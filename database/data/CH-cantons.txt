@@ -1,0 +1,26 @@
+AG	Aargau			Argovie				Argovia			Aargau			Argovia
+AI	Appenzell Innerrhoden	Appenzell Rhodes-Intérieures	Appenzello Interno	Appenzell Innerrhoden	Appenzell dadens
+AR	Appenzell Ausserrhoden	Appenzell Rhodes-Extérieures	Appenzello Esterno	Appenzell Ausserrhoden	Appenzell dador
+BS	Basel-City		Bâle-Ville			Basilea-Città		Basel-Stadt		Basilea-Citad
+BL	Basel-Land		Bâle-Campagne			Basilea-Campagna	Basel-Landschaft	Basilea-Champagna
+BE	Berne			Berne				Berna			Bern			Berna
+FR	Fribourg		Fribourg			Friburgo		Freiburg		Friburg
+GE	Geneva			Genève				Ginevra			Genf			Genevra
+GL	Glarus			Glaris				Glarona			Glarus			Glaruna
+GR	Graubünden		Grisons				Grigioni		Graubünden		Grischun
+JU	Jura			Jura				Giura			Jura			Giura
+LU	Lucerne			Lucerne				Lucerna			Luzern			Lucerna
+NE	Neuchâtel		Neuchâtel			Neuchâtel		Neuenburg		Neuchâtel
+NW	Nidwalden		Nidwald				Nidvaldo		Nidwalden		Sutsilvania
+OW	Obwalden		Obwald				Obvaldo			Obwalden		Sursilvania
+SH	Schaffhausen		Schaffhouse			Sciaffusa		Schaffhausen		Schaffusa
+SZ	Schwyz			Schwyz				Svitto			Schwyz			Sviz
+SO	Solothurn		Soleure				Soletta			Solothurn		Soloturn
+SG	St. Gallen		Saint-Gall			San Gallo		St. Gallen		Son Gagl
+TG	Thurgau			Thurgovie			Turgovia		Thurgau			Turgovia
+TI	Ticino			Tessin				Ticino			Tessin			Tessin
+UR	Uri			Uri				Uri			Uri			Uri
+VS	Valais			Valais				Vallese			Wallis			Vallais
+VD	Vaud			Vaud				Vaud			Waadt			Vad
+ZG	Zug			Zoug				Zugo			Zug			Zug
+ZH	Zurich			Zurich				Zurigo			Zürich			Turitg
