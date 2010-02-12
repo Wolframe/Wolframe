@@ -2,7 +2,7 @@
 // server.hpp
 // ~~~~~~~~~~
 //
-// Copyright (c) 2003-2010 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2008 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -30,23 +30,36 @@ public:
   /// Construct the server to listen on the specified TCP address and port, and
   /// serve up files from the given directory.
   explicit server(const std::string& address, const std::string& port,
-      const std::string& doc_root, std::size_t thread_pool_size);
+      const std::string& doc_root, std::size_t thread_pool_size,
+      long timeout_duration_ms);
 
   /// Run the server's io_service loop.
   void run();
 
-  /// Stop the server.
+  /// Stop the server. Outstanding asynchronous operations will be completed.
   void stop();
+
+  // Abort the server. Outstanding asynchronous operations will be aborted.
+  void abort();
 
 private:
   /// Handle completion of an asynchronous accept operation.
   void handle_accept(const boost::system::error_code& e);
 
+  /// Handle a request to stop the server.
+  void handle_stop();
+
   /// The number of threads that will call io_service::run().
   std::size_t thread_pool_size_;
 
+  /// The duration for timeouts in milliseconds.
+  long timeout_duration_ms_;
+
   /// The io_service used to perform asynchronous operations.
   boost::asio::io_service io_service_;
+
+  /// Strand to ensure the acceptor's handlers are not called concurrently.
+  boost::asio::io_service::strand strand_;
 
   /// Acceptor used to listen for incoming connections.
   boost::asio::ip::tcp::acceptor acceptor_;

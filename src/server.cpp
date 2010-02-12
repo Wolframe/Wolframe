@@ -2,7 +2,7 @@
 // server.cpp
 // ~~~~~~~~~~
 //
-// Copyright (c) 2003-2010 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2008 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -18,10 +18,14 @@ namespace http {
 namespace server3 {
 
 server::server(const std::string& address, const std::string& port,
-    const std::string& doc_root, std::size_t thread_pool_size)
+    const std::string& doc_root, std::size_t thread_pool_size,
+    long timeout_duration_ms)
   : thread_pool_size_(thread_pool_size),
+    timeout_duration_ms_(timeout_duration_ms),
+    strand_(io_service_),
     acceptor_(io_service_),
-    new_connection_(new connection(io_service_, request_handler_)),
+    new_connection_(new connection(io_service_, request_handler_,
+      timeout_duration_ms_)),
     request_handler_(doc_root)
 {
   // Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
@@ -33,8 +37,9 @@ server::server(const std::string& address, const std::string& port,
   acceptor_.bind(endpoint);
   acceptor_.listen();
   acceptor_.async_accept(new_connection_->socket(),
-      boost::bind(&server::handle_accept, this,
-        boost::asio::placeholders::error));
+      strand_.wrap(
+        boost::bind(&server::handle_accept, this,
+          boost::asio::placeholders::error)));
 }
 
 void server::run()
@@ -51,10 +56,23 @@ void server::run()
   // Wait for all threads in the pool to exit.
   for (std::size_t i = 0; i < threads.size(); ++i)
     threads[i]->join();
+
+  // Reset io_services.
+  io_service_.reset();
 }
 
 void server::stop()
 {
+  // Post a call to the stop function so that server::stop() is safe to call
+  // from any thread.
+  io_service_.post(
+      strand_.wrap(
+        boost::bind(&server::handle_stop, this)));
+}
+
+void server::abort()
+{
+  // Stop io_services the hard way.
   io_service_.stop();
 }
 
@@ -63,11 +81,21 @@ void server::handle_accept(const boost::system::error_code& e)
   if (!e)
   {
     new_connection_->start();
-    new_connection_.reset(new connection(io_service_, request_handler_));
+    new_connection_.reset(new connection(io_service_, request_handler_,
+      timeout_duration_ms_));
     acceptor_.async_accept(new_connection_->socket(),
-        boost::bind(&server::handle_accept, this,
-          boost::asio::placeholders::error));
+        strand_.wrap(
+          boost::bind(&server::handle_accept, this,
+            boost::asio::placeholders::error)));
   }
+}
+
+void server::handle_stop()
+{
+  // The server is stopped by closing the acceptor.
+  // When all outstanding operations are completed
+  // all calls to io_service::run() will return.
+  acceptor_.close();
 }
 
 } // namespace server3
