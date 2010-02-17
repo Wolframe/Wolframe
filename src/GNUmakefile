@@ -2,8 +2,9 @@ TOPDIR = ..
 
 SUBDIRS =
 
-INCLUDE_DIRS = \
-	-I$(TOPDIR)/include -I.
+INCLUDE_DIRS = -I. \
+	-I$(TOPDIR)/include \
+	-I$(TOPDIR)/3rdParty/include
 
 INCLUDE_LIBS = \
 
