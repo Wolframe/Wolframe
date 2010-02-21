@@ -8,8 +8,8 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef HTTP_SERVER3_SERVER_HPP
-#define HTTP_SERVER3_SERVER_HPP
+#ifndef NETWORK_SERVER_HPP_INCLUDED
+#define NETWORK_SERVER_HPP_INCLUDED
 
 #include <boost/asio.hpp>
 #include <string>
@@ -74,4 +74,4 @@ private:
 } // namespace server3
 } // namespace http
 
-#endif // HTTP_SERVER3_SERVER_HPP
+#endif // NETWORK_SERVER_HPP_INCLUDED

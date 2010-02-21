@@ -14,7 +14,6 @@
 #include <string>
 #include <vector>
 #include <boost/asio.hpp>
-#include "header.hpp"
 
 namespace http {
 namespace server3 {
@@ -42,9 +41,6 @@ struct reply
     bad_gateway = 502,
     service_unavailable = 503
   } status;
-
-  /// The headers to be included in the reply.
-  std::vector<header> headers;
 
   /// The content to be sent in the reply.
   std::string content;

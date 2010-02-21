@@ -3,8 +3,7 @@ TOPDIR = ..
 SUBDIRS =
 
 INCLUDE_DIRS = -I. \
-	-I$(TOPDIR)/include \
-	-I$(TOPDIR)/3rdParty/include
+	-I$(TOPDIR)/include
 
 INCLUDE_LIBS = \
 
@@ -21,7 +20,6 @@ OBJS = \
 	$(C_PORT_OBJS) \
 	$(STATIC_LIB_OBJS) \
 	connection.o \
-	mime_types.o \
 	posix_main.o \
 	reply.o \
 	request_handler.o \

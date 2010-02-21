@@ -8,8 +8,8 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef HTTP_SERVER3_CONNECTION_HPP
-#define HTTP_SERVER3_CONNECTION_HPP
+#ifndef NETWORK_CONNECTION_HPP_INCLUDED
+#define NETWORK_CONNECTION_HPP_INCLUDED
 
 #include <boost/asio.hpp>
 #include <boost/array.hpp>
@@ -85,4 +85,4 @@ typedef boost::shared_ptr<connection> connection_ptr;
 } // namespace server3
 } // namespace http
 
-#endif // HTTP_SERVER3_CONNECTION_HPP
+#endif // NETWORK_CONNECTION_HPP_INCLUDED

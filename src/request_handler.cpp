@@ -13,7 +13,6 @@
 #include <sstream>
 #include <string>
 #include <boost/lexical_cast.hpp>
-#include "mime_types.hpp"
 #include "reply.hpp"
 #include "request.hpp"
 
@@ -29,11 +28,6 @@ void request_handler::handle_request(const request& req, reply& rep)
 {
   // Decode url to path.
   std::string request_path;
-  if (!url_decode(req.uri, request_path))
-  {
-    rep = reply::stock_reply(reply::bad_request);
-    return;
-  }
 
   // Request path must be absolute and not contain "..".
   if (request_path.empty() || request_path[0] != '/'
@@ -72,11 +66,6 @@ void request_handler::handle_request(const request& req, reply& rep)
   char buf[512];
   while (is.read(buf, sizeof(buf)).gcount() > 0)
     rep.content.append(buf, is.gcount());
-  rep.headers.resize(2);
-  rep.headers[0].name = "Content-Length";
-  rep.headers[0].value = boost::lexical_cast<std::string>(rep.content.size());
-  rep.headers[1].name = "Content-Type";
-  rep.headers[1].value = mime_types::extension_to_type(extension);
 }
 
 bool request_handler::url_decode(const std::string& in, std::string& out)

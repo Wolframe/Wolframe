@@ -70,11 +70,13 @@ void server::stop()
         boost::bind(&server::handle_stop, this)));
 }
 
+
+// Stop io_services the hard way.
 void server::abort()
 {
-  // Stop io_services the hard way.
-  io_service_.stop();
+	io_service_.stop();
 }
+
 
 void server::handle_accept(const boost::system::error_code& e)
 {
@@ -90,13 +92,15 @@ void server::handle_accept(const boost::system::error_code& e)
   }
 }
 
+
+// The server is stopped by closing the acceptor.
+// When all outstanding operations are completed
+// all calls to io_service::run() will return.
 void server::handle_stop()
 {
-  // The server is stopped by closing the acceptor.
-  // When all outstanding operations are completed
-  // all calls to io_service::run() will return.
-  acceptor_.close();
+	acceptor_.close();
 }
+
 
 } // namespace server3
 } // namespace http
