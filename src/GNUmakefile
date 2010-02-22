@@ -8,7 +8,7 @@ INCLUDE_DIRS = -I. \
 INCLUDE_LIBS = \
 
 CPP_BINS = \
-	bunnyd$(EXE)
+	smerpd$(EXE)
 
 STATIC_LIBS = \
 
@@ -23,11 +23,11 @@ OBJS = \
 	posix_main.o \
 	reply.o \
 	request_handler.o \
-	request_parser.o \
+	requestParser.o \
 	server.o
 
-bunnyd$(EXE):	$(OBJS)
-	g++ -o bunnyd$(EXE) $(OBJS) -lboost_thread -lboost_system
+smerpd$(EXE):	$(OBJS)
+	g++ -o smerpd$(EXE) $(OBJS) -lboost_thread -lboost_system
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

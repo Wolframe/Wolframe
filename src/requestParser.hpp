@@ -1,15 +1,15 @@
 //
 // request_parser.hpp
 // ~~~~~~~~~~~~~~~~~~
-//
+// Based on boost asio http3 example
 // Copyright (c) 2003-2010 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef HTTP_SERVER3_REQUEST_PARSER_HPP
-#define HTTP_SERVER3_REQUEST_PARSER_HPP
+#ifndef MESSAGE_PARSER_HPP_INCLUDED
+#define MESSAGE_PARSER_HPP_INCLUDED
 
 #include <boost/logic/tribool.hpp>
 #include <boost/tuple/tuple.hpp>
@@ -93,4 +93,4 @@ private:
 } // namespace server3
 } // namespace http
 
-#endif // HTTP_SERVER3_REQUEST_PARSER_HPP
+#endif // MESSAGE_PARSER_HPP_INCLUDED
