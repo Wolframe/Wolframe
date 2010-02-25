@@ -8,11 +8,10 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef HTTP_SERVER3_REQUEST_HPP
-#define HTTP_SERVER3_REQUEST_HPP
+#ifndef SERVER_REQUEST_HPP_INCLUDED
+#define SERVER_REQUEST_HPP_INCLUDED
 
 #include <string>
-#include <vector>
 
 namespace http {
 namespace server3 {
@@ -20,10 +19,10 @@ namespace server3 {
 /// A request received from a client.
 struct request
 {
-  std::string method;
+	std::string method;
 };
 
 } // namespace server3
 } // namespace http
 
-#endif // HTTP_SERVER3_REQUEST_HPP
+#endif // SERVER_REQUEST_HPP_INCLUDED

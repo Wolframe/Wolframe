@@ -62,8 +62,7 @@ void connection::handle_read(const boost::system::error_code& e,
     if (result)
     {
       timer_.cancel();
-      timer_.expires_from_now(
-        boost::posix_time::milliseconds(timeout_duration_ms_));
+      timer_.expires_from_now(boost::posix_time::milliseconds(timeout_duration_ms_));
       timer_.async_wait(
           strand_.wrap(
             boost::bind(&connection::handle_timeout, shared_from_this(),
@@ -78,19 +77,18 @@ void connection::handle_read(const boost::system::error_code& e,
     else if (!result)
     {
       timer_.cancel();
-      timer_.expires_from_now(
-        boost::posix_time::milliseconds(timeout_duration_ms_));
+      timer_.expires_from_now(boost::posix_time::milliseconds(timeout_duration_ms_));
       timer_.async_wait(
           strand_.wrap(
             boost::bind(&connection::handle_timeout, shared_from_this(),
               boost::asio::placeholders::error)));
-
+/*
       reply_ = reply::stock_reply(reply::bad_request);
       boost::asio::async_write(socket_, reply_.to_buffers(),
           strand_.wrap(
             boost::bind(&connection::handle_write, shared_from_this(),
               boost::asio::placeholders::error)));
-    }
+*/    }
     else
     {
       socket_.async_read_some(boost::asio::buffer(buffer_),

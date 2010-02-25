@@ -8,8 +8,8 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef MESSAGE_PARSER_HPP_INCLUDED
-#define MESSAGE_PARSER_HPP_INCLUDED
+#ifndef REQUEST_PARSER_HPP_INCLUDED
+#define REQUEST_PARSER_HPP_INCLUDED
 
 #include <boost/logic/tribool.hpp>
 #include <boost/tuple/tuple.hpp>
@@ -93,4 +93,4 @@ private:
 } // namespace server3
 } // namespace http
 
-#endif // MESSAGE_PARSER_HPP_INCLUDED
+#endif // REQUEST_PARSER_HPP_INCLUDED
