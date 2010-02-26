@@ -19,9 +19,9 @@ namespace http {
 namespace server3 {
 
 /// A reply to be sent to a client.
-class reply
+struct reply
 {
-private:
+//private:
   /// The content to be sent in the reply.
   std::string content;
 

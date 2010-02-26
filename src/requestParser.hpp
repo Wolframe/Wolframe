@@ -51,17 +51,6 @@ private:
   /// Handle the next character of input.
   boost::tribool consume(request& req, char input);
 
-  /// Check if a byte is an HTTP character.
-  static bool is_char(int c);
-
-  /// Check if a byte is an HTTP control character.
-  static bool is_ctl(int c);
-
-  /// Check if a byte is defined as an HTTP tspecial character.
-  static bool is_tspecial(int c);
-
-  /// Check if a byte is a digit.
-  static bool is_digit(int c);
 
   /// The current state of the parser.
   enum state

@@ -8,8 +8,8 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef HTTP_SERVER3_REQUEST_HANDLER_HPP
-#define HTTP_SERVER3_REQUEST_HANDLER_HPP
+#ifndef REQUEST_HANDLER_HPP_INCLUDED
+#define REQUEST_HANDLER_HPP_INCLUDED
 
 #include <string>
 #include <boost/noncopyable.hpp>
@@ -26,7 +26,7 @@ class request_handler
 {
 public:
   /// Construct with a directory containing files to be served.
-  explicit request_handler(const std::string& doc_root);
+  explicit request_handler();
 
   /// Handle a request and produce a reply.
   void handle_request(const request& req, reply& rep);
@@ -37,4 +37,4 @@ private:
 } // namespace server3
 } // namespace http
 
-#endif // HTTP_SERVER3_REQUEST_HANDLER_HPP
+#endif // REQUEST_HANDLER_HPP_INCLUDED

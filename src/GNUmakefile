@@ -19,12 +19,13 @@ C_PORT_OBJS = \
 OBJS = \
 	$(C_PORT_OBJS) \
 	$(STATIC_LIB_OBJS) \
-	connection.o \
 	posix_main.o \
 	reply.o \
-	request_handler.o \
+	server.o\
+	connection.o \
 	requestParser.o \
-	server.o
+	requestHandler.o
+
 
 smerpd$(EXE):	$(OBJS)
 	g++ -o smerpd$(EXE) $(OBJS) -lboost_thread -lboost_system

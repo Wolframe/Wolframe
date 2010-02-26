@@ -17,7 +17,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include "connection.hpp"
-#include "request_handler.hpp"
+#include "requestHandler.hpp"
 
 namespace http {
 namespace server3 {
@@ -30,7 +30,7 @@ public:
   /// Construct the server to listen on the specified TCP address and port, and
   /// serve up files from the given directory.
   explicit server(const std::string& address, const std::string& port,
-      const std::string& doc_root, std::size_t thread_pool_size,
+      std::size_t thread_pool_size,
       long timeout_duration_ms);
 
   /// Run the server's io_service loop.

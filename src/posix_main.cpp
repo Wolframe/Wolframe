@@ -28,7 +28,6 @@ int main(int argc, char* argv[])
 		long timeout_duration_ms = 5000;
 		std::string port = "8080";
 		std::string address = "0.0.0.0";
-		std::string server_data = "blabla";
 
 		// Block all signals for background thread.
 		sigset_t new_mask;
@@ -37,7 +36,7 @@ int main(int argc, char* argv[])
 		pthread_sigmask(SIG_BLOCK, &new_mask, &old_mask);
 
 		// Run server in background thread(s).
-		http::server3::server s( address, port, server_data, num_threads, timeout_duration_ms);
+		http::server3::server s( address, port, num_threads, timeout_duration_ms);
 		boost::thread t(boost::bind(&http::server3::server::run, &s));
 
 		// Restore previous signals.

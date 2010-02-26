@@ -18,7 +18,7 @@
 #include <boost/enable_shared_from_this.hpp>
 #include "reply.hpp"
 #include "request.hpp"
-#include "request_handler.hpp"
+#include "requestHandler.hpp"
 #include "requestParser.hpp"
 
 namespace http {

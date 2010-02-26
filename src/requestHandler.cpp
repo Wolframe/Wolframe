@@ -1,6 +1,6 @@
 //
-// request.hpp
-// ~~~~~~~~~~~
+// request_handler.cpp
+// ~~~~~~~~~~~~~~~~~~~
 //
 // Copyright (c) 2003-2010 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
@@ -8,21 +8,25 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef SERVER_REQUEST_HPP_INCLUDED
-#define SERVER_REQUEST_HPP_INCLUDED
-
+#include "requestHandler.hpp"
+#include <fstream>
+#include <sstream>
 #include <string>
+#include "reply.hpp"
+#include "request.hpp"
 
 namespace http {
 namespace server3 {
 
-/// A request received from a client.
-struct request
+request_handler::request_handler()
 {
-	std::string content;
-};
+}
+
+void request_handler::handle_request(const request& req, reply& rep)
+{
+    rep.content = req.content;
+}
+
 
 } // namespace server3
 } // namespace http
-
-#endif // SERVER_REQUEST_HPP_INCLUDED
