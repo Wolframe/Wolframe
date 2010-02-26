@@ -35,6 +35,8 @@ boost::asio::ip::tcp::socket& connection::socket()
 
 void connection::start()
 {
+      boost::asio::write(socket_, boost::asio::buffer("Bla bla bla\n"));
+
   socket_.async_read_some(boost::asio::buffer(buffer_),
       strand_.wrap(
         boost::bind(&connection::handle_read, shared_from_this(),
@@ -129,6 +131,8 @@ void connection::handle_write(const boost::system::error_code& e)
 void connection::handle_timeout(const boost::system::error_code& e)
 {
 	if (!e)	{
+	      boost::asio::write(socket_, boost::asio::buffer("Timeout :P\n"));
+
 		boost::system::error_code ignored_ec;
 		socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
 	}
