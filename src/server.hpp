@@ -1,11 +1,5 @@
 //
 // server.hpp
-// ~~~~~~~~~~
-//
-// Copyright (c) 2003-2008 Christopher M. Kohlhoff (chris at kohlhoff dot com)
-//
-// Distributed under the Boost Software License, Version 1.0. (See accompanying
-// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
 #ifndef NETWORK_SERVER_HPP_INCLUDED
@@ -39,7 +33,7 @@ public:
   /// Stop the server. Outstanding asynchronous operations will be completed.
   void stop();
 
-  // Abort the server. Outstanding asynchronous operations will be aborted.
+  /// Abort the server. Outstanding asynchronous operations will be aborted.
   void abort();
 
 private:
@@ -49,26 +43,18 @@ private:
   /// Handle a request to stop the server.
   void handle_stop();
 
-  /// The number of threads that will call io_service::run().
-  std::size_t thread_pool_size_;
 
-  /// The duration for timeouts in milliseconds.
-  long timeout_duration_ms_;
+	std::size_t thread_pool_size_;			// The number of threads that will call io_service::run().
+	long timeout_duration_ms_;			// The duration for timeouts in milliseconds.
+	boost::asio::io_service io_service_;		// The io_service used to perform asynchronous operations.
 
-  /// The io_service used to perform asynchronous operations.
-  boost::asio::io_service io_service_;
+	boost::asio::io_service::strand strand_;	// Strand to ensure the acceptor's handlers are not called concurrently.
 
-  /// Strand to ensure the acceptor's handlers are not called concurrently.
-  boost::asio::io_service::strand strand_;
+	boost::asio::ip::tcp::acceptor acceptor_;	// Acceptor used to listen for incoming connections.
 
-  /// Acceptor used to listen for incoming connections.
-  boost::asio::ip::tcp::acceptor acceptor_;
+	connection_ptr new_connection_;			// The next connection to be accepted.
 
-  /// The next connection to be accepted.
-  connection_ptr new_connection_;
-
-  /// The handler for all incoming requests.
-  request_handler request_handler_;
+	request_handler request_handler_;		// The handler for all incoming requests.
 };
 
 } // namespace server3

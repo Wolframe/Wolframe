@@ -19,7 +19,7 @@ C_PORT_OBJS = \
 OBJS = \
 	$(C_PORT_OBJS) \
 	$(STATIC_LIB_OBJS) \
-	posix_main.o \
+	posixMain.o \
 	reply.o \
 	server.o\
 	connection.o \
