@@ -2,16 +2,14 @@
 // reply.hpp
 //
 
-#ifndef SERVER_REPLY_HPP_INCLUDED
-#define SERVER_REPLY_HPP_INCLUDED
+#ifndef _REPLY_HPP_INCLUDED
+#define _REPLY_HPP_INCLUDED
 
 #include <string>
 #include <vector>
 #include <boost/asio.hpp>
 
-namespace http {
-namespace server3 {
-
+namespace _SMERP {
 
 	/// A reply to be sent to a client.
 	struct reply
@@ -27,7 +25,7 @@ namespace server3 {
 		std::vector<boost::asio::const_buffer> to_buffers();
 	};
 
-} // namespace server3
-} // namespace http
 
-#endif // SERVER_REPLY_HPP_INCLUDED
+} // namespace _SMERP
+
+#endif // _REPLY_HPP_INCLUDED

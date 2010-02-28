@@ -7,8 +7,7 @@
 #include <boost/bind.hpp>
 #include "requestHandler.hpp"
 
-namespace http {
-namespace server3 {
+namespace _SMERP {
 
 connection::connection(boost::asio::io_service& io_service,
     request_handler& handler, long timeout_duration_ms)
@@ -133,5 +132,4 @@ void connection::handle_timeout(const boost::system::error_code& e)
 }
 
 
-} // namespace server3
-} // namespace http
+} // namespace _SMERP

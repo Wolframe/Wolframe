@@ -2,21 +2,22 @@
 // request.hpp
 //
 
-#ifndef SERVER_REQUEST_HPP_INCLUDED
-#define SERVER_REQUEST_HPP_INCLUDED
+#ifndef _REQUEST_HPP_INCLUDED
+#define _REQUEST_HPP_INCLUDED
 
 #include <string>
 
-namespace http {
-namespace server3 {
 
-/// A request received from a client.
-struct request
+namespace _SMERP {
+
+
+// A request received from a client.
+class request
 {
 	std::string content;
 };
 
-} // namespace server3
-} // namespace http
 
-#endif // SERVER_REQUEST_HPP_INCLUDED
+} // namespace _SMERP
+
+#endif // _REQUEST_HPP_INCLUDED

@@ -30,8 +30,8 @@ int main(int argc, char* argv[])
 		pthread_sigmask(SIG_BLOCK, &new_mask, &old_mask);
 
 		// Run server in background thread(s).
-		http::server3::server s( address, port, num_threads, timeout_duration_ms);
-		boost::thread t(boost::bind(&http::server3::server::run, &s));
+		_SMERP::server s( address, port, num_threads, timeout_duration_ms);
+		boost::thread t(boost::bind(&_SMERP::server::run, &s));
 
 		// Restore previous signals.
 		pthread_sigmask(SIG_SETMASK, &old_mask, 0);

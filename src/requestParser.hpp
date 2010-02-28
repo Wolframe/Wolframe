@@ -1,11 +1,5 @@
 //
-// request_parser.hpp
-// ~~~~~~~~~~~~~~~~~~
-// Based on boost asio http3 example
-// Copyright (c) 2003-2010 Christopher M. Kohlhoff (chris at kohlhoff dot com)
-//
-// Distributed under the Boost Software License, Version 1.0. (See accompanying
-// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+// requestParser.hpp
 //
 
 #ifndef REQUEST_PARSER_HPP_INCLUDED
@@ -14,8 +8,7 @@
 #include <boost/logic/tribool.hpp>
 #include <boost/tuple/tuple.hpp>
 
-namespace http {
-namespace server3 {
+namespace _SMERP {
 
 struct request;
 
@@ -59,15 +52,15 @@ private:
     method,
     uri_start,
     uri,
-    http_version_h,
-    http_version_t_1,
-    http_version_t_2,
-    http_version_p,
-    http_version_slash,
-    http_version_major_start,
-    http_version_major,
-    http_version_minor_start,
-    http_version_minor,
+    _SMERP_version_h,
+    _SMERP_version_t_1,
+    _SMERP_version_t_2,
+    _SMERP_version_p,
+    _SMERP_version_slash,
+    _SMERP_version_major_start,
+    _SMERP_version_major,
+    _SMERP_version_minor_start,
+    _SMERP_version_minor,
     expecting_newline_1,
     header_line_start,
     header_lws,
@@ -79,7 +72,6 @@ private:
   } state_;
 };
 
-} // namespace server3
-} // namespace http
+} // namespace _SMERP
 
 #endif // REQUEST_PARSER_HPP_INCLUDED

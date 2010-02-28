@@ -13,8 +13,7 @@
 #include "connection.hpp"
 #include "requestHandler.hpp"
 
-namespace http {
-namespace server3 {
+namespace _SMERP {
 
 /// The top-level class of the HTTP server.
 class server
@@ -57,7 +56,6 @@ private:
 	request_handler request_handler_;		// The handler for all incoming requests.
 };
 
-} // namespace server3
-} // namespace http
+} // namespace _SMERP
 
 #endif // NETWORK_SERVER_HPP_INCLUDED

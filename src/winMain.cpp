@@ -36,22 +36,22 @@ int main(int argc, char* argv[])
     // Check command line arguments.
     if (argc != 6)
     {
-      std::cerr << "Usage: http_server <address> <port> <threads> <timeout_duration_ms> <doc_root>\n";
+      std::cerr << "Usage: _SMERP_server <address> <port> <threads> <timeout_duration_ms> <doc_root>\n";
       std::cerr << "  For IPv4, try:\n";
-      std::cerr << "    http_server 0.0.0.0 80 1 5000.\n";
+      std::cerr << "    _SMERP_server 0.0.0.0 80 1 5000.\n";
       std::cerr << "  For IPv6, try:\n";
-      std::cerr << "    http_server 0::0 80 1 5000.\n";
+      std::cerr << "    _SMERP_server 0::0 80 1 5000.\n";
       return 1;
     }
 
     // Initialise server.
     std::size_t num_threads = boost::lexical_cast<std::size_t>(argv[3]);
     long timeout_duration_ms = boost::lexical_cast<long>(argv[4]);
-    http::server3::server s(argv[1], argv[2], argv[5], num_threads,
+    _SMERP::server s(argv[1], argv[2], argv[5], num_threads,
       timeout_duration_ms);
 
     // Set console control handler to allow server to be stopped.
-    console_ctrl_function = boost::bind(&http::server3::server::stop, &s);
+    console_ctrl_function = boost::bind(&_SMERP::server::stop, &s);
     SetConsoleCtrlHandler(console_ctrl_handler, TRUE);
 
     // Run the server until stopped.

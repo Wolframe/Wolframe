@@ -15,8 +15,7 @@
 #include "requestHandler.hpp"
 #include "requestParser.hpp"
 
-namespace http {
-namespace server3 {
+namespace _SMERP {
 
 /// Represents a single connection from a client.
 class connection
@@ -76,7 +75,7 @@ private:
 
 typedef boost::shared_ptr<connection> connection_ptr;
 
-} // namespace server3
-} // namespace http
+
+} // namespace _SMERP
 
 #endif // NETWORK_CONNECTION_HPP_INCLUDED

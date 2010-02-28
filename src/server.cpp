@@ -8,8 +8,7 @@
 #include <boost/shared_ptr.hpp>
 #include <vector>
 
-namespace http {
-namespace server3 {
+namespace _SMERP {
 
 server::server(const std::string& address, const std::string& port, std::size_t thread_pool_size,
     long timeout_duration_ms)
@@ -94,5 +93,4 @@ void server::handle_stop()
 }
 
 
-} // namespace server3
-} // namespace http
+} // namespace _SMERP
