@@ -112,7 +112,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="c:\boost"
+				AdditionalIncludeDirectories="c:\boost\include\boost-1_42"
 				PreprocessorDefinitions="_WIN32_WINNT=0x0500"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -131,7 +131,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalLibraryDirectories="c:\boost"
+				AdditionalLibraryDirectories="c:\boost\lib"
 				GenerateDebugInformation="true"
 				TargetMachine="17"
 			/>
@@ -256,7 +256,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="c:\boost"
+				AdditionalIncludeDirectories="c:\boost\include\boost-1_42"
 				PreprocessorDefinitions="_WIN32_WINNT=0x0500"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -274,7 +274,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalLibraryDirectories="c:\boost"
+				AdditionalLibraryDirectories="c:\boost\lib"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"

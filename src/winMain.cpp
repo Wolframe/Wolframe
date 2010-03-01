@@ -33,22 +33,13 @@ int main(int argc, char* argv[])
 {
   try
   {
-    // Check command line arguments.
-    if (argc != 6)
-    {
-      std::cerr << "Usage: _SMERP_server <address> <port> <threads> <timeout_duration_ms> <doc_root>\n";
-      std::cerr << "  For IPv4, try:\n";
-      std::cerr << "    _SMERP_server 0.0.0.0 80 1 5000.\n";
-      std::cerr << "  For IPv6, try:\n";
-      std::cerr << "    _SMERP_server 0::0 80 1 5000.\n";
-      return 1;
-    }
+		// get configuration !!!!
+		std::size_t num_threads = 4;
+		long timeout_duration_ms = 5000;
+		std::string port = "8080";
+		std::string address = "0.0.0.0";
 
-    // Initialise server.
-    std::size_t num_threads = boost::lexical_cast<std::size_t>(argv[3]);
-    long timeout_duration_ms = boost::lexical_cast<long>(argv[4]);
-    _SMERP::server s(argv[1], argv[2], argv[5], num_threads,
-      timeout_duration_ms);
+		_SMERP::server s(address, port, num_threads, timeout_duration_ms);
 
     // Set console control handler to allow server to be stopped.
     console_ctrl_function = boost::bind(&_SMERP::server::stop, &s);

@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SMERP", "SMERP.vcproj", "{225CD180-2A85-400B-8EE3-ACC5D1008C2A}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Server", "WindowsSetup\Server\Server.vdproj", "{6AE34B18-B2FB-4FB3-A992-FFB818F91FBC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -19,6 +21,10 @@ Global
 		{225CD180-2A85-400B-8EE3-ACC5D1008C2A}.Release|Win32.Build.0 = Release|Win32
 		{225CD180-2A85-400B-8EE3-ACC5D1008C2A}.Release|x64.ActiveCfg = Release|x64
 		{225CD180-2A85-400B-8EE3-ACC5D1008C2A}.Release|x64.Build.0 = Release|x64
+		{6AE34B18-B2FB-4FB3-A992-FFB818F91FBC}.Debug|Win32.ActiveCfg = Debug
+		{6AE34B18-B2FB-4FB3-A992-FFB818F91FBC}.Debug|x64.ActiveCfg = Debug
+		{6AE34B18-B2FB-4FB3-A992-FFB818F91FBC}.Release|Win32.ActiveCfg = Release
+		{6AE34B18-B2FB-4FB3-A992-FFB818F91FBC}.Release|x64.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
