@@ -13,7 +13,6 @@
 #include "reply.hpp"
 #include "request.hpp"
 #include "requestHandler.hpp"
-#include "requestParser.hpp"
 
 namespace _SMERP {
 
@@ -58,9 +57,6 @@ private:
 
   /// The incoming request.
   request request_;
-
-  /// The parser for the incoming request.
-  request_parser request_parser_;
 
   /// The reply to be sent back to the client.
   reply reply_;

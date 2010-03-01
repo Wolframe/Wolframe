@@ -23,7 +23,6 @@ OBJS = \
 	reply.o \
 	server.o\
 	connection.o \
-	requestParser.o \
 	requestHandler.o
 
 
