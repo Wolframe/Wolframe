@@ -332,19 +332,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\request_handler.cpp"
+				RelativePath=".\src\requestHandler.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\request_handler.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\requestParser.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\requestParser.hpp"
+				RelativePath=".\src\requestHandler.hpp"
 				>
 			</File>
 			<File
@@ -356,7 +348,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\win_main.cpp"
+				RelativePath=".\src\winMain.cpp"
 				>
 			</File>
 		</Filter>
