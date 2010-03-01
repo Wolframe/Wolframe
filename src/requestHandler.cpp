@@ -1,21 +1,21 @@
 //
-// request_handler.cpp
+// requestHandler.cpp
 //
 
 #include "requestHandler.hpp"
-#include <fstream>
-#include <sstream>
-#include <string>
 #include "reply.hpp"
 #include "request.hpp"
 
+#include <string>
+
+
 namespace _SMERP {
 
-request_handler::request_handler()
+requestHandler::requestHandler()
 {
 }
 
-void request_handler::handle_request(const request& req, reply& rep)
+void requestHandler::handleRequest(const request& req, reply& rep)
 {
     rep.content = req.content;
 }

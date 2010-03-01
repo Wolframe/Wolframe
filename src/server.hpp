@@ -53,7 +53,7 @@ private:
 
 	connection_ptr new_connection_;			// The next connection to be accepted.
 
-	request_handler request_handler_;		// The handler for all incoming requests.
+	requestHandler requestHandler_;		// The handler for all incoming requests.
 };
 
 } // namespace _SMERP

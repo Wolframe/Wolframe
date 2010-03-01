@@ -10,10 +10,10 @@
 namespace _SMERP {
 
 connection::connection(boost::asio::io_service& io_service,
-    request_handler& handler, long timeout_duration_ms)
+    requestHandler& handler, long timeout_duration_ms)
   : strand_(io_service),
     socket_(io_service),
-    request_handler_(handler),
+    requestHandler_(handler),
     timer_(io_service),
     timeout_duration_ms_(timeout_duration_ms)
 {
@@ -63,7 +63,7 @@ void connection::handle_read(const boost::system::error_code& e,
             boost::bind(&connection::handle_timeout, shared_from_this(),
               boost::asio::placeholders::error)));
 
-      request_handler_.handle_request(request_, reply_);
+      requestHandler_.handleRequest(request_, reply_);
       boost::asio::async_write(socket_, reply_.to_buffers(),
           strand_.wrap(
             boost::bind(&connection::handle_write, shared_from_this(),

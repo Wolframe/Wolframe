@@ -12,11 +12,12 @@
 namespace _SMERP {
 
 	/// A reply to be sent to a client.
-	struct reply
+	class reply
 	{
-		//private:
-		/// The content to be sent in the reply.
-		std::string content;
+	friend class requestHandler;
+
+	private:
+		std::string content;		/// The content to be sent in the reply.
 
 	public:
 		/// Convert the reply into a vector of buffers. The buffers do not own the

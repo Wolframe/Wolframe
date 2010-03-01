@@ -8,13 +8,7 @@
 namespace _SMERP {
 
 request_parser::request_parser()
-  : state_(method_start)
 {
-}
-
-void request_parser::reset()
-{
-  state_ = method_start;
 }
 
 boost::tribool request_parser::consume(request& req, char input)

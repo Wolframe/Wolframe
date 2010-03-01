@@ -14,6 +14,8 @@ namespace _SMERP {
 // A request received from a client.
 class request
 {
+	friend class requestHandler;
+
 	std::string content;
 };
 

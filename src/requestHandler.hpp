@@ -2,31 +2,30 @@
 // requestHandler.hpp
 //
 
-#ifndef REQUEST_HANDLER_HPP_INCLUDED
-#define REQUEST_HANDLER_HPP_INCLUDED
+#ifndef _REQUEST_HANDLER_HPP_INCLUDED
+#define _REQUEST_HANDLER_HPP_INCLUDED
 
-#include <string>
 #include <boost/noncopyable.hpp>
 
 namespace _SMERP {
 
-struct reply;
-struct request;
+class reply;
+class request;
 
 /// The common handler for all incoming requests.
-class request_handler
+class requestHandler
   : private boost::noncopyable
 {
 public:
   /// Construct with a directory containing files to be served.
-  explicit request_handler();
+  explicit requestHandler();
 
   /// Handle a request and produce a reply.
-  void handle_request(const request& req, reply& rep);
+  void handleRequest(const request& req, reply& rep);
 
 private:
 };
 
 } // namespace _SMERP
 
-#endif // REQUEST_HANDLER_HPP_INCLUDED
+#endif // _REQUEST_HANDLER_HPP_INCLUDED
