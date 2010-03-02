@@ -15,9 +15,9 @@ requestHandler::requestHandler()
 {
 }
 
-void requestHandler::handleRequest(const request& req, reply& rep)
+void requestHandler::handleRequest( const request& req, reply& rep )
 {
-    rep.content = req.content;
+	rep.setValue( req.getValue() );
 }
 
 

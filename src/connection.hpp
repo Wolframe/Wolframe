@@ -41,7 +41,7 @@ private:
   void handle_write(const boost::system::error_code& e);
 
   /// Handle completion of a timer operation.
-  void handle_timeout(const boost::system::error_code& e);
+  void handleTimeout( const boost::system::error_code& e );
 
   /// Strand to ensure the connection's handlers are not called concurrently.
   boost::asio::io_service::strand strand_;
@@ -65,7 +65,7 @@ private:
   boost::asio::deadline_timer timer_;
 
   /// The duration for timeouts in milliseconds.
-  long timeout_duration_ms_;
+  long timeoutDuration_;
 
 };
 
