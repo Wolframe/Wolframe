@@ -19,7 +19,7 @@ public:
 	explicit requestHandler();
 
 	/// Handle a request and produce a reply.
-	void handleRequest( const request& req, reply& rep );
+	void handleRequest( request& req, reply& rep );
 
 private:
 };

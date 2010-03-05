@@ -15,7 +15,7 @@ requestHandler::requestHandler()
 {
 }
 
-void requestHandler::handleRequest( const request& req, reply& rep )
+void requestHandler::handleRequest( request& req, reply& rep )
 {
 	rep.setValue( req.getValue() );
 }

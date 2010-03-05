@@ -27,40 +27,41 @@ boost::asio::ip::tcp::socket& connection::socket()
 
 void connection::start()
 {
-	boost::asio::write(socket_, boost::asio::buffer("Bla bla bla\n"));
+	boost::asio::write(socket_, boost::asio::buffer( "Welcome to bla bla bla\n" ));
 
 	socket_.async_read_some( boost::asio::buffer( buffer_),
-							strand_.wrap( boost::bind( &connection::handle_read, shared_from_this(),
-														boost::asio::placeholders::error,
-														boost::asio::placeholders::bytes_transferred )));
+				strand_.wrap( boost::bind( &connection::handle_read, shared_from_this(),
+							boost::asio::placeholders::error,
+							boost::asio::placeholders::bytes_transferred )));
 
 	timer_.expires_from_now( boost::posix_time::milliseconds( timeoutDuration_ ));
 	timer_.async_wait( strand_.wrap( boost::bind( &connection::handleTimeout, shared_from_this(),
-													boost::asio::placeholders::error )));
+							boost::asio::placeholders::error )));
 }
 
 
 void connection::handle_read( const boost::system::error_code& e, std::size_t bytes_transferred )
 {
 	if ( !e )	{
-		bool result = request_.parse( buffer_.data(), buffer_.data() + bytes_transferred );
+		request_.parse( buffer_.data(), buffer_.data() + bytes_transferred );
 
-		if ( result )	{
-			timer_.cancel();
-			timer_.expires_from_now( boost::posix_time::milliseconds( timeoutDuration_ ));
-			timer_.async_wait( strand_.wrap( boost::bind( &connection::handleTimeout, shared_from_this(),
-															boost::asio::placeholders::error )));
+		switch ( request_.status())	{
+			case request::READY:
+				timer_.cancel();
+				timer_.expires_from_now( boost::posix_time::milliseconds( timeoutDuration_ ));
+				timer_.async_wait( strand_.wrap( boost::bind( &connection::handleTimeout, shared_from_this(),
+									boost::asio::placeholders::error )));
 
-			requestHandler_.handleRequest( request_, reply_ );
-			boost::asio::async_write( socket_, reply_.toBuffers(),
-										strand_.wrap( boost::bind( &connection::handle_write, shared_from_this(),
-																	boost::asio::placeholders::error )));
-		}
-		else	{
-			socket_.async_read_some( boost::asio::buffer( buffer_ ),
-									strand_.wrap( boost::bind( &connection::handle_read, shared_from_this(),
-																boost::asio::placeholders::error,
-																boost::asio::placeholders::bytes_transferred )));
+				requestHandler_.handleRequest( request_, reply_ );
+				boost::asio::async_write( socket_, reply_.toBuffers(),
+						strand_.wrap( boost::bind( &connection::handle_write, shared_from_this(),
+										boost::asio::placeholders::error )));
+			case request::EMPTY:
+			case request::PARSING:
+				socket_.async_read_some( boost::asio::buffer( buffer_ ),
+						strand_.wrap( boost::bind( &connection::handle_read, shared_from_this(),
+										boost::asio::placeholders::error,
+										boost::asio::placeholders::bytes_transferred )));
 			}
 	}
 
