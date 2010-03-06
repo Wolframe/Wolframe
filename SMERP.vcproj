@@ -43,7 +43,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="c:\boost"
+				AdditionalIncludeDirectories="c:\boost\include\boost-1_42"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -61,6 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalLibraryDirectories="C:\boost\lib"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
 			/>
@@ -325,6 +326,10 @@
 			</File>
 			<File
 				RelativePath=".\src\reply.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\request.cpp"
 				>
 			</File>
 			<File
