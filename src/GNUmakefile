@@ -20,6 +20,7 @@ OBJS = \
 	$(C_PORT_OBJS) \
 	$(STATIC_LIB_OBJS) \
 	posixMain.o \
+	request.o \
 	reply.o \
 	server.o\
 	connection.o \

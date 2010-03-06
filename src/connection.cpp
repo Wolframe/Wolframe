@@ -77,6 +77,8 @@ void connection::handle_write( const boost::system::error_code& e )
 		// Cancel timer.
 		timer_.cancel();
 
+		boost::asio::write(socket_, boost::asio::buffer("Bye.\n"));
+
 		// Initiate graceful connection closure.
 		boost::system::error_code ignored_ec;
 		socket_.shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );

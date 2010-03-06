@@ -17,7 +17,9 @@ requestHandler::requestHandler()
 
 void requestHandler::handleRequest( request& req, reply& rep )
 {
-	rep.setValue( req.getValue() );
+	std::string msg = req.getValue();
+	msg += '\n';
+	rep.setValue( msg );
 }
 
 

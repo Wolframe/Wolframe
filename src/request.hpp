@@ -26,23 +26,11 @@ private:
 	parseStatus_t	status_;
 public:
 
-	request()
-	{
-		status_ = EMPTY;
-	}
+	request()	{ status_ = EMPTY; }
 
-/// Parse some data. The InputIterator return value indicates how much of the
+/// Parse some data. The return value indicates how much of the
 /// input has been consumed.
-
-template <typename InputIterator> InputIterator parse( InputIterator begin, InputIterator end )
-{
-	while ( begin != end )	{
-		if ( *begin != '\n' )
-			content_ += *begin;
-		begin++;
-	}
-	return ( begin );
-}
+	char *parse( char *begin, char *end );
 
 	std::string& getValue()	{ return content_; }
 	parseStatus_t status() 	{ return status_; }

@@ -20,3 +20,4 @@ database/data/countries.csv
 database/data/currencies.csv
 src/posixMain.cpp
 src/winMain.cpp
+src/request.cpp
