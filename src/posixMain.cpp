@@ -7,10 +7,11 @@
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
-#include "server.hpp"
+#include "appInstance.hpp"
 #include "commandLine.hpp"
 #include "configFile.hpp"
 #include "serverConfig.hpp"
+#include "server.hpp"
 
 #if !defined(_WIN32)
 
@@ -26,9 +27,9 @@ int main(int argc, char* argv[])
 		std::string port = "8080";
 		std::string address = "0.0.0.0";
 
-		_SMERP::cmdLineConfig	cmdLine;
-		_SMERP::cfgFileConfig	cfgFile;
-		_SMERP::serverConfig	*config = new _SMERP::serverConfig;
+		_SMERP::AppInstance	app;
+		_SMERP::CmdLineConfig	cmdLine;
+		_SMERP::CfgFileConfig	cfgFile;
 
 		// Block all signals for background thread.
 		sigset_t new_mask;

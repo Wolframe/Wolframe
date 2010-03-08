@@ -5,7 +5,7 @@
 
 namespace _SMERP	{
 
-	struct cfgFileConfig	{
+	struct CfgFileConfig	{
 		std::string	user;
 		std::string	group;
 		std::string	serverAddress;

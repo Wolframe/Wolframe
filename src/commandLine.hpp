@@ -5,7 +5,7 @@
 
 namespace _SMERP	{
 
-	struct cmdLineConfig	{
+	struct CmdLineConfig	{
 		std::string	user;
 		std::string	group;
 		std::string	serverAddress;
@@ -14,6 +14,6 @@ namespace _SMERP	{
 		unsigned short	logLevel;
 	};
 
-}
+} // namespace _SMERP
 
 #endif // _COMMANDLINE_HPP_INCLUDED
