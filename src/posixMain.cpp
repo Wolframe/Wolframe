@@ -8,6 +8,9 @@
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
 #include "server.hpp"
+#include "commandLine.hpp"
+#include "configFile.hpp"
+#include "serverConfig.hpp"
 
 #if !defined(_WIN32)
 
@@ -22,6 +25,10 @@ int main(int argc, char* argv[])
 		long timeout_duration_ms = 5000;
 		std::string port = "8080";
 		std::string address = "0.0.0.0";
+
+		_SMERP::cmdLineConfig	cmdLine;
+		_SMERP::cfgFileConfig	cfgFile;
+		_SMERP::serverConfig	*config = new _SMERP::serverConfig;
 
 		// Block all signals for background thread.
 		sigset_t new_mask;

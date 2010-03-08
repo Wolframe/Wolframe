@@ -21,3 +21,8 @@ database/data/currencies.csv
 src/posixMain.cpp
 src/winMain.cpp
 src/request.cpp
+src/serverConfig.hpp
+src/commandLine.hpp
+src/configFile.hpp
+src/configFile.cpp
+src/commandLine.cpp

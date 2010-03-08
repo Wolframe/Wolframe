@@ -54,11 +54,9 @@ void server::run()
 
 void server::stop()
 {
-  // Post a call to the stop function so that server::stop() is safe to call
-  // from any thread.
-  io_service_.post(
-      strand_.wrap(
-        boost::bind(&server::handle_stop, this)));
+	// Post a call to the stop function so that server::stop() is safe to call
+	// from any thread.
+	io_service_.post( strand_.wrap( boost::bind( &server::handleStop, this )));
 }
 
 
@@ -87,7 +85,7 @@ void server::handle_accept(const boost::system::error_code& e)
 // The server is stopped by closing the acceptor.
 // When all outstanding operations are completed
 // all calls to io_service::run() will return.
-void server::handle_stop()
+void server::handleStop()
 {
 	acceptor_.close();
 }

@@ -39,8 +39,8 @@ private:
   /// Handle completion of an asynchronous accept operation.
   void handle_accept(const boost::system::error_code& e);
 
-  /// Handle a request to stop the server.
-  void handle_stop();
+	/// Handle a request to stop the server.
+	void handleStop();
 
 
 	std::size_t thread_pool_size_;			// The number of threads that will call io_service::run().
