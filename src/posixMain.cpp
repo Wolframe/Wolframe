@@ -18,7 +18,7 @@
 #include <pthread.h>
 #include <signal.h>
 
-int main(int argc, char* argv[])
+int main( int argc, char* argv[] )
 {
 	try	{
 		// get configuration !!!!
@@ -28,8 +28,8 @@ int main(int argc, char* argv[])
 		std::string address = "0.0.0.0";
 
 		_SMERP::AppInstance	app;
-		_SMERP::CmdLineConfig	cmdLine;
-		_SMERP::CfgFileConfig	cfgFile;
+		cmdLine = new _SMERP::CmdLineConfig( argc, argv );
+//		cfgFile = _SMERP::CfgFileConfig();
 
 		// Block all signals for background thread.
 		sigset_t new_mask;

@@ -12,6 +12,8 @@ namespace _SMERP	{
 		unsigned short	port;
 		bool		foreground;
 		unsigned short	logLevel;
+
+		CmdLineConfig( int argc, char* argv[] );
 	};
 
 } // namespace _SMERP
