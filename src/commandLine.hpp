@@ -6,6 +6,17 @@
 namespace _SMERP	{
 
 	struct CmdLineConfig	{
+		enum Command_t	{
+			DEFAULT,
+			HELP,
+			VERIFY_CONFIG,
+			TEST_CONFIG,
+			PRINT_CONFIG,
+			VERSION,
+			UNKNOWN
+		};
+
+		Command_t	command;
 		std::string	user;
 		std::string	group;
 		std::string	serverAddress;

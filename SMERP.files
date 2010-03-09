@@ -26,3 +26,5 @@ src/commandLine.hpp
 src/configFile.hpp
 src/configFile.cpp
 src/commandLine.cpp
+src/smerpd.cpp
+src/version.hpp
