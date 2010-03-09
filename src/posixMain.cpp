@@ -13,10 +13,23 @@
 #include "serverConfig.hpp"
 #include "server.hpp"
 
-#if !defined(_WIN32)
+#if defined(_WIN32)
+#error "This is the POSIX main !"
+#else
+
 
 #include <pthread.h>
 #include <signal.h>
+
+
+static const char *VERSION_OUTPUT_STRING = "SMERP, version 0.0.2\n";
+
+static const int DEFAULT_DEBUG_LEVEL = 3;
+
+static const char *DEFAULT_MAIN_CONFIG = "/etc/smerpd.conf";
+static const char *DEFAULT_USER_CONFIG = "~/smerpd.conf";
+static const char *DEFAULT_LOCAL_CONFIG = "./smerpd.conf";
+
 
 int main(int argc, char* argv[])
 {

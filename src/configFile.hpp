@@ -8,10 +8,16 @@ namespace _SMERP	{
 	struct CfgFileConfig	{
 		std::string	user;
 		std::string	group;
+
 		std::string	serverAddress;
 		unsigned short	port;
-		bool		foreground;
-		unsigned short	logLevel;
+				// Logger configuration
+		std::string	logFile;
+//		severityLevel_t	fileLogLevel;
+		std::string	facility;
+//		severityLevel_t	syslogLogLevel;
+//		severityLevel_t	stderrLogLevel;
+
 	};
 
 }

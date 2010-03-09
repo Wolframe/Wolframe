@@ -9,7 +9,9 @@
 #include <boost/function.hpp>
 #include "server.hpp"
 
-#if defined(_WIN32)
+#if !defined(_WIN32)
+#error "This is the WIN32 main !"
+#else
 
 boost::function0<void> consoleCtrlFunction;
 
