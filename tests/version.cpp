@@ -1,0 +1,46 @@
+//
+// version class tests
+
+#define BOOST_AUTO_TEST_MAIN
+#define BOOST_TEST_MODULE "version class test"
+
+#include <boost/test/auto_unit_test.hpp>
+// Boost Test declaration and Checking macros
+#include <boost/test/unit_test_suite.hpp>
+#include <boost/test/test_tools.hpp>
+#include <boost/test/floating_point_comparison.hpp>
+#include <boost/test/unit_test.hpp>
+
+#include <cstdlib>
+#include <ctime>
+#include <iostream>
+#include <stdio.h>
+#include "version.hpp"
+
+
+#define	MAX_STRING	128
+
+
+BOOST_AUTO_TEST_CASE( _version_ )
+{
+	unsigned short	major, minor, revision;
+	unsigned	build;
+	char		verStr[MAX_STRING];
+
+	srand((unsigned)time(0));
+	major = (unsigned short)( rand() % USHRT_MAX );
+	minor = (unsigned short)( rand() % USHRT_MAX );
+	revision = (unsigned short)( rand() % USHRT_MAX );
+	build = (unsigned)( rand() % UINT_MAX );
+
+	_SMERP::version ver( major, minor, revision, build );
+	snprintf( verStr, MAX_STRING, "%d.%d.%d.%u", major, minor, revision, build );
+
+	BOOST_CHECK_EQUAL( ver.major(), major );
+	BOOST_CHECK_EQUAL( ver.minor(), minor );
+	BOOST_CHECK_EQUAL( ver.revision(), revision );
+	BOOST_CHECK_EQUAL( ver.build(), build );
+	BOOST_CHECK_EQUAL( ver.string().c_str(), verStr );
+	std::cout << ver.string();
+}
+
