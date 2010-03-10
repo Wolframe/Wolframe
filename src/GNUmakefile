@@ -20,13 +20,15 @@ C_PORT_OBJS = \
 OBJS = \
 	$(C_PORT_OBJS) \
 	$(STATIC_LIB_OBJS) \
+	version.o \
 	commandLine.o \
 	configFile.o \
 	request.o \
 	reply.o \
 	server.o\
 	connection.o \
-	requestHandler.o
+	requestHandler.o \
+	posixMain.o
 
 
 #smerpd$(EXE):	$(OBJS)

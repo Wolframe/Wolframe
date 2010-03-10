@@ -30,7 +30,7 @@ BOOL WINAPI consoleCtrlHandler(DWORD ctrlType)
 }
 
 
-int main(int argc, char* argv[])
+int _SMERP_winMain( int argc, char* argv[] )
 {
 	try	{
 		// get configuration !!!!

@@ -31,7 +31,7 @@ static const char *DEFAULT_USER_CONFIG = "~/smerpd.conf";
 static const char *DEFAULT_LOCAL_CONFIG = "./smerpd.conf";
 
 
-int main( int argc, char* argv[] )
+int _SMERP_posixMain( int argc, char* argv[] )
 {
 	try	{
 		// get configuration !!!!
