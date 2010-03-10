@@ -1,15 +1,11 @@
 //
 // version class tests
 
-#define BOOST_AUTO_TEST_MAIN
+#define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE "version class test"
 
-#include <boost/test/auto_unit_test.hpp>
-// Boost Test declaration and Checking macros
-#include <boost/test/unit_test_suite.hpp>
-#include <boost/test/test_tools.hpp>
-#include <boost/test/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
+
 
 #include <cstdlib>
 #include <ctime>

@@ -41,7 +41,7 @@ int main( int argc, char* argv[] )
 		std::string address = "0.0.0.0";
 
 		_SMERP::AppInstance	app;
-		cmdLine = new _SMERP::CmdLineConfig( argc, argv );
+//		cmdLine = new _SMERP::CmdLineConfig( argc, argv );
 //		cfgFile = _SMERP::CfgFileConfig();
 
 		// Block all signals for background thread.

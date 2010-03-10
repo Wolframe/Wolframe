@@ -7,12 +7,10 @@ INCLUDE_DIRS = \
 	-I$(TOPDIR)/src \
 
 INCLUDE_LDFLAGS = \
-
-#	-static -L/usr/lib
-
-INCLUDE_LIBS = -static \
 	-lboost_unit_test_framework \
 	-lboost_thread
+
+INCLUDE_LIBS = \
 
 
 TEST_CPP_BINS = \
@@ -28,7 +26,10 @@ local_clean:
 local_distclean:
 
 local_test:
+	@echo
 	@echo "Testing singleton template..."
 	@./singletonTest
+	@echo
 	@echo "Testing version..."
 	@./version
+	@echo
