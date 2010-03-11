@@ -44,6 +44,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="c:\boost\include\boost-1_42"
+				PreprocessorDefinitions="_WIN32_WINNT=0x0500"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -186,6 +187,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="c:\boost"
+				PreprocessorDefinitions="_WIN32_WINNT=0x0500"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				WarningLevel="4"
@@ -313,6 +315,26 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\src\appInstance.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\commandLine.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\commandLine.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\configFile.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\configFile.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\connection.cpp"
 				>
 			</File>
@@ -350,6 +372,22 @@
 			</File>
 			<File
 				RelativePath=".\src\server.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\serverConfig.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\smerpd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\version.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\version.hpp"
 				>
 			</File>
 			<File

@@ -4,7 +4,7 @@
 
 #include <string>
 #include <boost/lexical_cast.hpp>
-#include <version.hpp>
+#include "version.hpp"
 
 namespace _SMERP {
 
