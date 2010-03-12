@@ -18,6 +18,7 @@ namespace _SMERP	{
 //		severityLevel_t	syslogLogLevel;
 //		severityLevel_t	stderrLogLevel;
 
+		CfgFileConfig( std::string cfgFile );
 	};
 
 }

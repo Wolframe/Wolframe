@@ -8,11 +8,11 @@ namespace _SMERP	{
 	struct CmdLineConfig	{
 		enum Command_t	{
 			DEFAULT,
-			HELP,
+			PRINT_HELP,
 			VERIFY_CONFIG,
 			TEST_CONFIG,
 			PRINT_CONFIG,
-			VERSION,
+			PRINT_VERSION,
 			UNKNOWN
 		};
 
@@ -22,9 +22,10 @@ namespace _SMERP	{
 		std::string	serverAddress;
 		unsigned short	port;
 		bool		foreground;
-		unsigned short	logLevel;
+		unsigned short	debugLevel;
 
 		CmdLineConfig( int argc, char* argv[] );
+		void printUsage( void );
 	};
 
 } // namespace _SMERP

@@ -29,3 +29,4 @@ src/commandLine.cpp
 src/smerpd.cpp
 src/version.hpp
 src/version.cpp
+src/logger.hpp

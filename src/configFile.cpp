@@ -9,14 +9,15 @@
 
 namespace _SMERP {
 
-
+	CfgFileConfig::CfgFileConfig( std::string cfgFile )
+	{
 //	// Config file options
 //	boost::program_options::options_description cfgFileOptions( "Configuration file parameters" );
 //	cfgFileOptions.add_options()
+//			( "listen", po::value<string>(&config.addr)->default_value( "localhost" ), "address on which to listen (*) for all" )
 //			( "port", po::value<int>(&config.port)->default_value( 7788 ), "TCP port" )
 //			( "SSLport", po::value<int>(&config.SSLport)->default_value( 7789 ), "TCP port" )
-//			( "listen", po::value<string>(&config.addr)->default_value( "localhost" ), "address on which to listen (*) for all" )
-//			( "idleTimeout", po::value<int>(&config.idleTimeout)->default_value( 30 ), "timeout for an idle connection" )
+//			( "idleTimeout", po::value<int>(&config.idleTimeout)->default_value( 1800 ), "timeout for an idle connection" )
 //			( "requestTimeout", po::value<int>(&config.requestTimeout)->default_value( 180 ), "maximum time for a request" )
 //			( "threads", po::value<int>(&config.threads)->default_value( 4 ), "number of server threads" )
 //			( "dbHost", po::value<string>(&config.dbHost), "repository database host" )
@@ -33,5 +34,6 @@ namespace _SMERP {
 //			( "group,g", po::value<string>(&groupName), "run as <group>" )
 //			;
 
+	}
 
 }
