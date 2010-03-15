@@ -30,3 +30,5 @@ src/smerpd.cpp
 src/version.hpp
 src/version.cpp
 src/logger.hpp
+src/ErrorCodes.hpp
+src/appInstance.hpp

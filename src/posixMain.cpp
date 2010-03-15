@@ -12,6 +12,7 @@
 #include "configFile.hpp"
 #include "serverConfig.hpp"
 #include "server.hpp"
+#include "ErrorCodes.hpp"
 
 #if defined(_WIN32)
 #error "This is the POSIX main !"
@@ -39,10 +40,41 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		long timeout_duration_ms = 5000;
 		std::string port = "8080";
 		std::string address = "0.0.0.0";
+		std::string configFile;
 
 		_SMERP::AppInstance	app;
-//		cmdLine = new _SMERP::CmdLineConfig( argc, argv );
-//		cfgFile = _SMERP::CfgFileConfig();
+		_SMERP::CmdLineConfig	cmdLineCfg;
+
+//		_SMERP::CfgFileConfig cfgFileCfg = _SMERP::CfgFileConfig( cfgFile );
+
+		if ( !cmdLineCfg.parse( argc, argv ))	{	// there was an error parsing the command line
+			std::cerr << cmdLineCfg.errMsg() << std::endl;
+			cmdLineCfg.printUsage( std::cerr );
+			return _SMERP::ErrorCodes::FAILURE;
+		}
+// command line has been parsed successfully
+// if cmdLineCfg.errMsg() is not empty than we have a warning
+		if ( !cmdLineCfg.errMsg().empty() )	// there was a warning parsing the command line
+			std::cerr << "BOO:" << cmdLineCfg.errMsg() << std::endl;
+
+// if we have to print the version or the help do it and exit
+		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::PRINT_VERSION )	{
+			std::cout << VERSION_OUTPUT_STRING << std::endl;
+			return _SMERP::ErrorCodes::OK;
+		}
+		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::PRINT_HELP )	{
+			cmdLineCfg.printUsage( std::cerr );
+			return _SMERP::ErrorCodes::OK;
+		}
+
+// decide what configuration file to use
+		if ( !cmdLineCfg.cfgFile.empty() )	// if it has been specified than that's The One ! (and only)
+			configFile = cmdLineCfg.cfgFile;
+		else
+			configFile = _SMERP::CfgFileConfig::chooseFile( DEFAULT_MAIN_CONFIG,
+								       DEFAULT_USER_CONFIG,
+								       DEFAULT_LOCAL_CONFIG );
+
 
 		// Block all signals for background thread.
 		sigset_t new_mask;
@@ -72,7 +104,7 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		t.join();
 	}
 	catch (std::exception& e)	{
-		std::cerr << "exception: " << e.what() << "\n";
+		std::cerr << "posixMain: exception: " << e.what() << "\n";
 	}
 
 	return 0;

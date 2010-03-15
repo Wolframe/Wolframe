@@ -6,7 +6,8 @@ INCLUDE_DIRS = -I. \
 	-I$(TOPDIR)/include
 
 INCLUDE_LIBS = \
-	-lboost_thread -lboost_system
+	-lboost_thread -lboost_system \
+	-lboost_program_options
 
 CPP_BINS = \
 	smerpd$(EXE)

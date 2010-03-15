@@ -2,6 +2,7 @@
 #define _COMMANDLINE_HPP_INCLUDED
 
 #include <string>
+#include <boost/program_options.hpp>
 
 namespace _SMERP	{
 
@@ -9,23 +10,28 @@ namespace _SMERP	{
 		enum Command_t	{
 			DEFAULT,
 			PRINT_HELP,
-			VERIFY_CONFIG,
+			PRINT_VERSION,
+			CHECK_CONFIG,
 			TEST_CONFIG,
 			PRINT_CONFIG,
-			PRINT_VERSION,
 			UNKNOWN
 		};
 
 		Command_t	command;
-		std::string	user;
-		std::string	group;
-		std::string	serverAddress;
-		unsigned short	port;
 		bool		foreground;
 		unsigned short	debugLevel;
+		std::string	user;
+		std::string	group;
+		std::string	cfgFile;
+	private:
+		std::string	errMsg_;
+		boost::program_options::options_description	options_;
 
-		CmdLineConfig( int argc, char* argv[] );
-		void printUsage( void );
+	public:
+		CmdLineConfig();
+		bool parse( int argc, char* argv[] );
+		std::string errMsg( void )	{ return errMsg_; };
+		void printUsage( std::ostream& os ) const	{ options_.print( os ); };
 	};
 
 } // namespace _SMERP
