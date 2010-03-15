@@ -43,8 +43,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="c:\boost\include\boost-1_42"
-				PreprocessorDefinitions="_WIN32_WINNT=0x0500"
+				AdditionalIncludeDirectories="&quot;c:\boost\include\boost-1_42&quot;;D:\Projects\SMERP\include"
+				PreprocessorDefinitions="_WIN32_WINNT=0x0501"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -186,8 +186,8 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="c:\boost"
-				PreprocessorDefinitions="_WIN32_WINNT=0x0500"
+				AdditionalIncludeDirectories="&quot;c:\boost\include\boost-1_42&quot;;D:\Projects\SMERP\include"
+				PreprocessorDefinitions="_WIN32_WINNT=0x0501"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				WarningLevel="4"
@@ -315,6 +315,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\src\appInstance.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\appInstance.hpp"
 				>
 			</File>
@@ -340,6 +344,14 @@
 			</File>
 			<File
 				RelativePath=".\src\connection.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\ErrorCodes.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\logger.hpp"
 				>
 			</File>
 			<File
