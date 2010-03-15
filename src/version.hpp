@@ -5,23 +5,21 @@
 
 namespace _SMERP {
 
-	class version {
+	class Version {
 	private:
 		unsigned short	major_;
 		unsigned short	minor_;
 		unsigned short	revision_;
 		unsigned	build_;
-		std::string	verStr;
+		std::string	verStr_;
 	public:
-		version( unsigned short M, unsigned short m );
-		version( unsigned short M, unsigned short m, unsigned short r );
-		version( unsigned short M, unsigned short m, unsigned short r, unsigned b );
+		Version( unsigned short M, unsigned short m, unsigned short r = 0, unsigned b = 0 );
 
 		unsigned short major()		{ return major_; };
 		unsigned short minor()		{ return minor_; };
 		unsigned short revision()	{ return revision_; };
 		unsigned build()		{ return build_; };
-		const std::string& string()	{ return verStr; };
+		const std::string& toString()	{ return verStr_; };
 	};
 
 } // namespace _SMERP

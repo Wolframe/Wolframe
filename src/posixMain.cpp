@@ -23,7 +23,10 @@
 #include <signal.h>
 
 
-static const char *VERSION_OUTPUT_STRING = "SMERP, version 0.0.2\n";
+static const unsigned short MAJOR_VERSION = 0;
+static const short unsigned MINOR_VERSION = 0;
+static const short unsigned REVISION_NUMBER = 3;
+
 
 static const int DEFAULT_DEBUG_LEVEL = 3;
 
@@ -42,28 +45,30 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		std::string address = "0.0.0.0";
 		std::string configFile;
 
-		_SMERP::AppInstance	app;
+		_SMERP::AppInstance	app( MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER );
 		_SMERP::CmdLineConfig	cmdLineCfg;
 
 //		_SMERP::CfgFileConfig cfgFileCfg = _SMERP::CfgFileConfig( cfgFile );
 
 		if ( !cmdLineCfg.parse( argc, argv ))	{	// there was an error parsing the command line
-			std::cerr << cmdLineCfg.errMsg() << std::endl;
+			std::cerr << cmdLineCfg.errMsg() << std::endl << std::endl;
 			cmdLineCfg.printUsage( std::cerr );
+			std::cerr << std::endl;
 			return _SMERP::ErrorCodes::FAILURE;
 		}
 // command line has been parsed successfully
 // if cmdLineCfg.errMsg() is not empty than we have a warning
 		if ( !cmdLineCfg.errMsg().empty() )	// there was a warning parsing the command line
-			std::cerr << "BOO:" << cmdLineCfg.errMsg() << std::endl;
+			std::cerr << "BOO:" << cmdLineCfg.errMsg() << std::endl << std::endl;
 
 // if we have to print the version or the help do it and exit
 		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::PRINT_VERSION )	{
-			std::cout << VERSION_OUTPUT_STRING << std::endl;
+			std::cout << "BOBOBO version " << app.version().toString() << std::endl << std::endl;
 			return _SMERP::ErrorCodes::OK;
 		}
 		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::PRINT_HELP )	{
 			cmdLineCfg.printUsage( std::cerr );
+			std::cerr << std::endl;
 			return _SMERP::ErrorCodes::OK;
 		}
 

@@ -32,3 +32,4 @@ src/version.cpp
 src/logger.hpp
 src/ErrorCodes.hpp
 src/appInstance.hpp
+src/appInstance.cpp

@@ -8,34 +8,20 @@
 
 namespace _SMERP {
 
-version::version( unsigned short M, unsigned short m )
-{
-	major_ = M, minor_ = m;
-	verStr += boost::lexical_cast<std::string>( major_ );
-	verStr += ".";
-	verStr += boost::lexical_cast<std::string>( minor_ );
-}
-
-version::version( unsigned short M, unsigned short m, unsigned short r )
-{
-	major_ = M, minor_ = m, revision_ = r;
-	verStr += boost::lexical_cast<std::string>( major_ );
-	verStr += ".";
-	verStr += boost::lexical_cast<std::string>( minor_ );
-	verStr += ".";
-	verStr += boost::lexical_cast<std::string>( revision_ );
-}
-
-version::version( unsigned short M, unsigned short m, unsigned short r, unsigned b )
+Version::Version( unsigned short M, unsigned short m, unsigned short r, unsigned b )
 {
 	major_ = M, minor_ = m, revision_ = r, build_ = b;
-	verStr += boost::lexical_cast<std::string>( major_ );
-	verStr += ".";
-	verStr += boost::lexical_cast<std::string>( minor_ );
-	verStr += ".";
-	verStr += boost::lexical_cast<std::string>( revision_ );
-	verStr += ".";
-	verStr += boost::lexical_cast<std::string>( build_ );
+	verStr_ += boost::lexical_cast<std::string>( major_ );
+	verStr_ += ".";
+	verStr_ += boost::lexical_cast<std::string>( minor_ );
+	if ( r !=0 || b != 0 )	{
+		verStr_ += ".";
+		verStr_ += boost::lexical_cast<std::string>( revision_ );
+		if ( b != 0 )	{
+			verStr_ += ".";
+			verStr_ += boost::lexical_cast<std::string>( build_ );
+		}
+	}
 }
 
 } // namespace _SMERP
