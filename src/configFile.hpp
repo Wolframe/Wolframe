@@ -2,29 +2,34 @@
 #define _CONFIGFILE_HPP_INCLUDED
 
 #include <string>
+#include <boost/program_options.hpp>
 
 namespace _SMERP	{
 
 	struct CfgFileConfig	{
+// daemon configuration
 		std::string	user;
 		std::string	group;
-
+// network configuration
 		std::string	serverAddress;
 		unsigned short	port;
-				// Logger configuration
+		unsigned short	SSLport;
+// database configuration
+// logger configuration
 		std::string	logFile;
-//		severityLevel_t	fileLogLevel;
-		std::string	facility;
-//		severityLevel_t	syslogLogLevel;
-//		severityLevel_t	stderrLogLevel;
 
+	private:
+		std::string	errMsg_;
+		boost::program_options::options_description	options_;
+
+	public:
 		CfgFileConfig();
-		bool parse( const char *configFile );
 		static const char* chooseFile( const char *globalFile,
 						const char *userFile,
 						const char *localFile );
 
-
+		bool parse( const char *filename );
+		std::string errMsg( void )	{ return errMsg_; };
 	};
 
 }

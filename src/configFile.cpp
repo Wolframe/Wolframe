@@ -5,41 +5,63 @@
 #include "configFile.hpp"
 
 #include <boost/program_options.hpp>
+#include <boost/filesystem.hpp>
 
+#include <vector>
+#include <string>
+
+
+namespace prgOpts = boost::program_options;
 
 namespace _SMERP {
 
 	const char* CfgFileConfig::chooseFile( const char *globalFile, const char *userFile, const char *localFile )
 	{
-		return globalFile;
+		if ( globalFile != NULL )
+			if ( boost::filesystem::exists( globalFile ))
+				return globalFile;
+		if ( userFile != NULL )
+			if ( boost::filesystem::exists( userFile ))
+				return userFile;
+		if ( localFile != NULL )
+			if ( boost::filesystem::exists( localFile ))
+				return localFile;
+		return NULL;
 	}
 
 
 	CfgFileConfig::CfgFileConfig()
 	{
-//	// Config file options
-//	boost::program_options::options_description cfgFileOptions( "Configuration file parameters" );
-//	cfgFileOptions.add_options()
-//			( "listen", po::value< vector<string> >(&config.addr)->default_value( "localhost" ), "address on which to listen (*) for all" )
-//			( "port", po::value<int>(&config.port)->default_value( 7788 ), "TCP port" )
-//			( "SSLport", po::value<int>(&config.SSLport)->default_value( 7789 ), "TCP port" )
-//			( "idleTimeout", po::value<int>(&config.idleTimeout)->default_value( 1800 ), "timeout for an idle connection" )
-//			( "requestTimeout", po::value<int>(&config.requestTimeout)->default_value( 180 ), "maximum time for a request" )
-//			( "threads", po::value<int>(&config.threads)->default_value( 4 ), "number of server threads" )
-//			( "dbHost", po::value<string>(&config.dbHost), "repository database host" )
-//			( "dbPort", po::value<string>(&config.dbPort), "repository database port" )
-//			( "dbName", po::value<string>(&config.dbName), "repository database name" )
-//			( "dbUser", po::value<string>(&config.dbUser), "repository database user" )
-//			( "dbPassword", po::value<string>(&config.dbPwd), "repository database user" )
-//			( "logFile", po::value<string>(&logFile), "log file" )
-//			( "fileLogLevel", po::value<string>(), "log level for file logging" )
-//			( "facility", po::value<string>(&facility), "syslog facility" )
-//			( "syslogLogLevel", po::value<string>(), "log level for syslog" )
-//			( "stderrLogLevel", po::value<string>(), "log level for stderr" )
-//			( "user,u", po::value<string>(&userName), "run as <user>" )
-//			( "group,g", po::value<string>(&groupName), "run as <group>" )
-//			;
+	// Config file options
+	options_.add_options()
+// daemon configuration
+			( "user,u", prgOpts::value<std::string>(), "run as <user>" )
+			( "group,g", prgOpts::value<std::string>(), "run as <group>" )
+			( "threads", prgOpts::value<int>(), "number of server threads" )
+// network configuration
+			( "listen", prgOpts::value< std::vector<std::string> >(), "addresses on which to listen (* for all)" )
+			( "port", prgOpts::value<int>(), "TCP port" )
+			( "SSLport", prgOpts::value<int>(), "TCP port for SSL connections" )
 
+			( "idleTimeout", prgOpts::value<int>(), "timeout for an idle connection" )
+			( "requestTimeout", prgOpts::value<int>(), "maximum time for a request" )
+			( "answerTimeout", prgOpts::value<int>(), "maximum time for an answer" )
+// database configuration
+			( "dbHost", prgOpts::value<std::string>(), "application database host" )
+			( "dbPort", prgOpts::value<std::string>(), "application database port" )
+			( "dbName", prgOpts::value<std::string>(), "application database name" )
+			( "dbUser", prgOpts::value<std::string>(), "application database user" )
+			( "dbPassword", prgOpts::value<std::string>(), "application database password" )
+// logger configuration
+			( "logFile", prgOpts::value<std::string>(), "log file" )
+			;
 	}
 
-}
+	bool CfgFileConfig::parse ( const char *filename )
+	{
+		//
+
+		return true;
+	}
+
+} // namespace _SMERP

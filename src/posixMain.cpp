@@ -10,7 +10,7 @@
 #include "appInstance.hpp"
 #include "commandLine.hpp"
 #include "configFile.hpp"
-#include "serverConfig.hpp"
+#include "appConfig.hpp"
 #include "server.hpp"
 #include "ErrorCodes.hpp"
 
@@ -43,12 +43,10 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		long timeout_duration_ms = 5000;
 		std::string port = "8080";
 		std::string address = "0.0.0.0";
-		std::string configFile;
 
 		_SMERP::AppInstance	app( MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER );
 		_SMERP::CmdLineConfig	cmdLineCfg;
-
-//		_SMERP::CfgFileConfig cfgFileCfg = _SMERP::CfgFileConfig( cfgFile );
+		const char		*configFile;
 
 		if ( !cmdLineCfg.parse( argc, argv ))	{	// there was an error parsing the command line
 			std::cerr << cmdLineCfg.errMsg() << std::endl << std::endl;
@@ -74,12 +72,24 @@ int _SMERP_posixMain( int argc, char* argv[] )
 
 // decide what configuration file to use
 		if ( !cmdLineCfg.cfgFile.empty() )	// if it has been specified than that's The One ! (and only)
-			configFile = cmdLineCfg.cfgFile;
+			configFile = cmdLineCfg.cfgFile.c_str();
 		else
 			configFile = _SMERP::CfgFileConfig::chooseFile( DEFAULT_MAIN_CONFIG,
 								       DEFAULT_USER_CONFIG,
 								       DEFAULT_LOCAL_CONFIG );
+		if ( configFile == NULL )	{	// there is no configuration file
+			std::cerr << "MOMOMO: no configuration file found !" << std::endl << std::endl;
+			return _SMERP::ErrorCodes::FAILURE;
+		}
 
+		_SMERP::CfgFileConfig	cfgFileCfg;
+		if ( !cfgFileCfg.parse( configFile ))	{	// there was an error parsing the configuration file
+			std::cerr << cfgFileCfg.errMsg() << std::endl << std::endl;
+			return _SMERP::ErrorCodes::FAILURE;
+		}
+// configuration file has been parsed successfully
+// build the application configuration
+		_SMERP::ApplicationConfiguration config( cmdLineCfg, cfgFileCfg);
 
 		// Block all signals for background thread.
 		sigset_t new_mask;

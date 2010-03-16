@@ -7,7 +7,8 @@ INCLUDE_DIRS = -I. \
 
 INCLUDE_LIBS = \
 	-lboost_thread -lboost_system \
-	-lboost_program_options
+	-lboost_program_options \
+	-lboost_filesystem
 
 CPP_BINS = \
 	smerpd$(EXE)
@@ -25,6 +26,7 @@ OBJS = \
 	appInstance.o \
 	commandLine.o \
 	configFile.o \
+	appConfig.o \
 	request.o \
 	reply.o \
 	server.o\
