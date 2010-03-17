@@ -2,19 +2,26 @@
 #define _CONFIGFILE_HPP_INCLUDED
 
 #include <string>
+#include <vector>
 #include <boost/program_options.hpp>
 
 namespace _SMERP	{
 
 	struct CfgFileConfig	{
+		std::string	file;
 // daemon configuration
 		std::string	user;
 		std::string	group;
 // network configuration
-		std::string	serverAddress;
+		std::vector<std::string> address;
 		unsigned short	port;
 		unsigned short	SSLport;
 // database configuration
+		std::string	dbHost;
+		unsigned short	dbPort;
+		std::string	dbName;
+		std::string	dbUser;
+		std::string	dbPassword;
 // logger configuration
 		std::string	logFile;
 

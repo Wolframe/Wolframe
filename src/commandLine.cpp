@@ -11,9 +11,7 @@ namespace prgOpts = boost::program_options;
 
 namespace _SMERP {
 
-
-
-//	void printUsage( void );
+	static const unsigned short DEFAULT_DEBUG_LEVEL = 2;
 
 	CmdLineConfig::CmdLineConfig()
 	{
@@ -27,11 +25,13 @@ namespace _SMERP {
 // Options
 				( "foreground,f", "run in foreground (logs only on stderr)" )
 				( "config-file,c", prgOpts::value<std::string>(), "configuration file" )
-				( "debug,d", prgOpts::value<int>(), "set debug level (to be used only with --foreground)" )
+				( "debug,d", prgOpts::value<unsigned short>(), "set debug level (to be used only with --foreground)" )
 				( "user,u", prgOpts::value<std::string>(), "run as <user>" )
 				( "group,g", prgOpts::value<std::string>(), "run as <group>" )
 				;
 		command = DEFAULT;
+		foreground = false;
+		debugLevel = DEFAULT_DEBUG_LEVEL;
 	}
 
 	bool CmdLineConfig::parse( int argc, char* argv[] )
