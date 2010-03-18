@@ -1,1 +1,10 @@
 SSL test files for SMERP
+
+Generate a CA certificate:
+openssl req -nodes -days 1825 -x509 -newkey rsa:2048 -out smerpCA.cert.pem -keyout smerpCA.key.pem -outform PEM
+
+Generate a certificate:
+openssl req -new -nodes -keyout smerpd.key -out smerpd.req -days 365
+
+Sign a certificate
+openssl ca -cert smerpCA.cert.pem -policy policy_anything -out smerpd.crt -infiles smerpd.req

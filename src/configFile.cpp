@@ -84,14 +84,12 @@ namespace _SMERP {
 
 		//
 		BOOST_FOREACH( ptree::value_type &v, pt.get_child( "server.listen" ))
-				std::cerr << "MOMO: <" << v.first << "> FOFO" << std::endl;
-		BOOST_FOREACH( ptree::value_type &v, pt.get_child( "server.listen" ))
 			if ( v.first == "socket" )
-				address.push_back( make_pair( pt.get<std::string>( "server.listen.socket.address" ),
-						      pt.get<unsigned short>( "server.listen.socket.port" )));
+				address.push_back( make_pair( v.second.get<std::string>( "address" ),
+								v.second.get<unsigned short>( "port" )));
 			else if ( v.first == "SSLsocket" )
-				SSLaddress.push_back( make_pair( pt.get<std::string>( "server.listen.SSLsocket.address" ),
-						      pt.get<unsigned short>( "server.listen.SSLsocket.port" )));
+				SSLaddress.push_back( make_pair( v.second.get<std::string>( "address" ),
+								v.second.get<unsigned short>( "port" )));
 //			else ERROR
 
 		threads = pt.get<unsigned short>( "server.threads", 4 );
