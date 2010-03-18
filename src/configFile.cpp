@@ -4,14 +4,16 @@
 
 #include "configFile.hpp"
 
-#include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/foreach.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
 
 #include <vector>
 #include <string>
 
+#include <iostream>
 
-namespace prgOpts = boost::program_options;
 
 static boost::filesystem::path resolvePath(const boost::filesystem::path& p)
 {
@@ -60,30 +62,6 @@ namespace _SMERP {
 
 	CfgFileConfig::CfgFileConfig()
 	{
-	// Config file options
-	options_.add_options()
-// daemon configuration
-			( "user,u", prgOpts::value<std::string>(), "run as <user>" )
-			( "group,g", prgOpts::value<std::string>(), "run as <group>" )
-			( "threads", prgOpts::value<unsigned short>(), "number of server threads" )
-			( "maxClients", prgOpts::value<unsigned short>(), "maximum number of clients" )
-// network configuration
-			( "listen", prgOpts::value< std::vector<std::string> >(), "addresses on which to listen (* for all)" )
-			( "port", prgOpts::value<unsigned short>(), "TCP port" )
-			( "SSLport", prgOpts::value<unsigned short>(), "TCP port for SSL connections" )
-
-			( "idleTimeout", prgOpts::value<unsigned>(), "timeout for an idle connection" )
-			( "requestTimeout", prgOpts::value<unsigned>(), "maximum time for a request" )
-			( "answerTimeout", prgOpts::value<unsigned>(), "maximum time for an answer" )
-// database configuration
-			( "dbHost", prgOpts::value<std::string>(), "application database host" )
-			( "dbPort", prgOpts::value<unsigned short>(), "application database port" )
-			( "dbName", prgOpts::value<std::string>(), "application database name" )
-			( "dbUser", prgOpts::value<std::string>(), "application database user" )
-			( "dbPassword", prgOpts::value<std::string>(), "application database password" )
-// logger configuration
-			( "logFile", prgOpts::value<std::string>(), "log file" )
-			;
 	}
 
 	bool CfgFileConfig::parse ( const char *filename )
@@ -96,7 +74,47 @@ namespace _SMERP {
 			return false;
 		}
 
+		// Create an empty property tree object
+		using boost::property_tree::ptree;
+		ptree pt;
+
+		// Load the XML file into the property tree. If reading fails
+		// (cannot open file, parse error), an exception is thrown.
+		read_xml( filename, pt );
+
 		//
+		BOOST_FOREACH( ptree::value_type &v, pt.get_child( "server.listen" ))
+				std::cerr << "MOMO: <" << v.first << "> FOFO" << std::endl;
+		BOOST_FOREACH( ptree::value_type &v, pt.get_child( "server.listen" ))
+			if ( v.first == "socket" )
+				address.push_back( make_pair( pt.get<std::string>( "server.listen.socket.address" ),
+						      pt.get<unsigned short>( "server.listen.socket.port" )));
+			else if ( v.first == "SSLsocket" )
+				SSLaddress.push_back( make_pair( pt.get<std::string>( "server.listen.SSLsocket.address" ),
+						      pt.get<unsigned short>( "server.listen.SSLsocket.port" )));
+//			else ERROR
+
+		threads = pt.get<unsigned short>( "server.threads", 4 );
+		maxClients = pt.get<unsigned short>( "server.maxClients", 256 );
+		user = pt.get<std::string>( "server.user" );
+		group = pt.get<std::string>( "server.group" );
+
+		idleTimeout = pt.get<unsigned>( "server.timeout.idle", 900 );
+		requestTimeout = pt.get<unsigned>( "server.timeout.request", 30 );
+		answerTimeout = pt.get<unsigned>( "server.timeout.answer", 30 );
+		processTimeout = pt.get<unsigned>( "server.timeout.process", 30 );
+
+		SSLcertificate = pt.get<std::string>( "server.SSL.certificate" );
+		SSLkey = pt.get<std::string>( "server.SSL.key" );
+		SSLCAdirectory = pt.get<std::string>( "server.SSL.CAdirectory" );
+		SSLCAchainFile = pt.get<std::string>( "server.SSL.CAchainFile" );
+		SSLverify = pt.get<bool>( "server.SSL.verify", true );
+
+		dbHost = pt.get<std::string>( "database.host" );
+		dbPort = pt.get<unsigned short>( "database.port" );
+		dbName = pt.get<std::string>( "database.name" );
+		dbUser = pt.get<std::string>( "database.user" );
+		dbPassword = pt.get<std::string>( "database.password" );
 
 		return true;
 	}

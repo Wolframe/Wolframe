@@ -3,7 +3,6 @@
 
 #include <string>
 #include <vector>
-#include <boost/program_options.hpp>
 
 namespace _SMERP	{
 
@@ -12,10 +11,22 @@ namespace _SMERP	{
 // daemon configuration
 		std::string	user;
 		std::string	group;
+		unsigned short	threads;
+		unsigned short	maxClients;
 // network configuration
-		std::vector<std::string> address;
-		unsigned short	port;
-		unsigned short	SSLport;
+		std::vector< std::pair<std::string, unsigned short> > address;
+		std::vector< std::pair<std::string, unsigned short> > SSLaddress;
+
+		unsigned	idleTimeout;
+		unsigned	requestTimeout;
+		unsigned	answerTimeout;
+		unsigned	processTimeout;
+// SSL
+		std::string	SSLcertificate;
+		std::string	SSLkey;
+		std::string	SSLCAdirectory;
+		std::string	SSLCAchainFile;
+		bool		SSLverify;
 // database configuration
 		std::string	dbHost;
 		unsigned short	dbPort;
@@ -27,7 +38,6 @@ namespace _SMERP	{
 
 	private:
 		std::string	errMsg_;
-		boost::program_options::options_description	options_;
 
 	public:
 		CfgFileConfig();

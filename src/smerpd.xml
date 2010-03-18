@@ -1,0 +1,62 @@
+<!--
+SMERP configuration file
+-->
+
+<server>
+	<listen>
+		<socket>
+			<address>*</address><port>7922</port>
+		</socket>
+		<socket>
+			<address>localhost</address><port>7923</port>
+		</socket>
+		<SSLsocket>
+			<address>localhost</address><port>7924</port>
+		</SSLsocket>
+	</listen>
+
+<!-- SSL parameters: required if listenSSL are defined -->
+	<SSL>
+		<certificate></certificate>		<!-- Server certificate file (PEM) -->
+		<key></key>				<!-- Server key file (PEM) -->
+		<CAdirectory></CAdirectory>		<!-- Directory holding CA certificate files -->
+		<CAchainFile></CAchainFile>		<!-- SSL CA chain file -->
+		<verifiy>no</verifiy>			<!-- Require and verify client certificate -->
+	</SSL>
+
+<!-- Timeouts. All values are in seconds. Set to 0 to disable. -->
+	<timeout>
+		<idle>900</idle>		<!-- Timeout for an idle connection. (default 15 min) -->
+		<request>30</request>		<!-- Maximum time to receive a request. (default 30s) -->
+		<answer>30</answer>		<!-- Maximum time to send an answer. (default 30s) -->
+		<process>30</process>		<!-- Maximum time to process a request. (default 30s) -->
+	</timeout>
+
+<!-- Server parameters -->
+	<user>momo</user>
+	<group>fofo</group>
+	<threads>7</threads>			<!-- Number of server threads. Default 4 -->
+	<maxClients>255</maxClients>		<!-- Maximum number of simultaneous clients. Default 256 -->
+</server>
+
+
+<!-- Database configuration -->
+<database>
+	<host>localhost</host>			<!-- Database host. Uses the unix socket if not defined. -->
+	<port>5432</port> 			<!-- Database port. Uses the default port if not defined. -->
+	<name>SMERP</name>			<!-- Database name. -->
+	<user>SMERP</user>			<!-- Database user. -->
+	<password>blabla</password>		<!-- Password for database user. -->
+</database>
+
+
+<!-- Logging parameters -->
+<logging>
+	<stderr>
+		<level></level>			<!-- log level for console (stderr) logging -->
+	</stderr>
+	<logFile>
+		<filename></filename>
+		<level></level>			<!-- log level for file logging -->
+	</logFile>
+</logging>

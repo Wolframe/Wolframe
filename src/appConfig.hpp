@@ -28,12 +28,19 @@ namespace _SMERP {
 		unsigned	maxClients;
 
 // network configuration
-		std::vector<std::string> address;
-		unsigned short	port;
-		unsigned short	SSLport;
+		std::vector< std::pair<std::string, unsigned short> > address;
+		std::vector< std::pair<std::string, unsigned short> > SSLaddress;
+
 		unsigned	idleTimeout;
 		unsigned	requestTimeout;
 		unsigned	answerTimeout;
+		unsigned	processTimeout;
+// SSL
+		std::string	SSLcertificate;
+		std::string	SSLkey;
+		std::string	SSLCAdirectory;
+		std::string	SSLCAchainFile;
+		bool		SSLverify;
 
 // database configuration
 		std::string	dbHost;

@@ -50,7 +50,7 @@ int _SMERP_posixMain( int argc, char* argv[] )
 
 		if ( !cmdLineCfg.parse( argc, argv ))	{	// there was an error parsing the command line
 			std::cerr << cmdLineCfg.errMsg() << std::endl << std::endl;
-			cmdLineCfg.printUsage( std::cerr );
+			cmdLineCfg.usage( std::cerr );
 			std::cerr << std::endl;
 			return _SMERP::ErrorCodes::FAILURE;
 		}
@@ -65,7 +65,7 @@ int _SMERP_posixMain( int argc, char* argv[] )
 			return _SMERP::ErrorCodes::OK;
 		}
 		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::PRINT_HELP )	{
-			cmdLineCfg.printUsage( std::cerr );
+			cmdLineCfg.usage( std::cout );
 			std::cerr << std::endl;
 			return _SMERP::ErrorCodes::OK;
 		}

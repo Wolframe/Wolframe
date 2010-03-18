@@ -19,18 +19,33 @@ namespace _SMERP {
 		debug = cmdLine.debugLevel;
 
 		if ( !cmdLine.user.empty())
-			user = cfgFile.user;
-		else
 			user = cmdLine.user;
+		else
+			user = cfgFile.user;
+
 
 		if ( !cmdLine.group.empty())
-			group = cfgFile.group;
-		else
 			group = cmdLine.group;
+		else
+			group = cfgFile.group;
+
+		threads = cfgFile.threads;
+		maxClients = cfgFile.maxClients;
 
 		address = cfgFile.address;
-		port = cfgFile.port;
-		SSLport = cfgFile.SSLport;
+		SSLaddress = cfgFile.SSLaddress;
+
+		SSLcertificate = cfgFile.SSLcertificate;
+		SSLkey = cfgFile.SSLkey;
+		SSLCAdirectory = cfgFile.SSLCAdirectory;
+		SSLCAchainFile = cfgFile.SSLCAchainFile;
+		SSLverify = cfgFile.SSLverify;
+
+		idleTimeout = cfgFile.idleTimeout;
+		requestTimeout = cfgFile.requestTimeout;
+		answerTimeout = cfgFile.answerTimeout;
+		processTimeout = cfgFile.processTimeout;
+
 		dbHost = cfgFile.dbHost;
 		dbPort = cfgFile.dbPort;
 		dbName = cfgFile.dbName;
@@ -45,7 +60,7 @@ namespace _SMERP {
 	{
 		os << "Configuration file: " << configFile << std::endl;
 		// from command line
-		os << "Run in foreground: " << foreground << std::endl;
+		os << "Run in foreground: " << (foreground ? "yes" : "no") << std::endl;
 		os << "   Debug level: " << debug;
 		if ( !foreground )
 			os << " (inactive)" << std::endl;
@@ -58,25 +73,38 @@ namespace _SMERP {
 		os << "Maximum number of clients: " << maxClients << std::endl;
 
 		os << "Network" << std::endl;
-		os << "  Listen on:";
-		for ( unsigned i = 0; i < address.size(); i++ )
-			os << " " << address[i];
-		os << std::endl;
-		if ( port )
-			os << "   Unencrypted connections on port " << port << std::endl;
-		if ( SSLport )
-			os << "   SSL connections on port " << SSLport << std::endl;
+		if ( address.size() > 0 )	{
+			os << "  Unencrypted: " << address[0].first << ":" << address[0].second << std::endl;
+			for ( unsigned i = 1; i < address.size(); i++ )
+				os << "               " << address[i].first << ":" << address[i].second << std::endl;
+		}
+		if ( SSLaddress.size() > 0 )	{
+			os << "          SSL: " << SSLaddress[0].first << ":" << SSLaddress[0].second << std::endl;
+			for ( unsigned i = 1; i < SSLaddress.size(); i++ )
+				os << "               " << SSLaddress[i].first << ":" << SSLaddress[i].second << std::endl;
+		}
 
 		os << "Timeouts" << std::endl;
 		os << "   idle: " << idleTimeout << std::endl;
 		os << "   request: " << requestTimeout << std::endl;
 		os << "   answer: " << answerTimeout << std::endl;
+		os << "   process: " << processTimeout << std::endl;
+
+		os << "SSL" << std::endl;
+		os << "   certificate: " << (SSLcertificate.empty() ? "(none)" : SSLcertificate) << std::endl;
+		os << "   key file: " << (SSLkey.empty() ? "(none)" : SSLkey) << std::endl;
+		os << "   CA directory: " << (SSLCAdirectory.empty() ? "(none)" : SSLCAdirectory) << std::endl;
+		os << "   CA chain file: " << (SSLCAchainFile.empty() ? "(none)" : SSLCAchainFile) << std::endl;
+		os << "   verify client: " << (SSLverify ? "yes" : "no") << std::endl;
 
 		os << "Database" << std::endl;
-		os << "   DB host: " << dbHost << ":" << dbPort << std::endl;
-		os << "   DB name: " << (dbName.empty() ? "(not specified)" : dbName) << std::endl;
-		os << "   DB user / password: " << (dbUser.empty() ? "(not specified)" : dbUser) << " / "
-						<< (dbPassword.empty() ? "(not specified)" : dbPassword) << std::endl;
+		if ( dbHost.empty())
+			os << "   DB host: local unix domain socket" << std::endl;
+		else
+			os << "   DB host: " << dbHost << ":" << dbPort << std::endl;
+		os << "   DB name: " << (dbName.empty() ? "(not specified - server user default)" : dbName) << std::endl;
+		os << "   DB user / password: " << (dbUser.empty() ? "(not specified - same as server user)" : dbUser) << " / "
+						<< (dbPassword.empty() ? "(not specified - no password used)" : dbPassword) << std::endl;
 
 		os << "Logging" << std::endl;
 		os << "   Log file: " << logFile << std::endl;
