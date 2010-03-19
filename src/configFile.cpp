@@ -11,6 +11,7 @@
 
 #include <vector>
 #include <string>
+#include <strings.h>
 
 #include <iostream>
 
@@ -64,6 +65,7 @@ namespace _SMERP {
 	{
 	}
 
+
 	bool CfgFileConfig::parse ( const char *filename )
 	{
 		file = resolvePath( boost::filesystem::system_complete( filename )).string();
@@ -85,34 +87,48 @@ namespace _SMERP {
 		//
 		BOOST_FOREACH( ptree::value_type &v, pt.get_child( "server.listen" ))
 			if ( v.first == "socket" )
-				address.push_back( make_pair( v.second.get<std::string>( "address" ),
-								v.second.get<unsigned short>( "port" )));
+				address.push_back( make_pair( v.second.get<std::string>( "address", std::string() ),
+								v.second.get<unsigned short>( "port", 0 )));
 			else if ( v.first == "SSLsocket" )
-				SSLaddress.push_back( make_pair( v.second.get<std::string>( "address" ),
-								v.second.get<unsigned short>( "port" )));
-//			else ERROR
+				SSLaddress.push_back( make_pair( v.second.get<std::string>( "address", std::string() ),
+								v.second.get<unsigned short>( "port", 0 )));
+			else	{
+				errMsg_ = "Invalid listen type :";
+				errMsg_ += v.first;
+				return false;
+			}
 
 		threads = pt.get<unsigned short>( "server.threads", 4 );
 		maxClients = pt.get<unsigned short>( "server.maxClients", 256 );
-		user = pt.get<std::string>( "server.user" );
-		group = pt.get<std::string>( "server.group" );
+		user = pt.get<std::string>( "server.user", std::string() );
+		group = pt.get<std::string>( "server.group", std::string() );
 
 		idleTimeout = pt.get<unsigned>( "server.timeout.idle", 900 );
 		requestTimeout = pt.get<unsigned>( "server.timeout.request", 30 );
 		answerTimeout = pt.get<unsigned>( "server.timeout.answer", 30 );
 		processTimeout = pt.get<unsigned>( "server.timeout.process", 30 );
 
-		SSLcertificate = pt.get<std::string>( "server.SSL.certificate" );
-		SSLkey = pt.get<std::string>( "server.SSL.key" );
-		SSLCAdirectory = pt.get<std::string>( "server.SSL.CAdirectory" );
-		SSLCAchainFile = pt.get<std::string>( "server.SSL.CAchainFile" );
-		SSLverify = pt.get<bool>( "server.SSL.verify", true );
+		SSLcertificate = resolvePath( boost::filesystem::system_complete(
+							pt.get<std::string>( "server.SSL.certificate", std::string() ))).string();
+		SSLkey = resolvePath( boost::filesystem::system_complete(
+							pt.get<std::string>( "server.SSL.key", std::string() ))).string();
+		SSLCAdirectory = resolvePath( boost::filesystem::system_complete(
+							pt.get<std::string>( "server.SSL.CAdirectory", std::string() ))).string();
+		SSLCAchainFile = resolvePath( boost::filesystem::system_complete(
+							pt.get<std::string>( "server.SSL.CAchainFile", std::string() ))).string();
+		std::string SSLverifyStr = pt.get<std::string>( "server.SSL.verify", std::string() );
+		if ( strcasecmp( SSLverifyStr.c_str(), "no" )
+				|| strcasecmp( SSLverifyStr.c_str(), "false" )
+				|| strcasecmp( SSLverifyStr.c_str(), "0" ) )
+			SSLverify = false;
+		else
+			SSLverify = true;
 
-		dbHost = pt.get<std::string>( "database.host" );
-		dbPort = pt.get<unsigned short>( "database.port" );
-		dbName = pt.get<std::string>( "database.name" );
-		dbUser = pt.get<std::string>( "database.user" );
-		dbPassword = pt.get<std::string>( "database.password" );
+		dbHost = pt.get<std::string>( "database.host", std::string() );
+		dbPort = pt.get<unsigned short>( "database.port", 0 );
+		dbName = pt.get<std::string>( "database.name", std::string() );
+		dbUser = pt.get<std::string>( "database.user", std::string() );
+		dbPassword = pt.get<std::string>( "database.password", std::string() );
 
 		return true;
 	}

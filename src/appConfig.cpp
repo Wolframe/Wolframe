@@ -110,4 +110,10 @@ namespace _SMERP {
 		os << "   Log file: " << logFile << std::endl;
 	}
 
+
+	bool ApplicationConfiguration::check()
+	{
+		return true;
+	}
+
 } // namespace _SMERP

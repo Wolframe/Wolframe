@@ -50,8 +50,13 @@ namespace _SMERP {
 		std::string	dbPassword;
 // logger configuration
 		std::string	logFile;
+	private:
+		std::string	errMsg_;
+
 	public:
 		ApplicationConfiguration( const CmdLineConfig& cmdLine, const CfgFileConfig& cfgFile );
+		std::string errMsg() const	{ return errMsg_; };
+		bool check();
 		void print( std::ostream& os ) const;
 	};
 } // namespace _SMERP

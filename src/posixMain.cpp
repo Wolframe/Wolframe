@@ -91,10 +91,16 @@ int _SMERP_posixMain( int argc, char* argv[] )
 // build the application configuration
 		_SMERP::ApplicationConfiguration config( cmdLineCfg, cfgFileCfg);
 
-// Check configuration has nothing to do, the configuration was checked when it was built
+// Check the configuration
 		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::CHECK_CONFIG )	{
-			std::cout << "Configuration OK" << std::endl << std::endl;
-			return _SMERP::ErrorCodes::OK;
+			if ( config.check() )	{
+				std::cout << "Configuration OK" << std::endl << std::endl;
+				return _SMERP::ErrorCodes::OK;
+			}
+			else	{
+				std::cout << config.errMsg() << std::endl << std::endl;
+				return _SMERP::ErrorCodes::OK;
+			}
 		}
 
 		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::PRINT_CONFIG )	{
