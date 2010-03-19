@@ -38,12 +38,6 @@ static const char *DEFAULT_LOCAL_CONFIG = "./smerpd.conf";
 int _SMERP_posixMain( int argc, char* argv[] )
 {
 	try	{
-		// get configuration !!!!
-		std::size_t num_threads = 4;
-		long timeout_duration_ms = 5000;
-		std::string port = "8080";
-		std::string address = "0.0.0.0";
-
 		_SMERP::AppInstance	app( MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER );
 		_SMERP::CmdLineConfig	cmdLineCfg;
 		const char		*configFile;
@@ -121,7 +115,7 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		pthread_sigmask( SIG_BLOCK, &new_mask, &old_mask );
 
 		// Run server in background thread(s).
-		_SMERP::server s( address, port, num_threads, timeout_duration_ms );
+		_SMERP::server s( config.address[0].first, config.address[0].second, config.threads, config.idleTimeout * 1000 );
 		boost::thread t( boost::bind( &_SMERP::server::run, &s ));
 
 		// Restore previous signals.

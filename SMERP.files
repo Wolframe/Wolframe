@@ -8,7 +8,6 @@ src/reply.hpp
 src/request.hpp
 src/server.cpp
 src/server.hpp
-src/ssl-server.cpp
 tests/singletonTest.cpp
 src/GNUmakefile
 GNUmakefile
