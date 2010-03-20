@@ -6,6 +6,7 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/foreach.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
@@ -15,6 +16,8 @@
 
 #include <iostream>
 
+static unsigned short	DEFAULT_PORT = 7660;
+static unsigned short	SSL_DEFAULT_PORT = 7660;
 
 static boost::filesystem::path resolvePath(const boost::filesystem::path& p)
 {
@@ -68,6 +71,9 @@ namespace _SMERP {
 
 	bool CfgFileConfig::parse ( const char *filename )
 	{
+		std::string	tmpStr, portStr;
+		unsigned short	port;
+
 		file = resolvePath( boost::filesystem::system_complete( filename )).string();
 		if ( !boost::filesystem::exists( file ))	{
 			errMsg_ = "Configuration file ";
@@ -85,18 +91,49 @@ namespace _SMERP {
 		read_xml( filename, pt );
 
 		//
-		BOOST_FOREACH( ptree::value_type &v, pt.get_child( "server.listen" ))
-			if ( v.first == "socket" )
-				address.push_back( make_pair( v.second.get<std::string>( "address", std::string() ),
-								v.second.get<unsigned short>( "port", 0 )));
-			else if ( v.first == "SSLsocket" )
-				SSLaddress.push_back( make_pair( v.second.get<std::string>( "address", std::string() ),
-								v.second.get<unsigned short>( "port", 0 )));
+		BOOST_FOREACH( ptree::value_type &v, pt.get_child( "server.listen" ))	{
+			tmpStr = v.second.get<std::string>( "address", std::string() );
+			if ( tmpStr.empty() )	{
+				errMsg_ = "Interface must be defined";
+				return false;
+			}
+			if ( tmpStr == "*" )
+				tmpStr = "0.0.0.0";
+			portStr = v.second.get<std::string>( "port", std::string() );
+			if ( portStr.empty() )	{
+				if ( v.first == "socket" )
+					port = DEFAULT_PORT;
+				else
+					port = SSL_DEFAULT_PORT;
+			}
 			else	{
-				errMsg_ = "Invalid listen type :";
+				try	{
+					port = boost::lexical_cast<unsigned short>( portStr );
+				}
+				catch( boost::bad_lexical_cast& )	{
+					errMsg_ = "Invalid value for port: ";
+					errMsg_ += portStr;
+					return false;
+				}
+				if ( port == 0 )	{
+					errMsg_ = "Port out of range: ";
+					errMsg_ += portStr;
+					return false;
+				}
+			}
+
+			if ( v.first == "socket" )	{
+				address.push_back( make_pair( tmpStr, port ));
+			}
+			else if ( v.first == "SSLsocket" )	{
+				SSLaddress.push_back( make_pair( tmpStr, port ));
+			}
+			else	{
+				errMsg_ = "Invalid listen type: ";
 				errMsg_ += v.first;
 				return false;
 			}
+		}
 
 		threads = pt.get<unsigned short>( "server.threads", 4 );
 		maxClients = pt.get<unsigned short>( "server.maxClients", 256 );
@@ -116,10 +153,8 @@ namespace _SMERP {
 							pt.get<std::string>( "server.SSL.CAdirectory", std::string() ))).string();
 		SSLCAchainFile = resolvePath( boost::filesystem::system_complete(
 							pt.get<std::string>( "server.SSL.CAchainFile", std::string() ))).string();
-		std::string SSLverifyStr = pt.get<std::string>( "server.SSL.verify", std::string() );
-		if ( strcasecmp( SSLverifyStr.c_str(), "no" )
-				|| strcasecmp( SSLverifyStr.c_str(), "false" )
-				|| strcasecmp( SSLverifyStr.c_str(), "0" ) )
+		tmpStr = pt.get<std::string>( "server.SSL.verify", std::string() );
+		if ( strcasecmp( tmpStr.c_str(), "no" )	|| strcasecmp( tmpStr.c_str(), "false" ) || strcasecmp( tmpStr.c_str(), "0" ))
 			SSLverify = false;
 		else
 			SSLverify = true;

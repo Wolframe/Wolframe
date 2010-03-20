@@ -22,15 +22,14 @@ class connection
     private boost::noncopyable
 {
 public:
-  /// Construct a connection with the given io_service.
-  explicit connection(boost::asio::io_service& io_service,
-      requestHandler& handler, long timeout_duration_ms);
+	/// Construct a connection with the given io_service.
+	explicit connection( boost::asio::io_service& io_service, requestHandler& handler, long timeout_duration_ms );
 
-  /// Get the socket associated with the connection.
-  boost::asio::ip::tcp::socket& socket();
+	/// Get the socket associated with the connection.
+	boost::asio::ip::tcp::socket& socket();
 
-  /// Start the first asynchronous operation for the connection.
-  void start();
+	/// Start the first asynchronous operation for the connection.
+	void start();
 
 private:
   /// Handle completion of a read operation.

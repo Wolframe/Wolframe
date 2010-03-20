@@ -2,16 +2,31 @@
 SMERP configuration file
 -->
 
+<!--
+ Ports 7649-7671 and 7934-7966 are unassigned according to IANA (last updated 2010-03-11).
+ Let's use 7660 for unencrypted connections and 7960 for SSL connections.
+
+ 7654 seems to be used by Winamp.
+-->
+
+<!--		<socket>
+			<address>*</address><port>7660</port>
+		</socket>
+		<socket>
+			<address>localhost</address><port>7661</port>
+		</socket>
+-->
 <server>
 	<listen>
 		<socket>
-			<address>*</address><port>7922</port>
+			<address>*</address><port>7661</port>
 		</socket>
 		<socket>
-			<address>localhost</address><port>7923</port>
+			<address>localhost</address><port>7662</port>
 		</socket>
+
 		<SSLsocket>
-			<address>localhost</address><port>7924</port>
+			<address>0.0.0.0</address><port>7961</port>
 		</SSLsocket>
 	</listen>
 

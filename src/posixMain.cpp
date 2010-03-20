@@ -115,7 +115,7 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		pthread_sigmask( SIG_BLOCK, &new_mask, &old_mask );
 
 		// Run server in background thread(s).
-		_SMERP::server s( config.address[0].first, config.address[0].second, config.threads, config.idleTimeout * 1000 );
+		_SMERP::server s( config );
 		boost::thread t( boost::bind( &_SMERP::server::run, &s ));
 
 		// Restore previous signals.
