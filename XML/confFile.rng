@@ -1,0 +1,67 @@
+<!--
+  SMERP configuration file
+  Relax-NG definition
+-->
+
+<element name="document"	xmlns="http://relaxng.org/ns/structure/1.0"
+				datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+	<element name="accessPath">
+		<attribute name="method">
+	    		<text/>
+		</attribute>
+
+		<text/>
+	</element>
+
+	<optional>
+		<group>
+			<element name="mimetype">
+				<text/>
+			</element>
+
+			<optional>
+				<element name="encoding">
+					<text/>
+				</element>
+			</optional>
+		</group>
+	</optional>
+
+	<zeroOrMore>
+		<element name="attribute">
+			<attribute name="name">
+		    		<text/>
+			</attribute>
+
+			<text/>
+		</element>
+	</zeroOrMore>
+
+	<zeroOrMore>
+		<element name="data">
+			<attribute name="name">
+    				<text/>
+			</attribute>
+
+			<data type="base64Binary"/>
+		</element>
+	</zeroOrMore>
+
+	<optional>
+		<element name="data">
+			<data type="base64Binary"/>
+		</element>
+	</optional>
+
+	<zeroOrMore>
+		<element name="data">
+			<attribute name="name">
+    				<text/>
+			</attribute>
+
+			<data type="base64Binary"/>
+		</element>
+	</zeroOrMore>
+
+</element>
+
