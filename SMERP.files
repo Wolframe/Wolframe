@@ -34,3 +34,7 @@ src/appConfig.hpp
 src/SMERP.conf
 src/appInstance.cpp
 src/appConfig.cpp
+TODO
+README
+XML/README
+XML/confFile.rng

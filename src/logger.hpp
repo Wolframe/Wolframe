@@ -2,5 +2,20 @@
 #define _LOGGER_HPP_INCLUDED
 
 
+enum	{
+	dR_TRACE_DATA,
+	dR_TRACE,
+	dR_DEBUG,
+	dR_INFO,
+	dR_NOTICE,
+	dR_WARNING,
+	dR_ERROR,
+	dR_CRITICAL,
+	dR_FATAL,
+
+	dR_ALWAYS,
+	dR_NONE,
+	dR_UNKNOWN
+} severityLevel_t;
 
 #endif // _LOGGER_HPP_INCLUDED
