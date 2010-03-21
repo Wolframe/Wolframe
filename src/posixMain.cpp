@@ -30,7 +30,6 @@ static const unsigned short MAJOR_VERSION = 0;
 static const short unsigned MINOR_VERSION = 0;
 static const short unsigned REVISION_NUMBER = 3;
 
-
 static const int DEFAULT_DEBUG_LEVEL = 3;
 
 static const char *DEFAULT_MAIN_CONFIG = "/etc/smerpd.conf";
@@ -158,9 +157,10 @@ int _SMERP_posixMain( int argc, char* argv[] )
 	}
 	catch (std::exception& e)	{
 		std::cerr << "posixMain: exception: " << e.what() << "\n";
+		return _SMERP::ErrorCodes::FAILURE;
 	}
 
-	return 0;
+	return _SMERP::ErrorCodes::OK;
 }
 
 #endif // !defined(_WIN32)
