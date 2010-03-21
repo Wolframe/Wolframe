@@ -12,12 +12,17 @@
 
 #include <vector>
 #include <string>
+
+#if defined(_WIN32)		// we are on Windows
+#include <string.h>
+#define strcasecmp(a, b)	_stricmp((a), (b))
+#else
 #include <strings.h>
+#endif
 
-#include <iostream>
 
-static unsigned short	DEFAULT_PORT = 7660;
-static unsigned short	SSL_DEFAULT_PORT = 7660;
+static const unsigned short	DEFAULT_PORT = 7660;
+static const unsigned short	SSL_DEFAULT_PORT = 7660;
 
 static boost::filesystem::path resolvePath(const boost::filesystem::path& p)
 {
