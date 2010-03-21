@@ -1,2 +1,24 @@
 Translations
 
+
+Updating:
+
+For all the files do:
+
+1. extract the gettext strings to a file
+xgettext -d <gettext domain> -s -D ../src -o <file>.pot <file>.cpp
+
+2. for each locale (language) merge the pot file to the language file
+msgmerge -s -U <locale>.po <file>.pot
+
+3. delete the pot file(s)
+
+4. build the message files and install them
+msgfmt -c -v -o <locale>.mo <locale>.po
+mkdir -p /usr/share/locale/<locale>/LC_MESSAGES <-- that's system default on linux, I use a different one for now
+cp <locale>.mo /usr/share/locale/<locale>/LC_MESSAGES/<gettext domain>.mo
+
+
+Or at least that's what I got :P
+
+Now translate :)

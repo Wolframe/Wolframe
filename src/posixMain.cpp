@@ -14,6 +14,9 @@
 #include "server.hpp"
 #include "ErrorCodes.hpp"
 
+#include <libintl.h>
+#include <locale.h>
+
 #if defined(_WIN32)
 #error "This is the POSIX main !"
 #else
@@ -37,6 +40,22 @@ static const char *DEFAULT_LOCAL_CONFIG = "./smerpd.conf";
 
 int _SMERP_posixMain( int argc, char* argv[] )
 {
+// i18n global stuff
+	if ( setlocale( LC_ALL, "" ) == NULL )	{
+		std::cerr << "Unable to set locale. Falling back to deafult." << std::endl;
+	}
+	else	{
+		if ( bindtextdomain( "SMERP", "../po" ) == NULL )	{
+			std::cerr << "Not enough memory to bind textdomain" << std::endl;
+			return _SMERP::ErrorCodes::FAILURE;
+		}
+		if ( textdomain( "SMERP" ) == NULL )	{
+			std::cerr << "Not enough memory to set textdomain" << std::endl;
+			return _SMERP::ErrorCodes::FAILURE;
+		}
+	}
+// end of i18n global stuff
+
 	try	{
 		_SMERP::AppInstance	app( MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER );
 		_SMERP::CmdLineConfig	cmdLineCfg;
@@ -55,7 +74,7 @@ int _SMERP_posixMain( int argc, char* argv[] )
 
 // if we have to print the version or the help do it and exit
 		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::PRINT_VERSION )	{
-			std::cout << "BOBOBO version " << app.version().toString() << std::endl << std::endl;
+			std::cout << gettext( "BOBOBO version " ) << app.version().toString() << std::endl << std::endl;
 			return _SMERP::ErrorCodes::OK;
 		}
 		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::PRINT_HELP )	{
@@ -72,7 +91,7 @@ int _SMERP_posixMain( int argc, char* argv[] )
 								       DEFAULT_USER_CONFIG,
 								       DEFAULT_LOCAL_CONFIG );
 		if ( configFile == NULL )	{	// there is no configuration file
-			std::cerr << "MOMOMO: no configuration file found !" << std::endl << std::endl;
+			std::cerr << gettext ( "MOMOMO: no configuration file found !" ) << std::endl << std::endl;
 			return _SMERP::ErrorCodes::FAILURE;
 		}
 

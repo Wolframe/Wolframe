@@ -12,8 +12,8 @@ namespace _SMERP {
 
 server::server( const ApplicationConfiguration& config )
 	: threadPoolSize_( config.threads ),
-    timeout_duration_ms_( (unsigned long)config.idleTimeout * 1000 ),
-    strand_(io_service_),
+    timeout_duration_ms_((unsigned long)config.idleTimeout * 1000 ),
+    strand_( io_service_ ),
     acceptor_(io_service_),
     new_connection_(new connection(io_service_, requestHandler_, timeout_duration_ms_)),
     requestHandler_()
@@ -27,10 +27,8 @@ server::server( const ApplicationConfiguration& config )
   acceptor_.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
   acceptor_.bind(endpoint);
   acceptor_.listen();
-  acceptor_.async_accept(new_connection_->socket(),
-      strand_.wrap(
-	boost::bind(&server::handleAccept, this,
-          boost::asio::placeholders::error)));
+  acceptor_.async_accept( new_connection_->socket(),
+			strand_.wrap( boost::bind( &server::handleAccept, this, boost::asio::placeholders::error )));
 }
 
 
