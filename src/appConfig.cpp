@@ -23,7 +23,6 @@ namespace _SMERP {
 		else
 			user = cfgFile.user;
 
-
 		if ( !cmdLine.group.empty())
 			group = cmdLine.group;
 		else

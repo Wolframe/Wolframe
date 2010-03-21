@@ -46,9 +46,8 @@ private:
 	std::size_t	threadPoolSize_;		// The number of threads that will call io_service::run().
 	unsigned long	timeout_duration_ms_;		// The duration for timeouts in milliseconds.
 
-	boost::asio::io_service		io_service_;	// The io_service used to perform asynchronous operations.
+	boost::asio::io_service		IOservice_;	// The io_service used to perform asynchronous operations.
 	boost::asio::io_service::strand	strand_;	// Strand to ensure the acceptor's handlers are not called concurrently.
-	//	std::vector<boost::asio::ip::tcp::acceptor>	acceptor_;	// Acceptor(s) used to listen for incoming connections.
 	boost::asio::ip::tcp::acceptor	acceptor_;	// Acceptor(s) used to listen for incoming connections.
 
 	connection_ptr new_connection_;			// The next connection to be accepted.
