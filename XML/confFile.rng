@@ -3,65 +3,38 @@
   Relax-NG definition
 -->
 
-<element name="document"	xmlns="http://relaxng.org/ns/structure/1.0"
+<element name="configuration"	xmlns="http://relaxng.org/ns/structure/1.0"
 				datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
-	<element name="accessPath">
-		<attribute name="method">
-	    		<text/>
-		</attribute>
+	<element name="server">
+		<optional>
+			<group>
+			</group>
+		</optional>
 
-		<text/>
+		<zeroOrMore>
+		</zeroOrMore>
 	</element>
 
-	<optional>
-		<group>
-			<element name="mimetype">
-				<text/>
-			</element>
-
-			<optional>
-				<element name="encoding">
-					<text/>
-				</element>
-			</optional>
-		</group>
-	</optional>
-
-	<zeroOrMore>
-		<element name="attribute">
-			<attribute name="name">
-		    		<text/>
-			</attribute>
-
+	<element name="database">
+		<element name="host">
 			<text/>
 		</element>
-	</zeroOrMore>
-
-	<zeroOrMore>
-		<element name="data">
-			<attribute name="name">
-    				<text/>
-			</attribute>
-
-			<data type="base64Binary"/>
+		<element name="port">
+			<data type="unsigned short"/>
 		</element>
-	</zeroOrMore>
-
-	<optional>
-		<element name="data">
-			<data type="base64Binary"/>
+		<element name="name">
+			<text/>
 		</element>
-	</optional>
-
-	<zeroOrMore>
-		<element name="data">
-			<attribute name="name">
-    				<text/>
-			</attribute>
-
-			<data type="base64Binary"/>
+		<element name="user">
+			<text/>
 		</element>
-	</zeroOrMore>
+		<element name="password">
+			<text/>
+		</element>
+	</element>
+
+	<element name="logging">
+	</element>
 
 </element>
 

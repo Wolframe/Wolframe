@@ -1,21 +1,22 @@
 #ifndef _LOGGER_HPP_INCLUDED
 #define _LOGGER_HPP_INCLUDED
 
-
-enum	{
-	dR_TRACE_DATA,
-	dR_TRACE,
-	dR_DEBUG,
-	dR_INFO,
-	dR_NOTICE,
-	dR_WARNING,
-	dR_ERROR,
-	dR_CRITICAL,
-	dR_FATAL,
-
-	dR_ALWAYS,
-	dR_NONE,
-	dR_UNKNOWN
-} severityLevel_t;
+class LogLevel	{
+public:
+	enum	{
+		ALWAYS,		/// always log
+		DATA,		/// log everything, including data
+		TRACE,		/// trace functions calls
+		DEBUG,		/// log operations
+		INFO,
+		NOTICE,
+		WARNING,
+		ERROR,
+		SEVERE,
+		CRITICAL,
+		FATAL,
+		NEVER		/// log this only under special conditions
+	};
+}
 
 #endif // _LOGGER_HPP_INCLUDED
