@@ -1,6 +1,6 @@
 TOPDIR = .
 
-SUBDIRS = src tests
+SUBDIRS = libs src tests
 
 PACKAGE_NAME = SMERP
 PACKAGE_VERSION = 0.0.1

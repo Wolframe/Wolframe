@@ -1,0 +1,69 @@
+TOPDIR = ..\..\..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_DIRS = /I$(TOPDIR) /D_WIN32_WINNT=0x400 /I"$(BOOST_DIR)" /I"$(PLATFORM_SDK_DIR)\Include"
+
+MT=-mt
+VC_VER=vc80
+BOOST_VER=1_42
+TAG=-$(VC_VER)$(MT)-$(BOOST_VER)
+
+LIBRARIES = \
+	boost_log.lib \
+	boost_log_setup.lib
+
+LOG_OBJS = \
+	attribute_set.obj \
+	attribute_values_view.obj \
+	code_conversion.obj \
+	core.obj \
+	exceptions.obj \
+	global_logger_storage.obj \
+	named_scope.obj \
+	process_id.obj \
+	severity_level.obj \
+	sink_frontends.obj \
+	stream_provider.obj \
+	event_log_backend.obj \
+	nt6_event_log_backend.obj \
+	text_file_backend.obj \
+	text_ostream_backend.obj \
+	thread_specific.obj \
+	timer.obj \
+	trivial.obj \
+	slim_string.obj
+
+LOG_SETUP_OBJS = \
+	parser_utils.obj \
+	init_from_stream.obj \
+	init_from_settings.obj \
+	filter_parser.obj \
+	formatter_parser.obj
+
+OBJS = \
+	$(LOG_OBJS) \
+	$(LOG_SETUP_OBJS)
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+event_log_backend.obj: simple_event_log.rc
+
+boost_log.lib: $(LOG_OBJS) simple_event_log.res
+	$(LINK) /lib /nologo /out:$@ $(LDFLAGS) $(LIBS) $?
+	@-copy boost_log.lib libboost_log$(TAG).lib
+
+boost_log_setup.lib: $(LOG_SETUP_OBJS)
+	$(LINK) /lib /nologo /out:$@ $(LDFLAGS) $(LIBS) $?
+	@-copy boost_log.lib libboost_log_setup$(TAG).lib
+
+local_all: $(OBJS) $(LIBRARIES)
+
+local_test:
+
+local_clean:
+	@-erase $(LIBRARIES) simple_event_log.rc simple_event_log.h 2>NUL
+
+local_distclean:
