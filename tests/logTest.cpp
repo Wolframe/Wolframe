@@ -247,7 +247,7 @@ int main( void ) {
 #ifndef _WIN32
 	init_log_to_syslog(
 		keywords::facility = sinks::syslog::user,
-//		keywords::use_impl = sinks::syslog::native,
+		keywords::use_impl = sinks::syslog::native,
 		keywords::filter = flt::attr< log_level >( "Severity", nothrow ) <= FATAL
 	);
 #else
