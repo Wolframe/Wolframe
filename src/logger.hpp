@@ -24,6 +24,7 @@ public:
 		ERROR,
 		SEVERE,
 		CRITICAL,
+<<<<<<< HEAD:src/logger.hpp
 		ALERT,
 		FATAL,
 		NEVER		/// log this only under special conditions
