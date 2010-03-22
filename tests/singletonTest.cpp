@@ -36,7 +36,7 @@ void threadFunction()
 }
 
 
-int main( int argc, char *argv[] )
+int main( )
 {
 	boost::thread thread1( &threadFunction );
 	boost::thread thread2( &threadFunction );

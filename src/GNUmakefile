@@ -5,8 +5,10 @@ SUBDIRS =
 INCLUDE_DIRS = -I. \
 	-I$(TOPDIR)/include
 
+-include $(TOPDIR)/makefiles/gmake/platform.mk
+
 INCLUDE_LIBS = \
-	-lboost_thread -lboost_system \
+	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_program_options \
 	-lboost_filesystem
 

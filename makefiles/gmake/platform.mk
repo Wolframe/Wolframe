@@ -22,6 +22,10 @@ PLATFORM ?=		$(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_env --platform $(C
 OS_MAJOR_VERSION ?=	$(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_env --os-major-version $(CC) "$(CURDIR)" $(TOPDIR))
 OS_MINOR_VERSION ?=	$(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_env --os-minor-version $(CC) "$(CURDIR)" $(TOPDIR))
 COMPILER ?=		$(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_env --compiler $(CC) "$(CURDIR)" $(TOPDIR))
+ifeq "$(PLATFORM)" "LINUX" 
+LINUX_DIST ?=		$(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_env --linux-dist $(CC) "$(CURDIR)" $(TOPDIR))
+LINUX_REV ?=		$(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_env --linux-rev $(CC) "$(CURDIR)" $(TOPDIR))
+endif
 
 # platform specific flags
 #########################
@@ -30,6 +34,11 @@ PLATFORM_COMPILE_FLAGS = \
 			-D$(PLATFORM) \
 			-DOS_MAJOR_VERSION=$(OS_MAJOR_VERSION) \
 			-DOS_MINOR_VERSION=$(OS_MINOR_VERSION)
+
+ifeq "$(PLATFORM)" "LINUX"
+PLATFORM_COMPILE_FLAGS += \
+			-DLINUX_DIST=$(LINUX_DIST) -DLINUX_REV=$(LINUX_REV)
+endif
 
 # extensions for binaries
 ifeq "$(PLATFORM)" "CYGWIN"
@@ -122,26 +131,6 @@ endif
 PLATFORM_COMPILE_FLAGS += \
 	-DENABLE_NLS=$(ENABLE_NLS) -DLOCALEDIR=\"$(localedir)\"
 
-# command line parser generator gengetopt
-########################################
-
-# location of gengetopt (default: in the path)
-GENGETOPT=gengetopt
-
-# some platform either have no getopt/getopt_long or a broken one, so
-# gengetopt can include its own one
-
-GENGETOPT_INCLUDE_GETOPT = 
-
-ifeq "$(PLATFORM)" "SUNOS"
-ifeq "$(OS_MAJOR_VERSION)" "5"
-ifeq "$(OS_MINOR_VERSION)" "8"
-GENGETOPT_INCLUDE_GETOPT =  --include-getopt
-endif
-endif
-
-endif
-
 # TCP/IP, DNS
 #############
 
@@ -184,5 +173,16 @@ endif
 PLATFORM_COMPILE_FLAGS +=  $(INCLUDE_FLAGS_NET)
 
 # XSLT processor
+################
 
 XSLTPROC = xsltproc
+
+# Boost
+#######
+
+ifeq "$(PLATFORM)" "LINUX"
+ifeq "$(LINUX_DIST)" "arch"
+BOOST_DIR=/usr
+BOOST_LIBRARY_TAG =  "-mt"
+endif
+endif

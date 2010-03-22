@@ -40,7 +40,7 @@ GCC_MINOR_VERSION ?=	$(shell $(TOPDIR)/makefiles/gmake/guess_env --gcc-minor-ver
 COMMON_COMPILE_FLAGS = \
 	-g \
 	-fstrict-aliasing \
-	-pedantic -Wall \
+	-pedantic -Wall -Werror \
 	-Wunused -Wno-import \
 	-Wformat -Wformat-y2k -Wformat-nonliteral -Wformat-security -Wformat-y2k \
 	-Wswitch-enum -Wunknown-pragmas -Wfloat-equal \
@@ -50,12 +50,10 @@ COMMON_COMPILE_FLAGS = \
 	-Wmissing-noreturn \
 	-Wno-multichar -Wparentheses -Wredundant-decls \
 	-Winline \
-	-Wdisabled-optimization  -Wno-long-long
-# disabled -Werror (due to problems in boost)
-# disabled -Wfatal-errors (due to problems in boost)
+	-Wdisabled-optimization
 ifeq "$(GCC_MAJOR_VERSION)" "4"
 COMMON_COMPILE_FLAGS += \
-	-Wmissing-include-dirs -Wvariadic-macros \
+	-Wfatal-errors -Wmissing-include-dirs -Wvariadic-macros \
 	-Wvolatile-register-var \
 	-Wstrict-aliasing=2 -Wextra -Winit-self
 # -Wconversion had to meanings before gcc 4.3 (warn about ABI changes when porting
@@ -271,8 +269,47 @@ PTHREADS_LIBS =
 endif
 endif
 
-CFLAGS = $(COMPILE_FLAGS) $(PLATFORM_COMPILE_FLAGS) $(INCLUDE_DIRS) $(PTHREADS_CFLAGS)
-CCPPFLAGS = $(CCPP_COMPILE_FLAGS) $(PLATFORM_COMPILE_FLAGS) $(INCLUDE_DIRS) $(PTHREADS_CFLAGS)
+# set flags for position independend code (as required for shared libraries
+# on some platforms)
+ifeq "$(COMPILER)" "gcc"
+ifeq "$(PLATFORM)" "LINUX"
+SO_COMPILE_FLAGS = -fPIC
+endif
+ifeq "$(PLATFORM)" "SUNOS"
+SO_COMPILE_FLAGS = -fPIC
+endif
+ifeq "$(PLATFORM)" "FREEBSD"
+SO_COMPILE_FLAGS = -fPIC
+endif
+ifeq "$(PLATFORM)" "NETBSD"
+SO_COMPILE_FLAGS = -fPIC
+endif
+ifeq "$(PLATFORM)" "OPENBSD"
+SO_COMPILE_FLAGS = -fPIC
+endif
+ifeq "$(PLATFORM)" "CYGWIN"
+# code on Cygwin is always position independend
+SO_COMPILE_FLAGS =
+endif
+endif
+
+ifeq "$(COMPILER)" "icc"
+ifeq "$(PLATFORM)" "LINUX"
+SO_COMPILE_FLAGS = -fPIC
+endif
+endif
+
+# TODO: test this
+#ifeq "$(COMPILER)" "spro"
+#ifeq "$(PLATFORM)" "SUNOS"
+#ifeq "$(ARCH)" "sun4u"
+#SO_COMPILE_FLAGS = -xcode=pic32
+#endif
+#endif
+#endif
+
+CFLAGS = $(COMPILE_FLAGS) $(PLATFORM_COMPILE_FLAGS) $(INCLUDE_DIRS) $(INCLUDE_CFLAGS) $(PTHREADS_CFLAGS)
+CCPPFLAGS = $(CCPP_COMPILE_FLAGS) $(PLATFORM_COMPILE_FLAGS) $(INCLUDE_DIRS) $(INCLUDE_CPPFLAGS) $(PTHREADS_CFLAGS)
 
 LDFLAGS = $(INCLUDE_LDFLAGS) $(PTHREADS_LDFLAGS) $(LDFLAGS_NET) $(LDFLAGS_LT)
 LIBS = $(INCLUDE_LIBS) $(PTHREADS_LIBS) $(LIBS_NET) $(LIBS_LT)
@@ -289,18 +326,20 @@ CCPP_LINK = $(CCPP)
 	$(CCPP_LINK) -o $@ $(LDFLAGS) $(OBJS) $(TEST_OBJS) $< $(LIBS)
 
 %.sho : %.c
-	$(CC) -c -o $@ -fPIC -DSHARED $(CFLAGS) $<
+	$(CC) -c -o $@ $(SO_COMPILE_FLAGS) -DSHARED $(CFLAGS) $<
 
-%$(SO) : %.sho $(OBJS)
-	$(LINK) -shared -o $@ $(LDFLAGS) $(LIBS) $(OBJS) $<
+#%$(SO) : %.sho $(OBJS)
+#	$(LINK) -shared -o $@ $(LDFLAGS) $(LIBS) $(OBJS) $<
 
 %.sho++ : %.cpp
-	$(CCPP) -c -o $@ -fPIC -DSHARED $(CCPPFLAGS) $<
+	$(CCPP) -c -o $@ $(SO_COMPILE_FLAGS) -DSHARED $(CCPPFLAGS) $<
 
-%$(SO) : %.sho++ $(OBJS) $(CPPOBJS)
-	$(CCPP_LINK) -shared -o $@ $(LDFLAGS) $(LIBS) $(OBJS) $(CPPOBJS) $<
+#%$(SO) : %.sho++ $(OBJS) $(CPPOBJS)
+#	$(CCPP_LINK) -shared -o $@ $(LDFLAGS) $(LIBS) $(OBJS) $(CPPOBJS) $<
  
 BIN_OBJS = $(BINS:$(EXE)=.o) 
 TEST_BIN_OBJS = $(TEST_BINS:$(EXE)=.o)
 CPP_BIN_OBJS = $(CPP_BINS:$(EXE)=.o)
 TEST_CPP_BIN_OBJS = $(TEST_CPP_BINS:$(EXE)=.o)
+SH_OBJS = $(OBJS:.o=.sho)
+SHPP_OBJS = $(CPP_OBJS:.o=.sho++)

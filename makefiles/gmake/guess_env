@@ -11,6 +11,23 @@ case "$UNAME_SYSTEM.$UNAME_RELEASE" in
 	Linux*)		PLATFORM=LINUX
 			OS_MAJOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 1`
 			OS_MINOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 2`
+
+			if test -f /etc/arch-release; then
+				LINUX_DIST='arch'
+				LINUX_REV='current'
+			elif test -f /etc/debian_version; then
+				LINUX_DIST='debian'
+				LINUX_REV=`cat /etc/debian_version | cut -d . -f 1`
+			elif test -f /etc/slackware-version; then
+				LINUX_DIST='slackware'
+				LINUX_REV=`cat /etc/slackware-version | cut -d ' ' -f 2 | cut -d . -f 1`
+			elif test -f /etc/redhat-release; then
+				LINUX_DIST='redhat'
+				LINUX_REV=`cat /etc/redhat-release | sed s/.*release\ // | sed s/\ .*// | cut -f 1 -d .`
+			else
+				LINUX_DIST='unknown'
+				LINUX_REV='unknown'
+			fi
 			;;
 
 	FreeBSD*)	PLATFORM=FREEBSD
@@ -61,11 +78,18 @@ case "$UNAME_MACHINE" in
 			
 esac
 
+# get last line, old 'tail' syntax and POSIX syntax, both exist out there
+if test "x${PLATFORM}" = "xSUNOS"; then
+	TAIL1='tail -1'
+else
+	TAIL1='tail -n 1'
+fi
+
 # the compiler and version
 
 # what compiler do we have (we can't relly on it's name as it may be a cc link to the binary!)
 CC=$2
-(( $CC -v 2>&1 | tail -n 1 ) | tail -n 1 | grep -i GCC ) 2>/dev/null 1>/dev/null
+(( $CC -v 2>&1 | $TAIL1 ) | grep -i GCC ) 2>/dev/null 1>/dev/null
 if test $? = 0; then
 	COMPILER='gcc'
 else
@@ -194,5 +218,7 @@ ICC_MINOR_VERSION=$ICC_MINOR_VERSION
 SPRO_MAJOR_VERSION=$SPRO_MAJOR_VERSION
 PCC_MAJOR_VERSION=$PCC_MAJOR_VERSION
 PCC_MINOR_VERSION=$PCC_MINOR_VERSION
+LINUX_DIST=$LINUX_DIST
+LINUX_REV=$LINUX_REV
 EOF
 fi
