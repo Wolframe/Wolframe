@@ -1,0 +1,52 @@
+TOPDIR = ..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_DIRS = /I. \
+	/I$(TOPDIR)\include \
+	/D_WIN32_WINNT=0x400 /I"$(BOOST_DIR)" /I"$(PLATFORM_SDK_DIR)\Include"	
+
+# Note: libraries are picked automatically on Windows!
+SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib"
+BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib"
+INCLUDE_LDFLAGS = $(SDK_LDFLAGS) $(BOOST_LDFLAGS)
+
+CPP_BINS = \
+	smerpd.exe
+
+STATIC_LIBS = \
+
+STATIC_LIB_OBJS = \
+
+C_PORT_OBJS = \
+
+OBJS = \
+	$(C_PORT_OBJS) \
+	$(STATIC_LIB_OBJS) \
+	version.obj \
+	appInstance.obj \
+	commandLine.obj \
+	configFile.obj \
+	appConfig.obj \
+	request.obj \
+	reply.obj \
+	server.obj \
+	connection.obj \
+	requestHandler.obj \
+	winMain.obj
+
+all: $(OBJS) $(CPP_BINS)
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+smerpd.exe: smerpd.obj $(OBJS)
+
+local_all:
+
+local_clean:
+
+local_distclean:
+
+local_test:

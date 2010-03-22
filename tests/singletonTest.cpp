@@ -6,7 +6,7 @@
 #include <boost/thread/mutex.hpp>
 #include <iostream>
 
-#include <unistd.h>
+#include <boost/thread/thread.hpp> 
 
 #include "singleton.hpp"
 
@@ -22,7 +22,7 @@ public:
 protected:
 private:
 	TestClass()	{	std::cout << "Initializing TestClass" << std::endl;
-				sleep( 3 );
+				boost::this_thread::sleep(boost::posix_time::seconds( 3 ));
 				std::cout << "TestClass initialized" << std::endl;
 			}
 

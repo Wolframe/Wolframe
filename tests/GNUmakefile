@@ -12,10 +12,12 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 
+TEST_OBJS = \
+	$(TOPDIR)/src/version.o
 
 TEST_CPP_BINS = \
 	singletonTest$(EXE) \
-	version$(EXE) \
+	versionTest$(EXE)
 
 include $(TOPDIR)/makefiles/gmake/sub.mk
 
@@ -31,5 +33,5 @@ local_test:
 	@./singletonTest
 	@echo
 	@echo "Testing version..."
-	@./version
+	@./versionTest
 	@echo
