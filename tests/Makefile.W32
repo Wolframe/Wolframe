@@ -1,0 +1,46 @@
+TOPDIR = ..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_DIRS = \
+	/I$(TOPDIR) /I$(TOPDIR)/include /I. \
+	/I$(TOPDIR)/src \
+	/D_WIN32_WINNT=0x400 /I"$(BOOST_DIR)" /I"$(PLATFORM_SDK_DIR)\Include"
+
+# Note: libraries are picked automatically on Windows!
+SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib"
+BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib"
+INCLUDE_LDFLAGS = $(SDK_LDFLAGS) $(BOOST_LDFLAGS)
+
+TEST_CPP_BINS = \
+	singletonTest.exe
+# Aba: needs a lot of non-portable C-stuff, doesn't compile also on Linux
+#	version.exe
+
+OBJS =
+
+all: $(OBJS) $(CPP_BINS)
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+singletonTest.exe: singletonTest.obj
+version.exe: version.obj
+
+local_all:
+
+local_clean:
+	@-erase test.bat 2>NUL
+
+
+local_distclean:
+
+local_test:
+	@-echo @echo off > test.bat
+	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
+	@-echo echo Testing singleton template... >> test.bat
+	@-echo singletonTest >> test.bat
+#	@-echo echo Testing version... >> test.bat
+#	@-echo version >> test.bat
+	@-test.bat

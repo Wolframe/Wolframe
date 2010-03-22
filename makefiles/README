@@ -1,3 +1,4 @@
 Snippets and other goodies for makefiles
 
 gmake - include snippets for GNU makefiles
+nmake - include snippets for Windows NMAKE makefiles

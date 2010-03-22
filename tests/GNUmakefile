@@ -12,10 +12,9 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 
-
 TEST_CPP_BINS = \
 	singletonTest$(EXE) \
-	version$(EXE) \
+	version$(EXE)
 
 include $(TOPDIR)/makefiles/gmake/sub.mk
 
