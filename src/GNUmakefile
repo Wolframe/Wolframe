@@ -29,7 +29,7 @@ OBJS = \
 	appConfig.o \
 	request.o \
 	reply.o \
-	server.o\
+	server.o \
 	connection.o \
 	requestHandler.o \
 	posixMain.o
