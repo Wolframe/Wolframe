@@ -35,12 +35,14 @@ GCC_MINOR_VERSION ?=	$(shell $(TOPDIR)/makefiles/gmake/guess_env --gcc-minor-ver
 # everything implied by -Wall is not explicitly specified (gcc 4.2.3)
 # TODO: reenable -O2
 # -Waggregate-return: is for K&R code and mostly useless nowadays
+# -Wno-long-long: some boost code header require 'long long'
 
 # compilation flags and compilers
 COMMON_COMPILE_FLAGS = \
 	-g \
 	-fstrict-aliasing \
 	-pedantic -Wall -Werror \
+	-Wno-long-long \
 	-Wunused -Wno-import \
 	-Wformat -Wformat-y2k -Wformat-nonliteral -Wformat-security -Wformat-y2k \
 	-Wswitch-enum -Wunknown-pragmas -Wfloat-equal \
