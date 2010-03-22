@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE( _version_ )
 	build = (unsigned)( rand() % UINT_MAX );
 
 	_SMERP::Version ver( major, minor, revision, build );
-	snprintf( verStr, MAX_STRING, "%d.%d.%d.%u", major, minor, revision, build );
+	sprintf( verStr, "%d.%d.%d.%u", major, minor, revision, build );
 
 	BOOST_CHECK_EQUAL( ver.major(), major );
 	BOOST_CHECK_EQUAL( ver.minor(), minor );
