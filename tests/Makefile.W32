@@ -16,7 +16,8 @@ INCLUDE_LDFLAGS = $(SDK_LDFLAGS) $(BOOST_LDFLAGS)
 
 TEST_CPP_BINS = \
 	singletonTest.exe \
-	versionTest.exe
+	versionTest.exe \
+	logTest.exe
 
 OBJS = \
 	$(TOPDIR)\src\version.obj
@@ -27,6 +28,7 @@ all: $(OBJS) $(CPP_BINS)
 
 singletonTest.exe: singletonTest.obj
 versionTest.exe: versionTest.obj
+logTest.exe: logTest.obj
 
 local_all:
 
@@ -42,4 +44,6 @@ local_test:
 	@-echo singletonTest >> test.bat
 	@-echo echo Testing version... >> test.bat
 	@-echo versionTest >> test.bat
+	@-echo echo Testing boost log... >> test.bat
+	@-echo logTest >> test.bat
 	@-test.bat
