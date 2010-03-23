@@ -29,14 +29,14 @@ BOOST_AUTO_TEST_CASE( _version_ )
 	revision = (unsigned short)( rand() % USHRT_MAX );
 	build = (unsigned)( rand() % UINT_MAX );
 
-	_SMERP::version ver( major, minor, revision, build );
-	snprintf( verStr, MAX_STRING, "%d.%d.%d.%u", major, minor, revision, build );
+	_SMERP::Version ver( major, minor, revision, build );
+	sprintf( verStr, "%d.%d.%d.%u", major, minor, revision, build );
 
 	BOOST_CHECK_EQUAL( ver.major(), major );
 	BOOST_CHECK_EQUAL( ver.minor(), minor );
 	BOOST_CHECK_EQUAL( ver.revision(), revision );
 	BOOST_CHECK_EQUAL( ver.build(), build );
-	BOOST_CHECK_EQUAL( ver.string().c_str(), verStr );
-	std::cout << ver.string();
+	BOOST_CHECK_EQUAL( ver.toString().c_str(), verStr );
+	std::cout << ver.toString();
 }
 
