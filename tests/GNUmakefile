@@ -6,9 +6,11 @@ INCLUDE_DIRS = \
 	-I$(TOPDIR)/include -I. \
 	-I$(TOPDIR)/src \
 
+-include $(TOPDIR)/makefiles/gmake/platform.mk
+
 INCLUDE_LDFLAGS = \
 	-lboost_unit_test_framework \
-	-lboost_thread
+	-lboost_thread$(BOOST_LIBRARY_TAG)
 
 INCLUDE_LIBS = \
 
