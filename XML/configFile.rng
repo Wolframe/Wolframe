@@ -11,26 +11,50 @@
 			</group>
 		</optional>
 
-		<zeroOrMore>
-		</zeroOrMore>
+		<element name="listen">
+			<element name="host">
+			<zeroOrMore>
+				<element name="host">
+					<text/>
+				</element>
+				<optional>
+					<element name="port">
+						<data type="unsigned short"/>
+					</element>
+				</optional>
+			</zeroOrMore>
+		</element>
 	</element>
 
 	<element name="database">
-		<element name="host">
-			<text/>
-		</element>
-		<element name="port">
-			<data type="unsigned short"/>
-		</element>
-		<element name="name">
-			<text/>
-		</element>
-		<element name="user">
-			<text/>
-		</element>
-		<element name="password">
-			<text/>
-		</element>
+		<optional>
+			<element name="host">
+				<text/>
+			</element>
+			<optional>
+				<element name="port">
+					<data type="unsigned short"/>
+				</element>
+			</optional>
+		</optional>
+
+		<optional>
+			<element name="name">
+				<text/>
+			</element>
+		</optional>
+
+		<optional>
+			<element name="user">
+				<text/>
+			</element>
+
+			<optional>
+				<element name="password">
+					<text/>
+			</element>
+			</optional>
+		</optional>
 	</element>
 
 	<element name="logging">
