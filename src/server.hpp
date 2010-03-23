@@ -49,8 +49,10 @@ private:
 	boost::asio::io_service		IOservice_;	// The io_service used to perform asynchronous operations.
 	boost::asio::io_service::strand	strand_;	// Strand to ensure the acceptor's handlers are not called concurrently.
 	boost::asio::ip::tcp::acceptor	acceptor_;	// Acceptor(s) used to listen for incoming connections.
+	boost::asio::ip::tcp::acceptor	SSLacceptor_;	// Acceptor(s) used to listen for SSL incoming connections.
 
-	connection_ptr new_connection_;			// The next connection to be accepted.
+	connection_ptr newConnection_;			// The next connection to be accepted.
+	connection_ptr newSSLconnection_;			// The next connection to be accepted.
 
 	requestHandler requestHandler_;			// The handler for all incoming requests.
 };
