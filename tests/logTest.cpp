@@ -260,11 +260,18 @@ int main( void ) {
 	src::severity_logger< log_level > logger;
 
 	LOG_FATAL	<< "fatal error";
+	LOG_ALERT	<< "alert";
+	LOG_CRITICAL	<< "critical error";
 	LOG_ERROR	<< "an error";
 	LOG_WARNING	<< "a warning";
 	LOG_NOTICE	<< "a notice";
 	LOG_INFO 	<< "an info";
+	LOG_DEBUG0	<< "debug message of level 0";
+	LOG_DEBUG1	<< "debug message of level 1";
+	LOG_DEBUG2	<< "debug message of level 2";
+	LOG_DEBUG3	<< "debug message of level 3";
 	LOG_DEBUG4	<< "debug message of level 4";
+	LOG_DEBUG5	<< "debug message of level 5";
 
 	return 0;
 }
