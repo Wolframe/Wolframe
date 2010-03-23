@@ -17,7 +17,9 @@ server::server( const ApplicationConfiguration& config )
     timeout_duration_ms_((unsigned long)config.idleTimeout * 1000 ),
 	strand_( IOservice_ ),
 	acceptor_( IOservice_ ),
-    new_connection_(new connection(IOservice_, requestHandler_, timeout_duration_ms_)),
+	SSLacceptor_( IOservice_ ),
+    newConnection_(new connection(IOservice_, requestHandler_, timeout_duration_ms_)),
+    newSSLconnection_(new connection(IOservice_, requestHandler_, timeout_duration_ms_)),
     requestHandler_()
 {
 	// Open the acceptor(s) with the option to reuse the address (i.e. SO_REUSEADDR).
@@ -29,7 +31,7 @@ server::server( const ApplicationConfiguration& config )
 	acceptor_.set_option( boost::asio::ip::tcp::acceptor::reuse_address( true ));
 	acceptor_.bind( endpoint );
 	acceptor_.listen();
-	acceptor_.async_accept( new_connection_->socket(), strand_.wrap( boost::bind( &server::handleAccept,
+	acceptor_.async_accept( newConnection_->socket(), strand_.wrap( boost::bind( &server::handleAccept,
 										      this,
 										      boost::asio::placeholders::error )));
 }
@@ -72,10 +74,10 @@ void server::handleAccept(const boost::system::error_code& e)
 {
   if (!e)
   {
-    new_connection_->start();
-    new_connection_.reset(new connection(IOservice_, requestHandler_,
+    newConnection_->start();
+    newConnection_.reset(new connection(IOservice_, requestHandler_,
       timeout_duration_ms_));
-    acceptor_.async_accept(new_connection_->socket(),
+    acceptor_.async_accept(newConnection_->socket(),
         strand_.wrap(
 	  boost::bind(&server::handleAccept, this,
             boost::asio::placeholders::error)));
