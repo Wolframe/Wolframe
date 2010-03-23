@@ -15,24 +15,25 @@ BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib"
 INCLUDE_LDFLAGS = $(SDK_LDFLAGS) $(BOOST_LDFLAGS)
 
 TEST_CPP_BINS = \
-	singletonTest.exe
-# Aba: needs a lot of non-portable C-stuff, doesn't compile also on Linux
-#	version.exe
+	singletonTest.exe \
+	versionTest.exe \
+	logTest.exe
 
-OBJS =
+OBJS = \
+	$(TOPDIR)\src\version.obj
 
 all: $(OBJS) $(CPP_BINS)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 singletonTest.exe: singletonTest.obj
-version.exe: version.obj
+versionTest.exe: versionTest.obj
+logTest.exe: logTest.obj
 
 local_all:
 
 local_clean:
 	@-erase test.bat 2>NUL
-
 
 local_distclean:
 
@@ -41,6 +42,8 @@ local_test:
 	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
 	@-echo echo Testing singleton template... >> test.bat
 	@-echo singletonTest >> test.bat
-#	@-echo echo Testing version... >> test.bat
-#	@-echo version >> test.bat
+	@-echo echo Testing version... >> test.bat
+	@-echo versionTest >> test.bat
+	@-echo echo Testing boost log... >> test.bat
+	@-echo logTest >> test.bat
 	@-test.bat
