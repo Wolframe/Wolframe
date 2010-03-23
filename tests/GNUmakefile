@@ -8,11 +8,12 @@ INCLUDE_DIRS = \
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
-INCLUDE_LDFLAGS = \
-	-lboost_unit_test_framework \
-	-lboost_thread$(BOOST_LIBRARY_TAG)
+INCLUDE_LDFLAGS =
 
 INCLUDE_LIBS = \
+	-lboost_unit_test_framework \
+	-lboost_thread$(BOOST_LIBRARY_TAG) \
+	-lboost_filesystem -lboost_thread$(BOOST_LIBRARY_TAG) \
 
 TEST_OBJS = \
 	$(TOPDIR)/src/version.o
