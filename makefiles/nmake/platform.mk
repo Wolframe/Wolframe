@@ -28,5 +28,4 @@
 # Boost
 #######
 
-# check if we have the tagged or untagged version
-#BOOST_TAG ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_boost --tagged $(BOOST_DIR))
+BOOST_LIBRARY_TAG=-$(BOOST_VC_VER)$(BOOST_MT)-$(BOOST_VERSION)

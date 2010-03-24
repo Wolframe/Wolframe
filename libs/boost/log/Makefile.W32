@@ -4,17 +4,12 @@ SUBDIRS =
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
-INCLUDE_DIRS = /I$(TOPDIR) /D_WIN32_WINNT=0x400 /I"$(BOOST_DIR)" /I"$(PLATFORM_SDK_DIR)\Include"
-
-# TODO: autodetect in platform.mk
-MT=-mt
-VC_VER=vc90
-BOOST_VER=1_42
-TAG=-$(VC_VER)$(MT)-$(BOOST_VER)
+INCLUDE_DIRS = \
+	/I$(TOPDIR) /I"$(BOOST_DIR)" /I"$(PLATFORM_SDK_DIR)\Include"
 
 LIBRARIES = \
-	boost_log.lib \
-	boost_log_setup.lib
+	libboost_log$(BOOST_LIBRARY_TAG).lib \
+	libboost_log_setup$(BOOST_LIBRARY_TAG).lib
 
 LOG_OBJS = \
 	attribute_set.obj \
@@ -52,13 +47,11 @@ OBJS = \
 
 event_log_backend.obj: simple_event_log.rc
 
-boost_log.lib: $(LOG_OBJS) simple_event_log.res
+libboost_log$(BOOST_LIBRARY_TAG).lib: $(LOG_OBJS) simple_event_log.res
 	$(LINK) /lib /nologo /out:$@ $(LDFLAGS) $(LIBS) $?
-	@-copy boost_log.lib libboost_log$(TAG).lib
 
-boost_log_setup.lib: $(LOG_SETUP_OBJS)
+libboost_log_setup$(BOOST_LIBRARY_TAG).lib: $(LOG_SETUP_OBJS)
 	$(LINK) /lib /nologo /out:$@ $(LDFLAGS) $(LIBS) $?
-	@-copy boost_log.lib libboost_log_setup$(TAG).lib
 
 local_all: $(OBJS) $(LIBRARIES)
 
