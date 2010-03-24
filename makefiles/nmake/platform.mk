@@ -32,6 +32,7 @@ PLATFORM_SDK_DIR = C:\Program Files\Microsoft Platform SDK for Windows Server 20
 
 # base dir of boost
 BOOST_DIR=C:\Program Files\boost\boost_1_42
+#BOOST_DIR=C:\Programme\boost\boost_1_42
 
 # check if we have the tagged or untagged version
 #BOOST_TAG ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_boost --tagged $(BOOST_DIR))
