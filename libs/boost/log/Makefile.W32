@@ -6,8 +6,9 @@ SUBDIRS =
 
 INCLUDE_DIRS = /I$(TOPDIR) /D_WIN32_WINNT=0x400 /I"$(BOOST_DIR)" /I"$(PLATFORM_SDK_DIR)\Include"
 
+# TODO: autodetect in platform.mk
 MT=-mt
-VC_VER=vc80
+VC_VER=vc90
 BOOST_VER=1_42
 TAG=-$(VC_VER)$(MT)-$(BOOST_VER)
 
