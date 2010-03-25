@@ -40,7 +40,7 @@ server::server( const ApplicationConfiguration& config )
 		acceptor_ = NULL;
 
 	if ( config.SSLaddress.size() > 0 )	{
-		SSLcontext_ = new boost::asio::ssl::context(io_service, boost::asio::ssl::context::sslv23);
+		SSLcontext_ = new boost::asio::ssl::context(IOservice_, boost::asio::ssl::context::sslv23);
 		SSLacceptor_ = new boost::asio::ip::tcp::acceptor( IOservice_ );
 		// Open the acceptor(s) with the option to reuse the address (i.e. SO_REUSEADDR).
 		boost::asio::ip::tcp::resolver resolver( IOservice_ );
