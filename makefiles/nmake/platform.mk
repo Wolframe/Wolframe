@@ -1,17 +1,12 @@
 # Sets Windows specific variables
 #
-# requires:
-# - 
-#
 # provides:
-# - PLATFORM_SDK_DIR: the location of the Windows Platform SDK, used
-#   for compiling anything from the Win32 API into a binary/library
+# - BOOST_LIBRARY_TAG: how libraries are auto-tagged, for example
+#   libboost_log-vc90-mt-1_42
 #
 # author: Andreas Baumann, abaumann at yahoo dot com
 
-# The location of the Windows Platform SDK
-PLATFORM_SDK_DIR = C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2
-#PLATFORM_SDK_DIR = C:\Programme\Microsoft Platform SDK for Windows Server 2003 R2
+!include $(TOPDIR)\makefiles\nmake\config.mk
 
 # TODO: maybe we have to probe certain things like the version
 # of the visual studio or the availability of certain addons
@@ -30,9 +25,4 @@ PLATFORM_SDK_DIR = C:\Program Files\Microsoft Platform SDK for Windows Server 20
 # Boost
 #######
 
-# base dir of boost
-BOOST_DIR=C:\Program Files\boost\boost_1_42
-#BOOST_DIR=C:\Programme\boost\boost_1_42
-
-# check if we have the tagged or untagged version
-#BOOST_TAG ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_boost --tagged $(BOOST_DIR))
+BOOST_LIBRARY_TAG=-$(BOOST_VC_VER)$(BOOST_MT)-$(BOOST_VERSION)

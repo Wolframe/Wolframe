@@ -4,9 +4,12 @@ SUBDIRS =
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
-INCLUDE_DIRS = /I. \
+INCLUDE_DIRS = \
+	/D_WIN32_WINNT=0x400 \
+	/I. \
 	/I$(TOPDIR)\include \
-	/D_WIN32_WINNT=0x400 /I"$(BOOST_DIR)" /I"$(PLATFORM_SDK_DIR)\Include"	
+	/I"$(BOOST_DIR)" \
+	/I"$(PLATFORM_SDK_DIR)\Include"	
 
 # Note: libraries are picked automatically on Windows!
 SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib"

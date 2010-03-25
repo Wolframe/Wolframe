@@ -7,7 +7,8 @@ SUBDIRS =
 INCLUDE_DIRS = \
 	/I$(TOPDIR) /I$(TOPDIR)/include /I. \
 	/I$(TOPDIR)/src \
-	/D_WIN32_WINNT=0x400 /I"$(BOOST_DIR)" /I"$(PLATFORM_SDK_DIR)\Include"
+	/I"$(BOOST_DIR)" \
+	/I"$(PLATFORM_SDK_DIR)\Include"
 
 # Note: libraries are picked automatically on Windows!
 SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib"
@@ -30,7 +31,9 @@ all: $(OBJS) $(CPP_BINS)
 
 singletonTest.exe: singletonTest.obj
 versionTest.exe: versionTest.obj
-logTest.exe: logTest.obj
+logTest.exe: logTest.obj \
+	$(TOPDIR)\libs\boost\log\libboost_log$(BOOST_LIBRARY_TAG).lib \
+	$(TOPDIR)\libs\boost\log\libboost_log_setup$(BOOST_LIBRARY_TAG).lib
 
 local_all:
 
