@@ -5,35 +5,99 @@
 
 <element name="configuration"	xmlns="http://relaxng.org/ns/structure/1.0"
 				datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
-	<element name="server">
-		<optional>
-			<group>
-			</group>
-		</optional>
-
+<element name="server">
+	<interleave>
 		<element name="listen">
-			<element name="host">
-			<zeroOrMore>
-				<element name="host">
+			<oneOrMore>
+				<choice>
+					<element name="socket">
+						<element name="address">
+							<text/>
+						</element>
+						<optional>
+							<element name="port">
+								<data type="integer"/>
+							</element>
+						</optional>
+					</element>
+					<element name="SSLsocket">
+						<element name="address">
+							<text/>
+						</element>
+						<optional>
+							<element name="port">
+								<data type="integer"/>
+							</element>
+						</optional>
+					</element>
+				</choice>
+			</oneOrMore>
+		</element>
+
+		<element name="SSL">
+			<interleave>
+				<element name="certificate">
 					<text/>
 				</element>
-				<optional>
-					<element name="port">
-						<data type="unsigned short"/>
-					</element>
-				</optional>
-			</zeroOrMore>
+				<element name="key">
+					<text/>
+				</element>
+				<element name="CAdirectory">
+					<text/>
+				</element>
+				<element name="CAchainFile">
+					<text/>
+				</element>
+				<element name="verify">
+					<data type="boolean"/>
+				</element>
+			</interleave>
 		</element>
-	</element>
 
-	<element name="database">
+		<!-- Timeouts. All values are in seconds. Set to 0 to disable. -->
+		<element name="timeout">
+			<interleave>
+				<element name="idle">
+					<data type="integer"/>
+				</element>
+				<element name="request">
+					<data type="integer"/>
+				</element>
+				<element name="answer">
+					<data type="integer"/>
+				</element>
+				<element name="process">
+					<data type="integer"/>
+				</element>
+			</interleave>
+		</element>
+
+		<!-- Server parameters -->
+		<element name="user">
+			<text/>
+		</element>
+		<element name="group">
+			<text/>
+		</element>
+		<element name="threads">
+			<data type="integer"/>
+		</element>
+		<element name="maxClients">
+			<data type="integer"/>
+		</element>
+	</interleave>
+</element>
+
+
+<element name="database">
+	<interleave>
 		<optional>
 			<element name="host">
 				<text/>
 			</element>
 			<optional>
 				<element name="port">
-					<data type="unsigned short"/>
+					<data type="integer"/>
 				</element>
 			</optional>
 		</optional>
@@ -52,13 +116,23 @@
 			<optional>
 				<element name="password">
 					<text/>
-			</element>
+				</element>
 			</optional>
 		</optional>
-	</element>
-
-	<element name="logging">
-	</element>
-
+	</interleave>
 </element>
 
+
+<element name="logging">
+	<interleave>
+		<optional>
+			<element name="stderr">
+				<element name="level">
+					<data type="integer"/>
+				</element>
+			</element>
+		</optional>
+	</interleave>
+</element>
+
+</element>
