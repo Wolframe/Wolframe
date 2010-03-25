@@ -2,14 +2,17 @@
 // server.hpp
 //
 
-#ifndef NETWORK_SERVER_HPP_INCLUDED
-#define NETWORK_SERVER_HPP_INCLUDED
+#ifndef _NETWORK_SERVER_HPP_INCLUDED
+#define _NETWORK_SERVER_HPP_INCLUDED
 
 #include <boost/asio.hpp>
-#include <string>
-#include <vector>
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/asio/ssl.hpp>
+
+#include <string>
+#include <vector>
+
 #include "appConfig.hpp"
 #include "connection.hpp"
 #include "requestHandler.hpp"
@@ -23,6 +26,9 @@ class server: private boost::noncopyable
 public:
 	/// Construct the server
 	explicit server( const ApplicationConfiguration& config );
+
+	/// Construct the server
+	~server();
 
 	/// Run the server's io_service loop.
 	void run();
@@ -43,20 +49,21 @@ private:
 
 /// object variables
 
-	std::size_t	threadPoolSize_;		// The number of threads that will call io_service::run().
-	unsigned long	timeout_duration_ms_;		// The duration for timeouts in milliseconds.
+	std::size_t			threadPoolSize_;// The number of threads that will call io_service::run().
+	unsigned long			timeout_duration_ms_;		// The duration for timeouts in milliseconds.
 
 	boost::asio::io_service		IOservice_;	// The io_service used to perform asynchronous operations.
 	boost::asio::io_service::strand	strand_;	// Strand to ensure the acceptor's handlers are not called concurrently.
-	boost::asio::ip::tcp::acceptor	acceptor_;	// Acceptor(s) used to listen for incoming connections.
-	boost::asio::ip::tcp::acceptor	SSLacceptor_;	// Acceptor(s) used to listen for SSL incoming connections.
+	boost::asio::ip::tcp::acceptor	*acceptor_;	// Acceptor(s) used to listen for incoming connections.
+	connection_ptr			newConnection_;	// The next connection to be accepted.
 
-	connection_ptr newConnection_;			// The next connection to be accepted.
-	connection_ptr newSSLconnection_;			// The next connection to be accepted.
+	boost::asio::ssl::context	*SSLcontext_;	// SSL server context
+	boost::asio::ip::tcp::acceptor	*SSLacceptor_;	// Acceptor(s) used to listen for SSL incoming connections.
+	connection_ptr			newSSLconnection_;// The next connection to be accepted.
 
-	requestHandler requestHandler_;			// The handler for all incoming requests.
+	requestHandler			requestHandler_;// The handler for all incoming requests.
 };
 
 } // namespace _SMERP
 
-#endif // NETWORK_SERVER_HPP_INCLUDED
+#endif // _NETWORK_SERVER_HPP_INCLUDED
