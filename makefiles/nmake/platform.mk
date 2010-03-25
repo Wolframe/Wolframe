@@ -1,11 +1,8 @@
 # Sets Windows specific variables
 #
-# requires:
-# - 
-#
 # provides:
-# - PLATFORM_SDK_DIR: the location of the Windows Platform SDK, used
-#   for compiling anything from the Win32 API into a binary/library
+# - BOOST_LIBRARY_TAG: how libraries are auto-tagged, for example
+#   libboost_log-vc90-mt-1_42
 #
 # author: Andreas Baumann, abaumann at yahoo dot com
 

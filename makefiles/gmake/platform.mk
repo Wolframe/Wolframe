@@ -13,6 +13,7 @@
 # - EXE
 # - SO
 # - INSTALL
+# - BOOST_LIBRARY_TAG
 #
 # author: Andreas Baumann, abaumann at yahoo dot com
 
@@ -182,7 +183,7 @@ XSLTPROC = xsltproc
 
 ifeq "$(PLATFORM)" "LINUX"
 ifeq "$(LINUX_DIST)" "arch"
-BOOST_DIR=/usr
+BOOST_DIR = /usr
 BOOST_LIBRARY_TAG =  "-mt"
 endif
 endif
