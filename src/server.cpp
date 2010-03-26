@@ -66,6 +66,8 @@ server::~server()
 		delete acceptor_;
 	if ( SSLacceptor_ != NULL )
 		delete SSLacceptor_;
+	if ( SSLcontext_ != NULL )
+		delete SSLcontext_;
 }
 
 
