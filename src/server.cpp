@@ -32,8 +32,8 @@ server::server( const ApplicationConfiguration& config )
 	acceptor_.bind( endpoint );
 	acceptor_.listen();
 	acceptor_.async_accept( newConnection_->socket(), strand_.wrap( boost::bind( &server::handleAccept,
-										      this,
-										      boost::asio::placeholders::error )));
+											this,
+											boost::asio::placeholders::error )));
 }
 
 
