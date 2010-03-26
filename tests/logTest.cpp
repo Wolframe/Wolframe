@@ -18,6 +18,7 @@ namespace flt = boost::log::filters;
 namespace src = boost::log::sources;
 namespace keywords = boost::log::keywords;
 namespace fmt = boost::log::formatters;
+namespace sinks = boost::log::sinks;
 
 using namespace std;
 
