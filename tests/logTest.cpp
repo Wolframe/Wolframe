@@ -24,8 +24,6 @@
 #include <boost/preprocessor/repetition/enum_shifted_params.hpp>
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
 
-#include <boost/log/unused.hpp>
-
 namespace logging = boost::log;
 namespace flt = boost::log::filters;
 namespace src = boost::log::sources;
@@ -141,9 +139,15 @@ int main( void ) {
 	mapping[DEBUG5] = sinks::event_log::info;
 	sink->locked_backend( )->set_event_type_mapper( mapping );
 */
+
+/*
 	init_log_to_eventlog(
+		keywords::log_source = "Boosttests Logtest 1",
+		keywords::filter = flt::attr< log_level >( "Severity", nothrow ) <= DEBUG5
 		// TODO: pass custom_event_type_mapping
 	);
+*/
+
 #endif
 
 	logging::add_common_attributes( );

@@ -50,16 +50,6 @@
 #endif
 //! \endcond
 
-/*
-namespace sinks = boost::log::sinks;
-namespace logging = boost::log;
-namespace flt = boost::log::filters;
-namespace src = boost::log::sources;
-namespace keywords = boost::log::keywords;
-namespace fmt = boost::log::formatters;
-namespace sinks = boost::log::sinks;
-*/
-
 using namespace std;
 
 namespace boost {
@@ -161,7 +151,7 @@ BOOST_PP_REPEAT_FROM_TO(1, BOOST_LOG_MAX_PARAMETER_ARGS, BOOST_LOG_INIT_LOG_TO_S
         BOOST_LOG_SYSLOG_SINK_FRONTEND_INTERNAL<\
             sinks::wsyslog_backend\
         >\
-    > winit_log_to_file(BOOST_PP_ENUM_BINARY_PARAMS(n, T, const& arg))\
+    > winit_log_to_syslog(BOOST_PP_ENUM_BINARY_PARAMS(n, T, const& arg))\
     {\
         return init_log_to_syslog< wchar_t >(BOOST_PP_ENUM_PARAMS(n, arg));\
     }
@@ -221,6 +211,6 @@ shared_ptr<
 
 } // namespace boost
 
-#undef BOOST_LOG_FILE_SINK_FRONTEND_INTERNAL
+#undef BOOST_LOG_SYSLOG_SINK_FRONTEND_INTERNAL
 
-#endif // BOOST_LOG_UTILITY_INIT_TO_FILE_HPP_INCLUDED_
+#endif // BOOST_LOG_UTILITY_INIT_TO_SYSLOG_HPP_INCLUDED_

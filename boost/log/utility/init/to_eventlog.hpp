@@ -1,16 +1,29 @@
-#include <iostream>
+/*
+ * (C) 2007 Andrey Semashev
+ *
+ * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
+ * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+ *
+ * This header is the Boost.Log library implementation, see the library documentation
+ * at http://www.boost.org/libs/log/doc/log.html.
+ */
+/*!
+ * \file   to_eventlog.hpp
+ * \author Andrey Semashev
+ * \date   16.05.2008
+ *
+ * The header contains implementation of convenience functions for enabling logging to EVENTLOG.
+ */
 
-#include <boost/log/common.hpp>
-#include <boost/log/formatters.hpp>
-#include <boost/log/filters.hpp>
+#if (defined(_MSC_VER) && _MSC_VER > 1000)
+#pragma once
+#endif // _MSC_VER > 1000
 
-#include <boost/log/utility/init/to_file.hpp>
-#include <boost/log/utility/init/to_console.hpp>
-#include <boost/log/utility/init/common_attributes.hpp>
+#ifndef BOOST_LOG_UTILITY_INIT_TO_EVENTLOG_HPP_INCLUDED_
+#define BOOST_LOG_UTILITY_INIT_TO_EVENTLOG_HPP_INCLUDED_
 
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
-#include <boost/log/sinks.hpp>
 
 #include <boost/preprocessor/comparison/greater.hpp>
 #include <boost/preprocessor/punctuation/comma_if.hpp>
@@ -18,171 +31,16 @@
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
 #include <boost/preprocessor/repetition/enum_shifted_params.hpp>
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
-
-#include <boost/log/unused.hpp>
-
-namespace logging = boost::log;
-namespace flt = boost::log::filters;
-namespace src = boost::log::sources;
-namespace keywords = boost::log::keywords;
-namespace fmt = boost::log::formatters;
-namespace sinks = boost::log::sinks;
-
-using namespace std;
-
-using boost::shared_ptr;
-using boost::make_shared;
-
-enum log_level {
-	FATAL,
-	ALERT,
-	CRITICAL,
-	ERROR,
-	WARNING,
-	NOTICE,
-	INFO,
-	DEBUG0,
-	DEBUG1,
-	DEBUG2,
-	DEBUG3,
-	DEBUG4,
-	DEBUG5
-};
-
-#define LOG_FATAL	BOOST_LOG_SEV( logger, FATAL )
-#define LOG_ALERT	BOOST_LOG_SEV( logger, ALERT )
-#define LOG_CRITICAL	BOOST_LOG_SEV( logger, CRITICAL )
-#define LOG_ERROR	BOOST_LOG_SEV( logger, ERROR )
-#define LOG_WARNING	BOOST_LOG_SEV( logger, WARNING )
-#define LOG_NOTICE 	BOOST_LOG_SEV( logger, NOTICE )
-#define LOG_INFO 	BOOST_LOG_SEV( logger, INFO )
-#define LOG_DEBUG0	BOOST_LOG_SEV( logger, DEBUG0 )
-#define LOG_DEBUG1	BOOST_LOG_SEV( logger, DEBUG1 )
-#define LOG_DEBUG2	BOOST_LOG_SEV( logger, DEBUG2 )
-#define LOG_DEBUG3	BOOST_LOG_SEV( logger, DEBUG3 )
-#define LOG_DEBUG4	BOOST_LOG_SEV( logger, DEBUG4 )
-#define LOG_DEBUG5	BOOST_LOG_SEV( logger, DEBUG5 )
-
-template< typename CharT, typename TraitsT >
-inline basic_ostream< CharT, TraitsT > &operator<< ( basic_ostream< CharT, TraitsT >& s, log_level l ) {
-	static const char *const str[] = {
-		"FATAL", "ALERT", "CRITICAL", "ERROR", "WARNING", "NOTICE", "INFO",
-		"DEBUG0", "DEBUG1", "DEBUG2", "DEBUG3", "DEBUG4", "DEBUG5" };
-	if( static_cast< size_t >( l ) < ( sizeof( str ) / sizeof( *str ) ) ) {
-		s << str[l];
-	} else {
-		s << "Unknown enum used '" << static_cast< int >( l ) << "'";
-	}
-	return s;
-}
-
-#ifndef _WIN32
-
-//! \cond
+#include <boost/log/detail/prologue.hpp>
+#include <boost/log/detail/sink_init_helpers.hpp>
+#include <boost/log/detail/parameter_tools.hpp>
+#include <boost/log/core/core.hpp>
 #ifndef BOOST_LOG_NO_THREADS
-#define BOOST_LOG_SYSLOG_SINK_FRONTEND_INTERNAL sinks::synchronous_sink
+#include <boost/log/sinks/sync_frontend.hpp>
 #else
-#define BOOST_LOG_SYSLOG_SINK_FRONTEND_INTERNAL sinks::unlocked_sink
+#include <boost/log/sinks/unlocked_frontend.hpp>
 #endif
-//! \endcond
-
-namespace aux {
-
-template< typename CharT, typename ArgsT >
-	shared_ptr< BOOST_LOG_SYSLOG_SINK_FRONTEND_INTERNAL<
-		sinks::basic_syslog_backend< CharT >
-	>
-> init_log_to_syslog( ArgsT const& args UNUSED ) {
-	typedef sinks::basic_syslog_backend< CharT > backend_t;
-	shared_ptr< backend_t > backend = make_shared< backend_t >( args );
-
-	sinks::syslog::custom_severity_mapping< log_level > mapping( "Severity" );
-	mapping[FATAL] = sinks::syslog::emergency;
-	mapping[ALERT] = sinks::syslog::alert;
-	mapping[CRITICAL] = sinks::syslog::critical;
-	mapping[ERROR] = sinks::syslog::error;
-	mapping[WARNING] = sinks::syslog::warning;
-	mapping[NOTICE] = sinks::syslog::notice;
-	mapping[INFO] = sinks::syslog::info;
-	mapping[DEBUG0] = sinks::syslog::debug;
-	mapping[DEBUG1] = sinks::syslog::debug;
-	mapping[DEBUG2] = sinks::syslog::debug;
-	mapping[DEBUG3] = sinks::syslog::debug;
-	mapping[DEBUG4] = sinks::syslog::debug;
-	mapping[DEBUG5] = sinks::syslog::debug;
-	backend->set_severity_mapper( mapping );
-
-	typedef BOOST_LOG_SYSLOG_SINK_FRONTEND_INTERNAL< backend_t > sink_t;
-	shared_ptr< sink_t > sink = make_shared< sink_t >( backend );
-
-	shared_ptr< logging::core > core = logging::core::get( );
-	core->add_sink( sink );
-
-	return sink;
-}
-
-} // namespace aux
-
-#define BOOST_LOG_INIT_LOG_TO_SYSLOG_INTERNAL(z, n, data)\
-    template< typename CharT, BOOST_PP_ENUM_PARAMS(n, typename T) >\
-    inline shared_ptr<\
-    	BOOST_LOG_SYSLOG_SINK_FRONTEND_INTERNAL<\
-    		sinks::basic_syslog_backend< CharT >\
-    	>\
-    > init_log_to_syslog(BOOST_PP_ENUM_BINARY_PARAMS(n, T, const& arg))\
-    {\
-        return aux::init_log_to_syslog< CharT >((\
-            arg0\
-            BOOST_PP_COMMA_IF(BOOST_PP_GREATER(n, 1))\
-            BOOST_PP_ENUM_SHIFTED_PARAMS(n, arg)\
-        ));\
-    }
-
-BOOST_PP_REPEAT_FROM_TO(1, BOOST_LOG_MAX_PARAMETER_ARGS, BOOST_LOG_INIT_LOG_TO_SYSLOG_INTERNAL, ~)
-
-#undef BOOST_LOG_INIT_LOG_TO_SYSLOG_INTERNAL
-
-#if defined(BOOST_LOG_USE_CHAR)
-
-#define BOOST_LOG_INIT_LOG_TO_SYSLOG_INTERNAL(z, n, data)\
-    template< BOOST_PP_ENUM_PARAMS(n, typename T) >\
-    inline shared_ptr<\
-        BOOST_LOG_SYSLOG_SINK_FRONTEND_INTERNAL<\
-            sinks::syslog_backend\
-        >\
-    > init_log_to_syslog(BOOST_PP_ENUM_BINARY_PARAMS(n, T, const& arg))\
-    {\
-        return init_log_to_syslog< char >(BOOST_PP_ENUM_PARAMS(n, arg));\
-    }
-
-BOOST_PP_REPEAT_FROM_TO(1, BOOST_LOG_MAX_PARAMETER_ARGS, BOOST_LOG_INIT_LOG_TO_SYSLOG_INTERNAL, ~)
-
-#undef BOOST_LOG_INIT_LOG_TO_SYSLOG_INTERNAL
-
-#endif // defined(BOOST_LOG_USE_CHAR)
-
-#if defined(BOOST_LOG_USE_WCHAR_T)
-
-#define BOOST_LOG_INIT_LOG_TO_SYSLOG_INTERNAL(z, n, data)\
-    template< BOOST_PP_ENUM_PARAMS(n, typename T) >\
-    inline shared_ptr<\
-        BOOST_LOG_SYSLOG_SINK_FRONTEND_INTERNAL<\
-            sinks::wsyslog_backend\
-        >\
-    > winit_log_to_file(BOOST_PP_ENUM_BINARY_PARAMS(n, T, const& arg))\
-    {\
-        return init_log_to_syslog< wchar_t >(BOOST_PP_ENUM_PARAMS(n, arg));\
-    }
-
-BOOST_PP_REPEAT_FROM_TO(1, BOOST_LOG_MAX_PARAMETER_ARGS, BOOST_LOG_INIT_LOG_TO_SYSLOG_INTERNAL, ~)
-
-#undef BOOST_LOG_INIT_LOG_TO_FILE_INTERNAL
-
-#endif // defined(BOOST_LOG_USE_WCHAR_T)
-
-#endif // not defined( _WIN32 )
-
-#ifdef _WIN32
+#include <boost/log/sinks/event_log_backend.hpp>
 
 //! \cond
 #ifndef BOOST_LOG_NO_THREADS
@@ -192,16 +50,39 @@ BOOST_PP_REPEAT_FROM_TO(1, BOOST_LOG_MAX_PARAMETER_ARGS, BOOST_LOG_INIT_LOG_TO_S
 #endif
 //! \endcond
 
-shared_ptr< BOOST_LOG_EVENTLOG_SINK_FRONTEND_INTERNAL< sinks::simple_event_log_backend > > init_log_to_eventlog( ) {
-	typedef sinks::simple_event_log_backend backend_t;
-	shared_ptr< backend_t > backend = make_shared< backend_t >(
-		keywords::log_source = "Boosttests Logtest 1",
-		keywords::filter = flt::attr< log_level >( "Severity", nothrow ) <= NOTICE
-	);
+/*
+namespace sinks = boost::log::sinks;
+namespace logging = boost::log;
+namespace flt = boost::log::filters;
+namespace src = boost::log::sources;
+namespace keywords = boost::log::keywords;
+namespace fmt = boost::log::formatters;
+namespace sinks = boost::log::sinks;
+*/
+
+using namespace std;
+
+namespace boost {
+
+namespace BOOST_LOG_NAMESPACE {
+
+namespace aux {
+
+//! The function constructs the sink and adds it to the core
+template< typename CharT, typename ArgsT >
+    shared_ptr< BOOST_LOG_EVENTLOG_SINK_FRONTEND_INTERNAL<
+        sinks::basic_simple_event_log_backend< CharT >
+    >
+> init_log_to_eventlog( ArgsT const& args )
+{
+    typedef sinks::basic_simple_event_log_backend< CharT > backend_t;
+    shared_ptr< backend_t > pBackend = boost::make_shared< backend_t >(args);
+
+    aux::setup_formatter(*pBackend, args,
+        typename is_void< typename parameter::binding< ArgsT, keywords::tag::format, void >::type >::type());
 	
-	typedef BOOST_LOG_EVENTLOG_SINK_FRONTEND_INTERNAL< backend_t > sink_t;
-	shared_ptr< sink_t > sink = make_shared< sink_t >( backend );
-	
+/*
+	// TODO: set custom event type mapping
 	sinks::event_log::custom_event_type_mapping< log_level > mapping( "Severity" );
 	mapping[FATAL] = sinks::event_log::error;
 	mapping[ALERT] = sinks::event_log::error;
@@ -217,61 +98,128 @@ shared_ptr< BOOST_LOG_EVENTLOG_SINK_FRONTEND_INTERNAL< sinks::simple_event_log_b
 	mapping[DEBUG4] = sinks::event_log::info;
 	mapping[DEBUG5] = sinks::event_log::info;
 	sink->locked_backend( )->set_event_type_mapper( mapping );
-	
-	shared_ptr< logging::core > core = logging::core::get( );
-	core->add_sink( sink );
+*/
 
-	return sink;
+    shared_ptr< BOOST_LOG_EVENTLOG_SINK_FRONTEND_INTERNAL< backend_t > > pSink =
+        boost::make_shared< BOOST_LOG_EVENTLOG_SINK_FRONTEND_INTERNAL< backend_t > >(pBackend);
+
+    aux::setup_filter(*pSink, args,
+        typename is_void< typename parameter::binding< ArgsT, keywords::tag::filter, void >::type >::type());
+
+    basic_core< CharT >::get()->add_sink( pSink );
+
+    return pSink;
 }
-#endif
 
-int main( void ) {
-	logging::init_log_to_console(
-		clog,
-		keywords::format = fmt::format( "%1% %2%: %3%" )
-			% fmt::date_time( "TimeStamp", nothrow )
-			% fmt::attr< log_level >( "Severity", nothrow )
-			% fmt::message( )
-	);
+} // namespace aux
 
-	logging::init_log_to_file(
-		keywords::file_name = "logTest.log",
-		keywords::open_mode = ( ios_base::out | ios_base::app ),
-		keywords::filter = flt::attr< log_level >( "Severity", nothrow ) <= NOTICE,
-		keywords::format = fmt::format( "%1% %2%: %3%" )
-			% fmt::date_time( "TimeStamp", nothrow )
-			% fmt::attr< log_level >( "Severity", nothrow )
-			% fmt::message( )
-	);
+#ifndef BOOST_LOG_DOXYGEN_PASS
 
-#ifndef _WIN32
-	init_log_to_syslog(
-		keywords::facility = sinks::syslog::user,
-		keywords::use_impl = sinks::syslog::native,
-		keywords::filter = flt::attr< log_level >( "Severity", nothrow ) <= FATAL
-	);
-#else
-	init_log_to_eventlog(
-	);
-#endif
+#define BOOST_LOG_INIT_LOG_TO_EVENTLOG_INTERNAL(z, n, data)\
+    template< typename CharT, BOOST_PP_ENUM_PARAMS(n, typename T) >\
+    inline shared_ptr<\
+    	BOOST_LOG_EVENTLOG_SINK_FRONTEND_INTERNAL<\
+    		sinks::basic_simple_event_log_backend< CharT >\
+    	>\
+    > init_log_to_eventlog(BOOST_PP_ENUM_BINARY_PARAMS(n, T, const& arg))\
+    {\
+        return aux::init_log_to_eventlog< CharT >((\
+            arg0\
+            BOOST_PP_COMMA_IF(BOOST_PP_GREATER(n, 1))\
+            BOOST_PP_ENUM_SHIFTED_PARAMS(n, arg)\
+        ));\
+    }
 
-	logging::add_common_attributes( );
+BOOST_PP_REPEAT_FROM_TO(1, BOOST_LOG_MAX_PARAMETER_ARGS, BOOST_LOG_INIT_LOG_TO_EVENTLOG_INTERNAL, ~)
 
-	src::severity_logger< log_level > logger;
+#undef BOOST_LOG_INIT_LOG_TO_EVENTLOG_INTERNAL
 
-	LOG_FATAL	<< "fatal error";
-	LOG_ALERT	<< "alert";
-	LOG_CRITICAL	<< "critical error";
-	LOG_ERROR	<< "an error";
-	LOG_WARNING	<< "a warning";
-	LOG_NOTICE	<< "a notice";
-	LOG_INFO 	<< "an info";
-	LOG_DEBUG0	<< "debug message of level 0";
-	LOG_DEBUG1	<< "debug message of level 1";
-	LOG_DEBUG2	<< "debug message of level 2";
-	LOG_DEBUG3	<< "debug message of level 3";
-	LOG_DEBUG4	<< "debug message of level 4";
-	LOG_DEBUG5	<< "debug message of level 5";
+#if defined(BOOST_LOG_USE_CHAR)
 
-	return 0;
-}
+#define BOOST_LOG_INIT_LOG_TO_EVENTLOG_INTERNAL(z, n, data)\
+    template< BOOST_PP_ENUM_PARAMS(n, typename T) >\
+    inline shared_ptr<\
+        BOOST_LOG_EVENTLOG_SINK_FRONTEND_INTERNAL<\
+            sinks::simple_event_log_backend\
+        >\
+    > init_log_to_eventlog(BOOST_PP_ENUM_BINARY_PARAMS(n, T, const& arg))\
+    {\
+        return init_log_to_eventlog< char >(BOOST_PP_ENUM_PARAMS(n, arg));\
+    }
+
+BOOST_PP_REPEAT_FROM_TO(1, BOOST_LOG_MAX_PARAMETER_ARGS, BOOST_LOG_INIT_LOG_TO_EVENTLOG_INTERNAL, ~)
+
+#undef BOOST_LOG_INIT_LOG_TO_EVENTLOG_INTERNAL
+
+#endif // defined(BOOST_LOG_USE_CHAR)
+
+#if defined(BOOST_LOG_USE_WCHAR_T)
+
+#define BOOST_LOG_INIT_LOG_TO_EVENTLOG_INTERNAL(z, n, data)\
+    template< BOOST_PP_ENUM_PARAMS(n, typename T) >\
+    inline shared_ptr<\
+        BOOST_LOG_EVENTLOG_SINK_FRONTEND_INTERNAL<\
+            sinks::wsimple_event_log_backend\
+        >\
+    > winit_log_to_eventlog(BOOST_PP_ENUM_BINARY_PARAMS(n, T, const& arg))\
+    {\
+        return init_log_to_eventlog< wchar_t >(BOOST_PP_ENUM_PARAMS(n, arg));\
+    }
+
+BOOST_PP_REPEAT_FROM_TO(1, BOOST_LOG_MAX_PARAMETER_ARGS, BOOST_LOG_INIT_LOG_TO_EVENTLOG_INTERNAL, ~)
+
+#undef BOOST_LOG_INIT_LOG_TO_EVENTLOG_INTERNAL
+
+#endif // defined(BOOST_LOG_USE_WCHAR_T)
+
+#else // BOOST_LOG_DOXYGEN_PASS
+
+/*!
+ * The function initializes the logging library to write logs to the Windows Event Logger.
+ *
+ * \param args A number of named arguments. The following parameters are supported:
+ *             \li \c log_source The Event Logger source to log to
+ *             \li \c filter Specifies a filter to install into the sink. May be a string that represents a filter,
+ *                           or a filter lambda expression.
+ *             \li \c format Specifies a formatter to install into the sink. May be a string that represents a formatter,
+ *                           or a formatter lambda expression (either streaming or Boost.Format-like notation).
+ * \return Pointer to the constructed sink.
+ */
+template< typename CharT, typename... ArgsT >
+shared_ptr<
+    BOOST_LOG_EVENTLOG_SINK_FRONTEND_INTERNAL<
+        sinks::basic_eventlog_backend< CharT >
+    >
+> init_log_to_eventlog(ArgsT... const& args);
+
+/*!
+ * Equivalent to <tt>init_log_to_eventlog< char >(args...);</tt>
+ *
+ * \overload
+ */
+template< typename... ArgsT >
+shared_ptr<
+    BOOST_LOG_EVENTLOG_SINK_FRONTEND_INTERNAL<
+        sinks::simple_event_log_backend
+    >
+> init_log_to_eventlog(ArgsT... const& args);
+
+/*!
+ * Equivalent to <tt>init_log_to_eventlog< wchar_t >(args...);</tt>
+ */
+template< typename... ArgsT >
+shared_ptr<
+    BOOST_LOG_EVENTLOG_SINK_FRONTEND_INTERNAL<
+        sinks::wsimple_event_log_backend
+    >
+> winit_log_to_eventlog(ArgsT... const& args);
+
+#endif // BOOST_LOG_DOXYGEN_PASS
+
+} // namespace log
+
+} // namespace boost
+
+#undef BOOST_LOG_EVENTLOG_SINK_FRONTEND_INTERNAL
+
+#endif // BOOST_LOG_UTILITY_INIT_TO_EVENTLOG_HPP_INCLUDED_
