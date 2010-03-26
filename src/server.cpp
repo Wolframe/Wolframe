@@ -3,6 +3,7 @@
 //
 
 #include "server.hpp"
+
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
@@ -21,6 +22,8 @@ server::server( const ApplicationConfiguration& config )
     newSSLconnection_(new connection(IOservice_, requestHandler_, timeout_duration_ms_)),
     requestHandler_()
 {
+	int	verify = 0;
+
 	if ( config.address.size() > 0 )	{
 		acceptor_ = new boost::asio::ip::tcp::acceptor( IOservice_ );
 		// Open the acceptor(s) with the option to reuse the address (i.e. SO_REUSEADDR).
@@ -40,8 +43,33 @@ server::server( const ApplicationConfiguration& config )
 		acceptor_ = NULL;
 
 	if ( config.SSLaddress.size() > 0 )	{
-		SSLcontext_ = new boost::asio::ssl::context(IOservice_, boost::asio::ssl::context::sslv23);
+std::cerr << "bla bla 0" << std::endl;
+		SSLcontext_ = new boost::asio::ssl::context( IOservice_, boost::asio::ssl::context::sslv23 );
+std::cerr << "bla bla 1" << std::endl;
+
+		if ( config.SSLverify )
+			verify = boost::asio::ssl::context::verify_peer |
+					boost::asio::ssl::context::verify_fail_if_no_peer_cert;
+		else
+			verify = boost::asio::ssl::context::verify_none;
+		SSLcontext_->set_options( boost::asio::ssl::context::default_workarounds
+					| boost::asio::ssl::context::no_sslv2
+					| boost::asio::ssl::context::single_dh_use
+					| verify
+					);
+std::cerr << "bla bla 2" << std::endl;
+		SSLcontext_->set_password_callback( boost::bind( &server::getPassword, this ));
+		SSLcontext_->use_certificate_chain_file( config.SSLcertificate );
+		SSLcontext_->use_private_key_file( config.SSLkey, boost::asio::ssl::context::pem );
+		if ( ! config.SSLCAchainFile.empty() )
+			SSLcontext_->load_verify_file( config.SSLCAchainFile );
+		if ( ! config.SSLCAdirectory.empty() )
+			SSLcontext_->add_verify_path( config.SSLCAdirectory );
+//		SSLcontext_->use_tmp_dh_file( "dh4096.pem" );
+std::cerr << "bla bla 3" << std::endl;
+
 		SSLacceptor_ = new boost::asio::ip::tcp::acceptor( IOservice_ );
+
 		// Open the acceptor(s) with the option to reuse the address (i.e. SO_REUSEADDR).
 		boost::asio::ip::tcp::resolver resolver( IOservice_ );
 		boost::asio::ip::tcp::resolver::query query( config.SSLaddress[0].first, "");
@@ -51,9 +79,10 @@ server::server( const ApplicationConfiguration& config )
 		SSLacceptor_->set_option( boost::asio::ip::tcp::acceptor::reuse_address( true ));
 		SSLacceptor_->bind( endpoint );
 		SSLacceptor_->listen();
-		SSLacceptor_->async_accept( newConnection_->socket(), strand_.wrap( boost::bind( &server::handleAccept,
+		SSLacceptor_->async_accept( newConnection_->socket(), strand_.wrap( boost::bind( &server::handleSSLaccept,
 												this,
 												boost::asio::placeholders::error )));
+std::cerr << "bla bla xx" << std::endl;
 	}
 	else
 		SSLacceptor_ = NULL;
@@ -119,12 +148,30 @@ void server::handleAccept(const boost::system::error_code& e)
 }
 
 
+void server::handleSSLaccept(const boost::system::error_code& e)
+{
+  if (!e)
+  {
+    newConnection_->start();
+    newConnection_.reset(new connection(IOservice_, requestHandler_,
+      timeout_duration_ms_));
+    acceptor_->async_accept(newConnection_->socket(),
+	strand_.wrap(
+	  boost::bind(&server::handleSSLaccept, this,
+	    boost::asio::placeholders::error)));
+  }
+}
+
+
 // The server is stopped by closing the acceptor.
 // When all outstanding operations are completed
 // all calls to io_service::run() will return.
 void server::handleStop()
 {
-	acceptor_->close();
+	if ( acceptor_ != NULL )
+		acceptor_->close();
+	if ( SSLacceptor_ != NULL )
+		SSLacceptor_->close();
 }
 
 

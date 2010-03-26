@@ -5,134 +5,177 @@
 
 <element name="configuration"	xmlns="http://relaxng.org/ns/structure/1.0"
 				datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
-<element name="server">
-	<interleave>
-		<element name="listen">
-			<oneOrMore>
-				<choice>
-					<element name="socket">
-						<element name="address">
-							<text/>
+	<element name="server">
+		<interleave>
+			<element name="listen">
+				<oneOrMore>
+					<choice>
+						<element name="socket">
+							<element name="address">
+								<text/>
+							</element>
+							<optional>
+								<element name="port">
+									<data type="integer"/>
+								</element>
+							</optional>
 						</element>
+						<element name="SSLsocket">
+							<element name="address">
+								<text/>
+							</element>
+							<optional>
+								<element name="port">
+									<data type="integer"/>
+								</element>
+							</optional>
+						</element>
+					</choice>
+				</oneOrMore>
+			</element>
+
+			<element name="SSL">
+				<interleave>
+					<element name="certificate">
+						<text/>
+					</element>
+					<element name="key">
+						<text/>
+					</element>
+					<element name="CAdirectory">
+						<text/>
+					</element>
+					<element name="CAchainFile">
+						<text/>
+					</element>
+					<element name="verify">
+						<data type="boolean"/>
+					</element>
+				</interleave>
+			</element>
+
+			<!-- Timeouts. All values are in seconds. Set to 0 to disable. -->
+			<optional>
+				<element name="timeout">
+					<interleave>
 						<optional>
-							<element name="port">
+							<element name="idle">
 								<data type="integer"/>
 							</element>
 						</optional>
-					</element>
-					<element name="SSLsocket">
-						<element name="address">
-							<text/>
-						</element>
 						<optional>
-							<element name="port">
+							<element name="request">
 								<data type="integer"/>
 							</element>
 						</optional>
+						<optional>
+							<element name="answer">
+								<data type="integer"/>
+							</element>
+						</optional>
+						<optional>
+							<element name="process">
+								<data type="integer"/>
+							</element>
+						</optional>
+					</interleave>
+				</element>
+			</optional>
+
+			<!-- Server parameters -->
+			<optional>
+				<element name="user">
+					<text/>
+				</element>
+			</optional>
+			<optional>
+				<element name="group">
+					<text/>
+				</element>
+			</optional>
+			<optional>
+				<element name="threads">
+					<data type="integer"/>
+				</element>
+			</optional>
+			<optional>
+				<element name="maxClients">
+					<data type="integer"/>
+				</element>
+			</optional>
+		</interleave>
+	</element>
+
+
+	<element name="database">
+		<interleave>
+			<optional>
+				<element name="host">
+					<text/>
+				</element>
+				<optional>
+					<element name="port">
+						<data type="integer"/>
 					</element>
-				</choice>
-			</oneOrMore>
-		</element>
-
-		<element name="SSL">
-			<interleave>
-				<element name="certificate">
-					<text/>
-				</element>
-				<element name="key">
-					<text/>
-				</element>
-				<element name="CAdirectory">
-					<text/>
-				</element>
-				<element name="CAchainFile">
-					<text/>
-				</element>
-				<element name="verify">
-					<data type="boolean"/>
-				</element>
-			</interleave>
-		</element>
-
-		<!-- Timeouts. All values are in seconds. Set to 0 to disable. -->
-		<element name="timeout">
-			<interleave>
-				<element name="idle">
-					<data type="integer"/>
-				</element>
-				<element name="request">
-					<data type="integer"/>
-				</element>
-				<element name="answer">
-					<data type="integer"/>
-				</element>
-				<element name="process">
-					<data type="integer"/>
-				</element>
-			</interleave>
-		</element>
-
-		<!-- Server parameters -->
-		<element name="user">
-			<text/>
-		</element>
-		<element name="group">
-			<text/>
-		</element>
-		<element name="threads">
-			<data type="integer"/>
-		</element>
-		<element name="maxClients">
-			<data type="integer"/>
-		</element>
-	</interleave>
-</element>
-
-
-<element name="database">
-	<interleave>
-		<optional>
-			<element name="host">
-				<text/>
-			</element>
-			<optional>
-				<element name="port">
-					<data type="integer"/>
-				</element>
+				</optional>
 			</optional>
-		</optional>
-
-		<optional>
-			<element name="name">
-				<text/>
-			</element>
-		</optional>
-
-		<optional>
-			<element name="user">
-				<text/>
-			</element>
 
 			<optional>
-				<element name="password">
+				<element name="name">
 					<text/>
 				</element>
 			</optional>
-		</optional>
-	</interleave>
-</element>
 
-
-<element name="logging">
-	<interleave>
-		<optional>
-			<element name="stderr">
-				<element name="level">
-					<data type="integer"/>
+			<optional>
+				<element name="user">
+					<text/>
 				</element>
-			</element>
-		</optional>
-	</interleave>
-</element>
+
+				<optional>
+					<element name="password">
+						<text/>
+					</element>
+				</optional>
+			</optional>
+		</interleave>
+	</element>
+
+
+	<element name="logging">
+		<interleave>
+			<optional>
+				<element name="stderr">
+					<element name="level">
+						<choice>
+							<data type="integer"/>
+							<text/>
+						</choice>
+					</element>
+				</element>
+			</optional>
+
+			<optional>
+				<element name="logFile">
+					<element name="filename">
+						<text/>
+					</element>
+					<element name="level">
+						<data type="integer"/>
+					</element>
+				</element>
+			</optional>
+
+			<optional>
+				<element name="syslog">
+					<element name=""facility>
+						<text/>
+					</element>
+					<element name="level">
+						<data type="integer"/>
+					</element>
+				</element>
+			</optional>
+		</interleave>
+	</element>
 
 </element>

@@ -38,3 +38,4 @@ TODO
 README
 XML/README
 XML/configFile.rng
+src/getPassword.cpp
