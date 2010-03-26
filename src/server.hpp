@@ -43,9 +43,13 @@ public:
 private:
 	/// Handle completion of an asynchronous accept operation.
 	void handleAccept( const boost::system::error_code& e );
+	void handleSSLaccept( const boost::system::error_code& e );
 
 	/// Handle a request to stop the server.
 	void handleStop();
+
+	/// Get a password from the console
+	std::string getPassword();
 
 /// object variables
 

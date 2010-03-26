@@ -34,6 +34,7 @@ OBJS = \
 	reply.o \
 	server.o \
 	connection.o \
+	getPassword.o \
 	requestHandler.o \
 	posixMain.o
 
