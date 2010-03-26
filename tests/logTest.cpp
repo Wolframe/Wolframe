@@ -13,23 +13,11 @@
 #endif
 #include <boost/log/utility/init/common_attributes.hpp>
 
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
-#include <boost/log/sinks.hpp>
-
-#include <boost/preprocessor/comparison/greater.hpp>
-#include <boost/preprocessor/punctuation/comma_if.hpp>
-#include <boost/preprocessor/repetition/enum_params.hpp>
-#include <boost/preprocessor/repetition/enum_binary_params.hpp>
-#include <boost/preprocessor/repetition/enum_shifted_params.hpp>
-#include <boost/preprocessor/repetition/repeat_from_to.hpp>
-
 namespace logging = boost::log;
 namespace flt = boost::log::filters;
 namespace src = boost::log::sources;
 namespace keywords = boost::log::keywords;
 namespace fmt = boost::log::formatters;
-namespace sinks = boost::log::sinks;
 
 using namespace std;
 
@@ -140,14 +128,11 @@ int main( void ) {
 	sink->locked_backend( )->set_event_type_mapper( mapping );
 */
 
-/*
-	init_log_to_eventlog(
+	logging::init_log_to_eventlog(
 		keywords::log_source = "Boosttests Logtest 1",
 		keywords::filter = flt::attr< log_level >( "Severity", nothrow ) <= DEBUG5
 		// TODO: pass custom_event_type_mapping
 	);
-*/
-
 #endif
 
 	logging::add_common_attributes( );

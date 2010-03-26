@@ -12,7 +12,7 @@
  * \author Andrey Semashev
  * \date   16.05.2008
  *
- * The header contains implementation of convenience functions for enabling logging to EVENTLOG.
+ * The header contains implementation of convenience functions for enabling logging to the Windows event logger.
  */
 
 #if (defined(_MSC_VER) && _MSC_VER > 1000)
