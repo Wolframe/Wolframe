@@ -31,6 +31,10 @@ TEST_CPP_BINS = \
 
 include $(TOPDIR)/makefiles/gmake/sub.mk
 
+logTest$(EXE): logTest.o \
+	$(TOPDIR)/libs/boost/log/libboost_log.a \
+	$(TOPDIR)/libs/boost/log/libboost_log_setup.a
+
 local_all:
 
 local_clean:
