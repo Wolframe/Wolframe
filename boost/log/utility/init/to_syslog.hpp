@@ -73,24 +73,7 @@ template< typename CharT, typename ArgsT >
     aux::setup_formatter(*pBackend, args,
         typename is_void< typename parameter::binding< ArgsT, keywords::tag::format, void >::type >::type());
 
-/*
-	// TODO: set custom_severity_mapping
-	sinks::syslog::custom_severity_mapping< log_level > mapping( "Severity" );
-	mapping[FATAL] = sinks::syslog::emergency;
-	mapping[ALERT] = sinks::syslog::alert;
-	mapping[CRITICAL] = sinks::syslog::critical;
-	mapping[ERROR] = sinks::syslog::error;
-	mapping[WARNING] = sinks::syslog::warning;
-	mapping[NOTICE] = sinks::syslog::notice;
-	mapping[INFO] = sinks::syslog::info;
-	mapping[DEBUG0] = sinks::syslog::debug;
-	mapping[DEBUG1] = sinks::syslog::debug;
-	mapping[DEBUG2] = sinks::syslog::debug;
-	mapping[DEBUG3] = sinks::syslog::debug;
-	mapping[DEBUG4] = sinks::syslog::debug;
-	mapping[DEBUG5] = sinks::syslog::debug;
-	backend->set_severity_mapper( mapping );
-*/
+//    pBackend->set_severity_mapper( typename parameter::binding< ArgsT, keywords::tag::custom_severity_mapping, void >::type >::type());
 
     shared_ptr< BOOST_LOG_SYSLOG_SINK_FRONTEND_INTERNAL< backend_t > > pSink =
         boost::make_shared< BOOST_LOG_SYSLOG_SINK_FRONTEND_INTERNAL< backend_t > >(pBackend);
