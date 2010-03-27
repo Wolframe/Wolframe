@@ -87,7 +87,6 @@ int main( void ) {
 	);
 
 #ifndef _WIN32
-/*
 	sinks::syslog::custom_severity_mapping< log_level > mapping( "Severity" );
 	mapping[FATAL] = sinks::syslog::emergency;
 	mapping[ALERT] = sinks::syslog::alert;
@@ -102,13 +101,12 @@ int main( void ) {
 	mapping[DEBUG3] = sinks::syslog::debug;
 	mapping[DEBUG4] = sinks::syslog::debug;
 	mapping[DEBUG5] = sinks::syslog::debug;
-	backend->set_severity_mapper( mapping );
-*/
+
 	logging::init_log_to_syslog(
 		keywords::facility = sinks::syslog::user,
 		keywords::use_impl = sinks::syslog::native,
+		keywords::custom_severity_mapping = mapping,
 		keywords::filter = flt::attr< log_level >( "Severity", nothrow ) <= DEBUG5
-		// TODO: custom_severity_mapping
 	);
 #else
 /*

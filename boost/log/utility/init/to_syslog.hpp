@@ -42,6 +42,8 @@
 #endif
 #include <boost/log/sinks/syslog_backend.hpp>
 
+#include <boost/log/keywords/custom_severity_mapping.hpp>
+
 //! \cond
 #ifndef BOOST_LOG_NO_THREADS
 #define BOOST_LOG_SYSLOG_SINK_FRONTEND_INTERNAL sinks::synchronous_sink
