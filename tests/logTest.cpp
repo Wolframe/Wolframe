@@ -1,3 +1,7 @@
+//
+// testing the boost logging library
+//
+
 #include <iostream>
 
 #include <boost/log/common.hpp>
