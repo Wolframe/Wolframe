@@ -109,7 +109,6 @@ int main( void ) {
 		keywords::filter = flt::attr< log_level >( "Severity", nothrow ) <= DEBUG5
 	);
 #else
-/*
 	sinks::event_log::custom_event_type_mapping< log_level > mapping( "Severity" );
 	mapping[FATAL] = sinks::event_log::error;
 	mapping[ALERT] = sinks::event_log::error;
@@ -124,13 +123,11 @@ int main( void ) {
 	mapping[DEBUG3] = sinks::event_log::info;
 	mapping[DEBUG4] = sinks::event_log::info;
 	mapping[DEBUG5] = sinks::event_log::info;
-	sink->locked_backend( )->set_event_type_mapper( mapping );
-*/
 
 	logging::init_log_to_eventlog(
 		keywords::log_source = "Boosttests Logtest 1",
+		keywords::custom_event_type_mapping = mapping,
 		keywords::filter = flt::attr< log_level >( "Severity", nothrow ) <= DEBUG5
-		// TODO: pass custom_event_type_mapping
 	);
 #endif
 

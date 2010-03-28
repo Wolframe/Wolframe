@@ -8,19 +8,19 @@
  * at http://www.boost.org/libs/log/doc/log.html.
  */
 /*!
- * \file   keywords/custom_severity_mapping.hpp
+ * \file   keywords/custom_event_type_mapping.hpp
  * \author Andrey Semashev
  * \date   14.03.2009
  *
- * The header contains the \c custom_severity_mapping keyword declaration.
+ * The header contains the \c custom_event_type_mapping keyword declaration.
  */
 
 #if (defined(_MSC_VER) && _MSC_VER > 1000)
 #pragma once
 #endif // _MSC_VER > 1000
 
-#ifndef BOOST_LOG_KEYWORDS_CUSTOM_SEVERITY_MAPPING_HPP_INCLUDED_
-#define BOOST_LOG_KEYWORDS_CUSTOM_SEVERITY_MAPPING_HPP_INCLUDED_
+#ifndef BOOST_LOG_KEYWORDS_CUSTOM_EVENT_TYPE_MAPPING_HPP_INCLUDED_
+#define BOOST_LOG_KEYWORDS_CUSTOM_EVENT_TYPE_MAPPING_HPP_INCLUDED_
 
 #include <boost/parameter/keyword.hpp>
 #include <boost/log/detail/prologue.hpp>
@@ -31,8 +31,8 @@ namespace BOOST_LOG_NAMESPACE {
 
 namespace keywords {
 
-    //! The keyword for passing custom severity type flag to a syslog sink backend initialization
-    BOOST_PARAMETER_KEYWORD(tag, custom_severity_mapping)
+    //! The keyword for passing custom event type ampping flag to a eventlog sink backend initialization
+    BOOST_PARAMETER_KEYWORD(tag, custom_event_type_mapping)
 
 } // namespace keywords
 
@@ -40,4 +40,4 @@ namespace keywords {
 
 } // namespace boost
 
-#endif // BOOST_LOG_KEYWORDS_CUSTOM_SEVERITY_MAPPING_HPP_INCLUDED_
+#endif // BOOST_LOG_KEYWORDS_CUSTOM_EVENT_TYPE_MAPPING_HPP_INCLUDED_

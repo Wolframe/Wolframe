@@ -10,7 +10,7 @@
 /*!
  * \file   to_eventlog.hpp
  * \author Andrey Semashev
- * \date   16.05.2008
+ * \date   14.03.2009
  *
  * The header contains implementation of convenience functions for enabling logging to the Windows event logger.
  */
@@ -42,6 +42,8 @@
 #endif
 #include <boost/log/sinks/event_log_backend.hpp>
 
+#include <boost/log/keywords/custom_event_type_mapping.hpp>
+
 //! \cond
 #ifndef BOOST_LOG_NO_THREADS
 #define BOOST_LOG_EVENTLOG_SINK_FRONTEND_INTERNAL sinks::synchronous_sink
@@ -50,16 +52,6 @@
 #endif
 //! \endcond
 
-/*
-namespace sinks = boost::log::sinks;
-namespace logging = boost::log;
-namespace flt = boost::log::filters;
-namespace src = boost::log::sources;
-namespace keywords = boost::log::keywords;
-namespace fmt = boost::log::formatters;
-namespace sinks = boost::log::sinks;
-*/
-
 using namespace std;
 
 namespace boost {
@@ -67,6 +59,24 @@ namespace boost {
 namespace BOOST_LOG_NAMESPACE {
 
 namespace aux {
+
+template< typename CustomEnumT >
+inline typename sinks::event_log::custom_event_type_mapping< CustomEnumT > acquire_custom_event_type_mapping( sinks::event_log::custom_event_type_mapping< CustomEnumT > const& mapping )
+{
+    return mapping;
+}
+
+// The function installs the custom severity mapper into the syslog backend, if provided in the arguments pack
+template< typename SinkT, typename ArgsT >
+inline void setup_custom_event_type_mapping(SinkT&, ArgsT const&, mpl::true_)
+{
+}
+
+template< typename SinkT, typename ArgsT >
+inline void setup_custom_event_type_mapping(SinkT& s UNUSED, ArgsT const& args UNUSED, mpl::false_)
+{
+	s.locked_backend( )->set_event_type_mapper(aux::acquire_custom_event_type_mapping(args[keywords::custom_event_type_mapping]));
+}
 
 //! The function constructs the sink and adds it to the core
 template< typename CharT, typename ArgsT >
@@ -80,29 +90,13 @@ template< typename CharT, typename ArgsT >
 
     aux::setup_formatter(*pBackend, args,
         typename is_void< typename parameter::binding< ArgsT, keywords::tag::format, void >::type >::type());
-	
-/*
-	// TODO: set custom event type mapping
-	sinks::event_log::custom_event_type_mapping< log_level > mapping( "Severity" );
-	mapping[FATAL] = sinks::event_log::error;
-	mapping[ALERT] = sinks::event_log::error;
-	mapping[CRITICAL] = sinks::event_log::error;
-	mapping[ERROR] = sinks::event_log::error;
-	mapping[WARNING] = sinks::event_log::warning;
-	mapping[NOTICE] = sinks::event_log::info;
-	mapping[INFO] = sinks::event_log::info;
-	mapping[DEBUG0] = sinks::event_log::info;
-	mapping[DEBUG1] = sinks::event_log::info;
-	mapping[DEBUG2] = sinks::event_log::info;
-	mapping[DEBUG3] = sinks::event_log::info;
-	mapping[DEBUG4] = sinks::event_log::info;
-	mapping[DEBUG5] = sinks::event_log::info;
-	sink->locked_backend( )->set_event_type_mapper( mapping );
-*/
 
     shared_ptr< BOOST_LOG_EVENTLOG_SINK_FRONTEND_INTERNAL< backend_t > > pSink =
         boost::make_shared< BOOST_LOG_EVENTLOG_SINK_FRONTEND_INTERNAL< backend_t > >(pBackend);
 
+    aux::setup_custom_event_type_mapping(*pSink, args,
+        typename is_void< typename parameter::binding< ArgsT, keywords::tag::custom_event_type_mapping, void >::type >::type());
+		
     aux::setup_filter(*pSink, args,
         typename is_void< typename parameter::binding< ArgsT, keywords::tag::filter, void >::type >::type());
 

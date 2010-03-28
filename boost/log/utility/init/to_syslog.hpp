@@ -10,7 +10,7 @@
 /*!
  * \file   to_syslog.hpp
  * \author Andrey Semashev
- * \date   16.05.2008
+ * \date   14.03.2009
  *
  * The header contains implementation of convenience functions for enabling logging to syslog.
  */
@@ -62,11 +62,9 @@ namespace BOOST_LOG_NAMESPACE {
 
 namespace aux {
 
-//--+
-
 template< typename CustomEnumT >
 inline typename sinks::syslog::custom_severity_mapping< CustomEnumT > acquire_custom_severity_mapping( sinks::syslog::custom_severity_mapping< CustomEnumT > const& mapping )
- {
+{
     return mapping;
 }
 
@@ -81,8 +79,6 @@ inline void setup_custom_severity_mapping(BackendT& b UNUSED, ArgsT const& args 
 {
     b.set_severity_mapper(aux::acquire_custom_severity_mapping(args[keywords::custom_severity_mapping]));
 }
-
-//---
 
 //! The function constructs the sink and adds it to the core
 template< typename CharT, typename ArgsT >
