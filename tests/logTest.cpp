@@ -7,6 +7,7 @@
 #include <boost/log/common.hpp>
 #include <boost/log/formatters.hpp>
 #include <boost/log/filters.hpp>
+#include <boost/log/utility/init/common_attributes.hpp>
 
 #include <boost/log/utility/init/to_file.hpp>
 #include <boost/log/utility/init/to_console.hpp>
@@ -15,7 +16,6 @@
 #else
 #include <boost/log/utility/init/to_eventlog.hpp>
 #endif
-#include <boost/log/utility/init/common_attributes.hpp>
 
 namespace logging = boost::log;
 namespace flt = boost::log::filters;

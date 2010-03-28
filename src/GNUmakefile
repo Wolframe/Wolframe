@@ -2,15 +2,22 @@ TOPDIR = ..
 
 SUBDIRS =
 
+INCLUDE_CPPFLAGS = \
+	-DBOOST_LOG_USE_NATIVE_SYSLOG
+
+INCLUDE_LDFLAGS = \
+	-L$(TOPDIR)/libs/boost/log
+
 INCLUDE_DIRS = -I. \
-	-I$(TOPDIR)/include
+	-I$(TOPDIR)/include -I$(TOPDIR)
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
 INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_program_options \
-	-lboost_filesystem
+	-lboost_filesystem \
+	-lboost_log -lboost_log_setup
 
 CPP_BINS = \
 	smerpd$(EXE)
@@ -27,6 +34,7 @@ OBJS = \
 	version.o \
 	appInstance.o \
 	commandLine.o \
+	logger.o \
 	configFile.o \
 	appConfig.o \
 	request.o \

@@ -13,6 +13,7 @@
 #include "appConfig.hpp"
 #include "server.hpp"
 #include "ErrorCodes.hpp"
+#include "logger.hpp"
 
 #include <libintl.h>
 #include <locale.h>
@@ -131,6 +132,9 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		sigfillset( &new_mask );
 		sigset_t old_mask;
 		pthread_sigmask( SIG_BLOCK, &new_mask, &old_mask );
+
+		// Create the final logger based on the configuration
+		_SMERP::Logger::instance( );
 
 		// Run server in background thread(s).
 		_SMERP::server s( config );
