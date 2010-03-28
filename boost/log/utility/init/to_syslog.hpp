@@ -64,6 +64,12 @@ namespace aux {
 
 //--+
 
+template< typename CustomEnumT >
+inline typename sinks::syslog::custom_severity_mapping< CustomEnumT > acquire_custom_severity_mapping( sinks::syslog::custom_severity_mapping< CustomEnumT > const& mapping )
+ {
+    return mapping;
+}
+
 // The function installs the custom severity mapper into the syslog backend, if provided in the arguments pack
 template< typename BackendT, typename ArgsT >
 inline void setup_custom_severity_mapping(BackendT&, ArgsT const&, mpl::true_)
@@ -73,30 +79,8 @@ inline void setup_custom_severity_mapping(BackendT&, ArgsT const&, mpl::true_)
 template< typename BackendT, typename ArgsT >
 inline void setup_custom_severity_mapping(BackendT& b UNUSED, ArgsT const& args UNUSED, mpl::false_)
 {
-//    b.set_severity_mapper(aux::acquire_custom_severity_mapping(args[keywords::custom_severity_mapping]));
+    b.set_severity_mapper(aux::acquire_custom_severity_mapping(args[keywords::custom_severity_mapping]));
 }
-
-/*
-// The function creates a filter functional object from the provided argument
-template< typename CharT >
-inline typename formatter_types< CharT >::formatter_type acquire_formatter(const CharT* formatter)
-{
-    return boost::log::parse_formatter(formatter);
-}
-template< typename CharT, typename TraitsT, typename AllocatorT >
-inline typename formatter_types< CharT >::formatter_type acquire_formatter(std::basic_string< CharT, TraitsT, AllocatorT > const& formatter)
-{
-    return boost::log::parse_formatter(formatter);
-}
-template< typename FormatterT >
-inline typename enable_if<
-    formatters::is_formatter< FormatterT >,
-    FormatterT const&
->::type acquire_formatter(FormatterT const& formatter)
-{
-    return formatter;
-}
-*/
 
 //---
 
