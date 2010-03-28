@@ -44,6 +44,8 @@
 
 #include <boost/log/keywords/custom_severity_mapping.hpp>
 
+#include <boost/log/unused.hpp>
+
 //! \cond
 #ifndef BOOST_LOG_NO_THREADS
 #define BOOST_LOG_SYSLOG_SINK_FRONTEND_INTERNAL sinks::synchronous_sink
@@ -60,6 +62,44 @@ namespace BOOST_LOG_NAMESPACE {
 
 namespace aux {
 
+//--+
+
+// The function installs the custom severity mapper into the syslog backend, if provided in the arguments pack
+template< typename BackendT, typename ArgsT >
+inline void setup_custom_severity_mapping(BackendT&, ArgsT const&, mpl::true_)
+{
+}
+
+template< typename BackendT, typename ArgsT >
+inline void setup_custom_severity_mapping(BackendT& b UNUSED, ArgsT const& args UNUSED, mpl::false_)
+{
+//    b.set_severity_mapper(aux::acquire_custom_severity_mapping(args[keywords::custom_severity_mapping]));
+}
+
+/*
+// The function creates a filter functional object from the provided argument
+template< typename CharT >
+inline typename formatter_types< CharT >::formatter_type acquire_formatter(const CharT* formatter)
+{
+    return boost::log::parse_formatter(formatter);
+}
+template< typename CharT, typename TraitsT, typename AllocatorT >
+inline typename formatter_types< CharT >::formatter_type acquire_formatter(std::basic_string< CharT, TraitsT, AllocatorT > const& formatter)
+{
+    return boost::log::parse_formatter(formatter);
+}
+template< typename FormatterT >
+inline typename enable_if<
+    formatters::is_formatter< FormatterT >,
+    FormatterT const&
+>::type acquire_formatter(FormatterT const& formatter)
+{
+    return formatter;
+}
+*/
+
+//---
+
 //! The function constructs the sink and adds it to the core
 template< typename CharT, typename ArgsT >
     shared_ptr< BOOST_LOG_SYSLOG_SINK_FRONTEND_INTERNAL<
@@ -73,7 +113,8 @@ template< typename CharT, typename ArgsT >
     aux::setup_formatter(*pBackend, args,
         typename is_void< typename parameter::binding< ArgsT, keywords::tag::format, void >::type >::type());
 
-//    pBackend->set_severity_mapper( typename parameter::binding< ArgsT, keywords::tag::custom_severity_mapping, void >::type >::type());
+    aux::setup_custom_severity_mapping(*pBackend, args,
+        typename is_void< typename parameter::binding< ArgsT, keywords::tag::custom_severity_mapping, void >::type >::type());
 
     shared_ptr< BOOST_LOG_SYSLOG_SINK_FRONTEND_INTERNAL< backend_t > > pSink =
         boost::make_shared< BOOST_LOG_SYSLOG_SINK_FRONTEND_INTERNAL< backend_t > >(pBackend);
