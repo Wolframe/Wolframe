@@ -29,20 +29,22 @@ inline std::basic_ostream< CharT, TraitsT > &operator<< ( std::basic_ostream< Ch
 	return s;
 }
 
-Logger::Logger( ) {
+#define LOG_DEBUG      BOOST_LOG_SEV( logger, Logger::LogLevel::DEBUG )
+
+void Logger::initialize( ) {
 
 	// open logger to the console
 	logging::init_log_to_console(
 		std::clog,
 		keywords::format = fmt::format( "%1% %2%: %3%" )
 			% fmt::date_time( "TimeStamp", std::nothrow )
-			% fmt::attr< LogLevel >( "Severity", std::nothrow )
+			% fmt::attr< Logger::LogLevel >( "Severity", std::nothrow )
 			% fmt::message( )
 	);
 
 	logging::add_common_attributes( );
 
-	src::severity_logger< LogLevel > logger;
+	src::severity_logger< Logger::LogLevel > logger;
 
 	LOG_DEBUG << "Logger started";
 }

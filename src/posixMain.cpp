@@ -134,7 +134,7 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		pthread_sigmask( SIG_BLOCK, &new_mask, &old_mask );
 
 		// Create the final logger based on the configuration
-		_SMERP::Logger::instance( );
+		_SMERP::Logger::initialize( );
 
 		// Run server in background thread(s).
 		_SMERP::server s( config );
