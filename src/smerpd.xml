@@ -71,7 +71,7 @@ SMERP configuration file
 		<level></level>			<!-- log level for console (stderr) logging -->
 	</stderr>
 	<logFile>
-		<filename></filename>
+		<filename>smerpd.log</filename>
 		<level></level>			<!-- log level for file logging -->
 	</logFile>
 </logging>

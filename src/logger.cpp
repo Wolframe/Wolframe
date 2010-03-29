@@ -20,7 +20,8 @@ namespace _SMERP {
 
 // map enum values to strings
 template< typename CharT, typename TraitsT >
-inline std::basic_ostream< CharT, TraitsT > &operator<< ( std::basic_ostream< CharT, TraitsT >& s, Logger::LogLevel l ) {
+inline std::basic_ostream< CharT, TraitsT > &operator<< ( std::basic_ostream< CharT, TraitsT >& s, Logger::LogLevel l )
+{
 	static const char *const str[] = {
 		"ALWAYS", "DATA", "TRACE", "DEBUG", "INFO", "NOTICE",
 		"WARNING", "ERROR", "SEVERE", "CRITICAL", "ALERT", "FATAL", "NEVER" };
@@ -34,27 +35,32 @@ inline std::basic_ostream< CharT, TraitsT > &operator<< ( std::basic_ostream< Ch
 
 src::severity_logger< Logger::LogLevel > logger;
 
-void Logger::initialize( ) {
-
+void Logger::initialize( const ApplicationConfiguration& config )
+{
 	// open logger to the console
 	logging::init_log_to_console(
 		std::clog,
+// TODO: configurable
+		keywords::filter = flt::attr< LogLevel >( "Severity", std::nothrow ) >= DEBUG,
 		keywords::format = fmt::format( "%1% %2%: %3%" )
 			% fmt::date_time( "TimeStamp", std::nothrow )
 			% fmt::attr< LogLevel >( "Severity", std::nothrow )
 			% fmt::message( )
 	);
 
-	// open logger to a logfile
-	logging::init_log_to_file(
-		keywords::file_name = "smerpd.log",
-		keywords::open_mode = ( std::ios_base::out | std::ios_base::app ),
-		keywords::filter = flt::attr< LogLevel >( "Severity", std::nothrow ) <= NOTICE,
-		keywords::format = fmt::format( "%1% %2%: %3%" )
-			% fmt::date_time( "TimeStamp", std::nothrow )
-			% fmt::attr< LogLevel >( "Severity", std::nothrow )
-			% fmt::message( )
-	);
+	if( config.logFile != std::string( ) ) {
+		// open logger to a logfile
+		logging::init_log_to_file(
+			keywords::file_name = config.logFile,
+			keywords::open_mode = ( std::ios_base::out | std::ios_base::app ),
+// TODO: configurable
+			keywords::filter = flt::attr< LogLevel >( "Severity", std::nothrow ) >= NOTICE,
+			keywords::format = fmt::format( "%1% %2%: %3%" )
+				% fmt::date_time( "TimeStamp", std::nothrow )
+				% fmt::attr< LogLevel >( "Severity", std::nothrow )
+				% fmt::message( )
+		);
+	}
 
 	logging::add_common_attributes( );
 
