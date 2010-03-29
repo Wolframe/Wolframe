@@ -29,7 +29,7 @@ inline std::basic_ostream< CharT, TraitsT > &operator<< ( std::basic_ostream< Ch
 	return s;
 }
 
-#define LOG_DEBUG      BOOST_LOG_SEV( logger, DEBUG )
+src::severity_logger< Logger::LogLevel > logger;
 
 void Logger::initialize( ) {
 
@@ -43,8 +43,6 @@ void Logger::initialize( ) {
 	);
 
 	logging::add_common_attributes( );
-
-	src::severity_logger< LogLevel > logger;
 
 	LOG_DEBUG << "Logger started";
 }

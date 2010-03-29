@@ -135,6 +135,7 @@ int _SMERP_posixMain( int argc, char* argv[] )
 
 		// Create the final logger based on the configuration
 		_SMERP::Logger::initialize( );
+		LOG_DEBUG << "bla";
 
 		// Run server in background thread(s).
 		_SMERP::server s( config );
