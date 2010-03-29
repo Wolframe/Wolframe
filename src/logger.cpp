@@ -47,7 +47,7 @@ void Logger::initialize( ) {
 
 	// open logger to a logfile
 	logging::init_log_to_file(
-		keywords::file_name = "logTest.log",
+		keywords::file_name = "smerpd.log",
 		keywords::open_mode = ( std::ios_base::out | std::ios_base::app ),
 		keywords::filter = flt::attr< LogLevel >( "Severity", std::nothrow ) <= NOTICE,
 		keywords::format = fmt::format( "%1% %2%: %3%" )
