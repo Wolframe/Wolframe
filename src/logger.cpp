@@ -4,14 +4,17 @@
 
 #include <boost/log/common.hpp>
 #include <boost/log/formatters.hpp>
+#include <boost/log/filters.hpp>
 #include <boost/log/utility/init/common_attributes.hpp>
 
 #include <boost/log/utility/init/to_console.hpp>
+#include <boost/log/utility/init/to_file.hpp>
 
 namespace logging = boost::log;
 namespace keywords = boost::log::keywords;
 namespace fmt = boost::log::formatters;
 namespace src = boost::log::sources;
+namespace flt = boost::log::filters;
 
 namespace _SMERP {
 
@@ -42,9 +45,21 @@ void Logger::initialize( ) {
 			% fmt::message( )
 	);
 
+	// open logger to a logfile
+	logging::init_log_to_file(
+		keywords::file_name = "logTest.log",
+		keywords::open_mode = ( std::ios_base::out | std::ios_base::app ),
+		keywords::filter = flt::attr< LogLevel >( "Severity", std::nothrow ) <= NOTICE,
+		keywords::format = fmt::format( "%1% %2%: %3%" )
+			% fmt::date_time( "TimeStamp", std::nothrow )
+			% fmt::attr< LogLevel >( "Severity", std::nothrow )
+			% fmt::message( )
+	);
+
 	logging::add_common_attributes( );
 
 	LOG_DEBUG << "Logger started";
+	
 }
 
 } // namespace _SMERP

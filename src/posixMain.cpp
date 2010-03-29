@@ -135,7 +135,7 @@ int _SMERP_posixMain( int argc, char* argv[] )
 
 		// Create the final logger based on the configuration
 		_SMERP::Logger::initialize( );
-		LOG_DEBUG << "bla";
+		LOG_NOTICE << "Starting server";
 
 		// Run server in background thread(s).
 		_SMERP::server s( config );
@@ -155,13 +155,15 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		sigwait( &wait_mask, &sig );
 
 		// Stop the server.
+		LOG_NOTICE << "Stopping server";
 		s.stop();
 		t.join();
+		LOG_NOTICE << "Server stopped";
 
 		return _SMERP::ErrorCodes::OK;
 	}
 	catch (std::exception& e)	{
-		std::cerr << "posixMain: exception: " << e.what() << "\n";
+		LOG_ERROR << "posixMain: exception: " << e.what() << "\n";
 		return _SMERP::ErrorCodes::FAILURE;
 	}
 
