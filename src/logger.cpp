@@ -19,8 +19,8 @@ namespace _SMERP {
 template< typename CharT, typename TraitsT >
 inline std::basic_ostream< CharT, TraitsT > &operator<< ( std::basic_ostream< CharT, TraitsT >& s, Logger::LogLevel l ) {
 	static const char *const str[] = {
-		"ALWAYS", "FATAL", "ALERT", "CRITICAL", "SEVERE", "ERROR", "WARNING", "NOTICE", "INFO",
-		"DEBUG", "TRACE", "DATA", "NEVER" };
+		"ALWAYS", "DATA", "TRACE", "DEBUG", "INFO", "NOTICE",
+		"WARNING", "ERROR", "SEVERE", "CRITICAL", "ALERT", "FATAL", "NEVER" };
 	if( static_cast< size_t >( l ) < ( sizeof( str ) / sizeof( *str ) ) ) {
 		s << str[l];
 	} else {
@@ -29,7 +29,7 @@ inline std::basic_ostream< CharT, TraitsT > &operator<< ( std::basic_ostream< Ch
 	return s;
 }
 
-#define LOG_DEBUG      BOOST_LOG_SEV( logger, Logger::LogLevel::DEBUG )
+#define LOG_DEBUG      BOOST_LOG_SEV( logger, DEBUG )
 
 void Logger::initialize( ) {
 
@@ -38,13 +38,13 @@ void Logger::initialize( ) {
 		std::clog,
 		keywords::format = fmt::format( "%1% %2%: %3%" )
 			% fmt::date_time( "TimeStamp", std::nothrow )
-			% fmt::attr< Logger::LogLevel >( "Severity", std::nothrow )
+			% fmt::attr< LogLevel >( "Severity", std::nothrow )
 			% fmt::message( )
 	);
 
 	logging::add_common_attributes( );
 
-	src::severity_logger< Logger::LogLevel > logger;
+	src::severity_logger< LogLevel > logger;
 
 	LOG_DEBUG << "Logger started";
 }
