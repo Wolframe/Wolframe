@@ -51,9 +51,14 @@ namespace _SMERP {
 		dbUser = cfgFile.dbUser;
 		dbPassword = cfgFile.dbPassword;
 
+		logToStderr = cfgFile.logToStderr;
 		stderrLogLevel = cfgFile.stderrLogLevel;
+		logToFile = cfgFile.logToFile;
 		logFile = cfgFile.logFile;
 		logFileLogLevel = cfgFile.logFileLogLevel;
+		logToSyslog = cfgFile.logToSyslog;
+		syslogFacility = cfgFile.syslogFacility;
+		syslogLogLevel = cfgFile.syslogLogLevel;
 	}
 
 
@@ -108,9 +113,20 @@ namespace _SMERP {
 						<< (dbPassword.empty() ? "(not specified - no password used)" : dbPassword) << std::endl;
 
 		os << "Logging" << std::endl;
-		os << "   Log to stderr log level: " << stderrLogLevel << std::endl;
-		os << "   Log to file: " << logFile << std::endl;
-		os << "   Log to file log level: " << logFileLogLevel << std::endl;
+		if ( logToStderr )
+			os << "   Log to stderr log level: " << stderrLogLevel << std::endl;
+		else
+			os << "   Log to stderr: DISABLED" << std::endl;
+		if ( logToFile )	{
+			os << "   Log to file: " << logFile << std::endl;
+			os << "   Log to file log level: " << logFileLogLevel << std::endl;
+		}
+		else
+			os << "   Log to file: DISABLED" << std::endl;
+		if ( logToSyslog )
+			os << "   Log to syslog: facility " << syslogFacility << ", level " << syslogLogLevel << std::endl;
+		else
+			os << "   Log to syslog: DISABLED" << std::endl;
 	}
 
 
