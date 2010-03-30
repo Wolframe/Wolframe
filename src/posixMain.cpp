@@ -155,7 +155,7 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		sigwait( &wait_mask, &sig );
 
 		// Stop the server.
-		LOG_NOTICE << "Stopping server";
+		LOG_INFO << "Stopping server";
 		s.stop();
 		t.join();
 		LOG_NOTICE << "Server stopped";

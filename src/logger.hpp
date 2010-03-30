@@ -29,6 +29,8 @@ public:
 		NEVER		/// log this only under special conditions
 	};
 
+	static LogLevel str2LogLevel( const std::string s );
+
 	static void initialize( const ApplicationConfiguration& config );
 
 };

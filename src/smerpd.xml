@@ -68,10 +68,10 @@ SMERP configuration file
 <!-- Logging parameters -->
 <logging>
 	<stderr>
-		<level></level>			<!-- log level for console (stderr) logging -->
+		<level>NOTICE</level>			<!-- log level for console (stderr) logging -->
 	</stderr>
 	<logFile>
 		<filename>smerpd.log</filename>
-		<level></level>			<!-- log level for file logging -->
+		<level>NOTICE</level>			<!-- log level for file logging -->
 	</logFile>
 </logging>
