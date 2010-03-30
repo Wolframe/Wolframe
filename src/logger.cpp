@@ -64,14 +64,12 @@ void Logger::initialize( const ApplicationConfiguration& config )
 			% fmt::message( )
 	);
 
+	// open logger to a logfile
 	if( config.logFile != std::string( ) ) {
-		// open logger to a logfile
-		Logger::LogLevel level = DEBUG;
 		logging::init_log_to_file(
 			keywords::file_name = config.logFile,
 			keywords::open_mode = ( std::ios_base::out | std::ios_base::app ),
-// TODO: configurable
-			keywords::filter = flt::attr< LogLevel >( "Severity", std::nothrow ) >= level,
+			keywords::filter = flt::attr< LogLevel >( "Severity", std::nothrow ) >= Logger::str2LogLevel( config.logFileLogLevel ),
 			keywords::format = fmt::format( "%1% %2%: %3%" )
 				% fmt::date_time( "TimeStamp", std::nothrow )
 				% fmt::attr< LogLevel >( "Severity", std::nothrow )
