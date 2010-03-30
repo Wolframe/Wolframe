@@ -171,8 +171,11 @@ namespace _SMERP {
 		dbPassword = pt.get<std::string>( "database.password", std::string() );
 
 		stderrLogLevel = pt.get<std::string>( "logging.stderr.level", "NOTICE" );
-		logFile = pt.get<std::string>( "logging.logFile.filename", std::string() );
+		logFile = resolvePath( boost::filesystem::system_complete(
+					pt.get<std::string>( "logging.logFile.filename", std::string() )));
 		logFileLogLevel = pt.get<std::string>( "logging.logFile.level", "ERROR" );
+		syslogFacility = pt.get<std::string>( "logging.syslog.facility", "LOG_LOCAL4" );;
+		syslogLogLevel = pt.get<std::string>( "logging.syslog.level", "NOTICE" );;
 
 		return true;
 	}
