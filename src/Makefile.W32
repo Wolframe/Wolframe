@@ -7,6 +7,7 @@ SUBDIRS =
 INCLUDE_DIRS = \
 	/D_WIN32_WINNT=0x400 \
 	/I. \
+	/I$(TOPDIR) \
 	/I$(TOPDIR)\include \
 	/I"$(BOOST_DIR)" \
 	/I"$(PLATFORM_SDK_DIR)\Include"	
@@ -14,7 +15,9 @@ INCLUDE_DIRS = \
 # Note: libraries are picked automatically on Windows!
 SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib"
 BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib"
-INCLUDE_LDFLAGS = $(SDK_LDFLAGS) $(BOOST_LDFLAGS)
+INCLUDE_LDFLAGS = \
+	$(SDK_LDFLAGS) $(BOOST_LDFLAGS) \
+	/LIBPATH:$(TOPDIR)\libs\boost\log
 
 CPP_BINS = \
 	smerpd.exe
@@ -31,6 +34,7 @@ OBJS = \
 	version.obj \
 	appInstance.obj \
 	commandLine.obj \
+	logger.obj \
 	configFile.obj \
 	appConfig.obj \
 	request.obj \
@@ -44,7 +48,9 @@ all: $(OBJS) $(CPP_BINS)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-smerpd.exe: smerpd.obj $(OBJS)
+smerpd.exe: smerpd.obj $(OBJS) \
+	$(TOPDIR)\libs\boost\log\libboost_log$(BOOST_LIBRARY_TAG).lib \
+	$(TOPDIR)\libs\boost\log\libboost_log_setup$(BOOST_LIBRARY_TAG).lib
 
 local_all:
 

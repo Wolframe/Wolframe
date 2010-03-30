@@ -34,20 +34,20 @@ inline std::basic_ostream< CharT, TraitsT > &operator<< ( std::basic_ostream< Ch
 }
 
 Logger::LogLevel Logger::str2LogLevel( const std::string s ) {
-	if( s == "ALWAYS" )		return Logger::ALWAYS;
-	else if( s == "DATA" )		return Logger::DATA;
-	else if( s == "TRACE" )		return Logger::TRACE;
-	else if( s == "DEBUG" )		return Logger::DEBUG;
-	else if( s == "INFO" )		return Logger::INFO;
-	else if( s == "NOTICE" )	return Logger::NOTICE;
-	else if( s == "WARNING" )	return Logger::WARNING;
-	else if( s == "ERROR" )		return Logger::ERROR;
-	else if( s == "SEVERE" )	return Logger::SEVERE;
-	else if( s == "CRITICAL" )	return Logger::CRITICAL;
-	else if( s == "ALERT" )		return Logger::ALERT;
-	else if( s == "FATAL" )		return Logger::FATAL;
-	else if( s == "NEVER" )		return Logger::NEVER;
-	else return Logger::NEVER;
+	if( s == "ALWAYS" )		return Logger::_SMERP_ALWAYS;
+	else if( s == "DATA" )		return Logger::_SMERP_DATA;
+	else if( s == "TRACE" )		return Logger::_SMERP_TRACE;
+	else if( s == "DEBUG" )		return Logger::_SMERP_DEBUG;
+	else if( s == "INFO" )		return Logger::_SMERP_INFO;
+	else if( s == "NOTICE" )	return Logger::_SMERP_NOTICE;
+	else if( s == "WARNING" )	return Logger::_SMERP_WARNING;
+	else if( s == "ERROR" )		return Logger::_SMERP_ERROR;
+	else if( s == "SEVERE" )	return Logger::_SMERP_SEVERE;
+	else if( s == "CRITICAL" )	return Logger::_SMERP_CRITICAL;
+	else if( s == "ALERT" )		return Logger::_SMERP_ALERT;
+	else if( s == "FATAL" )		return Logger::_SMERP_FATAL;
+	else if( s == "NEVER" )		return Logger::_SMERP_NEVER;
+	else return Logger::_SMERP_NEVER;
 }
 
 src::severity_logger< Logger::LogLevel > logger;
