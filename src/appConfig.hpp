@@ -8,7 +8,6 @@
 #include <string>
 #include <vector>
 
-
 namespace _SMERP {
 
 // application configuration structure
@@ -49,7 +48,10 @@ namespace _SMERP {
 		std::string	dbUser;
 		std::string	dbPassword;
 // logger configuration
+		std::string	stderrLogLevel;
 		std::string	logFile;
+		std::string	logFileLogLevel;
+
 	private:
 		std::string	errMsg_;
 

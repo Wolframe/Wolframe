@@ -134,7 +134,7 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		pthread_sigmask( SIG_BLOCK, &new_mask, &old_mask );
 
 		// Create the final logger based on the configuration
-		_SMERP::Logger::initialize( );
+		_SMERP::Logger::initialize( config );
 		LOG_NOTICE << "Starting server";
 
 		// Run server in background thread(s).
@@ -155,7 +155,7 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		sigwait( &wait_mask, &sig );
 
 		// Stop the server.
-		LOG_NOTICE << "Stopping server";
+		LOG_INFO << "Stopping server";
 		s.stop();
 		t.join();
 		LOG_NOTICE << "Server stopped";

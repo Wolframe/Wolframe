@@ -170,6 +170,10 @@ namespace _SMERP {
 		dbUser = pt.get<std::string>( "database.user", std::string() );
 		dbPassword = pt.get<std::string>( "database.password", std::string() );
 
+		stderrLogLevel = pt.get<std::string>( "logging.stderr.level", "NOTICE" );
+		logFile = pt.get<std::string>( "logging.logFile.filename", std::string() );
+		logFileLogLevel = pt.get<std::string>( "logging.logFile.level", "ERROR" );
+
 		return true;
 	}
 

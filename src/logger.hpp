@@ -1,6 +1,10 @@
 #ifndef _LOGGER_HPP_INCLUDED
 #define _LOGGER_HPP_INCLUDED
 
+#include "appConfig.hpp"
+
+#include <string>
+
 #include <boost/log/common.hpp>
 
 namespace src = boost::log::sources;
@@ -25,7 +29,9 @@ public:
 		NEVER		/// log this only under special conditions
 	};
 
-	static void initialize( );
+	static LogLevel str2LogLevel( const std::string s );
+
+	static void initialize( const ApplicationConfiguration& config );
 
 };
 

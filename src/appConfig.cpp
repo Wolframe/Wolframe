@@ -51,7 +51,9 @@ namespace _SMERP {
 		dbUser = cfgFile.dbUser;
 		dbPassword = cfgFile.dbPassword;
 
+		stderrLogLevel = cfgFile.stderrLogLevel;
 		logFile = cfgFile.logFile;
+		logFileLogLevel = cfgFile.logFileLogLevel;
 	}
 
 
@@ -106,7 +108,9 @@ namespace _SMERP {
 						<< (dbPassword.empty() ? "(not specified - no password used)" : dbPassword) << std::endl;
 
 		os << "Logging" << std::endl;
-		os << "   Log file: " << logFile << std::endl;
+		os << "   Log to stderr log level: " << stderrLogLevel << std::endl;
+		os << "   Log to file: " << logFile << std::endl;
+		os << "   Log to file log level: " << logFileLogLevel << std::endl;
 	}
 
 
