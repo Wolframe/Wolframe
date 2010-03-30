@@ -51,6 +51,8 @@ namespace _SMERP {
 		std::string	stderrLogLevel;
 		std::string	logFile;
 		std::string	logFileLogLevel;
+		std::string	syslogFacility;
+		std::string	syslogLogLevel;
 
 	private:
 		std::string	errMsg_;
