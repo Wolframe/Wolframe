@@ -5,15 +5,15 @@
 #include <iostream>
 #include <string>
 #include <boost/asio.hpp>
-#include <boost/bind.hpp>
 #include <boost/function.hpp>
+#include <boost/bind.hpp>
 #include "appInstance.hpp"
 #include "commandLine.hpp"
 #include "configFile.hpp"
 #include "appConfig.hpp"
 #include "server.hpp"
 #include "ErrorCodes.hpp"
-
+#include "logger.hpp"
 
 #if !defined(_WIN32)
 #error "This is the WIN32 main !"
@@ -38,6 +38,7 @@ BOOL WINAPI consoleCtrlHandler(DWORD ctrlType)
 		case CTRL_BREAK_EVENT:
 		case CTRL_CLOSE_EVENT:
 		case CTRL_SHUTDOWN_EVENT:
+			LOG_INFO << "Stopping server";
 			consoleCtrlFunction();
 			return TRUE;
 		default:
@@ -119,6 +120,10 @@ int _SMERP_winMain( int argc, char* argv[] )
 			return _SMERP::ErrorCodes::OK;
 		}
 
+		// Create the final logger based on the configuration
+		_SMERP::Logger::initialize( config );
+		LOG_NOTICE << "Starting server";
+
 		_SMERP::server s( config );
 
 		// Set console control handler to allow server to be stopped.
@@ -132,6 +137,7 @@ int _SMERP_winMain( int argc, char* argv[] )
 		std::cerr << "exception: " << e.what() << "\n";
 		return _SMERP::ErrorCodes::FAILURE;
 	}
+	LOG_NOTICE << "Server stopped";
 
 	return _SMERP::ErrorCodes::OK;
 }
