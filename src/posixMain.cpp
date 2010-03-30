@@ -13,6 +13,7 @@
 #include "appConfig.hpp"
 #include "server.hpp"
 #include "ErrorCodes.hpp"
+#include "logger.hpp"
 
 #include <libintl.h>
 #include <locale.h>
@@ -132,6 +133,10 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		sigset_t old_mask;
 		pthread_sigmask( SIG_BLOCK, &new_mask, &old_mask );
 
+		// Create the final logger based on the configuration
+		_SMERP::Logger::initialize( );
+		LOG_NOTICE << "Starting server";
+
 		// Run server in background thread(s).
 		_SMERP::server s( config );
 		boost::thread t( boost::bind( &_SMERP::server::run, &s ));
@@ -150,13 +155,15 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		sigwait( &wait_mask, &sig );
 
 		// Stop the server.
+		LOG_NOTICE << "Stopping server";
 		s.stop();
 		t.join();
+		LOG_NOTICE << "Server stopped";
 
 		return _SMERP::ErrorCodes::OK;
 	}
 	catch (std::exception& e)	{
-		std::cerr << "posixMain: exception: " << e.what() << "\n";
+		LOG_ERROR << "posixMain: exception: " << e.what() << "\n";
 		return _SMERP::ErrorCodes::FAILURE;
 	}
 

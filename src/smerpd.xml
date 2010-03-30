@@ -71,7 +71,11 @@ SMERP configuration file
 		<level></level>			<!-- log level for console (stderr) logging -->
 	</stderr>
 	<logFile>
-		<filename></filename>
+		<filename></filename>		<!-- log file -->
 		<level></level>			<!-- log level for file logging -->
 	</logFile>
+	<syslog>
+		<facility></facility>		<!-- syslog facility -->
+		<level></level>			<!-- log level for file logging -->
+	</syslog>
 </logging>
