@@ -2,10 +2,11 @@
 // connection.hpp
 //
 
-#ifndef NETWORK_CONNECTION_HPP_INCLUDED
-#define NETWORK_CONNECTION_HPP_INCLUDED
+#ifndef _NETWORK_CONNECTION_HPP_INCLUDED
+#define _NETWORK_CONNECTION_HPP_INCLUDED
 
 #include <boost/asio.hpp>
+#include <boost/asio/ssl.hpp>
 #include <boost/array.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
@@ -73,4 +74,4 @@ typedef boost::shared_ptr<connection> connection_ptr;
 
 } // namespace _SMERP
 
-#endif // NETWORK_CONNECTION_HPP_INCLUDED
+#endif // _NETWORK_CONNECTION_HPP_INCLUDED
