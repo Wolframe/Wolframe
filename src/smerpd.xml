@@ -79,7 +79,7 @@ SMERP configuration file
 	</logFile>
 	<!-- syslog facility  and log level -->
 	<syslog>
-		<facility>local2</facility>
-		<level>INFO</level>
+		<facility>LOCAL2</facility>
+		<level>NOTICE</level>
 	</syslog>
 </logging>

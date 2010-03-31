@@ -160,9 +160,6 @@ void Logger::initialize( const ApplicationConfiguration& config )
 #endif
 
 	logging::add_common_attributes( );
-
-	LOG_DEBUG << "Logger started";
-	
 }
 
 } // namespace _SMERP
