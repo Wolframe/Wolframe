@@ -17,59 +17,71 @@
 
 namespace _SMERP {
 
-/// Represents a single connection from a client.
-class connection
-  : public boost::enable_shared_from_this<connection>,
-    private boost::noncopyable
-{
-public:
-	/// Construct a connection with the given io_service.
-	explicit connection( boost::asio::io_service& io_service, requestHandler& handler, long timeout_duration_ms );
+	/// Represents a single connection from a client.
+	class connection : public boost::enable_shared_from_this<connection>,
+			private boost::noncopyable
+	{
+	public:
+		/// Construct a connection with the given io_service.
+		explicit connection( boost::asio::io_service& io_service, requestHandler& handler, long timeoutDuration );
 
-	/// Get the socket associated with the connection.
-	boost::asio::ip::tcp::socket& socket();
+		/// Construct a connection with the given io_service and SSL conetext.
+		explicit connection( boost::asio::io_service& io_service, boost::asio::ssl::context& SSLcontext,
+				     requestHandler& handler, long timeoutDuration );
 
-	/// Start the first asynchronous operation for the connection.
-	void start();
+		/// Get the socket associated with the connection.
+		boost::asio::ip::tcp::socket& socket();
 
-private:
-  /// Handle completion of a read operation.
-  void handle_read(const boost::system::error_code& e,
-      std::size_t bytes_transferred);
+		/// Start the first asynchronous operation for the connection.
+		void start();
 
-  /// Handle completion of a write operation.
-  void handle_write(const boost::system::error_code& e);
+		/// Start the first asynchronous operation for the SSL connection.
+		void startSSL();
 
-  /// Handle completion of a timer operation.
-  void handleTimeout( const boost::system::error_code& e );
+	private:
+		/// Handle the SSL handshake
+		void handleHandshake( const boost::system::error_code& error );
 
-  /// Strand to ensure the connection's handlers are not called concurrently.
-  boost::asio::io_service::strand strand_;
+		/// Handle completion of a read operation.
+		void handle_read(const boost::system::error_code& e,
+				 std::size_t bytes_transferred);
 
-  /// Socket for the connection.
-  boost::asio::ip::tcp::socket socket_;
+		/// Handle completion of a write operation.
+		void handle_write(const boost::system::error_code& e);
 
-  /// The handler used to process the incoming request.
-  requestHandler& requestHandler_;
+		/// Handle completion of a timer operation.
+		void handleTimeout( const boost::system::error_code& e );
 
-  /// Buffer for incoming data.
-  boost::array<char, 8192> buffer_;
+		/// Strand to ensure the connection's handlers are not called concurrently.
+		boost::asio::io_service::strand strand_;
 
-  /// The incoming request.
-  request request_;
+		/// Socket for the connection.
+		boost::asio::ip::tcp::socket *socket_;
 
-  /// The reply to be sent back to the client.
-  reply reply_;
+		/// Socket for the SSL connection.
+		boost::asio::ssl::stream<boost::asio::ip::tcp::socket>	*SSLsocket_;
 
-  /// The timer for timeouts.
-  boost::asio::deadline_timer timer_;
+		/// The handler used to process the incoming request.
+		requestHandler& requestHandler_;
 
-  /// The duration for timeouts in milliseconds.
-  long timeoutDuration_;
+		/// Buffer for incoming data.
+		boost::array<char, 8192> buffer_;
 
-};
+		/// The incoming request.
+		request request_;
 
-typedef boost::shared_ptr<connection> connection_ptr;
+		/// The reply to be sent back to the client.
+		reply reply_;
+
+		/// The timer for timeouts.
+		boost::asio::deadline_timer timer_;
+
+		/// The duration for timeouts in milliseconds.
+		long timeoutDuration_;
+
+	};
+
+	typedef boost::shared_ptr<connection> connection_ptr;
 
 
 } // namespace _SMERP

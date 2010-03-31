@@ -10,26 +10,36 @@
 namespace _SMERP {
 
 connection::connection( boost::asio::io_service& io_service, requestHandler& handler, long timeoutDuration )
-	: strand_( io_service ),
-		socket_( io_service ),
-		requestHandler_( handler ),
-		timer_( io_service ),
-		timeoutDuration_( timeoutDuration )
+			: strand_( io_service ),
+			requestHandler_( handler ),
+			timer_( io_service ),
+			timeoutDuration_( timeoutDuration )
 {
+	socket_ = new boost::asio::ip::tcp::socket( io_service );
+}
+
+connection::connection( boost::asio::io_service& io_service, boost::asio::ssl::context& SSLcontext,
+				     requestHandler& handler, long timeoutDuration )
+					     : strand_( io_service ),
+					     requestHandler_( handler ),
+					     timer_( io_service ),
+					     timeoutDuration_( timeoutDuration )
+{
+	SSLsocket_ = new boost::asio::ssl::stream<boost::asio::ip::tcp::socket>( io_service, SSLcontext );
 }
 
 
 boost::asio::ip::tcp::socket& connection::socket()
 {
-	return socket_;
+	return *socket_;
 }
 
 
 void connection::start()
 {
-	boost::asio::write(socket_, boost::asio::buffer( "Welcome to bla bla bla\n" ));
+	boost::asio::write( *socket_, boost::asio::buffer( "Welcome to bla bla bla\n" ));
 
-	socket_.async_read_some( boost::asio::buffer( buffer_),
+	socket_->async_read_some( boost::asio::buffer( buffer_),
 				strand_.wrap( boost::bind( &connection::handle_read, shared_from_this(),
 							boost::asio::placeholders::error,
 							boost::asio::placeholders::bytes_transferred )));
@@ -53,12 +63,12 @@ void connection::handle_read( const boost::system::error_code& e, std::size_t by
 									boost::asio::placeholders::error )));
 
 				requestHandler_.handleRequest( request_, reply_ );
-				boost::asio::async_write( socket_, reply_.toBuffers(),
+				boost::asio::async_write( *socket_, reply_.toBuffers(),
 						strand_.wrap( boost::bind( &connection::handle_write, shared_from_this(),
 										boost::asio::placeholders::error )));
 			case request::EMPTY:
 			case request::PARSING:
-				socket_.async_read_some( boost::asio::buffer( buffer_ ),
+				socket_->async_read_some( boost::asio::buffer( buffer_ ),
 						strand_.wrap( boost::bind( &connection::handle_read, shared_from_this(),
 										boost::asio::placeholders::error,
 										boost::asio::placeholders::bytes_transferred )));
@@ -77,11 +87,11 @@ void connection::handle_write( const boost::system::error_code& e )
 		// Cancel timer.
 		timer_.cancel();
 
-		boost::asio::write(socket_, boost::asio::buffer("Bye.\n"));
+		boost::asio::write( *socket_, boost::asio::buffer( "Bye.\n" ));
 
 		// Initiate graceful connection closure.
 		boost::system::error_code ignored_ec;
-		socket_.shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
+		socket_->shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
 	}
 
 // No new asynchronous operations are started. This means that all shared_ptr
@@ -96,10 +106,10 @@ void connection::handle_write( const boost::system::error_code& e )
 void connection::handleTimeout( const boost::system::error_code& e )
 {
 	if ( !e )	{
-		boost::asio::write(socket_, boost::asio::buffer( "Timeout :P\n" ));
+		boost::asio::write( *socket_, boost::asio::buffer( "Timeout :P\n" ));
 
 		boost::system::error_code ignored_ec;
-		socket_.shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
+		socket_->shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
 	}
 }
 
