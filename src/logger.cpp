@@ -9,12 +9,18 @@
 
 #include <boost/log/utility/init/to_console.hpp>
 #include <boost/log/utility/init/to_file.hpp>
+#ifndef _WIN32
+#include <boost/log/utility/init/to_syslog.hpp>
+#else
+#include <boost/log/utility/init/to_eventlog.hpp>
+#endif
 
 namespace logging = boost::log;
 namespace keywords = boost::log::keywords;
 namespace fmt = boost::log::formatters;
 namespace src = boost::log::sources;
 namespace flt = boost::log::filters;
+namespace sinks = boost::log::sinks;
 
 namespace _SMERP {
 
@@ -75,6 +81,54 @@ void Logger::initialize( const ApplicationConfiguration& config )
 				% fmt::message( )
 		);
 	}
+
+#ifndef _WIN32
+	sinks::syslog::custom_severity_mapping< LogLevel > mapping( "Severity" );
+	mapping[Logger::_SMERP_FATAL] = sinks::syslog::emergency;
+	mapping[Logger::_SMERP_ALERT] = sinks::syslog::alert;
+	mapping[Logger::_SMERP_CRITICAL] = sinks::syslog::critical;
+	mapping[Logger::_SMERP_SEVERE] = sinks::syslog::critical;
+	mapping[Logger::_SMERP_ERROR] = sinks::syslog::error;
+	mapping[Logger::_SMERP_WARNING] = sinks::syslog::warning;
+	mapping[Logger::_SMERP_NOTICE] = sinks::syslog::notice;
+	mapping[Logger::_SMERP_INFO] = sinks::syslog::info;
+	mapping[Logger::_SMERP_DEBUG] = sinks::syslog::debug;
+	mapping[Logger::_SMERP_TRACE] = sinks::syslog::debug;
+	mapping[Logger::_SMERP_DATA] = sinks::syslog::debug;
+
+	logging::init_log_to_syslog(
+		// TODO: configurable facility, portable string mapper
+		keywords::facility = sinks::syslog::user,
+		keywords::use_impl = sinks::syslog::native,
+		keywords::custom_severity_mapping = mapping,
+		// TODO: log level configurable
+		keywords::filter = flt::attr< LogLevel >( "Severity", nothrow ) <= Logger::_SMERP_NOTICE,
+		keywords::format = fmt::format( "%1%: %2%" )
+			% fmt::attr< LogLevel >( "Severity", std::nothrow )
+			% fmt::message( )
+	);
+#else
+	sinks::event_log::custom_event_type_mapping< LogLevel > mapping( "Severity" );
+	mapping[Logger::_SMERP_FATAL] = sinks::event_log::error;
+	mapping[Logger::_SMERP_ALERT] = sinks::event_log::error;
+	mapping[Logger::_SMERP_CRITICAL] = sinks::event_log::error;
+	mapping[Logger::_SMERP_SEVERE] = sinks::event_log::error;
+	mapping[Logger::_SMERP_ERROR] = sinks::event_log::error;
+	mapping[Logger::_SMERP_WARNING] = sinks::event_log::warning;
+	mapping[Logger::_SMERP_NOTICE] = sinks::event_log::info;
+	mapping[Logger::_SMERP_INFO] = sinks::event_log::info;
+	mapping[Logger::_SMERP_DEBUG] = sinks::event_log::info;
+	mapping[Logger::_SMERP_TRACE] = sinks::event_log::info;
+	mapping[Logger::_SMERP_DATA] = sinks::event_log::info;
+
+	logging::init_log_to_eventlog(
+		// TODO: configurable
+		keywords::log_source = "Boosttests Logtest 1",
+		keywords::custom_event_type_mapping = mapping,
+		// TODO: log level configurable
+		keywords::filter = flt::attr< LogLevel >( "Severity", nothrow ) <= Logger::_SMERP_NOTICE
+	);
+#endif
 
 	logging::add_common_attributes( );
 
