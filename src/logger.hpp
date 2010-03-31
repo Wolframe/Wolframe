@@ -32,7 +32,6 @@ public:
 	static LogLevel str2LogLevel( const std::string s );
 
 	static void initialize( const ApplicationConfiguration& config );
-
 };
 
 // small compromise in leaking internal implementation of the logger to the

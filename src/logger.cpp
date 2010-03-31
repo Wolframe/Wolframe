@@ -11,6 +11,7 @@
 #include <boost/log/utility/init/to_file.hpp>
 #ifndef _WIN32
 #include <boost/log/utility/init/to_syslog.hpp>
+#include <boost/log/sinks/syslog_constants.hpp>
 #else
 #include <boost/log/utility/init/to_eventlog.hpp>
 #endif
@@ -53,7 +54,33 @@ Logger::LogLevel Logger::str2LogLevel( const std::string s ) {
 	else if( s == "ALERT" )		return Logger::_SMERP_ALERT;
 	else if( s == "FATAL" )		return Logger::_SMERP_FATAL;
 	else if( s == "NEVER" )		return Logger::_SMERP_NEVER;
-	else return Logger::_SMERP_NEVER;
+	else				return Logger::_SMERP_NEVER;
+}
+
+static sinks::syslog::facility_t str2syslogFacility( const std::string s ) {
+	if( s == "KERN" )		return sinks::syslog::kernel;
+	if( s == "USER" )		return sinks::syslog::user;
+	if( s == "MAIL" )		return sinks::syslog::mail;
+	if( s == "DAEMON" )		return sinks::syslog::daemon;
+	if( s == "AUTH" )		return sinks::syslog::security0;
+	if( s == "SYSLOG" )		return sinks::syslog::syslogd;
+	if( s == "LPR" )		return sinks::syslog::printer;
+	if( s == "NEWS" )		return sinks::syslog::news;
+	if( s == "UUCP" )		return sinks::syslog::uucp;
+	if( s == "CRON" )		return sinks::syslog::clock0;
+	if( s == "AUTHPRIV" )		return sinks::syslog::security1;
+	if( s == "FTP" )		return sinks::syslog::ftp;
+	if( s == "NTP" )		return sinks::syslog::ntp;
+	if( s == "SECURITY" )		return sinks::syslog::log_audit;
+	if( s == "LOCAL0" )		return sinks::syslog::local0;
+	if( s == "LOCAL1" )		return sinks::syslog::local1;
+	if( s == "LOCAL2" )		return sinks::syslog::local2;
+	if( s == "LOCAL3" )		return sinks::syslog::local3;
+	if( s == "LOCAL4" )		return sinks::syslog::local4;
+	if( s == "LOCAL5" )		return sinks::syslog::local5;
+	if( s == "LOCAL6" )		return sinks::syslog::local6;
+	if( s == "LOCAL7" )		return sinks::syslog::local7;
+	else 				return sinks::syslog::user;
 }
 
 src::severity_logger< Logger::LogLevel > logger;
@@ -61,16 +88,18 @@ src::severity_logger< Logger::LogLevel > logger;
 void Logger::initialize( const ApplicationConfiguration& config )
 {
 	// open logger to the console
-	logging::init_log_to_console(
-		std::clog,
-		keywords::filter = flt::attr< LogLevel >( "Severity", std::nothrow ) >= Logger::str2LogLevel( config.stderrLogLevel ),
-		keywords::format = fmt::format( "%1%: %2%" )
-			% fmt::attr< LogLevel >( "Severity", std::nothrow )
-			% fmt::message( )
-	);
+	if( config.logToStderr ) {
+		logging::init_log_to_console(
+			std::clog,
+			keywords::filter = flt::attr< LogLevel >( "Severity", std::nothrow ) >= Logger::str2LogLevel( config.stderrLogLevel ),
+			keywords::format = fmt::format( "%1%: %2%" )
+				% fmt::attr< LogLevel >( "Severity", std::nothrow )
+				% fmt::message( )
+		);
+	}
 
 	// open logger to a logfile
-	if( config.logFile != std::string( ) ) {
+	if( config.logToFile ) {
 		logging::init_log_to_file(
 			keywords::file_name = config.logFile,
 			keywords::open_mode = ( std::ios_base::out | std::ios_base::app ),
@@ -83,30 +112,30 @@ void Logger::initialize( const ApplicationConfiguration& config )
 	}
 
 #ifndef _WIN32
-	sinks::syslog::custom_severity_mapping< LogLevel > mapping( "Severity" );
-	mapping[Logger::_SMERP_FATAL] = sinks::syslog::emergency;
-	mapping[Logger::_SMERP_ALERT] = sinks::syslog::alert;
-	mapping[Logger::_SMERP_CRITICAL] = sinks::syslog::critical;
-	mapping[Logger::_SMERP_SEVERE] = sinks::syslog::critical;
-	mapping[Logger::_SMERP_ERROR] = sinks::syslog::error;
-	mapping[Logger::_SMERP_WARNING] = sinks::syslog::warning;
-	mapping[Logger::_SMERP_NOTICE] = sinks::syslog::notice;
-	mapping[Logger::_SMERP_INFO] = sinks::syslog::info;
-	mapping[Logger::_SMERP_DEBUG] = sinks::syslog::debug;
-	mapping[Logger::_SMERP_TRACE] = sinks::syslog::debug;
-	mapping[Logger::_SMERP_DATA] = sinks::syslog::debug;
+	if( config.logToSyslog ) {
+		sinks::syslog::custom_severity_mapping< LogLevel > mapping( "Severity" );
+		mapping[Logger::_SMERP_FATAL] = sinks::syslog::emergency;
+		mapping[Logger::_SMERP_ALERT] = sinks::syslog::alert;
+		mapping[Logger::_SMERP_CRITICAL] = sinks::syslog::critical;
+		mapping[Logger::_SMERP_SEVERE] = sinks::syslog::critical;
+		mapping[Logger::_SMERP_ERROR] = sinks::syslog::error;
+		mapping[Logger::_SMERP_WARNING] = sinks::syslog::warning;
+		mapping[Logger::_SMERP_NOTICE] = sinks::syslog::notice;
+		mapping[Logger::_SMERP_INFO] = sinks::syslog::info;
+		mapping[Logger::_SMERP_DEBUG] = sinks::syslog::debug;
+		mapping[Logger::_SMERP_TRACE] = sinks::syslog::debug;
+		mapping[Logger::_SMERP_DATA] = sinks::syslog::debug;
 
-	logging::init_log_to_syslog(
-		// TODO: configurable facility, portable string mapper
-		keywords::facility = sinks::syslog::user,
-		keywords::use_impl = sinks::syslog::native,
-		keywords::custom_severity_mapping = mapping,
-		// TODO: log level configurable
-		keywords::filter = flt::attr< LogLevel >( "Severity", nothrow ) <= Logger::_SMERP_NOTICE,
-		keywords::format = fmt::format( "%1%: %2%" )
-			% fmt::attr< LogLevel >( "Severity", std::nothrow )
-			% fmt::message( )
-	);
+		logging::init_log_to_syslog(
+			keywords::facility = str2syslogFacility( config.syslogFacility ),
+			keywords::use_impl = sinks::syslog::native,
+			keywords::custom_severity_mapping = mapping,
+			keywords::filter = flt::attr< LogLevel >( "Severity", nothrow ) <= Logger::str2LogLevel( config.syslogLogLevel ),
+			keywords::format = fmt::format( "%1%: %2%" )
+				% fmt::attr< LogLevel >( "Severity", std::nothrow )
+				% fmt::message( )
+		);
+	}
 #else
 	sinks::event_log::custom_event_type_mapping< LogLevel > mapping( "Severity" );
 	mapping[Logger::_SMERP_FATAL] = sinks::event_log::error;
