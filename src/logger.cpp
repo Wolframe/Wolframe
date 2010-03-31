@@ -58,8 +58,7 @@ void Logger::initialize( const ApplicationConfiguration& config )
 	logging::init_log_to_console(
 		std::clog,
 		keywords::filter = flt::attr< LogLevel >( "Severity", std::nothrow ) >= Logger::str2LogLevel( config.stderrLogLevel ),
-		keywords::format = fmt::format( "%1% %2%: %3%" )
-			% fmt::date_time( "TimeStamp", std::nothrow )
+		keywords::format = fmt::format( "%1%: %2%" )
 			% fmt::attr< LogLevel >( "Severity", std::nothrow )
 			% fmt::message( )
 	);
