@@ -57,4 +57,5 @@ extern src::severity_logger< _SMERP::Logger::LogLevel > logger;
 #define LOG_ALERT	BOOST_LOG_SEV( _SMERP::logger, _SMERP::Logger::ALERT )
 #define LOG_FATAL	BOOST_LOG_SEV( _SMERP::logger, _SMERP::Logger::FATAL )
 
+
 #endif // _LOGGER_HPP_INCLUDED
