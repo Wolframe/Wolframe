@@ -39,3 +39,6 @@ README
 XML/README
 XML/configFile.rng
 src/getPassword.cpp
+src/smerpd.xml
+src/Makefile.W32
+src/logger.cpp
