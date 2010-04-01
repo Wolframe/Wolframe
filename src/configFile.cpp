@@ -193,7 +193,8 @@ namespace _SMERP {
 			logToSyslog = false;
 		if ( pt.get_child_optional( "logging.eventlog" )) {
 			logToEventlog = true;
-			eventlogSource = pt.get<std::string>( "logging.eventlog.source", "smerp" );
+			eventlogLogName = pt.get<std::string>( "logging.eventlog.name", "smerpd" );
+			eventlogSource = pt.get<std::string>( "logging.eventlog.source", "unknown" );
 			eventlogLogLevel = pt.get<std::string>( "logging.eventlog.level", "NOTICE" );
 		}
 		else

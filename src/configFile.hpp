@@ -43,6 +43,7 @@ namespace _SMERP	{
 		std::string	syslogFacility;
 		std::string	syslogLogLevel;
 		bool		logToEventlog;
+		std::string	eventlogLogName;
 		std::string	eventlogSource;
 		std::string	eventlogLogLevel;
 

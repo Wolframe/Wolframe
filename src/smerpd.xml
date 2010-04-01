@@ -84,6 +84,7 @@ SMERP configuration file
 	</syslog>
 	<!-- eventlog source and log level -->
 	<eventlog>
+		<name>Application</name>
 		<source>smerpd</source>
 		<level>NOTICE</level>
 	</eventlog>

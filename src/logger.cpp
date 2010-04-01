@@ -14,6 +14,8 @@
 #include <boost/log/sinks/syslog_constants.hpp>
 #else
 #include <boost/log/utility/init/to_eventlog.hpp>
+#include <boost/log/sinks/event_log_constants.hpp>
+#include <boost/log/sinks/event_log_backend.hpp>
 #endif
 
 namespace logging = boost::log;
@@ -154,6 +156,8 @@ void Logger::initialize( const ApplicationConfiguration& config )
 		mapping[Logger::_SMERP_DATA] = sinks::event_log::info;
 
 		logging::init_log_to_eventlog(
+			keywords::registration = sinks::event_log::forced,
+			keywords::log_name = config.eventlogLogName,
 			keywords::log_source = config.eventlogSource,
 			keywords::custom_event_type_mapping = mapping,
 			keywords::filter = flt::attr< LogLevel >( "Severity", nothrow ) >= Logger::str2LogLevel( config.eventlogLogLevel )
