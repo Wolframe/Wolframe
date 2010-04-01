@@ -17,26 +17,25 @@
 
 namespace _SMERP {
 
+	typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket>	ssl_socket;
+
 	/// Represents a single connection from a client.
 	class connection : public boost::enable_shared_from_this<connection>,
 			private boost::noncopyable
 	{
 	public:
-		/// Construct a connection with the given io_service.
-		explicit connection( boost::asio::io_service& io_service, requestHandler& handler, long timeoutDuration );
-
 		/// Construct a connection with the given io_service and SSL conetext.
-		explicit connection( boost::asio::io_service& io_service, boost::asio::ssl::context& SSLcontext,
-				     requestHandler& handler, long timeoutDuration );
+		explicit connection( boost::asio::io_service& io_service, requestHandler& handler, long timeoutDuration,
+				     boost::asio::ssl::context *SSLcontext = NULL );
 
 		/// Get the socket associated with the connection.
 		boost::asio::ip::tcp::socket& socket();
 
+		/// Get the socket associated with the SSL connection.
+		ssl_socket::lowest_layer_type& SSLsocket();
+
 		/// Start the first asynchronous operation for the connection.
 		void start();
-
-		/// Start the first asynchronous operation for the SSL connection.
-		void startSSL();
 
 	private:
 		/// Handle the SSL handshake
@@ -55,11 +54,14 @@ namespace _SMERP {
 		/// Strand to ensure the connection's handlers are not called concurrently.
 		boost::asio::io_service::strand strand_;
 
+		/// true if it is a SSL connection, false otherwise
+		bool	isSSL_;
+
 		/// Socket for the connection.
 		boost::asio::ip::tcp::socket *socket_;
 
 		/// Socket for the SSL connection.
-		boost::asio::ssl::stream<boost::asio::ip::tcp::socket>	*SSLsocket_;
+		ssl_socket	*SSLsocket_;
 
 		/// The handler used to process the incoming request.
 		requestHandler& requestHandler_;
