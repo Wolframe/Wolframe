@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SMERP\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-04-01 00:27+0200\n"
+"POT-Creation-Date: 2010-04-01 14:59+0200\n"
 "PO-Revision-Date: 2010-03-21 02:07+0100\n"
 "Last-Translator: Mihai Barbos <mihai.barbos@gmail.com>\n"
 "Language-Team: Romanian\n"
@@ -19,6 +19,10 @@ msgstr ""
 "X-Poedit-SourceCharset: iso-8859-2\n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
 "20)) ? 1 : 2;\n"
+
+#: src/getPassword.cpp:21
+msgid "Enter your password:"
+msgstr ""
 
 #: src/posixMain.cpp:77
 msgid "BOBOBO version "
