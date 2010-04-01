@@ -69,7 +69,7 @@ SMERP configuration file
 <logging>
 	<!-- log level for console (stderr) logging -->
 	<stderr>
-		<level>ERROR</level>
+		<level>INFO</level>
 	</stderr>
 
 	<!-- log level for file logging -->
@@ -78,10 +78,14 @@ SMERP configuration file
 		<level>NOTICE</level>
 	</logFile>
 	<!-- syslog facility  and log level -->
-<!--
 	<syslog>
-		<facility>local4</facility>
-		<level>INFO</level>
+		<facility>LOCAL2</facility>
+		<level>NOTICE</level>
 	</syslog>
--->
+	<!-- eventlog source and log level -->
+	<eventlog>
+		<name>Application</name>
+		<source>smerpd</source>
+		<level>NOTICE</level>
+	</eventlog>
 </logging>
