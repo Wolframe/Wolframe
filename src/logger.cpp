@@ -139,26 +139,26 @@ void Logger::initialize( const ApplicationConfiguration& config )
 		);
 	}
 #else
-	sinks::event_log::custom_event_type_mapping< LogLevel > mapping( "Severity" );
-	mapping[Logger::_SMERP_FATAL] = sinks::event_log::error;
-	mapping[Logger::_SMERP_ALERT] = sinks::event_log::error;
-	mapping[Logger::_SMERP_CRITICAL] = sinks::event_log::error;
-	mapping[Logger::_SMERP_SEVERE] = sinks::event_log::error;
-	mapping[Logger::_SMERP_ERROR] = sinks::event_log::error;
-	mapping[Logger::_SMERP_WARNING] = sinks::event_log::warning;
-	mapping[Logger::_SMERP_NOTICE] = sinks::event_log::info;
-	mapping[Logger::_SMERP_INFO] = sinks::event_log::info;
-	mapping[Logger::_SMERP_DEBUG] = sinks::event_log::info;
-	mapping[Logger::_SMERP_TRACE] = sinks::event_log::info;
-	mapping[Logger::_SMERP_DATA] = sinks::event_log::info;
+	if( config.logToEventlog ) {
+		sinks::event_log::custom_event_type_mapping< LogLevel > mapping( "Severity" );
+		mapping[Logger::_SMERP_FATAL] = sinks::event_log::error;
+		mapping[Logger::_SMERP_ALERT] = sinks::event_log::error;
+		mapping[Logger::_SMERP_CRITICAL] = sinks::event_log::error;
+		mapping[Logger::_SMERP_SEVERE] = sinks::event_log::error;
+		mapping[Logger::_SMERP_ERROR] = sinks::event_log::error;
+		mapping[Logger::_SMERP_WARNING] = sinks::event_log::warning;
+		mapping[Logger::_SMERP_NOTICE] = sinks::event_log::info;
+		mapping[Logger::_SMERP_INFO] = sinks::event_log::info;
+		mapping[Logger::_SMERP_DEBUG] = sinks::event_log::info;
+		mapping[Logger::_SMERP_TRACE] = sinks::event_log::info;
+		mapping[Logger::_SMERP_DATA] = sinks::event_log::info;
 
-	logging::init_log_to_eventlog(
-		// TODO: configurable
-		keywords::log_source = "Boosttests Logtest 1",
-		keywords::custom_event_type_mapping = mapping,
-		// TODO: log level configurable
-		keywords::filter = flt::attr< LogLevel >( "Severity", nothrow ) <= Logger::_SMERP_NOTICE
-	);
+		logging::init_log_to_eventlog(
+			keywords::log_source = config.eventlogSource,
+			keywords::custom_event_type_mapping = mapping,
+			keywords::filter = flt::attr< LogLevel >( "Severity", nothrow ) <= Logger::str2LogLevel( config.eventlogLogLevel )
+		);
+	}
 #endif // !defined( _WIN32 )
 
 	logging::add_common_attributes( );

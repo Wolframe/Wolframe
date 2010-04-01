@@ -59,6 +59,9 @@ namespace _SMERP {
 		logToSyslog = cfgFile.logToSyslog;
 		syslogFacility = cfgFile.syslogFacility;
 		syslogLogLevel = cfgFile.syslogLogLevel;
+		logToEventlog = cfgFile.logToEventlog;
+		eventlogSource = cfgFile.eventlogSource;
+		eventlogLogLevel = cfgFile.eventlogLogLevel;
 	}
 
 
@@ -127,6 +130,10 @@ namespace _SMERP {
 			os << "   Log to syslog: facility " << syslogFacility << ", level " << syslogLogLevel << std::endl;
 		else
 			os << "   Log to syslog: DISABLED" << std::endl;
+		if ( logToEventlog )
+			os << "   Log to eventlog: source " << eventlogSource << ", level " << eventlogLogLevel;
+		else
+			os << "   Log to eventlog: DISABLED" << std::endl;
 	}
 
 

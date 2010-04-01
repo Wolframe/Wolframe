@@ -42,6 +42,9 @@ namespace _SMERP	{
 		bool		logToSyslog;
 		std::string	syslogFacility;
 		std::string	syslogLogLevel;
+		bool		logToEventlog;
+		std::string	eventlogSource;
+		std::string	eventlogLogLevel;
 
 	private:
 		std::string	errMsg_;

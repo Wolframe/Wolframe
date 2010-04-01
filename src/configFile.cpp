@@ -186,11 +186,18 @@ namespace _SMERP {
 			logToFile = false;
 		if ( pt.get_child_optional( "logging.syslog" ))	{
 			logToSyslog = true;
-			syslogFacility = pt.get<std::string>( "logging.syslog.facility", "LOG_LOCAL4" );
+			syslogFacility = pt.get<std::string>( "logging.syslog.facility", "LOCAL4" );
 			syslogLogLevel = pt.get<std::string>( "logging.syslog.level", "NOTICE" );
 		}
 		else
 			logToSyslog = false;
+		if ( pt.get_child_optional( "logging.eventlog" )) {
+			logToEventlog = true;
+			eventlogSource = pt.get<std::string>( "logging.eventlog.source", "smerp" );
+			eventlogLogLevel = pt.get<std::string>( "logging.eventlog.level", "NOTICE" );
+		}
+		else
+			logToEventlog = false;
 
 		return true;
 	}
