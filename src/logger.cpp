@@ -132,7 +132,7 @@ void Logger::initialize( const ApplicationConfiguration& config )
 			keywords::facility = str2syslogFacility( config.syslogFacility ),
 			keywords::use_impl = sinks::syslog::native,
 			keywords::custom_severity_mapping = mapping,
-			keywords::filter = flt::attr< LogLevel >( "Severity", nothrow ) <= Logger::str2LogLevel( config.syslogLogLevel ),
+			keywords::filter = flt::attr< LogLevel >( "Severity", nothrow ) >= Logger::str2LogLevel( config.syslogLogLevel ),
 			keywords::format = fmt::format( "%1%: %2%" )
 				% fmt::attr< LogLevel >( "Severity", std::nothrow )
 				% fmt::message( )
@@ -156,7 +156,7 @@ void Logger::initialize( const ApplicationConfiguration& config )
 		logging::init_log_to_eventlog(
 			keywords::log_source = config.eventlogSource,
 			keywords::custom_event_type_mapping = mapping,
-			keywords::filter = flt::attr< LogLevel >( "Severity", nothrow ) <= Logger::str2LogLevel( config.eventlogLogLevel )
+			keywords::filter = flt::attr< LogLevel >( "Severity", nothrow ) >= Logger::str2LogLevel( config.eventlogLogLevel )
 		);
 	}
 #endif // !defined( _WIN32 )
