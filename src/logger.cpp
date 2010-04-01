@@ -57,6 +57,7 @@ Logger::LogLevel Logger::str2LogLevel( const std::string s ) {
 	else				return Logger::_SMERP_NEVER;
 }
 
+#if !defined( _WIN32 )
 static sinks::syslog::facility_t str2syslogFacility( const std::string s ) {
 	if( s == "KERN" )		return sinks::syslog::kernel;
 	if( s == "USER" )		return sinks::syslog::user;
@@ -82,6 +83,7 @@ static sinks::syslog::facility_t str2syslogFacility( const std::string s ) {
 	if( s == "LOCAL7" )		return sinks::syslog::local7;
 	else 				return sinks::syslog::user;
 }
+#endif // !defined( _WIN32 )
 
 src::severity_logger< Logger::LogLevel > logger;
 
@@ -111,7 +113,7 @@ void Logger::initialize( const ApplicationConfiguration& config )
 		);
 	}
 
-#ifndef _WIN32
+#if !defined( _WIN32 )
 	if( config.logToSyslog ) {
 		sinks::syslog::custom_severity_mapping< LogLevel > mapping( "Severity" );
 		mapping[Logger::_SMERP_FATAL] = sinks::syslog::emergency;
@@ -157,7 +159,7 @@ void Logger::initialize( const ApplicationConfiguration& config )
 		// TODO: log level configurable
 		keywords::filter = flt::attr< LogLevel >( "Severity", nothrow ) <= Logger::_SMERP_NOTICE
 	);
-#endif
+#endif // !defined( _WIN32 )
 
 	logging::add_common_attributes( );
 }
