@@ -29,10 +29,10 @@ namespace _SMERP {
 				     boost::asio::ssl::context *SSLcontext = NULL );
 
 		/// Get the socket associated with the connection.
-		boost::asio::ip::tcp::socket& socket();
+		boost::asio::ip::tcp::socket& socket()		{ return *socket_; };
 
 		/// Get the socket associated with the SSL connection.
-		ssl_socket::lowest_layer_type& SSLsocket();
+		ssl_socket::lowest_layer_type& SSLsocket()	{ return SSLsocket_->lowest_layer(); };
 
 		/// Start the first asynchronous operation for the connection.
 		void start();

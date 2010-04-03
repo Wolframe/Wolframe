@@ -54,7 +54,7 @@ private:
 /// object variables
 
 	std::size_t			threadPoolSize_;// The number of threads that will call io_service::run().
-	unsigned long			timeout_duration_ms_;		// The duration for timeouts in milliseconds.
+	unsigned long			timeout_duration_;// The duration for timeouts in milliseconds.
 
 	boost::asio::io_service		IOservice_;	// The io_service used to perform asynchronous operations.
 	boost::asio::io_service::strand	strand_;	// Strand to ensure the acceptor's handlers are not called concurrently.
