@@ -3,13 +3,12 @@
 //
 
 #include "server.hpp"
+#include "logger.hpp"
 
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <vector>
-
-#include <iostream>
 
 namespace _SMERP {
 
@@ -28,7 +27,7 @@ server::server( const ApplicationConfiguration& config )
 		boost::asio::ip::tcp::resolver::query query( config.address[0].first, "");
 		boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve( query );
 		endpoint.port( config.address[0].second );
-		newConnection_ = new connection( IOservice_, requestHandler_, timeout_duration_ms_ );
+		newConnection_.reset( new connection( IOservice_, requestHandler_, timeout_duration_ms_ ));
 		acceptor_->open( endpoint.protocol() );
 		acceptor_->set_option( boost::asio::ip::tcp::acceptor::reuse_address( true ));
 		acceptor_->bind( endpoint );
@@ -36,14 +35,14 @@ server::server( const ApplicationConfiguration& config )
 		acceptor_->async_accept( newConnection_->socket(), strand_.wrap( boost::bind( &server::handleAccept,
 												this,
 												boost::asio::placeholders::error )));
+		LOG_INFO << "Accepting connections on " << acceptor_->local_endpoint().address().to_string()
+			 << " port " << acceptor_->local_endpoint().port();
 	}
 	else
 		acceptor_ = NULL;
 
 	if ( config.SSLaddress.size() > 0 )	{
-std::cerr << "bla bla 0" << std::endl;
 		SSLcontext_ = new boost::asio::ssl::context( IOservice_, boost::asio::ssl::context::sslv23 );
-std::cerr << "bla bla 1" << std::endl;
 
 		if ( config.SSLverify )
 			verify = boost::asio::ssl::context::verify_peer |
@@ -55,7 +54,6 @@ std::cerr << "bla bla 1" << std::endl;
 					| boost::asio::ssl::context::single_dh_use
 					| verify
 					);
-std::cerr << "bla bla 2" << std::endl;
 		SSLcontext_->set_password_callback( boost::bind( &server::getPassword, this ));
 		SSLcontext_->use_certificate_chain_file( config.SSLcertificate );
 		SSLcontext_->use_private_key_file( config.SSLkey, boost::asio::ssl::context::pem );
@@ -64,8 +62,8 @@ std::cerr << "bla bla 2" << std::endl;
 		if ( ! config.SSLCAdirectory.empty() )
 			SSLcontext_->add_verify_path( config.SSLCAdirectory );
 //		SSLcontext_->use_tmp_dh_file( "dh4096.pem" );
-std::cerr << "bla bla 3" << std::endl;
-		newSSLconnection_ = new connection(IOservice_, requestHandler_, timeout_duration_ms_, SSLcontext_ );
+		LOG_DEBUG << "SSL context created";
+		newSSLconnection_.reset( new connection( IOservice_, requestHandler_, timeout_duration_ms_, SSLcontext_ ));
 
 		SSLacceptor_ = new boost::asio::ip::tcp::acceptor( IOservice_ );
 
@@ -81,10 +79,12 @@ std::cerr << "bla bla 3" << std::endl;
 		SSLacceptor_->async_accept( newSSLconnection_->SSLsocket(), strand_.wrap( boost::bind( &server::handleSSLaccept,
 												this,
 												boost::asio::placeholders::error )));
-std::cerr << "bla bla xx" << std::endl;
+		LOG_INFO << "Accepting SSL connections on " << SSLacceptor_->local_endpoint().address().to_string()
+			 << " port " << SSLacceptor_->local_endpoint().port();
 	}
 	else
 		SSLacceptor_ = NULL;
+	LOG_DEBUG << "Network server up";
 }
 
 
@@ -119,6 +119,7 @@ void server::run()
 
 void server::stop()
 {
+	LOG_DEBUG << "Network server received a shutdown request";
 	// Post a call to the stop function so that server::stop() is safe to call
 	// from any thread.
 	IOservice_.post( strand_.wrap( boost::bind( &server::handleStop, this )));
@@ -128,6 +129,7 @@ void server::stop()
 // Stop io_services the hard way.
 void server::abort()
 {
+	LOG_DEBUG << "Network server received an abort request";
 	IOservice_.stop();
 }
 
@@ -136,11 +138,14 @@ void server::handleAccept( const boost::system::error_code& e )
 {
 	if ( !e )	{
 		newConnection_->start();
+		LOG_INFO << "Accepted connection from " << newConnection_->socket().remote_endpoint().address().to_string()
+			 << ":" << newConnection_->socket().remote_endpoint().port();
 		newConnection_.reset( new connection( IOservice_, requestHandler_, timeout_duration_ms_ ));
 		acceptor_->async_accept( newConnection_->socket(),
 					 strand_.wrap( boost::bind( &server::handleAccept,
 								    this,
 								    boost::asio::placeholders::error )));
+		LOG_TRACE << "Acceptor ready for new connection";
 	}
 }
 
@@ -149,11 +154,14 @@ void server::handleSSLaccept( const boost::system::error_code& e )
 {
 	if ( !e )	{
 		newSSLconnection_->start();
+		LOG_INFO << "Accepted SSL connection from " << newSSLconnection_->SSLsocket().remote_endpoint().address().to_string()
+			 << ":" << newSSLconnection_->SSLsocket().remote_endpoint().port();
 		newSSLconnection_.reset( new connection( IOservice_, requestHandler_, timeout_duration_ms_, SSLcontext_ ));
-		SSLacceptor_->async_accept( newSSLconnection_->socket(),
+		SSLacceptor_->async_accept( newSSLconnection_->SSLsocket(),
 					 strand_.wrap( boost::bind( &server::handleSSLaccept,
 								    this,
 								    boost::asio::placeholders::error )));
+		LOG_TRACE << "Acceptor ready for new SSL connection";
 	}
 }
 
@@ -163,10 +171,14 @@ void server::handleSSLaccept( const boost::system::error_code& e )
 // all calls to io_service::run() will return.
 void server::handleStop()
 {
-	if ( acceptor_ != NULL )
+	if ( acceptor_ != NULL )	{
+		LOG_TRACE << "Closing acceptor for unencrypted connections";
 		acceptor_->close();
-	if ( SSLacceptor_ != NULL )
+	}
+	if ( SSLacceptor_ != NULL )	{
+		LOG_TRACE << "Closing acceptor for SSL connections";
 		SSLacceptor_->close();
+	}
 }
 
 

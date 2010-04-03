@@ -3,9 +3,11 @@
 //
 
 #include "connection.hpp"
+#include "logger.hpp"
+#include "requestHandler.hpp"
+
 #include <vector>
 #include <boost/bind.hpp>
-#include "requestHandler.hpp"
 
 namespace _SMERP {
 
@@ -19,10 +21,12 @@ connection::connection( boost::asio::io_service& io_service, requestHandler& han
 	if ( SSLcontext )	{
 		isSSL_ = true;
 		SSLsocket_ = new ssl_socket( io_service, *SSLcontext );
+		LOG_TRACE << "New SSL socket created";
 	}
 	else	{
 		isSSL_ = false;
 		socket_ = new boost::asio::ip::tcp::socket( io_service );
+		LOG_TRACE << "New socket created";
 	}
 }
 
@@ -43,13 +47,19 @@ ssl_socket::lowest_layer_type& connection::SSLsocket()
 void connection::start()
 {
 	if ( isSSL_ )	{
+		LOG_TRACE << "Starting SSL handshake with " << SSLsocket().remote_endpoint().address().to_string()
+			  << ":" << SSLsocket().remote_endpoint().port();
 		SSLsocket_->async_handshake( boost::asio::ssl::stream_base::server,
 					     boost::bind( &connection::handleHandshake, this,
 							  boost::asio::placeholders::error ));
 	}
 	else	{
+		LOG_TRACE << "Writing welcome message to " << socket_->remote_endpoint().address().to_string()
+			  << ":" << SSLsocket().remote_endpoint().port();
 		boost::asio::write( *socket_, boost::asio::buffer( "Welcome to bla bla bla\n" ));
 
+		LOG_TRACE << "Reading data from " << SSLsocket().remote_endpoint().address().to_string()
+			  << ":" << SSLsocket().remote_endpoint().port();
 		socket_->async_read_some( boost::asio::buffer( buffer_),
 					  strand_.wrap( boost::bind( &connection::handle_read, shared_from_this(),
 								     boost::asio::placeholders::error,
@@ -58,14 +68,21 @@ void connection::start()
 		timer_.expires_from_now( boost::posix_time::milliseconds( timeoutDuration_ ));
 		timer_.async_wait( strand_.wrap( boost::bind( &connection::handleTimeout, shared_from_this(),
 							      boost::asio::placeholders::error )));
+		LOG_TRACE << "Expiring timer for " << SSLsocket().remote_endpoint().address().to_string()
+			  << ":" << SSLsocket().remote_endpoint().port() << " set up to " << timeoutDuration_ << " ms";
 	}
 }
 
 
-void connection::handleHandshake( const boost::system::error_code& error )
+void connection::handleHandshake( const boost::system::error_code& e )
 {
-	if ( !error )	{
+	if ( !e )	{
+		LOG_TRACE << "Writing welcome message to " << SSLsocket().remote_endpoint().address().to_string()
+			  << ":" << SSLsocket().remote_endpoint().port() << "(SSL)";
 		boost::asio::write( *SSLsocket_, boost::asio::buffer( "Welcome to SSL bla bla bla\n" ));
+
+		LOG_TRACE << "Reading data from " << SSLsocket().remote_endpoint().address().to_string()
+			  << ":" << SSLsocket().remote_endpoint().port() << "(SSL)";
 		SSLsocket_->async_read_some( boost::asio::buffer( buffer_ ),
 					     strand_.wrap( boost::bind( &connection::handle_read, this,
 									boost::asio::placeholders::error,
@@ -73,8 +90,12 @@ void connection::handleHandshake( const boost::system::error_code& error )
 		timer_.expires_from_now( boost::posix_time::milliseconds( timeoutDuration_ ));
 		timer_.async_wait( strand_.wrap( boost::bind( &connection::handleTimeout, shared_from_this(),
 							      boost::asio::placeholders::error )));
+		LOG_TRACE << "Expiring timer for " << SSLsocket().remote_endpoint().address().to_string()
+			  << ":" << SSLsocket().remote_endpoint().port() << "(SSL) set up to " << timeoutDuration_ << " ms";
 	}
 	else	{
+		LOG_DEBUG << "ERROR handling SSL handshake from " << SSLsocket().remote_endpoint().address().to_string()
+			  << ":" << SSLsocket().remote_endpoint().port();
 		delete this;
 	}
 }

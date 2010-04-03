@@ -159,10 +159,10 @@ namespace _SMERP {
 		SSLCAchainFile = resolvePath( boost::filesystem::system_complete(
 							pt.get<std::string>( "server.SSL.CAchainFile", std::string() ))).string();
 		tmpStr = pt.get<std::string>( "server.SSL.verify", std::string() );
-		if ( strcasecmp( tmpStr.c_str(), "no" )	|| strcasecmp( tmpStr.c_str(), "false" ) || strcasecmp( tmpStr.c_str(), "0" ))
-			SSLverify = false;
-		else
+		if ( strcasecmp( tmpStr.c_str(), "no" )	&& strcasecmp( tmpStr.c_str(), "false" ) && strcasecmp( tmpStr.c_str(), "0" ))
 			SSLverify = true;
+		else
+			SSLverify = false;
 
 		dbHost = pt.get<std::string>( "database.host", std::string() );
 		dbPort = pt.get<unsigned short>( "database.port", 0 );

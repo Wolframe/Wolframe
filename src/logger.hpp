@@ -43,8 +43,7 @@ extern src::severity_logger< _SMERP::Logger::LogLevel > logger;
 
 // shortcut macros
 #define LOG_DATA	BOOST_LOG_SEV( _SMERP::logger, _SMERP::Logger::_SMERP_DATA )
-#define LOG_DEBUG	BOOST_LOG_SEV( _SMERP::logger, _SMERP::Logger::_SMERP_DEBUG )
-#define LOG_TRACE	BOOST_LOG_SEV( _SMERP::logger, _SMERP::Logger::_SMERP_DATA )
+#define LOG_TRACE	BOOST_LOG_SEV( _SMERP::logger, _SMERP::Logger::_SMERP_TRACE )
 #define LOG_DEBUG	BOOST_LOG_SEV( _SMERP::logger, _SMERP::Logger::_SMERP_DEBUG )
 #define LOG_INFO	BOOST_LOG_SEV( _SMERP::logger, _SMERP::Logger::_SMERP_INFO )
 #define LOG_NOTICE	BOOST_LOG_SEV( _SMERP::logger, _SMERP::Logger::_SMERP_NOTICE )
