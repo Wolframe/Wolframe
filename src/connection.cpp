@@ -107,30 +107,35 @@ void connection::handle_read( const boost::system::error_code& e, std::size_t by
 			case request::READY:
 				timer_.cancel();
 				timer_.expires_from_now( boost::posix_time::seconds( timeoutDuration_ ));
-				timer_.async_wait( strand_.wrap( boost::bind( &connection::handleTimeout, shared_from_this(),
-									boost::asio::placeholders::error )));
+				timer_.async_wait( strand_.wrap( boost::bind( &connection::handleTimeout,
+									      shared_from_this(),
+									      boost::asio::placeholders::error )));
 
 				requestHandler_.handleRequest( request_, reply_ );
 				if ( isSSL_ )
 					boost::asio::async_write( *SSLsocket_, reply_.toBuffers(),
-							strand_.wrap( boost::bind( &connection::handle_write, shared_from_this(),
-										boost::asio::placeholders::error )));
+								  strand_.wrap( boost::bind( &connection::handleWrite,
+											     shared_from_this(),
+											     boost::asio::placeholders::error )));
 				else
 					boost::asio::async_write( *socket_, reply_.toBuffers(),
-							strand_.wrap( boost::bind( &connection::handle_write, shared_from_this(),
-										boost::asio::placeholders::error )));
+								  strand_.wrap( boost::bind( &connection::handleWrite,
+											     shared_from_this(),
+											     boost::asio::placeholders::error )));
 			case request::EMPTY:
 			case request::PARSING:
 				if ( isSSL_ )
 					SSLsocket_->async_read_some( boost::asio::buffer( buffer_ ),
-							strand_.wrap( boost::bind( &connection::handle_read, shared_from_this(),
-										boost::asio::placeholders::error,
-										boost::asio::placeholders::bytes_transferred )));
+								     strand_.wrap( boost::bind( &connection::handle_read,
+												shared_from_this(),
+												boost::asio::placeholders::error,
+												boost::asio::placeholders::bytes_transferred )));
 				else
 					socket_->async_read_some( boost::asio::buffer( buffer_ ),
-							strand_.wrap( boost::bind( &connection::handle_read, shared_from_this(),
-										boost::asio::placeholders::error,
-										boost::asio::placeholders::bytes_transferred )));
+								  strand_.wrap( boost::bind( &connection::handle_read,
+											     shared_from_this(),
+											     boost::asio::placeholders::error,
+											     boost::asio::placeholders::bytes_transferred )));
 			}
 	}
 
@@ -140,7 +145,7 @@ void connection::handle_read( const boost::system::error_code& e, std::size_t by
 // handler returns. The connection class's destructor closes the socket.
 }
 
-void connection::handle_write( const boost::system::error_code& e )
+void connection::handleWrite( const boost::system::error_code& e )
 {
 	if ( !e )	{
 		boost::system::error_code ignored_ec;
@@ -176,7 +181,7 @@ void connection::handleTimeout( const boost::system::error_code& e )
 
 		if ( isSSL_ )	{
 			LOG_INFO << "Timeout, client " << SSLsocket().remote_endpoint().address().to_string()
-				  << ":" << SSLsocket().remote_endpoint().port() << " (SSL)" ;
+				 << ":" << SSLsocket().remote_endpoint().port() << " (SSL)" ;
 			boost::asio::write( *SSLsocket_, boost::asio::buffer( "Timeout :P\n" ));
 			SSLsocket_->lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
 		}
@@ -184,7 +189,7 @@ void connection::handleTimeout( const boost::system::error_code& e )
 			boost::asio::write( *socket_, boost::asio::buffer( "Timeout :P\n" ));
 			socket_->shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
 			LOG_INFO << "Timeout, client " << socket_->remote_endpoint().address().to_string()
-				  << ":" << socket_->remote_endpoint().port();
+				 << ":" << socket_->remote_endpoint().port();
 		}
 	}
 }

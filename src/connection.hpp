@@ -46,7 +46,7 @@ namespace _SMERP {
 				 std::size_t bytes_transferred);
 
 		/// Handle completion of a write operation.
-		void handle_write(const boost::system::error_code& e);
+		void handleWrite(const boost::system::error_code& e);
 
 		/// Handle completion of a timer operation.
 		void handleTimeout( const boost::system::error_code& e );
