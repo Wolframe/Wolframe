@@ -19,8 +19,6 @@ server::server( const ApplicationConfiguration& config )
 	strand_( IOservice_ ),
     requestHandler_()
 {
-	int	verify = 0;
-
 	if ( config.address.size() > 0 )	{
 		acceptor_ = new boost::asio::ip::tcp::acceptor( IOservice_ );
 		// Open the acceptor(s) with the option to reuse the address (i.e. SO_REUSEADDR).
@@ -45,24 +43,28 @@ server::server( const ApplicationConfiguration& config )
 
 	if ( config.SSLaddress.size() > 0 )	{
 		SSLcontext_ = new boost::asio::ssl::context( IOservice_, boost::asio::ssl::context::sslv23 );
-		if ( config.SSLverify )
-			verify = boost::asio::ssl::context::verify_peer |
-					boost::asio::ssl::context::verify_fail_if_no_peer_cert;
-		else
-			verify = boost::asio::ssl::context::verify_none;
 		SSLcontext_->set_options( boost::asio::ssl::context::default_workarounds
 					| boost::asio::ssl::context::no_sslv2
 					| boost::asio::ssl::context::single_dh_use
-					| verify
 					);
 		SSLcontext_->set_password_callback( boost::bind( &server::getPassword, this ));
 		SSLcontext_->use_certificate_chain_file( config.SSLcertificate );
 		SSLcontext_->use_private_key_file( config.SSLkey, boost::asio::ssl::context::pem );
-		if ( ! config.SSLCAchainFile.empty() )
-			SSLcontext_->load_verify_file( config.SSLCAchainFile );
-		if ( ! config.SSLCAdirectory.empty() )
-			SSLcontext_->add_verify_path( config.SSLCAdirectory );
 //		SSLcontext_->use_tmp_dh_file( "dh4096.pem" );
+		if ( config.SSLverify )	{
+			if ( ! config.SSLCAchainFile.empty() )
+				SSLcontext_->load_verify_file( config.SSLCAchainFile );
+			if ( ! config.SSLCAdirectory.empty() )
+				SSLcontext_->add_verify_path( config.SSLCAdirectory );
+
+			SSLcontext_->set_verify_mode( boost::asio::ssl::context::verify_peer |
+						      boost::asio::ssl::context::verify_fail_if_no_peer_cert );
+			LOG_DEBUG << "SSL client certificate verification set to VERIFY";
+		}
+		else	{
+			SSLcontext_->set_verify_mode( boost::asio::ssl::context::verify_none );
+			LOG_DEBUG << "SSL client certificate verification set to NONE";
+		}
 		LOG_DEBUG << "SSL context created";
 
 		newSSLconnection_ = connection_ptr( new connection( IOservice_, requestHandler_, timeout_duration_, SSLcontext_ ));
@@ -110,14 +112,17 @@ server::~server()
 void server::run()
 {
 	// Create a pool of threads to run all of the io_services.
-	std::vector<boost::shared_ptr<boost::thread> > threads;
-	for ( std::size_t i = 0; i < threadPoolSize_; ++i )	{
+	std::vector<boost::shared_ptr<boost::thread> >	threads;
+	std::size_t					i;
+
+	for ( i = 0; i < threadPoolSize_; ++i )	{
 		boost::shared_ptr<boost::thread> thread( new boost::thread( boost::bind( &boost::asio::io_service::run, &IOservice_ )));
 		threads.push_back( thread );
 	}
+	LOG_TRACE << i << " network server threads started";
 
 	// Wait for all threads in the pool to exit.
-	for ( std::size_t i = 0; i < threads.size(); ++i )
+	for ( i = 0; i < threads.size(); ++i )
 		threads[i]->join();
 
 	// Reset io_services.

@@ -1,1 +1,4 @@
 V	110319104813Z		01	unknown	/C=XY/ST=Smerpland/L=Smerpville/O=Smerp Corp./OU=Smerp Testing/CN=SMERP Server/emailAddress=server@smerp.xy
+V	110403232729Z		02	unknown	/C=XY/ST=ClientLand/L=ClientVille/O=Client Group Ltd./OU=Client Dept./CN=client.clientland.xy/emailAddress=client@clientland.xy
+V	110403234509Z		03	unknown	/C=XY/ST=Smerpland/L=Smerponia/O=SMERP Clients A.G./OU=Client Dept./CN=client.smerp.xy/emailAddress=client@smerp.xy
+V	110404002940Z		04	unknown	/C=XY/ST=Smerpland/L=Smerpdorf/O=Smerp Corp./OU=Smerp Servers/CN=SMERP Server with password/emailAddress=smerpdpwd@smerp.xy

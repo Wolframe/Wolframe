@@ -1,0 +1,72 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 3 (0x3)
+        Signature Algorithm: sha1WithRSAEncryption
+        Issuer: C=XY, ST=Smerpland, L=Smerpville, O=Smerp Corp., OU=Smerp Fathers, CN=SMERP CA/emailAddress=CA@smerp.xy
+        Validity
+            Not Before: Apr  3 23:45:09 2010 GMT
+            Not After : Apr  3 23:45:09 2011 GMT
+        Subject: C=XY, ST=Smerpland, L=Smerponia, O=SMERP Clients A.G., OU=Client Dept., CN=client.smerp.xy/emailAddress=client@smerp.xy
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+            RSA Public Key: (1024 bit)
+                Modulus (1024 bit):
+                    00:f4:03:9b:c0:f5:f9:95:62:46:01:fd:0c:04:17:
+                    9a:02:d3:d1:5e:f6:ca:64:b6:d3:d3:84:07:72:02:
+                    d6:12:80:c5:41:0b:bf:bf:ad:e3:d2:6b:bd:d2:9e:
+                    4a:eb:d0:dc:de:ca:8b:8b:8a:96:ef:88:10:04:a3:
+                    2a:eb:a8:1a:86:4e:91:4e:94:5f:9b:df:12:af:02:
+                    a5:23:72:3c:5a:35:96:d0:4f:a3:9b:6b:15:36:73:
+                    07:f3:30:b7:b1:3b:63:7f:83:51:dc:0a:6f:b3:8e:
+                    7f:43:d1:36:88:84:5a:af:2c:34:54:4e:28:d4:be:
+                    eb:45:f9:c6:6e:c6:52:fa:35
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints: 
+                CA:FALSE
+            Netscape Comment: 
+                OpenSSL Generated Certificate
+            X509v3 Subject Key Identifier: 
+                73:96:48:26:E3:25:66:EF:74:FF:61:FA:24:A1:29:AF:B2:62:F0:DB
+            X509v3 Authority Key Identifier: 
+                keyid:BA:71:9C:97:06:7C:3C:B3:70:2D:9E:47:27:9E:94:47:53:A9:0F:D3
+
+    Signature Algorithm: sha1WithRSAEncryption
+        78:82:9e:da:d1:ca:46:b9:0a:2a:26:79:80:fe:aa:be:b5:e6:
+        ec:95:e6:d1:9d:f7:90:f8:38:8c:9d:c9:30:51:12:2d:94:d0:
+        64:20:43:fc:fe:09:23:68:9b:ab:56:c4:59:78:a7:93:ad:27:
+        b7:0b:53:c6:40:59:d8:c9:b7:6a:8e:e4:78:0b:5f:b5:22:ce:
+        2e:92:15:23:dd:9e:88:71:d3:a4:31:83:f4:43:f3:87:69:88:
+        29:7e:bd:7f:25:64:89:74:31:62:0f:9f:90:b8:d4:49:a7:3a:
+        fb:7b:a5:3f:43:73:27:47:a4:39:d2:28:ab:26:c7:b2:ae:b8:
+        8f:f7:7f:df:5d:84:11:67:9e:e4:1f:1b:5d:b4:df:c0:a1:f1:
+        cb:8f:c6:29:af:31:eb:e7:dc:55:a0:20:af:1a:a9:5a:06:34:
+        4d:84:67:50:95:aa:3f:24:f9:bf:48:9f:32:96:9f:03:4d:5b:
+        57:db:e1:3b:39:a8:f1:8f:6b:9d:bb:d8:72:a2:07:f8:a5:ec:
+        d5:9c:41:75:af:6c:50:8b:39:b7:ed:1b:08:e7:66:06:c5:e0:
+        a0:b3:90:9f:27:ff:88:fe:8a:8c:a6:42:f9:a1:32:a0:9d:1f:
+        eb:80:d5:76:48:cf:87:62:18:91:2a:7c:58:a2:e0:54:66:19:
+        b8:64:2e:a5
+-----BEGIN CERTIFICATE-----
+MIIDqjCCApKgAwIBAgIBAzANBgkqhkiG9w0BAQUFADCBkzELMAkGA1UEBhMCWFkx
+EjAQBgNVBAgTCVNtZXJwbGFuZDETMBEGA1UEBxMKU21lcnB2aWxsZTEUMBIGA1UE
+ChMLU21lcnAgQ29ycC4xFjAUBgNVBAsTDVNtZXJwIEZhdGhlcnMxETAPBgNVBAMT
+CFNNRVJQIENBMRowGAYJKoZIhvcNAQkBFgtDQUBzbWVycC54eTAeFw0xMDA0MDMy
+MzQ1MDlaFw0xMTA0MDMyMzQ1MDlaMIGjMQswCQYDVQQGEwJYWTESMBAGA1UECBMJ
+U21lcnBsYW5kMRIwEAYDVQQHEwlTbWVycG9uaWExGzAZBgNVBAoTElNNRVJQIENs
+aWVudHMgQS5HLjEVMBMGA1UECxMMQ2xpZW50IERlcHQuMRgwFgYDVQQDEw9jbGll
+bnQuc21lcnAueHkxHjAcBgkqhkiG9w0BCQEWD2NsaWVudEBzbWVycC54eTCBnzAN
+BgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA9AObwPX5lWJGAf0MBBeaAtPRXvbKZLbT
+04QHcgLWEoDFQQu/v63j0mu90p5K69Dc3sqLi4qW74gQBKMq66gahk6RTpRfm98S
+rwKlI3I8WjWW0E+jm2sVNnMH8zC3sTtjf4NR3Apvs45/Q9E2iIRaryw0VE4o1L7r
+RfnGbsZS+jUCAwEAAaN7MHkwCQYDVR0TBAIwADAsBglghkgBhvhCAQ0EHxYdT3Bl
+blNTTCBHZW5lcmF0ZWQgQ2VydGlmaWNhdGUwHQYDVR0OBBYEFHOWSCbjJWbvdP9h
++iShKa+yYvDbMB8GA1UdIwQYMBaAFLpxnJcGfDyzcC2eRyeelEdTqQ/TMA0GCSqG
+SIb3DQEBBQUAA4IBAQB4gp7a0cpGuQoqJnmA/qq+tebslebRnfeQ+DiMnckwURIt
+lNBkIEP8/gkjaJurVsRZeKeTrSe3C1PGQFnYybdqjuR4C1+1Is4ukhUj3Z6IcdOk
+MYP0Q/OHaYgpfr1/JWSJdDFiD5+QuNRJpzr7e6U/Q3MnR6Q50iirJseyrriP93/f
+XYQRZ57kHxtdtN/AofHLj8YprzHr59xVoCCvGqlaBjRNhGdQlao/JPm/SJ8ylp8D
+TVtX2+E7Oajxj2udu9hyogf4pezVnEF1r2xQizm37RsI52YGxeCgs5CfJ/+I/oqM
+pkL5oTKgnR/rgNV2SM+HYhiRKnxYouBUZhm4ZC6l
+-----END CERTIFICATE-----

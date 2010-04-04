@@ -9,4 +9,10 @@ openssl req -config openssl.cnf -new -nodes -keyout smerpd.key -out smerpd.req -
 Sign a certificate
 openssl ca -config openssl.cnf -policy policy_anything -out smerpd.crt -infiles smerpd.req
 
-Delete the unnecessary files: xx.pem, *.old *.req
+Delete the unnecessary files: xx.pem (xx means numeric), *.old *.req
+
+
+All passwords are xxyy.
+
+smerpd, smerpdpwd and SMERPclient are signed with CA
+client is signed with CAclient

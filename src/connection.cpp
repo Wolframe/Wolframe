@@ -84,7 +84,9 @@ void connection::handleHandshake( const boost::system::error_code& e )
 	else	{
 		LOG_DEBUG << "ERROR handling SSL handshake from " << SSLsocket().remote_endpoint().address().to_string()
 			  << ":" << SSLsocket().remote_endpoint().port();
-		delete this;
+//		delete this;
+		boost::system::error_code ignored_ec;
+		SSLsocket_->lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
 	}
 }
 
