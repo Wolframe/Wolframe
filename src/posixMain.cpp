@@ -107,11 +107,17 @@ int _SMERP_posixMain( int argc, char* argv[] )
 // Check the configuration
 		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::CHECK_CONFIG )	{
 			if ( config.check() )	{
-				std::cout << "Configuration OK" << std::endl << std::endl;
-				return _SMERP::ErrorCodes::OK;
+				if ( config.errMsg().empty() )	{
+					std::cout << "Configuration OK" << std::endl << std::endl;
+					return _SMERP::ErrorCodes::OK;
+				}
+				else	{
+					std::cout << "WARNING: " << config.errMsg() << std::endl << std::endl;
+					return _SMERP::ErrorCodes::OK;
+				}
 			}
 			else	{
-				std::cout << config.errMsg() << std::endl << std::endl;
+				std::cout << "ERROR: " << config.errMsg() << std::endl << std::endl;
 				return _SMERP::ErrorCodes::OK;
 			}
 		}

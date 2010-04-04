@@ -16,7 +16,6 @@ namespace _SMERP {
 		configFile = cfgFile.file;
 
 		foreground = cmdLine.foreground;
-		debug = cmdLine.debugLevel;
 
 		if ( !cmdLine.user.empty())
 			user = cmdLine.user;
@@ -51,18 +50,27 @@ namespace _SMERP {
 		dbUser = cfgFile.dbUser;
 		dbPassword = cfgFile.dbPassword;
 
-		logToStderr = cfgFile.logToStderr;
-		stderrLogLevel = cfgFile.stderrLogLevel;
-		logToFile = cfgFile.logToFile;
-		logFile = cfgFile.logFile;
-		logFileLogLevel = cfgFile.logFileLogLevel;
-		logToSyslog = cfgFile.logToSyslog;
-		syslogFacility = cfgFile.syslogFacility;
-		syslogLogLevel = cfgFile.syslogLogLevel;
-		logToEventlog = cfgFile.logToEventlog;
-		eventlogLogName = cfgFile.eventlogLogName;
-		eventlogSource = cfgFile.eventlogSource;
-		eventlogLogLevel = cfgFile.eventlogLogLevel;
+		if ( !foreground )	{
+			logToStderr = cfgFile.logToStderr;
+			stderrLogLevel = cfgFile.stderrLogLevel;
+			logToFile = cfgFile.logToFile;
+			logFile = cfgFile.logFile;
+			logFileLogLevel = cfgFile.logFileLogLevel;
+			logToSyslog = cfgFile.logToSyslog;
+			syslogFacility = cfgFile.syslogFacility;
+			syslogLogLevel = cfgFile.syslogLogLevel;
+			logToEventlog = cfgFile.logToEventlog;
+			eventlogLogName = cfgFile.eventlogLogName;
+			eventlogSource = cfgFile.eventlogSource;
+			eventlogLogLevel = cfgFile.eventlogLogLevel;
+		}
+		else	{
+			logToStderr = true;
+			stderrLogLevel = cmdLine.debugLevel;
+			logToFile = false;
+			logToSyslog = true;
+			logToEventlog = false;
+		}
 	}
 
 
@@ -137,9 +145,37 @@ namespace _SMERP {
 			os << "   Log to eventlog: DISABLED" << std::endl;
 	}
 
-
+	/// Check if the application configuration makes sense
+	///
+	/// Be aware that this function does NOT test if the configuration
+	/// can be used. It only tests if it MAY be valid.
 	bool ApplicationConfiguration::check()
 	{
+		// if log to file is requested a file must be specified
+		if ( logToFile )
+			if ( logFile.empty())	{
+				errMsg_ = "Log to file requested but no log file specified";
+				return false;
+			}
+
+		// if it listens to SSL a certificate file and a key file are required
+		if ( SSLaddress.size() > 0 )	{
+			if ( SSLcertificate.empty())	{
+				errMsg_ = "SSL port defined but no SSL certificate specified";
+				return false;
+			}
+			if ( SSLkey.empty())	{
+				errMsg_ = "Server SSL certificate needs a key but no key file specified";
+				return false;
+			}
+		}
+		// verify client SSL certificate needs either certificate dir or chain file
+		if ( SSLverify )	{
+			if ( SSLCAdirectory.empty() && SSLCAchainFile.empty())	{
+				errMsg_ = "Client SSL certificate verification requested but no CA directory or CA chain file specified";
+				return false;
+			}
+		}
 		return true;
 	}
 

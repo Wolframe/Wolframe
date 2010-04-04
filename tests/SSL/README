@@ -16,3 +16,6 @@ All passwords are xxyy.
 
 smerpd, smerpdpwd and SMERPclient are signed with CA
 client is signed with CAclient
+
+To build the CA directory copy / link CA certificates to the CA directory and then run
+c_rehash <dir> on that directory
