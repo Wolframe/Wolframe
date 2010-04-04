@@ -10,14 +10,19 @@ INCLUDE_DIRS = \
 	/I$(TOPDIR) \
 	/I$(TOPDIR)\include \
 	/I"$(BOOST_DIR)" \
-	/I"$(PLATFORM_SDK_DIR)\Include"	
+	/I"$(PLATFORM_SDK_DIR)\Include"	\
+	/I"$(OPENSSL_DIR)\include"
 
 # Note: libraries are picked automatically on Windows!
 SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib"
 BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib"
 INCLUDE_LDFLAGS = \
 	$(SDK_LDFLAGS) $(BOOST_LDFLAGS) \
-	/LIBPATH:$(TOPDIR)\libs\boost\log
+	/LIBPATH:$(TOPDIR)\libs\boost\log \
+	/LIBPATH:$(OPENSSL_DIR)\lib
+
+INCLUDE_LIBS = \
+	libeay32.lib ssleay32.lib
 
 CPP_BINS = \
 	smerpd.exe
@@ -41,6 +46,7 @@ OBJS = \
 	reply.obj \
 	server.obj \
 	connection.obj \
+	getPassword.obj \
 	requestHandler.obj \
 	winMain.obj
 

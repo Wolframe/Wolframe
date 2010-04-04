@@ -21,7 +21,8 @@ namespace _SMERP	{
 		enum	{
 			NORMAL,		/// the system is working normally
 			WARNING,	/// ok, a warning is a warning
-			ERROR,		/// an error has occured, the system might be able to continue
+			/* Aba: gets expanded on Windows, ERROR is a macro! */
+			_ERROR,		/// an error has occured, the system might be able to continue
 			SEVERE,		/// current processing is doomed. system not yet
 			CRITICAL,	/// the system is doomed now
 			FATAL		/// system cannot continue
