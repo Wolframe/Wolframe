@@ -70,7 +70,12 @@ namespace _SMERP {
 			logToFile = false;
 			// Aba: not very logical, either both false or both true, I opt for false
 			logToSyslog = true;
+			syslogFacility = cfgFile.syslogFacility;
+			syslogLogLevel = cfgFile.syslogLogLevel;
 			logToEventlog = false;
+			eventlogLogName = cfgFile.eventlogLogName;
+			eventlogSource = cfgFile.eventlogSource;
+			eventlogLogLevel = cfgFile.eventlogLogLevel;
 		}
 	}
 

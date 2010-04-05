@@ -101,7 +101,7 @@ void Logger::initialize( const ApplicationConfiguration& config )
 				% fmt::message( )
 		);
 
-		LOG_DEBUG << "Initialized stderr logger with level " <<  config.stderrLogLevel;
+		LOG_DEBUG << "Initialized stderr logger with level '" <<  config.stderrLogLevel << "'";
 	}
 
 	// open logger to a logfile
@@ -115,6 +115,8 @@ void Logger::initialize( const ApplicationConfiguration& config )
 				% fmt::attr< LogLevel >( "Severity", std::nothrow )
 				% fmt::message( )
 		);
+
+		LOG_DEBUG << "Initialized file logger to '" << config.logFile <<"' with level " <<  config.logFileLogLevel << "'";
 	}
 
 #if !defined( _WIN32 )
@@ -141,6 +143,9 @@ void Logger::initialize( const ApplicationConfiguration& config )
 				% fmt::attr< LogLevel >( "Severity", std::nothrow )
 				% fmt::message( )
 		);
+
+		LOG_DEBUG << "Initialized syslog logger to facility '" << config.syslogFacility
+		          << "' with level '" <<  config.syslogLogLevel << "'";
 	}
 #else
 	if( config.logToEventlog ) {
