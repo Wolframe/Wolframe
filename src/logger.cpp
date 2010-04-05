@@ -100,14 +100,13 @@ void Logger::initialize( const ApplicationConfiguration& config )
 				% fmt::attr< LogLevel >( "Severity", std::nothrow )
 				% fmt::message( )
 		);
-
-		LOG_DEBUG << "Initialized stderr logger with level '" <<  config.stderrLogLevel << "'";
 	}
 
 	// open logger to a logfile
 	if( config.logToFile ) {
 		logging::init_log_to_file(
 			keywords::file_name = config.logFile,
+			keywords::auto_flush = true,
 			keywords::open_mode = ( std::ios_base::out | std::ios_base::app ),
 			keywords::filter = flt::attr< LogLevel >( "Severity", std::nothrow ) >= Logger::str2LogLevel( config.logFileLogLevel ),
 			keywords::format = fmt::format( "%1% %2%: %3%" )
@@ -115,8 +114,6 @@ void Logger::initialize( const ApplicationConfiguration& config )
 				% fmt::attr< LogLevel >( "Severity", std::nothrow )
 				% fmt::message( )
 		);
-
-		LOG_DEBUG << "Initialized file logger to '" << config.logFile <<"' with level " <<  config.logFileLogLevel << "'";
 	}
 
 #if !defined( _WIN32 )
@@ -143,9 +140,6 @@ void Logger::initialize( const ApplicationConfiguration& config )
 				% fmt::attr< LogLevel >( "Severity", std::nothrow )
 				% fmt::message( )
 		);
-
-		LOG_DEBUG << "Initialized syslog logger to facility '" << config.syslogFacility
-		          << "' with level '" <<  config.syslogLogLevel << "'";
 	}
 #else
 	if( config.logToEventlog ) {
@@ -173,6 +167,11 @@ void Logger::initialize( const ApplicationConfiguration& config )
 #endif // !defined( _WIN32 )
 
 	logging::add_common_attributes( );
+
+	LOG_DEBUG << "Initialized stderr logger with level '" <<  config.stderrLogLevel << "'";
+	LOG_DEBUG << "Initialized file logger to '" << config.logFile <<"' with level " <<  config.logFileLogLevel << "'";
+	LOG_DEBUG << "Initialized syslog logger to facility '" << config.syslogFacility
+	          << "' with level '" <<  config.syslogLogLevel << "'";
 }
 
 } // namespace _SMERP
