@@ -95,6 +95,7 @@ namespace _SMERP {
 
 		os << "Run as " << (user.empty() ? "(not specified)" : user) << ":"
 				<< (group.empty() ? "(not specified)" : group) << std::endl;
+		os << "PID file: " << pidFile << std::endl;
 		os << "Number of threads: " << threads << std::endl;
 		os << "Maximum number of clients: " << maxClients << std::endl;
 

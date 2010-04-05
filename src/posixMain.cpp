@@ -3,9 +3,7 @@
 //
 
 #include <iostream>
-#include <fstream>
 #include <string>
-#include <cstdio>
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
@@ -27,8 +25,14 @@
 #include <pthread.h>
 #include <signal.h>
 #include <unistd.h>
+
+// daemon stuff
+#include <fstream>
+#include <cstdio>   
 #include <grp.h>
 #include <pwd.h>
+#include <boost/interprocess/sync/file_lock.hpp>
+#include <boost/filesystem.hpp>
 
 static const unsigned short MAJOR_VERSION = 0;
 static const short unsigned MINOR_VERSION = 0;
@@ -138,6 +142,16 @@ int _SMERP_posixMain( int argc, char* argv[] )
 
 		// Daemon stuff
 		if( !config.foreground ) {
+			// Aba: maybe also in the foreground?
+			// try to lock the pidfile, bail out if not possible
+			if( boost::filesystem::exists( config.pidFile ) ) {
+				boost::interprocess::file_lock lock( config.pidFile.c_str( ) );
+				if( lock.try_lock( ) ) {
+					std::cerr << "Pidfile is locked, another daemon running?" << std::endl;
+					return _SMERP::ErrorCodes::FAILURE;
+				}
+			}
+
 			// daemonize, loose process group, terminal output, etc.
 			if( daemon( 0, 0 ) ) {
 				std::cerr << "Going to daemon mode failed" << std::endl;
