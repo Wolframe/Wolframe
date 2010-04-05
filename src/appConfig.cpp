@@ -67,6 +67,7 @@ namespace _SMERP {
 		else	{
 			logToStderr = true;
 			stderrLogLevel = cmdLine.debugLevel;
+			// Aba: why no logfile when run as daemon?
 			logToFile = false;
 			// Aba: not very logical, either both false or both true, I opt for false
 			logToSyslog = true;
