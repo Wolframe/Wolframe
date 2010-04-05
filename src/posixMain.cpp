@@ -25,6 +25,8 @@
 #include <pthread.h>
 #include <signal.h>
 #include <unistd.h>
+#include <grp.h>
+#include <pwd.h>
 
 static const unsigned short MAJOR_VERSION = 0;
 static const short unsigned MINOR_VERSION = 0;
@@ -132,10 +134,32 @@ int _SMERP_posixMain( int argc, char* argv[] )
 			return _SMERP::ErrorCodes::OK;
 		}
 
-		// Daemonize
+		// Daemon stuff
 		if( !config.foreground ) {
-			if( daemon( 0, 0 )  ) {
+			// daemonize, loose process group, terminal output, etc.
+			if( daemon( 0, 0 ) ) {
 				std::cerr << "Going to daemon mode failed" << std::endl;
+				return _SMERP::ErrorCodes::FAILURE;
+			}
+
+			// if we are root we can drop privileges now
+			struct group *groupent;
+			struct passwd *passwdent;
+
+			groupent = getgrnam( config.group.c_str( ) );
+			passwdent = getpwnam( config.user.c_str( ) );
+			if( groupent == NULL || passwdent == NULL ) {
+				std::cerr << "Illegal group '" << config.group << "' or user '" << config.user << "'" << std::endl;
+				return _SMERP::ErrorCodes::FAILURE;
+			}
+
+			if( setgid( groupent->gr_gid ) < 0 ) {
+				std::cerr << "setgid for group '" << config.group << "' failed!" << std::endl;
+				return _SMERP::ErrorCodes::FAILURE;
+			}
+
+			if( setuid( passwdent->pw_uid ) < 0 ) {
+				std::cerr << "setgid for user '" << config.user << "' failed!" << std::endl;
 				return _SMERP::ErrorCodes::FAILURE;
 			}
 		}

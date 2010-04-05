@@ -48,8 +48,8 @@ SMERP configuration file
 	</timeout>
 
 <!-- Server parameters -->
-	<user>momo</user>
-	<group>fofo</group>
+	<user>nobody</user>
+	<group>nobody</group>
 	<threads>7</threads>			<!-- Number of server threads. Default 4 -->
 	<maxClients>255</maxClients>		<!-- Maximum number of simultaneous clients. Default 256 -->
 </server>
@@ -75,7 +75,7 @@ SMERP configuration file
 	<!-- log level for file logging -->
 	<logFile>
 		<filename>smerpd.log</filename>
-		<level>NOTICE</level>
+		<level>DATA</level>
 	</logFile>
 	<!-- syslog facility  and log level -->
 	<syslog>
