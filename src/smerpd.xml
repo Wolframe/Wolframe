@@ -75,7 +75,7 @@ SMERP configuration file
 
 	<!-- log level for file logging -->
 	<logFile>
-		<filename>smerpd.log</filename>
+		<filename>/tmp/smerpd.log</filename>
 		<level>DATA</level>
 	</logFile>
 	<!-- syslog facility  and log level -->
