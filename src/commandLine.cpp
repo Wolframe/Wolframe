@@ -87,6 +87,9 @@ namespace _SMERP {
 			if ( clMap.count( "foreground" ))
 				foreground = true;
 
+			if ( clMap.count( "debug" ))
+				debugLevel = clMap["debug"].as<std::string>();
+
 			if ( clMap.count( "config-file" ))
 				cfgFile = clMap["config-file"].as<std::string>();
 

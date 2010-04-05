@@ -93,7 +93,6 @@ void Logger::initialize( const ApplicationConfiguration& config )
 {
 	// open logger to the console
 	if( config.logToStderr ) {
-std::cout << config.stderrLogLevel << std::endl;
 		logging::init_log_to_console(
 			std::clog,
 			keywords::filter = flt::attr< LogLevel >( "Severity", std::nothrow ) >= Logger::str2LogLevel( config.stderrLogLevel ),
