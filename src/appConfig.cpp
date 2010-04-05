@@ -68,6 +68,7 @@ namespace _SMERP {
 			logToStderr = true;
 			stderrLogLevel = cmdLine.debugLevel;
 			logToFile = false;
+			// Aba: not very logical, either both false or both true, I opt for false
 			logToSyslog = true;
 			logToEventlog = false;
 		}

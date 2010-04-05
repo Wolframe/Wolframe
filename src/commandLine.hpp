@@ -19,7 +19,7 @@ namespace _SMERP	{
 
 		Command_t	command;
 		bool		foreground;
-		unsigned short	debugLevel;
+		std::string	debugLevel;
 		std::string	user;
 		std::string	group;
 		std::string	cfgFile;

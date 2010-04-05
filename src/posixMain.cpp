@@ -22,16 +22,15 @@
 #error "This is the POSIX main !"
 #else
 
-
 #include <pthread.h>
 #include <signal.h>
-
+#include <unistd.h>
 
 static const unsigned short MAJOR_VERSION = 0;
 static const short unsigned MINOR_VERSION = 0;
 static const short unsigned REVISION_NUMBER = 3;
 
-static const int DEFAULT_DEBUG_LEVEL = 3;
+static const std::string DEFAULT_DEBUG_LEVEL = "DEBUG";
 
 static const char *DEFAULT_MAIN_CONFIG = "/etc/smerpd.conf";
 static const char *DEFAULT_USER_CONFIG = "~/smerpd.conf";
@@ -131,6 +130,14 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::TEST_CONFIG )	{
 			std::cout << "Not implemented yet" << std::endl << std::endl;
 			return _SMERP::ErrorCodes::OK;
+		}
+
+		// Daemonize
+		if( !config.foreground ) {
+			if( daemon( 0, 0 )  ) {
+				std::cerr << "Going to daemon mode failed" << std::endl;
+				return _SMERP::ErrorCodes::FAILURE;
+			}
 		}
 
 		// Block all signals for background thread.
