@@ -11,6 +11,7 @@ namespace _SMERP	{
 // daemon configuration
 		std::string	user;
 		std::string	group;
+		std::string	pidFile;
 		unsigned short	threads;
 		unsigned short	maxClients;
 // network configuration

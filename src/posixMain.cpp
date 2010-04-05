@@ -3,7 +3,9 @@
 //
 
 #include <iostream>
+#include <fstream>
 #include <string>
+#include <cstdio>
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
@@ -162,6 +164,11 @@ int _SMERP_posixMain( int argc, char* argv[] )
 				std::cerr << "setgid for user '" << config.user << "' failed!" << std::endl;
 				return _SMERP::ErrorCodes::FAILURE;
 			}
+
+			// create a pid file and lock id
+			std::ofstream pidFile( config.pidFile.c_str( ), std::ios_base::trunc );
+			pidFile << getpid( ) << std::endl;
+			pidFile.close( );
 		}
 
 		// Block all signals for background thread.
@@ -197,9 +204,13 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		t.join();
 		LOG_NOTICE << "Server stopped";
 
-		return _SMERP::ErrorCodes::OK;
+		// Daemon stuff
+		if( !config.foreground ) {
+			(void)remove( config.pidFile.c_str( ) );
+		}
 	}
 	catch (std::exception& e)	{
+		// Aba: how to delete the pid file here?
 		LOG_ERROR << "posixMain: exception: " << e.what() << "\n";
 		return _SMERP::ErrorCodes::FAILURE;
 	}

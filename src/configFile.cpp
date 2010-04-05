@@ -144,6 +144,7 @@ namespace _SMERP {
 		maxClients = pt.get<unsigned short>( "server.maxClients", 256 );
 		user = pt.get<std::string>( "server.user", std::string() );
 		group = pt.get<std::string>( "server.group", std::string() );
+		pidFile = pt.get<std::string>( "server.pidFile", std::string( ) );
 
 		idleTimeout = pt.get<unsigned>( "server.timeout.idle", 900 );
 		requestTimeout = pt.get<unsigned>( "server.timeout.request", 30 );

@@ -50,6 +50,7 @@ SMERP configuration file
 <!-- Server parameters -->
 	<user>nobody</user>
 	<group>nobody</group>
+	<pidFile>/tmp/smerpd.pid</pidFile>
 	<threads>7</threads>			<!-- Number of server threads. Default 4 -->
 	<maxClients>255</maxClients>		<!-- Maximum number of simultaneous clients. Default 256 -->
 </server>

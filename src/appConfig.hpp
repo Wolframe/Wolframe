@@ -23,6 +23,7 @@ namespace _SMERP {
 // daemon configuration
 		std::string	user;
 		std::string	group;
+		std::string	pidFile;
 		unsigned	threads;
 		unsigned	maxClients;
 

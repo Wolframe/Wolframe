@@ -27,6 +27,7 @@ namespace _SMERP {
 		else
 			group = cfgFile.group;
 
+		pidFile = cfgFile.pidFile;
 		threads = cfgFile.threads;
 		maxClients = cfgFile.maxClients;
 
