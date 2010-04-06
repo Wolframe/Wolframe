@@ -97,11 +97,13 @@ namespace _SMERP {
 		else
 			os << std::endl;
 
+#if !defined(_WIN32)
 		os << "Run as " << (user.empty() ? "(not specified)" : user) << ":"
 				<< (group.empty() ? "(not specified)" : group) << std::endl;
 		os << "PID file: " << pidFile << std::endl;
 		os << "Number of threads: " << threads << std::endl;
 		os << "Maximum number of clients: " << maxClients << std::endl;
+#endif
 
 		os << "Network" << std::endl;
 		if ( address.size() > 0 )	{
