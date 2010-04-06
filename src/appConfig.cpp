@@ -28,6 +28,10 @@ namespace _SMERP {
 			group = cfgFile.group;
 
 		pidFile = cfgFile.pidFile;
+		serviceName = cfgFile.serviceName;
+		serviceDisplayName = cfgFile.serviceDisplayName;
+		serviceDescription = cfgFile.serviceDescription;
+
 		threads = cfgFile.threads;
 		maxClients = cfgFile.maxClients;
 

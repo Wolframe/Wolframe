@@ -47,10 +47,19 @@ SMERP configuration file
 		<process>30</process>		<!-- Maximum time to process a request. (default 30s) -->
 	</timeout>
 
-<!-- Server parameters -->
+	<!-- Unix daemon parameters -->
 	<user>nobody</user>
 	<group>nobody</group>
 	<pidFile>/tmp/smerpd.pid</pidFile>
+	
+	<!-- Windows service parameters -->
+	<service>
+		<name>smerp</name>
+		<displayName>Smerp Daemon</displayName>
+		<description>a daemon for smerping</description>
+	</service>
+	
+	<!-- Server parameters -->
 	<threads>7</threads>			<!-- Number of server threads. Default 4 -->
 	<maxClients>255</maxClients>		<!-- Maximum number of simultaneous clients. Default 256 -->
 </server>

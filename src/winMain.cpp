@@ -50,6 +50,35 @@ BOOL WINAPI consoleCtrlHandler(DWORD ctrlType)
 	}
 }
 
+static void install_as_service( const _SMERP::ApplicationConfiguration& config )
+{
+// get service control manager
+	SC_HANDLE scm = (SC_HANDLE)OpenSCManager( NULL, SERVICES_ACTIVE_DATABASE, SC_MANAGER_ALL_ACCESS );
+	
+// retrieve absolute path of binary
+	TCHAR binary_path[MAX_PATH];
+	DWORD res = GetModuleFileName( NULL, binary_path, MAX_PATH );
+	
+// create the service
+	SC_HANDLE service = CreateService( scm,
+		config.serviceName.c_str( ), config.serviceDisplayName.c_str( ),
+		SERVICE_ALL_ACCESS, SERVICE_WIN32_OWN_PROCESS,
+		SERVICE_DEMAND_START, SERVICE_ERROR_NORMAL,
+		binary_path, NULL, NULL, NULL, NULL, NULL );
+
+// set description of the service
+	SERVICE_DESCRIPTION descr;
+	descr.lpDescription = (LPTSTR)config.serviceDescription.c_str( );
+	(void)ChangeServiceConfig2( service, SERVICE_CONFIG_DESCRIPTION, &descr );
+
+// free handles
+	(void)CloseServiceHandle( service );
+	(void)CloseServiceHandle( scm );
+}
+
+static void remove_as_service( )
+{
+}
 
 int _SMERP_winMain( int argc, char* argv[] )
 {
@@ -125,11 +154,13 @@ int _SMERP_winMain( int argc, char* argv[] )
 		}
 		
 		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::INSTALL_SERVICE ) {
+			install_as_service( config );
 			std::cout << "Installed as Windows service" << std::endl << std::endl;
 			return _SMERP::ErrorCodes::OK;
 		}
 		
 		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::REMOVE_SERVICE ) {
+			remove_as_service( );
 			std::cout << "Removed as Windows service" << std::endl << std::endl;
 			return _SMERP::ErrorCodes::OK;
 		}

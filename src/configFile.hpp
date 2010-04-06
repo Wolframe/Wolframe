@@ -12,6 +12,13 @@ namespace _SMERP	{
 		std::string	user;
 		std::string	group;
 		std::string	pidFile;
+
+// service configuration
+		std::string	serviceName;
+		std::string	serviceDisplayName;
+		std::string	serviceDescription;
+
+// server configuration
 		unsigned short	threads;
 		unsigned short	maxClients;
 // network configuration
