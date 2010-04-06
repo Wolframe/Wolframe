@@ -164,7 +164,7 @@ int _SMERP_winMain( int argc, char* argv[] )
 			std::cout << "Not implemented yet" << std::endl << std::endl;
 			return _SMERP::ErrorCodes::OK;
 		}
-		
+
 		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::INSTALL_SERVICE ) {
 			install_as_service( config );
 			std::cout << "Installed as Windows service" << std::endl << std::endl;
@@ -177,9 +177,6 @@ int _SMERP_winMain( int argc, char* argv[] )
 			return _SMERP::ErrorCodes::OK;
 		}
 		
-		if( !config.foreground ) {
-		}
-
 		// Create the final logger based on the configuration
 		_SMERP::Logger::initialize( config );
 		LOG_NOTICE << "Starting server";

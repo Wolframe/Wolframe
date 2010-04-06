@@ -97,12 +97,21 @@ namespace _SMERP {
 		else
 			os << std::endl;
 
+// Unix daemon
 #if !defined(_WIN32)
 		os << "Run as " << (user.empty() ? "(not specified)" : user) << ":"
 				<< (group.empty() ? "(not specified)" : group) << std::endl;
 		os << "PID file: " << pidFile << std::endl;
 		os << "Number of threads: " << threads << std::endl;
 		os << "Maximum number of clients: " << maxClients << std::endl;
+#endif
+
+// Windows service
+#if defined(_WIN32)
+		os << "When run as service" << std::endl
+			<< "  Name: " << serviceName << std::endl
+			<< "  Displayed name: " << serviceDisplayName << std::endl
+			<< "  Description: " << serviceDescription << std::endl;
 #endif
 
 		os << "Network" << std::endl;
