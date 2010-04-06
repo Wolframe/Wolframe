@@ -76,8 +76,20 @@ static void install_as_service( const _SMERP::ApplicationConfiguration& config )
 	(void)CloseServiceHandle( scm );
 }
 
-static void remove_as_service( )
+static void remove_as_service( const _SMERP::ApplicationConfiguration& config )
 {
+// get service control manager
+	SC_HANDLE scm = (SC_HANDLE)OpenSCManager( NULL, SERVICES_ACTIVE_DATABASE, SC_MANAGER_ALL_ACCESS );
+
+// get service handle of the service to delete (identified by service name)
+	SC_HANDLE service = OpenService( scm, config.serviceName.c_str( ), SERVICE_ALL_ACCESS );
+
+// remove the service
+	(void)DeleteService( service );
+
+// free handles
+	(void)CloseServiceHandle( service );
+	(void)CloseServiceHandle( scm );
 }
 
 int _SMERP_winMain( int argc, char* argv[] )
@@ -160,7 +172,7 @@ int _SMERP_winMain( int argc, char* argv[] )
 		}
 		
 		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::REMOVE_SERVICE ) {
-			remove_as_service( );
+			remove_as_service( config );
 			std::cout << "Removed as Windows service" << std::endl << std::endl;
 			return _SMERP::ErrorCodes::OK;
 		}
