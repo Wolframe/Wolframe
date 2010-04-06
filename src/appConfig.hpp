@@ -24,6 +24,7 @@ namespace _SMERP {
 		std::string	user;
 		std::string	group;
 		std::string	pidFile;
+// server configuration
 		unsigned	threads;
 		unsigned	maxClients;
 

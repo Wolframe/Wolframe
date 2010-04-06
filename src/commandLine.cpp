@@ -22,12 +22,20 @@ namespace _SMERP {
 				( "print-config,p", "print configuration" )
 				( "check-config,t", "check the configuration" )
 				( "test-config,T", "test the configuration" )
+#if defined(_WIN32)
+// Windows Service Commands
+				( "install", "install as Windows service" )
+				( "remove", "remove registered Windows service" )
+#endif
 // Options
 				( "foreground,f", "run in foreground (logs only on stderr)" )
 				( "config-file,c", prgOpts::value<std::string>(), "configuration file" )
 				( "debug,d", prgOpts::value<std::string>(), "set debug level (to be used only with --foreground)" )
+#if !defined(_WIN32)
+// Unix daemon options
 				( "user,u", prgOpts::value<std::string>(), "run as <user>" )
 				( "group,g", prgOpts::value<std::string>(), "run as <group>" )
+#endif
 				;
 		command = DEFAULT;
 		foreground = false;
@@ -84,6 +92,26 @@ namespace _SMERP {
 				}
 			}
 
+#if defined(_WIN32)
+			if ( clMap.count( "install" ))	{
+				if ( command == DEFAULT )
+					command = INSTALL_SERVICE;
+				else	{
+					errMsg_ = "--install can not be specified together with -h|-p|-t|-T";
+					return false;
+				}
+			}
+
+			if ( clMap.count( "remove" ))	{
+				if ( command == DEFAULT )
+					command = REMOVE_SERVICE;
+				else	{
+					errMsg_ = "--remove can not be specified together with -h|-p|-t|-T";
+					return false;
+				}
+			}			
+#endif
+
 			if ( clMap.count( "foreground" ))
 				foreground = true;
 
@@ -93,10 +121,12 @@ namespace _SMERP {
 			if ( clMap.count( "config-file" ))
 				cfgFile = clMap["config-file"].as<std::string>();
 
+#if !defined(_WIN32)
 			if ( clMap.count( "user" ))
 				user = clMap["user"].as<std::string>();
 			if ( clMap.count( "group" ))
 				group = clMap["group"].as<std::string>();
+#endif
 
 			return true;
 

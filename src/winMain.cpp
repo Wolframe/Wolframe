@@ -19,6 +19,8 @@
 #error "This is the WIN32 main !"
 #else
 
+#include <WinSvc.h>
+
 static const unsigned short MAJOR_VERSION = 0;
 static const short unsigned MINOR_VERSION = 0;
 static const short unsigned REVISION_NUMBER = 3;
@@ -28,6 +30,8 @@ static const int DEFAULT_DEBUG_LEVEL = 3;
 static const char *DEFAULT_MAIN_CONFIG = "/etc/smerpd.conf";
 static const char *DEFAULT_USER_CONFIG = "~/smerpd.conf";
 static const char *DEFAULT_LOCAL_CONFIG = "./smerpd.conf";
+
+static const char *DEFAULT_SERVICE_NAME = "smerpd";
 
 boost::function0<void> consoleCtrlFunction;
 
@@ -118,6 +122,19 @@ int _SMERP_winMain( int argc, char* argv[] )
 		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::TEST_CONFIG )	{
 			std::cout << "Not implemented yet" << std::endl << std::endl;
 			return _SMERP::ErrorCodes::OK;
+		}
+		
+		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::INSTALL_SERVICE ) {
+			std::cout << "Installed as Windows service" << std::endl << std::endl;
+			return _SMERP::ErrorCodes::OK;
+		}
+		
+		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::REMOVE_SERVICE ) {
+			std::cout << "Removed as Windows service" << std::endl << std::endl;
+			return _SMERP::ErrorCodes::OK;
+		}
+		
+		if( !config.foreground ) {
 		}
 
 		// Create the final logger based on the configuration

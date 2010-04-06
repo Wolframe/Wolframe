@@ -14,6 +14,10 @@ namespace _SMERP	{
 			CHECK_CONFIG,
 			TEST_CONFIG,
 			PRINT_CONFIG,
+#if defined(_WIN32)
+			INSTALL_SERVICE,
+			REMOVE_SERVICE,
+#endif
 			UNKNOWN
 		};
 
