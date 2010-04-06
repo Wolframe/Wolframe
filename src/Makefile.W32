@@ -19,7 +19,7 @@ BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib"
 INCLUDE_LDFLAGS = \
 	$(SDK_LDFLAGS) $(BOOST_LDFLAGS) \
 	/LIBPATH:$(TOPDIR)\libs\boost\log \
-	/LIBPATH:$(OPENSSL_DIR)\lib
+	/LIBPATH:"$(OPENSSL_DIR)\lib"
 
 INCLUDE_LIBS = \
 	libeay32.lib ssleay32.lib
