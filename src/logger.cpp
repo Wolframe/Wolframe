@@ -136,8 +136,9 @@ void Logger::initialize( const ApplicationConfiguration& config )
 			keywords::use_impl = sinks::syslog::native,
 			keywords::custom_severity_mapping = mapping,
 			keywords::filter = flt::attr< LogLevel >( "Severity", nothrow ) >= Logger::str2LogLevel( config.syslogLogLevel ),
-			keywords::format = fmt::format( "%1%: %2%" )
-				% fmt::attr< LogLevel >( "Severity", std::nothrow )
+			keywords::format = fmt::format( "smerpd[%1%]: %2%" )
+				% fmt::attr< boost::log::aux::process::id >( "ProcessID", "%d", std::nothrow )
+//				% fmt::attr< LogLevel >( "Severity", std::nothrow )
 				% fmt::message( )
 		);
 	}
