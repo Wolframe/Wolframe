@@ -168,10 +168,13 @@ void Logger::initialize( const ApplicationConfiguration& config )
 
 	logging::add_common_attributes( );
 
-	LOG_DEBUG << "Initialized stderr logger with level '" <<  config.stderrLogLevel << "'";
-	LOG_DEBUG << "Initialized file logger to '" << config.logFile <<"' with level " <<  config.logFileLogLevel << "'";
-	LOG_DEBUG << "Initialized syslog logger to facility '" << config.syslogFacility
-	          << "' with level '" <<  config.syslogLogLevel << "'";
+	if( config.logToStderr )
+		LOG_DEBUG << "Initialized stderr logger with level '" <<  config.stderrLogLevel << "'";
+	if( config.logToFile )
+		LOG_DEBUG << "Initialized file logger to '" << config.logFile <<"' with level '" <<  config.logFileLogLevel << "'";
+	if( config.logToSyslog )
+		LOG_DEBUG << "Initialized syslog logger to facility '" << config.syslogFacility
+		          << "' with level '" <<  config.syslogLogLevel << "'";
 }
 
 } // namespace _SMERP
