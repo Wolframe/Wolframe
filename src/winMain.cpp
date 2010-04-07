@@ -6,6 +6,7 @@
 #include <string>
 #include <boost/asio.hpp>
 #include <boost/function.hpp>
+#include <boost/thread.hpp>
 #include <boost/bind.hpp>
 #include "appInstance.hpp"
 #include "commandLine.hpp"
@@ -95,66 +96,67 @@ static void remove_as_service( const _SMERP::ApplicationConfiguration& config )
 	(void)CloseServiceHandle( scm );
 }
 
+// state and helper variables for the service
 static SERVICE_STATUS_HANDLE serviceStatusHandle;
 static HANDLE serviceStopEvent = NULL;
+static SERVICE_STATUS serviceStatus;
+
+// helper function to report
+static void service_report_status(	DWORD currentState,
+					DWORD exitCode,
+					DWORD waitHint )
+{
+	serviceStatus.dwServiceType = SERVICE_WIN32_OWN_PROCESS;
+	serviceStatus.dwCurrentState = currentState;
+	serviceStatus.dwWin32ExitCode = exitCode;
+	serviceStatus.dwServiceSpecificExitCode = 0;
+	serviceStatus.dwWaitHint = waitHint;
+	serviceStatus.dwControlsAccepted = SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_SHUTDOWN;
+
+	switch( currentState ) {
+		case SERVICE_START_PENDING:
+// during startup we should not accept other events
+			serviceStatus.dwControlsAccepted = 0;
+			serviceStatus.dwCheckPoint++;
+			break;
+
+		case SERVICE_RUNNING:
+		case SERVICE_STOPPED:
+// reset checkpoint for drawing the progress bar in GUIs
+			serviceStatus.dwCheckPoint = 0;
+			break;
+
+		default:
+// increase the checkpoint ticks for the progress bar in GUIs
+			serviceStatus.dwCheckPoint++;
+			break;
+	}
+
+	if( !SetServiceStatus( serviceStatusHandle, &serviceStatus ) ) {
+		LOG_FATAL << "Unable to report service state " << currentState << " to SCM";
+		return;
+	}
+}
 
 // events from SCM and Windows comes here. Be responsive!!
-void WINAPI serviceCtrlHandler( DWORD control )
+void WINAPI serviceCtrlFunction( DWORD control )
 {
-	char errbuf[512];
-	BOOL res;
-
-	wolf_log( WOLF_LOG_DEBUG, WOLF_CATEGORY_SERVICE, WOLF_MSG_SERVICE_HANDLING_EVENT,
-		_( "service handler received status change '%s' (%d)" ),
-		wolf_service_control_to_str( control ),
-		control );
-
 	switch( control ) {
 		case SERVICE_CONTROL_STOP:
 		case SERVICE_CONTROL_SHUTDOWN:
-			wolf_service_report_status( SERVICE_STOP_PENDING, NO_ERROR, 1000 );
-			SetEvent( service_stop_event );
+			service_report_status( SERVICE_STOP_PENDING, NO_ERROR, DEFAULT_SERVICE_TIMEOUT );
+			LOG_INFO << "Stopping service";
+// signal stopping now
+			SetEvent( serviceStopEvent );
 			break;
 
 		case SERVICE_CONTROL_INTERROGATE:
-			/* fall through to send current status */
+			// see below
 			break;
 	}
 
-	/* report current state */
-	wolf_service_report_status( service_status.dwCurrentState, NO_ERROR, 1000 );
-}
-
-
-	/* signal that we are now up and running */
-	wolf_service_report_status( SERVICE_START_PENDING, NO_ERROR, 3000 );
-
-	/* register a stop event, the service control handler will send
-	 * the event. From now on we have a service event handler installed,
-	 * so if something goes wrong we can set the service state to
-	 * SERVICE_STOPPED and terminate gracefully.
-	 */
-	serviceStopEvent = CreateEvent( NULL, TRUE, FALSE, NULL );
-	if( serviceStopEvent == NULL ) {
-		
-	if( service_stop_event == NULL ) {
-		WOLF_LOG_GET_LAST_ERROR( GetLastError( ), errbuf, 512 );
-		wolf_log( WOLF_LOG_ERR, WOLF_CATEGORY_SERVICE, WOLF_MSG_SERVICE_CANT_CREATE_STOP_EVENT,
-			_( "Unable to create the stop event for service '%s': %s (%d)" ),
-			SERVICE_NAME, errbuf, GetLastError( ) );
-		wolf_service_report_status( SERVICE_STOPPED, NO_ERROR, 1000 );
-	}
-
-	wolf_service_report_status( SERVICE_RUNNING, NO_ERROR, 1000 );
-
-	/* now call the user-defined service main function */
-	service_service_main( argc, argv );
-
-	wolf_service_report_status( SERVICE_STOPPED, NO_ERROR, 1000 );
-
-	wolf_log_closelogtoeventlog( );
-
-	return;
+// report current status of service to SCM
+	service_report_status( serviceStatus.dwCurrentState, NO_ERROR, DEFAULT_SERVICE_TIMEOUT );
 }
 
 static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
@@ -174,7 +176,7 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 		_SMERP::Logger::initialize( config );
 
 // register the event callback where we get called by Windows and the SCM
-		serviceStatusHandle = RegisterServiceCtrlHandler( config.serviceName, serviceCtrlFunction );
+		serviceStatusHandle = RegisterServiceCtrlHandler( config.serviceName.c_str( ), serviceCtrlFunction );
 		if( serviceStatusHandle == 0 ) {
 			LOG_FATAL << "Unable to register service control handler function";
 			return;
@@ -186,7 +188,7 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 // register a stop event
 		serviceStopEvent = CreateEvent( NULL, TRUE, FALSE, NULL );
 		if( serviceStopEvent == NULL ) {
-			LOG_FATAL( "Unable to create the stop event for the termination of the service" );
+			LOG_FATAL << "Unable to create the stop event for the termination of the service";
 			service_report_status( SERVICE_STOPPED, NO_ERROR, DEFAULT_SERVICE_TIMEOUT );
 			return;
 		}
@@ -201,17 +203,33 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 		service_report_status( SERVICE_RUNNING, NO_ERROR, DEFAULT_SERVICE_TIMEOUT );
 
 // Sit and wait here for the stop event to happen, terminate then
+WAIT_FOR_STOP_EVENT:
+		DWORD res = WaitForSingleObject( serviceStopEvent, DEFAULT_SERVICE_TIMEOUT );
+		switch( res ) {
+			case WAIT_OBJECT_0:
+				s.stop( );
+// stop signal received, signal "going to stop" to SCM
+				service_report_status( SERVICE_STOP_PENDING, NO_ERROR, DEFAULT_SERVICE_TIMEOUT );
+				break;
 
+			case WAIT_TIMEOUT:
+// we could do something periodic here
+				goto WAIT_FOR_STOP_EVENT;
+
+			default:
+// error, stop now immediatelly
+				LOG_FATAL << "Waiting for stop event in service main failed, stopping now";
+				s.stop( );
+				service_report_status( SERVICE_STOPPED, NO_ERROR, DEFAULT_SERVICE_TIMEOUT );
+		}
 
 // signal the SCM that we are done
+		LOG_NOTICE << "Stopped service";
 		service_report_status( SERVICE_STOPPED, NO_ERROR, DEFAULT_SERVICE_TIMEOUT );
-
-	wolf_log_closelogtoeventlog( );
-
 	}
 	catch (std::exception& e)	{
-		LOG_FATAL << e.msg( );
-// any fatal error should signal the SCM that the service is down now
+		LOG_FATAL << e.what( );
+// any exception should signal the SCM that the service is down now
 		service_report_status( SERVICE_STOPPED, NO_ERROR, DEFAULT_SERVICE_TIMEOUT );
 	}
 }
