@@ -172,9 +172,15 @@ void Logger::initialize( const ApplicationConfiguration& config )
 		LOG_DEBUG << "Initialized stderr logger with level '" <<  config.stderrLogLevel << "'";
 	if( config.logToFile )
 		LOG_DEBUG << "Initialized file logger to '" << config.logFile <<"' with level '" <<  config.logFileLogLevel << "'";
+#if !defined( _WIN32 )
 	if( config.logToSyslog )
 		LOG_DEBUG << "Initialized syslog logger to facility '" << config.syslogFacility
 		          << "' with level '" <<  config.syslogLogLevel << "'";
+#else
+	if( config.logToEventlog )
+		LOG_DEBUG << "Initialized eventlog logger to log with name '" << config.eventlogLogName << "'"
+			  << " with log source '" <<  config.eventlogSource << "' and level '" <<  config.eventlogLogLevel << "'";
+#endif // !defined( _WIN32 )
 }
 
 } // namespace _SMERP

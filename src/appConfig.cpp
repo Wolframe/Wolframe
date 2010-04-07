@@ -72,13 +72,11 @@ namespace _SMERP {
 		else	{
 			logToStderr = true;
 			stderrLogLevel = cmdLine.debugLevel;
-			// Aba: why no logfile when run as daemon?
 			logToFile = false;
-			// Aba: not very logical, either both false or both true, I opt for false
-			logToSyslog = true;
+			logToSyslog = cfgFile.logToSyslog;
 			syslogFacility = cfgFile.syslogFacility;
 			syslogLogLevel = cfgFile.syslogLogLevel;
-			logToEventlog = false;
+			logToEventlog = cfgFile.logToEventlog;
 			eventlogLogName = cfgFile.eventlogLogName;
 			eventlogSource = cfgFile.eventlogSource;
 			eventlogLogLevel = cfgFile.eventlogLogLevel;
