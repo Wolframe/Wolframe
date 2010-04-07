@@ -27,10 +27,6 @@ static const short unsigned REVISION_NUMBER = 3;
 
 static const int DEFAULT_DEBUG_LEVEL = 3;
 
-static const char *DEFAULT_MAIN_CONFIG = "/etc/smerpd.conf";
-static const char *DEFAULT_USER_CONFIG = "~/smerpd.conf";
-static const char *DEFAULT_LOCAL_CONFIG = "./smerpd.conf";
-
 static const char *DEFAULT_SERVICE_NAME = "smerpd";
 
 boost::function0<void> consoleCtrlFunction;
@@ -98,6 +94,9 @@ static void remove_as_service( const _SMERP::ApplicationConfiguration& config )
 }
 
 static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
+// register the event callback where we get called by Windows and the SCM
+//service_status_handle = RegisterServiceCtrlHandler(
+//		SERVICE_NAME, wolf_service_ctrl_handler );
 }
 
 int _SMERP_winMain( int argc, char* argv[] )
@@ -136,9 +135,7 @@ int _SMERP_winMain( int argc, char* argv[] )
 		if ( !cmdLineCfg.cfgFile.empty() )	// if it has been specified than that's The One ! (and only)
 			configFile = cmdLineCfg.cfgFile.c_str();
 		else
-			configFile = _SMERP::CfgFileConfig::chooseFile( DEFAULT_MAIN_CONFIG,
-								       DEFAULT_USER_CONFIG,
-								       DEFAULT_LOCAL_CONFIG );
+			configFile = _SMERP::CfgFileConfig::fileFromRegistry( );
 		if ( configFile == NULL )	{	// there is no configuration file
 			std::cerr << "MOMOMO: no configuration file found !" << std::endl << std::endl;
 			return _SMERP::ErrorCodes::FAILURE;
@@ -189,24 +186,22 @@ int _SMERP_winMain( int argc, char* argv[] )
 		}
 		
 		// if started as service we dispatch the service thread now
-		if ( !config.foreground ) {
-			SERVICE_TABLE_ENTRY dispatch_table[2] =
-				{ { const_cast<char *>( config.serviceName.c_str( ) ), service_main },
-				{ NULL, NULL } };
+		SERVICE_TABLE_ENTRY dispatch_table[2] =
+			{ { const_cast<char *>( config.serviceName.c_str( ) ), service_main },
+			{ NULL, NULL } };
 
-			if( !StartServiceCtrlDispatcher( dispatch_table ) ) {
-				if( GetLastError( ) == ERROR_FAILED_SERVICE_CONTROLLER_CONNECT ) {
-					// not called as service, continue as console application
-					goto CONSOLE;
-				}
-				return _SMERP::ErrorCodes::FAILURE;
+		if( !StartServiceCtrlDispatcher( dispatch_table ) ) {
+			if( GetLastError( ) == ERROR_FAILED_SERVICE_CONTROLLER_CONNECT ) {
+				// not called as service, continue as console application
+				goto CONSOLE;
 			}
-				
-			// here we get if the service has been stopped
+			return _SMERP::ErrorCodes::FAILURE;
+		} else {
+			// here we get if the service has been stopped, so we terminate here
 			return _SMERP::ErrorCodes::OK;
 		}
+	
 CONSOLE:
-
 		// Create the final logger based on the configuration
 		_SMERP::Logger::initialize( config );
 		LOG_NOTICE << "Starting server";
