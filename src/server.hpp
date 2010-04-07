@@ -53,19 +53,19 @@ private:
 
 /// object variables
 
-	std::size_t			threadPoolSize_;// The number of threads that will call io_service::run().
-	unsigned long			timeout_duration_;// The duration for timeouts in milliseconds.
+	std::size_t				threadPoolSize_;// The number of threads that will call io_service::run().
+	unsigned long				timeout_duration_;// The duration for timeouts in milliseconds.
 
-	boost::asio::io_service		IOservice_;	// The io_service used to perform asynchronous operations.
-	boost::asio::io_service::strand	strand_;	// Strand to ensure the acceptor's handlers are not called concurrently.
-	boost::asio::ip::tcp::acceptor	*acceptor_;	// Acceptor(s) used to listen for incoming connections.
-	connection_ptr			newConnection_;	// The next connection to be accepted.
+	boost::asio::io_service			IOservice_;	// The io_service used to perform asynchronous operations.
+	boost::asio::io_service::strand		strand_;	// Strand to ensure the acceptor's handlers are not called concurrently.
+	std::vector< boost::asio::ip::tcp::acceptor* >	acceptor_;	// Acceptor(s) used to listen for incoming connections.
+	connection_ptr				newConnection_;	// The next connection to be accepted.
 
-	boost::asio::ssl::context	*SSLcontext_;	// SSL server context
-	boost::asio::ip::tcp::acceptor	*SSLacceptor_;	// Acceptor(s) used to listen for SSL incoming connections.
-	connection_ptr			newSSLconnection_;// The next connection to be accepted.
+	boost::asio::ssl::context		*SSLcontext_;	// SSL server context
+	std::vector< boost::asio::ip::tcp::acceptor* >	SSLacceptor_;	// Acceptor(s) used to listen for SSL incoming connections.
+	connection_ptr				newSSLconnection_;// The next connection to be accepted.
 
-	requestHandler			requestHandler_;// The handler for all incoming requests.
+	requestHandler				requestHandler_;// The handler for all incoming requests.
 };
 
 } // namespace _SMERP
