@@ -41,6 +41,7 @@ BOOL WINAPI consoleCtrlHandler(DWORD ctrlType)
 		case CTRL_C_EVENT:
 		case CTRL_BREAK_EVENT:
 		case CTRL_CLOSE_EVENT:
+		case CTRL_LOGOFF_EVENT:
 		case CTRL_SHUTDOWN_EVENT:
 			LOG_INFO << "Stopping server";
 			consoleCtrlFunction();
