@@ -27,6 +27,8 @@ static const short unsigned REVISION_NUMBER = 3;
 
 static const int DEFAULT_DEBUG_LEVEL = 3;
 
+static const int DEFAULT_SERVICE_TIMEOUT = 5000;
+
 static const char *DEFAULT_SERVICE_NAME = "smerpd";
 
 boost::function0<void> consoleCtrlFunction;
@@ -93,10 +95,125 @@ static void remove_as_service( const _SMERP::ApplicationConfiguration& config )
 	(void)CloseServiceHandle( scm );
 }
 
+static SERVICE_STATUS_HANDLE serviceStatusHandle;
+static HANDLE serviceStopEvent = NULL;
+
+// events from SCM and Windows comes here. Be responsive!!
+void WINAPI serviceCtrlHandler( DWORD control )
+{
+	char errbuf[512];
+	BOOL res;
+
+	wolf_log( WOLF_LOG_DEBUG, WOLF_CATEGORY_SERVICE, WOLF_MSG_SERVICE_HANDLING_EVENT,
+		_( "service handler received status change '%s' (%d)" ),
+		wolf_service_control_to_str( control ),
+		control );
+
+	switch( control ) {
+		case SERVICE_CONTROL_STOP:
+		case SERVICE_CONTROL_SHUTDOWN:
+			wolf_service_report_status( SERVICE_STOP_PENDING, NO_ERROR, 1000 );
+			SetEvent( service_stop_event );
+			break;
+
+		case SERVICE_CONTROL_INTERROGATE:
+			/* fall through to send current status */
+			break;
+	}
+
+	/* report current state */
+	wolf_service_report_status( service_status.dwCurrentState, NO_ERROR, 1000 );
+}
+
+
+	/* signal that we are now up and running */
+	wolf_service_report_status( SERVICE_START_PENDING, NO_ERROR, 3000 );
+
+	/* register a stop event, the service control handler will send
+	 * the event. From now on we have a service event handler installed,
+	 * so if something goes wrong we can set the service state to
+	 * SERVICE_STOPPED and terminate gracefully.
+	 */
+	serviceStopEvent = CreateEvent( NULL, TRUE, FALSE, NULL );
+	if( serviceStopEvent == NULL ) {
+		
+	if( service_stop_event == NULL ) {
+		WOLF_LOG_GET_LAST_ERROR( GetLastError( ), errbuf, 512 );
+		wolf_log( WOLF_LOG_ERR, WOLF_CATEGORY_SERVICE, WOLF_MSG_SERVICE_CANT_CREATE_STOP_EVENT,
+			_( "Unable to create the stop event for service '%s': %s (%d)" ),
+			SERVICE_NAME, errbuf, GetLastError( ) );
+		wolf_service_report_status( SERVICE_STOPPED, NO_ERROR, 1000 );
+	}
+
+	wolf_service_report_status( SERVICE_RUNNING, NO_ERROR, 1000 );
+
+	/* now call the user-defined service main function */
+	service_service_main( argc, argv );
+
+	wolf_service_report_status( SERVICE_STOPPED, NO_ERROR, 1000 );
+
+	wolf_log_closelogtoeventlog( );
+
+	return;
+}
+
 static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
+	try {
+// read configuration (from the location stored in the registry)
+		_SMERP::CmdLineConfig cmdLineCfg; // empty for a service
+		const char *configFile = _SMERP::CfgFileConfig::fileFromRegistry( );
+		_SMERP::CfgFileConfig cfgFileCfg;
+		if ( !cfgFileCfg.parse( configFile ))	{	// there was an error parsing the configuration file
+			// TODO: a hen and egg problem here with event logging and where to know where to log to
+			// LOG_FATAL << cmdLineCfg.errMsg();
+			return;
+		}
+		_SMERP::ApplicationConfiguration config( cmdLineCfg, cfgFileCfg );
+
+// Create the final logger based on the configuration
+		_SMERP::Logger::initialize( config );
+
 // register the event callback where we get called by Windows and the SCM
-//service_status_handle = RegisterServiceCtrlHandler(
-//		SERVICE_NAME, wolf_service_ctrl_handler );
+		serviceStatusHandle = RegisterServiceCtrlHandler( config.serviceName, serviceCtrlFunction );
+		if( serviceStatusHandle == 0 ) {
+			LOG_FATAL << "Unable to register service control handler function";
+			return;
+		}
+
+// send "we are starting up now" to the SCM
+		service_report_status( SERVICE_START_PENDING, NO_ERROR, DEFAULT_SERVICE_TIMEOUT );
+
+// register a stop event
+		serviceStopEvent = CreateEvent( NULL, TRUE, FALSE, NULL );
+		if( serviceStopEvent == NULL ) {
+			LOG_FATAL( "Unable to create the stop event for the termination of the service" );
+			service_report_status( SERVICE_STOPPED, NO_ERROR, DEFAULT_SERVICE_TIMEOUT );
+			return;
+		}
+
+		LOG_NOTICE << "Starting service";
+		
+// Run server in background thread(s).
+		_SMERP::server s( config );
+		boost::thread t( boost::bind( &_SMERP::server::run, &s ));
+
+// we are up and running now (hopefully), signal this to the SCM
+		service_report_status( SERVICE_RUNNING, NO_ERROR, DEFAULT_SERVICE_TIMEOUT );
+
+// Sit and wait here for the stop event to happen, terminate then
+
+
+// signal the SCM that we are done
+		service_report_status( SERVICE_STOPPED, NO_ERROR, DEFAULT_SERVICE_TIMEOUT );
+
+	wolf_log_closelogtoeventlog( );
+
+	}
+	catch (std::exception& e)	{
+		LOG_FATAL << e.msg( );
+// any fatal error should signal the SCM that the service is down now
+		service_report_status( SERVICE_STOPPED, NO_ERROR, DEFAULT_SERVICE_TIMEOUT );
+	}
 }
 
 int _SMERP_winMain( int argc, char* argv[] )
@@ -190,18 +307,20 @@ int _SMERP_winMain( int argc, char* argv[] )
 			{ { const_cast<char *>( config.serviceName.c_str( ) ), service_main },
 			{ NULL, NULL } };
 
-		if( !StartServiceCtrlDispatcher( dispatch_table ) ) {
-			if( GetLastError( ) == ERROR_FAILED_SERVICE_CONTROLLER_CONNECT ) {
-				// not called as service, continue as console application
-				goto CONSOLE;
+		// go into service mode now eventually 
+		if( !config.foreground ) {
+			if( !StartServiceCtrlDispatcher( dispatch_table ) ) {
+				if( GetLastError( ) == ERROR_FAILED_SERVICE_CONTROLLER_CONNECT ) {
+					// not called as service, continue as console application
+				} else {
+					return _SMERP::ErrorCodes::FAILURE;
+				}
+			} else {
+				// here we get if the service has been stopped, so we terminate here
+				return _SMERP::ErrorCodes::OK;
 			}
-			return _SMERP::ErrorCodes::FAILURE;
-		} else {
-			// here we get if the service has been stopped, so we terminate here
-			return _SMERP::ErrorCodes::OK;
 		}
 	
-CONSOLE:
 		// Create the final logger based on the configuration
 		_SMERP::Logger::initialize( config );
 		LOG_NOTICE << "Starting server";
