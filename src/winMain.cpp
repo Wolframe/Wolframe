@@ -177,6 +177,13 @@ int _SMERP_winMain( int argc, char* argv[] )
 			return _SMERP::ErrorCodes::OK;
 		}
 		
+		// if started as service we dispatch the service thread now
+		if ( argc < 2 ) {
+			
+			// here we get if the service has been stopped
+			return _SMERP::ErrorCodes::OK;
+		}
+
 		// Create the final logger based on the configuration
 		_SMERP::Logger::initialize( config );
 		LOG_NOTICE << "Starting server";

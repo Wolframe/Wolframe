@@ -48,11 +48,13 @@ SMERP configuration file
 	</timeout>
 
 	<!-- Unix daemon parameters -->
-	<user>nobody</user>
-	<group>nobody</group>
-	<pidFile>/tmp/smerpd.pid</pidFile>
+	<daemon>
+		<user>nobody</user>
+		<group>nobody</group>
+		<pidFile>/tmp/smerpd.pid</pidFile>
+	</daemon>
 	
-	<!-- Windows service parameters -->
+	<!-- Windows service parameters (for sevice registration) -->
 	<service>
 		<name>smerp</name>
 		<displayName>Smerp Daemon</displayName>

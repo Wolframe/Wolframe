@@ -147,9 +147,9 @@ namespace _SMERP {
 		threads = pt.get<unsigned short>( "server.threads", 4 );
 		maxClients = pt.get<unsigned short>( "server.maxClients", 256 );
 
-		user = pt.get<std::string>( "server.user", std::string() );
-		group = pt.get<std::string>( "server.group", std::string() );
-		pidFile = pt.get<std::string>( "server.pidFile", std::string( ) );
+		user = pt.get<std::string>( "server.daemon.user", std::string() );
+		group = pt.get<std::string>( "server.daemon.group", std::string() );
+		pidFile = pt.get<std::string>( "server.daemon.pidFile", std::string( ) );
 
 		serviceName = pt.get<std::string>( "server.service.name", DEFAULT_SERVICE_NAME );
 		serviceDisplayName = pt.get<std::string>( "server.service.displayName", DEFAULT_SERVICE_DISPLAY_NAME );
