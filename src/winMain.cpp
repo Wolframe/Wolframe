@@ -71,6 +71,8 @@ static void install_as_service( const _SMERP::ApplicationConfiguration& config )
 	descr.lpDescription = (LPTSTR)config.serviceDescription.c_str( );
 	(void)ChangeServiceConfig2( service, SERVICE_CONFIG_DESCRIPTION, &descr );
 
+// TODO: add location of the configuration file to the registry
+
 // free handles
 	(void)CloseServiceHandle( service );
 	(void)CloseServiceHandle( scm );
@@ -87,9 +89,14 @@ static void remove_as_service( const _SMERP::ApplicationConfiguration& config )
 // remove the service
 	(void)DeleteService( service );
 
+// TODO: remove location of the configuration file to the registry
+
 // free handles
 	(void)CloseServiceHandle( service );
 	(void)CloseServiceHandle( scm );
+}
+
+static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 }
 
 int _SMERP_winMain( int argc, char* argv[] )
@@ -98,6 +105,9 @@ int _SMERP_winMain( int argc, char* argv[] )
 		_SMERP::AppInstance	app( MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER );
 		_SMERP::CmdLineConfig	cmdLineCfg;
 		const char		*configFile;
+
+// TODO: service can't read command line options, read the only relevant one (the absolute
+// path of the configuration file from the registry
 
 		if ( !cmdLineCfg.parse( argc, argv ))	{	// there was an error parsing the command line
 			std::cerr << cmdLineCfg.errMsg() << std::endl << std::endl;
@@ -178,11 +188,23 @@ int _SMERP_winMain( int argc, char* argv[] )
 		}
 		
 		// if started as service we dispatch the service thread now
-		if ( argc < 2 ) {
-			
+		if ( !config.foreground ) {
+			SERVICE_TABLE_ENTRY dispatch_table[2] =
+				{ { const_cast<char *>( config.serviceName.c_str( ) ), service_main },
+				{ NULL, NULL } };
+
+			if( !StartServiceCtrlDispatcher( dispatch_table ) ) {
+				if( GetLastError( ) == ERROR_FAILED_SERVICE_CONTROLLER_CONNECT ) {
+					// not called as service, continue as console application
+					goto CONSOLE;
+				}
+				return _SMERP::ErrorCodes::FAILURE;
+			}
+				
 			// here we get if the service has been stopped
 			return _SMERP::ErrorCodes::OK;
 		}
+CONSOLE:
 
 		// Create the final logger based on the configuration
 		_SMERP::Logger::initialize( config );
