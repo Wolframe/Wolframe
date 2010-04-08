@@ -19,7 +19,6 @@ namespace _SMERP {
 		std::string	configFile;
 // from command line
 		bool		foreground;
-		unsigned short	debug;
 // daemon configuration
 		std::string	user;
 		std::string	group;

@@ -87,7 +87,6 @@ namespace _SMERP {
 		os << "Configuration file: " << configFile << std::endl;
 		// from command line
 		os << "Run in foreground: " << (foreground ? "yes" : "no") << std::endl;
-		os << "   Debug level: " << debug;
 		if ( !foreground )
 			os << " (inactive)" << std::endl;
 		else
