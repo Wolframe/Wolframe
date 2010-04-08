@@ -32,9 +32,9 @@ SMERP configuration file
 
 <!-- SSL parameters: required if listenSSL are defined -->
 	<SSL>
-		<certificate>../tests/SSL/smerpd.crt</certificate>	<!-- Server certificate file (PEM) -->
-		<key>../tests/SSL/smerpd.key</key>			<!-- Server key file (PEM) -->
-		<CAdirectory>../tests/SSL/CAdir</CAdirectory>		<!-- Directory holding CA certificate files -->
+		<certificate>C:/Cygwin/home/Administrator/SMERP/tests/SSL/smerpd.crt</certificate>	<!-- Server certificate file (PEM) -->
+		<key>C:/Cygwin/home/Administrator/SMERP/tests/SSL/smerpd.key</key>			<!-- Server key file (PEM) -->
+		<CAdirectory>C:/Cygwin/home/Administrator/SMERP/tests/SSL/CAdir</CAdirectory>		<!-- Directory holding CA certificate files -->
 		<CAchainFile></CAchainFile>				<!-- SSL CA chain file -->
 		<verify>no</verify>					<!-- Require and verify client certificate -->
 	</SSL>
@@ -98,6 +98,6 @@ SMERP configuration file
 	<eventlog>
 		<name>Application</name>
 		<source>smerpd</source>
-		<level>NOTICE</level>
+		<level>DEBUG</level>
 	</eventlog>
 </logging>
