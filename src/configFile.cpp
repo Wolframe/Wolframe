@@ -24,6 +24,10 @@
 static const unsigned short	DEFAULT_PORT = 7660;
 static const unsigned short	SSL_DEFAULT_PORT = 7660;
 
+static const char*		DEFAULT_SERVICE_NAME = "smerp";
+static const char*		DEFAULT_SERVICE_DISPLAY_NAME = "Smerp Daemon";
+static const char*		DEFAULT_SERVICE_DESCRIPTION = "a daemon for smerping";
+
 static boost::filesystem::path resolvePath(const boost::filesystem::path& p)
 {
 	boost::filesystem::path result;
@@ -68,6 +72,12 @@ namespace _SMERP {
 		return NULL;
 	}
 
+#if defined(_WIN32)
+	const char *CfgFileConfig::fileFromRegistry( ) {
+		// TODO: implement using GetKeyRegEx and friends
+		return "C:\\Cygwin\\home\\Administrator\\SMERP\\src\\smerpd.xml";
+	}
+#endif
 
 	CfgFileConfig::CfgFileConfig()
 	{
@@ -142,9 +152,14 @@ namespace _SMERP {
 
 		threads = pt.get<unsigned short>( "server.threads", 4 );
 		maxClients = pt.get<unsigned short>( "server.maxClients", 256 );
-		user = pt.get<std::string>( "server.user", std::string() );
-		group = pt.get<std::string>( "server.group", std::string() );
-		pidFile = pt.get<std::string>( "server.pidFile", std::string( ) );
+
+		user = pt.get<std::string>( "server.daemon.user", std::string() );
+		group = pt.get<std::string>( "server.daemon.group", std::string() );
+		pidFile = pt.get<std::string>( "server.daemon.pidFile", std::string( ) );
+
+		serviceName = pt.get<std::string>( "server.service.name", DEFAULT_SERVICE_NAME );
+		serviceDisplayName = pt.get<std::string>( "server.service.displayName", DEFAULT_SERVICE_DISPLAY_NAME );
+		serviceDescription = pt.get<std::string>( "server.service.description", DEFAULT_SERVICE_DESCRIPTION );
 
 		idleTimeout = pt.get<unsigned>( "server.timeout.idle", 900 );
 		requestTimeout = pt.get<unsigned>( "server.timeout.request", 30 );

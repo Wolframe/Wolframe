@@ -28,6 +28,10 @@ namespace _SMERP {
 			group = cfgFile.group;
 
 		pidFile = cfgFile.pidFile;
+		serviceName = cfgFile.serviceName;
+		serviceDisplayName = cfgFile.serviceDisplayName;
+		serviceDescription = cfgFile.serviceDescription;
+
 		threads = cfgFile.threads;
 		maxClients = cfgFile.maxClients;
 
@@ -68,13 +72,11 @@ namespace _SMERP {
 		else	{
 			logToStderr = true;
 			stderrLogLevel = cmdLine.debugLevel;
-			// Aba: why no logfile when run as daemon?
 			logToFile = false;
-			// Aba: not very logical, either both false or both true, I opt for false
-			logToSyslog = true;
+			logToSyslog = cfgFile.logToSyslog;
 			syslogFacility = cfgFile.syslogFacility;
 			syslogLogLevel = cfgFile.syslogLogLevel;
-			logToEventlog = false;
+			logToEventlog = cfgFile.logToEventlog;
 			eventlogLogName = cfgFile.eventlogLogName;
 			eventlogSource = cfgFile.eventlogSource;
 			eventlogLogLevel = cfgFile.eventlogLogLevel;
@@ -92,11 +94,22 @@ namespace _SMERP {
 		else
 			os << std::endl;
 
+// Unix daemon
+#if !defined(_WIN32)
 		os << "Run as " << (user.empty() ? "(not specified)" : user) << ":"
 				<< (group.empty() ? "(not specified)" : group) << std::endl;
 		os << "PID file: " << pidFile << std::endl;
 		os << "Number of threads: " << threads << std::endl;
 		os << "Maximum number of clients: " << maxClients << std::endl;
+#endif
+
+// Windows service
+#if defined(_WIN32)
+		os << "When run as service" << std::endl
+			<< "  Name: " << serviceName << std::endl
+			<< "  Displayed name: " << serviceDisplayName << std::endl
+			<< "  Description: " << serviceDescription << std::endl;
+#endif
 
 		os << "Network" << std::endl;
 		if ( address.size() > 0 )	{

@@ -12,6 +12,13 @@ namespace _SMERP	{
 		std::string	user;
 		std::string	group;
 		std::string	pidFile;
+
+// service configuration
+		std::string	serviceName;
+		std::string	serviceDisplayName;
+		std::string	serviceDescription;
+
+// server configuration
 		unsigned short	threads;
 		unsigned short	maxClients;
 // network configuration
@@ -56,6 +63,9 @@ namespace _SMERP	{
 		static const char* chooseFile( const char *globalFile,
 						const char *userFile,
 						const char *localFile );
+#if defined(_WIN32)
+		static const char *fileFromRegistry( );
+#endif
 
 		bool parse( const char *filename );
 		std::string errMsg( void )	{ return errMsg_; };
