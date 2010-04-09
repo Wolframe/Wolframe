@@ -282,6 +282,25 @@ int _SMERP_winMain( int argc, char* argv[] )
 // build the application configuration
 		_SMERP::ApplicationConfiguration config( cmdLineCfg, cfgFileCfg);
 
+		// go into service mode now eventually 
+		if( !config.foreground ) {
+		// if started as service we dispatch the service thread now
+			SERVICE_TABLE_ENTRY dispatch_table[2] =
+				{ { const_cast<char *>( config.serviceName.c_str( ) ), service_main },
+				{ NULL, NULL } };
+
+			if( !StartServiceCtrlDispatcher( dispatch_table ) ) {
+				if( GetLastError( ) == ERROR_FAILED_SERVICE_CONTROLLER_CONNECT ) {
+					// not called as service, continue as console application
+				} else {
+					return _SMERP::ErrorCodes::FAILURE;
+				}
+			} else {
+				// here we get if the service has been stopped, so we terminate here
+				return _SMERP::ErrorCodes::OK;
+			}
+		}
+	
 // Check the configuration
 		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::CHECK_CONFIG )	{
 			if ( config.check() )	{
@@ -317,25 +336,6 @@ int _SMERP_winMain( int argc, char* argv[] )
 			return _SMERP::ErrorCodes::OK;
 		}
 		
-		// go into service mode now eventually 
-		if( !config.foreground ) {
-		// if started as service we dispatch the service thread now
-			SERVICE_TABLE_ENTRY dispatch_table[2] =
-				{ { const_cast<char *>( config.serviceName.c_str( ) ), service_main },
-				{ NULL, NULL } };
-
-			if( !StartServiceCtrlDispatcher( dispatch_table ) ) {
-				if( GetLastError( ) == ERROR_FAILED_SERVICE_CONTROLLER_CONNECT ) {
-					// not called as service, continue as console application
-				} else {
-					return _SMERP::ErrorCodes::FAILURE;
-				}
-			} else {
-				// here we get if the service has been stopped, so we terminate here
-				return _SMERP::ErrorCodes::OK;
-			}
-		}
-	
 		// Create the final logger based on the configuration
 		_SMERP::Logger::initialize( config );
 		LOG_NOTICE << "Starting server";
