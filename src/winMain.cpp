@@ -241,9 +241,6 @@ int _SMERP_winMain( int argc, char* argv[] )
 		_SMERP::CmdLineConfig	cmdLineCfg;
 		const char		*configFile;
 
-// TODO: service can't read command line options, read the only relevant one (the absolute
-// path of the configuration file from the registry
-
 		if ( !cmdLineCfg.parse( argc, argv ))	{	// there was an error parsing the command line
 			std::cerr << cmdLineCfg.errMsg() << std::endl << std::endl;
 			cmdLineCfg.usage( std::cerr );
@@ -320,13 +317,13 @@ int _SMERP_winMain( int argc, char* argv[] )
 			return _SMERP::ErrorCodes::OK;
 		}
 		
-		// if started as service we dispatch the service thread now
-		SERVICE_TABLE_ENTRY dispatch_table[2] =
-			{ { const_cast<char *>( config.serviceName.c_str( ) ), service_main },
-			{ NULL, NULL } };
-
 		// go into service mode now eventually 
 		if( !config.foreground ) {
+		// if started as service we dispatch the service thread now
+			SERVICE_TABLE_ENTRY dispatch_table[2] =
+				{ { const_cast<char *>( config.serviceName.c_str( ) ), service_main },
+				{ NULL, NULL } };
+
 			if( !StartServiceCtrlDispatcher( dispatch_table ) ) {
 				if( GetLastError( ) == ERROR_FAILED_SERVICE_CONTROLLER_CONNECT ) {
 					// not called as service, continue as console application

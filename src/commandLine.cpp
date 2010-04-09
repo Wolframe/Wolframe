@@ -11,7 +11,7 @@ namespace prgOpts = boost::program_options;
 
 namespace _SMERP {
 
-	static const unsigned short DEFAULT_DEBUG_LEVEL = 2;
+	static const std::string DEFAULT_DEBUG_LEVEL = "INFO";
 
 	CmdLineConfig::CmdLineConfig()
 	{
