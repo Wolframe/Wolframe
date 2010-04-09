@@ -14,7 +14,6 @@ namespace _SMERP {
 class Logger {
 public:
 	enum LogLevel {
-		_SMERP_ALWAYS,		/// always log
 		_SMERP_DATA,		/// log everything, including data
 		_SMERP_TRACE,		/// trace functions calls
 		_SMERP_DEBUG,		/// log operations
@@ -26,7 +25,7 @@ public:
 		_SMERP_CRITICAL,
 		_SMERP_ALERT,
 		_SMERP_FATAL,
-		_SMERP_NEVER		/// log this only under special conditions
+		_SMERP_UNDEFINED	/// log this only under special conditions
 	};
 
 	static LogLevel str2LogLevel( const std::string s );

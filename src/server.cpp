@@ -19,14 +19,16 @@ server::server( const ApplicationConfiguration& config )
 	strand_( IOservice_ ),
     requestHandler_()
 {
+	boost::system::error_code	ec;
+
 	for ( size_t i = 0; i < config.address.size(); i++ )	{
 		boost::asio::ip::tcp::acceptor* acptr = new boost::asio::ip::tcp::acceptor( IOservice_ );
 
 		// Open the acceptor(s) with the option to reuse the address (i.e. SO_REUSEADDR).
 		boost::asio::ip::tcp::resolver resolver( IOservice_ );
-		boost::asio::ip::tcp::resolver::query query( config.address[0].first, "");
+		boost::asio::ip::tcp::resolver::query query( config.address[i].first, "");
 		boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve( query );
-		endpoint.port( config.address[0].second );
+		endpoint.port( config.address[i].second );
 
 		newConnection_ = connection_ptr( new connection( IOservice_, requestHandler_, timeout_duration_ ));
 
@@ -50,14 +52,26 @@ server::server( const ApplicationConfiguration& config )
 					  | boost::asio::ssl::context::single_dh_use
 					  );
 		SSLcontext_->set_password_callback( boost::bind( &server::getPassword, this ));
-		SSLcontext_->use_certificate_chain_file( config.SSLcertificate );
-		SSLcontext_->use_private_key_file( config.SSLkey, boost::asio::ssl::context::pem );
+		if ( SSLcontext_->use_certificate_chain_file( config.SSLcertificate, ec ) != 0 )	{
+			LOG_FATAL << ec.message() << " loading SSL certificate file: " << config.SSLcertificate;
+			exit( 1 );
+		}
+		if ( SSLcontext_->use_private_key_file( config.SSLkey, boost::asio::ssl::context::pem, ec ) != 0 )	{
+			LOG_FATAL << ec.message() << " loading SSL key file: " << config.SSLkey;
+			exit( 1 );
+		}
 		//		SSLcontext_->use_tmp_dh_file( "dh4096.pem" );
 		if ( config.SSLverify )	{
 			if ( ! config.SSLCAchainFile.empty() )
-				SSLcontext_->load_verify_file( config.SSLCAchainFile );
+				if ( SSLcontext_->load_verify_file( config.SSLCAchainFile, ec ) != 0 )	{
+					LOG_FATAL << ec.message() << " loading SSL CA chain file: " << config.SSLCAchainFile;
+					exit( 1 );
+				}
 			if ( ! config.SSLCAdirectory.empty() )
-				SSLcontext_->add_verify_path( config.SSLCAdirectory );
+				if ( SSLcontext_->add_verify_path( config.SSLCAdirectory, ec ) != 0 )	{
+					LOG_FATAL << ec.message() << " setting CA directory: " << config.SSLCAdirectory;
+					exit( 1 );
+				}
 
 			SSLcontext_->set_verify_mode( boost::asio::ssl::context::verify_peer |
 						      boost::asio::ssl::context::verify_fail_if_no_peer_cert );
@@ -75,9 +89,9 @@ server::server( const ApplicationConfiguration& config )
 			boost::asio::ip::tcp::acceptor* acptr = new boost::asio::ip::tcp::acceptor( IOservice_ );
 			// Open the acceptor(s) with the option to reuse the address (i.e. SO_REUSEADDR).
 			boost::asio::ip::tcp::resolver resolver( IOservice_ );
-			boost::asio::ip::tcp::resolver::query query( config.SSLaddress[0].first, "");
+			boost::asio::ip::tcp::resolver::query query( config.SSLaddress[i].first, "");
 			boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve( query );
-			endpoint.port( config.SSLaddress[0].second );
+			endpoint.port( config.SSLaddress[i].second );
 			acptr->open( endpoint.protocol() );
 			acptr->set_option( boost::asio::ip::tcp::acceptor::reuse_address( true ));
 			acptr->bind( endpoint );

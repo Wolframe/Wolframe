@@ -32,8 +32,8 @@ template< typename CharT, typename TraitsT >
 inline std::basic_ostream< CharT, TraitsT > &operator<< ( std::basic_ostream< CharT, TraitsT >& s, Logger::LogLevel l )
 {
 	static const char *const str[] = {
-		"ALWAYS", "DATA", "TRACE", "DEBUG", "INFO", "NOTICE",
-		"WARNING", "ERROR", "SEVERE", "CRITICAL", "ALERT", "FATAL", "NEVER" };
+		"DATA", "TRACE", "DEBUG", "INFO", "NOTICE", "WARNING",
+		"ERROR", "SEVERE", "CRITICAL", "ALERT", "FATAL" };
 	if( static_cast< size_t >( l ) < ( sizeof( str ) / sizeof( *str ) ) ) {
 		s << str[l];
 	} else {
@@ -43,8 +43,7 @@ inline std::basic_ostream< CharT, TraitsT > &operator<< ( std::basic_ostream< Ch
 }
 
 Logger::LogLevel Logger::str2LogLevel( const std::string s ) {
-	if( s == "ALWAYS" )		return Logger::_SMERP_ALWAYS;
-	else if( s == "DATA" )		return Logger::_SMERP_DATA;
+	if( s == "DATA" )		return Logger::_SMERP_DATA;
 	else if( s == "TRACE" )		return Logger::_SMERP_TRACE;
 	else if( s == "DEBUG" )		return Logger::_SMERP_DEBUG;
 	else if( s == "INFO" )		return Logger::_SMERP_INFO;
@@ -55,8 +54,7 @@ Logger::LogLevel Logger::str2LogLevel( const std::string s ) {
 	else if( s == "CRITICAL" )	return Logger::_SMERP_CRITICAL;
 	else if( s == "ALERT" )		return Logger::_SMERP_ALERT;
 	else if( s == "FATAL" )		return Logger::_SMERP_FATAL;
-	else if( s == "NEVER" )		return Logger::_SMERP_NEVER;
-	else				return Logger::_SMERP_NEVER;
+	else				return Logger::_SMERP_UNDEFINED;
 }
 
 #if !defined( _WIN32 )

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SMERP\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-04-01 14:59+0200\n"
-"PO-Revision-Date: 2010-03-21 02:07+0100\n"
+"POT-Creation-Date: 2010-04-08 18:42+0300\n"
+"PO-Revision-Date: 2010-04-08 18:40+0200\n"
 "Last-Translator: Mihai Barbos <mihai.barbos@gmail.com>\n"
 "Language-Team: Romanian\n"
 "MIME-Version: 1.0\n"
@@ -22,12 +22,12 @@ msgstr ""
 
 #: src/getPassword.cpp:21
 msgid "Enter your password:"
-msgstr ""
+msgstr "Introduceți parola:"
 
-#: src/posixMain.cpp:77
+#: src/posixMain.cpp:84
 msgid "BOBOBO version "
 msgstr "RO BOBOBO versiunea "
 
-#: src/posixMain.cpp:94
+#: src/posixMain.cpp:101
 msgid "MOMOMO: no configuration file found !"
 msgstr "RO MOMOMO: nu am găsit nici un fișier de configurare !"
