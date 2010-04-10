@@ -73,13 +73,8 @@ namespace _SMERP {
 			logToStderr = true;
 			stderrLogLevel = cmdLine.debugLevel;
 			logToFile = false;
-			logToSyslog = cfgFile.logToSyslog;
-			syslogFacility = cfgFile.syslogFacility;
-			syslogLogLevel = cfgFile.syslogLogLevel;
-			logToEventlog = cfgFile.logToEventlog;
-			eventlogLogName = cfgFile.eventlogLogName;
-			eventlogSource = cfgFile.eventlogSource;
-			eventlogLogLevel = cfgFile.eventlogLogLevel;
+			logToSyslog = false;
+			logToEventlog = false;
 		}
 	}
 
