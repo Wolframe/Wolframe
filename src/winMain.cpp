@@ -58,20 +58,27 @@ static void install_as_service( const _SMERP::ApplicationConfiguration& config )
 // retrieve absolute path of binary
 	TCHAR binary_path[MAX_PATH];
 	DWORD res = GetModuleFileName( NULL, binary_path, MAX_PATH );
+
+// add quotation marks around the 'ImagePath' (because of spaces). No arguments as
+// we loose them anyway after dispatching the service control thread.
+	std::ostringstream os;
+	os << "\"" << binary_path << "\" -c \"" << config.configFile << "\"";
 	
 // create the service
 	SC_HANDLE service = CreateService( scm,
 		config.serviceName.c_str( ), config.serviceDisplayName.c_str( ),
 		SERVICE_ALL_ACCESS, SERVICE_WIN32_OWN_PROCESS,
 		SERVICE_DEMAND_START, SERVICE_ERROR_NORMAL,
-		binary_path, NULL, NULL, NULL, NULL, NULL );
+		os.str( ).c_str( ), NULL, NULL, NULL, NULL, NULL );
 
 // set description of the service
 	SERVICE_DESCRIPTION descr;
 	descr.lpDescription = (LPTSTR)config.serviceDescription.c_str( );
 	(void)ChangeServiceConfig2( service, SERVICE_CONFIG_DESCRIPTION, &descr );
 
-// TODO: add location of the configuration file to the registry
+// add location of the configuration file to the registry, only, where?
+//	_T("SYSTEM\\CurrentControlSet\\Services\\EventLog\\Application\\");
+
 
 // free handles
 	(void)CloseServiceHandle( service );
@@ -159,11 +166,14 @@ void WINAPI serviceCtrlFunction( DWORD control )
 	service_report_status( serviceStatus.dwCurrentState, NO_ERROR, DEFAULT_SERVICE_TIMEOUT );
 }
 
+// passing the location of the configuration over an unsynchronized variable, let's see if this works
+static std::string theConfig;
+
 static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 	try {
 // read configuration (from the location stored in the registry)
 		_SMERP::CmdLineConfig cmdLineCfg; // empty for a service
-		const char *configFile = _SMERP::CfgFileConfig::fileFromRegistry( );
+		const char *configFile = theConfig.c_str( ); // configuration comes from main thread
 		_SMERP::CfgFileConfig cfgFileCfg;
 		if ( !cfgFileCfg.parse( configFile ))	{	// there was an error parsing the configuration file
 			// TODO: a hen and egg problem here with event logging and where to know where to log to
@@ -174,6 +184,8 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 
 // Create the final logger based on the configuration
 		_SMERP::Logger::initialize( config );
+
+LOG_DEBUG << "config from main thread for service thread: " << theConfig;
 
 // register the event callback where we get called by Windows and the SCM
 		serviceStatusHandle = RegisterServiceCtrlHandler( config.serviceName.c_str( ), serviceCtrlFunction );
@@ -239,7 +251,7 @@ int _SMERP_winMain( int argc, char* argv[] )
 	try	{
 		_SMERP::AppInstance	app( MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER );
 		_SMERP::CmdLineConfig	cmdLineCfg;
-		const char		*configFile;
+		const char		*configFile = NULL;
 
 		if ( !cmdLineCfg.parse( argc, argv ))	{	// there was an error parsing the command line
 			std::cerr << cmdLineCfg.errMsg() << std::endl << std::endl;
@@ -266,8 +278,6 @@ int _SMERP_winMain( int argc, char* argv[] )
 // decide what configuration file to use
 		if ( !cmdLineCfg.cfgFile.empty() )	// if it has been specified than that's The One ! (and only)
 			configFile = cmdLineCfg.cfgFile.c_str();
-		else
-			configFile = _SMERP::CfgFileConfig::fileFromRegistry( );
 		if ( configFile == NULL )	{	// there is no configuration file
 			std::cerr << "MOMOMO: no configuration file found !" << std::endl << std::endl;
 			return _SMERP::ErrorCodes::FAILURE;
@@ -319,16 +329,21 @@ int _SMERP_winMain( int argc, char* argv[] )
 
 		// go into service mode now eventually 
 		if( !config.foreground ) {
-		// if started as service we dispatch the service thread now
+			// if started as service we dispatch the service thread now
 			SERVICE_TABLE_ENTRY dispatch_table[2] =
 				{ { const_cast<char *>( config.serviceName.c_str( ) ), service_main },
 				{ NULL, NULL } };
+			
+			// pass configuration to service main
+			theConfig = config.configFile;
 
 			if( !StartServiceCtrlDispatcher( dispatch_table ) ) {
 				if( GetLastError( ) == ERROR_FAILED_SERVICE_CONTROLLER_CONNECT ) {
 					// not called as service, continue as console application
 					config.foreground = true;
 				} else {
+					_SMERP::Logger::initialize( config );
+					LOG_FATAL << "Unable to dispatch service control dispatcher";
 					return _SMERP::ErrorCodes::FAILURE;
 				}
 			} else {

@@ -63,9 +63,6 @@ namespace _SMERP	{
 		static const char* chooseFile( const char *globalFile,
 						const char *userFile,
 						const char *localFile );
-#if defined(_WIN32)
-		static const char *fileFromRegistry( );
-#endif
 
 		bool parse( const char *filename );
 		std::string errMsg( void )	{ return errMsg_; };

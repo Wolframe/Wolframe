@@ -72,13 +72,6 @@ namespace _SMERP {
 		return NULL;
 	}
 
-#if defined(_WIN32)
-	const char *CfgFileConfig::fileFromRegistry( ) {
-		// TODO: implement using GetKeyRegEx and friends
-		return "C:\\Cygwin\\home\\Administrator\\SMERP\\src\\smerpd.xml";
-	}
-#endif
-
 	CfgFileConfig::CfgFileConfig()
 	{
 	}
