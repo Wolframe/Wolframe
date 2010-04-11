@@ -169,7 +169,7 @@ static std::string theConfig;
 
 static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 	try {
-// read configuration (from the location stored in the registry)
+// read configuration (from the location passed in the command line arguments of the main, not the service_main)
 		_SMERP::CmdLineConfig cmdLineCfg; // empty for a service
 		const char *configFile = theConfig.c_str( ); // configuration comes from main thread
 		_SMERP::CfgFileConfig cfgFileCfg;
@@ -180,7 +180,7 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 		}
 		_SMERP::ApplicationConfiguration config( cmdLineCfg, cfgFileCfg );
 
-// Create the final logger based on the configuration
+// create the final logger based on the configuration
 		_SMERP::Logger::initialize( config );
 
 LOG_DEBUG << "config from main thread for service thread: " << theConfig;
@@ -205,7 +205,7 @@ LOG_DEBUG << "config from main thread for service thread: " << theConfig;
 
 		LOG_NOTICE << "Starting service";
 		
-// Run server in background thread(s).
+// run server in background thread(s).
 		_SMERP::server s( config );
 		boost::thread t( boost::bind( &_SMERP::server::run, &s ));
 
