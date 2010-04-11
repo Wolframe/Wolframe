@@ -96,8 +96,6 @@ static void remove_as_service( const _SMERP::ApplicationConfiguration& config )
 // remove the service
 	(void)DeleteService( service );
 
-// TODO: remove location of the configuration file to the registry
-
 // free handles
 	(void)CloseServiceHandle( service );
 	(void)CloseServiceHandle( scm );
