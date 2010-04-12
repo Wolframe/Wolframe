@@ -17,6 +17,7 @@ namespace _SMERP	{
 #if defined(_WIN32)
 			INSTALL_SERVICE,
 			REMOVE_SERVICE,
+			RUN_SERVICE,
 #endif
 			UNKNOWN
 		};

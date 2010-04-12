@@ -26,6 +26,7 @@ namespace _SMERP {
 // Windows Service Commands
 				( "install", "install as Windows service" )
 				( "remove", "remove registered Windows service" )
+				( "service", "run the service (don't call directly!)" )
 #endif
 // Options
 				( "foreground,f", "run in foreground (logs only on stderr)" )
@@ -38,7 +39,11 @@ namespace _SMERP {
 #endif
 				;
 		command = DEFAULT;
+#if defined(_WIN32)
+		foreground = true;
+#else
 		foreground = false;
+#endif
 		debugLevel = DEFAULT_DEBUG_LEVEL;
 	}
 
@@ -110,6 +115,14 @@ namespace _SMERP {
 					return false;
 				}
 			}			
+			
+			if ( clMap.count( "service" ))	{
+				if ( command == DEFAULT )
+					command = RUN_SERVICE;
+				else	{
+					errMsg_ = "--service can not be specified together with -h|-p|-t|-T";
+				}
+			}
 #endif
 
 			if ( clMap.count( "foreground" ))
