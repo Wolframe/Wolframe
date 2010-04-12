@@ -9,16 +9,17 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <vector>
 #include <string>
 
-#if defined(_WIN32)		// we are on Windows
-#include <string.h>
-#define strcasecmp(a, b)	_stricmp((a), (b))
-#else
-#include <strings.h>
-#endif
+//#if defined(_WIN32)		// we are on Windows
+//#include <string.h>
+//#define strcasecmp(a, b)	_stricmp((a), (b))
+//#else
+//#include <strings.h>
+//#endif
 
 
 static const unsigned short	DEFAULT_PORT = 7660;
@@ -170,11 +171,15 @@ namespace _SMERP {
 							boost::filesystem::path( file ).branch_path() ).string();
 		SSLCAchainFile = boost::filesystem::complete(
 							pt.get<std::string>( "server.SSL.CAchainFile", std::string() ),
-							boost::filesystem::path( file ).branch_path() ).string();		tmpStr = pt.get<std::string>( "server.SSL.verify", std::string() );
-		if ( strcasecmp( tmpStr.c_str(), "no" )	&& strcasecmp( tmpStr.c_str(), "false" ) && strcasecmp( tmpStr.c_str(), "0" ))
-			SSLverify = true;
-		else
+							boost::filesystem::path( file ).branch_path() ).string();
+
+		tmpStr = pt.get<std::string>( "server.SSL.verify", std::string() );
+		boost::to_upper( tmpStr );
+		boost::trim( tmpStr );
+		if ( tmpStr == "NO" || tmpStr == "FALSE" || tmpStr == "0" )
 			SSLverify = false;
+		else
+			SSLverify = true;
 
 		dbHost = pt.get<std::string>( "database.host", std::string() );
 		dbPort = pt.get<unsigned short>( "database.port", 0 );

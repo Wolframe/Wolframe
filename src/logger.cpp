@@ -6,6 +6,7 @@
 #include <boost/log/formatters.hpp>
 #include <boost/log/filters.hpp>
 #include <boost/log/utility/init/common_attributes.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <boost/log/utility/init/to_console.hpp>
 #include <boost/log/utility/init/to_file.hpp>
@@ -42,7 +43,11 @@ inline std::basic_ostream< CharT, TraitsT > &operator<< ( std::basic_ostream< Ch
 	return s;
 }
 
-Logger::LogLevel Logger::str2LogLevel( const std::string s ) {
+Logger::LogLevel Logger::str2LogLevel( const std::string str ) {
+	std::string s = str;
+	boost::trim( s );
+	boost::to_upper( s );
+
 	if( s == "DATA" )		return Logger::_SMERP_DATA;
 	else if( s == "TRACE" )		return Logger::_SMERP_TRACE;
 	else if( s == "DEBUG" )		return Logger::_SMERP_DEBUG;
@@ -174,7 +179,7 @@ void Logger::initialize( const ApplicationConfiguration& config )
 #if !defined( _WIN32 )
 	if( config.logToSyslog )
 		LOG_DEBUG << "Initialized syslog logger to facility '" << config.syslogFacility
-		          << "' with level '" <<  config.syslogLogLevel << "'";
+			  << "' with level '" <<  config.syslogLogLevel << "'";
 #else
 	if( config.logToEventlog )
 		LOG_DEBUG << "Initialized eventlog logger to log with name '" << config.eventlogLogName << "'"
