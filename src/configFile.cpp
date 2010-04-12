@@ -82,7 +82,7 @@ namespace _SMERP {
 		std::string	tmpStr, portStr;
 		unsigned short	port;
 
-		file = resolvePath( boost::filesystem::system_complete( filename )).string();
+		file = resolvePath( boost::filesystem::complete( filename )).string();
 		if ( !boost::filesystem::exists( file ))	{
 			errMsg_ = "Configuration file ";
 			errMsg_ += file;
@@ -159,15 +159,18 @@ namespace _SMERP {
 		answerTimeout = pt.get<unsigned>( "server.timeout.answer", 30 );
 		processTimeout = pt.get<unsigned>( "server.timeout.process", 30 );
 
-		SSLcertificate = resolvePath( boost::filesystem::system_complete(
-							pt.get<std::string>( "server.SSL.certificate", std::string() ))).string();
-		SSLkey = resolvePath( boost::filesystem::system_complete(
-							pt.get<std::string>( "server.SSL.key", std::string() ))).string();
-		SSLCAdirectory = resolvePath( boost::filesystem::system_complete(
-							pt.get<std::string>( "server.SSL.CAdirectory", std::string() ))).string();
-		SSLCAchainFile = resolvePath( boost::filesystem::system_complete(
-							pt.get<std::string>( "server.SSL.CAchainFile", std::string() ))).string();
-		tmpStr = pt.get<std::string>( "server.SSL.verify", std::string() );
+		SSLcertificate = boost::filesystem::complete(
+							pt.get<std::string>( "server.SSL.certificate", std::string() ),
+							boost::filesystem::path( file ).branch_path() ).string();
+		SSLkey = boost::filesystem::complete(
+							pt.get<std::string>( "server.SSL.key", std::string() ),
+							boost::filesystem::path( file ).branch_path() ).string();
+		SSLCAdirectory = boost::filesystem::complete(
+							pt.get<std::string>( "server.SSL.CAdirectory", std::string() ),
+							boost::filesystem::path( file ).branch_path() ).string();
+		SSLCAchainFile = boost::filesystem::complete(
+							pt.get<std::string>( "server.SSL.CAchainFile", std::string() ),
+							boost::filesystem::path( file ).branch_path() ).string();		tmpStr = pt.get<std::string>( "server.SSL.verify", std::string() );
 		if ( strcasecmp( tmpStr.c_str(), "no" )	&& strcasecmp( tmpStr.c_str(), "false" ) && strcasecmp( tmpStr.c_str(), "0" ))
 			SSLverify = true;
 		else
@@ -187,8 +190,9 @@ namespace _SMERP {
 			logToStderr = false;
 		if ( pt.get_child_optional( "logging.logFile" ))	{
 			logToFile = true;
-			logFile = resolvePath( boost::filesystem::system_complete(
-						pt.get<std::string>( "logging.logFile.filename", std::string() ))).string();
+			logFile = boost::filesystem::complete(
+						pt.get<std::string>( "logging.logFile.filename", std::string() ),
+							boost::filesystem::path( file ).branch_path() ).string();
 			logFileLogLevel = pt.get<std::string>( "logging.logFile.level", "ERROR" );
 		}
 		else
