@@ -26,8 +26,6 @@ static const unsigned short MAJOR_VERSION = 0;
 static const short unsigned MINOR_VERSION = 0;
 static const short unsigned REVISION_NUMBER = 3;
 
-static const int DEFAULT_DEBUG_LEVEL = 3;
-
 static const int DEFAULT_SERVICE_TIMEOUT = 5000;
 
 static const char *DEFAULT_SERVICE_NAME = "smerpd";

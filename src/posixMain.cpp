@@ -38,8 +38,6 @@ static const unsigned short MAJOR_VERSION = 0;
 static const short unsigned MINOR_VERSION = 0;
 static const short unsigned REVISION_NUMBER = 3;
 
-static const std::string DEFAULT_DEBUG_LEVEL = "DEBUG";
-
 static const char *DEFAULT_MAIN_CONFIG = "/etc/smerpd.conf";
 static const char *DEFAULT_USER_CONFIG = "~/smerpd.conf";
 static const char *DEFAULT_LOCAL_CONFIG = "./smerpd.conf";
