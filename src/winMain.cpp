@@ -57,8 +57,7 @@ static void install_as_service( const _SMERP::ApplicationConfiguration& config )
 	TCHAR binary_path[MAX_PATH];
 	DWORD res = GetModuleFileName( NULL, binary_path, MAX_PATH );
 
-// add quotation marks around the 'ImagePath' (because of spaces). No arguments as
-// we loose them anyway after dispatching the service control thread.
+// add quotation marks around filename in the 'ImagePath' (because of spaces).
 	std::ostringstream os;
 	os << "\"" << binary_path << "\" --service -c \"" << config.configFile << "\"";
 	
