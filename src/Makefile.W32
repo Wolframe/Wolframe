@@ -39,7 +39,7 @@ OBJS = \
 	version.obj \
 	appInstance.obj \
 	commandLine.obj \
-	logLevel.o \
+	logLevel.obj \
 	logger.obj \
 	configFile.obj \
 	appConfig.obj \
