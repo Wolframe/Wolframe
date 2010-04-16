@@ -118,14 +118,14 @@ namespace _SMERP {
 
 		os << "Network" << std::endl;
 		if ( address.size() > 0 )	{
-			os << "  Unencrypted: " << address[0].first << ":" << address[0].second << std::endl;
+			os << "  Unencrypted: " << address[0].host << ":" << address[0].port << std::endl;
 			for ( unsigned i = 1; i < address.size(); i++ )
-				os << "               " << address[i].first << ":" << address[i].second << std::endl;
+				os << "               " << address[i].host << ":" << address[i].port << std::endl;
 		}
 		if ( SSLaddress.size() > 0 )	{
-			os << "          SSL: " << SSLaddress[0].first << ":" << SSLaddress[0].second << std::endl;
+			os << "          SSL: " << SSLaddress[0].host << ":" << SSLaddress[0].port << std::endl;
 			for ( unsigned i = 1; i < SSLaddress.size(); i++ )
-				os << "               " << SSLaddress[i].first << ":" << SSLaddress[i].second << std::endl;
+				os << "               " << SSLaddress[i].host << ":" << SSLaddress[i].port << std::endl;
 		}
 
 		os << "Timeouts" << std::endl;

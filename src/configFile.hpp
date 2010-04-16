@@ -24,8 +24,8 @@ namespace _SMERP	{
 		unsigned short	threads;
 		unsigned short	maxClients;
 // network configuration
-		std::vector< std::pair<std::string, unsigned short> > address;
-		std::vector< std::pair<std::string, unsigned short> > SSLaddress;
+		std::vector<struct localEndpoint> address;
+		std::vector<struct localSSLendpoint> SSLaddress;
 
 		unsigned	idleTimeout;
 		unsigned	requestTimeout;
@@ -70,6 +70,6 @@ namespace _SMERP	{
 		std::string errMsg( void )	{ return errMsg_; };
 	};
 
-}
+} // namespace _SMERP
 
 #endif // _CONFIGFILE_HPP_INCLUDED

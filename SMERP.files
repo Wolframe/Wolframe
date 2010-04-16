@@ -45,3 +45,5 @@ src/logger.cpp
 src/smerpd.log
 src/logLevel.hpp
 src/logLevel.cpp
+src/miscStruct.hpp
+src/defaults.hpp

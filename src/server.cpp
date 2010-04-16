@@ -26,9 +26,9 @@ server::server( const ApplicationConfiguration& config )
 
 		// Open the acceptor(s) with the option to reuse the address (i.e. SO_REUSEADDR).
 		boost::asio::ip::tcp::resolver resolver( IOservice_ );
-		boost::asio::ip::tcp::resolver::query query( config.address[i].first, "");
+		boost::asio::ip::tcp::resolver::query query( config.address[i].host, "");
 		boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve( query );
-		endpoint.port( config.address[i].second );
+		endpoint.port( config.address[i].port );
 
 		newConnection_ = connection_ptr( new connection( IOservice_, requestHandler_, timeout_duration_ ));
 
@@ -98,9 +98,9 @@ server::server( const ApplicationConfiguration& config )
 			boost::asio::ip::tcp::acceptor* acptr = new boost::asio::ip::tcp::acceptor( IOservice_ );
 			// Open the acceptor(s) with the option to reuse the address (i.e. SO_REUSEADDR).
 			boost::asio::ip::tcp::resolver resolver( IOservice_ );
-			boost::asio::ip::tcp::resolver::query query( config.SSLaddress[i].first, "");
+			boost::asio::ip::tcp::resolver::query query( config.SSLaddress[i].host, "");
 			boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve( query );
-			endpoint.port( config.SSLaddress[i].second );
+			endpoint.port( config.SSLaddress[i].port );
 			acptr->open( endpoint.protocol() );
 			acptr->set_option( boost::asio::ip::tcp::acceptor::reuse_address( true ));
 			acptr->bind( endpoint );

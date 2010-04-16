@@ -3,6 +3,7 @@
 //
 
 #include "configFile.hpp"
+#include "miscStruct.hpp"
 
 #include <boost/filesystem.hpp>
 #include <boost/foreach.hpp>
@@ -134,10 +135,12 @@ namespace _SMERP {
 			}
 
 			if ( v.first == "socket" )	{
-				address.push_back( make_pair( tmpStr, port ));
+				struct localEndpoint lep( tmpStr, port );
+				address.push_back( lep );
 			}
 			else if ( v.first == "SSLsocket" )	{
-				SSLaddress.push_back( make_pair( tmpStr, port ));
+				struct localSSLendpoint lep( tmpStr, port );
+				SSLaddress.push_back( lep );
 			}
 			else	{
 				errMsg_ = "Invalid listen type: ";
