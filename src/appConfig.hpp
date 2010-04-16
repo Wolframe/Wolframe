@@ -14,8 +14,27 @@ namespace _SMERP {
 
 // application configuration structure
 
-	struct CmdLineConfig;		// for configuration from the command line
-	struct CfgFileConfig;		// for configuration from the config file
+	struct CmdLineConfig;		// forward declaration for configuration from the command line
+	struct CfgFileConfig;		// forward declaration for configuration from the config file
+
+
+	/// structure for local endpoint configuration
+	struct localEndpoint	{
+		std::string	host;
+		unsigned short	port;
+	};
+
+	/// structure for local SSL endpoint configuration
+	struct localSSLendpoint	{
+		std::string	host;
+		unsigned short	port;
+		std::string	certFile;
+		std::string	keyFile;
+		std::string	CAdirectory;
+		std::string	CAchainFile;
+		bool		verify;
+	};
+
 
 	struct ApplicationConfiguration	{
 		std::string		configFile;

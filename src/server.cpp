@@ -52,11 +52,20 @@ server::server( const ApplicationConfiguration& config )
 					  | boost::asio::ssl::context::single_dh_use
 					  );
 		SSLcontext_->set_password_callback( boost::bind( &server::getPassword, this ));
-		if ( SSLcontext_->use_certificate_chain_file( config.SSLcertificate, ec ) != 0 )	{
+		if ( config.SSLcertificate.empty() )	{
+			LOG_FATAL << "Empty SSL certificate filename";
+			exit( 1 );
+		}
+		else if ( SSLcontext_->use_certificate_chain_file( config.SSLcertificate, ec ) != 0 )	{
 			LOG_FATAL << ec.message() << " loading SSL certificate file: " << config.SSLcertificate;
 			exit( 1 );
 		}
-		if ( SSLcontext_->use_private_key_file( config.SSLkey, boost::asio::ssl::context::pem, ec ) != 0 )	{
+
+		if ( config.SSLkey.empty() )	{
+			LOG_FATAL << "Empty SSL key filename";
+			exit( 1 );
+		}
+		else if ( SSLcontext_->use_private_key_file( config.SSLkey, boost::asio::ssl::context::pem, ec ) != 0 )	{
 			LOG_FATAL << ec.message() << " loading SSL key file: " << config.SSLkey;
 			exit( 1 );
 		}
