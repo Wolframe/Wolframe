@@ -25,7 +25,7 @@ SMERP configuration file
 				<key>../tests/SSL/smerpd.key</key>			<!-- Server key file (PEM) -->
 				<CAdirectory>../tests/SSL/CAdir</CAdirectory>		<!-- Directory holding CA certificate files -->
 				<CAchainFile></CAchainFile>				<!-- SSL CA chain file -->
-				<verify>no</verify>					<!-- Require and verify client certificate -->
+				<verify>OFFF</verify>					<!-- Require and verify client certificate -->
 			</SSLsocket>
 		</listen>
 

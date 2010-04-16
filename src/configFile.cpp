@@ -181,10 +181,16 @@ namespace _SMERP {
 		tmpStr = pt.get<std::string>( "server.SSL.verify", std::string() );
 		boost::to_upper( tmpStr );
 		boost::trim( tmpStr );
-		if ( tmpStr == "NO" || tmpStr == "FALSE" || tmpStr == "0" )
+		if ( tmpStr == "NO" || tmpStr == "FALSE" || tmpStr == "0" || tmpStr == "OFF" )
 			SSLverify = false;
-		else
+		else	{
 			SSLverify = true;
+			if ( tmpStr != "YES" && tmpStr != "TRUE" && tmpStr != "1" && tmpStr == "ON" )	{
+				errMsg_ = "Unknown value \"";
+				errMsg_ += tmpStr;
+				errMsg_ += "\" for SSL verify client. WARNING: enabling verification";
+			}
+		}
 
 		dbHost = pt.get<std::string>( "database.host", std::string() );
 		dbPort = pt.get<unsigned short>( "database.port", 0 );

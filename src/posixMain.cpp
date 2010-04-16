@@ -105,6 +105,8 @@ int _SMERP_posixMain( int argc, char* argv[] )
 			std::cerr << cfgFileCfg.errMsg() << std::endl << std::endl;
 			return _SMERP::ErrorCodes::FAILURE;
 		}
+		else if ( !cfgFileCfg.errMsg().empty())
+			std::cerr << cfgFileCfg.errMsg() << std::endl;
 // configuration file has been parsed successfully
 // build the application configuration
 		_SMERP::ApplicationConfiguration config( cmdLineCfg, cfgFileCfg);
