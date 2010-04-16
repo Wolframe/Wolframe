@@ -2,6 +2,7 @@
 // commandLine.cpp
 //
 
+#include "logLevel.hpp"
 #include "commandLine.hpp"
 
 #include <boost/program_options.hpp>
@@ -11,7 +12,7 @@ namespace prgOpts = boost::program_options;
 
 namespace _SMERP {
 
-	static const std::string DEFAULT_DEBUG_LEVEL = "INFO";
+	static const LogLevel::Level DEFAULT_DEBUG_LEVEL = LogLevel::_SMERP_INFO;
 
 	CmdLineConfig::CmdLineConfig()
 	{
@@ -128,8 +129,16 @@ namespace _SMERP {
 			if ( clMap.count( "foreground" ))
 				foreground = true;
 
-			if ( clMap.count( "debug" ))
-				debugLevel = clMap["debug"].as<std::string>();
+			if ( clMap.count( "debug" ))	{
+				std::string s = clMap["debug"].as<std::string>();
+				debugLevel = LogLevel::str2LogLevel( s );
+				if ( debugLevel == LogLevel::_SMERP_UNDEFINED )	{
+					errMsg_ = "invalid debug level \"";
+					errMsg_ += s;
+					errMsg_ += "\"";
+					return false;
+				}
+			}
 
 			if ( clMap.count( "config-file" ))
 				cfgFile = clMap["config-file"].as<std::string>();

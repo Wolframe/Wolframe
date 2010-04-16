@@ -5,6 +5,8 @@
 #ifndef _APP_CONFIG_HPP_INCLUDED
 #define _APP_CONFIG_HPP_INCLUDED
 
+#include "logLevel.hpp"
+
 #include <string>
 #include <vector>
 
@@ -16,30 +18,30 @@ namespace _SMERP {
 	struct CfgFileConfig;		// for configuration from the config file
 
 	struct ApplicationConfiguration	{
-		std::string	configFile;
+		std::string		configFile;
 // from command line
-		bool		foreground;
+		bool			foreground;
 // daemon configuration
-		std::string	user;
-		std::string	group;
-		std::string	pidFile;
+		std::string		user;
+		std::string		group;
+		std::string		pidFile;
 // service configuration
-		std::string	serviceName;
-		std::string	serviceDisplayName;
-		std::string	serviceDescription;
+		std::string		serviceName;
+		std::string		serviceDisplayName;
+		std::string		serviceDescription;
 
 // server configuration
-		unsigned	threads;
-		unsigned	maxClients;
+		unsigned		threads;
+		unsigned		maxClients;
 
 // network configuration
 		std::vector< std::pair<std::string, unsigned short> > address;
 		std::vector< std::pair<std::string, unsigned short> > SSLaddress;
 
-		unsigned	idleTimeout;
-		unsigned	requestTimeout;
-		unsigned	answerTimeout;
-		unsigned	processTimeout;
+		unsigned		idleTimeout;
+		unsigned		requestTimeout;
+		unsigned		answerTimeout;
+		unsigned		processTimeout;
 // SSL
 		std::string	SSLcertificate;
 		std::string	SSLkey;
@@ -48,27 +50,27 @@ namespace _SMERP {
 		bool		SSLverify;
 
 // database configuration
-		std::string	dbHost;
-		unsigned short	dbPort;
-		std::string	dbName;
-		std::string	dbUser;
-		std::string	dbPassword;
+		std::string		dbHost;
+		unsigned short		dbPort;
+		std::string		dbName;
+		std::string		dbUser;
+		std::string		dbPassword;
 // logger configuration
-		bool		logToStderr;
-		std::string	stderrLogLevel;
+		bool			logToStderr;
+		LogLevel::Level	stderrLogLevel;
 		bool		logToFile;
 		std::string	logFile;
-		std::string	logFileLogLevel;
+		LogLevel::Level	logFileLogLevel;
 		bool		logToSyslog;
 		std::string	syslogFacility;
-		std::string	syslogLogLevel;
+		LogLevel::Level	syslogLogLevel;
 		bool		logToEventlog;
 		std::string	eventlogLogName;
 		std::string	eventlogSource;
-		std::string	eventlogLogLevel;
+		LogLevel::Level	eventlogLogLevel;
 
 	private:
-		std::string	errMsg_;
+		std::string		errMsg_;
 
 	public:
 		ApplicationConfiguration( const CmdLineConfig& cmdLine, const CfgFileConfig& cfgFile );

@@ -1,3 +1,8 @@
+//
+// logger.cpp
+//
+
+#include "logLevel.hpp"
 #include "logger.hpp"
 
 #include <iostream>
@@ -30,7 +35,7 @@ namespace _SMERP {
 
 // map enum values to strings
 template< typename CharT, typename TraitsT >
-inline std::basic_ostream< CharT, TraitsT > &operator<< ( std::basic_ostream< CharT, TraitsT >& s, Logger::LogLevel l )
+	inline std::basic_ostream< CharT, TraitsT > &operator<< ( std::basic_ostream< CharT, TraitsT >& s, LogLevel::Level l )
 {
 	static const char *const str[] = {
 		"DATA", "TRACE", "DEBUG", "INFO", "NOTICE", "WARNING",
@@ -43,23 +48,23 @@ inline std::basic_ostream< CharT, TraitsT > &operator<< ( std::basic_ostream< Ch
 	return s;
 }
 
-Logger::LogLevel Logger::str2LogLevel( const std::string str ) {
+LogLevel::Level LogLevel::str2LogLevel( const std::string str ) {
 	std::string s = str;
 	boost::trim( s );
 	boost::to_upper( s );
 
-	if( s == "DATA" )		return Logger::_SMERP_DATA;
-	else if( s == "TRACE" )		return Logger::_SMERP_TRACE;
-	else if( s == "DEBUG" )		return Logger::_SMERP_DEBUG;
-	else if( s == "INFO" )		return Logger::_SMERP_INFO;
-	else if( s == "NOTICE" )	return Logger::_SMERP_NOTICE;
-	else if( s == "WARNING" )	return Logger::_SMERP_WARNING;
-	else if( s == "ERROR" )		return Logger::_SMERP_ERROR;
-	else if( s == "SEVERE" )	return Logger::_SMERP_SEVERE;
-	else if( s == "CRITICAL" )	return Logger::_SMERP_CRITICAL;
-	else if( s == "ALERT" )		return Logger::_SMERP_ALERT;
-	else if( s == "FATAL" )		return Logger::_SMERP_FATAL;
-	else				return Logger::_SMERP_UNDEFINED;
+	if( s == "DATA" )		return LogLevel::_SMERP_DATA;
+	else if( s == "TRACE" )		return LogLevel::_SMERP_TRACE;
+	else if( s == "DEBUG" )		return LogLevel::_SMERP_DEBUG;
+	else if( s == "INFO" )		return LogLevel::_SMERP_INFO;
+	else if( s == "NOTICE" )	return LogLevel::_SMERP_NOTICE;
+	else if( s == "WARNING" )	return LogLevel::_SMERP_WARNING;
+	else if( s == "ERROR" )		return LogLevel::_SMERP_ERROR;
+	else if( s == "SEVERE" )	return LogLevel::_SMERP_SEVERE;
+	else if( s == "CRITICAL" )	return LogLevel::_SMERP_CRITICAL;
+	else if( s == "ALERT" )		return LogLevel::_SMERP_ALERT;
+	else if( s == "FATAL" )		return LogLevel::_SMERP_FATAL;
+	else				return LogLevel::_SMERP_UNDEFINED;
 }
 
 #if !defined( _WIN32 )
@@ -90,7 +95,7 @@ static sinks::syslog::facility_t str2syslogFacility( const std::string s ) {
 }
 #endif // !defined( _WIN32 )
 
-src::severity_logger< Logger::LogLevel > logger;
+src::severity_logger< LogLevel::Level > logger;
 
 void Logger::initialize( const ApplicationConfiguration& config )
 {
@@ -98,9 +103,9 @@ void Logger::initialize( const ApplicationConfiguration& config )
 	if( config.logToStderr ) {
 		logging::init_log_to_console(
 			std::clog,
-			keywords::filter = flt::attr< LogLevel >( "Severity", std::nothrow ) >= Logger::str2LogLevel( config.stderrLogLevel ),
+			keywords::filter = flt::attr< LogLevel::Level >( "Severity", std::nothrow ) >= config.stderrLogLevel,
 			keywords::format = fmt::format( "%1%: %2%" )
-				% fmt::attr< LogLevel >( "Severity", std::nothrow )
+				% fmt::attr< LogLevel::Level >( "Severity", std::nothrow )
 				% fmt::message( )
 		);
 	}
@@ -111,34 +116,34 @@ void Logger::initialize( const ApplicationConfiguration& config )
 			keywords::file_name = config.logFile,
 			keywords::auto_flush = true,
 			keywords::open_mode = ( std::ios_base::out | std::ios_base::app ),
-			keywords::filter = flt::attr< LogLevel >( "Severity", std::nothrow ) >= Logger::str2LogLevel( config.logFileLogLevel ),
+			keywords::filter = flt::attr< LogLevel::Level >( "Severity", std::nothrow ) >= config.logFileLogLevel,
 			keywords::format = fmt::format( "%1% %2%: %3%" )
 				% fmt::date_time( "TimeStamp", std::nothrow )
-				% fmt::attr< LogLevel >( "Severity", std::nothrow )
+				% fmt::attr< LogLevel::Level >( "Severity", std::nothrow )
 				% fmt::message( )
 		);
 	}
 
 #if !defined( _WIN32 )
 	if( config.logToSyslog ) {
-		sinks::syslog::custom_severity_mapping< LogLevel > mapping( "Severity" );
-		mapping[Logger::_SMERP_FATAL] = sinks::syslog::emergency;
-		mapping[Logger::_SMERP_ALERT] = sinks::syslog::alert;
-		mapping[Logger::_SMERP_CRITICAL] = sinks::syslog::critical;
-		mapping[Logger::_SMERP_SEVERE] = sinks::syslog::critical;
-		mapping[Logger::_SMERP_ERROR] = sinks::syslog::error;
-		mapping[Logger::_SMERP_WARNING] = sinks::syslog::warning;
-		mapping[Logger::_SMERP_NOTICE] = sinks::syslog::notice;
-		mapping[Logger::_SMERP_INFO] = sinks::syslog::info;
-		mapping[Logger::_SMERP_DEBUG] = sinks::syslog::debug;
-		mapping[Logger::_SMERP_TRACE] = sinks::syslog::debug;
-		mapping[Logger::_SMERP_DATA] = sinks::syslog::debug;
+		sinks::syslog::custom_severity_mapping< LogLevel::Level > mapping( "Severity" );
+		mapping[LogLevel::_SMERP_FATAL] = sinks::syslog::emergency;
+		mapping[LogLevel::_SMERP_ALERT] = sinks::syslog::alert;
+		mapping[LogLevel::_SMERP_CRITICAL] = sinks::syslog::critical;
+		mapping[LogLevel::_SMERP_SEVERE] = sinks::syslog::critical;
+		mapping[LogLevel::_SMERP_ERROR] = sinks::syslog::error;
+		mapping[LogLevel::_SMERP_WARNING] = sinks::syslog::warning;
+		mapping[LogLevel::_SMERP_NOTICE] = sinks::syslog::notice;
+		mapping[LogLevel::_SMERP_INFO] = sinks::syslog::info;
+		mapping[LogLevel::_SMERP_DEBUG] = sinks::syslog::debug;
+		mapping[LogLevel::_SMERP_TRACE] = sinks::syslog::debug;
+		mapping[LogLevel::_SMERP_DATA] = sinks::syslog::debug;
 
 		logging::init_log_to_syslog(
 			keywords::facility = str2syslogFacility( config.syslogFacility ),
 			keywords::use_impl = sinks::syslog::native,
 			keywords::custom_severity_mapping = mapping,
-			keywords::filter = flt::attr< LogLevel >( "Severity", nothrow ) >= Logger::str2LogLevel( config.syslogLogLevel ),
+			keywords::filter = flt::attr< LogLevel::Level >( "Severity", nothrow ) >= config.syslogLogLevel,
 			keywords::format = fmt::format( "smerpd[%1%]: %2%" )
 				% fmt::attr< boost::log::aux::process::id >( "ProcessID", "%d", std::nothrow )
 //				% fmt::attr< LogLevel >( "Severity", std::nothrow )
@@ -147,25 +152,25 @@ void Logger::initialize( const ApplicationConfiguration& config )
 	}
 #else
 	if( config.logToEventlog ) {
-		sinks::event_log::custom_event_type_mapping< LogLevel > mapping( "Severity" );
-		mapping[Logger::_SMERP_FATAL] = sinks::event_log::error;
-		mapping[Logger::_SMERP_ALERT] = sinks::event_log::error;
-		mapping[Logger::_SMERP_CRITICAL] = sinks::event_log::error;
-		mapping[Logger::_SMERP_SEVERE] = sinks::event_log::error;
-		mapping[Logger::_SMERP_ERROR] = sinks::event_log::error;
-		mapping[Logger::_SMERP_WARNING] = sinks::event_log::warning;
-		mapping[Logger::_SMERP_NOTICE] = sinks::event_log::info;
-		mapping[Logger::_SMERP_INFO] = sinks::event_log::info;
-		mapping[Logger::_SMERP_DEBUG] = sinks::event_log::info;
-		mapping[Logger::_SMERP_TRACE] = sinks::event_log::info;
-		mapping[Logger::_SMERP_DATA] = sinks::event_log::info;
+		sinks::event_log::custom_event_type_mapping< LogLevel::Level > mapping( "Severity" );
+		mapping[LogLevel::_SMERP_FATAL] = sinks::event_log::error;
+		mapping[LogLevel::_SMERP_ALERT] = sinks::event_log::error;
+		mapping[LogLevel::_SMERP_CRITICAL] = sinks::event_log::error;
+		mapping[LogLevel::_SMERP_SEVERE] = sinks::event_log::error;
+		mapping[LogLevel::_SMERP_ERROR] = sinks::event_log::error;
+		mapping[LogLevel::_SMERP_WARNING] = sinks::event_log::warning;
+		mapping[LogLevel::_SMERP_NOTICE] = sinks::event_log::info;
+		mapping[LogLevel::_SMERP_INFO] = sinks::event_log::info;
+		mapping[LogLevel::_SMERP_DEBUG] = sinks::event_log::info;
+		mapping[LogLevel::_SMERP_TRACE] = sinks::event_log::info;
+		mapping[LogLevel::_SMERP_DATA] = sinks::event_log::info;
 
 		logging::init_log_to_eventlog(
 			keywords::registration = sinks::event_log::forced,
 			keywords::log_name = config.eventlogLogName,
 			keywords::log_source = config.eventlogSource,
 			keywords::custom_event_type_mapping = mapping,
-			keywords::filter = flt::attr< LogLevel >( "Severity", nothrow ) >= Logger::str2LogLevel( config.eventlogLogLevel )
+			keywords::filter = flt::attr< LogLevel::Level >( "Severity", nothrow ) >= config.eventlogLogLevel
 		);
 	}
 #endif // !defined( _WIN32 )

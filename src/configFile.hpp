@@ -1,6 +1,8 @@
 #ifndef _CONFIGFILE_HPP_INCLUDED
 #define _CONFIGFILE_HPP_INCLUDED
 
+#include "logLevel.hpp"
+
 #include <string>
 #include <vector>
 
@@ -43,17 +45,17 @@ namespace _SMERP	{
 		std::string	dbPassword;
 // logger configuration
 		bool		logToStderr;
-		std::string	stderrLogLevel;
+		LogLevel::Level	stderrLogLevel;
 		bool		logToFile;
 		std::string	logFile;
-		std::string	logFileLogLevel;
+		LogLevel::Level	logFileLogLevel;
 		bool		logToSyslog;
 		std::string	syslogFacility;
-		std::string	syslogLogLevel;
+		LogLevel::Level	syslogLogLevel;
 		bool		logToEventlog;
 		std::string	eventlogLogName;
 		std::string	eventlogSource;
-		std::string	eventlogLogLevel;
+		LogLevel::Level	eventlogLogLevel;
 
 	private:
 		std::string	errMsg_;

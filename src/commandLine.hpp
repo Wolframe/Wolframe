@@ -1,5 +1,11 @@
+//
+// commandLine.hpp
+//
+
 #ifndef _COMMANDLINE_HPP_INCLUDED
 #define _COMMANDLINE_HPP_INCLUDED
+
+#include "logLevel.hpp"
 
 #include <string>
 #include <boost/program_options.hpp>
@@ -24,7 +30,7 @@ namespace _SMERP	{
 
 		Command_t	command;
 		bool		foreground;
-		std::string	debugLevel;
+		LogLevel::Level	debugLevel;
 		std::string	user;
 		std::string	group;
 		std::string	cfgFile;
