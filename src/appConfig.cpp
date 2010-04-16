@@ -152,12 +152,11 @@ namespace _SMERP {
 
 		os << "Logging" << std::endl;
 		if ( logToStderr )
-			os << "   Log to stderr log level: " << stderrLogLevel << std::endl;
+			os << "   Log to stderr, level " << stderrLogLevel << std::endl;
 		else
 			os << "   Log to stderr: DISABLED" << std::endl;
 		if ( logToFile )	{
-			os << "   Log to file: " << logFile << std::endl;
-			os << "   Log to file log level: " << logFileLogLevel << std::endl;
+			os << "   Log to file: " << logFile << ", level " << logFileLogLevel << std::endl;
 		}
 		else
 			os << "   Log to file: DISABLED" << std::endl;
