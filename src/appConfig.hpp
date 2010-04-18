@@ -6,6 +6,7 @@
 #define _APP_CONFIG_HPP_INCLUDED
 
 #include "logLevel.hpp"
+#include "logSyslogFacility.hpp"
 
 #include <string>
 #include <vector>
@@ -81,7 +82,7 @@ namespace _SMERP {
 		std::string	logFile;
 		LogLevel::Level	logFileLogLevel;
 		bool		logToSyslog;
-		std::string	syslogFacility;
+		SyslogFacility::Facility syslogFacility;
 		LogLevel::Level	syslogLogLevel;
 		bool		logToEventlog;
 		std::string	eventlogLogName;

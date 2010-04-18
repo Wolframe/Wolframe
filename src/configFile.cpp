@@ -218,8 +218,14 @@ namespace _SMERP {
 			logToFile = false;
 		if ( pt.get_child_optional( "logging.syslog" ))	{
 			logToSyslog = true;
-			syslogFacility = pt.get<std::string>( "logging.syslog.facility", "LOCAL4" );
-			std::string s = pt.get<std::string>( "logging.syslog.level", "NOTICE" );
+			std::string s = pt.get<std::string>( "logging.syslog.facility", "LOCAL4" );
+			if ( ( syslogFacility = SyslogFacility::str2SyslogFacility( s )) == SyslogFacility::_SMERP_SYSLOG_FACILITY_UNDEFINED )	{
+				errMsg_ = "unknown syslog facility \"";
+				errMsg_ += s;
+				errMsg_ += "\"";
+				return false;
+			}
+			s = pt.get<std::string>( "logging.syslog.level", "NOTICE" );
 			if ( ( syslogLogLevel = LogLevel::str2LogLevel( s )) == LogLevel::_SMERP_UNDEFINED )	{
 				errMsg_ = "unknown log level \"";
 				errMsg_ += s;

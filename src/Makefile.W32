@@ -40,6 +40,7 @@ OBJS = \
 	appInstance.obj \
 	commandLine.obj \
 	logLevel.obj \
+	logSyslogFacility.obj \
 	logger.obj \
 	configFile.obj \
 	appConfig.obj \

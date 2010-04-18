@@ -36,6 +36,7 @@ OBJS = \
 	appInstance.o \
 	commandLine.o \
 	logLevel.o \
+	logSyslogFacility.o \
 	logger.o \
 	configFile.o \
 	appConfig.o \

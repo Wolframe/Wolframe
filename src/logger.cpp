@@ -3,13 +3,13 @@
 //
 
 #include "logLevel.hpp"
+#include "logSyslogFacility.hpp"
 #include "logger.hpp"
 
 #include <boost/log/common.hpp>
 #include <boost/log/formatters.hpp>
 #include <boost/log/filters.hpp>
 #include <boost/log/utility/init/common_attributes.hpp>
-#include <boost/algorithm/string.hpp>
 
 #include <boost/log/utility/init/to_console.hpp>
 #include <boost/log/utility/init/to_file.hpp>
@@ -32,34 +32,34 @@ namespace sinks = boost::log::sinks;
 namespace _SMERP {
 
 #if !defined( _WIN32 )
-static sinks::syslog::facility_t str2syslogFacility( const std::string str ) {
-	std::string s = str;
-	boost::trim( s );
-	boost::to_upper( s );
-
-	if( s == "KERN" )		return sinks::syslog::kernel;
-	if( s == "USER" )		return sinks::syslog::user;
-	if( s == "MAIL" )		return sinks::syslog::mail;
-	if( s == "DAEMON" )		return sinks::syslog::daemon;
-	if( s == "AUTH" )		return sinks::syslog::security0;
-	if( s == "SYSLOG" )		return sinks::syslog::syslogd;
-	if( s == "LPR" )		return sinks::syslog::printer;
-	if( s == "NEWS" )		return sinks::syslog::news;
-	if( s == "UUCP" )		return sinks::syslog::uucp;
-	if( s == "CRON" )		return sinks::syslog::clock0;
-	if( s == "AUTHPRIV" )		return sinks::syslog::security1;
-	if( s == "FTP" )		return sinks::syslog::ftp;
-	if( s == "NTP" )		return sinks::syslog::ntp;
-	if( s == "SECURITY" )		return sinks::syslog::log_audit;
-	if( s == "LOCAL0" )		return sinks::syslog::local0;
-	if( s == "LOCAL1" )		return sinks::syslog::local1;
-	if( s == "LOCAL2" )		return sinks::syslog::local2;
-	if( s == "LOCAL3" )		return sinks::syslog::local3;
-	if( s == "LOCAL4" )		return sinks::syslog::local4;
-	if( s == "LOCAL5" )		return sinks::syslog::local5;
-	if( s == "LOCAL6" )		return sinks::syslog::local6;
-	if( s == "LOCAL7" )		return sinks::syslog::local7;
-	else 				return sinks::syslog::user;
+static sinks::syslog::facility_t mapSyslogFacility( const SyslogFacility::Facility f )
+{
+	switch( f ) {
+		case SyslogFacility::_SMERP_SYSLOG_FACILITY_KERN:	return sinks::syslog::kernel;
+		case SyslogFacility::_SMERP_SYSLOG_FACILITY_USER:	return sinks::syslog::user;
+		case SyslogFacility::_SMERP_SYSLOG_FACILITY_MAIL:	return sinks::syslog::mail;
+		case SyslogFacility::_SMERP_SYSLOG_FACILITY_DAEMON:	return sinks::syslog::daemon;
+		case SyslogFacility::_SMERP_SYSLOG_FACILITY_AUTH:	return sinks::syslog::security0;
+		case SyslogFacility::_SMERP_SYSLOG_FACILITY_SYSLOG:	return sinks::syslog::syslogd;
+		case SyslogFacility::_SMERP_SYSLOG_FACILITY_LPR:	return sinks::syslog::printer;
+		case SyslogFacility::_SMERP_SYSLOG_FACILITY_NEWS:	return sinks::syslog::news;
+		case SyslogFacility::_SMERP_SYSLOG_FACILITY_UUCP:	return sinks::syslog::uucp;
+		case SyslogFacility::_SMERP_SYSLOG_FACILITY_CRON:	return sinks::syslog::clock0;
+		case SyslogFacility::_SMERP_SYSLOG_FACILITY_AUTHPRIV:	return sinks::syslog::security1;
+		case SyslogFacility::_SMERP_SYSLOG_FACILITY_FTP:	return sinks::syslog::ftp;
+		case SyslogFacility::_SMERP_SYSLOG_FACILITY_NTP:	return sinks::syslog::ntp;
+		case SyslogFacility::_SMERP_SYSLOG_FACILITY_SECURITY:	return sinks::syslog::log_audit;
+		case SyslogFacility::_SMERP_SYSLOG_FACILITY_LOCAL0:	return sinks::syslog::local0;
+		case SyslogFacility::_SMERP_SYSLOG_FACILITY_LOCAL1:	return sinks::syslog::local1;
+		case SyslogFacility::_SMERP_SYSLOG_FACILITY_LOCAL2:	return sinks::syslog::local2;
+		case SyslogFacility::_SMERP_SYSLOG_FACILITY_LOCAL3:	return sinks::syslog::local3;
+		case SyslogFacility::_SMERP_SYSLOG_FACILITY_LOCAL4:	return sinks::syslog::local4;
+		case SyslogFacility::_SMERP_SYSLOG_FACILITY_LOCAL5:	return sinks::syslog::local5;
+		case SyslogFacility::_SMERP_SYSLOG_FACILITY_LOCAL6:	return sinks::syslog::local6;
+		case SyslogFacility::_SMERP_SYSLOG_FACILITY_LOCAL7:	return sinks::syslog::local7;
+		case SyslogFacility::_SMERP_SYSLOG_FACILITY_UNDEFINED:
+		default:				abort( );
+	}
 }
 #endif // !defined( _WIN32 )
 
@@ -108,7 +108,7 @@ void Logger::initialize( const ApplicationConfiguration& config )
 		mapping[LogLevel::_SMERP_DATA] = sinks::syslog::debug;
 
 		logging::init_log_to_syslog(
-			keywords::facility = str2syslogFacility( config.syslogFacility ),
+			keywords::facility = mapSyslogFacility( config.syslogFacility ),
 			keywords::use_impl = sinks::syslog::native,
 			keywords::custom_severity_mapping = mapping,
 			keywords::filter = flt::attr< LogLevel::Level >( "Severity", nothrow ) >= config.syslogLogLevel,
