@@ -48,12 +48,6 @@ namespace _SMERP {
 		address = cfgFile.address;
 		SSLaddress = cfgFile.SSLaddress;
 
-		SSLcertificate = cfgFile.SSLcertificate;
-		SSLkey = cfgFile.SSLkey;
-		SSLCAdirectory = cfgFile.SSLCAdirectory;
-		SSLCAchainFile = cfgFile.SSLCAchainFile;
-		SSLverify = cfgFile.SSLverify;
-
 		idleTimeout = cfgFile.idleTimeout;
 		requestTimeout = cfgFile.requestTimeout;
 		answerTimeout = cfgFile.answerTimeout;
@@ -94,10 +88,6 @@ namespace _SMERP {
 		os << "Configuration file: " << configFile << std::endl;
 		// from command line
 		os << "Run in foreground: " << (foreground ? "yes" : "no") << std::endl;
-		if ( !foreground )
-			os << " (inactive)" << std::endl;
-		else
-			os << std::endl;
 
 // Unix daemon
 #if !defined(_WIN32)
@@ -124,8 +114,14 @@ namespace _SMERP {
 		}
 		if ( SSLaddress.size() > 0 )	{
 			os << "          SSL: " << SSLaddress[0].host << ":" << SSLaddress[0].port << std::endl;
-			for ( unsigned i = 1; i < SSLaddress.size(); i++ )
+			os << "                  certificate: " << (SSLaddress[0].certFile.empty() ? "(none)" : SSLaddress[0].certFile) << std::endl;
+			os << "                  key file: " << (SSLaddress[0].keyFile.empty() ? "(none)" : SSLaddress[0].keyFile) << std::endl;
+			os << "                  CA directory: " << (SSLaddress[0].CAdirectory.empty() ? "(none)" : SSLaddress[0].CAdirectory) << std::endl;
+			os << "                  CA chain file: " << (SSLaddress[0].CAchainFile.empty() ? "(none)" : SSLaddress[0].CAchainFile) << std::endl;
+			os << "                  verify client: " << (SSLaddress[0].verify ? "yes" : "no") << std::endl;
+			for ( unsigned i = 1; i < SSLaddress.size(); i++ )	{
 				os << "               " << SSLaddress[i].host << ":" << SSLaddress[i].port << std::endl;
+			}
 		}
 
 		os << "Timeouts" << std::endl;
@@ -133,13 +129,6 @@ namespace _SMERP {
 		os << "   request: " << requestTimeout << std::endl;
 		os << "   answer: " << answerTimeout << std::endl;
 		os << "   process: " << processTimeout << std::endl;
-
-		os << "SSL" << std::endl;
-		os << "   certificate: " << (SSLcertificate.empty() ? "(none)" : SSLcertificate) << std::endl;
-		os << "   key file: " << (SSLkey.empty() ? "(none)" : SSLkey) << std::endl;
-		os << "   CA directory: " << (SSLCAdirectory.empty() ? "(none)" : SSLCAdirectory) << std::endl;
-		os << "   CA chain file: " << (SSLCAchainFile.empty() ? "(none)" : SSLCAchainFile) << std::endl;
-		os << "   verify client: " << (SSLverify ? "yes" : "no") << std::endl;
 
 		os << "Database" << std::endl;
 		if ( dbHost.empty())
@@ -182,7 +171,7 @@ namespace _SMERP {
 				errMsg_ = "Log to file requested but no log file specified";
 				return false;
 			}
-
+/*
 		// if it listens to SSL a certificate file and a key file are required
 		if ( SSLaddress.size() > 0 )	{
 			if ( SSLcertificate.empty())	{
@@ -201,6 +190,7 @@ namespace _SMERP {
 				return false;
 			}
 		}
+*/
 		return true;
 	}
 

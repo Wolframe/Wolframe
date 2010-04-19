@@ -140,6 +140,34 @@ namespace _SMERP {
 			}
 			else if ( v.first == "SSLsocket" )	{
 				struct localSSLendpoint lep( tmpStr, port );
+// get SSL certificate / CA param
+				lep.certFile = boost::filesystem::complete(
+									v.second.get<std::string>( "certificate", std::string() ),
+									boost::filesystem::path( file ).branch_path() ).string();
+				lep.keyFile = boost::filesystem::complete(
+									v.second.get<std::string>( "key", std::string() ),
+									boost::filesystem::path( file ).branch_path() ).string();
+				lep.CAdirectory = boost::filesystem::complete(
+									v.second.get<std::string>( "CAdirectory", std::string() ),
+									boost::filesystem::path( file ).branch_path() ).string();
+				lep.CAchainFile = boost::filesystem::complete(
+									v.second.get<std::string>( "CAchainFile", std::string() ),
+									boost::filesystem::path( file ).branch_path() ).string();
+
+				tmpStr = v.second.get<std::string>( "verify", std::string() );
+				boost::to_upper( tmpStr );
+				boost::trim( tmpStr );
+				if ( tmpStr == "NO" || tmpStr == "FALSE" || tmpStr == "0" || tmpStr == "OFF" )
+					lep.verify = false;
+				else	{
+					lep.verify = true;
+					if ( tmpStr != "YES" && tmpStr != "TRUE" && tmpStr != "1" && tmpStr == "ON" )	{
+						errMsg_ = "Unknown value \"";
+						errMsg_ += tmpStr;
+						errMsg_ += "\" for SSL verify client. WARNING: enabling verification";
+					}
+				}
+
 				SSLaddress.push_back( lep );
 			}
 			else	{
@@ -165,33 +193,7 @@ namespace _SMERP {
 		answerTimeout = pt.get<unsigned>( "server.timeout.answer", 30 );
 		processTimeout = pt.get<unsigned>( "server.timeout.process", 30 );
 
-		SSLcertificate = boost::filesystem::complete(
-							pt.get<std::string>( "server.SSL.certificate", std::string() ),
-							boost::filesystem::path( file ).branch_path() ).string();
-		SSLkey = boost::filesystem::complete(
-							pt.get<std::string>( "server.SSL.key", std::string() ),
-							boost::filesystem::path( file ).branch_path() ).string();
-		SSLCAdirectory = boost::filesystem::complete(
-							pt.get<std::string>( "server.SSL.CAdirectory", std::string() ),
-							boost::filesystem::path( file ).branch_path() ).string();
-		SSLCAchainFile = boost::filesystem::complete(
-							pt.get<std::string>( "server.SSL.CAchainFile", std::string() ),
-							boost::filesystem::path( file ).branch_path() ).string();
-
-		tmpStr = pt.get<std::string>( "server.SSL.verify", std::string() );
-		boost::to_upper( tmpStr );
-		boost::trim( tmpStr );
-		if ( tmpStr == "NO" || tmpStr == "FALSE" || tmpStr == "0" || tmpStr == "OFF" )
-			SSLverify = false;
-		else	{
-			SSLverify = true;
-			if ( tmpStr != "YES" && tmpStr != "TRUE" && tmpStr != "1" && tmpStr == "ON" )	{
-				errMsg_ = "Unknown value \"";
-				errMsg_ += tmpStr;
-				errMsg_ += "\" for SSL verify client. WARNING: enabling verification";
-			}
-		}
-
+// database
 		dbHost = pt.get<std::string>( "database.host", std::string() );
 		dbPort = pt.get<unsigned short>( "database.port", 0 );
 		dbName = pt.get<std::string>( "database.name", std::string() );

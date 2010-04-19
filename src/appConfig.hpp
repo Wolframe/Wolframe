@@ -45,12 +45,6 @@ namespace _SMERP {
 		unsigned		requestTimeout;
 		unsigned		answerTimeout;
 		unsigned		processTimeout;
-// SSL
-		std::string	SSLcertificate;
-		std::string	SSLkey;
-		std::string	SSLCAdirectory;
-		std::string	SSLCAchainFile;
-		bool		SSLverify;
 
 // database configuration
 		std::string		dbHost;

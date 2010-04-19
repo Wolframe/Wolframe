@@ -61,7 +61,7 @@ private:
 	std::vector< boost::asio::ip::tcp::acceptor* >	acceptor_;	// Acceptor(s) used to listen for incoming connections.
 	connection_ptr				newConnection_;	// The next connection to be accepted.
 
-	boost::asio::ssl::context		*SSLcontext_;	// SSL server context
+	std::vector< boost::asio::ssl::context* >	SSLcontext_;	// SSL server context
 	std::vector< boost::asio::ip::tcp::acceptor* >	SSLacceptor_;	// Acceptor(s) used to listen for SSL incoming connections.
 	connection_ptr				newSSLconnection_;// The next connection to be accepted.
 
