@@ -5,6 +5,7 @@
 #include "connection.hpp"
 #include "logger.hpp"
 #include "requestHandler.hpp"
+#include "connContext.hpp"
 
 #include <vector>
 #include <boost/bind.hpp>

@@ -16,14 +16,6 @@
 #include <string>
 
 
-//#if defined(_WIN32)		// we are on Windows
-//#include <string.h>
-//#define strcasecmp(a, b)	_stricmp((a), (b))
-//#else
-//#include <strings.h>
-//#endif
-
-
 static const unsigned short	DEFAULT_PORT = 7660;
 static const unsigned short	SSL_DEFAULT_PORT = 7660;
 
@@ -212,6 +204,7 @@ namespace _SMERP {
 		}
 		else
 			logToStderr = false;
+
 		if ( pt.get_child_optional( "logging.logFile" ))	{
 			logToFile = true;
 			logFile = boost::filesystem::complete(
@@ -227,6 +220,7 @@ namespace _SMERP {
 		}
 		else
 			logToFile = false;
+
 		if ( pt.get_child_optional( "logging.syslog" ))	{
 			logToSyslog = true;
 			std::string s = pt.get<std::string>( "logging.syslog.facility", "LOCAL4" );
@@ -246,6 +240,7 @@ namespace _SMERP {
 		}
 		else
 			logToSyslog = false;
+
 		if ( pt.get_child_optional( "logging.eventlog" )) {
 			logToEventlog = true;
 			eventlogLogName = pt.get<std::string>( "logging.eventlog.name", "smerpd" );
