@@ -84,7 +84,7 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		}
 		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::PRINT_HELP )	{
 			cmdLineCfg.usage( std::cout );
-			std::cerr << std::endl;
+			std::cout << std::endl;
 			return _SMERP::ErrorCodes::OK;
 		}
 
