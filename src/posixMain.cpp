@@ -79,10 +79,13 @@ int _SMERP_posixMain( int argc, char* argv[] )
 
 // if we have to print the version or the help do it and exit
 		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::PRINT_VERSION )	{
-			std::cout << gettext( "BOBOBO version " ) << app.version().toString() << std::endl << std::endl;
+			std::cout << std::endl << gettext( "BOBOBO version " )
+				<< app.version().toString() << std::endl << std::endl;
 			return _SMERP::ErrorCodes::OK;
 		}
 		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::PRINT_HELP )	{
+			std::cout << std::endl << gettext( "BOBOBO version " )
+				<< app.version().toString() << std::endl;
 			cmdLineCfg.usage( std::cout );
 			std::cout << std::endl;
 			return _SMERP::ErrorCodes::OK;
@@ -113,6 +116,8 @@ int _SMERP_posixMain( int argc, char* argv[] )
 
 // Check the configuration
 		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::CHECK_CONFIG )	{
+			std::cout << std::endl << gettext( "BOBOBO version " )
+				<< app.version().toString() << std::endl;
 			if ( config.check() )	{
 				if ( config.errMsg().empty() )	{
 					std::cout << "Configuration OK" << std::endl << std::endl;
@@ -130,6 +135,8 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		}
 
 		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::PRINT_CONFIG )	{
+			std::cout << std::endl << gettext( "BOBOBO version " )
+				<< app.version().toString() << std::endl;
 			config.print( std::cout );
 			std::cout << std::endl;
 			return _SMERP::ErrorCodes::OK;
