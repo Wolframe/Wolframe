@@ -8,6 +8,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/logic/tribool.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/algorithm/string.hpp>
@@ -48,6 +49,20 @@ static boost::filesystem::path resolvePath(const boost::filesystem::path& p)
 		}
 	}
 	return result;
+}
+
+
+static boost::logic::tribool getBoolValue( boost::property_tree::ptree& pt, const std::string& label, std::string& val )
+{
+	std::string s = pt.get<std::string>( label, std::string() );
+	val = s;
+	boost::to_upper( s );
+	boost::trim( s );
+	if ( s == "NO" || s == "FALSE" || s == "0" || s == "OFF" )
+		return false;
+	if ( s == "YES" || s == "TRUE" || s == "1" || s == "ON" )
+		return true;
+	return boost::logic::indeterminate;
 }
 
 
@@ -146,18 +161,16 @@ namespace _SMERP {
 									v.second.get<std::string>( "CAchainFile", std::string() ),
 									boost::filesystem::path( file ).branch_path() ).string();
 
-				tmpStr = v.second.get<std::string>( "verify", std::string() );
-				boost::to_upper( tmpStr );
-				boost::trim( tmpStr );
-				if ( tmpStr == "NO" || tmpStr == "FALSE" || tmpStr == "0" || tmpStr == "OFF" )
+				boost::logic::tribool flag = getBoolValue( v.second, "verify", tmpStr );
+				if ( flag )
+					lep.verify = true;
+				else if ( !flag )
 					lep.verify = false;
 				else	{
 					lep.verify = true;
-					if ( tmpStr != "YES" && tmpStr != "TRUE" && tmpStr != "1" && tmpStr == "ON" )	{
-						errMsg_ = "Unknown value \"";
-						errMsg_ += tmpStr;
-						errMsg_ += "\" for SSL verify client. WARNING: enabling verification";
-					}
+					errMsg_ = "Unknown value \"";
+					errMsg_ += tmpStr;
+					errMsg_ += "\" for SSL verify client. WARNING: enabling verification";
 				}
 
 				SSLaddress.push_back( lep );
