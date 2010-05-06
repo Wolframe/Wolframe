@@ -137,7 +137,7 @@ server::~server()
 	if ( SSLcontext_.size() > 0 )	{
 		for ( i = 0; i < SSLcontext_.size(); i++ )
 			delete SSLcontext_[i];
-		LOG_TRACE << i << "SSL context(s) deleted";
+		LOG_TRACE << i << " SSL context(s) deleted";
 	}
 }
 
