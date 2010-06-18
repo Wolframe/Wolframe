@@ -25,19 +25,14 @@ namespace _SMERP	{
 		unsigned short	threads;
 		unsigned short	maxClients;
 // network configuration
-		std::vector< std::pair<std::string, unsigned short> > address;
-		std::vector< std::pair<std::string, unsigned short> > SSLaddress;
+		std::vector<struct localEndpoint> address;
+		std::vector<struct localSSLendpoint> SSLaddress;
 
 		unsigned	idleTimeout;
 		unsigned	requestTimeout;
 		unsigned	answerTimeout;
 		unsigned	processTimeout;
-// SSL
-		std::string	SSLcertificate;
-		std::string	SSLkey;
-		std::string	SSLCAdirectory;
-		std::string	SSLCAchainFile;
-		bool		SSLverify;
+
 // database configuration
 		std::string	dbHost;
 		unsigned short	dbPort;
@@ -71,6 +66,6 @@ namespace _SMERP	{
 		std::string errMsg( void )	{ return errMsg_; };
 	};
 
-}
+} // namespace _SMERP
 
 #endif // _CONFIGFILE_HPP_INCLUDED

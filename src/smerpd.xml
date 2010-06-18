@@ -20,17 +20,14 @@ SMERP configuration file
 
 			<SSLsocket>
 				<address>0.0.0.0</address><port>7961</port>
+				<!-- SSL parameters: required if SSLsocket is defined -->
+				<certificate>../tests/SSL/smerpd.crt</certificate>	<!-- Server certificate file (PEM) -->
+				<key>../tests/SSL/smerpd.key</key>			<!-- Server key file (PEM) -->
+				<CAdirectory>../tests/SSL/CAdir</CAdirectory>		<!-- Directory holding CA certificate files -->
+				<CAchainFile></CAchainFile>				<!-- SSL CA chain file -->
+				<verify>OFFF</verify>					<!-- Require and verify client certificate -->
 			</SSLsocket>
 		</listen>
-
-		<!-- SSL parameters: required if listenSSL are defined -->
-		<SSL>
-			<certificate>../tests/SSL/smerpd.crt</certificate>		<!-- Server certificate file (PEM) -->
-			<key>../tests/SSL/smerpd.key</key>				<!-- Server key file (PEM) -->
-			<CAdirectory>../tests/SSL/CAdir</CAdirectory>			<!-- Directory holding CA certificate files -->
-			<CAchainFile></CAchainFile>				<!-- SSL CA chain file -->
-			<verify>no</verify>					<!-- Require and verify client certificate -->
-		</SSL>
 
 		<!-- Timeouts. All values are in seconds. Set to 0 to disable. -->
 		<timeout>

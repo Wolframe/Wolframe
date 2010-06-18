@@ -3,24 +3,18 @@
 //
 
 #include "configFile.hpp"
+#include "miscStruct.hpp"
 
 #include <boost/filesystem.hpp>
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/logic/tribool.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/algorithm/string.hpp>
 
 #include <vector>
 #include <string>
-
-
-//#if defined(_WIN32)		// we are on Windows
-//#include <string.h>
-//#define strcasecmp(a, b)	_stricmp((a), (b))
-//#else
-//#include <strings.h>
-//#endif
 
 
 static const unsigned short	DEFAULT_PORT = 7660;
@@ -55,6 +49,20 @@ static boost::filesystem::path resolvePath(const boost::filesystem::path& p)
 		}
 	}
 	return result;
+}
+
+
+static boost::logic::tribool getBoolValue( boost::property_tree::ptree& pt, const std::string& label, std::string& val )
+{
+	std::string s = pt.get<std::string>( label, std::string() );
+	val = s;
+	boost::to_upper( s );
+	boost::trim( s );
+	if ( s == "NO" || s == "FALSE" || s == "0" || s == "OFF" )
+		return false;
+	if ( s == "YES" || s == "TRUE" || s == "1" || s == "ON" )
+		return true;
+	return boost::logic::indeterminate;
 }
 
 
@@ -134,10 +142,38 @@ namespace _SMERP {
 			}
 
 			if ( v.first == "socket" )	{
-				address.push_back( make_pair( tmpStr, port ));
+				struct localEndpoint lep( tmpStr, port );
+				address.push_back( lep );
 			}
 			else if ( v.first == "SSLsocket" )	{
-				SSLaddress.push_back( make_pair( tmpStr, port ));
+				struct localSSLendpoint lep( tmpStr, port );
+// get SSL certificate / CA param
+				lep.certFile = boost::filesystem::complete(
+									v.second.get<std::string>( "certificate", std::string() ),
+									boost::filesystem::path( file ).branch_path() ).string();
+				lep.keyFile = boost::filesystem::complete(
+									v.second.get<std::string>( "key", std::string() ),
+									boost::filesystem::path( file ).branch_path() ).string();
+				lep.CAdirectory = boost::filesystem::complete(
+									v.second.get<std::string>( "CAdirectory", std::string() ),
+									boost::filesystem::path( file ).branch_path() ).string();
+				lep.CAchainFile = boost::filesystem::complete(
+									v.second.get<std::string>( "CAchainFile", std::string() ),
+									boost::filesystem::path( file ).branch_path() ).string();
+
+				boost::logic::tribool flag = getBoolValue( v.second, "verify", tmpStr );
+				if ( flag )
+					lep.verify = true;
+				else if ( !flag )
+					lep.verify = false;
+				else	{
+					lep.verify = true;
+					errMsg_ = "Unknown value \"";
+					errMsg_ += tmpStr;
+					errMsg_ += "\" for SSL verify client. WARNING: enabling verification";
+				}
+
+				SSLaddress.push_back( lep );
 			}
 			else	{
 				errMsg_ = "Invalid listen type: ";
@@ -162,27 +198,7 @@ namespace _SMERP {
 		answerTimeout = pt.get<unsigned>( "server.timeout.answer", 30 );
 		processTimeout = pt.get<unsigned>( "server.timeout.process", 30 );
 
-		SSLcertificate = boost::filesystem::complete(
-							pt.get<std::string>( "server.SSL.certificate", std::string() ),
-							boost::filesystem::path( file ).branch_path() ).string();
-		SSLkey = boost::filesystem::complete(
-							pt.get<std::string>( "server.SSL.key", std::string() ),
-							boost::filesystem::path( file ).branch_path() ).string();
-		SSLCAdirectory = boost::filesystem::complete(
-							pt.get<std::string>( "server.SSL.CAdirectory", std::string() ),
-							boost::filesystem::path( file ).branch_path() ).string();
-		SSLCAchainFile = boost::filesystem::complete(
-							pt.get<std::string>( "server.SSL.CAchainFile", std::string() ),
-							boost::filesystem::path( file ).branch_path() ).string();
-
-		tmpStr = pt.get<std::string>( "server.SSL.verify", std::string() );
-		boost::to_upper( tmpStr );
-		boost::trim( tmpStr );
-		if ( tmpStr == "NO" || tmpStr == "FALSE" || tmpStr == "0" )
-			SSLverify = false;
-		else
-			SSLverify = true;
-
+// database
 		dbHost = pt.get<std::string>( "database.host", std::string() );
 		dbPort = pt.get<unsigned short>( "database.port", 0 );
 		dbName = pt.get<std::string>( "database.name", std::string() );
@@ -201,6 +217,7 @@ namespace _SMERP {
 		}
 		else
 			logToStderr = false;
+
 		if ( pt.get_child_optional( "logging.logFile" ))	{
 			logToFile = true;
 			logFile = boost::filesystem::complete(
@@ -216,6 +233,7 @@ namespace _SMERP {
 		}
 		else
 			logToFile = false;
+
 		if ( pt.get_child_optional( "logging.syslog" ))	{
 			logToSyslog = true;
 			std::string s = pt.get<std::string>( "logging.syslog.facility", "LOCAL4" );
@@ -235,6 +253,7 @@ namespace _SMERP {
 		}
 		else
 			logToSyslog = false;
+
 		if ( pt.get_child_optional( "logging.eventlog" )) {
 			logToEventlog = true;
 			eventlogLogName = pt.get<std::string>( "logging.eventlog.name", "smerpd" );

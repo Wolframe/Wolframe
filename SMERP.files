@@ -13,8 +13,6 @@ src/GNUmakefile
 GNUmakefile
 src/requestHandler.cpp
 src/requestHandler.hpp
-src/requestParser.hpp
-src/requestParser.cpp
 database/data/countries.csv
 database/data/currencies.csv
 src/posixMain.cpp
@@ -45,3 +43,6 @@ src/logger.cpp
 src/smerpd.log
 src/logLevel.hpp
 src/logLevel.cpp
+src/miscStruct.hpp
+src/defaults.hpp
+src/connContext.hpp

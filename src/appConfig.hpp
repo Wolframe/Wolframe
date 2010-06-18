@@ -6,6 +6,7 @@
 #define _APP_CONFIG_HPP_INCLUDED
 
 #include "logLevel.hpp"
+#include "miscStruct.hpp"		// for localEndpoint and localSSLendpoint
 #include "logSyslogFacility.hpp"
 
 #include <string>
@@ -17,24 +18,6 @@ namespace _SMERP {
 
 	struct CmdLineConfig;		// forward declaration for configuration from the command line
 	struct CfgFileConfig;		// forward declaration for configuration from the config file
-
-
-	/// structure for local endpoint configuration
-	struct localEndpoint	{
-		std::string	host;
-		unsigned short	port;
-	};
-
-	/// structure for local SSL endpoint configuration
-	struct localSSLendpoint	{
-		std::string	host;
-		unsigned short	port;
-		std::string	certFile;
-		std::string	keyFile;
-		std::string	CAdirectory;
-		std::string	CAchainFile;
-		bool		verify;
-	};
 
 
 	struct ApplicationConfiguration	{
@@ -55,19 +38,13 @@ namespace _SMERP {
 		unsigned		maxClients;
 
 // network configuration
-		std::vector< std::pair<std::string, unsigned short> > address;
-		std::vector< std::pair<std::string, unsigned short> > SSLaddress;
+		std::vector<struct localEndpoint> address;
+		std::vector<struct localSSLendpoint> SSLaddress;
 
 		unsigned		idleTimeout;
 		unsigned		requestTimeout;
 		unsigned		answerTimeout;
 		unsigned		processTimeout;
-// SSL
-		std::string	SSLcertificate;
-		std::string	SSLkey;
-		std::string	SSLCAdirectory;
-		std::string	SSLCAchainFile;
-		bool		SSLverify;
 
 // database configuration
 		std::string		dbHost;
