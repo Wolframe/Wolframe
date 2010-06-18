@@ -1,3 +1,7 @@
+//
+// singleton.hpp
+//
+
 #ifndef _SINGLETON_HPP_INCLUDED
 #define _SINGLETON_HPP_INCLUDED
 
@@ -23,8 +27,10 @@ public:
 	}
 
 protected:
-	Singleton() {}
-	~Singleton() {}
+	Singleton()	{}
+	~Singleton()	{}
+	Singleton( Singleton const& );
+	Singleton& operator= ( Singleton const& );
 
 	static void init() // never throws
 	{
@@ -44,4 +50,4 @@ template<class T> boost::once_flag Singleton<T>::flag = BOOST_ONCE_INIT;
 template<class T> bool Singleton<T>::initialized = false;
 
 
-#endif	// _SINGLETON_HPP_INCLUDED
+#endif // _SINGLETON_HPP_INCLUDED
