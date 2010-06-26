@@ -3,3 +3,9 @@ MBa:
 1. add multiple interface(s) control
 2. add the SSL interfaces
 3. add connection logging
+
+ABa:
+
+1. synchornize boost-log with 1.0 version in SVN on sourceforge,
+   provide feedback to the author
+2. backport the module loader from Wolfbones/TextWolf
