@@ -1,11 +1,8 @@
 /*
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
- * This header is the Boost.Log library implementation, see the library documentation
- * at http://www.boost.org/libs/log/doc/log.html.
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
  */
 /*!
  * \file   sink.hpp
@@ -25,9 +22,8 @@
 
 #include <string>
 #include <boost/noncopyable.hpp>
-#include <boost/function/function0.hpp>
-#include <boost/function/function1.hpp>
 #include <boost/log/detail/prologue.hpp>
+#include <boost/log/detail/light_function.hpp>
 #include <boost/log/core/record.hpp>
 #include <boost/log/attributes/attribute_values_view.hpp>
 
@@ -59,9 +55,9 @@ public:
     //! Attribute values view type
     typedef basic_attribute_values_view< char_type > values_view_type;
     //! Filter function type
-    typedef function1< bool, values_view_type const& > filter_type;
+    typedef boost::log::aux::light_function1< bool, values_view_type const& > filter_type;
     //! An exception handler type
-    typedef function0< void > exception_handler_type;
+    typedef boost::log::aux::light_function0< void > exception_handler_type;
 
 public:
     /*!

@@ -1,17 +1,14 @@
 /*
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
- * This header is the Boost.Log library implementation, see the library documentation
- * at http://www.boost.org/libs/log/doc/log.html.
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
  */
 /*!
  * \file   slim_string.hpp
  * \author Andrey Semashev
  * \date   08.09.2007
- * 
+ *
  * The header contains implementation of a lightweight read-only STL-string analogue.
  * Slim strings are used to contain attribute names.
  */
@@ -43,7 +40,7 @@ namespace BOOST_LOG_NAMESPACE {
 
 /*!
  * \brief A slim string class with shared data and read-only access
- * 
+ *
  * The slim string class is used within the library to optimize attribute names storage
  * and copying. The \c basic_slim_string class template provides interface similar
  * to <tt>std::basic_string</tt> with regard to read-only capabilities.
@@ -91,13 +88,13 @@ private:
 public:
     /*!
      * Default constructor
-     * 
+     *
      * \post <tt>empty() == true</tt>
      */
     BOOST_LOG_EXPORT basic_slim_string();
     /*!
      * Copy constructor
-     * 
+     *
      * \post <tt>*this == that</tt>
      * \param that Source string to copy from
      */
@@ -105,14 +102,14 @@ public:
 
     /*!
      * Constructs a slim string from an STL string.
-     * 
+     *
      * \post <tt>*this == that</tt>
      * \param that Source string to copy from
      */
     BOOST_LOG_EXPORT explicit basic_slim_string(string_type const& that);
     /*!
      * Constructs a slim string from an STL string part.
-     * 
+     *
      * \post <tt>*this == that.substr(pos, n)</tt>
      * \param s Source string to copy from
      * \param pos Starting position to begin copying from
@@ -121,7 +118,7 @@ public:
     BOOST_LOG_EXPORT basic_slim_string(string_type const& s, size_type pos, size_type n = npos);
     /*!
      * Constructs a slim string from a slim string part.
-     * 
+     *
      * \post <tt>*this == that.substr(pos, n)</tt>
      * \param that Source string to copy from
      * \param pos Starting position to begin copying from
@@ -130,14 +127,14 @@ public:
     BOOST_LOG_EXPORT basic_slim_string(basic_slim_string const& that, size_type pos, size_type n = npos);
     /*!
      * Constructs a slim string from a C-style string
-     * 
+     *
      * \post <tt>*this == string_type(s)</tt>
      * \param s Source string. Must be a zero-terminated sequence of characters, must not be NULL.
      */
     BOOST_LOG_EXPORT basic_slim_string(const_pointer s);
     /*!
      * Constructs a slim string from a C-style string
-     * 
+     *
      * \post <tt>*this == string_type(s, n)</tt>
      * \param s Source string. Must be a sequence of characters, must not be NULL.
      * \param n Number of characters in sequence \a s
@@ -145,7 +142,7 @@ public:
     BOOST_LOG_EXPORT basic_slim_string(const_pointer s, size_type n);
     /*!
      * Constructs a slim string from a number of characters
-     * 
+     *
      * \post <tt>*this == string_type(n, c)</tt>
      * \param n Number of characters
      * \param c Filler character
@@ -159,7 +156,7 @@ public:
 
     /*!
      * Assignment operator
-     * 
+     *
      * \post <tt>*this == that</tt>
      * \param that Source string to copy from
      */
@@ -174,7 +171,7 @@ public:
     }
     /*!
      * Assignment operator
-     * 
+     *
      * \post <tt>*this == basic_slim_string(that)</tt>
      * \param that Source string to copy from
      */
@@ -188,7 +185,7 @@ public:
 
     /*!
      * Indexing operator
-     * 
+     *
      * \pre \a n <tt>&lt; size()</tt>
      * \param n Index of the character requested
      * \return Constant reference to the requested character
@@ -240,7 +237,7 @@ public:
 
     /*!
      * Checked accessor to a character within the string
-     * 
+     *
      * \param n Character index
      * \return Constant reference to the requested character
      *
@@ -325,7 +322,7 @@ public:
 
     /*!
      * Copies a part of the stored string into external buffer
-     * 
+     *
      * \param s Pointer to the beginning of external buffer. Must not be NULL.
      *          The buffer must have enough capacity to accommodate up to \a n characters.
      * \param n Maximum number of characters to copy
@@ -341,7 +338,7 @@ public:
     copy(pointer s, size_type n, size_type pos = 0) const;
     /*!
      * Creates another slim string containing a part of the stored string
-     * 
+     *
      * \param pos Starting position of the substring
      * \param n Length of the substring
      * \return The constructed substring
@@ -358,7 +355,7 @@ public:
 
     /*!
      * Searches the string for a substring
-     * 
+     *
      * \param that The sought substring
      * \param pos Search starting position
      * \return Starting position of the found substring within the string, if lookup was successful, \c npos otherwise
@@ -372,7 +369,7 @@ public:
     find(basic_slim_string const& that, size_type pos = 0) const;
     /*!
      * Searches the string for a substring
-     * 
+     *
      * \param s The sought substring
      * \param pos Search starting position
      * \return Starting position of the found substring within the string, if lookup was successful, \c npos otherwise
@@ -386,7 +383,7 @@ public:
     find(string_type const& s, size_type pos = 0) const;
     /*!
      * Searches the string for a substring
-     * 
+     *
      * \param s The sought substring. Must point to a zero-terminated sequence of characters, must not be NULL.
      * \param pos Search starting position
      * \return Starting position of the found substring within the string, if lookup was successful, \c npos otherwise
@@ -400,7 +397,7 @@ public:
     find(const_pointer s, size_type pos = 0) const;
     /*!
      * Searches the string for a substring
-     * 
+     *
      * \param s The sought substring. Must point to a sequence of characters, must not be NULL.
      * \param pos Search starting position
      * \param n Number of characters in the substring \a s
@@ -415,7 +412,7 @@ public:
     find(const_pointer s, size_type pos, size_type n) const;
     /*!
      * Searches the string for a character
-     * 
+     *
      * \param c The sought character
      * \param pos Search starting position
      * \return Position of the found character within the string, if lookup was successful, \c npos otherwise
@@ -430,7 +427,7 @@ public:
 
     /*!
      * Searches the string for a substring in the reverse direction
-     * 
+     *
      * \param that The sought substring
      * \param pos Search starting position
      * \return Starting position of the found substring within the string, if lookup was successful, \c npos otherwise
@@ -444,7 +441,7 @@ public:
     rfind(basic_slim_string const& that, size_type pos = npos) const;
     /*!
      * Searches the string for a substring in the reverse direction
-     * 
+     *
      * \param s The sought substring
      * \param pos Search starting position
      * \return Starting position of the found substring within the string, if lookup was successful, \c npos otherwise
@@ -458,7 +455,7 @@ public:
     rfind(string_type const& s, size_type pos = npos) const;
     /*!
      * Searches the string for a substring in the reverse direction
-     * 
+     *
      * \param s The sought substring. Must point to a zero-terminated sequence of characters, must not be NULL.
      * \param pos Search starting position
      * \return Starting position of the found substring within the string, if lookup was successful, \c npos otherwise
@@ -472,7 +469,7 @@ public:
     rfind(const_pointer s, size_type pos = npos) const;
     /*!
      * Searches the string for a substring in the reverse direction
-     * 
+     *
      * \param s The sought substring. Must point to a sequence of characters, must not be NULL.
      * \param pos Search starting position
      * \param n Number of characters in the substring \a s
@@ -487,7 +484,7 @@ public:
     rfind(const_pointer s, size_type pos, size_type n) const;
     /*!
      * Searches the string for a character in the reverse direction
-     * 
+     *
      * \param c The sought character
      * \param pos Search starting position
      * \return Position of the found character within the string, if lookup was successful, \c npos otherwise
@@ -502,7 +499,7 @@ public:
 
     /*!
      * Searches the string for one of the specified characters
-     * 
+     *
      * \param that The set of characters being sought
      * \param pos Search starting position
      * \return Position of the found character within the string, if lookup was successful, \c npos otherwise
@@ -516,7 +513,7 @@ public:
     find_first_of(basic_slim_string const& that, size_type pos = 0) const;
     /*!
      * Searches the string for one of the specified characters
-     * 
+     *
      * \param s The set of characters being sought
      * \param pos Search starting position
      * \return Position of the found character within the string, if lookup was successful, \c npos otherwise
@@ -530,7 +527,7 @@ public:
     find_first_of(string_type const& s, size_type pos = 0) const;
     /*!
      * Searches the string for one of the specified characters
-     * 
+     *
      * \param s The set of characters being sought. Must point to a zero-terminated sequence of characters, must not be NULL.
      * \param pos Search starting position
      * \return Position of the found character within the string, if lookup was successful, \c npos otherwise
@@ -544,7 +541,7 @@ public:
     find_first_of(const_pointer s, size_type pos = 0) const;
     /*!
      * Searches the string for one of the specified characters
-     * 
+     *
      * \param s The set of characters being sought. Must point to a sequence of characters, must not be NULL.
      * \param pos Search starting position
      * \param n Number of characters in the sequence \a s
@@ -559,7 +556,7 @@ public:
     find_first_of(const_pointer s, size_type pos, size_type n) const;
     /*!
      * Searches the string for a character
-     * 
+     *
      * \param c The sought character
      * \param pos Search starting position
      * \return Position of the found character within the string, if lookup was successful, \c npos otherwise
@@ -574,7 +571,7 @@ public:
 
     /*!
      * Searches the string for one of the specified characters in the reverse direction
-     * 
+     *
      * \param that The set of characters being sought
      * \param pos Search starting position
      * \return Position of the found character within the string, if lookup was successful, \c npos otherwise
@@ -588,7 +585,7 @@ public:
     find_last_of(basic_slim_string const& that, size_type pos = npos) const;
     /*!
      * Searches the string for one of the specified characters in the reverse direction
-     * 
+     *
      * \param s The set of characters being sought
      * \param pos Search starting position
      * \return Position of the found character within the string, if lookup was successful, \c npos otherwise
@@ -602,7 +599,7 @@ public:
     find_last_of(string_type const& s, size_type pos = npos) const;
     /*!
      * Searches the string for one of the specified characters in the reverse direction
-     * 
+     *
      * \param s The set of characters being sought. Must point to a zero-terminated sequence of characters, must not be NULL.
      * \param pos Search starting position
      * \return Position of the found character within the string, if lookup was successful, \c npos otherwise
@@ -616,7 +613,7 @@ public:
     find_last_of(const_pointer s, size_type pos = npos) const;
     /*!
      * Searches the string for one of the specified characters in the reverse direction
-     * 
+     *
      * \param s The set of characters being sought. Must point to a sequence of characters, must not be NULL.
      * \param pos Search starting position
      * \param n Number of characters in the sequence \a s
@@ -631,7 +628,7 @@ public:
     find_last_of(const_pointer s, size_type pos, size_type n) const;
     /*!
      * Searches the string for a character in the reverse direction in the reverse direction
-     * 
+     *
      * \param c The sought character
      * \param pos Search starting position
      * \return Position of the found character within the string, if lookup was successful, \c npos otherwise
@@ -646,7 +643,7 @@ public:
 
     /*!
      * Searches the string for one of the characters, other than specified in the sequence
-     * 
+     *
      * \param that The set of characters, that are not being sought
      * \param pos Search starting position
      * \return Position of the found character within the string, if lookup was successful, \c npos otherwise
@@ -660,7 +657,7 @@ public:
     find_first_not_of(basic_slim_string const& that, size_type pos = 0) const;
     /*!
      * Searches the string for one of the characters, other than specified in the sequence
-     * 
+     *
      * \param s The set of characters, that are not being sought
      * \param pos Search starting position
      * \return Position of the found character within the string, if lookup was successful, \c npos otherwise
@@ -674,7 +671,7 @@ public:
     find_first_not_of(string_type const& s, size_type pos = 0) const;
     /*!
      * Searches the string for one of the characters, other than specified in the sequence
-     * 
+     *
      * \param s The set of characters, that are not being sought. Must point to a zero-terminated sequence of characters, must not be NULL.
      * \param pos Search starting position
      * \return Position of the found character within the string, if lookup was successful, \c npos otherwise
@@ -688,7 +685,7 @@ public:
     find_first_not_of(const_pointer s, size_type pos = 0) const;
     /*!
      * Searches the string for one of the characters, other than specified in the sequence
-     * 
+     *
      * \param s The set of characters, that are not being sought. Must point to a sequence of characters, must not be NULL.
      * \param pos Search starting position
      * \param n Number of characters in the sequence \a s
@@ -703,7 +700,7 @@ public:
     find_first_not_of(const_pointer s, size_type pos, size_type n) const;
     /*!
      * Searches the string for one of the characters, other than specified
-     * 
+     *
      * \param c The character, that is not being sought
      * \param pos Search starting position
      * \return Position of the found character within the string, if lookup was successful, \c npos otherwise
@@ -718,7 +715,7 @@ public:
 
     /*!
      * Searches the string for one of the characters, other than specified in the sequence, in the reverse direction
-     * 
+     *
      * \param that The set of characters, that are not being sought
      * \param pos Search starting position
      * \return Position of the found character within the string, if lookup was successful, \c npos otherwise
@@ -732,7 +729,7 @@ public:
     find_last_not_of(basic_slim_string const& that, size_type pos = npos) const;
     /*!
      * Searches the string for one of the characters, other than specified in the sequence, in the reverse direction
-     * 
+     *
      * \param s The set of characters, that are not being sought
      * \param pos Search starting position
      * \return Position of the found character within the string, if lookup was successful, \c npos otherwise
@@ -746,7 +743,7 @@ public:
     find_last_not_of(string_type const& s, size_type pos = npos) const;
     /*!
      * Searches the string for one of the characters, other than specified in the sequence, in the reverse direction
-     * 
+     *
      * \param s The set of characters, that are not being sought. Must point to a zero-terminated sequence of characters, must not be NULL.
      * \param pos Search starting position
      * \return Position of the found character within the string, if lookup was successful, \c npos otherwise
@@ -760,7 +757,7 @@ public:
     find_last_not_of(const_pointer s, size_type pos = npos) const;
     /*!
      * Searches the string for one of the characters, other than specified in the sequence, in the reverse direction
-     * 
+     *
      * \param s The set of characters, that are not being sought. Must point to a sequence of characters, must not be NULL.
      * \param pos Search starting position
      * \param n Number of characters in the sequence \a s
@@ -775,7 +772,7 @@ public:
     find_last_not_of(const_pointer s, size_type pos, size_type n) const;
     /*!
      * Searches the string for one of the characters, other than specified, in the reverse direction
-     * 
+     *
      * \param c The character, that is not being sought
      * \param pos Search starting position
      * \return Position of the found character within the string, if lookup was successful, \c npos otherwise
@@ -790,7 +787,7 @@ public:
 
     /*!
      * Lexicographically compares the argument string to this string
-     * 
+     *
      * \param that Comparand
      * \return Zero if the comparand equals this string, a negative value if this string is less than the comparand,
      *         a positive value if this string is greater than the comparand.
@@ -798,7 +795,7 @@ public:
     BOOST_LOG_EXPORT int compare(basic_slim_string const& that) const;
     /*!
      * Lexicographically compares the argument string to this string
-     * 
+     *
      * \param s Comparand
      * \return Zero if the comparand equals this string, a negative value if this string is less than the comparand,
      *         a positive value if this string is greater than the comparand.
@@ -806,8 +803,8 @@ public:
     BOOST_LOG_EXPORT int compare(string_type const& s) const;
     /*!
      * Lexicographically compares the argument string to a part of this string
-     * 
-     * \pre <tt>pos1 + n1 < size()</tt> 
+     *
+     * \pre <tt>pos1 + n1 < size()</tt>
      * \param pos1 Starting position within this string to perform comparison to
      * \param n1 Length of the substring of this string to perform comparison to
      * \param that Comparand
@@ -819,8 +816,8 @@ public:
     BOOST_LOG_EXPORT int compare(size_type pos1, size_type n1, basic_slim_string const& that) const;
     /*!
      * Lexicographically compares the argument string to a part of this string
-     * 
-     * \pre <tt>pos1 + n1 < size()</tt> 
+     *
+     * \pre <tt>pos1 + n1 < size()</tt>
      * \param pos1 Starting position within this string to perform comparison to
      * \param n1 Length of the substring of this string to perform comparison to
      * \param s Comparand
@@ -832,8 +829,8 @@ public:
     BOOST_LOG_EXPORT int compare(size_type pos1, size_type n1, string_type const& s) const;
     /*!
      * Lexicographically compares substring of the argument string to a part of this string
-     * 
-     * \pre <tt>pos1 + n1 < size() && pos2 + n2 < that.size()</tt> 
+     *
+     * \pre <tt>pos1 + n1 < size() && pos2 + n2 < that.size()</tt>
      * \param pos1 Starting position within this string to perform comparison to
      * \param n1 Length of the substring of this string to perform comparison to
      * \param that Comparand full string
@@ -847,8 +844,8 @@ public:
     BOOST_LOG_EXPORT int compare(size_type pos1, size_type n1, basic_slim_string const& that, size_type pos2, size_type n2) const;
     /*!
      * Lexicographically compares substring of the argument string to a part of this string
-     * 
-     * \pre <tt>pos1 + n1 < size() && pos2 + n2 < that.size()</tt> 
+     *
+     * \pre <tt>pos1 + n1 < size() && pos2 + n2 < that.size()</tt>
      * \param pos1 Starting position within this string to perform comparison to
      * \param n1 Length of the substring of this string to perform comparison to
      * \param s Comparand full string
@@ -862,7 +859,7 @@ public:
     BOOST_LOG_EXPORT int compare(size_type pos1, size_type n1, string_type const& s, size_type pos2, size_type n2) const;
     /*!
      * Lexicographically compares the argument string to this string
-     * 
+     *
      * \param s Comparand. Must point to a zero-terminated sequence of characters, must not be NULL.
      * \return Zero if the comparand equals this string, a negative value if this string is less than the comparand,
      *         a positive value if this string is greater than the comparand.
@@ -870,7 +867,7 @@ public:
     BOOST_LOG_EXPORT int compare(const_pointer s) const;
     /*!
      * Lexicographically compares the argument string to this string
-     * 
+     *
      * \param s Comparand. Must point to a sequence of characters, must not be NULL.
      * \param n2 Number of characters in the sequence \a s.
      * \return Zero if the comparand equals this string, a negative value if this string is less than the comparand,
@@ -879,8 +876,8 @@ public:
     BOOST_LOG_EXPORT int compare(const_pointer s, size_type n2) const;
     /*!
      * Lexicographically compares the argument string to a part of this string
-     * 
-     * \pre <tt>pos1 + n1 < size()</tt> 
+     *
+     * \pre <tt>pos1 + n1 < size()</tt>
      * \param pos1 Starting position within this string to perform comparison to
      * \param n1 Length of the substring of this string to perform comparison to
      * \param s Comparand. Must point to a sequence of characters, must not be NULL.
@@ -892,8 +889,8 @@ public:
     BOOST_LOG_EXPORT int compare(size_type pos1, size_type n1, const_pointer s) const;
     /*!
      * Lexicographically compares the argument string to a part of this string
-     * 
-     * \pre <tt>pos1 + n1 < size()</tt> 
+     *
+     * \pre <tt>pos1 + n1 < size()</tt>
      * \param pos1 Starting position within this string to perform comparison to
      * \param n1 Length of the substring of this string to perform comparison to
      * \param s Comparand. Must point to a sequence of characters, must not be NULL.

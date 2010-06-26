@@ -1,17 +1,14 @@
 /*
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
- * This header is the Boost.Log library implementation, see the library documentation
- * at http://www.boost.org/libs/log/doc/log.html.
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
  */
 /*!
  * \file   unique_identifier_name.hpp
  * \author Andrey Semashev
  * \date   30.04.2008
- * 
+ *
  * The header contains BOOST_LOG_UNIQUE_IDENTIFIER_NAME macro definition.
  */
 
@@ -37,7 +34,7 @@
 
 /*!
  * \def BOOST_LOG_UNIQUE_IDENTIFIER_NAME(prefix)
- * 
+ *
  * Constructs a unique (in the current file scope) token that can be used as a variable name.
  * The name will contain a prefix passed in the \a prefix argument. This allows to use the
  * macro multiple times in another macro.

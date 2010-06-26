@@ -1,9 +1,10 @@
+/*
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
+ */
 /*!
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
  * \file   sink_frontends.cpp
  * \author Andrey Semashev
  * \date   03.11.2007
@@ -29,13 +30,13 @@
 #include <boost/intrusive/list.hpp>
 #include <boost/intrusive/trivial_value_traits.hpp>
 #include <boost/utility/in_place_factory.hpp>
-#include <boost/thread/thread.hpp>
 #include <boost/thread/locks.hpp>
+#include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/exceptions.hpp>
 #include <boost/thread/condition_variable.hpp>
 #include <boost/log/detail/light_rw_mutex.hpp>
-#include <boost/log/detail/shared_lock_guard.hpp>
+#include <boost/log/detail/locks.hpp>
 #include <boost/log/exceptions.hpp>
 #include <boost/log/sinks/sync_frontend.hpp>
 #include <boost/log/sinks/async_frontend.hpp>
@@ -62,7 +63,7 @@ struct basic_sink_frontend< CharT >::implementation
     //! Read lock type
     typedef boost::log::aux::shared_lock_guard< mutex_type > scoped_read_lock;
     //! Write lock type
-    typedef lock_guard< mutex_type > scoped_write_lock;
+    typedef boost::log::aux::exclusive_lock_guard< mutex_type > scoped_write_lock;
 
     //! Synchronization mutex
     mutex_type m_Mutex;
@@ -266,7 +267,7 @@ void synchronous_frontend< CharT >::consume(record_type const& record)
     register implementation* pImpl = this->BOOST_NESTED_TEMPLATE get_impl< implementation >();
     try
     {
-        lock_guard< mutex > _(pImpl->m_BackendMutex);
+        log::aux::exclusive_lock_guard< mutex > _(pImpl->m_BackendMutex);
         (pImpl->m_Consume)(pImpl->m_pBackend.get(), record);
     }
     catch (thread_interrupted&)
@@ -323,7 +324,7 @@ template class synchronous_frontend< wchar_t >;
 //  Asynchronous sink frontend implementation
 /////////////////////////////////////////////////////////////////////
 
-namespace {
+BOOST_LOG_ANONYMOUS_NAMESPACE {
 
     //! A simple scope guard that automatically clears processing thread id
     struct thread_id_cleanup
@@ -339,7 +340,7 @@ namespace {
         {
             if (m_Active)
             {
-                lock_guard< mutex > _(m_Mutex);
+                log::aux::exclusive_lock_guard< mutex > _(m_Mutex);
                 m_ThreadID = none;
                 if (m_pCond)
                     m_pCond->notify_all();
@@ -440,7 +441,7 @@ public:
     {
         thread_id_cleanup cleanup(m_FeedingThreadID, m_FrontendMutex, &m_FinishingCondition);
         {
-            lock_guard< mutex > lock1(m_FrontendMutex);
+            log::aux::exclusive_lock_guard< mutex > lock2(m_FrontendMutex);
             if (m_FeedingThreadID)
                 BOOST_LOG_THROW_DESCR(unexpected_call, "Asynchronous sink frontend already runs a thread");
             m_FeedingThreadID = this_thread::get_id();
@@ -475,12 +476,12 @@ public:
     //! The method softly interrupts record feeding loop
     bool stop()
     {
-        unique_lock< mutex > _lock(m_FrontendMutex);
+        unique_lock< mutex > lock2(m_FrontendMutex);
         if (m_FeedingThreadID)
         {
             m_Finishing = true;
             m_Condition.notify_one();
-            m_FinishingCondition.wait(_lock);
+            m_FinishingCondition.wait(lock2);
 
             if (m_Thread)
             {
@@ -498,7 +499,7 @@ public:
     {
         thread_id_cleanup cleanup(m_FeedingThreadID, m_FrontendMutex);
         {
-            lock_guard< mutex > _lock(m_FrontendMutex);
+            log::aux::exclusive_lock_guard< mutex > lock2(m_FrontendMutex);
             if (m_FeedingThreadID)
                 BOOST_LOG_THROW_DESCR(unexpected_call, "Asynchronous sink frontend already runs a thread");
             m_FeedingThreadID = this_thread::get_id();
@@ -548,7 +549,7 @@ private:
             record_type rec;
             rec.swap(records.front().m_Value);
             records.pop_front_and_dispose(checked_deleter< node >());
-            lock_guard< mutex > _(m_BackendMutex);
+            log::aux::exclusive_lock_guard< mutex > _(m_BackendMutex);
             m_Consume(m_pBackend.get(), rec);
         }
         catch (thread_interrupted&)
@@ -826,7 +827,7 @@ public:
     {
         thread_id_cleanup cleanup(m_FeedingThreadID, m_FrontendMutex, &m_FinishingCondition);
         {
-            lock_guard< mutex > lock1(m_FrontendMutex);
+            log::aux::exclusive_lock_guard< mutex > lock2(m_FrontendMutex);
             if (m_FeedingThreadID)
                 BOOST_LOG_THROW_DESCR(unexpected_call, "Asynchronous sink frontend already runs a thread");
             m_FeedingThreadID = this_thread::get_id();
@@ -854,12 +855,12 @@ public:
     //! The method softly interrupts record feeding loop
     bool stop()
     {
-        unique_lock< mutex > _lock(m_FrontendMutex);
+        unique_lock< mutex > lock2(m_FrontendMutex);
         if (m_FeedingThreadID)
         {
             m_Finishing = true;
             m_Condition.notify_one();
-            m_FinishingCondition.wait(_lock);
+            m_FinishingCondition.wait(lock2);
 
             if (m_Thread)
             {
@@ -878,7 +879,7 @@ public:
     {
         thread_id_cleanup cleanup(m_FeedingThreadID, m_FrontendMutex);
         {
-            lock_guard< mutex > _lock(m_FrontendMutex);
+            log::aux::exclusive_lock_guard< mutex > lock2(m_FrontendMutex);
             if (m_FeedingThreadID)
                 BOOST_LOG_THROW_DESCR(unexpected_call, "Asynchronous sink frontend already runs a thread");
             m_FeedingThreadID = this_thread::get_id();
@@ -926,7 +927,7 @@ private:
             record_type rec;
             rec.swap(m_OrderedRecords.front().m_Value.m_Record);
             m_OrderedRecords.pop_front_and_dispose(checked_deleter< node >());
-            lock_guard< mutex > _(m_BackendMutex);
+            log::aux::exclusive_lock_guard< mutex > _(m_BackendMutex);
             m_Consume(m_pBackend.get(), rec);
         }
         catch (thread_interrupted&)

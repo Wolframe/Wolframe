@@ -1,9 +1,10 @@
+/*
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
+ */
 /*!
- * (C) 2009 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
  * \file   trivial.cpp
  * \author Andrey Semashev
  * \date   07.11.2009
@@ -32,6 +33,7 @@
 #include <boost/log/sinks/text_file_backend.hpp>
 #include <boost/log/utility/init/common_attributes.hpp>
 #include <boost/log/detail/universal_path.hpp>
+#include <boost/log/sources/global_logger_storage.hpp>
 
 #if !defined(BOOST_LOG_NO_THREADS)
 #include <boost/log/sinks/sync_frontend.hpp>
@@ -52,9 +54,7 @@ namespace BOOST_LOG_NAMESPACE {
 
 namespace trivial {
 
-namespace aux {
-
-namespace {
+BOOST_LOG_ANONYMOUS_NAMESPACE {
 
     // By default we try to compose the log file name based on the application executable file name
 
@@ -63,19 +63,22 @@ namespace {
     log::aux::universal_path suggest_file_name()
     {
 #if !defined(BOOST_FILESYSTEM_NARROW_ONLY)
+        typedef std::wstring native_string_type;
         const wchar_t ext[] = L".log";
         wchar_t buf[FILENAME_MAX];
         std::size_t len = GetModuleFileNameW(NULL, buf, sizeof(buf) / sizeof(*buf));
 #else
+        typedef std::string native_string_type;
         const char ext[] = ".log";
         char buf[FILENAME_MAX];
         std::size_t len = GetModuleFileNameA(NULL, buf, sizeof(buf) / sizeof(*buf));
 #endif
-        if (len > 0)
+        if (len > 0 && len < (sizeof(buf) / sizeof(*buf)))
         {
             // Extract the file name from the full path and replace extension with .log
+            native_string_type filename(buf, len);
             return log::aux::universal_path(
-                filesystem::basename(log::aux::to_universal_path(buf)) + ext);
+                filesystem::basename(log::aux::to_universal_path(filename)) + ext);
         }
         else
         {
@@ -97,8 +100,11 @@ namespace {
             std::string full_name(buf, buf + len);
 
             // Extract the file name from the full path and replace extension with .log
+            // NOTE: Code conversion is required for cygwin
+            log::aux::universal_path::string_type ext;
+            log::aux::code_convert(std::string(".log"), ext);
             return log::aux::universal_path(
-                filesystem::basename(log::aux::to_universal_path(full_name)) + ".log");
+                filesystem::basename(log::aux::to_universal_path(full_name)) + ext);
         }
 
 #endif // defined(BOOST_HAS_UNISTD_H)
@@ -111,7 +117,7 @@ namespace {
 } // namespace
 
 //! Initialization routine
-BOOST_LOG_EXPORT void init()
+BOOST_LOG_EXPORT logger::logger_type logger::construct_logger()
 {
     log::add_common_attributes< char >();
 
@@ -140,9 +146,55 @@ BOOST_LOG_EXPORT void init()
     );
 
     log::core::get()->add_sink(sink);
+
+    return logger_type(keywords::severity = info);
 }
 
-} // namespace aux
+//! Returns a reference to the trivial logger instance
+BOOST_LOG_EXPORT logger::logger_type& logger::get()
+{
+    return log::sources::aux::logger_singleton< logger >::get();
+}
+
+//! Streaming operator for severity level
+template< typename CharT, typename TraitsT >
+std::basic_ostream< CharT, TraitsT >& operator<< (
+    std::basic_ostream< CharT, TraitsT >& strm, severity_level lvl)
+{
+    switch (lvl)
+    {
+    case trace:
+        strm << "trace"; break;
+    case debug:
+        strm << "debug"; break;
+    case info:
+        strm << "info"; break;
+    case warning:
+        strm << "warning"; break;
+    case error:
+        strm << "error"; break;
+    case fatal:
+        strm << "fatal"; break;
+    default:
+        strm << static_cast< int >(lvl); break;
+    }
+
+    return strm;
+}
+
+//  Explicitly instantiate the operator
+#ifdef BOOST_LOG_USE_CHAR
+template BOOST_LOG_EXPORT std::basic_ostream< char, std::char_traits< char > >&
+    operator<< < char, std::char_traits< char > >(
+        std::basic_ostream< char, std::char_traits< char > >& strm,
+        severity_level lvl);
+#endif
+#ifdef BOOST_LOG_USE_WCHAR_T
+template BOOST_LOG_EXPORT std::basic_ostream< wchar_t, std::char_traits< wchar_t > >&
+    operator<< < wchar_t, std::char_traits< wchar_t > >(
+        std::basic_ostream< wchar_t, std::char_traits< wchar_t > >& strm,
+        severity_level lvl);
+#endif
 
 } // namespace trivial
 

@@ -1,9 +1,10 @@
+/*
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
+ */
 /*!
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
  * \file   code_conversion.cpp
  * \author Andrey Semashev
  * \date   08.11.2008
@@ -25,7 +26,7 @@ namespace BOOST_LOG_NAMESPACE {
 
 namespace aux {
 
-namespace {
+BOOST_LOG_ANONYMOUS_NAMESPACE {
 
     //! The function performs character conversion with the specified facet
     inline std::codecvt_base::result convert(
@@ -216,7 +217,8 @@ void converting_ostringstreambuf< CharT, TraitsT >::write(const char_type*& pBas
             pBase = pPtr;
             return;
 
-	case std::codecvt_base::error:
+        case  std::codecvt_base::error:
+        default: // std::codecvt_base::error
             BOOST_LOG_THROW_DESCR(conversion_error, "Could not convert character encoding");
         }
     }

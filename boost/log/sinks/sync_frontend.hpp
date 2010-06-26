@@ -1,11 +1,8 @@
 /*
- * (C) 2009 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
- * This header is the Boost.Log library implementation, see the library documentation
- * at http://www.boost.org/libs/log/doc/log.html.
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
  */
 /*!
  * \file   sync_frontend.hpp
@@ -77,10 +74,12 @@ namespace aux {
 
 } // namespace aux
 
+//! \cond
 #define BOOST_LOG_SINK_CTOR_FORWARD_INTERNAL(z, n, data)\
     template< BOOST_PP_ENUM_PARAMS(n, typename T) >\
     explicit synchronous_sink(BOOST_PP_ENUM_BINARY_PARAMS(n, T, const& arg)) :\
         base_type(boost::make_shared< sink_backend_type >(BOOST_PP_ENUM_PARAMS(n, arg)), &synchronous_sink::consume_trampoline) {}
+//! \endcond
 
 /*!
  * \brief Synchronous logging sink frontend

@@ -1,11 +1,8 @@
 /*
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
- * This header is the Boost.Log library implementation, see the library documentation
- * at http://www.boost.org/libs/log/doc/log.html.
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
  */
 /*!
  * \file   basic_sink_backend.hpp
@@ -30,8 +27,8 @@
 #include <boost/mpl/or.hpp>
 #include <boost/mpl/assert.hpp>
 #include <boost/type_traits/is_same.hpp>
-#include <boost/function/function2.hpp>
 #include <boost/log/detail/prologue.hpp>
+#include <boost/log/detail/light_function.hpp>
 #include <boost/log/detail/cleanup_scope_guard.hpp>
 #include <boost/log/detail/code_conversion.hpp>
 #include <boost/log/sinks/threading_models.hpp>
@@ -128,7 +125,7 @@ private:
     stream_type m_FormattingStream;
 
     //! Formatter functor
-    boost::function2<
+    boost::log::aux::light_function2<
         void,
         stream_type&,
         record_type const&

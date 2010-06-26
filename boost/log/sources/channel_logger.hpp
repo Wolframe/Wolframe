@@ -1,11 +1,8 @@
 /*
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
- * This header is the Boost.Log library implementation, see the library documentation
- * at http://www.boost.org/libs/log/doc/log.html.
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
  */
 /*!
  * \file   channel_logger.hpp
@@ -30,6 +27,7 @@
 #include <boost/log/sources/basic_logger.hpp>
 #include <boost/log/sources/threading_models.hpp>
 #include <boost/log/sources/channel_feature.hpp>
+#include <boost/log/keywords/channel.hpp>
 
 namespace boost {
 
@@ -48,10 +46,17 @@ class channel_logger :
         char,
         channel_logger< ChannelT >,
         single_thread_model,
-        typename features< channel< ChannelT > >::type
+        features< channel< ChannelT > >
     >
 {
+    typedef typename channel_logger::logger_base base_type;
+
+public:
     BOOST_LOG_FORWARD_LOGGER_CONSTRUCTORS_TEMPLATE(channel_logger)
+
+    explicit channel_logger(ChannelT const& channel) : base_type(keywords::channel = channel)
+    {
+    }
 };
 
 #if !defined(BOOST_LOG_NO_THREADS)
@@ -63,10 +68,17 @@ class channel_logger_mt :
         char,
         channel_logger_mt< ChannelT >,
         multi_thread_model< boost::log::aux::light_rw_mutex >,
-        typename features< channel< ChannelT > >::type
+        features< channel< ChannelT > >
     >
 {
+    typedef typename channel_logger_mt::logger_base base_type;
+
+public:
     BOOST_LOG_FORWARD_LOGGER_CONSTRUCTORS_TEMPLATE(channel_logger_mt)
+
+    explicit channel_logger_mt(ChannelT const& channel) : base_type(keywords::channel = channel)
+    {
+    }
 };
 
 #endif // !defined(BOOST_LOG_NO_THREADS)
@@ -82,10 +94,17 @@ class wchannel_logger :
         wchar_t,
         wchannel_logger< ChannelT >,
         single_thread_model,
-        typename features< channel< ChannelT > >::type
+        features< channel< ChannelT > >
     >
 {
+    typedef typename wchannel_logger::logger_base base_type;
+
+public:
     BOOST_LOG_FORWARD_LOGGER_CONSTRUCTORS_TEMPLATE(wchannel_logger)
+
+    explicit wchannel_logger(ChannelT const& channel) : base_type(keywords::channel = channel)
+    {
+    }
 };
 
 #if !defined(BOOST_LOG_NO_THREADS)
@@ -97,10 +116,17 @@ class wchannel_logger_mt :
         wchar_t,
         wchannel_logger< ChannelT >,
         multi_thread_model< boost::log::aux::light_rw_mutex >,
-        typename features< channel< ChannelT > >::type
+        features< channel< ChannelT > >
     >
 {
+    typedef typename wchannel_logger_mt::logger_base base_type;
+
+public:
     BOOST_LOG_FORWARD_LOGGER_CONSTRUCTORS_TEMPLATE(wchannel_logger_mt)
+
+    explicit wchannel_logger_mt(ChannelT const& channel) : base_type(keywords::channel = channel)
+    {
+    }
 };
 
 #endif // !defined(BOOST_LOG_NO_THREADS)
@@ -137,6 +163,12 @@ public:
      */
     template< typename... ArgsT >
     explicit channel_logger(ArgsT... const& args);
+    /*!
+     * The constructor creates the logger with the specified channel name
+     *
+     * \param channel The channel name
+     */
+    explicit channel_logger(ChannelT const& channel);
     /*!
      * Assignment operator
      */
@@ -176,6 +208,12 @@ public:
     template< typename... ArgsT >
     explicit channel_logger_mt(ArgsT... const& args);
     /*!
+     * The constructor creates the logger with the specified channel name
+     *
+     * \param channel The channel name
+     */
+    explicit channel_logger_mt(ChannelT const& channel);
+    /*!
      * Assignment operator
      */
     channel_logger_mt& operator= (channel_logger_mt const& that)
@@ -214,6 +252,12 @@ public:
     template< typename... ArgsT >
     explicit wchannel_logger(ArgsT... const& args);
     /*!
+     * The constructor creates the logger with the specified channel name
+     *
+     * \param channel The channel name
+     */
+    explicit wchannel_logger(ChannelT const& channel);
+    /*!
      * Assignment operator
      */
     wchannel_logger& operator= (wchannel_logger const& that)
@@ -251,6 +295,12 @@ public:
      */
     template< typename... ArgsT >
     explicit wchannel_logger_mt(ArgsT... const& args);
+    /*!
+     * The constructor creates the logger with the specified channel name
+     *
+     * \param channel The channel name
+     */
+    explicit wchannel_logger_mt(ChannelT const& channel);
     /*!
      * Assignment operator
      */

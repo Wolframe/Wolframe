@@ -1,11 +1,8 @@
 /*
- * (C) 2009 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
- * This header is the Boost.Log library implementation, see the library documentation
- * at http://www.boost.org/libs/log/doc/log.html.
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
  */
 /*!
  * \file   current_thread_id.hpp
@@ -47,7 +44,7 @@ namespace attributes {
  */
 class current_thread_id :
     public attribute,
-    public attribute_value,
+    public attribute_value::implementation,
     public enable_shared_from_this< current_thread_id >
 {
 public:
@@ -57,23 +54,23 @@ public:
 public:
     virtual bool dispatch(type_dispatcher& dispatcher)
     {
-        register type_visitor< held_type >* visitor =
+        type_visitor< held_type > visitor =
             dispatcher.get_visitor< held_type >();
         if (visitor)
         {
-            visitor->visit(this_thread::get_id());
+            visitor(this_thread::get_id());
             return true;
         }
         else
             return false;
     }
 
-    virtual shared_ptr< attribute_value > get_value()
+    virtual attribute_value get_value()
     {
-        return this->shared_from_this();
+        return attribute_value(this->shared_from_this());
     }
 
-    virtual shared_ptr< attribute_value > detach_from_thread()
+    virtual shared_ptr< attribute_value::implementation > detach_from_thread()
     {
         typedef basic_attribute_value< held_type > detached_value;
         return boost::make_shared< detached_value >(this_thread::get_id());

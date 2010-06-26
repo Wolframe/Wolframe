@@ -1,9 +1,10 @@
+/*
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
+ */
 /*!
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
  * \file   timer.cpp
  * \author Andrey Semashev
  * \date   02.12.2007
@@ -16,14 +17,13 @@
 
 #if defined(BOOST_WINDOWS) && !defined(BOOST_LOG_NO_QUERY_PERFORMANCE_COUNTER)
 
-#include <windows.h>
+#include "windows_version.hpp"
 #include <boost/limits.hpp>
 #include <boost/assert.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/log/attributes/timer.hpp>
-#if !defined(BOOST_LOG_NO_THREADS)
-#include <boost/thread/locks.hpp>
-#endif
+#include <boost/log/detail/locks.hpp>
+#include <windows.h>
 
 namespace boost {
 
@@ -44,9 +44,9 @@ timer::timer()
 }
 
 //! The method returns the actual attribute value. It must not return NULL.
-shared_ptr< attribute_value > timer::get_value()
+attribute_value timer::get_value()
 {
-    BOOST_LOG_EXPR_IF_MT(lock_guard< mutex > _(m_Mutex);)
+    BOOST_LOG_EXPR_IF_MT(log::aux::exclusive_lock_guard< mutex > _(m_Mutex);)
 
     // QPC is called after acquiring the lock in order to get more accurate readings
     LARGE_INTEGER li;
@@ -80,7 +80,7 @@ shared_ptr< attribute_value > timer::get_value()
     }
     m_LastCounter = static_cast< uint64_t >(li.QuadPart);
 
-    return boost::make_shared< result_value >(m_Duration);
+    return attribute_value(boost::make_shared< result_value >(m_Duration));
 }
 
 } // namespace attributes

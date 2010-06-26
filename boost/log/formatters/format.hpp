@@ -1,11 +1,8 @@
 /*
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
- * This header is the Boost.Log library implementation, see the library documentation
- * at http://www.boost.org/libs/log/doc/log.html.
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
  */
 /*!
  * \file   formatters/format.hpp
@@ -26,8 +23,8 @@
 #include <ostream>
 #include <boost/format.hpp>
 #include <boost/io/ios_state.hpp>
-#include <boost/function/function2.hpp>
 #include <boost/log/detail/prologue.hpp>
+#include <boost/log/detail/light_function.hpp>
 #include <boost/log/formatters/basic_formatters.hpp>
 #include <boost/log/formatters/chain.hpp>
 #include <boost/log/formatters/wrappers.hpp>
@@ -76,7 +73,7 @@ private:
         typename ostream_type::traits_type
     > rdbuf_saver;
     //! Formatter function object type
-    typedef function2< void, ostream_type&, record_type const& > formatter_type;
+    typedef boost::log::aux::light_function2< void, ostream_type&, record_type const& > formatter_type;
     //! Sequence of formatters
     typedef std::vector< formatter_type > formatters;
     //! Stream buffer type
@@ -145,8 +142,8 @@ public:
     template< typename T >
     fmt_format< char_type >& operator% (T const& fmt)
     {
-        typedef typename wrap_if_not_formatter< char_type, T >::type result_type2;
-        m_Formatters.push_back(formatter_type(result_type2(fmt)));
+        typedef typename wrap_if_not_formatter< char_type, T >::type result_type;
+        m_Formatters.push_back(formatter_type(result_type(fmt)));
         return *this;
     }
 

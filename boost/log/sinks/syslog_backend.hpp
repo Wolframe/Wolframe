@@ -1,11 +1,8 @@
 /*
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
- * This header is the Boost.Log library implementation, see the library documentation
- * at http://www.boost.org/libs/log/doc/log.html.
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
  */
 /*!
  * \file   syslog_backend.hpp
@@ -24,9 +21,9 @@
 
 #include <string>
 #include <boost/shared_ptr.hpp>
-#include <boost/function/function1.hpp>
 #include <boost/log/detail/prologue.hpp>
 #include <boost/log/detail/asio_fwd.hpp>
+#include <boost/log/detail/light_function.hpp>
 #include <boost/log/detail/parameter_tools.hpp>
 #include <boost/log/sinks/basic_sink_backend.hpp>
 #include <boost/log/sinks/syslog_constants.hpp>
@@ -63,9 +60,14 @@ namespace syslog {
     enum impl_types
     {
 #ifdef BOOST_LOG_USE_NATIVE_SYSLOG
-        native = 0,             //!< Use native syslog API
+        native = 0                  //!< Use native syslog API
+#ifndef BOOST_LOG_NO_ASIO
+        ,
 #endif
-        udp_socket_based = 1    //!< Use UDP sockets, according to RFC3164
+#endif
+#ifndef BOOST_LOG_NO_ASIO
+        udp_socket_based = 1        //!< Use UDP sockets, according to RFC3164
+#endif
     };
 
     /*!
@@ -77,10 +79,10 @@ namespace syslog {
      */
     template< typename CharT, typename AttributeValueT = int >
     class basic_direct_severity_mapping :
-        public basic_direct_mapping< CharT, level_t, AttributeValueT >
+        public basic_direct_mapping< CharT, level, AttributeValueT >
     {
         //! Base type
-        typedef basic_direct_mapping< CharT, level_t, AttributeValueT > base_type;
+        typedef basic_direct_mapping< CharT, level, AttributeValueT > base_type;
 
     public:
         //! String type
@@ -107,10 +109,10 @@ namespace syslog {
      */
     template< typename CharT, typename AttributeValueT = int >
     class basic_custom_severity_mapping :
-        public basic_custom_mapping< CharT, level_t, AttributeValueT >
+        public basic_custom_mapping< CharT, level, AttributeValueT >
     {
         //! Base type
-        typedef basic_custom_mapping< CharT, level_t, AttributeValueT > base_type;
+        typedef basic_custom_mapping< CharT, level, AttributeValueT > base_type;
 
     public:
         //! String type
@@ -298,9 +300,9 @@ public:
     typedef typename base_type::record_type record_type;
 
     //! Syslog severity level mapper type
-    typedef boost::function1<
-        syslog::level_t,
-        values_view_type const&
+    typedef boost::log::aux::light_function1<
+        syslog::level,
+        record_type const&
     > severity_mapper_type;
 
 private:
@@ -343,6 +345,8 @@ public:
      */
     BOOST_LOG_EXPORT void set_severity_mapper(severity_mapper_type const& mapper);
 
+#if !defined(BOOST_LOG_NO_ASIO)
+
     /*!
      * The method sets the local host name which log records will be sent from. The host name
      * is resolved to obtain the final IP address.
@@ -383,6 +387,8 @@ public:
      */
     BOOST_LOG_EXPORT void set_target_address(boost::asio::ip::address const& addr, unsigned short port = 514);
 
+#endif // !defined(BOOST_LOG_NO_ASIO)
+
 private:
 #ifndef BOOST_LOG_DOXYGEN_PASS
     //! The method passes the formatted message to the Syslog API
@@ -394,11 +400,15 @@ private:
     {
         construct(
             args[keywords::facility | syslog::user],
+#if !defined(BOOST_LOG_NO_ASIO)
             args[keywords::use_impl | syslog::udp_socket_based],
+#else
+            args[keywords::use_impl | syslog::native],
+#endif
             args[keywords::ip_version | v4]);
     }
     BOOST_LOG_EXPORT void construct(
-        syslog::facility_t facility, syslog::impl_types use_impl, ip_versions ip_version);
+        syslog::facility facility, syslog::impl_types use_impl, ip_versions ip_version);
 #endif // BOOST_LOG_DOXYGEN_PASS
 };
 

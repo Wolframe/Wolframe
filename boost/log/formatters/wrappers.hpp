@@ -1,17 +1,14 @@
 /*
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
- * This header is the Boost.Log library implementation, see the library documentation
- * at http://www.boost.org/libs/log/doc/log.html.
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
  */
 /*!
  * \file   wrappers.hpp
  * \author Andrey Semashev
  * \date   22.04.2007
- * 
+ *
  * The header contains implementation of wrappers that are used to construct lambda
  * expressions of formatters. These wrappers are used to convert third-party
  * objects (like string literals, for instance) into valid formatters.
@@ -37,7 +34,7 @@ namespace formatters {
 
 /*!
  * \brief Formatter wrapper to output objects into streams
- * 
+ *
  * The formatter aggregates some object and provides formatter interface. Upon formatting
  * the wrapper puts the wrapped object into the formatting stream.
  */
@@ -62,14 +59,14 @@ private:
 public:
     /*!
      * Constructor
-     * 
+     *
      * \param obj Object to be aggregated
      */
     explicit fmt_wrapper(T const& obj) : m_T(obj) {}
 
     /*!
      * Formatting operator. Puts the aggregated object into the \a strm stream.
-     * 
+     *
      * \param strm A reference to the stream, where the final text of the logging record is composed
      */
     void operator() (ostream_type& strm, record_type const&) const
@@ -80,7 +77,7 @@ public:
 
 /*!
  * \brief Specialization to put objects into streams by reference
- * 
+ *
  * The specialization allows to put into the formatting stream external (with regard to
  * the formatter) objects.
  */
@@ -105,14 +102,14 @@ private:
 public:
     /*!
      * Constructor
-     * 
+     *
      * \param obj Object to be referenced
      */
     explicit fmt_wrapper(reference_wrapper< T > const& obj) : m_T(obj.get()) {}
 
     /*!
      * Formatting operator. Puts the referenced object into the \a strm stream.
-     * 
+     *
      * \param strm A reference to the stream, where the final text of the logging record is composed
      */
     void operator() (ostream_type& strm, record_type const&) const
@@ -125,7 +122,7 @@ public:
 template< typename CharT, typename T, bool >
 struct wrap_if_c
 {
-    fmt_wrapper< CharT, T > type;
+    typedef fmt_wrapper< CharT, T > type;
 };
 
 template< typename CharT, typename T >

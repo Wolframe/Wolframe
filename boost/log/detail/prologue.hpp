@@ -1,9 +1,10 @@
+/*
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
+ */
 /*!
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
  * \file   prologue.hpp
  * \author Andrey Semashev
  * \date   08.03.2007
@@ -20,12 +21,13 @@
 #ifndef BOOST_LOG_DETAIL_PROLOGUE_HPP_INCLUDED_
 #define BOOST_LOG_DETAIL_PROLOGUE_HPP_INCLUDED_
 
+#include <limits.h> // To bring in libc macros
 #include <boost/config.hpp>
 #include <boost/version.hpp>
 
-#if BOOST_VERSION < 103900
+#if BOOST_VERSION < 104200
     // Older Boost versions contained bugs that affected the library
-#   error Boost.Log: Boost version 1.39 or later is required
+#   error Boost.Log: Boost version 1.42 or later is required
 #endif
 
 #if defined(BOOST_MSVC)
@@ -58,6 +60,11 @@
 #   define BOOST_LOG_NO_MEMBER_TEMPLATE_FRIENDS
 #endif
 
+#if defined(__CYGWIN__)
+    // Boost.ASIO is broken on Cygwin
+#   define BOOST_LOG_NO_ASIO
+#endif
+
 #if (defined __SUNPRO_CC) && (__SUNPRO_CC <= 0x530) && !(defined BOOST_NO_COMPILER_CONFIG)
     // Sun C++ 5.3 can't handle the safe_bool idiom, so don't use it
 #   define BOOST_LOG_NO_UNSPECIFIED_BOOL
@@ -66,6 +73,13 @@
 #if defined(__GNUC__) && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 1))
     // GCC 4.0.0 (and probably older) can't cope with some optimizations regarding string literals
 #   define BOOST_LOG_BROKEN_STRING_LITERALS
+#endif
+
+#if defined(__GNUC__) && (__GNUC__ == 4 && __GNUC_MINOR__ <= 2)
+    // GCC 4.1 and 4.2 have buggy anonymous namespaces support, which interferes with symbol linkage
+#   define BOOST_LOG_ANONYMOUS_NAMESPACE namespace anonymous {} using namespace anonymous; namespace anonymous
+#else
+#   define BOOST_LOG_ANONYMOUS_NAMESPACE namespace
 #endif
 
 // Extended declaration macros. Used to implement compiler-specific optimizations.
@@ -119,12 +133,29 @@
 //
 // Automatically link to the correct build variant where possible.
 //
-#   if !defined(BOOST_ALL_NO_LIB) && !defined(BOOST_LOG_NO_LIB)
-#       define BOOST_LIB_NAME boost_log
-#       if defined(BOOST_LOG_DLL)
-#           define BOOST_DYN_LINK
+#   if !defined(BOOST_ALL_NO_LIB)
+#       if !defined(BOOST_LOG_NO_LIB)
+#          define BOOST_LIB_NAME boost_log
+#          if defined(BOOST_LOG_DLL)
+#              define BOOST_DYN_LINK
+#          endif
+#          include <boost/config/auto_link.hpp>
 #       endif
-#       include <boost/config/auto_link.hpp>
+#       // In static-library builds compilers ignore auto-link comments from Boost.Log binary to
+        // other Boost libraries. We explicitly add comments here for other libraries.
+        // In dynamic-library builds this is not needed.
+#       if !defined(BOOST_LOG_DLL)
+#           include <boost/system/config.hpp>
+#           include <boost/filesystem/config.hpp>
+#           if !defined(BOOST_DATE_TIME_NO_LIB) && !defined(BOOST_DATE_TIME_SOURCE)
+#               define BOOST_LIB_NAME boost_date_time
+#               if defined(BOOST_ALL_DYN_LINK) || defined(BOOST_DATE_TIME_DYN_LINK)
+#                   define BOOST_DYN_LINK
+#               endif
+#               include <boost/config/auto_link.hpp>
+#           endif
+            // Boost.Thread's config is included below, if needed
+#       endif
 #   endif  // auto-linking disabled
 
 #else // !defined(BOOST_LOG_BUILDING_THE_LIB)
@@ -139,6 +170,11 @@
 
 #endif // !defined(BOOST_LOG_BUILDING_THE_LIB)
 
+#if defined(__GNUC__) && __GNUC__ >= 4 && (defined(linux) || defined(__linux) || defined(__linux__))
+#   define BOOST_LOG_VISIBLE __attribute__((visibility("default")))
+#else
+#   define BOOST_LOG_VISIBLE
+#endif
 
 #if !defined(BOOST_LOG_USE_CHAR) && !defined(BOOST_LOG_USE_WCHAR_T)
     // By default we provide support for both char and wchar_t
@@ -154,14 +190,27 @@
 #endif // !defined(BOOST_LOG_DOXYGEN_PASS)
 
 #if !defined(BOOST_LOG_NO_THREADS)
-#   include <boost/thread/detail/platform.hpp>
+    // We need this header to (i) enable auto-linking with Boost.Thread and
+    // (ii) to bring in configuration macros of Boost.Thread.
+#   include <boost/thread/detail/config.hpp>
 #endif // !defined(BOOST_LOG_NO_THREADS)
 
 #if !defined(BOOST_LOG_NO_THREADS)
 #   define BOOST_LOG_EXPR_IF_MT(expr) expr
 #else
+#   undef BOOST_LOG_USE_COMPILER_TLS
 #   define BOOST_LOG_EXPR_IF_MT(expr)
 #endif // !defined(BOOST_LOG_NO_THREADS)
+
+#if defined(BOOST_LOG_USE_COMPILER_TLS)
+#   if defined(__GNUC__) || defined(__SUNPRO_CC)
+#       define BOOST_LOG_TLS __thread
+#   elif defined(BOOST_MSVC)
+#       define BOOST_LOG_TLS __declspec(thread)
+#   else
+#       undef BOOST_LOG_USE_COMPILER_TLS
+#   endif
+#endif // defined(BOOST_LOG_USE_COMPILER_TLS)
 
 namespace boost {
 

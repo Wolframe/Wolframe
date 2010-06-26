@@ -1,9 +1,10 @@
+/*
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
+ */
 /*!
- * (C) 2009 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
  * \file   init_from_settings.cpp
  * \author Andrey Semashev
  * \date   11.10.2009
@@ -38,7 +39,10 @@
 #include <boost/limits.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/make_shared.hpp>
+#include <boost/optional.hpp>
+#include <boost/function.hpp>
 #include <boost/filesystem/path.hpp>
+#include <boost/date_time/date_defs.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/type_traits/is_unsigned.hpp>
 #include <boost/asio/ip/address.hpp>
@@ -50,23 +54,15 @@
 #include <boost/log/core.hpp>
 #include <boost/log/sinks.hpp>
 #include <boost/log/exceptions.hpp>
-#if defined(BOOST_WINDOWS) && defined(BOOST_LOG_USE_WINNT6_API)
-#include <boost/log/sinks/nt6_event_log_backend.hpp>
-#endif // BOOST_WINDOWS && BOOST_LOG_USE_WINNT6_API
 #include <boost/log/utility/empty_deleter.hpp>
 #include <boost/log/utility/init/from_settings.hpp>
 #include <boost/log/utility/init/filter_parser.hpp>
 #include <boost/log/utility/init/formatter_parser.hpp>
 #if !defined(BOOST_LOG_NO_THREADS)
-#include <boost/thread/locks.hpp>
+#include <boost/log/detail/locks.hpp>
 #include <boost/log/detail/light_rw_mutex.hpp>
-#include <boost/log/detail/shared_lock_guard.hpp>
 #endif
 #include "parser_utils.hpp"
-
-#if defined(BOOST_WINDOWS) && defined(BOOST_LOG_USE_WINNT6_API)
-#include <guiddef.h>
-#endif // defined(BOOST_WINDOWS) && defined(BOOST_LOG_USE_WINNT6_API)
 
 namespace bsc = boost::spirit::classic;
 
@@ -74,250 +70,276 @@ namespace boost {
 
 namespace BOOST_LOG_NAMESPACE {
 
-namespace {
+BOOST_LOG_ANONYMOUS_NAMESPACE {
 
-    //! Throws an exception when a parameter type is not valid
-    template< typename CharT >
-    void BOOST_LOG_NORETURN throw_invalid_type(const CharT* param_name, log::type_info_wrapper const& param_type)
-    {
-        std::string descr = "Invalid parameter \""
-                            + log::aux::to_narrow(param_name)
-                            + "\" type: "
-                            + param_type.pretty_name();
-        BOOST_LOG_THROW_DESCR(invalid_type, descr);
-    }
+//! Throws an exception when a parameter type is not valid
+template< typename CharT >
+void BOOST_LOG_NORETURN throw_invalid_type(const CharT* param_name, log::type_info_wrapper const& param_type)
+{
+    std::string descr = "Invalid parameter \""
+                        + log::aux::to_narrow(param_name)
+                        + "\" type: "
+                        + param_type.pretty_name();
+    BOOST_LOG_THROW_DESCR(invalid_type, descr);
+}
 
-    //! Throws an exception when a parameter value is not valid
-    template< typename CharT >
-    void BOOST_LOG_NORETURN throw_invalid_value(const CharT* param_name)
-    {
-        std::string descr = "Invalid parameter \""
-                            + log::aux::to_narrow(param_name)
-                            + "\" value";
-        BOOST_LOG_THROW_DESCR(invalid_value, descr);
-    }
+//! Throws an exception when a parameter value is not valid
+template< typename CharT >
+void BOOST_LOG_NORETURN throw_invalid_value(const CharT* param_name)
+{
+    std::string descr = "Invalid parameter \""
+                        + log::aux::to_narrow(param_name)
+                        + "\" value";
+    BOOST_LOG_THROW_DESCR(invalid_value, descr);
+}
 
-    //! Extracts a filesystem path from any
-    template< typename CharT >
-    inline log::aux::universal_path any_cast_to_path(const CharT* param_name, any const& val)
-    {
-        std::type_info const& type = val.type();
-        if (type == typeid(filesystem::path))
-            return log::aux::to_universal_path(any_cast< filesystem::path >(val));
-        else if (type == typeid(std::string))
-            return log::aux::to_universal_path(any_cast< std::string >(val));
+//! Extracts a filesystem path from any
+template< typename CharT >
+inline log::aux::universal_path any_cast_to_path(const CharT* param_name, any const& val)
+{
+    std::type_info const& type = val.type();
+    if (type == typeid(filesystem::path))
+        return log::aux::to_universal_path(any_cast< filesystem::path >(val));
+    else if (type == typeid(std::string))
+        return log::aux::to_universal_path(any_cast< std::string >(val));
 #if !defined(BOOST_FILESYSTEM_NARROW_ONLY)
-        else if (type == typeid(filesystem::wpath))
-            return log::aux::to_universal_path(any_cast< filesystem::wpath >(val));
-        else if (type == typeid(std::wstring))
-            return log::aux::to_universal_path(any_cast< std::wstring >(val));
+    else if (type == typeid(filesystem::wpath))
+        return log::aux::to_universal_path(any_cast< filesystem::wpath >(val));
+    else if (type == typeid(std::wstring))
+        return log::aux::to_universal_path(any_cast< std::wstring >(val));
 #endif //!defined(BOOST_FILESYSTEM_NARROW_ONLY)
-        else
-            throw_invalid_type(param_name, type);
-    }
-    //! Extracts an integral value from any
-    template< typename IntT, typename CharT >
-    inline IntT any_cast_to_int(const CharT* param_name, any const& val)
-    {
-        typedef std::basic_string< CharT > string_type;
-        std::type_info const& type = val.type();
-        if (type == typeid(short))
-            return static_cast< IntT >(any_cast< short >(val));
-        else if (type == typeid(unsigned short))
-            return static_cast< IntT >(any_cast< unsigned short >(val));
-        else if (type == typeid(int))
-            return static_cast< IntT >(any_cast< int >(val));
-        else if (type == typeid(unsigned int))
-            return static_cast< IntT >(any_cast< unsigned int >(val));
-        else if (type == typeid(long))
-            return static_cast< IntT >(any_cast< long >(val));
-        else if (type == typeid(unsigned long))
-            return static_cast< IntT >(any_cast< unsigned long >(val));
+    else
+        throw_invalid_type(param_name, type);
+}
+//! Extracts an integral value from any
+template< typename IntT, typename CharT >
+inline IntT any_cast_to_int(const CharT* param_name, any const& val)
+{
+    typedef std::basic_string< CharT > string_type;
+    std::type_info const& type = val.type();
+    if (type == typeid(short))
+        return static_cast< IntT >(any_cast< short >(val));
+    else if (type == typeid(unsigned short))
+        return static_cast< IntT >(any_cast< unsigned short >(val));
+    else if (type == typeid(int))
+        return static_cast< IntT >(any_cast< int >(val));
+    else if (type == typeid(unsigned int))
+        return static_cast< IntT >(any_cast< unsigned int >(val));
+    else if (type == typeid(long))
+        return static_cast< IntT >(any_cast< long >(val));
+    else if (type == typeid(unsigned long))
+        return static_cast< IntT >(any_cast< unsigned long >(val));
 #if !defined(BOOST_NO_INT64_T)
-        else if (type == typeid(long long))
-            return static_cast< IntT >(any_cast< long long >(val));
-        else if (type == typeid(unsigned long long))
-            return static_cast< IntT >(any_cast< unsigned long long >(val));
+    else if (type == typeid(long long))
+        return static_cast< IntT >(any_cast< long long >(val));
+    else if (type == typeid(unsigned long long))
+        return static_cast< IntT >(any_cast< unsigned long long >(val));
 #endif // !defined(BOOST_NO_INT64_T)
-        else if (type == typeid(string_type))
+    else if (type == typeid(string_type))
+    {
+        string_type value = any_cast< string_type >(val);
+        IntT res = 0;
+        typedef typename mpl::if_<
+            is_unsigned< IntT >,
+            bsc::uint_parser< IntT >,
+            bsc::int_parser< IntT >
+        >::type int_parser_t;
+        int_parser_t int_p;
+        if (bsc::parse(value.begin(), value.end(), int_p[bsc::assign_a(res)]).full)
+            return res;
+        else
+            throw_invalid_value(param_name);
+    }
+    else
+        throw_invalid_type(param_name, type);
+}
+
+//! Extracts a boolean value from any
+template< typename CharT >
+inline bool any_cast_to_bool(const CharT* param_name, any const& val)
+{
+    typedef std::basic_string< CharT > string_type;
+    typedef log::aux::char_constants< CharT > char_constants;
+    std::type_info const& type = val.type();
+    if (type == typeid(bool))
+        return any_cast< bool >(val);
+    else if (type == typeid(string_type))
+    {
+        string_type value = any_cast< string_type >(val);
+        bool res = false;
+        if (bsc::parse(value.begin(), value.end(), (
+            bsc::int_p[bsc::assign_a(res)] ||
+            bsc::as_lower_d[ bsc::str_p(char_constants::true_keyword()) ][bsc::assign_a(res, true)] ||
+            bsc::as_lower_d[ bsc::str_p(char_constants::false_keyword()) ][bsc::assign_a(res, false)]
+        )).full)
         {
-            string_type value = any_cast< string_type >(val);
-            IntT res = 0;
-            typedef typename mpl::if_<
-                is_unsigned< IntT >,
-                bsc::uint_parser< IntT >,
-                bsc::int_parser< IntT >
-            >::type int_parser_t;
-            int_parser_t int_p;
-            if (bsc::parse(value.begin(), value.end(), int_p[bsc::assign_a(res)]).full)
-                return res;
-            else
-                throw_invalid_value(param_name);
+            return res;
         }
         else
-            throw_invalid_type(param_name, type);
+            throw_invalid_value(param_name);
     }
+    else
+        throw_invalid_type(param_name, type);
+}
 
-    //! Extracts a boolean value from any
-    template< typename CharT >
-    inline bool any_cast_to_bool(const CharT* param_name, any const& val)
+//! Extracts a filter from any
+template< typename CharT >
+inline boost::log::aux::light_function1<
+    bool,
+    basic_attribute_values_view< CharT > const&
+> any_cast_to_filter(const CharT* param_name, any const& val)
+{
+    typedef std::basic_string< CharT > string_type;
+    typedef basic_attribute_values_view< CharT > values_view_type;
+    typedef function1< bool, values_view_type const& > filter_type1;
+    typedef function< bool (values_view_type const&) > filter_type2;
+    typedef boost::log::aux::light_function1< bool, values_view_type const& > filter_type3;
+
+    std::type_info const& type = val.type();
+    if (type == typeid(string_type))
+        return parse_filter(any_cast< string_type >(val));
+    else if (type == typeid(filter_type1))
+        return any_cast< filter_type1 >(val);
+    else if (type == typeid(filter_type2))
+        return any_cast< filter_type2 >(val);
+    else if (type == typeid(filter_type3))
+        return any_cast< filter_type3 >(val);
+    else
+        throw_invalid_type(param_name, type);
+}
+
+//! Extracts a formatter from any
+template< typename CharT >
+inline boost::log::aux::light_function2<
+    void,
+    std::basic_ostream< CharT >&,
+    basic_record< CharT > const&
+> any_cast_to_formatter(const CharT* param_name, any const& val)
+{
+    typedef std::basic_string< CharT > string_type;
+    typedef std::basic_ostream< CharT > stream_type;
+    typedef basic_record< CharT > record_type;
+    typedef function2< void, stream_type&, record_type const& > formatter_type1;
+    typedef function< void (stream_type&, record_type const&) > formatter_type2;
+    typedef boost::log::aux::light_function2< void, stream_type&, record_type const& > formatter_type3;
+
+    std::type_info const& type = val.type();
+    if (type == typeid(string_type))
+        return parse_formatter(any_cast< string_type >(val));
+    else if (type == typeid(formatter_type1))
+        return any_cast< formatter_type1 >(val);
+    else if (type == typeid(formatter_type2))
+        return any_cast< formatter_type2 >(val);
+    else if (type == typeid(formatter_type3))
+        return any_cast< formatter_type3 >(val);
+    else
+        throw_invalid_type(param_name, type);
+}
+
+//! Extracts a formatter from any
+template< typename CharT >
+inline std::string any_cast_to_address(const CharT* param_name, any const& val)
+{
+    typedef std::basic_string< CharT > string_type;
+
+    std::type_info const& type = val.type();
+    if (type == typeid(asio::ip::address))
+        return any_cast< asio::ip::address >(val).to_string();
+    else if (type == typeid(asio::ip::address_v4))
+        return any_cast< asio::ip::address_v4 >(val).to_string();
+    else if (type == typeid(asio::ip::address_v6))
+        return any_cast< asio::ip::address_v6 >(val).to_string();
+    else if (type == typeid(string_type))
+        return log::aux::to_narrow(any_cast< string_type >(val));
+    else
+        throw_invalid_type(param_name, type);
+}
+
+//! The function extracts the file rotation time point predicate from the parameter
+template< typename CharT >
+boost::log::aux::light_function0< bool > any_cast_to_rotation_time_point(const CharT* param_name, any const& val)
+{
+    typedef CharT char_type;
+    typedef boost::log::aux::char_constants< char_type > constants;
+    typedef std::basic_string< char_type > string_type;
+    typedef function0< bool > predicate_type1;
+    typedef function< bool () > predicate_type2;
+    typedef boost::log::aux::light_function0< bool > predicate_type3;
+
+    std::type_info const& type = val.type();
+    if (type == typeid(sinks::file::rotation_at_time_point))
+        return any_cast< sinks::file::rotation_at_time_point >(val);
+    else if (type == typeid(predicate_type1))
+        return any_cast< predicate_type1 >(val);
+    else if (type == typeid(predicate_type2))
+        return any_cast< predicate_type2 >(val);
+    else if (type == typeid(predicate_type3))
+        return any_cast< predicate_type3 >(val);
+    else if (type == typeid(string_type))
     {
-        typedef std::basic_string< CharT > string_type;
-        typedef log::aux::char_constants< CharT > char_constants;
-        std::type_info const& type = val.type();
-        if (type == typeid(bool))
-            return any_cast< bool >(val);
-        else if (type == typeid(string_type))
-        {
-            string_type value = any_cast< string_type >(val);
-            bool res = false;
-            if (bsc::parse(value.begin(), value.end(), (
-                bsc::int_p[bsc::assign_a(res)] ||
-                bsc::as_lower_d[ bsc::str_p(char_constants::true_keyword()) ][bsc::assign_a(res, true)] ||
-                bsc::as_lower_d[ bsc::str_p(char_constants::false_keyword()) ][bsc::assign_a(res, false)]
-            )).full)
-            {
-                return res;
-            }
-            else
-                throw_invalid_value(param_name);
-        }
-        else
-            throw_invalid_type(param_name, type);
-    }
+        // We'll have to parse it from the string
+        const char_type colon = static_cast< char_type >(':');
+        bsc::uint_parser< unsigned char, 10, 2, 2 > time_component_p;
+        bsc::uint_parser< unsigned short, 10, 1, 2 > day_p;
 
-    //! Extracts a filter from any
-    template< typename CharT >
-    inline function1<
-        bool,
-        basic_attribute_values_view< CharT > const&
-    > any_cast_to_filter(const CharT* param_name, any const& val)
-    {
-        typedef std::basic_string< CharT > string_type;
-        typedef basic_attribute_values_view< CharT > values_view_type;
-        typedef function1< bool, values_view_type const& > filter_type1;
-        typedef function< bool (values_view_type const&) > filter_type2;
+        optional< date_time::weekdays > weekday;
+        optional< unsigned short > day;
+        unsigned char hour = 0, minute = 0, second = 0;
 
-        std::type_info const& type = val.type();
-        if (type == typeid(string_type))
-            return parse_filter(any_cast< string_type >(val));
-        else if (type == typeid(filter_type1))
-            return any_cast< filter_type1 >(val);
-        else if (type == typeid(filter_type2))
-            return any_cast< filter_type2 >(val);
-        else
-            throw_invalid_type(param_name, type);
-    }
-
-    //! Extracts a formatter from any
-    template< typename CharT >
-    inline function2<
-        void,
-        std::basic_ostream< CharT >&,
-        basic_record< CharT > const&
-    > any_cast_to_formatter(const CharT* param_name, any const& val)
-    {
-        typedef std::basic_string< CharT > string_type;
-        typedef std::basic_ostream< CharT > stream_type;
-        typedef basic_record< CharT > record_type;
-        typedef function2< void, stream_type&, record_type const& > formatter_type1;
-        typedef function< void (stream_type&, record_type const&) > formatter_type2;
-
-        std::type_info const& type = val.type();
-        if (type == typeid(string_type))
-            return parse_formatter(any_cast< string_type >(val));
-        else if (type == typeid(formatter_type1))
-            return any_cast< formatter_type1 >(val);
-        else if (type == typeid(formatter_type2))
-            return any_cast< formatter_type2 >(val);
-        else
-            throw_invalid_type(param_name, type);
-    }
-
-    //! Extracts a formatter from any
-    template< typename CharT >
-    inline std::string any_cast_to_address(const CharT* param_name, any const& val)
-    {
-        typedef std::basic_string< CharT > string_type;
-
-        std::type_info const& type = val.type();
-        if (type == typeid(asio::ip::address))
-            return any_cast< asio::ip::address >(val).to_string();
-        else if (type == typeid(asio::ip::address_v4))
-            return any_cast< asio::ip::address_v4 >(val).to_string();
-        else if (type == typeid(asio::ip::address_v6))
-            return any_cast< asio::ip::address_v6 >(val).to_string();
-        else if (type == typeid(string_type))
-            return log::aux::to_narrow(any_cast< string_type >(val));
-        else
-            throw_invalid_type(param_name, type);
-    }
-
-#if defined(BOOST_WINDOWS) && defined(BOOST_LOG_USE_WINNT6_API)
-
-    //! The function parses GUIDS from strings in form "{631EF147-9A84-4e33-8ADD-BCE174C4DBD9}"
-    template< typename CharT >
-    GUID any_cast_to_guid(const CharT* param_name, any const& val)
-    {
-        typedef CharT char_type;
-        typedef std::basic_string< char_type > string_type;
-
-        std::type_info const& type = val.type();
-        if (type == typeid(GUID))
-            return any_cast< GUID >(val);
-        else if (type == typeid(string_type))
-        {
-            const char_type
-                open_bracket = static_cast< char_type >('{'),
-                close_bracket = static_cast< char_type >('}'),
-                dash = static_cast< char_type >('-');
-
-            const bsc::uint_parser< unsigned char, 16, 2, 2 > octet_p;
-            const bsc::uint_parser< unsigned short, 16, 4, 4 > word_p;
-            const bsc::uint_parser< unsigned long, 16, 8, 8 > dword_p;
-
-            GUID g;
-            string_type str = any_cast< string_type >(val);
-            bsc::parse_info< const char_type* > result =
-                bsc::parse(
-                    str.c_str(),
-                    str.c_str() + str.size(),
+        string_type str = any_cast< string_type >(val);
+        bsc::parse_info< const char_type* > result =
+            bsc::parse(
+                str.c_str(),
+                str.c_str() + str.size(),
+                (
+                    !(
+                        (
+                            // First check for a weekday
+                            (
+                                (bsc::str_p(constants::monday_keyword()) || bsc::str_p(constants::short_monday_keyword()))
+                                    [bsc::assign_a(weekday, date_time::Monday)] ||
+                                (bsc::str_p(constants::tuesday_keyword()) || bsc::str_p(constants::short_tuesday_keyword()))
+                                    [bsc::assign_a(weekday, date_time::Tuesday)] ||
+                                (bsc::str_p(constants::wednesday_keyword()) || bsc::str_p(constants::short_wednesday_keyword()))
+                                    [bsc::assign_a(weekday, date_time::Wednesday)] ||
+                                (bsc::str_p(constants::thursday_keyword()) || bsc::str_p(constants::short_thursday_keyword()))
+                                    [bsc::assign_a(weekday, date_time::Thursday)] ||
+                                (bsc::str_p(constants::friday_keyword()) || bsc::str_p(constants::short_friday_keyword()))
+                                    [bsc::assign_a(weekday, date_time::Friday)] ||
+                                (bsc::str_p(constants::saturday_keyword()) || bsc::str_p(constants::short_saturday_keyword()))
+                                    [bsc::assign_a(weekday, date_time::Saturday)] ||
+                                (bsc::str_p(constants::sunday_keyword()) || bsc::str_p(constants::short_sunday_keyword()))
+                                    [bsc::assign_a(weekday, date_time::Sunday)]
+                            ) ||
+                            // ... or a day in month
+                            (
+                                day_p[bsc::assign_a(day)]
+                            )
+                        ) >>
+                        bsc::space_p
+                    ) >>
+                    // Then goes the time of day
                     (
-                        bsc::ch_p(open_bracket) >>
-                        dword_p[bsc::assign_a(g.Data1)] >>
-                        bsc::ch_p(dash) >>
-                        word_p[bsc::assign_a(g.Data2)] >>
-                        bsc::ch_p(dash) >>
-                        word_p[bsc::assign_a(g.Data3)] >>
-                        bsc::ch_p(dash) >>
-                        octet_p[bsc::assign_a(g.Data4[0])] >>
-                        octet_p[bsc::assign_a(g.Data4[1])] >>
-                        bsc::ch_p(dash) >>
-                        octet_p[bsc::assign_a(g.Data4[2])] >>
-                        octet_p[bsc::assign_a(g.Data4[3])] >>
-                        octet_p[bsc::assign_a(g.Data4[4])] >>
-                        octet_p[bsc::assign_a(g.Data4[5])] >>
-                        octet_p[bsc::assign_a(g.Data4[6])] >>
-                        octet_p[bsc::assign_a(g.Data4[7])] >>
-                        bsc::ch_p(close_bracket)
+                        time_component_p[bsc::assign_a(hour)] >> colon >>
+                        time_component_p[bsc::assign_a(minute)] >> colon >>
+                        time_component_p[bsc::assign_a(second)]
                     )
-                );
+                )
+            );
 
-            if (!result.full)
-            {
-                std::string descr = "Could not recognize CLSID from string "
-                                    + log::aux::to_narrow(str);
-                BOOST_LOG_THROW_DESCR(invalid_value, descr);
-            }
+        if (!result.full)
+            throw_invalid_value(param_name);
 
-            return g;
-        }
+        if (weekday)
+            return sinks::file::rotation_at_time_point(weekday.get(), hour, minute, second);
+        else if (day)
+            return sinks::file::rotation_at_time_point(gregorian::greg_day(day.get()), hour, minute, second);
         else
-            throw_invalid_type(param_name, type);
+            return sinks::file::rotation_at_time_point(hour, minute, second);
     }
-
-#endif // defined(BOOST_WINDOWS) && defined(BOOST_LOG_USE_WINNT6_API)
-
+    else
+        throw_invalid_type(param_name, type);
+}
 
 //! The supported sinks repository
 template< typename CharT >
@@ -336,7 +358,10 @@ struct sinks_repository :
     typedef std::basic_string< char_type > string_type;
     typedef boost::log::aux::char_constants< char_type > constants;
     typedef std::map< string_type, any > params_t;
-    typedef function1< shared_ptr< sinks::sink< char_type > >, params_t const& > sink_factory;
+    typedef boost::log::aux::light_function1<
+        shared_ptr< sinks::sink< char_type > >,
+        params_t const&
+    > sink_factory;
     typedef std::map< string_type, sink_factory > sink_factories;
 
 #if !defined(BOOST_LOG_NO_THREADS)
@@ -385,10 +410,6 @@ struct sinks_repository :
             &sinks_repository< char_type >::default_debugger_sink_factory;
         instance.m_Factories[constants::simple_event_log_destination()] =
             &sinks_repository< char_type >::default_simple_event_log_sink_factory;
-#ifdef BOOST_LOG_USE_WINNT6_API
-        instance.m_Factories[constants::simple_nt6_event_log_destination()] =
-            &sinks_repository< char_type >::default_simple_nt6_event_log_sink_factory;
-#endif // BOOST_LOG_USE_WINNT6_API
 #endif // BOOST_WINDOWS
     }
 
@@ -424,8 +445,18 @@ private:
         it = params.find(constants::rotation_interval_param_name());
         if (it != params.end() && !it->second.empty())
         {
-            backend->set_rotation_interval(posix_time::seconds(
-                any_cast_to_int< unsigned int >(constants::rotation_interval_param_name(), it->second)));
+            backend->set_time_based_rotation(sinks::file::rotation_at_time_interval(posix_time::seconds(
+                any_cast_to_int< unsigned int >(constants::rotation_interval_param_name(), it->second))));
+        }
+        else
+        {
+            // File rotation time point
+            it = params.find(constants::rotation_time_point_param_name());
+            if (it != params.end() && !it->second.empty())
+            {
+                backend->set_time_based_rotation(
+                    any_cast_to_rotation_time_point(constants::rotation_time_point_param_name(), it->second));
+            }
         }
 
         // Auto flush
@@ -600,30 +631,6 @@ private:
         return init_sink(backend, params);
     }
 
-#ifdef BOOST_LOG_USE_WINNT6_API
-
-    //! The function constructs a sink that writes log records to the Windows NT 6 Event Log
-    static shared_ptr< sinks::sink< char_type > > default_simple_nt6_event_log_sink_factory(params_t const& params)
-    {
-        typedef experimental::sinks::basic_simple_nt6_event_log_backend< char_type > backend_t;
-
-        // Determine the provider GUID
-        GUID provider_id = backend_t::get_default_provider_id();
-        typename params_t::const_iterator it = params.find(constants::provider_id_param_name());
-        if (it != params.end() && !it->second.empty())
-            provider_id = any_cast_to_guid(constants::provider_id_param_name(), it->second);
-
-        // Construct the backend
-        shared_ptr< backend_t > backend(boost::make_shared< backend_t >(boost::cref(provider_id)));
-
-        // For now we use only the default level mapping. Will add support for configuration later.
-        backend->set_severity_mapper(
-            experimental::sinks::etw::basic_direct_severity_mapping< char_type >(constants::default_level_attribute_name()));
-
-        return init_sink(backend, params);
-    }
-
-#endif // BOOST_LOG_USE_WINNT6_API
 #endif // BOOST_WINDOWS
 
     //! The function initializes common parameters of text stream sink and returns the constructed sink
@@ -745,7 +752,7 @@ void init_from_settings(basic_settings< CharT > const& setts)
         if (it->first.compare(0, sink_prefix.size(), sink_prefix) == 0)
             new_sinks.push_back(sinks_repo.construct_sink_from_settings(it->second));
     }
-    std::for_each(new_sinks.begin(), new_sinks.end(), bind(&core_t::add_sink, core_t::get(), _1));
+    std::for_each(new_sinks.begin(), new_sinks.end(), boost::bind(&core_t::add_sink, core_t::get(), _1));
 }
 
 
@@ -753,7 +760,7 @@ void init_from_settings(basic_settings< CharT > const& setts)
 template< typename CharT >
 void register_sink_factory(
     const CharT* sink_name,
-    function1<
+    boost::log::aux::light_function1<
         shared_ptr< sinks::sink< CharT > >,
         std::map< std::basic_string< CharT >, any > const&
     > const& factory)
@@ -767,7 +774,7 @@ void register_sink_factory(
 template BOOST_LOG_SETUP_EXPORT
 void register_sink_factory< char >(
     const char* sink_name,
-    function1<
+    boost::log::aux::light_function1<
         shared_ptr< sinks::sink< char > >,
         std::map< std::basic_string< char >, any > const&
     > const& factory);
@@ -778,7 +785,7 @@ template BOOST_LOG_SETUP_EXPORT void init_from_settings< char >(basic_settings< 
 template BOOST_LOG_SETUP_EXPORT
 void register_sink_factory< wchar_t >(
     const wchar_t* sink_name,
-    function1<
+    boost::log::aux::light_function1<
         shared_ptr< sinks::sink< wchar_t > >,
         std::map< std::basic_string< wchar_t >, any > const&
     > const& factory);

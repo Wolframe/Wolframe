@@ -19,7 +19,6 @@ LOG_OBJS = \
 	process_id.o \
 	severity_level.o \
 	sink_frontends.o \
-	stream_provider.o \
 	syslog_backend.o \
 	text_file_backend.o \
 	text_ostream_backend.o \

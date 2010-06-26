@@ -1,27 +1,28 @@
+/*
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
+ */
 /*!
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- * 
  * \file   singleton.hpp
  * \author Andrey Semashev
  * \date   20.04.2008
- * 
+ *
  * \brief  This header is the Boost.Log library implementation, see the library documentation
  *         at http://www.boost.org/libs/log/doc/log.html.
  */
+
+#if (defined(_MSC_VER) && _MSC_VER > 1000)
+#pragma once
+#endif // _MSC_VER > 1000
 
 #ifndef BOOST_LOG_DETAIL_SINGLETON_HPP_INCLUDED_
 #define BOOST_LOG_DETAIL_SINGLETON_HPP_INCLUDED_
 
 #include <boost/noncopyable.hpp>
 #include <boost/log/detail/prologue.hpp>
-#if !defined(BOOST_LOG_NO_THREADS)
-#include <boost/thread/once.hpp>
-#else
-#include <boost/log/utility/no_unused_warnings.hpp>
-#endif
+#include <boost/log/utility/once_block.hpp>
 
 namespace boost {
 
@@ -37,13 +38,10 @@ public:
     //! Returns the singleton instance
     static StorageT& get()
     {
-#if !defined(BOOST_LOG_NO_THREADS)
-        static once_flag flag = BOOST_ONCE_INIT;
-        boost::call_once(flag, &DerivedT::init_instance);
-#else
-        static const bool initialized = (DerivedT::init_instance(), true);
-        BOOST_LOG_NO_UNUSED_WARNINGS(initialized);
-#endif
+        BOOST_LOG_ONCE_BLOCK()
+        {
+            DerivedT::init_instance();
+        }
         return get_instance();
     }
 

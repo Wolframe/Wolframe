@@ -1,17 +1,14 @@
 /*
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
- * This header is the Boost.Log library implementation, see the library documentation
- * at http://www.boost.org/libs/log/doc/log.html.
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
  */
 /*!
  * \file   counter.hpp
  * \author Andrey Semashev
  * \date   01.05.2007
- * 
+ *
  * The header contains implementation of the counter attribute.
  */
 
@@ -40,7 +37,7 @@ namespace attributes {
 /*!
  * \class counter
  * \brief A class of an attribute that counts an integral value
- * 
+ *
  * This type of attribute acts as a counter, that is, it returns a monotonously
  * changing value each time requested. The attribute value type can be specified
  * as a template parameter. However, the type must support basic arithmetic
@@ -72,7 +69,7 @@ private:
 public:
     /*!
      * Constructor
-     * 
+     *
      * \param initial Initial value of the counter
      * \param step Changing step of the counter. Each value acquired from the attribute
      *        will be greater than the previous one to this amount.
@@ -82,11 +79,12 @@ public:
     {
     }
 
-    shared_ptr< attribute_value > get_value()
+    attribute_value get_value()
     {
         // TODO: a full featured atomic would do better here
         register long NextValue = --m_Counter;
-        return boost::make_shared< counter_value >(m_InitialValue - static_cast< held_type >(NextValue * m_Step));
+        return attribute_value(boost::make_shared< counter_value >(
+            m_InitialValue - static_cast< held_type >(NextValue * m_Step)));
     }
 };
 
@@ -113,7 +111,7 @@ private:
 public:
     /*!
      * Constructor
-     * 
+     *
      * \param initial Initial value of the counter
      * \param step Changing step of the counter. Each value acquired from the attribute
      *        will be greater than the previous one to this amount.
@@ -123,10 +121,10 @@ public:
     {
     }
 
-    shared_ptr< attribute_value > get_value()
+    attribute_value get_value()
     {
         m_Value += static_cast< held_type >(m_Step);
-        return boost::make_shared< counter_value >(m_Value);
+        return attribute_value(boost::make_shared< counter_value >(m_Value));
     }
 };
 

@@ -1,9 +1,10 @@
+/*
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
+ */
 /*!
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
  * \file   parser_utils.hpp
  * \author Andrey Semashev
  * \date   31.03.2008
@@ -82,6 +83,7 @@ struct char_constants< char >
     static const char_type* file_name_param_name() { return "FileName"; }
     static const char_type* rotation_size_param_name() { return "RotationSize"; }
     static const char_type* rotation_interval_param_name() { return "RotationInterval"; }
+    static const char_type* rotation_time_point_param_name() { return "RotationTimePoint"; }
     static const char_type* auto_flush_param_name() { return "AutoFlush"; }
     static const char_type* asynchronous_param_name() { return "Asynchronous"; }
     static const char_type* format_param_name() { return "Format"; }
@@ -106,9 +108,23 @@ struct char_constants< char >
     static const char_type* text_file_destination() { return "TextFile"; }
     static const char_type* console_destination() { return "Console"; }
     static const char_type* syslog_destination() { return "Syslog"; }
-    static const char_type* simple_nt6_event_log_destination() { return "SimpleNT6EventLog"; }
     static const char_type* simple_event_log_destination() { return "SimpleEventLog"; }
     static const char_type* debugger_destination() { return "Debugger"; }
+
+    static const char_type* monday_keyword() { return "Monday"; }
+    static const char_type* short_monday_keyword() { return "Mon"; }
+    static const char_type* tuesday_keyword() { return "Tuesday"; }
+    static const char_type* short_tuesday_keyword() { return "Tue"; }
+    static const char_type* wednesday_keyword() { return "Wednesday"; }
+    static const char_type* short_wednesday_keyword() { return "Wed"; }
+    static const char_type* thursday_keyword() { return "Thursday"; }
+    static const char_type* short_thursday_keyword() { return "Thu"; }
+    static const char_type* friday_keyword() { return "Friday"; }
+    static const char_type* short_friday_keyword() { return "Fri"; }
+    static const char_type* saturday_keyword() { return "Saturday"; }
+    static const char_type* short_saturday_keyword() { return "Sat"; }
+    static const char_type* sunday_keyword() { return "Sunday"; }
+    static const char_type* short_sunday_keyword() { return "Sun"; }
 
     static std::ostream& get_console_log_stream() { return std::clog; }
 
@@ -178,6 +194,7 @@ struct char_constants< wchar_t >
     static const char_type* file_name_param_name() { return L"FileName"; }
     static const char_type* rotation_size_param_name() { return L"RotationSize"; }
     static const char_type* rotation_interval_param_name() { return L"RotationInterval"; }
+    static const char_type* rotation_time_point_param_name() { return L"RotationTimePoint"; }
     static const char_type* auto_flush_param_name() { return L"AutoFlush"; }
     static const char_type* asynchronous_param_name() { return L"Asynchronous"; }
     static const char_type* format_param_name() { return L"Format"; }
@@ -202,9 +219,23 @@ struct char_constants< wchar_t >
     static const char_type* text_file_destination() { return L"TextFile"; }
     static const char_type* console_destination() { return L"Console"; }
     static const char_type* syslog_destination() { return L"Syslog"; }
-    static const char_type* simple_nt6_event_log_destination() { return L"SimpleNT6EventLog"; }
     static const char_type* simple_event_log_destination() { return L"SimpleEventLog"; }
     static const char_type* debugger_destination() { return L"Debugger"; }
+
+    static const char_type* monday_keyword() { return L"Monday"; }
+    static const char_type* short_monday_keyword() { return L"Mon"; }
+    static const char_type* tuesday_keyword() { return L"Tuesday"; }
+    static const char_type* short_tuesday_keyword() { return L"Tue"; }
+    static const char_type* wednesday_keyword() { return L"Wednesday"; }
+    static const char_type* short_wednesday_keyword() { return L"Wed"; }
+    static const char_type* thursday_keyword() { return L"Thursday"; }
+    static const char_type* short_thursday_keyword() { return L"Thu"; }
+    static const char_type* friday_keyword() { return L"Friday"; }
+    static const char_type* short_friday_keyword() { return L"Fri"; }
+    static const char_type* saturday_keyword() { return L"Saturday"; }
+    static const char_type* short_saturday_keyword() { return L"Sat"; }
+    static const char_type* sunday_keyword() { return L"Sunday"; }
+    static const char_type* short_sunday_keyword() { return L"Sun"; }
 
     static std::wostream& get_console_log_stream() { return std::wclog; }
 
@@ -214,7 +245,7 @@ struct char_constants< wchar_t >
         if (c >= L'0' && c <= L'9')
             n = c - L'0';
         else if (c >= L'a' && c <= L'f')
-            n = c - 'a' + 10;
+            n = c - L'a' + 10;
         else if (c >= L'A' && c <= L'F')
             n = c - L'A' + 10;
         return n;
