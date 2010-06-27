@@ -1,17 +1,14 @@
 /*
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
- * This header is the Boost.Log library implementation, see the library documentation
- * at http://www.boost.org/libs/log/doc/log.html.
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
  */
 /*!
  * \file   functor.hpp
  * \author Andrey Semashev
  * \date   24.06.2007
- * 
+ *
  * The header contains implementation of an attribute that calls a third-party function on value acquirement.
  */
 
@@ -43,10 +40,10 @@ namespace attributes {
 
 /*!
  * \brief A class of an attribute that acquires its value from a third-party functor
- * 
+ *
  * The attribute calls a stored nullary functional object to acquire each value.
  * The result type of the functional object is the attribute value type.
- * 
+ *
  * It is not recommended to use this class directly. Use \c make_functor_attr convenience functions
  * to construct the attribute instead.
  */
@@ -72,9 +69,9 @@ public:
      */
     explicit functor(held_type const& fun) : m_Functor(fun) {}
 
-    shared_ptr< attribute_value > get_value()
+    attribute_value get_value()
     {
-        return boost::make_shared< functor_result_value >(m_Functor());
+        return attribute_value(boost::make_shared< functor_result_value >(m_Functor()));
     }
 };
 
@@ -84,7 +81,7 @@ public:
 
 /*!
  * The function constructs functor attribute instance with the provided functional object.
- * 
+ *
  * \param fun Nullary functional object that returns an actual stored value for an attribute value.
  * \return Pointer to the attribute instance
  */
@@ -109,7 +106,7 @@ inline shared_ptr< attribute > make_functor_attr(T const& fun)
 /*!
  * The function constructs functor attribute instance with the provided functional object.
  * Use this version if your compiler fails to determine the result type of the functional object.
- * 
+ *
  * \param fun Nullary functional object that returns an actual stored value for an attribute value.
  * \return Pointer to the attribute instance
  */

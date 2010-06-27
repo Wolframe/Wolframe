@@ -1,9 +1,10 @@
+/*
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
+ */
 /*!
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
  * \file   functional.hpp
  * \author Andrey Semashev
  * \date   30.03.2008
@@ -29,9 +30,6 @@
 #include <boost/type_traits/is_integral.hpp>
 #include <boost/type_traits/is_unsigned.hpp>
 #include <boost/log/detail/prologue.hpp>
-
-#include <math.h>
-#define EPSILON 0.00001
 
 namespace boost {
 
@@ -77,18 +75,6 @@ private:
     {
         return (left == right);
     }
-    static bool op(float const& left, double const& right, mpl::false_ const&)
-    {
-        return (fabs( left - right ) < EPSILON);
-    }
-    static bool op(double const& left, double const& right, mpl::false_ const&)
-    {
-        return (fabs( left - right ) < EPSILON);
-    }
-    static bool op(long double const& left, double const& right, mpl::false_ const&)
-    {
-        return (fabs( (double)left - right ) < EPSILON);
-    }
     template< typename T, typename U >
     static bool op(T const& left, U const& right, mpl::true_ const&)
     {
@@ -112,18 +98,6 @@ private:
     static bool op(T const& left, U const& right, mpl::false_ const&)
     {
         return (left != right);
-    }
-    static bool op( long double const& left, double const& right, mpl::false_ const&)
-    {
-        return (fabs( (double)left - right ) >= EPSILON);
-    }
-    static bool op( float const& left, double const& right, mpl::false_ const&)
-    {
-        return (fabs( left - right ) >= EPSILON);
-    }
-    static bool op( double const& left, double const& right, mpl::false_ const&)
-    {
-        return (fabs( left - right ) >= EPSILON);
     }
     template< typename T, typename U >
     static bool op(T const& left, U const& right, mpl::true_ const&)
@@ -399,6 +373,26 @@ struct nop
     void operator() () const {}
     template< typename T >
     void operator() (T const&) const {}
+};
+
+//! The function object that assigns its operand to the bound value
+template< typename AssigneeT >
+struct assign_fun
+{
+    typedef void result_type;
+
+    explicit assign_fun(AssigneeT& assignee) : m_Assignee(assignee)
+    {
+    }
+
+    template< typename T >
+    void operator() (T const& val) const
+    {
+        m_Assignee = val;
+    }
+
+private:
+    AssigneeT& m_Assignee;
 };
 
 //! Second argument binder

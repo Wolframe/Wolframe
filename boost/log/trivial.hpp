@@ -1,11 +1,8 @@
 /*
- * (C) 2009 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
- * This header is the Boost.Log library implementation, see the library documentation
- * at http://www.boost.org/libs/log/doc/log.html.
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
  */
 /*!
  * \file   log/trivial.hpp
@@ -25,7 +22,6 @@
 #include <ostream>
 #include <boost/log/detail/prologue.hpp>
 #include <boost/log/keywords/severity.hpp>
-#include <boost/log/sources/global_logger_storage.hpp>
 #include <boost/log/sources/severity_logger.hpp>
 #include <boost/log/sources/record_ostream.hpp>
 
@@ -47,13 +43,6 @@ namespace BOOST_LOG_NAMESPACE {
 
 namespace trivial {
 
-namespace aux {
-
-    //! Initialization routine
-    BOOST_LOG_EXPORT void init();
-
-} // namespace aux
-
 //! Trivial severity levels
 enum severity_level
 {
@@ -66,52 +55,39 @@ enum severity_level
 };
 
 template< typename CharT, typename TraitsT >
-inline std::basic_ostream< CharT, TraitsT >& operator<< (
-    std::basic_ostream< CharT, TraitsT >& strm, severity_level lvl)
-{
-    switch (lvl)
-    {
-    case trace:
-        strm << "trace"; break;
-    case debug:
-        strm << "debug"; break;
-    case info:
-        strm << "info"; break;
-    case warning:
-        strm << "warning"; break;
-    case error:
-        strm << "error"; break;
-    case fatal:
-        strm << "fatal"; break;
-    default:
-        strm << static_cast< int >(lvl); break;
-    }
-
-    return strm;
-}
+BOOST_LOG_EXPORT std::basic_ostream< CharT, TraitsT >& operator<< (
+    std::basic_ostream< CharT, TraitsT >& strm, severity_level lvl);
 
 //! Trivial logger type
 #if !defined(BOOST_LOG_NO_THREADS)
-typedef sources::severity_logger_mt< severity_level > trivial_logger;
+typedef sources::severity_logger_mt< severity_level > logger_type;
 #else
-typedef sources::severity_logger< severity_level > trivial_logger;
+typedef sources::severity_logger< severity_level > logger_type;
 #endif
 
-#if !defined(BOOST_LOG_BUILDING_THE_LIB)
-
-//! Global logger instance
-BOOST_LOG_DECLARE_GLOBAL_LOGGER_INIT(logger, trivial_logger)
+//! Trivial logger tag
+struct logger
 {
-    trivial::aux::init();
-    return trivial_logger(keywords::severity = info);
-}
+    //! Logger type
+    typedef trivial::logger_type logger_type;
+
+    /*!
+     * Returns a reference to the trivial logger instance
+     */
+    static BOOST_LOG_EXPORT logger_type& get();
+
+    // Implementation details - never use these
+#if !defined(BOOST_LOG_DOXYGEN_PASS)
+    enum registration_line_t { registration_line = __LINE__ };
+    static const char* registration_file() { return __FILE__; }
+    static BOOST_LOG_EXPORT logger_type construct_logger();
+#endif
+};
 
 //! The macro is used to initiate logging
 #define BOOST_LOG_TRIVIAL(lvl)\
-    BOOST_LOG_STREAM_WITH_PARAMS(::boost::log::trivial::get_logger(),\
+    BOOST_LOG_STREAM_WITH_PARAMS(::boost::log::trivial::logger::get(),\
         (::boost::log::keywords::severity = ::boost::log::trivial::lvl))
-
-#endif // !defined(BOOST_LOG_BUILDING_THE_LIB)
 
 } // namespace trivial
 

@@ -1,12 +1,3 @@
-/*
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
- * This header is the Boost.Log library implementation, see the library documentation
- * at http://www.boost.org/libs/log/doc/log.html.
- */
 /*!
  * \file   type_info_wrapper.hpp
  * \author Andrey Semashev
@@ -24,10 +15,8 @@
 
 #include <typeinfo>
 #include <string>
-#include <algorithm>
-#include <boost/operators.hpp>
 #include <boost/log/detail/prologue.hpp>
-#include <boost/log/detail/unspecified_bool.hpp>
+#include <boost/log/utility/explicit_operator_bool.hpp>
 
 #if defined(__GNUC__) && !defined(__QNX__)
 #define BOOST_LOG_HAS_CXXABI
@@ -50,17 +39,12 @@ namespace BOOST_LOG_NAMESPACE {
  * and assignment support, an empty state and extended support for human-friendly type names.
  */
 class type_info_wrapper
-    //! \cond
-    : public partially_ordered< type_info_wrapper,
-        equality_comparable< type_info_wrapper >
-    >
-    //! \endcond
 {
 private:
 #ifndef BOOST_LOG_DOXYGEN_PASS
 
     //! An inaccessible type to indicate an uninitialized state of the wrapper
-    enum uninitialized {};
+    enum BOOST_LOG_VISIBLE uninitialized {};
 
 #ifdef BOOST_LOG_HAS_CXXABI
     //! A simple scope guard for automatic memory free
@@ -105,7 +89,7 @@ public:
      * \return \c true if the type info wrapper was initialized with a particular type,
      *         \c false if the wrapper was default-constructed and not yet initialized
      */
-    BOOST_LOG_OPERATOR_UNSPECIFIED_BOOL()
+    BOOST_LOG_EXPLICIT_OPERATOR_BOOL()
 
     /*!
      * Stored type info getter
@@ -120,7 +104,9 @@ public:
      */
     void swap(type_info_wrapper& that)
     {
-        std::swap(info, that.info);
+        register std::type_info const* temp = info;
+        info = that.info;
+        that.info = temp;
     }
 
     /*!
@@ -197,6 +183,30 @@ public:
 #endif
 
 };
+
+//! Inequality operator
+inline bool operator!= (type_info_wrapper const& left, type_info_wrapper const& right)
+{
+    return !left.operator==(right);
+}
+
+//! Ordering operator
+inline bool operator<= (type_info_wrapper const& left, type_info_wrapper const& right)
+{
+    return (left.operator==(right) || left.operator<(right));
+}
+
+//! Ordering operator
+inline bool operator> (type_info_wrapper const& left, type_info_wrapper const& right)
+{
+    return !(left.operator==(right) || left.operator<(right));
+}
+
+//! Ordering operator
+inline bool operator>= (type_info_wrapper const& left, type_info_wrapper const& right)
+{
+    return !left.operator<(right);
+}
 
 //! Free swap for type info wrapper
 inline void swap(type_info_wrapper& left, type_info_wrapper& right)

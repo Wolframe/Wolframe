@@ -1,11 +1,8 @@
 /*
- * (C) 2009 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
- * This header is the Boost.Log library implementation, see the library documentation
- * at http://www.boost.org/libs/log/doc/log.html.
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
  */
 /*!
  * \file   record_ostream.hpp
@@ -25,21 +22,21 @@
 
 #include <new>
 #include <string>
-#include <locale>
 #include <ostream>
 #include <boost/utility/addressof.hpp>
-#include <boost/utility/base_from_member.hpp>
 #include <boost/log/detail/prologue.hpp>
 #include <boost/log/detail/native_typeof.hpp>
-#include <boost/log/detail/unspecified_bool.hpp>
 #include <boost/log/detail/attachable_sstream_buf.hpp>
 #include <boost/log/core/record.hpp>
 #include <boost/log/utility/unique_identifier_name.hpp>
+#include <boost/log/utility/explicit_operator_bool.hpp>
 
 #ifdef _MSC_VER
 #pragma warning(push)
- // non dll-interface class 'A' used as base for dll-interface class 'B'
+// non dll-interface class 'A' used as base for dll-interface class 'B'
 #pragma warning(disable: 4275)
+// 'this' : used in base member initializer list
+#pragma warning(disable: 4355)
 #endif // _MSC_VER
 
 namespace boost {
@@ -54,13 +51,13 @@ namespace BOOST_LOG_NAMESPACE {
  */
 template< typename CharT, typename TraitsT = std::char_traits< CharT > >
 class basic_record_ostream :
-    private base_from_member< boost::log::aux::basic_ostringstreambuf< CharT, TraitsT > >,
+    private boost::log::aux::basic_ostringstreambuf< CharT, TraitsT >,
     public std::basic_ostream< CharT, TraitsT >
 {
     //! Self type
     typedef basic_record_ostream< CharT, TraitsT > this_type;
     //! Base class that contains the stream buffer
-    typedef base_from_member< boost::log::aux::basic_ostringstreambuf< CharT, TraitsT > > ostream_buf_base_type;
+    typedef boost::log::aux::basic_ostringstreambuf< CharT, TraitsT > ostream_buf_base_type;
 
 public:
     //! Stream type
@@ -83,7 +80,7 @@ public:
      *
      * \post <tt>!*this == true</tt>
      */
-    basic_record_ostream() : ostream_type(boost::addressof(ostream_buf_base_type::member))
+    basic_record_ostream() : ostream_type(static_cast< ostream_buf_base_type* >(this))
     {
         ostream_type::clear(ostream_type::badbit);
     }
@@ -96,7 +93,7 @@ public:
      * \param rec The record handle being adopted
      */
     explicit basic_record_ostream(record_handle const& rec) :
-        ostream_type(boost::addressof(ostream_buf_base_type::member)),
+        ostream_type(static_cast< ostream_buf_base_type* >(this)),
         m_Record(rec)
     {
         ostream_type::clear(ostream_type::badbit);
@@ -110,7 +107,7 @@ public:
      * \param rec The record handle being adopted
      */
     basic_record_ostream(record_type const& rec) :
-        ostream_type(boost::addressof(ostream_buf_base_type::member)),
+        ostream_type(static_cast< ostream_buf_base_type* >(this)),
         m_Record(rec)
     {
         ostream_type::clear(ostream_type::badbit);
@@ -131,7 +128,7 @@ public:
      * \return \c true, if stream is valid and ready for formatting, \c false, if the stream is not valid. The latter also applies to
      *         the case when the stream is not attached to a log record.
      */
-    BOOST_LOG_OPERATOR_UNSPECIFIED_BOOL()
+    BOOST_LOG_EXPLICIT_OPERATOR_BOOL()
 
     /*!
      * Inverted conversion to an unspecified boolean type
@@ -174,33 +171,9 @@ private:
     basic_record_ostream& operator= (basic_record_ostream const&);
 
     //! The function initializes the stream and the stream buffer
-    void init_stream()
-    {
-        if (!!m_Record)
-        {
-            ostream_buf_base_type::member.attach(m_Record.message());
-            ostream_type::clear(ostream_type::goodbit);
-            ostream_type::flags(
-                ostream_type::dec |
-                ostream_type::skipws |
-                ostream_type::boolalpha // this differs from the default stream flags but makes logs look better
-            );
-            ostream_type::width(0);
-            ostream_type::precision(6);
-            ostream_type::fill(static_cast< char_type >(' '));
-            ostream_type::imbue(std::locale());
-        }
-    }
+    BOOST_LOG_EXPORT void init_stream();
     //! The function resets the stream into a detached (default initialized) state
-    void detach_from_record()
-    {
-        if (!!m_Record)
-        {
-            ostream_buf_base_type::member.detach();
-            ostream_type::exceptions(ostream_type::goodbit);
-            ostream_type::clear(ostream_type::badbit);
-        }
-    }
+    BOOST_LOG_EXPORT void detach_from_record();
 };
 
 
@@ -315,13 +288,11 @@ public:
         }
     }
 
-    //! Forwarding output operators
-    template< typename T >
-    record_pump const& operator<< (T const& value) const
+    //! Returns the stream to be used for message text formatting
+    std::basic_ostream< char_type >& stream() const
     {
         BOOST_ASSERT(m_pStreamCompound != 0);
-        m_pStreamCompound->stream << value;
-        return *this;
+        return m_pStreamCompound->stream;
     }
 
 private:
@@ -350,21 +321,21 @@ BOOST_LOG_FORCEINLINE record_pump< LoggerT > make_pump_stream(LoggerT& lg, recor
 
 #define BOOST_LOG_STREAM_INTERNAL(logger, rec_var)\
     for (BOOST_LOG_AUTO(rec_var, (logger).open_record()); !!rec_var; rec_var.reset())\
-        ::boost::log::aux::make_pump_stream((logger), rec_var)
+        ::boost::log::aux::make_pump_stream((logger), rec_var).stream()
 
 #define BOOST_LOG_STREAM_WITH_PARAMS_INTERNAL(logger, rec_var, params_seq)\
     for (BOOST_LOG_AUTO(rec_var, (logger).open_record((BOOST_PP_SEQ_ENUM(params_seq)))); !!rec_var; rec_var.reset())\
-        ::boost::log::aux::make_pump_stream((logger), rec_var)
+        ::boost::log::aux::make_pump_stream((logger), rec_var).stream()
 
 #else // BOOST_LOG_AUTO
 
 #define BOOST_LOG_STREAM_INTERNAL(logger, rec_var)\
     for (::boost::log::record_handle rec_var = (logger).open_record().handle(); !!rec_var; rec_var.reset())\
-        ::boost::log::aux::make_pump_stream((logger), rec_var)
+        ::boost::log::aux::make_pump_stream((logger), rec_var).stream()
 
 #define BOOST_LOG_STREAM_WITH_PARAMS_INTERNAL(logger, rec_var, params_seq)\
     for (::boost::log::record_handle rec_var = (logger).open_record((BOOST_PP_SEQ_ENUM(params_seq))).handle(); !!rec_var; rec_var.reset())\
-        ::boost::log::aux::make_pump_stream((logger), rec_var)
+        ::boost::log::aux::make_pump_stream((logger), rec_var).stream()
 
 #endif // BOOST_LOG_AUTO
 

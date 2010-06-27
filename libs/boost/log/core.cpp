@@ -1,9 +1,10 @@
+/*
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
+ */
 /*!
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
  * \file   core.cpp
  * \author Andrey Semashev
  * \date   19.04.2007
@@ -25,9 +26,8 @@
 #include <boost/log/detail/singleton.hpp>
 #if !defined(BOOST_LOG_NO_THREADS)
 #include <boost/thread/tss.hpp>
-#include <boost/thread/locks.hpp>
 #include <boost/thread/exceptions.hpp>
-#include <boost/log/detail/shared_lock_guard.hpp>
+#include <boost/log/detail/locks.hpp>
 #include <boost/log/detail/light_rw_mutex.hpp>
 #endif
 
@@ -74,7 +74,7 @@ public:
     //! Read lock type
     typedef log::aux::shared_lock_guard< log::aux::light_rw_mutex > scoped_read_lock;
     //! Write lock type
-    typedef lock_guard< log::aux::light_rw_mutex > scoped_write_lock;
+    typedef log::aux::exclusive_lock_guard< log::aux::light_rw_mutex > scoped_write_lock;
 #endif
 
     //! Sinks container type
@@ -101,6 +101,12 @@ public:
 #if !defined(BOOST_LOG_NO_THREADS)
     //! Thread-specific data
     thread_specific_ptr< thread_data > pThreadData;
+
+#if defined(BOOST_LOG_USE_COMPILER_TLS)
+    //! Cached pointer to the thread-specific data
+    static BOOST_LOG_TLS thread_data* pThreadDataCache;
+#endif
+
 #else
     //! Thread-specific data
     std::auto_ptr< thread_data > pThreadData;
@@ -121,11 +127,19 @@ public:
     //! The method returns the current thread-specific data
     thread_data* get_thread_data()
     {
+#if defined(BOOST_LOG_USE_COMPILER_TLS)
+        thread_data* p = pThreadDataCache;
+#else
         thread_data* p = pThreadData.get();
+#endif
         if (!p)
         {
             init_thread_data();
+#if defined(BOOST_LOG_USE_COMPILER_TLS)
+            p = pThreadDataCache;
+#else
             p = pThreadData.get();
+#endif
         }
         return p;
     }
@@ -145,11 +159,21 @@ private:
         {
             std::auto_ptr< thread_data > p(new thread_data());
             pThreadData.reset(p.get());
+#if defined(BOOST_LOG_USE_COMPILER_TLS)
+            pThreadDataCache = p.release();
+#else
             p.release();
+#endif
         }
     }
 };
 
+#if defined(BOOST_LOG_USE_COMPILER_TLS)
+//! Cached pointer to the thread-specific data
+template< typename CharT >
+BOOST_LOG_TLS typename basic_core< CharT >::implementation::thread_data*
+basic_core< CharT >::implementation::pThreadDataCache = NULL;
+#endif // defined(BOOST_LOG_USE_COMPILER_TLS)
 
 //! Logging system constructor
 template< typename CharT >
@@ -180,6 +204,15 @@ bool basic_core< CharT >::set_logging_enabled(bool enabled)
     const bool old_value = pImpl->Enabled;
     pImpl->Enabled = enabled;
     return old_value;
+}
+
+//! The method allows to detect if logging is enabled
+template< typename CharT >
+bool basic_core< CharT >::get_logging_enabled() const
+{
+    // Should have a read barrier here, but for performance reasons it is omitted.
+    // The function should be used as a quick check and doesn't need to be reliable.
+    return pImpl->Enabled;
 }
 
 //! The method adds a new sink
@@ -226,7 +259,7 @@ void basic_core< CharT >::remove_global_attribute(typename attribute_set_type::i
 template< typename CharT >
 typename basic_core< CharT >::attribute_set_type basic_core< CharT >::get_global_attributes() const
 {
-    BOOST_LOG_EXPR_IF_MT(typename implementation::scoped_write_lock lock(pImpl->Mutex);)
+    BOOST_LOG_EXPR_IF_MT(typename implementation::scoped_read_lock lock(pImpl->Mutex);)
     return pImpl->GlobalAttributes;
 }
 //! The method replaces the complete set of currently registered global attributes with the provided set
@@ -404,11 +437,11 @@ void basic_core< CharT >::push_record(record_type const& rec)
         }
 
         bool shuffled = (end - begin) <= 1;
+        register shared_ptr< sink_type >* it = begin;
         while (true) try
         {
             // First try to distribute load between different sinks
             register bool all_locked = true;
-            register shared_ptr< sink_type >* it = begin;
             while (it != end)
             {
                 if (it->get()->try_consume(rec))
@@ -421,6 +454,7 @@ void basic_core< CharT >::push_record(record_type const& rec)
                     ++it;
             }
 
+            it = begin;
             if (begin != end)
             {
                 if (all_locked)
@@ -432,9 +466,9 @@ void basic_core< CharT >::push_record(record_type const& rec)
                         shuffled = true;
                     }
 
-                    begin->get()->consume(rec);
+                    it->get()->consume(rec);
                     --end;
-                    end->swap(*begin);
+                    end->swap(*it);
                 }
             }
             else
@@ -454,6 +488,10 @@ void basic_core< CharT >::push_record(record_type const& rec)
                 throw;
 
             pImpl->ExceptionHandler();
+
+            // Skip the sink that failed to consume the record
+            --end;
+            end->swap(*it);
         }
     }
 #if !defined(BOOST_LOG_NO_THREADS)

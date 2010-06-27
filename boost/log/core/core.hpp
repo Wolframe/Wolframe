@@ -1,11 +1,8 @@
 /*
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
- * This header is the Boost.Log library implementation, see the library documentation
- * at http://www.boost.org/libs/log/doc/log.html.
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
  */
 /*!
  * \file   core/core.hpp
@@ -26,11 +23,9 @@
 #include <utility>
 #include <boost/shared_ptr.hpp>
 #include <boost/noncopyable.hpp>
-#include <boost/function/function0.hpp>
-#include <boost/function/function1.hpp>
 #include <boost/log/detail/prologue.hpp>
+#include <boost/log/detail/light_function.hpp>
 #include <boost/log/core/record.hpp>
-#include <boost/log/detail/unspecified_bool.hpp>
 #include <boost/log/attributes/attribute_set.hpp>
 
 #ifdef _MSC_VER
@@ -80,9 +75,9 @@ public:
     //! Sink interface type
     typedef sinks::sink< char_type > sink_type;
     //! Filter function type
-    typedef function1< bool, values_view_type const& > filter_type;
+    typedef boost::log::aux::light_function1< bool, values_view_type const& > filter_type;
     //! Exception handler function type
-    typedef function0< void > exception_handler_type;
+    typedef boost::log::aux::light_function0< void > exception_handler_type;
 
 private:
     //! Implementation type
@@ -126,6 +121,10 @@ public:
      * \return The previous value of enabled/disabled logging flag
      */
     bool set_logging_enabled(bool enabled = true);
+    /*!
+     * The method allows to detect if logging is enabled. See the comment for \c set_logging_enabled
+     */
+    bool get_logging_enabled() const;
 
     /*!
      * The method sets the global logging filter. The filter is applied to every log record that is processed.
@@ -175,7 +174,7 @@ public:
     void remove_global_attribute(typename attribute_set_type::iterator it);
 
     /*!
-     * The method returns copy of the complete set of currently registered global attributes.
+     * The method returns a copy of the complete set of currently registered global attributes.
      */
     attribute_set_type get_global_attributes() const;
     /*!
@@ -214,7 +213,7 @@ public:
     void remove_thread_attribute(typename attribute_set_type::iterator it);
 
     /*!
-     * The method returns copy of the complete set of currently registered thread-specific attributes.
+     * The method returns a copy of the complete set of currently registered thread-specific attributes.
      */
     attribute_set_type get_thread_attributes() const;
     /*!
@@ -235,12 +234,11 @@ public:
      *
      * By default no handler is installed, thus any exception is propagated as usual.
      *
-     * \sa <tt>utility/exception_handler.hpp</tt>
+     * \sa See also: <tt>utility/exception_handler.hpp</tt>
      * \param handler Exception handling function
      *
      * \note The exception handler can be invoked in several threads concurrently.
-     *
-     * \note Thread interruptions are not affected by exception handlers.
+     *       Thread interruptions are not affected by exception handlers.
      */
     void set_exception_handler(exception_handler_type const& handler);
 

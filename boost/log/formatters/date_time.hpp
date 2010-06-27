@@ -1,11 +1,8 @@
 /*
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
- * This header is the Boost.Log library implementation, see the library documentation
- * at http://www.boost.org/libs/log/doc/log.html.
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
  */
 /*!
  * \file   date_time.hpp
@@ -38,8 +35,8 @@
 #include <boost/date_time/time_facet.hpp>
 #include <boost/date_time/date_facet.hpp>
 #include <boost/date_time/compiler_config.hpp>
-#include <boost/date_time/gregorian/conversion.hpp> // work around the problem of to_tm overload resolution in Boost.DateTime facets
-#include <boost/date_time/local_time/conversion.hpp> // work around the problem of to_tm overload resolution in Boost.DateTime facets
+#include <boost/date_time/gregorian/conversion.hpp>
+#include <boost/date_time/local_time/conversion.hpp>
 #include <boost/date_time/posix_time/conversion.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/parameter/parameters.hpp>
@@ -654,8 +651,8 @@ public:
      *
      * \param name Attribute name
      */
-    explicit fmt_date_time_facade(string_type const& name)
-        : m_Extractor(name)
+    explicit fmt_date_time_facade(string_type const& name) :
+        m_Extractor(name)
     {
     }
     /*!
@@ -665,8 +662,9 @@ public:
      * \param args A set of named arguments that describe the format
      */
     template< typename ArgsT >
-    fmt_date_time_facade(string_type const& name, ArgsT const& args)
-        : m_Extractor(name), m_Formatter(args)
+    fmt_date_time_facade(string_type const& name, ArgsT const& args) :
+        m_Extractor(name),
+        m_Formatter(args)
     {
     }
 

@@ -1,9 +1,10 @@
+/*
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
+ */
 /*!
- * (C) 2009 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
  * \file   text_file_backend.cpp
  * \author Andrey Semashev
  * \date   09.06.2009
@@ -17,6 +18,7 @@
 #include <string>
 #include <locale>
 #include <ostream>
+#include <sstream>
 #include <iterator>
 #include <algorithm>
 #include <stdexcept>
@@ -42,6 +44,7 @@
 #include <boost/intrusive/list_hook.hpp>
 #include <boost/intrusive/options.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/date_time/gregorian/gregorian_types.hpp>
 #include <boost/compatibility/cpp_c_headers/ctime>
 #include <boost/compatibility/cpp_c_headers/cctype>
 #include <boost/compatibility/cpp_c_headers/cwctype>
@@ -53,6 +56,7 @@
 #include <boost/spirit/include/classic_assign_actor.hpp>
 #include <boost/log/detail/snprintf.hpp>
 #include <boost/log/detail/singleton.hpp>
+#include <boost/log/detail/light_function.hpp>
 #include <boost/log/exceptions.hpp>
 #include <boost/log/attributes/time_traits.hpp>
 #include <boost/log/sinks/text_file_backend.hpp>
@@ -71,7 +75,35 @@ namespace BOOST_LOG_NAMESPACE {
 
 namespace sinks {
 
-namespace {
+BOOST_LOG_ANONYMOUS_NAMESPACE {
+
+    //! A possible Boost.Filesystem extension - renames or moves the file to the target storage
+    inline void move_file(
+        boost::log::aux::universal_path const& from,
+        boost::log::aux::universal_path const& to)
+    {
+#if defined(BOOST_WINDOWS_API)
+        // On Windows MoveFile already does what we need
+        filesystem::rename(from, to);
+#else
+        // On POSIX rename fails if the target points to a different device
+        try
+        {
+            filesystem::rename(from, to);
+        }
+        catch (system::system_error& e)
+        {
+            if (e.code().value() == system::errc::cross_device_link)
+            {
+                // Attempt to manually move the file instead
+                filesystem::copy_file(from, to);
+                filesystem::remove(from);
+            }
+            else
+                throw;
+        }
+#endif
+    }
 
     typedef boost::log::aux::universal_path::string_type path_string_type;
     typedef path_string_type::value_type path_char_type;
@@ -420,7 +452,7 @@ namespace {
                         path_string_type::const_iterator f = f_it;
                         if (!local::scan_digits(f, f_end, width))
                             return false;
-                        for (; f != f_end && traits_t::is_digit(*f); ++f) {}
+                        for (; f != f_end && traits_t::is_digit(*f); ++f);
 
                         spirit::classic::parse(f_it, f, spirit::classic::uint_p[spirit::classic::assign_a(file_counter)]);
 
@@ -450,6 +482,8 @@ namespace {
     }
 
 
+    class file_collector_repository;
+
     //! Type of the hook used for sequencing file collectors
     typedef intrusive::list_base_hook<
         intrusive::link_mode< intrusive::safe_link >
@@ -475,6 +509,9 @@ namespace {
         typedef path_type::string_type path_string_type;
 
     private:
+        //! A reference to the repository this collector belongs to
+        shared_ptr< file_collector_repository > m_pRepository;
+
 #if !defined(BOOST_LOG_NO_THREADS)
         //! Synchronization mutex
         mutex m_Mutex;
@@ -494,7 +531,11 @@ namespace {
 
     public:
         //! Constructor
-        file_collector(path_type const& target_dir, uintmax_t max_size, uintmax_t min_free_space);
+        file_collector(
+            shared_ptr< file_collector_repository > const& repo,
+            path_type const& target_dir,
+            uintmax_t max_size,
+            uintmax_t min_free_space);
 
         //! Destructor
         ~file_collector();
@@ -519,9 +560,18 @@ namespace {
 
     //! The singleton of the list of file collectors
     class file_collector_repository :
-        public log::aux::lazy_singleton< file_collector_repository >
+        public log::aux::lazy_singleton< file_collector_repository, shared_ptr< file_collector_repository > >
     {
     private:
+        //! Base type
+        typedef log::aux::lazy_singleton< file_collector_repository, shared_ptr< file_collector_repository > > base_type;
+
+#if !defined(BOOST_LOG_BROKEN_FRIEND_TEMPLATE_INSTANTIATIONS)
+        friend class log::aux::lazy_singleton< file_collector_repository, shared_ptr< file_collector_repository > >;
+#else
+        friend class base_type;
+#endif
+
         //! Path type
         typedef file_collector::path_type path_type;
         //! The type of the list of collectors
@@ -545,12 +595,23 @@ namespace {
 
         //! Removes the file collector from the list
         void remove_collector(file_collector* p);
+
+    private:
+        //! Initializes the singleton instance
+        static void init_instance()
+        {
+            base_type::get_instance() = boost::make_shared< file_collector_repository >();
+        }
     };
 
     //! Constructor
     file_collector::file_collector(
-        path_type const& target_dir, uintmax_t max_size, uintmax_t min_free_space
+        shared_ptr< file_collector_repository > const& repo,
+        path_type const& target_dir,
+        uintmax_t max_size,
+        uintmax_t min_free_space
     ) :
+        m_pRepository(repo),
         m_MaxSize(max_size),
         m_MinFreeSpace(min_free_space),
         m_StorageDir(filesystem::complete(target_dir)),
@@ -561,7 +622,7 @@ namespace {
     //! Destructor
     file_collector::~file_collector()
     {
-        file_collector_repository::get().remove_collector(this);
+        m_pRepository->remove_collector(this);
     }
 
     //! The function stores the specified file in the storage
@@ -574,21 +635,30 @@ namespace {
 
         path_string_type file_name = src_path.filename();
         info.m_Path = m_StorageDir / file_name;
-        if (filesystem::exists(info.m_Path))
-        {
-            // If the file already exists, try to mangle the file name
-            // to ensure there's no conflict. I'll need to make this customizable some day.
-            file_counter_formatter formatter(file_name.size(), 5);
-            unsigned int n = 0;
-            do
-            {
-                path_string_type alt_file_name = formatter(file_name, n++);
-                info.m_Path = m_StorageDir / alt_file_name;
-            }
-            while (filesystem::exists(info.m_Path) && n < (std::numeric_limits< unsigned int >::max)());
-        }
 
-        filesystem::create_directories(m_StorageDir);
+        // Check if the file is already in the target directory
+        path_type src_dir = src_path.has_parent_path() ?
+                            filesystem::system_complete(src_path.parent_path()) :
+                            filesystem::current_path< path_type >();
+        const bool is_in_target_dir = filesystem::equivalent(src_dir, m_StorageDir);
+        if (!is_in_target_dir)
+        {
+            if (filesystem::exists(info.m_Path))
+            {
+                // If the file already exists, try to mangle the file name
+                // to ensure there's no conflict. I'll need to make this customizable some day.
+                file_counter_formatter formatter(file_name.size(), 5);
+                unsigned int n = 0;
+                do
+                {
+                    path_string_type alt_file_name = formatter(file_name, n++);
+                    info.m_Path = m_StorageDir / alt_file_name;
+                }
+                while (filesystem::exists(info.m_Path) && n < (std::numeric_limits< unsigned int >::max)());
+            }
+
+            filesystem::create_directories(m_StorageDir);
+        }
 
         BOOST_LOG_EXPR_IF_MT(lock_guard< mutex > _(m_Mutex);)
 
@@ -625,8 +695,11 @@ namespace {
             }
         }
 
-        // Move/rename the file to the target storage
-        filesystem::rename(src_path, info.m_Path);
+        if (!is_in_target_dir)
+        {
+            // Move/rename the file to the target storage
+            move_file(src_path, info.m_Path);
+        }
 
         m_Files.push_back(info);
         m_TotalSize += info.m_Size;
@@ -738,7 +811,8 @@ namespace {
 
         if (!p)
         {
-            p = boost::make_shared< file_collector >(target_dir, max_size, min_free_space);
+            p = boost::make_shared< file_collector >(
+                file_collector_repository::get(), target_dir, max_size, min_free_space);
             m_Collectors.push_back(*p);
         }
 
@@ -750,6 +824,29 @@ namespace {
     {
         BOOST_LOG_EXPR_IF_MT(lock_guard< mutex > _(m_Mutex);)
         m_Collectors.erase(m_Collectors.iterator_to(*p));
+    }
+
+    //! Checks if the time point is valid
+    void check_time_point_validity(unsigned char hour, unsigned char minute, unsigned char second)
+    {
+        if (hour >= 24)
+        {
+            std::ostringstream strm;
+            strm << "Time point hours value is out of range: " << static_cast< unsigned int >(hour);
+            BOOST_THROW_EXCEPTION(std::out_of_range(strm.str()));
+        }
+        if (minute >= 60)
+        {
+            std::ostringstream strm;
+            strm << "Time point minutes value is out of range: " << static_cast< unsigned int >(minute);
+            BOOST_THROW_EXCEPTION(std::out_of_range(strm.str()));
+        }
+        if (second >= 60)
+        {
+            std::ostringstream strm;
+            strm << "Time point seconds value is out of range: " << static_cast< unsigned int >(second);
+            BOOST_THROW_EXCEPTION(std::out_of_range(strm.str()));
+        }
     }
 
 } // namespace
@@ -764,10 +861,152 @@ namespace aux {
         uintmax_t max_size,
         uintmax_t min_free_space)
     {
-        return file_collector_repository::get().get_collector(target_dir, max_size, min_free_space);
+        return file_collector_repository::get()->get_collector(target_dir, max_size, min_free_space);
     }
 
 } // namespace aux
+
+//! Creates a rotation time point of every day at the specified time
+BOOST_LOG_EXPORT rotation_at_time_point::rotation_at_time_point(
+    unsigned char hour,
+    unsigned char minute,
+    unsigned char second
+) :
+    m_DayKind(not_specified),
+    m_Day(0),
+    m_Hour(hour),
+    m_Minute(minute),
+    m_Second(second),
+    m_Previous(date_time::not_a_date_time)
+{
+    check_time_point_validity(hour, minute, second);
+}
+
+//! Creates a rotation time point of each specified weekday at the specified time
+BOOST_LOG_EXPORT rotation_at_time_point::rotation_at_time_point(
+    date_time::weekdays wday,
+    unsigned char hour,
+    unsigned char minute,
+    unsigned char second
+) :
+    m_DayKind(weekday),
+    m_Day(static_cast< unsigned char >(wday)),
+    m_Hour(hour),
+    m_Minute(minute),
+    m_Second(second),
+    m_Previous(date_time::not_a_date_time)
+{
+    check_time_point_validity(hour, minute, second);
+}
+
+//! Creates a rotation time point of each specified day of month at the specified time
+BOOST_LOG_EXPORT rotation_at_time_point::rotation_at_time_point(
+    gregorian::greg_day mday,
+    unsigned char hour,
+    unsigned char minute,
+    unsigned char second
+) :
+    m_DayKind(monthday),
+    m_Day(static_cast< unsigned char >(mday.as_number())),
+    m_Hour(hour),
+    m_Minute(minute),
+    m_Second(second),
+    m_Previous(date_time::not_a_date_time)
+{
+    check_time_point_validity(hour, minute, second);
+}
+
+//! Checks if it's time to rotate the file
+BOOST_LOG_EXPORT bool rotation_at_time_point::operator()() const
+{
+    bool result = false;
+    posix_time::time_duration rotation_time(
+        static_cast< posix_time::time_duration::hour_type >(m_Hour),
+        static_cast< posix_time::time_duration::min_type >(m_Minute),
+        static_cast< posix_time::time_duration::sec_type >(m_Second));
+    posix_time::ptime now = posix_time::second_clock::local_time();
+
+    if (m_Previous.is_special())
+    {
+        m_Previous = now;
+        return false;
+    }
+
+    const bool time_of_day_passed = rotation_time.total_seconds() <= m_Previous.time_of_day().total_seconds();
+    switch (m_DayKind)
+    {
+    case not_specified:
+        {
+            // The rotation takes place every day at the specified time
+            gregorian::date previous_date = m_Previous.date();
+            if (time_of_day_passed)
+                previous_date += gregorian::days(1);
+            posix_time::ptime next(previous_date, rotation_time);
+            result = (now >= next);
+        }
+        break;
+
+    case weekday:
+        {
+            // The rotation takes place on the specified week day at the specified time
+            gregorian::date previous_date = m_Previous.date(), next_date = previous_date;
+            int weekday2 = m_Day, previous_weekday = static_cast< int >(previous_date.day_of_week().as_number());
+            next_date += gregorian::days(weekday2 - previous_weekday);
+            if (weekday2 < previous_weekday || (weekday2 == previous_weekday && time_of_day_passed))
+            {
+                next_date += gregorian::weeks(1);
+            }
+
+            posix_time::ptime next(next_date, rotation_time);
+            result = (now >= next);
+        }
+        break;
+
+    case monthday:
+        {
+            // The rotation takes place on the specified day of month at the specified time
+            gregorian::date previous_date = m_Previous.date();
+            gregorian::date::day_type monthday2 = static_cast< gregorian::date::day_type >(m_Day),
+                previous_monthday = previous_date.day();
+            gregorian::date next_date(previous_date.year(), previous_date.month(), monthday2);
+            if (monthday2 < previous_monthday || (monthday2 == previous_monthday && time_of_day_passed))
+            {
+                next_date += gregorian::months(1);
+            }
+
+            posix_time::ptime next(next_date, rotation_time);
+            result = (now >= next);
+        }
+        break;
+
+    default:
+        break;
+    }
+
+    if (result)
+        m_Previous = now;
+
+    return result;
+}
+
+//! Checks if it's time to rotate the file
+BOOST_LOG_EXPORT bool rotation_at_time_interval::operator()() const
+{
+    bool result = false;
+    posix_time::ptime now = posix_time::second_clock::universal_time();
+    if (m_Previous.is_special())
+    {
+        m_Previous = now;
+        return false;
+    }
+
+    result = (now - m_Previous) >= m_Interval;
+
+    if (result)
+        m_Previous = now;
+
+    return result;
+}
 
 } // namespace file
 
@@ -786,7 +1025,7 @@ struct basic_text_file_backend< CharT >::implementation
     //! Directory to store files in
     path_type m_StorageDir;
     //! File name generator (according to m_FileNamePattern)
-    function1< path_string_type, unsigned int > m_FileNameGenerator;
+    log::aux::light_function1< path_string_type, unsigned int > m_FileNameGenerator;
 
     //! Stored files counter
     unsigned int m_FileCounter;
@@ -797,8 +1036,6 @@ struct basic_text_file_backend< CharT >::implementation
     filesystem::basic_ofstream< CharT > m_File;
     //! Characters written
     uintmax_t m_CharactersWritten;
-    //! The time point when the file was last rotated
-    posix_time::ptime m_LastRotation;
 
     //! File collector functional object
     shared_ptr< file::collector > m_pFileCollector;
@@ -809,8 +1046,8 @@ struct basic_text_file_backend< CharT >::implementation
 
     //! The maximum temp file size, in characters written to the stream
     uintmax_t m_FileRotationSize;
-    //! The maximum interval between file rotations
-    posix_time::time_duration m_FileRotationInterval;
+    //! Time-based rotation predicate
+    time_based_rotation_predicate m_TimeBasedRotation;
     //! The flag shows if every written record should be flushed
     bool m_AutoFlush;
 
@@ -818,7 +1055,6 @@ struct basic_text_file_backend< CharT >::implementation
         m_FileOpenMode(std::ios_base::trunc | std::ios_base::out),
         m_FileCounter(0),
         m_CharactersWritten(0),
-        m_LastRotation(date_time::not_a_date_time),
         m_FileRotationSize(rotation_size),
         m_AutoFlush(auto_flush)
     {
@@ -855,12 +1091,12 @@ void basic_text_file_backend< CharT >::construct(
     path_type const& pattern,
     std::ios_base::openmode mode,
     uintmax_t rotation_size,
-    posix_time::time_duration rotation_interval,
+    time_based_rotation_predicate const& time_based_rotation,
     bool _auto_flush)
 {
     m_pImpl = new implementation(rotation_size, _auto_flush);
     set_file_name_pattern_internal(pattern);
-    set_rotation_interval(rotation_interval);
+    set_time_based_rotation(time_based_rotation);
     set_open_mode(mode);
 }
 
@@ -873,12 +1109,9 @@ void basic_text_file_backend< CharT >::set_rotation_size(uintmax_t size)
 
 //! The method sets the maximum time interval between file rotations.
 template< typename CharT >
-void basic_text_file_backend< CharT >::set_rotation_interval(posix_time::time_duration interval)
+void basic_text_file_backend< CharT >::set_time_based_rotation(time_based_rotation_predicate const& predicate)
 {
-    if (interval.is_special() || interval.total_seconds() == 0)
-        m_pImpl->m_FileRotationInterval = posix_time::time_duration(date_time::pos_infin);
-    else
-        m_pImpl->m_FileRotationInterval = interval;
+    m_pImpl->m_TimeBasedRotation = predicate;
 }
 
 //! Sets the flag to automatically flush buffers of all attached streams after each log record
@@ -891,7 +1124,7 @@ void basic_text_file_backend< CharT >::auto_flush(bool f)
 //! The method writes the message to the sink
 template< typename CharT >
 void basic_text_file_backend< CharT >::do_consume(
-    record_type const& record UNUSED, target_string_type const& formatted_message)
+    record_type const& _record UNUSED, target_string_type const& formatted_message)
 {
     typedef file_char_traits< typename target_string_type::value_type > traits_t;
     if
@@ -900,7 +1133,7 @@ void basic_text_file_backend< CharT >::do_consume(
             m_pImpl->m_File.is_open() &&
             (
                 m_pImpl->m_CharactersWritten + formatted_message.size() >= m_pImpl->m_FileRotationSize ||
-                posix_time::second_clock::universal_time() - m_pImpl->m_LastRotation > m_pImpl->m_FileRotationInterval
+                (!m_pImpl->m_TimeBasedRotation.empty() && m_pImpl->m_TimeBasedRotation())
             )
         ) ||
         !m_pImpl->m_File.good()
@@ -923,7 +1156,6 @@ void basic_text_file_backend< CharT >::do_consume(
                 system::error_code(system::errc::io_error, system::get_generic_category()));
             BOOST_THROW_EXCEPTION(err);
         }
-        m_pImpl->m_LastRotation = posix_time::second_clock::universal_time();
 
         if (!m_pImpl->m_OpenHandler.empty())
             m_pImpl->m_OpenHandler(m_pImpl->m_File);
@@ -1002,7 +1234,7 @@ void basic_text_file_backend< CharT >::set_file_name_pattern_internal(path_type 
         break;
     case 2: // Only date/time placeholders in the pattern
         m_pImpl->m_FileNameGenerator =
-                boost::bind(date_and_time_formatter(), name_pattern, _1);
+            boost::bind(date_and_time_formatter(), name_pattern, _1);
         break;
     case 3: // Counter and date/time placeholder in the pattern
         m_pImpl->m_FileNameGenerator = boost::bind(date_and_time_formatter(),

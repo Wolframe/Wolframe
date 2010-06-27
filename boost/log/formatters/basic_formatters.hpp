@@ -1,17 +1,14 @@
 /*
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
- * This header is the Boost.Log library implementation, see the library documentation
- * at http://www.boost.org/libs/log/doc/log.html.
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
  */
 /*!
  * \file   basic_formatters.hpp
  * \author Andrey Semashev
  * \date   22.04.2007
- * 
+ *
  * The header contains implementation of basic facilities for auto-generated formatters,
  * including the base class for formatters.
  */
@@ -41,7 +38,7 @@ struct formatter_base {};
 
 /*!
  * \brief A type trait to detect formatters
- * 
+ *
  * The \c is_formatter class is a metafunction that returns \c true if it is instantiated with
  * a formatter type and \c false otherwise.
  */
@@ -50,7 +47,7 @@ struct is_formatter : public is_base_and_derived< formatter_base, T > {};
 
 /*!
  * \brief A base class for formatters
- * 
+ *
  * The \c basic_formatter class defines standard types that most formatters use and
  * have to provide in order to be valid functors. This class also enables
  * support for the \c is_formatter type trait, which allows the formatter

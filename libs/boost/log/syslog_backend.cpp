@@ -1,9 +1,10 @@
+/*
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
+ */
 /*!
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
  * \file   syslog_backend.cpp
  * \author Andrey Semashev
  * \date   08.01.2008
@@ -13,6 +14,7 @@
  */
 
 #include "windows_version.hpp"
+#include <boost/log/detail/prologue.hpp>
 #include <memory>
 #include <algorithm>
 #include <stdexcept>
@@ -21,12 +23,15 @@
 #include <boost/weak_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
+#include <boost/throw_exception.hpp>
+#if !defined(BOOST_LOG_NO_ASIO)
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/socket_base.hpp>
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/udp.hpp>
 #include <boost/asio/ip/address.hpp>
 #include <boost/asio/ip/host_name.hpp>
+#endif
 #include <boost/system/error_code.hpp>
 #include <boost/date_time/c_time.hpp>
 #include <boost/compatibility/cpp_c_headers/ctime>
@@ -51,41 +56,24 @@ namespace sinks {
 
 namespace syslog {
 
-    //  Syslog record levels
-    BOOST_LOG_EXPORT extern const level_t emergency = { 0 };
-    BOOST_LOG_EXPORT extern const level_t alert = { 1 };
-    BOOST_LOG_EXPORT extern const level_t critical = { 2 };
-    BOOST_LOG_EXPORT extern const level_t error = { 3 };
-    BOOST_LOG_EXPORT extern const level_t warning = { 4 };
-    BOOST_LOG_EXPORT extern const level_t notice = { 5 };
-    BOOST_LOG_EXPORT extern const level_t info = { 6 };
-    BOOST_LOG_EXPORT extern const level_t debug = { 7 };
+    //! The function constructs log record level from an integer
+    BOOST_LOG_EXPORT level make_level(int lev)
+    {
+        if (static_cast< unsigned int >(lev) >= 8)
+            BOOST_THROW_EXCEPTION(std::out_of_range("syslog level value is out of range"));
+        return static_cast< level >(lev);
+    }
 
-    //  Syslog facility codes
-    BOOST_LOG_EXPORT extern const facility_t kernel = { 0 * 8 };
-    BOOST_LOG_EXPORT extern const facility_t user = { 1 * 8 };
-    BOOST_LOG_EXPORT extern const facility_t mail = { 2 * 8 };
-    BOOST_LOG_EXPORT extern const facility_t daemon = { 3 * 8 };
-    BOOST_LOG_EXPORT extern const facility_t security0 = { 4 * 8 };
-    BOOST_LOG_EXPORT extern const facility_t syslogd = { 5 * 8 };
-    BOOST_LOG_EXPORT extern const facility_t printer = { 6 * 8 };
-    BOOST_LOG_EXPORT extern const facility_t news = { 7 * 8 };
-    BOOST_LOG_EXPORT extern const facility_t uucp = { 8 * 8 };
-    BOOST_LOG_EXPORT extern const facility_t clock0 = { 9 * 8 };
-    BOOST_LOG_EXPORT extern const facility_t security1 = { 10 * 8 };
-    BOOST_LOG_EXPORT extern const facility_t ftp = { 11 * 8 };
-    BOOST_LOG_EXPORT extern const facility_t ntp = { 12 * 8 };
-    BOOST_LOG_EXPORT extern const facility_t log_audit = { 13 * 8 };
-    BOOST_LOG_EXPORT extern const facility_t log_alert = { 14 * 8 };
-    BOOST_LOG_EXPORT extern const facility_t clock1 = { 15 * 8 };
-    BOOST_LOG_EXPORT extern const facility_t local0 = { 16 * 8 };
-    BOOST_LOG_EXPORT extern const facility_t local1 = { 17 * 8 };
-    BOOST_LOG_EXPORT extern const facility_t local2 = { 18 * 8 };
-    BOOST_LOG_EXPORT extern const facility_t local3 = { 19 * 8 };
-    BOOST_LOG_EXPORT extern const facility_t local4 = { 20 * 8 };
-    BOOST_LOG_EXPORT extern const facility_t local5 = { 21 * 8 };
-    BOOST_LOG_EXPORT extern const facility_t local6 = { 22 * 8 };
-    BOOST_LOG_EXPORT extern const facility_t local7 = { 23 * 8 };
+    //! The function constructs log source facility from an integer
+    BOOST_LOG_EXPORT facility make_facility(int fac)
+    {
+        if ((static_cast< unsigned int >(fac) & 7U) != 0
+            || static_cast< unsigned int >(fac) > (23U * 8U))
+        {
+            BOOST_THROW_EXCEPTION(std::out_of_range("syslog facility code value is out of range"));
+        }
+        return static_cast< facility >(fac);
+    }
 
 } // namespace syslog
 
@@ -98,7 +86,9 @@ struct basic_syslog_backend< CharT >::implementation
 #ifdef BOOST_LOG_USE_NATIVE_SYSLOG
     struct native;
 #endif // BOOST_LOG_USE_NATIVE_SYSLOG
+#if !defined(BOOST_LOG_NO_ASIO)
     struct udp_socket_based;
+#endif
 
     //! Level mapper
     severity_mapper_type m_LevelMapper;
@@ -115,7 +105,7 @@ struct basic_syslog_backend< CharT >::implementation
     virtual ~implementation() {}
 
     //! The method sends the formatted message to the syslog host
-    virtual void send(syslog::level_t level, target_string_type const& formatted_message) = 0;
+    virtual void send(syslog::level lev, target_string_type const& formatted_message) = 0;
 };
 
 
@@ -125,7 +115,7 @@ struct basic_syslog_backend< CharT >::implementation
 
 #ifdef BOOST_LOG_USE_NATIVE_SYSLOG
 
-namespace {
+BOOST_LOG_ANONYMOUS_NAMESPACE {
 
     //! Syslog service initializer (implemented as a weak singleton)
 #if !defined(BOOST_LOG_NO_THREADS)
@@ -176,33 +166,33 @@ struct basic_syslog_backend< CharT >::implementation::native :
     const shared_ptr< native_syslog_initializer > m_pSyslogInitializer;
 
     //! Constructor
-    explicit native(syslog::facility_t const& facility) :
-        implementation(convert_facility(facility)),
+    explicit native(syslog::facility const& fac) :
+        implementation(convert_facility(fac)),
         m_pSyslogInitializer(native_syslog_initializer::get_instance())
     {
     }
 
     //! The method sends the formatted message to the syslog host
-    void send(syslog::level_t level, target_string_type const& formatted_message)
+    void send(syslog::level lev, target_string_type const& formatted_message)
     {
         int native_level;
-        switch (static_cast< int >(level))
+        switch (lev)
         {
-        case 0:
+        case syslog::emergency:
             native_level = LOG_EMERG; break;
-        case 1:
+        case syslog::alert:
             native_level = LOG_ALERT; break;
-        case 2:
+        case syslog::critical:
             native_level = LOG_CRIT; break;
-        case 3:
+        case syslog::error:
             native_level = LOG_ERR; break;
-        case 4:
+        case syslog::warning:
             native_level = LOG_WARNING; break;
-        case 5:
+        case syslog::notice:
             native_level = LOG_NOTICE; break;
-        case 7:
+        case syslog::debug:
             native_level = LOG_DEBUG; break;
-        default:
+        case syslog::info:
             native_level = LOG_INFO; break;
         }
 
@@ -211,7 +201,7 @@ struct basic_syslog_backend< CharT >::implementation::native :
 
 private:
     //! The function converts portable facility codes to the native codes
-    static int convert_facility(syslog::facility_t const& facility)
+    static int convert_facility(syslog::facility const& fac)
     {
         // POSIX does not specify anything except for LOG_USER and LOG_LOCAL*
         #ifndef LOG_KERN
@@ -279,7 +269,7 @@ private:
             LOG_LOCAL7
         };
 
-        register std::size_t n = static_cast< int >(facility) / 8;
+        register std::size_t n = static_cast< unsigned int >(fac) / 8U;
         BOOST_ASSERT(n < sizeof(native_facilities) / sizeof(*native_facilities));
         return native_facilities[n];
     }
@@ -291,7 +281,10 @@ private:
 ////////////////////////////////////////////////////////////////////////////////
 //  Socket-based implementation
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+
+#if !defined(BOOST_LOG_NO_ASIO)
+
+BOOST_LOG_ANONYMOUS_NAMESPACE {
 
     //! The shared UDP socket
     struct syslog_udp_socket
@@ -341,14 +334,16 @@ namespace {
 #if !defined(BOOST_LOG_NO_THREADS)
         //! A synchronization primitive to protect the host name resolver
         mutex m_Mutex;
-#endif // !defined(BOOST_LOG_NO_THREADS)
         //! The resolver is used to acquire connection endpoints
         asio::ip::udp::resolver m_HostNameResolver;
+#endif // !defined(BOOST_LOG_NO_THREADS)
 
     private:
         //! Default constructor
-        syslog_udp_service() :
-            m_HostNameResolver(m_IOService)
+        syslog_udp_service()
+#if !defined(BOOST_LOG_NO_THREADS)
+            : m_HostNameResolver(m_IOService)
+#endif // !defined(BOOST_LOG_NO_THREADS)
         {
             boost::system::error_code err;
             m_LocalHostName = asio::ip::host_name(err);
@@ -409,8 +404,8 @@ struct basic_syslog_backend< CharT >::implementation::udp_socket_based :
     asio::ip::udp::endpoint m_TargetHost;
 
     //! Constructor
-    explicit udp_socket_based(syslog::facility_t const& facility, asio::ip::udp const& protocol) :
-        implementation(facility),
+    explicit udp_socket_based(syslog::facility const& fac, asio::ip::udp const& protocol) :
+        implementation(fac),
         m_Protocol(protocol),
         m_pService(syslog_udp_service::get())
     {
@@ -429,7 +424,7 @@ struct basic_syslog_backend< CharT >::implementation::udp_socket_based :
     }
 
     //! The method sends the formatted message to the syslog host
-    void send(syslog::level_t level, target_string_type const& formatted_message)
+    void send(syslog::level lev, target_string_type const& formatted_message)
     {
         if (!m_pSocket.get())
         {
@@ -438,13 +433,14 @@ struct basic_syslog_backend< CharT >::implementation::udp_socket_based :
         }
 
         m_pSocket->send_message(
-            this->m_Facility | static_cast< int >(level),
+            this->m_Facility | static_cast< int >(lev),
             m_pService->m_LocalHostName.c_str(),
             m_TargetHost,
             formatted_message.c_str());
     }
 };
 
+#endif // !defined(BOOST_LOG_NO_ASIO)
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Sink backend implementation
@@ -475,7 +471,7 @@ void basic_syslog_backend< CharT >::do_consume(
     record_type const& record, target_string_type const& formatted_message)
 {
     m_pImpl->send(
-        m_pImpl->m_LevelMapper.empty() ? syslog::info : m_pImpl->m_LevelMapper(record.attribute_values()),
+        m_pImpl->m_LevelMapper.empty() ? syslog::info : m_pImpl->m_LevelMapper(record),
         formatted_message);
 }
 
@@ -483,35 +479,40 @@ void basic_syslog_backend< CharT >::do_consume(
 //! The method creates the backend implementation
 template< typename CharT >
 void basic_syslog_backend< CharT >::construct(
-    syslog::facility_t facility, syslog::impl_types use_impl, ip_versions ip_version)
+    syslog::facility fac, syslog::impl_types use_impl, ip_versions ip_version)
 {
 #ifdef BOOST_LOG_USE_NATIVE_SYSLOG
     if (use_impl == syslog::native)
     {
         typedef typename implementation::native native_impl;
-        m_pImpl = new native_impl(facility);
+        m_pImpl = new native_impl(fac);
         return;
     }
 #endif // BOOST_LOG_USE_NATIVE_SYSLOG
 
+#if !defined(BOOST_LOG_NO_ASIO)
     typedef typename implementation::udp_socket_based udp_socket_based_impl;
     switch (ip_version)
     {
     case v4:
-        m_pImpl = new udp_socket_based_impl(facility, asio::ip::udp::v4());
+        m_pImpl = new udp_socket_based_impl(fac, asio::ip::udp::v4());
         break;
     case v6:
-        m_pImpl = new udp_socket_based_impl(facility, asio::ip::udp::v6());
+        m_pImpl = new udp_socket_based_impl(fac, asio::ip::udp::v6());
         break;
     default:
         BOOST_LOG_THROW_DESCR(setup_error, "Incorrect IP version specified");
     }
+#endif
 }
+
+#if !defined(BOOST_LOG_NO_ASIO)
 
 //! The method sets the local address which log records will be sent from.
 template< typename CharT >
 void basic_syslog_backend< CharT >::set_local_address(std::string const& addr, unsigned short port)
 {
+#if !defined(BOOST_LOG_NO_THREADS)
     typedef typename implementation::udp_socket_based udp_socket_based_impl;
     if (udp_socket_based_impl* impl = dynamic_cast< udp_socket_based_impl* >(m_pImpl))
     {
@@ -525,15 +526,17 @@ void basic_syslog_backend< CharT >::set_local_address(std::string const& addr, u
         asio::ip::udp::endpoint local_address;
 
         {
-#if !defined(BOOST_LOG_NO_THREADS)
             lock_guard< mutex > _(impl->m_pService->m_Mutex);
-#endif
-
             local_address = *impl->m_pService->m_HostNameResolver.resolve(q);
         }
 
         impl->m_pSocket.reset(new syslog_udp_socket(impl->m_pService->m_IOService, impl->m_Protocol, local_address));
     }
+#else
+    // Boost.ASIO requires threads for the host name resolver,
+    // so without threads wi simply assume the string already contains IP address
+    set_local_address(boost::asio::ip::address::from_string(addr), port);
+#endif // !defined(BOOST_LOG_NO_THREADS)
 }
 //! The method sets the local address which log records will be sent from.
 template< typename CharT >
@@ -551,6 +554,7 @@ void basic_syslog_backend< CharT >::set_local_address(boost::asio::ip::address c
 template< typename CharT >
 void basic_syslog_backend< CharT >::set_target_address(std::string const& addr, unsigned short port)
 {
+#if !defined(BOOST_LOG_NO_THREADS)
     typedef typename implementation::udp_socket_based udp_socket_based_impl;
     if (udp_socket_based_impl* impl = dynamic_cast< udp_socket_based_impl* >(m_pImpl))
     {
@@ -560,15 +564,17 @@ void basic_syslog_backend< CharT >::set_target_address(std::string const& addr, 
         asio::ip::udp::endpoint remote_address;
 
         {
-#if !defined(BOOST_LOG_NO_THREADS)
             lock_guard< mutex > _(impl->m_pService->m_Mutex);
-#endif
-
             remote_address = *impl->m_pService->m_HostNameResolver.resolve(q);
         }
 
         impl->m_TargetHost = remote_address;
     }
+#else
+    // Boost.ASIO requires threads for the host name resolver,
+    // so without threads wi simply assume the string already contains IP address
+    set_target_address(boost::asio::ip::address::from_string(addr), port);
+#endif // !defined(BOOST_LOG_NO_THREADS)
 }
 //! The method sets the address of the remote host where log records will be sent to.
 template< typename CharT >
@@ -580,6 +586,8 @@ void basic_syslog_backend< CharT >::set_target_address(boost::asio::ip::address 
         impl->m_TargetHost = asio::ip::udp::endpoint(addr, port);
     }
 }
+
+#endif // !defined(BOOST_LOG_NO_ASIO)
 
 //! Explicitly instantiate sink implementation
 #ifdef BOOST_LOG_USE_CHAR

@@ -1,11 +1,8 @@
 /*
- * (C) 2009 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
- * This header is the Boost.Log library implementation, see the library documentation
- * at http://www.boost.org/libs/log/doc/log.html.
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
  */
 /*!
  * \file   severity_feature.hpp
@@ -22,19 +19,15 @@
 #ifndef BOOST_LOG_SOURCES_SEVERITY_FEATURE_HPP_INCLUDED_
 #define BOOST_LOG_SOURCES_SEVERITY_FEATURE_HPP_INCLUDED_
 
-#include <algorithm> // swap
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/log/detail/prologue.hpp>
-#include <boost/log/detail/singleton.hpp>
-#if !defined(BOOST_LOG_NO_THREADS)
-#include <boost/log/detail/thread_specific.hpp>
-#include <boost/thread/locks.hpp>
-#endif
-#include <boost/log/sources/threading_models.hpp> // strictest_lock
+#include <boost/log/detail/locks.hpp>
 #include <boost/log/attributes/attribute.hpp>
 #include <boost/log/attributes/basic_attribute_value.hpp>
+#include <boost/log/utility/strictest_lock.hpp>
+#include <boost/log/utility/type_dispatch/type_dispatcher.hpp>
 #include <boost/log/keywords/severity.hpp>
 
 #ifdef _MSC_VER
@@ -72,90 +65,42 @@ namespace aux {
     };
 #endif
 
-    //! Severity level storage class
-    class severity_level_holder :
-        public enable_shared_from_this< severity_level_holder >,
-        public boost::log::aux::lazy_singleton< severity_level_holder, shared_ptr< severity_level_holder > >
-    {
-        friend class boost::log::aux::lazy_singleton< severity_level_holder, shared_ptr< severity_level_holder > >;
-        typedef boost::log::aux::lazy_singleton< severity_level_holder, shared_ptr< severity_level_holder > > singleton_base;
-
-    private:
-#if !defined(BOOST_LOG_NO_THREADS)
-        //! The actual severity level value
-        boost::log::aux::thread_specific< int > m_Value;
-#else
-        //! The actual severity level value
-        int m_Value;
-#endif
-
-    public:
-        ~severity_level_holder();
-
-        //! Returns an instance of the holder
-        static BOOST_LOG_EXPORT shared_ptr< severity_level_holder > get();
-
-        //! The method sets the actual level
-        void set_value(int level)
-        {
-            m_Value = level;
-        }
-        //! The method returns the current level
-        int get_value() const
-        {
-#if !defined(BOOST_LOG_NO_THREADS)
-            return m_Value.get();
-#else
-            return m_Value;
-#endif
-        }
-
-    private:
-        severity_level_holder();
-        //! Initializes the singleton instance
-        static void init_instance();
-    };
+    //! The method returns the severity level for the current thread
+    BOOST_LOG_EXPORT int get_severity_level();
+    //! The method sets the severity level for the current thread
+    BOOST_LOG_EXPORT void set_severity_level(int level);
 
     //! Severity level attribute implementation
     template< typename LevelT >
     class severity_level :
         public attribute,
-        public attribute_value,
+        public attribute_value::implementation,
         public enable_shared_from_this< severity_level< LevelT > >
     {
     public:
         //! Stored level type
         typedef LevelT held_type;
 
-    private:
-        //! Pointer to the level storage
-        shared_ptr< severity_level_holder > m_pHolder;
-
     public:
-        //! Default constructor
-        severity_level() : m_pHolder(severity_level_holder::get())
-        {
-        }
-
         //! The method returns the actual attribute value. It must not return NULL.
-        virtual shared_ptr< attribute_value > get_value()
+        virtual attribute_value get_value()
         {
-            return this->shared_from_this();
+            return attribute_value(this->shared_from_this());
         }
         //! The method sets the actual level
         void set_value(held_type level)
         {
-            m_pHolder->set_value(static_cast< int >(level));
+            set_severity_level(static_cast< int >(level));
         }
 
         //! The method dispatches the value to the given object
         virtual bool dispatch(type_dispatcher& dispatcher)
         {
-            register type_visitor< held_type >* visitor =
+            type_visitor< held_type > visitor =
                 dispatcher.get_visitor< held_type >();
             if (visitor)
             {
-                visitor->visit(static_cast< held_type >(m_pHolder->get_value()));
+                visitor(static_cast< held_type >(get_severity_level()));
                 return true;
             }
             else
@@ -163,12 +108,12 @@ namespace aux {
         }
 
         //! The method is called when the attribute value is passed to another thread
-        virtual shared_ptr< attribute_value > detach_from_thread()
+        virtual shared_ptr< attribute_value::implementation > detach_from_thread()
         {
 #if !defined(BOOST_LOG_NO_THREADS)
             return boost::make_shared<
                 attributes::basic_attribute_value< held_type >
-            >(static_cast< held_type >(m_pHolder->get_value()));
+            >(static_cast< held_type >(get_severity_level()));
 #else
             // With multithreading disabled we may safely return this here. This method will not be called anyway.
             return this->shared_from_this();
@@ -204,6 +149,24 @@ public:
     typedef LevelT severity_level;
     //! Severity attribute type
     typedef aux::severity_level< severity_level > severity_attribute;
+
+#if defined(BOOST_LOG_DOXYGEN_PASS)
+    //! Lock requirement for the open_record_unlocked method
+    typedef typename strictest_lock<
+        typename base_type::open_record_lock,
+        no_lock< threading_model >
+    >::type open_record_lock;
+#endif // defined(BOOST_LOG_DOXYGEN_PASS)
+
+    //! Lock requirement for the swap_unlocked method
+    typedef typename strictest_lock<
+        typename base_type::swap_lock,
+#ifndef BOOST_LOG_NO_THREADS
+        boost::log::aux::exclusive_lock_guard< threading_model >
+#else
+        no_lock< threading_model >
+#endif // !defined(BOOST_LOG_NO_THREADS)
+    >::type swap_lock;
 
 private:
     //! Default severity
@@ -252,21 +215,16 @@ public:
             m_pSeverity);
     }
 
-protected:
-    /*!
-     * Severity attribute accessor
-     */
-    shared_ptr< severity_attribute > const& severity() const { return m_pSeverity; }
     /*!
      * Default severity value getter
      */
     severity_level default_severity() const { return m_DefaultSeverity; }
 
-    //! Lock requirement for the open_record_unlocked method
-    typedef typename strictest_lock<
-        typename base_type::open_record_lock,
-        no_lock
-    >::type open_record_lock;
+protected:
+    /*!
+     * Severity attribute accessor
+     */
+    shared_ptr< severity_attribute > const& get_severity_attribute() const { return m_pSeverity; }
 
     /*!
      * Unlocked \c open_record
@@ -275,25 +233,16 @@ protected:
     record_type open_record_unlocked(ArgsT const& args)
     {
         m_pSeverity->set_value(args[keywords::severity | m_DefaultSeverity]);
-        return base_type::open_record_unlocked();
+        return base_type::open_record_unlocked(args);
     }
-
-    //! Lock requirement for the swap_unlocked method
-    typedef typename strictest_lock<
-        typename base_type::swap_lock,
-#ifndef BOOST_LOG_NO_THREADS
-        lock_guard< threading_model >
-#else
-        no_lock
-#endif // !defined(BOOST_LOG_NO_THREADS)
-    >::type swap_lock;
 
     //! Unlocked \c swap
     void swap_unlocked(basic_severity_logger& that)
     {
         base_type::swap_unlocked(static_cast< base_type& >(that));
-        using std::swap;
-        swap(m_DefaultSeverity, that.m_DefaultSeverity);
+        severity_level t = m_DefaultSeverity;
+        m_DefaultSeverity = that.m_DefaultSeverity;
+        that.m_DefaultSeverity = t;
         m_pSeverity.swap(that.m_pSeverity);
     }
 };

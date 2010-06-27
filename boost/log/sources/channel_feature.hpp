@@ -1,11 +1,8 @@
 /*
- * (C) 2009 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
- * This header is the Boost.Log library implementation, see the library documentation
- * at http://www.boost.org/libs/log/doc/log.html.
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
  */
 /*!
  * \file   channel_feature.hpp
@@ -22,19 +19,16 @@
 #ifndef BOOST_LOG_SOURCES_CHANNEL_FEATURE_HPP_INCLUDED_
 #define BOOST_LOG_SOURCES_CHANNEL_FEATURE_HPP_INCLUDED_
 
+#include <boost/none.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
-#include <boost/mpl/bool.hpp>
 #include <boost/mpl/if.hpp>
-#include <boost/parameter/binding.hpp>
 #include <boost/type_traits/is_void.hpp>
 #include <boost/log/detail/prologue.hpp>
+#include <boost/log/detail/locks.hpp>
 #include <boost/log/keywords/channel.hpp>
 #include <boost/log/attributes/constant.hpp>
-#include <boost/log/sources/threading_models.hpp> // strictest_lock
-#if !defined(BOOST_LOG_NO_THREADS)
-#include <boost/thread/locks.hpp>
-#endif // !defined(BOOST_LOG_NO_THREADS)
+#include <boost/log/utility/strictest_lock.hpp>
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -98,6 +92,16 @@ public:
     //! Channel attribute type
     typedef attributes::constant< channel_type > channel_attribute;
 
+    //! Lock requirement for the swap_unlocked method
+    typedef typename strictest_lock<
+        typename base_type::swap_lock,
+#ifndef BOOST_LOG_NO_THREADS
+        boost::log::aux::exclusive_lock_guard< threading_model >
+#else
+        no_lock< threading_model >
+#endif // !defined(BOOST_LOG_NO_THREADS)
+    >::type swap_lock;
+
 private:
     //! Channel attribute
     shared_ptr< channel_attribute > m_pChannel;
@@ -127,21 +131,29 @@ public:
     explicit basic_channel_logger(ArgsT const& args) :
         base_type(args)
     {
-        init_channel_attribute(args, typename is_void<
-            typename parameter::binding< ArgsT, keywords::tag::channel, void >::type
-        >::type());
+        init_channel_attribute(args[keywords::channel | none]);
     }
 
+    /*!
+     * The observer of the channel attribute presence
+     *
+     * \return \c true if the channel attribute is set by the logger, \c false otherwise
+     */
+    bool has_channel() const { return !!m_pChannel; }
+
+    /*!
+     * The observer of the channel name
+     *
+     * \pre <tt>this->has_channel() == true</tt>
+     * \return The channel name that was set by the logger
+     */
+    channel_type const& channel() const { return m_pChannel->get(); }
+
 protected:
-    //! Lock requirement for the swap_unlocked method
-    typedef typename strictest_lock<
-        typename base_type::swap_lock,
-#ifndef BOOST_LOG_NO_THREADS
-        lock_guard< threading_model >
-#else
-        no_lock
-#endif // !defined(BOOST_LOG_NO_THREADS)
-    >::type swap_lock;
+    /*!
+     * Channel attribute accessor
+     */
+    shared_ptr< channel_attribute > const& get_channel_attribute() const { return m_pChannel; }
 
     /*!
      * Unlocked swap
@@ -155,10 +167,8 @@ protected:
 private:
 #ifndef BOOST_LOG_DOXYGEN_PASS
     //! Initializes the channel attribute
-    template< typename ArgsT >
-    void init_channel_attribute(ArgsT const& args, mpl::false_ const&)
+    void init_channel_attribute(channel_type const& channel_name)
     {
-        channel_type channel_name(args[keywords::channel]);
         m_pChannel = boost::make_shared< channel_attribute >(channel_name);
         base_type::add_attribute_unlocked(
             aux::channel_attribute_name< char_type >::get(),
@@ -166,7 +176,7 @@ private:
     }
     //! Initializes the channel attribute (dummy, if no channel is specified)
     template< typename ArgsT >
-    void init_channel_attribute(ArgsT const& args, mpl::true_ const&)
+    void init_channel_attribute(none_t const&)
     {
     }
 #endif // BOOST_LOG_DOXYGEN_PASS

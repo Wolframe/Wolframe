@@ -1,17 +1,14 @@
 /*
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
- * This header is the Boost.Log library implementation, see the library documentation
- * at http://www.boost.org/libs/log/doc/log.html.
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
  */
 /*!
  * \file   scoped_attribute.hpp
  * \author Andrey Semashev
  * \date   13.05.2007
- * 
+ *
  * The header contains definition of facilities to define scoped attributes.
  */
 
@@ -40,7 +37,7 @@ namespace BOOST_LOG_NAMESPACE {
 
 namespace aux {
 
-    //! A base class for all scoped attribute classes
+    //! A base class for all scoped attribute guards
     class attribute_scope_guard
     {
     };
@@ -112,7 +109,7 @@ namespace aux {
 //  Generator helper functions
 /*!
  * Registers an attribute in the logger
- * 
+ *
  * \param l Logger to register the attribute in
  * \param name Attribute name
  * \param attr Pointer to the attribute. Must not be NULL.
@@ -248,7 +245,7 @@ namespace aux {
 //  Generator helper functions
 /*!
  * Registers a thread-specific attribute
- * 
+ *
  * \param name Attribute name
  * \param attr Pointer to the attribute. Must not be NULL.
  * \return An unspecified guard object that may be used to initialize \c scoped_attribute variable.
