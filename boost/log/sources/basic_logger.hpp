@@ -41,6 +41,8 @@
 #include <boost/log/sources/features.hpp>
 #include <boost/log/sources/threading_models.hpp>
 
+#include <boost/log/unused.hpp>
+
 #ifdef _MSC_VER
 #pragma warning(push)
 // 'm_A' : class 'A' needs to have dll-interface to be used by clients of class 'B'
@@ -251,7 +253,7 @@ protected:
      * Unlocked \c open_record
      */
     template< typename ArgsT >
-    record_type open_record_unlocked(ArgsT const& args)
+    record_type open_record_unlocked(ArgsT const& args UNUSED)
     {
         return m_pCore->open_record(m_Attributes);
     }

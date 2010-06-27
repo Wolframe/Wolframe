@@ -142,8 +142,8 @@ public:
     template< typename T >
     fmt_format< char_type >& operator% (T const& fmt)
     {
-        typedef typename wrap_if_not_formatter< char_type, T >::type result_type;
-        m_Formatters.push_back(formatter_type(result_type(fmt)));
+        typedef typename wrap_if_not_formatter< char_type, T >::type result_type2;
+        m_Formatters.push_back(formatter_type(result_type2(fmt)));
         return *this;
     }
 

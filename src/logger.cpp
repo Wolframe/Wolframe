@@ -32,7 +32,7 @@ namespace sinks = boost::log::sinks;
 namespace _SMERP {
 
 #if !defined( _WIN32 )
-static sinks::syslog::facility_t mapSyslogFacility( const SyslogFacility::Facility f )
+static sinks::syslog::facility mapSyslogFacility( const SyslogFacility::Facility f )
 {
 	switch( f ) {
 		case SyslogFacility::_SMERP_SYSLOG_FACILITY_KERN:	return sinks::syslog::kernel;
