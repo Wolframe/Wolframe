@@ -452,7 +452,7 @@ BOOST_LOG_ANONYMOUS_NAMESPACE {
                         path_string_type::const_iterator f = f_it;
                         if (!local::scan_digits(f, f_end, width))
                             return false;
-                        for (; f != f_end && traits_t::is_digit(*f); ++f);
+                        for (; f != f_end && traits_t::is_digit(*f); ++f) {}
 
                         spirit::classic::parse(f_it, f, spirit::classic::uint_p[spirit::classic::assign_a(file_counter)]);
 
