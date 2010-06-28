@@ -63,12 +63,9 @@ COMMON_COMPILE_FLAGS += \
 # precision. So we enable only -Wconversion (not -Wtraditional-conversion) for gcc
 # >= 4.3 and no -Wconversion for older gcc versions!
 # (see also http://gcc.gnu.org/wiki/NewWconversion)
-ifeq "$(GCC_MINOR_VERSION)" "4"
-COMMON_COMPILE_FLAGS += -Wconversion
-endif
-ifeq "$(GCC_MINOR_VERSION)" "5"
-COMMON_COMPILE_FLAGS += -Wconversion
-endif
+#ifeq "$(GCC_MINOR_VERSION)" "4"
+#COMMON_COMPILE_FLAGS += -Wconversion
+#endif
 
 endif
 
