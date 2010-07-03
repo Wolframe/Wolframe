@@ -1,9 +1,10 @@
+/*
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
+ */
 /*!
- * (C) 2009 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
  * \file   locking_ptr.hpp
  * \author Andrey Semashev
  * \date   15.07.2009
@@ -21,7 +22,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <boost/log/detail/prologue.hpp>
-#include <boost/log/detail/unspecified_bool.hpp>
+#include <boost/log/utility/explicit_operator_bool.hpp>
 
 namespace boost {
 
@@ -117,7 +118,7 @@ namespace aux {
         element_type* get() const { return m_pElement.get(); }
 
         //! Checks for null pointer
-        BOOST_LOG_OPERATOR_UNSPECIFIED_BOOL()
+        BOOST_LOG_EXPLICIT_OPERATOR_BOOL()
         //! Checks for null pointer
         bool operator! () const { return !m_pElement; }
 

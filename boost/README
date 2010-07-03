@@ -1,2 +1,2 @@
 local boost libraries (header files):
-- log (boost-log, RC4)
+- log (boost-log, trunk@527)

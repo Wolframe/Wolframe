@@ -1,11 +1,8 @@
 /*
- * (C) 2009 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
- * This header is the Boost.Log library implementation, see the library documentation
- * at http://www.boost.org/libs/log/doc/log.html.
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
  */
 /*!
  * \file   record_ordering.hpp
@@ -29,7 +26,7 @@
 #include <boost/log/detail/functional.hpp>
 #include <boost/log/detail/function_traits.hpp>
 #include <boost/log/core/record.hpp>
-#include <boost/log/attributes/attribute.hpp>
+#include <boost/log/attributes/attribute_value.hpp>
 
 namespace boost {
 
@@ -123,16 +120,10 @@ public:
      */
     result_type operator() (record_type const& left, record_type const& right) const
     {
-        optional< attribute_value_type > left_value, right_value;
-
-        typedef typename record_type::values_view_type values_view_type;
-        typename values_view_type::const_iterator
-            it_left = left.attribute_values().find(m_Name),
-            it_right = right.attribute_values().find(m_Name);
-        if (it_left != left.attribute_values().end())
-            left_value = it_left->second->get< attribute_value_type >();
-        if (it_right != right.attribute_values().end())
-            right_value = it_right->second->get< attribute_value_type >();
+        optional< attribute_value_type > left_value =
+            left.attribute_values()[m_Name].extract< attribute_value_type >();
+        optional< attribute_value_type > right_value =
+            right.attribute_values()[m_Name].extract< attribute_value_type >();
 
         if (left_value)
         {

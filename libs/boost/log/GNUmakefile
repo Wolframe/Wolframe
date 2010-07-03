@@ -15,11 +15,13 @@ LOG_OBJS = \
 	core.o \
 	exceptions.o \
 	global_logger_storage.o \
+	light_rw_mutex.o \
 	named_scope.o \
+	once_block.o \
 	process_id.o \
+	record_ostream.o \
 	severity_level.o \
 	sink_frontends.o \
-	stream_provider.o \
 	syslog_backend.o \
 	text_file_backend.o \
 	text_ostream_backend.o \

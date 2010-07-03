@@ -1,17 +1,14 @@
 /*
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
- * This header is the Boost.Log library implementation, see the library documentation
- * at http://www.boost.org/libs/log/doc/log.html.
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
  */
 /*!
  * \file   attribute_values_view.hpp
  * \author Andrey Semashev
  * \date   21.04.2007
- * 
+ *
  * This header file contains definition of attribute values view. The view is constructed from
  * three attribute sets (global, thread-specific and source-specific) and contains attribute
  * values.
@@ -32,6 +29,7 @@
 #include <boost/log/detail/prologue.hpp>
 #include <boost/log/utility/slim_string.hpp>
 #include <boost/log/attributes/attribute.hpp>
+#include <boost/log/attributes/attribute_value_def.hpp>
 #include <boost/log/attributes/attribute_set.hpp>
 
 namespace boost {
@@ -40,27 +38,27 @@ namespace BOOST_LOG_NAMESPACE {
 
 /*!
  * \brief A view of attribute values
- * 
+ *
  * Attribute values view is a read-only associative container with attribute name as a key and
  * a pointer to attribute value object as a mapped type. This is a collection of elements with unique
  * keys, that is, there can be only one attribute value with a given name in a view. With respect to
  * read-only capabilities, attribute values view is close to \c std::map.
- * 
+ *
  * An instance of attribute values view can be constructed from three attribute sets and attempts to
  * accommodate values all attributes from the sets. The situation when a same-named attribute is found
  * in more than one attribute is possible. This problem is solved on construction of the view: the three
  * attribute sets have different priorities when it comes to solving conflicts.
- * 
+ *
  * From the library perspective the three source attribute sets are global, thread-specific and source-specific
  * attributes, with the latter having the highest priority. This feature allows to override attributes of wider scopes
  * with the more specific ones.
- * 
+ *
  * After the view construction it cannot be modified. However, for sake of performance, the attribute values
  * are not immediately acquired on the view construction. Instead, on-demand acquision is performed either on
  * iterator dereferencing or on call to the \c freeze method. Once acquired, the attribute value stays within the view
  * until its destruction. This nuance does not affect other view properties, such as size or lookup ability.
  * The logging core automatically freezes the view at the right point, so users should not be bothered.
- * 
+ *
  * \note The attribute sets that were used for the view construction must not be modified or destroyed
  *       until the view is frozen. Otherwise the behavior is undefined.
  */
@@ -79,7 +77,7 @@ public:
     //! Key type
     typedef basic_slim_string< char_type > key_type;
     //! Mapped attribute type
-    typedef shared_ptr< attribute_value > mapped_type;
+    typedef attribute_value mapped_type;
     //! Corresponding attribute set type
     typedef basic_attribute_set< char_type > attribute_set_type;
 
@@ -205,7 +203,7 @@ public:
     /*!
      * The constructor adopts three attribute sets into the view. The \a source_attrs attributes have the greatest preference
      * when a same-named attribute is found in several sets, \a global_attrs has the least. The constructed view is not frozen.
-     * 
+     *
      * \param source_attrs A set of source-specific attributes.
      * \param thread_attrs A set of thread-specific attributes.
      * \param global_attrs A set of global attributes.
@@ -217,7 +215,7 @@ public:
 
     /*!
      * Copy constructor.
-     * 
+     *
      * \pre The original view is frozen.
      * \post The constructed view is frozen, <tt>std::equal(begin(), end(), that.begin()) == true</tt>
      */
@@ -229,7 +227,7 @@ public:
 
     /*!
      * Assignment operator
-     * 
+     *
      * \pre The original view is frozen.
      * \post The resulting view is frozen, <tt>std::equal(begin(), end(), that.begin()) == true</tt>
      */
@@ -237,7 +235,7 @@ public:
 
     /*!
      * Swaps two views
-     * 
+     *
      * \b Throws: Nothing.
      */
     void swap(basic_attribute_values_view& that)
@@ -265,7 +263,7 @@ public:
 
     /*!
      * The method finds the attribute value by name.
-     * 
+     *
      * \param key Attribute name.
      * \return Iterator to the found element or \c end() if the attribute with such name is not found.
      */
@@ -275,7 +273,7 @@ public:
     }
     /*!
      * The method finds the attribute value by name.
-     * 
+     *
      * \param key Attribute name.
      * \return Iterator to the found element or \c end() if the attribute with such name is not found.
      */
@@ -285,7 +283,7 @@ public:
     }
     /*!
      * The method finds the attribute value by name.
-     * 
+     *
      * \param key Attribute name. Must not be NULL, must point to a zero-terminated string.
      * \return Iterator to the found element or \c end() if the attribute with such name is not found.
      */
@@ -297,7 +295,7 @@ public:
 
     /*!
      * Alternative lookup syntax.
-     * 
+     *
      * \param key Attribute name.
      * \return A pointer to the attribute value if it is found with \a key, default-constructed mapped value otherwise.
      */
@@ -311,7 +309,7 @@ public:
     }
     /*!
      * Alternative lookup syntax.
-     * 
+     *
      * \param key Attribute name.
      * \return A pointer to the attribute value if it is found with \a key, default-constructed mapped value otherwise.
      */
@@ -325,7 +323,7 @@ public:
     }
     /*!
      * Alternative lookup syntax.
-     * 
+     *
      * \param key Attribute name. Must not be NULL, must point to a zero-terminated string.
      * \return A pointer to the attribute value if it is found with \a key, default-constructed mapped value otherwise.
      */
@@ -341,7 +339,7 @@ public:
     /*!
      * The method counts the number of the attribute value occurrences in the view. Since there can be only one
      * attribute value with a particular key, the method always return 0 or 1.
-     * 
+     *
      * \param key Attribute name.
      * \return The number of times the attribute value is found in the container.
      */
@@ -349,7 +347,7 @@ public:
     /*!
      * The method counts the number of the attribute value occurrences in the view. Since there can be only one
      * attribute value with a particular key, the method always return 0 or 1.
-     * 
+     *
      * \param key Attribute name.
      * \return The number of times the attribute value is found in the container.
      */
@@ -357,7 +355,7 @@ public:
     /*!
      * The method counts the number of the attribute value occurrences in the view. Since there can be only one
      * attribute value with a particular key, the method always return 0 or 1.
-     * 
+     *
      * \param key Attribute name. Must not be NULL, must point to a zero-terminated string.
      * \return The number of times the attribute value is found in the container.
      */
@@ -365,7 +363,7 @@ public:
 
     /*!
      * The method acquires values of all adopted attributes.
-     * 
+     *
      * \post The view is frozen
      */
     BOOST_LOG_EXPORT void freeze();

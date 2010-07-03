@@ -1,17 +1,14 @@
 /*
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
- * This header is the Boost.Log library implementation, see the library documentation
- * at http://www.boost.org/libs/log/doc/log.html.
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
  */
 /*!
  * \file   attribute_set.hpp
  * \author Andrey Semashev
  * \date   08.03.2007
- * 
+ *
  * This header contains definition of the attribute set container.
  */
 
@@ -42,7 +39,7 @@ class basic_attribute_values_view;
 
 /*!
  * \brief An attribute set class.
- * 
+ *
  * An attribute set is an associative container with attribute name as a key and
  * pointer to the attribute as a mapped value. The container allows storing only one element for each distinct
  * key value. In most regards attribute set container provides interface similar to \c std::map. However, there are
@@ -248,13 +245,13 @@ private:
 public:
     /*!
      * Default constructor.
-     * 
+     *
      * \post <tt>empty() == true</tt>
      */
     BOOST_LOG_EXPORT basic_attribute_set();
     /*!
      * Copy constructor.
-     * 
+     *
      * \post <tt>std::equal(begin(), end(), that.begin()) == true</tt>
      */
     BOOST_LOG_EXPORT basic_attribute_set(basic_attribute_set const& that);
@@ -265,14 +262,14 @@ public:
 
     /*!
      * Assignment operator.
-     * 
+     *
      * \post <tt>std::equal(begin(), end(), that.begin()) == true</tt>
      */
     BOOST_LOG_EXPORT basic_attribute_set& operator= (basic_attribute_set const& that);
 
     /*!
      * Swaps two instances of the container.
-     * 
+     *
      * \b Throws: Nothing.
      */
     void swap(basic_attribute_set& that) { std::swap(m_pImpl, that.m_pImpl); }
@@ -305,7 +302,7 @@ public:
 
     /*!
      * The method finds the attribute by name.
-     * 
+     *
      * \param key Attribute name.
      * \return Iterator to the found element or end() if the attribute with such name is not found.
      */
@@ -315,7 +312,7 @@ public:
     }
     /*!
      * The method finds the attribute by name.
-     * 
+     *
      * \param key Attribute name.
      * \return Iterator to the found element or \c end() if the attribute with such name is not found.
      */
@@ -325,7 +322,7 @@ public:
     }
     /*!
      * The method finds the attribute by name.
-     * 
+     *
      * \param key Attribute name. Must not be NULL, must point to a zero-terminated string.
      * \return Iterator to the found element or \c end() if the attribute with such name is not found.
      */
@@ -336,7 +333,7 @@ public:
     }
     /*!
      * The method finds the attribute by name.
-     * 
+     *
      * \param key Attribute name.
      * \return Iterator to the found element or \c end() if the attribute with such name is not found.
      */
@@ -346,7 +343,7 @@ public:
     }
     /*!
      * The method finds the attribute by name.
-     * 
+     *
      * \param key Attribute name.
      * \return Iterator to the found element or \c end() if the attribute with such name is not found.
      */
@@ -356,7 +353,7 @@ public:
     }
     /*!
      * The method finds the attribute by name.
-     * 
+     *
      * \param key Attribute name. Must not be NULL, must point to a zero-terminated string.
      * \return Iterator to the found element or \c end() if the attribute with such name is not found.
      */
@@ -368,7 +365,7 @@ public:
     /*!
      * The method counts the number of the attribute occurrences in the container. Since there can be only one
      * attribute with a particular key, the method always return 0 or 1.
-     * 
+     *
      * \param key Attribute name.
      * \return The number of times the attribute is found in the container.
      */
@@ -376,7 +373,7 @@ public:
     /*!
      * The method counts the number of the attribute occurrences in the container. Since there can be only one
      * attribute with a particular key, the method always return 0 or 1.
-     * 
+     *
      * \param key Attribute name.
      * \return The number of times the attribute is found in the container.
      */
@@ -384,7 +381,7 @@ public:
     /*!
      * The method counts the number of the attribute occurrences in the container. Since there can be only one
      * attribute with a particular key, the method always return 0 or 1.
-     * 
+     *
      * \param key Attribute name. Must not be NULL, must point to a zero-terminated string.
      * \return The number of times the attribute is found in the container.
      */
@@ -399,7 +396,7 @@ public:
      *     the result of the conversion is equivalent to the mapped value found with the second argument of the \c operator[] as a key,
      *     if such an element exists in the container, or a default-constructed mapped value, if an element does not exist in the
      *     container.
-     * 
+     *
      * \param key Attribute name.
      * \return A smart reference object of unspecified type.
      */
@@ -416,7 +413,7 @@ public:
      *     the result of the conversion is equivalent to the mapped value found with the second argument of the \c operator[] as a key,
      *     if such an element exists in the container, or a default-constructed mapped value, if an element does not exist in the
      *     container.
-     * 
+     *
      * \param key Attribute name.
      * \return A smart reference object of unspecified type.
      */
@@ -433,7 +430,7 @@ public:
      *     the result of the conversion is equivalent to the mapped value found with the second argument of the \c operator[] as a key,
      *     if such an element exists in the container, or a default-constructed mapped value, if an element does not exist in the
      *     container.
-     * 
+     *
      * \param key Attribute name. Must not be NULL, must point to a zero-terminated string.
      * \return A smart reference object of unspecified type.
      */
@@ -444,7 +441,7 @@ public:
     }
     /*!
      * Lookup operator
-     * 
+     *
      * \param key Attribute name.
      * \return If an element with the corresponding attribute name is found in the container, its mapped value
      *         is returned. Otherwise a refault-constructed mapped value is returned.
@@ -459,7 +456,7 @@ public:
     }
     /*!
      * Lookup operator
-     * 
+     *
      * \param key Attribute name.
      * \return If an element with the corresponding attribute name is found in the container, its mapped value
      *         is returned. Otherwise a refault-constructed mapped value is returned.
@@ -474,7 +471,7 @@ public:
     }
     /*!
      * Lookup operator
-     * 
+     *
      * \param key Attribute name. Must not be NULL, must point to a zero-terminated string.
      * \return If an element with the corresponding attribute name is found in the container, its mapped value
      *         is returned. Otherwise a refault-constructed mapped value is returned.
@@ -490,7 +487,7 @@ public:
 
     /*!
      * Insertion method
-     * 
+     *
      * \param key Attribute name.
      * \param data Pointer to the attribute. Must not be NULL.
      * \returns A pair of values. If second is true, the insertion succeeded and the first component points to the
@@ -500,7 +497,7 @@ public:
 
     /*!
      * Insertion method
-     * 
+     *
      * \param value An element to be inserted.
      * \returns A pair of values. If second is true, the insertion succeeded and the first component points to the
      *          inserted element. Otherwise the first component points to the element that prevents insertion.
@@ -512,7 +509,7 @@ public:
 
     /*!
      * Mass insertion method.
-     * 
+     *
      * \param begin A forward iterator that points to the first element to be inserted.
      * \param end A forward iterator that points to the after-the-last element to be inserted.
      */
@@ -525,7 +522,7 @@ public:
 
     /*!
      * Mass insertion method with ability to acquire iterators to the inserted elements.
-     * 
+     *
      * \param begin A forward iterator that points to the first element to be inserted.
      * \param end A forward iterator that points to the after-the-last element to be inserted.
      * \param out An output iterator that receives results of insertion of the elements
@@ -539,7 +536,7 @@ public:
 
     /*!
      * The method erases all attributes with the specified name
-     * 
+     *
      * \post All iterators to the erased elements become invalid.
      * \param key Attribute name.
      * \return Tne number of erased elements
@@ -547,7 +544,7 @@ public:
     BOOST_LOG_EXPORT size_type erase(key_type const& key);
     /*!
      * The method erases the specified attribute
-     * 
+     *
      * \post All iterators to the erased element become invalid.
      * \param it A valid iterator to the element to be erased.
      * \return Tne number of erased elements
@@ -555,7 +552,7 @@ public:
     BOOST_LOG_EXPORT void erase(iterator it);
     /*!
      * The method erases all attributes within the specified range
-     * 
+     *
      * \pre \a end is reachable from \a begin with a finite number of increments.
      * \post All iterators to the erased elements become invalid.
      * \param begin An iterator that points to the first element to be erased.
@@ -565,7 +562,7 @@ public:
 
     /*!
      * The method removes all elements from the container
-     * 
+     *
      * \post <tt>empty() == true</tt>
      */
     BOOST_LOG_EXPORT void clear();
@@ -593,7 +590,7 @@ inline void swap(basic_attribute_set< CharT >& left, basic_attribute_set< CharT 
     left.swap(right);
 }
 
-typedef basic_attribute_set< char > attribute_set;      //!< Convenience typedef for narrow-character logging 
+typedef basic_attribute_set< char > attribute_set;      //!< Convenience typedef for narrow-character logging
 typedef basic_attribute_set< wchar_t > wattribute_set;  //!< Convenience typedef for wide-character logging
 
 } // namespace log

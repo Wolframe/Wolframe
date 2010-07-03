@@ -1,9 +1,10 @@
+/*
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
+ */
 /*!
- * (C) 2008 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
  * \file   debug_output_backend.cpp
  * \author Andrey Semashev
  * \date   08.11.2008
@@ -12,9 +13,9 @@
  */
 
 #include "windows_version.hpp"
-#include <windows.h>
 #include <string>
 #include <boost/log/sinks/debug_output_backend.hpp>
+#include <windows.h>
 
 namespace boost {
 
@@ -22,7 +23,7 @@ namespace BOOST_LOG_NAMESPACE {
 
 namespace sinks {
 
-namespace {
+BOOST_LOG_ANONYMOUS_NAMESPACE {
 
 #if defined(BOOST_LOG_USE_CHAR)
     inline void output_debug_string(const char* str)

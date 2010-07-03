@@ -1,11 +1,8 @@
 /*
- * (C) 2009 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
- * This header is the Boost.Log library implementation, see the library documentation
- * at http://www.boost.org/libs/log/doc/log.html.
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
  */
 /*!
  * \file   record.hpp
@@ -26,7 +23,7 @@
 #include <boost/assert.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/log/detail/prologue.hpp>
-#include <boost/log/detail/unspecified_bool.hpp>
+#include <boost/log/utility/explicit_operator_bool.hpp>
 #include <boost/log/utility/intrusive_ref_counter.hpp>
 #include <boost/log/attributes/attribute_values_view.hpp>
 
@@ -92,7 +89,7 @@ public:
      *
      * \return \c true, if the handle identifies a log record, \c false, if the handle is not valid
      */
-    BOOST_LOG_OPERATOR_UNSPECIFIED_BOOL()
+    BOOST_LOG_EXPLICIT_OPERATOR_BOOL()
 
     /*!
      * Inverted conversion to an unspecified boolean type
@@ -175,7 +172,7 @@ public:
 #ifndef BOOST_LOG_DOXYGEN_PASS
 private:
     //! Publicly available record data
-    struct public_data :
+    struct BOOST_LOG_VISIBLE public_data :
         public intrusive_ref_counter
     {
         //! Shows if the record has already been detached from thread
@@ -301,7 +298,7 @@ public:
      *
      * \return \c true, if the <tt>*this</tt> identifies a log record, \c false, if the <tt>*this</tt> is not valid
      */
-    BOOST_LOG_OPERATOR_UNSPECIFIED_BOOL()
+    BOOST_LOG_EXPLICIT_OPERATOR_BOOL()
 
     /*!
      * Inverted conversion to an unspecified boolean type
@@ -350,8 +347,7 @@ public:
             for (; it != end; ++it)
             {
                 // Yep, a bit hackish. I'll need a better backdoor to do it gracefully.
-                it->second->detach_from_thread().swap(
-                    const_cast< typename values_view_type::mapped_type& >(it->second));
+                const_cast< typename values_view_type::mapped_type& >(it->second).detach_from_thread();
             }
 
             m_pData->m_Detached = true;

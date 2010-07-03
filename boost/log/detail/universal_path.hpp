@@ -1,9 +1,10 @@
+/*
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
+ */
 /*!
- * (C) 2009 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
  * \file   universal_path.hpp
  * \author Andrey Semashev
  * \date   27.06.2009
@@ -36,7 +37,9 @@ namespace aux {
     // 1. If no wide paths are supported then it's path
     // 2. If the native API only supports narrow paths, it's path, again.
     // 3. Otherwise, it's wpath.
-#if defined(BOOST_FILESYSTEM_NARROW_ONLY)
+    //
+    // NOTE: Cygwin is considered to have narrow native paths, although it actually supports UTF-8
+#if defined(BOOST_FILESYSTEM_NARROW_ONLY) || defined(__CYGWIN__)
     typedef filesystem::path universal_path;
 #else
     typedef mpl::if_<
@@ -46,8 +49,8 @@ namespace aux {
     >::type universal_path;
 #endif
 
-    template< typename PathT >
-    inline universal_path to_universal_path(PathT const& p)
+    template< typename StringT, typename TraitsT >
+    inline universal_path to_universal_path(filesystem::basic_path< StringT, TraitsT > const& p)
     {
         universal_path::string_type s;
         boost::log::aux::code_convert(p.string(), s);

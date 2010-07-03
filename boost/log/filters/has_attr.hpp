@@ -1,17 +1,14 @@
 /*
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
- * This header is the Boost.Log library implementation, see the library documentation
- * at http://www.boost.org/libs/log/doc/log.html.
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
  */
 /*!
  * \file   has_attr.hpp
  * \author Andrey Semashev
  * \date   22.04.2007
- * 
+ *
  * The header contains implementation of a filter that checks presence of an attribute in a log record.
  */
 
@@ -36,7 +33,7 @@ namespace filters {
 
 /*!
  * \brief A filter that detects if there is an attribute with given name and type in the attribute values view
- * 
+ *
  * The filter can be instantiated either with one particular attribute value type or with a sequence of types.
  */
 template< typename CharT, typename AttributeValueTypesT = void >
@@ -64,14 +61,14 @@ private:
 public:
     /*!
      * Constructs the filter
-     * 
+     *
      * \param name Attribute name
      */
     explicit flt_has_attr(string_type const& name) : m_Extractor(name) {}
 
     /*!
      * Applies the filter
-     * 
+     *
      * \param values A set of attribute values of a single log record
      * \return true if the log record contains the sought attribute value, false otherwise
      */
@@ -83,7 +80,7 @@ public:
 
 /*!
  * \brief A filter that detects if there is an attribute with given name in the complete attribute view
- * 
+ *
  * The specialization is used when an attribute value of any type is sought.
  */
 template< typename CharT >
@@ -109,14 +106,14 @@ private:
 public:
     /*!
      * Constructs the filter
-     * 
+     *
      * \param name Attribute name
      */
     explicit flt_has_attr(string_type const& name) : m_AttributeName(name) {}
 
     /*!
      * Applies the filter
-     * 
+     *
      * \param values A set of attribute values of a single log record
      * \return true if the log record contains the sought attribute value, false otherwise
      */

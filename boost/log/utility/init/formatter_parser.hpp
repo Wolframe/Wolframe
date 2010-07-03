@@ -1,11 +1,8 @@
 /*
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
- * This header is the Boost.Log library implementation, see the library documentation
- * at http://www.boost.org/libs/log/doc/log.html.
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
  */
 /*!
  * \file   formatter_parser.hpp
@@ -27,8 +24,8 @@
 #include <iosfwd>
 #include <map>
 #include <string>
-#include <boost/function/function2.hpp>
 #include <boost/log/detail/setup_prologue.hpp>
+#include <boost/log/detail/light_function.hpp>
 #include <boost/log/core/record.hpp>
 #include <boost/log/formatters/attr.hpp>
 
@@ -61,7 +58,7 @@ struct formatter_types
     //! Log record type
     typedef basic_record< char_type > record_type;
     //! The formatter function object
-    typedef function2< void, ostream_type&, record_type const& > formatter_type;
+    typedef boost::log::aux::light_function2< void, ostream_type&, record_type const& > formatter_type;
 
     /*!
      * Type of the map of formatter factory arguments [argument name -> argument value].
@@ -77,7 +74,11 @@ struct formatter_types
      * \b Throws: An <tt>std::exception</tt>-based If an exception is thrown from the method,
      *        the exception is propagated to the parse_formatter caller
      */
-    typedef function2< formatter_type, string_type const&, formatter_factory_args const& > formatter_factory;
+    typedef boost::log::aux::light_function2<
+        formatter_type,
+        string_type const&,
+        formatter_factory_args const&
+    > formatter_factory;
     //! Map of formatter factory function objects
     typedef std::map< string_type, formatter_factory > factories_map;
 };
@@ -119,8 +120,8 @@ BOOST_LOG_SETUP_EXPORT void register_formatter_factory(
 #ifndef BOOST_LOG_BROKEN_TEMPLATE_DEFINITION_MATCHING
     typename formatter_types< CharT >::formatter_factory const& factory
 #else
-    function2<
-        function2< void, std::basic_ostream< CharT >&, basic_record< CharT > const& >,
+    boost::log::aux::light_function2<
+        boost::log::aux::light_function2< void, std::basic_ostream< CharT >&, basic_record< CharT > const& >,
         std::basic_string< CharT > const&,
         std::map< std::basic_string< CharT >, std::basic_string< CharT > > const&
     > const& factory
@@ -195,7 +196,7 @@ BOOST_LOG_SETUP_EXPORT
 #ifndef BOOST_LOG_BROKEN_TEMPLATE_DEFINITION_MATCHING
 typename formatter_types< CharT >::formatter_type
 #else
-function2< void, std::basic_ostream< CharT >&, basic_record< CharT > const& >
+boost::log::aux::light_function2< void, std::basic_ostream< CharT >&, basic_record< CharT > const& >
 #endif
 parse_formatter(const CharT* begin, const CharT* end);
 

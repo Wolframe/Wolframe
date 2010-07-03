@@ -1,9 +1,10 @@
+/*
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
+ */
 /*!
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
  * \file   thread_specific.cpp
  * \author Andrey Semashev
  * \date   01.03.2008
@@ -23,8 +24,6 @@
 
 
 #if defined(BOOST_THREAD_PLATFORM_WIN32)
-
-#define WIN32_LEAN_AND_MEAN
 
 #include "windows_version.hpp"
 #include <windows.h>
@@ -78,7 +77,7 @@ namespace BOOST_LOG_NAMESPACE {
 
 namespace aux {
 
-namespace {
+BOOST_LOG_ANONYMOUS_NAMESPACE {
 
     //! A helper template to disable early name binding
     template< typename NonDependentT, typename DependentT >
@@ -225,7 +224,7 @@ void thread_specific_base::set_content(void* value) const
 } // namespace boost
 
 #else
-#error "An unsupported threading platform encountered"
+#error Boost.Log: unsupported threading API
 #endif
 
 #endif // !defined(BOOST_LOG_NO_THREADS)

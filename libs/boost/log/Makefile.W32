@@ -16,22 +16,24 @@ LOG_OBJS = \
 	attribute_values_view.obj \
 	code_conversion.obj \
 	core.obj \
+	debug_output_backend.obj \
 	exceptions.obj \
 	global_logger_storage.obj \
+	light_rw_mutex.obj \
 	named_scope.obj \
+	once_block.obj \
 	process_id.obj \
+	record_ostream.obj \
 	severity_level.obj \
 	sink_frontends.obj \
-	stream_provider.obj \
 	event_log_backend.obj \
-	nt6_event_log_backend.obj \
 	text_file_backend.obj \
 	text_ostream_backend.obj \
 	thread_specific.obj \
 	timer.obj \
 	trivial.obj \
 	slim_string.obj
-
+	
 LOG_SETUP_OBJS = \
 	parser_utils.obj \
 	init_from_stream.obj \

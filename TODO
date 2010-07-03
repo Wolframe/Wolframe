@@ -3,3 +3,12 @@ MBa:
 1. add multiple interface(s) control
 2. add the SSL interfaces
 3. add connection logging
+
+ABa:
+
+1. synchronize boost-log with 1.0 version in SVN on sourceforge,
+   provide feedback to the author:
+   - gcc flags and related bugs:
+     - -Wshadow
+   - the process id should be convertible to an int for printing
+2. backport the module loader from Wolfbones/TextWolf

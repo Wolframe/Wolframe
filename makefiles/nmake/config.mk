@@ -16,6 +16,7 @@
 
 PLATFORM_SDK_DIR = C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2
 #PLATFORM_SDK_DIR = C:\Programme\Microsoft Platform SDK for Windows Server 2003 R2
+#PLATFORM_SDK_DIR = D:\Programme\Microsoft Platform SDK
 
 # Boost (http://www.boostpro.com/download)
 ###########################################
@@ -28,6 +29,7 @@ BOOST_VERSION=1_42
 
 BOOST_DIR=C:\Program Files\boost\boost_$(BOOST_VERSION)
 #BOOST_DIR=C:\Programme\boost\boost_$(BOOST_VERSION)
+#BOOST_DIR=D:\Programme\boost\boost_$(BOOST_VERSION)
 
 # visual studio version used for compiling
 
@@ -42,3 +44,4 @@ BOOST_MT=-mt
 
 OPENSSL_DIR=C:\Program Files\OpenSSL
 #OPENSSL_DIR=C:\Programme\OpenSSL
+#OPENSSL_DIR=D:\Programme\OpenSSL

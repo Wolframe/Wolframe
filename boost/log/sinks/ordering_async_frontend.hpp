@@ -1,11 +1,8 @@
 /*
- * (C) 2009 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
- * This header is the Boost.Log library implementation, see the library documentation
- * at http://www.boost.org/libs/log/doc/log.html.
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
  */
 /*!
  * \file   ordering_async_frontend.hpp
@@ -25,11 +22,11 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/mpl/assert.hpp>
-#include <boost/function/function2.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/log/detail/prologue.hpp>
 #include <boost/log/detail/locking_ptr.hpp>
 #include <boost/log/detail/parameter_tools.hpp>
+#include <boost/log/detail/light_function.hpp>
 #include <boost/log/sinks/basic_sink_frontend.hpp>
 #include <boost/log/sinks/threading_models.hpp>
 #include <boost/log/keywords/start_thread.hpp>
@@ -65,7 +62,11 @@ namespace aux {
 
     public:
         typedef typename base_type::record_type record_type;
-        typedef function2< bool, record_type const&, record_type const& > order_type;
+        typedef boost::log::aux::light_function2<
+            bool,
+            record_type const&,
+            record_type const&
+        > order_type;
 
     protected:
         typedef void (*consume_trampoline_t)(void*, record_type const&);
@@ -106,6 +107,7 @@ namespace aux {
 
 } // namespace aux
 
+//! \cond
 #define BOOST_LOG_SINK_CTOR_FORWARD_INTERNAL(z, n, types)\
     template< BOOST_PP_ENUM_PARAMS(n, typename T) >\
     explicit ordering_asynchronous_sink(BOOST_PP_ENUM_BINARY_PARAMS(n, T, const& arg)) :\
@@ -123,6 +125,7 @@ namespace aux {
                   (BOOST_PP_ENUM_PARAMS(n, arg))[keywords::order],\
                   (BOOST_PP_ENUM_PARAMS(n, arg))[keywords::ordering_window || &base_type::get_default_ordering_window])\
     {}
+//! \endcond
 
 /*!
  * \brief Asynchronous logging sink frontend

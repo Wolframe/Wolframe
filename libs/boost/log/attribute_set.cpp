@@ -1,13 +1,14 @@
+/*
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
+ */
 /*!
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- * 
  * \file   attribute_set.cpp
  * \author Andrey Semashev
  * \date   19.04.2007
- * 
+ *
  * \brief  This header is the Boost.Log library implementation, see the library documentation
  *         at http://www.boost.org/libs/log/doc/log.html.
  */
@@ -28,7 +29,7 @@ namespace boost {
 
 namespace BOOST_LOG_NAMESPACE {
 
-namespace {
+BOOST_LOG_ANONYMOUS_NAMESPACE {
 
     //! A list-like container with ability to search for the value by the key
     template< typename ValueT, typename NodeT >
@@ -85,10 +86,10 @@ namespace {
             typedef node_type node;
             typedef node* node_ptr;
             typedef node const* const_node_ptr;
-            static node* get_next(const node* n) { return n->m_pNext; }  
-            static void set_next(node* n, node* next) { n->m_pNext = next; }  
-            static node* get_previous(const node* n) { return n->m_pPrev; }  
-            static void set_previous(node* n, node* prev) { n->m_pPrev = prev; }  
+            static node* get_next(const node* n) { return n->m_pNext; }
+            static void set_next(node* n, node* next) { n->m_pNext = next; }
+            static node* get_previous(const node* n) { return n->m_pPrev; }
+            static void set_previous(node* n, node* prev) { n->m_pPrev = prev; }
         };
 
         //! Contained node traits for the intrusive list
@@ -285,7 +286,7 @@ struct basic_attribute_set< CharT >::implementation
 public:
     //! A light key compound type
     typedef aux::light_key< char_type, size_type > light_key_type;
-    
+
     //! The container node
     struct node :
         public node_base,

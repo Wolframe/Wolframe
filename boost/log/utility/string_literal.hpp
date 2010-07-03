@@ -1,11 +1,8 @@
 /*
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
- * This header is the Boost.Log library implementation, see the library documentation
- * at http://www.boost.org/libs/log/doc/log.html.
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
  */
 /*!
  * \file   string_literal.hpp
@@ -26,8 +23,6 @@
 #include <iosfwd>
 #include <string>
 #include <iterator>
-#include <algorithm>
-#include <functional>
 #include <boost/operators.hpp>
 #include <boost/throw_exception.hpp>
 #include <boost/compatibility/cpp_c_headers/cstddef>
@@ -265,10 +260,9 @@ public:
      */
     const_reference at(size_type i) const
     {
-        if (i < m_Len)
-            return m_pStart[i];
-        else
+        if (i >= m_Len)
             BOOST_THROW_EXCEPTION(std::out_of_range("basic_string_literal::at: the index value is out of range"));
+        return m_pStart[i];
     }
 
     /*!
@@ -336,8 +330,13 @@ public:
      */
     void swap(this_type& that)
     {
-        std::swap(m_pStart, that.m_pStart);
-        std::swap(m_Len, that.m_Len);
+        register const_pointer p = m_pStart;
+        m_pStart = that.m_pStart;
+        that.m_pStart = p;
+
+        register size_type l = m_Len;
+        m_Len = that.m_Len;
+        that.m_Len = l;
     }
 
     /*!
@@ -388,14 +387,14 @@ public:
      */
     size_type copy(value_type* _str, size_type n, size_type pos = 0) const
     {
-        if (pos <= size())
-        {
-            const size_type len = (std::min)(n, size() - pos);
-            traits_type::copy(_str, m_pStart + pos, len);
-            return len;
-        }
-        else
+        if (pos > m_Len)
             BOOST_THROW_EXCEPTION(std::out_of_range("basic_string_literal::copy: the position is out of range"));
+
+        register size_type len = m_Len - pos;
+        if (len > n)
+            len = n;
+        traits_type::copy(str, m_pStart + pos, len);
+        return len;
     }
 
     /*!
@@ -413,13 +412,15 @@ public:
      */
     int compare(size_type pos, size_type n, const_pointer _str, size_type len) const
     {
-        if (pos <= size())
-        {
-            const size_type compare_size = (std::min)((std::min)(n, len), size() - pos);
-            return compare_internal(m_pStart + pos, compare_size, _str, compare_size);
-        }
-        else
+        if (pos > m_Len)
             BOOST_THROW_EXCEPTION(std::out_of_range("basic_string_literal::compare: the position is out of range"));
+
+        register size_type compare_size = m_Len - pos;
+        if (compare_size > len)
+            compare_size = len;
+        if (compare_size > n)
+            compare_size = n;
+        return compare_internal(m_pStart + pos, compare_size, str, compare_size);
     }
     /*!
      * Lexicographically compares the argument string to a part of this string
@@ -495,21 +496,19 @@ private:
     {
         if (pLeft != pRight)
         {
-            register const int result = traits_type::compare(pLeft, pRight, (std::min)(LeftLen, RightLen));
+            register const int result = traits_type::compare(
+                pLeft, pRight, (LeftLen < RightLen ? LeftLen : RightLen));
             if (result != 0)
                 return result;
         }
-        return (LeftLen - RightLen);
+        return static_cast< int >(LeftLen - RightLen);
     }
 #endif // BOOST_LOG_DOXYGEN_PASS
 };
 
 template< typename CharT, typename TraitsT >
 typename basic_string_literal< CharT, TraitsT >::value_type const
-basic_string_literal< CharT, TraitsT >::g_EmptyString[1] =
-{
-    typename basic_string_literal< CharT, TraitsT >::value_type()
-};
+basic_string_literal< CharT, TraitsT >::g_EmptyString[1] = { 0 };
 
 //! Output operator
 template< typename CharT, typename StrmTraitsT, typename LitTraitsT >

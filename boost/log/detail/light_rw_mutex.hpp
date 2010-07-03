@@ -1,13 +1,14 @@
+/*
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
+ */
 /*!
- * (C) 2009 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- * 
  * \file   light_rw_mutex.hpp
  * \author Andrey Semashev
  * \date   24.03.2009
- * 
+ *
  * \brief  This header is the Boost.Log library implementation, see the library documentation
  *         at http://www.boost.org/libs/log/doc/log.html.
  */
@@ -164,15 +165,30 @@ namespace aux {
 
 #else
 
-#include <boost/thread/shared_mutex.hpp>
-
 namespace boost {
 
 namespace BOOST_LOG_NAMESPACE {
 
 namespace aux {
 
-    typedef shared_mutex light_rw_mutex;
+    //! A light read/write mutex
+    class light_rw_mutex
+    {
+        struct { void* p; } m_Mutex;
+
+    public:
+        BOOST_LOG_EXPORT light_rw_mutex();
+        BOOST_LOG_EXPORT ~light_rw_mutex();
+        BOOST_LOG_EXPORT void lock_shared();
+        BOOST_LOG_EXPORT void unlock_shared();
+        BOOST_LOG_EXPORT void lock();
+        BOOST_LOG_EXPORT void unlock();
+
+    private:
+        // Noncopyable
+        light_rw_mutex(light_rw_mutex const&);
+        light_rw_mutex& operator= (light_rw_mutex const&);
+    };
 
 } // namespace aux
 

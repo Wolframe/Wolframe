@@ -1,11 +1,8 @@
 /*
- * (C) 2009 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
- * This header is the Boost.Log library implementation, see the library documentation
- * at http://www.boost.org/libs/log/doc/log.html.
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
  */
 /*!
  * \file   sources/features.hpp
@@ -22,16 +19,15 @@
 #ifndef BOOST_LOG_SOURCES_FEATURES_HPP_INCLUDED_
 #define BOOST_LOG_SOURCES_FEATURES_HPP_INCLUDED_
 
-#include <boost/mpl/vector.hpp>
-#include <boost/mpl/limits/vector.hpp>
-#include <boost/mpl/aux_/na.hpp>
-#include <boost/preprocessor/repetition/enum_params.hpp>
+#include <boost/preprocessor/repetition/enum.hpp>
+#include <boost/preprocessor/repetition/enum_shifted_params.hpp>
 #include <boost/preprocessor/repetition/enum_params_with_a_default.hpp>
+#include <boost/mpl/lambda.hpp>
 #include <boost/log/detail/prologue.hpp>
 
 //! The macro defines the maximum number of features that can be specified for a logger
 #ifndef BOOST_LOG_FEATURES_LIMIT
-#define BOOST_LOG_FEATURES_LIMIT BOOST_MPL_LIMIT_VECTOR_SIZE
+#define BOOST_LOG_FEATURES_LIMIT 10
 #endif // BOOST_LOG_FEATURES_LIMIT
 
 namespace boost {
@@ -43,10 +39,12 @@ namespace sources {
 #if !defined(BOOST_LOG_DOXYGEN_PASS)
 
 //! An MPL sequence of logger features
-template< BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT(BOOST_LOG_FEATURES_LIMIT, typename FeatureT, mpl::na) >
-struct features :
-    public mpl::vector< BOOST_PP_ENUM_PARAMS(BOOST_LOG_FEATURES_LIMIT, FeatureT) >::type
+template< BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT(BOOST_LOG_FEATURES_LIMIT, typename FeatureT, void) >
+struct features
 {
+    typedef features type;
+    typedef FeatureT0 head;
+    typedef features< BOOST_PP_ENUM_SHIFTED_PARAMS(BOOST_LOG_FEATURES_LIMIT, FeatureT) > tail;
 };
 
 #else // !defined(BOOST_LOG_DOXYGEN_PASS)
@@ -61,6 +59,37 @@ template< typename... FeaturesT >
 struct features;
 
 #endif // !defined(BOOST_LOG_DOXYGEN_PASS)
+
+namespace aux {
+
+    //! The metafunction produces the inherited features hierarchy with \c RootT as the ultimate base type
+    template< typename RootT, typename FeaturesT >
+    struct inherit_features
+    {
+        typedef typename mpl::lambda<
+            typename FeaturesT::head
+        >::type::BOOST_NESTED_TEMPLATE apply<
+            typename inherit_features<
+                RootT,
+                typename FeaturesT::tail
+            >::type
+        >::type type;
+    };
+
+#define BOOST_LOG_IDENTITY_INTERNAL(z, n, data) data
+
+    template< typename RootT >
+    struct inherit_features<
+        RootT,
+        features< BOOST_PP_ENUM(BOOST_LOG_FEATURES_LIMIT, BOOST_LOG_IDENTITY_INTERNAL, void) >
+    >
+    {
+        typedef RootT type;
+    };
+
+#undef BOOST_LOG_IDENTITY_INTERNAL
+
+} // namespace aux
 
 } // namespace sources
 

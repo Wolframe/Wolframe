@@ -1,11 +1,8 @@
 /*
- * (C) 2009 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
- * This header is the Boost.Log library implementation, see the library documentation
- * at http://www.boost.org/libs/log/doc/log.html.
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
  */
 /*!
  * \file   text_file_backend.hpp
@@ -28,8 +25,9 @@
 #include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/noncopyable.hpp>
-#include <boost/function/function1.hpp>
+#include <boost/date_time/date_defs.hpp>
 #include <boost/date_time/special_defs.hpp>
+#include <boost/date_time/gregorian/greg_day.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/log/keywords/max_size.hpp>
 #include <boost/log/keywords/min_free_space.hpp>
@@ -38,8 +36,9 @@
 #include <boost/log/keywords/open_mode.hpp>
 #include <boost/log/keywords/auto_flush.hpp>
 #include <boost/log/keywords/rotation_size.hpp>
-#include <boost/log/keywords/rotation_interval.hpp>
+#include <boost/log/keywords/time_based_rotation.hpp>
 #include <boost/log/detail/prologue.hpp>
+#include <boost/log/detail/light_function.hpp>
 #include <boost/log/detail/universal_path.hpp>
 #include <boost/log/detail/parameter_tools.hpp>
 #include <boost/log/sinks/basic_sink_backend.hpp>
@@ -201,6 +200,111 @@ shared_ptr< collector > make_collector(ArgsT... const& args);
 
 #endif // BOOST_LOG_DOXYGEN_PASS
 
+/*!
+ * The class represents the time point of log file rotation. One can specify one of three
+ * types of time point based rotation:
+ *
+ * \li rotation takes place every day, at the specified time
+ * \li rotation takes place on the specified day of every week, at the specified time
+ * \li rotation takes place on the specified day of every month, at the specified time
+ *
+ * The time points are considered to be local time.
+ */
+class rotation_at_time_point
+{
+public:
+    typedef bool result_type;
+
+private:
+    enum day_kind
+    {
+        not_specified,
+        weekday,
+        monthday
+    };
+
+    day_kind m_DayKind : 2;
+    unsigned char m_Day : 6;
+    unsigned char m_Hour, m_Minute, m_Second;
+
+    mutable posix_time::ptime m_Previous;
+
+public:
+    /*!
+     * Creates a rotation time point of every day at the specified time
+     *
+     * \param hour The rotation hour, should be within 0 and 23
+     * \param minute The rotation minute, should be within 0 and 59
+     * \param second The rotation second, should be within 0 and 59
+     */
+    BOOST_LOG_EXPORT explicit rotation_at_time_point(unsigned char hour, unsigned char minute, unsigned char second);
+
+    /*!
+     * Creates a rotation time point of each specified weekday at the specified time
+     *
+     * \param wday The weekday of the rotation
+     * \param hour The rotation hour, should be within 0 and 23
+     * \param minute The rotation minute, should be within 0 and 59
+     * \param second The rotation second, should be within 0 and 59
+     */
+    BOOST_LOG_EXPORT explicit rotation_at_time_point(
+        date_time::weekdays wday,
+        unsigned char hour = 0,
+        unsigned char minute = 0,
+        unsigned char second = 0);
+
+    /*!
+     * Creates a rotation time point of each specified day of month at the specified time
+     *
+     * \param mday The monthday of the rotation, should be within 1 and 31
+     * \param hour The rotation hour, should be within 0 and 23
+     * \param minute The rotation minute, should be within 0 and 59
+     * \param second The rotation second, should be within 0 and 59
+     */
+    BOOST_LOG_EXPORT explicit rotation_at_time_point(
+        gregorian::greg_day mday,
+        unsigned char hour = 0,
+        unsigned char minute = 0,
+        unsigned char second = 0);
+
+    /*!
+     * Checks if it's time to rotate the file
+     */
+    BOOST_LOG_EXPORT bool operator() () const;
+};
+
+/*!
+ * The class represents the time interval of log file rotation. The log file will be rotated
+ * after the specified time interval has passed.
+ */
+class rotation_at_time_interval
+{
+public:
+    typedef bool result_type;
+
+private:
+    posix_time::time_duration m_Interval;
+    mutable posix_time::ptime m_Previous;
+
+public:
+    /*!
+     * Creates a rotation time interval of the specified duration
+     *
+     * \param interval The interval of the rotation, should be no less than 1 second
+     */
+    explicit rotation_at_time_interval(posix_time::time_duration const& interval) :
+        m_Interval(interval)
+    {
+        BOOST_ASSERT(!interval.is_special());
+        BOOST_ASSERT(interval.total_seconds() > 0);
+    }
+
+    /*!
+     * Checks if it's time to rotate the file
+     */
+    BOOST_LOG_EXPORT bool operator() () const;
+};
+
 } // namespace file
 
 
@@ -233,9 +337,12 @@ public:
     typedef boost::log::aux::universal_path path_type;
 
     //! File open handler
-    typedef function1< void, stream_type& > open_handler_type;
+    typedef boost::log::aux::light_function1< void, stream_type& > open_handler_type;
     //! File close handler
-    typedef function1< void, stream_type& > close_handler_type;
+    typedef boost::log::aux::light_function1< void, stream_type& > close_handler_type;
+
+    //! Predicate that defines the time-based condition for file rotation
+    typedef boost::log::aux::light_function0< bool > time_based_rotation_predicate;
 
 private:
     //! \cond
@@ -270,8 +377,8 @@ public:
      *                        not count any possible character conversions that may take place during
      *                        writing to the file. If not specified, the file won't be rotated upon reaching
      *                        any size.
-     * \li \c rotation_interval - Specifies <tt>posix_time::time_duration</tt> between file rotations.
-     *                            No time-based file rotations will be performed, if not specified.
+     * \li \c time_based_rotation - Specifies the predicate for time-based file rotation.
+     *                              No time-based file rotations will be performed, if not specified.
      * \li \c auto_flush - Specifies a flag, whether or not to automatically flush the file after each
      *                     written log record. By default, is \c false.
      *
@@ -346,14 +453,15 @@ public:
     BOOST_LOG_EXPORT void set_rotation_size(uintmax_t size);
 
     /*!
-     * The method sets the maximum time interval between file rotations.
+     * The method sets the predicate that defines the time-based condition for file rotation.
      *
-     * \note The rotation always accurs on writing a log record, so the rotation is
-     *       not strictly bound to the specified time interval.
+     * \note The rotation always occurs on writing a log record, so the rotation is
+     *       not strictly bound to the specified condition.
      *
-     * \param interval The file rotation interval.
+     * \param predicate The predicate that defines the time-based condition for file rotation.
+     *                  If empty, no time-based rotation will take place.
      */
-    BOOST_LOG_EXPORT void set_rotation_interval(posix_time::time_duration interval);
+    BOOST_LOG_EXPORT void set_time_based_rotation(time_based_rotation_predicate const& predicate);
 
     /*!
      * Sets the flag to automatically flush buffers of all attached streams after each log record
@@ -392,7 +500,7 @@ private:
             boost::log::aux::to_universal_path(args[keywords::file_name | path_type()]),
             args[keywords::open_mode | (std::ios_base::trunc | std::ios_base::out)],
             args[keywords::rotation_size | (std::numeric_limits< uintmax_t >::max)()],
-            args[keywords::rotation_interval | posix_time::time_duration(date_time::pos_infin)],
+            args[keywords::time_based_rotation | time_based_rotation_predicate()],
             args[keywords::auto_flush | false]);
     }
     //! Constructor implementation
@@ -400,7 +508,7 @@ private:
         path_type const& pattern,
         std::ios_base::openmode mode,
         uintmax_t rotation_size,
-        posix_time::time_duration rotation_interval,
+        time_based_rotation_predicate const& time_based_rotation,
         bool auto_flush);
 
     //! The method writes the message to the sink

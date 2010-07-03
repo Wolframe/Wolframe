@@ -1,18 +1,20 @@
+/*
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
+ */
 /*!
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- * 
- * \file   stream_provider.cpp
+ * \file   record_ostream.cpp
  * \author Andrey Semashev
  * \date   17.04.2008
- * 
+ *
  * \brief  This header is the Boost.Log library implementation, see the library documentation
  *         at http://www.boost.org/libs/log/doc/log.html.
  */
 
 #include <memory>
+#include <locale>
 #include <boost/log/sources/record_ostream.hpp>
 #include <boost/log/detail/singleton.hpp>
 #if !defined(BOOST_LOG_NO_THREADS)
@@ -23,9 +25,40 @@ namespace boost {
 
 namespace BOOST_LOG_NAMESPACE {
 
+//! The function initializes the stream and the stream buffer
+template< typename CharT, typename TraitsT >
+void basic_record_ostream< CharT, TraitsT >::init_stream()
+{
+    if (!!m_Record)
+    {
+        ostream_buf_base_type::attach(m_Record.message());
+        ostream_type::clear(ostream_type::goodbit);
+        ostream_type::flags(
+            ostream_type::dec |
+            ostream_type::skipws |
+            ostream_type::boolalpha // this differs from the default stream flags but makes logs look better
+        );
+        ostream_type::width(0);
+        ostream_type::precision(6);
+        ostream_type::fill(static_cast< char_type >(' '));
+        ostream_type::imbue(std::locale());
+    }
+}
+//! The function resets the stream into a detached (default initialized) state
+template< typename CharT, typename TraitsT >
+void basic_record_ostream< CharT, TraitsT >::detach_from_record()
+{
+    if (!!m_Record)
+    {
+        ostream_buf_base_type::detach();
+        ostream_type::exceptions(ostream_type::goodbit);
+        ostream_type::clear(ostream_type::badbit);
+    }
+}
+
 namespace aux {
 
-namespace {
+BOOST_LOG_ANONYMOUS_NAMESPACE {
 
 //! The pool of stream compounds
 template< typename CharT >
@@ -126,6 +159,14 @@ template struct stream_provider< wchar_t >;
 #endif
 
 } // namespace aux
+
+//! Explicitly instantiate basic_record_ostream implementation
+#ifdef BOOST_LOG_USE_CHAR
+template class basic_record_ostream< char, std::char_traits< char > >;
+#endif
+#ifdef BOOST_LOG_USE_WCHAR_T
+template class basic_record_ostream< wchar_t, std::char_traits< wchar_t > >;
+#endif
 
 } // namespace log
 

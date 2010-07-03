@@ -1,13 +1,14 @@
+/*
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
+ */
 /*!
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- * 
  * \file   templated_shared_from_this.hpp
  * \author Andrey Semashev
  * \date   28.02.2008
- * 
+ *
  * \brief  This header is the Boost.Log library implementation, see the library documentation
  *         at http://www.boost.org/libs/log/doc/log.html.
  */
@@ -31,7 +32,7 @@ namespace aux {
 
     /*!
      *  \brief A type-neutral version for the \c enable_shared_from_this class
-     * 
+     *
      *  This class can be useful when several base classes in the hierarchy need to
      *  obtain a valid \c shared_ptr from \c this pointer.
      */

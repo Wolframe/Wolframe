@@ -1,17 +1,14 @@
 /*
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
- * This header is the Boost.Log library implementation, see the library documentation
- * at http://www.boost.org/libs/log/doc/log.html.
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
  */
 /*!
  * \file   attribute_mapping.hpp
  * \author Andrey Semashev
  * \date   07.11.2008
- * 
+ *
  * The header contains facilities that are used in different sinks to map attribute values
  * used throughout the application to values used with the specific native logging API.
  * These tools are mostly needed to map application severity levels on native levels,
@@ -29,6 +26,8 @@
 #include <string>
 #include <functional>
 #include <boost/log/detail/prologue.hpp>
+#include <boost/log/detail/tagged_integer.hpp>
+#include <boost/log/core/record.hpp>
 #include <boost/log/attributes/attribute_values_view.hpp>
 #include <boost/log/utility/attribute_value_extractor.hpp>
 
@@ -57,13 +56,61 @@ struct basic_mapping :
     typedef std::basic_string< char_type > string_type;
     //! Attribute values view type
     typedef basic_attribute_values_view< char_type > values_view_type;
+    //! Log record type
+    typedef basic_record< char_type > record_type;
     //! Mapped value type
     typedef MappedT mapped_type;
 };
 
+namespace aux {
+
+    //! Attribute value receiver
+    template< typename MappedT >
+    struct direct_mapping_receiver
+    {
+        typedef void result_type;
+        typedef MappedT mapped_type;
+
+        explicit direct_mapping_receiver(mapped_type& extracted) :
+            m_Extracted(extracted)
+        {
+        }
+        template< typename T >
+        void operator() (T const& val) const
+        {
+            m_Extracted = mapped_type(val);
+        }
+
+    private:
+        mapped_type& m_Extracted;
+    };
+    //  Specialization for the tagged integer
+    template< typename IntT, typename TagT >
+    struct direct_mapping_receiver< boost::log::aux::tagged_integer< IntT, TagT > >
+    {
+        typedef void result_type;
+        typedef boost::log::aux::tagged_integer< IntT, TagT > mapped_type;
+
+        explicit direct_mapping_receiver(mapped_type& extracted) :
+            m_Extracted(extracted)
+        {
+        }
+        template< typename T >
+        void operator() (T const& val) const
+        {
+            mapped_type v = { val };
+            m_Extracted = v;
+        }
+
+    private:
+        mapped_type& m_Extracted;
+    };
+
+} // namespace aux
+
 /*!
  * \brief Straightforward mapping
- * 
+ *
  * This type of mapping assumes that attribute with a particular name always
  * provides values that map directly onto the native values. The mapping
  * simply returns the extracted attribute value converted to the native value.
@@ -84,31 +131,10 @@ public:
     typedef typename base_type::string_type string_type;
     //! Attribute values view type
     typedef typename base_type::values_view_type values_view_type;
+    //! Log record type
+    typedef typename base_type::record_type record_type;
     //! Mapped value type
     typedef typename base_type::mapped_type mapped_type;
-
-private:
-    //! \cond
-
-    //! Attribute value receiver
-    struct receiver
-    {
-        typedef void result_type;
-
-        explicit receiver(mapped_type& extracted) : m_Extracted(extracted) {}
-        template< typename T >
-        void operator() (T const& val) const
-        {
-            // TODO: Make this thing work with non-POD mapped_types
-            mapped_type v = { val };
-            m_Extracted = v;
-        }
-
-    private:
-        mapped_type& m_Extracted;
-    };
-
-    //! \endcond
 
 private:
     //! Attribute value extractor
@@ -119,7 +145,7 @@ private:
 public:
     /*!
      * Constructor
-     * 
+     *
      * \param name Attribute name
      * \param default_value The default native value that is returned if the attribute value is not found
      */
@@ -131,22 +157,22 @@ public:
 
     /*!
      * Extraction operator
-     * 
-     * \param values A set of attribute values attached to a logging record
+     *
+     * \param rec A log record to extract value from
      * \return An extracted attribute value
      */
-    mapped_type operator() (values_view_type const& values) const
+    mapped_type operator() (record_type const& rec) const
     {
         mapped_type res = m_DefaultValue;
-        receiver rcv(res);
-        m_Extractor(values, rcv);
+        aux::direct_mapping_receiver< mapped_type > rcv(res);
+        m_Extractor(rec.attribute_values(), rcv);
         return res;
     }
 };
 
 /*!
  * \brief Customizable mapping
- * 
+ *
  * The class allows to setup a custom mapping between an attribute and native values.
  * The mapping should be initialized similarly to the standard \c map container, by using
  * indexing operator and assignment.
@@ -171,6 +197,8 @@ public:
     typedef typename base_type::string_type string_type;
     //! Attribute values view type
     typedef typename base_type::values_view_type values_view_type;
+    //! Log record type
+    typedef typename base_type::record_type record_type;
     //! Mapped value type
     typedef typename base_type::mapped_type mapped_type;
 
@@ -236,7 +264,7 @@ private:
 public:
     /*!
      * Constructor
-     * 
+     *
      * \param name Attribute name
      * \param default_value The default native value that is returned if the conversion cannot be performed
      */
@@ -248,21 +276,21 @@ public:
     /*!
      * Extraction operator. Extracts the attribute value and attempts to map it onto
      * the native value.
-     * 
-     * \param values A set of attribute values attached to a logging record
+     *
+     * \param rec A log record to extract value from
      * \return A mapped value, if mapping was successfull, or the default value if
      *         mapping did not succeed.
      */
-    mapped_type operator() (values_view_type const& values) const
+    mapped_type operator() (record_type const& rec) const
     {
         mapped_type res = m_DefaultValue;
         receiver rcv(m_Mapping, res);
-        m_Extractor(values, rcv);
+        m_Extractor(rec.attribute_values(), rcv);
         return res;
     }
     /*!
      * Insertion operator
-     * 
+     *
      * \param key Attribute value to be mapped
      * \return An object of unspecified type that allows to insert a new mapping through assignment.
      *         The \a key argument becomes the key attribute value, and the assigned value becomes the

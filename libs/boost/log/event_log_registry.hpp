@@ -1,9 +1,10 @@
+/*
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
+ */
 /*!
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
  * \file   event_log_registry.hpp
  * \author Andrey Semashev
  * \date   16.11.2008
@@ -15,7 +16,6 @@
 #ifndef BOOST_LOG_EVENT_LOG_REGISTRY_HPP_INCLUDED_
 #define BOOST_LOG_EVENT_LOG_REGISTRY_HPP_INCLUDED_
 
-#include <windows.h>
 #include <string>
 #include <sstream>
 #include <stdexcept>
@@ -24,6 +24,7 @@
 #include <boost/log/detail/prologue.hpp>
 #include <boost/log/detail/code_conversion.hpp>
 #include <boost/log/exceptions.hpp>
+#include <windows.h>
 
 namespace boost {
 

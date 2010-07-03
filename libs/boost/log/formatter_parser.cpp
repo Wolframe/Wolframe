@@ -1,9 +1,10 @@
+/*
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
+ */
 /*!
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
  * \file   formatter_parser.cpp
  * \author Andrey Semashev
  * \date   07.04.2008
@@ -54,7 +55,7 @@
 #include <boost/log/utility/type_dispatch/date_time_types.hpp>
 #if !defined(BOOST_LOG_NO_THREADS)
 #include <boost/thread/thread.hpp> // thread::id
-#include <boost/thread/locks.hpp>
+#include <boost/log/detail/locks.hpp>
 #include <boost/log/detail/light_rw_mutex.hpp>
 #endif
 #include "parser_utils.hpp"
@@ -67,7 +68,7 @@ namespace boost {
 
 namespace BOOST_LOG_NAMESPACE {
 
-namespace {
+BOOST_LOG_ANONYMOUS_NAMESPACE {
 
 //! The structure contains formatter factories repository
 template< typename CharT >
@@ -263,37 +264,37 @@ struct formatter_grammar< CharT >::definition
 
         arg =
             *bsc::space_p >>
-            (bsc::alpha_p >> *bsc::alnum_p)[bind(&formatter_grammar_type::on_arg_name, g, _1, _2)] >>
+            (bsc::alpha_p >> *bsc::alnum_p)[boost::bind(&formatter_grammar_type::on_arg_name, g, _1, _2)] >>
             *bsc::space_p >>
             constants::char_equal >>
             *bsc::space_p >>
-            arg_value[bind(&formatter_grammar_type::on_arg_value, g, _1, _2)] >>
+            arg_value[boost::bind(&formatter_grammar_type::on_arg_value, g, _1, _2)] >>
             *bsc::space_p;
 
         arg_list = bsc::confix_p(
             constants::char_paren_bracket_left,
-            arg[bind(&formatter_grammar_type::push_arg, g, _1, _2)] % bsc::ch_p(constants::char_comma),
+            arg[boost::bind(&formatter_grammar_type::push_arg, g, _1, _2)] % bsc::ch_p(constants::char_comma),
             constants::char_paren_bracket_right);
 
         expression =
             (*(bsc::c_escape_ch_p - constants::char_percent))
-                [bind(&formatter_grammar_type::push_string, g, _1, _2)] >>
+                [boost::bind(&formatter_grammar_type::push_string, g, _1, _2)] >>
             *(
                 bsc::confix_p(
                     constants::char_percent,
                     (
                         bsc::str_p(constants::message_text_keyword())
-                            [bind(&formatter_grammar_type::on_attr_name, g, _1, _2)] |
+                            [boost::bind(&formatter_grammar_type::on_attr_name, g, _1, _2)] |
                         (
                             (*(bsc::print_p - constants::char_paren_bracket_left - constants::char_percent))
-                                [bind(&formatter_grammar_type::on_attr_name, g, _1, _2)] >>
+                                [boost::bind(&formatter_grammar_type::on_attr_name, g, _1, _2)] >>
                             !arg_list
                         )
                     ),
                     constants::char_percent)
-                        [bind(&formatter_grammar_type::push_attr, g, _1, _2)] >>
+                        [boost::bind(&formatter_grammar_type::push_attr, g, _1, _2)] >>
                 (*(bsc::c_escape_ch_p - constants::char_percent))
-                    [bind(&formatter_grammar_type::push_string, g, _1, _2)]
+                    [boost::bind(&formatter_grammar_type::push_string, g, _1, _2)]
             );
     }
 
@@ -310,8 +311,8 @@ void register_formatter_factory(
 #ifndef BOOST_LOG_BROKEN_TEMPLATE_DEFINITION_MATCHING
     typename formatter_types< CharT >::formatter_factory const& factory
 #else
-    function2<
-        function2< void, std::basic_ostream< CharT >&, basic_record< CharT > const& >,
+    boost::log::aux::light_function2<
+        boost::log::aux::light_function2< void, std::basic_ostream< CharT >&, basic_record< CharT > const& >,
         std::basic_string< CharT > const&,
         std::map< std::basic_string< CharT >, std::basic_string< CharT > > const&
     > const& factory
@@ -321,7 +322,7 @@ void register_formatter_factory(
     typename formatter_types< CharT >::string_type name(attr_name);
     formatters_repository< CharT >& repo = formatters_repository< CharT >::get();
 
-    BOOST_LOG_EXPR_IF_MT(lock_guard< log::aux::light_rw_mutex > _(repo.m_Mutex);)
+    BOOST_LOG_EXPR_IF_MT(log::aux::exclusive_lock_guard< log::aux::light_rw_mutex > _(repo.m_Mutex);)
     repo.m_Map[name] = factory;
 }
 
@@ -330,7 +331,7 @@ template< typename CharT >
 #ifndef BOOST_LOG_BROKEN_TEMPLATE_DEFINITION_MATCHING
 typename formatter_types< CharT >::formatter_type
 #else
-function2< void, std::basic_ostream< CharT >&, basic_record< CharT > const& >
+boost::log::aux::light_function2< void, std::basic_ostream< CharT >&, basic_record< CharT > const& >
 #endif
 parse_formatter(const CharT* begin, const CharT* end)
 {
@@ -358,8 +359,8 @@ void register_formatter_factory< char >(
 #ifndef BOOST_LOG_BROKEN_TEMPLATE_DEFINITION_MATCHING
     formatter_types< char >::formatter_factory const& factory
 #else
-    function2<
-        function2< void, std::basic_ostream< char >&, basic_record< char > const& >,
+    boost::log::aux::light_function2<
+        boost::log::aux::light_function2< void, std::basic_ostream< char >&, basic_record< char > const& >,
         std::basic_string< char > const&,
         std::map< std::basic_string< char >, std::basic_string< char > > const&
     > const& factory
@@ -369,7 +370,7 @@ template BOOST_LOG_SETUP_EXPORT
 #ifndef BOOST_LOG_BROKEN_TEMPLATE_DEFINITION_MATCHING
 formatter_types< char >::formatter_type
 #else
-function2< void, std::basic_ostream< char >&, basic_record< char > const& >
+boost::log::aux::light_function2< void, std::basic_ostream< char >&, basic_record< char > const& >
 #endif // BOOST_LOG_BROKEN_TEMPLATE_DEFINITION_MATCHING
 parse_formatter< char >(const char* begin, const char* end);
 #endif // BOOST_LOG_USE_CHAR
@@ -381,8 +382,8 @@ void register_formatter_factory< wchar_t >(
 #ifndef BOOST_LOG_BROKEN_TEMPLATE_DEFINITION_MATCHING
     formatter_types< wchar_t >::formatter_factory const& factory
 #else
-    function2<
-        function2< void, std::basic_ostream< wchar_t >&, basic_record< wchar_t > const& >,
+    boost::log::aux::light_function2<
+        boost::log::aux::light_function2< void, std::basic_ostream< wchar_t >&, basic_record< wchar_t > const& >,
         std::basic_string< wchar_t > const&,
         std::map< std::basic_string< wchar_t >, std::basic_string< wchar_t > > const&
     > const& factory
@@ -393,7 +394,7 @@ template BOOST_LOG_SETUP_EXPORT
 #ifndef BOOST_LOG_BROKEN_TEMPLATE_DEFINITION_MATCHING
 formatter_types< wchar_t >::formatter_type
 #else
-function2< void, std::basic_ostream< wchar_t >&, basic_record< wchar_t > const& >
+boost::log::aux::light_function2< void, std::basic_ostream< wchar_t >&, basic_record< wchar_t > const& >
 #endif // BOOST_LOG_BROKEN_TEMPLATE_DEFINITION_MATCHING
 parse_formatter< wchar_t >(const wchar_t* begin, const wchar_t* end);
 #endif // BOOST_LOG_USE_WCHAR_T

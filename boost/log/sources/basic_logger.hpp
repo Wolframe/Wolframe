@@ -1,11 +1,8 @@
 /*
- * (C) 2007 Andrey Semashev
- *
- * Use, modification and distribution is subject to the Boost Software License, Version 1.0.
- * (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
- *
- * This header is the Boost.Log library implementation, see the library documentation
- * at http://www.boost.org/libs/log/doc/log.html.
+ *          Copyright Andrey Semashev 2007 - 2010.
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
  */
 /*!
  * \file   basic_logger.hpp
@@ -29,8 +26,6 @@
 #include <ostream>
 #include <boost/assert.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/mpl/lambda.hpp>
-#include <boost/mpl/reverse_fold.hpp>
 #include <boost/utility/addressof.hpp>
 #include <boost/preprocessor/facilities/empty.hpp>
 #include <boost/preprocessor/facilities/identity.hpp>
@@ -45,10 +40,6 @@
 #include <boost/log/core/record.hpp>
 #include <boost/log/sources/features.hpp>
 #include <boost/log/sources/threading_models.hpp>
-#if !defined(BOOST_LOG_NO_THREADS)
-#include <boost/log/detail/multiple_lock.hpp>
-#include <boost/log/detail/light_rw_mutex.hpp>
-#endif // !defined(BOOST_LOG_NO_THREADS)
 
 #include <boost/log/unused.hpp>
 
@@ -110,6 +101,34 @@ public:
     //! Threading model type
     typedef ThreadingModelT threading_model;
 
+#if !defined(BOOST_LOG_NO_THREADS)
+    //! Lock requirement for the swap_unlocked method
+    typedef boost::log::aux::exclusive_lock_guard< threading_model > swap_lock;
+    //! Lock requirement for the add_attribute_unlocked method
+    typedef boost::log::aux::exclusive_lock_guard< threading_model > add_attribute_lock;
+    //! Lock requirement for the remove_attribute_unlocked method
+    typedef boost::log::aux::exclusive_lock_guard< threading_model > remove_attribute_lock;
+    //! Lock requirement for the remove_all_attributes_unlocked method
+    typedef boost::log::aux::exclusive_lock_guard< threading_model > remove_all_attributes_lock;
+    //! Lock requirement for the get_attributes method
+    typedef boost::log::aux::shared_lock_guard< threading_model > get_attributes_lock;
+    //! Lock requirement for the open_record_unlocked method
+    typedef boost::log::aux::shared_lock_guard< threading_model > open_record_lock;
+    //! Lock requirement for the set_attributes method
+    typedef boost::log::aux::exclusive_lock_guard< threading_model > set_attributes_lock;
+#else
+    typedef no_lock< threading_model > swap_lock;
+    typedef no_lock< threading_model > add_attribute_lock;
+    typedef no_lock< threading_model > remove_attribute_lock;
+    typedef no_lock< threading_model > remove_all_attributes_lock;
+    typedef no_lock< threading_model > get_attributes_lock;
+    typedef no_lock< threading_model > open_record_lock;
+    typedef no_lock< threading_model > set_attributes_lock;
+#endif
+
+    //! Lock requirement for the push_record_unlocked method
+    typedef no_lock< threading_model > push_record_lock;
+
 private:
     //! A pointer to the logging system
     shared_ptr< core_type > m_pCore;
@@ -123,6 +142,7 @@ public:
      * acquires reference to the logging core.
      */
     basic_logger() :
+        threading_model(),
         m_pCore(core_type::get())
     {
     }
@@ -134,7 +154,7 @@ public:
      * \param that Source logger
      */
     basic_logger(basic_logger const& that) :
-        ThreadingModelT( ),
+        threading_model(),
         m_pCore(core_type::get()),
         m_Attributes(that.m_Attributes)
     {
@@ -144,7 +164,8 @@ public:
      * construction is equivalent to default construction.
      */
     template< typename ArgsT >
-    explicit basic_logger(ArgsT const& args UNUSED) :
+    explicit basic_logger(ArgsT const&) :
+        threading_model(),
         m_pCore(core_type::get())
     {
     }
@@ -187,13 +208,6 @@ protected:
         return static_cast< final_type const* >(this);
     }
 
-    //! Lock requirement for the swap_unlocked method
-#if !defined(BOOST_LOG_NO_THREADS)
-    typedef lock_guard< threading_model > swap_lock;
-#else
-    typedef no_lock swap_lock;
-#endif
-
     /*!
      * Unlocked \c swap
      */
@@ -202,13 +216,6 @@ protected:
         get_threading_model().swap(that.get_threading_model());
         m_Attributes.swap(that.m_Attributes);
     }
-
-    //! Lock requirement for the add_attribute_unlocked method
-#if !defined(BOOST_LOG_NO_THREADS)
-    typedef lock_guard< threading_model > add_attribute_lock;
-#else
-    typedef no_lock add_attribute_lock;
-#endif
 
     /*!
      * Unlocked \c add_attribute
@@ -219,13 +226,6 @@ protected:
         return m_Attributes.insert(std::make_pair(name, attr));
     }
 
-    //! Lock requirement for the remove_attribute_unlocked method
-#if !defined(BOOST_LOG_NO_THREADS)
-    typedef lock_guard< threading_model > remove_attribute_lock;
-#else
-    typedef no_lock remove_attribute_lock;
-#endif
-
     /*!
      * Unlocked \c remove_attribute
      */
@@ -234,13 +234,6 @@ protected:
         m_Attributes.erase(it);
     }
 
-    //! Lock requirement for the remove_all_attributes_unlocked method
-#if !defined(BOOST_LOG_NO_THREADS)
-    typedef lock_guard< threading_model > remove_all_attributes_lock;
-#else
-    typedef no_lock remove_all_attributes_lock;
-#endif
-
     /*!
      * Unlocked \c remove_all_attributes
      */
@@ -248,13 +241,6 @@ protected:
     {
         m_Attributes.clear();
     }
-
-    //! Lock requirement for the open_record_unlocked method
-#if !defined(BOOST_LOG_NO_THREADS)
-    typedef boost::log::aux::shared_lock_guard< threading_model > open_record_lock;
-#else
-    typedef no_lock open_record_lock;
-#endif
 
     /*!
      * Unlocked \c open_record
@@ -267,13 +253,10 @@ protected:
      * Unlocked \c open_record
      */
     template< typename ArgsT >
-    record_type open_record_unlocked(ArgsT const& args)
+    record_type open_record_unlocked(ArgsT const& args UNUSED)
     {
         return m_pCore->open_record(m_Attributes);
     }
-
-    //! Lock requirement for the push_record_unlocked method
-    typedef no_lock push_record_lock;
 
     /*!
      * Unlocked \c push_record
@@ -283,13 +266,6 @@ protected:
         m_pCore->push_record(record);
     }
 
-    //! Lock requirement for the get_attributes method
-#if !defined(BOOST_LOG_NO_THREADS)
-    typedef boost::log::aux::shared_lock_guard< threading_model > get_attributes_lock;
-#else
-    typedef no_lock get_attributes_lock;
-#endif
-
     /*!
      * Unlocked \c get_attributes
      */
@@ -297,13 +273,6 @@ protected:
     {
         return m_Attributes;
     }
-
-    //! Lock requirement for the set_attributes method
-#if !defined(BOOST_LOG_NO_THREADS)
-    typedef lock_guard< threading_model > set_attributes_lock;
-#else
-    typedef no_lock set_attributes_lock;
-#endif
 
     /*!
      * Unlocked \c set_attributes
@@ -329,46 +298,28 @@ inline void swap(
     static_cast< FinalT& >(left).swap(static_cast< FinalT& >(right));
 }
 
-namespace aux {
-
-/*!
- * \brief A helper metafunction that is used to inherit all logger features into the final logger
- */
-struct inherit_logger_features
-{
-    template< typename PrevT, typename T >
-    struct apply
-    {
-        typedef typename mpl::lambda< T >::type::BOOST_NESTED_TEMPLATE apply< PrevT >::type type;
-    };
-};
-
-} // namespace aux
-
 /*!
  * \brief A composite logger that inherits a number of features
  *
- * The composite logger is a helper class that simplifies feature composition into a final logger.
+ * The composite logger is a helper class that simplifies feature composition into the final logger.
  * The user's logger class is expected to derive from the composite logger class, instantiated with
- * the character type, the user's logger class, threading model and the list of the required features.
+ * the character type, the user's logger class, the threading model and the list of the required features.
  * The former three parameters are passed to the \c basic_logger class template. The feature list
- * must be an MPL type sequence, where each element is an unary MPL metafunction class, that upon
+ * must be a MPL type sequence, where each element is an unary MPL metafunction class, that upon
  * applying on its argument results in a logging feature class that derives from the argument.
  * Every logger feature provided by the library can participate in the feature list.
  */
 template< typename CharT, typename FinalT, typename ThreadingModelT, typename FeaturesT >
 class basic_composite_logger :
-    public mpl::reverse_fold<
-        FeaturesT,
+    public boost::log::sources::aux::inherit_features<
         basic_logger< CharT, FinalT, ThreadingModelT >,
-        aux::inherit_logger_features
+        FeaturesT
     >::type
 {
     //! Base type (the hierarchy of features)
-    typedef typename mpl::reverse_fold<
-        FeaturesT,
+    typedef typename boost::log::sources::aux::inherit_features<
         basic_logger< CharT, FinalT, ThreadingModelT >,
-        aux::inherit_logger_features
+        FeaturesT
     >::type base_type;
 
 protected:
@@ -420,7 +371,7 @@ public:
         {
             // We'll have to explicitly create the copy in order to make sure it's unlocked when we attempt to lock *this
             FinalT tmp(that);
-            lock_guard< threading_model > _(base_type::get_threading_model());
+            boost::log::aux::exclusive_lock_guard< threading_model > _(base_type::get_threading_model());
             base_type::swap_unlocked(tmp);
         }
         return static_cast< FinalT& >(*this);
@@ -496,8 +447,14 @@ public:
      */
     record_type open_record()
     {
-        typename base_type::open_record_lock _(base_type::get_threading_model());
-        return base_type::open_record_unlocked(boost::log::aux::empty_arg_list());
+        // Perform a quick check first
+        if (this->core()->get_logging_enabled())
+        {
+            typename base_type::open_record_lock _(base_type::get_threading_model());
+            return base_type::open_record_unlocked(boost::log::aux::empty_arg_list());
+        }
+        else
+            return record_type();
     }
     /*!
      * The method opens a new log record in the logging core.
@@ -508,8 +465,14 @@ public:
     template< typename ArgsT >
     record_type open_record(ArgsT const& args)
     {
-        typename base_type::open_record_lock _(base_type::get_threading_model());
-        return base_type::open_record_unlocked(args);
+        // Perform a quick check first
+        if (this->core()->get_logging_enabled())
+        {
+            typename base_type::open_record_lock _(base_type::get_threading_model());
+            return base_type::open_record_unlocked(args);
+        }
+        else
+            return record_type();
     }
     /*!
      * The method pushes the constructed message to the logging core
@@ -537,16 +500,14 @@ public:
 //! An optimized composite logger version with no multithreading support
 template< typename CharT, typename FinalT, typename FeaturesT >
 class basic_composite_logger< CharT, FinalT, single_thread_model, FeaturesT > :
-    public mpl::reverse_fold<
-        FeaturesT,
+    public boost::log::sources::aux::inherit_features<
         basic_logger< CharT, FinalT, single_thread_model >,
-        aux::inherit_logger_features
+        FeaturesT
     >::type
 {
-    typedef typename mpl::reverse_fold<
-        FeaturesT,
+    typedef typename boost::log::sources::aux::inherit_features<
         basic_logger< CharT, FinalT, single_thread_model >,
-        aux::inherit_logger_features
+        FeaturesT
     >::type base_type;
 
 protected:
@@ -600,12 +561,20 @@ public:
     }
     record_type open_record()
     {
-        return base_type::open_record_unlocked(boost::log::aux::empty_arg_list());
+        // Perform a quick check first
+        if (this->core()->get_logging_enabled())
+            return base_type::open_record_unlocked(boost::log::aux::empty_arg_list());
+        else
+            return record_type();
     }
     template< typename ArgsT >
     record_type open_record(ArgsT const& args)
     {
-        return base_type::open_record_unlocked(args);
+        // Perform a quick check first
+        if (this->core()->get_logging_enabled())
+            return base_type::open_record_unlocked(args);
+        else
+            return record_type();
     }
     void push_record(record_type const& record)
     {
@@ -641,65 +610,6 @@ public:
 #define BOOST_LOG_FORWARD_LOGGER_CONSTRUCTORS_TEMPLATE(class_type)\
     BOOST_LOG_FORWARD_LOGGER_CONSTRUCTORS_IMPL(class_type, BOOST_PP_IDENTITY(typename))
 
-
-#ifdef BOOST_LOG_USE_CHAR
-
-/*!
- * \brief Narrow-char logger. Functionally equivalent to \c basic_logger.
- *
- * See \c basic_logger class template for a more detailed description.
- */
-class logger :
-    public basic_composite_logger< char, logger, single_thread_model, features< >::type >
-{
-    BOOST_LOG_FORWARD_LOGGER_CONSTRUCTORS(logger)
-};
-
-#if !defined(BOOST_LOG_NO_THREADS)
-
-/*!
- * \brief Narrow-char thread-safe logger. Functionally equivalent to \c basic_logger.
- *
- * See \c basic_logger class template for a more detailed description.
- */
-class logger_mt :
-    public basic_composite_logger< char, logger_mt, multi_thread_model< boost::log::aux::light_rw_mutex >, features< >::type >
-{
-    BOOST_LOG_FORWARD_LOGGER_CONSTRUCTORS(logger_mt)
-};
-
-#endif // !defined(BOOST_LOG_NO_THREADS)
-#endif // BOOST_LOG_USE_CHAR
-
-#ifdef BOOST_LOG_USE_WCHAR_T
-
-/*!
- * \brief Wide-char logger. Functionally equivalent to \c basic_logger.
- *
- * See \c basic_logger class template for a more detailed description.
- */
-class wlogger :
-    public basic_composite_logger< wchar_t, wlogger, single_thread_model, features< >::type >
-{
-    BOOST_LOG_FORWARD_LOGGER_CONSTRUCTORS(wlogger)
-};
-
-#if !defined(BOOST_LOG_NO_THREADS)
-
-/*!
- * \brief Wide-char thread-safe logger. Functionally equivalent to \c basic_logger.
- *
- * See \c basic_logger class template for a more detailed description.
- */
-class wlogger_mt :
-    public basic_composite_logger< wchar_t, wlogger_mt, multi_thread_model< boost::log::aux::light_rw_mutex >, features< >::type >
-{
-    BOOST_LOG_FORWARD_LOGGER_CONSTRUCTORS(wlogger_mt)
-};
-
-#endif // !defined(BOOST_LOG_NO_THREADS)
-#endif // BOOST_LOG_USE_WCHAR_T
-
 } // namespace sources
 
 } // namespace log
@@ -724,7 +634,7 @@ class wlogger_mt :
             char_type,\
             type_name,\
             threading,\
-            ::boost::log::sources::features< BOOST_PP_SEQ_ENUM(base_seq) >::type\
+            ::boost::log::sources::features< BOOST_PP_SEQ_ENUM(base_seq) >\
         >\
     {\
         BOOST_LOG_FORWARD_LOGGER_CONSTRUCTORS(type_name)\
@@ -756,7 +666,8 @@ class wlogger_mt :
  *  \param base_seq A Boost.Preprocessor sequence of type identifiers of the base classes templates
  */
 #define BOOST_LOG_DECLARE_LOGGER_MT(type_name, base_seq)\
-    BOOST_LOG_DECLARE_LOGGER_TYPE(type_name, char, base_seq, ::boost::log::sources::multi_thread_model< ::boost::shared_mutex >)
+    BOOST_LOG_DECLARE_LOGGER_TYPE(type_name, char, base_seq,\
+        ::boost::log::sources::multi_thread_model< ::boost::shared_mutex >)
 
 #endif // !defined(BOOST_LOG_NO_THREADS)
 #endif // BOOST_LOG_USE_CHAR
@@ -785,7 +696,8 @@ class wlogger_mt :
  *  \param base_seq A Boost.Preprocessor sequence of type identifiers of the base classes templates
  */
 #define BOOST_LOG_DECLARE_WLOGGER_MT(type_name, base_seq)\
-    BOOST_LOG_DECLARE_LOGGER_TYPE(type_name, wchar_t, base_seq, ::boost::log::sources::multi_thread_model< ::boost::shared_mutex >)
+    BOOST_LOG_DECLARE_LOGGER_TYPE(type_name, wchar_t, base_seq,\
+        ::boost::log::sources::multi_thread_model< ::boost::shared_mutex >)
 
 #endif // !defined(BOOST_LOG_NO_THREADS)
 #endif // BOOST_LOG_USE_WCHAR_T
