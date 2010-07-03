@@ -23,11 +23,11 @@
 #define BOOST_LOG_SINKS_ATTRIBUTE_MAPPING_HPP_INCLUDED_
 
 #include <map>
-#include <string>
 #include <functional>
 #include <boost/log/detail/prologue.hpp>
 #include <boost/log/detail/tagged_integer.hpp>
 #include <boost/log/core/record.hpp>
+#include <boost/log/attributes/attribute_name.hpp>
 #include <boost/log/attributes/attribute_values_view.hpp>
 #include <boost/log/utility/attribute_value_extractor.hpp>
 
@@ -52,8 +52,8 @@ struct basic_mapping :
 {
     //! Char type
     typedef CharT char_type;
-    //! String type
-    typedef std::basic_string< char_type > string_type;
+    //! Attribute name type
+    typedef basic_attribute_name< char_type > attribute_name_type;
     //! Attribute values view type
     typedef basic_attribute_values_view< char_type > values_view_type;
     //! Log record type
@@ -127,8 +127,8 @@ public:
     typedef AttributeValueT attribute_value_type;
     //! Char type
     typedef typename base_type::char_type char_type;
-    //! String type
-    typedef typename base_type::string_type string_type;
+    //! Attribute name type
+    typedef typename base_type::attribute_name_type attribute_name_type;
     //! Attribute values view type
     typedef typename base_type::values_view_type values_view_type;
     //! Log record type
@@ -149,7 +149,7 @@ public:
      * \param name Attribute name
      * \param default_value The default native value that is returned if the attribute value is not found
      */
-    explicit basic_direct_mapping(string_type const& name, mapped_type const& default_value) :
+    explicit basic_direct_mapping(attribute_name_type const& name, mapped_type const& default_value) :
         m_Extractor(name),
         m_DefaultValue(default_value)
     {
@@ -193,8 +193,8 @@ public:
     typedef AttributeValueT attribute_value_type;
     //! Char type
     typedef typename base_type::char_type char_type;
-    //! String type
-    typedef typename base_type::string_type string_type;
+    //! Attribute name type
+    typedef typename base_type::attribute_name_type attribute_name_type;
     //! Attribute values view type
     typedef typename base_type::values_view_type values_view_type;
     //! Log record type
@@ -268,7 +268,7 @@ public:
      * \param name Attribute name
      * \param default_value The default native value that is returned if the conversion cannot be performed
      */
-    explicit basic_custom_mapping(string_type const& name, mapped_type const& default_value) :
+    explicit basic_custom_mapping(attribute_name_type const& name, mapped_type const& default_value) :
         m_Extractor(name),
         m_DefaultValue(default_value)
     {

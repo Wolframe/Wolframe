@@ -24,6 +24,7 @@
 #include <string>
 #include <boost/log/detail/prologue.hpp>
 #include <boost/log/attributes/attribute.hpp>
+#include <boost/log/attributes/attribute_name.hpp>
 #include <boost/log/attributes/attribute_value_def.hpp>
 #include <boost/log/attributes/attribute_values_view.hpp>
 #include <boost/log/utility/explicit_operator_bool.hpp>
@@ -98,8 +99,8 @@ public:
 
     //! Character type
     typedef CharT char_type;
-    //! String type
-    typedef std::basic_string< char_type > string_type;
+    //! Attribute name type
+    typedef basic_attribute_name< char_type > attribute_name_type;
     //! Attribute values view type
     typedef basic_attribute_values_view< char_type > values_view_type;
     //! Attribute value types
@@ -107,7 +108,7 @@ public:
 
 private:
     //! Attribute name to extract
-    string_type m_Name;
+    attribute_name_type m_Name;
 
 public:
     /*!
@@ -115,7 +116,7 @@ public:
      *
      * \param name Attribute name to be extracted on invokation
      */
-    explicit attribute_value_extractor(string_type const& _name) : m_Name(_name) {}
+    explicit attribute_value_extractor(attribute_name_type const& _name) : m_Name(_name) {}
 
 #ifdef BOOST_LOG_DOXYGEN_PASS
 
@@ -146,7 +147,7 @@ public:
         return extract(attrs, receiver);
     }
     //! Returns attribute value name
-    string_type const& name() const { return m_Name; }
+    attribute_name_type const& name() const { return m_Name; }
 
 private:
     //! Implementation of the attribute value extraction
@@ -198,6 +199,23 @@ inline extraction_result extract(
 template< typename T, typename CharT, typename ReceiverT >
 inline extraction_result extract(
     std::basic_string< CharT > const& name, basic_attribute_values_view< CharT > const& attrs, ReceiverT receiver)
+{
+    attribute_value_extractor< CharT, T > extractor(name);
+    return extractor(attrs, receiver);
+}
+
+/*!
+ * The function extracts an attribute value from the view. The user has to explicitly specify the
+ * type or set of possible types of the attribute value to be extracted.
+ *
+ * \param name An attribute value name to extract.
+ * \param attrs A set of attribute values in which to look for the specified attribute value.
+ * \param receiver A receiving functional object to pass the extracted value to.
+ * \return \c true if extraction succeeded, \c false otherwise
+ */
+template< typename T, typename CharT, typename ReceiverT >
+inline extraction_result extract(
+    basic_attribute_name< CharT > const& name, basic_attribute_values_view< CharT > const& attrs, ReceiverT receiver)
 {
     attribute_value_extractor< CharT, T > extractor(name);
     return extractor(attrs, receiver);

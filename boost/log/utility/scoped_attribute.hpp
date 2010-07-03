@@ -68,7 +68,7 @@ namespace aux {
         //! Constructor
         scoped_logger_attribute(
             logger_type& l,
-            typename logger_type::string_type const& name,
+            typename logger_type::attribute_name_type const& name,
             shared_ptr< attribute > const& attr
         ) :
             m_pLogger(boost::addressof(l))
@@ -117,31 +117,16 @@ namespace aux {
  */
 template< typename LoggerT >
 inline aux::scoped_logger_attribute< LoggerT > add_scoped_logger_attribute(
-    LoggerT& l, typename LoggerT::string_type const& name, shared_ptr< attribute > const& attr)
+    LoggerT& l, typename LoggerT::attribute_name_type const& name, shared_ptr< attribute > const& attr)
 {
     return aux::scoped_logger_attribute< LoggerT >(l, name, attr);
 }
 
 #ifndef BOOST_LOG_DOXYGEN_PASS
 
-template< typename LoggerT >
-inline aux::scoped_logger_attribute< LoggerT > add_scoped_logger_attribute(
-    LoggerT& l, typename LoggerT::char_type const* name, shared_ptr< attribute > const& attr)
-{
-    return aux::scoped_logger_attribute< LoggerT >(l, name, attr);
-}
-
 template< typename LoggerT, typename AttributeT >
 inline aux::scoped_logger_attribute< LoggerT > add_scoped_logger_attribute(
-    LoggerT& l, typename LoggerT::string_type const& name, AttributeT& attr)
-{
-    return aux::scoped_logger_attribute< LoggerT >(
-        l, name, shared_ptr< attribute >(boost::addressof(attr), empty_deleter()));
-}
-
-template< typename LoggerT, typename AttributeT >
-inline aux::scoped_logger_attribute< LoggerT > add_scoped_logger_attribute(
-    LoggerT& l, typename LoggerT::char_type const* name, AttributeT& attr)
+    LoggerT& l, typename LoggerT::attribute_name_type const& name, AttributeT& attr)
 {
     return aux::scoped_logger_attribute< LoggerT >(
         l, name, shared_ptr< attribute >(boost::addressof(attr), empty_deleter()));
@@ -208,7 +193,7 @@ namespace aux {
     public:
         //! Constructor
         scoped_thread_attribute(
-            typename core_type::string_type const& name, shared_ptr< attribute > const& attr) :
+            typename core_type::attribute_name_type const& name, shared_ptr< attribute > const& attr) :
             m_pCore(core_type::get())
         {
             std::pair<
@@ -252,31 +237,16 @@ namespace aux {
  */
 template< typename CharT >
 inline aux::scoped_thread_attribute< CharT > add_scoped_thread_attribute(
-    std::basic_string< CharT > const& name, shared_ptr< attribute > const& attr)
+    basic_attribute_name< CharT > const& name, shared_ptr< attribute > const& attr)
 {
     return aux::scoped_thread_attribute< CharT >(name, attr);
 }
 
 #ifndef BOOST_LOG_DOXYGEN_PASS
 
-template< typename CharT >
-inline aux::scoped_thread_attribute< CharT > add_scoped_thread_attribute(
-    const CharT* name, shared_ptr< attribute > const& attr)
-{
-    return aux::scoped_thread_attribute< CharT >(name, attr);
-}
-
 template< typename CharT, typename AttributeT >
 inline aux::scoped_thread_attribute< CharT > add_scoped_thread_attribute(
-    std::basic_string< CharT > const& name, AttributeT& attr)
-{
-    return aux::scoped_thread_attribute< CharT >(
-        name, shared_ptr< attribute >(boost::addressof(attr), empty_deleter()));
-}
-
-template< typename CharT, typename AttributeT >
-inline aux::scoped_thread_attribute< CharT > add_scoped_thread_attribute(
-    const CharT* name, AttributeT& attr)
+    basic_attribute_name< CharT > const& name, AttributeT& attr)
 {
     return aux::scoped_thread_attribute< CharT >(
         name, shared_ptr< attribute >(boost::addressof(attr), empty_deleter()));

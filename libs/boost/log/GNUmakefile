@@ -9,6 +9,7 @@ INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)
 
 LOG_OBJS = \
+	attribute_name.o \
 	attribute_set.o \
 	attribute_values_view.o \
 	code_conversion.o \

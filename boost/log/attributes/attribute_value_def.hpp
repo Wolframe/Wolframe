@@ -105,7 +105,7 @@ public:
      *
      * \param p A pointer to the attribute value holder.
      */
-    explicit attribute_value(shared_ptr< implementation > const& p) : m_pImpl(p) {}
+    explicit attribute_value(shared_ptr< implementation > p) { m_pImpl.swap(p); }
 
     /*!
      * The operator checks if the attribute value is empty

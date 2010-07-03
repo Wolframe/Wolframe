@@ -85,8 +85,8 @@ namespace syslog {
         typedef basic_direct_mapping< CharT, level, AttributeValueT > base_type;
 
     public:
-        //! String type
-        typedef typename base_type::string_type string_type;
+        //! Attribute name type
+        typedef typename base_type::attribute_name_type attribute_name_type;
 
     public:
         /*!
@@ -94,7 +94,7 @@ namespace syslog {
          *
          * \param name Attribute name
          */
-        explicit basic_direct_severity_mapping(string_type const& name) :
+        explicit basic_direct_severity_mapping(attribute_name_type const& name) :
             base_type(name, info)
         {
         }
@@ -115,8 +115,8 @@ namespace syslog {
         typedef basic_custom_mapping< CharT, level, AttributeValueT > base_type;
 
     public:
-        //! String type
-        typedef typename base_type::string_type string_type;
+        //! Attribute name type
+        typedef typename base_type::attribute_name_type attribute_name_type;
 
     public:
         /*!
@@ -124,7 +124,7 @@ namespace syslog {
          *
          * \param name Attribute name
          */
-        explicit basic_custom_severity_mapping(string_type const& name) :
+        explicit basic_custom_severity_mapping(attribute_name_type const& name) :
             base_type(name, info)
         {
         }
@@ -146,8 +146,8 @@ namespace syslog {
         typedef basic_direct_severity_mapping< char, AttributeValueT > base_type;
 
     public:
-        //! String type
-        typedef typename base_type::string_type string_type;
+        //! Attribute name type
+        typedef typename base_type::attribute_name_type attribute_name_type;
 
     public:
         /*!
@@ -155,7 +155,7 @@ namespace syslog {
          *
          * \param name Attribute name
          */
-        explicit direct_severity_mapping(string_type const& name) : base_type(name)
+        explicit direct_severity_mapping(attribute_name_type const& name) : base_type(name)
         {
         }
     };
@@ -174,8 +174,8 @@ namespace syslog {
         typedef basic_custom_severity_mapping< char, AttributeValueT > base_type;
 
     public:
-        //! String type
-        typedef typename base_type::string_type string_type;
+        //! Attribute name type
+        typedef typename base_type::attribute_name_type attribute_name_type;
 
     public:
         /*!
@@ -183,7 +183,7 @@ namespace syslog {
          *
          * \param name Attribute name
          */
-        explicit custom_severity_mapping(string_type const& name) : base_type(name)
+        explicit custom_severity_mapping(attribute_name_type const& name) : base_type(name)
         {
         }
     };
@@ -206,8 +206,8 @@ namespace syslog {
         typedef basic_direct_severity_mapping< wchar_t, AttributeValueT > base_type;
 
     public:
-        //! String type
-        typedef typename base_type::string_type string_type;
+        //! Attribute name type
+        typedef typename base_type::attribute_name_type attribute_name_type;
 
     public:
         /*!
@@ -215,7 +215,7 @@ namespace syslog {
          *
          * \param name Attribute name
          */
-        explicit wdirect_severity_mapping(string_type const& name) : base_type(name)
+        explicit wdirect_severity_mapping(attribute_name_type const& name) : base_type(name)
         {
         }
     };
@@ -234,8 +234,8 @@ namespace syslog {
         typedef basic_custom_severity_mapping< wchar_t, AttributeValueT > base_type;
 
     public:
-        //! String type
-        typedef typename base_type::string_type string_type;
+        //! Attribute name type
+        typedef typename base_type::attribute_name_type attribute_name_type;
 
     public:
         /*!
@@ -243,7 +243,7 @@ namespace syslog {
          *
          * \param name Attribute name
          */
-        explicit wcustom_severity_mapping(string_type const& name) : base_type(name)
+        explicit wcustom_severity_mapping(attribute_name_type const& name) : base_type(name)
         {
         }
     };

@@ -12,6 +12,7 @@ LIBRARIES = \
 	libboost_log_setup$(BOOST_LIBRARY_TAG).lib
 
 LOG_OBJS = \
+	attribute_name.obj \
 	attribute_set.obj \
 	attribute_values_view.obj \
 	code_conversion.obj \

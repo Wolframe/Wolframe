@@ -28,6 +28,7 @@
 #include <boost/log/detail/cleanup_scope_guard.hpp>
 #include <boost/log/formatters/basic_formatters.hpp>
 #include <boost/log/formatters/exception_policies.hpp>
+#include <boost/log/attributes/attribute_name.hpp>
 #include <boost/log/utility/type_dispatch/standard_types.hpp>
 #include <boost/log/utility/attribute_value_extractor.hpp>
 #include <boost/log/keywords/format.hpp>
@@ -82,9 +83,10 @@ namespace aux {
     {
         typedef fmt_attr_formatted< CharT, AttributeValueTypesT, ExceptionPolicyT > type;
         typedef typename type::string_type string_type;
+        typedef typename type::attribute_name_type attribute_name_type;
 
         template< typename ArgsT >
-        static type construct(string_type const& name, ArgsT const& args)
+        static type construct(attribute_name_type const& name, ArgsT const& args)
         {
             return type(name, args[keywords::format]);
         }
@@ -94,9 +96,10 @@ namespace aux {
     {
         typedef fmt_attr< CharT, AttributeValueTypesT, ExceptionPolicyT > type;
         typedef typename type::string_type string_type;
+        typedef typename type::attribute_name_type attribute_name_type;
 
         template< typename ArgsT >
-        static type construct(string_type const& name, ArgsT const& args)
+        static type construct(attribute_name_type const& name, ArgsT const& args)
         {
             return type(name);
         }
@@ -138,8 +141,8 @@ class fmt_attr :
 public:
     //! Character type
     typedef typename base_type::char_type char_type;
-    //! String type
-    typedef typename base_type::string_type string_type;
+    //! Attribute name type
+    typedef typename base_type::attribute_name_type attribute_name_type;
     //! Stream type
     typedef typename base_type::ostream_type ostream_type;
     //! Log record type
@@ -155,7 +158,7 @@ public:
      *
      * \param name Attribute name
      */
-    explicit fmt_attr(string_type const& name) : m_Extractor(name) {}
+    explicit fmt_attr(attribute_name_type const& name) : m_Extractor(name) {}
 
     /*!
      * Formatting operator. Puts the attribute with the specified on construction name from
@@ -181,7 +184,7 @@ inline fmt_attr<
     char,
     make_default_attribute_types< char >::type,
     throw_policy
-> attr(std::basic_string< char > const& name)
+> attr(basic_attribute_name< char > const& name)
 {
     return fmt_attr< char, make_default_attribute_types< char >::type, throw_policy >(name);
 }
@@ -193,7 +196,7 @@ inline fmt_attr<
     char,
     AttributeValueTypesT,
     throw_policy
-> attr(std::basic_string< char > const& name)
+> attr(basic_attribute_name< char > const& name)
 {
     return fmt_attr< char, AttributeValueTypesT, throw_policy >(name);
 }
@@ -207,7 +210,7 @@ inline fmt_attr<
     char,
     make_default_attribute_types< char >::type,
     no_throw_policy
-> attr(std::basic_string< char > const& name, std::nothrow_t const&)
+> attr(basic_attribute_name< char > const& name, std::nothrow_t const&)
 {
     return fmt_attr< char, make_default_attribute_types< char >::type, no_throw_policy >(name);
 }
@@ -221,7 +224,7 @@ inline fmt_attr<
     char,
     AttributeValueTypesT,
     no_throw_policy
-> attr(std::basic_string< char > const& name, std::nothrow_t const&)
+> attr(basic_attribute_name< char > const& name, std::nothrow_t const&)
 {
     return fmt_attr< char, AttributeValueTypesT, no_throw_policy >(name);
 }
@@ -237,7 +240,7 @@ inline fmt_attr<
     wchar_t,
     make_default_attribute_types< wchar_t >::type,
     throw_policy
-> attr(std::basic_string< wchar_t > const& name)
+> attr(basic_attribute_name< wchar_t > const& name)
 {
     return fmt_attr< wchar_t, make_default_attribute_types< wchar_t >::type, throw_policy >(name);
 }
@@ -249,7 +252,7 @@ inline fmt_attr<
     wchar_t,
     AttributeValueTypesT,
     throw_policy
-> attr(std::basic_string< wchar_t > const& name)
+> attr(basic_attribute_name< wchar_t > const& name)
 {
     return fmt_attr< wchar_t, AttributeValueTypesT, throw_policy >(name);
 }
@@ -263,7 +266,7 @@ inline fmt_attr<
     wchar_t,
     make_default_attribute_types< wchar_t >::type,
     no_throw_policy
-> attr(std::basic_string< wchar_t > const& name, std::nothrow_t const&)
+> attr(basic_attribute_name< wchar_t > const& name, std::nothrow_t const&)
 {
     return fmt_attr< wchar_t, make_default_attribute_types< wchar_t >::type, no_throw_policy >(name);
 }
@@ -277,7 +280,7 @@ inline fmt_attr<
     wchar_t,
     AttributeValueTypesT,
     no_throw_policy
-> attr(std::basic_string< wchar_t > const& name, std::nothrow_t const&)
+> attr(basic_attribute_name< wchar_t > const& name, std::nothrow_t const&)
 {
     return fmt_attr< wchar_t, AttributeValueTypesT, no_throw_policy >(name);
 }
@@ -304,6 +307,8 @@ class fmt_attr_formatted :
 public:
     //! Character type
     typedef typename base_type::char_type char_type;
+    //! Attribute name type
+    typedef typename base_type::attribute_name_type attribute_name_type;
     //! String type
     typedef typename base_type::string_type string_type;
     //! Stream type
@@ -327,7 +332,11 @@ public:
      * \param fmt Format string. Must be compatible with Boost.Format and contain a single placeholder.
      *        The placeholder must be compatible with all attribute value types specified in \c AttributeValueTypesT
      */
-    explicit fmt_attr_formatted(string_type const& name, string_type const& fmt) : m_Extractor(name), m_Formatter(fmt) {}
+    explicit fmt_attr_formatted(attribute_name_type const& name, string_type const& fmt) :
+        m_Extractor(name),
+        m_Formatter(fmt)
+    {
+    }
 
     /*!
      * Formatting operator. Formats the attribute with the specified on construction name from
@@ -355,7 +364,7 @@ inline fmt_attr_formatted<
     char,
     make_default_attribute_types< char >::type,
     throw_policy
-> attr(std::basic_string< char > const& name, std::basic_string< char > const& fmt)
+> attr(basic_attribute_name< char > const& name, std::basic_string< char > const& fmt)
 {
     return fmt_attr_formatted< char, make_default_attribute_types< char >::type, throw_policy >(name, fmt);
 }
@@ -367,7 +376,7 @@ inline fmt_attr_formatted<
     char,
     AttributeValueTypesT,
     throw_policy
-> attr(std::basic_string< char > const& name, std::basic_string< char > const& fmt)
+> attr(basic_attribute_name< char > const& name, std::basic_string< char > const& fmt)
 {
     return fmt_attr_formatted< char, AttributeValueTypesT, throw_policy >(name, fmt);
 }
@@ -384,7 +393,7 @@ inline typename lazy_enable_if<
         throw_policy,
         ArgsT
     >
->::type attr(std::basic_string< char > const& name, ArgsT const& fmt)
+>::type attr(basic_attribute_name< char > const& name, ArgsT const& fmt)
 {
     typedef aux::make_attr_formatter<
         char,
@@ -406,7 +415,7 @@ inline typename lazy_enable_if<
         throw_policy,
         ArgsT
     >
->::type attr(std::basic_string< char > const& name, ArgsT const& fmt)
+>::type attr(basic_attribute_name< char > const& name, ArgsT const& fmt)
 {
     typedef aux::make_attr_formatter<
         char,
@@ -426,7 +435,7 @@ inline fmt_attr_formatted<
     char,
     make_default_attribute_types< char >::type,
     no_throw_policy
-> attr(std::basic_string< char > const& name, std::basic_string< char > const& fmt, std::nothrow_t const&)
+> attr(basic_attribute_name< char > const& name, std::basic_string< char > const& fmt, std::nothrow_t const&)
 {
     return fmt_attr_formatted< char, make_default_attribute_types< char >::type, no_throw_policy >(name, fmt);
 }
@@ -440,7 +449,7 @@ inline fmt_attr_formatted<
     char,
     AttributeValueTypesT,
     no_throw_policy
-> attr(std::basic_string< char > const& name, std::basic_string< char > const& fmt, std::nothrow_t const&)
+> attr(basic_attribute_name< char > const& name, std::basic_string< char > const& fmt, std::nothrow_t const&)
 {
     return fmt_attr_formatted< char, AttributeValueTypesT, no_throw_policy >(name, fmt);
 }
@@ -459,7 +468,7 @@ inline typename lazy_enable_if<
         no_throw_policy,
         ArgsT
     >
->::type attr(std::basic_string< char > const& name, ArgsT const& fmt, std::nothrow_t const&)
+>::type attr(basic_attribute_name< char > const& name, ArgsT const& fmt, std::nothrow_t const&)
 {
     typedef aux::make_attr_formatter<
         char,
@@ -483,7 +492,7 @@ inline typename lazy_enable_if<
         no_throw_policy,
         ArgsT
     >
->::type attr(std::basic_string< char > const& name, ArgsT const& fmt, std::nothrow_t const&)
+>::type attr(basic_attribute_name< char > const& name, ArgsT const& fmt, std::nothrow_t const&)
 {
     typedef aux::make_attr_formatter<
         char,
@@ -505,7 +514,7 @@ inline fmt_attr_formatted<
     wchar_t,
     make_default_attribute_types< wchar_t >::type,
     throw_policy
-> attr(std::basic_string< wchar_t > const& name, std::basic_string< wchar_t > const& fmt)
+> attr(basic_attribute_name< wchar_t > const& name, std::basic_string< wchar_t > const& fmt)
 {
     return fmt_attr_formatted< wchar_t, make_default_attribute_types< wchar_t >::type, throw_policy >(name, fmt);
 }
@@ -517,7 +526,7 @@ inline fmt_attr_formatted<
     wchar_t,
     AttributeValueTypesT,
     throw_policy
-> attr(std::basic_string< wchar_t > const& name, std::basic_string< wchar_t > const& fmt)
+> attr(basic_attribute_name< wchar_t > const& name, std::basic_string< wchar_t > const& fmt)
 {
     return fmt_attr_formatted< wchar_t, AttributeValueTypesT, throw_policy >(name, fmt);
 }
@@ -534,7 +543,7 @@ inline typename lazy_enable_if<
         throw_policy,
         ArgsT
     >
->::type attr(std::basic_string< wchar_t > const& name, ArgsT const& fmt)
+>::type attr(basic_attribute_name< wchar_t > const& name, ArgsT const& fmt)
 {
     typedef aux::make_attr_formatter<
         wchar_t,
@@ -556,7 +565,7 @@ inline typename lazy_enable_if<
         throw_policy,
         ArgsT
     >
->::type attr(std::basic_string< wchar_t > const& name, ArgsT const& fmt)
+>::type attr(basic_attribute_name< wchar_t > const& name, ArgsT const& fmt)
 {
     typedef aux::make_attr_formatter<
         wchar_t,
@@ -576,7 +585,7 @@ inline fmt_attr_formatted<
     wchar_t,
     make_default_attribute_types< wchar_t >::type,
     no_throw_policy
-> attr(std::basic_string< wchar_t > const& name, std::basic_string< wchar_t > const& fmt, std::nothrow_t const&)
+> attr(basic_attribute_name< wchar_t > const& name, std::basic_string< wchar_t > const& fmt, std::nothrow_t const&)
 {
     return fmt_attr_formatted< wchar_t, make_default_attribute_types< wchar_t >::type, no_throw_policy >(name, fmt);
 }
@@ -590,7 +599,7 @@ inline fmt_attr_formatted<
     wchar_t,
     AttributeValueTypesT,
     no_throw_policy
-> attr(std::basic_string< wchar_t > const& name, std::basic_string< wchar_t > const& fmt, std::nothrow_t const&)
+> attr(basic_attribute_name< wchar_t > const& name, std::basic_string< wchar_t > const& fmt, std::nothrow_t const&)
 {
     return fmt_attr_formatted< wchar_t, AttributeValueTypesT, no_throw_policy >(name, fmt);
 }
@@ -609,7 +618,7 @@ inline typename lazy_enable_if<
         no_throw_policy,
         ArgsT
     >
->::type attr(std::basic_string< wchar_t > const& name, ArgsT const& fmt, std::nothrow_t const&)
+>::type attr(basic_attribute_name< wchar_t > const& name, ArgsT const& fmt, std::nothrow_t const&)
 {
     typedef aux::make_attr_formatter<
         wchar_t,
@@ -633,7 +642,7 @@ inline typename lazy_enable_if<
         no_throw_policy,
         ArgsT
     >
->::type attr(std::basic_string< wchar_t > const& name, ArgsT const& fmt, std::nothrow_t const&)
+>::type attr(basic_attribute_name< wchar_t > const& name, ArgsT const& fmt, std::nothrow_t const&)
 {
     typedef aux::make_attr_formatter<
         wchar_t,

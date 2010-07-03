@@ -48,7 +48,8 @@ struct basic_record< CharT >::private_data :
     //! A list of sinks that will accept the record
     sink_list m_AcceptingSinks;
 
-    explicit private_data(values_view_type const& values) : public_data(values)
+    template< typename SourceT >
+    explicit private_data(SourceT const& values) : public_data(values)
     {
     }
 };
@@ -177,8 +178,8 @@ basic_core< CharT >::implementation::pThreadDataCache = NULL;
 
 //! Logging system constructor
 template< typename CharT >
-basic_core< CharT >::basic_core()
-    : pImpl(new implementation())
+basic_core< CharT >::basic_core() :
+    pImpl(new implementation())
 {
 }
 
@@ -241,10 +242,10 @@ void basic_core< CharT >::remove_sink(shared_ptr< sink_type > const& s)
 //! The method adds an attribute to the global attribute set
 template< typename CharT >
 std::pair< typename basic_core< CharT >::attribute_set_type::iterator, bool >
-basic_core< CharT >::add_global_attribute(string_type const& name, shared_ptr< attribute > const& attr)
+basic_core< CharT >::add_global_attribute(attribute_name_type const& name, shared_ptr< attribute > const& attr)
 {
     BOOST_LOG_EXPR_IF_MT(typename implementation::scoped_write_lock lock(pImpl->Mutex);)
-    return pImpl->GlobalAttributes.insert(typename attribute_set_type::key_type(name), attr);
+    return pImpl->GlobalAttributes.insert(name, attr);
 }
 
 //! The method removes an attribute from the global attribute set
@@ -273,10 +274,10 @@ void basic_core< CharT >::set_global_attributes(attribute_set_type const& attrs)
 //! The method adds an attribute to the thread-specific attribute set
 template< typename CharT >
 std::pair< typename basic_core< CharT >::attribute_set_type::iterator, bool >
-basic_core< CharT >::add_thread_attribute(string_type const& name, shared_ptr< attribute > const& attr)
+basic_core< CharT >::add_thread_attribute(attribute_name_type const& name, shared_ptr< attribute > const& attr)
 {
     typename implementation::thread_data* p = pImpl->get_thread_data();
-    return p->ThreadAttributes.insert(typename attribute_set_type::key_type(name), attr);
+    return p->ThreadAttributes.insert(name, attr);
 }
 
 //! The method removes an attribute from the thread-specific attribute set
@@ -344,9 +345,10 @@ typename basic_core< CharT >::record_type basic_core< CharT >::open_record(attri
         if (pImpl->Enabled && !pImpl->Sinks.empty())
         {
             // Compose a view of attribute values (unfrozen, yet)
-            values_view_type attr_values(source_attributes, tsd->ThreadAttributes, pImpl->GlobalAttributes);
+            values_view_type temp_attr_values(source_attributes, tsd->ThreadAttributes, pImpl->GlobalAttributes);
+            register values_view_type* attr_values = &temp_attr_values;
 
-            if (pImpl->Filter.empty() || pImpl->Filter(attr_values))
+            if (pImpl->Filter.empty() || pImpl->Filter(*attr_values))
             {
                 // The global filter passed, trying the sinks
                 typedef typename record_type::private_data record_private_data;
@@ -356,13 +358,14 @@ typename basic_core< CharT >::record_type basic_core< CharT >::open_record(attri
                 {
                     try
                     {
-                        if (it->get()->will_consume(attr_values))
+                        if (it->get()->will_consume(*attr_values))
                         {
                             // If at least one sink accepts the record, it's time to create it
                             if (!pData)
                             {
-                                attr_values.freeze();
-                                rec.m_pData = pData = new record_private_data(attr_values);
+                                temp_attr_values.freeze();
+                                rec.m_pData = pData = new record_private_data(move(temp_attr_values));
+                                attr_values = &pData->m_AttributeValues;
                             }
                             pData->m_AcceptingSinks.push_back(*it);
                         }

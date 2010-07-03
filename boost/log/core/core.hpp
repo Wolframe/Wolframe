@@ -19,7 +19,6 @@
 #ifndef BOOST_LOG_CORE_CORE_HPP_INCLUDED_
 #define BOOST_LOG_CORE_CORE_HPP_INCLUDED_
 
-#include <string>
 #include <utility>
 #include <boost/shared_ptr.hpp>
 #include <boost/noncopyable.hpp>
@@ -27,10 +26,11 @@
 #include <boost/log/detail/light_function.hpp>
 #include <boost/log/core/record.hpp>
 #include <boost/log/attributes/attribute_set.hpp>
+#include <boost/log/attributes/attribute_name.hpp>
 
 #ifdef _MSC_VER
 #pragma warning(push)
- // non dll-interface class 'A' used as base for dll-interface class 'B'
+// non dll-interface class 'A' used as base for dll-interface class 'B'
 #pragma warning(disable: 4275)
 #endif // _MSC_VER
 
@@ -66,8 +66,8 @@ public:
     typedef CharT char_type;
     //! Log record type
     typedef basic_record< char_type > record_type;
-    //! String type to be used as a message text holder
-    typedef typename record_type::string_type string_type;
+    //! Attribute name type
+    typedef basic_attribute_name< char_type > attribute_name_type;
     //! Attribute set type
     typedef basic_attribute_set< char_type > attribute_set_type;
     //! Attribute values view type
@@ -162,7 +162,7 @@ public:
      *         addition.
      */
     std::pair< typename attribute_set_type::iterator, bool > add_global_attribute(
-        string_type const& name, shared_ptr< attribute > const& attr);
+        attribute_name_type const& name, shared_ptr< attribute > const& attr);
     /*!
      * The method removes an attribute from the global attribute set.
      *
@@ -201,7 +201,7 @@ public:
      *         addition.
      */
     std::pair< typename attribute_set_type::iterator, bool > add_thread_attribute(
-        string_type const& name, shared_ptr< attribute > const& attr);
+        attribute_name_type const& name, shared_ptr< attribute > const& attr);
     /*!
      * The method removes an attribute from the thread-specific attribute set.
      *

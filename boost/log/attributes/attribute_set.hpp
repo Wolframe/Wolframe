@@ -19,16 +19,15 @@
 #ifndef BOOST_LOG_ATTRIBUTE_SET_HPP_INCLUDED_
 #define BOOST_LOG_ATTRIBUTE_SET_HPP_INCLUDED_
 
+#include <memory>
 #include <string>
 #include <utility>
 #include <iterator>
-#include <algorithm>
 #include <boost/shared_ptr.hpp>
 #include <boost/mpl/if.hpp>
-#include <boost/utility/addressof.hpp>
 #include <boost/log/detail/prologue.hpp>
-#include <boost/log/utility/slim_string.hpp>
 #include <boost/log/attributes/attribute.hpp>
+#include <boost/log/attributes/attribute_name.hpp>
 
 namespace boost {
 
@@ -42,10 +41,10 @@ class basic_attribute_values_view;
  *
  * An attribute set is an associative container with attribute name as a key and
  * pointer to the attribute as a mapped value. The container allows storing only one element for each distinct
- * key value. In most regards attribute set container provides interface similar to \c std::map. However, there are
- * differences in \c operator[] semantics and a number of optimizations with regard to iteration. Besides,
- * attribute names are stored as a read-only <tt>slim_string</tt>'s instead of \c std::string, which is also saves memory
- * and CPU time.
+ * key value. In most regards attribute set container provides interface similar to \c std::unordered_map.
+ * However, there are differences in \c operator[] semantics and a number of optimizations with regard to iteration.
+ * Besides, attribute names are stored as a read-only <tt>attribute_name</tt>'s instead of \c std::string,
+ * which saves memory and CPU time.
  */
 template< typename CharT >
 class basic_attribute_set
@@ -61,7 +60,7 @@ public:
     //! String type
     typedef std::basic_string< char_type > string_type;
     //! Key type
-    typedef basic_slim_string< char_type > key_type;
+    typedef basic_attribute_name< char_type > key_type;
     //! Mapped attribute type
     typedef shared_ptr< attribute > mapped_type;
 
@@ -94,21 +93,21 @@ private:
     friend class reference_proxy;
     class reference_proxy
     {
-        basic_attribute_set* m_pContainer;
-        const char_type* m_pKey;
-        size_type m_KeyLen;
+        basic_attribute_set* const m_pContainer;
+        const key_type m_key;
 
     public:
         //! Constructor
-        explicit reference_proxy(basic_attribute_set* pContainer, const char_type* pKey, size_type KeyLen)
-            : m_pContainer(pContainer), m_pKey(pKey), m_KeyLen(KeyLen)
+        explicit reference_proxy(basic_attribute_set* pContainer, key_type const& key) :
+            m_pContainer(pContainer),
+            m_key(key)
         {
         }
 
         //! Conversion operator (would be invoked in case of reading from the container)
         operator mapped_type() const
         {
-            iterator it = m_pContainer->find_impl(m_pKey, m_KeyLen);
+            iterator it = m_pContainer->find(m_key);
             if (it != m_pContainer->end())
                 return it->second;
             else
@@ -117,8 +116,7 @@ private:
         //! Assignment operator (would be invoked in case of writing to the container)
         mapped_type& operator= (mapped_type const& val) const
         {
-            std::pair< iterator, bool > res =
-                m_pContainer->insert(key_type(m_pKey, m_KeyLen), val);
+            std::pair< iterator, bool > res = m_pContainer->insert(m_key, val);
             if (!res.second)
                 res.first->second = val;
             return res.first->second;
@@ -128,16 +126,28 @@ private:
     //! A base class for the container nodes
     struct node_base
     {
-        value_type m_Value;
         node_base* m_pPrev;
         node_base* m_pNext;
 
-        node_base() { /* m_pPrev = m_pNext = 0; -- initialized internally in cpp */ }
-        node_base(node_base const& that) : m_Value(that.m_Value) { /* m_pPrev = m_pNext = 0; -- initialized internally in cpp */ }
-        node_base(key_type const& key, mapped_type const& data) : m_Value(key, data) { /* m_pPrev = m_pNext = 0; -- initialized internally in cpp */ }
+        node_base();
 
     private:
+        node_base(node_base const&);
         node_base& operator= (node_base const&);
+    };
+
+    //! Container elements
+    struct node;
+    friend struct node;
+    struct node :
+        public node_base
+    {
+        value_type m_Value;
+
+        node();
+        node(node const& that);
+        node(key_type const& key, mapped_type const& data);
+        node& operator= (node const& that);
     };
 
     //! Iterator class
@@ -212,8 +222,10 @@ private:
         }
 
         //  Dereferencing
-        pointer operator-> () const { return boost::addressof(m_pNode->m_Value); }
-        reference operator* () const { return m_pNode->m_Value; }
+        pointer operator-> () const { return &(static_cast< node* >(m_pNode)->m_Value); }
+        reference operator* () const { return static_cast< node* >(m_pNode)->m_Value; }
+
+        node_base* base() const { return m_pNode; }
 
     private:
         node_base* m_pNode;
@@ -265,14 +277,19 @@ public:
      *
      * \post <tt>std::equal(begin(), end(), that.begin()) == true</tt>
      */
-    BOOST_LOG_EXPORT basic_attribute_set& operator= (basic_attribute_set const& that);
+    BOOST_LOG_EXPORT basic_attribute_set& operator= (basic_attribute_set that);
 
     /*!
      * Swaps two instances of the container.
      *
      * \b Throws: Nothing.
      */
-    void swap(basic_attribute_set& that) { std::swap(m_pImpl, that.m_pImpl); }
+    void swap(basic_attribute_set& that)
+    {
+        register implementation* p = m_pImpl;
+        m_pImpl = that.m_pImpl;
+        that.m_pImpl = p;
+    }
 
     /*!
      * \return Iterator to the first element of the container.
@@ -298,7 +315,7 @@ public:
     /*!
      * \return true if there are no elements in the container, false otherwise.
      */
-    bool empty() const { return (size() == 0); }
+    bool empty() const { return (this->size() == 0); }
 
     /*!
      * The method finds the attribute by name.
@@ -306,61 +323,16 @@ public:
      * \param key Attribute name.
      * \return Iterator to the found element or end() if the attribute with such name is not found.
      */
-    iterator find(key_type const& key)
-    {
-        return this->find_impl(key.data(), key.size());
-    }
+    BOOST_LOG_EXPORT iterator find(key_type key);
     /*!
      * The method finds the attribute by name.
      *
      * \param key Attribute name.
      * \return Iterator to the found element or \c end() if the attribute with such name is not found.
      */
-    iterator find(string_type const& key)
+    const_iterator find(key_type key) const
     {
-        return this->find_impl(key.data(), key.size());
-    }
-    /*!
-     * The method finds the attribute by name.
-     *
-     * \param key Attribute name. Must not be NULL, must point to a zero-terminated string.
-     * \return Iterator to the found element or \c end() if the attribute with such name is not found.
-     */
-    iterator find(const char_type* key)
-    {
-        typedef std::char_traits< char_type > traits_type;
-        return this->find_impl(key, traits_type::length(key));
-    }
-    /*!
-     * The method finds the attribute by name.
-     *
-     * \param key Attribute name.
-     * \return Iterator to the found element or \c end() if the attribute with such name is not found.
-     */
-    const_iterator find(key_type const& key) const
-    {
-        return this->find_impl(key.data(), key.size());
-    }
-    /*!
-     * The method finds the attribute by name.
-     *
-     * \param key Attribute name.
-     * \return Iterator to the found element or \c end() if the attribute with such name is not found.
-     */
-    const_iterator find(string_type const& key) const
-    {
-        return this->find_impl(key.data(), key.size());
-    }
-    /*!
-     * The method finds the attribute by name.
-     *
-     * \param key Attribute name. Must not be NULL, must point to a zero-terminated string.
-     * \return Iterator to the found element or \c end() if the attribute with such name is not found.
-     */
-    const_iterator find(const char_type* key) const
-    {
-        typedef std::char_traits< char_type > traits_type;
-        return this->find_impl(key, traits_type::length(key));
+        return const_iterator(const_cast< basic_attribute_set* >(this)->find(key));
     }
     /*!
      * The method counts the number of the attribute occurrences in the container. Since there can be only one
@@ -369,23 +341,7 @@ public:
      * \param key Attribute name.
      * \return The number of times the attribute is found in the container.
      */
-    size_type count(key_type const& key) const { return size_type(find(key) != end()); }
-    /*!
-     * The method counts the number of the attribute occurrences in the container. Since there can be only one
-     * attribute with a particular key, the method always return 0 or 1.
-     *
-     * \param key Attribute name.
-     * \return The number of times the attribute is found in the container.
-     */
-    size_type count(string_type const& key) const { return size_type(find(key) != end()); }
-    /*!
-     * The method counts the number of the attribute occurrences in the container. Since there can be only one
-     * attribute with a particular key, the method always return 0 or 1.
-     *
-     * \param key Attribute name. Must not be NULL, must point to a zero-terminated string.
-     * \return The number of times the attribute is found in the container.
-     */
-    size_type count(const char_type* key) const { return size_type(find(key) != end()); }
+    size_type count(key_type key) const { return size_type(this->find(key) != this->end()); }
 
     /*!
      * Combined lookup/insertion operator. The operator semantics depends on the further usage of the returned reference.
@@ -400,44 +356,9 @@ public:
      * \param key Attribute name.
      * \return A smart reference object of unspecified type.
      */
-    reference_proxy operator[] (key_type const& key)
+    reference_proxy operator[] (key_type key)
     {
-        return reference_proxy(this, key.data(), key.size());
-    }
-    /*!
-     * Combined lookup/insertion operator. The operator semantics depends on the further usage of the returned reference.
-     * \li If the reference is used as an assignment target, the assignment expression is equivalent to element insertion,
-     *     where the element is composed of the second argument of the \c operator[] as a key and the second argument of assignment
-     *     as a mapped value.
-     * \li If the returned reference is used in context where a conversion to the mapped type is required,
-     *     the result of the conversion is equivalent to the mapped value found with the second argument of the \c operator[] as a key,
-     *     if such an element exists in the container, or a default-constructed mapped value, if an element does not exist in the
-     *     container.
-     *
-     * \param key Attribute name.
-     * \return A smart reference object of unspecified type.
-     */
-    reference_proxy operator[] (string_type const& key)
-    {
-        return reference_proxy(this, key.data(), key.size());
-    }
-    /*!
-     * Combined lookup/insertion operator. The operator semantics depends on the further usage of the returned reference.
-     * \li If the reference is used as an assignment target, the assignment expression is equivalent to element insertion,
-     *     where the element is composed of the second argument of the \c operator[] as a key and the second argument of assignment
-     *     as a mapped value.
-     * \li If the returned reference is used in context where a conversion to the mapped type is required,
-     *     the result of the conversion is equivalent to the mapped value found with the second argument of the \c operator[] as a key,
-     *     if such an element exists in the container, or a default-constructed mapped value, if an element does not exist in the
-     *     container.
-     *
-     * \param key Attribute name. Must not be NULL, must point to a zero-terminated string.
-     * \return A smart reference object of unspecified type.
-     */
-    reference_proxy operator[] (const char_type* key)
-    {
-        typedef std::char_traits< char_type > traits_type;
-        return reference_proxy(this, key, traits_type::length(key));
+        return reference_proxy(this, key);
     }
     /*!
      * Lookup operator
@@ -446,39 +367,9 @@ public:
      * \return If an element with the corresponding attribute name is found in the container, its mapped value
      *         is returned. Otherwise a refault-constructed mapped value is returned.
      */
-    mapped_type operator[] (key_type const& key) const
+    mapped_type operator[] (key_type key) const
     {
-        const_iterator it = find(key);
-        if (it != end())
-            return it->second;
-        else
-            return mapped_type();
-    }
-    /*!
-     * Lookup operator
-     *
-     * \param key Attribute name.
-     * \return If an element with the corresponding attribute name is found in the container, its mapped value
-     *         is returned. Otherwise a refault-constructed mapped value is returned.
-     */
-    mapped_type operator[] (string_type const& key) const
-    {
-        const_iterator it = find(key);
-        if (it != end())
-            return it->second;
-        else
-            return mapped_type();
-    }
-    /*!
-     * Lookup operator
-     *
-     * \param key Attribute name. Must not be NULL, must point to a zero-terminated string.
-     * \return If an element with the corresponding attribute name is found in the container, its mapped value
-     *         is returned. Otherwise a refault-constructed mapped value is returned.
-     */
-    mapped_type operator[] (const char_type* key) const
-    {
-        const_iterator it = find(key);
+        const_iterator it = this->find(key);
         if (it != end())
             return it->second;
         else
@@ -493,7 +384,7 @@ public:
      * \returns A pair of values. If second is true, the insertion succeeded and the first component points to the
      *          inserted element. Otherwise the first component points to the element that prevents insertion.
      */
-    BOOST_LOG_EXPORT std::pair< iterator, bool > insert(key_type const& key, mapped_type const& data);
+    BOOST_LOG_EXPORT std::pair< iterator, bool > insert(key_type key, mapped_type const& data);
 
     /*!
      * Insertion method
@@ -504,7 +395,7 @@ public:
      */
     std::pair< iterator, bool > insert(const_reference value)
     {
-        return insert(value.first, value.second);
+        return this->insert(value.first, value.second);
     }
 
     /*!
@@ -517,7 +408,7 @@ public:
     void insert(FwdIteratorT _begin, FwdIteratorT _end)
     {
         for (; _begin != _end; ++_begin)
-            insert(*_begin);
+            this->insert(*_begin);
     }
 
     /*!
@@ -530,8 +421,8 @@ public:
     template< typename FwdIteratorT, typename OutputIteratorT >
     void insert(FwdIteratorT _begin, FwdIteratorT _end, OutputIteratorT out)
     {
-        for (; begin != _end; ++_begin, ++out)
-            *out = insert(*_begin);
+        for (; _begin != _end; ++_begin, ++out)
+            *out = this->insert(*_begin);
     }
 
     /*!
@@ -541,7 +432,7 @@ public:
      * \param key Attribute name.
      * \return Tne number of erased elements
      */
-    BOOST_LOG_EXPORT size_type erase(key_type const& key);
+    BOOST_LOG_EXPORT size_type erase(key_type key);
     /*!
      * The method erases the specified attribute
      *
@@ -566,19 +457,6 @@ public:
      * \post <tt>empty() == true</tt>
      */
     BOOST_LOG_EXPORT void clear();
-
-private:
-    //! \cond
-
-    //! Internal lookup implementation
-    BOOST_LOG_EXPORT iterator find_impl(const char_type* key, size_type len);
-    //! Internal lookup implementation
-    const_iterator find_impl(const char_type* key, size_type len) const
-    {
-        return const_iterator(const_cast< basic_attribute_set* >(this)->find_impl(key, len));
-    }
-
-    //! \endcond
 };
 
 /*!
@@ -590,8 +468,12 @@ inline void swap(basic_attribute_set< CharT >& left, basic_attribute_set< CharT 
     left.swap(right);
 }
 
+#ifdef BOOST_LOG_USE_CHAR
 typedef basic_attribute_set< char > attribute_set;      //!< Convenience typedef for narrow-character logging
+#endif
+#ifdef BOOST_LOG_USE_WCHAR_T
 typedef basic_attribute_set< wchar_t > wattribute_set;  //!< Convenience typedef for wide-character logging
+#endif
 
 } // namespace log
 
