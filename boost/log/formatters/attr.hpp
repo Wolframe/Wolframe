@@ -29,8 +29,8 @@
 #include <boost/log/formatters/basic_formatters.hpp>
 #include <boost/log/formatters/exception_policies.hpp>
 #include <boost/log/attributes/attribute_name.hpp>
+#include <boost/log/attributes/value_visitation.hpp>
 #include <boost/log/utility/type_dispatch/standard_types.hpp>
-#include <boost/log/utility/attribute_value_extractor.hpp>
 #include <boost/log/keywords/format.hpp>
 
 namespace boost {
@@ -149,8 +149,8 @@ public:
     typedef typename base_type::record_type record_type;
 
 private:
-    //! Attribute value extractor
-    attribute_value_extractor< char_type, AttributeValueTypesT > m_Extractor;
+    //! Visitor invoker for the attribute value
+    value_visitor_invoker< char_type, AttributeValueTypesT > m_Invoker;
 
 public:
     /*!
@@ -158,7 +158,7 @@ public:
      *
      * \param name Attribute name
      */
-    explicit fmt_attr(attribute_name_type const& name) : m_Extractor(name) {}
+    explicit fmt_attr(attribute_name_type const& name) : m_Invoker(name) {}
 
     /*!
      * Formatting operator. Puts the attribute with the specified on construction name from
@@ -170,7 +170,7 @@ public:
     void operator() (ostream_type& strm, record_type const& record) const
     {
         aux::ostream_op< ostream_type > op(strm);
-        if (!m_Extractor(record.attribute_values(), op))
+        if (!m_Invoker(record.attribute_values(), op))
             ExceptionPolicyT::on_attribute_value_not_found(__FILE__, __LINE__);
     }
 };
@@ -319,8 +319,8 @@ public:
     typedef typename base_type::record_type record_type;
 
 private:
-    //! Attribute value extractor
-    attribute_value_extractor< char_type, AttributeValueTypesT > m_Extractor;
+    //! Visitor invoker for the attribute value
+    value_visitor_invoker< char_type, AttributeValueTypesT > m_Invoker;
     //! Formatter object
     mutable format_type m_Formatter;
 
@@ -333,7 +333,7 @@ public:
      *        The placeholder must be compatible with all attribute value types specified in \c AttributeValueTypesT
      */
     explicit fmt_attr_formatted(attribute_name_type const& name, string_type const& fmt) :
-        m_Extractor(name),
+        m_Invoker(name),
         m_Formatter(fmt)
     {
     }
@@ -349,7 +349,7 @@ public:
     {
         boost::log::aux::cleanup_guard< format_type > _(m_Formatter);
         aux::format_op< format_type > op(m_Formatter);
-        if (!m_Extractor(record.attribute_values(), op))
+        if (!m_Invoker(record.attribute_values(), op))
             ExceptionPolicyT::on_attribute_value_not_found(__FILE__, __LINE__);
         strm << m_Formatter;
     }

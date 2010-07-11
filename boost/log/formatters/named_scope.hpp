@@ -28,7 +28,7 @@
 #include <boost/log/attributes/named_scope.hpp>
 #include <boost/log/formatters/basic_formatters.hpp>
 #include <boost/log/formatters/exception_policies.hpp>
-#include <boost/log/utility/attribute_value_extractor.hpp>
+#include <boost/log/attributes/value_visitation.hpp>
 #include <boost/log/keywords/delimiter.hpp>
 #include <boost/log/keywords/depth.hpp>
 #include <boost/log/keywords/iteration.hpp>
@@ -107,8 +107,8 @@ private:
 #endif // BOOST_LOG_DOXYGEN_PASS
 
 private:
-    //! Attribute value extractor
-    attribute_value_extractor< char_type, scope_stack > m_Extractor;
+    //! Visitor invoker for the attribute value
+    value_visitor_invoker< char_type, scope_stack > m_Invoker;
     //! Scope delimiter
     const string_type m_ScopeDelimiter;
     //! Number of scopes to output
@@ -131,7 +131,7 @@ public:
         typename scope_stack::size_type max_scopes,
         scope_iteration_direction direction
     ) :
-        m_Extractor(name),
+        m_Invoker(name),
         m_ScopeDelimiter(delimiter),
         m_MaxScopes(max_scopes),
         m_IterationDirection(direction)
@@ -155,7 +155,7 @@ public:
             &fmt_named_scope::format_reverse
         };
         binder receiver(this, formats[m_IterationDirection], strm);
-        if (!m_Extractor(record.attribute_values(), receiver))
+        if (!m_Invoker(record.attribute_values(), receiver))
             ExceptionPolicyT::on_attribute_value_not_found(__FILE__, __LINE__);
     }
 

@@ -23,11 +23,7 @@
 #include <boost/log/attributes/attribute_value.hpp>
 #include <boost/log/attributes/attribute_values_view.hpp>
 #include "alignment_gap_between.hpp"
-
-#ifndef BOOST_LOG_HASH_TABLE_SIZE_LOG
-// Hash table size will be 2 ^ this value
-#define BOOST_LOG_HASH_TABLE_SIZE_LOG 4
-#endif
+#include "attribute_set_impl.hpp"
 
 namespace boost {
 
@@ -56,6 +52,8 @@ public:
     typedef typename key_type::id_type id_type;
 
 private:
+    typedef typename attribute_set_type::implementation attribute_set_impl_type;
+
     //! Node base class traits for the intrusive list
     struct node_traits
     {
@@ -108,11 +106,11 @@ private:
 
 private:
     //! Pointer to the source-specific attributes
-    const attribute_set_type* m_pSourceAttributes;
+    attribute_set_impl_type* m_pSourceAttributes;
     //! Pointer to the thread-specific attributes
-    const attribute_set_type* m_pThreadAttributes;
+    attribute_set_impl_type* m_pThreadAttributes;
     //! Pointer to the global attributes
-    const attribute_set_type* m_pGlobalAttributes;
+    attribute_set_impl_type* m_pGlobalAttributes;
 
     //! The container with elements
     node_list m_Nodes;
@@ -131,9 +129,9 @@ private:
     implementation(
         node* storage,
         node* eos,
-        attribute_set_type const* source_attrs,
-        attribute_set_type const* thread_attrs,
-        attribute_set_type const* global_attrs
+        attribute_set_impl_type* source_attrs,
+        attribute_set_impl_type* thread_attrs,
+        attribute_set_impl_type* global_attrs
     ) :
         m_pSourceAttributes(source_attrs),
         m_pThreadAttributes(thread_attrs),
@@ -154,9 +152,9 @@ private:
     static implementation* create(
         internal_allocator_type& alloc,
         size_type element_count,
-        attribute_set_type const* source_attrs,
-        attribute_set_type const* thread_attrs,
-        attribute_set_type const* global_attrs)
+        attribute_set_impl_type* source_attrs,
+        attribute_set_impl_type* thread_attrs,
+        attribute_set_impl_type* global_attrs)
     {
         // Calculate the buffer size
         const size_type header_size = sizeof(implementation) +
@@ -180,10 +178,10 @@ public:
     {
         return create(
             alloc,
-            source_attrs.size() + thread_attrs.size() + global_attrs.size(),
-            &source_attrs,
-            &thread_attrs,
-            &global_attrs);
+            source_attrs.m_pImpl->size() + thread_attrs.m_pImpl->size() + global_attrs.m_pImpl->size(),
+            source_attrs.m_pImpl,
+            thread_attrs.m_pImpl,
+            global_attrs.m_pImpl);
     }
 
     //! Creates a copy of the object
@@ -298,7 +296,7 @@ private:
     //! Acquires the attribute value from the attribute sets
     node_base* freeze_node(key_type key, bucket& b, node* where)
     {
-        typename attribute_set_type::const_iterator it = m_pSourceAttributes->find(key);
+        typename attribute_set_type::iterator it = m_pSourceAttributes->find(key);
         if (it == m_pSourceAttributes->end())
         {
             it = m_pThreadAttributes->find(key);
@@ -348,7 +346,7 @@ private:
     }
 
     //! Acquires attribute values from the set of attributes
-    void freeze_nodes_from(const attribute_set_type* attrs)
+    void freeze_nodes_from(attribute_set_impl_type* attrs)
     {
         typename attribute_set_type::const_iterator
             it = attrs->begin(), _end = attrs->end();

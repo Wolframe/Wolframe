@@ -39,7 +39,7 @@
 #include <boost/log/filters/exception_policies.hpp>
 #include <boost/log/attributes/attribute_name.hpp>
 #include <boost/log/attributes/attribute_values_view.hpp>
-#include <boost/log/utility/attribute_value_extractor.hpp>
+#include <boost/log/attributes/value_visitation.hpp>
 
 namespace boost {
 
@@ -92,8 +92,6 @@ class flt_attr :
 {
     //! Base type
     typedef basic_filter< CharT, flt_attr< CharT, FunT, AttributeValueTypesT, ExceptionPolicyT > > base_type;
-    //! Attribute value extractor type
-    typedef attribute_value_extractor< CharT, AttributeValueTypesT > extractor;
 
 public:
     //! Attribute name type
@@ -104,8 +102,8 @@ public:
     typedef FunT checker_type;
 
 private:
-    //! Attribute value extractor
-    extractor m_Extractor;
+    //! Visitor invoker for the attribute value
+    value_visitor_invoker< CharT, AttributeValueTypesT > m_Invoker;
     //! Attribute value checker
     checker_type m_Checker;
 
@@ -117,7 +115,7 @@ public:
      * \param checker A predicate that is applied to the attribute value
      */
     flt_attr(attribute_name_type const& name, checker_type const& checker) :
-        m_Extractor(name),
+        m_Invoker(name),
         m_Checker(checker)
     {
     }
@@ -131,8 +129,8 @@ public:
     bool operator() (values_view_type const& values) const
     {
         bool result = false;
-        aux::predicate_wrapper< checker_type > receiver(m_Checker, result);
-        if (!m_Extractor(values, receiver))
+        aux::predicate_wrapper< checker_type > visitor(m_Checker, result);
+        if (!m_Invoker(values, visitor))
             ExceptionPolicyT::on_attribute_value_not_found(__FILE__, __LINE__);
 
         return result;

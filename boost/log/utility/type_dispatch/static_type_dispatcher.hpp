@@ -56,7 +56,7 @@ struct dispatching_map_order
 };
 
 //! Dispatching map filler
-template< typename ReceiverT >
+template< typename VisitorT >
 struct dispatching_map_initializer
 {
     typedef void result_type;
@@ -78,7 +78,7 @@ struct dispatching_map_initializer
             trampoline_t as_trampoline;
         }
         caster;
-        caster.as_trampoline = &type_visitor_base::trampoline< ReceiverT, T >;
+        caster.as_trampoline = &type_dispatcher::callback_base::trampoline< VisitorT, T >;
         m_p->second = caster.as_pvoid;
 
         ++m_p;
@@ -106,15 +106,15 @@ private:
 
 private:
     //! Pointer to the receiver function
-    void* m_pReceiver;
+    void* m_pVisitor;
 
 public:
     /*!
      * Constructor. Initializes the dispatcher internals.
      */
-    template< typename ReceiverT >
-    explicit type_sequence_dispatcher(ReceiverT& receiver) :
-        m_pReceiver((void*)boost::addressof(receiver))
+    template< typename VisitorT >
+    explicit type_sequence_dispatcher(VisitorT& visitor) :
+        m_pVisitor((void*)boost::addressof(visitor))
     {
         BOOST_LOG_ONCE_BLOCK()
         {
@@ -122,15 +122,15 @@ public:
             typename dispatching_map::value_type* p = &*disp_map.begin();
 
             mpl::for_each< supported_types, mpl::quote1< visible_type > >(
-                dispatching_map_initializer< ReceiverT >(p));
+                dispatching_map_initializer< VisitorT >(p));
 
             std::sort(disp_map.begin(), disp_map.end(), dispatching_map_order());
         }
     }
 
 private:
-    //! The get_visitor method implementation
-    type_visitor_base get_visitor(std::type_info const& type)
+    //! The get_callback method implementation
+    callback_base get_callback(std::type_info const& type)
     {
         dispatching_map const& disp_map = get_dispatching_map();
         type_info_wrapper wrapper(type);
@@ -145,9 +145,9 @@ private:
             );
 
         if (it != end && it->first == wrapper)
-            return type_visitor_base(m_pReceiver, it->second);
+            return callback_base(m_pVisitor, it->second);
         else
-            return type_visitor_base();
+            return callback_base();
     }
 
     //! The method returns the dispatching map instance
@@ -169,26 +169,26 @@ class single_type_dispatcher :
     public type_dispatcher
 {
 private:
-    //! A type visitor
-    type_visitor_base m_Visitor;
+    //! A callback for the supported type
+    callback_base m_Callback;
 
 public:
     //! Constructor
-    template< typename ReceiverT >
-    explicit single_type_dispatcher(ReceiverT& receiver) :
-        m_Visitor(
-            (void*)boost::addressof(receiver),
-            &type_visitor_base::trampoline< ReceiverT, T >
+    template< typename VisitorT >
+    explicit single_type_dispatcher(VisitorT& visitor) :
+        m_Callback(
+            (void*)boost::addressof(visitor),
+            &callback_base::trampoline< VisitorT, T >
         )
     {
     }
-    //! The get_visitor method implementation
-    type_visitor_base get_visitor(std::type_info const& type)
+    //! The get_callback method implementation
+    callback_base get_callback(std::type_info const& type)
     {
         if (type == typeid(visible_type< T >))
-            return m_Visitor;
+            return m_Callback;
         else
-            return type_visitor_base();
+            return callback_base();
     }
 
 private:

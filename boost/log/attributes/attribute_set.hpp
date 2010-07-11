@@ -144,10 +144,7 @@ private:
     {
         value_type m_Value;
 
-        node();
-        node(node const& that);
         node(key_type const& key, mapped_type const& data);
-        node& operator= (node const& that);
     };
 
     //! Iterator class

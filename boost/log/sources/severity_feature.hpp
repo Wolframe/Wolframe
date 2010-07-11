@@ -96,11 +96,11 @@ namespace aux {
         //! The method dispatches the value to the given object
         virtual bool dispatch(type_dispatcher& dispatcher)
         {
-            type_visitor< held_type > visitor =
-                dispatcher.get_visitor< held_type >();
-            if (visitor)
+            type_dispatcher::callback< held_type > callback =
+                dispatcher.get_callback< held_type >();
+            if (callback)
             {
-                visitor(static_cast< held_type >(get_severity_level()));
+                callback(static_cast< held_type >(get_severity_level()));
                 return true;
             }
             else

@@ -19,11 +19,10 @@
 #ifndef BOOST_LOG_FILTERS_HAS_ATTR_HPP_INCLUDED_
 #define BOOST_LOG_FILTERS_HAS_ATTR_HPP_INCLUDED_
 
-#include <string>
 #include <boost/log/detail/prologue.hpp>
 #include <boost/log/detail/functional.hpp>
 #include <boost/log/attributes/attribute_name.hpp>
-#include <boost/log/utility/attribute_value_extractor.hpp>
+#include <boost/log/attributes/value_visitation.hpp>
 #include <boost/log/filters/basic_filters.hpp>
 
 namespace boost {
@@ -44,8 +43,6 @@ class flt_has_attr :
 private:
     //! Base type
     typedef basic_filter< CharT, flt_has_attr< CharT, AttributeValueTypesT > > base_type;
-    //! Attribute value extractor type
-    typedef attribute_value_extractor< CharT, AttributeValueTypesT > extractor;
 
 public:
     //! Attribute values container type
@@ -56,8 +53,8 @@ public:
     typedef typename base_type::attribute_name_type attribute_name_type;
 
 private:
-    //! Attribute extractor
-    extractor m_Extractor;
+    //! Visitor invoker for the attribute value
+    value_visitor_invoker< char_type, AttributeValueTypesT > m_Invoker;
 
 public:
     /*!
@@ -65,7 +62,7 @@ public:
      *
      * \param name Attribute name
      */
-    explicit flt_has_attr(attribute_name_type const& name) : m_Extractor(name) {}
+    explicit flt_has_attr(attribute_name_type const& name) : m_Invoker(name) {}
 
     /*!
      * Applies the filter
@@ -75,7 +72,7 @@ public:
      */
     bool operator() (values_view_type const& values) const
     {
-        return (m_Extractor(values, boost::log::aux::nop()).code() == value_extracted);
+        return (m_Invoker(values, boost::log::aux::nop()).code() == visitation_result::ok);
     }
 };
 

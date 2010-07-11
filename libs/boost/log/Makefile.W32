@@ -32,8 +32,7 @@ LOG_OBJS = \
 	text_ostream_backend.obj \
 	thread_specific.obj \
 	timer.obj \
-	trivial.obj \
-	slim_string.obj
+	trivial.obj
 	
 LOG_SETUP_OBJS = \
 	parser_utils.obj \

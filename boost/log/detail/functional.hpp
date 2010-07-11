@@ -445,6 +445,36 @@ inline binder3rd< FunT, ThirdArgT > bind3rd(FunT const& fun, ThirdArgT const& ar
     return binder3rd< FunT, ThirdArgT >(fun, arg);
 }
 
+//! Reference wrapper for function objects
+template< typename FunT >
+struct function_reference_wrapper
+{
+    typedef typename FunT::result_type result_type;
+
+    explicit function_reference_wrapper(FunT& fun) : m_Fun(fun) {}
+
+    template< typename T >
+    result_type operator() (T const& arg) const
+    {
+        return m_Fun(arg);
+    }
+
+    template< typename T1, typename T2 >
+    result_type operator() (T1 const& arg1, T2 const& arg2) const
+    {
+        return m_Fun(arg1, arg2);
+    }
+
+private:
+    FunT& m_Fun;
+};
+
+template< typename FunT >
+inline function_reference_wrapper< FunT > fun_ref(FunT& fun)
+{
+    return function_reference_wrapper< FunT >(fun);
+}
+
 } // namespace aux
 
 } // namespace log

@@ -54,11 +54,11 @@ public:
 public:
     virtual bool dispatch(type_dispatcher& dispatcher)
     {
-        type_visitor< held_type > visitor =
-            dispatcher.get_visitor< held_type >();
-        if (visitor)
+        type_dispatcher::callback< held_type > callback =
+            dispatcher.get_callback< held_type >();
+        if (callback)
         {
-            visitor(this_thread::get_id());
+            callback(this_thread::get_id());
             return true;
         }
         else
