@@ -22,8 +22,6 @@
 #include <boost/log/detail/prologue.hpp>
 #include <boost/log/exceptions.hpp>
 
-#include <boost/log/noreturn.hpp>
-
 namespace boost {
 
 namespace BOOST_LOG_NAMESPACE {
@@ -49,7 +47,7 @@ struct no_throw_policy
  */
 struct throw_policy
 {
-    static void on_attribute_value_not_found(const char* file, unsigned int line) NORETURN
+    BOOST_LOG_NORETURN static void on_attribute_value_not_found(const char* file, unsigned int line)
     {
         missing_value::throw_(file, line, "Requested attribute value not found");
     }
