@@ -21,7 +21,6 @@
 #define BOOST_LOG_SOURCES_BASIC_LOGGER_HPP_INCLUDED_
 
 #include <exception>
-#include <string>
 #include <utility>
 #include <ostream>
 #include <boost/assert.hpp>
@@ -36,6 +35,7 @@
 #include <boost/log/detail/prologue.hpp>
 #include <boost/log/detail/parameter_tools.hpp>
 #include <boost/log/attributes/attribute_set.hpp>
+#include <boost/log/attributes/attribute_name.hpp>
 #include <boost/log/core/core.hpp>
 #include <boost/log/core/record.hpp>
 #include <boost/log/sources/features.hpp>
@@ -90,8 +90,8 @@ public:
     //! Final logger type
     typedef FinalT final_type;
 
-    //! String type to be used as a message text holder
-    typedef std::basic_string< char_type > string_type;
+    //! Attribute name type
+    typedef basic_attribute_name< char_type > attribute_name_type;
     //! Attribute set type
     typedef basic_attribute_set< char_type > attribute_set_type;
     //! Logging system core type
@@ -221,7 +221,7 @@ protected:
      * Unlocked \c add_attribute
      */
     std::pair< typename attribute_set_type::iterator, bool > add_attribute_unlocked(
-        string_type const& name, shared_ptr< attribute > const& attr)
+        attribute_name_type const& name, shared_ptr< attribute > const& attr)
     {
         return m_Attributes.insert(std::make_pair(name, attr));
     }
@@ -329,10 +329,10 @@ protected:
 public:
     //! Threading model being used
     typedef typename base_type::threading_model threading_model;
+    //! Attribute name type
+    typedef typename base_type::attribute_name_type attribute_name_type;
     //! Attribute set type
     typedef typename base_type::attribute_set_type attribute_set_type;
-    //! String type
-    typedef typename base_type::string_type string_type;
     //! Log record type
     typedef typename base_type::record_type record_type;
 
@@ -388,7 +388,7 @@ public:
      *         addition.
      */
     std::pair< typename attribute_set_type::iterator, bool > add_attribute(
-        string_type const& name, shared_ptr< attribute > const& attr)
+        attribute_name_type const& name, shared_ptr< attribute > const& attr)
     {
         typename base_type::add_attribute_lock _(base_type::get_threading_model());
         return base_type::add_attribute_unlocked(name, attr);
@@ -515,8 +515,8 @@ protected:
 
 public:
     typedef typename base_type::threading_model threading_model;
+    typedef typename base_type::attribute_name_type attribute_name_type;
     typedef typename base_type::attribute_set_type attribute_set_type;
-    typedef typename base_type::string_type string_type;
     typedef typename base_type::record_type record_type;
 
 #endif // !defined(BOOST_LOG_NO_THREADS)
@@ -539,7 +539,7 @@ public:
     }
 
     std::pair< typename attribute_set_type::iterator, bool > add_attribute(
-        string_type const& name, shared_ptr< attribute > const& attr)
+        attribute_name_type const& name, shared_ptr< attribute > const& attr)
     {
         return base_type::add_attribute_unlocked(name, attr);
     }

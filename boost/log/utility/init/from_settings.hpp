@@ -51,11 +51,12 @@ namespace BOOST_LOG_NAMESPACE {
  * compatible with <tt>boost::any</tt>, which is used to store parameters. Individual
  * parameters may be queried via subscript operators, like this:
  *
- * <code>
+ * <code><pre>
  * any param = settings["Section1"]["Param1"]; // reads parameter "Param1" in section "Section1"
  *                                             // returns empty value if no such parameter exists
- * settings["Section2"]["Param2"] = 10; // sets the parameter "Param2" in section "Section2" to value 10 (of type int)
- * </code>
+ * settings["Section2"]["Param2"] = 10; // sets the parameter "Param2" in section "Section2"
+ *                                      // to value 10 (of type int)
+ * </pre></code>
  *
  * There are also other methods to work with parameters.
  */

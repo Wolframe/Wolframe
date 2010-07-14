@@ -12,6 +12,7 @@ LIBRARIES = \
 	libboost_log_setup$(BOOST_LIBRARY_TAG).lib
 
 LOG_OBJS = \
+	attribute_name.obj \
 	attribute_set.obj \
 	attribute_values_view.obj \
 	code_conversion.obj \
@@ -31,8 +32,7 @@ LOG_OBJS = \
 	text_ostream_backend.obj \
 	thread_specific.obj \
 	timer.obj \
-	trivial.obj \
-	slim_string.obj
+	trivial.obj
 	
 LOG_SETUP_OBJS = \
 	parser_utils.obj \

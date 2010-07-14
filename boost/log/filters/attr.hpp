@@ -37,8 +37,9 @@
 #include <boost/log/detail/embedded_string_type.hpp>
 #include <boost/log/filters/basic_filters.hpp>
 #include <boost/log/filters/exception_policies.hpp>
+#include <boost/log/attributes/attribute_name.hpp>
 #include <boost/log/attributes/attribute_values_view.hpp>
-#include <boost/log/utility/attribute_value_extractor.hpp>
+#include <boost/log/attributes/value_visitation.hpp>
 
 namespace boost {
 
@@ -91,20 +92,18 @@ class flt_attr :
 {
     //! Base type
     typedef basic_filter< CharT, flt_attr< CharT, FunT, AttributeValueTypesT, ExceptionPolicyT > > base_type;
-    //! Attribute value extractor type
-    typedef attribute_value_extractor< CharT, AttributeValueTypesT > extractor;
 
 public:
-    //! String type
-    typedef typename base_type::string_type string_type;
+    //! Attribute name type
+    typedef typename base_type::attribute_name_type attribute_name_type;
     //! Attribute values container type
     typedef typename base_type::values_view_type values_view_type;
     //! Predicate functor type
     typedef FunT checker_type;
 
 private:
-    //! Attribute value extractor
-    extractor m_Extractor;
+    //! Visitor invoker for the attribute value
+    value_visitor_invoker< CharT, AttributeValueTypesT > m_Invoker;
     //! Attribute value checker
     checker_type m_Checker;
 
@@ -115,8 +114,9 @@ public:
      * \param name The attribute name
      * \param checker A predicate that is applied to the attribute value
      */
-    flt_attr(string_type const& name, checker_type const& checker)
-        : m_Extractor(name), m_Checker(checker)
+    flt_attr(attribute_name_type const& name, checker_type const& checker) :
+        m_Invoker(name),
+        m_Checker(checker)
     {
     }
 
@@ -129,8 +129,8 @@ public:
     bool operator() (values_view_type const& values) const
     {
         bool result = false;
-        aux::predicate_wrapper< checker_type > receiver(m_Checker, result);
-        if (!m_Extractor(values, receiver))
+        aux::predicate_wrapper< checker_type > visitor(m_Checker, result);
+        if (!m_Invoker(values, visitor))
             ExceptionPolicyT::on_attribute_value_not_found(__FILE__, __LINE__);
 
         return result;
@@ -152,8 +152,8 @@ namespace aux {
     public:
         //! Char type
         typedef CharT char_type;
-        //! String type
-        typedef std::basic_string< char_type > string_type;
+        //! Attribute name type
+        typedef basic_attribute_name< char_type > attribute_name_type;
         //! Attribute values container type
         typedef basic_attribute_values_view< char_type > values_view_type;
         //! Size type
@@ -163,10 +163,10 @@ namespace aux {
 
     protected:
         //! Attribute name
-        string_type m_AttributeName;
+        attribute_name_type m_AttributeName;
 
     public:
-        explicit flt_attr_gen_base(string_type const& name) : m_AttributeName(name) {}
+        explicit flt_attr_gen_base(attribute_name_type const& name) : m_AttributeName(name) {}
 
 #define BOOST_LOG_FILTER_ATTR_MEMBER(member, fun)\
         template< typename T >\
@@ -242,8 +242,8 @@ namespace aux {
     public:
         //! Char type
         typedef typename base_type::char_type char_type;
-        //! String type
-        typedef typename base_type::string_type string_type;
+        //! Attribute name type
+        typedef typename base_type::attribute_name_type attribute_name_type;
         //! Supported attribute value types (actually, a single string type in this specialization)
         typedef typename base_type::attribute_value_types attribute_value_types;
 
@@ -252,7 +252,7 @@ namespace aux {
         typedef typename attribute_value_types::value_type attribute_value_char_type;
 
     public:
-        explicit flt_attr_gen_base(string_type const& name) : base_type(name) {}
+        explicit flt_attr_gen_base(attribute_name_type const& name) : base_type(name) {}
 
         BOOST_LOG_FILTER_ATTR_MEMBER(begins_with, boost::log::aux::begins_with_fun)
         BOOST_LOG_FILTER_ATTR_MEMBER(ends_with, boost::log::aux::ends_with_fun)
@@ -341,34 +341,18 @@ namespace aux {
         > base_type;
 
     public:
-        //! String type
-        typedef typename base_type::string_type string_type;
+        //! Attribute name type
+        typedef typename base_type::attribute_name_type attribute_name_type;
 
     public:
-        explicit flt_attr_gen(string_type const& name) : base_type(name) {}
+        explicit flt_attr_gen(attribute_name_type const& name) : base_type(name) {}
     };
 
 } // namespace aux
 
 #endif // BOOST_LOG_DOXYGEN_PASS
 
-/*!
- * The function generates an attribute placeholder in filter expressions
- *
- * \param name Attribute name. Must point to a zero-terminated string, must not be NULL.
- * \return An object that will, upon applying a corresponding operation to it, construct the filter.
- */
-template< typename AttributeValueTypesT, typename CharT >
-inline
-#ifndef BOOST_LOG_DOXYGEN_PASS
-aux::flt_attr_gen< CharT, AttributeValueTypesT, throw_policy >
-#else
-implementation_defined
-#endif
-attr(const CharT* name)
-{
-    return aux::flt_attr_gen< CharT, AttributeValueTypesT, throw_policy >(name);
-}
+#ifdef BOOST_LOG_USE_CHAR
 
 /*!
  * The function generates an attribute placeholder in filter expressions
@@ -376,36 +360,16 @@ attr(const CharT* name)
  * \param name Attribute name.
  * \return An object that will, upon applying a corresponding operation to it, construct the filter.
  */
-template< typename AttributeValueTypesT, typename CharT >
+template< typename AttributeValueTypesT >
 inline
 #ifndef BOOST_LOG_DOXYGEN_PASS
-aux::flt_attr_gen< CharT, AttributeValueTypesT, throw_policy >
+aux::flt_attr_gen< char, AttributeValueTypesT, throw_policy >
 #else
 implementation_defined
 #endif
-attr(std::basic_string< CharT > const& name)
+attr(basic_attribute_name< char > const& name)
 {
-    return aux::flt_attr_gen< CharT, AttributeValueTypesT, throw_policy >(name);
-}
-
-/*!
- * The function generates an attribute placeholder in filter expressions.
- * The filter will not throw if the attribute value is not found in the record being filtered.
- * Instead, a negative result will be returned.
- *
- * \param name Attribute name. Must point to a zero-terminated string, must not be NULL.
- * \return An object that will, upon applying a corresponding operation to it, construct the filter.
- */
-template< typename AttributeValueTypesT, typename CharT >
-inline
-#ifndef BOOST_LOG_DOXYGEN_PASS
-aux::flt_attr_gen< CharT, AttributeValueTypesT, no_throw_policy >
-#else
-implementation_defined
-#endif
-attr(const CharT* name, std::nothrow_t const&)
-{
-    return aux::flt_attr_gen< CharT, AttributeValueTypesT, no_throw_policy >(name);
+    return aux::flt_attr_gen< char, AttributeValueTypesT, throw_policy >(name);
 }
 
 /*!
@@ -416,17 +380,61 @@ attr(const CharT* name, std::nothrow_t const&)
  * \param name Attribute name.
  * \return An object that will, upon applying a corresponding operation to it, construct the filter.
  */
-template< typename AttributeValueTypesT, typename CharT >
+template< typename AttributeValueTypesT >
 inline
 #ifndef BOOST_LOG_DOXYGEN_PASS
-aux::flt_attr_gen< CharT, AttributeValueTypesT, no_throw_policy >
+aux::flt_attr_gen< char, AttributeValueTypesT, no_throw_policy >
 #else
 implementation_defined
 #endif
-attr(std::basic_string< CharT > const& name, std::nothrow_t const&)
+attr(basic_attribute_name< char > const& name, std::nothrow_t const&)
 {
-    return aux::flt_attr_gen< CharT, AttributeValueTypesT, no_throw_policy >(name);
+    return aux::flt_attr_gen< char, AttributeValueTypesT, no_throw_policy >(name);
 }
+
+#endif // BOOST_LOG_USE_CHAR
+
+#ifdef BOOST_LOG_USE_WCHAR_T
+
+/*!
+ * The function generates an attribute placeholder in filter expressions
+ *
+ * \param name Attribute name.
+ * \return An object that will, upon applying a corresponding operation to it, construct the filter.
+ */
+template< typename AttributeValueTypesT >
+inline
+#ifndef BOOST_LOG_DOXYGEN_PASS
+aux::flt_attr_gen< wchar_t, AttributeValueTypesT, throw_policy >
+#else
+implementation_defined
+#endif
+attr(basic_attribute_name< wchar_t > const& name)
+{
+    return aux::flt_attr_gen< wchar_t, AttributeValueTypesT, throw_policy >(name);
+}
+
+/*!
+ * The function generates an attribute placeholder in filter expressions.
+ * The filter will not throw if the attribute value is not found in the record being filtered.
+ * Instead, a negative result will be returned.
+ *
+ * \param name Attribute name.
+ * \return An object that will, upon applying a corresponding operation to it, construct the filter.
+ */
+template< typename AttributeValueTypesT >
+inline
+#ifndef BOOST_LOG_DOXYGEN_PASS
+aux::flt_attr_gen< wchar_t, AttributeValueTypesT, no_throw_policy >
+#else
+implementation_defined
+#endif
+attr(basic_attribute_name< wchar_t > const& name, std::nothrow_t const&)
+{
+    return aux::flt_attr_gen< wchar_t, AttributeValueTypesT, no_throw_policy >(name);
+}
+
+#endif // BOOST_LOG_USE_WCHAR_T
 
 } // namespace filters
 

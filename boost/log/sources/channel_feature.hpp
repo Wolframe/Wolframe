@@ -19,6 +19,7 @@
 #ifndef BOOST_LOG_SOURCES_CHANNEL_FEATURE_HPP_INCLUDED_
 #define BOOST_LOG_SOURCES_CHANNEL_FEATURE_HPP_INCLUDED_
 
+#include <string>
 #include <boost/none.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
@@ -82,8 +83,6 @@ public:
     typedef typename base_type::final_type final_type;
     //! Attribute set type
     typedef typename base_type::attribute_set_type attribute_set_type;
-    //! String type
-    typedef typename base_type::string_type string_type;
     //! Threading model being used
     typedef typename base_type::threading_model threading_model;
 
@@ -202,7 +201,7 @@ struct channel
             BaseT,
             typename mpl::if_<
                 is_void< ChannelT >,
-                typename BaseT::string_type,
+                std::basic_string< typename BaseT::char_type >,
                 ChannelT
             >::type
         > type;

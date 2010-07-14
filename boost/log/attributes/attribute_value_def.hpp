@@ -21,7 +21,6 @@
 #define BOOST_LOG_ATTRIBUTE_VALUE_DEF_HPP_INCLUDED_
 
 #include <boost/shared_ptr.hpp>
-#include <boost/optional/optional_fwd.hpp>
 #include <boost/log/detail/prologue.hpp>
 #include <boost/log/utility/explicit_operator_bool.hpp>
 #include <boost/log/utility/type_dispatch/type_dispatcher.hpp>
@@ -91,6 +90,16 @@ public:
         virtual shared_ptr< implementation > detach_from_thread() = 0;
     };
 
+    /*!
+     * \brief A metafunction that allows to acquire the result of the value extraction
+     *
+     * The metafunction results in a type that is in form of <tt>optional< T ></tt>, if \c T is
+     * not a MPL type sequence, or <tt>optional< variant< T1, T2, ... > ></tt> otherwise, with
+     * \c T1, \c T2, etc. being the types comprising the type sequence \c T.
+     */
+    template< typename T >
+    struct result_of_extract;
+
 private:
     //! Pointer to the value implementation
     shared_ptr< implementation > m_pImpl;
@@ -105,7 +114,7 @@ public:
      *
      * \param p A pointer to the attribute value holder.
      */
-    explicit attribute_value(shared_ptr< implementation > const& p) : m_pImpl(p) {}
+    explicit attribute_value(shared_ptr< implementation > p) { m_pImpl.swap(p); }
 
     /*!
      * The operator checks if the attribute value is empty
@@ -145,27 +154,31 @@ public:
 
     /*!
      * The method attempts to extract the stored value, assuming the value has the specified type.
-     *
-     * \return The extracted value, if the attribute value is not empty and the value is the same
-     *         as specified. Otherwise returns an empty value.
-     */
-    template< typename T >
-    optional< T > extract() const;
-
-    /*!
-     * The method attempts to extract the stored value, assuming the value has the specified type.
      * One can specify either a single type or a MPL type sequence, in which case the stored value
      * is checked against every type in the sequence.
      *
-     * \param receiver A function object that will be invoked on the extracted attribute value.
-     *                 The receiver should be capable to be called with a single argument of
-     *                 any type of the specified types in \c T.
+     * \return The extracted value, if the attribute value is not empty and the value is the same
+     *         as specified. Otherwise returns an empty value. See description of the \c result_of_extract
+     *         metafunction for information on the nature of the result value.
+     */
+    template< typename T >
+    typename result_of_extract< T >::type extract() const;
+
+    /*!
+     * The method attempts to extract the stored value, assuming the value has the specified type,
+     * and pass it to the \a visitor function object.
+     * One can specify either a single type or a MPL type sequence, in which case the stored value
+     * is checked against every type in the sequence.
      *
-     * \return \c true, if the stored value has the requested type and had been passed to the \c receiver.
+     * \param visitor A function object that will be invoked on the extracted attribute value.
+     *                The visitor should be capable to be called with a single argument of
+     *                any type of the specified types in \c T.
+     *
+     * \return \c true, if the stored value has the requested type and had been passed to the \a visitor.
      *         Otherwise the method returns \c false.
      */
-    template< typename T, typename ReceiverT >
-    bool extract(ReceiverT receiver) const;
+    template< typename T, typename VisitorT >
+    bool visit(VisitorT visitor) const;
 
     /*!
      * The method swaps two attribute values

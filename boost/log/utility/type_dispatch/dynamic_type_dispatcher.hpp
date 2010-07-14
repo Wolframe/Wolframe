@@ -51,17 +51,17 @@ class dynamic_type_dispatcher :
 {
 private:
 #ifndef BOOST_LOG_DOXYGEN_PASS
-    template< typename T, typename FunT >
-    class visitor :
-        public aux::type_visitor_base
+    template< typename T, typename VisitorT >
+    class callback_impl :
+        public callback_base
     {
     private:
-        FunT m_Fun;
+        VisitorT m_Visitor;
 
     public:
-        explicit visitor(FunT const& fun) : m_Fun(fun)
+        explicit callback_impl(VisitorT const& visitor) : m_Visitor(visitor)
         {
-            this->m_pReceiver = (void*)boost::addressof(m_Fun);
+            this->m_pVisitor = (void*)boost::addressof(m_Visitor);
             typedef void (*trampoline_t)(void*, T const&);
             BOOST_STATIC_ASSERT(sizeof(trampoline_t) == sizeof(void*));
             union
@@ -70,27 +70,27 @@ private:
                 trampoline_t as_trampoline;
             }
             caster;
-            caster.as_trampoline = &aux::type_visitor_base::trampoline< FunT, T >;
+            caster.as_trampoline = &callback_base::trampoline< VisitorT, T >;
             this->m_pTrampoline = caster.as_pvoid;
         }
     };
 #endif // BOOST_LOG_DOXYGEN_PASS
 
     //! The dispatching map
-    typedef std::map< type_info_wrapper, shared_ptr< aux::type_visitor_base > > dispatching_map;
+    typedef std::map< type_info_wrapper, shared_ptr< callback_base > > dispatching_map;
     dispatching_map m_DispatchingMap;
 
 public:
     /*!
      * The method registers a new type
      *
-     * \param fun Function object that will be associated with the type \c T
+     * \param visitor Function object that will be associated with the type \c T
      */
-    template< typename T, typename FunT >
-    void register_type(FunT const& fun)
+    template< typename T, typename VisitorT >
+    void register_type(VisitorT const& visitor)
     {
-        boost::shared_ptr< aux::type_visitor_base > p(
-            boost::make_shared< visitor< T, FunT > >(boost::cref(fun)));
+        boost::shared_ptr< callback_base > p(
+            boost::make_shared< callback_impl< T, VisitorT > >(boost::cref(visitor)));
 
         type_info_wrapper wrapper(typeid(aux::visible_type< T >));
         m_DispatchingMap[wrapper].swap(p);
@@ -106,14 +106,14 @@ public:
 
 private:
 #ifndef BOOST_LOG_DOXYGEN_PASS
-    aux::type_visitor_base get_visitor(std::type_info const& type)
+    callback_base get_callback(std::type_info const& type)
     {
         type_info_wrapper wrapper(type);
         dispatching_map::iterator it = m_DispatchingMap.find(wrapper);
         if (it != m_DispatchingMap.end())
             return *it->second;
         else
-            return aux::type_visitor_base();
+            return callback_base();
     }
 #endif // BOOST_LOG_DOXYGEN_PASS
 };

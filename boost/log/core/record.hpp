@@ -183,7 +183,8 @@ private:
         string_type m_Message;
 
         //! Constructor from the attribute sets
-        explicit public_data(values_view_type const& values) :
+        template< typename SourceT >
+        explicit public_data(SourceT const& values) :
             m_Detached(false),
             m_AttributeValues(values)
         {

@@ -23,13 +23,13 @@
 #define BOOST_LOG_SINKS_ATTRIBUTE_MAPPING_HPP_INCLUDED_
 
 #include <map>
-#include <string>
 #include <functional>
 #include <boost/log/detail/prologue.hpp>
 #include <boost/log/detail/tagged_integer.hpp>
 #include <boost/log/core/record.hpp>
+#include <boost/log/attributes/attribute_name.hpp>
 #include <boost/log/attributes/attribute_values_view.hpp>
-#include <boost/log/utility/attribute_value_extractor.hpp>
+#include <boost/log/attributes/value_visitation.hpp>
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -52,8 +52,8 @@ struct basic_mapping :
 {
     //! Char type
     typedef CharT char_type;
-    //! String type
-    typedef std::basic_string< char_type > string_type;
+    //! Attribute name type
+    typedef basic_attribute_name< char_type > attribute_name_type;
     //! Attribute values view type
     typedef basic_attribute_values_view< char_type > values_view_type;
     //! Log record type
@@ -64,14 +64,14 @@ struct basic_mapping :
 
 namespace aux {
 
-    //! Attribute value receiver
+    //! Attribute value visitor
     template< typename MappedT >
-    struct direct_mapping_receiver
+    struct direct_mapping_visitor
     {
         typedef void result_type;
         typedef MappedT mapped_type;
 
-        explicit direct_mapping_receiver(mapped_type& extracted) :
+        explicit direct_mapping_visitor(mapped_type& extracted) :
             m_Extracted(extracted)
         {
         }
@@ -86,12 +86,12 @@ namespace aux {
     };
     //  Specialization for the tagged integer
     template< typename IntT, typename TagT >
-    struct direct_mapping_receiver< boost::log::aux::tagged_integer< IntT, TagT > >
+    struct direct_mapping_visitor< boost::log::aux::tagged_integer< IntT, TagT > >
     {
         typedef void result_type;
         typedef boost::log::aux::tagged_integer< IntT, TagT > mapped_type;
 
-        explicit direct_mapping_receiver(mapped_type& extracted) :
+        explicit direct_mapping_visitor(mapped_type& extracted) :
             m_Extracted(extracted)
         {
         }
@@ -127,8 +127,8 @@ public:
     typedef AttributeValueT attribute_value_type;
     //! Char type
     typedef typename base_type::char_type char_type;
-    //! String type
-    typedef typename base_type::string_type string_type;
+    //! Attribute name type
+    typedef typename base_type::attribute_name_type attribute_name_type;
     //! Attribute values view type
     typedef typename base_type::values_view_type values_view_type;
     //! Log record type
@@ -137,8 +137,8 @@ public:
     typedef typename base_type::mapped_type mapped_type;
 
 private:
-    //! Attribute value extractor
-    attribute_value_extractor< char_type, attribute_value_type > m_Extractor;
+    //! Visitor invoker for the attribute value
+    value_visitor_invoker< char_type, attribute_value_type > m_Invoker;
     //! Default native value
     mapped_type m_DefaultValue;
 
@@ -149,8 +149,8 @@ public:
      * \param name Attribute name
      * \param default_value The default native value that is returned if the attribute value is not found
      */
-    explicit basic_direct_mapping(string_type const& name, mapped_type const& default_value) :
-        m_Extractor(name),
+    explicit basic_direct_mapping(attribute_name_type const& name, mapped_type const& default_value) :
+        m_Invoker(name),
         m_DefaultValue(default_value)
     {
     }
@@ -164,8 +164,8 @@ public:
     mapped_type operator() (record_type const& rec) const
     {
         mapped_type res = m_DefaultValue;
-        aux::direct_mapping_receiver< mapped_type > rcv(res);
-        m_Extractor(rec.attribute_values(), rcv);
+        aux::direct_mapping_visitor< mapped_type > vis(res);
+        m_Invoker(rec.attribute_values(), vis);
         return res;
     }
 };
@@ -193,8 +193,8 @@ public:
     typedef AttributeValueT attribute_value_type;
     //! Char type
     typedef typename base_type::char_type char_type;
-    //! String type
-    typedef typename base_type::string_type string_type;
+    //! Attribute name type
+    typedef typename base_type::attribute_name_type attribute_name_type;
     //! Attribute values view type
     typedef typename base_type::values_view_type values_view_type;
     //! Log record type
@@ -226,14 +226,14 @@ private:
         }
     };
 
-    //! Attribute value receiver
-    struct receiver;
-    friend struct receiver;
-    struct receiver
+    //! Attribute value visitor
+    struct visitor;
+    friend struct visitor;
+    struct visitor
     {
         typedef void result_type;
 
-        receiver(mapping_type const& mapping, mapped_type& extracted) :
+        visitor(mapping_type const& mapping, mapped_type& extracted) :
             m_Mapping(mapping),
             m_Extracted(extracted)
         {
@@ -254,8 +254,8 @@ private:
     //! \endcond
 
 private:
-    //! Attribute value extractor
-    attribute_value_extractor< char_type, attribute_value_type > m_Extractor;
+    //! Visitor invoker for the attribute value
+    value_visitor_invoker< char_type, attribute_value_type > m_Invoker;
     //! Default native value
     mapped_type m_DefaultValue;
     //! Conversion mapping
@@ -268,8 +268,8 @@ public:
      * \param name Attribute name
      * \param default_value The default native value that is returned if the conversion cannot be performed
      */
-    explicit basic_custom_mapping(string_type const& name, mapped_type const& default_value) :
-        m_Extractor(name),
+    explicit basic_custom_mapping(attribute_name_type const& name, mapped_type const& default_value) :
+        m_Invoker(name),
         m_DefaultValue(default_value)
     {
     }
@@ -284,8 +284,8 @@ public:
     mapped_type operator() (record_type const& rec) const
     {
         mapped_type res = m_DefaultValue;
-        receiver rcv(m_Mapping, res);
-        m_Extractor(rec.attribute_values(), rcv);
+        visitor vis(m_Mapping, res);
+        m_Invoker(rec.attribute_values(), vis);
         return res;
     }
     /*!

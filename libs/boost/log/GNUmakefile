@@ -9,6 +9,7 @@ INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)
 
 LOG_OBJS = \
+	attribute_name.o \
 	attribute_set.o \
 	attribute_values_view.o \
 	code_conversion.o \
@@ -27,8 +28,7 @@ LOG_OBJS = \
 	text_ostream_backend.o \
 	thread_specific.o \
 	timer.o \
-	trivial.o \
-	slim_string.o
+	trivial.o
 
 LOG_SETUP_OBJS = \
 	parser_utils.o \

@@ -79,8 +79,8 @@ namespace event_log {
         typedef basic_direct_mapping< CharT, event_type, AttributeValueT > base_type;
 
     public:
-        //! String type
-        typedef typename base_type::string_type string_type;
+        //! Attribute name type
+        typedef typename base_type::attribute_name_type attribute_name_type;
 
     public:
         /*!
@@ -88,7 +88,7 @@ namespace event_log {
          *
          * \param name Attribute name
          */
-        explicit basic_direct_event_type_mapping(string_type const& name) :
+        explicit basic_direct_event_type_mapping(attribute_name_type const& name) :
             base_type(name, info)
         {
         }
@@ -109,8 +109,8 @@ namespace event_log {
         typedef basic_custom_mapping< CharT, event_type, AttributeValueT > base_type;
 
     public:
-        //! String type
-        typedef typename base_type::string_type string_type;
+        //! Attribute name type
+        typedef typename base_type::attribute_name_type attribute_name_type;
 
     public:
         /*!
@@ -118,7 +118,7 @@ namespace event_log {
          *
          * \param name Attribute name
          */
-        explicit basic_custom_event_type_mapping(string_type const& name) :
+        explicit basic_custom_event_type_mapping(attribute_name_type const& name) :
             base_type(name, info)
         {
         }
@@ -139,8 +139,8 @@ namespace event_log {
         typedef basic_direct_mapping< CharT, event_id, AttributeValueT > base_type;
 
     public:
-        //! String type
-        typedef typename base_type::string_type string_type;
+        //! Attribute name type
+        typedef typename base_type::attribute_name_type attribute_name_type;
 
     public:
         /*!
@@ -148,7 +148,7 @@ namespace event_log {
          *
          * \param name Attribute name
          */
-        explicit basic_direct_event_id_mapping(string_type const& name) :
+        explicit basic_direct_event_id_mapping(attribute_name_type const& name) :
             base_type(name, make_event_id(0))
         {
         }
@@ -169,8 +169,8 @@ namespace event_log {
         typedef basic_custom_mapping< CharT, event_id, AttributeValueT > base_type;
 
     public:
-        //! String type
-        typedef typename base_type::string_type string_type;
+        //! Attribute name type
+        typedef typename base_type::attribute_name_type attribute_name_type;
 
     public:
         /*!
@@ -178,7 +178,7 @@ namespace event_log {
          *
          * \param name Attribute name
          */
-        explicit basic_custom_event_id_mapping(string_type const& name) :
+        explicit basic_custom_event_id_mapping(attribute_name_type const& name) :
             base_type(name, make_event_id(0))
         {
         }
@@ -199,8 +199,8 @@ namespace event_log {
         typedef basic_direct_mapping< CharT, event_category, AttributeValueT > base_type;
 
     public:
-        //! String type
-        typedef typename base_type::string_type string_type;
+        //! Attribute name type
+        typedef typename base_type::attribute_name_type attribute_name_type;
 
     public:
         /*!
@@ -208,7 +208,7 @@ namespace event_log {
          *
          * \param name Attribute name
          */
-        explicit basic_direct_event_category_mapping(string_type const& name) :
+        explicit basic_direct_event_category_mapping(attribute_name_type const& name) :
             base_type(name, make_event_category(0))
         {
         }
@@ -229,8 +229,8 @@ namespace event_log {
         typedef basic_custom_mapping< CharT, event_category, AttributeValueT > base_type;
 
     public:
-        //! String type
-        typedef typename base_type::string_type string_type;
+        //! Attribute name type
+        typedef typename base_type::attribute_name_type attribute_name_type;
 
     public:
         /*!
@@ -238,7 +238,7 @@ namespace event_log {
          *
          * \param name Attribute name
          */
-        explicit basic_custom_event_category_mapping(string_type const& name) :
+        explicit basic_custom_event_category_mapping(attribute_name_type const& name) :
             base_type(name, make_event_category(0))
         {
         }
@@ -260,8 +260,8 @@ namespace event_log {
         typedef basic_direct_event_type_mapping< char, AttributeValueT > base_type;
 
     public:
-        //! String type
-        typedef typename base_type::string_type string_type;
+        //! Attribute name type
+        typedef typename base_type::attribute_name_type attribute_name_type;
 
     public:
         /*!
@@ -269,7 +269,7 @@ namespace event_log {
          *
          * \param name Attribute name
          */
-        explicit direct_event_type_mapping(string_type const& name) : base_type(name)
+        explicit direct_event_type_mapping(attribute_name_type const& name) : base_type(name)
         {
         }
     };
@@ -288,8 +288,8 @@ namespace event_log {
         typedef basic_custom_event_type_mapping< char, AttributeValueT > base_type;
 
     public:
-        //! String type
-        typedef typename base_type::string_type string_type;
+        //! Attribute name type
+        typedef typename base_type::attribute_name_type attribute_name_type;
 
     public:
         /*!
@@ -297,7 +297,7 @@ namespace event_log {
          *
          * \param name Attribute name
          */
-        explicit custom_event_type_mapping(string_type const& name) : base_type(name)
+        explicit custom_event_type_mapping(attribute_name_type const& name) : base_type(name)
         {
         }
     };
@@ -316,8 +316,8 @@ namespace event_log {
         typedef basic_direct_event_id_mapping< char, AttributeValueT > base_type;
 
     public:
-        //! String type
-        typedef typename base_type::string_type string_type;
+        //! Attribute name type
+        typedef typename base_type::attribute_name_type attribute_name_type;
 
     public:
         /*!
@@ -325,7 +325,7 @@ namespace event_log {
          *
          * \param name Attribute name
          */
-        explicit direct_event_id_mapping(string_type const& name) : base_type(name)
+        explicit direct_event_id_mapping(attribute_name_type const& name) : base_type(name)
         {
         }
     };
@@ -344,8 +344,8 @@ namespace event_log {
         typedef basic_custom_event_id_mapping< char, AttributeValueT > base_type;
 
     public:
-        //! String type
-        typedef typename base_type::string_type string_type;
+        //! Attribute name type
+        typedef typename base_type::attribute_name_type attribute_name_type;
 
     public:
         /*!
@@ -353,7 +353,7 @@ namespace event_log {
          *
          * \param name Attribute name
          */
-        explicit custom_event_id_mapping(string_type const& name) : base_type(name)
+        explicit custom_event_id_mapping(attribute_name_type const& name) : base_type(name)
         {
         }
     };
@@ -372,8 +372,8 @@ namespace event_log {
         typedef basic_direct_event_category_mapping< char, AttributeValueT > base_type;
 
     public:
-        //! String type
-        typedef typename base_type::string_type string_type;
+        //! Attribute name type
+        typedef typename base_type::attribute_name_type attribute_name_type;
 
     public:
         /*!
@@ -381,7 +381,7 @@ namespace event_log {
          *
          * \param name Attribute name
          */
-        explicit direct_event_category_mapping(string_type const& name) : base_type(name)
+        explicit direct_event_category_mapping(attribute_name_type const& name) : base_type(name)
         {
         }
     };
@@ -400,8 +400,8 @@ namespace event_log {
         typedef basic_custom_event_category_mapping< char, AttributeValueT > base_type;
 
     public:
-        //! String type
-        typedef typename base_type::string_type string_type;
+        //! Attribute name type
+        typedef typename base_type::attribute_name_type attribute_name_type;
 
     public:
         /*!
@@ -409,7 +409,7 @@ namespace event_log {
          *
          * \param name Attribute name
          */
-        explicit custom_event_category_mapping(string_type const& name) : base_type(name)
+        explicit custom_event_category_mapping(attribute_name_type const& name) : base_type(name)
         {
         }
     };
@@ -432,8 +432,8 @@ namespace event_log {
         typedef basic_direct_event_type_mapping< wchar_t, AttributeValueT > base_type;
 
     public:
-        //! String type
-        typedef typename base_type::string_type string_type;
+        //! Attribute name type
+        typedef typename base_type::attribute_name_type attribute_name_type;
 
     public:
         /*!
@@ -441,7 +441,7 @@ namespace event_log {
          *
          * \param name Attribute name
          */
-        explicit wdirect_event_type_mapping(string_type const& name) : base_type(name)
+        explicit wdirect_event_type_mapping(attribute_name_type const& name) : base_type(name)
         {
         }
     };
@@ -460,8 +460,8 @@ namespace event_log {
         typedef basic_custom_event_type_mapping< wchar_t, AttributeValueT > base_type;
 
     public:
-        //! String type
-        typedef typename base_type::string_type string_type;
+        //! Attribute name type
+        typedef typename base_type::attribute_name_type attribute_name_type;
 
     public:
         /*!
@@ -469,7 +469,7 @@ namespace event_log {
          *
          * \param name Attribute name
          */
-        explicit wcustom_event_type_mapping(string_type const& name) : base_type(name)
+        explicit wcustom_event_type_mapping(attribute_name_type const& name) : base_type(name)
         {
         }
     };
@@ -488,8 +488,8 @@ namespace event_log {
         typedef basic_direct_event_id_mapping< wchar_t, AttributeValueT > base_type;
 
     public:
-        //! String type
-        typedef typename base_type::string_type string_type;
+        //! Attribute name type
+        typedef typename base_type::attribute_name_type attribute_name_type;
 
     public:
         /*!
@@ -497,7 +497,7 @@ namespace event_log {
          *
          * \param name Attribute name
          */
-        explicit wdirect_event_id_mapping(string_type const& name) : base_type(name)
+        explicit wdirect_event_id_mapping(attribute_name_type const& name) : base_type(name)
         {
         }
     };
@@ -516,8 +516,8 @@ namespace event_log {
         typedef basic_custom_event_id_mapping< wchar_t, AttributeValueT > base_type;
 
     public:
-        //! String type
-        typedef typename base_type::string_type string_type;
+        //! Attribute name type
+        typedef typename base_type::attribute_name_type attribute_name_type;
 
     public:
         /*!
@@ -525,7 +525,7 @@ namespace event_log {
          *
          * \param name Attribute name
          */
-        explicit wcustom_event_id_mapping(string_type const& name) : base_type(name)
+        explicit wcustom_event_id_mapping(attribute_name_type const& name) : base_type(name)
         {
         }
     };
@@ -544,8 +544,8 @@ namespace event_log {
         typedef basic_direct_event_category_mapping< wchar_t, AttributeValueT > base_type;
 
     public:
-        //! String type
-        typedef typename base_type::string_type string_type;
+        //! Attribute name type
+        typedef typename base_type::attribute_name_type attribute_name_type;
 
     public:
         /*!
@@ -553,7 +553,7 @@ namespace event_log {
          *
          * \param name Attribute name
          */
-        explicit wdirect_event_category_mapping(string_type const& name) : base_type(name)
+        explicit wdirect_event_category_mapping(attribute_name_type const& name) : base_type(name)
         {
         }
     };
@@ -572,8 +572,8 @@ namespace event_log {
         typedef basic_custom_event_category_mapping< wchar_t, AttributeValueT > base_type;
 
     public:
-        //! String type
-        typedef typename base_type::string_type string_type;
+        //! Attribute name type
+        typedef typename base_type::attribute_name_type attribute_name_type;
 
     public:
         /*!
@@ -581,7 +581,7 @@ namespace event_log {
          *
          * \param name Attribute name
          */
-        explicit wcustom_event_category_mapping(string_type const& name) : base_type(name)
+        explicit wcustom_event_category_mapping(attribute_name_type const& name) : base_type(name)
         {
         }
     };

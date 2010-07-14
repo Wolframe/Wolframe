@@ -71,38 +71,38 @@ struct filter_factory :
     }
 
     //! The callback for equality relation filter
-    virtual filter_type on_equality_relation(string_type const& name UNUSED, string_type const& arg UNUSED) NORETURN
+    BOOST_LOG_NORETURN virtual filter_type on_equality_relation(string_type const& name UNUSED, string_type const& arg UNUSED)
     {
         BOOST_LOG_THROW_DESCR(parse_error, "The equality attribute value relation is not supported");
     }
     //! The callback for inequality relation filter
-    virtual filter_type on_inequality_relation(string_type const& name UNUSED, string_type const& arg UNUSED) NORETURN
+    BOOST_LOG_NORETURN virtual filter_type on_inequality_relation(string_type const& name UNUSED, string_type const& arg UNUSED)
     {
         BOOST_LOG_THROW_DESCR(parse_error, "The inequality attribute value relation is not supported");
     }
     //! The callback for less relation filter
-    virtual filter_type on_less_relation(string_type const& name UNUSED, string_type const& arg UNUSED) NORETURN
+    BOOST_LOG_NORETURN virtual filter_type on_less_relation(string_type const& name UNUSED, string_type const& arg UNUSED)
     {
         BOOST_LOG_THROW_DESCR(parse_error, "The less attribute value relation is not supported");
     }
     //! The callback for greater relation filter
-    virtual filter_type on_greater_relation(string_type const& name UNUSED, string_type const& arg UNUSED) NORETURN
+    BOOST_LOG_NORETURN virtual filter_type on_greater_relation(string_type const& name UNUSED, string_type const& arg UNUSED)
     {
         BOOST_LOG_THROW_DESCR(parse_error, "The greater attribute value relation is not supported");
     }
     //! The callback for less or equal relation filter
-    virtual filter_type on_less_or_equal_relation(string_type const& name UNUSED, string_type const& arg UNUSED) NORETURN
+    BOOST_LOG_NORETURN virtual filter_type on_less_or_equal_relation(string_type const& name UNUSED, string_type const& arg UNUSED)
     {
         BOOST_LOG_THROW_DESCR(parse_error, "The less-or-equal attribute value relation is not supported");
     }
     //! The callback for greater or equal relation filter
-    virtual filter_type on_greater_or_equal_relation(string_type const& name UNUSED, string_type const& arg UNUSED) NORETURN
+    BOOST_LOG_NORETURN virtual filter_type on_greater_or_equal_relation(string_type const& name UNUSED, string_type const& arg UNUSED)
     {
         BOOST_LOG_THROW_DESCR(parse_error, "The greater-or-equal attribute value relation is not supported");
     }
 
     //! The callback for custom relation filter
-    virtual filter_type on_custom_relation(string_type const& name UNUSED, string_type const& rel UNUSED, string_type const& arg UNUSED) NORETURN
+    BOOST_LOG_NORETURN virtual filter_type on_custom_relation(string_type const& name UNUSED, string_type const& rel UNUSED, string_type const& arg UNUSED)
     {
         BOOST_LOG_THROW_DESCR(parse_error, "The custom attribute value relation is not supported");
     }

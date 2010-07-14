@@ -36,7 +36,6 @@
 
 #include <boost/log/attributes/constant.hpp>
 #include <boost/log/attributes/named_scope.hpp>
-
-#include <boost/log/utility/scoped_attribute.hpp>
+#include <boost/log/attributes/scoped_attribute.hpp>
 
 #endif // BOOST_LOG_COMMON_HPP_INCLUDED_

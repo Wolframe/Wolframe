@@ -19,10 +19,10 @@
 #ifndef BOOST_LOG_FILTERS_HAS_ATTR_HPP_INCLUDED_
 #define BOOST_LOG_FILTERS_HAS_ATTR_HPP_INCLUDED_
 
-#include <string>
 #include <boost/log/detail/prologue.hpp>
 #include <boost/log/detail/functional.hpp>
-#include <boost/log/utility/attribute_value_extractor.hpp>
+#include <boost/log/attributes/attribute_name.hpp>
+#include <boost/log/attributes/value_visitation.hpp>
 #include <boost/log/filters/basic_filters.hpp>
 
 namespace boost {
@@ -43,20 +43,18 @@ class flt_has_attr :
 private:
     //! Base type
     typedef basic_filter< CharT, flt_has_attr< CharT, AttributeValueTypesT > > base_type;
-    //! Attribute value extractor type
-    typedef attribute_value_extractor< CharT, AttributeValueTypesT > extractor;
 
 public:
     //! Attribute values container type
     typedef typename base_type::values_view_type values_view_type;
     //! Char type
     typedef typename base_type::char_type char_type;
-    //! String type
-    typedef typename base_type::string_type string_type;
+    //! Attribute name type
+    typedef typename base_type::attribute_name_type attribute_name_type;
 
 private:
-    //! Attribute extractor
-    extractor m_Extractor;
+    //! Visitor invoker for the attribute value
+    value_visitor_invoker< char_type, AttributeValueTypesT > m_Invoker;
 
 public:
     /*!
@@ -64,7 +62,7 @@ public:
      *
      * \param name Attribute name
      */
-    explicit flt_has_attr(string_type const& name) : m_Extractor(name) {}
+    explicit flt_has_attr(attribute_name_type const& name) : m_Invoker(name) {}
 
     /*!
      * Applies the filter
@@ -74,7 +72,7 @@ public:
      */
     bool operator() (values_view_type const& values) const
     {
-        return m_Extractor(values, boost::log::aux::nop());
+        return (m_Invoker(values, boost::log::aux::nop()).code() == visitation_result::ok);
     }
 };
 
@@ -96,12 +94,12 @@ public:
     typedef typename base_type::values_view_type values_view_type;
     //! Char type
     typedef typename base_type::char_type char_type;
-    //! String type
-    typedef typename base_type::string_type string_type;
+    //! Attribute name type
+    typedef typename base_type::attribute_name_type attribute_name_type;
 
 private:
     //! Attribute name
-    string_type m_AttributeName;
+    attribute_name_type m_AttributeName;
 
 public:
     /*!
@@ -109,7 +107,7 @@ public:
      *
      * \param name Attribute name
      */
-    explicit flt_has_attr(string_type const& name) : m_AttributeName(name) {}
+    explicit flt_has_attr(attribute_name_type const& name) : m_AttributeName(name) {}
 
     /*!
      * Applies the filter
@@ -128,7 +126,7 @@ public:
 /*!
  * Filter generator
  */
-inline flt_has_attr< char > has_attr(std::basic_string< char > const& name)
+inline flt_has_attr< char > has_attr(basic_attribute_name< char > const& name)
 {
     return flt_has_attr< char >(name);
 }
@@ -137,7 +135,7 @@ inline flt_has_attr< char > has_attr(std::basic_string< char > const& name)
  * Filter generator
  */
 template< typename AttributeValueTypesT >
-inline flt_has_attr< char, AttributeValueTypesT > has_attr(std::basic_string< char > const& name)
+inline flt_has_attr< char, AttributeValueTypesT > has_attr(basic_attribute_name< char > const& name)
 {
     return flt_has_attr< char, AttributeValueTypesT >(name);
 }
@@ -149,7 +147,7 @@ inline flt_has_attr< char, AttributeValueTypesT > has_attr(std::basic_string< ch
 /*!
  * Filter generator
  */
-inline flt_has_attr< wchar_t > has_attr(std::basic_string< wchar_t > const& name)
+inline flt_has_attr< wchar_t > has_attr(basic_attribute_name< wchar_t > const& name)
 {
     return flt_has_attr< wchar_t >(name);
 }
@@ -158,7 +156,7 @@ inline flt_has_attr< wchar_t > has_attr(std::basic_string< wchar_t > const& name
  * Filter generator
  */
 template< typename AttributeValueTypesT >
-inline flt_has_attr< wchar_t, AttributeValueTypesT > has_attr(std::basic_string< wchar_t > const& name)
+inline flt_has_attr< wchar_t, AttributeValueTypesT > has_attr(basic_attribute_name< wchar_t > const& name)
 {
     return flt_has_attr< wchar_t, AttributeValueTypesT >(name);
 }

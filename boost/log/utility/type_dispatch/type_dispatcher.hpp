@@ -29,24 +29,34 @@ namespace boost {
 
 namespace BOOST_LOG_NAMESPACE {
 
-namespace aux {
+/*!
+ * \brief A type dispatcher interface
+ *
+ * All type dispatchers support this interface. It is used to acquire the
+ * visitor interface for the requested type.
+ */
+class BOOST_LOG_NO_VTABLE type_dispatcher
+{
+public:
 
-    //! The base class for type visitors
-    class type_visitor_base
+#ifndef BOOST_LOG_DOXYGEN_PASS
+
+    //! The base class for type dispatcher callbacks
+    class callback_base
     {
     protected:
-        void* m_pReceiver;
+        void* m_pVisitor;
         void* m_pTrampoline;
 
     public:
-        explicit type_visitor_base(void* receiver = 0, void* tramp = 0) :
-            m_pReceiver(receiver),
+        explicit callback_base(void* visitor = 0, void* tramp = 0) :
+            m_pVisitor(visitor),
             m_pTrampoline(tramp)
         {
         }
         template< typename ValueT >
-        explicit type_visitor_base(void* receiver, void (*tramp)(void*, ValueT const&)) :
-            m_pReceiver(receiver)
+        explicit callback_base(void* visitor, void (*tramp)(void*, ValueT const&)) :
+            m_pVisitor(visitor)
         {
             typedef void (*trampoline_t)(void*, ValueT const&);
             BOOST_STATIC_ASSERT(sizeof(trampoline_t) == sizeof(void*));
@@ -60,90 +70,81 @@ namespace aux {
             m_pTrampoline = caster.as_pvoid;
         }
 
-        template< typename ReceiverT, typename ValueT >
-        static void trampoline(void* receiver, ValueT const& value)
+        template< typename VisitorT, typename T >
+        static void trampoline(void* visitor, T const& value)
         {
-            (*static_cast< ReceiverT* >(receiver))(value);
+            (*static_cast< VisitorT* >(visitor))(value);
         }
     };
 
-} // namespace aux
-
-/*!
- * \brief An interface to the concrete type visitor
- *
- * This interface is used by type dispatchers to consume the dispatched value.
- */
-template< typename T >
-class type_visitor :
-    private boost::log::aux::type_visitor_base
-{
-private:
-    //! Base class type
-    typedef boost::log::aux::type_visitor_base base_type;
-    //! Type of the trampoline method
-    typedef void (*trampoline_t)(void*, T const&);
-
-public:
-    //! The type, which the visitor is able to consume
-    typedef T supported_type;
-
-public:
-#ifndef BOOST_LOG_DOXYGEN_PASS
-    /*!
-     * Default constructor. Creates an empty visitor.
-     */
-    type_visitor() : base_type()
+    //! An interface to the callback for the concrete type visitor
+    template< typename T >
+    class callback :
+        private callback_base
     {
-    }
+    private:
+        //! Type of the trampoline method
+        typedef void (*trampoline_t)(void*, T const&);
+
+    public:
+        //! The type, which the visitor is able to consume
+        typedef T supported_type;
+
+    public:
+        callback() : callback_base()
+        {
+        }
+        explicit callback(callback_base const& base) : callback_base(base)
+        {
+        }
+
+        void operator() (T const& value) const
+        {
+            BOOST_STATIC_ASSERT(sizeof(trampoline_t) == sizeof(void*));
+            union
+            {
+                void* as_pvoid;
+                trampoline_t as_trampoline;
+            }
+            caster;
+            caster.as_pvoid = this->m_pTrampoline;
+            (caster.as_trampoline)(this->m_pVisitor, value);
+        }
+
+        BOOST_LOG_EXPLICIT_OPERATOR_BOOL()
+
+        bool operator! () const { return (this->m_pVisitor == 0); }
+    };
+
+#else // BOOST_LOG_DOXYGEN_PASS
+
     /*!
-     * Initializing constructor. Creates a visitor that refers to the specified receiver.
+     * This interface is used by type dispatchers to consume the dispatched value.
      */
-    explicit type_visitor(base_type const& base) : base_type(base)
+    template< typename T >
+    class callback
     {
-    }
+    public:
+        /*!
+         * The operator invokes the visitor-specific logic with the given value
+         *
+         * \param value The dispatched value
+         */
+        void operator() (T const& value) const;
+
+        /*!
+         * The operator checks if the visitor is attached to a receiver
+         */
+        BOOST_LOG_EXPLICIT_OPERATOR_BOOL()
+
+        /*!
+         * The operator checks if the visitor is not attached to a receiver
+         */
+        bool operator! () const;
+    };
+
 #endif // BOOST_LOG_DOXYGEN_PASS
 
-    /*!
-     * The operator invokes the visitor-specific logic with the given value
-     *
-     * \param value The dispatched value
-     */
-    void operator() (T const& value) const
-    {
-        BOOST_STATIC_ASSERT(sizeof(trampoline_t) == sizeof(void*));
-        union
-        {
-            void* as_pvoid;
-            trampoline_t as_trampoline;
-        }
-        caster;
-        caster.as_pvoid = this->m_pTrampoline;
-        (caster.as_trampoline)(this->m_pReceiver, value);
-    }
-
-    /*!
-     * The operator checks if the visitor is attached to a receiver
-     */
-    BOOST_LOG_EXPLICIT_OPERATOR_BOOL()
-
-    /*!
-     * The operator checks if the visitor is not attached to a receiver
-     */
-    bool operator! () const
-    {
-        return (this->m_pReceiver == 0);
-    }
-};
-
-/*!
- * \brief A type dispatcher interface
- *
- * All type dispatchers support this interface. It is used to acquire the
- * visitor interface for the requested type.
- */
-struct BOOST_LOG_NO_VTABLE type_dispatcher
-{
 public:
     /*!
      * Virtual destructor
@@ -151,21 +152,21 @@ public:
     virtual ~type_dispatcher() {}
 
     /*!
-     * The method requests a type visitor for a value of type \c T
+     * The method requests a callback for the value of type \c T
      *
-     * \return The type-specific visitor or NULL, if the type is not supported
+     * \return The type-specific callback or an empty value, if the type is not supported
      */
     template< typename T >
-    type_visitor< T > get_visitor()
+    callback< T > get_callback()
     {
-        return type_visitor< T >(this->get_visitor(
+        return callback< T >(this->get_callback(
             typeid(boost::log::aux::visible_type< T >)));
     }
 
 private:
 #ifndef BOOST_LOG_DOXYGEN_PASS
-    //! The get_visitor method implementation
-    virtual boost::log::aux::type_visitor_base get_visitor(std::type_info const& type) = 0;
+    //! The get_callback method implementation
+    virtual callback_base get_callback(std::type_info const& type) = 0;
 #endif // BOOST_LOG_DOXYGEN_PASS
 };
 

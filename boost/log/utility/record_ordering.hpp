@@ -26,7 +26,9 @@
 #include <boost/log/detail/functional.hpp>
 #include <boost/log/detail/function_traits.hpp>
 #include <boost/log/core/record.hpp>
+#include <boost/log/attributes/attribute_name.hpp>
 #include <boost/log/attributes/attribute_value.hpp>
+#include <boost/log/attributes/value_extraction.hpp>
 
 namespace boost {
 
@@ -95,14 +97,14 @@ public:
     typedef CharT char_type;
     //! Log record type
     typedef basic_record< char_type > record_type;
-    //! String type
-    typedef typename record_type::string_type string_type;
+    //! Attribute name type
+    typedef basic_attribute_name< char_type > attribute_name_type;
     //! Compared attribute value type
     typedef ValueT attribute_value_type;
 
 private:
     //! Attribute value name
-    const string_type m_Name;
+    const attribute_name_type m_Name;
 
 public:
     /*!
@@ -111,7 +113,9 @@ public:
      * \param name The attribute value name to be compared
      * \param fun The ordering functor
      */
-    attribute_value_ordering(string_type const& name, FunT const& fun = FunT()) : FunT(fun), m_Name(name)
+    explicit attribute_value_ordering(attribute_name_type const& name, FunT const& fun = FunT()) :
+        FunT(fun),
+        m_Name(name)
     {
     }
 
@@ -121,13 +125,13 @@ public:
     result_type operator() (record_type const& left, record_type const& right) const
     {
         optional< attribute_value_type > left_value =
-            left.attribute_values()[m_Name].extract< attribute_value_type >();
+            boost::log::extract< attribute_value_type >(m_Name, left);
         optional< attribute_value_type > right_value =
-            right.attribute_values()[m_Name].extract< attribute_value_type >();
+            boost::log::extract< attribute_value_type >(m_Name, right);
 
-        if (left_value)
+        if (!!left_value)
         {
-            if (right_value)
+            if (!!right_value)
                 return FunT::operator() (left_value.get(), right_value.get());
             else
                 return false;

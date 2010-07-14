@@ -29,6 +29,7 @@
 #include <boost/type_traits/is_base_and_derived.hpp>
 #include <boost/log/detail/prologue.hpp>
 #include <boost/log/detail/function_traits.hpp>
+#include <boost/log/attributes/attribute_name.hpp>
 #include <boost/log/attributes/attribute_values_view.hpp>
 
 namespace boost {
@@ -64,6 +65,8 @@ struct basic_filter : public filter_base
     typedef CharT char_type;
     //! String type
     typedef std::basic_string< char_type > string_type;
+    //! Attribute name type
+    typedef basic_attribute_name< char_type > attribute_name_type;
     //! Attribute values view type
     typedef basic_attribute_values_view< char_type > values_view_type;
 
