@@ -29,7 +29,6 @@ src/logger.hpp
 src/ErrorCodes.hpp
 src/appInstance.hpp
 src/appConfig.hpp
-src/SMERP.conf
 src/appInstance.cpp
 src/appConfig.cpp
 TODO
@@ -46,3 +45,6 @@ src/logLevel.cpp
 src/miscStruct.hpp
 src/defaults.hpp
 src/connContext.hpp
+src/connContext.cpp
+src/message.hpp
+src/message.cpp
