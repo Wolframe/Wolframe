@@ -44,9 +44,12 @@ OBJS = \
 	reply.o \
 	server.o \
 	connection.o \
-	getPassword.o \
 	requestHandler.o \
 	posixMain.o
+
+#	SSLserver.o \
+#	SSLconnection.o \
+#	getPassword.o \
 
 CPP_BINS = \
 	smerpd$(EXE)
