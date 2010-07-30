@@ -30,11 +30,10 @@ namespace _SMERP {
 
 		/// Parse some data. The return value indicates how much of the
 		/// input has been consumed.
-		char *parse( char *begin, char *end );
+		char *parseInput( char *begin, std::size_t bytesTransferred );
 
 		std::string& getValue()	{ return content_; }
 		parseStatus_t status() 	{ return status_; }
-
 	};
 
 } // namespace _SMERP

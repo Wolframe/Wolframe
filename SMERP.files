@@ -48,3 +48,9 @@ src/connContext.hpp
 src/connContext.cpp
 src/message.hpp
 src/message.cpp
+src/SSLconnection.hpp
+src/SSLconnection.cpp
+src/SSLserver.hpp
+src/SSLserver.cpp
+src/baseConnection.hpp
+src/baseConnection.cpp

@@ -26,7 +26,7 @@ public:
 	/// Construct the server
 	explicit server( const ApplicationConfiguration& config );
 
-	/// Construct the server
+	/// Destruct the server
 	~server();
 
 	/// Run the server's io_service loop.
@@ -55,6 +55,7 @@ private:
 	boost::asio::io_service::strand		strand_;	// Strand to ensure the acceptor's handlers are not called concurrently.
 	boost::asio::ip::tcp::acceptor		acceptor_;	// Acceptor(s) used to listen for incoming connections.
 	connection_ptr				newConnection_;	// The next connection to be accepted.
+	std::string				identifier_;
 
 	requestHandler				requestHandler_;// The handler for all incoming requests.
 };

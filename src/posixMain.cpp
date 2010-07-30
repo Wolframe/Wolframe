@@ -28,7 +28,7 @@
 
 // daemon stuff
 #include <fstream>
-#include <cstdio>   
+#include <cstdio>
 #include <grp.h>
 #include <pwd.h>
 #include <boost/interprocess/sync/file_lock.hpp>

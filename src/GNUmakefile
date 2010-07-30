@@ -42,14 +42,15 @@ OBJS = \
 	appConfig.o \
 	request.o \
 	reply.o \
+	baseConnection.o \
 	server.o \
 	connection.o \
+	SSLserver.o \
+	SSLconnection.o \
+	getPassword.o \
 	requestHandler.o \
 	posixMain.o
 
-#	SSLserver.o \
-#	SSLconnection.o \
-#	getPassword.o \
 
 CPP_BINS = \
 	smerpd$(EXE)

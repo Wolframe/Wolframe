@@ -8,7 +8,7 @@
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
-#include <vector>
+#include <boost/lexical_cast.hpp>
 
 
 namespace _SMERP {
@@ -28,7 +28,7 @@ server::server( const ApplicationConfiguration& config )
 	boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve( query );
 	endpoint.port( config.address[0].port );
 
-	newConnection_ = connection_ptr( new connection( IOservice_, requestHandler_, timeout_duration_ ));
+	newConnection_ = connection_ptr( new connection( IOservice_, requestHandler_, timeout_duration_, 0, 0, 0 ));
 
 	acceptor_.open( endpoint.protocol() );
 	acceptor_.set_option( boost::asio::ip::tcp::acceptor::reuse_address( true ));
@@ -38,10 +38,9 @@ server::server( const ApplicationConfiguration& config )
 				strand_.wrap( boost::bind( &server::handleAccept,
 							   this,
 							   boost::asio::placeholders::error )));
-	LOG_INFO << "Accepting connections on " << acceptor_.local_endpoint().address().to_string()
-			<< " port " << acceptor_.local_endpoint().port();
-
-	LOG_DEBUG << "Server is waiting for connections";
+	identifier_ = acceptor_.local_endpoint().address().to_string()
+		      + ":" + boost::lexical_cast<std::string>( acceptor_.local_endpoint().port() );
+	LOG_INFO << "Accepting connections on " << identifier_;
 }
 
 
@@ -95,7 +94,7 @@ void server::handleAccept( const boost::system::error_code& e )
 		newConnection_->start();
 		LOG_TRACE << "Received new connection";
 
-		newConnection_.reset( new connection( IOservice_, requestHandler_, timeout_duration_ ));
+		newConnection_.reset( new connection( IOservice_, requestHandler_, timeout_duration_, 0, 0, 0 ));
 		acceptor_.async_accept( newConnection_->socket(),
 					 strand_.wrap( boost::bind( &server::handleAccept,
 								    this,
@@ -110,7 +109,8 @@ void server::handleAccept( const boost::system::error_code& e )
 // all calls to io_service::run() will return.
 void server::handleStop()
 {
-	LOG_TRACE << "Closed acceptor for unencrypted connections";
+	acceptor_.close();
+	LOG_TRACE << "Closing acceptor for " << identifier_;
 }
 
 

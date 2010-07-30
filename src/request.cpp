@@ -12,9 +12,9 @@ namespace _SMERP {
 /// Parse some data. The return value indicates how much of the
 /// input has been consumed.
 
-char *request::parse( char *begin, char *end )
+char *request::parseInput( char *begin, std::size_t bytesTransferred )
 {
-	while ( begin != end )	{
+	for ( std::size_t i = 0; i < bytesTransferred; i++ )	{
 		if ( *begin != '\n' )
 			content_ += *begin;
 		else	{
