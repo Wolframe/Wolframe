@@ -66,7 +66,7 @@ void baseConnection::handleWrite( const boost::system::error_code& e )
 		boost::system::error_code ignored_ec;
 
 		// Cancel timer.
-		timer_.cancel();
+		setTimeout( TIMEOUT_NONE );
 
 		boost::asio::write( socket(), boost::asio::buffer( "Bye.\n" ));
 		// Initiate graceful connection closure.
@@ -94,24 +94,31 @@ void baseConnection::handleTimeout( const boost::system::error_code& e )
 
 void baseConnection::setTimeout( const TimeOutType type )
 {
+	const char	*typeName;
+
 	if ( timerType_ != type )	{
 		unsigned long timeout;
 		switch( type )	{
 		case TIMEOUT_IDLE:
 			timeout = idleTimeout_;
+			typeName = "IDLE";
 			break;
 		case TIMEOUT_REQUEST:
 			timeout = requestTimeout_;
+			typeName = "REQUEST";
 			break;
 		case TIMEOUT_PROCESSING:
 			timeout = processTimeout_;
+			typeName = "PROCESSING";
 			break;
 		case TIMEOUT_ANSWER:
 			timeout = answerTimeout_;
+			typeName = "ANSWER";
 			break;
 		case TIMEOUT_NONE:
 		default:
 			timeout = 0;
+			typeName = "NONE";
 		}
 
 		timer_.cancel();
@@ -122,10 +129,10 @@ void baseConnection::setTimeout( const TimeOutType type )
 								      shared_from_this(),
 								      boost::asio::placeholders::error )));
 			timerType_ = type;
-			LOG_TRACE << timerType_ << " timer for " << identifier() << " set to " << timeout << " s";
+			LOG_TRACE << typeName << " timer for " << identifier() << " set to " << timeout << " s";
 		}
 		else	{
-			LOG_TRACE << timerType_ << " timer for " << identifier() << " disabled";
+			LOG_TRACE << typeName << " timer for " << identifier() << " disabled";
 			timerType_ = TIMEOUT_NONE;
 		}
 	}

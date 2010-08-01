@@ -30,6 +30,7 @@ namespace _SMERP {
 					 unsigned long processTimeout, unsigned long answerTimeout );
 
 		/// Get the socket associated with the connection.
+//		virtual boost::asio::ip::tcp::socket& socket() = 0;
 		virtual boost::asio::ip::tcp::socket& socket() = 0;
 
 		/// Start the first asynchronous operation for the connection.
@@ -98,24 +99,6 @@ namespace _SMERP {
 		/// Sending an answer timeout (milliseconds). 0 to disable.
 		unsigned long answerTimeout_;
 	};
-
-	typedef boost::shared_ptr<baseConnection> connection_ptr;
-
-
-	// map TimeoutType enum values to strings
-	template< typename CharT, typename TraitsT >
-	inline std::basic_ostream< CharT, TraitsT > &operator<< ( std::basic_ostream< CharT, TraitsT >& s,
-								  baseConnection::TimeOutType t )
-	{
-		static const char *const str[] = {
-			"NONE", "IDLE", "REQUEST", "PROCESSING", "ANSWER" };
-		if( static_cast< size_t >( t ) < ( sizeof( str ) / sizeof( *str ) ) ) {
-			s << str[t];
-		} else {
-			s << "Unknown enum used '" << static_cast< int >( t ) << "'";
-		}
-		return s;
-	}
 
 } // namespace _SMERP
 
