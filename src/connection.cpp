@@ -2,6 +2,7 @@
 // connection.cpp
 //
 
+#include "connectionBase.hpp"
 #include "connection.hpp"
 #include "logger.hpp"
 #include "requestHandler.hpp"
@@ -13,13 +14,9 @@
 namespace _SMERP {
 
 connection::connection( boost::asio::io_service& IOservice,
-			requestHandler& handler,
-			unsigned long idleTimeout, unsigned long requestTimeout,
-			unsigned long processTimeout, unsigned long answerTimeout ) :
-						baseConnection( IOservice, handler,
-								idleTimeout, requestTimeout,
-								processTimeout, answerTimeout ),
-						socket_( IOservice )
+			requestHandler& handler, connectionTimeout& timeouts ) :
+	connectionBase<boost::asio::ip::tcp::socket>( IOservice, handler, timeouts ),
+	socket_( IOservice )
 {
 	LOG_TRACE << "New connection created";
 }
@@ -39,7 +36,7 @@ void connection::start()
 							     boost::asio::placeholders::error,
 							     boost::asio::placeholders::bytes_transferred )));
 
-	setTimeout( TIMEOUT_IDLE );
+	setTimeout( connectionTimeout::TIMEOUT_IDLE );
 }
 
 } // namespace _SMERP

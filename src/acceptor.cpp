@@ -15,9 +15,9 @@ namespace _SMERP {
 
 server::server( const ApplicationConfiguration& config )
 	: threadPoolSize_( config.threads ),
+	timeout_duration_((unsigned long)config.idleTimeout ),
 	strand_( IOservice_ ),
 	acceptor_( IOservice_ ),
-	timeouts_((unsigned long)config.idleTimeout, 0, 0, 0 ),
 	requestHandler_()
 {
 	boost::system::error_code	ec;
@@ -28,7 +28,7 @@ server::server( const ApplicationConfiguration& config )
 	boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve( query );
 	endpoint.port( config.address[0].port );
 
-	newConnection_ = connection_ptr( new connection( IOservice_, requestHandler_, timeouts_ ));
+	newConnection_ = connection_ptr( new connection( IOservice_, requestHandler_, timeout_duration_, 0, 0, 0 ));
 
 	acceptor_.open( endpoint.protocol() );
 	acceptor_.set_option( boost::asio::ip::tcp::acceptor::reuse_address( true ));
@@ -94,7 +94,7 @@ void server::handleAccept( const boost::system::error_code& e )
 		newConnection_->start();
 		LOG_TRACE << "Received new connection";
 
-		newConnection_.reset( new connection( IOservice_, requestHandler_, timeouts_ ));
+		newConnection_.reset( new connection( IOservice_, requestHandler_, timeout_duration_, 0, 0, 0 ));
 		acceptor_.async_accept( newConnection_->socket(),
 					 strand_.wrap( boost::bind( &server::handleAccept,
 								    this,

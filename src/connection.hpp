@@ -7,20 +7,20 @@
 
 #include <boost/asio.hpp>
 
-#include "baseConnection.hpp"
+#include "connectionTimeout.hpp"
+#include "connectionBase.hpp"
 #include "requestHandler.hpp"
 
 namespace _SMERP {
 
 	/// Represents a single connection from a client.
-	class connection : public baseConnection
+	class connection : public connectionBase< boost::asio::ip::tcp::socket >
 	{
 	public:
 		/// Construct a connection with the given io_service.
 		explicit connection( boost::asio::io_service& io_service,
 				     requestHandler& handler,
-				     unsigned long idleTimeout, unsigned long requestTimeout,
-				     unsigned long processTimeout, unsigned long answerTimeout );
+				     connectionTimeout& timeouts );
 
 		/// Get the socket associated with the connection.
 		boost::asio::ip::tcp::socket& socket()	{ return socket_; }
@@ -33,8 +33,7 @@ namespace _SMERP {
 		boost::asio::ip::tcp::socket socket_;
 	};
 
-//	typedef boost::shared_ptr<connection> connection_ptr;
-
+	typedef boost::shared_ptr<connection> connection_ptr;
 
 } // namespace _SMERP
 

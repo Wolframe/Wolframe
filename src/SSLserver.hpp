@@ -45,11 +45,11 @@ private:
 	/// Handle a request to stop the server.
 	void handleStop();
 
-	/// Get a password from the console
-	std::string getPassword();
+	/// SSL server context
+	boost::asio::ssl::context		SSLcontext_;
 
-/// object variables
-	boost::asio::ssl::context		SSLcontext_;	// SSL server context
+	/// Get a password from the console (i.e. SSL key password)
+	std::string getPassword();
 };
 
 } // namespace _SMERP

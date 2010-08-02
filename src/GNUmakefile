@@ -42,7 +42,6 @@ OBJS = \
 	appConfig.o \
 	request.o \
 	reply.o \
-	baseConnection.o \
 	server.o \
 	connection.o \
 	requestHandler.o \

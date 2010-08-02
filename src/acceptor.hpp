@@ -13,7 +13,6 @@
 #include <vector>
 
 #include "appConfig.hpp"
-#include "connectionTimeout.hpp"
 #include "connection.hpp"
 #include "requestHandler.hpp"
 
@@ -57,8 +56,6 @@ private:
 	boost::asio::ip::tcp::acceptor		acceptor_;	// Acceptor(s) used to listen for incoming connections.
 	connection_ptr				newConnection_;	// The next connection to be accepted.
 	std::string				identifier_;
-
-	connectionTimeout			timeouts_;
 
 	requestHandler				requestHandler_;// The handler for all incoming requests.
 };

@@ -52,5 +52,5 @@ src/SSLconnection.hpp
 src/SSLconnection.cpp
 src/SSLserver.hpp
 src/SSLserver.cpp
-src/baseConnection.hpp
-src/baseConnection.cpp
+src/connectionBase.hpp
+src/connectionTimeout.hpp
