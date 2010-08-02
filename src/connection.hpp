@@ -18,9 +18,9 @@ namespace _SMERP {
 	{
 	public:
 		/// Construct a connection with the given io_service.
-		explicit connection( boost::asio::io_service& io_service,
-				     requestHandler& handler,
-				     connectionTimeout& timeouts );
+		explicit connection( boost::asio::io_service& IOservice,
+				     connectionTimeout& timeouts,
+				     requestHandler& handler );
 
 		/// Get the socket associated with the connection.
 		boost::asio::ip::tcp::socket& socket()	{ return socket_; }

@@ -15,38 +15,32 @@ namespace _SMERP {
 
 server::server( const ApplicationConfiguration& config )
 	: threadPoolSize_( config.threads ),
-	strand_( IOservice_ ),
-	acceptor_( IOservice_ ),
-	timeouts_((unsigned long)config.idleTimeout, 0, 0, 0 ),
+	IOservice_(),
+	timeouts_( (unsigned long)config.idleTimeout,
+		   (unsigned long)config.requestTimeout,
+		   (unsigned long)config.processTimeout,
+		   (unsigned long)config.answerTimeout ),
 	requestHandler_()
 {
-	boost::system::error_code	ec;
-
-	// Open the acceptor(s) with the option to reuse the address (i.e. SO_REUSEADDR).
-	boost::asio::ip::tcp::resolver resolver( IOservice_ );
-	boost::asio::ip::tcp::resolver::query query( config.address[0].host, "");
-	boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve( query );
-	endpoint.port( config.address[0].port );
-
-	newConnection_ = connection_ptr( new connection( IOservice_, requestHandler_, timeouts_ ));
-
-	acceptor_.open( endpoint.protocol() );
-	acceptor_.set_option( boost::asio::ip::tcp::acceptor::reuse_address( true ));
-	acceptor_.bind( endpoint );
-	acceptor_.listen();
-	acceptor_.async_accept( newConnection_->socket(),
-				strand_.wrap( boost::bind( &server::handleAccept,
-							   this,
-							   boost::asio::placeholders::error )));
-	identifier_ = acceptor_.local_endpoint().address().to_string()
-		      + ":" + boost::lexical_cast<std::string>( acceptor_.local_endpoint().port() );
-	LOG_INFO << "Accepting connections on " << identifier_;
+	size_t	i;
+	for ( i = 0; i < config.address.size(); i++ )	{
+		acceptor* acptr = new acceptor( IOservice_,
+						config.address[i].host, config.address[i].port,
+						timeouts_, requestHandler_ );
+		acceptor_.push_back( acptr );
+	}
+	LOG_DEBUG << i << "unencrypted network acceptors created.";
 }
 
 
 server::~server()
 {
 	LOG_TRACE << "Server destructor called";
+
+	std::size_t	i;
+	for ( i = 0; i < acceptor_.size(); i++ )
+		delete acceptor_[i];
+	LOG_TRACE << i << " acceptor(s) deleted";
 }
 
 
@@ -74,9 +68,11 @@ void server::run()
 void server::stop()
 {
 	LOG_DEBUG << "Network server received a shutdown request";
-	// Post a call to the stop function so that server::stop() is safe to call
-	// from any thread.
-	IOservice_.post( strand_.wrap( boost::bind( &server::handleStop, this )));
+
+	std::size_t	i;
+	for ( i = 0; i < acceptor_.size(); i++ )
+		acceptor_[i]->stop();
+	LOG_TRACE << i << " acceptor(s) signaled to stop";
 }
 
 
@@ -86,32 +82,5 @@ void server::abort()
 	LOG_DEBUG << "Network server received an abort request";
 	IOservice_.stop();
 }
-
-
-void server::handleAccept( const boost::system::error_code& e )
-{
-	if ( !e )	{
-		newConnection_->start();
-		LOG_TRACE << "Received new connection";
-
-		newConnection_.reset( new connection( IOservice_, requestHandler_, timeouts_ ));
-		acceptor_.async_accept( newConnection_->socket(),
-					 strand_.wrap( boost::bind( &server::handleAccept,
-								    this,
-								    boost::asio::placeholders::error )));
-		LOG_TRACE << "Acceptor ready for new connection";
-	}
-}
-
-
-// The server is stopped by closing the acceptor.
-// When all outstanding operations are completed
-// all calls to io_service::run() will return.
-void server::handleStop()
-{
-	acceptor_.close();
-	LOG_TRACE << "Closing acceptor for " << identifier_;
-}
-
 
 } // namespace _SMERP

@@ -42,8 +42,9 @@ OBJS = \
 	appConfig.o \
 	request.o \
 	reply.o \
-	server.o \
+	acceptor.o \
 	connection.o \
+	server.o \
 	requestHandler.o \
 	posixMain.o
 #	SSLserver.o \

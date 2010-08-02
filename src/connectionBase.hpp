@@ -30,8 +30,8 @@ namespace _SMERP {
 		/// Construct a connection with the given io_service.
 
 		explicit connectionBase( boost::asio::io_service& IOservice,
-						requestHandler& handler,
-						connectionTimeout& timeouts ) :
+						connectionTimeout& timeouts,
+						requestHandler& handler ) :
 			strand_( IOservice ),
 			requestHandler_( handler ),
 			timer_( IOservice ),

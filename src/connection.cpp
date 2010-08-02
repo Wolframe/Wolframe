@@ -14,8 +14,9 @@
 namespace _SMERP {
 
 connection::connection( boost::asio::io_service& IOservice,
-			requestHandler& handler, connectionTimeout& timeouts ) :
-	connectionBase<boost::asio::ip::tcp::socket>( IOservice, handler, timeouts ),
+			connectionTimeout& timeouts,
+			requestHandler& handler ) :
+	connectionBase<boost::asio::ip::tcp::socket>( IOservice, timeouts, handler ),
 	socket_( IOservice )
 {
 	LOG_TRACE << "New connection created";
