@@ -29,7 +29,7 @@ server::server( const ApplicationConfiguration& config )
 						timeouts_, requestHandler_ );
 		acceptor_.push_back( acptr );
 	}
-	LOG_DEBUG << i << "unencrypted network acceptors created.";
+	LOG_DEBUG << i << " unencrypted network acceptor(s) created.";
 }
 
 
@@ -54,7 +54,7 @@ void server::run()
 		boost::shared_ptr<boost::thread> thread( new boost::thread( boost::bind( &boost::asio::io_service::run, &IOservice_ )));
 		threads.push_back( thread );
 	}
-	LOG_TRACE << i << " network server threads started";
+	LOG_TRACE << i << " network server thread(s) started";
 
 	// Wait for all threads in the pool to exit.
 	for ( i = 0; i < threads.size(); ++i )
@@ -72,7 +72,7 @@ void server::stop()
 	std::size_t	i;
 	for ( i = 0; i < acceptor_.size(); i++ )
 		acceptor_[i]->stop();
-	LOG_TRACE << i << " acceptor(s) signaled to stop";
+	LOG_DEBUG << i << " unencrypted acceptor(s) signaled to stop";
 }
 
 

@@ -63,14 +63,14 @@ void acceptor::handleAccept( const boost::system::error_code& e )
 					 strand_.wrap( boost::bind( &acceptor::handleAccept,
 								    this,
 								    boost::asio::placeholders::error )));
-		LOG_DATA << "Acceptor " << identifier_ << "ready for new connection";
+		LOG_DATA << "Acceptor " << identifier_ << " ready for new connection";
 	}
 }
 
 
 void acceptor::stop()
 {
-	LOG_TRACE << "Acceptor " << identifier_ << "received a shutdown request";
+	LOG_TRACE << "Acceptor for " << identifier_ << " received a shutdown request";
 	// Post a call to the stop function so that acceptor::stop() is safe to call
 	// from any thread.
 	IOservice_.post( strand_.wrap( boost::bind( &acceptor::handleStop, this )));

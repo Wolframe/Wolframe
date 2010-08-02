@@ -178,6 +178,8 @@ namespace _SMERP {
 				}
 
 				timer_.cancel();
+				if ( timerType_ != connectionTimeout::TIMEOUT_NONE )
+					LOG_TRACE << timerType_ << " timeout for connection to " << identifier() << " disabled";
 
 				if ( timeout > 0 )	{
 					timer_.expires_from_now( boost::posix_time::seconds( timeout ));
@@ -185,12 +187,10 @@ namespace _SMERP {
 										      this->shared_from_this(),
 										      boost::asio::placeholders::error )));
 					timerType_ = type;
-					LOG_TRACE << timerType_ << " timer for " << identifier() << " set to " << timeout << " s";
+					LOG_TRACE << timerType_ << " timeout for connection to " << identifier() << " set to " << timeout << "s";
 				}
-				else	{
-					LOG_TRACE << timerType_ << " timer for " << identifier() << " disabled";
+				else
 					timerType_ = connectionTimeout::TIMEOUT_NONE;
-				}
 			}
 		}
 		// setTimeout function end

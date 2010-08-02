@@ -41,7 +41,7 @@ inline std::basic_ostream< CharT, TraitsT > &operator<< ( std::basic_ostream< Ch
 	if( static_cast< size_t >( l ) < ( sizeof( str ) / sizeof( *str ) ) ) {
 		s << str[l];
 	} else {
-		s << "Unknown enum used '" << static_cast< int >( l ) << "'";
+		s << "Unknown enum used '" << static_cast< int >( l ) << "' as log level";
 	}
 	return s;
 }
