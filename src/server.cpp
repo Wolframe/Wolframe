@@ -3,12 +3,13 @@
 //
 
 #include "server.hpp"
+#include "acceptor.hpp"
+#include "SSLacceptor.hpp"
 #include "logger.hpp"
 
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/lexical_cast.hpp>
 
 
 namespace _SMERP {
@@ -29,7 +30,18 @@ server::server( const ApplicationConfiguration& config )
 						timeouts_, requestHandler_ );
 		acceptor_.push_back( acptr );
 	}
-	LOG_DEBUG << i << " unencrypted network acceptor(s) created.";
+	LOG_DEBUG << i << " network acceptor(s) created.";
+
+	for ( i = 0; i < config.SSLaddress.size(); i++ )	{
+		SSLacceptor* acptr = new SSLacceptor( IOservice_,
+						      config.SSLaddress[i].certFile, config.SSLaddress[i].keyFile,
+						      config.SSLaddress[i].verify,
+						      config.SSLaddress[i].CAchainFile, config.SSLaddress[i].CAdirectory,
+						      config.SSLaddress[i].host, config.SSLaddress[i].port,
+						      timeouts_, requestHandler_ );
+		SSLacceptor_.push_back( acptr );
+	}
+	LOG_DEBUG << i << " network SSL acceptor(s) created.";
 }
 
 
@@ -41,6 +53,10 @@ server::~server()
 	for ( i = 0; i < acceptor_.size(); i++ )
 		delete acceptor_[i];
 	LOG_TRACE << i << " acceptor(s) deleted";
+
+	for ( i = 0; i < SSLacceptor_.size(); i++ )
+		delete SSLacceptor_[i];
+	LOG_TRACE << i << " SSL acceptor(s) deleted";
 }
 
 
@@ -72,6 +88,10 @@ void server::stop()
 	std::size_t	i;
 	for ( i = 0; i < acceptor_.size(); i++ )
 		acceptor_[i]->stop();
+	LOG_DEBUG << i << " acceptor(s) signaled to stop";
+
+	for ( i = 0; i < SSLacceptor_.size(); i++ )
+		SSLacceptor_[i]->stop();
 	LOG_DEBUG << i << " unencrypted acceptor(s) signaled to stop";
 }
 

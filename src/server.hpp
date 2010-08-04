@@ -13,6 +13,7 @@
 
 #include "appConfig.hpp"
 #include "acceptor.hpp"
+#include "SSLacceptor.hpp"
 #include "requestHandler.hpp"
 
 namespace _SMERP {
@@ -43,6 +44,7 @@ private:
 	boost::asio::io_service			IOservice_;	// The io_service used to perform asynchronous operations.
 	connectionTimeout			timeouts_;
 	std::vector<acceptor*>			acceptor_;
+	std::vector<SSLacceptor*>		SSLacceptor_;
 
 	requestHandler				requestHandler_;// The handler for all incoming requests.
 };

@@ -4,7 +4,7 @@
 
 #include <string>
 
-#include "server.hpp"
+#include "SSLacceptor.hpp"
 
 
 namespace _SMERP {
@@ -14,7 +14,7 @@ namespace _SMERP {
 #include <unistd.h>
 #include <libintl.h>
 
-std::string server::getPassword()
+std::string SSLacceptor::getPassword()
 {
 	char	*pass;
 
@@ -25,7 +25,7 @@ std::string server::getPassword()
 
 #else // defined(_WIN32)
 
-std::string server::getPassword()
+std::string SSLacceptor::getPassword()
 {
 	return "bla bla";
 }

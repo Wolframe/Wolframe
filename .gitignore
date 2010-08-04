@@ -4,11 +4,11 @@ SMERP.ncb
 SMERP.vcproj.*
 Debug
 x64
-#*~
-#*.o
-#*.d
-#*.a
-#*.exe
+*~
+*.o
+*.d
+*.a
+*.exe
 *.exe.manifest
 *.exp
 *.obj

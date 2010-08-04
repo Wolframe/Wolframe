@@ -43,13 +43,13 @@ OBJS = \
 	request.o \
 	reply.o \
 	acceptor.o \
+	SSLacceptor.o \
+	getPassword.o \
 	connection.o \
+	SSLconnection.o \
 	server.o \
 	requestHandler.o \
 	posixMain.o
-#	SSLserver.o \
-#	SSLconnection.o \
-#	getPassword.o \
 
 
 CPP_BINS = \

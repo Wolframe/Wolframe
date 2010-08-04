@@ -28,7 +28,6 @@ namespace _SMERP {
 	{
 	public:
 		/// Construct a connection with the given io_service.
-
 		explicit connectionBase( boost::asio::io_service& IOservice,
 						connectionTimeout& timeouts,
 						requestHandler& handler ) :
@@ -128,7 +127,7 @@ namespace _SMERP {
 
 				boost::asio::write( socket(), boost::asio::buffer( "Bye.\n" ));
 				// Initiate graceful connection closure.
-				socket().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
+				socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
 			}
 
 			// No new asynchronous operations are started. This means that all shared_ptr
@@ -147,7 +146,7 @@ namespace _SMERP {
 				boost::system::error_code ignored_ec;
 
 				boost::asio::write( socket(), boost::asio::buffer( "Timeout :P\n" ));
-				socket().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
+				socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
 				LOG_INFO << "Timeout, client " << identifier();
 			}
 		}

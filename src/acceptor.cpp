@@ -60,9 +60,9 @@ void acceptor::handleAccept( const boost::system::error_code& e )
 
 		newConnection_.reset( new connection( IOservice_, timeouts_, requestHandler_ ));
 		acceptor_.async_accept( newConnection_->socket(),
-					 strand_.wrap( boost::bind( &acceptor::handleAccept,
-								    this,
-								    boost::asio::placeholders::error )));
+					strand_.wrap( boost::bind( &acceptor::handleAccept,
+								   this,
+								   boost::asio::placeholders::error )));
 		LOG_DATA << "Acceptor " << identifier_ << " ready for new connection";
 	}
 }

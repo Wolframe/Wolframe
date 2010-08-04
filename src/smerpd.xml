@@ -27,6 +27,15 @@ SMERP configuration file
 				<CAchainFile></CAchainFile>				<!-- SSL CA chain file -->
 				<verify>OFF</verify>					<!-- Require and verify client certificate -->
 			</SSLsocket>
+			<SSLsocket>
+				<address>127.0.0.1</address><port>7962</port>
+				<!-- SSL parameters: required if SSLsocket is defined -->
+				<certificate>../tests/SSL/smerpd.crt</certificate>	<!-- Server certificate file (PEM) -->
+				<key>../tests/SSL/smerpd.key</key>			<!-- Server key file (PEM) -->
+				<CAdirectory>../tests/SSL/CAdir</CAdirectory>		<!-- Directory holding CA certificate files -->
+				<CAchainFile></CAchainFile>				<!-- SSL CA chain file -->
+				<verify>OFF</verify>					<!-- Require and verify client certificate -->
+			</SSLsocket>
 		</listen>
 
 		<!-- Timeouts. All values are in seconds. Set to 0 to disable. -->
