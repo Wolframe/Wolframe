@@ -77,7 +77,7 @@ public:
     /*!
      * Virtual destructor
      */
-    virtual ~intrusive_ref_counter () {}
+    virtual ~intrusive_ref_counter() {}
 
     /*!
      * Assignment

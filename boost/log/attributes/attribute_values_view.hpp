@@ -25,7 +25,6 @@
 #include <string>
 #include <utility>
 #include <iterator>
-#include <boost/shared_ptr.hpp>
 #include <boost/log/detail/prologue.hpp>
 #include <boost/log/attributes/attribute.hpp>
 #include <boost/log/attributes/attribute_name.hpp>

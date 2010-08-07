@@ -46,11 +46,15 @@ namespace BOOST_LOG_NAMESPACE {
 
 namespace aux {
 
-    struct unspecified_bool_helper
+    struct unspecified_bool
     {
-        static void true_value(unspecified_bool_helper) {}
+        // NOTE TO THE USER: If you see this in error messages then you tried
+        // to apply an unsupported operator on the object that supports
+        // explicit conversion to bool.
+        struct OPERATORS_NOT_ALLOWED;
+        static void true_value(OPERATORS_NOT_ALLOWED*) {}
     };
-    typedef void (*unspecified_bool)(unspecified_bool_helper);
+    typedef void (*unspecified_bool_type)(unspecified_bool::OPERATORS_NOT_ALLOWED*);
 
 } // namespace aux
 
@@ -58,11 +62,15 @@ namespace aux {
 
 } // namespace boost
 
+// These operators are not found through ADL
+template< typename T > void operator<< (T const&, boost::log::aux::unspecified_bool_type);
+template< typename T > void operator>> (T const&, boost::log::aux::unspecified_bool_type);
+
 #define BOOST_LOG_EXPLICIT_OPERATOR_BOOL()\
-    operator boost::log::aux::unspecified_bool () const\
+    operator boost::log::aux::unspecified_bool_type () const\
     {\
         if (!this->operator!())\
-            return &boost::log::aux::unspecified_bool_helper::true_value;\
+            return &boost::log::aux::unspecified_bool::true_value;\
         else\
             return 0;\
     }
