@@ -47,6 +47,7 @@ OBJS = \
 	request.obj \
 	reply.obj \
 	server.obj \
+	acceptor.obj \
 	connection.obj \
 	getPassword.obj \
 	requestHandler.obj \

@@ -48,11 +48,7 @@ src/connContext.hpp
 src/connContext.cpp
 src/message.hpp
 src/message.cpp
-src/SSLconnection.hpp
-src/SSLconnection.cpp
 src/connectionBase.hpp
 src/connectionTimeout.hpp
 src/acceptor.cpp
 src/acceptor.hpp
-src/SSLacceptor.hpp
-src/SSLacceptor.cpp

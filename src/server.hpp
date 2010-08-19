@@ -13,7 +13,6 @@
 
 #include "appConfig.hpp"
 #include "acceptor.hpp"
-#include "SSLacceptor.hpp"
 #include "requestHandler.hpp"
 
 namespace _SMERP {

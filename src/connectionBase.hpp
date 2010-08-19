@@ -85,6 +85,7 @@ namespace _SMERP {
 		void handleRead( const boost::system::error_code& e, std::size_t bytesTransferred )
 		{
 			if ( !e )	{
+				setTimeout( connectionTimeout::TIMEOUT_REQUEST );
 				LOG_TRACE << "Read " << bytesTransferred << " bytes from " << identifier();
 
 				request_.parseInput( buffer_.data(), bytesTransferred );

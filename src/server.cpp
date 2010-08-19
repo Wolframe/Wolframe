@@ -4,7 +4,6 @@
 
 #include "server.hpp"
 #include "acceptor.hpp"
-#include "SSLacceptor.hpp"
 #include "logger.hpp"
 
 #include <boost/thread.hpp>
