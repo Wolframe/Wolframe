@@ -1,0 +1,140 @@
+%define boost_version	1.44.0
+
+%define initscript	smerp.initd.RHEL
+%define configFile	smerp.conf
+
+%define SMERP_user	smerp
+%define SMERP_group	smerp
+
+Summary: Small and medium enterprise resource planning (SMERP)
+Name: SMERP
+Version: @VERSION@
+Release: 0.1
+License: SMERP License
+Group: Application/Business
+Source: smerp-%{version}.tar.bz2
+
+URL: http://www.smerp.com/
+
+BuildRoot: %{_tmppath}/%{name}-root
+Requires: expat >= 1.95
+BuildRequires: zlib-devel >= 1.2.3
+BuildRequires: openssl-devel >= 0.9.8
+BuildRequires: bzip2-devel >= 1.0.3
+BuildRequires: expat-devel >= 1.95
+BuildRequires: postgresql84-devel >= 8.4
+
+Distribution: rhel5
+Vendor: SMERP team
+Packager: Mihai Barbos <mihai.barbos@gmail.com>
+
+%description
+The SMERP server and server utilities
+
+
+%package doc
+Summary: SMERP documentation
+Group: Application/Business
+
+%description doc
+The SMERP documentation.
+This package contains the one file html documentation,
+multiple file html documentation and the pdf documentation.
+
+
+%package client
+Summary: SMERP client
+Group: Application/Business
+
+%description client
+X client for the SMERP server.
+
+
+%prep
+%setup
+
+
+%build
+LD_FLAGS=-Wl,-rpath=%{_libdir}/SMERP make all
+
+echo ======================= TESTING ==============================
+# make test
+echo ===================== END OF TESTING =========================
+
+
+%install
+rm -rf $RPM_BUILD_ROOT
+make DESTDIR=$RPM_BUILD_ROOT install
+
+mkdir -p $RPM_BUILD_ROOT%{_libdir}/SMERP
+for i in \
+	libboost_program_options.so.%{boost_version} libboost_system.so.%{boost_version} \
+	libboost_filesystem.so.%{boost_version} libboost_iostreams.so.%{boost_version} \
+	libboost_thread.so.%{boost_version} libboost_serialization.so.%{boost_version}; do
+    cp /usr/local/lib/$i $RPM_BUILD_ROOT%{_libdir}/SMERP/
+done
+
+mkdir -p $RPM_BUILD_ROOT%{_initrddir}
+cp %{initscript} $RPM_BUILD_ROOT%{_initrddir}/%{name}
+
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+
+%pre
+getent group %{SMERP_group} >/dev/null || /usr/sbin/groupadd %{SMERP_group}
+getent passwd %{SMERP_user} >/dev/null || /usr/sbin/useradd -g %{SMERP_group} %{SMERP_user} -c "SMERP user" -d /dev/null
+
+# Don't enable SMERP server at install time, just inform root how this is done
+echo
+echo Use '/sbin/chkconfig --add smerp' and '/sbin/ckconfig semrp on' to enable the
+echo SMERP server at startup
+echo
+
+
+%preun
+if [ "$1" = 0 ]; then
+    /etc/init.d/smerp stop > /dev/null 2>&1
+    /sbin/chkconfig --del smerp
+fi
+
+
+%postun
+if [ "$1" = 0 ]; then
+    /usr/sbin/userdel %{SMERP_user}
+fi
+
+
+%files
+%defattr( -, root, root )
+%attr( 554, root, root) %{_initrddir}/%{name}
+%{_sbindir}/smerpd
+%dir %attr(0755, root, root) %{_sysconfdir}/smerp
+%config %attr(0755, root, root) %{_sysconfdir}/smerp/smerp.conf
+%attr(0755, SMERP_user, SMERP_group) %dir /var/log/smerp
+%attr(0755, SMERP_user, SMERP_group) %dir /var/run/smerp
+
+%dir %{_libdir}/smerp
+%{_libdir}/smerp/libpqxx-%{libpqxx_version}.so
+%{_libdir}/smerp/libboost_program_options.so.%{boost_version}
+%{_libdir}/smerp/libboost_system.so.%{boost_version}
+%{_libdir}/smerp/libboost_filesystem.so.%{boost_version}
+%{_libdir}/smerp/libboost_iostreams.so.%{boost_version}
+%{_libdir}/smerp/libboost_thread.so.%{boost_version}
+%{_libdir}/smerp/libboost_serialization.so.%{boost_version}
+
+%dir %{_datadir}/smerp
+%doc LICENSE
+
+
+%files doc
+
+
+%files client
+
+
+%changelog
+* Sun Aug 29 2010 Mihai Barbos <mihai.barbos@gmail.com> 0.9.0-0.1
+- preliminary release
+
