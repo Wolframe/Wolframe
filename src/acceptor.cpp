@@ -125,11 +125,14 @@ SSLacceptor::SSLacceptor( boost::asio::io_service& IOservice,
 }
 
 
+/// acceptor destructor
 acceptor::~acceptor()
 {
 	LOG_TRACE << "Acceptor destructor called for " << identifier_;
 }
 
+
+/// acceptor destructor (SSL acceptor)
 SSLacceptor::~SSLacceptor()
 {
 	LOG_TRACE << "Acceptor destructor called for " << identifier_;
