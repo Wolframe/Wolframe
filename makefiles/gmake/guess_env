@@ -96,24 +96,20 @@ else
 	if test $? = 0; then
 		COMPILER='tcc'
 	else
-		( $CC -V 2>&1 | grep l_cproc_p ) >/dev/null
+#		( $CC -V 2>&1 | grep l_cproc_p ) >/dev/null
+		( $CC -V 2>&1 | grep "Intel(R) C" | grep "Compiler" ) >/dev/null
 		if test $? = 0; then
 			COMPILER='icc'
 		else
-			( $CC -V 2>&1 | grep "Intel(R) C" | grep "Compiler" ) >/dev/null
+			( $CC -xhelp=readme | head -n 1 | grep 'Sun Studio' ) >/dev/null
 			if test $? = 0; then
-				COMPILER='icc'
+				COMPILER='spro'
 			else
-				( $CC -xhelp=readme | head -n 1 | grep 'Sun Studio' ) >/dev/null
+				( $CC -v | head -n 1 | grep 'pcc' ) >/dev/null
 				if test $? = 0; then
-					COMPILER='spro'
+					COMPILER='pcc'
 				else
-					( $CC -v | head -n 1 | grep 'pcc' ) >/dev/null
-					if test $? = 0; then
-						COMPILER='pcc'
-					else
-						COMPILER='unknown'
-					fi
+					COMPILER='unknown'
 				fi
 			fi
 		fi

@@ -8,21 +8,39 @@
 
 namespace _SMERP {
 
+Version::Version( unsigned short M )
+{
+	major_ = M;
+	hasMinor_ = hasRevision_ = hasBuild_ = false;
+}
+
+Version::Version( unsigned short M, unsigned short m )
+{
+	major_ = M, minor_ = m;
+	hasMinor_ = true;
+	hasRevision_ = hasBuild_ = false;
+}
+
+Version::Version( unsigned short M, unsigned short m, unsigned short r )
+{
+	major_ = M, minor_ = m, revision_ = r;
+	hasMinor_ = hasRevision_ = true;
+	hasBuild_ = false;
+}
+
 Version::Version( unsigned short M, unsigned short m, unsigned short r, unsigned b )
 {
 	major_ = M, minor_ = m, revision_ = r, build_ = b;
-	verStr_ += boost::lexical_cast<std::string>( major_ );
-	verStr_ += ".";
-	verStr_ += boost::lexical_cast<std::string>( minor_ );
-	if ( r !=0 || b != 0 )	{
-		verStr_ += ".";
-		verStr_ += boost::lexical_cast<std::string>( revision_ );
-		if ( b != 0 )	{
-			verStr_ += ".";
-			verStr_ += boost::lexical_cast<std::string>( build_ );
-		}
-	}
+	hasMinor_ = hasRevision_ = hasBuild_ = true;
 }
 
+//bool Version::operator== ( const Version &other ) const;
+
+//bool Version::operator> ( const Version &other ) const;
+//bool Version::operator>= ( const Version &other ) const;
+//bool Version::operator< ( const Version &other ) const;
+//bool Version::operator<= ( const Version &other ) const;
+
+//std::string& toString();
 } // namespace _SMERP
 
