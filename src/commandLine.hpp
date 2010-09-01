@@ -41,8 +41,8 @@ namespace _SMERP	{
 	public:
 		CmdLineConfig();
 		bool parse( int argc, char* argv[] );
-		std::string errMsg( void )	{ return errMsg_; };
-		void usage( std::ostream& os ) const	{ options_.print( os ); };
+		std::string errMsg( void )	{ return errMsg_; }
+		void usage( std::ostream& os ) const	{ options_.print( os ); }
 	};
 
 } // namespace _SMERP

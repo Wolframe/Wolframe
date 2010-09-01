@@ -50,6 +50,7 @@ void connection::start()
 	setTimeout( connectionTimeout::TIMEOUT_IDLE );
 }
 
+
 void SSLconnection::start()
 {
 	identifier( std::string( SSLsocket_.lowest_layer().remote_endpoint().address().to_string())

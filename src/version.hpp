@@ -9,13 +9,11 @@ namespace _SMERP {
 	private:
 		unsigned short	major_;
 		unsigned short	minor_;
-		bool		hasMinor_;
 		unsigned short	revision_;
 		bool		hasRevision_;
 		unsigned	build_;
 		bool		hasBuild_;
 	public:
-		Version( unsigned short M );
 		Version( unsigned short M, unsigned short m );
 		Version( unsigned short M, unsigned short m, unsigned short r );
 		Version( unsigned short M, unsigned short m, unsigned short r, unsigned b );
@@ -26,14 +24,14 @@ namespace _SMERP {
 		unsigned build()		{ return build_; }
 
 		bool operator== ( const Version &other ) const;
-		bool operator!= ( const Version &other ) const	{ return !(*this == other); }
+		bool operator!= ( const Version &other ) const	{ return !( *this == other ); }
 
 		bool operator> ( const Version &other ) const;
-		bool operator>= ( const Version &other ) const;
-		bool operator< ( const Version &other ) const;
-		bool operator<= ( const Version &other ) const;
+		bool operator>= ( const Version &other ) const	{ return !( *this < other ); }
+		bool operator< ( const Version &other ) const	{ return ( other > *this ); }
+		bool operator<= ( const Version &other ) const	{ return !( *this > other ); }
 
-		std::string& toString();
+		std::string toString();
 	};
 
 } // namespace _SMERP
