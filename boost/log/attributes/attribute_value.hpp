@@ -17,8 +17,8 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#ifndef BOOST_LOG_ATTRIBUTE_VALUE_HPP_INCLUDED_
-#define BOOST_LOG_ATTRIBUTE_VALUE_HPP_INCLUDED_
+#ifndef BOOST_LOG_ATTRIBUTES_ATTRIBUTE_VALUE_HPP_INCLUDED_
+#define BOOST_LOG_ATTRIBUTES_ATTRIBUTE_VALUE_HPP_INCLUDED_
 
 #include <boost/mpl/eval_if.hpp>
 #include <boost/mpl/identity.hpp>
@@ -66,4 +66,4 @@ inline typename attribute_value::result_of_extract< T >::type attribute_value::e
 
 } // namespace boost
 
-#endif // BOOST_LOG_ATTRIBUTE_VALUE_HPP_INCLUDED_
+#endif // BOOST_LOG_ATTRIBUTES_ATTRIBUTE_VALUE_HPP_INCLUDED_

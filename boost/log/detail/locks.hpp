@@ -46,7 +46,7 @@ class no_lock
 {
 public:
     /*!
-     * Constructs the pseudo-lock with any type of mutex. The mutex is not affected during construction.
+     * Constructs the pseudo-lock. The mutex is not affected during the construction.
      */
     explicit no_lock(MutexT&) {}
 
@@ -58,6 +58,34 @@ private:
 namespace aux {
 
 #ifndef BOOST_LOG_NO_THREADS
+
+//! A trait to detect if the mutex supports exclusive locking
+template< typename MutexT >
+struct is_exclusively_lockable
+{
+    typedef char true_type;
+    struct false_type { char t[2]; };
+
+    template< typename T >
+    static true_type check(T*, void (T::*)() = &T::lock, void (T::*)() = &T::unlock);
+    static false_type check(void*);
+
+    enum _ { value = sizeof(check((MutexT*)NULL)) == sizeof(true_type) };
+};
+
+//! A trait to detect if the mutex supports shared locking
+template< typename MutexT >
+struct is_shared_lockable
+{
+    typedef char true_type;
+    struct false_type { char t[2]; };
+
+    template< typename T >
+    static true_type check(T*, void (T::*)() = &T::lock_shared, void (T::*)() = &T::unlock_shared);
+    static false_type check(void*);
+
+    enum _ { value = sizeof(check((MutexT*)NULL)) == sizeof(true_type) };
+};
 
 //! An analogue to the minimalistic \c lock_guard template. Defined here to avoid including Boost.Thread.
 template< typename MutexT >

@@ -25,9 +25,10 @@
 #error Boost.Log: The current_thread_id attribute is only available in multithreaded builds
 #endif
 
-#include <boost/make_shared.hpp>
-#include <boost/enable_shared_from_this.hpp>
+#include <boost/intrusive_ptr.hpp>
 #include <boost/thread/thread.hpp>
+#include <boost/log/attributes/attribute.hpp>
+#include <boost/log/attributes/attribute_cast.hpp>
 #include <boost/log/attributes/basic_attribute_value.hpp>
 
 namespace boost {
@@ -39,41 +40,55 @@ namespace attributes {
 /*!
  * \brief A class of an attribute that always returns the current thread identifier
  *
- * \note This attribute may be registered globally, it will still return the correct
- *       thread identifier no matter which thread emits the log record.
+ * \note This attribute can be registered globally, it will still return the correct
+ *       thread identifier, no matter which thread emits the log record.
  */
 class current_thread_id :
-    public attribute,
-    public attribute_value::implementation,
-    public enable_shared_from_this< current_thread_id >
+    public attribute
 {
 public:
     //! A held attribute value type
-    typedef thread::id held_type;
+    typedef thread::id value_type;
+
+protected:
+    //! Factory implementation
+    class BOOST_LOG_VISIBLE impl :
+        public attribute_value::impl
+    {
+    public:
+        bool dispatch(type_dispatcher& dispatcher)
+        {
+            type_dispatcher::callback< value_type > callback =
+                dispatcher.get_callback< value_type >();
+            if (callback)
+            {
+                callback(this_thread::get_id());
+                return true;
+            }
+            else
+                return false;
+        }
+
+        intrusive_ptr< attribute_value::impl > detach_from_thread()
+        {
+            typedef basic_attribute_value< value_type > detached_value;
+            return new detached_value(this_thread::get_id());
+        }
+    };
 
 public:
-    virtual bool dispatch(type_dispatcher& dispatcher)
+    /*!
+     * Default constructor
+     */
+    current_thread_id() : attribute(new impl())
     {
-        type_dispatcher::callback< held_type > callback =
-            dispatcher.get_callback< held_type >();
-        if (callback)
-        {
-            callback(this_thread::get_id());
-            return true;
-        }
-        else
-            return false;
     }
-
-    virtual attribute_value get_value()
+    /*!
+     * Constructor for casting support
+     */
+    explicit current_thread_id(cast_source const& source) :
+        attribute(source.as< impl >())
     {
-        return attribute_value(this->shared_from_this());
-    }
-
-    virtual shared_ptr< attribute_value::implementation > detach_from_thread()
-    {
-        typedef basic_attribute_value< held_type > detached_value;
-        return boost::make_shared< detached_value >(this_thread::get_id());
     }
 };
 

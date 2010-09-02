@@ -24,7 +24,6 @@
 #include <memory>
 #include <iterator>
 #include <boost/log/detail/prologue.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/current_function.hpp>
 #include <boost/mpl/if.hpp>
 #ifdef BOOST_LOG_USE_WCHAR_T
@@ -34,6 +33,7 @@
 #include <boost/log/utility/unique_identifier_name.hpp>
 #include <boost/log/utility/no_unused_warnings.hpp>
 #include <boost/log/attributes/attribute.hpp>
+#include <boost/log/attributes/attribute_cast.hpp>
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -358,9 +358,9 @@ public:
     //! Character type
     typedef CharT char_type;
     //! Scope names stack (the attribute value type)
-    typedef basic_named_scope_list< char_type > scope_stack;
+    typedef basic_named_scope_list< char_type > value_type;
     //! Scope entry
-    typedef typename scope_stack::value_type scope_entry;
+    typedef typename value_type::value_type scope_entry;
 
     //! Sentry object class to automatically push and pop scopes
     struct sentry
@@ -378,7 +378,9 @@ public:
         sentry(
             basic_string_literal< char_type > const& sn,
             basic_string_literal< char_type > const& fn,
-            unsigned int ln) : m_Entry(sn, fn, ln)
+            unsigned int ln
+        ) :
+            m_Entry(sn, fn, ln)
         {
             named_scope_type::push_scope(m_Entry);
         }
@@ -397,19 +399,17 @@ public:
 
 private:
     //! Attribute implementation class
-    struct implementation;
-
-private:
-    //! Pointer to the implementation
-    shared_ptr< implementation > pImpl;
+    struct BOOST_LOG_VISIBLE impl;
 
 public:
     /*!
      * Constructor. Creates an attribute.
      */
     basic_named_scope();
-
-    attribute_value get_value();
+    /*!
+     * Constructor for casting support
+     */
+    explicit basic_named_scope(cast_source const& source);
 
     /*!
      * The method pushes the scope to the back of the current thread's scope list
@@ -432,7 +432,7 @@ public:
      *        or \c pop_scope is called). User has to copy the stack if he wants to keep it intact regardless
      *        of the execution scope.
      */
-    static scope_stack const& get_scopes();
+    static value_type const& get_scopes();
 };
 
 #if defined(BOOST_LOG_USE_CHAR)

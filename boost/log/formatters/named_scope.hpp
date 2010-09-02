@@ -73,7 +73,7 @@ public:
     typedef typename base_type::record_type record_type;
 
     //! Scope stack container type
-    typedef typename attributes::basic_named_scope< char_type >::scope_stack scope_stack;
+    typedef typename attributes::basic_named_scope< char_type >::value_type scope_stack;
 
 private:
 #ifndef BOOST_LOG_DOXYGEN_PASS

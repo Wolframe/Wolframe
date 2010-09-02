@@ -47,8 +47,18 @@
 
 #if !defined(BOOST_LOG_CAS_PTR)
 #include <boost/thread/locks.hpp>
-#include <boost/thread/mutex.hpp>
+#include <boost/log/detail/spin_mutex.hpp>
 #endif // !defined(BOOST_LOG_CAS_PTR)
+
+#if defined(__GNUC__)
+#define BOOST_LOG_ALIGN(x) __attribute__((aligned(x)))
+#elif defined(_MSC_VER)
+#define BOOST_LOG_ALIGN(x) __declspec(align(x))
+#else
+#define BOOST_LOG_ALIGN(x)
+#endif
+
+#define BOOST_LOG_CPU_CACHE_LINE_SIZE 64
 
 namespace boost {
 
@@ -60,7 +70,7 @@ namespace aux {
  * A simple atomic queue class. Allows to put and eject elements from different threads concurrently.
  */
 template< typename T, typename AllocatorT = std::allocator< T > >
-class atomic_queue
+class BOOST_LOG_ALIGN(BOOST_LOG_CPU_CACHE_LINE_SIZE) atomic_queue
 {
 public:
     typedef typename AllocatorT::BOOST_NESTED_TEMPLATE rebind< T >::other allocator;
@@ -104,26 +114,18 @@ private:
     {
         node* m_pLast;
 #if !defined(BOOST_LOG_CAS_PTR)
-        mutex m_Mutex;
+        spin_mutex m_Mutex;
 #endif // !defined(BOOST_LOG_CAS_PTR)
     };
 
-    enum constants
-    {
-        // Padding size to avoid false aliasing
-        cache_line_size = 64
-    };
-
 private:
-    unsigned char padding1[cache_line_size];
     implementation m_Impl;
-    unsigned char padding2
+
+    // Padding to avoid false aliasing
+    unsigned char padding
     [
-        cache_line_size > sizeof(implementation) ?
-        cache_line_size - sizeof(implementation) :
-            (cache_line_size == sizeof(implementation) ?
-             (size_t)cache_line_size :
-             cache_line_size - (sizeof(implementation) % cache_line_size))
+        ((sizeof(implementation) + BOOST_LOG_CPU_CACHE_LINE_SIZE - 1) / BOOST_LOG_CPU_CACHE_LINE_SIZE)
+            * BOOST_LOG_CPU_CACHE_LINE_SIZE - sizeof(implementation)
     ];
 
     static internal_allocator g_Allocator;
@@ -151,8 +153,8 @@ public:
     {
 #if !defined(BOOST_LOG_CAS_PTR)
 
-        lock_guard< mutex > _(m_Impl.m_Mutex);
         register node* p = new node(val);
+        lock_guard< spin_mutex > _(m_Impl.m_Mutex);
         p->m_pPrev = m_Impl.m_pLast;
         m_Impl.m_pLast = p;
 
@@ -175,7 +177,7 @@ public:
     {
 #if !defined(BOOST_LOG_CAS_PTR)
 
-        unique_lock< mutex > lock(m_Impl.m_Mutex, try_to_lock);
+        unique_lock< spin_mutex > lock(m_Impl.m_Mutex, try_to_lock);
         if (lock)
         {
             register node* p = new node(val);
@@ -214,7 +216,7 @@ public:
 #if !defined(BOOST_LOG_CAS_PTR)
 
         {
-            lock_guard< mutex > _(m_Impl.m_Mutex);
+            lock_guard< spin_mutex > _(m_Impl.m_Mutex);
             p = m_Impl.m_pLast;
             m_Impl.m_pLast = NULL;
         }

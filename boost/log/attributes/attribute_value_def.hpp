@@ -20,10 +20,12 @@
 #ifndef BOOST_LOG_ATTRIBUTE_VALUE_DEF_HPP_INCLUDED_
 #define BOOST_LOG_ATTRIBUTE_VALUE_DEF_HPP_INCLUDED_
 
-#include <boost/shared_ptr.hpp>
+#include <boost/intrusive_ptr.hpp>
 #include <boost/log/detail/prologue.hpp>
 #include <boost/log/utility/explicit_operator_bool.hpp>
+#include <boost/log/utility/intrusive_ref_counter.hpp>
 #include <boost/log/utility/type_dispatch/type_dispatcher.hpp>
+#include <boost/log/attributes/attribute_def.hpp>
 
 namespace boost {
 
@@ -63,14 +65,10 @@ public:
      *
      * All attribute value holders should derive from this interface.
      */
-    struct BOOST_LOG_NO_VTABLE implementation
+    struct BOOST_LOG_NO_VTABLE impl :
+        public attribute::impl
     {
     public:
-        /*!
-         * Destructor. Destroys the value.
-         */
-        virtual ~implementation() {}
-
         /*!
          * The method dispatches the value to the given object.
          *
@@ -87,7 +85,15 @@ public:
          *         In the latter case the returned pointer replaces the pointer used by caller to invoke this
          *         method and is considered to be a functional equivalent to the previous pointer.
          */
-        virtual shared_ptr< implementation > detach_from_thread() = 0;
+        virtual intrusive_ptr< impl > detach_from_thread()
+        {
+            return this;
+        }
+
+        /*!
+         * \return The attribute value that refers to self implementation.
+         */
+        virtual attribute_value get_value() { return attribute_value(this); }
     };
 
     /*!
@@ -102,7 +108,7 @@ public:
 
 private:
     //! Pointer to the value implementation
-    shared_ptr< implementation > m_pImpl;
+    intrusive_ptr< impl > m_pImpl;
 
 public:
     /*!
@@ -114,7 +120,7 @@ public:
      *
      * \param p A pointer to the attribute value holder.
      */
-    explicit attribute_value(shared_ptr< implementation > p) { m_pImpl.swap(p); }
+    explicit attribute_value(intrusive_ptr< impl > p) { m_pImpl.swap(p); }
 
     /*!
      * The operator checks if the attribute value is empty

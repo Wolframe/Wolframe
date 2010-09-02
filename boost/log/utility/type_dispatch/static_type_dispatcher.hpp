@@ -107,6 +107,8 @@ private:
 private:
     //! Pointer to the receiver function
     void* m_pVisitor;
+    //! Pointer to the dispatching map
+    dispatching_map const& m_DispatchingMap;
 
 public:
     /*!
@@ -114,28 +116,18 @@ public:
      */
     template< typename VisitorT >
     explicit type_sequence_dispatcher(VisitorT& visitor) :
-        m_pVisitor((void*)boost::addressof(visitor))
+        m_pVisitor((void*)boost::addressof(visitor)),
+        m_DispatchingMap(get_dispatching_map< VisitorT >())
     {
-        BOOST_LOG_ONCE_BLOCK()
-        {
-            dispatching_map& disp_map = get_dispatching_map();
-            typename dispatching_map::value_type* p = &*disp_map.begin();
-
-            mpl::for_each< supported_types, mpl::quote1< visible_type > >(
-                dispatching_map_initializer< VisitorT >(p));
-
-            std::sort(disp_map.begin(), disp_map.end(), dispatching_map_order());
-        }
     }
 
 private:
     //! The get_callback method implementation
     callback_base get_callback(std::type_info const& type)
     {
-        dispatching_map const& disp_map = get_dispatching_map();
         type_info_wrapper wrapper(type);
-        typename dispatching_map::value_type const* begin = &*disp_map.begin();
-        typename dispatching_map::value_type const* end = begin + disp_map.size();
+        typename dispatching_map::value_type const* begin = &*m_DispatchingMap.begin();
+        typename dispatching_map::value_type const* end = begin + dispatching_map::static_size;
         typename dispatching_map::value_type const* it =
             std::lower_bound(
                 begin,
@@ -151,10 +143,25 @@ private:
     }
 
     //! The method returns the dispatching map instance
-    static dispatching_map& get_dispatching_map()
+    template< typename VisitorT >
+    static dispatching_map const& get_dispatching_map()
     {
-        static dispatching_map instance;
-        return instance;
+        static const dispatching_map* pinstance = NULL;
+
+        BOOST_LOG_ONCE_BLOCK()
+        {
+            static dispatching_map instance;
+            typename dispatching_map::value_type* p = &*instance.begin();
+
+            mpl::for_each< supported_types, mpl::quote1< visible_type > >(
+                dispatching_map_initializer< VisitorT >(p));
+
+            std::sort(instance.begin(), instance.end(), dispatching_map_order());
+
+            pinstance = &instance;
+        }
+
+        return *pinstance;
     }
 
 private:

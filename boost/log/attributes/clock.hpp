@@ -19,12 +19,10 @@
 #ifndef BOOST_LOG_ATTRIBUTES_CLOCK_HPP_INCLUDED_
 #define BOOST_LOG_ATTRIBUTES_CLOCK_HPP_INCLUDED_
 
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
-#include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/log/detail/prologue.hpp>
 #include <boost/log/attributes/attribute.hpp>
 #include <boost/log/attributes/attribute_value_def.hpp>
+#include <boost/log/attributes/attribute_cast.hpp>
 #include <boost/log/attributes/basic_attribute_value.hpp>
 #include <boost/log/attributes/time_traits.hpp>
 
@@ -50,17 +48,33 @@ class basic_clock :
     public attribute
 {
 public:
-    //! Time storage type
-    typedef typename TimeTraitsT::time_type time_type;
+    //! Generated value type
+    typedef typename TimeTraitsT::time_type value_type;
 
-private:
-    //! Attribute value type
-    typedef basic_attribute_value< time_type > result_value;
+protected:
+    //! Attribute factory implementation
+    struct BOOST_LOG_VISIBLE impl :
+        public attribute::impl
+    {
+        attribute_value get_value()
+        {
+            typedef basic_attribute_value< value_type > result_value;
+            return attribute_value(new result_value(TimeTraitsT::get_clock()));
+        }
+    };
 
 public:
-    attribute_value get_value()
+    /*!
+     * Default constructor
+     */
+    basic_clock() : attribute(new impl())
     {
-        return attribute_value(boost::make_shared< result_value >(TimeTraitsT::get_clock()));
+    }
+    /*!
+     * Constructor for casting support
+     */
+    explicit basic_clock(cast_source const& source) : attribute(source.as< impl >())
+    {
     }
 };
 

@@ -20,8 +20,6 @@
 #define BOOST_LOG_UTILITY_INIT_COMMON_ATTRIBUTES_HPP_INCLUDED_
 
 #include <iostream>
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
 #include <boost/log/detail/prologue.hpp>
 #include <boost/log/core/core.hpp>
 #include <boost/log/attributes/clock.hpp>
@@ -87,17 +85,17 @@ void add_common_attributes()
     shared_ptr< basic_core< CharT > > pCore = basic_core< CharT >::get();
     pCore->add_global_attribute(
         traits_t::line_id_attr_name(),
-        boost::make_shared< attributes::counter< unsigned int > >(1));
+        attributes::counter< unsigned int >(1));
     pCore->add_global_attribute(
         traits_t::time_stamp_attr_name(),
-        boost::make_shared< attributes::local_clock >());
+        attributes::local_clock());
     pCore->add_global_attribute(
         traits_t::process_id_attr_name(),
-        boost::make_shared< attributes::current_process_id >());
+        attributes::current_process_id());
 #if !defined(BOOST_LOG_NO_THREADS)
     pCore->add_global_attribute(
         traits_t::thread_id_attr_name(),
-        boost::make_shared< attributes::current_thread_id >());
+        attributes::current_thread_id());
 #endif
 }
 

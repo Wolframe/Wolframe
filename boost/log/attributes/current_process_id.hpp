@@ -22,6 +22,7 @@
 #include <boost/log/detail/prologue.hpp>
 #include <boost/log/detail/process_id.hpp>
 #include <boost/log/attributes/constant.hpp>
+#include <boost/log/attributes/attribute_cast.hpp>
 
 namespace boost {
 
@@ -42,6 +43,13 @@ public:
      * Constructor. Inirializes the attribute with the current process identifier.
      */
     current_process_id() : base_type(boost::log::aux::this_process::get_id()) {}
+    /*!
+     * Constructor for casting support
+     */
+    explicit current_process_id(cast_source const& source) :
+        base_type(source)
+    {
+    }
 };
 
 } // namespace attributes

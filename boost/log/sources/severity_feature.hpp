@@ -19,12 +19,11 @@
 #ifndef BOOST_LOG_SOURCES_SEVERITY_FEATURE_HPP_INCLUDED_
 #define BOOST_LOG_SOURCES_SEVERITY_FEATURE_HPP_INCLUDED_
 
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
-#include <boost/enable_shared_from_this.hpp>
+#include <boost/intrusive_ptr.hpp>
 #include <boost/log/detail/prologue.hpp>
 #include <boost/log/detail/locks.hpp>
 #include <boost/log/attributes/attribute.hpp>
+#include <boost/log/attributes/attribute_cast.hpp>
 #include <boost/log/attributes/basic_attribute_value.hpp>
 #include <boost/log/utility/strictest_lock.hpp>
 #include <boost/log/utility/type_dispatch/type_dispatcher.hpp>
@@ -73,51 +72,59 @@ namespace aux {
     //! Severity level attribute implementation
     template< typename LevelT >
     class severity_level :
-        public attribute,
-        public attribute_value::implementation,
-        public enable_shared_from_this< severity_level< LevelT > >
+        public attribute
     {
     public:
         //! Stored level type
-        typedef LevelT held_type;
+        typedef LevelT value_type;
+
+    protected:
+        //! Factory implementation
+        class BOOST_LOG_VISIBLE impl :
+            public attribute_value::impl
+        {
+        public:
+            //! The method dispatches the value to the given object
+            bool dispatch(type_dispatcher& dispatcher)
+            {
+                type_dispatcher::callback< value_type > callback =
+                    dispatcher.get_callback< value_type >();
+                if (callback)
+                {
+                    callback(static_cast< value_type >(get_severity_level()));
+                    return true;
+                }
+                else
+                    return false;
+            }
+
+            //! The method is called when the attribute value is passed to another thread
+            intrusive_ptr< attribute_value::impl > detach_from_thread()
+            {
+    #if !defined(BOOST_LOG_NO_THREADS)
+                return new attributes::basic_attribute_value< value_type >(
+                    static_cast< value_type >(get_severity_level()));
+    #else
+                // With multithreading disabled we may safely return this here. This method will not be called anyway.
+                return this;
+    #endif
+            }
+        };
 
     public:
-        //! The method returns the actual attribute value. It must not return NULL.
-        virtual attribute_value get_value()
+        //! Default constructor
+        severity_level() : attribute(new impl())
         {
-            return attribute_value(this->shared_from_this());
+        }
+        //! Constructor for casting support
+        explicit severity_level(attributes::cast_source const& source) :
+            attribute(source.as< impl >())
+        {
         }
         //! The method sets the actual level
-        void set_value(held_type level)
+        void set_value(value_type level)
         {
             set_severity_level(static_cast< int >(level));
-        }
-
-        //! The method dispatches the value to the given object
-        virtual bool dispatch(type_dispatcher& dispatcher)
-        {
-            type_dispatcher::callback< held_type > callback =
-                dispatcher.get_callback< held_type >();
-            if (callback)
-            {
-                callback(static_cast< held_type >(get_severity_level()));
-                return true;
-            }
-            else
-                return false;
-        }
-
-        //! The method is called when the attribute value is passed to another thread
-        virtual shared_ptr< attribute_value::implementation > detach_from_thread()
-        {
-#if !defined(BOOST_LOG_NO_THREADS)
-            return boost::make_shared<
-                attributes::basic_attribute_value< held_type >
-            >(static_cast< held_type >(get_severity_level()));
-#else
-            // With multithreading disabled we may safely return this here. This method will not be called anyway.
-            return this->shared_from_this();
-#endif
         }
     };
 
@@ -172,7 +179,7 @@ private:
     //! Default severity
     severity_level m_DefaultSeverity;
     //! Severity attribute
-    shared_ptr< severity_attribute > m_pSeverity;
+    severity_attribute m_SeverityAttr;
 
 public:
     /*!
@@ -181,12 +188,11 @@ public:
      */
     basic_severity_logger() :
         base_type(),
-        m_DefaultSeverity(static_cast< severity_level >(0)),
-        m_pSeverity(boost::make_shared< severity_attribute >())
+        m_DefaultSeverity(static_cast< severity_level >(0))
     {
         base_type::add_attribute_unlocked(
             aux::severity_attribute_name< char_type >::get(),
-            m_pSeverity);
+            m_SeverityAttr);
     }
     /*!
      * Copy constructor
@@ -194,9 +200,9 @@ public:
     basic_severity_logger(basic_severity_logger const& that) :
         base_type(static_cast< base_type const& >(that)),
         m_DefaultSeverity(that.m_DefaultSeverity),
-        m_pSeverity(that.m_pSeverity)
+        m_SeverityAttr(that.m_SeverityAttr)
     {
-        base_type::attributes()[aux::severity_attribute_name< char_type >::get()] = m_pSeverity;
+        base_type::attributes()[aux::severity_attribute_name< char_type >::get()] = m_SeverityAttr;
     }
     /*!
      * Constructor with named arguments. Allows to setup the default level for log records.
@@ -207,12 +213,11 @@ public:
     template< typename ArgsT >
     explicit basic_severity_logger(ArgsT const& args) :
         base_type(args),
-        m_DefaultSeverity(args[keywords::severity | severity_level()]),
-        m_pSeverity(boost::make_shared< severity_attribute >())
+        m_DefaultSeverity(args[keywords::severity | severity_level()])
     {
         base_type::add_attribute_unlocked(
             aux::severity_attribute_name< char_type >::get(),
-            m_pSeverity);
+            m_SeverityAttr);
     }
 
     /*!
@@ -224,7 +229,7 @@ protected:
     /*!
      * Severity attribute accessor
      */
-    shared_ptr< severity_attribute > const& get_severity_attribute() const { return m_pSeverity; }
+    severity_attribute const& get_severity_attribute() const { return m_SeverityAttr; }
 
     /*!
      * Unlocked \c open_record
@@ -232,7 +237,7 @@ protected:
     template< typename ArgsT >
     record_type open_record_unlocked(ArgsT const& args)
     {
-        m_pSeverity->set_value(args[keywords::severity | m_DefaultSeverity]);
+        m_SeverityAttr.set_value(args[keywords::severity | m_DefaultSeverity]);
         return base_type::open_record_unlocked(args);
     }
 
@@ -243,7 +248,7 @@ protected:
         severity_level t = m_DefaultSeverity;
         m_DefaultSeverity = that.m_DefaultSeverity;
         that.m_DefaultSeverity = t;
-        m_pSeverity.swap(that.m_pSeverity);
+        m_SeverityAttr.swap(that.m_SeverityAttr);
     }
 };
 

@@ -19,8 +19,6 @@
 #ifndef BOOST_LOG_ATTRIBUTES_FUNCTOR_HPP_INCLUDED_
 #define BOOST_LOG_ATTRIBUTES_FUNCTOR_HPP_INCLUDED_
 
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/utility/result_of.hpp>
 #include <boost/type_traits/is_void.hpp>
@@ -28,6 +26,7 @@
 #include <boost/type_traits/remove_reference.hpp>
 #include <boost/log/detail/prologue.hpp>
 #include <boost/log/attributes/attribute.hpp>
+#include <boost/log/attributes/attribute_cast.hpp>
 #include <boost/log/attributes/basic_attribute_value.hpp>
 
 namespace boost {
@@ -36,46 +35,75 @@ namespace BOOST_LOG_NAMESPACE {
 
 namespace attributes {
 
-#ifndef BOOST_LOG_DOXYGEN_PASS
-
 /*!
  * \brief A class of an attribute that acquires its value from a third-party functor
  *
- * The attribute calls a stored nullary functional object to acquire each value.
- * The result type of the functional object is the attribute value type.
+ * The attribute calls a stored nullary function object to acquire each value.
+ * The result type of the function object is the attribute value type.
  *
  * It is not recommended to use this class directly. Use \c make_functor_attr convenience functions
  * to construct the attribute instead.
  */
-template< typename R, typename T >
+template< typename R >
 class functor :
     public attribute
 {
+    //  The result type of the function object must not be void
+    BOOST_STATIC_ASSERT(!is_void< R >::value);
+
 public:
-    //! A held functor type
-    typedef T held_type;
+    //! The attribute value type
+    typedef R value_type;
 
-private:
-    //! Attribute value type
-    typedef basic_attribute_value< R > functor_result_value;
+protected:
+    //! Base class for factory implementation
+    class BOOST_LOG_NO_VTABLE BOOST_LOG_VISIBLE impl :
+        public attribute::impl
+    {
+    };
 
-private:
-    //! Functor that returns attribute values
-    const held_type m_Functor;
+    //! Factory implementation
+    template< typename T >
+    class impl_template :
+        public impl
+    {
+    private:
+        //! Functor that returns attribute values
+        /*!
+         * \note The constness signifies that the function object should avoid
+         *       modifying its state since it's not protected against concurrent calls.
+         */
+        const T m_Functor;
+
+    public:
+        /*!
+         * Constructor with the stored delegate imitialization
+         */
+        explicit impl_template(T const& fun) : m_Functor(fun) {}
+
+        attribute_value get_value()
+        {
+            typedef basic_attribute_value< value_type > attr_value;
+            return attribute_value(new attr_value(m_Functor()));
+        }
+    };
 
 public:
     /*!
-     * Constructor with the stored delegate imitialization
+     * Initializing constructor
      */
-    explicit functor(held_type const& fun) : m_Functor(fun) {}
-
-    attribute_value get_value()
+    template< typename T >
+    explicit functor(T const& fun) : attribute(new impl_template< T >(fun))
     {
-        return attribute_value(boost::make_shared< functor_result_value >(m_Functor()));
+    }
+    /*!
+     * Constructor for casting support
+     */
+    explicit functor(cast_source const& source) :
+        attribute(source.as< impl >())
+    {
     }
 };
-
-#endif // BOOST_LOG_DOXYGEN_PASS
 
 #ifndef BOOST_NO_RESULT_OF
 
@@ -86,17 +114,22 @@ public:
  * \return Pointer to the attribute instance
  */
 template< typename T >
-inline shared_ptr< attribute > make_functor_attr(T const& fun)
+inline functor<
+    typename remove_cv<
+        typename remove_reference<
+            typename result_of< T() >::type
+        >::type
+    >::type
+> make_functor_attr(T const& fun)
 {
     typedef typename remove_cv<
         typename remove_reference<
             typename result_of< T() >::type
         >::type
     >::type result_type;
-    BOOST_STATIC_ASSERT(!is_void< result_type >::value);
 
-    typedef functor< result_type, T > functor_t;
-    return boost::make_shared< functor_t >(fun);
+    typedef functor< result_type > functor_t;
+    return functor_t(fun);
 }
 
 #endif // BOOST_NO_RESULT_OF
@@ -111,15 +144,18 @@ inline shared_ptr< attribute > make_functor_attr(T const& fun)
  * \return Pointer to the attribute instance
  */
 template< typename R, typename T >
-inline shared_ptr< attribute > make_functor_attr(T const& fun)
+inline functor<
+    typename remove_cv<
+        typename remove_reference< R >::type
+    >::type
+> make_functor_attr(T const& fun)
 {
     typedef typename remove_cv<
         typename remove_reference< R >::type
     >::type result_type;
-    BOOST_STATIC_ASSERT(!is_void< result_type >::value);
 
-    typedef functor< result_type, T > functor_t;
-    return boost::make_shared< functor_t >(fun);
+    typedef functor< result_type > functor_t;
+    return functor_t(fun);
 }
 
 #endif // BOOST_LOG_DOXYGEN_PASS

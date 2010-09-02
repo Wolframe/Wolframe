@@ -312,7 +312,7 @@ private:
         }
 
         // The attribute is found, acquiring the value
-        return insert_node(key, b, where, it->second->get_value());
+        return insert_node(key, b, where, it->second.get_value());
     }
 
     //! The function inserts a node into the container
@@ -362,7 +362,7 @@ private:
                     continue; // the element is already frozen
             }
 
-            insert_node(key, b, p, it->second->get_value());
+            insert_node(key, b, p, it->second.get_value());
         }
     }
 };

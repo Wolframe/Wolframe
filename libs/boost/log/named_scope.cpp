@@ -76,8 +76,7 @@ BOOST_LOG_ANONYMOUS_NAMESPACE {
     //! Named scope attribute value
     template< typename CharT >
     class basic_named_scope_value :
-        public attribute_value::implementation,
-        public enable_shared_from_this< basic_named_scope_value< CharT > >
+        public attribute_value::impl
     {
         //! Character type
         typedef CharT char_type;
@@ -110,7 +109,7 @@ BOOST_LOG_ANONYMOUS_NAMESPACE {
 
         //! The method is called when the attribute value is passed to another thread (e.g.
         //! in case of asynchronous logging). The value should ensure it properly owns all thread-specific data.
-        shared_ptr< attribute_value::implementation > detach_from_thread()
+        intrusive_ptr< attribute_value::impl > detach_from_thread()
         {
             if (!m_DetachedValue)
             {
@@ -118,7 +117,7 @@ BOOST_LOG_ANONYMOUS_NAMESPACE {
                 m_pValue = m_DetachedValue.get_ptr();
             }
 
-            return this->shared_from_this();
+            return this;
         }
     };
 
@@ -126,17 +125,17 @@ BOOST_LOG_ANONYMOUS_NAMESPACE {
 
 //! Named scope attribute implementation
 template< typename CharT >
-struct basic_named_scope< CharT >::implementation :
+struct BOOST_LOG_VISIBLE basic_named_scope< CharT >::impl :
+    public attribute::impl,
     public log::aux::singleton<
-        implementation,
-        shared_ptr< implementation >
-    >,
-    public enable_shared_from_this< implementation >
+        impl,
+        intrusive_ptr< impl >
+    >
 {
     //! Singleton base type
     typedef log::aux::singleton<
-        implementation,
-        shared_ptr< implementation >
+        impl,
+        intrusive_ptr< impl >
     > singleton_base_type;
 
     //! Writable scope list type
@@ -181,11 +180,17 @@ struct basic_named_scope< CharT >::implementation :
     //! Instance initializer
     static void init_instance()
     {
-        singleton_base_type::get_instance().reset(new implementation());
+        singleton_base_type::get_instance().reset(new impl());
+    }
+
+    //! The method returns the actual attribute value. It must not return NULL.
+    attribute_value get_value()
+    {
+        return attribute_value(new basic_named_scope_value< char_type >(&get_scope_list()));
     }
 
 private:
-    implementation() {}
+    impl() {}
 };
 
 #if defined(BOOST_LOG_USE_COMPILER_TLS)
@@ -276,23 +281,22 @@ void basic_named_scope_list< CharT >::swap(basic_named_scope_list& that)
 //! Constructor
 template< typename CharT >
 basic_named_scope< CharT >::basic_named_scope() :
-    pImpl(implementation::instance)
+    attribute(impl::instance)
 {
 }
 
-//! The method returns the actual attribute value. It must not return NULL.
+//! Constructor for casting support
 template< typename CharT >
-attribute_value basic_named_scope< CharT >::get_value()
+basic_named_scope< CharT >::basic_named_scope(cast_source const& source) :
+    attribute(source.as< impl >())
 {
-    return attribute_value(
-        boost::make_shared< basic_named_scope_value< char_type > >(&pImpl->get_scope_list()));
 }
 
 //! The method pushes the scope to the stack
 template< typename CharT >
 void basic_named_scope< CharT >::push_scope(scope_entry const& entry)
 {
-    typename implementation::scope_list& s = implementation::instance->get_scope_list();
+    typename impl::scope_list& s = impl::instance->get_scope_list();
     s.push_back(entry);
 }
 
@@ -300,15 +304,15 @@ void basic_named_scope< CharT >::push_scope(scope_entry const& entry)
 template< typename CharT >
 void basic_named_scope< CharT >::pop_scope()
 {
-    typename implementation::scope_list& s = implementation::instance->get_scope_list();
+    typename impl::scope_list& s = impl::instance->get_scope_list();
     s.pop_back();
 }
 
 //! Returns the current thread's scope stack
 template< typename CharT >
-typename basic_named_scope< CharT >::scope_stack const& basic_named_scope< CharT >::get_scopes()
+typename basic_named_scope< CharT >::value_type const& basic_named_scope< CharT >::get_scopes()
 {
-    return implementation::instance->get_scope_list();
+    return impl::instance->get_scope_list();
 }
 
 //! Explicitly instantiate named_scope implementation

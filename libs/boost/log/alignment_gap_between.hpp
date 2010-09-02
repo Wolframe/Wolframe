@@ -22,31 +22,25 @@ namespace BOOST_LOG_NAMESPACE {
 
 namespace aux {
 
-#ifdef _MSC_VER
-#pragma warning(push)
-// 'alignment_gap_between<T1,T2>::both' : destructor could not be generated because a base class destructor is inaccessible
-#pragma warning(disable: 4624)
-#endif
-
 //! The metafunction computes the minimal gap between objects t1 and t2 of types T1 and T2
-//! that would be needed to maintain the alignment of t2
+//! that would be needed to maintain the alignment of t2 if it's placed right after t1
 template< typename T1, typename T2 >
 struct alignment_gap_between
 {
 private:
     struct both
     {
-        T1 m1;
-        T2 m2;
+        T1 t1;
+        T2 t2;
+
+        // To avoid warnings about inability to generate the destructor
+        // if T1's or T2's destructor is inaccessible
+        ~both();
     };
 
 public:
-    enum { value = sizeof(both) - (sizeof(T1) + sizeof(T2)) };
+    enum _ { value = sizeof(both) - (sizeof(T1) + sizeof(T2)) };
 };
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 } // namespace aux
 

@@ -19,19 +19,18 @@
 #ifndef BOOST_LOG_ATTRIBUTES_TIMER_HPP_INCLUDED_
 #define BOOST_LOG_ATTRIBUTES_TIMER_HPP_INCLUDED_
 
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
-#include <boost/date_time/posix_time/posix_time_types.hpp>
-#if defined(BOOST_WINDOWS) && !defined(BOOST_LOG_NO_QUERY_PERFORMANCE_COUNTER)
-#include <boost/cstdint.hpp>
-#endif
 #include <boost/log/detail/prologue.hpp>
 #include <boost/log/attributes/attribute.hpp>
-#include <boost/log/attributes/basic_attribute_value.hpp>
+#include <boost/log/attributes/attribute_cast.hpp>
 #include <boost/log/attributes/time_traits.hpp>
-#if !defined(BOOST_LOG_NO_THREADS) && defined(BOOST_WINDOWS) && !defined(BOOST_LOG_NO_QUERY_PERFORMANCE_COUNTER)
-#include <boost/thread/mutex.hpp>
-#endif
+
+#ifdef _MSC_VER
+#pragma warning(push)
+// non dll-interface class 'A' used as base for dll-interface class 'B'
+#pragma warning(disable: 4275)
+// class 'A' needs to have dll-interface to be used by clients of class 'B'
+#pragma warning(disable: 4251)
+#endif // _MSC_VER
 
 namespace boost {
 
@@ -40,7 +39,6 @@ namespace BOOST_LOG_NAMESPACE {
 namespace attributes {
 
 /*!
- * \class timer
  * \brief A class of an attribute that makes an attribute value of the time interval since construction
  *
  * The timer attribute calculates the time passed since its construction and returns it on value acquision.
@@ -59,89 +57,36 @@ namespace attributes {
  * In case if none of these solutions apply, you are free to define <tt>BOOST_LOG_NO_QUERY_PERFORMANCE_COUNTER</tt> macro to
  * fall back to another implementation based on Boost.DateTime.
  */
-
-#if defined(BOOST_WINDOWS) && !defined(BOOST_LOG_NO_QUERY_PERFORMANCE_COUNTER)
-
-#ifdef _MSC_VER
-#pragma warning(push)
-// non dll-interface class 'A' used as base for dll-interface class 'B'
-#pragma warning(disable: 4275)
-// class 'boost::mutex' needs to have dll-interface to be used by clients of class 'boost::log::attributes::timer'
-#pragma warning(disable: 4251)
-#endif // _MSC_VER
-
 class BOOST_LOG_EXPORT timer :
     public attribute
 {
 public:
-    //! Time type
-    typedef utc_time_traits::time_type time_type;
-
-private:
     //! Attribute value type
-    typedef basic_attribute_value< time_type::time_duration_type > result_value;
+    typedef utc_time_traits::time_type::time_duration_type value_type;
 
 private:
-#if !defined(BOOST_LOG_NO_THREADS)
-    //! Synchronization mutex
-    mutex m_Mutex;
-#endif
-    //! Frequency factor for calculating duration
-    uint64_t m_FrequencyFactor;
-    //! Last value of the performance counter
-    uint64_t m_LastCounter;
-    //! Elapsed time duration
-    time_type::time_duration_type m_Duration;
+    //! Factory implementation
+    class BOOST_LOG_VISIBLE impl;
 
 public:
     /*!
      * Constructor. Starts time counting.
      */
     timer();
-
-    attribute_value get_value();
-};
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-
-#else // defined(BOOST_WINDOWS) && !defined(BOOST_LOG_NO_QUERY_PERFORMANCE_COUNTER)
-
-class timer :
-    public attribute
-{
-public:
-    //! Time type
-    typedef utc_time_traits::time_type time_type;
-
-private:
-    //! Attribute value type
-    typedef basic_attribute_value< time_type::time_duration_type > result_value;
-
-private:
-    //! Base time point
-    const time_type m_BaseTimePoint;
-
-public:
     /*!
-     * Constructor. Starts time counting.
+     * Constructor for casting support
      */
-    timer() : m_BaseTimePoint(utc_time_traits::get_clock()) {}
-
-    attribute_value get_value()
-    {
-        return attribute_value(boost::make_shared< result_value >(
-            utc_time_traits::get_clock() - m_BaseTimePoint));
-    }
+    explicit timer(cast_source const& source);
 };
-
-#endif // defined(BOOST_WINDOWS) && !defined(BOOST_LOG_NO_QUERY_PERFORMANCE_COUNTER)
 
 } // namespace attributes
 
 } // namespace log
 
 } // namespace boost
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 #endif // BOOST_LOG_ATTRIBUTES_TIMER_HPP_INCLUDED_

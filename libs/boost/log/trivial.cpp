@@ -139,7 +139,7 @@ BOOST_LOG_EXPORT logger::logger_type logger::construct_logger()
             << formatters::attr< unsigned int >(traits_t::line_id_attr_name())
             << " [" << formatters::date_time< posix_time::ptime >(traits_t::time_stamp_attr_name())
 #if !defined(BOOST_LOG_NO_THREADS)
-            << "] [" << formatters::attr< attributes::current_thread_id::held_type >(traits_t::thread_id_attr_name())
+            << "] [" << formatters::attr< attributes::current_thread_id::value_type >(traits_t::thread_id_attr_name())
 #endif
             << "] [" << formatters::attr< severity_level >(sources::aux::severity_attribute_name< char >::get())
             << "] " << formatters::message< char >()
@@ -185,15 +185,15 @@ std::basic_ostream< CharT, TraitsT >& operator<< (
 //  Explicitly instantiate the operator
 #ifdef BOOST_LOG_USE_CHAR
 template BOOST_LOG_EXPORT std::basic_ostream< char, std::char_traits< char > >&
-    operator<< < char, std::char_traits< char > >(
-        std::basic_ostream< char, std::char_traits< char > >& strm,
-        severity_level lvl);
+operator<< < char, std::char_traits< char > >(
+    std::basic_ostream< char, std::char_traits< char > >& strm,
+    severity_level lvl);
 #endif
 #ifdef BOOST_LOG_USE_WCHAR_T
 template BOOST_LOG_EXPORT std::basic_ostream< wchar_t, std::char_traits< wchar_t > >&
-    operator<< < wchar_t, std::char_traits< wchar_t > >(
-        std::basic_ostream< wchar_t, std::char_traits< wchar_t > >& strm,
-        severity_level lvl);
+operator<< < wchar_t, std::char_traits< wchar_t > >(
+    std::basic_ostream< wchar_t, std::char_traits< wchar_t > >& strm,
+    severity_level lvl);
 #endif
 
 } // namespace trivial

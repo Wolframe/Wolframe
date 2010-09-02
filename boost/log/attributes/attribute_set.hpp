@@ -23,11 +23,10 @@
 #include <string>
 #include <utility>
 #include <iterator>
-#include <boost/shared_ptr.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/log/detail/prologue.hpp>
-#include <boost/log/attributes/attribute.hpp>
 #include <boost/log/attributes/attribute_name.hpp>
+#include <boost/log/attributes/attribute.hpp>
 
 namespace boost {
 
@@ -62,7 +61,7 @@ public:
     //! Key type
     typedef basic_attribute_name< char_type > key_type;
     //! Mapped attribute type
-    typedef shared_ptr< attribute > mapped_type;
+    typedef attribute mapped_type;
 
     //! Value type
     typedef std::pair< const key_type, mapped_type > value_type;
@@ -362,7 +361,7 @@ public:
      *
      * \param key Attribute name.
      * \return If an element with the corresponding attribute name is found in the container, its mapped value
-     *         is returned. Otherwise a refault-constructed mapped value is returned.
+     *         is returned. Otherwise a default-constructed mapped value is returned.
      */
     mapped_type operator[] (key_type key) const
     {

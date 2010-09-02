@@ -21,7 +21,6 @@
 
 #include <boost/log/detail/prologue.hpp>
 #include <boost/log/attributes/attribute_value_def.hpp>
-#include <boost/log/detail/templated_shared_from_this.hpp>
 #include <boost/log/utility/type_dispatch/type_dispatcher.hpp>
 
 namespace boost {
@@ -39,27 +38,26 @@ namespace attributes {
  */
 template< typename T >
 class basic_attribute_value :
-    public attribute_value::implementation,
-    public boost::log::aux::templated_shared_from_this
+    public attribute_value::impl
 {
 public:
     //! Value type
-    typedef T held_type;
+    typedef T value_type;
 
 private:
     //! Attribute value
-    held_type m_Value;
+    value_type m_Value;
 
 public:
     /*!
      * Constructor with initialization of the stored value
      */
-    explicit basic_attribute_value(held_type const& v) : m_Value(v) {}
+    explicit basic_attribute_value(value_type const& v) : m_Value(v) {}
 
     virtual bool dispatch(type_dispatcher& dispatcher)
     {
-        type_dispatcher::callback< held_type > callback =
-            dispatcher.get_callback< held_type >();
+        type_dispatcher::callback< value_type > callback =
+            dispatcher.get_callback< value_type >();
         if (callback)
         {
             callback(m_Value);
@@ -69,15 +67,10 @@ public:
             return false;
     }
 
-    virtual shared_ptr< attribute_value::implementation > detach_from_thread()
-    {
-        return this->shared_from_this< basic_attribute_value< held_type > >();
-    }
-
     /*!
      * \return Reference to the contained value.
      */
-    held_type const& get() const { return m_Value; }
+    value_type const& get() const { return m_Value; }
 };
 
 } // namespace attributes

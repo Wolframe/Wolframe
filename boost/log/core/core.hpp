@@ -27,6 +27,7 @@
 #include <boost/log/core/record.hpp>
 #include <boost/log/attributes/attribute_set.hpp>
 #include <boost/log/attributes/attribute_name.hpp>
+#include <boost/log/attributes/attribute.hpp>
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -156,13 +157,13 @@ public:
      * The method adds an attribute to the global attribute set. The attribute will be implicitly added to every log record.
      *
      * \param name The attribute name.
-     * \param attr Pointer to the attribute. Must not be NULL.
+     * \param attr The attribute factory.
      * \return A pair of values. If the second member is \c true, then the attribute is added and the first member points to the
      *         attribute. Otherwise the attribute was not added and the first member points to the attribute that prevents
      *         addition.
      */
     std::pair< typename attribute_set_type::iterator, bool > add_global_attribute(
-        attribute_name_type const& name, shared_ptr< attribute > const& attr);
+        attribute_name_type const& name, attribute const& attr);
     /*!
      * The method removes an attribute from the global attribute set.
      *
@@ -195,13 +196,13 @@ public:
      *       not imply that iterators to thread-specific and global attributes are interchangable.
      *
      * \param name The attribute name.
-     * \param attr Pointer to the attribute. Must not be NULL.
+     * \param attr The attribute factory.
      * \return A pair of values. If the second member is \c true, then the attribute is added and the first member points to the
      *         attribute. Otherwise the attribute was not added and the first member points to the attribute that prevents
      *         addition.
      */
     std::pair< typename attribute_set_type::iterator, bool > add_thread_attribute(
-        attribute_name_type const& name, shared_ptr< attribute > const& attr);
+        attribute_name_type const& name, attribute const& attr);
     /*!
      * The method removes an attribute from the thread-specific attribute set.
      *

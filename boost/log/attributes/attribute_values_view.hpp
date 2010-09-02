@@ -26,8 +26,8 @@
 #include <utility>
 #include <iterator>
 #include <boost/log/detail/prologue.hpp>
-#include <boost/log/attributes/attribute.hpp>
 #include <boost/log/attributes/attribute_name.hpp>
+#include <boost/log/attributes/attribute.hpp>
 #include <boost/log/attributes/attribute_value_def.hpp>
 #include <boost/log/attributes/attribute_set.hpp>
 
@@ -41,7 +41,7 @@ namespace BOOST_LOG_NAMESPACE {
  * Attribute values view is a read-only associative container with attribute name as a key and
  * a pointer to attribute value object as a mapped type. This is a collection of elements with unique
  * keys, that is, there can be only one attribute value with a given name in a view. With respect to
- * read-only capabilities, attribute values view is close to \c std::unordered_map.
+ * read-only capabilities, the view interface is close to \c std::unordered_map.
  *
  * An instance of attribute values view can be constructed from three attribute sets. The constructor attempts to
  * accommodate values all attributes from the sets. The situation when a same-named attribute is found
