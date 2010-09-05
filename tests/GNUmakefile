@@ -19,7 +19,7 @@ INCLUDE_LIBS = \
 	-lboost_unit_test_framework \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_filesystem -lboost_thread$(BOOST_LIBRARY_TAG) \
-	-lboost_log -lboost_log_setup
+	-lboost_log -lboost_log_setup -lgtest
 
 TEST_OBJS = \
 	$(TOPDIR)/src/version.o
@@ -27,6 +27,7 @@ TEST_OBJS = \
 TEST_CPP_BINS = \
 	singletonTest$(EXE) \
 	versionTest$(EXE) \
+	version-gTest$(EXE) \
 	logTest$(EXE)
 
 include $(TOPDIR)/makefiles/gmake/sub.mk
@@ -49,6 +50,8 @@ local_test:
 	@echo
 	@echo "Testing version..."
 	@./versionTest
+	@echo
+	@./version-gTest
 	@echo
 	@echo "Testing boost log..."
 	@./logTest

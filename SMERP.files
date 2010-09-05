@@ -39,7 +39,6 @@ src/getPassword.cpp
 src/smerpd.xml
 src/Makefile.W32
 src/logger.cpp
-src/smerpd.log
 src/logLevel.hpp
 src/logLevel.cpp
 src/miscStruct.hpp
@@ -52,3 +51,5 @@ src/connectionBase.hpp
 src/connectionTimeout.hpp
 src/acceptor.cpp
 src/acceptor.hpp
+tests/versionTest.cpp
+tests/version-gTest.cpp
