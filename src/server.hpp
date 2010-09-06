@@ -13,7 +13,7 @@
 
 #include "appConfig.hpp"
 #include "acceptor.hpp"
-#include "requestHandler.hpp"
+#include "connectionHandler.hpp"
 
 namespace _SMERP {
 
@@ -45,7 +45,7 @@ private:
 	std::vector<acceptor*>			acceptor_;
 	std::vector<SSLacceptor*>		SSLacceptor_;
 
-	requestHandler				requestHandler_;// The handler for all incoming requests.
+	connectionHandler				requestHandler_;// The handler for all incoming requests.
 };
 
 } // namespace _SMERP

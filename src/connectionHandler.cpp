@@ -1,8 +1,8 @@
 //
-// requestHandler.cpp
+// connectionHandler.cpp
 //
 
-#include "requestHandler.hpp"
+#include "connectionHandler.hpp"
 #include "reply.hpp"
 #include "request.hpp"
 
@@ -11,11 +11,7 @@
 
 namespace _SMERP {
 
-requestHandler::requestHandler()
-{
-}
-
-void requestHandler::handleRequest( request& req, reply& rep )
+void connectionHandler::handleRequest( request& req, reply& rep )
 {
 	std::string msg = req.getValue();
 	msg += '\n';

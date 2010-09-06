@@ -14,7 +14,7 @@
 
 #include "connectionTimeout.hpp"
 #include "connection.hpp"
-#include "requestHandler.hpp"
+#include "connectionHandler.hpp"
 
 namespace _SMERP {
 
@@ -27,7 +27,7 @@ public:
 	explicit acceptor( boost::asio::io_service& IOservice,
 			   const std::string& host, const unsigned short port,
 			   connectionTimeout& timeouts,
-			   requestHandler& reqHandler );
+			   connectionHandler& reqHandler );
 
 	/// Destruct the serverrequestHandler&				requestHandler
 	~acceptor();
@@ -54,7 +54,7 @@ private:
 	connectionTimeout&			timeouts_;
 	std::string				identifier_;
 
-	requestHandler&				requestHandler_;// The handler for all incoming requests.
+	connectionHandler&				requestHandler_;// The handler for all incoming requests.
 };
 
 
@@ -68,7 +68,7 @@ public:
 			      const std::string& certFile, const std::string& keyFile,
 				  bool verify, const std::string& CAchainFile, const std::string& CAdirectory,
 				  const std::string& host, const unsigned short port,
-				  connectionTimeout& timeouts, requestHandler& reqHandler);
+				  connectionTimeout& timeouts, connectionHandler& reqHandler);
 
 	/// Destruct the serverrequestHandler&				requestHandler
 	~SSLacceptor();
@@ -99,7 +99,7 @@ private:
 	connectionTimeout&			timeouts_;
 	std::string				identifier_;
 
-	requestHandler&				requestHandler_;// The handler for all incoming requests.
+	connectionHandler&				requestHandler_;// The handler for all incoming requests.
 };
 
 } // namespace _SMERP

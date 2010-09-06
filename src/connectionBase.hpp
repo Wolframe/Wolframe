@@ -17,7 +17,7 @@
 #include "logger.hpp"
 #include "reply.hpp"
 #include "request.hpp"
-#include "requestHandler.hpp"
+#include "connectionHandler.hpp"
 
 namespace _SMERP {
 
@@ -30,7 +30,7 @@ namespace _SMERP {
 		/// Construct a connection with the given io_service.
 		explicit connectionBase( boost::asio::io_service& IOservice,
 						connectionTimeout& timeouts,
-						requestHandler& handler ) :
+						connectionHandler& handler ) :
 			strand_( IOservice ),
 			requestHandler_( handler ),
 			timer_( IOservice ),
@@ -64,7 +64,7 @@ namespace _SMERP {
 		boost::array<char, 8192>	buffer_;
 
 		/// The handler used to process the incoming request.
-		requestHandler& requestHandler_;
+		connectionHandler& requestHandler_;
 
 		/// The incoming request.
 		request	request_;

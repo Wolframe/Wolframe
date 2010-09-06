@@ -46,7 +46,7 @@ OBJS = \
 	getPassword.o \
 	connection.o \
 	server.o \
-	requestHandler.o \
+	connectionHandler.o \
 	posixMain.o
 
 

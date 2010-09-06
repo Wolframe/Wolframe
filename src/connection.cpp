@@ -5,8 +5,7 @@
 #include "connectionBase.hpp"
 #include "connection.hpp"
 #include "logger.hpp"
-#include "requestHandler.hpp"
-#include "connContext.hpp"
+#include "connectionHandler.hpp"
 
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
@@ -15,7 +14,7 @@ namespace _SMERP {
 
 connection::connection( boost::asio::io_service& IOservice,
 			connectionTimeout& timeouts,
-			requestHandler& handler ) :
+			connectionHandler& handler ) :
 	connectionBase< boost::asio::ip::tcp::socket >( IOservice, timeouts, handler ),
 	socket_( IOservice )
 {
@@ -25,7 +24,7 @@ connection::connection( boost::asio::io_service& IOservice,
 SSLconnection::SSLconnection( boost::asio::io_service& IOservice,
 			      boost::asio::ssl::context& SSLcontext,
 			      connectionTimeout& timeouts,
-			      requestHandler& handler ) :
+			      connectionHandler& handler ) :
 	connectionBase< ssl_socket >( IOservice, timeouts, handler ),
 	SSLsocket_( IOservice, SSLcontext )
 {

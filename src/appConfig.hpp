@@ -71,7 +71,7 @@ namespace _SMERP {
 
 	public:
 		ApplicationConfiguration( const CmdLineConfig& cmdLine, const CfgFileConfig& cfgFile );
-		std::string errMsg() const	{ return errMsg_; };
+		std::string errMsg() const	{ return errMsg_; }
 		bool check();
 		void print( std::ostream& os ) const;
 	};

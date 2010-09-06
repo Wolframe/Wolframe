@@ -23,7 +23,7 @@ namespace _SMERP {
 		/// not be changed until the write operation has completed.
 		std::vector<boost::asio::const_buffer> toBuffers();
 
-		void setValue( const std::string& content )	{ content_ = content; };
+		void setValue( const std::string& content )	{ content_ = content; }
 	};
 
 

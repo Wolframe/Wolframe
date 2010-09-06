@@ -10,7 +10,7 @@
 
 #include "connectionTimeout.hpp"
 #include "connectionBase.hpp"
-#include "requestHandler.hpp"
+#include "connectionHandler.hpp"
 
 namespace _SMERP {
 
@@ -21,7 +21,7 @@ namespace _SMERP {
 		/// Construct a connection with the given io_service.
 		explicit connection( boost::asio::io_service& IOservice,
 				     connectionTimeout& timeouts,
-				     requestHandler& handler );
+				     connectionHandler& handler );
 
 		/// Get the socket associated with the connection.
 		boost::asio::ip::tcp::socket& socket()	{ return socket_; }
@@ -46,7 +46,7 @@ namespace _SMERP {
 		explicit SSLconnection( boost::asio::io_service& IOservice,
 					boost::asio::ssl::context& SSLcontext,
 					connectionTimeout& timeouts,
-					requestHandler& handler );
+					connectionHandler& handler );
 
 		/// Get the socket associated with the SSL connection.
 		ssl_socket& socket()	{ return SSLsocket_; }

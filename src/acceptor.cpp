@@ -17,7 +17,7 @@ namespace _SMERP {
 
 acceptor::acceptor( boost::asio::io_service& IOservice,
 		    const std::string& host, const unsigned short port,
-		    connectionTimeout& timeouts, requestHandler& reqHandler) :
+		    connectionTimeout& timeouts, connectionHandler& reqHandler) :
 	IOservice_( IOservice ),
 	strand_( IOservice_ ),
 	acceptor_( IOservice_ ),
@@ -49,7 +49,7 @@ SSLacceptor::SSLacceptor( boost::asio::io_service& IOservice,
 			  const std::string& certFile, const std::string& keyFile,
 			  bool verify, const std::string& CAchainFile, const std::string& CAdirectory,
 			  const std::string& host, const unsigned short port,
-			  connectionTimeout& timeouts, requestHandler& reqHandler) :
+			  connectionTimeout& timeouts, connectionHandler& reqHandler) :
 	IOservice_( IOservice ),
 	strand_( IOservice_ ),
 	acceptor_( IOservice_ ),

@@ -11,8 +11,6 @@ src/server.hpp
 tests/singletonTest.cpp
 src/GNUmakefile
 GNUmakefile
-src/requestHandler.cpp
-src/requestHandler.hpp
 database/data/countries.csv
 database/data/currencies.csv
 src/posixMain.cpp
@@ -43,13 +41,11 @@ src/logLevel.hpp
 src/logLevel.cpp
 src/miscStruct.hpp
 src/defaults.hpp
-src/connContext.hpp
-src/connContext.cpp
-src/message.hpp
-src/message.cpp
 src/connectionBase.hpp
 src/connectionTimeout.hpp
 src/acceptor.cpp
 src/acceptor.hpp
 tests/versionTest.cpp
 tests/version-gTest.cpp
+src/connectionHandler.hpp
+src/connectionHandler.cpp

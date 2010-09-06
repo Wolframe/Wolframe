@@ -50,7 +50,7 @@ OBJS = \
 	acceptor.obj \
 	connection.obj \
 	getPassword.obj \
-	requestHandler.obj \
+	connectionHandler.obj \
 	winMain.obj
 
 all: $(OBJS) $(CPP_BINS)
