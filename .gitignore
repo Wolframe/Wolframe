@@ -24,3 +24,5 @@ src/smerpd
 tests/singletonTest
 tests/versionTest
 tests/logTest
+tests/threadLeakTest
+tests/version-gTest
