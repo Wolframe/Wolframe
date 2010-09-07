@@ -28,7 +28,8 @@ TEST_CPP_BINS = \
 	singletonTest$(EXE) \
 	versionTest$(EXE) \
 	version-gTest$(EXE) \
-	logTest$(EXE)
+	logTest$(EXE) \
+	threadLeakTest$(EXE)	
 
 include $(TOPDIR)/makefiles/gmake/sub.mk
 
