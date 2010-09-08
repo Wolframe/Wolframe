@@ -3,7 +3,7 @@
 //
 
 #include <string>
-#include <boost/lexical_cast.hpp>
+#include <sstream>
 #include "version.hpp"
 
 namespace _SMERP {
@@ -55,15 +55,16 @@ bool Version::operator> ( const Version &other ) const
 
 std::string Version::toString()
 {
-	std::string	s = boost::lexical_cast<std::string>( major_ );
-	s += ".", s += boost::lexical_cast<std::string>( minor_ );
+	std::ostringstream	o;
+
+	o << major_ << "." << minor_;
 	if ( hasRevision_ )	{
-		s += ".", s += boost::lexical_cast<std::string>( revision_ );
+		o << "." << revision_;
 		if ( hasBuild_ )	{
-			s += ".", s += boost::lexical_cast<std::string>( build_ );
+			o << "." << build_;
 		}
 	}
-	return s;
+	return o.str();
 }
 
 } // namespace _SMERP
