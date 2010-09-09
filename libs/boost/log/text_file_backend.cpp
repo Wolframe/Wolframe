@@ -431,7 +431,7 @@ BOOST_LOG_ANONYMOUS_NAMESPACE {
                     break;
 
                 case traits_t::frac_sec_placeholder: // Fraction seconds width is configuration-dependent
-                    typedef posix_time::ptime::time_system_type::time_rep_type::resolution_traits posix_resolution_traits;
+                    typedef posix_time::time_res_traits posix_resolution_traits;
                     if (!local::scan_digits(f_it, f_end, posix_resolution_traits::num_fractional_digits()))
                     {
                         return false;
