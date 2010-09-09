@@ -18,7 +18,8 @@ INCLUDE_LIBS = \
 	-lboost_program_options \
 	-lboost_filesystem \
 	-lboost_log -lboost_log_setup \
-	-lssl
+
+#	-lssl
 
 CPP_BINS = \
 	smerpd$(EXE)

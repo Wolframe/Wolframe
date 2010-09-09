@@ -43,9 +43,10 @@ private:
 	boost::asio::io_service			IOservice_;	// The io_service used to perform asynchronous operations.
 	connectionTimeout			timeouts_;
 	std::vector<acceptor*>			acceptor_;
+#ifdef WITH_SSL
 	std::vector<SSLacceptor*>		SSLacceptor_;
-
-	connectionHandler				requestHandler_;// The handler for all incoming requests.
+#endif // WITH_SSL
+	connectionHandler			requestHandler_;// The handler for all incoming requests.
 };
 
 } // namespace _SMERP

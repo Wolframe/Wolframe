@@ -6,7 +6,9 @@
 #define _NETWORK_ACCEPTOR_HPP_INCLUDED
 
 #include <boost/asio.hpp>
+#ifdef WITH_SSL
 #include <boost/asio/ssl.hpp>
+#endif // WITH_SSL
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 
@@ -54,9 +56,11 @@ private:
 	connectionTimeout&			timeouts_;
 	std::string				identifier_;
 
-	connectionHandler&				requestHandler_;// The handler for all incoming requests.
+	connectionHandler&			requestHandler_;// The handler for all incoming requests.
 };
 
+
+#ifdef WITH_SSL
 
 /// SSL acceptor class of the SMERP network server.
 class SSLacceptor: private boost::noncopyable
@@ -99,8 +103,10 @@ private:
 	connectionTimeout&			timeouts_;
 	std::string				identifier_;
 
-	connectionHandler&				requestHandler_;// The handler for all incoming requests.
+	connectionHandler&			requestHandler_;// The handler for all incoming requests.
 };
+
+#endif // WITH_SSL
 
 } // namespace _SMERP
 

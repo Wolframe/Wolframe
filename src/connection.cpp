@@ -27,22 +27,6 @@ connection::~connection()
 }
 
 
-SSLconnection::SSLconnection( boost::asio::io_service& IOservice,
-			      boost::asio::ssl::context& SSLcontext,
-			      connectionTimeout& timeouts,
-			      connectionHandler& handler ) :
-	connectionBase< ssl_socket >( IOservice, timeouts, handler ),
-	SSLsocket_( IOservice, SSLcontext )
-{
-	LOG_TRACE << "New SSL connection created";
-}
-
-SSLconnection::~SSLconnection()
-{
-	LOG_TRACE << "SSL connection destroyed";
-}
-
-
 void connection::start()
 {
 	identifier( std::string( socket().remote_endpoint().address().to_string())
@@ -60,6 +44,23 @@ void connection::start()
 	setTimeout( connectionTimeout::TIMEOUT_IDLE );
 }
 
+
+#ifdef WITH_SSL
+
+SSLconnection::SSLconnection( boost::asio::io_service& IOservice,
+			      boost::asio::ssl::context& SSLcontext,
+			      connectionTimeout& timeouts,
+			      connectionHandler& handler ) :
+	connectionBase< ssl_socket >( IOservice, timeouts, handler ),
+	SSLsocket_( IOservice, SSLcontext )
+{
+	LOG_TRACE << "New SSL connection created";
+}
+
+SSLconnection::~SSLconnection()
+{
+	LOG_TRACE << "SSL connection destroyed";
+}
 
 void SSLconnection::start()
 {
@@ -95,5 +96,7 @@ void SSLconnection::handleHandshake( const boost::system::error_code& e )
 		socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
 	}
 }
+
+#endif // WITH_SSL
 
 } // namespace _SMERP

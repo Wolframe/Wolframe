@@ -2,10 +2,10 @@
 // getPassword.cpp
 //
 
+#ifdef WITH_SSL
+
 #include <string>
-
 #include "acceptor.hpp"
-
 
 namespace _SMERP {
 
@@ -14,24 +14,25 @@ namespace _SMERP {
 #include <unistd.h>
 #include <libintl.h>
 
-std::string SSLacceptor::getPassword()
-{
-	char	*pass;
+	std::string SSLacceptor::getPassword()
+	{
+		char	*pass;
 
-	pass = getpass( gettext( "Enter your password:" ));
+		pass = getpass( gettext( "Enter your password:" ));
 
-	return std::string( pass );
-}
+		return std::string( pass );
+	}
 
 #else // defined(_WIN32)
 
-std::string SSLacceptor::getPassword()
-{
-	return "bla bla";
-}
+	std::string SSLacceptor::getPassword()
+	{
+		return "bla bla";
+	}
 
 #endif // defined(_WIN32)
 
 
 } // namespace _SMERP
 
+#endif // WITH_SSL

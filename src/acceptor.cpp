@@ -45,6 +45,48 @@ acceptor::acceptor( boost::asio::io_service& IOservice,
 	LOG_INFO << "Accepting connections on " << identifier_;
 }
 
+/// acceptor destructor
+acceptor::~acceptor()
+{
+	LOG_TRACE << "Acceptor destructor called for " << identifier_;
+}
+
+void acceptor::handleAccept( const boost::system::error_code& e )
+{
+	if ( !e )	{
+		newConnection_->start();
+		LOG_DEBUG << "Received new connection on " << identifier_;
+
+		newConnection_.reset( new connection( IOservice_, timeouts_, requestHandler_ ));
+		acceptor_.async_accept( newConnection_->socket(),
+					strand_.wrap( boost::bind( &acceptor::handleAccept,
+								   this,
+								   boost::asio::placeholders::error )));
+		LOG_DATA << "Acceptor " << identifier_ << " ready for new connection";
+	}
+}
+
+
+// Post a call to the stop function so that acceptor::stop() is safe to call
+// from any thread.
+void acceptor::stop()
+{
+	LOG_TRACE << "Acceptor for " << identifier_ << " received a shutdown request";
+	IOservice_.post( strand_.wrap( boost::bind( &acceptor::handleStop, this )));
+}
+
+// The server is stopped by closing the acceptor.
+// When all outstanding operations are completed
+// all calls to io_service::run() will return.
+void acceptor::handleStop()
+{
+	acceptor_.close();
+	LOG_DEBUG << "Closed acceptor for " << identifier_;
+}
+
+
+#ifdef WITH_SSL
+
 SSLacceptor::SSLacceptor( boost::asio::io_service& IOservice,
 			  const std::string& certFile, const std::string& keyFile,
 			  bool verify, const std::string& CAchainFile, const std::string& CAdirectory,
@@ -124,34 +166,10 @@ SSLacceptor::SSLacceptor( boost::asio::io_service& IOservice,
 	LOG_INFO << "Accepting connections on " << identifier_;
 }
 
-
-/// acceptor destructor
-acceptor::~acceptor()
-{
-	LOG_TRACE << "Acceptor destructor called for " << identifier_;
-}
-
-
 /// acceptor destructor (SSL acceptor)
 SSLacceptor::~SSLacceptor()
 {
 	LOG_TRACE << "Acceptor destructor called for " << identifier_;
-}
-
-
-void acceptor::handleAccept( const boost::system::error_code& e )
-{
-	if ( !e )	{
-		newConnection_->start();
-		LOG_DEBUG << "Received new connection on " << identifier_;
-
-		newConnection_.reset( new connection( IOservice_, timeouts_, requestHandler_ ));
-		acceptor_.async_accept( newConnection_->socket(),
-					strand_.wrap( boost::bind( &acceptor::handleAccept,
-								   this,
-								   boost::asio::placeholders::error )));
-		LOG_DATA << "Acceptor " << identifier_ << " ready for new connection";
-	}
 }
 
 void SSLacceptor::handleAccept( const boost::system::error_code& e )
@@ -169,29 +187,10 @@ void SSLacceptor::handleAccept( const boost::system::error_code& e )
 	}
 }
 
-
-// Post a call to the stop function so that acceptor::stop() is safe to call
-// from any thread.
-void acceptor::stop()
-{
-	LOG_TRACE << "Acceptor for " << identifier_ << " received a shutdown request";
-	IOservice_.post( strand_.wrap( boost::bind( &acceptor::handleStop, this )));
-}
-
 void SSLacceptor::stop()
 {
 	LOG_TRACE << "Acceptor for " << identifier_ << " received a shutdown request";
 	IOservice_.post( strand_.wrap( boost::bind( &SSLacceptor::handleStop, this )));
-}
-
-
-// The server is stopped by closing the acceptor.
-// When all outstanding operations are completed
-// all calls to io_service::run() will return.
-void acceptor::handleStop()
-{
-	acceptor_.close();
-	LOG_DEBUG << "Closed acceptor for " << identifier_;
 }
 
 void SSLacceptor::handleStop()
@@ -199,5 +198,7 @@ void SSLacceptor::handleStop()
 	acceptor_.close();
 	LOG_DEBUG << "Closed acceptor for " << identifier_;
 }
+
+#endif // WITH_SSL
 
 } // namespace _SMERP

@@ -30,7 +30,7 @@ server::server( const ApplicationConfiguration& config )
 		acceptor_.push_back( acptr );
 	}
 	LOG_DEBUG << i << " network acceptor(s) created.";
-
+#ifdef WITH_SSL
 	for ( i = 0; i < config.SSLaddress.size(); i++ )	{
 		SSLacceptor* acptr = new SSLacceptor( IOservice_,
 						      config.SSLaddress[i].certFile, config.SSLaddress[i].keyFile,
@@ -41,6 +41,7 @@ server::server( const ApplicationConfiguration& config )
 		SSLacceptor_.push_back( acptr );
 	}
 	LOG_DEBUG << i << " network SSL acceptor(s) created.";
+#endif // WITH_SSL
 }
 
 
@@ -52,10 +53,11 @@ server::~server()
 	for ( i = 0; i < acceptor_.size(); i++ )
 		delete acceptor_[i];
 	LOG_TRACE << i << " acceptor(s) deleted";
-
+#ifdef WITH_SSL
 	for ( i = 0; i < SSLacceptor_.size(); i++ )
 		delete SSLacceptor_[i];
 	LOG_TRACE << i << " SSL acceptor(s) deleted";
+#endif // WITH_SSL
 }
 
 
@@ -88,10 +90,11 @@ void server::stop()
 	for ( i = 0; i < acceptor_.size(); i++ )
 		acceptor_[i]->stop();
 	LOG_DEBUG << i << " acceptor(s) signaled to stop";
-
+#ifdef WITH_SSL
 	for ( i = 0; i < SSLacceptor_.size(); i++ )
 		SSLacceptor_[i]->stop();
-	LOG_DEBUG << i << " unencrypted acceptor(s) signaled to stop";
+	LOG_DEBUG << i << " SSL acceptor(s) signaled to stop";
+#endif // WITH_SSL
 }
 
 

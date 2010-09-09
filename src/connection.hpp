@@ -6,7 +6,9 @@
 #define _CONNECTION_HPP_INCLUDED
 
 #include <boost/asio.hpp>
+#ifdef WITH_SSL
 #include <boost/asio/ssl.hpp>
+#endif // WITH_SSL
 
 #include "connectionTimeout.hpp"
 #include "connectionBase.hpp"
@@ -38,6 +40,7 @@ namespace _SMERP {
 
 	typedef boost::shared_ptr<connection> connection_ptr;
 
+#ifdef WITH_SSL
 	typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket>	ssl_socket;
 
 	/// Represents a single connection from a client.
@@ -67,6 +70,7 @@ namespace _SMERP {
 	};
 
 	typedef boost::shared_ptr<SSLconnection> SSLconnection_ptr;
+#endif // WITH_SSL
 
 } // namespace _SMERP
 
