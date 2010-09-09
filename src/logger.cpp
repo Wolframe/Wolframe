@@ -2,6 +2,8 @@
 // logger.cpp
 //
 
+#ifndef FAKE_LOGGER
+
 #include "logLevel.hpp"
 #include "logSyslogFacility.hpp"
 #include "logger.hpp"
@@ -161,3 +163,5 @@ void Logger::initialize( const ApplicationConfiguration& config )
 }
 
 } // namespace _SMERP
+
+#endif // FAKE_LOGGER

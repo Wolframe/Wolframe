@@ -21,6 +21,12 @@ connection::connection( boost::asio::io_service& IOservice,
 	LOG_TRACE << "New connection created";
 }
 
+connection::~connection()
+{
+	LOG_TRACE << "Connection destroyed";
+}
+
+
 SSLconnection::SSLconnection( boost::asio::io_service& IOservice,
 			      boost::asio::ssl::context& SSLcontext,
 			      connectionTimeout& timeouts,
@@ -29,6 +35,11 @@ SSLconnection::SSLconnection( boost::asio::io_service& IOservice,
 	SSLsocket_( IOservice, SSLcontext )
 {
 	LOG_TRACE << "New SSL connection created";
+}
+
+SSLconnection::~SSLconnection()
+{
+	LOG_TRACE << "SSL connection destroyed";
 }
 
 

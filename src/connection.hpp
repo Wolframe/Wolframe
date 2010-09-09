@@ -23,6 +23,8 @@ namespace _SMERP {
 				     connectionTimeout& timeouts,
 				     connectionHandler& handler );
 
+		~connection();
+
 		/// Get the socket associated with the connection.
 		boost::asio::ip::tcp::socket& socket()	{ return socket_; }
 
@@ -47,6 +49,8 @@ namespace _SMERP {
 					boost::asio::ssl::context& SSLcontext,
 					connectionTimeout& timeouts,
 					connectionHandler& handler );
+
+		~SSLconnection();
 
 		/// Get the socket associated with the SSL connection.
 		ssl_socket& socket()	{ return SSLsocket_; }

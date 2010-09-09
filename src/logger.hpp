@@ -5,6 +5,8 @@
 #ifndef _LOGGER_HPP_INCLUDED
 #define _LOGGER_HPP_INCLUDED
 
+#ifndef FAKE_LOGGER
+
 #include "logLevel.hpp"
 #include "appConfig.hpp"
 
@@ -41,5 +43,35 @@ extern src::severity_logger< _SMERP::LogLevel::Level > logger;
 #define LOG_ALERT	BOOST_LOG_SEV( _SMERP::logger, _SMERP::LogLevel::_SMERP_ALERT )
 #define LOG_FATAL	BOOST_LOG_SEV( _SMERP::logger, _SMERP::LogLevel::_SMERP_FATAL )
 
+#else // FAKE_LOGGER
+
+#include "appConfig.hpp"
+
+#include <ostream>
+
+namespace _SMERP {
+
+class Logger {
+public:
+	static void initialize( const ApplicationConfiguration& config )	{ (void)(config); }
+	static std::ostream& Get()	{ return std::cerr; }
+};
+
+} // namespace _SMERP
+
+// shortcut macros
+#define LOG_DATA	_SMERP::Logger::Get()
+#define LOG_TRACE	_SMERP::Logger::Get()
+#define LOG_DEBUG	_SMERP::Logger::Get()
+#define LOG_INFO	_SMERP::Logger::Get()
+#define LOG_NOTICE	_SMERP::Logger::Get()
+#define LOG_WARNING	_SMERP::Logger::Get()
+#define LOG_ERROR	_SMERP::Logger::Get()
+#define LOG_SEVERE	_SMERP::Logger::Get()
+#define LOG_CRITICAL	_SMERP::Logger::Get()
+#define LOG_ALERT	_SMERP::Logger::Get()
+#define LOG_FATAL	_SMERP::Logger::Get()
+
+#endif // FAKE_LOGGER
 
 #endif // _LOGGER_HPP_INCLUDED
