@@ -3,7 +3,7 @@ TOPDIR = ..
 SUBDIRS =
 
 INCLUDE_CPPFLAGS = \
-	-DBOOST_LOG_USE_NATIVE_SYSLOG
+	-DBOOST_LOG_USE_NATIVE_SYSLOG -DWITH_SSL
 
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/libs/boost/log
@@ -18,8 +18,7 @@ INCLUDE_LIBS = \
 	-lboost_program_options \
 	-lboost_filesystem \
 	-lboost_log -lboost_log_setup \
-
-#	-lssl
+	-lssl
 
 CPP_BINS = \
 	smerpd$(EXE)

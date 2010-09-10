@@ -39,7 +39,6 @@ GCC_MINOR_VERSION ?=	$(shell $(TOPDIR)/makefiles/gmake/guess_env --gcc-minor-ver
 
 # compilation flags and compilers
 COMMON_COMPILE_FLAGS = \
-	-DFAKE_LOGGER \
 	-g \
 	-fstrict-aliasing \
 	-pedantic -Wall -Werror \
@@ -224,7 +223,7 @@ endif
 ifeq "$(PLATFORM)" "SUNOS"
 PTHREADS_CFLAGS = -D_REENTRANT -pthreads
 PTHREADS_LDFLAGS = -pthreads
-PTHREADS_LIBS = 
+PTHREADS_LIBS =
 endif
 ifeq "$(PLATFORM)" "FREEBSD"
 PTHREADS_CFLAGS = -D_REENTRANT -pthread
@@ -339,8 +338,8 @@ CCPP_LINK = $(CCPP)
 
 #%$(SO) : %.sho++ $(OBJS) $(CPPOBJS)
 #	$(CCPP_LINK) -shared -o $@ $(LDFLAGS) $(LIBS) $(OBJS) $(CPPOBJS) $<
- 
-BIN_OBJS = $(BINS:$(EXE)=.o) 
+
+BIN_OBJS = $(BINS:$(EXE)=.o)
 TEST_BIN_OBJS = $(TEST_BINS:$(EXE)=.o)
 CPP_BIN_OBJS = $(CPP_BINS:$(EXE)=.o)
 TEST_CPP_BIN_OBJS = $(TEST_CPP_BINS:$(EXE)=.o)

@@ -1,8 +1,8 @@
 MBa:
 
-1. add multiple interface(s) control
-2. add the SSL interfaces
-3. add connection logging
+2. propagate symbols through makefiles
+xxxx. SSL must require certificate from peer if verify is on
+
 
 ABa:
 
