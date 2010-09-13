@@ -2,6 +2,8 @@
 // configFile.cpp
 //
 
+// #define HAS_XML_CONFIG_FILE
+
 #include "configFile.hpp"
 #include "miscStruct.hpp"
 
@@ -9,9 +11,15 @@
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/logic/tribool.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/xml_parser.hpp>
 #include <boost/algorithm/string.hpp>
+
+#include <boost/property_tree/ptree.hpp>
+
+#ifdef HAS_XML_CONFIG_FILE
+#include <boost/property_tree/xml_parser.hpp>
+#else
+#include <boost/property_tree/info_parser.hpp>
+#endif
 
 #include <vector>
 #include <string>
@@ -102,14 +110,18 @@ namespace _SMERP {
 
 		// Create an empty property tree object
 		using boost::property_tree::ptree;
-		ptree	pt, rootTree;
+		ptree	pt;
+		try	{
+#ifdef HAS_XML_CONFIG_FILE
+		ptree	rootTree;
 
 		// Load the XML file into the property tree. If reading fails
 		// (cannot open file, parse error), an exception is thrown.
 		read_xml( filename, rootTree );
 		pt = rootTree.get_child( "configuration" );
-
-		//
+#else
+		read_info( filename, pt );
+#endif
 		BOOST_FOREACH( ptree::value_type &v, pt.get_child( "server.listen" ))	{
 			tmpStr = v.second.get<std::string>( "address", std::string() );
 			if ( tmpStr.empty() )	{
@@ -268,6 +280,11 @@ namespace _SMERP {
 		}
 		else
 			logToEventlog = false;
+	}
+		catch( std::exception& e)	{
+			errMsg_ = e.what();
+			return false;
+		}
 
 		return true;
 	}
