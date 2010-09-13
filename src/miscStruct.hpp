@@ -15,7 +15,7 @@ namespace _SMERP {
 		std::string	host;
 		unsigned short	port;
 
-		localEndpoint ( std::string h, unsigned short p )	{ host = h, port = p; };
+		localEndpoint ( std::string h, unsigned short p )	{ host = h, port = p; }
 	};
 
 	/// structure for local SSL endpoint configuration
@@ -28,7 +28,7 @@ namespace _SMERP {
 		std::string	CAchainFile;
 		bool		verify;
 
-		localSSLendpoint ( std::string h, unsigned short p )	{ host = h, port = p; };
+		localSSLendpoint ( std::string h, unsigned short p )	{ host = h, port = p; }
 	};
 
 } // namespace _SMERP
