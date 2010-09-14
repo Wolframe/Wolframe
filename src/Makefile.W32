@@ -44,8 +44,6 @@ OBJS = \
 	logger.obj \
 	configFile.obj \
 	appConfig.obj \
-	request.obj \
-	reply.obj \
 	server.obj \
 	acceptor.obj \
 	connection.obj \

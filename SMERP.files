@@ -3,9 +3,6 @@ database/data/RO-judete.txt
 include/singleton.hpp
 src/connection.cpp
 src/connection.hpp
-src/reply.cpp
-src/reply.hpp
-src/request.hpp
 src/server.cpp
 src/server.hpp
 tests/singletonTest.cpp
@@ -15,7 +12,6 @@ database/data/countries.csv
 database/data/currencies.csv
 src/posixMain.cpp
 src/winMain.cpp
-src/request.cpp
 src/commandLine.hpp
 src/configFile.hpp
 src/configFile.cpp

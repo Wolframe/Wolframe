@@ -40,8 +40,6 @@ OBJS = \
 	logger.o \
 	configFile.o \
 	appConfig.o \
-	request.o \
-	reply.o \
 	acceptor.o \
 	getPassword.o \
 	connection.o \

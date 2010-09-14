@@ -15,8 +15,6 @@
 
 #include "connectionTimeout.hpp"
 #include "logger.hpp"
-#include "reply.hpp"
-#include "request.hpp"
 #include "connectionHandler.hpp"
 
 namespace _SMERP {
@@ -64,13 +62,7 @@ namespace _SMERP {
 		boost::array<char, 8192>	buffer_;
 
 		/// The handler used to process the incoming request.
-		connectionHandler& requestHandler_;
-
-		/// The incoming request.
-		request	request_;
-
-		/// The reply to be sent back to the client.
-		reply	reply_;
+		connectionHandler& connectionHandler_;
 
 		/// The timer for timeouts.
 		boost::asio::deadline_timer	timer_;
@@ -88,14 +80,13 @@ namespace _SMERP {
 				setTimeout( connectionTimeout::TIMEOUT_REQUEST );
 				LOG_TRACE << "Read " << bytesTransferred << " bytes from " << identifier();
 
-				request_.parseInput( buffer_.data(), bytesTransferred );
+				connectionHandler_.parseInput( buffer_.data(), bytesTransferred );
 
-				switch ( request_.status())	{
-				case request::READY:
+				networkOperation netOp = connectionHandler_.nextOperation();
+				switch ( netOp.operation )	{
+				case networkOperation::WRITE:
 					setTimeout( connectionTimeout::TIMEOUT_PROCESSING );
-					requestHandler_.handleRequest( request_, reply_ );
-
-					boost::asio::async_write( socket(), reply_.toBuffers(),
+					boost::asio::async_write( socket(), netOp.msg.toBuffers(),
 								  strand_.wrap( boost::bind( &connectionBase::handleWrite,
 											     this->shared_from_this(),
 											     boost::asio::placeholders::error )));

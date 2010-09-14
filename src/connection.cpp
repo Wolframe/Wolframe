@@ -33,6 +33,15 @@ void connection::start()
 		    + ":" + boost::lexical_cast<std::string>( socket().remote_endpoint().port() ));
 	LOG_TRACE << "Starting connection to " << identifier();
 
+	networkOperation netOp = connectionHandler_.nextOperation();
+	switch ( netOp.operation )	{
+	case networkOperation::READ:
+	case networkOperation::WRITE:
+	case networkOperation::WRITE_TERMINATE:
+	case networkOperation::TERMINATE:
+		break;
+	}
+
 	boost::asio::write( socket(), boost::asio::buffer( "Welcome to bla bla bla\n" ));
 	LOG_TRACE << "Wrote welcome message to " << identifier();
 

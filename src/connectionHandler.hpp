@@ -9,10 +9,6 @@
 #include <boost/noncopyable.hpp>
 #include <boost/asio.hpp>
 
-#include "request.hpp"
-#include "reply.hpp"
-
-
 namespace _SMERP {
 	/// A reply to be sent to a client.
 	class outMessage
@@ -35,8 +31,10 @@ namespace _SMERP {
 			WRITE_TERMINATE,
 			TERMINATE
 		};
+		Operation	operation;
 		outMessage*	msg;
 	};
+
 
 	/// The common handler for the connection status.
 	class connectionHandler : private boost::noncopyable
@@ -45,12 +43,12 @@ namespace _SMERP {
 		connectionHandler()	{}
 		virtual ~connectionHandler()	{}
 
-		/// Parse some data. The return value indicates how much of the
+		/// Parse incoming data. The return value indicates how much of the
 		/// input has been consumed.
 		char *parseInput( char *begin, std::size_t bytesTransferred );
 
 		/// Handle a request and produce a reply.
-		void handleRequest( request& req, reply& rep );
+		networkOperation nextOperation();
 
 	private:
 	};
