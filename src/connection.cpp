@@ -33,24 +33,8 @@ void connection::start()
 		    + ":" + boost::lexical_cast<std::string>( socket().remote_endpoint().port() ));
 	LOG_TRACE << "Starting connection to " << identifier();
 
-	networkOperation netOp = connectionHandler_.nextOperation();
-	switch ( netOp.operation )	{
-	case networkOperation::READ:
-	case networkOperation::WRITE:
-	case networkOperation::WRITE_TERMINATE:
-	case networkOperation::TERMINATE:
-		break;
-	}
-
-	boost::asio::write( socket(), boost::asio::buffer( "Welcome to bla bla bla\n" ));
-	LOG_TRACE << "Wrote welcome message to " << identifier();
-
-	socket_.async_read_some( boost::asio::buffer( buffer_ ),
-				 strand_.wrap( boost::bind( &connection::handleRead,
-							    boost::static_pointer_cast<connection>( shared_from_this()),
-							    boost::asio::placeholders::error,
-							    boost::asio::placeholders::bytes_transferred )));
 	setTimeout( connectionTimeout::TIMEOUT_IDLE );
+	nextOperation();
 }
 
 
@@ -88,15 +72,8 @@ void SSLconnection::handleHandshake( const boost::system::error_code& e )
 {
 	LOG_DATA << "SSL handshake to " << identifier();
 	if ( !e )	{
-		boost::asio::write( socket(), boost::asio::buffer( "Welcome to SSL bla bla bla\n" ));
-		LOG_TRACE << "Wrote welcome message to " << identifier();
-
-		socket().async_read_some( boost::asio::buffer( buffer_ ),
-					    strand_.wrap( boost::bind( &SSLconnection::handleRead,
-								       boost::static_pointer_cast<SSLconnection>( shared_from_this() ),
-								       boost::asio::placeholders::error,
-								       boost::asio::placeholders::bytes_transferred )));
 		setTimeout( connectionTimeout::TIMEOUT_IDLE );
+		nextOperation();
 	}
 	else	{
 		LOG_DEBUG << "ERROR handling SSL handshake from " << identifier();

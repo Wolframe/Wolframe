@@ -30,7 +30,7 @@ namespace _SMERP {
 						connectionTimeout& timeouts,
 						connectionHandler& handler ) :
 			strand_( IOservice ),
-			requestHandler_( handler ),
+			connectionHandler_( handler ),
 			timer_( IOservice ),
 			timeout_( timeouts )
 		{
@@ -73,6 +73,36 @@ namespace _SMERP {
 		connectionTimeout&		timeout_;
 
 
+		/// Connection base state machine
+		void nextOperation()
+		{
+			networkOperation netOp = connectionHandler_.nextOperation();
+			switch ( netOp.operation )	{
+			case networkOperation::READ:
+				LOG_TRACE << "Next operation: READ from " << identifier();
+				socket().async_read_some( boost::asio::buffer( buffer_ ),
+							 strand_.wrap( boost::bind( &connectionBase::handleRead,
+										    this->shared_from_this(),
+										    boost::asio::placeholders::error,
+										    boost::asio::placeholders::bytes_transferred )));
+				break;
+			case networkOperation::WRITE:
+				LOG_TRACE << "Next operation: WRITE to " << identifier();
+				boost::asio::async_write( socket(), netOp.msg->toBuffers(),
+							  strand_.wrap( boost::bind( &connectionBase::handleWrite,
+										     this->shared_from_this(),
+										     boost::asio::placeholders::error )));
+				break;
+			case networkOperation::TERMINATE:
+				LOG_TRACE << "Next operation: TERMINATE connection to " << identifier();
+				// Initiate graceful connection closure.
+				boost::system::error_code ignored_ec;
+				socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
+				break;
+			}
+		}
+
+
 		/// Handle completion of a read operation.
 		void handleRead( const boost::system::error_code& e, std::size_t bytesTransferred )
 		{
@@ -81,23 +111,7 @@ namespace _SMERP {
 				LOG_TRACE << "Read " << bytesTransferred << " bytes from " << identifier();
 
 				connectionHandler_.parseInput( buffer_.data(), bytesTransferred );
-
-				networkOperation netOp = connectionHandler_.nextOperation();
-				switch ( netOp.operation )	{
-				case networkOperation::WRITE:
-					setTimeout( connectionTimeout::TIMEOUT_PROCESSING );
-					boost::asio::async_write( socket(), netOp.msg.toBuffers(),
-								  strand_.wrap( boost::bind( &connectionBase::handleWrite,
-											     this->shared_from_this(),
-											     boost::asio::placeholders::error )));
-				case request::EMPTY:
-				case request::PARSING:
-					socket().async_read_some( boost::asio::buffer( buffer_ ),
-								  strand_.wrap( boost::bind( &connectionBase::handleRead,
-											     this->shared_from_this(),
-											     boost::asio::placeholders::error,
-											     boost::asio::placeholders::bytes_transferred )));
-				}
+				nextOperation();
 			}
 
 			// If an error occurs then no new asynchronous operations are started. This
@@ -112,14 +126,9 @@ namespace _SMERP {
 		void handleWrite( const boost::system::error_code& e )
 		{
 			if ( !e )	{
-				boost::system::error_code ignored_ec;
-
 				// Cancel timer.
 				setTimeout( connectionTimeout::TIMEOUT_NONE );
-
-				boost::asio::write( socket(), boost::asio::buffer( "Bye.\n" ));
-				// Initiate graceful connection closure.
-				socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
+				nextOperation();
 			}
 
 			// No new asynchronous operations are started. This means that all shared_ptr

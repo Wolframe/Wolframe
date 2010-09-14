@@ -28,7 +28,6 @@ namespace _SMERP {
 		enum Operation	{
 			READ,
 			WRITE,
-			WRITE_TERMINATE,
 			TERMINATE
 		};
 		Operation	operation;

@@ -10,6 +10,7 @@
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include "echoHandler.hpp"
 
 namespace _SMERP {
 
@@ -20,24 +21,26 @@ server::server( const ApplicationConfiguration& config )
 		   (unsigned long)config.requestTimeout,
 		   (unsigned long)config.processTimeout,
 		   (unsigned long)config.answerTimeout ),
-	requestHandler_()
+	connectionHandler_()
 {
 	size_t	i;
 	for ( i = 0; i < config.address.size(); i++ )	{
+		echoHandler* handler = new echoHandler();
 		acceptor* acptr = new acceptor( IOservice_,
 						config.address[i].host, config.address[i].port,
-						timeouts_, requestHandler_ );
+						timeouts_, *handler );
 		acceptor_.push_back( acptr );
 	}
 	LOG_DEBUG << i << " network acceptor(s) created.";
 #ifdef WITH_SSL
 	for ( i = 0; i < config.SSLaddress.size(); i++ )	{
+		echoHandler* handler = new echoHandler();
 		SSLacceptor* acptr = new SSLacceptor( IOservice_,
 						      config.SSLaddress[i].certFile, config.SSLaddress[i].keyFile,
 						      config.SSLaddress[i].verify,
 						      config.SSLaddress[i].CAchainFile, config.SSLaddress[i].CAdirectory,
 						      config.SSLaddress[i].host, config.SSLaddress[i].port,
-						      timeouts_, requestHandler_ );
+						      timeouts_, *handler );
 		SSLacceptor_.push_back( acptr );
 	}
 	LOG_DEBUG << i << " network SSL acceptor(s) created.";

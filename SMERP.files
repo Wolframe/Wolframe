@@ -44,7 +44,6 @@ src/acceptor.hpp
 tests/versionTest.cpp
 tests/version-gTest.cpp
 src/connectionHandler.hpp
-src/connectionHandler.cpp
 Makefile.W32
 makefiles/nmake/top.mk
 makefiles/nmake/sub.mk
@@ -67,3 +66,5 @@ makefiles/gmake/dist.mk
 makefiles/gmake/depend.mk
 makefiles/gmake/compiler.mk
 makefiles/gmake/clean.mk
+src/echoHandler.hpp
+src/echoHandler.cpp
