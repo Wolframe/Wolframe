@@ -1,6 +1,6 @@
-TOPDIR = ..
+TOPDIR = ..\..\..
 
-SUBDIRS = boost
+SUBDIRS = log
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 

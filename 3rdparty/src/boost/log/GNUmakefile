@@ -1,4 +1,4 @@
-TOPDIR = ../../..
+TOPDIR = ../../../..
 
 SUBDIRS =
 
@@ -6,7 +6,7 @@ INCLUDE_CPPFLAGS = \
 	-DBOOST_LOG_USE_NATIVE_SYSLOG
 
 INCLUDE_DIRS = \
-	-I. -I$(TOPDIR)
+	-I. -I../../../include
 
 LOG_OBJS = \
 	attribute_name.o \

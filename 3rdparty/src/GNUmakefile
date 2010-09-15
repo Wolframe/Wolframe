@@ -1,6 +1,6 @@
 TOPDIR = ../..
 
-SUBDIRS = log
+SUBDIRS = boost
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

@@ -6,7 +6,6 @@
 
 #include <string>
 
-/*
 namespace _SMERP {
 
 void connectionHandler::handleRequest( request& req, reply& rep )
@@ -47,5 +46,3 @@ std::vector<boost::asio::const_buffer> reply::toBuffers()
 
 
 } // namespace _SMERP
-
-*/

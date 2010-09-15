@@ -6,10 +6,10 @@ INCLUDE_CPPFLAGS = \
 	-DBOOST_LOG_USE_NATIVE_SYSLOG -DWITH_SSL
 
 INCLUDE_LDFLAGS = \
-	-L$(TOPDIR)/libs/boost/log
+	-L$(TOPDIR)/3rdparty/src/boost/log
 
 INCLUDE_DIRS = -I. \
-	-I$(TOPDIR)/include -I$(TOPDIR)
+	-I$(TOPDIR)/include -I$(TOPDIR)/3rdparty/include
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
