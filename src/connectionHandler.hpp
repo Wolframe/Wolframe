@@ -10,28 +10,24 @@
 #include <boost/asio.hpp>
 
 namespace _SMERP {
-	/// A reply to be sent to a client.
-	class outMessage
+	/// A message to be sent to a client.
+	struct outputMessage
 	{
 	public:
-		/// Virtual functions deserve virtual destructors
-		virtual ~outMessage()	{}
-
-		/// Convert the reply into a vector of buffers. The buffers do not own the
-		/// underlying memory blocks, therefore the reply object must remain valid and
-		/// not be changed until the write operation has completed.
-		virtual std::vector<boost::asio::const_buffer> toBuffers() = 0;
+		const void	*data;
+		std::size_t	size;
 	};
 
 	struct	networkOperation
 	{
+	public:
 		enum Operation	{
 			READ,
 			WRITE,
 			TERMINATE
 		};
 		Operation	operation;
-		outMessage*	msg;
+		outputMessage	*msg;
 	};
 
 

@@ -18,8 +18,7 @@ void connectionHandler::handleRequest( request& req, reply& rep )
 
 /// Parse some data. The return value indicates how much of the
 /// input has been consumed.
-
-char *request::parseInput( char *begin, std::size_t bytesTransferred )
+char *connectionHandler::parseInput( char *begin, std::size_t bytesTransferred )
 {
 	for ( std::size_t i = 0; i < bytesTransferred; i++ )	{
 		if ( *begin != '\n' )
