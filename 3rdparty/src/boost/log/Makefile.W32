@@ -5,7 +5,8 @@ SUBDIRS =
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
 INCLUDE_DIRS = \
-	/I$(TOPDIR) /I"$(BOOST_DIR)" /I"$(PLATFORM_SDK_DIR)\Include"
+	/I$(TOPDIR) /I"$(BOOST_DIR)" /I"$(PLATFORM_SDK_DIR)\Include" \
+	/I..\..\..\include
 
 LIBRARIES = \
 	libboost_log$(BOOST_LIBRARY_TAG).lib \

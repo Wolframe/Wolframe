@@ -7,7 +7,7 @@ SUBDIRS =
 INCLUDE_DIRS = \
 	/D_WIN32_WINNT=0x400 \
 	/I. \
-	/I$(TOPDIR) \
+	/I$(TOPDIR)\3rdparty\include \
 	/I$(TOPDIR)\include \
 	/I"$(BOOST_DIR)" \
 	/I"$(PLATFORM_SDK_DIR)\Include"	\
@@ -18,7 +18,7 @@ SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib"
 BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib"
 INCLUDE_LDFLAGS = \
 	$(SDK_LDFLAGS) $(BOOST_LDFLAGS) \
-	/LIBPATH:$(TOPDIR)\libs\boost\log \
+	/LIBPATH:$(TOPDIR)\3rdparty\src\boost\log \
 	/LIBPATH:"$(OPENSSL_DIR)\lib"
 
 INCLUDE_LIBS = \

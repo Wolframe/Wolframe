@@ -5,8 +5,9 @@ SUBDIRS =
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
 INCLUDE_DIRS = \
-	/I$(TOPDIR) /I$(TOPDIR)/include /I. \
+	/I$(TOPDIR)/include /I. \
 	/I$(TOPDIR)/src \
+	/I$(TOPDIR)/3rdparty/include \
 	/I"$(BOOST_DIR)" \
 	/I"$(PLATFORM_SDK_DIR)\Include"
 
@@ -15,7 +16,7 @@ SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib"
 BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib"
 INCLUDE_LDFLAGS = \
 	$(SDK_LDFLAGS) $(BOOST_LDFLAGS) \
-	/LIBPATH:$(TOPDIR)\libs\boost\log
+	/LIBPATH:$(TOPDIR)\3rdparty\src\boost\log
 
 TEST_CPP_BINS = \
 	singletonTest.exe \
@@ -32,8 +33,8 @@ all: $(OBJS) $(CPP_BINS)
 singletonTest.exe: singletonTest.obj
 versionTest.exe: versionTest.obj
 logTest.exe: logTest.obj \
-	$(TOPDIR)\libs\boost\log\libboost_log$(BOOST_LIBRARY_TAG).lib \
-	$(TOPDIR)\libs\boost\log\libboost_log_setup$(BOOST_LIBRARY_TAG).lib
+	$(TOPDIR)\3rdparty\src\boost\log\libboost_log$(BOOST_LIBRARY_TAG).lib \
+	$(TOPDIR)\3rdparty\src\boost\log\libboost_log_setup$(BOOST_LIBRARY_TAG).lib
 
 local_all:
 
