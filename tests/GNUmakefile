@@ -8,12 +8,12 @@ INCLUDE_CPPFLAGS = \
 INCLUDE_DIRS = \
 	-I$(TOPDIR)/include -I. \
 	-I$(TOPDIR)/src \
-	-I$(TOPDIR)
+	-I$(TOPDIR)/3rdparty/include
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
 INCLUDE_LDFLAGS = \
-	-L$(TOPDIR)/libs/boost/log
+	-L$(TOPDIR)/3rdparty/src/boost/log
 
 INCLUDE_LIBS = \
 	-lboost_unit_test_framework \
@@ -34,8 +34,8 @@ TEST_CPP_BINS = \
 include $(TOPDIR)/makefiles/gmake/sub.mk
 
 logTest$(EXE): logTest.o \
-	$(TOPDIR)/libs/boost/log/libboost_log.a \
-	$(TOPDIR)/libs/boost/log/libboost_log_setup.a
+	$(TOPDIR)/3rdparty/src/boost/log/libboost_log.a \
+	$(TOPDIR)/3rdparty/src/boost/log/libboost_log_setup.a
 
 local_all:
 
