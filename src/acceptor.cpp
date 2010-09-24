@@ -17,12 +17,12 @@ namespace _SMERP {
 
 acceptor::acceptor( boost::asio::io_service& IOservice,
 		    const std::string& host, const unsigned short port,
-		    connectionTimeout& timeouts, connectionHandler& reqHandler) :
+		    connectionTimeout& timeouts, ServerHandler& srvHandler) :
 	IOservice_( IOservice ),
 	strand_( IOservice_ ),
 	acceptor_( IOservice_ ),
 	timeouts_( timeouts ),
-	requestHandler_( reqHandler )
+	srvHandler_( srvHandler )
 {
 	// Open the acceptor(s) with the option to reuse the address (i.e. SO_REUSEADDR).
 	boost::asio::ip::tcp::resolver resolver( IOservice_ );
@@ -91,13 +91,13 @@ SSLacceptor::SSLacceptor( boost::asio::io_service& IOservice,
 			  const std::string& certFile, const std::string& keyFile,
 			  bool verify, const std::string& CAchainFile, const std::string& CAdirectory,
 			  const std::string& host, const unsigned short port,
-			  connectionTimeout& timeouts, connectionHandler& reqHandler) :
+			  connectionTimeout& timeouts, ServerHandler& srvHandler) :
 	IOservice_( IOservice ),
 	strand_( IOservice_ ),
 	acceptor_( IOservice_ ),
 	SSLcontext_( IOservice_, boost::asio::ssl::context::sslv23 ),
 	timeouts_( timeouts ),
-	requestHandler_( reqHandler )
+	srvHandler_( srvHandler )
 {
 	boost::system::error_code	ec;
 

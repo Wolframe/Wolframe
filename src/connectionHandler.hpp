@@ -30,6 +30,10 @@ namespace _SMERP {
 	public:
 		const void	*data;
 		std::size_t	size;
+
+		outputMessage()			{ data = NULL; size = 0;}
+		outputMessage( const void *d, std::size_t s )
+						{ data = d; size = s;}
 	};
 
 	struct	networkOperation
@@ -49,7 +53,7 @@ namespace _SMERP {
 	class connectionHandler
 	{
 	protected:
-		virtual connectionHandler()	{}
+		connectionHandler()		{}
 		virtual ~connectionHandler()	{}
 
 	private:
@@ -59,7 +63,7 @@ namespace _SMERP {
 	public:
 		/// Parse incoming data. The return value indicates how much of the
 		/// input has been consumed.
-		virtual char *parseInput( char *begin, std::size_t bytesTransferred ) = 0;
+		virtual char* parseInput( char *begin, std::size_t bytesTransferred ) = 0;
 
 		/// Handle a request and produce a reply.
 		virtual networkOperation nextOperation() = 0;
@@ -69,15 +73,15 @@ namespace _SMERP {
 
 
 	/// The server
-	class serverHandler
+	class ServerHandler
 	{
 	protected:
-		virtual serverHandler()	{}
-		virtual ~connectionHandler()	{}
+		ServerHandler()			{}
+		virtual ~ServerHandler()	{}
 
 	private:
-		serverHandler( const serverHandler& );
-		serverHandler& operator = ( const serverHandler& );
+		ServerHandler( const ServerHandler& );
+		ServerHandler& operator = ( const ServerHandler& );
 
 	public:
 		/// Create a new connection handler and return a pointer to it

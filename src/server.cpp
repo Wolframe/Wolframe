@@ -10,8 +10,6 @@
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include "echoHandler.hpp"
-
 namespace _SMERP {
 
 server::server( const ApplicationConfiguration& config )
@@ -21,7 +19,7 @@ server::server( const ApplicationConfiguration& config )
 		   (unsigned long)config.requestTimeout,
 		   (unsigned long)config.processTimeout,
 		   (unsigned long)config.answerTimeout ),
-	connectionHandler_()
+	serverHandler_()
 {
 	size_t	i;
 	for ( i = 0; i < config.address.size(); i++ )	{

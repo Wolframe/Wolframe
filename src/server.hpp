@@ -46,7 +46,7 @@ private:
 #ifdef WITH_SSL
 	std::vector<SSLacceptor*>		SSLacceptor_;
 #endif // WITH_SSL
-	connectionHandler			connectionHandler_;// The connection higher level state machine
+	ServerHandler				serverHandler_;// The connection higher level state machine
 };
 
 } // namespace _SMERP
