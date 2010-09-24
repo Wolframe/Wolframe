@@ -14,6 +14,9 @@ namespace _SMERP {
 	{
 		std::string	address;
 		unsigned short	port;
+
+		connectionPeer( std::string peerAddress, unsigned short peerPort )
+						{ address = peerAddress; port = peerPort; }
 	};
 
 	struct SSLconnectionPeer
@@ -21,6 +24,9 @@ namespace _SMERP {
 		std::string	dn;
 		std::string	address;
 		unsigned short	port;
+
+		SSLconnectionPeer( std::string peerAddress, unsigned short peerPort )
+						{ address = peerAddress; port = peerPort; }
 	};
 
 

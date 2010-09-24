@@ -62,7 +62,7 @@ namespace _SMERP {
 		boost::array<char, 8192>	buffer_;
 
 		/// The handler used to process the incoming request.
-		connectionHandler& connectionHandler_;
+		connectionHandler&		connectionHandler_;
 
 		/// The timer for timeouts.
 		boost::asio::deadline_timer	timer_;
