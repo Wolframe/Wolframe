@@ -23,7 +23,7 @@ class server: private boost::noncopyable
 /// public interface
 public:
 	/// Construct the server
-	explicit server( const ApplicationConfiguration& config );
+	explicit server( const ApplicationConfiguration& config, const ServerHandler& serverHandler );
 
 	/// Destruct the server
 	~server();
@@ -46,7 +46,7 @@ private:
 #ifdef WITH_SSL
 	std::vector<SSLacceptor*>		SSLacceptor_;
 #endif // WITH_SSL
-	ServerHandler				serverHandler_;// The connection higher level state machine
+//	ServerHandler&				serverHandler_;// The connection higher level state machine
 };
 
 } // namespace _SMERP

@@ -8,17 +8,27 @@
 #include "connectionHandler.hpp"
 
 namespace _SMERP {
-	/// The handler
-	class echoHandler : public connectionHandler
+	/// The server handler container
+	class echoServer : public ServerHandler
 	{
 	public:
+		connectionHandler* newConnection()	{ return new echoConnection(); }
+		connectionHandler* newSSLconnection()	{ return new echoConnection(); }
+	};
+
+	/// The connection handler
+	class echoConnection : public connectionHandler
+	{
+	public:
+		void setPeer( const connectionPeer& local, const connectionPeer& remote );
+		void setPeer( const SSLconnectionPeer& local, const SSLconnectionPeer& remote );
+
 		/// Parse incoming data. The return value indicates how much of the
 		/// input has been consumed.
 		char *parseInput( char *begin, std::size_t bytesTransferred );
 
 		/// Handle a request and produce a reply.
 		networkOperation nextOperation();
-
 	private:
 		enum State	{
 			NEW,

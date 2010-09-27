@@ -28,8 +28,8 @@ public:
 	/// Construct the acceptor
 	explicit acceptor( boost::asio::io_service& IOservice,
 			   const std::string& host, const unsigned short port,
-			   connectionTimeout& timeouts,
-			   ServerHandler& srvHandler );
+			   const connectionTimeout& timeouts,
+			   const ServerHandler& srvHandler );
 
 	/// Destruct the serverrequestHandler&				requestHandler
 	~acceptor();
@@ -53,10 +53,10 @@ private:
 	boost::asio::io_service::strand		strand_;	// Strand to ensure the acceptor's handlers are not called concurrently.
 	boost::asio::ip::tcp::acceptor		acceptor_;	// Acceptor(s) used to listen for incoming connections.
 	connection_ptr				newConnection_;	// The next connection to be accepted.
-	connectionTimeout&			timeouts_;
+	const connectionTimeout&		timeouts_;
 	std::string				identifier_;
 
-	ServerHandler&				srvHandler_;	// The handler for all incoming requests.
+	const ServerHandler&			srvHandler_;	// The handler for all incoming requests.
 };
 
 
@@ -72,7 +72,8 @@ public:
 			      const std::string& certFile, const std::string& keyFile,
 				  bool verify, const std::string& CAchainFile, const std::string& CAdirectory,
 				  const std::string& host, const unsigned short port,
-				  connectionTimeout& timeouts, ServerHandler& srvHandler);
+				  const connectionTimeout& timeouts,
+				  const ServerHandler& srvHandler );
 
 	/// Destruct the serverrequestHandler&				requestHandler
 	~SSLacceptor();
@@ -100,10 +101,10 @@ private:
 	boost::asio::ip::tcp::acceptor		acceptor_;	// Acceptor(s) used to listen for incoming connections.
 	boost::asio::ssl::context		SSLcontext_;	/// SSL acceptor server context
 	SSLconnection_ptr			newConnection_;	// The next connection to be accepted.
-	connectionTimeout&			timeouts_;
+	const connectionTimeout&		timeouts_;
 	std::string				identifier_;
 
-	ServerHandler&				srvHandler_;	// The handler for all incoming requests.
+	const ServerHandler&			srvHandler_;	// The handler for all incoming requests.
 };
 
 #endif // WITH_SSL

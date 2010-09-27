@@ -22,8 +22,8 @@ namespace _SMERP {
 	public:
 		/// Construct a connection with the given io_service.
 		explicit connection( boost::asio::io_service& IOservice,
-				     connectionTimeout& timeouts,
-				     connectionHandler& handler );
+				     const connectionTimeout& timeouts,
+				     const connectionHandler *handler );
 
 		~connection();
 
@@ -50,8 +50,8 @@ namespace _SMERP {
 		/// Construct a connection with the given io_service and SSL conetext.
 		explicit SSLconnection( boost::asio::io_service& IOservice,
 					boost::asio::ssl::context& SSLcontext,
-					connectionTimeout& timeouts,
-					connectionHandler& handler );
+					const connectionTimeout& timeouts,
+					const connectionHandler *handler );
 
 		~SSLconnection();
 

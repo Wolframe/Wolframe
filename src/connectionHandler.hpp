@@ -58,6 +58,7 @@ namespace _SMERP {
 	/// The common handler for the connection status.
 	class connectionHandler
 	{
+		template< typename socketType > friend class connectionBase;
 	protected:
 		connectionHandler()		{}
 		virtual ~connectionHandler()	{}
@@ -69,11 +70,13 @@ namespace _SMERP {
 	public:
 		/// Parse incoming data. The return value indicates how much of the
 		/// input has been consumed.
-		virtual char* parseInput( char *begin, std::size_t bytesTransferred ) = 0;
+		virtual char* parseInput( char *begin, std::size_t bytesTransferred ) const;
 
 		/// Handle a request and produce a reply.
-		virtual networkOperation nextOperation() = 0;
+		virtual networkOperation nextOperation() const;
 
+		virtual void setPeer( const connectionPeer& local, const connectionPeer& remote );
+		virtual void setPeer( const SSLconnectionPeer& local, const SSLconnectionPeer& remote );
 	private:
 	};
 
@@ -91,8 +94,8 @@ namespace _SMERP {
 
 	public:
 		/// Create a new connection handler and return a pointer to it
-		virtual connectionHandler* newConnection( const connectionPeer& peer );
-		virtual connectionHandler* newConnection( const SSLconnectionPeer& peer );
+		virtual connectionHandler* newConnection() const;
+		virtual connectionHandler* newSSLconnection() const;
 	};
 } // namespace _SMERP
 

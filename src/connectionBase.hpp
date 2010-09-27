@@ -12,10 +12,11 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/bind.hpp>
 #include <string>
+#include <cassert>
 
 #include "connectionTimeout.hpp"
-#include "logger.hpp"
 #include "connectionHandler.hpp"
+#include "logger.hpp"
 
 namespace _SMERP {
 
@@ -27,17 +28,23 @@ namespace _SMERP {
 	public:
 		/// Construct a connection with the given io_service.
 		explicit connectionBase( boost::asio::io_service& IOservice,
-						connectionTimeout& timeouts,
-						connectionHandler& handler ) :
+						const connectionTimeout& timeouts,
+						const connectionHandler* handler ) :
 			strand_( IOservice ),
 			connectionHandler_( handler ),
 			timer_( IOservice ),
 			timeout_( timeouts )
 		{
+			assert( handler != NULL );
+			connectionHandler_ = handler;
 			timerType_ = connectionTimeout::TIMEOUT_NONE;
 			LOG_TRACE << "New connection base created";
 		}
 
+		~connectionBase()
+		{
+			delete connectionHandler_;
+		}
 
 		/// Get the socket associated with the connection.
 		virtual socketType& socket() = 0;
@@ -62,7 +69,7 @@ namespace _SMERP {
 		boost::array<char, 8192>	buffer_;
 
 		/// The handler used to process the incoming request.
-		connectionHandler&		connectionHandler_;
+		const connectionHandler		*connectionHandler_;
 
 		/// The timer for timeouts.
 		boost::asio::deadline_timer	timer_;
@@ -70,13 +77,13 @@ namespace _SMERP {
 		connectionTimeout::TimeOutType	timerType_;
 
 		/// connection timeouts structure
-		connectionTimeout&		timeout_;
+		const connectionTimeout&	timeout_;
 
 
 		/// Connection base state machine
 		void nextOperation()
 		{
-			networkOperation netOp = connectionHandler_.nextOperation();
+			networkOperation netOp = connectionHandler_->nextOperation();
 			switch ( netOp.operation )	{
 			case networkOperation::READ:
 				LOG_TRACE << "Next operation: READ from " << identifier();
@@ -111,7 +118,7 @@ namespace _SMERP {
 				setTimeout( connectionTimeout::TIMEOUT_REQUEST );
 				LOG_TRACE << "Read " << bytesTransferred << " bytes from " << identifier();
 
-				connectionHandler_.parseInput( buffer_.data(), bytesTransferred );
+				connectionHandler_->parseInput( buffer_.data(), bytesTransferred );
 				nextOperation();
 			}
 

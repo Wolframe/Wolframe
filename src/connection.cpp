@@ -13,8 +13,8 @@
 namespace _SMERP {
 
 connection::connection( boost::asio::io_service& IOservice,
-			connectionTimeout& timeouts,
-			connectionHandler& handler ) :
+			const connectionTimeout& timeouts,
+			const connectionHandler* handler ) :
 	connectionBase< boost::asio::ip::tcp::socket >( IOservice, timeouts, handler ),
 	socket_( IOservice )
 {
@@ -42,8 +42,8 @@ void connection::start()
 
 SSLconnection::SSLconnection( boost::asio::io_service& IOservice,
 			      boost::asio::ssl::context& SSLcontext,
-			      connectionTimeout& timeouts,
-			      connectionHandler& handler ) :
+			      const connectionTimeout& timeouts,
+			      const connectionHandler *handler ) :
 	connectionBase< ssl_socket >( IOservice, timeouts, handler ),
 	SSLsocket_( IOservice, SSLcontext )
 {
