@@ -37,9 +37,9 @@ namespace _SMERP {
 		const void	*data;
 		std::size_t	size;
 
-		outputMessage()			{ data = NULL; size = 0;}
+		outputMessage()			{ data = NULL; size = 0; }
 		outputMessage( const void *d, std::size_t s )
-						{ data = d; size = s;}
+						{ data = d; size = s; }
 	};
 
 	struct	networkOperation
@@ -51,7 +51,7 @@ namespace _SMERP {
 			TERMINATE
 		};
 		Operation	operation;
-		outputMessage	*msg;
+		outputMessage	msg;
 	};
 
 
@@ -63,21 +63,20 @@ namespace _SMERP {
 		connectionHandler()		{}
 		virtual ~connectionHandler()	{}
 
-	private:
-		connectionHandler( const connectionHandler& );
-		connectionHandler& operator = ( const connectionHandler& );
+//	private:
+//		connectionHandler( const connectionHandler& )			{}
+//		connectionHandler& operator = ( const connectionHandler& )	{ return *this; }
 
 	public:
 		/// Parse incoming data. The return value indicates how much of the
 		/// input has been consumed.
-		virtual char* parseInput( char *begin, std::size_t bytesTransferred ) const;
+		virtual char* parseInput( char *begin, std::size_t bytesTransferred ) = 0;
 
 		/// Handle a request and produce a reply.
-		virtual networkOperation nextOperation() const;
+		virtual networkOperation nextOperation() = 0;
 
-		virtual void setPeer( const connectionPeer& local, const connectionPeer& remote );
-		virtual void setPeer( const SSLconnectionPeer& local, const SSLconnectionPeer& remote );
-	private:
+		virtual void setPeer( const connectionPeer& remote ) = 0;
+		virtual void setPeer( const SSLconnectionPeer& remote ) = 0;
 	};
 
 
@@ -88,14 +87,14 @@ namespace _SMERP {
 		ServerHandler()			{}
 		virtual ~ServerHandler()	{}
 
-	private:
-		ServerHandler( const ServerHandler& );
-		ServerHandler& operator = ( const ServerHandler& );
+//	private:
+//		ServerHandler( const ServerHandler& )			{}
+//		ServerHandler& operator = ( const ServerHandler& )	{ return *this; }
 
 	public:
 		/// Create a new connection handler and return a pointer to it
-		virtual connectionHandler* newConnection() const;
-		virtual connectionHandler* newSSLconnection() const;
+		virtual connectionHandler* newConnection( const connectionPeer& local ) = 0;
+		virtual connectionHandler* newSSLconnection( const SSLconnectionPeer& local ) = 0;
 	};
 } // namespace _SMERP
 

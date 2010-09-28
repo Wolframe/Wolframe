@@ -14,7 +14,7 @@
 
 namespace _SMERP {
 
-server::server( const ApplicationConfiguration& config, const ServerHandler& serverHandler )
+server::server( const ApplicationConfiguration& config, ServerHandler& serverHandler )
 	: threadPoolSize_( config.threads ),
 	IOservice_(),
 	timeouts_( (unsigned long)config.idleTimeout,

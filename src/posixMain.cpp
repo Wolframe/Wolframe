@@ -15,6 +15,8 @@
 #include "ErrorCodes.hpp"
 #include "logger.hpp"
 
+#include "echoHandler.hpp"
+
 #include <libintl.h>
 #include <locale.h>
 
@@ -203,7 +205,8 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		LOG_NOTICE << "Starting server";
 
 		// Run server in background thread(s).
-		_SMERP::server s( config );
+		_SMERP::echoServer	echo;
+		_SMERP::server s( config, echo );
 		boost::thread t( boost::bind( &_SMERP::server::run, &s ));
 
 		// Restore previous signals.

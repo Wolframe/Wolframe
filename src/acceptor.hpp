@@ -29,7 +29,7 @@ public:
 	explicit acceptor( boost::asio::io_service& IOservice,
 			   const std::string& host, const unsigned short port,
 			   const connectionTimeout& timeouts,
-			   const ServerHandler& srvHandler );
+			   ServerHandler& srvHandler );
 
 	/// Destruct the serverrequestHandler&				requestHandler
 	~acceptor();
@@ -56,7 +56,7 @@ private:
 	const connectionTimeout&		timeouts_;
 	std::string				identifier_;
 
-	const ServerHandler&			srvHandler_;	// The handler for all incoming requests.
+	ServerHandler&				srvHandler_;	// The handler for all incoming requests.
 };
 
 
@@ -73,7 +73,7 @@ public:
 				  bool verify, const std::string& CAchainFile, const std::string& CAdirectory,
 				  const std::string& host, const unsigned short port,
 				  const connectionTimeout& timeouts,
-				  const ServerHandler& srvHandler );
+				  ServerHandler& srvHandler );
 
 	/// Destruct the serverrequestHandler&				requestHandler
 	~SSLacceptor();
@@ -104,7 +104,7 @@ private:
 	const connectionTimeout&		timeouts_;
 	std::string				identifier_;
 
-	const ServerHandler&			srvHandler_;	// The handler for all incoming requests.
+	ServerHandler&				srvHandler_;	// The handler for all incoming requests.
 };
 
 #endif // WITH_SSL

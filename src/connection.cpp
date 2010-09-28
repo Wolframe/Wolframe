@@ -14,7 +14,7 @@ namespace _SMERP {
 
 connection::connection( boost::asio::io_service& IOservice,
 			const connectionTimeout& timeouts,
-			const connectionHandler* handler ) :
+			connectionHandler* handler ) :
 	connectionBase< boost::asio::ip::tcp::socket >( IOservice, timeouts, handler ),
 	socket_( IOservice )
 {
@@ -33,6 +33,9 @@ void connection::start()
 		    + ":" + boost::lexical_cast<std::string>( socket().remote_endpoint().port() ));
 	LOG_TRACE << "Starting connection to " << identifier();
 
+	connectionHandler_->setPeer( connectionPeer( socket().remote_endpoint().address().to_string(),
+						     socket().remote_endpoint().port()));
+
 	setTimeout( connectionTimeout::TIMEOUT_IDLE );
 	nextOperation();
 }
@@ -43,7 +46,7 @@ void connection::start()
 SSLconnection::SSLconnection( boost::asio::io_service& IOservice,
 			      boost::asio::ssl::context& SSLcontext,
 			      const connectionTimeout& timeouts,
-			      const connectionHandler *handler ) :
+			      connectionHandler *handler ) :
 	connectionBase< ssl_socket >( IOservice, timeouts, handler ),
 	SSLsocket_( IOservice, SSLcontext )
 {
@@ -61,6 +64,9 @@ void SSLconnection::start()
 		    + ":" + boost::lexical_cast<std::string>( SSLsocket_.lowest_layer().remote_endpoint().port() )
 		    + " (SSL)");
 	LOG_TRACE << "Starting connection to " << identifier();
+	connectionHandler_->setPeer( SSLconnectionPeer( SSLsocket_.lowest_layer().remote_endpoint().address().to_string(),
+							SSLsocket_.lowest_layer().remote_endpoint().port()));
+
 	SSLsocket_.async_handshake( boost::asio::ssl::stream_base::server,
 				    strand_.wrap( boost::bind( &SSLconnection::handleHandshake,
 							       boost::static_pointer_cast<SSLconnection>( shared_from_this() ),

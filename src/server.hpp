@@ -23,7 +23,7 @@ class server: private boost::noncopyable
 /// public interface
 public:
 	/// Construct the server
-	explicit server( const ApplicationConfiguration& config, const ServerHandler& serverHandler );
+	explicit server( const ApplicationConfiguration& config, ServerHandler& serverHandler );
 
 	/// Destruct the server
 	~server();

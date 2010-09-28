@@ -8,20 +8,16 @@
 #include "connectionHandler.hpp"
 
 namespace _SMERP {
-	/// The server handler container
-	class echoServer : public ServerHandler
-	{
-	public:
-		connectionHandler* newConnection()	{ return new echoConnection(); }
-		connectionHandler* newSSLconnection()	{ return new echoConnection(); }
-	};
-
 	/// The connection handler
 	class echoConnection : public connectionHandler
 	{
 	public:
-		void setPeer( const connectionPeer& local, const connectionPeer& remote );
-		void setPeer( const SSLconnectionPeer& local, const SSLconnectionPeer& remote );
+		echoConnection( const connectionPeer& local );
+		echoConnection( const SSLconnectionPeer& local );
+		~echoConnection();
+
+		void setPeer( const connectionPeer& remote );
+		void setPeer( const SSLconnectionPeer& remote );
 
 		/// Parse incoming data. The return value indicates how much of the
 		/// input has been consumed.
@@ -32,10 +28,20 @@ namespace _SMERP {
 	private:
 		enum State	{
 			NEW,
-			CONNECTED
+			READING,
+			ANSWERING
 		};
 		State		state_;
 		std::string	buffer;
+	};
+
+
+	/// The server handler container
+	class echoServer : public ServerHandler
+	{
+	public:
+		connectionHandler* newConnection( const connectionPeer& local );
+		connectionHandler* newSSLconnection( const SSLconnectionPeer& local );
 	};
 
 } // namespace _SMERP
