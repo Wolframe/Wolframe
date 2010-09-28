@@ -29,7 +29,9 @@ namespace _SMERP {
 		enum State	{
 			NEW,
 			READING,
-			ANSWERING
+			ANSWERING,
+			FINISHING,
+			TERMINATING
 		};
 		State		state_;
 		std::string	buffer;

@@ -96,7 +96,7 @@ namespace _SMERP {
 			case networkOperation::WRITE:
 				LOG_TRACE << "Next operation: WRITE to " << identifier();
 				boost::asio::async_write( socket(),
-							  boost::asio::buffer( netOp.msg.data, netOp.msg.size ),
+							  boost::asio::buffer( netOp.msg.data(), netOp.msg.size() ),
 							  strand_.wrap( boost::bind( &connectionBase::handleWrite,
 										     this->shared_from_this(),
 										     boost::asio::placeholders::error )));

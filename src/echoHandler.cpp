@@ -6,7 +6,7 @@
 #include "logger.hpp"
 
 #include <string>
-#include <string.h>
+#include <cstring>
 
 namespace _SMERP {
 
@@ -46,17 +46,14 @@ namespace _SMERP {
 
 		switch( state_ )	{
 		case NEW:
-			op.msg.data = "Welcome to SMERP.\n";
-			op.msg.size = strlen( (const char*)op.msg.data );
-			state_ = READING;
+			op.msg = NetworkMessage( "Welcome to SMERP.\n" );
 			op.operation = networkOperation::WRITE;
+			state_ = READING;
 			break;
 
 		case READING:
-			if ( ! buffer.empty() )	{
-				op.msg.data = buffer.c_str();
-				op.msg.size = buffer.length();
-			}
+			if ( ! buffer.empty() )
+				op.msg = NetworkMessage( buffer );
 			state_ = ANSWERING;
 			op.operation = networkOperation::WRITE;
 			break;
@@ -65,6 +62,17 @@ namespace _SMERP {
 			buffer.clear();
 			state_ = READING;
 			op.operation = networkOperation::READ;
+			break;
+
+		case FINISHING:
+			op.msg = NetworkMessage( "Thanks for using SMERP.\n" );
+			op.operation = networkOperation::WRITE;
+			state_ = TERMINATING;
+			break;
+
+		case TERMINATING:
+			buffer.clear();
+			op.operation = networkOperation::TERMINATE;
 			break;
 		}
 		return op;
@@ -75,12 +83,18 @@ namespace _SMERP {
 	/// input has been consumed.
 	char *echoConnection::parseInput( char *begin, std::size_t bytesTransferred )
 	{
-		for ( std::size_t i = 0; i < bytesTransferred; i++ )	{
-			if ( *begin != '\n' )
-				buffer += *begin;
-			else
-				return( begin );
-			begin++;
+		if ( !strncmp( "QUIT", begin, 4 ))
+			state_ = FINISHING;
+		else	{
+			for ( std::size_t i = 0; i < bytesTransferred; i++ )	{
+				if ( *begin != '\n' )
+					buffer += *begin;
+				else	{
+					buffer += *begin++;
+					return( begin );
+				}
+				begin++;
+			}
 		}
 		return( begin );
 	}

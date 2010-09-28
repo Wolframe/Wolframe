@@ -68,3 +68,5 @@ makefiles/gmake/compiler.mk
 makefiles/gmake/clean.mk
 src/echoHandler.hpp
 src/echoHandler.cpp
+src/connectionEndpoint.hpp
+src/networkMessage.hpp

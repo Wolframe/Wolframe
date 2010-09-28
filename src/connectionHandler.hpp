@@ -7,6 +7,8 @@
 
 #include <string>
 
+#include "networkMessage.hpp"
+
 namespace _SMERP {
 
 	/// Structures describing the peer
@@ -30,18 +32,6 @@ namespace _SMERP {
 	};
 
 
-	/// A message to be sent to a client.
-	struct outputMessage
-	{
-	public:
-		const void	*data;
-		std::size_t	size;
-
-		outputMessage()			{ data = NULL; size = 0; }
-		outputMessage( const void *d, std::size_t s )
-						{ data = d; size = s; }
-	};
-
 	struct	networkOperation
 	{
 	public:
@@ -51,7 +41,7 @@ namespace _SMERP {
 			TERMINATE
 		};
 		Operation	operation;
-		outputMessage	msg;
+		NetworkMessage	msg;
 	};
 
 
@@ -63,9 +53,9 @@ namespace _SMERP {
 		connectionHandler()		{}
 		virtual ~connectionHandler()	{}
 
-//	private:
-//		connectionHandler( const connectionHandler& )			{}
-//		connectionHandler& operator = ( const connectionHandler& )	{ return *this; }
+	private:
+		connectionHandler( const connectionHandler& );
+		connectionHandler& operator = ( const connectionHandler& );
 
 	public:
 		/// Parse incoming data. The return value indicates how much of the
@@ -87,9 +77,9 @@ namespace _SMERP {
 		ServerHandler()			{}
 		virtual ~ServerHandler()	{}
 
-//	private:
-//		ServerHandler( const ServerHandler& )			{}
-//		ServerHandler& operator = ( const ServerHandler& )	{ return *this; }
+	private:
+		ServerHandler( const ServerHandler& );
+		ServerHandler& operator = ( const ServerHandler& );
 
 	public:
 		/// Create a new connection handler and return a pointer to it
