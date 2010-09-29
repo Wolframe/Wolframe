@@ -21,10 +21,10 @@ namespace _SMERP {
 
 		/// Parse incoming data. The return value indicates how much of the
 		/// input has been consumed.
-		char *parseInput( char *begin, std::size_t bytesTransferred );
+		void* parseInput( const void *begin, std::size_t bytesTransferred );
 
 		/// Handle a request and produce a reply.
-		networkOperation nextOperation();
+		NetworkOperation nextOperation();
 	private:
 		enum State	{
 			NEW,

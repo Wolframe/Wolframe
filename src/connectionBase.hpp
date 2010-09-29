@@ -83,9 +83,9 @@ namespace _SMERP {
 		/// Connection base state machine
 		void nextOperation()
 		{
-			networkOperation netOp = connectionHandler_->nextOperation();
-			switch ( netOp.operation )	{
-			case networkOperation::READ:
+			NetworkOperation netOp = connectionHandler_->nextOperation();
+			switch ( netOp.operation() )	{
+			case NetworkOperation::READ:
 				LOG_TRACE << "Next operation: READ from " << identifier();
 				socket().async_read_some( boost::asio::buffer( buffer_ ),
 							 strand_.wrap( boost::bind( &connectionBase::handleRead,
@@ -93,15 +93,15 @@ namespace _SMERP {
 										    boost::asio::placeholders::error,
 										    boost::asio::placeholders::bytes_transferred )));
 				break;
-			case networkOperation::WRITE:
+			case NetworkOperation::WRITE:
 				LOG_TRACE << "Next operation: WRITE to " << identifier();
 				boost::asio::async_write( socket(),
-							  boost::asio::buffer( netOp.msg.data(), netOp.msg.size() ),
+							  boost::asio::buffer( netOp.data(), netOp.size() ),
 							  strand_.wrap( boost::bind( &connectionBase::handleWrite,
 										     this->shared_from_this(),
 										     boost::asio::placeholders::error )));
 				break;
-			case networkOperation::TERMINATE:
+			case NetworkOperation::TERMINATE:
 				LOG_TRACE << "Next operation: TERMINATE connection to " << identifier();
 				// Initiate graceful connection closure.
 				boost::system::error_code ignored_ec;

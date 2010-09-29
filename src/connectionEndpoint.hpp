@@ -2,17 +2,21 @@
 #define _CONNECTION_ENDPOINT_HPP_INCLUDED
 
 #include <string>
+#include <ostream>
 
 namespace _SMERP {
 
 	/// Structures describing a
 	class ConnectionEndpoint
 	{
-		std::string	address;
-		unsigned short	port;
-
-		connectionPeer( std::string address, unsigned short port )
-						{ address = peerAddress; port = peerPort; }
+	private:
+		std::string	address_;
+		unsigned short	port_;
+	public:
+		ConnectionEndpoint( std::string address, unsigned short port )
+						{ address_ = address; port_ = port; }
+		std::string address()		{ return address_; }
+		unsigned short port()		{ return port_; }
 		std::string toString();
 	};
 
