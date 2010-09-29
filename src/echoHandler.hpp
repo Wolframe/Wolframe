@@ -12,12 +12,12 @@ namespace _SMERP {
 	class echoConnection : public connectionHandler
 	{
 	public:
-		echoConnection( const connectionPeer& local );
-		echoConnection( const SSLconnectionPeer& local );
+		echoConnection( const TCPendpoint& local );
+		echoConnection( const SSLendpoint& local );
 		~echoConnection();
 
-		void setPeer( const connectionPeer& remote );
-		void setPeer( const SSLconnectionPeer& remote );
+		void setPeer( const TCPendpoint& remote );
+		void setPeer( const SSLendpoint& remote );
 
 		/// Parse incoming data. The return value indicates how much of the
 		/// input has been consumed.
@@ -42,8 +42,8 @@ namespace _SMERP {
 	class echoServer : public ServerHandler
 	{
 	public:
-		connectionHandler* newConnection( const connectionPeer& local );
-		connectionHandler* newSSLconnection( const SSLconnectionPeer& local );
+		connectionHandler* newConnection( const TCPendpoint& local );
+		connectionHandler* newSSLconnection( const SSLendpoint& local );
 	};
 
 } // namespace _SMERP

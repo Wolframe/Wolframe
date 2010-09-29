@@ -33,7 +33,7 @@ void connection::start()
 		    + ":" + boost::lexical_cast<std::string>( socket().remote_endpoint().port() ));
 	LOG_TRACE << "Starting connection to " << identifier();
 
-	connectionHandler_->setPeer( connectionPeer( socket().remote_endpoint().address().to_string(),
+	connectionHandler_->setPeer( TCPendpoint( socket().remote_endpoint().address().to_string(),
 						     socket().remote_endpoint().port()));
 
 	setTimeout( connectionTimeout::TIMEOUT_IDLE );
@@ -64,7 +64,7 @@ void SSLconnection::start()
 		    + ":" + boost::lexical_cast<std::string>( SSLsocket_.lowest_layer().remote_endpoint().port() )
 		    + " (SSL)");
 	LOG_TRACE << "Starting connection to " << identifier();
-	connectionHandler_->setPeer( SSLconnectionPeer( SSLsocket_.lowest_layer().remote_endpoint().address().to_string(),
+	connectionHandler_->setPeer( SSLendpoint( SSLsocket_.lowest_layer().remote_endpoint().address().to_string(),
 							SSLsocket_.lowest_layer().remote_endpoint().port()));
 
 	SSLsocket_.async_handshake( boost::asio::ssl::stream_base::server,

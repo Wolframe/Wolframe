@@ -5,7 +5,6 @@
 #ifndef _MISCSTRUCT_HPP_INCLUDED
 #define _MISCSTRUCT_HPP_INCLUDED
 
-#include "defaults.hpp"
 #include <string>
 
 namespace _SMERP {

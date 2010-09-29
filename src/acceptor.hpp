@@ -14,8 +14,8 @@
 
 #include <string>
 
-#include "connectionTimeout.hpp"
 #include "connection.hpp"
+#include "connectionTimeout.hpp"
 #include "connectionHandler.hpp"
 
 namespace _SMERP {
@@ -27,7 +27,7 @@ class acceptor: private boost::noncopyable
 public:
 	/// Construct the acceptor
 	explicit acceptor( boost::asio::io_service& IOservice,
-			   const std::string& host, const unsigned short port,
+			   const std::string& host, unsigned short port,
 			   const connectionTimeout& timeouts,
 			   ServerHandler& srvHandler );
 
@@ -71,7 +71,7 @@ public:
 	explicit SSLacceptor( boost::asio::io_service& IOservice,
 			      const std::string& certFile, const std::string& keyFile,
 				  bool verify, const std::string& CAchainFile, const std::string& CAdirectory,
-				  const std::string& host, const unsigned short port,
+				  const std::string& host, unsigned short port,
 				  const connectionTimeout& timeouts,
 				  ServerHandler& srvHandler );
 

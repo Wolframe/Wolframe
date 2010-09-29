@@ -16,7 +16,7 @@
 namespace _SMERP {
 
 acceptor::acceptor( boost::asio::io_service& IOservice,
-		    const std::string& host, const unsigned short port,
+		    const std::string& host, unsigned short port,
 		    const connectionTimeout& timeouts,
 		    ServerHandler& srvHandler ) :
 	IOservice_( IOservice ),
@@ -31,7 +31,7 @@ acceptor::acceptor( boost::asio::io_service& IOservice,
 	boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve( query );
 	endpoint.port( port );
 
-	connectionHandler *handler = srvHandler_.newConnection( connectionPeer( host, port ));
+	connectionHandler *handler = srvHandler_.newConnection( TCPendpoint( host, port ));
 	newConnection_ = connection_ptr( new connection( IOservice_, timeouts_, handler ));
 
 	acceptor_.open( endpoint.protocol() );
@@ -59,7 +59,7 @@ void acceptor::handleAccept( const boost::system::error_code& e )
 		newConnection_->start();
 		LOG_DEBUG << "Received new connection on " << identifier_;
 
-		connectionHandler *handler = srvHandler_.newConnection( connectionPeer( acceptor_.local_endpoint().address().to_string(),
+		connectionHandler *handler = srvHandler_.newConnection( TCPendpoint( acceptor_.local_endpoint().address().to_string(),
 										       acceptor_.local_endpoint().port() ));
 		newConnection_.reset( new connection( IOservice_, timeouts_, handler ));
 		acceptor_.async_accept( newConnection_->socket(),
@@ -94,7 +94,7 @@ void acceptor::handleStop()
 SSLacceptor::SSLacceptor( boost::asio::io_service& IOservice,
 			  const std::string& certFile, const std::string& keyFile,
 			  bool verify, const std::string& CAchainFile, const std::string& CAdirectory,
-			  const std::string& host, const unsigned short port,
+			  const std::string& host, unsigned short port,
 			  const connectionTimeout& timeouts,
 			  ServerHandler& srvHandler) :
 	IOservice_( IOservice ),
@@ -156,7 +156,7 @@ SSLacceptor::SSLacceptor( boost::asio::io_service& IOservice,
 	boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve( query );
 	endpoint.port( port );
 
-	connectionHandler *handler = srvHandler_.newSSLconnection( SSLconnectionPeer( host, port ));
+	connectionHandler *handler = srvHandler_.newSSLconnection( SSLendpoint( host, port ));
 	newConnection_ = SSLconnection_ptr( new SSLconnection( IOservice_, SSLcontext_, timeouts_, handler ));
 
 	acceptor_.open( endpoint.protocol() );
@@ -184,7 +184,7 @@ void SSLacceptor::handleAccept( const boost::system::error_code& e )
 		newConnection_->start();
 		LOG_DEBUG << "Received new connection on " << identifier_;
 
-		connectionHandler *handler = srvHandler_.newSSLconnection( SSLconnectionPeer( acceptor_.local_endpoint().address().to_string(),
+		connectionHandler *handler = srvHandler_.newSSLconnection( SSLendpoint( acceptor_.local_endpoint().address().to_string(),
 											  acceptor_.local_endpoint().port() ));
 		newConnection_.reset( new SSLconnection( IOservice_, SSLcontext_, timeouts_, handler ));
 		acceptor_.async_accept( newConnection_->socket().lowest_layer(),

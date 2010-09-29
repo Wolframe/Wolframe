@@ -2,7 +2,7 @@
 #define _CONNECTION_ENDPOINT_HPP_INCLUDED
 
 #include <string>
-#include <ostream>
+#include <sstream>
 
 namespace _SMERP {
 
@@ -13,11 +13,33 @@ namespace _SMERP {
 		std::string	address_;
 		unsigned short	port_;
 	public:
-		ConnectionEndpoint( std::string address, unsigned short port )
-						{ address_ = address; port_ = port; }
+		ConnectionEndpoint( const std::string& Address, unsigned short Port )
+						{ address_ = Address; port_ = Port; }
+
 		std::string address()		{ return address_; }
 		unsigned short port()		{ return port_; }
-		std::string toString();
+		std::string toString() const
+		{
+			std::ostringstream o;
+			o << address_ << ":" << port_;
+			return o.str();
+		}
+	};
+
+	/// No encryption endpoint
+	class TCPendpoint : public ConnectionEndpoint
+	{
+	public:
+		TCPendpoint( const std::string& Address, unsigned short Port )
+			: ConnectionEndpoint( Address, Port)	{}
+	};
+
+	/// SSL connection
+	class SSLendpoint : public ConnectionEndpoint
+	{
+	public:
+		SSLendpoint( const std::string& Address, unsigned short Port )
+			: ConnectionEndpoint( Address, Port)	{}
 	};
 
 } // namespace _SMERP

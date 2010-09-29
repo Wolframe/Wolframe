@@ -9,29 +9,9 @@
 #include <cstring>
 #include <string>
 
+#include "connectionEndpoint.hpp"
 
 namespace _SMERP {
-
-	/// Structures describing the peer
-	struct connectionPeer
-	{
-		std::string	address;
-		unsigned short	port;
-
-		connectionPeer( std::string peerAddress, unsigned short peerPort )
-						{ address = peerAddress; port = peerPort; }
-	};
-
-	struct SSLconnectionPeer
-	{
-		std::string	dn;
-		std::string	address;
-		unsigned short	port;
-
-		SSLconnectionPeer( std::string peerAddress, unsigned short peerPort )
-						{ address = peerAddress; port = peerPort; }
-	};
-
 
 	struct	NetworkOperation
 	{
@@ -46,6 +26,7 @@ namespace _SMERP {
 		Operation	operation_;
 		const void	*data_;
 		std::size_t	size_;
+
 	public:
 		NetworkOperation( Operation op )
 					{ operation_ = op, data_ = NULL; size_ = 0; }
@@ -82,8 +63,8 @@ namespace _SMERP {
 		/// Handle a request and produce a reply.
 		virtual NetworkOperation nextOperation() = 0;
 
-		virtual void setPeer( const connectionPeer& remote ) = 0;
-		virtual void setPeer( const SSLconnectionPeer& remote ) = 0;
+		virtual void setPeer( const TCPendpoint& remote ) = 0;
+		virtual void setPeer( const SSLendpoint& remote ) = 0;
 	};
 
 
@@ -100,8 +81,8 @@ namespace _SMERP {
 
 	public:
 		/// Create a new connection handler and return a pointer to it
-		virtual connectionHandler* newConnection( const connectionPeer& local ) = 0;
-		virtual connectionHandler* newSSLconnection( const SSLconnectionPeer& local ) = 0;
+		virtual connectionHandler* newConnection( const TCPendpoint& local ) = 0;
+		virtual connectionHandler* newSSLconnection( const SSLendpoint& local ) = 0;
 	};
 } // namespace _SMERP
 
