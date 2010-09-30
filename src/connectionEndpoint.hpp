@@ -26,7 +26,8 @@ namespace _SMERP {
 		}
 	};
 
-	/// No encryption endpoint
+
+	/// No encryption endpoints
 	class TCPendpoint : public ConnectionEndpoint
 	{
 	public:
@@ -34,11 +35,26 @@ namespace _SMERP {
 			: ConnectionEndpoint( Address, Port)	{}
 	};
 
-	/// SSL connection
+	class RemoteEndpoint : public ConnectionEndpoint
+	{
+	public:
+		RemoteEndpoint( const std::string& Address, unsigned short Port )
+			: ConnectionEndpoint( Address, Port)	{}
+	};
+
+
+	/// SSL connection endpoints
 	class SSLendpoint : public ConnectionEndpoint
 	{
 	public:
 		SSLendpoint( const std::string& Address, unsigned short Port )
+			: ConnectionEndpoint( Address, Port)	{}
+	};
+
+	class RemoteSSLendpoint : public ConnectionEndpoint
+	{
+	public:
+		RemoteSSLendpoint( const std::string& Address, unsigned short Port )
 			: ConnectionEndpoint( Address, Port)	{}
 	};
 
