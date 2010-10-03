@@ -175,14 +175,14 @@ private:
 
 //! The macro defines a global logger initializer that will default-construct the logger
 #define BOOST_LOG_GLOBAL_LOGGER_DEFAULT(tag_name, logger)\
-    BOOST_LOG_GLOBAL_LOGGER_INIT\
+    BOOST_LOG_GLOBAL_LOGGER_INIT(tag_name, logger)\
     {\
         return logger_type();\
     }
 
 //! The macro defines a global logger initializer that will construct the logger with the specified constructor arguments
 #define BOOST_LOG_GLOBAL_LOGGER_CTOR_ARGS(tag_name, logger, args)\
-    BOOST_LOG_GLOBAL_LOGGER_INIT\
+    BOOST_LOG_GLOBAL_LOGGER_INIT(tag_name, logger)\
     {\
         return logger_type(BOOST_PP_SEQ_ENUM(args));\
     }

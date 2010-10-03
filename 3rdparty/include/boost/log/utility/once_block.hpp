@@ -173,7 +173,7 @@ private:
 #define BOOST_LOG_ONCE_BLOCK_FLAG(flag_var)\
     BOOST_LOG_ONCE_BLOCK_INTERNAL(\
         flag_var,\
-        BOOST_LOG_UNIQUE_IDENTIFIER_NAME(boost_log_once_block_sentry_))
+        BOOST_LOG_UNIQUE_IDENTIFIER_NAME(_boost_log_once_block_sentry_))
 
 /*!
  * \def BOOST_LOG_ONCE_BLOCK()
@@ -182,7 +182,7 @@ private:
  */
 #define BOOST_LOG_ONCE_BLOCK()\
     BOOST_LOG_ONCE_BLOCK_INTERNAL(\
-        BOOST_LOG_UNIQUE_IDENTIFIER_NAME(boost_log_once_block_flag_),\
-        BOOST_LOG_UNIQUE_IDENTIFIER_NAME(boost_log_once_block_sentry_))
+        BOOST_LOG_UNIQUE_IDENTIFIER_NAME(_boost_log_once_block_flag_),\
+        BOOST_LOG_UNIQUE_IDENTIFIER_NAME(_boost_log_once_block_sentry_))
 
 #endif // BOOST_LOG_UTILITY_ONCE_BLOCK_HPP_INCLUDED_

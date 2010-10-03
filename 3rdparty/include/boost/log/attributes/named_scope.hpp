@@ -23,11 +23,13 @@
 #include <ostream>
 #include <memory>
 #include <iterator>
+#include <boost/compatibility/cpp_c_headers/cstddef>
 #include <boost/log/detail/prologue.hpp>
 #include <boost/current_function.hpp>
 #include <boost/mpl/if.hpp>
 #ifdef BOOST_LOG_USE_WCHAR_T
 #include <boost/preprocessor/cat.hpp>
+#include <boost/log/utility/once_block.hpp>
 #endif
 #include <boost/log/utility/string_literal.hpp>
 #include <boost/log/utility/unique_identifier_name.hpp>
@@ -494,7 +496,30 @@ typedef basic_named_scope< wchar_t > wnamed_scope;              //!< Convenience
  *
  * Not all compilers have support for this macro. The exact form of the scope name may vary from one compiler to another.
  */
-#define BOOST_LOG_WFUNCTION() BOOST_LOG_WNAMED_SCOPE(BOOST_PP_CAT(L, BOOST_CURRENT_FUNCTION))
+#define BOOST_LOG_WFUNCTION()\
+    BOOST_LOG_WFUNCTION_INTERNAL(BOOST_LOG_UNIQUE_IDENTIFIER_NAME(_boost_log_wfunction_name_))
+
+//! \cond
+
+// This hacky implementation is required because compilers treat BOOST_CURRENT_FUNCTION differently than other macros.
+// The macro is not unfolded completely during the preprocessing stage, which prevents adding L before it,
+// like with __FILE__. Instead, we are forced to perform character conversion in run time. But in order to support
+// no-throw guarantee there must be no dynamic memory allocations and no sophisticated character code conversions that
+// may fail. Therefore we do not support function names with national characters (outside of ASCII).
+#define BOOST_LOG_WFUNCTION_INTERNAL(wfvar)\
+    static ::boost::log::wstring_literal* wfvar = NULL;\
+    BOOST_LOG_ONCE_BLOCK()\
+    {\
+        static wchar_t buf[sizeof(BOOST_CURRENT_FUNCTION)];\
+        for (std::size_t i = 0U; i < sizeof(BOOST_CURRENT_FUNCTION); ++i)\
+            buf[i] = static_cast< wchar_t > ((BOOST_CURRENT_FUNCTION)[i]);\
+        typedef const wchar_t literal_type[sizeof(BOOST_CURRENT_FUNCTION)];\
+        static ::boost::log::wstring_literal wfname((literal_type const&)buf);\
+        wfvar = &wfname;\
+    }\
+    BOOST_LOG_WNAMED_SCOPE(*wfvar)
+
+//! \endcond
 
 #endif
 
