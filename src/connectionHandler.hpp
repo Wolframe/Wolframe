@@ -63,8 +63,8 @@ namespace _SMERP {
 		/// Handle a request and produce a reply.
 		virtual NetworkOperation nextOperation() = 0;
 
-		virtual void setPeer( const TCPendpoint& remote ) = 0;
-		virtual void setPeer( const SSLendpoint& remote ) = 0;
+		virtual void setPeer( const RemoteTCPendpoint& remote ) = 0;
+		virtual void setPeer( const RemoteSSLendpoint& remote ) = 0;
 	};
 
 
@@ -81,8 +81,8 @@ namespace _SMERP {
 
 	public:
 		/// Create a new connection handler and return a pointer to it
-		virtual connectionHandler* newConnection( const TCPendpoint& local ) = 0;
-		virtual connectionHandler* newSSLconnection( const SSLendpoint& local ) = 0;
+		virtual connectionHandler* newConnection( const LocalTCPendpoint& local ) = 0;
+		virtual connectionHandler* newSSLconnection( const LocalSSLendpoint& local ) = 0;
 	};
 } // namespace _SMERP
 

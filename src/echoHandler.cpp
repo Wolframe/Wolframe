@@ -10,14 +10,14 @@
 
 namespace _SMERP {
 
-	echoConnection::echoConnection( const TCPendpoint& local )
+	echoConnection::echoConnection( const LocalTCPendpoint& local )
 	{
 		LOG_TRACE << "Created connection handler for " << local.toString();
 		state_ = NEW;
 	}
 
 
-	echoConnection::echoConnection( const SSLendpoint& local )
+	echoConnection::echoConnection( const LocalSSLendpoint& local )
 	{
 		LOG_TRACE << "Created connection handler (SSL) for " << local.toString();
 		state_ = NEW;
@@ -28,12 +28,12 @@ namespace _SMERP {
 		LOG_TRACE << "Connection handler destroyed";
 	}
 
-	void echoConnection::setPeer( const TCPendpoint& remote )
+	void echoConnection::setPeer( const RemoteTCPendpoint& remote )
 	{
 		LOG_TRACE << "Peer set to " << remote.toString();
 	}
 
-	void echoConnection::setPeer( const SSLendpoint& remote )
+	void echoConnection::setPeer( const RemoteSSLendpoint& remote )
 	{
 		LOG_TRACE << "Peer set to " << remote.toString();
 	}
@@ -93,12 +93,12 @@ namespace _SMERP {
 	}
 
 
-	connectionHandler* echoServer::newConnection( const TCPendpoint& local )
+	connectionHandler* echoServer::newConnection( const LocalTCPendpoint& local )
 	{
 		return new echoConnection( local );
 	}
 
-	connectionHandler* echoServer::newSSLconnection( const SSLendpoint& local )
+	connectionHandler* echoServer::newSSLconnection( const LocalSSLendpoint& local )
 	{
 		return new echoConnection( local );
 	}
