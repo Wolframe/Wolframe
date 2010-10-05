@@ -30,7 +30,6 @@ README
 XML/README
 XML/configFile.rng
 src/getPassword.cpp
-src/smerpd.xml
 src/Makefile.W32
 src/logger.cpp
 src/logLevel.hpp
@@ -69,3 +68,4 @@ makefiles/gmake/clean.mk
 src/echoHandler.hpp
 src/echoHandler.cpp
 src/connectionEndpoint.hpp
+src/serverEndpoint.hpp

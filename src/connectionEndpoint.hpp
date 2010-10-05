@@ -32,14 +32,14 @@ namespace _SMERP {
 	{
 	public:
 		LocalTCPendpoint( const std::string& Address, unsigned short Port )
-			: ConnectionEndpoint( Address, Port)	{}
+			: ConnectionEndpoint( Address, Port )	{}
 	};
 
 	class RemoteTCPendpoint : public ConnectionEndpoint
 	{
 	public:
 		RemoteTCPendpoint( const std::string& Address, unsigned short Port )
-			: ConnectionEndpoint( Address, Port)	{}
+			: ConnectionEndpoint( Address, Port )	{}
 	};
 
 
@@ -48,14 +48,14 @@ namespace _SMERP {
 	{
 	public:
 		LocalSSLendpoint( const std::string& Address, unsigned short Port )
-			: ConnectionEndpoint( Address, Port)	{}
+			: ConnectionEndpoint( Address, Port )	{}
 	};
 
 	class RemoteSSLendpoint : public ConnectionEndpoint
 	{
 	public:
 		RemoteSSLendpoint( const std::string& Address, unsigned short Port )
-			: ConnectionEndpoint( Address, Port)	{}
+			: ConnectionEndpoint( Address, Port )	{}
 	};
 
 } // namespace _SMERP

@@ -9,6 +9,7 @@
 #include "server.hpp"
 #include "acceptor.hpp"
 #include "logger.hpp"
+#include "serverEndpoint.hpp"
 #include "connectionHandler.hpp"
 
 

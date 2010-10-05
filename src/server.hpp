@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "appConfig.hpp"
+#include "serverEndpoint.hpp"
 #include "acceptor.hpp"
 #include "connectionHandler.hpp"
 
@@ -46,7 +47,6 @@ private:
 #ifdef WITH_SSL
 	std::vector<SSLacceptor*>		SSLacceptor_;
 #endif // WITH_SSL
-//	ServerHandler&				serverHandler_;// The connection higher level state machine
 };
 
 } // namespace _SMERP
