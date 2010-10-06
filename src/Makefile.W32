@@ -56,8 +56,8 @@ all: $(OBJS) $(CPP_BINS)
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 smerpd.exe: smerpd.obj $(OBJS) \
-	$(TOPDIR)\libs\boost\log\libboost_log$(BOOST_LIBRARY_TAG).lib \
-	$(TOPDIR)\libs\boost\log\libboost_log_setup$(BOOST_LIBRARY_TAG).lib
+	$(TOPDIR)\3rdparty\src\boost\log\libboost_log$(BOOST_LIBRARY_TAG).lib \
+	$(TOPDIR)\3rdparty\src\boost\log\libboost_log_setup$(BOOST_LIBRARY_TAG).lib
 
 local_all:
 
