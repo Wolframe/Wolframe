@@ -6,8 +6,6 @@
 #define _CONNECTION_HANDLER_HPP_INCLUDED
 
 #include <cstddef>
-#include <cstring>
-#include <string>
 
 #include "connectionEndpoint.hpp"
 
@@ -32,10 +30,6 @@ namespace _SMERP {
 					{ operation_ = op, data_ = NULL; size_ = 0; }
 		NetworkOperation( Operation op, const void *d, std::size_t s )
 					{ operation_ = op, data_ = d; size_ = s; }
-		NetworkOperation( Operation op, const char *str )
-					{ operation_ = op, data_ = str; size_ = std::strlen( str); }
-		NetworkOperation( Operation op, std::string& str )
-					{ operation_ = op, data_ = str.c_str(); size_ = str.length(); }
 
 		Operation operation()	{ return operation_; }
 		const void* data()	{ return data_; }

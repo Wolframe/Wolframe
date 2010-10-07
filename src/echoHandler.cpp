@@ -43,25 +43,31 @@ namespace _SMERP {
 	NetworkOperation echoConnection::nextOperation()
 	{
 		switch( state_ )	{
-		case NEW:
+		case NEW:	{
 			state_ = READING;
-			return NetworkOperation( NetworkOperation::WRITE, "Welcome to SMERP.\n" );
+			std::string msg = "Welcome to SMERP.\n";
+			return NetworkOperation( NetworkOperation::WRITE, msg.c_str(), msg.length());
+		}
 
 		case READING:
 			state_ = ANSWERING;
 			if ( ! buffer.empty() )
-				return NetworkOperation( NetworkOperation::WRITE, buffer );
-			else
-				return NetworkOperation( NetworkOperation::WRITE, "EMPTY BUFFER !\n" );
+				return NetworkOperation( NetworkOperation::WRITE, buffer.c_str(), buffer.length() );
+			else	{
+				std::string msg = "EMPTY BUFFER !\n";
+				return NetworkOperation( NetworkOperation::WRITE, msg.c_str(), msg.length());
+			}
 
 		case ANSWERING:
 			buffer.clear();
 			state_ = READING;
 			return NetworkOperation( NetworkOperation::READ );
 
-		case FINISHING:
+		case FINISHING:	{
 			state_ = TERMINATING;
-			return NetworkOperation( NetworkOperation::WRITE, "Thanks for using SMERP.\n" );
+			std::string msg = "Thanks for using SMERP.\n";
+			return NetworkOperation( NetworkOperation::WRITE, msg.c_str(), msg.length());
+		}
 
 		case TERMINATING:
 			buffer.clear();

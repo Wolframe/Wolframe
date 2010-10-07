@@ -25,6 +25,7 @@ namespace _SMERP {
 
 		/// Handle a request and produce a reply.
 		NetworkOperation nextOperation();
+
 	private:
 		enum State	{
 			NEW,
