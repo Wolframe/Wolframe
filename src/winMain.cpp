@@ -201,7 +201,7 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 		
 // run server in background thread(s).
 		_SMERP::echoServer	echo;
-		_SMERP::server s( config, echo );
+		_SMERP::server s( config.address, config.SSLaddress, echo, config );
 		boost::thread t( boost::bind( &_SMERP::server::run, &s ));
 
 // we are up and running now (hopefully), signal this to the SCM
@@ -349,7 +349,7 @@ int _SMERP_winMain( int argc, char* argv[] )
 		LOG_NOTICE << "Starting server";
 
 		_SMERP::echoServer	echo;
-		_SMERP::server s( config, echo );
+		_SMERP::server s( config.address, config.SSLaddress, echo, config );
 
 		// Set console control handler to allow server to be stopped.
 		consoleCtrlFunction = boost::bind(&_SMERP::server::stop, &s);
