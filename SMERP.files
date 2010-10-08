@@ -34,7 +34,6 @@ src/Makefile.W32
 src/logger.cpp
 src/logLevel.hpp
 src/logLevel.cpp
-src/miscStruct.hpp
 src/defaults.hpp
 src/connectionBase.hpp
 src/connectionTimeout.hpp

@@ -26,7 +26,7 @@ namespace _SMERP {
 		std::size_t	size_;
 
 	public:
-		NetworkOperation( Operation op )
+		explicit NetworkOperation( Operation op )
 					{ operation_ = op, data_ = NULL; size_ = 0; }
 		NetworkOperation( Operation op, const void *d, std::size_t s )
 					{ operation_ = op, data_ = d; size_ = s; }

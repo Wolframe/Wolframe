@@ -10,8 +10,8 @@ namespace _SMERP	{
 	class ServerTCPendpoint : public ConnectionEndpoint
 	{
 	public:
-		ServerTCPendpoint( const std::string& Address, unsigned short Port )
-			: ConnectionEndpoint( Address, Port )	{}
+		ServerTCPendpoint( const std::string& Host, unsigned short Port )
+			: ConnectionEndpoint( Host, Port )	{}
 	};
 
 
@@ -26,17 +26,23 @@ namespace _SMERP	{
 		std::string	CAchain_;
 		bool		verify_;
 	public:
-		ServerSSLendpoint( const std::string& Address, unsigned short Port,
+		ServerSSLendpoint( const std::string& Host, unsigned short Port,
 				   const std::string& Certificate, const std::string& Key,
-				   bool verify, const std::string& CAdirectory, const std::string& CAchainFile )
-			: ConnectionEndpoint( Address, Port )
+				   bool verify, const std::string& CAdir, const std::string& CAchainFile )
+			: ConnectionEndpoint( Host, Port )
 		{
 			cert_ = Certificate;
 			key_ = Key;
 			verify_ = verify;
-			CAdir_ = CAdirectory;
+			CAdir_ = CAdir;
 			CAchain_ = CAchainFile;
 		}
+
+		const std::string& certificate() const	{ return cert_; }
+		const std::string& key() const		{ return key_; }
+		const std::string& CAdirectory() const	{ return CAdir_; }
+		const std::string& CAchain() const	{ return CAchain_; }
+		bool verifyClientCert() const		{ return verify_; }
 	};
 
 }

@@ -17,7 +17,7 @@ namespace _SMERP {
 
 #if defined(_WIN32)
 		// on Windows the user should either use -f or start in the console
-		// (assuming an implicit -f) or the service option should contain 
+		// (assuming an implicit -f) or the service option should contain
 		// --service in the startup parameters of the service impling non-foreground
 		if( cmdLine.command == _SMERP::CmdLineConfig::RUN_SERVICE )
 			foreground = false;
@@ -108,19 +108,19 @@ namespace _SMERP {
 
 		os << "Network" << std::endl;
 		if ( address.size() > 0 )	{
-			os << "  Unencrypted: " << address[0].host << ":" << address[0].port << std::endl;
+			os << "  Unencrypted: " << address[0].toString() << std::endl;
 			for ( unsigned i = 1; i < address.size(); i++ )
-				os << "               " << address[i].host << ":" << address[i].port << std::endl;
+				os << "               " << address[i].toString() << std::endl;
 		}
 		if ( SSLaddress.size() > 0 )	{
-			os << "          SSL: " << SSLaddress[0].host << ":" << SSLaddress[0].port << std::endl;
-			os << "                  certificate: " << (SSLaddress[0].certFile.empty() ? "(none)" : SSLaddress[0].certFile) << std::endl;
-			os << "                  key file: " << (SSLaddress[0].keyFile.empty() ? "(none)" : SSLaddress[0].keyFile) << std::endl;
-			os << "                  CA directory: " << (SSLaddress[0].CAdirectory.empty() ? "(none)" : SSLaddress[0].CAdirectory) << std::endl;
-			os << "                  CA chain file: " << (SSLaddress[0].CAchainFile.empty() ? "(none)" : SSLaddress[0].CAchainFile) << std::endl;
-			os << "                  verify client: " << (SSLaddress[0].verify ? "yes" : "no") << std::endl;
+			os << "          SSL: " << SSLaddress[0].toString() << std::endl;
+			os << "                  certificate: " << (SSLaddress[0].certificate().empty() ? "(none)" : SSLaddress[0].certificate()) << std::endl;
+			os << "                  key file: " << (SSLaddress[0].key().empty() ? "(none)" : SSLaddress[0].key()) << std::endl;
+			os << "                  CA directory: " << (SSLaddress[0].CAdirectory().empty() ? "(none)" : SSLaddress[0].CAdirectory()) << std::endl;
+			os << "                  CA chain file: " << (SSLaddress[0].CAchain().empty() ? "(none)" : SSLaddress[0].CAchain()) << std::endl;
+			os << "                  verify client: " << (SSLaddress[0].verifyClientCert() ? "yes" : "no") << std::endl;
 			for ( unsigned i = 1; i < SSLaddress.size(); i++ )	{
-				os << "               " << SSLaddress[i].host << ":" << SSLaddress[i].port << std::endl;
+				os << "               " << SSLaddress[i].toString() << std::endl;
 			}
 		}
 

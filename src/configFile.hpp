@@ -3,6 +3,7 @@
 
 #include "logLevel.hpp"
 #include "logSyslogFacility.hpp"
+#include "serverEndpoint.hpp"
 
 #include <string>
 #include <vector>
@@ -25,8 +26,8 @@ namespace _SMERP	{
 		unsigned short	threads;
 		unsigned short	maxClients;
 // network configuration
-		std::vector<struct localEndpoint> address;
-		std::vector<struct localSSLendpoint> SSLaddress;
+		std::vector<ServerTCPendpoint> address;
+		std::vector<ServerSSLendpoint> SSLaddress;
 
 		unsigned	idleTimeout;
 		unsigned	requestTimeout;
@@ -63,7 +64,7 @@ namespace _SMERP	{
 						const char *localFile );
 
 		bool parse( const char *filename );
-		std::string errMsg( void )	{ return errMsg_; };
+		std::string errMsg( void )		{ return errMsg_; }
 	};
 
 } // namespace _SMERP

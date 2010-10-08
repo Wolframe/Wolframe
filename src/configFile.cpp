@@ -5,7 +5,7 @@
 // #define HAS_XML_CONFIG_FILE
 
 #include "configFile.hpp"
-#include "miscStruct.hpp"
+#include "serverEndpoint.hpp"
 
 #include <boost/filesystem.hpp>
 #include <boost/foreach.hpp>
@@ -154,37 +154,38 @@ namespace _SMERP {
 			}
 
 			if ( v.first == "socket" )	{
-				struct localEndpoint lep( tmpStr, port );
+				ServerTCPendpoint lep( tmpStr, port );
 				address.push_back( lep );
 			}
 			else if ( v.first == "SSLsocket" )	{
-				struct localSSLendpoint lep( tmpStr, port );
 // get SSL certificate / CA param
-				lep.certFile = boost::filesystem::complete(
+				std::string certFile = boost::filesystem::complete(
 									v.second.get<std::string>( "certificate", std::string() ),
 									boost::filesystem::path( file ).branch_path() ).string();
-				lep.keyFile = boost::filesystem::complete(
+				std::string keyFile = boost::filesystem::complete(
 									v.second.get<std::string>( "key", std::string() ),
 									boost::filesystem::path( file ).branch_path() ).string();
-				lep.CAdirectory = boost::filesystem::complete(
+				std::string CAdirectory = boost::filesystem::complete(
 									v.second.get<std::string>( "CAdirectory", std::string() ),
 									boost::filesystem::path( file ).branch_path() ).string();
-				lep.CAchainFile = boost::filesystem::complete(
+				std::string CAchainFile = boost::filesystem::complete(
 									v.second.get<std::string>( "CAchainFile", std::string() ),
 									boost::filesystem::path( file ).branch_path() ).string();
 
 				boost::logic::tribool flag = getBoolValue( v.second, "verify", tmpStr );
+				bool verify;
 				if ( flag )
-					lep.verify = true;
+					verify = true;
 				else if ( !flag )
-					lep.verify = false;
+					verify = false;
 				else	{
-					lep.verify = true;
+					verify = true;
 					errMsg_ = "Unknown value \"";
 					errMsg_ += tmpStr;
 					errMsg_ += "\" for SSL verify client. WARNING: enabling verification";
 				}
-
+				ServerSSLendpoint lep( tmpStr, port,
+						       certFile, keyFile, verify, CAdirectory, CAchainFile );
 				SSLaddress.push_back( lep );
 			}
 			else	{

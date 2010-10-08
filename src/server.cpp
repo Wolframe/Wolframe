@@ -15,7 +15,8 @@
 
 namespace _SMERP {
 
-server::server( const ApplicationConfiguration& config, ServerHandler& serverHandler )
+	server::server( const std::vector<ServerTCPendpoint>& TCPserver, const std::vector<ServerSSLendpoint>& SSLserver,
+		ServerHandler& serverHandler, const ApplicationConfiguration& config )
 	: threadPoolSize_( config.threads ),
 	IOservice_(),
 	timeouts_( (unsigned long)config.idleTimeout,
@@ -24,20 +25,20 @@ server::server( const ApplicationConfiguration& config, ServerHandler& serverHan
 		   (unsigned long)config.answerTimeout )
 {
 	size_t	i;
-	for ( i = 0; i < config.address.size(); i++ )	{
+	for ( i = 0; i < TCPserver.size(); i++ )	{
 		acceptor* acptr = new acceptor( IOservice_,
-						config.address[i].host, config.address[i].port,
+						TCPserver[i].host(), TCPserver[i].port(),
 						timeouts_, serverHandler );
 		acceptor_.push_back( acptr );
 	}
 	LOG_DEBUG << i << " network acceptor(s) created.";
 #ifdef WITH_SSL
-	for ( i = 0; i < config.SSLaddress.size(); i++ )	{
+	for ( i = 0; i < SSLserver.size(); i++ )	{
 		SSLacceptor* acptr = new SSLacceptor( IOservice_,
-						      config.SSLaddress[i].certFile, config.SSLaddress[i].keyFile,
-						      config.SSLaddress[i].verify,
-						      config.SSLaddress[i].CAchainFile, config.SSLaddress[i].CAdirectory,
-						      config.SSLaddress[i].host, config.SSLaddress[i].port,
+						      SSLserver[i].certificate(), SSLserver[i].key(),
+						      SSLserver[i].verifyClientCert(),
+						      SSLserver[i].CAchain(), SSLserver[i].CAdirectory(),
+						      SSLserver[i].host(), SSLserver[i].port(),
 						      timeouts_, serverHandler );
 		SSLacceptor_.push_back( acptr );
 	}

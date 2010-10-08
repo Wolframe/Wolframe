@@ -24,7 +24,8 @@ class server: private boost::noncopyable
 /// public interface
 public:
 	/// Construct the server
-	explicit server( const ApplicationConfiguration& config, ServerHandler& serverHandler );
+	explicit server( const std::vector<ServerTCPendpoint>& TCPserver, const std::vector<ServerSSLendpoint>& SSLserver,
+			 ServerHandler& serverHandler, const ApplicationConfiguration& config );
 
 	/// Destruct the server
 	~server();

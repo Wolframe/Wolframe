@@ -6,8 +6,8 @@
 #define _APP_CONFIG_HPP_INCLUDED
 
 #include "logLevel.hpp"
-#include "miscStruct.hpp"		// for localEndpoint and localSSLendpoint
 #include "logSyslogFacility.hpp"
+#include "serverEndpoint.hpp"
 
 #include <string>
 #include <vector>
@@ -38,8 +38,8 @@ namespace _SMERP {
 		unsigned		maxClients;
 
 // network configuration
-		std::vector<struct localEndpoint> address;
-		std::vector<struct localSSLendpoint> SSLaddress;
+		std::vector<ServerTCPendpoint> address;
+		std::vector<ServerSSLendpoint> SSLaddress;
 
 		unsigned		idleTimeout;
 		unsigned		requestTimeout;

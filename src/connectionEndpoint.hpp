@@ -10,18 +10,18 @@ namespace _SMERP {
 	class ConnectionEndpoint
 	{
 	private:
-		std::string	address_;
+		std::string	host_;
 		unsigned short	port_;
 	public:
-		ConnectionEndpoint( const std::string& Address, unsigned short Port )
-						{ address_ = Address; port_ = Port; }
+		ConnectionEndpoint( const std::string& Host, unsigned short Port )
+						{ host_ = Host; port_ = Port; }
 
-		std::string address()		{ return address_; }
-		unsigned short port()		{ return port_; }
+		const std::string& host() const	{ return host_; }
+		unsigned short port() const	{ return port_; }
 		std::string toString() const
 		{
 			std::ostringstream o;
-			o << address_ << ":" << port_;
+			o << host_ << ":" << port_;
 			return o.str();
 		}
 	};
@@ -31,15 +31,15 @@ namespace _SMERP {
 	class LocalTCPendpoint : public ConnectionEndpoint
 	{
 	public:
-		LocalTCPendpoint( const std::string& Address, unsigned short Port )
-			: ConnectionEndpoint( Address, Port )	{}
+		LocalTCPendpoint( const std::string& Host, unsigned short Port )
+			: ConnectionEndpoint( Host, Port )	{}
 	};
 
 	class RemoteTCPendpoint : public ConnectionEndpoint
 	{
 	public:
-		RemoteTCPendpoint( const std::string& Address, unsigned short Port )
-			: ConnectionEndpoint( Address, Port )	{}
+		RemoteTCPendpoint( const std::string& Host, unsigned short Port )
+			: ConnectionEndpoint( Host, Port )	{}
 	};
 
 
@@ -47,15 +47,15 @@ namespace _SMERP {
 	class LocalSSLendpoint : public ConnectionEndpoint
 	{
 	public:
-		LocalSSLendpoint( const std::string& Address, unsigned short Port )
-			: ConnectionEndpoint( Address, Port )	{}
+		LocalSSLendpoint( const std::string& Host, unsigned short Port )
+			: ConnectionEndpoint( Host, Port )	{}
 	};
 
 	class RemoteSSLendpoint : public ConnectionEndpoint
 	{
 	public:
-		RemoteSSLendpoint( const std::string& Address, unsigned short Port )
-			: ConnectionEndpoint( Address, Port )	{}
+		RemoteSSLendpoint( const std::string& Host, unsigned short Port )
+			: ConnectionEndpoint( Host, Port )	{}
 	};
 
 } // namespace _SMERP
