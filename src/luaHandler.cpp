@@ -7,6 +7,7 @@
 
 #include <string>
 #include <cstring>
+#include <stdexcept>
 
 extern "C" {
 #include <lualib.h>
@@ -107,7 +108,37 @@ namespace _SMERP {
 	luaServer::luaServer( ) : ServerHandler( )
 	{
 		l = luaL_newstate( );
+
+		// TODO: open standard libraries, most likely something to configure later
 		luaL_openlibs( l );
+
+		// TODO: script location, also configurable
+		int res = luaL_loadfile( l, "echo.lua" );
+		if( res != 0 ) {
+			LOG_FATAL << "Unable to load LUA code 'echo.lua': " << lua_tostring( l, -1 );
+			lua_pop( l, 1 );
+			throw new std::runtime_error( "Can't initialize LUA processor" );
+		}
+
+		// TODO: careful here with threads and how they get generated!
+
+		// call main, we may have to initialized LUA modules there
+		res = lua_pcall( l, 0, LUA_MULTRET, 0 );
+		if( res != 0 ) {
+			LOG_FATAL << "Unable to call main entry of script: " << lua_tostring( l, -1 );
+			lua_pop( l, 1 );
+			throw new std::runtime_error( "Can't initialize LUA processor" );
+		}
+
+		// execute the main entry point of the script, we could initialize things there in LUA
+		lua_pushstring( l, "init" );
+		lua_gettable( l, LUA_GLOBALSINDEX );
+		res = lua_pcall( l, 0, 0, 0 );
+		if( res != 0 ) {
+			LOG_FATAL << "Unable to call 'init' function: " << lua_tostring( l, -1 );
+			lua_pop( l, 1 );
+			throw new std::runtime_error( "Can't initialize LUA processor" );
+		}
 	}
 
 	luaServer::~luaServer( )
