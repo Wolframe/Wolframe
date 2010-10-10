@@ -45,6 +45,7 @@ OBJS = \
 	connection.o \
 	server.o \
 	echoHandler.o \
+	luaHandler.o \
 	posixMain.o
 
 
