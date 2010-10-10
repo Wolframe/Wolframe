@@ -8,6 +8,11 @@
 #include <string>
 #include <cstring>
 
+extern "C" {
+#include <lualib.h>
+#include <lauxlib.h>
+}
+
 namespace _SMERP {
 
 	luaConnection::luaConnection( const LocalTCPendpoint& local )
@@ -98,6 +103,17 @@ namespace _SMERP {
 		return( s );
 	}
 
+
+	luaServer::luaServer( ) : ServerHandler( )
+	{
+		l = luaL_newstate( );
+		luaL_openlibs( l );
+	}
+
+	luaServer::~luaServer( )
+	{
+		lua_close( l );
+	}
 
 	connectionHandler* luaServer::newConnection( const LocalTCPendpoint& local )
 	{

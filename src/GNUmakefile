@@ -18,7 +18,8 @@ INCLUDE_LIBS = \
 	-lboost_program_options \
 	-lboost_filesystem \
 	-lboost_log -lboost_log_setup \
-	-lssl
+	-lssl \
+	-llua
 
 CPP_BINS = \
 	smerpd$(EXE)
@@ -45,7 +46,7 @@ OBJS = \
 	connection.o \
 	server.o \
 	echoHandler.o \
-	luaHandler.o \
+	luaHandler.o luahelpers.o \
 	posixMain.o
 
 

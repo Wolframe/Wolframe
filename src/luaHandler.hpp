@@ -7,6 +7,10 @@
 
 #include "connectionHandler.hpp"
 
+extern "C" {
+#include <lua.h>
+}
+
 namespace _SMERP {
 	/// The connection handler
 	class luaConnection : public connectionHandler
@@ -42,7 +46,13 @@ namespace _SMERP {
 	/// The server handler container
 	class luaServer : public ServerHandler
 	{
+	private:
+		lua_State *l;
+
 	public:
+		luaServer( );
+		virtual ~luaServer( );
+
 		connectionHandler* newConnection( const LocalTCPendpoint& local );
 		connectionHandler* newSSLconnection( const LocalSSLendpoint& local );
 	};
