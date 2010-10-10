@@ -107,6 +107,7 @@ namespace _SMERP {
 
 	luaServer::luaServer( ) : ServerHandler( )
 	{
+		// instanitate a new VM
 		l = luaL_newstate( );
 
 		// TODO: open standard libraries, most likely something to configure later
@@ -143,6 +144,17 @@ namespace _SMERP {
 
 	luaServer::~luaServer( )
 	{
+		// give LUA code a chance to clean up resources or something
+		lua_pushstring( l, "destroy" );
+		lua_gettable( l, LUA_GLOBALSINDEX );
+		int res = lua_pcall( l, 0, 0, 0 );
+		if( res != 0 ) {
+			LOG_FATAL << "Unable to call 'destroy' function: " << lua_tostring( l, -1 );
+			lua_pop( l, 1 );
+			throw new std::runtime_error( "Error in destruction of LUA processor" );
+		}
+
+		// close the VM, give away resources
 		lua_close( l );
 	}
 
