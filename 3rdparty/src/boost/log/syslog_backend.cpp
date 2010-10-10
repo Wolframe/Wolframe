@@ -196,7 +196,7 @@ struct basic_syslog_backend< CharT >::implementation::native :
             native_level = LOG_INFO; break;
         }
 
-        ::syslog(LOG_MAKEPRI(this->m_Facility, native_level), "%s", formatted_message.c_str());
+        ::syslog(this->m_Facility | native_level, "%s", formatted_message.c_str());
     }
 
 private:
