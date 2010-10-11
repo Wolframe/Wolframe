@@ -11,7 +11,8 @@ INCLUDE_DIRS = \
 	/I$(TOPDIR)\include \
 	/I"$(BOOST_DIR)" \
 	/I"$(PLATFORM_SDK_DIR)\Include"	\
-	/I"$(OPENSSL_DIR)\include"
+	/I"$(OPENSSL_DIR)\include" \
+	/I"$(LUA_DIR)\src"
 
 # Note: libraries are picked automatically on Windows!
 SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib"
@@ -19,10 +20,12 @@ BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib"
 INCLUDE_LDFLAGS = \
 	$(SDK_LDFLAGS) $(BOOST_LDFLAGS) \
 	/LIBPATH:$(TOPDIR)\3rdparty\src\boost\log \
-	/LIBPATH:"$(OPENSSL_DIR)\lib"
+	/LIBPATH:"$(OPENSSL_DIR)\lib" \
+	/LIBPATH:"$(LUA_DIR)\src"
 
 INCLUDE_LIBS = \
-	libeay32.lib ssleay32.lib
+	libeay32.lib ssleay32.lib \
+	"$(LUA_DIR)\src\lua51.lib"
 
 CPP_BINS = \
 	smerpd.exe
@@ -49,6 +52,7 @@ OBJS = \
 	connection.obj \
 	getPassword.obj \
 	echoHandler.obj \
+	luaHandler.obj luahelpers.obj \
 	winMain.obj
 
 all: $(OBJS) $(CPP_BINS)

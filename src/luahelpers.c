@@ -39,7 +39,11 @@ void lua_helper_dump_stack( lua_State *l, const char *comment )
 
 			case LUA_TFUNCTION: {
 				lua_CFunction f = lua_tocfunction( l, i );
+#ifndef _WIN32
 				printf( "STACK %s -- %d (-%d): function[%016"PRIxPTR"]\n", comment, i, top - i + 1, (uintptr_t)f );
+#else
+				printf( "STACK %s -- %d (-%d): function[%016]\n", comment, i, top - i + 1, f );
+#endif
 				break;
 				}
 
