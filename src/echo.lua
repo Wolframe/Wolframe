@@ -8,4 +8,10 @@ function destroy( )
 	io.write( "lua destroy called.\n" )
 end
 
+-- called when a new connection arrives
+function newConnection( )
+	io.write( "lua got a new connection.\n" )
+end
+
+-- the main, initialize globals here
 io.write( "lua main called.\n" )
