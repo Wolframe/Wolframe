@@ -191,7 +191,9 @@ endif
 # OpenSSL
 #########
 
+ifdef WITH_SSL
 OPENSSL_LIBS = -lssl
+endif
 
 # Google Unit testing gtest
 ###########################

@@ -16,7 +16,7 @@ make check-po          check sanity of gettext files
 
 Available optional features:
 
-WITH_OPENSSL=1         use OpenSSL additionally for communication encryption
+WITH_SSL=1             use OpenSSL additionally for communication encryption
 WITH_BOOST_LOG=1       use embedded Boost Log library instead of a fake logger
 
 Avaliable optional features during testing only:
