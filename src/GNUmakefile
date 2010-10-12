@@ -49,8 +49,6 @@ INCLUDE_LIBS += \
 
 endif
 
->>>>>>> master
-
 CPP_BINS = \
 	smerpd$(EXE)
 
