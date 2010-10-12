@@ -11,16 +11,4 @@ ABa:
    - gcc flags and related bugs:
      - -Wshadow
    - the process id should be convertible to an int for printing
-
-2. add switches to makefile for
-   - OpenSSL
-   - fake logger (without boost-log)
-   - lua processor (temporarily)
-
-3. make multiple services run in parallel
-
-PF:
-
-1. backport the module loader from Wolfbones/TextWolf,
-   especially interesting for servers and handler in funny languages
-
+2. backport the module loader from Wolfbones/TextWolf

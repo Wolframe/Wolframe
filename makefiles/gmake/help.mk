@@ -13,3 +13,9 @@ make help              show this very help page
 make init-po           create initial version of the gettext files
 make merge-po          merge the gettext files after changes
 make check-po          check sanity of gettext files
+
+Available optional features:
+
+WITH_OPENSSL=1         use OpenSSL additionally for communication encryption
+WITH_BOOST_LOG=1       use embedded Boost Log library instead of a fake logger
+WITH_GTEST=1           use Google Unit testing library

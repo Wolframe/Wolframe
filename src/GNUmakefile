@@ -5,6 +5,14 @@ SUBDIRS =
 INCLUDE_CPPFLAGS = \
 	-DBOOST_LOG_USE_NATIVE_SYSLOG -DWITH_SSL
 
+ifndef WITH_BOOST_LOG
+INCLUDE_CPPFLAGS += -DFAKE_LOGGER
+else
+ifeq "$(WITH_BOOST_LOG)" "1"
+INCLUDE_CPPFLAGS += -DFAKE_LOGGER
+endif
+endif
+
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/3rdparty/src/boost/log
 
@@ -17,8 +25,8 @@ INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_program_options \
 	-lboost_filesystem \
-	-lboost_log -lboost_log_setup \
-	-lssl
+	$(OPENSSL_LIBS) \
+	$(BOOST_LOG_LIBS)
 
 CPP_BINS = \
 	smerpd$(EXE)

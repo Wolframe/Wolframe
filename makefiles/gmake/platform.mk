@@ -184,6 +184,23 @@ XSLTPROC = xsltproc
 ifeq "$(PLATFORM)" "LINUX"
 ifeq "$(LINUX_DIST)" "arch"
 BOOST_DIR = /usr
-BOOST_LIBRARY_TAG =  "-mt"
+BOOST_LIBRARY_TAG = -mt
 endif
+endif
+
+# OpenSSL
+#########
+
+OPENSSL_LIBS = -lssl
+
+#TODO: no fakelogger
+ifdef WITH_BOOST_LOG
+BOOST_LOG_LIBS=-lboost_log -lboost_log_setup
+endif
+
+# Google Unit testing gtest
+###########################
+
+ifdef WITH_GTEST
+GTEST_LIBS = -lgtest
 endif
