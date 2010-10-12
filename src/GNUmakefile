@@ -5,26 +5,10 @@ SUBDIRS =
 INCLUDE_CPPFLAGS = \
 	-DWITH_SSL
 
-ifdef WITH_BOOST_LOG
-#INCLUDE_CPPFLAGS += -DBOOST_LOG_USE_NATIVE_SYSLOG
-else
-INCLUDE_CPPFLAGS += -DFAKE_LOGGER
-endif
-
 INCLUDE_LDFLAGS = \
-
-ifdef WITH_BOOST_LOG
-INCLUDE_LDFLAGS += \
-	-L$(TOPDIR)/3rdparty/src/boost/log
-endif
 
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include
-
-ifdef WITH_BOOST_LOG
-INCLUDE_DIRS += \
-	-I$(TOPDIR)/3rdparty/include
-endif
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
@@ -34,6 +18,19 @@ INCLUDE_LIBS = \
 	-lboost_filesystem \
 	$(OPENSSL_LIBS) \
 	$(BOOST_LOG_LIBS)
+
+ifndef WITH_BOOST_LOG
+INCLUDE_CPPFLAGS += -DFAKE_LOGGER
+else
+INCLUDE_LDFLAGS += \
+	-L$(TOPDIR)/3rdparty/src/boost/log
+
+INCLUDE_DIRS += \
+	-I$(TOPDIR)/3rdparty/include
+
+INCLUDE_LIBS += \
+	-lboost_log -lboost_log_setup
+endif
 
 CPP_BINS = \
 	smerpd$(EXE)
