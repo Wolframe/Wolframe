@@ -12,6 +12,7 @@
 #include <boost/log/utility/init/to_file.hpp>
 #include <boost/log/utility/init/to_console.hpp>
 #ifndef _WIN32
+#define BOOST_LOG_USE_NATIVE_SYSLOG
 #include <boost/log/utility/init/to_syslog.hpp>
 #else
 #include <boost/log/utility/init/to_eventlog.hpp>
