@@ -3,21 +3,28 @@ TOPDIR = ..
 SUBDIRS =
 
 INCLUDE_CPPFLAGS = \
-	-DBOOST_LOG_USE_NATIVE_SYSLOG -DWITH_SSL
+	-DWITH_SSL
 
-ifndef WITH_BOOST_LOG
-INCLUDE_CPPFLAGS += -DFAKE_LOGGER
+ifdef WITH_BOOST_LOG
+#INCLUDE_CPPFLAGS += -DBOOST_LOG_USE_NATIVE_SYSLOG
 else
-ifeq "$(WITH_BOOST_LOG)" "1"
 INCLUDE_CPPFLAGS += -DFAKE_LOGGER
-endif
 endif
 
 INCLUDE_LDFLAGS = \
-	-L$(TOPDIR)/3rdparty/src/boost/log
 
-INCLUDE_DIRS = -I. \
-	-I$(TOPDIR)/include -I$(TOPDIR)/3rdparty/include
+ifdef WITH_BOOST_LOG
+INCLUDE_LDFLAGS += \
+	-L$(TOPDIR)/3rdparty/src/boost/log
+endif
+
+INCLUDE_DIRS = \
+	-I. -I$(TOPDIR)/include
+
+ifdef WITH_BOOST_LOG
+INCLUDE_DIRS += \
+	-I$(TOPDIR)/3rdparty/include
+endif
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 

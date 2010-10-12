@@ -195,7 +195,7 @@ OPENSSL_LIBS = -lssl
 
 #TODO: no fakelogger
 ifdef WITH_BOOST_LOG
-BOOST_LOG_LIBS=-lboost_log -lboost_log_setup
+BOOST_LOG_LIBS = -lboost_log -lboost_log_setup
 endif
 
 # Google Unit testing gtest
