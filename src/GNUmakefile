@@ -2,14 +2,12 @@ TOPDIR = ..
 
 SUBDIRS =
 
-INCLUDE_CPPFLAGS = \
-	-DBOOST_LOG_USE_NATIVE_SYSLOG -DWITH_SSL
+INCLUDE_CPPFLAGS =
 
 INCLUDE_LDFLAGS = \
-	-L$(TOPDIR)/3rdparty/src/boost/log
 
-INCLUDE_DIRS = -I. \
-	-I$(TOPDIR)/include -I$(TOPDIR)/3rdparty/include
+INCLUDE_DIRS = \
+	-I. -I$(TOPDIR)/include
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
@@ -17,9 +15,41 @@ INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_program_options \
 	-lboost_filesystem \
-	-lboost_log -lboost_log_setup \
-	-lssl \
 	-llua
+
+
+# openssl
+
+ifdef WITH_SSL
+
+INCLUDE_CPPFLAGS += \
+	-DWITH_SSL
+
+INCLUDE_LIBS += \
+	$(OPENSSL_LIBS)
+
+endif
+
+# boost-log
+
+ifndef WITH_BOOST_LOG
+
+INCLUDE_CPPFLAGS += -DFAKE_LOGGER
+
+else
+
+INCLUDE_LDFLAGS += \
+	-L$(TOPDIR)/3rdparty/src/boost/log
+
+INCLUDE_DIRS += \
+	-I$(TOPDIR)/3rdparty/include
+
+INCLUDE_LIBS += \
+	-lboost_log -lboost_log_setup
+
+endif
+
+>>>>>>> master
 
 CPP_BINS = \
 	smerpd$(EXE)

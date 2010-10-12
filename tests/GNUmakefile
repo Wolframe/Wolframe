@@ -3,23 +3,35 @@ TOPDIR = ..
 SUBDIRS =
 
 INCLUDE_CPPFLAGS = \
-	-DBOOST_LOG_USE_NATIVE_SYSLOG
 
 INCLUDE_DIRS = \
 	-I$(TOPDIR)/include -I. \
-	-I$(TOPDIR)/src \
-	-I$(TOPDIR)/3rdparty/include
+	-I$(TOPDIR)/src
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
 INCLUDE_LDFLAGS = \
-	-L$(TOPDIR)/3rdparty/src/boost/log
 
 INCLUDE_LIBS = \
 	-lboost_unit_test_framework \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_filesystem -lboost_thread$(BOOST_LIBRARY_TAG) \
-	-lboost_log -lboost_log_setup -lgtest
+	$(GTEST_LIBS)
+
+# boost-log
+
+ifdef WITH_BOOST_LOG
+
+INCLUDE_LDFLAGS += \
+	-L$(TOPDIR)/3rdparty/src/boost/log
+
+INCLUDE_DIRS += \
+	-I$(TOPDIR)/3rdparty/include
+
+INCLUDE_LIBS += \
+	-lboost_log -lboost_log_setup
+
+endif
 
 TEST_OBJS = \
 	$(TOPDIR)/src/version.o
@@ -27,9 +39,16 @@ TEST_OBJS = \
 TEST_CPP_BINS = \
 	singletonTest$(EXE) \
 	versionTest$(EXE) \
-	version-gTest$(EXE) \
-	logTest$(EXE) \
-	threadLeakTest$(EXE)	
+	threadLeakTest$(EXE)
+
+ifdef WITH_GTEST
+TEST_CPP_BINS += \
+	version-gTest$(EXE)
+endif
+
+ifdef WITH_BOOST_LOG
+TEST_CPP_BINS += logTest$(EXE)
+endif
 
 include $(TOPDIR)/makefiles/gmake/sub.mk
 
@@ -52,9 +71,14 @@ local_test:
 	@echo "Testing version..."
 	@./versionTest
 	@echo
+ifdef WITH_GTEST
+	@echo "Testing Google test.."
 	@./version-gTest
 	@echo
+endif
+ifdef WITH_BOOST_LOG
 	@echo "Testing boost log..."
 	@./logTest
 	@echo
+endif
 

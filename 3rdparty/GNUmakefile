@@ -1,6 +1,8 @@
 TOPDIR = ..
 
+ifdef WITH_BOOST_LOG
 SUBDIRS = src
+endif
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

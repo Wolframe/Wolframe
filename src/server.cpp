@@ -12,10 +12,11 @@
 #include "serverEndpoint.hpp"
 #include "connectionHandler.hpp"
 
+#include "unused.h"
 
 namespace _SMERP {
 
-	server::server( const std::vector<ServerTCPendpoint>& TCPserver, const std::vector<ServerSSLendpoint>& SSLserver,
+	server::server( const std::vector<ServerTCPendpoint>& TCPserver, SMERP_UNUSED const std::vector<ServerSSLendpoint>& SSLserver,
 		ServerHandler& serverHandler, const ApplicationConfiguration& config )
 	: threadPoolSize_( config.threads ),
 	IOservice_(),
