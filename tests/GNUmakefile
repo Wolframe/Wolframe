@@ -3,24 +3,35 @@ TOPDIR = ..
 SUBDIRS =
 
 INCLUDE_CPPFLAGS = \
-	-DBOOST_LOG_USE_NATIVE_SYSLOG
 
 INCLUDE_DIRS = \
 	-I$(TOPDIR)/include -I. \
-	-I$(TOPDIR)/src \
-	-I$(TOPDIR)/3rdparty/include
+	-I$(TOPDIR)/src
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
 INCLUDE_LDFLAGS = \
-	-L$(TOPDIR)/3rdparty/src/boost/log
 
 INCLUDE_LIBS = \
 	-lboost_unit_test_framework \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_filesystem -lboost_thread$(BOOST_LIBRARY_TAG) \
-	$(BOOST_LOG_LIBS) \
 	$(GTEST_LIBS)
+
+# boost-log
+
+ifdef WITH_BOOST_LOG
+
+INCLUDE_LDFLAGS += \
+	-L$(TOPDIR)/3rdparty/src/boost/log
+
+INCLUDE_DIRS += \
+	-I$(TOPDIR)/3rdparty/include
+
+INCLUDE_LIBS += \
+	-lboost_log -lboost_log_setup
+
+endif
 
 TEST_OBJS = \
 	$(TOPDIR)/src/version.o
