@@ -12,8 +12,7 @@ ABa:
      - -Wshadow
    - the process id should be convertible to an int for printing
 
-2. add switches to makefile for
-   - lua processor (temporarily)
+2. finish LUA processor
 
 3. make multiple services run in parallel
 

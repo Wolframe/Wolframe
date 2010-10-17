@@ -10,7 +10,7 @@ end
 
 -- called when a new connection arrives
 function newConnection( )
-	io.write( "lua got a new connection.\n" )
+	io.write( "lua creates a new connection object.\n" )
 end
 
 -- the main, initialize globals here

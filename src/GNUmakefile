@@ -74,9 +74,12 @@ OBJS = \
 	connection.o \
 	server.o \
 	echoHandler.o \
-	luaHandler.o luahelpers.o \
 	posixMain.o
 
+ifdef WITH_LUA
+OBJS += \
+	luaHandler.o luahelpers.o
+endif
 
 CPP_BINS = \
 	smerpd$(EXE)
