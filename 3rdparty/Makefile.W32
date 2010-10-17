@@ -1,6 +1,8 @@
 TOPDIR = ..
 
+!IFDEF WITH_BOOST_LOG
 SUBDIRS = src
+!ENDIF
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 

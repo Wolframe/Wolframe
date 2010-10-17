@@ -7,25 +7,79 @@ SUBDIRS =
 INCLUDE_DIRS = \
 	/D_WIN32_WINNT=0x400 \
 	/I. \
-	/I$(TOPDIR)\3rdparty\include \
 	/I$(TOPDIR)\include \
 	/I"$(BOOST_DIR)" \
-	/I"$(PLATFORM_SDK_DIR)\Include"	\
-	/I"$(OPENSSL_DIR)\include" \
-	/I"$(LUA_DIR)\src"
+	/I"$(PLATFORM_SDK_DIR)\Include"
 
 # Note: libraries are picked automatically on Windows!
 SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib"
 BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib"
 INCLUDE_LDFLAGS = \
-	$(SDK_LDFLAGS) $(BOOST_LDFLAGS) \
-	/LIBPATH:$(TOPDIR)\3rdparty\src\boost\log \
-	/LIBPATH:"$(OPENSSL_DIR)\lib" \
-	/LIBPATH:"$(LUA_DIR)\src"
+	$(SDK_LDFLAGS) $(BOOST_LDFLAGS)
+	
+INCLUDE_LIBS = \
+	Advapi32.lib
+
+# openssl
+
+!IFDEF WITH_SSL
+
+INCLUDE_DIRS = \
+	$(INCLUDE_DIRS)	/I"$(OPENSSL_DIR)\include"
+
+INCLUDE_CPPFLAGS = \
+	$(INCLUDE_CPPFLAGS) /DWITH_SSL
+
+INCLUDE_LDFLAGS = \
+	$(INCLUDE_LDFLAGS) /LIBPATH:"$(OPENSSL_DIR)\lib"
 
 INCLUDE_LIBS = \
-	libeay32.lib ssleay32.lib \
-	"$(LUA_DIR)\src\lua51.lib"
+	$(INCLUDE_LIBS) $(OPENSSL_LIBS)
+
+!ENDIF
+
+# boost-log
+
+!IFNDEF WITH_BOOST_LOG
+
+INCLUDE_CPPFLAGS = \
+	$(INCLUDE_CPPFLAGS) /DFAKE_LOGGER
+	
+!ELSE
+
+INCLUDE_LDFLAGS = \
+	$(INCLUDE_LDFLAGS) /LIBPATH:$(TOPDIR)\3rdparty\src\boost\log
+
+INCLUDE_DIRS = \
+	$(INCLUDE_DIRS)	/I$(TOPDIR)\3rdparty\include
+
+INCLUDE_LIBS = \
+	$(INCLUDE_LIBS) \
+	$(TOPDIR)\3rdparty\src\boost\log\libboost_log$(BOOST_LIBRARY_TAG).lib \
+	$(TOPDIR)\3rdparty\src\boost\log\libboost_log_setup$(BOOST_LIBRARY_TAG).lib
+
+!ENDIF
+
+# lua
+
+!IFDEF WITH_LUA
+
+OBJS = \
+	$(OBJS) luaHandler.obj luahelpers.obj
+
+INCLUDE_CPPFLAGS = \
+	$(INCLUDE_CPPFLAGS) /DWITH_LUA
+
+INCLUDE_DIRS = \
+	$(INCLUDE_DIRS) /I"$(LUA_DIR)\src"
+
+INCLUDE_LDFLAGS = \
+	$(INCLUDE_LDFLAGS) /LIBPATH:"$(LUA_DIR)\src"
+
+INCLUDE_LIBS = \
+	$(INCLUDE_LIBS) "$(LUA_DIR)\src\lua51.lib"
+
+!ENDIF
 
 CPP_BINS = \
 	smerpd.exe
@@ -59,9 +113,7 @@ all: $(OBJS) $(CPP_BINS)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-smerpd.exe: smerpd.obj $(OBJS) \
-	$(TOPDIR)\3rdparty\src\boost\log\libboost_log$(BOOST_LIBRARY_TAG).lib \
-	$(TOPDIR)\3rdparty\src\boost\log\libboost_log_setup$(BOOST_LIBRARY_TAG).lib
+smerpd.exe: smerpd.obj $(OBJS) $(BOOST_LOG_LIBS)
 
 local_all:
 

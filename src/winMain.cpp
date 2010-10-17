@@ -209,7 +209,7 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 #else
 		_SMERP::luaServer	lua;
 		_SMERP::server s( config.address, config.SSLaddress, lua, config );
-#enidf
+#endif
 		boost::thread t( boost::bind( &_SMERP::server::run, &s ));
 
 // we are up and running now (hopefully), signal this to the SCM
