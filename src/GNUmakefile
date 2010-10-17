@@ -14,9 +14,7 @@ INCLUDE_DIRS = \
 INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_program_options \
-	-lboost_filesystem \
-	-llua
-
+	-lboost_filesystem
 
 # openssl
 
@@ -76,9 +74,19 @@ OBJS = \
 	echoHandler.o \
 	posixMain.o
 
+# lua
+
 ifdef WITH_LUA
+
 OBJS += \
 	luaHandler.o luahelpers.o
+
+INCLUDE_CPPFLAGS += \
+	-DWITH_LUA
+
+INCLUDE_LIBS += \
+	-llua
+
 endif
 
 CPP_BINS = \
