@@ -106,8 +106,13 @@ OBJS = \
 	connection.obj \
 	getPassword.obj \
 	echoHandler.obj \
-	luaHandler.obj luahelpers.obj \
 	winMain.obj
+
+!IFDEF WITH_LUA
+
+OBJS = \
+	$(OBJS) luaHandler.obj luahelpers.obj
+!ENDIF
 
 all: $(OBJS) $(CPP_BINS)
 

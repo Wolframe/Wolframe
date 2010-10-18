@@ -7,7 +7,6 @@ SUBDIRS =
 INCLUDE_DIRS = \
 	/I$(TOPDIR)/include /I. \
 	/I$(TOPDIR)/src \
-	/I$(TOPDIR)/3rdparty/include \
 	/I"$(BOOST_DIR)" \
 	/I"$(PLATFORM_SDK_DIR)\Include"
 
@@ -15,13 +14,37 @@ INCLUDE_DIRS = \
 SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib"
 BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib"
 INCLUDE_LDFLAGS = \
-	$(SDK_LDFLAGS) $(BOOST_LDFLAGS) \
-	/LIBPATH:$(TOPDIR)\3rdparty\src\boost\log
+	$(SDK_LDFLAGS) $(BOOST_LDFLAGS)
+
+# boost-log
+
+!IFNDEF WITH_BOOST_LOG
+
+INCLUDE_CPPFLAGS = \
+	$(INCLUDE_CPPFLAGS) /DFAKE_LOGGER
+	
+!ELSE
+
+INCLUDE_LDFLAGS = \
+	$(INCLUDE_LDFLAGS) /LIBPATH:$(TOPDIR)\3rdparty\src\boost\log
+
+INCLUDE_DIRS = \
+	$(INCLUDE_DIRS)	/I$(TOPDIR)\3rdparty\include
+
+INCLUDE_LIBS = \
+	$(INCLUDE_LIBS) \
+	$(TOPDIR)\3rdparty\src\boost\log\libboost_log$(BOOST_LIBRARY_TAG).lib \
+	$(TOPDIR)\3rdparty\src\boost\log\libboost_log_setup$(BOOST_LIBRARY_TAG).lib
+
+!ENDIF
 
 TEST_CPP_BINS = \
 	singletonTest.exe \
-	versionTest.exe \
-	logTest.exe
+	versionTest.exe
+
+!IFDEF WITH_BOOST_LOG
+TEST_CPP_BINS = $(TEST_CPP_BINS) logTest$(EXE)
+!ENDIF
 
 OBJS = \
 	$(TOPDIR)\src\version.obj
@@ -50,6 +73,8 @@ local_test:
 	@-echo singletonTest >> test.bat
 	@-echo echo Testing version... >> test.bat
 	@-echo versionTest >> test.bat
+!IFDEF WITH_BOOST_LOG
 	@-echo echo Testing boost log... >> test.bat
 	@-echo logTest >> test.bat
+!ENDIF
 	@-test.bat
