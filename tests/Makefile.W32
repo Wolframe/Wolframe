@@ -43,7 +43,7 @@ TEST_CPP_BINS = \
 	versionTest.exe
 
 !IFDEF WITH_BOOST_LOG
-TEST_CPP_BINS = $(TEST_CPP_BINS) logTest$(EXE)
+TEST_CPP_BINS = $(TEST_CPP_BINS) logTest.exe
 !ENDIF
 
 OBJS = \
