@@ -13,6 +13,8 @@ ABa:
    - the process id should be convertible to an int for printing
 
 2. finish LUA processor
+   - solve the default folder problem in services (echo.lua
+     is currently searched in C:\WINDOWS\SYSTEM32)
 
 3. make multiple services run in parallel
 
