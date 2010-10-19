@@ -1,0 +1,7 @@
+Have a boost, if not get it and install it with:
+./bootstrap.sh --prefix=/tmpdir/boost-1_44_0
+./bjam
+./bjam install
+
+configure SMERP in makefiles/gmake/config.mk and
+set BOOST_DIR to /somewhere/boost-1_44_0
