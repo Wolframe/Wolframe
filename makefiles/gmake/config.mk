@@ -12,8 +12,8 @@
 
 # base dir where boost is installed
 
-#BOOST_DIR=/usr
-BOOST_DIR=/home/baumann/boost
+BOOST_DIR=/usr
+#BOOST_DIR=/home/baumann/boost
 
 # TODO: probe those
 BOOST_MT=-mt
