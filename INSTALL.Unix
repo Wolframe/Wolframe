@@ -12,3 +12,8 @@ configure SMERP in makefiles/gmake/config.mk and
 set BOOST_DIR to /somewhere/boost-1_44_0
 
 Compile and install openssl
+
+Compile and install lua
+
+make sure you have the readline-devel package
+make linux

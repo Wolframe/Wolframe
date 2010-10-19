@@ -83,11 +83,17 @@ ifdef WITH_LUA
 OBJS += \
 	luaHandler.o luahelpers.o
 
+INCLUDE_DIRS += \
+	-I$(LUA_DIR)/src
+
 INCLUDE_CPPFLAGS += \
 	-DWITH_LUA
 
+INCLUDE_LDFLAGS += \
+	-L$(LUA_DIR)/src
+
 INCLUDE_LIBS += \
-	-llua
+	-llua -ldl
 
 endif
 
