@@ -18,6 +18,7 @@ ifeq "$(COMPILER)" "gcc"
 GCC_MAJOR_VERSION ?=	$(shell $(TOPDIR)/makefiles/gmake/guess_env --gcc-major-version $(CC) "$(CURDIR)" $(TOPDIR))
 GCC_MINOR_VERSION ?=	$(shell $(TOPDIR)/makefiles/gmake/guess_env --gcc-minor-version $(CC) "$(CURDIR)" $(TOPDIR))
 
+# -Werror: troubles boost too much, too many warnings
 # -Wswitch-default: not good for switches with enums
 # -Wsystem-headers: bad idea, as header files are usually happily broken :-)
 # -Wtraditional: we don't want to program tradition K&R C anymore!
@@ -41,7 +42,7 @@ GCC_MINOR_VERSION ?=	$(shell $(TOPDIR)/makefiles/gmake/guess_env --gcc-minor-ver
 COMMON_COMPILE_FLAGS = \
 	-g \
 	-fstrict-aliasing \
-	-pedantic -Wall -Werror \
+	-pedantic -Wall \
 	-Wno-long-long \
 	-Wunused -Wno-import \
 	-Wformat -Wformat-y2k -Wformat-nonliteral -Wformat-security -Wformat-y2k \

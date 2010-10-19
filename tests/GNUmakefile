@@ -2,20 +2,22 @@ TOPDIR = ..
 
 SUBDIRS =
 
+-include $(TOPDIR)/makefiles/gmake/platform.mk
+
 INCLUDE_CPPFLAGS = \
 
 INCLUDE_DIRS = \
 	-I$(TOPDIR)/include -I. \
-	-I$(TOPDIR)/src
-
--include $(TOPDIR)/makefiles/gmake/platform.mk
+	-I$(TOPDIR)/src \
+	-I$(BOOST_DIR)/include
 
 INCLUDE_LDFLAGS = \
+	-L$(BOOST_DIR)/lib
 
 INCLUDE_LIBS = \
 	-lboost_unit_test_framework \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
-	-lboost_filesystem -lboost_thread$(BOOST_LIBRARY_TAG) \
+	-lboost_filesystem -lboost_system -lboost_thread$(BOOST_LIBRARY_TAG) \
 	$(GTEST_LIBS)
 
 # boost-log
@@ -66,19 +68,19 @@ local_distclean:
 local_test:
 	@echo
 	@echo "Testing singleton template..."
-	@./singletonTest
+	@LD_LIBRARY_PATH=$(BOOST_DIR)/lib ./singletonTest
 	@echo
 	@echo "Testing version..."
-	@./versionTest
+	@LD_LIBRARY_PATH=$(BOOST_DIR)/lib ./versionTest
 	@echo
 ifdef WITH_GTEST
 	@echo "Testing Google test.."
-	@./version-gTest
+	@LD_LIBRARY_PATH=$(BOOST_DIR)/lib ./version-gTest
 	@echo
 endif
 ifdef WITH_BOOST_LOG
 	@echo "Testing boost log..."
-	@./logTest
+	@LD_LIBRARY_PATH=$(BOOST_DIR)/lib ./logTest
 	@echo
 endif
 

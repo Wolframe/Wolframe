@@ -2,14 +2,16 @@ TOPDIR = ..
 
 SUBDIRS =
 
+-include $(TOPDIR)/makefiles/gmake/platform.mk
+
 INCLUDE_CPPFLAGS =
 
 INCLUDE_LDFLAGS = \
+	-L$(BOOST_DIR)/lib
 
 INCLUDE_DIRS = \
-	-I. -I$(TOPDIR)/include
-
--include $(TOPDIR)/makefiles/gmake/platform.mk
+	-I. -I$(TOPDIR)/include \
+	-I$(BOOST_DIR)/include
 
 INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \

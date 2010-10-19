@@ -4,6 +4,7 @@
 # - PLATFORM_SDK_DIR
 # - BOOST_DIR
 # - OPENSSL_DIR
+# - LUA_DIR
 
 # please customize
 

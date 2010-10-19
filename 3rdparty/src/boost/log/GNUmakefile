@@ -2,11 +2,14 @@ TOPDIR = ../../../..
 
 SUBDIRS =
 
+-include $(TOPDIR)/makefiles/gmake/platform.mk
+
 INCLUDE_CPPFLAGS = \
 	-DBOOST_LOG_USE_NATIVE_SYSLOG
 
 INCLUDE_DIRS = \
-	-I. -I../../../include
+	-I. -I../../../include \
+	-I$(BOOST_DIR)/include
 
 LOG_OBJS = \
 	attribute_name.o \
