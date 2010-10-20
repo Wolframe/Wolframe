@@ -1,9 +1,13 @@
-You need:
+Prerequisites
+-------------
+
 - boost 1.41.0 or later
 - optionally (WITH_SSL) openssl 0.9.8 or later
 - optionally (WITH_LUA) lua 5.1.4 or later
 
-Compile and install boost:
+Compile and install boost
+-------------------------
+
 ./bootstrap.sh --prefix=/tmpdir/boost-1_44_0
 ./bjam
 ./bjam install
@@ -12,8 +16,11 @@ configure SMERP in makefiles/gmake/config.mk and
 set BOOST_DIR to /somewhere/boost-1_44_0
 
 Compile and install openssl
+---------------------------
 
 Compile and install lua
+-----------------------
 
-make sure you have the readline-devel package
+make sure you have the readline-devel package installed, then
+
 make linux
