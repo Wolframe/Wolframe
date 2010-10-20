@@ -30,5 +30,5 @@ OPENSSL_DIR=/usr
 #  etc\luavc.bat
 ###############################
 
-#LUA_DIR = ..\..\lua-5.1.4
-LUA_DIR = /home/baumann/lua-5.1.4
+LUA_DIR = /usr
+#LUA_DIR = /home/baumann/lua-5.1.4
