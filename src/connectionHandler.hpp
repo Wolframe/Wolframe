@@ -15,6 +15,7 @@ namespace _SMERP {
 	{
 	public:
 		enum Operation	{
+			SET_TIMEOUT,
 			READ,
 			WRITE,
 			TERMINATE
@@ -24,16 +25,25 @@ namespace _SMERP {
 		Operation	operation_;
 		const void	*data_;
 		std::size_t	size_;
+		unsigned long	timeout_;
+		unsigned	timeoutID_;
 
 	public:
 		explicit NetworkOperation( Operation op )
-					{ operation_ = op, data_ = NULL; size_ = 0; }
+					{ operation_ = op, data_ = NULL; size_ = 0;
+					  timeout_ = 0; timeoutID_ = 0;}
 		NetworkOperation( Operation op, const void *d, std::size_t s )
-					{ operation_ = op, data_ = d; size_ = s; }
+					{ operation_ = op, data_ = d; size_ = s;
+					  timeout_ = 0; timeoutID_ = 0;}
+		NetworkOperation( Operation op, unsigned long to, unsigned ID )
+					{ operation_ = op, data_ = NULL; size_ = 0;
+					  timeout_ = to; timeoutID_ = ID;}
 
 		Operation operation()	{ return operation_; }
 		const void* data()	{ return data_; }
 		std::size_t size()	{ return size_; }
+		unsigned long timeout()	{ return timeout_; }
+		unsigned timeoutID()	{ return timeoutID_; }
 	};
 
 
@@ -54,9 +64,13 @@ namespace _SMERP {
 		/// input has been consumed.
 		virtual void* parseInput( const void *begin, std::size_t bytesTransferred ) = 0;
 
-		/// Handle a request and produce a reply.
+		/// What should the network do next.
 		virtual NetworkOperation nextOperation() = 0;
 
+		/// What should the network do next.
+		virtual void timeoutOccured( unsigned /* ID */ )	{ }
+
+		/// Set the remote peer. The connection is up now.
 		virtual void setPeer( const RemoteTCPendpoint& remote ) = 0;
 		virtual void setPeer( const RemoteSSLendpoint& remote ) = 0;
 	};

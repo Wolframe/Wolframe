@@ -36,7 +36,6 @@ src/logLevel.hpp
 src/logLevel.cpp
 src/defaults.hpp
 src/connectionBase.hpp
-src/connectionTimeout.hpp
 src/acceptor.cpp
 src/acceptor.hpp
 tests/versionTest.cpp

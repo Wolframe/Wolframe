@@ -4,7 +4,6 @@
 
 #include "acceptor.hpp"
 #include "connection.hpp"
-#include "connectionTimeout.hpp"
 #include "logger.hpp"
 
 #include <boost/thread.hpp>
@@ -17,12 +16,10 @@ namespace _SMERP {
 
 acceptor::acceptor( boost::asio::io_service& IOservice,
 		    const std::string& host, unsigned short port,
-		    const connectionTimeout& timeouts,
 		    ServerHandler& srvHandler ) :
 	IOservice_( IOservice ),
 	strand_( IOservice_ ),
 	acceptor_( IOservice_ ),
-	timeouts_( timeouts ),
 	srvHandler_( srvHandler )
 {
 	// Open the acceptor(s) with the option to reuse the address (i.e. SO_REUSEADDR).
@@ -32,7 +29,7 @@ acceptor::acceptor( boost::asio::io_service& IOservice,
 	endpoint.port( port );
 
 	connectionHandler *handler = srvHandler_.newConnection( LocalTCPendpoint( host, port ));
-	newConnection_ = connection_ptr( new connection( IOservice_, timeouts_, handler ));
+	newConnection_ = connection_ptr( new connection( IOservice_, handler ));
 
 	acceptor_.open( endpoint.protocol() );
 	acceptor_.set_option( boost::asio::ip::tcp::acceptor::reuse_address( true ));
@@ -61,7 +58,7 @@ void acceptor::handleAccept( const boost::system::error_code& e )
 
 		connectionHandler *handler = srvHandler_.newConnection( LocalTCPendpoint( acceptor_.local_endpoint().address().to_string(),
 										       acceptor_.local_endpoint().port() ));
-		newConnection_.reset( new connection( IOservice_, timeouts_, handler ));
+		newConnection_.reset( new connection( IOservice_, handler ));
 		acceptor_.async_accept( newConnection_->socket(),
 					strand_.wrap( boost::bind( &acceptor::handleAccept,
 								   this,
@@ -95,13 +92,11 @@ SSLacceptor::SSLacceptor( boost::asio::io_service& IOservice,
 			  const std::string& certFile, const std::string& keyFile,
 			  bool verify, const std::string& CAchainFile, const std::string& CAdirectory,
 			  const std::string& host, unsigned short port,
-			  const connectionTimeout& timeouts,
 			  ServerHandler& srvHandler) :
 	IOservice_( IOservice ),
 	strand_( IOservice_ ),
 	acceptor_( IOservice_ ),
 	SSLcontext_( IOservice_, boost::asio::ssl::context::sslv23 ),
-	timeouts_( timeouts ),
 	srvHandler_( srvHandler )
 {
 	boost::system::error_code	ec;
@@ -157,7 +152,7 @@ SSLacceptor::SSLacceptor( boost::asio::io_service& IOservice,
 	endpoint.port( port );
 
 	connectionHandler *handler = srvHandler_.newSSLconnection( LocalSSLendpoint( host, port ));
-	newConnection_ = SSLconnection_ptr( new SSLconnection( IOservice_, SSLcontext_, timeouts_, handler ));
+	newConnection_ = SSLconnection_ptr( new SSLconnection( IOservice_, SSLcontext_, handler ));
 
 	acceptor_.open( endpoint.protocol() );
 	acceptor_.set_option( boost::asio::ip::tcp::acceptor::reuse_address( true ));
@@ -186,7 +181,7 @@ void SSLacceptor::handleAccept( const boost::system::error_code& e )
 
 		connectionHandler *handler = srvHandler_.newSSLconnection( LocalSSLendpoint( acceptor_.local_endpoint().address().to_string(),
 											  acceptor_.local_endpoint().port() ));
-		newConnection_.reset( new SSLconnection( IOservice_, SSLcontext_, timeouts_, handler ));
+		newConnection_.reset( new SSLconnection( IOservice_, SSLcontext_, handler ));
 		acceptor_.async_accept( newConnection_->socket().lowest_layer(),
 					strand_.wrap( boost::bind( &SSLacceptor::handleAccept,
 								   this,

@@ -13,9 +13,8 @@
 namespace _SMERP {
 
 connection::connection( boost::asio::io_service& IOservice,
-			const connectionTimeout& timeouts,
 			connectionHandler* handler ) :
-	connectionBase< boost::asio::ip::tcp::socket >( IOservice, timeouts, handler ),
+	connectionBase< boost::asio::ip::tcp::socket >( IOservice, handler ),
 	socket_( IOservice )
 {
 	LOG_TRACE << "New connection created";
@@ -36,7 +35,6 @@ void connection::start()
 	connectionHandler_->setPeer( RemoteTCPendpoint( socket().remote_endpoint().address().to_string(),
 							socket().remote_endpoint().port()));
 
-	setTimeout( connectionTimeout::TIMEOUT_IDLE );
 	nextOperation();
 }
 
@@ -45,9 +43,8 @@ void connection::start()
 
 SSLconnection::SSLconnection( boost::asio::io_service& IOservice,
 			      boost::asio::ssl::context& SSLcontext,
-			      const connectionTimeout& timeouts,
 			      connectionHandler *handler ) :
-	connectionBase< ssl_socket >( IOservice, timeouts, handler ),
+	connectionBase< ssl_socket >( IOservice, handler ),
 	SSLsocket_( IOservice, SSLcontext )
 {
 	LOG_TRACE << "New SSL connection created";
@@ -78,7 +75,6 @@ void SSLconnection::handleHandshake( const boost::system::error_code& e )
 {
 	LOG_DATA << "SSL handshake to " << identifier();
 	if ( !e )	{
-		setTimeout( connectionTimeout::TIMEOUT_IDLE );
 		nextOperation();
 	}
 	else	{

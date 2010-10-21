@@ -13,8 +13,8 @@
 #include <boost/bind.hpp>
 #include <string>
 #include <cassert>
+#include <limits>
 
-#include "connectionTimeout.hpp"
 #include "connectionHandler.hpp"
 #include "logger.hpp"
 
@@ -28,16 +28,14 @@ namespace _SMERP {
 	public:
 		/// Construct a connection with the given io_service.
 		explicit connectionBase( boost::asio::io_service& IOservice,
-						const connectionTimeout& timeouts,
 						connectionHandler* handler ) :
 			strand_( IOservice ),
 			connectionHandler_( handler ),
-			timer_( IOservice ),
-			timeout_( timeouts )
+			timer_( IOservice )
 		{
 			assert( handler != NULL );
 			connectionHandler_ = handler;
-			timerType_ = connectionTimeout::TIMEOUT_NONE;
+			timeoutID_ = std::numeric_limits<unsigned>::max();
 			LOG_TRACE << "New connection base created";
 		}
 
@@ -73,11 +71,8 @@ namespace _SMERP {
 
 		/// The timer for timeouts.
 		boost::asio::deadline_timer	timer_;
-		/// The timer type
-		connectionTimeout::TimeOutType	timerType_;
-
-		/// connection timeouts structure
-		const connectionTimeout&	timeout_;
+		/// The timeout ID
+		unsigned			timeoutID_;
 
 
 		/// Connection base state machine
@@ -85,6 +80,10 @@ namespace _SMERP {
 		{
 			NetworkOperation netOp = connectionHandler_->nextOperation();
 			switch ( netOp.operation() )	{
+			case NetworkOperation::SET_TIMEOUT:
+				LOG_TRACE << "Next operation: SET TIMEOUT id: " << netOp.timeoutID() << " to " << netOp.timeout() << "s";
+				setTimeout( netOp.timeout(), netOp.timeoutID());
+				break;
 			case NetworkOperation::READ:
 				LOG_TRACE << "Next operation: READ from " << identifier();
 				socket().async_read_some( boost::asio::buffer( buffer_ ),
@@ -115,7 +114,6 @@ namespace _SMERP {
 		void handleRead( const boost::system::error_code& e, std::size_t bytesTransferred )
 		{
 			if ( !e )	{
-				setTimeout( connectionTimeout::TIMEOUT_REQUEST );
 				LOG_TRACE << "Read " << bytesTransferred << " bytes from " << identifier();
 
 				connectionHandler_->parseInput( buffer_.data(), bytesTransferred );
@@ -134,8 +132,6 @@ namespace _SMERP {
 		void handleWrite( const boost::system::error_code& e )
 		{
 			if ( !e )	{
-				// Cancel timer.
-				setTimeout( connectionTimeout::TIMEOUT_NONE );
 				nextOperation();
 			}
 
@@ -152,53 +148,30 @@ namespace _SMERP {
 		void handleTimeout( const boost::system::error_code& e )
 		{
 			if ( !e )	{
-				boost::system::error_code ignored_ec;
-
-				boost::asio::write( socket(), boost::asio::buffer( "Timeout :P\n" ));
-				socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
-				LOG_INFO << "Timeout, client " << identifier();
+				connectionHandler_->timeoutOccured( timeoutID_ );
+				LOG_DEBUG << "Timeout, id: " << timeoutID_;
+				nextOperation();
 			}
 		}
 		// handleTimeout function end
 
 
 		/// Set / reset timeout timer
-		void setTimeout( const connectionTimeout::TimeOutType type )
+		void setTimeout( unsigned long timeout, unsigned ID )
 		{
-			if ( timerType_ != type )	{
-				unsigned long timeout;
-				switch( type )	{
-				case connectionTimeout::TIMEOUT_IDLE:
-					timeout = timeout_.idle;
-					break;
-				case connectionTimeout::TIMEOUT_REQUEST:
-					timeout = timeout_.request;
-					break;
-				case connectionTimeout::TIMEOUT_PROCESSING:
-					timeout = timeout_.processing;
-					break;
-				case connectionTimeout::TIMEOUT_ANSWER:
-					timeout = timeout_.answer;
-					break;
-				case connectionTimeout::TIMEOUT_NONE:
-				default:
-					timeout = 0;
-				}
-
-				timer_.cancel();
-				if ( timerType_ != connectionTimeout::TIMEOUT_NONE )
-					LOG_TRACE << timerType_ << " timeout for connection to " << identifier() << " disabled";
-
-				if ( timeout > 0 )	{
+			if ( timeout == 0 )	{
+				timeoutID_ = std::numeric_limits<unsigned>::max();
+			}
+			else	{
+				if ( timeoutID_ != ID )	{
+					timer_.cancel();
+					timeoutID_ = ID;
 					timer_.expires_from_now( boost::posix_time::seconds( timeout ));
 					timer_.async_wait( strand_.wrap( boost::bind( &connectionBase::handleTimeout,
 										      this->shared_from_this(),
 										      boost::asio::placeholders::error )));
-					timerType_ = type;
-					LOG_TRACE << timerType_ << " timeout for connection to " << identifier() << " set to " << timeout << "s";
+					LOG_TRACE << "Timeout for connection to " << identifier() << " set to " << timeout << "s";
 				}
-				else
-					timerType_ = connectionTimeout::TIMEOUT_NONE;
 			}
 		}
 		// setTimeout function end

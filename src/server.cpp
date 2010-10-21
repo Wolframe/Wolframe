@@ -16,20 +16,17 @@
 
 namespace _SMERP {
 
-	server::server( const std::vector<ServerTCPendpoint>& TCPserver, SMERP_UNUSED const std::vector<ServerSSLendpoint>& SSLserver,
+	server::server( const std::vector<ServerTCPendpoint>& TCPserver,
+			SMERP_UNUSED const std::vector<ServerSSLendpoint>& SSLserver,
 		ServerHandler& serverHandler, const ApplicationConfiguration& config )
 	: threadPoolSize_( config.threads ),
-	IOservice_(),
-	timeouts_( (unsigned long)config.idleTimeout,
-		   (unsigned long)config.requestTimeout,
-		   (unsigned long)config.processTimeout,
-		   (unsigned long)config.answerTimeout )
+	IOservice_()
 {
 	size_t	i;
 	for ( i = 0; i < TCPserver.size(); i++ )	{
 		acceptor* acptr = new acceptor( IOservice_,
 						TCPserver[i].host(), TCPserver[i].port(),
-						timeouts_, serverHandler );
+						serverHandler );
 		acceptor_.push_back( acptr );
 	}
 	LOG_DEBUG << i << " network acceptor(s) created.";
@@ -40,7 +37,7 @@ namespace _SMERP {
 						      SSLserver[i].verifyClientCert(),
 						      SSLserver[i].CAchain(), SSLserver[i].CAdirectory(),
 						      SSLserver[i].host(), SSLserver[i].port(),
-						      timeouts_, serverHandler );
+						      serverHandler );
 		SSLacceptor_.push_back( acptr );
 	}
 	LOG_DEBUG << i << " network SSL acceptor(s) created.";

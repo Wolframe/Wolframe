@@ -24,7 +24,8 @@ class server: private boost::noncopyable
 /// public interface
 public:
 	/// Construct the server
-	explicit server( const std::vector<ServerTCPendpoint>& TCPserver, const std::vector<ServerSSLendpoint>& SSLserver,
+	explicit server( const std::vector<ServerTCPendpoint>& TCPserver,
+			 const std::vector<ServerSSLendpoint>& SSLserver,
 			 ServerHandler& serverHandler, const ApplicationConfiguration& config );
 
 	/// Destruct the server
@@ -43,7 +44,6 @@ private:
 	std::size_t				threadPoolSize_;// The number of threads that will call io_service::run().
 
 	boost::asio::io_service			IOservice_;	// The io_service used to perform asynchronous operations.
-	connectionTimeout			timeouts_;
 	std::vector<acceptor*>			acceptor_;
 #ifdef WITH_SSL
 	std::vector<SSLacceptor*>		SSLacceptor_;
