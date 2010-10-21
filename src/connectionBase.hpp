@@ -13,6 +13,11 @@
 #include <boost/bind.hpp>
 #include <string>
 #include <cassert>
+#ifdef _WIN32
+// avoid C4003: not enough actual parameters for macro 'max'
+#undef max
+#undef min
+#endif
 #include <limits>
 
 #include "connectionHandler.hpp"
