@@ -160,14 +160,6 @@ namespace _SMERP {
 
 	connectionHandler* luaServer::newConnection( const LocalTCPendpoint& local )
 	{
-		lua_pushstring( l, "newConnection" );
-		lua_gettable( l, LUA_GLOBALSINDEX );
-		int res = lua_pcall( l, 0, 0, 0 );
-		if( res != 0 ) {
-			LOG_FATAL << "Unable to call 'newConnection' function: " << lua_tostring( l, -1 );
-			lua_pop( l, 1 );
-			throw new std::runtime_error( "Error when creating new connection in LUA processor" );
-		}
 		return new luaConnection( local );
 	}
 
