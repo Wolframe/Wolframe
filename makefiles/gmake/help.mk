@@ -23,3 +23,6 @@ WITH_LUA=1             generate LUA handler
 Avaliable optional features during testing only:
 
 WITH_GTEST=1           use Google Unit testing library
+
+Example:
+make WITH_SSL=1 WITH_BOOST_LOG=1 WITH_LUA=1 WITH_GTEST=1
