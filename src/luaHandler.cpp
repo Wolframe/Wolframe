@@ -109,9 +109,22 @@ namespace _SMERP {
 	{
 		// instanitate a new VM
 		l = luaL_newstate( );
+		if( !l ) {
+			LOG_FATAL << "Unable to create new LUA engine!";
+			throw new std::runtime_error( "Can't initialize LUA processor" );			
+		}
 
-		// TODO: open standard libraries, most likely something to configure later
-		luaL_openlibs( l );
+		// TODO: open standard libraries, most likely something to configure later,
+		// the plain echo processor should work without any lua libraries
+		//luaL_openlibs( l );
+		// or open them individually, see:
+		// http://stackoverflow.com/questions/966162/best-way-to-omit-lua-standard-libraries
+		lua_pushcfunction( l, luaopen_base );
+		lua_pushstring( l, "" );
+		lua_call( l, 1, 0 );
+		lua_pushcfunction( l, luaopen_io );
+		lua_pushstring( l, LUA_LOADLIBNAME );
+		lua_call( l, 1, 0 );
 
 		// TODO: script location, also configurable
 		int res = luaL_loadfile( l, "echo.lua" );
