@@ -67,3 +67,4 @@ src/echoHandler.hpp
 src/echoHandler.cpp
 src/connectionEndpoint.hpp
 src/serverEndpoint.hpp
+src/unused.h

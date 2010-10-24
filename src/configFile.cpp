@@ -221,7 +221,7 @@ namespace _SMERP {
 		if ( pt.get_child_optional( "logging.stderr" ))	{
 			logToStderr = true;
 			std::string s = pt.get<std::string>( "logging.stderr.level", "NOTICE" );
-			if ( ( stderrLogLevel = LogLevel::str2LogLevel( s )) == LogLevel::_SMERP_UNDEFINED )	{
+			if ( ( stderrLogLevel = LogLevel::str2LogLevel( s )) == LogLevel::LOG_UNDEFINED )	{
 				errMsg_ = "unknown log level \"";
 				errMsg_ += s;
 				errMsg_ += " for stderr";
@@ -237,7 +237,7 @@ namespace _SMERP {
 						pt.get<std::string>( "logging.logFile.filename", std::string() ),
 							boost::filesystem::path( file ).branch_path() ).string();
 			std::string s = pt.get<std::string>( "logging.logFile.level", "ERROR" );
-			if ( ( logFileLogLevel = LogLevel::str2LogLevel( s )) == LogLevel::_SMERP_UNDEFINED )	{
+			if ( ( logFileLogLevel = LogLevel::str2LogLevel( s )) == LogLevel::LOG_UNDEFINED )	{
 				errMsg_ = "unknown log level \"";
 				errMsg_ += s;
 				errMsg_ += " for stderr";
@@ -257,7 +257,7 @@ namespace _SMERP {
 				return false;
 			}
 			s = pt.get<std::string>( "logging.syslog.level", "NOTICE" );
-			if ( ( syslogLogLevel = LogLevel::str2LogLevel( s )) == LogLevel::_SMERP_UNDEFINED )	{
+			if ( ( syslogLogLevel = LogLevel::str2LogLevel( s )) == LogLevel::LOG_UNDEFINED )	{
 				errMsg_ = "unknown log level \"";
 				errMsg_ += s;
 				errMsg_ += " for syslog";
@@ -272,7 +272,7 @@ namespace _SMERP {
 			eventlogLogName = pt.get<std::string>( "logging.eventlog.name", "smerpd" );
 			eventlogSource = pt.get<std::string>( "logging.eventlog.source", "unknown" );
 			std::string s = pt.get<std::string>( "logging.eventlog.level", "NOTICE" );
-			if ( ( eventlogLogLevel = LogLevel::str2LogLevel( s )) == LogLevel::_SMERP_UNDEFINED )	{
+			if ( ( eventlogLogLevel = LogLevel::str2LogLevel( s )) == LogLevel::LOG_UNDEFINED )	{
 				errMsg_ = "unknown log level \"";
 				errMsg_ += s;
 				errMsg_ += " for Event Log";

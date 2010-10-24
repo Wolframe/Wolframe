@@ -15,9 +15,10 @@
 #include "ErrorCodes.hpp"
 #include "logger.hpp"
 
-#include "echoHandler.hpp"
 #ifdef WITH_LUA
 #include "luaHandler.hpp"
+#else
+#include "echoHandler.hpp"
 #endif
 
 #include <libintl.h>
@@ -46,6 +47,11 @@ static const short unsigned REVISION_NUMBER = 3;
 static const char *DEFAULT_MAIN_CONFIG = "/etc/smerpd.conf";
 static const char *DEFAULT_USER_CONFIG = "~/smerpd.conf";
 static const char *DEFAULT_LOCAL_CONFIG = "./smerpd.conf";
+
+
+#ifdef FAKE_LOGGER
+_SMERP::LogBackend	logBack;
+#endif
 
 
 int _SMERP_posixMain( int argc, char* argv[] )
@@ -164,7 +170,7 @@ int _SMERP_posixMain( int argc, char* argv[] )
 				}
 			}
 
-			// daemonize, loose process group, terminal output, etc.
+			// daemonize, lose process group, terminal output, etc.
 			if( daemon( 0, 0 ) ) {
 				std::cerr << "Going to daemon mode failed" << std::endl;
 				return _SMERP::ErrorCodes::FAILURE;
@@ -204,16 +210,20 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		pthread_sigmask( SIG_BLOCK, &new_mask, &old_mask );
 
 		// Create the final logger based on the configuration
+#ifndef FAKE_LOGGER
 		_SMERP::Logger::initialize( config );
+#else
+		logBack.setLevel( config.stderrLogLevel );
+#endif
 		LOG_NOTICE << "Starting server";
 
 		// Run server in background thread(s).
 #ifndef WITH_LUA
 		_SMERP::echoServer	echo;
-		_SMERP::server s( config.address, config.SSLaddress, echo, config );
+		_SMERP::server s( config.address, config.SSLaddress, echo, config.threads );
 #else
 		_SMERP::luaServer	lua;
-		_SMERP::server s( config.address, config.SSLaddress, lua, config );
+		_SMERP::server s( config.address, config.SSLaddress, lua, config.threads );
 #endif
 		boost::thread t( boost::bind( &_SMERP::server::run, &s ));
 

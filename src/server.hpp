@@ -26,7 +26,7 @@ public:
 	/// Construct the server
 	explicit server( const std::vector<ServerTCPendpoint>& TCPserver,
 			 const std::vector<ServerSSLendpoint>& SSLserver,
-			 ServerHandler& serverHandler, const ApplicationConfiguration& config );
+			 ServerHandler& serverHandler, unsigned threads );
 
 	/// Destruct the server
 	~server();
