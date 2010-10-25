@@ -39,7 +39,6 @@ TEST_OBJS = \
 	$(TOPDIR)/src/version.o
 
 TEST_CPP_BINS = \
-	singletonTest$(EXE) \
 	versionTest$(EXE) \
 	threadLeakTest$(EXE)
 

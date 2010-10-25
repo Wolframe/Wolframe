@@ -1,11 +1,9 @@
 database/data/CH-cantons.txt
 database/data/RO-judete.txt
-include/singleton.hpp
 src/connection.cpp
 src/connection.hpp
 src/server.cpp
 src/server.hpp
-tests/singletonTest.cpp
 src/GNUmakefile
 GNUmakefile
 database/data/countries.csv
@@ -21,9 +19,7 @@ src/version.hpp
 src/version.cpp
 src/logger.hpp
 src/ErrorCodes.hpp
-src/appInstance.hpp
 src/appConfig.hpp
-src/appInstance.cpp
 src/appConfig.cpp
 TODO
 README
@@ -68,3 +64,5 @@ src/echoHandler.cpp
 src/connectionEndpoint.hpp
 src/serverEndpoint.hpp
 src/unused.h
+tests/GNUmakefile
+tests/Makefile.W32

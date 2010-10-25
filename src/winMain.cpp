@@ -8,7 +8,7 @@
 #include <boost/function.hpp>
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
-#include "appInstance.hpp"
+#include "version.hpp"
 #include "commandLine.hpp"
 #include "configFile.hpp"
 #include "appConfig.hpp"
@@ -57,7 +57,7 @@ static void install_as_service( const _SMERP::ApplicationConfiguration& config )
 {
 // get service control manager
 	SC_HANDLE scm = (SC_HANDLE)OpenSCManager( NULL, SERVICES_ACTIVE_DATABASE, SC_MANAGER_ALL_ACCESS );
-	
+
 // retrieve absolute path of binary
 	TCHAR binary_path[MAX_PATH];
 	DWORD res = GetModuleFileName( NULL, binary_path, MAX_PATH );
@@ -65,7 +65,7 @@ static void install_as_service( const _SMERP::ApplicationConfiguration& config )
 // add quotation marks around filename in the 'ImagePath' (because of spaces).
 	std::ostringstream os;
 	os << "\"" << binary_path << "\" --service -c \"" << config.configFile << "\"";
-	
+
 // create the service
 	SC_HANDLE service = CreateService( scm,
 		config.serviceName.c_str( ), config.serviceDisplayName.c_str( ),
@@ -201,7 +201,7 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 		}
 
 		LOG_NOTICE << "Starting service";
-		
+
 // run server in background thread(s).
 #ifndef WITH_LUA
 		_SMERP::echoServer	echo;
@@ -250,7 +250,7 @@ WAIT_FOR_STOP_EVENT:
 int _SMERP_winMain( int argc, char* argv[] )
 {
 	try	{
-		_SMERP::AppInstance	app( MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER );
+		_SMERP::Version		appVersion( MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER );
 		_SMERP::CmdLineConfig	cmdLineCfg;
 		const char		*configFile = NULL;
 
@@ -267,7 +267,7 @@ int _SMERP_winMain( int argc, char* argv[] )
 
 // if we have to print the version or the help do it and exit
 		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::PRINT_VERSION )	{
-			std::cout << "BOBOBO version " << app.version().toString() << std::endl << std::endl;
+			std::cout << "BOBOBO version " << appVersion.toString() << std::endl << std::endl;
 			return _SMERP::ErrorCodes::OK;
 		}
 		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::PRINT_HELP )	{
@@ -292,7 +292,7 @@ int _SMERP_winMain( int argc, char* argv[] )
 // configuration file has been parsed successfully
 // build the application configuration
 		_SMERP::ApplicationConfiguration config( cmdLineCfg, cfgFileCfg);
-	
+
 // Check the configuration
 		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::CHECK_CONFIG )	{
 			if ( config.check() )	{
@@ -321,7 +321,7 @@ int _SMERP_winMain( int argc, char* argv[] )
 			std::cout << "Installed as Windows service" << std::endl << std::endl;
 			return _SMERP::ErrorCodes::OK;
 		}
-		
+
 		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::REMOVE_SERVICE ) {
 			remove_as_service( config );
 			std::cout << "Removed as Windows service" << std::endl << std::endl;
@@ -333,7 +333,7 @@ int _SMERP_winMain( int argc, char* argv[] )
 			SERVICE_TABLE_ENTRY dispatch_table[2] =
 				{ { const_cast<char *>( config.serviceName.c_str( ) ), service_main },
 				{ NULL, NULL } };
-			
+
 			// pass configuration to service main
 			serviceConfig = config.configFile;
 
@@ -351,7 +351,7 @@ int _SMERP_winMain( int argc, char* argv[] )
 				return _SMERP::ErrorCodes::OK;
 			}
 		}
-		
+
 		// Create the final logger based on the configuration
 		_SMERP::Logger::initialize( config );
 		LOG_NOTICE << "Starting server";

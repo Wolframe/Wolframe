@@ -62,7 +62,6 @@ OBJS = \
 	$(C_PORT_OBJS) \
 	$(STATIC_LIB_OBJS) \
 	version.o \
-	appInstance.o \
 	commandLine.o \
 	logLevel.o \
 	logSyslogFacility.o \

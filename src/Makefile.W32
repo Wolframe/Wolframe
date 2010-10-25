@@ -16,7 +16,7 @@ SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib"
 BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib"
 INCLUDE_LDFLAGS = \
 	$(SDK_LDFLAGS) $(BOOST_LDFLAGS)
-	
+
 INCLUDE_LIBS = \
 	Advapi32.lib
 
@@ -44,7 +44,7 @@ INCLUDE_LIBS = \
 
 INCLUDE_CPPFLAGS = \
 	$(INCLUDE_CPPFLAGS) /DFAKE_LOGGER
-	
+
 !ELSE
 
 INCLUDE_LDFLAGS = \
@@ -94,7 +94,6 @@ OBJS = \
 	$(C_PORT_OBJS) \
 	$(STATIC_LIB_OBJS) \
 	version.obj \
-	appInstance.obj \
 	commandLine.obj \
 	logLevel.obj \
 	logSyslogFacility.obj \
