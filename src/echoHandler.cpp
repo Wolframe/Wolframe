@@ -44,10 +44,19 @@ namespace _SMERP {
 	{
 		switch( state_ )	{
 		case NEW:	{
-			state_ = READING;
+			state_ = HELLO;
 			std::string msg = "Welcome to SMERP.\n";
 			return NetworkOperation( NetworkOperation::WRITE, msg.c_str(), msg.length());
 		}
+
+		case HELLO:
+			state_ = ANSWERING;
+			if ( buffer.empty() )
+				return NetworkOperation( NetworkOperation::WRITE, buffer.c_str(), buffer.length() );
+			else	{
+				std::string msg = "BUFFER NOT EMPTY!\n";
+				return NetworkOperation( NetworkOperation::WRITE, msg.c_str(), msg.length());
+			}
 
 		case READING:
 			state_ = ANSWERING;
@@ -66,6 +75,12 @@ namespace _SMERP {
 		case FINISHING:	{
 			state_ = TERMINATING;
 			std::string msg = "Thanks for using SMERP.\n";
+			return NetworkOperation( NetworkOperation::WRITE, msg.c_str(), msg.length());
+		}
+
+		case TIMEOUT:	{
+			state_ = TERMINATING;
+			std::string msg = "Timeout. :P\n";
 			return NetworkOperation( NetworkOperation::WRITE, msg.c_str(), msg.length());
 		}
 
@@ -96,6 +111,12 @@ namespace _SMERP {
 			}
 		}
 		return( s );
+	}
+
+	void echoConnection::timeoutOccured( unsigned ID )
+	{
+		state_ = TIMEOUT;
+		LOG_TRACE << "Timeout id: " << ID << " occured";
 	}
 
 

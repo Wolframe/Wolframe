@@ -13,12 +13,6 @@
 #include <boost/bind.hpp>
 #include <string>
 #include <cassert>
-#ifdef _WIN32
-// avoid C4003: not enough actual parameters for macro 'max'
-#undef max
-#undef min
-#endif
-#include <limits>
 
 #include "connectionHandler.hpp"
 #include "logger.hpp"
@@ -40,7 +34,7 @@ namespace _SMERP {
 		{
 			assert( handler != NULL );
 			connectionHandler_ = handler;
-			timeoutID_ = std::numeric_limits<unsigned>::max();
+			timeoutID_ = -1;
 			LOG_TRACE << "New connection base created";
 		}
 
@@ -77,40 +71,42 @@ namespace _SMERP {
 		/// The timer for timeouts.
 		boost::asio::deadline_timer	timer_;
 		/// The timeout ID
-		unsigned			timeoutID_;
+		int			timeoutID_;
 
 
 		/// Connection base state machine
 		void nextOperation()
 		{
 			NetworkOperation netOp = connectionHandler_->nextOperation();
-			switch ( netOp.operation() )	{
-			case NetworkOperation::SET_TIMEOUT:
-				LOG_TRACE << "Next operation: SET TIMEOUT id: " << netOp.timeoutID() << " to " << netOp.timeout() << "s";
-				setTimeout( netOp.timeout(), netOp.timeoutID());
-				break;
-			case NetworkOperation::READ:
-				LOG_TRACE << "Next operation: READ from " << identifier();
-				socket().async_read_some( boost::asio::buffer( buffer_ ),
-							 strand_.wrap( boost::bind( &connectionBase::handleRead,
-										    this->shared_from_this(),
-										    boost::asio::placeholders::error,
-										    boost::asio::placeholders::bytes_transferred )));
-				break;
-			case NetworkOperation::WRITE:
-				LOG_TRACE << "Next operation: WRITE to " << identifier();
-				boost::asio::async_write( socket(),
-							  boost::asio::buffer( netOp.data(), netOp.size() ),
-							  strand_.wrap( boost::bind( &connectionBase::handleWrite,
-										     this->shared_from_this(),
-										     boost::asio::placeholders::error )));
-				break;
-			case NetworkOperation::TERMINATE:
-				LOG_TRACE << "Next operation: TERMINATE connection to " << identifier();
-				// Initiate graceful connection closure.
-				boost::system::error_code ignored_ec;
-				socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
-				break;
+			while ( netOp.operation() == NetworkOperation::SET_TIMEOUT )	{
+				switch ( netOp.operation() )	{
+				case NetworkOperation::SET_TIMEOUT:
+					LOG_TRACE << "Next operation: SET TIMEOUT id: " << netOp.timeoutID() << " to " << netOp.timeout() << "s";
+					setTimeout( netOp.timeout(), netOp.timeoutID());
+					break;
+				case NetworkOperation::READ:
+					LOG_TRACE << "Next operation: READ from " << identifier();
+					socket().async_read_some( boost::asio::buffer( buffer_ ),
+								  strand_.wrap( boost::bind( &connectionBase::handleRead,
+											     this->shared_from_this(),
+											     boost::asio::placeholders::error,
+											     boost::asio::placeholders::bytes_transferred )));
+					break;
+				case NetworkOperation::WRITE:
+					LOG_TRACE << "Next operation: WRITE to " << identifier();
+					boost::asio::async_write( socket(),
+								  boost::asio::buffer( netOp.data(), netOp.size() ),
+								  strand_.wrap( boost::bind( &connectionBase::handleWrite,
+											     this->shared_from_this(),
+											     boost::asio::placeholders::error )));
+					break;
+				case NetworkOperation::TERMINATE:
+					LOG_TRACE << "Next operation: TERMINATE connection to " << identifier();
+					// Initiate graceful connection closure.
+					boost::system::error_code ignored_ec;
+					socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
+					break;
+				}
 			}
 		}
 
@@ -162,10 +158,10 @@ namespace _SMERP {
 
 
 		/// Set / reset timeout timer
-		void setTimeout( unsigned long timeout, unsigned ID )
+		void setTimeout( unsigned long timeout, int ID )
 		{
 			if ( timeout == 0 )	{
-				timeoutID_ = std::numeric_limits<unsigned>::max();
+				timeoutID_ = -1;
 			}
 			else	{
 				if ( timeoutID_ != ID )	{
