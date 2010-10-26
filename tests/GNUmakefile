@@ -66,9 +66,6 @@ local_distclean:
 
 local_test:
 	@echo
-	@echo "Testing singleton template..."
-	@LD_LIBRARY_PATH=$(BOOST_DIR)/lib ./singletonTest
-	@echo
 	@echo "Testing version..."
 	@LD_LIBRARY_PATH=$(BOOST_DIR)/lib ./versionTest
 	@echo

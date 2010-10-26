@@ -52,7 +52,6 @@ all: $(OBJS) $(CPP_BINS)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-singletonTest.exe: singletonTest.obj
 versionTest.exe: versionTest.obj
 logTest.exe: logTest.obj \
 	$(TOPDIR)\3rdparty\src\boost\log\libboost_log$(BOOST_LIBRARY_TAG).lib \
@@ -68,8 +67,6 @@ local_distclean:
 local_test:
 	@-echo @echo off > test.bat
 	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
-	@-echo echo Testing singleton template... >> test.bat
-	@-echo singletonTest >> test.bat
 	@-echo echo Testing version... >> test.bat
 	@-echo versionTest >> test.bat
 !IFDEF WITH_BOOST_LOG
