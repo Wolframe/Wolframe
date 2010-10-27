@@ -15,18 +15,18 @@ LogLevel::Level LogLevel::str2LogLevel( const std::string str )
 	boost::trim( s );
 	boost::to_upper( s );
 
-	if( s == "DATA" )		return LogLevel::LOG_DATA;
-	else if( s == "TRACE" )		return LogLevel::LOG_TRACE;
-	else if( s == "DEBUG" )		return LogLevel::LOG_DEBUG;
-	else if( s == "INFO" )		return LogLevel::LOG_INFO;
-	else if( s == "NOTICE" )	return LogLevel::LOG_NOTICE;
-	else if( s == "WARNING" )	return LogLevel::LOG_WARNING;
-	else if( s == "ERROR" )		return LogLevel::LOG_ERROR;
-	else if( s == "SEVERE" )	return LogLevel::LOG_SEVERE;
-	else if( s == "CRITICAL" )	return LogLevel::LOG_CRITICAL;
-	else if( s == "ALERT" )		return LogLevel::LOG_ALERT;
-	else if( s == "FATAL" )		return LogLevel::LOG_FATAL;
-	else				return LogLevel::LOG_UNDEFINED;
+	if( s == "DATA" )		return LogLevel::LOGLEVEL_DATA;
+	else if( s == "TRACE" )		return LogLevel::LOGLEVEL_TRACE;
+	else if( s == "DEBUG" )		return LogLevel::LOGLEVEL_DEBUG;
+	else if( s == "INFO" )		return LogLevel::LOGLEVEL_INFO;
+	else if( s == "NOTICE" )	return LogLevel::LOGLEVEL_NOTICE;
+	else if( s == "WARNING" )	return LogLevel::LOGLEVEL_WARNING;
+	else if( s == "ERROR" )		return LogLevel::LOGLEVEL_ERROR;
+	else if( s == "SEVERE" )	return LogLevel::LOGLEVEL_SEVERE;
+	else if( s == "CRITICAL" )	return LogLevel::LOGLEVEL_CRITICAL;
+	else if( s == "ALERT" )		return LogLevel::LOGLEVEL_ALERT;
+	else if( s == "FATAL" )		return LogLevel::LOGLEVEL_FATAL;
+	else				return LogLevel::LOGLEVEL_UNDEFINED;
 }
 
 } // namespace _SMERP

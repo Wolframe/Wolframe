@@ -12,7 +12,7 @@ namespace prgOpts = boost::program_options;
 
 namespace _SMERP {
 
-	static const LogLevel::Level DEFAULT_DEBUG_LEVEL = LogLevel::LOG_INFO;
+	static const LogLevel::Level DEFAULT_DEBUG_LEVEL = LogLevel::LOGLEVEL_INFO;
 
 	CmdLineConfig::CmdLineConfig()
 	{
@@ -132,7 +132,7 @@ namespace _SMERP {
 			if ( clMap.count( "debug" ))	{
 				std::string s = clMap["debug"].as<std::string>();
 				debugLevel = LogLevel::str2LogLevel( s );
-				if ( debugLevel == LogLevel::LOG_UNDEFINED )	{
+				if ( debugLevel == LogLevel::LOGLEVEL_UNDEFINED )	{
 					errMsg_ = "invalid debug level \"";
 					errMsg_ += s;
 					errMsg_ += "\"";
