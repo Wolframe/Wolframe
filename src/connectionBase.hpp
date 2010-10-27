@@ -77,37 +77,51 @@ namespace _SMERP {
 		/// Connection base state machine
 		void nextOperation()
 		{
-			NetworkOperation netOp = connectionHandler_->nextOperation();
-			while ( netOp.operation() == NetworkOperation::SET_TIMEOUT )	{
+			bool	cycle;
+			do	{
+				NetworkOperation netOp = connectionHandler_->nextOperation();
 				switch ( netOp.operation() )	{
 				case NetworkOperation::SET_TIMEOUT:
 					LOG_TRACE << "Next operation: SET TIMEOUT id: " << netOp.timeoutID() << " to " << netOp.timeout() << "s";
 					setTimeout( netOp.timeout(), netOp.timeoutID());
+					cycle = true;
 					break;
+
 				case NetworkOperation::READ:
 					LOG_TRACE << "Next operation: READ from " << identifier();
+					if ( netOp.timeoutID() >= 0 )
+						setTimeout( netOp.timeout(), netOp.timeoutID());
 					socket().async_read_some( boost::asio::buffer( buffer_ ),
 								  strand_.wrap( boost::bind( &connectionBase::handleRead,
 											     this->shared_from_this(),
 											     boost::asio::placeholders::error,
 											     boost::asio::placeholders::bytes_transferred )));
+					cycle = false;
 					break;
+
 				case NetworkOperation::WRITE:
 					LOG_TRACE << "Next operation: WRITE to " << identifier();
+					if ( netOp.timeoutID() >= 0 )
+						setTimeout( netOp.timeout(), netOp.timeoutID());
 					boost::asio::async_write( socket(),
 								  boost::asio::buffer( netOp.data(), netOp.size() ),
 								  strand_.wrap( boost::bind( &connectionBase::handleWrite,
 											     this->shared_from_this(),
 											     boost::asio::placeholders::error )));
+					cycle = false;
 					break;
+
 				case NetworkOperation::TERMINATE:
 					LOG_TRACE << "Next operation: TERMINATE connection to " << identifier();
 					// Initiate graceful connection closure.
+					if ( netOp.timeoutID() >= 0 )
+						setTimeout( netOp.timeout(), netOp.timeoutID());
 					boost::system::error_code ignored_ec;
 					socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
+					cycle = false;
 					break;
 				}
-			}
+			} while ( cycle );
 		}
 
 
@@ -120,7 +134,8 @@ namespace _SMERP {
 				connectionHandler_->parseInput( buffer_.data(), bytesTransferred );
 				nextOperation();
 			}
-
+			else
+				LOG_TRACE << "Read error: " << e.message();
 			// If an error occurs then no new asynchronous operations are started. This
 			// means that all shared_ptr references to the connection object will
 			// disappear and the object will be destroyed automatically after this
@@ -135,6 +150,8 @@ namespace _SMERP {
 			if ( !e )	{
 				nextOperation();
 			}
+			else
+				LOG_TRACE << "Write error: " << e.message();
 
 			// No new asynchronous operations are started. This means that all shared_ptr
 			// references to the connection object will disappear and the object will be
@@ -153,6 +170,8 @@ namespace _SMERP {
 				LOG_DEBUG << "Timeout, id: " << timeoutID_;
 				nextOperation();
 			}
+			else
+				LOG_TRACE << "Timer error: " << e.message();
 		}
 		// handleTimeout function end
 

@@ -46,7 +46,7 @@ namespace _SMERP {
 		const void* data()	{ return data_; }
 		std::size_t size()	{ return size_; }
 		unsigned long timeout()	{ return timeout_; }
-		unsigned timeoutID()	{ return timeoutID_; }
+		int timeoutID()		{ return timeoutID_; }
 	};
 
 

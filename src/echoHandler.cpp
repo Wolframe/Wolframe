@@ -70,7 +70,7 @@ namespace _SMERP {
 		case ANSWERING:
 			buffer.clear();
 			state_ = READING;
-			return NetworkOperation( NetworkOperation::READ );
+			return NetworkOperation( NetworkOperation::READ, 30, 1 );
 
 		case FINISHING:	{
 			state_ = TERMINATING;
