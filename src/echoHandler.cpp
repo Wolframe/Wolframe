@@ -45,8 +45,8 @@ namespace _SMERP {
 		switch( state_ )	{
 		case NEW:	{
 			state_ = HELLO;
-			std::string msg = "Welcome to SMERP.\n";
-			return NetworkOperation( NetworkOperation::WRITE, msg.c_str(), msg.length());
+			const char *msg = "Welcome to SMERP.\n";
+			return NetworkOperation( NetworkOperation::WRITE, msg, strlen( msg ));
 		}
 
 		case HELLO:
@@ -54,8 +54,8 @@ namespace _SMERP {
 			if ( buffer.empty() )
 				return NetworkOperation( NetworkOperation::WRITE, buffer.c_str(), buffer.length() );
 			else	{
-				std::string msg = "BUFFER NOT EMPTY!\n";
-				return NetworkOperation( NetworkOperation::WRITE, msg.c_str(), msg.length());
+				const char *msg = "BUFFER NOT EMPTY!\n";
+				return NetworkOperation( NetworkOperation::WRITE, msg, strlen( msg ));
 			}
 
 		case READING:
@@ -63,8 +63,8 @@ namespace _SMERP {
 			if ( ! buffer.empty() )
 				return NetworkOperation( NetworkOperation::WRITE, buffer.c_str(), buffer.length() );
 			else	{
-				std::string msg = "EMPTY BUFFER !\n";
-				return NetworkOperation( NetworkOperation::WRITE, msg.c_str(), msg.length());
+				const char *msg = "EMPTY BUFFER !\n";
+				return NetworkOperation( NetworkOperation::WRITE, msg, strlen( msg ));
 			}
 
 		case ANSWERING:
@@ -74,14 +74,14 @@ namespace _SMERP {
 
 		case FINISHING:	{
 			state_ = TERMINATING;
-			std::string msg = "Thanks for using SMERP.\n";
-			return NetworkOperation( NetworkOperation::WRITE, msg.c_str(), msg.length());
+			const char *msg = "Thanks for using SMERP.\n";
+			return NetworkOperation( NetworkOperation::WRITE, msg, strlen( msg ));
 		}
 
 		case TIMEOUT:	{
 			state_ = TERMINATING;
-			std::string msg = "Timeout. :P\n";
-			return NetworkOperation( NetworkOperation::WRITE, msg.c_str(), msg.length());
+			const char *msg = "Timeout. :P\n";
+			return NetworkOperation( NetworkOperation::WRITE, msg, strlen( msg ));
 		}
 
 		case TERMINATING:

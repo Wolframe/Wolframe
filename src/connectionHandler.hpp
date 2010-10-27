@@ -32,10 +32,10 @@ namespace _SMERP {
 		explicit NetworkOperation( Operation op )
 					{ operation_ = op, data_ = NULL; size_ = 0;
 					  timeout_ = 0; timeoutID_ = -1; }
-		NetworkOperation( Operation op, const void *d, std::size_t s )
+		explicit NetworkOperation( Operation op, const void *d, std::size_t s )
 					{ operation_ = op, data_ = d; size_ = s;
 					  timeout_ = 0; timeoutID_ = -1; }
-		NetworkOperation( Operation op, unsigned long to, int ID )
+		explicit NetworkOperation( Operation op, unsigned long to, int ID )
 					{ operation_ = op, data_ = NULL; size_ = 0;
 					  timeout_ = to; timeoutID_ = ID; }
 		NetworkOperation( Operation op, const void *d, std::size_t s, unsigned long to, int ID )
