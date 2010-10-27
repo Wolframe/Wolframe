@@ -16,9 +16,10 @@
 #include "ErrorCodes.hpp"
 #include "logger.hpp"
 
-#include "echoHandler.hpp"
 #ifdef WITH_LUA
 #include "luaHandler.hpp"
+#else
+#include "echoHandler.hpp"
 #endif
 
 #if !defined(_WIN32)
@@ -180,7 +181,11 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 		_SMERP::ApplicationConfiguration config( cmdLineCfg, cfgFileCfg );
 
 // create the final logger based on the configuration
+#ifndef FAKE_LOGGER
 		_SMERP::Logger::initialize( config );
+#else
+		logBack.setLevel( config.stderrLogLevel );
+#endif
 
 // register the event callback where we get called by Windows and the SCM
 		serviceStatusHandle = RegisterServiceCtrlHandler( config.serviceName.c_str( ), serviceCtrlFunction );
@@ -205,7 +210,7 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 // run server in background thread(s).
 #ifndef WITH_LUA
 		_SMERP::echoServer	echo;
-		_SMERP::server s( config.address, config.SSLaddress, echo, config );
+		_SMERP::server s( config.address, config.SSLaddress, echo, config.threads );
 #else
 		_SMERP::luaServer	lua;
 		_SMERP::server s( config.address, config.SSLaddress, lua, config );
@@ -247,6 +252,10 @@ WAIT_FOR_STOP_EVENT:
 	}
 }
 
+
+#ifdef FAKE_LOGGER
+_SMERP::LogBackend	logBack;
+#endif
 int _SMERP_winMain( int argc, char* argv[] )
 {
 	try	{
@@ -342,7 +351,11 @@ int _SMERP_winMain( int argc, char* argv[] )
 					// not called as service, continue as console application
 					config.foreground = true;
 				} else {
+#ifndef FAKE_LOGGER
 					_SMERP::Logger::initialize( config );
+#else
+					logBack.setLevel( config.stderrLogLevel );
+#endif
 					LOG_FATAL << "Unable to dispatch service control dispatcher";
 					return _SMERP::ErrorCodes::FAILURE;
 				}
@@ -353,16 +366,23 @@ int _SMERP_winMain( int argc, char* argv[] )
 		}
 
 		// Create the final logger based on the configuration
+#ifndef FAKE_LOGGER
 		_SMERP::Logger::initialize( config );
+#else
+		logBack.setLevel( config.stderrLogLevel );
+#endif
 		LOG_NOTICE << "Starting server";
 
 #ifndef WITH_LUA
 		_SMERP::echoServer	echo;
-		_SMERP::server s( config.address, config.SSLaddress, echo, config );
+		_SMERP::server s( config.address, config.SSLaddress, echo, config.threads );
 #else
 		_SMERP::luaServer	lua;
 		_SMERP::server s( config.address, config.SSLaddress, lua, config );
 #endif
+
+
+
 
 		// Set console control handler to allow server to be stopped.
 		consoleCtrlFunction = boost::bind(&_SMERP::server::stop, &s);
