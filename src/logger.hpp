@@ -53,7 +53,7 @@ namespace _SMERP {
 	class LogBackend
 	{
 	public:
-		LogBackend()	{ logLevel_ = _SMERP::LogLevel::LOG_NOTICE; }
+		LogBackend()	{ logLevel_ = _SMERP::LogLevel::LOGLEVEL_NOTICE; }
 		~LogBackend()	{ /* free logger resources here */ };
 
 		void setLevel( LogLevel::Level level )	{
