@@ -23,7 +23,7 @@
 #include <boost/log/utility/init/to_eventlog.hpp>
 #include <boost/log/sinks/event_log_constants.hpp>
 #include <boost/log/sinks/event_log_backend.hpp>
-#endif
+#endif // defined(_WIN32)
 
 namespace logging = boost::log;
 namespace keywords = boost::log::keywords;
@@ -98,17 +98,17 @@ void Logger::initialize( const ApplicationConfiguration& config )
 #if !defined( _WIN32 )
 	if( config.logToSyslog ) {
 		sinks::syslog::custom_severity_mapping< LogLevel::Level > mapping( "Severity" );
-		mapping[LogLevel::LOG_FATAL] = sinks::syslog::emergency;
-		mapping[LogLevel::LOG_ALERT] = sinks::syslog::alert;
-		mapping[LogLevel::LOG_CRITICAL] = sinks::syslog::critical;
-		mapping[LogLevel::LOG_SEVERE] = sinks::syslog::critical;
-		mapping[LogLevel::LOG_ERROR] = sinks::syslog::error;
-		mapping[LogLevel::LOG_WARNING] = sinks::syslog::warning;
-		mapping[LogLevel::LOG_NOTICE] = sinks::syslog::notice;
-		mapping[LogLevel::LOG_INFO] = sinks::syslog::info;
-		mapping[LogLevel::LOG_DEBUG] = sinks::syslog::debug;
-		mapping[LogLevel::LOG_TRACE] = sinks::syslog::debug;
-		mapping[LogLevel::LOG_DATA] = sinks::syslog::debug;
+		mapping[LogLevel::LOGLEVEL_FATAL] = sinks::syslog::emergency;
+		mapping[LogLevel::LOGLEVEL_ALERT] = sinks::syslog::alert;
+		mapping[LogLevel::LOGLEVEL_CRITICAL] = sinks::syslog::critical;
+		mapping[LogLevel::LOGLEVEL_SEVERE] = sinks::syslog::critical;
+		mapping[LogLevel::LOGLEVEL_ERROR] = sinks::syslog::error;
+		mapping[LogLevel::LOGLEVEL_WARNING] = sinks::syslog::warning;
+		mapping[LogLevel::LOGLEVEL_NOTICE] = sinks::syslog::notice;
+		mapping[LogLevel::LOGLEVEL_INFO] = sinks::syslog::info;
+		mapping[LogLevel::LOGLEVEL_DEBUG] = sinks::syslog::debug;
+		mapping[LogLevel::LOGLEVEL_TRACE] = sinks::syslog::debug;
+		mapping[LogLevel::LOGLEVEL_DATA] = sinks::syslog::debug;
 
 		logging::init_log_to_syslog(
 			keywords::facility = mapSyslogFacility( config.syslogFacility ),
@@ -124,17 +124,17 @@ void Logger::initialize( const ApplicationConfiguration& config )
 #else
 	if( config.logToEventlog ) {
 		sinks::event_log::custom_event_type_mapping< LogLevel::Level > mapping( "Severity" );
-		mapping[LogLevel::_SMERP_FATAL] = sinks::event_log::error;
-		mapping[LogLevel::_SMERP_ALERT] = sinks::event_log::error;
-		mapping[LogLevel::_SMERP_CRITICAL] = sinks::event_log::error;
-		mapping[LogLevel::_SMERP_SEVERE] = sinks::event_log::error;
-		mapping[LogLevel::_SMERP_ERROR] = sinks::event_log::error;
-		mapping[LogLevel::_SMERP_WARNING] = sinks::event_log::warning;
-		mapping[LogLevel::_SMERP_NOTICE] = sinks::event_log::info;
-		mapping[LogLevel::_SMERP_INFO] = sinks::event_log::info;
-		mapping[LogLevel::_SMERP_DEBUG] = sinks::event_log::info;
-		mapping[LogLevel::_SMERP_TRACE] = sinks::event_log::info;
-		mapping[LogLevel::_SMERP_DATA] = sinks::event_log::info;
+		mapping[LogLevel::LOGLEVEL_FATAL] = sinks::event_log::error;
+		mapping[LogLevel::LOGLEVEL_ALERT] = sinks::event_log::error;
+		mapping[LogLevel::LOGLEVEL_CRITICAL] = sinks::event_log::error;
+		mapping[LogLevel::LOGLEVEL_SEVERE] = sinks::event_log::error;
+		mapping[LogLevel::LOGLEVEL_ERROR] = sinks::event_log::error;
+		mapping[LogLevel::LOGLEVEL_WARNING] = sinks::event_log::warning;
+		mapping[LogLevel::LOGLEVEL_NOTICE] = sinks::event_log::info;
+		mapping[LogLevel::LOGLEVEL_INFO] = sinks::event_log::info;
+		mapping[LogLevel::LOGLEVEL_DEBUG] = sinks::event_log::info;
+		mapping[LogLevel::LOGLEVEL_TRACE] = sinks::event_log::info;
+		mapping[LogLevel::LOGLEVEL_DATA] = sinks::event_log::info;
 
 		logging::init_log_to_eventlog(
 			keywords::registration = sinks::event_log::forced,

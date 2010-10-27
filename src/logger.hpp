@@ -31,17 +31,17 @@ namespace _SMERP {
 } // namespace _SMERP
 
 // shortcut macros
-#define LOG_DATA	BOOST_LOG_SEV( _SMERP::logger, _SMERP::LogLevel::LOG_DATA )
-#define LOG_TRACE	BOOST_LOG_SEV( _SMERP::logger, _SMERP::LogLevel::LOG_TRACE )
-#define LOG_DEBUG	BOOST_LOG_SEV( _SMERP::logger, _SMERP::LogLevel::LOG_DEBUG )
-#define LOG_INFO	BOOST_LOG_SEV( _SMERP::logger, _SMERP::LogLevel::LOG_INFO )
-#define LOG_NOTICE	BOOST_LOG_SEV( _SMERP::logger, _SMERP::LogLevel::LOG_NOTICE )
-#define LOG_WARNING	BOOST_LOG_SEV( _SMERP::logger, _SMERP::LogLevel::LOG_WARNING )
-#define LOG_ERROR	BOOST_LOG_SEV( _SMERP::logger, _SMERP::LogLevel::LOG_ERROR )
-#define LOG_SEVERE	BOOST_LOG_SEV( _SMERP::logger, _SMERP::LogLevel::LOG_SEVERE )
-#define LOG_CRITICAL	BOOST_LOG_SEV( _SMERP::logger, _SMERP::LogLevel::LOG_CRITICAL )
-#define LOG_ALERT	BOOST_LOG_SEV( _SMERP::logger, _SMERP::LogLevel::LOG_ALERT )
-#define LOG_FATAL	BOOST_LOG_SEV( _SMERP::logger, _SMERP::LogLevel::LOG_FATAL )
+#define LOG_DATA	BOOST_LOG_SEV( _SMERP::logger, _SMERP::LogLevel::LOGLEVEL_DATA )
+#define LOG_TRACE	BOOST_LOG_SEV( _SMERP::logger, _SMERP::LogLevel::LOGLEVEL_TRACE )
+#define LOG_DEBUG	BOOST_LOG_SEV( _SMERP::logger, _SMERP::LogLevel::LOGLEVEL_DEBUG )
+#define LOG_INFO	BOOST_LOG_SEV( _SMERP::logger, _SMERP::LogLevel::LOGLEVEL_INFO )
+#define LOG_NOTICE	BOOST_LOG_SEV( _SMERP::logger, _SMERP::LogLevel::LOGLEVEL_NOTICE )
+#define LOG_WARNING	BOOST_LOG_SEV( _SMERP::logger, _SMERP::LogLevel::LOGLEVEL_WARNING )
+#define LOG_ERROR	BOOST_LOG_SEV( _SMERP::logger, _SMERP::LogLevel::LOGLEVEL_ERROR )
+#define LOG_SEVERE	BOOST_LOG_SEV( _SMERP::logger, _SMERP::LogLevel::LOGLEVEL_SEVERE )
+#define LOG_CRITICAL	BOOST_LOG_SEV( _SMERP::logger, _SMERP::LogLevel::LOGLEVEL_CRITICAL )
+#define LOG_ALERT	BOOST_LOG_SEV( _SMERP::logger, _SMERP::LogLevel::LOGLEVEL_ALERT )
+#define LOG_FATAL	BOOST_LOG_SEV( _SMERP::logger, _SMERP::LogLevel::LOGLEVEL_FATAL )
 
 
 #else // FAKE_LOGGER
@@ -93,17 +93,17 @@ namespace _SMERP {
 extern _SMERP::LogBackend	logBack;
 
 // shortcut macros
-#define LOG_DATA	_SMERP::Logger( logBack ).Get( _SMERP::LogLevel::LOG_DATA )
-#define LOG_TRACE	_SMERP::Logger( logBack ).Get( _SMERP::LogLevel::LOG_TRACE )
-#define LOG_DEBUG	_SMERP::Logger( logBack ).Get( _SMERP::LogLevel::LOG_DEBUG )
-#define LOG_INFO	_SMERP::Logger( logBack ).Get( _SMERP::LogLevel::LOG_INFO )
-#define LOG_NOTICE	_SMERP::Logger( logBack ).Get( _SMERP::LogLevel::LOG_NOTICE )
-#define LOG_WARNING	_SMERP::Logger( logBack ).Get( _SMERP::LogLevel::LOG_WARNING )
-#define LOG_ERROR	_SMERP::Logger( logBack ).Get( _SMERP::LogLevel::LOG_ERROR )
-#define LOG_SEVERE	_SMERP::Logger( logBack ).Get( _SMERP::LogLevel::LOG_SEVERE )
-#define LOG_CRITICAL	_SMERP::Logger( logBack ).Get( _SMERP::LogLevel::LOG_CRITICAL )
-#define LOG_ALERT	_SMERP::Logger( logBack ).Get( _SMERP::LogLevel::LOG_ALERT )
-#define LOG_FATAL	_SMERP::Logger( logBack ).Get( _SMERP::LogLevel::LOG_FATAL )
+#define LOG_DATA	_SMERP::Logger( logBack ).Get( _SMERP::LogLevel::LOGLEVEL_DATA )
+#define LOG_TRACE	_SMERP::Logger( logBack ).Get( _SMERP::LogLevel::LOGLEVEL_TRACE )
+#define LOG_DEBUG	_SMERP::Logger( logBack ).Get( _SMERP::LogLevel::LOGLEVEL_DEBUG )
+#define LOG_INFO	_SMERP::Logger( logBack ).Get( _SMERP::LogLevel::LOGLEVEL_INFO )
+#define LOG_NOTICE	_SMERP::Logger( logBack ).Get( _SMERP::LogLevel::LOGLEVEL_NOTICE )
+#define LOG_WARNING	_SMERP::Logger( logBack ).Get( _SMERP::LogLevel::LOGLEVEL_WARNING )
+#define LOG_ERROR	_SMERP::Logger( logBack ).Get( _SMERP::LogLevel::LOGLEVEL_ERROR )
+#define LOG_SEVERE	_SMERP::Logger( logBack ).Get( _SMERP::LogLevel::LOGLEVEL_SEVERE )
+#define LOG_CRITICAL	_SMERP::Logger( logBack ).Get( _SMERP::LogLevel::LOGLEVEL_CRITICAL )
+#define LOG_ALERT	_SMERP::Logger( logBack ).Get( _SMERP::LogLevel::LOGLEVEL_ALERT )
+#define LOG_FATAL	_SMERP::Logger( logBack ).Get( _SMERP::LogLevel::LOGLEVEL_FATAL )
 
 #endif // FAKE_LOGGER
 

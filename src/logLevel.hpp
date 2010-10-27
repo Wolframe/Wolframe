@@ -13,18 +13,18 @@ namespace _SMERP {
 class LogLevel {
 public:
 	enum Level	{
-		LOG_DATA,		/// log everything, including data
-		LOG_TRACE,		/// trace functions calls
-		LOG_DEBUG,		/// log operations
-		LOG_INFO,
-		LOG_NOTICE,
-		LOG_WARNING,
-		LOG_ERROR,
-		LOG_SEVERE,
-		LOG_CRITICAL,
-		LOG_ALERT,
-		LOG_FATAL,
-		LOG_UNDEFINED	/// log this only under special conditions
+		LOGLEVEL_DATA,		/// log everything, including data
+		LOGLEVEL_TRACE,		/// trace functions calls
+		LOGLEVEL_DEBUG,		/// log operations
+		LOGLEVEL_INFO,
+		LOGLEVEL_NOTICE,
+		LOGLEVEL_WARNING,
+		LOGLEVEL_ERROR,
+		LOGLEVEL_SEVERE,
+		LOGLEVEL_CRITICAL,
+		LOGLEVEL_ALERT,
+		LOGLEVEL_FATAL,
+		LOGLEVEL_UNDEFINED	/// log this only under special conditions
 	};
 
 	static Level str2LogLevel( const std::string s );
