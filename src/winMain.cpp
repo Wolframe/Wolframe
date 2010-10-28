@@ -213,7 +213,7 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 		_SMERP::server s( config.address, config.SSLaddress, echo, config.threads );
 #else
 		_SMERP::luaServer	lua;
-		_SMERP::server s( config.address, config.SSLaddress, lua, config );
+		_SMERP::server s( config.address, config.SSLaddress, lua, config.threads );
 #endif
 		boost::thread t( boost::bind( &_SMERP::server::run, &s ));
 
@@ -378,7 +378,7 @@ int _SMERP_winMain( int argc, char* argv[] )
 		_SMERP::server s( config.address, config.SSLaddress, echo, config.threads );
 #else
 		_SMERP::luaServer	lua;
-		_SMERP::server s( config.address, config.SSLaddress, lua, config );
+		_SMERP::server s( config.address, config.SSLaddress, lua, config.threads );
 #endif
 
 
