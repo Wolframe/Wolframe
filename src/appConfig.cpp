@@ -121,6 +121,11 @@ namespace _SMERP {
 			os << "                  verify client: " << (SSLaddress[0].verifyClientCert() ? "yes" : "no") << std::endl;
 			for ( unsigned i = 1; i < SSLaddress.size(); i++ )	{
 				os << "               " << SSLaddress[i].toString() << std::endl;
+				os << "                  certificate: " << (SSLaddress[i].certificate().empty() ? "(none)" : SSLaddress[i].certificate()) << std::endl;
+				os << "                  key file: " << (SSLaddress[i].key().empty() ? "(none)" : SSLaddress[i].key()) << std::endl;
+				os << "                  CA directory: " << (SSLaddress[i].CAdirectory().empty() ? "(none)" : SSLaddress[i].CAdirectory()) << std::endl;
+				os << "                  CA chain file: " << (SSLaddress[i].CAchain().empty() ? "(none)" : SSLaddress[i].CAchain()) << std::endl;
+				os << "                  verify client: " << (SSLaddress[i].verifyClientCert() ? "yes" : "no") << std::endl;
 			}
 		}
 

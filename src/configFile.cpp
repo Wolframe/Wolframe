@@ -97,7 +97,6 @@ namespace _SMERP {
 
 	bool CfgFileConfig::parse ( const char *filename )
 	{
-		std::string	tmpStr, portStr;
 		unsigned short	port;
 
 		file = resolvePath( boost::filesystem::complete( filename )).string();
@@ -123,14 +122,14 @@ namespace _SMERP {
 		read_info( filename, pt );
 #endif
 		BOOST_FOREACH( ptree::value_type &v, pt.get_child( "server.listen" ))	{
-			tmpStr = v.second.get<std::string>( "address", std::string() );
-			if ( tmpStr.empty() )	{
+			std::string hostStr = v.second.get<std::string>( "address", std::string() );
+			if ( hostStr.empty() )	{
 				errMsg_ = "Interface must be defined";
 				return false;
 			}
-			if ( tmpStr == "*" )
-				tmpStr = "0.0.0.0";
-			portStr = v.second.get<std::string>( "port", std::string() );
+			if ( hostStr == "*" )
+				hostStr = "0.0.0.0";
+			std::string portStr = v.second.get<std::string>( "port", std::string() );
 			if ( portStr.empty() )	{
 				if ( v.first == "socket" )
 					port = DEFAULT_PORT;
@@ -154,7 +153,7 @@ namespace _SMERP {
 			}
 
 			if ( v.first == "socket" )	{
-				ServerTCPendpoint lep( tmpStr, port );
+				ServerTCPendpoint lep( hostStr, port );
 				address.push_back( lep );
 			}
 			else if ( v.first == "SSLsocket" )	{
@@ -172,6 +171,7 @@ namespace _SMERP {
 									v.second.get<std::string>( "CAchainFile", std::string() ),
 									boost::filesystem::path( file ).branch_path() ).string();
 
+				std::string tmpStr;
 				boost::logic::tribool flag = getBoolValue( v.second, "verify", tmpStr );
 				bool verify;
 				if ( flag )
@@ -184,7 +184,7 @@ namespace _SMERP {
 					errMsg_ += tmpStr;
 					errMsg_ += "\" for SSL verify client. WARNING: enabling verification";
 				}
-				ServerSSLendpoint lep( tmpStr, port,
+				ServerSSLendpoint lep( hostStr, port,
 						       certFile, keyFile, verify, CAdirectory, CAchainFile );
 				SSLaddress.push_back( lep );
 			}
