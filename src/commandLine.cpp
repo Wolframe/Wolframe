@@ -30,7 +30,9 @@ namespace _SMERP {
 				( "service", "run the service (don't call directly!)" )
 #endif
 // Options
+#if !defined(_WIN32)
 				( "foreground,f", "run in foreground (logs only on stderr)" )
+#endif
 				( "config-file,c", prgOpts::value<std::string>(), "configuration file" )
 				( "debug,d", prgOpts::value<std::string>(), "set debug level (to be used only with --foreground)" )
 #if !defined(_WIN32)
@@ -126,8 +128,10 @@ namespace _SMERP {
 			}
 #endif
 
+#if !defined(_WIN32)
 			if ( clMap.count( "foreground" ))
 				foreground = true;
+#endif
 
 			if ( clMap.count( "debug" ))	{
 				std::string s = clMap["debug"].as<std::string>();
