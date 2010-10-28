@@ -50,29 +50,44 @@ namespace _SMERP {
 	{
 		switch( state_ )	{
 		case NEW:	{
-			state_ = READING;
-			std::string msg = "Welcome to SMERP.\n";
-			return NetworkOperation( NetworkOperation::WRITE, msg.c_str(), msg.length());
+			state_ = HELLO;
+			const char *msg = "Welcome to SMERP.\n";
+			return NetworkOperation( NetworkOperation::WRITE, msg, strlen( msg ));
 		}
+
+		case HELLO:
+			state_ = ANSWERING;
+			if ( buffer.empty() )
+				return NetworkOperation( NetworkOperation::WRITE, buffer.c_str(), buffer.length() );
+			else	{
+				const char *msg = "BUFFER NOT EMPTY!\n";
+				return NetworkOperation( NetworkOperation::WRITE, msg, strlen( msg ));
+			}
 
 		case READING:
 			state_ = ANSWERING;
 			if ( ! buffer.empty() )
 				return NetworkOperation( NetworkOperation::WRITE, buffer.c_str(), buffer.length() );
 			else	{
-				std::string msg = "EMPTY BUFFER !\n";
-				return NetworkOperation( NetworkOperation::WRITE, msg.c_str(), msg.length());
+				const char *msg = "EMPTY BUFFER !\n";
+				return NetworkOperation( NetworkOperation::WRITE, msg, strlen( msg ));
 			}
 
 		case ANSWERING:
 			buffer.clear();
 			state_ = READING;
-			return NetworkOperation( NetworkOperation::READ );
+			return NetworkOperation( NetworkOperation::READ, 30, 1 );
 
 		case FINISHING:	{
 			state_ = TERMINATING;
-			std::string msg = "Thanks for using SMERP.\n";
-			return NetworkOperation( NetworkOperation::WRITE, msg.c_str(), msg.length());
+			const char *msg = "Thanks for using SMERP.\n";
+			return NetworkOperation( NetworkOperation::WRITE, msg, strlen( msg ));
+		}
+
+		case TIMEOUT:	{
+			state_ = TERMINATING;
+			const char *msg = "Timeout. :P\n";
+			return NetworkOperation( NetworkOperation::WRITE, msg, strlen( msg ));
 		}
 
 		case TERMINATING:
@@ -102,6 +117,12 @@ namespace _SMERP {
 			}
 		}
 		return( s );
+	}
+
+	void luaConnection::timeoutOccured( unsigned ID )
+	{
+		state_ = TIMEOUT;
+		LOG_TRACE << "Timeout id: " << ID << " occured";
 	}
 
 
