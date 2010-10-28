@@ -61,8 +61,6 @@ void SSLconnection::start()
 		    + ":" + boost::lexical_cast<std::string>( SSLsocket_.lowest_layer().remote_endpoint().port() )
 		    + " (SSL)");
 	LOG_TRACE << "Starting connection to " << identifier();
-	connectionHandler_->setPeer( RemoteSSLendpoint( SSLsocket_.lowest_layer().remote_endpoint().address().to_string(),
-							SSLsocket_.lowest_layer().remote_endpoint().port()));
 
 	SSLsocket_.async_handshake( boost::asio::ssl::stream_base::server,
 				    strand_.wrap( boost::bind( &SSLconnection::handleHandshake,
@@ -75,6 +73,21 @@ void SSLconnection::handleHandshake( const boost::system::error_code& e )
 {
 	LOG_DATA << "SSL handshake to " << identifier();
 	if ( !e )	{
+		// Extract the common name from the client cert
+		SSL* ssl = SSLsocket_.impl()->ssl;
+		X509* peer_cert;
+		char buf[2048];
+		memset( buf, 0, 2048 );
+		peer_cert = SSL_get_peer_certificate( ssl );
+		int x = X509_NAME_get_text_by_NID( X509_get_subject_name( peer_cert ),
+						   NID_commonName, buf, 2047 );
+		if ( x != -1 )
+			connectionHandler_->setPeer( RemoteSSLendpoint( SSLsocket_.lowest_layer().remote_endpoint().address().to_string(),
+									SSLsocket_.lowest_layer().remote_endpoint().port(),
+									buf ));
+		else
+			connectionHandler_->setPeer( RemoteSSLendpoint( SSLsocket_.lowest_layer().remote_endpoint().address().to_string(),
+									SSLsocket_.lowest_layer().remote_endpoint().port()));
 		nextOperation();
 	}
 	else	{
