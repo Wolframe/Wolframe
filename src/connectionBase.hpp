@@ -57,7 +57,7 @@ namespace _SMERP {
 
 	protected:
 		/// Connection identification string (i.e. remote endpoint)
-		std::string	identifier_;
+		std::string			identifier_;
 
 		/// Strand to ensure the connection's handlers are not called concurrently.
 		boost::asio::io_service::strand	strand_;
@@ -71,7 +71,7 @@ namespace _SMERP {
 		/// The timer for timeouts.
 		boost::asio::deadline_timer	timer_;
 		/// The timeout ID
-		int			timeoutID_;
+		int				timeoutID_;
 
 
 		/// Connection base state machine
@@ -167,7 +167,7 @@ namespace _SMERP {
 		{
 			if ( !e )	{
 				connectionHandler_->timeoutOccured( timeoutID_ );
-				LOG_DEBUG << "Timeout, id: " << timeoutID_;
+				LOG_DEBUG << "Timeout on  connection to " << identifier() << ", id " << timeoutID_;
 				nextOperation();
 			}
 			else

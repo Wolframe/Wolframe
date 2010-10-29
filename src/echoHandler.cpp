@@ -36,6 +36,7 @@ namespace _SMERP {
 	void echoConnection::setPeer( const RemoteSSLendpoint& remote )
 	{
 		LOG_TRACE << "Peer set to " << remote.toString();
+		LOG_TRACE << "Peer Common Name: " << remote.commonName();
 	}
 
 
@@ -116,7 +117,7 @@ namespace _SMERP {
 	void echoConnection::timeoutOccured( unsigned ID )
 	{
 		state_ = TIMEOUT;
-		LOG_TRACE << "Timeout id: " << ID << " occured";
+		LOG_TRACE << "Processor received timeout, id: " << ID;
 	}
 
 

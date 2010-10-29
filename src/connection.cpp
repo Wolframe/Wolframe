@@ -22,7 +22,10 @@ connection::connection( boost::asio::io_service& IOservice,
 
 connection::~connection()
 {
-	LOG_TRACE << "Connection destroyed";
+	if ( identifier_.empty() )
+		LOG_TRACE << "Connection (unconnected) destroyed";
+	else
+		LOG_TRACE << "Connection to " << identifier_ <<" destroyed";
 }
 
 
@@ -52,7 +55,10 @@ SSLconnection::SSLconnection( boost::asio::io_service& IOservice,
 
 SSLconnection::~SSLconnection()
 {
-	LOG_TRACE << "SSL connection destroyed";
+	if ( identifier_.empty() )
+		LOG_TRACE << "SSL connection (unconnected) destroyed";
+	else
+		LOG_TRACE << "Connection to " << identifier_ <<" destroyed";
 }
 
 void SSLconnection::start()
@@ -71,17 +77,22 @@ void SSLconnection::start()
 
 void SSLconnection::handleHandshake( const boost::system::error_code& e )
 {
-	LOG_DATA << "SSL handshake to " << identifier();
 	if ( !e )	{
+		LOG_DATA << "successful SSL handshake, peer " << identifier();
 		// Extract the common name from the client cert
-		SSL* ssl = SSLsocket_.impl()->ssl;
-		X509* peer_cert;
-		char buf[2048];
+
+		X509*	peerCert;
+		char	buf[2048];
+		int	res = -1;
+
+		SSL*	ssl = SSLsocket_.impl()->ssl;
+
 		memset( buf, 0, 2048 );
-		peer_cert = SSL_get_peer_certificate( ssl );
-		int x = X509_NAME_get_text_by_NID( X509_get_subject_name( peer_cert ),
-						   NID_commonName, buf, 2047 );
-		if ( x != -1 )
+		peerCert = SSL_get_peer_certificate( ssl );
+		if ( peerCert )
+			res = X509_NAME_get_text_by_NID( X509_get_subject_name( peerCert ),
+							 NID_commonName, buf, 2047 );
+		if ( res != -1 )
 			connectionHandler_->setPeer( RemoteSSLendpoint( SSLsocket_.lowest_layer().remote_endpoint().address().to_string(),
 									SSLsocket_.lowest_layer().remote_endpoint().port(),
 									buf ));
@@ -91,7 +102,7 @@ void SSLconnection::handleHandshake( const boost::system::error_code& e )
 		nextOperation();
 	}
 	else	{
-		LOG_DEBUG << "ERROR handling SSL handshake from " << identifier();
+		LOG_DEBUG << "SSL handshake error, peer " << identifier();
 //		delete this;
 		boost::system::error_code ignored_ec;
 		socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );

@@ -57,10 +57,10 @@ namespace _SMERP {
 		RemoteSSLendpoint( const std::string& Host, unsigned short Port )
 			: ConnectionEndpoint( Host, Port )	{}
 		RemoteSSLendpoint( const std::string& Host, unsigned short Port,
-				   const std::string CN )
+				   const std::string& CN )
 			: ConnectionEndpoint( Host, Port )	{ CN_ = CN; }
 
-		const std::string&	commonName()		{ return CN_; }
+		const std::string& commonName() const		{ return CN_; }
 	private:
 		std::string	CN_;
 	};
