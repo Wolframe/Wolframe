@@ -187,13 +187,17 @@ ifeq "$(LINUX_DIST)" "arch"
 BOOST_DIR = /usr
 BOOST_LIBRARY_TAG = -mt
 endif
+ifeq "$(LINUX_DIST)" "redhat"
+BOOST_DIR = /usr
+BOOST_LIBRARY_TAG = -mt
+endif
 endif
 
 # OpenSSL
 #########
 
 ifdef WITH_SSL
-OPENSSL_LIBS = -lssl
+OPENSSL_LIBS = -lssl -lcrypto
 endif
 
 # Google Unit testing gtest

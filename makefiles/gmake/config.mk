@@ -15,9 +15,6 @@
 BOOST_DIR=/usr
 #BOOST_DIR=/home/baumann/boost
 
-# TODO: probe those
-BOOST_MT=-mt
-
 # OpenSSL (http://www.slproweb.com/products/Win32OpenSSL.html)
 ##############################################################
 
