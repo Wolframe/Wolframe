@@ -28,17 +28,17 @@ struct MemBlock
    };
    ~MemBlock()
    {
-      free [] (unsigned char*)ptr;
+      delete [] (unsigned char*)ptr;
    };
    void init()
    {
       lastblock = false;
       filled = 0;
-   },
+   };
     
 private:
    MemBlock( const MemBlock&) {};
-   MemBlock& operator=const MemBlock& o){return *this;};
+   MemBlock& operator=( const MemBlock&);
 };
 
 
@@ -46,15 +46,16 @@ class InputBlock
 {
 private:
    MemBlock mem;
+public:
    unsigned char* content() const       {return (unsigned char*)mem.ptr;};
    unsigned int size() const            {return mem.size;};
-   unsigned int end() const             {return mem.filled;};
+   unsigned int endpos() const          {return mem.filled;};
    unsigned int pos;
   
 public:
    InputBlock( unsigned int p_size)     :mem(p_size),pos(0) {};
 
-   MemBlock& operator->() const         {return mem;};
+   MemBlock* operator->()               {return &mem;};
   
    void init()
    {
@@ -66,11 +67,11 @@ public:
 
    char getchar()
    {         
-      if (pos == end())
+      if (pos == endpos())
       {
         pos = 0;
         mem.filled = 0;
-        if (lastblock) return 0;
+        if (mem.lastblock) return 0;
         throw End();
       }
       return content()[ pos++];
@@ -78,33 +79,37 @@ public:
   
    struct iterator
    {
-      NetMessage* input;
+      InputBlock* input;
       int ch;
       
-      iterator( NetMessage* p_input)      :input(p_input),ch(0) {};
-      iterator()                          :input(0),ch(0) {};
-      iterator( const iterator& o)        :input(o.input),ch(o.ch) {};
+      iterator( InputBlock* p_input)          :input(p_input),ch(0) {};
+      iterator()                              :input(0),ch(0) {};
+      iterator( const iterator& o)            :input(o.input),ch(o.ch) {};
+      iterator& operator=( const iterator& o) {input=o.input;ch=o.ch;return *this;}
       
-      void skip()                         {ch=input->getchar();};                                
-      iterator& operator++()              {skip(); return *this;};
-      iterator operator++(int)            {iterator tmp(*this); skip(); return tmp;};
-      char operator*()                    {return ch;};
+      void skip()                             {ch=input->getchar();};                                
+      iterator& operator++()                  {skip(); return *this;};
+      iterator operator++(int)                {iterator tmp(*this); skip(); return tmp;};
+      char operator*()                        {return ch;};
    };
-   iterator begin()                       {iterator rt(this); rt.skip(); return rt;};
-   iterator end()                         {return iterator();};
+   iterator begin()                           {iterator rt(this); rt.skip(); return rt;};
+   iterator end()                             {return iterator();};
 };
 
 
 class OutputBlock
 {
-  unsigned char* content() const         {return (unsigned char*)mem.ptr + mem.filled;};
-  unsigned int size() const              {return mem.size - mem.filled;};
-  MemBlock mem;
-  
+private:
+   MemBlock mem;
+public:
+   unsigned char* content() const         {return (unsigned char*)mem.ptr + mem.filled;};
+   unsigned int size() const              {return mem.size - mem.filled;};
+   void shift( unsigned int nn)           {mem.filled += nn;};
+   
 public:
    OutputBlock( unsigned int p_size)     :mem(p_size) {};
 
-   MemBlock& operator->() const         {return mem;};
+   MemBlock* operator->()                {return &mem;};
 
    void init()
    {
@@ -118,21 +123,20 @@ public:
    };
 };
 
-}//namespace io
-}//namespace textwolf
-#endif
+}//anonymous namespace 
 
 
+using namespace _SMERP;
 using namespace _SMERP::xmlselect;
 namespace tw = textwolf;
 
-struct Connection::Data
+struct Connection::Private
 {
    InputBlock input;
    OutputBlock output;
    
    typedef tw::XMLPathSelectAutomaton<tw::charset::UTF8> Automaton;
-   typedef tw::XMLPathSelect<tw::Input::iterator,tw::charset::IsoLatin1,tw::charset::UTF8> Processor;   
+   typedef tw::XMLPathSelect<InputBlock::iterator,tw::charset::IsoLatin1,tw::charset::UTF8> Processor;   
 
    enum ElementType
    {
@@ -148,8 +152,9 @@ struct Connection::Data
    Processor* proc;
    Processor::iterator itr;
    Processor::iterator end;
+   InputBlock::iterator src;
    
-   Data() :error(0),state(Init),proc(0),input(MemBlockSize),output(MemBlockSize)
+   Private() :input(MemBlockSize),output(MemBlockSize),error(0),state(Init),proc(0),itr(Processor::iterator(Processor::End())),end(Processor::iterator(Processor::End()))
    {
       (*atm)["docs"]["doc"]["name"] = Name;
       (*atm)["docs"]["doc"]["vorname"] = Vorname;
@@ -163,14 +168,14 @@ struct Connection::Data
       (*atm)["docs"] = Doc;
    };
    
-   ~Data()
+   ~Private()
    {
       done();
    };
 
    void done()
    {
-      itr = end = Processor::iterator( Processor::End());
+      itr = Processor::iterator( Processor::End());
       if (proc) delete proc;
       proc = 0;
       input.init();
@@ -180,7 +185,7 @@ struct Connection::Data
    enum {ElemHdrSize=3,ElemTailSize=2};
    void produceElement( unsigned int type, unsigned int size)
    {
-      static char HEX[16] = "0123456789abcdef";
+      static char HEX[17] = "0123456789abcdef";
       output.content()[0] = HEX[ (type & 0xF0) >> 8];
       output.content()[1] = HEX[ (type & 0x0F)];
       output.content()[2] = ' ';
@@ -189,9 +194,9 @@ struct Connection::Data
       output.shift( ElemHdrSize+ElemTailSize+size);
    };
    
-   void* elementPtr() const
+   char* elementPtr() const
    {
-      output.content() + ElemHdrSize;
+      return (char*)output.content() + ElemHdrSize;
    };
    
    unsigned int elementSize() const
@@ -200,19 +205,19 @@ struct Connection::Data
       return output.size()-ElemHdrSize+ElemTailSize;
    };
 
-   enum Result {Read,Write,WriteLast,Error};
-   Action get()
+   enum Result {Read,Write,WriteLast,ReportError};
+   Result get()
    {      
       if (!proc)
       {
-         proc = new (std::nothrow) Processor( &atm, input.begin(), elementPtr(), elementSize());
+         src = input.begin();
+         proc = new (std::nothrow) Processor( &atm, src, elementPtr(), elementSize());
          if (!proc)
          {
             error = "OutOfMem";
-            return Error;
+            return ReportError;
          }
-         end = processor->end();
-         itr = processor->init();
+         end = proc->end();
       } 
       else
       {
@@ -227,10 +232,10 @@ struct Connection::Data
          }
          switch (itr->state)
          {
-            case Processor::Ok:          return Write;
-            case Processor::EndOfOutput: return Write;
-            case Processor::EndOfInput:  return WriteLast;
-            case Processor::ErrorState:  error=itr->content; return Error;
+            case Processor::iterator::Element::Ok:          return Write;
+            case Processor::iterator::Element::EndOfOutput: return Write;
+            case Processor::iterator::Element::EndOfInput:  return WriteLast;
+            case Processor::iterator::Element::ErrorState:  error=itr->content; return ReportError;
          }
       }
       catch (InputBlock::End)
@@ -242,16 +247,16 @@ struct Connection::Data
 
 Connection::Connection( const LocalTCPendpoint& local )
 {
-   data = new Connection::Data();
+   data = new Connection::Private();
    LOG_TRACE << "Created connection handler for " << local.toString();
-   data->state = Init;
+   data->state = Connection::Private::Init;
 }
 
 Connection::Connection( const LocalSSLendpoint& local )
 {
-   data = new Connection::Data();
+   data = new Connection::Private();
    LOG_TRACE << "Created connection handler (SSL) for " << local.toString();
-   data->state = Init;
+   data->state = Connection::Private::Init;
 }
 
 Connection::~Connection()
@@ -270,6 +275,11 @@ void Connection::setPeer( const RemoteSSLendpoint& remote )
    LOG_TRACE << "Peer set to " << remote.toString();
 }
 
+void* Connection::parseInput( const void *begin, std::size_t bytesTransferred )
+{
+   data->input->filled = bytesTransferred;
+   return (void*)(((char*)begin) + bytesTransferred);
+}
 
 /// Handle a request and produce a reply.
 NetworkOperation Connection::nextOperation()
@@ -277,38 +287,42 @@ NetworkOperation Connection::nextOperation()
   std::string msg;
   switch( data->state)
   {
-     case Init:
+     case Connection::Private::Init:
         data->done();
-        data->state = Welcome;
+        data->state = Connection::Private::Welcome;
         msg = "OK expecting data\n";
         return NetworkOperation( NetworkOperation::WRITE, msg.c_str(), msg.length());
      
-     case Welcome:
-        data->state = Processing;
-        return NetworkOperation( NetworkOperation::READ, input->ptr, input->size, &input->filled);
+     case Connection::Private::Welcome:
+        data->state = Connection::Private::Processing;
+        return NetworkOperation( NetworkOperation::READ, data->input->ptr, data->input->size);
      
-     case Processing:
+     case Connection::Private::Processing:
      {
          switch (data->get())
          {
-            case Read:
-               return NetworkOperation( NetworkOperation::READ, data->input->ptr, data->input->size, &data->input->filled);
+           case Private::Read:
+               return NetworkOperation( NetworkOperation::READ, data->input->ptr, data->input->size);
               
-            case Write:
+            case Private::Write:
                return NetworkOperation( NetworkOperation::WRITE, data->output->ptr, data->output->size);
                
-            case WriteLast:
-               data->state = Init;
+            case Private::WriteLast:
+               data->state = Connection::Private::Init;
                return NetworkOperation( NetworkOperation::WRITE, data->output->ptr, data->output->size);
                
-            case Error:
-               data->state = Error;
+            case Private::Error:
+               data->state = Connection::Private::Error;
                msg.append( "\r\n.\r\nERROR ");
                msg.append( data->error?data->error:"unknown");
                data->done();
                return NetworkOperation( NetworkOperation::WRITE, msg.c_str(), msg.length());
          }
      }
+     case Connection::Private::Error:
+         //TODO handle error case
+     break;
+              
   }
   return NetworkOperation( NetworkOperation::TERMINATE );
 }

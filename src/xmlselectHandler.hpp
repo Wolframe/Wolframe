@@ -23,6 +23,7 @@ namespace xmlselect {
 
 		/// Handle a request and produce a reply.
 		NetworkOperation nextOperation();
+      virtual void* parseInput( const void *begin, std::size_t bytesTransferred );
       
    public:
       enum {MemBlockSize=4096};

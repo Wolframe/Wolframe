@@ -73,6 +73,7 @@ OBJS = \
 	connection.o \
 	server.o \
 	echoHandler.o \
+	xmlselectHandler.o \
 	posixMain.o
 
 # lua
