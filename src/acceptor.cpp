@@ -63,7 +63,7 @@ void acceptor::handleAccept( const boost::system::error_code& e )
 					strand_.wrap( boost::bind( &acceptor::handleAccept,
 								   this,
 								   boost::asio::placeholders::error )));
-		LOG_DATA << "Acceptor " << identifier_ << " ready for new connection";
+		LOG_DATA << "Acceptor on " << identifier_ << " ready for new connection";
 	}
 }
 
@@ -83,6 +83,8 @@ void acceptor::handleStop()
 {
 	acceptor_.close();
 	LOG_DEBUG << "Closed acceptor for " << identifier_;
+	// at this point no more connections are accepted
+	// Signal the list of processors to terminate
 }
 
 
@@ -185,7 +187,7 @@ void SSLacceptor::handleAccept( const boost::system::error_code& e )
 					strand_.wrap( boost::bind( &SSLacceptor::handleAccept,
 								   this,
 								   boost::asio::placeholders::error )));
-		LOG_DATA << "Acceptor " << identifier_ << " ready for new connection";
+		LOG_DATA << "Acceptor on " << identifier_ << " ready for new connection";
 	}
 }
 

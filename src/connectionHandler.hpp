@@ -62,6 +62,9 @@ namespace _SMERP {
 		/// What should the network do next.
 		virtual void timeoutOccured()	{}
 
+		/// A signal was received from outside.
+		virtual void signalOccured()	{}
+
 		/// Set the remote peer. The connection is up now.
 		virtual void setPeer( const RemoteTCPendpoint& remote ) = 0;
 		virtual void setPeer( const RemoteSSLendpoint& remote ) = 0;

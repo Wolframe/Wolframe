@@ -10,10 +10,22 @@
 #include <boost/asio/ssl.hpp>
 #endif // WITH_SSL
 
+#include <list>
 #include "connectionBase.hpp"
 #include "connectionHandler.hpp"
 
 namespace _SMERP {
+
+	template< typename ConnectionType >
+	class ConnectionList
+	{
+	public:
+		void add( ConnectionType& conn );
+		void remove( ConnectionType& conn );
+	private:
+		std::list< ConnectionType& >	connList_;
+	};
+
 
 	/// Represents a single connection from a client.
 	class connection : public connectionBase< boost::asio::ip::tcp::socket >
@@ -37,6 +49,7 @@ namespace _SMERP {
 	};
 
 	typedef boost::shared_ptr<connection> connection_ptr;
+
 
 #ifdef WITH_SSL
 	typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket>	ssl_socket;

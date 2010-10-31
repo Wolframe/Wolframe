@@ -180,6 +180,14 @@ namespace _SMERP {
 			}
 		}
 		// setTimeout function end
+
+//		/// Send a signal to the processor
+//		void signalHandler()
+//		{
+//			strand_.dispatch( connectionHandler_->signalOccured());
+//			LOG_TRACE << "Handler for connection to " << identifier() << " signalled";
+//		}
+//		// signalHandler function end
 	};
 
 } // namespace _SMERP
