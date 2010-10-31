@@ -34,7 +34,6 @@ namespace _SMERP {
 		{
 			assert( handler != NULL );
 			connectionHandler_ = handler;
-			timeoutID_ = -1;
 			LOG_TRACE << "New connection base created";
 		}
 
@@ -70,64 +69,51 @@ namespace _SMERP {
 
 		/// The timer for timeouts.
 		boost::asio::deadline_timer	timer_;
-		/// The timeout ID
-		int				timeoutID_;
 
 
 		/// Connection base state machine
 		void nextOperation()
 		{
-			bool	cycle;
-			do	{
-				NetworkOperation netOp = connectionHandler_->nextOperation();
-				switch ( netOp.operation() )	{
-				case NetworkOperation::SET_TIMEOUT:
-					LOG_TRACE << "Next operation: SET TIMEOUT id: " << netOp.timeoutID() << " to " << netOp.timeout() << "s";
-					setTimeout( netOp.timeout(), netOp.timeoutID());
-					cycle = true;
-					break;
+			NetworkOperation netOp = connectionHandler_->nextOperation();
+			switch ( netOp.operation() )	{
+			case NetworkOperation::READ:
+				LOG_TRACE << "Next operation: READ from " << identifier();
+				if ( netOp.timeout() > 0 )
+					setTimeout( netOp.timeout());
+				socket().async_read_some( boost::asio::buffer( buffer_ ),
+							  strand_.wrap( boost::bind( &connectionBase::handleRead,
+										     this->shared_from_this(),
+										     boost::asio::placeholders::error,
+										     boost::asio::placeholders::bytes_transferred )));
 
-				case NetworkOperation::READ:
-					LOG_TRACE << "Next operation: READ from " << identifier();
-					if ( netOp.timeoutID() >= 0 )
-						setTimeout( netOp.timeout(), netOp.timeoutID());
-					socket().async_read_some( boost::asio::buffer( buffer_ ),
-								  strand_.wrap( boost::bind( &connectionBase::handleRead,
-											     this->shared_from_this(),
-											     boost::asio::placeholders::error,
-											     boost::asio::placeholders::bytes_transferred )));
-					cycle = false;
-					break;
+				break;
 
-				case NetworkOperation::WRITE:
-					LOG_TRACE << "Next operation: WRITE to " << identifier();
-					if ( netOp.timeoutID() >= 0 )
-						setTimeout( netOp.timeout(), netOp.timeoutID());
-					boost::asio::async_write( socket(),
-								  boost::asio::buffer( netOp.data(), netOp.size() ),
-								  strand_.wrap( boost::bind( &connectionBase::handleWrite,
-											     this->shared_from_this(),
-											     boost::asio::placeholders::error )));
-					cycle = false;
-					break;
+			case NetworkOperation::WRITE:
+				LOG_TRACE << "Next operation: WRITE to " << identifier();
+				if ( netOp.timeout() > 0 )
+					setTimeout( netOp.timeout());
+				boost::asio::async_write( socket(),
+							  boost::asio::buffer( netOp.data(), netOp.size() ),
+							  strand_.wrap( boost::bind( &connectionBase::handleWrite,
+										     this->shared_from_this(),
+										     boost::asio::placeholders::error )));
+				break;
 
-				case NetworkOperation::TERMINATE:
-					LOG_TRACE << "Next operation: TERMINATE connection to " << identifier();
-					// Initiate graceful connection closure.
-					if ( netOp.timeoutID() >= 0 )
-						setTimeout( netOp.timeout(), netOp.timeoutID());
-					boost::system::error_code ignored_ec;
-					socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
-					cycle = false;
-					break;
-				}
-			} while ( cycle );
+			case NetworkOperation::TERMINATE:
+				LOG_TRACE << "Next operation: TERMINATE connection to " << identifier();
+				// Initiate graceful connection closure.
+				setTimeout( 0 );
+				boost::system::error_code ignored_ec;
+				socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
+				break;
+			}
 		}
 
 
 		/// Handle completion of a read operation.
 		void handleRead( const boost::system::error_code& e, std::size_t bytesTransferred )
 		{
+			setTimeout( 0 );
 			if ( !e )	{
 				LOG_TRACE << "Read " << bytesTransferred << " bytes from " << identifier();
 
@@ -147,6 +133,7 @@ namespace _SMERP {
 		/// Handle completion of a write operation.
 		void handleWrite( const boost::system::error_code& e )
 		{
+			setTimeout( 0 );
 			if ( !e )	{
 				nextOperation();
 			}
@@ -166,8 +153,8 @@ namespace _SMERP {
 		void handleTimeout( const boost::system::error_code& e )
 		{
 			if ( !e )	{
-				connectionHandler_->timeoutOccured( timeoutID_ );
-				LOG_DEBUG << "Timeout on  connection to " << identifier() << ", id " << timeoutID_;
+				connectionHandler_->timeoutOccured();
+				LOG_DEBUG << "Timeout on connection to " << identifier();
 				nextOperation();
 			}
 			else
@@ -177,21 +164,19 @@ namespace _SMERP {
 
 
 		/// Set / reset timeout timer
-		void setTimeout( unsigned long timeout, int ID )
+		void setTimeout( unsigned timeout )
 		{
 			if ( timeout == 0 )	{
-				timeoutID_ = -1;
+				LOG_TRACE << "Timeout for connection to " << identifier() << " reset";
+				timer_.cancel();
 			}
 			else	{
-				if ( timeoutID_ != ID )	{
-					timer_.cancel();
-					timeoutID_ = ID;
-					timer_.expires_from_now( boost::posix_time::seconds( timeout ));
-					timer_.async_wait( strand_.wrap( boost::bind( &connectionBase::handleTimeout,
-										      this->shared_from_this(),
-										      boost::asio::placeholders::error )));
-					LOG_TRACE << "Timeout for connection to " << identifier() << " set to " << timeout << "s";
-				}
+				timer_.cancel();
+				timer_.expires_from_now( boost::posix_time::seconds( timeout ));
+				timer_.async_wait( strand_.wrap( boost::bind( &connectionBase::handleTimeout,
+									      this->shared_from_this(),
+									      boost::asio::placeholders::error )));
+				LOG_TRACE << "Timeout for connection to " << identifier() << " set to " << timeout << "s";
 			}
 		}
 		// setTimeout function end

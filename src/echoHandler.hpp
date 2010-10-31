@@ -23,7 +23,7 @@ namespace _SMERP {
 		/// input has been consumed.
 		void* parseInput( const void *begin, std::size_t bytesTransferred );
 
-		void timeoutOccured( unsigned ID );
+		void timeoutOccured();
 
 		/// Handle a request and produce a reply.
 		NetworkOperation nextOperation();
@@ -37,12 +37,6 @@ namespace _SMERP {
 			FINISHING,
 			TIMEOUT,
 			TERMINATING
-		};
-
-		enum TimerType	{
-			TIMER_IDLE,
-			TIMER_READING,
-			TIMER_WRITING
 		};
 
 		State		state_;

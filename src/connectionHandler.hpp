@@ -15,7 +15,6 @@ namespace _SMERP {
 	{
 	public:
 		enum Operation	{
-			SET_TIMEOUT,
 			READ,
 			WRITE,
 			TERMINATE
@@ -25,28 +24,18 @@ namespace _SMERP {
 		Operation	operation_;
 		const void	*data_;
 		std::size_t	size_;
-		unsigned long	timeout_;
-		int		timeoutID_;
+		unsigned	timeout_;
 
 	public:
-		explicit NetworkOperation( Operation op )
-					{ operation_ = op, data_ = NULL; size_ = 0;
-					  timeout_ = 0; timeoutID_ = -1; }
-		explicit NetworkOperation( Operation op, const void *d, std::size_t s )
-					{ operation_ = op, data_ = d; size_ = s;
-					  timeout_ = 0; timeoutID_ = -1; }
-		explicit NetworkOperation( Operation op, unsigned long to, int ID )
-					{ operation_ = op, data_ = NULL; size_ = 0;
-					  timeout_ = to; timeoutID_ = ID; }
-		NetworkOperation( Operation op, const void *d, std::size_t s, unsigned long to, int ID )
-					{ operation_ = op, data_ = d; size_ = s;
-					  timeout_ = to; timeoutID_ = ID; }
+		NetworkOperation( Operation op, unsigned to = 0 )
+					{ operation_ = op, data_ = NULL; size_ = 0; timeout_ = to; }
+		NetworkOperation( Operation op, const void *d, std::size_t s, unsigned to = 0 )
+					{ operation_ = op, data_ = d; size_ = s; timeout_ = to; }
 
 		Operation operation()	{ return operation_; }
 		const void* data()	{ return data_; }
 		std::size_t size()	{ return size_; }
-		unsigned long timeout()	{ return timeout_; }
-		int timeoutID()		{ return timeoutID_; }
+		unsigned timeout()	{ return timeout_; }
 	};
 
 
@@ -71,7 +60,7 @@ namespace _SMERP {
 		virtual NetworkOperation nextOperation() = 0;
 
 		/// What should the network do next.
-		virtual void timeoutOccured( unsigned /* ID */ )	{ }
+		virtual void timeoutOccured()	{}
 
 		/// Set the remote peer. The connection is up now.
 		virtual void setPeer( const RemoteTCPendpoint& remote ) = 0;

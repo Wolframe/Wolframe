@@ -71,7 +71,7 @@ namespace _SMERP {
 		case ANSWERING:
 			buffer.clear();
 			state_ = READING;
-			return NetworkOperation( NetworkOperation::READ, 30, 1 );
+			return NetworkOperation( NetworkOperation::READ, 30 );
 
 		case FINISHING:	{
 			state_ = TERMINATING;
@@ -98,7 +98,7 @@ namespace _SMERP {
 	void* echoConnection::parseInput( const void *begin, std::size_t bytesTransferred )
 	{
 		char *s = (char *)begin;
-		if ( !strncmp( "QUIT", s, 4 ))
+		if ( !strncmp( "quit", s, 4 ))
 			state_ = FINISHING;
 		else	{
 			for ( std::size_t i = 0; i < bytesTransferred; i++ )	{
@@ -114,10 +114,10 @@ namespace _SMERP {
 		return( s );
 	}
 
-	void echoConnection::timeoutOccured( unsigned ID )
+	void echoConnection::timeoutOccured()
 	{
 		state_ = TIMEOUT;
-		LOG_TRACE << "Processor received timeout, id: " << ID;
+		LOG_TRACE << "Processor received timeout";
 	}
 
 
