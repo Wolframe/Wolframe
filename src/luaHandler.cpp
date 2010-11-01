@@ -76,7 +76,7 @@ namespace _SMERP {
 		case ANSWERING:
 			buffer.clear();
 			state_ = READING;
-			return NetworkOperation( NetworkOperation::READ, 30, 1 );
+			return NetworkOperation( NetworkOperation::READ, 30 );
 
 		case FINISHING:	{
 			state_ = TERMINATING;
