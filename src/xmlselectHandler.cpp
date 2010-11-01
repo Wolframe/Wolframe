@@ -6,6 +6,7 @@
 #include "textwolf.hpp"
 #include "logger.hpp"
 
+#include <vector>
 #include <string>
 #include <cstring>
 #include <boost/static_assert.hpp>
@@ -123,7 +124,210 @@ public:
    };
 };
 
+//iterator over a content that terminates with a defined character sequence
+template <class Iterator>
+class ProtocolContentIterator
+{
+private:
+   const char* endSequence;
+   const char* retSequence;
+   unsigned int state;
+   char next;
+   Iterator src;
+   
+public:
+   ProtocolContentIterator( const char* p_endSequence, const char* p_retSequence) :endSequence(p_endSequence),retSequence(p_retSequence),state(0),next(endSequence[0]) {};
+   
+   void set( const Iterator& p_src)                            {src=p_src;};
+   void skip()                                                 {src++;};                                
+   ProtocolContentIterator& operator++()                       {skip(); return *this;};
+   ProtocolContentIterator operator++(int)                     {ProtocolContentIterator tmp(*this); skip(); return tmp;};
+   char operator*()                                            {if (*src == next) {next = endSequence[++state]; if (next==0) return 0; else return retSequence[state-1];} else {state=0; return *src;}};
+   ProtocolContentIterator& operator=( const Iterator& p_src)  {src=p_src; return *this;};
+};
+
+//specialization of the content iterator with the termination sequence CRLF dot CRLF with the dot escaping any other line than a single dot
+struct TextContentIterator :public ProtocolContentIterator<InputBlock::iterator>
+{   
+   TextContentIterator() :ProtocolContentIterator<InputBlock::iterator>( "\r\n.\r\n", "\r\n \r\n") {}; 
+   TextContentIterator& operator=( const InputBlock::iterator& p_src)    {set(p_src); return *this;};
+};
+
+struct XPathExpression
+{
+public:
+   struct Error {};
+   
+   struct Element
+   {
+      const char* name;
+      unsigned int namesize;
+      enum Type
+      {
+         Tag,
+         Follow,
+         AttributeName,
+         AttributeValue,
+         Count
+      };
+      Type type;
+      
+      Element()                                                               :name(0),namesize(0),type(Count) {};
+      Element( Type p_type, const char* p_name=0, unsigned int p_namesize=0)  :name(p_name),namesize(p_namesize),type(p_type) {};
+      Element( const Element& o)                                              :name(o.name),namesize(o.namesize),type(o.type) {};
+   };
+private:
+   const char* input;
+   std::vector<Element> ar;
+   unsigned int pos;
+   bool valid;
+
+   void skipB()
+   {
+      const char* name = input+pos;
+      unsigned int ii;
+      for (ii=0; name[ii] != '\0' && name[ii]<=' '; ii++);
+      if (name[ii] == '\0') throw Error();
+      pos += ii;
+   };
+   void parseNumber( Element::Type type)
+   {
+      const char* name = input+pos;
+      unsigned int ii;
+      for (ii=0; name[ii] >= '0' && name[ii] <= '9'; ii++);
+      if (ii == 0) throw Error();
+      ar.push_back( Element( type, name, ii));
+      pos += ii;
+      skipB();
+   };
+   void parseName( Element::Type type)
+   {
+      const char* name = input+pos;
+      unsigned int ii;
+      for (ii=0; name[ii] != '/' && name[ii] != '[' && name[ii] != '@' && name[ii] != '=' && name[ii] != '\0'; ii++);
+      if (ii == 0) throw Error();
+      ar.push_back( Element( type, name, ii));
+      pos += ii;      
+      skipB();
+   };
+   void parseString( Element::Type type, char eb)
+   {
+      const char* name = input+pos;
+      unsigned int ii;
+      for (ii=0; name[ii] != eb && name[ii] != '\0'; ii++);
+      if (name[ii] == '\0') throw Error();
+      ar.push_back( Element( type, name, ii));
+      pos += ii+1;      
+      skipB();
+   };
+   void parseElement()
+   {
+      skipB();
+      if (input[pos] == '@')
+      {
+         pos++;
+         parseName( Element::AttributeName);
+         if (input[pos] == '=')
+         {
+            pos++;
+            if (input[pos] == '\'' || input[pos] == '\"') 
+            {
+               pos++;
+               parseString( Element::AttributeValue, input[pos-1]);
+            }
+            else
+            {
+               parseName( Element::AttributeValue);
+            }
+         }
+      }
+      else
+      {
+         parseNumber( Element::Count);
+      }
+      if (input[pos] != ']') throw Error();
+      pos++;
+      skipB();
+   };
+   void parse()
+   {
+      while (input[pos] != '\0')
+      {
+          if (input[pos] == '/')
+          {
+             pos++;
+             if (input[pos] == '/')
+             {
+                ar.push_back( Element::Follow);
+             }
+             else 
+             {
+                parseName( Element::Tag);
+             }
+          }
+          else if (input[pos] == '@')
+          {
+             parseName( Element::AttributeName);
+          }
+          else if (input[pos] == '[')
+          {
+             parseElement();
+          }
+      }
+   };
+public:
+   XPathExpression( const char* p_input)      :input(p_input),pos(0),valid(true)
+   {
+      try
+      {
+         parse();
+      }
+      catch (Error)
+      {
+         valid = false;
+      };
+   };
+   
+   int errorPos()
+   {
+      return (valid)?-1:(int)pos;
+   };
+
+   
+   struct iterator
+   {
+      XPathExpression* input;
+      Element cur;
+      unsigned int pos;
+      bool eof;
+      
+      iterator( XPathExpression* p_input)     :input(p_input),pos(0),eof(false) {};
+      iterator()                              :input(0),pos(0),eof(true) {};
+      iterator( const iterator& o)            :input(o.input),cur(o.cur),pos(o.pos),eof(o.eof) {};
+      iterator& operator=( const iterator& o) {input=o.input;cur=o.cur;pos=o.pos;eof=o.eof; return *this;}
+      
+      void skip()
+      {
+         if (pos < input->ar.size())
+         {
+            cur = input->ar[ pos++];
+         }
+         else
+         {
+            eof = true;
+         }
+      };                                
+      iterator& operator++()                  {skip(); return *this;};
+      iterator operator++(int)                {iterator tmp(*this); skip(); return tmp;};
+      Element& operator*()                    {return cur;};
+      Element* operator->()                   {return &cur;};
+   };
+   iterator begin()                           {iterator rt(this); rt.skip(); return rt;};
+   iterator end()                             {return iterator();};
+};
+
 }//anonymous namespace 
+
 
 
 using namespace _SMERP;
@@ -136,7 +340,7 @@ struct Connection::Private
    OutputBlock output;
    
    typedef tw::XMLPathSelectAutomaton<tw::charset::UTF8> Automaton;
-   typedef tw::XMLPathSelect<InputBlock::iterator,tw::charset::IsoLatin1,tw::charset::UTF8> Processor;   
+   typedef tw::XMLPathSelect<TextContentIterator,tw::charset::IsoLatin1,tw::charset::UTF8> Processor;   
 
    enum ElementType
    {
@@ -144,7 +348,7 @@ struct Connection::Private
    };
    enum State
    {
-      Init, Welcome, Processing, Error
+      Init, Welcome, Processing, Terminate
    };
    const char* error;
    State state;
@@ -152,7 +356,7 @@ struct Connection::Private
    Processor* proc;
    Processor::iterator itr;
    Processor::iterator end;
-   InputBlock::iterator src;
+   TextContentIterator src;
    
    Private() :input(MemBlockSize),output(MemBlockSize),error(0),state(Init),proc(0),itr(Processor::iterator(Processor::End())),end(Processor::iterator(Processor::End()))
    {
@@ -243,18 +447,68 @@ struct Connection::Private
          return Read;
       };
    };
+
+   NetworkOperation nextOperation()
+   {
+      std::string msg;
+      const char* errstr;
+      
+      switch( state)
+      {
+        case Init:
+           done();
+           state = Welcome;
+           msg = "OK expecting data\n";
+           return NetworkOperation( NetworkOperation::WRITE, msg.c_str(), msg.length());
+        
+        case Welcome:
+           state = Processing;
+           return NetworkOperation( NetworkOperation::READ, input->ptr, input->size);
+        
+        case Processing:
+        {
+           switch (get())
+           {
+                case Read:
+                   return NetworkOperation( NetworkOperation::READ, input->ptr, input->size);
+                  
+                case Write:
+                   return NetworkOperation( NetworkOperation::WRITE, output->ptr, output->size);
+                  
+                case WriteLast:
+                   state = Terminate;
+                   return NetworkOperation( NetworkOperation::WRITE, output->ptr, output->size);
+                  
+                case ReportError:
+                   state = Terminate;
+                   errstr = error?error:"unknown";
+                   LOG_TRACE << "Error processing xml: " << errstr;
+                   msg.append( "\r\n.\r\nERROR ");
+                   msg.append( errstr);
+                   done();
+                   return NetworkOperation( NetworkOperation::WRITE, msg.c_str(), msg.length());
+            }
+        }
+        case Terminate:
+            state = Init;          
+            return NetworkOperation( NetworkOperation::TERMINATE);
+        break;
+                  
+      }
+      return NetworkOperation( NetworkOperation::TERMINATE);
+   };
 };
 
-Connection::Connection( const LocalTCPendpoint& local )
+Connection::Connection( const LocalTCPendpoint& local)
 {
-   data = new Connection::Private();
+   data = new Private();
    LOG_TRACE << "Created connection handler for " << local.toString();
    data->state = Connection::Private::Init;
 }
 
-Connection::Connection( const LocalSSLendpoint& local )
+Connection::Connection( const LocalSSLendpoint& local)
 {
-   data = new Connection::Private();
+   data = new Private();
    LOG_TRACE << "Created connection handler (SSL) for " << local.toString();
    data->state = Connection::Private::Init;
 }
@@ -265,76 +519,34 @@ Connection::~Connection()
    delete data;
 }
 
-void Connection::setPeer( const RemoteTCPendpoint& remote )
+void Connection::setPeer( const RemoteTCPendpoint& remote)
 {
    LOG_TRACE << "Peer set to " << remote.toString();
 }
 
-void Connection::setPeer( const RemoteSSLendpoint& remote )
+void Connection::setPeer( const RemoteSSLendpoint& remote)
 {
    LOG_TRACE << "Peer set to " << remote.toString();
 }
 
-void* Connection::parseInput( const void *begin, std::size_t bytesTransferred )
+void* Connection::parseInput( const void *begin, std::size_t bytesTransferred)
 {
    data->input->filled = bytesTransferred;
    return (void*)(((char*)begin) + bytesTransferred);
 }
 
-/// Handle a request and produce a reply.
 NetworkOperation Connection::nextOperation()
 {
-  std::string msg;
-  switch( data->state)
-  {
-     case Connection::Private::Init:
-        data->done();
-        data->state = Connection::Private::Welcome;
-        msg = "OK expecting data\n";
-        return NetworkOperation( NetworkOperation::WRITE, msg.c_str(), msg.length());
-     
-     case Connection::Private::Welcome:
-        data->state = Connection::Private::Processing;
-        return NetworkOperation( NetworkOperation::READ, data->input->ptr, data->input->size);
-     
-     case Connection::Private::Processing:
-     {
-         switch (data->get())
-         {
-           case Private::Read:
-               return NetworkOperation( NetworkOperation::READ, data->input->ptr, data->input->size);
-              
-            case Private::Write:
-               return NetworkOperation( NetworkOperation::WRITE, data->output->ptr, data->output->size);
-               
-            case Private::WriteLast:
-               data->state = Connection::Private::Init;
-               return NetworkOperation( NetworkOperation::WRITE, data->output->ptr, data->output->size);
-               
-            case Private::Error:
-               data->state = Connection::Private::Error;
-               msg.append( "\r\n.\r\nERROR ");
-               msg.append( data->error?data->error:"unknown");
-               data->done();
-               return NetworkOperation( NetworkOperation::WRITE, msg.c_str(), msg.length());
-         }
-     }
-     case Connection::Private::Error:
-         //TODO handle error case
-     break;
-              
-  }
-  return NetworkOperation( NetworkOperation::TERMINATE );
+   return data->nextOperation();
 }
 
-
-connectionHandler* Server::newConnection( const LocalTCPendpoint& local )
+connectionHandler* Server::newConnection( const LocalTCPendpoint& local)
 {
-  return new Connection( local );
+   return new Connection( local);
 }
 
-connectionHandler* Server::newSSLconnection( const LocalSSLendpoint& local )
+connectionHandler* Server::newSSLconnection( const LocalSSLendpoint& local)
 {
-  return new Connection( local );
+   return new Connection( local);
 }
 
