@@ -118,34 +118,40 @@ SSLacceptor::SSLacceptor( boost::asio::io_service& IOservice,
 	}
 
 	if ( keyFile.empty() )	{
-		LOG_FATAL << "Empty SSL key filename";
+		LOG_FATAL << "SSL key filename is required";
 		exit( 1 );
 	}
 	else if ( SSLcontext_.use_private_key_file( keyFile, boost::asio::ssl::context::pem, ec ) != 0 )	{
 		LOG_FATAL << ec.message() << " loading SSL key file: " << keyFile;
 		exit( 1 );
 	}
-	//		SSLcontext_->use_tmp_dh_file( "dh4096.pem" );
+//		SSLcontext_->use_tmp_dh_file( "dh4096.pem" );
 	if ( verify )	{
-		SSLcontext_.set_verify_mode( boost::asio::ssl::context::verify_peer |
-					boost::asio::ssl::context::verify_fail_if_no_peer_cert );
-		if ( ! CAchainFile.empty() )
+		if ( ! CAchainFile.empty() )	{
 			if ( SSLcontext_.load_verify_file( CAchainFile, ec ) != 0 )	{
-			LOG_FATAL << ec.message() << " loading SSL CA chain file: " << CAchainFile;
-			exit( 1 );
+				LOG_FATAL << ec.message() << " loading SSL CA chain file: " << CAchainFile;
+				exit( 1 );
+			}
 		}
-		if ( ! CAdirectory.empty() )
+		if ( ! CAdirectory.empty() )	{
 			if ( SSLcontext_.add_verify_path( CAdirectory, ec ) != 0 )	{
-			LOG_FATAL << ec.message() << " setting CA directory: " << CAdirectory;
+				LOG_FATAL << ec.message() << " setting CA directory: " << CAdirectory;
+				exit( 1 );
+			}
+		}
+		if ( CAchainFile.empty() && CAdirectory.empty() )	{
+			LOG_FATAL << "Either a CA directory or a CA chain file is required";
 			exit( 1 );
 		}
+		SSLcontext_.set_verify_mode( boost::asio::ssl::context::verify_peer |
+					     boost::asio::ssl::context::verify_fail_if_no_peer_cert );
 		LOG_DEBUG << "SSL client certificate verification set to VERIFY";
 	}
 	else	{
 		SSLcontext_.set_verify_mode( boost::asio::ssl::context::verify_none );
 		LOG_DEBUG << "SSL client certificate verification set to NONE";
 	}
-LOG_DEBUG << "SSL host: " << host << " port: " << port;
+
 	// Open the acceptor(s) with the option to reuse the address (i.e. SO_REUSEADDR).
 	boost::asio::ip::tcp::resolver resolver( IOservice_ );
 	boost::asio::ip::tcp::resolver::query query( host, "");
