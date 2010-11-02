@@ -13,9 +13,11 @@
 namespace _SMERP {
 
 connection::connection( boost::asio::io_service& IOservice,
+			ConnectionList<connection_ptr>& connList,
 			connectionHandler* handler ) :
 	connectionBase< boost::asio::ip::tcp::socket >( IOservice, handler ),
-	socket_( IOservice )
+	socket_( IOservice ),
+	connList_( connList )
 {
 	LOG_TRACE << "New connection created";
 }
@@ -46,9 +48,11 @@ void connection::start()
 
 SSLconnection::SSLconnection( boost::asio::io_service& IOservice,
 			      boost::asio::ssl::context& SSLcontext,
+			      ConnectionList<SSLconnection_ptr>& connList,
 			      connectionHandler *handler ) :
 	connectionBase< ssl_socket >( IOservice, handler ),
-	SSLsocket_( IOservice, SSLcontext )
+	SSLsocket_( IOservice, SSLcontext ),
+	connList_( connList )
 {
 	LOG_TRACE << "New SSL connection created";
 }

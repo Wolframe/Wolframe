@@ -16,16 +16,34 @@
 
 namespace _SMERP {
 
-	template< typename ConnectionType >
+	template< typename T >
 	class ConnectionList
 	{
 	public:
-		void add( ConnectionType& conn );
-		void remove( ConnectionType& conn );
+		void push( T conn )
+		{
+			connList_.push_back( conn );
+		}
+
+		void remove( T conn )
+		{
+			connList_.remove( conn );
+		}
+
+		T pop()
+		{
+			T conn = connList_.front();
+			connList_.pop_front();
+			return conn;
+		}
+
 	private:
-		std::list< ConnectionType& >	connList_;
+		std::list< T >	connList_;
 	};
 
+
+	class connection;
+	typedef boost::shared_ptr<connection> connection_ptr;
 
 	/// Represents a single connection from a client.
 	class connection : public connectionBase< boost::asio::ip::tcp::socket >
@@ -33,6 +51,7 @@ namespace _SMERP {
 	public:
 		/// Construct a connection with the given io_service.
 		explicit connection( boost::asio::io_service& IOservice,
+				     ConnectionList<connection_ptr>& connList,
 				     connectionHandler *handler );
 
 		~connection();
@@ -45,13 +64,18 @@ namespace _SMERP {
 
 	private:
 		/// Socket for the connection.
-		boost::asio::ip::tcp::socket socket_;
-	};
+		boost::asio::ip::tcp::socket	socket_;
 
-	typedef boost::shared_ptr<connection> connection_ptr;
+		/// List of connections to which it belongs
+		ConnectionList<connection_ptr>&	connList_;
+	};
 
 
 #ifdef WITH_SSL
+
+	class SSLconnection;
+	typedef boost::shared_ptr<SSLconnection> SSLconnection_ptr;
+
 	typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket>	ssl_socket;
 
 	/// Represents a single connection from a client.
@@ -61,6 +85,7 @@ namespace _SMERP {
 		/// Construct a connection with the given io_service and SSL conetext.
 		explicit SSLconnection( boost::asio::io_service& IOservice,
 					boost::asio::ssl::context& SSLcontext,
+					ConnectionList<SSLconnection_ptr>& connList,
 					connectionHandler *handler );
 
 		~SSLconnection();
@@ -76,10 +101,12 @@ namespace _SMERP {
 		void handleHandshake( const boost::system::error_code& error );
 
 		/// Socket for the SSL connection.
-		ssl_socket	SSLsocket_;
+		ssl_socket				SSLsocket_;
+
+		/// List of connections to which it belongs
+		ConnectionList<SSLconnection_ptr>&	connList_;
 	};
 
-	typedef boost::shared_ptr<SSLconnection> SSLconnection_ptr;
 #endif // WITH_SSL
 
 } // namespace _SMERP
