@@ -29,7 +29,7 @@ acceptor::acceptor( boost::asio::io_service& IOservice,
 	endpoint.port( port );
 
 	connectionHandler *handler = srvHandler_.newConnection( LocalTCPendpoint( host, port ));
-	newConnection_ = connection_ptr( new connection( IOservice_, handler ));
+	newConnection_ = connection_ptr( new connection( IOservice_, connList_, handler ));
 
 	acceptor_.open( endpoint.protocol() );
 	acceptor_.set_option( boost::asio::ip::tcp::acceptor::reuse_address( true ));
@@ -57,8 +57,8 @@ void acceptor::handleAccept( const boost::system::error_code& e )
 		LOG_DEBUG << "Received new connection on " << identifier_;
 
 		connectionHandler *handler = srvHandler_.newConnection( LocalTCPendpoint( acceptor_.local_endpoint().address().to_string(),
-										       acceptor_.local_endpoint().port() ));
-		newConnection_.reset( new connection( IOservice_, handler ));
+											  acceptor_.local_endpoint().port() ));
+		newConnection_.reset( new connection( IOservice_, connList_, handler ));
 		acceptor_.async_accept( newConnection_->socket(),
 					strand_.wrap( boost::bind( &acceptor::handleAccept,
 								   this,
@@ -85,6 +85,9 @@ void acceptor::handleStop()
 	LOG_DEBUG << "Closed acceptor for " << identifier_;
 	// at this point no more connections are accepted
 	// Signal the list of processors to terminate
+	connection_ptr conn;
+	while (( conn = connList_.pop()) != NULL )
+		conn->signal();
 }
 
 
@@ -159,7 +162,7 @@ SSLacceptor::SSLacceptor( boost::asio::io_service& IOservice,
 	endpoint.port( port );
 
 	connectionHandler *handler = srvHandler_.newSSLconnection( LocalSSLendpoint( host, port ));
-	newConnection_ = SSLconnection_ptr( new SSLconnection( IOservice_, SSLcontext_, handler ));
+	newConnection_ = SSLconnection_ptr( new SSLconnection( IOservice_, SSLcontext_, connList_, handler ));
 
 	acceptor_.open( endpoint.protocol() );
 	acceptor_.set_option( boost::asio::ip::tcp::acceptor::reuse_address( true ));
@@ -188,7 +191,7 @@ void SSLacceptor::handleAccept( const boost::system::error_code& e )
 
 		connectionHandler *handler = srvHandler_.newSSLconnection( LocalSSLendpoint( acceptor_.local_endpoint().address().to_string(),
 											  acceptor_.local_endpoint().port() ));
-		newConnection_.reset( new SSLconnection( IOservice_, SSLcontext_, handler ));
+		newConnection_.reset( new SSLconnection( IOservice_, SSLcontext_, connList_, handler ));
 		acceptor_.async_accept( newConnection_->socket().lowest_layer(),
 					strand_.wrap( boost::bind( &SSLacceptor::handleAccept,
 								   this,

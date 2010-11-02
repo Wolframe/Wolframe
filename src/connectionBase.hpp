@@ -48,6 +48,13 @@ namespace _SMERP {
 		/// Start the first asynchronous operation for the connection.
 		virtual void start() = 0;
 
+		/// Dispatch a signal for the processor
+		void signal()
+		{
+//			strand_.dispatch( &connectionBase::handleSignal );
+			LOG_TRACE << "Handler for connection to " << identifier() << " signalled";
+		}
+
 		/// Set the connection identifier (i.e. remote endpoint).
 		void identifier( const std::string& name )	{ identifier_ = name; }
 
@@ -181,13 +188,17 @@ namespace _SMERP {
 		}
 		// setTimeout function end
 
-//		/// Send a signal to the processor
-//		void signalHandler()
-//		{
-//			strand_.dispatch( connectionHandler_->signalOccured());
-//			LOG_TRACE << "Handler for connection to " << identifier() << " signalled";
-//		}
-//		// signalHandler function end
+
+		/// Handle a signal from above
+		void handleSignal()
+		{
+			LOG_TRACE << "Signal received for connection to " << identifier();
+			connectionHandler_->signalOccured();
+
+			nextOperation();
+		}
+		// handleSignal function end
+
 	};
 
 } // namespace _SMERP
