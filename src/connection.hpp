@@ -32,6 +32,8 @@ namespace _SMERP {
 
 		T pop()
 		{
+			if ( connList_.empty())
+				return T();
 			T conn = connList_.front();
 			connList_.pop_front();
 			return conn;
