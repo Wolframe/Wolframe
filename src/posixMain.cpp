@@ -207,8 +207,8 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		LOG_NOTICE << "Starting server";
 
 		// Run server in background thread(s).
-		_SMERP::luaServer	lua;
-		_SMERP::server s( config.address, config.SSLaddress, lua, config.threads );
+		_SMERP::echoServer	echo;
+		_SMERP::server s( config.address, config.SSLaddress, echo, config.threads );
 		boost::thread t( boost::bind( &_SMERP::server::run, &s ));
 
 		// Restore previous signals.
