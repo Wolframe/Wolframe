@@ -3,7 +3,6 @@ Prerequisites
 
 - boost 1.41.0 or later
 - optionally (WITH_SSL) openssl 0.9.8 or later
-- optionally (WITH_LUA) lua 5.1.4 or later
 
 Boost
 -----
@@ -34,14 +33,7 @@ set BOOST_DIR to C:\TEMP\boost-1_44_0
 Compile and install openssl
 ---------------------------
 
-Easiest ist to get the native Windows version from
+Easiest ist to get the native Windows binary version from
 
-Compile and install lua
------------------------
+http://www.slproweb.com/products/Win32OpenSSL.html
 
-Get the sources from http://www.lua.org.
-
-Depending on the age of your Windows SDK, Visual Studio you
-may have to set the variable PLATFORM_SDK_DIR in etc\luavs.bat.
-
-Execute in a "Visual Studio Prompt" the "etc\luavs.bat" script.

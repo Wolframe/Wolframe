@@ -17,10 +17,3 @@ set BOOST_DIR to /somewhere/boost-1_44_0
 
 Compile and install openssl
 ---------------------------
-
-Compile and install lua
------------------------
-
-make sure you have the readline-devel package installed, then execute:
-
-make linux

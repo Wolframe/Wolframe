@@ -6,17 +6,6 @@ xxxx. SSL must require certificate from peer if verify is on
 
 ABa:
 
-1. finish LUA processor
-   - compose tables as parameters (like SSL, connection peer data)
-   - pass log level to LUA module (for debug messages)
-   - solve the default folder problem in services (echo.lua
-     is currently searched in C:\WINDOWS\SYSTEM32)
-   - configuration passing?
-
 PF:
 
-1. TA processor
-
-?. backport the module loader from Wolfbones/TextWolf,
-   especially interesting for servers and handler in funny languages
 
