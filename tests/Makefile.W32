@@ -29,9 +29,7 @@ all: $(OBJS) $(CPP_BINS)
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 versionTest.exe: versionTest.obj
-logTest.exe: logTest.obj \
-	$(TOPDIR)\3rdparty\src\boost\log\libboost_log$(BOOST_LIBRARY_TAG).lib \
-	$(TOPDIR)\3rdparty\src\boost\log\libboost_log_setup$(BOOST_LIBRARY_TAG).lib
+logTest.exe: logTest.obj
 
 local_all:
 
