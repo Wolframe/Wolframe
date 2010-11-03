@@ -15,11 +15,7 @@
 #include "ErrorCodes.hpp"
 #include "logger.hpp"
 
-#ifdef WITH_LUA
-#include "luaHandler.hpp"
-#else
 #include "echoHandler.hpp"
-#endif
 
 #include <libintl.h>
 #include <locale.h>
@@ -211,15 +207,9 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		LOG_NOTICE << "Starting server";
 
 		// Run server in background thread(s).
-#ifndef WITH_LUA
-		_SMERP::echoServer	echo;
-		_SMERP::server s( config.address, config.SSLaddress, echo, config.threads );
-#else
 		_SMERP::luaServer	lua;
 		_SMERP::server s( config.address, config.SSLaddress, lua, config.threads );
-#endif
 		boost::thread t( boost::bind( &_SMERP::server::run, &s ));
-
 
 		// Restore previous signals.
 		pthread_sigmask( SIG_SETMASK, &old_mask, 0 );

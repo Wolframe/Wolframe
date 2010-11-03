@@ -3,7 +3,6 @@
 # provides:
 # - BOOST_DIR
 # - OPENSSL_DIR
-# - LUA_DIR
 
 # please customize
 
@@ -13,19 +12,10 @@
 # base dir where boost is installed
 
 BOOST_DIR=/usr
-#BOOST_DIR=/home/baumann/boost
+#BOOST_DIR=/home/usre/boost
 
 # OpenSSL (http://www.slproweb.com/products/Win32OpenSSL.html)
 ##############################################################
 
 OPENSSL_DIR=/usr
-#OPENSSL_DIR=/home/baumann/openssl
-
-# LUA sources (for LUA handler)
-# build it from sources with:
-#  cd lua-5.1.4
-#  etc\luavc.bat
-###############################
-
-LUA_DIR = /usr
-#LUA_DIR = /home/baumann/lua-5.1.4
+#OPENSSL_DIR=/home/user/openssl

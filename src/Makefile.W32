@@ -38,27 +38,6 @@ INCLUDE_LIBS = \
 
 !ENDIF
 
-# lua
-
-!IFDEF WITH_LUA
-
-OBJS = \
-	$(OBJS) luaHandler.obj luahelpers.obj
-
-INCLUDE_CPPFLAGS = \
-	$(INCLUDE_CPPFLAGS) /DWITH_LUA
-
-INCLUDE_DIRS = \
-	$(INCLUDE_DIRS) /I"$(LUA_DIR)\src"
-
-INCLUDE_LDFLAGS = \
-	$(INCLUDE_LDFLAGS) /LIBPATH:"$(LUA_DIR)\src"
-
-INCLUDE_LIBS = \
-	$(INCLUDE_LIBS) "$(LUA_DIR)\src\lua51.lib"
-
-!ENDIF
-
 CPP_BINS = \
 	smerpd.exe
 
@@ -85,17 +64,11 @@ OBJS = \
 	echoHandler.obj \
 	winMain.obj
 
-!IFDEF WITH_LUA
-
-OBJS = \
-	$(OBJS) luaHandler.obj luahelpers.obj
-!ENDIF
-
 all: $(OBJS) $(CPP_BINS)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-smerpd.exe: smerpd.obj $(OBJS) $(BOOST_LOG_LIBS)
+smerpd.exe: smerpd.obj $(OBJS)
 
 local_all:
 

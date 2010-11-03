@@ -16,11 +16,7 @@
 #include "ErrorCodes.hpp"
 #include "logger.hpp"
 
-#ifdef WITH_LUA
-#include "luaHandler.hpp"
-#else
 #include "echoHandler.hpp"
-#endif
 
 #if !defined(_WIN32)
 #error "This is the WIN32 main !"
@@ -205,13 +201,8 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 		LOG_NOTICE << "Starting service";
 
 // run server in background thread(s).
-#ifndef WITH_LUA
 		_SMERP::echoServer	echo;
 		_SMERP::server s( config.address, config.SSLaddress, echo, config.threads );
-#else
-		_SMERP::luaServer	lua;
-		_SMERP::server s( config.address, config.SSLaddress, lua, config.threads );
-#endif
 		boost::thread t( boost::bind( &_SMERP::server::run, &s ));
 
 // we are up and running now (hopefully), signal this to the SCM
@@ -363,16 +354,8 @@ int _SMERP_winMain( int argc, char* argv[] )
 		logBack.setLevel( config.stderrLogLevel );
 		LOG_NOTICE << "Starting server";
 
-#ifndef WITH_LUA
 		_SMERP::echoServer	echo;
 		_SMERP::server s( config.address, config.SSLaddress, echo, config.threads );
-#else
-		_SMERP::luaServer	lua;
-		_SMERP::server s( config.address, config.SSLaddress, lua, config.threads );
-#endif
-
-
-
 
 		// Set console control handler to allow server to be stopped.
 		consoleCtrlFunction = boost::bind(&_SMERP::server::stop, &s);

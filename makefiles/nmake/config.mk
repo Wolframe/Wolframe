@@ -4,7 +4,6 @@
 # - PLATFORM_SDK_DIR
 # - BOOST_DIR
 # - OPENSSL_DIR
-# - LUA_DIR
 
 # please customize
 
@@ -45,11 +44,3 @@ BOOST_MT=-mt
 OPENSSL_DIR=C:\Programme\OpenSSL-1.0.0a
 #OPENSSL_DIR=C:\Programme\OpenSSL
 #OPENSSL_DIR=D:\Programme\OpenSSL
-
-# LUA sources (for LUA handler)
-# build it from sources with:
-#  cd lua-5.1.4
-#  etc\luavc.bat
-###############################
-
-LUA_DIR = ..\..\lua-5.1.4
