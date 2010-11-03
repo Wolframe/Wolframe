@@ -6,13 +6,7 @@ xxxx. SSL must require certificate from peer if verify is on
 
 ABa:
 
-1. synchronize boost-log with 1.0 version in SVN on sourceforge,
-   provide feedback to the author:
-   - gcc flags and related bugs:
-     - -Wshadow
-   - the process id should be convertible to an int for printing
-
-2. finish LUA processor
+1. finish LUA processor
    - compose tables as parameters (like SSL, connection peer data)
    - pass log level to LUA module (for debug messages)
    - solve the default folder problem in services (echo.lua
