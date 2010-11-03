@@ -38,28 +38,6 @@ INCLUDE_LIBS = \
 
 !ENDIF
 
-# boost-log
-
-!IFNDEF WITH_BOOST_LOG
-
-INCLUDE_CPPFLAGS = \
-	$(INCLUDE_CPPFLAGS) /DFAKE_LOGGER
-
-!ELSE
-
-INCLUDE_LDFLAGS = \
-	$(INCLUDE_LDFLAGS) /LIBPATH:$(TOPDIR)\3rdparty\src\boost\log
-
-INCLUDE_DIRS = \
-	$(INCLUDE_DIRS)	/I$(TOPDIR)\3rdparty\include
-
-INCLUDE_LIBS = \
-	$(INCLUDE_LIBS) \
-	$(TOPDIR)\3rdparty\src\boost\log\libboost_log$(BOOST_LIBRARY_TAG).lib \
-	$(TOPDIR)\3rdparty\src\boost\log\libboost_log_setup$(BOOST_LIBRARY_TAG).lib
-
-!ENDIF
-
 # lua
 
 !IFDEF WITH_LUA

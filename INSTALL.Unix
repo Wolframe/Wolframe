@@ -2,7 +2,6 @@ Prerequisites
 -------------
 
 - boost 1.41.0 or later
-  - optionally (WITH_BOOST_LOG) boost 1.42 or later
 - optionally (WITH_SSL) openssl 0.9.8 or later
 - optionally (WITH_LUA) lua 5.1.4 or later
 

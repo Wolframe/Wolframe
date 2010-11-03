@@ -181,11 +181,8 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 		_SMERP::ApplicationConfiguration config( cmdLineCfg, cfgFileCfg );
 
 // create the final logger based on the configuration
-#ifndef FAKE_LOGGER
-		_SMERP::Logger::initialize( config );
-#else
+		//_SMERP::Logger::initialize( config );
 		logBack.setLevel( config.stderrLogLevel );
-#endif
 
 // register the event callback where we get called by Windows and the SCM
 		serviceStatusHandle = RegisterServiceCtrlHandler( config.serviceName.c_str( ), serviceCtrlFunction );
@@ -253,9 +250,8 @@ WAIT_FOR_STOP_EVENT:
 }
 
 
-#ifdef FAKE_LOGGER
 _SMERP::LogBackend	logBack;
-#endif
+
 int _SMERP_winMain( int argc, char* argv[] )
 {
 	try	{
@@ -351,11 +347,8 @@ int _SMERP_winMain( int argc, char* argv[] )
 					// not called as service, continue as console application
 					config.foreground = true;
 				} else {
-#ifndef FAKE_LOGGER
-					_SMERP::Logger::initialize( config );
-#else
+					//_SMERP::Logger::initialize( config );
 					logBack.setLevel( config.stderrLogLevel );
-#endif
 					LOG_FATAL << "Unable to dispatch service control dispatcher";
 					return _SMERP::ErrorCodes::FAILURE;
 				}
@@ -366,11 +359,8 @@ int _SMERP_winMain( int argc, char* argv[] )
 		}
 
 		// Create the final logger based on the configuration
-#ifndef FAKE_LOGGER
-		_SMERP::Logger::initialize( config );
-#else
+		//_SMERP::Logger::initialize( config );
 		logBack.setLevel( config.stderrLogLevel );
-#endif
 		LOG_NOTICE << "Starting server";
 
 #ifndef WITH_LUA

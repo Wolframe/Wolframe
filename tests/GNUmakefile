@@ -20,42 +20,22 @@ INCLUDE_LIBS = \
 	-lboost_filesystem -lboost_system -lboost_thread$(BOOST_LIBRARY_TAG) \
 	$(GTEST_LIBS)
 
-# boost-log
-
-ifdef WITH_BOOST_LOG
-
-INCLUDE_LDFLAGS += \
-	-L$(TOPDIR)/3rdparty/src/boost/log
-
-INCLUDE_DIRS += \
-	-I$(TOPDIR)/3rdparty/include
-
-INCLUDE_LIBS += \
-	-lboost_log -lboost_log_setup
-
-endif
-
 TEST_OBJS = \
 	$(TOPDIR)/src/version.o
 
 TEST_CPP_BINS = \
 	versionTest$(EXE) \
-	threadLeakTest$(EXE)
+	threadLeakTest$(EXE) \
+	logTest$(EXE)
 
 ifdef WITH_GTEST
 TEST_CPP_BINS += \
 	version-gTest$(EXE)
 endif
 
-ifdef WITH_BOOST_LOG
 TEST_CPP_BINS += logTest$(EXE)
-endif
 
 include $(TOPDIR)/makefiles/gmake/sub.mk
-
-logTest$(EXE): logTest.o \
-	$(TOPDIR)/3rdparty/src/boost/log/libboost_log.a \
-	$(TOPDIR)/3rdparty/src/boost/log/libboost_log_setup.a
 
 local_all:
 
@@ -74,9 +54,6 @@ ifdef WITH_GTEST
 	@LD_LIBRARY_PATH=$(BOOST_DIR)/lib ./version-gTest
 	@echo
 endif
-ifdef WITH_BOOST_LOG
 	@echo "Testing boost log..."
 	@LD_LIBRARY_PATH=$(BOOST_DIR)/lib ./logTest
 	@echo
-endif
-

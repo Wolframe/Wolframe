@@ -8,44 +8,6 @@
 #include "logLevel.hpp"
 #include "appConfig.hpp"
 
-#ifndef FAKE_LOGGER
-
-#include <string>
-
-#include <boost/log/common.hpp>
-
-namespace src = boost::log::sources;
-
-namespace _SMERP {
-
-	class Logger {
-	public:
-		static void initialize( const ApplicationConfiguration& config );
-	};
-
-	// small compromise in leaking internal implementation of the logger to the
-	// outside world. sadly boost log is a little bit intrusive because of the
-	// macros you have to use..
-	extern src::severity_logger< _SMERP::LogLevel::Level > logger;
-
-} // namespace _SMERP
-
-// shortcut macros
-#define LOG_DATA	BOOST_LOG_SEV( _SMERP::logger, _SMERP::LogLevel::LOGLEVEL_DATA )
-#define LOG_TRACE	BOOST_LOG_SEV( _SMERP::logger, _SMERP::LogLevel::LOGLEVEL_TRACE )
-#define LOG_DEBUG	BOOST_LOG_SEV( _SMERP::logger, _SMERP::LogLevel::LOGLEVEL_DEBUG )
-#define LOG_INFO	BOOST_LOG_SEV( _SMERP::logger, _SMERP::LogLevel::LOGLEVEL_INFO )
-#define LOG_NOTICE	BOOST_LOG_SEV( _SMERP::logger, _SMERP::LogLevel::LOGLEVEL_NOTICE )
-#define LOG_WARNING	BOOST_LOG_SEV( _SMERP::logger, _SMERP::LogLevel::LOGLEVEL_WARNING )
-#define LOG_ERROR	BOOST_LOG_SEV( _SMERP::logger, _SMERP::LogLevel::LOGLEVEL_ERROR )
-#define LOG_SEVERE	BOOST_LOG_SEV( _SMERP::logger, _SMERP::LogLevel::LOGLEVEL_SEVERE )
-#define LOG_CRITICAL	BOOST_LOG_SEV( _SMERP::logger, _SMERP::LogLevel::LOGLEVEL_CRITICAL )
-#define LOG_ALERT	BOOST_LOG_SEV( _SMERP::logger, _SMERP::LogLevel::LOGLEVEL_ALERT )
-#define LOG_FATAL	BOOST_LOG_SEV( _SMERP::logger, _SMERP::LogLevel::LOGLEVEL_FATAL )
-
-
-#else // FAKE_LOGGER
-
 #include <ostream>
 
 namespace _SMERP {
@@ -104,7 +66,5 @@ extern _SMERP::LogBackend	logBack;
 #define LOG_CRITICAL	_SMERP::Logger( logBack ).Get( _SMERP::LogLevel::LOGLEVEL_CRITICAL )
 #define LOG_ALERT	_SMERP::Logger( logBack ).Get( _SMERP::LogLevel::LOGLEVEL_ALERT )
 #define LOG_FATAL	_SMERP::Logger( logBack ).Get( _SMERP::LogLevel::LOGLEVEL_FATAL )
-
-#endif // FAKE_LOGGER
 
 #endif // _LOGGER_HPP_INCLUDED

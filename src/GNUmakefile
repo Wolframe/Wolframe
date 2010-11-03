@@ -30,25 +30,6 @@ INCLUDE_LIBS += \
 
 endif
 
-# boost-log
-
-ifndef WITH_BOOST_LOG
-
-INCLUDE_CPPFLAGS += -DFAKE_LOGGER
-
-else
-
-INCLUDE_LDFLAGS += \
-	-L$(TOPDIR)/3rdparty/src/boost/log
-
-INCLUDE_DIRS += \
-	-I$(TOPDIR)/3rdparty/include
-
-INCLUDE_LIBS += \
-	-lboost_log -lboost_log_setup
-
-endif
-
 CPP_BINS = \
 	smerpd$(EXE)
 

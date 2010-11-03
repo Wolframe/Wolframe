@@ -48,11 +48,7 @@ static const char *DEFAULT_MAIN_CONFIG = "/etc/smerpd.conf";
 static const char *DEFAULT_USER_CONFIG = "~/smerpd.conf";
 static const char *DEFAULT_LOCAL_CONFIG = "./smerpd.conf";
 
-
-#ifdef FAKE_LOGGER
 _SMERP::LogBackend	logBack;
-#endif
-
 
 int _SMERP_posixMain( int argc, char* argv[] )
 {
@@ -210,11 +206,8 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		pthread_sigmask( SIG_BLOCK, &new_mask, &old_mask );
 
 		// Create the final logger based on the configuration
-#ifndef FAKE_LOGGER
-		_SMERP::Logger::initialize( config );
-#else
+		//_SMERP::Logger::initialize( config );
 		logBack.setLevel( config.stderrLogLevel );
-#endif
 		LOG_NOTICE << "Starting server";
 
 		// Run server in background thread(s).
