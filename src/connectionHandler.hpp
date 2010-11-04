@@ -22,7 +22,7 @@ namespace _SMERP {
 
 	private:
 		Operation	operation_;
-		const void	*data_;
+		const void*	data_;
 		std::size_t	size_;
 		unsigned	timeout_;
 
@@ -31,6 +31,7 @@ namespace _SMERP {
 					{ operation_ = op, data_ = NULL; size_ = 0; timeout_ = to; }
 		NetworkOperation( Operation op, const void *d, std::size_t s, unsigned to = 0 )
 					{ operation_ = op, data_ = d; size_ = s; timeout_ = to; }
+
 
 		Operation operation()	{ return operation_; }
 		const void* data()	{ return data_; }

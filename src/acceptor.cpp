@@ -210,6 +210,11 @@ void SSLacceptor::handleStop()
 {
 	acceptor_.close();
 	LOG_DEBUG << "Closed acceptor for " << identifier_;
+	// at this point no more connections are accepted
+	// Signal the list of processors to terminate
+	SSLconnection_ptr conn;
+	while (( conn = connList_.pop()) != NULL )
+		conn->signal();
 }
 
 #endif // WITH_SSL

@@ -48,10 +48,15 @@ namespace _SMERP {
 		/// Start the first asynchronous operation for the connection.
 		virtual void start() = 0;
 
+		/// Unregister the connection from the list of active connections
+		virtual void unregister() = 0;
+
 		/// Dispatch a signal for the processor
 		void signal()
 		{
-//			strand_.dispatch( &connectionBase::handleSignal );
+			LOG_TRACE << "Signalling handler for connection to " << identifier();
+			strand_.dispatch( boost::bind( &connectionBase::handleSignal,
+						       this->shared_from_this() ));
 			LOG_TRACE << "Handler for connection to " << identifier() << " signalled";
 		}
 
@@ -92,11 +97,16 @@ namespace _SMERP {
 										     this->shared_from_this(),
 										     boost::asio::placeholders::error,
 										     boost::asio::placeholders::bytes_transferred )));
-
 				break;
 
 			case NetworkOperation::WRITE:
 				LOG_TRACE << "Next operation: WRITE to " << identifier();
+				if ( netOp.data() == NULL )	{
+					;
+				}
+				if ( netOp.size() == 0 )	{
+					;
+				}
 				if ( netOp.timeout() > 0 )
 					setTimeout( netOp.timeout());
 				boost::asio::async_write( socket(),
@@ -129,10 +139,6 @@ namespace _SMERP {
 			}
 			else
 				LOG_TRACE << "Read error: " << e.message();
-			// If an error occurs then no new asynchronous operations are started. This
-			// means that all shared_ptr references to the connection object will
-			// disappear and the object will be destroyed automatically after this
-			// handler returns. The connection class's destructor closes the socket.
 		}
 		// handleRead function end
 
@@ -146,14 +152,13 @@ namespace _SMERP {
 			}
 			else
 				LOG_TRACE << "Write error: " << e.message();
-
-			// No new asynchronous operations are started. This means that all shared_ptr
-			// references to the connection object will disappear and the object will be
-			// destroyed automatically after this handler returns. The connection class's
-			// destructor closes the socket.
 		}
 		// handleWrite function end
 
+		// If an error occurs then no new asynchronous operations are started. This
+		// means that all shared_ptr references to the connection object will
+		// disappear and the object will be destroyed automatically after this
+		// handler returns. The connection class's destructor closes the socket.
 
 
 		/// Handle completion of a timer operation.

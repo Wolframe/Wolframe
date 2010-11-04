@@ -36,11 +36,16 @@ void connection::start()
 	identifier( std::string( socket().remote_endpoint().address().to_string())
 		    + ":" + boost::lexical_cast<std::string>( socket().remote_endpoint().port() ));
 	LOG_TRACE << "Starting connection to " << identifier();
+	connList_.push( boost::static_pointer_cast<connection>( shared_from_this()));
 
 	connectionHandler_->setPeer( RemoteTCPendpoint( socket().remote_endpoint().address().to_string(),
 							socket().remote_endpoint().port()));
-
 	nextOperation();
+}
+
+void connection::unregister()
+{
+	connList_.remove( boost::static_pointer_cast<connection>( shared_from_this()) );
 }
 
 
@@ -96,6 +101,8 @@ void SSLconnection::handleHandshake( const boost::system::error_code& e )
 		if ( peerCert )
 			res = X509_NAME_get_text_by_NID( X509_get_subject_name( peerCert ),
 							 NID_commonName, buf, 2047 );
+		connList_.push( boost::static_pointer_cast<SSLconnection>( shared_from_this()) );
+
 		if ( res != -1 )
 			connectionHandler_->setPeer( RemoteSSLendpoint( SSLsocket_.lowest_layer().remote_endpoint().address().to_string(),
 									SSLsocket_.lowest_layer().remote_endpoint().port(),
@@ -111,6 +118,11 @@ void SSLconnection::handleHandshake( const boost::system::error_code& e )
 		boost::system::error_code ignored_ec;
 		socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
 	}
+}
+
+void SSLconnection::unregister()
+{
+	connList_.remove( boost::static_pointer_cast<SSLconnection>( shared_from_this()) );
 }
 
 #endif // WITH_SSL

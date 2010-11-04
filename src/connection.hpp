@@ -64,6 +64,9 @@ namespace _SMERP {
 		/// Start the first asynchronous operation for the connection.
 		void start();
 
+		/// Unregister the connection from the list of active connections
+		void unregister();
+
 	private:
 		/// Socket for the connection.
 		boost::asio::ip::tcp::socket	socket_;
@@ -97,6 +100,9 @@ namespace _SMERP {
 
 		/// Start the first asynchronous operation for the connection.
 		void start();
+
+		/// Unregister the connection from the list of active connections
+		void unregister();
 
 	private:
 		/// Handle the SSL handshake

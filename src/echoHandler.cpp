@@ -52,8 +52,8 @@ namespace _SMERP {
 
 		case HELLO:
 			state_ = ANSWERING;
-			if ( buffer.empty() )
-				return NetworkOperation( NetworkOperation::WRITE, buffer.c_str(), buffer.length() );
+			if ( buffer_.empty() )
+				return NetworkOperation( NetworkOperation::WRITE, buffer_.c_str(), buffer_.length() );
 			else	{
 				const char *msg = "BUFFER NOT EMPTY!\n";
 				return NetworkOperation( NetworkOperation::WRITE, msg, strlen( msg ));
@@ -61,15 +61,15 @@ namespace _SMERP {
 
 		case READING:
 			state_ = ANSWERING;
-			if ( ! buffer.empty() )
-				return NetworkOperation( NetworkOperation::WRITE, buffer.c_str(), buffer.length() );
+			if ( ! buffer_.empty() )
+				return NetworkOperation( NetworkOperation::WRITE, buffer_.c_str(), buffer_.length() );
 			else	{
 				const char *msg = "EMPTY BUFFER !\n";
 				return NetworkOperation( NetworkOperation::WRITE, msg, strlen( msg ));
 			}
 
 		case ANSWERING:
-			buffer.clear();
+			buffer_.clear();
 			state_ = READING;
 			return NetworkOperation( NetworkOperation::READ, 30 );
 
@@ -85,8 +85,13 @@ namespace _SMERP {
 			return NetworkOperation( NetworkOperation::WRITE, msg, strlen( msg ));
 		}
 
+		case SIGNALLED:	{
+			state_ = TERMINATING;
+			const char *msg = "Server is shutting down. :P\n";
+			return NetworkOperation( NetworkOperation::WRITE, msg, strlen( msg ));
+		}
+
 		case TERMINATING:
-			buffer.clear();
 			return NetworkOperation( NetworkOperation::TERMINATE );
 		}
 		return NetworkOperation( NetworkOperation::TERMINATE );
@@ -103,9 +108,9 @@ namespace _SMERP {
 		else	{
 			for ( std::size_t i = 0; i < bytesTransferred; i++ )	{
 				if ( *s != '\n' )
-					buffer += *s;
+					buffer_ += *s;
 				else	{
-					buffer += *s++;
+					buffer_ += *s++;
 					return( s );
 				}
 				s++;
@@ -120,6 +125,11 @@ namespace _SMERP {
 		LOG_TRACE << "Processor received timeout";
 	}
 
+	void echoConnection::signalOccured()
+	{
+		state_ = SIGNALLED;
+		LOG_TRACE << "Processor received signal";
+	}
 
 	connectionHandler* echoServer::newConnection( const LocalTCPendpoint& local )
 	{
