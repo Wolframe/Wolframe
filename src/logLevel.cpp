@@ -4,17 +4,11 @@
 
 #include "logLevel.hpp"
 
-#include <boost/algorithm/string.hpp>
-
 namespace _SMERP {
 
 
-LogLevel::Level LogLevel::str2LogLevel( const std::string str )
+LogLevel::Level LogLevel::str2LogLevel( const std::string s )
 {
-	std::string s = str;
-	boost::trim( s );
-	boost::to_upper( s );
-
 	if( s == "DATA" )		return LogLevel::LOGLEVEL_DATA;
 	else if( s == "TRACE" )		return LogLevel::LOGLEVEL_TRACE;
 	else if( s == "DEBUG" )		return LogLevel::LOGLEVEL_DEBUG;

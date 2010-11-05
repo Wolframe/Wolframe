@@ -4,17 +4,11 @@
 
 #include "logSyslogFacility.hpp"
 
-#include <boost/algorithm/string.hpp>
-
 namespace _SMERP {
 
 
-SyslogFacility::Facility SyslogFacility::str2SyslogFacility( const std::string str )
+SyslogFacility::Facility SyslogFacility::str2SyslogFacility( const std::string s )
 {
-	std::string s = str;
-	boost::trim( s );
-	boost::to_upper( s );
-
 	if( s == "KERN" )		return SyslogFacility::_SMERP_SYSLOG_FACILITY_KERN;
 	else if( s == "USER" )		return SyslogFacility::_SMERP_SYSLOG_FACILITY_USER;
 	else if( s == "MAIL" )		return SyslogFacility::_SMERP_SYSLOG_FACILITY_MAIL;

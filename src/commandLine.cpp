@@ -8,6 +8,8 @@
 #include <boost/program_options.hpp>
 #include <string>
 
+#include <boost/algorithm/string.hpp>
+
 namespace prgOpts = boost::program_options;
 
 namespace _SMERP {
@@ -134,11 +136,14 @@ namespace _SMERP {
 #endif
 
 			if ( clMap.count( "debug" ))	{
-				std::string s = clMap["debug"].as<std::string>();
+				std::string str = clMap["debug"].as<std::string>();
+				std::string s = str;
+				boost::trim( s );
+				boost::to_upper( s );
 				debugLevel = LogLevel::str2LogLevel( s );
 				if ( debugLevel == LogLevel::LOGLEVEL_UNDEFINED )	{
 					errMsg_ = "invalid debug level \"";
-					errMsg_ += s;
+					errMsg_ += str;
 					errMsg_ += "\"";
 					return false;
 				}
