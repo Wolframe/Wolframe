@@ -23,6 +23,8 @@ SyslogFacility::Facility SyslogFacility::str2SyslogFacility( const std::string s
 	else if( s == "FTP" )		return SyslogFacility::_SMERP_SYSLOG_FACILITY_FTP;
 	else if( s == "NTP" )		return SyslogFacility::_SMERP_SYSLOG_FACILITY_NTP;
 	else if( s == "SECURITY" )	return SyslogFacility::_SMERP_SYSLOG_FACILITY_SECURITY;
+	else if( s == "CONSOLE" )	return SyslogFacility::_SMERP_SYSLOG_FACILITY_CONSOLE;
+	else if( s == "AUDIT" )		return SyslogFacility::_SMERP_SYSLOG_FACILITY_AUDIT;
 	else if( s == "LOCAL0" )	return SyslogFacility::_SMERP_SYSLOG_FACILITY_LOCAL0;
 	else if( s == "LOCAL1" )	return SyslogFacility::_SMERP_SYSLOG_FACILITY_LOCAL1;
 	else if( s == "LOCAL2" )	return SyslogFacility::_SMERP_SYSLOG_FACILITY_LOCAL2;

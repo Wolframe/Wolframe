@@ -27,6 +27,8 @@ public:
 		_SMERP_SYSLOG_FACILITY_FTP,		/// FTP daemon
 		_SMERP_SYSLOG_FACILITY_NTP,		/// NTP daemon (on FreeBSD)
 		_SMERP_SYSLOG_FACILITY_SECURITY,	/// security subsystem (on FreeBSD)
+		_SMERP_SYSLOG_FACILITY_CONSOLE,		/// /dev/console output (on FreeBSD)
+		_SMERP_SYSLOG_FACILITY_AUDIT,		/// audit (on Solaris 10)
 		_SMERP_SYSLOG_FACILITY_LOCAL0,		/// local facility 0
 		_SMERP_SYSLOG_FACILITY_LOCAL1,		/// local facility 1
 		_SMERP_SYSLOG_FACILITY_LOCAL2,		/// local facility 2
@@ -48,8 +50,8 @@ inline std::basic_ostream< CharT, TraitsT > &operator<< ( std::basic_ostream< Ch
 	static const char *const str[] = {
 		"KERN", "USER", "MAIL", "DAEMON", "AUTH", "SYSLOG", "LPR",
 		"NEWS", "UUCP", "CRON", "AUTHPRIV", "FTP", "NTP", "SECURITY",
-		"LOCAL0", "LOCAL1", "LOCAL2", "LOCAL3", "LOCAL4", "LOCAL5",
-		"LOCAL6", "LOCAL7" };
+		"CONSOLE", "AUDIT", "LOCAL0", "LOCAL1", "LOCAL2", "LOCAL3",
+		"LOCAL4", "LOCAL5", "LOCAL6", "LOCAL7" };
 	if( static_cast< size_t >( f ) < ( sizeof( str ) / sizeof( *str ) ) ) {
 		s << str[f];
 	} else {
