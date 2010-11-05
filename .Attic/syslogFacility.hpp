@@ -8,7 +8,7 @@
 #include <string>
 #include <iostream>
 
-namespace _dR {
+namespace _SMERP {
 
 class SyslogFacility {
 public:
@@ -59,7 +59,7 @@ inline std::basic_ostream< CharT, TraitsT > &operator<< ( std::basic_ostream< Ch
 	return s;
 }
 
-} // namespace _dR
+} // namespace _SMERP
 
 
 #endif // _LOG_SYSLOG_FACILITY_HPP_INCLUDED

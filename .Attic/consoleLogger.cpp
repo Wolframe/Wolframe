@@ -10,7 +10,7 @@
 #include "consoleLogger.hpp"
 
 
-namespace _dR {
+namespace _SMERP {
 
 consoleLogger::consoleLogger( LogLevel::Level l )
 {
@@ -50,4 +50,4 @@ void consoleLogger::prefix( const std::string& prefixStr )
 }
 
 
-} // namespace _dR
+} // namespace _SMERP

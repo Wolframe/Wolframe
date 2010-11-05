@@ -10,7 +10,7 @@
 #include "syslogLogger.hpp"
 
 
-namespace _dR {
+namespace _SMERP {
 
 syslogLogger::syslogLogger( std::string ident, SyslogFacility::Facility facility, LogLevel::Level l )
 {
@@ -47,4 +47,4 @@ void syslogLogger::log( LogLevel::Level l, const std::string& msg )
 		syslog( LogLevel::level2syslog( l ), "%s", msg.c_str());
 }
 
-} // namespace _dR
+} // namespace _SMERP

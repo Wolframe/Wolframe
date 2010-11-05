@@ -10,13 +10,13 @@
 #include "logLevel.hpp"
 
 
-namespace _dR {
+namespace _SMERP {
 
 
 class fileLogger
 {
 public:
-	fileLogger( std::string filename, LogLevel::Level l = LogLevel::_dR_INFO );
+	fileLogger( std::string filename, LogLevel::Level l = LogLevel::_SMERP_INFO );
 	~fileLogger( void );
 
 	void level( LogLevel::Level l );
@@ -36,6 +36,6 @@ private:
 };
 
 
-} // namespace _dR
+} // namespace _SMERP
 
 #endif // _FILE_LOGGER_H_INCLUDED

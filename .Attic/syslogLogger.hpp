@@ -9,12 +9,12 @@
 #include "syslogFacility.hpp"
 #include "logLevel.hpp"
 
-namespace _dR {
+namespace _SMERP {
 
 class syslogLogger
 {
 public:
-	syslogLogger( std::string ident, SyslogFacility::Facility f, LogLevel::Level l = LogLevel::_dR_INFO );
+	syslogLogger( std::string ident, SyslogFacility::Facility f, LogLevel::Level l = LogLevel::_SMERP_INFO );
 	~syslogLogger( void );
 
 	void level( LogLevel::Level l );
@@ -30,6 +30,6 @@ private:
 };
 
 
-} // namespace _dR
+} // namespace _SMERP
 
 #endif // _SYSLOG_LOGGER_H_INCLUDED

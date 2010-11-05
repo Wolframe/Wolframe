@@ -9,13 +9,13 @@
 #include "logLevel.hpp"
 
 
-namespace _dR {
+namespace _SMERP {
 
 
 class consoleLogger
 {
 public:
-	consoleLogger( LogLevel::Level l = LogLevel::_dR_INFO );
+	consoleLogger( LogLevel::Level l = LogLevel::_SMERP_INFO );
 	~consoleLogger();
 
 	void level( LogLevel::Level l );
@@ -32,6 +32,6 @@ private:
 };
 
 
-} // namespace _dR
+} // namespace _SMERP
 
 #endif // _CONSOLE_LOGGER_H_INCLUDED

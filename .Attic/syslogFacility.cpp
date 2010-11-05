@@ -6,7 +6,7 @@
 #include <syslog.h>
 #include <boost/algorithm/string.hpp>
 
-namespace _dR {
+namespace _SMERP {
 
 
 SyslogFacility::Facility SyslogFacility::str2SyslogFacility( const std::string str )
@@ -74,4 +74,4 @@ int SyslogFacility::facility2int( const SyslogFacility::Facility f )
 }
 
 
-} // namespace _dR
+} // namespace _SMERP

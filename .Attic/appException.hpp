@@ -11,7 +11,7 @@
 
 #include "ErrorCode.hpp"
 
-namespace _dR	{
+namespace _SMERP	{
 
 class appException : public std::exception
 {
@@ -61,6 +61,6 @@ template <typename C> inline std::basic_ostream<C>& operator<< ( std::basic_ostr
 	return o << e.what();
 }
 
-} // namespace _dR
+} // namespace _SMERP
 
 #endif // _APP_EXCEPTION_HPP_INCLUDED
