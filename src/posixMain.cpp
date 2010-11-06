@@ -202,7 +202,6 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		pthread_sigmask( SIG_BLOCK, &new_mask, &old_mask );
 
 		// Create the final logger based on the configuration
-		//_SMERP::Logger::initialize( config );
 		logBack.setLevel( config.stderrLogLevel );
 		LOG_NOTICE << "Starting server";
 

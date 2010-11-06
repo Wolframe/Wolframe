@@ -177,7 +177,6 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 		_SMERP::ApplicationConfiguration config( cmdLineCfg, cfgFileCfg );
 
 // create the final logger based on the configuration
-		//_SMERP::Logger::initialize( config );
 		logBack.setLevel( config.stderrLogLevel );
 
 // register the event callback where we get called by Windows and the SCM
@@ -338,7 +337,6 @@ int _SMERP_winMain( int argc, char* argv[] )
 					// not called as service, continue as console application
 					config.foreground = true;
 				} else {
-					//_SMERP::Logger::initialize( config );
 					logBack.setLevel( config.stderrLogLevel );
 					LOG_FATAL << "Unable to dispatch service control dispatcher";
 					return _SMERP::ErrorCodes::FAILURE;
@@ -350,7 +348,6 @@ int _SMERP_winMain( int argc, char* argv[] )
 		}
 
 		// Create the final logger based on the configuration
-		//_SMERP::Logger::initialize( config );
 		logBack.setLevel( config.stderrLogLevel );
 		LOG_NOTICE << "Starting server";
 
