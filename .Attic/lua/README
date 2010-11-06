@@ -1,0 +1,5 @@
+Careful, doesn't work (seems to work, but is lua mixed with C functionality)
+
+luavs.bat	builds Lua on old Windows SDKs where LIBPATH
+		and INCLUDES are not set automatically
+		(edit the PLATHFORM_SDK_DIR variable)
