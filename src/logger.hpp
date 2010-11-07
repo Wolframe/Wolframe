@@ -19,7 +19,7 @@ namespace _SMERP {
 	class ConsoleLogBackend
 	{
 	public:
-		ConsoleLogBackend( ) { logLevel_ = _SMERP::LogLevel::LOGLEVEL_UNDEFINED; }
+		ConsoleLogBackend( ) { logLevel_ = _SMERP::LogLevel::LOGLEVEL_ERROR; }
 		~ConsoleLogBackend( ) { }
 
 		void setLevel( const LogLevel::Level level )	{
@@ -41,7 +41,6 @@ namespace _SMERP {
 		SyslogBackend( ) {
 			std::cout << "CONST SYSLOG" << std::endl;
 			logLevel_ = _SMERP::LogLevel::LOGLEVEL_UNDEFINED;
-			facility_ = facilityToSyslogFacility( _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_DAEMON );
 			ident_ = "<undefined>";
 			openlog( ident_.c_str( ), LOG_CONS | LOG_PID, facility_ );
 		}
@@ -55,11 +54,11 @@ namespace _SMERP {
 		}
 		
 		void setFacility( const SyslogFacility::Facility facility ) {
-			facility_ = facility;
+			facility_ = facilityToSyslogFacility( facility );
 			reopen( );
 		}
 		
-		void setIdent( const std::string &ident ) {
+		void setIdent( const std::string ident ) {
 			ident_ = ident;
 			reopen( );
 		}

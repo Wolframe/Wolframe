@@ -117,6 +117,9 @@ int _SMERP_posixMain( int argc, char* argv[] )
 // build the application configuration
 		_SMERP::ApplicationConfiguration config( cmdLineCfg, cfgFileCfg);
 
+// now here we know where to log to on stderr
+		logBack.setConsoleLevel( config.stderrLogLevel );
+
 // Check the configuration
 		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::CHECK_CONFIG )	{
 			std::cout << std::endl << gettext( "BOBOBO version " )
@@ -173,6 +176,7 @@ int _SMERP_posixMain( int argc, char* argv[] )
 			// going on in the syslog
 			logBack.setSyslogLevel( config.syslogLogLevel );
 			logBack.setSyslogFacility( config.syslogFacility );
+			logBack.setSyslogIdent( config.syslogIdent );
 
 			// if we are root we can drop privileges now
 			struct group *groupent;
@@ -208,11 +212,6 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		pthread_sigmask( SIG_BLOCK, &new_mask, &old_mask );
 
 		// Create the final logger based on the configuration
-		logBack.setConsoleLevel( config.stderrLogLevel );
-		if( !config.foreground ) {
-			logBack.setSyslogLevel( config.syslogLogLevel );
-			logBack.setSyslogFacility( config.syslogFacility );
-		}
 		LOG_NOTICE << "Starting server";
 
 		// Run server in background thread(s).
