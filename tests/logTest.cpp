@@ -7,7 +7,6 @@
 _SMERP::LogBackend logBack;
 
 int main( void ) {
-	//_SMERP::Logger::initialize( config );
 	logBack.setLevel( _SMERP::LogLevel::LOGLEVEL_NOTICE );
 
 	LOG_FATAL	<< "fatal error";
