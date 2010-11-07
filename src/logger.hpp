@@ -79,15 +79,19 @@ namespace _SMERP {
 	class LogBackend
 	{
 	public:
-		LogBackend()	{  }
-		~LogBackend()	{ /* free logger resources here */ }
-
-		void setLevel( const LogLevel::Level level )	{
+		LogBackend() { }
+		
+		void setConsoleLevel( const LogLevel::Level level )	{
 			consoleLogger_.setLevel( level );
-#ifndef _WIN32
-			syslogLogger_.setLevel( level );
-#endif // _WIN32
 		}
+
+#ifndef _WIN32		
+		void setSyslogLevel( const LogLevel::Level level )	{
+			syslogLogger_.setLevel( level );
+		}
+#endif //_WIN32
+			
+		~LogBackend()	{ /* free logger resources here */ }
 		
 		inline void log( const LogLevel::Level level, const std::string& msg )	{
 			consoleLogger_.log( level, msg );

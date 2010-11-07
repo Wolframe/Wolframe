@@ -87,4 +87,92 @@ namespace _SMERP {
 
 #endif // _WIN32
 
+#if 0
+
+src::severity_logger< LogLevel::Level > logger;
+
+void Logger::initialize( const ApplicationConfiguration& config )
+{
+	// open logger to the console
+	if( config.logToStderr ) {
+		logging::init_log_to_console(
+			std::clog,
+			keywords::filter = flt::attr< LogLevel::Level >( "Severity", std::nothrow ) >= config.stderrLogLevel,
+			keywords::format = fmt::format( "%1%: %2%" )
+				% fmt::attr< LogLevel::Level >( "Severity", std::nothrow )
+				% fmt::message( )
+		);
+	}
+
+	// open logger to a logfile
+	if( config.logToFile ) {
+		logging::init_log_to_file(
+			keywords::file_name = config.logFile,
+			keywords::auto_flush = true,
+			keywords::open_mode = ( std::ios_base::out | std::ios_base::app ),
+			keywords::filter = flt::attr< LogLevel::Level >( "Severity", std::nothrow ) >= config.logFileLogLevel,
+			keywords::format = fmt::format( "%1% %2%: %3%" )
+				% fmt::date_time( "TimeStamp", std::nothrow )
+				% fmt::attr< LogLevel::Level >( "Severity", std::nothrow )
+				% fmt::message( )
+		);
+	}
+
+#if !defined( _WIN32 )
+	if( config.logToSyslog ) {
+		logging::init_log_to_syslog(
+			keywords::facility = mapSyslogFacility( config.syslogFacility ),
+			keywords::filter = flt::attr< LogLevel::Level >( "Severity", nothrow ) >= config.syslogLogLevel,
+			keywords::format = fmt::format( "smerpd[%1%]: %2%" )
+				% fmt::attr< boost::log::aux::process::id >( "ProcessID", "%d", std::nothrow )
+//				% fmt::attr< LogLevel >( "Severity", std::nothrow )
+				% fmt::message( )
+		);
+	}
+#else
+	if( config.logToEventlog ) {
+		sinks::event_log::custom_event_type_mapping< LogLevel::Level > mapping( "Severity" );
+		mapping[LogLevel::LOGLEVEL_FATAL] = sinks::event_log::error;
+		mapping[LogLevel::LOGLEVEL_ALERT] = sinks::event_log::error;
+		mapping[LogLevel::LOGLEVEL_CRITICAL] = sinks::event_log::error;
+		mapping[LogLevel::LOGLEVEL_SEVERE] = sinks::event_log::error;
+		mapping[LogLevel::LOGLEVEL_ERROR] = sinks::event_log::error;
+		mapping[LogLevel::LOGLEVEL_WARNING] = sinks::event_log::warning;
+		mapping[LogLevel::LOGLEVEL_NOTICE] = sinks::event_log::info;
+		mapping[LogLevel::LOGLEVEL_INFO] = sinks::event_log::info;
+		mapping[LogLevel::LOGLEVEL_DEBUG] = sinks::event_log::info;
+		mapping[LogLevel::LOGLEVEL_TRACE] = sinks::event_log::info;
+		mapping[LogLevel::LOGLEVEL_DATA] = sinks::event_log::info;
+
+		logging::init_log_to_eventlog(
+			keywords::registration = sinks::event_log::forced,
+			keywords::log_name = config.eventlogLogName,
+			keywords::log_source = config.eventlogSource,
+			keywords::custom_event_type_mapping = mapping,
+			keywords::filter = flt::attr< LogLevel::Level >( "Severity", nothrow ) >= config.eventlogLogLevel
+		);
+	}
+#endif // !defined( _WIN32 )
+
+	logging::add_common_attributes( );
+
+	if( config.logToStderr )
+		LOG_DEBUG << "Initialized stderr logger with level '" <<  config.stderrLogLevel << "'";
+	if( config.logToFile )
+		LOG_DEBUG << "Initialized file logger to '" << config.logFile <<"' with level '" <<  config.logFileLogLevel << "'";
+#if !defined( _WIN32 )
+	if( config.logToSyslog )
+		LOG_DEBUG << "Initialized syslog logger to facility '" << config.syslogFacility
+			  << "' with level '" <<  config.syslogLogLevel << "'";
+#else
+	if( config.logToEventlog )
+		LOG_DEBUG << "Initialized eventlog logger to log with name '" << config.eventlogLogName << "'"
+			  << " with log source '" <<  config.eventlogSource << "' and level '" <<  config.eventlogLogLevel << "'";
+#endif // !defined( _WIN32 )
+}
+
+} // namespace _SMERP
+
+#endif
+
 } // namespace _SMERP
