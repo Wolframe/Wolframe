@@ -203,6 +203,8 @@ int _SMERP_posixMain( int argc, char* argv[] )
 
 		// Create the final logger based on the configuration
 		logBack.setConsoleLevel( config.stderrLogLevel );
+		logBack.setSyslogLevel( config.syslogLogLevel );
+		logBack.setSyslogFacility( config.syslogFacility );
 		LOG_NOTICE << "Starting server";
 
 		// Run server in background thread(s).

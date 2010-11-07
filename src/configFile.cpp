@@ -281,6 +281,8 @@ namespace _SMERP {
 				errMsg_ += " for syslog";
 				return false;
 			}
+			
+			syslogIdent = pt.get<std::string>( "logging.syslog.ident", "smerpd" );
 		}
 		else
 			logToSyslog = false;

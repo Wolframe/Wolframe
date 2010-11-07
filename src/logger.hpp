@@ -39,9 +39,10 @@ namespace _SMERP {
 	{
 	public:
 		SyslogBackend( ) {
+			std::cout << "CONST SYSLOG" << std::endl;
 			logLevel_ = _SMERP::LogLevel::LOGLEVEL_ERROR;
 			facility_ = facilityToSyslogFacility( _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_DAEMON );
-			ident_ = "SMERP";
+			ident_ = "<undefined>";
 			openlog( ident_.c_str( ), LOG_CONS | LOG_PID | LOG_NDELAY, facility_ );
 		}
 		
@@ -55,17 +56,19 @@ namespace _SMERP {
 		
 		void setFacility( const SyslogFacility::Facility facility ) {
 			facility_ = facility;
+			reopen( );
 		}
 		
 		void setIdent( const std::string &ident ) {
 			ident_ = ident;
+			reopen( );
 		}
 		
 		inline void log( const LogLevel::Level level, const std::string& msg )	{
 			if ( level >= logLevel_ )
 				syslog( levelToSyslogLevel( level ), "%s", msg.c_str( ) );
 		}
-
+		
 	private:
 		LogLevel::Level logLevel_;
 		int facility_;
@@ -73,6 +76,11 @@ namespace _SMERP {
 
 		int levelToSyslogLevel( const LogLevel::Level level );
 		int facilityToSyslogFacility( const SyslogFacility::Facility );
+		void reopen( ) {
+			closelog( );
+			std::cerr << "reopen " << facility_ << " " << logLevel_ << " " << ident_ << std::endl;
+			openlog( ident_.c_str( ), LOG_CONS | LOG_PID | LOG_NDELAY, facility_ );
+		}
 	};
 #endif // _WIN32	
 
@@ -88,6 +96,14 @@ namespace _SMERP {
 #ifndef _WIN32		
 		void setSyslogLevel( const LogLevel::Level level )	{
 			syslogLogger_.setLevel( level );
+		}
+		
+		void setSyslogFacility( const SyslogFacility::Facility facility )	{
+			syslogLogger_.setFacility( facility );
+		}
+		
+		void setSyslogIdent( const std::string ident )	{
+			syslogLogger_.setIdent( ident );
 		}
 #endif //_WIN32
 			

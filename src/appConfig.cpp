@@ -68,6 +68,7 @@ namespace _SMERP {
 			logToSyslog = cfgFile.logToSyslog;
 			syslogFacility = cfgFile.syslogFacility;
 			syslogLogLevel = cfgFile.syslogLogLevel;
+			syslogIdent = cfgFile.syslogIdent;
 			logToEventlog = cfgFile.logToEventlog;
 			eventlogLogName = cfgFile.eventlogLogName;
 			eventlogSource = cfgFile.eventlogSource;
