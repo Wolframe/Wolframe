@@ -38,11 +38,27 @@ namespace _SMERP {
 	class SyslogBackend
 	{
 	public:
-		SyslogBackend( ) { logLevel_ = _SMERP::LogLevel::LOGLEVEL_ERROR; }
-		~SyslogBackend( ) { }
+		SyslogBackend( ) {
+			logLevel_ = _SMERP::LogLevel::LOGLEVEL_ERROR;
+			facility_ = facilityToSyslogFacility( _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_DAEMON );
+			ident_ = "SMERP";
+			openlog( ident_.c_str( ), LOG_CONS | LOG_PID | LOG_NDELAY, facility_ );
+		}
+		
+		~SyslogBackend( ) {
+			closelog( );
+		}
 		
 		void setLevel( const LogLevel::Level level )	{
 			logLevel_ = level;
+		}
+		
+		void setFacility( const SyslogFacility::Facility facility ) {
+			facility_ = facility;
+		}
+		
+		void setIdent( const std::string &ident ) {
+			ident_ = ident;
 		}
 		
 		inline void log( const LogLevel::Level level, const std::string& msg )	{
@@ -51,9 +67,12 @@ namespace _SMERP {
 		}
 
 	private:
-		LogLevel::Level logLevel_;		
+		LogLevel::Level logLevel_;
+		int facility_;
+		std::string ident_;
 
 		int levelToSyslogLevel( const LogLevel::Level level );
+		int facilityToSyslogFacility( const SyslogFacility::Facility );
 	};
 #endif // _WIN32	
 
