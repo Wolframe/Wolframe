@@ -168,6 +168,12 @@ int _SMERP_posixMain( int argc, char* argv[] )
 				return _SMERP::ErrorCodes::FAILURE;
 			}
 
+			// now here we lost constrol over the console, we should
+			// create a temporary logger which at least tells what's
+			// going on in the syslog
+			logBack.setSyslogLevel( config.syslogLogLevel );
+			logBack.setSyslogFacility( config.syslogFacility );
+
 			// if we are root we can drop privileges now
 			struct group *groupent;
 			struct passwd *passwdent;
@@ -203,8 +209,10 @@ int _SMERP_posixMain( int argc, char* argv[] )
 
 		// Create the final logger based on the configuration
 		logBack.setConsoleLevel( config.stderrLogLevel );
-		logBack.setSyslogLevel( config.syslogLogLevel );
-		logBack.setSyslogFacility( config.syslogFacility );
+		if( !config.foreground ) {
+			logBack.setSyslogLevel( config.syslogLogLevel );
+			logBack.setSyslogFacility( config.syslogFacility );
+		}
 		LOG_NOTICE << "Starting server";
 
 		// Run server in background thread(s).
