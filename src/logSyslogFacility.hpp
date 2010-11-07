@@ -5,7 +5,6 @@
 #ifndef _LOG_SYSLOG_FACILITY_HPP_INCLUDED
 #define _LOG_SYSLOG_FACILITY_HPP_INCLUDED
 
-#include <string>
 #include <iostream>
 
 namespace _SMERP {
@@ -47,7 +46,7 @@ public:
 template< typename CharT, typename TraitsT >
 inline std::basic_ostream< CharT, TraitsT > &operator<< ( std::basic_ostream< CharT, TraitsT >& s, SyslogFacility::Facility f )
 {
-	static const char *const str[] = {
+	static const CharT *const str[] = {
 		"KERN", "USER", "MAIL", "DAEMON", "AUTH", "SYSLOG", "LPR",
 		"NEWS", "UUCP", "CRON", "AUTHPRIV", "FTP", "NTP", "SECURITY",
 		"CONSOLE", "AUDIT", "LOCAL0", "LOCAL1", "LOCAL2", "LOCAL3",
