@@ -22,7 +22,8 @@ TEST_CPP_BINS = \
 	logTest.exe
 
 OBJS = \
-	$(TOPDIR)\src\version.obj
+	$(TOPDIR)\src\version.obj \
+	$(TOPDIR)\src\logger.obj
 
 all: $(OBJS) $(CPP_BINS)
 

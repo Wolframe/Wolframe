@@ -21,7 +21,8 @@ INCLUDE_LIBS = \
 	$(GTEST_LIBS)
 
 TEST_OBJS = \
-	$(TOPDIR)/src/version.o
+	$(TOPDIR)/src/version.o \
+	$(TOPDIR)/src/logger.o
 
 TEST_CPP_BINS = \
 	versionTest$(EXE) \
