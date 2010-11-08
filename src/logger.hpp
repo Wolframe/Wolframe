@@ -20,7 +20,7 @@ namespace _SMERP {
 	{
 	public:
 		ConsoleLogBackend( ) { logLevel_ = _SMERP::LogLevel::LOGLEVEL_ERROR; }
-		~ConsoleLogBackend( ) { }
+		~ConsoleLogBackend( ) { /* nothing to do here */ }
 
 		void setLevel( const LogLevel::Level level )	{
 			logLevel_ = level;
@@ -39,9 +39,9 @@ namespace _SMERP {
 	{
 	public:
 		SyslogBackend( ) {
-			std::cout << "CONST SYSLOG" << std::endl;
 			logLevel_ = _SMERP::LogLevel::LOGLEVEL_UNDEFINED;
 			ident_ = "<undefined>";
+			facility_ = _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_DAEMON;
 			openlog( ident_.c_str( ), LOG_CONS | LOG_PID, facility_ );
 		}
 		
@@ -80,6 +80,31 @@ namespace _SMERP {
 			openlog( ident_.c_str( ), LOG_CONS | LOG_PID, facility_ );
 		}
 	};
+#endif // _WIN32
+
+#ifdef _WIN32
+	class EventlogBackend
+	{
+	public:
+		EventlogBackend( ) {
+			logLevel_ = _SMERP::LogLevel::LOGLEVEL_UNDEFINED;
+		}
+		
+		~EventlogBackend( ) {
+		}
+		
+		void setLevel( const LogLevel::Level level )	{
+			logLevel_ = level;
+		}
+				
+		inline void log( const LogLevel::Level level, const std::string& msg )	{
+			//if ( level >= logLevel_ )
+				//TODO: eventlog( levelToSyslogLevel( level ), "%s", msg.c_str( ) );
+		}
+	
+	private:
+		LogLevel::Level logLevel_;
+	};
 #endif // _WIN32	
 
 	class LogBackend
@@ -103,14 +128,22 @@ namespace _SMERP {
 		void setSyslogIdent( const std::string ident )	{
 			syslogLogger_.setIdent( ident );
 		}
-#endif //_WIN32
-			
+#endif // _WIN32
+
+#ifdef _WIN32
+		void setEventlogLevel( const LogLevel::Level level ) {
+			eventlogLogger_.setLevel( level );
+		}
+#endif // _WIN32	
 		~LogBackend()	{ /* free logger resources here */ }
 		
 		inline void log( const LogLevel::Level level, const std::string& msg )	{
 			consoleLogger_.log( level, msg );
 #ifndef _WIN32
 			syslogLogger_.log( level, msg );
+#endif //
+#ifdef _WIN32
+			eventlogLogger_.log( level, msg );
 #endif // _WIN32
 		}
 	private:
@@ -118,6 +151,9 @@ namespace _SMERP {
 #ifndef _WIN32
 		SyslogBackend syslogLogger_;
 #endif // _WIN32	
+#ifdef _WIN32
+		EventlogBackend eventlogLogger_;
+#endif // _WIN32
 	};
 
 

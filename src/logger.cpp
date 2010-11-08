@@ -89,20 +89,8 @@ namespace _SMERP {
 
 #if 0
 
-src::severity_logger< LogLevel::Level > logger;
-
 void Logger::initialize( const ApplicationConfiguration& config )
 {
-	// open logger to the console
-	if( config.logToStderr ) {
-		logging::init_log_to_console(
-			std::clog,
-			keywords::filter = flt::attr< LogLevel::Level >( "Severity", std::nothrow ) >= config.stderrLogLevel,
-			keywords::format = fmt::format( "%1%: %2%" )
-				% fmt::attr< LogLevel::Level >( "Severity", std::nothrow )
-				% fmt::message( )
-		);
-	}
 
 	// open logger to a logfile
 	if( config.logToFile ) {
@@ -118,18 +106,6 @@ void Logger::initialize( const ApplicationConfiguration& config )
 		);
 	}
 
-#if !defined( _WIN32 )
-	if( config.logToSyslog ) {
-		logging::init_log_to_syslog(
-			keywords::facility = mapSyslogFacility( config.syslogFacility ),
-			keywords::filter = flt::attr< LogLevel::Level >( "Severity", nothrow ) >= config.syslogLogLevel,
-			keywords::format = fmt::format( "smerpd[%1%]: %2%" )
-				% fmt::attr< boost::log::aux::process::id >( "ProcessID", "%d", std::nothrow )
-//				% fmt::attr< LogLevel >( "Severity", std::nothrow )
-				% fmt::message( )
-		);
-	}
-#else
 	if( config.logToEventlog ) {
 		sinks::event_log::custom_event_type_mapping< LogLevel::Level > mapping( "Severity" );
 		mapping[LogLevel::LOGLEVEL_FATAL] = sinks::event_log::error;
@@ -152,9 +128,6 @@ void Logger::initialize( const ApplicationConfiguration& config )
 			keywords::filter = flt::attr< LogLevel::Level >( "Severity", nothrow ) >= config.eventlogLogLevel
 		);
 	}
-#endif // !defined( _WIN32 )
-
-	logging::add_common_attributes( );
 
 	if( config.logToStderr )
 		LOG_DEBUG << "Initialized stderr logger with level '" <<  config.stderrLogLevel << "'";
