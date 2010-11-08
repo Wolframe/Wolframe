@@ -78,7 +78,7 @@ smerp.rc: smerp.mc
 local_all:
 
 local_clean:
-	@-erase MSG*.bin smerp.rc smerp.h smerp.res 2>NUL
+	@-erase MSG*.bin smerp.rc smerp.h smerp.res smerp.dll 2>NUL
 
 local_distclean:
 

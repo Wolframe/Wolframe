@@ -114,7 +114,7 @@ namespace _SMERP {
 	// 01 - Informational		4
 	// 10 - Warning			2
 	// 11 - Error			1
-	DWORD messageIdToEventlogId( DWORD eventLogLevel, int messageId ) {
+	DWORD EventlogBackend::messageIdToEventlogId( DWORD eventLogLevel, int messageId ) {
 		DWORD mask = 0;
 
 		switch( eventLogLevel ) {
@@ -126,6 +126,64 @@ namespace _SMERP {
 		return( messageId | 0x0FFF0000L | ( mask << 30 ) );
 	}
 
+
+#if 0
+	void EventlogBackend::registrySetString( HKEY h, TCHAR *name, TCHAR *value ) {
+		RegSetValueEx( h, name, 0, REG_EXPAND_SZ, (LPBYTE)value, strlen( value ) );
+	}
+
+	void EventlogBackend::registrySetWord( HKEY h, TCHAR *name, DWORD value ) {
+		RegSetValueEx( h, name, 0, REG_DWORD, (LPBYTE)&value, sizeof( DWORD ) );
+	}
+		void registerEventSource( );
+		void registrySetString( HKEY h, TCHAR *name, TCHAR *value );
+		void registrySetWord( HKEY h, TCHAR *name, DWORD value );
+
+	void EventlogBackend::registerEventSource( )	{
+	/* fiddle in the registry and register the location of the
+	 * message DLL, how many categories we define and what types
+	 * of events we are supporting
+	 */
+
+	eventlog_server = server;
+	eventlog_log = log;
+	eventlog_source = source;
+	eventlog_level = level;
+
+	register_event_source( log, source, path_to_dll, nof_categories );
+
+	char key[256];
+	HKEY h = 0;
+	DWORD disposition;
+
+	/* compose the registry key and simply overwrite the values there, we know */
+	snprintf( key, 256, "SYSTEM\\CurrentControlSet\\Services\\EventLog\\%s\\%s", log, source );
+	RegCreateKeyEx( HKEY_LOCAL_MACHINE, key, 0, NULL, REG_OPTION_NON_VOLATILE,
+		KEY_SET_VALUE, NULL, &h, &disposition );
+
+	/* make sure not to have hard-coded pathes here, otherwise remote
+	 * event logging will not work! */
+	registry_set_expandable_string( h, "EventMessageFile", "C:\\TEMP\\smerp.dll" );
+	registry_set_expandable_string( h, "CategoryMessageFile", "C:\\TEMP\\smerp.dll" );
+	registry_set_word( h, "TypesSupported", (DWORD)7 );
+	registry_set_word( h, "CategoryCount", (DWORD)1 ); // currently we have only one category
+	RegCloseKey( h );
+}
+
+
+	/* TODO: remote machine and event log source should be in the API,
+	 * but we have Windows localized strings which are hard to unify
+	 * with Unix. We also don't want to have a stupid string wrapper
+	 * on top.. No clue for now
+	 */
+        event_source = RegisterEventSource( server, source );
+	if( event_source == NULL ) {
+		/* TODO: add GetLastError here! */
+		fprintf( stderr, "%s: Unable to register event source\n",
+			wolf_log_level_to_str( WOLF_LOG_ALERT ) );
+	}
+#endif
+	
 #endif // defined( _WIN32 )
 	
 #if 0
@@ -148,25 +206,9 @@ void Logger::initialize( const ApplicationConfiguration& config )
 	}
 
 	if( config.logToEventlog ) {
-		sinks::event_log::custom_event_type_mapping< LogLevel::Level > mapping( "Severity" );
-		mapping[LogLevel::LOGLEVEL_FATAL] = sinks::event_log::error;
-		mapping[LogLevel::LOGLEVEL_ALERT] = sinks::event_log::error;
-		mapping[LogLevel::LOGLEVEL_CRITICAL] = sinks::event_log::error;
-		mapping[LogLevel::LOGLEVEL_SEVERE] = sinks::event_log::error;
-		mapping[LogLevel::LOGLEVEL_ERROR] = sinks::event_log::error;
-		mapping[LogLevel::LOGLEVEL_WARNING] = sinks::event_log::warning;
-		mapping[LogLevel::LOGLEVEL_NOTICE] = sinks::event_log::info;
-		mapping[LogLevel::LOGLEVEL_INFO] = sinks::event_log::info;
-		mapping[LogLevel::LOGLEVEL_DEBUG] = sinks::event_log::info;
-		mapping[LogLevel::LOGLEVEL_TRACE] = sinks::event_log::info;
-		mapping[LogLevel::LOGLEVEL_DATA] = sinks::event_log::info;
-
 		logging::init_log_to_eventlog(
-			keywords::registration = sinks::event_log::forced,
 			keywords::log_name = config.eventlogLogName,
 			keywords::log_source = config.eventlogSource,
-			keywords::custom_event_type_mapping = mapping,
-			keywords::filter = flt::attr< LogLevel::Level >( "Severity", nothrow ) >= config.eventlogLogLevel
 		);
 	}
 

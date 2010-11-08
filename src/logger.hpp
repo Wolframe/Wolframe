@@ -96,6 +96,9 @@ namespace _SMERP {
 			logLevel_ = _SMERP::LogLevel::LOGLEVEL_UNDEFINED;
 			categoryId_ = 1 | 0x0FFF0000L; // the one category we have at the moment in the resource
 			messageId_ = 1;  // the one event we have at the moment in the resource, must be masked!
+			log_ = "Application";
+			source_ = "<undefined>";
+		        eventSource_ = RegisterEventSource( NULL, source_.c_str( ) );
 		}
 		
 		~EventlogBackend( ) {
@@ -108,6 +111,14 @@ namespace _SMERP {
 		void setLevel( const LogLevel::Level level )	{
 			logLevel_ = level;
 		}
+
+		void setLog( const std::string log ) {
+			log_ = log;
+		}
+		
+		void setSource( const std::string source ) {
+			source_ = source;
+		}
 				
 		inline void log( const LogLevel::Level level, const std::string& msg )	{
 			if ( level >= logLevel_ ) {
@@ -117,9 +128,9 @@ namespace _SMERP {
 					eventSource_,
 					levelToEventlogLevel( level ),
 					categoryId_, 
-					messageIdToEventlogId( messageId_ ),
+					messageIdToEventlogId( level, messageId_ ),
 					NULL, // SID of the user owning the process, not now, later..
-					0, // at the moment no strings to replace
+					1, // at the moment no strings to replace
 					0, // no binary data
 					msg_arr, // array of strings to log
 					NULL ); // no binary data
@@ -131,9 +142,11 @@ namespace _SMERP {
 		DWORD categoryId_;
 		DWORD messageId_;
 		HANDLE eventSource_;
+		std::string log_;
+		std::string source_;
 		
 		DWORD levelToEventlogLevel( const LogLevel::Level level );
-		DWORD messageIdToEventlogId( int messageId );
+		DWORD messageIdToEventlogId( DWORD eventLogLevel, int messageId );
 	};
 #endif // _WIN32	
 
@@ -163,6 +176,14 @@ namespace _SMERP {
 #ifdef _WIN32
 		void setEventlogLevel( const LogLevel::Level level ) {
 			eventlogLogger_.setLevel( level );
+		}
+		
+		void setEventlogLog( const std::string log ) {
+			eventlogLogger_.setLog( log );
+		}
+		
+		void setEventlogSource( const std::string source ) {
+			eventlogLogger_.setSource( source );
 		}
 #endif // _WIN32	
 		~LogBackend()	{ /* free logger resources here */ }
