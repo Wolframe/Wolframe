@@ -10,9 +10,14 @@
 
 #include <ostream>
 
-#ifndef _WIN32
+#if !defined( _WIN32 )
 #include <syslog.h>
-#endif // _WIN32
+#endif // !defined( _WIN32 )
+
+#if defined( _WIN32 )
+#define WIN32_MEAN_AND_LEAN
+#include <windows.h>
+#endif // defined( _WIN32 )
 
 namespace _SMERP {
 
@@ -75,6 +80,7 @@ namespace _SMERP {
 
 		int levelToSyslogLevel( const LogLevel::Level level );
 		int facilityToSyslogFacility( const SyslogFacility::Facility );
+		
 		void reopen( ) {
 			closelog( );
 			openlog( ident_.c_str( ), LOG_CONS | LOG_PID, facility_ );
@@ -88,9 +94,15 @@ namespace _SMERP {
 	public:
 		EventlogBackend( ) {
 			logLevel_ = _SMERP::LogLevel::LOGLEVEL_UNDEFINED;
+			categoryId_ = 1 | 0x0FFF0000L; // the one category we have at the moment in the resource
+			messageId_ = 1;  // the one event we have at the moment in the resource, must be masked!
 		}
 		
 		~EventlogBackend( ) {
+			if( eventSource_ ) {
+				(void)DeregisterEventSource( eventSource_ );
+				eventSource_ = 0;
+			}
 		}
 		
 		void setLevel( const LogLevel::Level level )	{
@@ -98,12 +110,30 @@ namespace _SMERP {
 		}
 				
 		inline void log( const LogLevel::Level level, const std::string& msg )	{
-			//if ( level >= logLevel_ )
-				//TODO: eventlog( levelToSyslogLevel( level ), "%s", msg.c_str( ) );
+			if ( level >= logLevel_ ) {
+				LPCSTR msg_arr[1];
+				msg_arr[0] = (LPSTR)msg.c_str( );
+				(void)ReportEvent(
+					eventSource_,
+					levelToEventlogLevel( level ),
+					categoryId_, 
+					messageIdToEventlogId( messageId_ ),
+					NULL, // SID of the user owning the process, not now, later..
+					0, // at the moment no strings to replace
+					0, // no binary data
+					msg_arr, // array of strings to log
+					NULL ); // no binary data
+			}					
 		}
 	
 	private:
 		LogLevel::Level logLevel_;
+		DWORD categoryId_;
+		DWORD messageId_;
+		HANDLE eventSource_;
+		
+		DWORD levelToEventlogLevel( const LogLevel::Level level );
+		DWORD messageIdToEventlogId( int messageId );
 	};
 #endif // _WIN32	
 

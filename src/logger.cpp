@@ -5,13 +5,13 @@
 #define NO_LOG_MACROS
 #include "logger.hpp"
 
-#ifndef _WIN32
+#if !defined( _WIN32 )
 #include <syslog.h>
-#endif // _WIN32
+#endif // !defined( _WIN32 )
 
 namespace _SMERP {
 
-#ifndef _WIN32
+#if !defined( _WIN32 )
 	int SyslogBackend::levelToSyslogLevel( const LogLevel::Level level )	{
 		switch( level )	{
 			case _SMERP::LogLevel::LOGLEVEL_DATA:
@@ -85,8 +85,49 @@ namespace _SMERP {
 		return LOG_DAEMON;
 	}
 
-#endif // _WIN32
+#endif // !defined( _WIN32 )
 
+#if defined( _WIN32 )
+
+	DWORD EventlogBackend::levelToEventlogLevel( const LogLevel::Level level )	{
+		switch( level )	{
+			case _SMERP::LogLevel::LOGLEVEL_DATA:
+			case _SMERP::LogLevel::LOGLEVEL_TRACE:
+			case _SMERP::LogLevel::LOGLEVEL_DEBUG:
+			case _SMERP::LogLevel::LOGLEVEL_INFO:
+			case _SMERP::LogLevel::LOGLEVEL_NOTICE:
+				return EVENTLOG_INFORMATION_TYPE;
+			case _SMERP::LogLevel::LOGLEVEL_WARNING:
+				return EVENTLOG_WARNING_TYPE;
+			case _SMERP::LogLevel::LOGLEVEL_ERROR:
+			case _SMERP::LogLevel::LOGLEVEL_SEVERE:
+			case _SMERP::LogLevel::LOGLEVEL_CRITICAL:
+			case _SMERP::LogLevel::LOGLEVEL_ALERT:
+			case _SMERP::LogLevel::LOGLEVEL_FATAL:
+			case _SMERP::LogLevel::LOGLEVEL_UNDEFINED:
+				return EVENTLOG_ERROR_TYPE;
+		}
+		return EVENTLOG_ERROR_TYPE;
+	}
+	
+	// 00 - Success			0
+	// 01 - Informational		4
+	// 10 - Warning			2
+	// 11 - Error			1
+	DWORD messageIdToEventlogId( DWORD eventLogLevel, int messageId ) {
+		DWORD mask = 0;
+
+		switch( eventLogLevel ) {
+			case EVENTLOG_ERROR_TYPE:	mask = 3; break;
+			case EVENTLOG_WARNING_TYPE:	mask = 2; break;
+			case EVENTLOG_INFORMATION_TYPE:	mask = 1; break;
+			default:			mask = 3;
+		}
+		return( messageId | 0x0FFF0000L | ( mask << 30 ) );
+	}
+
+#endif // defined( _WIN32 )
+	
 #if 0
 
 void Logger::initialize( const ApplicationConfiguration& config )
@@ -133,18 +174,13 @@ void Logger::initialize( const ApplicationConfiguration& config )
 		LOG_DEBUG << "Initialized stderr logger with level '" <<  config.stderrLogLevel << "'";
 	if( config.logToFile )
 		LOG_DEBUG << "Initialized file logger to '" << config.logFile <<"' with level '" <<  config.logFileLogLevel << "'";
-#if !defined( _WIN32 )
 	if( config.logToSyslog )
 		LOG_DEBUG << "Initialized syslog logger to facility '" << config.syslogFacility
 			  << "' with level '" <<  config.syslogLogLevel << "'";
-#else
 	if( config.logToEventlog )
 		LOG_DEBUG << "Initialized eventlog logger to log with name '" << config.eventlogLogName << "'"
 			  << " with log source '" <<  config.eventlogSource << "' and level '" <<  config.eventlogLogLevel << "'";
-#endif // !defined( _WIN32 )
 }
-
-} // namespace _SMERP
 
 #endif
 

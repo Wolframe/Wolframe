@@ -69,3 +69,4 @@ tests/Makefile.W32
 src/logSyslogFacility.hpp
 src/logSyslogFacility.cpp
 tests/logTest.cpp
+src/smerp.mc
