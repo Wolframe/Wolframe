@@ -10,9 +10,8 @@ int main( void ) {
 	logBack.setConsoleLevel( _SMERP::LogLevel::LOGLEVEL_NOTICE );
 #ifndef _WIN32
 	logBack.setSyslogLevel( _SMERP::LogLevel::LOGLEVEL_NOTICE );
-	logBack.setSyslogFacility( facility_ = _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_USER );
+	logBack.setSyslogFacility( _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_USER );
 	logBack.setSyslogIdent( "test" );
-);	
 #else
 	logBack.setEventlogLevel( _SMERP::LogLevel::LOGLEVEL_DATA );
 	logBack.setEventlogSource( "smerptest" );
