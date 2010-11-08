@@ -4,6 +4,8 @@
 
 #include "logLevel.hpp"
 
+#include <string>
+
 namespace _SMERP {
 
 

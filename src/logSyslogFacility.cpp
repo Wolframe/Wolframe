@@ -4,6 +4,8 @@
 
 #include "logSyslogFacility.hpp"
 
+#include <string>
+
 namespace _SMERP {
 
 
