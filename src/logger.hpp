@@ -114,10 +114,12 @@ namespace _SMERP {
 
 		void setLog( const std::string log ) {
 			log_ = log;
+			reopen( );
 		}
 		
 		void setSource( const std::string source ) {
 			source_ = source;
+			reopen( );
 		}
 				
 		inline void log( const LogLevel::Level level, const std::string& msg )	{
@@ -147,6 +149,12 @@ namespace _SMERP {
 		
 		DWORD levelToEventlogLevel( const LogLevel::Level level );
 		DWORD messageIdToEventlogId( DWORD eventLogLevel, int messageId );
+
+		void reopen( ) {
+			if( eventSource_ )
+				(void)DeregisterEventSource( eventSource_ );
+			eventSource_ = RegisterEventSource( NULL, source_.c_str( ) );
+		}		
 	};
 #endif // _WIN32	
 

@@ -169,19 +169,6 @@ namespace _SMERP {
 	registry_set_word( h, "CategoryCount", (DWORD)1 ); // currently we have only one category
 	RegCloseKey( h );
 }
-
-
-	/* TODO: remote machine and event log source should be in the API,
-	 * but we have Windows localized strings which are hard to unify
-	 * with Unix. We also don't want to have a stupid string wrapper
-	 * on top.. No clue for now
-	 */
-        event_source = RegisterEventSource( server, source );
-	if( event_source == NULL ) {
-		/* TODO: add GetLastError here! */
-		fprintf( stderr, "%s: Unable to register event source\n",
-			wolf_log_level_to_str( WOLF_LOG_ALERT ) );
-	}
 #endif
 	
 #endif // defined( _WIN32 )
@@ -202,13 +189,6 @@ void Logger::initialize( const ApplicationConfiguration& config )
 				% fmt::date_time( "TimeStamp", std::nothrow )
 				% fmt::attr< LogLevel::Level >( "Severity", std::nothrow )
 				% fmt::message( )
-		);
-	}
-
-	if( config.logToEventlog ) {
-		logging::init_log_to_eventlog(
-			keywords::log_name = config.eventlogLogName,
-			keywords::log_source = config.eventlogSource,
 		);
 	}
 

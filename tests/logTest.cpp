@@ -15,6 +15,8 @@ int main( void ) {
 );	
 #else
 	logBack.setEventlogLevel( _SMERP::LogLevel::LOGLEVEL_DATA );
+	logBack.setEventlogSource( "smerptest" );
+	logBack.setEventlogLog( "Application" );
 #endif
 
 	LOG_FATAL	<< "fatal error";
