@@ -74,6 +74,7 @@ smerp.dll: smerp.res
 	$(LINK) /dll /nologo /noentry /MACHINE:x86 /out:$@ $?
 smerp.res: smerp.rc
 smerp.rc: smerp.mc
+logger.obj: smerp.res
 
 local_all:
 

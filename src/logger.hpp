@@ -95,7 +95,6 @@ namespace _SMERP {
 		EventlogBackend( ) {
 			logLevel_ = _SMERP::LogLevel::LOGLEVEL_UNDEFINED;
 			categoryId_ = 1 | 0x0FFF0000L; // the one category we have at the moment in the resource
-			messageId_ = 1;  // the one event we have at the moment in the resource, must be masked!
 			log_ = "Application";
 			source_ = "<undefined>";
 		        eventSource_ = RegisterEventSource( NULL, source_.c_str( ) );
@@ -130,7 +129,7 @@ namespace _SMERP {
 					eventSource_,
 					levelToEventlogLevel( level ),
 					categoryId_, 
-					messageIdToEventlogId( level, messageId_ ),
+					messageIdToEventlogId( level ),
 					NULL, // SID of the user owning the process, not now, later..
 					1, // at the moment no strings to replace, just the message itself
 					0, // no binary data
@@ -142,13 +141,12 @@ namespace _SMERP {
 	private:
 		LogLevel::Level logLevel_;
 		DWORD categoryId_;
-		DWORD messageId_;
 		HANDLE eventSource_;
 		std::string log_;
 		std::string source_;
 		
 		DWORD levelToEventlogLevel( const LogLevel::Level level );
-		DWORD messageIdToEventlogId( DWORD eventLogLevel, int messageId );
+		DWORD messageIdToEventlogId( DWORD eventLogLevel );
 
 		void reopen( ) {
 			if( eventSource_ )

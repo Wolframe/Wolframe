@@ -9,6 +9,8 @@
 #include <syslog.h>
 #endif // !defined( _WIN32 )
 
+#include "smerp.h"
+
 namespace _SMERP {
 
 #if !defined( _WIN32 )
@@ -114,62 +116,22 @@ namespace _SMERP {
 	// 01 - Informational		4
 	// 10 - Warning			2
 	// 11 - Error			1
-	DWORD EventlogBackend::messageIdToEventlogId( DWORD eventLogLevel, int messageId ) {
+	DWORD EventlogBackend::messageIdToEventlogId( DWORD eventLogLevel ) {
 		DWORD mask = 0;
+		DWORD eventId;
 
 		switch( eventLogLevel ) {
-			case EVENTLOG_ERROR_TYPE:	mask = 3; break;
-			case EVENTLOG_WARNING_TYPE:	mask = 2; break;
-			case EVENTLOG_INFORMATION_TYPE:	mask = 1; break;
-			default:			mask = 3;
+			case EVENTLOG_ERROR_TYPE:
+				eventId = SMERP_EVENTID_ERROR; mask = 3; break;
+			case EVENTLOG_WARNING_TYPE:
+				eventId = SMERP_EVENTID_WARNING; mask = 2; break;
+			case EVENTLOG_INFORMATION_TYPE:
+				eventId = SMERP_EVENTID_INFO; mask = 1; break;
+			default:
+				eventId = SMERP_EVENTID_ERROR; mask = 3;
 		}
-		return( messageId | 0x0FFF0000L | ( mask << 30 ) );
+		return( eventId | 0x0FFF0000L | ( mask << 30 ) );
 	}
-
-
-#if 0
-	void EventlogBackend::registrySetString( HKEY h, TCHAR *name, TCHAR *value ) {
-		RegSetValueEx( h, name, 0, REG_EXPAND_SZ, (LPBYTE)value, strlen( value ) );
-	}
-
-	void EventlogBackend::registrySetWord( HKEY h, TCHAR *name, DWORD value ) {
-		RegSetValueEx( h, name, 0, REG_DWORD, (LPBYTE)&value, sizeof( DWORD ) );
-	}
-		void registerEventSource( );
-		void registrySetString( HKEY h, TCHAR *name, TCHAR *value );
-		void registrySetWord( HKEY h, TCHAR *name, DWORD value );
-
-	void EventlogBackend::registerEventSource( )	{
-	/* fiddle in the registry and register the location of the
-	 * message DLL, how many categories we define and what types
-	 * of events we are supporting
-	 */
-
-	eventlog_server = server;
-	eventlog_log = log;
-	eventlog_source = source;
-	eventlog_level = level;
-
-	register_event_source( log, source, path_to_dll, nof_categories );
-
-	char key[256];
-	HKEY h = 0;
-	DWORD disposition;
-
-	/* compose the registry key and simply overwrite the values there, we know */
-	snprintf( key, 256, "SYSTEM\\CurrentControlSet\\Services\\EventLog\\%s\\%s", log, source );
-	RegCreateKeyEx( HKEY_LOCAL_MACHINE, key, 0, NULL, REG_OPTION_NON_VOLATILE,
-		KEY_SET_VALUE, NULL, &h, &disposition );
-
-	/* make sure not to have hard-coded pathes here, otherwise remote
-	 * event logging will not work! */
-	registry_set_expandable_string( h, "EventMessageFile", "C:\\TEMP\\smerp.dll" );
-	registry_set_expandable_string( h, "CategoryMessageFile", "C:\\TEMP\\smerp.dll" );
-	registry_set_word( h, "TypesSupported", (DWORD)7 );
-	registry_set_word( h, "CategoryCount", (DWORD)1 ); // currently we have only one category
-	RegCloseKey( h );
-}
-#endif
 	
 #endif // defined( _WIN32 )
 	

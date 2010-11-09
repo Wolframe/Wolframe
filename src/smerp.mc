@@ -40,26 +40,26 @@ FacilityNames = (
 
 MessageIdTypedef = DWORD
 
-MessageId = 1
+MessageId = 0x100
 Severity = Error
 Facility = Application
-SymbolicName = SMERP_ERROR
+SymbolicName = SMERP_EVENTID_ERROR
 Language = English
 %1
 .
 
-MessageId = 1
+MessageId = 0x101
 Severity = Warning
 Facility = Application
-SymbolicName = SMERP_WARNING
+SymbolicName = SMERP_EVENTID_WARNING
 Language = English
 %1
 .
 
-MessageId = 1
+MessageId = 0x102
 Severity = Informational
 Facility = Application
-SymbolicName = SMERP_INFO
+SymbolicName = SMERP_EVENTID_INFO
 Language = English
 %1
 .
