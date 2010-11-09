@@ -23,7 +23,7 @@ TEST_CPP_BINS = \
 	versionTest.exe \
 	logTest.exe
 
-OBJS =
+OBJS = \
 
 all: $(OBJS) $(CPP_BINS)
 

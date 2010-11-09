@@ -68,7 +68,7 @@ all: $(OBJS) $(CPP_BINS) smerpmsg.dll
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-smerpd.exe: $(OBJS) smerpd.obj smerpmsg.res 
+smerpd.exe: smerpd.obj smerpmsg.res 
 
 smerpmsg.dll: smerpmsg.res
 	$(LINK) /dll /nologo /noentry /MACHINE:x86 /out:$@ $?
