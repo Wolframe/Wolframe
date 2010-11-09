@@ -63,7 +63,7 @@ CCPP_LINK = link.exe
 	$(CCPP) $(CCPPFLAGS) /D "BUILD_SHARED" /Fo$@ $<
 
 .obj.exe:
-	$(CCPP_LINK) $(LDFLAGS) $(LIBS) /out:$@ $< $(OBJS)
+	$(CCPP_LINK) $(LDFLAGS) $(LIBS) /out:$@ $**
 
 .mc.rc:
 	$(MC) -h $(@D) -r $(@D) $<
