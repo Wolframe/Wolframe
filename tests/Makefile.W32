@@ -23,16 +23,14 @@ TEST_CPP_BINS = \
 	versionTest.exe \
 	logTest.exe
 
-OBJS = \
-	$(TOPDIR)\src\version.obj \
-	$(TOPDIR)\src\logger.obj
+OBJS =
 
 all: $(OBJS) $(CPP_BINS)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-versionTest.exe: versionTest.obj
-logTest.exe: logTest.obj
+versionTest.exe: versionTest.obj $(TOPDIR)\src\version.obj
+logTest.exe: logTest.obj $(TOPDIR)\src\logger.obj
 
 local_all:
 

@@ -6,7 +6,6 @@ xxxx. SSL must require certificate from peer if verify is on
 
 ABa:
 
-- integrate event resources into service exe
 - split src into the libsmerp.a (libsmerp.lib) development library
   and in the sample service (otherwise we run into problems in the
   tests directory)
