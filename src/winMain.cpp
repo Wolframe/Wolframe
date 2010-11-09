@@ -403,7 +403,7 @@ int _SMERP_winMain( int argc, char* argv[] )
 		LOG_NOTICE << "Starting server";
 
 		_SMERP::echoServer	echo;
-		_SMERP::server s( config.address, config.SSLaddress, echo, config.threads );
+		_SMERP::server s( config.address, config.SSLaddress, echo, config.threads, config.maxClients );
 
 		// Set console control handler to allow server to be stopped.
 		consoleCtrlFunction = boost::bind(&_SMERP::server::stop, &s);
