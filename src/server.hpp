@@ -8,10 +8,8 @@
 #include <boost/asio.hpp>
 #include <boost/noncopyable.hpp>
 
-#include <string>
 #include <vector>
 
-#include "appConfig.hpp"
 #include "serverEndpoint.hpp"
 #include "acceptor.hpp"
 #include "connectionHandler.hpp"
@@ -26,7 +24,7 @@ public:
 	/// Construct the server
 	explicit server( const std::vector<ServerTCPendpoint>& TCPserver,
 			 const std::vector<ServerSSLendpoint>& SSLserver,
-			 ServerHandler& serverHandler, unsigned threads );
+			 ServerHandler& serverHandler, unsigned threads, unsigned maxConnections );
 
 	/// Destruct the server
 	~server();
@@ -42,6 +40,7 @@ public:
 
 private:
 	std::size_t				threadPoolSize_;// The number of threads that will call io_service::run().
+	unsigned				maxConnections_;
 
 	boost::asio::io_service			IOservice_;	// The io_service used to perform asynchronous operations.
 	std::vector<acceptor*>			acceptor_;

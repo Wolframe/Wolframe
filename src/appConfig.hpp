@@ -54,18 +54,18 @@ namespace _SMERP {
 		std::string		dbPassword;
 // logger configuration
 		bool			logToStderr;
-		LogLevel::Level	stderrLogLevel;
-		bool		logToFile;
-		std::string	logFile;
-		LogLevel::Level	logFileLogLevel;
-		bool		logToSyslog;
+		LogLevel::Level		stderrLogLevel;
+		bool			logToFile;
+		std::string		logFile;
+		LogLevel::Level		logFileLogLevel;
+		bool			logToSyslog;
 		SyslogFacility::Facility syslogFacility;
-		LogLevel::Level	syslogLogLevel;
-		std::string	syslogIdent;
-		bool		logToEventlog;
-		std::string	eventlogLogName;
-		std::string	eventlogSource;
-		LogLevel::Level	eventlogLogLevel;
+		LogLevel::Level		syslogLogLevel;
+		std::string		syslogIdent;
+		bool			logToEventlog;
+		std::string		eventlogLogName;
+		std::string		eventlogSource;
+		LogLevel::Level		eventlogLogLevel;
 
 	private:
 		std::string		errMsg_;

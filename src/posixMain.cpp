@@ -216,7 +216,7 @@ int _SMERP_posixMain( int argc, char* argv[] )
 
 		// Run server in background thread(s).
 		_SMERP::echoServer	echo;
-		_SMERP::server s( config.address, config.SSLaddress, echo, config.threads );
+		_SMERP::server s( config.address, config.SSLaddress, echo, config.threads, config.maxClients );
 		boost::thread t( boost::bind( &_SMERP::server::run, &s ));
 
 		// Restore previous signals.
