@@ -64,22 +64,22 @@ OBJS = \
 	echoHandler.obj \
 	winMain.obj
 
-all: $(OBJS) $(CPP_BINS) smerp.dll
+all: $(OBJS) $(CPP_BINS) smerpmsg.dll
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-smerpd.exe: smerpd.obj $(OBJS)
+smerpd.exe: smerpd.obj $(OBJS) smerpmsg.res
 
-smerp.dll: smerp.res
+smerpmsg.dll: smerpmsg.res
 	$(LINK) /dll /nologo /noentry /MACHINE:x86 /out:$@ $?
-smerp.res: smerp.rc
-smerp.rc: smerp.mc
-logger.obj: smerp.res
+smerpmsg.res: smerpmsg.rc
+smerpmsg.rc: smerpmsg.mc
+logger.obj: smerpmsg.rc
 
 local_all:
 
 local_clean:
-	@-erase MSG*.bin smerp.rc smerp.h smerp.res smerp.dll 2>NUL
+	@-erase MSG*.bin smerpmsg.rc smerpmsg.h smerpmsg.res smerpmsg.dll 2>NUL
 
 local_distclean:
 

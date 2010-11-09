@@ -73,10 +73,20 @@ static void registerEventlog( const _SMERP::ApplicationConfiguration& config )
 	(void)RegCreateKeyEx( HKEY_LOCAL_MACHINE, key, 0, NULL, REG_OPTION_NON_VOLATILE,
 		KEY_SET_VALUE, NULL, &h, &disposition );
 
-	registrySetString( h, "EventMessageFile", "C:\\TEMP\\smerp.dll" );
-	registrySetString( h, "CategoryMessageFile", "C:\\TEMP\\smerp.dll" );
-	registrySetWord( h, "TypesSupported", (DWORD)7 );
-	registrySetWord( h, "CategoryCount", (DWORD)1 ); // currently we have only one category
+// retrieve absolute path of binary
+	TCHAR binary_path[MAX_PATH];
+	DWORD res = GetModuleFileName( NULL, binary_path, MAX_PATH );
+
+// register resources in the service binary itself as message source
+	registrySetString( h, "EventMessageFile", binary_path );
+	registrySetString( h, "CategoryMessageFile", binary_path );
+	
+// supported event types
+	DWORD eventTypes = EVENTLOG_ERROR_TYPE | EVENTLOG_WARNING_TYPE | EVENTLOG_INFORMATION_TYPE;
+	registrySetWord( h, "TypesSupported", eventTypes );
+
+// exactly one category for now (smerp)
+	registrySetWord( h, "CategoryCount", (DWORD)1 );
 
 	(void)RegCloseKey( h );
 }

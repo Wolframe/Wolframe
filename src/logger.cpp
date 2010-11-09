@@ -9,7 +9,7 @@
 #include <syslog.h>
 #endif // !defined( _WIN32 )
 
-#include "smerp.h"
+#include "smerpmsg.h"
 
 namespace _SMERP {
 
