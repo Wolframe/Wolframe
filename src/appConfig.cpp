@@ -70,9 +70,6 @@ namespace _SMERP {
 			syslogLogLevel = cfgFile.syslogLogLevel;
 			syslogIdent = cfgFile.syslogIdent;
 			logToEventlog = cfgFile.logToEventlog;
-			eventlogLogName = cfgFile.eventlogLogName;
-			eventlogSource = cfgFile.eventlogSource;
-			eventlogLogLevel = cfgFile.eventlogLogLevel;
 		}
 		else	{
 			logToStderr = true;
@@ -81,6 +78,12 @@ namespace _SMERP {
 			logToSyslog = false;
 			logToEventlog = false;
 		}
+
+		// we need the data always (for running, --install and --remove,
+		// which run in foreground)
+		eventlogLogName = cfgFile.eventlogLogName;
+		eventlogSource = cfgFile.eventlogSource;
+		eventlogLogLevel = cfgFile.eventlogLogLevel;
 	}
 
 

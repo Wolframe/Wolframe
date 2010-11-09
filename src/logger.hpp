@@ -132,9 +132,9 @@ namespace _SMERP {
 					categoryId_, 
 					messageIdToEventlogId( level, messageId_ ),
 					NULL, // SID of the user owning the process, not now, later..
-					1, // at the moment no strings to replace
+					1, // at the moment no strings to replace, just the message itself
 					0, // no binary data
-					msg_arr, // array of strings to log
+					msg_arr, // array of strings to log (msg.c_str() for now)
 					NULL ); // no binary data
 			}					
 		}

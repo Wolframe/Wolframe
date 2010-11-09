@@ -24,6 +24,8 @@
 
 #include <WinSvc.h>
 
+#include <stdio.h>
+
 static const unsigned short MAJOR_VERSION = 0;
 static const short unsigned MINOR_VERSION = 0;
 static const short unsigned REVISION_NUMBER = 3;
@@ -50,7 +52,49 @@ BOOL WINAPI consoleCtrlHandler(DWORD ctrlType)
 	}
 }
 
-static void install_as_service( const _SMERP::ApplicationConfiguration& config )
+static void registrySetString( HKEY h, TCHAR *name, TCHAR *value ) {
+	(void)RegSetValueEx( h, name, 0, REG_EXPAND_SZ, (LPBYTE)value, strlen( value ) );
+}
+
+static void registrySetWord( HKEY h, TCHAR *name, DWORD value ) {
+	(void)RegSetValueEx( h, name, 0, REG_DWORD, (LPBYTE)&value, sizeof( DWORD ) );
+}
+
+// initializes the Event Logger
+static void registerEventlog( const _SMERP::ApplicationConfiguration& config )
+{
+	char key[256];
+	HKEY h = 0;
+	DWORD disposition;
+
+// choose the key for the EventLog registry entry
+	_snprintf( key, 256, "SYSTEM\\CurrentControlSet\\Services\\EventLog\\%s\\%s",
+		config.eventlogLogName.c_str( ), config.eventlogSource.c_str( ) );
+	(void)RegCreateKeyEx( HKEY_LOCAL_MACHINE, key, 0, NULL, REG_OPTION_NON_VOLATILE,
+		KEY_SET_VALUE, NULL, &h, &disposition );
+
+	registrySetString( h, "EventMessageFile", "C:\\TEMP\\smerp.dll" );
+	registrySetString( h, "CategoryMessageFile", "C:\\TEMP\\smerp.dll" );
+	registrySetWord( h, "TypesSupported", (DWORD)7 );
+	registrySetWord( h, "CategoryCount", (DWORD)1 ); // currently we have only one category
+
+	(void)RegCloseKey( h );
+}
+
+static void deregisterEventlog( const _SMERP::ApplicationConfiguration& config )
+{
+	char key[256];
+	HKEY h = 0;
+	DWORD disposition;
+	LONG res;
+
+	_snprintf( key, 256, "SYSTEM\\CurrentControlSet\\Services\\EventLog\\%s",
+		config.eventlogLogName.c_str( ) );
+	res = RegOpenKeyEx( HKEY_LOCAL_MACHINE, key, 0, KEY_WRITE, &h );
+	(void)RegDeleteKey( h, config.eventlogSource.c_str( ) );
+}
+
+static void installAsService( const _SMERP::ApplicationConfiguration& config )
 {
 // get service control manager
 	SC_HANDLE scm = (SC_HANDLE)OpenSCManager( NULL, SERVICES_ACTIVE_DATABASE, SC_MANAGER_ALL_ACCESS );
@@ -314,13 +358,15 @@ int _SMERP_winMain( int argc, char* argv[] )
 		}
 
 		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::INSTALL_SERVICE ) {
-			install_as_service( config );
+			registerEventlog( config );
+			installAsService( config );
 			std::cout << "Installed as Windows service" << std::endl << std::endl;
 			return _SMERP::ErrorCodes::OK;
 		}
 
 		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::REMOVE_SERVICE ) {
 			remove_as_service( config );
+			deregisterEventlog( config );
 			std::cout << "Removed as Windows service" << std::endl << std::endl;
 			return _SMERP::ErrorCodes::OK;
 		}
