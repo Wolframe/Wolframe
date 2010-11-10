@@ -80,7 +80,7 @@ static void registerEventlog( const _SMERP::ApplicationConfiguration& config )
 // register resources in the service binary itself as message source
 	registrySetString( h, "EventMessageFile", binary_path );
 	registrySetString( h, "CategoryMessageFile", binary_path );
-	
+
 // supported event types
 	DWORD eventTypes = EVENTLOG_ERROR_TYPE | EVENTLOG_WARNING_TYPE | EVENTLOG_INFORMATION_TYPE;
 	registrySetWord( h, "TypesSupported", eventTypes );
@@ -413,10 +413,11 @@ int _SMERP_winMain( int argc, char* argv[] )
 		LOG_NOTICE << "Starting server";
 
 		_SMERP::echoServer	echo;
-		_SMERP::server s( config.address, config.SSLaddress, echo, config.threads, config.maxClients );
+		_SMERP::Network::server s( config.address, config.SSLaddress,
+					   echo, config.threads, config.maxClients );
 
 		// Set console control handler to allow server to be stopped.
-		consoleCtrlFunction = boost::bind(&_SMERP::server::stop, &s);
+		consoleCtrlFunction = boost::bind(&_SMERP::Network::server::stop, &s);
 		SetConsoleCtrlHandler(consoleCtrlHandler, TRUE);
 
 		// Run the server until stopped.

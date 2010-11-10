@@ -9,15 +9,15 @@
 
 namespace _SMERP {
 	/// The connection handler
-	class echoConnection : public connectionHandler
+	class echoConnection : public Network::connectionHandler
 	{
 	public:
-		echoConnection( const LocalTCPendpoint& local );
-		echoConnection( const LocalSSLendpoint& local );
+		echoConnection( const Network::LocalTCPendpoint& local );
+		echoConnection( const Network::LocalSSLendpoint& local );
 		~echoConnection();
 
-		void setPeer( const RemoteTCPendpoint& remote );
-		void setPeer( const RemoteSSLendpoint& remote );
+		void setPeer( const Network::RemoteTCPendpoint& remote );
+		void setPeer( const Network::RemoteSSLendpoint& remote );
 
 		/// Parse incoming data. The return value indicates how much of the
 		/// input has been consumed.
@@ -27,7 +27,7 @@ namespace _SMERP {
 		void signalOccured();
 
 		/// Handle a request and produce a reply.
-		NetworkOperation nextOperation();
+		Network::NetworkOperation nextOperation();
 
 	private:
 		enum State	{
@@ -47,11 +47,11 @@ namespace _SMERP {
 
 
 	/// The server handler container
-	class echoServer : public ServerHandler
+	class echoServer : public Network::ServerHandler
 	{
 	public:
-		connectionHandler* newConnection( const LocalTCPendpoint& local );
-		connectionHandler* newSSLconnection( const LocalSSLendpoint& local );
+		Network::connectionHandler* newConnection( const Network::LocalTCPendpoint& local );
+		Network::connectionHandler* newSSLconnection( const Network::LocalSSLendpoint& local );
 	};
 
 } // namespace _SMERP

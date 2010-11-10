@@ -5,8 +5,9 @@
 #include <sstream>
 
 namespace _SMERP {
+	namespace Network {
 
-	/// Structures describing a
+	/// Base class for network endpoints in SMERP
 	class ConnectionEndpoint
 	{
 	private:
@@ -65,6 +66,7 @@ namespace _SMERP {
 		std::string	CN_;
 	};
 
+} // namespace Network
 } // namespace _SMERP
 
 #endif // _CONNECTION_ENDPOINT_HPP_INCLUDED

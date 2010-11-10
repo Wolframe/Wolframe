@@ -8,6 +8,7 @@
 #include "acceptor.hpp"
 
 namespace _SMERP {
+	namespace Network {
 
 #if !defined(_WIN32)
 
@@ -33,6 +34,7 @@ namespace _SMERP {
 #endif // defined(_WIN32)
 
 
+} // namespace Network
 } // namespace _SMERP
 
 #endif // WITH_SSL

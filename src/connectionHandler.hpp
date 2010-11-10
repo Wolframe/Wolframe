@@ -10,6 +10,7 @@
 #include "connectionEndpoint.hpp"
 
 namespace _SMERP {
+	namespace Network {
 
 	struct	NetworkOperation
 	{
@@ -88,6 +89,8 @@ namespace _SMERP {
 		virtual connectionHandler* newConnection( const LocalTCPendpoint& local ) = 0;
 		virtual connectionHandler* newSSLconnection( const LocalSSLendpoint& local ) = 0;
 	};
+
+} // namespace Network
 } // namespace _SMERP
 
 #endif // _CONNECTION_HANDLER_HPP_INCLUDED

@@ -38,8 +38,8 @@ namespace _SMERP {
 		unsigned		maxClients;
 
 // network configuration
-		std::vector<ServerTCPendpoint> address;
-		std::vector<ServerSSLendpoint> SSLaddress;
+		std::vector<Network::ServerTCPendpoint> address;
+		std::vector<Network::ServerSSLendpoint> SSLaddress;
 
 		unsigned		idleTimeout;
 		unsigned		requestTimeout;

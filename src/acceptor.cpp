@@ -13,6 +13,7 @@
 
 
 namespace _SMERP {
+	namespace Network {
 
 acceptor::acceptor( boost::asio::io_service& IOservice,
 		    const std::string& host, unsigned short port,
@@ -219,4 +220,5 @@ void SSLacceptor::handleStop()
 
 #endif // WITH_SSL
 
+} // namespace Network
 } // namespace _SMERP

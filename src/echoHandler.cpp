@@ -10,14 +10,14 @@
 
 namespace _SMERP {
 
-	echoConnection::echoConnection( const LocalTCPendpoint& local )
+	echoConnection::echoConnection( const Network::LocalTCPendpoint& local )
 	{
 		LOG_TRACE << "Created connection handler for " << local.toString();
 		state_ = NEW;
 	}
 
 
-	echoConnection::echoConnection( const LocalSSLendpoint& local )
+	echoConnection::echoConnection( const Network::LocalSSLendpoint& local )
 	{
 		LOG_TRACE << "Created connection handler (SSL) for " << local.toString();
 		state_ = NEW;
@@ -28,12 +28,12 @@ namespace _SMERP {
 		LOG_TRACE << "Connection handler destroyed";
 	}
 
-	void echoConnection::setPeer( const RemoteTCPendpoint& remote )
+	void echoConnection::setPeer( const Network::RemoteTCPendpoint& remote )
 	{
 		LOG_TRACE << "Peer set to " << remote.toString();
 	}
 
-	void echoConnection::setPeer( const RemoteSSLendpoint& remote )
+	void echoConnection::setPeer( const Network::RemoteSSLendpoint& remote )
 	{
 		LOG_TRACE << "Peer set to " << remote.toString();
 		LOG_TRACE << "Peer Common Name: " << remote.commonName();
@@ -41,60 +41,68 @@ namespace _SMERP {
 
 
 	/// Handle a request and produce a reply.
-	NetworkOperation echoConnection::nextOperation()
+	Network::NetworkOperation echoConnection::nextOperation()
 	{
 		switch( state_ )	{
 		case NEW:	{
 			state_ = HELLO;
 			const char *msg = "Welcome to SMERP.\n";
-			return NetworkOperation( NetworkOperation::WRITE, msg, strlen( msg ));
+			return Network::NetworkOperation( Network::NetworkOperation::WRITE,
+							  msg, strlen( msg ));
 		}
 
 		case HELLO:
 			state_ = ANSWERING;
 			if ( buffer_.empty() )
-				return NetworkOperation( NetworkOperation::WRITE, buffer_.c_str(), buffer_.length() );
+				return Network::NetworkOperation( Network::NetworkOperation::WRITE,
+								  buffer_.c_str(), buffer_.length() );
 			else	{
 				const char *msg = "BUFFER NOT EMPTY!\n";
-				return NetworkOperation( NetworkOperation::WRITE, msg, strlen( msg ));
+				return Network::NetworkOperation( Network::NetworkOperation::WRITE,
+								  msg, strlen( msg ));
 			}
 
 		case READING:
 			state_ = ANSWERING;
 			if ( ! buffer_.empty() )
-				return NetworkOperation( NetworkOperation::WRITE, buffer_.c_str(), buffer_.length() );
+				return Network::NetworkOperation( Network::NetworkOperation::WRITE,
+								  buffer_.c_str(), buffer_.length() );
 			else	{
 				const char *msg = "EMPTY BUFFER !\n";
-				return NetworkOperation( NetworkOperation::WRITE, msg, strlen( msg ));
+				return Network::NetworkOperation( Network::NetworkOperation::WRITE,
+								  msg, strlen( msg ));
 			}
 
 		case ANSWERING:
 			buffer_.clear();
 			state_ = READING;
-			return NetworkOperation( NetworkOperation::READ, 30 );
+			return Network::NetworkOperation( Network::NetworkOperation::READ, 30 );
 
 		case FINISHING:	{
 			state_ = TERMINATING;
 			const char *msg = "Thanks for using SMERP.\n";
-			return NetworkOperation( NetworkOperation::WRITE, msg, strlen( msg ));
+			return Network::NetworkOperation( Network::NetworkOperation::WRITE,
+							  msg, strlen( msg ));
 		}
 
 		case TIMEOUT:	{
 			state_ = TERMINATING;
 			const char *msg = "Timeout. :P\n";
-			return NetworkOperation( NetworkOperation::WRITE, msg, strlen( msg ));
+			return Network::NetworkOperation( Network::NetworkOperation::WRITE,
+							  msg, strlen( msg ));
 		}
 
 		case SIGNALLED:	{
 			state_ = TERMINATING;
 			const char *msg = "Server is shutting down. :P\n";
-			return NetworkOperation( NetworkOperation::WRITE, msg, strlen( msg ));
+			return Network::NetworkOperation( Network::NetworkOperation::WRITE,
+							  msg, strlen( msg ));
 		}
 
 		case TERMINATING:
-			return NetworkOperation( NetworkOperation::TERMINATE );
+			return Network::NetworkOperation( Network::NetworkOperation::TERMINATE );
 		}
-		return NetworkOperation( NetworkOperation::TERMINATE );
+		return Network::NetworkOperation( Network::NetworkOperation::TERMINATE );
 	}
 
 
@@ -131,12 +139,12 @@ namespace _SMERP {
 		LOG_TRACE << "Processor received signal";
 	}
 
-	connectionHandler* echoServer::newConnection( const LocalTCPendpoint& local )
+	Network::connectionHandler* echoServer::newConnection( const Network::LocalTCPendpoint& local )
 	{
 		return new echoConnection( local );
 	}
 
-	connectionHandler* echoServer::newSSLconnection( const LocalSSLendpoint& local )
+	Network::connectionHandler* echoServer::newSSLconnection( const Network::LocalSSLendpoint& local )
 	{
 		return new echoConnection( local );
 	}

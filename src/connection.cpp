@@ -11,6 +11,7 @@
 #include <boost/lexical_cast.hpp>
 
 namespace _SMERP {
+	namespace Network {
 
 connection::connection( boost::asio::io_service& IOservice,
 			ConnectionList<connection_ptr>& connList,
@@ -127,4 +128,5 @@ void SSLconnection::unregister()
 
 #endif // WITH_SSL
 
+} // namespace Network
 } // namespace _SMERP

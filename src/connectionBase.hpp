@@ -18,6 +18,7 @@
 #include "logger.hpp"
 
 namespace _SMERP {
+	namespace Network {
 
 	/// Represents a single connection from a client.
 	template< typename socketType >
@@ -206,6 +207,7 @@ namespace _SMERP {
 
 	};
 
+} // namespace Network
 } // namespace _SMERP
 
 #endif // _CONNECTION_BASE_HPP_INCLUDED

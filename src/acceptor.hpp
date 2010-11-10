@@ -18,25 +18,23 @@
 #include "connectionHandler.hpp"
 
 namespace _SMERP {
+	namespace Network {
 
 /// acceptor class of the SMERP network server.
 class acceptor: private boost::noncopyable
 {
 /// public interface
 public:
-	/// Construct the acceptor
+	/// Constructor
 	explicit acceptor( boost::asio::io_service& IOservice,
 			   const std::string& host, unsigned short port,
 			   ServerHandler& srvHandler );
 
-	/// Destruct the serverrequestHandler&				requestHandler
+	/// Destructor
 	~acceptor();
 
 	/// Stop the acceptor. Outstanding asynchronous operations will be completed.
 	void stop();
-
-	/// Abort the server. Outstanding asynchronous operations will be aborted.
-	void abort();
 
 /// private functions of the server
 private:
@@ -78,9 +76,6 @@ public:
 	/// Stop the acceptor. Outstanding asynchronous operations will be completed.
 	void stop();
 
-	/// Abort the server. Outstanding asynchronous operations will be aborted.
-	void abort();
-
 	/// Get a password from the console (i.e. SSL key password)
 	std::string getPassword();
 
@@ -106,6 +101,7 @@ private:
 
 #endif // WITH_SSL
 
+	} // namespace Network
 } // namespace _SMERP
 
 #endif // _NETWORK_ACCEPTOR_HPP_INCLUDED

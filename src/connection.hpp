@@ -15,6 +15,7 @@
 #include "connectionHandler.hpp"
 
 namespace _SMERP {
+	namespace Network {
 
 	template< typename T >
 	class ConnectionList
@@ -117,6 +118,7 @@ namespace _SMERP {
 
 #endif // WITH_SSL
 
+	} // namespace Network
 } // namespace _SMERP
 
 #endif // _CONNECTION_HPP_INCLUDED

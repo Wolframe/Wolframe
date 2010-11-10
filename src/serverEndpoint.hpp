@@ -5,6 +5,7 @@
 #include "connectionEndpoint.hpp"
 
 namespace _SMERP	{
+namespace Network	{
 
 	/// No encryption server endpoint
 	class ServerTCPendpoint : public ConnectionEndpoint
@@ -45,6 +46,7 @@ namespace _SMERP	{
 		bool verifyClientCert() const		{ return verify_; }
 	};
 
-}
+} // namespace Network
+} // namespace _SMERP
 
 #endif // _SERVER_ENDPOINT_HPP_INCLUDED

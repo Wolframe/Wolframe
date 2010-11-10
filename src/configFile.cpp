@@ -155,7 +155,7 @@ namespace _SMERP {
 			}
 
 			if ( v.first == "socket" )	{
-				ServerTCPendpoint lep( hostStr, port );
+				Network::ServerTCPendpoint lep( hostStr, port );
 				address.push_back( lep );
 			}
 			else if ( v.first == "SSLsocket" )	{
@@ -186,8 +186,9 @@ namespace _SMERP {
 					errMsg_ += tmpStr;
 					errMsg_ += "\" for SSL verify client. WARNING: enabling verification";
 				}
-				ServerSSLendpoint lep( hostStr, port,
-						       certFile, keyFile, verify, CAdirectory, CAchainFile );
+				Network::ServerSSLendpoint lep( hostStr, port,
+								certFile, keyFile,
+								verify, CAdirectory, CAchainFile );
 				SSLaddress.push_back( lep );
 			}
 			else	{
@@ -246,7 +247,7 @@ namespace _SMERP {
 			std::string s = str;
 			boost::trim( s );
 			boost::to_upper( s );
-			
+
 			if ( ( logFileLogLevel = LogLevel::str2LogLevel( s )) == LogLevel::LOGLEVEL_UNDEFINED )	{
 				errMsg_ = "unknown log level \"";
 				errMsg_ += str;
@@ -263,7 +264,7 @@ namespace _SMERP {
 			std::string s = str;
 			boost::trim( s );
 			boost::to_upper( s );
-			
+
 			if ( ( syslogFacility = SyslogFacility::str2SyslogFacility( s )) == SyslogFacility::_SMERP_SYSLOG_FACILITY_UNDEFINED )	{
 				errMsg_ = "unknown syslog facility \"";
 				errMsg_ += str;
@@ -274,14 +275,14 @@ namespace _SMERP {
 			s = str;
 			boost::trim( s );
 			boost::to_upper( s );
-			
+
 			if ( ( syslogLogLevel = LogLevel::str2LogLevel( s )) == LogLevel::LOGLEVEL_UNDEFINED )	{
 				errMsg_ = "unknown log level \"";
 				errMsg_ += str;
 				errMsg_ += " for syslog";
 				return false;
 			}
-			
+
 			syslogIdent = pt.get<std::string>( "logging.syslog.ident", "smerpd" );
 		}
 		else
