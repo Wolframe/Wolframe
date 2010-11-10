@@ -7,9 +7,11 @@
 _SMERP::LogBackend logBack;
 
 int main( void ) {
-	logBack.setConsoleLevel( _SMERP::LogLevel::LOGLEVEL_NOTICE );
+	logBack.setConsoleLevel( _SMERP::LogLevel::LOGLEVEL_DATA );
+	logBack.setLogfileLevel( _SMERP::LogLevel::LOGLEVEL_DATA );
+	logBack.setLogfileName( "logTest.log ");
 #ifndef _WIN32
-	logBack.setSyslogLevel( _SMERP::LogLevel::LOGLEVEL_NOTICE );
+	logBack.setSyslogLevel( _SMERP::LogLevel::LOGLEVEL_DATA );
 	logBack.setSyslogFacility( _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_USER );
 	logBack.setSyslogIdent( "test" );
 #else

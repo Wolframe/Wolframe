@@ -35,7 +35,7 @@ logTest.exe: logTest.obj $(TOPDIR)\src\logger.obj
 local_all:
 
 local_clean:
-	@-erase test.bat 2>NUL
+	@-erase test.bat logTest.log 2>NUL
 
 local_distclean:
 

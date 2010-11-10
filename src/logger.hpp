@@ -9,6 +9,7 @@
 #include "appConfig.hpp"
 
 #include <ostream>
+#include <fstream>
 
 #if !defined( _WIN32 )
 #include <syslog.h>
@@ -35,8 +36,48 @@ namespace _SMERP {
 			if ( level >= logLevel_ )
 				std::cerr << level << ": " << msg << std::endl;
 		}
+		
 	private:
 		LogLevel::Level	logLevel_;		
+	};
+	
+	class LogfileBackend
+	{
+	public:
+		LogfileBackend( ) {
+			logLevel_ = _SMERP::LogLevel::LOGLEVEL_UNDEFINED;
+			// we don't open a primare unknown logfile, wait for setFilename
+		}
+		
+		~LogfileBackend( ) {
+			logFile_.close( );
+		}
+		
+		void setLevel( const LogLevel::Level level )	{
+			logLevel_ = level;
+		}
+		
+		void setFilename( const std::string filename ) {
+			filename_ = filename;
+			reopen( );
+		}
+
+		void reopen( ) {
+			logFile_.close( );
+			logFile_.open( filename_.c_str( ), std::ios_base::out | std::ios_base::app );
+		}	
+		
+		inline void log( const LogLevel::Level level, const std::string& msg )	{
+			if( level >= logLevel_ ) {
+				logFile_ << level << ": " << msg << std::endl;
+				logFile_.flush( );
+			}
+		}	
+		
+	private:
+		LogLevel::Level logLevel_;
+		std::ofstream logFile_;
+		std::string filename_;
 	};
 
 #ifndef _WIN32
@@ -72,6 +113,11 @@ namespace _SMERP {
 			if ( level >= logLevel_ )
 				syslog( levelToSyslogLevel( level ), "%s", msg.c_str( ) );
 		}
+
+		void reopen( ) {
+			closelog( );
+			openlog( ident_.c_str( ), LOG_CONS | LOG_PID, facility_ );
+		}
 		
 	private:
 		LogLevel::Level logLevel_;
@@ -79,12 +125,7 @@ namespace _SMERP {
 		std::string ident_;
 
 		int levelToSyslogLevel( const LogLevel::Level level );
-		int facilityToSyslogFacility( const SyslogFacility::Facility );
-		
-		void reopen( ) {
-			closelog( );
-			openlog( ident_.c_str( ), LOG_CONS | LOG_PID, facility_ );
-		}
+		int facilityToSyslogFacility( const SyslogFacility::Facility );		
 	};
 #endif // _WIN32
 
@@ -137,6 +178,12 @@ namespace _SMERP {
 					NULL ); // no binary data
 			}					
 		}
+
+		void reopen( ) {
+			if( eventSource_ )
+				(void)DeregisterEventSource( eventSource_ );
+			eventSource_ = RegisterEventSource( NULL, source_.c_str( ) );
+		}		
 	
 	private:
 		LogLevel::Level logLevel_;
@@ -147,12 +194,6 @@ namespace _SMERP {
 		
 		DWORD levelToEventlogLevel( const LogLevel::Level level );
 		DWORD messageIdToEventlogId( DWORD eventLogLevel );
-
-		void reopen( ) {
-			if( eventSource_ )
-				(void)DeregisterEventSource( eventSource_ );
-			eventSource_ = RegisterEventSource( NULL, source_.c_str( ) );
-		}		
 	};
 #endif // _WIN32	
 
@@ -163,6 +204,14 @@ namespace _SMERP {
 		
 		void setConsoleLevel( const LogLevel::Level level )	{
 			consoleLogger_.setLevel( level );
+		}
+		
+		void setLogfileLevel( const LogLevel::Level level )	{
+			logfileLogger_.setLevel( level );
+		}
+
+		void setLogfileName( const std::string filename )	{
+			logfileLogger_.setFilename( filename );
 		}
 
 #ifndef _WIN32		
@@ -196,6 +245,7 @@ namespace _SMERP {
 		
 		inline void log( const LogLevel::Level level, const std::string& msg )	{
 			consoleLogger_.log( level, msg );
+			logfileLogger_.log( level, msg );
 #ifndef _WIN32
 			syslogLogger_.log( level, msg );
 #endif //
@@ -205,6 +255,7 @@ namespace _SMERP {
 		}
 	private:
 		ConsoleLogBackend consoleLogger_;
+		LogfileBackend logfileLogger_;
 #ifndef _WIN32
 		SyslogBackend syslogLogger_;
 #endif // _WIN32	
