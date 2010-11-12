@@ -136,38 +136,5 @@ namespace _SMERP {
 	}
 	
 #endif // defined( _WIN32 )
-	
-#if 0
-
-void Logger::initialize( const ApplicationConfiguration& config )
-{
-
-	// open logger to a logfile
-	if( config.logToFile ) {
-		logging::init_log_to_file(
-			keywords::file_name = config.logFile,
-			keywords::auto_flush = true,
-			keywords::open_mode = ( std::ios_base::out | std::ios_base::app ),
-			keywords::filter = flt::attr< LogLevel::Level >( "Severity", std::nothrow ) >= config.logFileLogLevel,
-			keywords::format = fmt::format( "%1% %2%: %3%" )
-				% fmt::date_time( "TimeStamp", std::nothrow )
-				% fmt::attr< LogLevel::Level >( "Severity", std::nothrow )
-				% fmt::message( )
-		);
-	}
-
-	if( config.logToStderr )
-		LOG_DEBUG << "Initialized stderr logger with level '" <<  config.stderrLogLevel << "'";
-	if( config.logToFile )
-		LOG_DEBUG << "Initialized file logger to '" << config.logFile <<"' with level '" <<  config.logFileLogLevel << "'";
-	if( config.logToSyslog )
-		LOG_DEBUG << "Initialized syslog logger to facility '" << config.syslogFacility
-			  << "' with level '" <<  config.syslogLogLevel << "'";
-	if( config.logToEventlog )
-		LOG_DEBUG << "Initialized eventlog logger to log with name '" << config.eventlogLogName << "'"
-			  << " with log source '" <<  config.eventlogSource << "' and level '" <<  config.eventlogLogLevel << "'";
-}
-
-#endif
 
 } // namespace _SMERP
