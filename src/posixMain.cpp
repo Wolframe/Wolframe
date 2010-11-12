@@ -185,22 +185,26 @@ int _SMERP_posixMain( int argc, char* argv[] )
 			groupent = getgrnam( config.group.c_str( ) );
 			passwdent = getpwnam( config.user.c_str( ) );
 			if( groupent == NULL || passwdent == NULL ) {
-				std::cerr << "Illegal group '" << config.group << "' or user '" << config.user << "'" << std::endl;
+				LOG_CRITICAL << "Illegal group '" << config.group << "' or user '" << config.user << "'";
 				return _SMERP::ErrorCodes::FAILURE;
 			}
 
 			if( setgid( groupent->gr_gid ) < 0 ) {
-				std::cerr << "setgid for group '" << config.group << "' failed!" << std::endl;
+				LOG_CRITICAL << "setgid for group '" << config.group << "' failed!";
 				return _SMERP::ErrorCodes::FAILURE;
 			}
 
 			if( setuid( passwdent->pw_uid ) < 0 ) {
-				std::cerr << "setgid for user '" << config.user << "' failed!" << std::endl;
+				LOG_CRITICAL << "setgid for user '" << config.user << "' failed!";
 				return _SMERP::ErrorCodes::FAILURE;
 			}
 
 			// create a pid file and lock id
 			std::ofstream pidFile( config.pidFile.c_str( ), std::ios_base::trunc );
+			if( !pidFile.good( ) ) {
+				LOG_CRITICAL << "Unable to create PID file '" << config.pidFile << "'!";
+				return _SMERP::ErrorCodes::FAILURE;
+ 			}
 			pidFile << getpid( ) << std::endl;
 			pidFile.close( );
 
@@ -215,7 +219,6 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		sigfillset( &new_mask );
 		sigset_t old_mask;
 		pthread_sigmask( SIG_BLOCK, &new_mask, &old_mask );
-
 
 		LOG_NOTICE << "Starting server";
 
