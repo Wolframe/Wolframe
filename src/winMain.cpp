@@ -231,6 +231,8 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 		_SMERP::ApplicationConfiguration config( cmdLineCfg, cfgFileCfg );
 
 // create the final logger based on the configuration
+		logBack.setLogfileLevel( config.logFileLogLevel );
+		logBack.setLogfileName( config.logFile );
 		logBack.setEventlogLevel( config.eventlogLogLevel );
 		logBack.setEventlogSource( config.eventlogSource );
 		logBack.setEventlogLog( config.eventlogLogName );
@@ -406,10 +408,9 @@ int _SMERP_winMain( int argc, char* argv[] )
 		}
 
 		// Create the final logger based on the configuration, this is the
-		// foreground mode in a console, so we start only the stderr and
-		// file loggers
+		// foreground mode in a console, so we start only the stderr logger
 		logBack.setConsoleLevel( config.stderrLogLevel );
-		//TODO: fileLevel and logfile
+
 		LOG_NOTICE << "Starting server";
 
 		_SMERP::echoServer	echo;

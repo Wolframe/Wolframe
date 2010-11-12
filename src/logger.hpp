@@ -13,6 +13,7 @@
 
 #if !defined( _WIN32 )
 #include <syslog.h>
+#include <sys/time.h>
 #endif // !defined( _WIN32 )
 
 #if defined( _WIN32 )
@@ -69,10 +70,22 @@ namespace _SMERP {
 		
 		inline void log( const LogLevel::Level level, const std::string& msg )	{
 			if( level >= logLevel_ ) {
-				logFile_ << level << ": " << msg << std::endl;
+				logFile_ << timestamp( ) << " " << level << ": " << msg << std::endl;
 				logFile_.flush( );
 			}
-		}	
+		}
+
+		inline std::string timestamp( void ) {
+			time_t t;
+			struct tm lt;
+			char buf[32];
+
+			time( &t );
+			localtime_r( &t, &lt );
+ 			strftime( buf, 32, "%b %e %X", &lt );
+
+			return buf;
+		}
 		
 	private:
 		LogLevel::Level logLevel_;

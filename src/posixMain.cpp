@@ -203,6 +203,11 @@ int _SMERP_posixMain( int argc, char* argv[] )
 			std::ofstream pidFile( config.pidFile.c_str( ), std::ios_base::trunc );
 			pidFile << getpid( ) << std::endl;
 			pidFile.close( );
+
+			// Create the final logger based on the configuration
+			// file logger only here to get the right permissions
+			logBack.setLogfileLevel( config.logFileLogLevel );
+			logBack.setLogfileName( config.logFile );
 		}
 
 		// Block all signals for background thread.
@@ -211,7 +216,7 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		sigset_t old_mask;
 		pthread_sigmask( SIG_BLOCK, &new_mask, &old_mask );
 
-		// Create the final logger based on the configuration
+
 		LOG_NOTICE << "Starting server";
 
 		// Run server in background thread(s).
