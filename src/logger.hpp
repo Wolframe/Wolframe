@@ -254,7 +254,7 @@ namespace _SMERP {
 			eventlogLogger_.setSource( source );
 		}
 #endif // _WIN32	
-		~LogBackend()	{ /* free logger resources here */ }
+		~LogBackend()	{ /* logger resources freed in destructors of members */ }
 		
 		inline void log( const LogLevel::Level level, const std::string& msg )	{
 			consoleLogger_.log( level, msg );
