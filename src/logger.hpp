@@ -47,10 +47,12 @@ namespace _SMERP {
 	public:
 		LogfileBackend( ) {
 			logLevel_ = _SMERP::LogLevel::LOGLEVEL_UNDEFINED;
-			// we don't open a primare unknown logfile, wait for setFilename
+			isOpen_ = false;
+			// we don't open a primarily unknown logfile, wait for setFilename
 		}
 		
 		~LogfileBackend( ) {
+			logFile_.flush( );
 			logFile_.close( );
 		}
 		
@@ -64,17 +66,30 @@ namespace _SMERP {
 		}
 
 		void reopen( ) {
-			logFile_.close( );
-			logFile_.open( filename_.c_str( ), std::ios_base::out | std::ios_base::app );
+			if( isOpen_ ) {
+				logFile_.close( );
+				isOpen_ = false;
+			}
+
+			logFile_.exceptions( logFile_.badbit | logFile_.failbit ); 
+
+			try {
+				logFile_.open( filename_.c_str( ), std::ios_base::app );
+				isOpen_ = true;
+			} catch( const std::ofstream::failure& e ) {
+				//TODO: introduce system exceptions
+				std::cerr << "ERROR: " << e.what( ) << std::endl;
+			}
 		}	
 		
 		inline void log( const LogLevel::Level level, const std::string& msg )	{
-			if( level >= logLevel_ ) {
+			if( level >= logLevel_ && isOpen_ ) {
 				logFile_ << timestamp( ) << " " << level << ": " << msg << std::endl;
 				logFile_.flush( );
 			}
 		}
 
+#if !defined( _WIN32 )
 		inline std::string timestamp( void ) {
 			time_t t;
 			struct tm lt;
@@ -86,11 +101,23 @@ namespace _SMERP {
 
 			return buf;
 		}
-		
+#else // !defined( _WIN32)
+		inline std::string timestamp( void ) {
+			SYSTEMTIME t;
+			SYSTEMTIME lt;
+			TCHAR buf[32];
+			
+			GetSystemTime( &t );
+			GetLocalTime( &lt );
+			(void)GetTimeFormat( LOCALE_USER_DEFAULT, 0, &lt, NULL, buf, 32 );
+			return buf;
+		}
+#endif // !defined( _WIN32 )		
 	private:
 		LogLevel::Level logLevel_;
 		std::ofstream logFile_;
 		std::string filename_;
+		bool isOpen_;
 	};
 
 #ifndef _WIN32

@@ -31,6 +31,6 @@ int main( void ) {
 	LOG_DEBUG	<< "debug message";
 	LOG_TRACE	<< "debug message with tracing";
 	LOG_DATA	<< "debug message with tracing and data";
-
+	
 	return 0;
 }
