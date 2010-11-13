@@ -53,8 +53,9 @@ namespace _SMERP {
 		}
 		
 		~LogfileBackend( ) {
-			logFile_.flush( );
-			logFile_.close( );
+			if( isOpen_ ) {
+				logFile_.close( );
+			}
 		}
 		
 		void setLevel( const LogLevel::Level level )	{
