@@ -9,6 +9,7 @@
 #include "appConfig.hpp"
 
 #include <ostream>
+#include <sstream>
 #include <fstream>
 
 #if !defined( _WIN32 )
@@ -105,12 +106,18 @@ namespace _SMERP {
 		inline std::string timestamp( void ) {
 			SYSTEMTIME t;
 			SYSTEMTIME lt;
-			TCHAR buf[32];
+			TCHAR buf1[16];
+			TCHAR buf2[16];
 			
 			GetSystemTime( &t );
 			GetLocalTime( &lt );
-			(void)GetTimeFormat( LOCALE_USER_DEFAULT, 0, &lt, NULL, buf, 32 );
-			return buf;
+			
+			(void)GetDateFormat( LOCALE_USER_DEFAULT, 0, &lt, NULL, buf1, 16 );
+			(void)GetTimeFormat( LOCALE_USER_DEFAULT, 0, &lt, NULL, buf2, 16 );
+			
+			std::ostringstream oss;
+			oss << buf1 << " " << buf2;
+			return oss.str( );
 		}
 #endif // !defined( _WIN32 )		
 	private:
