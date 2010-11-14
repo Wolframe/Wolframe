@@ -2,7 +2,7 @@ TOPDIR = ..
 
 SUBDIRS = qt
 
--include $(TOPDIR)/makefiles/gmake/platform.mk
+-include $(TOPDIR)/makefiles/gmake/sub.mk
 
 local_all:
 

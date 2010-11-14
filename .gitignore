@@ -26,3 +26,4 @@ tests/versionTest
 tests/logTest
 tests/threadLeakTest
 tests/version-gTest
+clients/qt/qtclient
