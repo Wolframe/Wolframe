@@ -19,10 +19,14 @@ namespace _SMERP {
 	
 	private:
 		QWidget *m_ui;		// main window from theme
+		QString m_currentTheme;	// the name of the currently selected theme
 
 		void initialize( );
+		void populateThemesMenu( );
+		void loadTheme( QString themeName );
 
 	private Q_SLOTS:
+		void themeSelected( QAction *action );
 		void on_actionExit_triggered( );
 		void on_actionAbout_triggered( );
 		void on_actionAboutQt_triggered( );

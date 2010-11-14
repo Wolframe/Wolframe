@@ -17,8 +17,35 @@ MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent )
 
 void MainWindow::initialize( )
 {
+// load default theme
+	loadTheme( QString( QLatin1String( "windows" ) ) );
+
+// load all themes possible to pick
+	populateThemesMenu( );
+}
+
+void MainWindow::populateThemesMenu( )
+{
+// construct a menu which shows all available themes in a directory
+	QDir themes_dir( QLatin1String( "themes" ) );
+	QStringList themes = themes_dir.entryList( QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name );
+	QMenu *themes_menu = qFindChild<QMenu *>( m_ui, "menuThemes" );
+	QActionGroup *themesGroup = new QActionGroup( themes_menu );
+	themesGroup->setExclusive( true );
+	foreach( QString t, themes ) {
+		QAction *action = new QAction( t, themesGroup );
+		action->setCheckable( true );
+		themesGroup->addAction( action );
+		if( t == m_currentTheme ) action->setChecked( true );
+	}
+
+	themes_menu->addActions( themesGroup->actions( ) );
+	QObject::connect( themesGroup, SIGNAL( triggered( QAction * ) ), this, SLOT( themeSelected( QAction * ) ) );
+}
+
+void MainWindow::loadTheme( QString theme )
+{
 // set working directory to theme
-	QString theme( QLatin1String( "windows" ) );
 	QString themesFolder( QLatin1String( "themes/" ) + theme + QLatin1Char( '/' ) );
 
 // tell the loader that this is the working directory
@@ -33,15 +60,17 @@ void MainWindow::initialize( )
 	file.close( );
 
 // wire standard actions by name (on_<object>_<signal>)
-	QAction *actionExit = qFindChild<QAction *>( m_ui, "actionExit" );
-	QObject::connect( actionExit, SIGNAL( triggered( ) ), this, SLOT( on_actionExit_triggered( ) ) );
+	QMetaObject::connectSlotsByName( this );
 
-	QAction *actionAbout = qFindChild<QAction *>( m_ui, "actionAbout" );
-	QObject::connect( actionAbout, SIGNAL( triggered( ) ), this, SLOT( on_actionAbout_triggered( ) ) );
+// remember current theme
+	m_currentTheme = theme;
+}
 
-	QAction *actionAboutQt = qFindChild<QAction *>( m_ui, "actionAboutQt" );
-	QObject::connect( actionAboutQt, SIGNAL( triggered( ) ), this, SLOT( on_actionAboutQt_triggered( ) ) );
-
+void MainWindow::themeSelected( QAction *action )
+{
+	QString theme = action->text( );
+	if( theme != m_currentTheme )
+		loadTheme( theme );
 }
 
 void MainWindow::on_actionExit_triggered( )
