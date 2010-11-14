@@ -26,4 +26,3 @@ OPENSSL_DIR=/usr
 
 QT_DIR=/usr
 #QT_DIR=/home/user/qt
-
