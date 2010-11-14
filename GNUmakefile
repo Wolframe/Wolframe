@@ -1,8 +1,8 @@
 TOPDIR = .
 
-SUBDIRS = src tests
+SUBDIRS = src tests clients
 
-PACKAGE_NAME = SMERP
+PACKAGE_NAME = smerp
 PACKAGE_VERSION = 0.0.1
 
 -include $(TOPDIR)/makefiles/gmake/top.mk

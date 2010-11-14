@@ -2,7 +2,7 @@ TOPDIR = .
 
 SUBDIRS = src tests
 
-PACKAGE_NAME = SMERP
+PACKAGE_NAME = smerp
 PACKAGE_VERSION = 0.0.1
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\top.mk
