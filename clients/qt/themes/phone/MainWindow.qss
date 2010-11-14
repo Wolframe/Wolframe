@@ -1,0 +1,117 @@
+QMainWindow .QWidget, QStatusBar {
+    background: #f1eecf;
+}
+
+#movieWidget {
+    border: 1px solid #dc9c20;
+    border-radius: 5px;
+}
+
+#stopButton, #pauseButton, #playButton {
+    border: 1px solid transparent;
+    padding: 3px;
+}
+
+#stopButton:hover, #pauseButton:hover, #playButton:hover {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1, stop: 0 #f1eba7, stop: 1 #e0ce00);
+    border: 1px solid gray;
+    border-radius: 5px;
+}
+
+
+#stopButton:pressed, #pauseButton:pressed, #playButton:pressed,
+#stopButton:checked, #pauseButton:checked, #playButton:checked {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1, stop: 0 #e0ce00, stop: 1 #f1eba7);
+    border: 1px solid #dc9c20;
+    border-radius: 5px;
+}
+
+#timeLabel {
+    color: #b7a909;
+}
+
+QSizeGrip {
+    image: url(sizegrip.png);
+}
+
+#timeLineSlider::groove:horizontal {
+    border: 1px solid #cac15b;
+    height: 6px;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #ece273, stop:1 #f1e776);
+}
+
+#timeLineSlider::handle:horizontal {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #ede69c, stop:1 #e7d400);
+    border: 1px solid #beb44c;
+    width: 18px;
+    margin: -4px 0;
+    border-radius: 3px;
+}
+
+QMenuBar {
+     background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                       stop:0 #e5de8a, stop:1 #ded03b);
+ }
+
+QMenuBar::item {
+    spacing: 3px; /* spacing between menu bar items */
+    padding: 1px 4px;
+    background: transparent;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
+QMenuBar::item:selected { /* when selected using mouse or keyboard */
+    background: #66a5b4;
+}
+
+QMenuBar::item:pressed {
+    background: #3f91a6;
+}
+
+QMenu {
+    background-color: #ffebae;
+    border: 1px solid #a7800a;
+    padding: 1px;
+}
+
+QMenu::item {
+    padding: 2px 2px 2px 20px;
+    border: 1px solid transparent;
+    min-width: 8ex;
+}
+
+QMenu::item:selected {
+    border-color: #a47b00;
+    background: #e1bd51;
+}
+
+QMenu::icon:checked {
+    background: #dc9c20;
+    border: 1px inset #dc9c20;
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    bottom: 1px;
+    left: 1px;
+}
+
+QMenu::indicator {
+    image: none;
+}
+
+QMenu::indicator:checked {
+    image: url(tick_black.png);
+}
+
+QMenu::indicator:checked:selected {
+    image: url(tick_white.png);
+}
+
+QMenu::separator {
+    height: 2px;
+    background: #9a7504;
+    margin-left: 10px;
+    margin-right: 5px;
+}
+
