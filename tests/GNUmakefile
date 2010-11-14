@@ -34,8 +34,6 @@ TEST_CPP_BINS += \
 	version-gTest$(EXE)
 endif
 
-TEST_CPP_BINS += logTest$(EXE)
-
 include $(TOPDIR)/makefiles/gmake/sub.mk
 
 local_all:
