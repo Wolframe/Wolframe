@@ -31,7 +31,6 @@ connection::~connection()
 		LOG_TRACE << "Connection to " << identifier_ <<" destroyed";
 }
 
-
 void connection::start()
 {
 	identifier( std::string( socket().remote_endpoint().address().to_string())
@@ -42,6 +41,17 @@ void connection::start()
 	connectionHandler_->setPeer( RemoteTCPendpoint( socket().remote_endpoint().address().to_string(),
 							socket().remote_endpoint().port()));
 	nextOperation();
+}
+
+void connection::refuse( const std::string& reason )
+{
+	identifier( std::string( socket().remote_endpoint().address().to_string())
+		    + ":" + boost::lexical_cast<std::string>( socket().remote_endpoint().port() ));
+	LOG_TRACE << "Refusing connection to " << identifier() << ": " << reason;
+
+	boost::system::error_code ignored_ec;
+	socket().write_some( boost::asio::buffer( reason ), ignored_ec );
+	socket().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
 }
 
 void connection::unregister()

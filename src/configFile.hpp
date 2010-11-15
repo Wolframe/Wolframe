@@ -24,7 +24,7 @@ namespace _SMERP	{
 
 // server configuration
 		unsigned short	threads;
-		unsigned short	maxClients;
+		unsigned short	maxConnections;
 // network configuration
 		std::vector<Network::ServerTCPendpoint> address;
 		std::vector<Network::ServerSSLendpoint> SSLaddress;

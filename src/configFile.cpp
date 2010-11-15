@@ -154,8 +154,10 @@ namespace _SMERP {
 				}
 			}
 
+			unsigned maxConn = v.second.get<unsigned>( "maxConnections", 0 );
+
 			if ( v.first == "socket" )	{
-				Network::ServerTCPendpoint lep( hostStr, port );
+				Network::ServerTCPendpoint lep( hostStr, port, maxConn );
 				address.push_back( lep );
 			}
 			else if ( v.first == "SSLsocket" )	{
@@ -186,7 +188,7 @@ namespace _SMERP {
 					errMsg_ += tmpStr;
 					errMsg_ += "\" for SSL verify client. WARNING: enabling verification";
 				}
-				Network::ServerSSLendpoint lep( hostStr, port,
+				Network::ServerSSLendpoint lep( hostStr, port, maxConn,
 								certFile, keyFile,
 								verify, CAdirectory, CAchainFile );
 				SSLaddress.push_back( lep );
@@ -199,7 +201,7 @@ namespace _SMERP {
 		}
 
 		threads = pt.get<unsigned short>( "server.threads", 4 );
-		maxClients = pt.get<unsigned short>( "server.maxClients", 256 );
+		maxConnections = pt.get<unsigned short>( "server.maxConnections", 256 );
 
 		user = pt.get<std::string>( "server.daemon.user", std::string() );
 		group = pt.get<std::string>( "server.daemon.group", std::string() );

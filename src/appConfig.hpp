@@ -11,8 +11,33 @@
 
 #include <string>
 #include <vector>
+#include <list>
 
 namespace _SMERP {
+	namespace Network {
+
+		struct ServerConfig	{
+#if !defined( _WIN32 )
+			// daemon configuration
+			std::string		user;
+			std::string		group;
+			std::string		pidFile;
+#else
+			// service configuration
+			std::string		serviceName;
+			std::string		serviceDisplayName;
+			std::string		serviceDescription;
+#endif	// !defined( _WIN32 )
+			// server configuration
+			unsigned		threads;
+			unsigned		maxConnections;
+
+			// network configuration
+			std::list<Network::ServerTCPendpoint> address;
+			std::list<Network::ServerSSLendpoint> SSLaddress;
+		};
+
+	} // namespace Network
 
 // application configuration structure
 
@@ -35,7 +60,7 @@ namespace _SMERP {
 
 // server configuration
 		unsigned		threads;
-		unsigned		maxClients;
+		unsigned		maxConnections;
 
 // network configuration
 		std::vector<Network::ServerTCPendpoint> address;

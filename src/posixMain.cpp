@@ -204,7 +204,7 @@ int _SMERP_posixMain( int argc, char* argv[] )
 			if( !pidFile.good( ) ) {
 				LOG_CRITICAL << "Unable to create PID file '" << config.pidFile << "'!";
 				return _SMERP::ErrorCodes::FAILURE;
- 			}
+			}
 			pidFile << getpid( ) << std::endl;
 			pidFile.close( );
 
@@ -225,7 +225,7 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		// Run server in background thread(s).
 		_SMERP::echoServer	echo;
 		_SMERP::Network::server s( config.address, config.SSLaddress, echo,
-					   config.threads, config.maxClients );
+					   config.threads, config.maxConnections );
 		boost::thread t( boost::bind( &_SMERP::Network::server::run, &s ));
 
 		// Restore previous signals.

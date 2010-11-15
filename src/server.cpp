@@ -19,7 +19,8 @@ namespace _SMERP {
 
 		server::server( const std::vector<ServerTCPendpoint>& TCPserver,
 				SMERP_UNUSED const std::vector<ServerSSLendpoint>& SSLserver,
-				ServerHandler& serverHandler, unsigned threads,  unsigned maxConnections )
+				ServerHandler& serverHandler,
+				unsigned threads, unsigned maxConnections )
 					: threadPoolSize_( threads ),
 					maxConnections_( maxConnections ),
 					IOservice_()
@@ -27,7 +28,7 @@ namespace _SMERP {
 			size_t	i;
 			for ( i = 0; i < TCPserver.size(); i++ )	{
 				acceptor* acptr = new acceptor( IOservice_,
-								TCPserver[i].host(), TCPserver[i].port(),
+								TCPserver[i].host(), TCPserver[i].port(), TCPserver[i].maxConnections(),
 								serverHandler );
 				acceptor_.push_back( acptr );
 			}
@@ -38,7 +39,7 @@ namespace _SMERP {
 								      SSLserver[i].certificate(), SSLserver[i].key(),
 								      SSLserver[i].verifyClientCert(),
 								      SSLserver[i].CAchain(), SSLserver[i].CAdirectory(),
-								      SSLserver[i].host(), SSLserver[i].port(),
+								      SSLserver[i].host(), SSLserver[i].port(), SSLserver[i].maxConnections(),
 								      serverHandler );
 				SSLacceptor_.push_back( acptr );
 			}

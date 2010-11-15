@@ -27,7 +27,7 @@ class acceptor: private boost::noncopyable
 public:
 	/// Constructor
 	explicit acceptor( boost::asio::io_service& IOservice,
-			   const std::string& host, unsigned short port,
+			   const std::string& host, unsigned short port, unsigned maxConnections,
 			   ServerHandler& srvHandler );
 
 	/// Destructor
@@ -50,6 +50,7 @@ private:
 	boost::asio::ip::tcp::acceptor		acceptor_;	// Acceptor(s) used to listen for incoming connections.
 	connection_ptr				newConnection_;	// The next connection to be accepted.
 	ConnectionList<connection_ptr>		connList_;	// List of active connections
+	unsigned				maxConnections_;// maximum number of simultaneous connections
 	std::string				identifier_;
 
 	ServerHandler&				srvHandler_;	// The handler for all incoming requests.
@@ -66,9 +67,9 @@ public:
 	/// Construct the acceptor
 	explicit SSLacceptor( boost::asio::io_service& IOservice,
 			      const std::string& certFile, const std::string& keyFile,
-				  bool verify, const std::string& CAchainFile, const std::string& CAdirectory,
-				  const std::string& host, unsigned short port,
-				  ServerHandler& srvHandler );
+			      bool verify, const std::string& CAchainFile, const std::string& CAdirectory,
+			      const std::string& host, unsigned short port, unsigned maxConnections,
+			      ServerHandler& srvHandler );
 
 	/// Destruct the serverrequestHandler&				requestHandler
 	~SSLacceptor();
@@ -94,6 +95,7 @@ private:
 	boost::asio::ssl::context		SSLcontext_;	/// SSL acceptor server context
 	SSLconnection_ptr			newConnection_;	// The next connection to be accepted.
 	ConnectionList<SSLconnection_ptr>	connList_;	// List of active connections
+	unsigned				maxConnections_;// maximum number of simultaneous connections
 	std::string				identifier_;
 
 	ServerHandler&				srvHandler_;	// The handler for all incoming requests.

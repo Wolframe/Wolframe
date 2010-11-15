@@ -21,31 +21,22 @@ namespace _SMERP {
 	class ConnectionList
 	{
 	public:
-		void push( T conn )
-		{
-			connList_.push_back( conn );
-		}
-
-		void remove( T conn )
-		{
-			connList_.remove( conn );
-		}
-
-		T pop()
-		{
+		std::size_t size()	{ return connList_.size(); }
+		void push( T conn )	{ connList_.push_back( conn ); }
+		void remove( T conn )	{ connList_.remove( conn ); }
+		T pop()	{
 			if ( connList_.empty())
 				return T();
 			T conn = connList_.front();
 			connList_.pop_front();
 			return conn;
 		}
-
 	private:
 		std::list< T >	connList_;
 	};
 
 
-	class connection;
+	class connection;		// forward declaration for connection_ptr
 	typedef boost::shared_ptr<connection> connection_ptr;
 
 	/// Represents a single connection from a client.
@@ -65,6 +56,9 @@ namespace _SMERP {
 		/// Start the first asynchronous operation for the connection.
 		void start();
 
+		/// Send back a standard message and shutdown socket
+		void refuse( const std::string& reason );
+
 		/// Unregister the connection from the list of active connections
 		void unregister();
 
@@ -79,7 +73,7 @@ namespace _SMERP {
 
 #ifdef WITH_SSL
 
-	class SSLconnection;
+	class SSLconnection;		// forward declaration for SSLconnection_ptr
 	typedef boost::shared_ptr<SSLconnection> SSLconnection_ptr;
 
 	typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket>	ssl_socket;

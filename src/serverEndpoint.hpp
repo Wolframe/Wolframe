@@ -11,13 +11,21 @@ namespace Network	{
 	class ServerTCPendpoint : public ConnectionEndpoint
 	{
 	public:
-		ServerTCPendpoint( const std::string& Host, unsigned short Port )
-			: ConnectionEndpoint( Host, Port )	{}
+		ServerTCPendpoint( const std::string& Host, unsigned short Port, unsigned maxConn = 0 )
+			: ConnectionEndpoint( Host, Port )
+		{
+			maxConnections_ = maxConn;
+		}
+
+		unsigned maxConnections() const	{ return maxConnections_; }
+
+	private:
+		unsigned	maxConnections_;
 	};
 
 
 	/// SSL connection server endpoint
-	class ServerSSLendpoint : public ConnectionEndpoint
+	class ServerSSLendpoint : public ServerTCPendpoint
 	{
 		friend class server;
 	private:
@@ -27,10 +35,10 @@ namespace Network	{
 		std::string	CAchain_;
 		bool		verify_;
 	public:
-		ServerSSLendpoint( const std::string& Host, unsigned short Port,
+		ServerSSLendpoint( const std::string& Host, unsigned short Port, unsigned maxConn,
 				   const std::string& Certificate, const std::string& Key,
 				   bool verify, const std::string& CAdir, const std::string& CAchainFile )
-			: ConnectionEndpoint( Host, Port )
+			: ServerTCPendpoint( Host, Port, maxConn )
 		{
 			cert_ = Certificate;
 			key_ = Key;

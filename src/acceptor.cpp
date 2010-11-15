@@ -16,13 +16,14 @@ namespace _SMERP {
 	namespace Network {
 
 acceptor::acceptor( boost::asio::io_service& IOservice,
-		    const std::string& host, unsigned short port,
+		    const std::string& host, unsigned short port, unsigned maxConnections,
 		    ServerHandler& srvHandler ) :
 	IOservice_( IOservice ),
 	strand_( IOservice_ ),
 	acceptor_( IOservice_ ),
 	srvHandler_( srvHandler )
 {
+	maxConnections_ = maxConnections;
 	// Open the acceptor(s) with the option to reuse the address (i.e. SO_REUSEADDR).
 	boost::asio::ip::tcp::resolver resolver( IOservice_ );
 	boost::asio::ip::tcp::resolver::query query( host, "");
@@ -54,8 +55,11 @@ acceptor::~acceptor()
 void acceptor::handleAccept( const boost::system::error_code& e )
 {
 	if ( !e )	{
-		newConnection_->start();
 		LOG_DEBUG << "Received new connection on " << identifier_;
+		if ( maxConnections_ > 0 && connList_.size() >= maxConnections_ )
+			newConnection_->refuse( "Maximum number of connections reached. \nPlease try again later.\n" );
+		else
+			newConnection_->start();
 
 		connectionHandler *handler = srvHandler_.newConnection( LocalTCPendpoint( acceptor_.local_endpoint().address().to_string(),
 											  acceptor_.local_endpoint().port() ));
@@ -97,7 +101,7 @@ void acceptor::handleStop()
 SSLacceptor::SSLacceptor( boost::asio::io_service& IOservice,
 			  const std::string& certFile, const std::string& keyFile,
 			  bool verify, const std::string& CAchainFile, const std::string& CAdirectory,
-			  const std::string& host, unsigned short port,
+			  const std::string& host, unsigned short port, unsigned maxConnections,
 			  ServerHandler& srvHandler) :
 	IOservice_( IOservice ),
 	strand_( IOservice_ ),
@@ -107,6 +111,7 @@ SSLacceptor::SSLacceptor( boost::asio::io_service& IOservice,
 {
 	boost::system::error_code	ec;
 
+	maxConnections_ = maxConnections;
 	SSLcontext_.set_options( boost::asio::ssl::context::default_workarounds
 			    | boost::asio::ssl::context::no_sslv2
 			    | boost::asio::ssl::context::single_dh_use

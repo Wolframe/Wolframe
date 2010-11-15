@@ -43,7 +43,7 @@ namespace _SMERP {
 		serviceDescription = cfgFile.serviceDescription;
 
 		threads = cfgFile.threads;
-		maxClients = cfgFile.maxClients;
+		maxConnections = cfgFile.maxConnections;
 
 		address = cfgFile.address;
 		SSLaddress = cfgFile.SSLaddress;
@@ -89,26 +89,23 @@ namespace _SMERP {
 
 	void ApplicationConfiguration::print( std::ostream& os ) const
 	{
-		os << "Configuration file: " << configFile << std::endl;
-		// from command line
-		os << "Run in foreground: " << (foreground ? "yes" : "no") << std::endl;
 
+		os << "Configuration file: " << configFile << std::endl;
 // Unix daemon
 #if !defined(_WIN32)
+		os << "Run in foreground: " << (foreground ? "yes" : "no") << std::endl;
 		os << "Run as " << (user.empty() ? "(not specified)" : user) << ":"
 				<< (group.empty() ? "(not specified)" : group) << std::endl;
 		os << "PID file: " << pidFile << std::endl;
-		os << "Number of threads: " << threads << std::endl;
-		os << "Maximum number of clients: " << maxClients << std::endl;
-#endif
-
+#else
 // Windows service
-#if defined(_WIN32)
 		os << "When run as service" << std::endl
 			<< "  Name: " << serviceName << std::endl
 			<< "  Displayed name: " << serviceDisplayName << std::endl
 			<< "  Description: " << serviceDescription << std::endl;
 #endif
+		os << "Number of threads: " << threads << std::endl;
+		os << "Maximum number of connections: " << maxConnections << std::endl;
 
 		os << "Network" << std::endl;
 		if ( address.size() > 0 )	{
