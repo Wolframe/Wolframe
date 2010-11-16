@@ -22,9 +22,10 @@ namespace _SMERP {
 				ServerHandler& serverHandler,
 				unsigned threads, unsigned maxConnections )
 					: threadPoolSize_( threads ),
-					maxConnections_( maxConnections ),
+
 					IOservice_()
 		{
+			maxConnections_ = maxConnections;
 			size_t	i;
 			for ( i = 0; i < TCPserver.size(); i++ )	{
 				acceptor* acptr = new acceptor( IOservice_,

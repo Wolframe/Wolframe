@@ -65,7 +65,7 @@ namespace _SMERP {
 		void identifier( const std::string& name )	{ identifier_ = name; }
 
 		/// Get the connection identifier (i.e. remote endpoint).
-		const std::string& identifier()	{ return identifier_; }
+		const std::string& identifier()			{ return identifier_; }
 
 	protected:
 		/// Connection identification string (i.e. remote endpoint)

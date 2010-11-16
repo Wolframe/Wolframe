@@ -13,7 +13,7 @@
 
 
 namespace _SMERP {
-	namespace Network {
+namespace Network {
 
 acceptor::acceptor( boost::asio::io_service& IOservice,
 		    const std::string& host, unsigned short port, unsigned maxConnections,
@@ -21,12 +21,12 @@ acceptor::acceptor( boost::asio::io_service& IOservice,
 	IOservice_( IOservice ),
 	strand_( IOservice_ ),
 	acceptor_( IOservice_ ),
+	connList_ ( maxConnections ),
 	srvHandler_( srvHandler )
 {
-	maxConnections_ = maxConnections;
 	// Open the acceptor(s) with the option to reuse the address (i.e. SO_REUSEADDR).
 	boost::asio::ip::tcp::resolver resolver( IOservice_ );
-	boost::asio::ip::tcp::resolver::query query( host, "");
+	boost::asio::ip::tcp::resolver::query query( host, "" );
 	boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve( query );
 	endpoint.port( port );
 
@@ -56,10 +56,7 @@ void acceptor::handleAccept( const boost::system::error_code& e )
 {
 	if ( !e )	{
 		LOG_DEBUG << "Received new connection on " << identifier_;
-		if ( maxConnections_ > 0 && connList_.size() >= maxConnections_ )
-			newConnection_->refuse( "Maximum number of connections reached. \nPlease try again later.\n" );
-		else
-			newConnection_->start();
+		newConnection_->start();
 
 		connectionHandler *handler = srvHandler_.newConnection( LocalTCPendpoint( acceptor_.local_endpoint().address().to_string(),
 											  acceptor_.local_endpoint().port() ));
@@ -107,11 +104,11 @@ SSLacceptor::SSLacceptor( boost::asio::io_service& IOservice,
 	strand_( IOservice_ ),
 	acceptor_( IOservice_ ),
 	SSLcontext_( IOservice_, boost::asio::ssl::context::sslv23 ),
+	connList_ ( maxConnections ),
 	srvHandler_( srvHandler )
 {
 	boost::system::error_code	ec;
 
-	maxConnections_ = maxConnections;
 	SSLcontext_.set_options( boost::asio::ssl::context::default_workarounds
 			    | boost::asio::ssl::context::no_sslv2
 			    | boost::asio::ssl::context::single_dh_use
@@ -163,7 +160,7 @@ SSLacceptor::SSLacceptor( boost::asio::io_service& IOservice,
 
 	// Open the acceptor(s) with the option to reuse the address (i.e. SO_REUSEADDR).
 	boost::asio::ip::tcp::resolver resolver( IOservice_ );
-	boost::asio::ip::tcp::resolver::query query( host, "");
+	boost::asio::ip::tcp::resolver::query query( host, "" );
 	boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve( query );
 	endpoint.port( port );
 
@@ -192,11 +189,11 @@ SSLacceptor::~SSLacceptor()
 void SSLacceptor::handleAccept( const boost::system::error_code& e )
 {
 	if ( !e )	{
-		newConnection_->start();
 		LOG_DEBUG << "Received new connection on " << identifier_;
+		newConnection_->start();
 
 		connectionHandler *handler = srvHandler_.newSSLconnection( LocalSSLendpoint( acceptor_.local_endpoint().address().to_string(),
-											  acceptor_.local_endpoint().port() ));
+											     acceptor_.local_endpoint().port() ));
 		newConnection_.reset( new SSLconnection( IOservice_, SSLcontext_, connList_, handler ));
 		acceptor_.async_accept( newConnection_->socket().lowest_layer(),
 					strand_.wrap( boost::bind( &SSLacceptor::handleAccept,

@@ -21,7 +21,8 @@ namespace _SMERP {
 	class ConnectionList
 	{
 	public:
-		std::size_t size()	{ return connList_.size(); }
+		ConnectionList( unsigned maxConnections )
+					{ maxConn_ = maxConnections; }
 		void push( T conn )	{ connList_.push_back( conn ); }
 		void remove( T conn )	{ connList_.remove( conn ); }
 		T pop()	{
@@ -31,13 +32,15 @@ namespace _SMERP {
 			connList_.pop_front();
 			return conn;
 		}
+		bool full()		{ return( maxConn_ > 0 && connList_.size() >= maxConn_ ); }
 	private:
 		std::list< T >	connList_;
+		unsigned	maxConn_;
 	};
 
 
 	class connection;		// forward declaration for connection_ptr
-	typedef boost::shared_ptr<connection> connection_ptr;
+	typedef boost::shared_ptr< connection > connection_ptr;
 
 	/// Represents a single connection from a client.
 	class connection : public connectionBase< boost::asio::ip::tcp::socket >
@@ -56,25 +59,22 @@ namespace _SMERP {
 		/// Start the first asynchronous operation for the connection.
 		void start();
 
-		/// Send back a standard message and shutdown socket
-		void refuse( const std::string& reason );
-
 		/// Unregister the connection from the list of active connections
 		void unregister();
 
 	private:
 		/// Socket for the connection.
-		boost::asio::ip::tcp::socket	socket_;
+		boost::asio::ip::tcp::socket		socket_;
 
 		/// List of connections to which it belongs
-		ConnectionList<connection_ptr>&	connList_;
+		ConnectionList< connection_ptr >&	connList_;
 	};
 
 
 #ifdef WITH_SSL
 
 	class SSLconnection;		// forward declaration for SSLconnection_ptr
-	typedef boost::shared_ptr<SSLconnection> SSLconnection_ptr;
+	typedef boost::shared_ptr< SSLconnection > SSLconnection_ptr;
 
 	typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket>	ssl_socket;
 
@@ -107,7 +107,7 @@ namespace _SMERP {
 		ssl_socket				SSLsocket_;
 
 		/// List of connections to which it belongs
-		ConnectionList<SSLconnection_ptr>&	connList_;
+		ConnectionList< SSLconnection_ptr >&	connList_;
 	};
 
 #endif // WITH_SSL
