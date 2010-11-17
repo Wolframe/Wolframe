@@ -27,3 +27,4 @@ tests/logTest
 tests/threadLeakTest
 tests/version-gTest
 clients/qt/qtclient
+moc_*.cpp
