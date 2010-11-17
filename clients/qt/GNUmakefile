@@ -8,6 +8,7 @@ INCLUDE_CPPFLAGS =
 
 INCLUDE_DIRS = \
 	-I. \
+	-I$(QT_DIR)/include \
 	-I$(QT_DIR)/include/QtCore \
 	-I$(QT_DIR)/include/QtGui \
 	-I$(QT_DIR)/include/QtUiTools
