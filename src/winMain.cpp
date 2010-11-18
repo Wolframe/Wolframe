@@ -259,7 +259,7 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 
 // run server in background thread(s).
 		_SMERP::echoServer	echo;
-		_SMERP::Network::server s( config.address, config.SSLaddress, echo, config.threads, config.maxClients );
+		_SMERP::Network::server s( config.address, config.SSLaddress, echo, config.threads, config.maxConnections );
 		boost::thread t( boost::bind( &_SMERP::Network::server::run, &s ));
 
 // we are up and running now (hopefully), signal this to the SCM
@@ -415,7 +415,7 @@ int _SMERP_winMain( int argc, char* argv[] )
 
 		_SMERP::echoServer	echo;
 		_SMERP::Network::server s( config.address, config.SSLaddress,
-					   echo, config.threads, config.maxClients );
+					   echo, config.threads, config.maxConnections );
 
 		// Set console control handler to allow server to be stopped.
 		consoleCtrlFunction = boost::bind(&_SMERP::Network::server::stop, &s);

@@ -20,15 +20,13 @@ set BOOST_DIR to C:\Program Files\Boost\Boost_1_44
 Compile and install boost
 -------------------------
 
-If you insist to compile Boost from scratch, do the following:
+If you insist to compile Boost from scratch, do the following
+in a Visual Studio C++ command line:
 
-TODO: ./bootstrap.sh --prefix=C:\TEMP\boost-1_44_0
-TODO: ./bjam
-TODO: ./bjam install
-TODO: 
+bootstrap
+.\bjam
 
-configure SMERP in makefiles\nmake\config.mk and
-set BOOST_DIR to C:\TEMP\boost-1_44_0
+set BOOST_DIR to C:\<myhome>\boost-1_44_0
 
 Compile and install openssl
 ---------------------------
