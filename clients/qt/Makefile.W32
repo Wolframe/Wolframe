@@ -12,7 +12,6 @@ INCLUDE_DIRS = \
 	/I"$(QT_DIR)\include\QtGui" \
 	/I"$(QT_DIR)\include\QtUiTools"
 
-# Note: libraries are picked automatically on Windows!
 QT_LDFLAGS = /LIBPATH:"$(QT_DIR)\lib"
 INCLUDE_LDFLAGS = \
 	$(QT_LDFLAGS)
