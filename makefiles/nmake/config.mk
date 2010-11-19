@@ -53,3 +53,10 @@ BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\stage\lib"
 OPENSSL_DIR=C:\Programme\OpenSSL-1.0.0a
 #OPENSSL_DIR=C:\Program Files\OpenSSL
 #OPENSSL_DIR=D:\Programme\OpenSSL
+
+# Qt 4 (http://qt.nokia.com/products/)
+# take the VC2008 version SDK Opensource, not the MinGW one
+############################################################
+
+QT_DIR=C:\Qt\4.7.1
+#QT_DIR=/home/user/qt
