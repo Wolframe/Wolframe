@@ -20,9 +20,6 @@ INCLUDE_LDFLAGS = \
 INCLUDE_LIBS = \
 	QtCore4.lib QtGui4.lib QtUiTools.lib
 
-#INCLUDE_LIBS =
-#	-lQtCore -lQtGui -lQtUiTools
-
 CPP_BINS = \
 	qtclient.exe
 	
@@ -33,8 +30,6 @@ OBJS = \
 all: $(OBJS) $(CPP_BINS)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
-
-smerpd.exe: smerpd.obj smerpmsg.res 
 
 local_all:
 
