@@ -10,7 +10,7 @@
 namespace _SMERP {
 	namespace QtClient {
 
-MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent )
+MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ), m_ui( 0 )
 {
 	initialize( );
 }
@@ -19,9 +19,6 @@ void MainWindow::initialize( )
 {
 // load default theme
 	loadTheme( QString( QLatin1String( "windows" ) ) );
-
-// load all themes possible to pick
-	populateThemesMenu( );
 }
 
 void MainWindow::populateThemesMenu( )
@@ -45,52 +42,6 @@ void MainWindow::populateThemesMenu( )
 
 void MainWindow::loadTheme( QString theme )
 {
-#if 0
-	current_theme = theme;
-
-	QWidget *old_ui = ui;
-	QUiLoader loader;
-
-	// go to theme directory
-	QString theme_folder( QLatin1String( "themes/" ) + theme + QLatin1Char( '/' ) );
-	loader.setWorkingDirectory( theme_folder );
-
-	// load the main window
-	QFile file( theme_folder + QLatin1String( "Test1.ui" ) );
-	file.open( QFile::ReadOnly );
-	ui = loader.load( &file, this );
-	file.close( );
-
-	// set stylesheet of the application (has impact on the whole application)
-	QFile qss( theme_folder + QLatin1String( "Test1.qss" ) );
-	qApp->setStyleSheet( QLatin1String( "file:///" ) + QFileInfo( qss ).absoluteFilePath( ) );
-
-	// initialize menu actions and connects signals to slots
-	initialize( );
-
-	// copy over the location of the old window to the new one
-	// also copy over the current form, don't destroy the old ui,
-	// events could be outstanding (deleteLater marks the widget
-	// for deletion, will be deleted when returning into the event
-	// loop)
-	if( old_ui ) {
-		ui->move( old_ui->pos( ) );
-		old_ui->hide( );
-		old_ui->deleteLater( );
-	}
-
-	// set preferred base style
-	QStyle *base_style = QStyleFactory::create( ui->property( "themeBaseStyle" ).toString( ) );
-	if( base_style ) {
-		base_style->setParent( ui );
-		ui->setStyle( base_style );
-	}
-
-	// show new UI
-	ui->show( );
-
-#endif
-
 	qApp->setOverrideCursor( Qt::BusyCursor );
 
 // set working directory to theme
@@ -99,6 +50,9 @@ void MainWindow::loadTheme( QString theme )
 // tell the loader that this is the working directory
 	QUiLoader loader;
 	loader.setWorkingDirectory( themesFolder );
+
+// remember current user interface
+	QWidget *oldUi = m_ui;
 
 // load the main window (which is empty) and provides basic functions like
 // theme switching, login, exit, about, etc. (to start unauthenticated)
@@ -123,8 +77,25 @@ void MainWindow::loadTheme( QString theme )
 	QAction *actionAboutQt = qFindChild<QAction *>( m_ui, "actionAboutQt" );
 	QObject::connect( actionAboutQt, SIGNAL( triggered( ) ), this, SLOT( on_actionAboutQt_triggered( ) ) );
 
+// copy over the location of the old window to the new one
+// also copy over the current form, don't destroy the old ui,
+// events could be outstanding (deleteLater marks the widget 
+// for deletion, will be deleted when returning into the event
+// loop)
+	if( oldUi ) {
+		m_ui->move( oldUi->pos( ) );
+		oldUi->hide( );
+		oldUi->deleteLater( );
+	}
+
+// show the new gui
+	m_ui->show( );
+	
 // remember current theme
 	m_currentTheme = theme;
+
+// load all themes possible to pick and mark the current one
+	populateThemesMenu( );
 
 	qApp->restoreOverrideCursor( );
 }
