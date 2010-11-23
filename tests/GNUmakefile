@@ -27,6 +27,7 @@ TEST_OBJS = \
 TEST_CPP_BINS = \
 	versionTest$(EXE) \
 	threadLeakTest$(EXE) \
+	pechoHandlerTest$(EXE) \
 	logTest$(EXE)
 
 ifdef WITH_GTEST
@@ -35,6 +36,11 @@ TEST_CPP_BINS += \
 endif
 
 include $(TOPDIR)/makefiles/gmake/sub.mk
+
+pechoHandlerTest$(EXE): pechoHandlerTest.cpp $(TOPDIR)/src/pechoHandler.cpp $(TOPDIR)/src/pechoHandler.hpp $(TOPDIR)/src/protocol.hpp
+	$(CCPP) -c -o pechoHandlerTest.o $(CCPPFLAGS) pechoHandlerTest.cpp
+	$(CCPP) -c -o pechoHandler.o -DMODULE_TEST $(CCPPFLAGS) $(TOPDIR)/src/pechoHandler.cpp
+	$(CCPP_LINK) -o pechoHandlerTest$(EXE) pechoHandler.o pechoHandlerTest.o
 
 local_all:
 

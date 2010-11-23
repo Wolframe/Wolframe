@@ -54,6 +54,7 @@ OBJS = \
 	connection.o \
 	server.o \
 	echoHandler.o \
+	pechoHandler.o \
 	xmlselectHandler.o \
 	posixMain.o
 

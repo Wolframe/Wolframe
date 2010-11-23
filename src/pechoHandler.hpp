@@ -1,14 +1,14 @@
 //
-// xmlselectHandler.hpp - simple echo handler example
+// pechoHandler.hpp - simple echo handler example
 //
 
-#ifndef _SMERP_XMLSELECT_HANDLER_HPP_INCLUDED
-#define _SMERP_XMLSELECT_HANDLER_HPP_INCLUDED
-
+#ifndef _SMERP_PROTOCOL_ECHO_HANDLER_HPP_INCLUDED
+#define _SMERP_PROTOCOL_ECHO_HANDLER_HPP_INCLUDED
 #include "connectionHandler.hpp"
 
+
 namespace _SMERP {
-namespace xmlselect {
+namespace pecho {
 
 	/// The connection handler
 	class Connection : public Network::connectionHandler
@@ -16,7 +16,7 @@ namespace xmlselect {
 	public:
       typedef Network::NetworkOperation Operation;
 
-		Connection( const Network::LocalTCPendpoint& local );
+      Connection( const Network::LocalTCPendpoint& local );
 		Connection( const Network::LocalSSLendpoint& local );
 		~Connection();
 
@@ -28,7 +28,7 @@ namespace xmlselect {
       virtual void* parseInput( const void *begin, std::size_t bytesTransferred );
 
    public:
-      enum {MemBlockSize=4096};
+      enum {MemBlockSize=8};
       struct Private;
 	private:
       Private* data;
@@ -43,7 +43,7 @@ namespace xmlselect {
 		Network::connectionHandler* newSSLconnection( const Network::LocalSSLendpoint& local );
 	};
 
-} // namespace xmlselect
+} // namespace pecho
 } // namespace _SMERP
 
 #endif // _SMERP_XMLSELECT_HANDLER_HPP_INCLUDED
