@@ -7,15 +7,7 @@
 #include "textwolf.hpp"
 #include "protocol.hpp"
 #include "pechoHandler.hpp"
-#ifdef MODULE_TEST
-#include <iostream>
-#define LOG_TRACE std::cerr
-#define LOG_DATA std::stringstream()
-#define ENDL std::endl
-#else
 #include "logger.hpp"
-#define ENDL ""
-#endif
 #include <vector>
 #include <string>
 #include <cstring>
@@ -373,7 +365,7 @@ struct Connection::Private
       {
          for (;;)
          {
-            LOG_DATA << "\nState: " << stateName(state) << ENDL;
+            LOG_DATA << "\nState: " << stateName(state);
       
             switch( state)
             {
@@ -522,7 +514,7 @@ struct Connection::Private
       }
       catch (Input::End)
       {
-         LOG_DATA << "End of input interrupt" << ENDL;
+         LOG_DATA << "End of input interrupt";
          return Operation( Operation::READ, input->ptr, input->size);         
       };
       return Operation( Operation::TERMINATE);

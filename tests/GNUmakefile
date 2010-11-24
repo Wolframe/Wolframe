@@ -37,10 +37,11 @@ endif
 
 include $(TOPDIR)/makefiles/gmake/sub.mk
 
-pechoHandlerTest$(EXE): pechoHandlerTest.cpp $(TOPDIR)/src/pechoHandler.cpp $(TOPDIR)/src/pechoHandler.hpp $(TOPDIR)/src/protocol.hpp
+pechoHandlerTest$(EXE): pechoHandlerTest.cpp $(TOPDIR)/src/logger.cpp $(TOPDIR)/src/pechoHandler.cpp $(TOPDIR)/src/pechoHandler.hpp $(TOPDIR)/src/protocol.hpp
 	$(CCPP) -c -o pechoHandlerTest.o $(CCPPFLAGS) pechoHandlerTest.cpp
-	$(CCPP) -c -o pechoHandler.o -DMODULE_TEST $(CCPPFLAGS) $(TOPDIR)/src/pechoHandler.cpp
-	$(CCPP_LINK) -o pechoHandlerTest$(EXE) pechoHandler.o pechoHandlerTest.o
+	$(CCPP) -c -o logger.o $(CCPPFLAGS) $(TOPDIR)/src/logger.cpp
+	$(CCPP) -c -o pechoHandler.o $(CCPPFLAGS) $(TOPDIR)/src/pechoHandler.cpp
+	$(CCPP_LINK) -o pechoHandlerTest$(EXE) logger.o pechoHandler.o pechoHandlerTest.o
 
 local_all:
 

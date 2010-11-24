@@ -3,15 +3,7 @@
 //
 #include "protocol.hpp"
 #include "pechoHandler.hpp"
-#ifdef MODULE_TEST
-#include <iostream>
-#define LOG_TRACE std::cerr
-#define LOG_DATA std::stringstream()
-#define ENDL std::endl
-#else
 #include "logger.hpp"
-#define ENDL ""
-#endif
 
 using namespace _SMERP;
 using namespace _SMERP::pecho;
@@ -124,7 +116,7 @@ struct Connection::Private
       {
          for (;;)
          {
-         LOG_DATA << "\nState: " << stateName(state) << "(" << modeName(mode) << ")" << ENDL;
+         LOG_DATA << "\nState: " << stateName(state) << "(" << modeName(mode) << ")";
   
          switch( state)
          {
@@ -308,7 +300,7 @@ struct Connection::Private
       }
       catch (Input::End)
       {
-         LOG_DATA << "End of input interrupt" << ENDL;
+         LOG_DATA << "End of input interrupt";
          return Operation( Operation::READ, input->ptr, input->size);         
       };
       return Operation( Operation::TERMINATE);
@@ -319,29 +311,29 @@ struct Connection::Private
 Connection::Connection( const Network::LocalTCPendpoint& local)
 {
    data = new Private();
-   LOG_TRACE << "Created connection handler for " << local.toString() << ENDL;
+   LOG_TRACE << "Created connection handler for " << local.toString();
 }
 
 Connection::Connection( const Network::LocalSSLendpoint& local)
 {
    data = new Private();
-   LOG_TRACE << "Created connection handler (SSL) for " << local.toString() << ENDL;
+   LOG_TRACE << "Created connection handler (SSL) for " << local.toString();
 }
 
 Connection::~Connection()
 {
-   LOG_TRACE << "Connection handler destroyed" << ENDL;
+   LOG_TRACE << "Connection handler destroyed";
    delete data;
 }
 
 void Connection::setPeer( const Network::RemoteTCPendpoint& remote)
 {
-   LOG_TRACE << "Peer set to " << remote.toString() << ENDL;
+   LOG_TRACE << "Peer set to " << remote.toString();
 }
 
 void Connection::setPeer( const Network::RemoteSSLendpoint& remote)
 {
-   LOG_TRACE << "Peer set to " << remote.toString() << ENDL;
+   LOG_TRACE << "Peer set to " << remote.toString();
 }
 
 void* Connection::parseInput( const void *begin, std::size_t bytesTransferred)

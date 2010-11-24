@@ -6,27 +6,30 @@
 //link     g++ -lc -o pechoHandlerTest pechoHandlerTest.o pechoHandler.o
 
 #include "pechoHandler.hpp"
+#include "logger.hpp"
 #include <stdio.h>
 #include <string.h>
 
 using namespace _SMERP;
 
+LogBackend   logBack;
+
 struct Bad {};
 
 int main( int, const char**)
 {
-   LocalTCPendpoint ep( "127.0.0.1", 12345);
+   Network::LocalTCPendpoint ep( "127.0.0.1", 12345);
    pecho::Connection test( ep);
 
    try
    {
       for (;;)
       {
-          NetworkOperation netop( test.nextOperation());
+          Network::NetworkOperation netop( test.nextOperation());
 
           switch (netop.operation())
           {
-              case NetworkOperation::READ:
+              case Network::NetworkOperation::READ:
               {
                   //fprintf( stderr, "network operation is READ\n"); 
                   char* data = (char*)netop.data();
@@ -36,7 +39,7 @@ int main( int, const char**)
               }
               break;
               
-              case NetworkOperation::WRITE:
+              case Network::NetworkOperation::WRITE:
               {
                   char* data = (char*)netop.data();
                   std::size_t size = netop.size();                  
@@ -46,7 +49,7 @@ int main( int, const char**)
               }
               break;
               
-              case NetworkOperation::TERMINATE:
+              case Network::NetworkOperation::TERMINATE:
                   //fprintf( stderr, "network operation is TERMINATE\n"); 
                   return 0;
               break;
