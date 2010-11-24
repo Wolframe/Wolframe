@@ -24,19 +24,19 @@ PLATFORM_SDK_DIR = C:\Program Files\Microsoft SDKs\Windows\v7.0
 
 # version of the boost library
 
-BOOST_VERSION=1_44
+BOOST_VERSION=1_45
 
 # base dir where boost is installed
 
 #BOOST_DIR=C:\Programme\boost\boost_$(BOOST_VERSION)
 #BOOST_DIR=C:\Program Files\boost\boost_$(BOOST_VERSION)
 #BOOST_DIR=D:\Programme\boost\boost_$(BOOST_VERSION)
-BOOST_DIR=C:\Cygwin\home\Andreas\boost_1_44_0
+BOOST_DIR=E:\boost_1_45_0
 
 # visual studio version used for compiling
 
-BOOST_VC_VER=vc80
-#BOOST_VC_VER=vc90
+#BOOST_VC_VER=vc80
+BOOST_VC_VER=vc90
 
 # TODO: probe those
 BOOST_MT=-mt
