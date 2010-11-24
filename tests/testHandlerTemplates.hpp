@@ -11,62 +11,74 @@ namespace _SMERP
 {
 namespace test
 {
+   template<typename Input>
+   int getc( Input& in)
+   {
+      return *in++;
+   }
+
+   template<>
+   int getc( FILE*& in)
+   {
+      return ::getc( in);
+   }
+
+   template<typename Output>
+   void putc( char ch, Output& out)
+   {
+      out.push_back( ch);
+   }
+
+   template<>
+   void putc( char ch, FILE*& out)
+   {
+      ::putc( ch, out);
+   }
+
    //template for a test of a connection handler using FILE I/O
    //@return 0, if ok, some errorcode as main would else
-   template<class Connection>
-   int runTestFileIO( FILE* in, FILE* out, Connection& connection)
+   template<typename Input, typename Output, class Connection>
+   int runTestIO( Input& in, Output& out, Connection& connection)
    {
-      try
+      for (;;)
       {
-         for (;;)
+         Network::NetworkOperation netop( connection.nextOperation());
+         
+         switch (netop.operation())
          {
-            Network::NetworkOperation netop( connection.nextOperation());
-            
-            switch (netop.operation())
+            case Network::NetworkOperation::READ:
             {
-               case Network::NetworkOperation::READ:
+               //fprintf( stderr, "network operation is READ\n"); 
+               char* data = (char*)netop.data();
+               std::size_t ii,size = netop.size();
+               for (ii=0; ii<size; ii++)
                {
-                  //fprintf( stderr, "network operation is READ\n"); 
-                  char* data = (char*)netop.data();
-                  std::size_t ii,size = netop.size();
-                  for (ii=0; ii<size; ii++)
-                  {
-                     int ch = getc( in);
-                     if (ch == EOF) break;
-                     data[ ii] = ch;
-                  }
-                  connection.parseInput( netop.data(), ii);
+                  int ch = getc( in);
+                  if (ch == EOF) break;
+                  data[ ii] = ch;
                }
-               break;
-               
-               case Network::NetworkOperation::WRITE:
-               {
-                  char* data = (char*)netop.data();
-                  std::size_t ii,size = netop.size();                  
-                  //fprintf( stderr, "network operation is WRITE '%.8s'[%u]\n", data, size); 
-                  for (ii=0; ii<size; ii++)
-                  {
-                     putc( data[ ii], out);
-                     fflush( out);
-                  }
-               }
-               break;
-               
-               case Network::NetworkOperation::TERMINATE:
-                  //fprintf( stderr, "network operation is TERMINATE\n"); 
-                  return 0;
-                  break;
+               connection.parseInput( netop.data(), ii);
             }
+            break;
+            
+            case Network::NetworkOperation::WRITE:
+            {
+               char* data = (char*)netop.data();
+               std::size_t ii,size = netop.size();                  
+               //fprintf( stderr, "network operation is WRITE '%.8s'[%u]\n", data, size); 
+               for (ii=0; ii<size; ii++)
+               {
+                  putc( data[ ii], out);
+                  fflush( out);
+               }
+            }
+            break;
+            
+            case Network::NetworkOperation::TERMINATE:
+               //fprintf( stderr, "network operation is TERMINATE\n"); 
+               return 0;
          }
       }
-      catch (std::exception e)
-      {
-         fprintf( stderr, "exception %s\n", e.what()); 
-      }
-      catch (...)
-      {
-         fprintf( stderr, "an unexpected exception (this is a test program)\n"); 
-      };
       return 1;      
    }
 }}//namespace _SMERP::test

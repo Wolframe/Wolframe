@@ -13,7 +13,19 @@ int main( int, const char**)
 {
    Network::LocalTCPendpoint ep( "127.0.0.1", 12345);
    xmlselect::Connection connection( ep);
-   return test::runTestFileIO( stdin, stdout, connection);
+   try
+   {
+      return test::runTestIO( stdin, stdout, connection);
+   }
+   catch (std::exception e)
+   {
+      fprintf( stderr, "exception %s\n", e.what());       
+   }
+   catch (...)
+   {
+      fprintf( stderr, "an unexpected exception (this is a test program)\n"); 
+   }
+   return 1;
 }
 
 
