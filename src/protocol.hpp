@@ -159,18 +159,9 @@ public:
    }
    
    //release a written memory block
-   bool release()
+   void release()
    {
-      if (mem.filled == 0) return false;
-      unsigned int nn = mem.size-mem.filled;
-      char* cc = (char*)mem.ptr;
-      
-      for (unsigned int ii=0; ii<nn; ii++)
-      {
-         cc[ii] = cc[ii+mem.filled];
-      }
       mem.filled = 0;
-      return true;
    }
 };
 

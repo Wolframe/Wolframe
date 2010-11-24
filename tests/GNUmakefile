@@ -37,11 +37,17 @@ endif
 
 include $(TOPDIR)/makefiles/gmake/sub.mk
 
-pechoHandlerTest$(EXE): pechoHandlerTest.cpp $(TOPDIR)/src/logger.cpp $(TOPDIR)/src/pechoHandler.cpp $(TOPDIR)/src/pechoHandler.hpp $(TOPDIR)/src/protocol.hpp
+pechoHandlerTest$(EXE): pechoHandlerTest.cpp $(TOPDIR)/src/logger.cpp $(TOPDIR)/src/pechoHandler.cpp $(TOPDIR)/src/pechoHandler.hpp $(TOPDIR)/src/protocol.hpp testHandlerTemplates.hpp
 	$(CCPP) -c -o pechoHandlerTest.o $(CCPPFLAGS) pechoHandlerTest.cpp
 	$(CCPP) -c -o logger.o $(CCPPFLAGS) $(TOPDIR)/src/logger.cpp
 	$(CCPP) -c -o pechoHandler.o $(CCPPFLAGS) $(TOPDIR)/src/pechoHandler.cpp
 	$(CCPP_LINK) -o pechoHandlerTest$(EXE) logger.o pechoHandler.o pechoHandlerTest.o
+
+xmlselectHandlerTest$(EXE): xmlselectHandlerTest.cpp $(TOPDIR)/src/logger.cpp $(TOPDIR)/src/xmlselectHandler.cpp $(TOPDIR)/src/xmlselectHandler.hpp $(TOPDIR)/src/protocol.hpp testHandlerTemplates.hpp
+	$(CCPP) -c -o xmlselectHandlerTest.o $(CCPPFLAGS) xmlselectHandlerTest.cpp
+	$(CCPP) -c -o logger.o $(CCPPFLAGS) $(TOPDIR)/src/logger.cpp
+	$(CCPP) -c -o xmlselectHandler.o $(CCPPFLAGS) $(TOPDIR)/src/xmlselectHandler.cpp
+	$(CCPP_LINK) -o xmlselectHandlerTest$(EXE) logger.o xmlselectHandler.o xmlselectHandlerTest.o
 
 local_all:
 

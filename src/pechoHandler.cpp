@@ -79,7 +79,11 @@ struct Connection::Private
    //output of one character with return code true/false for success/failure
    bool print( char ch)
    {
-      switch (mode)
+      if (ch < 0) 
+      {
+         if (!output.print( ch)) return false; 
+      }
+      else switch (mode)
       {
          case Ident:     if (!output.print( ch)) return false; break;
          case Uppercase: if (!output.print( toupper(ch))) return false; break;
@@ -95,18 +99,28 @@ struct Connection::Private
       char ch;
       while ((ch=*src) != 0)           
       {
+         if (output.restsize() == 0)
+         {
+            return false;
+         }
          if (output.restsize() == 0) return false;  //we check if there is space for output to ensure that we can do both 
                                                     //  operations input&output or none of them. doing only one of them is
                                                     //  not covered by this state machine.
+         if (!print(ch))
+         {
+            return false;                           //this does not fail because we checked
+         }
          ++src;                                     //if this fails we get to the same point when reentering this procedure
-         print(ch);                                 //this does not fail because we checked
-         if (ch == '\n') return false;              //force flush at end of line
       }
       return true;
    };
 
    //* interface   
-   Private()   :state(Init),mode(Ident),input(MemBlockSize),output(MemBlockSize) {itr=input.begin(); src=&itr;};
+   Private()   :state(Init),mode(Ident),input(MemBlockSize),output(MemBlockSize)
+   {
+      itr = input.begin(); 
+      src = &itr;
+   };
    ~Private()  {};
 
    //statemachine of the processor
@@ -172,8 +186,6 @@ struct Connection::Private
                 //this state is for reading until the end of the line. there is no buffering below,
                 //so we have to the next line somehow:
                 protocol::Parser::getLine( itr, buffer);
-                itr++; //< consume the end of line for not getting into an endless loop
-
                 if (buffer.size() > 0)
                 {
                    state = Init;
@@ -185,6 +197,7 @@ struct Connection::Private
                 {
                    //here is an empty line, so we jump back to the line promt:
                    state = EnterCommand;
+                   if (*itr) itr++; //< consume the end of line for not getting into an endless loop with empty command
                    continue;
                 }
             }
@@ -251,18 +264,10 @@ struct Connection::Private
             
             case ProcessingAfterWrite:
             {
-               //do processing but first release the output buffer content that has been written in the processing state:
-               state = Processing;
-               if (!output.release())
-               {
-                  state = HandleError;
-                  continue;
-               }
-               else
-               {
-                  state = Processing;
-                  continue;
-               }
+                //do processing but first release the output buffer content that has been written in the processing state:
+                state = Processing;
+                output.release();
+                continue;
             }
 
             case Processing:

@@ -326,37 +326,36 @@ struct Connection::Private
    enum Result {Read,Write,WriteLast,ReportError};
    Result get()
    {
-      if (!proc)
-      {
-         proc = new (std::nothrow) Processor( &atm, citr, elementPtr(), elementSize());
-         if (!proc)
-         {
-            error = "OutOfMem";
-            return ReportError;
-         }
-         src = proc->begin();
-         end = proc->end();
-      }
-
-      try
-      {
-         for (src++; src!=end; src++)
-         {
-            produceElement( src->type, src->size);
-            proc->setOutputBuffer( elementPtr(), elementSize());
-         }
-         switch (src->state)
-         {
-            case Processor::iterator::Element::Ok:          return Write;
-            case Processor::iterator::Element::EndOfOutput: return Write;
-            case Processor::iterator::Element::EndOfInput:  return WriteLast;
-            case Processor::iterator::Element::ErrorState:  error=src->content; return ReportError;
-         }
-      }
-      catch (Input::End)
-      {
-         return Read;
-      };
+       if (!proc)
+       {
+          proc = new (std::nothrow) Processor( &atm, citr, elementPtr(), elementSize());
+          if (!proc)
+          {
+             error = "OutOfMem";
+             return ReportError;
+          }
+          src = proc->begin();
+          end = proc->end();
+       }
+       try
+       {
+          for (src++; src!=end; src++)
+          {
+             produceElement( src->type, src->size);
+             proc->setOutputBuffer( elementPtr(), elementSize());
+          }
+          switch (src->state)
+          {
+             case Processor::iterator::Element::Ok:          return Write;
+             case Processor::iterator::Element::EndOfOutput: return Write;
+             case Processor::iterator::Element::EndOfInput:  return WriteLast;
+             case Processor::iterator::Element::ErrorState:  error=src->content; return ReportError;
+          }
+       }
+       catch (Input::End)
+       {
+          return Read;
+       };
    };
 
    Operation nextOperation()
@@ -365,10 +364,10 @@ struct Connection::Private
       {
          for (;;)
          {
-            LOG_DATA << "\nState: " << stateName(state);
+             LOG_DATA << "\nState: " << stateName(state);
       
-            switch( state)
-            {
+             switch( state)
+             {
                 case Init:
                 {
                     //start or restart:
@@ -387,31 +386,31 @@ struct Connection::Private
                     
                     switch (parser.get( itr, protocolState))
                     {             
-                      case empty:
-                      {
+                       case empty:
+                       {
                           state = EmptyLine;
                           continue;
-                      }   
-                      case caps: 
-                      {
+                       }   
+                       case caps: 
+                       {
                           state = EnterCommand;  
                           return WriteLine( "OK caps select quit");
-                      }
-                      case select: 
-                      {
+                       }
+                       case select: 
+                       {
                           state = EmptyLine;  
                           continue;
-                      }
-                      case quit:
-                      {
+                       }
+                       case quit:
+                       {
                           state = Terminate;
                           return WriteLine( "BYE");
-                      }
-                      default:
-                      {
+                       }
+                       default:
+                       {
                           state = HandleError;
                           return WriteLine( "BAD unknown command");                 
-                      }
+                       }
                     }
                 }
 
@@ -424,16 +423,16 @@ struct Connection::Private
 
                     if (buffer.size() > 0)
                     {
-                      state = Init;
-                      buffer.init();
-                      //a line starting with a space that is not an empty line leads to an error:
-                      return WriteLine( "BAD command line");
+                       state = Init;
+                       buffer.init();
+                       //a line starting with a space that is not an empty line leads to an error:
+                       return WriteLine( "BAD command line");
                     }
                     else
                     {
-                      //here is an empty line, so we jump back to the line promt:
-                      state = EnterCommand;
-                      continue;
+                       //here is an empty line, so we jump back to the line promt:
+                       state = EnterCommand;
+                       continue;
                     }
                 }
 
@@ -445,72 +444,72 @@ struct Connection::Private
                     protocol::Parser::getLine( itr, buffer);
                     if (buffer.size() > 0)
                     {
-                      state = Init;
-                      buffer.init();
-                      return WriteLine( "BAD too many arguments");
+                       state = Init;
+                       buffer.init();
+                       return WriteLine( "BAD too many arguments");
                     }
                     else
                     {
-                      state = Processing;
-                      return WriteLine( "OK enter data");
+                       state = Processing;
+                       return WriteLine( "OK enter data");
                     }
                 }
             
-            case ProcessingAfterWrite:
-            {
-                //do processing but first release the output buffer content that has been written in the processing state:
-                state = Processing;
-                if (!output.release())
+                case ProcessingAfterWrite:
                 {
-                  state = HandleError;
-                  continue;
-                }
-                else
-                {
-                  state = Processing;
-                  continue;
-                }
-            }
-            
-            case Processing:
-            {
-              switch (get())
-              {
-                    case Read:
-                      return Operation( Operation::READ, input->ptr, input->size);
-
-                    case Write:
-                      state = ProcessingAfterWrite;
-                      return Operation( Operation::WRITE, output->ptr, output->filled);
-
-                    case WriteLast:
-                      state = Terminate;
-                      return Operation( Operation::WRITE, output->ptr, output->size);
-
-                    case ReportError:
+                    //do processing but first release the output buffer content that has been written in the processing state:
+                    state = Processing;
+                    if (!output.release())
                     {
-                      state = HandleError;
-                      return WriteLine( "ERR", error?error:"unknown");
+                       state = HandleError;
+                       continue;
+                    }
+                    else
+                    {
+                       state = Processing;
+                       continue;
                     }
                 }
-            }
+                
+                case Processing:
+                {
+                    switch (get())
+                    {
+                       case Read:
+                          return Operation( Operation::READ, input->ptr, input->size);
 
-            case HandleError:
-            {
-                //in the error case, start again after complaining (Operation::WRITE sent in previous state):
-                protocol::Parser::getLine( itr, buffer);  //parse the rest of the line to clean the input for the next command
-                state = Init;
-                continue;
-            }
-            
-            case Terminate:
-            {
-                state = Terminate;
-                return Operation( Operation::TERMINATE);                      
-            }
+                       case Write:
+                          state = ProcessingAfterWrite;
+                          return Operation( Operation::WRITE, output->ptr, output->filled);
 
-          }//switch(..)
-        }//for(,,)
+                       case WriteLast:
+                          state = Terminate;
+                          return Operation( Operation::WRITE, output->ptr, output->size);
+
+                       case ReportError:
+                       {
+                          state = HandleError;
+                          return WriteLine( "ERR", error?error:"unknown");
+                       }
+                    }
+                }
+
+                case HandleError:
+                {
+                    //in the error case, start again after complaining (Operation::WRITE sent in previous state):
+                    protocol::Parser::getLine( itr, buffer);  //parse the rest of the line to clean the input for the next command
+                    state = Init;
+                    continue;
+                }
+                
+                case Terminate:
+                {
+                    state = Terminate;
+                    return Operation( Operation::TERMINATE);                      
+                }
+
+             }//switch(..)
+         }//for(,,)
       }
       catch (Input::End)
       {
