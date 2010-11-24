@@ -4,8 +4,10 @@ SUBDIRS =
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
+INCLUDE_CPPFLAGS = \
+	/D_WIN32_WINNT=0x403
+
 INCLUDE_DIRS = \
-	/D_WIN32_WINNT=0x403 \
 	/I. \
 	/I"$(QT_DIR)\include" \
 	/I"$(QT_DIR)\include\QtCore" \
@@ -19,13 +21,13 @@ INCLUDE_LDFLAGS = \
 INCLUDE_LIBS = \
 	QtCore4.lib QtGui4.lib QtUiTools.lib
 
-CPP_BINS = \
-	qtclient.exe
-	
 OBJS = \
 	moc_MainWindow.obj \
 	MainWindow.obj
 
+CPP_BINS = \
+	qtclient.exe
+	
 all: $(OBJS) $(CPP_BINS)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
