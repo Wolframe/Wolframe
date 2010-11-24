@@ -459,16 +459,8 @@ struct Connection::Private
                 {
                     //do processing but first release the output buffer content that has been written in the processing state:
                     state = Processing;
-                    if (!output.release())
-                    {
-                       state = HandleError;
-                       continue;
-                    }
-                    else
-                    {
-                       state = Processing;
-                       continue;
-                    }
+                    output.release();
+                    continue;
                 }
                 
                 case Processing:
