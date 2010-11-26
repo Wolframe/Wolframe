@@ -12,6 +12,9 @@
 #include <stdio.h>
 #include "version.hpp"
 
+// this is because the echoHandler uses the logger, should it do that?
+#include <logger.hpp>
+_SMERP::LogBackend logBack;
 
 #define	MAX_STRING	128
 
