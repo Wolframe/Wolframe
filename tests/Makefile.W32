@@ -4,6 +4,9 @@ SUBDIRS =
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
+INCLUDE_CPPFLAGS = \
+	/D_WIN32_WINNT=0x403
+
 INCLUDE_DIRS = \
 	/I$(TOPDIR)/include /I. \
 	/I$(TOPDIR)/src \
@@ -20,7 +23,9 @@ INCLUDE_LIBS = \
 
 TEST_CPP_BINS = \
 	versionTest.exe \
-	logTest.exe
+	logTest.exe \
+	pechoHandlerTest$(EXE) \
+	xmlselectHandlerTest$(EXE)
 
 OBJS = \
 
@@ -30,6 +35,8 @@ all: $(OBJS) $(CPP_BINS)
 
 versionTest.exe: versionTest.obj $(TOPDIR)\src\version.obj
 logTest.exe: logTest.obj $(TOPDIR)\src\logger.obj
+pechoHandlerTest.exe: pechoHandlerTest.obj $(TOPDIR)\src\pechoHandler.o
+xmlselectHandlerTest.exe: xmlselectHandlerTest.obj $(TOPDIR)\src\xmlselectHandler.o
 
 local_all:
 
