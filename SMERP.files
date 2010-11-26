@@ -71,3 +71,6 @@ src/logSyslogFacility.cpp
 tests/logTest.cpp
 src/xmlselectHandler.hpp
 src/xmlselectHandler.cpp
+include/GNUmakefile
+include/README
+include/atomicCounter.h

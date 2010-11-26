@@ -16,7 +16,7 @@ private:
    std::string expected;
    Network::LocalTCPendpoint ep;
    pecho::Connection connection;
-   
+
 protected:
    pechoHandlerFixture(){};
 
@@ -24,13 +24,13 @@ protected:
 	{
       Network::LocalTCPendpoint ep( "127.0.0.1", 12345);
       pecho::Connection connection( ep);
-      
+
       input.clear();
       expected.clear();
       input.append( "echo tolower\r\n");
       expected.append( "OK expecting command\r\n");
       expected.append( "OK enter data\r\n");
-      
+
       //TODO generated data here
       const char* content =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZ\r\n"
@@ -59,13 +59,13 @@ protected:
       "ABC\r\n"
       "AB\r\n"
       "A\r\n";
-      
-      input.append( content);   
-      expected.append( content);   
+
+      input.append( content);
+      expected.append( content);
       input.append( ".\r\n");
       expected.append( "OK expecting command\r\n");
       input.append( "quit\r\n");
-      expected.append( "BYE\r\n");      
+      expected.append( "BYE\r\n");
 	};
 };
 
