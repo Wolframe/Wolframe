@@ -251,6 +251,12 @@ public:
       }
    }
   
+   template <typename IteratorType>
+   static bool isEOLN( IteratorType& src)
+   {
+      return (*src == '\n' || *src == '\r');
+   }
+  
    //go to the end of line and write it to buffer, starting with the first non space.
    //after call the iterator is pointing to the end of line char or at the end of content char
    template <typename IteratorType, typename BufferType>
@@ -265,7 +271,7 @@ public:
           if (ch <= ' ') {buf.push_back(' '); ++src; continue;}
           buf.push_back(ch);
           ++src;
-       } 
+       }
    }
   
 private:
@@ -314,10 +320,9 @@ public:
    char cur()
    {
       char ch = *src();
-      if (state == 0) return ch;
-      if (state == 1) return (ch == '.')?'\r':ch;
-      if (state == 2 && ch != '\n') return ch;
-      state = 0;
+      if (state < 2) return ch;
+      if (state == 2) return (ch == '.')?'\r':ch;
+      if (state < 4) return ch;
       return 0; /*EOF*/
    };
    
@@ -328,33 +333,56 @@ public:
       {
          char ch = *src(); 
          ++src();
-         if (ch == '\n')
+         if (ch < 32)
          {
-            state = 1;
+            if (ch == '\r')
+            {
+               state = 1;
+            }
+            else if (ch == '\n')
+            {
+               state = 2;
+            }
          }
       }
       else if (state == 1)
       {
          char ch = *src();
          ++src();
+         if (ch != '\n')
+         {
+            state = 0;
+         }
+         state = 2;
+      }
+      else if (state == 2)
+      {
+         char ch = *src();
+         ++src();
          if (ch == '.')
          {
-            state = 2;            
+            state = 3;         
          }
-         else if (ch != '\n')
+         else if (ch == '\r')
+         {
+            state = 1;
+         }
+         else if (ch == '\n')
+         {
+            //state = 2;
+         }
+         else
          {
             state = 0;
          }
       }
-      else //if (state >= 2)
+      else //if (state >= 3)
       {
          char ch = *src();
          ++src();
-         if (ch == '\r')
-         {}
-         else if (ch == '\n')
+         if (ch == '\r' || ch == '\n')
          {
-            state = 3;
+            state = 4;
          } 
          else
          {

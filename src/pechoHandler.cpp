@@ -248,11 +248,10 @@ struct Connection::Private
                 //read the rest of the line and reject more arguments than expected. 
                 //go on with processing, if this is clear. do not cosnsume the first end of line because it could be
                 //the first character of the EOF sequence.
-                protocol::Parser::getLine( itr, buffer);
-                if (buffer.size() > 0)
+                protocol::Parser::skipSpaces( itr);
+                if (!protocol::Parser::isEOLN( itr))
                 {
                    state = Init;
-                   buffer.init();
                    return WriteLine( "BAD too many arguments");
                 }
                 else
