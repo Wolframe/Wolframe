@@ -26,6 +26,7 @@ TEST_OBJS = \
 
 TEST_CPP_BINS = \
 	versionTest$(EXE) \
+	counterTest$(EXE) \
 	threadLeakTest$(EXE) \
 	pechoHandlerTest$(EXE) \
 	logTest$(EXE)
@@ -33,6 +34,7 @@ TEST_CPP_BINS = \
 ifdef WITH_GTEST
 TEST_CPP_BINS += \
 	version-gTest$(EXE) \
+	counter-gTest$(EXE) \
 	pechoHandler-gTest$(EXE)
 endif
 
@@ -70,9 +72,14 @@ local_test:
 	@echo "Testing version..."
 	@LD_LIBRARY_PATH=$(BOOST_DIR)/lib ./versionTest
 	@echo
+	@LD_LIBRARY_PATH=$(BOOST_DIR)/lib ./counterTest
+	@echo
 ifdef WITH_GTEST
-	@echo "Testing Google test.."
+	@echo "Testing with Google test framework..."
 	@LD_LIBRARY_PATH=$(BOOST_DIR)/lib ./version-gTest
+	@echo
+	@LD_LIBRARY_PATH=$(BOOST_DIR)/lib ./counter-gTest
+	@echo
 	@LD_LIBRARY_PATH=$(BOOST_DIR)/lib ./pechoHandler-gTest
 	@echo
 endif

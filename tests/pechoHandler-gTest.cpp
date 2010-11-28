@@ -16,7 +16,7 @@ const char* getRandomAsciiString()
 {
    enum {MaxStringSize=2048};
    static char rt[ MaxStringSize+1];
-   
+
    unsigned int ii=0,nn=rand()%MaxStringSize+1;
    while (ii<nn) rt[ii++] = 32+rand()%96;
    rt[ii] = 0;

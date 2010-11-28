@@ -23,6 +23,7 @@ INCLUDE_LIBS = \
 
 TEST_CPP_BINS = \
 	versionTest.exe \
+	counterTest$(EXE) \
 	logTest.exe \
 	pechoHandlerTest$(EXE) \
 	xmlselectHandlerTest$(EXE)

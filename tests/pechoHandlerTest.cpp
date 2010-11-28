@@ -28,6 +28,3 @@ int main( int, const char**)
    return 1;
 }
 
-
-
-

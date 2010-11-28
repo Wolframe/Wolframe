@@ -8,37 +8,25 @@
 #include <iostream>
 #include <stdio.h>
 
-#include "version.hpp"
+#include "atomicCounter.hpp"
 #include <gtest/gtest.h>
 
 
 #define	MAX_STRING	128
 
-// The fixture for testing class SMERP::Version
-class VersionFixture : public ::testing::Test	{
+// The fixture for testing class SMERP::AtomicCounter
+class CounterFixture : public ::testing::Test	{
 protected:
-	// You can remove any or all of the following functions if its body is empty.
-
 	// Set-up work for each test here.
-	VersionFixture()	{
+	// You can remove any or all of the following functions if its body is empty.
+	CounterFixture()	{
 		srand((unsigned)time(0));
-		major = (unsigned short)( rand() % USHRT_MAX );
-		minor = (unsigned short)( rand() % USHRT_MAX );
-		revision = (unsigned short)( rand() % USHRT_MAX );
-		build = (unsigned)( rand() % UINT_MAX );
-		if ( !build )
-			build++;
-
-		ver = new _SMERP::Version( major, minor, revision, build );
-		ver0 = new _SMERP::Version( major, minor, revision );
-		sprintf( verStr, "%d.%d.%d.%u", major, minor, revision, build );
-
+		ulVal0 = (unsigned)( rand() % ULONG_MAX );
+		iVal0 = (int)( rand() % INT_MAX );
 	}
 
 	// Clean-up work that doesn't throw exceptions here.
-	virtual ~VersionFixture()	{
-		delete ver0;
-		delete ver;
+	virtual ~CounterFixture()	{
 	}
 
 
@@ -47,6 +35,8 @@ protected:
 	//   Code here will be called immediately after the constructor (right
 	//   before each test).
 	virtual void SetUp() {
+		ulCounter0 = ulVal0;
+		iCounter0 = iVal0;
 	}
 
 	//   Code here will be called immediately after each test (right
@@ -55,31 +45,22 @@ protected:
 	}
 
 	// Objects declared here can be used by all tests in the test case.
-	unsigned short	major, minor, revision;
-	unsigned	build;
-	_SMERP::Version	*ver, *ver0;
-	char		verStr[MAX_STRING];
+	unsigned long	ulVal0;
+	int		iVal0;
+	_SMERP::AtomicCounter< unsigned long >	ulCounter0;
+	_SMERP::AtomicCounter< int >		iCounter0;
 };
 
 
 // Tests the Version constructors and members
-TEST_F( VersionFixture, Members )	{
-	ASSERT_EQ( ver->major(), major );
-	ASSERT_EQ( ver->minor(), minor );
-	ASSERT_EQ( ver->revision(), revision );
-	ASSERT_EQ( ver->build(), build );
-	ASSERT_STREQ( ver->toString().c_str(), verStr );
+TEST_F( CounterFixture, Assignment )	{
+	ASSERT_EQ( ulCounter0.val(), ulVal0 );
+	ASSERT_EQ( iCounter0.val(), iVal0 );
 }
 
 
 // Tests the Version operators
-TEST_F( VersionFixture, Operators )	{
-	ASSERT_TRUE( *ver != *ver0 );
-	ASSERT_TRUE( *ver > *ver0 );
-	ASSERT_TRUE( *ver >= *ver0 );
-	ASSERT_FALSE( *ver == *ver0 );
-	ASSERT_FALSE( *ver < *ver0 );
-	ASSERT_FALSE( *ver <= *ver0 );
+TEST_F( CounterFixture, Operators )	{
 }
 
 

@@ -73,4 +73,6 @@ src/xmlselectHandler.hpp
 src/xmlselectHandler.cpp
 include/GNUmakefile
 include/README
-include/atomicCounter.h
+tests/counter-gTest.cpp
+tests/counterTest.cpp
+include/atomicCounter.hpp
