@@ -30,14 +30,14 @@ struct OneLine :public std::string  {OneLine(){ this->append("Hello world!\r\n")
 struct Random :public std::string
 {
    Random()
-   { 
+   {
       unsigned int ii=0,nn=rand()%1024+1;
       while (ii++<=nn)
       {
-         this->append( getRandomAsciiString());
-         this->append( "\r\n");
+	 this->append( getRandomAsciiString());
+	 this->append( "\r\n");
       }
-   };
+   }
 };
 
 
@@ -51,7 +51,7 @@ public:
    pecho::Connection* connection;
 
 protected:
-   pechoHandlerFixture() :ep( "127.0.0.1", 12345),connection(0) {};
+   pechoHandlerFixture() :ep( "127.0.0.1", 12345),connection(0) {}
 
 	virtual void SetUp()
 	{
@@ -62,7 +62,7 @@ protected:
       input.append( "echo tolower\r\n");
       expected.append( "OK expecting command\r\n");
       expected.append( "OK enter data\r\n\r\n");
-      
+
       Input content;
       input.append( content);
       expected.append( content);
@@ -71,12 +71,12 @@ protected:
       expected.append( "\r\r\nOK expecting command\r\n");
       input.append( "quit\r\n");
       expected.append( "BYE\r\n");
-	};
+	}
 
    virtual void TearDown()
    {
       delete connection;
-   };
+   }
 };
 
 typedef ::testing::Types<Empty, OneEmptyLine, OneOneCharLine, OneLine> MyTypes;

@@ -76,3 +76,5 @@ include/README
 tests/counter-gTest.cpp
 tests/counterTest.cpp
 include/atomicCounter.hpp
+tests/pechoHandler-gTest.cpp
+tests/pechoHandlerTest.cpp

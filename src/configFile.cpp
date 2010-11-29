@@ -34,7 +34,7 @@ static const char*		DEFAULT_SERVICE_NAME = "smerp";
 static const char*		DEFAULT_SERVICE_DISPLAY_NAME = "Smerp Daemon";
 static const char*		DEFAULT_SERVICE_DESCRIPTION = "a daemon for smerping";
 
-static boost::filesystem::path resolvePath(const boost::filesystem::path& p)
+static boost::filesystem::path resolvePath( const boost::filesystem::path& p )
 {
 	boost::filesystem::path result;
 	for ( boost::filesystem::path::iterator it = p.begin(); it != p.end(); ++it )	{

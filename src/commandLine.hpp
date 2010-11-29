@@ -29,10 +29,12 @@ namespace _SMERP	{
 		};
 
 		Command_t	command;
+#if !defined(_WIN32)
 		bool		foreground;
-		LogLevel::Level	debugLevel;
 		std::string	user;
 		std::string	group;
+#endif
+		LogLevel::Level	debugLevel;
 		std::string	cfgFile;
 	private:
 		std::string	errMsg_;

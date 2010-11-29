@@ -74,6 +74,7 @@ local_test:
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_DIR)/lib ./counterTest
 	@echo
+	@LD_LIBRARY_PATH=$(BOOST_DIR)/lib ./counterTest
 ifdef WITH_GTEST
 	@echo "Testing with Google test framework..."
 	@LD_LIBRARY_PATH=$(BOOST_DIR)/lib ./version-gTest
@@ -81,8 +82,8 @@ ifdef WITH_GTEST
 	@LD_LIBRARY_PATH=$(BOOST_DIR)/lib ./counter-gTest
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_DIR)/lib ./pechoHandler-gTest
-	@echo
 endif
+	@echo
 	@echo "Testing boost log..."
 	@LD_LIBRARY_PATH=$(BOOST_DIR)/lib ./logTest
 	@echo
