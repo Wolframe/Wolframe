@@ -15,5 +15,13 @@ void FileFormLoader::initiateFormLoad( QString &name )
 {
 }
 
+QStringList FileFormLoader::getFormNames( )
+{
+}
+
+QString FileFormLoader::getFormRef( QString &name )
+{
+}
+
 } // namespace QtClient
 } // namespace _SMERP
