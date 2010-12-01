@@ -15,8 +15,6 @@ namespace _SMERP {
 
 	class FileFormLoader : public AbstractFormLoader
 	{
-	Q_OBJECT
-	
 		public:
 			FileFormLoader( QString dir );
 			virtual ~FileFormLoader( ) {};

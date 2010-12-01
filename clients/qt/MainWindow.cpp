@@ -106,6 +106,31 @@ void MainWindow::loadTheme( QString theme )
 	qApp->restoreOverrideCursor( );
 }
 
+void MainWindow::formSelected( QAction *action )
+{
+	QString form = action->text( );
+	if( form != m_currentForm )
+		loadForm( form );
+}
+
+void MainWindow::loadForm( QString form )
+{
+	qApp->setOverrideCursor( Qt::BusyCursor );
+
+	QObject::connect( m_formLoader, SIGNAL( formLoaded( QString, QByteArray ) ),
+		this, SLOT( formLoaded( QString, QByteArray ) ) );
+	
+	m_formLoader->initiateFormLoad( form );
+}
+
+void MainWindow::formListLoaded( )
+{
+}
+
+void MainWindow::formLoaded( QString name, QByteArray xml )
+{
+}
+
 void MainWindow::themeSelected( QAction *action )
 {
 	QString theme = action->text( );

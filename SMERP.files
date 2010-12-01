@@ -86,3 +86,4 @@ clients/qt/MainWindow.cpp
 clients/qt/AbstractFormLoader.hpp
 clients/qt/FileFormLoader.hpp
 clients/qt/FileFormLoader.cpp
+clients/qt/AbstractFormLoader.cpp

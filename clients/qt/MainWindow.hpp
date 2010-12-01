@@ -22,18 +22,24 @@ namespace _SMERP {
 	
 	private:
 		QWidget *m_ui;			// main window from theme
+		QWidget *m_form;		// current active form
 		QString m_currentTheme;		// the name of the currently selected theme
+		QString m_currentForm;		// the name of the form currently visible
 		FileFormLoader *m_formLoader;	// a simple form loader for testing (for now)
 
 		void initialize( );
 		void populateThemesMenu( );
 		void loadTheme( QString themeName );
+		void loadForm( QString formName );
 
 	private Q_SLOTS:
 		void themeSelected( QAction *action );
+		void formSelected( QAction *action );
 		void on_actionExit_triggered( );
 		void on_actionAbout_triggered( );
 		void on_actionAboutQt_triggered( );
+		void formListLoaded( );
+		void formLoaded( QString name, QByteArray xml );
 	};
 } // namespace QtClient
 } // namespace _SMERP

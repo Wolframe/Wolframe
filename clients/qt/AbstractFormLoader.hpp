@@ -14,7 +14,9 @@ namespace _SMERP {
 	namespace QtClient {
 
 	class AbstractFormLoader : public QObject
-	{
+	{	
+		Q_OBJECT
+		
 		public:
 			virtual ~AbstractFormLoader( ) {};
 			virtual void initiateListLoad( ) = 0;
