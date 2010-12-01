@@ -22,6 +22,7 @@ INCLUDE_LIBS = \
 OBJS = \
 	moc_MainWindow.o \
 	MainWindow.o \
+	AbstractFormLoader.o \
 	moc_AbstractFormLoader.o \
 	FileFormLoader.o
 

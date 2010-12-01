@@ -42,12 +42,14 @@ void MainWindow::populateThemesMenu( )
 		if( t == m_currentTheme ) action->setChecked( true );
 	}
 
+// connect signal for theme selection
 	themes_menu->addActions( themesGroup->actions( ) );
 	QObject::connect( themesGroup, SIGNAL( triggered( QAction * ) ), this, SLOT( themeSelected( QAction * ) ) );
 }
 
 void MainWindow::loadTheme( QString theme )
 {
+// indicate busy state
 	qApp->setOverrideCursor( Qt::BusyCursor );
 
 // set working directory to theme
@@ -103,7 +105,35 @@ void MainWindow::loadTheme( QString theme )
 // load all themes possible to pick and mark the current one
 	populateThemesMenu( );
 
+// now that we have a menu where we can add things, we start the form list loading
+	QObject::connect( m_formLoader, SIGNAL( formListLoaded( ) ), this, SLOT( formListLoaded( ) ) );
+	m_formLoader->initiateListLoad( );
+
+// not busy anymore
 	qApp->restoreOverrideCursor( );
+}
+
+void MainWindow::formListLoaded( )
+{
+// get the list of available forms
+	QStringList forms = m_formLoader->getFormNames( );
+
+// contruct a menu which shows and wires them in the menu
+	QMenu *formsMenu = qFindChild<QMenu *>( m_ui, "menuForms" );
+	formsMenu->clear( );
+	QActionGroup *formGroup = new QActionGroup( formsMenu );
+	formGroup->setExclusive( true );
+	foreach( QString form, forms ) {
+		QAction *action = new QAction( form, formGroup );
+		action->setCheckable( true );
+		formGroup->addAction( action );
+		if( form == m_currentForm ) action->setChecked( true );
+	}
+	formsMenu->addActions( formGroup->actions( ) );
+	QObject::connect( formGroup, SIGNAL( triggered( QAction * ) ), this, SLOT( formSelected( QAction * ) ) );
+	
+// not busy anymore
+	qApp->restoreOverrideCursor();
 }
 
 void MainWindow::formSelected( QAction *action )
@@ -115,16 +145,13 @@ void MainWindow::formSelected( QAction *action )
 
 void MainWindow::loadForm( QString form )
 {
+// indicate busy state
 	qApp->setOverrideCursor( Qt::BusyCursor );
 
 	QObject::connect( m_formLoader, SIGNAL( formLoaded( QString, QByteArray ) ),
 		this, SLOT( formLoaded( QString, QByteArray ) ) );
 	
 	m_formLoader->initiateFormLoad( form );
-}
-
-void MainWindow::formListLoaded( )
-{
 }
 
 void MainWindow::formLoaded( QString name, QByteArray xml )
