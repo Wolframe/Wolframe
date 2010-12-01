@@ -78,3 +78,11 @@ tests/counterTest.cpp
 include/atomicCounter.hpp
 tests/pechoHandler-gTest.cpp
 tests/pechoHandlerTest.cpp
+clients/qt/Makefile.W32
+clients/qt/GNUmakefile
+clients/qt/qtclient.cpp
+clients/qt/MainWindow.hpp
+clients/qt/MainWindow.cpp
+clients/qt/AbstractFormLoader.hpp
+clients/qt/FileFormLoader.hpp
+clients/qt/FileFormLoader.cpp

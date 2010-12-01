@@ -22,6 +22,7 @@ INCLUDE_LIBS = \
 OBJS = \
 	moc_MainWindow.o \
 	MainWindow.o \
+	moc_FileFormLoader.o \
 	FileFormLoader.o
 
 CPP_BINS = \
@@ -34,8 +35,11 @@ local_all:
 moc_MainWindow.cpp: MainWindow.hpp
 	$(QT_DIR)/bin/moc -I. MainWindow.hpp -o moc_MainWindow.cpp
 
+moc_FileFormLoader.cpp: FileFormLoader.hpp
+	$(QT_DIR)/bin/moc -I. FileFormLoader.hpp -o moc_FileFormLoader.cpp
+
 local_clean:
-	@-rm -f moc_MainWindow.cpp
+	@-rm -f moc_*.cpp 
 
 local_distclean:
 

@@ -6,6 +6,7 @@
 #define _FILE_FORM_LOADER_HPP_INCLUDED
 
 #include <QObject>
+#include <QString>
 
 #include "AbstractFormLoader.hpp"
 
@@ -17,7 +18,13 @@ namespace _SMERP {
 	Q_OBJECT
 	
 		public:
-			FileFormLoader( );
+			FileFormLoader( QString dir );
+			virtual ~FileFormLoader( ) {};
+			virtual void initiateListLoad( );
+			virtual void initiateFormLoad( QString &name );
+		
+		private:
+			QString m_dir;
 	};
 } // namespace QtClient
 } // namespace _SMERP

@@ -12,7 +12,10 @@ namespace _SMERP {
 
 	class AbstractFormLoader : public QObject
 	{
-	Q_OBJECT
+		public:
+			virtual ~AbstractFormLoader( ) {};
+			virtual void initiateListLoad( ) = 0;
+			virtual void initiateFormLoad( QString &name ) = 0;
 	};
 } // namespace QtClient
 } // namespace _SMERP

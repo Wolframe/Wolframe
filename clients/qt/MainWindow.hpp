@@ -7,6 +7,8 @@
 
 #include <QWidget>
 
+#include "FileFormLoader.hpp"
+
 namespace _SMERP {
 	namespace QtClient {
 
@@ -16,10 +18,12 @@ namespace _SMERP {
 
 	public:
 		MainWindow( QWidget *_parent = 0 );
+		~MainWindow( );
 	
 	private:
-		QWidget *m_ui;		// main window from theme
-		QString m_currentTheme;	// the name of the currently selected theme
+		QWidget *m_ui;			// main window from theme
+		QString m_currentTheme;		// the name of the currently selected theme
+		FileFormLoader *m_formLoader;	// a simple form loader for testing (for now)
 
 		void initialize( );
 		void populateThemesMenu( );
