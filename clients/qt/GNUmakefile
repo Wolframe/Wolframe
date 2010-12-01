@@ -21,7 +21,8 @@ INCLUDE_LIBS = \
 	
 OBJS = \
 	moc_MainWindow.o \
-	MainWindow.o
+	MainWindow.o \
+	FileFormLoader.o
 
 CPP_BINS = \
 	qtclient$(EXE)
