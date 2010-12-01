@@ -156,6 +156,8 @@ void MainWindow::loadForm( QString form )
 
 void MainWindow::formLoaded( QString name, QByteArray xml )
 {
+// not busy anymore
+	qApp->restoreOverrideCursor();
 }
 
 void MainWindow::themeSelected( QAction *action )

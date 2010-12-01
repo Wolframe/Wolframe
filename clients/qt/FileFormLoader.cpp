@@ -18,6 +18,7 @@ void FileFormLoader::initiateListLoad( )
 void FileFormLoader::initiateFormLoad( QString &name )
 {
 	// just remembering the name here, deferring to getFormRef
+	emit formLoaded( name, 0 );
 }
 
 QStringList FileFormLoader::getFormNames( )
