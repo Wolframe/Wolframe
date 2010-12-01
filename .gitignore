@@ -26,5 +26,8 @@ tests/versionTest
 tests/logTest
 tests/threadLeakTest
 tests/version-gTest
+tests/counterTest
+tests/pechoHandlerTest
+tests/xmlselectHandlerTest
 clients/qt/qtclient
 moc_*.cpp
