@@ -44,9 +44,7 @@ namespace _SMERP {
 #endif
 				;
 		command = DEFAULT;
-#if defined(_WIN32)
-		foreground = true;
-#else
+#if !defined(_WIN32)
 		foreground = false;
 #endif
 		debugLevel = DEFAULT_DEBUG_LEVEL;

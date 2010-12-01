@@ -27,6 +27,7 @@ namespace _SMERP {
 		foreground = cmdLine.foreground;
 #endif
 
+#if !defined(_WIN32)
 		if ( !cmdLine.user.empty())
 			user = cmdLine.user;
 		else
@@ -36,6 +37,7 @@ namespace _SMERP {
 			group = cmdLine.group;
 		else
 			group = cfgFile.group;
+#endif
 
 		pidFile = cfgFile.pidFile;
 		serviceName = cfgFile.serviceName;
