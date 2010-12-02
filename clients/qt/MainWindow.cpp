@@ -3,14 +3,16 @@
 //
 
 #include "MainWindow.hpp"
+#include "FileFormLoader.hpp"
 
 #include <QtUiTools>
 #include <QtGui>
+#include <QBuffer>
 
 namespace _SMERP {
 	namespace QtClient {
 
-MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ), m_ui( 0 )
+MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ), m_ui( 0 ), m_form( 0 )
 {
 	m_formLoader = new FileFormLoader( "forms" );
 	initialize( );
@@ -156,6 +158,28 @@ void MainWindow::loadForm( QString form )
 
 void MainWindow::formLoaded( QString name, QByteArray xml )
 {
+// read the form and construct it
+	QWidget *oldForm = m_form;
+	QUiLoader loader;
+	QBuffer buf( &xml );
+	m_form = loader.load( &buf, m_ui );
+	buf.close( );
+
+// add it to the main window, disable old form
+	QVBoxLayout *layout = qFindChild<QVBoxLayout *>( m_ui, "mainAreaLayout" );
+	layout->addWidget( m_form );
+
+	if( oldForm ) {
+		m_form->move( oldForm->pos( ) );
+		oldForm->hide( );
+		oldForm->deleteLater( );
+		oldForm = NULL;
+	}
+	m_form->show( );
+
+// remember the name of the current form
+	m_currentForm = name;
+	
 // not busy anymore
 	qApp->restoreOverrideCursor();
 }
