@@ -7,8 +7,6 @@
 #include <QDir>
 #include <QFile>
 
-#include <iostream>
-
 namespace _SMERP {
 	namespace QtClient {
 
@@ -28,9 +26,7 @@ void FileFormLoader::initiateFormLoad( QString &name )
 	QFile file( m_dir + "/" + name );
 	file.open( QFile::ReadOnly );
 	QByteArray data = file.readAll( );
-	file.close( );
-	std::cout << "Read form '" << file.fileName( ).toStdString( ) << "' with " << data.size( ) << " octects." << std::endl;
-	
+	file.close( );	
 	emit formLoaded( name, data );
 }
 
