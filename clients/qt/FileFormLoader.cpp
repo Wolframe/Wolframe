@@ -1,6 +1,9 @@
 #include "FileFormLoader.hpp"
 
 #include <QDir>
+#include <QFile>
+
+#include <iostream>
 
 namespace _SMERP {
 	namespace QtClient {
@@ -17,8 +20,12 @@ void FileFormLoader::initiateListLoad( )
 
 void FileFormLoader::initiateFormLoad( QString &name )
 {
-	// just remembering the name here, deferring to getFormRef
-	emit formLoaded( name, 0 );
+	QFile file( m_dir + "/" + name );
+	file.open( QFile::ReadOnly );
+	QByteArray data = file.readAll( );
+	file.close( );
+	std::cout << "Read form '" << file.fileName( ).toStdString( ) << "' with " << data.size( ) << " octects." << std::endl;
+	emit formLoaded( name, data );
 }
 
 QStringList FileFormLoader::getFormNames( )

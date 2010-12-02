@@ -12,7 +12,7 @@ namespace _SMERP {
 
 MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ), m_ui( 0 )
 {
-	m_formLoader = new FileFormLoader( "themes" );
+	m_formLoader = new FileFormLoader( "forms" );
 	initialize( );
 }
 
