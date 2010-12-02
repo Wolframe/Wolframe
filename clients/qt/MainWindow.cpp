@@ -110,9 +110,12 @@ void MainWindow::loadTheme( QString theme )
 // now that we have a menu where we can add things, we start the form list loading
 	QObject::connect( m_formLoader, SIGNAL( formListLoaded( ) ), this, SLOT( formListLoaded( ) ) );
 	m_formLoader->initiateListLoad( );
-
+	
 // not busy anymore
 	qApp->restoreOverrideCursor( );
+
+// load the current form again
+	if( m_form ) loadForm( m_currentForm );
 }
 
 void MainWindow::formListLoaded( )
