@@ -87,3 +87,9 @@ clients/qt/AbstractFormLoader.hpp
 clients/qt/FileFormLoader.hpp
 clients/qt/FileFormLoader.cpp
 clients/qt/AbstractFormLoader.cpp
+clients/qt/forms/form2.ui
+clients/qt/forms/form1.ui
+clients/qt/themes/phone/MainWindow.qss
+clients/qt/themes/phone/MainWindow.ui
+clients/qt/themes/windows/MainWindow.qss
+clients/qt/themes/windows/MainWindow.ui

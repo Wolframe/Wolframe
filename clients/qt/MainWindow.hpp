@@ -35,11 +35,12 @@ namespace _SMERP {
 	private Q_SLOTS:
 		void themeSelected( QAction *action );
 		void formSelected( QAction *action );
+		void formListLoaded( );
+		void formLoaded( QString name, QByteArray xml );
+
 		void on_actionExit_triggered( );
 		void on_actionAbout_triggered( );
 		void on_actionAboutQt_triggered( );
-		void formListLoaded( );
-		void formLoaded( QString name, QByteArray xml );
 	};
 } // namespace QtClient
 } // namespace _SMERP
