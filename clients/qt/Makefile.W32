@@ -24,6 +24,8 @@ INCLUDE_LIBS = \
 OBJS = \
 	moc_MainWindow.obj \
 	MainWindow.obj \
+	AbstractFormLoader.obj \
+	moc_AbstractFormLoader.obj \
 	FileFormLoader.obj
 
 CPP_BINS = \
@@ -42,8 +44,11 @@ qtclient.exe: qtclient.obj $(OBJS)
 moc_MainWindow.cpp: MainWindow.hpp
 	$(QT_DIR)\bin\moc.exe -I. MainWindow.hpp -o moc_MainWindow.cpp
 
+moc_AbstractFormLoader.cpp: AbstractFormLoader.hpp
+	$(QT_DIR)\bin\moc.exe -I. AbstractFormLoader.hpp -o moc_AbstractFormLoader.cpp
+
 local_clean:
-	@-erase moc_MainWindow.cpp 2>NUL
+	@-erase moc_*.cpp 2>NUL
 
 local_distclean:
 

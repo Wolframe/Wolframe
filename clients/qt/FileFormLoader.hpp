@@ -21,7 +21,6 @@ namespace _SMERP {
 			virtual void initiateListLoad( );
 			virtual void initiateFormLoad( QString &name );
 			virtual QStringList getFormNames( );
-			virtual QString getFormRef( QString &name );
 		
 		private:
 			QString m_dir;

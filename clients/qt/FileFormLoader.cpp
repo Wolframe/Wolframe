@@ -42,9 +42,5 @@ QStringList FileFormLoader::getFormNames( )
 	return forms;
 }
 
-QString FileFormLoader::getFormRef( QString &name )
-{
-}
-
 } // namespace QtClient
 } // namespace _SMERP
