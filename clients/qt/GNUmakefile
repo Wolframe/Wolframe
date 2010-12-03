@@ -47,3 +47,9 @@ local_distclean:
 local_install:
 	$(INSTALL) -d -m 755 $(bindir)
 	$(INSTALL) -m 644 $(CPP_BINS) $(bindir)
+
+local_test:
+	@echo "Testing validity of forms.."
+	@xmllint --noout --schema qt-ui-4.7.xsd forms/form1.ui
+	@xmllint --noout --schema qt-ui-4.7.xsd forms/form2.ui
+	
