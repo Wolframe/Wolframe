@@ -22,7 +22,7 @@ namespace test
    {
       return ::getc( in);
    }
-
+   
    template<typename Output>
    void putc( char ch, Output& out)
    {

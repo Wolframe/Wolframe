@@ -71,9 +71,7 @@ local_test:
 	@echo
 	@echo "Testing version..."
 	@LD_LIBRARY_PATH=$(BOOST_DIR)/lib ./versionTest
-	@echo
-	@LD_LIBRARY_PATH=$(BOOST_DIR)/lib ./counterTest
-	@echo
+	@echo "Testing counter.."
 	@LD_LIBRARY_PATH=$(BOOST_DIR)/lib ./counterTest
 ifdef WITH_GTEST
 	@echo "Testing with Google test framework..."
