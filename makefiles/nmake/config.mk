@@ -14,38 +14,38 @@
 # newer versions of Visual Studio integrate the header files of the SDK
 # some versions of Visual Studio miss the mc.exe binary
 
-#PLATFORM_SDK_DIR = C:\Programme\Microsoft Platform SDK
+PLATFORM_SDK_DIR = C:\Programme\Microsoft Platform SDK
 #PLATFORM_SDK_DIR = C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2
 #PLATFORM_SDK_DIR = D:\Programme\Microsoft Platform SDK
-PLATFORM_SDK_DIR = C:\Program Files\Microsoft SDKs\Windows\v7.0
+#PLATFORM_SDK_DIR = C:\Program Files\Microsoft SDKs\Windows\v7.0
 
 # Boost (http://www.boostpro.com/download)
 ###########################################
 
 # version of the boost library
 
-BOOST_VERSION=1_45
+BOOST_VERSION=1_44
 
 # base dir where boost is installed
 
-#BOOST_DIR=C:\Programme\boost\boost_$(BOOST_VERSION)
+BOOST_DIR=C:\Programme\boost\boost_$(BOOST_VERSION)
 #BOOST_DIR=C:\Program Files\boost\boost_$(BOOST_VERSION)
 #BOOST_DIR=D:\Programme\boost\boost_$(BOOST_VERSION)
-BOOST_DIR=E:\boost_1_45_0
+#BOOST_DIR=E:\boost_1_45_0
 
 # visual studio version used for compiling
 
-#BOOST_VC_VER=vc80
-BOOST_VC_VER=vc90
+BOOST_VC_VER=vc80
+#BOOST_VC_VER=vc90
 
 # TODO: probe those
 BOOST_MT=-mt
 
 # preinstalled binaties
-#BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib"
+BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib"
 
 # self-compiled
-BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\stage\lib"
+#BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\stage\lib"
 
 # OpenSSL (http://www.slproweb.com/products/Win32OpenSSL.html)
 ##############################################################

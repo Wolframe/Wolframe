@@ -23,10 +23,10 @@ INCLUDE_LIBS = \
 
 TEST_CPP_BINS = \
 	versionTest.exe \
-	counterTest$(EXE) \
+	counterTest.exe \
 	logTest.exe \
-	pechoHandlerTest$(EXE) \
-	xmlselectHandlerTest$(EXE)
+	pechoHandlerTest.exe \
+	xmlselectHandlerTest.exe
 
 OBJS = \
 
@@ -35,6 +35,7 @@ all: $(OBJS) $(CPP_BINS)
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 versionTest.exe: versionTest.obj $(TOPDIR)\src\version.obj
+counterTest.exe: counterTest.obj
 logTest.exe: logTest.obj $(TOPDIR)\src\logger.obj
 pechoHandlerTest.exe: pechoHandlerTest.obj $(TOPDIR)\src\pechoHandler.o
 xmlselectHandlerTest.exe: xmlselectHandlerTest.obj $(TOPDIR)\src\xmlselectHandler.o
@@ -50,6 +51,7 @@ local_test:
 	@-echo @echo off > test.bat
 	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
 	@-echo echo Testing version... >> test.bat
+	@-echo counterTest >> test.bat
 	@-echo versionTest >> test.bat
 	@-echo echo Testing boost log... >> test.bat
 	@-echo logTest >> test.bat
