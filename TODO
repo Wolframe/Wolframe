@@ -9,6 +9,8 @@ ABa:
 - split src into the libsmerp.a (libsmerp.lib) development library
   and in the sample service (otherwise we run into problems in the
   tests directory)
+- username, password for service credentials
+- clean up native Win32 string mess in service code
 
 PF:
 
