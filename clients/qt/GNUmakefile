@@ -52,4 +52,6 @@ local_test:
 	@echo "Testing validity of forms.."
 	@xmllint --noout --schema qt-ui-4.7.xsd forms/form1.ui
 	@xmllint --noout --schema qt-ui-4.7.xsd forms/form2.ui
-	
+	@echo "Testing Qt client.."
+	@./qtclient
+		
