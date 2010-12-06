@@ -316,13 +316,15 @@ public:
    TextIterator()                         :state(0) {};
    TextIterator( Iterator* p_src)         :src_(p_src),state(0) {};
 
-   //return the current character or 0 if we reached the EOF state
+   //return the current character
+   //  or a '\r' for the '.' after EOL
+   //  or 0 if we reached the EOF state
    char cur()
    {
       char ch = *src();
       if (state < 2) return ch;
       if (state == 2) return (ch == '.')?'\r':ch;
-      if (state < 4) return ch;
+      if (state < 5) return ch;
       return 0; /*EOF*/
    };
    
@@ -351,9 +353,12 @@ public:
          ++src();
          if (ch != '\n')
          {
-            state = 0;
+            if (ch != '\r') state = 0;
          }
-         state = 2;
+         else
+         {
+            state = 2;
+         }
       }
       else if (state == 2)
       {
@@ -376,18 +381,38 @@ public:
             state = 0;
          }
       }
-      else //if (state >= 3)
+      else if (state == 3)
       {
          char ch = *src();
          ++src();
-         if (ch == '\r' || ch == '\n')
+         if (ch == '\r')
          {
             state = 4;
          } 
+         else if (ch == '\n')
+         {
+            state = 5;
+         }
          else
          {
             state = 0;
-         };
+         }
+      }
+      else if (state == 4)
+      {
+         char ch = *src();
+         if (ch == '\n')
+         {
+            state = 5;
+         }
+         else
+         {
+            state = 0;
+         }
+      }
+      else
+      {
+         state = 0;
       }
    };
 
