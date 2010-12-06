@@ -12,7 +12,10 @@ namespace _SMERP
 namespace test
 {
    template<typename Input>
-   int getc( Input& in)
+   int getc( Input&){char a[sizeof(Input)!=0]; return 0;}//not defined!
+   
+   template<>
+   int getc( char*& in)
    {
       return *in++;
    }
@@ -22,15 +25,18 @@ namespace test
    {
       return ::getc( in);
    }
-   
+
    template<typename Output>
-   void putc( char ch, Output& out)
+   void putc( char, Output*){char a[sizeof(Output)!=0];}//not defined!
+
+   template<>
+   void putc( char ch, std::string* out)
    {
-      out.push_back( ch);
+      out->push_back( ch);
    }
 
    template<>
-   void putc( char ch, FILE*& out)
+   void putc( char ch, FILE* out)
    {
       ::putc( ch, out);
    }
@@ -38,7 +44,7 @@ namespace test
    //template for a test of a connection handler using FILE I/O
    //@return 0, if ok, some errorcode as main would else
    template<typename Input, typename Output, class Connection>
-   int runTestIO( Input& in, Output& out, Connection& connection)
+   int runTestIO( Input*& in, Output* out, Connection& connection)
    {
       for (;;)
       {
@@ -69,7 +75,6 @@ namespace test
                for (ii=0; ii<size; ii++)
                {
                   putc( data[ ii], out);
-                  fflush( out);
                }
             }
             break;
