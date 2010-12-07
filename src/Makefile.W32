@@ -62,7 +62,7 @@ OBJS = \
 	acceptor.obj \
 	connection.obj \
 	getPassword.obj \
-	echoHandler.obj \
+	smerpHandler.obj \
 	winMain.obj
 
 all: $(OBJS) $(CPP_BINS) smerpmsg.dll

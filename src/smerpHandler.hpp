@@ -1,9 +1,9 @@
 //
-// echoHandler.hpp - simple echo handler example
+// smerpHandler.hpp - smerp main handler
 //
 
-#ifndef _ECHO_HANDLER_HPP_INCLUDED
-#define _ECHO_HANDLER_HPP_INCLUDED
+#ifndef _SMERP_HANDLER_HPP_INCLUDED
+#define _SMERP_HANDLER_HPP_INCLUDED
 
 #include "connectionHandler.hpp"
 
@@ -56,4 +56,4 @@ namespace _SMERP {
 
 } // namespace _SMERP
 
-#endif // _ECHO_HANDLER_HPP_INCLUDED
+#endif // _SMERP_HANDLER_HPP_INCLUDED

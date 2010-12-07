@@ -2,7 +2,7 @@
 // connectionHandler.cpp
 //
 
-#include "echoHandler.hpp"
+#include "smerpHandler.hpp"
 #include "logger.hpp"
 
 #include <string>

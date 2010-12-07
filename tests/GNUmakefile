@@ -51,7 +51,7 @@ pechoHandler-gTest$(EXE): pechoHandler-gTest.cpp $(TOPDIR)/src/logger.cpp $(TOPD
 	$(CCPP) -c -o pechoHandler-gTest.o $(CCPPFLAGS) $(INCLUDE_DIRS) pechoHandler-gTest.cpp
 	$(CCPP) -c -o logger.o $(CCPPFLAGS) $(TOPDIR)/src/logger.cpp
 	$(CCPP) -c -o pechoHandler.o $(CCPPFLAGS) $(TOPDIR)/src/pechoHandler.cpp
-	$(CCPP_LINK) -o pechoHandler-gTest$(EXE) $(INCLUDE_LDFLAGS) $(GTEST_LIBS) logger.o pechoHandler.o pechoHandler-gTest.o
+	$(CCPP_LINK) -o pechoHandler-gTest$(EXE) $(INCLUDE_LDFLAGS) $(GTEST_LIBS) -lpthread logger.o pechoHandler.o pechoHandler-gTest.o
 endif
 
 xmlselectHandlerTest$(EXE): xmlselectHandlerTest.cpp $(TOPDIR)/src/logger.cpp $(TOPDIR)/src/xmlselectHandler.cpp $(TOPDIR)/src/xmlselectHandler.hpp $(TOPDIR)/src/protocol.hpp testHandlerTemplates.hpp

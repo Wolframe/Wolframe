@@ -1,0 +1,31 @@
+OID DataTypes
+
+SMI defines a fixed number of datatypes which are returned by OIDs. These datatypes include:
+
+Integer
+    Signed 32bit Integer (values between -2147483648 and 2147483647). 
+Integer32
+    Same as Integer. 
+UInteger32
+    Unsigned 32bit Integer (values between 0 and 4294967295). 
+Octet String
+    Arbitrary binary or textual data, typically limited to 255 characters in length. 
+Object Identifier
+    An OID. 
+Bit String
+    Represents an enumeration of named bits. This is an unsigned datatype. 
+IpAddress
+    An IP address. 
+Counter32
+    Represents a non-negative integer which monotonically increases until it reaches a maximum value of 32bits-1 (4294967295 dec), when it wraps around and starts increasing again from zero. 
+Counter64
+    Same as Counter32 but has a maximum value of 64bits-1. 
+Gauge32
+    Represents an unsigned integer, which may increase or decrease, but shall never exceed a maximum value. 
+TimeTicks
+    Represents an unsigned integer which represents the time, modulo 232 (4294967296 dec), in hundredths of a second between two epochs. 
+Opaque
+    Provided solely for backward-compatibility, its no longer used. 
+NsapAddress
+    Represents an OSI address as a variable-length OCTET STRING. 
+

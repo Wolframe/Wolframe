@@ -15,7 +15,7 @@
 #include "ErrorCodes.hpp"
 #include "logger.hpp"
 
-#include "echoHandler.hpp"
+#include "smerpHandler.hpp"
 
 #include <libintl.h>
 #include <locale.h>

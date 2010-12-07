@@ -53,7 +53,7 @@ OBJS = \
 	getPassword.o \
 	connection.o \
 	server.o \
-	echoHandler.o \
+	smerpHandler.o \
 	pechoHandler.o \
 	xmlselectHandler.o \
 	posixMain.o
