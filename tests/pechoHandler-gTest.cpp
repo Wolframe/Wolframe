@@ -14,11 +14,28 @@ LogBackend logBack;
 
 const char* getRandomAsciiString()
 {
-   enum {MaxStringSize=2048};
+   enum {MaxStringSize=4096};
    static char rt[ MaxStringSize+1];
 
    unsigned int ii=0,nn=rand()%MaxStringSize+1;
-   while (ii<nn) rt[ii++] = 32+rand()%96;
+   while (ii<nn && rand()%104 != 103)
+   {
+      rt[ii] = 32+rand()%96;
+      
+      //avoid random end of content:
+      if (ii>=2 && rt[ii-2]=='\n' && rt[ii-1]=='.' && rt[ii]=='\n')
+      {
+         continue;
+      }
+      if (ii>=3 && rt[ii-3]=='\n' && rt[ii-2]=='.' && rt[ii-1]=='\r' && rt[ii]=='\n')
+      {
+         continue;
+      }
+      ii++;
+   }
+   //avoid random end of content:
+   while (ii >= 2 && rt[ii-2]=='\n' && rt[ii-1]=='.') ii--;
+   if (ii == 1 && rt[ii-1]=='.') ii=0;
    rt[ii] = 0;
    return rt;
 }
@@ -26,13 +43,12 @@ const char* getRandomAsciiString()
 struct Empty :public std::string {};
 struct OneEmptyLine :public std::string {OneEmptyLine(){ this->append("");};};
 struct OneOneCharLine :public std::string {OneOneCharLine(){ this->append("?\r\n");};};
-struct FakeEOF :public std::string {FakeEOF(){ this->append("\r\n#.\r\n");};};
 struct OneLine :public std::string  {OneLine(){ this->append("Hello world!\r\n");};};
 struct Random :public std::string
 {
    Random()
    {
-      enum {MaxNofLines=128};
+      enum {MaxNofLines=24000};
       unsigned int ii=0,nn=rand()%MaxNofLines+1;
       while (ii++<=nn)
       {
@@ -94,7 +110,7 @@ protected:
    }
 };
 
-typedef ::testing::Types<Empty, OneEmptyLine, OneOneCharLine, FakeEOF, OneLine, Random> MyTypes;
+typedef ::testing::Types<Empty, OneEmptyLine, OneOneCharLine, OneLine, Random> MyTypes;
 TYPED_TEST_CASE( pechoHandlerFixture, MyTypes);
 
 TYPED_TEST( pechoHandlerFixture, ExpectedResult )
@@ -102,13 +118,7 @@ TYPED_TEST( pechoHandlerFixture, ExpectedResult )
    std::string output;
    char* itr = const_cast<char*>( this->input.c_str());
    EXPECT_EQ( 0, test::runTestIO( itr, &output, *this->connection));
-   EXPECT_EQ( output.size(), this->expected.size());
-   unsigned int ii,nn;
-   for (ii=0,nn=output.size(); ii<nn; ii++)
-   {
-      if (output[ii] != this->expected[ii]) break;
-   }
-   EXPECT_EQ( ii, nn);
+   EXPECT_EQ( output, this->expected);
 }
 
 int main( int argc, char **argv )

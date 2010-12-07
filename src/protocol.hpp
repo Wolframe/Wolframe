@@ -43,10 +43,8 @@ private:
 
 //input memory block to iterate through with an iterator: 
 //read as long as you can and throw an exception if you can't because you need more data.
-//@remark iterators based on this iterator must be without read ahead (believe me, one byte is too much). it's illegal to
-//read over more that you can consume. you can read your EOF but detecting this by reading more that belongs to you is illegal.
-//but you can buffer what ever you want if it is yours. but do not read over one single byte that you cannot consume.
-//TODO make iterator more general, not only char iterator but covering arbitrary data types and binary data.
+//@remark iterators based on this iterator must be without read ahead. 
+// it's illegal to ahead more that you consume. 
 class InputBlock 
 {
 private:
@@ -66,11 +64,11 @@ public:
       mem.init();
    };
    
-   //exception thrown if there is nothing to read from the input anymore: triggers reading more input from the network
+   //exception thrown if there is nothing to read from the input anymore.
+   //triggers reading more input from the network
    struct End {};
 
-   //STL conform input iterator
-   //TODO tag it correctly according STL and do not rely on the default properties (input iterator)
+   //input iterator
    struct iterator
    {
       InputBlock* input;
@@ -108,7 +106,8 @@ public:
 };
 
 
-//output interface based on a memory block. print as long a you can and the order to "ship" what you printed.
+//output interface based on a memory block. 
+// print as buffer is available and then order to "ship" what you printed.
 class OutputBlock
 {
 private:
@@ -167,9 +166,8 @@ public:
 
 
 //case insensitive ascii protocol parser
-//TODO make it really ascii and not a superset of it
-//TODO simplify multi argument parsing (C argc,argv model)
-//@remark end of lines or trailing spaces are not implicitely consumed, because this raises problems (like was it consumed or not).
+//@remark end of lines or trailing spaces are not implicitely consumed, 
+// because this leads to intermediate states that cannot be handled
 class Parser
 {      
 public:
@@ -219,7 +217,8 @@ public:
    };
   
    //get the next command of the parser. buffer the visited command start in context.
-   //so we can be called again and continue with context in case of an input exception
+   // so it can be called again and continue with context in case of an missing input
+   // exception
    template <typename IteratorType>
    int get( IteratorType& src, Context& ct) const
    {
@@ -258,7 +257,8 @@ public:
    }
   
    //go to the end of line and write it to buffer, starting with the first non space.
-   //after call the iterator is pointing to the end of line char or at the end of content char
+   // after call the iterator is pointing to the end of line char or at the end of 
+   // content char
    template <typename IteratorType, typename BufferType>
    static void getLine( IteratorType& src, BufferType& buf)
    {
@@ -303,116 +303,125 @@ private:
 
 
 
-//iterator over a content that terminates with [CR]LF dot [CR]LF 
+//iterator over a content that returns 0 (end of data) with [CR]LF dot(".") [CR]LF reached
+//when 0 is returned the iterator for the protocol can take over again
 template <class Iterator>
 class TextIterator
 {
 private:
    Iterator* src_;
    Iterator& src() const                  {return *src_;};
-   unsigned int state;
+   enum State {SRC,CR,CR_LF,CR_LF_DOT,CR_LF_DOT_CR,CR_LF_DOT_CR_LF};
+   State state;
+   unsigned int nn;
    
 public:
-   TextIterator()                         :state(0) {};
-   TextIterator( Iterator* p_src)         :src_(p_src),state(0) {};
+   TextIterator()                         :state(SRC),nn(0) {};
+   TextIterator( Iterator* p_src)         :src_(p_src),state(SRC),nn(0) {};
 
    //return the current character
    //  or a '\r' for the '.' after EOL
-   //  or 0 if we reached the EOF state
+   //  or 0 if we reached end of data marked by [CR]LF dot(".") [CR]LF
    char cur()
    {
       char ch = *src();
-      if (state < 2) return ch;
-      if (state == 2) return (ch == '.')?'\r':ch;
-      if (state < 5) return ch;
+      if (state < CR_LF) return ch;
+      if (state == CR_LF) return (ch == '.')?'\r':ch;
+      if (state < CR_LF_DOT_CR_LF) return ch;
       return 0; /*EOF*/
    };
    
    //skip one character and adapt the EOF sequence detection state
+   // its a cascaded if instead of a switch because the states are ordered 
+   // ascending according their probability
    void skip()
    {
-      if (state == 0)
+      if (state == SRC)
       {
          char ch = *src(); 
-         ++src();
          if (ch < 32)
          {
             if (ch == '\r')
             {
-               state = 1;
+               state = CR;
             }
             else if (ch == '\n')
             {
-               state = 2;
+               state = CR_LF;
             }
          }
+         ++src();++nn;
       }
-      else if (state == 1)
-      {
-         char ch = *src();
-         ++src();
-         if (ch != '\n')
-         {
-            if (ch != '\r') state = 0;
-         }
-         else
-         {
-            state = 2;
-         }
-      }
-      else if (state == 2)
-      {
-         char ch = *src();
-         ++src();
-         if (ch == '.')
-         {
-            state = 3;         
-         }
-         else if (ch == '\r')
-         {
-            state = 1;
-         }
-         else if (ch == '\n')
-         {
-            //state = 2;
-         }
-         else
-         {
-            state = 0;
-         }
-      }
-      else if (state == 3)
-      {
-         char ch = *src();
-         ++src();
-         if (ch == '\r')
-         {
-            state = 4;
-         } 
-         else if (ch == '\n')
-         {
-            state = 5;
-         }
-         else
-         {
-            state = 0;
-         }
-      }
-      else if (state == 4)
+      else if (state == CR)
       {
          char ch = *src();
          if (ch == '\n')
          {
-            state = 5;
+            state = CR_LF;
+         }
+         else if (ch == '\r')
+         {
+            //state = CR;
          }
          else
          {
-            state = 0;
+            state = SRC;
+         }
+         ++src();++nn;
+      }
+      else if (state == CR_LF)
+      {
+         char ch = *src();
+         if (ch == '.')
+         {
+            state = CR_LF_DOT;         
+         }
+         else if (ch == '\r')
+         {
+            state = CR;
+         }
+         else if (ch == '\n')
+         {
+            //state = CR_LF;
+         }
+         else
+         {
+            state = SRC;
+         }
+         ++src();++nn;
+      }
+      else if (state == CR_LF_DOT)
+      {
+         char ch = *src();
+         if (ch == '\r')
+         {
+            state = CR_LF_DOT_CR;
+         } 
+         else if (ch == '\n')
+         {
+            state = CR_LF_DOT_CR_LF;
+         }
+         else
+         {
+            state = SRC;
+         }
+         ++src();++nn;
+      }
+      else if (state == CR_LF_DOT_CR)
+      {
+         char ch = *src();
+         if (ch == '\n')
+         {
+            state = CR_LF_DOT_CR_LF;
+         }
+         else
+         {
+            state = SRC;
          }
       }
       else
       {
-         state = 0;
+         state = SRC;
       }
    };
 
