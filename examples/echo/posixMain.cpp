@@ -40,9 +40,9 @@ static const unsigned short MAJOR_VERSION = 0;
 static const short unsigned MINOR_VERSION = 0;
 static const short unsigned REVISION_NUMBER = 3;
 
-static const char *DEFAULT_MAIN_CONFIG = "/etc/smerp.conf";
-static const char *DEFAULT_USER_CONFIG = "~/smerp.conf";
-static const char *DEFAULT_LOCAL_CONFIG = "./smerp.conf";
+static const char *DEFAULT_MAIN_CONFIG = "/etc/smerpd.conf";
+static const char *DEFAULT_USER_CONFIG = "~/smerpd.conf";
+static const char *DEFAULT_LOCAL_CONFIG = "./smerpd.conf";
 
 _SMERP::LogBackend	logBack;
 
@@ -50,7 +50,7 @@ int _SMERP_posixMain( int argc, char* argv[] )
 {
 // i18n global stuff
 	if ( setlocale( LC_ALL, "" ) == NULL )	{
-		std::cerr << "Unable to set locale. Falling back to default." << std::endl;
+		std::cerr << "Unable to set locale. Falling back to deafult." << std::endl;
 	}
 	else	{
 		if ( bindtextdomain( "SMERP", "../po" ) == NULL )	{

@@ -63,7 +63,8 @@ xmlselectHandlerTest$(EXE): xmlselectHandlerTest.cpp $(TOPDIR)/src/logger.cpp $(
 local_all:
 
 local_clean:
-	-rm -rf logTest.log
+	-rm -f $(TEST_CPP_BINS)
+	-rm -f *.o
 
 local_distclean:
 
