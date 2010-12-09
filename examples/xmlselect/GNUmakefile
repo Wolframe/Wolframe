@@ -22,11 +22,11 @@ OBJS = \
 	appConfig.o \
 	configFile.o \
 	commandLine.o \
-	pechoHandler.o \
+	xmlselectHandler.o \
 	posixMain.o
 
 CPP_BINS = \
-	smerp-echo$(EXE)
+	smerp-xmlselect$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

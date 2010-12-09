@@ -15,7 +15,7 @@
 #include "ErrorCodes.hpp"
 #include "logger.hpp"
 
-#include "pechoHandler.hpp"
+#include "xmlselectHandler.hpp"
 
 #include <libintl.h>
 #include <locale.h>
@@ -223,7 +223,7 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		LOG_NOTICE << "Starting server";
 
 		// Run server in background thread(s).
-		_SMERP::pecho::Server	echo;
+		_SMERP::xmlselect::Server	echo;
 		_SMERP::Network::server s( config.address, config.SSLaddress, echo,
 					   config.threads, config.maxConnections );
 		boost::thread t( boost::bind( &_SMERP::Network::server::run, &s ));
