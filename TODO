@@ -6,11 +6,15 @@ xxxx. SSL must require certificate from peer if verify is on
 
 ABa:
 
-- split src into the libsmerp.a (libsmerp.lib) development library
-  and in the sample service (otherwise we run into problems in the
-  tests directory)
-- username, password for service credentials
-- clean up native Win32 string mess in service code
+- generic:
+  - split src into the libsmerp.a (libsmerp.lib) development library
+    and in the sample service (otherwise we run into problems in the
+    tests directory)
+- Windows:
+  - username, password for service credentials
+  - clean up native Win32 string mess in service code
+  - LINK : fatal error LNK1104: cannot open file 'boost_unit_test_framework-vc90-mt-1_45.lib'
+    NMAKE : fatal error U1077: '"C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\BIN\link.exe"' : return code '0x450'
 
 PF:
 
