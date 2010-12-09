@@ -10,6 +10,7 @@ INCLUDE_DIRS = \
 	-I$(TOPDIR)/include -I. \
 	-I$(TOPDIR)/src \
 	-I$(TOPDIR)/examples/pecho \
+	-I$(TOPDIR)/examples/xmlselect \
 	-I$(BOOST_DIR)/include
 
 INCLUDE_LDFLAGS = \
@@ -31,6 +32,7 @@ TEST_CPP_BINS = \
 	counterTest$(EXE) \
 	threadLeakTest$(EXE) \
 	pechoHandlerTest$(EXE) \
+	xmlselectHandlerTest$(EXE) \
 	logTest$(EXE)
 
 ifdef WITH_GTEST
@@ -45,18 +47,10 @@ include $(TOPDIR)/makefiles/gmake/sub.mk
 pechoHandlerTest$(EXE): $(TOPDIR)/src/libsmerp.a $(TOPDIR)/examples/pecho/pechoHandler.o
 
 ifdef WITH_GTEST
-pechoHandler-gTest$(EXE): pechoHandler-gTest.cpp $(TOPDIR)/src/logger.cpp $(TOPDIR)/src/pechoHandler.cpp $(TOPDIR)/src/pechoHandler.hpp $(TOPDIR)/src/protocol.hpp testHandlerTemplates.hpp
-	$(CCPP) -c -o pechoHandler-gTest.o $(CCPPFLAGS) $(INCLUDE_DIRS) pechoHandler-gTest.cpp
-	$(CCPP) -c -o logger.o $(CCPPFLAGS) $(TOPDIR)/src/logger.cpp
-	$(CCPP) -c -o pechoHandler.o $(CCPPFLAGS) $(TOPDIR)/src/pechoHandler.cpp
-	$(CCPP_LINK) -o pechoHandler-gTest$(EXE) $(INCLUDE_LDFLAGS) $(GTEST_LIBS) -lpthread logger.o pechoHandler.o pechoHandler-gTest.o
+pechoHandler-gTest$(EXE): $(TOPDIR)/src/libsmerp.a $(TOPDIR)/examples/pecho/pechoHandler.o
 endif
 
-xmlselectHandlerTest$(EXE): xmlselectHandlerTest.cpp $(TOPDIR)/src/logger.cpp $(TOPDIR)/src/xmlselectHandler.cpp $(TOPDIR)/src/xmlselectHandler.hpp $(TOPDIR)/src/protocol.hpp testHandlerTemplates.hpp
-	$(CCPP) -c -o xmlselectHandlerTest.o $(CCPPFLAGS) xmlselectHandlerTest.cpp
-	$(CCPP) -c -o logger.o $(CCPPFLAGS) $(TOPDIR)/src/logger.cpp
-	$(CCPP) -c -o xmlselectHandler.o $(CCPPFLAGS) $(TOPDIR)/src/xmlselectHandler.cpp
-	$(CCPP_LINK) -o xmlselectHandlerTest$(EXE) logger.o xmlselectHandler.o xmlselectHandlerTest.o
+xmlselectHandlerTest$(EXE): $(TOPDIR)/src/libsmerp.a $(TOPDIR)/examples/xmlselect/xmlselectHandler.o
 
 local_all:
 
