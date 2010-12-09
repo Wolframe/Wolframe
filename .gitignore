@@ -29,5 +29,10 @@ tests/version-gTest
 tests/counterTest
 tests/pechoHandlerTest
 tests/xmlselectHandlerTest
+tests/counter-gTest
+tests/pechoHandler-gTest
+examples/echo/smerp-echo
+examples/pecho/smerp-echo
+examples/xmlselect/smerp-xmlselect
 clients/qt/qtclient
 moc_*.cpp
