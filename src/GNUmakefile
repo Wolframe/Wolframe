@@ -33,13 +33,7 @@ endif
 STATIC_LIB = \
 	libsmerp.a
 
-STATIC_LIB_OBJS = \
-
-C_PORT_OBJS = \
-
 OBJS = \
-	$(C_PORT_OBJS) \
-	$(STATIC_LIB_OBJS) \
 	version.o \
 	commandLine.o \
 	logLevel.o \
