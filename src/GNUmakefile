@@ -30,9 +30,6 @@ INCLUDE_LIBS += \
 
 endif
 
-CPP_BINS = \
-	smerpd$(EXE)
-
 STATIC_LIB = \
 
 STATIC_LIB_OBJS = \
