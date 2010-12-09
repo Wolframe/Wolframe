@@ -24,8 +24,18 @@ INCLUDE_LIBS = \
 	$(TOPDIR)/src/libsmerp.a \
 	$(GTEST_LIBS)
 
+# openssl
+
+ifdef WITH_SSL
+
+INCLUDE_LIBS += \
+	$(OPENSSL_LIBS)
+
+endif
+
 TEST_OBJS = \
-	$(TOPDIR)/examples/pecho/pechoHandler.o
+	$(TOPDIR)/examples/pecho/pechoHandler.o \
+	$(TOPDIR)/examples/xmlselect/xmlselectHandler.o
 
 TEST_CPP_BINS = \
 	versionTest$(EXE) \
