@@ -9,6 +9,7 @@ INCLUDE_CPPFLAGS = \
 INCLUDE_DIRS = \
 	-I$(TOPDIR)/include -I. \
 	-I$(TOPDIR)/src \
+	-I$(TOPDIR)/examples/pecho \
 	-I$(BOOST_DIR)/include
 
 INCLUDE_LDFLAGS = \
@@ -18,11 +19,12 @@ INCLUDE_LIBS = \
 	-lboost_unit_test_framework \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_filesystem -lboost_system -lboost_thread$(BOOST_LIBRARY_TAG) \
+	-lboost_program_options \
+	$(TOPDIR)/src/libsmerp.a \
 	$(GTEST_LIBS)
 
 TEST_OBJS = \
-	$(TOPDIR)/src/version.o \
-	$(TOPDIR)/src/logger.o
+	$(TOPDIR)/examples/pecho/pechoHandler.o
 
 TEST_CPP_BINS = \
 	versionTest$(EXE) \
@@ -40,11 +42,7 @@ endif
 
 include $(TOPDIR)/makefiles/gmake/sub.mk
 
-pechoHandlerTest$(EXE): pechoHandlerTest.cpp $(TOPDIR)/src/logger.cpp $(TOPDIR)/src/pechoHandler.cpp $(TOPDIR)/src/pechoHandler.hpp $(TOPDIR)/src/protocol.hpp testHandlerTemplates.hpp
-	$(CCPP) -c -o pechoHandlerTest.o $(CCPPFLAGS) pechoHandlerTest.cpp
-	$(CCPP) -c -o logger.o $(CCPPFLAGS) $(TOPDIR)/src/logger.cpp
-	$(CCPP) -c -o pechoHandler.o $(CCPPFLAGS) $(TOPDIR)/src/pechoHandler.cpp
-	$(CCPP_LINK) -o pechoHandlerTest$(EXE) logger.o pechoHandler.o pechoHandlerTest.o
+pechoHandlerTest$(EXE): $(TOPDIR)/src/libsmerp.a $(TOPDIR)/examples/pecho/pechoHandler.o
 
 ifdef WITH_GTEST
 pechoHandler-gTest$(EXE): pechoHandler-gTest.cpp $(TOPDIR)/src/logger.cpp $(TOPDIR)/src/pechoHandler.cpp $(TOPDIR)/src/pechoHandler.hpp $(TOPDIR)/src/protocol.hpp testHandlerTemplates.hpp
