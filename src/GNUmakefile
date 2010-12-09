@@ -31,6 +31,7 @@ INCLUDE_LIBS += \
 endif
 
 STATIC_LIB = \
+	libsmerp.a
 
 STATIC_LIB_OBJS = \
 

@@ -51,15 +51,15 @@ namespace _SMERP {
 		SSLaddress = cfgFile.SSLaddress;
 
 		idleTimeout = cfgFile.idleTimeout;
-		requestTimeout = cfgFile.requestTimeout;
-		answerTimeout = cfgFile.answerTimeout;
-		processTimeout = cfgFile.processTimeout;
+//		requestTimeout = cfgFile.requestTimeout;
+//		answerTimeout = cfgFile.answerTimeout;
+//		processTimeout = cfgFile.processTimeout;
 
-		dbHost = cfgFile.dbHost;
-		dbPort = cfgFile.dbPort;
-		dbName = cfgFile.dbName;
-		dbUser = cfgFile.dbUser;
-		dbPassword = cfgFile.dbPassword;
+//		dbHost = cfgFile.dbHost;
+//		dbPort = cfgFile.dbPort;
+//		dbName = cfgFile.dbName;
+//		dbUser = cfgFile.dbUser;
+//		dbPassword = cfgFile.dbPassword;
 
 		if ( !foreground )	{
 			logToStderr = cfgFile.logToStderr;
@@ -134,18 +134,18 @@ namespace _SMERP {
 
 		os << "Timeouts" << std::endl;
 		os << "   idle: " << idleTimeout << std::endl;
-		os << "   request: " << requestTimeout << std::endl;
-		os << "   answer: " << answerTimeout << std::endl;
-		os << "   process: " << processTimeout << std::endl;
+//		os << "   request: " << requestTimeout << std::endl;
+//		os << "   answer: " << answerTimeout << std::endl;
+//		os << "   process: " << processTimeout << std::endl;
 
-		os << "Database" << std::endl;
-		if ( dbHost.empty())
-			os << "   DB host: local unix domain socket" << std::endl;
-		else
-			os << "   DB host: " << dbHost << ":" << dbPort << std::endl;
-		os << "   DB name: " << (dbName.empty() ? "(not specified - server user default)" : dbName) << std::endl;
-		os << "   DB user / password: " << (dbUser.empty() ? "(not specified - same as server user)" : dbUser) << " / "
-						<< (dbPassword.empty() ? "(not specified - no password used)" : dbPassword) << std::endl;
+//		os << "Database" << std::endl;
+//		if ( dbHost.empty())
+//			os << "   DB host: local unix domain socket" << std::endl;
+//		else
+//			os << "   DB host: " << dbHost << ":" << dbPort << std::endl;
+//		os << "   DB name: " << (dbName.empty() ? "(not specified - server user default)" : dbName) << std::endl;
+//		os << "   DB user / password: " << (dbUser.empty() ? "(not specified - same as server user)" : dbUser) << " / "
+//						<< (dbPassword.empty() ? "(not specified - no password used)" : dbPassword) << std::endl;
 
 		os << "Logging" << std::endl;
 		if ( logToStderr )
