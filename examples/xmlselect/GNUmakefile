@@ -18,6 +18,15 @@ INCLUDE_LIBS = \
 	-lboost_filesystem \
 	$(TOPDIR)/src/libsmerp.a
 
+# openssl
+
+ifdef WITH_SSL
+
+INCLUDE_LIBS += \
+	$(OPENSSL_LIBS)
+
+endif
+
 OBJS = \
 	appConfig.o \
 	configFile.o \
