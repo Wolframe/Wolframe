@@ -46,7 +46,6 @@ OBJS = \
 	connection.o \
 	server.o \
 	smerpHandler.o \
-	xmlselectHandler.o \
 	posixMain.o
 
 CPP_BINS = \

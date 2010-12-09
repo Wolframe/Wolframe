@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = echo pecho
+SUBDIRS = echo pecho xmlselect
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
