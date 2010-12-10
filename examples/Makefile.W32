@@ -2,7 +2,7 @@ TOPDIR = ..
 
 SUBDIRS = echo pecho xmlselect
 
--include $(TOPDIR)/makefiles/gmake/sub.mk
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 local_all:
 

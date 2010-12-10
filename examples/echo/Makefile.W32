@@ -25,12 +25,6 @@ INCLUDE_LIBS = \
 
 !IFDEF WITH_SSL
 
-INCLUDE_DIRS = \
-	$(INCLUDE_DIRS)	/I"$(OPENSSL_DIR)\include"
-
-INCLUDE_CPPFLAGS = \
-	$(INCLUDE_CPPFLAGS) /DWITH_SSL
-
 INCLUDE_LDFLAGS = \
 	$(INCLUDE_LDFLAGS) /LIBPATH:"$(OPENSSL_DIR)\lib"
 
@@ -39,31 +33,21 @@ INCLUDE_LIBS = \
 
 !ENDIF
 
-CPP_BINS = \
-	smerpd.exe
-
-STATIC_LIB = \
-	smerp.lib
-
 OBJS = \
-	version.obj \
-	commandLine.obj \
-	logLevel.obj \
-	logSyslogFacility.obj \
-	logger.obj \
-	configFile.obj \
 	appConfig.obj \
-	acceptor.obj \
-	getPassword.obj \
-	connection.obj \
-	server.obj \
-	smerpHandler.obj
+	configFile.obj \
+	commandLine.obj \
+	echoHandler.obj \
+	winMain.obj
+
+CPP_BINS = \
+	smerp-echo.exe
 
 all: $(OBJS) $(CPP_BINS) smerpmsg.dll
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-smerpd.exe: smerpd.obj winMain.obj smerpmsg.res 
+smerpd.exe: smerpd.obj smerpmsg.res 
 
 smerpmsg.dll: smerpmsg.res
 	$(LINK) /dll /nologo /noentry /MACHINE:x86 /out:$@ $?
@@ -71,14 +55,10 @@ smerpmsg.res: smerpmsg.rc
 smerpmsg.rc: smerpmsg.mc
 logger.obj: smerpmsg.rc
 
-smerp.lib: $(OBJS)
-	$(LINK) /lib /nologo /out:$@ $(LDFLAGS) $(LIBS) $?
-
-local_all: smerp.lib
+local_all:
 
 local_clean:
 	@-erase MSG*.bin smerpmsg.rc smerpmsg.h smerpmsg.res smerpmsg.dll 2>NUL
-	@-erase smerp.lib 2>NUL
 
 local_distclean:
 
