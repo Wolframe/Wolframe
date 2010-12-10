@@ -39,13 +39,10 @@ INCLUDE_LIBS = \
 
 !ENDIF
 
-CPP_BINS = \
-	smerpd.exe
-
-STATIC_LIB = \
+LOCAL_STATIC_LIB = \
 	smerp.lib
 
-OBJS = \
+LOCAL_STATIC_LIB_OBJS = \
 	version.obj \
 	commandLine.obj \
 	logLevel.obj \
@@ -57,13 +54,20 @@ OBJS = \
 	getPassword.obj \
 	connection.obj \
 	server.obj \
-	smerpHandler.obj
+
+OBJS = \
+	$(LOCAL_STATIC_LIB_OBJS) \
+	smerpHandler.obj \
+	winMain.obj
+
+CPP_BINS = \
+	smerpd.exe
 
 all: $(OBJS) $(CPP_BINS) smerpmsg.dll
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-smerpd.exe: smerpd.obj winMain.obj smerpmsg.res 
+smerpd.exe: smerpd.obj smerpmsg.res 
 
 smerpmsg.dll: smerpmsg.res
 	$(LINK) /dll /nologo /noentry /MACHINE:x86 /out:$@ $?
@@ -71,14 +75,14 @@ smerpmsg.res: smerpmsg.rc
 smerpmsg.rc: smerpmsg.mc
 logger.obj: smerpmsg.rc
 
-smerp.lib: $(OBJS)
+$(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
 	$(LINK) /lib /nologo /out:$@ $(LDFLAGS) $(LIBS) $?
 
-local_all: smerp.lib
+local_all: $(LOCAL_STATIC_LIB)
 
 local_clean:
 	@-erase MSG*.bin smerpmsg.rc smerpmsg.h smerpmsg.res smerpmsg.dll 2>NUL
-	@-erase smerp.lib 2>NUL
+	@-erase $(LOCAL_STATIC_LIB) 2>NUL
 
 local_distclean:
 

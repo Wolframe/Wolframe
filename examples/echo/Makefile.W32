@@ -1,4 +1,4 @@
-TOPDIR = ..
+TOPDIR = ..\..
 
 SUBDIRS =
 
@@ -43,22 +43,15 @@ OBJS = \
 CPP_BINS = \
 	smerp-echo.exe
 
-all: $(OBJS) $(CPP_BINS) smerpmsg.dll
+all: $(OBJS) $(CPP_BINS)
+
+smerp-echo.exe: smerp-echo.obj $(TOPDIR)\src\smerp.lib
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
-
-smerpd.exe: smerpd.obj smerpmsg.res 
-
-smerpmsg.dll: smerpmsg.res
-	$(LINK) /dll /nologo /noentry /MACHINE:x86 /out:$@ $?
-smerpmsg.res: smerpmsg.rc
-smerpmsg.rc: smerpmsg.mc
-logger.obj: smerpmsg.rc
 
 local_all:
 
 local_clean:
-	@-erase MSG*.bin smerpmsg.rc smerpmsg.h smerpmsg.res smerpmsg.dll 2>NUL
 
 local_distclean:
 
