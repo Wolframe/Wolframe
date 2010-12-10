@@ -30,10 +30,10 @@ INCLUDE_LIBS += \
 
 endif
 
-STATIC_LIB = \
+LOCAL_STATIC_LIB = \
 	libsmerp.a
 
-OBJS = \
+LOCAL_STATIC_LIB_OBJS = \
 	version.o \
 	commandLine.o \
 	logLevel.o \
@@ -44,7 +44,10 @@ OBJS = \
 	acceptor.o \
 	getPassword.o \
 	connection.o \
-	server.o \
+	server.o
+
+OBJS = \
+	$(LOCAL_STATIC_LIB_OBJS) \
 	smerpHandler.o \
 	posixMain.o
 
@@ -53,13 +56,13 @@ CPP_BINS = \
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
-local_all: $(CPP_BINS)
+local_all: $(LOCAL_STATIC_LIB)
 
-$(STATIC_LIBS): $(STATIC_LIBS_OBJS)
-	ar rcs $(STATIC_LIBS) $(STATIC_LIB_OBJS)
+$(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
+	ar rcs $(LOCAL_STATIC_LIB) $(LOCAL_STATIC_LIB_OBJS)
 
 local_clean:
-	@rm -f $(STATIC_LIBS)
+	@rm -f $(STATIC_LIB)
 
 local_distclean:
 
