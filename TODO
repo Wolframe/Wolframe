@@ -8,7 +8,6 @@ ABa:
 
 - we should split tests with different dependencies
 - test gtest on Windows
-- finish split in example also on Windows
 - Windows:
   - username, password for service credentials
   - clean up native Win32 string mess in service code
