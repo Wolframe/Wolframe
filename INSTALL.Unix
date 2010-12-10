@@ -3,17 +3,16 @@ Prerequisites
 
 - boost 1.41.0 or later
 - optionally (WITH_SSL) openssl 0.9.8 or later
+- optionally (WITH_GTEST) gtest 1.5.0 or later
 
 Compile and install boost
 -------------------------
 
-./bootstrap.sh --prefix=/tmpdir/boost-1_44_0
+./bootstrap.sh --prefix=/somewhere/boost-1_44_0
 ./bjam
 
 configure SMERP in makefiles/gmake/config.mk and
-set BOOST_DIR to /somewhere/boost-1_44_0 and set
-BOOST_INCLUDE_DIRS and BOOST_LIB_DIR to the local
-version
+set BOOST_DIR to /somewhere/boost-1_44_0.
 
 Compile and install openssl
 ---------------------------
@@ -23,3 +22,6 @@ Compile and install gtest
 
 ./configure
 make
+
+configure SMERP in makefiles/gmake/config.mk and
+set GTEST_DIR accordingly.
