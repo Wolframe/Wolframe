@@ -1,0 +1,58 @@
+TOPDIR = ..\..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_CPPFLAGS = \
+	/D_WIN32_WINNT=0x403
+
+INCLUDE_DIRS = \
+	/I. \
+	/I$(TOPDIR)\include \
+	/I"$(BOOST_DIR)" \
+	/I"$(PLATFORM_SDK_DIR)\Include"
+
+# Note: libraries are picked automatically on Windows!
+SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib"
+INCLUDE_LDFLAGS = \
+	$(SDK_LDFLAGS) $(BOOST_LDFLAGS)
+
+INCLUDE_LIBS = \
+	Advapi32.lib
+
+# openssl
+
+!IFDEF WITH_SSL
+
+INCLUDE_LDFLAGS = \
+	$(INCLUDE_LDFLAGS) /LIBPATH:"$(OPENSSL_DIR)\lib"
+
+INCLUDE_LIBS = \
+	$(INCLUDE_LIBS) $(OPENSSL_LIBS)
+
+!ENDIF
+
+OBJS = \
+	appConfig.obj \
+	configFile.obj \
+	commandLine.obj \
+	pechoHandler.obj \
+	winMain.obj
+
+CPP_BINS = \
+	smerp-echo.exe
+
+all: $(OBJS) $(CPP_BINS)
+
+smerp-echo.exe: smerp-echo.obj $(TOPDIR)\src\smerp.lib
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+local_all:
+
+local_clean:
+
+local_distclean:
+
+local_test:

@@ -16,7 +16,7 @@
 #include "ErrorCodes.hpp"
 #include "logger.hpp"
 
-#include "echoHandler.hpp"
+#include "pechoHandler.hpp"
 
 #if !defined(_WIN32)
 #error "This is the WIN32 main !"
@@ -258,7 +258,7 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 		LOG_NOTICE << "Starting service";
 
 // run server in background thread(s).
-		_SMERP::echoServer	echo;
+		_SMERP::pecho::Server	echo;
 		_SMERP::Network::server s( config.address, config.SSLaddress, echo, config.threads, config.maxConnections );
 		boost::thread t( boost::bind( &_SMERP::Network::server::run, &s ));
 
@@ -413,7 +413,7 @@ int _SMERP_winMain( int argc, char* argv[] )
 
 		LOG_NOTICE << "Starting server";
 
-		_SMERP::echoServer	echo;
+		_SMERP::pecho::Server	echo;
 		_SMERP::Network::server s( config.address, config.SSLaddress,
 					   echo, config.threads, config.maxConnections );
 
