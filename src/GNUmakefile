@@ -7,11 +7,11 @@ SUBDIRS =
 INCLUDE_CPPFLAGS =
 
 INCLUDE_LDFLAGS = \
-	-L$(BOOST_DIR)/lib
+	-L$(BOOST_LIB_DIR)
 
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include \
-	-I$(BOOST_DIR)/include
+	-I$(BOOST_INCLUDE_DIRS)
 
 INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \

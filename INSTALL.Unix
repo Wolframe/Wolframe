@@ -9,10 +9,17 @@ Compile and install boost
 
 ./bootstrap.sh --prefix=/tmpdir/boost-1_44_0
 ./bjam
-./bjam install
 
 configure SMERP in makefiles/gmake/config.mk and
-set BOOST_DIR to /somewhere/boost-1_44_0
+set BOOST_DIR to /somewhere/boost-1_44_0 and set
+BOOST_INCLUDE_DIRS and BOOST_LIB_DIR to the local
+version
 
 Compile and install openssl
 ---------------------------
+
+Compile and install gtest
+-------------------------
+
+./configure
+make

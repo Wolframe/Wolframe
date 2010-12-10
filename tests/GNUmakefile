@@ -11,10 +11,18 @@ INCLUDE_DIRS = \
 	-I$(TOPDIR)/src \
 	-I$(TOPDIR)/examples/pecho \
 	-I$(TOPDIR)/examples/xmlselect \
-	-I$(BOOST_DIR)/include
+	-I$(BOOST_INCLUDE_DIRS)
 
 INCLUDE_LDFLAGS = \
-	-L$(BOOST_DIR)/lib
+	-L$(BOOST_LIB_DIR)
+
+ifdef WITH_GTEST
+INCLUDE_CPPFLAGS += \
+	-I$(GTEST_INCLUDE_DIRS)
+
+INCLUDE_LDFLAGS += \
+	-L$(GTEST_LIB_DIR)
+endif
 
 INCLUDE_LIBS = \
 	-lboost_unit_test_framework \
@@ -73,18 +81,18 @@ local_distclean:
 local_test:
 	@echo
 	@echo "Testing version..."
-	@LD_LIBRARY_PATH=$(BOOST_DIR)/lib ./versionTest
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./versionTest
 	@echo "Testing counter.."
-	@LD_LIBRARY_PATH=$(BOOST_DIR)/lib ./counterTest
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./counterTest
 ifdef WITH_GTEST
 	@echo "Testing with Google test framework..."
-	@LD_LIBRARY_PATH=$(BOOST_DIR)/lib ./version-gTest
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./version-gTest
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_DIR)/lib ./counter-gTest
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./counter-gTest
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_DIR)/lib ./pechoHandler-gTest
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./pechoHandler-gTest
 endif
 	@echo
 	@echo "Testing boost log..."
-	@LD_LIBRARY_PATH=$(BOOST_DIR)/lib ./logTest
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./logTest
 	@echo
