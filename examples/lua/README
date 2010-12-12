@@ -7,3 +7,7 @@ to build it.
 If you have an old Windows SWK which doesn't set LIBPATH and INCLUDES
 use the supplied 'luavs.bat' script and set PLATFORM_SDK_DIR there
 correctly.
+
+links:
+
+http://www.gamedev.net/reference/programming/features/CPPLuaExport/
