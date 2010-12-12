@@ -1,0 +1,9 @@
+Installation:
+------------
+
+Get lua 5.1.4 or newer, on Windows use 'luavs.bat' from the lua sources
+to build it.
+
+If you have an old Windows SWK which doesn't set LIBPATH and INCLUDES
+use the supplied 'luavs.bat' script and set PLATFORM_SDK_DIR there
+correctly.

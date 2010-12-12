@@ -31,7 +31,7 @@ set BOOST_DIR to C:\<myhome>\boost-1_44_0
 Compile and install openssl
 ---------------------------
 
-Easiest ist to get the native Windows binary version from
+Easiest is to get the native Windows binary version from
 
 http://www.slproweb.com/products/Win32OpenSSL.html
 

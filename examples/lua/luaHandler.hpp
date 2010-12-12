@@ -1,5 +1,5 @@
 //
-// luaHandler.hpp - simple LUA handler example
+// luaHandler.hpp - simple echo handler using Lua
 //
 
 #ifndef _LUA_HANDLER_HPP_INCLUDED
@@ -13,24 +13,25 @@ extern "C" {
 
 namespace _SMERP {
 	/// The connection handler
-	class luaConnection : public connectionHandler
+	class luaConnection : public Network::connectionHandler
 	{
 	public:
-		luaConnection( const LocalTCPendpoint& local );
-		luaConnection( const LocalSSLendpoint& local );
+		luaConnection( const Network::LocalTCPendpoint& local );
+		luaConnection( const Network::LocalSSLendpoint& local );
 		~luaConnection();
 
-		void setPeer( const RemoteTCPendpoint& remote );
-		void setPeer( const RemoteSSLendpoint& remote );
+		void setPeer( const Network::RemoteTCPendpoint& remote );
+		void setPeer( const Network::RemoteSSLendpoint& remote );
 
 		/// Parse incoming data. The return value indicates how much of the
 		/// input has been consumed.
 		void* parseInput( const void *begin, std::size_t bytesTransferred );
 
-		void timeoutOccured( unsigned ID );
+		void timeoutOccured();
+		void signalOccured();
 
 		/// Handle a request and produce a reply.
-		NetworkOperation nextOperation();
+		Network::NetworkOperation nextOperation();
 
 	private:
 		enum State	{
@@ -40,22 +41,17 @@ namespace _SMERP {
 			ANSWERING,
 			FINISHING,
 			TIMEOUT,
+			SIGNALLED,
 			TERMINATING
 		};
 
-		enum TimerType	{
-			TIMER_IDLE,
-			TIMER_READING,
-			TIMER_WRITING
-		};
-		
 		State		state_;
-		std::string	buffer;
+		std::string	buffer_;
 	};
 
 
 	/// The server handler container
-	class luaServer : public ServerHandler
+	class luaServer : public Network::ServerHandler
 	{
 	private:
 		lua_State *l;
@@ -63,9 +59,8 @@ namespace _SMERP {
 	public:
 		luaServer( );
 		virtual ~luaServer( );
-
-		connectionHandler* newConnection( const LocalTCPendpoint& local );
-		connectionHandler* newSSLconnection( const LocalSSLendpoint& local );
+		Network::connectionHandler* newConnection( const Network::LocalTCPendpoint& local );
+		Network::connectionHandler* newSSLconnection( const Network::LocalSSLendpoint& local );
 	};
 
 } // namespace _SMERP

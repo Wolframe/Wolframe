@@ -16,14 +16,14 @@ extern "C" {
 
 namespace _SMERP {
 
-	luaConnection::luaConnection( const LocalTCPendpoint& local )
+	luaConnection::luaConnection( const Network::LocalTCPendpoint& local )
 	{
 		LOG_TRACE << "Created connection handler for " << local.toString();
 		state_ = NEW;
 	}
 
 
-	luaConnection::luaConnection( const LocalSSLendpoint& local )
+	luaConnection::luaConnection( const Network::LocalSSLendpoint& local )
 	{
 		LOG_TRACE << "Created connection handler (SSL) for " << local.toString();
 		state_ = NEW;
@@ -34,67 +34,81 @@ namespace _SMERP {
 		LOG_TRACE << "Connection handler destroyed";
 	}
 
-	void luaConnection::setPeer( const RemoteTCPendpoint& remote )
+	void luaConnection::setPeer( const Network::RemoteTCPendpoint& remote )
 	{
 		LOG_TRACE << "Peer set to " << remote.toString();
 	}
 
-	void luaConnection::setPeer( const RemoteSSLendpoint& remote )
+	void luaConnection::setPeer( const Network::RemoteSSLendpoint& remote )
 	{
 		LOG_TRACE << "Peer set to " << remote.toString();
+		LOG_TRACE << "Peer Common Name: " << remote.commonName();
 	}
 
 
 	/// Handle a request and produce a reply.
-	NetworkOperation luaConnection::nextOperation()
+	Network::NetworkOperation luaConnection::nextOperation()
 	{
 		switch( state_ )	{
 		case NEW:	{
 			state_ = HELLO;
 			const char *msg = "Welcome to SMERP.\n";
-			return NetworkOperation( NetworkOperation::WRITE, msg, strlen( msg ));
+			return Network::NetworkOperation( Network::NetworkOperation::WRITE,
+							  msg, strlen( msg ));
 		}
 
 		case HELLO:
 			state_ = ANSWERING;
-			if ( buffer.empty() )
-				return NetworkOperation( NetworkOperation::WRITE, buffer.c_str(), buffer.length() );
+			if ( buffer_.empty() )
+				return Network::NetworkOperation( Network::NetworkOperation::WRITE,
+								  buffer_.c_str(), buffer_.length() );
 			else	{
 				const char *msg = "BUFFER NOT EMPTY!\n";
-				return NetworkOperation( NetworkOperation::WRITE, msg, strlen( msg ));
+				return Network::NetworkOperation( Network::NetworkOperation::WRITE,
+								  msg, strlen( msg ));
 			}
 
 		case READING:
 			state_ = ANSWERING;
-			if ( ! buffer.empty() )
-				return NetworkOperation( NetworkOperation::WRITE, buffer.c_str(), buffer.length() );
+			if ( ! buffer_.empty() )
+				return Network::NetworkOperation( Network::NetworkOperation::WRITE,
+								  buffer_.c_str(), buffer_.length() );
 			else	{
 				const char *msg = "EMPTY BUFFER !\n";
-				return NetworkOperation( NetworkOperation::WRITE, msg, strlen( msg ));
+				return Network::NetworkOperation( Network::NetworkOperation::WRITE,
+								  msg, strlen( msg ));
 			}
 
 		case ANSWERING:
-			buffer.clear();
+			buffer_.clear();
 			state_ = READING;
-			return NetworkOperation( NetworkOperation::READ, 30 );
+			return Network::NetworkOperation( Network::NetworkOperation::READ, 30 );
 
 		case FINISHING:	{
 			state_ = TERMINATING;
 			const char *msg = "Thanks for using SMERP.\n";
-			return NetworkOperation( NetworkOperation::WRITE, msg, strlen( msg ));
+			return Network::NetworkOperation( Network::NetworkOperation::WRITE,
+							  msg, strlen( msg ));
 		}
 
 		case TIMEOUT:	{
 			state_ = TERMINATING;
 			const char *msg = "Timeout. :P\n";
-			return NetworkOperation( NetworkOperation::WRITE, msg, strlen( msg ));
+			return Network::NetworkOperation( Network::NetworkOperation::WRITE,
+							  msg, strlen( msg ));
+		}
+
+		case SIGNALLED:	{
+			state_ = TERMINATING;
+			const char *msg = "Server is shutting down. :P\n";
+			return Network::NetworkOperation( Network::NetworkOperation::WRITE,
+							  msg, strlen( msg ));
 		}
 
 		case TERMINATING:
-			buffer.clear();
-			return NetworkOperation( NetworkOperation::TERMINATE );
+			return Network::NetworkOperation( Network::NetworkOperation::TERMINATE );
 		}
-		return NetworkOperation( NetworkOperation::TERMINATE );
+		return Network::NetworkOperation( Network::NetworkOperation::TERMINATE );
 	}
 
 
@@ -103,14 +117,14 @@ namespace _SMERP {
 	void* luaConnection::parseInput( const void *begin, std::size_t bytesTransferred )
 	{
 		char *s = (char *)begin;
-		if ( !strncmp( "QUIT", s, 4 ))
+		if ( !strncmp( "quit", s, 4 ))
 			state_ = FINISHING;
 		else	{
 			for ( std::size_t i = 0; i < bytesTransferred; i++ )	{
 				if ( *s != '\n' )
-					buffer += *s;
+					buffer_ += *s;
 				else	{
-					buffer += *s++;
+					buffer_ += *s++;
 					return( s );
 				}
 				s++;
@@ -119,13 +133,18 @@ namespace _SMERP {
 		return( s );
 	}
 
-	void luaConnection::timeoutOccured( unsigned ID )
+	void luaConnection::timeoutOccured()
 	{
 		state_ = TIMEOUT;
-		LOG_TRACE << "Timeout id: " << ID << " occured";
+		LOG_TRACE << "Processor received timeout";
 	}
 
-
+	void luaConnection::signalOccured()
+	{
+		state_ = SIGNALLED;
+		LOG_TRACE << "Processor received signal";
+	}
+	
 	luaServer::luaServer( ) : ServerHandler( )
 	{
 		// instanitate a new VM
@@ -192,12 +211,12 @@ namespace _SMERP {
 		lua_close( l );
 	}
 
-	connectionHandler* luaServer::newConnection( const LocalTCPendpoint& local )
+	Network::connectionHandler* luaServer::newConnection( const Network::LocalTCPendpoint& local )
 	{
 		return new luaConnection( local );
 	}
 
-	connectionHandler* luaServer::newSSLconnection( const LocalSSLendpoint& local )
+	Network::connectionHandler* luaServer::newSSLconnection( const Network::LocalSSLendpoint& local )
 	{
 		return new luaConnection( local );
 	}
