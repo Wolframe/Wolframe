@@ -22,10 +22,10 @@
 # /Wall: enable all warnings
 
 # compilation flags and compilers (release)
-COMMON_COMPILE_FLAGS = /MD /nologo /O2 /c $(INCLUDE_DIRS)
+COMMON_COMPILE_FLAGS = /MD /nologo /O2 /EHsc /c $(INCLUDE_DIRS)
 
 # compilation flags and compilers (debug)
-#COMMON_COMPILE_FLAGS = /MDd /ZI /nologo /c $(INCLUDE_DIRS) /RTC1
+#COMMON_COMPILE_FLAGS = /MDd /ZI /nologo /EHsc /c $(INCLUDE_DIRS) /RTC1
 
 COMPILE_FLAGS = $(COMMON_COMPILE_FLAGS)
 

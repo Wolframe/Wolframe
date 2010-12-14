@@ -18,16 +18,51 @@ SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib"
 INCLUDE_LDFLAGS = \
 	$(SDK_LDFLAGS) $(BOOST_LDFLAGS)
 
+# Gtest
+
 INCLUDE_LIBS = \
 	Advapi32.lib
 
+!IFDEF WITH_GTEST
+
+INCLUDE_DIRS = \
+	$(INCLUDE_DIRS)	/I"$(GTEST_INCLUDE_DIRS)"
+
+INCLUDE_LDFLAGS = \
+	$(INCLUDE_LDFLAGS) /LIBPATH:"$(GTEST_LIB_DIR)"
+
+INCLUDE_LIBS = \
+	$(INCLUDE_LIBS) $(GTEST_LIBS)
+!ENDIF
+
 TEST_CPP_BINS = \
-	versionTest.exe \
-	counterTest.exe \
-	logTest.exe \
+	logTest.exe
+	
+# fails for me:
+#link.exe /nologo /LIBPATH:"C:\Program Files\Microsoft SDKs\Windows\v7.0\
+#lib" /LIBPATH:"C:\Cygwin\home\Andreas\boost_1_45_0\stage\lib" /LIBPATH:"C:\Cygwi
+#n\home\Andreas\gtest-1.5.0\msvc\gtest\Debug" Advapi32.lib /out:versionTest.exe
+#versionTest.obj ..\src\version.obj
+#LINK : fatal error LNK1104: cannot open file 'boost_unit_test_framework-vc90-mt-
+#1_45.lib'
+#NMAKE : fatal error U1077: '"C:\Program Files (x86)\Microsoft Visual Studio 9.0\
+#VC\BIN\link.exe"' : return code '0x450'
+#Stop.
+#	versionTest.exe
+#	counterTest.exe
+
 # currently don't compile because of ref-to-ptr trickery in test template
 #	pechoHandlerTest.exe
 #	xmlselectHandlerTest.exe
+
+!IFDEF WITH_GTEST
+TEST_CPP_BINS = \
+	$(TEST_CPP_BINS) \
+	version-gTest.exe \
+	counter-gTest.exe
+# currently don't compile because of ref-to-ptr trickery in test template
+#	pechoHandler-gTest$(EXE)
+!ENDIF
 
 OBJS = \
 
@@ -35,11 +70,15 @@ all: $(OBJS) $(CPP_BINS)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-versionTest.exe: versionTest.obj $(TOPDIR)\src\version.obj
-counterTest.exe: counterTest.obj $(TOPDIR)\src\version.obj
-logTest.exe: logTest.obj $(TOPDIR)\src\logger.obj
+versionTest.exe: versionTest.obj $(TOPDIR)\src\smerp.lib
+counterTest.exe: counterTest.obj $(TOPDIR)\src\smerp.lib
+logTest.exe: logTest.obj $(TOPDIR)\src\smerp.lib
 pechoHandlerTest.exe: pechoHandlerTest.obj $(TOPDIR)\src\pechoHandler.o
 xmlselectHandlerTest.exe: xmlselectHandlerTest.obj $(TOPDIR)\src\xmlselectHandler.o
+!IFDEF WITH_GTEST
+version-gTest.exe: version-gTest.obj $(TOPDIR)\src\smerp.lib
+counter-gTest.exe: counter-gTest.obj $(TOPDIR)\src\smerp.lib
+!ENDIF
 
 local_all:
 
