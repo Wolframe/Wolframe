@@ -34,5 +34,6 @@ tests/pechoHandler-gTest
 examples/echo/smerp-echo
 examples/pecho/smerp-echo
 examples/xmlselect/smerp-xmlselect
+examples/lua/smerp-lua
 clients/qt/qtclient
 moc_*.cpp
