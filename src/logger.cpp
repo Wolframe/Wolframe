@@ -28,8 +28,6 @@
 
 #if defined( _WIN32 )
 #include "smerpmsg.h"
-#define WIN32_MEAN_AND_LEAN
-#include <windows.h>
 #endif // defined( _WIN32 )
 
 namespace _SMERP {

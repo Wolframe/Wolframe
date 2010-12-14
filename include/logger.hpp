@@ -12,6 +12,11 @@
 #include <fstream>
 #include <sstream>
 
+#if defined( _WIN32 )
+#define WIN32_MEAN_AND_LEAN
+#include <windows.h>
+#endif // defined( _WIN32 )
+
 namespace _SMERP {
 
 	class ConsoleLogBackend
