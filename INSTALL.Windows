@@ -3,6 +3,7 @@ Prerequisites
 
 - boost 1.41.0 or later
 - optionally (WITH_SSL) openssl 0.9.8 or later
+- optionally (WITH_GTEST) gtest 1.5.0 or later
 
 Boost
 -----
