@@ -38,5 +38,5 @@ OPENSSL_LIBS = libeay32.lib ssleay32.lib
 ###########################
 
 !IFDEF WITH_GTEST
-GTEST_LIBS = gtestd.lib
+GTEST_LIBS = gtest.lib
 !ENDIF

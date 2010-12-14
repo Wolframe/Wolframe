@@ -39,8 +39,8 @@ Compile and install gtest
 -------------------------
 
 Open the solution files in gtest-1.5.0\msvc and build the
-solution. You may have Visual Studio to convert your solution
-files before you can do this.
+solution (the Release version). You may have Visual Studio
+to convert your solution files before you can do this.
 
 Then adapt:
 
