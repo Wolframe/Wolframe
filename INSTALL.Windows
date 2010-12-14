@@ -38,13 +38,11 @@ http://www.slproweb.com/products/Win32OpenSSL.html
 Compile and install gtest
 -------------------------
 
-Open the solution files in gtest-1.5.0\msvc and build the
-solution (the Release version). You may have Visual Studio
-to convert your solution files before you can do this.
+Go to gtest-1.5.0\src and build the library with:
+
+cl /I"C:\Programme\Microsoft Platform SDK\Include" /I..\include /I.. /MD /nologo /O2 /EHsc /c /Fogtest-all.obj gtest-all.cc gtest-all.cc
+link /lib /nologo /LIBPATH:"C:\Programme\Microsoft Platform SDK\lib" /out:gtest.lib gtest-all.obj
 
 Then adapt:
 
 GTEST_DIR=C:\<myhome>\gtest-1.5.0
-
-and eventually GTEST_LIB_DIR to fit the Debug or Release version
-of the library.

@@ -61,9 +61,9 @@ OPENSSL_DIR=C:\Programme\OpenSSL-1.0.0a
 # gtest (http://code.google.com/p/googletest)
 #############################################
 
-GTEST_DIR=C:\Cygwin\home\Andreas\gtest-1.5.0
+GTEST_DIR=C:\Cygwin\home\Administrator\gtest-1.5.0
 GTEST_INCLUDE_DIRS=$(GTEST_DIR)\include
-GTEST_LIB_DIR=$(GTEST_DIR)\msvc\gtest\Release
+GTEST_LIB_DIR=$(GTEST_DIR)\src
 
 # Qt 4 (http://qt.nokia.com/products/)
 # take the VC2008 version SDK Opensource, not the MinGW one

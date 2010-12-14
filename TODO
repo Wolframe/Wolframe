@@ -7,7 +7,6 @@ xxxx. SSL must require certificate from peer if verify is on
 ABa:
 
 - we should split tests with different dependencies
-- test gtest on Windows
 - Windows:
   - username, password for service credentials
   - clean up native Win32 string mess in service code

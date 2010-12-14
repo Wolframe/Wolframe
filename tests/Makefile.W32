@@ -94,6 +94,11 @@ local_test:
 	@-echo versionTest >> test.bat
 	@-echo echo Testing counter.. >> test.bat
 	@-echo counterTest >> test.bat
+!IFDEF WITH_GTEST
+	@-echo Testing with Google test framework... >> test.bat
+	@-echo version-gTest >> test.bat
+	@-echo counter-gTest >> test.bat
+!ENDIF
 	@-echo echo Testing boost log... >> test.bat
 	@-echo logTest >> test.bat
 	@-test.bat
