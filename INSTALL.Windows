@@ -41,7 +41,7 @@ Compile and install gtest
 
 Go to gtest-1.5.0\src and build the library with:
 
-cl /I"C:\Programme\Microsoft Platform SDK\Include" /I..\include /I.. /MD /nologo /O2 /EHsc /c /Fogtest-all.obj gtest-all.cc gtest-all.cc
+cl /I"C:\Programme\Microsoft Platform SDK\Include" /I..\include /I.. /MD /nologo /O2 /EHsc /c /Fogtest-all.obj gtest-all.cc
 link /lib /nologo /LIBPATH:"C:\Programme\Microsoft Platform SDK\lib" /out:gtest.lib gtest-all.obj
 
 Then adapt:
