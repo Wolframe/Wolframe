@@ -284,6 +284,7 @@ WAIT_FOR_STOP_EVENT:
 				LOG_FATAL << "Waiting for stop event in service main failed, stopping now";
 				s.stop( );
 				service_report_status( SERVICE_STOPPED, NO_ERROR, DEFAULT_SERVICE_TIMEOUT );
+				return;
 		}
 
 // signal the SCM that we are done
