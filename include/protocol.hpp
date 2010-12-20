@@ -312,10 +312,10 @@ public:
             case Content:
                switch (ch)
                {
-                  case '\'': state = SQContent; openArg(); break;
-                  case '\"': state = DQContent; openArg(); break;
+                  case '\'': content.push_back(0); state = SQContent; openArg(); break;
+                  case '\"': content.push_back(0); state = DQContent; openArg(); break;
                   case '\\': state = ContentEsc; break;
-                  case ' ':  state = Empty; break;
+                  case ' ':  content.push_back(0); state = Empty; break;
                   default:   content.push_back(ch); break;
                }
                break;
@@ -328,7 +328,7 @@ public:
             case SQContent:
                switch (ch)
                {
-                  case '\'': state = Empty; break;
+                  case '\'': content.push_back(0); state = Empty; break;
                   case '\\': state = SQContentEsc; break;
                   default:   content.push_back(ch); break;
                }
@@ -342,7 +342,7 @@ public:
             case DQContent:
                switch (ch)
                {
-                  case '\"': state = Empty; break;
+                  case '\"': content.push_back(0); state = Empty; break;
                   case '\\': state = DQContentEsc; break;
                   default:   content.push_back(ch); break;
                }
