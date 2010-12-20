@@ -1,5 +1,5 @@
 //
-// version class unit tests using google test framework (gTest)
+// atomic counter template unit tests using google test framework (gTest)
 //
 
 #include <climits>
@@ -8,12 +8,10 @@
 #include <iostream>
 #include <stdio.h>
 
+#include <boost/thread/thread.hpp>
+
 #include "atomicCounter.hpp"
 #include <gtest/gtest.h>
-
-// this is because the echoHandler uses the logger, should it do that?
-#include "logger.hpp"
-_SMERP::LogBackend logBack;
 
 #define	MAX_STRING	128
 
@@ -26,6 +24,7 @@ protected:
 		srand((unsigned)time(0));
 		ulVal0 = (unsigned)( rand() % ULONG_MAX );
 		iVal0 = (int)( rand() % INT_MAX );
+		noThreads = (int)( rand() % INT_MAX );
 	}
 
 	// Clean-up work that doesn't throw exceptions here.
@@ -40,29 +39,39 @@ protected:
 	virtual void SetUp() {
 		ulCounter0 = ulVal0;
 		iCounter0 = iVal0;
+		for ( int i = 0; i < noThreads; i++ )   {
+			boost::thread* thread = new boost::thread( &threadFunction );
+			threads.push_back( thread );
+		}
 	}
 
 	//   Code here will be called immediately after each test (right
 	//   before the destructor).
 	virtual void TearDown() {
+		for ( int i = 0; i < noThreads; i++ )   {
+			threads[i].join();
+			delete threads[i];
+		}
 	}
 
 	// Objects declared here can be used by all tests in the test case.
-	unsigned long	ulVal0;
-	int		iVal0;
+	int                             noThreads;
+	std::list<boost::thread *>        threads;
+	unsigned long                   ulVal0;
+	int                             iVal0;
 	_SMERP::AtomicCounter< unsigned long >	ulCounter0;
 	_SMERP::AtomicCounter< int >		iCounter0;
 };
 
 
-// Tests the Version constructors and members
+// Tests the AtomicCounter constructors and members
 TEST_F( CounterFixture, Assignment )	{
 	ASSERT_EQ( ulCounter0.val(), ulVal0 );
 	ASSERT_EQ( iCounter0.val(), iVal0 );
 }
 
 
-// Tests the Version operators
+// Tests the AtomicCounter operators
 TEST_F( CounterFixture, Operators )	{
 }
 
