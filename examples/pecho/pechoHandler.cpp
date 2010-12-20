@@ -33,29 +33,13 @@ struct Connection::Private
       return ar[i];
    };
    
-   //buffer for printing messages and reading the arguments of a protocol command with a subset of std::string interface
-   class Buffer
-   {
-   private:
-      enum {Size=64};
-      unsigned int pos;
-      char buf[ Size+1];
-
-   public:
-      Buffer()                     :pos(0){};
-      void init()                  {pos=0;};
-      void push_back( char ch)     {if (pos<=Size) buf[pos++]=ch;};
-      unsigned int size() const    {return pos;};
-      const char* c_str()          {buf[pos]=0; return buf;}; 
-   };
-  
    //* all state variables of this processor
    //1. states
    State state;                               //< state of the processor
    Mode mode;                                 //< selected function to process the content
    //2. buffers and context
    protocol::Parser::Context protocolState;   //< context (sub state) for partly parsed protocol commands
-   Buffer buffer;                             //< context (sub state) for partly parsed input lines 
+   protocol::Parser::Buffer<64> buffer;       //< context (sub state) for partly parsed input lines 
    Input input;                               //< buffer for READ network messages 
    Output output;                             //< buffer for WRITE network messages
    //3. Iterators

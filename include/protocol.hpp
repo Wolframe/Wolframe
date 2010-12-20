@@ -200,8 +200,8 @@ public:
    //remind to keep this as part of the parser state variables and NOT as local (!)
    struct Context
    {
-      typedef unsigned long long ValueType;
-      unsigned int pos;
+      typedef unsigned long long ValueType; //< stores the command name with a maximum of 10 characters (6 bit per character = case insensitive alpha or digit)
+      unsigned int pos;                     //< current position
       ValueType value;
       
       Context()                   :pos(0),value(0) {};
@@ -225,8 +225,8 @@ public:
       char ch;
       while ((ch=*src) > 32)
       {
-         if (!next( ct, ch)) return -1;
          ++src;
+         if (!next( ct, ch)) return -1;
       }
 
       Context::ValueType vt = ct.value;
@@ -255,7 +255,109 @@ public:
    {
       return (*src == '\n' || *src == '\r');
    }
-  
+
+   //constant size buffer for printing messages and reading the 
+   // arguments of a protocol command with a subset of std::string interface
+   // that implements a minumum implemnting the 'getLine'::BufferType interface
+   template <unsigned int SIZE=128>
+   class Buffer
+   {
+   private:
+      enum {Size=SIZE};
+      unsigned int pos;
+      char buf[ Size+1];
+      
+   public:
+      Buffer()                     :pos(0){};
+      void init()                  {pos=0;};
+      void push_back( char ch)     {if (pos<Size) buf[pos++]=ch;};
+      unsigned int size() const    {return pos;};
+      const char* c_str()          {buf[pos]=0; return buf;}; 
+   };
+
+   //buffer for multi argument parsing that can be used for getLine
+   // escaping is done with backslash, strings can be single or double quoted
+   // the maximum number of arguments parsed is fix (16).
+   // the template argument is a Buffer as used for getLine (subset of std::string).
+   template <class Buffer>
+   class CargBuffer
+   {
+   private:
+      enum {Size=16};
+      enum State {Empty,Content,ContentEsc,SQContent,SQContentEsc,DQContent,DQContentEsc};
+      unsigned int pos;
+      unsigned int buf[ Size];
+      State state;
+      Buffer content;
+      void openArg()                      {if (pos<Size) buf[pos++]=content.size();};
+      
+    public:
+      CargBuffer()                        :pos(0){buf[0]=0;};
+      void init()                         {pos=0;buf[0]=0;content.init();};
+      void push_back( char ch)
+      {
+         switch (state)
+         {
+            case Empty:
+               switch (ch)
+               {
+                  case '\'': state = SQContent; openArg(); break;
+                  case '\"': state = DQContent; openArg(); break;
+                  case '\\': state = ContentEsc; openArg(); break;
+                  case ' ': break;
+                  default: state = Content; openArg(); content.push_back(ch); break;
+               }
+               break;
+               
+            case Content:
+               switch (ch)
+               {
+                  case '\'': state = SQContent; openArg(); break;
+                  case '\"': state = DQContent; openArg(); break;
+                  case '\\': state = ContentEsc; break;
+                  case ' ':  state = Empty; break;
+                  default:   content.push_back(ch); break;
+               }
+               break;
+               
+            case ContentEsc:
+               state = Content;
+               content.push_back(ch); 
+               break;
+               
+            case SQContent:
+               switch (ch)
+               {
+                  case '\'': state = Empty; break;
+                  case '\\': state = SQContentEsc; break;
+                  default:   content.push_back(ch); break;
+               }
+               break;
+               
+            case SQContentEsc:
+               state = SQContent;
+               content.push_back(ch); 
+               break;
+
+            case DQContent:
+               switch (ch)
+               {
+                  case '\"': state = Empty; break;
+                  case '\\': state = DQContentEsc; break;
+                  default:   content.push_back(ch); break;
+               }
+               break;
+               
+            case DQContentEsc:
+               state = DQContent;
+               content.push_back(ch); 
+               break;
+         }
+      };
+      unsigned int size() const                          {return pos;};
+      const char* operator[]( unsigned int idx) const    {return (idx<pos)?content.c_str()+buf[idx]:0;};
+   };
+
    //go to the end of line and write it to buffer, starting with the first non space.
    // after call the iterator is pointing to the end of line char or at the end of 
    // content char
@@ -275,7 +377,7 @@ public:
    }
   
 private:
-   enum {MaxNofCommands=16,MaxCommandLen=(sizeof(Context::ValueType)/6)};
+   enum {MaxNofCommands=32,MaxCommandLen=(sizeof(Context::ValueType)/6)};
    Context::ValueType elem[ MaxNofCommands];
    unsigned int size;
 
@@ -289,7 +391,7 @@ private:
       ct.init();
       return false;
    };
-  
+
    //add a command to the protocol parser (case insensitive)
    void add( const char* cmd)
    {
