@@ -13,9 +13,12 @@ struct Connection::Private
    //* typedefs for input output blocks and input iterators  
    typedef protocol::InputBlock Input;                                           //< input buffer type 
    typedef protocol::OutputBlock Output;                                         //< output buffer type 
-   typedef Input::iterator ProtocolIterator;                                     //< iterator type for protocol commands  
+   typedef protocol::InputBlock::iterator ProtocolIterator;                      //< iterator type for protocol commands  
    typedef protocol::TextIterator<Input::iterator> ContentIterator;              //< iterator type for content
    
+   //* typedefs for input output buffers  
+   typedef protocol::Buffer<128> LineBuffer;                                     //< buffer for one line of input/output
+   typedef protocol::Parser::Context ProtocolContext;                            //< buffers the currently parsed command
    
    //* typedefs for state variables and buffers
    //list of processor states
@@ -38,8 +41,8 @@ struct Connection::Private
    State state;                               //< state of the processor
    Mode mode;                                 //< selected function to process the content
    //2. buffers and context
-   protocol::Parser::Context protocolState;   //< context (sub state) for partly parsed protocol commands
-   protocol::Parser::Buffer<64> buffer;       //< context (sub state) for partly parsed input lines 
+   ProtocolContext protocolState;             //< context (sub state) for partly parsed protocol commands
+   LineBuffer buffer;                         //< context (sub state) for partly parsed input lines 
    Input input;                               //< buffer for READ network messages 
    Output output;                             //< buffer for WRITE network messages
    //3. Iterators
@@ -135,7 +138,7 @@ struct Connection::Private
                 //    the next state should read one character for sure otherwise it may result in an endless loop
                 static const protocol::Parser parser(cmd);
                 
-                switch (parser.get( itr, protocolState))
+                switch (parser.getCommand( itr, protocolState))
                 {             
                    case empty:
                    {
@@ -198,7 +201,7 @@ struct Connection::Private
                 
                 protocol::Parser::skipSpaces( itr);
                 
-                switch (parser.get( itr, protocolState))
+                switch (parser.getCommand( itr, protocolState))
                 {             
                    case none:
                    {

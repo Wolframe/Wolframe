@@ -383,7 +383,7 @@ struct Connection::Private
                     //    the next state should read one character for sure otherwise it may result in an endless loop
                     static const protocol::Parser parser(cmd);
                     
-                    switch (parser.get( itr, protocolState))
+                    switch (parser.getCommand( itr, protocolState))
                     {             
                        case empty:
                        {
