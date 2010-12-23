@@ -487,11 +487,11 @@ class XMLScannerBase
 public:
    enum ElementType
    {
-      None, ErrorOccurred, HeaderAttribName, HeaderAttribValue, TagAttribName, TagAttribValue, OpenTag, CloseTag, CloseTagIm, Content, Exit
+      None, ErrorOccurred, HeaderAttribName, HeaderAttribValue, HeaderEnd, TagAttribName, TagAttribValue, OpenTag, CloseTag, CloseTagIm, Content, Exit
    };
    static const char* getElementTypeName( ElementType ee)
    {
-      static const char* names[ (unsigned int)Exit+1] = {0,"ErrorOccurred","HeaderAttribName","HeaderAttribValue","TagAttribName","TagAttribValue","OpenTag","CloseTag","CloseTagIm","Content","Exit"};
+      static const char* names[ (unsigned int)Exit+1] = {0,"ErrorOccurred","HeaderAttribName","HeaderAttribValue","HeaderEnd","TagAttribName","TagAttribValue","OpenTag","CloseTag","CloseTagIm","Content","Exit"};
       return names[ (unsigned int)ee];
    };
    enum Error
@@ -552,7 +552,7 @@ public:
          [ START    ](EndOfLine)(Cntrl)(Space)(Lt,STARTTAG).miss(ErrExpectedOpenTag)
          [ STARTTAG ](EndOfLine)(Cntrl)(Space)(Questm,XTAG )(Exclam,ENTITYSL).fallback(OPENTAG)
          [ XTAG     ].action(ExpectIdentifierXML)(EndOfLine,Cntrl,Space,XTAGAISK)(Questm,XTAGEND).miss(ErrExpectedXMLTag)
-         [ XTAGEND  ](Gt,CONTENT)(EndOfLine)(Cntrl)(Space).miss(ErrExpectedTagEnd)
+         [ XTAGEND  ].action(Return,HeaderEnd)(Gt,CONTENT)(EndOfLine)(Cntrl)(Space).miss(ErrExpectedTagEnd)
          [ XTAGAISK ](EndOfLine)(Cntrl)(Space)(Questm,XTAGEND).fallback(XTAGANAM)
          [ XTAGANAM ].action(ReturnIdentifier,HeaderAttribName)(EndOfLine,Cntrl,Space,XTAGAESK)(Equal,XTAGAVSK).miss(ErrExpectedEqual)
          [ XTAGAESK ](EndOfLine)(Cntrl)(Space)(Equal,XTAGAVSK).miss(ErrExpectedEqual)
@@ -1129,7 +1129,7 @@ public:
       static const char* stringDefs[ NofSTMActions] = {0,0,0,0,0,"xml","CDATA",0};
 
       ElementType rt = None;
-		if (tokstate.id == TokState::Start)
+      if (tokstate.id == TokState::Start)
       {
          outputSize = 0;
          outputBuf[0] = 0;
@@ -1318,11 +1318,11 @@ public:
 public:
    enum Operation 
    {
-      Content, Tag, Attribute, ThisAttributeValue, AttributeValue
+      Content, Tag, Attribute, ThisAttributeValue, AttributeValue, ContentStart
    };
    static const char* operationName( Operation op)
    {
-      static const char* name[ 5] = {"Content", "Tag", "Attribute", "ThisAttributeValue", "AttributeValue"};
+      static const char* name[ 6] = {"Content", "Tag", "Attribute", "ThisAttributeValue", "AttributeValue", "ContentStart"};
       return name[ (unsigned int)op];
    };
 
@@ -1341,15 +1341,23 @@ public:
          switch (op)
          {
             case Tag:                this->match( XMLScannerBase::OpenTag); break;
-            case Attribute:          this->match( XMLScannerBase::TagAttribName); break;               
+            case Attribute:          this->match( XMLScannerBase::TagAttribName); 
+                                     this->match( XMLScannerBase::HeaderAttribName); break;
+                                     
             case ThisAttributeValue: this->match( XMLScannerBase::TagAttribValue); 
+                                     this->match( XMLScannerBase::HeaderAttribValue);
                                      this->reject( XMLScannerBase::TagAttribName); 
+                                     this->reject( XMLScannerBase::HeaderAttribName); 
                                      this->reject( XMLScannerBase::Content); 
                                      this->reject( XMLScannerBase::OpenTag); break;
+                                     
             case AttributeValue:     this->match( XMLScannerBase::TagAttribValue); 
-                                     this->reject( XMLScannerBase::Content); 
-                                     break;
+                                     this->match( XMLScannerBase::HeaderAttribValue); 
+                                     this->reject( XMLScannerBase::Content); break;
+                                     
             case Content:            this->match( XMLScannerBase::Content); break; 
+
+            case ContentStart:       this->match( XMLScannerBase::HeaderEnd); break; 
          }         
       };
       void join( const Mask& mask)                         {pos |= mask.pos; neg |= mask.neg;};
@@ -1584,8 +1592,15 @@ public:
                                        pushOpMask.match( XMLScannerBase::TagAttribValue); 
                                        break;
             case Attribute:            pushOpMask.match( XMLScannerBase::TagAttribName);
+                                       pushOpMask.match( XMLScannerBase::HeaderAttribName);
+                                       break;
             case ThisAttributeValue:   pushOpMask.match( XMLScannerBase::TagAttribValue);
+                                       pushOpMask.match( XMLScannerBase::HeaderAttribValue);
+                                       break;
             case AttributeValue:       pushOpMask.match( XMLScannerBase::TagAttribValue);
+                                       pushOpMask.match( XMLScannerBase::HeaderAttribValue);
+                                       break;
+            case ContentStart:         pushOpMask.match( XMLScannerBase::HeaderEnd);
          }
          return *this;
       };
@@ -1635,7 +1650,7 @@ public:
 
    public:
       PathElement()                                                  :xs(0),stateidx(0),count(-1),follow(false),pushOpMask(0) {};
-      PathElement( XMLPathSelectAutomaton* p_xs, int p_stateidx=0)   :xs(p_xs),stateidx(p_stateidx),count(-1),follow(false),pushOpMask(0) {doSelect(Tag);};
+      PathElement( XMLPathSelectAutomaton* p_xs, int p_stateidx=0)   :xs(p_xs),stateidx(p_stateidx),count(-1),follow(false),pushOpMask(0) {doSelect(Tag);doSelect(ContentStart);};
       PathElement( const PathElement& orig)                          :xs(orig.xs),stateidx(orig.stateidx),count(orig.count),follow(orig.follow),pushOpMask(orig.pushOpMask) {};
 
       //corresponds to "//" in abbreviated syntax of XPath

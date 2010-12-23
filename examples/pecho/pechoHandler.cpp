@@ -13,9 +13,12 @@ struct Connection::Private
    //* typedefs for input output blocks and input iterators  
    typedef protocol::InputBlock Input;                                           //< input buffer type 
    typedef protocol::OutputBlock Output;                                         //< output buffer type 
-   typedef Input::iterator ProtocolIterator;                                     //< iterator type for protocol commands  
+   typedef protocol::InputBlock::iterator ProtocolIterator;                      //< iterator type for protocol commands  
    typedef protocol::TextIterator<Input::iterator> ContentIterator;              //< iterator type for content
    
+   //* typedefs for input output buffers  
+   typedef protocol::Buffer<128> LineBuffer;                                     //< buffer for one line of input/output
+   typedef protocol::Parser::Context ProtocolContext;                            //< buffers the currently parsed command
    
    //* typedefs for state variables and buffers
    //list of processor states
@@ -33,29 +36,13 @@ struct Connection::Private
       return ar[i];
    };
    
-   //buffer for printing messages and reading the arguments of a protocol command with a subset of std::string interface
-   class Buffer
-   {
-   private:
-      enum {Size=64};
-      unsigned int pos;
-      char buf[ Size+1];
-
-   public:
-      Buffer()                     :pos(0){};
-      void init()                  {pos=0;};
-      void push_back( char ch)     {if (pos<=Size) buf[pos++]=ch;};
-      unsigned int size() const    {return pos;};
-      const char* c_str()          {buf[pos]=0; return buf;}; 
-   };
-  
    //* all state variables of this processor
    //1. states
    State state;                               //< state of the processor
    Mode mode;                                 //< selected function to process the content
    //2. buffers and context
-   protocol::Parser::Context protocolState;   //< context (sub state) for partly parsed protocol commands
-   Buffer buffer;                             //< context (sub state) for partly parsed input lines 
+   ProtocolContext protocolState;             //< context (sub state) for partly parsed protocol commands
+   LineBuffer buffer;                         //< context (sub state) for partly parsed input lines 
    Input input;                               //< buffer for READ network messages 
    Output output;                             //< buffer for WRITE network messages
    //3. Iterators
@@ -151,7 +138,7 @@ struct Connection::Private
                 //    the next state should read one character for sure otherwise it may result in an endless loop
                 static const protocol::Parser parser(cmd);
                 
-                switch (parser.get( itr, protocolState))
+                switch (parser.getCommand( itr, protocolState))
                 {             
                    case empty:
                    {
@@ -214,7 +201,7 @@ struct Connection::Private
                 
                 protocol::Parser::skipSpaces( itr);
                 
-                switch (parser.get( itr, protocolState))
+                switch (parser.getCommand( itr, protocolState))
                 {             
                    case none:
                    {
