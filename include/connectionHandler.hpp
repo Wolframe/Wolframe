@@ -54,6 +54,11 @@ namespace _SMERP {
 		connectionHandler& operator = ( const connectionHandler& );
 
 	public:
+		enum NetworkError	{
+			EOF
+		};
+
+
 		/// Parse incoming data. The return value indicates how much of the
 		/// input has been consumed.
 		virtual void* parseInput( const void *begin, std::size_t bytesTransferred ) = 0;
@@ -68,7 +73,7 @@ namespace _SMERP {
 		virtual void signalOccured()	{}
 
 		/// An error network occured
-		virtual void errorOccured()	{}
+		virtual void errorOccured( NetworkError e )	{}
 
 		/// Set the remote peer. The connection is up now.
 		virtual void setPeer( const RemoteTCPendpoint& remote ) = 0;
