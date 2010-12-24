@@ -6,7 +6,6 @@
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
-#include <stdio.h>
 
 #include <boost/thread/thread.hpp>
 
@@ -15,6 +14,11 @@
 
 #define	MAX_STRING	128
 
+
+_SMERP::AtomicCounter< unsigned long >	ulCounter0;
+_SMERP::AtomicCounter< int >		iCounter0;
+
+
 // The fixture for testing class SMERP::AtomicCounter
 class CounterFixture : public ::testing::Test	{
 protected:
@@ -22,9 +26,11 @@ protected:
 	// You can remove any or all of the following functions if its body is empty.
 	CounterFixture()	{
 		srand((unsigned)time(0));
-		ulVal0 = (unsigned)( rand() % ULONG_MAX );
+		ulVal0 = (unsigned long)( rand() % ULONG_MAX );
 		iVal0 = (int)( rand() % INT_MAX );
-		noThreads = (int)( rand() % INT_MAX );
+		noThreads = (int)( rand() % 256 );
+		times = (unsigned long)( rand() % 100000 );
+//		std::cout << noThreads << " threads, " << times << " iterations";
 	}
 
 	// Clean-up work that doesn't throw exceptions here.
@@ -39,28 +45,36 @@ protected:
 	virtual void SetUp() {
 		ulCounter0 = ulVal0;
 		iCounter0 = iVal0;
-		for ( int i = 0; i < noThreads; i++ )   {
-			boost::thread* thread = new boost::thread( &threadFunction );
-			threads.push_back( thread );
-		}
 	}
 
 	//   Code here will be called immediately after each test (right
 	//   before the destructor).
 	virtual void TearDown() {
-		for ( int i = 0; i < noThreads; i++ )   {
-			threads[i].join();
-			delete threads[i];
-		}
 	}
 
 	// Objects declared here can be used by all tests in the test case.
 	int                             noThreads;
-	std::list<boost::thread *>        threads;
+	std::vector<boost::thread *>	threads;
 	unsigned long                   ulVal0;
-	int                             iVal0;
-	_SMERP::AtomicCounter< unsigned long >	ulCounter0;
-	_SMERP::AtomicCounter< int >		iCounter0;
+	int				iVal0;
+	unsigned long			times;
+
+public:
+	static void incrementThread( unsigned long count )
+	{
+		for ( unsigned long i = 0; i < count; i++ )	{
+			++ulCounter0;
+			++iCounter0;
+		}
+	}
+
+	static void decrementThread( unsigned long count )
+	{
+		for ( unsigned long i = 0; i < count; i++ )	{
+			--ulCounter0;
+			--iCounter0;
+		}
+	}
 };
 
 
@@ -72,7 +86,48 @@ TEST_F( CounterFixture, Assignment )	{
 
 
 // Tests the AtomicCounter operators
-TEST_F( CounterFixture, Operators )	{
+TEST_F( CounterFixture, Increment )	{
+	ASSERT_EQ( ulCounter0.val(), ulVal0 );
+	ASSERT_EQ( iCounter0.val(), iVal0 );
+
+	for ( int i = 0; i < noThreads; i++ )   {
+		boost::thread* thread = new boost::thread( &CounterFixture::incrementThread, times );
+		threads.push_back( thread );
+	}
+	for ( int i = 0; i < noThreads; i++ )   {
+		threads[i]->join();
+		delete threads[i];
+	}
+
+	ASSERT_EQ( ulCounter0.val(), ulVal0 + noThreads * times );
+	ASSERT_EQ( iCounter0.val(), iVal0 + noThreads * times );
+
+	ulCounter0 -= noThreads * times;
+	iCounter0 -= noThreads * times;
+	ASSERT_EQ( ulCounter0.val(), ulVal0 );
+	ASSERT_EQ( iCounter0.val(), iVal0 );
+}
+
+TEST_F( CounterFixture, Decrement )	{
+	ASSERT_EQ( ulCounter0.val(), ulVal0 );
+	ASSERT_EQ( iCounter0.val(), iVal0 );
+
+	ulCounter0 += noThreads * times;
+	iCounter0 += noThreads * times;
+	ASSERT_EQ( ulCounter0.val(), ulVal0 + noThreads * times );
+	ASSERT_EQ( iCounter0.val(), iVal0 + noThreads * times );
+
+	for ( int i = 0; i < noThreads; i++ )   {
+		boost::thread* thread = new boost::thread( &CounterFixture::decrementThread, times );
+		threads.push_back( thread );
+	}
+	for ( int i = 0; i < noThreads; i++ )   {
+		threads[i]->join();
+		delete threads[i];
+	}
+
+	ASSERT_EQ( ulCounter0.val(), ulVal0 );
+	ASSERT_EQ( iCounter0.val(), iVal0 );
 }
 
 

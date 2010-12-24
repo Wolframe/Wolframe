@@ -61,11 +61,14 @@ namespace _SMERP {
 		/// What should the network do next.
 		virtual NetworkOperation nextOperation() = 0;
 
-		/// What should the network do next.
+		/// Timeout timer was fired.
 		virtual void timeoutOccured()	{}
 
 		/// A signal was received from outside.
 		virtual void signalOccured()	{}
+
+		/// An error network occured
+		virtual void errorOccured()	{}
 
 		/// Set the remote peer. The connection is up now.
 		virtual void setPeer( const RemoteTCPendpoint& remote ) = 0;

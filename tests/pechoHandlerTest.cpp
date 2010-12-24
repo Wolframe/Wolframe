@@ -3,7 +3,7 @@
 
 #include "pechoHandler.hpp"
 #include "testHandlerTemplates.hpp"
-#include <stdio.h>
+#include <cstdio>
 
 using namespace _SMERP;
 
@@ -19,7 +19,7 @@ int main( int, const char**)
    }
    catch (std::exception e)
    {
-      fprintf( stderr, "exception %s\n", e.what());       
+      fprintf( stderr, "exception %s\n", e.what());
    }
    catch (...)
    {
@@ -27,4 +27,3 @@ int main( int, const char**)
    }
    return 1;
 }
-
