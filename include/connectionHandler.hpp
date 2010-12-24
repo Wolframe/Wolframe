@@ -55,7 +55,7 @@ namespace _SMERP {
 
 	public:
 		enum NetworkError	{
-			EOF
+			EndOfFile
 		};
 
 
@@ -73,7 +73,7 @@ namespace _SMERP {
 		virtual void signalOccured()	{}
 
 		/// An error network occured
-		virtual void errorOccured( NetworkError e )	{}
+		virtual void errorOccured( NetworkError )	{}
 
 		/// Set the remote peer. The connection is up now.
 		virtual void setPeer( const RemoteTCPendpoint& remote ) = 0;

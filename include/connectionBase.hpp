@@ -138,8 +138,10 @@ namespace _SMERP {
 				connectionHandler_->parseInput( buffer_.data(), bytesTransferred );
 				nextOperation();
 			}
-			else
+			else	{
 				LOG_TRACE << "Read error: " << e.message();
+				connectionHandler_->errorOccured( connectionHandler::EndOfFile );
+			}
 		}
 		// handleRead function end
 
@@ -151,15 +153,12 @@ namespace _SMERP {
 			if ( !e )	{
 				nextOperation();
 			}
-			else
+			else	{
 				LOG_TRACE << "Write error: " << e.message();
+				connectionHandler_->errorOccured( connectionHandler::EndOfFile );
+			}
 		}
 		// handleWrite function end
-
-		// If an error occurs then no new asynchronous operations are started. This
-		// means that all shared_ptr references to the connection object will
-		// disappear and the object will be destroyed automatically after this
-		// handler returns. The connection class's destructor closes the socket.
 
 
 		/// Handle completion of a timer operation.
