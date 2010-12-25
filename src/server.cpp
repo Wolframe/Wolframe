@@ -19,7 +19,7 @@ namespace _SMERP {
 
 		server::server( const std::vector<ServerTCPendpoint>& TCPserver,
 				SMERP_UNUSED const std::vector<ServerSSLendpoint>& SSLserver,
-				ServerHandler& serverHandler,
+				_SMERP::ServerHandler& serverHandler,
 				unsigned threads, unsigned maxConnections )
 					: threadPoolSize_( threads ),
 

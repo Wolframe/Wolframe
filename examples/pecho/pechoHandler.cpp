@@ -10,19 +10,19 @@ using namespace _SMERP::pecho;
 
 struct Connection::Private
 {
-   //* typedefs for input output blocks and input iterators  
-   typedef protocol::InputBlock Input;                                           //< input buffer type 
-   typedef protocol::OutputBlock Output;                                         //< output buffer type 
-   typedef protocol::InputBlock::iterator ProtocolIterator;                      //< iterator type for protocol commands  
+   //* typedefs for input output blocks and input iterators
+   typedef protocol::InputBlock Input;                                           //< input buffer type
+   typedef protocol::OutputBlock Output;                                         //< output buffer type
+   typedef protocol::InputBlock::iterator ProtocolIterator;                      //< iterator type for protocol commands
    typedef protocol::TextIterator<Input::iterator> ContentIterator;              //< iterator type for content
-   
-   //* typedefs for input output buffers  
+
+   //* typedefs for input output buffers
    typedef protocol::Buffer<128> LineBuffer;                                     //< buffer for one line of input/output
    typedef protocol::Parser::Context ProtocolContext;                            //< buffers the currently parsed command
-   
+
    //* typedefs for state variables and buffers
    //list of processor states
-   enum State {Init,EnterCommand,EmptyLine,EnterMode,StartProcessing,ProcessingAfterWrite,Processing,HandleError,Terminate}; 
+   enum State {Init,EnterCommand,EmptyLine,EnterMode,StartProcessing,ProcessingAfterWrite,Processing,HandleError,Terminate};
    static const char* stateName( State i)
    {
       static const char* ar[] = {"Init","EnterCommand","EmptyLine","EnterMode","StartProcessing","ProcessingAfterWrite","Processing","HandleError","Terminate"};
@@ -35,15 +35,15 @@ struct Connection::Private
       static const char* ar[] = {"Ident","Uppercase","Lowercase"};
       return ar[i];
    };
-   
+
    //* all state variables of this processor
    //1. states
    State state;                               //< state of the processor
    Mode mode;                                 //< selected function to process the content
    //2. buffers and context
    ProtocolContext protocolState;             //< context (sub state) for partly parsed protocol commands
-   LineBuffer buffer;                         //< context (sub state) for partly parsed input lines 
-   Input input;                               //< buffer for READ network messages 
+   LineBuffer buffer;                         //< context (sub state) for partly parsed input lines
+   Input input;                               //< buffer for READ network messages
    Output output;                             //< buffer for WRITE network messages
    //3. Iterators
    ProtocolIterator itr;                      //< iterator to scan protocol commands
@@ -66,15 +66,15 @@ struct Connection::Private
    //output of one character with return code true/false for success/failure
    bool print( char ch)
    {
-      if (ch < 0) 
+      if (ch < 0)
       {
-         if (!output.print( ch)) return false; 
+	 if (!output.print( ch)) return false;
       }
       else switch (mode)
       {
-         case Ident:     if (!output.print( ch)) return false; break;
-         case Uppercase: if (!output.print( toupper(ch))) return false; break;
-         case Lowercase: if (!output.print( tolower(ch))) return false; break;
+	 case Ident:     if (!output.print( ch)) return false; break;
+	 case Uppercase: if (!output.print( toupper(ch))) return false; break;
+	 case Lowercase: if (!output.print( tolower(ch))) return false; break;
       }
       return true;
    };
@@ -84,215 +84,215 @@ struct Connection::Private
    bool echoInput()
    {
       char ch;
-      while ((ch=*src) != 0)           
+      while ((ch=*src) != 0)
       {
-         if (output.restsize() == 0)
-         {
-            return false;
-         }
-         if (output.restsize() == 0) return false;  //we check if there is space for output to ensure that we can do both 
-                                                    //  operations input&output or none of them. doing only one of them is
-                                                    //  not covered by this state machine.
-         if (!print(ch))
-         {
-            return false;                           //this does not fail because we checked
-         }
-         ++src;                                     //if this fails we get to the same point when reentering this procedure
+	 if (output.restsize() == 0)
+	 {
+	    return false;
+	 }
+	 if (output.restsize() == 0) return false;  //we check if there is space for output to ensure that we can do both
+						    //  operations input&output or none of them. doing only one of them is
+						    //  not covered by this state machine.
+	 if (!print(ch))
+	 {
+	    return false;                           //this does not fail because we checked
+	 }
+	 ++src;                                     //if this fails we get to the same point when reentering this procedure
       }
       return true;
    };
 
-   //* interface   
+   //* interface
    Private()   :state(Init),mode(Ident),input(MemBlockSize),output(MemBlockSize)
    {
-      itr = input.begin(); 
+      itr = input.begin();
       src = &itr;
    };
    ~Private()  {};
 
    //statemachine of the processor
    Operation nextOperation()
-   {      
-      try 
+   {
+      try
       {
-         for (;;)
-         {
-         LOG_DATA << "\nState: " << stateName(state) << "(" << modeName(mode) << ")";
-  
-         switch( state)
-         {
-            case Init:
-            {
-                //start or restart:
-                state = EnterCommand;
-                mode = Ident;
-                return WriteLine( "OK expecting command");
-            }
-            
-            case EnterCommand:
-            {
-                //parsing the command:
-                enum Command {empty, caps, echo, quit};
-                static const char* cmd[5] = {"","caps","echo","quit",0};
-                //... the empty command is for an empty line for not bothering the client with obscure error messages.
-                //    the next state should read one character for sure otherwise it may result in an endless loop
-                static const protocol::Parser parser(cmd);
-                
-                switch (parser.getCommand( itr, protocolState))
-                {             
-                   case empty:
-                   {
-                      state = EmptyLine;
-                      continue;
-                   }   
-                   case caps: 
-                   {
-                      state = EnterCommand;  
-                      return WriteLine( "OK caps echo[tolower|toupper] quit");
-                   }
-                   case echo: 
-                   {
-                      state = EnterMode;  
-                      continue;
-                   }
-                   case quit:
-                   {
-                      state = Terminate;
-                      return WriteLine( "BYE");
-                   }
-                   default:
-                   {
-                      state = HandleError;
-                      return WriteLine( "BAD unknown command");                 
-                   }
-                }
-            }
+	 for (;;)
+	 {
+	 LOG_DATA << "\nState: " << stateName(state) << "(" << modeName(mode) << ")";
 
-            case EmptyLine:
-            {
-                //this state is for reading until the end of the line. there is no buffering below,
-                //so we have to the next line somehow:
-                protocol::Parser::getLine( itr, buffer);
-                if (buffer.size() > 0)
-                {
-                   state = Init;
-                   buffer.init();
-                   //a line starting with a space that is not an empty line leads to an error:
-                   return WriteLine( "BAD command line");
-                }
-                else
-                {
-                   //here is an empty line, so we jump back to the line promt:
-                   state = EnterCommand;
-                   if (*itr) itr++; //< consume the end of line for not getting into an endless loop with empty command
-                   continue;
-                }
-            }
-            
-            case EnterMode:
-            {
-                //here we parse the 1st (and only or missing) argument of the 'echo' command.
-                //it defines the way of processing the input lines:
-                enum Command {none, tolower, toupper};
-                static const char* cmd[4] = {"","tolower","toupper",0}; 
-                //... the empty command is for no arguments meaning a simple ECHO
-                //    the next state should read one character for sure otherwise it may result in an endless loop (as in EnterCommand)
-                static const protocol::Parser parser(cmd);
-                
-                protocol::Parser::skipSpaces( itr);
-                
-                switch (parser.getCommand( itr, protocolState))
-                {             
-                   case none:
-                   {
-                       //... no argument => simple echo
-                       mode = Ident;
-                       state = StartProcessing; 
-                       continue;
-                   }
-                   case tolower:
-                   {
-                       mode = Lowercase;
-                       state = StartProcessing;
-                       continue;
-                   }
-                   case toupper:
-                   {
-                       mode = Uppercase;
-                       state = StartProcessing;
-                       continue;
-                   }
-                   default:
-                   {
-                      state = HandleError;
-                      return WriteLine( "BAD unknown argument");
-                   }
-                }
-            }
-            
-            case StartProcessing:
-            {
-                //read the rest of the line and reject more arguments than expected. 
-                //go on with processing, if this is clear. do not cosnsume the first end of line because it could be
-                //the first character of the EOF sequence.
-                protocol::Parser::skipSpaces( itr);
-                if (!protocol::Parser::isEOLN( itr))
-                {
-                   state = Init;
-                   return WriteLine( "BAD too many arguments");
-                }
-                else
-                {
-                   state = Processing;
-                   return WriteLine( "OK enter data");
-                }
-            }
-            
-            case ProcessingAfterWrite:
-            {
-                //do processing but first release the output buffer content that has been written in the processing state:
-                state = Processing;
-                output.release();
-                continue;
-            }
+	 switch( state)
+	 {
+	    case Init:
+	    {
+		//start or restart:
+		state = EnterCommand;
+		mode = Ident;
+		return WriteLine( "OK expecting command");
+	    }
 
-            case Processing:
-            {
-                //do the ECHO with some filter function or pure:
-                bool eof = echoInput(); 
-                if (eof)
-                {
-                   state = Init;                         //we got to the echo contents EOF = "\n.\n"
-                }
-                else
-                {
-                   state = ProcessingAfterWrite;         //we a flushing the output buffer and have to release it when entering next time
-                }                
-                void* content = output->ptr;
-                std::size_t size = output->filled;
-                return Operation( Operation::WRITE, content, size);                
-            }
-            
-            case HandleError:
-            {
-                //in the error case, start again after complaining (Operation::WRITE sent in previous state):
-                protocol::Parser::getLine( itr, buffer);  //parse the rest of the line to clean the input for the next command
-                state = Init;
-                continue;
-            }
-            
-            case Terminate:
-            {
-                state = Terminate;
-                return Operation( Operation::TERMINATE);                      
-            }
-         }//switch(..)
-         }//for(,,)
+	    case EnterCommand:
+	    {
+		//parsing the command:
+		enum Command {empty, caps, echo, quit};
+		static const char* cmd[5] = {"","caps","echo","quit",0};
+		//... the empty command is for an empty line for not bothering the client with obscure error messages.
+		//    the next state should read one character for sure otherwise it may result in an endless loop
+		static const protocol::Parser parser(cmd);
+
+		switch (parser.getCommand( itr, protocolState))
+		{
+		   case empty:
+		   {
+		      state = EmptyLine;
+		      continue;
+		   }
+		   case caps:
+		   {
+		      state = EnterCommand;
+		      return WriteLine( "OK caps echo[tolower|toupper] quit");
+		   }
+		   case echo:
+		   {
+		      state = EnterMode;
+		      continue;
+		   }
+		   case quit:
+		   {
+		      state = Terminate;
+		      return WriteLine( "BYE");
+		   }
+		   default:
+		   {
+		      state = HandleError;
+		      return WriteLine( "BAD unknown command");
+		   }
+		}
+	    }
+
+	    case EmptyLine:
+	    {
+		//this state is for reading until the end of the line. there is no buffering below,
+		//so we have to the next line somehow:
+		protocol::Parser::getLine( itr, buffer);
+		if (buffer.size() > 0)
+		{
+		   state = Init;
+		   buffer.init();
+		   //a line starting with a space that is not an empty line leads to an error:
+		   return WriteLine( "BAD command line");
+		}
+		else
+		{
+		   //here is an empty line, so we jump back to the line promt:
+		   state = EnterCommand;
+		   if (*itr) itr++; //< consume the end of line for not getting into an endless loop with empty command
+		   continue;
+		}
+	    }
+
+	    case EnterMode:
+	    {
+		//here we parse the 1st (and only or missing) argument of the 'echo' command.
+		//it defines the way of processing the input lines:
+		enum Command {none, tolower, toupper};
+		static const char* cmd[4] = {"","tolower","toupper",0};
+		//... the empty command is for no arguments meaning a simple ECHO
+		//    the next state should read one character for sure otherwise it may result in an endless loop (as in EnterCommand)
+		static const protocol::Parser parser(cmd);
+
+		protocol::Parser::skipSpaces( itr);
+
+		switch (parser.getCommand( itr, protocolState))
+		{
+		   case none:
+		   {
+		       //... no argument => simple echo
+		       mode = Ident;
+		       state = StartProcessing;
+		       continue;
+		   }
+		   case tolower:
+		   {
+		       mode = Lowercase;
+		       state = StartProcessing;
+		       continue;
+		   }
+		   case toupper:
+		   {
+		       mode = Uppercase;
+		       state = StartProcessing;
+		       continue;
+		   }
+		   default:
+		   {
+		      state = HandleError;
+		      return WriteLine( "BAD unknown argument");
+		   }
+		}
+	    }
+
+	    case StartProcessing:
+	    {
+		//read the rest of the line and reject more arguments than expected.
+		//go on with processing, if this is clear. do not cosnsume the first end of line because it could be
+		//the first character of the EOF sequence.
+		protocol::Parser::skipSpaces( itr);
+		if (!protocol::Parser::isEOLN( itr))
+		{
+		   state = Init;
+		   return WriteLine( "BAD too many arguments");
+		}
+		else
+		{
+		   state = Processing;
+		   return WriteLine( "OK enter data");
+		}
+	    }
+
+	    case ProcessingAfterWrite:
+	    {
+		//do processing but first release the output buffer content that has been written in the processing state:
+		state = Processing;
+		output.release();
+		continue;
+	    }
+
+	    case Processing:
+	    {
+		//do the ECHO with some filter function or pure:
+		bool eof = echoInput();
+		if (eof)
+		{
+		   state = Init;                         //we got to the echo contents EOF = "\n.\n"
+		}
+		else
+		{
+		   state = ProcessingAfterWrite;         //we a flushing the output buffer and have to release it when entering next time
+		}
+		void* content = output->ptr;
+		std::size_t size = output->filled;
+		return Operation( Operation::WRITE, content, size);
+	    }
+
+	    case HandleError:
+	    {
+		//in the error case, start again after complaining (Operation::WRITE sent in previous state):
+		protocol::Parser::getLine( itr, buffer);  //parse the rest of the line to clean the input for the next command
+		state = Init;
+		continue;
+	    }
+
+	    case Terminate:
+	    {
+		state = Terminate;
+		return Operation( Operation::TERMINATE);
+	    }
+	 }//switch(..)
+	 }//for(,,)
       }
       catch (Input::End)
       {
-         LOG_DATA << "End of input interrupt";
-         return Operation( Operation::READ, input->ptr, input->size);         
+	 LOG_DATA << "End of input interrupt";
+	 return Operation( Operation::READ, input->ptr, input->size);
       };
       return Operation( Operation::TERMINATE);
    };
@@ -338,13 +338,28 @@ Connection::Operation Connection::nextOperation()
    return data->nextOperation();
 }
 
-Network::connectionHandler* Server::newConnection( const Network::LocalTCPendpoint& local)
+
+/// ServerHandler PIMPL
+Network::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const Network::LocalTCPendpoint& local )
 {
-   return new Connection( local);
+	return new Connection( local );
 }
 
-Network::connectionHandler* Server::newSSLconnection( const Network::LocalSSLendpoint& local)
+Network::connectionHandler* ServerHandler::ServerHandlerImpl::newSSLconnection( const Network::LocalSSLendpoint& local )
 {
-   return new Connection( local);
+	return new Connection( local );
 }
 
+ServerHandler::ServerHandler() : impl_( new ServerHandlerImpl )	{}
+
+ServerHandler::~ServerHandler()	{ delete impl_; }
+
+Network::connectionHandler* ServerHandler::newConnection( const Network::LocalTCPendpoint& local )
+{
+	return impl_->newConnection( local );
+}
+
+Network::connectionHandler* ServerHandler::newSSLconnection( const Network::LocalSSLendpoint& local )
+{
+	return impl_->newSSLconnection( local );
+}

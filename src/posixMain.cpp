@@ -15,7 +15,7 @@
 #include "ErrorCodes.hpp"
 #include "logger.hpp"
 
-#include "smerpHandler.hpp"
+#include "connectionHandler.hpp"
 
 #include <libintl.h>
 #include <locale.h>
@@ -223,8 +223,8 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		LOG_NOTICE << "Starting server";
 
 		// Run server in background thread(s).
-		_SMERP::echoServer	echo;
-		_SMERP::Network::server s( config.address, config.SSLaddress, echo,
+		_SMERP::ServerHandler	handler;
+		_SMERP::Network::server s( config.address, config.SSLaddress, handler,
 					   config.threads, config.maxConnections );
 		boost::thread t( boost::bind( &_SMERP::Network::server::run, &s ));
 

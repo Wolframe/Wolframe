@@ -258,8 +258,8 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 		LOG_NOTICE << "Starting service";
 
 // run server in background thread(s).
-		_SMERP::echoServer	echo;
-		_SMERP::Network::server s( config.address, config.SSLaddress, echo, config.threads, config.maxConnections );
+		_SMERP::ServerHandler	handler;
+		_SMERP::Network::server s( config.address, config.SSLaddress, handler, config.threads, config.maxConnections );
 		boost::thread t( boost::bind( &_SMERP::Network::server::run, &s ));
 
 // we are up and running now (hopefully), signal this to the SCM

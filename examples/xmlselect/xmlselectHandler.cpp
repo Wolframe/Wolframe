@@ -25,11 +25,11 @@ public:
       unsigned int namesize;
       enum Type
       {
-         Tag,
-         Follow,
-         AttributeName,
-         AttributeValue,
-         Count
+	 Tag,
+	 Follow,
+	 AttributeName,
+	 AttributeValue,
+	 Count
       };
       Type type;
 
@@ -86,25 +86,25 @@ private:
       skipB();
       if (input[pos] == '@')
       {
-         pos++;
-         parseName( Element::AttributeName);
-         if (input[pos] == '=')
-         {
-            pos++;
-            if (input[pos] == '\'' || input[pos] == '\"')
-            {
-               pos++;
-               parseString( Element::AttributeValue, input[pos-1]);
-            }
-            else
-            {
-               parseName( Element::AttributeValue);
-            }
-         }
+	 pos++;
+	 parseName( Element::AttributeName);
+	 if (input[pos] == '=')
+	 {
+	    pos++;
+	    if (input[pos] == '\'' || input[pos] == '\"')
+	    {
+	       pos++;
+	       parseString( Element::AttributeValue, input[pos-1]);
+	    }
+	    else
+	    {
+	       parseName( Element::AttributeValue);
+	    }
+	 }
       }
       else
       {
-         parseNumber( Element::Count);
+	 parseNumber( Element::Count);
       }
       if (input[pos] != ']') throw Error();
       pos++;
@@ -114,26 +114,26 @@ private:
    {
       while (input[pos] != '\0')
       {
-          if (input[pos] == '/')
-          {
-             pos++;
-             if (input[pos] == '/')
-             {
-                ar.push_back( Element::Follow);
-             }
-             else
-             {
-                parseName( Element::Tag);
-             }
-          }
-          else if (input[pos] == '@')
-          {
-             parseName( Element::AttributeName);
-          }
-          else if (input[pos] == '[')
-          {
-             parseElement();
-          }
+	  if (input[pos] == '/')
+	  {
+	     pos++;
+	     if (input[pos] == '/')
+	     {
+		ar.push_back( Element::Follow);
+	     }
+	     else
+	     {
+		parseName( Element::Tag);
+	     }
+	  }
+	  else if (input[pos] == '@')
+	  {
+	     parseName( Element::AttributeName);
+	  }
+	  else if (input[pos] == '[')
+	  {
+	     parseElement();
+	  }
       }
    };
 public:
@@ -141,11 +141,11 @@ public:
    {
       try
       {
-         parse();
+	 parse();
       }
       catch (Error)
       {
-         valid = false;
+	 valid = false;
       };
    };
 
@@ -169,14 +169,14 @@ public:
 
       void skip()
       {
-         if (pos < input->ar.size())
-         {
-            cur = input->ar[ pos++];
-         }
-         else
-         {
-            eof = true;
-         }
+	 if (pos < input->ar.size())
+	 {
+	    cur = input->ar[ pos++];
+	 }
+	 else
+	 {
+	    eof = true;
+	 }
       };
       iterator& operator++()                  {skip(); return *this;};
       iterator operator++(int)                {iterator tmp(*this); skip(); return tmp;};
@@ -197,10 +197,10 @@ namespace tw = textwolf;
 
 struct Connection::Private
 {
-   //* typedefs for input output blocks and input iterators  
-   typedef protocol::InputBlock Input;                                           //< input buffer type 
-   typedef protocol::OutputBlock Output;                                         //< output buffer type 
-   typedef Input::iterator ProtocolIterator;                                     //< iterator type for protocol commands  
+   //* typedefs for input output blocks and input iterators
+   typedef protocol::InputBlock Input;                                           //< input buffer type
+   typedef protocol::OutputBlock Output;                                         //< output buffer type
+   typedef Input::iterator ProtocolIterator;                                     //< iterator type for protocol commands
    typedef protocol::TextIterator<Input::iterator> ContentIterator;              //< iterator type for content
    typedef tw::XMLPathSelectAutomaton<tw::charset::UTF8> Automaton;
    typedef tw::XMLPathSelect<ContentIterator,tw::charset::IsoLatin1,tw::charset::UTF8> Processor;
@@ -237,7 +237,7 @@ struct Connection::Private
       void init()                  {pos=0;};
       void push_back( char ch)     {if (pos<=Size) buf[pos++]=ch;};
       unsigned int size() const    {return pos;};
-      const char* c_str()          {buf[pos]=0; return buf;}; 
+      const char* c_str()          {buf[pos]=0; return buf;};
    };
 
    //* all state variables of this processor
@@ -249,8 +249,8 @@ struct Connection::Private
    const char* error;
    //3. buffers and context
    protocol::Parser::Context protocolState;   //< context (sub state) for partly parsed protocol commands
-   Buffer buffer;                             //< context (sub state) for partly parsed input lines 
-   Input input;                               //< buffer for READ network messages 
+   Buffer buffer;                             //< context (sub state) for partly parsed input lines
+   Input input;                               //< buffer for READ network messages
    Output output;                             //< buffer for WRITE network messages
    //3. Iterators
    ProtocolIterator itr;                      //< iterator to scan protocol commands
@@ -267,8 +267,8 @@ struct Connection::Private
       for (ii=0; str[ii]; ii++) buffer.push_back( str[ii]);
       if (arg)
       {
-         buffer.push_back( ' ');
-         for (ii=0; arg[ii]; ii++) buffer.push_back( arg[ii]);
+	 buffer.push_back( ' ');
+	 for (ii=0; arg[ii]; ii++) buffer.push_back( arg[ii]);
       }
       buffer.push_back( '\r');
       buffer.push_back( '\n');
@@ -277,7 +277,7 @@ struct Connection::Private
       return Operation( Operation::WRITE, msg, ii+2);
    };
 
-   
+
    Private() :proc(0),state(Init),error(0),input(MemBlockSize),output(MemBlockSize)
    {
       itr = input.begin();
@@ -327,185 +327,185 @@ struct Connection::Private
    {
        if (!proc)
        {
-          proc = new (std::nothrow) Processor( &atm, citr, elementPtr(), elementSize());
-          if (!proc)
-          {
-             error = "OutOfMem";
-             return ReportError;
-          }
-          src = proc->begin();
-          end = proc->end();
+	  proc = new (std::nothrow) Processor( &atm, citr, elementPtr(), elementSize());
+	  if (!proc)
+	  {
+	     error = "OutOfMem";
+	     return ReportError;
+	  }
+	  src = proc->begin();
+	  end = proc->end();
        }
        try
        {
-          for (src++; src!=end; src++)
-          {
-             produceElement( src->type, src->size);
-             proc->setOutputBuffer( elementPtr(), elementSize());
-          }
-          switch (src->state)
-          {
-             case Processor::iterator::Element::Ok:          return Write;
-             case Processor::iterator::Element::EndOfOutput: return Write;
-             case Processor::iterator::Element::EndOfInput:  return WriteLast;
-             case Processor::iterator::Element::ErrorState:  error=src->content; return ReportError;
-          }
+	  for (src++; src!=end; src++)
+	  {
+	     produceElement( src->type, src->size);
+	     proc->setOutputBuffer( elementPtr(), elementSize());
+	  }
+	  switch (src->state)
+	  {
+	     case Processor::iterator::Element::Ok:          return Write;
+	     case Processor::iterator::Element::EndOfOutput: return Write;
+	     case Processor::iterator::Element::EndOfInput:  return WriteLast;
+	     case Processor::iterator::Element::ErrorState:  error=src->content; return ReportError;
+	  }
        }
        catch (Input::End)
        {
-          return Read;
+	  return Read;
        };
    };
 
    Operation nextOperation()
    {
-      try 
+      try
       {
-         for (;;)
-         {
-             LOG_DATA << "\nState: " << stateName(state);
-      
-             switch( state)
-             {
-                case Init:
-                {
-                    //start or restart:
-                    state = EnterCommand;
-                    return WriteLine( "OK expecting command");
-                }
-                
-                case EnterCommand:
-                {
-                    //parsing the command:
-                    enum Command {empty, caps, select, quit};
-                    static const char* cmd[5] = {"","caps","select","quit",0};
-                    //... the empty command is for an empty line for not bothering the client with obscure error messages.
-                    //    the next state should read one character for sure otherwise it may result in an endless loop
-                    static const protocol::Parser parser(cmd);
-                    
-                    switch (parser.getCommand( itr, protocolState))
-                    {             
-                       case empty:
-                       {
-                          state = EmptyLine;
-                          continue;
-                       }   
-                       case caps: 
-                       {
-                          state = EnterCommand;  
-                          return WriteLine( "OK caps select quit");
-                       }
-                       case select: 
-                       {
-                          state = EmptyLine;  
-                          continue;
-                       }
-                       case quit:
-                       {
-                          state = Terminate;
-                          return WriteLine( "BYE");
-                       }
-                       default:
-                       {
-                          state = HandleError;
-                          return WriteLine( "BAD unknown command");                 
-                       }
-                    }
-                }
+	 for (;;)
+	 {
+	     LOG_DATA << "\nState: " << stateName(state);
 
-                case EmptyLine:
-                {
-                    //this state is for reading until the end of the line. there is no buffering below,
-                    //so we have to the next line somehow:
-                    protocol::Parser::getLine( itr, buffer);
-                    itr++; //< consume the end of line for not getting into an endless loop
+	     switch( state)
+	     {
+		case Init:
+		{
+		    //start or restart:
+		    state = EnterCommand;
+		    return WriteLine( "OK expecting command");
+		}
 
-                    if (buffer.size() > 0)
-                    {
-                       state = Init;
-                       buffer.init();
-                       //a line starting with a space that is not an empty line leads to an error:
-                       return WriteLine( "BAD command line");
-                    }
-                    else
-                    {
-                       //here is an empty line, so we jump back to the line promt:
-                       state = EnterCommand;
-                       continue;
-                    }
-                }
+		case EnterCommand:
+		{
+		    //parsing the command:
+		    enum Command {empty, caps, select, quit};
+		    static const char* cmd[5] = {"","caps","select","quit",0};
+		    //... the empty command is for an empty line for not bothering the client with obscure error messages.
+		    //    the next state should read one character for sure otherwise it may result in an endless loop
+		    static const protocol::Parser parser(cmd);
 
-                case StartProcessing:
-                {
-                    //read the rest of the line and reject more arguments than expected. 
-                    //go on with processing, if this is clear. do not cosnsume the first end of line because it could be
-                    //the first character of the EOF sequence.
-                    protocol::Parser::getLine( itr, buffer);
-                    if (buffer.size() > 0)
-                    {
-                       state = Init;
-                       buffer.init();
-                       return WriteLine( "BAD too many arguments");
-                    }
-                    else
-                    {
-                       state = Processing;
-                       return WriteLine( "OK enter data");
-                    }
-                }
-            
-                case ProcessingAfterWrite:
-                {
-                    //do processing but first release the output buffer content that has been written in the processing state:
-                    state = Processing;
-                    output.release();
-                    continue;
-                }
-                
-                case Processing:
-                {
-                    switch (get())
-                    {
-                       case Read:
-                          return Operation( Operation::READ, input->ptr, input->size);
+		    switch (parser.getCommand( itr, protocolState))
+		    {
+		       case empty:
+		       {
+			  state = EmptyLine;
+			  continue;
+		       }
+		       case caps:
+		       {
+			  state = EnterCommand;
+			  return WriteLine( "OK caps select quit");
+		       }
+		       case select:
+		       {
+			  state = EmptyLine;
+			  continue;
+		       }
+		       case quit:
+		       {
+			  state = Terminate;
+			  return WriteLine( "BYE");
+		       }
+		       default:
+		       {
+			  state = HandleError;
+			  return WriteLine( "BAD unknown command");
+		       }
+		    }
+		}
 
-                       case Write:
-                          state = ProcessingAfterWrite;
-                          return Operation( Operation::WRITE, output->ptr, output->filled);
+		case EmptyLine:
+		{
+		    //this state is for reading until the end of the line. there is no buffering below,
+		    //so we have to the next line somehow:
+		    protocol::Parser::getLine( itr, buffer);
+		    itr++; //< consume the end of line for not getting into an endless loop
 
-                       case WriteLast:
-                          state = Terminate;
-                          return Operation( Operation::WRITE, output->ptr, output->size);
+		    if (buffer.size() > 0)
+		    {
+		       state = Init;
+		       buffer.init();
+		       //a line starting with a space that is not an empty line leads to an error:
+		       return WriteLine( "BAD command line");
+		    }
+		    else
+		    {
+		       //here is an empty line, so we jump back to the line promt:
+		       state = EnterCommand;
+		       continue;
+		    }
+		}
 
-                       case ReportError:
-                       {
-                          state = HandleError;
-                          return WriteLine( "ERR", error?error:"unknown");
-                       }
-                    }
-                }
+		case StartProcessing:
+		{
+		    //read the rest of the line and reject more arguments than expected.
+		    //go on with processing, if this is clear. do not cosnsume the first end of line because it could be
+		    //the first character of the EOF sequence.
+		    protocol::Parser::getLine( itr, buffer);
+		    if (buffer.size() > 0)
+		    {
+		       state = Init;
+		       buffer.init();
+		       return WriteLine( "BAD too many arguments");
+		    }
+		    else
+		    {
+		       state = Processing;
+		       return WriteLine( "OK enter data");
+		    }
+		}
 
-                case HandleError:
-                {
-                    //in the error case, start again after complaining (Operation::WRITE sent in previous state):
-                    protocol::Parser::getLine( itr, buffer);  //parse the rest of the line to clean the input for the next command
-                    state = Init;
-                    continue;
-                }
-                
-                case Terminate:
-                {
-                    state = Terminate;
-                    return Operation( Operation::TERMINATE);                      
-                }
+		case ProcessingAfterWrite:
+		{
+		    //do processing but first release the output buffer content that has been written in the processing state:
+		    state = Processing;
+		    output.release();
+		    continue;
+		}
 
-             }//switch(..)
-         }//for(,,)
+		case Processing:
+		{
+		    switch (get())
+		    {
+		       case Read:
+			  return Operation( Operation::READ, input->ptr, input->size);
+
+		       case Write:
+			  state = ProcessingAfterWrite;
+			  return Operation( Operation::WRITE, output->ptr, output->filled);
+
+		       case WriteLast:
+			  state = Terminate;
+			  return Operation( Operation::WRITE, output->ptr, output->size);
+
+		       case ReportError:
+		       {
+			  state = HandleError;
+			  return WriteLine( "ERR", error?error:"unknown");
+		       }
+		    }
+		}
+
+		case HandleError:
+		{
+		    //in the error case, start again after complaining (Operation::WRITE sent in previous state):
+		    protocol::Parser::getLine( itr, buffer);  //parse the rest of the line to clean the input for the next command
+		    state = Init;
+		    continue;
+		}
+
+		case Terminate:
+		{
+		    state = Terminate;
+		    return Operation( Operation::TERMINATE);
+		}
+
+	     }//switch(..)
+	 }//for(,,)
       }
       catch (Input::End)
       {
-         LOG_DATA << "End of input interrupt";
-         return Operation( Operation::READ, input->ptr, input->size);         
+	 LOG_DATA << "End of input interrupt";
+	 return Operation( Operation::READ, input->ptr, input->size);
       };
       return Operation( Operation::TERMINATE);
    };
@@ -552,13 +552,29 @@ Connection::Operation Connection::nextOperation()
    return data->nextOperation();
 }
 
-Network::connectionHandler* Server::newConnection( const Network::LocalTCPendpoint& local)
+
+/// ServerHandler PIMPL
+Network::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const Network::LocalTCPendpoint& local )
 {
-   return new Connection( local);
+	return new Connection( local );
 }
 
-Network::connectionHandler* Server::newSSLconnection( const Network::LocalSSLendpoint& local)
+Network::connectionHandler* ServerHandler::ServerHandlerImpl::newSSLconnection( const Network::LocalSSLendpoint& local )
 {
-   return new Connection( local);
+	return new Connection( local );
+}
+
+ServerHandler::ServerHandler() : impl_( new ServerHandlerImpl )	{}
+
+ServerHandler::~ServerHandler()	{ delete impl_; }
+
+Network::connectionHandler* ServerHandler::newConnection( const Network::LocalTCPendpoint& local )
+{
+	return impl_->newConnection( local );
+}
+
+Network::connectionHandler* ServerHandler::newSSLconnection( const Network::LocalSSLendpoint& local )
+{
+	return impl_->newSSLconnection( local );
 }
 

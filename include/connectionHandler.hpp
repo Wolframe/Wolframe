@@ -99,6 +99,22 @@ namespace _SMERP {
 	};
 
 } // namespace Network
+
+	/// The server
+	class ServerHandler
+	{
+	public:
+		ServerHandler();
+		~ServerHandler();
+
+		/// Create a new connection handler and return a pointer to it
+		Network::connectionHandler* newConnection( const Network::LocalTCPendpoint& local );
+		Network::connectionHandler* newSSLconnection( const Network::LocalSSLendpoint& local );
+	private:
+		class ServerHandlerImpl;
+		ServerHandlerImpl	*impl_;
+	};
+
 } // namespace _SMERP
 
 #endif // _CONNECTION_HANDLER_HPP_INCLUDED

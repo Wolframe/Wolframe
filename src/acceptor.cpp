@@ -17,7 +17,7 @@ namespace Network {
 
 acceptor::acceptor( boost::asio::io_service& IOservice,
 		    const std::string& host, unsigned short port, unsigned maxConnections,
-		    ServerHandler& srvHandler ) :
+		    _SMERP::ServerHandler& srvHandler ) :
 	IOservice_( IOservice ),
 	strand_( IOservice_ ),
 	acceptor_( IOservice_ ),
@@ -99,7 +99,7 @@ SSLacceptor::SSLacceptor( boost::asio::io_service& IOservice,
 			  const std::string& certFile, const std::string& keyFile,
 			  bool verify, const std::string& CAchainFile, const std::string& CAdirectory,
 			  const std::string& host, unsigned short port, unsigned maxConnections,
-			  ServerHandler& srvHandler) :
+			  _SMERP::ServerHandler& srvHandler) :
 	IOservice_( IOservice ),
 	strand_( IOservice_ ),
 	acceptor_( IOservice_ ),
