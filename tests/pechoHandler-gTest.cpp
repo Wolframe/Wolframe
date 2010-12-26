@@ -21,7 +21,7 @@ const char* getRandomAsciiString()
    while (ii<nn && rand()%104 != 103)
    {
       rt[ii] = 32+rand()%96;
-      
+
       //avoid random end of content:
       if (ii>=2 && rt[ii-2]=='\n' && rt[ii-1]=='.' && rt[ii]=='\n')
       {

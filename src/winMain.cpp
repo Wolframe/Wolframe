@@ -231,11 +231,11 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 		_SMERP::ApplicationConfiguration config( cmdLineCfg, cfgFileCfg );
 
 // create the final logger based on the configuration
-		logBack.setLogfileLevel( config.logFileLogLevel );
-		logBack.setLogfileName( config.logFile );
-		logBack.setEventlogLevel( config.eventlogLogLevel );
-		logBack.setEventlogSource( config.eventlogSource );
-		logBack.setEventlogLog( config.eventlogLogName );
+		_SMERP::LogBackend::instance().setLogfileLevel( config.logFileLogLevel );
+		_SMERP::LogBackend::instance().setLogfileName( config.logFile );
+		_SMERP::LogBackend::instance().setEventlogLevel( config.eventlogLogLevel );
+		_SMERP::LogBackend::instance().setEventlogSource( config.eventlogSource );
+		_SMERP::LogBackend::instance().setEventlogLog( config.eventlogLogName );
 
 // register the event callback where we get called by Windows and the SCM
 		serviceStatusHandle = RegisterServiceCtrlHandler( config.serviceName.c_str( ), serviceCtrlFunction );
@@ -258,8 +258,8 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 		LOG_NOTICE << "Starting service";
 
 // run server in background thread(s).
-		_SMERP::echoServer	echo;
-		_SMERP::Network::server s( config.address, config.SSLaddress, echo, config.threads, config.maxConnections );
+		_SMERP::ServerHandler	handler;
+		_SMERP::Network::server s( config.address, config.SSLaddress, handler, config.threads, config.maxConnections );
 		boost::thread t( boost::bind( &_SMERP::Network::server::run, &s ));
 
 // we are up and running now (hopefully), signal this to the SCM
@@ -298,8 +298,6 @@ WAIT_FOR_STOP_EVENT:
 	}
 }
 
-
-_SMERP::LogBackend	logBack;
 
 int _SMERP_winMain( int argc, char* argv[] )
 {
@@ -410,13 +408,13 @@ int _SMERP_winMain( int argc, char* argv[] )
 
 		// Create the final logger based on the configuration, this is the
 		// foreground mode in a console, so we start only the stderr logger
-		logBack.setConsoleLevel( config.stderrLogLevel );
+		_SMERP::LogBackend::instance().setConsoleLevel( config.stderrLogLevel );
 
 		LOG_NOTICE << "Starting server";
 
-		_SMERP::echoServer	echo;
+		_SMERP::ServerHandler	handler;
 		_SMERP::Network::server s( config.address, config.SSLaddress,
-					   echo, config.threads, config.maxConnections );
+					   handler, config.threads, config.maxConnections );
 
 		// Set console control handler to allow server to be stopped.
 		consoleCtrlFunction = boost::bind(&_SMERP::Network::server::stop, &s);

@@ -47,7 +47,7 @@ namespace _SMERP {
 
 
 	/// The server handler container
-	class echoServer : public Network::ServerHandler
+	class ServerHandler::ServerHandlerImpl
 	{
 	public:
 		Network::connectionHandler* newConnection( const Network::LocalTCPendpoint& local );

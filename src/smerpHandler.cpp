@@ -139,14 +139,30 @@ namespace _SMERP {
 		LOG_TRACE << "Processor received signal";
 	}
 
-	Network::connectionHandler* echoServer::newConnection( const Network::LocalTCPendpoint& local )
+
+	/// ServerHandler PIMPL
+	Network::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const Network::LocalTCPendpoint& local )
 	{
 		return new echoConnection( local );
 	}
 
-	Network::connectionHandler* echoServer::newSSLconnection( const Network::LocalSSLendpoint& local )
+	Network::connectionHandler* ServerHandler::ServerHandlerImpl::newSSLconnection( const Network::LocalSSLendpoint& local )
 	{
 		return new echoConnection( local );
+	}
+
+	ServerHandler::ServerHandler() : impl_( new ServerHandlerImpl )	{}
+
+	ServerHandler::~ServerHandler()	{ delete impl_; }
+
+	Network::connectionHandler* ServerHandler::newConnection( const Network::LocalTCPendpoint& local )
+	{
+		return impl_->newConnection( local );
+	}
+
+	Network::connectionHandler* ServerHandler::newSSLconnection( const Network::LocalSSLendpoint& local )
+	{
+		return impl_->newSSLconnection( local );
 	}
 
 } // namespace _SMERP

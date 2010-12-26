@@ -34,16 +34,16 @@ namespace xmlselect {
       Private* data;
 	};
 
+} // namespace xmlselect
 
 	/// The server handler container
-	class Server : public Network::ServerHandler
+	class ServerHandler::ServerHandlerImpl
 	{
 	public:
 		Network::connectionHandler* newConnection( const Network::LocalTCPendpoint& local );
 		Network::connectionHandler* newSSLconnection( const Network::LocalSSLendpoint& local );
 	};
 
-} // namespace xmlselect
 } // namespace _SMERP
 
 #endif // _SMERP_XMLSELECT_HANDLER_HPP_INCLUDED

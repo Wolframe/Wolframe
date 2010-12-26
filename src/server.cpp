@@ -19,7 +19,7 @@ namespace _SMERP {
 
 		server::server( const std::vector<ServerTCPendpoint>& TCPserver,
 				SMERP_UNUSED const std::vector<ServerSSLendpoint>& SSLserver,
-				ServerHandler& serverHandler,
+				_SMERP::ServerHandler& serverHandler,
 				unsigned threads, unsigned maxConnections )
 					: threadPoolSize_( threads ),
 
@@ -72,14 +72,14 @@ namespace _SMERP {
 			std::vector< boost::shared_ptr<boost::thread> >	threads;
 			std::size_t					i;
 
-			for ( i = 0; i < threadPoolSize_; ++i )	{
+			for ( i = 0; i < threadPoolSize_; i++ )	{
 				boost::shared_ptr<boost::thread> thread( new boost::thread( boost::bind( &boost::asio::io_service::run, &IOservice_ )));
 				threads.push_back( thread );
 			}
 			LOG_TRACE << i << " network server thread(s) started";
 
 			// Wait for all threads in the pool to exit.
-			for ( i = 0; i < threads.size(); ++i )
+			for ( i = 0; i < threads.size(); i++ )
 				threads[i]->join();
 
 			// Reset io_services.

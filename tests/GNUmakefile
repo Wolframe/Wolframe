@@ -41,9 +41,9 @@ INCLUDE_LIBS += \
 
 endif
 
-TEST_OBJS = \
-	$(TOPDIR)/examples/pecho/pechoHandler.o \
-	$(TOPDIR)/examples/xmlselect/xmlselectHandler.o
+TEST_OBJS =
+#	$(TOPDIR)/examples/pecho/pechoHandler.o
+#	$(TOPDIR)/examples/xmlselect/xmlselectHandler.o
 
 TEST_CPP_BINS = \
 	versionTest$(EXE) \
@@ -62,13 +62,16 @@ endif
 
 include $(TOPDIR)/makefiles/gmake/sub.mk
 
-pechoHandlerTest$(EXE): $(TOPDIR)/src/libsmerp.a $(TOPDIR)/examples/pecho/pechoHandler.o
+pechoHandlerTest$(EXE): pechoHandlerTest.o $(TOPDIR)/src/libsmerp.a $(TOPDIR)/examples/pecho/pechoHandler.o
+	$(CCPP_LINK) -o $@ $(LDFLAGS) $(OBJS) $< $(LIBS) $(TOPDIR)/examples/pecho/pechoHandler.o
 
 ifdef WITH_GTEST
-pechoHandler-gTest$(EXE): $(TOPDIR)/src/libsmerp.a $(TOPDIR)/examples/pecho/pechoHandler.o
+pechoHandler-gTest$(EXE): pechoHandler-gTest.o $(TOPDIR)/src/libsmerp.a $(TOPDIR)/examples/pecho/pechoHandler.o
+	$(CCPP_LINK) -o $@ $(LDFLAGS) $(OBJS) $< $(LIBS) $(TOPDIR)/examples/pecho/pechoHandler.o
 endif
 
-xmlselectHandlerTest$(EXE): $(TOPDIR)/src/libsmerp.a $(TOPDIR)/examples/xmlselect/xmlselectHandler.o
+xmlselectHandlerTest$(EXE): xmlselectHandlerTest.o $(TOPDIR)/src/libsmerp.a $(TOPDIR)/examples/xmlselect/xmlselectHandler.o
+	$(CCPP_LINK) -o $@ $(LDFLAGS) $(OBJS) $< $(LIBS) $(TOPDIR)/examples/xmlselect/xmlselectHandler.o
 
 local_all:
 

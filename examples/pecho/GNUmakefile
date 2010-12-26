@@ -31,12 +31,11 @@ endif
 OBJS = \
 	appConfig.o \
 	configFile.o \
-	commandLine.o \
 	pechoHandler.o \
-	posixMain.o
+	$(TOPDIR)/src/posixMain.o
 
 CPP_BINS = \
-	smerp-echo$(EXE)
+	smerp-pecho$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

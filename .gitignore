@@ -32,7 +32,7 @@ tests/xmlselectHandlerTest
 tests/counter-gTest
 tests/pechoHandler-gTest
 examples/echo/smerp-echo
-examples/pecho/smerp-echo
+examples/pecho/smerp-pecho
 examples/xmlselect/smerp-xmlselect
 examples/lua/smerp-lua
 clients/qt/qtclient

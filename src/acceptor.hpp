@@ -28,7 +28,7 @@ public:
 	/// Constructor
 	explicit acceptor( boost::asio::io_service& IOservice,
 			   const std::string& host, unsigned short port, unsigned maxConnections,
-			   ServerHandler& srvHandler );
+			   _SMERP::ServerHandler& srvHandler );
 
 	/// Destructor
 	~acceptor();
@@ -52,7 +52,7 @@ private:
 	ConnectionList<connection_ptr>		connList_;	// List of active connections
 	std::string				identifier_;
 
-	ServerHandler&				srvHandler_;	// The handler for all incoming requests.
+	_SMERP::ServerHandler&			srvHandler_;	// The handler for all incoming requests.
 };
 
 
@@ -68,7 +68,7 @@ public:
 			      const std::string& certFile, const std::string& keyFile,
 			      bool verify, const std::string& CAchainFile, const std::string& CAdirectory,
 			      const std::string& host, unsigned short port, unsigned maxConnections,
-			      ServerHandler& srvHandler );
+			      _SMERP::ServerHandler& srvHandler );
 
 	/// Destruct the serverrequestHandler&				requestHandler
 	~SSLacceptor();
@@ -96,7 +96,7 @@ private:
 	ConnectionList<SSLconnection_ptr>	connList_;	// List of active connections
 	std::string				identifier_;
 
-	ServerHandler&				srvHandler_;	// The handler for all incoming requests.
+	_SMERP::ServerHandler&			srvHandler_;	// The handler for all incoming requests.
 };
 
 #endif // WITH_SSL

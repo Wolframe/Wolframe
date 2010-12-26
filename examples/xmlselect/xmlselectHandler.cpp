@@ -91,7 +91,7 @@ private:
          if (input[pos] == '=')
          {
             pos++;
-            if (input[pos] == '\'' || input[pos] == '\"')
+            if (input[pos] == '\'' || input[pos] == '\"')     
             {
                pos++;
                parseString( Element::AttributeValue, input[pos-1]);
@@ -197,10 +197,10 @@ namespace tw = textwolf;
 
 struct Connection::Private
 {
-   //* typedefs for input output blocks and input iterators  
-   typedef protocol::InputBlock Input;                                           //< input buffer type 
-   typedef protocol::OutputBlock Output;                                         //< output buffer type 
-   typedef Input::iterator ProtocolIterator;                                     //< iterator type for protocol commands  
+   //* typedefs for input output blocks and input iterators
+   typedef protocol::InputBlock Input;                                           //< input buffer type
+   typedef protocol::OutputBlock Output;                                         //< output buffer type
+   typedef Input::iterator ProtocolIterator;                                     //< iterator type for protocol commands
    typedef protocol::TextIterator<Input::iterator> ContentIterator;              //< iterator type for content
    typedef tw::XMLPathSelectAutomaton<tw::charset::UTF8> Automaton;
    typedef tw::XMLPathSelect<ContentIterator,tw::charset::IsoLatin1,tw::charset::UTF8> Processor;
@@ -237,7 +237,7 @@ struct Connection::Private
       void init()                  {pos=0;};
       void push_back( char ch)     {if (pos<=Size) buf[pos++]=ch;};
       unsigned int size() const    {return pos;};
-      const char* c_str()          {buf[pos]=0; return buf;}; 
+      const char* c_str()          {buf[pos]=0; return buf;};
    };
    typedef protocol::CmdBuffer CmdBuffer;
    
@@ -281,7 +281,7 @@ struct Connection::Private
       return Operation( Operation::WRITE, msg, ii+2);
    };
 
-   
+
    Private() :proc(0),state(Init),error(0),input(MemBlockSize),output(MemBlockSize)
    {
       itr = input.begin();
@@ -363,7 +363,7 @@ struct Connection::Private
 
    Operation nextOperation()
    {
-      try 
+      try
       {
          for (;;)
          {
@@ -509,7 +509,7 @@ struct Connection::Private
       catch (Input::End)
       {
          LOG_DATA << "End of input interrupt";
-         return Operation( Operation::READ, input->ptr, input->size);         
+              return Operation( Operation::READ, input->ptr, input->size);
       };
       return Operation( Operation::TERMINATE);
    };
@@ -556,13 +556,29 @@ Connection::Operation Connection::nextOperation()
    return data->nextOperation();
 }
 
-Network::connectionHandler* Server::newConnection( const Network::LocalTCPendpoint& local)
+
+/// ServerHandler PIMPL
+Network::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const Network::LocalTCPendpoint& local )
 {
-   return new Connection( local);
+   return new Connection( local );
 }
 
-Network::connectionHandler* Server::newSSLconnection( const Network::LocalSSLendpoint& local)
+Network::connectionHandler* ServerHandler::ServerHandlerImpl::newSSLconnection( const Network::LocalSSLendpoint& local )
 {
-   return new Connection( local);
+   return new Connection( local );
+}
+
+ServerHandler::ServerHandler() : impl_( new ServerHandlerImpl )        {}
+
+ServerHandler::~ServerHandler()        { delete impl_; }
+
+Network::connectionHandler* ServerHandler::newConnection( const Network::LocalTCPendpoint& local )
+{
+   return impl_->newConnection( local );
+}
+
+Network::connectionHandler* ServerHandler::newSSLconnection( const Network::LocalSSLendpoint& local )
+{
+   return impl_->newSSLconnection( local );
 }
 

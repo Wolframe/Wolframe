@@ -45,9 +45,8 @@ namespace _SMERP {
 		std::string	buffer_;
 	};
 
-
 	/// The server handler container
-	class echoServer : public Network::ServerHandler
+	class ServerHandler::ServerHandlerImpl
 	{
 	public:
 		Network::connectionHandler* newConnection( const Network::LocalTCPendpoint& local );

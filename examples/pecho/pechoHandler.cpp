@@ -10,19 +10,19 @@ using namespace _SMERP::pecho;
 
 struct Connection::Private
 {
-   //* typedefs for input output blocks and input iterators  
-   typedef protocol::InputBlock Input;                                           //< input buffer type 
-   typedef protocol::OutputBlock Output;                                         //< output buffer type 
-   typedef protocol::InputBlock::iterator ProtocolIterator;                      //< iterator type for protocol commands  
+   //* typedefs for input output blocks and input iterators
+   typedef protocol::InputBlock Input;                                           //< input buffer type
+   typedef protocol::OutputBlock Output;                                         //< output buffer type
+   typedef protocol::InputBlock::iterator ProtocolIterator;                      //< iterator type for protocol commands
    typedef protocol::TextIterator<Input::iterator> ContentIterator;              //< iterator type for content
-   
-   //* typedefs for input output buffers  
+
+   //* typedefs for input output buffers
    typedef protocol::Buffer<128> LineBuffer;                                     //< buffer for one line of input/output
    typedef protocol::CmdBuffer CmdBuffer;
    
    //* typedefs for state variables and buffers
    //list of processor states
-   enum State {Init,EnterCommand,EmptyLine,EnterMode,StartProcessing,ProcessingAfterWrite,Processing,HandleError,Terminate}; 
+   enum State {Init,EnterCommand,EmptyLine,EnterMode,StartProcessing,ProcessingAfterWrite,Processing,HandleError,Terminate};
    static const char* stateName( State i)
    {
       static const char* ar[] = {"Init","EnterCommand","EmptyLine","EnterMode","StartProcessing","ProcessingAfterWrite","Processing","HandleError","Terminate"};
@@ -35,7 +35,7 @@ struct Connection::Private
       static const char* ar[] = {"Ident","Uppercase","Lowercase"};
       return ar[i];
    };
-   
+
    //* all state variables of this processor
    //1. states
    State state;                               //< state of the processor
@@ -68,9 +68,9 @@ struct Connection::Private
    //output of one character with return code true/false for success/failure
    bool print( char ch)
    {
-      if (ch < 0) 
+      if (ch < 0)
       {
-         if (!output.print( ch)) return false; 
+         if (!output.print( ch)) return false;
       }
       else switch (mode)
       {
@@ -86,13 +86,13 @@ struct Connection::Private
    bool echoInput()
    {
       char ch;
-      while ((ch=*src) != 0)           
+      while ((ch=*src) != 0)
       {
          if (output.restsize() == 0)
          {
             return false;
          }
-         if (output.restsize() == 0) return false;  //we check if there is space for output to ensure that we can do both 
+         if (output.restsize() == 0) return false;  //we check if there is space for output to ensure that we can do both
                                                     //  operations input&output or none of them. doing only one of them is
                                                     //  not covered by this state machine.
          if (!print(ch))
@@ -104,18 +104,18 @@ struct Connection::Private
       return true;
    };
 
-   //* interface   
+   //* interface
    Private()   :state(Init),mode(Ident),input(MemBlockSize),output(MemBlockSize)
    {
-      itr = input.begin(); 
+      itr = input.begin();
       src = &itr;
    };
    ~Private()  {};
 
    //statemachine of the processor
    Operation nextOperation()
-   {      
-      try 
+   {
+      try
       {
          for (;;)
          {
@@ -295,7 +295,7 @@ struct Connection::Private
       catch (Input::End)
       {
          LOG_DATA << "End of input interrupt";
-         return Operation( Operation::READ, input->ptr, input->size);         
+         return Operation( Operation::READ, input->ptr, input->size);
       };
       return Operation( Operation::TERMINATE);
    };
@@ -341,13 +341,28 @@ Connection::Operation Connection::nextOperation()
    return data->nextOperation();
 }
 
-Network::connectionHandler* Server::newConnection( const Network::LocalTCPendpoint& local)
+
+/// ServerHandler PIMPL
+Network::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const Network::LocalTCPendpoint& local )
 {
-   return new Connection( local);
+   return new Connection( local );
 }
 
-Network::connectionHandler* Server::newSSLconnection( const Network::LocalSSLendpoint& local)
+Network::connectionHandler* ServerHandler::ServerHandlerImpl::newSSLconnection( const Network::LocalSSLendpoint& local )
 {
-   return new Connection( local);
+   return new Connection( local );
 }
 
+ServerHandler::ServerHandler() : impl_( new ServerHandlerImpl ) {}
+
+ServerHandler::~ServerHandler()  { delete impl_; }
+
+Network::connectionHandler* ServerHandler::newConnection( const Network::LocalTCPendpoint& local )
+{
+   return impl_->newConnection( local );
+}
+
+Network::connectionHandler* ServerHandler::newSSLconnection( const Network::LocalSSLendpoint& local )
+{
+   return impl_->newSSLconnection( local );
+}

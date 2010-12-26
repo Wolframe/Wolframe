@@ -38,7 +38,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	commandLine.o \
 	logLevel.o \
 	logSyslogFacility.o \
-	logger.o \
+	logBackend.o \
 	configFile.o \
 	appConfig.o \
 	acceptor.o \
@@ -62,7 +62,7 @@ $(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
 	ar rcs $(LOCAL_STATIC_LIB) $(LOCAL_STATIC_LIB_OBJS)
 
 local_clean:
-	@rm -f $(STATIC_LIB)
+	@rm -f $(LOCAL_STATIC_LIB)
 
 local_distclean:
 

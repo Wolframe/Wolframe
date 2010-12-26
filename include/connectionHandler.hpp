@@ -54,6 +54,11 @@ namespace _SMERP {
 		connectionHandler& operator = ( const connectionHandler& );
 
 	public:
+		enum NetworkError	{
+			EndOfFile
+		};
+
+
 		/// Parse incoming data. The return value indicates how much of the
 		/// input has been consumed.
 		virtual void* parseInput( const void *begin, std::size_t bytesTransferred ) = 0;
@@ -61,11 +66,14 @@ namespace _SMERP {
 		/// What should the network do next.
 		virtual NetworkOperation nextOperation() = 0;
 
-		/// What should the network do next.
+		/// Timeout timer was fired.
 		virtual void timeoutOccured()	{}
 
 		/// A signal was received from outside.
 		virtual void signalOccured()	{}
+
+		/// An error network occured
+		virtual void errorOccured( NetworkError )	{}
 
 		/// Set the remote peer. The connection is up now.
 		virtual void setPeer( const RemoteTCPendpoint& remote ) = 0;
@@ -91,6 +99,22 @@ namespace _SMERP {
 	};
 
 } // namespace Network
+
+	/// The server
+	class ServerHandler
+	{
+	public:
+		ServerHandler();
+		~ServerHandler();
+
+		/// Create a new connection handler and return a pointer to it
+		Network::connectionHandler* newConnection( const Network::LocalTCPendpoint& local );
+		Network::connectionHandler* newSSLconnection( const Network::LocalSSLendpoint& local );
+	private:
+		class ServerHandlerImpl;
+		ServerHandlerImpl	*impl_;
+	};
+
 } // namespace _SMERP
 
 #endif // _CONNECTION_HANDLER_HPP_INCLUDED

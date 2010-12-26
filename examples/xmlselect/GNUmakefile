@@ -31,9 +31,8 @@ endif
 OBJS = \
 	appConfig.o \
 	configFile.o \
-	commandLine.o \
 	xmlselectHandler.o \
-	posixMain.o
+	$(TOPDIR)/src/posixMain.o
 
 CPP_BINS = \
 	smerp-xmlselect$(EXE)

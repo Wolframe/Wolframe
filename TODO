@@ -1,7 +1,9 @@
 MBa:
 
-2. propagate symbols through makefiles
-xxxx. SSL must require certificate from peer if verify is on
+- propagate symbols through makefiles
+- SSL must require certificate from peer if verify is on
+- logger must be part of an application singleton, not an object defined as a global
+
 
 
 ABa:

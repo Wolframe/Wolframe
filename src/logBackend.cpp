@@ -3,6 +3,7 @@
 //
 
 #include "logger.hpp"
+#include "logBackend.hpp"
 
 // no macros here, name clash with variables in syslog.h, so
 // undefine them here..
@@ -48,13 +49,13 @@ void ConsoleLogBackend::setLevel( const LogLevel::Level level )
 {
 	logLevel_ = level;
 }
-	
+
 inline void ConsoleLogBackend::log( const LogLevel::Level level, const std::string& msg )
 {
 	if ( level >= logLevel_ )
 		std::cerr << level << ": " << msg << std::endl;
 }
-		
+
 void ConsoleLogBackend::reopen( )
 {
 	/* nothing to do here */
@@ -68,19 +69,19 @@ LogfileBackend::LogfileBackend( )
 	isOpen_ = false;
 	// we don't open a primarily unknown logfile, wait for setFilename
 }
-		
+
 LogfileBackend::~LogfileBackend( )
 {
 	if( isOpen_ ) {
 		logFile_.close( );
 	}
 }
-		
+
 void LogfileBackend::setLevel( const LogLevel::Level level )
 {
 	logLevel_ = level;
 }
-		
+
 void LogfileBackend::setFilename( const std::string filename )
 {
 	filename_ = filename;
@@ -94,7 +95,7 @@ void LogfileBackend::reopen( )
 		isOpen_ = false;
 	}
 
-	logFile_.exceptions( logFile_.badbit | logFile_.failbit ); 
+	logFile_.exceptions( logFile_.badbit | logFile_.failbit );
 
 	try {
 		logFile_.open( filename_.c_str( ), std::ios_base::app );
@@ -103,7 +104,7 @@ void LogfileBackend::reopen( )
 		//TODO: introduce system exceptions
 		std::cerr << "ERROR: " << e.what( ) << std::endl;
 	}
-}	
+}
 
 static inline std::string timestamp( void )
 {
@@ -122,19 +123,19 @@ static inline std::string timestamp( void )
 	SYSTEMTIME lt;
 	TCHAR buf1[16];
 	TCHAR buf2[16];
-			
+
 	GetSystemTime( &t );
 	GetLocalTime( &lt );
-			
+
 	(void)GetDateFormat( LOCALE_USER_DEFAULT, 0, &lt, NULL, buf1, 16 );
 	(void)GetTimeFormat( LOCALE_USER_DEFAULT, 0, &lt, NULL, buf2, 16 );
-			
+
 	std::ostringstream oss;
 	oss << buf1 << " " << buf2;
 	return oss.str( );
-#endif // !defined( _WIN32 )		
+#endif // !defined( _WIN32 )
 }
-		
+
 inline void LogfileBackend::log( const LogLevel::Level level, const std::string& msg )
 {
 	if( level >= logLevel_ && isOpen_ ) {
@@ -153,7 +154,7 @@ SyslogBackend::SyslogBackend( )
 	facility_ = _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_DAEMON;
 	openlog( ident_.c_str( ), LOG_CONS | LOG_PID, facility_ );
 }
-		
+
 SyslogBackend::~SyslogBackend( )
 {
 	closelog( );
@@ -228,29 +229,29 @@ static int facilityToSyslogFacility( const SyslogFacility::Facility facility )
 		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_LOCAL4:	return LOG_LOCAL4;
 		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_LOCAL5:	return LOG_LOCAL5;
 		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_LOCAL6:	return LOG_LOCAL6;
-		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_LOCAL7:	return LOG_LOCAL7;	
-		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_UNDEFINED:	return LOG_DAEMON;		
+		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_LOCAL7:	return LOG_LOCAL7;
+		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_UNDEFINED:	return LOG_DAEMON;
 	}
 	return LOG_DAEMON;
 }
-		
+
 void SyslogBackend::setLevel( const LogLevel::Level level )
 {
 	logLevel_ = level;
 }
-		
+
 void SyslogBackend::setFacility( const SyslogFacility::Facility facility )
 {
 	facility_ = facilityToSyslogFacility( facility );
 	reopen( );
 }
-		
+
 void SyslogBackend::setIdent( const std::string ident )
 {
 	ident_ = ident;
 	reopen( );
 }
-		
+
 inline void SyslogBackend::log( const LogLevel::Level level, const std::string& msg )
 {
 	if ( level >= logLevel_ )
@@ -262,7 +263,7 @@ void SyslogBackend::reopen( )
 	closelog( );
 	openlog( ident_.c_str( ), LOG_CONS | LOG_PID, facility_ );
 }
-		
+
 #endif // !defined( _WIN32 )
 
 // EventlogBackend
@@ -274,9 +275,9 @@ EventlogBackend::EventlogBackend( )
 	categoryId_ = 1 | 0x0FFF0000L; // the one category we have at the moment in the resource
 	log_ = "Application";
 	source_ = "<undefined>";
-        eventSource_ = RegisterEventSource( NULL, source_.c_str( ) );
+	eventSource_ = RegisterEventSource( NULL, source_.c_str( ) );
 }
-		
+
 EventlogBackend::~EventlogBackend( )
 {
 	if( eventSource_ ) {
@@ -284,7 +285,7 @@ EventlogBackend::~EventlogBackend( )
 		eventSource_ = 0;
 	}
 }
-		
+
 void EventlogBackend::setLevel( const LogLevel::Level level )
 {
 	logLevel_ = level;
@@ -295,7 +296,7 @@ void EventlogBackend::setLog( const std::string log )
 	log_ = log;
 	reopen( );
 }
-		
+
 void EventlogBackend::setSource( const std::string source )
 {
 	source_ = source;
@@ -323,7 +324,7 @@ static DWORD levelToEventlogLevel( const LogLevel::Level level )
 	}
 	return EVENTLOG_ERROR_TYPE;
 }
-	
+
 // 00 - Success			0
 // 01 - Informational		4
 // 10 - Warning			2
@@ -345,7 +346,7 @@ static DWORD messageIdToEventlogId( DWORD eventLogLevel )
 	}
 	return( eventId | 0x0FFF0000L | ( mask << 30 ) );
 }
-					
+
 inline void EventlogBackend::log( const LogLevel::Level level, const std::string& msg )
 {
 	if ( level >= logLevel_ ) {
@@ -354,14 +355,14 @@ inline void EventlogBackend::log( const LogLevel::Level level, const std::string
 		(void)ReportEvent(
 			eventSource_,
 			levelToEventlogLevel( level ),
-			categoryId_, 
+			categoryId_,
 			messageIdToEventlogId( level ),
 			NULL, // SID of the user owning the process, not now, later..
 			1, // at the moment no strings to replace, just the message itself
 			0, // no binary data
 			msg_arr, // array of strings to log (msg.c_str() for now)
 			NULL ); // no binary data
-	}					
+	}
 }
 
 void EventlogBackend::reopen( )
@@ -372,69 +373,69 @@ void EventlogBackend::reopen( )
 }
 
 #endif // defined( _WIN32 )
-		
+
 // LogBackend
 
-LogBackend::LogBackend( )
+LogBackend::LogBackendImpl::LogBackendImpl( )
 {
 	/* logger are members, implicit initialization */
 }
 
-LogBackend::~LogBackend( )
+LogBackend::LogBackendImpl::~LogBackendImpl( )
 {
 	/* logger resources freed in destructors of members */
 }
-		
-void LogBackend::setConsoleLevel( const LogLevel::Level level )
+
+void LogBackend::LogBackendImpl::setConsoleLevel( const LogLevel::Level level )
 {
 	consoleLogger_.setLevel( level );
 }
-		
-void LogBackend::setLogfileLevel( const LogLevel::Level level )
+
+void LogBackend::LogBackendImpl::setLogfileLevel( const LogLevel::Level level )
 {
 	logfileLogger_.setLevel( level );
 }
 
-void LogBackend::setLogfileName( const std::string filename )
+void LogBackend::LogBackendImpl::setLogfileName( const std::string filename )
 {
 	logfileLogger_.setFilename( filename );
 }
 
 #if !defined( _WIN32 )
-void LogBackend::setSyslogLevel( const LogLevel::Level level )
+void LogBackend::LogBackendImpl::setSyslogLevel( const LogLevel::Level level )
 {
 	syslogLogger_.setLevel( level );
 }
-		
-void LogBackend::setSyslogFacility( const SyslogFacility::Facility facility )
+
+void LogBackend::LogBackendImpl::setSyslogFacility( const SyslogFacility::Facility facility )
 {
 	syslogLogger_.setFacility( facility );
 }
-		
-void LogBackend::setSyslogIdent( const std::string ident )
+
+void LogBackend::LogBackendImpl::setSyslogIdent( const std::string ident )
 {
 	syslogLogger_.setIdent( ident );
 }
 #endif // !defined( _WIN32 )
 
 #if defined( _WIN32 )
-void LogBackend::setEventlogLevel( const LogLevel::Level level )
+void LogBackend::LogBackendImpl::setEventlogLevel( const LogLevel::Level level )
 {
 	eventlogLogger_.setLevel( level );
 }
-		
-void LogBackend::setEventlogLog( const std::string log )
+
+void LogBackend::LogBackendImpl::setEventlogLog( const std::string log )
 {
 	eventlogLogger_.setLog( log );
 }
-		
-void LogBackend::setEventlogSource( const std::string source )
+
+void LogBackend::LogBackendImpl::setEventlogSource( const std::string source )
 {
 	eventlogLogger_.setSource( source );
 }
 #endif // defined( _WIN32 )
-		
-inline void LogBackend::log( const LogLevel::Level level, const std::string& msg )
+
+inline void LogBackend::LogBackendImpl::log( const LogLevel::Level level, const std::string& msg )
 {
 	consoleLogger_.log( level, msg );
 	logfileLogger_.log( level, msg );
@@ -445,6 +446,37 @@ inline void LogBackend::log( const LogLevel::Level level, const std::string& msg
 	eventlogLogger_.log( level, msg );
 #endif // defined( _WIN32 )
 }
+
+
+// Log backend PIMPL redirection
+LogBackend::LogBackend() : impl_( new LogBackendImpl )	{}
+
+LogBackend::~LogBackend()	{ delete impl_; }
+
+void LogBackend::setConsoleLevel( const LogLevel::Level level )	{ impl_->setConsoleLevel( level ); }
+
+void LogBackend::setLogfileLevel( const LogLevel::Level level )	{ impl_->setLogfileLevel( level ); }
+
+void LogBackend::setLogfileName( const std::string filename )	{ impl_->setLogfileName( filename );}
+
+#ifndef _WIN32
+void LogBackend::setSyslogLevel( const LogLevel::Level level )	{ impl_->setSyslogLevel( level );}
+
+void LogBackend::setSyslogFacility( const SyslogFacility::Facility facility )	{ impl_->setSyslogFacility( facility );}
+
+void LogBackend::setSyslogIdent( const std::string ident )	{ impl_->setSyslogIdent( ident );}
+#endif // _WIN32
+
+#ifdef _WIN32
+void LogBackend::setEventlogLevel( const LogLevel::Level level )	{ impl_->setEventlogLevel( level );}
+
+void LogBackend::setEventlogLog( const std::string log )	{ impl_->setEventlogLog( log ); }
+
+void LogBackend::setEventlogSource( const std::string source )	{ impl_->setEventlogSource( source ); }
+#endif // _WIN32
+
+void LogBackend::log( const LogLevel::Level level, const std::string& msg )	{ impl_->log( level, msg ); }
+
 
 // Logger
 
@@ -457,7 +489,7 @@ Logger::~Logger( )
 	logBk_.log( msgLevel_, os_.str( ) );
 }
 
-std::ostringstream& Logger::Get( LogLevel::Level level ) 
+std::ostringstream& Logger::Get( LogLevel::Level level )
 {
 	msgLevel_ = level;
 	return os_;

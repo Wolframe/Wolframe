@@ -325,8 +325,8 @@ CCPP_LINK = $(CCPP)
 %.o : %.cpp
 	$(CCPP) -c -o $@ $(CCPPFLAGS) $<
 
-%$(EXE): %.o $(OBJS) $(TEST_OBJS)
-	$(CCPP_LINK) -o $@ $(LDFLAGS) $(OBJS) $(TEST_OBJS) $< $(LIBS)
+%$(EXE): %.o $(OBJS)
+	$(CCPP_LINK) -o $@ $(LDFLAGS) $(OBJS) $< $(LIBS)
 
 %.sho : %.c
 	$(CC) -c -o $@ $(SO_COMPILE_FLAGS) -DSHARED $(CFLAGS) $<

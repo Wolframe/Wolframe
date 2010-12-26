@@ -1,8 +1,5 @@
 #include <boost/thread.hpp>
 
-// this is because the echoHandler uses the logger, should it do that?
-#include <logger.hpp>
-_SMERP::LogBackend logBack;
 
 void
 someWork ()

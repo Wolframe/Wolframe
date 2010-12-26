@@ -25,7 +25,7 @@ namespace _SMERP {
 			/// Construct the server
 			explicit server( const std::vector<ServerTCPendpoint>& TCPserver,
 					 const std::vector<ServerSSLendpoint>& SSLserver,
-					 ServerHandler& serverHandler,
+					 _SMERP::ServerHandler& serverHandler,
 					 unsigned threads, unsigned maxConnections );
 
 			/// Destruct the server

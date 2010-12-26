@@ -15,7 +15,7 @@
 #include "ErrorCodes.hpp"
 #include "logger.hpp"
 
-#include "smerpHandler.hpp"
+#include "connectionHandler.hpp"
 
 #include <libintl.h>
 #include <locale.h>
@@ -44,7 +44,6 @@ static const char *DEFAULT_MAIN_CONFIG = "/etc/smerp.conf";
 static const char *DEFAULT_USER_CONFIG = "~/smerp.conf";
 static const char *DEFAULT_LOCAL_CONFIG = "./smerp.conf";
 
-_SMERP::LogBackend	logBack;
 
 int _SMERP_posixMain( int argc, char* argv[] )
 {
@@ -118,7 +117,7 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		_SMERP::ApplicationConfiguration config( cmdLineCfg, cfgFileCfg);
 
 // now here we know where to log to on stderr
-		logBack.setConsoleLevel( config.stderrLogLevel );
+		_SMERP::LogBackend::instance().setConsoleLevel( config.stderrLogLevel );
 
 // Check the configuration
 		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::CHECK_CONFIG )	{
@@ -167,16 +166,16 @@ int _SMERP_posixMain( int argc, char* argv[] )
 
 			// daemonize, lose process group, terminal output, etc.
 			if( daemon( 0, 0 ) ) {
-				std::cerr << "Going to daemon mode failed" << std::endl;
+				std::cerr << "Daemonizing server failed" << std::endl;
 				return _SMERP::ErrorCodes::FAILURE;
 			}
 
 			// now here we lost constrol over the console, we should
 			// create a temporary logger which at least tells what's
 			// going on in the syslog
-			logBack.setSyslogLevel( config.syslogLogLevel );
-			logBack.setSyslogFacility( config.syslogFacility );
-			logBack.setSyslogIdent( config.syslogIdent );
+			_SMERP::LogBackend::instance().setSyslogLevel( config.syslogLogLevel );
+			_SMERP::LogBackend::instance().setSyslogFacility( config.syslogFacility );
+			_SMERP::LogBackend::instance().setSyslogIdent( config.syslogIdent );
 
 			// if we are root we can drop privileges now
 			struct group *groupent;
@@ -210,8 +209,8 @@ int _SMERP_posixMain( int argc, char* argv[] )
 
 			// Create the final logger based on the configuration
 			// file logger only here to get the right permissions
-			logBack.setLogfileLevel( config.logFileLogLevel );
-			logBack.setLogfileName( config.logFile );
+			_SMERP::LogBackend::instance().setLogfileLevel( config.logFileLogLevel );
+			_SMERP::LogBackend::instance().setLogfileName( config.logFile );
 		}
 
 		// Block all signals for background thread.
@@ -223,8 +222,8 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		LOG_NOTICE << "Starting server";
 
 		// Run server in background thread(s).
-		_SMERP::echoServer	echo;
-		_SMERP::Network::server s( config.address, config.SSLaddress, echo,
+		_SMERP::ServerHandler	handler;
+		_SMERP::Network::server s( config.address, config.SSLaddress, handler,
 					   config.threads, config.maxConnections );
 		boost::thread t( boost::bind( &_SMERP::Network::server::run, &s ));
 

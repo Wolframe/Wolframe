@@ -2,4 +2,6 @@ This is the README.
 It should say more about the project but we'll postpone that till we find a suitable name.
 Sorry ;)
 
-March 21, 2010 - MBa - I've created the branch for my part.
+The GitHub repository was created on Feb 11, 2010. Maybe we shoul remember the date :)
+
+Dec 20, 2010: A singleton exists now, but it is not a nicely defined singleton. Will fix it really soon now.

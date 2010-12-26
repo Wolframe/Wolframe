@@ -34,16 +34,16 @@ namespace pecho {
       Private* data;
 	};
 
+} // namespace pecho
 
-	/// The server handler container
-	class Server : public Network::ServerHandler
+/// The server handler container
+	class ServerHandler::ServerHandlerImpl
 	{
 	public:
 		Network::connectionHandler* newConnection( const Network::LocalTCPendpoint& local );
 		Network::connectionHandler* newSSLconnection( const Network::LocalSSLendpoint& local );
 	};
 
-} // namespace pecho
 } // namespace _SMERP
 
 #endif // _SMERP_XMLSELECT_HANDLER_HPP_INCLUDED
