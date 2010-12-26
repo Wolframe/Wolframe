@@ -239,24 +239,28 @@ struct Connection::Private
       unsigned int size() const    {return pos;};
       const char* c_str()          {buf[pos]=0; return buf;}; 
    };
-
+   typedef protocol::CmdBuffer CmdBuffer;
+   
    //* all state variables of this processor
    //1. automaton
    Automaton atm;
    Processor* proc;
    //2. states
-   State state;                               //< state of the processor
+   State state;                   //< state of the processor
    const char* error;
    //3. buffers and context
-   protocol::Parser::Context protocolState;   //< context (sub state) for partly parsed protocol commands
-   Buffer buffer;                             //< context (sub state) for partly parsed input lines 
-   Input input;                               //< buffer for READ network messages 
-   Output output;                             //< buffer for WRITE network messages
+   CmdBuffer cmdBuffer;           //< context (sub state) for partly parsed protocol commands
+   Buffer buffer;                 //< context (sub state) for partly parsed input lines 
+   Input input;                   //< buffer for READ network messages 
+   Output output;                 //< buffer for WRITE network messages
    //3. Iterators
-   ProtocolIterator itr;                      //< iterator to scan protocol commands
+   ProtocolIterator itr;          //< iterator to scan protocol commands
    ContentIterator citr;
-   Processor::iterator src;                   //< iterator to scan content terminated with (CR)LF dor (CR)LF
-   Processor::iterator end;                   //< end of content content terminated with (CR)LF dor (CR)LF
+   Processor::iterator src;       //< iterator to scan content terminated with (CR)LF dor (CR)LF
+   Processor::iterator end;       //< end of content content terminated with (CR)LF dor (CR)LF
+
+   //* the parser of the protocol 
+   typedef protocol::CmdParser<CmdBuffer> ProtocolParser;
 
    //* helper methods for I/O
    //helper function to send a line message with CRLF termination as C string
@@ -381,9 +385,9 @@ struct Connection::Private
                     static const char* cmd[5] = {"","caps","select","quit",0};
                     //... the empty command is for an empty line for not bothering the client with obscure error messages.
                     //    the next state should read one character for sure otherwise it may result in an endless loop
-                    static const protocol::Parser parser(cmd);
+                    static const ProtocolParser parser(cmd);
                     
-                    switch (parser.getCommand( itr, protocolState))
+                    switch (parser.getCommand( itr, cmdBuffer))
                     {             
                        case empty:
                        {
@@ -417,7 +421,7 @@ struct Connection::Private
                 {
                     //this state is for reading until the end of the line. there is no buffering below,
                     //so we have to the next line somehow:
-                    protocol::Parser::getLine( itr, buffer);
+                    ProtocolParser::getLine( itr, buffer);
                     itr++; //< consume the end of line for not getting into an endless loop
 
                     if (buffer.size() > 0)
@@ -440,7 +444,7 @@ struct Connection::Private
                     //read the rest of the line and reject more arguments than expected. 
                     //go on with processing, if this is clear. do not cosnsume the first end of line because it could be
                     //the first character of the EOF sequence.
-                    protocol::Parser::getLine( itr, buffer);
+                    ProtocolParser::getLine( itr, buffer);
                     if (buffer.size() > 0)
                     {
                        state = Init;
@@ -488,7 +492,7 @@ struct Connection::Private
                 case HandleError:
                 {
                     //in the error case, start again after complaining (Operation::WRITE sent in previous state):
-                    protocol::Parser::getLine( itr, buffer);  //parse the rest of the line to clean the input for the next command
+                    ProtocolParser::getLine( itr, buffer);  //parse the rest of the line to clean the input for the next command
                     state = Init;
                     continue;
                 }

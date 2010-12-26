@@ -16,11 +16,10 @@ private:
    Iterator& src() const                  {return *src_;};
    enum State {SRC,CR,CR_LF,CR_LF_DOT,CR_LF_DOT_CR,CR_LF_DOT_CR_LF};
    State state;
-   unsigned int nn;
    
 public:
-   TextIterator()                         :state(SRC),nn(0) {};
-   TextIterator( Iterator* p_src)         :src_(p_src),state(SRC),nn(0) {};
+   TextIterator()                         :state(SRC) {};
+   TextIterator( Iterator* p_src)         :src_(p_src),state(SRC) {};
 
    //return the current character
    //  or a '\r' for the '.' after EOL
@@ -53,7 +52,7 @@ public:
                state = CR_LF;
             }
          }
-         ++src();++nn;
+         ++src();
       }
       else if (state == CR)
       {
@@ -70,7 +69,7 @@ public:
          {
             state = SRC;
          }
-         ++src();++nn;
+         ++src();
       }
       else if (state == CR_LF)
       {
@@ -91,7 +90,7 @@ public:
          {
             state = SRC;
          }
-         ++src();++nn;
+         ++src();
       }
       else if (state == CR_LF_DOT)
       {
@@ -108,7 +107,7 @@ public:
          {
             state = SRC;
          }
-         ++src();++nn;
+         ++src();
       }
       else if (state == CR_LF_DOT_CR)
       {

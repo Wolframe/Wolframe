@@ -27,6 +27,36 @@ public:
    const char* c_str()          {buf[pos]=0; return buf;}; 
 };
 
+//buffer for the currently parsed command. 
+struct CmdBuffer
+{
+   typedef long long ValueType;    //< stores the command name with a maximum of 10 characters (6 bit per character = case insensitive alpha or digit)
+   unsigned int pos;               //< current position
+   ValueType value;
+   enum 
+   {
+      MaxCommandLen=(sizeof(ValueType)/6)
+   };
+   
+   CmdBuffer()                     :pos(0),value(0) {};
+   CmdBuffer( const CmdBuffer& o)  :pos(o.pos),value(o.value) {}; 
+   void init()                     {pos=0;value=0;};
+  
+   //feed context with the next input character (case insensitive)
+   void push_back( char ch)
+   {
+      if (pos >= MaxCommandLen) {init(); return;}
+      if (ch >= 'a' && ch <= 'z') {value = (value << 6) | (ch-'a'); return;} 
+      if (ch >= 'A' && ch <= 'Z') {value = (value << 6) | (ch-'A'); return;}
+      if (ch >= '0' && ch <= '9') {value = (value << 6) | (ch+26-'0'); return;}
+      init();
+   };
+   
+   unsigned int size() const {return pos;};
+   operator ValueType() const {return value;};
+   ValueType operator*() const {return value;};
+};
+
 
 //* buffer for multi argument parsing (fixed array of null terminated byte character strings)
 // beside splitting the input by blanks it parses escaping and quoted strings:
