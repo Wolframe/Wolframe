@@ -8,8 +8,6 @@
 ./src/server.cpp
 ./src/logLevel.cpp
 ./src/getPassword.cpp
-./src/logger.cpp
-./src/logSyslogFacility.cpp
 ./src/smerpHandler.cpp
 ./src/winMain.cpp
 ./src/smerpd.cpp
@@ -117,3 +115,5 @@ examples/lua/README
 examples/lua/README
 examples/lua/luavs.bat
 include/singleton.hpp
+src/logBackend.cpp
+src/logBackend.hpp

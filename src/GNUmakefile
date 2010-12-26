@@ -38,7 +38,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	commandLine.o \
 	logLevel.o \
 	logSyslogFacility.o \
-	logger.o \
+	logBackend.o \
 	configFile.o \
 	appConfig.o \
 	acceptor.o \
