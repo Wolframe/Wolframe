@@ -167,7 +167,7 @@ int _SMERP_posixMain( int argc, char* argv[] )
 
 			// daemonize, lose process group, terminal output, etc.
 			if( daemon( 0, 0 ) ) {
-				std::cerr << "Going to daemon mode failed" << std::endl;
+				std::cerr << "Daemonizing server failed" << std::endl;
 				return _SMERP::ErrorCodes::FAILURE;
 			}
 

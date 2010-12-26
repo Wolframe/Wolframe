@@ -116,4 +116,4 @@ examples/lua/appConfig.cpp
 examples/lua/README
 examples/lua/README
 examples/lua/luavs.bat
-src/singleton.hpp
+include/singleton.hpp
