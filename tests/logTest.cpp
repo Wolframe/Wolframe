@@ -4,9 +4,9 @@
 
 #include "logger.hpp"
 
-_SMERP::LogBackend logBack;
-
 int main( void ) {
+	_SMERP::LogBackend& logBack = _SMERP::LogBackend::instance( );
+
 	logBack.setConsoleLevel( _SMERP::LogLevel::LOGLEVEL_DATA );
 	logBack.setLogfileLevel( _SMERP::LogLevel::LOGLEVEL_DATA );
 	logBack.setLogfileName( "logTest.log" );

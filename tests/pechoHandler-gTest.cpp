@@ -10,7 +10,7 @@
 #include <stdlib.h>
 
 using namespace _SMERP;
-LogBackend logBack;
+LogBackend& logBack = _SMERP::LogBackend::instance( );
 
 const char* getRandomAsciiString()
 {

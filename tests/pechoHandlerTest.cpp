@@ -7,7 +7,7 @@
 
 using namespace _SMERP;
 
-LogBackend logBack;
+LogBackend& logBack = _SMERP::LogBackend::instance( );
 
 int main( int, const char**)
 {
