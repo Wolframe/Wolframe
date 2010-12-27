@@ -46,7 +46,7 @@ public:
       char ch;
       if (buf.size() == 0) skipSpaces( src);
       
-      while ((ch=*src) != '\n')
+      while ((ch=*src) != '\n' && ch != '\0')
       {
          if (ch == '\r') {++src; continue;}
          if (ch <= ' ') {buf.push_back(' '); ++src; continue;}

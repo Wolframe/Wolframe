@@ -74,10 +74,11 @@ private:
    unsigned int buf[ Size];
    State state;
    Buffer content;
+   
    void openArg()                      {if (pos<Size) buf[pos++]=content.size();};
    
    public:
-   CArgBuffer()                        :pos(0){buf[0]=0;};
+   CArgBuffer()                        :pos(0),state(Empty) {buf[0]=0;};
    void init()                         {pos=0;buf[0]=0;content.init();};
    void push_back( char ch)
    {

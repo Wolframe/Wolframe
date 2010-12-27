@@ -30,7 +30,7 @@ namespace test
       char* itr;
       StringInput( const StringInput& o) :itr(o.itr) {};
       StringInput( char* p_itr) :itr(p_itr) {};
-      int get() {return *itr++;};
+      int get() {ch = *itr++; return (ch)?ch:EOF};
    };
    struct StringOutput
    {
