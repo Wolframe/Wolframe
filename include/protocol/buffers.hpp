@@ -1,6 +1,8 @@
 #ifndef _SMERP_PROTOCOL_BUFFERS_HPP_INCLUDED
 #define _SMERP_PROTOCOL_BUFFERS_HPP_INCLUDED
 
+#include <boost/cstdint.hpp>
+
 namespace _SMERP {
 namespace protocol {
 
@@ -30,7 +32,7 @@ public:
 //buffer for the currently parsed command. 
 struct CmdBuffer
 {
-   typedef long long ValueType;    //< stores the command name with a maximum of 10 characters (6 bit per character = case insensitive alpha or digit)
+   typedef int_least64_t ValueType;    //< stores the command name with a maximum of 10 characters (6 bit per character = case insensitive alpha or digit)
    unsigned int pos;               //< current position
    ValueType value;
    enum 
