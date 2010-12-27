@@ -12,7 +12,7 @@ LogBackend& logBack = _SMERP::LogBackend::instance( );
 int main( int, const char**)
 {
    Network::LocalTCPendpoint ep( "127.0.0.1", 12345);
-   pecho::Connection connection( ep);
+   pecho::Connection connection( ep, 8, 8);
    try
    {
       return test::runTestIO( stdin, stdout, connection);

@@ -99,8 +99,8 @@ public:
       char ch;
       while ((ch=*src) > 32)
       {
-         ++src;
          buf.push_back( ch);
+         ++src;
       }
       if (*buf == -1)
       {

@@ -105,7 +105,7 @@ struct Connection::Private
    };
 
    //* interface
-   Private()   :state(Init),mode(Ident),input(MemBlockSize),output(MemBlockSize)
+   Private( unsigned int inputBufferSize, unsigned int outputBufferSize)   :state(Init),mode(Ident),input(inputBufferSize),output(outputBufferSize)
    {
       itr = input.begin();
       src = &itr;
@@ -302,15 +302,15 @@ struct Connection::Private
 };
 
 
-Connection::Connection( const Network::LocalTCPendpoint& local)
+Connection::Connection( const Network::LocalTCPendpoint& local, unsigned int inputBufferSize, unsigned int outputBufferSize)
 {
-   data = new Private();
+   data = new Private( inputBufferSize, outputBufferSize);
    LOG_TRACE << "Created connection handler for " << local.toString();
 }
 
 Connection::Connection( const Network::LocalSSLendpoint& local)
 {
-   data = new Private();
+   data = new Private(8,8);
    LOG_TRACE << "Created connection handler (SSL) for " << local.toString();
 }
 
