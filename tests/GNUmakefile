@@ -58,7 +58,8 @@ TEST_CPP_BINS += \
 	version-gTest$(EXE) \
 	counter-gTest$(EXE) \
 	pool-gTest$(EXE) \
-	pechoHandler-gTest$(EXE)
+	pechoHandler-gTest$(EXE) \
+	protocolArgumentParsing-gTest$(EXE)
 endif
 
 include $(TOPDIR)/makefiles/gmake/sub.mk

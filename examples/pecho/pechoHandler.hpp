@@ -16,7 +16,7 @@ namespace pecho {
 	public:
       typedef Network::NetworkOperation Operation;
 
-      Connection( const Network::LocalTCPendpoint& local );
+      Connection( const Network::LocalTCPendpoint& local, unsigned int inputBufferSize=128, unsigned int outputBufferSize=128);
 		Connection( const Network::LocalSSLendpoint& local );
 		~Connection();
 
@@ -28,7 +28,6 @@ namespace pecho {
       virtual void* parseInput( const void *begin, std::size_t bytesTransferred );
 
    public:
-      enum {MemBlockSize=8};
       struct Private;
 	private:
       Private* data;

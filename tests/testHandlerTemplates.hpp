@@ -11,40 +11,36 @@ namespace _SMERP
 {
 namespace test
 {
-   template<typename Input>
-   int getc( Input&){char a[sizeof(Input)!=0]; return 0;}//not defined!
-   
-   template<>
-   int getc( char*& in)
+   struct FileInput
    {
-      return *in++;
-   }
-
-   template<>
-   int getc( FILE*& in)
+      FILE* file;
+      FileInput( const FileInput& o) :file(o.file) {};
+      FileInput( FILE* p_file) :file(p_file) {};
+      int get() {return getc(file);};
+   };
+   struct FileOutput
    {
-      return ::getc( in);
-   }
-
-   template<typename Output>
-   void putc( char, Output*){char a[sizeof(Output)!=0];}//not defined!
-
-   template<>
-   void putc( char ch, std::string* out)
+      FILE* file;
+      FileOutput( const FileOutput& o) :file(o.file) {};
+      FileOutput( FILE* p_file) :file(p_file) {};
+      void put( char ch) {putc(ch,file);};
+   };
+   struct StringInput
    {
-      out->push_back( ch);
-   }
-
-   template<>
-   void putc( char ch, FILE* out)
+      char* itr;
+      StringInput( const StringInput& o) :itr(o.itr) {};
+      StringInput( char* p_itr) :itr(p_itr) {};
+      int get() { int ch = *itr++; return (ch)?ch:EOF;};
+   };
+   struct StringOutput
    {
-      ::putc( ch, out);
-   }
-
-   //template for a test of a connection handler using FILE I/O
-   //@return 0, if ok, some errorcode as main would else
+      std::string* buf;
+      StringOutput( const StringOutput& o) :buf(o.buf) {};
+      StringOutput( std::string* p_buf) :buf(p_buf) {};
+      void put( char ch) {buf->push_back(ch);};
+   };
    template<typename Input, typename Output, class Connection>
-   int runTestIO( Input*& in, Output* out, Connection& connection)
+   int runTestIO_( Input in, Output out, Connection& connection)
    {
       for (;;)
       {
@@ -59,7 +55,7 @@ namespace test
                std::size_t ii,size = netop.size();
                for (ii=0; ii<size; ii++)
                {
-                  int ch = getc( in);
+                  int ch = in.get();
                   if (ch == EOF) break;
                   data[ ii] = ch;
                }
@@ -74,7 +70,7 @@ namespace test
                //fprintf( stderr, "network operation is WRITE '%.8s'[%u]\n", data, size); 
                for (ii=0; ii<size; ii++)
                {
-                  putc( data[ ii], out);
+                  out.put( data[ ii]);
                }
             }
             break;
@@ -85,6 +81,21 @@ namespace test
          }
       }
       return 1;      
+   }
+   
+   template<class Connection>
+   int runTestIO( char* input, std::string* output, Connection& connection)
+   {
+      StringInput in(input);
+      StringOutput out(output);
+      return runTestIO_( in, out, connection);
+   }
+   template<class Connection>
+   int runTestIO( FILE* input, FILE* output, Connection& connection)
+   {
+      FileInput in(input);
+      FileOutput out(output);
+      return runTestIO_( in, out, connection);
    }
 }}//namespace _SMERP::test
 #endif
