@@ -21,7 +21,7 @@ struct MemBlock
    
    MemBlock( unsigned int p_size) :ptr(0),size(p_size),filled(0),lastblock(false)
    {
-      ptr = (unsigned char*)new unsigned char[ size];
+      ptr = new unsigned char[ size];
    };
    ~MemBlock()
    {

@@ -14,10 +14,42 @@ struct TestDescription
    const char* in;
    const char* out;
 };
-static const TestDescription testDescription[20] =
+static const TestDescription testDescription[40] =
 {
+   {" bla","bla"},
+   {" bla ","bla"},
+   {"  bla ","bla"},
    {"bla","bla"},
    {"bla ","bla"},
+   {"b a","b#a"},
+   {"b  a","b#a"},
+   {"b\ta","b#a"},
+   {"b\t\ta","b#a"},
+   {"b  acd","b#acd"},
+   {"b  acd e","b#acd#e"},
+   {"b  acd   e","b#acd#e"},
+   {"b  acd   e  ","b#acd#e"},
+   {"b'la'","bla"},
+   {"b'l'","bl"},
+   {"b''","b"},
+   {"b 'la'","b#la"},
+   {"b 'l'","b#l"},
+   {"b ''","b#"},
+   {"b 'la","b#la"},
+   {"b 'l","b#l"},
+   {"b '","b#"},
+   {"b 'la''e'","b#lae"},
+   {"b 'l''e'","b#le"},
+   {"b '''e'","b#e"},
+   {"b 'la' 'e'","b#la#e"},
+   {"b 'l' 'e'","b#l#e"},
+   {"b '' 'e'","b##e"},
+   {"b 'l a'","b#l a"},
+   {"b 'l '","b#l "},
+   {"b ' '","b# "},
+   {"bl\\a","bla"},
+   {"bl\\'a ","bl'a"},
+   {"b\\ a","b a"},
    {0,0}
 };
 
