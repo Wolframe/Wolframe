@@ -58,6 +58,8 @@
     <addaction name="actionAbout"/>
     <addaction name="separator"/>
     <addaction name="actionAboutQt"/>
+    <addaction name="separator"/>
+    <addaction name="actionDebugTerminal"/>
    </widget>
    <widget class="QMenu" name="menuThemes">
     <property name="title">
@@ -118,6 +120,17 @@
   <action name="actionAboutQt">
    <property name="text">
     <string>About &amp;Qt</string>
+   </property>
+  </action>
+  <action name="actionDebugTerminal">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Debug Terminal</string>
+   </property>
+   <property name="iconText">
+    <string>Debug Terminal</string>
    </property>
   </action>
  </widget>
