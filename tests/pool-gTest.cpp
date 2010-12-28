@@ -18,7 +18,7 @@
 class testObject	{
 public:
 	testObject()		{ threads = 0, uses = 0; }
-	void doSomething()	{ threads++, uses++; usleep( 100 ); threads--; }
+	void doSomething()	{ threads++, uses++;     boost::this_thread::sleep( boost::posix_time::milliseconds( 100 ) ); threads--; }
 	bool unused()		{ return threads == 0; }
 	unsigned long used()	{ return uses; }
 private:
