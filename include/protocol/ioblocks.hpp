@@ -134,6 +134,7 @@ public:
    };
 
    //forward the output buffer cursor
+   //TODO rename function
    bool shift( unsigned int nn)
    {
       if (mem.filled+nn >= mem.size) return false;
