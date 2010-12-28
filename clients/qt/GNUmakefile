@@ -24,7 +24,9 @@ OBJS = \
 	MainWindow.o \
 	AbstractFormLoader.o \
 	moc_AbstractFormLoader.o \
-	FileFormLoader.o
+	FileFormLoader.o \
+	DebugTerminal.o \
+	moc_DebugTerminal.o
 
 CPP_BINS = \
 	qtclient$(EXE)
@@ -35,6 +37,9 @@ local_all:
 
 moc_MainWindow.cpp: MainWindow.hpp
 	$(QT_DIR)/bin/moc -I. MainWindow.hpp -o moc_MainWindow.cpp
+
+moc_DebugTerminal.cpp: DebugTerminal.hpp
+	$(QT_DIR)/bin/moc -I. DebugTerminal.hpp -o moc_DebugTerminal.cpp
 
 moc_AbstractFormLoader.cpp: AbstractFormLoader.hpp
 	$(QT_DIR)/bin/moc -I. AbstractFormLoader.hpp -o moc_AbstractFormLoader.cpp

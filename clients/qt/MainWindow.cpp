@@ -21,12 +21,16 @@ MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ), m_ui( 0 ), m_fo
 MainWindow::~MainWindow( )
 {
 	delete m_formLoader;
+	delete m_debugTerminal;
 }
 
 void MainWindow::initialize( )
 {
 // load default theme
 	loadTheme( QString( QLatin1String( "windows" ) ) );
+
+// create debuging terminal
+	m_debugTerminal = new DebugTerminal( this );
 }
 
 void MainWindow::populateThemesMenu( )
@@ -86,6 +90,9 @@ void MainWindow::loadTheme( QString theme )
 
 	QAction *actionAboutQt = qFindChild<QAction *>( m_ui, "actionAboutQt" );
 	QObject::connect( actionAboutQt, SIGNAL( triggered( ) ), this, SLOT( on_actionAboutQt_triggered( ) ) );
+
+	QAction *actionDebugTerminal = qFindChild<QAction *>( m_ui, "actionDebugTerminal" );
+	QObject::connect( actionDebugTerminal, SIGNAL( triggered( bool ) ), this, SLOT( on_actionDebugTerminal_triggered( bool ) ) ); 
 
 // copy over the location of the old window to the new one
 // also copy over the current form, don't destroy the old ui,
@@ -169,8 +176,8 @@ void MainWindow::formLoaded( QString name, QByteArray xml )
 	buf.close( );
 
 // add it to the main window, disable old form
-	QVBoxLayout *layout = qFindChild<QVBoxLayout *>( m_ui, "mainAreaLayout" );
-	layout->addWidget( m_form );
+	QVBoxLayout *l = qFindChild<QVBoxLayout *>( m_ui, "mainAreaLayout" );
+	l->addWidget( m_form );
 
 	if( oldForm ) {
 		m_form->move( oldForm->pos( ) );
@@ -208,6 +215,14 @@ void MainWindow::on_actionAbout_triggered( )
 void MainWindow::on_actionAboutQt_triggered( )
 {
 	QMessageBox::aboutQt( m_ui, tr( "qtclient" ) );
+}
+
+void MainWindow::on_actionDebugTerminal_triggered( bool checked )
+{
+	if( checked )
+		m_debugTerminal->show( );
+	else
+		m_debugTerminal->hide( );
 }
 
 } // namespace QtClient

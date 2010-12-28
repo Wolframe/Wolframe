@@ -8,6 +8,7 @@
 #include <QWidget>
 
 #include "FileFormLoader.hpp"
+#include "DebugTerminal.hpp"
 
 namespace _SMERP {
 	namespace QtClient {
@@ -26,6 +27,7 @@ namespace _SMERP {
 		QString m_currentTheme;		// the name of the currently selected theme
 		QString m_currentForm;		// the name of the form currently visible
 		FileFormLoader *m_formLoader;	// a simple form loader for testing (for now)
+		DebugTerminal *m_debugTerminal;	// protocol debug terminal (interactive)
 
 		void initialize( );
 		void populateThemesMenu( );
@@ -41,6 +43,7 @@ namespace _SMERP {
 		void on_actionExit_triggered( );
 		void on_actionAbout_triggered( );
 		void on_actionAboutQt_triggered( );
+		void on_actionDebugTerminal_triggered( bool checked );
 	};
 } // namespace QtClient
 } // namespace _SMERP
