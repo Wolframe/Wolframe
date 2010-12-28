@@ -20,11 +20,11 @@ namespace xmlselect {
 		Connection( const Network::LocalSSLendpoint& local );
 		~Connection();
 
-		void setPeer( const Network::RemoteTCPendpoint& remote );
-		void setPeer( const Network::RemoteSSLendpoint& remote );
+      virtual void setPeer( const Network::RemoteTCPendpoint& remote );
+      virtual void setPeer( const Network::RemoteSSLendpoint& remote );
 
 		/// Handle a request and produce a reply.
-		Operation nextOperation();
+      virtual Operation nextOperation();
       virtual void* parseInput( const void *begin, std::size_t bytesTransferred );
 
    public:

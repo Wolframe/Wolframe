@@ -85,13 +85,15 @@ private:
       switch (state)
       {
          case EndToken:
-            if (ch == ' ')
+            switch (ch)
             {
-               content.push_back(0); 
-               state = Empty;
-               break;
+               case '\'': state = SQContent; break;
+               case '\"': state = DQContent; break;
+               case '\\': state = ContentEsc; break;
+               case ' ': content.push_back(0); state = Empty; break;
+               default: state = Content; content.push_back(ch); break;
             }
-            //no break here!
+            break;
             
          case Empty:
             switch (ch)
