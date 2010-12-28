@@ -32,8 +32,16 @@ namespace _SMERP	{
 					return obj;
 				}
 				else	{
-					while( available_.empty() )
-						cond_.wait( lock );
+					if ( timeout_ == 0 )	{
+						while( available_.empty() )
+							cond_.wait( lock );
+					}
+					else {
+						boost::system_time absTime = boost::get_system_time() + boost::posix_time::seconds( timeout_ );
+						while( available_.empty() )
+							if ( ! cond_.timed_wait( lock, absTime ))
+								return NULL;
+					}
 				}
 			}
 			return NULL;

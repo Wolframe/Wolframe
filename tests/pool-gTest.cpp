@@ -34,8 +34,8 @@ protected:
 	// You can remove any or all of the following functions if its body is empty.
 	ObjectPoolFixture()	{
 		srand((unsigned)time(0));
-		poolSize = (int)( rand() % 256 );
 		noThreads = (int)( rand() % 256 );
+		poolSize = (int)( rand() % 128 );
 		times = (unsigned long)( rand() % 100000 );
 	}
 
@@ -89,7 +89,31 @@ public:
 
 
 // Tests the ObjectPool get & release
-TEST_F( ObjectPoolFixture, doSomething )	{
+TEST_F( ObjectPoolFixture, noTimeout )	{
+	for ( unsigned long i = 0; i < poolSize; i++ )	{
+		ASSERT_EQ( tstObjs[i]->used(), 0 );
+	}
+
+	for ( int i = 0; i < noThreads; i++ )   {
+		boost::thread* thread = new boost::thread( &ObjectPoolFixture::testThread, &objPool, times );
+		threads.push_back( thread );
+	}
+	for ( int i = 0; i < noThreads; i++ )   {
+		threads[i]->join();
+		delete threads[i];
+	}
+
+	unsigned long used = 0;
+	for ( unsigned long i = 0; i < poolSize; i++ )	{
+		ASSERT_TRUE( tstObjs[i]->unused() );
+		used += tstObjs[i]->used();
+	}
+
+	ASSERT_EQ( used, noThreads * times );
+}
+
+TEST_F( ObjectPoolFixture, Timeout )	{
+	objPool.timeout( 1 );
 	for ( unsigned long i = 0; i < poolSize; i++ )	{
 		ASSERT_EQ( tstObjs[i]->used(), 0 );
 	}

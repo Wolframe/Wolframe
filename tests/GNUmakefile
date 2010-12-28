@@ -80,6 +80,7 @@ local_all:
 local_clean:
 	-rm -f $(TEST_CPP_BINS)
 	-rm -f *.o
+	-rm -f logTest.log
 
 local_distclean:
 
