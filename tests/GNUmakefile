@@ -57,6 +57,7 @@ ifdef WITH_GTEST
 TEST_CPP_BINS += \
 	version-gTest$(EXE) \
 	counter-gTest$(EXE) \
+	pool-gTest$(EXE) \
 	pechoHandler-gTest$(EXE)
 endif
 
@@ -92,6 +93,8 @@ ifdef WITH_GTEST
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./version-gTest
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./counter-gTest
+	@echo
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./pool-gTest
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./pechoHandler-gTest
 endif

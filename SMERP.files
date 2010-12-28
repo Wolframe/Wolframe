@@ -117,3 +117,7 @@ examples/lua/luavs.bat
 include/singleton.hpp
 src/logBackend.cpp
 src/logBackend.hpp
+include/database.hpp
+include/README
+include/objectPool.hpp
+tests/pool-gTest.cpp

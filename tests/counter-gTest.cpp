@@ -12,8 +12,6 @@
 #include "atomicCounter.hpp"
 #include <gtest/gtest.h>
 
-#define	MAX_STRING	128
-
 
 _SMERP::AtomicCounter< unsigned long >	ulCounter0;
 _SMERP::AtomicCounter< int >		iCounter0;
