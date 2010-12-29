@@ -53,10 +53,18 @@ local_install:
 	$(INSTALL) -d -m 755 $(bindir)
 	$(INSTALL) -m 644 $(CPP_BINS) $(bindir)
 
+FORMS = \
+	forms/form1.ui \
+	forms/form2.ui
+
+THEMES = \
+	themes/phone/MainWindow.ui \
+	themes/windows/MainWindow.ui
+
 local_test:
+	@echo "Testing validity of themes.."
+	@for i in $(THEMES); do xmllint --noout --schema qt-ui-4.7.xsd $$i; done
 	@echo "Testing validity of forms.."
-	@xmllint --noout --schema qt-ui-4.7.xsd forms/form1.ui
-	@xmllint --noout --schema qt-ui-4.7.xsd forms/form2.ui
+	@for i in $(FORMS); do xmllint --noout --schema qt-ui-4.7.xsd $$i; done
 	@echo "Testing Qt client.."
 	@./qtclient
-		
