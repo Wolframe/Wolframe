@@ -32,7 +32,7 @@ public:
 //buffer for the currently parsed command. 
 struct CmdBuffer
 {
-   typedef int_least64_t ValueType;    //< stores the command name with a maximum of 10 characters (6 bit per character = case insensitive alpha or digit)
+   typedef boost::int_least64_t ValueType;    //< stores the command name with a maximum of 10 characters (6 bit per character = case insensitive alpha or digit)
    unsigned int pos;               //< current position
    ValueType value;
    enum 

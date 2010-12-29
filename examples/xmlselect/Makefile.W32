@@ -36,9 +36,8 @@ INCLUDE_LIBS = \
 OBJS = \
 	appConfig.obj \
 	configFile.obj \
-	commandLine.obj \
 	xmlselectHandler.obj \
-	winMain.obj
+	$(TOPDIR)\src\winMain.obj
 
 CPP_BINS = \
 	smerp-xmlselect.exe
