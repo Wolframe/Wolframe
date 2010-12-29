@@ -7,6 +7,7 @@
 
 #include <QWidget>
 #include <QTextEdit>
+#include <QLineEdit>
 
 namespace _SMERP {
 	namespace QtClient {
@@ -16,7 +17,8 @@ namespace _SMERP {
 	Q_OBJECT
 
 	private:
-		QTextEdit *m_textEdit;
+		QTextEdit *m_output;
+		QLineEdit *m_input;
 
 	public:
 		DebugTerminal( QWidget *_parent = 0 );
@@ -26,6 +28,7 @@ namespace _SMERP {
 		void initialize( );
 
 	private Q_SLOTS:
+		void returnPressed( );
 	};
 } // namespace QtClient
 } // namespace _SMERP
