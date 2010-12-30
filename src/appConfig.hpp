@@ -6,7 +6,11 @@
 #define _APP_CONFIG_HPP_INCLUDED
 
 #include "logLevel.hpp"
+
+#if !defined( _WIN32 )
 #include "logSyslogFacility.hpp"
+#endif	// !defined( _WIN32 )
+
 #include "serverEndpoint.hpp"
 
 #include <string>
@@ -14,6 +18,13 @@
 #include <list>
 
 namespace _SMERP {
+	class ConfigurationBase	{
+	public:
+		virtual bool check();
+		virtual bool test();
+		virtual void print( std::ostream& os ) const;
+	};
+
 	namespace Network {
 
 		struct ServerConfig	{
@@ -83,14 +94,17 @@ namespace _SMERP {
 		bool			logToFile;
 		std::string		logFile;
 		LogLevel::Level		logFileLogLevel;
+#if !defined( _WIN32 )
 		bool			logToSyslog;
 		SyslogFacility::Facility syslogFacility;
 		LogLevel::Level		syslogLogLevel;
 		std::string		syslogIdent;
+#else
 		bool			logToEventlog;
 		std::string		eventlogLogName;
 		std::string		eventlogSource;
 		LogLevel::Level		eventlogLogLevel;
+#endif	// !defined( _WIN32 )
 
 	private:
 		std::string		errMsg_;

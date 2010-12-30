@@ -121,3 +121,4 @@ include/database.hpp
 include/README
 include/objectPool.hpp
 tests/pool-gTest.cpp
+include/ErrorCodes.hpp

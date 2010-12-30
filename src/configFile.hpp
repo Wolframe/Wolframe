@@ -46,14 +46,17 @@ namespace _SMERP	{
 		bool		logToFile;
 		std::string	logFile;
 		LogLevel::Level	logFileLogLevel;
-		bool		logToSyslog;
+#if !defined( _WIN32 )
+		bool			logToSyslog;
 		SyslogFacility::Facility syslogFacility;
-		LogLevel::Level	syslogLogLevel;
-		std::string	syslogIdent;
-		bool		logToEventlog;
-		std::string	eventlogLogName;
-		std::string	eventlogSource;
-		LogLevel::Level	eventlogLogLevel;
+		LogLevel::Level		syslogLogLevel;
+		std::string		syslogIdent;
+#else
+		bool			logToEventlog;
+		std::string		eventlogLogName;
+		std::string		eventlogSource;
+		LogLevel::Level		eventlogLogLevel;
+#endif	// !defined( _WIN32 )
 
 	private:
 		std::string	errMsg_;

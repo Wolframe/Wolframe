@@ -259,7 +259,7 @@ namespace _SMERP {
 		}
 		else
 			logToFile = false;
-
+#if !defined( _WIN32 )
 		if ( pt.get_child_optional( "logging.syslog" ))	{
 			logToSyslog = true;
 			std::string str = pt.get<std::string>( "logging.syslog.facility", "LOCAL4" );
@@ -289,7 +289,9 @@ namespace _SMERP {
 		}
 		else
 			logToSyslog = false;
+#endif	// !defined( _WIN32 )
 
+#if defined( _WIN32 )
 		if ( pt.get_child_optional( "logging.eventlog" )) {
 			logToEventlog = true;
 			eventlogLogName = pt.get<std::string>( "logging.eventlog.name", "smerpd" );
@@ -308,6 +310,7 @@ namespace _SMERP {
 		}
 		else
 			logToEventlog = false;
+#endif	// defined( _WIN32 )
 	}
 		catch( std::exception& e)	{
 			errMsg_ = e.what();
