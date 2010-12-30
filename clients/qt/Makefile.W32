@@ -26,7 +26,9 @@ OBJS = \
 	MainWindow.obj \
 	AbstractFormLoader.obj \
 	moc_AbstractFormLoader.obj \
-	FileFormLoader.obj
+	FileFormLoader.obj \
+	DebugTerminal.obj \
+	moc_DebugTerminal.obj
 
 CPP_BINS = \
 	qtclient.exe
@@ -43,6 +45,9 @@ qtclient.exe: qtclient.obj $(OBJS)
 
 moc_MainWindow.cpp: MainWindow.hpp
 	$(QT_DIR)\bin\moc.exe -I. MainWindow.hpp -o moc_MainWindow.cpp
+
+moc_DebugTerminal.cpp: DebugTerminal.hpp
+	$(QT_DIR)\bin\moc -I. DebugTerminal.hpp -o moc_DebugTerminal.cpp
 
 moc_AbstractFormLoader.cpp: AbstractFormLoader.hpp
 	$(QT_DIR)\bin\moc.exe -I. AbstractFormLoader.hpp -o moc_AbstractFormLoader.cpp

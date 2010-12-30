@@ -36,16 +36,15 @@ INCLUDE_LIBS = \
 OBJS = \
 	appConfig.obj \
 	configFile.obj \
-	commandLine.obj \
 	pechoHandler.obj \
-	winMain.obj
+	$(TOPDIR)\src\winMain.obj
 
 CPP_BINS = \
-	smerp-echo.exe
+	smerp-pecho.exe
 
 all: $(OBJS) $(CPP_BINS)
 
-smerp-echo.exe: smerp-echo.obj $(TOPDIR)\src\smerp.lib
+smerp-pecho.exe: smerp-pecho.obj $(TOPDIR)\src\smerp.lib
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
