@@ -34,6 +34,10 @@ namespace _SMERP {
 
 	private Q_SLOTS:
 		void returnPressed( );
+
+	Q_SIGNALS:
+			void formListLoaded( );
+			void formLoaded( QString form_name, QByteArray form );
 	};
 } // namespace QtClient
 } // namespace _SMERP
