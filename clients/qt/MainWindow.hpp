@@ -19,7 +19,7 @@ namespace _SMERP {
 
 	public:
 		MainWindow( QWidget *_parent = 0 );
-		~MainWindow( );
+		virtual ~MainWindow( );
 	
 	private:
 		QWidget *m_ui;			// main window from theme
