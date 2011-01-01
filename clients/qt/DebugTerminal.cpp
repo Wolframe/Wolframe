@@ -6,6 +6,7 @@
 
 #include <QBoxLayout>
 #include <QTextStream>
+#include <QCompleter>
 
 namespace _SMERP {
 	namespace QtClient {
@@ -20,13 +21,21 @@ void DebugTerminal::initialize( )
 	setWindowTitle( tr( "Debug Terminal" ) );
 
 	QBoxLayout *l = new QBoxLayout( QBoxLayout::TopToBottom, this );
-	m_output = new QTextEdit;
+	m_output = new QTextEdit( this );
 	m_output->setReadOnly( true );
 	l->addWidget( m_output );
 
-	m_input = new HistoryLineEdit;
+	m_input = new HistoryLineEdit( this );
 	l->addWidget( m_input );
 	m_input->setFocus( );
+
+	QStringList wordList;
+	wordList << "connect" << "quit" << "caps" << "help";
+
+	QCompleter *completer = new QCompleter( wordList, this );
+	completer->setCaseSensitivity( Qt::CaseInsensitive );
+	completer->setCompletionMode( QCompleter::InlineCompletion );
+	m_input->setCompleter( completer );
 
 	QObject::connect( m_input, SIGNAL( lineEntered( QString ) ), this, SLOT( lineEntered( QString ) ) );
 }
