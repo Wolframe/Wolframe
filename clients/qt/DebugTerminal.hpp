@@ -36,8 +36,7 @@ namespace _SMERP {
 		void returnPressed( );
 
 	Q_SIGNALS:
-			void formListLoaded( );
-			void formLoaded( QString form_name, QByteArray form );
+		void lineEntered( QString line );
 	};
 } // namespace QtClient
 } // namespace _SMERP

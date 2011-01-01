@@ -49,6 +49,7 @@ void DebugTerminal::returnPressed( )
 {
 	m_output->append( m_input->text( ) );
 	m_inputHistory->append( m_input->text( ) );
+	lineEntered.emit( m_input->text( ) );
 	m_input->clear( );
 }
 
