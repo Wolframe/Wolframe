@@ -7,6 +7,7 @@
 
 #include <QLineEdit>
 #include <QStringList>
+#include <QKeyEvent>
 
 namespace _SMERP {
 	namespace QtClient {
@@ -18,6 +19,7 @@ namespace _SMERP {
 	private:
 		QStringList *m_history;
 		QString m_historyFilename;
+		int m_pos;
 
 	private:
 		void initialize( );
@@ -33,6 +35,9 @@ namespace _SMERP {
 
 	private slots:
 		void returnPressed( );
+
+	protected:
+		virtual void keyPressEvent( QKeyEvent *event );
 	};
 } // namespace QtClient
 } // namespace _SMERP

@@ -132,6 +132,9 @@
    <property name="iconText">
     <string>Debug Terminal</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
+   </property>
   </action>
  </widget>
  <resources/>
