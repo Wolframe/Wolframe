@@ -26,7 +26,9 @@ OBJS = \
 	moc_AbstractFormLoader.o \
 	FileFormLoader.o \
 	DebugTerminal.o \
-	moc_DebugTerminal.o
+	moc_DebugTerminal.o \
+	HistoryLineEdit.o \
+	moc_HistoryLineEdit.o
 
 CPP_BINS = \
 	qtclient$(EXE)
@@ -37,6 +39,9 @@ local_all:
 
 moc_MainWindow.cpp: MainWindow.hpp
 	$(QT_DIR)/bin/moc -I. MainWindow.hpp -o moc_MainWindow.cpp
+
+moc_HistoryLineEdit.cpp: HistoryLineEdit.hpp
+	$(QT_DIR)/bin/moc -I. HistoryLineEdit.hpp -o moc_HistoryLineEdit.cpp
 
 moc_DebugTerminal.cpp: DebugTerminal.hpp
 	$(QT_DIR)/bin/moc -I. DebugTerminal.hpp -o moc_DebugTerminal.cpp
