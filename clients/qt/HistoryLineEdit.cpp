@@ -14,12 +14,14 @@ HistoryLineEdit::HistoryLineEdit( QWidget *_parent ) : QLineEdit( _parent ),
 	m_historyFilename( ".history" ), m_pos( 0 )
 {
 	initialize( );
-	readHistory( );
 }
 
 void HistoryLineEdit::initialize( )
 {
 	m_history = new QStringList;
+
+	readHistory( );
+	m_pos = m_history->size( ) - 1;
 
 	QObject::connect( this, SIGNAL( returnPressed( ) ), this, SLOT( returnPressed( ) ) );
 }
@@ -68,13 +70,17 @@ void HistoryLineEdit::saveHistory( )
 void HistoryLineEdit::keyPressEvent( QKeyEvent *_event )
 {
 	if( _event->key( ) == Qt::Key_Up ) {
-		m_pos--;
-		if( m_pos < 0 ) m_pos = 0;
-		setText( m_history->at( m_pos ) );
+		if( m_history->size( ) > 0 ) {
+			m_pos--;
+			if( m_pos < 0 ) m_pos = 0;
+			setText( m_history->at( m_pos ) );
+		}
 	} else if( _event->key( ) == Qt::Key_Down ) {
-		m_pos++;
-		if( m_pos >= m_history->size( ) ) m_pos = m_history->size( ) - 1;
-		setText( m_history->at( m_pos ) );
+		if( m_history->size( ) > 0 ) {
+			m_pos++;
+			if( m_pos >= m_history->size( ) ) m_pos = m_history->size( ) - 1;
+			setText( m_history->at( m_pos ) );
+		}
 	} else {
 		QLineEdit::keyPressEvent( _event );
 	}
