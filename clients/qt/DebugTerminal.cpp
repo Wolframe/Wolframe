@@ -5,6 +5,7 @@
 #include "DebugTerminal.hpp"
 
 #include <QBoxLayout>
+#include <QLabel>
 #include <QTextStream>
 #include <QCompleter>
 
@@ -21,6 +22,10 @@ void DebugTerminal::initialize( )
 	setWindowTitle( tr( "Debug Terminal" ) );
 
 	QBoxLayout *l = new QBoxLayout( QBoxLayout::TopToBottom, this );
+
+	QLabel *label = new QLabel( tr( "Ctrl-D enables/disables the protocol debug window" ), this );
+	l->addWidget( label );
+
 	m_output = new QTextEdit( this );
 	m_output->setReadOnly( true );
 	l->addWidget( m_output );
