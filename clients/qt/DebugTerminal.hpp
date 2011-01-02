@@ -35,6 +35,8 @@ namespace _SMERP {
 
 	private slots:
 		void lineEntered( QString line );
+		void networkError( QString error );
+
 	};
 } // namespace QtClient
 } // namespace _SMERP

@@ -47,6 +47,9 @@ namespace _SMERP {
 
 	private slots:
 		void error( QAbstractSocket::SocketError );
+
+	signals:
+		void error( QString error );
 	};
 } // namespace QtClient
 } // namespace _SMERP

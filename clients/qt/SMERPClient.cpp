@@ -51,8 +51,7 @@ void SMERPClient::disconnect( )
 
 void SMERPClient::error( QAbstractSocket::SocketError _error )
 {
-	QMessageBox::information( m_parent, tr( "Connection Failed" ),
-		tr( "Error: %1." ).arg(	m_socket->errorString( ) ) );
+	emit error( m_socket->errorString( ) );
 }
 
 } // namespace QtClient

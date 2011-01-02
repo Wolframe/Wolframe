@@ -45,6 +45,8 @@ void DebugTerminal::initialize( )
 	m_input->setCompleter( completer );
 
 	QObject::connect( m_input, SIGNAL( lineEntered( QString ) ), this, SLOT( lineEntered( QString ) ) );
+
+	QObject::connect( m_smerpClient, SIGNAL( error( QString ) ), this, SLOT( networkError( QString ) ) );
 }
 
 DebugTerminal::~DebugTerminal( )
@@ -75,6 +77,11 @@ bool DebugTerminal::focusNextPrevChild( bool next )
 		return false;
 	}
 	return true;
+}
+
+void DebugTerminal::networkError( QString error )
+{
+	m_output->append( error );
 }
 
 } // namespace QtClient
