@@ -27,6 +27,9 @@ namespace _SMERP {
 	private:
 		void initialize( );
 
+	protected:
+		virtual bool focusNextPrevChild( bool next );
+
 	private slots:
 		void lineEntered( QString line );
 	};

@@ -28,7 +28,9 @@ OBJS = \
 	DebugTerminal.o \
 	moc_DebugTerminal.o \
 	HistoryLineEdit.o \
-	moc_HistoryLineEdit.o
+	moc_HistoryLineEdit.o \
+	SMERPClient.o \
+	moc_SMERPClient.o
 
 CPP_BINS = \
 	qtclient$(EXE)
@@ -48,6 +50,9 @@ moc_DebugTerminal.cpp: DebugTerminal.hpp
 
 moc_AbstractFormLoader.cpp: AbstractFormLoader.hpp
 	$(QT_DIR)/bin/moc -I. AbstractFormLoader.hpp -o moc_AbstractFormLoader.cpp
+
+moc_SMERPClient.cpp: SMERPClient.hpp
+	$(QT_DIR)/bin/moc -I. SMERPClient.hpp -o moc_SMERPClient.cpp
 
 local_clean:
 	@-rm -f moc_*.cpp 
