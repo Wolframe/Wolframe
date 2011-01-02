@@ -19,7 +19,9 @@ namespace _SMERP {
 	public:
 		enum State {
 			Disconnected,
-			Connected
+			AboutToConnect,
+			Connected,
+			AboutToDisconnect
 		};
 	
 
@@ -47,9 +49,13 @@ namespace _SMERP {
 
 	private slots:
 		void error( QAbstractSocket::SocketError );
+		void dataAvailable( );
+		void connected( );
+		void disconnected( );
 
 	signals:
 		void error( QString error );
+		void lineReceived( QString line );
 	};
 } // namespace QtClient
 } // namespace _SMERP

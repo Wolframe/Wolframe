@@ -29,7 +29,7 @@ namespace _SMERP {
 	public:
 		HistoryLineEdit( QWidget *_parent = 0 );
 		virtual ~HistoryLineEdit( );
-		void complete( void );
+		void complete( );
 
 	signals:
 		void lineEntered( QString line );

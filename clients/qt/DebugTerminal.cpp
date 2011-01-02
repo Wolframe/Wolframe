@@ -8,6 +8,7 @@
 #include <QLabel>
 #include <QTextStream>
 #include <QCompleter>
+#include <QColor>
 
 namespace _SMERP {
 	namespace QtClient {
@@ -47,6 +48,7 @@ void DebugTerminal::initialize( )
 	QObject::connect( m_input, SIGNAL( lineEntered( QString ) ), this, SLOT( lineEntered( QString ) ) );
 
 	QObject::connect( m_smerpClient, SIGNAL( error( QString ) ), this, SLOT( networkError( QString ) ) );
+	QObject::connect( m_smerpClient, SIGNAL( lineReceived( QString ) ), this, SLOT( lineReceived( QString ) ) );
 }
 
 DebugTerminal::~DebugTerminal( )
@@ -81,7 +83,16 @@ bool DebugTerminal::focusNextPrevChild( bool next )
 
 void DebugTerminal::networkError( QString error )
 {
+	m_output->setTextColor( QColor( "red" ) );
 	m_output->append( error );
+	m_output->setTextColor( QColor( "black" ) );
+}
+
+void DebugTerminal::lineReceived( QString line )
+{
+	m_output->setTextColor( QColor( "blue" ) );
+	m_output->append( line );
+	m_output->setTextColor( QColor( "black" ) );
 }
 
 } // namespace QtClient
