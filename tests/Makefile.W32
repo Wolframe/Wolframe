@@ -60,6 +60,8 @@ TEST_CPP_BINS = \
 	$(TEST_CPP_BINS) \
 	version-gTest.exe \
 	counter-gTest.exe
+#  lot's of error, doens't compile on Windows!
+#	pool-gTest.exe
 # currently don't compile because of ref-to-ptr trickery in test template
 #	pechoHandler-gTest$(EXE)
 !ENDIF
@@ -78,6 +80,7 @@ xmlselectHandlerTest.exe: xmlselectHandlerTest.obj $(TOPDIR)\src\xmlselectHandle
 !IFDEF WITH_GTEST
 version-gTest.exe: version-gTest.obj $(TOPDIR)\src\smerp.lib
 counter-gTest.exe: counter-gTest.obj $(TOPDIR)\src\smerp.lib
+pool-gTest.exe: pool-gTest.obj $(TOPDIR)\src\smerp.lib
 !ENDIF
 
 local_all:
@@ -90,15 +93,16 @@ local_distclean:
 local_test:
 	@-echo @echo off > test.bat
 	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
-	@-echo echo Testing version... >> test.bat
-	@-echo versionTest >> test.bat
-	@-echo echo Testing counter.. >> test.bat
-	@-echo counterTest >> test.bat
+#	@-echo echo Testing version... >> test.bat
+#	@-echo versionTest >> test.bat
+#	@-echo echo Testing counter.. >> test.bat
+#	@-echo counterTest >> test.bat
+	@-echo echo Testing logging... >> test.bat
+	@-echo logTest >> test.bat
 !IFDEF WITH_GTEST
-	@-echo Testing with Google test framework... >> test.bat
+	@-echo echo Testing with Google test framework... >> test.bat
 	@-echo version-gTest >> test.bat
 	@-echo counter-gTest >> test.bat
+#	@-echo pool-gTest >> test.bat
 !ENDIF
-	@-echo echo Testing boost log... >> test.bat
-	@-echo logTest >> test.bat
 	@-test.bat
