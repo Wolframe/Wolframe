@@ -100,7 +100,7 @@ local_test:
 	@-echo echo Testing logging... >> test.bat
 	@-echo logTest >> test.bat
 !IFDEF WITH_GTEST
-	@-echo Testing with Google test framework... >> test.bat
+	@-echo echo Testing with Google test framework... >> test.bat
 	@-echo version-gTest >> test.bat
 	@-echo counter-gTest >> test.bat
 #	@-echo pool-gTest >> test.bat
