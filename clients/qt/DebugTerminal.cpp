@@ -12,7 +12,9 @@
 namespace _SMERP {
 	namespace QtClient {
 
-DebugTerminal::DebugTerminal( QWidget *_parent ) : QWidget( _parent, Qt::Tool | Qt::WindowStaysOnTopHint | Qt::WindowTitleHint )
+DebugTerminal::DebugTerminal( SMERPClient *_smerpClient, QWidget *_parent ) :
+	QWidget( _parent, Qt::Tool | Qt::WindowStaysOnTopHint | Qt::WindowTitleHint ),
+	m_smerpClient( _smerpClient )
 {
 	initialize( );
 }
@@ -54,6 +56,16 @@ DebugTerminal::~DebugTerminal( )
 void DebugTerminal::lineEntered( QString line )
 {
 	m_output->append( line );
+
+	if( line.toLower( ).startsWith( "connect" ) ) {
+		QString host = "localhost";
+		unsigned int port = 7661;
+		m_smerpClient->setHost( host );
+		m_smerpClient->setPort( port );
+		m_smerpClient->connect( );
+	} else if( line.toLower( ).startsWith( "quit" ) ) {
+		m_smerpClient->disconnect( );
+	}
 }
 
 bool DebugTerminal::focusNextPrevChild( bool next )
