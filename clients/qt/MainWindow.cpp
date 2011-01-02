@@ -219,10 +219,12 @@ void MainWindow::on_actionAboutQt_triggered( )
 
 void MainWindow::on_actionDebugTerminal_triggered( bool checked )
 {
-	if( checked )
+	if( checked ) {
 		m_debugTerminal->show( );
-	else
+		m_debugTerminal->activateWindow( );
+	} else {
 		m_debugTerminal->hide( );
+	}
 }
 
 } // namespace QtClient
