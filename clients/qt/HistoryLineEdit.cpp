@@ -86,5 +86,10 @@ void HistoryLineEdit::keyPressEvent( QKeyEvent *_event )
 	}
 }
 
+void HistoryLineEdit::complete( )
+{
+	end( false );
+}
+
 } // namespace QtClient
 } // namespace _SMERP

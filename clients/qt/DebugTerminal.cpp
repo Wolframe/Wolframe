@@ -54,7 +54,7 @@ void DebugTerminal::lineEntered( QString line )
 bool DebugTerminal::focusNextPrevChild( bool next )
 {
 	if( next ) {
-		m_input->end( false );
+		m_input->complete( );
 		return false;
 	}
 	return true;
