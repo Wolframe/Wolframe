@@ -7,7 +7,9 @@
 
 #include <QWidget>
 #include <QTextEdit>
+
 #include "HistoryLineEdit.hpp"
+#include "SMERPClient.hpp"
 
 namespace _SMERP {
 	namespace QtClient {
@@ -19,9 +21,10 @@ namespace _SMERP {
 	private:
 		QTextEdit *m_output;
 		HistoryLineEdit *m_input;
+		SMERPClient *m_smerpClient;
 
 	public:
-		DebugTerminal( QWidget *_parent = 0 );
+		DebugTerminal( SMERPClient *_smerpClient, QWidget *_parent = 0 );
 		virtual ~DebugTerminal( );
 	
 	private:
@@ -32,6 +35,9 @@ namespace _SMERP {
 
 	private slots:
 		void lineEntered( QString line );
+		void networkError( QString error );
+		void lineReceived( QString line );
+
 	};
 } // namespace QtClient
 } // namespace _SMERP

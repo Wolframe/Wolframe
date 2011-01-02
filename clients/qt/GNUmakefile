@@ -11,13 +11,14 @@ INCLUDE_DIRS = \
 	-I$(QT_DIR)/include \
 	-I$(QT_DIR)/include/QtCore \
 	-I$(QT_DIR)/include/QtGui \
-	-I$(QT_DIR)/include/QtUiTools
+	-I$(QT_DIR)/include/QtUiTools \
+	-I$(QT_DIR)/include/QtNetwork
 
 INCLUDE_LDFLAGS = \
 	-L$(QT_DIR)/lib
 
 INCLUDE_LIBS = \
-	-lQtCore -lQtGui -lQtUiTools
+	-lQtCore -lQtGui -lQtUiTools -lQtNetwork
 	
 OBJS = \
 	moc_MainWindow.o \

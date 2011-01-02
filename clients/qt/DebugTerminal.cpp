@@ -8,11 +8,14 @@
 #include <QLabel>
 #include <QTextStream>
 #include <QCompleter>
+#include <QColor>
 
 namespace _SMERP {
 	namespace QtClient {
 
-DebugTerminal::DebugTerminal( QWidget *_parent ) : QWidget( _parent, Qt::Tool | Qt::WindowStaysOnTopHint | Qt::WindowTitleHint )
+DebugTerminal::DebugTerminal( SMERPClient *_smerpClient, QWidget *_parent ) :
+	QWidget( _parent, Qt::Tool | Qt::WindowStaysOnTopHint | Qt::WindowTitleHint ),
+	m_smerpClient( _smerpClient )
 {
 	initialize( );
 }
@@ -43,6 +46,9 @@ void DebugTerminal::initialize( )
 	m_input->setCompleter( completer );
 
 	QObject::connect( m_input, SIGNAL( lineEntered( QString ) ), this, SLOT( lineEntered( QString ) ) );
+
+	QObject::connect( m_smerpClient, SIGNAL( error( QString ) ), this, SLOT( networkError( QString ) ) );
+	QObject::connect( m_smerpClient, SIGNAL( lineReceived( QString ) ), this, SLOT( lineReceived( QString ) ) );
 }
 
 DebugTerminal::~DebugTerminal( )
@@ -54,6 +60,16 @@ DebugTerminal::~DebugTerminal( )
 void DebugTerminal::lineEntered( QString line )
 {
 	m_output->append( line );
+
+	if( line.toLower( ).startsWith( "connect" ) ) {
+		QString host = "localhost";
+		unsigned int port = 7661;
+		m_smerpClient->setHost( host );
+		m_smerpClient->setPort( port );
+		m_smerpClient->connect( );
+	} else if( line.toLower( ).startsWith( "quit" ) ) {
+		m_smerpClient->disconnect( );
+	}
 }
 
 bool DebugTerminal::focusNextPrevChild( bool next )
@@ -63,6 +79,20 @@ bool DebugTerminal::focusNextPrevChild( bool next )
 		return false;
 	}
 	return true;
+}
+
+void DebugTerminal::networkError( QString error )
+{
+	m_output->setTextColor( QColor( "red" ) );
+	m_output->append( error );
+	m_output->setTextColor( QColor( "black" ) );
+}
+
+void DebugTerminal::lineReceived( QString line )
+{
+	m_output->setTextColor( QColor( "blue" ) );
+	m_output->append( line );
+	m_output->setTextColor( QColor( "black" ) );
 }
 
 } // namespace QtClient
