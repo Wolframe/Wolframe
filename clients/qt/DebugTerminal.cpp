@@ -51,5 +51,14 @@ void DebugTerminal::lineEntered( QString line )
 	m_output->append( line );
 }
 
+bool DebugTerminal::focusNextPrevChild( bool next )
+{
+	if( next ) {
+		m_input->end( false );
+		return false;
+	}
+	return true;
+}
+
 } // namespace QtClient
 } // namespace _SMERP
