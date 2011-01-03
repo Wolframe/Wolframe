@@ -20,7 +20,7 @@ INCLUDE_LDFLAGS = \
 	$(QT_LDFLAGS)
 
 INCLUDE_LIBS = \
-	QtCore4.lib QtGui4.lib QtUiTools.lib QtNetwork.lib
+	QtCore4.lib QtGui4.lib QtUiTools.lib QtNetwork4.lib
 
 OBJS = \
 	moc_MainWindow.obj \
@@ -72,6 +72,7 @@ local_test:
 	@-echo @echo off > test.bat
 	@-echo copy $(QT_DIR)\bin\QtCore4.dll . >> test.bat
 	@-echo copy $(QT_DIR)\bin\QtGui4.dll . >> test.bat
+	@-echo copy $(QT_DIR)\bin\QtNetwork4.dll . >> test.bat
 	@-echo echo Testing Qt client... >> test.bat
 	@-echo qtclient.exe >> test.bat
 	@-test.bat
