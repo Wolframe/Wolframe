@@ -83,7 +83,18 @@ void SMERPClient::error( QAbstractSocket::SocketError _error SMERP_UNUSED )
 	switch( m_state ) {
 		case Disconnected:
 		case AboutToDisconnect:
-			emit error( m_socket->errorString( ) );
+			switch( _error ) {
+// connection closed by server as a reaction to QUIT command (should better be "client
+// goes first disconnection pattern" IMHO)
+				case QAbstractSocket::RemoteHostClosedError:
+					m_socket->close( );
+					m_state = Disconnected;
+					emit error( tr( "Connection closed by server." ) );
+					break;
+				
+				default:
+					emit error( m_socket->errorString( ) );
+			}
 			break;
 
 		case AboutToConnect:
@@ -94,10 +105,18 @@ void SMERPClient::error( QAbstractSocket::SocketError _error SMERP_UNUSED )
 			break;
 
 		case Connected:
-// TODO: depending on the error we must react here most likely, for now we are chicken
-			m_socket->close( );
-			m_state = Disconnected;
-			emit error( m_socket->errorString( ) );
+			switch( _error ) {
+// connection closed by server as a reaction to QUIT command (should better be "client
+// goes first disconnection pattern" IMHO)
+				case QAbstractSocket::RemoteHostClosedError:
+					m_socket->close( );
+					m_state = Disconnected;
+					emit error( tr( "Connection closed by server." ) );
+					break;
+
+				default:
+					emit error( m_socket->errorString( ) );
+			}
 			break;
 
 		default:
@@ -108,6 +127,10 @@ void SMERPClient::error( QAbstractSocket::SocketError _error SMERP_UNUSED )
 void SMERPClient::connected( )
 {
 	switch( m_state ) {
+		case Disconnected:
+			emit error( tr( "Got a connect Qt signal when not starting a new connection!" ) );
+			break;
+
 		case AboutToConnect:
 // yep, a connect signal was received
 			m_state = Connected;
@@ -121,10 +144,6 @@ void SMERPClient::connected( )
 			emit error( tr( "Got dconnected Qt signal when already disconnecting!" ) );
 			break;
 
-		case Disconnected:
-			emit error( tr( "Got a connect Qt signal when not starting a new connection!" ) );
-			break;
-
 		default:
 			emit error( tr( "ILLEGAL STATE %1 in connected!" ).arg( m_state ) );
 	}
@@ -133,14 +152,19 @@ void SMERPClient::connected( )
 void SMERPClient::disconnected( )
 {
 	switch( m_state ) {
+		case AboutToConnect:
 		case Disconnected:
-			emit error( tr( "Got a disconnected Qt signal when already in connected state!" ) );
+		case Connected:
+			emit error( tr( "Got a disconnected Qt signal when already in illegal state!" ) );
 			break;
 
-		case Connected:
+		case AboutToDisconnect:
 			m_socket->close( );
 			m_state = Disconnected;
 			break;
+
+		default:
+			emit error( tr( "ILLEGAL STATE %1 in disconnected!" ).arg( m_state ) );
 	}
 }
 
@@ -148,15 +172,21 @@ void SMERPClient::dataAvailable( )
 {
 	switch( m_state ) {
 		case Disconnected:
-			emit error( tr( "Invalid state, got data while disconnected?" ) );
+		case AboutToConnect:
+			emit error( tr( "Invalid state, got data while in state %1?" ).arg( m_state ) );
 			break;
 
+		case AboutToDisconnect:
 		case Connected:
 			if( m_socket->canReadLine( ) ) {
 				char buf[1024];
 				qint64 len = m_socket->readLine( buf, sizeof( buf ) );
 				emit lineReceived( QString( QByteArray( buf, len ) ) );
 			}
+			break;
+
+		default:
+			emit error( tr( "ILLEGAL STATE %1 in dataAvailable!" ).arg( m_state ) );
 	}
 }
 
