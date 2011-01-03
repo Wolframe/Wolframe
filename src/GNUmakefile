@@ -69,3 +69,7 @@ local_distclean:
 local_install:
 	$(INSTALL) -d -m 755 $(bindir)
 	$(INSTALL) -m 644 $(CPP_BINS) $(bindir)
+
+local_test:
+	@echo "Running the SMERP server..."
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./smerpd.exe -c smerp.conf -f

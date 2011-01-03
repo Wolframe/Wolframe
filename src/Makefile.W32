@@ -87,3 +87,9 @@ local_clean:
 local_distclean:
 
 local_test:
+	@-echo @echo off > test.bat
+	@-echo copy $(OPENSSL_DIR)\bin\libeay32.dll . >> test.bat
+	@-echo copy $(OPENSSL_DIR)\bin\ssleay32.dll . >> test.bat
+	@-echo echo Running the SMERP server... >> test.bat
+	@-echo smerpd.exe -c smerp.conf -d DATA >> test.bat
+	@-test.bat
