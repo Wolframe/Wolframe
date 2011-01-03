@@ -72,4 +72,4 @@ local_install:
 
 local_test:
 	@echo "Running the SMERP server..."
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./smerpd.exe -c smerp.conf -f
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./smerpd -c smerp.conf -f -d DATA

@@ -192,7 +192,7 @@ void SMERPClient::dataAvailable( )
 
 void SMERPClient::sendLine( QString line )
 {
-	m_socket->write( line.toAscii( ) );
+	m_socket->write( line.toAscii( ).append( "\n" ) );
 	m_socket->flush( );
 }
 
