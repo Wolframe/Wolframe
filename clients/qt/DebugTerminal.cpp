@@ -69,6 +69,14 @@ void DebugTerminal::lineEntered( QString line )
 		m_smerpClient->connect( );
 	} else if( line.toLower( ).startsWith( "quit" ) ) {
 		m_smerpClient->disconnect( );
+	} else if( line.toLower( ).startsWith( "help" ) ) {
+		m_output->append( "A very informative help page comes here :-)" );
+	} else if( line.toLower( ).startsWith( "caps" ) ) {
+		m_output->setTextColor( QColor( "blue" ) );
+		m_output->append( "OK QUIT CAPS" );
+		m_output->setTextColor( QColor( "black" ) );
+	} else {
+		m_smerpClient->sendLine( line );
 	}
 }
 

@@ -190,5 +190,11 @@ void SMERPClient::dataAvailable( )
 	}
 }
 
+void SMERPClient::sendLine( QString line )
+{
+	m_socket->write( line.toAscii( ) );
+	m_socket->flush( );
+}
+
 } // namespace QtClient
 } // namespace _SMERP

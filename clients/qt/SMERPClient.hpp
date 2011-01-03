@@ -38,6 +38,7 @@ namespace _SMERP {
 
 		void connect( );
 		void disconnect( );
+		void sendLine( QString line );
 
 		Q_PROPERTY( QString m_host READ host WRITE setHost )
 		QString host( ) const { return m_host; }
