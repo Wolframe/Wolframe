@@ -11,41 +11,41 @@
 namespace _SMERP	{
 
 	struct CfgFileConfig	{
-		std::string	file;
+		std::string		file;
 // daemon configuration
-		std::string	user;
-		std::string	group;
-		std::string	pidFile;
+		std::string		user;
+		std::string		group;
+		std::string		pidFile;
 
 // service configuration
-		std::string	serviceName;
-		std::string	serviceDisplayName;
-		std::string	serviceDescription;
+		std::string		serviceName;
+		std::string		serviceDisplayName;
+		std::string		serviceDescription;
 
 // server configuration
-		unsigned short	threads;
-		unsigned short	maxConnections;
+		unsigned short		threads;
+		unsigned short		maxConnections;
 // network configuration
 		std::vector<Network::ServerTCPendpoint> address;
 		std::vector<Network::ServerSSLendpoint> SSLaddress;
 
-		unsigned	idleTimeout;
-		unsigned	requestTimeout;
-		unsigned	answerTimeout;
-		unsigned	processTimeout;
+		unsigned		idleTimeout;
+		unsigned		requestTimeout;
+		unsigned		answerTimeout;
+		unsigned		processTimeout;
 
 // database configuration
-		std::string	dbHost;
-		unsigned short	dbPort;
-		std::string	dbName;
-		std::string	dbUser;
-		std::string	dbPassword;
+		std::string		dbHost;
+		unsigned short		dbPort;
+		std::string		dbName;
+		std::string		dbUser;
+		std::string		dbPassword;
 // logger configuration
-		bool		logToStderr;
-		LogLevel::Level	stderrLogLevel;
-		bool		logToFile;
-		std::string	logFile;
-		LogLevel::Level	logFileLogLevel;
+		bool			logToStderr;
+		LogLevel::Level		stderrLogLevel;
+		bool			logToFile;
+		std::string		logFile;
+		LogLevel::Level		logFileLogLevel;
 #if !defined( _WIN32 )
 		bool			logToSyslog;
 		SyslogFacility::Facility syslogFacility;
@@ -59,7 +59,7 @@ namespace _SMERP	{
 #endif	// !defined( _WIN32 )
 
 	private:
-		std::string	errMsg_;
+		std::string		errMsg_;
 
 	public:
 		CfgFileConfig();

@@ -122,3 +122,5 @@ include/README
 include/objectPool.hpp
 tests/pool-gTest.cpp
 include/ErrorCodes.hpp
+src/server.hpp
+include/processorConfig.hpp

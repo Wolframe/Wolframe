@@ -5,6 +5,7 @@
 #ifndef _LOG_BACKEND_HPP_INCLUDED
 #define _LOG_BACKEND_HPP_INCLUDED
 
+#include "appConfig.hpp"
 #include "logLevel.hpp"
 #include "logSyslogFacility.hpp"
 
@@ -19,6 +20,7 @@
 
 namespace _SMERP {
 
+	/// Logger backends
 	class ConsoleLogBackend
 	{
 	public:
