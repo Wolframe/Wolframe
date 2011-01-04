@@ -224,8 +224,7 @@ void MainWindow::on_actionAboutQt_triggered( )
 void MainWindow::on_actionDebugTerminal_triggered( bool checked )
 {
 	if( checked ) {
-		m_debugTerminal->show( );
-		m_debugTerminal->activateWindow( );
+		m_debugTerminal->bringToFront( );
 	} else {
 		m_debugTerminal->hide( );
 	}

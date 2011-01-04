@@ -7,7 +7,7 @@
 
 #include <QObject>
 #include <QWidget>
-#include <QtNetwork>
+#include <QtNetwork/QAbstractSocket>
 
 namespace _SMERP {
 	namespace QtClient {
@@ -28,8 +28,9 @@ namespace _SMERP {
 	private:
 		QString m_host;
 		unsigned short m_port;
+		bool m_secure;
 		State m_state;
-		QTcpSocket *m_socket;
+		QAbstractSocket *m_socket;
 		QWidget *m_parent;
 
 	public:
@@ -47,6 +48,10 @@ namespace _SMERP {
 		Q_PROPERTY( unsigned short m_port READ port WRITE setPort )
 		unsigned short port( ) const { return m_port; }
 		void setPort( unsigned short _port ) { m_port = _port; }
+		
+		Q_PROPERTY( bool m_secure READ secure WRITE setSecure )
+		bool secure( ) const { return m_secure; }
+		void setSecure( bool _secure ) { m_secure = _secure; }
 
 	private slots:
 		void error( QAbstractSocket::SocketError );

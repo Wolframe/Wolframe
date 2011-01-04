@@ -26,6 +26,7 @@ namespace _SMERP {
 	public:
 		DebugTerminal( SMERPClient *_smerpClient, QWidget *_parent = 0 );
 		virtual ~DebugTerminal( );
+		void bringToFront( );
 	
 	private:
 		void initialize( );
