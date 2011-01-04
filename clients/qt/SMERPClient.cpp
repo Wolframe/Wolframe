@@ -5,8 +5,9 @@
 #include "unused.h"
 #include "SMERPClient.hpp"
 
-#include <QMessageBox>
 #include <QByteArray>
+#include <QtNetwork/QSslSocket>
+#include <QtNetwork/QTcpSocket>
 
 namespace _SMERP {
 	namespace QtClient {
@@ -68,6 +69,10 @@ void SMERPClient::disconnect( )
 			emit error( tr( "Got disconnected Qt signal when about to build up a connection?!" ) );
 			break;
 
+		case AboutToDisconnect:
+			m_state = Disconnected;
+			break;
+
 		case Connected:
 			m_socket->write( QByteArray( "quit" ) );
 			m_state = AboutToDisconnect;
@@ -78,22 +83,19 @@ void SMERPClient::disconnect( )
 	}
 }
 
-void SMERPClient::error( QAbstractSocket::SocketError _error SMERP_UNUSED )
+void SMERPClient::error( QAbstractSocket::SocketError _error )
 {
 	switch( m_state ) {
 		case Disconnected:
 		case AboutToDisconnect:
-			switch( _error ) {
 // connection closed by server as a reaction to QUIT command (should better be "client
 // goes first disconnection pattern" IMHO)
-				case QAbstractSocket::RemoteHostClosedError:
-					m_socket->close( );
-					m_state = Disconnected;
-					emit error( tr( "Connection closed by server." ) );
-					break;
-				
-				default:
-					emit error( m_socket->errorString( ) );
+			if( _error == QAbstractSocket::RemoteHostClosedError ) {
+				m_socket->close( );
+				m_state = Disconnected;
+				emit error( tr( "Connection closed by server." ) );
+			} else {
+				emit error( m_socket->errorString( ) );
 			}
 			break;
 
@@ -105,17 +107,14 @@ void SMERPClient::error( QAbstractSocket::SocketError _error SMERP_UNUSED )
 			break;
 
 		case Connected:
-			switch( _error ) {
 // connection closed by server as a reaction to QUIT command (should better be "client
 // goes first disconnection pattern" IMHO)
-				case QAbstractSocket::RemoteHostClosedError:
-					m_socket->close( );
-					m_state = Disconnected;
-					emit error( tr( "Connection closed by server." ) );
-					break;
-
-				default:
-					emit error( m_socket->errorString( ) );
+			if( _error == QAbstractSocket::RemoteHostClosedError ) {
+				m_socket->close( );
+				m_state = Disconnected;
+				emit error( tr( "Connection closed by server." ) );
+			} else {
+				emit error( m_socket->errorString( ) );
 			}
 			break;
 

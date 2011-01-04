@@ -7,7 +7,7 @@
 
 #include <QObject>
 #include <QWidget>
-#include <QtNetwork>
+#include <QtNetwork/QAbstractSocket>
 
 namespace _SMERP {
 	namespace QtClient {
@@ -30,7 +30,7 @@ namespace _SMERP {
 		unsigned short m_port;
 		bool m_secure;
 		State m_state;
-		QTcpSocket *m_socket;
+		QAbstractSocket *m_socket;
 		QWidget *m_parent;
 
 	public:

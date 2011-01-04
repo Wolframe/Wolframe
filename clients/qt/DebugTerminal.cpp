@@ -74,7 +74,6 @@ void DebugTerminal::lineEntered( QString line )
 		line.toLower( ).startsWith( "sconnect" ) ) {
 		QRegExp rx( "^s?connect\\s+([^:]+):(\\d+)$", Qt::CaseInsensitive );
 		QStringList m;
-		int pos = 0;
 		if( rx.indexIn( line ) != -1 ) {
 			QString host = rx.cap( 1 );
 			unsigned short port = rx.cap( 2 ).toUShort( );
@@ -91,7 +90,6 @@ void DebugTerminal::lineEntered( QString line )
 		m_smerpClient->disconnect( );
 	} else if( line.toLower( ).startsWith( "help" ) ) {
 		m_output->setTextColor( QColor( "blue" ) );
-		m_output->append( "A very informative help page comes here :-)" );
 		m_output->append( "HELP - show this help page" );
 		m_output->append( "CONNECT host:port - connect to SMERP server (insecure)" );
 		m_output->append( "SCONNECT host:port - connect to SMERP server (secure)" );
