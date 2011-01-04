@@ -181,6 +181,7 @@ void SMERPClient::dataAvailable( )
 			if( m_socket->canReadLine( ) ) {
 				char buf[1024];
 				qint64 len = m_socket->readLine( buf, sizeof( buf ) );
+				if( buf[len-1] == '\n' ) buf[len-1] = '\0';
 				emit lineReceived( QString( QByteArray( buf, len ) ) );
 			}
 			break;
