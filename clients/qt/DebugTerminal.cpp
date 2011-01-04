@@ -9,12 +9,13 @@
 #include <QTextStream>
 #include <QCompleter>
 #include <QColor>
+#include <QRegExp>
 
 namespace _SMERP {
 	namespace QtClient {
 
 DebugTerminal::DebugTerminal( SMERPClient *_smerpClient, QWidget *_parent ) :
-	QWidget( _parent, Qt::Tool | Qt::WindowStaysOnTopHint | Qt::WindowTitleHint ),
+	QWidget( _parent, Qt::Tool | Qt::WindowTitleHint ),
 	m_smerpClient( _smerpClient )
 {
 	initialize( );
@@ -23,6 +24,7 @@ DebugTerminal::DebugTerminal( SMERPClient *_smerpClient, QWidget *_parent ) :
 void DebugTerminal::initialize( )
 {
 	setWindowTitle( tr( "Debug Terminal" ) );
+	setFixedSize( 640, 480 );
 
 	QBoxLayout *l = new QBoxLayout( QBoxLayout::TopToBottom, this );
 
@@ -38,7 +40,7 @@ void DebugTerminal::initialize( )
 	m_input->setFocus( );
 
 	QStringList wordList;
-	wordList << "connect" << "quit" << "caps" << "help";
+	wordList << "connect" << "sconnect" << "quit" << "caps" << "help";
 
 	QCompleter *completer = new QCompleter( wordList, this );
 	completer->setCaseSensitivity( Qt::CaseInsensitive );
@@ -57,20 +59,44 @@ DebugTerminal::~DebugTerminal( )
 	delete m_output;
 }
 
+void DebugTerminal::bringToFront( )
+{
+	show( );
+	activateWindow( );
+	m_input->setFocus( );
+}
+
 void DebugTerminal::lineEntered( QString line )
 {
 	m_output->append( line );
 
-	if( line.toLower( ).startsWith( "connect" ) ) {
-		QString host = "localhost";
-		unsigned int port = 7661;
-		m_smerpClient->setHost( host );
-		m_smerpClient->setPort( port );
-		m_smerpClient->connect( );
+	if( line.toLower( ).startsWith( "connect" ) ||
+		line.toLower( ).startsWith( "sconnect" ) ) {
+		QRegExp rx( "^s?connect\\s+([^:]+):(\\d+)$", Qt::CaseInsensitive );
+		QStringList m;
+		int pos = 0;
+		if( rx.indexIn( line ) != -1 ) {
+			QString host = rx.cap( 1 );
+			unsigned short port = rx.cap( 2 ).toUShort( );
+			m_smerpClient->setHost( host );
+			m_smerpClient->setPort( port );
+			m_smerpClient->setSecure( line.toLower( ).startsWith( "sconnect" ) );
+			m_smerpClient->connect( );
+		} else {
+			m_output->setTextColor( QColor( "red" ) );
+			m_output->append( "illegal connect parameters, expecting '(s)connect <host>:<port>'.." );
+			m_output->setTextColor( QColor( "black" ) );
+		}
 	} else if( line.toLower( ).startsWith( "quit" ) ) {
 		m_smerpClient->disconnect( );
 	} else if( line.toLower( ).startsWith( "help" ) ) {
+		m_output->setTextColor( QColor( "blue" ) );
 		m_output->append( "A very informative help page comes here :-)" );
+		m_output->append( "HELP - show this help page" );
+		m_output->append( "CONNECT host:port - connect to SMERP server (insecure)" );
+		m_output->append( "SCONNECT host:port - connect to SMERP server (secure)" );
+		m_output->append( "QUIT - terminate connection to SMERP server" );
+		m_output->setTextColor( QColor( "black" ) );
 	} else if( line.toLower( ).startsWith( "caps" ) ) {
 		m_output->setTextColor( QColor( "blue" ) );
 		m_output->append( "OK QUIT CAPS" );
