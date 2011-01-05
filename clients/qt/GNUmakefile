@@ -30,6 +30,9 @@ INCLUDE_CPPFLAGS += \
 INCLUDE_LIBS += \
 	$(OPENSSL_LIBS)
 
+MOC_FLAGS = \
+	-DWITH_SSL
+
 endif
 	
 OBJS = \
@@ -53,19 +56,19 @@ CPP_BINS = \
 local_all:
 
 moc_MainWindow.cpp: MainWindow.hpp
-	$(QT_DIR)/bin/moc -I. MainWindow.hpp -o moc_MainWindow.cpp
+	$(QT_DIR)/bin/moc $(MOC_FLAGS) -I. MainWindow.hpp -o moc_MainWindow.cpp
 
 moc_HistoryLineEdit.cpp: HistoryLineEdit.hpp
-	$(QT_DIR)/bin/moc -I. HistoryLineEdit.hpp -o moc_HistoryLineEdit.cpp
+	$(QT_DIR)/bin/moc $(MOC_FLAGS) -I. HistoryLineEdit.hpp -o moc_HistoryLineEdit.cpp
 
 moc_DebugTerminal.cpp: DebugTerminal.hpp
-	$(QT_DIR)/bin/moc -I. DebugTerminal.hpp -o moc_DebugTerminal.cpp
+	$(QT_DIR)/bin/moc $(MOC_FLAGS) -I. DebugTerminal.hpp -o moc_DebugTerminal.cpp
 
 moc_AbstractFormLoader.cpp: AbstractFormLoader.hpp
-	$(QT_DIR)/bin/moc -I. AbstractFormLoader.hpp -o moc_AbstractFormLoader.cpp
+	$(QT_DIR)/bin/moc $(MOC_FLAGS) -I. AbstractFormLoader.hpp -o moc_AbstractFormLoader.cpp
 
 moc_SMERPClient.cpp: SMERPClient.hpp
-	$(QT_DIR)/bin/moc -I. SMERPClient.hpp -o moc_SMERPClient.cpp
+	$(QT_DIR)/bin/moc $(MOC_FLAGS) -I. SMERPClient.hpp -o moc_SMERPClient.cpp
 
 local_clean:
 	@-rm -f moc_*.cpp 

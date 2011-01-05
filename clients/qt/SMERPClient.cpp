@@ -42,6 +42,9 @@ void SMERPClient::sslErrors( const QList<QSslError> &errors )
 {
 	foreach( const QSslError &e, errors )
 		emit error( e.errorString( ) );
+
+	// ignore for now
+	reinterpret_cast<QSslSocket *>( m_socket )->ignoreSslErrors( );
 }
 
 void SMERPClient::encrypted( )
