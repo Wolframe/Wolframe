@@ -2,7 +2,6 @@
 // SMERPClient.cpp
 //
 
-#include "unused.h"
 #include "SMERPClient.hpp"
 
 #include <QByteArray>
