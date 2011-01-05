@@ -32,6 +32,7 @@ OBJS = \
 	appConfig.o \
 	configFile.o \
 	xmlselectHandler.o \
+	xmlIterator.o \
 	$(TOPDIR)/src/posixMain.o
 
 CPP_BINS = \

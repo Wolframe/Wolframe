@@ -268,15 +268,18 @@ struct UTF8
 * control characters needed for XML scanner statemachine
 */
 enum ControlCharacter 
-{ 
+{
    Undef=0, EndOfText, EndOfLine, Cntrl, Space, Amp, Lt, Equal, Gt, Slash, Exclam, Questm, Sq, Dq, Osb, Csb, Any,
    NofControlCharacter=17
 };
-const char* controlCharacterName( ControlCharacter c)
+struct ControlCharacterM
 {
-   static const char* name[ NofControlCharacter] = {"Undef", "EndOfText", "EndOfLine", "Cntrl", "Space", "Amp", "Lt", "Equal", "Gt", "Slash", "Exclam", "Questm", "Sq", "Dq", "Osb", "Csb", "Any"};
-   return name[ (unsigned int)c];   
-}
+   static const char* name( ControlCharacter c)
+   {
+      static const char* name[ NofControlCharacter] = {"Undef", "EndOfText", "EndOfLine", "Cntrl", "Space", "Amp", "Lt", "Equal", "Gt", "Slash", "Exclam", "Questm", "Sq", "Dq", "Osb", "Csb", "Any"};
+      return name[ (unsigned int)c];
+   }
+};
 
 struct DefaultCharProd
 {
@@ -1689,14 +1692,14 @@ public:
       PathElement& operator ()( const char* name, const char* value) throw(exception)   {return doSelect( Attribute, name).doSelect( ThisAttributeValue, value);};
 
       //define maximum element index to push
-      PathElement& operator <= (int cnt)   throw(exception)                             {doCount((cnt>=0)?(cnt+1):-1);};
+      PathElement& operator <= (int cnt)   throw(exception)                             {return doCount((cnt>=0)?(cnt+1):-1); return *this;};
       //define maximum element count limit
-      PathElement& operator <(int cnt)   throw(exception)                               {doCount(cnt);};
+      PathElement& operator <(int cnt)   throw(exception)                               {return doCount(cnt);};
 
       //define minimum element index to push
-      PathElement& operator >=(int cnt)   throw(exception)                              {if (cnt>0) doStart(cnt-1);};
+      PathElement& operator >=(int cnt)   throw(exception)                              {if (cnt>0) return doStart(cnt-1); return *this;};
       //define minimum element count limit
-      PathElement& operator >(int cnt)   throw(exception)                               {doStart(cnt);};
+      PathElement& operator >(int cnt)   throw(exception)                               {return doStart(cnt);};
 
       //define element type to push
       PathElement& operator =(int type)  throw(exception)                               {return push( type);};

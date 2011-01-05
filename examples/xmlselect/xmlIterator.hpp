@@ -1,6 +1,6 @@
 #ifndef _SMERP_PROTOCOL_XML_ITERATOR_HPP_INCLUDED
 #define _SMERP_PROTOCOL_XML_ITERATOR_HPP_INCLUDED
-#include "protocol/ioblocks.hpp"
+#include "protocol.hpp"
 
 //@section xmlContentIterators
 //provides a uniform interface to 2 types of XML iterators of arbitrary source and 
@@ -14,10 +14,15 @@ namespace xml {
 class Automaton
 {
 public:
-   Automaton() {};
-   bool defineExpression( int type, const char* expression);
+   Automaton();
+   bool defineExpression( int type, const char* expression, int* errorPos=0);
+
+private:
+   struct Private;
+   Private* data;
 };
 
+/* TODO
 class Source
 {
 public:
@@ -36,6 +41,7 @@ private:
    struct Private;
    Private* data;
 };
+*/
 
 } // namespace xml
 } // namespace _SMERP
