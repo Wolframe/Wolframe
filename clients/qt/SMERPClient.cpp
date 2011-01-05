@@ -12,7 +12,8 @@ namespace _SMERP {
 
 SMERPClient::SMERPClient( QWidget *_parent ) :
 	m_state( Disconnected ),
-	m_parent( _parent )
+	m_parent( _parent ),
+	m_hasErrors( false )
 {
 #ifdef WITH_SSL
 	m_socket = new QSslSocket( this );
@@ -33,12 +34,20 @@ SMERPClient::SMERPClient( QWidget *_parent ) :
 		this, SLOT( sslErrors( const QList<QSslError> & ) ) );
 	QObject::connect( m_socket, SIGNAL( encrypted( ) ),
 		this, SLOT( encrypted( ) ) );
+	QObject::connect( m_socket, SIGNAL( peerVerifyError( const QSslError & ) ),
+		this, SLOT( peerVerifyError( const QSslError & ) ) );
+#endif
+
+#ifdef WITH_SSL
+	reinterpret_cast<QSslSocket *>( m_socket )->setLocalCertificate( "./client.crt" );
+	reinterpret_cast<QSslSocket *>( m_socket )->setPrivateKey( "./client.key" );
 #endif
 }
 
 #ifdef WITH_SSL
 void SMERPClient::sslErrors( const QList<QSslError> &errors )
 {
+	m_hasErrors = true;
 	foreach( const QSslError &e, errors )
 		emit error( e.errorString( ) );
 
@@ -46,9 +55,15 @@ void SMERPClient::sslErrors( const QList<QSslError> &errors )
 	reinterpret_cast<QSslSocket *>( m_socket )->ignoreSslErrors( );
 }
 
+void SMERPClient::peerVerifyError( const QSslError &e )
+{
+	m_hasErrors = true;
+	emit error( e.errorString( ) );
+}
+
 void SMERPClient::encrypted( )
 {
-	emit error( tr( "Channel is encrypted now." ) );
+	emit error( m_hasErrors ? tr( "Channel is encrypted, but there were errors on the way." ) : tr( "Channel is encrypted now." ) );
 }
 #endif
 
@@ -92,6 +107,8 @@ void SMERPClient::connect( )
 
 void SMERPClient::disconnect( )
 {
+	m_hasErrors = false;
+
 	switch( m_state ) {
 		case Disconnected:
 			emit error( tr( "Got disconnected Qt signal when already in disconnected state!" ) );

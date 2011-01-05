@@ -36,6 +36,7 @@ namespace _SMERP {
 		State m_state;
 		QAbstractSocket *m_socket;
 		QWidget *m_parent;
+		bool m_hasErrors;
 
 	public:
 		SMERPClient( QWidget *_parent = 0 );
@@ -64,6 +65,7 @@ namespace _SMERP {
 #ifdef WITH_SSL
 		void sslErrors( const QList<QSslError> &errors );
 		void encrypted( );
+		void peerVerifyError( const QSslError &e );
 #endif
 		void dataAvailable( );
 		void connected( );
