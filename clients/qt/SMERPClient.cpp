@@ -7,10 +7,6 @@
 
 #include <QByteArray>
 #include <QTcpSocket>
-#ifdef WITH_SSL
-#include <QSslSocket>
-#include <QList>
-#endif
 
 namespace _SMERP {
 	namespace QtClient {
@@ -36,8 +32,23 @@ SMERPClient::SMERPClient( QWidget *_parent ) :
 #ifdef WITH_SSL
 	QObject::connect( m_socket, SIGNAL( sslErrors( const QList<QSslError> & ) ),
 		this, SLOT( sslErrors( const QList<QSslError> & ) ) );
+	QObject::connect( m_socket, SIGNAL( encrypted( ) ),
+		this, SLOT( encrypted( ) ) );
 #endif
 }
+
+#ifdef WITH_SSL
+void SMERPClient::sslErrors( const QList<QSslError> &errors )
+{
+	foreach( const QSslError &e, errors )
+		emit error( e.errorString( ) );
+}
+
+void SMERPClient::encrypted( )
+{
+	emit error( tr( "Channel is encrypted now." ) );
+}
+#endif
 
 SMERPClient::~SMERPClient( )
 {
@@ -48,7 +59,15 @@ void SMERPClient::connect( )
 {
 	switch( m_state ) {
 		case Disconnected:
-			m_socket->connectToHost( m_host, m_port );
+			if( m_secure ) {
+#ifdef WITH_SSL
+				reinterpret_cast<QSslSocket *>( m_socket )->connectToHostEncrypted( m_host, m_port );
+#else
+				m_socket->connectToHost( m_host, m_port );
+#endif
+			} else {
+				m_socket->connectToHost( m_host, m_port );
+			}
 			m_state = AboutToConnect;
 			break;
 

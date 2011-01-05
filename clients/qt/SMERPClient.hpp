@@ -8,6 +8,10 @@
 #include <QObject>
 #include <QWidget>
 #include <QAbstractSocket>
+#ifdef WITH_SSL
+#include <QSslSocket>
+#include <QList>
+#endif
 
 namespace _SMERP {
 	namespace QtClient {
@@ -57,6 +61,10 @@ namespace _SMERP {
 
 	private slots:
 		void error( QAbstractSocket::SocketError );
+#ifdef WITH_SSL
+		void sslErrors( const QList<QSslError> &errors );
+		void encrypted( );
+#endif
 		void dataAvailable( );
 		void connected( );
 		void disconnected( );

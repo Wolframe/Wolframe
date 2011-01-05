@@ -38,6 +38,9 @@ INCLUDE_LDFLAGS = \
 INCLUDE_LIBS = \
 	$(INCLUDE_LIBS) $(OPENSSL_LIBS)
 
+MOC_FLAGS = \
+	-DWITH_SSL
+	
 !ENDIF
 
 OBJS = \
@@ -67,19 +70,19 @@ local_clean:
 qtclient.exe: qtclient.obj $(OBJS)
 
 moc_MainWindow.cpp: MainWindow.hpp
-	$(QT_DIR)\bin\moc.exe -I. MainWindow.hpp -o moc_MainWindow.cpp
+	$(QT_DIR)\bin\moc.exe $(MOC_FLAGS) -I. MainWindow.hpp -o moc_MainWindow.cpp
 
 moc_HistoryLineEdit.cpp: HistoryLineEdit.hpp
-	$(QT_DIR)\bin\moc -I. HistoryLineEdit.hpp -o moc_HistoryLineEdit.cpp
+	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. HistoryLineEdit.hpp -o moc_HistoryLineEdit.cpp
 
 moc_DebugTerminal.cpp: DebugTerminal.hpp
-	$(QT_DIR)\bin\moc -I. DebugTerminal.hpp -o moc_DebugTerminal.cpp
+	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. DebugTerminal.hpp -o moc_DebugTerminal.cpp
 
 moc_AbstractFormLoader.cpp: AbstractFormLoader.hpp
-	$(QT_DIR)\bin\moc.exe -I. AbstractFormLoader.hpp -o moc_AbstractFormLoader.cpp
+	$(QT_DIR)\bin\moc.exe $(MOC_FLAGS) -I. AbstractFormLoader.hpp -o moc_AbstractFormLoader.cpp
 
 moc_SMERPClient.cpp: SMERPClient.hpp
-	$(QT_DIR)\bin\moc -I. SMERPClient.hpp -o moc_SMERPClient.cpp
+	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. SMERPClient.hpp -o moc_SMERPClient.cpp
 
 local_clean:
 	@-erase moc_*.cpp *.dll 2>NUL
@@ -91,6 +94,10 @@ local_test:
 	@-echo copy $(QT_DIR)\bin\QtCore4.dll . >> test.bat
 	@-echo copy $(QT_DIR)\bin\QtGui4.dll . >> test.bat
 	@-echo copy $(QT_DIR)\bin\QtNetwork4.dll . >> test.bat
+!IFDEF WITH_SSL
+	@-echo copy $(OPENSSL_DIR)\bin\libeay32.dll . >> test.bat
+	@-echo copy $(OPENSSL_DIR)\bin\ssleay32.dll . >> test.bat
+!ENDIF
 	@-echo echo Testing Qt client... >> test.bat
 	@-echo qtclient.exe >> test.bat
 	@-test.bat
