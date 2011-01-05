@@ -39,6 +39,7 @@
 #include <map>
 #include <exception>
 #include <iostream>
+#include <limits>
 
 namespace textwolf {
 
@@ -201,7 +202,7 @@ struct UTF8
 
    static UChar value( const char* buf)
    {
-      const UChar invalid = (UChar)0-1;
+      const UChar invalid = std::numeric_limits<UChar>::max();
       UChar res;
       int gg;
       int ii;
@@ -325,8 +326,8 @@ public:
          while (state < CharSet::size(buf))
          {
             buf[state] = *input;        
-            input++;
-            state++;
+            ++input;
+            ++state;
          }
          val = CharSet::value(buf);
       }
@@ -338,8 +339,8 @@ public:
       while (state < CharSet::asize())
       {
          buf[state] = *input;        
-         input++;
-         state++;
+         ++input;
+         ++state;
       }
       cur = charProd[ CharSet::achar(buf)];
    };
@@ -361,8 +362,8 @@ public:
    {
       while (state < CharSet::asize())
       {
-         input++; 
-         state++;
+         ++input;
+         ++state;
       }
       state = 0;
       cur = 0;
@@ -1370,10 +1371,11 @@ public:
       Mask mask;
       bool follow;
       int typeidx;
-      int cnt;
+      int cnt_start;
+      int cnt_end;
 
-      Core()                      :follow(false),typeidx(0),cnt(-1) {};
-      Core( const Core& orig)     :mask(orig.mask),follow(orig.follow),typeidx(orig.typeidx),cnt(orig.cnt) {};
+      Core()                  :follow(false),typeidx(0),cnt_start(0),cnt_end(-1) {};
+      Core( const Core& o)    :mask(o.mask),follow(o.follow),typeidx(o.typeidx),cnt_start(o.cnt_start),cnt_end(o.cnt_end) {};
    };
 
    struct State
@@ -1432,11 +1434,12 @@ public:
          core.follow = p_follow; 
       };
       
-      void defOutput( const Mask& mask, int p_typeidx, bool p_follow=false, int p_cnt=-1)
+      void defOutput( const Mask& mask, int p_typeidx, bool p_follow, int p_start, int p_end)
       {
          core.mask.join( mask);
          core.typeidx = p_typeidx;
-         if (p_cnt >= 0) core.cnt = p_cnt;
+         core.cnt_end = p_end;
+         core.cnt_start = p_start;
          core.follow = p_follow; 
       };
       
@@ -1536,7 +1539,7 @@ private:
       };
    };   
 
-   int defOutput( int stateidx, const Mask& pushOpMask, int typeidx, bool follow=false, int cnt=-1) throw(exception)
+   int defOutput( int stateidx, const Mask& pushOpMask, int typeidx, bool follow, int start, int end) throw(exception)
    {
       try
       {
@@ -1553,7 +1556,7 @@ private:
             stateidx = states[stateidx].link = states.size();
             states.push_back( state);
          }
-         states[ stateidx].defOutput( pushOpMask, typeidx, follow, cnt);
+         states[ stateidx].defOutput( pushOpMask, typeidx, follow, start, end);
          return stateidx;
       }
       catch (std::bad_alloc)
@@ -1574,7 +1577,17 @@ public:
       
       XMLPathSelectAutomaton* xs;
       int stateidx;
-      int count;
+      struct Range
+      {
+         int start;
+         int end;
+
+         Range( const Range& o)          :start(o.start),end(o.end){};
+         Range( int p_start, int p_end)  :start(p_start),end(p_end){};
+         Range( int count)               :start(0),end(count){};
+         Range()                         :start(0),end(-1){};
+      };
+      Range range;
       bool follow;
       Mask pushOpMask; 
 
@@ -1630,28 +1643,41 @@ public:
          follow = true;
          return *this;  
       };
-      PathElement& doCount( int p_count)
+      PathElement& doRange( int p_start, int p_end)
       {
-         if (count == -1)
+         if (range.end == -1)
          {
-            count = p_count;
+            range = Range( p_start, p_end);
          }
-         else if (p_count < count)
+         else if (p_end < range.end)
          {
-            count = p_count;
+            range.end = p_end;
+         }
+         else if (p_start > range.start)
+         {
+            range.start = p_start;
          }
          return *this;
       };
+      PathElement& doCount( int p_count)
+      {
+         return doRange( 0, p_count);
+      };
+      PathElement& doStart( int p_start)
+      {
+         return doRange( p_start, std::numeric_limits<int>::max());
+      };
+
       PathElement& push( int typeidx) throw(exception)
       {
-         if (xs != 0) stateidx = xs->defOutput( stateidx, pushOpMask, typeidx, follow, count);
+         if (xs != 0) stateidx = xs->defOutput( stateidx, pushOpMask, typeidx, follow, range.start, range.end);
          return *this;
       };
 
    public:
-      PathElement()                                                  :xs(0),stateidx(0),count(-1),follow(false),pushOpMask(0) {};
-      PathElement( XMLPathSelectAutomaton* p_xs, int p_stateidx=0)   :xs(p_xs),stateidx(p_stateidx),count(-1),follow(false),pushOpMask(0) {doSelect(Tag);doSelect(ContentStart);};
-      PathElement( const PathElement& orig)                          :xs(orig.xs),stateidx(orig.stateidx),count(orig.count),follow(orig.follow),pushOpMask(orig.pushOpMask) {};
+      PathElement()                                                  :xs(0),stateidx(0),follow(false),pushOpMask(0) {};
+      PathElement( XMLPathSelectAutomaton* p_xs, int p_stateidx=0)   :xs(p_xs),stateidx(p_stateidx),follow(false),pushOpMask(0) {doSelect(Tag);doSelect(ContentStart);};
+      PathElement( const PathElement& orig)                          :xs(orig.xs),stateidx(orig.stateidx),range(orig.range),follow(orig.follow),pushOpMask(orig.pushOpMask) {};
 
       //corresponds to "//" in abbreviated syntax of XPath
       PathElement& operator --(int)                                                     {return doFollow();};
@@ -1661,8 +1687,17 @@ public:
       PathElement& operator ()( const char* name) throw(exception)                      {return doSelect( Attribute, name);};
       //find tag with one attribute
       PathElement& operator ()( const char* name, const char* value) throw(exception)   {return doSelect( Attribute, name).doSelect( ThisAttributeValue, value);};
-      //define maximum element count to push
-      PathElement& operator /(int cnt)   throw(exception)                               {doCount(cnt);};
+
+      //define maximum element index to push
+      PathElement& operator <= (int cnt)   throw(exception)                             {doCount((cnt>=0)?(cnt+1):-1);};
+      //define maximum element count limit
+      PathElement& operator <(int cnt)   throw(exception)                               {doCount(cnt);};
+
+      //define minimum element index to push
+      PathElement& operator >=(int cnt)   throw(exception)                              {if (cnt>0) doStart(cnt-1);};
+      //define minimum element count limit
+      PathElement& operator >(int cnt)   throw(exception)                               {doStart(cnt);};
+
       //define element type to push
       PathElement& operator =(int type)  throw(exception)                               {return push( type);};
       //grab content
@@ -1812,15 +1847,43 @@ private:
          }
       }
    };
+
+   void produce( unsigned int tokenidx, const State& st)
+   {
+      const Token& tk = tokens[ tokenidx];
+      if (tk.core.cnt_end == -1)
+      {
+         expand( st.next);
+      }
+      else
+      {
+         if (tk.core.cnt_end > 0)
+         {
+            if (--tokens[ tokenidx].core.cnt_end == 0)
+            {
+               tokens[ tokenidx].core.mask.reset();
+            }
+            if (tk.core.cnt_start <= 0)
+            {
+               expand( st.next);
+            }
+            else
+            {
+               --tokens[ tokenidx].core.cnt_start;
+            }
+         }
+      }
+   };
    
    int match( unsigned int tokenidx)
    {
+      int rt = 0;
       if (context.key != 0)
       {
          if (tokenidx >= context.scope.range.tokenidx_to) return 0;
 
          const Token& tk = tokens[ tokenidx];
-         if (tk.core.cnt != 0 && tk.core.mask.matches( context.type))
+         if (tk.core.mask.matches( context.type))
          {
             const State& st = atm->states[ tk.stateidx];
             if (st.key)
@@ -1829,19 +1892,34 @@ private:
                for (ii=0; ii<context.keysize && st.key[ii] == context.key[ii]; ii++);
                if (ii==context.keysize)
                {
-                  expand( st.next);
-                  if (tk.core.cnt > 0) tokens[ tokenidx].core.cnt--;
+                  produce( tokenidx, st);
                }
             }
             else
             {
-               expand( st.next);
-               if (tk.core.cnt > 0) tokens[ tokenidx].core.cnt--;
+               produce( tokenidx, st);
             }
             if (tk.core.typeidx != 0)
             {
-               if (tk.core.cnt > 0) tokens[ tokenidx].core.cnt--;
-               return tk.core.typeidx;
+               if (tk.core.cnt_end == -1)
+               {
+                  rt = tk.core.typeidx;
+               }
+               else if (tk.core.cnt_end > 0)
+               {
+                  if (--tokens[ tokenidx].core.cnt_end == 0)
+                  {
+                     tokens[ tokenidx].core.mask.reset();
+                  }
+                  if (tk.core.cnt_start <= 0)
+                  {
+                     rt = tk.core.typeidx;
+                  }
+                  else
+                  {
+                     --tokens[ tokenidx].core.cnt_start;
+                  }
+               }
             }
          }
          if (tk.core.mask.rejects( context.type))
@@ -1863,7 +1941,8 @@ private:
          {
             if (context.scope_iter < context.scope.range.tokenidx_to)
             {
-               type = match( context.scope_iter++);
+               type = match( context.scope_iter);
+               ++context.scope_iter;
             }
             else 
             {
@@ -1873,7 +1952,7 @@ private:
                &&  context.scope.range.tokenidx_from > follows[ ii])
                {
                   type = match( follows[ ii]);
-                  context.scope_iter ++;
+                  ++context.scope_iter;
                }
                else
                {

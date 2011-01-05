@@ -1,0 +1,73 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 2 (0x2)
+        Signature Algorithm: sha1WithRSAEncryption
+        Issuer: C=XY, ST=ClientLand, L=ClientVille, O=Client Corp., OU=Client Authority, CN=CA.client.xy/emailAddress=CA@client.xy
+        Validity
+            Not Before: Apr  3 23:27:29 2010 GMT
+            Not After : Apr  3 23:27:29 2011 GMT
+        Subject: C=XY, ST=ClientLand, L=ClientVille, O=Client Group Ltd., OU=Client Dept., CN=client.clientland.xy/emailAddress=client@clientland.xy
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+            RSA Public Key: (1024 bit)
+                Modulus (1024 bit):
+                    00:eb:7b:01:3a:0c:ca:4e:7a:22:7f:0e:63:af:12:
+                    b6:94:e1:8d:ed:d4:d8:c2:16:81:2f:3c:91:b7:c3:
+                    68:ba:5c:5b:24:62:74:f0:1a:c2:3c:98:68:3f:6f:
+                    91:3b:cf:4b:a5:0c:1c:a4:42:8a:d3:c2:6a:ba:fb:
+                    ba:95:d3:21:00:25:a9:c1:9a:f8:a8:e1:11:4a:6c:
+                    2a:b2:15:72:23:4f:9d:2f:aa:58:a1:10:1b:6d:b1:
+                    57:4b:22:be:00:70:b9:54:13:48:75:ea:1e:b5:9e:
+                    ae:9c:a6:1a:cd:05:28:87:59:b7:4d:31:dc:a2:11:
+                    62:ba:df:5f:93:93:9b:b8:41
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints: 
+                CA:FALSE
+            Netscape Comment: 
+                OpenSSL Generated Certificate
+            X509v3 Subject Key Identifier: 
+                6F:66:D1:98:1C:B7:CB:70:9C:5C:5A:2F:97:FA:66:77:E1:56:E3:09
+            X509v3 Authority Key Identifier: 
+                keyid:E2:B1:D8:8C:4A:46:F3:23:CA:98:CD:95:FB:9E:6E:ED:5E:1B:F0:11
+
+    Signature Algorithm: sha1WithRSAEncryption
+        31:2e:7b:6b:44:1d:d4:29:36:06:80:a5:64:7b:32:63:92:2c:
+        fb:61:ef:7a:33:8e:5e:33:68:d1:ee:42:8c:34:fa:12:80:45:
+        7b:e5:6e:56:92:87:e4:ca:44:13:ef:9a:cd:85:47:ca:22:a8:
+        a2:ee:eb:0d:04:1f:f3:85:bc:75:ed:79:53:d6:4c:f1:62:05:
+        61:fb:61:48:d4:0f:4a:9c:2d:ed:cb:9b:04:e7:c4:d1:57:b1:
+        e8:ae:38:95:63:10:1b:55:e5:0e:5c:3f:bf:44:99:68:52:24:
+        48:f9:41:e5:eb:c7:7f:65:fc:41:b7:76:2c:29:2f:8a:3a:5c:
+        85:88:f0:b4:f0:5d:b2:dc:db:bc:91:c6:6f:e3:83:a3:90:59:
+        be:08:0a:ee:1c:04:f8:01:b9:f1:18:6c:fc:63:0c:d7:ba:ed:
+        3e:f9:64:2d:5c:32:dd:d9:74:2b:0a:68:e2:69:f0:46:0b:bf:
+        2c:ca:0b:48:2b:cf:fc:07:a7:8d:90:e8:d9:9e:57:dc:92:e5:
+        ba:45:de:74:ce:c0:e2:1e:ff:35:f8:f4:1c:5a:e0:49:45:7b:
+        7e:00:7f:e7:66:f1:1c:4f:bf:40:23:57:8c:4a:11:f9:bc:a1:
+        80:d9:d7:5c:81:8f:2f:00:69:04:8b:29:a4:c2:9c:64:15:7c:
+        02:bf:2f:02
+-----BEGIN CERTIFICATE-----
+MIIDwTCCAqmgAwIBAgIBAjANBgkqhkiG9w0BAQUFADCBnjELMAkGA1UEBhMCWFkx
+EzARBgNVBAgTCkNsaWVudExhbmQxFDASBgNVBAcTC0NsaWVudFZpbGxlMRUwEwYD
+VQQKEwxDbGllbnQgQ29ycC4xGTAXBgNVBAsTEENsaWVudCBBdXRob3JpdHkxFTAT
+BgNVBAMTDENBLmNsaWVudC54eTEbMBkGCSqGSIb3DQEJARYMQ0FAY2xpZW50Lnh5
+MB4XDTEwMDQwMzIzMjcyOVoXDTExMDQwMzIzMjcyOVowga8xCzAJBgNVBAYTAlhZ
+MRMwEQYDVQQIEwpDbGllbnRMYW5kMRQwEgYDVQQHEwtDbGllbnRWaWxsZTEaMBgG
+A1UEChMRQ2xpZW50IEdyb3VwIEx0ZC4xFTATBgNVBAsTDENsaWVudCBEZXB0LjEd
+MBsGA1UEAxMUY2xpZW50LmNsaWVudGxhbmQueHkxIzAhBgkqhkiG9w0BCQEWFGNs
+aWVudEBjbGllbnRsYW5kLnh5MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDr
+ewE6DMpOeiJ/DmOvEraU4Y3t1NjCFoEvPJG3w2i6XFskYnTwGsI8mGg/b5E7z0ul
+DBykQorTwmq6+7qV0yEAJanBmvio4RFKbCqyFXIjT50vqlihEBttsVdLIr4AcLlU
+E0h16h61nq6cphrNBSiHWbdNMdyiEWK631+Tk5u4QQIDAQABo3sweTAJBgNVHRME
+AjAAMCwGCWCGSAGG+EIBDQQfFh1PcGVuU1NMIEdlbmVyYXRlZCBDZXJ0aWZpY2F0
+ZTAdBgNVHQ4EFgQUb2bRmBy3y3CcXFovl/pmd+FW4wkwHwYDVR0jBBgwFoAU4rHY
+jEpG8yPKmM2V+55u7V4b8BEwDQYJKoZIhvcNAQEFBQADggEBADEue2tEHdQpNgaA
+pWR7MmOSLPth73ozjl4zaNHuQow0+hKARXvlblaSh+TKRBPvms2FR8oiqKLu6w0E
+H/OFvHXteVPWTPFiBWH7YUjUD0qcLe3LmwTnxNFXseiuOJVjEBtV5Q5cP79EmWhS
+JEj5QeXrx39l/EG3diwpL4o6XIWI8LTwXbLc27yRxm/jg6OQWb4ICu4cBPgBufEY
+bPxjDNe67T75ZC1cMt3ZdCsKaOJp8EYLvyzKC0grz/wHp42Q6NmeV9yS5bpF3nTO
+wOIe/zX49Bxa4ElFe34Af+dm8RxPv0AjV4xKEfm8oYDZ11yBjy8AaQSLKaTCnGQV
+fAK/LwI=
+-----END CERTIFICATE-----

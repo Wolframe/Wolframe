@@ -7,7 +7,11 @@
 
 #include <QObject>
 #include <QWidget>
-#include <QtNetwork/QAbstractSocket>
+#include <QAbstractSocket>
+#ifdef WITH_SSL
+#include <QSslSocket>
+#include <QList>
+#endif
 
 namespace _SMERP {
 	namespace QtClient {
@@ -32,6 +36,7 @@ namespace _SMERP {
 		State m_state;
 		QAbstractSocket *m_socket;
 		QWidget *m_parent;
+		bool m_hasErrors;
 
 	public:
 		SMERPClient( QWidget *_parent = 0 );
@@ -48,13 +53,20 @@ namespace _SMERP {
 		Q_PROPERTY( unsigned short m_port READ port WRITE setPort )
 		unsigned short port( ) const { return m_port; }
 		void setPort( unsigned short _port ) { m_port = _port; }
-		
+
+#ifdef WITH_SSL		
 		Q_PROPERTY( bool m_secure READ secure WRITE setSecure )
 		bool secure( ) const { return m_secure; }
 		void setSecure( bool _secure ) { m_secure = _secure; }
+#endif
 
 	private slots:
 		void error( QAbstractSocket::SocketError );
+#ifdef WITH_SSL
+		void sslErrors( const QList<QSslError> &errors );
+		void encrypted( );
+		void peerVerifyError( const QSslError &e );
+#endif
 		void dataAvailable( );
 		void connected( );
 		void disconnected( );

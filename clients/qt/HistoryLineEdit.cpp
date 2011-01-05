@@ -36,6 +36,7 @@ HistoryLineEdit::~HistoryLineEdit( )
 void HistoryLineEdit::returnPressed( )
 {
 	m_history->append( text( ) );
+	m_pos = m_history->size( );
 	emit lineEntered( text( ) );
 	clear( );
 }
