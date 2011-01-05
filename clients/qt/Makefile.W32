@@ -22,6 +22,24 @@ INCLUDE_LDFLAGS = \
 INCLUDE_LIBS = \
 	QtCore4.lib QtGui4.lib QtUiTools.lib QtNetwork4.lib
 
+# openssl
+
+!IFDEF WITH_SSL
+
+INCLUDE_DIRS = \
+	$(INCLUDE_DIRS)	/I"$(OPENSSL_DIR)\include"
+
+INCLUDE_CPPFLAGS = \
+	$(INCLUDE_CPPFLAGS) /DWITH_SSL
+
+INCLUDE_LDFLAGS = \
+	$(INCLUDE_LDFLAGS) /LIBPATH:"$(OPENSSL_DIR)\lib"
+
+INCLUDE_LIBS = \
+	$(INCLUDE_LIBS) $(OPENSSL_LIBS)
+
+!ENDIF
+
 OBJS = \
 	moc_MainWindow.obj \
 	MainWindow.obj \

@@ -19,6 +19,18 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 	-lQtCore -lQtGui -lQtUiTools -lQtNetwork
+
+# openssl
+
+ifdef WITH_SSL
+
+INCLUDE_CPPFLAGS += \
+	-DWITH_SSL
+
+INCLUDE_LIBS += \
+	$(OPENSSL_LIBS)
+
+endif
 	
 OBJS = \
 	moc_MainWindow.o \

@@ -40,8 +40,10 @@ void DebugTerminal::initialize( )
 	m_input->setFocus( );
 
 	QStringList wordList;
-	wordList << "connect" << "sconnect" << "quit" << "caps" << "help";
-
+	wordList << "connect" << "quit" << "caps" << "help";
+#ifdef WITH_SSL
+	wordList << "sconnect";
+#endif
 	QCompleter *completer = new QCompleter( wordList, this );
 	completer->setCaseSensitivity( Qt::CaseInsensitive );
 	completer->setCompletionMode( QCompleter::InlineCompletion );
@@ -79,7 +81,9 @@ void DebugTerminal::lineEntered( QString line )
 			unsigned short port = rx.cap( 2 ).toUShort( );
 			m_smerpClient->setHost( host );
 			m_smerpClient->setPort( port );
+#ifdef WITH_SSL
 			m_smerpClient->setSecure( line.toLower( ).startsWith( "sconnect" ) );
+#endif
 			m_smerpClient->connect( );
 		} else {
 			m_output->setTextColor( QColor( "red" ) );
@@ -92,7 +96,9 @@ void DebugTerminal::lineEntered( QString line )
 		m_output->setTextColor( QColor( "blue" ) );
 		m_output->append( "HELP - show this help page" );
 		m_output->append( "CONNECT host:port - connect to SMERP server (insecure)" );
+#ifdef WITH_SSL
 		m_output->append( "SCONNECT host:port - connect to SMERP server (secure)" );
+#endif
 		m_output->append( "QUIT - terminate connection to SMERP server" );
 		m_output->setTextColor( QColor( "black" ) );
 	} else if( line.toLower( ).startsWith( "caps" ) ) {

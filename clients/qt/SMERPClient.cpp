@@ -6,8 +6,11 @@
 #include "SMERPClient.hpp"
 
 #include <QByteArray>
-#include <QtNetwork/QSslSocket>
-#include <QtNetwork/QTcpSocket>
+#include <QTcpSocket>
+#ifdef WITH_SSL
+#include <QSslSocket>
+#include <QList>
+#endif
 
 namespace _SMERP {
 	namespace QtClient {
@@ -16,7 +19,11 @@ SMERPClient::SMERPClient( QWidget *_parent ) :
 	m_state( Disconnected ),
 	m_parent( _parent )
 {
+#ifdef WITH_SSL
+	m_socket = new QSslSocket( this );
+#else
 	m_socket = new QTcpSocket( this );
+#endif
 
 	QObject::connect( m_socket, SIGNAL( error( QAbstractSocket::SocketError ) ),
 		this, SLOT( error( QAbstractSocket::SocketError ) ) );
@@ -24,8 +31,12 @@ SMERPClient::SMERPClient( QWidget *_parent ) :
 		this, SLOT( dataAvailable( ) ) );
 	QObject::connect( m_socket, SIGNAL( connected( ) ),
 		this, SLOT( connected( ) ) );
-	QObject::disconnect( m_socket, SIGNAL( disconnected( ) ),
+	QObject::connect( m_socket, SIGNAL( disconnected( ) ),
 		this, SLOT( disconnected( ) ) );
+#ifdef WITH_SSL
+	QObject::connect( m_socket, SIGNAL( sslErrors( const QList<QSslError> & ) ),
+		this, SLOT( sslErrors( const QList<QSslError> & ) ) );
+#endif
 }
 
 SMERPClient::~SMERPClient( )
