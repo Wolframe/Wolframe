@@ -10,6 +10,7 @@
 #include <QAbstractSocket>
 #ifdef WITH_SSL
 #include <QSslSocket>
+#include <QSslCertificate>
 #include <QList>
 #endif
 
@@ -37,6 +38,9 @@ namespace _SMERP {
 		QAbstractSocket *m_socket;
 		QWidget *m_parent;
 		bool m_hasErrors;
+#ifdef WITH_SSL
+		bool m_initializedSsl;
+#endif
 
 	public:
 		SMERPClient( QWidget *_parent = 0 );
@@ -63,6 +67,8 @@ namespace _SMERP {
 	private slots:
 		void error( QAbstractSocket::SocketError );
 #ifdef WITH_SSL
+		void initializeSsl( );
+		QSslCertificate getCertificate( QString filename );
 		void sslErrors( const QList<QSslError> &errors );
 		void encrypted( );
 		void peerVerifyError( const QSslError &e );
