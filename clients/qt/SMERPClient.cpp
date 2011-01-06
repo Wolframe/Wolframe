@@ -40,14 +40,14 @@ SMERPClient::SMERPClient( QWidget *_parent ) :
 #endif
 
 #ifdef WITH_SSL
-	reinterpret_cast<QSslSocket *>( m_socket )->setLocalCertificate( "./client.crt" );
-	reinterpret_cast<QSslSocket *>( m_socket )->setPrivateKey( "./client.key" );
 	QFile CAfile( "CAclient.cert.pem" );
 	if( CAfile.open( QIODevice::ReadOnly | QIODevice::Text ) )
 		reinterpret_cast<QSslSocket *>( m_socket )->addCaCertificate( CAfile.readAll( ) );
 	QFile CAfile2( "CAclient.cert.pem" );
 	if( CAfile2.open( QIODevice::ReadOnly | QIODevice::Text ) )
 		reinterpret_cast<QSslSocket *>( m_socket )->addCaCertificate( CAfile2.readAll( ) );
+	reinterpret_cast<QSslSocket *>( m_socket )->setLocalCertificate( "./client.crt" );
+	reinterpret_cast<QSslSocket *>( m_socket )->setPrivateKey( "./client.key" );
 #endif
 }
 
