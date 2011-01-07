@@ -90,6 +90,8 @@ local_clean:
 local_distclean:
 
 local_test:
+
+run: $(CPP_BINS)
 	@-echo @echo off > test.bat
 	@-echo copy $(QT_DIR)\bin\QtCore4.dll . >> test.bat
 	@-echo copy $(QT_DIR)\bin\QtGui4.dll . >> test.bat

@@ -212,16 +212,16 @@ namespace _SMERP {
 		serviceDescription = pt.get<std::string>( "server.service.description", DEFAULT_SERVICE_DESCRIPTION );
 
 		idleTimeout = pt.get<unsigned>( "server.timeout.idle", 900 );
-//		requestTimeout = pt.get<unsigned>( "server.timeout.request", 30 );
-//		answerTimeout = pt.get<unsigned>( "server.timeout.answer", 30 );
-//		processTimeout = pt.get<unsigned>( "server.timeout.process", 30 );
+		requestTimeout = pt.get<unsigned>( "server.timeout.request", 30 );
+		answerTimeout = pt.get<unsigned>( "server.timeout.answer", 30 );
+		processTimeout = pt.get<unsigned>( "server.timeout.process", 30 );
 
 // database
-//		dbHost = pt.get<std::string>( "database.host", std::string() );
-//		dbPort = pt.get<unsigned short>( "database.port", 0 );
-//		dbName = pt.get<std::string>( "database.name", std::string() );
-//		dbUser = pt.get<std::string>( "database.user", std::string() );
-//		dbPassword = pt.get<std::string>( "database.password", std::string() );
+		dbHost = pt.get<std::string>( "database.host", std::string() );
+		dbPort = pt.get<unsigned short>( "database.port", 0 );
+		dbName = pt.get<std::string>( "database.name", std::string() );
+		dbUser = pt.get<std::string>( "database.user", std::string() );
+		dbPassword = pt.get<std::string>( "database.password", std::string() );
 
 		if ( pt.get_child_optional( "logging.stderr" ))	{
 			logToStderr = true;

@@ -1,5 +1,5 @@
 //
-// luaHandler.cpp
+// connectionHandler.cpp
 //
 
 #include "luaHandler.hpp"
@@ -10,36 +10,36 @@
 #include <stdexcept>
 
 extern "C" {
-#include <lualib.h>
-#include <lauxlib.h>
+	#include <lualib.h>
+	#include <lauxlib.h>
 }
 
 namespace _SMERP {
 
-	luaConnection::luaConnection( const Network::LocalTCPendpoint& local )
+	echoConnection::echoConnection( const Network::LocalTCPendpoint& local )
 	{
 		LOG_TRACE << "Created connection handler for " << local.toString();
 		state_ = NEW;
 	}
 
 
-	luaConnection::luaConnection( const Network::LocalSSLendpoint& local )
+	echoConnection::echoConnection( const Network::LocalSSLendpoint& local )
 	{
 		LOG_TRACE << "Created connection handler (SSL) for " << local.toString();
 		state_ = NEW;
 	}
 
-	luaConnection::~luaConnection()
+	echoConnection::~echoConnection()
 	{
 		LOG_TRACE << "Connection handler destroyed";
 	}
 
-	void luaConnection::setPeer( const Network::RemoteTCPendpoint& remote )
+	void echoConnection::setPeer( const Network::RemoteTCPendpoint& remote )
 	{
 		LOG_TRACE << "Peer set to " << remote.toString();
 	}
 
-	void luaConnection::setPeer( const Network::RemoteSSLendpoint& remote )
+	void echoConnection::setPeer( const Network::RemoteSSLendpoint& remote )
 	{
 		LOG_TRACE << "Peer set to " << remote.toString();
 		LOG_TRACE << "Peer Common Name: " << remote.commonName();
@@ -47,7 +47,7 @@ namespace _SMERP {
 
 
 	/// Handle a request and produce a reply.
-	Network::NetworkOperation luaConnection::nextOperation()
+	Network::NetworkOperation echoConnection::nextOperation()
 	{
 		switch( state_ )	{
 		case NEW:	{
@@ -114,7 +114,7 @@ namespace _SMERP {
 
 	/// Parse incoming data. The return value indicates how much of the
 	/// input has been consumed.
-	void* luaConnection::parseInput( const void *begin, std::size_t bytesTransferred )
+	void* echoConnection::parseInput( const void *begin, std::size_t bytesTransferred )
 	{
 		char *s = (char *)begin;
 		if ( !strncmp( "quit", s, 4 ))
@@ -133,19 +133,21 @@ namespace _SMERP {
 		return( s );
 	}
 
-	void luaConnection::timeoutOccured()
+	void echoConnection::timeoutOccured()
 	{
 		state_ = TIMEOUT;
 		LOG_TRACE << "Processor received timeout";
 	}
 
-	void luaConnection::signalOccured()
+	void echoConnection::signalOccured()
 	{
 		state_ = SIGNALLED;
 		LOG_TRACE << "Processor received signal";
 	}
-	
-	luaServer::luaServer( ) : ServerHandler( )
+
+
+	/// ServerHandler PIMPL
+	ServerHandler::ServerHandlerImpl::ServerHandlerImpl( )
 	{
 		// instanitate a new VM
 		l = luaL_newstate( );
@@ -153,7 +155,7 @@ namespace _SMERP {
 			LOG_FATAL << "Unable to create new LUA engine!";
 			throw new std::runtime_error( "Can't initialize LUA processor" );			
 		}
-
+		
 		// TODO: open standard libraries, most likely something to configure later,
 		// the plain echo processor should work without any lua libraries
 		//luaL_openlibs( l );
@@ -165,7 +167,7 @@ namespace _SMERP {
 		lua_pushcfunction( l, luaopen_io );
 		lua_pushstring( l, LUA_LOADLIBNAME );
 		lua_call( l, 1, 0 );
-
+		
 		// TODO: script location, also configurable
 		int res = luaL_loadfile( l, "echo.lua" );
 		if( res != 0 ) {
@@ -173,9 +175,9 @@ namespace _SMERP {
 			lua_pop( l, 1 );
 			throw new std::runtime_error( "Can't initialize LUA processor" );
 		}
-
+		
 		// TODO: careful here with threads and how they get generated!
-
+		
 		// call main, we may have to initialized LUA modules there
 		res = lua_pcall( l, 0, LUA_MULTRET, 0 );
 		if( res != 0 ) {
@@ -183,7 +185,7 @@ namespace _SMERP {
 			lua_pop( l, 1 );
 			throw new std::runtime_error( "Can't initialize LUA processor" );
 		}
-
+		
 		// execute the main entry point of the script, we could initialize things there in LUA
 		lua_pushstring( l, "init" );
 		lua_gettable( l, LUA_GLOBALSINDEX );
@@ -194,8 +196,8 @@ namespace _SMERP {
 			throw new std::runtime_error( "Can't initialize LUA processor" );
 		}
 	}
-
-	luaServer::~luaServer( )
+	
+	ServerHandler::ServerHandlerImpl::~ServerHandlerImpl( )
 	{
 		// give LUA code a chance to clean up resources or something
 		lua_pushstring( l, "destroy" );
@@ -206,19 +208,33 @@ namespace _SMERP {
 			lua_pop( l, 1 );
 			throw new std::runtime_error( "Error in destruction of LUA processor" );
 		}
-
+		
 		// close the VM, give away resources
 		lua_close( l );
 	}
-
-	Network::connectionHandler* luaServer::newConnection( const Network::LocalTCPendpoint& local )
+	
+	Network::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const Network::LocalTCPendpoint& local )
 	{
-		return new luaConnection( local );
+		return new echoConnection( local );
 	}
 
-	Network::connectionHandler* luaServer::newSSLconnection( const Network::LocalSSLendpoint& local )
+	Network::connectionHandler* ServerHandler::ServerHandlerImpl::newSSLconnection( const Network::LocalSSLendpoint& local )
 	{
-		return new luaConnection( local );
+		return new echoConnection( local );
+	}
+
+	ServerHandler::ServerHandler() : impl_( new ServerHandlerImpl )	{}
+
+	ServerHandler::~ServerHandler()	{ delete impl_; }
+
+	Network::connectionHandler* ServerHandler::newConnection( const Network::LocalTCPendpoint& local )
+	{
+		return impl_->newConnection( local );
+	}
+
+	Network::connectionHandler* ServerHandler::newSSLconnection( const Network::LocalSSLendpoint& local )
+	{
+		return impl_->newSSLconnection( local );
 	}
 
 } // namespace _SMERP

@@ -66,9 +66,17 @@ namespace _SMERP {
 		std::vector<Network::ServerTCPendpoint> address;
 		std::vector<Network::ServerSSLendpoint> SSLaddress;
 
-// hadler configuration
 		unsigned		idleTimeout;
+		unsigned		requestTimeout;
+		unsigned		answerTimeout;
+		unsigned		processTimeout;
 
+// database configuration
+		std::string		dbHost;
+		unsigned short		dbPort;
+		std::string		dbName;
+		std::string		dbUser;
+		std::string		dbPassword;
 // logger configuration
 		bool			logToStderr;
 		LogLevel::Level		stderrLogLevel;

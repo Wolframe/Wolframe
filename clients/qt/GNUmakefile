@@ -92,5 +92,7 @@ local_test:
 	@for i in $(THEMES); do xmllint --noout --schema qt-ui-4.7.xsd $$i; done
 	@echo "Testing validity of forms.."
 	@for i in $(FORMS); do xmllint --noout --schema qt-ui-4.7.xsd $$i; done
+
+run: $(CPP_BINS)
 	@echo "Testing Qt client.."
 	@./qtclient

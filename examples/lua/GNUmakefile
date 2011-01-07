@@ -31,9 +31,8 @@ endif
 OBJS = \
 	appConfig.o \
 	configFile.o \
-	commandLine.o \
 	luaHandler.o \
-	posixMain.o
+	$(TOPDIR)/src/posixMain.o
 
 CPP_BINS = \
 	smerp-lua$(EXE)
@@ -47,3 +46,9 @@ local_clean:
 local_distclean:
 
 local_install:
+
+localhost_test:
+
+run: $(CPP_BINS)
+	@echo "Running the SMERP server..."
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./smerp-lua -c smerp-lua.conf -f
