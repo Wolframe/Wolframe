@@ -6,6 +6,7 @@
 
 #include <QByteArray>
 #include <QTcpSocket>
+#include <QFile>
 
 namespace _SMERP {
 	namespace QtClient {
@@ -29,6 +30,7 @@ SMERPClient::SMERPClient( QWidget *_parent ) :
 		this, SLOT( connected( ) ) );
 	QObject::connect( m_socket, SIGNAL( disconnected( ) ),
 		this, SLOT( disconnected( ) ) );
+
 #ifdef WITH_SSL
 	QObject::connect( m_socket, SIGNAL( sslErrors( const QList<QSslError> & ) ),
 		this, SLOT( sslErrors( const QList<QSslError> & ) ) );
@@ -37,14 +39,45 @@ SMERPClient::SMERPClient( QWidget *_parent ) :
 	QObject::connect( m_socket, SIGNAL( peerVerifyError( const QSslError & ) ),
 		this, SLOT( peerVerifyError( const QSslError & ) ) );
 #endif
-
-#ifdef WITH_SSL
-	reinterpret_cast<QSslSocket *>( m_socket )->setLocalCertificate( "./client.crt" );
-	reinterpret_cast<QSslSocket *>( m_socket )->setPrivateKey( "./client.key" );
-#endif
 }
 
 #ifdef WITH_SSL
+void SMERPClient::initializeSsl( )
+{
+	if( m_initializedSsl ) return;
+
+	reinterpret_cast<QSslSocket *>( m_socket )->addCaCertificate( 
+		getCertificate( "./CA.cert.pem" ) );
+	reinterpret_cast<QSslSocket *>( m_socket )->addCaCertificate(
+		getCertificate( "./CAclient.cert.pem" ) );
+	reinterpret_cast<QSslSocket *>( m_socket )->setLocalCertificate(
+		getCertificate( "./client.crt" ) );
+	reinterpret_cast<QSslSocket *>( m_socket )->setPrivateKey( "./client.key" );
+
+	m_initializedSsl = true;
+}
+
+QSslCertificate SMERPClient::getCertificate( QString filename )
+{
+	QFile file( filename );
+
+	if( !file.exists( ) )
+		emit error( tr( "certificate %1 doesn't exist" ).arg( filename ) );
+
+	if( !file.open( QIODevice::ReadOnly ) )
+		emit error( tr( "can't open certificate %1" ).arg( filename ) );
+
+	QSslCertificate cert( file.readAll( ) );
+
+	if( cert.isNull( ) )
+		emit error( tr( "empty certificate in file %1" ).arg( filename ) );
+
+	if( !cert.isValid( ) )
+		emit error( tr( "certificate in %1 is invalid" ).arg( filename ) );
+
+	return cert;
+}
+
 void SMERPClient::sslErrors( const QList<QSslError> &errors )
 {
 	m_hasErrors = true;
@@ -78,6 +111,7 @@ void SMERPClient::connect( )
 		case Disconnected:
 			if( m_secure ) {
 #ifdef WITH_SSL
+				initializeSsl( );
 				reinterpret_cast<QSslSocket *>( m_socket )->connectToHostEncrypted( m_host, m_port );
 #else
 				m_socket->connectToHost( m_host, m_port );
@@ -189,7 +223,7 @@ void SMERPClient::connected( )
 			break;
 
 		case AboutToDisconnect:
-			emit error( tr( "Got dconnected Qt signal when already disconnecting!" ) );
+			emit error( tr( "Got connected Qt signal when already disconnecting!" ) );
 			break;
 
 		default:
@@ -203,7 +237,7 @@ void SMERPClient::disconnected( )
 		case AboutToConnect:
 		case Disconnected:
 		case Connected:
-			emit error( tr( "Got a disconnected Qt signal when already in illegal state!" ) );
+			emit error( tr( "Got a disconnected Qt signal when already in disconnected state!" ) );
 			break;
 
 		case AboutToDisconnect:
