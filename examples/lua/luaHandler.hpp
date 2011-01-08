@@ -1,24 +1,24 @@
 //
-// luaHandler.hpp - simple echo handler using Lua
+// smerpHandler.hpp - smerp main handler
 //
 
-#ifndef _LUA_HANDLER_HPP_INCLUDED
-#define _LUA_HANDLER_HPP_INCLUDED
+#ifndef _SMERP_HANDLER_HPP_INCLUDED
+#define _SMERP_HANDLER_HPP_INCLUDED
 
 #include "connectionHandler.hpp"
 
 extern "C" {
-#include <lua.h>
+	#include <lua.h>
 }
 
 namespace _SMERP {
 	/// The connection handler
-	class luaConnection : public Network::connectionHandler
+	class echoConnection : public Network::connectionHandler
 	{
 	public:
-		luaConnection( const Network::LocalTCPendpoint& local );
-		luaConnection( const Network::LocalSSLendpoint& local );
-		~luaConnection();
+		echoConnection( const Network::LocalTCPendpoint& local );
+		echoConnection( const Network::LocalSSLendpoint& local );
+		~echoConnection();
 
 		void setPeer( const Network::RemoteTCPendpoint& remote );
 		void setPeer( const Network::RemoteSSLendpoint& remote );
@@ -49,20 +49,19 @@ namespace _SMERP {
 		std::string	buffer_;
 	};
 
-
 	/// The server handler container
-	class luaServer : public Network::ServerHandler
+	class ServerHandler::ServerHandlerImpl
 	{
 	private:
 		lua_State *l;
-
+		
 	public:
-		luaServer( );
-		virtual ~luaServer( );
+		ServerHandlerImpl( );
+		virtual ~ServerHandlerImpl( );
 		Network::connectionHandler* newConnection( const Network::LocalTCPendpoint& local );
 		Network::connectionHandler* newSSLconnection( const Network::LocalSSLendpoint& local );
 	};
 
 } // namespace _SMERP
 
-#endif // _LUA_HANDLER_HPP_INCLUDED
+#endif // _SMERP_HANDLER_HPP_INCLUDED

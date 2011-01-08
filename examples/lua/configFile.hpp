@@ -30,7 +30,16 @@ namespace _SMERP	{
 		std::vector<Network::ServerSSLendpoint> SSLaddress;
 
 		unsigned	idleTimeout;
+		unsigned	requestTimeout;
+		unsigned	answerTimeout;
+		unsigned	processTimeout;
 
+// database configuration
+		std::string	dbHost;
+		unsigned short	dbPort;
+		std::string	dbName;
+		std::string	dbUser;
+		std::string	dbPassword;
 // logger configuration
 		bool		logToStderr;
 		LogLevel::Level	stderrLogLevel;

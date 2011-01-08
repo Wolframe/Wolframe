@@ -71,5 +71,7 @@ local_install:
 	$(INSTALL) -m 644 $(CPP_BINS) $(bindir)
 
 local_test:
+
+run: $(CPP_BINS)
 	@echo "Running the SMERP server..."
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./smerpd -c smerp.conf -f -d DATA
