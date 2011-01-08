@@ -20,6 +20,14 @@ namespace _SMERP {
 	{
 		LOG_TRACE << "Created connection handler for " << local.toString();
 		state_ = NEW;
+		lua_pushstring( l, "init_connection" );
+		lua_gettable( l, LUA_GLOBALSINDEX );
+		int res = lua_pcall( l, 0, 0, 0 );
+		if( res != 0 ) {
+			LOG_FATAL << "Unable to call 'init_connection' function: " << lua_tostring( l, -1 );
+			lua_pop( l, 1 );
+			throw new std::runtime_error( "Error in destruction of LUA processor" );
+		}
 	}
 
 
@@ -200,6 +208,7 @@ namespace _SMERP {
 	ServerHandler::ServerHandlerImpl::~ServerHandlerImpl( )
 	{
 		// give LUA code a chance to clean up resources or something
+		// usually hardly necessary, as the garbage collector should take care of it
 		lua_pushstring( l, "destroy" );
 		lua_gettable( l, LUA_GLOBALSINDEX );
 		int res = lua_pcall( l, 0, 0, 0 );
