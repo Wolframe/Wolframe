@@ -1,12 +1,20 @@
 -- called when a new LUA server is started
 function init( )
-	io.write( "lua init called.\n" )
+	io.write( "LUA: init called.\n" )
 end
 
 -- called when the LUA server is stopped
 function destroy( )
-	io.write( "lua destroy called.\n" )
+	io.write( "LUA: destroy called.\n" )
+end
+
+-- called when a client connection gets established
+function new_connection( remote_host, remote_port, common_name )
+	io.write( "LUA: new_connection called from " .. remote_host .. " (port: " .. remote_port .. ")\n" )
+	if( common_name ) then
+		io.write( "LUA: encrypted connection, CN is " .. common_name .. "\n" )
+	end
 end
 
 -- the main, initialize globals here
-io.write( "lua main called.\n" )
+io.write( "LUA: main called.\n" )

@@ -8,6 +8,7 @@
 #include <string>
 #include <cstring>
 #include <stdexcept>
+#include <sstream>
 
 extern "C" {
 	#include <lualib.h>
@@ -16,41 +17,130 @@ extern "C" {
 
 namespace _SMERP {
 
-	echoConnection::echoConnection( const Network::LocalTCPendpoint& local )
+	void echoConnection::createVM( )
 	{
-		LOG_TRACE << "Created connection handler for " << local.toString();
-		state_ = NEW;
-		lua_pushstring( l, "init_connection" );
+		// instanitate a new VM
+		l = luaL_newstate( );
+		if( !l ) {
+			LOG_FATAL << "Unable to create new LUA engine!";
+			throw new std::runtime_error( "Can't initialize LUA processor" );			
+		}
+		
+		// TODO: open standard libraries, most likely something to configure later,
+		// the plain echo processor should work without any lua libraries
+		//luaL_openlibs( l );
+		// or open them individually, see:
+		// http://stackoverflow.com/questions/966162/best-way-to-omit-lua-standard-libraries
+		lua_pushcfunction( l, luaopen_base );
+		lua_pushstring( l, "" );
+		lua_call( l, 1, 0 );
+		lua_pushcfunction( l, luaopen_io );
+		lua_pushstring( l, LUA_LOADLIBNAME );
+		lua_call( l, 1, 0 );
+		
+		// TODO: script location, also configurable
+		int res = luaL_loadfile( l, "echo.lua" );
+		if( res != 0 ) {
+			LOG_FATAL << "Unable to load LUA code 'echo.lua': " << lua_tostring( l, -1 );
+			lua_pop( l, 1 );
+			throw new std::runtime_error( "Can't initialize LUA processor" );
+		}
+				
+		// call main, we may have to initialize LUA modules there
+		res = lua_pcall( l, 0, LUA_MULTRET, 0 );
+		if( res != 0 ) {
+			LOG_FATAL << "Unable to call main entry of script: " << lua_tostring( l, -1 );
+			lua_pop( l, 1 );
+			throw new std::runtime_error( "Can't initialize LUA processor" );
+		}
+		
+		// execute the main entry point of the script, we could initialize things there in LUA
+		lua_pushstring( l, "init" );
+		lua_gettable( l, LUA_GLOBALSINDEX );
+		res = lua_pcall( l, 0, 0, 0 );
+		if( res != 0 ) {
+			LOG_FATAL << "Unable to call 'init' function: " << lua_tostring( l, -1 );
+			lua_pop( l, 1 );
+			throw new std::runtime_error( "Can't initialize LUA processor" );
+		}
+	}
+	
+	void echoConnection::destroyVM( )
+	{
+		// give LUA code a chance to clean up resources or something
+		// usually hardly necessary, as the garbage collector should take care of it
+		lua_pushstring( l, "destroy" );
 		lua_gettable( l, LUA_GLOBALSINDEX );
 		int res = lua_pcall( l, 0, 0, 0 );
 		if( res != 0 ) {
-			LOG_FATAL << "Unable to call 'init_connection' function: " << lua_tostring( l, -1 );
+			LOG_FATAL << "Unable to call 'destroy' function: " << lua_tostring( l, -1 );
 			lua_pop( l, 1 );
 			throw new std::runtime_error( "Error in destruction of LUA processor" );
 		}
+		
+		// close the VM, give away resources
+		lua_close( l );
+	}
+
+	echoConnection::echoConnection( const Network::LocalTCPendpoint& local )
+	{
+		LOG_TRACE << "Created connection handler for " << local.toString();
+		createVM( );
+		state_ = NEW;
 	}
 
 
 	echoConnection::echoConnection( const Network::LocalSSLendpoint& local )
 	{
 		LOG_TRACE << "Created connection handler (SSL) for " << local.toString();
+		createVM( );
 		state_ = NEW;
 	}
 
 	echoConnection::~echoConnection()
 	{
 		LOG_TRACE << "Connection handler destroyed";
+		destroyVM( );
 	}
 
 	void echoConnection::setPeer( const Network::RemoteTCPendpoint& remote )
 	{
 		LOG_TRACE << "Peer set to " << remote.toString();
+		
+		lua_pushstring( l, "new_connection" );
+		lua_gettable( l, LUA_GLOBALSINDEX );
+		lua_pushstring( l, remote.host( ).c_str( ) );
+		unsigned short port = remote.port( );
+		std::stringstream ss;
+		ss << port;
+		lua_pushstring( l, ss.str( ).c_str( ) );
+		int res = lua_pcall( l, 2, 0, 0 );
+		if( res != 0 ) {
+			LOG_FATAL << "Unable to call 'new_connection' function: " << lua_tostring( l, -1 );
+			lua_pop( l, 1 );
+			throw new std::runtime_error( "Error in destruction of LUA processor" );
+		}
 	}
 
 	void echoConnection::setPeer( const Network::RemoteSSLendpoint& remote )
 	{
 		LOG_TRACE << "Peer set to " << remote.toString();
 		LOG_TRACE << "Peer Common Name: " << remote.commonName();
+
+		lua_pushstring( l, "new_connection" );
+		lua_gettable( l, LUA_GLOBALSINDEX );
+		lua_pushstring( l, remote.host( ).c_str( ) );
+		unsigned short port = remote.port( );
+		std::stringstream ss;
+		ss << port;
+		lua_pushstring( l, ss.str( ).c_str( ) );
+		lua_pushstring( l, remote.commonName( ).c_str( ) );
+		int res = lua_pcall( l, 3, 0, 0 );
+		if( res != 0 ) {
+			LOG_FATAL << "Unable to call 'new_connection' function: " << lua_tostring( l, -1 );
+			lua_pop( l, 1 );
+			throw new std::runtime_error( "Error in destruction of LUA processor" );
+		}
 	}
 
 
@@ -155,73 +245,6 @@ namespace _SMERP {
 
 
 	/// ServerHandler PIMPL
-	ServerHandler::ServerHandlerImpl::ServerHandlerImpl( )
-	{
-		// instanitate a new VM
-		l = luaL_newstate( );
-		if( !l ) {
-			LOG_FATAL << "Unable to create new LUA engine!";
-			throw new std::runtime_error( "Can't initialize LUA processor" );			
-		}
-		
-		// TODO: open standard libraries, most likely something to configure later,
-		// the plain echo processor should work without any lua libraries
-		//luaL_openlibs( l );
-		// or open them individually, see:
-		// http://stackoverflow.com/questions/966162/best-way-to-omit-lua-standard-libraries
-		lua_pushcfunction( l, luaopen_base );
-		lua_pushstring( l, "" );
-		lua_call( l, 1, 0 );
-		lua_pushcfunction( l, luaopen_io );
-		lua_pushstring( l, LUA_LOADLIBNAME );
-		lua_call( l, 1, 0 );
-		
-		// TODO: script location, also configurable
-		int res = luaL_loadfile( l, "echo.lua" );
-		if( res != 0 ) {
-			LOG_FATAL << "Unable to load LUA code 'echo.lua': " << lua_tostring( l, -1 );
-			lua_pop( l, 1 );
-			throw new std::runtime_error( "Can't initialize LUA processor" );
-		}
-		
-		// TODO: careful here with threads and how they get generated!
-		
-		// call main, we may have to initialized LUA modules there
-		res = lua_pcall( l, 0, LUA_MULTRET, 0 );
-		if( res != 0 ) {
-			LOG_FATAL << "Unable to call main entry of script: " << lua_tostring( l, -1 );
-			lua_pop( l, 1 );
-			throw new std::runtime_error( "Can't initialize LUA processor" );
-		}
-		
-		// execute the main entry point of the script, we could initialize things there in LUA
-		lua_pushstring( l, "init" );
-		lua_gettable( l, LUA_GLOBALSINDEX );
-		res = lua_pcall( l, 0, 0, 0 );
-		if( res != 0 ) {
-			LOG_FATAL << "Unable to call 'init' function: " << lua_tostring( l, -1 );
-			lua_pop( l, 1 );
-			throw new std::runtime_error( "Can't initialize LUA processor" );
-		}
-	}
-	
-	ServerHandler::ServerHandlerImpl::~ServerHandlerImpl( )
-	{
-		// give LUA code a chance to clean up resources or something
-		// usually hardly necessary, as the garbage collector should take care of it
-		lua_pushstring( l, "destroy" );
-		lua_gettable( l, LUA_GLOBALSINDEX );
-		int res = lua_pcall( l, 0, 0, 0 );
-		if( res != 0 ) {
-			LOG_FATAL << "Unable to call 'destroy' function: " << lua_tostring( l, -1 );
-			lua_pop( l, 1 );
-			throw new std::runtime_error( "Error in destruction of LUA processor" );
-		}
-		
-		// close the VM, give away resources
-		lua_close( l );
-	}
-	
 	Network::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const Network::LocalTCPendpoint& local )
 	{
 		return new echoConnection( local );

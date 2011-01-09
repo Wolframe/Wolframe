@@ -19,7 +19,7 @@ namespace _SMERP {
 		echoConnection( const Network::LocalTCPendpoint& local );
 		echoConnection( const Network::LocalSSLendpoint& local );
 		~echoConnection();
-
+		
 		void setPeer( const Network::RemoteTCPendpoint& remote );
 		void setPeer( const Network::RemoteSSLendpoint& remote );
 
@@ -47,17 +47,18 @@ namespace _SMERP {
 
 		State		state_;
 		std::string	buffer_;
+		
+	private:
+		lua_State *l;
+
+		void createVM( );
+		void destroyVM( );
 	};
 
 	/// The server handler container
 	class ServerHandler::ServerHandlerImpl
-	{
-	private:
-		lua_State *l;
-		
+	{		
 	public:
-		ServerHandlerImpl( );
-		virtual ~ServerHandlerImpl( );
 		Network::connectionHandler* newConnection( const Network::LocalTCPendpoint& local );
 		Network::connectionHandler* newSSLconnection( const Network::LocalSSLendpoint& local );
 	};
