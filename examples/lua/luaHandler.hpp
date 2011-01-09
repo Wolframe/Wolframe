@@ -52,7 +52,8 @@ namespace _SMERP {
 		lua_State *l;
 
 		void createVM( );
-		void destroyVM( );		
+		void destroyVM( );
+		void newRequest( );
 	};
 
 	/// The server handler container

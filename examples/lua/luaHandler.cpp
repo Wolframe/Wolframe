@@ -8,6 +8,7 @@
 #include <string>
 #include <cstring>
 #include <stdexcept>
+#include <sstream>
 
 extern "C" {
 	#include <lualib.h>
@@ -80,7 +81,7 @@ namespace _SMERP {
 		// close the VM, give away resources
 		lua_close( l );
 	}
-	
+
 	echoConnection::echoConnection( const Network::LocalTCPendpoint& local )
 	{
 		LOG_TRACE << "Created connection handler for " << local.toString();
@@ -105,12 +106,41 @@ namespace _SMERP {
 	void echoConnection::setPeer( const Network::RemoteTCPendpoint& remote )
 	{
 		LOG_TRACE << "Peer set to " << remote.toString();
+		
+		lua_pushstring( l, "new_connection" );
+		lua_gettable( l, LUA_GLOBALSINDEX );
+		lua_pushstring( l, remote.host( ).c_str( ) );
+		unsigned short port = remote.port( );
+		std::stringstream ss;
+		ss << port;
+		lua_pushstring( l, ss.str( ).c_str( ) );
+		int res = lua_pcall( l, 2, 0, 0 );
+		if( res != 0 ) {
+			LOG_FATAL << "Unable to call 'new_connection' function: " << lua_tostring( l, -1 );
+			lua_pop( l, 1 );
+			throw new std::runtime_error( "Error in destruction of LUA processor" );
+		}
 	}
 
 	void echoConnection::setPeer( const Network::RemoteSSLendpoint& remote )
 	{
 		LOG_TRACE << "Peer set to " << remote.toString();
 		LOG_TRACE << "Peer Common Name: " << remote.commonName();
+
+		lua_pushstring( l, "new_connection" );
+		lua_gettable( l, LUA_GLOBALSINDEX );
+		lua_pushstring( l, remote.host( ).c_str( ) );
+		unsigned short port = remote.port( );
+		std::stringstream ss;
+		ss << port;
+		lua_pushstring( l, ss.str( ).c_str( ) );
+		lua_pushstring( l, remote.commonName( ).c_str( ) );
+		int res = lua_pcall( l, 3, 0, 0 );
+		if( res != 0 ) {
+			LOG_FATAL << "Unable to call 'new_connection' function: " << lua_tostring( l, -1 );
+			lua_pop( l, 1 );
+			throw new std::runtime_error( "Error in destruction of LUA processor" );
+		}
 	}
 
 
