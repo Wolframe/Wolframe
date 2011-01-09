@@ -1692,15 +1692,11 @@ public:
       PathElement& operator ()( const char* name, const char* value) throw(exception)   {return doSelect( Attribute, name).doSelect( ThisAttributeValue, value);};
 
       //define maximum element index to push
-      PathElement& operator <= (int cnt)   throw(exception)                             {return doCount((cnt>=0)?(cnt+1):-1); return *this;};
-      //define maximum element count limit
-      PathElement& operator <(int cnt)   throw(exception)                               {return doCount(cnt);};
-
+      PathElement& TO(int cnt)   throw(exception)                                       {return doCount((cnt>=0)?(cnt+1):-1); return *this;};
       //define minimum element index to push
-      PathElement& operator >=(int cnt)   throw(exception)                              {if (cnt>0) return doStart(cnt-1); return *this;};
-      //define minimum element count limit
-      PathElement& operator >(int cnt)   throw(exception)                               {return doStart(cnt);};
-
+      PathElement& FROM(int cnt)   throw(exception)                                     {return doStart(cnt); return *this;};
+      //define minimum and maximum element index to push
+      PathElement& RANGE(int cnt)   throw(exception)                                    {return doRange(cnt,(cnt>=0)?(cnt+1):-1); return *this;};
       //define element type to push
       PathElement& operator =(int type)  throw(exception)                               {return push( type);};
       //grab content
