@@ -8,12 +8,16 @@ MBa:
 
 ABa:
 
+- logger
+  - add a prefix for logging in subparts of the system (e.g. network, luaprocessor)
 - we should split tests with different dependencies
 - Windows:
   - username, password for service credentials
   - clean up native Win32 string mess in service code
   - LINK : fatal error LNK1104: cannot open file 'boost_unit_test_framework-vc90-mt-1_45.lib'
     NMAKE : fatal error U1077: '"C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\BIN\link.exe"' : return code '0x450'
+- lua processor:
+  - didn't find a way to limit the memory usage of the VM
 
 PF:
 

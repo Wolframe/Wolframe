@@ -82,10 +82,18 @@ namespace _SMERP {
 		lua_close( l );
 	}
 
+	void echoConnection::printMemStats( )
+	{
+		int kbytes = lua_gc( l, LUA_GCCOUNT, 0 );
+		int bytes = lua_gc( l, LUA_GCCOUNTB, 0 );
+		LOG_TRACE << "LUA VM memory in use: " << kbytes << "." << bytes << " kBytes";
+	}
+
 	echoConnection::echoConnection( const Network::LocalTCPendpoint& local )
 	{
 		LOG_TRACE << "Created connection handler for " << local.toString();
 		createVM( );
+		printMemStats( );
 		state_ = NEW;
 	}
 
@@ -94,6 +102,7 @@ namespace _SMERP {
 	{
 		LOG_TRACE << "Created connection handler (SSL) for " << local.toString();
 		createVM( );
+		printMemStats( );
 		state_ = NEW;
 	}
 
@@ -120,6 +129,7 @@ namespace _SMERP {
 			lua_pop( l, 1 );
 			throw new std::runtime_error( "Error in destruction of LUA processor" );
 		}
+		printMemStats( );
 	}
 
 	void echoConnection::setPeer( const Network::RemoteSSLendpoint& remote )
@@ -141,6 +151,7 @@ namespace _SMERP {
 			lua_pop( l, 1 );
 			throw new std::runtime_error( "Error in destruction of LUA processor" );
 		}
+		printMemStats( );
 	}
 
 

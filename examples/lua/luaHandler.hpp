@@ -53,6 +53,7 @@ namespace _SMERP {
 
 		void createVM( );
 		void destroyVM( );
+		void printMemStats( );
 	};
 
 	/// The server handler container
