@@ -25,13 +25,15 @@ namespace
                Follow,
                AttributeName,
                AttributeValue,
-               Count
+               RangeStart,
+               RangeEnd
             };
             Type type;
             
             Element()                                                           :type(Tag) {};
             Element( Type p_type)                                               :type(p_type) {};
             Element( Type p_type, const char* p_name, unsigned int p_namesize)  :name(p_name,p_namesize),type(p_type) {};
+            Element( Type p_type, const std::string& p_name)                    :name(p_name),type(p_type) {};
             Element( const Element& o)                                          :name(o.name),type(o.type) {};
          };
       private:
@@ -42,12 +44,28 @@ namespace
          
          void skipB()
          {
-            const char* name = input+pos;
-            unsigned int ii;
-            for (ii=0; name[ii] != '\0' && name[ii]<=' '; ii++);
-            if (name[ii] == '\0') throw Error();
-            pos += ii;
+            while (input[pos] != '\0' && input[pos]<=' ') pos++;
          };
+         void skip( unsigned int nn=1)
+         {
+            while (nn>0 && input[pos+nn]) --nn;
+            skipB();
+         };
+         char cur() const
+         {
+            return input[pos];
+         };
+         bool match( const char* str) const
+         {
+            unsigned int ii=0;
+            while (input[pos+ii] != '\0' && input[pos+ii] == str[ii]) ii++;
+            return (str[ii] == '\0');
+         };
+         bool match( char ch) const
+         {
+            return cur()==ch;
+         };
+         
          void parseNumber( Element::Type type)
          {
             const char* name = input+pos;
@@ -58,6 +76,37 @@ namespace
             pos += ii;
             skipB();
          };
+         
+         void parseRange()
+         {
+            if (match( ".."))
+            {
+               skip(2);
+               parseNumber( Element::RangeEnd);
+            }
+            else
+            {
+               parseNumber( Element::RangeStart);
+               if (match( ".."))
+               {
+                  skip(2);
+                  if (cur() != ']')
+                  {
+                     parseNumber( Element::RangeEnd);
+                  }
+               }
+               else if (cur() == ']')
+               {
+                  ar.push_back( Element( Element::RangeEnd, ar[ ar.size()-1].name));
+               }
+               else
+               {
+                  throw Error();
+               }
+            }
+            skipB();
+         };
+         
          void parseName( Element::Type type)
          {
             const char* name = input+pos;
@@ -68,8 +117,10 @@ namespace
             pos += ii;
             skipB();
          };
-         void parseString( Element::Type type, char eb)
+         
+         void parseString( Element::Type type)
          {
+            char eb = input[pos++];
             const char* name = input+pos;
             unsigned int ii;
             for (ii=0; name[ii] != eb && name[ii] != '\0'; ii++);
@@ -78,20 +129,19 @@ namespace
             pos += ii+1;
             skipB();
          };
-         void parseElement()
+         
+         void parseCondition()
          {
-            skipB();
-            if (input[pos] == '@')
+            if (match( '@'))
             {
-               pos++;
+               skip();
                parseName( Element::AttributeName);
-               if (input[pos] == '=')
+               if (match( '='))
                {
-                  pos++;
-                  if (input[pos] == '\'' || input[pos] == '\"')     
+                  skip();
+                  if (match( '\"') || match( '\''))     
                   {
-                     pos++;
-                     parseString( Element::AttributeValue, input[pos-1]);
+                     parseString( Element::AttributeValue);
                   }
                   else
                   {
@@ -101,35 +151,35 @@ namespace
             }
             else
             {
-               parseNumber( Element::Count);
+               parseRange();
             }
-            if (input[pos] != ']') throw Error();
-            pos++;
-            skipB();
+            if (cur() != ']') throw Error();
+            skip();
          };
          void parse()
          {
-            while (input[pos] != '\0')
+            while (cur() != '\0')
             {
-               if (input[pos] == '/')
+               if (match("//"))
                {
-                  pos++;
-                  if (input[pos] == '/')
-                  {
-                     ar.push_back( Element( Element::Follow));
-                  }
-                  else
-                  {
-                     parseName( Element::Tag);
-                  }
+                  ar.push_back( Element( Element::Follow));
+                  skip(2);
                }
-               else if (input[pos] == '@')
+               else if (match('/'))
+               {
+                  skip();
+               }
+               else if (match('@'))
                {
                   parseName( Element::AttributeName);
                }
-               else if (input[pos] == '[')
+               else if (match('['))
                {
-                  parseElement();
+                  parseCondition();
+               }
+               else
+               {
+                  parseName( Element::Tag);
                }
             }
          };
@@ -214,9 +264,16 @@ struct Automaton::Private
             }
             break;
             
-            case XPathExpression::Element::Count:
+            case XPathExpression::Element::RangeStart:
             {
-               elem < atoi( itr->name.c_str());
+               elem.FROM( atoi( itr->name.c_str()));
+               itr++;
+            }
+            break;
+            
+            case XPathExpression::Element::RangeEnd:
+            {
+               elem.TO( atoi( itr->name.c_str()));
                itr++;
             }
             break;
@@ -238,5 +295,6 @@ bool Automaton::defineExpression( int type, const char* expression, int* errorpo
 {
    return data->defineExpression( type, expression, errorpos);
 }
+
 
 

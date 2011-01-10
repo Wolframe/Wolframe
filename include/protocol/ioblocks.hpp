@@ -15,21 +15,22 @@ struct MemBlock
    void* ptr;
    unsigned int size;
    unsigned int filled;
-   bool lastblock;
+   bool allocated;
   
-   void setEOF() {lastblock=true;};
-   
-   MemBlock( unsigned int p_size) :ptr(0),size(p_size),filled(0),lastblock(false)
+   MemBlock( unsigned int p_size) :ptr(0),size(p_size),filled(0),allocated(false)
    {
       ptr = new unsigned char[ size];
+      allocated = true;
    };
+   MemBlock( void* p_ptr, unsigned int p_size) :ptr(p_ptr),size(p_size),filled(0),allocated(false)
+   {};
+   
    ~MemBlock()
    {
-      delete [] (unsigned char*)ptr;
+      if (allocated) delete [] (unsigned char*)ptr;
    };
    void init()
    {
-      lastblock = false;
       filled = 0;
    };
     
@@ -47,14 +48,15 @@ class InputBlock
 private:
    MemBlock mem;
 public:
-   unsigned char* content() const       {return (unsigned char*)mem.ptr;};
-   unsigned int size() const            {return mem.size;};
-   unsigned int endpos() const          {return mem.filled;};
+   unsigned char* content() const                    {return (unsigned char*)mem.ptr;};
+   unsigned int size() const                         {return mem.size;};
+   unsigned int endpos() const                       {return mem.filled;};
   
 public:
-   InputBlock( unsigned int p_size)     :mem(p_size) {};
-
-   MemBlock* operator->()               {return &mem;};
+   InputBlock( unsigned int p_size)                  :mem(p_size) {};
+   InputBlock( void* p_ptr, unsigned int p_size)     :mem(p_ptr,p_size) {};
+   
+   MemBlock* operator->()                            {return &mem;};
   
    void init()
    {
@@ -66,11 +68,9 @@ public:
    struct End {};
 
    //input iterator
-   struct iterator
+   class iterator
    {
-      InputBlock* input;
-      unsigned int pos;
-      
+   public:   
       //skip to the next input character
       void skip()
       {
@@ -81,22 +81,26 @@ public:
             throw End();
           }
       };
-      
+
       //get the current input character
       char cur()
       {         
           if (pos == input->endpos()) throw End();
           return input->content()[ pos];
       };
-      
+
       iterator( InputBlock* p_input)          :input(p_input),pos(0) {};
       iterator()                              :input(0),pos(0) {};
       iterator( const iterator& o)            :input(o.input),pos(o.pos) {};
       iterator& operator=( const iterator& o) {input=o.input; return *this;}
-      
+
       iterator& operator++()                  {skip(); return *this;};
       iterator operator++(int)                {iterator tmp(*this); skip(); return tmp;};
       char operator*()                        {return cur();};
+
+   private:
+      InputBlock* input;
+      unsigned int pos;        
    };
    iterator begin()                           {iterator rt(this); return rt;};
    iterator end()                             {return iterator();};
