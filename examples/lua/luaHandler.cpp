@@ -226,6 +226,29 @@ namespace _SMERP {
 	void* echoConnection::parseInput( const void *begin, std::size_t bytesTransferred )
 	{
 		char *s = (char *)begin;
+		for( std::size_t i = 0; i < bytesTransferred; i++ ) {
+			if( *s != '\n' ) {
+				buffer_ += *s;
+			} else {
+				buffer_ += *s++;
+				lua_pushstring( l, "got_line" );
+				lua_gettable( l, LUA_GLOBALSINDEX );
+				lua_pushstring( l, buffer_.c_str( ) );
+				int res = lua_pcall( l, 1, 0, 0 );
+				if( res != 0 ) {
+					LOG_FATAL << "Unable to call 'got_line' function: " << lua_tostring( l, -1 );
+					lua_pop( l, 1 );
+					throw new std::runtime_error( "Error in destruction of LUA processor" );
+				}
+				printMemStats( );
+				return( s );
+			}
+			s++;
+		}
+		return( s );
+				
+	/*
+		char *s = (char *)begin;
 		if ( !strncmp( "quit", s, 4 ))
 			state_ = FINISHING;
 		else	{
@@ -240,6 +263,7 @@ namespace _SMERP {
 			}
 		}
 		return( s );
+		*/
 	}
 
 	void echoConnection::timeoutOccured()
