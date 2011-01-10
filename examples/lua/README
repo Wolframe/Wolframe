@@ -11,3 +11,5 @@ correctly.
 links:
 
 http://www.gamedev.net/reference/programming/features/CPPLuaExport/
+
+Execute in the root directory of lua 'etc\luavc.bat' (in a SDK Shell).

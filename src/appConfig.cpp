@@ -73,8 +73,9 @@ namespace _SMERP {
 			syslogLogLevel = cfgFile.syslogLogLevel;
 #endif	// !defined( _WIN32 )
 #if defined( _WIN32 )
-			syslogIdent = cfgFile.syslogIdent;
-			logToEventlog = cfgFile.logToEventlog;
+// Aba, what for?
+//			syslogIdent = cfgFile.syslogIdent;
+//			logToEventlog = cfgFile.logToEventlog;
 #endif	//defined( _WIN32 )
 		}
 		else	{

@@ -4,6 +4,8 @@ SUBDIRS =
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
+LUA_DIR = C:\Cygwin\home\Andreas\lua-5.1.4
+
 INCLUDE_CPPFLAGS = \
 	/D_WIN32_WINNT=0x403
 
@@ -11,15 +13,17 @@ INCLUDE_DIRS = \
 	/I. \
 	/I$(TOPDIR)\include \
 	/I"$(BOOST_DIR)" \
-	/I"$(PLATFORM_SDK_DIR)\Include"
+	/I"$(PLATFORM_SDK_DIR)\Include" \
+	/I"$(LUA_DIR)\src"
 
 # Note: libraries are picked automatically on Windows!
 SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib"
+LUA_LDFLAGS = /LIBPATH:"$(LUA_DIR)\src"
 INCLUDE_LDFLAGS = \
-	$(SDK_LDFLAGS) $(BOOST_LDFLAGS)
+	$(SDK_LDFLAGS) $(BOOST_LDFLAGS) $(LUA_LDFLAGS)
 
 INCLUDE_LIBS = \
-	Advapi32.lib
+	Advapi32.lib lua51.lib
 
 # openssl
 
@@ -36,9 +40,8 @@ INCLUDE_LIBS = \
 OBJS = \
 	appConfig.obj \
 	configFile.obj \
-	commandLine.obj \
 	luaHandler.obj \
-	winMain.obj
+	$(TOPDIR)\src\winMain.obj
 
 CPP_BINS = \
 	smerp-lua.exe
@@ -56,3 +59,12 @@ local_clean:
 local_distclean:
 
 local_test:
+
+run: $(CPP_BINS)
+	@-echo @echo off > test.bat
+	@-echo copy $(OPENSSL_DIR)\bin\libeay32.dll . >> test.bat
+	@-echo copy $(OPENSSL_DIR)\bin\ssleay32.dll . >> test.bat
+	@-echo copy $(LUA_DIR)\src\lua51.dll . >> test.bat
+	@-echo echo Running the SMERP server... >> test.bat
+	@-echo smerp-lua.exe -c smerp-lua.conf -d DATA >> test.bat
+	@-test.bat
