@@ -157,7 +157,7 @@ void SMERPClient::disconnect( )
 			break;
 
 		case Connected:
-			m_socket->write( QByteArray( "quit" ) );
+			m_socket->write( QByteArray( "quit\n" ) );
 			m_state = AboutToDisconnect;
 			break;
 
