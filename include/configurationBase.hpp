@@ -2,10 +2,11 @@
 // processorConfig.hpp
 //
 
-#ifndef _PROCESSOR_CONFIG_HPP_INCLUDED
-#define _PROCESSOR_CONFIG_HPP_INCLUDED
+#ifndef _CONFIGURATION_BASE_HPP_INCLUDED
+#define _CONFIGURATION_BASE_HPP_INCLUDED
 
 #include <string>
+#include <list>
 
 namespace _SMERP {
 
@@ -33,4 +34,4 @@ namespace _SMERP {
 
 } // namespace _SMERP
 
-#endif // _PROCESSOR_CONFIG_HPP_INCLUDED
+#endif // _CONFIGURATION_BASE_HPP_INCLUDED

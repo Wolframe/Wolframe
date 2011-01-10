@@ -12,7 +12,7 @@
 #endif	// !defined( _WIN32 )
 
 #include "serverEndpoint.hpp"
-#include "processorConfig.hpp"
+#include "configurationBase.hpp"
 
 #include <string>
 #include <vector>
@@ -33,7 +33,7 @@ namespace _SMERP {
 		std::string		serviceName;
 		std::string		serviceDisplayName;
 		std::string		serviceDescription;
-#endif	// !defined( _WIN32 )
+#endif // !defined( _WIN32 )
 		// server configuration
 		unsigned		threads;
 		unsigned		maxConnections;
@@ -47,6 +47,9 @@ namespace _SMERP {
 		bool check();
 		bool test();
 		void print( std::ostream& os ) const;
+#if !defined( _WIN32 )
+		void override( std::string user, std::string group );
+#endif // !defined( _WIN32 )
 	};
 
 
@@ -70,13 +73,15 @@ namespace _SMERP {
 		std::string		eventlogLogName;
 		std::string		eventlogSource;
 		LogLevel::Level		eventlogLogLevel;
-#endif	// !defined( _WIN32 )
+#endif // !defined( _WIN32 )
 
 		/// methods
 		bool parse( ptree& pt );
 		bool check();
 		bool test();
 		void print( std::ostream& os ) const;
+
+		void foreground( LogLevel::Level debugLevel );
 	};
 
 
