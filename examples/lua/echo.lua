@@ -16,5 +16,13 @@ function new_connection( remote_host, remote_port, common_name )
 	end
 end
 
+-- called when receiving a line a data
+function got_line( s )
+	if s == "quit" then
+		-- TODO: how to signal end?
+	end
+	io.write( "LUA got line: " .. s .. "\n" )
+end
+
 -- the main, initialize globals here
 io.write( "LUA: main called.\n" )
