@@ -36,6 +36,7 @@ namespace _SMERP	{
 #endif
 		LogLevel::Level	debugLevel;
 		std::string	cfgFile;
+		bool		useConfigLog;
 	private:
 		std::string	errMsg_;
 		boost::program_options::options_description	options_;

@@ -36,7 +36,8 @@ namespace _SMERP {
 				( "foreground,f", "run in foreground (logs only on stderr)" )
 #endif
 				( "config-file,c", prgOpts::value<std::string>(), "configuration file" )
-				( "debug,d", prgOpts::value<std::string>(), "set debug level (to be used only with --foreground)" )
+				( "debug,d", prgOpts::value<std::string>(), "set debug level (active only with --foreground)" )
+				( "use-config-logging", "log according to the configuration filr (active only with --foreground)" )
 #if !defined(_WIN32)
 // Unix daemon options
 				( "user,u", prgOpts::value<std::string>(), "run as <user>" )
@@ -117,8 +118,8 @@ namespace _SMERP {
 					errMsg_ = "--remove can not be specified together with -h|-p|-t|-T";
 					return false;
 				}
-			}			
-			
+			}
+
 			if ( clMap.count( "service" ))	{
 				if ( command == DEFAULT )
 					command = RUN_SERVICE;

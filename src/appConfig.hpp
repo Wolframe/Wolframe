@@ -22,6 +22,7 @@ namespace _SMERP {
 
 	/// server configuration
 	struct ServerConfig : public _SMERP::ConfigurationBase	{
+	public:
 #if !defined( _WIN32 )
 		// daemon configuration
 		std::string		user;
@@ -40,6 +41,12 @@ namespace _SMERP {
 		// network configuration
 		std::list<Network::ServerTCPendpoint> address;
 		std::list<Network::ServerSSLendpoint> SSLaddress;
+
+		/// methods
+		bool parse( ptree& pt );
+		bool check();
+		bool test();
+		void print( std::ostream& os ) const;
 	};
 
 
@@ -64,6 +71,12 @@ namespace _SMERP {
 		std::string		eventlogSource;
 		LogLevel::Level		eventlogLogLevel;
 #endif	// !defined( _WIN32 )
+
+		/// methods
+		bool parse( ptree& pt );
+		bool check();
+		bool test();
+		void print( std::ostream& os ) const;
 	};
 
 
