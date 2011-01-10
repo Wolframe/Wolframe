@@ -67,25 +67,36 @@ namespace _SMERP {
 			logToFile = cfgFile.logToFile;
 			logFile = cfgFile.logFile;
 			logFileLogLevel = cfgFile.logFileLogLevel;
+#if !defined( _WIN32 )
 			logToSyslog = cfgFile.logToSyslog;
 			syslogFacility = cfgFile.syslogFacility;
 			syslogLogLevel = cfgFile.syslogLogLevel;
-			syslogIdent = cfgFile.syslogIdent;
-			logToEventlog = cfgFile.logToEventlog;
+#endif	// !defined( _WIN32 )
+#if defined( _WIN32 )
+// Aba, what for?
+//			syslogIdent = cfgFile.syslogIdent;
+//			logToEventlog = cfgFile.logToEventlog;
+#endif	//defined( _WIN32 )
 		}
 		else	{
 			logToStderr = true;
 			stderrLogLevel = cmdLine.debugLevel;
 			logToFile = false;
+#if !defined( _WIN32 )
 			logToSyslog = false;
+#endif	// !defined( _WIN32 )
+#if defined( _WIN32 )
 			logToEventlog = false;
+#endif	// defined( _WIN32 )
 		}
 
+#if defined( _WIN32 )
 		// we need the data always (for running, --install and --remove,
 		// which run in foreground)
 		eventlogLogName = cfgFile.eventlogLogName;
 		eventlogSource = cfgFile.eventlogSource;
 		eventlogLogLevel = cfgFile.eventlogLogLevel;
+#endif	// defined( _WIN32 )
 	}
 
 
@@ -157,14 +168,20 @@ namespace _SMERP {
 		}
 		else
 			os << "   Log to file: DISABLED" << std::endl;
+
+#if !defined(_WIN32)
 		if ( logToSyslog )
 			os << "   Log to syslog: facility " << syslogFacility << ", level " << syslogLogLevel << std::endl;
 		else
 			os << "   Log to syslog: DISABLED" << std::endl;
+#endif	// !defined( _WIN32 )
+
+#if defined(_WIN32)
 		if ( logToEventlog )
 			os << "   Log to eventlog: name " << eventlogLogName << ", source " << eventlogSource << ", level " << eventlogLogLevel;
 		else
 			os << "   Log to eventlog: DISABLED" << std::endl;
+#endif	// defined( _WIN32 )
 	}
 
 	/// Check if the application configuration makes sense

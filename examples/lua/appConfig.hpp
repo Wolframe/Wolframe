@@ -6,44 +6,83 @@
 #define _APP_CONFIG_HPP_INCLUDED
 
 #include "logLevel.hpp"
+
+#if !defined( _WIN32 )
 #include "logSyslogFacility.hpp"
+#endif	// !defined( _WIN32 )
+
 #include "serverEndpoint.hpp"
+#include "processorConfig.hpp"
 
 #include <string>
 #include <vector>
 #include <list>
 
 namespace _SMERP {
-	namespace Network {
 
-		struct ServerConfig	{
+	/// server configuration
+	struct ServerConfig : public _SMERP::ConfigurationBase	{
+	public:
 #if !defined( _WIN32 )
-			// daemon configuration
-			std::string		user;
-			std::string		group;
-			std::string		pidFile;
+		// daemon configuration
+		std::string		user;
+		std::string		group;
+		std::string		pidFile;
 #else
-			// service configuration
-			std::string		serviceName;
-			std::string		serviceDisplayName;
-			std::string		serviceDescription;
+		// service configuration
+		std::string		serviceName;
+		std::string		serviceDisplayName;
+		std::string		serviceDescription;
 #endif	// !defined( _WIN32 )
-			// server configuration
-			unsigned		threads;
-			unsigned		maxConnections;
+		// server configuration
+		unsigned		threads;
+		unsigned		maxConnections;
 
-			// network configuration
-			std::list<Network::ServerTCPendpoint> address;
-			std::list<Network::ServerSSLendpoint> SSLaddress;
-		};
+		// network configuration
+		std::list<Network::ServerTCPendpoint> address;
+		std::list<Network::ServerSSLendpoint> SSLaddress;
 
-	} // namespace Network
+		/// methods
+		bool parse( ptree& pt );
+		bool check();
+		bool test();
+		void print( std::ostream& os ) const;
+	};
 
-// application configuration structure
 
+	/// logger configuration
+	struct LoggerConfiguration : public _SMERP::ConfigurationBase
+	{
+	public:
+		bool			logToStderr;
+		LogLevel::Level		stderrLogLevel;
+		bool			logToFile;
+		std::string		logFile;
+		LogLevel::Level		logFileLogLevel;
+		std::string		logFileIdent;
+#if !defined( _WIN32 )
+		bool			logToSyslog;
+		SyslogFacility::Facility syslogFacility;
+		LogLevel::Level		syslogLogLevel;
+		std::string		syslogIdent;
+#else
+		bool			logToEventlog;
+		std::string		eventlogLogName;
+		std::string		eventlogSource;
+		LogLevel::Level		eventlogLogLevel;
+#endif	// !defined( _WIN32 )
+
+		/// methods
+		bool parse( ptree& pt );
+		bool check();
+		bool test();
+		void print( std::ostream& os ) const;
+	};
+
+
+/// application configuration structure
 	struct CmdLineConfig;		// forward declaration for configuration from the command line
 	struct CfgFileConfig;		// forward declaration for configuration from the config file
-
 
 	struct ApplicationConfiguration	{
 		std::string		configFile;
@@ -83,14 +122,17 @@ namespace _SMERP {
 		bool			logToFile;
 		std::string		logFile;
 		LogLevel::Level		logFileLogLevel;
+#if !defined( _WIN32 )
 		bool			logToSyslog;
 		SyslogFacility::Facility syslogFacility;
 		LogLevel::Level		syslogLogLevel;
 		std::string		syslogIdent;
+#else
 		bool			logToEventlog;
 		std::string		eventlogLogName;
 		std::string		eventlogSource;
 		LogLevel::Level		eventlogLogLevel;
+#endif	// !defined( _WIN32 )
 
 	private:
 		std::string		errMsg_;
@@ -99,8 +141,10 @@ namespace _SMERP {
 		ApplicationConfiguration( const CmdLineConfig& cmdLine, const CfgFileConfig& cfgFile );
 		std::string errMsg() const	{ return errMsg_; }
 		bool check();
+		bool test();
 		void print( std::ostream& os ) const;
 	};
+
 } // namespace _SMERP
 
 #endif // _APP_CONFIG_HPP_INCLUDED
