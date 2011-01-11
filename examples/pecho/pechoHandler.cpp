@@ -270,8 +270,8 @@ struct Connection::Private
                 {
                    state = ProcessingAfterWrite;         //we a flushing the output buffer and have to release it when entering next time
                 }                
-                void* content = output->ptr;
-                std::size_t size = output->filled;
+                void* content = output->ptr();
+                std::size_t size = output->filled();
                 return Operation( Operation::WRITE, content, size);                
             }
             
@@ -295,7 +295,7 @@ struct Connection::Private
       catch (Input::End)
       {
          LOG_DATA << "End of input interrupt";
-         return Operation( Operation::READ, input->ptr, input->size);
+         return Operation( Operation::READ, input->ptr(), input->size());
       };
       return Operation( Operation::TERMINATE);
    };
@@ -332,7 +332,7 @@ void Connection::setPeer( const Network::RemoteSSLendpoint& remote)
 
 void* Connection::parseInput( const void *begin, std::size_t bytesTransferred)
 {
-   data->input->filled = bytesTransferred;
+   data->input.setFilled( bytesTransferred);
    return (void*)(((char*)begin) + bytesTransferred);
 }
 

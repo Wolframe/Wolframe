@@ -6,6 +6,7 @@
 #include "protocol.hpp"
 #include "textwolf.hpp"
 #include <vector>
+#include <cstring>
 
 namespace tw = textwolf;
 
@@ -209,6 +210,7 @@ namespace
    
 }//anonymous namespace
 
+using namespace _SMERP;
 using namespace _SMERP::xml;
 
 struct Automaton::Private
@@ -295,6 +297,110 @@ bool Automaton::defineExpression( int type, const char* expression, int* errorpo
 {
    return data->defineExpression( type, expression, errorpos);
 }
+
+template <typename Charset_>
+struct ElementIteratorBase
+{
+   typedef protocol::InputBlock::const_iterator MemBlockIterator;
+   typedef protocol::TextIterator<MemBlockIterator> ContentIterator;
+   typedef Charset_ Charset;
+   typedef tw::XMLScanner<ContentIterator,Charset,tw::charset::UTF8> Scanner;
+   typedef typename Scanner::iterator ScannerIterator;
+   
+   char* m_outbuf;
+   unsigned int m_outbufsize;
+   protocol::InputBlock input;
+   MemBlockIterator memBlockIterator;
+   ContentIterator contentIterator;
+   Scanner scanner;
+   ScannerIterator itr;
+   
+   ElementIteratorBase( char* outbuf, unsigned int outbufsize) 
+           :m_outbuf( outbuf),
+            m_outbufsize( outbufsize),
+            input(0,0),
+            memBlockIterator( &input),
+            contentIterator( &memBlockIterator),
+            scanner( contentIterator, outbuf, outbufsize),
+            itr( scanner.begin()) {};
+               
+   void defineInput( void* ptr, unsigned int size)
+   {
+      input.mem.define( ptr,size);
+   };
+   
+   Source::State next()
+   {
+      try
+      {
+         itr++; 
+         if (itr == scanner.end())
+         {
+            return Source::EndOfInput;
+         }
+         else if (itr->type == Scanner::ErrorOccurred)
+         {
+            return Source::Error;
+         }
+         else
+         {
+            return Source::Processing;
+         }
+      }
+      catch (protocol::InputBlock::End)
+      {
+         return Source::EndOfBuffer;
+      };
+   };
+};
+
+template <typename Charset>
+struct ElementIterator
+      :public Source::const_iterator, 
+       public ElementIteratorBase<Charset>
+{
+   ElementIterator( char* outbuf, unsigned int outbufsize)
+       :Source::const_iterator( outbuf, outbufsize),
+        ElementIteratorBase<Charset>( outbuf, outbufsize) {};
+
+   virtual ~ElementIterator() {};
+   
+   virtual void skip()
+   {
+      m_state = ElementIteratorBase<Charset>::next();
+   };
+   
+   virtual void feed( char* block, unsigned int blocksize)
+   {
+      ElementIteratorBase<Charset>::input.mem.define( block, blocksize);
+   };
+};
+
+Source::const_iterator* Source::createElementIterator( const char* charset, char* outbuf, unsigned int outbufsize)
+{
+   unsigned int ii;
+   std::string cc;
+   for (ii=0; charset[ii]; ii++)
+   {
+      if (charset[ii] != '-') cc.push_back( tolower(charset[ii]));
+   }
+   if (strstr( "utf8", cc.c_str()))
+   {
+      return new ElementIterator<tw::charset::UTF8>( outbuf, outbufsize);
+   }
+   else if (strstr( "isolatin", cc.c_str()))
+   {
+      return new ElementIterator<tw::charset::IsoLatin1>( outbuf, outbufsize);
+   }
+   return 0;
+}
+
+/* TODO
+const_iterator Automaton::selectIterator( Charset charset, Automaton* atm)
+{
+}
+*/
+
 
 
 

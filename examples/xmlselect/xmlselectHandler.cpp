@@ -471,15 +471,15 @@ struct Connection::Private
                     switch (get())
                     {
                        case Read:
-                          return Operation( Operation::READ, input->ptr, input->size);
+                          return Operation( Operation::READ, input->ptr(), input->size());
 
                        case Write:
                           state = ProcessingAfterWrite;
-                          return Operation( Operation::WRITE, output->ptr, output->filled);
+                          return Operation( Operation::WRITE, output->ptr(), output->filled());
 
                        case WriteLast:
                           state = Terminate;
-                          return Operation( Operation::WRITE, output->ptr, output->size);
+                          return Operation( Operation::WRITE, output->ptr(), output->size());
 
                        case ReportError:
                        {
@@ -509,7 +509,7 @@ struct Connection::Private
       catch (Input::End)
       {
          LOG_DATA << "End of input interrupt";
-              return Operation( Operation::READ, input->ptr, input->size);
+         return Operation( Operation::READ, input->ptr(), input->size());
       };
       return Operation( Operation::TERMINATE);
    };
@@ -547,7 +547,7 @@ void Connection::setPeer( const Network::RemoteSSLendpoint& remote)
 
 void* Connection::parseInput( const void *begin, std::size_t bytesTransferred)
 {
-   data->input->filled = bytesTransferred;
+   data->input.setFilled( bytesTransferred);
    return (void*)(((char*)begin) + bytesTransferred);
 }
 

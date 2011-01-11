@@ -10,31 +10,49 @@ namespace protocol {
 // output blocks.
 
 //memory block for network messages
-struct MemBlock
-{
-   void* ptr;
-   unsigned int size;
-   unsigned int filled;
-   bool allocated;
-  
-   MemBlock( unsigned int p_size) :ptr(0),size(p_size),filled(0),allocated(false)
+class MemBlock
+{  
+public:
+   friend class InputBlock;
+   friend class OutputBlock;
+   
+   MemBlock( unsigned int p_size) :m_ptr(0),m_size(p_size),m_filled(0),m_allocated(false)
    {
-      ptr = new unsigned char[ size];
-      allocated = true;
+      m_ptr = new unsigned char[ m_size];
+      m_allocated = true;
    };
-   MemBlock( void* p_ptr, unsigned int p_size) :ptr(p_ptr),size(p_size),filled(0),allocated(false)
+   MemBlock( void* p_ptr, unsigned int p_size) :m_ptr(p_ptr),m_size(p_size),m_filled(0),m_allocated(false)
    {};
    
    ~MemBlock()
    {
-      if (allocated) delete [] (unsigned char*)ptr;
+      if (m_allocated) delete [] (unsigned char*)m_ptr;
    };
+   
    void init()
    {
-      filled = 0;
+      m_filled = 0;
    };
-    
+   
+   void define( void* p_ptr, unsigned int p_size)
+   {
+      if (m_allocated) delete [] (unsigned char*)m_ptr;
+      m_ptr = p_ptr;
+      m_size = p_size;
+      m_filled = 0;
+      m_allocated = false;
+   };
+   
+   void* ptr() const                  {return m_ptr;};
+   unsigned int size() const          {return m_size;};
+   unsigned int filled() const        {return m_filled;};
+   
 private:
+   void* m_ptr;
+   unsigned int m_size;
+   unsigned int m_filled;
+   bool m_allocated;
+   
    MemBlock( const MemBlock&) {};
    MemBlock& operator=( const MemBlock&);
 };
@@ -45,12 +63,11 @@ private:
 // it's illegal to ahead more that you consume. 
 class InputBlock 
 {
-private:
-   MemBlock mem;
 public:
-   unsigned char* content() const                    {return (unsigned char*)mem.ptr;};
-   unsigned int size() const                         {return mem.size;};
-   unsigned int endpos() const                       {return mem.filled;};
+   MemBlock mem;
+   unsigned char* content() const                    {return (unsigned char*)mem.ptr();};
+   unsigned int size() const                         {return mem.size();};
+   unsigned int endpos() const                       {return mem.filled();};
   
 public:
    InputBlock( unsigned int p_size)                  :mem(p_size) {};
@@ -61,6 +78,11 @@ public:
    void init()
    {
       mem.init();
+   };
+   
+   void setFilled( unsigned int nn)
+   {
+      mem.m_filled = nn;
    };
    
    //exception thrown if there is nothing to read from the input anymore.
@@ -77,7 +99,7 @@ public:
           if (++pos == input->endpos())
           {
             pos = 0;
-            input->mem.filled = 0;
+            input->mem.init();
             throw End();
           }
       };
@@ -104,6 +126,9 @@ public:
    };
    iterator begin()                           {iterator rt(this); return rt;};
    iterator end()                             {return iterator();};
+   
+   //TODO make a real const iterator
+   typedef iterator const_iterator;
 };
 
 //output interface based on a memory block. 
@@ -126,14 +151,14 @@ public:
    //return true if the buffer is empty
    bool empty() const
    {
-      return mem.filled==0;
+      return mem.filled()==0;
    };
    
    //print one character to the output
    bool print( char ch)
    {
-      if (mem.filled == mem.size) return false;
-      ((char*)mem.ptr)[ mem.filled++] = ch;
+      if (mem.m_filled == mem.m_size) return false;
+      ((char*)mem.m_ptr)[ mem.m_filled++] = ch;
       return true;
    };
 
@@ -141,27 +166,27 @@ public:
    //TODO rename function
    bool shift( unsigned int nn)
    {
-      if (mem.filled+nn >= mem.size) return false;
-      mem.filled += nn;
+      if (mem.m_filled+nn >= mem.m_size) return false;
+      mem.m_filled += nn;
       return true;
    };
    
    //pointer to the rest of the output buffer block
    char* rest() const
    {
-      return ((char*)mem.ptr) + mem.filled;
+      return ((char*)mem.m_ptr) + mem.m_filled;
    }
    
    //size of the rest of the output buffer (how many characters can be written)
    unsigned int restsize() const
    {
-      return mem.size - mem.filled;
+      return mem.m_size - mem.m_filled;
    }
    
    //release a written memory block
    void release()
    {
-      mem.filled = 0;
+      mem.m_filled = 0;
    }
 };
 

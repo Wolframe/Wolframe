@@ -281,23 +281,15 @@ struct ControlCharacterM
    }
 };
 
-struct DefaultCharProd
-{
-   DefaultCharProd(){};
-   char operator[]( char ch) const {return ch;};
-};
-
 /**
 * reads the input and provides the items to control the parsing:
 *   control characters, ascii characters, unicode characters
-* @TODO Implement better skip for iterator += i if available
 */
-template <class Iterator, class CharSet, class CharProd=DefaultCharProd>
+template <class Iterator, class CharSet>
 class TextScanner
 {
 private:
    Iterator input;
-   CharProd charProd;
    
    char buf[8];
    UChar val;
@@ -345,7 +337,7 @@ public:
          ++input;
          ++state;
       }
-      cur = charProd[ CharSet::achar(buf)];
+      cur = CharSet::achar(buf);
    };
    
    ControlCharacter control()
@@ -593,11 +585,10 @@ public:
 
 
 template <
-      class InputIterator,                         //< STL conform input iterator with ++ and read only * returning 0 als last character of the input
-      class InputCharSet_=charset::UTF8,           //Character set encoding of the input, read as stream of bytes
-      class OutputCharSet_=charset::UTF8,          //Character set encoding of the output, printed as string of the item type of the character set
-      class EntityMap=std::map<const char*,UChar>, //< STL like map from ASCII const char* to UChar
-      class CharProd=DefaultCharProd
+      class InputIterator,                          //< STL conform input iterator with ++ and read only * returning 0 als last character of the input
+      class InputCharSet_=charset::UTF8,            //Character set encoding of the input, read as stream of bytes
+      class OutputCharSet_=charset::UTF8,           //Character set encoding of the output, printed as string of the item type of the character set
+      class EntityMap_=std::map<const char*,UChar>  //< STL like map from ASCII const char* to UChar
 >
 class XMLScanner :public XMLScannerBase
 {
@@ -624,8 +615,9 @@ public:
    class iterator;
    
 public:
-   typedef TextScanner<InputIterator,InputCharSet_,CharProd> InputReader;
-   typedef XMLScanner<InputIterator,InputCharSet_,OutputCharSet_,EntityMap,CharProd> ThisXMLScanner;
+   typedef TextScanner<InputIterator,InputCharSet_> InputReader;
+   typedef XMLScanner<InputIterator,InputCharSet_,OutputCharSet_,EntityMap_> ThisXMLScanner;
+   typedef EntityMap_ EntityMap;
    typedef typename EntityMap::iterator EntityMapIterator;
    
    unsigned int print( UChar ch)
@@ -1710,18 +1702,18 @@ public:
 
 
 template <
-      class InputIterator,                         //< STL conform input iterator with ++ and read only * returning 0 als last character of the input
-      class InputCharSet_=charset::UTF8,           //Character set encoding of the input, read as stream of bytes
-      class OutputCharSet_=charset::UTF8,          //Character set encoding of the output, printed as string of the item type of the character set
-      class EntityMap=std::map<const char*,UChar>, //< STL like map from ASCII const char* to UChar
-      class CharProd=DefaultCharProd
+      class InputIterator,                          //< STL conform input iterator with ++ and read only * returning 0 als last character of the input
+      class InputCharSet_=charset::UTF8,            //< character set encoding of the input, read as stream of bytes
+      class OutputCharSet_=charset::UTF8,           //< character set encoding of the output, printed as string of the item type of the character set
+      class EntityMap_=std::map<const char*,UChar>  //< STL like map from ASCII const char* to UChar
 >
 class XMLPathSelect :public throws_exception
 {
 public:
    typedef XMLPathSelectAutomaton<OutputCharSet_> Automaton;
-   typedef XMLScanner<InputIterator,InputCharSet_,OutputCharSet_,EntityMap,CharProd> ThisXMLScanner;
-   typedef XMLPathSelect<InputIterator,InputCharSet_,OutputCharSet_,EntityMap> ThisXMLPathSelect;
+   typedef XMLScanner<InputIterator,InputCharSet_,OutputCharSet_,EntityMap_> ThisXMLScanner;
+   typedef XMLPathSelect<InputIterator,InputCharSet_,OutputCharSet_,EntityMap_> ThisXMLPathSelect;
+   typedef EntityMap_ EntityMap;
    
 private:
    ThisXMLScanner scan;
