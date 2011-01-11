@@ -124,3 +124,5 @@ tests/pool-gTest.cpp
 include/ErrorCodes.hpp
 src/server.hpp
 include/configurationBase.hpp
+makefiles/gmake/platform.mk
+makefiles/gmake/config.mk

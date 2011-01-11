@@ -8,6 +8,7 @@ INCLUDE_CPPFLAGS =
 
 INCLUDE_DIRS = \
 	-I. \
+	-I$(QT_INCLUDE_DIRS) \
 	-I$(QT_INCLUDE_DIRS)/QtCore \
 	-I$(QT_INCLUDE_DIRS)/QtNetwork \
 	-I$(QT_INCLUDE_DIRS)/QtGui \
@@ -20,6 +21,9 @@ INCLUDE_LDFLAGS = \
 INCLUDE_LIBS = \
 	-lQtCore -lQtGui -lQtUiTools -lQtNetwork
 
+MOC_FLAGS = \
+	$(INCLUDE_DIRS)
+
 # openssl
 
 ifdef WITH_SSL
@@ -30,11 +34,10 @@ INCLUDE_CPPFLAGS += \
 INCLUDE_LIBS += \
 	$(OPENSSL_LIBS)
 
-MOC_FLAGS = \
+MOC_FLAGS += \
 	-DWITH_SSL
-
 endif
-	
+
 OBJS = \
 	moc_MainWindow.o \
 	MainWindow.o \
@@ -56,22 +59,22 @@ CPP_BINS = \
 local_all:
 
 moc_MainWindow.cpp: MainWindow.hpp
-	$(QT_DIR)/bin/moc $(MOC_FLAGS) -I. MainWindow.hpp -o moc_MainWindow.cpp
+	$(QT_DIR)/bin/moc $(MOC_FLAGS) MainWindow.hpp -o moc_MainWindow.cpp
 
 moc_HistoryLineEdit.cpp: HistoryLineEdit.hpp
-	$(QT_DIR)/bin/moc $(MOC_FLAGS) -I. HistoryLineEdit.hpp -o moc_HistoryLineEdit.cpp
+	$(QT_DIR)/bin/moc $(MOC_FLAGS) HistoryLineEdit.hpp -o moc_HistoryLineEdit.cpp
 
 moc_DebugTerminal.cpp: DebugTerminal.hpp
-	$(QT_DIR)/bin/moc $(MOC_FLAGS) -I. DebugTerminal.hpp -o moc_DebugTerminal.cpp
+	$(QT_DIR)/bin/moc $(MOC_FLAGS) DebugTerminal.hpp -o moc_DebugTerminal.cpp
 
 moc_AbstractFormLoader.cpp: AbstractFormLoader.hpp
-	$(QT_DIR)/bin/moc $(MOC_FLAGS) -I. AbstractFormLoader.hpp -o moc_AbstractFormLoader.cpp
+	$(QT_DIR)/bin/moc $(MOC_FLAGS) AbstractFormLoader.hpp -o moc_AbstractFormLoader.cpp
 
 moc_SMERPClient.cpp: SMERPClient.hpp
-	$(QT_DIR)/bin/moc $(MOC_FLAGS) -I. SMERPClient.hpp -o moc_SMERPClient.cpp
+	$(QT_DIR)/bin/moc $(MOC_FLAGS) SMERPClient.hpp -o moc_SMERPClient.cpp
 
 local_clean:
-	@-rm -f moc_*.cpp 
+	@-rm -f moc_*.cpp
 
 local_distclean:
 
