@@ -230,18 +230,25 @@ namespace _SMERP {
 			if( *s != '\n' ) {
 				buffer_ += *s;
 			} else {
-				buffer_ += *s++;
+				// don't pass the end of line to Lua
+				s++;
 				lua_pushstring( l, "got_line" );
 				lua_gettable( l, LUA_GLOBALSINDEX );
 				lua_pushstring( l, buffer_.c_str( ) );
-				int res = lua_pcall( l, 1, 0, 0 );
+				int res = lua_pcall( l, 1, 1, 0 );
 				if( res != 0 ) {
 					LOG_FATAL << "Unable to call 'got_line' function: " << lua_tostring( l, -1 );
 					lua_pop( l, 1 );
 					throw new std::runtime_error( "Error in destruction of LUA processor" );
 				}
-				printMemStats( );
-				return( s );
+				bool cont = lua_toboolean( l, lua_gettop( l ) );
+				if( !cont ) {
+					state_ = FINISHING;
+					return( s );
+				} else {
+					buffer_ += '\n';
+					return( s );
+				}
 			}
 			s++;
 		}

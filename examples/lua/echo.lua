@@ -18,10 +18,12 @@ end
 
 -- called when receiving a line a data
 function got_line( s )
-	if s == "quit" then
-		-- TODO: how to signal end?
-	end
 	io.write( "LUA got line: " .. s .. "\n" )
+	if s == "quit" then
+		-- signals end
+		return false
+	end
+	return true
 end
 
 -- the main, initialize globals here
