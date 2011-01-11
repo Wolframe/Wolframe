@@ -47,5 +47,13 @@ GTEST_INCLUDE_DIRS=$(GTEST_DIR)/include
 # Qt 4 (http://qt.nokia.com/products/)
 ######################################
 
-QT_DIR=/usr
+# self-compiled
 #QT_DIR=/home/user/qt
+
+# system-wide
+QT_DIR=/usr
+
+# usual layout, may differ
+QT_INCLUDE_DIRS=$(QT_DIR)/include
+#QT_INCLUDE_DIRS=$(QT_DIR)/include/qt4
+QT_LIB_DIRS=$(QT_DIR)/lib
