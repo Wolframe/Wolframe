@@ -50,7 +50,6 @@ TEST_CPP_BINS = \
 	counterTest$(EXE) \
 	threadLeakTest$(EXE) \
 	pechoHandlerTest$(EXE) \
-	xmlselectHandlerTest$(EXE) \
 	logTest$(EXE)
 
 ifdef WITH_GTEST
@@ -71,9 +70,6 @@ ifdef WITH_GTEST
 pechoHandler-gTest$(EXE): pechoHandler-gTest.o $(TOPDIR)/src/libsmerp.a $(TOPDIR)/examples/pecho/pechoHandler.o
 	$(CCPP_LINK) -o $@ $(LDFLAGS) $(OBJS) $< $(LIBS) $(TOPDIR)/examples/pecho/pechoHandler.o
 endif
-
-xmlselectHandlerTest$(EXE): xmlselectHandlerTest.o $(TOPDIR)/src/libsmerp.a $(TOPDIR)/examples/xmlselect/xmlselectHandler.o
-	$(CCPP_LINK) -o $@ $(LDFLAGS) $(OBJS) $< $(LIBS) $(TOPDIR)/examples/xmlselect/xmlselectHandler.o
 
 local_all:
 

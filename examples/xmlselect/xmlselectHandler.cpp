@@ -198,10 +198,10 @@ namespace tw = textwolf;
 struct Connection::Private
 {
    //* typedefs for input output blocks and input iterators
-   typedef protocol::InputBlock Input;                                           //< input buffer type
-   typedef protocol::OutputBlock Output;                                         //< output buffer type
-   typedef Input::iterator ProtocolIterator;                                     //< iterator type for protocol commands
-   typedef protocol::TextIterator<Input::iterator> ContentIterator;              //< iterator type for content
+   typedef protocol::InputBlock Input;                                      //< input buffer type
+   typedef protocol::OutputBlock Output;                                    //< output buffer type
+   typedef Input::const_iterator ProtocolIterator;                          //< iterator type for protocol commands
+   typedef protocol::TextIterator<Input::const_iterator> ContentIterator;   //< iterator type for content
    typedef tw::XMLPathSelectAutomaton<tw::charset::UTF8> Automaton;
    typedef tw::XMLPathSelect<ContentIterator,tw::charset::IsoLatin1,tw::charset::UTF8> Processor;
 
@@ -312,7 +312,7 @@ struct Connection::Private
       output.rest()[ 2] = ' ';
       output.rest()[ ElemHdrSize+size] = '\r';
       output.rest()[ ElemHdrSize+size+1] = '\n';
-      output.shift( ElemHdrSize+ElemTailSize+size);
+      output.setPos( output.pos()+ElemHdrSize+ElemTailSize+size);
    };
 
    char* elementPtr() const
@@ -471,15 +471,15 @@ struct Connection::Private
                     switch (get())
                     {
                        case Read:
-                          return Operation( Operation::READ, input->ptr(), input->size());
+                          return Operation( Operation::READ, input.ptr(), input.size());
 
                        case Write:
                           state = ProcessingAfterWrite;
-                          return Operation( Operation::WRITE, output->ptr(), output->filled());
+                          return Operation( Operation::WRITE, output.ptr(), output.pos());
 
                        case WriteLast:
                           state = Terminate;
-                          return Operation( Operation::WRITE, output->ptr(), output->size());
+                          return Operation( Operation::WRITE, output.ptr(), output.size());
 
                        case ReportError:
                        {
@@ -509,7 +509,7 @@ struct Connection::Private
       catch (Input::End)
       {
          LOG_DATA << "End of input interrupt";
-         return Operation( Operation::READ, input->ptr(), input->size());
+         return Operation( Operation::READ, input.ptr(), input.size());
       };
       return Operation( Operation::TERMINATE);
    };
@@ -545,10 +545,10 @@ void Connection::setPeer( const Network::RemoteSSLendpoint& remote)
    LOG_TRACE << "Peer set to " << remote.toString();
 }
 
-void* Connection::parseInput( const void *begin, std::size_t bytesTransferred)
+void* Connection::parseInput( const void*, std::size_t bytesTransferred)
 {
-   data->input.setFilled( bytesTransferred);
-   return (void*)(((char*)begin) + bytesTransferred);
+   data->input.setPos( bytesTransferred);
+   return (void*)(data->input.charptr() + bytesTransferred);
 }
 
 Connection::Operation Connection::nextOperation()

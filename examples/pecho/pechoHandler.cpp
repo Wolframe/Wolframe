@@ -11,18 +11,29 @@ using namespace _SMERP::pecho;
 struct Connection::Private
 {
    //* typedefs for input output blocks and input iterators
-   typedef protocol::InputBlock Input;                                           //< input buffer type
-   typedef protocol::OutputBlock Output;                                         //< output buffer type
-   typedef protocol::InputBlock::iterator ProtocolIterator;                      //< iterator type for protocol commands
-   typedef protocol::TextIterator<Input::iterator> ContentIterator;              //< iterator type for content
+   typedef protocol::InputBlock Input;                                      //< input buffer type
+   typedef protocol::OutputBlock Output;                                    //< output buffer type
+   typedef protocol::InputBlock::const_iterator ProtocolIterator;           //< iterator type for protocol commands
+   typedef protocol::TextIterator<Input::const_iterator> ContentIterator;   //< iterator type for content
 
    //* typedefs for input output buffers
-   typedef protocol::Buffer<128> LineBuffer;                                     //< buffer for one line of input/output
-   typedef protocol::CmdBuffer CmdBuffer;
+   typedef protocol::Buffer<128> LineBuffer;                                //< buffer for one line of input/output
+   typedef protocol::CmdBuffer CmdBuffer;                                   //< buffer for protocol commands 
    
    //* typedefs for state variables and buffers
    //list of processor states
-   enum State {Init,EnterCommand,EmptyLine,EnterMode,StartProcessing,ProcessingAfterWrite,Processing,HandleError,Terminate};
+   enum State 
+   {
+      Init,
+      EnterCommand,
+      EmptyLine,
+      EnterMode,
+      StartProcessing,
+      ProcessingAfterWrite,
+      Processing,
+      HandleError,
+      Terminate
+   };
    static const char* stateName( State i)
    {
       static const char* ar[] = {"Init","EnterCommand","EmptyLine","EnterMode","StartProcessing","ProcessingAfterWrite","Processing","HandleError","Terminate"};
@@ -270,8 +281,8 @@ struct Connection::Private
                 {
                    state = ProcessingAfterWrite;         //we a flushing the output buffer and have to release it when entering next time
                 }                
-                void* content = output->ptr();
-                std::size_t size = output->filled();
+                void* content = output.ptr();
+                std::size_t size = output.pos();
                 return Operation( Operation::WRITE, content, size);                
             }
             
@@ -295,7 +306,7 @@ struct Connection::Private
       catch (Input::End)
       {
          LOG_DATA << "End of input interrupt";
-         return Operation( Operation::READ, input->ptr(), input->size());
+         return Operation( Operation::READ, input.ptr(), input.size());
       };
       return Operation( Operation::TERMINATE);
    };
@@ -330,10 +341,10 @@ void Connection::setPeer( const Network::RemoteSSLendpoint& remote)
    LOG_TRACE << "Peer set to " << remote.toString();
 }
 
-void* Connection::parseInput( const void *begin, std::size_t bytesTransferred)
+void* Connection::parseInput( const void*, std::size_t bytesTransferred)
 {
-   data->input.setFilled( bytesTransferred);
-   return (void*)(((char*)begin) + bytesTransferred);
+   data->input.setPos( bytesTransferred);
+   return (void*)(data->input.charptr() + bytesTransferred);
 }
 
 Connection::Operation Connection::nextOperation()

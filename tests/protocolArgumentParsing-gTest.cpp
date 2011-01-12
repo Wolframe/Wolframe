@@ -54,14 +54,14 @@ static const TestDescription testDescription[40] =
 };
 
 
-class ProtocolFixture : public ::testing::Test
+class ProtocolArgumentParsingFixture : public ::testing::Test
 {
 public:
    std::vector<std::string> output;
    std::vector<std::string> expected;
 
 protected:
-   ProtocolFixture() {}
+   ProtocolArgumentParsingFixture() {}
 
 	virtual void SetUp()
 	{
@@ -87,7 +87,7 @@ protected:
 
 
 // Tests the Version constructors and members
-TEST_F( ProtocolFixture, Members )
+TEST_F( ProtocolArgumentParsingFixture, Members )
 {
    for (unsigned int tt=0; testDescription[tt].in; tt++)
    {

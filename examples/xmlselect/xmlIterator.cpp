@@ -326,7 +326,7 @@ struct ElementIteratorBase
                
    void defineInput( void* ptr, unsigned int size)
    {
-      input.mem.define( ptr,size);
+      input.set( ptr,size);
    };
    
    Source::State next()
@@ -372,7 +372,7 @@ struct ElementIterator
    
    virtual void feed( char* block, unsigned int blocksize)
    {
-      ElementIteratorBase<Charset>::input.mem.define( block, blocksize);
+      ElementIteratorBase<Charset>::input.set( block, blocksize);
    };
 };
 

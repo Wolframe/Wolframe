@@ -13,15 +13,12 @@ namespace protocol {
 class MemBlock
 {  
 public:
-   friend class InputBlock;
-   friend class OutputBlock;
-   
-   MemBlock( unsigned int p_size) :m_ptr(0),m_size(p_size),m_filled(0),m_allocated(false)
+   MemBlock( unsigned int p_size) :m_ptr(0),m_size(p_size),m_pos(0),m_allocated(false)
    {
       m_ptr = new unsigned char[ m_size];
       m_allocated = true;
    };
-   MemBlock( void* p_ptr, unsigned int p_size) :m_ptr(p_ptr),m_size(p_size),m_filled(0),m_allocated(false)
+   MemBlock( void* p_ptr, unsigned int p_size) :m_ptr(p_ptr),m_size(p_size),m_pos(0),m_allocated(false)
    {};
    
    ~MemBlock()
@@ -29,28 +26,29 @@ public:
       if (m_allocated) delete [] (unsigned char*)m_ptr;
    };
    
-   void init()
+   void setPos( unsigned int p_pos=0)
    {
-      m_filled = 0;
+      m_pos = p_pos;
    };
    
-   void define( void* p_ptr, unsigned int p_size)
+   void set( void* p_ptr, unsigned int p_size)
    {
       if (m_allocated) delete [] (unsigned char*)m_ptr;
       m_ptr = p_ptr;
       m_size = p_size;
-      m_filled = 0;
+      m_pos = 0;
       m_allocated = false;
    };
    
    void* ptr() const                  {return m_ptr;};
+   char* charptr() const              {return (char*)m_ptr;};
    unsigned int size() const          {return m_size;};
-   unsigned int filled() const        {return m_filled;};
+   unsigned int pos() const           {return m_pos;};
    
 private:
    void* m_ptr;
    unsigned int m_size;
-   unsigned int m_filled;
+   unsigned int m_pos;
    bool m_allocated;
    
    MemBlock( const MemBlock&) {};
@@ -61,45 +59,27 @@ private:
 //read as long as you can and throw an exception if you can't because you need more data.
 //@remark iterators based on this iterator must be without read ahead. 
 // it's illegal to ahead more that you consume. 
-class InputBlock 
+class InputBlock :public MemBlock 
 {
 public:
-   MemBlock mem;
-   unsigned char* content() const                    {return (unsigned char*)mem.ptr();};
-   unsigned int size() const                         {return mem.size();};
-   unsigned int endpos() const                       {return mem.filled();};
-  
-public:
-   InputBlock( unsigned int p_size)                  :mem(p_size) {};
-   InputBlock( void* p_ptr, unsigned int p_size)     :mem(p_ptr,p_size) {};
-   
-   MemBlock* operator->()                            {return &mem;};
-  
-   void init()
-   {
-      mem.init();
-   };
-   
-   void setFilled( unsigned int nn)
-   {
-      mem.m_filled = nn;
-   };
+   InputBlock( unsigned int p_size)                  :MemBlock(p_size) {};
+   InputBlock( void* p_ptr, unsigned int p_size)     :MemBlock(p_ptr,p_size) {};
    
    //exception thrown if there is nothing to read from the input anymore.
    //triggers reading more input from the network
    struct End {};
 
    //input iterator
-   class iterator
+   class const_iterator
    {
    public:   
       //skip to the next input character
       void skip()
       {
-          if (++pos == input->endpos())
+          if (++m_pos == m_input->pos())
           {
-            pos = 0;
-            input->mem.init();
+            m_pos = 0;
+            m_input->setPos(0);
             throw End();
           }
       };
@@ -107,86 +87,74 @@ public:
       //get the current input character
       char cur()
       {         
-          if (pos == input->endpos()) throw End();
-          return input->content()[ pos];
+          if (m_pos == m_input->pos()) throw End();
+          return m_input->charptr()[ m_pos];
       };
 
-      iterator( InputBlock* p_input)          :input(p_input),pos(0) {};
-      iterator()                              :input(0),pos(0) {};
-      iterator( const iterator& o)            :input(o.input),pos(o.pos) {};
-      iterator& operator=( const iterator& o) {input=o.input; return *this;}
+      const_iterator( InputBlock* input)                    :m_input(input),m_pos(0) {};
+      const_iterator()                                      :m_input(0),m_pos(0) {};
+      const_iterator( const const_iterator& o)              :m_input(o.m_input),m_pos(o.m_pos) {};
+      const_iterator& operator=( const const_iterator& o)   {m_input=o.m_input; return *this;}
 
-      iterator& operator++()                  {skip(); return *this;};
-      iterator operator++(int)                {iterator tmp(*this); skip(); return tmp;};
-      char operator*()                        {return cur();};
+      const_iterator& operator++()                          {skip(); return *this;};
+      const_iterator operator++(int)                        {const_iterator tmp(*this); skip(); return tmp;};
+      char operator*()                                      {return cur();};
 
    private:
-      InputBlock* input;
-      unsigned int pos;        
+      InputBlock* m_input;
+      unsigned int m_pos;        
    };
-   iterator begin()                           {iterator rt(this); return rt;};
-   iterator end()                             {return iterator();};
-   
-   //TODO make a real const iterator
-   typedef iterator const_iterator;
+   const_iterator begin()        {const_iterator rt(this); return rt;};
+   const_iterator end()          {return const_iterator();};
 };
 
 //output interface based on a memory block. 
 // print as buffer is available and then order to "ship" what you printed.
-class OutputBlock
+class OutputBlock :public MemBlock
 {
-private:
-   MemBlock mem;
-  
 public:
-   OutputBlock( unsigned int p_size)     :mem(p_size) {};
-
-   MemBlock* operator->()                {return &mem;};
-
-   void init()
-   {
-      mem.init();
-   };
-
+   OutputBlock( unsigned int p_size)                        :MemBlock(p_size) {};
+   OutputBlock( void* p_ptr, unsigned int p_size)           :MemBlock(p_ptr,p_size) {};
+   
    //return true if the buffer is empty
    bool empty() const
    {
-      return mem.filled()==0;
+      return (pos()==0);
    };
    
    //print one character to the output
    bool print( char ch)
    {
-      if (mem.m_filled == mem.m_size) return false;
-      ((char*)mem.m_ptr)[ mem.m_filled++] = ch;
+      if (pos() == size()) return false;
+      charptr()[ pos()] = ch;
+      setPos( pos() + 1);
       return true;
    };
 
    //forward the output buffer cursor
-   //TODO rename function
-   bool shift( unsigned int nn)
+   bool incPos( unsigned int nn)
    {
-      if (mem.m_filled+nn >= mem.m_size) return false;
-      mem.m_filled += nn;
+      if (pos()+nn >= size()) return false;
+      setPos( pos() + nn);
       return true;
    };
    
    //pointer to the rest of the output buffer block
    char* rest() const
    {
-      return ((char*)mem.m_ptr) + mem.m_filled;
+      return charptr() + pos();
    }
    
    //size of the rest of the output buffer (how many characters can be written)
    unsigned int restsize() const
    {
-      return mem.m_size - mem.m_filled;
+      return size() - pos();
    }
    
    //release a written memory block
    void release()
    {
-      mem.m_filled = 0;
+      setPos(0);
    }
 };
 

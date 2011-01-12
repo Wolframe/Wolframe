@@ -88,16 +88,19 @@ struct Random :public TestDescription<InputBufferSize,OutputBufferSize>
    }
 };
 
-static void escape( std::string& content)
+static std::string escape( std::string& content)
 {
    unsigned int ii,nn;
+   std::string rt;
    for (ii=0,nn=content.size(); ii<nn; ii++)
    {
       if (content[ii] == '.' && (ii==0 || content[ii-1] == '\n'))
       {
-         content[ii] = '\r';
+         continue;
       }
+      rt.push_back( content[ii]); 
    }
+   return rt;
 }
 
 
@@ -125,11 +128,10 @@ protected:
       expected.append( "OK enter data\r\n\r\n");
 
       input.append( test.content);
-      escape( test.content);
-      expected.append( test.content);
+      expected.append( escape( test.content));
 
       input.append( ".\r\n");
-      expected.append( "\r\r\nOK expecting command\r\n");
+      expected.append( "\r\nOK expecting command\r\n");
       input.append( "quit\r\n");
       expected.append( "BYE\r\n");
 	}
@@ -199,6 +201,11 @@ TYPED_TEST( pechoHandlerFixture, ExpectedResult )
    std::string output;
    char* itr = const_cast<char*>( this->input.c_str());
    EXPECT_EQ( 0, test::runTestIO( itr, &output, *this->connection));
+/* DEBUG   
+unsigned int ii=0,nn=output.size();
+for (;ii<nn && output[ii]==this->expected[ii]; ii++);
+if (ii != nn) printf( "SIZE R=%u,E=%u,DIFF AT %u='%d %d %d %d|%d %d %d %d'\n", output.size(), this->expected.size(), ii, output[ii-2],output[ii-1],output[ii-0],output[ii+1],this->expected[ii-2],this->expected[ii-1],this->expected[ii-0],this->expected[ii+1]);
+*/
    EXPECT_EQ( output, this->expected);
 }
 

@@ -14,7 +14,7 @@ class TextIterator
 private:
    Iterator* src_;
    Iterator& src() const                  {return *src_;};
-   enum State {SRC,CR,CR_LF,CR_LF_DOT,CR_LF_DOT_CR,CR_LF_DOT_CR_LF};
+   enum State {SRC,CR,CR_LF,CR_LF_DOT,CR_LF_DOT_CR,CR_LF_DOT_CR_LF,EOFSRC};
    State state;
    
 public:
@@ -28,9 +28,17 @@ public:
    {
       char ch = *src();
       if (state < CR_LF) return ch;
-      if (state == CR_LF) return (ch == '.')?'\r':ch;
-      if (state < CR_LF_DOT_CR_LF) return ch;
-      return 0; /*EOF*/
+      if (state == CR_LF)
+      {
+         if (ch == '.')
+         {
+            skip();
+            ch = *src();
+         }
+         if (state == CR_LF_DOT && ch == '\r') return 0;
+         return ch;
+      }
+      return (state < CR_LF_DOT_CR_LF)?ch:0;
    };
    
    //skip one character and adapt the EOF sequence detection state
@@ -115,16 +123,20 @@ public:
          if (ch == '\n')
          {
             state = CR_LF_DOT_CR_LF;
+            ++src();
          }
-         else
-         {
-            state = SRC;
-         }
+         state = EOFSRC;
       }
-      else
+      else if (state == CR_LF_DOT_CR_LF)
       {
-         state = SRC;
+         ++src();
+         state = EOFSRC;
       }
+   };
+
+   void resume()
+   {
+      while (state = EOFSRC) ++src();
    };
 
    TextIterator& operator++()                                  {skip(); return *this;};
