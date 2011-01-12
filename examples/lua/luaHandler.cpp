@@ -244,33 +244,15 @@ namespace _SMERP {
 				bool cont = lua_toboolean( l, lua_gettop( l ) );
 				if( !cont ) {
 					state_ = FINISHING;
-					return( s );
+					return s;
 				} else {
 					buffer_ += '\n';
-					return( s );
+					return s;
 				}
 			}
 			s++;
 		}
-		return( s );
-				
-	/*
-		char *s = (char *)begin;
-		if ( !strncmp( "quit", s, 4 ))
-			state_ = FINISHING;
-		else	{
-			for ( std::size_t i = 0; i < bytesTransferred; i++ )	{
-				if ( *s != '\n' )
-					buffer_ += *s;
-				else	{
-					buffer_ += *s++;
-					return( s );
-				}
-				s++;
-			}
-		}
-		return( s );
-		*/
+		return s;
 	}
 
 	void echoConnection::timeoutOccured()
