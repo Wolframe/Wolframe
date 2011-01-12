@@ -31,6 +31,8 @@ tests/pechoHandlerTest
 tests/xmlselectHandlerTest
 tests/counter-gTest
 tests/pechoHandler-gTest
+tests/pool-gTest
+tests/protocolArgumentParsing-gTest
 examples/echo/smerp-echo
 examples/pecho/smerp-pecho
 examples/xmlselect/smerp-xmlselect
