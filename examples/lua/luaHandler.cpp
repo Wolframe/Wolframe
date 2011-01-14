@@ -19,6 +19,8 @@ namespace _SMERP {
 
 	void echoConnection::createVM( )
 	{
+		LOG_TRACE << "Creating new Lua virtual machine";
+		
 		// instanitate a new VM
 		l = luaL_newstate( );
 		if( !l ) {
@@ -63,10 +65,14 @@ namespace _SMERP {
 			lua_pop( l, 1 );
 			throw new std::runtime_error( "Can't initialize LUA processor" );
 		}
+
+		LOG_TRACE << "A new Lua virtual machine has been created";
 	}
 	
 	void echoConnection::destroyVM( )
 	{
+		LOG_TRACE << "Destroying the Lua virtual machine";
+		
 		// give LUA code a chance to clean up resources or something
 		// usually hardly necessary, as the garbage collector should take care of it
 		lua_pushstring( l, "destroy" );
@@ -80,6 +86,8 @@ namespace _SMERP {
 		
 		// close the VM, give away resources
 		lua_close( l );
+
+		LOG_TRACE << "Lua virtual machine has been destroyed";
 	}
 
 	void echoConnection::printMemStats( )
@@ -127,7 +135,7 @@ namespace _SMERP {
 		if( res != 0 ) {
 			LOG_FATAL << "Unable to call 'new_connection' function: " << lua_tostring( l, -1 );
 			lua_pop( l, 1 );
-			throw new std::runtime_error( "Error in destruction of LUA processor" );
+			throw new std::runtime_error( "Error in LUA processor" );
 		}
 		printMemStats( );
 	}
@@ -149,124 +157,90 @@ namespace _SMERP {
 		if( res != 0 ) {
 			LOG_FATAL << "Unable to call 'new_connection' function: " << lua_tostring( l, -1 );
 			lua_pop( l, 1 );
-			throw new std::runtime_error( "Error in destruction of LUA processor" );
+			throw new std::runtime_error( "Error in LUA processor" );
 		}
 		printMemStats( );
 	}
 
-
 	/// Handle a request and produce a reply.
 	Network::NetworkOperation echoConnection::nextOperation()
 	{
-		switch( state_ )	{
-		case NEW:	{
-			state_ = HELLO;
-			const char *msg = "Welcome to SMERP.\n";
-			return Network::NetworkOperation( Network::NetworkOperation::WRITE,
-							  msg, strlen( msg ));
+		lua_pushstring( l, "next_operation" );
+		lua_gettable( l, LUA_GLOBALSINDEX );
+		int res = lua_pcall( l, 0, 2, 0 );
+		if( res != 0 ) {
+			LOG_FATAL << "Unable to call 'next_operation' function: " << lua_tostring( l, -1 );
+			lua_pop( l, 1 );
+			throw new std::runtime_error( "Error in LUA processor" );
 		}
-
-		case HELLO:
-			state_ = ANSWERING;
-			if ( buffer_.empty() )
-				return Network::NetworkOperation( Network::NetworkOperation::WRITE,
-								  buffer_.c_str(), buffer_.length() );
-			else	{
-				const char *msg = "BUFFER NOT EMPTY!\n";
-				return Network::NetworkOperation( Network::NetworkOperation::WRITE,
-								  msg, strlen( msg ));
-			}
-
-		case READING:
-			state_ = ANSWERING;
-			if ( ! buffer_.empty() )
-				return Network::NetworkOperation( Network::NetworkOperation::WRITE,
-								  buffer_.c_str(), buffer_.length() );
-			else	{
-				const char *msg = "EMPTY BUFFER !\n";
-				return Network::NetworkOperation( Network::NetworkOperation::WRITE,
-								  msg, strlen( msg ));
-			}
-
-		case ANSWERING:
-			buffer_.clear();
-			state_ = READING;
-			return Network::NetworkOperation( Network::NetworkOperation::READ, 30 );
-
-		case FINISHING:	{
-			state_ = TERMINATING;
-			const char *msg = "Thanks for using SMERP.\n";
+		const char *op = lua_tostring( l, lua_gettop( l ) );
+		if( !strcmp( op, "WRITE" ) ) {
+			const char *msg = lua_tostring( l, lua_gettop( l ) );
 			return Network::NetworkOperation( Network::NetworkOperation::WRITE,
-							  msg, strlen( msg ));
-		}
-
-		case TIMEOUT:	{
-			state_ = TERMINATING;
-			const char *msg = "Timeout. :P\n";
-			return Network::NetworkOperation( Network::NetworkOperation::WRITE,
-							  msg, strlen( msg ));
-		}
-
-		case SIGNALLED:	{
-			state_ = TERMINATING;
-			const char *msg = "Server is shutting down. :P\n";
-			return Network::NetworkOperation( Network::NetworkOperation::WRITE,
-							  msg, strlen( msg ));
-		}
-
-		case TERMINATING:
+							  msg, strlen( msg ) );
+		} else if( !strcmp( op, "READ" ) ) {
+			int size = lua_tointeger( l, lua_gettop( l ) );
+			return Network::NetworkOperation( Network::NetworkOperation::READ, size );
+		} else if( !strcmp( op, "TERMINATE" ) ) {
+			lua_pop( l, 1 );
 			return Network::NetworkOperation( Network::NetworkOperation::TERMINATE );
+		} else {
+			lua_pop( l, 1 );
+			LOG_FATAL << "Lua code returns '" << op << "', expecting one of 'READ', 'WRITE', 'TERMINATE'!";
+			throw new std::runtime_error( "Error in LUA processor" );
 		}
-		return Network::NetworkOperation( Network::NetworkOperation::TERMINATE );
+		printMemStats( );
 	}
-
-
+	
 	/// Parse incoming data. The return value indicates how much of the
 	/// input has been consumed.
 	void* echoConnection::parseInput( const void *begin, std::size_t bytesTransferred )
 	{
 		char *s = (char *)begin;
-		for( std::size_t i = 0; i < bytesTransferred; i++ ) {
-			if( *s != '\n' ) {
-				buffer_ += *s;
-			} else {
-				// don't pass the end of line to Lua
-				s++;
-				lua_pushstring( l, "got_line" );
-				lua_gettable( l, LUA_GLOBALSINDEX );
-				lua_pushstring( l, buffer_.c_str( ) );
-				int res = lua_pcall( l, 1, 1, 0 );
-				if( res != 0 ) {
-					LOG_FATAL << "Unable to call 'got_line' function: " << lua_tostring( l, -1 );
-					lua_pop( l, 1 );
-					throw new std::runtime_error( "Error in destruction of LUA processor" );
-				}
-				bool cont = lua_toboolean( l, lua_gettop( l ) );
-				if( !cont ) {
-					state_ = FINISHING;
-					return s;
-				} else {
-					buffer_ += '\n';
-					return s;
-				}
-			}
-			s++;
+		s[bytesTransferred] = '\0';
+		
+		lua_pushstring( l, "parse_input" );
+		lua_gettable( l, LUA_GLOBALSINDEX );
+		lua_pushstring( l, s );
+		int res = lua_pcall( l, 1, 0, 0 );
+		if( res != 0 ) {
+			LOG_FATAL << "Unable to call 'parse_input' function: " << lua_tostring( l, -1 );
+			lua_pop( l, 1 );
+			throw new std::runtime_error( "Error in LUA processor" );
 		}
+		
 		return s;
 	}
 
 	void echoConnection::timeoutOccured()
 	{
-		state_ = TIMEOUT;
 		LOG_TRACE << "Processor received timeout";
+
+		lua_pushstring( l, "timeout_occured" );
+		lua_gettable( l, LUA_GLOBALSINDEX );
+		lua_pushstring( l, buffer_.c_str( ) );
+		int res = lua_pcall( l, 0, 0, 0 );
+		if( res != 0 ) {
+			LOG_FATAL << "Unable to call 'timeout_occured' function: " << lua_tostring( l, -1 );
+			lua_pop( l, 1 );
+			throw new std::runtime_error( "Error in LUA processor" );
+		}
 	}
 
 	void echoConnection::signalOccured()
 	{
-		state_ = SIGNALLED;
 		LOG_TRACE << "Processor received signal";
-	}
 
+		lua_pushstring( l, "signal_occured" );
+		lua_gettable( l, LUA_GLOBALSINDEX );
+		lua_pushstring( l, buffer_.c_str( ) );
+		int res = lua_pcall( l, 0, 0, 0 );
+		if( res != 0 ) {
+			LOG_FATAL << "Unable to call 'signal_occured' function: " << lua_tostring( l, -1 );
+			lua_pop( l, 1 );
+			throw new std::runtime_error( "Error in LUA processor" );
+		}
+	}
 
 	/// ServerHandler PIMPL
 	Network::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const Network::LocalTCPendpoint& local )
