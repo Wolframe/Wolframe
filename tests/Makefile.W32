@@ -37,7 +37,7 @@ INCLUDE_LIBS = \
 
 TEST_CPP_BINS = \
 	logTest.exe
-	
+
 # fails for me:
 #link.exe /nologo /LIBPATH:"C:\Program Files\Microsoft SDKs\Windows\v7.0\
 #lib" /LIBPATH:"C:\Cygwin\home\Andreas\boost_1_45_0\stage\lib" /LIBPATH:"C:\Cygwi
@@ -48,8 +48,6 @@ TEST_CPP_BINS = \
 #NMAKE : fatal error U1077: '"C:\Program Files (x86)\Microsoft Visual Studio 9.0\
 #VC\BIN\link.exe"' : return code '0x450'
 #Stop.
-#	versionTest.exe
-#	counterTest.exe
 
 # currently don't compile because of ref-to-ptr trickery in test template
 #	pechoHandlerTest.exe
@@ -58,10 +56,10 @@ TEST_CPP_BINS = \
 !IFDEF WITH_GTEST
 TEST_CPP_BINS = \
 	$(TEST_CPP_BINS) \
-	version-gTest.exe \
-	counter-gTest.exe
-#  lot's of error, doens't compile on Windows!
-#	pool-gTest.exe
+	versionTest.exe \
+	counterTest.exe
+#  lots of errors, doens't compile on Windows!
+#	poolTest.exe
 # currently don't compile because of ref-to-ptr trickery in test template
 #	pechoHandler-gTest$(EXE)
 !ENDIF
@@ -72,15 +70,13 @@ all: $(OBJS) $(CPP_BINS)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-versionTest.exe: versionTest.obj $(TOPDIR)\src\smerp.lib
-counterTest.exe: counterTest.obj $(TOPDIR)\src\smerp.lib
 logTest.exe: logTest.obj $(TOPDIR)\src\smerp.lib
 pechoHandlerTest.exe: pechoHandlerTest.obj $(TOPDIR)\src\pechoHandler.o
 xmlselectHandlerTest.exe: xmlselectHandlerTest.obj $(TOPDIR)\src\xmlselectHandler.o
 !IFDEF WITH_GTEST
-version-gTest.exe: version-gTest.obj $(TOPDIR)\src\smerp.lib
-counter-gTest.exe: counter-gTest.obj $(TOPDIR)\src\smerp.lib
-pool-gTest.exe: pool-gTest.obj $(TOPDIR)\src\smerp.lib
+versionTest.exe: version-gTest.obj $(TOPDIR)\src\smerp.lib
+counterTest.exe: counter-gTest.obj $(TOPDIR)\src\smerp.lib
+poolTest.exe: pool-gTest.obj $(TOPDIR)\src\smerp.lib
 !ENDIF
 
 local_all:
@@ -93,16 +89,14 @@ local_distclean:
 local_test:
 	@-echo @echo off > test.bat
 	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
-#	@-echo echo Testing version... >> test.bat
-#	@-echo versionTest >> test.bat
-#	@-echo echo Testing counter.. >> test.bat
-#	@-echo counterTest >> test.bat
 	@-echo echo Testing logging... >> test.bat
 	@-echo logTest >> test.bat
 !IFDEF WITH_GTEST
 	@-echo echo Testing with Google test framework... >> test.bat
-	@-echo version-gTest >> test.bat
-	@-echo counter-gTest >> test.bat
-#	@-echo pool-gTest >> test.bat
+#	@-echo echo Testing version... >> test.bat
+#	@-echo versionTest >> test.bat
+#	@-echo echo Testing counter.. >> test.bat
+#	@-echo counterTest >> test.bat
+#	@-echo poolTest >> test.bat
 !ENDIF
 	@-test.bat

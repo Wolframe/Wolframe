@@ -54,7 +54,7 @@ ifdef WITH_GTEST
 TEST_CPP_BINS += \
 	versionTest$(EXE) \
 	counterTest$(EXE) \
-	pool-gTest$(EXE) \
+	poolTest$(EXE) \
 	pechoHandler-gTest$(EXE) \
 	protocolArgumentParsing-gTest$(EXE)
 endif
@@ -80,19 +80,15 @@ local_distclean:
 
 local_test:
 	@echo
-	@echo "Testing version..."
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./versionTest
-	@echo "Testing counter.."
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./counterTest
 	@echo "Testing logging..."
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./logTest
 ifdef WITH_GTEST
 	@echo "Testing with Google test framework..."
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./version-gTest
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./versionTest
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./counter-gTest
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./counterTest
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./pool-gTest
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./poolTest
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./pechoHandler-gTest
 	@echo
