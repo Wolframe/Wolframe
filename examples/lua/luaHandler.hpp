@@ -34,21 +34,6 @@ namespace _SMERP {
 		Network::NetworkOperation nextOperation();
 
 	private:
-		enum State	{
-			NEW,
-			HELLO,
-			READING,
-			ANSWERING,
-			FINISHING,
-			TIMEOUT,
-			SIGNALLED,
-			TERMINATING
-		};
-
-		State		state_;
-		std::string	buffer_;
-		
-	private:
 		lua_State *l;
 
 		void createVM( );

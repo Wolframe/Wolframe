@@ -48,7 +48,7 @@ CPP_BINS = \
 
 all: $(OBJS) $(CPP_BINS)
 
-smerp-lua.exe: smerp-lua.obj $(TOPDIR)\src\smerp.lib
+smerp-lua.exe: smerp-lua.obj $(TOPDIR)\src\smerp.lib $(OBJS)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
