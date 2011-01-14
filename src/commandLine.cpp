@@ -37,7 +37,7 @@ namespace _SMERP {
 #endif
 				( "config-file,c", prgOpts::value<std::string>(), "configuration file" )
 				( "debug,d", prgOpts::value<std::string>(), "set debug level (active only with --foreground)" )
-				( "use-config-logging", "log according to the configuration filr (active only with --foreground)" )
+				( "use-config-logging", "log according to the configuration file (active only with --foreground)" )
 #if !defined(_WIN32)
 // Unix daemon options
 				( "user,u", prgOpts::value<std::string>(), "run as <user>" )
@@ -133,6 +133,8 @@ namespace _SMERP {
 			if ( clMap.count( "foreground" ))
 				foreground = true;
 #endif
+			if ( clMap.count( "use-config-logging" ))
+				useConfigLog = true;
 
 			if ( clMap.count( "debug" ))	{
 				std::string str = clMap["debug"].as<std::string>();

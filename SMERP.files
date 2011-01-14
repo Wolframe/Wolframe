@@ -13,9 +13,7 @@
 ./src/smerpd.cpp
 ./src/version.cpp
 ./tests/logTest.cpp
-./tests/counter-gTest.cpp
 ./tests/threadLeakTest.cpp
-./tests/version-gTest.cpp
 ./tests/versionTest.cpp
 ./tests/pechoHandler-gTest.cpp
 ./tests/pechoHandlerTest.cpp
@@ -120,9 +118,9 @@ src/logBackend.hpp
 include/database.hpp
 include/README
 include/objectPool.hpp
-tests/pool-gTest.cpp
 include/ErrorCodes.hpp
 src/server.hpp
 include/configurationBase.hpp
 makefiles/gmake/platform.mk
 makefiles/gmake/config.mk
+tests/poolTest.cpp

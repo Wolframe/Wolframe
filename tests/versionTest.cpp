@@ -1,22 +1,26 @@
 //
-// version class tests
+// version class unit tests using google test framework (gTest)
+//
 
-#define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE "version class"
-
-#include <boost/test/unit_test.hpp>
-
+#include <climits>
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
 #include <stdio.h>
+
 #include "version.hpp"
+#include <gtest/gtest.h>
 
 
 #define	MAX_STRING	128
 
-struct F {
-	F()	{
+// The fixture for testing class SMERP::Version
+class VersionFixture : public ::testing::Test	{
+protected:
+	// You can remove any or all of the following functions if its body is empty.
+
+	// Set-up work for each test here.
+	VersionFixture()	{
 		srand((unsigned)time(0));
 		major = (unsigned short)( rand() % USHRT_MAX );
 		minor = (unsigned short)( rand() % USHRT_MAX );
@@ -29,15 +33,28 @@ struct F {
 		ver0 = new _SMERP::Version( major, minor, revision );
 		sprintf( verStr, "%d.%d.%d.%u", major, minor, revision, build );
 
-		BOOST_TEST_MESSAGE( "setup test versions" );
 	}
 
-	~F()	{
+	// Clean-up work that doesn't throw exceptions here.
+	virtual ~VersionFixture()	{
 		delete ver0;
 		delete ver;
-		BOOST_TEST_MESSAGE( "teardown fixture" );
 	}
 
+
+	// If the constructor and destructor are not enough for setting up
+	// and cleaning up each test, you can define the following methods:
+	//   Code here will be called immediately after the constructor (right
+	//   before each test).
+	virtual void SetUp() {
+	}
+
+	//   Code here will be called immediately after each test (right
+	//   before the destructor).
+	virtual void TearDown() {
+	}
+
+	// Objects declared here can be used by all tests in the test case.
 	unsigned short	major, minor, revision;
 	unsigned	build;
 	_SMERP::Version	*ver, *ver0;
@@ -45,27 +62,29 @@ struct F {
 };
 
 
-BOOST_FIXTURE_TEST_SUITE( _version_, F )
-
-BOOST_AUTO_TEST_CASE( members )
-{
-	BOOST_CHECK_EQUAL( ver->major(), major );
-	BOOST_CHECK_EQUAL( ver->minor(), minor );
-	BOOST_CHECK_EQUAL( ver->revision(), revision );
-	BOOST_CHECK_EQUAL( ver->build(), build );
-	BOOST_CHECK_EQUAL( ver->toString().c_str(), verStr );
+// Tests the Version constructors and members
+TEST_F( VersionFixture, Members )	{
+	ASSERT_EQ( ver->major(), major );
+	ASSERT_EQ( ver->minor(), minor );
+	ASSERT_EQ( ver->revision(), revision );
+	ASSERT_EQ( ver->build(), build );
+	ASSERT_STREQ( ver->toString().c_str(), verStr );
 }
 
-BOOST_AUTO_TEST_CASE( operators )
-{
-	BOOST_CHECK( *ver != *ver0 );
-	BOOST_CHECK( *ver > *ver0 );
-	BOOST_CHECK( *ver >= *ver0 );
-	BOOST_CHECK( !( *ver == *ver0 ));
-	BOOST_CHECK( !( *ver < *ver0 ));
-	BOOST_CHECK( !( *ver <= *ver0 ));
 
-	std::cout << ver->toString();
+// Tests the Version operators
+TEST_F( VersionFixture, Operators )	{
+	ASSERT_TRUE( *ver != *ver0 );
+	ASSERT_TRUE( *ver > *ver0 );
+	ASSERT_TRUE( *ver >= *ver0 );
+	ASSERT_FALSE( *ver == *ver0 );
+	ASSERT_FALSE( *ver < *ver0 );
+	ASSERT_FALSE( *ver <= *ver0 );
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+
+int main( int argc, char **argv )
+{
+	::testing::InitGoogleTest( &argc, argv );
+	return RUN_ALL_TESTS();
+}

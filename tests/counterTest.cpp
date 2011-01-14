@@ -1,51 +1,136 @@
 //
-// version class tests
+// atomic counter template unit tests using google test framework (gTest)
+//
 
-#define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE "atomic counter class"
-
-#include <boost/test/unit_test.hpp>
-
+#include <climits>
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
-#include <stdio.h>
+
+#include <boost/thread/thread.hpp>
+
 #include "atomicCounter.hpp"
+#include <gtest/gtest.h>
 
 
-#define	MAX_STRING	128
+_SMERP::AtomicCounter< unsigned long >	ulCounter0;
+_SMERP::AtomicCounter< int >		iCounter0;
 
-struct F {
-	F()	{
+
+// The fixture for testing class SMERP::AtomicCounter
+class CounterFixture : public ::testing::Test	{
+protected:
+	// Set-up work for each test here.
+	// You can remove any or all of the following functions if its body is empty.
+	CounterFixture()	{
 		srand((unsigned)time(0));
-		ulVal0 = (unsigned)( rand() % ULONG_MAX );
+		ulVal0 = (unsigned long)( rand() % ULONG_MAX );
 		iVal0 = (int)( rand() % INT_MAX );
-
-		ulCounter0.set( ulVal0 );
-		iCounter0.set( iVal0 );
-		BOOST_TEST_MESSAGE( "setup initial test numbers" );
+		noThreads = (int)( rand() % 256 );
+		times = (unsigned long)( rand() % 100000 );
+//		std::cout << noThreads << " threads, " << times << " iterations";
 	}
 
-	~F()	{
+	// Clean-up work that doesn't throw exceptions here.
+	virtual ~CounterFixture()	{
 	}
 
-	unsigned long	ulVal0;
-	int		iVal0;
-	_SMERP::AtomicCounter< unsigned long >	ulCounter0;
-	_SMERP::AtomicCounter< int >		iCounter0;
+
+	// If the constructor and destructor are not enough for setting up
+	// and cleaning up each test, you can define the following methods:
+	//   Code here will be called immediately after the constructor (right
+	//   before each test).
+	virtual void SetUp() {
+		ulCounter0 = ulVal0;
+		iCounter0 = iVal0;
+	}
+
+	//   Code here will be called immediately after each test (right
+	//   before the destructor).
+	virtual void TearDown() {
+	}
+
+	// Objects declared here can be used by all tests in the test case.
+	int                             noThreads;
+	std::vector<boost::thread *>	threads;
+	unsigned long                   ulVal0;
+	int				iVal0;
+	unsigned long			times;
+
+public:
+	static void incrementThread( unsigned long count )
+	{
+		for ( unsigned long i = 0; i < count; i++ )	{
+			++ulCounter0;
+			++iCounter0;
+		}
+	}
+
+	static void decrementThread( unsigned long count )
+	{
+		for ( unsigned long i = 0; i < count; i++ )	{
+			--ulCounter0;
+			--iCounter0;
+		}
+	}
 };
 
 
-BOOST_FIXTURE_TEST_SUITE( _atomicCounter_, F )
-
-BOOST_AUTO_TEST_CASE( assignment )
-{
-	BOOST_CHECK_EQUAL( ulCounter0.val(), ulVal0 );
-	BOOST_CHECK_EQUAL( iCounter0.val(), iVal0 );
+// Tests the AtomicCounter constructors and members
+TEST_F( CounterFixture, Assignment )	{
+	ASSERT_EQ( ulCounter0.val(), ulVal0 );
+	ASSERT_EQ( iCounter0.val(), iVal0 );
 }
 
-BOOST_AUTO_TEST_CASE( operators )
-{
+
+// Tests the AtomicCounter operators
+TEST_F( CounterFixture, Increment )	{
+	ASSERT_EQ( ulCounter0.val(), ulVal0 );
+	ASSERT_EQ( iCounter0.val(), iVal0 );
+
+	for ( int i = 0; i < noThreads; i++ )   {
+		boost::thread* thread = new boost::thread( &CounterFixture::incrementThread, times );
+		threads.push_back( thread );
+	}
+	for ( int i = 0; i < noThreads; i++ )   {
+		threads[i]->join();
+		delete threads[i];
+	}
+
+	ASSERT_EQ( ulCounter0.val(), ulVal0 + noThreads * times );
+	ASSERT_EQ( iCounter0.val(), iVal0 + noThreads * times );
+
+	ulCounter0 -= noThreads * times;
+	iCounter0 -= noThreads * times;
+	ASSERT_EQ( ulCounter0.val(), ulVal0 );
+	ASSERT_EQ( iCounter0.val(), iVal0 );
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+TEST_F( CounterFixture, Decrement )	{
+	ASSERT_EQ( ulCounter0.val(), ulVal0 );
+	ASSERT_EQ( iCounter0.val(), iVal0 );
+
+	ulCounter0 += noThreads * times;
+	iCounter0 += noThreads * times;
+	ASSERT_EQ( ulCounter0.val(), ulVal0 + noThreads * times );
+	ASSERT_EQ( iCounter0.val(), iVal0 + noThreads * times );
+
+	for ( int i = 0; i < noThreads; i++ )   {
+		boost::thread* thread = new boost::thread( &CounterFixture::decrementThread, times );
+		threads.push_back( thread );
+	}
+	for ( int i = 0; i < noThreads; i++ )   {
+		threads[i]->join();
+		delete threads[i];
+	}
+
+	ASSERT_EQ( ulCounter0.val(), ulVal0 );
+	ASSERT_EQ( iCounter0.val(), iVal0 );
+}
+
+
+int main( int argc, char **argv )
+{
+	::testing::InitGoogleTest( &argc, argv );
+	return RUN_ALL_TESTS();
+}

@@ -81,7 +81,7 @@ namespace _SMERP {
 		bool test();
 		void print( std::ostream& os ) const;
 
-		void foreground( LogLevel::Level debugLevel );
+		void foreground( LogLevel::Level debugLevel, bool useConfig );
 	};
 
 

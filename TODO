@@ -2,8 +2,6 @@ MBa:
 
 - propagate symbols through makefiles
 - SSL must require certificate from peer if verify is on
-- logger must be part of an application singleton, not an object defined as a global
-
 
 
 ABa:
@@ -18,6 +16,7 @@ ABa:
     NMAKE : fatal error U1077: '"C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\BIN\link.exe"' : return code '0x450'
 - lua processor:
   - didn't find a way to limit the memory usage of the VM
+
 
 PF:
 

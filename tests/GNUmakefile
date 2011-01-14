@@ -46,16 +46,14 @@ TEST_OBJS =
 #	$(TOPDIR)/examples/xmlselect/xmlselectHandler.o
 
 TEST_CPP_BINS = \
-	versionTest$(EXE) \
-	counterTest$(EXE) \
 	threadLeakTest$(EXE) \
 	pechoHandlerTest$(EXE) \
 	logTest$(EXE)
 
 ifdef WITH_GTEST
 TEST_CPP_BINS += \
-	version-gTest$(EXE) \
-	counter-gTest$(EXE) \
+	versionTest$(EXE) \
+	counterTest$(EXE) \
 	pool-gTest$(EXE) \
 	pechoHandler-gTest$(EXE) \
 	protocolArgumentParsing-gTest$(EXE)
