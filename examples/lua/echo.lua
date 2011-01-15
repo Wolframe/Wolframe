@@ -20,6 +20,7 @@ function new_connection( remote_host, remote_port, common_name )
 	if( common_name ) then
 		io.write( "LUA: encrypted connection, CN is " .. common_name .. "\n" )
 	end
+	state = "NEW"
 end
 
 -- handle a request and produce a reply

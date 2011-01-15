@@ -102,7 +102,6 @@ namespace _SMERP {
 		LOG_TRACE << "Created connection handler for " << local.toString();
 		createVM( );
 		printMemStats( );
-		state_ = NEW;
 	}
 
 
@@ -111,7 +110,6 @@ namespace _SMERP {
 		LOG_TRACE << "Created connection handler (SSL) for " << local.toString();
 		createVM( );
 		printMemStats( );
-		state_ = NEW;
 	}
 
 	echoConnection::~echoConnection()
@@ -218,7 +216,6 @@ namespace _SMERP {
 
 		lua_pushstring( l, "timeout_occured" );
 		lua_gettable( l, LUA_GLOBALSINDEX );
-		lua_pushstring( l, buffer_.c_str( ) );
 		int res = lua_pcall( l, 0, 0, 0 );
 		if( res != 0 ) {
 			LOG_FATAL << "Unable to call 'timeout_occured' function: " << lua_tostring( l, -1 );
@@ -233,7 +230,6 @@ namespace _SMERP {
 
 		lua_pushstring( l, "signal_occured" );
 		lua_gettable( l, LUA_GLOBALSINDEX );
-		lua_pushstring( l, buffer_.c_str( ) );
 		int res = lua_pcall( l, 0, 0, 0 );
 		if( res != 0 ) {
 			LOG_FATAL << "Unable to call 'signal_occured' function: " << lua_tostring( l, -1 );
