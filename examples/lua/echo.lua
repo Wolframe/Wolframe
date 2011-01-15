@@ -30,37 +30,37 @@ function next_operation( )
 	if state == "NEW" then
 		state = "HELLO"
 		return WRITE, "Welcome to SMERP.\n"
- 	else if state == "HELLO" then
+ 	elseif state == "HELLO" then
 		state = "ANSWERING"
 		if string.len( buffer ) == 0 then
 			return WRITE, buffer
 		else
 			return WRITE, "BUFFER NOT EMPTY!\n"
 		end
-	else if state == "READING" then
+	elseif state == "READING" then
 		state = ANSWERING
 		if string.len( buffer ) > 0 then
 			return WRITE, buffer
 		else
 			return WRITE, "EMTPY BUFFER!\n"
 		end
-	else if state == "ANSWERING" then
+	elseif state == "ANSWERING" then
 		buffer = ""
 		state = "READING"
 		return READ, 30
-	else if state == "FINISHING" then
+	elseif state == "FINISHING" then
 		state = "TERMINATING"
 		return WRITE, "Thanks for using SMERP.\n"
-	else if state == "TIMEOUT" then
+	elseif state == "TIMEOUT" then
 		state = TERMINATING
 		return WRITE, "Timeout. :P\n"
-	else if state == "SIGNALLED" then
+	elseif state == "SIGNALLED" then
 		state = TERMINATING
 		return WRITE, "Server is shutting down. :P\n";
-	else if state == "TERMINATING"  then
+	elseif state == "TERMINATING"  then
 		return "TERMINATE", 0
 	else
-		io.write( "Illegal state " . state . "!!" )
+		io.write( "Illegal state " .. state .. "!!" )
 	end
 end
 
@@ -76,45 +76,21 @@ end
 
 -- called when receiving a line a data
 function parse_input( data )
-	io.write( "LUA got line: " .. s .. "\n" )
-	if s == "quit" then
-		-- signals end
-		return false
-	end
-	return true
-end
+	io.write( "LUA got data: " .. data .. "\n" )
 
-	void* echoConnection::parseInput( const void *begin, std::size_t bytesTransferred )
-	{
-		char *s = (char *)begin;
-		for( std::size_t i = 0; i < bytesTransferred; i++ ) {
-			if( *s != '\n' ) {
-				buffer_ += *s;
-			} else {
-				// don't pass the end of line to Lua
-				s++;
-				lua_pushstring( l, "got_line" );
-				lua_gettable( l, LUA_GLOBALSINDEX );
-				lua_pushstring( l, buffer_.c_str( ) );
-				int res = lua_pcall( l, 1, 1, 0 );
-				if( res != 0 ) {
-					LOG_FATAL << "Unable to call 'got_line' function: " << lua_tostring( l, -1 );
-					lua_pop( l, 1 );
-					throw new std::runtime_error( "Error in LUA processor" );
-				}
-				bool cont = lua_toboolean( l, lua_gettop( l ) );
-				if( !cont ) {
-					state_ = FINISHING;
-					return s;
-				} else {
-					buffer_ += '\n';
-					return s;
-				}
-			}
-			s++;
-		}
-		return s;
-	}
+	buffer = buffer + s
+	pos = string.find( buffer, "\n" )
+	if pos then
+		s = string.sub( buffer, 0, pos )
+		buffer = string.sub( buffer, pos+1 )
+
+		if s == "quit" then
+			state = "FINISHING"
+		end
+	else
+		-- buffer doesn't contain a newline, wait a little longer
+	end
+end
 
 -- the main, initialize globals here
 io.write( "LUA: main called.\n" )

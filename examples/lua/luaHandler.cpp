@@ -171,13 +171,13 @@ namespace _SMERP {
 			lua_pop( l, 1 );
 			throw new std::runtime_error( "Error in LUA processor" );
 		}
-		const char *op = lua_tostring( l, lua_gettop( l ) );
+		const char *op = lua_tostring( l, -2 );
 		if( !strcmp( op, "WRITE" ) ) {
-			const char *msg = lua_tostring( l, lua_gettop( l ) );
+			const char *msg = lua_tostring( l, -1 );
 			return Network::NetworkOperation( Network::NetworkOperation::WRITE,
 							  msg, strlen( msg ) );
 		} else if( !strcmp( op, "READ" ) ) {
-			int size = lua_tointeger( l, lua_gettop( l ) );
+			int size = lua_tointeger( l, -1 );
 			return Network::NetworkOperation( Network::NetworkOperation::READ, size );
 		} else if( !strcmp( op, "TERMINATE" ) ) {
 			lua_pop( l, 1 );
