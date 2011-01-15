@@ -29,34 +29,34 @@ function next_operation( )
 	
 	if state == "NEW" then
 		state = "HELLO"
-		return WRITE, "Welcome to SMERP.\n"
+		return "WRITE", "Welcome to SMERP.\n"
  	elseif state == "HELLO" then
 		state = "ANSWERING"
 		if string.len( buffer ) == 0 then
-			return WRITE, buffer
+			return "WRITE", buffer
 		else
-			return WRITE, "BUFFER NOT EMPTY!\n"
+			return "WRITE", "BUFFER NOT EMPTY!\n"
 		end
 	elseif state == "READING" then
-		state = ANSWERING
+		state = "ANSWERING"
 		if string.len( buffer ) > 0 then
-			return WRITE, buffer
+			return "WRITE", buffer
 		else
-			return WRITE, "EMTPY BUFFER!\n"
+			return "WRITE", "EMTPY BUFFER!\n"
 		end
 	elseif state == "ANSWERING" then
 		buffer = ""
 		state = "READING"
-		return READ, 30
+		return "READ", 30
 	elseif state == "FINISHING" then
 		state = "TERMINATING"
-		return WRITE, "Thanks for using SMERP.\n"
+		return "WRITE", "Thanks for using SMERP.\n"
 	elseif state == "TIMEOUT" then
-		state = TERMINATING
-		return WRITE, "Timeout. :P\n"
+		state = "TERMINATING"
+		return "WRITE", "Timeout. :P\n"
 	elseif state == "SIGNALLED" then
-		state = TERMINATING
-		return WRITE, "Server is shutting down. :P\n";
+		state = "TERMINATING"
+		return "WRITE", "Server is shutting down. :P\n"
 	elseif state == "TERMINATING"  then
 		return "TERMINATE", 0
 	else
@@ -78,7 +78,7 @@ end
 function parse_input( data )
 	io.write( "LUA got data: " .. data .. "\n" )
 
-	buffer = buffer + s
+	buffer = buffer .. data
 	pos = string.find( buffer, "\n" )
 	if pos then
 		s = string.sub( buffer, 0, pos )

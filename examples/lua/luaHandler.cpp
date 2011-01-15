@@ -30,13 +30,16 @@ namespace _SMERP {
 		
 		// TODO: open standard libraries, most likely something to configure later,
 		// the plain echo processor should work without any lua libraries
-		//luaL_openlibs( l );
+		luaL_openlibs( l );
 		// or open them individually, see:
 		// http://stackoverflow.com/questions/966162/best-way-to-omit-lua-standard-libraries
 		lua_pushcfunction( l, luaopen_base );
 		lua_pushstring( l, "" );
 		lua_call( l, 1, 0 );
 		lua_pushcfunction( l, luaopen_io );
+		lua_pushstring( l, LUA_LOADLIBNAME );
+		lua_call( l, 1, 0 );
+		lua_pushcfunction( l, luaopen_string );
 		lua_pushstring( l, LUA_LOADLIBNAME );
 		lua_call( l, 1, 0 );
 		
@@ -174,16 +177,18 @@ namespace _SMERP {
 		const char *op = lua_tostring( l, -2 );
 		if( !strcmp( op, "WRITE" ) ) {
 			const char *msg = lua_tostring( l, -1 );
+			lua_pop( l, 2 );
 			return Network::NetworkOperation( Network::NetworkOperation::WRITE,
 							  msg, strlen( msg ) );
 		} else if( !strcmp( op, "READ" ) ) {
 			int size = lua_tointeger( l, -1 );
+			lua_pop( l, 2 );
 			return Network::NetworkOperation( Network::NetworkOperation::READ, size );
 		} else if( !strcmp( op, "TERMINATE" ) ) {
-			lua_pop( l, 1 );
+			lua_pop( l, 2 );
 			return Network::NetworkOperation( Network::NetworkOperation::TERMINATE );
 		} else {
-			lua_pop( l, 1 );
+			lua_pop( l, 2 );
 			LOG_FATAL << "Lua code returns '" << op << "', expecting one of 'READ', 'WRITE', 'TERMINATE'!";
 			throw new std::runtime_error( "Error in LUA processor" );
 		}
