@@ -143,12 +143,12 @@ protected:
 };
 
 typedef ::testing::Types<
-   Empty<1,1>, 
-   OneEmptyLine<1,1>, 
+   Empty<1,1>,
+   OneEmptyLine<1,1>,
    OneOneCharLine<1,1>, 
    OneLine<1,1>, 
    Random<1,1,2000>,
-   Empty<2,2>, 
+   Empty<2,2>,
    OneEmptyLine<2,2>, 
    OneOneCharLine<2,2>, 
    OneLine<2,2>, 
@@ -201,11 +201,11 @@ TYPED_TEST( pechoHandlerFixture, ExpectedResult )
    std::string output;
    char* itr = const_cast<char*>( this->input.c_str());
    EXPECT_EQ( 0, test::runTestIO( itr, &output, *this->connection));
-/* DEBUG   
-unsigned int ii=0,nn=output.size();
-for (;ii<nn && output[ii]==this->expected[ii]; ii++);
-if (ii != nn) printf( "SIZE R=%u,E=%u,DIFF AT %u='%d %d %d %d|%d %d %d %d'\n", output.size(), this->expected.size(), ii, output[ii-2],output[ii-1],output[ii-0],output[ii+1],this->expected[ii-2],this->expected[ii-1],this->expected[ii-0],this->expected[ii+1]);
-*/
+#ifdef _SMERP_LOWLEVEL_DEBUG   
+      unsigned int ii=0,nn=output.size();
+      for (;ii<nn && output[ii]==this->expected[ii]; ii++);
+      if (ii != nn) printf( "SIZE R=%u,E=%u,DIFF AT %u='%d %d %d %d|%d %d %d %d'\n", output.size(), this->expected.size(), ii, output[ii-2],output[ii-1],output[ii-0],output[ii+1],this->expected[ii-2],this->expected[ii-1],this->expected[ii-0],this->expected[ii+1]);
+#endif   
    EXPECT_EQ( output, this->expected);
 }
 
