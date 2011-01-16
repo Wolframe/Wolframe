@@ -60,17 +60,19 @@ function next_operation( )
 	elseif state == "TERMINATING"  then
 		return "TERMINATE", 0
 	else
-		io.write( "Illegal state " .. state .. "!!" )
+		io.write( "LUA: Illegal state " .. state .. "!!" )
 	end
 end
 
 -- a timeout occured
 function timeout_occured( )
+	io.write( "LUA: got timeout\n" )
 	state = "TIMEOUT"
 end
 
 -- a signal (Ctrl-C) occured
-function aignal_occured( )
+function signal_occured( )
+	io.write( "LUA: got signalled\n" )
 	state = "SIGNALLED"
 end
 
@@ -81,14 +83,17 @@ function parse_input( data )
 	buffer = buffer .. data
 	pos = string.find( buffer, "\n" )
 	if pos then
-		s = string.sub( buffer, 0, pos )
-		buffer = string.sub( buffer, pos+1 )
+		buffer = string.sub( buffer, 0, pos - 1 )
 
-		if s == "quit" then
+		if buffer == "quit" then
 			state = "FINISHING"
+		else
+			buffer = buffer .. "\n"
 		end
+		return pos
 	else
 		-- buffer doesn't contain a newline, wait a little longer
+		return 0
 	end
 end
 

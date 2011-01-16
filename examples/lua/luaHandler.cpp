@@ -205,13 +205,15 @@ namespace _SMERP {
 		lua_pushstring( l, "parse_input" );
 		lua_gettable( l, LUA_GLOBALSINDEX );
 		lua_pushstring( l, s );
-		int res = lua_pcall( l, 1, 0, 0 );
+		int res = lua_pcall( l, 1, 1, 0 );
 		if( res != 0 ) {
 			LOG_FATAL << "Unable to call 'parse_input' function: " << lua_tostring( l, -1 );
 			lua_pop( l, 1 );
 			throw new std::runtime_error( "Error in LUA processor" );
 		}
-		
+		int bytesProcessed = lua_tointeger( l, -1 );
+
+		s += bytesProcessed;
 		return s;
 	}
 
