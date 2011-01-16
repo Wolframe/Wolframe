@@ -4,7 +4,8 @@ SUBDIRS =
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
-LUA_DIR = C:\Cygwin\home\Andreas\lua-5.1.4
+#LUA_DIR = C:\Cygwin\home\Andreas\lua-5.1.4
+LUA_DIR = C:\Cygwin\home\Administrator\lua-5.1.4
 
 INCLUDE_CPPFLAGS = \
 	/D_WIN32_WINNT=0x403

@@ -74,9 +74,9 @@ logTest.exe: logTest.obj $(TOPDIR)\src\smerp.lib
 pechoHandlerTest.exe: pechoHandlerTest.obj $(TOPDIR)\src\pechoHandler.o
 xmlselectHandlerTest.exe: xmlselectHandlerTest.obj $(TOPDIR)\src\xmlselectHandler.o
 !IFDEF WITH_GTEST
-versionTest.exe: version-gTest.obj $(TOPDIR)\src\smerp.lib
-counterTest.exe: counter-gTest.obj $(TOPDIR)\src\smerp.lib
-poolTest.exe: pool-gTest.obj $(TOPDIR)\src\smerp.lib
+versionTest.exe: versionTest.obj $(TOPDIR)\src\smerp.lib
+counterTest.exe: counterTest.obj $(TOPDIR)\src\smerp.lib
+poolTest.exe: poolTest.obj $(TOPDIR)\src\smerp.lib
 !ENDIF
 
 local_all:
@@ -93,10 +93,10 @@ local_test:
 	@-echo logTest >> test.bat
 !IFDEF WITH_GTEST
 	@-echo echo Testing with Google test framework... >> test.bat
-#	@-echo echo Testing version... >> test.bat
-#	@-echo versionTest >> test.bat
-#	@-echo echo Testing counter.. >> test.bat
-#	@-echo counterTest >> test.bat
-#	@-echo poolTest >> test.bat
+	@-echo echo Testing version... >> test.bat
+	@-echo versionTest >> test.bat
+	@-echo echo Testing counter.. >> test.bat
+	@-echo counterTest >> test.bat
+	@-echo poolTest >> test.bat
 !ENDIF
 	@-test.bat
