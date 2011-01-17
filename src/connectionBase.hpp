@@ -20,6 +20,9 @@
 namespace _SMERP {
 	namespace Network {
 
+	static const std::size_t	ReadBufferSize = 8192;
+
+
 	/// Represents a single connection from a client.
 	template< typename socketType >
 	class connectionBase : public boost::enable_shared_from_this< connectionBase< socketType > >,
@@ -75,7 +78,7 @@ namespace _SMERP {
 		boost::asio::io_service::strand	strand_;
 
 		/// Buffer for incoming data.
-		boost::array<char, 8192>	buffer_;
+		boost::array<char, ReadBufferSize>	buffer_;
 
 		/// The handler used to process the incoming request.
 		connectionHandler		*connectionHandler_;
