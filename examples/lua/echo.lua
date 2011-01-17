@@ -1,4 +1,4 @@
--- global variable
+-- global variables
 state = "INIT"
 buffer = ""
 
@@ -27,6 +27,8 @@ end
 function next_operation( )
 	io.write( "LUA next operation\n" )
 	
+	error( "bla" )
+
 	if state == "NEW" then
 		state = "HELLO"
 		return "WRITE", "Welcome to SMERP.\n"
@@ -60,7 +62,7 @@ function next_operation( )
 	elseif state == "TERMINATING"  then
 		return "TERMINATE", 0
 	else
-		io.write( "LUA: Illegal state " .. state .. "!!" )
+		error( "LUA: Illegal state " .. state .. "!!" )
 	end
 end
 
