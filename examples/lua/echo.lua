@@ -27,8 +27,6 @@ end
 function next_operation( )
 	io.write( "LUA next operation\n" )
 	
-	error( "bla" )
-
 	if state == "NEW" then
 		state = "HELLO"
 		return "WRITE", "Welcome to SMERP.\n"
