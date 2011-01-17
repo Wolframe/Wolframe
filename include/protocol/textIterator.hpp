@@ -12,8 +12,9 @@ template <class Iterator>
 class TextIterator
 {
 private:
-   Iterator* src_;
-   Iterator& src() const                  {return *src_;};
+   Iterator* m_src;
+   Iterator& src() const                  {return *m_src;};
+   
    enum State {SRC,CR,CR_LF,CR_LF_DOT,CR_LF_DOT_CR,CR_LF_DOT_CR_LF};
    
    static const char* stateName( State state)
@@ -25,7 +26,7 @@ private:
    
 public:
    TextIterator()                         :state(SRC) {};
-   TextIterator( Iterator* p_src)         :src_(p_src),state(SRC) {};
+   TextIterator( Iterator* p_src)         :m_src(p_src),state(SRC) {};
 
    //return the current character
    //  or a '\r' for the '.' after EOL
@@ -141,7 +142,7 @@ public:
    TextIterator& operator++()                                  {skip(); return *this;};
    TextIterator operator++(int)                                {TextIterator tmp(*this); skip(); return tmp;};
    char operator*()                                            {return cur();};
-   TextIterator& operator=( Iterator* p_src)                   {src_=p_src; return *this;};
+   TextIterator& operator=( Iterator* p_src)                   {m_src=p_src; return *this;};
 };
    
 } // namespace protocol
