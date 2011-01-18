@@ -8,9 +8,10 @@ namespace protocol {
 //Defines the building block for generators as iterator concept in interpreted languages 
 //having a form of 'yield' instruction (LUA,Python,etc.).
 
-//Behind a generator is everithing hidden that we want to keep away from the processor:
+//Behind a generator are things hidden from the processor:
 // - different levels of source transformation and filtering (for example XML Path selection and charset mapping)
 // - end of content recognition (part of the protocol)
+// - state handling for different action of the protocol handler in yield
 
 
 //interface for (non copyable, non STL conform) iterator over input content elements
@@ -43,10 +44,30 @@ class Generator
       State state() const                                      {return m_state;};
       
       virtual ~Generator() {};
-      virtual bool skip()=0;
-      virtual void feed( void* block, unsigned int blocksize)=0;
-      virtual void getRestBlock( void** block, unsigned int* blocksize)=0;
       
+      //used to go to next element (see example below)
+      virtual bool skip()=0;
+
+      //used by the protocol to pass more content to the generator in yield state.
+      virtual void feed( void* block, unsigned int blocksize)=0;
+      
+      //used by functions that transform generators (like XML header to content with different character set)
+      virtual void getRestBlock( void** block, unsigned int* blocksize)=0;
+
+      //@example generator function in C for the processor:
+      //
+      //bool nativeGeneratorCall( Generator* g, const char** b, unsigned int* n)
+      //{
+      //   if (!g->skip()) 
+      //   {
+      //      if (g->state() == Generator::EndOfInput) return false;
+      //      nativeCallYield();
+      //   }
+      //   *b = g->value();
+      //   *n = g->size();
+      //   return true;
+      //}
+
    protected:
       Element m_cur;
       State m_state;
