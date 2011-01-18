@@ -1,5 +1,6 @@
 #ifndef _SMERP_PROTOCOL_IO_BLOCKS_HPP_INCLUDED
 #define _SMERP_PROTOCOL_IO_BLOCKS_HPP_INCLUDED
+#include <cstring>
 
 namespace _SMERP {
 namespace protocol {
@@ -13,13 +14,34 @@ namespace protocol {
 class MemBlock
 {  
 public:
-   MemBlock( unsigned int p_size) :m_ptr(0),m_size(p_size),m_pos(0),m_allocated(false)
+   MemBlock()                                    :m_ptr(0),m_size(0),m_pos(0),m_allocated(false) {};
+   MemBlock( unsigned int p_size)                :m_ptr(0),m_size(p_size),m_pos(0),m_allocated(false)
    {
       m_ptr = new unsigned char[ m_size];
       m_allocated = true;
    };
-   MemBlock( void* p_ptr, unsigned int p_size) :m_ptr(p_ptr),m_size(p_size),m_pos(0),m_allocated(false)
-   {};
+   MemBlock( void* p_ptr, unsigned int p_size)   :m_ptr(p_ptr),m_size(p_size),m_pos(0),m_allocated(false){};
+
+   MemBlock( const MemBlock& o)                  :m_ptr(0),m_size(0),m_pos(0),m_allocated(false) {*this = o;};
+   
+   MemBlock& operator=( const MemBlock& o)
+   {
+      if (m_allocated) delete [] (unsigned char*)m_ptr;
+      m_size = o.m_size;
+      m_pos = o.m_pos;
+      m_allocated = o.m_allocated;
+
+      if (o.m_allocated)
+      {
+         m_ptr = new unsigned char[ m_size];
+         memcpy( m_ptr, o.m_ptr, m_size); 
+      }
+      else
+      {
+         m_ptr = o.m_ptr;
+      }
+      return *this;
+   };
    
    ~MemBlock()
    {
@@ -50,9 +72,6 @@ private:
    unsigned int m_size;
    unsigned int m_pos;
    bool m_allocated;
-   
-   MemBlock( const MemBlock&) {};
-   MemBlock& operator=( const MemBlock&);
 };
 
 //input memory block to iterate through with an iterator: 
@@ -62,8 +81,10 @@ private:
 class InputBlock :public MemBlock 
 {
 public:
+   InputBlock()                                      {};
    InputBlock( unsigned int p_size)                  :MemBlock(p_size) {};
    InputBlock( void* p_ptr, unsigned int p_size)     :MemBlock(p_ptr,p_size) {};
+   InputBlock( const InputBlock& o)                  :MemBlock(o) {};
    
    //exception thrown if there is nothing to read from the input anymore.
    //triggers reading more input from the network
@@ -115,6 +136,7 @@ class OutputBlock :public MemBlock
 public:
    OutputBlock( unsigned int p_size)                        :MemBlock(p_size) {};
    OutputBlock( void* p_ptr, unsigned int p_size)           :MemBlock(p_ptr,p_size) {};
+   OutputBlock( const OutputBlock& o)                  :MemBlock(o) {};
    
    //return true if the buffer is empty
    bool empty() const

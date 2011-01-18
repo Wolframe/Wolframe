@@ -1965,8 +1965,7 @@ public:
    {
       if (atm->states.size() > 0) expand(0);
    };
-   XMLPathSelect( const XMLPathSelect& o)                                                                           :scan(o.scan),atm(o.atm),scopestk(o.maxScopeStackSize),follows(o.maxFollows),tokens(o.maxTokens) 
-   {};
+   XMLPathSelect( const XMLPathSelect& o)                                                                           :scan(o.scan),atm(o.atm),scopestk(o.maxScopeStackSize),follows(o.maxFollows),tokens(o.maxTokens){};
 
    void setOutputBuffer( char* outputBuf, unsigned int outputBufSize)
    {

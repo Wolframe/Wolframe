@@ -18,6 +18,7 @@ public:
    bool defineExpression( int type, const char* expression, int* errorPos=0);
 
 private:
+   friend class Source;
    struct Private;
    Private* data;
 };
@@ -68,11 +69,11 @@ public:
    };
 
    //create iterator over the XML header
-   const_iterator* createHeaderIterator( char* outbuf, unsigned int outbufsize);
+   const_iterator* createXMLHeaderIterator( char* outbuf, unsigned int outbufsize);
    //create iterator over the XML elements
-   const_iterator* createElementIterator( const char* charset, char* outbuf, unsigned int outbufsize);
+   const_iterator* createXMLElementIterator( const char* charset, char* outbuf, unsigned int outbufsize);
    //create iterator over the XPath selected elements
-   const_iterator* createSelectIterator( const char* charset, char* outbuf, unsigned int outbufsize, Automaton* atm);
+   const_iterator* createXMLSelectIterator( const char* charset, char* outbuf, unsigned int outbufsize, const Automaton* atm);
 };
 
 
