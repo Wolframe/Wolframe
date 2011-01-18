@@ -8,7 +8,8 @@ INCLUDE_CPPFLAGS =
 
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include \
-	-I$(BOOST_INCLUDE_DIRS)
+	-I$(BOOST_INCLUDE_DIRS) \
+	-I/usr/include/lua5.1
 
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR)
@@ -18,7 +19,7 @@ INCLUDE_LIBS = \
 	-lboost_program_options \
 	-lboost_filesystem \
 	$(TOPDIR)/src/libsmerp.a \
-	-llua -ldl
+	-llua5.1 -ldl
 # openssl
 
 ifdef WITH_SSL

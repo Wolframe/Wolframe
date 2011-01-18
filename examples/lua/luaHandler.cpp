@@ -204,8 +204,8 @@ namespace _SMERP {
 	void* echoConnection::parseInput( const void *begin, std::size_t bytesTransferred )
 	{
 		char *s = (char *)begin;
-		s[bytesTransferred] = '\0';
-		
+		s[bytesTransferred - 1] = '\0';
+
 		lua_pushstring( l, "parse_input" );
 		lua_gettable( l, LUA_GLOBALSINDEX );
 		lua_pushstring( l, s );

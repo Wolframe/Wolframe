@@ -98,7 +98,7 @@ namespace _SMERP {
 			switch ( netOp.operation() )	{
 
 			case NetworkOperation::READ:
-				LOG_TRACE << "Next operation: READ from " << identifier();
+				LOG_TRACE << "Next operation: READ " << ReadBufferSize - bufUsed_ << " bytes from " << identifier();
 				if ( netOp.timeout() > 0 )
 					setTimeout( netOp.timeout());
 				socket().async_read_some( boost::asio::buffer( bufStart_, ReadBufferSize - bufUsed_ ),
@@ -143,10 +143,12 @@ namespace _SMERP {
 			if ( !e )	{
 				LOG_TRACE << "Read " << bytesTransferred << " bytes from " << identifier();
 
-				char* bufEnd = (char*)connectionHandler_->parseInput( buffer_.data(), bytesTransferred + bufUsed_ );
-				bufUsed_ = bytesTransferred + bufUsed_ - ( bufEnd - buffer_.data());
+				bufUsed_ += bytesTransferred;
+				char* bufEnd = (char*)connectionHandler_->parseInput( buffer_.data(), bufUsed_ );
+				bufUsed_ = bufUsed_ - ( bufEnd - buffer_.data());
 				assert( bufUsed_ <= ReadBufferSize );
 				memmove( buffer_.data(), bufEnd, bufUsed_ );
+				bufStart_ = buffer_.data() + bufUsed_;
 				nextOperation();
 			}
 			else	{
