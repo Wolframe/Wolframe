@@ -1,3 +1,6 @@
+-- includes
+--require "smerplogger"
+
 -- global variables
 state = "INIT"
 buffer = ""

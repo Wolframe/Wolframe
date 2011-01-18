@@ -11,8 +11,9 @@
 #include <sstream>
 
 extern "C" {
-	#include <lualib.h>
-	#include <lauxlib.h>
+	#include "lua.h"
+	#include "lualib.h"
+	#include "lauxlib.h"
 }
 
 namespace _SMERP {
@@ -30,17 +31,20 @@ namespace _SMERP {
 		
 		// TODO: open standard libraries, most likely something to configure later,
 		// the plain echo processor should work without any lua libraries
-		luaL_openlibs( l );
+		//luaL_openlibs( l );
 		// or open them individually, see:
 		// http://stackoverflow.com/questions/966162/best-way-to-omit-lua-standard-libraries
 		lua_pushcfunction( l, luaopen_base );
 		lua_pushstring( l, "" );
 		lua_call( l, 1, 0 );
-		lua_pushcfunction( l, luaopen_io );
+		lua_pushcfunction( l, luaopen_package );
 		lua_pushstring( l, LUA_LOADLIBNAME );
 		lua_call( l, 1, 0 );
+		lua_pushcfunction( l, luaopen_io );
+		lua_pushstring( l, LUA_IOLIBNAME );
+		lua_call( l, 1, 0 );
 		lua_pushcfunction( l, luaopen_string );
-		lua_pushstring( l, LUA_LOADLIBNAME );
+		lua_pushstring( l, LUA_STRLIBNAME );
 		lua_call( l, 1, 0 );
 		
 		// TODO: script location, also configurable
