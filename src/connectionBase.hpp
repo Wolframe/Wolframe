@@ -38,6 +38,8 @@ namespace _SMERP {
 		{
 			assert( handler != NULL );
 			connectionHandler_ = handler;
+			bufStart_ = buffer_.data();
+			bufUsed_ = 0;
 			LOG_TRACE << "New connection base created";
 		}
 
@@ -79,6 +81,8 @@ namespace _SMERP {
 
 		/// Buffer for incoming data.
 		boost::array<char, ReadBufferSize>	buffer_;
+		char*					bufStart_;
+		std::size_t				bufUsed_;
 
 		/// The handler used to process the incoming request.
 		connectionHandler		*connectionHandler_;
@@ -92,11 +96,12 @@ namespace _SMERP {
 		{
 			NetworkOperation netOp = connectionHandler_->nextOperation();
 			switch ( netOp.operation() )	{
+
 			case NetworkOperation::READ:
 				LOG_TRACE << "Next operation: READ from " << identifier();
 				if ( netOp.timeout() > 0 )
 					setTimeout( netOp.timeout());
-				socket().async_read_some( boost::asio::buffer( buffer_ ),
+				socket().async_read_some( boost::asio::buffer( bufStart_, ReadBufferSize - bufUsed_ ),
 							  strand_.wrap( boost::bind( &connectionBase::handleRead,
 										     this->shared_from_this(),
 										     boost::asio::placeholders::error,
@@ -138,7 +143,10 @@ namespace _SMERP {
 			if ( !e )	{
 				LOG_TRACE << "Read " << bytesTransferred << " bytes from " << identifier();
 
-				connectionHandler_->parseInput( buffer_.data(), bytesTransferred );
+				char* bufEnd = (char*)connectionHandler_->parseInput( buffer_.data(), bytesTransferred + bufUsed_ );
+				bufUsed_ = bytesTransferred + bufUsed_ - ( bufEnd - buffer_.data());
+				assert( bufUsed_ <= ReadBufferSize );
+				memmove( buffer_.data(), bufEnd, bufUsed_ );
 				nextOperation();
 			}
 			else	{
