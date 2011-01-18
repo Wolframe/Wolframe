@@ -10,6 +10,7 @@
 
 namespace tw = textwolf;
 namespace pt = _SMERP::protocol;
+namespace xx = _SMERP::xml;
 
 namespace
 {
@@ -78,7 +79,7 @@ namespace
             pos += ii;
             skipB();
          };
-         
+
          void parseRange()
          {
             if (match( ".."))
@@ -108,7 +109,7 @@ namespace
             }
             skipB();
          };
-         
+
          void parseName( Element::Type type)
          {
             const char* name = input+pos;
@@ -119,7 +120,7 @@ namespace
             pos += ii;
             skipB();
          };
-         
+
          void parseString( Element::Type type)
          {
             char eb = input[pos++];
@@ -131,7 +132,7 @@ namespace
             pos += ii+1;
             skipB();
          };
-         
+
          void parseCondition()
          {
             if (match( '@'))
@@ -158,6 +159,7 @@ namespace
             if (cur() != ']') throw Error();
             skip();
          };
+
          void parse()
          {
             while (cur() != '\0')
@@ -185,6 +187,7 @@ namespace
                }
             }
          };
+
       public:
          XPathExpression( const char* p_input)      :input(p_input),pos(0),valid(true)
          {
@@ -208,7 +211,36 @@ namespace
          iterator begin()  {return ar.begin();};
          iterator end()    {return ar.end();};
    };
-   
+
+
+   struct Input  :public pt::Generator
+   {
+      pt::InputBlock m_block;
+      typedef pt::InputBlock::const_iterator MemBlockIterator;
+      typedef pt::TextIterator< MemBlockIterator> Iterator;
+
+      MemBlockIterator m_memBlockIterator;
+      Iterator m_iterator;
+
+      Input()                                            :m_memBlockIterator( &m_block),m_iterator( &m_memBlockIterator) {};
+
+      Iterator& iterator()                               {return m_iterator;};
+
+      virtual void feed( void* block, unsigned int blocksize)
+      {
+         m_block.set( block, blocksize);
+      };
+
+      virtual void getRestBlock( void** block, unsigned int* blocksize)
+      {
+         *block = m_block.charptr() + m_block.pos();
+         *blocksize = m_block.size() - m_block.pos();
+      };
+
+      virtual bool skip() {return false;};
+   };
+
+
    template <typename Charset_, typename Scanner_>
    struct ElementIteratorBase
    {
@@ -217,7 +249,7 @@ namespace
       typedef Charset_ Charset;
       typedef Scanner_ Scanner;
       typedef typename Scanner::iterator ScannerIterator;
-      typedef _SMERP::xml::Source Source;
+      typedef xx::Source_UTF8 Source;
       
       char* m_outbuf;
       unsigned int m_outbufsize;
@@ -231,116 +263,116 @@ namespace
              m_itr( m_scanner->begin()) {};
    };
 
-   struct Input
-   {
-      pt::InputBlock m_input;
-      typedef pt::InputBlock::const_iterator MemBlockIterator;
-      typedef pt::TextIterator< MemBlockIterator> Iterator;
-      
-      MemBlockIterator m_memBlockIterator;
-      Iterator m_iterator;
-      
-      void defineInput( void* ptr, unsigned int size)
-      {
-         m_input.set( ptr, size);
-      };
-
-      Input()                     :m_memBlockIterator( &m_input),m_iterator( &m_memBlockIterator) {};
-            
-      Iterator& iterator()        {return m_iterator;};
-   };
 
    template <typename Charset>
-   struct XMLElementIterator :public _SMERP::xml::Source::const_iterator
+   struct XMLElementIterator  :public Input
    {
       typedef tw::XMLScanner<Input::Iterator,Charset,tw::charset::UTF8> Scanner;
+      typedef typename Scanner::ElementType ScannerElementType;
       typedef ElementIteratorBase<Charset, Scanner> Base;
-      typedef _SMERP::xml::Source Source;
+      typedef xx::Source_UTF8 Source;
       
-      Input input;
       Scanner scanner;
       Base base;
       
       XMLElementIterator( char* outbuf, unsigned int outbufsize)
-         :_SMERP::xml::Source::const_iterator( outbuf, outbufsize),
-          scanner( input.iterator(), outbuf, outbufsize),
-          base( outbuf, outbufsize, &scanner) {};
+            :scanner( iterator(), outbuf, outbufsize),
+             base( outbuf, outbufsize, &scanner) {};
 
       virtual ~XMLElementIterator() {};
       
-      virtual void skip()
+      struct ElementTypeMap
       {
+         xx::ElementType ar[ Scanner::NofElementTypes];
+         ElementTypeMap()
+         {
+            ar[ Scanner::None] = xx::Unknown;
+            ar[ Scanner::ErrorOccurred] = xx::Unknown;
+            ar[ Scanner::HeaderAttribName] = xx::HeaderAttribName;
+            ar[ Scanner::HeaderAttribValue] = xx::HeaderAttribValue;
+            ar[ Scanner::HeaderEnd] = xx::HeaderEnd;
+            ar[ Scanner::TagAttribName] = xx::TagAttribName;
+            ar[ Scanner::TagAttribValue] = xx::TagAttribValue;
+            ar[ Scanner::OpenTag] = xx::OpenTag;
+            ar[ Scanner::CloseTag] = xx::CloseTag;
+            ar[ Scanner::CloseTagIm] = xx::CloseTagIm;
+            ar[ Scanner::Content] = xx::Content;
+            ar[ Scanner::Exit] = xx::Unknown;
+         };
+         xx::ElementType operator[]( ScannerElementType e) const {return ar[e];};
+      };
+      
+      virtual bool skip()
+      {
+         static ElementTypeMap etm;
          try
          {
-            base.m_itr++; 
-            if (base.m_itr == scanner.end())
+            base.m_itr++;
+            m_cur.init( base.m_itr->content, base.m_itr->size, etm[ base.m_itr->type]);
+                        
+            if (base.m_itr->type == Scanner::None || base.m_itr->type == Scanner::ErrorOccurred)
             {
-               m_state = Source::EndOfInput;
+               m_state = pt::Generator::Error;
+               return false;
             }
-            else if (base.m_itr->type == Base::Scanner::ErrorOccurred)
+            else if (base.m_itr->type == Scanner::Exit)
             {
-               m_state = Source::Error;
+               m_state = pt::Generator::EndOfInput;
+               return false;
             }
             else
             {
-               m_state = Source::Processing;
+               m_state = pt::Generator::Processing;
+               return true;
             }
          }
          catch (pt::InputBlock::End)
          {
-            m_state = Source::EndOfBuffer;
+            m_state = pt::Generator::EndOfBuffer;
          };
-      };
-      
-      virtual void feed( char* block, unsigned int blocksize)
-      {
-         input.defineInput( block, blocksize);
+         return false;
       };
    };
 
 
    template <typename Charset>
-   struct XMLSelectIterator :public _SMERP::xml::Source::const_iterator
+   struct XMLSelectIterator  :public Input
    {
       typedef std::map< const char*,tw::UChar> EntityMap;
       typedef tw::XMLPathSelectAutomaton< tw::charset::UTF8> Automaton;
       typedef tw::XMLPathSelect< Input::Iterator,Charset,tw::charset::UTF8,EntityMap> Scanner;
       typedef ElementIteratorBase< Charset, Scanner> Base;
-      typedef _SMERP::xml::Source Source;
+      typedef xx::Source_UTF8 Source;
       
-      Input input;
       Scanner scanner;
       Base base;
       
       XMLSelectIterator( char* outbuf, unsigned int outbufsize, Automaton* automaton, EntityMap* entityMap)
-         :Source::const_iterator( outbuf, outbufsize),
-         scanner( automaton, input.iterator(), outbuf, outbufsize, entityMap),
-         base( outbuf, outbufsize, &scanner) {};       
+            :scanner( automaton, iterator(), outbuf, outbufsize, entityMap),
+             base( outbuf, outbufsize, &scanner) {};       
       
       virtual ~XMLSelectIterator() {};
       
-      virtual void skip()
+      virtual bool skip()
       {
          try
          {
             base.m_itr++; 
+            m_cur.init( base.m_itr->content, base.m_itr->size, base.m_itr->type);
+            
             switch (base.m_itr->state)
             {
-               case Scanner::iterator::Element::Ok:          m_state = Source::Processing; break;
-               case Scanner::iterator::Element::EndOfOutput: m_state = Source::Error; break;
-               case Scanner::iterator::Element::EndOfInput:  m_state = Source::EndOfInput; break;
-               case Scanner::iterator::Element::ErrorState:  m_state = Source::Error; break;
+               case Scanner::iterator::Element::Ok:          m_state = pt::Generator::Processing; break;
+               case Scanner::iterator::Element::EndOfOutput: m_state = pt::Generator::Error; break;
+               case Scanner::iterator::Element::EndOfInput:  m_state = pt::Generator::EndOfInput; break;
+               case Scanner::iterator::Element::ErrorState:  m_state = pt::Generator::Error; break;
             }
          }
          catch (pt::InputBlock::End)
          {
-            m_state = Source::EndOfBuffer;
+            m_state = pt::Generator::EndOfBuffer;
          };
-      };
-      
-      virtual void feed( char* block, unsigned int blocksize)
-      {
-         input.defineInput( block, blocksize);
+         return (m_state == pt::Generator::Processing);
       };
    };
 
@@ -404,10 +436,12 @@ struct Automaton::Private
             break;
             
             case XPathExpression::Element::Follow:
+            {
                elem--;
                itr++;
-               break;
-               
+            }  
+            break;
+
             case XPathExpression::Element::AttributeName:
             {
                XPathExpression::iterator aa = itr++;
@@ -421,28 +455,28 @@ struct Automaton::Private
                }
             }
             break;
-            
+
             case XPathExpression::Element::AttributeValue:
             {
                elem( 0, itr->name.c_str());
                itr++;
             }
             break;
-            
+
             case XPathExpression::Element::RangeStart:
             {
                elem.FROM( atoi( itr->name.c_str()));
                itr++;
             }
             break;
-            
+
             case XPathExpression::Element::RangeEnd:
             {
                elem.TO( atoi( itr->name.c_str()));
                itr++;
             }
             break;
-            
+
             default: return false;
          }
       }
@@ -461,26 +495,48 @@ bool Automaton::defineExpression( int type, const char* expression, int* errorpo
    return data->defineExpression( type, expression, errorpos);
 }
 
-Source::const_iterator* Source::createXMLElementIterator( const char* charset, char* outbuf, unsigned int outbufsize)
+static void inheritBuffer( protocol::Generator* to, protocol::Generator* from)
 {
-   switch (getCharset(charset))
+   if (to && from)
    {
-      case UTF8: return new XMLElementIterator<tw::charset::UTF8>( outbuf, outbufsize);
-      case IsoLatin1: return new XMLElementIterator<tw::charset::IsoLatin1>( outbuf, outbufsize);
-      case Unknown: return 0;
+      void* buf = 0;
+      unsigned int bufsize = 0;
+      from->getRestBlock( &buf, &bufsize);
+      to->feed( buf, bufsize);
    }
-   return 0;
 }
 
-Source::const_iterator* Source::createXMLSelectIterator( const char* charset, char* outbuf, unsigned int outbufsize, const Automaton* atm)
+pt::Generator* Source_UTF8::createXMLElementIterator( const char* charset, char* outbuf, unsigned int outbufsize, pt::Generator* prev)
 {
+   protocol::Generator* rt = 0;
    switch (getCharset(charset))
    {
-      case UTF8: return new XMLSelectIterator<tw::charset::UTF8>( outbuf, outbufsize, &atm->data->implementation, 0);
-      case IsoLatin1: return new XMLSelectIterator<tw::charset::IsoLatin1>( outbuf, outbufsize, &atm->data->implementation, 0);
-      case Unknown: return 0;
+      case UTF8:      rt = new XMLElementIterator<tw::charset::UTF8>( outbuf, outbufsize);
+      case IsoLatin1: rt = new XMLElementIterator<tw::charset::IsoLatin1>( outbuf, outbufsize);
+      case Unknown:   rt = 0;
    }
-   return 0;
+   inheritBuffer( rt, prev);
+   return rt;
+}
+
+pt::Generator* Source_UTF8::createXMLSelectIterator( const char* charset, char* outbuf, unsigned int outbufsize, const Automaton* atm, pt::Generator* prev)
+{
+   protocol::Generator* rt = 0;
+   switch (getCharset(charset))
+   {
+      case UTF8:      rt = new XMLSelectIterator<tw::charset::UTF8>( outbuf, outbufsize, &atm->data->implementation, 0);
+      case IsoLatin1: rt = new XMLSelectIterator<tw::charset::IsoLatin1>( outbuf, outbufsize, &atm->data->implementation, 0);
+      case Unknown:   rt = 0;
+   }
+   inheritBuffer( rt, prev);
+   return rt;
+}
+
+pt::Generator* Source_UTF8::createXMLHeaderIterator( char* outbuf, unsigned int outbufsize, pt::Generator* prev)
+{
+   protocol::Generator* rt = new XMLElementIterator<tw::charset::IsoLatin1>( outbuf, outbufsize);
+   inheritBuffer( rt, prev);
+   return rt;
 }
 
 

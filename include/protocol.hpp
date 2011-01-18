@@ -14,6 +14,8 @@
 #include "protocol/textIterator.hpp"
 //basic input iterators and message blocks
 #include "protocol/ioblocks.hpp"
+//building blocks for generators in processing languages knowing a 'yield' operation
+#include "protocol/generator.hpp" 
 
 #endif // _SMERP_PROTOCOL_HPP_INCLUDED
 

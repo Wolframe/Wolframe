@@ -306,6 +306,7 @@ struct Connection::Private
       catch (Input::End)
       {
          LOG_DATA << "End of input interrupt";
+         input.setPos( 0);
          return Operation( Operation::READ, input.ptr(), input.size());
       };
       return Operation( Operation::TERMINATE);

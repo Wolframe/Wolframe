@@ -100,7 +100,6 @@ public:
           if (++m_pos == m_input->pos())
           {
             m_pos = 0;
-            m_input->setPos(0);
             throw End();
           }
       };

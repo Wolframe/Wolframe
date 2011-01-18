@@ -485,9 +485,11 @@ public:
    {
       None, ErrorOccurred, HeaderAttribName, HeaderAttribValue, HeaderEnd, TagAttribName, TagAttribValue, OpenTag, CloseTag, CloseTagIm, Content, Exit
    };
+   enum {NofElementTypes=Exit+1};
+
    static const char* getElementTypeName( ElementType ee)
    {
-      static const char* names[ (unsigned int)Exit+1] = {0,"ErrorOccurred","HeaderAttribName","HeaderAttribValue","HeaderEnd","TagAttribName","TagAttribValue","OpenTag","CloseTag","CloseTagIm","Content","Exit"};
+      static const char* names[ NofElementTypes] = {0,"ErrorOccurred","HeaderAttribName","HeaderAttribValue","HeaderEnd","TagAttribName","TagAttribValue","OpenTag","CloseTag","CloseTagIm","Content","Exit"};
       return names[ (unsigned int)ee];
    };
    enum Error
