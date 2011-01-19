@@ -37,11 +37,11 @@ class Generator
             int type() const                                      {return m_type;};
       };
       
-      Generator()                                              :m_state(Init){};
+      Generator()                                                 :m_state(Init){};
       
-      const Element& operator*() const                         {return m_cur;};
-      const Element* operator->() const                        {return &m_cur;};
-      State state() const                                      {return m_state;};
+      const Element& operator*() const                            {return m_cur;};
+      const Element* operator->() const                           {return &m_cur;};
+      State state() const                                         {return m_state;};
       
       virtual ~Generator() {};
       
