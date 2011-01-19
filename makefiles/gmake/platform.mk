@@ -206,3 +206,71 @@ endif
 ifdef WITH_GTEST
 GTEST_LIBS = -lgtest
 endif
+
+# Lua
+#####
+
+#ifdef WITH_LUA
+#ifeq "$(PLATFORM)" "LINUX"
+#ifeq "$(LINUX_DIST)" "arch"
+#BOOST_DIR = /usr
+3BOOST_LIBRARY_TAG = -mt
+#endif
+#ifeq "$(LINUX_DIST)" "redhat"
+#BOOST_DIR = /usr
+#BOOST_LIBRARY_TAG = -mt
+#endif
+#endif
+#endif
+
+# Qt 4
+######
+
+#ifdef WITH_QT
+#ifeq "$(PLATFORM)" "LINUX"
+#ifeq "$(LINUX_DIST)" "arch"
+#BOOST_DIR = /usr
+#BOOST_LIBRARY_TAG = -mt
+#endif
+#ifeq "$(LINUX_DIST)" "redhat"
+#BOOST_DIR = /usr
+#BOOST_LIBRARY_TAG = -mt
+#endif
+#endif
+#endif
+
+# Qt 4 (http://qt.nokia.com/products/)
+######################################
+
+# self-compiled
+#QT_DIR=/home/user/qt
+
+# system-wide
+#QT_DIR=/usr
+
+# usual layout, may differ
+#QT_INCLUDE_DIRS=$(QT_DIR)/include
+#QT_INCLUDE_DIRS=$(QT_DIR)/include/qt4
+#QT_LIB_DIRS=$(QT_DIR)/lib
+
+# Lua 5.1
+#########
+
+#LUA_VERSION=5.1
+
+# self-compiled
+#LUA_DIR=/home/user/lua-5.1.4
+
+# system-wide
+#LUA_DIR=/usr
+
+# usual layout
+#LUA_INCLUDE_DIRS=$(LUA_DIR)/include
+#LUA_LIB_DIRS=$(LUA_DIR)/lib
+#LUA_LIBS=-llua
+
+# Debian-ish layout
+#LUA_INCLUDE_DIRS=/usr/include/lua5.1
+#LUA_LIB_DIRS=/usr/lib
+#LUA_LIBS=-llua$(LUA_VERSION)
+
