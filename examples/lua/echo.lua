@@ -1,5 +1,5 @@
 -- includes
---require "smerplogger"
+require "smerplogger"
 
 -- global variables
 state = "INIT"
@@ -7,28 +7,28 @@ buffer = ""
 
 -- called when a new LUA server is started
 function init( )
-	io.write( "LUA: init called.\n" )
+	smerplogger.write( "ERROR", "LUA: init called." )
 	state = "INIT"
 	buffer = ""
 end
 
 -- called when the LUA server is stopped
 function destroy( )
-	io.write( "LUA: destroy called.\n" )
+	smerplogger.write( "ERROR", "LUA: destroy called." )
 end
 
 -- called when a client connection gets established
 function new_connection( remote_host, remote_port, common_name )
-	io.write( "LUA: new_connection called from " .. remote_host .. " (port: " .. remote_port .. ")\n" )
+	smerplogger.write( "ERROR",  "LUA: new_connection called from " .. remote_host .. " (port: " .. remote_port .. ")" )
 	if( common_name ) then
-		io.write( "LUA: encrypted connection, CN is " .. common_name .. "\n" )
+		--io.write( "LUA: encrypted connection, CN is " .. common_name .. "\n" )
 	end
 	state = "NEW"
 end
 
 -- handle a request and produce a reply
 function next_operation( )
-	io.write( "LUA next operation\n" )
+	--smerplogger.write( "ERROR", "LUA next operation" )
 	
 	if state == "NEW" then
 		state = "HELLO"
@@ -63,25 +63,25 @@ function next_operation( )
 	elseif state == "TERMINATING"  then
 		return "TERMINATE", 0
 	else
-		error( "LUA: Illegal state " .. state .. "!!" )
+		smerplogger.write( "FATAL", "LUA: Illegal state " .. state .. "!!" )
 	end
 end
 
 -- a timeout occured
 function timeout_occured( )
-	io.write( "LUA: got timeout\n" )
+	smerplogger.write( "ERROR", "LUA: got timeout" )
 	state = "TIMEOUT"
 end
 
 -- a signal (Ctrl-C) occured
 function signal_occured( )
-	io.write( "LUA: got signalled\n" )
+	smerplogger.write( "ERROR", "LUA: got signalled" )
 	state = "SIGNALLED"
 end
 
 -- called when receiving a line a data
 function parse_input( data )
-	io.write( "LUA got data: " .. data .. "\n" )
+	--smerplogger.write( "ERROR", "LUA: Got " .. string.len( data ) .. " bytes of data" )
 
 	buffer = buffer .. data
 	pos = string.find( buffer, "\n" )
@@ -101,4 +101,4 @@ function parse_input( data )
 end
 
 -- the main, initialize globals here
-io.write( "LUA: main called.\n" )
+smerplogger.write( "ERROR", "LUA: main called." )

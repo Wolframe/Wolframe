@@ -35,6 +35,8 @@ namespace _SMERP {
 
 	private:
 		lua_State *l;
+		int counter;
+		int maxMemUsed;
 
 		void createVM( );
 		void destroyVM( );

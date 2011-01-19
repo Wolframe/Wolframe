@@ -39,9 +39,12 @@ OBJS = \
 CPP_BINS = \
 	smerp-lua$(EXE)
 
+smerplogger.so: smerplogger.sho++ $(TOPDIR)/src/libsmerp.a
+	$(CCPP_LINK) -shared -o $@ $(LDFLAGS) $< $(TOPDIR)/src/libsmerp.a
+
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
-local_all: $(CPP_BINS)
+local_all: $(CPP_BINS) smerplogger.so
 
 local_clean:
 
@@ -51,6 +54,6 @@ local_install:
 
 localhost_test:
 
-run: $(CPP_BINS)
+run: $(CPP_BINS) smerplogger.so
 	@echo "Running the SMERP server..."
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./smerp-lua -c smerp-lua.conf -f

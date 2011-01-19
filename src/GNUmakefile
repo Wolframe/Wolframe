@@ -74,4 +74,4 @@ local_test:
 
 run: $(CPP_BINS)
 	@echo "Running the SMERP server..."
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./smerpd -c smerp.conf -f -d DATA
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./smerpd -c smerp.conf -f

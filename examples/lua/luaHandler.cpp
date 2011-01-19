@@ -100,11 +100,13 @@ namespace _SMERP {
 	void echoConnection::printMemStats( )
 	{
 		int kbytes = lua_gc( l, LUA_GCCOUNT, 0 );
-		int bytes = lua_gc( l, LUA_GCCOUNTB, 0 );
-		LOG_TRACE << "LUA VM memory in use: " << kbytes << "." << bytes << " kBytes";
+		if( kbytes > maxMemUsed ) {
+			maxMemUsed = kbytes;
+		}
+		LOG_INFO << "LUA VM memory in use: " << kbytes << " kBytes (max. " << maxMemUsed << " kBytes)";
 	}
 
-	echoConnection::echoConnection( const Network::LocalTCPendpoint& local )
+	echoConnection::echoConnection( const Network::LocalTCPendpoint& local ) : counter( 0 ), maxMemUsed( 0 )
 	{
 		LOG_TRACE << "Created connection handler for " << local.toString();
 		createVM( );
@@ -112,7 +114,7 @@ namespace _SMERP {
 	}
 
 
-	echoConnection::echoConnection( const Network::LocalSSLendpoint& local )
+	echoConnection::echoConnection( const Network::LocalSSLendpoint& local ) : counter( 0 ), maxMemUsed( 0 )
 	{
 		LOG_TRACE << "Created connection handler (SSL) for " << local.toString();
 		createVM( );
@@ -203,6 +205,11 @@ namespace _SMERP {
 	/// input has been consumed.
 	void* echoConnection::parseInput( const void *begin, std::size_t bytesTransferred )
 	{
+		counter++;
+		if( counter % 1000 == 0 ) {
+			//(void)lua_gc( l, LUA_GCCOLLECT, 0 );
+			printMemStats( );
+		}
 		lua_pushstring( l, "parse_input" );
 		lua_gettable( l, LUA_GLOBALSINDEX );
 		lua_pushlstring( l, (const char *)begin, bytesTransferred );
