@@ -1,6 +1,11 @@
 TOPDIR = ..
 
-SUBDIRS = qt
+SUBDIRS =
+
+!IFDEF WITH_QT
+SUBDIRS = \
+	$(SUBDIRS) qt
+!ENDIF
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 

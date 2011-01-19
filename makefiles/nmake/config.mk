@@ -74,3 +74,16 @@ GTEST_LIB_DIR=$(GTEST_DIR)\src
 
 QT_DIR=C:\Qt\4.7.1
 #QT_DIR=/home/user/qt
+
+# Lua 5.1
+#########
+
+LUA_VERSION=5.1
+
+# self-compiled
+#LUA_DIR = C:\Cygwin\home\Andreas\lua-5.1.4
+LUA_DIR = C:\Cygwin\home\Administrator\lua-5.1.4
+LUA_INCLUDE_DIRS=$(LUA_DIR)\src
+LUA_LDFLAGS = /LIBPATH:"$(LUA_DIR)\src"
+LUA_LIBS = lua51.lib
+

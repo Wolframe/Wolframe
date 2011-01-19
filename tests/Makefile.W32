@@ -97,6 +97,6 @@ local_test:
 	@-echo versionTest >> test.bat
 	@-echo echo Testing counter.. >> test.bat
 	@-echo counterTest >> test.bat
-	@-echo poolTest >> test.bat
+#	@-echo poolTest >> test.bat
 !ENDIF
 	@-test.bat
