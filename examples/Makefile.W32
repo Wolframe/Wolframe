@@ -2,6 +2,11 @@ TOPDIR = ..
 
 SUBDIRS = echo pecho xmlselect
 
+!IFDEF WITH_LUA
+SUBDIRS = \
+	$(SUBDIRS) lua
+!ENDIF
+
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 local_all:

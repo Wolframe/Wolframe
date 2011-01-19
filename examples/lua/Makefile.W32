@@ -4,9 +4,6 @@ SUBDIRS =
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
-#LUA_DIR = C:\Cygwin\home\Andreas\lua-5.1.4
-LUA_DIR = C:\Cygwin\home\Administrator\lua-5.1.4
-
 INCLUDE_CPPFLAGS = \
 	/D_WIN32_WINNT=0x403
 
@@ -15,16 +12,15 @@ INCLUDE_DIRS = \
 	/I$(TOPDIR)\include \
 	/I"$(BOOST_DIR)" \
 	/I"$(PLATFORM_SDK_DIR)\Include" \
-	/I"$(LUA_DIR)\src"
+	/I$(LUA_INCLUDE_DIRS)
 
 # Note: libraries are picked automatically on Windows!
 SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib"
-LUA_LDFLAGS = /LIBPATH:"$(LUA_DIR)\src"
 INCLUDE_LDFLAGS = \
 	$(SDK_LDFLAGS) $(BOOST_LDFLAGS) $(LUA_LDFLAGS)
 
 INCLUDE_LIBS = \
-	Advapi32.lib lua51.lib
+	Advapi32.lib $(LUA_LIBS)
 
 # openssl
 
@@ -53,7 +49,10 @@ smerp-lua.exe: smerp-lua.obj $(TOPDIR)\src\smerp.lib $(OBJS)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-local_all:
+smerplogger.dll: smerplogger.obj $(TOPDIR)\src\smerp.lib
+	$(LINK) /DLL /nologo /out:$@ $(LDFLAGS) $(LIBS) $?
+
+local_all: smerplogger.dll
 
 local_clean:
 
