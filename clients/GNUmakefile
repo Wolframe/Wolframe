@@ -1,6 +1,10 @@
 TOPDIR = ..
 
-SUBDIRS = qt
+SUBDIRS =
+
+ifdef WITH_QT
+SUBDIRS += qt
+endif
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

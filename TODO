@@ -6,17 +6,21 @@ MBa:
 
 ABa:
 
+- makefiles
+  - add WITH_LUA
+  - do some Linux distribution autodetection
+  - do automatic layout for includes and libraries for Linux
 - logger
-  - add a prefix for logging in subparts of the system (e.g. network, luaprocessor)
+  - add a prefix for logging in subparts of the system (e.g. network, luaprocessor),
+    map it to ident for syslog, source for eventlog
+  - gtestify the logtest
 - we should split tests with different dependencies
 - Windows:
   - username, password for service credentials
   - clean up native Win32 string mess in service code
-  - LINK : fatal error LNK1104: cannot open file 'boost_unit_test_framework-vc90-mt-1_45.lib'
-    NMAKE : fatal error U1077: '"C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\BIN\link.exe"' : return code '0x450'
 - lua processor:
-  - didn't find a way to limit the memory usage of the VM
-
+  - see how well the gc is working under load
+  - handle passing binary data differently
 
 PF:
 

@@ -57,3 +57,25 @@ QT_DIR=/usr
 QT_INCLUDE_DIRS=$(QT_DIR)/include
 #QT_INCLUDE_DIRS=$(QT_DIR)/include/qt4
 QT_LIB_DIRS=$(QT_DIR)/lib
+
+# Lua 5.1
+#########
+
+LUA_VERSION=5.1
+
+# self-compiled
+#LUA_DIR=/home/user/lua-5.1.4
+
+# system-wide
+LUA_DIR=/usr
+
+# usual layout
+LUA_INCLUDE_DIRS=$(LUA_DIR)/include
+LUA_LIB_DIRS=$(LUA_DIR)/lib
+LUA_LIBS=-llua
+
+# Debian-ish layout
+#LUA_INCLUDE_DIRS=/usr/include/lua5.1
+#LUA_LIB_DIRS=/usr/lib
+#LUA_LIBS=-llua$(LUA_VERSION)
+
