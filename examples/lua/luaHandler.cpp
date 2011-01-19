@@ -203,12 +203,9 @@ namespace _SMERP {
 	/// input has been consumed.
 	void* echoConnection::parseInput( const void *begin, std::size_t bytesTransferred )
 	{
-		char *s = (char *)begin;
-		s[bytesTransferred - 1] = '\0';
-
 		lua_pushstring( l, "parse_input" );
 		lua_gettable( l, LUA_GLOBALSINDEX );
-		lua_pushstring( l, s );
+		lua_pushlstring( l, (const char *)begin, bytesTransferred );
 		int res = lua_pcall( l, 1, 1, 0 );
 		if( res != 0 ) {
 			LOG_FATAL << "Unable to call 'parse_input' function: " << lua_tostring( l, -1 );
@@ -216,9 +213,8 @@ namespace _SMERP {
 			throw new std::runtime_error( "Error in LUA processor" );
 		}
 		int bytesProcessed = lua_tointeger( l, -1 );
-
-		s += bytesProcessed;
-		return s;
+		char *end = (char *)begin + bytesProcessed;
+		return (void *)end;
 	}
 
 	void echoConnection::timeoutOccured()
