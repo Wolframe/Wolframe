@@ -81,7 +81,7 @@ end
 
 -- called when receiving a line a data
 function parse_input( data )
-	--smerplogger.write( "ERROR", "LUA: Got " .. string.len( data ) .. " bytes of data" )
+	smerplogger.write( "ERROR", "LUA: Got ", string.len( data ), " bytes of data" )
 
 	buffer = buffer .. data
 	pos = string.find( buffer, "\n" )
