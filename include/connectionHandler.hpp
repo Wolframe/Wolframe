@@ -60,6 +60,7 @@ namespace _SMERP {
 		enum NetworkSignal	{
 			END_OF_FILE,
 			OPERATION_CANCELLED,
+			BROKEN_PIPE,
 			UNKNOWN_ERROR
 		};
 

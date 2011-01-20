@@ -160,6 +160,33 @@ namespace _SMERP {
 		}
 
 
+		/// Translate network error to processor error
+		void signalError( const boost::system::error_code& e )
+		{
+			connectionHandler::NetworkSignal	ns;
+
+			switch( e.value() )	{
+			case boost::asio::error::connection_reset:
+				ns = connectionHandler::END_OF_FILE;
+				break;
+
+			case boost::asio::error::operation_aborted:
+				ns = connectionHandler::OPERATION_CANCELLED;
+				break;
+
+			case boost::asio::error::broken_pipe:
+				ns = connectionHandler::BROKEN_PIPE;
+				break;
+
+			default:
+				ns = connectionHandler::UNKNOWN_ERROR;
+				break;
+			}
+			connectionHandler_->errorOccured( ns );
+			LOG_DATA << "Signalled " << ns << " to processor for connection to " << identifier();
+		}
+
+
 		/// Handle completion of a read operation.
 		void handleRead( const boost::system::error_code& e, std::size_t bytesTransferred )
 		{
@@ -177,22 +204,7 @@ namespace _SMERP {
 			}
 			else	{
 				LOG_TRACE << "Read error: " << e.message();
-				switch( e.value() )	{
-				case boost::asio::error::connection_reset:
-					LOG_DATA << "Read error, send EOF to processor";
-					connectionHandler_->errorOccured( connectionHandler::END_OF_FILE );
-					break;
-
-				case boost::asio::error::operation_aborted:
-					LOG_DATA << "Read error, send OPERATION_CANCELLED to processor";
-					connectionHandler_->errorOccured( connectionHandler::OPERATION_CANCELLED );
-					break;
-
-				default:
-					LOG_DATA << "Read error, send UNKNOWN to processor";
-					connectionHandler_->errorOccured( connectionHandler::UNKNOWN_ERROR );
-					break;
-				}
+				signalError( e );
 			}
 		}
 		// handleRead function end
@@ -207,22 +219,7 @@ namespace _SMERP {
 			}
 			else	{
 				LOG_DATA << "Write error: " << e.message();
-				switch( e.value() )	{
-				case boost::asio::error::connection_reset:
-					LOG_DATA << "Write error, send EOF to processor";
-					connectionHandler_->errorOccured( connectionHandler::END_OF_FILE );
-					break;
-
-				case boost::asio::error::operation_aborted:
-					LOG_DATA << "Write error, send OPERATION_CANCELLED to processor";
-					connectionHandler_->errorOccured( connectionHandler::OPERATION_CANCELLED );
-					break;
-
-				default:
-					LOG_DATA << "Write error, send UNKNOWN to processor";
-					connectionHandler_->errorOccured( connectionHandler::UNKNOWN_ERROR );
-					break;
-				}
+				signalError( e );
 			}
 		}
 		// handleWrite function end

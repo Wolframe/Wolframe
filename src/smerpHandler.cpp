@@ -152,9 +152,14 @@ namespace _SMERP {
 			LOG_TRACE << "Processor received EOF (the peer has closed connection)";
 			break;
 
+		case	BROKEN_PIPE:
+			state_ = TERMINATING;
+			LOG_TRACE << "Processor received BROKEN PIPE (the peer has closed connection)";
+			break;
+
 		case OPERATION_CANCELLED:
 			state_ = TERMINATING;
-			LOG_TRACE << "Processor received OPERATION_CANCELED (that should have been requested by us)";
+			LOG_TRACE << "Processor received OPERATION_CANCELED (should have been requested by us)";
 			break;
 
 		case UNKNOWN_ERROR:
