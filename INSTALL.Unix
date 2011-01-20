@@ -25,3 +25,11 @@ make
 
 configure SMERP in makefiles/gmake/config.mk and
 set GTEST_DIR accordingly.
+
+Compile and install Lua
+-----------------------
+
+See 'examples/lua/README'
+
+Compile and install Qt
+----------------------

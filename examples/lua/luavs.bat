@@ -4,8 +4,11 @@
 @rem (contributed by David Manura and Mike Pall)
 
 @setlocal
+
 #@set PLATFORM_SDK_DIR=C:\Programme\Microsoft Platform SDK
-@set PLATFORM_SDK_DIR=C:\Program Files\Microsoft SDKs\Windows\v6.0A
+#@set PLATFORM_SDK_DIR=C:\Program Files\Microsoft SDKs\Windows\v6.0A
+@set PLATFORM_SDK_DIR=D:\Programme\Microsoft Platform SDK
+
 @set MYCOMPILE=cl /nologo /MD /O2 /W3 /c /D_CRT_SECURE_NO_DEPRECATE /I"%PLATFORM_SDK_DIR%\Include"
 @set MYLINK=link /nologo /LIBPATH:"%PLATFORM_SDK_DIR%\lib"
 @set MYMT="%PLATFORM_SDK_DIR%\Bin\mt" /nologo

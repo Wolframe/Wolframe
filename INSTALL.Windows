@@ -47,3 +47,15 @@ link /lib /nologo /LIBPATH:"C:\Programme\Microsoft Platform SDK\lib" /out:gtest.
 Then adapt:
 
 GTEST_DIR=C:\<myhome>\gtest-1.5.0
+
+Compile and install Lua
+-----------------------
+
+See 'examples\lua\README'
+
+Compile and install Qt
+----------------------
+
+See 'http://qtnode.net/wiki/Qt4_with_Visual_Studio'.
+
+Then adapt QT_DIR in 'makefiles\nmake\config.mk'

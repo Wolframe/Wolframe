@@ -62,9 +62,9 @@ local_test:
 
 run: $(CPP_BINS)
 	@-echo @echo off > test.bat
-	@-echo copy $(OPENSSL_DIR)\bin\libeay32.dll . >> test.bat
-	@-echo copy $(OPENSSL_DIR)\bin\ssleay32.dll . >> test.bat
-	@-echo copy $(LUA_DIR)\src\lua51.dll . >> test.bat
+	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat
+	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >> test.bat
+	@-echo copy "$(LUA_DIR)\src\lua51.dll" . >> test.bat
 	@-echo echo Running the SMERP server... >> test.bat
 	@-echo smerp-lua.exe -c smerp-lua.conf -d DATA >> test.bat
 	@-test.bat

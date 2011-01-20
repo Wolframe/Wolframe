@@ -6,13 +6,19 @@ extern "C" {
         #include "lauxlib.h"
 }
 
+#ifdef _WIN32
+#define MYLUA_API __declspec(dllexport)
+#else
+#define MYLUA_API
+#endif
+
 #include "logger.hpp"
 
 /* prototypes */
 static int l_write( lua_State *l );
 
 extern "C" {
-	LUALIB_API int luaopen_smerplogger( lua_State *l );
+	LUALIB_API int MYLUA_API luaopen_smerplogger( lua_State *l );
 }
 
 static int l_write( lua_State *l )
@@ -31,18 +37,18 @@ static int l_write( lua_State *l )
 }
 
 /* registry */
-static const luaL_Reg smerplogger[] = {
+static const luaL_Reg smerplogger_registry[] = {
 	{ "write", l_write },
 	{ NULL, NULL }
 };
 
 extern "C" {
 
-LUALIB_API int luaopen_smerplogger( lua_State *l )
+LUALIB_API int MYLUA_API luaopen_smerplogger( lua_State *l )
 {
-	luaL_register( l, "smerplogger", smerplogger );
+	luaL_register( l, "smerplogger", smerplogger_registry );
 
 	return 0;
 }
 
-}
+} // extern "C"
