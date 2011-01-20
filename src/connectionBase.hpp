@@ -153,6 +153,7 @@ namespace _SMERP {
 						setTimeout( 0 );
 						boost::system::error_code ignored_ec;
 						socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
+						unregister();
 					}
 					break;
 				}
