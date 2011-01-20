@@ -79,11 +79,10 @@ local_clean:
 local_distclean:
 
 local_test:
-	@echo
+ifdef WITH_GTEST
 	@echo "Testing logging..."
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./logTest
-ifdef WITH_GTEST
-	@echo "Testing with Google test framework..."
+	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./versionTest
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./counterTest

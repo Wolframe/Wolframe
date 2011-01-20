@@ -43,16 +43,16 @@ OBJS = \
 CPP_BINS = \
 	smerp-lua.exe
 
-all: $(OBJS) $(CPP_BINS)
+all: $(OBJS) $(CPP_BINS) smerplogger.dll
 
 smerp-lua.exe: smerp-lua.obj $(TOPDIR)\src\smerp.lib $(OBJS)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-smerplogger.dll: smerplogger.obj $(TOPDIR)\src\smerp.lib
-	$(LINK) /DLL /nologo /out:$@ $(LDFLAGS) $(LIBS) $?
+smerplogger.dll: smerplogger.obj $(TOPDIR)/src/logBackend.obj $(TOPDIR)/src/logLevel.obj
+	$(LINK) /DLL /nologo /out:$@ $(LDFLAGS) $(LIBS) $**
 
-local_all: smerplogger.dll
+local_all:
 
 local_clean:
 

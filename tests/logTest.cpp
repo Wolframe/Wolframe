@@ -3,23 +3,35 @@
 //
 
 #include "logger.hpp"
+#include <gtest/gtest.h>
 
-int main( void ) {
-	_SMERP::LogBackend& logBack = _SMERP::LogBackend::instance( );
-
-	logBack.setConsoleLevel( _SMERP::LogLevel::LOGLEVEL_DATA );
-	logBack.setLogfileLevel( _SMERP::LogLevel::LOGLEVEL_DATA );
-	logBack.setLogfileName( "logTest.log" );
+// The fixture for testing class SMERP::Version
+class LoggingFixture : public ::testing::Test
+{
+	private:
+		_SMERP::LogBackend& logBack;
+		
+	protected:
+		LoggingFixture( ) :
+			logBack( _SMERP::LogBackend::instance( ) ) 
+		{
+			logBack.setConsoleLevel( _SMERP::LogLevel::LOGLEVEL_DATA );
+			logBack.setLogfileLevel( _SMERP::LogLevel::LOGLEVEL_DATA );
+			logBack.setLogfileName( "logTest.log" );
 #ifndef _WIN32
-	logBack.setSyslogLevel( _SMERP::LogLevel::LOGLEVEL_DATA );
-	logBack.setSyslogFacility( _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_USER );
-	logBack.setSyslogIdent( "test" );
+			logBack.setSyslogLevel( _SMERP::LogLevel::LOGLEVEL_DATA );
+			logBack.setSyslogFacility( _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_USER );
+			logBack.setSyslogIdent( "test" );
 #else
-	logBack.setEventlogLevel( _SMERP::LogLevel::LOGLEVEL_DATA );
-	logBack.setEventlogSource( "smerptest" );
-	logBack.setEventlogLog( "Application" );
+			logBack.setEventlogLevel( _SMERP::LogLevel::LOGLEVEL_DATA );
+			logBack.setEventlogSource( "smerptest" );
+			logBack.setEventlogLog( "Application" );
 #endif
+		}
+};
 
+TEST_F( LoggingFixture, Macros )
+{
 	LOG_FATAL	<< "fatal error";
 	LOG_ALERT	<< "alert";
 	LOG_CRITICAL	<< "critical error";
@@ -31,6 +43,10 @@ int main( void ) {
 	LOG_DEBUG	<< "debug message";
 	LOG_TRACE	<< "debug message with tracing";
 	LOG_DATA	<< "debug message with tracing and data";
-	
-	return 0;
+}
+
+int main( int argc, char **argv )
+{
+	::testing::InitGoogleTest( &argc, argv );
+	return RUN_ALL_TESTS( );
 }
