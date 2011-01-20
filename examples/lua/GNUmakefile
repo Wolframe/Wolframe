@@ -39,8 +39,8 @@ OBJS = \
 CPP_BINS = \
 	smerp-lua$(EXE)
 
-smerplogger.so: smerplogger.sho++ $(TOPDIR)/src/libsmerp.a
-	$(CCPP_LINK) -shared -o $@ $(LDFLAGS) $< $(TOPDIR)/src/libsmerp.a
+smerplogger.so: smerplogger.sho++ $(TOPDIR)/src/logBackend.sho++ $(TOPDIR)/src/logLevel.sho++
+	$(CCPP_LINK) -shared -o $@ $(LDFLAGS) $?
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

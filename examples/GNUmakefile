@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = echo pecho xmlselect
+SUBDIRS = echo pecho
 
 ifdef WITH_LUA
 SUBDIRS += lua
