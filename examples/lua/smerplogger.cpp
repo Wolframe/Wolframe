@@ -14,6 +14,8 @@ extern "C" {
 
 #include "logger.hpp"
 
+#include <sstream>
+
 /* prototypes */
 static int l_write( lua_State *l );
 
@@ -27,11 +29,28 @@ static int l_write( lua_State *l )
 	 * whether it's a string or a number
 	 */
 	const char *logLevel = luaL_checkstring( l, 1 );
-	const char *msg = luaL_checkstring( l, 2 );
+
+	std::ostringstream os;
+	int n = lua_gettop( l ) - 1;
+	int i = 2;
+	for( ; n--; i++ ) {
+		if( lua_type( l, i ) == LUA_TNUMBER ) {
+			lua_Number v = lua_tonumber( l, i );
+			os << v;
+		} else if( lua_type( l, i ) == LUA_TSTRING ) {
+			const char *v = lua_tostring( l, i );
+			os << v;
+		} else {
+			os << "<unknown LUA type>";
+		}
+	}
+
 	// TODO: this is NOT the singleton instance of the daemon!?
 	// the first level logged is thus ERROR
 	_SMERP::Logger( _SMERP::LogBackend::instance() ).Get(
-		_SMERP::LogLevel::str2LogLevel( logLevel ) ) << msg;
+		_SMERP::LogLevel::str2LogLevel( logLevel ) ) << os.str( );
+
+	lua_pop( l, n );
 
 	return 0;
 }
