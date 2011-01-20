@@ -7,20 +7,18 @@ MBa:
 ABa:
 
 - makefiles
-  - add WITH_LUA
   - do some Linux distribution autodetection
   - do automatic layout for includes and libraries for Linux
 - logger
   - add a prefix for logging in subparts of the system (e.g. network, luaprocessor),
     map it to ident for syslog, source for eventlog
-  - gtestify the logtest
-- we should split tests with different dependencies
 - Windows:
   - username, password for service credentials
   - clean up native Win32 string mess in service code
 - lua processor:
-  - see how well the gc is working under load
-  - handle passing binary data differently
+  - smerplogger.dll/.so: linking is currently delicate, to say the least!
+    also we have a singleton problem with the logger, it seems..
+- 64-bit on Windows, issues with Qt, boost at least
 
 PF:
 

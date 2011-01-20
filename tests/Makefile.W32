@@ -89,10 +89,9 @@ local_distclean:
 local_test:
 	@-echo @echo off > test.bat
 	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
+!IFDEF WITH_GTEST
 	@-echo echo Testing logging... >> test.bat
 	@-echo logTest >> test.bat
-!IFDEF WITH_GTEST
-	@-echo echo Testing with Google test framework... >> test.bat
 	@-echo echo Testing version... >> test.bat
 	@-echo versionTest >> test.bat
 	@-echo echo Testing counter.. >> test.bat
