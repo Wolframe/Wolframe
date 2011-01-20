@@ -25,6 +25,7 @@ namespace _SMERP {
 
 		void timeoutOccured();
 		void signalOccured();
+		void errorOccured( NetworkSignal );
 
 		/// Handle a request and produce a reply.
 		Network::NetworkOperation nextOperation();
@@ -38,6 +39,7 @@ namespace _SMERP {
 			FINISHING,
 			TIMEOUT,
 			SIGNALLED,
+			CLOSING,
 			TERMINATING
 		};
 

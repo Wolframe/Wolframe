@@ -18,6 +18,9 @@ namespace _SMERP {
 		enum Operation	{
 			READ,
 			WRITE,
+			CANCEL_OPERATIONS,
+			SET_TIMER,
+			CANCEL_TIMER,
 			TERMINATE
 		};
 
@@ -54,8 +57,10 @@ namespace _SMERP {
 		connectionHandler& operator = ( const connectionHandler& );
 
 	public:
-		enum NetworkError	{
-			EndOfFile
+		enum NetworkSignal	{
+			END_OF_FILE,
+			OPERATION_CANCELLED,
+			UNKNOWN_ERROR
 		};
 
 
@@ -73,7 +78,7 @@ namespace _SMERP {
 		virtual void signalOccured()	{}
 
 		/// An error network occured
-		virtual void errorOccured( NetworkError )	{}
+		virtual void errorOccured( NetworkSignal )	{}
 
 		/// Set the remote peer. The connection is up now.
 		virtual void setPeer( const RemoteTCPendpoint& remote ) = 0;
