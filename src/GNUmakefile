@@ -35,6 +35,7 @@ LOCAL_STATIC_LIB = \
 
 LOCAL_STATIC_LIB_OBJS = \
 	version.o \
+	resolvePath.o \
 	commandLine.o \
 	logLevel.o \
 	logSyslogFacility.o \

@@ -5,6 +5,7 @@
 #include "configFile.hpp"
 #include "serverEndpoint.hpp"
 
+#include "miscUtils.hpp"
 
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
@@ -30,37 +31,6 @@ static const unsigned short	SSL_DEFAULT_PORT = 7660;
 static const char*		DEFAULT_SERVICE_NAME = "smerp";
 static const char*		DEFAULT_SERVICE_DISPLAY_NAME = "Smerp Daemon";
 static const char*		DEFAULT_SERVICE_DESCRIPTION = "a daemon for smerping";
-
-
-static std::string resolvePath( const std::string& path )
-// static boost::filesystem::path resolvePath( const boost::filesystem::path& p )
-{
-	boost::filesystem::path result;
-	boost::filesystem::path	p( path );
-
-	for ( boost::filesystem::path::iterator it = p.begin(); it != p.end(); ++it )	{
-		if ( *it == ".." )	{
-			// /a/b/.. is not necessarily /a.. if b is a symbolic link
-			if ( boost::filesystem::is_symlink( result ) )
-				result /= *it;
-			// /a/b/../.. is not /a/b/.. under most circumstances
-			// We can end up with ..s in our result because of symbolic links
-			else if( result.filename() == ".." )
-				result /= *it;
-			// Otherwise it should be safe to resolve the parent
-			else
-				result = result.parent_path();
-		}
-		else if( *it == "." )	{
-			// Ignore
-		}
-		else {
-			// Just cat other path entries
-			result /= *it;
-		}
-	}
-	return result.string();
-}
 
 
 static boost::logic::tribool getBoolValue( boost::property_tree::ptree& pt, const std::string& label, std::string& val )

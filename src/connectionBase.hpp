@@ -94,69 +94,53 @@ namespace _SMERP {
 		/// Connection base state machine
 		void nextOperation()
 		{
-			bool loop = true;
-			while( loop )	{
-				NetworkOperation netOp = connectionHandler_->nextOperation();
-				switch ( netOp.operation() )	{
+			NetworkOperation netOp = connectionHandler_->nextOperation();
+			switch ( netOp.operation() )	{
 
-				case NetworkOperation::READ:
-					loop = false;
-					LOG_TRACE << "Next operation: READ " << ReadBufferSize - bufUsed_ << " bytes from " << identifier();
-					if ( netOp.timeout() > 0 )
-						setTimeout( netOp.timeout());
-					socket().async_read_some( boost::asio::buffer( bufStart_, ReadBufferSize - bufUsed_ ),
-								  strand_.wrap( boost::bind( &connectionBase::handleRead,
-											     this->shared_from_this(),
-											     boost::asio::placeholders::error,
-											     boost::asio::placeholders::bytes_transferred )));
-					break;
-
-				case NetworkOperation::WRITE:
-					loop = false;
-					LOG_TRACE << "Next operation: WRITE to " << identifier();
-					if ( netOp.data() == NULL )	{
-						;
-					}
-					if ( netOp.size() == 0 )	{
-						;
-					}
-					if ( netOp.timeout() > 0 )
-						setTimeout( netOp.timeout());
-					boost::asio::async_write( socket(),
-								  boost::asio::buffer( netOp.data(), netOp.size() ),
-								  strand_.wrap( boost::bind( &connectionBase::handleWrite,
-											     this->shared_from_this(),
-											     boost::asio::placeholders::error )));
-					break;
-
-				case NetworkOperation::CANCEL_OPERATIONS:	{
-						LOG_TRACE << "Next operation: CANCEL_OPERATIONS on connection to " << identifier();
-						boost::system::error_code ignored_ec;
-						socket().lowest_layer().cancel( ignored_ec );
-					}
-					break;
-
-				case NetworkOperation::SET_TIMER:
-					LOG_TRACE << "Next operation: SET_TIMER to " << netOp.timeout() << " on connection to " << identifier();
+			case NetworkOperation::READ:
+				LOG_TRACE << "Next operation: READ " << ReadBufferSize - bufUsed_ << " bytes from " << identifier();
+				if ( netOp.timeout() > 0 )
 					setTimeout( netOp.timeout());
-					break;
+				socket().async_read_some( boost::asio::buffer( bufStart_, ReadBufferSize - bufUsed_ ),
+							  strand_.wrap( boost::bind( &connectionBase::handleRead,
+										     this->shared_from_this(),
+										     boost::asio::placeholders::error,
+										     boost::asio::placeholders::bytes_transferred )));
+				break;
 
-				case NetworkOperation::CANCEL_TIMER:
-					LOG_TRACE << "Next operation: CANCEL_TIMER on connection to " << identifier();
-					setTimeout( 0 );
-					break;
-
-				case NetworkOperation::TERMINATE:	{
-						loop = false;
-						LOG_TRACE << "Next operation: TERMINATE connection to " << identifier();
-						// Initiate graceful connection closure.
-						setTimeout( 0 );
-						boost::system::error_code ignored_ec;
-						socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
-						unregister();
-					}
-					break;
+			case NetworkOperation::WRITE:
+				LOG_TRACE << "Next operation: WRITE to " << identifier();
+				if ( netOp.data() == NULL )	{
+					;
 				}
+				if ( netOp.size() == 0 )	{
+					;
+				}
+				if ( netOp.timeout() > 0 )
+					setTimeout( netOp.timeout());
+				boost::asio::async_write( socket(),
+							  boost::asio::buffer( netOp.data(), netOp.size() ),
+							  strand_.wrap( boost::bind( &connectionBase::handleWrite,
+										     this->shared_from_this(),
+										     boost::asio::placeholders::error )));
+				break;
+
+			case NetworkOperation::CANCEL_OPERATIONS:	{
+					LOG_TRACE << "Next operation: CANCEL_OPERATIONS on connection to " << identifier();
+					boost::system::error_code ignored_ec;
+					socket().lowest_layer().cancel( ignored_ec );
+				}
+				break;
+
+			case NetworkOperation::TERMINATE:	{
+					LOG_TRACE << "Next operation: TERMINATE connection to " << identifier();
+					// Initiate graceful connection closure.
+					setTimeout( 0 );
+					boost::system::error_code ignored_ec;
+					socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
+					unregister();
+				}
+				break;
 			}
 		}
 
@@ -167,7 +151,7 @@ namespace _SMERP {
 			connectionHandler::NetworkSignal	ns;
 
 			switch( e.value() )	{
-			case boost::asio::error::connection_reset:
+			case boost::asio::error::eof:
 				ns = connectionHandler::END_OF_FILE;
 				break;
 
@@ -180,6 +164,7 @@ namespace _SMERP {
 				break;
 
 			default:
+				LOG_DEBUG << "Unknown error: " << e.value() << ", message: " << e.message();
 				ns = connectionHandler::UNKNOWN_ERROR;
 				break;
 			}
@@ -201,12 +186,12 @@ namespace _SMERP {
 				assert( bufUsed_ <= ReadBufferSize );
 				memmove( buffer_.data(), bufEnd, bufUsed_ );
 				bufStart_ = buffer_.data() + bufUsed_;
-				nextOperation();
 			}
 			else	{
 				LOG_TRACE << "Read error: " << e.message();
 				signalError( e );
 			}
+			nextOperation();
 		}
 		// handleRead function end
 
@@ -216,12 +201,13 @@ namespace _SMERP {
 		{
 			setTimeout( 0 );
 			if ( !e )	{
-				nextOperation();
+				;
 			}
 			else	{
 				LOG_DATA << "Write error: " << e.message();
 				signalError( e );
 			}
+			nextOperation();
 		}
 		// handleWrite function end
 

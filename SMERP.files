@@ -158,3 +158,6 @@ src/commandLine.cpp
 src/appException.cpp
 src/appConfig.cpp
 src/acceptor.cpp
+src/resolvePath.cpp
+include/miscUtils.hpp
+tests/resolvePathTest.cpp

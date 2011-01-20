@@ -19,8 +19,6 @@ namespace _SMERP {
 			READ,
 			WRITE,
 			CANCEL_OPERATIONS,
-			SET_TIMER,
-			CANCEL_TIMER,
 			TERMINATE
 		};
 

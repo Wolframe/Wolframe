@@ -54,6 +54,7 @@ ifdef WITH_GTEST
 TEST_CPP_BINS += \
 	versionTest$(EXE) \
 	counterTest$(EXE) \
+	resolvePathTest$(EXE) \
 	poolTest$(EXE) \
 	pechoHandler-gTest$(EXE) \
 	protocolArgumentParsing-gTest$(EXE)
