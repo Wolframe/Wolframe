@@ -1,9 +1,12 @@
+Build Instructions
+==================
+
 Prerequisites
 -------------
 
 - boost 1.41.0 or later
 - optionally (WITH_SSL) openssl 0.9.8 or later
-- optionally (WITH_GTEST) gtest 1.5.0 or later
+- optionally (WITH_GTEST) gtest 1.4.0 or later
 
 Compile and install boost
 -------------------------
@@ -33,3 +36,14 @@ See 'examples/lua/README'
 
 Compile and install Qt
 ----------------------
+
+A note on Linux Distributions
+=============================
+
+Fedora 14
+---------
+
+No problems wit the supplied packages at all, everything builds out of the box:
+
+Required packages: boost-devel
+Optional packages: openssl-devel lua-devel qt4-devel gtest-devel

@@ -242,6 +242,18 @@ endif
 # Qt 4 (http://qt.nokia.com/products/)
 ######################################
 
+ifdef WITH_QT
+ifeq "$(PLATFORM)" "LINUX"
+ifeq "$(LINUX_DIST)" "redhat"
+# Fedora 14 puts Qt in a subdir in /usr/lib
+QT_DIR ?= /usr/lib/qt4
+QT_INCLUDE_DIRS ?= /usr/include
+QT_LIB_DIRS ?= $(QT_DIR)/lib
+FOO ?= bar
+endif
+endif
+endif
+
 # self-compiled
 #QT_DIR=/home/user/qt
 

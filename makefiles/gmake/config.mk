@@ -4,8 +4,11 @@
 # - BOOST_DIR
 # - OPENSSL_DIR
 # - QT_DIR
+# - LUA_DIR
 
-# please customize
+# IMPORTANT:
+# please customize for new platforms or leave empty for
+# an autodetection in platform.mk
 
 # Boost (http://www.boostpro.com/download)
 ###########################################
@@ -51,12 +54,11 @@ GTEST_INCLUDE_DIRS=$(GTEST_DIR)/include
 #QT_DIR=/home/user/qt
 
 # system-wide
-QT_DIR=/usr
+#QT_DIR=/usr
 
 # usual layout, may differ
-QT_INCLUDE_DIRS=$(QT_DIR)/include
-#QT_INCLUDE_DIRS=$(QT_DIR)/include/qt4
-QT_LIB_DIRS=$(QT_DIR)/lib
+#QT_INCLUDE_DIRS=$(QT_DIR)/include
+#QT_LIB_DIRS=$(QT_DIR)/lib
 
 # Lua 5.1
 #########

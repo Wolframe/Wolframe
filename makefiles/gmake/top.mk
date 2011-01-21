@@ -55,6 +55,12 @@ doc:
 .PHONY: help
 help:
 	@cat $(TOPDIR)/makefiles/gmake/help.mk
+	@echo
+	@echo "Operating system: $(PLATFORM), $(OS_MAJOR_VERSION).$(OS_MINOR_VERSION)"
+ifeq "$(PLATFORM)" "LINUX"
+	@echo "Linux distribution: $(LINUX_DIST) $(LINUX_REV)"
+endif
+	@echo "C++ Compiler: $(COMPILER)"
 
 .PHONY: init-po
 init-po:
