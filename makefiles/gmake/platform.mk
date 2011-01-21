@@ -243,6 +243,12 @@ endif
 ######################################
 
 ifdef WITH_QT
+
+# defaults
+QT_DIR ?= /usr
+QT_INCLUDE_DIRS ?= /usr/include
+QT_LIB_DIRS ?= /usr/lib
+
 ifeq "$(PLATFORM)" "LINUX"
 
 ifeq "$(LINUX_DIST)" "redhat"
@@ -254,10 +260,11 @@ endif
 
 endif
 
+QT_INCLUDE_DIRS ?= /usr/include
+
 # Ubuntu 10.04 TLS, 10.10
 ifeq "$(LINUX_DIST)" "debian"
 ifeq "$(LINUX_REV)" "squeeze/sid"
-QT_DIR ?= /usr
 QT_INCLUDE_DIRS ?= /usr/include/qt4
 endif
 endif
