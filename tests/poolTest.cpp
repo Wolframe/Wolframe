@@ -2,21 +2,21 @@
 // atomic counter template unit tests using google test framework (gTest)
 //
 
-#include <climits>
 #include <cstdlib>
-#include <ctime>
-#include <iostream>
-
 #include <boost/thread/thread.hpp>
 
 #include "objectPool.hpp"
 #include <gtest/gtest.h>
 
+
 class testObject	{
 public:
 	testObject()		{ threads = 0, uses = 0; }
 	void doSomething()	{ threads++, uses++;
-				/*  boost::this_thread::sleep( boost::posix_time::microseconds( 10 ) ); */
+				  threads--;
+				}
+	void sleepSomething()	{ threads++, uses++;
+				  boost::this_thread::sleep( boost::posix_time::microseconds( 100 ) );
 				  threads--;
 				}
 	bool unused()		{ return threads == 0; }
@@ -34,9 +34,11 @@ protected:
 	// You can remove any or all of the following functions if its body is empty.
 	ObjectPoolFixture()	{
 		srand((unsigned)time(0));
-		noThreads = (int)( rand() % 256 );
-		poolSize = (int)( rand() % 128 );
-		times = (unsigned long)( rand() % 100000 );
+		noThreads = (int)( rand() % 32 );
+		poolSize = (int)( rand() % 32 );
+		times = (unsigned long)( rand() % 200000 );
+		timesSleep = (unsigned long)( rand() % 50000 );
+
 	}
 
 	// Clean-up work that doesn't throw exceptions here.
@@ -72,6 +74,7 @@ protected:
 	_SMERP::ObjectPool< testObject >	objPool;
 	unsigned				poolSize;
 	unsigned long				times;
+	unsigned long				timesSleep;
 
 public:
 	static void testThread( _SMERP::ObjectPool< testObject > *pool, unsigned count )
@@ -80,6 +83,17 @@ public:
 			testObject *tstObj = pool->get();
 			if ( tstObj != NULL )	{
 				tstObj->doSomething();
+				pool->add( tstObj );
+			}
+		}
+	}
+
+	static void sleepTestThread( _SMERP::ObjectPool< testObject > *pool, unsigned count )
+	{
+		for ( std::size_t i = 0; i < count; i++ )	{
+			testObject *tstObj = pool->get();
+			if ( tstObj != NULL )	{
+				tstObj->sleepSomething();
 				pool->add( tstObj );
 			}
 		}
@@ -112,6 +126,29 @@ TEST_F( ObjectPoolFixture, noTimeout )	{
 	ASSERT_EQ( used, noThreads * times );
 }
 
+TEST_F( ObjectPoolFixture, noTimeoutSleep )	{
+	for ( unsigned long i = 0; i < poolSize; i++ )	{
+		ASSERT_EQ( tstObjs[i]->used(), 0 );
+	}
+
+	for ( int i = 0; i < noThreads; i++ )   {
+		boost::thread* thread = new boost::thread( &ObjectPoolFixture::sleepTestThread, &objPool, timesSleep );
+		threads.push_back( thread );
+	}
+	for ( int i = 0; i < noThreads; i++ )   {
+		threads[i]->join();
+		delete threads[i];
+	}
+
+	unsigned long used = 0;
+	for ( unsigned long i = 0; i < poolSize; i++ )	{
+		ASSERT_TRUE( tstObjs[i]->unused() );
+		used += tstObjs[i]->used();
+	}
+
+	ASSERT_EQ( used, noThreads * timesSleep );
+}
+
 TEST_F( ObjectPoolFixture, Timeout )	{
 	objPool.timeout( 1 );
 	for ( unsigned long i = 0; i < poolSize; i++ )	{
@@ -134,6 +171,30 @@ TEST_F( ObjectPoolFixture, Timeout )	{
 	}
 
 	ASSERT_EQ( used, noThreads * times );
+}
+
+TEST_F( ObjectPoolFixture, TimeoutSleep )	{
+	objPool.timeout( 1 );
+	for ( unsigned long i = 0; i < poolSize; i++ )	{
+		ASSERT_EQ( tstObjs[i]->used(), 0 );
+	}
+
+	for ( int i = 0; i < noThreads; i++ )   {
+		boost::thread* thread = new boost::thread( &ObjectPoolFixture::sleepTestThread, &objPool, timesSleep );
+		threads.push_back( thread );
+	}
+	for ( int i = 0; i < noThreads; i++ )   {
+		threads[i]->join();
+		delete threads[i];
+	}
+
+	unsigned long used = 0;
+	for ( unsigned long i = 0; i < poolSize; i++ )	{
+		ASSERT_TRUE( tstObjs[i]->unused() );
+		used += tstObjs[i]->used();
+	}
+
+	ASSERT_EQ( used, noThreads * timesSleep );
 }
 
 

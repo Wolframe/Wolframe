@@ -39,7 +39,6 @@ namespace _SMERP {
 			FINISHING,
 			TIMEOUT,
 			SIGNALLED,
-			CLOSING,
 			TERMINATING
 		};
 

@@ -4,9 +4,7 @@
 
 #include <climits>
 #include <cstdlib>
-#include <ctime>
-#include <iostream>
-#include <stdio.h>
+#include <cstdio>
 
 #include "version.hpp"
 #include <gtest/gtest.h>

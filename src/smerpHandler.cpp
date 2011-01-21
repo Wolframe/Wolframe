@@ -85,13 +85,8 @@ namespace _SMERP {
 							  msg, strlen( msg ));
 		}
 
-		case CLOSING:	{
-			state_ = TERMINATING;
-			return Network::NetworkOperation( Network::NetworkOperation::CANCEL_OPERATIONS );
-		}
-
 		case TIMEOUT:	{
-			state_ = CLOSING;
+			state_ = TERMINATING;
 			const char *msg = "Timeout. :P\n";
 			return Network::NetworkOperation( Network::NetworkOperation::WRITE,
 							  msg, strlen( msg ));
@@ -148,13 +143,11 @@ namespace _SMERP {
 	{
 		switch( signal )	{
 		case END_OF_FILE:
-			state_ = TERMINATING;
-			LOG_TRACE << "Processor received EOF (the peer has closed connection)";
+			LOG_TRACE << "Processor received EOF (read on closed connection)";
 			break;
 
 		case BROKEN_PIPE:
-			state_ = TERMINATING;
-			LOG_TRACE << "Processor received BROKEN PIPE (the peer has closed connection)";
+			LOG_TRACE << "Processor received BROKEN PIPE (write on closed connection)";
 			break;
 
 		case OPERATION_CANCELLED:
@@ -162,7 +155,6 @@ namespace _SMERP {
 			break;
 
 		case UNKNOWN_ERROR:
-			state_ = TERMINATING;
 			LOG_TRACE << "Processor received an UNKNOWN error from the framework";
 			break;
 		}

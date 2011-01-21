@@ -125,13 +125,6 @@ namespace _SMERP {
 										     boost::asio::placeholders::error )));
 				break;
 
-			case NetworkOperation::CANCEL_OPERATIONS:	{
-					LOG_TRACE << "Next operation: CANCEL_OPERATIONS on connection to " << identifier();
-					boost::system::error_code ignored_ec;
-					socket().lowest_layer().cancel( ignored_ec );
-				}
-				break;
-
 			case NetworkOperation::TERMINATE:	{
 					LOG_TRACE << "Next operation: TERMINATE connection to " << identifier();
 					// Initiate graceful connection closure.
@@ -149,27 +142,32 @@ namespace _SMERP {
 		void signalError( const boost::system::error_code& e )
 		{
 			connectionHandler::NetworkSignal	ns;
+			std::string				name;
 
 			switch( e.value() )	{
 			case boost::asio::error::eof:
 				ns = connectionHandler::END_OF_FILE;
+				name = "EOF";
 				break;
 
 			case boost::asio::error::operation_aborted:
 				ns = connectionHandler::OPERATION_CANCELLED;
+				name = "OPERATION CANCELLED";
 				break;
 
 			case boost::asio::error::broken_pipe:
 				ns = connectionHandler::BROKEN_PIPE;
+				name = "BROKEN PIPE";
 				break;
 
 			default:
 				LOG_DEBUG << "Unknown error: " << e.value() << ", message: " << e.message();
 				ns = connectionHandler::UNKNOWN_ERROR;
+				name = "UNKNOWN ERROR";
 				break;
 			}
 			connectionHandler_->errorOccured( ns );
-			LOG_DATA << "Signalled " << ns << " to processor for connection to " << identifier();
+			LOG_DATA << "Signalled " << name << " to processor for connection to " << identifier();
 		}
 
 
