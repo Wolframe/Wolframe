@@ -247,7 +247,7 @@ ifeq "$(PLATFORM)" "LINUX"
 ifeq "$(LINUX_DIST)" "redhat"
 
 # Archlinux
-ifeq $(LINUX_REV) "arch"
+ifeq "$(LINUX_REV)" "arch"
 QT_DIR ?= /usr
 QT_INCLUDE_DIRS ?= /usr/include
 QT_LIB_DIRS ?= /usr/lib

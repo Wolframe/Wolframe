@@ -9,6 +9,9 @@ ABa:
 - makefiles
   - do some Linux distribution autodetection
   - do automatic layout for includes and libraries for Linux
+  - check if dist* work
+  - merge po stuff from WolfBones with the funny script in po :-)
+  - build documentation (doxygen, docbook)
 - logger
   - add a prefix for logging in subparts of the system (e.g. network, luaprocessor),
     map it to ident for syslog, source for eventlog
