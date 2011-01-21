@@ -16,14 +16,14 @@
 # base dir where boost is installed
 
 # system version
-BOOST_DIR=/usr
-BOOST_LIB_DIRS=$(BOOST_DIR)/lib
-BOOST_INCLUDE_DIRS=$(BOOST_DIR)/include
+#BOOST_DIR=/usr
+#BOOST_LIB_DIRS=$(BOOST_DIR)/lib
+#BOOST_INCLUDE_DIRS=$(BOOST_DIR)/include
 
 # self-compiled
-#BOOST_DIR=/home/abaumann/boost_1_45_0
-#BOOST_INCLUDE_DIRS=$(BOOST_DIR)
-#BOOST_LIB_DIR=$(BOOST_DIR)/stage/lib
+BOOST_DIR=/home/abaumann/boost_1_45_0
+BOOST_INCLUDE_DIRS=$(BOOST_DIR)
+BOOST_LIB_DIR=$(BOOST_DIR)/stage/lib
 
 # OpenSSL (http://www.slproweb.com/products/Win32OpenSSL.html)
 ##############################################################
@@ -63,21 +63,13 @@ GTEST_INCLUDE_DIRS=$(GTEST_DIR)/include
 # Lua 5.1
 #########
 
-LUA_VERSION=5.1
-
 # self-compiled
 #LUA_DIR=/home/user/lua-5.1.4
 
 # system-wide
-LUA_DIR=/usr
+#LUA_DIR=/usr
 
 # usual layout
-LUA_INCLUDE_DIRS=$(LUA_DIR)/include
-LUA_LIB_DIRS=$(LUA_DIR)/lib
-LUA_LIBS=-llua
-
-# Debian-ish layout
-#LUA_INCLUDE_DIRS=/usr/include/lua5.1
-#LUA_LIB_DIRS=/usr/lib
-#LUA_LIBS=-llua$(LUA_VERSION)
-
+#LUA_INCLUDE_DIRS=$(LUA_DIR)/include
+#LUA_LIB_DIRS=$(LUA_DIR)/lib
+#LUA_LIBS=-llua

@@ -262,38 +262,45 @@ QT_LIB_DIRS ?= /usr/lib
 endif
 
 endif
+
+# Ubuntu 10.04 TLS, 10.10
+ifeq "$(LINUX_DIST)" "debian"
+ifeq "$(LINUX_REV)" "squeeze/sid"
+QT_DIR ?= /usr
+QT_INCLUDE_DIRS ?= /usr/include/qt4
+QT_LIB_DIRS ?= /usr/lib
 endif
 endif
 
-# self-compiled
-#QT_DIR=/home/user/qt
-
-# system-wide
-#QT_DIR=/usr
-
-# usual layout, may differ
-#QT_INCLUDE_DIRS=$(QT_DIR)/include
-#QT_INCLUDE_DIRS=$(QT_DIR)/include/qt4
-#QT_LIB_DIRS=$(QT_DIR)/lib
+endif
+endif
 
 # Lua 5.1
 #########
 
-#LUA_VERSION=5.1
+ifdef WITH_LUA
+ifeq "$(PLATFORM)" "LINUX"
 
-# self-compiled
-#LUA_DIR=/home/user/lua-5.1.4
+ifeq "$(LINUX_DIST)" "redhat"
+LUA_INCLUDE_DIRS=/usr/include
+LUA_LIB_DIRS=/usr/lib
+LUA_LIBS=-llua
+endif
 
-# system-wide
-#LUA_DIR=/usr
+ifeq "$(LINUX_DIST)" "arch"
+LUA_INCLUDE_DIRS=/usr/include
+LUA_LIB_DIRS=/usr/lib       
+LUA_LIBS=-llua
+endif
 
-# usual layout
-#LUA_INCLUDE_DIRS=$(LUA_DIR)/include
-#LUA_LIB_DIRS=$(LUA_DIR)/lib
-#LUA_LIBS=-llua
+# Ubuntu 10.04 TLS, 10.10
+ifeq "$(LINUX_DIST)" "debian"
+ifeq "$(LINUX_REV)" "squeeze/sid"
+LUA_INCLUDE_DIRS=/usr/include/lua5.1
+LUA_LIB_DIRS=/usr/lib
+LUA_LIBS=-llua5.1
+endif
+endif
 
-# Debian-ish layout
-#LUA_INCLUDE_DIRS=/usr/include/lua5.1
-#LUA_LIB_DIRS=/usr/lib
-#LUA_LIBS=-llua$(LUA_VERSION)
-
+endif
+endif

@@ -61,6 +61,16 @@ ifeq "$(PLATFORM)" "LINUX"
 	@echo "Linux distribution: $(LINUX_DIST) $(LINUX_REV)"
 endif
 	@echo "C++ Compiler: $(COMPILER)"
+ifdef WITH_LUA
+	@echo "LUA_INCLUDE_DIRS: $(LUA_INCLUDE_DIRS)"
+	@echo "LUA_LIB_DIRS: $(LUA_LIB_DIRS)"
+	@echo "LUA_LIBS: $(LUA_LIBS)"
+endif
+ifdef WITH_QT
+	@echo "QT_DIR: $(QT_DIR)"
+	@echo "QT_INCLUDE_DIRS: $(QT_INCLUDE_DIRS)"
+	@echo "QT_LIB_DIRS: $(QT_LIB_DIRS)"
+endif
 
 .PHONY: init-po
 init-po:
