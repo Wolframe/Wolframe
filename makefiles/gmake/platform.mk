@@ -251,7 +251,7 @@ ifeq "$(LINUX_DIST)" "redhat"
 # Fedora 14 puts Qt in a subdir in /usr/lib
 ifeq "$(LINUX_REV)" "14"
 QT_DIR ?= /usr/lib/qt4
-QT_INCLUDE_DIRS ?= /usr/include 
+QT_INCLUDE_DIRS ?= /usr/include
 QT_LIB_DIRS ?= /usr/lib
 endif
 
