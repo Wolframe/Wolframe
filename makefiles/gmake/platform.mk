@@ -276,15 +276,13 @@ endif
 #########
 
 ifdef WITH_LUA
+
+# defaults
+LUA_INCLUDE_DIRS ?= /usr/include
+LUA_LIB_DIRS ?= /usr/lib
+LUA_LIBS=-llua
+
 ifeq "$(PLATFORM)" "LINUX"
-
-ifeq "$(LINUX_DIST)" "redhat"
-LUA_LIBS=-llua
-endif
-
-ifeq "$(LINUX_DIST)" "arch"
-LUA_LIBS=-llua
-endif
 
 # Ubuntu 10.04 TLS, 10.10
 ifeq "$(LINUX_DIST)" "debian"
