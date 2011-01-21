@@ -244,14 +244,15 @@ endif
 
 ifdef WITH_QT
 ifeq "$(PLATFORM)" "LINUX"
-ifeq "$(LINUX_DIST)" "redhat"
 
 # Archlinux
-ifeq "$(LINUX_REV)" "arch"
+ifeq "$(LINUX_DIST)" "arch"
 QT_DIR ?= /usr
 QT_INCLUDE_DIRS ?= /usr/include
 QT_LIB_DIRS ?= /usr/lib
 endif
+
+ifeq "$(LINUX_DIST)" "redhat"
 
 # Fedora 14 puts Qt in a subdir in /usr/lib
 ifeq "$(LINUX_REV)" "14"
