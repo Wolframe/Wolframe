@@ -244,11 +244,6 @@ endif
 
 ifdef WITH_QT
 
-# defaults
-QT_DIR ?= /usr
-QT_INCLUDE_DIRS ?= /usr/include
-QT_LIB_DIRS ?= /usr/lib
-
 ifeq "$(PLATFORM)" "LINUX"
 
 ifeq "$(LINUX_DIST)" "redhat"
@@ -256,16 +251,18 @@ ifeq "$(LINUX_DIST)" "redhat"
 # Fedora 14 puts Qt in a subdir in /usr/lib
 ifeq "$(LINUX_REV)" "14"
 QT_DIR ?= /usr/lib/qt4
+QT_INCLUDE_DIRS ?= /usr/include 
+QT_LIB_DIRS ?= /usr/lib
 endif
 
 endif
-
-QT_INCLUDE_DIRS ?= /usr/include
 
 # Ubuntu 10.04 TLS, 10.10
 ifeq "$(LINUX_DIST)" "debian"
 ifeq "$(LINUX_REV)" "squeeze/sid"
+QT_DIR ?= /usr
 QT_INCLUDE_DIRS ?= /usr/include/qt4
+QT_LIB_DIRS ?= /usr/lib
 endif
 endif
 
