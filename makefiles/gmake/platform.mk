@@ -246,6 +246,12 @@ ifdef WITH_QT
 
 ifeq "$(PLATFORM)" "LINUX"
 
+ifeq "$(LINUX_DIST)" "arch"
+QT_DIR ?= /usr
+QT_INCLUDE_DIRS ?= /usr/include
+QT_LIB_DIRS ?= /usr/lib
+endif
+
 ifeq "$(LINUX_DIST)" "redhat"
 
 # Fedora 14 puts Qt in a subdir in /usr/lib
