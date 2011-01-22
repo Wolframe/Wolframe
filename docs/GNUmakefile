@@ -4,9 +4,13 @@ SUBDIRS =
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
-local_all:
+doc:
+	cd $(TOPDIR); doxygen docs/doxygen.conf
 
 local_clean:
+	-@rm -rf doxygen 2>/dev/null
+
+local_all:
 
 local_distclean:
 
