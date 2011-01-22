@@ -19,7 +19,7 @@ INCLUDE_LDFLAGS = \
 	-L$(QT_LIB_DIRS)
 
 INCLUDE_LIBS = \
-	-lQtCore -lQtGui -lQtUiTools -lQtNetwork
+	-lQtCore -lQtGui -lQtUiTools -lQtNetwork -lQtXml
 
 MOC_FLAGS = \
 	$(INCLUDE_DIRS)

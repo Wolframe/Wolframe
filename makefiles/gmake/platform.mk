@@ -263,13 +263,21 @@ endif
 
 endif
 
-# Ubuntu 10.04 TLS, 10.10
+# Ubuntu 10.04 TLS, 10.10, Debian 5.0
 ifeq "$(LINUX_DIST)" "debian"
+
 ifeq "$(LINUX_REV)" "squeeze/sid"
 QT_DIR ?= /usr
 QT_INCLUDE_DIRS ?= /usr/include/qt4
 QT_LIB_DIRS ?= /usr/lib
 endif
+
+ifeq "$(LINUX_REV)" "5"
+QT_DIR ?= /usr
+QT_INCLUDE_DIRS ?= /usr/include/qt4
+QT_LIB_DIRS ?= /usr/lib
+endif
+
 endif
 
 endif
@@ -287,9 +295,13 @@ LUA_LIBS=-llua
 
 ifeq "$(PLATFORM)" "LINUX"
 
-# Ubuntu 10.04 TLS, 10.10
+# Ubuntu 10.04 TLS, 10.10, Debian 5.0
 ifeq "$(LINUX_DIST)" "debian"
 ifeq "$(LINUX_REV)" "squeeze/sid"
+LUA_INCLUDE_DIRS=/usr/include/lua5.1
+LUA_LIBS=-llua5.1
+endif
+ifeq "$(LINUX_REV)" "5"
 LUA_INCLUDE_DIRS=/usr/include/lua5.1
 LUA_LIBS=-llua5.1
 endif

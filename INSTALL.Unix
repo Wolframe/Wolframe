@@ -53,8 +53,16 @@ Optional packages: openssl-devel, lua-devel (5.1), qt4-devel, gtest-devel (1.4)
 Ubuntu 10.04.1 LTS
 ------------------
 
-Optional packages: liblua5.1-devm libgtest-dev (1.3, a little bit old), libqt4-dev
+Optional packages: liblua5.1-dev, libgtest-dev (1.3, a little bit old), libqt4-dev
 
 libboost-dev is 1.40, too old, missing asio features and property_tree, build
 you own boost. gcc on Debian complains a lot about boost header files..
 
+Debian 5.0
+----------
+
+Optional packages: liblua5.1-dev, libqt4-dev
+
+libbost-dev is 1.34, far too old. Compile your own version.
+libgtest-dev is missing. Compile your own version.
+Qt client can't load designer library and run correctly, don'y know why?
