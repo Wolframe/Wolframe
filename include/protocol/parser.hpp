@@ -72,6 +72,20 @@ public:
       for (unsigned int ii=0; ii<size; ii++) elem[ii]=o.elem[ii];
    };
 
+   void init()
+   {
+      size = 0;
+   };
+
+   //add a command to the protocol parser (case insensitive)
+   void add( const char* cmd)
+   {
+      CmdBufferType ct;
+      for (unsigned int ii=0; cmd[ii]; ii++) ct.push_back(cmd[ii]);
+      if (size == MaxNofCommands) throw Bad();
+      elem[size++] = *ct; 
+   };
+
    CmdParser& operator=( const CmdParser& o)
    {
       size = o.size;
@@ -124,15 +138,6 @@ private:
    typedef typename CmdBufferType::ValueType CmdValueType;
    CmdValueType elem[ MaxNofCommands];
    unsigned int size;
-
-   //add a command to the protocol parser (case insensitive)
-   void add( const char* cmd)
-   {
-      CmdBufferType ct;
-      for (unsigned int ii=0; cmd[ii]; ii++) ct.push_back(cmd[ii]);
-      if (size == MaxNofCommands) throw Bad();
-      elem[size++] = *ct; 
-   };
 };
    
 } // namespace protocol
@@ -140,3 +145,4 @@ private:
 
 #endif // _SMERP_PROTOCOL_PARSER_HPP_INCLUDED
 
+   

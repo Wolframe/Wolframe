@@ -280,12 +280,12 @@ struct Connection::Private
                 else
                 {
                    state = ProcessingAfterWrite;         //we a flushing the output buffer and have to release it when entering next time
-                }                
+                }
                 void* content = output.ptr();
                 std::size_t size = output.pos();
                 return Operation( Operation::WRITE, content, size);                
             }
-            
+
             case HandleError:
             {
                 //in the error case, start again after complaining (Operation::WRITE sent in previous state):
@@ -294,7 +294,7 @@ struct Connection::Private
                 state = Init;
                 continue;
             }
-            
+
             case Terminate:
             {
                 state = Terminate;
@@ -342,10 +342,15 @@ void Connection::setPeer( const Network::RemoteSSLendpoint& remote)
    LOG_TRACE << "Peer set to " << remote.toString();
 }
 
-void* Connection::parseInput( const void*, std::size_t bytesTransferred)
+void* Connection::parseInput( const void* bytes, std::size_t nofBytes)
 {
-   data->input.setPos( bytesTransferred);
-   return (void*)(data->input.charptr() + bytesTransferred);
+   if (nofBytes > data->input.size())
+   {
+      nofBytes = data->input.size();
+   }
+   data->input.setPos( nofBytes);
+   memcpy( data->input.charptr(), bytes, nofBytes);
+   return (void*)(data->input.charptr() + nofBytes);
 }
 
 Connection::Operation Connection::nextOperation()
