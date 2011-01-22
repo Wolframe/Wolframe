@@ -66,3 +66,8 @@ Optional packages: liblua5.1-dev, libqt4-dev
 libbost-dev is 1.34, far too old. Compile your own version.
 libgtest-dev is missing. Compile your own version.
 Qt client can't load designer library and run correctly, don'y know why?
+
+OpenSuSe 11.3
+-------------
+
+Optional packages:
