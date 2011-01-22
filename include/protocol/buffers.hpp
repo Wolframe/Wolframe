@@ -18,45 +18,46 @@ class Buffer
 {
 private:
    enum {Size=SIZE};
-   unsigned int pos;
-   char buf[ Size+1];
+   unsigned int m_pos;
+   char m_buf[ Size+1];
    
 public:
-   Buffer()                     :pos(0){};
-   void init()                  {pos=0;};
-   void push_back( char ch)     {if (pos<Size) buf[pos++]=ch;};
-   unsigned int size() const    {return pos;};
-   const char* c_str()          {buf[pos]=0; return buf;}; 
+   Buffer()                     :m_pos(0){};
+   void init()                  {m_pos=0;};
+   void push_back( char ch)     {if (m_pos<Size) m_buf[m_pos++]=ch;};
+   void append( const char* cc) {unsigned int ii=0; while(m_pos<Size && cc[ii]) m_buf[m_pos++]=cc[ii++];};
+   unsigned int size() const    {return m_pos;};
+   const char* c_str()          {m_buf[m_pos]=0; return m_buf;}; 
 };
 
 //buffer for the currently parsed command. 
 struct CmdBuffer
 {
    typedef boost::int_least64_t ValueType;    //< stores the command name with a maximum of 10 characters (6 bit per character = case insensitive alpha or digit)
-   unsigned int pos;               //< current position
-   ValueType value;
+   unsigned int m_pos;                        //< current position
+   ValueType m_value;
    enum 
    {
       MaxCommandLen=(sizeof(ValueType)/6)
    };
    
-   CmdBuffer()                     :pos(0),value(0) {};
-   CmdBuffer( const CmdBuffer& o)  :pos(o.pos),value(o.value) {}; 
-   void init()                     {pos=0;value=0;};
+   CmdBuffer()                     :m_pos(0),m_value(0) {};
+   CmdBuffer( const CmdBuffer& o)  :m_pos(o.m_pos),m_value(o.m_value) {}; 
+   void init()                     {m_pos=0;m_value=0;};
   
    //feed context with the next input character (case insensitive)
    void push_back( char ch)
    {
-      if (pos >= MaxCommandLen) {init(); return;}
-      if (ch >= 'a' && ch <= 'z') {value = (value << 6) | (ch-'a'); return;} 
-      if (ch >= 'A' && ch <= 'Z') {value = (value << 6) | (ch-'A'); return;}
-      if (ch >= '0' && ch <= '9') {value = (value << 6) | (ch+26-'0'); return;}
+      if (m_pos >= MaxCommandLen) {init(); return;}
+      if (ch >= 'a' && ch <= 'z') {m_value = (m_value << 6) | (ch-'a'); return;} 
+      if (ch >= 'A' && ch <= 'Z') {m_value = (m_value << 6) | (ch-'A'); return;}
+      if (ch >= '0' && ch <= '9') {m_value = (m_value << 6) | (ch+26-'0'); return;}
       init();
    };
    
-   unsigned int size() const {return pos;};
-   operator ValueType() const {return value;};
-   ValueType operator*() const {return value;};
+   unsigned int size() const {return m_pos;};
+   operator ValueType() const {return m_value;};
+   ValueType operator*() const {return m_value;};
 };
 
 
@@ -70,89 +71,104 @@ class CArgBuffer
 private:
    enum {Size=16};
    enum State {EndToken,Empty,Content,ContentEsc,SQContent,SQContentEsc,DQContent,DQContentEsc};
-   unsigned int pos;
-   unsigned int buf[ Size];
-   State state;
-   Buffer content;
+   unsigned int m_pos;
+   unsigned int m_buf[ Size];
+   const char* m_sbuf[ Size];
+   State m_state;
+   Buffer* m_content;
    
-   void openArg()                      {if (pos<Size) buf[pos++]=content.size();};
+   void openArg()                      {if (m_pos<Size) m_buf[m_pos++]=m_content->size();};
    
-   public:
-   CArgBuffer()                        :pos(0),state(Empty) {buf[0]=0;};
-   void init()                         {pos=0;buf[0]=0;content.init();};
+public:
+   CArgBuffer( Buffer* c)              :m_content(c),m_pos(0),m_state(Empty) {m_buf[0]=0;m_sbuf[0]=0;};
+   void init()                         {m_pos=0;m_buf[0]=0;m_sbuf[0]=0;m_content->init();};
    void push_back( char ch)
    {
-      switch (state)
+      switch (m_state)
       {
          case EndToken:
             switch (ch)
             {
-               case '\'': state = SQContent; break;
-               case '\"': state = DQContent; break;
-               case '\\': state = ContentEsc; break;
-               case ' ': content.push_back(0); state = Empty; break;
-               default: state = Content; content.push_back(ch); break;
+               case '\'': m_state = SQContent; break;
+               case '\"': m_state = DQContent; break;
+               case '\\': m_state = ContentEsc; break;
+               case ' ': m_content->push_back(0); m_state = Empty; break;
+               default: m_state = Content; m_content->push_back(ch); break;
             }
             break;
             
          case Empty:
             switch (ch)
             {
-               case '\'': state = SQContent; openArg(); break;
-               case '\"': state = DQContent; openArg(); break;
-               case '\\': state = ContentEsc; openArg(); break;
+               case '\'': m_state = SQContent; openArg(); break;
+               case '\"': m_state = DQContent; openArg(); break;
+               case '\\': m_state = ContentEsc; openArg(); break;
                case ' ': break;
-               default: state = Content; openArg(); content.push_back(ch); break;
+               default: m_state = Content; openArg(); m_content->push_back(ch); break;
             }
             break;
          
          case Content:
             switch (ch)
             {
-               case '\'': state = SQContent; break;
-               case '\"': state = DQContent; break;
-               case '\\': state = ContentEsc; break;
-               case ' ':  content.push_back(0); state = Empty; break;
-               default:   content.push_back(ch); break;
+               case '\'': m_state = SQContent; break;
+               case '\"': m_state = DQContent; break;
+               case '\\': m_state = ContentEsc; break;
+               case ' ':  m_content->push_back(0); m_state = Empty; break;
+               default:   m_content->push_back(ch); break;
             }
             break;
             
          case ContentEsc:
-            state = Content;
-            content.push_back(ch); 
+            m_state = Content;
+            m_content->push_back(ch); 
             break;
             
          case SQContent:
             switch (ch)
             {
-               case '\'': state = EndToken; break;
-               case '\\': state = SQContentEsc; break;
-               default:   content.push_back(ch); break;
+               case '\'': m_state = EndToken; break;
+               case '\\': m_state = SQContentEsc; break;
+               default:   m_content->push_back(ch); break;
             }
             break;
             
          case SQContentEsc:
-            state = SQContent;
-            content.push_back(ch); 
+            m_state = SQContent;
+            m_content->push_back(ch); 
             break;
 
          case DQContent:
             switch (ch)
             {
-               case '\"': state = EndToken; break;
-               case '\\': state = DQContentEsc; break;
-               default:   content.push_back(ch); break;
+               case '\"': m_state = EndToken; break;
+               case '\\': m_state = DQContentEsc; break;
+               default:   m_content->push_back(ch); break;
             }
             break;
             
          case DQContentEsc:
-            state = DQContent;
-            content.push_back(ch); 
+            m_state = DQContent;
+            m_content->push_back(ch); 
             break;
       }
    };
-   unsigned int size() const                          {return pos;};
-   const char* operator[]( unsigned int idx) const    {return (idx<pos)?content.c_str()+buf[idx]:0;};
+   unsigned int size() const                          {return m_pos;};
+   const char* operator[]( unsigned int idx) const    {return (idx<m_pos)?m_content->c_str()+m_buf[idx]:0;};
+   
+   //return an array of 0-terminated strings as convenient in C for program arguments
+   //@remark the return value of this function may not be valid anymore after a new call of push_back
+   const char** argv()
+   {
+      if (m_sbuf[0]==0)
+      {
+         unsigned int ii;
+         for (ii=0; ii<m_pos; ii++) m_sbuf[ii]=m_content->c_str()+m_buf[ii]; 
+         if (ii<m_pos) m_sbuf[ii]=0;
+      }
+      return m_sbuf;
+   };
+   unsigned int argc() const                          {return m_pos;};
 };
    
 } // namespace protocol
