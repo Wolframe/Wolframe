@@ -14,6 +14,7 @@
 # - target 'help'
 # - target 'install'
 # - target 'uninstall'
+# - target 'config'
 
 -include makefiles/gmake/platform.mk
 
@@ -55,6 +56,11 @@ doc:
 .PHONY: help
 help:
 	@cat $(TOPDIR)/makefiles/gmake/help.mk
+
+.PHONY: config
+config:
+	@echo "Build Configuration for SMERP"
+	@echo "-----------------------------"
 	@echo
 	@echo "Operating system: $(PLATFORM), $(OS_MAJOR_VERSION).$(OS_MINOR_VERSION)"
 ifeq "$(PLATFORM)" "LINUX"
