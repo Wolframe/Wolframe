@@ -29,38 +29,53 @@ private:
       Init,
       EnterCommand,
       ParseArguments,
-      StartProcessing,
-      ProcessingAfterWrite,
       Processing,
+      ProcessingAfterWrite,
       HandleError,
       Terminate
    };
    static const char* stateName( State i)
    {
-      static const char* ar[] = {"Init","EnterCommand","ParseArguments","StartProcessing","ProcessingAfterWrite","Processing","HandleError","Terminate"};
+      static const char* ar[] =
+      {
+         "Init",
+         "EnterCommand",
+         "ParseArguments",
+         "Processing",
+         "ProcessingAfterWrite",
+         "HandleError",
+         "Terminate"
+      };
       return ar[i];
    };
 
    //* typedefs for the parser of the protocol
    //1. negotiation phase
    typedef protocol::CmdParser<CmdBuffer> ProtocolParser;
-   //2. parser of the commands (state EnterCommand)
+   //2. parser of the commands with interface to processor method execution
    struct CommandHandler
    {
    private:
       ProtocolParser m_parser;
       Instance* m_instance;
-      int m_parsedCommand;
       Method::Context m_context;
+      unsigned int m_methodIdx;
+      bool m_terminated;
+      
+      void resetCommand()
+      {
+         m_methodIdx = 0;
+         m_terminated = true;
+         m_context.init( m_instance?m_instance->data,0);
+      };
       
       void init( const char** protocolCmds, Instance* instance)
       {
          if (m_instance) delete m_instance;
          m_instance = instance;
          parser.init();
-         m_parsedCommand = -1;
-         m_context.init();
-
+         resetCommand();
+         
          if (protocolCmds)
          {
             for( unsigned int ii=0; protocolCmds[ ii]; ii++)
@@ -78,15 +93,65 @@ private:
          }
       };
 
+      void getGeneratorMem( Input& input, Input::const_iterator& itr)
+      {
+         if (m_context.contentIterator)
+         {
+            void* block;
+            unsigned int blocksize;
+            m_context.contentIterator->getRestBlock( &block, &blocksize);
+            if (blocksize > input.size())
+            {
+               LOG_ERROR << "cannot buffer rest of processor input block: " << blocksize << " bytes";
+               blocksize = input.size();
+            }
+            if (input.charptr()+input.pos() == (char*)block+blocksize)
+            {
+               //... memory block was not copied by the processor method.
+               //    So we just move our iterator to the end of the block processed by the method.
+               itr = input.at( input.pos()-blocksize);
+            }
+            else
+            {
+               //... memory block is not the original, so we have to move it into the input buffer
+               memmove( input.ptr(), block, blocksize);
+               input.setPos( blocksize);
+               itr = input.begin();
+            }
+         }
+      };
+      
+      void feedGeneratorMem( Input& input, Input::const_iterator& itr)
+      {
+         if (m_context.contentIterator && input.pos()>itr.pos())
+         {
+            m_context.contentIterator->feed( input.charptr()+itr.pos(), input.pos()-itr.pos());
+         }
+      };
+      
    public:   
-      enum Command {unknown=-1, empty=0, caps, quit, method};
-
+      enum Command {unknown=-1, empty=0, caps, quit, method};      
       void init( Instance* instance)
       {
-         static const char* cmd[4] = {"","caps","quit",0};
+         static const char* cmd[4] = {"","caps","quit", 0};
          init( cmd, instance);
       };
+      
+      CommandHandler( Instance* instance)
+      {
+         init( instance);
+      };
 
+      CommandHandler()
+      {
+         init( 0);
+      };
+
+      ~CommandHandler()
+      {
+         if (m_instance) delete m_instance;
+      };
+      
       template <class Buffer>
       void writeCaps( Buffer& buf)
       {
@@ -107,51 +172,60 @@ private:
       
       Command getCommand()
       {
-         Command rt;
-         m_context.init( m_instance->data);
+         resetCommand();
          
-         m_parsedCommand = (int)m_parser.getCommand();
-         if (parserCommand >= (int)unknown && parserCommand < (int)method)
+         int ci = m_parser.getCommand();
+         if (ci >= unknown && ci < method)
          {
-            rt = (Command)parserCommand;
-            m_parsedCommand = -1;
+            return (Command)ci;
          }
          else
          {
-            m_parsedCommand -= (int)method;
-            rt = method;
+            m_methodIdx = (unsigned int)ci - (unsigned int)method;
+            return method;
          }
          return rt;
       };
       
-      int call( int argc, const char** argv)
+      unsigned int call( int argc, const char** argv)
       {
-         if (m_parsedCommand < 0) return false;
-         unsigned int rt = m_instance->vmt[ m_parsedCommand].call( &m_context, argc, argv);
+         if (m_context.contentIterator && m_context.contentIterator->state == protocol::Generator::EndOfInput)
+         {
+            feedGeneratorMem( input, itr)
+            m_context.contentIterator->state = protocol::Generator::Processing;
+         }
+         LOG_DEBUG << "call of '" << m_instance->vmt[ m_methodIdx].name << "'";
+
+         unsigned int rt = m_instance->vmt[ m_methodIdx].call( &m_context, argc, argv);
          if (rt != 0)
          {
-            LOG_ERROR << "error " << rt << " calling '" << m_instance->vmt[ m_parsedCommand].name << "'";
+            LOG_ERROR << "error " << rt << " calling '" << m_instance->vmt[ m_methodIdx].name << "'";
+            getGeneratorMem( input, itr)
+            resetCommand();
          }
          else
          {
-            LOG_DEBUG << "call of '" << m_instance->vmt[ m_parsedCommand].name << "'";
+            switch (m_context.contentIterator->state)
+            {
+               case protocol::Generator::Init:
+                  m_context.contentIterator->state = protocol::Generator::Processing;
+               case protocol::Generator::Processing:
+                  break;
+               case protocol::Generator::Error:
+               case protocol::Generator::EndOfInput:
+                  getGeneratorMem( input, itr)
+                  resetCommand();
+                  break;
+               case protocol::Generator::EndOfBuffer:
+                  throw InputBlock::End;
+            }
          }
          return rt;
       };
-      
-      CommandHandler( Instance* instance)
-      {
-         init( instance);
-      };
 
-      CommandHandler()
+      bool hasTerminated() const
       {
-         init( 0);
-      };
-
-      ~CommandHandler()
-      {
-         if (m_instance) delete m_instance;
+         return m_terminated;
       };
    };
 
@@ -159,11 +233,11 @@ private:
    //1. states
    State state;                               //< state of the processor
    CommandHandler commandHandler;
-   unsigned int command;                      //< command of commandHandler parsed in the state EnterCommand
    
    //2. buffers and context
    CmdBuffer cmdBuffer;                       //< context (sub state) for partly parsed protocol commands
-   LineBuffer buffer;                         //< context (sub state) for partly parsed input lines 
+   LineBuffer writeLineBuffer;                //< context (sub state) for partly parsed input lines 
+   LineBuffer readLineBuffer;                 //< context (sub state) for partly parsed input lines 
    ArgBuffer argBuffer;                       //< context (sub state) the list of arguments (array structure for the elements in buffer)
    Input input;                               //< buffer for READ network messages 
    Output output;                             //< buffer for WRITE network messages
@@ -171,42 +245,27 @@ private:
    ProtocolIterator itr;                      //< iterator to scan protocol commands
    ContentIterator src;                       //< iterator to scan protocol content terminated with (CR)LF dor (CR)LF
 
-
-   //TODO do less code for obvious things. try to use iostreams with the buffers
-
    //* helper methods for I/O
    //helper function to send a line message with CRLF termination as C string
-   Operation WriteLine( const char* str, const char* arg=0)
+   Operation WriteLine( const char* fmt, ...)
    {
       unsigned int ii;
-      buffer.init();
-      if (str) for (ii=0; str[ii]; ii++) buffer.push_back( str[ii]);
-      if (arg) for (ii=0; arg[ii]; ii++) buffer.push_back( arg[ii]);
-      buffer.push_back( '\r');
-      buffer.push_back( '\n');
-      const char* msg = buffer.c_str();
-      buffer.init();
-      return Operation( Operation::WRITE, msg, ii+2);
-   };
-   
-   Operation WriteLine( const char* str, unsigned int errorcode)
-   {
-      enum {BufSize=32};
-      char buf[BufSize];
-      unsigned int ii=BufSize;
-      buf[ --ii] = 0;
-      do
-      {
-         buf[ --ii] = errorcode % 10;
-         errorcode /= 10;
-      }
-      while (errorcode != 0);
-      
-      return WriteLine( str, buf+ii);
+      writeLineBuffer.init();
+      va_list al;
+      va_start( al, fmt);
+      char line[ LineBuffer::Size];
+      unsigned int len = vsnprintf( line, LineBuffer::Size, fmt, al);
+      if (len > LineBuffer::Size) len = LineBuffer::Size-3;
+      line[ len] = 0;
+      writeLineBuffer.append( line);
+      writeLineBuffer.push_back( '\r');
+      writeLineBuffer.push_back( '\n');
+      const char* msg = writeLineBuffer.c_str();
+      return Operation( Operation::WRITE, msg, writeLineBuffer.size());
    };
    
 public:
-   Private( unsigned int inputBufferSize, unsigned int outputBufferSize)   :state(Init),argBuffer(&buffer),input(inputBufferSize),output(outputBufferSize)
+   Private( unsigned int inputBufferSize, unsigned int outputBufferSize)   :state(Init),argBuffer(&readLineBuffer),input(inputBufferSize),output(outputBufferSize)
    {
       itr = input.begin();
       src = &itr;
@@ -225,8 +284,9 @@ public:
                case Init:
                {
                   //start or restart:
+                  readLineBuffer.init();
+                  writeLineBuffer.init();
                   state = EnterCommand;
-                  mode = Ident;
                   return WriteLine( "OK expecting command");
                }
                
@@ -245,7 +305,7 @@ public:
                         state = EnterCommand;
                         LineBuffer buf;
                         commandHandler.writeCaps( buf)
-                        return WriteLine( "OK ", buf.c_str());
+                        return WriteLine( "OK %s", buf.c_str());
                      }
                      case CommandHandler::method: 
                      {
@@ -270,27 +330,33 @@ public:
                   ProtocolParser::getLine( itr, argBuffer);
                   state = StartProcessing;
                   ProtocolParser::consumeEOLN( itr);
-                  state = StartProcessing;
                   continue;
                }
                
-               case StartProcessing:
+               case Processing:
                {
-                  ProtocolParser::getLine( itr, argBuffer);
+                  int rt = commandHandler.call( argBuffer.argc(), argBuffer.argv());                  
                   if (rt == 0)
                   {
-                     state = Processing;
-                     ProtocolParser::consumeEOLN( itr);
-                     continue;
+                      
+                     if (commandHandler.hasTerminated())
+                     {
+                        state = Init;
+                        continue;
+                     }
+                     else
+                     {
+                        void* content = output.ptr();
+                        std::size_t size = output.pos();
+                        return Operation( Operation::WRITE, content, size);                
+                     }
                   }
                   else
                   {
-                     state = HandleError;                     
+                     state = Terminate;
                      return WriteLine( "ERR ", rt);                 
                   }
                }
-
-//TODO continue here
 
                case ProcessingAfterWrite:
                {
@@ -300,17 +366,10 @@ public:
                   continue;
                }
 
-               case Processing:
-               {
-                  void* content = output.ptr();
-                  std::size_t size = output.pos();
-                  return Operation( Operation::WRITE, content, size);                
-               }
-
                case HandleError:
                {
-                  //in the error case, start again after complaining (Operation::WRITE sent in previous state):
-                  ProtocolParser::getLine( itr, buffer);   //< parse the rest of the line to clean the input for the next command
+                                                                   //in the error case of non content processing, start again after complaining (Operation::WRITE sent in previous state):
+                  ProtocolParser::getLine( itr, readLineBuffer);   //< parse the rest of the line to clean the input for the next command
                   ProtocolParser::consumeEOLN( itr);
                   state = Init;
                   continue;
@@ -319,7 +378,7 @@ public:
                case Terminate:
                {
                   state = Terminate;
-                  return Operation( Operation::TERMINATE);                      
+                  return Operation( Operation::TERMINATE); 
                }
             }//switch(..)
          }//for(,,)
@@ -340,11 +399,8 @@ public:
          bufsize = data->input.size();
       }
       data->input.setPos( bufsize);
-      memcpy( data->input.charptr(), buf, bufsize);
-   };
-
-   NetworkOperation nextOperation()
-   {
+      memmove( data->input.charptr(), buf, bufsize);
+      itr = data->input.begin();
    };
 
    void timeoutOccured()
