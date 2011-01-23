@@ -120,12 +120,16 @@ public:
       const_iterator operator++(int)                        {const_iterator tmp(*this); skip(); return tmp;};
       char operator*()                                      {return cur();};
 
+      unsigned int getPos() const                           {return m_pos;};
    private:
+      friend class InputBlock;
       InputBlock* m_input;
       unsigned int m_pos;        
    };
-   const_iterator begin()        {const_iterator rt(this); return rt;};
-   const_iterator end()          {return const_iterator();};
+
+   const_iterator begin()                                   {const_iterator rt(this); return rt;};
+   const_iterator at( unsigned int pos_)                    {const_iterator rt(this); rt.m_pos=(pos_ <= pos())?pos_:pos(); return rt;};
+   const_iterator end()                                     {return const_iterator();};
 };
 
 //output interface based on a memory block. 

@@ -19,7 +19,14 @@ class Generator
 {
    public:            
       //the client of the generator decides when and how he wants to yield according this state.
-      enum State {Init, Processing, EndOfBuffer, EndOfInput, Error};
+      enum State
+      {
+         Init,           //after initialization
+         Processing,     //processing
+         EndOfBuffer,    //EWOULDBLK -> have to yield
+         EndOfInput,     //EOF
+         Error           //an error occurred
+      };
 
       //generator element
       class Element
