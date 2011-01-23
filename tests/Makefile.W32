@@ -36,18 +36,8 @@ INCLUDE_LIBS = \
 !ENDIF
 
 TEST_CPP_BINS = \
-	logTest.exe
-
-# fails for me:
-#link.exe /nologo /LIBPATH:"C:\Program Files\Microsoft SDKs\Windows\v7.0\
-#lib" /LIBPATH:"C:\Cygwin\home\Andreas\boost_1_45_0\stage\lib" /LIBPATH:"C:\Cygwi
-#n\home\Andreas\gtest-1.5.0\msvc\gtest\Debug" Advapi32.lib /out:versionTest.exe
-#versionTest.obj ..\src\version.obj
-#LINK : fatal error LNK1104: cannot open file 'boost_unit_test_framework-vc90-mt-
-#1_45.lib'
-#NMAKE : fatal error U1077: '"C:\Program Files (x86)\Microsoft Visual Studio 9.0\
-#VC\BIN\link.exe"' : return code '0x450'
-#Stop.
+	logTest.exe \
+	poolTest.exe
 
 # currently don't compile because of ref-to-ptr trickery in test template
 #	pechoHandlerTest.exe
@@ -58,8 +48,6 @@ TEST_CPP_BINS = \
 	$(TEST_CPP_BINS) \
 	versionTest.exe \
 	counterTest.exe
-#  lots of errors, doens't compile on Windows!
-#	poolTest.exe
 # currently don't compile because of ref-to-ptr trickery in test template
 #	pechoHandler-gTest$(EXE)
 !ENDIF
@@ -90,12 +78,11 @@ local_test:
 	@-echo @echo off > test.bat
 	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
 !IFDEF WITH_GTEST
-	@-echo echo Testing logging... >> test.bat
 	@-echo logTest >> test.bat
 	@-echo echo Testing version... >> test.bat
 	@-echo versionTest >> test.bat
 	@-echo echo Testing counter.. >> test.bat
 	@-echo counterTest >> test.bat
-#	@-echo poolTest >> test.bat
+	@-echo poolTest >> test.bat
 !ENDIF
 	@-test.bat

@@ -12,7 +12,7 @@
 	http://www.tldp.org/HOWTO/Man-Page/q2.html). -->
     <!ENTITY dhtitle     "SMERP User Manual">
     <!ENTITY dhucpackage "SMERP">
-    <!ENTITY dhpackage   "smerp">
+    <!ENTITY dhpackage   "smerpd">
 ]>
 
 
