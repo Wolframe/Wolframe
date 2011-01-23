@@ -50,6 +50,7 @@ private:
 	boost::asio::ip::tcp::acceptor		acceptor_;	// Acceptor(s) used to listen for incoming connections.
 	connection_ptr				newConnection_;	// The next connection to be accepted.
 	ConnectionList<connection_ptr>		connList_;	// List of active connections
+
 	std::string				identifier_;
 
 	_SMERP::ServerHandler&			srvHandler_;	// The handler for all incoming requests.
@@ -94,6 +95,7 @@ private:
 	boost::asio::ssl::context		SSLcontext_;	/// SSL acceptor server context
 	SSLconnection_ptr			newConnection_;	// The next connection to be accepted.
 	ConnectionList<SSLconnection_ptr>	connList_;	// List of active connections
+
 	std::string				identifier_;
 
 	_SMERP::ServerHandler&			srvHandler_;	// The handler for all incoming requests.

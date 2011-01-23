@@ -57,12 +57,6 @@ void connection::start()
 }
 
 
-void connection::unregister()
-{
-	connList_.remove( boost::static_pointer_cast<connection>( shared_from_this()) );
-}
-
-
 #ifdef WITH_SSL
 
 SSLconnection::SSLconnection( boost::asio::io_service& IOservice,
@@ -142,12 +136,6 @@ void SSLconnection::handleHandshake( const boost::system::error_code& e )
 		boost::system::error_code ignored_ec;
 		socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
 	}
-}
-
-
-void SSLconnection::unregister()
-{
-	connList_.remove( boost::static_pointer_cast<SSLconnection>( shared_from_this()) );
 }
 
 #endif // WITH_SSL

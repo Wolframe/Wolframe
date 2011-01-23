@@ -25,7 +25,6 @@ namespace _SMERP {
 
 					IOservice_()
 		{
-			maxConnections_ = maxConnections;
 			size_t	i;
 			for ( i = 0; i < TCPserver.size(); i++ )	{
 				acceptor* acptr = new acceptor( IOservice_,

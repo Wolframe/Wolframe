@@ -44,9 +44,7 @@ namespace _SMERP {
 		private:
 			/// The number of threads that will call io_service::run().
 			std::size_t				threadPoolSize_;
-			/// The maximum number of simultaneous connections accepted by the server.
-			AtomicCounter< unsigned >		noConnections_;
-			unsigned				maxConnections_;
+
 			/// The io_service used to perform asynchronous operations.
 			boost::asio::io_service			IOservice_;
 			/// The vector(s) of connection acceptors.

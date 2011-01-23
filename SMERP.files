@@ -127,7 +127,6 @@ tests/poolTest.cpp
 src/connectionBase.hpp
 src/smerpmsg.mc
 src/smerp.conf
-src/posixMain.d
 src/Makefile.W32
 src/GNUmakefile
 src/unused.h
@@ -161,3 +160,5 @@ src/acceptor.cpp
 src/resolvePath.cpp
 include/miscUtils.hpp
 tests/resolvePathTest.cpp
+docs/smerp.conf-man.xml
+docs/smerpd-man.xml

@@ -13,6 +13,7 @@
 #include <list>
 #include "connectionBase.hpp"
 #include "connectionHandler.hpp"
+#include "atomicCounter.hpp"
 
 namespace _SMERP {
 	namespace Network {
@@ -23,19 +24,34 @@ namespace _SMERP {
 	public:
 		ConnectionList( unsigned maxConnections )
 					{ maxConn_ = maxConnections; }
-		void push( T conn )	{ connList_.push_back( conn ); }
-		void remove( T conn )	{ connList_.remove( conn ); }
+
+		void push( T conn )	{
+			connList_.push_back( conn );
+			LOG_DATA << "Push connection: local: " << connList_.size() << " of " << maxConn_;
+		}
+
+		void remove( T conn )	{
+			connList_.remove( conn );
+			LOG_DATA << "Remove connection: local: " << connList_.size() << " of " << maxConn_;
+		}
+
 		T pop()	{
 			if ( connList_.empty())
 				return T();
 			T conn = connList_.front();
 			connList_.pop_front();
+			LOG_DATA << "Pop connection: local: " << connList_.size() << " of " << maxConn_;
 			return conn;
 		}
-		bool full()		{ return( maxConn_ > 0 && connList_.size() >= maxConn_ ); }
+
+		bool full()		{
+			LOG_DATA << "Check number of connections: local: " << connList_.size() << " of " << maxConn_;
+			return( maxConn_ > 0 && connList_.size() >= maxConn_ );
+		}
+
 	private:
-		std::list< T >	connList_;
-		unsigned	maxConn_;
+		std::list< T >			connList_;
+		unsigned			maxConn_;
 	};
 
 
@@ -60,7 +76,9 @@ namespace _SMERP {
 		void start();
 
 		/// Unregister the connection from the list of active connections
-		void unregister();
+		void unregister()	{
+			connList_.remove( boost::static_pointer_cast<connection>( shared_from_this()) );
+		}
 
 	private:
 		/// Socket for the connection.
@@ -97,7 +115,9 @@ namespace _SMERP {
 		void start();
 
 		/// Unregister the connection from the list of active connections
-		void unregister();
+		void unregister()	{
+			connList_.remove( boost::static_pointer_cast<SSLconnection>( shared_from_this()) );
+		}
 
 	private:
 		/// Handle the SSL handshake
