@@ -252,6 +252,12 @@ QT_INCLUDE_DIRS ?= /usr/include
 QT_LIB_DIRS ?= /usr/lib
 endif
 
+ifeq "$(LINUX_DIST)" "slackware"
+QT_DIR ?= /usr
+QT_INCLUDE_DIRS ?= /usr/include  
+QT_LIB_DIRS ?= /usr/lib
+endif
+
 ifeq "$(LINUX_DIST)" "redhat"
 
 # Fedora 14 puts Qt in a subdir in /usr/lib
@@ -288,22 +294,29 @@ endif
 
 ifdef WITH_LUA
 
-# defaults
+ifeq "$(PLATFORM)" "LINUX"
+
+ifeq "$(LINUX_DIST)" "arch"
 LUA_INCLUDE_DIRS ?= /usr/include
 LUA_LIB_DIRS ?= /usr/lib
-LUA_LIBS=-llua
+LUA_LIBS ?= -llua
+endif
 
-ifeq "$(PLATFORM)" "LINUX"
+ifeq "$(LINUX_DIST)" "slackware"
+LUA_INCLUDE_DIRS ?= NOT SUPPLIED ON THIS PLATFORM
+LUA_LIB_DIRS ?= NOT SUPPLIED ON THIS PLATFORM
+LUA_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
+endif
 
 # Ubuntu 10.04 TLS, 10.10, Debian 5.0
 ifeq "$(LINUX_DIST)" "debian"
 ifeq "$(LINUX_REV)" "squeeze/sid"
 LUA_INCLUDE_DIRS=/usr/include/lua5.1
-LUA_LIBS=-llua5.1
+LUA_LIBS ?= -llua5.1
 endif
 ifeq "$(LINUX_REV)" "5"
 LUA_INCLUDE_DIRS=/usr/include/lua5.1
-LUA_LIBS=-llua5.1
+LUA_LIBS ?= -llua5.1
 endif
 endif
 

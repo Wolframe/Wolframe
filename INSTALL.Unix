@@ -79,3 +79,12 @@ OpenSuSe 11.3
 -------------
 
 Optional packages:
+
+Slackware 13.1
+--------------
+
+boost is 1.42, only missing some new filesystem stuff, but you'll have to
+compile your own one.
+
+openssl and qt are there (select the correct "disk" sets while installing).
+gtest and lua are missing, compile your own ones.
