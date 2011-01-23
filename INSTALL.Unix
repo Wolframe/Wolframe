@@ -78,4 +78,21 @@ Qt client can't load designer library and run correctly, don'y know why?
 OpenSuSe 11.3
 -------------
 
-Optional packages:
+Optional packages: qt-devel (4.6.3)
+
+boost is 1.42, only missing some new filesystem stuff, but you'll have to
+compile your own one.
+
+there is a liblua5_1 but no traces of a development library, build your own
+(for this you need readline-devel, ncurses-devel packages)
+
+no traces of gtest, compile your own.
+
+Slackware 13.1
+--------------
+
+boost is 1.42, only missing some new filesystem stuff, but you'll have to
+compile your own one.
+
+openssl and qt are there (select the correct "disk" sets while installing).
+gtest and lua are missing, compile your own ones.
