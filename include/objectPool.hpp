@@ -9,6 +9,7 @@
 #include <list>
 
 #include <boost/thread/mutex.hpp>
+#include <boost/thread/condition_variable.hpp>
 
 
 namespace _SMERP	{
