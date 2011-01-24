@@ -15,6 +15,48 @@ namespace Network {
 
 static const char* REFUSE_MSG = "Server is busy. Please try again later.\n";
 
+
+void GlobalConnectionList::addList( SocketConnectionList< connection_ptr >* lst )
+{
+	connList_.push_back( lst );
+	LOG_DATA << "Added unencrypted connection list, " << connList_.size() << " list(s) for unencrypted connections";
+}
+
+#ifdef WITH_SSL
+void GlobalConnectionList::addList( SocketConnectionList< SSLconnection_ptr >* lst )
+{
+	SSLconnList_.push_back( lst );
+	LOG_DATA << "Added SSL connection list, " << SSLconnList_.size() << " list(s) for SSL connections";
+}
+#endif // WITH_SSL
+
+bool GlobalConnectionList::isFull()
+{
+	unsigned conns = 0;
+
+	for ( std::list< SocketConnectionList< connection_ptr >* >::iterator it = connList_.begin();
+									it != connList_.end(); it++ )	{
+		conns += (*it)->size();
+		LOG_DATA << "local number of connections: " << (*it)->size() << ", global: "<< conns;
+	}
+//#ifdef WITH_SSL
+//	for ( std::list< SocketConnectionList< SSLconnection_ptr >* >::iterator it = SSLconnList_.begin();
+//									it != SSLconnList_.end(); it++ )	{
+//		conns += (*it)->size();
+//		LOG_DATA << "local number of SSL connections: " << (*it)->size() << ", global: "<< conns;
+//	}
+//#endif // WITH_SSL
+	if ( maxConn_ > 0 )	{
+		LOG_DATA << "Global number of connections: " << conns << " of maximum " << maxConn_;
+		return( conns >= maxConn_ );
+	}
+	else	{
+		LOG_DATA << "Global number of connections: " << conns << ", no maximum limit";
+		return( false );
+	}
+}
+
+
 connection::connection( boost::asio::io_service& IOservice,
 			SocketConnectionList< connection_ptr >& connList,
 			connectionHandler* handler ) :

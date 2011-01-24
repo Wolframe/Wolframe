@@ -17,11 +17,12 @@ namespace Network {
 
 acceptor::acceptor( boost::asio::io_service& IOservice,
 		    const std::string& host, unsigned short port, unsigned maxConnections,
+		    GlobalConnectionList& globalList,
 		    _SMERP::ServerHandler& srvHandler ) :
 	IOservice_( IOservice ),
 	strand_( IOservice_ ),
 	acceptor_( IOservice_ ),
-	connList_ ( maxConnections ),
+	connList_ ( maxConnections, globalList ),
 	srvHandler_( srvHandler )
 {
 	// Open the acceptor(s) with the option to reuse the address (i.e. SO_REUSEADDR).
@@ -99,12 +100,13 @@ SSLacceptor::SSLacceptor( boost::asio::io_service& IOservice,
 			  const std::string& certFile, const std::string& keyFile,
 			  bool verify, const std::string& CAchainFile, const std::string& CAdirectory,
 			  const std::string& host, unsigned short port, unsigned maxConnections,
+			  GlobalConnectionList& globalList,
 			  _SMERP::ServerHandler& srvHandler) :
 	IOservice_( IOservice ),
 	strand_( IOservice_ ),
 	acceptor_( IOservice_ ),
 	SSLcontext_( IOservice_, boost::asio::ssl::context::sslv23 ),
-	connList_ ( maxConnections ),
+	connList_ ( maxConnections, globalList ),
 	srvHandler_( srvHandler )
 {
 	boost::system::error_code	ec;

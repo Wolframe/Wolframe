@@ -18,51 +18,82 @@
 namespace _SMERP {
 namespace Network {
 
+	class connection;		// forward declaration for connection_ptr
+	typedef boost::shared_ptr< connection > connection_ptr;
 
-	class GlobalConnectionList;
+#ifdef WITH_SSL
+	class SSLconnection;		// forward declaration for SSLconnection_ptr
+	typedef boost::shared_ptr< SSLconnection > SSLconnection_ptr;
+
+#endif // WITH_SSL
+
+
+	template< typename T > class SocketConnectionList;
+
+	class GlobalConnectionList
+	{
+	public:
+		GlobalConnectionList( unsigned maxConnections )	{
+			maxConn_ = maxConnections;
+		}
+
+		void addList( SocketConnectionList< connection_ptr >* lst );
+#ifdef WITH_SSL
+		void addList( SocketConnectionList< SSLconnection_ptr >* lst );
+#endif // WITH_SSL
+		bool isFull();
+
+	private:
+		std::list< SocketConnectionList< connection_ptr >* >	connList_;
+#ifdef WITH_SSL
+		std::list< SocketConnectionList< SSLconnection_ptr >* >	SSLconnList_;
+#endif // WITH_SSL
+		unsigned						maxConn_;
+	};
+
 
 	template< typename T >
 	class SocketConnectionList
 	{
 	public:
-		SocketConnectionList( unsigned maxConnections )
-					{ maxConn_ = maxConnections; }
+		SocketConnectionList( unsigned maxConnections, GlobalConnectionList& globalList )
+			: globalList_( globalList )
+		{
+			maxConn_ = maxConnections;
+			globalList_.addList( this );
+		}
 
 		std::size_t size()	{ return connList_.size(); }
 
-		void push( T conn )	{
-			connList_.push_back( conn );
-			LOG_DATA << "Push connection to list: " << connList_.size() << " of " << maxConn_;
-		}
+		void push( T conn )	{ connList_.push_back( conn ); }
 
-		void remove( T conn )	{
-			connList_.remove( conn );
-			LOG_DATA << "Remove connection from list: " << connList_.size() << " of " << maxConn_;
-		}
+		void remove( T conn )	{ connList_.remove( conn ); }
 
 		T pop()	{
 			if ( connList_.empty())
 				return T();
 			T conn = connList_.front();
 			connList_.pop_front();
-			LOG_DATA << "Pop connection from list: " << connList_.size() << " of " << maxConn_;
 			return conn;
 		}
 
-		bool isFull()		{
-			LOG_DATA << "Check local number of connections: " << connList_.size() << " of " << maxConn_;
-			return( maxConn_ > 0 && connList_.size() >= maxConn_ );
+		bool isFull()	{
+			if ( maxConn_ > 0 )	{
+				LOG_DATA << "Connections on socket: " << connList_.size() << " of maximum " << maxConn_;
+				return(( connList_.size() >= maxConn_ ) || globalList_.isFull() );
+			}
+			else	{
+				LOG_DATA << "Connections on socket: " << connList_.size() << ", no maximum limit";
+				return( globalList_.isFull() );
+			}
 		}
 
 	private:
 		std::list< T >		connList_;
 		unsigned		maxConn_;
-//		GlobalConnectionList&	globalList_;
+		GlobalConnectionList&	globalList_;
 	};
 
-
-	class connection;		// forward declaration for connection_ptr
-	typedef boost::shared_ptr< connection > connection_ptr;
 
 	/// Represents a single connection from a client.
 	class connection : public connectionBase< boost::asio::ip::tcp::socket >
@@ -96,9 +127,6 @@ namespace Network {
 
 
 #ifdef WITH_SSL
-
-	class SSLconnection;		// forward declaration for SSLconnection_ptr
-	typedef boost::shared_ptr< SSLconnection > SSLconnection_ptr;
 
 	typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket>	ssl_socket;
 
@@ -137,48 +165,6 @@ namespace Network {
 	};
 
 #endif // WITH_SSL
-
-
-	class GlobalConnectionList
-	{
-	public:
-		GlobalConnectionList( unsigned maxConnections )
-					{ maxConn_ = maxConnections; }
-
-		void addList( SocketConnectionList< connection_ptr > lst )	{
-			connList_.push_back( lst );
-			LOG_DATA << "Added unencrypted connection list, " << connList_.size() << "lists";
-		}
-
-#ifdef WITH_SSL
-		void addList( SocketConnectionList< SSLconnection_ptr > lst )	{
-			SSLconnList_.push_back( lst );
-			LOG_DATA << "Added unencrypted connection list, " << SSLconnList_.size() << "lists";
-		}
-#endif // WITH_SSL
-
-		bool isFull()		{
-			unsigned conns = 0;
-
-			for ( std::list< SocketConnectionList< connection_ptr > >::iterator it = connList_.begin();
-											it != connList_.end(); it++ )
-				conns += it->size();
-#ifdef WITH_SSL
-			for ( std::list< SocketConnectionList< SSLconnection_ptr > >::iterator it = SSLconnList_.begin();
-											it != SSLconnList_.end(); it++ )
-				conns += it->size();
-#endif // WITH_SSL
-			LOG_DATA << "Check global number of connections: local: " << conns << " of " << maxConn_;
-			return( maxConn_ > 0 && conns >= maxConn_ );
-		}
-
-	private:
-		std::list< SocketConnectionList< connection_ptr > >	connList_;
-#ifdef WITH_SSL
-		std::list< SocketConnectionList< SSLconnection_ptr > >	SSLconnList_;
-#endif // WITH_SSL
-		unsigned						maxConn_;
-	};
 
 } // namespace Network
 } // namespace _SMERP

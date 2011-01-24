@@ -22,13 +22,14 @@ namespace _SMERP {
 				_SMERP::ServerHandler& serverHandler,
 				unsigned threads, unsigned maxConnections )
 					: threadPoolSize_( threads ),
-
-					IOservice_()
+					IOservice_(),
+					globalList_( maxConnections )
 		{
 			size_t	i;
 			for ( i = 0; i < TCPserver.size(); i++ )	{
 				acceptor* acptr = new acceptor( IOservice_,
 								TCPserver[i].host(), TCPserver[i].port(), TCPserver[i].maxConnections(),
+								globalList_,
 								serverHandler );
 				acceptor_.push_back( acptr );
 			}
@@ -40,6 +41,7 @@ namespace _SMERP {
 								      SSLserver[i].verifyClientCert(),
 								      SSLserver[i].CAchain(), SSLserver[i].CAdirectory(),
 								      SSLserver[i].host(), SSLserver[i].port(), SSLserver[i].maxConnections(),
+								      globalList_,
 								      serverHandler );
 				SSLacceptor_.push_back( acptr );
 			}

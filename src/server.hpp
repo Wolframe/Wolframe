@@ -52,6 +52,7 @@ namespace _SMERP {
 #ifdef WITH_SSL
 			std::vector<SSLacceptor*>		SSLacceptor_;
 #endif // WITH_SSL
+			GlobalConnectionList			globalList_;
 		};
 
 	} // namespace Network

@@ -28,6 +28,7 @@ public:
 	/// Constructor
 	explicit acceptor( boost::asio::io_service& IOservice,
 			   const std::string& host, unsigned short port, unsigned maxConnections,
+			   GlobalConnectionList& globalList,
 			   _SMERP::ServerHandler& srvHandler );
 
 	/// Destructor
@@ -69,6 +70,7 @@ public:
 			      const std::string& certFile, const std::string& keyFile,
 			      bool verify, const std::string& CAchainFile, const std::string& CAdirectory,
 			      const std::string& host, unsigned short port, unsigned maxConnections,
+			      GlobalConnectionList& globalList,
 			      _SMERP::ServerHandler& srvHandler );
 
 	/// Destruct the serverrequestHandler&				requestHandler
