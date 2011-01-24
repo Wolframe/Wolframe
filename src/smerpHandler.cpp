@@ -47,73 +47,67 @@ namespace _SMERP {
 		case NEW:	{
 			state_ = HELLO;
 			const char *msg = "Welcome to SMERP.\n";
-			return Network::NetworkOperation( Network::NetworkOperation::WRITE,
-							  msg, strlen( msg ));
+			return Network::NetworkOperation( Network::WriteOperation( msg, strlen( msg )));
 		}
 
 		case HELLO:
 			state_ = ANSWERING;
 			if ( buffer_.empty() )
-				return Network::NetworkOperation( Network::NetworkOperation::WRITE,
-								  buffer_.c_str(), buffer_.length() );
+				return Network::NetworkOperation( Network::WriteOperation( buffer_.c_str(),
+											   buffer_.length() ));
 			else	{
 				const char *msg = "BUFFER NOT EMPTY!\n";
-				return Network::NetworkOperation( Network::NetworkOperation::WRITE,
-								  msg, strlen( msg ));
+				return Network::NetworkOperation( Network::WriteOperation( msg, strlen( msg )));
 			}
 
 		case READING:
 			state_ = ANSWERING;
 			if ( ! buffer_.empty() )
-				return Network::NetworkOperation( Network::NetworkOperation::WRITE,
-								  buffer_.c_str(), buffer_.length() );
+				return Network::NetworkOperation( Network::WriteOperation( buffer_.c_str(),
+											   buffer_.length() ));
 			else	{
 				const char *msg = "EMPTY BUFFER !\n";
-				return Network::NetworkOperation( Network::NetworkOperation::WRITE,
-								  msg, strlen( msg ));
+				return Network::NetworkOperation( Network::WriteOperation( msg, strlen( msg )));
 			}
 
 		case ANSWERING:
 			buffer_.clear();
 			state_ = READING;
-			return Network::NetworkOperation( Network::NetworkOperation::READ, 30 );
+			return Network::NetworkOperation( Network::ReadOperation( 30 ));
 
 		case FINISHING:	{
 			state_ = TERMINATING;
 			const char *msg = "Thanks for using SMERP.\n";
-			return Network::NetworkOperation( Network::NetworkOperation::WRITE,
-							  msg, strlen( msg ));
+			return Network::NetworkOperation( Network::WriteOperation( msg, strlen( msg )));
 		}
 
 		case TIMEOUT:	{
 			state_ = TERMINATING;
 			const char *msg = "Timeout. :P\n";
-			return Network::NetworkOperation( Network::NetworkOperation::WRITE,
-							  msg, strlen( msg ));
+			return Network::NetworkOperation( Network::WriteOperation( msg, strlen( msg )));
 		}
 
 		case SIGNALLED:	{
 			state_ = TERMINATING;
 			const char *msg = "Server is shutting down. :P\n";
-			return Network::NetworkOperation( Network::NetworkOperation::WRITE,
-							  msg, strlen( msg ));
+			return Network::NetworkOperation( Network::WriteOperation( msg, strlen( msg )));
 		}
 
 		case TERMINATING:
 			state_ = END;
-			return Network::NetworkOperation( Network::NetworkOperation::TERMINATE );
+			return Network::NetworkOperation( Network::TerminateOperation() );
 
 		case END:
 			state_ = END;
-			return Network::NetworkOperation( Network::NetworkOperation::END_OF_LIFE );
+			return Network::NetworkOperation( Network::EOL_Operation() );
 		}
-		return Network::NetworkOperation( Network::NetworkOperation::TERMINATE );
+		return Network::NetworkOperation( Network::EOL_Operation() );
 	}
 
 
 	/// Parse incoming data. The return value indicates how much of the
 	/// input has been consumed.
-	void* echoConnection::parseInput( const void *begin, std::size_t bytesTransferred )
+	void* echoConnection::networkInput( const void *begin, std::size_t bytesTransferred )
 	{
 		char *s = (char *)begin;
 		if ( !strncmp( "quit", s, 4 ))

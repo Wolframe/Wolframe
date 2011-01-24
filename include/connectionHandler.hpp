@@ -12,9 +12,9 @@
 namespace _SMERP {
 	namespace Network {
 
-	struct	NetworkOperation
+	class	NetworkOperation
 	{
-	public:
+	protected:
 		enum Operation	{
 			READ,
 			WRITE,
@@ -22,23 +22,64 @@ namespace _SMERP {
 			END_OF_LIFE
 		};
 
+		NetworkOperation( Operation op, unsigned to = 0 )
+					{ operation_ = op, timeout_ = to; }
+	public:
+		Operation operation()	{ return operation_; }
+		virtual ~NetworkOperation() {}
 	private:
 		Operation	operation_;
+	protected:
+		unsigned	timeout_;
+	};
+
+
+	class ReadOperation : public NetworkOperation
+	{
+	public:
+		ReadOperation( unsigned to = 0 )
+			: NetworkOperation( READ, to )	{}
+
+		unsigned timeout()			{ return timeout_; }
+	};
+
+	class WriteOperation : public NetworkOperation
+	{
+	public:
+		WriteOperation( const void* d, std::size_t s, unsigned to = 0 )
+			: NetworkOperation( WRITE, to )	{ data_ = d; size_ = s; }
+
+		unsigned timeout()			{ return timeout_; }
+		const void* data()			{ return data_; }
+		std::size_t size()			{ return size_; }
+	private:
 		const void*	data_;
 		std::size_t	size_;
-		unsigned	timeout_;
+	};
 
+
+	class TerminateOperation : public NetworkOperation
+	{
 	public:
-		NetworkOperation( Operation op, unsigned to = 0 )
-					{ operation_ = op, data_ = NULL; size_ = 0; timeout_ = to; }
-		NetworkOperation( Operation op, const void *d, std::size_t s, unsigned to = 0 )
-					{ operation_ = op, data_ = d; size_ = s; timeout_ = to; }
+		TerminateOperation()
+			: NetworkOperation( TERMINATE, 0 )	{}
 
+		TerminateOperation( const void* d, std::size_t s, unsigned to = 0 )
+			: NetworkOperation( TERMINATE, to )	{ data_ = d; size_ = s; }
 
-		Operation operation()	{ return operation_; }
-		const void* data()	{ return data_; }
-		std::size_t size()	{ return size_; }
-		unsigned timeout()	{ return timeout_; }
+		unsigned timeout()			{ return timeout_; }
+		const void* data()			{ return data_; }
+		std::size_t size()			{ return size_; }
+	private:
+		const void*	data_;
+		std::size_t	size_;
+	};
+
+	class EOL_Operation : public NetworkOperation
+	{
+	public:
+		EOL_Operation()
+			: NetworkOperation( TERMINATE, 0 )	{}
 	};
 
 
@@ -63,9 +104,9 @@ namespace _SMERP {
 		};
 
 
-		/// Parse incoming data. The return value indicates how much of the
+		/// Get the incoming data. The return value indicates how much of the
 		/// input has been consumed.
-		virtual void* parseInput( const void *begin, std::size_t bytesTransferred ) = 0;
+		virtual void* networkInput( const void *begin, std::size_t bytesTransferred ) = 0;
 
 		/// What should the network do next.
 		virtual NetworkOperation nextOperation() = 0;

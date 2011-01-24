@@ -97,35 +97,40 @@ namespace _SMERP {
 			NetworkOperation netOp = connectionHandler_->nextOperation();
 			switch ( netOp.operation() )	{
 
-			case NetworkOperation::READ:
+			case NetworkOperation::READ:	{
+				ReadOperation& readOp = dynamic_cast<ReadOperation&>( netOp );
 				LOG_TRACE << "Next operation: READ " << ReadBufferSize - bufUsed_ << " bytes from " << identifier();
-				if ( netOp.timeout() > 0 )
-					setTimeout( netOp.timeout());
+				if ( readOp.timeout() > 0 )
+					setTimeout( readOp.timeout());
 				socket().async_read_some( boost::asio::buffer( bufStart_, ReadBufferSize - bufUsed_ ),
 							  strand_.wrap( boost::bind( &connectionBase::handleRead,
 										     this->shared_from_this(),
 										     boost::asio::placeholders::error,
 										     boost::asio::placeholders::bytes_transferred )));
+				}
 				break;
 
-			case NetworkOperation::WRITE:
+			case NetworkOperation::WRITE:	{
+				WriteOperation& writeOp = dynamic_cast<WriteOperation&>( netOp );
 				LOG_TRACE << "Next operation: WRITE to " << identifier();
-				if ( netOp.data() == NULL )	{
+				if ( writeOp.data() == NULL )	{
 					;
 				}
-				if ( netOp.size() == 0 )	{
+				if ( writeOp.size() == 0 )	{
 					;
 				}
-				if ( netOp.timeout() > 0 )
-					setTimeout( netOp.timeout());
+				if ( writeOp.timeout() > 0 )
+					setTimeout( writeOp.timeout());
 				boost::asio::async_write( socket(),
-							  boost::asio::buffer( netOp.data(), netOp.size() ),
+							  boost::asio::buffer( writeOp.data(), writeOp.size() ),
 							  strand_.wrap( boost::bind( &connectionBase::handleWrite,
 										     this->shared_from_this(),
 										     boost::asio::placeholders::error )));
+				}
 				break;
 
 			case NetworkOperation::TERMINATE:	{
+//					TerminateOperation& termOp = dynamic_cast<TerminateOperation&>( netOp );
 					LOG_TRACE << "Next operation: TERMINATE connection to " << identifier();
 					// Initiate graceful connection closure.
 					setTimeout( 0 );
@@ -137,6 +142,7 @@ namespace _SMERP {
 				break;
 
 			case NetworkOperation::END_OF_LIFE:	{
+//					EOL_Operation& termOp = dynamic_cast<EOL_Operation&>( netOp );
 					LOG_TRACE << "Next operation: END_OF_LIFE on connection to " << identifier();
 					// Initiate graceful connection closure.
 					setTimeout( 0 );
@@ -193,7 +199,7 @@ namespace _SMERP {
 				LOG_TRACE << "Read " << bytesTransferred << " bytes from " << identifier();
 
 				bufUsed_ += bytesTransferred;
-				char* bufEnd = (char*)connectionHandler_->parseInput( buffer_.data(), bufUsed_ );
+				char* bufEnd = (char*)connectionHandler_->networkInput( buffer_.data(), bufUsed_ );
 				bufUsed_ = bufUsed_ - ( bufEnd - buffer_.data());
 				assert( bufUsed_ <= ReadBufferSize );
 				memmove( buffer_.data(), bufEnd, bufUsed_ );
