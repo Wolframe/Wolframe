@@ -35,17 +35,13 @@ bool GlobalConnectionList::isFull()
 	unsigned conns = 0;
 
 	for ( std::list< SocketConnectionList< connection_ptr >* >::iterator it = connList_.begin();
-									it != connList_.end(); it++ )	{
+									it != connList_.end(); it++ )
 		conns += (*it)->size();
-		LOG_DATA << "local number of connections: " << (*it)->size() << ", global: "<< conns;
-	}
-//#ifdef WITH_SSL
-//	for ( std::list< SocketConnectionList< SSLconnection_ptr >* >::iterator it = SSLconnList_.begin();
-//									it != SSLconnList_.end(); it++ )	{
-//		conns += (*it)->size();
-//		LOG_DATA << "local number of SSL connections: " << (*it)->size() << ", global: "<< conns;
-//	}
-//#endif // WITH_SSL
+#ifdef WITH_SSL
+	for ( std::list< SocketConnectionList< SSLconnection_ptr >* >::iterator it = SSLconnList_.begin();
+									it != SSLconnList_.end(); it++ )
+		conns += (*it)->size();
+#endif // WITH_SSL
 	if ( maxConn_ > 0 )	{
 		LOG_DATA << "Global number of connections: " << conns << " of maximum " << maxConn_;
 		return( conns >= maxConn_ );

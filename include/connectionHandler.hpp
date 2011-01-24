@@ -18,7 +18,8 @@ namespace _SMERP {
 		enum Operation	{
 			READ,
 			WRITE,
-			TERMINATE
+			TERMINATE,
+			END_OF_LIFE
 		};
 
 	private:

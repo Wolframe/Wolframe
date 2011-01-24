@@ -100,7 +100,12 @@ namespace _SMERP {
 		}
 
 		case TERMINATING:
+			state_ = END;
 			return Network::NetworkOperation( Network::NetworkOperation::TERMINATE );
+
+		case END:
+			state_ = END;
+			return Network::NetworkOperation( Network::NetworkOperation::END_OF_LIFE );
 		}
 		return Network::NetworkOperation( Network::NetworkOperation::TERMINATE );
 	}
@@ -158,6 +163,7 @@ namespace _SMERP {
 			LOG_TRACE << "Processor received an UNKNOWN error from the framework";
 			break;
 		}
+		state_ = TERMINATING;
 	}
 
 

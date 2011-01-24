@@ -39,7 +39,8 @@ namespace _SMERP {
 			FINISHING,
 			TIMEOUT,
 			SIGNALLED,
-			TERMINATING
+			TERMINATING,
+			END
 		};
 
 		State		state_;

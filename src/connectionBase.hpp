@@ -131,6 +131,20 @@ namespace _SMERP {
 					setTimeout( 0 );
 					boost::system::error_code ignored_ec;
 					socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
+					socket().lowest_layer().close();
+					unregister();
+				}
+				break;
+
+			case NetworkOperation::END_OF_LIFE:	{
+					LOG_TRACE << "Next operation: END_OF_LIFE on connection to " << identifier();
+					// Initiate graceful connection closure.
+					setTimeout( 0 );
+					boost::system::error_code ignored_ec;
+					if ( socket().lowest_layer().is_open() )	{
+						socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
+						socket().lowest_layer().close();
+					}
 					unregister();
 				}
 				break;
