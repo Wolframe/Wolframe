@@ -16,7 +16,7 @@ namespace Network {
 static const char* REFUSE_MSG = "Server is busy. Please try again later.\n";
 
 connection::connection( boost::asio::io_service& IOservice,
-			ConnectionList< connection_ptr >& connList,
+			SocketConnectionList< connection_ptr >& connList,
 			connectionHandler* handler ) :
 	connectionBase< boost::asio::ip::tcp::socket >( IOservice, handler ),
 	socket_( IOservice ),
@@ -41,7 +41,7 @@ void connection::start()
 	LOG_TRACE << "Starting connection to " << identifier();
 
 	// if the maximum number of connections has been reached refuse the connection
-	if ( connList_.full() )	{
+	if ( connList_.isFull() )	{
 		LOG_TRACE << "Refusing connection from " << identifier() << ". Too many connections.";
 		boost::system::error_code ignored_ec;
 		socket().write_some( boost::asio::buffer( REFUSE_MSG ));
@@ -61,7 +61,7 @@ void connection::start()
 
 SSLconnection::SSLconnection( boost::asio::io_service& IOservice,
 			      boost::asio::ssl::context& SSLcontext,
-			      ConnectionList< SSLconnection_ptr >& connList,
+			      SocketConnectionList< SSLconnection_ptr >& connList,
 			      connectionHandler *handler ) :
 	connectionBase< ssl_socket >( IOservice, handler ),
 	SSLsocket_( IOservice, SSLcontext ),
@@ -99,7 +99,7 @@ void SSLconnection::handleHandshake( const boost::system::error_code& e )
 		LOG_DATA << "successful SSL handshake, peer " << identifier();
 
 		// if the maximum number of connections has been reached refuse the connection
-		if ( connList_.full() )	{
+		if ( connList_.isFull() )	{
 			LOG_TRACE << "Refusing connection from " << identifier() << ". Too many connections.";
 			boost::system::error_code ignored_ec;
 			socket().write_some( boost::asio::buffer( REFUSE_MSG ));
