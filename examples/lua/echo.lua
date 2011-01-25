@@ -34,10 +34,11 @@ function next_operation( )
 		state = "HELLO"
 		return "WRITE", "Welcome to SMERP.\n"
  	elseif state == "HELLO" then
-		state = "ANSWERING"
 		if string.len( buffer ) == 0 then
-			return "WRITE", buffer
+			state = "READING"
+			return "READ", 30
 		else
+			state = "ANSWERING"
 			return "WRITE", "BUFFER NOT EMPTY!\n"
 		end
 	elseif state == "READING" then
@@ -52,16 +53,21 @@ function next_operation( )
 		state = "READING"
 		return "READ", 30
 	elseif state == "FINISHING" then
-		state = "TERMINATING"
+		state = "CLOSING"
 		return "WRITE", "Thanks for using SMERP.\n"
 	elseif state == "TIMEOUT" then
-		state = "TERMINATING"
+		state = "CLOSING"
 		return "WRITE", "Timeout. :P\n"
 	elseif state == "SIGNALLED" then
-		state = "TERMINATING"
+		state = "CLOSING"
 		return "WRITE", "Server is shutting down. :P\n"
+	elseif state == "CLOSING" then
+		state = "TERMINATED"
+		return "CLOSE"
 	elseif state == "TERMINATING"  then
-		return "TERMINATE", 0
+		state = "TERMINATED"
+		return "TERMINATE"
+	-- we should not get called anymore when in "TERMINATE" state
 	else
 		smerplogger.write( "FATAL", "LUA: Illegal state " .. state .. "!!" )
 	end
@@ -79,8 +85,14 @@ function signal_occured( )
 	state = "SIGNALLED"
 end
 
+-- an error occured
+function error_occured( error )
+	smerplogger.write( "ERROR", "LUA: got error ", error )
+	state = "CLOSING"
+end
+
 -- called when receiving a line a data
-function parse_input( data )
+function network_input( data )
 	smerplogger.write( "ERROR", "LUA: Got ", string.len( data ), " bytes of data" )
 
 	buffer = buffer .. data

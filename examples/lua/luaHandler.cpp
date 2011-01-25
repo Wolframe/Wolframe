@@ -1,5 +1,5 @@
 //
-// connectionHandler.cpp
+// luaHandler.cpp
 //
 
 #include "luaHandler.hpp"
@@ -184,15 +184,17 @@ namespace _SMERP {
 		if( !strcmp( op, "WRITE" ) ) {
 			const char *msg = lua_tostring( l, -1 );
 			lua_pop( l, 2 );
-			return Network::NetworkOperation( Network::NetworkOperation::WRITE,
-							  msg, strlen( msg ) );
+			return Network::NetworkOperation( Network::WriteOperation( msg, strlen( msg ) ) );
 		} else if( !strcmp( op, "READ" ) ) {
 			int size = lua_tointeger( l, -1 );
 			lua_pop( l, 2 );
-			return Network::NetworkOperation( Network::NetworkOperation::READ, size );
+			return Network::NetworkOperation( Network::ReadOperation( size ) );
+		} else if( !strcmp( op, "CLOSE" ) ) {
+			lua_pop( l, 2 );
+			return Network::NetworkOperation( Network::CloseOperation( ) );
 		} else if( !strcmp( op, "TERMINATE" ) ) {
 			lua_pop( l, 2 );
-			return Network::NetworkOperation( Network::NetworkOperation::TERMINATE );
+			return Network::NetworkOperation( Network::TerminateOperation( ) );
 		} else {
 			lua_pop( l, 2 );
 			LOG_FATAL << "Lua code returns '" << op << "', expecting one of 'READ', 'WRITE', 'TERMINATE'!";
@@ -203,19 +205,19 @@ namespace _SMERP {
 	
 	/// Parse incoming data. The return value indicates how much of the
 	/// input has been consumed.
-	void* echoConnection::parseInput( const void *begin, std::size_t bytesTransferred )
+	void* echoConnection::networkInput( const void *begin, std::size_t bytesTransferred )
 	{
 		counter++;
 		if( counter % 1000 == 0 ) {
 			//(void)lua_gc( l, LUA_GCCOLLECT, 0 );
 			printMemStats( );
 		}
-		lua_pushstring( l, "parse_input" );
+		lua_pushstring( l, "network_input" );
 		lua_gettable( l, LUA_GLOBALSINDEX );
 		lua_pushlstring( l, (const char *)begin, bytesTransferred );
 		int res = lua_pcall( l, 1, 1, 0 );
 		if( res != 0 ) {
-			LOG_FATAL << "Unable to call 'parse_input' function: " << lua_tostring( l, -1 );
+			LOG_FATAL << "Unable to call 'network_input' function: " << lua_tostring( l, -1 );
 			lua_pop( l, 1 );
 			throw new std::runtime_error( "Error in LUA processor" );
 		}
@@ -251,6 +253,42 @@ namespace _SMERP {
 			throw new std::runtime_error( "Error in LUA processor" );
 		}
 	}
+
+	void echoConnection::errorOccured( NetworkSignal signal )
+	{
+		const char *signal_s;
+		
+		switch( signal ) {
+			case END_OF_FILE:
+				signal_s = "END_OF_FILE";
+				break;
+
+			case BROKEN_PIPE:
+				signal_s = "BROKEN_PIPE";
+				break;
+
+			case OPERATION_CANCELLED:
+				signal_s = "OPERATION_CANCELLED";
+				break;
+
+			case UNKNOWN_ERROR:
+				signal_s = "UNKNOWN_ERROR";
+				break;
+		}
+		
+		LOG_TRACE << "Got error '" << signal_s << "'";
+		
+		lua_pushstring( l, "error_occured" );
+		lua_gettable( l, LUA_GLOBALSINDEX );
+		lua_pushstring( l, signal_s );
+		int res = lua_pcall( l, 1, 0, 0 );
+		if( res != 0 ) {
+			LOG_FATAL << "Unable to call 'error_occured' function: " << lua_tostring( l, -1 );
+			lua_pop( l, 1 );
+			throw new std::runtime_error( "Error in LUA processor" );
+		}		
+	}
+
 
 	/// ServerHandler PIMPL
 	Network::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const Network::LocalTCPendpoint& local )
