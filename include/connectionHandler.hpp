@@ -14,6 +14,7 @@ namespace _SMERP {
 
 	class	NetworkOperation
 	{
+		template< typename T > friend class connectionBase/*<T>*/;
 	protected:
 		enum Operation	{
 			READ,
@@ -22,15 +23,20 @@ namespace _SMERP {
 			TERMINATE
 		};
 
-		NetworkOperation( Operation op, unsigned to = 0 )
-					{ operation_ = op, timeout_ = to; }
+		NetworkOperation( Operation op, const void* d = NULL, std::size_t s = 0, unsigned to = 0 )
+					{ operation_ = op,  data_ = d; size_ = s; timeout_ = to; }
+		unsigned timeout()			{ return timeout_; }
+		const void* data()			{ return data_; }
+		std::size_t size()			{ return size_; }
 	public:
 		Operation operation()	{ return operation_; }
-		virtual ~NetworkOperation() {}
+
 	private:
 		Operation	operation_;
 	protected:
 		unsigned	timeout_;
+		const void*	data_;
+		std::size_t	size_;
 	};
 
 
@@ -38,48 +44,30 @@ namespace _SMERP {
 	{
 	public:
 		ReadOperation( unsigned to = 0 )
-			: NetworkOperation( READ, to )	{}
-
-		unsigned timeout()			{ return timeout_; }
+			: NetworkOperation( READ, NULL, 0, to )	{}
 	};
 
 	class WriteOperation : public NetworkOperation
 	{
 	public:
 		WriteOperation( const void* d, std::size_t s, unsigned to = 0 )
-			: NetworkOperation( WRITE, to )	{ data_ = d; size_ = s; }
-
-		unsigned timeout()			{ return timeout_; }
-		const void* data()			{ return data_; }
-		std::size_t size()			{ return size_; }
-	private:
-		const void*	data_;
-		std::size_t	size_;
+			: NetworkOperation( WRITE, d, s, to )	{}
 	};
 
 
 	class CloseOperation : public NetworkOperation
 	{
 	public:
-		CloseOperation()
-			: NetworkOperation( CLOSE, 0 )	{}
+		CloseOperation() : NetworkOperation( CLOSE )	{}
 
 		CloseOperation( const void* d, std::size_t s, unsigned to = 0 )
-			: NetworkOperation( CLOSE, to )	{ data_ = d; size_ = s; }
-
-		unsigned timeout()			{ return timeout_; }
-		const void* data()			{ return data_; }
-		std::size_t size()			{ return size_; }
-	private:
-		const void*	data_;
-		std::size_t	size_;
+			: NetworkOperation( CLOSE, d, s, to )	{}
 	};
 
 	class TerminateOperation : public NetworkOperation
 	{
 	public:
-		TerminateOperation()
-			: NetworkOperation( TERMINATE, 0 )	{}
+		TerminateOperation() : NetworkOperation( TERMINATE )	{}
 	};
 
 

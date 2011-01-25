@@ -98,10 +98,9 @@ namespace _SMERP {
 			switch ( netOp.operation() )	{
 
 			case NetworkOperation::READ:	{
-				ReadOperation& readOp = static_cast<ReadOperation&>( netOp );
 				LOG_TRACE << "Next operation: READ " << ReadBufferSize - bufUsed_ << " bytes from " << identifier();
-				if ( readOp.timeout() > 0 )
-					setTimeout( readOp.timeout());
+				if ( netOp.timeout() > 0 )
+					setTimeout( netOp.timeout());
 				socket().async_read_some( boost::asio::buffer( bufStart_, ReadBufferSize - bufUsed_ ),
 							  strand_.wrap( boost::bind( &connectionBase::handleRead,
 										     this->shared_from_this(),
@@ -111,15 +110,14 @@ namespace _SMERP {
 				break;
 
 			case NetworkOperation::WRITE:	{
-				WriteOperation& writeOp = static_cast<WriteOperation&>( netOp );
-				LOG_TRACE << "Next operation: WRITE to " << identifier();
-				if ( writeOp.data() == NULL || writeOp.size() == 0 )	{
+				LOG_TRACE << "Next operation: WRITE " << netOp.size() << " bytes to " << identifier();
+				if ( netOp.data() == NULL || netOp.size() == 0 )	{
 					abort();		// here should be a system exception
 				}
-				if ( writeOp.timeout() > 0 )
-					setTimeout( writeOp.timeout());
+				if ( netOp.timeout() > 0 )
+					setTimeout( netOp.timeout());
 				boost::asio::async_write( socket(),
-							  boost::asio::buffer( writeOp.data(), writeOp.size() ),
+							  boost::asio::buffer( netOp.data(), netOp.size() ),
 							  strand_.wrap( boost::bind( &connectionBase::handleWrite,
 										     this->shared_from_this(),
 										     boost::asio::placeholders::error )));
@@ -127,7 +125,6 @@ namespace _SMERP {
 				break;
 
 			case NetworkOperation::CLOSE:	{
-//					TerminateOperation& termOp = static_cast<TerminateOperation&>( netOp );
 					LOG_TRACE << "Next operation: CLOSING connection to " << identifier();
 					// Initiate graceful connection closure.
 					setTimeout( 0 );
@@ -139,7 +136,6 @@ namespace _SMERP {
 				break;
 
 			case NetworkOperation::TERMINATE:	{
-//					EOL_Operation& termOp = static_cast<EOL_Operation&>( netOp );
 					LOG_TRACE << "Next operation: TERMINATE on connection to " << identifier();
 					// Initiate graceful connection closure.
 					setTimeout( 0 );
