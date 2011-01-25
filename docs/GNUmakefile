@@ -18,11 +18,13 @@ XSLT_MAN_PARAMS = \
 XSLT_MAN = \
 	$(XSLTPROC) --nonet \
 	$(XSLT_MAN_PARAMS) \
-	/usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl
+	/usr/share/sgml/docbook/xsl-stylesheets-`rpm -q --queryformat '%{VERSION}' docbook-style-xsl`/manpages/docbook.xsl
 # Archlinux
 #	/usr/share/xml/docbook/xsl-stylesheets-$(XSLT_VERSION)/manpages/docbook.xsl
 # Ubuntu 10.04 TLS and 10.10, Debian 5.0
 #	/usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl
+# Fedora 14
+#	/usr/share/sgml/docbook/xsl-stylesheets-`rpm -q --queryformat '%{VERSION}' docbook-style-xsl`/manpages/docbook.xsl
 # TODO: porting and probing needed here
 
 smerpd.8: smerpd-man.xml
