@@ -51,11 +51,12 @@ namespace _SMERP {
 		}
 
 		case HELLO:
-			state_ = ANSWERING;
-			if ( buffer_.empty() )
-				return Network::NetworkOperation( Network::WriteOperation( buffer_.c_str(),
-											   buffer_.length() ));
+			if ( buffer_.empty() )	{
+				state_ = READING;
+				return Network::NetworkOperation(  Network::ReadOperation( 30 ));
+			}
 			else	{
+				state_ = ANSWERING;
 				const char *msg = "BUFFER NOT EMPTY!\n";
 				return Network::NetworkOperation( Network::WriteOperation( msg, strlen( msg )));
 			}
