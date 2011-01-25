@@ -18,9 +18,10 @@ XSLT_MAN_PARAMS = \
 XSLT_MAN = \
 	$(XSLTPROC) --nonet \
 	$(XSLT_MAN_PARAMS) \
-	/usr/share/xml/docbook/xsl-stylesheets-$(XSLT_VERSION)/manpages/docbook.xsl
+	/usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl
+# Archlinux
+#	/usr/share/xml/docbook/xsl-stylesheets-$(XSLT_VERSION)/manpages/docbook.xsl
 # TODO: porting and probing needed here
-# /usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl
 
 smerpd.8: smerpd-man.xml
 	$(XSLT_MAN) $<
