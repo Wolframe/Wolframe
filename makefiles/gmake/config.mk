@@ -10,6 +10,16 @@
 # please customize for new platforms or leave empty for
 # an autodetection in platform.mk
 
+# XSLT processor
+################
+
+#XSLTPROC = xsltproc
+
+# DocBook and Stylesheets
+#########################
+
+#XSLT_MAN_STYLESHEET = /usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl
+
 # Boost (http://www.boostpro.com/download)
 ###########################################
 
