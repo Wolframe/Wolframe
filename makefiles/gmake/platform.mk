@@ -177,7 +177,7 @@ PLATFORM_COMPILE_FLAGS +=  $(INCLUDE_FLAGS_NET)
 # XSLT processor
 ################
 
-XSLTPROC = xsltproc
+XSLTPROC ?= xsltproc
 
 # DocBook and Stylesheets
 #########################
@@ -202,7 +202,7 @@ endif
 ifeq "$(LINUX_DIST)" "redhat"
 ifeq "$(LINUX_REV)" "14"
 XSLT_VERSION ?= $(shell rpm -q --queryformat '%{VERSION}' docbook-style-xsl)
-XSLT_MAN_STYLESHEET =? /usr/share/sgml/docbook/xsl-stylesheets-$(XSLT_VERSION)/manpages/docbook.xsl
+XSLT_MAN_STYLESHEET ?= /usr/share/sgml/docbook/xsl-stylesheets-$(XSLT_VERSION)/manpages/docbook.xsl
 endif
 endif
 
