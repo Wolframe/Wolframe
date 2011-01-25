@@ -52,6 +52,8 @@ No problems wit the supplied packages at all, everything builds out of the box:
 Required packages: boost-devel (1.44)
 Optional packages: openssl-devel, lua-devel (5.1), qt4-devel, gtest-devel (1.4)
 
+For building the documentation you need 'libxslt', 'docbook-style-xsl' and 'doxygen'.
+
 Ubuntu 10.04.1 LTS
 ------------------
 
