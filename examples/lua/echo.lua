@@ -93,7 +93,7 @@ function error_occured( error )
 	state = "CLOSING"
 end
 
--- called when receiving a line a data
+-- called when receiving new data from the network, we decide how much we want to consume
 function network_input( data )
 	smerplogger.write( "ERROR", "LUA: Got ", string.len( data ), " bytes of data" )
 
