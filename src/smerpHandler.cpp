@@ -76,32 +76,32 @@ namespace _SMERP {
 			return Network::NetworkOperation( Network::ReadOperation( 30 ));
 
 		case FINISHING:	{
-			state_ = TERMINATING;
+			state_ = CLOSING;
 			const char *msg = "Thanks for using SMERP.\n";
 			return Network::NetworkOperation( Network::WriteOperation( msg, strlen( msg )));
 		}
 
 		case TIMEOUT:	{
-			state_ = TERMINATING;
+			state_ = CLOSING;
 			const char *msg = "Timeout. :P\n";
 			return Network::NetworkOperation( Network::WriteOperation( msg, strlen( msg )));
 		}
 
 		case SIGNALLED:	{
-			state_ = TERMINATING;
+			state_ = CLOSING;
 			const char *msg = "Server is shutting down. :P\n";
 			return Network::NetworkOperation( Network::WriteOperation( msg, strlen( msg )));
 		}
 
-		case TERMINATING:
-			state_ = END;
-			return Network::NetworkOperation( Network::TerminateOperation() );
+		case CLOSING:
+			state_ = TERMINATED;
+			return Network::NetworkOperation( Network::CloseOperation() );
 
-		case END:
-			state_ = END;
-			return Network::NetworkOperation( Network::EOL_Operation() );
+		case TERMINATED:
+			state_ = TERMINATED;
+			return Network::NetworkOperation( Network::TerminateOperation() );
 		}
-		return Network::NetworkOperation( Network::EOL_Operation() );
+		return Network::NetworkOperation( Network::TerminateOperation() );
 	}
 
 
@@ -157,7 +157,7 @@ namespace _SMERP {
 			LOG_TRACE << "Processor received an UNKNOWN error from the framework";
 			break;
 		}
-		state_ = TERMINATING;
+		state_ = CLOSING;
 	}
 
 
@@ -171,6 +171,7 @@ namespace _SMERP {
 	{
 		return new echoConnection( local );
 	}
+
 
 	ServerHandler::ServerHandler() : impl_( new ServerHandlerImpl )	{}
 

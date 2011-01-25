@@ -47,68 +47,67 @@ namespace _SMERP {
 		case NEW:	{
 			state_ = HELLO;
 			const char *msg = "Welcome to SMERP.\n";
-			return Network::NetworkOperation( Network::NetworkOperation::WRITE,
-							  msg, strlen( msg ));
+			return Network::NetworkOperation( Network::WriteOperation( msg, strlen( msg )));
 		}
 
 		case HELLO:
 			state_ = ANSWERING;
 			if ( buffer_.empty() )
-				return Network::NetworkOperation( Network::NetworkOperation::WRITE,
-								  buffer_.c_str(), buffer_.length() );
+				return Network::NetworkOperation( Network::WriteOperation( buffer_.c_str(),
+											   buffer_.length() ));
 			else	{
 				const char *msg = "BUFFER NOT EMPTY!\n";
-				return Network::NetworkOperation( Network::NetworkOperation::WRITE,
-								  msg, strlen( msg ));
+				return Network::NetworkOperation( Network::WriteOperation( msg, strlen( msg )));
 			}
 
 		case READING:
 			state_ = ANSWERING;
 			if ( ! buffer_.empty() )
-				return Network::NetworkOperation( Network::NetworkOperation::WRITE,
-								  buffer_.c_str(), buffer_.length() );
+				return Network::NetworkOperation( Network::WriteOperation( buffer_.c_str(),
+											   buffer_.length() ));
 			else	{
 				const char *msg = "EMPTY BUFFER !\n";
-				return Network::NetworkOperation( Network::NetworkOperation::WRITE,
-								  msg, strlen( msg ));
+				return Network::NetworkOperation( Network::WriteOperation( msg, strlen( msg )));
 			}
 
 		case ANSWERING:
 			buffer_.clear();
 			state_ = READING;
-			return Network::NetworkOperation( Network::NetworkOperation::READ, 30 );
+			return Network::NetworkOperation( Network::ReadOperation( 30 ));
 
 		case FINISHING:	{
-			state_ = TERMINATING;
+			state_ = CLOSING;
 			const char *msg = "Thanks for using SMERP.\n";
-			return Network::NetworkOperation( Network::NetworkOperation::WRITE,
-							  msg, strlen( msg ));
+			return Network::NetworkOperation( Network::WriteOperation( msg, strlen( msg )));
 		}
 
 		case TIMEOUT:	{
-			state_ = TERMINATING;
+			state_ = CLOSING;
 			const char *msg = "Timeout. :P\n";
-			return Network::NetworkOperation( Network::NetworkOperation::WRITE,
-							  msg, strlen( msg ));
+			return Network::NetworkOperation( Network::WriteOperation( msg, strlen( msg )));
 		}
 
 		case SIGNALLED:	{
-			state_ = TERMINATING;
+			state_ = CLOSING;
 			const char *msg = "Server is shutting down. :P\n";
-			return Network::NetworkOperation( Network::NetworkOperation::WRITE,
-							  msg, strlen( msg ));
+			return Network::NetworkOperation( Network::WriteOperation( msg, strlen( msg )));
 		}
 
-		case TERMINATING:
-			return Network::NetworkOperation( Network::NetworkOperation::TERMINATE );
+		case CLOSING:
+			state_ = TERMINATED;
+			return Network::NetworkOperation( Network::CloseOperation() );
+
+		case TERMINATED:
+			state_ = TERMINATED;
+			return Network::NetworkOperation( Network::TerminateOperation() );
 		}
-		return Network::NetworkOperation( Network::NetworkOperation::TERMINATE );
+		return Network::NetworkOperation( Network::TerminateOperation() );
 	}
 
 
 	/// Parse incoming data. The return value indicates how much of the
 	/// input has been consumed.
-	void* echoConnection::parseInput( const void *begin, std::size_t bytesTransferred )
+	void* echoConnection::networkInput( const void *begin, std::size_t bytesTransferred )
 	{
 		char *s = (char *)begin;
 		if ( !strncmp( "quit", s, 4 ))
@@ -139,6 +138,28 @@ namespace _SMERP {
 		LOG_TRACE << "Processor received signal";
 	}
 
+	void echoConnection::errorOccured( NetworkSignal signal )
+	{
+		switch( signal )	{
+		case END_OF_FILE:
+			LOG_TRACE << "Processor received EOF (read on closed connection)";
+			break;
+
+		case BROKEN_PIPE:
+			LOG_TRACE << "Processor received BROKEN PIPE (write on closed connection)";
+			break;
+
+		case OPERATION_CANCELLED:
+			LOG_TRACE << "Processor received OPERATION_CANCELED (should have been requested by us)";
+			break;
+
+		case UNKNOWN_ERROR:
+			LOG_TRACE << "Processor received an UNKNOWN error from the framework";
+			break;
+		}
+		state_ = CLOSING;
+	}
+
 
 	/// ServerHandler PIMPL
 	Network::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const Network::LocalTCPendpoint& local )
@@ -154,7 +175,7 @@ namespace _SMERP {
 
 	ServerHandler::ServerHandler() : impl_( new ServerHandlerImpl )	{}
 
-	ServerHandler::~ServerHandler()	{ delete impl_;	}
+	ServerHandler::~ServerHandler()	{ delete impl_; }
 
 	Network::connectionHandler* ServerHandler::newConnection( const Network::LocalTCPendpoint& local )
 	{

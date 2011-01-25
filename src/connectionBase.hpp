@@ -98,7 +98,7 @@ namespace _SMERP {
 			switch ( netOp.operation() )	{
 
 			case NetworkOperation::READ:	{
-				ReadOperation& readOp = dynamic_cast<ReadOperation&>( netOp );
+				ReadOperation& readOp = static_cast<ReadOperation&>( netOp );
 				LOG_TRACE << "Next operation: READ " << ReadBufferSize - bufUsed_ << " bytes from " << identifier();
 				if ( readOp.timeout() > 0 )
 					setTimeout( readOp.timeout());
@@ -111,13 +111,10 @@ namespace _SMERP {
 				break;
 
 			case NetworkOperation::WRITE:	{
-				WriteOperation& writeOp = dynamic_cast<WriteOperation&>( netOp );
+				WriteOperation& writeOp = static_cast<WriteOperation&>( netOp );
 				LOG_TRACE << "Next operation: WRITE to " << identifier();
-				if ( writeOp.data() == NULL )	{
-					;
-				}
-				if ( writeOp.size() == 0 )	{
-					;
+				if ( writeOp.data() == NULL || writeOp.size() == 0 )	{
+					abort();		// here should be a system exception
 				}
 				if ( writeOp.timeout() > 0 )
 					setTimeout( writeOp.timeout());
@@ -129,9 +126,9 @@ namespace _SMERP {
 				}
 				break;
 
-			case NetworkOperation::TERMINATE:	{
-//					TerminateOperation& termOp = dynamic_cast<TerminateOperation&>( netOp );
-					LOG_TRACE << "Next operation: TERMINATE connection to " << identifier();
+			case NetworkOperation::CLOSE:	{
+//					TerminateOperation& termOp = static_cast<TerminateOperation&>( netOp );
+					LOG_TRACE << "Next operation: CLOSING connection to " << identifier();
 					// Initiate graceful connection closure.
 					setTimeout( 0 );
 					boost::system::error_code ignored_ec;
@@ -141,9 +138,9 @@ namespace _SMERP {
 				}
 				break;
 
-			case NetworkOperation::END_OF_LIFE:	{
-//					EOL_Operation& termOp = dynamic_cast<EOL_Operation&>( netOp );
-					LOG_TRACE << "Next operation: END_OF_LIFE on connection to " << identifier();
+			case NetworkOperation::TERMINATE:	{
+//					EOL_Operation& termOp = static_cast<EOL_Operation&>( netOp );
+					LOG_TRACE << "Next operation: TERMINATE on connection to " << identifier();
 					// Initiate graceful connection closure.
 					setTimeout( 0 );
 					boost::system::error_code ignored_ec;

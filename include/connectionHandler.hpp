@@ -18,8 +18,8 @@ namespace _SMERP {
 		enum Operation	{
 			READ,
 			WRITE,
-			TERMINATE,
-			END_OF_LIFE
+			CLOSE,
+			TERMINATE
 		};
 
 		NetworkOperation( Operation op, unsigned to = 0 )
@@ -58,14 +58,14 @@ namespace _SMERP {
 	};
 
 
-	class TerminateOperation : public NetworkOperation
+	class CloseOperation : public NetworkOperation
 	{
 	public:
-		TerminateOperation()
-			: NetworkOperation( TERMINATE, 0 )	{}
+		CloseOperation()
+			: NetworkOperation( CLOSE, 0 )	{}
 
-		TerminateOperation( const void* d, std::size_t s, unsigned to = 0 )
-			: NetworkOperation( TERMINATE, to )	{ data_ = d; size_ = s; }
+		CloseOperation( const void* d, std::size_t s, unsigned to = 0 )
+			: NetworkOperation( CLOSE, to )	{ data_ = d; size_ = s; }
 
 		unsigned timeout()			{ return timeout_; }
 		const void* data()			{ return data_; }
@@ -75,10 +75,10 @@ namespace _SMERP {
 		std::size_t	size_;
 	};
 
-	class EOL_Operation : public NetworkOperation
+	class TerminateOperation : public NetworkOperation
 	{
 	public:
-		EOL_Operation()
+		TerminateOperation()
 			: NetworkOperation( TERMINATE, 0 )	{}
 	};
 
