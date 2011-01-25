@@ -179,6 +179,37 @@ PLATFORM_COMPILE_FLAGS +=  $(INCLUDE_FLAGS_NET)
 
 XSLTPROC = xsltproc
 
+# DocBook and Stylesheets
+#########################
+
+ifeq "$(PLATFORM)" "LINUX"
+
+ifeq "$(LINUX_DIST)" "arch"
+XSLT_VERSION ?= $(shell pacman -Q | grep docbook-xsl | cut -f 2 -d ' ' | cut -f 1 -d -)
+XSLT_MAN_STYLESHEET ?= /usr/share/xml/docbook/xsl-stylesheets-$(XSLT_VERSION)/manpages/docbook.xsl
+endif
+
+# Ubuntu 10.04 TLS, 10.10, Debian 5.0
+ifeq "$(LINUX_DIST)" "debian"
+ifeq "$(LINUX_REV)" "squeeze/sid"
+XSLT_MAN_STYLESHEET ?= /usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl
+endif
+ifeq "$(LINUX_REV)" "5"
+XSLT_MAN_STYLESHEET ?= /usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl
+endif
+
+# Fedora 14
+ifeq "$(LINUX_DIST)" "redhat"
+ifeq "$(LINUX_REV)" "14"
+XSLT_VERSION ?= $(shell rpm -q --queryformat '%{VERSION}' docbook-style-xsl)
+XSLT_MAN_STYLESHEET =? /usr/share/sgml/docbook/xsl-stylesheets-$(XSLT_VERSION)/manpages/docbook.xsl
+endif
+endif
+
+endif
+
+endif
+
 # Boost
 #######
 

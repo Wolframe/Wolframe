@@ -7,9 +7,6 @@ SUBDIRS =
 doc: smerpd.8 smerp.conf.5
 	cd $(TOPDIR); doxygen docs/doxygen.conf
 
-XSLT_VERSION = \
-	$(shell pacman -Q | grep docbook-xsl | cut -f 2 -d ' ' | cut -f 1 -d -)
-
 XSLT_MAN_PARAMS = \
 	--param man.charmap.use.subset "0" \
 	--param make.year.ranges "1" \
@@ -18,14 +15,7 @@ XSLT_MAN_PARAMS = \
 XSLT_MAN = \
 	$(XSLTPROC) --nonet \
 	$(XSLT_MAN_PARAMS) \
-	/usr/share/sgml/docbook/xsl-stylesheets-`rpm -q --queryformat '%{VERSION}' docbook-style-xsl`/manpages/docbook.xsl
-# Archlinux
-#	/usr/share/xml/docbook/xsl-stylesheets-$(XSLT_VERSION)/manpages/docbook.xsl
-# Ubuntu 10.04 TLS and 10.10, Debian 5.0
-#	/usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl
-# Fedora 14
-#	/usr/share/sgml/docbook/xsl-stylesheets-`rpm -q --queryformat '%{VERSION}' docbook-style-xsl`/manpages/docbook.xsl
-# TODO: porting and probing needed here
+	$(XSLT_MAN_STYLESHEET)
 
 smerpd.8: smerpd-man.xml
 	$(XSLT_MAN) $<
