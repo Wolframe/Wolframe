@@ -67,7 +67,9 @@ function next_operation( )
 	elseif state == "TERMINATING"  then
 		state = "TERMINATED"
 		return "TERMINATE"
-	-- we should not get called anymore when in "TERMINATE" state
+	elseif state == "TERMINATED" then
+		smerplogger.write( "ERROR", "LUA: got a nextOperation while in TERMINATED state" )
+		return "TERMINATE"
 	else
 		smerplogger.write( "FATAL", "LUA: Illegal state " .. state .. "!!" )
 	end
