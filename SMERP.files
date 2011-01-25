@@ -162,3 +162,5 @@ include/miscUtils.hpp
 tests/resolvePathTest.cpp
 docs/smerp.conf-man.xml
 docs/smerpd-man.xml
+examples/lua/echo.lua
+examples/lua/smerplogger.cpp
