@@ -4,6 +4,8 @@ SUBDIRS =
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
+local_all:
+
 doc: smerpd.8 smerp.conf.5
 	cd $(TOPDIR); doxygen docs/doxygen.conf
 
@@ -26,8 +28,6 @@ smerp.conf.5: smerp.conf-man.xml
 local_clean:
 	-@rm -rf doxygen 2>/dev/null
 	-@rm smerpd.8 smerp.conf.5 2>/dev/null
-
-local_all:
 
 local_distclean:
 
