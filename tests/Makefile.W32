@@ -41,7 +41,6 @@ TEST_CPP_BINS = \
 
 # currently don't compile because of ref-to-ptr trickery in test template
 #	pechoHandlerTest.exe
-#	xmlselectHandlerTest.exe
 
 !IFDEF WITH_GTEST
 TEST_CPP_BINS = \

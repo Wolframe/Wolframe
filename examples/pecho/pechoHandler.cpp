@@ -74,7 +74,7 @@ struct Connection::Private
       buffer.push_back( '\n');
       const char* msg = buffer.c_str();
       buffer.init();
-      return Operation( Operation::WRITE, msg, ii+2);
+      return Network::WriteOperation( msg, ii+2);
    };
    //output of one character with return code true/false for success/failure
    bool print( char ch)
@@ -283,12 +283,12 @@ struct Connection::Private
                 }
                 void* content = output.ptr();
                 std::size_t size = output.pos();
-                return Operation( Operation::WRITE, content, size);                
+                return Network::WriteOperation( content, size);                
             }
 
             case HandleError:
             {
-                //in the error case, start again after complaining (Operation::WRITE sent in previous state):
+                //in the error case, start again after complaining (write sent in previous state):
                 ProtocolParser::getLine( itr, buffer);   //< parse the rest of the line to clean the input for the next command
                 ProtocolParser::consumeEOLN( itr);
                 state = Init;
@@ -298,7 +298,7 @@ struct Connection::Private
             case Terminate:
             {
                 state = Terminate;
-                return Operation( Operation::TERMINATE);                      
+                return Network::TerminateOperation();                      
             }
          }//switch(..)
          }//for(,,)
@@ -307,9 +307,9 @@ struct Connection::Private
       {
          LOG_DATA << "End of input interrupt";
          input.setPos( 0);
-         return Operation( Operation::READ, input.ptr(), input.size());
+         return Network::ReadOperation();
       };
-      return Operation( Operation::TERMINATE);
+      return Network::TerminateOperation();
    };
 };
 
@@ -342,7 +342,7 @@ void Connection::setPeer( const Network::RemoteSSLendpoint& remote)
    LOG_TRACE << "Peer set to " << remote.toString();
 }
 
-void* Connection::parseInput( const void* bytes, std::size_t nofBytes)
+void* Connection::networkInput( const void* bytes, std::size_t nofBytes)
 {
    if (nofBytes > data->input.size())
    {
@@ -350,7 +350,22 @@ void* Connection::parseInput( const void* bytes, std::size_t nofBytes)
    }
    data->input.setPos( nofBytes);
    memcpy( data->input.charptr(), bytes, nofBytes);
-   return (void*)(data->input.charptr() + nofBytes);
+   return (void*)((char*)bytes + nofBytes);
+}
+
+void Connection::timeoutOccured()
+{
+   data->state = Private::Terminate;
+}
+
+void Connection::signalOccured()
+{
+   data->state = Private::Terminate;
+}
+
+void Connection::errorOccured( NetworkSignal )
+{
+   data->state = Private::Terminate;
 }
 
 Connection::Operation Connection::nextOperation()
@@ -358,16 +373,15 @@ Connection::Operation Connection::nextOperation()
    return data->nextOperation();
 }
 
-
 /// ServerHandler PIMPL
 Network::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const Network::LocalTCPendpoint& local )
 {
-   return new Connection( local );
+   return new pecho::Connection( local );
 }
 
 Network::connectionHandler* ServerHandler::ServerHandlerImpl::newSSLconnection( const Network::LocalSSLendpoint& local )
 {
-   return new Connection( local );
+   return new pecho::Connection( local );
 }
 
 ServerHandler::ServerHandler() : impl_( new ServerHandlerImpl ) {}
@@ -383,3 +397,4 @@ Network::connectionHandler* ServerHandler::newSSLconnection( const Network::Loca
 {
    return impl_->newSSLconnection( local );
 }
+

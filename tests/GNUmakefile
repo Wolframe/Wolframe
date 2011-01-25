@@ -47,7 +47,6 @@ TEST_OBJS =
 
 TEST_CPP_BINS = \
 	threadLeakTest$(EXE) \
-	pechoHandlerTest$(EXE) \
 	logTest$(EXE)
 
 ifdef WITH_GTEST
@@ -56,10 +55,8 @@ TEST_CPP_BINS += \
 	counterTest$(EXE) \
 	resolvePathTest$(EXE) \
 	poolTest$(EXE) \
-	pechoHandler-gTest$(EXE)
-# protocolArgumentParsing-gTest.cpp: In member function 'virtual void ProtocolArgumentParsingFixture::SetUp()':
-#protocolArgumentParsing-gTest.cpp:72:44: error: no matching function for call to '_SMERP::protocol::CArgBuffer<std::basic_string<char> >::CArgBuffer()'
-#	protocolArgumentParsing-gTest$(EXE)
+	pechoHandler-gTest$(EXE) \
+	protocolArgumentParsing-gTest$(EXE)
 endif
 
 include $(TOPDIR)/makefiles/gmake/sub.mk

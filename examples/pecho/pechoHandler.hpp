@@ -25,8 +25,12 @@ namespace pecho {
 
 		/// Handle a request and produce a reply.
       virtual Operation nextOperation();
-      virtual void* parseInput( const void *begin, std::size_t bytesTransferred );
+      virtual void* networkInput( const void *begin, std::size_t bytesTransferred );
 
+      void timeoutOccured();
+      void signalOccured();
+      void errorOccured( NetworkSignal );
+      
    public:
       struct Private;
 	private:

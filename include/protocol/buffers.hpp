@@ -80,7 +80,7 @@ private:
    void openArg()                      {if (m_pos<Size) m_buf[m_pos++]=m_content->size();};
    
 public:
-   CArgBuffer( Buffer* c)              :m_content(c),m_pos(0),m_state(Empty) {m_buf[0]=0;m_sbuf[0]=0;};
+   CArgBuffer( Buffer* c)              :m_pos(0),m_state(Empty),m_content(c) {m_buf[0]=0;m_sbuf[0]=0;};
    void init()                         {m_pos=0;m_buf[0]=0;m_sbuf[0]=0;m_content->init();};
    void push_back( char ch)
    {

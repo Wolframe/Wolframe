@@ -69,7 +69,8 @@ protected:
       {
          std::string out;
          char* itr = const_cast<char*>( testDescription[ tt].in);
-         protocol::CArgBuffer<std::string> args;
+         std::string argbuf;
+         protocol::CArgBuffer<std::string> args( &argbuf);
          protocol::Parser::getLine( itr, args);
          unsigned int ii=0,nn=args.size();
          while (ii<nn)

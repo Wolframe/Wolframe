@@ -49,6 +49,15 @@ private:
       return ar[i];
    };
 
+   enum InputState
+   {
+      SRC,
+      LF,
+      LF_DOT,
+      LF_DOT_CR,
+      LF_DOT_CR_LF
+   };
+
    //* typedefs for the parser of the protocol
    //1. negotiation phase
    typedef protocol::CmdParser<CmdBuffer> ProtocolParser;
@@ -239,6 +248,7 @@ private:
    LineBuffer writeLineBuffer;                //< context (sub state) for partly parsed input lines 
    LineBuffer readLineBuffer;                 //< context (sub state) for partly parsed input lines 
    ArgBuffer argBuffer;                       //< context (sub state) the list of arguments (array structure for the elements in buffer)
+   InputState inputState;                     //< state of read buffer (feedInput) in detecting end of content
    Input input;                               //< buffer for READ network messages 
    Output output;                             //< buffer for WRITE network messages
    //3. Iterators
@@ -265,7 +275,7 @@ private:
    };
    
 public:
-   Private( unsigned int inputBufferSize, unsigned int outputBufferSize)   :state(Init),argBuffer(&readLineBuffer),input(inputBufferSize),output(outputBufferSize)
+   Private( unsigned int inputBufferSize, unsigned int outputBufferSize)   :state(Init),argBuffer(&readLineBuffer),input(inputBufferSize),output(outputBufferSize),inputState(SRC)
    {
       itr = input.begin();
       src = &itr;
@@ -392,15 +402,151 @@ public:
       return Operation( Operation::TERMINATE);
    };
 
-   unsigned int feedInput( const char* buf, unsigned int bufsize)
+   void feedInput( const char* buf, unsigned int bufsize, bool withEOF=false)
+   {
+      if (bufsize > 0) memmove( data->input.charptr(), buf, bufsize);
+      if (withEOF && bufsize < data->input.size())
+      {
+         data->input.charptr()[ bufsize] = 0;
+         data->input.setPos( ++bufsize);
+      }
+      else
+      {
+         data->input.setPos( bufsize);
+      }
+      itr = data->input.begin();
+      return bufsize;
+   };
+
+   unsigned int parseInput( const char* buf, unsigned int bufsize)
    {
       if (bufsize > data->input.size())
       {
          bufsize = data->input.size();
       }
-      data->input.setPos( bufsize);
+      unsigned int eatsize = 0;
+      unsigned int ii = 0;
+
+      if (ii == bufsize)
+      {
+         feedInput( buf, bufsize);
+         return eatsize;
+      }
+      if (state == LF && buf[ii] == '.')
+      {
+         state = LF_DOT;
+         goto state_LF_DOT;
+      }
+      goto state_SRC:
+
+      state_LF_DOT:
+      if (buf[ii] == '.')
+      {
+         state = LF_DOT;
+         goto state_LF_DOT;
+      }
+      goto state_SRC:
+      
+
+      else if (state == LF_DOT) && buf[0] == '\r')
+      {
+         state = LF_DOT_CR;
+         return 1;
+      }
+      else if (state == LF_DOT_CR && buf[0] == '\n')
+      {
+         state = LF_DOT_CR_LF;
+         return 1;
+      }
+      
+      if (buf[ii] ==  '\n')
+         {
+            feedInput( buf, eatsize, true);            
+            state = LF_DOT_CR_LF;
+            return ii+1;
+         }
+         state = SRC;               
+         feedInput( buf, eatsize);
+         return ii+1;
+      }
+      if (state == LF_DOT_CR)
+      {
+         if (bufsize > ii)
+         {
+            if (buf[ii] ==  '\n')
+            {
+               eatsize = ++ii; 
+               state = LF_DOT_CR_LF;
+            }
+            else
+            {
+               state = SRC;               
+               feedInput( buf, ii);
+               return ii+1;
+            }
+         }
+      }
+      
+      {
+         case LF:           if (bufsize > ii) if (buf[ii] ==  '.') {eatsize = ++ii; state = LF_DOT;} else {state=SRC; break;
+         case LF_DOT:       if (bufsize > ii && buf[ii] == '\r') {eatsize = ++ii; state = LF_DOT_CR;}
+         case LF_DOT_CR:    if (bufsize > ii && buf[ii] == '\n') {eatsize = ++ii; state = LF_DOT_CR_LF;}
+         case LF_DOT_CR_LF: break;
+         case SRC:          break;
+      }
+      if (state != SRC)
+      {
+         
+      }
+      else
+      {
+         char* cc = memchr( buf, '\n', bufsize);
+         while (cc && state == SRC)
+         {
+            ii = cc - buf;
+            if (ii == bufsize-2)
+            {
+               inputState = CR_LF_DOT;
+               eatsize = ii+2;
+               bufsize = ii;
+            }
+            else if (buf[ ii+2] == '\r')
+            {
+               inputState = CR_LF_DOT_CR;
+               eatsize = ii+3;
+               bufsize = ii;
+            }
+            else if (buf[ ii+2] == '\n')
+            {
+               inputState = CR_LF_DOT_CR_LF;
+               eatsize = ii+3;
+               bufsize = ii;
+            }
+            cc = strchr( buf+ii+1, bufsize-ii-1, '\n');
+         }
+         if (state == SRC && buf[bufsize-1] == '\n')
+         {
+            inputState = CR_LF;
+            eatsize = bufsize;
+            bufsize = bufsize-1;
+         }
+      }
       memmove( data->input.charptr(), buf, bufsize);
+      if (bufsize > 0)
+      {
+         if (state >= CR_LF_DOT_CR_LF)
+         {
+            if (bufsize < data->input.size())
+            {
+               data->input.charptr()[ bufsize] = '\0';
+               bufsize++;
+               state = SRC;
+            }
+         }
+      }
+      data->input.setPos( bufsize);
       itr = data->input.begin();
+      return eatsize;
    };
 
    void timeoutOccured()
@@ -444,7 +590,7 @@ void Connection::setPeer( const Network::RemoteSSLendpoint& remote)
 
 void* Connection::parseInput( const void* bytes, std::size_t nofBytes)
 {
-   std::size_t nn = data->feedInput( (const char*)bytes, nofBytes);
+   std::size_t nn = data->parseInput( (const char*)bytes, nofBytes);
    return (void*)(data->input.charptr() + nn);
 }
 
@@ -496,3 +642,4 @@ Network::connectionHandler* ServerHandler::newSSLconnection( const Network::Loca
 {
    return impl_->newSSLconnection( local );
 }
+

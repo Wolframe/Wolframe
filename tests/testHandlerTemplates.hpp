@@ -5,97 +5,89 @@
 #ifndef _SMERP_TEST_HANDLER_TEMPLATES_HPP_INCLUDED
 #define _SMERP_TEST_HANDLER_TEMPLATES_HPP_INCLUDED
 #include "logger.hpp"
+#include <cstring>
 #include <stdio.h>
 
 namespace _SMERP
 {
+
+//! THIS YOU CAN CALL A TRICKY (UNMASKING ACCESS RIGHTS BY INTRUSION)
+//! ... OR YOU SHOULD BE CAREFUL WITH WHO YOU CALL YOUR FRIEND  :-)
+template <typename T>
+class connectionBase :public T
+{
+public:
+   connectionBase() :T(T::READ) {};
+   const void* data()                    { return T::data(); }
+   std::size_t size()                    { return T::size(); }
+   typename T::Operation operation()     { return T::operation(); }
+};
+
+class NetworkOperation :public connectionBase<Network::NetworkOperation>
+{
+public:
+   NetworkOperation( const Network::NetworkOperation& o)
+   {
+      memcpy( this, ((char*)&o), sizeof(*this));
+   };
+};
+
+
 namespace test
 {
-   struct FileInput
+   template <class Connection>
+   int runTestIO( char* in, std::string& out, Connection& connection)
    {
-      FILE* file;
-      FileInput( const FileInput& o) :file(o.file) {};
-      FileInput( FILE* p_file) :file(p_file) {};
-      int get() {return getc(file);};
-   };
-   struct FileOutput
-   {
-      FILE* file;
-      FileOutput( const FileOutput& o) :file(o.file) {};
-      FileOutput( FILE* p_file) :file(p_file) {};
-      void put( char ch) {putc(ch,file);};
-   };
-   struct StringInput
-   {
-      char* itr;
-      StringInput( const StringInput& o) :itr(o.itr) {};
-      StringInput( char* p_itr) :itr(p_itr) {};
-      int get() { int ch = *itr++; return (ch)?ch:EOF;};
-   };
-   struct StringOutput
-   {
-      std::string* buf;
-      StringOutput( const StringOutput& o) :buf(o.buf) {};
-      StringOutput( std::string* p_buf) :buf(p_buf) {};
-      void put( char ch) {buf->push_back(ch);};
-   };
-   template<typename Input, typename Output, class Connection>
-   int runTestIO_( Input in, Output out, Connection& connection)
-   {
+      enum {NetworkBufSize=8};
+      char networkBuf[ NetworkBufSize];
+      unsigned int networkBufPos = 0;
+      
       for (;;)
       {
-         Network::NetworkOperation netop( connection.nextOperation());
+         NetworkOperation netop( connection.nextOperation());
          
          switch (netop.operation())
          {
-            case Network::NetworkOperation::READ:
+            case NetworkOperation::READ:
             {
                //fprintf( stderr, "network operation is READ\n"); 
-               char* data = (char*)netop.data();
-               std::size_t ii,size = netop.size();
-               for (ii=0; ii<size; ii++)
+               if (networkBufPos == 0)
                {
-                  int ch = in.get();
-                  if (ch == EOF) break;
-                  data[ ii] = ch;
+                  for (;networkBufPos<NetworkBufSize; networkBufPos++)
+                  {
+                     int ch = *in++;
+                     if (ch == 0) break;
+                     networkBuf[ networkBufPos] = ch;
+                  }
                }
-               connection.parseInput( netop.data(), ii);
+               unsigned int len = (char*)connection.networkInput( networkBuf, networkBufPos)-networkBuf;
+               memmove( networkBuf, networkBuf+len, networkBufPos-len);
+               networkBufPos -= len;
             }
             break;
             
-            case Network::NetworkOperation::WRITE:
+            case NetworkOperation::WRITE:
             {
                char* data = (char*)netop.data();
                std::size_t ii,size = netop.size();                  
                //fprintf( stderr, "network operation is WRITE '%.8s'[%u]\n", data, size); 
                for (ii=0; ii<size; ii++)
                {
-                  out.put( data[ ii]);
+                  out.push_back( data[ ii]);
                }
             }
             break;
             
-            case Network::NetworkOperation::TERMINATE:
+            case NetworkOperation::CLOSE:
+            case NetworkOperation::TERMINATE:
                //fprintf( stderr, "network operation is TERMINATE\n"); 
                return 0;
+               
+            default:
+               continue;
          }
       }
       return 1;      
-   }
-   
-   template<class Connection>
-   int runTestIO( char* input, std::string* output, Connection& connection)
-   {
-      StringInput in(input);
-      StringOutput out(output);
-      return runTestIO_( in, out, connection);
-   }
-   template<class Connection>
-   int runTestIO( FILE* input, FILE* output, Connection& connection)
-   {
-      FileInput in(input);
-      FileOutput out(output);
-      return runTestIO_( in, out, connection);
    }
 }}//namespace _SMERP::test
 #endif
