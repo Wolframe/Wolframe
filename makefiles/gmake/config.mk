@@ -26,14 +26,16 @@
 # base dir where boost is installed
 
 # system version
-BOOST_DIR=/usr
-BOOST_LIB_DIRS=$(BOOST_DIR)/lib
-BOOST_INCLUDE_DIRS=$(BOOST_DIR)/include
+#BOOST_DIR=/usr
+#BOOST_LIB_DIRS=$(BOOST_DIR)/lib
+#BOOST_INCLUDE_DIRS=$(BOOST_DIR)/include
+#BOOST_LIBRARY_TAG=-mt
 
 # self-compiled
 #BOOST_DIR=/home/abaumann/boost_1_45_0
 #BOOST_INCLUDE_DIRS=$(BOOST_DIR)
 #BOOST_LIB_DIR=$(BOOST_DIR)/stage/lib
+#BOOST_LIBRARY_TAG=-mt
 
 # OpenSSL (http://www.slproweb.com/products/Win32OpenSSL.html)
 ##############################################################
