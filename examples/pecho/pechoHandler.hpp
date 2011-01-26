@@ -1,5 +1,5 @@
 //
-// pechoHandler.hpp - simple echo handler example
+// pechoHandler.hpp - simple echo handler example with protocol
 //
 
 #ifndef _SMERP_PROTOCOL_ECHO_HANDLER_HPP_INCLUDED
@@ -10,20 +10,20 @@
 namespace _SMERP {
 namespace pecho {
 
-	/// The connection handler
-	class Connection : public Network::connectionHandler
-	{
-	public:
+   /// The connection handler
+   class Connection : public Network::connectionHandler
+   {
+   public:
       typedef Network::NetworkOperation Operation;
 
       Connection( const Network::LocalTCPendpoint& local, unsigned int inputBufferSize=128, unsigned int outputBufferSize=128);
-		Connection( const Network::LocalSSLendpoint& local );
-		~Connection();
+      Connection( const Network::LocalSSLendpoint& local );
+      ~Connection();
 
       virtual void setPeer( const Network::RemoteTCPendpoint& remote );
       virtual void setPeer( const Network::RemoteSSLendpoint& remote );
 
-		/// Handle a request and produce a reply.
+      /// Handle a request and produce a reply.
       virtual const Operation nextOperation();
       virtual void* networkInput( const void *begin, std::size_t bytesTransferred );
 
@@ -33,19 +33,19 @@ namespace pecho {
 
    public:
       struct Private;
-	private:
+   private:
       Private* data;
-	};
+   };
 
 } // namespace pecho
 
 /// The server handler container
-	class ServerHandler::ServerHandlerImpl
-	{
-	public:
-		Network::connectionHandler* newConnection( const Network::LocalTCPendpoint& local );
-		Network::connectionHandler* newSSLconnection( const Network::LocalSSLendpoint& local );
-	};
+   class ServerHandler::ServerHandlerImpl
+   {
+   public:
+      Network::connectionHandler* newConnection( const Network::LocalTCPendpoint& local );
+      Network::connectionHandler* newSSLconnection( const Network::LocalSSLendpoint& local );
+   };
 
 } // namespace _SMERP
 

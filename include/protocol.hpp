@@ -10,8 +10,6 @@
 #include "protocol/parser.hpp"
 //buffers used by parser to collect arguments of protocol commands
 #include "protocol/buffers.hpp"
-//iterator for CRLFdotCRLF delimited text content
-#include "protocol/textIterator.hpp"
 //basic input iterators and message blocks
 #include "protocol/ioblocks.hpp"
 //building blocks for generators in processing languages knowing a 'yield' operation

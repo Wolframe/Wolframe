@@ -42,6 +42,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	logBackend.o \
 	configFile.o \
 	appConfig.o \
+	protocol_ioblocks.o \
 	acceptor.o \
 	getPassword.o \
 	connection.o \

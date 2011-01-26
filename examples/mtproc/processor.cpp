@@ -49,15 +49,6 @@ private:
       return ar[i];
    };
 
-   enum InputState
-   {
-      SRC,
-      LF,
-      LF_DOT,
-      LF_DOT_CR,
-      LF_DOT_CR_LF
-   };
-
    //* typedefs for the parser of the protocol
    //1. negotiation phase
    typedef protocol::CmdParser<CmdBuffer> ProtocolParser;
@@ -402,9 +393,11 @@ public:
       return Operation( Operation::TERMINATE);
    };
 
-   void feedInput( const char* buf, unsigned int bufsize, bool withEOF=false)
+   void feedInput( const char* buf, unsigned int bufsize)
    {
+      if (bufsize > data->input.size()) bufsize = data->input.size();
       if (bufsize > 0) memmove( data->input.charptr(), buf, bufsize);
+
       if (withEOF && bufsize < data->input.size())
       {
          data->input.charptr()[ bufsize] = 0;
@@ -420,133 +413,66 @@ public:
 
    unsigned int parseInput( const char* buf, unsigned int bufsize)
    {
-      if (bufsize > data->input.size())
-      {
-         bufsize = data->input.size();
-      }
+      data->input.setPos( 0);
+      if (bufsize > data->input.size()) bufsize = data->input.size();
+      if (bufsize == 0) return 0;
+
       unsigned int eatsize = 0;
       unsigned int ii = 0;
 
-      if (ii == bufsize)
+      while (ii<bufsize)
       {
-         feedInput( buf, bufsize);
-         return eatsize;
-      }
-      if (state == LF && buf[ii] == '.')
-      {
-         state = LF_DOT;
-         goto state_LF_DOT;
-      }
-      goto state_SRC:
-
-      state_LF_DOT:
-      if (buf[ii] == '.')
-      {
-         state = LF_DOT;
-         goto state_LF_DOT;
-      }
-      goto state_SRC:
-      
-
-      else if (state == LF_DOT) && buf[0] == '\r')
-      {
-         state = LF_DOT_CR;
-         return 1;
-      }
-      else if (state == LF_DOT_CR && buf[0] == '\n')
-      {
-         state = LF_DOT_CR_LF;
-         return 1;
-      }
-      
-      if (buf[ii] ==  '\n')
+         if (state == SRC)
          {
-            feedInput( buf, eatsize, true);            
-            state = LF_DOT_CR_LF;
-            return ii+1;
-         }
-         state = SRC;               
-         feedInput( buf, eatsize);
-         return ii+1;
-      }
-      if (state == LF_DOT_CR)
-      {
-         if (bufsize > ii)
-         {
-            if (buf[ii] ==  '\n')
+            char* cc = memchr( buf+ii, '\n', bufsize-ii);
+            if (cc)
             {
-               eatsize = ++ii; 
-               state = LF_DOT_CR_LF;
+               ii = cc - buf;
+               state = LF;
             }
             else
             {
-               state = SRC;               
-               feedInput( buf, ii);
-               return ii+1;
+               ii = bufsize;
+               feedInput( buf+eatsize, ii-eatsize);
             }
          }
-      }
-      
-      {
-         case LF:           if (bufsize > ii) if (buf[ii] ==  '.') {eatsize = ++ii; state = LF_DOT;} else {state=SRC; break;
-         case LF_DOT:       if (bufsize > ii && buf[ii] == '\r') {eatsize = ++ii; state = LF_DOT_CR;}
-         case LF_DOT_CR:    if (bufsize > ii && buf[ii] == '\n') {eatsize = ++ii; state = LF_DOT_CR_LF;}
-         case LF_DOT_CR_LF: break;
-         case SRC:          break;
-      }
-      if (state != SRC)
-      {
-         
-      }
-      else
-      {
-         char* cc = memchr( buf, '\n', bufsize);
-         while (cc && state == SRC)
+         else if (state == LF)
          {
-            ii = cc - buf;
-            if (ii == bufsize-2)
+            if (buf[ii] == '.')
             {
-               inputState = CR_LF_DOT;
-               eatsize = ii+2;
-               bufsize = ii;
-            }
-            else if (buf[ ii+2] == '\r')
-            {
-               inputState = CR_LF_DOT_CR;
-               eatsize = ii+3;
-               bufsize = ii;
-            }
-            else if (buf[ ii+2] == '\n')
-            {
-               inputState = CR_LF_DOT_CR_LF;
-               eatsize = ii+3;
-               bufsize = ii;
-            }
-            cc = strchr( buf+ii+1, bufsize-ii-1, '\n');
+               state = LF_DOT;
+               feedInput( buf+eatsize, ii-eatsize);
+               ii++;
+               eatsize=ii;
+            } 
          }
-         if (state == SRC && buf[bufsize-1] == '\n')
+         else if (state == LF_DOT)
          {
-            inputState = CR_LF;
-            eatsize = bufsize;
-            bufsize = bufsize-1;
-         }
-      }
-      memmove( data->input.charptr(), buf, bufsize);
-      if (bufsize > 0)
-      {
-         if (state >= CR_LF_DOT_CR_LF)
-         {
-            if (bufsize < data->input.size())
+            if (buf[ii] == '\r')
             {
-               data->input.charptr()[ bufsize] = '\0';
-               bufsize++;
+               feedInput( "", 1); //< feed EOD
+               state = LF_DOT_CR;
+               ii++; 
+            }
+            else if (buf[ii] == '\n')
+            {
+               feedInput( "", 1); //< feed EOD
+               state = LF_DOT_CR_LF;
+               ii++;
+            }
+            else
+            {
                state = SRC;
             }
+         else if (state == LF_DOT_CR)
+         {
+            if (buf[ii] == '\n')
+            {
+               ii++; 
+            }
+            state = LF_DOT_CR_LF;
          }
       }
-      data->input.setPos( bufsize);
-      itr = data->input.begin();
-      return eatsize;
    };
 
    void timeoutOccured()

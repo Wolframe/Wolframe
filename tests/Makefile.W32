@@ -43,8 +43,7 @@ TEST_CPP_BINS = \
 TEST_CPP_BINS = \
 	$(TEST_CPP_BINS) \
 	versionTest.exe \
-	counterTest.exe \
-	pechoHandler-gTest.exe
+	counterTest.exe
 !ENDIF
 
 OBJS = \
@@ -54,8 +53,6 @@ all: $(OBJS) $(CPP_BINS)
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 logTest.exe: logTest.obj $(TOPDIR)\src\smerp.lib
-pechoHandlerTest.exe: pechoHandlerTest.obj $(TOPDIR)\src\pechoHandler.o
-xmlselectHandlerTest.exe: xmlselectHandlerTest.obj $(TOPDIR)\src\xmlselectHandler.o
 !IFDEF WITH_GTEST
 versionTest.exe: versionTest.obj $(TOPDIR)\src\smerp.lib
 counterTest.exe: counterTest.obj $(TOPDIR)\src\smerp.lib

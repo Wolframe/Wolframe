@@ -55,14 +55,10 @@ TEST_CPP_BINS += \
 	counterTest$(EXE) \
 	resolvePathTest$(EXE) \
 	poolTest$(EXE) \
-	pechoHandler-gTest$(EXE) \
 	protocolArgumentParsing-gTest$(EXE)
 endif
 
 include $(TOPDIR)/makefiles/gmake/sub.mk
-
-pechoHandlerTest$(EXE): .o $(TOPDIR)/src/libsmerp.a $(TOPDIR)/examples/pecho/pechoHandler.o
-	$(CCPP_LINK) -o $@ $(LDFLAGS) $(OBJS) $< $(LIBS) $(TOPDIR)/examples/pecho/pechoHandler.o
 
 ifdef WITH_GTEST
 pechoHandler-gTest$(EXE): pechoHandler-gTest.o $(TOPDIR)/src/libsmerp.a $(TOPDIR)/examples/pecho/pechoHandler.o
