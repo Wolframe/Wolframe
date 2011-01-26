@@ -32,7 +32,7 @@ namespace _SMERP {
 		void errorOccured( NetworkSignal );
 
 		/// Handle a request and produce a reply.
-		Network::NetworkOperation nextOperation();
+		const Network::NetworkOperation nextOperation();
 
 	private:
 		lua_State *l;

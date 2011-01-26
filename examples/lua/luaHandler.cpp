@@ -170,7 +170,7 @@ namespace _SMERP {
 	}
 
 	/// Handle a request and produce a reply.
-	Network::NetworkOperation echoConnection::nextOperation()
+	const Network::NetworkOperation echoConnection::nextOperation()
 	{
 		lua_pushstring( l, "next_operation" );
 		lua_gettable( l, LUA_GLOBALSINDEX );
