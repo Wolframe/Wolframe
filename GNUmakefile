@@ -1,6 +1,6 @@
 TOPDIR = .
 
-SUBDIRS = src tests examples clients docs
+SUBDIRS = src tests examples clients
 
 PACKAGE_NAME = smerp
 PACKAGE_VERSION = 0.0.1
