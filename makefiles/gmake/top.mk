@@ -67,6 +67,14 @@ ifeq "$(PLATFORM)" "LINUX"
 	@echo "Linux distribution: $(LINUX_DIST) $(LINUX_REV)"
 endif
 	@echo "C++ Compiler: $(COMPILER)"
+	@echo
+	@echo "Required Dependencies:"
+	@echo
+	@echo "BOOST_INCLUDE_DIRS: $(BOOST_INCLUDE_DIRS)"
+	@echo "BOOST_LIB_DIRS: $(BOOST_LIB_DIRS)"
+	@echo
+	@echo "Optional Dependencies:"
+	@echo
 ifdef WITH_LUA
 	@echo "LUA_INCLUDE_DIRS: $(LUA_INCLUDE_DIRS)"
 	@echo "LUA_LIB_DIRS: $(LUA_LIB_DIRS)"

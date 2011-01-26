@@ -214,14 +214,13 @@ endif
 #######
 
 ifeq "$(PLATFORM)" "LINUX"
+
 ifeq "$(LINUX_DIST)" "arch"
-BOOST_DIR = /usr
-BOOST_LIBRARY_TAG = -mt
+BOOST_LIB_DIRS ?= /usr/lib
+BOOST_INCLUDE_DIRS ?= /usr/include
+BOOST_LIBRARY_TAG ?= -mt
 endif
-ifeq "$(LINUX_DIST)" "redhat"
-BOOST_DIR = /usr
-BOOST_LIBRARY_TAG = -mt
-endif
+
 endif
 
 # OpenSSL
@@ -237,38 +236,6 @@ endif
 ifdef WITH_GTEST
 GTEST_LIBS = -lgtest
 endif
-
-# Lua
-#####
-
-#ifdef WITH_LUA
-#ifeq "$(PLATFORM)" "LINUX"
-#ifeq "$(LINUX_DIST)" "arch"
-#BOOST_DIR = /usr
-3BOOST_LIBRARY_TAG = -mt
-#endif
-#ifeq "$(LINUX_DIST)" "redhat"
-#BOOST_DIR = /usr
-#BOOST_LIBRARY_TAG = -mt
-#endif
-#endif
-#endif
-
-# Qt 4
-######
-
-#ifdef WITH_QT
-#ifeq "$(PLATFORM)" "LINUX"
-#ifeq "$(LINUX_DIST)" "arch"
-#BOOST_DIR = /usr
-#BOOST_LIBRARY_TAG = -mt
-#endif
-#ifeq "$(LINUX_DIST)" "redhat"
-#BOOST_DIR = /usr
-#BOOST_LIBRARY_TAG = -mt
-#endif
-#endif
-#endif
 
 # Qt 4 (http://qt.nokia.com/products/)
 ######################################
