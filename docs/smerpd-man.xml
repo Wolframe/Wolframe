@@ -23,11 +23,11 @@
     <authorgroup>
       <author>
        <firstname>&firstname;</firstname>
-        <surname>&surname;</surname>
-        <contrib>Wrote this manpage for the Debian system.</contrib>
-        <address>
-          <email>&email;</email>
-        </address>
+	<surname>&surname;</surname>
+	<contrib>Wrote this manpage for the Debian system.</contrib>
+	<address>
+	  <email>&email;</email>
+	</address>
       </author>
     </authorgroup>
     <copyright>
@@ -36,14 +36,14 @@
     </copyright>
     <legalnotice>
       <para>This manual page was written for the Debian system
-        (and may be used by others).</para>
+	(and may be used by others).</para>
       <para>Permission is granted to copy, distribute and/or modify this
-        document under the terms of the GNU General Public License,
-        Version 2 or (at your option) any later version published by
-        the Free Software Foundation.</para>
+	document under the terms of the GNU General Public License,
+	Version 2 or (at your option) any later version published by
+	the Free Software Foundation.</para>
       <para>On Debian systems, the complete text of the GNU General Public
-        License can be found in
-        <filename>/usr/share/common-licenses/GPL</filename>.</para>
+	License can be found in
+	<filename>/usr/share/common-licenses/GPL</filename>.</para>
     </legalnotice>
   </refentryinfo>
   <refmeta>
@@ -61,40 +61,40 @@
       <arg choice="plain"><option>-e <replaceable>this</replaceable></option></arg>
       <arg choice="opt"><option>--example=<parameter>that</parameter></option></arg>
       <arg choice="opt">
-        <group choice="req">
-          <arg choice="plain"><option>-e</option></arg>
-          <arg choice="plain"><option>--example</option></arg>
-        </group>
-        <replaceable class="option">this</replaceable>
+	<group choice="req">
+	  <arg choice="plain"><option>-e</option></arg>
+	  <arg choice="plain"><option>--example</option></arg>
+	</group>
+	<replaceable class="option">this</replaceable>
       </arg>
       <arg choice="opt">
-        <group choice="req">
-          <arg choice="plain"><option>-e</option></arg>
-          <arg choice="plain"><option>--example</option></arg>
-        </group>
-        <group choice="req">
-          <arg choice="plain"><replaceable>this</replaceable></arg>
-          <arg choice="plain"><replaceable>that</replaceable></arg>
-        </group>
+	<group choice="req">
+	  <arg choice="plain"><option>-e</option></arg>
+	  <arg choice="plain"><option>--example</option></arg>
+	</group>
+	<group choice="req">
+	  <arg choice="plain"><replaceable>this</replaceable></arg>
+	  <arg choice="plain"><replaceable>that</replaceable></arg>
+	</group>
       </arg>
     </cmdsynopsis>
     <cmdsynopsis>
       <command>&dhpackage;</command>
       <!-- Normally the help and version options make the programs stop
-           right after outputting the requested information. -->
+	   right after outputting the requested information. -->
       <group choice="opt">
-        <arg choice="plain">
-          <group choice="req">
-            <arg choice="plain"><option>-h</option></arg>
-            <arg choice="plain"><option>--help</option></arg>
-          </group>
-        </arg>
-        <arg choice="plain">
-          <group choice="req">
-            <arg choice="plain"><option>-v</option></arg>
-            <arg choice="plain"><option>--version</option></arg>
-          </group>
-        </arg>
+	<arg choice="plain">
+	  <group choice="req">
+	    <arg choice="plain"><option>-h</option></arg>
+	    <arg choice="plain"><option>--help</option></arg>
+	  </group>
+	</arg>
+	<arg choice="plain">
+	  <group choice="req">
+	    <arg choice="plain"><option>-v</option></arg>
+	    <arg choice="plain"><option>--version</option></arg>
+	  </group>
+	</arg>
       </group>
     </cmdsynopsis>
   </refsynopsisdiv>
@@ -106,71 +106,117 @@
     <para>This manual page was written for the Debian distribution
       because the original program does not have a manual page.
       Instead, it has documentation in the GNU <citerefentry>
-        <refentrytitle>info</refentrytitle>
-        <manvolnum>1</manvolnum>
+	<refentrytitle>info</refentrytitle>
+	<manvolnum>1</manvolnum>
       </citerefentry> format; see below.</para>
     <para><command>&dhpackage;</command> is a program that...</para>
   </refsect1>
+
   <refsect1 id="options">
     <title>OPTIONS</title>
     <para>The program follows the usual GNU command line syntax,
       with long options starting with two dashes (`-').  A summary of
       options is included below.  For a complete description, see the
-      <citerefentry>
-        <refentrytitle>info</refentrytitle>
-        <manvolnum>1</manvolnum>
-      </citerefentry> files.</para>
-    <variablelist>
-      <!-- Use the variablelist.term.separator and the
-           variablelist.term.break.after parameters to
-           control the term elements. -->
-      <varlistentry>
-        <term><option>-e <replaceable>this</replaceable></option></term>
-        <term><option>--example=<replaceable>that</replaceable></option></term>
-        <listitem>
-          <para>Does this and that.</para>
-        </listitem>
-      </varlistentry>
-      <varlistentry>
-        <term><option>-h</option></term>
-        <term><option>--help</option></term>
-        <listitem>
-          <para>Show summary of options.</para>
-        </listitem>
-      </varlistentry>
-      <varlistentry>
-        <term><option>-v</option></term>
-        <term><option>--version</option></term>
-        <listitem>
-          <para>Show version of program.</para>
-        </listitem>
-      </varlistentry>
-    </variablelist>
-  </refsect1>
-  <refsect1 id="files">
+      <citerefentry><refentrytitle>info</refentrytitle><manvolnum>1</manvolnum></citerefentry>
+      files.</para>
+		<variablelist>
+	<!--	Use the variablelist.term.separator and the
+		variablelist.term.break.after parameters to
+		control the term elements. -->
+			<varlistentry>
+				<term><option>-e <replaceable>this</replaceable></option></term>
+				<term><option>--example=<replaceable>that</replaceable></option></term>
+				<listitem>
+					<para>Does this and that.</para>
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><option>-v</option></term>
+				<term><option>--version</option></term>
+				<listitem>
+					<para>Show version of program.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><option>-h</option></term>
+				<term><option>--help</option></term>
+				<listitem>
+					<para>Show summary of options.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><option>-p</option></term>
+				<term><option>--print-config</option></term>
+				<listitem>
+					<para>Print the configuration.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><option>-t</option></term>
+				<term><option>--check-config</option></term>
+				<listitem>
+					<para>Check the configuration.</para>
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><option>-u <replaceable>user</replaceable></option></term>
+				<term><option>--user <replaceable>user</replaceable></option></term>
+				<listitem>
+					<para>run as <replaceable>user</replaceable>.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><option>-g <replaceable>group</replaceable></option></term>
+				<term><option>--group <replaceable>group</replaceable></option></term>
+				<listitem>
+					<para>run as <replaceable>group</replaceable>.</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+	</refsect1>
+
+<!--
+	-v [ version ]         print version
+	-h [ help ]            print help message
+	-p [ print-config ]    print configuration
+	-t [ check-config ]    check the configuration
+-T [ test-config ]     test the configuration
+-f [ foreground ]      run in foreground (logs only on stderr)
+-c [ config-file ] arg configuration file
+-d [ debug ] arg       set debug level (active only with foreground)
+use-config-logging     log according to the configuration file (active only
+			 with foreground)
+	-u [ user ] arg        run as user
+	-g [ group ] arg       run as group
+-->
+
+
+<refsect1 id="files">
     <title>FILES</title>
     <variablelist>
       <varlistentry>
-        <term><filename>/etc/foo.conf</filename></term>
-        <listitem>
-          <para>The system-wide configuration file to control the
-            behaviour of <application>&dhpackage;</application>. See
-            <citerefentry>
-              <refentrytitle>foo.conf</refentrytitle>
-              <manvolnum>5</manvolnum>
-            </citerefentry> for further details.</para>
-        </listitem>
+	<term><filename>/etc/foo.conf</filename></term>
+	<listitem>
+	  <para>The system-wide configuration file to control the
+	    behaviour of <application>&dhpackage;</application>. See
+	    <citerefentry>
+	      <refentrytitle>foo.conf</refentrytitle>
+	      <manvolnum>5</manvolnum>
+	    </citerefentry> for further details.</para>
+	</listitem>
       </varlistentry>
       <varlistentry>
-        <term><filename>${HOME}/.foo.conf</filename></term>
-        <listitem>
-          <para>The per-user configuration file to control the
-             behaviour of <application>&dhpackage;</application>. See
-             <citerefentry>
-               <refentrytitle>foo.conf</refentrytitle>
-               <manvolnum>5</manvolnum>
-             </citerefentry> for further details.</para>
-        </listitem>
+	<term><filename>${HOME}/.foo.conf</filename></term>
+	<listitem>
+	  <para>The per-user configuration file to control the
+	     behaviour of <application>&dhpackage;</application>. See
+	     <citerefentry>
+	       <refentrytitle>foo.conf</refentrytitle>
+	       <manvolnum>5</manvolnum>
+	     </citerefentry> for further details.</para>
+	</listitem>
       </varlistentry>
     </variablelist>
   </refsect1>
@@ -178,11 +224,11 @@
     <title>ENVIONMENT</title>
     <variablelist>
       <varlistentry>
-        <term><envar>FOO_CONF</envar></term>
-        <listitem>
-          <para>If used, the defined file is used as configuration
-            file (see also <xref linkend="files"/>).</para>
-        </listitem>
+	<term><envar>FOO_CONF</envar></term>
+	<listitem>
+	  <para>If used, the defined file is used as configuration
+	    file (see also <xref linkend="files"/>).</para>
+	</listitem>
       </varlistentry>
     </variablelist>
   </refsect1>
@@ -192,12 +238,12 @@
       on <filename class="devicefile">stderr</filename>:</para>
     <variablelist>
       <varlistentry>
-        <term><errortext>Bad configuration file. Exiting.</errortext></term>
-        <listitem>
-          <para>The configuration file seems to contain a broken configuration
-            line. Use the <option>--verbose</option> option, to get more info.
-          </para>
-        </listitem>
+	<term><errortext>Bad configuration file. Exiting.</errortext></term>
+	<listitem>
+	  <para>The configuration file seems to contain a broken configuration
+	    line. Use the <option>--verbose</option> option, to get more info.
+	  </para>
+	</listitem>
       </varlistentry>
     </variablelist>
     <para><command>&dhpackage;</command> provides some return codes, that can
@@ -206,12 +252,12 @@
       <segtitle>Code</segtitle>
       <segtitle>Diagnostic</segtitle>
       <seglistitem>
-        <seg><errorcode>0</errorcode></seg>
-        <seg>Program exited successfully.</seg>
+	<seg><errorcode>0</errorcode></seg>
+	<seg>Program exited successfully.</seg>
       </seglistitem>
       <seglistitem>
-        <seg><errorcode>1</errorcode></seg>
-        <seg>The configuration file seems to be broken.</seg>
+	<seg><errorcode>1</errorcode></seg>
+	<seg>The configuration file seems to be broken.</seg>
       </seglistitem>
     </segmentedlist>
   </refsect1>
@@ -227,19 +273,19 @@
     <title>SEE ALSO</title>
     <!-- In alpabetical order. -->
     <para><citerefentry>
-        <refentrytitle>bar</refentrytitle>
-        <manvolnum>1</manvolnum>
+	<refentrytitle>bar</refentrytitle>
+	<manvolnum>1</manvolnum>
       </citerefentry>, <citerefentry>
-        <refentrytitle>baz</refentrytitle>
-        <manvolnum>1</manvolnum>
+	<refentrytitle>baz</refentrytitle>
+	<manvolnum>1</manvolnum>
       </citerefentry>, <citerefentry>
-        <refentrytitle>foo.conf</refentrytitle>
-        <manvolnum>5</manvolnum>
+	<refentrytitle>foo.conf</refentrytitle>
+	<manvolnum>5</manvolnum>
       </citerefentry></para>
     <para>The programs are documented fully by <citetitle>The Rise and
       Fall of a Fooish Bar</citetitle> available via the <citerefentry>
-        <refentrytitle>info</refentrytitle>
-        <manvolnum>1</manvolnum>
+	<refentrytitle>info</refentrytitle>
+	<manvolnum>1</manvolnum>
       </citerefentry> system.</para>
   </refsect1>
 </refentry>
