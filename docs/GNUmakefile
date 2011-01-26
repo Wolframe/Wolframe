@@ -27,7 +27,7 @@ smerp.conf.5: smerp.conf-man.xml
 
 local_clean:
 	-@rm -rf doxygen 2>/dev/null
-	-@rm smerpd.8 smerp.conf.5 2>/dev/null
+	-@rm -f smerpd.8 smerp.conf.5 2>/dev/null
 
 local_distclean:
 

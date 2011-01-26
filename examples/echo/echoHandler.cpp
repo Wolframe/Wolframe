@@ -41,7 +41,7 @@ namespace _SMERP {
 
 
 	/// Handle a request and produce a reply.
-	Network::NetworkOperation echoConnection::nextOperation()
+	const Network::NetworkOperation echoConnection::nextOperation()
 	{
 		switch( state_ )	{
 		case NEW:	{

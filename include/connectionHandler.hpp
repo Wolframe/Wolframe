@@ -97,7 +97,7 @@ namespace _SMERP {
 		virtual void* networkInput( const void *begin, std::size_t bytesTransferred ) = 0;
 
 		/// What should the network do next.
-		virtual NetworkOperation nextOperation() = 0;
+		virtual const NetworkOperation nextOperation() = 0;
 
 		/// Timeout timer was fired.
 		virtual void timeoutOccured()	{}

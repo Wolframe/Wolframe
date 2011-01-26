@@ -24,13 +24,13 @@ namespace pecho {
       virtual void setPeer( const Network::RemoteSSLendpoint& remote );
 
 		/// Handle a request and produce a reply.
-      virtual Operation nextOperation();
+      virtual const Operation nextOperation();
       virtual void* networkInput( const void *begin, std::size_t bytesTransferred );
 
       void timeoutOccured();
       void signalOccured();
       void errorOccured( NetworkSignal );
-      
+
    public:
       struct Private;
 	private:
