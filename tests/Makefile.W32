@@ -37,8 +37,7 @@ INCLUDE_LIBS = \
 
 TEST_CPP_BINS = \
 	logTest.exe \
-	poolTest.exe \
-	pechoHandlerTest.exe
+	poolTest.exe
 
 !IFDEF WITH_GTEST
 TEST_CPP_BINS = \
