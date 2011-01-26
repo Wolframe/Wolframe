@@ -37,18 +37,15 @@ INCLUDE_LIBS = \
 
 TEST_CPP_BINS = \
 	logTest.exe \
-	poolTest.exe
-
-# currently don't compile because of ref-to-ptr trickery in test template
-#	pechoHandlerTest.exe
+	poolTest.exe \
+	pechoHandlerTest.exe
 
 !IFDEF WITH_GTEST
 TEST_CPP_BINS = \
 	$(TEST_CPP_BINS) \
 	versionTest.exe \
-	counterTest.exe
-# currently don't compile because of ref-to-ptr trickery in test template
-#	pechoHandler-gTest$(EXE)
+	counterTest.exe \
+	pechoHandler-gTest.exe
 !ENDIF
 
 OBJS = \

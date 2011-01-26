@@ -47,7 +47,8 @@ TEST_OBJS =
 
 TEST_CPP_BINS = \
 	threadLeakTest$(EXE) \
-	logTest$(EXE)
+	logTest$(EXE) \
+	pechoHandlerTest$(EXE)
 
 ifdef WITH_GTEST
 TEST_CPP_BINS += \
