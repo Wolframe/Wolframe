@@ -47,8 +47,7 @@ TEST_OBJS =
 
 TEST_CPP_BINS = \
 	threadLeakTest$(EXE) \
-	logTest$(EXE) \
-	pechoHandlerTest$(EXE)
+	logTest$(EXE)
 
 ifdef WITH_GTEST
 TEST_CPP_BINS += \
@@ -62,7 +61,7 @@ endif
 
 include $(TOPDIR)/makefiles/gmake/sub.mk
 
-pechoHandlerTest$(EXE): pechoHandlerTest.o $(TOPDIR)/src/libsmerp.a $(TOPDIR)/examples/pecho/pechoHandler.o
+pechoHandlerTest$(EXE): .o $(TOPDIR)/src/libsmerp.a $(TOPDIR)/examples/pecho/pechoHandler.o
 	$(CCPP_LINK) -o $@ $(LDFLAGS) $(OBJS) $< $(LIBS) $(TOPDIR)/examples/pecho/pechoHandler.o
 
 ifdef WITH_GTEST
