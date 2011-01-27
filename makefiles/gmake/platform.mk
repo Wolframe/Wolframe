@@ -216,7 +216,7 @@ endif
 ifeq "$(PLATFORM)" "LINUX"
 
 ifeq "$(LINUX_DIST)" "arch"
-BOOST_LIB_DIRS ?= /usr/lib
+BOOST_LIB_DIR ?= /usr/lib
 BOOST_INCLUDE_DIRS ?= /usr/include
 BOOST_LIBRARY_TAG ?= -mt
 endif

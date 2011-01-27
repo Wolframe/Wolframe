@@ -71,7 +71,8 @@ endif
 	@echo "Required Dependencies:"
 	@echo
 	@echo "BOOST_INCLUDE_DIRS: $(BOOST_INCLUDE_DIRS)"
-	@echo "BOOST_LIB_DIRS: $(BOOST_LIB_DIRS)"
+	@echo "BOOST_LIB_DIR: $(BOOST_LIB_DIR)"
+	@echo "BOOST_LIBRARY_TAG: $(BOOST_LIBRARY_TAG)"
 	@echo
 	@echo "Optional Dependencies:"
 	@echo
