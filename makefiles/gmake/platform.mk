@@ -255,7 +255,13 @@ endif
 #########
 
 ifdef WITH_SSL
-OPENSSL_LIBS = -lssl -lcrypto
+
+ifeq "$(PLATFORM)" "LINUX"
+
+OPENSSL_LIBS ?= -lssl -lcrypto
+
+endif
+
 endif
 
 # Google Unit testing gtest

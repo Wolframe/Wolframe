@@ -75,6 +75,11 @@ endif
 	@echo "BOOST_LIBRARY_TAG: $(BOOST_LIBRARY_TAG)"
 	@echo
 	@echo "Optional Dependencies:"
+ifdef WITH_SSL
+	@echo
+	@echo "OPENSSL_DIR: $(OPENSSL_DIR)"
+	@echo "OPENSSL_LIBS: $(OPENSSL_LIBS)"
+endif
 ifdef WITH_LUA
 	@echo
 	@echo "LUA_INCLUDE_DIRS: $(LUA_INCLUDE_DIRS)"

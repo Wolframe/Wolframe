@@ -7,7 +7,7 @@
 # - LUA_DIR
 
 # IMPORTANT:
-# please customize for new platforms or leave empty for
+# please customize for new platforms or leave commented out for
 # an autodetection in platform.mk
 
 # XSLT processor
@@ -41,7 +41,7 @@
 ##############################################################
 
 # system version
-OPENSSL_DIR=/usr
+#OPENSSL_DIR=/usr
 
 # self-compiled
 #OPENSSL_DIR=/home/user/openssl
