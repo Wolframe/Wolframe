@@ -111,7 +111,12 @@ namespace _SMERP {
 
 			case NetworkOperation::WRITE:	{
 				LOG_TRACE << "Next operation: WRITE " << netOp.size() << " bytes to " << identifier();
-				if ( netOp.data() == NULL || netOp.size() == 0 )	{
+				if ( netOp.data() == NULL )	{
+					LOG_FATAL << "Attempt to WRITE a NULL data block to " << identifier();
+					abort();		// here should be a system exception
+				}
+				if ( netOp.size() == 0 )	{
+					LOG_FATAL << "Attempt to WRITE a 0 bytes data block to " << identifier();
 					abort();		// here should be a system exception
 				}
 				if ( netOp.timeout() > 0 )
@@ -125,10 +130,25 @@ namespace _SMERP {
 				break;
 
 			case NetworkOperation::CLOSE:	{
-					LOG_TRACE << "Next operation: CLOSING connection to " << identifier();
+					boost::system::error_code ignored_ec;
+					if ( netOp.data() == NULL && netOp.size() != 0 )	{
+						LOG_FATAL << "Attempt to WRITE a NULL data block in CLOSE connection to " << identifier();
+						abort();		// here should be a system exception
+					}
+					if ( netOp.size() == 0 && netOp.data() != NULL )	{
+						LOG_FATAL << "Attempt to WRITE a 0 bytes data block in CLOSE connection to " << identifier();
+						abort();		// here should be a system exception
+					}
+					if ( netOp.data() != NULL && netOp.size() != 0 )	{
+						LOG_TRACE << "Next operation: WRITE " << netOp.size() << " bytes to " << identifier() << " and CLOSE connection";
+						socket().boost::asio::write_some( boost::asio::buffer( netOp.data(), netOp.size() ), ec );
+					}
+					else	{
+						LOG_TRACE << "Next operation: CLOSE connection to " << identifier();
+					}
 					// Initiate graceful connection closure.
 					setTimeout( 0 );
-					boost::system::error_code ignored_ec;
+
 					socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
 					socket().lowest_layer().close();
 					unregister();

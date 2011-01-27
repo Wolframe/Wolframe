@@ -14,7 +14,7 @@ namespace _SMERP {
 
 	class	NetworkOperation
 	{
-		template< typename T > friend class connectionBase/*<T>*/;
+		template< typename T > friend class connectionBase;
 	protected:
 		enum Operation	{
 			READ,
@@ -100,10 +100,10 @@ namespace _SMERP {
 		virtual const NetworkOperation nextOperation() = 0;
 
 		/// Timeout timer was fired.
-		virtual void timeoutOccured()	{}
+		virtual void timeoutOccured()			{}
 
 		/// A signal was received from outside.
-		virtual void signalOccured()	{}
+		virtual void signalOccured()			{}
 
 		/// An error network occured
 		virtual void errorOccured( NetworkSignal )	{}
@@ -145,7 +145,7 @@ namespace _SMERP {
 		Network::connectionHandler* newSSLconnection( const Network::LocalSSLendpoint& local );
 	private:
 		class ServerHandlerImpl;
-		ServerHandlerImpl	*impl_;
+		ServerHandlerImpl *impl_;
 	};
 
 } // namespace _SMERP
