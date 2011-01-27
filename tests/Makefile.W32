@@ -8,11 +8,13 @@ INCLUDE_CPPFLAGS = \
 	/D_WIN32_WINNT=0x403
 
 INCLUDE_DIRS = \
-	/I$(TOPDIR)/include /I. \
-	/I$(TOPDIR)/src \
+	/I$(TOPDIR)\include /I. \
+	/I$(TOPDIR)\src \
+	-I$(TOPDIR)\examples\pecho \
+	-I$(TOPDIR)\examples\xmlselect \
 	/I"$(BOOST_DIR)" \
 	/I"$(PLATFORM_SDK_DIR)\Include"
-
+	
 # Note: libraries are picked automatically on Windows!
 SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib"
 INCLUDE_LDFLAGS = \
@@ -36,14 +38,18 @@ INCLUDE_LIBS = \
 !ENDIF
 
 TEST_CPP_BINS = \
-	logTest.exe \
-	poolTest.exe
+	threadLeakTest.exe
 
 !IFDEF WITH_GTEST
 TEST_CPP_BINS = \
 	$(TEST_CPP_BINS) \
 	versionTest.exe \
-	counterTest.exe
+	counterTest.exe \
+	resolvePathTest.exe \
+	poolTest.exe \
+	logTest.exe \
+	protocolArgumentParsing-gTest.exe
+#	pechoHandler-gTest.exe
 !ENDIF
 
 OBJS = \
@@ -52,11 +58,15 @@ all: $(OBJS) $(CPP_BINS)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-logTest.exe: logTest.obj $(TOPDIR)\src\smerp.lib
 !IFDEF WITH_GTEST
+threadLeakTest.exe: threadLeakTest.obj $(TOPDIR)\src\smerp.lib
 versionTest.exe: versionTest.obj $(TOPDIR)\src\smerp.lib
 counterTest.exe: counterTest.obj $(TOPDIR)\src\smerp.lib
+resolvePathTest.exe: resolvePathTest.obj $(TOPDIR)\src\smerp.lib
 poolTest.exe: poolTest.obj $(TOPDIR)\src\smerp.lib
+logTest.exe: logTest.obj $(TOPDIR)\src\smerp.lib
+protocolArgumentParsing-gTest.exe: protocolArgumentParsing-gTest.obj
+pechoHandler-gTest.exe: pechoHandler-gTest.obj
 !ENDIF
 
 local_all:
@@ -71,10 +81,10 @@ local_test:
 	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
 !IFDEF WITH_GTEST
 	@-echo logTest >> test.bat
-	@-echo echo Testing version... >> test.bat
 	@-echo versionTest >> test.bat
-	@-echo echo Testing counter.. >> test.bat
 	@-echo counterTest >> test.bat
+	@-echo resolvePathTest >> test.bat
 	@-echo poolTest >> test.bat
+	@-echo protocolArgumentParsing-gTest >> test.bat
 !ENDIF
 	@-test.bat

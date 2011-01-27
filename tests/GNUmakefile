@@ -46,8 +46,7 @@ TEST_OBJS =
 #	$(TOPDIR)/examples/xmlselect/xmlselectHandler.o
 
 TEST_CPP_BINS = \
-	threadLeakTest$(EXE) \
-	logTest$(EXE)
+	threadLeakTest$(EXE)
 
 ifdef WITH_GTEST
 TEST_CPP_BINS += \
@@ -55,6 +54,7 @@ TEST_CPP_BINS += \
 	counterTest$(EXE) \
 	resolvePathTest$(EXE) \
 	poolTest$(EXE) \
+	logTest$(EXE) \
 	protocolArgumentParsing-gTest$(EXE)
 endif
 
