@@ -15,7 +15,9 @@ class LoggingFixture : public ::testing::Test
 		LoggingFixture( ) :
 			logBack( _SMERP::LogBackend::instance( ) ) 
 		{
-			logBack.setConsoleLevel( _SMERP::LogLevel::LOGLEVEL_DATA );
+			// in order not to spoil the output of gtest :-)
+			logBack.setConsoleLevel( _SMERP::LogLevel::LOGLEVEL_UNDEFINED );
+
 			logBack.setLogfileLevel( _SMERP::LogLevel::LOGLEVEL_DATA );
 			logBack.setLogfileName( "logTest.log" );
 #ifndef _WIN32
