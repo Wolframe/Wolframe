@@ -50,14 +50,16 @@ OPENSSL_DIR=/usr
 #############################################
 
 # system version
-GTEST_DIR=/usr
-GTEST_LIB_DIR=$(GTEST_DIR)/lib
-GTEST_INCLUDE_DIRS=$(GTEST_DIR)/include
+#GTEST_DIR=/usr
+#GTEST_LIB_DIR=$(GTEST_DIR)/lib
+#GTEST_INCLUDE_DIRS=$(GTEST_DIR)/include
+#GTEST_LIBS = -lgtest
 
 # self-compiled
 #GTEST_DIR=/home/abaumann/gtest-1.5.0
 #GTEST_INCLUDE_DIRS=$(GTEST_DIR)/include
 #GTEST_LIB_DIR=$(GTEST_DIR)/lib/.libs
+#GTEST_LIBS = -lgtest
 
 # Qt 4 (http://qt.nokia.com/products/)
 ######################################

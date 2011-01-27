@@ -75,16 +75,24 @@ endif
 	@echo "BOOST_LIBRARY_TAG: $(BOOST_LIBRARY_TAG)"
 	@echo
 	@echo "Optional Dependencies:"
-	@echo
 ifdef WITH_LUA
+	@echo
 	@echo "LUA_INCLUDE_DIRS: $(LUA_INCLUDE_DIRS)"
 	@echo "LUA_LIB_DIRS: $(LUA_LIB_DIRS)"
 	@echo "LUA_LIBS: $(LUA_LIBS)"
 endif
 ifdef WITH_QT
+	@echo
 	@echo "QT_DIR: $(QT_DIR)"
 	@echo "QT_INCLUDE_DIRS: $(QT_INCLUDE_DIRS)"
 	@echo "QT_LIB_DIRS: $(QT_LIB_DIRS)"
+endif
+ifdef WITH_GTEST
+	@echo
+	@echo "GTEST_DIR: $(GTEST_DIR)"
+	@echo "GTEST_INCLUDE_DIRS: $(GTEST_INCLUDE_DIRS)"
+	@echo "GTEST_LIB_DIR: $(GTEST_LIB_DIR)"
+	@echo "GTEST_LIBS: $(GTEST_LIBS)"
 endif
 
 .PHONY: init-po
