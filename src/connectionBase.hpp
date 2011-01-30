@@ -249,6 +249,7 @@ namespace _SMERP {
 			if ( !e )	{
 				connectionHandler_->timeoutOccured();
 				LOG_DEBUG << "Timeout on connection to " << identifier();
+
 				nextOperation();
 			}
 			else	{
