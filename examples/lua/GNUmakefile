@@ -47,6 +47,7 @@ smerplogger.so: smerplogger.sho++ $(TOPDIR)/src/logBackend.sho++ $(TOPDIR)/src/l
 local_all: smerplogger.so
 
 local_clean:
+	-rm smerplogger.sho++ smerplogger.so
 
 local_distclean:
 
