@@ -64,14 +64,13 @@ function next_operation( )
 	elseif state == "CLOSING" then
 		state = "TERMINATED"
 		return "CLOSE"
-	elseif state == "TERMINATING"  then
+	elseif state == "TERMINATED"  then
 		state = "TERMINATED"
 		return "TERMINATE"
-	elseif state == "TERMINATED" then
-		smerplogger.write( "ERROR", "LUA: got a nextOperation while in TERMINATED state" )
-		return "TERMINATE"
 	else
+		state = "TERMINATED"
 		smerplogger.write( "FATAL", "LUA: Illegal state " .. state .. "!!" )
+		return "TERMINATE"
 	end
 end
 
