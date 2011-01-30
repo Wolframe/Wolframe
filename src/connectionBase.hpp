@@ -130,25 +130,10 @@ namespace _SMERP {
 				break;
 
 			case NetworkOperation::CLOSE:	{
-					boost::system::error_code ignored_ec;
-					if ( netOp.data() == NULL && netOp.size() != 0 )	{
-						LOG_FATAL << "Attempt to WRITE a NULL data block in CLOSE connection to " << identifier();
-						abort();		// here should be a system exception
-					}
-					if ( netOp.size() == 0 && netOp.data() != NULL )	{
-						LOG_FATAL << "Attempt to WRITE a 0 bytes data block in CLOSE connection to " << identifier();
-						abort();		// here should be a system exception
-					}
-					if ( netOp.data() != NULL && netOp.size() != 0 )	{
-						LOG_TRACE << "Next operation: WRITE " << netOp.size() << " bytes to " << identifier() << " and CLOSE connection";
-						socket().write_some( boost::asio::buffer( netOp.data(), netOp.size() ), ignored_ec );
-					}
-					else	{
-						LOG_TRACE << "Next operation: CLOSE connection to " << identifier();
-					}
+					LOG_TRACE << "Next operation: CLOSE connection to " << identifier();
 					// Initiate graceful connection closure.
 					setTimeout( 0 );
-
+					boost::system::error_code ignored_ec;
 					socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
 					socket().lowest_layer().close();
 					unregister();
@@ -243,7 +228,7 @@ namespace _SMERP {
 		// handleWrite function end
 
 
-		/// Handle completion of a timer operation.
+		/// Handle the completion of a timer operation.
 		void handleTimeout( const boost::system::error_code& e )
 		{
 			if ( !e )	{
@@ -259,7 +244,7 @@ namespace _SMERP {
 		// handleTimeout function end
 
 
-		/// Set / reset timeout timer
+		/// Set / reset the timeout timer
 		void setTimeout( unsigned timeout )
 		{
 			if ( timeout == 0 )	{

@@ -33,7 +33,7 @@ namespace _SMERP {
 
 	private:
 		Operation	operation_;
-	protected:
+//	protected:
 		unsigned	timeout_;
 		const void*	data_;
 		std::size_t	size_;
@@ -45,6 +45,8 @@ namespace _SMERP {
 	public:
 		ReadOperation( unsigned to = 0 )
 			: NetworkOperation( READ, NULL, 0, to )	{}
+		ReadOperation( const void* d, std::size_t s, unsigned to = 0 )
+			: NetworkOperation( WRITE, d, s, to )	{}
 	};
 
 	class WriteOperation : public NetworkOperation
@@ -59,9 +61,6 @@ namespace _SMERP {
 	{
 	public:
 		CloseOperation() : NetworkOperation( CLOSE )	{}
-
-		CloseOperation( const void* d, std::size_t s, unsigned to = 0 )
-			: NetworkOperation( CLOSE, d, s, to )	{}
 	};
 
 	class TerminateOperation : public NetworkOperation
