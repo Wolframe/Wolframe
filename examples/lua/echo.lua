@@ -115,3 +115,6 @@ end
 
 -- the main, initialize globals here
 smerplogger.write( "ERROR", "LUA: main called." )
+
+smerplogger.write( "ERROR", "XXX: nil ", nil )
+smerplogger.write( "ERROR", "XXX: function ", smerplogger.write )
