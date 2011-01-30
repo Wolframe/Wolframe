@@ -12,6 +12,14 @@ extern "C" {
 #define MYLUA_API
 #endif
 
+#ifndef _WIN32
+#define __STDC_FORMAT_MACROS
+#include <cstdio>
+#include <inttypes.h>
+#else
+#define PRIxPTR "%p"
+#endif
+
 #include "logger.hpp"
 
 #include <sstream>
@@ -34,14 +42,38 @@ static int l_write( lua_State *l )
 	int n = lua_gettop( l ) - 1;
 	int i = 2;
 	for( ; n--; i++ ) {
-		if( lua_type( l, i ) == LUA_TNUMBER ) {
-			lua_Number v = lua_tonumber( l, i );
-			os << v;
-		} else if( lua_type( l, i ) == LUA_TSTRING ) {
-			const char *v = lua_tostring( l, i );
-			os << v;
-		} else {
-			os << "<unknown LUA type>";
+		int type = lua_type( l, i );
+
+		switch( type ) {
+			case LUA_TNIL:
+				os << "nil";
+				break;
+
+			case LUA_TSTRING: {
+				const char *v = lua_tostring( l, i );
+				os << v;
+				}
+				break;
+				
+			case LUA_TNUMBER: {
+				lua_Number v = lua_tonumber( l, i );
+				os << v;
+				}
+				break;
+
+			case LUA_TFUNCTION: {
+				lua_CFunction f = lua_tocfunction( l, i );
+				char buf[33];
+				snprintf( buf, 32, "function[%016" PRIxPTR "]", (uintptr_t)f );
+				os << buf;
+				}
+				break;
+
+			case LUA_TTABLE:
+				// TODO
+
+			default:
+				os << "<unknown>";
 		}
 	}
 

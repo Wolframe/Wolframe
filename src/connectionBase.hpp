@@ -141,7 +141,7 @@ namespace _SMERP {
 					}
 					if ( netOp.data() != NULL && netOp.size() != 0 )	{
 						LOG_TRACE << "Next operation: WRITE " << netOp.size() << " bytes to " << identifier() << " and CLOSE connection";
-						socket().boost::asio::write_some( boost::asio::buffer( netOp.data(), netOp.size() ), ec );
+						socket().write_some( boost::asio::buffer( netOp.data(), netOp.size() ), ignored_ec );
 					}
 					else	{
 						LOG_TRACE << "Next operation: CLOSE connection to " << identifier();
