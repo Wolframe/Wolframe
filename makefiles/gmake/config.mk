@@ -26,14 +26,14 @@
 # base dir where boost is installed
 
 # system version
-BOOST_DIR=/usr/local
-BOOST_LIB_DIR=$(BOOST_DIR)/lib
-BOOST_INCLUDE_DIRS=$(BOOST_DIR)/include
-BOOST_LIBRARY_TAG=
+#BOOST_DIR ?= /usr/local
+#BOOST_LIB_DIR ?= $(BOOST_DIR)/lib2
+#BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include2
+#BOOST_LIBRARY_TAG ?=
 
 # self-compiled
 #BOOST_DIR=/home/abaumann/boost_1_45_0
-#BOOST_INCLUDE_DIRS=$(BOOST_DIR)
+#BOOST_INCLUDE_DIR=$(BOOST_DIR)
 #BOOST_LIB_DIR=$(BOOST_DIR)/stage/lib
 #BOOST_LIBRARY_TAG=-mt
 
@@ -41,7 +41,7 @@ BOOST_LIBRARY_TAG=
 ##############################################################
 
 # system version
-#OPENSSL_DIR=/usr
+OPENSSL_DIR ?= /usr
 
 # self-compiled
 #OPENSSL_DIR=/home/user/openssl

@@ -11,7 +11,7 @@ INCLUDE_DIRS = \
 	-I$(TOPDIR)/src \
 	-I$(TOPDIR)/examples/pecho \
 	-I$(TOPDIR)/examples/xmlselect \
-	-I$(BOOST_INCLUDE_DIRS)
+	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR)

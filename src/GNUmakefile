@@ -11,7 +11,7 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include \
-	-I$(BOOST_INCLUDE_DIRS)
+	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
