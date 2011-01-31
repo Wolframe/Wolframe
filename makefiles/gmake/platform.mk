@@ -257,6 +257,16 @@ BOOST_LIBRARY_TAG ?= NOT SUPPLIED ON THIS PLATFORM
 endif
 endif
 
+# Fedora 14
+ifeq "$(LINUX_DIST)" "redhat"
+ifeq "$(LINUX_REV)" "14"
+BOOST_DIR ?= /usr
+BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
+BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
+BOOST_LIBRARY_TAG ?= -mt
+endif
+endif
+
 endif
 
 # OpenSSL
@@ -311,6 +321,16 @@ endif
 
 ifeq "$(LINUX_DIST)" "suse"
 ifeq "$(LINUX_REV)" "11"   
+GTEST_DIR ?= /usr
+GTEST_LIB_DIR ?= $(GTEST_DIR)/lib  
+GTEST_INCLUDE_DIR ?= $(GTEST_DIR)/include 
+GTEST_LIBS ?= -lgtest
+endif
+endif
+
+# Fedora 14
+ifeq "$(LINUX_DIST)" "redhat"
+ifeq "$(LINUX_REV)" "14"
 GTEST_DIR ?= /usr
 GTEST_LIB_DIR ?= $(GTEST_DIR)/lib  
 GTEST_INCLUDE_DIR ?= $(GTEST_DIR)/include 
@@ -422,6 +442,16 @@ LUA_DIR ?= /usr
 LUA_INCLUDE_DIR ?= $(LUA_DIR)/include
 LUA_LIB_DIR ?= $(LUA_DIR)/lib
 LUA_LIBS ?= -llua
+endif
+
+# Fedora 14
+ifeq "$(LINUX_DIST)" "redhat"
+ifeq "$(LINUX_REV)" "14"
+LUA_DIR ?= /usr
+LUA_INCLUDE_DIR ?= $(LUA_DIR)/include
+LUA_LIB_DIR ?= $(LUA_DIR)/lib
+LUA_LIBS ?= -llua
+endif
 endif
 
 endif
