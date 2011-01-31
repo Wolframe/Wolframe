@@ -8,15 +8,15 @@ INCLUDE_CPPFLAGS =
 
 INCLUDE_DIRS = \
 	-I. \
-	-I$(QT_INCLUDE_DIRS) \
-	-I$(QT_INCLUDE_DIRS)/QtCore \
-	-I$(QT_INCLUDE_DIRS)/QtNetwork \
-	-I$(QT_INCLUDE_DIRS)/QtGui \
-	-I$(QT_INCLUDE_DIRS)/QtUiTools
+	-I$(QT_INCLUDE_DIR) \
+	-I$(QT_INCLUDE_DIR)/QtCore \
+	-I$(QT_INCLUDE_DIR)/QtNetwork \
+	-I$(QT_INCLUDE_DIR)/QtGui \
+	-I$(QT_INCLUDE_DIR)/QtUiTools
 
 INCLUDE_LDFLAGS = \
 	-L$(QT_DIR)/lib \
-	-L$(QT_LIB_DIRS)
+	-L$(QT_LIB_DIR)
 
 INCLUDE_LIBS = \
 	-lQtCore -lQtGui -lQtUiTools -lQtNetwork -lQtXml

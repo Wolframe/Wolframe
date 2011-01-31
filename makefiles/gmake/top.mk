@@ -90,8 +90,8 @@ endif
 ifdef WITH_QT
 	@echo
 	@echo "QT_DIR: $(QT_DIR)"
-	@echo "QT_INCLUDE_DIRS: $(QT_INCLUDE_DIRS)"
-	@echo "QT_LIB_DIRS: $(QT_LIB_DIRS)"
+	@echo "QT_INCLUDE_DIR: $(QT_INCLUDE_DIR)"
+	@echo "QT_LIB_DIR: $(QT_LIB_DIR)"
 endif
 ifdef WITH_GTEST
 	@echo

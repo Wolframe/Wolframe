@@ -69,8 +69,8 @@
 #QT_DIR = /usr
 
 # usual layout, may differ
-#QT_INCLUDE_DIRS = $(QT_DIR)/include
-#QT_LIB_DIRS = $(QT_DIR)/lib
+#QT_INCLUDE_DIR = $(QT_DIR)/include
+#QT_LIB_DIR = $(QT_DIR)/lib
 
 # Lua 5.1
 #########

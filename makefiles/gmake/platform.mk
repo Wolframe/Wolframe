@@ -325,14 +325,14 @@ ifeq "$(PLATFORM)" "LINUX"
 
 ifeq "$(LINUX_DIST)" "arch"
 QT_DIR ?= /usr
-QT_INCLUDE_DIRS ?= /usr/include
-QT_LIB_DIRS ?= /usr/lib
+QT_INCLUDE_DIR ?= $(QT_DIR)/include
+QT_LIB_DIR ?= $(QT_DIR)/lib
 endif
 
 ifeq "$(LINUX_DIST)" "slackware"
 QT_DIR ?= /usr
-QT_INCLUDE_DIRS ?= /usr/include  
-QT_LIB_DIRS ?= /usr/lib
+QT_INCLUDE_DIR ?= $(QT_DIR)/include
+QT_LIB_DIR ?= $(QT_DIR)/lib
 endif
 
 ifeq "$(LINUX_DIST)" "redhat"
@@ -340,8 +340,8 @@ ifeq "$(LINUX_DIST)" "redhat"
 # Fedora 14 puts Qt in a subdir in /usr/lib
 ifeq "$(LINUX_REV)" "14"
 QT_DIR ?= /usr/lib/qt4
-QT_INCLUDE_DIRS ?= /usr/include
-QT_LIB_DIRS ?= /usr/lib
+QT_INCLUDE_DIR ?= /usr/include
+QT_LIB_DIR ?= /usr/lib
 endif
 
 endif
@@ -351,14 +351,14 @@ ifeq "$(LINUX_DIST)" "debian"
 
 ifeq "$(LINUX_REV)" "squeeze/sid"
 QT_DIR ?= /usr
-QT_INCLUDE_DIRS ?= /usr/include/qt4
-QT_LIB_DIRS ?= /usr/lib
+QT_INCLUDE_DIR ?= $(QT_DIR)/include/qt4
+QT_LIB_DIR ?= $(QT_DIR)/lib
 endif
 
 ifeq "$(LINUX_REV)" "5"
 QT_DIR ?= /usr
-QT_INCLUDE_DIRS ?= /usr/include/qt4
-QT_LIB_DIRS ?= /usr/lib
+QT_INCLUDE_DIR ?= $(QT_DIR)/include/qt4
+QT_LIB_DIR ?= $(QT_DIR)/lib
 endif
 
 endif
@@ -366,8 +366,8 @@ endif
 ifeq "$(LINUX_DIST)" "suse"
 ifeq "$(LINUX_REV)" "11"
 QT_DIR ?= /usr
-QT_INCLUDE_DIRS ?= /usr/include
-QT_LIB_DIRS ?= /usr/lib
+QT_INCLUDE_DIR ?= $(QT_DIR)/include
+QT_LIB_DIR ?= $(QT_DIR)/lib
 endif
 endif
 
