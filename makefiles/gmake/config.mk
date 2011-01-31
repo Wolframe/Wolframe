@@ -27,9 +27,9 @@
 
 # system version
 BOOST_DIR=/usr/local
-BOOST_LIB_DIRS=$(BOOST_DIR)/lib
+BOOST_LIB_DIR=$(BOOST_DIR)/lib
 BOOST_INCLUDE_DIRS=$(BOOST_DIR)/include
-BOOST_LIBRARY_TAG=-mt
+BOOST_LIBRARY_TAG=
 
 # self-compiled
 #BOOST_DIR=/home/abaumann/boost_1_45_0
