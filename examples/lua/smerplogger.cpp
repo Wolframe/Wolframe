@@ -17,6 +17,7 @@ extern "C" {
 #include <cstdio>
 #include <inttypes.h>
 #else
+#define snprintf _snprintf
 #define PRIxPTR "%p"
 #endif
 
