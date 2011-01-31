@@ -23,10 +23,11 @@ namespace _SMERP {
 			TERMINATE
 		};
 
-		NetworkOperation( Operation op, const void* d = NULL, std::size_t s = 0, unsigned to = 0 )
+		NetworkOperation( Operation op, void* d = NULL, std::size_t s = 0, unsigned to = 0 )
 					{ operation_ = op,  data_ = d; size_ = s; timeout_ = to; }
 		unsigned timeout()			{ return timeout_; }
-		const void* data()			{ return data_; }
+		const void* data()			{ return (const void*)data_; }
+		void* buffer()				{ return data_; }
 		std::size_t size()			{ return size_; }
 	public:
 		Operation operation()	{ return operation_; }
@@ -35,7 +36,7 @@ namespace _SMERP {
 		Operation	operation_;
 //	protected:
 		unsigned	timeout_;
-		const void*	data_;
+		void*		data_;
 		std::size_t	size_;
 	};
 
@@ -43,9 +44,7 @@ namespace _SMERP {
 	class ReadOperation : public NetworkOperation
 	{
 	public:
-		ReadOperation( unsigned to = 0 )
-			: NetworkOperation( READ, NULL, 0, to )	{}
-		ReadOperation( const void* d, std::size_t s, unsigned to = 0 )
+		ReadOperation( void* d, std::size_t s, unsigned to = 0 )
 			: NetworkOperation( WRITE, d, s, to )	{}
 	};
 
@@ -53,7 +52,7 @@ namespace _SMERP {
 	{
 	public:
 		WriteOperation( const void* d, std::size_t s, unsigned to = 0 )
-			: NetworkOperation( WRITE, d, s, to )	{}
+			: NetworkOperation( WRITE, const_cast<void*>( d ), s, to )	{}
 	};
 
 
@@ -91,9 +90,8 @@ namespace _SMERP {
 		};
 
 
-		/// Get the incoming data. The return value indicates how much of the
-		/// input has been consumed.
-		virtual void* networkInput( const void *begin, std::size_t bytesTransferred ) = 0;
+		/// Signal the incoming data. buffer is the buffer given to the read operation
+		virtual void networkInput( const void* buffer, std::size_t bytesTransferred ) = 0;
 
 		/// What should the network do next.
 		virtual const NetworkOperation nextOperation() = 0;

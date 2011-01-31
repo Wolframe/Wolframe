@@ -20,9 +20,6 @@
 namespace _SMERP {
 	namespace Network {
 
-	static const std::size_t	ReadBufferSize = 8192;
-
-
 	/// Represents a single connection from a client.
 	template< typename socketType >
 	class connectionBase : public boost::enable_shared_from_this< connectionBase< socketType > >,
@@ -38,8 +35,7 @@ namespace _SMERP {
 		{
 			assert( handler != NULL );
 			connectionHandler_ = handler;
-			bufStart_ = buffer_.data();
-			bufUsed_ = 0;
+			readBuffer_ = NULL;
 			LOG_TRACE << "New connection base created";
 		}
 
@@ -79,10 +75,8 @@ namespace _SMERP {
 		/// Strand to ensure the connection's handlers are not called concurrently.
 		boost::asio::io_service::strand	strand_;
 
-		/// Buffer for incoming data.
-		boost::array<char, ReadBufferSize>	buffer_;
-		char*					bufStart_;
-		std::size_t				bufUsed_;
+		/// Pointer to the read buffer
+		void*				readBuffer_;
 
 		/// The handler used to process the incoming request.
 		connectionHandler		*connectionHandler_;
@@ -98,10 +92,19 @@ namespace _SMERP {
 			switch ( netOp.operation() )	{
 
 			case NetworkOperation::READ:	{
-				LOG_TRACE << "Next operation: READ " << ReadBufferSize - bufUsed_ << " bytes from " << identifier();
+				LOG_TRACE << "Next operation: READ " << netOp.size() << " bytes from " << identifier();
+				if ( netOp.buffer() == NULL )	{
+					LOG_FATAL << "Attempt to READ from " << identifier() << " to a NULL data block";
+					abort();		// here should be a system exception
+				}
+				if ( netOp.size() == 0 )	{
+					LOG_FATAL << "Attempt to READ 0 bytes data block from " << identifier();
+					abort();		// here should be a system exception
+				}
 				if ( netOp.timeout() > 0 )
 					setTimeout( netOp.timeout());
-				socket().async_read_some( boost::asio::buffer( bufStart_, ReadBufferSize - bufUsed_ ),
+				readBuffer_ = netOp.buffer();
+				socket().async_read_some( boost::asio::buffer( readBuffer_, netOp.size() ),
 							  strand_.wrap( boost::bind( &connectionBase::handleRead,
 										     this->shared_from_this(),
 										     boost::asio::placeholders::error,
@@ -195,13 +198,7 @@ namespace _SMERP {
 			setTimeout( 0 );
 			if ( !e )	{
 				LOG_TRACE << "Read " << bytesTransferred << " bytes from " << identifier();
-
-				bufUsed_ += bytesTransferred;
-				char* bufEnd = (char*)connectionHandler_->networkInput( buffer_.data(), bufUsed_ );
-				bufUsed_ = bufUsed_ - ( bufEnd - buffer_.data());
-				assert( bufUsed_ <= ReadBufferSize );
-				memmove( buffer_.data(), bufEnd, bufUsed_ );
-				bufStart_ = buffer_.data() + bufUsed_;
+				connectionHandler_->networkInput( readBuffer_, bytesTransferred );
 			}
 			else	{
 				LOG_TRACE << "Read error: " << e.message();

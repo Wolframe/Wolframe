@@ -108,7 +108,7 @@ namespace _SMERP {
 
 	/// Parse incoming data. The return value indicates how much of the
 	/// input has been consumed.
-	void* echoConnection::networkInput( const void *begin, std::size_t bytesTransferred )
+	void echoConnection::networkInput( const void *begin, std::size_t bytesTransferred )
 	{
 		char *s = (char *)begin;
 		if ( !strncmp( "quit", s, 4 ))
