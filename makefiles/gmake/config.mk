@@ -50,12 +50,12 @@
 # system version
 #GTEST_DIR = /usr
 #GTEST_LIB_DIR = $(GTEST_DIR)/lib
-#GTEST_INCLUDE_DIRS = $(GTEST_DIR)/include
+#GTEST_INCLUDE_DIR = $(GTEST_DIR)/include
 #GTEST_LIBS = -lgtest
 
 # self-compiled
 #GTEST_DIR = /home/abaumann/gtest-1.5.0
-#GTEST_INCLUDE_DIRS = $(GTEST_DIR)/include
+#GTEST_INCLUDE_DIR = $(GTEST_DIR)/include
 #GTEST_LIB_DIR = $(GTEST_DIR)/lib/.libs
 #GTEST_LIBS = -lgtest
 
@@ -82,6 +82,6 @@
 #LUA_DIR = /usr
 
 # usual layout
-#LUA_INCLUDE_DIRS = $(LUA_DIR)/include
-#LUA_LIB_DIRS = $(LUA_DIR)/lib
+#LUA_INCLUDE_DIR = $(LUA_DIR)/include
+#LUA_LIB_DIR = $(LUA_DIR)/lib
 #LUA_LIBS = -llua

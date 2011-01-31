@@ -276,14 +276,14 @@ ifeq "$(PLATFORM)" "LINUX"
 ifeq "$(LINUX_DIST)" "arch"
 GTEST_DIR ?= /usr
 GTEST_LIB_DIR ?= $(GTEST_DIR)/lib  
-GTEST_INCLUDE_DIRS ?= $(GTEST_DIR)/include 
+GTEST_INCLUDE_DIR ?= $(GTEST_DIR)/include 
 GTEST_LIBS ?= -lgtest
 endif
 
 ifeq "$(LINUX_DIST)" "slackware"
 GTEST_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 GTEST_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-GTEST_INCLUDE_DIRS ?= NOT SUPPLIED ON THIS PLATFORM
+GTEST_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 GTEST_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
 endif
 
@@ -292,13 +292,13 @@ ifeq "$(LINUX_DIST)" "debian"
 ifeq "$(LINUX_REV)" "squeeze/sid"
 GTEST_DIR ?= /usr
 GTEST_LIB_DIR ?= $(GTEST_DIR)/lib  
-GTEST_INCLUDE_DIRS ?= $(GTEST_DIR)/include 
+GTEST_INCLUDE_DIR ?= $(GTEST_DIR)/include 
 GTEST_LIBS ?= -lgtest
 endif
 ifeq "$(LINUX_REV)" "5"
 GTEST_DIR ?= /usr
 GTEST_LIB_DIR ?= $(GTEST_DIR)/lib  
-GTEST_INCLUDE_DIRS ?= $(GTEST_DIR)/include 
+GTEST_INCLUDE_DIR ?= $(GTEST_DIR)/include 
 GTEST_LIBS ?= -lgtest
 endif
 endif
@@ -307,7 +307,7 @@ ifeq "$(LINUX_DIST)" "suse"
 ifeq "$(LINUX_REV)" "11"   
 GTEST_DIR ?= /usr
 GTEST_LIB_DIR ?= $(GTEST_DIR)/lib  
-GTEST_INCLUDE_DIRS ?= $(GTEST_DIR)/include 
+GTEST_INCLUDE_DIR ?= $(GTEST_DIR)/include 
 GTEST_LIBS ?= -lgtest
 endif
 endif
@@ -383,34 +383,38 @@ ifdef WITH_LUA
 ifeq "$(PLATFORM)" "LINUX"
 
 ifeq "$(LINUX_DIST)" "arch"
-LUA_INCLUDE_DIRS ?= /usr/include
-LUA_LIB_DIRS ?= /usr/lib
+LUA_DIR ?= /usr
+LUA_INCLUDE_DIR ?= $(LUA_DIR)/include
+LUA_LIB_DIR ?= $(LUA_DIR)/lib
 LUA_LIBS ?= -llua
 endif
 
 ifeq "$(LINUX_DIST)" "slackware"
-LUA_INCLUDE_DIRS ?= NOT SUPPLIED ON THIS PLATFORM
-LUA_LIB_DIRS ?= NOT SUPPLIED ON THIS PLATFORM
+LUA_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
+LUA_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 LUA_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
 endif
 
 # Ubuntu 10.04 TLS, 10.10, Debian 5.0
 ifeq "$(LINUX_DIST)" "debian"
 ifeq "$(LINUX_REV)" "squeeze/sid"
-LUA_INCLUDE_DIRS ?= /usr/include/lua5.1
-LUA_LIB_DIRS ?= /usr/lib
+LUA_DIR ?= /usr
+LUA_INCLUDE_DIR ?= $(LUA_DIR_/include/lua5.1
+LUA_LIB_DIR ?= $(LUA_DIR)/lib
 LUA_LIBS ?= -llua5.1
 endif
 ifeq "$(LINUX_REV)" "5"
-LUA_INCLUDE_DIRS ?= /usr/include/lua5.1
-LUA_LIB_DIRS ?= /usr/lib
+LUA_DIR ?= /usr
+LUA_INCLUDE_DIR ?= $(LUA_DIR)/include/lua5.1
+LUA_LIB_DIR ?= $(LUA_DIR)/lib
 LUA_LIBS ?= -llua5.1
 endif
 endif
 
 ifeq "$(LINUX_DIST)" "suse"
-LUA_INCLUDE_DIRS ?= /usr/include
-LUA_LIB_DIRS ?= /usr/lib
+LUA_DIR ?= /usr
+LUA_INCLUDE_DIR ?= $(LUA_DIR)/include
+LUA_LIB_DIR ?= $(LUA_DIR)/lib
 LUA_LIBS ?= -llua
 endif
 

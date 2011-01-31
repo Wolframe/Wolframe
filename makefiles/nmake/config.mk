@@ -26,24 +26,24 @@ PLATFORM_SDK_DIR = C:\Program Files\Microsoft SDKs\Windows\v7.0
 
 # version of the boost library
 
-BOOST_VERSION=1_45
+BOOST_VERSION = 1_45
 
 # base dir where boost is installed
 
-#BOOST_DIR=C:\Programme\boost\boost_$(BOOST_VERSION)
-#BOOST_DIR=C:\Program Files\boost\boost_$(BOOST_VERSION)
-#BOOST_DIR=D:\Programme\boost\boost_$(BOOST_VERSION)
-BOOST_DIR=C:\Cygwin\home\Andreas\boost_1_45_0
-#BOOST_DIR=C:\Cygwin\home\Administrator\boost_1_45_0
+#BOOST_DIR = C:\Programme\boost\boost_$(BOOST_VERSION)
+#BOOST_DIR = C:\Program Files\boost\boost_$(BOOST_VERSION)
+#BOOST_DIR = D:\Programme\boost\boost_$(BOOST_VERSION)
+BOOST_DIR = C:\Cygwin\home\Andreas\boost_1_45_0
+#BOOST_DIR = C:\Cygwin\home\Administrator\boost_1_45_0
 
 # visual studio version used for compiling
 
-#BOOST_VC_VER=vc80
-BOOST_VC_VER=vc90
-#BOOST_VC_VER=vc100
+#BOOST_VC_VER = vc80
+BOOST_VC_VER = vc90
+#BOOST_VC_VER = vc100
 
 # TODO: probe those
-BOOST_MT=-mt
+BOOST_MT = -mt
 
 # preinstalled binaries
 #BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib"
@@ -54,31 +54,31 @@ BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\stage\lib"
 # OpenSSL (http://www.slproweb.com/products/Win32OpenSSL.html)
 ##############################################################
 
-#OPENSSL_DIR=C:\Programme\OpenSSL-1.0.0a
-OPENSSL_DIR=C:\Programme\OpenSSL
-#OPENSSL_DIR=C:\Program Files\OpenSSL
-#OPENSSL_DIR=D:\Programme\OpenSSL
+#OPENSSL_DIR = C:\Programme\OpenSSL-1.0.0a
+OPENSSL_DIR = C:\Programme\OpenSSL
+#OPENSSL_DIR = C:\Program Files\OpenSSL
+#OPENSSL_DIR = D:\Programme\OpenSSL
 
 # gtest (http://code.google.com/p/googletest)
 #############################################
 
-#GTEST_DIR=C:\Cygwin\home\Administrator\gtest-1.5.0
-GTEST_DIR=C:\Cygwin\home\Andreas\gtest-1.5.0
+#GTEST_DIR = C:\Cygwin\home\Administrator\gtest-1.5.0
+GTEST_DIR = C:\Cygwin\home\Andreas\gtest-1.5.0
 
-GTEST_INCLUDE_DIRS=$(GTEST_DIR)\include
-GTEST_LIB_DIR=$(GTEST_DIR)\src
+GTEST_INCLUDE_DIR = $(GTEST_DIR)\include
+GTEST_LIB_DIR = $(GTEST_DIR)\src
 
 # Qt 4 (http://qt.nokia.com/products/)
 # take the VC2008 version SDK Opensource, not the MinGW one
 ############################################################
 
-QT_DIR=C:\Qt\4.7.1
-#QT_DIR=/home/user/qt
+QT_DIR = C:\Qt\4.7.1
+#QT_DIR = /home/user/qt
 
 # Lua 5.1
 #########
 
-LUA_VERSION=5.1
+LUA_VERSION = 5.1
 
 # self-compiled
 LUA_DIR = C:\Cygwin\home\Andreas\lua-5.1.4

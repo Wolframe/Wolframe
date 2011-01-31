@@ -83,8 +83,8 @@ ifdef WITH_SSL
 endif
 ifdef WITH_LUA
 	@echo
-	@echo "LUA_INCLUDE_DIRS: $(LUA_INCLUDE_DIRS)"
-	@echo "LUA_LIB_DIRS: $(LUA_LIB_DIRS)"
+	@echo "LUA_INCLUDE_DIR: $(LUA_INCLUDE_DIR)"
+	@echo "LUA_LIB_DIR: $(LUA_LIB_DIR)"
 	@echo "LUA_LIBS: $(LUA_LIBS)"
 endif
 ifdef WITH_QT
@@ -96,7 +96,7 @@ endif
 ifdef WITH_GTEST
 	@echo
 	@echo "GTEST_DIR: $(GTEST_DIR)"
-	@echo "GTEST_INCLUDE_DIRS: $(GTEST_INCLUDE_DIRS)"
+	@echo "GTEST_INCLUDE_DIR: $(GTEST_INCLUDE_DIR)"
 	@echo "GTEST_LIB_DIR: $(GTEST_LIB_DIR)"
 	@echo "GTEST_LIBS: $(GTEST_LIBS)"
 endif

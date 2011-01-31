@@ -9,11 +9,11 @@ INCLUDE_CPPFLAGS =
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include \
 	-I$(BOOST_INCLUDE_DIR) \
-	-I$(LUA_INCLUDE_DIRS)
+	-I$(LUA_INCLUDE_DIR)
 
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR) \
-	-L$(LUA_LIB_DIRS)
+	-L$(LUA_LIB_DIR)
 
 INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
