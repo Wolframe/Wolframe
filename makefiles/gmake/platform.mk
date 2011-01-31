@@ -232,9 +232,15 @@ endif
 # Ubuntu 10.04 TLS, 10.10, Debian 5.0
 ifeq "$(LINUX_DIST)" "debian"
 ifeq "$(LINUX_REV)" "squeeze/sid"
-BOOST_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM    
+ifdef BOOST_DIR
+BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
+BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
+endif
+ifndef BOOST_DIR
+BOOST_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 BOOST_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 BOOST_LIBRARY_TAG ?= NOT SUPPLIED ON THIS PLATFORM
+endif
 endif
 ifeq "$(LINUX_REV)" "5"
 BOOST_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM    
@@ -399,7 +405,7 @@ endif
 ifeq "$(LINUX_DIST)" "debian"
 ifeq "$(LINUX_REV)" "squeeze/sid"
 LUA_DIR ?= /usr
-LUA_INCLUDE_DIR ?= $(LUA_DIR_/include/lua5.1
+LUA_INCLUDE_DIR ?= $(LUA_DIR)/include/lua5.1
 LUA_LIB_DIR ?= $(LUA_DIR)/lib
 LUA_LIBS ?= -llua5.1
 endif
