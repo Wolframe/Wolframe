@@ -24,9 +24,9 @@
 ###########################################
 
 # system version
-#BOOST_DIR = /usr/local
-#BOOST_LIB_DIR = $(BOOST_DIR)/lib2
-#BOOST_INCLUDE_DIR = $(BOOST_DIR)/include2
+BOOST_DIR = /usr/local
+BOOST_LIB_DIR = $(BOOST_DIR)/lib
+BOOST_INCLUDE_DIR = $(BOOST_DIR)/include
 #BOOST_LIBRARY_TAG =
 
 # self-compiled
@@ -48,9 +48,9 @@
 #############################################
 
 # system version
-#GTEST_DIR = /usr
-#GTEST_LIB_DIR = $(GTEST_DIR)/lib
-#GTEST_INCLUDE_DIR = $(GTEST_DIR)/include
+GTEST_DIR = /usr
+GTEST_LIB_DIR = $(GTEST_DIR)/lib
+GTEST_INCLUDE_DIR = $(GTEST_DIR)/include
 #GTEST_LIBS = -lgtest
 
 # self-compiled

@@ -44,11 +44,10 @@ namespace _SMERP {
 	const Network::NetworkOperation echoConnection::nextOperation()
 	{
 		switch( state_ )	{
-		case NEW:	{
+		case NEW:
 			state_ = HELLO;
 			const char *msg = "Welcome to SMERP.\n";
 			return Network::NetworkOperation( Network::WriteOperation( msg, strlen( msg )));
-		}
 
 		case HELLO:
 			if ( buffer_.empty() )	{
@@ -76,23 +75,20 @@ namespace _SMERP {
 			state_ = READING;
 			return Network::NetworkOperation( Network::ReadOperation( 30 ));
 
-		case FINISHING:	{
+		case FINISHING:
 			state_ = CLOSING;
 			const char *msg = "Thanks for using SMERP.\n";
 			return Network::NetworkOperation( Network::WriteOperation( msg, strlen( msg )));
-		}
 
-		case TIMEOUT:	{
+		case TIMEOUT:
 			state_ = CLOSING;
 			const char *msg = "Timeout. :P\n";
 			return Network::NetworkOperation( Network::WriteOperation( msg, strlen( msg )));
-		}
 
-		case SIGNALLED:	{
+		case SIGNALLED:
 			state_ = CLOSING;
 			const char *msg = "Server is shutting down. :P\n";
 			return Network::NetworkOperation( Network::WriteOperation( msg, strlen( msg )));
-		}
 
 		case CLOSING:
 			state_ = TERMINATED;
@@ -108,23 +104,24 @@ namespace _SMERP {
 
 	/// Parse incoming data. The return value indicates how much of the
 	/// input has been consumed.
-	void echoConnection::networkInput( const void *begin, std::size_t bytesTransferred )
+	void echoConnection::networkInput( const void*, std::size_t bytesTransferred )
 	{
-		char *s = (char *)begin;
-		if ( !strncmp( "quit", s, 4 ))
-			state_ = FINISHING;
-		else	{
-			for ( std::size_t i = 0; i < bytesTransferred; i++ )	{
-				if ( *s != '\n' )
-					buffer_ += *s;
-				else	{
-					buffer_ += *s++;
-					return( s );
-				}
-				s++;
-			}
-		}
-		return( s );
+		bufSize_ = bytesTransferred;
+//		char *s = (char *)begin;
+//		if ( !strncmp( "quit", s, 4 ))
+//			state_ = FINISHING;
+//		else	{
+//			for ( std::size_t i = 0; i < bytesTransferred; i++ )	{
+//				if ( *s != '\n' )
+//					buffer_ += *s;
+//				else	{
+//					buffer_ += *s++;
+//					return( s );
+//				}
+//				s++;
+//			}
+//		}
+//		return( s );
 	}
 
 	void echoConnection::timeoutOccured()

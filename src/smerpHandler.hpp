@@ -43,8 +43,12 @@ namespace _SMERP {
 			TERMINATED
 		};
 
+		static const std::size_t ReadBufSize = 8192;
 		State		state_;
-		std::string	buffer_;
+		char		readBuf_[ ReadBufSize ];
+		char*		bufStart_;
+		std::size_t	bufSize_;
+		std::string	outMsg_;
 	};
 
 	/// The server handler container
