@@ -18,7 +18,6 @@
 # author: Andreas Baumann, abaumann at yahoo dot com
 
 -include $(HOME)/config.mk
--include $(TOPDIR)/makefiles/gmake/config.mk
 -include $(TOPDIR)/makefiles/gmake/platform.mk.vars
 
 PLATFORM ?=		$(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_env --platform $(CC) "$(CURDIR)" $(TOPDIR))
