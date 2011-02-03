@@ -14,6 +14,9 @@ namespace _SMERP {
 	{
 		LOG_TRACE << "Created connection handler for " << local.toString();
 		state_ = NEW;
+		dataStart_ = NULL;
+		dataSize_ = 0;
+		idleTimeout_ = 30;
 	}
 
 
@@ -21,6 +24,9 @@ namespace _SMERP {
 	{
 		LOG_TRACE << "Created connection handler (SSL) for " << local.toString();
 		state_ = NEW;
+		dataStart_ = NULL;
+		dataSize_ = 0;
+		idleTimeout_ = 30;
 	}
 
 	echoConnection::~echoConnection()
@@ -44,61 +50,74 @@ namespace _SMERP {
 	const Network::NetworkOperation echoConnection::nextOperation()
 	{
 		switch( state_ )	{
-		case NEW:
-			state_ = HELLO;
-			const char *msg = "Welcome to SMERP.\n";
-			return Network::NetworkOperation( Network::WriteOperation( msg, strlen( msg )));
-
-		case HELLO:
-			if ( buffer_.empty() )	{
-				state_ = READING;
-				return Network::NetworkOperation(  Network::ReadOperation( 30 ));
-			}
-			else	{
-				state_ = ANSWERING;
-				const char *msg = "BUFFER NOT EMPTY!\n";
-				return Network::NetworkOperation( Network::WriteOperation( msg, strlen( msg )));
-			}
-
-		case READING:
-			state_ = ANSWERING;
-			if ( ! buffer_.empty() )
-				return Network::NetworkOperation( Network::WriteOperation( buffer_.c_str(),
-											   buffer_.length() ));
-			else	{
-				const char *msg = "EMPTY BUFFER !\n";
-				return Network::NetworkOperation( Network::WriteOperation( msg, strlen( msg )));
-			}
-
-		case ANSWERING:
-			buffer_.clear();
-			state_ = READING;
-			return Network::NetworkOperation( Network::ReadOperation( 30 ));
-
-		case FINISHING:
-			state_ = CLOSING;
-			const char *msg = "Thanks for using SMERP.\n";
-			return Network::NetworkOperation( Network::WriteOperation( msg, strlen( msg )));
-
-		case TIMEOUT:
-			state_ = CLOSING;
-			const char *msg = "Timeout. :P\n";
-			return Network::NetworkOperation( Network::WriteOperation( msg, strlen( msg )));
-
-		case SIGNALLED:
-			state_ = CLOSING;
-			const char *msg = "Server is shutting down. :P\n";
-			return Network::NetworkOperation( Network::WriteOperation( msg, strlen( msg )));
-
-		case CLOSING:
-			state_ = TERMINATED;
-			return Network::NetworkOperation( Network::CloseOperation() );
-
-		case TERMINATED:
-			state_ = TERMINATED;
-			return Network::NetworkOperation( Network::TerminateOperation() );
+		case NEW:	{
+			state_ = HELLO_SENT;
+			return Network::NetworkOperation( Network::WriteOperation( "Welcome to SMERP.\n" ));
 		}
-		return Network::NetworkOperation( Network::TerminateOperation() );
+
+		case HELLO_SENT:	{
+			state_ = READ_INPUT;
+			return Network::NetworkOperation( Network::ReadOperation( readBuf_, ReadBufSize, idleTimeout_ ));
+		}
+
+		case READ_INPUT:
+			dataStart_ = readBuf_;
+			// Yes, it continues with OUTPUT_MSG, sneaky, sneaky, sneaky :P
+
+		case OUTPUT_MSG:
+			if ( !strncmp( "quit", dataStart_, 4 ))	{
+				state_ = TERMINATE;
+				return Network::NetworkOperation( Network::WriteOperation( "Thanks for using SMERP.\n" ));
+			}
+			else	{
+				char *s = dataStart_;
+				for ( std::size_t i = 0; i < dataSize_; i++ )	{
+					if ( *s == '\n' )	{
+						s++;
+						outMsg_ = std::string( dataStart_, s - dataStart_ );
+						dataSize_ -= s - dataStart_;
+						dataStart_ = s;
+						state_ = OUTPUT_MSG;
+						return Network::NetworkOperation( Network::WriteOperation( outMsg_ ));
+					}
+					s++;
+				}
+				// If we got here, no \n was found, we need to read more
+				// or close the connection if the buffer is full
+				if ( dataSize_ >= ReadBufSize )	{
+					state_ = TERMINATE;
+					return Network::NetworkOperation( Network::WriteOperation( "Line too long. Bye.\n" ));
+				}
+				else {
+					memmove( readBuf_, dataStart_, dataSize_ );
+					state_ = READ_INPUT;
+					return Network::NetworkOperation( Network::ReadOperation( readBuf_ + dataSize_,
+												  ReadBufSize - dataSize_,
+												  idleTimeout_ ));
+				}
+			}
+
+		case TIMEOUT:	{
+			state_ = TERMINATE;
+			return Network::NetworkOperation( Network::WriteOperation( "Timeout. :P\n" ));
+		}
+
+		case SIGNALLED:	{
+			state_ = TERMINATE;
+			return Network::NetworkOperation( Network::WriteOperation( "Server is shutting down. :P\n" ));
+		}
+
+		case TERMINATE:	{
+			state_ = FINISHED;
+			return Network::NetworkOperation( Network::CloseOperation() );
+		}
+
+		case FINISHED:
+			LOG_DEBUG << "Processor in FINISHED state";
+			break;
+
+		} /* switch( state_ ) */
+		return Network::NetworkOperation( Network::CloseOperation() );
 	}
 
 
@@ -106,22 +125,8 @@ namespace _SMERP {
 	/// input has been consumed.
 	void echoConnection::networkInput( const void*, std::size_t bytesTransferred )
 	{
-		bufSize_ = bytesTransferred;
-//		char *s = (char *)begin;
-//		if ( !strncmp( "quit", s, 4 ))
-//			state_ = FINISHING;
-//		else	{
-//			for ( std::size_t i = 0; i < bytesTransferred; i++ )	{
-//				if ( *s != '\n' )
-//					buffer_ += *s;
-//				else	{
-//					buffer_ += *s++;
-//					return( s );
-//				}
-//				s++;
-//			}
-//		}
-//		return( s );
+		LOG_DATA << "network Input: Read " << bytesTransferred << " bytes";
+		dataSize_ += bytesTransferred;
 	}
 
 	void echoConnection::timeoutOccured()
@@ -155,7 +160,7 @@ namespace _SMERP {
 			LOG_TRACE << "Processor received an UNKNOWN error from the framework";
 			break;
 		}
-		state_ = CLOSING;
+		state_ = TERMINATE;
 	}
 
 

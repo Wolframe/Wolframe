@@ -136,19 +136,8 @@ namespace _SMERP {
 					LOG_TRACE << "Next operation: CLOSE connection to " << identifier();
 					// Initiate graceful connection closure.
 					setTimeout( 0 );
-					boost::system::error_code ignored_ec;
-					socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
-					socket().lowest_layer().close();
-					unregister();
-				}
-				break;
-
-			case NetworkOperation::TERMINATE:	{
-					LOG_TRACE << "Next operation: TERMINATE on connection to " << identifier();
-					// Initiate graceful connection closure.
-					setTimeout( 0 );
-					boost::system::error_code ignored_ec;
 					if ( socket().lowest_layer().is_open() )	{
+						boost::system::error_code ignored_ec;
 						socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
 						socket().lowest_layer().close();
 					}

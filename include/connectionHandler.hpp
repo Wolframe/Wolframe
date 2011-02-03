@@ -6,6 +6,7 @@
 #define _CONNECTION_HANDLER_HPP_INCLUDED
 
 #include <cstddef>
+#include <string>
 
 #include "connectionEndpoint.hpp"
 
@@ -19,8 +20,7 @@ namespace _SMERP {
 		enum Operation	{
 			READ,
 			WRITE,
-			CLOSE,
-			TERMINATE
+			CLOSE
 		};
 
 		NetworkOperation( Operation op, void* d = NULL, std::size_t s = 0, unsigned to = 0 )
@@ -45,7 +45,7 @@ namespace _SMERP {
 	{
 	public:
 		ReadOperation( void* d, std::size_t s, unsigned to = 0 )
-			: NetworkOperation( WRITE, d, s, to )	{}
+			: NetworkOperation( READ, d, s, to )	{}
 	};
 
 	class WriteOperation : public NetworkOperation
@@ -53,19 +53,16 @@ namespace _SMERP {
 	public:
 		WriteOperation( const void* d, std::size_t s, unsigned to = 0 )
 			: NetworkOperation( WRITE, const_cast<void*>( d ), s, to )	{}
+		/// This is just some syntactic sugar
+		WriteOperation( const std::string& s, unsigned to = 0 )
+			: NetworkOperation( WRITE, const_cast<char*>( s.c_str() ), s.length(), to )
+											{}
 	};
-
 
 	class CloseOperation : public NetworkOperation
 	{
 	public:
 		CloseOperation() : NetworkOperation( CLOSE )	{}
-	};
-
-	class TerminateOperation : public NetworkOperation
-	{
-	public:
-		TerminateOperation() : NetworkOperation( TERMINATE )	{}
 	};
 
 
