@@ -25,7 +25,7 @@ namespace _SMERP {
 
 		/// Parse incoming data. The return value indicates how much of the
 		/// input has been consumed.
-		void* networkInput( const void *begin, std::size_t bytesTransferred );
+		void networkInput( const void *begin, std::size_t bytesTransferred );
 
 		void timeoutOccured();
 		void signalOccured();
@@ -38,6 +38,8 @@ namespace _SMERP {
 		lua_State *l;
 		int counter;
 		int maxMemUsed;
+		static const std::size_t buf_size = 8192;
+		char buf[buf_size];
 
 		void createVM( );
 		void destroyVM( );
@@ -46,7 +48,7 @@ namespace _SMERP {
 
 	/// The server handler container
 	class ServerHandler::ServerHandlerImpl
-	{		
+	{
 	public:
 		Network::connectionHandler* newConnection( const Network::LocalTCPendpoint& local );
 		Network::connectionHandler* newSSLconnection( const Network::LocalSSLendpoint& local );

@@ -186,9 +186,9 @@ namespace _SMERP {
 			lua_pop( l, 2 );
 			return Network::NetworkOperation( Network::WriteOperation( msg, strlen( msg ) ) );
 		} else if( !strcmp( op, "READ" ) ) {
-			int size = lua_tointeger( l, -1 );
+			int idle_timeout = lua_tointeger( l, -1 );
 			lua_pop( l, 2 );
-			return Network::NetworkOperation( Network::ReadOperation( size ) );
+			return Network::NetworkOperation( Network::ReadOperation( buf, buf_size, idle_timeout ));
 		} else if( !strcmp( op, "CLOSE" ) ) {
 			lua_pop( l, 2 );
 			return Network::NetworkOperation( Network::CloseOperation( ) );
@@ -205,7 +205,7 @@ namespace _SMERP {
 	
 	/// Parse incoming data. The return value indicates how much of the
 	/// input has been consumed.
-	void* echoConnection::networkInput( const void *begin, std::size_t bytesTransferred )
+	void echoConnection::networkInput( const void *begin, std::size_t bytesTransferred )
 	{
 		counter++;
 		if( counter % 1000 == 0 ) {
