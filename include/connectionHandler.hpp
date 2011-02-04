@@ -107,24 +107,6 @@ namespace _SMERP {
 		virtual void setPeer( const RemoteSSLendpoint& remote ) = 0;
 	};
 
-
-	/// The server
-	class ServerHandler
-	{
-	protected:
-		ServerHandler()			{}
-		virtual ~ServerHandler()	{}
-
-	private:
-		ServerHandler( const ServerHandler& );
-		ServerHandler& operator = ( const ServerHandler& );
-
-	public:
-		/// Create a new connection handler and return a pointer to it
-		virtual connectionHandler* newConnection( const LocalTCPendpoint& local ) = 0;
-		virtual connectionHandler* newSSLconnection( const LocalSSLendpoint& local ) = 0;
-	};
-
 } // namespace Network
 
 	/// The server
@@ -138,6 +120,9 @@ namespace _SMERP {
 		Network::connectionHandler* newConnection( const Network::LocalTCPendpoint& local );
 		Network::connectionHandler* newSSLconnection( const Network::LocalSSLendpoint& local );
 	private:
+		ServerHandler( const ServerHandler& );
+		ServerHandler& operator = ( const ServerHandler& );
+
 		class ServerHandlerImpl;
 		ServerHandlerImpl *impl_;
 	};

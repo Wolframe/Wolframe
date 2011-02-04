@@ -21,7 +21,7 @@
 namespace _SMERP {
 
 	/// server configuration
-	struct ServerConfig : public _SMERP::ConfigurationBase	{
+	struct ServerConfiguration : public _SMERP::ConfigurationBase	{
 	public:
 #if !defined( _WIN32 )
 		// daemon configuration

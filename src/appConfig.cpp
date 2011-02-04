@@ -99,6 +99,37 @@ namespace _SMERP {
 #endif	// defined( _WIN32 )
 	}
 
+	void ServerConfiguration::print( std::ostream& os ) const
+	{
+
+	}
+
+	void LoggerConfiguration::print( std::ostream& os ) const
+	{
+		os << "Logging" << std::endl;
+		if ( logToStderr )
+			os << "   Log to stderr, level " << stderrLogLevel << std::endl;
+		else
+			os << "   Log to stderr: DISABLED" << std::endl;
+		if ( logToFile )
+			os << "   Log to file: " << logFile << ", level " << logFileLogLevel << std::endl;
+		else
+			os << "   Log to file: DISABLED" << std::endl;
+
+#if !defined(_WIN32)
+		if ( logToSyslog )
+			os << "   Log to syslog: facility " << syslogFacility << ", level " << syslogLogLevel << std::endl;
+		else
+			os << "   Log to syslog: DISABLED" << std::endl;
+#endif	// !defined( _WIN32 )
+
+#if defined(_WIN32)
+		if ( logToEventlog )
+			os << "   Log to eventlog: name " << eventlogLogName << ", source " << eventlogSource << ", level " << eventlogLogLevel;
+		else
+			os << "   Log to eventlog: DISABLED" << std::endl;
+#endif	// defined( _WIN32 )
+	}
 
 	void ApplicationConfiguration::print( std::ostream& os ) const
 	{
