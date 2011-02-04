@@ -40,6 +40,8 @@ namespace _SMERP {
 		int maxMemUsed;
 		static const std::size_t buf_size = 8192;
 		char buf[buf_size];
+		char *data_start;
+		std::size_t data_size;
 
 		void createVM( );
 		void destroyVM( );

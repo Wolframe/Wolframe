@@ -106,7 +106,8 @@ namespace _SMERP {
 		LOG_INFO << "LUA VM memory in use: " << kbytes << " kBytes (max. " << maxMemUsed << " kBytes)";
 	}
 
-	echoConnection::echoConnection( const Network::LocalTCPendpoint& local ) : counter( 0 ), maxMemUsed( 0 )
+	echoConnection::echoConnection( const Network::LocalTCPendpoint& local )
+		: counter( 0 ), maxMemUsed( 0 ), data_start( NULL ), data_size( 0 )
 	{
 		LOG_TRACE << "Created connection handler for " << local.toString();
 		createVM( );
@@ -114,7 +115,8 @@ namespace _SMERP {
 	}
 
 
-	echoConnection::echoConnection( const Network::LocalSSLendpoint& local ) : counter( 0 ), maxMemUsed( 0 )
+	echoConnection::echoConnection( const Network::LocalSSLendpoint& local )
+		: counter( 0 ), maxMemUsed( 0 ), data_start( NULL ), data_size( 0 )
 	{
 		LOG_TRACE << "Created connection handler (SSL) for " << local.toString();
 		createVM( );
@@ -192,12 +194,9 @@ namespace _SMERP {
 		} else if( !strcmp( op, "CLOSE" ) ) {
 			lua_pop( l, 2 );
 			return Network::NetworkOperation( Network::CloseOperation( ) );
-		} else if( !strcmp( op, "TERMINATE" ) ) {
-			lua_pop( l, 2 );
-			return Network::NetworkOperation( Network::TerminateOperation( ) );
 		} else {
 			lua_pop( l, 2 );
-			LOG_FATAL << "Lua code returns '" << op << "', expecting one of 'READ', 'WRITE', 'TERMINATE'!";
+			LOG_FATAL << "Lua code returns '" << op << "', expecting one of 'READ', 'WRITE', 'CLOSE'!";
 			throw new std::runtime_error( "Error in LUA processor" );
 		}
 		printMemStats( );
@@ -207,23 +206,24 @@ namespace _SMERP {
 	/// input has been consumed.
 	void echoConnection::networkInput( const void *begin, std::size_t bytesTransferred )
 	{
+		LOG_DATA << "network Input: Read " << bytesTransferred << " bytes";
+		data_size += bytesTransferred;
+		
 		counter++;
 		if( counter % 1000 == 0 ) {
 			//(void)lua_gc( l, LUA_GCCOLLECT, 0 );
 			printMemStats( );
 		}
+		
 		lua_pushstring( l, "network_input" );
 		lua_gettable( l, LUA_GLOBALSINDEX );
 		lua_pushlstring( l, (const char *)begin, bytesTransferred );
-		int res = lua_pcall( l, 1, 1, 0 );
+		int res = lua_pcall( l, 1, 0, 0 );
 		if( res != 0 ) {
 			LOG_FATAL << "Unable to call 'network_input' function: " << lua_tostring( l, -1 );
 			lua_pop( l, 1 );
 			throw new std::runtime_error( "Error in LUA processor" );
 		}
-		int bytesProcessed = lua_tointeger( l, -1 );
-		char *end = (char *)begin + bytesProcessed;
-		return (void *)end;
 	}
 
 	void echoConnection::timeoutOccured()
