@@ -8,7 +8,6 @@ ABa:
 
 - makefiles
   - merge po stuff from WolfBones with the funny script in po :-)
-  - clean up BOOST_*, GTEST_*, OPENSSL_DIR, fix documentation in makefiles
 - logger
   - add a prefix for logging in subparts of the system (e.g. network, luaprocessor),
     map it to ident for syslog, source for eventlog
@@ -16,9 +15,7 @@ ABa:
   - username, password for service credentials
   - clean up native Win32 string mess in service code
 - lua processor:
-  - smerplogger.dll/.so: linking is currently delicate, to say the least!
-    also we have a singleton problem with the logger, it seems..
-  - test different C++/lua bindings and build test modules for examples/lua
+  - better adaption to smerpLogger
 - 64-bit on Windows, issues with Qt, boost at least
 - Debian 5.0: Qt client can't load designer library and run correctly, don'y know why?
 
