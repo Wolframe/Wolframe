@@ -1,25 +1,22 @@
--- includes
-require "smerplogger"
-
 -- global variables
 state = "INIT"
 buffer = ""
 
 -- called when a new LUA server is started
 function init( )
-	smerplogger.write( "ERROR", "LUA: init called." )
+	log( "TRACE", "LUA: init called." )
 	state = "INIT"
 	buffer = ""
 end
 
 -- called when the LUA server is stopped
 function destroy( )
-	smerplogger.write( "ERROR", "LUA: destroy called." )
+	log( "TRACE", "LUA: destroy called." )
 end
 
 -- called when a client connection gets established
 function new_connection( remote_host, remote_port, common_name )
-	smerplogger.write( "ERROR",  "LUA: new_connection called from " .. remote_host .. " (port: " .. remote_port .. ")" )
+	log( "TRACE",  "LUA: new_connection called from " .. remote_host .. " (port: " .. remote_port .. ")" )
 	if( common_name ) then
 		--io.write( "LUA: encrypted connection, CN is " .. common_name .. "\n" )
 	end
@@ -28,7 +25,7 @@ end
 
 -- handle a request and produce a reply
 function next_operation( )
-	--smerplogger.write( "ERROR", "LUA next operation" )
+	--log( "TRACE", "LUA next operation" )
 	
 	if state == "NEW" then
 		state = "HELLO"
@@ -69,32 +66,32 @@ function next_operation( )
 		return "TERMINATE"
 	else
 		state = "TERMINATED"
-		smerplogger.write( "FATAL", "LUA: Illegal state " .. state .. "!!" )
+		log( "FATAL", "LUA: Illegal state " .. state .. "!!" )
 		return "TERMINATE"
 	end
 end
 
 -- a timeout occured
 function timeout_occured( )
-	smerplogger.write( "ERROR", "LUA: got timeout" )
+	log( "TRACE", "LUA: got timeout" )
 	state = "TIMEOUT"
 end
 
 -- a signal (Ctrl-C) occured
 function signal_occured( )
-	smerplogger.write( "ERROR", "LUA: got signalled" )
+	log( "TRACE", "LUA: got signalled" )
 	state = "SIGNALLED"
 end
 
 -- an error occured
 function error_occured( error )
-	smerplogger.write( "ERROR", "LUA: got error ", error )
+	log( "TRACE", "LUA: got error ", error )
 	state = "CLOSING"
 end
 
 -- called when receiving new data from the network, we decide how much we want to consume
 function network_input( data )
-	smerplogger.write( "ERROR", "LUA: Got ", string.len( data ), " bytes of data" )
+	log( "DATA", "LUA: Got ", string.len( data ), " bytes of data" )
 
 	buffer = buffer .. data
 	pos = string.find( buffer, "\n" )
@@ -114,4 +111,4 @@ function network_input( data )
 end
 
 -- the main, initialize globals here
-smerplogger.write( "ERROR", "LUA: main called." )
+log( "TRACE", "LUA: main called." )

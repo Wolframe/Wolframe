@@ -16,7 +16,72 @@ extern "C" {
 	#include "lauxlib.h"
 }
 
+#ifndef _WIN32
+#define __STDC_FORMAT_MACROS
+#include <cstdio>
+#include <inttypes.h>
+#else
+#define snprintf _snprintf
+#define PRIxPTR "%p"
+#endif
+
 namespace _SMERP {
+
+	static int lua_log( lua_State *_l )
+	{
+		/* first parameter maps to a log level, rest gets printed depending on
+		 * whether it's a string or a number
+		 */
+		const char *logLevel = luaL_checkstring( _l, 1 );
+
+		std::ostringstream os;
+		int n = lua_gettop( _l ) - 1;
+		int i = 2;
+		for( ; n--; i++ ) {
+			int type = lua_type( _l, i );
+	
+			switch( type ) {
+				case LUA_TNIL:
+					os << "nil";
+					break;
+
+				case LUA_TSTRING: {
+					const char *v = lua_tostring( _l, i );
+					os << v;
+					}
+					break;
+				
+				case LUA_TNUMBER: {
+					lua_Number v = lua_tonumber( _l, i );
+					os << v;
+					}
+					break;
+
+				case LUA_TFUNCTION: {
+					lua_CFunction f = lua_tocfunction( _l, i );
+					char buf[33];
+					snprintf( buf, 32, "function[%016" PRIxPTR "]", (uintptr_t)f );
+					os << buf;
+					}
+					break;
+
+				case LUA_TTABLE:
+					// TODO
+
+				default:
+					os << "<unknown>";
+			}
+		}
+
+		// TODO: this is NOT the singleton instance of the daemon!?
+		// the first level logged is thus ERROR
+		_SMERP::Logger( _SMERP::LogBackend::instance() ).Get(
+			_SMERP::LogLevel::str2LogLevel( logLevel ) ) << os.str( );
+
+		lua_pop( _l, n );
+
+		return 0;
+	}
 
 	void echoConnection::createVM( )
 	{
@@ -54,6 +119,10 @@ namespace _SMERP {
 			lua_pop( l, 1 );
 			throw new std::runtime_error( "Can't initialize LUA processor" );
 		}
+		
+		// register logging function
+		lua_pushcclosure( l, &lua_log, 0 );
+		lua_setglobal( l, "log" );
 				
 		// call main, we may have to initialize LUA modules there
 		res = lua_pcall( l, 0, LUA_MULTRET, 0 );
@@ -107,7 +176,7 @@ namespace _SMERP {
 	}
 
 	echoConnection::echoConnection( const Network::LocalTCPendpoint& local )
-		: counter( 0 ), maxMemUsed( 0 ), data_start( NULL ), data_size( 0 )
+		: counter( 0 ), maxMemUsed( 0 ), data_start( NULL ), data_size( 0 ), idle_timeout( 30 )
 	{
 		LOG_TRACE << "Created connection handler for " << local.toString();
 		createVM( );
@@ -116,7 +185,7 @@ namespace _SMERP {
 
 
 	echoConnection::echoConnection( const Network::LocalSSLendpoint& local )
-		: counter( 0 ), maxMemUsed( 0 ), data_start( NULL ), data_size( 0 )
+		: counter( 0 ), maxMemUsed( 0 ), data_start( NULL ), data_size( 0 ), idle_timeout( 30 )
 	{
 		LOG_TRACE << "Created connection handler (SSL) for " << local.toString();
 		createVM( );
@@ -188,7 +257,7 @@ namespace _SMERP {
 			lua_pop( l, 2 );
 			return Network::NetworkOperation( Network::WriteOperation( msg, strlen( msg ) ) );
 		} else if( !strcmp( op, "READ" ) ) {
-			int idle_timeout = lua_tointeger( l, -1 );
+			idle_timeout = lua_tointeger( l, -1 );			
 			lua_pop( l, 2 );
 			return Network::NetworkOperation( Network::ReadOperation( buf, buf_size, idle_timeout ));
 		} else if( !strcmp( op, "CLOSE" ) ) {
@@ -221,7 +290,6 @@ namespace _SMERP {
 		int res = lua_pcall( l, 1, 0, 0 );
 		if( res != 0 ) {
 			LOG_FATAL << "Unable to call 'network_input' function: " << lua_tostring( l, -1 );
-			lua_pop( l, 1 );
 			throw new std::runtime_error( "Error in LUA processor" );
 		}
 	}

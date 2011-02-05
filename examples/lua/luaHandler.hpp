@@ -6,6 +6,7 @@
 #define _SMERP_HANDLER_HPP_INCLUDED
 
 #include "connectionHandler.hpp"
+#include "unused.h"
 
 extern "C" {
 	#include <lua.h>
@@ -42,6 +43,8 @@ namespace _SMERP {
 		char buf[buf_size];
 		char *data_start;
 		std::size_t data_size;
+		std::string out_buf;
+		unsigned idle_timeout;
 
 		void createVM( );
 		void destroyVM( );

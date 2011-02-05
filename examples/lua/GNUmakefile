@@ -7,7 +7,7 @@ SUBDIRS =
 INCLUDE_CPPFLAGS =
 
 INCLUDE_DIRS = \
-	-I. -I$(TOPDIR)/include \
+	-I. -I$(TOPDIR)/include -I$(TOPDIR)/src \
 	-I$(BOOST_INCLUDE_DIR) \
 	-I$(LUA_INCLUDE_DIR)
 
@@ -41,13 +41,9 @@ CPP_BINS = \
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
-smerplogger.so: smerplogger.sho++ $(TOPDIR)/src/logBackend.sho++ $(TOPDIR)/src/logLevel.sho++
-	$(CCPP_LINK) -shared -o $@ $(LDFLAGS) $?
-
-local_all: smerplogger.so
+local_all:
 
 local_clean:
-	-rm -f smerplogger.sho++ smerplogger.so
 
 local_distclean:
 
@@ -55,6 +51,6 @@ local_install:
 
 localhost_test:
 
-run: $(CPP_BINS) smerplogger.so
+run: $(CPP_BINS)
 	@echo "Running the SMERP server..."
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./smerp-lua -c smerp-lua.conf -f
