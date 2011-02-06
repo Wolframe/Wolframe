@@ -27,7 +27,7 @@ const char* getRandomAsciiString()
       {
          continue;
       }
-      if (ii>=3 && rt[ii-3]=='\n' && rt[ii-2]=='.' && rt[ii-1]=='\r' && rt[ii]=='\n')
+      if (ii>=2 && rt[ii-2]=='\n' && rt[ii-1]=='.' && rt[ii]=='\r')
       {
          continue;
       }
@@ -131,7 +131,7 @@ protected:
       expected.append( escape( test.content));
 
       input.append( ".\r\n");
-      expected.append( "\r\nOK expecting command\r\n");
+      expected.append( "OK expecting command\r\n");
       input.append( "quit\r\n");
       expected.append( "BYE\r\n");
 	}
@@ -201,7 +201,7 @@ TYPED_TEST( pechoHandlerFixture, ExpectedResult )
    std::string output;
    char* itr = const_cast<char*>( this->input.c_str());
    EXPECT_EQ( 0, test::runTestIO( itr, output, *this->connection));
-#ifdef _SMERP_LOWLEVEL_DEBUG   
+#ifdef _SMERP_LOWLEVEL_DEBUG
       unsigned int ii=0,nn=output.size();
       for (;ii<nn && output[ii]==this->expected[ii]; ii++);
       if (ii != nn) printf( "SIZE R=%u,E=%u,DIFF AT %u='%d %d %d %d|%d %d %d %d'\n", output.size(), this->expected.size(), ii, output[ii-2],output[ii-1],output[ii-0],output[ii+1],this->expected[ii-2],this->expected[ii-1],this->expected[ii-0],this->expected[ii+1]);

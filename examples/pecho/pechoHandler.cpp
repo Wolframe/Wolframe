@@ -11,13 +11,13 @@ using namespace _SMERP::pecho;
 struct Connection::Private
 {
    //* typedefs for input output blocks and input iterators
-   typedef protocol::InputBlock Input;                                      //< input buffer type
-   typedef protocol::OutputBlock Output;                                    //< output buffer type
-   typedef protocol::InputBlock::const_iterator InputIterator;           //< iterator type for protocol commands
+   typedef protocol::InputBlock Input;                          //< input buffer type
+   typedef protocol::OutputBlock Output;                        //< output buffer type
+   typedef protocol::InputBlock::const_iterator InputIterator;  //< iterator type for protocol commands
    
    //* typedefs for input output buffers
-   typedef protocol::Buffer<128> LineBuffer;                                //< buffer for one line of input/output
-   typedef protocol::CmdBuffer CmdBuffer;                                   //< buffer for protocol commands
+   typedef protocol::Buffer<128> LineBuffer;                    //< buffer for one line of input/output
+   typedef protocol::CmdBuffer CmdBuffer;                       //< buffer for protocol commands
 
    //* typedefs for state variables and buffers
    //list of processor states
@@ -30,12 +30,13 @@ struct Connection::Private
       StartProcessing,
       ProcessingAfterWrite,
       Processing,
+      ProcessingEoD,
       HandleError,
       Terminate
    };
    static const char* stateName( State i)
    {
-      static const char* ar[] = {"Init","EnterCommand","EmptyLine","EnterMode","StartProcessing","ProcessingAfterWrite","Processing","HandleError","Terminate"};
+      static const char* ar[] = {"Init","EnterCommand","EmptyLine","EnterMode","StartProcessing","ProcessingAfterWrite","Processing","ProcessingEoD","HandleError","Terminate"};
       return ar[i];
    };
    //substate of processing (how we do processing)
@@ -54,11 +55,11 @@ struct Connection::Private
    CmdBuffer cmdBuffer;                       //< context (sub state) for partly parsed protocol commands
    LineBuffer buffer;                         //< context (sub state) for partly parsed input lines
    Input input;                               //< buffer for network read messages
-   Input::EODState eodState;        //< EOD parsing state of the input reader in a content processing state
    Output output;                             //< buffer for network write messages
    //3. Iterators
-   InputIterator itr;                      //< iterator to scan input
-
+   InputIterator itr;                         //< iterator to scan protocol input
+   InputIterator end;                         //< iterator pointing to end of buffer
+   
    //* the parser of the protocol
    typedef protocol::CmdParser<CmdBuffer> ProtocolParser;
 
@@ -92,53 +93,39 @@ struct Connection::Private
    };
    //echo processing: every character read from input is written to output and with an end of line recognized the
    //output is flushed. (false returned)
-   //@return terminated (got content EOF) true=yes, false=no
-   bool echoInput()
+   //@return EchoState
+   enum EchoState {EoD, EoM, bufferFull};
+   EchoState echoInput()
    {
       char ch;
-      while ((ch=*itr) != 0)
+      for (;;)
       {
-         if (output.restsize() == 0)
-         {
-            return false;
-         }
-         if (output.restsize() == 0) return false;  //we check if there is space for output to ensure that we can do both
-                                                    //  operations input&output or none of them. doing only one of them is
-                                                    //  not covered by this state machine.
-         if (!print(ch))
-         {
-            return false;                           //this does not fail because we checked
-         }
-         ++itr;                                     //if this fails we get to the same point when reentering this procedure
+         if (itr == end) return EoM;
+         if ((ch=*itr) == 0) return EoD;
+         if (output.restsize() == 0) return bufferFull;
+         print(ch);
+         ++itr;    //if this fails we get to the same point when reentering this procedure
       }
-      return true;
    };
 
-   void* networkInput( const void* bytes, std::size_t nofBytes)
+   void networkInput( const void*, std::size_t nofBytes)
    {
-        if (nofBytes > input.size())
-       {
-           nofBytes = input.size();
-       }
        input.setPos( nofBytes);
-       memcpy( input.charptr(), bytes, nofBytes);
-       if (state == Processing)
-       {
-           input.markEndOfData( eodState, itr);
-       }
-       return (void*)((char*)bytes + nofBytes);
+       itr = const_cast<const Input*>(&input)->begin();
+       end = const_cast<const Input*>(&input)->end();
+       if (state == Processing) end = input.getEoD( itr);
    };
    
    void signalTerminate()
    {
-        eodState = Input::SRC;
         state = Terminate;
    };
 
    //* interface
-   Private( unsigned int inputBufferSize, unsigned int outputBufferSize)   :state(Init),mode(Ident),input(inputBufferSize),eodState(Input::SRC),output(outputBufferSize)
+   Private( unsigned int inputBufferSize, unsigned int outputBufferSize)   :state(Init),mode(Ident),input(inputBufferSize),output(outputBufferSize)
    {
-      itr = input.begin();
+      itr = const_cast<const Input*>(&input)->begin();
+      end = const_cast<const Input*>(&input)->end();
    };
    ~Private()  {};
 
@@ -267,6 +254,7 @@ struct Connection::Private
                 //read the rest of the line and reject more arguments than expected.
                 //go on with processing, if this is clear. do not cosnsume the first end of line because it could be
                 //the first character of the EOF sequence.
+                input.resetEoD();
                 ProtocolParser::skipSpaces( itr);
                 if (!ProtocolParser::isEOLN( itr))
                 {
@@ -276,8 +264,7 @@ struct Connection::Private
                 else
                 {
                    state = Processing;
-                   eodState = Input::SRC;
-                   input.markEndOfData( eodState, itr);
+                   end = input.getEoD( itr);
                    return WriteLine( "OK enter data");
                 }
             }
@@ -293,19 +280,32 @@ struct Connection::Private
             case Processing:
             {
                 //do the ECHO with some filter function or pure:
-                bool eof = echoInput();
-                if (eof)
+                EchoState echoState = echoInput();
+                if (echoState == EoM)
                 {
-                   state = Init;
-                   eodState = Input::SRC;
+                   input.setPos( 0);
+                   return Network::ReadOperation( input.ptr(), input.size());
+                }
+
+                if (echoState == EoD)
+                {
+                   state = ProcessingEoD;
                 }
                 else
                 {
-                   state = ProcessingAfterWrite;         //we a flushing the output buffer and have to release it when entering next time
+                   state = ProcessingAfterWrite;
                 }
                 void* content = output.ptr();
                 std::size_t size = output.pos();
+                if (size == 0) continue;
                 return Network::WriteOperation( content, size);
+            }
+
+            case ProcessingEoD:
+            {
+                state = Init;
+                itr++;
+                continue;
             }
 
             case HandleError:
@@ -320,18 +320,18 @@ struct Connection::Private
             case Terminate:
             {
                 state = Terminate;
-                return Network::TerminateOperation();
+                return Network::CloseOperation();
             }
          }//switch(..)
          }//for(,,)
       }
-      catch (Input::End)
+      catch (Input::ArrayBoundReadError)
       {
          LOG_DATA << "End of input interrupt";
          input.setPos( 0);
-         return Network::ReadOperation();
+         return Network::ReadOperation( input.ptr(), input.size());
       };
-      return Network::TerminateOperation();
+      return Network::CloseOperation();
    };
 };
 
@@ -364,9 +364,9 @@ void Connection::setPeer( const Network::RemoteSSLendpoint& remote)
    LOG_TRACE << "Peer set to " << remote.toString();
 }
 
-void* Connection::networkInput( const void* bytes, std::size_t nofBytes)
+void Connection::networkInput( const void* bytes, std::size_t nofBytes)
 {
-   return data->networkInput( bytes, nofBytes);
+   data->networkInput( bytes, nofBytes);
 }
 
 void Connection::timeoutOccured()

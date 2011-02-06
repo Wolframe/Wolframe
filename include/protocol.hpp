@@ -4,8 +4,6 @@
 #ifndef _SMERP_PROTOCOL_HPP_INCLUDED
 #define _SMERP_PROTOCOL_HPP_INCLUDED
 
-//TODO name const iterators const_iterator as STL does instead of iterator
-
 //parser for the protocol commands and their arguments
 #include "protocol/parser.hpp"
 //buffers used by parser to collect arguments of protocol commands

@@ -1,72 +1,49 @@
 #ifndef _SMERP_PROTOCOL_IO_BLOCKS_HPP_INCLUDED
 #define _SMERP_PROTOCOL_IO_BLOCKS_HPP_INCLUDED
-#include <cstring>
+#include "iterators.hpp"
+#include <stdexcept>
 
 namespace _SMERP {
 namespace protocol {
 
 //@section protocolIOBlocks
 //defines the processed blocks for output from and input to the processor 
-// that reads the input through iterators of the input blocks and prints to the
-// output blocks.
+//  that reads the input through iterators of the input blocks and prints via the output blocks.
+
 
 //memory block for network messages
 class MemBlock
 {  
 public:
-   MemBlock()                                    :m_ptr(0),m_size(0),m_pos(0),m_allocated(false) {};
-   MemBlock( unsigned int p_size)                :m_ptr(0),m_size(p_size),m_pos(0),m_allocated(false)
-   {
-      m_ptr = new unsigned char[ m_size];
-      m_allocated = true;
-   };
-   MemBlock( void* p_ptr, unsigned int p_size)   :m_ptr(p_ptr),m_size(p_size),m_pos(0),m_allocated(false){};
+   MemBlock();
+   MemBlock( unsigned int p_size);
+   MemBlock( void* p_ptr, unsigned int p_size);
+   MemBlock( const MemBlock& o);
+   ~MemBlock();
 
-   MemBlock( const MemBlock& o)                  :m_ptr(0),m_size(0),m_pos(0),m_allocated(false) {*this = o;};
-   
-   MemBlock& operator=( const MemBlock& o)
-   {
-      if (m_allocated) delete [] (unsigned char*)m_ptr;
-      m_size = o.m_size;
-      m_pos = o.m_pos;
-      m_allocated = o.m_allocated;
+   MemBlock& operator=( const MemBlock& o);
 
-      if (o.m_allocated)
-      {
-         m_ptr = new unsigned char[ m_size];
-         memcpy( m_ptr, o.m_ptr, m_size); 
-      }
-      else
-      {
-         m_ptr = o.m_ptr;
-      }
-      return *this;
-   };
+   void setPos( unsigned int p_pos=0)            {m_pos = p_pos;};
+   void set( void* p_ptr, unsigned int p_size);
+   void* ptr()                                   {return m_ptr;};
+   const void* ptr() const                       {return m_ptr;};
+   char* charptr()                               {return (char*)m_ptr;};
+   const char* charptr() const                   {return (const char*)m_ptr;};
+   unsigned int size() const                     {return m_size;};
+   unsigned int pos() const                      {return m_pos;};
    
-   ~MemBlock()
-   {
-      if (m_allocated) delete [] (unsigned char*)m_ptr;
-   };
+   //access violation exceptions
+   struct ArrayBoundReadError                    :public std::logic_error {ArrayBoundReadError():std::logic_error("ABR"){};};
+   struct ArrayBoundWriteError                   :public std::logic_error {ArrayBoundWriteError():std::logic_error("ABR"){};};
    
-   void setPos( unsigned int p_pos=0)
-   {
-      m_pos = p_pos;
-   };
+   //element typedefs
+   typedef char value_type;
+   typedef unsigned int size_type;
    
-   void set( void* p_ptr, unsigned int p_size)
-   {
-      if (m_allocated) delete [] (unsigned char*)m_ptr;
-      m_ptr = p_ptr;
-      m_size = p_size;
-      m_pos = 0;
-      m_allocated = false;
-   };
-   
-   void* ptr() const                  {return m_ptr;};
-   char* charptr() const              {return (char*)m_ptr;};
-   unsigned int size() const          {return m_size;};
-   unsigned int pos() const           {return m_pos;};
-   
+   //random access operators
+   char operator[]( size_type idx) const         {if (idx>=m_pos) throw ArrayBoundReadError(); return charptr()[idx];};
+   char& operator[]( size_type idx)              {if (idx>=m_pos) throw ArrayBoundWriteError(); return charptr()[idx];};
+  
 private:
    void* m_ptr;
    unsigned int m_size;
@@ -74,165 +51,61 @@ private:
    bool m_allocated;
 };
 
-//input memory block to iterate through with an iterator: 
-//read as long as you can and throw an exception if you can't because you need more data.
-//@remark iterators based on this iterator must be without read ahead. 
-// it's illegal to ahead more that you consume. 
-class InputBlock :public MemBlock 
+
+
+
+//input memory block to iterate through
+//  read as long as you can and throw an exception if you can't because you need more data.
+class InputBlock  :public MemBlock
 {
 public:
-   InputBlock()                                      {};
-   InputBlock( unsigned int p_size)                  :MemBlock(p_size) {};
-   InputBlock( void* p_ptr, unsigned int p_size)     :MemBlock(p_ptr,p_size) {};
-   InputBlock( const InputBlock& o)                  :MemBlock(o) {};
-   
-   //exception thrown if there is nothing to read from the input anymore.
-   //triggers reading more input from the network
-   struct End {};
-
-   //input iterator
-   class const_iterator
+   struct EoD
    {
-   public:   
-      //skip to the next input character
-      void skip()
-      {
-          if (++m_pos == m_input->pos())
-          {
-            m_pos = 0;
-            throw End();
-          }
-      };
-
-      //get the current input character
-      char cur()
-      {         
-          if (m_pos == m_input->pos()) throw End();
-          return m_input->charptr()[ m_pos];
-      };
-
-      const_iterator( InputBlock* input)                    :m_input(input),m_pos(0) {};
-      const_iterator()                                      :m_input(0),m_pos(0) {};
-      const_iterator( const const_iterator& o)              :m_input(o.m_input),m_pos(o.m_pos) {};
-      const_iterator& operator=( const const_iterator& o)   {m_input=o.m_input; return *this;}
-
-      const_iterator& operator++()                          {skip(); return *this;};
-      const_iterator operator++(int)                        {const_iterator tmp(*this); skip(); return tmp;};
-      char operator*()                                      {return cur();};
-
-      unsigned int pos() const                              {return m_pos;};
-   private:
-      friend class InputBlock;
-      InputBlock* m_input;
-      unsigned int m_pos;        
+      enum State {SRC,LF,LF_DOT,LF_DOT_CR,LF_DOT_CR_LF};
    };
-
-   const_iterator begin()                                   {const_iterator rt(this); return rt;};
-   const_iterator at( unsigned int pos_)                    {const_iterator rt(this); rt.m_pos=(pos_ <= pos())?pos_:pos(); return rt;};
-   const_iterator end()                                     {return const_iterator();};
    
-   enum EODState
-   {
-      SRC,
-      LF,
-      LF_DOT,
-      LF_DOT_CR,
-      LF_DOT_CR_LF
-   };
+   InputBlock()                                         :m_eodState(EoD::SRC){};
+   InputBlock( unsigned int p_size)                     :MemBlock(p_size),m_eodState(EoD::SRC){};
+   InputBlock( void* p_ptr, unsigned int p_size)        :MemBlock(p_ptr,p_size),m_eodState(EoD::SRC){};
+   InputBlock( const InputBlock& o)                     :MemBlock(o),m_eodState(o.m_eodState){};
 
-   void markEndOfData( EODState& state, const InputBlock::const_iterator& start)
-   {
-   if (size()<start.pos()) return;
-        
-   unsigned int bufsize = size()-start.pos();
-   char* buf = charptr()+start.pos();
-   unsigned int bufpos,eatsize,dstsize;
-   dstsize = bufpos = eatsize = 0;
+   //random access iterators
+   typedef array::iterator_t<const InputBlock,size_type,char,char,const char*> const_iterator;
+   typedef array::iterator_t<InputBlock,size_type,char,char&,char*> iterator;
+   
+   const_iterator begin() const                         {const_iterator rt(this); return rt;};
+   iterator begin()                                     {iterator rt(this); return rt;};
+   const_iterator at( unsigned int pos_) const          {const_iterator rt(this); return rt+pos_;};
+   iterator at( unsigned int pos_)                      {iterator rt(this); return rt+pos_;};
+   const_iterator end() const                           {return const_iterator(this)+size();};
+   iterator end()                                       {return iterator(this)+size();};
+   
+   //end of data calculation and markup
+   const_iterator getEoD( const_iterator start);
+   void resetEoD()                                      {m_eodState=EoD::SRC;};
 
-   while (bufpos<bufsize)
-   {
-       if (state == SRC)
-       {
-           char* cc = (char*)memchr( buf+bufpos, '\n', bufsize-bufpos);
-           if (cc)
-           {
-               bufpos = cc - buf;
-               state = LF;
-           }
-           else
-           {
-               bufpos = bufsize;
-               if (dstsize != eatsize) memmove( buf+dstsize, buf+eatsize, bufpos-eatsize);
-               dstsize += bufpos-eatsize;
-               eatsize = bufpos;
-           }
-       }
-       else if (state == LF)
-       {
-          if (buf[bufpos] == '.')
-          {
-              state = LF_DOT;
-              if (dstsize != eatsize) memmove( buf+dstsize, buf+eatsize, bufpos-eatsize);
-              dstsize += bufpos-eatsize;
-              bufpos++;
-              eatsize = bufpos;
-          }
-          else
-          {
-              state = SRC;
-          }
-       }
-       else if (state == LF_DOT)
-       {
-          if (buf[bufpos] == '\r')
-          {
-              memmove( buf+dstsize++, "", 1);  //< feed EOD
-              state = LF_DOT_CR;
-              bufpos++; 
-          }
-          else if (buf[bufpos] == '\n')
-          {
-              memmove( buf+dstsize++, "", 1);  //< feed EOD
-              state = LF_DOT_CR_LF;
-              bufpos++;
-          }
-          else
-          {
-              state = SRC;
-          }
-       }
-       else if (state == LF_DOT_CR)
-       {
-           if (buf[bufpos] == '\n') bufpos++; 
-           state = LF_DOT_CR_LF;
-       }
-       else //if (state == LF_DOT_CR_LF)
-       {
-            bufpos = bufsize;
-            if (dstsize != eatsize) memmove( buf+dstsize, buf+eatsize, bufpos-eatsize);
-            dstsize += bufpos-eatsize;
-            eatsize = bufpos;
-       }
-   }
-   setPos( start.pos() + dstsize);
-  };
+private:
+   EoD::State m_eodState;
 };
+
+
+
 
 //output interface based on a memory block. 
 // print as buffer is available and then order to "ship" what you printed.
 class OutputBlock :public MemBlock
 {
 public:
-   OutputBlock( unsigned int p_size)                        :MemBlock(p_size) {};
-   OutputBlock( void* p_ptr, unsigned int p_size)           :MemBlock(p_ptr,p_size) {};
-   OutputBlock( const OutputBlock& o)                  :MemBlock(o) {};
+   OutputBlock( unsigned int p_size)                    :MemBlock(p_size) {};
+   OutputBlock( void* p_ptr, unsigned int p_size)       :MemBlock(p_ptr,p_size) {};
+   OutputBlock( const OutputBlock& o)                   :MemBlock(o) {};
    
    //return true if the buffer is empty
    bool empty() const
    {
       return (pos()==0);
    };
-   
+
    //print one character to the output
    bool print( char ch)
    {
@@ -249,24 +122,16 @@ public:
       setPos( pos() + nn);
       return true;
    };
-   
+
    //pointer to the rest of the output buffer block
-   char* rest() const
-   {
-      return charptr() + pos();
-   }
-   
+   const char* rest() const                            {return charptr() + pos();};
+   char* rest()                                        {return charptr() + pos();};
+
    //size of the rest of the output buffer (how many characters can be written)
-   unsigned int restsize() const
-   {
-      return size() - pos();
-   }
-   
+   unsigned int restsize() const                       {return size()-pos();};
+
    //release a written memory block
-   void release()
-   {
-      setPos(0);
-   }
+   void release()                                      {setPos(0);};
 };
 
 } // namespace protocol

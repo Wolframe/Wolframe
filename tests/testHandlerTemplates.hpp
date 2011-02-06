@@ -11,8 +11,6 @@
 namespace _SMERP
 {
 
-//! THIS YOU CAN CALL A TRICKY (UNMASKING ACCESS RIGHTS BY INTRUSION)
-//! ... OR YOU SHOULD BE CAREFUL WITH WHO YOU CALL YOUR FRIEND  :-)
 template <typename T>
 class connectionBase :public T
 {
@@ -28,7 +26,7 @@ class NetworkOperation :public connectionBase<Network::NetworkOperation>
 public:
    NetworkOperation( const Network::NetworkOperation& o)
    {
-      memcpy( this, ((char*)&o), sizeof(*this));
+      std::memcpy( this, ((char*)&o), sizeof(*this));
    };
 };
 
@@ -38,10 +36,6 @@ namespace test
    template <class Connection>
    int runTestIO( char* in, std::string& out, Connection& connection)
    {
-      enum {NetworkBufSize=8};
-      char networkBuf[ NetworkBufSize];
-      unsigned int networkBufPos = 0;
-      
       for (;;)
       {
          NetworkOperation netop( connection.nextOperation());
@@ -50,19 +44,10 @@ namespace test
          {
             case NetworkOperation::READ:
             {
-               //fprintf( stderr, "network operation is READ\n"); 
-               if (networkBufPos == 0)
-               {
-                  for (;networkBufPos<NetworkBufSize; networkBufPos++)
-                  {
-                     int ch = *in++;
-                     if (ch == 0) break;
-                     networkBuf[ networkBufPos] = ch;
-                  }
-               }
-               unsigned int len = (char*)connection.networkInput( networkBuf, networkBufPos)-networkBuf;
-               memmove( networkBuf, networkBuf+len, networkBufPos-len);
-               networkBufPos -= len;
+               char* data = const_cast<char*>((char*)netop.data());
+               unsigned int size = netop.size();
+               for (unsigned int ii=0; ii<size && *in; ii++,in++) data[ii]=*in;
+               connection.networkInput( (void*)data, size);
             }
             break;
             
@@ -70,7 +55,6 @@ namespace test
             {
                char* data = (char*)netop.data();
                std::size_t ii,size = netop.size();                  
-               //fprintf( stderr, "network operation is WRITE '%.8s'[%u]\n", data, size); 
                for (ii=0; ii<size; ii++)
                {
                   out.push_back( data[ ii]);
@@ -79,8 +63,6 @@ namespace test
             break;
             
             case NetworkOperation::CLOSE:
-            case NetworkOperation::TERMINATE:
-               //fprintf( stderr, "network operation is TERMINATE\n"); 
                return 0;
                
             default:
