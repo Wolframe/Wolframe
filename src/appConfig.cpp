@@ -101,8 +101,47 @@ namespace _SMERP {
 
 	void ServerConfiguration::print( std::ostream& os ) const
 	{
+		// Unix daemon
+#if !defined(_WIN32)
+		os << "Run as " << (user.empty() ? "(not specified)" : user) << ":"
+				<< (group.empty() ? "(not specified)" : group) << std::endl;
+		os << "PID file: " << pidFile << std::endl;
+#else
+		// Windows service
+		os << "When run as service" << std::endl
+				<< "  Name: " << serviceName << std::endl
+				<< "  Displayed name: " << serviceDisplayName << std::endl
+				<< "  Description: " << serviceDescription << std::endl;
+#endif
+		os << "Number of threads: " << threads << std::endl;
+		os << "Maximum number of connections: " << maxConnections << std::endl;
 
+		os << "Network" << std::endl;
+		if ( address.size() > 0 )	{
+			std::list<Network::ServerTCPendpoint>::const_iterator it = address.begin();
+			os << "  Unencrypted: " << it->toString() << std::endl;
+			for ( ++it; it != address.end(); ++it )
+				os << "               " << it->toString() << std::endl;
+		}
+		if ( SSLaddress.size() > 0 )	{
+			std::list<Network::ServerSSLendpoint>::const_iterator it = SSLaddress.begin();
+			os << "          SSL: " << it->toString() << std::endl;
+			os << "                  certificate: " << (it->certificate().empty() ? "(none)" : it->certificate()) << std::endl;
+			os << "                  key file: " << (it->key().empty() ? "(none)" : it->key()) << std::endl;
+			os << "                  CA directory: " << (it->CAdirectory().empty() ? "(none)" : it->CAdirectory()) << std::endl;
+			os << "                  CA chain file: " << (it->CAchain().empty() ? "(none)" : it->CAchain()) << std::endl;
+			os << "                  verify client: " << (it->verifyClientCert() ? "yes" : "no") << std::endl;
+			for ( ++it; it != SSLaddress.end(); ++it )	{
+				os << "               " << it->toString() << std::endl;
+				os << "                  certificate: " << (it->certificate().empty() ? "(none)" : it->certificate()) << std::endl;
+				os << "                  key file: " << (it->key().empty() ? "(none)" : it->key()) << std::endl;
+				os << "                  CA directory: " << (it->CAdirectory().empty() ? "(none)" : it->CAdirectory()) << std::endl;
+				os << "                  CA chain file: " << (it->CAchain().empty() ? "(none)" : it->CAchain()) << std::endl;
+				os << "                  verify client: " << (it->verifyClientCert() ? "yes" : "no") << std::endl;
+			}
+		}
 	}
+
 
 	void LoggerConfiguration::print( std::ostream& os ) const
 	{
@@ -130,6 +169,20 @@ namespace _SMERP {
 			os << "   Log to eventlog: DISABLED" << std::endl;
 #endif	// defined( _WIN32 )
 	}
+
+
+	/// Check if the logger configuration makes sense
+	bool LoggerConfiguration::check()
+	{
+		// if log to file is requested a file must be specified
+		if ( logToFile )
+			if ( logFile.empty())	{
+//				errMsg_ = "Log to file requested but no log file specified";
+				return false;
+			}
+		return true;
+	}
+
 
 	void ApplicationConfiguration::print( std::ostream& os ) const
 	{

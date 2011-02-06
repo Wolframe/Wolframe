@@ -34,7 +34,6 @@ namespace _SMERP {
 
 	private:
 		Operation	operation_;
-//	protected:
 		unsigned	timeout_;
 		void*		data_;
 		std::size_t	size_;

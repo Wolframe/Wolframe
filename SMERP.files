@@ -32,7 +32,6 @@
 ./examples/pecho/appConfig.cpp
 ./examples/pecho/configFile.cpp
 ./examples/pecho/pechoHandler.cpp
-./examples/pecho/smerp-echo.cpp
 ./examples/xmlselect/xmlselectHandler.cpp
 ./examples/xmlselect/appConfig.cpp
 ./examples/xmlselect/configFile.cpp
@@ -64,7 +63,6 @@
 ./examples/pecho/commandLine.hpp
 ./examples/pecho/configFile.hpp
 ./examples/pecho/pechoHandler.hpp
-./examples/pecho/protocol.hpp
 ./examples/xmlselect/xmlselectHandler.hpp
 ./examples/xmlselect/appConfig.hpp
 ./examples/xmlselect/commandLine.hpp
@@ -193,3 +191,10 @@ makefiles/nmake/config.mk
 makefiles/nmake/compiler.mk
 makefiles/nmake/clean.mk
 makefiles/README
+examples/pecho/smerp-pecho.cpp
+include/protocol.hpp
+include/protocol/parser.hpp
+include/protocol/iterators.hpp
+include/protocol/ioblocks.hpp
+include/protocol/generator.hpp
+include/protocol/buffers.hpp
