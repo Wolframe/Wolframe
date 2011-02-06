@@ -74,7 +74,7 @@ struct Connection::Private
       buffer.push_back( '\n');
       const char* msg = buffer.c_str();
       buffer.init();
-      return Network::WriteOperation( (const void*)msg, ii+2);
+      return Network::WriteOperation( msg, ii+2);
    };
    //output of one character with return code true/false for success/failure
    bool print( char ch)
