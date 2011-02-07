@@ -99,6 +99,10 @@ namespace _SMERP {
 #endif	// defined( _WIN32 )
 	}
 
+
+///********************************************************************************************************
+
+// Server configuration functions
 	void ServerConfiguration::print( std::ostream& os ) const
 	{
 		// Unix daemon
@@ -142,7 +146,49 @@ namespace _SMERP {
 		}
 	}
 
+	/// Check if the server configuration makes sense
+	///
+	/// Be aware that this function does NOT test if the configuration
+	/// can be used. It only tests if it MAY be valid.
+	bool ServerConfiguration::check( std::ostream& os ) const
+	{
+		bool	correct = true;
 
+		for ( std::list<Network::ServerSSLendpoint>::const_iterator it = SSLaddress.begin();
+									it != SSLaddress.end(); ++it )	{
+			// if it listens to SSL a certificate file and a key file are required
+			if ( it->certificate().empty() )	{
+				os << "No SSL certificate specified for " << it->toString() << std::endl;
+				correct = false;
+			}
+			if ( it->key().empty() )	{
+				os << "No SSL key specified for " << it->toString() << std::endl;
+				correct = false;
+			}
+			// verify client SSL certificate needs either certificate dir or chain file
+			if ( it->verifyClientCert() && it->CAdirectory().empty() && it->CAchain().empty() )	{
+				os << "Client SSL certificate verification requested but no CA "
+						"directory or CA chain file specified for "
+						<< it->toString() << std::endl;
+				correct = false;
+			}
+		}
+		return correct;
+	}
+
+
+#if !defined(_WIN32)
+	/// Override the server configuration with command line arguments
+	void ServerConfiguration::override( std::string usr, std::string grp )
+	{
+		if ( !usr.empty())
+			user = usr;
+		if ( !grp.empty())
+			group = grp;
+	}
+#endif
+
+// Logger configuration functions
 	void LoggerConfiguration::print( std::ostream& os ) const
 	{
 		os << "Logging" << std::endl;
@@ -170,18 +216,21 @@ namespace _SMERP {
 #endif	// defined( _WIN32 )
 	}
 
-
 	/// Check if the logger configuration makes sense
-	bool LoggerConfiguration::check()
+	///
+	/// Be aware that this function does NOT test if the configuration
+	/// can be used. It only tests if it MAY be valid.
+	bool LoggerConfiguration::check( std::ostream& os ) const
 	{
-		// if log to file is requested a file must be specified
-		if ( logToFile )
-			if ( logFile.empty())	{
-//				errMsg_ = "Log to file requested but no log file specified";
-				return false;
-			}
+		// if log to file is requested then a file must be specified
+		if ( logToFile && logFile.empty() )	{
+			os << "Log to file requested but no log file specified";
+			return false;
+		}
 		return true;
 	}
+
+///********************************************************************************************************
 
 
 	void ApplicationConfiguration::print( std::ostream& os ) const
@@ -280,26 +329,6 @@ namespace _SMERP {
 				errMsg_ = "Log to file requested but no log file specified";
 				return false;
 			}
-/*
-		// if it listens to SSL a certificate file and a key file are required
-		if ( SSLaddress.size() > 0 )	{
-			if ( SSLcertificate.empty())	{
-				errMsg_ = "SSL port defined but no SSL certificate specified";
-				return false;
-			}
-			if ( SSLkey.empty())	{
-				errMsg_ = "Server SSL certificate needs a key but no key file specified";
-				return false;
-			}
-		}
-		// verify client SSL certificate needs either certificate dir or chain file
-		if ( SSLverify )	{
-			if ( SSLCAdirectory.empty() && SSLCAchainFile.empty())	{
-				errMsg_ = "Client SSL certificate verification requested but no CA directory or CA chain file specified";
-				return false;
-			}
-		}
-*/
 		return true;
 	}
 

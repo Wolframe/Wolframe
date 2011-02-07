@@ -198,3 +198,5 @@ include/protocol/iterators.hpp
 include/protocol/ioblocks.hpp
 include/protocol/generator.hpp
 include/protocol/buffers.hpp
+src/authentication.hpp
+src/authentication.cpp
