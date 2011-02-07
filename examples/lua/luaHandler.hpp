@@ -6,7 +6,6 @@
 #define _SMERP_HANDLER_HPP_INCLUDED
 
 #include "connectionHandler.hpp"
-#include "unused.h"
 
 extern "C" {
 	#include <lua.h>
