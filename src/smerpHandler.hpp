@@ -9,12 +9,12 @@
 
 namespace _SMERP {
 	/// The connection handler
-	class echoConnection : public Network::connectionHandler
+	class smerpConnection : public Network::connectionHandler
 	{
 	public:
-		echoConnection( const Network::LocalTCPendpoint& local );
-		echoConnection( const Network::LocalSSLendpoint& local );
-		~echoConnection();
+		smerpConnection( const Network::LocalTCPendpoint& local );
+		smerpConnection( const Network::LocalSSLendpoint& local );
+		~smerpConnection();
 
 		void setPeer( const Network::RemoteTCPendpoint& remote );
 		void setPeer( const Network::RemoteSSLendpoint& remote );

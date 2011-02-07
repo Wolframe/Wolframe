@@ -14,107 +14,116 @@
 namespace _SMERP {
 	namespace Network {
 
-	class	NetworkOperation
-	{
-		template< typename T > friend class connectionBase;
-	protected:
-		enum Operation	{
-			READ,
-			WRITE,
-			CLOSE
+		/// Base class for a network operation. It should never be accessed directly by
+		/// the user code
+		class	NetworkOperation
+		{
+			template< typename T > friend class connectionBase;
+
+		protected:
+			enum Operation	{
+				READ,
+				WRITE,
+				CLOSE
+			};
+
+			explicit NetworkOperation( Operation op, void* d = NULL, std::size_t s = 0,
+						   unsigned to = 0 )
+						{ operation_ = op,  data_ = d; size_ = s; timeout_ = to; }
+
+			unsigned timeout()	{ return timeout_; }
+			const void* data()	{ return (const void*)data_; }
+			void* buffer()		{ return data_; }
+			std::size_t size()	{ return size_; }
+			Operation operation()	{ return operation_; }
+
+		private:
+			Operation	operation_;
+			unsigned	timeout_;
+			void*		data_;
+			std::size_t	size_;
 		};
 
-		explicit NetworkOperation( Operation op, void* d = NULL, std::size_t s = 0, unsigned to = 0 )
-					{ operation_ = op,  data_ = d; size_ = s; timeout_ = to; }
-		unsigned timeout()	{ return timeout_; }
-		const void* data()	{ return (const void*)data_; }
-		void* buffer()		{ return data_; }
-		std::size_t size()	{ return size_; }
-		Operation operation()	{ return operation_; }
+		/// Network operation: asynchronously read a block of data
+		class ReadData : public NetworkOperation
+		{
+		public:
+			explicit ReadData( void* d, std::size_t s, unsigned to = 0 )
+				: NetworkOperation( READ, d, s, to )	{}
+		};
 
-	private:
-		Operation	operation_;
-		unsigned	timeout_;
-		void*		data_;
-		std::size_t	size_;
-	};
+		/// Network operation: asynchronously send a block of data
+		class SendData : public NetworkOperation
+		{
+		public:
+			explicit SendData( const void* d, std::size_t s, unsigned to = 0 )
+				: NetworkOperation( WRITE, const_cast<void*>( d ), s, to )	{}
+		};
 
+		/// Network operation: asynchronously send a string (message)
+		/// This is just some syntactic sugar, simplifying SendData
+		class SendString : public NetworkOperation
+		{
+		public:
+			explicit SendString( const std::string& s, unsigned to = 0 )
+				: NetworkOperation( WRITE, const_cast<char*>( s.c_str() ), s.length(), to )	{}
+			explicit SendString( const char *s, unsigned to = 0 )
+				: NetworkOperation( WRITE, const_cast<char*>( s ), strlen( s ), to )	{}
+		};
 
-	class ReadData : public NetworkOperation
-	{
-	public:
-		explicit ReadData( void* d, std::size_t s, unsigned to = 0 )
-			: NetworkOperation( READ, d, s, to )	{}
-	};
-
-	class SendData : public NetworkOperation
-	{
-	public:
-		explicit SendData( const void* d, std::size_t s, unsigned to = 0 )
-			: NetworkOperation( WRITE, const_cast<void*>( d ), s, to )	{}
-	};
-
-	/// This is just some syntactic sugar
-	class SendString : public NetworkOperation
-	{
-	public:
-		explicit SendString( const std::string& s, unsigned to = 0 )
-			: NetworkOperation( WRITE, const_cast<char*>( s.c_str() ), s.length(), to )	{}
-		explicit SendString( const char *s, unsigned to = 0 )
-			: NetworkOperation( WRITE, const_cast<char*>( s ), strlen( s ), to )	{}
-	};
-
-	class CloseConnection : public NetworkOperation
-	{
-	public:
-		CloseConnection() : NetworkOperation( CLOSE )	{}
-	};
-
-
-	/// The common handler for the connection status.
-	class connectionHandler
-	{
-		template< typename socketType > friend class connectionBase;
-	protected:
-		connectionHandler()		{}
-		virtual ~connectionHandler()	{}
-
-	private:
-		connectionHandler( const connectionHandler& );
-		connectionHandler& operator = ( const connectionHandler& );
-
-	public:
-		enum NetworkSignal	{
-			END_OF_FILE,
-			OPERATION_CANCELLED,
-			BROKEN_PIPE,
-			UNKNOWN_ERROR
+		/// Network operation: close the current network connection
+		class CloseConnection : public NetworkOperation
+		{
+		public:
+			CloseConnection() : NetworkOperation( CLOSE )	{}
 		};
 
 
-		/// Signal the incoming data. buffer is the buffer given to the read operation
-		virtual void networkInput( const void* buffer, std::size_t bytesTransferred ) = 0;
+		/// The common handler for the connection status.
+		class connectionHandler
+		{
+			template< typename socketType > friend class connectionBase;
+		protected:
+			connectionHandler()		{}
+			virtual ~connectionHandler()	{}
 
-		/// What should the network do next.
-		virtual const NetworkOperation nextOperation() = 0;
+		private:
+			connectionHandler( const connectionHandler& );
+			connectionHandler& operator = ( const connectionHandler& );
 
-		/// Timeout timer was fired.
-		virtual void timeoutOccured()			{}
+		public:
+			enum NetworkSignal	{
+				END_OF_FILE,
+				OPERATION_CANCELLED,
+				BROKEN_PIPE,
+				UNKNOWN_ERROR
+			};
 
-		/// A signal was received from outside.
-		virtual void signalOccured()			{}
 
-		/// An error network occured
-		virtual void errorOccured( NetworkSignal )	{}
+			/// Signal the incoming data. buffer is the buffer given to the read operation
+			virtual void networkInput( const void* buffer, std::size_t bytesTransferred ) = 0;
 
-		/// Set the remote peer. The connection is up now.
-		virtual void setPeer( const RemoteTCPendpoint& remote ) = 0;
-		virtual void setPeer( const RemoteSSLendpoint& remote ) = 0;
-	};
+			/// What should the network do next.
+			virtual const NetworkOperation nextOperation() = 0;
 
-} // namespace Network
+			/// Timeout timer was fired.
+			virtual void timeoutOccured()			{}
 
-	/// The server
+			/// A signal was received from outside.
+			virtual void signalOccured()			{}
+
+			/// An error network occured
+			virtual void errorOccured( NetworkSignal )	{}
+
+			/// Set the remote peer. The connection is up now.
+			virtual void setPeer( const RemoteTCPendpoint& remote ) = 0;
+			virtual void setPeer( const RemoteSSLendpoint& remote ) = 0;
+		};
+
+	} // namespace Network
+
+	/// The SMERP server main
+	/// All it should do is to provide connection handlers
 	class ServerHandler
 	{
 	public:

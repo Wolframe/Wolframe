@@ -10,7 +10,7 @@
 
 namespace _SMERP {
 
-	echoConnection::echoConnection( const Network::LocalTCPendpoint& local )
+	smerpConnection::smerpConnection( const Network::LocalTCPendpoint& local )
 	{
 		LOG_TRACE << "Created connection handler for " << local.toString();
 		state_ = NEW;
@@ -20,7 +20,7 @@ namespace _SMERP {
 	}
 
 
-	echoConnection::echoConnection( const Network::LocalSSLendpoint& local )
+	smerpConnection::smerpConnection( const Network::LocalSSLendpoint& local )
 	{
 		LOG_TRACE << "Created connection handler (SSL) for " << local.toString();
 		state_ = NEW;
@@ -29,17 +29,17 @@ namespace _SMERP {
 		idleTimeout_ = 30;
 	}
 
-	echoConnection::~echoConnection()
+	smerpConnection::~smerpConnection()
 	{
 		LOG_TRACE << "Connection handler destroyed";
 	}
 
-	void echoConnection::setPeer( const Network::RemoteTCPendpoint& remote )
+	void smerpConnection::setPeer( const Network::RemoteTCPendpoint& remote )
 	{
 		LOG_TRACE << "Peer set to " << remote.toString();
 	}
 
-	void echoConnection::setPeer( const Network::RemoteSSLendpoint& remote )
+	void smerpConnection::setPeer( const Network::RemoteSSLendpoint& remote )
 	{
 		LOG_TRACE << "Peer set to " << remote.toString();
 		LOG_TRACE << "Peer Common Name: " << remote.commonName();
@@ -47,7 +47,7 @@ namespace _SMERP {
 
 
 	/// Handle a request and produce a reply.
-	const Network::NetworkOperation echoConnection::nextOperation()
+	const Network::NetworkOperation smerpConnection::nextOperation()
 	{
 		switch( state_ )	{
 		case NEW:	{
@@ -123,25 +123,25 @@ namespace _SMERP {
 
 	/// Parse incoming data. The return value indicates how much of the
 	/// input has been consumed.
-	void echoConnection::networkInput( const void*, std::size_t bytesTransferred )
+	void smerpConnection::networkInput( const void*, std::size_t bytesTransferred )
 	{
 		LOG_DATA << "network Input: Read " << bytesTransferred << " bytes";
 		dataSize_ += bytesTransferred;
 	}
 
-	void echoConnection::timeoutOccured()
+	void smerpConnection::timeoutOccured()
 	{
 		state_ = TIMEOUT;
 		LOG_TRACE << "Processor received timeout";
 	}
 
-	void echoConnection::signalOccured()
+	void smerpConnection::signalOccured()
 	{
 		state_ = SIGNALLED;
 		LOG_TRACE << "Processor received signal";
 	}
 
-	void echoConnection::errorOccured( NetworkSignal signal )
+	void smerpConnection::errorOccured( NetworkSignal signal )
 	{
 		switch( signal )	{
 		case END_OF_FILE:
@@ -167,12 +167,12 @@ namespace _SMERP {
 	/// ServerHandler PIMPL
 	Network::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const Network::LocalTCPendpoint& local )
 	{
-		return new echoConnection( local );
+		return new smerpConnection( local );
 	}
 
 	Network::connectionHandler* ServerHandler::ServerHandlerImpl::newSSLconnection( const Network::LocalSSLendpoint& local )
 	{
-		return new echoConnection( local );
+		return new smerpConnection( local );
 	}
 
 
