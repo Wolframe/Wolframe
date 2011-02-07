@@ -23,8 +23,8 @@ namespace _SMERP {
 		std::string& errMsg()			{ return errMsg_; }
 
 		virtual bool parse( ptree& pt ) = 0;
-		virtual bool check() = 0;
-		virtual bool test() = 0;
+		virtual bool check( std::ostream& os ) const = 0;
+		virtual bool test( std::ostream& os ) const = 0;
 		virtual void print( std::ostream& os ) const = 0;
 	private:
 		std::string	root_;

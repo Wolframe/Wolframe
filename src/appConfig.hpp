@@ -44,8 +44,8 @@ namespace _SMERP {
 
 		/// methods
 		bool parse( ptree& pt );
-		bool check();
-		bool test();
+		bool check( std::ostream& os ) const;
+		bool test( std::ostream& os ) const;
 		void print( std::ostream& os ) const;
 #if !defined( _WIN32 )
 		void override( std::string user, std::string group );
@@ -77,8 +77,8 @@ namespace _SMERP {
 
 		/// methods
 		bool parse( ptree& pt );
-		bool check();
-		bool test();
+		bool check( std::ostream& os ) const;
+		bool test( std::ostream& os ) const;
 		void print( std::ostream& os ) const;
 
 		void foreground( LogLevel::Level debugLevel, bool useConfig );
