@@ -14,8 +14,6 @@ ABa:
 - Windows:
   - username, password for service credentials
   - clean up native Win32 string mess in service code
-- lua processor:
-  - better adaption to smerpHandler
 - 64-bit on Windows, issues with Qt, boost at least
 - Debian 5.0: Qt client can't load designer library and run correctly, don'y know why?
 
