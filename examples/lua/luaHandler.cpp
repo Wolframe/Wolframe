@@ -176,7 +176,7 @@ namespace _SMERP {
 	}
 
 	echoConnection::echoConnection( const Network::LocalTCPendpoint& local )
-		: counter( 0 ), maxMemUsed( 0 ), data_start( NULL ), data_size( 0 ), idle_timeout( 30 )
+		: counter( 0 ), maxMemUsed( 0 )
 	{
 		LOG_TRACE << "Created connection handler for " << local.toString();
 		createVM( );
@@ -185,7 +185,7 @@ namespace _SMERP {
 
 
 	echoConnection::echoConnection( const Network::LocalSSLendpoint& local )
-		: counter( 0 ), maxMemUsed( 0 ), data_start( NULL ), data_size( 0 ), idle_timeout( 30 )
+		: counter( 0 ), maxMemUsed( 0 )
 	{
 		LOG_TRACE << "Created connection handler (SSL) for " << local.toString();
 		createVM( );
@@ -252,12 +252,16 @@ namespace _SMERP {
 			throw new std::runtime_error( "Error in LUA processor" );
 		}
 		const char *op = lua_tostring( l, -2 );
+		if( !op ) {
+			LOG_FATAL << "Lua function next_operation returned NULL as operation, illegal!!";
+			throw new std::runtime_error( "Error in LUA processor" );
+		}
 		if( !strcmp( op, "WRITE" ) ) {
 			const char *msg = lua_tostring( l, -1 );
 			lua_pop( l, 2 );
 			return Network::NetworkOperation( Network::SendString( msg ) );
 		} else if( !strcmp( op, "READ" ) ) {
-			idle_timeout = lua_tointeger( l, -1 );
+			unsigned int idle_timeout = lua_tointeger( l, -1 );
 			lua_pop( l, 2 );
 			return Network::NetworkOperation( Network::ReadData( buf, buf_size, idle_timeout ));
 		} else if( !strcmp( op, "CLOSE" ) ) {
@@ -271,15 +275,15 @@ namespace _SMERP {
 		printMemStats( );
 	}
 
-	/// Parse incoming data. The return value indicates how much of the
-	/// input has been consumed.
+	// Parse incoming data. The data is copied from the temporary read buffer in
+	// the handler to the lua parameter passed by value (it's most likely not a good
+	// idea when using iterators later, we use too much copying around here!)
 	void echoConnection::networkInput( const void *begin, std::size_t bytesTransferred )
 	{
 		LOG_DATA << "network Input: Read " << bytesTransferred << " bytes";
-		data_size += bytesTransferred;
 
 		counter++;
-		if( counter % 1000 == 0 ) {
+		if( counter % 100 == 0 ) {
 			//(void)lua_gc( l, LUA_GCCOLLECT, 0 );
 			printMemStats( );
 		}
