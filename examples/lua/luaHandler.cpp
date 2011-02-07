@@ -39,7 +39,7 @@ namespace _SMERP {
 		int i = 2;
 		for( ; n--; i++ ) {
 			int type = lua_type( _l, i );
-	
+
 			switch( type ) {
 				case LUA_TNIL:
 					os << "nil";
@@ -50,7 +50,7 @@ namespace _SMERP {
 					os << v;
 					}
 					break;
-				
+
 				case LUA_TNUMBER: {
 					lua_Number v = lua_tonumber( _l, i );
 					os << v;
@@ -86,14 +86,14 @@ namespace _SMERP {
 	void echoConnection::createVM( )
 	{
 		LOG_TRACE << "Creating new Lua virtual machine";
-		
+
 		// instanitate a new VM
 		l = luaL_newstate( );
 		if( !l ) {
 			LOG_FATAL << "Unable to create new LUA engine!";
-			throw new std::runtime_error( "Can't initialize LUA processor" );			
+			throw new std::runtime_error( "Can't initialize LUA processor" );
 		}
-		
+
 		// TODO: open standard libraries, most likely something to configure later,
 		// the plain echo processor should work without any lua libraries
 		//luaL_openlibs( l );
@@ -111,7 +111,7 @@ namespace _SMERP {
 		lua_pushcfunction( l, luaopen_string );
 		lua_pushstring( l, LUA_STRLIBNAME );
 		lua_call( l, 1, 0 );
-		
+
 		// TODO: script location, also configurable
 		int res = luaL_loadfile( l, "echo.lua" );
 		if( res != 0 ) {
@@ -119,11 +119,11 @@ namespace _SMERP {
 			lua_pop( l, 1 );
 			throw new std::runtime_error( "Can't initialize LUA processor" );
 		}
-		
+
 		// register logging function
 		lua_pushcclosure( l, &lua_log, 0 );
 		lua_setglobal( l, "log" );
-				
+
 		// call main, we may have to initialize LUA modules there
 		res = lua_pcall( l, 0, LUA_MULTRET, 0 );
 		if( res != 0 ) {
@@ -131,7 +131,7 @@ namespace _SMERP {
 			lua_pop( l, 1 );
 			throw new std::runtime_error( "Can't initialize LUA processor" );
 		}
-		
+
 		// execute the main entry point of the script, we could initialize things there in LUA
 		lua_pushstring( l, "init" );
 		lua_gettable( l, LUA_GLOBALSINDEX );
@@ -144,11 +144,11 @@ namespace _SMERP {
 
 		LOG_TRACE << "A new Lua virtual machine has been created";
 	}
-	
+
 	void echoConnection::destroyVM( )
 	{
 		LOG_TRACE << "Destroying the Lua virtual machine";
-		
+
 		// give LUA code a chance to clean up resources or something
 		// usually hardly necessary, as the garbage collector should take care of it
 		lua_pushstring( l, "destroy" );
@@ -159,7 +159,7 @@ namespace _SMERP {
 			lua_pop( l, 1 );
 			throw new std::runtime_error( "Error in destruction of LUA processor" );
 		}
-		
+
 		// close the VM, give away resources
 		lua_close( l );
 
@@ -201,7 +201,7 @@ namespace _SMERP {
 	void echoConnection::setPeer( const Network::RemoteTCPendpoint& remote )
 	{
 		LOG_TRACE << "Peer set to " << remote.toString();
-		
+
 		lua_pushstring( l, "new_connection" );
 		lua_gettable( l, LUA_GLOBALSINDEX );
 		lua_pushstring( l, remote.host( ).c_str( ) );
@@ -255,14 +255,14 @@ namespace _SMERP {
 		if( !strcmp( op, "WRITE" ) ) {
 			const char *msg = lua_tostring( l, -1 );
 			lua_pop( l, 2 );
-			return Network::NetworkOperation( Network::WriteOperation( msg, strlen( msg ) ) );
+			return Network::NetworkOperation( Network::SendString( msg ) );
 		} else if( !strcmp( op, "READ" ) ) {
-			idle_timeout = lua_tointeger( l, -1 );			
+			idle_timeout = lua_tointeger( l, -1 );
 			lua_pop( l, 2 );
-			return Network::NetworkOperation( Network::ReadOperation( buf, buf_size, idle_timeout ));
+			return Network::NetworkOperation( Network::ReadData( buf, buf_size, idle_timeout ));
 		} else if( !strcmp( op, "CLOSE" ) ) {
 			lua_pop( l, 2 );
-			return Network::NetworkOperation( Network::CloseOperation( ) );
+			return Network::NetworkOperation( Network::CloseConnection( ) );
 		} else {
 			lua_pop( l, 2 );
 			LOG_FATAL << "Lua code returns '" << op << "', expecting one of 'READ', 'WRITE', 'CLOSE'!";
@@ -270,20 +270,20 @@ namespace _SMERP {
 		}
 		printMemStats( );
 	}
-	
+
 	/// Parse incoming data. The return value indicates how much of the
 	/// input has been consumed.
 	void echoConnection::networkInput( const void *begin, std::size_t bytesTransferred )
 	{
 		LOG_DATA << "network Input: Read " << bytesTransferred << " bytes";
 		data_size += bytesTransferred;
-		
+
 		counter++;
 		if( counter % 1000 == 0 ) {
 			//(void)lua_gc( l, LUA_GCCOLLECT, 0 );
 			printMemStats( );
 		}
-		
+
 		lua_pushstring( l, "network_input" );
 		lua_gettable( l, LUA_GLOBALSINDEX );
 		lua_pushlstring( l, (const char *)begin, bytesTransferred );
@@ -325,7 +325,7 @@ namespace _SMERP {
 	void echoConnection::errorOccured( NetworkSignal signal )
 	{
 		const char *signal_s;
-		
+
 		switch( signal ) {
 			case END_OF_FILE:
 				signal_s = "END_OF_FILE";
@@ -343,9 +343,9 @@ namespace _SMERP {
 				signal_s = "UNKNOWN_ERROR";
 				break;
 		}
-		
+
 		LOG_TRACE << "Got error '" << signal_s << "'";
-		
+
 		lua_pushstring( l, "error_occured" );
 		lua_gettable( l, LUA_GLOBALSINDEX );
 		lua_pushstring( l, signal_s );
@@ -354,7 +354,7 @@ namespace _SMERP {
 			LOG_FATAL << "Unable to call 'error_occured' function: " << lua_tostring( l, -1 );
 			lua_pop( l, 1 );
 			throw new std::runtime_error( "Error in LUA processor" );
-		}		
+		}
 	}
 
 

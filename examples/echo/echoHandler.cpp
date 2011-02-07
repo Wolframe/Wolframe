@@ -52,12 +52,12 @@ namespace _SMERP {
 		switch( state_ )	{
 		case NEW:	{
 			state_ = HELLO_SENT;
-			return Network::NetworkOperation( Network::WriteOperation( "Welcome to SMERP.\n" ));
+			return Network::NetworkOperation( Network::SendString( "Welcome to SMERP.\n" ));
 		}
 
 		case HELLO_SENT:	{
 			state_ = READ_INPUT;
-			return Network::NetworkOperation( Network::ReadOperation( readBuf_, ReadBufSize, idleTimeout_ ));
+			return Network::NetworkOperation( Network::ReadData( readBuf_, ReadBufSize, idleTimeout_ ));
 		}
 
 		case READ_INPUT:
@@ -67,7 +67,7 @@ namespace _SMERP {
 		case OUTPUT_MSG:
 			if ( !strncmp( "quit", dataStart_, 4 ))	{
 				state_ = TERMINATE;
-				return Network::NetworkOperation( Network::WriteOperation( "Thanks for using SMERP.\n" ));
+				return Network::NetworkOperation( Network::SendString( "Thanks for using SMERP.\n" ));
 			}
 			else	{
 				char *s = dataStart_;
@@ -78,7 +78,7 @@ namespace _SMERP {
 						dataSize_ -= s - dataStart_;
 						dataStart_ = s;
 						state_ = OUTPUT_MSG;
-						return Network::NetworkOperation( Network::WriteOperation( outMsg_ ));
+						return Network::NetworkOperation( Network::SendString( outMsg_ ));
 					}
 					s++;
 				}
@@ -86,12 +86,12 @@ namespace _SMERP {
 				// or close the connection if the buffer is full
 				if ( dataSize_ >= ReadBufSize )	{
 					state_ = TERMINATE;
-					return Network::NetworkOperation( Network::WriteOperation( "Line too long. Bye.\n" ));
+					return Network::NetworkOperation( Network::SendString( "Line too long. Bye.\n" ));
 				}
 				else {
 					memmove( readBuf_, dataStart_, dataSize_ );
 					state_ = READ_INPUT;
-					return Network::NetworkOperation( Network::ReadOperation( readBuf_ + dataSize_,
+					return Network::NetworkOperation( Network::ReadData( readBuf_ + dataSize_,
 												  ReadBufSize - dataSize_,
 												  idleTimeout_ ));
 				}
@@ -99,17 +99,17 @@ namespace _SMERP {
 
 		case TIMEOUT:	{
 			state_ = TERMINATE;
-			return Network::NetworkOperation( Network::WriteOperation( "Timeout. :P\n" ));
+			return Network::NetworkOperation( Network::SendString( "Timeout. :P\n" ));
 		}
 
 		case SIGNALLED:	{
 			state_ = TERMINATE;
-			return Network::NetworkOperation( Network::WriteOperation( "Server is shutting down. :P\n" ));
+			return Network::NetworkOperation( Network::SendString( "Server is shutting down. :P\n" ));
 		}
 
 		case TERMINATE:	{
 			state_ = FINISHED;
-			return Network::NetworkOperation( Network::CloseOperation() );
+			return Network::NetworkOperation( Network::CloseConnection() );
 		}
 
 		case FINISHED:
@@ -117,7 +117,7 @@ namespace _SMERP {
 			break;
 
 		} /* switch( state_ ) */
-		return Network::NetworkOperation( Network::CloseOperation() );
+		return Network::NetworkOperation( Network::CloseConnection() );
 	}
 
 

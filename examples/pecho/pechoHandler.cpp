@@ -74,7 +74,7 @@ struct Connection::Private
       buffer.push_back( '\n');
       const char* msg = buffer.c_str();
       buffer.init();
-      return Network::WriteOperation( msg, ii+2);
+      return Network::SendData( msg, ii+2);
    };
    //output of one character with return code true/false for success/failure
    bool print( char ch)
@@ -284,7 +284,7 @@ struct Connection::Private
                 if (echoState == EoM)
                 {
                    input.setPos( 0);
-                   return Network::ReadOperation( input.ptr(), input.size());
+                   return Network::ReadData( input.ptr(), input.size());
                 }
 
                 if (echoState == EoD)
@@ -298,7 +298,7 @@ struct Connection::Private
                 void* content = output.ptr();
                 std::size_t size = output.pos();
                 if (size == 0) continue;
-                return Network::WriteOperation( content, size);
+                return Network::SendData( content, size);
             }
 
             case ProcessingEoD:
@@ -320,7 +320,7 @@ struct Connection::Private
             case Terminate:
             {
                 state = Terminate;
-                return Network::CloseOperation();
+                return Network::CloseConnection();
             }
          }//switch(..)
          }//for(,,)
@@ -329,9 +329,9 @@ struct Connection::Private
       {
          LOG_DATA << "End of input interrupt";
          input.setPos( 0);
-         return Network::ReadOperation( input.ptr(), input.size());
+         return Network::ReadData( input.ptr(), input.size());
       };
-      return Network::CloseOperation();
+      return Network::CloseConnection();
    };
 };
 

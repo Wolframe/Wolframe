@@ -5,8 +5,9 @@
 #ifndef _CONNECTION_HANDLER_HPP_INCLUDED
 #define _CONNECTION_HANDLER_HPP_INCLUDED
 
-#include <cstddef>
 #include <string>
+#include <cstddef>
+#include <cstring>
 
 #include "connectionEndpoint.hpp"
 
@@ -23,13 +24,12 @@ namespace _SMERP {
 			CLOSE
 		};
 
-		NetworkOperation( Operation op, void* d = NULL, std::size_t s = 0, unsigned to = 0 )
+		explicit NetworkOperation( Operation op, void* d = NULL, std::size_t s = 0, unsigned to = 0 )
 					{ operation_ = op,  data_ = d; size_ = s; timeout_ = to; }
-		unsigned timeout()			{ return timeout_; }
-		const void* data()			{ return (const void*)data_; }
-		void* buffer()				{ return data_; }
-		std::size_t size()			{ return size_; }
-	public:
+		unsigned timeout()	{ return timeout_; }
+		const void* data()	{ return (const void*)data_; }
+		void* buffer()		{ return data_; }
+		std::size_t size()	{ return size_; }
 		Operation operation()	{ return operation_; }
 
 	private:
@@ -40,28 +40,34 @@ namespace _SMERP {
 	};
 
 
-	class ReadOperation : public NetworkOperation
+	class ReadData : public NetworkOperation
 	{
 	public:
-		ReadOperation( void* d, std::size_t s, unsigned to = 0 )
+		explicit ReadData( void* d, std::size_t s, unsigned to = 0 )
 			: NetworkOperation( READ, d, s, to )	{}
 	};
 
-	class WriteOperation : public NetworkOperation
+	class SendData : public NetworkOperation
 	{
 	public:
-		WriteOperation( const void* d, std::size_t s, unsigned to = 0 )
+		explicit SendData( const void* d, std::size_t s, unsigned to = 0 )
 			: NetworkOperation( WRITE, const_cast<void*>( d ), s, to )	{}
-		/// This is just some syntactic sugar
-		WriteOperation( const std::string& s, unsigned to = 0 )
-			: NetworkOperation( WRITE, const_cast<char*>( s.c_str() ), s.length(), to )
-											{}
 	};
 
-	class CloseOperation : public NetworkOperation
+	/// This is just some syntactic sugar
+	class SendString : public NetworkOperation
 	{
 	public:
-		CloseOperation() : NetworkOperation( CLOSE )	{}
+		explicit SendString( const std::string& s, unsigned to = 0 )
+			: NetworkOperation( WRITE, const_cast<char*>( s.c_str() ), s.length(), to )	{}
+		explicit SendString( const char *s, unsigned to = 0 )
+			: NetworkOperation( WRITE, const_cast<char*>( s ), strlen( s ), to )	{}
+	};
+
+	class CloseConnection : public NetworkOperation
+	{
+	public:
+		CloseConnection() : NetworkOperation( CLOSE )	{}
 	};
 
 
