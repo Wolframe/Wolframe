@@ -50,6 +50,7 @@ TEST_CPP_BINS = \
 
 ifdef WITH_GTEST
 TEST_CPP_BINS += \
+	testNamedRetVal$(EXE) \
 	versionTest$(EXE) \
 	counterTest$(EXE) \
 	resolvePathTest$(EXE) \
@@ -77,6 +78,8 @@ local_distclean:
 
 local_test:
 ifdef WITH_GTEST
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./testNamedRetVal
+	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./logTest
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./versionTest

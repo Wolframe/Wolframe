@@ -8,16 +8,21 @@
 // Most of the compilers should do that these days, but let's test...
 
 #include <iostream>
+#include <string>
+
+#include <gtest/gtest.h>
+
+std::string	outStr;
 
 class foobar	{
 public:
-	foobar()		{ std::cout << "foobar::foobar()\n"; }
-	~foobar()		{ std::cout << "foobar::~foobar()\n"; }
+	foobar()		{ outStr += "foobar::foobar()\n"; }
+	~foobar()		{ outStr += "foobar::~foobar()\n"; }
 
-	foobar( const foobar &rhs )
-				{ std::cout << "foobar::foobar( const foobar & )\n"; }
-	foobar& operator= ( const foobar &rhs )
-				{ std::cout << "foobar::operator=( const foobar & )\n"; }
+	foobar( const foobar& )
+				{ outStr += "foobar::foobar( const foobar & )\n"; }
+	foobar& operator= ( const foobar& )
+				{ outStr += "foobar::operator=( const foobar & )\n"; return *this; }
 
 	void ival( int nval )	{ _ival = nval; }
 private:
@@ -31,9 +36,19 @@ foobar f( int val )
 	return local;
 }
 
-int main()
+void testFunc()
 {
 	foobar ml = f( 1024 );
-	return 0;
 }
 
+TEST( NamedRetVal, test )	{
+	testFunc();
+	ASSERT_STREQ( outStr.c_str(), "foobar::foobar()\nfoobar::~foobar()\n" );
+}
+
+
+int main( int argc, char **argv )
+{
+	::testing::InitGoogleTest( &argc, argv );
+	return RUN_ALL_TESTS();
+}

@@ -14,7 +14,7 @@ INCLUDE_DIRS = \
 	-I$(TOPDIR)\examples\xmlselect \
 	/I"$(BOOST_DIR)" \
 	/I"$(PLATFORM_SDK_DIR)\Include"
-	
+
 # Note: libraries are picked automatically on Windows!
 SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib"
 INCLUDE_LDFLAGS = \
@@ -43,6 +43,7 @@ TEST_CPP_BINS = \
 !IFDEF WITH_GTEST
 TEST_CPP_BINS = \
 	$(TEST_CPP_BINS) \
+	testNamedRetVal.exe \
 	versionTest.exe \
 	counterTest.exe \
 	resolvePathTest.exe \
@@ -60,6 +61,7 @@ all: $(OBJS) $(CPP_BINS)
 
 threadLeakTest.exe: threadLeakTest.obj $(TOPDIR)\src\smerp.lib
 !IFDEF WITH_GTEST
+testNamedRetVal.exe: testNamedRetVal.obj
 versionTest.exe: versionTest.obj $(TOPDIR)\src\smerp.lib
 counterTest.exe: counterTest.obj $(TOPDIR)\src\smerp.lib
 resolvePathTest.exe: resolvePathTest.obj $(TOPDIR)\src\smerp.lib
@@ -80,6 +82,7 @@ local_test:
 	@-echo @echo off > test.bat
 	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
 !IFDEF WITH_GTEST
+	@-echo testNamedRetVal >> test.bat
 	@-echo logTest >> test.bat
 	@-echo versionTest >> test.bat
 	@-echo counterTest >> test.bat
