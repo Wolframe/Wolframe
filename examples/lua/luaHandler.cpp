@@ -73,8 +73,6 @@ namespace _SMERP {
 			}
 		}
 
-		// TODO: this is NOT the singleton instance of the daemon!?
-		// the first level logged is thus ERROR
 		_SMERP::Logger( _SMERP::LogBackend::instance() ).Get(
 			_SMERP::LogLevel::str2LogLevel( logLevel ) ) << os.str( );
 

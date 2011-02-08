@@ -23,10 +23,7 @@ namespace _SMERP {
 		void setPeer( const Network::RemoteTCPendpoint& remote );
 		void setPeer( const Network::RemoteSSLendpoint& remote );
 
-		/// Parse incoming data. The return value indicates how much of the
-		/// input has been consumed.
 		void networkInput( const void *begin, std::size_t bytesTransferred );
-
 		void timeoutOccured();
 		void signalOccured();
 		void errorOccured( NetworkSignal );
