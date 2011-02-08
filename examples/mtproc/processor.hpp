@@ -1,10 +1,10 @@
-#ifndef _SMERP_VMTPROCESSOR_HANDLER_HPP_INCLUDED
-#define _SMERP_VMTPROCESSOR_HANDLER_HPP_INCLUDED
+#ifndef _SMERP_METHODTABLE_PROCESSOR_HANDLER_HPP_INCLUDED
+#define _SMERP_METHODTABLE_PROCESSOR_HANDLER_HPP_INCLUDED
 #include "protocol/generator.hpp"
 #include "connectionHandler.hpp"
 
 namespace _SMERP {
-namespace vmtproc {
+namespace mtproc {
 
 //method of the processor
 struct Method
@@ -31,10 +31,10 @@ struct Method
 //current instance with data of the processor
 struct Instance
 {
-   const Method* vmt;
+   const Method* mt;
    Method::Data* data;
 
-   Instance()                    :vmt(0),data(0){};
+   Instance()                    :mt(0),data(0){};
    virtual ~Instance(){};
 
 private:
@@ -42,23 +42,28 @@ private:
    void operator=( Instance&){};
 };
 
-//connection handler of the processor
+
+/// The connection handler
 class Connection : public Network::connectionHandler
 {
    public:
       typedef Network::NetworkOperation Operation;
       
       Connection( const Network::LocalTCPendpoint& local, unsigned int inputBufferSize=128, unsigned int outputBufferSize=128);
-      Connection( const Network::LocalSSLendpoint& local );
-      ~Connection();
+      Connection( const Network::LocalSSLendpoint& local);
+      virtual ~Connection();
       
-      virtual void setPeer( const Network::RemoteTCPendpoint& remote );
-      virtual void setPeer( const Network::RemoteSSLendpoint& remote );
+      virtual void setPeer( const Network::RemoteTCPendpoint& remote);
+      virtual void setPeer( const Network::RemoteSSLendpoint& remote);
       
       /// Handle a request and produce a reply.
-      virtual Operation nextOperation();
-      virtual void* networkInput( const void *begin, std::size_t bytesTransferred );
-
+      virtual const Operation nextOperation();
+      virtual void networkInput( const void *begin, std::size_t bytesTransferred);
+      
+      virtual void timeoutOccured();
+      virtual void signalOccured();
+      virtual void errorOccured( NetworkSignal);
+      
       void initInstance( Instance* instance);
       
    public:
@@ -67,14 +72,14 @@ class Connection : public Network::connectionHandler
       Private* data;
 };
 
-}//namespace vmtproc
+}//namespace mtproc
 
 /// The server handler container
 class ServerHandler::ServerHandlerImpl
 {
    public:
-      Network::connectionHandler* newConnection( const Network::LocalTCPendpoint& local );
-      Network::connectionHandler* newSSLconnection( const Network::LocalSSLendpoint& local );
+      Network::connectionHandler* newConnection( const Network::LocalTCPendpoint& local);
+      Network::connectionHandler* newSSLconnection( const Network::LocalSSLendpoint& local);
 };
 
 }//namespace

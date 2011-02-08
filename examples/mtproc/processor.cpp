@@ -11,16 +11,16 @@ private:
    protocol::Parser cmdParser;
 
    //* typedefs for input output blocks and input iterators
-   typedef protocol::InputBlock Input;                                      //< input buffer type
-   typedef protocol::OutputBlock Output;                                    //< output buffer type
-   typedef protocol::InputBlock::const_iterator ProtocolIterator;           //< iterator type for protocol commands
-   typedef protocol::TextIterator<Input::const_iterator> ContentIterator;   //< iterator type for content   
+   typedef protocol::InputBlock Input;                          //< input buffer type
+   typedef protocol::OutputBlock Output;                        //< output buffer type
+   typedef protocol::InputBlock::const_iterator InputIterator;  //< iterator type for protocol commands
 
    //* typedefs for input output buffers
    enum {BufferSize=256};
-   typedef protocol::Buffer<BufferSize> LineBuffer;                         //< buffer for one line of input/output
-   typedef protocol::CmdBuffer CmdBuffer;                                   //< buffer for protocol commands 
-   typedef protocol::CArgBuffer <LineBuffer> ArgBuffer;
+   typedef protocol::Buffer<BufferSize> LineBuffer;             //< buffer for one line of input/output
+   typedef protocol::CmdBuffer CmdBuffer;                       //< buffer for protocol commands 
+   typedef protocol::CArgBuffer <LineBuffer> ArgBuffer;         //< buffer for argc,argv argument parsing
+   typedef protocol::CmdParser<CmdBuffer> ProtocolParser;       //< parser for the protocol
 
    //* typedefs for state variables and buffers
    //list of processor states
@@ -29,8 +29,10 @@ private:
       Init,
       EnterCommand,
       ParseArguments,
-      Processing,
+      StartProcessing,
       ProcessingAfterWrite,
+      Processing,
+      ProcessingEoD,
       HandleError,
       Terminate
    };
@@ -38,13 +40,7 @@ private:
    {
       static const char* ar[] =
       {
-         "Init",
-         "EnterCommand",
-         "ParseArguments",
-         "Processing",
-         "ProcessingAfterWrite",
-         "HandleError",
-         "Terminate"
+         "Init","EnterCommand","ParseArguments","StartProcessing","ProcessingAfterWrite","Processing","ProcessingEoD","HandleError","Terminate"
       };
       return ar[i];
    };
@@ -57,15 +53,15 @@ private:
    {
    private:
       ProtocolParser m_parser;
-      Instance* m_instance;
-      Method::Context m_context;
-      unsigned int m_methodIdx;
-      bool m_terminated;
+      Instance* m_instance;          //< method table and data
+      Method::Context m_context;     //< context of current method executed
+      unsigned int m_methodIdx;      //< index of currently executed method
+      bool m_running;                //< true if method started
       
       void resetCommand()
       {
          m_methodIdx = 0;
-         m_terminated = true;
+         m_running = false;
          m_context.init( m_instance?m_instance->data,0);
       };
       
@@ -83,49 +79,26 @@ private:
                parser.add( protocolCmds[ ii]);
             }
          }
-         if (instance && instance->vmt)
+         if (instance && instance->mt)
          {
             m_context.data = instance->data;
-            for( unsigned int ii=0; instance->vmt[ii].call && instance->vmt[ii].name; ii++)
+            for( unsigned int ii=0; instance->mt[ii].call && instance->mt[ii].name; ii++)
             {
-               parser.add( instance->vmt[ii].name);
+               parser.add( instance->mt[ii].name);
             }
          }
       };
 
-      void getGeneratorMem( Input& input, Input::const_iterator& itr)
+      void processorInput( Input& input, Input::const_iterator& end)
       {
          if (m_context.contentIterator)
          {
-            void* block;
-            unsigned int blocksize;
-            m_context.contentIterator->getRestBlock( &block, &blocksize);
-            if (blocksize > input.size())
-            {
-               LOG_ERROR << "cannot buffer rest of processor input block: " << blocksize << " bytes";
-               blocksize = input.size();
-            }
-            if (input.charptr()+input.pos() == (char*)block+blocksize)
-            {
-               //... memory block was not copied by the processor method.
-               //    So we just move our iterator to the end of the block processed by the method.
-               itr = input.at( input.pos()-blocksize);
-            }
-            else
-            {
-               //... memory block is not the original, so we have to move it into the input buffer
-               memmove( input.ptr(), block, blocksize);
-               input.setPos( blocksize);
-               itr = input.begin();
-            }
+            m_context.contentIterator->processorInput( input.ptr(), end-input.begin());
          }
-      };
-      
-      void feedGeneratorMem( Input& input, Input::const_iterator& itr)
-      {
-         if (m_context.contentIterator && input.pos()>itr.pos())
+         else
          {
-            m_context.contentIterator->feed( input.charptr()+itr.pos(), input.pos()-itr.pos());
+            LOG_ERROR << "illegal state (running but no context)";
+            init();
          }
       };
       
@@ -156,16 +129,16 @@ private:
       void writeCaps( Buffer& buf)
       {
          unsigned int ii;
-         if (m_instance && m_instance->vmt)
+         if (m_instance && m_instance->mt)
          {
-            for( unsigned int ii=0; instance->vmt[ii].call && instance->vmt[ii].name; ii++)
+            for( unsigned int ii=0; instance->mt[ii].call && instance->mt[ii].name; ii++)
             {
                if (ii>0)
                {
                   buf.push_back( ',');
                   buf.push_back( ' ');
                }
-               buf.append( instance->vmt[ii].name);
+               buf.append( instance->mt[ii].name);
             }
          }
       };
@@ -189,17 +162,13 @@ private:
       
       unsigned int call( int argc, const char** argv)
       {
-         if (m_context.contentIterator && m_context.contentIterator->state == protocol::Generator::EndOfInput)
-         {
-            feedGeneratorMem( input, itr)
-            m_context.contentIterator->state = protocol::Generator::Processing;
-         }
-         LOG_DEBUG << "call of '" << m_instance->vmt[ m_methodIdx].name << "'";
+         if (!m_running) LOG_DEBUG << "call of '" << m_instance->mt[ m_methodIdx].name << "'";
+         m_running = true;
 
-         unsigned int rt = m_instance->vmt[ m_methodIdx].call( &m_context, argc, argv);
+         unsigned int rt = m_instance->mt[ m_methodIdx].call( &m_context, argc, argv);
          if (rt != 0)
          {
-            LOG_ERROR << "error " << rt << " calling '" << m_instance->vmt[ m_methodIdx].name << "'";
+            LOG_ERROR << "error " << rt << " calling '" << m_instance->mt[ m_methodIdx].name << "'";
             getGeneratorMem( input, itr)
             resetCommand();
          }
@@ -213,7 +182,6 @@ private:
                   break;
                case protocol::Generator::Error:
                case protocol::Generator::EndOfInput:
-                  getGeneratorMem( input, itr)
                   resetCommand();
                   break;
                case protocol::Generator::EndOfBuffer:
@@ -223,9 +191,9 @@ private:
          return rt;
       };
 
-      bool hasTerminated() const
+      bool isRunning() const
       {
-         return m_terminated;
+         return m_running;
       };
    };
 

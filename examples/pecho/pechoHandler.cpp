@@ -18,7 +18,8 @@ struct Connection::Private
    //* typedefs for input output buffers
    typedef protocol::Buffer<128> LineBuffer;                    //< buffer for one line of input/output
    typedef protocol::CmdBuffer CmdBuffer;                       //< buffer for protocol commands
-
+   typedef protocol::CmdParser<CmdBuffer> ProtocolParser;       //< parser for the protocol
+   
    //* typedefs for state variables and buffers
    //list of processor states
    enum State
@@ -59,9 +60,6 @@ struct Connection::Private
    //3. Iterators
    InputIterator itr;                         //< iterator to scan protocol input
    InputIterator end;                         //< iterator pointing to end of buffer
-   
-   //* the parser of the protocol
-   typedef protocol::CmdParser<CmdBuffer> ProtocolParser;
 
    //* helper methods for I/O
    //helper function to send a line message with CRLF termination as C string

@@ -17,19 +17,19 @@ namespace pecho {
       typedef Network::NetworkOperation Operation;
 
       Connection( const Network::LocalTCPendpoint& local, unsigned int inputBufferSize=128, unsigned int outputBufferSize=128);
-      Connection( const Network::LocalSSLendpoint& local );
-      ~Connection();
+      Connection( const Network::LocalSSLendpoint& local);
+      virtual ~Connection();
 
-      virtual void setPeer( const Network::RemoteTCPendpoint& remote );
-      virtual void setPeer( const Network::RemoteSSLendpoint& remote );
+      virtual void setPeer( const Network::RemoteTCPendpoint& remote);
+      virtual void setPeer( const Network::RemoteSSLendpoint& remote);
 
       /// Handle a request and produce a reply.
       virtual const Operation nextOperation();
-      virtual void networkInput( const void *begin, std::size_t bytesTransferred );
+      virtual void networkInput( const void *begin, std::size_t bytesTransferred);
 
-      void timeoutOccured();
-      void signalOccured();
-      void errorOccured( NetworkSignal );
+      virtual void timeoutOccured();
+      virtual void signalOccured();
+      virtual void errorOccured( NetworkSignal);
 
    public:
       struct Private;
@@ -43,8 +43,8 @@ namespace pecho {
    class ServerHandler::ServerHandlerImpl
    {
    public:
-      Network::connectionHandler* newConnection( const Network::LocalTCPendpoint& local );
-      Network::connectionHandler* newSSLconnection( const Network::LocalSSLendpoint& local );
+      Network::connectionHandler* newConnection( const Network::LocalTCPendpoint& local);
+      Network::connectionHandler* newSSLconnection( const Network::LocalSSLendpoint& local);
    };
 
 } // namespace _SMERP

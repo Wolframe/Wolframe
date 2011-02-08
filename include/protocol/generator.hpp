@@ -56,7 +56,7 @@ class Generator
       virtual bool skip()=0;
 
       //used by the protocol to pass more content to the generator in yield state.
-      virtual void feed( void* block, unsigned int blocksize)=0;
+      virtual void protocolInput( void* block, unsigned int blocksize)=0;
       
       //used by functions that transform generators (like XML header to content with different character set)
       virtual void getRestBlock( void** block, unsigned int* blocksize)=0;
