@@ -58,8 +58,8 @@ all: $(OBJS) $(CPP_BINS)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-!IFDEF WITH_GTEST
 threadLeakTest.exe: threadLeakTest.obj $(TOPDIR)\src\smerp.lib
+!IFDEF WITH_GTEST
 versionTest.exe: versionTest.obj $(TOPDIR)\src\smerp.lib
 counterTest.exe: counterTest.obj $(TOPDIR)\src\smerp.lib
 resolvePathTest.exe: resolvePathTest.obj $(TOPDIR)\src\smerp.lib
