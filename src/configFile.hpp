@@ -62,7 +62,6 @@ namespace _SMERP	{
 		std::string		errMsg_;
 
 	public:
-		CfgFileConfig();
 		static const char* chooseFile( const char *globalFile,
 						const char *userFile,
 						const char *localFile );

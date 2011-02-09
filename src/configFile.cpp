@@ -61,10 +61,6 @@ namespace _SMERP {
 		return NULL;
 	}
 
-	CfgFileConfig::CfgFileConfig()
-	{
-	}
-
 
 	bool CfgFileConfig::parse ( const char *filename )
 	{
