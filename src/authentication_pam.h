@@ -1,5 +1,5 @@
-#ifndef WTPACMAN_AUTH_PAM_H
-#define WTPACMAN_AUTH_PAM_H
+#ifndef SMERP__AUTH_PAM_H
+#define SMERP__AUTH_PAM_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -12,14 +12,16 @@ extern "C" {
 
 /**
  * Login via PAM.
+ *
  */
-int auth_pam(		const char *login,
-				const char *password,
-				const char *service,
-				char *errbuf, size_t errbuflen );
+int smerp_auth_pam(	const char *login,
+			const char *password,
+			const char *service,
+			char *errbuf,
+			size_t errbuflen );
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* ifndef WTPACMAN_AUTH_PAM_H */
+#endif /* ifndef SMERP__AUTH_PAM_H */

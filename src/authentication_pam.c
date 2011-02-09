@@ -11,7 +11,8 @@ typedef struct {
 	pam_handle_t *h;
 } pam_appdata;
 
-static const char *msg_style_to_str( int msg_style ) {
+static const char *msg_style_to_str( int msg_style )
+{
 	switch( msg_style ) {
 		case PAM_PROMPT_ECHO_OFF:	return "PAM_PROMPT_ECHO_OFF";
 		case PAM_TEXT_INFO:		return "PAM_TEXT_INFO";
@@ -21,7 +22,8 @@ static const char *msg_style_to_str( int msg_style ) {
 	}
 }
 
-static void null_and_free( int nmsg, struct pam_response *pr ) {
+static void null_and_free( int nmsg, struct pam_response *pr )
+{
 	int i;
 	struct pam_response *r = pr;
 
@@ -38,14 +40,18 @@ static void null_and_free( int nmsg, struct pam_response *pr ) {
 }
 
 static int pam_conv_func( int nmsg, const struct pam_message **msg,
-	struct pam_response **reply, void *appdata_ptr ) {
+	struct pam_response **reply, void *appdata_ptr )
+{
 	int i;
 	const struct pam_message *m = *msg;
 	struct pam_response *r;
 	int rc;
 	const char *login_prompt = NULL;
+	union { const char *s; const void *v; } login_prompt_union;
 
 	pam_appdata *appdata = (pam_appdata *)appdata_ptr;
+
+	login_prompt_union.s = login_prompt;
 
 	/* check sanity of the messages passed */
 	if( nmsg <= 0 || nmsg >= PAM_MAX_NUM_MSG ) {
@@ -86,7 +92,7 @@ static int pam_conv_func( int nmsg, const struct pam_message **msg,
 			 * Always recheck because the library could change the prompt any time
 			 */
 			case PAM_PROMPT_ECHO_ON:
-				rc = pam_get_item( appdata->h, PAM_USER_PROMPT, &login_prompt );
+				rc = pam_get_item( appdata->h, PAM_USER_PROMPT, &login_prompt_union.v );
 				if( rc != PAM_SUCCESS ) {
 					snprintf( appdata->errbuf, appdata->errbuflen,
 						"pam_get_item( PAM_USER_PROMPT) failed with: %s (%d)\n",
@@ -125,10 +131,12 @@ error:
 	return PAM_CONV_ERR;
 }
 
-int auth_pam(		const char *login,
+int smerp_auth_pam(	const char *login,
 			const char *password,
 			const char *service,
-			char *errbuf, size_t errbuflen ) {
+			char *errbuf,
+			size_t errbuflen )
+{
 	int rc;
 	pam_appdata appdata;
 	struct pam_conv conv;
@@ -161,7 +169,7 @@ int auth_pam(		const char *login,
 	/* is access permitted? */
 	rc = pam_acct_mgmt( h, 0 );
 	if( rc != PAM_SUCCESS ) {
-		fprintf( stderr, "pam_acct_mgmt failed with: %s (%d)\n", pam_strerror( h, rc ), rc );
+		snprintf( errbuf, errbuflen, "pam_acct_mgmt failed with: %s (%d)\n", pam_strerror( h, rc ), rc );
 		goto TERMINATE;
 	}
 
