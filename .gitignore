@@ -21,6 +21,7 @@ test.bat
 simple_event_log.h
 *.rc
 src/smerpd
+tests/testNamedRetVal
 tests/singletonTest
 tests/versionTest
 tests/logTest

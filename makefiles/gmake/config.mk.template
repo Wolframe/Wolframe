@@ -85,3 +85,13 @@
 #LUA_INCLUDE_DIR = $(LUA_DIR)/include
 #LUA_LIB_DIR = $(LUA_DIR)/lib
 #LUA_LIBS = -llua
+
+# PAM 1.1.3
+###########
+
+#PAM_DIR = /home/user/pam-1.1.3
+
+# usual layout
+#PAM_INCLUDE_DIR = $(PAM_DIR)/include
+#PAM_LIB_DIR = $(PAM_DIR)/lib
+#PAM_LIBS = -lpam
