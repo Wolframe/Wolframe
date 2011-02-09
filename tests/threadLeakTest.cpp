@@ -4,7 +4,7 @@
 void
 someWork ()
 {
-  double a;
+  double a = 0.0;
   for (int i = 0; i < 1000; i++)
     {
       a += log ((double) i);
