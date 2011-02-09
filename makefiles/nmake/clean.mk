@@ -36,6 +36,8 @@ clean: clean_recursive local_clean
 	-@erase *.res 2>NUL
 	-@erase MSG*.bin 2>NUL
 	-@erase *.dllobj 2>NUL
+	-@erase *.dll 2>NUL
+	-@erase *.lib 2>NUL
 	-@erase $(DLL_OBJS) 2>NUL
 	-@erase *.exp 2>NUL
 	-@erase *.ilk 2>NUL
