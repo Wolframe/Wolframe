@@ -17,33 +17,38 @@
 namespace _SMERP {
 	namespace Network	{
 
-		server::server( const std::vector<ServerTCPendpoint>& TCPserver,
-				SMERP_UNUSED const std::vector<ServerSSLendpoint>& SSLserver,
+		server::server( const std::list<ServerTCPendpoint>& TCPserver,
+				SMERP_UNUSED const std::list<ServerSSLendpoint>& SSLserver,
 				_SMERP::ServerHandler& serverHandler,
 				unsigned threads, unsigned maxConnections )
 					: threadPoolSize_( threads ),
 					IOservice_(),
 					globalList_( maxConnections )
 		{
-			size_t	i;
-			for ( i = 0; i < TCPserver.size(); i++ )	{
+			int i = 0;
+			for ( std::list<ServerTCPendpoint>::const_iterator it = TCPserver.begin();
+									it != TCPserver.end(); it++ )	{
 				acceptor* acptr = new acceptor( IOservice_,
-								TCPserver[i].host(), TCPserver[i].port(), TCPserver[i].maxConnections(),
+								it->host(), it->port(), it->maxConnections(),
 								globalList_,
 								serverHandler );
 				acceptor_.push_back( acptr );
+				i++;
 			}
 			LOG_DEBUG << i << " network acceptor(s) created.";
 #ifdef WITH_SSL
-			for ( i = 0; i < SSLserver.size(); i++ )	{
+			i = 0;
+			for ( std::list<ServerSSLendpoint>::const_iterator it = SSLserver.begin();
+									it != SSLserver.end(); it++ )	{
 				SSLacceptor* acptr = new SSLacceptor( IOservice_,
-								      SSLserver[i].certificate(), SSLserver[i].key(),
-								      SSLserver[i].verifyClientCert(),
-								      SSLserver[i].CAchain(), SSLserver[i].CAdirectory(),
-								      SSLserver[i].host(), SSLserver[i].port(), SSLserver[i].maxConnections(),
+								      it->certificate(), it->key(),
+								      it->verifyClientCert(),
+								      it->CAchain(), it->CAdirectory(),
+								      it->host(), it->port(), it->maxConnections(),
 								      globalList_,
 								      serverHandler );
 				SSLacceptor_.push_back( acptr );
+				i++;
 			}
 			LOG_DEBUG << i << " network SSL acceptor(s) created.";
 #endif // WITH_SSL

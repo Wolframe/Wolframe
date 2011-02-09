@@ -15,7 +15,6 @@
 #include "configurationBase.hpp"
 
 #include <string>
-#include <vector>
 #include <list>
 
 namespace _SMERP {
@@ -107,8 +106,8 @@ namespace _SMERP {
 		unsigned		maxConnections;
 
 // network configuration
-		std::vector<Network::ServerTCPendpoint> address;
-		std::vector<Network::ServerSSLendpoint> SSLaddress;
+		std::list<Network::ServerTCPendpoint> address;
+		std::list<Network::ServerSSLendpoint> SSLaddress;
 
 		unsigned		idleTimeout;
 		unsigned		requestTimeout;

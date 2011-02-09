@@ -255,24 +255,26 @@ namespace _SMERP {
 
 		os << "Network" << std::endl;
 		if ( address.size() > 0 )	{
-			os << "  Unencrypted: " << address[0].toString() << std::endl;
-			for ( unsigned i = 1; i < address.size(); i++ )
-				os << "               " << address[i].toString() << std::endl;
+			std::list<Network::ServerTCPendpoint>::const_iterator it = address.begin();
+			os << "  Unencrypted: " << it->toString() << std::endl;
+			for ( ++it; it != address.end(); ++it )
+				os << "               " << it->toString() << std::endl;
 		}
 		if ( SSLaddress.size() > 0 )	{
-			os << "          SSL: " << SSLaddress[0].toString() << std::endl;
-			os << "                  certificate: " << (SSLaddress[0].certificate().empty() ? "(none)" : SSLaddress[0].certificate()) << std::endl;
-			os << "                  key file: " << (SSLaddress[0].key().empty() ? "(none)" : SSLaddress[0].key()) << std::endl;
-			os << "                  CA directory: " << (SSLaddress[0].CAdirectory().empty() ? "(none)" : SSLaddress[0].CAdirectory()) << std::endl;
-			os << "                  CA chain file: " << (SSLaddress[0].CAchain().empty() ? "(none)" : SSLaddress[0].CAchain()) << std::endl;
-			os << "                  verify client: " << (SSLaddress[0].verifyClientCert() ? "yes" : "no") << std::endl;
-			for ( unsigned i = 1; i < SSLaddress.size(); i++ )	{
-				os << "               " << SSLaddress[i].toString() << std::endl;
-				os << "                  certificate: " << (SSLaddress[i].certificate().empty() ? "(none)" : SSLaddress[i].certificate()) << std::endl;
-				os << "                  key file: " << (SSLaddress[i].key().empty() ? "(none)" : SSLaddress[i].key()) << std::endl;
-				os << "                  CA directory: " << (SSLaddress[i].CAdirectory().empty() ? "(none)" : SSLaddress[i].CAdirectory()) << std::endl;
-				os << "                  CA chain file: " << (SSLaddress[i].CAchain().empty() ? "(none)" : SSLaddress[i].CAchain()) << std::endl;
-				os << "                  verify client: " << (SSLaddress[i].verifyClientCert() ? "yes" : "no") << std::endl;
+			std::list<Network::ServerSSLendpoint>::const_iterator it = SSLaddress.begin();
+			os << "          SSL: " << it->toString() << std::endl;
+			os << "                  certificate: " << (it->certificate().empty() ? "(none)" : it->certificate()) << std::endl;
+			os << "                  key file: " << (it->key().empty() ? "(none)" : it->key()) << std::endl;
+			os << "                  CA directory: " << (it->CAdirectory().empty() ? "(none)" : it->CAdirectory()) << std::endl;
+			os << "                  CA chain file: " << (it->CAchain().empty() ? "(none)" : it->CAchain()) << std::endl;
+			os << "                  verify client: " << (it->verifyClientCert() ? "yes" : "no") << std::endl;
+			for ( ++it; it != SSLaddress.end(); ++it )	{
+				os << "               " << it->toString() << std::endl;
+				os << "                  certificate: " << (it->certificate().empty() ? "(none)" : it->certificate()) << std::endl;
+				os << "                  key file: " << (it->key().empty() ? "(none)" : it->key()) << std::endl;
+				os << "                  CA directory: " << (it->CAdirectory().empty() ? "(none)" : it->CAdirectory()) << std::endl;
+				os << "                  CA chain file: " << (it->CAchain().empty() ? "(none)" : it->CAchain()) << std::endl;
+				os << "                  verify client: " << (it->verifyClientCert() ? "yes" : "no") << std::endl;
 			}
 		}
 

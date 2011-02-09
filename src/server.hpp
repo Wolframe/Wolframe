@@ -8,7 +8,7 @@
 #include <boost/asio.hpp>
 #include <boost/noncopyable.hpp>
 
-#include <vector>
+#include <list>
 
 #include "serverEndpoint.hpp"
 #include "acceptor.hpp"
@@ -24,8 +24,8 @@ namespace _SMERP {
 			/// public interface
 		public:
 			/// Construct the server
-			explicit server( const std::vector<ServerTCPendpoint>& TCPserver,
-					 const std::vector<ServerSSLendpoint>& SSLserver,
+			explicit server( const std::list<ServerTCPendpoint>& TCPserver,
+					 const std::list<ServerSSLendpoint>& SSLserver,
 					 _SMERP::ServerHandler& serverHandler,
 					 unsigned threads, unsigned maxConnections );
 
