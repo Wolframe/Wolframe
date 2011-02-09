@@ -30,6 +30,24 @@ INCLUDE_LIBS += \
 
 endif
 
+# pam
+
+ifdef WITH_PAM
+
+INCLUDE_CPPFLAGS += \
+	-DWITH_PAM
+
+INCLUDE_DIRS += \
+	-I$(PAM_INCLUDE_DIR)
+
+INCLUDE_LDFLAGS += \
+	-L$(PAM_LIB_DIR)
+
+INCLUDE_LIBS += \
+	$(PAM_LIBS)
+
+endif
+
 LOCAL_STATIC_LIB = \
 	libsmerp.a
 
@@ -46,7 +64,14 @@ LOCAL_STATIC_LIB_OBJS = \
 	acceptor.o \
 	getPassword.o \
 	connection.o \
-	server.o
+	server.o \
+	authentication.o
+
+# pam
+ifdef WITH_PAM
+LOCAL_STATIC_LIB_OBJS += \
+	authentication_pam.o
+endif
 
 OBJS = \
 	$(LOCAL_STATIC_LIB_OBJS) \

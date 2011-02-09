@@ -455,3 +455,20 @@ endif
 
 endif
 endif
+
+# PAM 1.1.3
+###########
+
+ifdef WITH_PAM
+
+ifeq "$(PLATFORM)" "LINUX"
+
+ifeq "$(LINUX_DIST)" "arch"
+PAM_DIR ?= /usr
+PAM_INCLUDE_DIR ?= $(PAM_DIR)/include
+PAM_LIB_DIR ?= /lib
+PAM_LIBS ?= -lpam
+endif
+
+endif
+endif
