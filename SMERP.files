@@ -201,3 +201,4 @@ include/protocol/buffers.hpp
 src/authentication.hpp
 src/authentication.cpp
 tests/testNamedRetVal.cpp
+src/smerpLogic.cpp

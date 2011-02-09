@@ -19,14 +19,12 @@
 
 #include <boost/property_tree/info_parser.hpp>
 
-#include <boost/algorithm/string.hpp>
-
 #include <vector>
 #include <string>
 
 
 static const unsigned short	DEFAULT_PORT = 7660;
-static const unsigned short	SSL_DEFAULT_PORT = 7660;
+static const unsigned short	SSL_DEFAULT_PORT = 7960;
 
 static const char*		DEFAULT_SERVICE_NAME = "smerp";
 static const char*		DEFAULT_SERVICE_DISPLAY_NAME = "Smerp Daemon";

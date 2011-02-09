@@ -36,6 +36,7 @@ LOCAL_STATIC_LIB = \
 LOCAL_STATIC_LIB_OBJS = \
 	version.o \
 	resolvePath.o \
+	smerpLogic.o \
 	commandLine.o \
 	logLevel.o \
 	logSyslogFacility.o \
