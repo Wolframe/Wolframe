@@ -34,7 +34,6 @@ public:
    
    //access violation exceptions
    struct ArrayBoundReadError                    :public std::logic_error {ArrayBoundReadError():std::logic_error("ABR"){};};
-   struct ArrayBoundWriteError                   :public std::logic_error {ArrayBoundWriteError():std::logic_error("ABR"){};};
    
    //element typedefs
    typedef char value_type;
@@ -42,7 +41,7 @@ public:
    
    //random access operators
    char operator[]( size_type idx) const         {if (idx>=m_pos) throw ArrayBoundReadError(); return charptr()[idx];};
-   char& operator[]( size_type idx)              {if (idx>=m_pos) throw ArrayBoundWriteError(); return charptr()[idx];};
+   char& operator[]( size_type idx)              {if (idx>=m_pos) throw ArrayBoundReadError(); return charptr()[idx];};
   
 private:
    void* m_ptr;
@@ -81,7 +80,7 @@ public:
    iterator end()                                       {return iterator(this)+size();};
    
    //end of data calculation and markup
-   const_iterator getEoD( const_iterator start);
+   iterator getEoD( iterator start);
    void resetEoD()                                      {m_eodState=EoD::SRC;};
 
 private:

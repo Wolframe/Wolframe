@@ -13,7 +13,7 @@ struct Connection::Private
    //* typedefs for input output blocks and input iterators
    typedef protocol::InputBlock Input;                          //< input buffer type
    typedef protocol::OutputBlock Output;                        //< output buffer type
-   typedef protocol::InputBlock::const_iterator InputIterator;  //< iterator type for protocol commands
+   typedef protocol::InputBlock::iterator InputIterator;        //< iterator type for protocol commands
    
    //* typedefs for input output buffers
    typedef protocol::Buffer<128> LineBuffer;                    //< buffer for one line of input/output
@@ -31,13 +31,12 @@ struct Connection::Private
       StartProcessing,
       ProcessingAfterWrite,
       Processing,
-      ProcessingEoD,
       HandleError,
       Terminate
    };
    static const char* stateName( State i)
    {
-      static const char* ar[] = {"Init","EnterCommand","EmptyLine","EnterMode","StartProcessing","ProcessingAfterWrite","Processing","ProcessingEoD","HandleError","Terminate"};
+      static const char* ar[] = {"Init","EnterCommand","EmptyLine","EnterMode","StartProcessing","ProcessingAfterWrite","Processing","HandleError","Terminate"};
       return ar[i];
    };
    //substate of processing (how we do processing)
@@ -59,8 +58,9 @@ struct Connection::Private
    Output output;                             //< buffer for network write messages
    //3. Iterators
    InputIterator itr;                         //< iterator to scan protocol input
-   InputIterator end;                         //< iterator pointing to end of buffer
-
+   InputIterator eoM;                         //< iterator pointing to end of message buffer
+   InputIterator eoD;                         //< iterator pointing to end of data or to eoM, if not yet available
+   
    //* helper methods for I/O
    //helper function to send a line message with CRLF termination as C string
    Operation WriteLine( const char* str)
@@ -89,29 +89,36 @@ struct Connection::Private
       }
       return true;
    };
-   //echo processing: every character read from input is written to output and with an end of line recognized the
-   //output is flushed. (false returned)
+   //echo processing: every character read from input is written to output 
    //@return EchoState
    enum EchoState {EoD, EoM, bufferFull};
    EchoState echoInput()
    {
-      char ch;
       for (;;)
       {
-         if (itr == end) return EoM;
-         if ((ch=*itr) == 0) return EoD;
+         if (itr == eoD)
+         {
+            if (itr == eoM) return EoM; else return EoD;
+         }
          if (output.restsize() == 0) return bufferFull;
-         print(ch);
-         ++itr;    //if this fails we get to the same point when reentering this procedure
+         print(*itr);
+         ++itr;
       }
    };
 
    void networkInput( const void*, std::size_t nofBytes)
    {
        input.setPos( nofBytes);
-       itr = const_cast<const Input*>(&input)->begin();
-       end = const_cast<const Input*>(&input)->end();
-       if (state == Processing) end = input.getEoD( itr);
+       itr = input.begin();
+       if (state == Processing || state == StartProcessing)
+       {
+          eoD = input.getEoD( itr);
+          eoM = input.end();
+       }
+       else
+       {
+          eoD = eoM = input.end();
+       }
    };
    
    void signalTerminate()
@@ -122,8 +129,8 @@ struct Connection::Private
    //* interface
    Private( unsigned int inputBufferSize, unsigned int outputBufferSize)   :state(Init),mode(Ident),input(inputBufferSize),output(outputBufferSize)
    {
-      itr = const_cast<const Input*>(&input)->begin();
-      end = const_cast<const Input*>(&input)->end();
+      itr = input.begin();
+      eoD = eoM = input.end();
    };
    ~Private()  {};
 
@@ -187,23 +194,16 @@ struct Connection::Private
 
             case EmptyLine:
             {
-                //this state is for reading until the end of the line. there is no buffering below,
-                //so we have to the next line somehow:
-                ProtocolParser::getLine( itr, buffer);
-                if (buffer.size() > 0)
-                {
-                   state = Init;
-                   buffer.init();
-                   //a line starting with a space that is not an empty line leads to an error:
-                   return WriteLine( "BAD command line");
-                }
-                else
-                {
-                   //here is an empty line, so we jump back to the line promt:
-                   state = EnterCommand;
-                   ProtocolParser::consumeEOLN( itr); //< consume the end of line for not getting into an endless loop with empty command
-                   continue;
-                }
+               ProtocolParser::skipSpaces( itr);
+               if (*itr != '\r' && *itr != '\n')
+               {
+                  state = Init;
+                  buffer.init();
+                  return WriteLine( "BAD command line");
+               }
+               if (*itr == '\r') itr++;
+               state = EnterCommand;
+               if (*itr == '\n') itr++;
             }
 
             case EnterMode:
@@ -254,7 +254,7 @@ struct Connection::Private
                 //the first character of the EOF sequence.
                 input.resetEoD();
                 ProtocolParser::skipSpaces( itr);
-                if (!ProtocolParser::isEOLN( itr))
+                if (*itr != '\r' && *itr != '\n')
                 {
                    state = Init;
                    return WriteLine( "BAD too many arguments");
@@ -262,7 +262,8 @@ struct Connection::Private
                 else
                 {
                    state = Processing;
-                   end = input.getEoD( itr);
+                   eoD = input.getEoD( itr);
+                   eoM = input.end();
                    return WriteLine( "OK enter data");
                 }
             }
@@ -287,7 +288,8 @@ struct Connection::Private
 
                 if (echoState == EoD)
                 {
-                   state = ProcessingEoD;
+                   input.resetEoD();
+                   state = Init;
                 }
                 else
                 {
@@ -299,19 +301,12 @@ struct Connection::Private
                 return Network::SendData( content, size);
             }
 
-            case ProcessingEoD:
-            {
-                state = Init;
-                itr++;
-                continue;
-            }
-
             case HandleError:
             {
-                //in the error case, start again after complaining (write sent in previous state):
-                ProtocolParser::getLine( itr, buffer);   //< parse the rest of the line to clean the input for the next command
-                ProtocolParser::consumeEOLN( itr);
+                ProtocolParser::skipSpaces( itr);
+                if (*itr == '\r') itr++;
                 state = Init;
+                if (*itr == '\n') itr++;
                 continue;
             }
 

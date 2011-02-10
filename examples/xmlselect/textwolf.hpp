@@ -49,7 +49,7 @@ struct throws_exception
    {
       Unknown, DimOutOfRange, StateNumbersNotAscending, InvalidParam,
       InvalidState, IllegalParam, IllegalAttributeName, OutOfMem,
-      ArrayBoundsReadWrite
+      ArrayBoundsReadWrite,NotAllowedOperation
    };
 };
 
@@ -57,17 +57,17 @@ struct exception   :public std::exception
 {
    typedef throws_exception::Cause Cause;
    Cause cause;
-   
+
    exception (Cause p_cause) throw()                    :cause(p_cause) {};
    exception (const exception& orig) throw()            :cause(orig.cause) {};
    exception& operator= (const exception& orig) throw() {cause=orig.cause; return *this;};
    virtual ~exception() throw() {};
    virtual const char* what() const throw()
    {
-      static const char* nameCause[ 9] = {
+      static const char* nameCause[ 10] = {
          "Unknown","DimOutOfRange","StateNumbersNotAscending","InvalidParam",
          "InvalidState","IllegalParam","IllegalAttributeName","OutOfMem",
-         "ArrayBoundsReadWrite"
+         "ArrayBoundsReadWrite","NotAllowedOperation"
       };
       return nameCause[ (unsigned int) cause];
    };
@@ -345,13 +345,13 @@ public:
       getcur();
       return controlCharMap[ (unsigned char)cur];
    };
-   
+
    char ascii()
    {
       getcur();
       return cur>=0?cur:0;
    };
-   
+
    TextScanner& skip()
    {
       while (state < CharSet::asize())
@@ -364,7 +364,7 @@ public:
       val = 0;
       return *this;
    };
-   
+
    TextScanner& operator ++()     {return skip();};
    TextScanner operator ++(int)   {TextScanner tmp(*this); skip(); return tmp;};
 };
@@ -388,8 +388,7 @@ public:
       } action;
       char next[ NofControlCharacter];
 
-      Element()
-            :fallbackState(-1),missError(-1)
+      Element() :fallbackState(-1),missError(-1)
       {
          action.op = -1;
          action.arg = 0;
@@ -455,9 +454,7 @@ private:
       tab[ size-1].fallbackState = stateIdx;
    };
 public:
-   ScannerStatemachine()
-      :size(0)
-   {};
+   ScannerStatemachine() :size(0){};
 
    ScannerStatemachine& operator[]( int stateIdx)                           {newState(stateIdx); return *this;};   
    ScannerStatemachine& operator()( ControlCharacter inputchr, int ns)      {addTransition(inputchr,ns); return *this;};
@@ -540,7 +537,7 @@ public:
       return name[ (unsigned int)a];
    };
 
-   //@TODO return entity definitions as events back
+   //@TODO handle entity definitions
    struct Statemachine :public ScannerStatemachine
    {
       Statemachine()
@@ -629,14 +626,14 @@ public:
          error = ErrOutputBufferTooSmall;
          tokstate.curchr_saved = ch;
       }
-      return nn;     
+      return nn;
    };
    
    bool push( UChar ch)
    {
       unsigned int nn = print( ch);
       outputSize += nn;
-      return (nn != 0);     
+      return (nn != 0);
    };
    
    static unsigned char HEX( unsigned char ch)
@@ -1297,11 +1294,12 @@ public:
    unsigned int maxDepth;
    unsigned int maxScopeStackSize;
    unsigned int maxFollows;
+   unsigned int maxTriggers;
    unsigned int maxTokens;
 
 public:
    XMLPathSelectAutomaton()
-         :memUsage(defaultMemUsage),maxDepth(defaultMaxDepth),maxScopeStackSize(0),maxFollows(0),maxTokens(0)
+         :memUsage(defaultMemUsage),maxDepth(defaultMaxDepth),maxScopeStackSize(0),maxFollows(0),maxTriggers(0),maxTokens(0)
    {
       if (!setMemUsage( memUsage, maxDepth)) throw exception( DimOutOfRange);
    };
@@ -1324,6 +1322,7 @@ public:
    {
       unsigned short pos;
       unsigned short neg;
+      bool empty() const                                   {return (pos==0);};
       Mask( unsigned short p_pos=0, unsigned short p_neg=0):pos(p_pos),neg(p_neg) {};
       Mask( const Mask& orig)                              :pos(orig.pos),neg(orig.neg) {};
       Mask( Operation op)                                  :pos(0),neg(0) {this->match(op);};
@@ -1338,18 +1337,18 @@ public:
             case Attribute:          this->match( XMLScannerBase::TagAttribName);
                                      this->match( XMLScannerBase::HeaderAttribName);
                                      this->reject( XMLScannerBase::Content); break;
-                                     
+
             case ThisAttributeValue: this->match( XMLScannerBase::TagAttribValue);
                                      this->match( XMLScannerBase::HeaderAttribValue);
                                      this->reject( XMLScannerBase::TagAttribName);
                                      this->reject( XMLScannerBase::HeaderAttribName);
                                      this->reject( XMLScannerBase::Content);
                                      this->reject( XMLScannerBase::OpenTag); break;
-                                     
+
             case AttributeValue:     this->match( XMLScannerBase::TagAttribValue);
                                      this->match( XMLScannerBase::HeaderAttribValue);
                                      this->reject( XMLScannerBase::Content); break;
-                                     
+
             case Content:            this->match( XMLScannerBase::Content); break;
 
             case ContentStart:       this->match( XMLScannerBase::HeaderEnd); break;
@@ -1420,7 +1419,7 @@ public:
          }
       };
 
-      void defNext( Operation op, unsigned int p_keysize, const char* p_key, const char* p_srckey, int p_next, bool p_follow=false)
+      void defineNext( Operation op, unsigned int p_keysize, const char* p_key, const char* p_srckey, int p_next, bool p_follow=false)
       {
          core.mask.seekop( op);
          defineKey( p_keysize, p_key, p_srckey);
@@ -1428,9 +1427,9 @@ public:
          core.follow = p_follow;
       };
 
-      void defOutput( const Mask& mask, int p_typeidx, bool p_follow, int p_start, int p_end)
+      void defineOutput( const Mask& mask, int p_typeidx, bool p_follow, int p_start, int p_end)
       {
-         core.mask.join( mask);
+         core.mask = mask;
          core.typeidx = p_typeidx;
          core.cnt_end = p_end;
          core.cnt_start = p_start;
@@ -1488,13 +1487,14 @@ public:
          p_memUsage -= maxScopeStackSize * sizeof(Scope);
       }
       maxFollows = (p_memUsage / sizeof(unsigned int)) / 32 + 2;
-      p_memUsage -= sizeof(unsigned int) * maxFollows;
+      maxTriggers = (p_memUsage / sizeof(unsigned int)) / 32 + 3;
+      p_memUsage -= sizeof(unsigned int) * maxFollows + sizeof(unsigned int) * maxTriggers;
       maxTokens = p_memUsage / sizeof(Token);
-      return (maxScopeStackSize != 0 && maxTokens != 0 && maxFollows != 0);
+      return (maxScopeStackSize != 0 && maxTokens != 0 && maxFollows != 0 && maxTriggers != 0);
    };
 
 private:
-   int defNext( int stateidx, Operation op, unsigned int keysize, const char* key, const char* srckey, bool follow=false) throw(exception)
+   int defineNext( int stateidx, Operation op, unsigned int keysize, const char* key, const char* srckey, bool follow=false) throw(exception)
    {
       try
       {
@@ -1520,7 +1520,7 @@ private:
          }
          states.push_back( state);
          unsigned int lastidx = states.size()-1;
-         states[ stateidx].defNext( op, keysize, key, srckey, lastidx, follow);
+         states[ stateidx].defineNext( op, keysize, key, srckey, lastidx, follow);
          return stateidx=lastidx;
       }
       catch (std::bad_alloc)
@@ -1533,7 +1533,14 @@ private:
       };
    };
 
-   int defOutput( int stateidx, const Mask& pushOpMask, int typeidx, bool follow, int start, int end) throw(exception)
+   void defineThisOutput( int stateidx, int typeidx)
+   {
+      if ((unsigned int)stateidx >= states.size()) throw exception( IllegalParam);
+      if (states[stateidx].core.typeidx != 0) throw exception( NotAllowedOperation);
+      states[stateidx].core.typeidx = typeidx;
+   };
+
+   int defineOutput( int stateidx, const Mask& printOpMask, int typeidx, bool follow, int start, int end) throw(exception)
    {
       try
       {
@@ -1544,13 +1551,13 @@ private:
             states.push_back( state);
          }
          if ((unsigned int)stateidx >= states.size()) throw exception( IllegalParam);
-         
+
          if (!states[stateidx].isempty())
          {
             stateidx = states[stateidx].link = states.size();
             states.push_back( state);
          }
-         states[ stateidx].defOutput( pushOpMask, typeidx, follow, start, end);
+         states[ stateidx].defineOutput( printOpMask, typeidx, follow, start, end);
          return stateidx;
       }
       catch (std::bad_alloc)
@@ -1584,33 +1591,13 @@ public:
       Range range;
       bool follow;
       Mask pushOpMask;
+      Mask printOpMask;
 
    private:
-      PathElement& doSelect( Operation op)
+      PathElement& defineOutput( Operation op)
       {
-         pushOpMask.reset();
-         switch (op)
-         {
-            case Content:              pushOpMask.match( XMLScannerBase::Content);
-                                       break;
-            case Tag:                  pushOpMask.match( XMLScannerBase::Content);
-                                       pushOpMask.match( XMLScannerBase::OpenTag);
-                                       pushOpMask.match( XMLScannerBase::TagAttribName);
-                                       pushOpMask.match( XMLScannerBase::TagAttribValue);
-                                       break;
-            case Attribute:            pushOpMask.match( XMLScannerBase::TagAttribName);
-                                       pushOpMask.match( XMLScannerBase::HeaderAttribName);
-                                       pushOpMask.match( XMLScannerBase::TagAttribValue);
-                                       pushOpMask.match( XMLScannerBase::HeaderAttribValue);
-                                       break;
-            case ThisAttributeValue:   pushOpMask.match( XMLScannerBase::TagAttribValue);
-                                       pushOpMask.match( XMLScannerBase::HeaderAttribValue);
-                                       break;
-            case AttributeValue:       pushOpMask.match( XMLScannerBase::TagAttribValue);
-                                       pushOpMask.match( XMLScannerBase::HeaderAttribValue);
-                                       break;
-            case ContentStart:         pushOpMask.match( XMLScannerBase::HeaderEnd);
-         }
+         printOpMask.reset();
+         printOpMask.seekop( op);
          return *this;
       };
       PathElement& doSelect( Operation op, const char* value) throw(exception)
@@ -1625,14 +1612,14 @@ public:
                {
                   throw exception( IllegalAttributeName);
                }
-               stateidx = xs->defNext( stateidx, op, size, buf, value, follow);
+               stateidx = xs->defineNext( stateidx, op, size, buf, value, follow);
             }
             else
             {
-               stateidx = xs->defNext( stateidx, op, 0, 0, 0, follow);
+               stateidx = xs->defineNext( stateidx, op, 0, 0, 0, follow);
             }
          }
-         return doSelect( op);
+         return *this;
       };
       PathElement& doFollow()
       {
@@ -1666,35 +1653,37 @@ public:
 
       PathElement& push( int typeidx) throw(exception)
       {
-         if (xs != 0) stateidx = xs->defOutput( stateidx, pushOpMask, typeidx, follow, range.start, range.end);
+         if (xs != 0) stateidx = xs->defineOutput( stateidx, printOpMask, typeidx, follow, range.start, range.end);
          return *this;
       };
 
    public:
-      PathElement()                                                  :xs(0),stateidx(0),follow(false),pushOpMask(0) {};
-      PathElement( XMLPathSelectAutomaton* p_xs, int p_si=0)         :xs(p_xs),stateidx(p_si),follow(false),pushOpMask(0) {doSelect(Tag);doSelect(ContentStart);};
-      PathElement( const PathElement& orig)                          :xs(orig.xs),stateidx(orig.stateidx),range(orig.range),follow(orig.follow),pushOpMask(orig.pushOpMask) {};
+      PathElement()                                                  :xs(0),stateidx(0),follow(false),pushOpMask(0),printOpMask(0){};
+      PathElement( XMLPathSelectAutomaton* p_xs, int p_si=0)         :xs(p_xs),stateidx(p_si),follow(false),pushOpMask(0),printOpMask(0){};
+      PathElement( const PathElement& orig)                          :xs(orig.xs),stateidx(orig.stateidx),range(orig.range),follow(orig.follow),pushOpMask(orig.pushOpMask),printOpMask(orig.printOpMask) {};
 
       //corresponds to "//" in abbreviated syntax of XPath
       PathElement& operator --(int)                                                     {return doFollow();};
       //find tag
       PathElement& operator []( const char* name) throw(exception)                      {return doSelect( Tag, name);};
       //find tag with one attribute
-      PathElement& operator ()( const char* name) throw(exception)                      {return doSelect( Attribute, name);};
+      PathElement& operator ()( const char* name) throw(exception)                      {return doSelect( Attribute, name).defineOutput( ThisAttributeValue);};
       //find tag with one attribute
       PathElement& operator ()( const char* name, const char* value) throw(exception)   {return doSelect( Attribute, name).doSelect( ThisAttributeValue, value);};
 
       //define maximum element index to push
-      PathElement& TO(int cnt)   throw(exception)                                       {return doCount((cnt>=0)?(cnt+1):-1); return *this;};
+      PathElement& TO(int cnt) throw(exception)                                         {return doCount((cnt>=0)?(cnt+1):-1);};
+
       //define minimum element index to push
-      PathElement& FROM(int cnt)   throw(exception)                                     {return doStart(cnt); return *this;};
+      PathElement& FROM(int cnt) throw(exception)                                       {return doStart(cnt); return *this;};
       //define minimum and maximum element index to push
-      PathElement& RANGE(int cnt)   throw(exception)                                    {return doRange(cnt,(cnt>=0)?(cnt+1):-1); return *this;};
+      PathElement& RANGE(int cnt) throw(exception)                                      {return doRange(cnt,(cnt>=0)?(cnt+1):-1); return *this;};
       //define element type to push
-      PathElement& operator =(int type)  throw(exception)                               {return push( type);};
+      PathElement& operator =(int type) throw(exception)                                {return push( type);};
       //grab content
-      PathElement& operator ()()  throw(exception)                                      {return doSelect(Content);};
+      PathElement& operator ()()  throw(exception)                                      {return defineOutput(Content);};
    };
+
    PathElement operator*()
    {
       return PathElement( this);
@@ -1747,20 +1736,25 @@ private:
          if (m_size == m_maxSize) throw exception( OutOfMem);
          m_ar[ m_size++] = elem;
       };
+      void pop_back()
+      {
+         if (m_size == 0) throw exception( NotAllowedOperation);
+         m_size--;
+      };
       Element& operator[]( unsigned int idx)
       {
          if (idx >= m_size) throw exception( ArrayBoundsReadWrite);
          return m_ar[ idx];
       };
+      Element& back()
+      {
+         if (m_size == 0) throw exception( ArrayBoundsReadWrite);
+         return m_ar[ m_size-1];
+      };
       void resize( unsigned int p_size)
       {
          if (p_size > m_size) throw exception( ArrayBoundsReadWrite);
          m_size = p_size;
-      };
-      Element& pop()
-      {
-         if (m_size == 0) throw exception( ArrayBoundsReadWrite);
-         return m_ar[ --m_size];
       };
       unsigned int size() const  {return m_size;};
       bool empty() const         {return m_size==0;};
@@ -1768,6 +1762,7 @@ private:
    
    Array<Scope> scopestk;                   //stack of scopes opened
    Array<unsigned int> follows;             //indices of tokens active in all descendant scopes
+   Array<int> triggers;                     //triggered elements
    Array<Token> tokens;                     //list of waiting tokens
    
    struct Context
@@ -1796,12 +1791,19 @@ private:
       {
          const State& st = atm->states[ stateidx];
          context.scope.mask.join( st.core.mask);
-         if (st.core.follow)
+         if (st.core.mask.empty() && st.core.typeidx != 0)
          {
-            context.scope.followMask.join( st.core.mask);
-            follows.push_back( tokens.size());
+            triggers.push_back( st.core.typeidx);
          }
-         tokens.push_back( Token( st, stateidx));
+         else
+         {
+            if (st.core.follow)
+            {
+               context.scope.followMask.join( st.core.mask);
+               follows.push_back( tokens.size());
+            }
+            tokens.push_back( Token( st, stateidx));
+         }
          stateidx = st.link;
       }
    };
@@ -1831,7 +1833,8 @@ private:
       {
          if (!scopestk.empty())
          {
-            context.scope = scopestk.pop();
+            context.scope = scopestk.back();
+            scopestk.pop_back();
             follows.resize( context.scope.range.followidx);
             tokens.resize( context.scope.range.tokenidx_to);
          }
@@ -1938,15 +1941,20 @@ private:
             {
                unsigned int ii = context.scope_iter - context.scope.range.tokenidx_to;
                //we match all follows that are not yet been checked in the current scope
-               if (ii < context.scope.range.followidx
-               &&  context.scope.range.tokenidx_from > follows[ ii])
+               if (ii < context.scope.range.followidx && context.scope.range.tokenidx_from > follows[ ii])
                {
                   type = match( follows[ ii]);
                   ++context.scope_iter;
                }
+               else if (!triggers.empty())
+               {
+                  type = triggers.back();
+                  triggers.pop_back();
+               }
                else
                {
                   context.key = 0;
+                  context.keysize = 0;
                   return 0; //end of all candidates
                }
             }
@@ -1955,16 +1963,17 @@ private:
       else
       {
          context.key = 0;
+         context.keysize = 0;
       }
       return type;
    };
 
 public:
-   XMLPathSelect( const Automaton* p_atm, InputIterator& src, char* obuf, unsigned int obufsize, EntityMap* entityMap=0)  :scan(src,obuf,obufsize,entityMap),atm(p_atm),scopestk(p_atm->maxScopeStackSize),follows(p_atm->maxFollows),tokens(p_atm->maxTokens)
+   XMLPathSelect( const Automaton* p_atm, InputIterator& src, char* obuf, unsigned int obufsize, EntityMap* entityMap=0)  :scan(src,obuf,obufsize,entityMap),atm(p_atm),scopestk(p_atm->maxScopeStackSize),follows(p_atm->maxFollows),triggers(p_atm->maxTriggers),tokens(p_atm->maxTokens)
    {
       if (atm->states.size() > 0) expand(0);
    };
-   XMLPathSelect( const XMLPathSelect& o)                                                                           :scan(o.scan),atm(o.atm),scopestk(o.maxScopeStackSize),follows(o.maxFollows),tokens(o.maxTokens){};
+   XMLPathSelect( const XMLPathSelect& o)                                                                           :scan(o.scan),atm(o.atm),scopestk(o.maxScopeStackSize),follows(o.maxFollows),follows(o.maxTriggers),tokens(o.maxTokens){};
 
    void setOutputBuffer( char* outputBuf, unsigned int outputBufSize)
    {

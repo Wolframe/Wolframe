@@ -46,8 +46,9 @@ namespace test
             {
                char* data = const_cast<char*>((char*)netop.data());
                unsigned int size = netop.size();
-               for (unsigned int ii=0; ii<size && *in; ii++,in++) data[ii]=*in;
-               connection.networkInput( (void*)data, size);
+               unsigned int ii;
+               for (ii=0; ii<size && *in; ii++,in++) data[ii]=*in;
+               connection.networkInput( (void*)data, ii);
             }
             break;
             

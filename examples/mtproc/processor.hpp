@@ -35,11 +35,7 @@ struct Instance
    Method::Data* data;
 
    Instance()                    :mt(0),data(0){};
-   virtual ~Instance(){};
-
-private:
-   Instance( const Instance&){};
-   void operator=( Instance&){};
+   Instance( const Instance& o)  :mt(o.mt),data(o.data){};
 };
 
 

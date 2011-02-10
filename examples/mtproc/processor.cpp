@@ -52,22 +52,31 @@ private:
    struct CommandHandler
    {
    private:
+      enum State {Null,Init,Selected,Running};
+      
       ProtocolParser m_parser;
       Instance* m_instance;          //< method table and data
       Method::Context m_context;     //< context of current method executed
-      unsigned int m_methodIdx;      //< index of currently executed method
-      bool m_running;                //< true if method started
+      unsigned int m_methodIdx;      //< index of currently executed method or -1
+      State m_state;                 //< command handler state
       
       void resetCommand()
       {
          m_methodIdx = 0;
-         m_running = false;
-         m_context.init( m_instance?m_instance->data,0);
+         if (m_instance)
+         {
+            m_state = Init;
+            m_context.init( m_instance->data);
+         }
+         else
+         {
+            m_state = Null;
+            m_context.init( m_instance->data);
+         }
       };
       
       void init( const char** protocolCmds, Instance* instance)
       {
-         if (m_instance) delete m_instance;
          m_instance = instance;
          parser.init();
          resetCommand();
@@ -79,19 +88,24 @@ private:
                parser.add( protocolCmds[ ii]);
             }
          }
-         if (instance && instance->mt)
+         if (instance)
          {
             m_context.data = instance->data;
-            for( unsigned int ii=0; instance->mt[ii].call && instance->mt[ii].name; ii++)
+            m_context.contentIterator = 0;
+
+            if (instance->mt)
             {
-               parser.add( instance->mt[ii].name);
+               for( unsigned int ii=0; instance->mt[ii].call && instance->mt[ii].name; ii++)
+               {
+                  parser.add( instance->mt[ii].name);
+               }
             }
          }
       };
 
       void processorInput( Input& input, Input::const_iterator& end)
       {
-         if (m_context.contentIterator)
+         if (m_state == Running)
          {
             m_context.contentIterator->processorInput( input.ptr(), end-input.begin());
          }
@@ -145,8 +159,6 @@ private:
       
       Command getCommand()
       {
-         resetCommand();
-         
          int ci = m_parser.getCommand();
          if (ci >= unknown && ci < method)
          {
@@ -155,6 +167,7 @@ private:
          else
          {
             m_methodIdx = (unsigned int)ci - (unsigned int)method;
+            m_state = Selected;
             return method;
          }
          return rt;
@@ -162,14 +175,21 @@ private:
       
       unsigned int call( int argc, const char** argv)
       {
-         if (!m_running) LOG_DEBUG << "call of '" << m_instance->mt[ m_methodIdx].name << "'";
-         m_running = true;
-
+         if (m_state == Selected)
+         {
+            LOG_DEBUG << "call of '" << m_instance->mt[ m_methodIdx].name << "'";
+            m_state = Running;
+         }
+         if (m_state != Running)
+         {
+            LOG_ERROR << "illegal call in this state (not running)";
+            init();
+            return 0;
+         }
          unsigned int rt = m_instance->mt[ m_methodIdx].call( &m_context, argc, argv);
          if (rt != 0)
          {
             LOG_ERROR << "error " << rt << " calling '" << m_instance->mt[ m_methodIdx].name << "'";
-            getGeneratorMem( input, itr)
             resetCommand();
          }
          else
@@ -177,7 +197,6 @@ private:
             switch (m_context.contentIterator->state)
             {
                case protocol::Generator::Init:
-                  m_context.contentIterator->state = protocol::Generator::Processing;
                case protocol::Generator::Processing:
                   break;
                case protocol::Generator::Error:

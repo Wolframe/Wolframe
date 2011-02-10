@@ -13,24 +13,7 @@ public:
    template <typename IteratorType>
    static void skipSpaces( IteratorType& src)
    {
-      char ch;
-      while ((ch=*src) == ' ' || ch == '\t') 
-      {
-         ++src;
-      }
-   }
-   
-   template <typename IteratorType>
-   static bool isEOLN( IteratorType& src)
-   {
-      return (*src == '\n' || *src == '\r');
-   }
-   
-   template <typename IteratorType>
-   static void consumeEOLN( IteratorType& src)
-   {
-      if (*src == '\r') ++src;
-      if (*src == '\n') ++src;
+      while (*src == ' ' || *src == '\t') ++src;
    }
    
    //* go to the end of line and write it to buffer, starting with the first non space.
@@ -46,9 +29,8 @@ public:
       char ch;
       if (buf.size() == 0) skipSpaces( src);
       
-      while ((ch=*src) != '\n' && ch != '\0')
+      while ((ch=*src) != '\n' && ch != '\r' && ch != '\0')
       {
-         if (ch == '\r') {++src; continue;}
          if (ch <= ' ') {buf.push_back(' '); ++src; continue;}
          buf.push_back(ch);
          ++src;
