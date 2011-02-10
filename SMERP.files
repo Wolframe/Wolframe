@@ -32,10 +32,6 @@
 ./examples/pecho/appConfig.cpp
 ./examples/pecho/configFile.cpp
 ./examples/pecho/pechoHandler.cpp
-./examples/xmlselect/xmlselectHandler.cpp
-./examples/xmlselect/appConfig.cpp
-./examples/xmlselect/configFile.cpp
-./examples/xmlselect/smerp-xmlselect.cpp
 ./include/connectionEndpoint.hpp
 ./include/connectionHandler.hpp
 ./include/logLevel.hpp
@@ -63,11 +59,6 @@
 ./examples/pecho/commandLine.hpp
 ./examples/pecho/configFile.hpp
 ./examples/pecho/pechoHandler.hpp
-./examples/xmlselect/xmlselectHandler.hpp
-./examples/xmlselect/appConfig.hpp
-./examples/xmlselect/commandLine.hpp
-./examples/xmlselect/configFile.hpp
-./examples/xmlselect/protocol.hpp
 ./examples/xmlselect/textwolf.hpp
 ./GNUmakefile
 ./include/GNUmakefile
@@ -78,14 +69,12 @@
 ./examples/echo/GNUmakefile
 ./examples/GNUmakefile
 ./examples/pecho/GNUmakefile
-./examples/xmlselect/GNUmakefile
 ./Makefile.W32
 ./src/Makefile.W32
 ./tests/Makefile.W32
 ./clients/qt/Makefile.W32
 ./examples/echo/Makefile.W32
 ./examples/pecho/Makefile.W32
-./examples/xmlselect/Makefile.W32
 ./examples/Makefile.W32
 ./docs/SNMPtypes.txt
 ./database/data/CH-cantons.txt
@@ -203,3 +192,6 @@ src/authentication.cpp
 tests/testNamedRetVal.cpp
 src/smerpLogic.cpp
 src/smerpLogic.cpp
+examples/xmlselect/xmlIterator.hpp
+examples/xmlselect/textwolf.hpp
+examples/xmlselect/xmlIterator.cpp
