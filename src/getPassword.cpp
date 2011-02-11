@@ -26,9 +26,19 @@ namespace _SMERP {
 
 #else // defined(_WIN32)
 
+#include <tchar.h>
+#include <stdlib.h>
+#include <conio.h>  
+
 	std::string SSLacceptor::getPassword()
 	{
-		return "bla bla";
+		std::string pass = "";
+		std::cout << "Enter your password:";
+		char ch = _getch( );
+		while( ch != 13 ) {
+			std::cout << "*";
+			pass.push_back( ch );
+			char ch = _getch( );
 	}
 
 #endif // defined(_WIN32)

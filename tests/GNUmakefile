@@ -46,7 +46,8 @@ TEST_OBJS =
 #	$(TOPDIR)/examples/xmlselect/xmlselectHandler.o
 
 TEST_CPP_BINS = \
-	threadLeakTest$(EXE)
+	threadLeakTest$(EXE) \
+	testGetPassword$(EXE)
 
 ifdef WITH_GTEST
 TEST_CPP_BINS += \
