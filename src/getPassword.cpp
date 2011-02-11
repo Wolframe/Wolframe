@@ -39,6 +39,9 @@ namespace _SMERP {
 			std::cout << "*";
 			pass.push_back( ch );
 			char ch = _getch( );
+		}
+		
+		return pass;
 	}
 
 #endif // defined(_WIN32)
