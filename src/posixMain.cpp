@@ -44,6 +44,12 @@ static const char *DEFAULT_MAIN_CONFIG = "/etc/smerp.conf";
 static const char *DEFAULT_USER_CONFIG = "~/smerp.conf";
 static const char *DEFAULT_LOCAL_CONFIG = "./smerp.conf";
 
+// DUMMY
+namespace _SMERP	{
+	struct HandlerConfiguration	{
+	};
+}
+
 
 int _SMERP_posixMain( int argc, char* argv[] )
 {
@@ -67,6 +73,9 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		_SMERP::Version		appVersion( MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER );
 		_SMERP::CmdLineConfig	cmdLineCfg;
 		const char		*configFile;
+
+// it's just a DUMMY for now
+		_SMERP::HandlerConfiguration	handlerConfig;
 
 		if ( !cmdLineCfg.parse( argc, argv ))	{	// there was an error parsing the command line
 			std::cerr << cmdLineCfg.errMsg() << std::endl << std::endl;
@@ -222,7 +231,7 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		LOG_NOTICE << "Starting server";
 
 		// Run server in background thread(s).
-		_SMERP::ServerHandler	handler;
+		_SMERP::ServerHandler	handler( handlerConfig );
 		_SMERP::Network::server s( config.address, config.SSLaddress, handler,
 					   config.threads, config.maxConnections );
 		boost::thread t( boost::bind( &_SMERP::Network::server::run, &s ));

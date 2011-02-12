@@ -195,4 +195,3 @@ src/smerpLogic.cpp
 examples/xmlselect/xmlIterator.hpp
 examples/xmlselect/textwolf.hpp
 examples/xmlselect/xmlIterator.cpp
-src/getPassword.hpp

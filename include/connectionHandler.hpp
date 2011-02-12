@@ -124,10 +124,13 @@ namespace _SMERP {
 
 	/// The SMERP server main
 	/// All it should do is to provide connection handlers
+
+	struct	HandlerConfiguration;
+
 	class ServerHandler
 	{
 	public:
-		ServerHandler();
+		ServerHandler( const HandlerConfiguration& config );
 		~ServerHandler();
 
 		/// Create a new connection handler and return a pointer to it

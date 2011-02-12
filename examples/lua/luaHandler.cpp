@@ -371,7 +371,7 @@ namespace _SMERP {
 		return new echoConnection( local );
 	}
 
-	ServerHandler::ServerHandler() : impl_( new ServerHandlerImpl )	{}
+	ServerHandler::ServerHandler( const HandlerConfiguration& ) : impl_( new ServerHandlerImpl )	{}
 
 	ServerHandler::~ServerHandler()	{ delete impl_; }
 
