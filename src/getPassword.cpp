@@ -36,10 +36,10 @@ namespace _SMERP {
 		
 		_cputs( "Enter your password:" );
 		
-		char ch = _getch( );
+		int ch = _getch( );
 		while( ch != 13 ) {
 			pass.push_back( ch );
-			char ch = _getch( );
+			int ch = _getch( );
 		}
 		
 		return pass;
