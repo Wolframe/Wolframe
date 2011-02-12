@@ -28,27 +28,27 @@ namespace _SMERP {
 
 #include <tchar.h>
 #include <stdlib.h>
-#include <conio.h>  
+#include <conio.h>
 
 	std::string getPassword()
 	{
 		std::string pass = "";
-		
+
 		_cputs( "Enter your password:" );
-		
+
 		int ch = _getch( );
 		while( ch != 13 ) {
 			pass.push_back( ch );
 			int ch = _getch( );
 		}
-		
+
 		return pass;
 	}
 
 #endif // defined(_WIN32)
 
 
-} // namespace Network
+} // namespace Authentication
 } // namespace _SMERP
 
 #endif // WITH_SSL

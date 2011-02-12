@@ -84,6 +84,24 @@ namespace _SMERP {
 	};
 
 
+	/// database configuration
+	struct DatabaseConfiguration : public _SMERP::ConfigurationBase
+	{
+	public:
+		std::string		dbHost;
+		unsigned short		dbPort;
+		std::string		dbName;
+		std::string		dbUser;
+		std::string		dbPassword;
+
+		/// methods
+		bool parse( ptree& pt );
+		bool check( std::ostream& os ) const;
+		bool test( std::ostream& os ) const;
+		void print( std::ostream& os ) const;
+	};
+
+
 /// application configuration structure
 	struct CmdLineConfig;		// forward declaration for configuration from the command line
 	struct CfgFileConfig;		// forward declaration for configuration from the config file
