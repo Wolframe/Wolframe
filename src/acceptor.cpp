@@ -5,6 +5,7 @@
 #include "acceptor.hpp"
 #include "connection.hpp"
 #include "logger.hpp"
+#include "getPassword.hpp"
 
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
@@ -69,7 +70,6 @@ void acceptor::handleAccept( const boost::system::error_code& e )
 		LOG_DATA << "Acceptor on " << identifier_ << " ready for new connection";
 	}
 }
-
 
 // Post a call to the stop function so that acceptor::stop() is safe to call
 // from any thread.
@@ -203,6 +203,11 @@ void SSLacceptor::handleAccept( const boost::system::error_code& e )
 								   boost::asio::placeholders::error )));
 		LOG_DATA << "Acceptor on " << identifier_ << " ready for new connection";
 	}
+}
+
+std::string SSLacceptor::getPassword()
+{
+	return _SMERP::Authentication::getPassword();
 }
 
 void SSLacceptor::stop()

@@ -8,14 +8,14 @@
 #include "acceptor.hpp"
 
 namespace _SMERP {
-	namespace Network {
+	namespace Authentication {
 
 #if !defined(_WIN32)
 
 #include <unistd.h>
 #include <libintl.h>
 
-	std::string SSLacceptor::getPassword()
+	std::string getPassword()
 	{
 		char	*pass;
 
@@ -30,7 +30,7 @@ namespace _SMERP {
 #include <stdlib.h>
 #include <conio.h>  
 
-	std::string SSLacceptor::getPassword()
+	std::string getPassword()
 	{
 		std::string pass = "";
 		std::cout << "Enter your password:";
