@@ -25,11 +25,11 @@ const char* getRandomAsciiString()
       //avoid random end of content:
       if (ii>=2 && rt[ii-2]=='\n' && rt[ii-1]=='.' && rt[ii]=='\n')
       {
-         continue;
+	 continue;
       }
       if (ii>=2 && rt[ii-2]=='\n' && rt[ii-1]=='.' && rt[ii]=='\r')
       {
-         continue;
+	 continue;
       }
       ii++;
    }
@@ -43,10 +43,10 @@ const char* getRandomAsciiString()
 template <unsigned int InputBufferSize, unsigned int OutputBufferSize>
 struct TestDescription
 {
-   unsigned int inputBufferSize; 
-   unsigned int outputBufferSize; 
+   unsigned int inputBufferSize;
+   unsigned int outputBufferSize;
    std::string content;
-   
+
    TestDescription() :inputBufferSize(InputBufferSize),outputBufferSize(OutputBufferSize) {};
 };
 
@@ -82,8 +82,8 @@ struct Random :public TestDescription<InputBufferSize,OutputBufferSize>
       unsigned int ii=0,nn=rand()%MaxNofLines+1;
       while (ii++<=nn)
       {
-         ThisTestDescription::content.append( getRandomAsciiString());
-         ThisTestDescription::content.append( "\r\n");
+	 ThisTestDescription::content.append( getRandomAsciiString());
+	 ThisTestDescription::content.append( "\r\n");
       }
    }
 };
@@ -96,9 +96,9 @@ static std::string escape( std::string& content)
    {
       if (content[ii] == '.' && (ii==0 || content[ii-1] == '\n'))
       {
-         continue;
+	 continue;
       }
-      rt.push_back( content[ii]); 
+      rt.push_back( content[ii]);
    }
    return rt;
 }
@@ -145,53 +145,53 @@ protected:
 typedef ::testing::Types<
    Empty<1,1>,
    OneEmptyLine<1,1>,
-   OneOneCharLine<1,1>, 
-   OneLine<1,1>, 
+   OneOneCharLine<1,1>,
+   OneLine<1,1>,
    Random<1,1,2000>,
    Empty<2,2>,
-   OneEmptyLine<2,2>, 
-   OneOneCharLine<2,2>, 
-   OneLine<2,2>, 
+   OneEmptyLine<2,2>,
+   OneOneCharLine<2,2>,
+   OneLine<2,2>,
    Random<2,2,2000>,
-   Empty<3,3>, 
-   OneEmptyLine<3,3>, 
-   OneOneCharLine<3,3>, 
-   OneLine<3,3>, 
+   Empty<3,3>,
+   OneEmptyLine<3,3>,
+   OneOneCharLine<3,3>,
+   OneLine<3,3>,
    Random<3,3,2000>,
-   Empty<4,4>, 
-   OneEmptyLine<4,4>, 
-   OneOneCharLine<4,4>, 
-   OneLine<4,4>, 
+   Empty<4,4>,
+   OneEmptyLine<4,4>,
+   OneOneCharLine<4,4>,
+   OneLine<4,4>,
    Random<4,4,8000>,
-   Empty<1,2>, 
-   OneEmptyLine<1,2>, 
-   OneOneCharLine<1,2>, 
-   OneLine<1,2>, 
+   Empty<1,2>,
+   OneEmptyLine<1,2>,
+   OneOneCharLine<1,2>,
+   OneLine<1,2>,
    Random<1,2,1000>,
-   Empty<2,3>, 
-   OneEmptyLine<2,3>, 
-   OneOneCharLine<2,3>, 
-   OneLine<2,3>, 
+   Empty<2,3>,
+   OneEmptyLine<2,3>,
+   OneOneCharLine<2,3>,
+   OneLine<2,3>,
    Random<2,3,1000>,
-   Empty<3,4>, 
-   OneEmptyLine<3,4>, 
-   OneOneCharLine<3,4>, 
-   OneLine<3,4>, 
+   Empty<3,4>,
+   OneEmptyLine<3,4>,
+   OneOneCharLine<3,4>,
+   OneLine<3,4>,
    Random<3,4,24000>,
-   Empty<2,1>, 
-   OneEmptyLine<2,1>, 
-   OneOneCharLine<2,1>, 
-   OneLine<2,1>, 
+   Empty<2,1>,
+   OneEmptyLine<2,1>,
+   OneOneCharLine<2,1>,
+   OneLine<2,1>,
    Random<2,1,1000>,
-   Empty<3,2>, 
-   OneEmptyLine<3,2>, 
-   OneOneCharLine<3,2>, 
-   OneLine<3,2>, 
+   Empty<3,2>,
+   OneEmptyLine<3,2>,
+   OneOneCharLine<3,2>,
+   OneLine<3,2>,
    Random<3,2,1000>,
-   Empty<4,3>, 
-   OneEmptyLine<4,3>, 
-   OneOneCharLine<4,3>, 
-   OneLine<4,3>, 
+   Empty<4,3>,
+   OneEmptyLine<4,3>,
+   OneOneCharLine<4,3>,
+   OneLine<4,3>,
    Random<4,3,24000>
    > MyTypes;
 TYPED_TEST_CASE( pechoHandlerFixture, MyTypes);
@@ -205,8 +205,9 @@ TYPED_TEST( pechoHandlerFixture, ExpectedResult )
 #ifdef _SMERP_LOWLEVEL_DEBUG
       unsigned int ii=0,nn=output.size();
       for (;ii<nn && output[ii]==this->expected[ii]; ii++);
-      if (ii != nn) printf( "SIZE R=%u,E=%u,DIFF AT %u='%d %d %d %d|%d %d %d %d'\n", output.size(), this->expected.size(), ii, output[ii-2],output[ii-1],output[ii-0],output[ii+1],this->expected[ii-2],this->expected[ii-1],this->expected[ii-0],this->expected[ii+1]);
-#endif   
+      if (ii != nn) printf( "SIZE R=%lu,E=%lu,DIFF AT %u='%d %d %d %d|%d %d %d %d'\n",
+			    (unsigned long)output.size(), (unsigned long)this->expected.size(), ii, output[ii-2],output[ii-1],output[ii-0],output[ii+1],this->expected[ii-2],this->expected[ii-1],this->expected[ii-0],this->expected[ii+1]);
+#endif
    EXPECT_EQ( output, this->expected);
 }
 
