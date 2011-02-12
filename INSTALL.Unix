@@ -11,6 +11,7 @@ Prerequisites
 - optionally (WITH_GTEST) gtest 1.3.0 or later
 - optionally (WITH_LUA) lua 5.1.x
 - optionally (WITH_QT) Qt 4, 4.5.x or later
+- optionally (WITH_PAM)
 
 Compile and install boost
 -------------------------
@@ -64,7 +65,8 @@ For building the documentation you need 'libxslt', 'docbook-style-xsl' and 'doxy
 Ubuntu 10.04.1 LTS
 ------------------
 
-Optional packages: liblua5.1-dev, libgtest-dev (1.3, a little bit old), libqt4-dev
+Optional packages: liblua5.1-dev, libgtest-dev (1.3, a little bit old), libqt4-dev,
+                   libpam-dev
 
 libboost-dev is 1.40, too old, missing asio features and property_tree, build
 you own boost. gcc on Debian complains a lot about boost header files..
@@ -74,7 +76,8 @@ For building the documentation you need 'xsltproc', 'docbook-xsl' and 'doxygen'.
 Ubuntu 10.10 Server
 -------------------
 
-Optional packages: libssl-dev, liblua5.1-dev, libqt4-dev, libgtest-dev (1.5)
+Optional packages: libssl-dev, liblua5.1-dev, libqt4-dev, libgtest-dev (1.5),
+                   libpam-dev
 
 libboost-dev is 1.42, only missing some new filesystem stuff, but you'll have to
 compile your own one.
@@ -84,7 +87,7 @@ For building the documentation you need 'xsltproc', 'docbook-xsl' and 'doxygen'.
 Debian 5.0
 ----------
 
-Optional packages: liblua5.1-dev, libqt4-dev
+Optional packages: liblua5.1-dev, libqt4-dev, libpam-dev
 
 libbost-dev is 1.34, far too old. Compile your own version.
 libgtest-dev is missing. Compile your own version.

@@ -470,5 +470,21 @@ PAM_LIB_DIR ?= /lib
 PAM_LIBS ?= -lpam
 endif
 
+# Ubuntu 10.04 TLS, 10.10, Debian 5.0
+ifeq "$(LINUX_DIST)" "debian"
+ifeq "$(LINUX_REV)" "squeeze/sid"
+PAM_DIR ?= /usr
+PAM_INCLUDE_DIR ?= $(PAM_DIR)/include
+PAM_LIB_DIR ?= /lib
+PAM_LIBS ?= -lpam
+endif
+ifeq "$(LINUX_REV)" "5"
+PAM_DIR ?= /usr
+PAM_INCLUDE_DIR ?= $(PAM_DIR)/include
+PAM_LIB_DIR ?= /lib
+PAM_LIBS ?= -lpam
+endif
+endif
+
 endif
 endif
