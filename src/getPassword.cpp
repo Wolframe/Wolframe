@@ -33,7 +33,9 @@ namespace _SMERP {
 	std::string getPassword()
 	{
 		std::string pass = "";
-		std::cout << "Enter your password:";
+		
+		_cputs( "Enter your password:" );
+		
 		char ch = _getch( );
 		while( ch != 13 ) {
 			pass.push_back( ch );

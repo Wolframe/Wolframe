@@ -16,7 +16,7 @@
 #include "ErrorCodes.hpp"
 #include "logger.hpp"
 
-#include "smerpHandler.hpp"
+#include "connectionHandler.hpp"
 
 #if !defined(_WIN32)
 #error "This is the WIN32 main !"
@@ -33,6 +33,12 @@ static const short unsigned REVISION_NUMBER = 3;
 static const int DEFAULT_SERVICE_TIMEOUT = 5000;
 
 static const char *DEFAULT_SERVICE_NAME = "smerpd";
+
+// DUMMY
+namespace _SMERP	{
+	struct HandlerConfiguration	{
+	};
+}
 
 boost::function0<void> consoleCtrlFunction;
 
@@ -230,6 +236,9 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 		}
 		_SMERP::ApplicationConfiguration config( cmdLineCfg, cfgFileCfg );
 
+		// it's just a DUMMY for now
+		_SMERP::HandlerConfiguration	handlerConfig;
+		
 // create the final logger based on the configuration
 		_SMERP::LogBackend::instance().setLogfileLevel( config.logFileLogLevel );
 		_SMERP::LogBackend::instance().setLogfileName( config.logFile );
@@ -258,7 +267,7 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 		LOG_NOTICE << "Starting service";
 
 // run server in background thread(s).
-		_SMERP::ServerHandler	handler;
+		_SMERP::ServerHandler	handler( handlerConfig );
 		_SMERP::Network::server s( config.address, config.SSLaddress, handler, config.threads, config.maxConnections );
 		boost::thread t( boost::bind( &_SMERP::Network::server::run, &s ));
 
@@ -305,6 +314,9 @@ int _SMERP_winMain( int argc, char* argv[] )
 		_SMERP::Version		appVersion( MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER );
 		_SMERP::CmdLineConfig	cmdLineCfg;
 		const char		*configFile = NULL;
+
+// it's just a DUMMY for now
+		_SMERP::HandlerConfiguration	handlerConfig;
 
 		if ( !cmdLineCfg.parse( argc, argv ))	{	// there was an error parsing the command line
 			std::cerr << cmdLineCfg.errMsg() << std::endl << std::endl;
@@ -412,7 +424,7 @@ int _SMERP_winMain( int argc, char* argv[] )
 
 		LOG_NOTICE << "Starting server";
 
-		_SMERP::ServerHandler	handler;
+		_SMERP::ServerHandler	handler( handlerConfig );
 		_SMERP::Network::server s( config.address, config.SSLaddress,
 					   handler, config.threads, config.maxConnections );
 

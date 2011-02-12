@@ -38,7 +38,8 @@ INCLUDE_LIBS = \
 !ENDIF
 
 TEST_CPP_BINS = \
-	threadLeakTest.exe
+	threadLeakTest.exe \
+	testGetPassword.exe
 
 !IFDEF WITH_GTEST
 TEST_CPP_BINS = \
@@ -60,6 +61,7 @@ all: $(OBJS) $(CPP_BINS)
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 threadLeakTest.exe: threadLeakTest.obj $(TOPDIR)\src\smerp.lib
+testGetPassword.exe: testGetPassword.obj $(TOPDIR)\src\smerp.lib
 !IFDEF WITH_GTEST
 testNamedRetVal.exe: testNamedRetVal.obj
 versionTest.exe: versionTest.obj $(TOPDIR)\src\smerp.lib
