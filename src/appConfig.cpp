@@ -188,7 +188,9 @@ namespace _SMERP {
 	}
 #endif
 
-// Logger configuration functions
+
+//----- Logger configuration functions---------------------------------------------------------------------------------
+
 	void LoggerConfiguration::print( std::ostream& os ) const
 	{
 		os << "Logging" << std::endl;
@@ -227,6 +229,27 @@ namespace _SMERP {
 			os << "Log to file requested but no log file specified";
 			return false;
 		}
+		return true;
+	}
+
+
+//----- Database configuration functions---------------------------------------------------------------------------------
+
+	void DatabaseConfiguration::print( std::ostream& os ) const
+	{
+		os << "Database" << std::endl;
+		if ( dbHost.empty())
+			os << "   DB host: local unix domain socket" << std::endl;
+		else
+			os << "   DB host: " << dbHost << ":" << dbPort << std::endl;
+		os << "   DB name: " << (dbName.empty() ? "(not specified - server user default)" : dbName) << std::endl;
+		os << "   DB user / password: " << (dbUser.empty() ? "(not specified - same as server user)" : dbUser) << " / "
+						<< (dbPassword.empty() ? "(not specified - no password used)" : dbPassword) << std::endl;
+	}
+
+	/// Check if the database configuration makes sense
+	bool DatabaseConfiguration::check( std::ostream& ) const
+	{
 		return true;
 	}
 
