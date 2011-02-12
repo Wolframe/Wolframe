@@ -36,7 +36,6 @@ namespace _SMERP {
 		std::cout << "Enter your password:";
 		char ch = _getch( );
 		while( ch != 13 ) {
-			std::cout << "*";
 			pass.push_back( ch );
 			char ch = _getch( );
 		}
