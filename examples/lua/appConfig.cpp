@@ -100,6 +100,139 @@ namespace _SMERP {
 	}
 
 
+///********************************************************************************************************
+
+// Server configuration functions
+	void ServerConfiguration::print( std::ostream& os ) const
+	{
+		// Unix daemon
+#if !defined(_WIN32)
+		os << "Run as " << (user.empty() ? "(not specified)" : user) << ":"
+				<< (group.empty() ? "(not specified)" : group) << std::endl;
+		os << "PID file: " << pidFile << std::endl;
+#else
+		// Windows service
+		os << "When run as service" << std::endl
+				<< "  Name: " << serviceName << std::endl
+				<< "  Displayed name: " << serviceDisplayName << std::endl
+				<< "  Description: " << serviceDescription << std::endl;
+#endif
+		os << "Number of threads: " << threads << std::endl;
+		os << "Maximum number of connections: " << maxConnections << std::endl;
+
+		os << "Network" << std::endl;
+		if ( address.size() > 0 )	{
+			std::list<Network::ServerTCPendpoint>::const_iterator it = address.begin();
+			os << "  Unencrypted: " << it->toString() << std::endl;
+			for ( ++it; it != address.end(); ++it )
+				os << "               " << it->toString() << std::endl;
+		}
+		if ( SSLaddress.size() > 0 )	{
+			std::list<Network::ServerSSLendpoint>::const_iterator it = SSLaddress.begin();
+			os << "          SSL: " << it->toString() << std::endl;
+			os << "                  certificate: " << (it->certificate().empty() ? "(none)" : it->certificate()) << std::endl;
+			os << "                  key file: " << (it->key().empty() ? "(none)" : it->key()) << std::endl;
+			os << "                  CA directory: " << (it->CAdirectory().empty() ? "(none)" : it->CAdirectory()) << std::endl;
+			os << "                  CA chain file: " << (it->CAchain().empty() ? "(none)" : it->CAchain()) << std::endl;
+			os << "                  verify client: " << (it->verifyClientCert() ? "yes" : "no") << std::endl;
+			for ( ++it; it != SSLaddress.end(); ++it )	{
+				os << "               " << it->toString() << std::endl;
+				os << "                  certificate: " << (it->certificate().empty() ? "(none)" : it->certificate()) << std::endl;
+				os << "                  key file: " << (it->key().empty() ? "(none)" : it->key()) << std::endl;
+				os << "                  CA directory: " << (it->CAdirectory().empty() ? "(none)" : it->CAdirectory()) << std::endl;
+				os << "                  CA chain file: " << (it->CAchain().empty() ? "(none)" : it->CAchain()) << std::endl;
+				os << "                  verify client: " << (it->verifyClientCert() ? "yes" : "no") << std::endl;
+			}
+		}
+	}
+
+	/// Check if the server configuration makes sense
+	///
+	/// Be aware that this function does NOT test if the configuration
+	/// can be used. It only tests if it MAY be valid.
+	bool ServerConfiguration::check( std::ostream& os ) const
+	{
+		bool	correct = true;
+
+		for ( std::list<Network::ServerSSLendpoint>::const_iterator it = SSLaddress.begin();
+									it != SSLaddress.end(); ++it )	{
+			// if it listens to SSL a certificate file and a key file are required
+			if ( it->certificate().empty() )	{
+				os << "No SSL certificate specified for " << it->toString() << std::endl;
+				correct = false;
+			}
+			if ( it->key().empty() )	{
+				os << "No SSL key specified for " << it->toString() << std::endl;
+				correct = false;
+			}
+			// verify client SSL certificate needs either certificate dir or chain file
+			if ( it->verifyClientCert() && it->CAdirectory().empty() && it->CAchain().empty() )	{
+				os << "Client SSL certificate verification requested but no CA "
+						"directory or CA chain file specified for "
+						<< it->toString() << std::endl;
+				correct = false;
+			}
+		}
+		return correct;
+	}
+
+
+#if !defined(_WIN32)
+	/// Override the server configuration with command line arguments
+	void ServerConfiguration::override( std::string usr, std::string grp )
+	{
+		if ( !usr.empty())
+			user = usr;
+		if ( !grp.empty())
+			group = grp;
+	}
+#endif
+
+// Logger configuration functions
+	void LoggerConfiguration::print( std::ostream& os ) const
+	{
+		os << "Logging" << std::endl;
+		if ( logToStderr )
+			os << "   Log to stderr, level " << stderrLogLevel << std::endl;
+		else
+			os << "   Log to stderr: DISABLED" << std::endl;
+		if ( logToFile )
+			os << "   Log to file: " << logFile << ", level " << logFileLogLevel << std::endl;
+		else
+			os << "   Log to file: DISABLED" << std::endl;
+
+#if !defined(_WIN32)
+		if ( logToSyslog )
+			os << "   Log to syslog: facility " << syslogFacility << ", level " << syslogLogLevel << std::endl;
+		else
+			os << "   Log to syslog: DISABLED" << std::endl;
+#endif	// !defined( _WIN32 )
+
+#if defined(_WIN32)
+		if ( logToEventlog )
+			os << "   Log to eventlog: name " << eventlogLogName << ", source " << eventlogSource << ", level " << eventlogLogLevel;
+		else
+			os << "   Log to eventlog: DISABLED" << std::endl;
+#endif	// defined( _WIN32 )
+	}
+
+	/// Check if the logger configuration makes sense
+	///
+	/// Be aware that this function does NOT test if the configuration
+	/// can be used. It only tests if it MAY be valid.
+	bool LoggerConfiguration::check( std::ostream& os ) const
+	{
+		// if log to file is requested then a file must be specified
+		if ( logToFile && logFile.empty() )	{
+			os << "Log to file requested but no log file specified";
+			return false;
+		}
+		return true;
+	}
+
+///********************************************************************************************************
+
+
 	void ApplicationConfiguration::print( std::ostream& os ) const
 	{
 
@@ -122,24 +255,26 @@ namespace _SMERP {
 
 		os << "Network" << std::endl;
 		if ( address.size() > 0 )	{
-			os << "  Unencrypted: " << address[0].toString() << std::endl;
-			for ( unsigned i = 1; i < address.size(); i++ )
-				os << "               " << address[i].toString() << std::endl;
+			std::list<Network::ServerTCPendpoint>::const_iterator it = address.begin();
+			os << "  Unencrypted: " << it->toString() << std::endl;
+			for ( ++it; it != address.end(); ++it )
+				os << "               " << it->toString() << std::endl;
 		}
 		if ( SSLaddress.size() > 0 )	{
-			os << "          SSL: " << SSLaddress[0].toString() << std::endl;
-			os << "                  certificate: " << (SSLaddress[0].certificate().empty() ? "(none)" : SSLaddress[0].certificate()) << std::endl;
-			os << "                  key file: " << (SSLaddress[0].key().empty() ? "(none)" : SSLaddress[0].key()) << std::endl;
-			os << "                  CA directory: " << (SSLaddress[0].CAdirectory().empty() ? "(none)" : SSLaddress[0].CAdirectory()) << std::endl;
-			os << "                  CA chain file: " << (SSLaddress[0].CAchain().empty() ? "(none)" : SSLaddress[0].CAchain()) << std::endl;
-			os << "                  verify client: " << (SSLaddress[0].verifyClientCert() ? "yes" : "no") << std::endl;
-			for ( unsigned i = 1; i < SSLaddress.size(); i++ )	{
-				os << "               " << SSLaddress[i].toString() << std::endl;
-				os << "                  certificate: " << (SSLaddress[i].certificate().empty() ? "(none)" : SSLaddress[i].certificate()) << std::endl;
-				os << "                  key file: " << (SSLaddress[i].key().empty() ? "(none)" : SSLaddress[i].key()) << std::endl;
-				os << "                  CA directory: " << (SSLaddress[i].CAdirectory().empty() ? "(none)" : SSLaddress[i].CAdirectory()) << std::endl;
-				os << "                  CA chain file: " << (SSLaddress[i].CAchain().empty() ? "(none)" : SSLaddress[i].CAchain()) << std::endl;
-				os << "                  verify client: " << (SSLaddress[i].verifyClientCert() ? "yes" : "no") << std::endl;
+			std::list<Network::ServerSSLendpoint>::const_iterator it = SSLaddress.begin();
+			os << "          SSL: " << it->toString() << std::endl;
+			os << "                  certificate: " << (it->certificate().empty() ? "(none)" : it->certificate()) << std::endl;
+			os << "                  key file: " << (it->key().empty() ? "(none)" : it->key()) << std::endl;
+			os << "                  CA directory: " << (it->CAdirectory().empty() ? "(none)" : it->CAdirectory()) << std::endl;
+			os << "                  CA chain file: " << (it->CAchain().empty() ? "(none)" : it->CAchain()) << std::endl;
+			os << "                  verify client: " << (it->verifyClientCert() ? "yes" : "no") << std::endl;
+			for ( ++it; it != SSLaddress.end(); ++it )	{
+				os << "               " << it->toString() << std::endl;
+				os << "                  certificate: " << (it->certificate().empty() ? "(none)" : it->certificate()) << std::endl;
+				os << "                  key file: " << (it->key().empty() ? "(none)" : it->key()) << std::endl;
+				os << "                  CA directory: " << (it->CAdirectory().empty() ? "(none)" : it->CAdirectory()) << std::endl;
+				os << "                  CA chain file: " << (it->CAchain().empty() ? "(none)" : it->CAchain()) << std::endl;
+				os << "                  verify client: " << (it->verifyClientCert() ? "yes" : "no") << std::endl;
 			}
 		}
 
@@ -196,26 +331,6 @@ namespace _SMERP {
 				errMsg_ = "Log to file requested but no log file specified";
 				return false;
 			}
-/*
-		// if it listens to SSL a certificate file and a key file are required
-		if ( SSLaddress.size() > 0 )	{
-			if ( SSLcertificate.empty())	{
-				errMsg_ = "SSL port defined but no SSL certificate specified";
-				return false;
-			}
-			if ( SSLkey.empty())	{
-				errMsg_ = "Server SSL certificate needs a key but no key file specified";
-				return false;
-			}
-		}
-		// verify client SSL certificate needs either certificate dir or chain file
-		if ( SSLverify )	{
-			if ( SSLCAdirectory.empty() && SSLCAchainFile.empty())	{
-				errMsg_ = "Client SSL certificate verification requested but no CA directory or CA chain file specified";
-				return false;
-			}
-		}
-*/
 		return true;
 	}
 

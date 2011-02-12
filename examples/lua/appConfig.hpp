@@ -15,13 +15,12 @@
 #include "configurationBase.hpp"
 
 #include <string>
-#include <vector>
 #include <list>
 
 namespace _SMERP {
 
 	/// server configuration
-	struct ServerConfig : public _SMERP::ConfigurationBase	{
+	struct ServerConfiguration : public _SMERP::ConfigurationBase	{
 	public:
 #if !defined( _WIN32 )
 		// daemon configuration
@@ -44,8 +43,8 @@ namespace _SMERP {
 
 		/// methods
 		bool parse( ptree& pt );
-		bool check();
-		bool test();
+		bool check( std::ostream& os ) const;
+		bool test( std::ostream& os ) const;
 		void print( std::ostream& os ) const;
 #if !defined( _WIN32 )
 		void override( std::string user, std::string group );
@@ -77,11 +76,11 @@ namespace _SMERP {
 
 		/// methods
 		bool parse( ptree& pt );
-		bool check();
-		bool test();
+		bool check( std::ostream& os ) const;
+		bool test( std::ostream& os ) const;
 		void print( std::ostream& os ) const;
 
-		void foreground( LogLevel::Level debugLevel );
+		void foreground( LogLevel::Level debugLevel, bool useConfig );
 	};
 
 
@@ -107,8 +106,8 @@ namespace _SMERP {
 		unsigned		maxConnections;
 
 // network configuration
-		std::vector<Network::ServerTCPendpoint> address;
-		std::vector<Network::ServerSSLendpoint> SSLaddress;
+		std::list<Network::ServerTCPendpoint> address;
+		std::list<Network::ServerSSLendpoint> SSLaddress;
 
 		unsigned		idleTimeout;
 		unsigned		requestTimeout;
