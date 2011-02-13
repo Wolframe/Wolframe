@@ -29,5 +29,35 @@ Mech::AuthMech str2AuthMech( const std::string s )
 	else				return Mech::_SMERP_AUTH_MECH_UNDEFINED;
 }
 
+Authenticator* AuthenticatorFactory::getAuthenticator( const std::string method )
+{
+}
+
+std::vector<std::string> AuthenticatorFactory::getAvailableMechs( )
+{
+	std::vector<std::string> mechs;
+		
+	mechs.push_back( "TEXT_FILE");
+#ifdef _WIN32
+	mechs.push_back( "WINAD" );
+	mechs.push_back( "WINKERB" );
+#endif
+#ifdef WITH_OPENLDAP
+	mechs.push_back( "LDAP" );
+#endif
+#ifdef WITH_PAM
+	mechs.push_back( "PAM" );
+#endif
+#ifdef WITH_SASL
+	mechs.push_back( "SASL" );
+#endif
+#ifdef WITH_GSSAPI
+	mechs.push_back( "GSSAPI" );
+#endif
+	
+	return mechs;
+}
+
 } // namespace Authentication
 } // namespace _SMERP
+

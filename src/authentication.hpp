@@ -6,6 +6,9 @@
 #define _AUTHENTICATION_HPP_INCLUDED
 
 #include <string>
+#include <vector>
+
+#include "singleton.hpp"
 
 namespace _SMERP {
 	namespace Authentication {
@@ -47,9 +50,10 @@ class Authenticator {
 		virtual bool authenticate( const Credentials *cred ) = 0;
 };
 
-class AuthenticatorFactory {
+class AuthenticatorFactory : public Singleton< AuthenticatorFactory> {
 	public:
-		virtual Authenticator* getAuthenticator( const std::string method ) = 0;
+		Authenticator* getAuthenticator( const std::string method );
+		std::vector<std::string> getAvailableMechs( );
 };
 
 class UsernamePasswordCredentials {
@@ -65,7 +69,7 @@ class TextFileCredentials : public UsernamePasswordCredentials {
 
 class TextFileAuthenticator : public Authenticator {		
 	public:
-		TextFileAuthenticator( ) { }
+		TextFileAuthenticator( const std::string _filename ) { }
 		virtual bool authenticate( const Credentials *cred );
 };
 

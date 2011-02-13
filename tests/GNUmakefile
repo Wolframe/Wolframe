@@ -47,7 +47,7 @@ TEST_OBJS =
 
 TEST_CPP_BINS = \
 	threadLeakTest$(EXE) \
-	testGetPassword$(EXE)
+	testAuth$(EXE)
 
 ifdef WITH_GTEST
 TEST_CPP_BINS += \

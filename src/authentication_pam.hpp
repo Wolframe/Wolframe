@@ -31,10 +31,10 @@ extern "C" int pam_conv_func(	int nmsg, const struct pam_message **msg,
 
 class PAMAuthenticator : public Authenticator {
 	private:
-		std::string service;
+		std::string m_service;
 		
 	public:
-		PAMAuthenticator( );
+		PAMAuthenticator( const std::string _service );
 		virtual bool authenticate( const Credentials *cred );
 };
 

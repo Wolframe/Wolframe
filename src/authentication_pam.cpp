@@ -15,7 +15,8 @@ extern "C" {
 namespace _SMERP {
 	namespace Authentication {
 
-PAMAuthenticator::PAMAuthenticator( )
+PAMAuthenticator::PAMAuthenticator( const std::string _service )
+	: m_service( _service )
 {
 }
 
@@ -164,10 +165,10 @@ bool PAMAuthenticator::authenticate( const Credentials *cred )
 	conv.appdata_ptr = &appdata;
 
 // the service name must be a CONSTANT due to security reasons!
-	rc = pam_start( service.c_str( ), appdata.cred->m_userName.c_str( ), &conv, &h );
+	rc = pam_start( m_service.c_str( ), appdata.cred->m_userName.c_str( ), &conv, &h );
 	if( rc != PAM_SUCCESS ) {
 		std::ostringstream ss;
-		ss	<< "pam_start failed with service " << service << ": "
+		ss	<< "pam_start failed with service " << m_service << ": "
 			<< pam_strerror( h, rc ) << " (" << rc << ")";
 		throw std::runtime_error( ss.str( ) );
 	}
@@ -177,7 +178,7 @@ bool PAMAuthenticator::authenticate( const Credentials *cred )
 	rc = pam_authenticate( h, 0 );
 	if( rc != PAM_SUCCESS ) {
 		std::ostringstream ss;
-		ss	<< "pam_authenticate failed with service " << service << ": "
+		ss	<< "pam_authenticate failed with service " << m_service << ": "
 			<< pam_strerror( h, rc ) << " (" << rc << ")";
 		(void)pam_end( h, rc );
 		throw std::runtime_error( ss.str( ) );
@@ -187,7 +188,7 @@ bool PAMAuthenticator::authenticate( const Credentials *cred )
 	rc = pam_acct_mgmt( h, 0 );
 	if( rc != PAM_SUCCESS ) {
 		std::ostringstream ss;
-		ss	<< "pam_acct_mgmt failed with service " << service << ": "
+		ss	<< "pam_acct_mgmt failed with service " << m_service << ": "
 			<< pam_strerror( h, rc ) << " (" << rc << ")";
 		(void)pam_end( h, rc );
 		throw std::runtime_error( ss.str( ) );
@@ -196,7 +197,7 @@ bool PAMAuthenticator::authenticate( const Credentials *cred )
 // terminate PAM session with last exit code
 	if( pam_end( h, rc ) != PAM_SUCCESS ) {
 		std::ostringstream ss;
-		ss	<< "pam_end failed with service " << service << ": "
+		ss	<< "pam_end failed with service " << m_service << ": "
 			<< pam_strerror( h, rc ) << " (" << rc << ")";
 		(void)pam_end( h, rc );
 		throw std::runtime_error( ss.str( ) );
