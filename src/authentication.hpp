@@ -14,12 +14,12 @@ class Mech {
 public:
 	enum AuthMech {
 #ifdef _WIN32
-		_SMERP_AUTH_MECH_WINAD,			// Windows AD
-		_SMERP_AUTH_MECH_WINKERB,		// integrated Windows authentication
-							// (Kerberos)
+		_SMERP_AUTH_MECH_WINAD,			/// Windows AD
+		_SMERP_AUTH_MECH_WINKERB,		/// integrated Windows authentication
+							/// (Kerberos)
 #endif
 #ifdef WITH_OPENLDAP
-		_SMERP_AUTH_MECH_LDAP,			// LDAP (Unix and Windows)
+		_SMERP_AUTH_MECH_LDAP,			/// LDAP (Unix and Windows)
 #endif
 #ifdef WITH_PAM
 		_SMERP_AUTH_MECH_PAM,			/// Suns PAM
@@ -35,6 +35,38 @@ public:
 	};
 
 	static AuthMech str2AuthMech( const std::string s );
+};
+
+class Credentials {
+	public:
+		virtual ~Credentials( ) { }
+};
+
+class Authenticator {		
+	public:
+		virtual bool authenticate( const Credentials *cred ) = 0;
+};
+
+class AuthenticatorFactory {
+	public:
+		virtual Authenticator* getAuthenticator( const std::string method ) = 0;
+};
+
+class UsernamePasswordCredentials {
+	public:
+		std::string m_userName;
+		std::string m_password;
+};
+
+// text file
+
+class TextFileCredentials : public UsernamePasswordCredentials {
+};
+
+class TextFileAuthenticator : public Authenticator {		
+	public:
+		TextFileAuthenticator( ) { }
+		virtual bool authenticate( const Credentials *cred );
 };
 
 // map enum values to strings

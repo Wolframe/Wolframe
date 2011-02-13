@@ -196,7 +196,6 @@ examples/xmlselect/xmlIterator.hpp
 examples/xmlselect/textwolf.hpp
 examples/xmlselect/xmlIterator.cpp
 src/getPassword.hpp
-src/authentication.hpp
 src/smerpmsg.mc
 src/smerp.conf
 src/posixMain.d
@@ -213,8 +212,8 @@ src/configFile.hpp
 src/commandLine.hpp
 src/logBackend.hpp
 src/getPassword.hpp
-src/authentication_pam.h
-src/authentication.hpp
+src/authentication_pam.hpp
+src/authentication_pam.cpp
 src/appConfig.hpp
 src/acceptor.hpp
 src/winMain.cpp
@@ -233,8 +232,6 @@ src/logSyslogFacility.cpp
 src/logLevel.cpp
 src/logBackend.cpp
 src/commandLine.cpp
-src/authentication_pam.c
-src/authentication.cpp
 src/appException.cpp
 src/appConfig.cpp
 src/acceptor.cpp
