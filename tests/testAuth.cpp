@@ -7,6 +7,10 @@
 using namespace std;
 using namespace _SMERP::Authentication;
 
+#ifndef _WIN32
+#include <unistd.h>
+#endif
+
 int main( void )
 {
 // get list of available authentication methods
@@ -37,7 +41,12 @@ int main( void )
 				a->receiveData( pass );
 // login name required
 			} else if( token == "login" ) {
+#ifndef _WI32
 				string login = getlogin( );
+#else
+// TODO: get username on Windows
+				string login = "dummy";
+#endif
 				a->receiveData( login );
 			} else {
 				cerr << "authenticator requests unknown token '" << token << "'" << endl;

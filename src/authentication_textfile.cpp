@@ -14,6 +14,7 @@ namespace _SMERP {
 
 TextFileAuthenticator::TextFileAuthenticator( SMERP_UNUSED const std::string _filename )
 {
+	// TODO: read file here
 	m_creds.insert( std::make_pair<std::string, std::string>( "abaumann", "xx" ) );
 }
 

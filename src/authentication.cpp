@@ -42,7 +42,7 @@ AuthenticatorFactory::AuthenticatorFactory( )
 	// TODO: register over loadable module loader and a register function
 	// with creation functors, but later :-)
 	
-	// TODO: where to get parameters for creation from?
+	// TODO: where to get parameters for creation from outside?
 	
 	m_authenticators.insert( std::make_pair<std::string, Authenticator *>("TEXT_FILE", new TextFileAuthenticator( "creds.conf" ) ) );
 #ifdef WITH_PAM

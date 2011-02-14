@@ -33,6 +33,7 @@ tests/pechoHandler-gTest
 tests/protocolArgumentParsing-gTest
 tests/poolTest
 tests/resolvePathTest
+tests/testAuth
 examples/echo/smerp-echo
 examples/pecho/smerp-pecho
 examples/xmlselect/smerp-xmlselect
