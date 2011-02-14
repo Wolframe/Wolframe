@@ -17,8 +17,8 @@ struct Method
       Data* data;
       protocol::Generator* contentIterator;
       
-      Context()                   :data(0),contentIterator(0){};
-      void init( Data* p_data=0)  {data(p_data),contentIterator(0){};
+      Context()                   :data(0),contentIterator(0){}
+      void init( Data* p_data=0)  {data(p_data),contentIterator(0){}
    };
    //Method call
    //@return 0, in case of success, errorcode for client in case of error
@@ -34,8 +34,8 @@ struct Instance
    const Method* mt;
    Method::Data* data;
 
-   Instance()                    :mt(0),data(0){};
-   Instance( const Instance& o)  :mt(o.mt),data(o.data){};
+   Instance()                    :mt(0),data(0){}
+   Instance( const Instance& o)  :mt(o.mt),data(o.data){}
 };
 
 
