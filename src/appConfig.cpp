@@ -6,6 +6,9 @@
 #include "commandLine.hpp"
 #include "configFile.hpp"
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/algorithm/string.hpp>
+
 #include <string>
 #include <ostream>
 
@@ -55,48 +58,45 @@ namespace _SMERP {
 		answerTimeout = cfgFile.answerTimeout;
 		processTimeout = cfgFile.processTimeout;
 
-		dbHost = cfgFile.dbHost;
-		dbPort = cfgFile.dbPort;
-		dbName = cfgFile.dbName;
-		dbUser = cfgFile.dbUser;
-		dbPassword = cfgFile.dbPassword;
+		dbConfig = cfgFile.dbConfig;
+		logConfig = cfgFile.logConfig;
 
-		if ( !foreground )	{
-			logToStderr = cfgFile.logToStderr;
-			stderrLogLevel = cfgFile.stderrLogLevel;
-			logToFile = cfgFile.logToFile;
-			logFile = cfgFile.logFile;
-			logFileLogLevel = cfgFile.logFileLogLevel;
-#if !defined( _WIN32 )
-			logToSyslog = cfgFile.logToSyslog;
-			syslogFacility = cfgFile.syslogFacility;
-			syslogLogLevel = cfgFile.syslogLogLevel;
-#endif	// !defined( _WIN32 )
-#if defined( _WIN32 )
-// Aba, what for?
-//			syslogIdent = cfgFile.syslogIdent;
-//			logToEventlog = cfgFile.logToEventlog;
-#endif	//defined( _WIN32 )
-		}
-		else	{
-			logToStderr = true;
-			stderrLogLevel = cmdLine.debugLevel;
-			logToFile = false;
-#if !defined( _WIN32 )
-			logToSyslog = false;
-#endif	// !defined( _WIN32 )
-#if defined( _WIN32 )
-			logToEventlog = false;
-#endif	// defined( _WIN32 )
-		}
+//		if ( !foreground )	{
+//			logToStderr = cfgFile.logToStderr;
+//			stderrLogLevel = cfgFile.stderrLogLevel;
+//			logToFile = cfgFile.logToFile;
+//			logFile = cfgFile.logFile;
+//			logFileLogLevel = cfgFile.logFileLogLevel;
+//#if !defined( _WIN32 )
+//			logToSyslog = cfgFile.logToSyslog;
+//			syslogFacility = cfgFile.syslogFacility;
+//			syslogLogLevel = cfgFile.syslogLogLevel;
+//#endif	// !defined( _WIN32 )
+//#if defined( _WIN32 )
+//// Aba, what for?
+////			syslogIdent = cfgFile.syslogIdent;
+////			logToEventlog = cfgFile.logToEventlog;
+//#endif	//defined( _WIN32 )
+//		}
+//		else	{
+//			logToStderr = true;
+//			stderrLogLevel = cmdLine.debugLevel;
+//			logToFile = false;
+//#if !defined( _WIN32 )
+//			logToSyslog = false;
+//#endif	// !defined( _WIN32 )
+//#if defined( _WIN32 )
+//			logToEventlog = false;
+//#endif	// defined( _WIN32 )
+//		}
 
-#if defined( _WIN32 )
-		// we need the data always (for running, --install and --remove,
-		// which run in foreground)
-		eventlogLogName = cfgFile.eventlogLogName;
-		eventlogSource = cfgFile.eventlogSource;
-		eventlogLogLevel = cfgFile.eventlogLogLevel;
-#endif	// defined( _WIN32 )
+//#if defined( _WIN32 )
+//		// we need the data always (for running, --install and --remove,
+//		// which run in foreground)
+//		eventlogLogName = cfgFile.eventlogLogName;
+//		eventlogSource = cfgFile.eventlogSource;
+//		eventlogLogLevel = cfgFile.eventlogLogLevel;
+//#endif	// defined( _WIN32 )
 	}
 
 
@@ -176,6 +176,12 @@ namespace _SMERP {
 		return correct;
 	}
 
+	bool ServerConfiguration::test( std::ostream& os ) const
+	{
+		os << displayStr() << "Not implemented yet !" << std::endl;
+		return false;
+	}
+
 
 #if !defined(_WIN32)
 	/// Override the server configuration with command line arguments
@@ -193,7 +199,7 @@ namespace _SMERP {
 
 	void LoggerConfiguration::print( std::ostream& os ) const
 	{
-		os << "Logging" << std::endl;
+		os << displayStr() << std::endl;
 		if ( logToStderr )
 			os << "   Log to stderr, level " << stderrLogLevel << std::endl;
 		else
@@ -232,24 +238,166 @@ namespace _SMERP {
 		return true;
 	}
 
+	bool LoggerConfiguration::test( std::ostream& os ) const
+	{
+		os << displayStr() << "Not implemented yet !" << std::endl;
+		return false;
+	}
+
+
+	bool LoggerConfiguration::parse( boost::property_tree::ptree& pt, std::ostream& os )
+	{
+		if ( pt.get_child_optional( "logging.stderr" ))	{
+			logToStderr = true;
+			std::string str = pt.get<std::string>( "logging.stderr.level", "NOTICE" );
+
+			if ( ( stderrLogLevel = LogLevel::str2LogLevel( str )) == LogLevel::LOGLEVEL_UNDEFINED )	{
+				os << "unknown log level \"" << str << " for stderr";
+				return false;
+			}
+		}
+		else
+			logToStderr = false;
+
+		if ( pt.get_child_optional( "logging.logFile" ))	{
+			logToFile = true;
+			logFile = boost::filesystem::absolute(
+					pt.get<std::string>( "logging.logFile.filename", std::string() ),
+					boost::filesystem::path( file ).branch_path() ).string();
+			std::string str = pt.get<std::string>( "logging.logFile.level", "ERROR" );
+
+			if ( ( logFileLogLevel = LogLevel::str2LogLevel( str )) == LogLevel::LOGLEVEL_UNDEFINED )	{
+				os << "unknown log level \"" << str << " for logfile";
+				return false;
+			}
+		}
+		else
+			logToFile = false;
+#if !defined( _WIN32 )
+		if ( pt.get_child_optional( "logging.syslog" ))	{
+			logToSyslog = true;
+			std::string str = pt.get<std::string>( "logging.syslog.facility", "LOCAL4" );
+
+			if ( ( syslogFacility = SyslogFacility::str2SyslogFacility( str )) == SyslogFacility::_SMERP_SYSLOG_FACILITY_UNDEFINED )	{
+				os << "unknown syslog facility \"" << str << "\"";
+				return false;
+			}
+			str = pt.get<std::string>( "logging.syslog.level", "NOTICE" );
+
+			if ( ( syslogLogLevel = LogLevel::str2LogLevel( str )) == LogLevel::LOGLEVEL_UNDEFINED )	{
+				os << "unknown log level \"" << str << " for syslog";
+				return false;
+			}
+
+			syslogIdent = pt.get<std::string>( "logging.syslog.ident", "smerpd" );
+		}
+		else
+			logToSyslog = false;
+#endif	// !defined( _WIN32 )
+
+#if defined( _WIN32 )
+		if ( pt.get_child_optional( "logging.eventlog" )) {
+			logToEventlog = true;
+			eventlogLogName = pt.get<std::string>( "logging.eventlog.name", "smerpd" );
+			eventlogSource = pt.get<std::string>( "logging.eventlog.source", "unknown" );
+			std::string str = pt.get<std::string>( "logging.eventlog.level", "NOTICE" );
+			std::string s = str;
+			boost::trim( s );
+			boost::to_upper( s );
+
+			if ( ( eventlogLogLevel = LogLevel::str2LogLevel( s )) == LogLevel::LOGLEVEL_UNDEFINED )	{
+				os << "unknown log level \"" << s << " for Event Log";
+				return false;
+			}
+		}
+		else
+			logToEventlog = false;
+#endif	// defined( _WIN32 )
+	}
+
 
 //----- Database configuration functions---------------------------------------------------------------------------------
 
 	void DatabaseConfiguration::print( std::ostream& os ) const
 	{
-		os << "Database" << std::endl;
-		if ( dbHost.empty())
+		os << displayStr() << std::endl;
+		if ( host.empty())
 			os << "   DB host: local unix domain socket" << std::endl;
 		else
-			os << "   DB host: " << dbHost << ":" << dbPort << std::endl;
-		os << "   DB name: " << (dbName.empty() ? "(not specified - server user default)" : dbName) << std::endl;
-		os << "   DB user / password: " << (dbUser.empty() ? "(not specified - same as server user)" : dbUser) << " / "
-						<< (dbPassword.empty() ? "(not specified - no password used)" : dbPassword) << std::endl;
+			os << "   DB host: " << host << ":" << dbPort << std::endl;
+		os << "   DB name: " << (name.empty() ? "(not specified - server user default)" : name) << std::endl;
+		os << "   DB user / password: " << (user.empty() ? "(not specified - same as server user)" : user) << " / "
+						<< (password.empty() ? "(not specified - no password used)" : password) << std::endl;
 	}
 
 	/// Check if the database configuration makes sense
 	bool DatabaseConfiguration::check( std::ostream& ) const
 	{
+		return true;
+	}
+
+	bool DatabaseConfiguration::test( std::ostream& os ) const
+	{
+		os << displayStr() << "Not implemented yet !" << std::endl;
+		return false;
+	}
+
+	bool getString( boost::property_tree::ptree::const_iterator it,
+			       const char *name, std::string& value, std::ostream& os )
+	{
+		if ( !value.empty() )	{
+			os << displayStr() << ": " << name << " redefined";
+			return false;
+		}
+		value = it->second.get_value<std::string>();
+		if ( value.empty() )	{
+			os << displayStr() << ": invalid " << name << ": <"
+					<< it->second.get_value<std::string>() << ">";
+			return false;
+		}
+		return true;
+	}
+
+	bool getUnsignedShort( boost::property_tree::ptree::const_iterator it,
+			       const char *name, unsigned short& value, std::ostream& os )
+	{
+		if ( value != 0 )	{
+			os << displayStr() << ": " << name << " redefined";
+			return false;
+		}
+		value = it->second.get_value<unsigned short>();
+		if ( value == 0 )	{
+			os << displayStr() << ": invalid " << name << ": <"
+					<< it->second.get_value<std::string>() << ">";
+			return false;
+		}
+		return true;
+	}
+
+	bool DatabaseConfiguration::parse( boost::property_tree::ptree& pt, std::ostream& os )
+	{
+		for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
+			std::string entry = it->first;
+			if ( boost::algorithm::iequals( entry, "host" ))	{
+				if ( !getString( it, "host", host, os ))		return false;
+			}
+			else if ( boost::algorithm::iequals( entry, "port" ))	{
+				if ( !getUnsignedShort( it, "port", port, os ))		return false;
+			}
+			else if ( boost::algorithm::iequals( entry, "name" ))	{
+				if ( !getString( it, "name", name, os ))		return false;
+			}
+			else if ( boost::algorithm::iequals( entry, "user" ))	{
+				if ( !getString( it, "user", user, os ))		return false;
+			}
+			else if ( boost::algorithm::iequals( entry, "password" ))	{
+				if ( !getString( it, "password", password, os ))	return false;
+			}
+			else	{
+				os << displayStr() << ": unknown configuration option: <" << it->first << ">";
+				return false;
+			}
+		}
 		return true;
 	}
 
@@ -307,14 +455,7 @@ namespace _SMERP {
 		os << "   answer: " << answerTimeout << std::endl;
 		os << "   process: " << processTimeout << std::endl;
 
-		os << "Database" << std::endl;
-		if ( dbHost.empty())
-			os << "   DB host: local unix domain socket" << std::endl;
-		else
-			os << "   DB host: " << dbHost << ":" << dbPort << std::endl;
-		os << "   DB name: " << (dbName.empty() ? "(not specified - server user default)" : dbName) << std::endl;
-		os << "   DB user / password: " << (dbUser.empty() ? "(not specified - same as server user)" : dbUser) << " / "
-						<< (dbPassword.empty() ? "(not specified - no password used)" : dbPassword) << std::endl;
+		dbConfig->print( os );
 
 		os << "Logging" << std::endl;
 		if ( logToStderr )

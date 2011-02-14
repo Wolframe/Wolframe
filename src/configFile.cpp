@@ -16,11 +16,12 @@
 #include <boost/algorithm/string.hpp>
 
 #include <boost/property_tree/ptree.hpp>
-
 #include <boost/property_tree/info_parser.hpp>
 
 #include <vector>
 #include <string>
+
+#include <sstream>
 
 
 static const unsigned short	DEFAULT_PORT = 7660;
@@ -174,100 +175,19 @@ namespace _SMERP {
 		processTimeout = pt.get<unsigned>( "server.timeout.process", 30 );
 
 // database
-		dbHost = pt.get<std::string>( "database.host", std::string() );
-		dbPort = pt.get<unsigned short>( "database.port", 0 );
-		dbName = pt.get<std::string>( "database.name", std::string() );
-		dbUser = pt.get<std::string>( "database.user", std::string() );
-		dbPassword = pt.get<std::string>( "database.password", std::string() );
-
-		if ( pt.get_child_optional( "logging.stderr" ))	{
-			logToStderr = true;
-			std::string str = pt.get<std::string>( "logging.stderr.level", "NOTICE" );
-			std::string s = str;
-			boost::trim( s );
-			boost::to_upper( s );
-
-			if ( ( stderrLogLevel = LogLevel::str2LogLevel( s )) == LogLevel::LOGLEVEL_UNDEFINED )	{
-				errMsg_ = "unknown log level \"";
-				errMsg_ += str;
-				errMsg_ += " for stderr";
-				return false;
-			}
+		dbConfig = new DatabaseConfiguration( "database", "Database Server" );
+		std::stringstream	errStr;
+		if ( ! dbConfig->parse( pt.get_child( "database" ), errStr ))	{
+			errMsg_ = errStr.str();
+			return false;
 		}
-		else
-			logToStderr = false;
 
-		if ( pt.get_child_optional( "logging.logFile" ))	{
-			logToFile = true;
-			logFile = boost::filesystem::absolute(
-						pt.get<std::string>( "logging.logFile.filename", std::string() ),
-							boost::filesystem::path( file ).branch_path() ).string();
-			std::string str = pt.get<std::string>( "logging.logFile.level", "ERROR" );
-			std::string s = str;
-			boost::trim( s );
-			boost::to_upper( s );
-
-			if ( ( logFileLogLevel = LogLevel::str2LogLevel( s )) == LogLevel::LOGLEVEL_UNDEFINED )	{
-				errMsg_ = "unknown log level \"";
-				errMsg_ += str;
-				errMsg_ += " for logfile";
-				return false;
-			}
+// logging
+		logConfig = new LoggerConfiguration( "logging", "Logging" );
+		if ( ! logConfig->parse( pt.get_child( "logging" ), errStr ))	{
+			errMsg_ = errStr.str();
+			return false;
 		}
-		else
-			logToFile = false;
-#if !defined( _WIN32 )
-		if ( pt.get_child_optional( "logging.syslog" ))	{
-			logToSyslog = true;
-			std::string str = pt.get<std::string>( "logging.syslog.facility", "LOCAL4" );
-			std::string s = str;
-			boost::trim( s );
-			boost::to_upper( s );
-
-			if ( ( syslogFacility = SyslogFacility::str2SyslogFacility( s )) == SyslogFacility::_SMERP_SYSLOG_FACILITY_UNDEFINED )	{
-				errMsg_ = "unknown syslog facility \"";
-				errMsg_ += str;
-				errMsg_ += "\"";
-				return false;
-			}
-			str = pt.get<std::string>( "logging.syslog.level", "NOTICE" );
-			s = str;
-			boost::trim( s );
-			boost::to_upper( s );
-
-			if ( ( syslogLogLevel = LogLevel::str2LogLevel( s )) == LogLevel::LOGLEVEL_UNDEFINED )	{
-				errMsg_ = "unknown log level \"";
-				errMsg_ += str;
-				errMsg_ += " for syslog";
-				return false;
-			}
-
-			syslogIdent = pt.get<std::string>( "logging.syslog.ident", "smerpd" );
-		}
-		else
-			logToSyslog = false;
-#endif	// !defined( _WIN32 )
-
-#if defined( _WIN32 )
-		if ( pt.get_child_optional( "logging.eventlog" )) {
-			logToEventlog = true;
-			eventlogLogName = pt.get<std::string>( "logging.eventlog.name", "smerpd" );
-			eventlogSource = pt.get<std::string>( "logging.eventlog.source", "unknown" );
-			std::string str = pt.get<std::string>( "logging.eventlog.level", "NOTICE" );
-			std::string s = str;
-			boost::trim( s );
-			boost::to_upper( s );
-
-			if ( ( eventlogLogLevel = LogLevel::str2LogLevel( s )) == LogLevel::LOGLEVEL_UNDEFINED )	{
-				errMsg_ = "unknown log level \"";
-				errMsg_ += s;
-				errMsg_ += " for Event Log";
-				return false;
-			}
-		}
-		else
-			logToEventlog = false;
-#endif	// defined( _WIN32 )
 	}
 		catch( std::exception& e)	{
 			errMsg_ = e.what();

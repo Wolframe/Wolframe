@@ -5,6 +5,8 @@
 #include "logSyslogFacility.hpp"
 #include "serverEndpoint.hpp"
 
+#include "appConfig.hpp"
+
 #include <string>
 #include <list>
 
@@ -35,28 +37,9 @@ namespace _SMERP	{
 		unsigned		processTimeout;
 
 // database configuration
-		std::string		dbHost;
-		unsigned short		dbPort;
-		std::string		dbName;
-		std::string		dbUser;
-		std::string		dbPassword;
+		DatabaseConfiguration	*dbConfig;
 // logger configuration
-		bool			logToStderr;
-		LogLevel::Level		stderrLogLevel;
-		bool			logToFile;
-		std::string		logFile;
-		LogLevel::Level		logFileLogLevel;
-#if !defined( _WIN32 )
-		bool			logToSyslog;
-		SyslogFacility::Facility syslogFacility;
-		LogLevel::Level		syslogLogLevel;
-		std::string		syslogIdent;
-#else
-		bool			logToEventlog;
-		std::string		eventlogLogName;
-		std::string		eventlogSource;
-		LogLevel::Level		eventlogLogLevel;
-#endif	// !defined( _WIN32 )
+		LoggerConfiguration	*logConfig;
 
 	private:
 		std::string		errMsg_;

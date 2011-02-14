@@ -41,8 +41,11 @@ namespace _SMERP {
 		std::list<Network::ServerTCPendpoint> address;
 		std::list<Network::ServerSSLendpoint> SSLaddress;
 
+		/// constructor
+		ServerConfiguration( std::string node, std::string header ) : ConfigurationBase( node, header )
+									{}
 		/// methods
-		bool parse( ptree& pt );
+		bool parse( boost::property_tree::ptree& pt, std::ostream& os );
 		bool check( std::ostream& os ) const;
 		bool test( std::ostream& os ) const;
 		void print( std::ostream& os ) const;
@@ -74,8 +77,11 @@ namespace _SMERP {
 		LogLevel::Level		eventlogLogLevel;
 #endif // !defined( _WIN32 )
 
+		/// constructor
+		LoggerConfiguration( std::string node, std::string header ) : ConfigurationBase( node, header )
+									{}
 		/// methods
-		bool parse( ptree& pt );
+		bool parse( boost::property_tree::ptree& pt, std::ostream& os );
 		bool check( std::ostream& os ) const;
 		bool test( std::ostream& os ) const;
 		void print( std::ostream& os ) const;
@@ -88,14 +94,17 @@ namespace _SMERP {
 	struct DatabaseConfiguration : public _SMERP::ConfigurationBase
 	{
 	public:
-		std::string		dbHost;
-		unsigned short		dbPort;
-		std::string		dbName;
-		std::string		dbUser;
-		std::string		dbPassword;
+		std::string		host;
+		unsigned short		port;
+		std::string		name;
+		std::string		user;
+		std::string		password;
 
+		/// constructor
+		DatabaseConfiguration( std::string node, std::string header ) : ConfigurationBase( node, header )
+									{ port = 0; }
 		/// methods
-		bool parse( ptree& pt );
+		bool parse( boost::property_tree::ptree& pt, std::ostream& os );
 		bool check( std::ostream& os ) const;
 		bool test( std::ostream& os ) const;
 		void print( std::ostream& os ) const;
@@ -133,28 +142,9 @@ namespace _SMERP {
 		unsigned		processTimeout;
 
 // database configuration
-		std::string		dbHost;
-		unsigned short		dbPort;
-		std::string		dbName;
-		std::string		dbUser;
-		std::string		dbPassword;
+		DatabaseConfiguration	*dbConfig;
 // logger configuration
-		bool			logToStderr;
-		LogLevel::Level		stderrLogLevel;
-		bool			logToFile;
-		std::string		logFile;
-		LogLevel::Level		logFileLogLevel;
-#if !defined( _WIN32 )
-		bool			logToSyslog;
-		SyslogFacility::Facility syslogFacility;
-		LogLevel::Level		syslogLogLevel;
-		std::string		syslogIdent;
-#else
-		bool			logToEventlog;
-		std::string		eventlogLogName;
-		std::string		eventlogSource;
-		LogLevel::Level		eventlogLogLevel;
-#endif	// !defined( _WIN32 )
+		LoggerConfiguration	*logConfig;
 
 	private:
 		std::string		errMsg_;
