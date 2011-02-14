@@ -7,6 +7,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 #include "singleton.hpp"
 
@@ -59,7 +60,12 @@ class Authenticator {
 };
 
 class AuthenticatorFactory : public Singleton< AuthenticatorFactory> {
+	private:
+		std::map<std::string, Authenticator *> m_authenticators;
+
 	public:
+		AuthenticatorFactory( );
+		virtual ~AuthenticatorFactory( );
 		Authenticator* getAuthenticator( const std::string method );
 		std::vector<std::string> getAvailableMechs( );
 };

@@ -41,6 +41,24 @@ INCLUDE_LIBS += \
 
 endif
 
+# pam
+
+ifdef WITH_PAM
+
+INCLUDE_CPPFLAGS += \
+	-DWITH_PAM
+
+INCLUDE_DIRS += \
+	-I$(PAM_INCLUDE_DIR)
+
+INCLUDE_LDFLAGS += \
+	-L$(PAM_LIB_DIR)
+
+INCLUDE_LIBS += \
+	$(PAM_LIBS)
+
+endif
+
 TEST_OBJS =
 #	$(TOPDIR)/examples/pecho/pechoHandler.o
 #	$(TOPDIR)/examples/xmlselect/xmlselectHandler.o
@@ -62,6 +80,8 @@ TEST_CPP_BINS += \
 endif
 
 include $(TOPDIR)/makefiles/gmake/sub.mk
+
+testAuth: $(TOPDIR)/src/libsmerp.a
 
 ifdef WITH_GTEST
 pechoHandler-gTest$(EXE): pechoHandler-gTest.o $(TOPDIR)/src/libsmerp.a $(TOPDIR)/examples/pecho/pechoHandler.o $(TOPDIR)/src/protocol_ioblocks.o

@@ -32,7 +32,7 @@ class PAMAuthenticator : public Authenticator {
 		
 	public:
 		PAMAuthenticator( const std::string _service );
-		virtual Step::AuthStep nextStep( ) = 0;
+		virtual Step::AuthStep nextStep( );
 		virtual std::string sendData( );
 		virtual std::string token( );
 		virtual void receiveData( const std::string data );
