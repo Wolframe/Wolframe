@@ -10,12 +10,15 @@ struct CommandHandler
 {
 private:
    enum State {Null,Init,Selected,Running};
+   typedef protocol::CmdBuffer CmdBuffer;                    //< buffer for protocol commands
+   typedef protocol::CmdParser<CmdBuffer> ProtocolParser;    //< parser for the protocol
    
-   protocol::ProtocolParser m_parser;       //< parser for the commands
-   Instance* m_instance;                    //< method table and data
-   Method::Context m_context;               //< context of current method executed
-   unsigned int m_methodIdx;                //< index of currently executed method or -1
-   State m_state;                           //< command handler state
+   CmdBuffer m_cmdBuffer;                                    //< buffer for the command
+   ProtocolParser m_parser;                                  //< parser for the commands
+   Instance* m_instance;                                     //< method table and data
+   Method::Context m_context;                                //< context of current method executed
+   unsigned int m_methodIdx;                                 //< index of currently executed method or -1
+   State m_state;                                            //< command handler state
 
    //set the current command to unknown without affecting the processed data object
    void resetCommand();
@@ -24,7 +27,7 @@ private:
    void init( const char** protocolCmds, Instance* instance);
 
    //pass a protocol data input chunk to the processors generator function
-   void processorInput( Input& input, Input::iterator& end);
+   void protocolInput( protocol::InputBlock& input, protocol::InputBlock::iterator& end);
    
 public:
    //initialize the prcessed data object with all its methods and some default protocol commands
@@ -45,7 +48,10 @@ public:
       init( 0);
    }
 
-   Command getCommand();
+   ~CommandHandler();
+
+   Command getCommand( protocol::InputBlock::iterator& itr, protocol::InputBlock::iterator& eoM);
+
    int call( int argc, const char** argv);
 
    template <class Buffer>
@@ -54,14 +60,14 @@ public:
       unsigned int ii;
       if (m_instance && m_instance->mt)
       {
-         for( unsigned int ii=0; instance->mt[ii].call && instance->mt[ii].name; ii++)
+         for (ii=0; m_instance->mt[ii].call && m_instance->mt[ii].name; ii++)
          {
             if (ii>0)
             {
                buf.push_back( ',');
                buf.push_back( ' ');
             }
-            buf.append( instance->mt[ii].name);
+            buf.append( m_instance->mt[ii].name);
          }
       }
    }      

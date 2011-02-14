@@ -46,4 +46,5 @@ class ServerHandler::ServerHandlerImpl
 };
 
 }//namespace
+#endif
 

@@ -17,11 +17,11 @@ struct Method
       protocol::Generator* contentIterator;
       
       Context()                   :data(0),contentIterator(0){}
-      void init( Data* p_data=0)  {data(p_data),contentIterator(0){}
+      void init( Data* p_data=0)  {data=p_data;contentIterator=0;}
    };
    //Method call
    //@return 0, in case of success, errorcode for client in case of error
-   typedef (int*) Call( Context* context, unsigned int argc, const char* argv);
+   typedef int (*Call)( Context* context, unsigned int argc, const char** argv);
    
    const char* name;
    Call call;

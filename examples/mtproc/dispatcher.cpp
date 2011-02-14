@@ -1,5 +1,6 @@
 #include "dispatcher.hpp"
 #include "methodtable.hpp"
+#include "logger.hpp"
 
 using namespace _SMERP::mtproc;
 using namespace _SMERP::protocol;
@@ -22,14 +23,14 @@ void CommandHandler::resetCommand()
 void CommandHandler::init( const char** protocolCmds, Instance* instance)
 {
    m_instance = instance;
-   parser.init();
+   m_parser.init();
    resetCommand();
    
    if (protocolCmds)
    {
       for( unsigned int ii=0; protocolCmds[ ii]; ii++)
       {
-         parser.add( protocolCmds[ ii]);
+         m_parser.add( protocolCmds[ ii]);
       }
    }
    if (instance)
@@ -41,19 +42,19 @@ void CommandHandler::init( const char** protocolCmds, Instance* instance)
       {
          for( unsigned int ii=0; instance->mt[ii].call && instance->mt[ii].name; ii++)
          {
-            parser.add( instance->mt[ii].name);
+            m_parser.add( instance->mt[ii].name);
          }
       }
    }
 }
 
-void CommandHandler::processorInput( Input& input, Input::iterator& end)
+void CommandHandler::protocolInput( protocol::InputBlock& input, protocol::InputBlock::iterator& end)
 {
    if (m_state == Running)
    {
       if (m_context.contentIterator)
       {
-         m_context.contentIterator->processorInput( input.ptr(), end-input.begin());
+         m_context.contentIterator->protocolInput( input.ptr(), end-input.begin());
       }
       else
       {
@@ -63,7 +64,7 @@ void CommandHandler::processorInput( Input& input, Input::iterator& end)
    else
    {
       LOG_ERROR << "illegal state (running but no context)";
-      init();
+      init(0);
    }
 }
 
@@ -72,10 +73,10 @@ CommandHandler::~CommandHandler()
    if (m_instance) delete m_instance;
 }
 
-Command CommandHandler::getCommand()
+CommandHandler::Command CommandHandler::getCommand( protocol::InputBlock::iterator& itr, protocol::InputBlock::iterator& eoM)
 {
    resetCommand();
-   int ci = m_parser.getCommand();
+   int ci = m_parser.getCommand( itr, eoM, m_cmdBuffer);
    if (ci >= unknown && ci < method)
    {
       return (Command)ci;
@@ -86,7 +87,6 @@ Command CommandHandler::getCommand()
       m_state = Selected;
       return method;
    }
-   return rt;
 }
 
 int CommandHandler::call( int argc, const char** argv)
@@ -99,7 +99,7 @@ int CommandHandler::call( int argc, const char** argv)
    if (m_state != Running)
    {
       LOG_ERROR << "illegal call in this state (not running)";
-      init();
+      init(0);
       return 0;
    }
    int rt = m_instance->mt[ m_methodIdx].call( &m_context, argc, argv);
@@ -111,7 +111,7 @@ int CommandHandler::call( int argc, const char** argv)
    else
    {
       const char* errmsg;
-      switch (m_context.contentIterator->state)
+      switch (m_context.contentIterator->state())
       {
          case protocol::Generator::Init:
          case protocol::Generator::Processing:

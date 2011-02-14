@@ -1,9 +1,9 @@
-#include "processor.hpp"
+#include "mtprocHandler.hpp"
 #include "protocol.hpp"
 #include "logger.hpp"
 
 using namespace _SMERP;
-using namespace _SMERP::pecho;
+using namespace _SMERP::mtproc;
 
 struct Connection::Private
 {
