@@ -162,7 +162,7 @@ struct Connection::Private
                    //    the next state should read one character for sure otherwise it may result in an endless loop
                    static const ProtocolParser parser(cmd);
 
-                   switch (parser.getCommand( itr, cmdBuffer))
+                   switch (parser.getCommand( itr, eoM, cmdBuffer))
                    {
                       case empty:
                       {
@@ -186,86 +186,126 @@ struct Connection::Private
                       }
                       default:
                       {
-                         state = HandleError;
-                         return WriteLine( "BAD unknown command");
+                         if (itr == eoM)
+                         {
+                            input.setPos( 0);
+                            return Network::ReadData( input.ptr(), input.size());
+                         }
+                         else
+                         {
+                            state = HandleError;
+                            return WriteLine( "BAD unknown command");
+                         }
                       }
                    }
                }
 
                case EmptyLine:
                {
-                  ProtocolParser::skipSpaces( itr);
-                  if (*itr != '\r' && *itr != '\n')
+                  if (!ProtocolParser::skipSpaces( itr, eoM))
                   {
-                     state = Init;
-                     buffer.init();
-                     return WriteLine( "BAD command line");
+                     input.setPos( 0);
+                     return Network::ReadData( input.ptr(), input.size());
                   }
-                  if (*itr == '\r') itr++;
-                  state = EnterCommand;
-                  if (*itr == '\n') itr++;
+                  if (!ProtocolParser::consumeEOLN( itr, eoM))
+                  {
+                     if (itr == eoM)
+                     {
+                        input.setPos( 0);
+                        return Network::ReadData( input.ptr(), input.size());
+                     }
+                     else
+                     {
+                        state = Init;
+                        buffer.init();
+                        return WriteLine( "BAD command line");
+                     }
+                  }
+                  else
+                  {
+                     state = EnterCommand;
+                     continue;
+                  }
                }
 
                case EnterMode:
                {
-                   //here we parse the 1st (and only or missing) argument of the 'echo' command.
-                   //it defines the way of processing the input lines:
-                   enum Command {none, tolower, toupper};
-                   static const char* cmd[4] = {"","tolower","toupper",0};
-                   //... the empty command is for no arguments meaning a simple ECHO
-                   //    the next state should read one character for sure otherwise it may result in an endless loop (as in EnterCommand)
-                   static const ProtocolParser parser(cmd);
+                  //here we parse the 1st (and only or missing) argument of the 'echo' command.
+                  //it defines the way of processing the input lines:
+                  enum Command {none, tolower, toupper};
+                  static const char* cmd[4] = {"","tolower","toupper",0};
+                  //... the empty command is for no arguments meaning a simple ECHO
+                  //    the next state should read one character for sure
+                  //    otherwise it may result in an endless loop (as in EnterCommand)
 
-                   ProtocolParser::skipSpaces( itr);
+                  static const ProtocolParser parser(cmd);
 
-                   switch (parser.getCommand( itr, cmdBuffer))
-                   {
-                      case none:
-                      {
-                          //... no argument => simple echo
-                          mode = Ident;
-                          state = StartProcessing;
-                          continue;
-                      }
-                      case tolower:
-                      {
-                          mode = Lowercase;
-                          state = StartProcessing;
-                          continue;
-                      }
-                      case toupper:
-                      {
-                          mode = Uppercase;
-                          state = StartProcessing;
-                          continue;
-                      }
-                      default:
-                      {
-                         state = HandleError;
-                         return WriteLine( "BAD unknown argument");
-                      }
-                   }
+                  if (!ProtocolParser::skipSpaces( itr, eoM))
+                  {
+                     input.setPos( 0);
+                     return Network::ReadData( input.ptr(), input.size());
+                  }
+
+                  switch (parser.getCommand( itr, eoM, cmdBuffer))
+                  {
+                     case none:
+                     {
+                        //... no argument => simple echo
+                        mode = Ident;
+                        state = StartProcessing;
+                        continue;
+                     }
+                     case tolower:
+                     {
+                        mode = Lowercase;
+                        state = StartProcessing;
+                        continue;
+                     }
+                     case toupper:
+                     {
+                        mode = Uppercase;
+                        state = StartProcessing;
+                        continue;
+                     }
+                     default:
+                     {
+                        if (itr == eoM)
+                        {
+                           input.setPos( 0);
+                           return Network::ReadData( input.ptr(), input.size());
+                        }
+                        else
+                        {
+                           state = HandleError;
+                           return WriteLine( "BAD unknown command argument");
+                        }
+                     }
+                  }
                }
 
                case StartProcessing:
                {
-                   //read the rest of the line and reject more arguments than expected.
-                   //go on with processing, if this is clear. do not cosnsume the first end of line because it could be
-                   //the first character of the EOF sequence.
-                   input.resetEoD();
-                   ProtocolParser::skipSpaces( itr);
-                   if (*itr != '\r' && *itr != '\n')
-                   {
-                      state = Init;
-                      return WriteLine( "BAD too many arguments");
-                   }
-                   else
-                   {
-                      state = Processing;
-                      eoD = input.getEoD( itr);
-                      eoM = input.end();
-                      return WriteLine( "OK enter data");
-                   }
+                  //read the rest of the line and reject more arguments than expected.
+                  //go on with processing, if this is clear. do not cosnsume the first end of line because it could be
+                  //the first character of the EOF sequence.
+                  input.resetEoD();
+                  if (!ProtocolParser::skipSpaces( itr, eoM))
+                  {
+                     input.setPos( 0);
+                     return Network::ReadData( input.ptr(), input.size());
+                  }
+                  if (!ProtocolParser::isEOLN( itr))
+                  {
+                     state = Init;
+                     return WriteLine( "BAD too many arguments");
+                  }
+                  else
+                  {
+                     state = Processing;
+                     eoD = input.getEoD( itr);
+                     eoM = input.end();
+                     return WriteLine( "OK enter data");
+                  }
                }
 
                case ProcessingAfterWrite:
@@ -303,10 +343,12 @@ struct Connection::Private
 
                case HandleError:
                {
-                   ProtocolParser::skipSpaces( itr);
-                   if (*itr == '\r') itr++;
+                   if (!ProtocolParser::skipLine( itr, eoM) || !ProtocolParser::consumeEOLN( itr, eoM))
+                   {
+                      input.setPos( 0);
+                      return Network::ReadData( input.ptr(), input.size());
+                   }            
                    state = Init;
-                   if (*itr == '\n') itr++;
                    continue;
                }
 
@@ -318,12 +360,6 @@ struct Connection::Private
             }//switch(..)
          }//for(,,)
       }
-      catch (Input::ArrayBoundReadError)
-      {
-         LOG_DATA << "End of input interrupt";
-         input.setPos( 0);
-         return Network::ReadData( input.ptr(), input.size());
-      };
       return Network::CloseConnection();
    }
 };

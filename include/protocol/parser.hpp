@@ -11,11 +11,37 @@ class Parser
 public:
    //go to the next non space
    template <typename IteratorType>
-   static void skipSpaces( IteratorType& src)
+   static bool skipSpaces( IteratorType& src, IteratorType& end)
    {
-      while (*src == ' ' || *src == '\t') ++src;
+      while (src < end && (*src == ' ' || *src == '\t')) ++src;
+      return (src<end);
+   }
+
+   template <typename IteratorType>
+   static bool skipLine( IteratorType& src, IteratorType& end)
+   {
+      while (src < end && *src != '\r' && *src != '\n') ++src;
+      return (src<end);
+   }
+
+   //consume the end of line
+   template <typename IteratorType>
+   static bool consumeEOLN( IteratorType& src, IteratorType& end)
+   {
+      if (src == end) return false;
+      if (*src == '\r') src++;
+      if (src == end) return false;
+      if (*src != '\n') return false;
+      src++;
+      return true;
    }
    
+   template <typename IteratorType>
+   static bool isEOLN( IteratorType& src)
+   {
+      return (*src == '\r' || *src == '\n');
+   }
+
    //* go to the end of line and write it to buffer, starting with the first non space.
    // after call the iterator is pointing to the end of line char or at the EOF char.
    //@remark end of lines or trailing spaces are not implicitely consumed, 
@@ -23,18 +49,19 @@ public:
    //@remark control characters are mapped to space (ascii 32) before writing them to 'buf'
    //@param src input iterator
    //@param buf output buffer with a minimal subset of std::string interface
+   //@return true, if the line was consumed completely
    template <typename IteratorType, typename BufferType>
-   static void getLine( IteratorType& src, BufferType& buf)
+   static bool getLine( IteratorType& src, IteratorType& end, BufferType& buf)
    {
-      char ch;
-      if (buf.size() == 0) skipSpaces( src);
+      if (buf.size() == 0) if (!skipSpaces( src)) return false;
       
-      while ((ch=*src) != '\n' && ch != '\r' && ch != '\0')
+      while (src < end && *src != '\n' && *src != '\r')
       {
-         if (ch <= ' ') {buf.push_back(' '); ++src; continue;}
-         buf.push_back(ch);
+         if (*src <= ' ') {buf.push_back(' '); ++src; continue;}
+         buf.push_back(*src);
          ++src;
       }
+      return (src < end);
    }   
 };
 
@@ -89,15 +116,17 @@ public:
    };
    
    //parse the next command.
+   //@return -1, if the command could not be parsed
    template <typename IteratorType>
-   int getCommand( IteratorType& src, CmdBufferType& buf) const
+   int getCommand( IteratorType& src, IteratorType& end, CmdBufferType& buf) const
    {
-      char ch;
-      while ((ch=*src) > 32)
+      while (src < end && *src > 32)
       {
-         buf.push_back( ch);
+         buf.push_back( *src);
          ++src;
       }
+      if (src == end) return -1;
+
       if (*buf == -1)
       {
          buf.init();

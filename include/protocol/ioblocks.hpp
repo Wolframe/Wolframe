@@ -76,8 +76,8 @@ public:
    iterator begin()                                     {iterator rt(this); return rt;}
    const_iterator at( unsigned int pos_) const          {const_iterator rt(this); return rt+pos_;}
    iterator at( unsigned int pos_)                      {iterator rt(this); return rt+pos_;}
-   const_iterator end() const                           {return const_iterator(this)+size();}
-   iterator end()                                       {return iterator(this)+size();}
+   const_iterator end() const                           {return const_iterator(this)+pos();}
+   iterator end()                                       {return iterator(this)+pos();}
    
    //end of data calculation and markup
    iterator getEoD( iterator start);
