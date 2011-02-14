@@ -57,7 +57,8 @@ LOCAL_STATIC_LIB_OBJS = \
 	getPassword.obj \
 	connection.obj \
 	server.obj \
-	authentication.obj
+	authentication.obj \
+	authentication_textfile.obj
 
 OBJS = \
 	$(LOCAL_STATIC_LIB_OBJS) \
