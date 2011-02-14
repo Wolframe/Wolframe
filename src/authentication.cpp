@@ -31,6 +31,7 @@ Mech::AuthMech str2AuthMech( const std::string s )
 
 Authenticator* AuthenticatorFactory::getAuthenticator( const std::string method )
 {
+	return 0;
 }
 
 std::vector<std::string> AuthenticatorFactory::getAvailableMechs( )
