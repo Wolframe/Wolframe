@@ -61,6 +61,11 @@ class Generator
       //used by functions that transform generators (like XML header to content with different character set)
       virtual void getRestBlock( void** block, unsigned int* blocksize)=0;
 
+      //get the error details
+      //@param msg pointer to return bthe error message as string 
+      //@return the error code in case of an error state or 0.  
+      virtual int getError( char** msg=0)=0;
+
       //@example generator function in C for the processor:
       //
       //bool nativeGeneratorCall( Generator* g, const char** b, unsigned int* n)
