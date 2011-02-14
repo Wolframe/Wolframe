@@ -12,6 +12,8 @@ extern "C" {
 #include <sstream>
 #include <stdexcept>
 
+#include "unused.h"
+
 namespace _SMERP {
 	namespace Authentication {
 
@@ -96,7 +98,7 @@ int pam_conv_func(	int nmsg, const struct pam_message **msg,
 		switch( msg[i]->msg_style ) {
 // Usually we get prompted for a password, this is not always true though.
 			case PAM_PROMPT_ECHO_OFF:
-				r->resp = strdup( appdata->cred->m_password.c_str( ) );
+				r->resp = strdup( appdata->pass.c_str( ) );
 				if( r->resp == NULL ) {
 					appdata->errmsg = "Unable to allocate memory for password answer";
 					goto error;
@@ -116,7 +118,7 @@ int pam_conv_func(	int nmsg, const struct pam_message **msg,
 					goto error;
 				}
 				if( strcmp( m->msg, login_prompt ) == 0 ) {
-					r->resp = strdup( appdata->cred->m_userName.c_str( ) );
+					r->resp = strdup( appdata->login.c_str( ) );
 					if( r->resp == NULL ) {
 						appdata->errmsg = "Unable to allocate memory for login answer";
 						goto error;
@@ -151,6 +153,26 @@ error:
 	return PAM_CONV_ERR;
 }
 
+Step::AuthStep PAMAuthenticator::nextStep( )
+{
+	return Step::_SMERP_AUTH_STEP_FAIL;
+}
+
+std::string PAMAuthenticator::sendData( )
+{
+	return 0;
+}
+
+std::string PAMAuthenticator::token( )
+{
+	return 0;
+}
+
+void PAMAuthenticator::receiveData( SMERP_UNUSED const std::string data )
+{
+}
+
+#if 0
 bool PAMAuthenticator::authenticate( const Credentials *cred )
 {
 	int rc;
@@ -205,6 +227,7 @@ bool PAMAuthenticator::authenticate( const Credentials *cred )
 
 	return ( rc == PAM_SUCCESS );
 }
+#endif
 
 } // namespace Authentication
 } // namespace _SMERP

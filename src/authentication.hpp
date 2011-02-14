@@ -40,37 +40,28 @@ public:
 	static AuthMech str2AuthMech( const std::string s );
 };
 
-class Credentials {
-	public:
-		virtual ~Credentials( ) { }
+class Step {
+public:
+	enum AuthStep {
+		_SMERP_AUTH_STEP_SUCCESS,		/// successful authentication
+		_SMERP_AUTH_STEP_FAIL,			/// authentication failed
+		_SMERP_AUTH_STEP_SEND_DATA,		/// we need to send some data
+		_SMERP_AUTH_STEP_RECV_DATA		/// we require some data
+	};
 };
 
 class Authenticator {		
 	public:
-		virtual bool authenticate( const Credentials *cred ) = 0;
+		virtual Step::AuthStep nextStep( ) = 0;
+		virtual std::string sendData( ) = 0;
+		virtual std::string token( ) = 0;
+		virtual void receiveData( const std::string data ) = 0;
 };
 
 class AuthenticatorFactory : public Singleton< AuthenticatorFactory> {
 	public:
 		Authenticator* getAuthenticator( const std::string method );
 		std::vector<std::string> getAvailableMechs( );
-};
-
-class UsernamePasswordCredentials {
-	public:
-		std::string m_userName;
-		std::string m_password;
-};
-
-// text file
-
-class TextFileCredentials : public UsernamePasswordCredentials {
-};
-
-class TextFileAuthenticator : public Authenticator {		
-	public:
-		TextFileAuthenticator( const std::string _filename ) { }
-		virtual bool authenticate( const Credentials *cred );
 };
 
 // map enum values to strings
