@@ -7,6 +7,10 @@
 using namespace std;
 using namespace _SMERP::Authentication;
 
+#ifndef _WIN32
+#include <unistd.h>
+#endif
+
 int main( void )
 {
 // get list of available authentication methods
@@ -17,7 +21,7 @@ int main( void )
 	cout << endl;
 
 // get a specific authenticator			
-	Authenticator *a = AuthenticatorFactory::instance( ).getAuthenticator( "PAM" );
+	Authenticator *a = AuthenticatorFactory::instance( ).getAuthenticator( "TEXT_FILE" );
 
 // go in a loop where we do what the authenticator tells us, in
 // the simplest case it asks us for a login and a password
@@ -37,8 +41,16 @@ int main( void )
 				a->receiveData( pass );
 // login name required
 			} else if( token == "login" ) {
-				string login = "abaumann";
+#ifndef _WI32
+				string login = getlogin( );
+#else
+// TODO: get username on Windows
+				string login = "dummy";
+#endif
 				a->receiveData( login );
+			} else {
+				cerr << "authenticator requests unknown token '" << token << "'" << endl;
+				return 1;
 			}
 		}
 
