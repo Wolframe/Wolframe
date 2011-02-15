@@ -71,7 +71,8 @@ protected:
          char* itr = const_cast<char*>( testDescription[ tt].in);
          std::string argbuf;
          protocol::CArgBuffer<std::string> args( &argbuf);
-         protocol::Parser::getLine( itr, args);
+		 //Aba: temporarily commented out..
+         //protocol::Parser::getLine( itr, args);
          unsigned int ii=0,nn=args.size();
          while (ii<nn)
          {

@@ -37,20 +37,20 @@ class Generator
             int m_type;
             
          public:
-            Element()                                             :m_value(0),m_size(0),m_type(0){};
-            void init( const char* v, unsigned int s, int t)      {m_value=v;m_size=s;m_type=t;};
-            const char* value() const                             {return m_value;};
-            unsigned int size() const                             {return m_size;};
-            int type() const                                      {return m_type;};
+            Element()                                             :m_value(0),m_size(0),m_type(0){}
+            void init( const char* v, unsigned int s, int t)      {m_value=v;m_size=s;m_type=t;}
+            const char* value() const                             {return m_value;}
+            unsigned int size() const                             {return m_size;}
+            int type() const                                      {return m_type;}
       };
       
-      Generator()                                                 :m_state(Init){};
+      Generator()                                                 :m_state(Init){}
       
-      const Element& operator*() const                            {return m_cur;};
-      const Element* operator->() const                           {return &m_cur;};
-      State state() const                                         {return m_state;};
+      const Element& operator*() const                            {return m_cur;}
+      const Element* operator->() const                           {return &m_cur;}
+      State state() const                                         {return m_state;}
       
-      virtual ~Generator() {};
+      virtual ~Generator() {}
       
       //used to go to next element (see example below)
       virtual bool skip()=0;
@@ -60,6 +60,11 @@ class Generator
       
       //used by functions that transform generators (like XML header to content with different character set)
       virtual void getRestBlock( void** block, unsigned int* blocksize)=0;
+
+      //get the error details
+      //@param msg pointer to return bthe error message as string 
+      //@return the error code in case of an error state or 0.  
+      virtual int getError( const char** msg=0)=0;
 
       //@example generator function in C for the processor:
       //

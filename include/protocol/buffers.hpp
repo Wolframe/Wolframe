@@ -22,12 +22,12 @@ private:
    char m_buf[ Size+1];
    
 public:
-   Buffer()                     :m_pos(0){};
-   void init()                  {m_pos=0;};
-   void push_back( char ch)     {if (m_pos<Size) m_buf[m_pos++]=ch;};
-   void append( const char* cc) {unsigned int ii=0; while(m_pos<Size && cc[ii]) m_buf[m_pos++]=cc[ii++];};
-   unsigned int size() const    {return m_pos;};
-   const char* c_str()          {m_buf[m_pos]=0; return m_buf;}; 
+   Buffer()                     :m_pos(0){}
+   void init()                  {m_pos=0;}
+   void push_back( char ch)     {if (m_pos<Size) m_buf[m_pos++]=ch;}
+   void append( const char* cc) {unsigned int ii=0; while(m_pos<Size && cc[ii]) m_buf[m_pos++]=cc[ii++];}
+   unsigned int size() const    {return m_pos;}
+   const char* c_str()          {m_buf[m_pos]=0; return m_buf;} 
 };
 
 //buffer for the currently parsed command. 
@@ -41,9 +41,9 @@ struct CmdBuffer
       MaxCommandLen=(sizeof(ValueType)/6)
    };
    
-   CmdBuffer()                     :m_pos(0),m_value(0) {};
-   CmdBuffer( const CmdBuffer& o)  :m_pos(o.m_pos),m_value(o.m_value) {}; 
-   void init()                     {m_pos=0;m_value=0;};
+   CmdBuffer()                     :m_pos(0),m_value(0) {}
+   CmdBuffer( const CmdBuffer& o)  :m_pos(o.m_pos),m_value(o.m_value) {} 
+   void init()                     {m_pos=0;m_value=0;}
   
    //feed context with the next input character (case insensitive)
    void push_back( char ch)
@@ -53,11 +53,11 @@ struct CmdBuffer
       if (ch >= 'A' && ch <= 'Z') {m_value = (m_value << 6) | (ch-'A'); return;}
       if (ch >= '0' && ch <= '9') {m_value = (m_value << 6) | (ch+26-'0'); return;}
       init();
-   };
+   }
    
-   unsigned int size() const {return m_pos;};
-   operator ValueType() const {return m_value;};
-   ValueType operator*() const {return m_value;};
+   unsigned int size() const {return m_pos;}
+   operator ValueType() const {return m_value;}
+   ValueType operator*() const {return m_value;}
 };
 
 
@@ -77,11 +77,11 @@ private:
    State m_state;
    Buffer* m_content;
    
-   void openArg()                      {if (m_pos<Size) m_buf[m_pos++]=m_content->size();};
+   void openArg()                      {if (m_pos<Size) m_buf[m_pos++]=m_content->size();}
    
 public:
-   CArgBuffer( Buffer* c)              :m_pos(0),m_state(Empty),m_content(c) {m_buf[0]=0;m_sbuf[0]=0;};
-   void init()                         {m_pos=0;m_buf[0]=0;m_sbuf[0]=0;m_content->init();};
+   CArgBuffer( Buffer* c)              :m_pos(0),m_state(Empty),m_content(c) {m_buf[0]=0;m_sbuf[0]=0;}
+   void init()                         {m_pos=0;m_buf[0]=0;m_sbuf[0]=0;m_content->init();}
    void push_back( char ch)
    {
       switch (m_state)
@@ -153,8 +153,8 @@ public:
             break;
       }
    };
-   unsigned int size() const                          {return m_pos;};
-   const char* operator[]( unsigned int idx) const    {return (idx<m_pos)?m_content->c_str()+m_buf[idx]:0;};
+   unsigned int size() const                          {return m_pos;}
+   const char* operator[]( unsigned int idx) const    {return (idx<m_pos)?m_content->c_str()+m_buf[idx]:0;}
    
    //return an array of 0-terminated strings as convenient in C for program arguments
    //@remark the return value of this function may not be valid anymore after a new call of push_back
@@ -167,8 +167,8 @@ public:
          if (ii<m_pos) m_sbuf[ii]=0;
       }
       return m_sbuf;
-   };
-   unsigned int argc() const                          {return m_pos;};
+   }
+   unsigned int argc() const                          {return m_pos;}
 };
    
 } // namespace protocol

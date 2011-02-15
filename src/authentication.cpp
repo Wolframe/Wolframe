@@ -4,6 +4,14 @@
 
 #include "authentication.hpp"
 
+// badbad, see below
+#include "authentication_textfile.hpp"
+#ifdef WITH_PAM
+#include "authentication_pam.hpp"
+#endif
+
+#include <utility>
+
 namespace _SMERP {
 	namespace Authentication {
 
@@ -29,8 +37,30 @@ Mech::AuthMech str2AuthMech( const std::string s )
 	else				return Mech::_SMERP_AUTH_MECH_UNDEFINED;
 }
 
+AuthenticatorFactory::AuthenticatorFactory( )
+{
+	// TODO: register over loadable module loader and a register function
+	// with creation functors, but later :-)
+	
+	// TODO: where to get parameters for creation from outside?
+	
+	m_authenticators.insert( std::make_pair<std::string, Authenticator *>("TEXT_FILE", new TextFileAuthenticator( "creds.conf" ) ) );
+#ifdef WITH_PAM
+	m_authenticators.insert( std::make_pair<std::string, Authenticator *>( "PAM", new PAMAuthenticator( "SMERP" ) ) );
+#endif
+}
+
+AuthenticatorFactory::~AuthenticatorFactory( )
+{
+}
+
 Authenticator* AuthenticatorFactory::getAuthenticator( const std::string method )
 {
+	std::map<std::string, Authenticator *>::const_iterator it = m_authenticators.find( method );
+	if( it != m_authenticators.end( ) )
+		return it->second;
+
+	return 0;
 }
 
 std::vector<std::string> AuthenticatorFactory::getAvailableMechs( )

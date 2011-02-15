@@ -122,6 +122,7 @@ InputBlock::iterator InputBlock::getEoD( InputBlock::iterator start)
       else if (m_eodState == EoD::LF_DOT_CR)
       {
          if (buf[bufpos] == '\n') bufpos++; 
+         if (bufpos == bufsize) moveInput( buf, dstsize, eatsize, bufpos);
          m_eodState = EoD::LF_DOT_CR_LF;
       }
       else //if (m_eodState == EoD::LF_DOT_CR_LF)

@@ -12,13 +12,10 @@ extern "C" {
 namespace _SMERP {
 	namespace Authentication {
 
-// PAM
-
-class PAMCredentials : public UsernamePasswordCredentials {
-};
 
 typedef struct {
-	const PAMCredentials *cred;
+	std::string login;
+	std::string pass;
 	std::string errmsg;
 	pam_handle_t *h;
 } pam_appdata;
@@ -35,7 +32,10 @@ class PAMAuthenticator : public Authenticator {
 		
 	public:
 		PAMAuthenticator( const std::string _service );
-		virtual bool authenticate( const Credentials *cred );
+		virtual Step::AuthStep nextStep( );
+		virtual std::string sendData( );
+		virtual std::string token( );
+		virtual void receiveData( const std::string data );
 };
 
 } // namespace Authentication
@@ -43,4 +43,4 @@ class PAMAuthenticator : public Authenticator {
 
 #endif // WITH_PAM
 
-#endif /* ifndef SMERP__AUTH_PAM_H */
+#endif // _SMERP_AUTHENTICATION_PAM_HPP_INCLUDED

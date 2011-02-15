@@ -66,7 +66,8 @@ LOCAL_STATIC_LIB_OBJS = \
 	getPassword.o \
 	connection.o \
 	server.o \
-	authentication.o
+	authentication.o \
+	authentication_textfile.o
 
 # pam
 ifdef WITH_PAM
