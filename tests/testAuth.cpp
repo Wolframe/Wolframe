@@ -41,7 +41,7 @@ int main( void )
 				a->receiveData( pass );
 // login name required
 			} else if( token == "login" ) {
-#ifndef _WI32
+#ifndef _WIN32
 				string login = getlogin( );
 #else
 // TODO: get username on Windows
