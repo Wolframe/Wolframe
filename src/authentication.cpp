@@ -46,7 +46,7 @@ AuthenticatorFactory::AuthenticatorFactory( )
 	
 	m_authenticators.insert( std::make_pair<std::string, Authenticator *>("TEXT_FILE", new TextFileAuthenticator( "creds.conf" ) ) );
 #ifdef WITH_PAM
-	m_authenticators.insert( std::make_pair<std::string, Authenticator *>( "PAM", new PAMAuthenticator( "SMERP" ) ) );
+	m_authenticators.insert( std::make_pair<std::string, Authenticator *>( "PAM", new PAMAuthenticator( "smerp" ) ) );
 #endif
 }
 
