@@ -1,3 +1,7 @@
+//
+// authentication_pam.cpp
+//
+
 #include "authentication_pam.hpp"
 
 // PAM
@@ -20,6 +24,9 @@ namespace _SMERP {
 PAMAuthenticator::PAMAuthenticator( const std::string _service )
 	: m_service( _service )
 {
+	m_appdata.h = NULL;
+	m_conv.conv = pam_conv_func;
+	m_conv.appdata_ptr = &m_appdata;
 }
 
 const char *msg_style_to_str( int msg_style )
@@ -155,6 +162,66 @@ error:
 
 Step::AuthStep PAMAuthenticator::nextStep( )
 {
+	switch( m_state ) {
+		case _SMERP_PAM_STATE_NEED_LOGIN:
+			m_token = "login";
+			return Step::_SMERP_AUTH_STEP_RECV_DATA;
+		
+		case _SMERP_PAM_STATE_NEED_PASS:
+			m_token = "password";
+			return Step::_SMERP_AUTH_STEP_RECV_DATA;
+			
+		case _SMERP_PAM_STATE_COMPUTE: {
+			int rc;
+
+// TODO: the service name must be a CONSTANT due to security reasons!
+			rc = pam_start( m_service.c_str( ), m_appdata.login.c_str( ), &m_conv, &m_appdata.h );
+			if( rc != PAM_SUCCESS ) {
+				std::ostringstream ss;
+				ss	<< "pam_start failed with service " << m_service << ": "
+					<< pam_strerror( m_appdata.h, rc ) << " (" << rc << ")";
+				throw std::runtime_error( ss.str( ) );
+			}
+
+// authenticate: are we who we claim to be?
+			rc = pam_authenticate( m_appdata.h, 0 );
+			if( rc != PAM_SUCCESS ) {
+				std::ostringstream ss;
+				ss	<< "pam_authenticate failed with service " << m_service << ": "
+					<< pam_strerror( m_appdata.h, rc ) << " (" << rc << ")";
+				(void)pam_end( m_appdata.h, rc );
+				throw std::runtime_error( ss.str( ) );
+			}
+
+// is access permitted?
+			rc = pam_acct_mgmt( m_appdata.h, 0 );
+			if( rc != PAM_SUCCESS ) {
+				std::ostringstream ss;
+				ss	<< "pam_acct_mgmt failed with service " << m_service << ": "
+					<< pam_strerror( m_appdata.h, rc ) << " (" << rc << ")";
+				(void)pam_end( m_appdata.h, rc );
+				throw std::runtime_error( ss.str( ) );
+			}
+
+// terminate PAM session with last exit code
+			if( pam_end( m_appdata.h, rc ) != PAM_SUCCESS ) {
+				std::ostringstream ss;
+				ss	<< "pam_end failed with service " << m_service << ": "
+					<< pam_strerror( m_appdata.h, rc ) << " (" << rc << ")";
+				(void)pam_end( m_appdata.h, rc );
+				throw std::runtime_error( ss.str( ) );
+			}
+
+			m_state = _SMERP_PAM_STATE_NEED_LOGIN;
+			m_appdata.h = NULL;
+
+			if( rc == PAM_SUCCESS )
+				return Step::_SMERP_AUTH_STEP_SUCCESS;
+			else
+				return Step::_SMERP_AUTH_STEP_FAIL;
+		}
+	}
+
 	return Step::_SMERP_AUTH_STEP_FAIL;
 }
 
@@ -165,69 +232,28 @@ std::string PAMAuthenticator::sendData( )
 
 std::string PAMAuthenticator::token( )
 {
-	return 0;
+	return m_token;
 }
 
 void PAMAuthenticator::receiveData( SMERP_UNUSED const std::string data )
 {
-}
-
-#if 0
-bool PAMAuthenticator::authenticate( const Credentials *cred )
-{
-	int rc;
-	pam_appdata appdata;
-	struct pam_conv conv;
-	pam_handle_t *h;
-
-	appdata.cred = dynamic_cast<const PAMCredentials *>( cred );
-	appdata.h = NULL;
-
-	conv.conv = pam_conv_func;
-	conv.appdata_ptr = &appdata;
-
-// the service name must be a CONSTANT due to security reasons!
-	rc = pam_start( m_service.c_str( ), appdata.cred->m_userName.c_str( ), &conv, &h );
-	if( rc != PAM_SUCCESS ) {
-		std::ostringstream ss;
-		ss	<< "pam_start failed with service " << m_service << ": "
-			<< pam_strerror( h, rc ) << " (" << rc << ")";
-		throw std::runtime_error( ss.str( ) );
-	}
-	appdata.h = h;
+	switch( m_state ) {
+		case _SMERP_PAM_STATE_NEED_LOGIN:
+			m_appdata.login = data;
+			m_state = _SMERP_PAM_STATE_NEED_PASS;
+			break;
 		
-// authenticate: are we who we claim to be?
-	rc = pam_authenticate( h, 0 );
-	if( rc != PAM_SUCCESS ) {
-		std::ostringstream ss;
-		ss	<< "pam_authenticate failed with service " << m_service << ": "
-			<< pam_strerror( h, rc ) << " (" << rc << ")";
-		(void)pam_end( h, rc );
-		throw std::runtime_error( ss.str( ) );
-	}
+		case _SMERP_PAM_STATE_NEED_PASS:
+			m_appdata.pass = data;
+			m_state = _SMERP_PAM_STATE_COMPUTE;
+			break;
 
-// is access permitted?
-	rc = pam_acct_mgmt( h, 0 );
-	if( rc != PAM_SUCCESS ) {
-		std::ostringstream ss;
-		ss	<< "pam_acct_mgmt failed with service " << m_service << ": "
-			<< pam_strerror( h, rc ) << " (" << rc << ")";
-		(void)pam_end( h, rc );
-		throw std::runtime_error( ss.str( ) );
+// TODO: application exception		
+		case _SMERP_PAM_STATE_COMPUTE:
+			throw new std::runtime_error( "Illegal state in auhenticator" );
+			break;
 	}
-
-// terminate PAM session with last exit code
-	if( pam_end( h, rc ) != PAM_SUCCESS ) {
-		std::ostringstream ss;
-		ss	<< "pam_end failed with service " << m_service << ": "
-			<< pam_strerror( h, rc ) << " (" << rc << ")";
-		(void)pam_end( h, rc );
-		throw std::runtime_error( ss.str( ) );
-	}
-
-	return ( rc == PAM_SUCCESS );
 }
-#endif
 
 } // namespace Authentication
 } // namespace _SMERP
