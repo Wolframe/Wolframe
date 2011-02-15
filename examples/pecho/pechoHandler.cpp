@@ -359,6 +359,8 @@ struct Connection::Private
                }
             }//switch(..)
          }//for(,,)
+      // Aba: added a catch here to avoid errors in compiling..
+      } catch( ... ) {
       }
       return Network::CloseConnection();
    }
