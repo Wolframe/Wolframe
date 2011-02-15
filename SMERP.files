@@ -236,3 +236,6 @@ src/appException.cpp
 src/appConfig.cpp
 src/acceptor.cpp
 examples/echo/smerp-echo.conf
+tests/testAuth.cpp
+src/authentication_textfile.hpp
+src/authentication_textfile.cpp
