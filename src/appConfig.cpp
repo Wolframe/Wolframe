@@ -12,7 +12,60 @@
 #include <string>
 #include <ostream>
 
+
 namespace _SMERP {
+
+	bool getBoolValue( boost::property_tree::ptree::const_iterator it, std::string& module,
+			   std::string& name, bool& value, std::ostream& os )
+	{
+		std::string s = it->second.get_value<std::string>();
+		boost::to_upper( s );
+		boost::trim( s );
+		if ( s == "NO" || s == "FALSE" || s == "0" || s == "OFF" )	{
+			value = false;
+			return true;
+		}
+		if ( s == "YES" || s == "TRUE" || s == "1" || s == "ON" )	{
+			value = true;
+			return true;
+		}
+		os << module << ": invalid logical value for " << name << ": <"
+				<< it->second.get_value<std::string>() << ">";
+		return false;
+	}
+
+	bool getStringValue( boost::property_tree::ptree::const_iterator it, std::string& module,
+			     std::string& name, std::string& value, std::ostream& os )
+	{
+		if ( !value.empty() )	{
+			os << module << ": " << name << " redefined";
+			return false;
+		}
+		value = it->second.get_value<std::string>();
+		if ( value.empty() )	{
+			os << module << ": invalid " << name << ": <"
+					<< it->second.get_value<std::string>() << ">";
+			return false;
+		}
+		return true;
+	}
+
+	bool getUnsignedShortVlaue( boost::property_tree::ptree::const_iterator it, std::string& module,
+				    std::string& name, unsigned short& value, std::ostream& os )
+	{
+		if ( value != 0 )	{
+			os << module << ": " << name << " redefined";
+			return false;
+		}
+		value = it->second.get_value<unsigned short>();
+		if ( value == 0 )	{
+			os << module << ": invalid " << name << ": <"
+					<< it->second.get_value<std::string>() << ">";
+			return false;
+		}
+		return true;
+	}
+
 
 	ApplicationConfiguration::ApplicationConfiguration( const CmdLineConfig& cmdLine, const CfgFileConfig& cfgFile )
 	{
@@ -247,6 +300,39 @@ namespace _SMERP {
 
 	bool LoggerConfiguration::parse( boost::property_tree::ptree& pt, std::ostream& os )
 	{
+		for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
+			if ( boost::algorithm::iequals( L1it->first, "stderr" ))	{
+				if ( logToStderr )	{
+					os << displayStr() << ": stderr channel already defined";
+					return false;
+				}
+				logToStderr = true;
+				stderrLogLevel = LogLevel::LOGLEVEL_UNDEFINED;
+				for ( boost::property_tree::ptree::const_iterator L2it = pt.begin(); L2it != pt.end(); L2it++ )	{
+					if ( boost::algorithm::iequals( L2it->first, "level" ))	{
+						LogLevel::Level lvl = LogLevel::str2LogLevel( L2it->second.get_value<std::string>() );
+						if ( lvl ==  LogLevel::LOGLEVEL_UNDEFINED )	{
+							os << displayStr() << ": unknown log level: "
+								<< L2it->second.get_value<std::string>();
+							return false;
+						}
+						if ( stderrLogLevel == LogLevel::LOGLEVEL_UNDEFINED )	{
+							os << displayStr() << ": stderr log level already defined. Second value: "
+								<< L2it->second.get_value<std::string>();
+							return false;
+						}
+						stderrLogLevel = lvl;
+					}
+					else	{
+						os << displayStr() << ": stderr: unknown configuration option: <"
+								<< L2it->first << ">";
+						return false;
+
+					}
+				}
+			}
+
+
 		if ( pt.get_child_optional( "logging.stderr" ))	{
 			logToStderr = true;
 			std::string str = pt.get<std::string>( "logging.stderr.level", "NOTICE" );
@@ -342,56 +428,24 @@ namespace _SMERP {
 		return false;
 	}
 
-	bool getString( boost::property_tree::ptree::const_iterator it,
-			       const char *name, std::string& value, std::ostream& os )
-	{
-		if ( !value.empty() )	{
-			os << displayStr() << ": " << name << " redefined";
-			return false;
-		}
-		value = it->second.get_value<std::string>();
-		if ( value.empty() )	{
-			os << displayStr() << ": invalid " << name << ": <"
-					<< it->second.get_value<std::string>() << ">";
-			return false;
-		}
-		return true;
-	}
-
-	bool getUnsignedShort( boost::property_tree::ptree::const_iterator it,
-			       const char *name, unsigned short& value, std::ostream& os )
-	{
-		if ( value != 0 )	{
-			os << displayStr() << ": " << name << " redefined";
-			return false;
-		}
-		value = it->second.get_value<unsigned short>();
-		if ( value == 0 )	{
-			os << displayStr() << ": invalid " << name << ": <"
-					<< it->second.get_value<std::string>() << ">";
-			return false;
-		}
-		return true;
-	}
 
 	bool DatabaseConfiguration::parse( boost::property_tree::ptree& pt, std::ostream& os )
 	{
 		for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
-			std::string entry = it->first;
-			if ( boost::algorithm::iequals( entry, "host" ))	{
-				if ( !getString( it, "host", host, os ))		return false;
+			if ( boost::algorithm::iequals( it->first, "host" ))	{
+				if ( !getStringValue( it, "host", host, os ))		return false;
 			}
-			else if ( boost::algorithm::iequals( entry, "port" ))	{
-				if ( !getUnsignedShort( it, "port", port, os ))		return false;
+			else if ( boost::algorithm::iequals( it->first, "port" ))	{
+				if ( !getUnsignedShortValue( it, "port", port, os ))	return false;
 			}
-			else if ( boost::algorithm::iequals( entry, "name" ))	{
-				if ( !getString( it, "name", name, os ))		return false;
+			else if ( boost::algorithm::iequals( it->first, "name" ))	{
+				if ( !getStringValue( it, "name", name, os ))		return false;
 			}
-			else if ( boost::algorithm::iequals( entry, "user" ))	{
-				if ( !getString( it, "user", user, os ))		return false;
+			else if ( boost::algorithm::iequals( it->first, "user" ))	{
+				if ( !getStringValue( it, "user", user, os ))		return false;
 			}
-			else if ( boost::algorithm::iequals( entry, "password" ))	{
-				if ( !getString( it, "password", password, os ))	return false;
+			else if ( boost::algorithm::iequals( it->first, "password" ))	{
+				if ( !getStringValue( it, "password", password, os ))	return false;
 			}
 			else	{
 				os << displayStr() << ": unknown configuration option: <" << it->first << ">";
