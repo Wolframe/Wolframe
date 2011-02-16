@@ -189,10 +189,10 @@ namespace _SMERP {
 			return false;
 		}
 	}
-		catch( std::exception& e)	{
-			errMsg_ = e.what();
-			return false;
-		}
+	catch( std::exception& e)	{
+		errMsg_ = e.what();
+		return false;
+	}
 
 		return true;
 	}
