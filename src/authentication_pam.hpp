@@ -39,11 +39,13 @@ class PAMAuthenticator : public Authenticator {
 			_SMERP_PAM_STATE_NEED_LOGIN,
 			_SMERP_PAM_STATE_HAS_LOGIN,
 			_SMERP_PAM_STATE_NEED_PASS,
-			_SMERP_PAM_STATE_HAS_PASS
+			_SMERP_PAM_STATE_HAS_PASS,
+			_SMERP_PAM_STATE_ERROR
 		} m_state;
 		
 		pam_appdata m_appdata;
 		std::string m_token;
+		std::string m_data;
 		struct pam_conv m_conv;
 		
 	public:

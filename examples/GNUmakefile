@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = echo pecho
+SUBDIRS = echo pecho mtproc
 
 ifdef WITH_LUA
 SUBDIRS += lua

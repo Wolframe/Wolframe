@@ -166,7 +166,7 @@ error:
 
 Step::AuthStep PAMAuthenticator::nextStep( )
 {
-	int rc;
+	int rc = 0;
 	
 	switch( m_state ) {
 		case _SMERP_PAM_STATE_NEED_LOGIN:
@@ -182,43 +182,37 @@ Step::AuthStep PAMAuthenticator::nextStep( )
 					<< pam_strerror( m_appdata.h, rc ) << " (" << rc << ")";
 				throw std::runtime_error( ss.str( ) );
 			}
+// everything went ok, so authentication succeeded with for example pam_rootok.so withou
+// requiring a password.. intetionally no break here :-)
 
 // authenticate: are we who we claim to be?
+		case _SMERP_PAM_STATE_HAS_PASS:
 			rc = pam_authenticate( m_appdata.h, 0 );
-			if( rc == PAM_INCOMPLETE ) {
+			if( m_state == _SMERP_PAM_STATE_HAS_LOGIN && rc == PAM_INCOMPLETE ) {
 				m_token = "password";
 				m_state = _SMERP_PAM_STATE_NEED_PASS;
 				return Step::_SMERP_AUTH_STEP_RECV_DATA;
 			} else if( rc != PAM_SUCCESS ) {
+				m_token = "message";
 				std::ostringstream ss;
 				ss	<< "pam_authenticate failed with service " << m_service << ": "
 					<< pam_strerror( m_appdata.h, rc ) << " (" << rc << ")";
-				(void)pam_end( m_appdata.h, rc );
-				throw std::runtime_error( ss.str( ) );
-			}
-// everything is fine here, go on
-			goto CONTINUE;
-
-// go back into the PAM callback function, now we have a password
-		case _SMERP_PAM_STATE_HAS_PASS:
-			rc = pam_authenticate( m_appdata.h, 0 );
-			if( rc != PAM_SUCCESS ) {
-				std::ostringstream ss;
-				ss	<< "pam_authenticate failed with service " << m_service << ": "
-					<< pam_strerror( m_appdata.h, rc ) << " (" << rc << ")";
-				(void)pam_end( m_appdata.h, rc );
-				throw std::runtime_error( ss.str( ) );
+				m_data = ss.str( );
+				m_state = _SMERP_PAM_STATE_ERROR;
+				return Step::_SMERP_AUTH_STEP_SEND_DATA;
 			}
 
-CONTINUE:
 // is access permitted?
 			rc = pam_acct_mgmt( m_appdata.h, 0 );
 			if( rc != PAM_SUCCESS ) {
+				m_token = "message";
 				std::ostringstream ss;
 				ss	<< "pam_acct_mgmt failed with service " << m_service << ": "
 					<< pam_strerror( m_appdata.h, rc ) << " (" << rc << ")";
-				(void)pam_end( m_appdata.h, rc );
-				throw std::runtime_error( ss.str( ) );
+				m_data = ss.str( );
+				m_state = _SMERP_PAM_STATE_ERROR;
+				return Step::_SMERP_AUTH_STEP_SEND_DATA;
+
 			}
 
 // terminate PAM session with last exit code
@@ -239,8 +233,19 @@ CONTINUE:
 			else
 				return Step::_SMERP_AUTH_STEP_FAIL;
 		
+		case _SMERP_PAM_STATE_ERROR:
+			m_state = _SMERP_PAM_STATE_NEED_LOGIN;
+			m_appdata.h = NULL;
+			m_appdata.pass = "";
+			(void)pam_end( m_appdata.h, rc );
+			return Step::_SMERP_AUTH_STEP_FAIL;
+			
 		case _SMERP_PAM_STATE_NEED_PASS:
-			throw new std::runtime_error( "Illegal state in auhenticator" );
+			throw new std::runtime_error( "Illegal state in PAMAuthenticator::nextStep!" );
+			break;
+		
+		default:
+			throw new std::runtime_error( "Unknown state in PAMAuthenticator::nextStep!" );
 			break;
 	}
 
@@ -249,6 +254,22 @@ CONTINUE:
 
 std::string PAMAuthenticator::sendData( )
 {
+	switch( m_state ) {
+		case _SMERP_PAM_STATE_ERROR:
+			return m_data;
+
+		case _SMERP_PAM_STATE_NEED_LOGIN:
+		case _SMERP_PAM_STATE_HAS_LOGIN:
+		case _SMERP_PAM_STATE_NEED_PASS:
+		case _SMERP_PAM_STATE_HAS_PASS:
+			throw new std::runtime_error( "Illegal state in PAMAuthenticator::sendData!" );
+			break;
+		
+		default:
+			throw new std::runtime_error( "Unknown state in PAMAuthenticator::sendData!" );
+			break;			
+	}
+
 	return 0;
 }
 
@@ -273,7 +294,12 @@ void PAMAuthenticator::receiveData( SMERP_UNUSED const std::string data )
 // TODO: application exception		
 		case _SMERP_PAM_STATE_HAS_LOGIN:
 		case _SMERP_PAM_STATE_HAS_PASS:
-			throw new std::runtime_error( "Illegal state in auhenticator" );
+		case _SMERP_PAM_STATE_ERROR:
+			throw new std::runtime_error( "Illegal state in PAMAuthenticator::receiveData!" );
+			break;
+		
+		default:
+			throw new std::runtime_error( "Unknown state in PAMAuthenticator::receiveData!" );
 			break;
 	}
 }

@@ -5,7 +5,7 @@
 using namespace _SMERP::mtproc;
 using namespace _SMERP::protocol;
 
-void CommandHandler::resetCommand()
+void CommandDispatcher::resetCommand()
 {
    m_methodIdx = 0;
    m_lineBuffer.init();
@@ -24,7 +24,7 @@ void CommandHandler::resetCommand()
    }
 }
 
-void CommandHandler::init( const char** protocolCmds, Instance* instance)
+void CommandDispatcher::init( const char** protocolCmds, Instance* instance)
 {
    m_instance = instance;
    m_parser.init();
@@ -52,7 +52,7 @@ void CommandHandler::init( const char** protocolCmds, Instance* instance)
    }
 }
 
-void CommandHandler::protocolInput( protocol::InputBlock::iterator& start, protocol::InputBlock::iterator& end)
+void CommandDispatcher::protocolInput( protocol::InputBlock::iterator& start, protocol::InputBlock::iterator& end)
 {
    if (m_state == WaitForInput)
    {
@@ -66,7 +66,7 @@ void CommandHandler::protocolInput( protocol::InputBlock::iterator& start, proto
    }
    if (m_context.contentIterator)
    {
-      m_context.contentIterator->protocolInput( &start[0], end-input.begin());
+      m_context.contentIterator->protocolInput( (void*)&*start, end-start);
    }
    else
    {
@@ -75,18 +75,18 @@ void CommandHandler::protocolInput( protocol::InputBlock::iterator& start, proto
    }
 }
 
-CommandHandler::CommandHandler( Instance* instance=0)
-   :m_argBuffer( &m_lineBuffer);
+CommandDispatcher::CommandDispatcher( Instance* instance)
+   :m_argBuffer( &m_lineBuffer)
 {
    init( instance);
 }
 
-CommandHandler::~CommandHandler()
+CommandDispatcher::~CommandDispatcher()
 {
    if (m_instance) delete m_instance;
 }
 
-CommandHandler::Command CommandHandler::getCommand( protocol::InputBlock::iterator& itr, protocol::InputBlock::iterator& eoM)
+CommandDispatcher::Command CommandDispatcher::getCommand( protocol::InputBlock::iterator& itr, protocol::InputBlock::iterator& eoM)
 {
    switch (m_state)
    {
@@ -107,7 +107,7 @@ CommandHandler::Command CommandHandler::getCommand( protocol::InputBlock::iterat
       }
       case Selected:
       {
-         if (!getLine( itr, eoM, m_argBuffer)) return unknown;
+         if (!ProtocolParser::getLine( itr, eoM, m_argBuffer)) return unknown;
          //no break here !
       }
       case ArgumentsParsed:
@@ -119,8 +119,7 @@ CommandHandler::Command CommandHandler::getCommand( protocol::InputBlock::iterat
    throw (IllegalState());
 }
 
-
-IOState CommandHandler::call( int& returnCode)
+CommandDispatcher::IOState CommandDispatcher::call( int& returnCode)
 {
    switch (m_state)
    {
@@ -146,7 +145,7 @@ IOState CommandHandler::call( int& returnCode)
          returnCode = m_instance->mt[ m_methodIdx].call( &m_context, m_argBuffer.argc(), m_argBuffer.argv());
          if (returnCode != 0)
          {
-            LOG_ERROR << "error " << rt << " calling '" << m_instance->mt[ m_methodIdx].name << "'";
+            LOG_ERROR << "error " << returnCode << " calling '" << m_instance->mt[ m_methodIdx].name << "'";
             resetCommand();
             return Close;
          }
@@ -179,7 +178,7 @@ IOState CommandHandler::call( int& returnCode)
    return Close;
 }
 
-const char* CommandHandler::getCaps()
+const char* CommandDispatcher::getCaps()
 {
    m_lineBuffer.init();
    unsigned int ii;

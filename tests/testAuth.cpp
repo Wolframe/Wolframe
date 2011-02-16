@@ -48,7 +48,12 @@ int main( int argc, const char *argv[] )
 
 // the authenticator needs to send some data to the client side		
 		if( step == Step::_SMERP_AUTH_STEP_SEND_DATA ) {
-			std::string data = a->sendData( );
+			string token = a->token( );
+			string data = a->sendData( );
+
+// an error messages			
+			if( token == "message" )
+				cerr << "ERROR: " << data << endl;
 			
 // the authenticate needs some specific input from the client
 		} else if( step == Step::_SMERP_AUTH_STEP_RECV_DATA ) {
