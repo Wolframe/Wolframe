@@ -9,9 +9,9 @@
 
 #ifdef WITH_PAM
 
-extern "C" {
+#include <string>
+
 #include <security/pam_appl.h> 
-}
 
 namespace _SMERP {
 	namespace Authentication {
@@ -37,8 +37,9 @@ class PAMAuthenticator : public Authenticator {
 		
 		enum {
 			_SMERP_PAM_STATE_NEED_LOGIN,
+			_SMERP_PAM_STATE_HAS_LOGIN,
 			_SMERP_PAM_STATE_NEED_PASS,
-			_SMERP_PAM_STATE_COMPUTE
+			_SMERP_PAM_STATE_HAS_PASS
 		} m_state;
 		
 		pam_appdata m_appdata;
