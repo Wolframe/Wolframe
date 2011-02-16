@@ -137,77 +137,135 @@ struct Connection::Private
    //statemachine of the processor
    const Operation nextOperation()
    {
-      try
+      for (;;)
       {
-         for (;;)
+         LOG_DATA << "\nState: " << stateName(state) << "(" << modeName(mode) << ")";
+
+         switch( state)
          {
-            LOG_DATA << "\nState: " << stateName(state) << "(" << modeName(mode) << ")";
-
-            switch( state)
+            case Init:
             {
-               case Init:
-               {
-                   //start or restart:
-                   state = EnterCommand;
-                   mode = Ident;
-                   return WriteLine( "OK expecting command");
-               }
+                //start or restart:
+                state = EnterCommand;
+                mode = Ident;
+                return WriteLine( "OK expecting command");
+            }
 
-               case EnterCommand:
-               {
-                   //parsing the command:
-                   enum Command {empty, caps, echo, quit};
-                   static const char* cmd[5] = {"","caps","echo","quit",0};
-                   //... the empty command is for an empty line for not bothering the client with obscure error messages.
-                   //    the next state should read one character for sure otherwise it may result in an endless loop
-                   static const ProtocolParser parser(cmd);
+            case EnterCommand:
+            {
+                //parsing the command:
+                enum Command {empty, caps, echo, quit};
+                static const char* cmd[5] = {"","caps","echo","quit",0};
+                //... the empty command is for an empty line for not bothering the client with obscure error messages.
+                //    the next state should read one character for sure otherwise it may result in an endless loop
+                static const ProtocolParser parser(cmd);
 
-                   switch (parser.getCommand( itr, eoM, cmdBuffer))
+                switch (parser.getCommand( itr, eoM, cmdBuffer))
+                {
+                   case empty:
                    {
-                      case empty:
+                      state = EmptyLine;
+                      continue;
+                   }
+                   case caps:
+                   {
+                      state = EnterCommand;
+                      return WriteLine( "OK caps echo[tolower|toupper] quit");
+                   }
+                   case echo:
+                   {
+                      state = EnterMode;
+                      continue;
+                   }
+                   case quit:
+                   {
+                      state = Terminate;
+                      return WriteLine( "BYE");
+                   }
+                   default:
+                   {
+                      if (itr == eoM)
                       {
-                         state = EmptyLine;
-                         continue;
+                         input.setPos( 0);
+                         return Network::ReadData( input.ptr(), input.size());
                       }
-                      case caps:
+                      else
                       {
-                         state = EnterCommand;
-                         return WriteLine( "OK caps echo[tolower|toupper] quit");
-                      }
-                      case echo:
-                      {
-                         state = EnterMode;
-                         continue;
-                      }
-                      case quit:
-                      {
-                         state = Terminate;
-                         return WriteLine( "BYE");
-                      }
-                      default:
-                      {
-                         if (itr == eoM)
-                         {
-                            input.setPos( 0);
-                            return Network::ReadData( input.ptr(), input.size());
-                         }
-                         else
-                         {
-                            state = HandleError;
-                            return WriteLine( "BAD unknown command");
-                         }
+                         state = HandleError;
+                         return WriteLine( "BAD unknown command");
                       }
                    }
-               }
+                }
+            }
 
-               case EmptyLine:
+            case EmptyLine:
+            {
+               if (!ProtocolParser::skipSpaces( itr, eoM))
                {
-                  if (!ProtocolParser::skipSpaces( itr, eoM))
+                  input.setPos( 0);
+                  return Network::ReadData( input.ptr(), input.size());
+               }
+               if (!ProtocolParser::consumeEOLN( itr, eoM))
+               {
+                  if (itr == eoM)
                   {
                      input.setPos( 0);
                      return Network::ReadData( input.ptr(), input.size());
                   }
-                  if (!ProtocolParser::consumeEOLN( itr, eoM))
+                  else
+                  {
+                     state = Init;
+                     buffer.init();
+                     return WriteLine( "BAD command line");
+                  }
+               }
+               else
+               {
+                  state = EnterCommand;
+                  continue;
+               }
+            }
+
+            case EnterMode:
+            {
+               //here we parse the 1st (and only or missing) argument of the 'echo' command.
+               //it defines the way of processing the input lines:
+               enum Command {none, tolower, toupper};
+               static const char* cmd[4] = {"","tolower","toupper",0};
+               //... the empty command is for no arguments meaning a simple ECHO
+               //    the next state should read one character for sure
+               //    otherwise it may result in an endless loop (as in EnterCommand)
+
+               static const ProtocolParser parser(cmd);
+
+               if (!ProtocolParser::skipSpaces( itr, eoM))
+               {
+                  input.setPos( 0);
+                  return Network::ReadData( input.ptr(), input.size());
+               }
+
+               switch (parser.getCommand( itr, eoM, cmdBuffer))
+               {
+                  case none:
+                  {
+                     //... no argument => simple echo
+                     mode = Ident;
+                     state = StartProcessing;
+                     continue;
+                  }
+                  case tolower:
+                  {
+                     mode = Lowercase;
+                     state = StartProcessing;
+                     continue;
+                  }
+                  case toupper:
+                  {
+                     mode = Uppercase;
+                     state = StartProcessing;
+                     continue;
+                  }
+                  default:
                   {
                      if (itr == eoM)
                      {
@@ -216,152 +274,89 @@ struct Connection::Private
                      }
                      else
                      {
-                        state = Init;
-                        buffer.init();
-                        return WriteLine( "BAD command line");
-                     }
-                  }
-                  else
-                  {
-                     state = EnterCommand;
-                     continue;
-                  }
-               }
-
-               case EnterMode:
-               {
-                  //here we parse the 1st (and only or missing) argument of the 'echo' command.
-                  //it defines the way of processing the input lines:
-                  enum Command {none, tolower, toupper};
-                  static const char* cmd[4] = {"","tolower","toupper",0};
-                  //... the empty command is for no arguments meaning a simple ECHO
-                  //    the next state should read one character for sure
-                  //    otherwise it may result in an endless loop (as in EnterCommand)
-
-                  static const ProtocolParser parser(cmd);
-
-                  if (!ProtocolParser::skipSpaces( itr, eoM))
-                  {
-                     input.setPos( 0);
-                     return Network::ReadData( input.ptr(), input.size());
-                  }
-
-                  switch (parser.getCommand( itr, eoM, cmdBuffer))
-                  {
-                     case none:
-                     {
-                        //... no argument => simple echo
-                        mode = Ident;
-                        state = StartProcessing;
-                        continue;
-                     }
-                     case tolower:
-                     {
-                        mode = Lowercase;
-                        state = StartProcessing;
-                        continue;
-                     }
-                     case toupper:
-                     {
-                        mode = Uppercase;
-                        state = StartProcessing;
-                        continue;
-                     }
-                     default:
-                     {
-                        if (itr == eoM)
-                        {
-                           input.setPos( 0);
-                           return Network::ReadData( input.ptr(), input.size());
-                        }
-                        else
-                        {
-                           state = HandleError;
-                           return WriteLine( "BAD unknown command argument");
-                        }
+                        state = HandleError;
+                        return WriteLine( "BAD unknown command argument");
                      }
                   }
                }
+            }
 
-               case StartProcessing:
+            case StartProcessing:
+            {
+               //read the rest of the line and reject more arguments than expected.
+               //go on with processing, if this is clear. do not cosnsume the first end of line because it could be
+               //the first character of the EOF sequence.
+               input.resetEoD();
+               if (!ProtocolParser::skipSpaces( itr, eoM))
                {
-                  //read the rest of the line and reject more arguments than expected.
-                  //go on with processing, if this is clear. do not cosnsume the first end of line because it could be
-                  //the first character of the EOF sequence.
-                  input.resetEoD();
-                  if (!ProtocolParser::skipSpaces( itr, eoM))
-                  {
-                     input.setPos( 0);
-                     return Network::ReadData( input.ptr(), input.size());
-                  }
-                  if (!ProtocolParser::isEOLN( itr))
-                  {
-                     state = Init;
-                     return WriteLine( "BAD too many arguments");
-                  }
-                  else
-                  {
-                     state = Processing;
-                     eoD = input.getEoD( itr);
-                     eoM = input.end();
-                     return WriteLine( "OK enter data");
-                  }
+                  input.setPos( 0);
+                  return Network::ReadData( input.ptr(), input.size());
                }
-
-               case ProcessingAfterWrite:
+               if (!ProtocolParser::isEOLN( itr))
                {
-                   //do processing but first release the output buffer content that has been written in the processing state:
-                   state = Processing;
-                   output.release();
-                   continue;
+                  state = Init;
+                  return WriteLine( "BAD too many arguments");
                }
-
-               case Processing:
+               else
                {
-                   //do the ECHO with some filter function or pure:
-                   EchoState echoState = echoInput();
-                   if (echoState == EoM)
-                   {
-                      input.setPos( 0);
-                      return Network::ReadData( input.ptr(), input.size());
-                   }
-
-                   if (echoState == EoD)
-                   {
-                      input.resetEoD();
-                      state = Init;
-                   }
-                   else
-                   {
-                      state = ProcessingAfterWrite;
-                   }
-                   void* content = output.ptr();
-                   std::size_t size = output.pos();
-                   if (size == 0) continue;
-                   return Network::SendData( content, size);
+                  state = Processing;
+                  eoD = input.getEoD( itr);
+                  eoM = input.end();
+                  return WriteLine( "OK enter data");
                }
+            }
 
-               case HandleError:
-               {
-                   if (!ProtocolParser::skipLine( itr, eoM) || !ProtocolParser::consumeEOLN( itr, eoM))
-                   {
-                      input.setPos( 0);
-                      return Network::ReadData( input.ptr(), input.size());
-                   }            
+            case ProcessingAfterWrite:
+            {
+                //do processing but first release the output buffer content that has been written in the processing state:
+                state = Processing;
+                output.release();
+                continue;
+            }
+
+            case Processing:
+            {
+                //do the ECHO with some filter function or pure:
+                EchoState echoState = echoInput();
+                if (echoState == EoM)
+                {
+                   input.setPos( 0);
+                   return Network::ReadData( input.ptr(), input.size());
+                }
+
+                if (echoState == EoD)
+                {
+                   input.resetEoD();
                    state = Init;
-                   continue;
-               }
+                }
+                else
+                {
+                   state = ProcessingAfterWrite;
+                }
+                void* content = output.ptr();
+                std::size_t size = output.pos();
+                if (size == 0) continue;
+                return Network::SendData( content, size);
+            }
 
-               case Terminate:
-               {
-                   state = Terminate;
-                   return Network::CloseConnection();
-               }
-            }//switch(..)
-         }//for(,,)
-      // Aba: added a catch here to avoid errors in compiling..
-      } catch( ... ) {
-      }
+            case HandleError:
+            {
+                if (!ProtocolParser::skipLine( itr, eoM) || !ProtocolParser::consumeEOLN( itr, eoM))
+                {
+                   input.setPos( 0);
+                   return Network::ReadData( input.ptr(), input.size());
+                }            
+                state = Init;
+                continue;
+            }
+
+            case Terminate:
+            {
+                state = Terminate;
+                return Network::CloseConnection();
+            }
+         }//switch(..)
+      }//for(,,)
       return Network::CloseConnection();
    }
 };

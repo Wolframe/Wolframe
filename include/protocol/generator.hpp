@@ -23,7 +23,7 @@ class Generator
       {
          Init,           //after initialization
          Processing,     //processing
-         EndOfBuffer,    //EWOULDBLK -> have to yield
+         EndOfMessage,   //EWOULDBLK -> have to yield
          EndOfInput,     //EOF
          Error           //an error occurred
       };
