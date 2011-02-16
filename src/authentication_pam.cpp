@@ -166,14 +166,14 @@ error:
 
 Step::AuthStep PAMAuthenticator::nextStep( )
 {
+	int rc;
+	
 	switch( m_state ) {
 		case _SMERP_PAM_STATE_NEED_LOGIN:
 			m_token = "login";
 			return Step::_SMERP_AUTH_STEP_RECV_DATA;
 			
 		case _SMERP_PAM_STATE_HAS_LOGIN:
-			int rc;
-
 // TODO: the service name must be a CONSTANT due to security reasons!
 			rc = pam_start( m_service.c_str( ), m_appdata.login.c_str( ), &m_conv, &m_appdata.h );
 			if( rc != PAM_SUCCESS ) {
@@ -196,7 +196,8 @@ Step::AuthStep PAMAuthenticator::nextStep( )
 				(void)pam_end( m_appdata.h, rc );
 				throw std::runtime_error( ss.str( ) );
 			}
-			break;
+// everything is fine here, go on
+			goto CONTINUE;
 
 // go back into the PAM callback function, now we have a password
 		case _SMERP_PAM_STATE_HAS_PASS:
@@ -209,6 +210,7 @@ Step::AuthStep PAMAuthenticator::nextStep( )
 				throw std::runtime_error( ss.str( ) );
 			}
 
+CONTINUE:
 // is access permitted?
 			rc = pam_acct_mgmt( m_appdata.h, 0 );
 			if( rc != PAM_SUCCESS ) {
@@ -238,8 +240,8 @@ Step::AuthStep PAMAuthenticator::nextStep( )
 				return Step::_SMERP_AUTH_STEP_FAIL;
 		
 		case _SMERP_PAM_STATE_NEED_PASS:
-			m_token = "password";
-			return Step::_SMERP_AUTH_STEP_RECV_DATA;
+			throw new std::runtime_error( "Illegal state in auhenticator" );
+			break;
 	}
 
 	return Step::_SMERP_AUTH_STEP_FAIL;
