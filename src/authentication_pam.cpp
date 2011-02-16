@@ -8,10 +8,8 @@
 
 #ifdef WITH_PAM
 
-extern "C" {
 #include <string.h>
 #include <stdlib.h>
-}
 
 #include <sstream>
 #include <stdexcept>
@@ -24,6 +22,7 @@ namespace _SMERP {
 PAMAuthenticator::PAMAuthenticator( const std::string _service )
 	: m_service( _service )
 {
+	m_state = _SMERP_PAM_STATE_NEED_LOGIN;
 	m_appdata.h = NULL;
 	m_conv.conv = pam_conv_func;
 	m_conv.appdata_ptr = &m_appdata;
@@ -105,6 +104,9 @@ int pam_conv_func(	int nmsg, const struct pam_message **msg,
 		switch( msg[i]->msg_style ) {
 // Usually we get prompted for a password, this is not always true though.
 			case PAM_PROMPT_ECHO_OFF:
+				if( !setjmp( appdata->pass_jmp ) ) {
+					return PAM_INCOMPLETE;
+				}
 				r->resp = strdup( appdata->pass.c_str( ) );
 				if( r->resp == NULL ) {
 					appdata->errmsg = "Unable to allocate memory for password answer";
@@ -166,12 +168,12 @@ Step::AuthStep PAMAuthenticator::nextStep( )
 		case _SMERP_PAM_STATE_NEED_LOGIN:
 			m_token = "login";
 			return Step::_SMERP_AUTH_STEP_RECV_DATA;
-		
-		case _SMERP_PAM_STATE_NEED_PASS:
-			m_token = "password";
-			return Step::_SMERP_AUTH_STEP_RECV_DATA;
+
+// go back into the PAM callback function, now we have a password
+		case _SMERP_PAM_STATE_HAS_PASS:
+			longjmp( m_appdata.pass_jmp, 1 );			
 			
-		case _SMERP_PAM_STATE_COMPUTE: {
+		case _SMERP_PAM_STATE_HAS_LOGIN:
 			int rc;
 
 // TODO: the service name must be a CONSTANT due to security reasons!
@@ -185,13 +187,18 @@ Step::AuthStep PAMAuthenticator::nextStep( )
 
 // authenticate: are we who we claim to be?
 			rc = pam_authenticate( m_appdata.h, 0 );
-			if( rc != PAM_SUCCESS ) {
+			if( rc == PAM_INCOMPLETE ) {
+				m_token = "password";
+				m_state = _SMERP_PAM_STATE_NEED_PASS;
+				return Step::_SMERP_AUTH_STEP_RECV_DATA;
+			} else if( rc != PAM_SUCCESS ) {
 				std::ostringstream ss;
 				ss	<< "pam_authenticate failed with service " << m_service << ": "
 					<< pam_strerror( m_appdata.h, rc ) << " (" << rc << ")";
 				(void)pam_end( m_appdata.h, rc );
 				throw std::runtime_error( ss.str( ) );
 			}
+			break;
 
 // is access permitted?
 			rc = pam_acct_mgmt( m_appdata.h, 0 );
@@ -219,7 +226,10 @@ Step::AuthStep PAMAuthenticator::nextStep( )
 				return Step::_SMERP_AUTH_STEP_SUCCESS;
 			else
 				return Step::_SMERP_AUTH_STEP_FAIL;
-		}
+		
+		case _SMERP_PAM_STATE_NEED_PASS:
+			m_token = "password";
+			return Step::_SMERP_AUTH_STEP_RECV_DATA;
 	}
 
 	return Step::_SMERP_AUTH_STEP_FAIL;
@@ -240,16 +250,17 @@ void PAMAuthenticator::receiveData( SMERP_UNUSED const std::string data )
 	switch( m_state ) {
 		case _SMERP_PAM_STATE_NEED_LOGIN:
 			m_appdata.login = data;
-			m_state = _SMERP_PAM_STATE_NEED_PASS;
+			m_state = _SMERP_PAM_STATE_HAS_LOGIN;
 			break;
 		
 		case _SMERP_PAM_STATE_NEED_PASS:
 			m_appdata.pass = data;
-			m_state = _SMERP_PAM_STATE_COMPUTE;
+			m_state = _SMERP_PAM_STATE_HAS_PASS;
 			break;
 
 // TODO: application exception		
-		case _SMERP_PAM_STATE_COMPUTE:
+		case _SMERP_PAM_STATE_HAS_LOGIN:
+		case _SMERP_PAM_STATE_HAS_PASS:
 			throw new std::runtime_error( "Illegal state in auhenticator" );
 			break;
 	}

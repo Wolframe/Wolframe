@@ -44,7 +44,7 @@ AuthenticatorFactory::AuthenticatorFactory( )
 	
 	// TODO: where to get parameters for creation from outside?
 	
-	m_authenticators.insert( std::make_pair<std::string, Authenticator *>("TEXT_FILE", new TextFileAuthenticator( "creds.conf" ) ) );
+	m_authenticators.insert( std::make_pair<std::string, Authenticator *>( "TEXT_FILE", new TextFileAuthenticator( "creds.conf" ) ) );
 #ifdef WITH_PAM
 	m_authenticators.insert( std::make_pair<std::string, Authenticator *>( "PAM", new PAMAuthenticator( "smerp" ) ) );
 #endif
@@ -52,6 +52,9 @@ AuthenticatorFactory::AuthenticatorFactory( )
 
 AuthenticatorFactory::~AuthenticatorFactory( )
 {
+	std::map<std::string, Authenticator *>::iterator it;
+	for( it = m_authenticators.begin( ); it != m_authenticators.end( ); it++ )
+		delete it->second;
 }
 
 Authenticator* AuthenticatorFactory::getAuthenticator( const std::string method )

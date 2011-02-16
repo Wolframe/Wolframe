@@ -9,9 +9,8 @@
 
 #ifdef WITH_PAM
 
-extern "C" {
 #include <security/pam_appl.h> 
-}
+#include <setjmp.h>
 
 namespace _SMERP {
 	namespace Authentication {
@@ -22,6 +21,7 @@ typedef struct {
 	std::string pass;
 	std::string errmsg;
 	pam_handle_t *h;
+	jmp_buf pass_jmp;
 } pam_appdata;
 
 extern "C" const char *msg_style_to_str( int msg_style );
@@ -37,8 +37,9 @@ class PAMAuthenticator : public Authenticator {
 		
 		enum {
 			_SMERP_PAM_STATE_NEED_LOGIN,
+			_SMERP_PAM_STATE_HAS_LOGIN,
 			_SMERP_PAM_STATE_NEED_PASS,
-			_SMERP_PAM_STATE_COMPUTE
+			_SMERP_PAM_STATE_HAS_PASS
 		} m_state;
 		
 		pam_appdata m_appdata;
