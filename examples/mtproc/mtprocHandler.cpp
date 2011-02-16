@@ -5,6 +5,7 @@
 #include "mtprocHandler.hpp"
 #include "logger.hpp"
 #include "dispatcher.hpp"
+#include "implementation.hpp"
 
 using namespace _SMERP;
 using namespace _SMERP::mtproc;
@@ -55,6 +56,9 @@ struct Connection::Private
    InputIterator itr;                         //< iterator to scan protocol input
    InputIterator end;                         //< iterator pointing to end of message buffer
    bool gotEoD;
+   
+   //3. implementation
+   Method::Data object;
 
    //* helper methods for I/O
    //helper function to send a line message with CRLF termination as C string
@@ -112,14 +116,15 @@ struct Connection::Private
 
    void signalTerminate()
    {
-        state = Terminate;
+       state = Terminate;
    }
 
    //* interface
    Private( unsigned int inputBufferSize, unsigned int outputBufferSize)   :state(Init),input(inputBufferSize),output(outputBufferSize),gotEoD(false)
    {
-      itr = input.begin();
-      end = input.end();
+       itr = input.begin();
+       end = input.end();
+       commandDispatcher.init( &object);
    }
    ~Private()  {}
 

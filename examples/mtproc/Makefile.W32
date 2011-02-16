@@ -36,6 +36,7 @@ INCLUDE_LIBS = \
 OBJS = \
 	appConfig.obj \
 	configFile.obj \
+	implementation.obj \
 	dispatcher.obj \
 	mtprocHandler.obj \
 	$(TOPDIR)\src\winMain.obj
