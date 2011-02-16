@@ -31,6 +31,7 @@ endif
 OBJS = \
 	appConfig.o \
 	configFile.o \
+	dispatcher.o \
 	mtprocHandler.o \
 	$(TOPDIR)/src/posixMain.o
 

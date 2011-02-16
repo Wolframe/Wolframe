@@ -1,5 +1,5 @@
-#ifndef _SMERP_METHODTABLE_DISPATCHER_PRIVATE_HPP_INCLUDED
-#define _SMERP_METHODTABLE_DISPATCHER_PRIVATE_HPP_INCLUDED
+#ifndef _SMERP_METHODTABLE_COMMAND_DISPATCHER_PRIVATE_HPP_INCLUDED
+#define _SMERP_METHODTABLE_COMMAND_DISPATCHER_PRIVATE_HPP_INCLUDED
 #include "protocol.hpp"
 #include "methodtable.hpp"
 #include <exception>
@@ -7,13 +7,13 @@
 namespace _SMERP {
 namespace mtproc {
 
-struct CommandHandler
+struct CommandDispatcher
 {
 private:
    //exception thrown in case of an illegal state (internal error, must not happen)
    struct IllegalState :public std::logic_error
    {
-      IllegalState() :std::logic_error( "IllegalState in CommandHandler") {}
+      IllegalState() :std::logic_error( "IllegalState in CommandDispatcher") {}
    };
 
    enum State
@@ -54,8 +54,8 @@ public:
       init( cmd, instance);
    }
    
-   CommandHandler( Instance* instance=0);
-   ~CommandHandler();
+   CommandDispatcher( Instance* instance=0);
+   ~CommandDispatcher();
 
    //return the type of the command
    Command getCommand( protocol::InputBlock::iterator& itr, protocol::InputBlock::iterator& eoM);
