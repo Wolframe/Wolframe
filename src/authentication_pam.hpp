@@ -9,8 +9,9 @@
 
 #ifdef WITH_PAM
 
+#include <string>
+
 #include <security/pam_appl.h> 
-#include <setjmp.h>
 
 namespace _SMERP {
 	namespace Authentication {
@@ -21,7 +22,6 @@ typedef struct {
 	std::string pass;
 	std::string errmsg;
 	pam_handle_t *h;
-	jmp_buf pass_jmp;
 } pam_appdata;
 
 extern "C" const char *msg_style_to_str( int msg_style );
