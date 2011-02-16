@@ -1,3 +1,7 @@
+//
+// authentication_pam.hpp
+//
+
 #ifndef _SMERP_AUTHENTICATION_PAM_HPP_INCLUDED
 #define _SMERP_AUTHENTICATION_PAM_HPP_INCLUDED
 
@@ -29,6 +33,17 @@ extern "C" int pam_conv_func(	int nmsg, const struct pam_message **msg,
 class PAMAuthenticator : public Authenticator {
 	private:
 		std::string m_service;
+
+		
+		enum {
+			_SMERP_PAM_STATE_NEED_LOGIN,
+			_SMERP_PAM_STATE_NEED_PASS,
+			_SMERP_PAM_STATE_COMPUTE
+		} m_state;
+		
+		pam_appdata m_appdata;
+		std::string m_token;
+		struct pam_conv m_conv;
 		
 	public:
 		PAMAuthenticator( const std::string _service );

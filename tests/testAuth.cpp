@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <algorithm>
 
 #include "authentication.hpp"
 #include "getPassword.hpp"
@@ -11,17 +12,34 @@ using namespace _SMERP::Authentication;
 #include <unistd.h>
 #endif
 
-int main( void )
-{
+static void print_usage( ) {
 // get list of available authentication methods
 	vector<string> mechs = AuthenticatorFactory::instance( ).getAvailableMechs( );
-	cout << "Available authentication methods: ";
+	cerr << "Available authentication methods: ";	
 	for( vector<string>::const_iterator it = mechs.begin( ); it != mechs.end( ); it++ )
-		cout << *it << " ";
-	cout << endl;
+		cerr << *it << " ";
+	cerr << endl;
+}
+
+int main( int argc, const char *argv[] )
+{
+	if( argc != 2 ) {
+		cerr << "usage: testAuth <authentication method>" << endl;
+		print_usage( );
+		return 1;
+	}
+
+// check if authentication method exists
+	vector<string> mechs = AuthenticatorFactory::instance( ).getAvailableMechs( );
+	vector<string>::const_iterator it = find( mechs.begin( ), mechs.end( ), argv[1] );
+	if( it == mechs.end( ) ) {
+		print_usage( );
+		return 1;
+	}
+	
 
 // get a specific authenticator			
-	Authenticator *a = AuthenticatorFactory::instance( ).getAuthenticator( "TEXT_FILE" );
+	Authenticator *a = AuthenticatorFactory::instance( ).getAuthenticator( argv[1] );
 
 // go in a loop where we do what the authenticator tells us, in
 // the simplest case it asks us for a login and a password

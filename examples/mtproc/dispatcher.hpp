@@ -2,6 +2,7 @@
 #define _SMERP_METHODTABLE_DISPATCHER_PRIVATE_HPP_INCLUDED
 #include "protocol.hpp"
 #include "methodtable.hpp"
+#include <exception>
 
 namespace _SMERP {
 namespace mtproc {
@@ -9,11 +10,29 @@ namespace mtproc {
 struct CommandHandler
 {
 private:
-   enum State {Null,Init,Selected,Running};
-   typedef protocol::CmdBuffer CmdBuffer;                    //< buffer for protocol commands
-   typedef protocol::CmdParser<CmdBuffer> ProtocolParser;    //< parser for the protocol
-   
+   //exception thrown in case of an illegal state (internal error, must not happen)
+   struct IllegalState :public std::logic_error
+   {
+      IllegalState() :std::logic_error( "IllegalState in CommandHandler") {}
+   };
+
+   enum State
+   {
+      Null,
+      Init,
+      Selected,
+      ArgumentsParsed,
+      Running,
+      WaitForInput
+   };
+   typedef protocol::CmdBuffer CmdBuffer;                    //< buffer type for protocol commands
+   typedef protocol::CmdParser<CmdBuffer> ProtocolParser;    //< parser type for the protocol
+   typedef protocol::Buffer<256> LineBuffer;                 //< buffer type for the command argument strings
+   typedef protocol::CArgBuffer<LineBuffer> ArgBuffer;       //< buffer type for the command arguments
+
    CmdBuffer m_cmdBuffer;                                    //< buffer for the command
+   LineBuffer m_lineBuffer;                                  //< buffer for the argument strings
+   ArgBuffer m_argBuffer;                                    //< buffer for the arguments
    ProtocolParser m_parser;                                  //< parser for the commands
    Instance* m_instance;                                     //< method table and data
    Method::Context m_context;                                //< context of current method executed
@@ -25,52 +44,31 @@ private:
    
    //initialize the processed data object with its methods and set the current command to unknown
    void init( const char** protocolCmds, Instance* instance);
-
-   //pass a protocol data input chunk to the processors generator function
-   void protocolInput( protocol::InputBlock& input, protocol::InputBlock::iterator& end);
    
 public:
-   //initialize the prcessed data object with all its methods and some default protocol commands
    enum Command {unknown=-1, empty=0, caps, quit, method};      
+   //initialize the prcessed data object with all its methods and some default protocol commands
    void init( Instance* instance)
    {
       static const char* cmd[4] = {"","caps","quit", 0};
       init( cmd, instance);
    }
    
-   CommandHandler( Instance* instance)
-   {
-      init( instance);
-   }
-
-   CommandHandler()
-   {
-      init( 0);
-   }
-
+   CommandHandler( Instance* instance=0);
    ~CommandHandler();
 
+   //return the type of the command
    Command getCommand( protocol::InputBlock::iterator& itr, protocol::InputBlock::iterator& eoM);
 
-   int call( int argc, const char** argv);
+   //call the function (first or subsequent call)
+   enum IOState {ReadInput,WriteOutput,Close};
+   IOState call( int& returnCode);
 
-   template <class Buffer>
-   void writeCaps( Buffer& buf)
-   {
-      unsigned int ii;
-      if (m_instance && m_instance->mt)
-      {
-         for (ii=0; m_instance->mt[ii].call && m_instance->mt[ii].name; ii++)
-         {
-            if (ii>0)
-            {
-               buf.push_back( ',');
-               buf.push_back( ' ');
-            }
-            buf.append( m_instance->mt[ii].name);
-         }
-      }
-   }      
+   //pass a protocol data input chunk to the processors generator function
+   void protocolInput( protocol::InputBlock::iterator& start, protocol::InputBlock::iterator& end);
+
+   //get the capabilities message
+   const char* getCaps();
 };
 
 }}//namespace

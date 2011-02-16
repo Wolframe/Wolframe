@@ -63,16 +63,16 @@ public:
 protected:
    ProtocolArgumentParsingFixture() {}
 
-	virtual void SetUp()
-	{
+   virtual void SetUp()
+   {
       for (unsigned int tt=0; testDescription[tt].in; tt++)
       {
          std::string out;
          char* itr = const_cast<char*>( testDescription[ tt].in);
+         char* end = strchr( itr, '\0');
          std::string argbuf;
          protocol::CArgBuffer<std::string> args( &argbuf);
-		 //Aba: temporarily commented out..
-         //protocol::Parser::getLine( itr, args);
+         protocol::Parser::getLine( itr, end, args);
          unsigned int ii=0,nn=args.size();
          while (ii<nn)
          {

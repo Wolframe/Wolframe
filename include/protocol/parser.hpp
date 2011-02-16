@@ -53,7 +53,7 @@ public:
    template <typename IteratorType, typename BufferType>
    static bool getLine( IteratorType& src, IteratorType& end, BufferType& buf)
    {
-      if (buf.size() == 0) if (!skipSpaces( src)) return false;
+      if (buf.size() == 0) if (!skipSpaces( src, end)) return false;
       
       while (src < end && *src != '\n' && *src != '\r')
       {

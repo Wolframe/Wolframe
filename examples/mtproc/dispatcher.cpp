@@ -8,6 +8,10 @@ using namespace _SMERP::protocol;
 void CommandHandler::resetCommand()
 {
    m_methodIdx = 0;
+   m_lineBuffer.init();
+   m_argBuffer.init();
+   m_cmdBuffer.init();
+
    if (m_instance)
    {
       m_state = Init;
@@ -48,24 +52,33 @@ void CommandHandler::init( const char** protocolCmds, Instance* instance)
    }
 }
 
-void CommandHandler::protocolInput( protocol::InputBlock& input, protocol::InputBlock::iterator& end)
+void CommandHandler::protocolInput( protocol::InputBlock::iterator& start, protocol::InputBlock::iterator& end)
 {
-   if (m_state == Running)
+   if (m_state == WaitForInput)
    {
-      if (m_context.contentIterator)
-      {
-         m_context.contentIterator->protocolInput( input.ptr(), end-input.begin());
-      }
-      else
-      {
-         LOG_ERROR << "content iterator disapeared";
-      }
+      LOG_DATA << "command handler got input";
+      m_state = Running;
    }
    else
    {
-      LOG_ERROR << "illegal state (running but no context)";
-      init(0);
+      LOG_ERROR << "illegal state (unexpected protocol input)";
+      throw (IllegalState());
    }
+   if (m_context.contentIterator)
+   {
+      m_context.contentIterator->protocolInput( &start[0], end-input.begin());
+   }
+   else
+   {
+      LOG_ERROR << "illegal state: got input without recipient (content iterator disapeared)";
+      throw (IllegalState());
+   }
+}
+
+CommandHandler::CommandHandler( Instance* instance=0)
+   :m_argBuffer( &m_lineBuffer);
+{
+   init( instance);
 }
 
 CommandHandler::~CommandHandler()
@@ -75,64 +88,114 @@ CommandHandler::~CommandHandler()
 
 CommandHandler::Command CommandHandler::getCommand( protocol::InputBlock::iterator& itr, protocol::InputBlock::iterator& eoM)
 {
-   resetCommand();
-   int ci = m_parser.getCommand( itr, eoM, m_cmdBuffer);
-   if (ci >= unknown && ci < method)
+   switch (m_state)
    {
-      return (Command)ci;
-   }
-   else
-   {
-      m_methodIdx = (unsigned int)ci - (unsigned int)method;
-      m_state = Selected;
-      return method;
-   }
-}
-
-int CommandHandler::call( int argc, const char** argv)
-{
-   if (m_state == Selected)
-   {
-      LOG_DEBUG << "call of '" << m_instance->mt[ m_methodIdx].name << "'";
-      m_state = Running;
-   }
-   if (m_state != Running)
-   {
-      LOG_ERROR << "illegal call in this state (not running)";
-      init(0);
-      return 0;
-   }
-   int rt = m_instance->mt[ m_methodIdx].call( &m_context, argc, argv);
-   if (rt != 0)
-   {
-      LOG_ERROR << "error " << rt << " calling '" << m_instance->mt[ m_methodIdx].name << "'";
-      resetCommand();
-   }
-   else
-   {
-      const char* errmsg;
-      switch (m_context.contentIterator->state())
+      case Running:
+      case WaitForInput:
+      case Null:
+      case Init:
       {
-         case protocol::Generator::Init:
-         case protocol::Generator::Processing:
-            break;
-
-         case protocol::Generator::Error:
-            rt = m_context.contentIterator->getError( &errmsg);
-            LOG_ERROR << "error " << errmsg << "(" << rt << ") in generator calling '" << m_instance->mt[ m_methodIdx].name << "'";
-            resetCommand();
-            break;
-
-         case protocol::Generator::EndOfInput:
-            resetCommand();
-            break;
-
-         case protocol::Generator::EndOfBuffer:
-            break;
+         resetCommand();
+         int ci = m_parser.getCommand( itr, eoM, m_cmdBuffer);
+         if (ci >= unknown && ci < method)
+         {
+            return (Command)ci;
+         }
+         m_methodIdx = (unsigned int)ci - (unsigned int)method;
+         m_state = Selected;
+         //no break here !
+      }
+      case Selected:
+      {
+         if (!getLine( itr, eoM, m_argBuffer)) return unknown;
+         //no break here !
+      }
+      case ArgumentsParsed:
+      {
+         return method;
       }
    }
-   return rt;
+   LOG_ERROR << "illegal state (end of getCommand)";
+   throw (IllegalState());
 }
 
+
+IOState CommandHandler::call( int& returnCode)
+{
+   switch (m_state)
+   {
+      case Null:
+      case Init:
+      case Selected:
+      { 
+         LOG_ERROR << "illegal call in this state (not running)";
+         throw (IllegalState());
+      }
+      case ArgumentsParsed:
+      {
+         LOG_DEBUG << "call of '" << m_instance->mt[ m_methodIdx].name << "'";
+         m_state = Running;
+         //no break here !
+      }
+      case WaitForInput:
+         LOG_ERROR << "called without input";
+         //no break here !
+         
+      case Running:
+      {
+         returnCode = m_instance->mt[ m_methodIdx].call( &m_context, m_argBuffer.argc(), m_argBuffer.argv());
+         if (returnCode != 0)
+         {
+            LOG_ERROR << "error " << rt << " calling '" << m_instance->mt[ m_methodIdx].name << "'";
+            resetCommand();
+            return Close;
+         }
+         if (m_context.contentIterator)
+         {
+            const char* errmsg;
+            switch (m_context.contentIterator->state())
+            {
+               case protocol::Generator::Init:
+               case protocol::Generator::Processing:
+                  return WriteOutput;
+
+               case protocol::Generator::Error:
+                  returnCode = m_context.contentIterator->getError( &errmsg);
+                  LOG_ERROR << "error " << errmsg << "(" << returnCode << ") in generator calling '" << m_instance->mt[ m_methodIdx].name << "'";
+                  resetCommand();
+                  return Close;
+
+               case protocol::Generator::EndOfInput:
+                  resetCommand();
+                  return Close;
+
+               case protocol::Generator::EndOfMessage:
+                  m_state = WaitForInput;
+                  return ReadInput;
+            }
+         }
+      }
+   }
+   return Close;
+}
+
+const char* CommandHandler::getCaps()
+{
+   m_lineBuffer.init();
+   unsigned int ii;
+   if (m_instance && m_instance->mt)
+   {
+      for (ii=0; m_instance->mt[ii].call && m_instance->mt[ii].name; ii++)
+      {
+         if (ii>0)
+         {
+            m_lineBuffer.push_back( ',');
+            m_lineBuffer.push_back( ' ');
+         }
+         m_lineBuffer.append( m_instance->mt[ii].name);
+      }
+   }
+   return m_lineBuffer.c_str();
+}      
 
 
