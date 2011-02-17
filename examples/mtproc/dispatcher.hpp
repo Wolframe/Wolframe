@@ -66,6 +66,7 @@ public:
 
    //pass a protocol data input chunk to the processors generator function
    void protocolInput( protocol::InputBlock::iterator& start, protocol::InputBlock::iterator& end);
+   void setEoD();
 
    //get the capabilities message
    const char* getCaps();
