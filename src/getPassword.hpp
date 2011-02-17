@@ -10,7 +10,8 @@
 namespace _SMERP {
 	namespace Authentication {
 
-		std::string getPassword();
+		std::string getLogin( );
+		std::string getPassword( );
 
 	} // namespace Authentication
 } // namespace _SMERP

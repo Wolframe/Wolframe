@@ -63,12 +63,8 @@ int main( int argc, const char *argv[] )
 				a->receiveData( pass );
 // login name required
 			} else if( token == "login" ) {
-#ifndef _WIN32
-				string login = getlogin( );
-#else
-// TODO: get username on Windows
-				string login = "abaumann";
-#endif
+				string login = getLogin( );
+				cout << "login is: " << login << endl;
 				a->receiveData( login );
 			} else {
 				cerr << "authenticator requests unknown token '" << token << "'" << endl;
