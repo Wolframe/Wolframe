@@ -349,7 +349,7 @@ namespace _SMERP {
 										L2it != L1it->second.end(); L2it++ )	{
 					if ( boost::algorithm::iequals( L2it->first, "level" ))	{
 						LogLevel::Level lvl = LogLevel::str2LogLevel( L2it->second.get_value<std::string>() );
-						if ( lvl ==  LogLevel::LOGLEVEL_UNDEFINED )	{
+						if ( lvl == LogLevel::LOGLEVEL_UNDEFINED )	{
 							os << displayStr() << ": logfile: unknown log level: "
 								<< L2it->second.get_value<std::string>();
 							return false;
@@ -399,46 +399,111 @@ namespace _SMERP {
 										L2it != L1it->second.end(); L2it++ )	{
 					if ( boost::algorithm::iequals( L2it->first, "level" ))	{
 						LogLevel::Level lvl = LogLevel::str2LogLevel( L2it->second.get_value<std::string>() );
-						if ( lvl ==  LogLevel::LOGLEVEL_UNDEFINED )	{
-							os << displayStr() << ": unknown log level: "
+						if ( lvl == LogLevel::LOGLEVEL_UNDEFINED )	{
+							os << displayStr() << ": syslog: unknown log level: "
 								<< L2it->second.get_value<std::string>();
 							return false;
 						}
-						if ( logFileLogLevel != LogLevel::LOGLEVEL_UNDEFINED )	{
-							os << displayStr() << ": logfile log level already defined. Second value: "
+						if ( syslogLogLevel != LogLevel::LOGLEVEL_UNDEFINED )	{
+							os << displayStr() << ": syslog: log level already defined. Second value: "
 								<< L2it->second.get_value<std::string>();
 							return false;
 						}
-						logFileLogLevel = lvl;
+						syslogLogLevel = lvl;
 					}
-					else if ( boost::algorithm::iequals( L2it->first, "filename" ))	{
-						if ( ! logFile.empty() )	{
-							os << displayStr() << ": log file already defined. Second value: "
+					else if ( boost::algorithm::iequals( L2it->first, "facility" ))	{
+						SyslogFacility::Facility fclt = SyslogFacility::str2SyslogFacility( L2it->second.get_value<std::string>() );
+						if ( fclt == SyslogFacility::_SMERP_SYSLOG_FACILITY_UNDEFINED )	{
+							os << displayStr() << ": syslog: unknown facility: "
 								<< L2it->second.get_value<std::string>();
 							return false;
 						}
-						std::string fName = L2it->second.get_value<std::string>();
-						if ( fName.empty() )	{
-							os << displayStr() << ": logfile: empty filename";
+						if ( syslogFacility != SyslogFacility::_SMERP_SYSLOG_FACILITY_UNDEFINED )	{
+							os << displayStr() << ": syslog: facility already defined. Second value: "
+								<< L2it->second.get_value<std::string>();
 							return false;
 						}
-						if ( ! boost::filesystem::path( fName ).is_absolute() )	{
-							os << displayStr() << ": logfile: filename must be absolute: " << fName;
+						syslogFacility = fclt;
+					}
+					else if ( boost::algorithm::iequals( L2it->first, "ident" ))	{
+						if ( ! syslogIdent.empty() )	{
+							os << displayStr() << ": syslog: ident already defined. Second value: "
+								<< L2it->second.get_value<std::string>();
 							return false;
 						}
-						logFile = fName;
+						std::string ident = L2it->second.get_value<std::string>();
+						if ( ident.empty() )	{
+							os << displayStr() << ": syslog: empty ident";
+							return false;
+						}
+						syslogIdent = ident;
 					}
 					else	{
-						os << displayStr() << ": logfile: unknown configuration option: <"
+						os << displayStr() << ": syslog: unknown configuration option: <"
 								<< L2it->first << ">";
 						return false;
-
 					}
 				}
 			}
 #endif	// !defined( _WIN32 )
 #if defined( _WIN32 )
-			else if ()...
+			// event log
+			else if ( boost::algorithm::iequals( L1it->first, "eventlog" ))	{
+				if ( logToEventlog )	{
+					os << displayStr() << ": eventlog channel already defined";
+					return false;
+				}
+				logToEventlog = true;
+				eventlogLogLevel = LogLevel::LOGLEVEL_UNDEFINED;
+				for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
+										L2it != L1it->second.end(); L2it++ )	{
+					if ( boost::algorithm::iequals( L2it->first, "level" ))	{
+						LogLevel::Level lvl = LogLevel::str2LogLevel( L2it->second.get_value<std::string>() );
+						if ( lvl == LogLevel::LOGLEVEL_UNDEFINED )	{
+							os << displayStr() << ": eventlog: unknown log level: "
+								<< L2it->second.get_value<std::string>();
+							return false;
+						}
+						if ( eventlogLogLevel != LogLevel::LOGLEVEL_UNDEFINED )	{
+							os << displayStr() << ": eventlog: log level already defined. Second value: "
+								<< L2it->second.get_value<std::string>();
+							return false;
+						}
+						eventlogLogLevel = lvl;
+					}
+					else if ( boost::algorithm::iequals( L2it->first, "name" ))	{
+						if ( ! eventlogLogName.empty() )	{
+							os << displayStr() << ": eventlog: name already defined. Second value: "
+								<< L2it->second.get_value<std::string>();
+							return false;
+						}
+						std::string eName = L2it->second.get_value<std::string>();
+						if ( eName.empty() )	{
+							os << displayStr() << ": eventlog: empty name";
+							return false;
+						}
+						eventlogLogName = eName;
+					}
+					else if ( boost::algorithm::iequals( L2it->first, "source" ))	{
+						if ( ! eventlogSource.empty() )	{
+							os << displayStr() << ": eventlog: source already defined. Second value: "
+								<< L2it->second.get_value<std::string>();
+							return false;
+						}
+						std::string eSource = L2it->second.get_value<std::string>();
+						if ( eSource.empty() )	{
+							os << displayStr() << ": eventlog: empty source";
+							return false;
+						}
+						eventlogSource = eSource;
+					}
+					else	{
+						os << displayStr() << ": syslog: unknown configuration option: <"
+								<< L2it->first << ">";
+						return false;
+					}
+				}
+			}
 #endif	// defined( _WIN32 )
 			// unknown log method
 			else	{
@@ -448,45 +513,6 @@ namespace _SMERP {
 		}
 		return true;
 	}
-
-//#if !defined( _WIN32 )
-//		if ( pt.get_child_optional( "logging.syslog" ))	{
-//			logToSyslog = true;
-//			std::string str = pt.get<std::string>( "logging.syslog.facility", "LOCAL4" );
-
-//			if ( ( syslogFacility = SyslogFacility::str2SyslogFacility( str )) == SyslogFacility::_SMERP_SYSLOG_FACILITY_UNDEFINED )	{
-//				os << "unknown syslog facility \"" << str << "\"";
-//				return false;
-//			}
-//			str = pt.get<std::string>( "logging.syslog.level", "NOTICE" );
-
-//			if ( ( syslogLogLevel = LogLevel::str2LogLevel( str )) == LogLevel::LOGLEVEL_UNDEFINED )	{
-//				os << "unknown log level \"" << str << " for syslog";
-//				return false;
-//			}
-
-//			syslogIdent = pt.get<std::string>( "logging.syslog.ident", "smerpd" );
-//		}
-//		else
-//			logToSyslog = false;
-//#endif	// !defined( _WIN32 )
-
-//#if defined( _WIN32 )
-//		if ( pt.get_child_optional( "logging.eventlog" )) {
-//			logToEventlog = true;
-//			eventlogLogName = pt.get<std::string>( "logging.eventlog.name", "smerpd" );
-//			eventlogSource = pt.get<std::string>( "logging.eventlog.source", "unknown" );
-//			std::string str = pt.get<std::string>( "logging.eventlog.level", "NOTICE" );
-//
-//			if ( ( eventlogLogLevel = LogLevel::str2LogLevel( str )) == LogLevel::LOGLEVEL_UNDEFINED )	{
-//				os << "unknown log level \"" << s << " for Event Log";
-//				return false;
-//			}
-//		}
-//		else
-//			logToEventlog = false;
-//#endif	// defined( _WIN32 )
-//	}
 
 
 //----- Database configuration functions---------------------------------------------------------------------------------
