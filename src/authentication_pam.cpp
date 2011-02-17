@@ -188,6 +188,8 @@ Step::AuthStep PAMAuthenticator::nextStep( )
 		case _SMERP_PAM_STATE_HAS_PASS:
 			rc = pam_authenticate( m_appdata.h, 0 );
 			if( m_state == _SMERP_PAM_STATE_HAS_LOGIN && rc == PAM_INCOMPLETE ) {
+// we need a password, so drop out of authentication, keep the state and return in
+// _SMERP_PAM_STATE_HAS_PASS..
 				m_token = "password";
 				m_state = _SMERP_PAM_STATE_NEED_PASS;
 				return Step::_SMERP_AUTH_STEP_RECV_DATA;
@@ -201,7 +203,7 @@ Step::AuthStep PAMAuthenticator::nextStep( )
 				return Step::_SMERP_AUTH_STEP_SEND_DATA;
 			}
 
-// is access permitted?
+// is access to the account permitted?
 			rc = pam_acct_mgmt( m_appdata.h, 0 );
 			if( rc != PAM_SUCCESS ) {
 				m_token = "message";
