@@ -109,11 +109,6 @@ namespace _SMERP {
 		address = cfgFile.address;
 		SSLaddress = cfgFile.SSLaddress;
 
-		idleTimeout = cfgFile.idleTimeout;
-		requestTimeout = cfgFile.requestTimeout;
-		answerTimeout = cfgFile.answerTimeout;
-		processTimeout = cfgFile.processTimeout;
-
 		dbConfig = cfgFile.dbConfig;
 		logConfig = cfgFile.logConfig;
 
@@ -244,6 +239,29 @@ namespace _SMERP {
 
 //----- Logger configuration functions---------------------------------------------------------------------------------
 
+	LoggerConfiguration::LoggerConfiguration( std::string node, std::string header )
+		: ConfigurationBase( node, header )
+	{
+		logToStderr = false;
+		stderrLogLevel = LogLevel::LOGLEVEL_UNDEFINED;
+		logToFile = false;
+		// std::string		logFile;
+		logFileLogLevel = LogLevel::LOGLEVEL_UNDEFINED;
+		// std::string		logFileIdent;
+#if !defined( _WIN32 )
+		logToSyslog = false;
+		syslogFacility = SyslogFacility::_SMERP_SYSLOG_FACILITY_UNDEFINED;
+		syslogLogLevel = LogLevel::LOGLEVEL_UNDEFINED;
+		// std::string		syslogIdent;
+#else
+		logToEventlog = false;
+		// std::string		eventlogLogName;
+		// std::string		eventlogSource;
+		eventlogLogLevel = LogLevel::LOGLEVEL_UNDEFINED;
+#endif // !defined( _WIN32 )
+	}
+
+
 	void LoggerConfiguration::print( std::ostream& os ) const
 	{
 		os << displayStr() << std::endl;
@@ -332,6 +350,56 @@ namespace _SMERP {
 					if ( boost::algorithm::iequals( L2it->first, "level" ))	{
 						LogLevel::Level lvl = LogLevel::str2LogLevel( L2it->second.get_value<std::string>() );
 						if ( lvl ==  LogLevel::LOGLEVEL_UNDEFINED )	{
+							os << displayStr() << ": logfile: unknown log level: "
+								<< L2it->second.get_value<std::string>();
+							return false;
+						}
+						if ( logFileLogLevel != LogLevel::LOGLEVEL_UNDEFINED )	{
+							os << displayStr() << ": logfile: log level already defined. Second value: "
+								<< L2it->second.get_value<std::string>();
+							return false;
+						}
+						logFileLogLevel = lvl;
+					}
+					else if ( boost::algorithm::iequals( L2it->first, "filename" ))	{
+						if ( ! logFile.empty() )	{
+							os << displayStr() << ": log file already defined. Second value: "
+								<< L2it->second.get_value<std::string>();
+							return false;
+						}
+						std::string fName = L2it->second.get_value<std::string>();
+						if ( fName.empty() )	{
+							os << displayStr() << ": logfile: empty filename";
+							return false;
+						}
+						if ( ! boost::filesystem::path( fName ).is_absolute() )	{
+							os << displayStr() << ": logfile: filename must be absolute: " << fName;
+							return false;
+						}
+						logFile = fName;
+					}
+					else	{
+						os << displayStr() << ": logfile: unknown configuration option: <"
+								<< L2it->first << ">";
+						return false;
+
+					}
+				}
+			}
+#if !defined( _WIN32 )
+			// syslog
+			else if ( boost::algorithm::iequals( L1it->first, "syslog" ))	{
+				if ( logToSyslog )	{
+					os << displayStr() << ": syslog channel already defined";
+					return false;
+				}
+				logToSyslog = true;
+				syslogLogLevel = LogLevel::LOGLEVEL_UNDEFINED;
+				for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
+										L2it != L1it->second.end(); L2it++ )	{
+					if ( boost::algorithm::iequals( L2it->first, "level" ))	{
+						LogLevel::Level lvl = LogLevel::str2LogLevel( L2it->second.get_value<std::string>() );
+						if ( lvl ==  LogLevel::LOGLEVEL_UNDEFINED )	{
 							os << displayStr() << ": unknown log level: "
 								<< L2it->second.get_value<std::string>();
 							return false;
@@ -368,7 +436,11 @@ namespace _SMERP {
 					}
 				}
 			}
-			// syslog
+#endif	// !defined( _WIN32 )
+#if defined( _WIN32 )
+			else if ()...
+#endif	// defined( _WIN32 )
+			// unknown log method
 			else	{
 				os << displayStr() << ": unknown configuration option: <" << L1it->first << ">";
 				return false;
@@ -511,12 +583,6 @@ namespace _SMERP {
 				os << "                  verify client: " << (it->verifyClientCert() ? "yes" : "no") << std::endl;
 			}
 		}
-
-		os << "Timeouts" << std::endl;
-		os << "   idle: " << idleTimeout << std::endl;
-		os << "   request: " << requestTimeout << std::endl;
-		os << "   answer: " << answerTimeout << std::endl;
-		os << "   process: " << processTimeout << std::endl;
 
 		dbConfig->print( os );
 		logConfig->print( os );

@@ -169,11 +169,6 @@ namespace _SMERP {
 		serviceDisplayName = pt.get<std::string>( "server.service.displayName", DEFAULT_SERVICE_DISPLAY_NAME );
 		serviceDescription = pt.get<std::string>( "server.service.description", DEFAULT_SERVICE_DESCRIPTION );
 
-		idleTimeout = pt.get<unsigned>( "server.timeout.idle", 900 );
-		requestTimeout = pt.get<unsigned>( "server.timeout.request", 30 );
-		answerTimeout = pt.get<unsigned>( "server.timeout.answer", 30 );
-		processTimeout = pt.get<unsigned>( "server.timeout.process", 30 );
-
 // database
 		dbConfig = new DatabaseConfiguration( "database", "Database Server" );
 		std::stringstream	errStr;

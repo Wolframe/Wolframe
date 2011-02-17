@@ -31,11 +31,6 @@ namespace _SMERP	{
 		std::list<Network::ServerTCPendpoint> address;
 		std::list<Network::ServerSSLendpoint> SSLaddress;
 
-		unsigned		idleTimeout;
-		unsigned		requestTimeout;
-		unsigned		answerTimeout;
-		unsigned		processTimeout;
-
 // database configuration
 		DatabaseConfiguration	*dbConfig;
 // logger configuration

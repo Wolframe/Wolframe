@@ -79,8 +79,8 @@ namespace _SMERP {
 #endif // !defined( _WIN32 )
 
 		/// constructor
-		LoggerConfiguration( std::string node, std::string header ) : ConfigurationBase( node, header )
-									{}
+		LoggerConfiguration( std::string node, std::string header );
+
 		/// methods
 		bool parse( boost::property_tree::ptree& pt, std::ostream& os );
 		bool check( std::ostream& os ) const;
@@ -138,11 +138,6 @@ namespace _SMERP {
 // network configuration
 		std::list<Network::ServerTCPendpoint> address;
 		std::list<Network::ServerSSLendpoint> SSLaddress;
-
-		unsigned		idleTimeout;
-		unsigned		requestTimeout;
-		unsigned		answerTimeout;
-		unsigned		processTimeout;
 
 // database configuration
 		DatabaseConfiguration	*dbConfig;
