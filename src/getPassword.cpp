@@ -5,7 +5,6 @@
 #ifdef WITH_SSL
 
 #include <string>
-#include "acceptor.hpp"
 
 namespace _SMERP {
 	namespace Authentication {
@@ -39,7 +38,7 @@ namespace _SMERP {
 
 	std::string getLogin( )
 	{
-		TCHAR login[255];
+		TCHAR login[256];
 		DWORD len = 254;
 		GetUserName( login, &len );
 		return std::string( login );

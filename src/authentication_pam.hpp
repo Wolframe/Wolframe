@@ -19,6 +19,7 @@ namespace _SMERP {
 
 typedef struct {
 	std::string login;
+	bool has_pass;
 	std::string pass;
 	std::string errmsg;
 	pam_handle_t *h;
