@@ -29,6 +29,7 @@ namespace _SMERP {
 #include <tchar.h>
 #include <stdlib.h>
 #include <conio.h>
+#include <cstdio>
 
 	std::string getPassword()
 	{
@@ -39,8 +40,9 @@ namespace _SMERP {
 		int ch = _getch( );
 		while( ch != 13 ) {
 			pass.push_back( ch );
-			int ch = _getch( );
+			ch = _getch( );
 		}
+		puts( "" );
 
 		return pass;
 	}
