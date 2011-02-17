@@ -75,6 +75,14 @@ void CommandDispatcher::protocolInput( protocol::InputBlock::iterator& start, pr
    }
 }
 
+void CommandDispatcher::setEoD()
+{
+   if (m_context.contentIterator)
+   {
+      m_context.contentIterator->setEoD();
+   }
+}
+
 CommandDispatcher::CommandDispatcher( Instance* instance)
    :m_argBuffer( &m_lineBuffer)
 {

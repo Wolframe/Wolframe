@@ -4,8 +4,6 @@
 
 #include "authentication_pam.hpp"
 
-// PAM
-
 #ifdef WITH_PAM
 
 #include <string.h>
@@ -24,6 +22,7 @@ PAMAuthenticator::PAMAuthenticator( const std::string _service )
 {
 	m_state = _SMERP_PAM_STATE_NEED_LOGIN;
 	m_appdata.h = NULL;
+	m_appdata.has_pass = false;
 	m_appdata.pass = "";
 	m_conv.conv = pam_conv_func;
 	m_conv.appdata_ptr = &m_appdata;
@@ -106,7 +105,7 @@ int pam_conv_func(	int nmsg, const struct pam_message **msg,
 // Usually we get prompted for a password, this is not always true though.
 			case PAM_PROMPT_ECHO_OFF:
 // thank you very much, come again (but with a password)
-				if( appdata->pass.empty( ) )
+				if( !appdata->has_pass )
 					return PAM_CONV_AGAIN;
 
 				r->resp = strdup( appdata->pass.c_str( ) );
@@ -236,6 +235,7 @@ Step::AuthStep PAMAuthenticator::nextStep( )
 		case _SMERP_PAM_STATE_ERROR:
 			m_state = _SMERP_PAM_STATE_NEED_LOGIN;
 			m_appdata.h = NULL;
+			m_appdata.has_pass = false;
 			m_appdata.pass = "";
 			(void)pam_end( m_appdata.h, rc );
 			return Step::_SMERP_AUTH_STEP_FAIL;
@@ -287,6 +287,7 @@ void PAMAuthenticator::receiveData( SMERP_UNUSED const std::string data )
 			break;
 		
 		case _SMERP_PAM_STATE_NEED_PASS:
+			m_appdata.has_pass = true;
 			m_appdata.pass = data;
 			m_state = _SMERP_PAM_STATE_HAS_PASS;
 			break;
