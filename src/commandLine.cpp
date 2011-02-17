@@ -164,7 +164,7 @@ namespace _SMERP {
 
 		}
 		catch( std::exception& e )	{
-			errMsg_ = "BLA BLA:", errMsg_ += e.what();
+			errMsg_ = "BLA BLA: ", errMsg_ += e.what();
 			return false;
 		}
 	}

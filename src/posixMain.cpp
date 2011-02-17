@@ -126,7 +126,7 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		_SMERP::ApplicationConfiguration config( cmdLineCfg, cfgFileCfg);
 
 // now here we know where to log to on stderr
-		_SMERP::LogBackend::instance().setConsoleLevel( config.stderrLogLevel );
+		_SMERP::LogBackend::instance().setConsoleLevel( config.logConfig->stderrLogLevel );
 
 // Check the configuration
 		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::CHECK_CONFIG )	{
@@ -182,9 +182,9 @@ int _SMERP_posixMain( int argc, char* argv[] )
 			// now here we lost constrol over the console, we should
 			// create a temporary logger which at least tells what's
 			// going on in the syslog
-			_SMERP::LogBackend::instance().setSyslogLevel( config.syslogLogLevel );
-			_SMERP::LogBackend::instance().setSyslogFacility( config.syslogFacility );
-			_SMERP::LogBackend::instance().setSyslogIdent( config.syslogIdent );
+			_SMERP::LogBackend::instance().setSyslogLevel( config.logConfig->syslogLogLevel );
+			_SMERP::LogBackend::instance().setSyslogFacility( config.logConfig->syslogFacility );
+			_SMERP::LogBackend::instance().setSyslogIdent( config.logConfig->syslogIdent );
 
 			// if we are root we can drop privileges now
 			struct group *groupent;
@@ -218,8 +218,8 @@ int _SMERP_posixMain( int argc, char* argv[] )
 
 			// Create the final logger based on the configuration
 			// file logger only here to get the right permissions
-			_SMERP::LogBackend::instance().setLogfileLevel( config.logFileLogLevel );
-			_SMERP::LogBackend::instance().setLogfileName( config.logFile );
+			_SMERP::LogBackend::instance().setLogfileLevel( config.logConfig->logFileLogLevel );
+			_SMERP::LogBackend::instance().setLogfileName( config.logConfig->logFile );
 		}
 
 		// Block all signals for background thread.

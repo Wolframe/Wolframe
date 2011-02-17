@@ -295,7 +295,8 @@ namespace _SMERP {
 				}
 				logToStderr = true;
 				stderrLogLevel = LogLevel::LOGLEVEL_UNDEFINED;
-				for ( boost::property_tree::ptree::const_iterator L2it = pt.begin(); L2it != pt.end(); L2it++ )	{
+				for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
+										L2it != L1it->second.end(); L2it++ )	{
 					if ( boost::algorithm::iequals( L2it->first, "level" ))	{
 						LogLevel::Level lvl = LogLevel::str2LogLevel( L2it->second.get_value<std::string>() );
 						if ( lvl ==  LogLevel::LOGLEVEL_UNDEFINED )	{
@@ -326,7 +327,8 @@ namespace _SMERP {
 				}
 				logToFile = true;
 				logFileLogLevel = LogLevel::LOGLEVEL_UNDEFINED;
-				for ( boost::property_tree::ptree::const_iterator L2it = pt.begin(); L2it != pt.end(); L2it++ )	{
+				for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
+										L2it != L1it->second.end(); L2it++ )	{
 					if ( boost::algorithm::iequals( L2it->first, "level" ))	{
 						LogLevel::Level lvl = LogLevel::str2LogLevel( L2it->second.get_value<std::string>() );
 						if ( lvl ==  LogLevel::LOGLEVEL_UNDEFINED )	{
@@ -341,7 +343,7 @@ namespace _SMERP {
 						}
 						logFileLogLevel = lvl;
 					}
-					if ( boost::algorithm::iequals( L2it->first, "filename" ))	{
+					else if ( boost::algorithm::iequals( L2it->first, "filename" ))	{
 						if ( ! logFile.empty() )	{
 							os << displayStr() << ": log file already defined. Second value: "
 								<< L2it->second.get_value<std::string>();
@@ -367,6 +369,10 @@ namespace _SMERP {
 				}
 			}
 			// syslog
+			else	{
+				os << displayStr() << ": unknown configuration option: <" << L1it->first << ">";
+				return false;
+			}
 		}
 		return true;
 	}

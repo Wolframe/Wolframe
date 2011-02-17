@@ -198,7 +198,6 @@ examples/xmlselect/xmlIterator.cpp
 src/getPassword.hpp
 src/smerpmsg.mc
 src/smerp.conf
-src/posixMain.d
 src/Makefile.W32
 src/GNUmakefile
 src/unused.h

@@ -47,7 +47,8 @@ namespace _SMERP {
 		/// methods
 		bool parse( boost::property_tree::ptree& pt, std::ostream& os );
 		bool check( std::ostream& os ) const;
-		bool test( std::ostream& os ) const;
+//		Not implemented yet, inherited from base for the time being
+//		bool test( std::ostream& os ) const;
 		void print( std::ostream& os ) const;
 #if !defined( _WIN32 )
 		void override( std::string user, std::string group );
@@ -83,7 +84,8 @@ namespace _SMERP {
 		/// methods
 		bool parse( boost::property_tree::ptree& pt, std::ostream& os );
 		bool check( std::ostream& os ) const;
-		bool test( std::ostream& os ) const;
+//		Not implemented yet, inherited from base for the time being
+//		bool test( std::ostream& os ) const;
 		void print( std::ostream& os ) const;
 
 		void foreground( LogLevel::Level debugLevel, bool useConfig );
@@ -106,7 +108,8 @@ namespace _SMERP {
 		/// methods
 		bool parse( boost::property_tree::ptree& pt, std::ostream& os );
 		bool check( std::ostream& os ) const;
-		bool test( std::ostream& os ) const;
+//		Not implemented yet, inherited from base for the time being
+//		bool test( std::ostream& os ) const;
 		void print( std::ostream& os ) const;
 	};
 
