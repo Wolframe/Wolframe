@@ -31,6 +31,8 @@ namespace _SMERP	{
 		std::list<Network::ServerTCPendpoint> address;
 		std::list<Network::ServerSSLendpoint> SSLaddress;
 
+// server configuration
+		ServerConfiguration	*srvConfig;
 // database configuration
 		DatabaseConfiguration	*dbConfig;
 // logger configuration

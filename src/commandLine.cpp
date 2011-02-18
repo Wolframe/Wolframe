@@ -134,7 +134,7 @@ namespace _SMERP {
 				foreground = true;
 #endif
 			if ( clMap.count( "use-config-logging" ))
-				useConfigLog = true;
+				useLogConfig = true;
 
 			if ( clMap.count( "debug" ))	{
 				std::string str = clMap["debug"].as<std::string>();

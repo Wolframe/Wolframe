@@ -169,9 +169,15 @@ namespace _SMERP {
 		serviceDisplayName = pt.get<std::string>( "server.service.displayName", DEFAULT_SERVICE_DISPLAY_NAME );
 		serviceDescription = pt.get<std::string>( "server.service.description", DEFAULT_SERVICE_DESCRIPTION );
 
+		std::stringstream	errStr;
+// server
+		srvConfig = new ServerConfiguration( "server", "Server" );
+		if ( ! srvConfig->parse( pt.get_child( "server" ), errStr ))	{
+			errMsg_ = errStr.str();
+			return false;
+		}
 // database
 		dbConfig = new DatabaseConfiguration( "database", "Database Server" );
-		std::stringstream	errStr;
 		if ( ! dbConfig->parse( pt.get_child( "database" ), errStr ))	{
 			errMsg_ = errStr.str();
 			return false;

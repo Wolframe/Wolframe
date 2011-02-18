@@ -109,45 +109,12 @@ namespace _SMERP {
 		address = cfgFile.address;
 		SSLaddress = cfgFile.SSLaddress;
 
+		srvConfig = cfgFile.srvConfig;
 		dbConfig = cfgFile.dbConfig;
 		logConfig = cfgFile.logConfig;
 
-//		if ( !foreground )	{
-//			logToStderr = cfgFile.logToStderr;
-//			stderrLogLevel = cfgFile.stderrLogLevel;
-//			logToFile = cfgFile.logToFile;
-//			logFile = cfgFile.logFile;
-//			logFileLogLevel = cfgFile.logFileLogLevel;
-//#if !defined( _WIN32 )
-//			logToSyslog = cfgFile.logToSyslog;
-//			syslogFacility = cfgFile.syslogFacility;
-//			syslogLogLevel = cfgFile.syslogLogLevel;
-//#endif	// !defined( _WIN32 )
-//#if defined( _WIN32 )
-//// Aba, what for?
-////			syslogIdent = cfgFile.syslogIdent;
-////			logToEventlog = cfgFile.logToEventlog;
-//#endif	//defined( _WIN32 )
-//		}
-//		else	{
-//			logToStderr = true;
-//			stderrLogLevel = cmdLine.debugLevel;
-//			logToFile = false;
-//#if !defined( _WIN32 )
-//			logToSyslog = false;
-//#endif	// !defined( _WIN32 )
-//#if defined( _WIN32 )
-//			logToEventlog = false;
-//#endif	// defined( _WIN32 )
-//		}
-
-//#if defined( _WIN32 )
-//		// we need the data always (for running, --install and --remove,
-//		// which run in foreground)
-//		eventlogLogName = cfgFile.eventlogLogName;
-//		eventlogSource = cfgFile.eventlogSource;
-//		eventlogLogLevel = cfgFile.eventlogLogLevel;
-//#endif	// defined( _WIN32 )
+		if ( foreground )
+			logConfig->foreground( cmdLine.debugLevel, cmdLine.useLogConfig );
 	}
 
 
@@ -224,6 +191,101 @@ namespace _SMERP {
 		return correct;
 	}
 
+
+//////////////////////////////////
+	bool parse( boost::property_tree::ptree& pt, std::ostream& os )
+	{
+		return true;
+	}
+//________________________________
+//	BOOST_FOREACH( boost::property_tree::ptree::value_type &v, pt.get_child( "server.listen" ))	{
+//		std::string hostStr = v.second.get<std::string>( "address", std::string() );
+//		if ( hostStr.empty() )	{
+//			errMsg_ = "Interface must be defined";
+//			return false;
+//		}
+//		if ( hostStr == "*" )
+//			hostStr = "0.0.0.0";
+//		std::string portStr = v.second.get<std::string>( "port", std::string() );
+//		if ( portStr.empty() )	{
+//			if ( v.first == "socket" )
+//				port = DEFAULT_PORT;
+//			else
+//				port = SSL_DEFAULT_PORT;
+//		}
+//		else	{
+//			try	{
+//				port = boost::lexical_cast<unsigned short>( portStr );
+//			}
+//			catch( boost::bad_lexical_cast& )	{
+//				errMsg_ = "Invalid value for port: ";
+//				errMsg_ += portStr;
+//				return false;
+//			}
+//			if ( port == 0 )	{
+//				errMsg_ = "Port out of range: ";
+//				errMsg_ += portStr;
+//				return false;
+//			}
+//		}
+
+//		unsigned maxConn = v.second.get<unsigned>( "maxConnections", 0 );
+
+//		if ( v.first == "socket" )	{
+//			Network::ServerTCPendpoint lep( hostStr, port, maxConn );
+//			address.push_back( lep );
+//		}
+//		else if ( v.first == "SSLsocket" )	{
+//// get SSL certificate / CA param
+//			std::string certFile = boost::filesystem::absolute(
+//								v.second.get<std::string>( "certificate", std::string() ),
+//								boost::filesystem::path( file ).branch_path() ).string();
+//			std::string keyFile = boost::filesystem::absolute(
+//								v.second.get<std::string>( "key", std::string() ),
+//								boost::filesystem::path( file ).branch_path() ).string();
+//			std::string CAdirectory = boost::filesystem::absolute(
+//								v.second.get<std::string>( "CAdirectory", std::string() ),
+//								boost::filesystem::path( file ).branch_path() ).string();
+//			std::string CAchainFile = boost::filesystem::absolute(
+//								v.second.get<std::string>( "CAchainFile", std::string() ),
+//								boost::filesystem::path( file ).branch_path() ).string();
+
+//			std::string tmpStr;
+//			boost::logic::tribool flag = getBoolValue( v.second, "verify", tmpStr );
+//			bool verify;
+//			if ( flag )
+//				verify = true;
+//			else if ( !flag )
+//				verify = false;
+//			else	{
+//				verify = true;
+//				errMsg_ = "Unknown value \"";
+//				errMsg_ += tmpStr;
+//				errMsg_ += "\" for SSL verify client. WARNING: enabling verification";
+//			}
+//			Network::ServerSSLendpoint lep( hostStr, port, maxConn,
+//							certFile, keyFile,
+//							verify, CAdirectory, CAchainFile );
+//			SSLaddress.push_back( lep );
+//		}
+//		else	{
+//			errMsg_ = "Invalid listen type: ";
+//			errMsg_ += v.first;
+//			return false;
+//		}
+//	}
+
+//	threads = pt.get<unsigned short>( "server.threads", 4 );
+//	maxConnections = pt.get<unsigned short>( "server.maxConnections", 256 );
+
+//	user = pt.get<std::string>( "server.daemon.user", std::string() );
+//	group = pt.get<std::string>( "server.daemon.group", std::string() );
+//	pidFile = pt.get<std::string>( "server.daemon.pidFile", std::string( ) );
+
+//	serviceName = pt.get<std::string>( "server.service.name", DEFAULT_SERVICE_NAME );
+//	serviceDisplayName = pt.get<std::string>( "server.service.displayName", DEFAULT_SERVICE_DISPLAY_NAME );
+//	serviceDescription = pt.get<std::string>( "server.service.description", DEFAULT_SERVICE_DESCRIPTION );
+// ********************************
 
 #if !defined(_WIN32)
 	/// Override the server configuration with command line arguments

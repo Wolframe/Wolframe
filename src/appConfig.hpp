@@ -35,6 +35,7 @@ namespace _SMERP {
 #endif // !defined( _WIN32 )
 		// server configuration
 		unsigned		threads;
+
 		unsigned		maxConnections;
 
 		// network configuration
@@ -139,6 +140,8 @@ namespace _SMERP {
 		std::list<Network::ServerTCPendpoint> address;
 		std::list<Network::ServerSSLendpoint> SSLaddress;
 
+// server configuration
+		ServerConfiguration	*srvConfig;
 // database configuration
 		DatabaseConfiguration	*dbConfig;
 // logger configuration
