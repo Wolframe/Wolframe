@@ -39,7 +39,7 @@ INCLUDE_LIBS = \
 
 TEST_CPP_BINS = \
 	threadLeakTest.exe \
-	testAuth.exe
+	authTest.exe
 
 !IFDEF WITH_GTEST
 TEST_CPP_BINS = \
@@ -50,8 +50,9 @@ TEST_CPP_BINS = \
 	resolvePathTest.exe \
 	poolTest.exe \
 	logTest.exe \
-	protocolArgumentParsing-gTest.exe
-#	pechoHandler-gTest.exe
+	protocolArgumentParsing-gTest.exe \
+	pechoHandler-gTest.exe \
+	singletonTest.exe
 !ENDIF
 
 OBJS = \

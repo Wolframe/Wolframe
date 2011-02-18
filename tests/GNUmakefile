@@ -65,7 +65,7 @@ TEST_OBJS =
 
 TEST_CPP_BINS = \
 	threadLeakTest$(EXE) \
-	testAuth$(EXE)
+	authTest$(EXE)
 
 ifdef WITH_GTEST
 TEST_CPP_BINS += \
@@ -76,7 +76,8 @@ TEST_CPP_BINS += \
 	poolTest$(EXE) \
 	logTest$(EXE) \
 	protocolArgumentParsing-gTest$(EXE) \
-	pechoHandler-gTest$(EXE)
+	pechoHandler-gTest$(EXE) \
+	singletonTest$(EXE)
 endif
 
 include $(TOPDIR)/makefiles/gmake/sub.mk
