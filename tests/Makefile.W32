@@ -48,11 +48,11 @@ TEST_CPP_BINS = \
 	versionTest.exe \
 	counterTest.exe \
 	resolvePathTest.exe \
+	singletonTest.exe \
 	poolTest.exe \
 	logTest.exe \
 	protocolArgumentParsing-gTest.exe \
-	pechoHandler-gTest.exe \
-	singletonTest.exe
+	pechoHandler-gTest.exe
 !ENDIF
 
 OBJS = \
@@ -62,12 +62,13 @@ all: $(OBJS) $(CPP_BINS)
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 threadLeakTest.exe: threadLeakTest.obj $(TOPDIR)\src\smerp.lib
-testAuth.exe: testAuth.obj $(TOPDIR)\src\smerp.lib
+authTest.exe: authTest.obj $(TOPDIR)\src\smerp.lib
 !IFDEF WITH_GTEST
 testNamedRetVal.exe: testNamedRetVal.obj
 versionTest.exe: versionTest.obj $(TOPDIR)\src\smerp.lib
 counterTest.exe: counterTest.obj $(TOPDIR)\src\smerp.lib
 resolvePathTest.exe: resolvePathTest.obj $(TOPDIR)\src\smerp.lib
+singletonTest.exe: singletonTest.obj $(TOPDIR)\src\smerp.lib
 poolTest.exe: poolTest.obj $(TOPDIR)\src\smerp.lib
 logTest.exe: logTest.obj $(TOPDIR)\src\smerp.lib
 protocolArgumentParsing-gTest.exe: protocolArgumentParsing-gTest.obj
@@ -90,6 +91,7 @@ local_test:
 	@-echo versionTest >> test.bat
 	@-echo counterTest >> test.bat
 	@-echo resolvePathTest >> test.bat
+	@-echo singletonTest >> test.bat
 	@-echo poolTest >> test.bat
 	@-echo protocolArgumentParsing-gTest >> test.bat
 !ENDIF

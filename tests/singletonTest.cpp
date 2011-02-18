@@ -37,7 +37,9 @@ protected:
 };
 
 // Tests to check basic functionality of the singleton
-TEST_F( SingletonFixture , basic ) {
+// (implicitly tests for memory leaks in the destructor of
+// the test object)
+TEST_F( SingletonFixture, basic ) {
 	TestObject *o1 = &TestObject::instance( );
 	TestObject *o2 = &TestObject::instance( );
 	

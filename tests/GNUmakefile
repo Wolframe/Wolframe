@@ -73,11 +73,11 @@ TEST_CPP_BINS += \
 	versionTest$(EXE) \
 	counterTest$(EXE) \
 	resolvePathTest$(EXE) \
+	singletonTest$(EXE) \
 	poolTest$(EXE) \
 	logTest$(EXE) \
 	protocolArgumentParsing-gTest$(EXE) \
-	pechoHandler-gTest$(EXE) \
-	singletonTest$(EXE)
+	pechoHandler-gTest$(EXE)
 endif
 
 include $(TOPDIR)/makefiles/gmake/sub.mk
@@ -109,6 +109,8 @@ ifdef WITH_GTEST
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./counterTest
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./resolvePathTest
+	@echo
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./singletonTest
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./poolTest
 	@echo
