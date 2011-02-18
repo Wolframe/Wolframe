@@ -486,5 +486,15 @@ PAM_LIBS ?= -lpam
 endif
 endif
 
+# Fedora 14
+ifeq "$(LINUX_DIST)" "redhat"
+ifeq "$(LINUX_REV)" "14"
+PAM_DIR ?= /usr
+PAM_INCLUDE_DIR ?= $(PAM_DIR)/include
+PAM_LIB_DIR ?= /lib
+PAM_LIBS ?= -lpam
+endif
+endif
+
 endif
 endif
