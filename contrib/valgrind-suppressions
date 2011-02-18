@@ -11,3 +11,14 @@
    fun:_ZN5boost6detail25get_once_per_thread_epochEv
    ...
 }
+
+# POSIX getpass is a deprecated function, which also leaks
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:malloc
+   fun:getdelim
+   fun:getpass
+   fun:_ZN6_SMERP14Authentication11getPasswordEv
+   ...
+}
