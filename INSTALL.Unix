@@ -98,7 +98,7 @@ For building the documentation you need 'xsltproc', 'docbook-xsl' and 'doxygen'.
 OpenSuSe 11.3
 -------------
 
-Optional packages: qt-devel (4.6.3)
+Optional packages: qt-devel (4.6.3), pam-devel (1.1.1)
 
 boost is 1.42, only missing some new filesystem stuff, but you'll have to
 compile your own one.

@@ -496,5 +496,12 @@ PAM_LIBS ?= -lpam
 endif
 endif
 
+ifeq "$(LINUX_DIST)" "suse"
+PAM_DIR ?= /usr
+PAM_INCLUDE_DIR ?= $(PAM_DIR)/include
+PAM_LIB_DIR ?= /lib
+PAM_LIBS ?= -lpam
+endif
+
 endif
 endif
