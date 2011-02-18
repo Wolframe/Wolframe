@@ -7,7 +7,6 @@ MBa:
 ABa:
 
 - authentication
-  - test singleton especially memory management
   - make authentication leak free
   - LDAP
   - AD/Windows Kerberos

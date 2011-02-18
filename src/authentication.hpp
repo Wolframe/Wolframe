@@ -14,6 +14,8 @@
 namespace _SMERP {
 	namespace Authentication {
 
+// the list of available authentication methods
+// (TODO: make this dynamic and in modules)
 class Mech {
 public:
 	enum AuthMech {
@@ -41,6 +43,7 @@ public:
 	static AuthMech str2AuthMech( const std::string s );
 };
 
+// the basic steps the authenticator can be in
 class Step {
 public:
 	enum AuthStep {
@@ -51,14 +54,37 @@ public:
 	};
 };
 
+// virtual base for all authentication methods
 class Authenticator {		
 	public:
+		virtual ~Authenticator( ) { }
+		
+		// get next step in authentication
 		virtual Step::AuthStep nextStep( ) = 0;
-		virtual std::string sendData( ) = 0;
+
+		// used when sending or receiving to indicate
+		// the kind of data the Authenticator expects
+		// (e.g. "login", "password", "md5")
 		virtual std::string token( ) = 0;
+		
+		// the authenticator wants us to send out data
+		// (for instance a challenge). The message has
+		// to be send to the client
+		//
+		// token() gives you the kind of data (which
+		// depends on the authentication method)
+		virtual std::string sendData( ) = 0;
+		
+		// the authenticator can't continue without getting
+		// some data (for instance we need a password)
+		//
+		// token() indicates the kind of data the authenticator
+		// expects (depends on the authentication method)
 		virtual void receiveData( const std::string data ) = 0;
 };
 
+// a factory returning us an authenticator for a given authentication
+// method (indicated by a speaking string like 'PAM')
 class AuthenticatorFactory : public Singleton< AuthenticatorFactory> {
 	private:
 		std::map<std::string, Authenticator *> m_authenticators;
@@ -66,11 +92,15 @@ class AuthenticatorFactory : public Singleton< AuthenticatorFactory> {
 	public:
 		AuthenticatorFactory( );
 		virtual ~AuthenticatorFactory( );
+		
+		// get a specific authenticator identified by method
 		Authenticator* getAuthenticator( const std::string method );
+		
+		// get the list of all currently available authentication methods
 		std::vector<std::string> getAvailableMechs( );
 };
 
-// map enum values to strings
+// map authentication method enum values to strings
 template< typename CharT, typename TraitsT >
 inline std::basic_ostream< CharT, TraitsT > &operator<< ( std::basic_ostream< CharT, TraitsT >& s, Mech::AuthMech f )
 {

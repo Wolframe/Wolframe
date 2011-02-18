@@ -9,13 +9,16 @@
    Memcheck:Leak
    fun:malloc
    fun:_ZN5boost6detail25get_once_per_thread_epochEv
-   fun:_ZN5boost9call_onceIPFvvEEEvRNS_9once_flagET_.clone.3
-   fun:_ZN5boost6detail23get_current_thread_dataEv
-   fun:_ZN5boost11this_thread20interruption_enabledEv
-   fun:_ZN5boost11this_thread20disable_interruptionC1Ev
-   fun:_ZN5boost12shared_mutex4lockEv
-   fun:_ZN5boost10lock_guardINS_12shared_mutexEEC1ERS1_
-   fun:_ZN5boost12thread_group13create_threadIPFvvEEEPNS_6threadET_
-   fun:main
+   ...
 }
 
+# POSIX getpass is a deprecated function, which also leaks
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:malloc
+   fun:getdelim
+   fun:getpass
+   fun:_ZN6_SMERP14Authentication11getPasswordEv
+   ...
+}

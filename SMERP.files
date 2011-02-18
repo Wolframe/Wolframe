@@ -238,3 +238,4 @@ examples/echo/smerp-echo.conf
 tests/testAuth.cpp
 src/authentication_textfile.hpp
 src/authentication_textfile.cpp
+tests/singletonTest.cpp

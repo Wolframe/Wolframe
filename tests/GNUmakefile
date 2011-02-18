@@ -65,7 +65,7 @@ TEST_OBJS =
 
 TEST_CPP_BINS = \
 	threadLeakTest$(EXE) \
-	testAuth$(EXE)
+	authTest$(EXE)
 
 ifdef WITH_GTEST
 TEST_CPP_BINS += \
@@ -73,6 +73,7 @@ TEST_CPP_BINS += \
 	versionTest$(EXE) \
 	counterTest$(EXE) \
 	resolvePathTest$(EXE) \
+	singletonTest$(EXE) \
 	poolTest$(EXE) \
 	logTest$(EXE) \
 	protocolArgumentParsing-gTest$(EXE) \
@@ -108,6 +109,8 @@ ifdef WITH_GTEST
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./counterTest
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./resolvePathTest
+	@echo
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./singletonTest
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./poolTest
 	@echo
