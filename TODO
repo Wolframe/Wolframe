@@ -6,6 +6,12 @@ MBa:
 
 ABa:
 
+- authentication
+  - test singleton especially memory management
+  - make authentication leak free
+  - LDAP
+  - AD/Windows Kerberos
+  - SASL
 - makefiles
   - merge po stuff from WolfBones with the funny script in po :-)
 - logger
