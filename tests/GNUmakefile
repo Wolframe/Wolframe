@@ -82,7 +82,7 @@ endif
 
 include $(TOPDIR)/makefiles/gmake/sub.mk
 
-testAuth: $(TOPDIR)/src/libsmerp.a
+authTest: $(TOPDIR)/src/libsmerp.a
 
 ifdef WITH_GTEST
 pechoHandler-gTest$(EXE): pechoHandler-gTest.o $(TOPDIR)/src/libsmerp.a $(TOPDIR)/examples/pecho/pechoHandler.o $(TOPDIR)/src/protocol_ioblocks.o

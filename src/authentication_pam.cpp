@@ -235,11 +235,11 @@ Step::AuthStep PAMAuthenticator::nextStep( )
 				return Step::_SMERP_AUTH_STEP_FAIL;
 		
 		case _SMERP_PAM_STATE_ERROR:
-			m_state = _SMERP_PAM_STATE_NEED_LOGIN;
+			(void)pam_end( m_appdata.h, rc );
 			m_appdata.h = NULL;
 			m_appdata.has_pass = false;
 			m_appdata.pass = "";
-			(void)pam_end( m_appdata.h, rc );
+			m_state = _SMERP_PAM_STATE_NEED_LOGIN;
 			return Step::_SMERP_AUTH_STEP_FAIL;
 			
 		case _SMERP_PAM_STATE_NEED_PASS:

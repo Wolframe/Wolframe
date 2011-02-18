@@ -5,7 +5,7 @@
 # https://bugzilla.redhat.com/show_bug.cgi?id=627875
 # https://bugzilla.redhat.com/show_bug.cgi?id=629673
 {
-   <insert_a_suppression_name_here>
+   Boost-threads, posix thread desctructors never called
    Memcheck:Leak
    fun:malloc
    fun:_ZN5boost6detail25get_once_per_thread_epochEv
@@ -14,11 +14,24 @@
 
 # POSIX getpass is a deprecated function, which also leaks
 {
-   <insert_a_suppression_name_here>
+   POSIX getpass leak
    Memcheck:Leak
    fun:malloc
    fun:getdelim
    fun:getpass
    fun:_ZN6_SMERP14Authentication11getPasswordEv
+   ...
+}
+
+# PAM modules call shared library object, those leak in
+# libdl, which is normal
+{
+   dynamically loaded PAM modules leak in libdl
+   Memcheck:Leak
+   fun:calloc
+   ...
+   fun:dlopen
+   ...
+   fun:pam_start
    ...
 }

@@ -35,7 +35,7 @@ class PAMAuthenticator : public Authenticator {
 	private:
 		std::string m_service;
 
-		
+		// states of the authenticator state machine
 		enum {
 			_SMERP_PAM_STATE_NEED_LOGIN,
 			_SMERP_PAM_STATE_HAS_LOGIN,
