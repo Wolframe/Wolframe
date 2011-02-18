@@ -121,6 +121,6 @@ Archlinux
 ---------
 
 Required packages: boost and boost-libs
-Optional packages: openssl, lua, qt, gtest (from the AUR) 
+Optional packages: openssl, lua, qt, gtest (from the AUR), pam
 
 For building the documentation you need 'xsltproc', 'docbook-xsl' and 'doxygen'.
