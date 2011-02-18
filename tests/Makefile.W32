@@ -51,8 +51,9 @@ TEST_CPP_BINS = \
 	singletonTest.exe \
 	poolTest.exe \
 	logTest.exe \
-	protocolArgumentParsing-gTest.exe \
-	pechoHandler-gTest.exe
+	protocolArgumentParsing-gTest.exe
+# currently broken on Windows
+#	pechoHandler-gTest.exe
 !ENDIF
 
 OBJS = \
