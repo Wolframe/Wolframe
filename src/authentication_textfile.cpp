@@ -83,5 +83,10 @@ void TextFileAuthenticator::receiveData( SMERP_UNUSED const std::string data )
 	}
 }
 
+std::string TextFileAuthenticator::getError( )
+{
+	return "";
+}
+
 } // namespace Authentication
 } // namespace _SMERP

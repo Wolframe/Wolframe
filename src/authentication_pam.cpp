@@ -194,26 +194,23 @@ Step::AuthStep PAMAuthenticator::nextStep( )
 				m_state = _SMERP_PAM_STATE_NEED_PASS;
 				return Step::_SMERP_AUTH_STEP_RECV_DATA;
 			} else if( rc != PAM_SUCCESS ) {
-				m_token = "message";
 				std::ostringstream ss;
 				ss	<< "pam_authenticate failed with service " << m_service << ": "
 					<< pam_strerror( m_appdata.h, rc ) << " (" << rc << ")";
-				m_data = ss.str( );
+				m_error = ss.str( );
 				m_state = _SMERP_PAM_STATE_ERROR;
-				return Step::_SMERP_AUTH_STEP_SEND_DATA;
+				return Step::_SMERP_AUTH_STEP_GET_ERROR;
 			}
 
 // is access to the account permitted?
 			rc = pam_acct_mgmt( m_appdata.h, 0 );
 			if( rc != PAM_SUCCESS ) {
-				m_token = "message";
 				std::ostringstream ss;
 				ss	<< "pam_acct_mgmt failed with service " << m_service << ": "
 					<< pam_strerror( m_appdata.h, rc ) << " (" << rc << ")";
-				m_data = ss.str( );
+				m_error = ss.str( );
 				m_state = _SMERP_PAM_STATE_ERROR;
-				return Step::_SMERP_AUTH_STEP_SEND_DATA;
-
+				return Step::_SMERP_AUTH_STEP_GET_ERROR;
 			}
 
 // terminate PAM session with last exit code
@@ -305,6 +302,11 @@ void PAMAuthenticator::receiveData( SMERP_UNUSED const std::string data )
 			throw new std::runtime_error( "Unknown state in PAMAuthenticator::receiveData!" );
 			break;
 	}
+}
+
+std::string PAMAuthenticator::getError( )
+{
+	return m_error;
 }
 
 } // namespace Authentication

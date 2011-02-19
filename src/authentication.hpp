@@ -50,7 +50,8 @@ public:
 		_SMERP_AUTH_STEP_SUCCESS,		/// successful authentication
 		_SMERP_AUTH_STEP_FAIL,			/// authentication failed
 		_SMERP_AUTH_STEP_SEND_DATA,		/// we need to send some data
-		_SMERP_AUTH_STEP_RECV_DATA		/// we require some data
+		_SMERP_AUTH_STEP_RECV_DATA,		/// we require some data
+		_SMERP_AUTH_STEP_GET_ERROR		/// error occurred
 	};
 };
 
@@ -81,6 +82,10 @@ class Authenticator {
 		// token() indicates the kind of data the authenticator
 		// expects (depends on the authentication method)
 		virtual void receiveData( const std::string data ) = 0;
+
+		// we got an error (which usually should be logged only,
+		// not sent to the client)
+		virtual std::string getError( ) = 0;
 };
 
 // a factory returning us an authenticator for a given authentication

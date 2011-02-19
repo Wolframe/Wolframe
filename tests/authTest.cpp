@@ -50,10 +50,6 @@ int main( int argc, const char *argv[] )
 			string token = a->token( );
 			string data = a->sendData( );
 
-// an error messages			
-			if( token == "message" )
-				cerr << "ERROR: " << data << endl;
-			
 // the authenticate needs some specific input from the client
 		} else if( step == Step::_SMERP_AUTH_STEP_RECV_DATA ) {
 			string token = a->token( );
@@ -70,8 +66,11 @@ int main( int argc, const char *argv[] )
 				cerr << "authenticator requests unknown token '" << token << "'" << endl;
 				return 1;
 			}
-		}
 
+// an error occurred, get error message and print it
+		} else if( step == Step::_SMERP_AUTH_STEP_GET_ERROR ) {
+			cerr << "ERROR: " << a->getError( ) << endl;
+		}
 // next step
 		step = a->nextStep( );
 	}

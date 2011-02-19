@@ -47,6 +47,7 @@ class PAMAuthenticator : public Authenticator {
 		pam_appdata m_appdata;
 		std::string m_token;
 		std::string m_data;
+		std::string m_error;
 		struct pam_conv m_conv;
 		
 	public:
@@ -55,6 +56,7 @@ class PAMAuthenticator : public Authenticator {
 		virtual std::string sendData( );
 		virtual std::string token( );
 		virtual void receiveData( const std::string data );
+		virtual std::string getError( );
 };
 
 } // namespace Authentication

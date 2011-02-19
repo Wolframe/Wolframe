@@ -33,6 +33,7 @@ class TextFileAuthenticator : public Authenticator {
 		virtual std::string sendData( );
 		virtual std::string token( );
 		virtual void receiveData( const std::string data );
+		virtual std::string getError( );
 };
 
 } // namespace Authentication
