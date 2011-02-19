@@ -17,6 +17,11 @@
 namespace _SMERP {
 	namespace Authentication {
 
+Authenticator *CreatePAMAuthenticator( )
+{
+	return new PAMAuthenticator( "smerp" );	
+}
+
 PAMAuthenticator::PAMAuthenticator( const std::string _service )
 	: m_service( _service )
 {

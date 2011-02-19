@@ -12,6 +12,11 @@
 namespace _SMERP {
 	namespace Authentication {
 
+Authenticator *CreateTextFileAuthenticator( )
+{
+	return new TextFileAuthenticator( "passwd" );	
+}
+
 TextFileAuthenticator::TextFileAuthenticator( SMERP_UNUSED const std::string _filename )
 {
 	m_state = _SMERP_TEXTFILE_STATE_NEED_LOGIN;

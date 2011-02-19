@@ -13,6 +13,8 @@
 namespace _SMERP {
 	namespace Authentication {
 
+Authenticator *CreateTextFileAuthenticator( );
+
 class TextFileAuthenticator : public Authenticator {
 	private:
 		std::map< std::string, std::string > m_creds;

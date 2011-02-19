@@ -31,6 +31,8 @@ extern "C" void null_and_free(	int nmsg, struct pam_response *pr );
 extern "C" int pam_conv_func(	int nmsg, const struct pam_message **msg,
 				struct pam_response **reply, void *appdata_ptr );
 
+Authenticator *CreatePAMAuthenticator( );
+
 class PAMAuthenticator : public Authenticator {
 	private:
 		std::string m_service;

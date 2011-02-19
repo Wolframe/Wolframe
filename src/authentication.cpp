@@ -39,15 +39,15 @@ Mech::AuthMech str2AuthMech( const std::string s )
 
 AuthenticatorFactory::AuthenticatorFactory( )
 {
+// register some authentication methods
+	registerAuthenticator( "TEXT_FILE", CreateTextFileAuthenticator );
+#ifdef WITH_PAM
+	registerAuthenticator( "PAM", CreatePAMAuthenticator );
+#endif
 	// TODO: register over loadable module loader and a register function
 	// with creation functors, but later :-)
 	
 	// TODO: where to get parameters for creation from outside?
-	
-	m_authenticators.insert( std::make_pair<std::string, Authenticator *>( "TEXT_FILE", new TextFileAuthenticator( "creds.conf" ) ) );
-#ifdef WITH_PAM
-	m_authenticators.insert( std::make_pair<std::string, Authenticator *>( "PAM", new PAMAuthenticator( "smerp" ) ) );
-#endif
 }
 
 AuthenticatorFactory::~AuthenticatorFactory( )
@@ -55,6 +55,15 @@ AuthenticatorFactory::~AuthenticatorFactory( )
 	std::map<std::string, Authenticator *>::iterator it;
 	for( it = m_authenticators.begin( ); it != m_authenticators.end( ); it++ )
 		delete it->second;
+}
+
+void AuthenticatorFactory::registerAuthenticator( std::string _method, CreateAuthenticatorFunc _createf )
+{
+	m_authenticators.insert( std::make_pair<std::string, Authenticator *>( _method, _createf( ) ) );
+}
+		
+void AuthenticatorFactory::unregisterAuthenticator( std::string _method )
+{
 }
 
 Authenticator* AuthenticatorFactory::getAuthenticator( const std::string method )

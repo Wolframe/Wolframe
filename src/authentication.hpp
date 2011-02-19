@@ -56,7 +56,7 @@ public:
 };
 
 // virtual base for all authentication methods
-class Authenticator {		
+class Authenticator {	
 	public:
 		virtual ~Authenticator( ) { }
 		
@@ -91,12 +91,19 @@ class Authenticator {
 // a factory returning us an authenticator for a given authentication
 // method (indicated by a speaking string like 'PAM')
 class AuthenticatorFactory : public Singleton< AuthenticatorFactory> {
+	public:
+		typedef Authenticator* (*CreateAuthenticatorFunc)( );
+		
 	private:
 		std::map<std::string, Authenticator *> m_authenticators;
 
 	public:
 		AuthenticatorFactory( );
 		virtual ~AuthenticatorFactory( );
+		
+		void registerAuthenticator( std::string _method, CreateAuthenticatorFunc _createf );
+		
+		void unregisterAuthenticator( std::string _method );
 		
 		// get a specific authenticator identified by method
 		Authenticator* getAuthenticator( const std::string method );
