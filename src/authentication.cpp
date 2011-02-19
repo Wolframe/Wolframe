@@ -64,6 +64,7 @@ void AuthenticatorFactory::registerAuthenticator( std::string _method, CreateAut
 		
 void AuthenticatorFactory::unregisterAuthenticator( std::string _method )
 {
+	m_authenticators.erase( _method );
 }
 
 Authenticator* AuthenticatorFactory::getAuthenticator( const std::string method )
