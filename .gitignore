@@ -33,10 +33,11 @@ tests/pechoHandler-gTest
 tests/protocolArgumentParsing-gTest
 tests/poolTest
 tests/resolvePathTest
-tests/testAuth
+tests/authTest
 examples/echo/smerp-echo
 examples/pecho/smerp-pecho
 examples/xmlselect/smerp-xmlselect
+examples/mtproc/smerp-mtproc
 examples/lua/smerp-lua
 clients/qt/qtclient
 moc_*.cpp
