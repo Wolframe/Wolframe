@@ -218,7 +218,7 @@ CommandDispatcher::IOState CommandDispatcher::call( int& returnCode)
    return Close;
 }
 
-const char* CommandDispatcher::getCaps()
+const char* CommandDispatcher::getCapabilities()
 {
    m_lineBuffer.init();
    unsigned int ii;

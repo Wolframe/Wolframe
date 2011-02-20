@@ -29,7 +29,6 @@ struct Connection::Private
       Init,
       EnterCommand,
       EmptyLine,
-      ProcessingAfterWrite,
       Processing,
       ProtocolError,
       DiscardInput,
@@ -37,7 +36,7 @@ struct Connection::Private
    };
    static const char* stateName( State i)
    {
-      static const char* ar[] = {"Init","EnterCommand","EmptyLine","ProcessingAfterWrite","Processing","ProtocolError","CommandError","Terminate"};
+      static const char* ar[] = {"Init","EnterCommand","EmptyLine","Processing","ProtocolError","CommandError","Terminate"};
       return ar[i];
    }
 
@@ -54,7 +53,6 @@ struct Connection::Private
    //3. Iterators
    InputIterator itr;                         //< iterator to scan protocol input
    InputIterator end;                         //< iterator pointing to end of message buffer
-   bool gotEoD;
    
    //3. implementation
    Method::Data object;
@@ -87,8 +85,7 @@ struct Connection::Private
        {
           Input::iterator eoD = input.getEoD( itr);
           end = input.end();
-          gotEoD = (eoD < end);
-          commandDispatcher.protocolInput( itr, eoD, gotEoD);
+          commandDispatcher.protocolInput( itr, eoD, input.gotEoD());
           itr = eoD+1;
        }
        else if (state == DiscardInput)
@@ -98,12 +95,10 @@ struct Connection::Private
           end = input.end();
           if (eoD < end)
           {
-             gotEoD = true;
              itr = eoD+1;
           }
           else
           {
-             gotEoD = false;
              itr = end;
           }
        }
@@ -119,7 +114,7 @@ struct Connection::Private
    }
 
    //* interface
-   Private( unsigned int inputBufferSize, unsigned int outputBufferSize)   :state(Init),input(inputBufferSize),output(outputBufferSize),gotEoD(false)
+   Private( unsigned int inputBufferSize, unsigned int outputBufferSize)   :state(Init),input(inputBufferSize),output(outputBufferSize)
    {
        itr = input.begin();
        end = input.end();
@@ -155,7 +150,7 @@ struct Connection::Private
                    case CommandDispatcher::caps:
                    {
                       state = EmptyLine;
-                      return WriteLine( "OK", commandDispatcher.getCaps());
+                      return WriteLine( "OK", commandDispatcher.getCapabilities());
                    }
                    case CommandDispatcher::quit:
                    {
@@ -164,7 +159,6 @@ struct Connection::Private
                    }
                    case CommandDispatcher::method:
                    {
-                      gotEoD = false;
                       input.resetEoD();
                       state = Processing;
                       continue;
@@ -213,14 +207,6 @@ struct Connection::Private
                }
             }
 
-            case ProcessingAfterWrite:
-            {
-                //do processing but first release the output buffer content that has been written in the processing state:
-                state = Processing;
-                commandDispatcher.setOutputBuffer( output.ptr(), output.size());
-                continue;
-            }
-
             case Processing:
             {
                 int returnCode = 0;
@@ -235,13 +221,17 @@ struct Connection::Private
                    {
                       void* content;
                       unsigned int contentsize;
-                      state = ProcessingAfterWrite;
-                      if (!commandDispatcher.getOutput( &content, &contentsize))
+                      bool hasOutput = commandDispatcher.getOutput( &content, &contentsize);
+                      commandDispatcher.setOutputBuffer( output.ptr(), output.size());
+
+                      if (!hasOutput)
                       {
-                         commandDispatcher.setOutputBuffer( output.ptr(), output.size());
                          continue;
                       }
-                      return Network::SendData( content, contentsize);
+                      else
+                      {
+                         return Network::SendData( content, contentsize);
+                      }
                    }
                    case CommandDispatcher::Close:
                    {
@@ -254,7 +244,7 @@ struct Connection::Private
                       }
                       else
                       {
-                         state = (gotEoD)?Init:DiscardInput;
+                         state = (input.gotEoD())?Init:DiscardInput;
                          return WriteLine( "\r\n.\r\nOK");
                       }
                    }
@@ -263,11 +253,10 @@ struct Connection::Private
 
             case DiscardInput:
             {
-               if (gotEoD)
+               if (input.gotEoD())
                {
                   state = Init;
                   input.resetEoD();
-                  gotEoD = false;
                   continue;
                }
                else

@@ -82,6 +82,7 @@ public:
    //end of data calculation and markup
    iterator getEoD( iterator start);
    void resetEoD()                                      {m_eodState=EoD::SRC;}
+   bool gotEoD() const                                  {return m_eodState>=EoD::LF_DOT_CR;}
 
 private:
    EoD::State m_eodState;
