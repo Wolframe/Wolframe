@@ -75,6 +75,28 @@ void CommandDispatcher::protocolInput( protocol::InputBlock::iterator& start, pr
    }
 }
 
+bool CommandDispatcher::getOutput( void** output, unsigned int* outputsize)
+{
+   if (!m_context.output) return false;
+   if (!m_context.output->pos()) return false;
+   *output = m_context.output->ptr();
+   *outputsize = m_context.output->pos();
+   return true;
+}
+
+void CommandDispatcher::setOutputBuffer( void* buf, unsigned int bufsize)
+{
+   if (m_context.output)
+   {
+      m_context.output->init( buf, bufsize);
+   }
+   else
+   {
+      LOG_ERROR << "illegal state: declare output buffer without format output object existing";
+      throw (IllegalState());
+   }
+}
+
 CommandDispatcher::CommandDispatcher( Instance* instance)
    :m_argBuffer( &m_lineBuffer)
 {
@@ -164,12 +186,31 @@ CommandDispatcher::IOState CommandDispatcher::call( int& returnCode)
                   return Close;
 
                case protocol::Generator::EndOfInput:
-                  resetCommand();
-                  return Close;
+                  if (m_context.output && m_context.output->pos())
+                  {
+                     return WriteOutput;
+                  }
+                  else
+                  {
+                     resetCommand();
+                     return Close;
+                  }
 
                case protocol::Generator::EndOfMessage:
                   m_state = WaitForInput;
                   return ReadInput;
+            }
+         }
+         else
+         {
+            if (m_context.output && m_context.output->pos())
+            {
+               return WriteOutput;
+            }
+            else
+            {
+               resetCommand();
+               return Close;
             }
          }
       }
@@ -177,7 +218,7 @@ CommandDispatcher::IOState CommandDispatcher::call( int& returnCode)
    return Close;
 }
 
-const char* CommandDispatcher::getCaps()
+const char* CommandDispatcher::getCapabilities()
 {
    m_lineBuffer.init();
    unsigned int ii;

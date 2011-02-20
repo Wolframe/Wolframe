@@ -26,19 +26,17 @@ struct Connection::Private
    //list of processor states
    enum State
    {
-      Init,
-      EnterCommand,
-      EmptyLine,
-      ProcessingAfterWrite,
-      Processing,
-      ProtocolError,
-      DiscardInput,
-      CommandOk,
-      Terminate
+      Init,                     //< start state, called first time in this session
+      EnterCommand,             //< parse command
+      EmptyLine,                //< looking if rest of line is empty
+      Processing,               //< running the dispatcher sub state machine; execute a command
+      ProtocolError,            //< a protocol error (bad command etc) appeared and the rest of the line has to be discarded
+      DiscardInput,             //< reading and discarding data until end of data has been seen
+      Terminate                 //< terminate processing (close for network)
    };
    static const char* stateName( State i)
    {
-      static const char* ar[] = {"Init","EnterCommand","EmptyLine","ProcessingAfterWrite","Processing","ProtocolError","CommandError","CommandOk","Terminate"};
+      static const char* ar[] = {"Init","EnterCommand","EmptyLine","Processing","ProtocolError","CommandError","Terminate"};
       return ar[i];
    }
 
@@ -55,7 +53,6 @@ struct Connection::Private
    //3. Iterators
    InputIterator itr;                         //< iterator to scan protocol input
    InputIterator end;                         //< iterator pointing to end of message buffer
-   bool gotEoD;
    
    //3. implementation
    Method::Data object;
@@ -88,8 +85,7 @@ struct Connection::Private
        {
           Input::iterator eoD = input.getEoD( itr);
           end = input.end();
-          gotEoD = (eoD < end);
-          commandDispatcher.protocolInput( itr, eoD, gotEoD);
+          commandDispatcher.protocolInput( itr, eoD, input.gotEoD());
           itr = eoD+1;
        }
        else if (state == DiscardInput)
@@ -99,12 +95,10 @@ struct Connection::Private
           end = input.end();
           if (eoD < end)
           {
-             gotEoD = true;
              itr = eoD+1;
           }
           else
           {
-             gotEoD = false;
              itr = end;
           }
        }
@@ -120,7 +114,7 @@ struct Connection::Private
    }
 
    //* interface
-   Private( unsigned int inputBufferSize, unsigned int outputBufferSize)   :state(Init),input(inputBufferSize),output(outputBufferSize),gotEoD(false)
+   Private( unsigned int inputBufferSize, unsigned int outputBufferSize)   :state(Init),input(inputBufferSize),output(outputBufferSize)
    {
        itr = input.begin();
        end = input.end();
@@ -156,7 +150,7 @@ struct Connection::Private
                    case CommandDispatcher::caps:
                    {
                       state = EmptyLine;
-                      return WriteLine( "OK", commandDispatcher.getCaps());
+                      return WriteLine( "OK", commandDispatcher.getCapabilities());
                    }
                    case CommandDispatcher::quit:
                    {
@@ -165,7 +159,6 @@ struct Connection::Private
                    }
                    case CommandDispatcher::method:
                    {
-                      gotEoD = false;
                       input.resetEoD();
                       state = Processing;
                       continue;
@@ -214,14 +207,6 @@ struct Connection::Private
                }
             }
 
-            case ProcessingAfterWrite:
-            {
-                //do processing but first release the output buffer content that has been written in the processing state:
-                state = Processing;
-                output.release();
-                continue;
-            }
-
             case Processing:
             {
                 int returnCode = 0;
@@ -234,11 +219,19 @@ struct Connection::Private
                    }
                    case CommandDispatcher::WriteOutput:
                    {
-                      state = ProcessingAfterWrite;
-                      void* content = output.ptr();
-                      std::size_t size = output.pos();
-                      if (size == 0) continue;
-                      return Network::SendData( content, size);
+                      void* content;
+                      unsigned int contentsize;
+                      bool hasOutput = commandDispatcher.getOutput( &content, &contentsize);
+                      commandDispatcher.setOutputBuffer( output.ptr(), output.size());
+
+                      if (!hasOutput)
+                      {
+                         continue;
+                      }
+                      else
+                      {
+                         return Network::SendData( content, contentsize);
+                      }
                    }
                    case CommandDispatcher::Close:
                    {
@@ -251,29 +244,19 @@ struct Connection::Private
                       }
                       else
                       {
-                         state = CommandOk;
-                         void* content = output.ptr();
-                         std::size_t size = output.pos();
-                         if (size == 0) continue;
-                         return Network::SendData( content, size);
+                         state = (input.gotEoD())?Init:DiscardInput;
+                         return WriteLine( "\r\n.\r\nOK");
                       }
                    }
                 }
             }
 
-            case CommandOk:
-            {
-               state = (gotEoD)?Init:DiscardInput;
-               return WriteLine( "\r\n.\r\nOK");
-            }
-
             case DiscardInput:
             {
-               if (gotEoD)
+               if (input.gotEoD())
                {
                   state = Init;
                   input.resetEoD();
-                  gotEoD = false;
                   continue;
                }
                else

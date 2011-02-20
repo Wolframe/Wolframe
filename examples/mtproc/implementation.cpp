@@ -6,11 +6,18 @@ using namespace _SMERP::mtproc;
 int Method::Data::echo( Context* ctx, unsigned int, const char**)
 {
    if (!ctx->contentIterator) ctx->contentIterator = new protocol::Generator( generator::CharIsoLatin1::GetNext);
+   if (!ctx->output) ctx->output = new protocol::FormatOutput( generator::CharIsoLatin1::Print);
+   char ch;
+   while (ctx->contentIterator->getNext( &ch, 1)) 
+   {
+      if (!ctx->output->print( 0, &ch, 1)) return 0;
+   }
    return 0;
 }
 
-int Method::Data::printarg( Context*, unsigned int, const char**)
+int Method::Data::printarg( Context* ctx, unsigned int, const char**)
 {
+   if (!ctx->output) ctx->output = new protocol::FormatOutput( generator::CharIsoLatin1::Print);
    return 0;
 }
 

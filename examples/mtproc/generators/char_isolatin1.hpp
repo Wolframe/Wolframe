@@ -10,6 +10,7 @@ namespace generator {
 struct CharIsoLatin1
 {
    typedef protocol::Generator Generator;
+   typedef protocol::FormatOutput FormatOutput;
 
    enum ErrorCodes {Ok=0,ErrBufferTooSmall=1};
    static bool GetNext( Generator* this_, void* buffer, unsigned int buffersize)
@@ -32,6 +33,23 @@ struct CharIsoLatin1
          this_->setState( Generator::Processing, Ok);
          *(char*)buffer = *in;
          this_->skip( 1);
+         return true;
+      }
+   }
+
+   static bool Print( FormatOutput* this_, int, void* element, unsigned int elementsize)
+   {
+      char* out = (char*)this_->cur();
+      unsigned int nn = this_->restsize();
+
+      if (elementsize > nn)
+      {
+         return false;
+      }
+      else
+      {
+         *out = *(char*)element;
+         this_->incr( 1);
          return true;
       }
    }

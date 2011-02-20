@@ -18,12 +18,12 @@ private:
 
    enum State
    {
-      Null,
-      Init,
-      Selected,
-      ArgumentsParsed,
-      Running,
-      WaitForInput
+      Null,                    //< not instantiated yet
+      Init,                    //< object and method table have been initialized
+      Selected,                //< command has been parsed
+      ArgumentsParsed,         //< command arguments have been parsed
+      Running,                 //< running command, interrupted by a yield 
+      WaitForInput             //< running and waiting for input
    };
    typedef protocol::CmdBuffer CmdBuffer;                    //< buffer type for protocol commands
    typedef protocol::CmdParser<CmdBuffer> ProtocolParser;    //< parser type for the protocol
@@ -67,8 +67,11 @@ public:
    //pass a protocol data input chunk to the processors generator function
    void protocolInput( protocol::InputBlock::iterator& start, protocol::InputBlock::iterator& end, bool eoD);
 
+   bool getOutput( void** output, unsigned int* outputsize);
+   void setOutputBuffer( void* buf, unsigned int bufsize);
+
    //get the capabilities message
-   const char* getCaps();
+   const char* getCapabilities();
 };
 
 }}//namespace
