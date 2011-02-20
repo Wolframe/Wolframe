@@ -4,10 +4,11 @@
 
 #include "authentication_textfile.hpp"
 
-#include <stdexcept>
+#include <boost/algorithm/string.hpp>
 
-#include "unused.h"
-#include <utility>
+#include <stdexcept>
+#include <fstream>
+#include <iostream>
 
 namespace _SMERP {
 	namespace Authentication {
@@ -19,12 +20,26 @@ Authenticator *CreateTextFileAuthenticator( AuthenticatorFactory::properties pro
 	);
 }
 
-TextFileAuthenticator::TextFileAuthenticator( SMERP_UNUSED const std::string _filename )
+TextFileAuthenticator::TextFileAuthenticator( const std::string _filename )
 {
+	std::ifstream f;
+	
+	f.open( _filename.c_str( ), std::ifstream::in );
+	if( f.good( ) ) {
+		while( !f.eof( ) ) {
+			char line[256];
+			f.getline( line, 255 );
+			std::vector<std::string> v;
+			split( v, line, boost::is_any_of( "\t" ) );
+			if( v.size( ) == 2 ) {
+				std::cout << line << " -> " << v.size( ) << std::endl;
+				m_creds.insert( std::make_pair<std::string, std::string>( v[0], v[1] ) );
+			}
+		}
+		f.close( );
+	}
+	
 	m_state = _SMERP_TEXTFILE_STATE_NEED_LOGIN;
-
-	// TODO: read file here
-	m_creds.insert( std::make_pair<std::string, std::string>( "abaumann", "xx" ) );
 }
 
 Step::AuthStep TextFileAuthenticator::nextStep( )
@@ -70,7 +85,7 @@ std::string TextFileAuthenticator::token( )
 	return m_token;
 }
 
-void TextFileAuthenticator::receiveData( SMERP_UNUSED const std::string data )
+void TextFileAuthenticator::receiveData( const std::string data )
 {
 	switch( m_state ) {
 		case _SMERP_TEXTFILE_STATE_NEED_LOGIN:

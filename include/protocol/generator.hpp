@@ -13,58 +13,78 @@ namespace protocol {
 // - different levels of source transformation and filtering (for example XML Path selection and charset mapping)
 // - state handling for different action of the protocol handler in yield
 
-//interface for (non copyable, non STL conform) iterator over input content elements
-class Generator
+//@example generator function in C for the processor:
+//
+//bool nativeGeneratorCall( Generator* g, const void* b, unsigned int* n)
+//{
+//   if (!g->getNext( b, n)) 
+//   {
+//      if (g->state() == Generator::EndOfInput) return false;
+//      nativeCallYield();
+//   }
+//   return true;
+//}
+
+//interface for (non STL conform) iterator over input content elements
+struct Generator
 {
-   public:            
-      //the client of the generator decides when and how he wants to yield according this state.
-      enum State
-      {
-         Init,           //after initialization
-         Processing,     //processing
-         EndOfMessage,   //EWOULDBLK -> have to yield
-         EndOfInput,     //EOF
-         Error           //an error occurred
-      };
+   enum State
+   {
+      Init,           //after initialization
+      Processing,     //processing
+      EndOfMessage,   //EWOULDBLK -> have to yield
+      EndOfInput,     //EOF
+      Error           //an error occurred
+   };
+   //Get next element call
+   typedef bool (*GetNext)( Generator* this_, void* buffer, unsigned int buffersize);
 
-      Generator()                                                 :m_state(Init){}      
-      State state() const                                         {return m_state;}
-      //set the got end of data flag for the generator
-      void setEoD()                                               {m_gotEoD=true;}
-      
-      virtual ~Generator() {}
-      
-      //used to go to next element (see example below)
-      virtual bool next( const void** elem, unsigned int* elemsize)=0;
+   bool getNext( void* buffer, unsigned int buffersize)
+   {
+      return m_getNext( this, buffer, buffersize);
+   }
+   State state() const
+   {
+      return m_state;
+   }
 
-      //used by the protocol to pass more content to the generator in yield state.
-      virtual void protocolInput( const void* block, unsigned int blocksize)=0;
+   void protocolInput( void* data, unsigned int datasize, bool eoD)
+   {
+      m_gotEoD = eoD;
+      m_ptr = data;
+      m_size = datasize;
+      m_pos = 0;
+   }
 
-      //used by functions that transform generators (like XML header to content with different character set)
-      virtual void getRestBlock( const void** block, unsigned int* blocksize)=0;
+   Generator& operator = (const Generator& o)
+   {
+      m_ptr = o.m_ptr;
+      m_pos = o.m_pos;
+      m_size = o.m_size;
+      m_gotEoD = o.m_gotEoD;
+      m_state = o.m_state;
+      m_errorCode = o.m_errorCode;
+      return *this;
+   }
 
-      //get the error details
-      //@param msg pointer to return bthe error message as string 
-      //@return the error code in case of an error state or 0.  
-      virtual int getError( const char** msg=0) const {if (msg) *msg=0; return 0;}
+   Generator( const GetNext& gn) :m_ptr(0),m_pos(0),m_size(0),m_gotEoD(false),m_state(Init),m_errorCode(0),m_getNext(gn){}
 
-      //@example generator function in C for the processor:
-      //
-      //bool nativeGeneratorCall( Generator* g, const void** b, unsigned int* n)
-      //{
-      //   if (!g->next( b, n)) 
-      //   {
-      //      if (g->state() == Generator::EndOfInput) return false;
-      //      nativeCallYield();
-      //   }
-      //   return true;
-      //}
+   int getError() const              {return m_errorCode;}
+   bool gotEoD() const               {return m_gotEoD;}
+   void* ptr() const                 {return(void*)((char*)m_ptr+m_pos);}
+   unsigned int size() const         {return (m_pos<m_size)?(m_size-m_pos):0;}
+   void skip( unsigned int n)        {if ((m_pos+n)>=m_size) m_pos=m_size; else m_pos+=n;}
+   void setState( State s, int e=0)  {m_state=s;m_errorCode=e;}
 
-   protected:
-      State m_state;
-      bool m_gotEoD;
+private:
+   void* m_ptr;
+   unsigned int m_pos;
+   unsigned int m_size;
+   bool m_gotEoD;
+   State m_state;
+   int m_errorCode;
+   GetNext m_getNext;
 };
-
 }}//namespace
 #endif
 

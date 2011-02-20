@@ -5,7 +5,7 @@ using namespace _SMERP::mtproc;
 
 int Method::Data::echo( Context* ctx, unsigned int, const char**)
 {
-   if (!ctx->contentIterator) ctx->contentIterator = new isolatin1::Generator();
+   if (!ctx->contentIterator) ctx->contentIterator = new protocol::Generator( generator::CharIsoLatin1::GetNext);
    return 0;
 }
 
