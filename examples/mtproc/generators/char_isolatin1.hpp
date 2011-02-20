@@ -13,7 +13,7 @@ struct CharIsoLatin1
    typedef protocol::FormatOutput FormatOutput;
 
    enum ErrorCodes {Ok=0,ErrBufferTooSmall=1};
-   static bool GetNext( Generator* this_, void* buffer, unsigned int buffersize)
+   static int GetNext( Generator* this_, void* buffer, unsigned int buffersize)
    {
       char* in = (char*)this_->ptr();
       unsigned int nn = this_->size();
@@ -21,19 +21,19 @@ struct CharIsoLatin1
       if (buffersize == 0)
       {
          this_->setState( Generator::Error, ErrBufferTooSmall);
-         return false;
+         return 0;
       }
       else if (nn == 0)
       {
          this_->setState( this_->gotEoD()?Generator::EndOfInput:Generator::EndOfMessage, Ok);
-         return false;
+         return 0;
       }
       else
       {
          this_->setState( Generator::Processing, Ok);
          *(char*)buffer = *in;
          this_->skip( 1);
-         return true;
+         return 1;
       }
    }
 

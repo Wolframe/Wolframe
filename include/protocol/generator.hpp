@@ -37,9 +37,9 @@ struct Generator
       Error           //an error occurred
    };
    //Get next element call
-   typedef bool (*GetNext)( Generator* this_, void* buffer, unsigned int buffersize);
+   typedef int (*GetNext)( Generator* this_, void* buffer, unsigned int buffersize);
 
-   bool getNext( void* buffer, unsigned int buffersize)
+   int getNext( void* buffer, unsigned int buffersize)
    {
       return m_getNext( this, buffer, buffersize);
    }
