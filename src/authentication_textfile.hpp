@@ -13,6 +13,8 @@
 namespace _SMERP {
 	namespace Authentication {
 
+Authenticator *CreateTextFileAuthenticator( AuthenticatorFactory::properties props );
+
 class TextFileAuthenticator : public Authenticator {
 	private:
 		std::map< std::string, std::string > m_creds;
@@ -33,6 +35,7 @@ class TextFileAuthenticator : public Authenticator {
 		virtual std::string sendData( );
 		virtual std::string token( );
 		virtual void receiveData( const std::string data );
+		virtual std::string getError( );
 };
 
 } // namespace Authentication

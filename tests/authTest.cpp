@@ -3,6 +3,10 @@
 #include <algorithm>
 
 #include "authentication.hpp"
+#include "authentication_textfile.hpp"
+#ifdef WITH_PAM
+#include "authentication_pam.hpp"
+#endif
 #include "getPassword.hpp"
 
 using namespace std;
@@ -29,6 +33,17 @@ int main( int argc, const char *argv[] )
 		return 1;
 	}
 
+// register some authentication methods
+	AuthenticatorFactory::properties props;
+	props.push_back( AuthenticatorFactory::property( "filename", std::string( "passwd" ) ) );
+	AuthenticatorFactory::instance( ).registerAuthenticator( "TEXT_FILE", CreateTextFileAuthenticator, props );
+
+#ifdef WITH_PAM
+	AuthenticatorFactory::properties props2;
+	props2.push_back( AuthenticatorFactory::property( "service", std::string( "smerp" ) ) );
+	AuthenticatorFactory::instance( ).registerAuthenticator( "PAM", CreatePAMAuthenticator, props2 );
+#endif
+
 // check if authentication method exists
 	vector<string> mechs = AuthenticatorFactory::instance( ).getAvailableMechs( );
 	vector<string>::const_iterator it = find( mechs.begin( ), mechs.end( ), argv[1] );
@@ -50,10 +65,6 @@ int main( int argc, const char *argv[] )
 			string token = a->token( );
 			string data = a->sendData( );
 
-// an error messages			
-			if( token == "message" )
-				cerr << "ERROR: " << data << endl;
-			
 // the authenticate needs some specific input from the client
 		} else if( step == Step::_SMERP_AUTH_STEP_RECV_DATA ) {
 			string token = a->token( );
@@ -70,8 +81,11 @@ int main( int argc, const char *argv[] )
 				cerr << "authenticator requests unknown token '" << token << "'" << endl;
 				return 1;
 			}
-		}
 
+// an error occurred, get error message and print it
+		} else if( step == Step::_SMERP_AUTH_STEP_GET_ERROR ) {
+			cerr << "ERROR: " << a->getError( ) << endl;
+		}
 // next step
 		step = a->nextStep( );
 	}

@@ -12,11 +12,19 @@
 #include <sstream>
 #include <stdexcept>
 
-#include "unused.h"
-
 namespace _SMERP {
 	namespace Authentication {
 
+Authenticator *CreatePAMAuthenticator( AuthenticatorFactory::properties props )
+{
+	return new PAMAuthenticator(
+		findprop<std::string>( props, "service" )
+	);
+}
+
+static int pam_conv_func(	int nmsg, const struct pam_message **msg,
+				struct pam_response **reply, void *appdata_ptr );
+				
 PAMAuthenticator::PAMAuthenticator( const std::string _service )
 	: m_service( _service )
 {
@@ -28,7 +36,7 @@ PAMAuthenticator::PAMAuthenticator( const std::string _service )
 	m_conv.appdata_ptr = &m_appdata;
 }
 
-const char *msg_style_to_str( int msg_style )
+static const char *msg_style_to_str( int msg_style )
 {
 	switch( msg_style ) {
 		case PAM_PROMPT_ECHO_OFF:	return "PAM_PROMPT_ECHO_OFF";
@@ -39,7 +47,7 @@ const char *msg_style_to_str( int msg_style )
 	}
 }
 
-void null_and_free( int nmsg, struct pam_response *pr )
+static void null_and_free( int nmsg, struct pam_response *pr )
 {
 	int i;
 	struct pam_response *r = pr;
@@ -56,8 +64,8 @@ void null_and_free( int nmsg, struct pam_response *pr )
 	free( pr );
 }
 
-int pam_conv_func(	int nmsg, const struct pam_message **msg,
-			struct pam_response **reply, void *appdata_ptr )
+static int pam_conv_func(	int nmsg, const struct pam_message **msg,
+				struct pam_response **reply, void *appdata_ptr )
 {
 	int i;
 	const struct pam_message *m = *msg;
@@ -194,26 +202,23 @@ Step::AuthStep PAMAuthenticator::nextStep( )
 				m_state = _SMERP_PAM_STATE_NEED_PASS;
 				return Step::_SMERP_AUTH_STEP_RECV_DATA;
 			} else if( rc != PAM_SUCCESS ) {
-				m_token = "message";
 				std::ostringstream ss;
 				ss	<< "pam_authenticate failed with service " << m_service << ": "
 					<< pam_strerror( m_appdata.h, rc ) << " (" << rc << ")";
-				m_data = ss.str( );
+				m_error = ss.str( );
 				m_state = _SMERP_PAM_STATE_ERROR;
-				return Step::_SMERP_AUTH_STEP_SEND_DATA;
+				return Step::_SMERP_AUTH_STEP_GET_ERROR;
 			}
 
 // is access to the account permitted?
 			rc = pam_acct_mgmt( m_appdata.h, 0 );
 			if( rc != PAM_SUCCESS ) {
-				m_token = "message";
 				std::ostringstream ss;
 				ss	<< "pam_acct_mgmt failed with service " << m_service << ": "
 					<< pam_strerror( m_appdata.h, rc ) << " (" << rc << ")";
-				m_data = ss.str( );
+				m_error = ss.str( );
 				m_state = _SMERP_PAM_STATE_ERROR;
-				return Step::_SMERP_AUTH_STEP_SEND_DATA;
-
+				return Step::_SMERP_AUTH_STEP_GET_ERROR;
 			}
 
 // terminate PAM session with last exit code
@@ -235,11 +240,11 @@ Step::AuthStep PAMAuthenticator::nextStep( )
 				return Step::_SMERP_AUTH_STEP_FAIL;
 		
 		case _SMERP_PAM_STATE_ERROR:
-			m_state = _SMERP_PAM_STATE_NEED_LOGIN;
+			(void)pam_end( m_appdata.h, rc );
 			m_appdata.h = NULL;
 			m_appdata.has_pass = false;
 			m_appdata.pass = "";
-			(void)pam_end( m_appdata.h, rc );
+			m_state = _SMERP_PAM_STATE_NEED_LOGIN;
 			return Step::_SMERP_AUTH_STEP_FAIL;
 			
 		case _SMERP_PAM_STATE_NEED_PASS:
@@ -280,7 +285,7 @@ std::string PAMAuthenticator::token( )
 	return m_token;
 }
 
-void PAMAuthenticator::receiveData( SMERP_UNUSED const std::string data )
+void PAMAuthenticator::receiveData( const std::string data )
 {
 	switch( m_state ) {
 		case _SMERP_PAM_STATE_NEED_LOGIN:
@@ -305,6 +310,11 @@ void PAMAuthenticator::receiveData( SMERP_UNUSED const std::string data )
 			throw new std::runtime_error( "Unknown state in PAMAuthenticator::receiveData!" );
 			break;
 	}
+}
+
+std::string PAMAuthenticator::getError( )
+{
+	return m_error;
 }
 
 } // namespace Authentication

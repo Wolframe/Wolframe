@@ -100,6 +100,13 @@ ifdef WITH_GTEST
 	@echo "GTEST_LIB_DIR: $(GTEST_LIB_DIR)"
 	@echo "GTEST_LIBS: $(GTEST_LIBS)"
 endif
+ifdef WITH_PAM
+	@echo
+	@echo "PAM_DIR: $(PAM_DIR)"
+	@echo "PAM_INCLUDE_DIR: $(PAM_INCLUDE_DIR)"
+	@echo "PAM_LIB_DIR: $(PAM_LIB_DIR)"
+	@echo "PAM_LIBS: $(PAM_LIBS)"
+endif
 
 .PHONY: init-po
 init-po:

@@ -7,7 +7,6 @@ MBa:
 ABa:
 
 - authentication
-  - make authentication leak free
   - LDAP
   - AD/Windows Kerberos
   - SASL

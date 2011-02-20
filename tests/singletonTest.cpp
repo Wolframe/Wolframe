@@ -30,10 +30,6 @@ protected:
 	
 	virtual ~SingletonFixture( ) {
 	}
-	
-// mmh? I can instatiate it? it has a public constructor.. what for?
-	TestObject t1;
-	TestObject t2;
 };
 
 // Tests to check basic functionality of the singleton

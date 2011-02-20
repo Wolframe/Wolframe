@@ -8,40 +8,15 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <list>
+#include <stdexcept>
+#include <sstream>
+#include <boost/any.hpp>
 
 #include "singleton.hpp"
 
 namespace _SMERP {
 	namespace Authentication {
-
-// the list of available authentication methods
-// (TODO: make this dynamic and in modules)
-class Mech {
-public:
-	enum AuthMech {
-#ifdef _WIN32
-		_SMERP_AUTH_MECH_WINAD,			/// Windows AD
-		_SMERP_AUTH_MECH_WINKERB,		/// integrated Windows authentication
-							/// (Kerberos)
-#endif
-#ifdef WITH_OPENLDAP
-		_SMERP_AUTH_MECH_LDAP,			/// LDAP (Unix and Windows)
-#endif
-#ifdef WITH_PAM
-		_SMERP_AUTH_MECH_PAM,			/// Suns PAM
-#endif
-#ifdef WITH_SASL
-		_SMERP_AUTH_MECH_SASL,			/// Cyrus SASL
-#endif
-#ifdef WITH_GSSAPI
-		_SMERP_AUTH_MECH_GSSAPI,		/// GSSAPI
-#endif
-		_SMERP_AUTH_MECH_TEXT_FILE,		/// simple textfile
-		_SMERP_AUTH_MECH_UNDEFINED
-	};
-
-	static AuthMech str2AuthMech( const std::string s );
-};
 
 // the basic steps the authenticator can be in
 class Step {
@@ -50,12 +25,13 @@ public:
 		_SMERP_AUTH_STEP_SUCCESS,		/// successful authentication
 		_SMERP_AUTH_STEP_FAIL,			/// authentication failed
 		_SMERP_AUTH_STEP_SEND_DATA,		/// we need to send some data
-		_SMERP_AUTH_STEP_RECV_DATA		/// we require some data
+		_SMERP_AUTH_STEP_RECV_DATA,		/// we require some data
+		_SMERP_AUTH_STEP_GET_ERROR		/// error occurred
 	};
 };
 
 // virtual base for all authentication methods
-class Authenticator {		
+class Authenticator {	
 	public:
 		virtual ~Authenticator( ) { }
 		
@@ -81,17 +57,44 @@ class Authenticator {
 		// token() indicates the kind of data the authenticator
 		// expects (depends on the authentication method)
 		virtual void receiveData( const std::string data ) = 0;
+
+		// we got an error (which usually should be logged only,
+		// not sent to the client)
+		virtual std::string getError( ) = 0;
 };
 
 // a factory returning us an authenticator for a given authentication
 // method (indicated by a speaking string like 'PAM')
 class AuthenticatorFactory : public Singleton< AuthenticatorFactory> {
+	public:
+		struct property {
+			property( );
+			property( const std::string &_name, const boost::any &_value )
+				: name( _name ), value( _value ) { }
+			std::string name;
+			boost::any value;
+			
+			bool operator==( const std::string &_name ) const
+			{
+				return name == _name;
+			}
+		};
+		typedef std::list<property> properties;
+		
+		typedef Authenticator* (*CreateAuthenticatorFunc)( properties props );
+		
 	private:
 		std::map<std::string, Authenticator *> m_authenticators;
 
 	public:
 		AuthenticatorFactory( );
 		virtual ~AuthenticatorFactory( );
+		
+		void registerAuthenticator(	std::string _method,
+						CreateAuthenticatorFunc _createf,
+						properties _props );
+		
+		void unregisterAuthenticator( std::string _method );
 		
 		// get a specific authenticator identified by method
 		Authenticator* getAuthenticator( const std::string method );
@@ -100,18 +103,16 @@ class AuthenticatorFactory : public Singleton< AuthenticatorFactory> {
 		std::vector<std::string> getAvailableMechs( );
 };
 
-// map authentication method enum values to strings
-template< typename CharT, typename TraitsT >
-inline std::basic_ostream< CharT, TraitsT > &operator<< ( std::basic_ostream< CharT, TraitsT >& s, Mech::AuthMech f )
+template<class T> T findprop( AuthenticatorFactory::properties _props, const std::string _name )
 {
-	static const CharT *const str[] = {
-		"WINAD", "WINKERB", "LDAP", "PAM", "SASL", "GSSAPI", "TEXT_FILE" };
-	if( static_cast< size_t >( f ) < ( sizeof( str ) / sizeof( *str ) ) ) {
-		s << str[f];
-	} else {
-		s << "Unknown enum used '" << static_cast< int >( f ) << "'";
+	std::list<AuthenticatorFactory::property>::const_iterator it;
+	it = std::find( _props.begin( ), _props.end( ), _name );
+	if( it != _props.end( ) ) {
+		return boost::any_cast<T>( it->value );
 	}
-	return s;
+	std::ostringstream ss;
+	ss << "Unknown authenticator property '" << _name << "'";
+	throw std::logic_error( ss.str( ) );
 }
 
 } // namespace Authentication

@@ -12,6 +12,13 @@
 namespace _SMERP {
 	namespace Authentication {
 
+Authenticator *CreateTextFileAuthenticator( AuthenticatorFactory::properties props )
+{
+	return new TextFileAuthenticator(
+		findprop<std::string>( props, "filename" )
+	);
+}
+
 TextFileAuthenticator::TextFileAuthenticator( SMERP_UNUSED const std::string _filename )
 {
 	m_state = _SMERP_TEXTFILE_STATE_NEED_LOGIN;
@@ -81,6 +88,11 @@ void TextFileAuthenticator::receiveData( SMERP_UNUSED const std::string data )
 			throw new std::runtime_error( "Illegal state in auhenticator" );
 			break;
 	}
+}
+
+std::string TextFileAuthenticator::getError( )
+{
+	return "";
 }
 
 } // namespace Authentication

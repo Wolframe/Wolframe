@@ -25,17 +25,13 @@ typedef struct {
 	pam_handle_t *h;
 } pam_appdata;
 
-extern "C" const char *msg_style_to_str( int msg_style );
-extern "C" void null_and_free(	int nmsg, struct pam_response *pr );
-		
-extern "C" int pam_conv_func(	int nmsg, const struct pam_message **msg,
-				struct pam_response **reply, void *appdata_ptr );
+Authenticator *CreatePAMAuthenticator( AuthenticatorFactory::properties props );
 
 class PAMAuthenticator : public Authenticator {
 	private:
 		std::string m_service;
 
-		
+		// states of the authenticator state machine
 		enum {
 			_SMERP_PAM_STATE_NEED_LOGIN,
 			_SMERP_PAM_STATE_HAS_LOGIN,
@@ -47,6 +43,7 @@ class PAMAuthenticator : public Authenticator {
 		pam_appdata m_appdata;
 		std::string m_token;
 		std::string m_data;
+		std::string m_error;
 		struct pam_conv m_conv;
 		
 	public:
@@ -55,6 +52,7 @@ class PAMAuthenticator : public Authenticator {
 		virtual std::string sendData( );
 		virtual std::string token( );
 		virtual void receiveData( const std::string data );
+		virtual std::string getError( );
 };
 
 } // namespace Authentication
