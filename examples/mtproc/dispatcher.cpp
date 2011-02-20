@@ -8,6 +8,7 @@ using namespace _SMERP::protocol;
 void CommandDispatcher::resetCommand()
 {
    m_methodIdx = 0;
+   m_command = unknown;
    m_lineBuffer.init();
    m_argBuffer.init();
    m_cmdBuffer.init();
@@ -121,20 +122,33 @@ CommandDispatcher::Command CommandDispatcher::getCommand( protocol::InputBlock::
          int ci = m_parser.getCommand( itr, eoM, m_cmdBuffer);
          if (ci >= unknown && ci < method)
          {
-            return (Command)ci;
+            m_command = (Command)ci;
+            m_methodIdx = 0;
          }
-         m_methodIdx = (unsigned int)ci - (unsigned int)method;
+         else
+         {
+            m_command = method; 
+            m_methodIdx = (unsigned int)ci - (unsigned int)method;
+         }
          m_state = Selected;
          //no break here !
       }
       case Selected:
       {
-         if (!ProtocolParser::getLine( itr, eoM, m_argBuffer)) return unknown;
+         if (m_command == method)
+         {
+            if (!ProtocolParser::getLine( itr, eoM, m_argBuffer)) return unknown;
+         }
+         else
+         {
+            if (!ProtocolParser::skipSpaces( itr, eoM) && !ProtocolParser::consumeEOLN( itr, eoM)) return unknown;
+            return m_command;
+         }
          //no break here !
       }
       case ArgumentsParsed:
       {
-         return method;
+         return m_command;
       }
    }
    LOG_ERROR << "illegal state (end of getCommand)";

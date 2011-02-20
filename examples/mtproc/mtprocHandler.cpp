@@ -28,7 +28,6 @@ struct Connection::Private
    {
       Init,                     //< start state, called first time in this session
       EnterCommand,             //< parse command
-      EmptyLine,                //< looking if rest of line is empty
       Processing,               //< running the dispatcher sub state machine; execute a command
       ProtocolError,            //< a protocol error (bad command etc) appeared and the rest of the line has to be discarded
       DiscardInput,             //< reading and discarding data until end of data has been seen
@@ -36,7 +35,7 @@ struct Connection::Private
    };
    static const char* stateName( State i)
    {
-      static const char* ar[] = {"Init","EnterCommand","EmptyLine","Processing","ProtocolError","CommandError","Terminate"};
+      static const char* ar[] = {"Init","EnterCommand","Processing","ProtocolError","CommandError","Terminate"};
       return ar[i];
    }
 
@@ -81,17 +80,13 @@ struct Connection::Private
        input.setPos( nofBytes);
        itr = input.begin();
 
-       if (state == Processing)
+       if (state == Processing || state == DiscardInput)
        {
           Input::iterator eoD = input.getEoD( itr);
-          end = input.end();
-          commandDispatcher.protocolInput( itr, eoD, input.gotEoD());
-          itr = eoD+1;
-       }
-       else if (state == DiscardInput)
-       {
-          //discard input until EOF
-          Input::iterator eoD = input.getEoD( itr);
+          if (state == Processing)
+          {
+             commandDispatcher.protocolInput( itr, eoD, input.gotEoD());
+          }
           end = input.end();
           if (eoD < end)
           {
@@ -144,12 +139,12 @@ struct Connection::Private
                 {
                    case CommandDispatcher::empty:
                    {
-                      state = EmptyLine;
+                      state = EnterCommand;
                       continue;
                    }
                    case CommandDispatcher::caps:
                    {
-                      state = EmptyLine;
+                      state = EnterCommand;
                       return WriteLine( "OK", commandDispatcher.getCapabilities());
                    }
                    case CommandDispatcher::quit:
@@ -173,38 +168,10 @@ struct Connection::Private
                       else
                       {
                          state = ProtocolError;
-                         return WriteLine( "BAD unknown command");
+                         return WriteLine( "BAD error in command line");
                       }
                    }
                 }
-            }
-
-            case EmptyLine:
-            {
-               if (!ProtocolParser::skipSpaces( itr, end))
-               {
-                  input.setPos( 0);
-                  return Network::ReadData( input.ptr(), input.size());
-               }
-               if (!ProtocolParser::consumeEOLN( itr, end))
-               {
-                  if (itr == end)
-                  {
-                     input.setPos( 0);
-                     return Network::ReadData( input.ptr(), input.size());
-                  }
-                  else
-                  {
-                     state = Init;
-                     buffer.init();
-                     return WriteLine( "BAD command line");
-                  }
-               }
-               else
-               {
-                  state = EnterCommand;
-                  continue;
-               }
             }
 
             case Processing:
@@ -235,17 +202,17 @@ struct Connection::Private
                    }
                    case CommandDispatcher::Close:
                    {
-                      if (returnCode != 0)
+                      if (returnCode == 0)
+                      {
+                         state = (input.gotEoD())?Init:DiscardInput;
+                         return WriteLine( "\r\n.\r\nOK");
+                      }
+                      else
                       {
                          state = DiscardInput;
                          char ee[ 64];
                          snprintf( ee, sizeof(ee), "%d", returnCode); 
                          return WriteLine( "\r\n.\r\nERR", ee);
-                      }
-                      else
-                      {
-                         state = (input.gotEoD())?Init:DiscardInput;
-                         return WriteLine( "\r\n.\r\nOK");
                       }
                    }
                 }
