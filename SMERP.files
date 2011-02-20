@@ -239,3 +239,9 @@ tests/authTest.cpp
 src/authentication_textfile.hpp
 src/authentication_textfile.cpp
 tests/singletonTest.cpp
+src/configStandard.hpp
+src/configDatabase.cpp
+src/configLogger.cpp
+src/configHelpers.cpp
+src/configHelpers.hpp
+src/configServer.cpp

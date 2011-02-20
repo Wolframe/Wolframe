@@ -18,32 +18,39 @@
 //}
 
 namespace _SMERP {
+	namespace Configuration	{
 
-	struct ConfigurationBase	{
-	public:
-		ConfigurationBase( std::string rt, std::string ds )
-							{ root_ = rt; dispStr_ = ds; }
-		const std::string& root() const		{ return root_; }
-		const std::string& displayStr()	const	{ return dispStr_; }
+		struct ConfigurationBase	{
+		public:
+			ConfigurationBase( const std::string& rt, const std::string& ds )
+								{ root_ = rt; dispStr_ = ds; }
 
-		virtual bool parse( boost::property_tree::ptree& pt, std::ostream& os ) = 0;
+//			virtual ~ConfigurationBase();
 
-		/// Check if the server configuration makes sense
-		///
-		/// Be aware that this function does NOT test if the configuration
-		/// can be used. It only tests if it MAY be valid.
-		virtual bool check( std::ostream& os ) const = 0;
+			const std::string& root() const		{ return root_; }
+			const std::string& displayStr()	const	{ return dispStr_; }
 
-		/// these functions are not implemented / implementable yet
-		virtual bool test( std::ostream& os ) const	{ os << "Not implemented yet !" << std::endl; return false; }
+			virtual bool parse( boost::property_tree::ptree& pt, std::ostream& os ) = 0;
 
-		///
-		virtual void print( std::ostream& os ) const = 0;
-	private:
-		std::string	root_;
-		std::string	dispStr_;
-	};
+			/// Check if the server configuration makes sense
+			///
+			/// Be aware that this function does NOT test if the configuration
+			/// can be used. It only tests if it MAY be valid.
+			virtual bool check( std::ostream& os ) const = 0;
 
+			/// these functions are not implemented / implementable yet
+			// virtual bool test( std::ostream& os ) const = 0;
+			virtual bool test( std::ostream& os ) const
+								{ os << "Not implemented yet !" << std::endl; return false; }
+
+			///
+			virtual void print( std::ostream& os ) const = 0;
+		private:
+			std::string	root_;
+			std::string	dispStr_;
+		};
+
+	} // namespace Configuration
 } // namespace _SMERP
 
 #endif // _CONFIGURATION_BASE_HPP_INCLUDED

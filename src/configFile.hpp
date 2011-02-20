@@ -32,11 +32,11 @@ namespace _SMERP	{
 		std::list<Network::ServerSSLendpoint> SSLaddress;
 
 // server configuration
-		ServerConfiguration	*srvConfig;
+		Configuration::ServerConfiguration	*srvConfig;
 // database configuration
-		DatabaseConfiguration	*dbConfig;
+		Configuration::DatabaseConfiguration	*dbConfig;
 // logger configuration
-		LoggerConfiguration	*logConfig;
+		Configuration::LoggerConfiguration	*logConfig;
 
 	private:
 		std::string		errMsg_;

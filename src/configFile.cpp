@@ -171,20 +171,20 @@ namespace _SMERP {
 
 		std::stringstream	errStr;
 // server
-		srvConfig = new ServerConfiguration( "server", "Server" );
+		srvConfig = new Configuration::ServerConfiguration( "server", "Server" );
 		if ( ! srvConfig->parse( pt.get_child( "server" ), errStr ))	{
 			errMsg_ = errStr.str();
 			return false;
 		}
 // database
-		dbConfig = new DatabaseConfiguration( "database", "Database Server" );
+		dbConfig = new Configuration::DatabaseConfiguration( "database", "Database Server" );
 		if ( ! dbConfig->parse( pt.get_child( "database" ), errStr ))	{
 			errMsg_ = errStr.str();
 			return false;
 		}
 
 // logging
-		logConfig = new LoggerConfiguration( "logging", "Logging" );
+		logConfig = new Configuration::LoggerConfiguration( "logging", "Logging" );
 		if ( ! logConfig->parse( pt.get_child( "logging" ), errStr ))	{
 			errMsg_ = errStr.str();
 			return false;

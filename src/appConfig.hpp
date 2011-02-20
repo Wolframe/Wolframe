@@ -12,107 +12,13 @@
 #endif	// !defined( _WIN32 )
 
 #include "serverEndpoint.hpp"
-#include "configurationBase.hpp"
+
+#include "configStandard.hpp"
 
 #include <string>
 #include <list>
 
 namespace _SMERP {
-
-	/// server configuration
-	struct ServerConfiguration : public _SMERP::ConfigurationBase	{
-	public:
-#if !defined( _WIN32 )
-		// daemon configuration
-		std::string		user;
-		std::string		group;
-		std::string		pidFile;
-#else
-		// service configuration
-		std::string		serviceName;
-		std::string		serviceDisplayName;
-		std::string		serviceDescription;
-#endif // !defined( _WIN32 )
-		// server configuration
-		unsigned		threads;
-
-		unsigned		maxConnections;
-
-		// network configuration
-		std::list<Network::ServerTCPendpoint> address;
-		std::list<Network::ServerSSLendpoint> SSLaddress;
-
-		/// constructor
-		ServerConfiguration( std::string node, std::string header ) : ConfigurationBase( node, header )
-									{}
-		/// methods
-		bool parse( boost::property_tree::ptree& pt, std::ostream& os );
-		bool check( std::ostream& os ) const;
-//		Not implemented yet, inherited from base for the time being
-//		bool test( std::ostream& os ) const;
-		void print( std::ostream& os ) const;
-#if !defined( _WIN32 )
-		void override( std::string user, std::string group );
-#endif // !defined( _WIN32 )
-	};
-
-
-	/// logger configuration
-	struct LoggerConfiguration : public _SMERP::ConfigurationBase
-	{
-	public:
-		bool			logToStderr;
-		LogLevel::Level		stderrLogLevel;
-		bool			logToFile;
-		std::string		logFile;
-		LogLevel::Level		logFileLogLevel;
-		std::string		logFileIdent;
-#if !defined( _WIN32 )
-		bool			logToSyslog;
-		SyslogFacility::Facility syslogFacility;
-		LogLevel::Level		syslogLogLevel;
-		std::string		syslogIdent;
-#else
-		bool			logToEventlog;
-		std::string		eventlogLogName;
-		std::string		eventlogSource;
-		LogLevel::Level		eventlogLogLevel;
-#endif // !defined( _WIN32 )
-
-		/// constructor
-		LoggerConfiguration( std::string node, std::string header );
-
-		/// methods
-		bool parse( boost::property_tree::ptree& pt, std::ostream& os );
-		bool check( std::ostream& os ) const;
-//		Not implemented yet, inherited from base for the time being
-//		bool test( std::ostream& os ) const;
-		void print( std::ostream& os ) const;
-
-		void foreground( LogLevel::Level debugLevel, bool useConfig );
-	};
-
-
-	/// database configuration
-	struct DatabaseConfiguration : public _SMERP::ConfigurationBase
-	{
-	public:
-		std::string		host;
-		unsigned short		port;
-		std::string		name;
-		std::string		user;
-		std::string		password;
-
-		/// constructor
-		DatabaseConfiguration( std::string node, std::string header ) : ConfigurationBase( node, header )
-									{ port = 0; }
-		/// methods
-		bool parse( boost::property_tree::ptree& pt, std::ostream& os );
-		bool check( std::ostream& os ) const;
-//		Not implemented yet, inherited from base for the time being
-//		bool test( std::ostream& os ) const;
-		void print( std::ostream& os ) const;
-	};
 
 
 /// application configuration structure
@@ -141,11 +47,11 @@ namespace _SMERP {
 		std::list<Network::ServerSSLendpoint> SSLaddress;
 
 // server configuration
-		ServerConfiguration	*srvConfig;
+		Configuration::ServerConfiguration	*srvConfig;
 // database configuration
-		DatabaseConfiguration	*dbConfig;
+		Configuration::DatabaseConfiguration	*dbConfig;
 // logger configuration
-		LoggerConfiguration	*logConfig;
+		Configuration::LoggerConfiguration	*logConfig;
 
 	private:
 		std::string		errMsg_;

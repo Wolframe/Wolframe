@@ -59,7 +59,11 @@ LOCAL_STATIC_LIB_OBJS = \
 	logLevel.o \
 	logSyslogFacility.o \
 	logBackend.o \
+	configHelpers.o \
 	configFile.o \
+	configServer.o \
+	configLogger.o \
+	configDatabase.o \
 	appConfig.o \
 	protocol_ioblocks.o \
 	acceptor.o \
