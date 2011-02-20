@@ -1,0 +1,5 @@
+various contributions
+
+create_qtcreator_files.sh	- create SMERP.files for qtcreator
+valgrind-suppressions		- known problems when testing SMERP
+				  with valgrind memcheck/leakcheck
