@@ -71,7 +71,7 @@ public:
    void setOutputBuffer( void* buf, unsigned int bufsize);
 
    //get the capabilities message
-   const char* getCaps();
+   const char* getCapabilities();
 };
 
 }}//namespace
