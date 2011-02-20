@@ -65,8 +65,7 @@ public:
    IOState call( int& returnCode);
 
    //pass a protocol data input chunk to the processors generator function
-   void protocolInput( protocol::InputBlock::iterator& start, protocol::InputBlock::iterator& end);
-   void setEoD();
+   void protocolInput( protocol::InputBlock::iterator& start, protocol::InputBlock::iterator& end, bool eoD);
 
    //get the capabilities message
    const char* getCaps();

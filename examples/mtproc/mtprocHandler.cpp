@@ -89,8 +89,7 @@ struct Connection::Private
           Input::iterator eoD = input.getEoD( itr);
           end = input.end();
           gotEoD = (eoD < end);
-          if (gotEoD) commandDispatcher.setEoD();
-          commandDispatcher.protocolInput( itr, eoD);
+          commandDispatcher.protocolInput( itr, eoD, gotEoD);
           itr = eoD+1;
        }
        else if (state == DiscardInput)

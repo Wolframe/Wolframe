@@ -52,7 +52,7 @@ void CommandDispatcher::init( const char** protocolCmds, Instance* instance)
    }
 }
 
-void CommandDispatcher::protocolInput( protocol::InputBlock::iterator& start, protocol::InputBlock::iterator& end)
+void CommandDispatcher::protocolInput( protocol::InputBlock::iterator& start, protocol::InputBlock::iterator& end, bool eoD)
 {
    if (m_state == WaitForInput)
    {
@@ -66,20 +66,12 @@ void CommandDispatcher::protocolInput( protocol::InputBlock::iterator& start, pr
    }
    if (m_context.contentIterator)
    {
-      m_context.contentIterator->protocolInput( (void*)&*start, end-start);
+      m_context.contentIterator->protocolInput( (void*)&*start, end-start, eoD);
    }
    else
    {
       LOG_ERROR << "illegal state: got input without recipient (content iterator disapeared)";
       throw (IllegalState());
-   }
-}
-
-void CommandDispatcher::setEoD()
-{
-   if (m_context.contentIterator)
-   {
-      m_context.contentIterator->setEoD();
    }
 }
 
@@ -159,7 +151,6 @@ CommandDispatcher::IOState CommandDispatcher::call( int& returnCode)
          }
          if (m_context.contentIterator)
          {
-            const char* errmsg;
             switch (m_context.contentIterator->state())
             {
                case protocol::Generator::Init:
@@ -167,8 +158,8 @@ CommandDispatcher::IOState CommandDispatcher::call( int& returnCode)
                   return WriteOutput;
 
                case protocol::Generator::Error:
-                  returnCode = m_context.contentIterator->getError( &errmsg);
-                  LOG_ERROR << "error " << errmsg << "(" << returnCode << ") in generator calling '" << m_instance->mt[ m_methodIdx].name << "'";
+                  returnCode = m_context.contentIterator->getError();
+                  LOG_ERROR << "error " << returnCode << ") in generator calling '" << m_instance->mt[ m_methodIdx].name << "'";
                   resetCommand();
                   return Close;
 
