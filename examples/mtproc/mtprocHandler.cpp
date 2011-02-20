@@ -26,13 +26,13 @@ struct Connection::Private
    //list of processor states
    enum State
    {
-      Init,
-      EnterCommand,
-      EmptyLine,
-      Processing,
-      ProtocolError,
-      DiscardInput,
-      Terminate
+      Init,                     //< start state, called first time in this session
+      EnterCommand,             //< parse command
+      EmptyLine,                //< looking if rest of line is empty
+      Processing,               //< running the dispatcher sub state machine; execute a command
+      ProtocolError,            //< a protocol error (bad command etc) appeared and the rest of the line has to be discarded
+      DiscardInput,             //< reading and discarding data until end of data has been seen
+      Terminate                 //< terminate processing (close for network)
    };
    static const char* stateName( State i)
    {

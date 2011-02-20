@@ -18,12 +18,12 @@ private:
 
    enum State
    {
-      Null,
-      Init,
-      Selected,
-      ArgumentsParsed,
-      Running,
-      WaitForInput
+      Null,                    //< not instantiated yet
+      Init,                    //< object and method table have been initialized
+      Selected,                //< command has been parsed
+      ArgumentsParsed,         //< command arguments have been parsed
+      Running,                 //< running command, interrupted by a yield 
+      WaitForInput             //< running and waiting for input
    };
    typedef protocol::CmdBuffer CmdBuffer;                    //< buffer type for protocol commands
    typedef protocol::CmdParser<CmdBuffer> ProtocolParser;    //< parser type for the protocol
