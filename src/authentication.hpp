@@ -10,6 +10,7 @@
 #include <map>
 #include <list>
 #include <stdexcept>
+#include <sstream>
 #include <boost/any.hpp>
 
 #include "singleton.hpp"
@@ -109,7 +110,9 @@ template<class T> T findprop( AuthenticatorFactory::properties _props, const std
 	if( it != _props.end( ) ) {
 		return boost::any_cast<T>( it->value );
 	}
-	throw std::logic_error( "bad argument in property set" );
+	std::ostringstream ss;
+	ss << "Unknown authenticator property '" << _name << "'";
+	throw std::logic_error( ss.str( ) );
 }
 
 } // namespace Authentication
