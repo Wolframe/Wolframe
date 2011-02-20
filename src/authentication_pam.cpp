@@ -12,16 +12,19 @@
 #include <sstream>
 #include <stdexcept>
 
-#include "unused.h"
-
 namespace _SMERP {
 	namespace Authentication {
 
-Authenticator *CreatePAMAuthenticator( )
+Authenticator *CreatePAMAuthenticator( AuthenticatorFactory::properties props )
 {
-	return new PAMAuthenticator( "smerp" );	
+	return new PAMAuthenticator(
+		findprop<std::string>( props, "service" )
+	);
 }
 
+static int pam_conv_func(	int nmsg, const struct pam_message **msg,
+				struct pam_response **reply, void *appdata_ptr );
+				
 PAMAuthenticator::PAMAuthenticator( const std::string _service )
 	: m_service( _service )
 {
@@ -33,7 +36,7 @@ PAMAuthenticator::PAMAuthenticator( const std::string _service )
 	m_conv.appdata_ptr = &m_appdata;
 }
 
-const char *msg_style_to_str( int msg_style )
+static const char *msg_style_to_str( int msg_style )
 {
 	switch( msg_style ) {
 		case PAM_PROMPT_ECHO_OFF:	return "PAM_PROMPT_ECHO_OFF";
@@ -44,7 +47,7 @@ const char *msg_style_to_str( int msg_style )
 	}
 }
 
-void null_and_free( int nmsg, struct pam_response *pr )
+static void null_and_free( int nmsg, struct pam_response *pr )
 {
 	int i;
 	struct pam_response *r = pr;
@@ -61,8 +64,8 @@ void null_and_free( int nmsg, struct pam_response *pr )
 	free( pr );
 }
 
-int pam_conv_func(	int nmsg, const struct pam_message **msg,
-			struct pam_response **reply, void *appdata_ptr )
+static int pam_conv_func(	int nmsg, const struct pam_message **msg,
+				struct pam_response **reply, void *appdata_ptr )
 {
 	int i;
 	const struct pam_message *m = *msg;
@@ -282,7 +285,7 @@ std::string PAMAuthenticator::token( )
 	return m_token;
 }
 
-void PAMAuthenticator::receiveData( SMERP_UNUSED const std::string data )
+void PAMAuthenticator::receiveData( const std::string data )
 {
 	switch( m_state ) {
 		case _SMERP_PAM_STATE_NEED_LOGIN:

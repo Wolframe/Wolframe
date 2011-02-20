@@ -13,7 +13,7 @@
 namespace _SMERP {
 	namespace Authentication {
 
-Authenticator *CreateTextFileAuthenticator( );
+Authenticator *CreateTextFileAuthenticator( AuthenticatorFactory::properties props );
 
 class TextFileAuthenticator : public Authenticator {
 	private:

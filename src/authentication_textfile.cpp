@@ -12,9 +12,11 @@
 namespace _SMERP {
 	namespace Authentication {
 
-Authenticator *CreateTextFileAuthenticator( )
+Authenticator *CreateTextFileAuthenticator( AuthenticatorFactory::properties props )
 {
-	return new TextFileAuthenticator( "passwd" );	
+	return new TextFileAuthenticator(
+		findprop<std::string>( props, "filename" )
+	);
 }
 
 TextFileAuthenticator::TextFileAuthenticator( SMERP_UNUSED const std::string _filename )

@@ -25,13 +25,7 @@ typedef struct {
 	pam_handle_t *h;
 } pam_appdata;
 
-extern "C" const char *msg_style_to_str( int msg_style );
-extern "C" void null_and_free(	int nmsg, struct pam_response *pr );
-		
-extern "C" int pam_conv_func(	int nmsg, const struct pam_message **msg,
-				struct pam_response **reply, void *appdata_ptr );
-
-Authenticator *CreatePAMAuthenticator( );
+Authenticator *CreatePAMAuthenticator( AuthenticatorFactory::properties props );
 
 class PAMAuthenticator : public Authenticator {
 	private:

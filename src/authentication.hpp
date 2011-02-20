@@ -8,6 +8,9 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <list>
+#include <stdexcept>
+#include <boost/any.hpp>
 
 #include "singleton.hpp"
 
@@ -92,7 +95,21 @@ class Authenticator {
 // method (indicated by a speaking string like 'PAM')
 class AuthenticatorFactory : public Singleton< AuthenticatorFactory> {
 	public:
-		typedef Authenticator* (*CreateAuthenticatorFunc)( );
+		struct property {
+			property( );
+			property( const std::string &_name, const boost::any &_value )
+				: name( _name ), value( _value ) { }
+			std::string name;
+			boost::any value;
+			
+			bool operator==( const std::string &_name ) const
+			{
+				return name == _name;
+			}
+		};
+		typedef std::list<property> properties;
+		
+		typedef Authenticator* (*CreateAuthenticatorFunc)( properties props );
 		
 	private:
 		std::map<std::string, Authenticator *> m_authenticators;
@@ -101,7 +118,9 @@ class AuthenticatorFactory : public Singleton< AuthenticatorFactory> {
 		AuthenticatorFactory( );
 		virtual ~AuthenticatorFactory( );
 		
-		void registerAuthenticator( std::string _method, CreateAuthenticatorFunc _createf );
+		void registerAuthenticator(	std::string _method,
+						CreateAuthenticatorFunc _createf,
+						properties _props );
 		
 		void unregisterAuthenticator( std::string _method );
 		
@@ -111,6 +130,16 @@ class AuthenticatorFactory : public Singleton< AuthenticatorFactory> {
 		// get the list of all currently available authentication methods
 		std::vector<std::string> getAvailableMechs( );
 };
+
+template<class T> T findprop( AuthenticatorFactory::properties _props, const std::string _name )
+{
+	std::list<AuthenticatorFactory::property>::const_iterator it;
+	it = std::find( _props.begin( ), _props.end( ), _name );
+	if( it != _props.end( ) ) {
+		return boost::any_cast<T>( it->value );
+	}
+	throw std::logic_error( "bad argument in property set" );
+}
 
 // map authentication method enum values to strings
 template< typename CharT, typename TraitsT >
