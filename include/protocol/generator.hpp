@@ -43,6 +43,7 @@ struct Generator
    {
       return m_getNext( this, buffer, buffersize);
    }
+
    State state() const
    {
       return m_state;
@@ -84,6 +85,47 @@ private:
    State m_state;
    int m_errorCode;
    GetNext m_getNext;
+};
+
+
+struct FormatOutput
+{
+   //Print next element call
+   typedef bool (*Print)( FormatOutput* this_, int type, void* element, unsigned int elementsize);
+
+   FormatOutput( const Print& op) :m_ptr(0),m_pos(0),m_size(0),m_print(op){}
+
+   FormatOutput& operator = (const FormatOutput& o)
+   {
+      m_ptr = o.m_ptr;
+      m_pos = o.m_pos;
+      m_size = o.m_size;
+      return *this;
+   }
+
+   void init( void* data, unsigned int datasize)
+   {
+      m_ptr = data;
+      m_size = datasize;
+      m_pos = 0;
+   }
+
+   void* cur() const                 {return (void*)((char*)m_ptr+m_pos);}
+   unsigned int restsize() const     {return (m_pos<m_size)?(m_size-m_pos):0;}
+   unsigned int pos() const          {return m_pos;}
+   void* ptr() const                 {return m_ptr;}
+   void incr( unsigned int n)        {if ((m_pos+n)>=m_size) m_pos=m_size; else m_pos+=n;}
+
+   bool print( int type, void* element, unsigned int elementsize)
+   {
+      return m_print( this, type, element, elementsize);
+   }
+
+private:
+   void* m_ptr;
+   unsigned int m_pos;
+   unsigned int m_size;
+   Print m_print;
 };
 }}//namespace
 #endif

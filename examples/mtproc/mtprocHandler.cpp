@@ -33,12 +33,11 @@ struct Connection::Private
       Processing,
       ProtocolError,
       DiscardInput,
-      CommandOk,
       Terminate
    };
    static const char* stateName( State i)
    {
-      static const char* ar[] = {"Init","EnterCommand","EmptyLine","ProcessingAfterWrite","Processing","ProtocolError","CommandError","CommandOk","Terminate"};
+      static const char* ar[] = {"Init","EnterCommand","EmptyLine","ProcessingAfterWrite","Processing","ProtocolError","CommandError","Terminate"};
       return ar[i];
    }
 
@@ -218,7 +217,7 @@ struct Connection::Private
             {
                 //do processing but first release the output buffer content that has been written in the processing state:
                 state = Processing;
-                output.release();
+                commandDispatcher.setOutputBuffer( output.ptr(), output.size());
                 continue;
             }
 
@@ -234,11 +233,15 @@ struct Connection::Private
                    }
                    case CommandDispatcher::WriteOutput:
                    {
+                      void* content;
+                      unsigned int contentsize;
                       state = ProcessingAfterWrite;
-                      void* content = output.ptr();
-                      std::size_t size = output.pos();
-                      if (size == 0) continue;
-                      return Network::SendData( content, size);
+                      if (!commandDispatcher.getOutput( &content, &contentsize))
+                      {
+                         commandDispatcher.setOutputBuffer( output.ptr(), output.size());
+                         continue;
+                      }
+                      return Network::SendData( content, contentsize);
                    }
                    case CommandDispatcher::Close:
                    {
@@ -251,20 +254,11 @@ struct Connection::Private
                       }
                       else
                       {
-                         state = CommandOk;
-                         void* content = output.ptr();
-                         std::size_t size = output.pos();
-                         if (size == 0) continue;
-                         return Network::SendData( content, size);
+                         state = (gotEoD)?Init:DiscardInput;
+                         return WriteLine( "\r\n.\r\nOK");
                       }
                    }
                 }
-            }
-
-            case CommandOk:
-            {
-               state = (gotEoD)?Init:DiscardInput;
-               return WriteLine( "\r\n.\r\nOK");
             }
 
             case DiscardInput:
