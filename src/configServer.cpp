@@ -104,28 +104,45 @@ bool ServerConfiguration::parse( boost::property_tree::ptree& pt, std::ostream& 
 {
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "threads" ))	{
-			if ( ! getUnsignedShortValue( L1it, displayStr(), "threads", threads, os ))	return false;
+			if ( ! getUnsignedShortValue( L1it, displayStr(), "threads", threads, os ))
+				return false;
 		}
 #if !defined(_WIN32)
-		else if ( boost::algorithm::iequals( L1it->first, "user" ))	{
-			if ( ! getStringValue( L1it, displayStr(), "user", user, os ))			return false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "group" ))	{
-			if ( ! getStringValue( L1it, displayStr(), "group", group, os ))		return false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "pidFile" ))	{
-			if ( ! getStringValue( L1it, displayStr(), "pidFile", pidFile, os ))		return false;
+		else if ( boost::algorithm::iequals( L1it->first, "daemon" ))	{
+			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
+									L2it != L1it->second.end(); L2it++ )	{
+				if ( boost::algorithm::iequals( L2it->first, "user" ))	{
+					if ( ! getStringValue( L2it, displayStr(), "user", user, os ))
+						return false;
+				}
+				else if ( boost::algorithm::iequals( L2it->first, "group" ))	{
+					if ( ! getStringValue( L2it, displayStr(), "group", group, os ))
+						return false;
+				}
+				else if ( boost::algorithm::iequals( L2it->first, "pidFile" ))	{
+					if ( ! getStringValue( L2it, displayStr(), "pidFile", pidFile, os ))
+						return false;
+				}
+			}
 		}
 #endif
 #if defined(_WIN32)
-		else if ( boost::algorithm::iequals( L1it->first, "serviceName" ))	{
-			if ( ! getStringValue( L1it, displayStr(), "serviceName", serviceName, os ))	return false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "displayName" ))	{
-			if ( ! getStringValue( L1it, displayStr(), "displayName", displayName, os ))	return false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "description" ))	{
-			if ( ! getStringValue( L1it, displayStr(), "description", description, os ))	return false;
+		else if ( boost::algorithm::iequals( L1it->first, "listen" ))	{
+			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
+									L2it != L1it->second.end(); L2it++ )	{
+				if ( boost::algorithm::iequals( L1it->first, "serviceName" ))	{
+					if ( ! getStringValue( L1it, displayStr(), "serviceName", serviceName, os ))
+						return false;
+				}
+				else if ( boost::algorithm::iequals( L1it->first, "displayName" ))	{
+					if ( ! getStringValue( L1it, displayStr(), "displayName", displayName, os ))
+						return false;
+				}
+				else if ( boost::algorithm::iequals( L1it->first, "description" ))	{
+					if ( ! getStringValue( L1it, displayStr(), "description", description, os ))
+						return false;
+				}
+			}
 		}
 #endif
 		else if ( boost::algorithm::iequals( L1it->first, "listen" ))	{
@@ -133,7 +150,7 @@ bool ServerConfiguration::parse( boost::property_tree::ptree& pt, std::ostream& 
 									L2it != L1it->second.end(); L2it++ )	{
 				if ( boost::algorithm::iequals( L2it->first, "maxConnections" ))	{
 					if ( ! getUnsignedShortValue( L2it, displayStr(), "maxConnections", maxConnections, os ))
-													return false;
+						return false;
 				}
 			}
 		}
