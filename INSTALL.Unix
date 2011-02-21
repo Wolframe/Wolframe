@@ -54,14 +54,14 @@ Fetch from epel/rpmforge whatever: lua-devel (5.1)
 Fetch from normal repository: openssl-devel, pam-devel (0.99.6), qt-devel (4.2.1)
 
 Boost is not available in a decent version (1.33), build your own one.
+Qt (4.2.1) is too old, compile your own one.
 For building the documentation you need 'libxslt', 'doxygen' and
 'docbook-style-xsl' (from epel).
-Qt (4.2.1) is too old, compile your own one
 
 Fedora 14
 ---------
 
-No problems wit the supplied packages at all, everything builds out of the box:
+No problems with the supplied packages at all, everything builds out of the box:
 
 Required packages: boost-devel (1.44)
 Optional packages: openssl-devel, lua-devel (5.1), qt4-devel, gtest-devel (1.4),
