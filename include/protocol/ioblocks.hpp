@@ -31,14 +31,14 @@ public:
    const char* charptr() const                   {return (const char*)m_ptr;}
    unsigned int size() const                     {return m_size;}
    unsigned int pos() const                      {return m_pos;}
-   
+
    //access violation exceptions
    struct ArrayBoundReadError                    :public std::logic_error {ArrayBoundReadError():std::logic_error("ABR"){}};
-   
+
    //element typedefs
    typedef char value_type;
    typedef unsigned int size_type;
-   
+
    //random access operators
    char operator[]( size_type idx) const         {if (idx>=m_pos) throw ArrayBoundReadError(); return charptr()[idx];}
    char& operator[]( size_type idx)              {if (idx>=m_pos) throw ArrayBoundReadError(); return charptr()[idx];}
@@ -80,11 +80,17 @@ public:
    iterator end()                                       {return iterator(this)+pos();}
    
    //end of data calculation and markup
-   iterator getEoD( iterator start);
+   iterator getEoD( iterator start)
+   {
+      int eodpos = getEoDpos( start-begin());
+      return (eodpos>=0)?(start+eodpos):end();
+   }
+
    void resetEoD()                                      {m_eodState=EoD::SRC;}
    bool gotEoD() const                                  {return m_eodState>=EoD::LF_DOT_CR;}
 
 private:
+   int getEoDpos( unsigned int offset);
    EoD::State m_eodState;
 };
 

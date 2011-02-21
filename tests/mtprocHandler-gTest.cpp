@@ -1,9 +1,9 @@
 //
-// pechoHandler class unit tests using google test framework (gTest)
+// mtprocHandler class unit tests using google test framework (gTest)
 //
 
 
-#include "pechoHandler.hpp"
+#include "mtprocHandler.hpp"
 #include "connectionHandler.hpp"
 #include "testHandlerTemplates.hpp"
 #include <gtest/gtest.h>
@@ -104,21 +104,21 @@ static std::string escape( std::string& content)
 
 
 template <class TestDescription>
-class pechoHandlerFixture : public ::testing::Test
+class mtprocHandlerFixture : public ::testing::Test
 {
 public:
    std::string input;
    std::string expected;
    Network::LocalTCPendpoint ep;
-   pecho::Connection* connection;
+   mtproc::Connection* connection;
 
 protected:
-   pechoHandlerFixture() :ep( "127.0.0.1", 12345),connection(0) {}
+   mtprocHandlerFixture() :ep( "127.0.0.1", 12345),connection(0) {}
 
 	virtual void SetUp()
 	{
       TestDescription test;
-      connection = new pecho::Connection( ep, test.inputBufferSize, test.outputBufferSize);
+      connection = new mtproc::Connection( ep, test.inputBufferSize, test.outputBufferSize);
 
       input.clear();
       expected.clear();
@@ -193,9 +193,9 @@ typedef ::testing::Types<
    OneLine<4,3>,
    Random<4,3,24000>
    > MyTypes;
-TYPED_TEST_CASE( pechoHandlerFixture, MyTypes);
+TYPED_TEST_CASE( mtprocHandlerFixture, MyTypes);
 
-TYPED_TEST( pechoHandlerFixture, ExpectedResult )
+TYPED_TEST( mtprocHandlerFixture, ExpectedResult )
 {
    std::string output;
    char* itr = const_cast<char*>( this->input.c_str());

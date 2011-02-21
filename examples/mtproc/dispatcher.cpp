@@ -21,7 +21,7 @@ void CommandDispatcher::resetCommand()
    else
    {
       m_state = Null;
-      m_context.init( m_instance->data);
+      m_context.init( 0);
    }
 }
 
