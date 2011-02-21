@@ -165,8 +165,8 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		if( !config.foreground ) {
 			// Aba: maybe also in the foreground?
 			// try to lock the pidfile, bail out if not possible
-			if( boost::filesystem::exists( config.pidFile ) ) {
-				boost::interprocess::file_lock lock( config.pidFile.c_str( ) );
+			if( boost::filesystem::exists( config.srvConfig->pidFile ) ) {
+				boost::interprocess::file_lock lock( config.srvConfig->pidFile.c_str( ) );
 				if( lock.try_lock( ) ) {
 					std::cerr << "Pidfile is locked, another daemon running?" << std::endl;
 					return _SMERP::ErrorCodes::FAILURE;
@@ -190,27 +190,27 @@ int _SMERP_posixMain( int argc, char* argv[] )
 			struct group *groupent;
 			struct passwd *passwdent;
 
-			groupent = getgrnam( config.group.c_str( ) );
-			passwdent = getpwnam( config.user.c_str( ) );
+			groupent = getgrnam( config.srvConfig->group.c_str( ) );
+			passwdent = getpwnam( config.srvConfig->user.c_str( ) );
 			if( groupent == NULL || passwdent == NULL ) {
-				LOG_CRITICAL << "Illegal group '" << config.group << "' or user '" << config.user << "'";
+				LOG_CRITICAL << "Illegal group '" << config.srvConfig->group << "' or user '" << config.srvConfig->user << "'";
 				return _SMERP::ErrorCodes::FAILURE;
 			}
 
 			if( setgid( groupent->gr_gid ) < 0 ) {
-				LOG_CRITICAL << "setgid for group '" << config.group << "' failed!";
+				LOG_CRITICAL << "setgid for group '" << config.srvConfig->group << "' failed!";
 				return _SMERP::ErrorCodes::FAILURE;
 			}
 
 			if( setuid( passwdent->pw_uid ) < 0 ) {
-				LOG_CRITICAL << "setgid for user '" << config.user << "' failed!";
+				LOG_CRITICAL << "setgid for user '" << config.srvConfig->user << "' failed!";
 				return _SMERP::ErrorCodes::FAILURE;
 			}
 
 			// create a pid file and lock id
-			std::ofstream pidFile( config.pidFile.c_str( ), std::ios_base::trunc );
+			std::ofstream pidFile( config.srvConfig->pidFile.c_str( ), std::ios_base::trunc );
 			if( !pidFile.good( ) ) {
-				LOG_CRITICAL << "Unable to create PID file '" << config.pidFile << "'!";
+				LOG_CRITICAL << "Unable to create PID file '" << config.srvConfig->pidFile << "'!";
 				return _SMERP::ErrorCodes::FAILURE;
 			}
 			pidFile << getpid( ) << std::endl;
@@ -232,8 +232,8 @@ int _SMERP_posixMain( int argc, char* argv[] )
 
 		// Run server in background thread(s).
 		_SMERP::ServerHandler	handler( handlerConfig );
-		_SMERP::Network::server s( config.address, config.SSLaddress, handler,
-					   config.threads, config.maxConnections );
+		_SMERP::Network::server s( config.srvConfig->address, config.srvConfig->SSLaddress, handler,
+					   config.srvConfig->threads, config.srvConfig->maxConnections );
 		boost::thread t( boost::bind( &_SMERP::Network::server::run, &s ));
 
 		// Restore previous signals.
@@ -257,7 +257,7 @@ int _SMERP_posixMain( int argc, char* argv[] )
 
 		// Daemon stuff
 		if( !config.foreground ) {
-			(void)remove( config.pidFile.c_str( ) );
+			(void)remove( config.srvConfig->pidFile.c_str( ) );
 		}
 	}
 	catch (std::exception& e)	{

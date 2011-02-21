@@ -29,22 +29,6 @@ namespace _SMERP {
 		std::string		configFile;
 // from command line
 		bool			foreground;
-// daemon configuration
-		std::string		user;
-		std::string		group;
-		std::string		pidFile;
-// service configuration
-		std::string		serviceName;
-		std::string		serviceDisplayName;
-		std::string		serviceDescription;
-
-// server configuration
-		unsigned		threads;
-		unsigned		maxConnections;
-
-// network configuration
-		std::list<Network::ServerTCPendpoint> address;
-		std::list<Network::ServerSSLendpoint> SSLaddress;
 
 // server configuration
 		Configuration::ServerConfiguration	*srvConfig;

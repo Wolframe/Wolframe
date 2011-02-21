@@ -123,24 +123,32 @@ bool ServerConfiguration::parse( boost::property_tree::ptree& pt, std::ostream& 
 					if ( ! getStringValue( L2it, displayStr(), "pidFile", pidFile, os ))
 						return false;
 				}
+				else	{
+					os << displayStr() << ": daemon: unknown configuration option: <" << L2it->first << ">";
+					return false;
+				}
 			}
 		}
 #endif
 #if defined(_WIN32)
-		else if ( boost::algorithm::iequals( L1it->first, "listen" ))	{
+		else if ( boost::algorithm::iequals( L1it->first, "service" ))	{
 			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
 									L2it != L1it->second.end(); L2it++ )	{
-				if ( boost::algorithm::iequals( L1it->first, "serviceName" ))	{
-					if ( ! getStringValue( L1it, displayStr(), "serviceName", serviceName, os ))
+				if ( boost::algorithm::iequals( L2it->first, "serviceName" ))	{
+					if ( ! getStringValue( L2it, displayStr(), "serviceName", serviceName, os ))
 						return false;
 				}
-				else if ( boost::algorithm::iequals( L1it->first, "displayName" ))	{
-					if ( ! getStringValue( L1it, displayStr(), "displayName", displayName, os ))
+				else if ( boost::algorithm::iequals( L2it->first, "displayName" ))	{
+					if ( ! getStringValue( L2it, displayStr(), "displayName", displayName, os ))
 						return false;
 				}
 				else if ( boost::algorithm::iequals( L1it->first, "description" ))	{
-					if ( ! getStringValue( L1it, displayStr(), "description", description, os ))
+					if ( ! getStringValue( L2it, displayStr(), "description", description, os ))
 						return false;
+				}
+				else	{
+					os << displayStr() << ": service: unknown configuration option: <" << L2it->first << ">";
+					return false;
 				}
 			}
 		}
@@ -152,90 +160,107 @@ bool ServerConfiguration::parse( boost::property_tree::ptree& pt, std::ostream& 
 					if ( ! getUnsignedShortValue( L2it, displayStr(), "maxConnections", maxConnections, os ))
 						return false;
 				}
+				else if ( boost::algorithm::iequals( L2it->first, "socket" ))	{
+					std::string	host;
+					unsigned short	port = 0;
+					unsigned short	maxConn = 0;
+					for ( boost::property_tree::ptree::const_iterator L3it = L2it->second.begin();
+											L3it != L2it->second.end(); L3it++ )	{
+						if ( boost::algorithm::iequals( L3it->first, "host" ))	{
+							if ( ! getHostnameValue( L3it, displayStr(), "host", host, os ))
+								return false;
+						}
+						else if ( boost::algorithm::iequals( L3it->first, "address" ))	{
+							if ( ! getHostnameValue( L3it, displayStr(), "address", host, os ))
+								return false;
+						}
+						else if ( boost::algorithm::iequals( L3it->first, "port" ))	{
+							if ( ! getUnsignedShortValue( L3it, displayStr(), "port", port, os ))
+								return false;
+						}
+						else if ( boost::algorithm::iequals( L3it->first, "maxConnections" ))	{
+							if ( ! getUnsignedShortValue( L3it, displayStr(), "maxConnections", maxConn, os ))
+								return false;
+						}
+						else	{
+							os << displayStr() << ": socket: unknown configuration option: <" << L3it->first << ">";
+							return false;
+						}
+					}
+					Network::ServerTCPendpoint lep( host, port, maxConn );
+					address.push_back( lep );
+				}
+				else if ( boost::algorithm::iequals( L2it->first, "SSLsocket" ))	{
+					std::string	host;
+					unsigned short	port = 0;
+					unsigned short	maxConn = 0;
+					std::string	certFile;
+					std::string	keyFile;
+					std::string	CAdirectory;
+					std::string	CAchainFile;
+					bool		verify;
+					for ( boost::property_tree::ptree::const_iterator L3it = L2it->second.begin();
+											L3it != L2it->second.end(); L3it++ )	{
+						if ( boost::algorithm::iequals( L3it->first, "host" ))	{
+							if ( ! getHostnameValue( L3it, displayStr(), "host", host, os ))
+								return false;
+						}
+						else if ( boost::algorithm::iequals( L3it->first, "address" ))	{
+							if ( ! getHostnameValue( L3it, displayStr(), "address", host, os ))
+								return false;
+						}
+						else if ( boost::algorithm::iequals( L3it->first, "port" ))	{
+							if ( ! getUnsignedShortValue( L3it, displayStr(), "port", port, os ))
+								return false;
+						}
+						else if ( boost::algorithm::iequals( L3it->first, "maxConnections" ))	{
+							if ( ! getUnsignedShortValue( L3it, displayStr(), "maxConnections", maxConn, os ))
+								return false;
+						}
+						else if ( boost::algorithm::iequals( L3it->first, "certificate" ))	{
+							if ( ! getHostnameValue( L3it, displayStr(), "certificate", certFile, os ))
+								return false;
+						}
+						else if ( boost::algorithm::iequals( L3it->first, "key" ))	{
+							if ( ! getHostnameValue( L3it, displayStr(), "key", keyFile, os ))
+								return false;
+						}
+						else if ( boost::algorithm::iequals( L3it->first, "CAdirectory" ))	{
+							if ( ! getHostnameValue( L3it, displayStr(), "CAdirectory", CAdirectory, os ))
+								return false;
+						}
+						else if ( boost::algorithm::iequals( L3it->first, "CAchainFile" ))	{
+							if ( ! getHostnameValue( L3it, displayStr(), "CAchainFile", CAchainFile, os ))
+								return false;
+						}
+						else if ( boost::algorithm::iequals( L3it->first, "verify" ))	{
+							if ( ! getBoolValue( L3it, displayStr(), "verify", verify, os ))
+								return false;
+						}
+						else	{
+							os << displayStr() << ": socket: unknown configuration option: <" << L3it->first << ">";
+							return false;
+						}
+					}
+					Network::ServerSSLendpoint lep( host, port, maxConn,
+									certFile, keyFile,
+									verify, CAdirectory, CAchainFile );
+					SSLaddress.push_back( lep );
+				}
+				else	{
+					os << displayStr() << ": listen: unknown configuration option: <" << L2it->first << ">";
+					return false;
+				}
 			}
+		}
+		else	{
+			os << displayStr() << ": unknown configuration option: <" << L1it->first << ">";
+			return false;
 		}
 	}
 	return true;
 }
 
-//________________________________
-//	BOOST_FOREACH( boost::property_tree::ptree::value_type &v, pt.get_child( "server.listen" ))	{
-//		std::string hostStr = v.second.get<std::string>( "address", std::string() );
-//		if ( hostStr.empty() )	{
-//			errMsg_ = "Interface must be defined";
-//			return false;
-//		}
-//		if ( hostStr == "*" )
-//			hostStr = "0.0.0.0";
-//		std::string portStr = v.second.get<std::string>( "port", std::string() );
-//		if ( portStr.empty() )	{
-//			if ( v.first == "socket" )
-//				port = DEFAULT_PORT;
-//			else
-//				port = SSL_DEFAULT_PORT;
-//		}
-//		else	{
-//			try	{
-//				port = boost::lexical_cast<unsigned short>( portStr );
-//			}
-//			catch( boost::bad_lexical_cast& )	{
-//				errMsg_ = "Invalid value for port: ";
-//				errMsg_ += portStr;
-//				return false;
-//			}
-//			if ( port == 0 )	{
-//				errMsg_ = "Port out of range: ";
-//				errMsg_ += portStr;
-//				return false;
-//			}
-//		}
-
-//		unsigned maxConn = v.second.get<unsigned>( "maxConnections", 0 );
-
-//		if ( v.first == "socket" )	{
-//			Network::ServerTCPendpoint lep( hostStr, port, maxConn );
-//			address.push_back( lep );
-//		}
-//		else if ( v.first == "SSLsocket" )	{
-//// get SSL certificate / CA param
-//			std::string certFile = boost::filesystem::absolute(
-//								v.second.get<std::string>( "certificate", std::string() ),
-//								boost::filesystem::path( file ).branch_path() ).string();
-//			std::string keyFile = boost::filesystem::absolute(
-//								v.second.get<std::string>( "key", std::string() ),
-//								boost::filesystem::path( file ).branch_path() ).string();
-//			std::string CAdirectory = boost::filesystem::absolute(
-//								v.second.get<std::string>( "CAdirectory", std::string() ),
-//								boost::filesystem::path( file ).branch_path() ).string();
-//			std::string CAchainFile = boost::filesystem::absolute(
-//								v.second.get<std::string>( "CAchainFile", std::string() ),
-//								boost::filesystem::path( file ).branch_path() ).string();
-
-//			std::string tmpStr;
-//			boost::logic::tribool flag = getBoolValue( v.second, "verify", tmpStr );
-//			bool verify;
-//			if ( flag )
-//				verify = true;
-//			else if ( !flag )
-//				verify = false;
-//			else	{
-//				verify = true;
-//				errMsg_ = "Unknown value \"";
-//				errMsg_ += tmpStr;
-//				errMsg_ += "\" for SSL verify client. WARNING: enabling verification";
-//			}
-//			Network::ServerSSLendpoint lep( hostStr, port, maxConn,
-//							certFile, keyFile,
-//							verify, CAdirectory, CAchainFile );
-//			SSLaddress.push_back( lep );
-//		}
-//		else	{
-//			errMsg_ = "Invalid listen type: ";
-//			errMsg_ += v.first;
-//			return false;
-//		}
-//	}
-// ********************************
 
 #if !defined(_WIN32)
 	/// Override the server configuration with command line arguments

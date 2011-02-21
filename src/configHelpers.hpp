@@ -15,6 +15,9 @@ namespace _SMERP {
 		bool getStringValue( boost::property_tree::ptree::const_iterator it, const std::string& module,
 				     const std::string& name, std::string& value, std::ostream& os );
 
+		bool getHostnameValue( boost::property_tree::ptree::const_iterator it, const std::string& module,
+				     const std::string& name, std::string& value, std::ostream& os );
+
 		bool getUnsignedShortValue( boost::property_tree::ptree::const_iterator it, const std::string& module,
 					    const std::string& name, unsigned short& value, std::ostream& os );
 

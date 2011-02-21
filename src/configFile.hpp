@@ -14,22 +14,6 @@ namespace _SMERP	{
 
 	struct CfgFileConfig	{
 		std::string		file;
-// daemon configuration
-		std::string		user;
-		std::string		group;
-		std::string		pidFile;
-
-// service configuration
-		std::string		serviceName;
-		std::string		serviceDisplayName;
-		std::string		serviceDescription;
-
-// server configuration
-		unsigned short		threads;
-		unsigned short		maxConnections;
-// network configuration
-		std::list<Network::ServerTCPendpoint> address;
-		std::list<Network::ServerSSLendpoint> SSLaddress;
 
 // server configuration
 		Configuration::ServerConfiguration	*srvConfig;

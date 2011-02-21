@@ -50,6 +50,24 @@ bool getStringValue( boost::property_tree::ptree::const_iterator it, const std::
 }
 
 
+bool getHostnameValue( boost::property_tree::ptree::const_iterator it, const std::string& module,
+		     const std::string& name, std::string& value, std::ostream& os )
+{
+	if ( !value.empty() )	{
+		os << module << ": " << name << " redefined";
+		return false;
+	}
+	value = it->second.get_value<std::string>();
+	if ( value.empty() )	{
+		os << module << ": invalid " << name << ": <" << it->second.get_value<std::string>() << ">";
+		return false;
+	}
+	if ( value == "*" )
+		value = "0.0.0.0";
+	return true;
+}
+
+
 bool getUnsignedShortValue( boost::property_tree::ptree::const_iterator it, const std::string& module,
 			    const std::string& name, unsigned short& value, std::ostream& os )
 {
