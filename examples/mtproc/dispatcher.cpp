@@ -12,6 +12,8 @@ void CommandDispatcher::resetCommand()
    m_lineBuffer.init();
    m_argBuffer.init();
    m_cmdBuffer.init();
+   m_argc = 0;
+   m_argv = 0;
 
    if (m_instance)
    {
@@ -55,19 +57,9 @@ void CommandDispatcher::init( const char** protocolCmds, Instance* instance)
 
 void CommandDispatcher::protocolInput( protocol::InputBlock::iterator& start, protocol::InputBlock::iterator& end, bool eoD)
 {
-   if (m_state == WaitForInput)
-   {
-      LOG_DATA << "command handler got input";
-      m_state = Running;
-   }
-   else
-   {
-      LOG_ERROR << "illegal state (unexpected protocol input)";
-      throw (IllegalState());
-   }
    if (m_context.contentIterator)
    {
-      m_context.contentIterator->protocolInput( (void*)&*start, end-start, eoD);
+      m_context.contentIterator->protocolInput( start.ptr(), end-start, eoD);
    }
    else
    {
@@ -104,24 +96,24 @@ CommandDispatcher::CommandDispatcher( Instance* instance)
    init( instance);
 }
 
-CommandDispatcher::~CommandDispatcher()
-{
-   if (m_instance) delete m_instance;
-}
-
 CommandDispatcher::Command CommandDispatcher::getCommand( protocol::InputBlock::iterator& itr, protocol::InputBlock::iterator& eoM)
 {
    switch (m_state)
    {
       case Running:
-      case WaitForInput:
       case Null:
       case Init:
       {
          resetCommand();
+         m_state = Parsing;
+         //no break here !
+      }
+      case Parsing:
+      {
          int ci = m_parser.getCommand( itr, eoM, m_cmdBuffer);
          if (ci >= unknown && ci < method)
          {
+            if (ci == unknown) return unknown;
             m_command = (Command)ci;
             m_methodIdx = 0;
          }
@@ -138,11 +130,14 @@ CommandDispatcher::Command CommandDispatcher::getCommand( protocol::InputBlock::
          if (m_command == method)
          {
             if (!ProtocolParser::getLine( itr, eoM, m_argBuffer)) return unknown;
+            m_state = ArgumentsParsed;
          }
          else
          {
-            if (!ProtocolParser::skipSpaces( itr, eoM) && !ProtocolParser::consumeEOLN( itr, eoM)) return unknown;
-            return m_command;
+            if (!ProtocolParser::skipSpaces( itr, eoM) || !ProtocolParser::consumeEOLN( itr, eoM)) return unknown;
+            CommandDispatcher::Command rt = m_command;
+            resetCommand();
+            return rt;         
          }
          //no break here !
       }
@@ -161,6 +156,7 @@ CommandDispatcher::IOState CommandDispatcher::call( int& returnCode)
    {
       case Null:
       case Init:
+      case Parsing:
       case Selected:
       { 
          LOG_ERROR << "illegal call in this state (not running)";
@@ -169,16 +165,15 @@ CommandDispatcher::IOState CommandDispatcher::call( int& returnCode)
       case ArgumentsParsed:
       {
          LOG_DEBUG << "call of '" << m_instance->mt[ m_methodIdx].name << "'";
+         m_argc = m_argBuffer.argc();
+         m_argv = m_argBuffer.argv();
          m_state = Running;
          //no break here !
       }
-      case WaitForInput:
-         LOG_ERROR << "called without input";
-         //no break here !
-         
+
       case Running:
       {
-         returnCode = m_instance->mt[ m_methodIdx].call( &m_context, m_argBuffer.argc(), m_argBuffer.argv());
+         returnCode = m_instance->mt[ m_methodIdx].call( &m_context, m_argc, m_argv);
          if (returnCode != 0)
          {
             LOG_ERROR << "error " << returnCode << " calling '" << m_instance->mt[ m_methodIdx].name << "'";
@@ -211,7 +206,6 @@ CommandDispatcher::IOState CommandDispatcher::call( int& returnCode)
                   }
 
                case protocol::Generator::EndOfMessage:
-                  m_state = WaitForInput;
                   return ReadInput;
             }
          }

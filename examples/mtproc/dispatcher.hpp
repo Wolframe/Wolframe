@@ -23,10 +23,10 @@ private:
    {
       Null,                    //< not instantiated yet
       Init,                    //< object and method table have been initialized
+      Parsing,                 //< parsing command
       Selected,                //< command has been parsed
       ArgumentsParsed,         //< command arguments have been parsed
-      Running,                 //< running command, interrupted by a yield 
-      WaitForInput             //< running and waiting for input
+      Running                  //< running command, interrupted by a yield 
    };
    typedef protocol::CmdBuffer CmdBuffer;                    //< buffer type for protocol commands
    typedef protocol::CmdParser<CmdBuffer> ProtocolParser;    //< parser type for the protocol
@@ -42,6 +42,8 @@ private:
    unsigned int m_methodIdx;                                 //< index of currently executed method or -1
    Command m_command;                                        //< command parsed (return value of getCommand)
    State m_state;                                            //< command handler state
+   unsigned int m_argc;                                      //< number of arguments parsed
+   const char** m_argv;                                      //< pointer to arguments parsed
 
    //set the current command to unknown without affecting the processed data object
    void resetCommand();
@@ -58,7 +60,6 @@ public:
    }
    
    CommandDispatcher( Instance* instance=0);
-   ~CommandDispatcher();
 
    //return the type of the command
    Command getCommand( protocol::InputBlock::iterator& itr, protocol::InputBlock::iterator& eoM);
