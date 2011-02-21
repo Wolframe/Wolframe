@@ -52,4 +52,8 @@ namespace mtproc {
 
 } // namespace _SMERP
 
-#endif // _SMERP_XMLSELECT_HANDLER_HPP_INCLUDED
+#endif
+
+
+
+

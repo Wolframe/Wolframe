@@ -9,6 +9,9 @@ namespace mtproc {
 
 struct CommandDispatcher
 {
+public:
+   enum Command {unknown=-1, empty=0, caps, quit, method};      
+
 private:
    //exception thrown in case of an illegal state (internal error, must not happen)
    struct IllegalState :public std::logic_error
@@ -37,6 +40,7 @@ private:
    Instance* m_instance;                                     //< method table and data
    Method::Context m_context;                                //< context of current method executed
    unsigned int m_methodIdx;                                 //< index of currently executed method or -1
+   Command m_command;                                        //< command parsed (return value of getCommand)
    State m_state;                                            //< command handler state
 
    //set the current command to unknown without affecting the processed data object
@@ -46,7 +50,6 @@ private:
    void init( const char** protocolCmds, Instance* instance);
    
 public:
-   enum Command {unknown=-1, empty=0, caps, quit, method};      
    //initialize the prcessed data object with all its methods and some default protocol commands
    void init( Instance* instance)
    {
