@@ -24,10 +24,14 @@ namespace _SMERP {
 		~LogBackend( );
 
 		void setConsoleLevel( const LogLevel::Level level );
+		
+		void setConsolePrefix( const std::string prefix );
 
 		void setLogfileLevel( const LogLevel::Level level );
 
 		void setLogfileName( const std::string filename );
+
+		void setLogfilePrefix( const std::string prefix );
 
 #ifndef _WIN32
 		void setSyslogLevel( const LogLevel::Level level );

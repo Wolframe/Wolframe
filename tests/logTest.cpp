@@ -17,13 +17,15 @@ class LoggingFixture : public ::testing::Test
 		{
 			// in order not to spoil the output of gtest :-)
 			logBack.setConsoleLevel( _SMERP::LogLevel::LOGLEVEL_UNDEFINED );
+			logBack.setConsolePrefix( "smerp" );
 
 			logBack.setLogfileLevel( _SMERP::LogLevel::LOGLEVEL_DATA );
 			logBack.setLogfileName( "logTest.log" );
+			logBack.setLogfilePrefix( "smerp" );
 #ifndef _WIN32
 			logBack.setSyslogLevel( _SMERP::LogLevel::LOGLEVEL_DATA );
 			logBack.setSyslogFacility( _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_USER );
-			logBack.setSyslogIdent( "test" );
+			logBack.setSyslogIdent( "smerptest" );
 #else
 			logBack.setEventlogLevel( _SMERP::LogLevel::LOGLEVEL_DATA );
 			logBack.setEventlogSource( "smerptest" );

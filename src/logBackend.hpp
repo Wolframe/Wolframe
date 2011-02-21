@@ -32,10 +32,13 @@ namespace _SMERP {
 
 		void log( const LogLevel::Level level, const std::string& msg );
 
-		void reopen( );
+		void setPrefix( const std::string& prefix );
 
+		void reopen( );
+		
 	private:
 		LogLevel::Level	logLevel_;
+		std::string prefix_;
 	};
 
 	class LogfileBackend
@@ -49,6 +52,8 @@ namespace _SMERP {
 
 		void setFilename( const std::string filename );
 
+		void setPrefix( const std::string& prefix );
+
 		void reopen( );
 
 		void log( const LogLevel::Level level, const std::string& msg );
@@ -58,6 +63,7 @@ namespace _SMERP {
 		std::ofstream logFile_;
 		std::string filename_;
 		bool isOpen_;
+		std::string prefix_;
 	};
 
 #ifndef _WIN32
@@ -120,8 +126,12 @@ namespace _SMERP {
 		~LogBackendImpl( );
 
 		void setConsoleLevel( const LogLevel::Level level );
+		
+		void setConsolePrefix( const std::string& prefix );
 
 		void setLogfileLevel( const LogLevel::Level level );
+		
+		void setLogfilePrefix( const std::string& prefix );
 
 		void setLogfileName( const std::string filename );
 

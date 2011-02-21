@@ -12,9 +12,6 @@ ABa:
   - SASL
 - makefiles
   - merge po stuff from WolfBones with the funny script in po :-)
-- logger
-  - add a prefix for logging in subparts of the system (e.g. network, luaprocessor),
-    map it to ident for syslog, source for eventlog
 - Windows:
   - username, password for service credentials
   - clean up native Win32 string mess in service code

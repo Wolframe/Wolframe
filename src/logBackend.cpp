@@ -38,6 +38,7 @@ namespace _SMERP {
 ConsoleLogBackend::ConsoleLogBackend( )
 {
 	logLevel_ = _SMERP::LogLevel::LOGLEVEL_ERROR;
+	prefix_ = "";
 }
 
 ConsoleLogBackend::~ConsoleLogBackend( )
@@ -50,10 +51,16 @@ void ConsoleLogBackend::setLevel( const LogLevel::Level level )
 	logLevel_ = level;
 }
 
+void ConsoleLogBackend::setPrefix( const std::string& prefix )
+{
+	prefix_ = prefix;
+}
+
 inline void ConsoleLogBackend::log( const LogLevel::Level level, const std::string& msg )
 {
 	if ( level >= logLevel_ )
-		std::cerr << level << ": " << msg << std::endl;
+		std::cerr << prefix_ << ( prefix_.empty( ) ? "" : " - " ) << level << ": " << msg << std::endl;
+		std::cerr.flush();
 }
 
 void ConsoleLogBackend::reopen( )
@@ -67,6 +74,7 @@ LogfileBackend::LogfileBackend( )
 {
 	logLevel_ = _SMERP::LogLevel::LOGLEVEL_UNDEFINED;
 	isOpen_ = false;
+	prefix_ = "";
 	// we don't open a primarily unknown logfile, wait for setFilename
 }
 
@@ -86,6 +94,11 @@ void LogfileBackend::setFilename( const std::string filename )
 {
 	filename_ = filename;
 	reopen( );
+}
+
+void LogfileBackend::setPrefix( const std::string& prefix )
+{
+	prefix_ = prefix;
 }
 
 void LogfileBackend::reopen( )
@@ -139,7 +152,9 @@ static inline std::string timestamp( void )
 inline void LogfileBackend::log( const LogLevel::Level level, const std::string& msg )
 {
 	if( level >= logLevel_ && isOpen_ ) {
-		logFile_ << timestamp( ) << " " << level << ": " << msg << std::endl;
+		logFile_	<< timestamp( ) << " "
+				<<  prefix_ << ( prefix_.empty( ) ? "" : " - " )
+				<< level << ": " << msg << std::endl;
 		logFile_.flush( );
 	}
 }
@@ -391,6 +406,11 @@ void LogBackend::LogBackendImpl::setConsoleLevel( const LogLevel::Level level )
 	consoleLogger_.setLevel( level );
 }
 
+void LogBackend::LogBackendImpl::setConsolePrefix( const std::string& prefix )
+{
+	consoleLogger_.setPrefix( prefix );
+}
+
 void LogBackend::LogBackendImpl::setLogfileLevel( const LogLevel::Level level )
 {
 	logfileLogger_.setLevel( level );
@@ -399,6 +419,11 @@ void LogBackend::LogBackendImpl::setLogfileLevel( const LogLevel::Level level )
 void LogBackend::LogBackendImpl::setLogfileName( const std::string filename )
 {
 	logfileLogger_.setFilename( filename );
+}
+
+void LogBackend::LogBackendImpl::setLogfilePrefix( const std::string& prefix )
+{
+	logfileLogger_.setPrefix( prefix );
 }
 
 #if !defined( _WIN32 )
@@ -455,9 +480,13 @@ LogBackend::~LogBackend()	{ delete impl_; }
 
 void LogBackend::setConsoleLevel( const LogLevel::Level level )	{ impl_->setConsoleLevel( level ); }
 
+void LogBackend::setConsolePrefix( const std::string prefix ) { impl_->setConsolePrefix( prefix ); }
+
 void LogBackend::setLogfileLevel( const LogLevel::Level level )	{ impl_->setLogfileLevel( level ); }
 
 void LogBackend::setLogfileName( const std::string filename )	{ impl_->setLogfileName( filename );}
+
+void LogBackend::setLogfilePrefix( const std::string prefix ) { impl_->setLogfilePrefix( prefix ); }
 
 #ifndef _WIN32
 void LogBackend::setSyslogLevel( const LogLevel::Level level )	{ impl_->setSyslogLevel( level );}

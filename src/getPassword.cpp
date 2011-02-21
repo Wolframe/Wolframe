@@ -31,6 +31,7 @@ namespace _SMERP {
 #else // defined(_WIN32)
 
 #include <tchar.h>
+#define WIN32_MEAN_AND_LEAN
 #include <windows.h>
 #include <stdlib.h>
 #include <conio.h>
