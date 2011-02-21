@@ -1,6 +1,8 @@
 Prerequisites
 -------------
 
+- Visual C++ (cl, link and nmake), VC8 or later
+- Platform SDK 6.0a or later
 - boost 1.43.0 or later
 - optionally (WITH_SSL) openssl 0.9.8 or later
 - optionally (WITH_GTEST) gtest 1.5.0 or later
