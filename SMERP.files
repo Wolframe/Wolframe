@@ -298,7 +298,6 @@ src/authentication.hpp
 src/authentication.cpp
 tests/testNamedRetVal.cpp
 src/smerpLogic.cpp
-src/smerpLogic.cpp
 examples/xmlselect/xmlIterator.hpp
 examples/xmlselect/textwolf.hpp
 examples/xmlselect/xmlIterator.cpp
@@ -358,3 +357,4 @@ src/configServer.cpp
 ./clients/qt/Makefile.W32
 ./clients/Makefile.W32
 ./src/Makefile.W32
+src/appDefaults.hpp

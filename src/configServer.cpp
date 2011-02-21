@@ -99,7 +99,7 @@ ServerConfiguration::ServerConfiguration( const std::string& node, const std::st
 	}
 
 
-//////////////////////////////////
+/// Parse the configuration
 bool ServerConfiguration::parse( boost::property_tree::ptree& pt, std::ostream& os )
 {
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
@@ -151,6 +151,12 @@ bool ServerConfiguration::parse( boost::property_tree::ptree& pt, std::ostream& 
 					return false;
 				}
 			}
+			if ( serviceName.empty() )
+				serviceName = DEFAULT_SERVICE_NAME;
+			if ( displayName.empty() )
+				displayName = DEFAULT_SERVICE_DISPLAY_NAME;
+			if ( description.empty() )
+				description = DEFAULT_SERVICE_DESCRIPTION;
 		}
 #endif
 		else if ( boost::algorithm::iequals( L1it->first, "listen" ))	{
@@ -187,6 +193,9 @@ bool ServerConfiguration::parse( boost::property_tree::ptree& pt, std::ostream& 
 							return false;
 						}
 					}
+					if ( port == 0 )
+						port = DEFAULT_TCP_PORT;
+
 					Network::ServerTCPendpoint lep( host, port, maxConn );
 					address.push_back( lep );
 				}
@@ -242,6 +251,9 @@ bool ServerConfiguration::parse( boost::property_tree::ptree& pt, std::ostream& 
 							return false;
 						}
 					}
+					if ( port == 0 )
+						port = DEFAULT_SSL_PORT;
+
 					Network::ServerSSLendpoint lep( host, port, maxConn,
 									certFile, keyFile,
 									verify, CAdirectory, CAchainFile );

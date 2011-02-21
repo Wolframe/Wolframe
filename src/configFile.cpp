@@ -10,40 +10,12 @@
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 
-#include <boost/foreach.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/logic/tribool.hpp>
-#include <boost/algorithm/string.hpp>
-
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/info_parser.hpp>
 
 #include <vector>
-#include <string>
 
 #include <sstream>
-
-
-static const unsigned short	DEFAULT_PORT = 7660;
-static const unsigned short	SSL_DEFAULT_PORT = 7960;
-
-static const char*		DEFAULT_SERVICE_NAME = "smerp";
-static const char*		DEFAULT_SERVICE_DISPLAY_NAME = "Smerp Daemon";
-static const char*		DEFAULT_SERVICE_DESCRIPTION = "a daemon for smerping";
-
-
-static boost::logic::tribool getBoolValue( boost::property_tree::ptree& pt, const std::string& label, std::string& val )
-{
-	std::string s = pt.get<std::string>( label, std::string() );
-	val = s;
-	boost::to_upper( s );
-	boost::trim( s );
-	if ( s == "NO" || s == "FALSE" || s == "0" || s == "OFF" )
-		return false;
-	if ( s == "YES" || s == "TRUE" || s == "1" || s == "ON" )
-		return true;
-	return boost::logic::indeterminate;
-}
 
 
 namespace _SMERP {

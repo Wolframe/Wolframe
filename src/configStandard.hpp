@@ -5,6 +5,7 @@
 #ifndef _CONFIG_STANDARD_HPP_INCLUDED
 #define _CONFIG_STANDARD_HPP_INCLUDED
 
+#include "appDefaults.hpp"
 #include "configurationBase.hpp"
 #include "serverEndpoint.hpp"
 #include "logLevel.hpp"
