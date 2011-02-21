@@ -197,13 +197,20 @@ endif
 ifeq "$(LINUX_REV)" "5"
 XSLT_MAN_STYLESHEET ?= /usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl
 endif
+endif
 
 # Fedora 14
 ifeq "$(LINUX_DIST)" "redhat"
+
+# Fedora 14
 ifeq "$(LINUX_REV)" "14"
 XSLT_VERSION ?= $(shell rpm -q --queryformat '%{VERSION}' docbook-style-xsl)
 XSLT_MAN_STYLESHEET ?= /usr/share/sgml/docbook/xsl-stylesheets-$(XSLT_VERSION)/manpages/docbook.xsl
 endif
+
+# RHEL5
+ifeq "$(LINUX_REV)" "5"
+XSLT_MAN_STYLESHEET ?= /usr/share/sgml/docbook/xsl-stylesheets/manpages/docbook.xsl
 endif
 
 endif
@@ -327,14 +334,24 @@ GTEST_LIBS ?= -lgtest
 endif
 endif
 
-# Fedora 14
 ifeq "$(LINUX_DIST)" "redhat"
+
+# Fedora 14
 ifeq "$(LINUX_REV)" "14"
 GTEST_DIR ?= /usr
 GTEST_LIB_DIR ?= $(GTEST_DIR)/lib  
 GTEST_INCLUDE_DIR ?= $(GTEST_DIR)/include 
 GTEST_LIBS ?= -lgtest
 endif
+
+# RHEL 5
+ifeq "$(LINUX_REV)" "5"
+GTEST_DIR ?= NOT SUPPLIED ON THIS PLATFORM
+GTEST_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
+GTEST_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
+GTEST_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
+endif
+
 endif
 
 endif
@@ -367,6 +384,12 @@ ifeq "$(LINUX_REV)" "14"
 QT_DIR ?= /usr/lib/qt4
 QT_INCLUDE_DIR ?= /usr/include
 QT_LIB_DIR ?= /usr/lib
+endif
+
+ifeq "$(LINUX_REV)" "5"
+QT_DIR ?= /usr/lib/qt4
+QT_INCLUDE_DIR ?= $(QT_DIR)/include
+QT_LIB_DIR ?= $(QT_DIR)/lib
 endif
 
 endif
@@ -443,14 +466,24 @@ LUA_LIB_DIR ?= $(LUA_DIR)/lib
 LUA_LIBS ?= -llua
 endif
 
-# Fedora 14
 ifeq "$(LINUX_DIST)" "redhat"
+
+# Fedora 14
 ifeq "$(LINUX_REV)" "14"
 LUA_DIR ?= /usr
 LUA_INCLUDE_DIR ?= $(LUA_DIR)/include
 LUA_LIB_DIR ?= $(LUA_DIR)/lib
 LUA_LIBS ?= -llua
 endif
+
+# RHEL 5
+ifeq "$(LINUX_REV)" "5"
+LUA_DIR ?= /usr
+LUA_INCLUDE_DIR ?= $(LUA_DIR)/include
+LUA_LIB_DIR ?= $(LUA_DIR)/lib
+LUA_LIBS ?= -llua
+endif
+
 endif
 
 endif
@@ -486,14 +519,24 @@ PAM_LIBS ?= -lpam
 endif
 endif
 
-# Fedora 14
 ifeq "$(LINUX_DIST)" "redhat"
+
+# Fedora 14
 ifeq "$(LINUX_REV)" "14"
 PAM_DIR ?= /usr
 PAM_INCLUDE_DIR ?= $(PAM_DIR)/include
 PAM_LIB_DIR ?= /lib
 PAM_LIBS ?= -lpam
 endif
+
+# RHEL5
+ifeq "$(LINUX_REV)" "5"
+PAM_DIR ?= /usr
+PAM_INCLUDE_DIR ?= $(PAM_DIR)/include
+PAM_LIB_DIR ?= /lib
+PAM_LIBS ?= -lpam  
+endif
+
 endif
 
 ifeq "$(LINUX_DIST)" "suse"

@@ -17,7 +17,7 @@ ABa:
   - clean up native Win32 string mess in service code
 - 64-bit on Windows, issues with Qt, boost at least
 - Debian 5.0: Qt client can't load designer library and run correctly, don'y know why?
-
+- RHEL 5: no decent qt available
 
 PF:
 

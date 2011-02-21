@@ -107,6 +107,8 @@ ifdef WITH_PAM
 	@echo "PAM_LIB_DIR: $(PAM_LIB_DIR)"
 	@echo "PAM_LIBS: $(PAM_LIBS)"
 endif
+	@echo
+	@echo "XSLT_MAN_STYLESHEET: $(XSLT_MAN_STYLESHEET)"
 
 .PHONY: init-po
 init-po:

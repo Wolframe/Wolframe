@@ -48,9 +48,15 @@ A note on Linux Distributions
 RHEL/Centos/SL 5.5
 ------------------
 
-Fetch from epel/rpmforge whatever: lua-devel
 
-Boost is not available in a decent version (1.33), build your own
+Optional packages:
+Fetch from epel/rpmforge whatever: lua-devel (5.1)
+Fetch from normal repository: openssl-devel, pam-devel (0.99.6), qt-devel (4.2.1)
+
+Boost is not available in a decent version (1.33), build your own one.
+For building the documentation you need 'libxslt', 'doxygen' and
+'docbook-style-xsl' (from epel).
+Qt (4.2.1) is too old, compile your own one
 
 Fedora 14
 ---------
