@@ -82,6 +82,7 @@ endif
 
 include $(TOPDIR)/makefiles/gmake/sub.mk
 
+logTest: $(TOPDIR)/src/libsmerp.a
 authTest: $(TOPDIR)/src/libsmerp.a
 
 ifdef WITH_GTEST
