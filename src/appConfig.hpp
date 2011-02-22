@@ -23,7 +23,6 @@ namespace _SMERP {
 
 /// application configuration structure
 	struct CmdLineConfig;		// forward declaration for configuration from the command line
-	struct CfgFileConfig;		// forward declaration for configuration from the config file
 
 	struct ApplicationConfiguration	{
 		std::string		configFile;
@@ -41,11 +40,20 @@ namespace _SMERP {
 		std::string		errMsg_;
 
 	public:
-		ApplicationConfiguration( const CmdLineConfig& cmdLine, const CfgFileConfig& cfgFile );
-		std::string errMsg() const	{ return errMsg_; }
-		bool check();
-		bool test();
+		ApplicationConfiguration();
+
+		bool parse( const char *filename, std::ostream& os );
+		void finalize( const CmdLineConfig& cmdLine );
+
+		std::string errMsg() const;
+		bool check( std::ostream& os ) const;
+		bool test( std::ostream& os ) const;
 		void print( std::ostream& os ) const;
+
+		static const char* chooseFile( const char *globalFile,
+						const char *userFile,
+						const char *localFile );
+
 	};
 
 } // namespace _SMERP

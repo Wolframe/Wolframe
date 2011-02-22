@@ -37,8 +37,6 @@ makefiles/nmake/top.mk
 ./examples/echo/echoHandler.cpp
 ./examples/echo/commandLine.hpp
 ./examples/echo/appConfig.hpp
-./examples/echo/configFile.cpp
-./examples/echo/configFile.hpp
 ./examples/echo/smerp-echo.cpp
 ./examples/pecho/appConfig.cpp
 ./examples/pecho/commandLine.hpp
@@ -138,12 +136,10 @@ makefiles/nmake/top.mk
 ./src/server.cpp
 ./src/defaults.hpp
 ./src/smerpd.cpp
-./src/configFile.cpp
 ./src/protocol_ioblocks.cpp
 ./src/authentication_pam.hpp
 ./src/connection.hpp
 ./src/getPassword.hpp
-./src/configFile.hpp
 ./src/authentication.hpp
 ./src/authentication_textfile.cpp
 ./src/logLevel.cpp
@@ -231,7 +227,6 @@ src/exceptionBase.hpp
 src/defaults.hpp
 src/connectionBase.hpp
 src/connection.hpp
-src/configFile.hpp
 src/commandLine.hpp
 src/appConfig.hpp
 src/acceptor.hpp
@@ -246,7 +241,6 @@ src/logLevel.cpp
 src/logBackend.cpp
 src/getPassword.cpp
 src/connection.cpp
-src/configFile.cpp
 src/commandLine.cpp
 src/appException.cpp
 src/appConfig.cpp
@@ -313,7 +307,6 @@ src/exceptionBase.hpp
 src/defaults.hpp
 src/connectionBase.hpp
 src/connection.hpp
-src/configFile.hpp
 src/commandLine.hpp
 src/logBackend.hpp
 src/getPassword.hpp
@@ -330,7 +323,6 @@ src/server.cpp
 src/resolvePath.cpp
 src/getPassword.cpp
 src/connection.cpp
-src/configFile.cpp
 src/protocol_ioblocks.cpp
 src/posixMain.cpp
 src/logSyslogFacility.cpp

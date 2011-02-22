@@ -12,7 +12,6 @@
 
 #include "version.hpp"
 #include "commandLine.hpp"
-#include "configFile.hpp"
 #include "appConfig.hpp"
 #include "server.hpp"
 #include "ErrorCodes.hpp"
@@ -71,7 +70,7 @@ int _SMERP_posixMain( int argc, char* argv[] )
 						    _SMERP::applicationMinorVersion(),
 						    _SMERP::applicationRevisionVersion(),
 						    _SMERP::applicationBuildVersion() );
-		_SMERP::CmdLineConfig	cmdLineCfg;
+		_SMERP::CmdLineConfig   cmdLineCfg;
 		const char		*configFile;
 
 // it's just a DUMMY for now
@@ -106,24 +105,23 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		if ( !cmdLineCfg.cfgFile.empty() )	// if it has been specified than that's The One ! (and only)
 			configFile = cmdLineCfg.cfgFile.c_str();
 		else
-			configFile = _SMERP::CfgFileConfig::chooseFile( _SMERP::Configuration::defaultMainConfig(),
-									_SMERP::Configuration::defaultUserConfig(),
-									_SMERP::Configuration::defaultLocalConfig() );
+			configFile = _SMERP::ApplicationConfiguration::chooseFile( _SMERP::Configuration::defaultMainConfig(),
+										   _SMERP::Configuration::defaultUserConfig(),
+										   _SMERP::Configuration::defaultLocalConfig() );
 		if ( configFile == NULL )	{	// there is no configuration file
 			std::cerr << gettext ( "MOMOMO: no configuration file found !" ) << std::endl << std::endl;
 			return _SMERP::ErrorCodes::FAILURE;
 		}
 
-		_SMERP::CfgFileConfig	cfgFileCfg;
-		if ( !cfgFileCfg.parse( configFile ))	{	// there was an error parsing the configuration file
-			std::cerr << cfgFileCfg.errMsg() << std::endl << std::endl;
+		_SMERP::ApplicationConfiguration config;
+		if ( !config.parse( configFile, std::cerr ))	{	// there was an error parsing the configuration file
+			std::cerr << std::endl << std::endl;
 			return _SMERP::ErrorCodes::FAILURE;
 		}
-		else if ( !cfgFileCfg.errMsg().empty())
-			std::cerr << cfgFileCfg.errMsg() << std::endl;
 // configuration file has been parsed successfully
-// build the application configuration
-		_SMERP::ApplicationConfiguration config( cmdLineCfg, cfgFileCfg);
+// finalize the application configuration
+		config.finalize( cmdLineCfg );
+
 
 // now here we know where to log to on stderr
 		_SMERP::LogBackend::instance().setConsoleLevel( config.logConfig->stderrLogLevel );

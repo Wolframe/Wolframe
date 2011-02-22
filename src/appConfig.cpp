@@ -4,12 +4,15 @@
 
 #include "appConfig.hpp"
 #include "commandLine.hpp"
-#include "configFile.hpp"
+
+#include "miscUtils.hpp"
 
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 
 #include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/info_parser.hpp>
+
 #include <boost/algorithm/string.hpp>
 
 #include <string>
@@ -18,56 +21,99 @@
 
 namespace _SMERP {
 
-	ApplicationConfiguration::ApplicationConfiguration( const CmdLineConfig& cmdLine, const CfgFileConfig& cfgFile )
-	{
-		configFile = cfgFile.file;
+const char* ApplicationConfiguration::chooseFile( const char *globalFile, const char *userFile, const char *localFile )
+{
+	if ( globalFile != NULL )
+		if ( boost::filesystem::exists( globalFile ))
+			return globalFile;
+	if ( userFile != NULL )
+		if ( boost::filesystem::exists( userFile ))
+			return userFile;
+	if ( localFile != NULL )
+		if ( boost::filesystem::exists( localFile ))
+			return localFile;
+	return NULL;
+}
 
-#if defined(_WIN32)
-		// on Windows the user should either use -f or start in the console
-		// (assuming an implicit -f) or the service option should contain
-		// --service in the startup parameters of the service impling non-foreground
-		if( cmdLine.command == _SMERP::CmdLineConfig::RUN_SERVICE )
-			foreground = false;
-		else
-			foreground = true;
-#else
-		foreground = cmdLine.foreground;
-#endif
-		srvConfig = cfgFile.srvConfig;
-		dbConfig = cfgFile.dbConfig;
-		logConfig = cfgFile.logConfig;
 
-		if ( foreground )
-			logConfig->foreground( cmdLine.debugLevel, cmdLine.useLogConfig );
-		srvConfig->override( cmdLine.user, cmdLine.group );
+bool ApplicationConfiguration::parse ( const char *filename, std::ostream& os )
+{
+	configFile = resolvePath( boost::filesystem::absolute( filename ).string() );
+	if ( !boost::filesystem::exists( configFile ))	{
+		os << "Configuration file " << configFile << " does not exist.";
+		return false;
 	}
 
+	// Create an empty property tree object
+	boost::property_tree::ptree	pt;
+	try	{
 
-	void ApplicationConfiguration::print( std::ostream& os ) const
-	{
+		read_info( filename, pt );
 
-		os << "Configuration file: " << configFile << std::endl;
-// Unix daemon
-#if !defined(_WIN32)
-		os << "Run in foreground: " << (foreground ? "yes" : "no") << std::endl;
-#endif
-		srvConfig->print( os );
-		dbConfig->print( os );
-		logConfig->print( os );
-	}
-
-	/// Check if the application configuration makes sense
-	bool ApplicationConfiguration::check()
-	{
-		std::stringstream	errStr;
-
-		// check logging
-		if ( ! logConfig->check( errStr ))	{
-			errMsg_ = errStr.str();
+		// server
+		srvConfig = new Configuration::ServerConfiguration( "server", "Server" );
+		if ( ! srvConfig->parse( pt.get_child( "server" ), os ))	{
+			return false;
+		}
+		// database
+		dbConfig = new Configuration::DatabaseConfiguration( "database", "Database Server" );
+		if ( ! dbConfig->parse( pt.get_child( "database" ), os ))	{
 			return false;
 		}
 
-		return true;
+		// logging
+		logConfig = new Configuration::LoggerConfiguration( "logging", "Logging" );
+		if ( ! logConfig->parse( pt.get_child( "logging" ), os ))	{
+			return false;
+		}
 	}
+	catch( std::exception& e)	{
+		os << e.what();
+		return false;
+	}
+	return true;
+}
+
+
+void ApplicationConfiguration::finalize( const CmdLineConfig& cmdLine )
+{
+#if defined(_WIN32)
+	// on Windows the user should either use -f or start in the console
+	// (assuming an implicit -f) or the service option should contain
+	// --service in the startup parameters of the service impling non-foreground
+	if( cmdLine.command == _SMERP::CmdLineConfig::RUN_SERVICE )
+		foreground = false;
+	else
+		foreground = true;
+#else
+	foreground = cmdLine.foreground;
+#endif
+	if ( foreground )
+		logConfig->foreground( cmdLine.debugLevel, cmdLine.useLogConfig );
+	srvConfig->override( cmdLine.user, cmdLine.group );
+}
+
+
+void ApplicationConfiguration::print( std::ostream& os ) const
+{
+
+	os << "Configuration file: " << configFile << std::endl;
+	// Unix daemon
+#if !defined(_WIN32)
+	os << "Run in foreground: " << (foreground ? "yes" : "no") << std::endl;
+#endif
+	srvConfig->print( os );
+	dbConfig->print( os );
+	logConfig->print( os );
+}
+
+/// Check if the application configuration makes sense
+bool ApplicationConfiguration::check( std::ostream& os ) const
+{
+	// check logging
+	if ( ! logConfig->check( os ))
+		return false;
+	return true;
+}
 
 } // namespace _SMERP

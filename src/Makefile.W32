@@ -49,7 +49,10 @@ LOCAL_STATIC_LIB_OBJS = \
 	logLevel.obj \
 	logSyslogFacility.obj \
 	logBackend.obj \
-	configFile.obj \
+	configHelpers.obj \
+	configServer.obj \
+	configLogger.obj \
+	configDatabase.obj \
 	appConfig.obj \
 	protocol_ioblocks.obj \
 	acceptor.obj \
@@ -61,6 +64,7 @@ LOCAL_STATIC_LIB_OBJS = \
 
 OBJS = \
 	$(LOCAL_STATIC_LIB_OBJS) \
+	appProperties.obj \
 	smerpHandler.obj \
 	winMain.obj
 
