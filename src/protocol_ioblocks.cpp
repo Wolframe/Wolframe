@@ -1,8 +1,10 @@
+#include "protocol/ioblocks.hpp"
 #include "protocol.hpp"
 #include <cstring>
+#include <new>
 
-using namespace _SMERP;
-using namespace protocol;
+namespace _SMERP {
+namespace protocol {
 
 #ifdef _SMERP_LOWLEVEL_DEBUG
 static const char* eodStateName( EODState e)
@@ -54,12 +56,11 @@ static void moveInput( char* buf, unsigned int& dstsize, unsigned int& eatsize, 
    eatsize = bufpos;
 } 
 
-InputBlock::iterator InputBlock::getEoD( InputBlock::iterator start)
+int InputBlock::getEoDpos( unsigned int offset)
 {
-   unsigned int offset = start-begin();
-   if (size()<=offset) return start;
+   if (pos()<=offset) return -1;
 
-   unsigned int bufsize = size()-offset;
+   unsigned int bufsize = pos()-offset;
    char* buf = charptr()+offset;
    unsigned int bufpos=0,eatsize=0,dstsize=0;
    int eodpos = -1;
@@ -132,13 +133,7 @@ InputBlock::iterator InputBlock::getEoD( InputBlock::iterator start)
       }
    }
    setPos( offset+dstsize);   //.. adjust buffer size to the bytes really printed
-   if (eodpos >= 0)
-   {
-      return start+eodpos;
-   }
-   else
-   {
-      return end();
-   }
+   return eodpos;
 }
+}}//namespace
 

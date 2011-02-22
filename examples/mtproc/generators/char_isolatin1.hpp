@@ -1,6 +1,7 @@
 #ifndef _SMERP_PROTOCOL_GENERATOR_CHAR_ISOLATIN1_HPP_INCLUDED
 #define _SMERP_PROTOCOL_GENERATOR_CHAR_ISOLATIN1_HPP_INCLUDED
 #include "protocol/generator.hpp"
+#include <cstring>
 
 namespace _SMERP {
 namespace mtproc {
@@ -48,8 +49,8 @@ struct CharIsoLatin1
       }
       else
       {
-         *out = *(char*)element;
-         this_->incr( 1);
+         std::memcpy( out, element, elementsize);
+         this_->incr( elementsize);
          return true;
       }
    }

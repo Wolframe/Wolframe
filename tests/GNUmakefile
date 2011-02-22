@@ -10,7 +10,7 @@ INCLUDE_DIRS = \
 	-I$(TOPDIR)/include -I. \
 	-I$(TOPDIR)/src \
 	-I$(TOPDIR)/examples/pecho \
-	-I$(TOPDIR)/examples/xmlselect \
+	-I$(TOPDIR)/examples/mtproc \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LDFLAGS = \
@@ -61,7 +61,6 @@ endif
 
 TEST_OBJS =
 #	$(TOPDIR)/examples/pecho/pechoHandler.o
-#	$(TOPDIR)/examples/xmlselect/xmlselectHandler.o
 
 TEST_CPP_BINS = \
 	threadLeakTest$(EXE) \
@@ -77,7 +76,8 @@ TEST_CPP_BINS += \
 	poolTest$(EXE) \
 	logTest$(EXE) \
 	protocolArgumentParsing-gTest$(EXE) \
-	pechoHandler-gTest$(EXE)
+	pechoHandler-gTest$(EXE) \
+	mtprocHandler-gTest$(EXE)
 endif
 
 include $(TOPDIR)/makefiles/gmake/sub.mk
@@ -86,8 +86,13 @@ logTest: $(TOPDIR)/src/libsmerp.a
 authTest: $(TOPDIR)/src/libsmerp.a
 
 ifdef WITH_GTEST
-pechoHandler-gTest$(EXE): pechoHandler-gTest.o $(TOPDIR)/src/libsmerp.a $(TOPDIR)/examples/pecho/pechoHandler.o $(TOPDIR)/src/protocol_ioblocks.o
-	$(CCPP_LINK) -o $@ $(LDFLAGS) $(OBJS) $< $(LIBS) $(TOPDIR)/src/protocol_ioblocks.o $(TOPDIR)/examples/pecho/pechoHandler.o
+PECHO_GTEST_OBJS=$(TOPDIR)/examples/pecho/pechoHandler.o
+pechoHandler-gTest$(EXE): pechoHandler-gTest.o $(PECHO_GTEST_OBJS) $(TOPDIR)/src/libsmerp.a
+	$(CCPP_LINK) -o $@ $(LDFLAGS) $(PECHO_GTEST_OBJS) $(OBJS) $< $(LIBS)
+
+MTPROC_GTEST_OBJS=$(TOPDIR)/examples/mtproc/mtprocHandler.o $(TOPDIR)/examples/mtproc/implementation.o $(TOPDIR)/examples/mtproc/dispatcher.o
+mtprocHandler-gTest$(EXE): mtprocHandler-gTest.o $(MTPROC_GTEST_OBJS) $(TOPDIR)/src/libsmerp.a
+	$(CCPP_LINK) -o $@ $(LDFLAGS) $(MTPROC_GTEST_OBJS) $(OBJS) $< $(LIBS)
 endif
 
 local_all:

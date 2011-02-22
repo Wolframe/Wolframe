@@ -8,7 +8,7 @@ int Method::Data::echo( Context* ctx, unsigned int, const char**)
    if (!ctx->contentIterator) ctx->contentIterator = new protocol::Generator( generator::CharIsoLatin1::GetNext);
    if (!ctx->output) ctx->output = new protocol::FormatOutput( generator::CharIsoLatin1::Print);
    char ch;
-   while (ctx->contentIterator->getNext( &ch, 1)) 
+   while (ctx->contentIterator->getNext( &ch, 1))
    {
       if (!ctx->output->print( 0, &ch, 1)) return 0;
    }

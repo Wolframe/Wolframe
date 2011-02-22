@@ -51,9 +51,11 @@ public:
    bool operator <= (const iterator_t& o) const             {return (o.m_this == m_this && m_idx <= o.m_idx);}
    const value_type& operator[]( size_type& i) const        {return (*m_this)[m_idx+i];}
    value_type& operator[]( size_type& i)                    {return (*m_this)[m_idx+i];}
+   deref_type ptr() const                                   {return (deref_type)(m_this->ptr()) + m_idx;}
+   deref_type ptr()                                         {return (deref_type)(m_this->ptr()) + m_idx;}
 
 private:
-   array_type* m_this;
+   array_type* m_this;     //< the array is accessed over the structure this, to catch ABR/ABW for sure
    size_type m_idx;
 };
 }//namespace array

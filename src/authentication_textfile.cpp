@@ -8,7 +8,6 @@
 
 #include <stdexcept>
 #include <fstream>
-#include <iostream>
 
 namespace _SMERP {
 	namespace Authentication {
@@ -32,7 +31,6 @@ TextFileAuthenticator::TextFileAuthenticator( const std::string _filename )
 			std::vector<std::string> v;
 			split( v, line, boost::is_any_of( "\t" ) );
 			if( v.size( ) == 2 ) {
-				std::cout << line << " -> " << v.size( ) << std::endl;
 				m_creds.insert( std::make_pair<std::string, std::string>( v[0], v[1] ) );
 			}
 		}

@@ -2,8 +2,6 @@
 // getPassword.cpp
 //
 
-#ifdef WITH_SSL
-
 #include <string>
 
 namespace _SMERP {
@@ -66,5 +64,3 @@ namespace _SMERP {
 
 } // namespace Authentication
 } // namespace _SMERP
-
-#endif // WITH_SSL
