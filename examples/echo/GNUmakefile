@@ -29,6 +29,7 @@ INCLUDE_LIBS += \
 endif
 
 OBJS = \
+	appProperties.o \
 	appConfig.o \
 	configFile.o \
 	echoHandler.o \

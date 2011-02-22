@@ -4,6 +4,7 @@
 
 #include "configStandard.hpp"
 #include "configHelpers.hpp"
+#include "appProperties.hpp"
 
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
@@ -152,11 +153,11 @@ bool ServerConfiguration::parse( boost::property_tree::ptree& pt, std::ostream& 
 				}
 			}
 			if ( serviceName.empty() )
-				serviceName = DEFAULT_SERVICE_NAME;
+				serviceName = defaultServiceName();
 			if ( displayName.empty() )
-				displayName = DEFAULT_SERVICE_DISPLAY_NAME;
+				displayName = defaultServiceDisplayName();
 			if ( description.empty() )
-				description = DEFAULT_SERVICE_DESCRIPTION;
+				description = defaultServiceDescription()
 		}
 #endif
 		else if ( boost::algorithm::iequals( L1it->first, "listen" ))	{
@@ -194,7 +195,7 @@ bool ServerConfiguration::parse( boost::property_tree::ptree& pt, std::ostream& 
 						}
 					}
 					if ( port == 0 )
-						port = DEFAULT_TCP_PORT;
+						port = defaultTCPport();
 
 					Network::ServerTCPendpoint lep( host, port, maxConn );
 					address.push_back( lep );
@@ -252,7 +253,7 @@ bool ServerConfiguration::parse( boost::property_tree::ptree& pt, std::ostream& 
 						}
 					}
 					if ( port == 0 )
-						port = DEFAULT_SSL_PORT;
+						port = defaultSSLport();
 
 					Network::ServerSSLendpoint lep( host, port, maxConn,
 									certFile, keyFile,

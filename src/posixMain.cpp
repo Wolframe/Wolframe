@@ -7,6 +7,9 @@
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
+
+#include "appProperties.hpp"
+
 #include "version.hpp"
 #include "commandLine.hpp"
 #include "configFile.hpp"
@@ -36,13 +39,7 @@
 #include <boost/interprocess/sync/file_lock.hpp>
 #include <boost/filesystem.hpp>
 
-static const unsigned short MAJOR_VERSION = 0;
-static const short unsigned MINOR_VERSION = 0;
-static const short unsigned REVISION_NUMBER = 3;
 
-static const char *DEFAULT_MAIN_CONFIG = "/etc/smerp.conf";
-static const char *DEFAULT_USER_CONFIG = "~/smerp.conf";
-static const char *DEFAULT_LOCAL_CONFIG = "./smerp.conf";
 
 // DUMMY
 namespace _SMERP	{
@@ -70,7 +67,10 @@ int _SMERP_posixMain( int argc, char* argv[] )
 // end of i18n global stuff
 
 	try	{
-		_SMERP::Version		appVersion( MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER );
+		_SMERP::Version		appVersion( _SMERP::applicationMajorVersion(),
+						    _SMERP::applicationMinorVersion(),
+						    _SMERP::applicationRevisionVersion(),
+						    _SMERP::applicationBuildVersion() );
 		_SMERP::CmdLineConfig	cmdLineCfg;
 		const char		*configFile;
 
@@ -95,7 +95,7 @@ int _SMERP_posixMain( int argc, char* argv[] )
 			return _SMERP::ErrorCodes::OK;
 		}
 		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::PRINT_HELP )	{
-			std::cout << std::endl << gettext( "BOBOBO version " )
+			std::cout << std::endl << _SMERP::applicationName() << gettext( "BOBOBO version " )
 				<< appVersion.toString() << std::endl;
 			cmdLineCfg.usage( std::cout );
 			std::cout << std::endl;
@@ -106,9 +106,9 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		if ( !cmdLineCfg.cfgFile.empty() )	// if it has been specified than that's The One ! (and only)
 			configFile = cmdLineCfg.cfgFile.c_str();
 		else
-			configFile = _SMERP::CfgFileConfig::chooseFile( DEFAULT_MAIN_CONFIG,
-								       DEFAULT_USER_CONFIG,
-								       DEFAULT_LOCAL_CONFIG );
+			configFile = _SMERP::CfgFileConfig::chooseFile( _SMERP::Configuration::defaultMainConfig(),
+									_SMERP::Configuration::defaultUserConfig(),
+									_SMERP::Configuration::defaultLocalConfig() );
 		if ( configFile == NULL )	{	// there is no configuration file
 			std::cerr << gettext ( "MOMOMO: no configuration file found !" ) << std::endl << std::endl;
 			return _SMERP::ErrorCodes::FAILURE;
