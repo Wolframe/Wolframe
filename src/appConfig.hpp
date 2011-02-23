@@ -13,44 +13,49 @@
 
 #include "serverEndpoint.hpp"
 
-#include "configStandard.hpp"
-
 #include <string>
 #include <list>
 
 namespace _SMERP {
 
+	struct HandlerConfiguration;
 
-/// application configuration structure
-	struct CmdLineConfig;		// forward declaration for configuration from the command line
+	namespace Configuration	{
 
-	struct ApplicationConfiguration	{
-		std::string		configFile;
-// from command line
-		bool			foreground;
+		struct CmdLineConfig;		// forward declaration for the command line structure
 
-// server configuration
-		Configuration::ServerConfiguration	*srvConfig;
-// database configuration
-		Configuration::DatabaseConfiguration	*dbConfig;
-// logger configuration
-		Configuration::LoggerConfiguration	*logConfig;
+		struct ServerConfiguration;	// forward declarations for configuration elements
+		struct LoggerConfiguration;
 
-	public:
-		ApplicationConfiguration();
 
-		bool parse( const char *filename, std::ostream& os );
-		void finalize( const CmdLineConfig& cmdLine );
+		/// application configuration structure
+		struct ApplicationConfiguration	{
+			std::string			configFile;
+			// from command line
+			bool				foreground;
 
-		bool check( std::ostream& os ) const;
-		bool test( std::ostream& os ) const;
-		void print( std::ostream& os ) const;
+			// server configuration
+			ServerConfiguration	*srvConfig;
+			// logger configuration
+			LoggerConfiguration	*logConfig;
 
-		static const char* chooseFile( const char *globalFile,
-						const char *userFile,
-						const char *localFile );
-	};
+			_SMERP::HandlerConfiguration	*handlerConfig;
 
+		public:
+			ApplicationConfiguration();
+
+			bool parse( const char *filename, std::ostream& os );
+			void finalize( const CmdLineConfig& cmdLine );
+
+			bool check( std::ostream& os ) const;
+			bool test( std::ostream& os ) const;
+			void print( std::ostream& os ) const;
+
+			static const char* chooseFile( const char *globalFile,
+						       const char *userFile,
+						       const char *localFile );
+		};
+	} // namespace Configuration
 } // namespace _SMERP
 
 #endif // _APP_CONFIG_HPP_INCLUDED

@@ -3,6 +3,7 @@
 //
 
 #include "appConfig.hpp"
+#include "configStandard.hpp"
 #include "commandLine.hpp"
 
 #include "miscUtils.hpp"
@@ -20,6 +21,7 @@
 
 
 namespace _SMERP {
+	namespace Configuration {
 
 ApplicationConfiguration::ApplicationConfiguration()
 {
@@ -58,11 +60,6 @@ bool ApplicationConfiguration::parse ( const char *filename, std::ostream& os )
 		// server
 		srvConfig = new Configuration::ServerConfiguration( "server", "Server" );
 		if ( ! srvConfig->parse( pt.get_child( "server" ), os ))	{
-			return false;
-		}
-		// database
-		dbConfig = new Configuration::DatabaseConfiguration( "database", "Database Server" );
-		if ( ! dbConfig->parse( pt.get_child( "database" ), os ))	{
 			return false;
 		}
 
@@ -110,7 +107,6 @@ void ApplicationConfiguration::print( std::ostream& os ) const
 	os << "Run in foreground: " << (foreground ? "yes" : "no") << std::endl;
 #endif
 	srvConfig->print( os );
-	dbConfig->print( os );
 	logConfig->print( os );
 }
 
@@ -123,4 +119,5 @@ bool ApplicationConfiguration::check( std::ostream& os ) const
 	return true;
 }
 
+	} // namespace Configuration
 } // namespace _SMERP

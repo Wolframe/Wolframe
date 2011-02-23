@@ -13,6 +13,7 @@
 #include "version.hpp"
 #include "commandLine.hpp"
 #include "appConfig.hpp"
+#include "configStandard.hpp"
 #include "server.hpp"
 #include "ErrorCodes.hpp"
 #include "logger.hpp"
@@ -32,19 +33,12 @@
 
 // daemon stuff
 #include <fstream>
+#include <sstream>
 #include <cstdio>
 #include <grp.h>
 #include <pwd.h>
 #include <boost/interprocess/sync/file_lock.hpp>
 #include <boost/filesystem.hpp>
-
-
-
-// DUMMY
-namespace _SMERP	{
-	struct HandlerConfiguration	{
-	};
-}
 
 
 int _SMERP_posixMain( int argc, char* argv[] )
@@ -70,11 +64,8 @@ int _SMERP_posixMain( int argc, char* argv[] )
 						    _SMERP::applicationMinorVersion(),
 						    _SMERP::applicationRevisionVersion(),
 						    _SMERP::applicationBuildVersion() );
-		_SMERP::CmdLineConfig   cmdLineCfg;
-		const char		*configFile;
-
-// it's just a DUMMY for now
-		_SMERP::HandlerConfiguration	handlerConfig;
+		_SMERP::Configuration::CmdLineConfig   cmdLineCfg;
+		const char *configFile;
 
 		if ( !cmdLineCfg.parse( argc, argv ))	{	// there was an error parsing the command line
 			std::cerr << cmdLineCfg.errMsg() << std::endl << std::endl;
@@ -88,12 +79,12 @@ int _SMERP_posixMain( int argc, char* argv[] )
 			std::cerr << "BOO:" << cmdLineCfg.errMsg() << std::endl << std::endl;
 
 // if we have to print the version or the help do it and exit
-		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::PRINT_VERSION )	{
+		if ( cmdLineCfg.command == _SMERP::Configuration::CmdLineConfig::PRINT_VERSION )	{
 			std::cout << std::endl << gettext( "BOBOBO version " )
 				<< appVersion.toString() << std::endl << std::endl;
 			return _SMERP::ErrorCodes::OK;
 		}
-		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::PRINT_HELP )	{
+		if ( cmdLineCfg.command == _SMERP::Configuration::CmdLineConfig::PRINT_HELP )	{
 			std::cout << std::endl << _SMERP::applicationName() << gettext( "BOBOBO version " )
 				<< appVersion.toString() << std::endl;
 			cmdLineCfg.usage( std::cout );
@@ -105,19 +96,23 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		if ( !cmdLineCfg.cfgFile.empty() )	// if it has been specified than that's The One ! (and only)
 			configFile = cmdLineCfg.cfgFile.c_str();
 		else
-			configFile = _SMERP::ApplicationConfiguration::chooseFile( _SMERP::Configuration::defaultMainConfig(),
-										   _SMERP::Configuration::defaultUserConfig(),
-										   _SMERP::Configuration::defaultLocalConfig() );
+			configFile = _SMERP::Configuration::ApplicationConfiguration::chooseFile( _SMERP::Configuration::defaultMainConfig(),
+												  _SMERP::Configuration::defaultUserConfig(),
+												  _SMERP::Configuration::defaultLocalConfig() );
 		if ( configFile == NULL )	{	// there is no configuration file
 			std::cerr << gettext ( "MOMOMO: no configuration file found !" ) << std::endl << std::endl;
 			return _SMERP::ErrorCodes::FAILURE;
 		}
 
-		_SMERP::ApplicationConfiguration config;
-		if ( !config.parse( configFile, std::cerr ))	{	// there was an error parsing the configuration file
-			std::cerr << std::endl << std::endl;
+		_SMERP::Configuration::ApplicationConfiguration config;
+		std::stringstream errMsg;
+
+		if ( !config.parse( configFile, errMsg ))	{	// there was an error parsing the configuration file
+			std::cerr << errMsg.str() << std::endl << std::endl;
 			return _SMERP::ErrorCodes::FAILURE;
 		}
+		else if ( ! errMsg.str().empty() )
+			std::cerr << errMsg.str() << std::endl;
 // configuration file has been parsed successfully
 // finalize the application configuration
 		config.finalize( cmdLineCfg );
@@ -127,26 +122,26 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		_SMERP::LogBackend::instance().setConsoleLevel( config.logConfig->stderrLogLevel );
 
 // Check the configuration
-		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::CHECK_CONFIG )	{
+		if ( cmdLineCfg.command == _SMERP::Configuration::CmdLineConfig::CHECK_CONFIG )	{
 			std::cout << std::endl << gettext( "BOBOBO version " )
 				<< appVersion.toString() << std::endl;
-			if ( config.check() )	{
-				if ( config.errMsg().empty() )	{
+			if ( config.check( errMsg ) )	{
+				if ( errMsg.str().empty() )	{
 					std::cout << "Configuration OK" << std::endl << std::endl;
 					return _SMERP::ErrorCodes::OK;
 				}
 				else	{
-					std::cout << "WARNING: " << config.errMsg() << std::endl << std::endl;
+					std::cout << "WARNING: " << errMsg.str() << std::endl << std::endl;
 					return _SMERP::ErrorCodes::OK;
 				}
 			}
 			else	{
-				std::cout << "ERROR: " << config.errMsg() << std::endl << std::endl;
+				std::cout << "ERROR: " << errMsg.str() << std::endl << std::endl;
 				return _SMERP::ErrorCodes::OK;
 			}
 		}
 
-		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::PRINT_CONFIG )	{
+		if ( cmdLineCfg.command == _SMERP::Configuration::CmdLineConfig::PRINT_CONFIG )	{
 			std::cout << std::endl << gettext( "BOBOBO version " )
 				<< appVersion.toString() << std::endl;
 			config.print( std::cout );
@@ -154,7 +149,7 @@ int _SMERP_posixMain( int argc, char* argv[] )
 			return _SMERP::ErrorCodes::OK;
 		}
 
-		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::TEST_CONFIG )	{
+		if ( cmdLineCfg.command == _SMERP::Configuration::CmdLineConfig::TEST_CONFIG )	{
 			std::cout << "Not implemented yet" << std::endl << std::endl;
 			return _SMERP::ErrorCodes::OK;
 		}
@@ -229,7 +224,7 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		LOG_NOTICE << "Starting server";
 
 		// Run server in background thread(s).
-		_SMERP::ServerHandler	handler( handlerConfig );
+		_SMERP::ServerHandler	handler( config.handlerConfig );
 		_SMERP::Network::server s( config.srvConfig->address, config.srvConfig->SSLaddress, handler,
 					   config.srvConfig->threads, config.srvConfig->maxConnections );
 		boost::thread t( boost::bind( &_SMERP::Network::server::run, &s ));

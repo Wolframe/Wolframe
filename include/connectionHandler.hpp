@@ -130,7 +130,7 @@ namespace _SMERP {
 	class ServerHandler
 	{
 	public:
-		ServerHandler( const HandlerConfiguration& config );
+		ServerHandler( const HandlerConfiguration *config );
 		~ServerHandler();
 
 		/// Create a new connection handler and return a pointer to it
