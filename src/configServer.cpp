@@ -140,11 +140,11 @@ bool ServerConfiguration::parse( boost::property_tree::ptree& pt, std::ostream& 
 						return false;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "displayName" ))	{
-					if ( ! getStringValue( L2it, displayStr(), "displayName", displayName, os ))
+					if ( ! getStringValue( L2it, displayStr(), "displayName", serviceDisplayName, os ))
 						return false;
 				}
 				else if ( boost::algorithm::iequals( L1it->first, "description" ))	{
-					if ( ! getStringValue( L2it, displayStr(), "description", description, os ))
+					if ( ! getStringValue( L2it, displayStr(), "description", serviceDescription, os ))
 						return false;
 				}
 				else	{
@@ -154,10 +154,10 @@ bool ServerConfiguration::parse( boost::property_tree::ptree& pt, std::ostream& 
 			}
 			if ( serviceName.empty() )
 				serviceName = defaultServiceName();
-			if ( displayName.empty() )
-				displayName = defaultServiceDisplayName();
-			if ( description.empty() )
-				description = defaultServiceDescription()
+			if ( serviceDisplayName.empty() )
+				serviceDisplayName = defaultServiceDisplayName();
+			if ( serviceDescription.empty() )
+				serviceDescription = defaultServiceDescription();
 		}
 #endif
 		else if ( boost::algorithm::iequals( L1it->first, "listen" ))	{

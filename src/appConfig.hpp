@@ -36,16 +36,12 @@ namespace _SMERP {
 // logger configuration
 		Configuration::LoggerConfiguration	*logConfig;
 
-	private:
-		std::string		errMsg_;
-
 	public:
 		ApplicationConfiguration();
 
 		bool parse( const char *filename, std::ostream& os );
 		void finalize( const CmdLineConfig& cmdLine );
 
-		std::string errMsg() const;
 		bool check( std::ostream& os ) const;
 		bool test( std::ostream& os ) const;
 		void print( std::ostream& os ) const;
@@ -53,7 +49,6 @@ namespace _SMERP {
 		static const char* chooseFile( const char *globalFile,
 						const char *userFile,
 						const char *localFile );
-
 	};
 
 } // namespace _SMERP

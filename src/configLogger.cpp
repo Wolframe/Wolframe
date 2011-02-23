@@ -82,7 +82,6 @@ bool LoggerConfiguration::check( std::ostream& os ) const
 }
 
 
-#if !defined( _WIN32 )
 /// Modify the logging parameters according to the command line
 void LoggerConfiguration::foreground( LogLevel::Level debugLevel, bool useConfig )
 {
@@ -95,14 +94,14 @@ void LoggerConfiguration::foreground( LogLevel::Level debugLevel, bool useConfig
 		logFile.clear();
 		logFileLogLevel = LogLevel::LOGLEVEL_UNDEFINED;
 		logFileIdent.clear();
-
+#if !defined( _WIN32 )
 		logToSyslog = false;
 		syslogFacility = SyslogFacility::_SMERP_SYSLOG_FACILITY_UNDEFINED;
 		syslogLogLevel = LogLevel::LOGLEVEL_UNDEFINED;
 		syslogIdent.clear();
+#endif // !defined( _WIN32 )
 	}
 }
-#endif // !defined( _WIN32 )
 
 
 bool LoggerConfiguration::parse( boost::property_tree::ptree& pt, std::ostream& os )

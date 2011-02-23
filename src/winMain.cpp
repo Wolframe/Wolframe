@@ -8,6 +8,7 @@
 #include <boost/function.hpp>
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
+#include "appProperties.hpp"
 #include "version.hpp"
 #include "commandLine.hpp"
 #include "configFile.hpp"
@@ -24,15 +25,12 @@
 
 #include <WinSvc.h>
 
-#include <stdio.h>
+#include <cstdio>
+#include <sstream>
 
-static const unsigned short MAJOR_VERSION = 0;
-static const short unsigned MINOR_VERSION = 0;
-static const short unsigned REVISION_NUMBER = 3;
 
 static const int DEFAULT_SERVICE_TIMEOUT = 5000;
 
-static const char *DEFAULT_SERVICE_NAME = "smerpd";
 
 // DUMMY
 namespace _SMERP	{
@@ -75,7 +73,7 @@ static void registerEventlog( const _SMERP::ApplicationConfiguration& config )
 
 // choose the key for the EventLog registry entry
 	_snprintf( key, 256, "SYSTEM\\CurrentControlSet\\Services\\EventLog\\%s\\%s",
-		config.eventlogLogName.c_str( ), config.eventlogSource.c_str( ) );
+		config.logConfig->eventlogLogName.c_str( ), config.logConfig->eventlogSource.c_str( ) );
 	(void)RegCreateKeyEx( HKEY_LOCAL_MACHINE, key, 0, NULL, REG_OPTION_NON_VOLATILE,
 		KEY_SET_VALUE, NULL, &h, &disposition );
 
@@ -105,9 +103,9 @@ static void deregisterEventlog( const _SMERP::ApplicationConfiguration& config )
 	LONG res;
 
 	_snprintf( key, 256, "SYSTEM\\CurrentControlSet\\Services\\EventLog\\%s",
-		config.eventlogLogName.c_str( ) );
+		config.logConfig->eventlogLogName.c_str( ) );
 	res = RegOpenKeyEx( HKEY_LOCAL_MACHINE, key, 0, KEY_WRITE, &h );
-	(void)RegDeleteKey( h, config.eventlogSource.c_str( ) );
+	(void)RegDeleteKey( h, config.logConfig->eventlogSource.c_str( ) );
 }
 
 static void installAsService( const _SMERP::ApplicationConfiguration& config )
@@ -125,14 +123,14 @@ static void installAsService( const _SMERP::ApplicationConfiguration& config )
 
 // create the service
 	SC_HANDLE service = CreateService( scm,
-		config.serviceName.c_str( ), config.serviceDisplayName.c_str( ),
+		config.srvConfig->serviceName.c_str( ), config.srvConfig->serviceDisplayName.c_str( ),
 		SERVICE_ALL_ACCESS, SERVICE_WIN32_OWN_PROCESS,
 		SERVICE_DEMAND_START, SERVICE_ERROR_NORMAL,
 		os.str( ).c_str( ), NULL, NULL, NULL, NULL, NULL );
 
 // set description of the service
 	SERVICE_DESCRIPTION descr;
-	descr.lpDescription = (LPTSTR)config.serviceDescription.c_str( );
+	descr.lpDescription = (LPTSTR)config.srvConfig->serviceDescription.c_str( );
 	(void)ChangeServiceConfig2( service, SERVICE_CONFIG_DESCRIPTION, &descr );
 
 // free handles
@@ -146,7 +144,7 @@ static void remove_as_service( const _SMERP::ApplicationConfiguration& config )
 	SC_HANDLE scm = (SC_HANDLE)OpenSCManager( NULL, SERVICES_ACTIVE_DATABASE, SC_MANAGER_ALL_ACCESS );
 
 // get service handle of the service to delete (identified by service name)
-	SC_HANDLE service = OpenService( scm, config.serviceName.c_str( ), SERVICE_ALL_ACCESS );
+	SC_HANDLE service = OpenService( scm, config.srvConfig->serviceName.c_str( ), SERVICE_ALL_ACCESS );
 
 // remove the service
 	(void)DeleteService( service );
@@ -228,26 +226,28 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 		_SMERP::CmdLineConfig cmdLineCfg; // empty for a service with --service
 		cmdLineCfg.command = _SMERP::CmdLineConfig::RUN_SERVICE;
 		const char *configFile = serviceConfig.c_str( ); // configuration comes from main thread
-		_SMERP::CfgFileConfig cfgFileCfg;
-		if ( !cfgFileCfg.parse( configFile ))	{	// there was an error parsing the configuration file
+
+		std::stringstream	errMsg;
+		_SMERP::ApplicationConfiguration config;
+		if ( !config.parse( configFile, errMsg ))	{	// there was an error parsing the configuration file
 			// TODO: a hen and egg problem here with event logging and where to know where to log to
-			// LOG_FATAL << cmdLineCfg.errMsg();
+			// LOG_FATAL << errMsg.str();
 			return;
 		}
-		_SMERP::ApplicationConfiguration config( cmdLineCfg, cfgFileCfg );
+		
 
 		// it's just a DUMMY for now
 		_SMERP::HandlerConfiguration	handlerConfig;
 		
 // create the final logger based on the configuration
-		_SMERP::LogBackend::instance().setLogfileLevel( config.logFileLogLevel );
-		_SMERP::LogBackend::instance().setLogfileName( config.logFile );
-		_SMERP::LogBackend::instance().setEventlogLevel( config.eventlogLogLevel );
-		_SMERP::LogBackend::instance().setEventlogSource( config.eventlogSource );
-		_SMERP::LogBackend::instance().setEventlogLog( config.eventlogLogName );
+		_SMERP::LogBackend::instance().setLogfileLevel( config.logConfig->logFileLogLevel );
+		_SMERP::LogBackend::instance().setLogfileName( config.logConfig->logFile );
+		_SMERP::LogBackend::instance().setEventlogLevel( config.logConfig->eventlogLogLevel );
+		_SMERP::LogBackend::instance().setEventlogSource( config.logConfig->eventlogSource );
+		_SMERP::LogBackend::instance().setEventlogLog( config.logConfig->eventlogLogName );
 
 // register the event callback where we get called by Windows and the SCM
-		serviceStatusHandle = RegisterServiceCtrlHandler( config.serviceName.c_str( ), serviceCtrlFunction );
+		serviceStatusHandle = RegisterServiceCtrlHandler( config.srvConfig->serviceName.c_str( ), serviceCtrlFunction );
 		if( serviceStatusHandle == 0 ) {
 			LOG_FATAL << "Unable to register service control handler function";
 			return;
@@ -268,7 +268,8 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 
 // run server in background thread(s).
 		_SMERP::ServerHandler	handler( handlerConfig );
-		_SMERP::Network::server s( config.address, config.SSLaddress, handler, config.threads, config.maxConnections );
+		_SMERP::Network::server s( config.srvConfig->address, config.srvConfig->SSLaddress,
+								handler, config.srvConfig->threads, config.srvConfig->maxConnections );
 		boost::thread t( boost::bind( &_SMERP::Network::server::run, &s ));
 
 // we are up and running now (hopefully), signal this to the SCM
@@ -311,7 +312,8 @@ WAIT_FOR_STOP_EVENT:
 int _SMERP_winMain( int argc, char* argv[] )
 {
 	try	{
-		_SMERP::Version		appVersion( MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER );
+		_SMERP::Version		appVersion( _SMERP::applicationMajorVersion(), _SMERP::applicationMinorVersion(),
+										_SMERP::applicationRevisionVersion(), _SMERP::applicationBuildVersion() );
 		_SMERP::CmdLineConfig	cmdLineCfg;
 		const char		*configFile = NULL;
 
@@ -348,23 +350,24 @@ int _SMERP_winMain( int argc, char* argv[] )
 			return _SMERP::ErrorCodes::FAILURE;
 		}
 
-		_SMERP::CfgFileConfig	cfgFileCfg;
-		if ( !cfgFileCfg.parse( configFile ))	{	// there was an error parsing the configuration file
-			std::cerr << cfgFileCfg.errMsg() << std::endl << std::endl;
+		_SMERP::ApplicationConfiguration config;
+		std::stringstream	errMsg;
+		if ( !config.parse( configFile, errMsg ))	{	// there was an error parsing the configuration file
+			std::cerr << errMsg.str() << std::endl << std::endl;
 			return _SMERP::ErrorCodes::FAILURE;
 		}
 // configuration file has been parsed successfully
-// build the application configuration
-		_SMERP::ApplicationConfiguration config( cmdLineCfg, cfgFileCfg);
+// build the final configuration
+		config.finalize( cmdLineCfg );
 
 // Check the configuration
 		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::CHECK_CONFIG )	{
-			if ( config.check() )	{
+			if ( config.check( errMsg ) )	{
 				std::cout << "Configuration OK" << std::endl << std::endl;
 				return _SMERP::ErrorCodes::OK;
 			}
 			else	{
-				std::cout << config.errMsg() << std::endl << std::endl;
+				std::cout << errMsg.str() << std::endl << std::endl;
 				return _SMERP::ErrorCodes::OK;
 			}
 		}
@@ -397,7 +400,7 @@ int _SMERP_winMain( int argc, char* argv[] )
 		if( cmdLineCfg.command == _SMERP::CmdLineConfig::RUN_SERVICE ) {
 			// if started as service we dispatch the service thread now
 			SERVICE_TABLE_ENTRY dispatch_table[2] =
-				{ { const_cast<char *>( config.serviceName.c_str( ) ), service_main },
+				{ { const_cast<char *>( config.srvConfig->serviceName.c_str( ) ), service_main },
 				{ NULL, NULL } };
 
 			// pass configuration to service main
@@ -420,13 +423,13 @@ int _SMERP_winMain( int argc, char* argv[] )
 
 		// Create the final logger based on the configuration, this is the
 		// foreground mode in a console, so we start only the stderr logger
-		_SMERP::LogBackend::instance().setConsoleLevel( config.stderrLogLevel );
+		_SMERP::LogBackend::instance().setConsoleLevel( config.logConfig->stderrLogLevel );
 
 		LOG_NOTICE << "Starting server";
 
 		_SMERP::ServerHandler	handler( handlerConfig );
-		_SMERP::Network::server s( config.address, config.SSLaddress,
-					   handler, config.threads, config.maxConnections );
+		_SMERP::Network::server s( config.srvConfig->address, config.srvConfig->SSLaddress,
+					   handler, config.srvConfig->threads, config.srvConfig->maxConnections );
 
 		// Set console control handler to allow server to be stopped.
 		consoleCtrlFunction = boost::bind(&_SMERP::Network::server::stop, &s);

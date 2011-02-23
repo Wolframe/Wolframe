@@ -21,6 +21,11 @@
 
 namespace _SMERP {
 
+ApplicationConfiguration::ApplicationConfiguration()
+{
+}
+
+
 const char* ApplicationConfiguration::chooseFile( const char *globalFile, const char *userFile, const char *localFile )
 {
 	if ( globalFile != NULL )
@@ -90,7 +95,9 @@ void ApplicationConfiguration::finalize( const CmdLineConfig& cmdLine )
 #endif
 	if ( foreground )
 		logConfig->foreground( cmdLine.debugLevel, cmdLine.useLogConfig );
+#if !defined(_WIN32)
 	srvConfig->override( cmdLine.user, cmdLine.group );
+#endif
 }
 
 

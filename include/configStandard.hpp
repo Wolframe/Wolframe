@@ -28,7 +28,8 @@ namespace _SMERP {
 			std::string		user;
 			std::string		group;
 			std::string		pidFile;
-#else
+#endif
+#if defined( _WIN32 )
 			// service configuration
 			std::string		serviceName;
 			std::string		serviceDisplayName;
