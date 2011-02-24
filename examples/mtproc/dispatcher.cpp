@@ -169,8 +169,8 @@ CommandDispatcher::IOState CommandDispatcher::call( int& returnCode)
       case ArgumentsParsed:
       {
          LOG_DEBUG << "call of '" << m_instance->mt[ m_methodIdx].name << "'";
-         m_argc = m_argBuffer.argc();
-         m_argv = m_argBuffer.argv();
+         m_argc = m_argBuffer.argc()+1;
+         m_argv = m_argBuffer.argv( m_instance->mt[ m_methodIdx].name);
          m_state = Running;
          //no break here !
       }

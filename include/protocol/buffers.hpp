@@ -158,12 +158,13 @@ public:
    
    //return an array of 0-terminated strings as convenient in C for program arguments
    //@remark the return value of this function may not be valid anymore after a new call of push_back
-   const char** argv()
+   const char** argv( const char* cmdname=0)
    {
       if (m_sbuf[0]==0)
       {
-         unsigned int ii;
-         for (ii=0; ii<m_pos; ii++) m_sbuf[ii]=m_content->c_str()+m_buf[ii]; 
+         unsigned int ii=0;
+         if (cmdname) m_sbuf[ii++] = cmdname;
+         for (;ii<m_pos; ii++) m_sbuf[ii]=m_content->c_str()+m_buf[ii]; 
          if (ii<m_pos) m_sbuf[ii]=0;
       }
       return m_sbuf;
