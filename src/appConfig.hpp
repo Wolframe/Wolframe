@@ -5,16 +5,10 @@
 #ifndef _APP_CONFIG_HPP_INCLUDED
 #define _APP_CONFIG_HPP_INCLUDED
 
-#include "logLevel.hpp"
-
-#if !defined( _WIN32 )
-#include "logSyslogFacility.hpp"
-#endif	// !defined( _WIN32 )
-
-#include "serverEndpoint.hpp"
+#include "configurationBase.hpp"
 
 #include <string>
-#include <list>
+#include <map>
 
 namespace _SMERP {
 
@@ -35,9 +29,9 @@ namespace _SMERP {
 			bool				foreground;
 
 			// server configuration
-			ServerConfiguration	*srvConfig;
+			ServerConfiguration		*srvConfig;
 			// logger configuration
-			LoggerConfiguration	*logConfig;
+			LoggerConfiguration		*logConfig;
 
 			_SMERP::HandlerConfiguration	*handlerConfig;
 
@@ -54,6 +48,8 @@ namespace _SMERP {
 			static const char* chooseFile( const char *globalFile,
 						       const char *userFile,
 						       const char *localFile );
+		private:
+			std::map< const char*, ConfigurationBase* >	confs;
 		};
 	} // namespace Configuration
 } // namespace _SMERP

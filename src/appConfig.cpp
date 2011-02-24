@@ -25,6 +25,17 @@ namespace _SMERP {
 
 ApplicationConfiguration::ApplicationConfiguration()
 {
+	// server
+	srvConfig = new Configuration::ServerConfiguration( "server", "Server" );
+
+	// logging
+	logConfig = new Configuration::LoggerConfiguration( "logging", "Logging" );
+
+//	handlerConfig = new Configuration::DatabaseConfiguration( "database", "Database Server" );
+
+	confs["server"] = srvConfig;
+	confs["logging"] = logConfig;
+//	confs["database"] = handlerConfig;
 }
 
 
@@ -54,20 +65,21 @@ bool ApplicationConfiguration::parse ( const char *filename, std::ostream& os )
 	// Create an empty property tree object
 	boost::property_tree::ptree	pt;
 	try	{
-
 		read_info( filename, pt );
 
-		// server
-		srvConfig = new Configuration::ServerConfiguration( "server", "Server" );
-		if ( ! srvConfig->parse( pt.get_child( "server" ), os ))	{
-			return false;
+		for ( boost::property_tree::ptree::const_iterator it = pt.begin();
+								it != pt.end(); it++ )	{
+			std::map< const char*, ConfigurationBase* >::iterator confIt;
+			if (( confIt = confs.find( it->first.c_str() ) ) != confs.end() )	{
+				if ( ! confIt->second->parse( pt.get_child( it->first ), os ))
+					return false;
+			}
+//			else	{
+//				os << "Unknown configuration option " << it->first;
+//				return false;
+//			}
 		}
 
-		// logging
-		logConfig = new Configuration::LoggerConfiguration( "logging", "Logging" );
-		if ( ! logConfig->parse( pt.get_child( "logging" ), os ))	{
-			return false;
-		}
 	}
 	catch( std::exception& e)	{
 		os << e.what();
@@ -106,8 +118,9 @@ void ApplicationConfiguration::print( std::ostream& os ) const
 #if !defined(_WIN32)
 	os << "Run in foreground: " << (foreground ? "yes" : "no") << std::endl;
 #endif
-	srvConfig->print( os );
-	logConfig->print( os );
+	for ( std::map< const char*, ConfigurationBase* >::const_iterator it = confs.begin();
+									it != confs.end(); it++ )
+		it->second->print( os );
 }
 
 /// Check if the application configuration makes sense

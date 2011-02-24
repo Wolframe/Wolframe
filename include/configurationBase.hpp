@@ -10,10 +10,10 @@
 
 #include <boost/property_tree/ptree.hpp>
 
-// forward declaration for boost::property_tree
+//// forward declaration for boost::property_tree
 //namespace boost	{
 //	namespace property_tree	{
-//		class	ptree;
+//		struct	ptree;
 //	}
 //}
 
