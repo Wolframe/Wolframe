@@ -98,6 +98,8 @@ CommandDispatcher::CommandDispatcher( Instance* instance)
 
 CommandDispatcher::Command CommandDispatcher::getCommand( protocol::InputBlock::iterator& itr, protocol::InputBlock::iterator& eoM)
 {
+   LOG_DATA << "Dispatcher State: " << stateName(m_state);
+
    switch (m_state)
    {
       case Running:
@@ -152,6 +154,8 @@ CommandDispatcher::Command CommandDispatcher::getCommand( protocol::InputBlock::
 
 CommandDispatcher::IOState CommandDispatcher::call( int& returnCode)
 {
+   LOG_DATA << "Dispatcher Call";
+
    switch (m_state)
    {
       case Null:
@@ -201,6 +205,7 @@ CommandDispatcher::IOState CommandDispatcher::call( int& returnCode)
                   }
                   else
                   {
+                     LOG_DATA << "End of Method Call";
                      resetCommand();
                      return Close;
                   }
