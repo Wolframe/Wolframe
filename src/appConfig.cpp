@@ -69,8 +69,8 @@ bool ApplicationConfiguration::parse ( const char *filename, std::ostream& os )
 
 		for ( boost::property_tree::ptree::const_iterator it = pt.begin();
 								it != pt.end(); it++ )	{
-			std::map< const char*, ConfigurationBase* >::iterator confIt;
-			if (( confIt = confs.find( it->first.c_str() ) ) != confs.end() )	{
+			std::map< std::string, ConfigurationBase* >::iterator confIt;
+			if (( confIt = confs.find( it->first ) ) != confs.end() )	{
 				if ( ! confIt->second->parse( pt.get_child( it->first ), os ))
 					return false;
 			}
@@ -118,7 +118,7 @@ void ApplicationConfiguration::print( std::ostream& os ) const
 #if !defined(_WIN32)
 	os << "Run in foreground: " << (foreground ? "yes" : "no") << std::endl;
 #endif
-	for ( std::map< const char*, ConfigurationBase* >::const_iterator it = confs.begin();
+	for ( std::map< std::string, ConfigurationBase* >::const_iterator it = confs.begin();
 									it != confs.end(); it++ )
 		it->second->print( os );
 }

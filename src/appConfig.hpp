@@ -49,7 +49,7 @@ namespace _SMERP {
 						       const char *userFile,
 						       const char *localFile );
 		private:
-			std::map< const char*, ConfigurationBase* >	confs;
+			std::map< std::string, ConfigurationBase* >	confs;
 		};
 	} // namespace Configuration
 } // namespace _SMERP
