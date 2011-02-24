@@ -39,7 +39,9 @@ public:
    iterator_t& operator--()                                 {--m_idx; return *this;}
    iterator_t operator--(int)                               {iterator_t rt=*this; --m_idx; return rt;}
    iterator_t operator+( difference_type d)                 {iterator_t rt=*this; rt.m_idx+=d; return rt;}
+   iterator_t operator+( difference_type d) const           {iterator_t rt=*this; rt.m_idx+=d; return rt;}
    iterator_t operator-( difference_type d)                 {iterator_t rt=*this; rt.m_idx-=d; return rt;}
+   iterator_t operator-( difference_type d) const           {iterator_t rt=*this; rt.m_idx-=d; return rt;}
    iterator_t& operator+=( difference_type d)               {m_idx+=d; return *this;}
    iterator_t& operator-=( difference_type d)               {m_idx-=d; return *this;}
    difference_type operator-( const iterator_t& b) const    {return m_idx-b.m_idx;}

@@ -87,7 +87,22 @@ public:
    }
 
    void resetEoD()                                      {m_eodState=EoD::SRC;}
+
    bool gotEoD() const                                  {return m_eodState>=EoD::LF_DOT_CR;}
+   bool gotEoD_LF() const                               {return m_eodState>=EoD::LF_DOT_CR_LF;}
+
+   iterator getStart( const iterator itr)
+   {
+      if (m_eodState == EoD::LF_DOT_CR && itr < end() && *itr == '\n')
+      {
+         m_eodState = EoD::LF_DOT_CR_LF;
+         return itr+(size_type)1;
+      }
+      else
+      {
+         return itr;
+      }
+   }
 
 private:
    int getEoDpos( unsigned int offset);

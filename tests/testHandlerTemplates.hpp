@@ -6,7 +6,7 @@
 #define _SMERP_TEST_HANDLER_TEMPLATES_HPP_INCLUDED
 #include "logger.hpp"
 #include <cstring>
-#include <stdio.h>
+#include <iostream>
 
 namespace _SMERP
 {
@@ -48,6 +48,7 @@ namespace test
                unsigned int size = netop.size();
                unsigned int ii;
                for (ii=0; ii<size && *in; ii++,in++) data[ii]=*in;
+
                connection.networkInput( (void*)data, ii);
             }
             break;

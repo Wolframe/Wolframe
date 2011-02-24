@@ -1,10 +1,13 @@
 #include "implementation.hpp"
+#include "logger.hpp"
 #include "generators/char_isolatin1.hpp"
 
 using namespace _SMERP::mtproc;
 
 int Method::Data::echo( Context* ctx, unsigned int, const char**)
 {
+   LOG_DATA << "Method Call";
+
    if (!ctx->contentIterator) ctx->contentIterator = new protocol::Generator( generator::CharIsoLatin1::GetNext);
    if (!ctx->output) ctx->output = new protocol::FormatOutput( generator::CharIsoLatin1::Print);
    char ch;

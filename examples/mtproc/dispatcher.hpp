@@ -28,6 +28,9 @@ private:
       ArgumentsParsed,         //< command arguments have been parsed
       Running                  //< running command, interrupted by a yield 
    };
+   static const char* stateName( State s) {const char* ar[]={"Null","Init","Parsing","Selected","ArgumentsParsed","Running"}; return ar[s];}
+
+
    typedef protocol::CmdBuffer CmdBuffer;                    //< buffer type for protocol commands
    typedef protocol::CmdParser<CmdBuffer> ProtocolParser;    //< parser type for the protocol
    typedef protocol::Buffer<256> LineBuffer;                 //< buffer type for the command argument strings

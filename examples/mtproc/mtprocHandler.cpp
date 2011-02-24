@@ -32,11 +32,12 @@ struct Connection::Private
       Processing,               //< running the dispatcher sub state machine; execute a command
       ProtocolError,            //< a protocol error (bad command etc) appeared and the rest of the line has to be discarded
       DiscardInput,             //< reading and discarding data until end of data has been seen
+      EndOfCommand,             //< cleanup after processing
       Terminate                 //< terminate processing (close for network)
    };
    static const char* stateName( State i)
    {
-      static const char* ar[] = {"Init","EnterCommand","Processing","ProtocolError","CommandError","Terminate"};
+      static const char* ar[] = {"Init","EnterCommand","Processing","ProtocolError","CommandError","EndOfCommand","Terminate"};
       return ar[i];
    }
 
@@ -123,13 +124,13 @@ struct Connection::Private
    {
       for (;;)
       {
-         LOG_DATA << "\nState: " << stateName(state);
+         LOG_DATA << "Handler State: " << stateName(state);
 
          switch( state)
          {
             case Init:
             {
-                //start or restart:
+                //start:
                 state = EnterCommand;
                 return WriteLine( "OK expecting command");
             }
@@ -192,20 +193,15 @@ struct Connection::Private
                       bool hasOutput = commandDispatcher.getOutput( &content, &contentsize);
                       commandDispatcher.setOutputBuffer( output.ptr(), output.size());
 
-                      if (!hasOutput)
-                      {
-                         continue;
-                      }
-                      else
-                      {
-                         return Network::SendData( content, contentsize);
-                      }
+                      if (!hasOutput) continue;
+
+                      return Network::SendData( content, contentsize);
                    }
                    case CommandDispatcher::Close:
                    {
                       if (returnCode == 0)
                       {
-                         state = (input.gotEoD())?Init:DiscardInput;
+                         state = (input.gotEoD())?EndOfCommand:DiscardInput;
                          return WriteLine( "\r\n.\r\nOK");
                       }
                       else
@@ -223,9 +219,28 @@ struct Connection::Private
             {
                if (input.gotEoD())
                {
-                  state = Init;
-                  input.resetEoD();
+                  state = EndOfCommand;
                   continue;
+               }
+               else
+               {
+                  input.setPos( 0);
+                  return Network::ReadData( input.ptr(), input.size());
+               }
+            }
+
+            case EndOfCommand:
+            {
+               itr = input.getStart( itr);
+               if (input.gotEoD_LF())
+               {
+                  state = EnterCommand;
+                  continue;                  
+               }
+               else if (itr < end)
+               {
+                  state = Init;
+                  return WriteLine( "BAD end of line in protocol after end of data"); 
                }
                else
                {

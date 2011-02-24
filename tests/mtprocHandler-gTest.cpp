@@ -124,13 +124,12 @@ protected:
       expected.clear();
       input.append( "echo\r\n");
       expected.append( "OK expecting command\r\n");
-      expected.append( "OK enter data\r\n\r\n");
 
       input.append( test.content);
       expected.append( escape( test.content));
 
       input.append( ".\r\n");
-      expected.append( "OK expecting command\r\n");
+      expected.append( "\r\n.\r\nOK\r\n");
       input.append( "quit\r\n");
       expected.append( "BYE\r\n");
 	}
