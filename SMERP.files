@@ -337,7 +337,6 @@ tests/authTest.cpp
 src/authentication_textfile.hpp
 src/authentication_textfile.cpp
 tests/singletonTest.cpp
-src/configStandard.hpp
 src/configDatabase.cpp
 src/configLogger.cpp
 src/configHelpers.cpp
@@ -348,8 +347,10 @@ src/configServer.cpp
 ./clients/qt/Makefile.W32
 ./clients/Makefile.W32
 ./src/Makefile.W32
-include/configStandard.hpp
 include/configHelpers.hpp
 examples/echo/appProperties.cpp
 include/appProperties.hpp
 src/appProperties.cpp
+src/appConfigDefinition.cpp
+include/standardConfigs.hpp
+src/handlerConfig.hpp

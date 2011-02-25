@@ -3,8 +3,8 @@
 //
 
 #include "appConfig.hpp"
-#include "configStandard.hpp"
 #include "commandLine.hpp"
+#include "standardConfigs.hpp"
 
 #include "miscUtils.hpp"
 
@@ -22,22 +22,6 @@
 
 namespace _SMERP {
 	namespace Configuration {
-
-ApplicationConfiguration::ApplicationConfiguration()
-{
-	// server
-	srvConfig = new Configuration::ServerConfiguration( "server", "Server" );
-
-	// logging
-	logConfig = new Configuration::LoggerConfiguration( "logging", "Logging" );
-
-//	handlerConfig = new Configuration::DatabaseConfiguration( "database", "Database Server" );
-
-	section["server"] = 0, conf.push_back( srvConfig );
-	section["logging"] = 1, conf.push_back( logConfig );
-//	section["database"] = 2, conf.push_back( handlerConfig );
-}
-
 
 const char* ApplicationConfiguration::chooseFile( const char *globalFile, const char *userFile, const char *localFile )
 {
@@ -118,8 +102,10 @@ void ApplicationConfiguration::print( std::ostream& os ) const
 #if !defined(_WIN32)
 	os << "Run in foreground: " << (foreground ? "yes" : "no") << std::endl;
 #endif
-	for ( std::size_t i = 0; i < conf.size(); i++ )
+	for ( std::size_t i = 0; i < conf.size(); i++ )	{
+		os << std::endl;
 		conf[ i ]->print( os );
+	}
 }
 
 /// Check if the application configuration makes sense

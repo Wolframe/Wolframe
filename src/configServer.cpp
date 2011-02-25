@@ -2,7 +2,7 @@
 // server configuration
 //
 
-#include "configStandard.hpp"
+#include "standardConfigs.hpp"
 #include "configHelpers.hpp"
 #include "appProperties.hpp"
 
@@ -49,25 +49,40 @@ ServerConfiguration::ServerConfiguration( const std::string& node, const std::st
 		os << "Network" << std::endl;
 		if ( address.size() > 0 )	{
 			std::list<Network::ServerTCPendpoint>::const_iterator it = address.begin();
-			os << "  Unencrypted: " << it->toString() << std::endl;
-			for ( ++it; it != address.end(); ++it )
-				os << "               " << it->toString() << std::endl;
+			os << "   Unencrypted: " << it->toString();
+			if ( it->maxConnections() != 0 )
+				os << ", maximum: " << it->maxConnections() << " client connections";
+			os << std::endl;
+
+			for ( ++it; it != address.end(); ++it )	{
+				os << "                " << it->toString();
+				if ( it->maxConnections() != 0 )
+					os << ", maximum: " << it->maxConnections() << " client connections";
+				os << std::endl;
+			}
 		}
 		if ( SSLaddress.size() > 0 )	{
 			std::list<Network::ServerSSLendpoint>::const_iterator it = SSLaddress.begin();
-			os << "          SSL: " << it->toString() << std::endl;
-			os << "                  certificate: " << (it->certificate().empty() ? "(none)" : it->certificate()) << std::endl;
-			os << "                  key file: " << (it->key().empty() ? "(none)" : it->key()) << std::endl;
-			os << "                  CA directory: " << (it->CAdirectory().empty() ? "(none)" : it->CAdirectory()) << std::endl;
-			os << "                  CA chain file: " << (it->CAchain().empty() ? "(none)" : it->CAchain()) << std::endl;
-			os << "                  verify client: " << (it->verifyClientCert() ? "yes" : "no") << std::endl;
+			os << "           SSL: " << it->toString();
+			if ( it->maxConnections() != 0 )
+				os << ", maximum: " << it->maxConnections() << " client connections";
+			os << std::endl;
+
+			os << "                   certificate: " << (it->certificate().empty() ? "(none)" : it->certificate()) << std::endl;
+			os << "                   key file: " << (it->key().empty() ? "(none)" : it->key()) << std::endl;
+			os << "                   CA directory: " << (it->CAdirectory().empty() ? "(none)" : it->CAdirectory()) << std::endl;
+			os << "                   CA chain file: " << (it->CAchain().empty() ? "(none)" : it->CAchain()) << std::endl;
+			os << "                   verify client: " << (it->verifyClientCert() ? "yes" : "no") << std::endl;
 			for ( ++it; it != SSLaddress.end(); ++it )	{
-				os << "               " << it->toString() << std::endl;
-				os << "                  certificate: " << (it->certificate().empty() ? "(none)" : it->certificate()) << std::endl;
-				os << "                  key file: " << (it->key().empty() ? "(none)" : it->key()) << std::endl;
-				os << "                  CA directory: " << (it->CAdirectory().empty() ? "(none)" : it->CAdirectory()) << std::endl;
-				os << "                  CA chain file: " << (it->CAchain().empty() ? "(none)" : it->CAchain()) << std::endl;
-				os << "                  verify client: " << (it->verifyClientCert() ? "yes" : "no") << std::endl;
+				os << "                " << it->toString();
+				if ( it->maxConnections() != 0 )
+					os << ", maximum: " << it->maxConnections() << " client connections";
+				os << std::endl;
+				os << "                   certificate: " << (it->certificate().empty() ? "(none)" : it->certificate()) << std::endl;
+				os << "                   key file: " << (it->key().empty() ? "(none)" : it->key()) << std::endl;
+				os << "                   CA directory: " << (it->CAdirectory().empty() ? "(none)" : it->CAdirectory()) << std::endl;
+				os << "                   CA chain file: " << (it->CAchain().empty() ? "(none)" : it->CAchain()) << std::endl;
+				os << "                   verify client: " << (it->verifyClientCert() ? "yes" : "no") << std::endl;
 			}
 		}
 	}

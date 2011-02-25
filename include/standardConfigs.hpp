@@ -2,8 +2,8 @@
 // standard configuration structures
 //
 
-#ifndef _CONFIG_STANDARD_HPP_INCLUDED
-#define _CONFIG_STANDARD_HPP_INCLUDED
+#ifndef _STANDARD_CONFIGS_HPP_INCLUDED
+#define _STANDARD_CONFIGS_HPP_INCLUDED
 
 #include "configurationBase.hpp"
 #include "serverEndpoint.hpp"
@@ -108,10 +108,11 @@ namespace _SMERP {
 			std::string		name;
 			std::string		user;
 			std::string		password;
+			unsigned short		connections;
 
 			/// constructor
 			DatabaseConfiguration( const std::string& node, const std::string& header )
-				: ConfigurationBase( node, header )	{ port = 0; }
+				: ConfigurationBase( node, header )	{ port = 0; connections = 0; }
 			/// methods
 			bool parse( boost::property_tree::ptree& pt, std::ostream& os );
 			bool check( std::ostream& os ) const;
@@ -125,4 +126,4 @@ namespace _SMERP {
 } // namespace _SMERP
 
 
-#endif // _CONFIG_STANDARD_HPP_INCLUDED
+#endif // _STANDARD_CONFIGS_HPP_INCLUDED

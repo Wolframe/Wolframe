@@ -80,6 +80,7 @@ endif
 OBJS = \
 	$(LOCAL_STATIC_LIB_OBJS) \
 	appProperties.o \
+	appConfigDefinition.o \
 	smerpHandler.o \
 	posixMain.o
 

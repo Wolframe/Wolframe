@@ -2,7 +2,7 @@
 // logger configuration functions
 //
 
-#include "configStandard.hpp"
+#include "standardConfigs.hpp"
 #include "configHelpers.hpp"
 
 #define BOOST_FILESYSTEM_VERSION 3

@@ -3,7 +3,7 @@
 //
 
 
-#include "configStandard.hpp"
+#include "standardConfigs.hpp"
 #include "configHelpers.hpp"
 
 #define BOOST_FILESYSTEM_VERSION 3
@@ -16,26 +16,33 @@
 #include <ostream>
 
 
+static const unsigned short DEFAULT_DB_CONNECTIONS = 4;
+
+
 namespace _SMERP	{
 	namespace	Configuration	{
-
 
 void DatabaseConfiguration::print( std::ostream& os ) const
 {
 	os << displayStr() << std::endl;
 	if ( host.empty())
-		os << "   DB host: local unix domain socket" << std::endl;
+		os << "   Database host: local unix domain socket" << std::endl;
 	else
-		os << "   DB host: " << host << ":" << port << std::endl;
-	os << "   DB name: " << (name.empty() ? "(not specified - server user default)" : name) << std::endl;
-	os << "   DB user / password: " << (user.empty() ? "(not specified - same as server user)" : user) << " / "
-			<< (password.empty() ? "(not specified - no password used)" : password) << std::endl;
+		os << "   Database host: " << host << ":" << port << std::endl;
+	os << "   Database name: " << (name.empty() ? "(not specified - server user default)" : name) << std::endl;
+	os << "   Database user: " << (user.empty() ? "(not specified - same as server user)" : user)
+		 << ", password: " << (password.empty() ? "(not specified - no password used)" : password) << std::endl;
+	os << "   Database connections: " << connections << std::endl;
 }
 
 
 /// Check if the database configuration makes sense
-bool DatabaseConfiguration::check( std::ostream& ) const
+bool DatabaseConfiguration::check( std::ostream& os ) const
 {
+	if ( connections == 0 )	{
+		os << "Invalid number of connections: " << connections;
+		return false;
+	}
 	return true;
 }
 
@@ -58,11 +65,18 @@ bool DatabaseConfiguration::parse( boost::property_tree::ptree& pt, std::ostream
 		else if ( boost::algorithm::iequals( it->first, "password" ))	{
 			if ( !getStringValue( it, displayStr(), "password", password, os ))	return false;
 		}
+		else if ( boost::algorithm::iequals( it->first, "connections" ))	{
+			if ( !getUnsignedShortValue( it, displayStr(), "connections", connections, os ))
+												return false;
+		}
 		else	{
 			os << displayStr() << ": unknown configuration option: <" << it->first << ">";
 			return false;
 		}
 	}
+	if ( connections == 0 )
+		connections = DEFAULT_DB_CONNECTIONS;
+
 	return true;
 }
 

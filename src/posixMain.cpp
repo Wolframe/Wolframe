@@ -13,7 +13,7 @@
 #include "version.hpp"
 #include "commandLine.hpp"
 #include "appConfig.hpp"
-#include "configStandard.hpp"
+#include "standardConfigs.hpp"
 #include "server.hpp"
 #include "ErrorCodes.hpp"
 #include "logger.hpp"
