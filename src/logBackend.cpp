@@ -4,6 +4,7 @@
 
 #include "logger.hpp"
 #include "logBackend.hpp"
+#include "logComponent.hpp"
 
 // no macros here, name clash with variables in syslog.h, so
 // undefine them here..
@@ -31,6 +32,10 @@
 #include "smerpmsg.h"
 #endif // defined( _WIN32 )
 
+#include <sstream>
+
+#include "unused.h"
+
 namespace _SMERP {
 
 // ConsoleLogBackend
@@ -38,7 +43,6 @@ namespace _SMERP {
 ConsoleLogBackend::ConsoleLogBackend( )
 {
 	logLevel_ = _SMERP::LogLevel::LOGLEVEL_ERROR;
-	prefix_ = "";
 }
 
 ConsoleLogBackend::~ConsoleLogBackend( )
@@ -51,16 +55,12 @@ void ConsoleLogBackend::setLevel( const LogLevel::Level level )
 	logLevel_ = level;
 }
 
-void ConsoleLogBackend::setPrefix( const std::string& prefix )
+inline void ConsoleLogBackend::log( SMERP_UNUSED const LogComponent::Component component, const LogLevel::Level level, const std::string& msg )
 {
-	prefix_ = prefix;
-}
-
-inline void ConsoleLogBackend::log( const LogLevel::Level level, const std::string& msg )
-{
-	if ( level >= logLevel_ )
-		std::cerr << prefix_ << ( prefix_.empty( ) ? "" : " - " ) << level << ": " << msg << std::endl;
+	if ( level >= logLevel_ ) {
+		std::cerr << level << ": " << msg << std::endl;
 		std::cerr.flush();
+	}
 }
 
 void ConsoleLogBackend::reopen( )
@@ -74,7 +74,6 @@ LogfileBackend::LogfileBackend( )
 {
 	logLevel_ = _SMERP::LogLevel::LOGLEVEL_UNDEFINED;
 	isOpen_ = false;
-	prefix_ = "";
 	// we don't open a primarily unknown logfile, wait for setFilename
 }
 
@@ -94,11 +93,6 @@ void LogfileBackend::setFilename( const std::string filename )
 {
 	filename_ = filename;
 	reopen( );
-}
-
-void LogfileBackend::setPrefix( const std::string& prefix )
-{
-	prefix_ = prefix;
 }
 
 void LogfileBackend::reopen( )
@@ -149,11 +143,11 @@ static inline std::string timestamp( void )
 #endif // !defined( _WIN32 )
 }
 
-inline void LogfileBackend::log( const LogLevel::Level level, const std::string& msg )
+inline void LogfileBackend::log( const LogComponent::Component component, const LogLevel::Level level, const std::string& msg )
 {
 	if( level >= logLevel_ && isOpen_ ) {
 		logFile_	<< timestamp( ) << " "
-				<<  prefix_ << ( prefix_.empty( ) ? "" : " - " )
+				<< component << ( component == LogComponent::LOGCOMPONENT_NONE ? "" : " - " )
 				<< level << ": " << msg << std::endl;
 		logFile_.flush( );
 	}
@@ -267,10 +261,14 @@ void SyslogBackend::setIdent( const std::string ident )
 	reopen( );
 }
 
-inline void SyslogBackend::log( const LogLevel::Level level, const std::string& msg )
+inline void SyslogBackend::log( const LogComponent::Component component, const LogLevel::Level level, const std::string& msg )
 {
-	if ( level >= logLevel_ )
-		syslog( levelToSyslogLevel( level ), "%s", msg.c_str( ) );
+	if ( level >= logLevel_ ) {
+		std::ostringstream os;
+		os	<< component << ( component == LogComponent::LOGCOMPONENT_NONE ? "" : " - " )
+			<< msg;
+		syslog( levelToSyslogLevel( level ), "%s", os.str( ).c_str( ) );
+	}
 }
 
 void SyslogBackend::reopen( )
@@ -362,7 +360,7 @@ static DWORD messageIdToEventlogId( DWORD eventLogLevel )
 	return( eventId | 0x0FFF0000L | ( mask << 30 ) );
 }
 
-inline void EventlogBackend::log( const LogLevel::Level level, const std::string& msg )
+inline void EventlogBackend::log( SMERP_UNUSED const LogComponent::Component component, const LogLevel::Level level, const std::string& msg )
 {
 	if ( level >= logLevel_ ) {
 		LPCSTR msg_arr[1];
@@ -406,11 +404,6 @@ void LogBackend::LogBackendImpl::setConsoleLevel( const LogLevel::Level level )
 	consoleLogger_.setLevel( level );
 }
 
-void LogBackend::LogBackendImpl::setConsolePrefix( const std::string& prefix )
-{
-	consoleLogger_.setPrefix( prefix );
-}
-
 void LogBackend::LogBackendImpl::setLogfileLevel( const LogLevel::Level level )
 {
 	logfileLogger_.setLevel( level );
@@ -419,11 +412,6 @@ void LogBackend::LogBackendImpl::setLogfileLevel( const LogLevel::Level level )
 void LogBackend::LogBackendImpl::setLogfileName( const std::string filename )
 {
 	logfileLogger_.setFilename( filename );
-}
-
-void LogBackend::LogBackendImpl::setLogfilePrefix( const std::string& prefix )
-{
-	logfileLogger_.setPrefix( prefix );
 }
 
 #if !defined( _WIN32 )
@@ -460,15 +448,15 @@ void LogBackend::LogBackendImpl::setEventlogSource( const std::string source )
 }
 #endif // defined( _WIN32 )
 
-inline void LogBackend::LogBackendImpl::log( const LogLevel::Level level, const std::string& msg )
+inline void LogBackend::LogBackendImpl::log( const LogComponent::Component component, const LogLevel::Level level, const std::string& msg )
 {
-	consoleLogger_.log( level, msg );
-	logfileLogger_.log( level, msg );
+	consoleLogger_.log( component, level, msg );
+	logfileLogger_.log( component, level, msg );
 #if !defined( _WIN32 )
-	syslogLogger_.log( level, msg );
+	syslogLogger_.log( component, level, msg );
 #endif // !defined( _WIN32 )
 #if defined( _WIN32 )
-	eventlogLogger_.log( level, msg );
+	eventlogLogger_.log( component, level, msg );
 #endif // defined( _WIN32 )
 }
 
@@ -480,13 +468,9 @@ LogBackend::~LogBackend()	{ delete impl_; }
 
 void LogBackend::setConsoleLevel( const LogLevel::Level level )	{ impl_->setConsoleLevel( level ); }
 
-void LogBackend::setConsolePrefix( const std::string prefix ) { impl_->setConsolePrefix( prefix ); }
-
 void LogBackend::setLogfileLevel( const LogLevel::Level level )	{ impl_->setLogfileLevel( level ); }
 
 void LogBackend::setLogfileName( const std::string filename )	{ impl_->setLogfileName( filename );}
-
-void LogBackend::setLogfilePrefix( const std::string prefix ) { impl_->setLogfilePrefix( prefix ); }
 
 #ifndef _WIN32
 void LogBackend::setSyslogLevel( const LogLevel::Level level )	{ impl_->setSyslogLevel( level );}
@@ -504,7 +488,7 @@ void LogBackend::setEventlogLog( const std::string log )	{ impl_->setEventlogLog
 void LogBackend::setEventlogSource( const std::string source )	{ impl_->setEventlogSource( source ); }
 #endif // _WIN32
 
-void LogBackend::log( const LogLevel::Level level, const std::string& msg )	{ impl_->log( level, msg ); }
+void LogBackend::log( const LogComponent::Component component, const LogLevel::Level level, const std::string& msg )	{ impl_->log( component, level, msg ); }
 
 
 // Logger
@@ -515,11 +499,12 @@ Logger::Logger( LogBackend& backend ) :	logBk_( backend )
 
 Logger::~Logger( )
 {
-	logBk_.log( msgLevel_, os_.str( ) );
+	logBk_.log( component_, msgLevel_, os_.str( ) );
 }
 
-std::ostringstream& Logger::Get( LogLevel::Level level )
+std::ostringstream& Logger::Get( LogComponent::Component component, LogLevel::Level level )
 {
+	component_ = component;
 	msgLevel_ = level;
 	return os_;
 }

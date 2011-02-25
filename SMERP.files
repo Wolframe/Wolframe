@@ -354,3 +354,4 @@ src/appProperties.cpp
 src/appConfigDefinition.cpp
 include/standardConfigs.hpp
 src/handlerConfig.hpp
+./include/logComponent.hpp

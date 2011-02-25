@@ -17,11 +17,9 @@ class LoggingFixture : public ::testing::Test
 		{
 			// in order not to spoil the output of gtest :-)
 			logBack.setConsoleLevel( _SMERP::LogLevel::LOGLEVEL_UNDEFINED );
-			logBack.setConsolePrefix( "smerp" );
 
 			logBack.setLogfileLevel( _SMERP::LogLevel::LOGLEVEL_DATA );
 			logBack.setLogfileName( "logTest.log" );
-			logBack.setLogfilePrefix( "smerp" );
 #ifndef _WIN32
 			logBack.setSyslogLevel( _SMERP::LogLevel::LOGLEVEL_DATA );
 			logBack.setSyslogFacility( _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_USER );
@@ -47,6 +45,18 @@ TEST_F( LoggingFixture, Macros )
 	LOG_DEBUG	<< "debug message";
 	LOG_TRACE	<< "debug message with tracing";
 	LOG_DATA	<< "debug message with tracing and data";
+
+	LOG_NETWORK_FATAL	<< "fatal error";
+	LOG_NETWORK_ALERT	<< "alert";
+	LOG_NETWORK_CRITICAL	<< "critical error";
+	LOG_NETWORK_SEVERE	<< "severe error";
+	LOG_NETWORK_ERROR	<< "an error";
+	LOG_NETWORK_WARNING	<< "a warning";
+	LOG_NETWORK_NOTICE	<< "a notice";
+	LOG_NETWORK_INFO 	<< "an info";
+	LOG_NETWORK_DEBUG	<< "debug message";
+	LOG_NETWORK_TRACE	<< "debug message with tracing";
+	LOG_NETWORK_DATA	<< "debug message with tracing and data";
 }
 
 int main( int argc, char **argv )

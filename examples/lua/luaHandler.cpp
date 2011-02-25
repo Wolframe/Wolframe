@@ -74,6 +74,7 @@ namespace _SMERP {
 		}
 
 		_SMERP::Logger( _SMERP::LogBackend::instance() ).Get(
+			_SMERP::LogComponent::LOGCOMPONENT_LUA,
 			_SMERP::LogLevel::str2LogLevel( logLevel ) ) << os.str( );
 
 		lua_pop( _l, n );
