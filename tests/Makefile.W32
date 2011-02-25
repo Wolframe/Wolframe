@@ -11,7 +11,7 @@ INCLUDE_DIRS = \
 	/I$(TOPDIR)\include /I. \
 	/I$(TOPDIR)\src \
 	-I$(TOPDIR)\examples\pecho \
-	-I$(TOPDIR)\examples\xmlselect \
+	-I$(TOPDIR)\examples\mtproc \
 	/I"$(BOOST_DIR)" \
 	/I"$(PLATFORM_SDK_DIR)\Include"
 
@@ -52,8 +52,9 @@ TEST_CPP_BINS = \
 	poolTest.exe \
 	logTest.exe \
 	protocolArgumentParsing-gTest.exe
-# currently broken on Windows
+# broken on windows
 #	pechoHandler-gTest.exe
+#	mtprocHandler-gTest.exe
 !ENDIF
 
 OBJS = \
@@ -64,6 +65,7 @@ all: $(OBJS) $(CPP_BINS)
 
 threadLeakTest.exe: threadLeakTest.obj $(TOPDIR)\src\smerp.lib
 authTest.exe: authTest.obj $(TOPDIR)\src\smerp.lib
+
 !IFDEF WITH_GTEST
 testNamedRetVal.exe: testNamedRetVal.obj
 versionTest.exe: versionTest.obj $(TOPDIR)\src\smerp.lib
@@ -73,7 +75,12 @@ singletonTest.exe: singletonTest.obj $(TOPDIR)\src\smerp.lib
 poolTest.exe: poolTest.obj $(TOPDIR)\src\smerp.lib
 logTest.exe: logTest.obj $(TOPDIR)\src\smerp.lib
 protocolArgumentParsing-gTest.exe: protocolArgumentParsing-gTest.obj
+
 pechoHandler-gTest.exe: pechoHandler-gTest.obj
+
+MTPROC_GTEST_OBJS=$(TOPDIR)\examples\mtproc\mtprocHandler.obj $(TOPDIR)\examples\mtproc\implementation.obj $(TOPDIR)\examples\mtproc\dispatcher.obj
+mtprocHandler-gTest.exe: mtprocHandler-gTest.obj $(MTPROC_GTEST_OBJS) $(TOPDIR)\src\libsmerp.lib
+
 !ENDIF
 
 local_all:
