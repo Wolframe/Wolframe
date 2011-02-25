@@ -29,8 +29,9 @@ INCLUDE_LIBS += \
 endif
 
 OBJS = \
-	appConfig.o \
-	configFile.o \
+	appProperties.o \
+	appConfigDefinition.o \
+	pechoConfig.o \
 	pechoHandler.o \
 	$(TOPDIR)/src/posixMain.o
 

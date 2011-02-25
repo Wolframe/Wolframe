@@ -175,7 +175,7 @@ namespace _SMERP {
 	}
 
 
-	ServerHandler::ServerHandler( const HandlerConfiguration& ) : impl_( new ServerHandlerImpl )	{}
+	ServerHandler::ServerHandler( const HandlerConfiguration* ) : impl_( new ServerHandlerImpl )	{}
 
 	ServerHandler::~ServerHandler()	{ delete impl_; }
 

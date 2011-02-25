@@ -30,8 +30,8 @@ endif
 
 OBJS = \
 	appProperties.o \
-	appConfig.o \
-	configFile.o \
+	appConfigDefinition.o \
+	echoConfig.o \
 	echoHandler.o \
 	$(TOPDIR)/src/posixMain.o
 

@@ -31,8 +31,9 @@ INCLUDE_LIBS += \
 endif
 
 OBJS = \
-	appConfig.o \
-	configFile.o \
+	appProperties.o \
+	appConfigDefinition.o \
+	luaConfig.o \
 	luaHandler.o \
 	$(TOPDIR)/src/posixMain.o
 

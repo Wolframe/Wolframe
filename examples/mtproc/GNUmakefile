@@ -29,8 +29,9 @@ INCLUDE_LIBS += \
 endif
 
 OBJS = \
-	appConfig.o \
-	configFile.o \
+	appProperties.o \
+	appConfigDefinition.o \
+	mtprocConfig.o \
 	implementation.o \
 	dispatcher.o \
 	mtprocHandler.o \
