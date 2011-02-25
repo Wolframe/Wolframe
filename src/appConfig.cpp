@@ -33,9 +33,9 @@ ApplicationConfiguration::ApplicationConfiguration()
 
 //	handlerConfig = new Configuration::DatabaseConfiguration( "database", "Database Server" );
 
-	confs["server"] = srvConfig;
-	confs["logging"] = logConfig;
-//	confs["database"] = handlerConfig;
+	section["server"] = 0, conf.push_back( srvConfig );
+	section["logging"] = 1, conf.push_back( logConfig );
+//	section["database"] = 2, conf.push_back( handlerConfig );
 }
 
 
@@ -69,15 +69,15 @@ bool ApplicationConfiguration::parse ( const char *filename, std::ostream& os )
 
 		for ( boost::property_tree::ptree::const_iterator it = pt.begin();
 								it != pt.end(); it++ )	{
-			std::map< std::string, ConfigurationBase* >::iterator confIt;
-			if (( confIt = confs.find( it->first ) ) != confs.end() )	{
-				if ( ! confIt->second->parse( pt.get_child( it->first ), os ))
+			std::map< std::string, int >::iterator confIt;
+			if (( confIt = section.find( it->first ) ) != section.end() )	{
+				if ( ! conf[ confIt->second ]->parse( pt.get_child( it->first ), os ))
 					return false;
 			}
-//			else	{
-//				os << "Unknown configuration option " << it->first;
-//				return false;
-//			}
+			else	{
+				os << "Unknown configuration option " << it->first;
+				return false;
+			}
 		}
 
 	}
@@ -118,17 +118,16 @@ void ApplicationConfiguration::print( std::ostream& os ) const
 #if !defined(_WIN32)
 	os << "Run in foreground: " << (foreground ? "yes" : "no") << std::endl;
 #endif
-	for ( std::map< std::string, ConfigurationBase* >::const_iterator it = confs.begin();
-									it != confs.end(); it++ )
-		it->second->print( os );
+	for ( std::size_t i = 0; i < conf.size(); i++ )
+		conf[ i ]->print( os );
 }
 
 /// Check if the application configuration makes sense
 bool ApplicationConfiguration::check( std::ostream& os ) const
 {
-	// check logging
-	if ( ! logConfig->check( os ))
-		return false;
+	for ( std::size_t i = 0; i < conf.size(); i++ )
+		if ( ! conf[ i ]->check( os ))
+			return false;
 	return true;
 }
 

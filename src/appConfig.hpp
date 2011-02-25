@@ -9,6 +9,7 @@
 
 #include <string>
 #include <map>
+#include <vector>
 
 namespace _SMERP {
 
@@ -49,7 +50,8 @@ namespace _SMERP {
 						       const char *userFile,
 						       const char *localFile );
 		private:
-			std::map< std::string, ConfigurationBase* >	confs;
+			std::vector< ConfigurationBase* >	conf;
+			std::map< std::string, int >		section;
 		};
 	} // namespace Configuration
 } // namespace _SMERP
