@@ -30,15 +30,12 @@ namespace _SMERP {
 
 		void setLevel( const LogLevel::Level level );
 
-		void log( const LogLevel::Level level, const std::string& msg );
-
-		void setPrefix( const std::string& prefix );
+		void log( const LogComponent::Component component, const LogLevel::Level level, const std::string& msg );
 
 		void reopen( );
 		
 	private:
 		LogLevel::Level	logLevel_;
-		std::string prefix_;
 	};
 
 	class LogfileBackend
@@ -52,18 +49,15 @@ namespace _SMERP {
 
 		void setFilename( const std::string filename );
 
-		void setPrefix( const std::string& prefix );
-
 		void reopen( );
 
-		void log( const LogLevel::Level level, const std::string& msg );
+		void log( const LogComponent::Component component, const LogLevel::Level level, const std::string& msg );
 
 	private:
 		LogLevel::Level logLevel_;
 		std::ofstream logFile_;
 		std::string filename_;
 		bool isOpen_;
-		std::string prefix_;
 	};
 
 #ifndef _WIN32
@@ -80,7 +74,7 @@ namespace _SMERP {
 
 		void setIdent( const std::string ident );
 
-		void log( const LogLevel::Level level, const std::string& msg );
+		void log( const LogComponent::Component component, const LogLevel::Level level, const std::string& msg );
 
 		void reopen( );
 
@@ -105,7 +99,7 @@ namespace _SMERP {
 
 		void setSource( const std::string source );
 
-		void log( const LogLevel::Level level, const std::string& msg );
+		void log( const LogComponent::Component component, const LogLevel::Level level, const std::string& msg );
 
 		void reopen( );
 
@@ -127,12 +121,8 @@ namespace _SMERP {
 
 		void setConsoleLevel( const LogLevel::Level level );
 		
-		void setConsolePrefix( const std::string& prefix );
-
 		void setLogfileLevel( const LogLevel::Level level );
 		
-		void setLogfilePrefix( const std::string& prefix );
-
 		void setLogfileName( const std::string filename );
 
 #ifndef _WIN32
@@ -151,7 +141,7 @@ namespace _SMERP {
 		void setEventlogSource( const std::string source );
 #endif // _WIN32
 
-		void log( const LogLevel::Level level, const std::string& msg );
+		void log( const LogComponent::Component component, const LogLevel::Level level, const std::string& msg );
 
 	private:
 		ConsoleLogBackend consoleLogger_;

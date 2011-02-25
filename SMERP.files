@@ -189,3 +189,4 @@ makefiles/nmake/top.mk
 ./clients/qt/Makefile.W32
 ./clients/Makefile.W32
 ./src/Makefile.W32
+./include/logComponent.hpp
