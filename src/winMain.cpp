@@ -234,7 +234,9 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 			// LOG_FATAL << errMsg.str();
 			return;
 		}
-		
+// configuration file has been parsed successfully
+// build the final configuration
+		config.finalize( cmdLineCfg );		
 
 		// it's just a DUMMY for now
 		_SMERP::HandlerConfiguration	handlerConfig;
