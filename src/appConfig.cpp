@@ -79,7 +79,7 @@ void ApplicationConfiguration::finalize( const CmdLineConfig& cmdLine )
 	// on Windows the user should either use -f or start in the console
 	// (assuming an implicit -f) or the service option should contain
 	// --service in the startup parameters of the service impling non-foreground
-	if( cmdLine.command == _SMERP::CmdLineConfig::RUN_SERVICE )
+	if( cmdLine.command == CmdLineConfig::RUN_SERVICE )
 		foreground = false;
 	else
 		foreground = true;

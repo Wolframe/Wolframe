@@ -11,8 +11,8 @@
 #include "appProperties.hpp"
 #include "version.hpp"
 #include "commandLine.hpp"
-#include "configFile.hpp"
 #include "appConfig.hpp"
+#include "standardConfigs.hpp"
 #include "server.hpp"
 #include "ErrorCodes.hpp"
 #include "logger.hpp"
@@ -65,7 +65,7 @@ static void registrySetWord( HKEY h, TCHAR *name, DWORD value ) {
 }
 
 // initializes the Event Logger
-static void registerEventlog( const _SMERP::ApplicationConfiguration& config )
+static void registerEventlog( const _SMERP::Configuration::ApplicationConfiguration& config )
 {
 	char key[256];
 	HKEY h = 0;
@@ -95,7 +95,7 @@ static void registerEventlog( const _SMERP::ApplicationConfiguration& config )
 	(void)RegCloseKey( h );
 }
 
-static void deregisterEventlog( const _SMERP::ApplicationConfiguration& config )
+static void deregisterEventlog( const _SMERP::Configuration::ApplicationConfiguration& config )
 {
 	char key[256];
 	HKEY h = 0;
@@ -108,7 +108,7 @@ static void deregisterEventlog( const _SMERP::ApplicationConfiguration& config )
 	(void)RegDeleteKey( h, config.logConfig->eventlogSource.c_str( ) );
 }
 
-static void installAsService( const _SMERP::ApplicationConfiguration& config )
+static void installAsService( const _SMERP::Configuration::ApplicationConfiguration& config )
 {
 // get service control manager
 	SC_HANDLE scm = (SC_HANDLE)OpenSCManager( NULL, SERVICES_ACTIVE_DATABASE, SC_MANAGER_ALL_ACCESS );
@@ -138,7 +138,7 @@ static void installAsService( const _SMERP::ApplicationConfiguration& config )
 	(void)CloseServiceHandle( scm );
 }
 
-static void remove_as_service( const _SMERP::ApplicationConfiguration& config )
+static void remove_as_service( const _SMERP::Configuration::ApplicationConfiguration& config )
 {
 // get service control manager
 	SC_HANDLE scm = (SC_HANDLE)OpenSCManager( NULL, SERVICES_ACTIVE_DATABASE, SC_MANAGER_ALL_ACCESS );
@@ -223,12 +223,12 @@ static std::string serviceConfig;
 static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 	try {
 // read configuration (from the location passed in the command line arguments of the main, not the service_main)
-		_SMERP::CmdLineConfig cmdLineCfg; // empty for a service with --service
-		cmdLineCfg.command = _SMERP::CmdLineConfig::RUN_SERVICE;
+		_SMERP::Configuration::CmdLineConfig cmdLineCfg; // empty for a service with --service
+		cmdLineCfg.command = _SMERP::Configuration::CmdLineConfig::RUN_SERVICE;
 		const char *configFile = serviceConfig.c_str( ); // configuration comes from main thread
 
 		std::stringstream	errMsg;
-		_SMERP::ApplicationConfiguration config;
+		_SMERP::Configuration::ApplicationConfiguration config;
 		if ( !config.parse( configFile, errMsg ))	{	// there was an error parsing the configuration file
 			// TODO: a hen and egg problem here with event logging and where to know where to log to
 			// LOG_FATAL << errMsg.str();
@@ -267,7 +267,7 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 		LOG_NOTICE << "Starting service";
 
 // run server in background thread(s).
-		_SMERP::ServerHandler	handler( handlerConfig );
+		_SMERP::ServerHandler	handler( config.handlerConfig );
 		_SMERP::Network::server s( config.srvConfig->address, config.srvConfig->SSLaddress,
 								handler, config.srvConfig->threads, config.srvConfig->maxConnections );
 		boost::thread t( boost::bind( &_SMERP::Network::server::run, &s ));
@@ -314,7 +314,7 @@ int _SMERP_winMain( int argc, char* argv[] )
 	try	{
 		_SMERP::Version		appVersion( _SMERP::applicationMajorVersion(), _SMERP::applicationMinorVersion(),
 										_SMERP::applicationRevisionVersion(), _SMERP::applicationBuildVersion() );
-		_SMERP::CmdLineConfig	cmdLineCfg;
+		_SMERP::Configuration::CmdLineConfig	cmdLineCfg;
 		const char		*configFile = NULL;
 
 // it's just a DUMMY for now
@@ -332,11 +332,11 @@ int _SMERP_winMain( int argc, char* argv[] )
 			std::cerr << "BOO:" << cmdLineCfg.errMsg() << std::endl << std::endl;
 
 // if we have to print the version or the help do it and exit
-		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::PRINT_VERSION )	{
+		if ( cmdLineCfg.command == _SMERP::Configuration::CmdLineConfig::PRINT_VERSION )	{
 			std::cout << "BOBOBO version " << appVersion.toString() << std::endl << std::endl;
 			return _SMERP::ErrorCodes::OK;
 		}
-		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::PRINT_HELP )	{
+		if ( cmdLineCfg.command == _SMERP::Configuration::CmdLineConfig::PRINT_HELP )	{
 			cmdLineCfg.usage( std::cout );
 			std::cerr << std::endl;
 			return _SMERP::ErrorCodes::OK;
@@ -350,7 +350,7 @@ int _SMERP_winMain( int argc, char* argv[] )
 			return _SMERP::ErrorCodes::FAILURE;
 		}
 
-		_SMERP::ApplicationConfiguration config;
+		_SMERP::Configuration::ApplicationConfiguration config;
 		std::stringstream	errMsg;
 		if ( !config.parse( configFile, errMsg ))	{	// there was an error parsing the configuration file
 			std::cerr << errMsg.str() << std::endl << std::endl;
@@ -361,7 +361,7 @@ int _SMERP_winMain( int argc, char* argv[] )
 		config.finalize( cmdLineCfg );
 
 // Check the configuration
-		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::CHECK_CONFIG )	{
+		if ( cmdLineCfg.command == _SMERP::Configuration::CmdLineConfig::CHECK_CONFIG )	{
 			if ( config.check( errMsg ) )	{
 				std::cout << "Configuration OK" << std::endl << std::endl;
 				return _SMERP::ErrorCodes::OK;
@@ -372,32 +372,32 @@ int _SMERP_winMain( int argc, char* argv[] )
 			}
 		}
 
-		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::PRINT_CONFIG )	{
+		if ( cmdLineCfg.command == _SMERP::Configuration::CmdLineConfig::PRINT_CONFIG )	{
 			config.print( std::cout );
 			std::cout << std::endl;
 			return _SMERP::ErrorCodes::OK;
 		}
 
-		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::TEST_CONFIG )	{
+		if ( cmdLineCfg.command == _SMERP::Configuration::CmdLineConfig::TEST_CONFIG )	{
 			std::cout << "Not implemented yet" << std::endl << std::endl;
 			return _SMERP::ErrorCodes::OK;
 		}
 
-		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::INSTALL_SERVICE ) {
+		if ( cmdLineCfg.command == _SMERP::Configuration::CmdLineConfig::INSTALL_SERVICE ) {
 			registerEventlog( config );
 			installAsService( config );
 			std::cout << "Installed as Windows service" << std::endl << std::endl;
 			return _SMERP::ErrorCodes::OK;
 		}
 
-		if ( cmdLineCfg.command == _SMERP::CmdLineConfig::REMOVE_SERVICE ) {
+		if ( cmdLineCfg.command == _SMERP::Configuration::CmdLineConfig::REMOVE_SERVICE ) {
 			remove_as_service( config );
 			deregisterEventlog( config );
 			std::cout << "Removed as Windows service" << std::endl << std::endl;
 			return _SMERP::ErrorCodes::OK;
 		}
 
-		if( cmdLineCfg.command == _SMERP::CmdLineConfig::RUN_SERVICE ) {
+		if( cmdLineCfg.command == _SMERP::Configuration::CmdLineConfig::RUN_SERVICE ) {
 			// if started as service we dispatch the service thread now
 			SERVICE_TABLE_ENTRY dispatch_table[2] =
 				{ { const_cast<char *>( config.srvConfig->serviceName.c_str( ) ), service_main },
@@ -427,7 +427,7 @@ int _SMERP_winMain( int argc, char* argv[] )
 
 		LOG_NOTICE << "Starting server";
 
-		_SMERP::ServerHandler	handler( handlerConfig );
+		_SMERP::ServerHandler	handler( config.handlerConfig );
 		_SMERP::Network::server s( config.srvConfig->address, config.srvConfig->SSLaddress,
 					   handler, config.srvConfig->threads, config.srvConfig->maxConnections );
 
