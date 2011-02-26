@@ -19,7 +19,7 @@ Compile and install boost
 ./bootstrap.sh --prefix=/somewhere/boost-1_44_0
 ./bjam
 
-configure SMERP in makefiles/gmake/config.mk and
+configure Wolframe in makefiles/gmake/config.mk and
 set BOOST_DIR to /somewhere/boost-1_44_0.
 
 Compile and install openssl
@@ -31,7 +31,7 @@ Compile and install gtest
 ./configure
 make
 
-configure SMERP in makefiles/gmake/config.mk and
+configure Wolframe in makefiles/gmake/config.mk and
 set GTEST_DIR accordingly.
 
 Compile and install Lua

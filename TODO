@@ -1,6 +1,5 @@
 MBa:
 
-- propagate symbols through makefiles
 - SSL must require certificate from peer if verify is on
 
 

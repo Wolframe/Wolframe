@@ -1,7 +1,7 @@
-SMERP.creator.user*
-SMERP.suo
-SMERP.ncb
-SMERP.vcproj.*
+Wolframe.creator.user*
+Wolframe.suo
+Wolframe.ncb
+Wolframe.vcproj.*
 Debug
 x64
 *~
@@ -20,7 +20,7 @@ test.bat
 *.RES
 simple_event_log.h
 *.rc
-src/smerpd
+src/Wolframed
 tests/testNamedRetVal
 tests/singletonTest
 tests/versionTest
