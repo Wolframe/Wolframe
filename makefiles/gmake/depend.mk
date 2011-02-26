@@ -68,9 +68,13 @@ ifeq "$(COMPILER)" "pcc"
 
 endif
 
+ifneq ($(MAKECMDGOALS),clean)
+ifneq ($(MAKECMDGOALS),distclean)
 -include $(OBJS:.o=.d)
 -include $(CPP_OBJS:.o=.d)
 -include $(BIN_OBJS:.o=.d)
 -include $(CPP_BIN_OBJS:.o=.d)
 -include $(TEST_BIN_OBJS:.o=.d)
 -include $(TEST_CPP_BIN_OBJS:.o=.d)
+endif
+endif
