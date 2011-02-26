@@ -35,8 +35,9 @@ INCLUDE_LIBS = \
 !ENDIF
 
 OBJS = \
-	appConfig.obj \
-	configFile.obj \
+	appProperties.obj \
+	appConfigDefinition.obj \
+	luaConfig.obj \
 	luaHandler.obj \
 	$(TOPDIR)\src\winMain.obj
 

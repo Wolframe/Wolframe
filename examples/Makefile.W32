@@ -1,6 +1,7 @@
 TOPDIR = ..
 
 SUBDIRS = echo pecho
+# mtproc breaks on Windows
 
 !IFDEF WITH_LUA
 SUBDIRS = \

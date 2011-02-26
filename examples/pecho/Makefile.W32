@@ -34,8 +34,9 @@ INCLUDE_LIBS = \
 !ENDIF
 
 OBJS = \
-	appConfig.obj \
-	configFile.obj \
+	appProperties.obj \
+	appConfigDefinition.obj \
+	pechoConfig.obj \
 	pechoHandler.obj \
 	$(TOPDIR)\src\winMain.obj
 

@@ -34,8 +34,9 @@ INCLUDE_LIBS = \
 !ENDIF
 
 OBJS = \
-	appConfig.obj \
-	configFile.obj \
+	appProperties.obj \
+	appConfigDefinition.obj \
+	mtprocConfig.obj \
 	implementation.obj \
 	dispatcher.obj \
 	mtprocHandler.obj \
