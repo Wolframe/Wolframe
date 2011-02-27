@@ -41,11 +41,11 @@ OBJS = \
 	$(TOPDIR)\src\winMain.obj
 
 CPP_BINS = \
-	smerp-echo.exe
+	wolframe-echo.exe
 
 all: $(OBJS) $(CPP_BINS)
 
-smerp-echo.exe: smerp-echo.obj $(TOPDIR)\src\smerp.lib
+wolframe-echo.exe: wolframe-echo.obj $(TOPDIR)\src\wolframe.lib
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 

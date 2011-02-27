@@ -1,13 +1,13 @@
 '\" t
-.\"     Title: SMERP
-.\"    Author: Mihai Barbos <mihai.barbos@gmail.com>
+.\"     Title: wolframe
+.\"    Author: FIRSTNAME SURNAME <mihai.barbos@gmail.com>
 .\" Generator: DocBook XSL Stylesheets v1.75.2 <http://docbook.sf.net/>
-.\"      Date: 01/26/2011
-.\"    Manual: SMERP User Manual
-.\"    Source: smerpd
+.\"      Date: 02/27/2011
+.\"    Manual: Wolframe User Manual
+.\"    Source: wolframe.conf
 .\"  Language: English
 .\"
-.TH "SMERP" "8" "01/26/2011" "smerpd" "SMERP User Manual"
+.TH "WOLFRAME" "5" "02/27/2011" "wolframe.conf" "Wolframe User Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -28,16 +28,16 @@
 .\" * MAIN CONTENT STARTS HERE *
 .\" -----------------------------------------------------------------
 .SH "NAME"
-smerpd \- program to do something
+wolframe.conf \- program to do something
 .SH "SYNOPSIS"
-.HP \w'\fBsmerpd\fR\ 'u
-\fBsmerpd\fR \fB\-e\ \fR\fB\fIthis\fR\fR [\fB\-\-example=\fR\fBthat\fR] [{\fB\-e\fR\ |\ \fB\-\-example\fR}\ \fIthis\fR] [{\fB\-e\fR\ |\ \fB\-\-example\fR}\ {\fIthis\fR\ |\ \fIthat\fR}]
-.HP \w'\fBsmerpd\fR\ 'u
-\fBsmerpd\fR [{\fB\-h\fR\ |\ \fB\-\-help\fR} | {\fB\-v\fR\ |\ \fB\-\-version\fR}]
+.HP \w'\fBwolframe\&.conf\fR\ 'u
+\fBwolframe\&.conf\fR \fB\-e\ \fR\fB\fIthis\fR\fR [\fB\-\-example=\fR\fBthat\fR] [{\fB\-e\fR\ |\ \fB\-\-example\fR}\ \fIthis\fR] [{\fB\-e\fR\ |\ \fB\-\-example\fR}\ {\fIthis\fR\ |\ \fIthat\fR}]
+.HP \w'\fBwolframe\&.conf\fR\ 'u
+\fBwolframe\&.conf\fR [{\fB\-h\fR\ |\ \fB\-\-help\fR} | {\fB\-v\fR\ |\ \fB\-\-version\fR}]
 .SH "DESCRIPTION"
 .PP
 This manual page documents briefly the
-\fBsmerpd\fR
+\fBwolframe\&.conf\fR
 and
 \fBbar\fR
 commands\&.
@@ -46,7 +46,7 @@ This manual page was written for the Debian distribution because the original pr
 \fBinfo\fR(1)
 format; see below\&.
 .PP
-\fBsmerpd\fR
+\fBwolframe\&.conf\fR
 is a program that\&.\&.\&.
 .SH "OPTIONS"
 .PP
@@ -59,43 +59,21 @@ files\&.
 Does this and that\&.
 .RE
 .PP
-\fB\-v\fR, \fB\-\-version\fR
-.RS 4
-Show version of program\&.
-.RE
-.PP
 \fB\-h\fR, \fB\-\-help\fR
 .RS 4
 Show summary of options\&.
 .RE
 .PP
-\fB\-p\fR, \fB\-\-print\-config\fR
+\fB\-v\fR, \fB\-\-version\fR
 .RS 4
-Print the configuration\&.
-.RE
-.PP
-\fB\-t\fR, \fB\-\-check\-config\fR
-.RS 4
-Check the configuration\&.
-.RE
-.PP
-\fB\-u \fR\fB\fIuser\fR\fR, \fB\-\-user \fR\fB\fIuser\fR\fR
-.RS 4
-run as
-\fIuser\fR\&.
-.RE
-.PP
-\fB\-g \fR\fB\fIgroup\fR\fR, \fB\-\-group \fR\fB\fIgroup\fR\fR
-.RS 4
-run as
-\fIgroup\fR\&.
+Show version of program\&.
 .RE
 .SH "FILES"
 .PP
 /etc/foo\&.conf
 .RS 4
 The system\-wide configuration file to control the behaviour of
-smerpd\&. See
+wolframe\&.conf\&. See
 \fBfoo.conf\fR(5)
 for further details\&.
 .RE
@@ -103,7 +81,7 @@ for further details\&.
 ${HOME}/\&.foo\&.conf
 .RS 4
 The per\-user configuration file to control the behaviour of
-smerpd\&. See
+wolframe\&.conf\&. See
 \fBfoo.conf\fR(5)
 for further details\&.
 .RE
@@ -126,7 +104,7 @@ The configuration file seems to contain a broken configuration line\&. Use the
 option, to get more info\&.
 .RE
 .PP
-\fBsmerpd\fR
+\fBwolframe\&.conf\fR
 provides some return codes, that can be used in scripts:
 .\" line length increase to cope w/ tbl weirdness
 .ll +(\n(LLu * 62u / 100u)
@@ -170,13 +148,13 @@ available via the
 system\&.
 .SH "AUTHOR"
 .PP
-\fBMihai Barbos\fR <\&mihai\&.barbos@gmail\&.com\&>
+\fBFIRSTNAME SURNAME\fR <\&mihai\&.barbos@gmail\&.com\&>
 .RS 4
 Wrote this manpage for the Debian system\&.
 .RE
 .SH "COPYRIGHT"
 .br
-Copyright \(co 2010-2011 Mihai Barbos
+Copyright \(co 2007 Mihai Barbos
 .br
 .PP
 This manual page was written for the Debian system (and may be used by others)\&.

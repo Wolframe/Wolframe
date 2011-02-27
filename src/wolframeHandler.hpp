@@ -1,5 +1,5 @@
 //
-// smerpHandler.hpp - smerp main handler
+// wolframeHandler.hpp - wolframe main handler
 //
 
 #ifndef _SMERP_HANDLER_HPP_INCLUDED

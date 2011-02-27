@@ -29,7 +29,7 @@ INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_filesystem -lboost_system -lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_program_options \
-	$(TOPDIR)/src/libsmerp.a \
+	$(TOPDIR)/src/libwolframe.a \
 	$(GTEST_LIBS)
 
 # openssl
@@ -82,16 +82,16 @@ endif
 
 include $(TOPDIR)/makefiles/gmake/sub.mk
 
-logTest: $(TOPDIR)/src/libsmerp.a
-authTest: $(TOPDIR)/src/libsmerp.a
+logTest: $(TOPDIR)/src/libwolframe.a
+authTest: $(TOPDIR)/src/libwolframe.a
 
 ifdef WITH_GTEST
 PECHO_GTEST_OBJS=$(TOPDIR)/examples/pecho/pechoHandler.o
-pechoHandler-gTest$(EXE): pechoHandler-gTest.o $(PECHO_GTEST_OBJS) $(TOPDIR)/src/libsmerp.a
+pechoHandler-gTest$(EXE): pechoHandler-gTest.o $(PECHO_GTEST_OBJS) $(TOPDIR)/src/libwolframe.a
 	$(CCPP_LINK) -o $@ $(LDFLAGS) $(PECHO_GTEST_OBJS) $(OBJS) $< $(LIBS)
 
 MTPROC_GTEST_OBJS=$(TOPDIR)/examples/mtproc/mtprocHandler.o $(TOPDIR)/examples/mtproc/implementation.o $(TOPDIR)/examples/mtproc/dispatcher.o
-mtprocHandler-gTest$(EXE): mtprocHandler-gTest.o $(MTPROC_GTEST_OBJS) $(TOPDIR)/src/libsmerp.a
+mtprocHandler-gTest$(EXE): mtprocHandler-gTest.o $(MTPROC_GTEST_OBJS) $(TOPDIR)/src/libwolframe.a
 	$(CCPP_LINK) -o $@ $(LDFLAGS) $(MTPROC_GTEST_OBJS) $(OBJS) $< $(LIBS)
 endif
 

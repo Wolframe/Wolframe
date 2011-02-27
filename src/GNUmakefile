@@ -49,7 +49,7 @@ INCLUDE_LIBS += \
 endif
 
 LOCAL_STATIC_LIB = \
-	libsmerp.a
+	libwolframe.a
 
 LOCAL_STATIC_LIB_OBJS = \
 	version.o \
@@ -81,11 +81,11 @@ OBJS = \
 	$(LOCAL_STATIC_LIB_OBJS) \
 	appProperties.o \
 	appConfigDefinition.o \
-	smerpHandler.o \
+	wolframeHandler.o \
 	posixMain.o
 
 CPP_BINS = \
-	smerpd$(EXE)
+	wolframed$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
@@ -107,5 +107,5 @@ local_install:
 local_test:
 
 run: $(CPP_BINS)
-	@echo "Running the SMERP server..."
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./smerpd -c smerp.conf -f
+	@echo "Running the Wolframe server..."
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./wolframed -c wolframe.conf -f

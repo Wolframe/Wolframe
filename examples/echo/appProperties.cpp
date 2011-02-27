@@ -6,23 +6,23 @@
 
 namespace _SMERP	{
 
-	const char*	applicationName()				{ return "Smerp-ECHO"; }
+	const char*	applicationName()				{ return "Wolframe-ECHO"; }
 	unsigned short	applicationMajorVersion()			{ return 0; }
 	unsigned short	applicationMinorVersion()			{ return 0; }
 	unsigned short	applicationRevisionVersion()			{ return 4; }
 	unsigned	applicationBuildVersion()			{ return 0; }
 
-	const char*	Configuration::defaultMainConfig()		{ return "/etc/smerp-echo.conf"; }
-	const char*	Configuration::defaultUserConfig()		{ return "~/smerp-echo.conf"; }
-	const char*	Configuration::defaultLocalConfig()		{ return "./smerp-echo.conf"; }
+	const char*	Configuration::defaultMainConfig()		{ return "/etc/wolframe-echo.conf"; }
+	const char*	Configuration::defaultUserConfig()		{ return "~/wolframe-echo.conf"; }
+	const char*	Configuration::defaultLocalConfig()		{ return "./wolframe-echo.conf"; }
 
 	unsigned short	Configuration::defaultTCPport()			{ return 7660; }
 	unsigned short	Configuration::defaultSSLport()			{ return 7960; }
 
-	const char*	Configuration::defaultServiceName()		{ return "smerp-echo"; }
+	const char*	Configuration::defaultServiceName()		{ return "wolframe-echo"; }
 #if defined( _WIN32 )
-	const char*	Configuration::defaultServiceDisplayName()	{ return "Smerp ECHO Daemon"; }
-	const char*	Configuration::defaultServiceDescription()	{ return "a daemon for echo smerping"; }
+	const char*	Configuration::defaultServiceDisplayName()	{ return "Wolframe ECHO Daemon"; }
+	const char*	Configuration::defaultServiceDescription()	{ return "a daemon for echo wolframeing"; }
 #endif // defined( _WIN32 )
 
 } // namespace _SMERP

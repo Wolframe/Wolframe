@@ -17,7 +17,7 @@ INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_program_options \
 	-lboost_filesystem \
-	$(TOPDIR)/src/libsmerp.a
+	$(TOPDIR)/src/libwolframe.a
 
 # openssl
 
@@ -38,7 +38,7 @@ OBJS = \
 	$(TOPDIR)/src/posixMain.o
 
 CPP_BINS = \
-	smerp-mtproc$(EXE)
+	wolframe-mtproc$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

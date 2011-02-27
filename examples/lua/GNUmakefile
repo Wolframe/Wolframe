@@ -19,7 +19,7 @@ INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_program_options \
 	-lboost_filesystem \
-	$(TOPDIR)/src/libsmerp.a \
+	$(TOPDIR)/src/libwolframe.a \
 	$(LUA_LIBS) -ldl
 # openssl
 
@@ -38,7 +38,7 @@ OBJS = \
 	$(TOPDIR)/src/posixMain.o
 
 CPP_BINS = \
-	smerp-lua$(EXE)
+	wolframe-lua$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
@@ -53,5 +53,5 @@ local_install:
 localhost_test:
 
 run: $(CPP_BINS)
-	@echo "Running the SMERP server..."
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./smerp-lua -c smerp-lua.conf -f
+	@echo "Running the Wolframe server..."
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./wolframe-lua -c wolframe-lua.conf -f

@@ -63,23 +63,23 @@ all: $(OBJS) $(CPP_BINS)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-threadLeakTest.exe: threadLeakTest.obj $(TOPDIR)\src\smerp.lib
-authTest.exe: authTest.obj $(TOPDIR)\src\smerp.lib
+threadLeakTest.exe: threadLeakTest.obj $(TOPDIR)\src\wolframe.lib
+authTest.exe: authTest.obj $(TOPDIR)\src\wolframe.lib
 
 !IFDEF WITH_GTEST
 testNamedRetVal.exe: testNamedRetVal.obj
-versionTest.exe: versionTest.obj $(TOPDIR)\src\smerp.lib
-counterTest.exe: counterTest.obj $(TOPDIR)\src\smerp.lib
-resolvePathTest.exe: resolvePathTest.obj $(TOPDIR)\src\smerp.lib
-singletonTest.exe: singletonTest.obj $(TOPDIR)\src\smerp.lib
-poolTest.exe: poolTest.obj $(TOPDIR)\src\smerp.lib
-logTest.exe: logTest.obj $(TOPDIR)\src\smerp.lib
+versionTest.exe: versionTest.obj $(TOPDIR)\src\wolframe.lib
+counterTest.exe: counterTest.obj $(TOPDIR)\src\wolframe.lib
+resolvePathTest.exe: resolvePathTest.obj $(TOPDIR)\src\wolframe.lib
+singletonTest.exe: singletonTest.obj $(TOPDIR)\src\wolframe.lib
+poolTest.exe: poolTest.obj $(TOPDIR)\src\wolframe.lib
+logTest.exe: logTest.obj $(TOPDIR)\src\wolframe.lib
 protocolArgumentParsing-gTest.exe: protocolArgumentParsing-gTest.obj
 
 pechoHandler-gTest.exe: pechoHandler-gTest.obj
 
 MTPROC_GTEST_OBJS=$(TOPDIR)\examples\mtproc\mtprocHandler.obj $(TOPDIR)\examples\mtproc\implementation.obj $(TOPDIR)\examples\mtproc\dispatcher.obj
-mtprocHandler-gTest.exe: mtprocHandler-gTest.obj $(MTPROC_GTEST_OBJS) $(TOPDIR)\src\libsmerp.lib
+mtprocHandler-gTest.exe: mtprocHandler-gTest.obj $(MTPROC_GTEST_OBJS) $(TOPDIR)\src\libwolframe.lib
 
 !ENDIF
 

@@ -40,7 +40,7 @@ INCLUDE_LIBS = \
 !ENDIF
 
 LOCAL_STATIC_LIB = \
-	smerp.lib
+	wolframe.lib
 
 LOCAL_STATIC_LIB_OBJS = \
 	version.obj \
@@ -66,23 +66,23 @@ OBJS = \
 	$(LOCAL_STATIC_LIB_OBJS) \
 	appProperties.obj \
 	appConfigDefinition.obj \
-	smerpHandler.obj \
+	wolframeHandler.obj \
 	winMain.obj
 
 CPP_BINS = \
-	smerpd.exe
+	wolframed.exe
 
-all: $(OBJS) $(CPP_BINS) smerpmsg.dll
+all: $(OBJS) $(CPP_BINS) wolframemsg.dll
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-smerpd.exe: smerpd.obj smerpmsg.res
+wolframed.exe: wolframed.obj wolframemsg.res
 
-smerpmsg.dll: smerpmsg.res
+wolframemsg.dll: wolframemsg.res
 	$(LINK) /dll /nologo /noentry /MACHINE:x86 /out:$@ $?
-smerpmsg.res: smerpmsg.rc
-smerpmsg.rc: smerpmsg.mc
-logBackend.obj: smerpmsg.rc
+wolframemsg.res: wolframemsg.rc
+wolframemsg.rc: wolframemsg.mc
+logBackend.obj: wolframemsg.rc
 
 $(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
 	$(LINK) /lib /nologo /out:$@ $(LDFLAGS) $(LIBS) $?
@@ -90,7 +90,7 @@ $(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
 local_all: $(LOCAL_STATIC_LIB)
 
 local_clean:
-	@-erase MSG*.bin smerpmsg.rc smerpmsg.h smerpmsg.res smerpmsg.dll 2>NUL
+	@-erase MSG*.bin wolframemsg.rc wolframemsg.h wolframemsg.res wolframemsg.dll 2>NUL
 	@-erase $(LOCAL_STATIC_LIB) 2>NUL
 	@-erase test.bat 2>NUL
 
@@ -102,6 +102,6 @@ run: $(CPP_BINS)
 	@-echo @echo off > test.bat
 	@-echo copy $(OPENSSL_DIR)\bin\libeay32.dll . >> test.bat
 	@-echo copy $(OPENSSL_DIR)\bin\ssleay32.dll . >> test.bat
-	@-echo echo Running the SMERP server... >> test.bat
-	@-echo smerpd.exe -c smerp.conf -d DATA >> test.bat
+	@-echo echo Running the Wolframe server... >> test.bat
+	@-echo wolframed.exe -c wolframe.conf -d DATA >> test.bat
 	@-test.bat

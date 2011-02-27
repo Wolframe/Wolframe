@@ -2,19 +2,64 @@
 <!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
 
-<!ENTITY firstname "Mihai">
-<!ENTITY surname   "Barbos">
-<!ENTITY username  "&firstname; &surname;">
-<!ENTITY email     "mihai.barbos@gmail.com">
-<!ENTITY year      "2010-2011">
-<!ENTITY section   "8">
-<!-- TITLE should be something like "User commands" or similar (see
-	http://www.tldp.org/HOWTO/Man-Page/q2.html). -->
-    <!ENTITY dhtitle     "SMERP User Manual">
-    <!ENTITY dhucpackage "SMERP">
-    <!ENTITY dhpackage   "smerpd">
-]>
+<!--
 
+`xsltproc -''-nonet \
+	  -''-param man.charmap.use.subset "0" \
+	  -''-param make.year.ranges "1" \
+	  -''-param make.single.year.ranges "1" \
+	  /usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl \
+	  manpage.xml'
+
+A manual page <package>.<section> will be generated. You may view the
+manual page with: nroff -man <package>.<section> | less'. A typical entry
+in a Makefile or Makefile.am is:
+
+DB2MAN = /usr/share/sgml/docbook/stylesheet/xsl/nwalsh/manpages/docbook.xsl
+XP     = xsltproc -''-nonet -''-param man.charmap.use.subset "0"
+
+manpage.1: manpage.xml
+	$(XP) $(DB2MAN) $<
+
+The xsltproc binary is found in the xsltproc package. The XSL files are in
+docbook-xsl. A description of the parameters you can use can be found in the
+docbook-xsl-doc-* packages. Please remember that if you create the nroff
+version in one of the debian/rules file targets (such as build), you will need
+to include xsltproc and docbook-xsl in your Build-Depends control field.
+Alternatively use the xmlto command/package. That will also automatically
+pull in xsltproc and docbook-xsl.
+
+Notes for using docbook2x: docbook2x-man does not automatically create the
+AUTHOR(S) and COPYRIGHT sections. In this case, please add them manually as
+<refsect1> ... </refsect1>.
+
+To disable the automatic creation of the AUTHOR(S) and COPYRIGHT sections
+read /usr/share/doc/docbook-xsl/doc/manpages/authors.html. This file can be
+found in the docbook-xsl-doc-html package.
+
+Validation can be done using: `xmllint -''-noout -''-valid manpage.xml`
+
+General documentation about man-pages and man-page-formatting:
+man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
+
+-->
+
+  <!-- Fill in your name for FIRSTNAME and SURNAME. -->
+  <!ENTITY dhfirstname "FIRSTNAME">
+  <!ENTITY dhsurname   "SURNAME">
+  <!-- dhusername could also be set to "&dhfirstname; &dhsurname;". -->
+  <!ENTITY dhusername  "Mihai Barbos">
+  <!ENTITY dhemail     "mihai.barbos@gmail.com">
+  <!-- SECTION should be 1-8, maybe w/ subsection other parameters are
+       allowed: see man(7), man(1) and
+       http://www.tldp.org/HOWTO/Man-Page/q2.html. -->
+  <!ENTITY dhsection   "5">
+  <!-- TITLE should be something like "User commands" or similar (see
+       http://www.tldp.org/HOWTO/Man-Page/q2.html). -->
+  <!ENTITY dhtitle     "Wolframe User Manual">
+  <!ENTITY dhucpackage "wolframe">
+  <!ENTITY dhpackage   "wolframe.conf">
+]>
 
 <refentry>
   <refentryinfo>
@@ -22,17 +67,17 @@
     <productname>&dhpackage;</productname>
     <authorgroup>
       <author>
-       <firstname>&firstname;</firstname>
-	<surname>&surname;</surname>
+       <firstname>&dhfirstname;</firstname>
+	<surname>&dhsurname;</surname>
 	<contrib>Wrote this manpage for the Debian system.</contrib>
 	<address>
-	  <email>&email;</email>
+	  <email>&dhemail;</email>
 	</address>
       </author>
     </authorgroup>
     <copyright>
-      <year>&year;</year>
-      <holder>&username;</holder>
+      <year>2007</year>
+      <holder>&dhusername;</holder>
     </copyright>
     <legalnotice>
       <para>This manual page was written for the Debian system
@@ -48,7 +93,7 @@
   </refentryinfo>
   <refmeta>
     <refentrytitle>&dhucpackage;</refentrytitle>
-    <manvolnum>&section;</manvolnum>
+    <manvolnum>&dhsection;</manvolnum>
   </refmeta>
   <refnamediv>
     <refname>&dhpackage;</refname>
@@ -111,89 +156,43 @@
       </citerefentry> format; see below.</para>
     <para><command>&dhpackage;</command> is a program that...</para>
   </refsect1>
-
   <refsect1 id="options">
     <title>OPTIONS</title>
     <para>The program follows the usual GNU command line syntax,
       with long options starting with two dashes (`-').  A summary of
       options is included below.  For a complete description, see the
-      <citerefentry><refentrytitle>info</refentrytitle><manvolnum>1</manvolnum></citerefentry>
-      files.</para>
-		<variablelist>
-	<!--	Use the variablelist.term.separator and the
-		variablelist.term.break.after parameters to
-		control the term elements. -->
-			<varlistentry>
-				<term><option>-e <replaceable>this</replaceable></option></term>
-				<term><option>--example=<replaceable>that</replaceable></option></term>
-				<listitem>
-					<para>Does this and that.</para>
-				</listitem>
-			</varlistentry>
-
-			<varlistentry>
-				<term><option>-v</option></term>
-				<term><option>--version</option></term>
-				<listitem>
-					<para>Show version of program.</para>
-				</listitem>
-			</varlistentry>
-			<varlistentry>
-				<term><option>-h</option></term>
-				<term><option>--help</option></term>
-				<listitem>
-					<para>Show summary of options.</para>
-				</listitem>
-			</varlistentry>
-			<varlistentry>
-				<term><option>-p</option></term>
-				<term><option>--print-config</option></term>
-				<listitem>
-					<para>Print the configuration.</para>
-				</listitem>
-			</varlistentry>
-			<varlistentry>
-				<term><option>-t</option></term>
-				<term><option>--check-config</option></term>
-				<listitem>
-					<para>Check the configuration.</para>
-				</listitem>
-			</varlistentry>
-
-			<varlistentry>
-				<term><option>-u <replaceable>user</replaceable></option></term>
-				<term><option>--user <replaceable>user</replaceable></option></term>
-				<listitem>
-					<para>run as <replaceable>user</replaceable>.</para>
-				</listitem>
-			</varlistentry>
-			<varlistentry>
-				<term><option>-g <replaceable>group</replaceable></option></term>
-				<term><option>--group <replaceable>group</replaceable></option></term>
-				<listitem>
-					<para>run as <replaceable>group</replaceable>.</para>
-				</listitem>
-			</varlistentry>
-		</variablelist>
-	</refsect1>
-
-<!--
-	-v [ version ]         print version
-	-h [ help ]            print help message
-	-p [ print-config ]    print configuration
-	-t [ check-config ]    check the configuration
--T [ test-config ]     test the configuration
--f [ foreground ]      run in foreground (logs only on stderr)
--c [ config-file ] arg configuration file
--d [ debug ] arg       set debug level (active only with foreground)
-use-config-logging     log according to the configuration file (active only
-			 with foreground)
-	-u [ user ] arg        run as user
-	-g [ group ] arg       run as group
--->
-
-
-<refsect1 id="files">
+      <citerefentry>
+	<refentrytitle>info</refentrytitle>
+	<manvolnum>1</manvolnum>
+      </citerefentry> files.</para>
+    <variablelist>
+      <!-- Use the variablelist.term.separator and the
+	   variablelist.term.break.after parameters to
+	   control the term elements. -->
+      <varlistentry>
+	<term><option>-e <replaceable>this</replaceable></option></term>
+	<term><option>--example=<replaceable>that</replaceable></option></term>
+	<listitem>
+	  <para>Does this and that.</para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term><option>-h</option></term>
+	<term><option>--help</option></term>
+	<listitem>
+	  <para>Show summary of options.</para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term><option>-v</option></term>
+	<term><option>--version</option></term>
+	<listitem>
+	  <para>Show version of program.</para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+  <refsect1 id="files">
     <title>FILES</title>
     <variablelist>
       <varlistentry>

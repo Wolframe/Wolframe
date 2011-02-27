@@ -6,7 +6,7 @@ SUBDIRS =
 
 local_all:
 
-doc: smerpd.8 smerp.conf.5
+doc: wolframed.8 wolframe.conf.5
 	cd $(TOPDIR); doxygen docs/doxygen.conf
 
 XSLT_MAN_PARAMS = \
@@ -19,10 +19,10 @@ XSLT_MAN = \
 	$(XSLT_MAN_PARAMS) \
 	$(XSLT_MAN_STYLESHEET)
 
-smerpd.8: smerpd-man.xml
+wolframed.8: wolframed-man.xml
 	$(XSLT_MAN) $<
 
-smerp.conf.5: smerp.conf-man.xml
+wolframe.conf.5: wolframe.conf-man.xml
 	$(XSLT_MAN) $<
 
 local_clean:
