@@ -1,8 +1,8 @@
-#ifndef _SMERP_MTPROC_IMPLEMENTATION_HPP_INCLUDED
-#define _SMERP_MTPROC_IMPLEMENTATION_HPP_INCLUDED
+#ifndef _Wolframe_MTPROC_IMPLEMENTATION_HPP_INCLUDED
+#define _Wolframe_MTPROC_IMPLEMENTATION_HPP_INCLUDED
 #include "methodtable.hpp"
 
-namespace _SMERP {
+namespace _Wolframe {
 namespace mtproc {
 
 //example mtprocHandler object implementation in C++ish form

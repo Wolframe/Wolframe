@@ -17,7 +17,7 @@
 #include "connectionHandler.hpp"
 #include "logger.hpp"
 
-namespace _SMERP {
+namespace _Wolframe {
 	namespace Network {
 
 	/// Represents a single connection from a client.
@@ -262,6 +262,6 @@ namespace _SMERP {
 	};
 
 } // namespace Network
-} // namespace _SMERP
+} // namespace _Wolframe
 
 #endif // _CONNECTION_BASE_HPP_INCLUDED

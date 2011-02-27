@@ -11,7 +11,7 @@
 
 #include "connectionEndpoint.hpp"
 
-namespace _SMERP {
+namespace _Wolframe {
 	namespace Network {
 
 		/// Base class for a network operation. It should never be accessed directly by
@@ -144,6 +144,6 @@ namespace _SMERP {
 		ServerHandlerImpl *impl_;
 	};
 
-} // namespace _SMERP
+} // namespace _Wolframe
 
 #endif // _CONNECTION_HANDLER_HPP_INCLUDED

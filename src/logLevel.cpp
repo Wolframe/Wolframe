@@ -7,7 +7,7 @@
 #include <string>
 #include <boost/algorithm/string.hpp>
 
-namespace _SMERP {
+namespace _Wolframe {
 
 	LogLevel::Level LogLevel::str2LogLevel( const std::string str )
 	{
@@ -27,4 +27,4 @@ namespace _SMERP {
 		else				return LogLevel::LOGLEVEL_UNDEFINED;
 	}
 
-} // namespace _SMERP
+} // namespace _Wolframe

@@ -10,7 +10,7 @@
 #include <string>
 #include <boost/program_options.hpp>
 
-namespace _SMERP	{
+namespace _Wolframe	{
 	namespace Configuration	{
 
 		struct CmdLineConfig	{
@@ -49,6 +49,6 @@ namespace _SMERP	{
 			void usage( std::ostream& os ) const	{ options_.print( os ); }
 		};
 	} // namespace Configuration
-} // namespace _SMERP
+} // namespace _Wolframe
 
 #endif // _COMMANDLINE_HPP_INCLUDED

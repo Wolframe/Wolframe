@@ -11,7 +11,7 @@
 #include <string>
 #include <ostream>
 
-namespace _SMERP	{
+namespace _Wolframe	{
 	namespace	Configuration	{
 
 
@@ -85,4 +85,4 @@ bool getUnsignedShortValue( boost::property_tree::ptree::const_iterator it, cons
 
 
 	} // namespace Configuration
-} // namespace _SMERP
+} // namespace _Wolframe

@@ -7,7 +7,7 @@
 #include "handlerConfig.hpp"
 
 
-namespace _SMERP {
+namespace _Wolframe {
 	namespace Configuration {
 
 ApplicationConfiguration::ApplicationConfiguration()
@@ -18,7 +18,7 @@ ApplicationConfiguration::ApplicationConfiguration()
 	// logging
 	logConfig = new Configuration::LoggerConfiguration( "logging", "Logging" );
 
-	handlerConfig = new _SMERP::HandlerConfiguration();
+	handlerConfig = new _Wolframe::HandlerConfiguration();
 
 	section["server"] = 0, conf.push_back( srvConfig );
 	section["logging"] = 1, conf.push_back( logConfig );
@@ -26,4 +26,4 @@ ApplicationConfiguration::ApplicationConfiguration()
 }
 
 	} // namespace Configuration
-} // namespace _SMERP
+} // namespace _Wolframe

@@ -1,8 +1,8 @@
-#ifndef _SMERP_METHODTABLE_HPP_INCLUDED
-#define _SMERP_METHODTABLE_HPP_INCLUDED
+#ifndef _Wolframe_METHODTABLE_HPP_INCLUDED
+#define _Wolframe_METHODTABLE_HPP_INCLUDED
 #include "protocol/generator.hpp"
 
-namespace _SMERP {
+namespace _Wolframe {
 namespace mtproc {
 
 //method of the processor

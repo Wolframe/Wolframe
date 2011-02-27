@@ -2,8 +2,8 @@
 // SMERPClient.hpp
 //
 
-#ifndef _SMERP_CLIENT_HPP_INCLUDED
-#define _SMERP_CLIENT_HPP_INCLUDED
+#ifndef _Wolframe_CLIENT_HPP_INCLUDED
+#define _Wolframe_CLIENT_HPP_INCLUDED
 
 #include <QObject>
 #include <QWidget>
@@ -14,7 +14,7 @@
 #include <QList>
 #endif
 
-namespace _SMERP {
+namespace _Wolframe {
 	namespace QtClient {
 
 	class SMERPClient : public QObject
@@ -82,6 +82,6 @@ namespace _SMERP {
 		void lineReceived( QString line );
 	};
 } // namespace QtClient
-} // namespace _SMERP
+} // namespace _Wolframe
 
-#endif // _SMERP_CLIENT_HPP_INCLUDED
+#endif // _Wolframe_CLIENT_HPP_INCLUDED

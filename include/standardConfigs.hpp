@@ -17,11 +17,11 @@
 #include <list>
 
 
-namespace _SMERP {
+namespace _Wolframe {
 	namespace Configuration	{
 
 		/// server configuration
-		struct ServerConfiguration : public _SMERP::Configuration::ConfigurationBase	{
+		struct ServerConfiguration : public _Wolframe::Configuration::ConfigurationBase	{
 		public:
 #if !defined( _WIN32 )
 			// daemon configuration
@@ -62,7 +62,7 @@ namespace _SMERP {
 
 
 		/// logger configuration
-		struct LoggerConfiguration : public _SMERP::Configuration::ConfigurationBase
+		struct LoggerConfiguration : public _Wolframe::Configuration::ConfigurationBase
 		{
 		public:
 			bool			logToStderr;
@@ -100,7 +100,7 @@ namespace _SMERP {
 
 
 		/// database configuration
-		struct DatabaseConfiguration : public _SMERP::Configuration::ConfigurationBase
+		struct DatabaseConfiguration : public _Wolframe::Configuration::ConfigurationBase
 		{
 		public:
 			std::string		host;
@@ -123,7 +123,7 @@ namespace _SMERP {
 		};
 
 	} // namespace Configuration
-} // namespace _SMERP
+} // namespace _Wolframe
 
 
 #endif // _STANDARD_CONFIGS_HPP_INCLUDED

@@ -33,7 +33,7 @@ static const int DEFAULT_SERVICE_TIMEOUT = 5000;
 
 
 // DUMMY
-namespace _SMERP	{
+namespace _Wolframe	{
 	struct HandlerConfiguration	{
 	};
 }
@@ -65,7 +65,7 @@ static void registrySetWord( HKEY h, TCHAR *name, DWORD value ) {
 }
 
 // initializes the Event Logger
-static void registerEventlog( const _SMERP::Configuration::ApplicationConfiguration& config )
+static void registerEventlog( const _Wolframe::Configuration::ApplicationConfiguration& config )
 {
 	char key[256];
 	HKEY h = 0;
@@ -95,7 +95,7 @@ static void registerEventlog( const _SMERP::Configuration::ApplicationConfigurat
 	(void)RegCloseKey( h );
 }
 
-static void deregisterEventlog( const _SMERP::Configuration::ApplicationConfiguration& config )
+static void deregisterEventlog( const _Wolframe::Configuration::ApplicationConfiguration& config )
 {
 	char key[256];
 	HKEY h = 0;
@@ -108,7 +108,7 @@ static void deregisterEventlog( const _SMERP::Configuration::ApplicationConfigur
 	(void)RegDeleteKey( h, config.logConfig->eventlogSource.c_str( ) );
 }
 
-static void installAsService( const _SMERP::Configuration::ApplicationConfiguration& config )
+static void installAsService( const _Wolframe::Configuration::ApplicationConfiguration& config )
 {
 // get service control manager
 	SC_HANDLE scm = (SC_HANDLE)OpenSCManager( NULL, SERVICES_ACTIVE_DATABASE, SC_MANAGER_ALL_ACCESS );
@@ -138,7 +138,7 @@ static void installAsService( const _SMERP::Configuration::ApplicationConfigurat
 	(void)CloseServiceHandle( scm );
 }
 
-static void remove_as_service( const _SMERP::Configuration::ApplicationConfiguration& config )
+static void remove_as_service( const _Wolframe::Configuration::ApplicationConfiguration& config )
 {
 // get service control manager
 	SC_HANDLE scm = (SC_HANDLE)OpenSCManager( NULL, SERVICES_ACTIVE_DATABASE, SC_MANAGER_ALL_ACCESS );
@@ -223,12 +223,12 @@ static std::string serviceConfig;
 static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 	try {
 // read configuration (from the location passed in the command line arguments of the main, not the service_main)
-		_SMERP::Configuration::CmdLineConfig cmdLineCfg; // empty for a service with --service
-		cmdLineCfg.command = _SMERP::Configuration::CmdLineConfig::RUN_SERVICE;
+		_Wolframe::Configuration::CmdLineConfig cmdLineCfg; // empty for a service with --service
+		cmdLineCfg.command = _Wolframe::Configuration::CmdLineConfig::RUN_SERVICE;
 		const char *configFile = serviceConfig.c_str( ); // configuration comes from main thread
 
 		std::stringstream	errMsg;
-		_SMERP::Configuration::ApplicationConfiguration config;
+		_Wolframe::Configuration::ApplicationConfiguration config;
 		if ( !config.parse( configFile, errMsg ))	{	// there was an error parsing the configuration file
 			// TODO: a hen and egg problem here with event logging and where to know where to log to
 			// LOG_FATAL << errMsg.str();
@@ -239,14 +239,14 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 		config.finalize( cmdLineCfg );		
 
 		// it's just a DUMMY for now
-		_SMERP::HandlerConfiguration	handlerConfig;
+		_Wolframe::HandlerConfiguration	handlerConfig;
 		
 // create the final logger based on the configuration
-		_SMERP::LogBackend::instance().setLogfileLevel( config.logConfig->logFileLogLevel );
-		_SMERP::LogBackend::instance().setLogfileName( config.logConfig->logFile );
-		_SMERP::LogBackend::instance().setEventlogLevel( config.logConfig->eventlogLogLevel );
-		_SMERP::LogBackend::instance().setEventlogSource( config.logConfig->eventlogSource );
-		_SMERP::LogBackend::instance().setEventlogLog( config.logConfig->eventlogLogName );
+		_Wolframe::LogBackend::instance().setLogfileLevel( config.logConfig->logFileLogLevel );
+		_Wolframe::LogBackend::instance().setLogfileName( config.logConfig->logFile );
+		_Wolframe::LogBackend::instance().setEventlogLevel( config.logConfig->eventlogLogLevel );
+		_Wolframe::LogBackend::instance().setEventlogSource( config.logConfig->eventlogSource );
+		_Wolframe::LogBackend::instance().setEventlogLog( config.logConfig->eventlogLogName );
 
 // register the event callback where we get called by Windows and the SCM
 		serviceStatusHandle = RegisterServiceCtrlHandler( config.srvConfig->serviceName.c_str( ), serviceCtrlFunction );
@@ -269,10 +269,10 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 		LOG_NOTICE << "Starting service";
 
 // run server in background thread(s).
-		_SMERP::ServerHandler	handler( config.handlerConfig );
-		_SMERP::Network::server s( config.srvConfig->address, config.srvConfig->SSLaddress,
+		_Wolframe::ServerHandler	handler( config.handlerConfig );
+		_Wolframe::Network::server s( config.srvConfig->address, config.srvConfig->SSLaddress,
 								handler, config.srvConfig->threads, config.srvConfig->maxConnections );
-		boost::thread t( boost::bind( &_SMERP::Network::server::run, &s ));
+		boost::thread t( boost::bind( &_Wolframe::Network::server::run, &s ));
 
 // we are up and running now (hopefully), signal this to the SCM
 		service_report_status( SERVICE_RUNNING, NO_ERROR, DEFAULT_SERVICE_TIMEOUT );
@@ -311,22 +311,22 @@ WAIT_FOR_STOP_EVENT:
 }
 
 
-int _SMERP_winMain( int argc, char* argv[] )
+int _Wolframe_winMain( int argc, char* argv[] )
 {
 	try	{
-		_SMERP::Version		appVersion( _SMERP::applicationMajorVersion(), _SMERP::applicationMinorVersion(),
-										_SMERP::applicationRevisionVersion(), _SMERP::applicationBuildVersion() );
-		_SMERP::Configuration::CmdLineConfig	cmdLineCfg;
+		_Wolframe::Version		appVersion( _Wolframe::applicationMajorVersion(), _Wolframe::applicationMinorVersion(),
+										_Wolframe::applicationRevisionVersion(), _Wolframe::applicationBuildVersion() );
+		_Wolframe::Configuration::CmdLineConfig	cmdLineCfg;
 		const char		*configFile = NULL;
 
 // it's just a DUMMY for now
-		_SMERP::HandlerConfiguration	handlerConfig;
+		_Wolframe::HandlerConfiguration	handlerConfig;
 
 		if ( !cmdLineCfg.parse( argc, argv ))	{	// there was an error parsing the command line
 			std::cerr << cmdLineCfg.errMsg() << std::endl << std::endl;
 			cmdLineCfg.usage( std::cerr );
 			std::cerr << std::endl;
-			return _SMERP::ErrorCodes::FAILURE;
+			return _Wolframe::ErrorCodes::FAILURE;
 		}
 // command line has been parsed successfully
 // if cmdLineCfg.errMsg() is not empty than we have a warning
@@ -334,14 +334,14 @@ int _SMERP_winMain( int argc, char* argv[] )
 			std::cerr << "BOO:" << cmdLineCfg.errMsg() << std::endl << std::endl;
 
 // if we have to print the version or the help do it and exit
-		if ( cmdLineCfg.command == _SMERP::Configuration::CmdLineConfig::PRINT_VERSION )	{
+		if ( cmdLineCfg.command == _Wolframe::Configuration::CmdLineConfig::PRINT_VERSION )	{
 			std::cout << "BOBOBO version " << appVersion.toString() << std::endl << std::endl;
-			return _SMERP::ErrorCodes::OK;
+			return _Wolframe::ErrorCodes::OK;
 		}
-		if ( cmdLineCfg.command == _SMERP::Configuration::CmdLineConfig::PRINT_HELP )	{
+		if ( cmdLineCfg.command == _Wolframe::Configuration::CmdLineConfig::PRINT_HELP )	{
 			cmdLineCfg.usage( std::cout );
 			std::cerr << std::endl;
-			return _SMERP::ErrorCodes::OK;
+			return _Wolframe::ErrorCodes::OK;
 		}
 
 // decide what configuration file to use
@@ -349,57 +349,57 @@ int _SMERP_winMain( int argc, char* argv[] )
 			configFile = cmdLineCfg.cfgFile.c_str();
 		if ( configFile == NULL )	{	// there is no configuration file
 			std::cerr << "MOMOMO: no configuration file found !" << std::endl << std::endl;
-			return _SMERP::ErrorCodes::FAILURE;
+			return _Wolframe::ErrorCodes::FAILURE;
 		}
 
-		_SMERP::Configuration::ApplicationConfiguration config;
+		_Wolframe::Configuration::ApplicationConfiguration config;
 		std::stringstream	errMsg;
 		if ( !config.parse( configFile, errMsg ))	{	// there was an error parsing the configuration file
 			std::cerr << errMsg.str() << std::endl << std::endl;
-			return _SMERP::ErrorCodes::FAILURE;
+			return _Wolframe::ErrorCodes::FAILURE;
 		}
 // configuration file has been parsed successfully
 // build the final configuration
 		config.finalize( cmdLineCfg );
 
 // Check the configuration
-		if ( cmdLineCfg.command == _SMERP::Configuration::CmdLineConfig::CHECK_CONFIG )	{
+		if ( cmdLineCfg.command == _Wolframe::Configuration::CmdLineConfig::CHECK_CONFIG )	{
 			if ( config.check( errMsg ) )	{
 				std::cout << "Configuration OK" << std::endl << std::endl;
-				return _SMERP::ErrorCodes::OK;
+				return _Wolframe::ErrorCodes::OK;
 			}
 			else	{
 				std::cout << errMsg.str() << std::endl << std::endl;
-				return _SMERP::ErrorCodes::OK;
+				return _Wolframe::ErrorCodes::OK;
 			}
 		}
 
-		if ( cmdLineCfg.command == _SMERP::Configuration::CmdLineConfig::PRINT_CONFIG )	{
+		if ( cmdLineCfg.command == _Wolframe::Configuration::CmdLineConfig::PRINT_CONFIG )	{
 			config.print( std::cout );
 			std::cout << std::endl;
-			return _SMERP::ErrorCodes::OK;
+			return _Wolframe::ErrorCodes::OK;
 		}
 
-		if ( cmdLineCfg.command == _SMERP::Configuration::CmdLineConfig::TEST_CONFIG )	{
+		if ( cmdLineCfg.command == _Wolframe::Configuration::CmdLineConfig::TEST_CONFIG )	{
 			std::cout << "Not implemented yet" << std::endl << std::endl;
-			return _SMERP::ErrorCodes::OK;
+			return _Wolframe::ErrorCodes::OK;
 		}
 
-		if ( cmdLineCfg.command == _SMERP::Configuration::CmdLineConfig::INSTALL_SERVICE ) {
+		if ( cmdLineCfg.command == _Wolframe::Configuration::CmdLineConfig::INSTALL_SERVICE ) {
 			registerEventlog( config );
 			installAsService( config );
 			std::cout << "Installed as Windows service" << std::endl << std::endl;
-			return _SMERP::ErrorCodes::OK;
+			return _Wolframe::ErrorCodes::OK;
 		}
 
-		if ( cmdLineCfg.command == _SMERP::Configuration::CmdLineConfig::REMOVE_SERVICE ) {
+		if ( cmdLineCfg.command == _Wolframe::Configuration::CmdLineConfig::REMOVE_SERVICE ) {
 			remove_as_service( config );
 			deregisterEventlog( config );
 			std::cout << "Removed as Windows service" << std::endl << std::endl;
-			return _SMERP::ErrorCodes::OK;
+			return _Wolframe::ErrorCodes::OK;
 		}
 
-		if( cmdLineCfg.command == _SMERP::Configuration::CmdLineConfig::RUN_SERVICE ) {
+		if( cmdLineCfg.command == _Wolframe::Configuration::CmdLineConfig::RUN_SERVICE ) {
 			// if started as service we dispatch the service thread now
 			SERVICE_TABLE_ENTRY dispatch_table[2] =
 				{ { const_cast<char *>( config.srvConfig->serviceName.c_str( ) ), service_main },
@@ -415,26 +415,26 @@ int _SMERP_winMain( int argc, char* argv[] )
 				} else {
 					// TODO: mmh? what are we doing here? No longer here
 					LOG_FATAL << "Unable to dispatch service control dispatcher";
-					return _SMERP::ErrorCodes::FAILURE;
+					return _Wolframe::ErrorCodes::FAILURE;
 				}
 			} else {
 				// here we get if the service has been stopped, so we terminate here
-				return _SMERP::ErrorCodes::OK;
+				return _Wolframe::ErrorCodes::OK;
 			}
 		}
 
 		// Create the final logger based on the configuration, this is the
 		// foreground mode in a console, so we start only the stderr logger
-		_SMERP::LogBackend::instance().setConsoleLevel( config.logConfig->stderrLogLevel );
+		_Wolframe::LogBackend::instance().setConsoleLevel( config.logConfig->stderrLogLevel );
 
 		LOG_NOTICE << "Starting server";
 
-		_SMERP::ServerHandler	handler( config.handlerConfig );
-		_SMERP::Network::server s( config.srvConfig->address, config.srvConfig->SSLaddress,
+		_Wolframe::ServerHandler	handler( config.handlerConfig );
+		_Wolframe::Network::server s( config.srvConfig->address, config.srvConfig->SSLaddress,
 					   handler, config.srvConfig->threads, config.srvConfig->maxConnections );
 
 		// Set console control handler to allow server to be stopped.
-		consoleCtrlFunction = boost::bind(&_SMERP::Network::server::stop, &s);
+		consoleCtrlFunction = boost::bind(&_Wolframe::Network::server::stop, &s);
 		SetConsoleCtrlHandler(consoleCtrlHandler, TRUE);
 
 		// Run the server until stopped.
@@ -442,11 +442,11 @@ int _SMERP_winMain( int argc, char* argv[] )
 	}
 	catch (std::exception& e)	{
 		std::cerr << "exception: " << e.what() << "\n";
-		return _SMERP::ErrorCodes::FAILURE;
+		return _Wolframe::ErrorCodes::FAILURE;
 	}
 	LOG_NOTICE << "Server stopped";
 
-	return _SMERP::ErrorCodes::OK;
+	return _Wolframe::ErrorCodes::OK;
 }
 
 #endif // defined(_WIN32)

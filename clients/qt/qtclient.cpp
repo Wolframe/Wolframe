@@ -2,7 +2,7 @@
 
 #include "MainWindow.hpp"
 
-using namespace _SMERP::QtClient;
+using namespace _Wolframe::QtClient;
 
 int main( int argc, char* argv[] ) {
 	QApplication app( argc, argv );

@@ -10,7 +10,7 @@
 
 #include "AbstractFormLoader.hpp"
 
-namespace _SMERP {
+namespace _Wolframe {
 	namespace QtClient {
 
 	class FileFormLoader : public AbstractFormLoader
@@ -28,6 +28,6 @@ namespace _SMERP {
 			QString m_dir;
 	};
 } // namespace QtClient
-} // namespace _SMERP
+} // namespace _Wolframe
 
 #endif // _FILE_FORM_LOADER_HPP_INCLUDED

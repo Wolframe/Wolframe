@@ -16,7 +16,7 @@
 #include <ostream>
 
 
-namespace _SMERP	{
+namespace _Wolframe	{
 	namespace	Configuration	{
 
 // Constructor
@@ -303,4 +303,4 @@ bool ServerConfiguration::parse( boost::property_tree::ptree& pt, std::ostream& 
 
 
 	} // namespace Configuration
-} // namespace _SMERP
+} // namespace _Wolframe

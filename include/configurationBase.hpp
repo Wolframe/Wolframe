@@ -17,7 +17,7 @@
 //	}
 //}
 
-namespace _SMERP {
+namespace _Wolframe {
 	namespace Configuration	{
 
 		struct ConfigurationBase	{
@@ -51,6 +51,6 @@ namespace _SMERP {
 		};
 
 	} // namespace Configuration
-} // namespace _SMERP
+} // namespace _Wolframe
 
 #endif // _CONFIGURATION_BASE_HPP_INCLUDED

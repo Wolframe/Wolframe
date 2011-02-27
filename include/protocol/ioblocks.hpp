@@ -1,9 +1,9 @@
-#ifndef _SMERP_PROTOCOL_IO_BLOCKS_HPP_INCLUDED
-#define _SMERP_PROTOCOL_IO_BLOCKS_HPP_INCLUDED
+#ifndef _Wolframe_PROTOCOL_IO_BLOCKS_HPP_INCLUDED
+#define _Wolframe_PROTOCOL_IO_BLOCKS_HPP_INCLUDED
 #include "iterators.hpp"
 #include <stdexcept>
 
-namespace _SMERP {
+namespace _Wolframe {
 namespace protocol {
 
 //@section protocolIOBlocks
@@ -156,7 +156,7 @@ public:
 };
 
 } // namespace protocol
-} // namespace _SMERP
+} // namespace _Wolframe
 
-#endif // _SMERP_PROTOCOL_IO_BLOCKS_HPP_INCLUDED
+#endif // _Wolframe_PROTOCOL_IO_BLOCKS_HPP_INCLUDED
 

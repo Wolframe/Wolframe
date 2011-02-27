@@ -1,8 +1,8 @@
-#ifndef _SMERP_PROTOCOL_PARSER_HPP_INCLUDED
-#define _SMERP_PROTOCOL_PARSER_HPP_INCLUDED
+#ifndef _Wolframe_PROTOCOL_PARSER_HPP_INCLUDED
+#define _Wolframe_PROTOCOL_PARSER_HPP_INCLUDED
 #include <exception>
 
-namespace _SMERP {
+namespace _Wolframe {
 namespace protocol {
 
 //helper functions for protocol parsing
@@ -152,8 +152,8 @@ private:
 };
    
 } // namespace protocol
-} // namespace _SMERP
+} // namespace _Wolframe
 
-#endif // _SMERP_PROTOCOL_PARSER_HPP_INCLUDED
+#endif // _Wolframe_PROTOCOL_PARSER_HPP_INCLUDED
 
    

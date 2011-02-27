@@ -41,7 +41,7 @@
 #include <boost/filesystem.hpp>
 
 
-int _SMERP_posixMain( int argc, char* argv[] )
+int _Wolframe_posixMain( int argc, char* argv[] )
 {
 // i18n global stuff
 	if ( setlocale( LC_ALL, "" ) == NULL )	{
@@ -50,28 +50,28 @@ int _SMERP_posixMain( int argc, char* argv[] )
 	else	{
 		if ( bindtextdomain( "SMERP", "../po" ) == NULL )	{
 			std::cerr << "Not enough memory to bind textdomain" << std::endl;
-			return _SMERP::ErrorCodes::FAILURE;
+			return _Wolframe::ErrorCodes::FAILURE;
 		}
 		if ( textdomain( "SMERP" ) == NULL )	{
 			std::cerr << "Not enough memory to set textdomain" << std::endl;
-			return _SMERP::ErrorCodes::FAILURE;
+			return _Wolframe::ErrorCodes::FAILURE;
 		}
 	}
 // end of i18n global stuff
 
 	try	{
-		_SMERP::Version		appVersion( _SMERP::applicationMajorVersion(),
-						    _SMERP::applicationMinorVersion(),
-						    _SMERP::applicationRevisionVersion(),
-						    _SMERP::applicationBuildVersion() );
-		_SMERP::Configuration::CmdLineConfig   cmdLineCfg;
+		_Wolframe::Version		appVersion( _Wolframe::applicationMajorVersion(),
+						    _Wolframe::applicationMinorVersion(),
+						    _Wolframe::applicationRevisionVersion(),
+						    _Wolframe::applicationBuildVersion() );
+		_Wolframe::Configuration::CmdLineConfig   cmdLineCfg;
 		const char *configFile;
 
 		if ( !cmdLineCfg.parse( argc, argv ))	{	// there was an error parsing the command line
 			std::cerr << cmdLineCfg.errMsg() << std::endl << std::endl;
 			cmdLineCfg.usage( std::cerr );
 			std::cerr << std::endl;
-			return _SMERP::ErrorCodes::FAILURE;
+			return _Wolframe::ErrorCodes::FAILURE;
 		}
 // command line has been parsed successfully
 // if cmdLineCfg.errMsg() is not empty than we have a warning
@@ -79,37 +79,37 @@ int _SMERP_posixMain( int argc, char* argv[] )
 			std::cerr << "BOO:" << cmdLineCfg.errMsg() << std::endl << std::endl;
 
 // if we have to print the version or the help do it and exit
-		if ( cmdLineCfg.command == _SMERP::Configuration::CmdLineConfig::PRINT_VERSION )	{
+		if ( cmdLineCfg.command == _Wolframe::Configuration::CmdLineConfig::PRINT_VERSION )	{
 			std::cout << std::endl << gettext( "BOBOBO version " )
 				<< appVersion.toString() << std::endl << std::endl;
-			return _SMERP::ErrorCodes::OK;
+			return _Wolframe::ErrorCodes::OK;
 		}
-		if ( cmdLineCfg.command == _SMERP::Configuration::CmdLineConfig::PRINT_HELP )	{
-			std::cout << std::endl << _SMERP::applicationName() << gettext( "BOBOBO version " )
+		if ( cmdLineCfg.command == _Wolframe::Configuration::CmdLineConfig::PRINT_HELP )	{
+			std::cout << std::endl << _Wolframe::applicationName() << gettext( "BOBOBO version " )
 				<< appVersion.toString() << std::endl;
 			cmdLineCfg.usage( std::cout );
 			std::cout << std::endl;
-			return _SMERP::ErrorCodes::OK;
+			return _Wolframe::ErrorCodes::OK;
 		}
 
 // decide what configuration file to use
 		if ( !cmdLineCfg.cfgFile.empty() )	// if it has been specified than that's The One ! (and only)
 			configFile = cmdLineCfg.cfgFile.c_str();
 		else
-			configFile = _SMERP::Configuration::ApplicationConfiguration::chooseFile( _SMERP::Configuration::defaultMainConfig(),
-												  _SMERP::Configuration::defaultUserConfig(),
-												  _SMERP::Configuration::defaultLocalConfig() );
+			configFile = _Wolframe::Configuration::ApplicationConfiguration::chooseFile( _Wolframe::Configuration::defaultMainConfig(),
+												  _Wolframe::Configuration::defaultUserConfig(),
+												  _Wolframe::Configuration::defaultLocalConfig() );
 		if ( configFile == NULL )	{	// there is no configuration file
 			std::cerr << gettext ( "MOMOMO: no configuration file found !" ) << std::endl << std::endl;
-			return _SMERP::ErrorCodes::FAILURE;
+			return _Wolframe::ErrorCodes::FAILURE;
 		}
 
-		_SMERP::Configuration::ApplicationConfiguration config;
+		_Wolframe::Configuration::ApplicationConfiguration config;
 		std::stringstream errMsg;
 
 		if ( !config.parse( configFile, errMsg ))	{	// there was an error parsing the configuration file
 			std::cerr << errMsg.str() << std::endl << std::endl;
-			return _SMERP::ErrorCodes::FAILURE;
+			return _Wolframe::ErrorCodes::FAILURE;
 		}
 		else if ( ! errMsg.str().empty() )
 			std::cerr << errMsg.str() << std::endl;
@@ -119,39 +119,39 @@ int _SMERP_posixMain( int argc, char* argv[] )
 
 
 // now here we know where to log to on stderr
-		_SMERP::LogBackend::instance().setConsoleLevel( config.logConfig->stderrLogLevel );
+		_Wolframe::LogBackend::instance().setConsoleLevel( config.logConfig->stderrLogLevel );
 
 // Check the configuration
-		if ( cmdLineCfg.command == _SMERP::Configuration::CmdLineConfig::CHECK_CONFIG )	{
+		if ( cmdLineCfg.command == _Wolframe::Configuration::CmdLineConfig::CHECK_CONFIG )	{
 			std::cout << std::endl << gettext( "BOBOBO version " )
 				<< appVersion.toString() << std::endl;
 			if ( config.check( errMsg ) )	{
 				if ( errMsg.str().empty() )	{
 					std::cout << "Configuration OK" << std::endl << std::endl;
-					return _SMERP::ErrorCodes::OK;
+					return _Wolframe::ErrorCodes::OK;
 				}
 				else	{
 					std::cout << "WARNING: " << errMsg.str() << std::endl << std::endl;
-					return _SMERP::ErrorCodes::OK;
+					return _Wolframe::ErrorCodes::OK;
 				}
 			}
 			else	{
 				std::cout << "ERROR: " << errMsg.str() << std::endl << std::endl;
-				return _SMERP::ErrorCodes::OK;
+				return _Wolframe::ErrorCodes::OK;
 			}
 		}
 
-		if ( cmdLineCfg.command == _SMERP::Configuration::CmdLineConfig::PRINT_CONFIG )	{
+		if ( cmdLineCfg.command == _Wolframe::Configuration::CmdLineConfig::PRINT_CONFIG )	{
 			std::cout << std::endl << gettext( "BOBOBO version " )
 				<< appVersion.toString() << std::endl;
 			config.print( std::cout );
 			std::cout << std::endl;
-			return _SMERP::ErrorCodes::OK;
+			return _Wolframe::ErrorCodes::OK;
 		}
 
-		if ( cmdLineCfg.command == _SMERP::Configuration::CmdLineConfig::TEST_CONFIG )	{
+		if ( cmdLineCfg.command == _Wolframe::Configuration::CmdLineConfig::TEST_CONFIG )	{
 			std::cout << "Not implemented yet" << std::endl << std::endl;
-			return _SMERP::ErrorCodes::OK;
+			return _Wolframe::ErrorCodes::OK;
 		}
 
 		// Daemon stuff
@@ -162,22 +162,22 @@ int _SMERP_posixMain( int argc, char* argv[] )
 				boost::interprocess::file_lock lock( config.srvConfig->pidFile.c_str( ) );
 				if( lock.try_lock( ) ) {
 					std::cerr << "Pidfile is locked, another daemon running?" << std::endl;
-					return _SMERP::ErrorCodes::FAILURE;
+					return _Wolframe::ErrorCodes::FAILURE;
 				}
 			}
 
 			// daemonize, lose process group, terminal output, etc.
 			if( daemon( 0, 0 ) ) {
 				std::cerr << "Daemonizing server failed" << std::endl;
-				return _SMERP::ErrorCodes::FAILURE;
+				return _Wolframe::ErrorCodes::FAILURE;
 			}
 
 			// now here we lost constrol over the console, we should
 			// create a temporary logger which at least tells what's
 			// going on in the syslog
-			_SMERP::LogBackend::instance().setSyslogLevel( config.logConfig->syslogLogLevel );
-			_SMERP::LogBackend::instance().setSyslogFacility( config.logConfig->syslogFacility );
-			_SMERP::LogBackend::instance().setSyslogIdent( config.logConfig->syslogIdent );
+			_Wolframe::LogBackend::instance().setSyslogLevel( config.logConfig->syslogLogLevel );
+			_Wolframe::LogBackend::instance().setSyslogFacility( config.logConfig->syslogFacility );
+			_Wolframe::LogBackend::instance().setSyslogIdent( config.logConfig->syslogIdent );
 
 			// if we are root we can drop privileges now
 			struct group *groupent;
@@ -187,32 +187,32 @@ int _SMERP_posixMain( int argc, char* argv[] )
 			passwdent = getpwnam( config.srvConfig->user.c_str( ) );
 			if( groupent == NULL || passwdent == NULL ) {
 				LOG_CRITICAL << "Illegal group '" << config.srvConfig->group << "' or user '" << config.srvConfig->user << "'";
-				return _SMERP::ErrorCodes::FAILURE;
+				return _Wolframe::ErrorCodes::FAILURE;
 			}
 
 			if( setgid( groupent->gr_gid ) < 0 ) {
 				LOG_CRITICAL << "setgid for group '" << config.srvConfig->group << "' failed!";
-				return _SMERP::ErrorCodes::FAILURE;
+				return _Wolframe::ErrorCodes::FAILURE;
 			}
 
 			if( setuid( passwdent->pw_uid ) < 0 ) {
 				LOG_CRITICAL << "setgid for user '" << config.srvConfig->user << "' failed!";
-				return _SMERP::ErrorCodes::FAILURE;
+				return _Wolframe::ErrorCodes::FAILURE;
 			}
 
 			// create a pid file and lock id
 			std::ofstream pidFile( config.srvConfig->pidFile.c_str( ), std::ios_base::trunc );
 			if( !pidFile.good( ) ) {
 				LOG_CRITICAL << "Unable to create PID file '" << config.srvConfig->pidFile << "'!";
-				return _SMERP::ErrorCodes::FAILURE;
+				return _Wolframe::ErrorCodes::FAILURE;
 			}
 			pidFile << getpid( ) << std::endl;
 			pidFile.close( );
 
 			// Create the final logger based on the configuration
 			// file logger only here to get the right permissions
-			_SMERP::LogBackend::instance().setLogfileLevel( config.logConfig->logFileLogLevel );
-			_SMERP::LogBackend::instance().setLogfileName( config.logConfig->logFile );
+			_Wolframe::LogBackend::instance().setLogfileLevel( config.logConfig->logFileLogLevel );
+			_Wolframe::LogBackend::instance().setLogfileName( config.logConfig->logFile );
 		}
 
 		// Block all signals for background thread.
@@ -224,10 +224,10 @@ int _SMERP_posixMain( int argc, char* argv[] )
 		LOG_NOTICE << "Starting server";
 
 		// Run server in background thread(s).
-		_SMERP::ServerHandler	handler( config.handlerConfig );
-		_SMERP::Network::server s( config.srvConfig->address, config.srvConfig->SSLaddress, handler,
+		_Wolframe::ServerHandler	handler( config.handlerConfig );
+		_Wolframe::Network::server s( config.srvConfig->address, config.srvConfig->SSLaddress, handler,
 					   config.srvConfig->threads, config.srvConfig->maxConnections );
-		boost::thread t( boost::bind( &_SMERP::Network::server::run, &s ));
+		boost::thread t( boost::bind( &_Wolframe::Network::server::run, &s ));
 
 		// Restore previous signals.
 		pthread_sigmask( SIG_SETMASK, &old_mask, 0 );
@@ -256,10 +256,10 @@ int _SMERP_posixMain( int argc, char* argv[] )
 	catch (std::exception& e)	{
 		// Aba: how to delete the pid file here?
 		LOG_ERROR << "posixMain: exception: " << e.what() << "\n";
-		return _SMERP::ErrorCodes::FAILURE;
+		return _Wolframe::ErrorCodes::FAILURE;
 	}
 
-	return _SMERP::ErrorCodes::OK;
+	return _Wolframe::ErrorCodes::OK;
 }
 
 #endif // !defined(_WIN32)

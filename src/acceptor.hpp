@@ -17,7 +17,7 @@
 #include "connection.hpp"
 #include "connectionHandler.hpp"
 
-namespace _SMERP {
+namespace _Wolframe {
 	namespace Network {
 
 /// acceptor class of the SMERP network server.
@@ -29,7 +29,7 @@ public:
 	explicit acceptor( boost::asio::io_service& IOservice,
 			   const std::string& host, unsigned short port, unsigned maxConnections,
 			   GlobalConnectionList& globalList,
-			   _SMERP::ServerHandler& srvHandler );
+			   _Wolframe::ServerHandler& srvHandler );
 
 	/// Destructor
 	~acceptor();
@@ -54,7 +54,7 @@ private:
 
 	std::string				identifier_;
 
-	_SMERP::ServerHandler&			srvHandler_;	// The handler for all incoming requests.
+	_Wolframe::ServerHandler&			srvHandler_;	// The handler for all incoming requests.
 };
 
 
@@ -71,7 +71,7 @@ public:
 			      bool verify, const std::string& CAchainFile, const std::string& CAdirectory,
 			      const std::string& host, unsigned short port, unsigned maxConnections,
 			      GlobalConnectionList& globalList,
-			      _SMERP::ServerHandler& srvHandler );
+			      _Wolframe::ServerHandler& srvHandler );
 
 	/// Destruct the serverrequestHandler&				requestHandler
 	~SSLacceptor();
@@ -100,12 +100,12 @@ private:
 
 	std::string				identifier_;
 
-	_SMERP::ServerHandler&			srvHandler_;	// The handler for all incoming requests.
+	_Wolframe::ServerHandler&			srvHandler_;	// The handler for all incoming requests.
 };
 
 #endif // WITH_SSL
 
 	} // namespace Network
-} // namespace _SMERP
+} // namespace _Wolframe
 
 #endif // _NETWORK_ACCEPTOR_HPP_INCLUDED

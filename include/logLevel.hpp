@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-namespace _SMERP {
+namespace _Wolframe {
 
 	class LogLevel {
 	public:
@@ -46,7 +46,7 @@ namespace _SMERP {
 		return s;
 	}
 
-} // namespace _SMERP
+} // namespace _Wolframe
 
 
 #endif // _LOG_LEVEL_HPP_INCLUDED

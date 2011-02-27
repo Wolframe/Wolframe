@@ -2,8 +2,8 @@
 // authentication_pam.hpp
 //
 
-#ifndef _SMERP_AUTHENTICATION_PAM_HPP_INCLUDED
-#define _SMERP_AUTHENTICATION_PAM_HPP_INCLUDED
+#ifndef _Wolframe_AUTHENTICATION_PAM_HPP_INCLUDED
+#define _Wolframe_AUTHENTICATION_PAM_HPP_INCLUDED
 
 #include "authentication.hpp"
 
@@ -13,7 +13,7 @@
 
 #include <security/pam_appl.h> 
 
-namespace _SMERP {
+namespace _Wolframe {
 	namespace Authentication {
 
 
@@ -33,11 +33,11 @@ class PAMAuthenticator : public Authenticator {
 
 		// states of the authenticator state machine
 		enum {
-			_SMERP_PAM_STATE_NEED_LOGIN,
-			_SMERP_PAM_STATE_HAS_LOGIN,
-			_SMERP_PAM_STATE_NEED_PASS,
-			_SMERP_PAM_STATE_HAS_PASS,
-			_SMERP_PAM_STATE_ERROR
+			_Wolframe_PAM_STATE_NEED_LOGIN,
+			_Wolframe_PAM_STATE_HAS_LOGIN,
+			_Wolframe_PAM_STATE_NEED_PASS,
+			_Wolframe_PAM_STATE_HAS_PASS,
+			_Wolframe_PAM_STATE_ERROR
 		} m_state;
 		
 		pam_appdata m_appdata;
@@ -56,8 +56,8 @@ class PAMAuthenticator : public Authenticator {
 };
 
 } // namespace Authentication
-} // namespace _SMERP
+} // namespace _Wolframe
 
 #endif // WITH_PAM
 
-#endif // _SMERP_AUTHENTICATION_PAM_HPP_INCLUDED
+#endif // _Wolframe_AUTHENTICATION_PAM_HPP_INCLUDED

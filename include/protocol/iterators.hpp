@@ -1,8 +1,8 @@
-#ifndef _SMERP_PROTOCOL_ITERATORS_HPP_INCLUDED
-#define _SMERP_PROTOCOL_ITERATORS_HPP_INCLUDED
+#ifndef _Wolframe_PROTOCOL_ITERATORS_HPP_INCLUDED
+#define _Wolframe_PROTOCOL_ITERATORS_HPP_INCLUDED
 #include <iterator>
 
-namespace _SMERP {
+namespace _Wolframe {
 namespace protocol {
 
 namespace array

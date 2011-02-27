@@ -14,7 +14,7 @@
 static const unsigned short DEFAULT_TIMEOUT = 180;
 
 
-namespace _SMERP	{
+namespace _Wolframe	{
 
 void EchoConfiguration::print( std::ostream& os ) const
 {
@@ -49,4 +49,4 @@ bool EchoConfiguration::parse( boost::property_tree::ptree& pt, std::ostream& os
 	return true;
 }
 
-} // namespace _SMERP
+} // namespace _Wolframe

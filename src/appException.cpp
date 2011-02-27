@@ -14,7 +14,7 @@
 static const size_t WHAT_BUFFER_SIZE = 255;
 
 
-namespace _SMERP	{
+namespace _Wolframe	{
 
 appException::appException( ErrorCode::Error error, ErrorSeverity::Severity severity, const char* format, ... )
 {
@@ -41,5 +41,5 @@ systemException::systemException( ErrorCode::Error error, ErrorSeverity::Severit
 	msg_ = msg;
 }
 
-} // namespace _SMERP
+} // namespace _Wolframe
 

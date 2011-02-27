@@ -18,7 +18,7 @@
 #include <windows.h>
 #endif // defined( _WIN32 )
 
-namespace _SMERP {
+namespace _Wolframe {
 
 	/// Logger backends
 	class ConsoleLogBackend
@@ -154,6 +154,6 @@ namespace _SMERP {
 #endif // _WIN32
 	};
 
-} // namespace _SMERP
+} // namespace _Wolframe
 
 #endif // _LOG_BACKEND_HPP_INCLUDED

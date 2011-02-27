@@ -3,7 +3,7 @@
 
 #include <boost/thread/mutex.hpp>
 
-namespace _SMERP	{
+namespace _Wolframe	{
 
 	template <typename T>
 	class AtomicCounter	{
@@ -80,6 +80,6 @@ namespace _SMERP	{
 		boost::mutex	mtx_;
 	};
 
-} // namespace _SMERP
+} // namespace _Wolframe
 
 #endif // _ATOMIC_COUNTER_HPP_INCLUDED

@@ -10,7 +10,7 @@
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 
-namespace _SMERP {
+namespace _Wolframe {
 namespace Network {
 
 static const char* REFUSE_MSG = "Server is busy. Please try again later.\n";
@@ -179,4 +179,4 @@ void SSLconnection::handleHandshake( const boost::system::error_code& e )
 #endif // WITH_SSL
 
 } // namespace Network
-} // namespace _SMERP
+} // namespace _Wolframe

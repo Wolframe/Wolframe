@@ -4,7 +4,7 @@
 
 #include "authentication.hpp"
 
-namespace _SMERP {
+namespace _Wolframe {
 	namespace Authentication {
 
 AuthenticatorFactory::AuthenticatorFactory( )
@@ -49,5 +49,5 @@ std::vector<std::string> AuthenticatorFactory::getAvailableMechs( )
 }
 
 } // namespace Authentication
-} // namespace _SMERP
+} // namespace _Wolframe
 

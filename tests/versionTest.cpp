@@ -28,8 +28,8 @@ protected:
 		if ( !build )
 			build++;
 
-		ver = new _SMERP::Version( major, minor, revision, build );
-		ver0 = new _SMERP::Version( major, minor, revision );
+		ver = new _Wolframe::Version( major, minor, revision, build );
+		ver0 = new _Wolframe::Version( major, minor, revision );
 		sprintf( verStr, "%d.%d.%d.%u", major, minor, revision, build );
 
 	}
@@ -56,7 +56,7 @@ protected:
 	// Objects declared here can be used by all tests in the test case.
 	unsigned short	major, minor, revision;
 	unsigned	build;
-	_SMERP::Version	*ver, *ver0;
+	_Wolframe::Version	*ver, *ver0;
 	char		verStr[MAX_STRING];
 };
 

@@ -25,7 +25,7 @@ extern "C" {
 #define PRIxPTR "%p"
 #endif
 
-namespace _SMERP {
+namespace _Wolframe {
 
 	static int lua_log( lua_State *_l )
 	{
@@ -73,9 +73,9 @@ namespace _SMERP {
 			}
 		}
 
-		_SMERP::Logger( _SMERP::LogBackend::instance() ).Get(
-			_SMERP::LogComponent::LOGCOMPONENT_LUA,
-			_SMERP::LogLevel::str2LogLevel( logLevel ) ) << os.str( );
+		_Wolframe::Logger( _Wolframe::LogBackend::instance() ).Get(
+			_Wolframe::LogComponent::LOGCOMPONENT_LUA,
+			_Wolframe::LogLevel::str2LogLevel( logLevel ) ) << os.str( );
 
 		lua_pop( _l, n );
 
@@ -386,4 +386,4 @@ namespace _SMERP {
 		return impl_->newSSLconnection( local );
 	}
 
-} // namespace _SMERP
+} // namespace _Wolframe

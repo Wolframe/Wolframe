@@ -7,13 +7,13 @@
 
 #include <string>
 
-namespace _SMERP {
+namespace _Wolframe {
 	namespace Authentication {
 
 		std::string getLogin( );
 		std::string getPassword( );
 
 	} // namespace Authentication
-} // namespace _SMERP
+} // namespace _Wolframe
 
 #endif // _GET_PASSWORD_HPP_INCLUDED

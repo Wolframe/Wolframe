@@ -7,7 +7,7 @@
 #include <QFile>
 #include <QTextStream>
 
-namespace _SMERP {
+namespace _Wolframe {
 	namespace QtClient {
 
 HistoryLineEdit::HistoryLineEdit( QWidget *_parent ) : QLineEdit( _parent ),
@@ -93,4 +93,4 @@ void HistoryLineEdit::complete( )
 }
 
 } // namespace QtClient
-} // namespace _SMERP
+} // namespace _Wolframe

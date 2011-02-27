@@ -14,12 +14,12 @@
 
 #include "unused.h"
 
-namespace _SMERP {
+namespace _Wolframe {
 	namespace Network	{
 
 		server::server( const std::list<ServerTCPendpoint>& TCPserver,
 				SMERP_UNUSED const std::list<ServerSSLendpoint>& SSLserver,
-				_SMERP::ServerHandler& serverHandler,
+				_Wolframe::ServerHandler& serverHandler,
 				unsigned threads, unsigned maxConnections )
 					: threadPoolSize_( threads ),
 					IOservice_(),
@@ -117,4 +117,4 @@ namespace _SMERP {
 		}
 
 	} // namespace Network
-} // namespace _SMERP
+} // namespace _Wolframe

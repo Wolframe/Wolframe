@@ -7,7 +7,7 @@
 
 #include "version.hpp"
 
-namespace _SMERP	{
+namespace _Wolframe	{
 
 	const char*		applicationName();
 	unsigned short		applicationMajorVersion();
@@ -31,6 +31,6 @@ namespace _SMERP	{
 #endif // defined( _WIN32 )
 
 	} // namespace Configuration
-} // namespace _SMERP
+} // namespace _Wolframe
 
 #endif // _APP_PROPERTIES_HPP_INCLUDED

@@ -9,7 +9,7 @@
 #include <gtest/gtest.h>
 #include <stdlib.h>
 
-using namespace _SMERP;
+using namespace _Wolframe;
 
 static const char* getRandomAsciiString()
 {
@@ -200,8 +200,8 @@ TYPED_TEST( pechoHandlerFixture, ExpectedResult )
    std::string output;
    char* itr = const_cast<char*>( this->input.c_str());
    EXPECT_EQ( 0, test::runTestIO( itr, output, *this->connection));
-#define _SMERP_LOWLEVEL_DEBUG
-#ifdef _SMERP_LOWLEVEL_DEBUG
+#define _Wolframe_LOWLEVEL_DEBUG
+#ifdef _Wolframe_LOWLEVEL_DEBUG
       unsigned int ii=0,nn=output.size();
       for (;ii<nn && output[ii]==this->expected[ii]; ii++);
       if (ii != nn) printf( "SIZE R=%lu,E=%lu,DIFF AT %u='%d %d %d %d|%d %d %d %d'\n",

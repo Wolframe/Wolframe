@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-namespace _SMERP {
+namespace _Wolframe {
 
 	class LogComponent {
 	public:
@@ -38,7 +38,7 @@ namespace _SMERP {
 		return s;
 	}
 
-} // namespace _SMERP
+} // namespace _Wolframe
 
 
 #endif // _LOG_COMPONENT_HPP_INCLUDED

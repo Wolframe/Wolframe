@@ -9,8 +9,8 @@
 #include <cstring>
 
 namespace tw = textwolf;
-namespace pt = _SMERP::protocol;
-namespace xx = _SMERP::xml;
+namespace pt = _Wolframe::protocol;
+namespace xx = _Wolframe::xml;
 
 namespace
 {
@@ -404,8 +404,8 @@ namespace
 
 
 //public implementation
-using namespace _SMERP;
-using namespace _SMERP::xml;
+using namespace _Wolframe;
+using namespace _Wolframe::xml;
 
 struct Automaton::Private
 {

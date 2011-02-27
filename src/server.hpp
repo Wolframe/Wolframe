@@ -15,7 +15,7 @@
 #include "connectionHandler.hpp"
 #include "atomicCounter.hpp"
 
-namespace _SMERP {
+namespace _Wolframe {
 	namespace Network	{
 
 		/// The top-level class of the SMERP network server.
@@ -26,7 +26,7 @@ namespace _SMERP {
 			/// Construct the server
 			explicit server( const std::list<ServerTCPendpoint>& TCPserver,
 					 const std::list<ServerSSLendpoint>& SSLserver,
-					 _SMERP::ServerHandler& serverHandler,
+					 _Wolframe::ServerHandler& serverHandler,
 					 unsigned threads, unsigned maxConnections );
 
 			/// Destruct the server
@@ -56,6 +56,6 @@ namespace _SMERP {
 		};
 
 	} // namespace Network
-} // namespace _SMERP
+} // namespace _Wolframe
 
 #endif // _NETWORK_SERVER_HPP_INCLUDED

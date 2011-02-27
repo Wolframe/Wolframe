@@ -4,7 +4,7 @@
 
 #include "appProperties.hpp"
 
-namespace _SMERP	{
+namespace _Wolframe	{
 
 	const char*	applicationName()				{ return "Wolframe-ECHO"; }
 	unsigned short	applicationMajorVersion()			{ return 0; }
@@ -25,5 +25,5 @@ namespace _SMERP	{
 	const char*	Configuration::defaultServiceDescription()	{ return "a daemon for echo wolframeing"; }
 #endif // defined( _WIN32 )
 
-} // namespace _SMERP
+} // namespace _Wolframe
 

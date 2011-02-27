@@ -2,13 +2,13 @@
 // pechoHandler.hpp - simple echo handler example
 //
 
-#ifndef _SMERP_TEST_HANDLER_TEMPLATES_HPP_INCLUDED
-#define _SMERP_TEST_HANDLER_TEMPLATES_HPP_INCLUDED
+#ifndef _Wolframe_TEST_HANDLER_TEMPLATES_HPP_INCLUDED
+#define _Wolframe_TEST_HANDLER_TEMPLATES_HPP_INCLUDED
 #include "logger.hpp"
 #include <cstring>
 #include <iostream>
 
-namespace _SMERP
+namespace _Wolframe
 {
 
 template <typename T>
@@ -73,5 +73,5 @@ namespace test
       }
       return 1;      
    }
-}}//namespace _SMERP::test
+}}//namespace _Wolframe::test
 #endif

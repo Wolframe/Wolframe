@@ -7,10 +7,10 @@
 
 #include "standardConfigs.hpp"
 
-namespace _SMERP {
+namespace _Wolframe {
 
 	/// echo configuration
-	struct EchoConfiguration : public _SMERP::Configuration::ConfigurationBase
+	struct EchoConfiguration : public _Wolframe::Configuration::ConfigurationBase
 	{
 	public:
 		unsigned short		timeout;
@@ -42,6 +42,6 @@ namespace _SMERP {
 	};
 
 
-} // namespace _SMERP
+} // namespace _Wolframe
 
 #endif // _HANDLERCONFIG_HPP_INCLUDED

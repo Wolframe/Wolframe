@@ -8,7 +8,7 @@
 #include <QTcpSocket>
 #include <QFile>
 
-namespace _SMERP {
+namespace _Wolframe {
 	namespace QtClient {
 
 SMERPClient::SMERPClient( QWidget *_parent ) :
@@ -280,4 +280,4 @@ void SMERPClient::sendLine( QString line )
 }
 
 } // namespace QtClient
-} // namespace _SMERP
+} // namespace _Wolframe

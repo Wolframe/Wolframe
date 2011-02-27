@@ -8,8 +8,8 @@
 #include "dispatcher.hpp"
 #include "implementation.hpp"
 
-using namespace _SMERP;
-using namespace _SMERP::mtproc;
+using namespace _Wolframe;
+using namespace _Wolframe::mtproc;
 
 struct Connection::Private
 {

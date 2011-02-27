@@ -1,8 +1,8 @@
 //
 // protocol helper
 //
-#ifndef _SMERP_PROTOCOL_HPP_INCLUDED
-#define _SMERP_PROTOCOL_HPP_INCLUDED
+#ifndef _Wolframe_PROTOCOL_HPP_INCLUDED
+#define _Wolframe_PROTOCOL_HPP_INCLUDED
 
 //parser for the protocol commands and their arguments
 #include "protocol/parser.hpp"
@@ -13,5 +13,5 @@
 //building blocks for generators in processing languages knowing a 'yield' operation
 #include "protocol/generator.hpp" 
 
-#endif // _SMERP_PROTOCOL_HPP_INCLUDED
+#endif // _Wolframe_PROTOCOL_HPP_INCLUDED
 

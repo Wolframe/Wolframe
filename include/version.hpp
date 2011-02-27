@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace _SMERP {
+namespace _Wolframe {
 
 	class Version {
 	private:
@@ -34,6 +34,6 @@ namespace _SMERP {
 		std::string toString();
 	};
 
-} // namespace _SMERP
+} // namespace _Wolframe
 
 #endif // _VERSION_HPP_INCLUDED

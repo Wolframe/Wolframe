@@ -13,13 +13,13 @@
 #include <boost/lexical_cast.hpp>
 
 
-namespace _SMERP {
+namespace _Wolframe {
 namespace Network {
 
 acceptor::acceptor( boost::asio::io_service& IOservice,
 		    const std::string& host, unsigned short port, unsigned maxConnections,
 		    GlobalConnectionList& globalList,
-		    _SMERP::ServerHandler& srvHandler ) :
+		    _Wolframe::ServerHandler& srvHandler ) :
 	IOservice_( IOservice ),
 	strand_( IOservice_ ),
 	acceptor_( IOservice_ ),
@@ -101,7 +101,7 @@ SSLacceptor::SSLacceptor( boost::asio::io_service& IOservice,
 			  bool verify, const std::string& CAchainFile, const std::string& CAdirectory,
 			  const std::string& host, unsigned short port, unsigned maxConnections,
 			  GlobalConnectionList& globalList,
-			  _SMERP::ServerHandler& srvHandler) :
+			  _Wolframe::ServerHandler& srvHandler) :
 	IOservice_( IOservice ),
 	strand_( IOservice_ ),
 	acceptor_( IOservice_ ),
@@ -207,7 +207,7 @@ void SSLacceptor::handleAccept( const boost::system::error_code& e )
 
 std::string SSLacceptor::getPassword()
 {
-	return _SMERP::Authentication::getPassword();
+	return _Wolframe::Authentication::getPassword();
 }
 
 void SSLacceptor::stop()
@@ -230,4 +230,4 @@ void SSLacceptor::handleStop()
 #endif // WITH_SSL
 
 } // namespace Network
-} // namespace _SMERP
+} // namespace _Wolframe

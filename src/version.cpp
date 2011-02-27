@@ -6,7 +6,7 @@
 #include <sstream>
 #include "version.hpp"
 
-namespace _SMERP {
+namespace _Wolframe {
 
 Version::Version( unsigned short M, unsigned short m )
 {
@@ -67,5 +67,5 @@ std::string Version::toString()
 	return o.str();
 }
 
-} // namespace _SMERP
+} // namespace _Wolframe
 

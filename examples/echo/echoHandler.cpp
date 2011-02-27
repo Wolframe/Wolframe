@@ -8,7 +8,7 @@
 #include <string>
 #include <cstring>
 
-namespace _SMERP {
+namespace _Wolframe {
 
 	echoConnection::echoConnection( const Network::LocalTCPendpoint& local )
 	{
@@ -189,4 +189,4 @@ namespace _SMERP {
 		return impl_->newSSLconnection( local );
 	}
 
-} // namespace _SMERP
+} // namespace _Wolframe

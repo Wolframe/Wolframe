@@ -1,5 +1,5 @@
-#ifndef _SMERP_PROTOCOL_XML_ITERATOR_HPP_INCLUDED
-#define _SMERP_PROTOCOL_XML_ITERATOR_HPP_INCLUDED
+#ifndef _Wolframe_PROTOCOL_XML_ITERATOR_HPP_INCLUDED
+#define _Wolframe_PROTOCOL_XML_ITERATOR_HPP_INCLUDED
 #include "protocol/generator.hpp" 
 
 //@section xmlContentIterators
@@ -7,7 +7,7 @@
 // [1] generator for iterating over the xml elements like tag name etc.
 // [2] generator for iterating over a selection by an automaton of a subset of abbreviated syntax of XPath
 
-namespace _SMERP {
+namespace _Wolframe {
 namespace xml {
 
 class Automaton
@@ -63,7 +63,7 @@ public:
 };
 
 } // namespace xml
-} // namespace _SMERP
+} // namespace _Wolframe
 
-#endif // _SMERP_PROTOCOL_TEXT_ITERATOR_HPP_INCLUDED
+#endif // _Wolframe_PROTOCOL_TEXT_ITERATOR_HPP_INCLUDED
 

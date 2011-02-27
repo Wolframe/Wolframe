@@ -10,7 +10,7 @@
 #include "getPassword.hpp"
 
 using namespace std;
-using namespace _SMERP::Authentication;
+using namespace _Wolframe::Authentication;
 
 #ifndef _WIN32
 #include <unistd.h>
@@ -58,15 +58,15 @@ int main( int argc, const char *argv[] )
 // go in a loop where we do what the authenticator tells us, in
 // the simplest case it asks us for a login and a password
 	Step::AuthStep step = a->nextStep( );
-	while( step != Step::_SMERP_AUTH_STEP_SUCCESS &&step != Step::_SMERP_AUTH_STEP_FAIL ) {
+	while( step != Step::_Wolframe_AUTH_STEP_SUCCESS &&step != Step::_Wolframe_AUTH_STEP_FAIL ) {
 
 // the authenticator needs to send some data to the client side		
-		if( step == Step::_SMERP_AUTH_STEP_SEND_DATA ) {
+		if( step == Step::_Wolframe_AUTH_STEP_SEND_DATA ) {
 			string token = a->token( );
 			string data = a->sendData( );
 
 // the authenticate needs some specific input from the client
-		} else if( step == Step::_SMERP_AUTH_STEP_RECV_DATA ) {
+		} else if( step == Step::_Wolframe_AUTH_STEP_RECV_DATA ) {
 			string token = a->token( );
 // safe password input required
 			if( token == "password" ) {
@@ -83,7 +83,7 @@ int main( int argc, const char *argv[] )
 			}
 
 // an error occurred, get error message and print it
-		} else if( step == Step::_SMERP_AUTH_STEP_GET_ERROR ) {
+		} else if( step == Step::_Wolframe_AUTH_STEP_GET_ERROR ) {
 			cerr << "ERROR: " << a->getError( ) << endl;
 		}
 // next step
@@ -91,11 +91,11 @@ int main( int argc, const char *argv[] )
 	}
 
 // no we are either authenticated or not
-	if( step == Step::_SMERP_AUTH_STEP_SUCCESS ) {
+	if( step == Step::_Wolframe_AUTH_STEP_SUCCESS ) {
 		cout << "Authentication succeeded!" << endl;
-	} else if( step == Step::_SMERP_AUTH_STEP_FAIL ) {
+	} else if( step == Step::_Wolframe_AUTH_STEP_FAIL ) {
 		cout << "Authentication failed!" << endl;
 	}
 
-	return ( step != Step::_SMERP_AUTH_STEP_SUCCESS );
+	return ( step != Step::_Wolframe_AUTH_STEP_SUCCESS );
 }

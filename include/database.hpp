@@ -8,7 +8,7 @@
 #ifndef _DATABASE_HPP_INCLUDED
 #define _DATABASE_HPP_INCLUDED
 
-namespace _SMERP	{
+namespace _Wolframe	{
 	namespace Database	{
 
 		/// database type
@@ -18,7 +18,7 @@ namespace _SMERP	{
 		};
 
 		/// database configuration
-		struct DatabaseConfig : public _SMERP::ConfigurationBase
+		struct DatabaseConfig : public _Wolframe::ConfigurationBase
 		{
 		public:
 			DatabaseType		type;
@@ -31,7 +31,7 @@ namespace _SMERP	{
 			unsigned short		timeout;
 
 		/// ConfigurationBase virtual functions
-			DatabaseConfig() : _SMERP::ConfigurationBase( "database" )	{}
+			DatabaseConfig() : _Wolframe::ConfigurationBase( "database" )	{}
 			bool parse();
 			bool check();
 			bool test();
@@ -39,6 +39,6 @@ namespace _SMERP	{
 		};
 
 	} // namespace Database
-} // namespace _SMERP
+} // namespace _Wolframe
 
 #endif // _DATABASE_HPP_INCLUDED

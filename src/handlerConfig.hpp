@@ -7,7 +7,7 @@
 
 #include "standardConfigs.hpp"
 
-namespace _SMERP {
+namespace _Wolframe {
 
 	/// SMERP handler configuration structure
 	struct HandlerConfiguration
@@ -23,6 +23,6 @@ namespace _SMERP {
 	};
 
 
-} // namespace _SMERP
+} // namespace _Wolframe
 
 #endif // _HANDLERCONFIG_HPP_INCLUDED

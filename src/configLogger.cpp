@@ -15,7 +15,7 @@
 #include <ostream>
 
 
-namespace _SMERP	{
+namespace _Wolframe	{
 	namespace	Configuration	{
 
 
@@ -30,7 +30,7 @@ LoggerConfiguration::LoggerConfiguration( const std::string& node, const std::st
 	// std::string		logFileIdent;
 #if !defined( _WIN32 )
 	logToSyslog = false;
-	syslogFacility = SyslogFacility::_SMERP_SYSLOG_FACILITY_UNDEFINED;
+	syslogFacility = SyslogFacility::_Wolframe_SYSLOG_FACILITY_UNDEFINED;
 	syslogLogLevel = LogLevel::LOGLEVEL_UNDEFINED;
 	// std::string		syslogIdent;
 #else
@@ -96,7 +96,7 @@ void LoggerConfiguration::foreground( LogLevel::Level debugLevel, bool useConfig
 		logFileIdent.clear();
 #if !defined( _WIN32 )
 		logToSyslog = false;
-		syslogFacility = SyslogFacility::_SMERP_SYSLOG_FACILITY_UNDEFINED;
+		syslogFacility = SyslogFacility::_Wolframe_SYSLOG_FACILITY_UNDEFINED;
 		syslogLogLevel = LogLevel::LOGLEVEL_UNDEFINED;
 		syslogIdent.clear();
 #endif // !defined( _WIN32 )
@@ -215,12 +215,12 @@ bool LoggerConfiguration::parse( boost::property_tree::ptree& pt, std::ostream& 
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "facility" ))	{
 					SyslogFacility::Facility fclt = SyslogFacility::str2SyslogFacility( L2it->second.get_value<std::string>() );
-					if ( fclt == SyslogFacility::_SMERP_SYSLOG_FACILITY_UNDEFINED )	{
+					if ( fclt == SyslogFacility::_Wolframe_SYSLOG_FACILITY_UNDEFINED )	{
 						os << displayStr() << ": syslog: unknown facility: "
 								<< L2it->second.get_value<std::string>();
 						return false;
 					}
-					if ( syslogFacility != SyslogFacility::_SMERP_SYSLOG_FACILITY_UNDEFINED )	{
+					if ( syslogFacility != SyslogFacility::_Wolframe_SYSLOG_FACILITY_UNDEFINED )	{
 						os << displayStr() << ": syslog: facility already defined. Second value: "
 								<< L2it->second.get_value<std::string>();
 						return false;
@@ -318,4 +318,4 @@ bool LoggerConfiguration::parse( boost::property_tree::ptree& pt, std::ostream& 
 
 
 	} // namespace Configuration
-} // namespace _SMERP
+} // namespace _Wolframe

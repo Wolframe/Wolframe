@@ -4,7 +4,7 @@
 #include <string>
 #include "connectionEndpoint.hpp"
 
-namespace _SMERP	{
+namespace _Wolframe	{
 namespace Network	{
 
 	/// No encryption server endpoint
@@ -55,6 +55,6 @@ namespace Network	{
 	};
 
 } // namespace Network
-} // namespace _SMERP
+} // namespace _Wolframe
 
 #endif // _SERVER_ENDPOINT_HPP_INCLUDED

@@ -1,7 +1,7 @@
-#ifndef _SMERP_PROTOCOL_GENERATOR_INTERFACE_HPP_INCLUDED
-#define _SMERP_PROTOCOL_GENERATOR_INTERFACE_HPP_INCLUDED
+#ifndef _Wolframe_PROTOCOL_GENERATOR_INTERFACE_HPP_INCLUDED
+#define _Wolframe_PROTOCOL_GENERATOR_INTERFACE_HPP_INCLUDED
 
-namespace _SMERP {
+namespace _Wolframe {
 namespace protocol {
 
 //@section protocolGeneratorInterface

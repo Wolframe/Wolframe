@@ -4,7 +4,7 @@
 #include <string>
 #include <sstream>
 
-namespace _SMERP {
+namespace _Wolframe {
 	namespace Network {
 
 		/// Base class for network endpoints in SMERP
@@ -67,6 +67,6 @@ namespace _SMERP {
 		};
 
 	} // namespace Network
-} // namespace _SMERP
+} // namespace _Wolframe
 
 #endif // _CONNECTION_ENDPOINT_HPP_INCLUDED

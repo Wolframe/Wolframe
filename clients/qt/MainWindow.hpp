@@ -11,7 +11,7 @@
 #include "DebugTerminal.hpp"
 #include "SMERPClient.hpp"
 
-namespace _SMERP {
+namespace _Wolframe {
 	namespace QtClient {
 
 	class MainWindow : public QWidget
@@ -48,6 +48,6 @@ namespace _SMERP {
 		void on_actionDebugTerminal_triggered( bool checked );
 	};
 } // namespace QtClient
-} // namespace _SMERP
+} // namespace _Wolframe
 
 #endif // _MAIN_WINDOW_HPP_INCLUDED

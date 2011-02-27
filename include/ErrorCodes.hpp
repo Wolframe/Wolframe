@@ -5,7 +5,7 @@
 #ifndef _ERRORCODES_HPP_INCLUDED
 #define _ERRORCODES_HPP_INCLUDED
 
-namespace _SMERP	{
+namespace _Wolframe	{
 
 	class ErrorCodes	{
 	public:
@@ -29,7 +29,7 @@ namespace _SMERP	{
 		};
 	};
 
-} // namespace _SMERP
+} // namespace _Wolframe
 
 
 #endif // _ERRORCODES_HPP_INCLUDED

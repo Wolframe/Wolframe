@@ -11,7 +11,7 @@
 #include "HistoryLineEdit.hpp"
 #include "SMERPClient.hpp"
 
-namespace _SMERP {
+namespace _Wolframe {
 	namespace QtClient {
 
 	class DebugTerminal : public QWidget
@@ -41,6 +41,6 @@ namespace _SMERP {
 
 	};
 } // namespace QtClient
-} // namespace _SMERP
+} // namespace _Wolframe
 
 #endif // _DEBUG_TERMINAL_HPP_INCLUDED

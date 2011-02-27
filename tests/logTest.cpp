@@ -9,23 +9,23 @@
 class LoggingFixture : public ::testing::Test
 {
 	private:
-		_SMERP::LogBackend& logBack;
+		_Wolframe::LogBackend& logBack;
 		
 	protected:
 		LoggingFixture( ) :
-			logBack( _SMERP::LogBackend::instance( ) ) 
+			logBack( _Wolframe::LogBackend::instance( ) ) 
 		{
 			// in order not to spoil the output of gtest :-)
-			logBack.setConsoleLevel( _SMERP::LogLevel::LOGLEVEL_UNDEFINED );
+			logBack.setConsoleLevel( _Wolframe::LogLevel::LOGLEVEL_UNDEFINED );
 
-			logBack.setLogfileLevel( _SMERP::LogLevel::LOGLEVEL_DATA );
+			logBack.setLogfileLevel( _Wolframe::LogLevel::LOGLEVEL_DATA );
 			logBack.setLogfileName( "logTest.log" );
 #ifndef _WIN32
-			logBack.setSyslogLevel( _SMERP::LogLevel::LOGLEVEL_DATA );
-			logBack.setSyslogFacility( _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_USER );
+			logBack.setSyslogLevel( _Wolframe::LogLevel::LOGLEVEL_DATA );
+			logBack.setSyslogFacility( _Wolframe::SyslogFacility::_Wolframe_SYSLOG_FACILITY_USER );
 			logBack.setSyslogIdent( "smerptest" );
 #else
-			logBack.setEventlogLevel( _SMERP::LogLevel::LOGLEVEL_DATA );
+			logBack.setEventlogLevel( _Wolframe::LogLevel::LOGLEVEL_DATA );
 			logBack.setEventlogSource( "smerptest" );
 			logBack.setEventlogLog( "Application" );
 #endif

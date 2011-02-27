@@ -4,8 +4,8 @@
 
 #include "AbstractFormLoader.hpp"
 
-namespace _SMERP {
+namespace _Wolframe {
 	namespace QtClient {
 
 } // namespace QtClient
-} // namespace _SMERP
+} // namespace _Wolframe

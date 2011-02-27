@@ -36,13 +36,13 @@
 
 #include "unused.h"
 
-namespace _SMERP {
+namespace _Wolframe {
 
 // ConsoleLogBackend
 
 ConsoleLogBackend::ConsoleLogBackend( )
 {
-	logLevel_ = _SMERP::LogLevel::LOGLEVEL_ERROR;
+	logLevel_ = _Wolframe::LogLevel::LOGLEVEL_ERROR;
 }
 
 ConsoleLogBackend::~ConsoleLogBackend( )
@@ -72,7 +72,7 @@ void ConsoleLogBackend::reopen( )
 
 LogfileBackend::LogfileBackend( )
 {
-	logLevel_ = _SMERP::LogLevel::LOGLEVEL_UNDEFINED;
+	logLevel_ = _Wolframe::LogLevel::LOGLEVEL_UNDEFINED;
 	isOpen_ = false;
 	// we don't open a primarily unknown logfile, wait for setFilename
 }
@@ -158,9 +158,9 @@ inline void LogfileBackend::log( const LogComponent::Component component, const 
 #if !defined( _WIN32 )
 SyslogBackend::SyslogBackend( )
 {
-	logLevel_ = _SMERP::LogLevel::LOGLEVEL_UNDEFINED;
+	logLevel_ = _Wolframe::LogLevel::LOGLEVEL_UNDEFINED;
 	ident_ = "<undefined>";
-	facility_ = _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_DAEMON;
+	facility_ = _Wolframe::SyslogFacility::_Wolframe_SYSLOG_FACILITY_DAEMON;
 	openlog( ident_.c_str( ), LOG_CONS | LOG_PID, facility_ );
 }
 
@@ -172,18 +172,18 @@ SyslogBackend::~SyslogBackend( )
 static int levelToSyslogLevel( const LogLevel::Level level )
 {
 	switch( level )	{
-		case _SMERP::LogLevel::LOGLEVEL_DATA:
-		case _SMERP::LogLevel::LOGLEVEL_TRACE:
-		case _SMERP::LogLevel::LOGLEVEL_DEBUG:		return LOG_DEBUG;
-		case _SMERP::LogLevel::LOGLEVEL_INFO:		return LOG_INFO;
-		case _SMERP::LogLevel::LOGLEVEL_NOTICE:		return LOG_NOTICE;
-		case _SMERP::LogLevel::LOGLEVEL_WARNING:	return LOG_WARNING;
-		case _SMERP::LogLevel::LOGLEVEL_ERROR:		return LOG_ERR;
-		case _SMERP::LogLevel::LOGLEVEL_SEVERE:
-		case _SMERP::LogLevel::LOGLEVEL_CRITICAL:	return LOG_CRIT;
-		case _SMERP::LogLevel::LOGLEVEL_ALERT:		return LOG_ALERT;
-		case _SMERP::LogLevel::LOGLEVEL_FATAL:		return LOG_EMERG;
-		case _SMERP::LogLevel::LOGLEVEL_UNDEFINED:	return LOG_ERR;
+		case _Wolframe::LogLevel::LOGLEVEL_DATA:
+		case _Wolframe::LogLevel::LOGLEVEL_TRACE:
+		case _Wolframe::LogLevel::LOGLEVEL_DEBUG:		return LOG_DEBUG;
+		case _Wolframe::LogLevel::LOGLEVEL_INFO:		return LOG_INFO;
+		case _Wolframe::LogLevel::LOGLEVEL_NOTICE:		return LOG_NOTICE;
+		case _Wolframe::LogLevel::LOGLEVEL_WARNING:	return LOG_WARNING;
+		case _Wolframe::LogLevel::LOGLEVEL_ERROR:		return LOG_ERR;
+		case _Wolframe::LogLevel::LOGLEVEL_SEVERE:
+		case _Wolframe::LogLevel::LOGLEVEL_CRITICAL:	return LOG_CRIT;
+		case _Wolframe::LogLevel::LOGLEVEL_ALERT:		return LOG_ALERT;
+		case _Wolframe::LogLevel::LOGLEVEL_FATAL:		return LOG_EMERG;
+		case _Wolframe::LogLevel::LOGLEVEL_UNDEFINED:	return LOG_ERR;
 	}
 	return LOG_ERR;
 }
@@ -191,55 +191,55 @@ static int levelToSyslogLevel( const LogLevel::Level level )
 static int facilityToSyslogFacility( const SyslogFacility::Facility facility )
 {
 	switch( facility ) {
-		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_KERN:	return LOG_KERN;
-		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_USER:	return LOG_USER;
-		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_MAIL:	return LOG_MAIL;
-		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_DAEMON:	return LOG_DAEMON;
-		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_AUTH:	return LOG_AUTH;
-		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_SYSLOG:	return LOG_SYSLOG;
-		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_LPR:	return LOG_LPR;
-		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_NEWS:	return LOG_NEWS;
-		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_UUCP:	return LOG_UUCP;
-		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_CRON:	return LOG_CRON;
+		case _Wolframe::SyslogFacility::_Wolframe_SYSLOG_FACILITY_KERN:	return LOG_KERN;
+		case _Wolframe::SyslogFacility::_Wolframe_SYSLOG_FACILITY_USER:	return LOG_USER;
+		case _Wolframe::SyslogFacility::_Wolframe_SYSLOG_FACILITY_MAIL:	return LOG_MAIL;
+		case _Wolframe::SyslogFacility::_Wolframe_SYSLOG_FACILITY_DAEMON:	return LOG_DAEMON;
+		case _Wolframe::SyslogFacility::_Wolframe_SYSLOG_FACILITY_AUTH:	return LOG_AUTH;
+		case _Wolframe::SyslogFacility::_Wolframe_SYSLOG_FACILITY_SYSLOG:	return LOG_SYSLOG;
+		case _Wolframe::SyslogFacility::_Wolframe_SYSLOG_FACILITY_LPR:	return LOG_LPR;
+		case _Wolframe::SyslogFacility::_Wolframe_SYSLOG_FACILITY_NEWS:	return LOG_NEWS;
+		case _Wolframe::SyslogFacility::_Wolframe_SYSLOG_FACILITY_UUCP:	return LOG_UUCP;
+		case _Wolframe::SyslogFacility::_Wolframe_SYSLOG_FACILITY_CRON:	return LOG_CRON;
 #if defined LOG_AUTHPRIV
-		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_AUTHPRIV:	return LOG_AUTHPRIV;
+		case _Wolframe::SyslogFacility::_Wolframe_SYSLOG_FACILITY_AUTHPRIV:	return LOG_AUTHPRIV;
 #else
-		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_AUTHPRIV:	return LOG_AUTH;
+		case _Wolframe::SyslogFacility::_Wolframe_SYSLOG_FACILITY_AUTHPRIV:	return LOG_AUTH;
 #endif
 #if defined LOG_FTP
-		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_FTP:	return LOG_FTP;
+		case _Wolframe::SyslogFacility::_Wolframe_SYSLOG_FACILITY_FTP:	return LOG_FTP;
 #else
-		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_FTP:	return LOG_DAEMON;
+		case _Wolframe::SyslogFacility::_Wolframe_SYSLOG_FACILITY_FTP:	return LOG_DAEMON;
 #endif
 #if defined LOG_NTP
-		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_NTP:	return LOG_NTP;
+		case _Wolframe::SyslogFacility::_Wolframe_SYSLOG_FACILITY_NTP:	return LOG_NTP;
 #else
-		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_NTP:	return LOG_DAEMON;
+		case _Wolframe::SyslogFacility::_Wolframe_SYSLOG_FACILITY_NTP:	return LOG_DAEMON;
 #endif
 #if defined LOG_SECURITY
-		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_SECURITY:	return LOG_SECURITY;
+		case _Wolframe::SyslogFacility::_Wolframe_SYSLOG_FACILITY_SECURITY:	return LOG_SECURITY;
 #else
-		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_SECURITY:	return LOG_AUTH;
+		case _Wolframe::SyslogFacility::_Wolframe_SYSLOG_FACILITY_SECURITY:	return LOG_AUTH;
 #endif
 #if defined LOG_CONSOLE
-		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_CONSOLE:	return LOG_CONSOLE;
+		case _Wolframe::SyslogFacility::_Wolframe_SYSLOG_FACILITY_CONSOLE:	return LOG_CONSOLE;
 #else
-		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_CONSOLE:	return LOG_DAEMON;
+		case _Wolframe::SyslogFacility::_Wolframe_SYSLOG_FACILITY_CONSOLE:	return LOG_DAEMON;
 #endif
 #if defined LOG_AUDIT
-		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_AUDIT:	return LOG_AUDIT;
+		case _Wolframe::SyslogFacility::_Wolframe_SYSLOG_FACILITY_AUDIT:	return LOG_AUDIT;
 #else
-		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_AUDIT:	return LOG_AUTH;
+		case _Wolframe::SyslogFacility::_Wolframe_SYSLOG_FACILITY_AUDIT:	return LOG_AUTH;
 #endif
-		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_LOCAL0:	return LOG_LOCAL0;
-		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_LOCAL1:	return LOG_LOCAL1;
-		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_LOCAL2:	return LOG_LOCAL2;
-		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_LOCAL3:	return LOG_LOCAL3;
-		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_LOCAL4:	return LOG_LOCAL4;
-		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_LOCAL5:	return LOG_LOCAL5;
-		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_LOCAL6:	return LOG_LOCAL6;
-		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_LOCAL7:	return LOG_LOCAL7;
-		case _SMERP::SyslogFacility::_SMERP_SYSLOG_FACILITY_UNDEFINED:	return LOG_DAEMON;
+		case _Wolframe::SyslogFacility::_Wolframe_SYSLOG_FACILITY_LOCAL0:	return LOG_LOCAL0;
+		case _Wolframe::SyslogFacility::_Wolframe_SYSLOG_FACILITY_LOCAL1:	return LOG_LOCAL1;
+		case _Wolframe::SyslogFacility::_Wolframe_SYSLOG_FACILITY_LOCAL2:	return LOG_LOCAL2;
+		case _Wolframe::SyslogFacility::_Wolframe_SYSLOG_FACILITY_LOCAL3:	return LOG_LOCAL3;
+		case _Wolframe::SyslogFacility::_Wolframe_SYSLOG_FACILITY_LOCAL4:	return LOG_LOCAL4;
+		case _Wolframe::SyslogFacility::_Wolframe_SYSLOG_FACILITY_LOCAL5:	return LOG_LOCAL5;
+		case _Wolframe::SyslogFacility::_Wolframe_SYSLOG_FACILITY_LOCAL6:	return LOG_LOCAL6;
+		case _Wolframe::SyslogFacility::_Wolframe_SYSLOG_FACILITY_LOCAL7:	return LOG_LOCAL7;
+		case _Wolframe::SyslogFacility::_Wolframe_SYSLOG_FACILITY_UNDEFINED:	return LOG_DAEMON;
 	}
 	return LOG_DAEMON;
 }
@@ -284,7 +284,7 @@ void SyslogBackend::reopen( )
 #if defined( _WIN32 )
 EventlogBackend::EventlogBackend( )
 {
-	logLevel_ = _SMERP::LogLevel::LOGLEVEL_UNDEFINED;
+	logLevel_ = _Wolframe::LogLevel::LOGLEVEL_UNDEFINED;
 	categoryId_ = 1 | 0x0FFF0000L; // the one category we have at the moment in the resource
 	log_ = "Application";
 	source_ = "<undefined>";
@@ -319,20 +319,20 @@ void EventlogBackend::setSource( const std::string source )
 static DWORD levelToEventlogLevel( const LogLevel::Level level )
 {
 	switch( level )	{
-		case _SMERP::LogLevel::LOGLEVEL_DATA:
-		case _SMERP::LogLevel::LOGLEVEL_TRACE:
-		case _SMERP::LogLevel::LOGLEVEL_DEBUG:
-		case _SMERP::LogLevel::LOGLEVEL_INFO:
-		case _SMERP::LogLevel::LOGLEVEL_NOTICE:
+		case _Wolframe::LogLevel::LOGLEVEL_DATA:
+		case _Wolframe::LogLevel::LOGLEVEL_TRACE:
+		case _Wolframe::LogLevel::LOGLEVEL_DEBUG:
+		case _Wolframe::LogLevel::LOGLEVEL_INFO:
+		case _Wolframe::LogLevel::LOGLEVEL_NOTICE:
 			return EVENTLOG_INFORMATION_TYPE;
-		case _SMERP::LogLevel::LOGLEVEL_WARNING:
+		case _Wolframe::LogLevel::LOGLEVEL_WARNING:
 			return EVENTLOG_WARNING_TYPE;
-		case _SMERP::LogLevel::LOGLEVEL_ERROR:
-		case _SMERP::LogLevel::LOGLEVEL_SEVERE:
-		case _SMERP::LogLevel::LOGLEVEL_CRITICAL:
-		case _SMERP::LogLevel::LOGLEVEL_ALERT:
-		case _SMERP::LogLevel::LOGLEVEL_FATAL:
-		case _SMERP::LogLevel::LOGLEVEL_UNDEFINED:
+		case _Wolframe::LogLevel::LOGLEVEL_ERROR:
+		case _Wolframe::LogLevel::LOGLEVEL_SEVERE:
+		case _Wolframe::LogLevel::LOGLEVEL_CRITICAL:
+		case _Wolframe::LogLevel::LOGLEVEL_ALERT:
+		case _Wolframe::LogLevel::LOGLEVEL_FATAL:
+		case _Wolframe::LogLevel::LOGLEVEL_UNDEFINED:
 			return EVENTLOG_ERROR_TYPE;
 	}
 	return EVENTLOG_ERROR_TYPE;
@@ -509,4 +509,4 @@ std::ostringstream& Logger::Get( LogComponent::Component component, LogLevel::Le
 	return os_;
 }
 
-} // namespace _SMERP
+} // namespace _Wolframe

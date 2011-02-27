@@ -12,7 +12,7 @@
 
 namespace prgOpts = boost::program_options;
 
-namespace _SMERP {
+namespace _Wolframe {
 	namespace Configuration	{
 
 		static const LogLevel::Level DEFAULT_DEBUG_LEVEL = LogLevel::LOGLEVEL_INFO;
@@ -171,5 +171,5 @@ namespace _SMERP {
 		}
 
 	} // namespace Configuration
-} // namespace _SMERP
+} // namespace _Wolframe
 

@@ -7,7 +7,7 @@
 #include <gtest/gtest.h>
 #include <stdlib.h>
 
-using namespace _SMERP;
+using namespace _Wolframe;
 
 struct TestDescription
 {

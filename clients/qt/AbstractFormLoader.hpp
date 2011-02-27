@@ -10,7 +10,7 @@
 #include <QStringList>
 #include <QByteArray>
 
-namespace _SMERP {
+namespace _Wolframe {
 	namespace QtClient {
 
 	class AbstractFormLoader : public QObject
@@ -28,6 +28,6 @@ namespace _SMERP {
 			void formLoaded( QString form_name, QByteArray form );
 	};
 } // namespace QtClient
-} // namespace _SMERP
+} // namespace _Wolframe
 
 #endif // _ABSTRACT_FORM_LOADER_HPP_INCLUDED

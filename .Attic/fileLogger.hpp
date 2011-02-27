@@ -10,13 +10,13 @@
 #include "logLevel.hpp"
 
 
-namespace _SMERP {
+namespace _Wolframe {
 
 
 class fileLogger
 {
 public:
-	fileLogger( std::string filename, LogLevel::Level l = LogLevel::_SMERP_INFO );
+	fileLogger( std::string filename, LogLevel::Level l = LogLevel::_Wolframe_INFO );
 	~fileLogger( void );
 
 	void level( LogLevel::Level l );
@@ -36,6 +36,6 @@ private:
 };
 
 
-} // namespace _SMERP
+} // namespace _Wolframe
 
 #endif // _FILE_LOGGER_H_INCLUDED

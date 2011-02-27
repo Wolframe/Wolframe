@@ -15,18 +15,18 @@
 
 #include "singleton.hpp"
 
-namespace _SMERP {
+namespace _Wolframe {
 	namespace Authentication {
 
 // the basic steps the authenticator can be in
 class Step {
 public:
 	enum AuthStep {
-		_SMERP_AUTH_STEP_SUCCESS,		/// successful authentication
-		_SMERP_AUTH_STEP_FAIL,			/// authentication failed
-		_SMERP_AUTH_STEP_SEND_DATA,		/// we need to send some data
-		_SMERP_AUTH_STEP_RECV_DATA,		/// we require some data
-		_SMERP_AUTH_STEP_GET_ERROR		/// error occurred
+		_Wolframe_AUTH_STEP_SUCCESS,		/// successful authentication
+		_Wolframe_AUTH_STEP_FAIL,			/// authentication failed
+		_Wolframe_AUTH_STEP_SEND_DATA,		/// we need to send some data
+		_Wolframe_AUTH_STEP_RECV_DATA,		/// we require some data
+		_Wolframe_AUTH_STEP_GET_ERROR		/// error occurred
 	};
 };
 
@@ -116,6 +116,6 @@ template<class T> T findprop( AuthenticatorFactory::properties _props, const std
 }
 
 } // namespace Authentication
-} // namespace _SMERP
+} // namespace _Wolframe
 
 #endif // _AUTHENTICATION_HPP_INCLUDED

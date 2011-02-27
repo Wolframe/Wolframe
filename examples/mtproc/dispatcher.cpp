@@ -2,8 +2,8 @@
 #include "methodtable.hpp"
 #include "logger.hpp"
 
-using namespace _SMERP::mtproc;
-using namespace _SMERP::protocol;
+using namespace _Wolframe::mtproc;
+using namespace _Wolframe::protocol;
 
 void CommandDispatcher::resetCommand()
 {

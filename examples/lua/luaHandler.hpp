@@ -2,8 +2,8 @@
 // smerpHandler.hpp - smerp main handler
 //
 
-#ifndef _SMERP_HANDLER_HPP_INCLUDED
-#define _SMERP_HANDLER_HPP_INCLUDED
+#ifndef _Wolframe_HANDLER_HPP_INCLUDED
+#define _Wolframe_HANDLER_HPP_INCLUDED
 
 #include "connectionHandler.hpp"
 
@@ -11,7 +11,7 @@ extern "C" {
 	#include <lua.h>
 }
 
-namespace _SMERP {
+namespace _Wolframe {
 	/// The connection handler
 	class echoConnection : public Network::connectionHandler
 	{
@@ -51,6 +51,6 @@ namespace _SMERP {
 		Network::connectionHandler* newSSLconnection( const Network::LocalSSLendpoint& local );
 	};
 
-} // namespace _SMERP
+} // namespace _Wolframe
 
-#endif // _SMERP_HANDLER_HPP_INCLUDED
+#endif // _Wolframe_HANDLER_HPP_INCLUDED

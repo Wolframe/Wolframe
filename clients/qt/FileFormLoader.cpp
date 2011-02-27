@@ -7,7 +7,7 @@
 #include <QDir>
 #include <QFile>
 
-namespace _SMERP {
+namespace _Wolframe {
 	namespace QtClient {
 
 FileFormLoader::FileFormLoader( QString dir ) : m_dir( dir ) 
@@ -39,4 +39,4 @@ QStringList FileFormLoader::getFormNames( )
 }
 
 } // namespace QtClient
-} // namespace _SMERP
+} // namespace _Wolframe

@@ -1,10 +1,10 @@
-#ifndef _SMERP_METHODTABLE_COMMAND_DISPATCHER_PRIVATE_HPP_INCLUDED
-#define _SMERP_METHODTABLE_COMMAND_DISPATCHER_PRIVATE_HPP_INCLUDED
+#ifndef _Wolframe_METHODTABLE_COMMAND_DISPATCHER_PRIVATE_HPP_INCLUDED
+#define _Wolframe_METHODTABLE_COMMAND_DISPATCHER_PRIVATE_HPP_INCLUDED
 #include "protocol.hpp"
 #include "methodtable.hpp"
 #include <exception>
 
-namespace _SMERP {
+namespace _Wolframe {
 namespace mtproc {
 
 struct CommandDispatcher

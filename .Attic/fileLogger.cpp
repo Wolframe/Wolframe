@@ -12,7 +12,7 @@
 #include "fileLogger.hpp"
 
 
-namespace _SMERP {
+namespace _Wolframe {
 
 
 #include <sys/time.h>
@@ -87,4 +87,4 @@ void fileLogger::log( LogLevel::Level l, const std::string& msg )
 	}
 }
 
-} // namespace _SMERP
+} // namespace _Wolframe

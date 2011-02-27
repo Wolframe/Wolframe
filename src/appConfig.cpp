@@ -20,7 +20,7 @@
 #include <ostream>
 
 
-namespace _SMERP {
+namespace _Wolframe {
 	namespace Configuration {
 
 const char* ApplicationConfiguration::chooseFile( const char *globalFile, const char *userFile, const char *localFile )
@@ -118,4 +118,4 @@ bool ApplicationConfiguration::check( std::ostream& os ) const
 }
 
 	} // namespace Configuration
-} // namespace _SMERP
+} // namespace _Wolframe

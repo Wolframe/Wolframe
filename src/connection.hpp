@@ -15,7 +15,7 @@
 #include "connectionHandler.hpp"
 #include "atomicCounter.hpp"
 
-namespace _SMERP {
+namespace _Wolframe {
 namespace Network {
 
 	class connection;		// forward declaration for connection_ptr
@@ -167,6 +167,6 @@ namespace Network {
 #endif // WITH_SSL
 
 } // namespace Network
-} // namespace _SMERP
+} // namespace _Wolframe
 
 #endif // _CONNECTION_HPP_INCLUDED

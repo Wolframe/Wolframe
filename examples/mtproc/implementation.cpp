@@ -2,7 +2,7 @@
 #include "logger.hpp"
 #include "generators/char_isolatin1.hpp"
 
-using namespace _SMERP::mtproc;
+using namespace _Wolframe::mtproc;
 
 int Method::Data::echo( Context* ctx, unsigned int, const char**)
 {

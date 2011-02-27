@@ -11,7 +11,7 @@
 #include <map>
 #include <vector>
 
-namespace _SMERP {
+namespace _Wolframe {
 
 	struct HandlerConfiguration;
 
@@ -34,7 +34,7 @@ namespace _SMERP {
 			// logger configuration
 			LoggerConfiguration		*logConfig;
 
-			_SMERP::HandlerConfiguration	*handlerConfig;
+			_Wolframe::HandlerConfiguration	*handlerConfig;
 
 		public:
 			ApplicationConfiguration();
@@ -54,6 +54,6 @@ namespace _SMERP {
 			std::map< std::string, int >		section;
 		};
 	} // namespace Configuration
-} // namespace _SMERP
+} // namespace _Wolframe
 
 #endif // _APP_CONFIG_HPP_INCLUDED

@@ -6,7 +6,7 @@
 
 #include <boost/property_tree/ptree.hpp>
 
-namespace _SMERP {
+namespace _Wolframe {
 	namespace Configuration	{
 
 		bool getBoolValue( boost::property_tree::ptree::const_iterator it, const std::string& module,
@@ -22,7 +22,7 @@ namespace _SMERP {
 					    const std::string& name, unsigned short& value, std::ostream& os );
 
 	} // namespace Configuration
-} // namespace _SMERP
+} // namespace _Wolframe
 
 
 #endif // _CONFIG_HELPERS_HPP_INCLUDED

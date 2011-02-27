@@ -2,13 +2,13 @@
 // mtprocHandler.hpp - simple method table processor connection handler
 //
 
-#ifndef _SMERP_PROTOCOL_ECHO_HANDLER_HPP_INCLUDED
-#define _SMERP_PROTOCOL_ECHO_HANDLER_HPP_INCLUDED
+#ifndef _Wolframe_PROTOCOL_ECHO_HANDLER_HPP_INCLUDED
+#define _Wolframe_PROTOCOL_ECHO_HANDLER_HPP_INCLUDED
 #include "connectionHandler.hpp"
 #include "methodtable.hpp"
 
 
-namespace _SMERP {
+namespace _Wolframe {
 namespace mtproc {
 
    /// The connection handler
@@ -50,7 +50,7 @@ namespace mtproc {
       Network::connectionHandler* newSSLconnection( const Network::LocalSSLendpoint& local);
    };
 
-} // namespace _SMERP
+} // namespace _Wolframe
 
 #endif
 

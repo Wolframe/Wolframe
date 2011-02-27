@@ -11,7 +11,7 @@
 #include <QColor>
 #include <QRegExp>
 
-namespace _SMERP {
+namespace _Wolframe {
 	namespace QtClient {
 
 DebugTerminal::DebugTerminal( SMERPClient *_smerpClient, QWidget *_parent ) :
@@ -134,4 +134,4 @@ void DebugTerminal::lineReceived( QString line )
 }
 
 } // namespace QtClient
-} // namespace _SMERP
+} // namespace _Wolframe

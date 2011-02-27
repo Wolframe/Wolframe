@@ -3,10 +3,10 @@
 #include <cstring>
 #include <new>
 
-namespace _SMERP {
+namespace _Wolframe {
 namespace protocol {
 
-#ifdef _SMERP_LOWLEVEL_DEBUG
+#ifdef _Wolframe_LOWLEVEL_DEBUG
 static const char* eodStateName( EODState e)
 {
    static const char* ar[]={"SRC","LF","LF_DOT","LF_DOT_CR","LF_DOT_CR_LF"}; 

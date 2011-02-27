@@ -9,7 +9,7 @@
 #include <QtGui>
 #include <QBuffer>
 
-namespace _SMERP {
+namespace _Wolframe {
 	namespace QtClient {
 
 MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ), m_ui( 0 ), m_form( 0 )
@@ -231,4 +231,4 @@ void MainWindow::on_actionDebugTerminal_triggered( bool checked )
 }
 
 } // namespace QtClient
-} // namespace _SMERP
+} // namespace _Wolframe

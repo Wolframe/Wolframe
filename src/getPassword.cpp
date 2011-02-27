@@ -4,7 +4,7 @@
 
 #include <string>
 
-namespace _SMERP {
+namespace _Wolframe {
 	namespace Authentication {
 
 #if !defined(_WIN32)
@@ -63,4 +63,4 @@ namespace _SMERP {
 
 
 } // namespace Authentication
-} // namespace _SMERP
+} // namespace _Wolframe

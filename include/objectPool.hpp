@@ -12,7 +12,7 @@
 #include <boost/thread/condition_variable.hpp>
 
 
-namespace _SMERP	{
+namespace _Wolframe	{
 
 	// the object pool
 	template < typename objectType >
@@ -65,6 +65,6 @@ namespace _SMERP	{
 		unsigned				timeout_;
 	};
 
-} // namespace _SMERP
+} // namespace _Wolframe
 
 #endif // _OBJECT_POOL_HPP_INCLUDED

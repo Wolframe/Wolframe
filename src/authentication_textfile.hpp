@@ -10,7 +10,7 @@
 #include <map>
 #include <string>
 
-namespace _SMERP {
+namespace _Wolframe {
 	namespace Authentication {
 
 Authenticator *CreateTextFileAuthenticator( AuthenticatorFactory::properties props );
@@ -20,9 +20,9 @@ class TextFileAuthenticator : public Authenticator {
 		std::map< std::string, std::string > m_creds;
 		
 		enum {
-			_SMERP_TEXTFILE_STATE_NEED_LOGIN,
-			_SMERP_TEXTFILE_STATE_NEED_PASS,
-			_SMERP_TEXTFILE_STATE_COMPUTE
+			_Wolframe_TEXTFILE_STATE_NEED_LOGIN,
+			_Wolframe_TEXTFILE_STATE_NEED_PASS,
+			_Wolframe_TEXTFILE_STATE_COMPUTE
 		} m_state;
 		
 		std::string m_token;
@@ -39,6 +39,6 @@ class TextFileAuthenticator : public Authenticator {
 };
 
 } // namespace Authentication
-} // namespace _SMERP
+} // namespace _Wolframe
 
 #endif // _AUTHENTICATION_TEXTFILE_HPP_INCLUDED

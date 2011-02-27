@@ -2,12 +2,12 @@
 // pechoHandler.hpp - simple echo handler example with protocol
 //
 
-#ifndef _SMERP_PROTOCOL_ECHO_HANDLER_HPP_INCLUDED
-#define _SMERP_PROTOCOL_ECHO_HANDLER_HPP_INCLUDED
+#ifndef _Wolframe_PROTOCOL_ECHO_HANDLER_HPP_INCLUDED
+#define _Wolframe_PROTOCOL_ECHO_HANDLER_HPP_INCLUDED
 #include "connectionHandler.hpp"
 
 
-namespace _SMERP {
+namespace _Wolframe {
 namespace pecho {
 
    /// The connection handler
@@ -47,6 +47,6 @@ namespace pecho {
       Network::connectionHandler* newSSLconnection( const Network::LocalSSLendpoint& local);
    };
 
-} // namespace _SMERP
+} // namespace _Wolframe
 
-#endif // _SMERP_XMLSELECT_HANDLER_HPP_INCLUDED
+#endif // _Wolframe_XMLSELECT_HANDLER_HPP_INCLUDED

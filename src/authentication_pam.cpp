@@ -12,7 +12,7 @@
 #include <sstream>
 #include <stdexcept>
 
-namespace _SMERP {
+namespace _Wolframe {
 	namespace Authentication {
 
 Authenticator *CreatePAMAuthenticator( AuthenticatorFactory::properties props )
@@ -28,7 +28,7 @@ static int pam_conv_func(	int nmsg, const struct pam_message **msg,
 PAMAuthenticator::PAMAuthenticator( const std::string _service )
 	: m_service( _service )
 {
-	m_state = _SMERP_PAM_STATE_NEED_LOGIN;
+	m_state = _Wolframe_PAM_STATE_NEED_LOGIN;
 	m_appdata.h = NULL;
 	m_appdata.has_pass = false;
 	m_appdata.pass = "";
@@ -176,11 +176,11 @@ Step::AuthStep PAMAuthenticator::nextStep( )
 	int rc = 0;
 	
 	switch( m_state ) {
-		case _SMERP_PAM_STATE_NEED_LOGIN:
+		case _Wolframe_PAM_STATE_NEED_LOGIN:
 			m_token = "login";
-			return Step::_SMERP_AUTH_STEP_RECV_DATA;
+			return Step::_Wolframe_AUTH_STEP_RECV_DATA;
 			
-		case _SMERP_PAM_STATE_HAS_LOGIN:
+		case _Wolframe_PAM_STATE_HAS_LOGIN:
 // TODO: the service name must be a CONSTANT due to security reasons!
 			rc = pam_start( m_service.c_str( ), m_appdata.login.c_str( ), &m_conv, &m_appdata.h );
 			if( rc != PAM_SUCCESS ) {
@@ -193,21 +193,21 @@ Step::AuthStep PAMAuthenticator::nextStep( )
 // requiring a password.. intetionally no break here :-)
 
 // authenticate: are we who we claim to be?
-		case _SMERP_PAM_STATE_HAS_PASS:
+		case _Wolframe_PAM_STATE_HAS_PASS:
 			rc = pam_authenticate( m_appdata.h, 0 );
-			if( m_state == _SMERP_PAM_STATE_HAS_LOGIN && rc == PAM_INCOMPLETE ) {
+			if( m_state == _Wolframe_PAM_STATE_HAS_LOGIN && rc == PAM_INCOMPLETE ) {
 // we need a password, so drop out of authentication, keep the state and return in
-// _SMERP_PAM_STATE_HAS_PASS..
+// _Wolframe_PAM_STATE_HAS_PASS..
 				m_token = "password";
-				m_state = _SMERP_PAM_STATE_NEED_PASS;
-				return Step::_SMERP_AUTH_STEP_RECV_DATA;
+				m_state = _Wolframe_PAM_STATE_NEED_PASS;
+				return Step::_Wolframe_AUTH_STEP_RECV_DATA;
 			} else if( rc != PAM_SUCCESS ) {
 				std::ostringstream ss;
 				ss	<< "pam_authenticate failed with service " << m_service << ": "
 					<< pam_strerror( m_appdata.h, rc ) << " (" << rc << ")";
 				m_error = ss.str( );
-				m_state = _SMERP_PAM_STATE_ERROR;
-				return Step::_SMERP_AUTH_STEP_GET_ERROR;
+				m_state = _Wolframe_PAM_STATE_ERROR;
+				return Step::_Wolframe_AUTH_STEP_GET_ERROR;
 			}
 
 // is access to the account permitted?
@@ -217,8 +217,8 @@ Step::AuthStep PAMAuthenticator::nextStep( )
 				ss	<< "pam_acct_mgmt failed with service " << m_service << ": "
 					<< pam_strerror( m_appdata.h, rc ) << " (" << rc << ")";
 				m_error = ss.str( );
-				m_state = _SMERP_PAM_STATE_ERROR;
-				return Step::_SMERP_AUTH_STEP_GET_ERROR;
+				m_state = _Wolframe_PAM_STATE_ERROR;
+				return Step::_Wolframe_AUTH_STEP_GET_ERROR;
 			}
 
 // terminate PAM session with last exit code
@@ -230,24 +230,24 @@ Step::AuthStep PAMAuthenticator::nextStep( )
 				throw std::runtime_error( ss.str( ) );
 			}
 
-			m_state = _SMERP_PAM_STATE_NEED_LOGIN;
+			m_state = _Wolframe_PAM_STATE_NEED_LOGIN;
 			m_appdata.h = NULL;
 			m_appdata.pass = "";
 
 			if( rc == PAM_SUCCESS )
-				return Step::_SMERP_AUTH_STEP_SUCCESS;
+				return Step::_Wolframe_AUTH_STEP_SUCCESS;
 			else
-				return Step::_SMERP_AUTH_STEP_FAIL;
+				return Step::_Wolframe_AUTH_STEP_FAIL;
 		
-		case _SMERP_PAM_STATE_ERROR:
+		case _Wolframe_PAM_STATE_ERROR:
 			(void)pam_end( m_appdata.h, rc );
 			m_appdata.h = NULL;
 			m_appdata.has_pass = false;
 			m_appdata.pass = "";
-			m_state = _SMERP_PAM_STATE_NEED_LOGIN;
-			return Step::_SMERP_AUTH_STEP_FAIL;
+			m_state = _Wolframe_PAM_STATE_NEED_LOGIN;
+			return Step::_Wolframe_AUTH_STEP_FAIL;
 			
-		case _SMERP_PAM_STATE_NEED_PASS:
+		case _Wolframe_PAM_STATE_NEED_PASS:
 			throw new std::runtime_error( "Illegal state in PAMAuthenticator::nextStep!" );
 			break;
 		
@@ -256,19 +256,19 @@ Step::AuthStep PAMAuthenticator::nextStep( )
 			break;
 	}
 
-	return Step::_SMERP_AUTH_STEP_FAIL;
+	return Step::_Wolframe_AUTH_STEP_FAIL;
 }
 
 std::string PAMAuthenticator::sendData( )
 {
 	switch( m_state ) {
-		case _SMERP_PAM_STATE_ERROR:
+		case _Wolframe_PAM_STATE_ERROR:
 			return m_data;
 
-		case _SMERP_PAM_STATE_NEED_LOGIN:
-		case _SMERP_PAM_STATE_HAS_LOGIN:
-		case _SMERP_PAM_STATE_NEED_PASS:
-		case _SMERP_PAM_STATE_HAS_PASS:
+		case _Wolframe_PAM_STATE_NEED_LOGIN:
+		case _Wolframe_PAM_STATE_HAS_LOGIN:
+		case _Wolframe_PAM_STATE_NEED_PASS:
+		case _Wolframe_PAM_STATE_HAS_PASS:
 			throw new std::runtime_error( "Illegal state in PAMAuthenticator::sendData!" );
 			break;
 		
@@ -288,21 +288,21 @@ std::string PAMAuthenticator::token( )
 void PAMAuthenticator::receiveData( const std::string data )
 {
 	switch( m_state ) {
-		case _SMERP_PAM_STATE_NEED_LOGIN:
+		case _Wolframe_PAM_STATE_NEED_LOGIN:
 			m_appdata.login = data;
-			m_state = _SMERP_PAM_STATE_HAS_LOGIN;
+			m_state = _Wolframe_PAM_STATE_HAS_LOGIN;
 			break;
 		
-		case _SMERP_PAM_STATE_NEED_PASS:
+		case _Wolframe_PAM_STATE_NEED_PASS:
 			m_appdata.has_pass = true;
 			m_appdata.pass = data;
-			m_state = _SMERP_PAM_STATE_HAS_PASS;
+			m_state = _Wolframe_PAM_STATE_HAS_PASS;
 			break;
 
 // TODO: application exception		
-		case _SMERP_PAM_STATE_HAS_LOGIN:
-		case _SMERP_PAM_STATE_HAS_PASS:
-		case _SMERP_PAM_STATE_ERROR:
+		case _Wolframe_PAM_STATE_HAS_LOGIN:
+		case _Wolframe_PAM_STATE_HAS_PASS:
+		case _Wolframe_PAM_STATE_ERROR:
 			throw new std::runtime_error( "Illegal state in PAMAuthenticator::receiveData!" );
 			break;
 		
@@ -318,6 +318,6 @@ std::string PAMAuthenticator::getError( )
 }
 
 } // namespace Authentication
-} // namespace _SMERP
+} // namespace _Wolframe
 
 #endif // WITH_PAM

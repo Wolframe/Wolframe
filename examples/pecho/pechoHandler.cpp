@@ -5,8 +5,8 @@
 #include "pechoHandler.hpp"
 #include "logger.hpp"
 
-using namespace _SMERP;
-using namespace _SMERP::pecho;
+using namespace _Wolframe;
+using namespace _Wolframe::pecho;
 
 struct Connection::Private
 {

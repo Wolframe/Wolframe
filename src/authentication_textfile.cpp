@@ -9,7 +9,7 @@
 #include <stdexcept>
 #include <fstream>
 
-namespace _SMERP {
+namespace _Wolframe {
 	namespace Authentication {
 
 Authenticator *CreateTextFileAuthenticator( AuthenticatorFactory::properties props )
@@ -37,39 +37,39 @@ TextFileAuthenticator::TextFileAuthenticator( const std::string _filename )
 		f.close( );
 	}
 	
-	m_state = _SMERP_TEXTFILE_STATE_NEED_LOGIN;
+	m_state = _Wolframe_TEXTFILE_STATE_NEED_LOGIN;
 }
 
 Step::AuthStep TextFileAuthenticator::nextStep( )
 {
 	switch( m_state ) {
-		case _SMERP_TEXTFILE_STATE_NEED_LOGIN:
+		case _Wolframe_TEXTFILE_STATE_NEED_LOGIN:
 			m_token = "login";
-			return Step::_SMERP_AUTH_STEP_RECV_DATA;
+			return Step::_Wolframe_AUTH_STEP_RECV_DATA;
 		
-		case _SMERP_TEXTFILE_STATE_NEED_PASS:
+		case _Wolframe_TEXTFILE_STATE_NEED_PASS:
 			m_token = "password";
-			return Step::_SMERP_AUTH_STEP_RECV_DATA;
+			return Step::_Wolframe_AUTH_STEP_RECV_DATA;
 			
-		case _SMERP_TEXTFILE_STATE_COMPUTE:
+		case _Wolframe_TEXTFILE_STATE_COMPUTE:
 			std::map<std::string, std::string>::const_iterator it = m_creds.find( m_login );
 // user not in text file
 			if( it == m_creds.end( ) ) {
-				m_state = _SMERP_TEXTFILE_STATE_NEED_LOGIN;
-				return Step::_SMERP_AUTH_STEP_FAIL;
+				m_state = _Wolframe_TEXTFILE_STATE_NEED_LOGIN;
+				return Step::_Wolframe_AUTH_STEP_FAIL;
 			}
 // user found, but password doesn't match			
 			if( it->second != m_pass ) {
-				m_state = _SMERP_TEXTFILE_STATE_NEED_LOGIN;
-				return Step::_SMERP_AUTH_STEP_FAIL;			
+				m_state = _Wolframe_TEXTFILE_STATE_NEED_LOGIN;
+				return Step::_Wolframe_AUTH_STEP_FAIL;			
 			}
 			
 // everythink is peachy
-			m_state = _SMERP_TEXTFILE_STATE_NEED_LOGIN;
-			return Step::_SMERP_AUTH_STEP_SUCCESS;
+			m_state = _Wolframe_TEXTFILE_STATE_NEED_LOGIN;
+			return Step::_Wolframe_AUTH_STEP_SUCCESS;
 	}
 
-	return Step::_SMERP_AUTH_STEP_FAIL;
+	return Step::_Wolframe_AUTH_STEP_FAIL;
 }
 
 // never used
@@ -86,18 +86,18 @@ std::string TextFileAuthenticator::token( )
 void TextFileAuthenticator::receiveData( const std::string data )
 {
 	switch( m_state ) {
-		case _SMERP_TEXTFILE_STATE_NEED_LOGIN:
+		case _Wolframe_TEXTFILE_STATE_NEED_LOGIN:
 			m_login = data;
-			m_state = _SMERP_TEXTFILE_STATE_NEED_PASS;
+			m_state = _Wolframe_TEXTFILE_STATE_NEED_PASS;
 			break;
 		
-		case _SMERP_TEXTFILE_STATE_NEED_PASS:
+		case _Wolframe_TEXTFILE_STATE_NEED_PASS:
 			m_pass = data;
-			m_state = _SMERP_TEXTFILE_STATE_COMPUTE;
+			m_state = _Wolframe_TEXTFILE_STATE_COMPUTE;
 			break;
 
 // TODO: application exception		
-		case _SMERP_TEXTFILE_STATE_COMPUTE:
+		case _Wolframe_TEXTFILE_STATE_COMPUTE:
 			throw new std::runtime_error( "Illegal state in auhenticator" );
 			break;
 	}
@@ -109,4 +109,4 @@ std::string TextFileAuthenticator::getError( )
 }
 
 } // namespace Authentication
-} // namespace _SMERP
+} // namespace _Wolframe

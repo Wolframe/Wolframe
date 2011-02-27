@@ -7,7 +7,7 @@
 
 #include "connectionHandler.hpp"
 
-namespace _SMERP {
+namespace _Wolframe {
 	/// The connection handler
 	class echoConnection : public Network::connectionHandler
 	{
@@ -64,6 +64,6 @@ namespace _SMERP {
 		Network::connectionHandler* newSSLconnection( const Network::LocalSSLendpoint& local );
 	};
 
-} // namespace _SMERP
+} // namespace _Wolframe
 
 #endif // _ECHO_HANDLER_HPP_INCLUDED

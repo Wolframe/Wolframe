@@ -1,5 +1,5 @@
-#ifndef _SMERP_METHODTABLE_H_INCLUDED
-#define _SMERP_METHODTABLE_H_INCLUDED
+#ifndef _Wolframe_METHODTABLE_H_INCLUDED
+#define _Wolframe_METHODTABLE_H_INCLUDED
 
 typedef struct MethodData;
 
