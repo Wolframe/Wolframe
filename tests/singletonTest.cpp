@@ -22,7 +22,7 @@ public:
 	}
 };
 
-// The fixture for testing SMERP::Singleton
+// The fixture for testing _Wolframe::Singleton
 class SingletonFixture : public ::testing::Test	{
 protected:
 	SingletonFixture( ) {

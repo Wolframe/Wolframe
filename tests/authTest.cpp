@@ -40,7 +40,7 @@ int main( int argc, const char *argv[] )
 
 #ifdef WITH_PAM
 	AuthenticatorFactory::properties props2;
-	props2.push_back( AuthenticatorFactory::property( "service", std::string( "smerp" ) ) );
+	props2.push_back( AuthenticatorFactory::property( "service", std::string( "wolframe" ) ) );
 	AuthenticatorFactory::instance( ).registerAuthenticator( "PAM", CreatePAMAuthenticator, props2 );
 #endif
 

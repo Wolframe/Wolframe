@@ -1,11 +1,11 @@
 //
-// testing the boost logging library
+// testing the Logging library
 //
 
 #include "logger.hpp"
 #include <gtest/gtest.h>
 
-// The fixture for testing class SMERP::Version
+// The fixture for testing class _Wolframe::Logging
 class LoggingFixture : public ::testing::Test
 {
 	private:
@@ -23,10 +23,10 @@ class LoggingFixture : public ::testing::Test
 #ifndef _WIN32
 			logBack.setSyslogLevel( _Wolframe::LogLevel::LOGLEVEL_DATA );
 			logBack.setSyslogFacility( _Wolframe::SyslogFacility::_Wolframe_SYSLOG_FACILITY_USER );
-			logBack.setSyslogIdent( "smerptest" );
+			logBack.setSyslogIdent( "logTest" );
 #else
 			logBack.setEventlogLevel( _Wolframe::LogLevel::LOGLEVEL_DATA );
-			logBack.setEventlogSource( "smerptest" );
+			logBack.setEventlogSource( "logTest" );
 			logBack.setEventlogLog( "Application" );
 #endif
 		}
