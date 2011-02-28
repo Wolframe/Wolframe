@@ -14,9 +14,9 @@
 namespace _Wolframe {
 	namespace QtClient {
 
-DebugTerminal::DebugTerminal( SMERPClient *_smerpClient, QWidget *_parent ) :
+DebugTerminal::DebugTerminal( WolframeClient *_wolframeClient, QWidget *_parent ) :
 	QWidget( _parent, Qt::Tool | Qt::WindowTitleHint ),
-	m_smerpClient( _smerpClient )
+	m_wolframeClient( _wolframeClient )
 {
 	initialize( );
 }
@@ -51,8 +51,8 @@ void DebugTerminal::initialize( )
 
 	QObject::connect( m_input, SIGNAL( lineEntered( QString ) ), this, SLOT( lineEntered( QString ) ) );
 
-	QObject::connect( m_smerpClient, SIGNAL( error( QString ) ), this, SLOT( networkError( QString ) ) );
-	QObject::connect( m_smerpClient, SIGNAL( lineReceived( QString ) ), this, SLOT( lineReceived( QString ) ) );
+	QObject::connect( m_wolframeClient, SIGNAL( error( QString ) ), this, SLOT( networkError( QString ) ) );
+	QObject::connect( m_wolframeClient, SIGNAL( lineReceived( QString ) ), this, SLOT( lineReceived( QString ) ) );
 }
 
 DebugTerminal::~DebugTerminal( )
@@ -79,34 +79,34 @@ void DebugTerminal::lineEntered( QString line )
 		if( rx.indexIn( line ) != -1 ) {
 			QString host = rx.cap( 1 );
 			unsigned short port = rx.cap( 2 ).toUShort( );
-			m_smerpClient->setHost( host );
-			m_smerpClient->setPort( port );
+			m_wolframeClient->setHost( host );
+			m_wolframeClient->setPort( port );
 #ifdef WITH_SSL
-			m_smerpClient->setSecure( line.toLower( ).startsWith( "sconnect" ) );
+			m_wolframeClient->setSecure( line.toLower( ).startsWith( "sconnect" ) );
 #endif
-			m_smerpClient->connect( );
+			m_wolframeClient->connect( );
 		} else {
 			m_output->setTextColor( QColor( "red" ) );
 			m_output->append( "illegal connect parameters, expecting '(s)connect <host>:<port>'.." );
 			m_output->setTextColor( QColor( "black" ) );
 		}
 	} else if( line.toLower( ).startsWith( "quit" ) ) {
-		m_smerpClient->disconnect( );
+		m_wolframeClient->disconnect( );
 	} else if( line.toLower( ).startsWith( "help" ) ) {
 		m_output->setTextColor( QColor( "blue" ) );
 		m_output->append( "HELP - show this help page" );
-		m_output->append( "CONNECT host:port - connect to SMERP server (insecure)" );
+		m_output->append( "CONNECT host:port - connect to Wolframe server (insecure)" );
 #ifdef WITH_SSL
-		m_output->append( "SCONNECT host:port - connect to SMERP server (secure)" );
+		m_output->append( "SCONNECT host:port - connect to Wolframe server (secure)" );
 #endif
-		m_output->append( "QUIT - terminate connection to SMERP server" );
+		m_output->append( "QUIT - terminate connection to Wolframe server" );
 		m_output->setTextColor( QColor( "black" ) );
 	} else if( line.toLower( ).startsWith( "caps" ) ) {
 		m_output->setTextColor( QColor( "blue" ) );
 		m_output->append( "OK QUIT CAPS" );
 		m_output->setTextColor( QColor( "black" ) );
 	} else {
-		m_smerpClient->sendLine( line );
+		m_wolframeClient->sendLine( line );
 	}
 }
 

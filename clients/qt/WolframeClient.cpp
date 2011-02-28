@@ -1,8 +1,8 @@
 //
-// SMERPClient.cpp
+// WolframeClient.cpp
 //
 
-#include "SMERPClient.hpp"
+#include "WolframeClient.hpp"
 
 #include <QByteArray>
 #include <QTcpSocket>
@@ -11,7 +11,7 @@
 namespace _Wolframe {
 	namespace QtClient {
 
-SMERPClient::SMERPClient( QWidget *_parent ) :
+WolframeClient::WolframeClient( QWidget *_parent ) :
 	m_state( Disconnected ),
 	m_parent( _parent ),
 	m_hasErrors( false )
@@ -42,7 +42,7 @@ SMERPClient::SMERPClient( QWidget *_parent ) :
 }
 
 #ifdef WITH_SSL
-void SMERPClient::initializeSsl( )
+void WolframeClient::initializeSsl( )
 {
 	if( m_initializedSsl ) return;
 
@@ -57,7 +57,7 @@ void SMERPClient::initializeSsl( )
 	m_initializedSsl = true;
 }
 
-QSslCertificate SMERPClient::getCertificate( QString filename )
+QSslCertificate WolframeClient::getCertificate( QString filename )
 {
 	QFile file( filename );
 
@@ -78,7 +78,7 @@ QSslCertificate SMERPClient::getCertificate( QString filename )
 	return cert;
 }
 
-void SMERPClient::sslErrors( const QList<QSslError> &errors )
+void WolframeClient::sslErrors( const QList<QSslError> &errors )
 {
 	m_hasErrors = true;
 	foreach( const QSslError &e, errors )
@@ -88,24 +88,24 @@ void SMERPClient::sslErrors( const QList<QSslError> &errors )
 	reinterpret_cast<QSslSocket *>( m_socket )->ignoreSslErrors( );
 }
 
-void SMERPClient::peerVerifyError( const QSslError &e )
+void WolframeClient::peerVerifyError( const QSslError &e )
 {
 	m_hasErrors = true;
 	emit error( e.errorString( ) );
 }
 
-void SMERPClient::encrypted( )
+void WolframeClient::encrypted( )
 {
 	emit error( m_hasErrors ? tr( "Channel is encrypted, but there were errors on the way." ) : tr( "Channel is encrypted now." ) );
 }
 #endif
 
-SMERPClient::~SMERPClient( )
+WolframeClient::~WolframeClient( )
 {
 	delete m_socket;
 }
 
-void SMERPClient::connect( )
+void WolframeClient::connect( )
 {
 	switch( m_state ) {
 		case Disconnected:
@@ -139,7 +139,7 @@ void SMERPClient::connect( )
 	}
 }
 
-void SMERPClient::disconnect( )
+void WolframeClient::disconnect( )
 {
 	m_hasErrors = false;
 
@@ -166,7 +166,7 @@ void SMERPClient::disconnect( )
 	}
 }
 
-void SMERPClient::error( QAbstractSocket::SocketError _error )
+void WolframeClient::error( QAbstractSocket::SocketError _error )
 {
 	switch( m_state ) {
 		case Disconnected:
@@ -206,7 +206,7 @@ void SMERPClient::error( QAbstractSocket::SocketError _error )
 	}
 }
 
-void SMERPClient::connected( )
+void WolframeClient::connected( )
 {
 	switch( m_state ) {
 		case Disconnected:
@@ -231,7 +231,7 @@ void SMERPClient::connected( )
 	}
 }
 
-void SMERPClient::disconnected( )
+void WolframeClient::disconnected( )
 {
 	switch( m_state ) {
 		case AboutToConnect:
@@ -250,7 +250,7 @@ void SMERPClient::disconnected( )
 	}
 }
 
-void SMERPClient::dataAvailable( )
+void WolframeClient::dataAvailable( )
 {
 	switch( m_state ) {
 		case Disconnected:
@@ -273,7 +273,7 @@ void SMERPClient::dataAvailable( )
 	}
 }
 
-void SMERPClient::sendLine( QString line )
+void WolframeClient::sendLine( QString line )
 {
 	m_socket->write( line.toAscii( ).append( "\n" ) );
 	m_socket->flush( );

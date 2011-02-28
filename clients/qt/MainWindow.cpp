@@ -21,7 +21,7 @@ MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ), m_ui( 0 ), m_fo
 MainWindow::~MainWindow( )
 {
 	delete m_debugTerminal;
-	delete m_smerpClient;
+	delete m_wolframeClient;
 	delete m_formLoader;
 }
 
@@ -31,10 +31,10 @@ void MainWindow::initialize( )
 	loadTheme( QString( QLatin1String( "windows" ) ) );
 
 // create a SMERP protocol client
-	m_smerpClient = new SMERPClient( );
+	m_wolframeClient = new WolframeClient( );
 
 // create debuging terminal
-	m_debugTerminal = new DebugTerminal( m_smerpClient, this );
+	m_debugTerminal = new DebugTerminal( m_wolframeClient, this );
 }
 
 void MainWindow::populateThemesMenu( )

@@ -9,7 +9,7 @@
 
 #include "FileFormLoader.hpp"
 #include "DebugTerminal.hpp"
-#include "SMERPClient.hpp"
+#include "WolframeClient.hpp"
 
 namespace _Wolframe {
 	namespace QtClient {
@@ -29,7 +29,7 @@ namespace _Wolframe {
 		QString m_currentForm;		// the name of the form currently visible
 		FileFormLoader *m_formLoader;	// a simple form loader for testing (for now)
 		DebugTerminal *m_debugTerminal;	// protocol debug terminal (interactive)
-		SMERPClient *m_smerpClient;	// the client protocol class
+		WolframeClient *m_wolframeClient; // the client protocol class
 
 		void initialize( );
 		void populateThemesMenu( );

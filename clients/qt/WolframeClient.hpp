@@ -1,5 +1,5 @@
 //
-// SMERPClient.hpp
+// WolframeClient.hpp
 //
 
 #ifndef _Wolframe_CLIENT_HPP_INCLUDED
@@ -17,7 +17,7 @@
 namespace _Wolframe {
 	namespace QtClient {
 
-	class SMERPClient : public QObject
+	class WolframeClient : public QObject
 	{
 	Q_OBJECT
 
@@ -43,8 +43,8 @@ namespace _Wolframe {
 #endif
 
 	public:
-		SMERPClient( QWidget *_parent = 0 );
-		virtual ~SMERPClient( );
+		WolframeClient( QWidget *_parent = 0 );
+		virtual ~WolframeClient( );
 
 		void connect( );
 		void disconnect( );

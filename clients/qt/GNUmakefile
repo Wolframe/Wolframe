@@ -48,7 +48,7 @@ OBJS = \
 	moc_DebugTerminal.o \
 	HistoryLineEdit.o \
 	moc_HistoryLineEdit.o \
-	SMERPClient.o \
+	WolframeClient.o \
 	moc_WolframeClient.o
 
 CPP_BINS = \
@@ -70,8 +70,8 @@ moc_DebugTerminal.cpp: DebugTerminal.hpp
 moc_AbstractFormLoader.cpp: AbstractFormLoader.hpp
 	$(QT_DIR)/bin/moc $(MOC_FLAGS) AbstractFormLoader.hpp -o moc_AbstractFormLoader.cpp
 
-moc_WolframeClient.cpp: SMERPClient.hpp
-	$(QT_DIR)/bin/moc $(MOC_FLAGS) SMERPClient.hpp -o moc_WolframeClient.cpp
+moc_WolframeClient.cpp: WolframeClient.hpp
+	$(QT_DIR)/bin/moc $(MOC_FLAGS) WolframeClient.hpp -o moc_WolframeClient.cpp
 
 local_clean:
 	@-rm -f moc_*.cpp

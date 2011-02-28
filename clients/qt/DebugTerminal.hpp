@@ -9,7 +9,7 @@
 #include <QTextEdit>
 
 #include "HistoryLineEdit.hpp"
-#include "SMERPClient.hpp"
+#include "WolframeClient.hpp"
 
 namespace _Wolframe {
 	namespace QtClient {
@@ -21,10 +21,10 @@ namespace _Wolframe {
 	private:
 		QTextEdit *m_output;
 		HistoryLineEdit *m_input;
-		SMERPClient *m_smerpClient;
+		WolframeClient *m_wolframeClient;
 
 	public:
-		DebugTerminal( SMERPClient *_smerpClient, QWidget *_parent = 0 );
+		DebugTerminal( WolframeClient *_wolframeClient, QWidget *_parent = 0 );
 		virtual ~DebugTerminal( );
 		void bringToFront( );
 	
