@@ -30,7 +30,7 @@ void MainWindow::initialize( )
 // load default theme
 	loadTheme( QString( QLatin1String( "windows" ) ) );
 
-// create a SMERP protocol client
+// create a Wolframe protocol client
 	m_wolframeClient = new WolframeClient( );
 
 // create debuging terminal
