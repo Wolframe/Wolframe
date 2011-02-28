@@ -20,7 +20,7 @@ test.bat
 *.RES
 simple_event_log.h
 *.rc
-src/Wolframed
+src/wolframed
 tests/testNamedRetVal
 tests/singletonTest
 tests/versionTest
