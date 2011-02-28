@@ -59,8 +59,8 @@ help:
 
 .PHONY: config
 config:
-	@echo "Build Configuration for SMERP"
-	@echo "-----------------------------"
+	@echo "Build Configuration for Wolframe"
+	@echo "--------------------------------"
 	@echo
 	@echo "Operating system: $(PLATFORM), $(OS_MAJOR_VERSION).$(OS_MINOR_VERSION)"
 ifeq "$(PLATFORM)" "LINUX"

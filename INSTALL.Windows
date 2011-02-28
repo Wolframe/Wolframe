@@ -19,7 +19,7 @@ https://svn.boost.org/trac/boost/ticket/4487
 
 Install for instance into C:\Program Files\Boost\Boost_1_44
 
-configure SMERP in makefile\nmake\config.mk and 
+configure 'makefile\nmake\config.mk' and 
 set BOOST_DIR to C:\Program Files\Boost\Boost_1_44
 
 Compile and install boost
