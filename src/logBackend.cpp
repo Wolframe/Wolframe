@@ -29,7 +29,7 @@
 #endif // !defined( _WIN32 )
 
 #if defined( _WIN32 )
-#include "smerpmsg.h"
+#include "wolframemsg.h"
 #endif // defined( _WIN32 )
 
 #include <sstream>
