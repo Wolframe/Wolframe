@@ -55,7 +55,7 @@ void ConsoleLogBackend::setLevel( const LogLevel::Level level )
 	logLevel_ = level;
 }
 
-inline void ConsoleLogBackend::log( SMERP_UNUSED const LogComponent::Component component, const LogLevel::Level level, const std::string& msg )
+inline void ConsoleLogBackend::log( WOLFRAME_UNUSED const LogComponent::Component component, const LogLevel::Level level, const std::string& msg )
 {
 	if ( level >= logLevel_ ) {
 		std::cerr << level << ": " << msg << std::endl;
@@ -360,7 +360,7 @@ static DWORD messageIdToEventlogId( DWORD eventLogLevel )
 	return( eventId | 0x0FFF0000L | ( mask << 30 ) );
 }
 
-inline void EventlogBackend::log( SMERP_UNUSED const LogComponent::Component component, const LogLevel::Level level, const std::string& msg )
+inline void EventlogBackend::log( WOLFRAME_UNUSED const LogComponent::Component component, const LogLevel::Level level, const std::string& msg )
 {
 	if ( level >= logLevel_ ) {
 		LPCSTR msg_arr[1];

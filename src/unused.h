@@ -1,11 +1,11 @@
 //
-// UNUSED
+// unused.h
 //
 
 /* mark variables as being unused */
 
-#ifndef __PORT_UNUSED_H
-#define __PORT_UNUSED_H
+#ifndef __WOLFRAME_UNUSED_H
+#define __WOLFRAME_UNUSED_H
 
 /**
  * @brief Macro to avoid unused parameter messages in functions
@@ -13,9 +13,9 @@
  * __attribute__(unused) creates trouble at least on OpeBSD 4.5..
  */
 #ifdef __GNUC__
-#define SMERP_UNUSED __attribute__((unused))
+#define WOLFRAME_UNUSED __attribute__((unused))
 #else
-#define SMERP_UNUSED
+#define WOLFRAME_UNUSED
 #endif
 
-#endif /* ifndef __PORT_UNUSED_H */
+#endif /* ifndef __WOLFRAME_UNUSED_H */

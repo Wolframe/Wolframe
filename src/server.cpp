@@ -18,7 +18,7 @@ namespace _Wolframe {
 	namespace Network	{
 
 		server::server( const std::list<ServerTCPendpoint>& TCPserver,
-				SMERP_UNUSED const std::list<ServerSSLendpoint>& SSLserver,
+				WOLFRAME_UNUSED const std::list<ServerSSLendpoint>& SSLserver,
 				_Wolframe::ServerHandler& serverHandler,
 				unsigned threads, unsigned maxConnections )
 					: threadPoolSize_( threads ),
