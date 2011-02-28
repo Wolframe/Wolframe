@@ -28,5 +28,6 @@ wolframe.conf.5: wolframe.conf-man.xml
 local_clean:
 
 local_distclean:
+	-rm -rf doxygen/*
 
 local_test:
