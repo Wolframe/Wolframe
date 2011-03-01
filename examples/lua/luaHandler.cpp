@@ -112,7 +112,7 @@ namespace _Wolframe {
 		lua_call( l, 1, 0 );
 
 		// TODO: script location, also configurable
-		int res = luaL_loadfile( l, "echo.lua" );
+		int res = luaL_loadfile( l, "echo.lua" /*TODO: how to get the handler config here?! handlerConfig->luaConfig->script*/ );
 		if( res != 0 ) {
 			LOG_FATAL << "Unable to load LUA code 'echo.lua': " << lua_tostring( l, -1 );
 			lua_pop( l, 1 );

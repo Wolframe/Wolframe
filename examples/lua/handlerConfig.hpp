@@ -10,14 +10,14 @@
 namespace _Wolframe {
 
 	/// echo configuration
-	struct EchoConfiguration : public _Wolframe::Configuration::ConfigurationBase
+	struct LuaConfiguration : public _Wolframe::Configuration::ConfigurationBase
 	{
 	public:
-		unsigned short		timeout;
+		std::string		script;
 
 		/// constructor
-		EchoConfiguration( const std::string& node, const std::string& header )
-			: ConfigurationBase( node, header )	{ timeout = 0; }
+		LuaConfiguration( const std::string& node, const std::string& header )
+			: ConfigurationBase( node, header )	{ }
 		/// methods
 		bool parse( boost::property_tree::ptree& pt, std::ostream& os );
 		bool check( std::ostream& os ) const;
@@ -32,12 +32,12 @@ namespace _Wolframe {
 	struct HandlerConfiguration
 	{
 	public:
-		EchoConfiguration	*echoConfig;
+		LuaConfiguration	*luaConfig;
 
 		/// constructor
 		HandlerConfiguration()
 		{
-			echoConfig = new EchoConfiguration( "timeout", "Echo Server" );
+			luaConfig = new LuaConfiguration( "lua", "Lua Example Server" );
 		}
 	};
 

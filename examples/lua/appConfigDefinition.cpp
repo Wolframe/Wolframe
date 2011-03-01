@@ -22,7 +22,7 @@ ApplicationConfiguration::ApplicationConfiguration()
 
 	section["server"] = 0, conf.push_back( srvConfig );
 	section["logging"] = 1, conf.push_back( logConfig );
-	section["timeout"] = 2, conf.push_back( handlerConfig->echoConfig );
+	section["lua"] = 2, conf.push_back( handlerConfig->luaConfig );
 }
 
 	} // namespace Configuration
