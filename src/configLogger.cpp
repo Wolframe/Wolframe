@@ -104,7 +104,7 @@ void LoggerConfiguration::foreground( LogLevel::Level debugLevel, bool useConfig
 }
 
 
-bool LoggerConfiguration::parse( boost::property_tree::ptree& pt, std::ostream& os )
+bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, std::ostream& os )
 {
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		// stderr logging

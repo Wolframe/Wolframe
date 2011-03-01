@@ -34,7 +34,7 @@ bool LuaConfiguration::check( std::ostream& os ) const
 }
 
 
-bool LuaConfiguration::parse( boost::property_tree::ptree& pt, std::ostream& os )
+bool LuaConfiguration::parse( const boost::property_tree::ptree& pt, std::ostream& os )
 {
 	for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
 		if ( boost::algorithm::iequals( it->first, "script" ))	{

@@ -48,7 +48,7 @@ namespace _Wolframe {
 			ServerConfiguration( const std::string& node, const std::string& header );
 
 			/// methods
-			bool parse( boost::property_tree::ptree& pt, std::ostream& os );
+			bool parse( const boost::property_tree::ptree& pt, std::ostream& os );
 			bool check( std::ostream& os ) const;
 			void print( std::ostream& os ) const;
 
@@ -88,7 +88,7 @@ namespace _Wolframe {
 			LoggerConfiguration( const std::string& node, const std::string& header );
 
 			/// methods
-			bool parse( boost::property_tree::ptree& pt, std::ostream& os );
+			bool parse( const boost::property_tree::ptree& pt, std::ostream& os );
 			bool check( std::ostream& os ) const;
 			void print( std::ostream& os ) const;
 
@@ -114,7 +114,7 @@ namespace _Wolframe {
 			DatabaseConfiguration( const std::string& node, const std::string& header )
 				: ConfigurationBase( node, header )	{ port = 0; connections = 0; }
 			/// methods
-			bool parse( boost::property_tree::ptree& pt, std::ostream& os );
+			bool parse( const boost::property_tree::ptree& pt, std::ostream& os );
 			bool check( std::ostream& os ) const;
 			void print( std::ostream& os ) const;
 

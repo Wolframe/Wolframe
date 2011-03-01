@@ -116,7 +116,7 @@ ServerConfiguration::ServerConfiguration( const std::string& node, const std::st
 
 
 /// Parse the configuration
-bool ServerConfiguration::parse( boost::property_tree::ptree& pt, std::ostream& os )
+bool ServerConfiguration::parse( const boost::property_tree::ptree& pt, std::ostream& os )
 {
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "threads" ))	{

@@ -19,7 +19,7 @@ namespace _Wolframe {
 		LuaConfiguration( const std::string& node, const std::string& header )
 			: ConfigurationBase( node, header )	{ }
 		/// methods
-		bool parse( boost::property_tree::ptree& pt, std::ostream& os );
+		bool parse( const boost::property_tree::ptree& pt, std::ostream& os );
 		bool check( std::ostream& os ) const;
 		void print( std::ostream& os ) const;
 

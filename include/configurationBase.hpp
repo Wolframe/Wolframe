@@ -30,7 +30,7 @@ namespace _Wolframe {
 			const std::string& root() const		{ return root_; }
 			const std::string& displayStr()	const	{ return dispStr_; }
 
-			virtual bool parse( boost::property_tree::ptree& pt, std::ostream& os ) = 0;
+			virtual bool parse( const boost::property_tree::ptree& pt, std::ostream& os ) = 0;
 
 			/// Check if the server configuration makes sense
 			///

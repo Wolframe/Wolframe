@@ -31,7 +31,7 @@ bool EchoConfiguration::check( std::ostream& ) const
 }
 
 
-bool EchoConfiguration::parse( boost::property_tree::ptree& pt, std::ostream& os )
+bool EchoConfiguration::parse( const boost::property_tree::ptree& pt, std::ostream& os )
 {
 	for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
 		if ( boost::algorithm::iequals( it->first, "timeout" ))	{
