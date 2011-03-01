@@ -190,7 +190,11 @@ CommandDispatcher::IOState CommandDispatcher::call( int& returnCode)
             {
                case protocol::Generator::Init:
                case protocol::Generator::Processing:
-                  return WriteOutput;
+               case protocol::Generator::EndOfInput:
+                  if (m_context.output && m_context.output->pos()) return WriteOutput;
+                  LOG_DATA << "End of Method Call";
+                  resetCommand();
+                  return Close;
 
                case protocol::Generator::Error:
                   returnCode = m_context.contentIterator->getError();
@@ -198,33 +202,16 @@ CommandDispatcher::IOState CommandDispatcher::call( int& returnCode)
                   resetCommand();
                   return Close;
 
-               case protocol::Generator::EndOfInput:
-                  if (m_context.output && m_context.output->pos())
-                  {
-                     return WriteOutput;
-                  }
-                  else
-                  {
-                     LOG_DATA << "End of Method Call";
-                     resetCommand();
-                     return Close;
-                  }
-
                case protocol::Generator::EndOfMessage:
                   return ReadInput;
             }
          }
          else
          {
-            if (m_context.output && m_context.output->pos())
-            {
-               return WriteOutput;
-            }
-            else
-            {
-               resetCommand();
-               return Close;
-            }
+            if (m_context.output && m_context.output->pos()) return WriteOutput;
+            LOG_DATA << "End of Method Call";
+            resetCommand();
+            return Close;
          }
       }
    }
