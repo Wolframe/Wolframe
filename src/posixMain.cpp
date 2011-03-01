@@ -48,11 +48,11 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 		std::cerr << "Unable to set locale. Falling back to default." << std::endl;
 	}
 	else	{
-		if ( bindtextdomain( "SMERP", "../po" ) == NULL )	{
+		if ( bindtextdomain( "Wolframe", "../po" ) == NULL )	{
 			std::cerr << "Not enough memory to bind textdomain" << std::endl;
 			return _Wolframe::ErrorCodes::FAILURE;
 		}
-		if ( textdomain( "SMERP" ) == NULL )	{
+		if ( textdomain( "Wolframe" ) == NULL )	{
 			std::cerr << "Not enough memory to set textdomain" << std::endl;
 			return _Wolframe::ErrorCodes::FAILURE;
 		}

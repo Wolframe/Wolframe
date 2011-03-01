@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ${DOMAIN}.pot is used as the extracted message file
-DOMAIN="SMERP"
+DOMAIN="Wolframe"
 LOCALES="ro de"
 EXTENSIONS="hpp cpp"
 

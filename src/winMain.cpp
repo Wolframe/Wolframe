@@ -89,7 +89,7 @@ static void registerEventlog( const _Wolframe::Configuration::ApplicationConfigu
 	DWORD eventTypes = EVENTLOG_ERROR_TYPE | EVENTLOG_WARNING_TYPE | EVENTLOG_INFORMATION_TYPE;
 	registrySetWord( h, "TypesSupported", eventTypes );
 
-// exactly one category for now (smerp)
+// exactly one category for now (Wolframe)
 	registrySetWord( h, "CategoryCount", (DWORD)1 );
 
 	(void)RegCloseKey( h );

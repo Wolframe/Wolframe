@@ -9,7 +9,7 @@
 
 namespace _Wolframe {
 
-	/// SMERP handler configuration structure
+	/// Wolrame handler configuration structure
 	struct HandlerConfiguration
 	{
 	public:

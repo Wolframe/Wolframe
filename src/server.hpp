@@ -18,7 +18,7 @@
 namespace _Wolframe {
 	namespace Network	{
 
-		/// The top-level class of the SMERP network server.
+		/// The top-level class of the Wolframe network server.
 		class server: private boost::noncopyable
 		{
 			/// public interface

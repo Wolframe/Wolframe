@@ -20,7 +20,7 @@
 namespace _Wolframe {
 	namespace Network {
 
-/// acceptor class of the SMERP network server.
+/// acceptor class of the Wolframe network server.
 class acceptor: private boost::noncopyable
 {
 /// public interface
@@ -60,7 +60,7 @@ private:
 
 #ifdef WITH_SSL
 
-/// SSL acceptor class of the SMERP network server.
+/// SSL acceptor class of the Wolframe network server.
 class SSLacceptor: private boost::noncopyable
 {
 /// public interface
