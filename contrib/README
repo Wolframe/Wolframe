@@ -1,5 +1,5 @@
 various contributions
 
 create_qtcreator_files.sh	- create *.files for qtcreator
-valgrind-suppressions		- known problems when testing SMERP
+valgrind-suppressions		- known problems when testing
 				  with valgrind memcheck/leakcheck
