@@ -349,13 +349,13 @@ static DWORD messageIdToEventlogId( DWORD eventLogLevel )
 
 	switch( eventLogLevel ) {
 		case EVENTLOG_ERROR_TYPE:
-			eventId = SMERP_EVENTID_ERROR; mask = 3; break;
+			eventId = WOLFRAME_EVENTID_ERROR; mask = 3; break;
 		case EVENTLOG_WARNING_TYPE:
-			eventId = SMERP_EVENTID_WARNING; mask = 2; break;
+			eventId = WOLFRAME_EVENTID_WARNING; mask = 2; break;
 		case EVENTLOG_INFORMATION_TYPE:
-			eventId = SMERP_EVENTID_INFO; mask = 1; break;
+			eventId = WOLFRAME_EVENTID_INFO; mask = 1; break;
 		default:
-			eventId = SMERP_EVENTID_ERROR; mask = 3;
+			eventId = WOLFRAME_EVENTID_ERROR; mask = 3;
 	}
 	return( eventId | 0x0FFF0000L | ( mask << 30 ) );
 }

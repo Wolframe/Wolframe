@@ -1,4 +1,4 @@
-;// messages file for SMERP messages
+;// messages file for Wolframe messages
 
 ;// language codes for translated messages
 ;// (409 ist the windows locale for en-US)
@@ -16,9 +16,9 @@ LanguageNames = (
 ;// field is quite small.
 
 MessageId = 1
-SymbolicName = SMERP_CATEGORY
+SymbolicName = WOLFRAME_CATEGORY
 Language = English
-Smerp
+Wolframe
 .
 
 ;// event log severity levels (severity bits)
@@ -43,7 +43,7 @@ MessageIdTypedef = DWORD
 MessageId = 0x100
 Severity = Error
 Facility = Application
-SymbolicName = SMERP_EVENTID_ERROR
+SymbolicName = WOLFRAME_EVENTID_ERROR
 Language = English
 %1
 .
@@ -51,7 +51,7 @@ Language = English
 MessageId = 0x101
 Severity = Warning
 Facility = Application
-SymbolicName = SMERP_EVENTID_WARNING
+SymbolicName = WOLFRAME_EVENTID_WARNING
 Language = English
 %1
 .
@@ -59,7 +59,7 @@ Language = English
 MessageId = 0x102
 Severity = Informational
 Facility = Application
-SymbolicName = SMERP_EVENTID_INFO
+SymbolicName = WOLFRAME_EVENTID_INFO
 Language = English
 %1
 .
