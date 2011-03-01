@@ -188,7 +188,12 @@ bool LoggerConfiguration::parse( boost::property_tree::ptree& pt, std::ostream& 
 				}
 			}
 		}
-#if !defined( _WIN32 )
+#if defined( _WIN32 )
+		// syslog
+		else if ( boost::algorithm::iequals( L1it->first, "syslog" ))	{
+			os << "WARNING: " << displayStr() << ": syslog is not defined on Windows";
+		}
+#else // if defined( _WIN32 )
 		// syslog
 		else if ( boost::algorithm::iequals( L1it->first, "syslog" ))	{
 			if ( logToSyslog )	{
@@ -248,7 +253,12 @@ bool LoggerConfiguration::parse( boost::property_tree::ptree& pt, std::ostream& 
 			}
 		}
 #endif	// !defined( _WIN32 )
-#if defined( _WIN32 )
+
+#if !defined( _WIN32 )
+		else if ( boost::algorithm::iequals( L1it->first, "eventlog" ))	{
+			os << "WARNING: " << displayStr() << ": event log is defined only on Windows";
+		}
+#else // if !defined( _WIN32 )
 		// event log
 		else if ( boost::algorithm::iequals( L1it->first, "eventlog" ))	{
 			if ( logToEventlog )	{

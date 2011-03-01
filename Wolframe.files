@@ -46,9 +46,11 @@ clients/qt/Makefile.W32
 clients/qt/qtclient.cpp
 clients/qt/WolframeClient.cpp
 clients/qt/WolframeClient.hpp
+docs/doxygen.conf
 docs/GNUmakefile
 examples/echo/appConfigDefinition.cpp
 examples/echo/appProperties.cpp
+examples/echo/echo.conf
 examples/echo/echoConfig.cpp
 examples/echo/echod.cpp
 examples/echo/echoHandler.cpp
@@ -63,6 +65,7 @@ examples/lua/.Attic/luahelpers.c
 examples/lua/.Attic/luahelpers.h
 examples/lua/GNUmakefile
 examples/lua/handlerConfig.hpp
+examples/lua/lua.conf
 examples/lua/luaConfig.cpp
 examples/lua/luad.cpp
 examples/lua/luaHandler.cpp
@@ -83,6 +86,7 @@ examples/mtproc/implementation.cpp
 examples/mtproc/implementation.hpp
 examples/mtproc/Makefile.W32
 examples/mtproc/methodtable.hpp
+examples/mtproc/mtproc.conf
 examples/mtproc/mtprocConfig.cpp
 examples/mtproc/mtprocd.cpp
 examples/mtproc/mtprocHandler.cpp
@@ -92,6 +96,7 @@ examples/pecho/appProperties.cpp
 examples/pecho/GNUmakefile
 examples/pecho/handlerConfig.hpp
 examples/pecho/Makefile.W32
+examples/pecho/pecho.conf
 examples/pecho/pechoConfig.cpp
 examples/pecho/pechod.cpp
 examples/pecho/pechoHandler.cpp
@@ -167,10 +172,13 @@ src/server.hpp
 src/unused.h
 src/version.cpp
 src/winMain.cpp
+src/wolframe.conf
 src/wolframed.cpp
 src/wolframeHandler.cpp
 src/wolframeHandler.hpp
 tests/authTest.cpp
+tests/config/wolframe-posix.conf
+tests/config/wolframe-win.conf
 tests/counterTest.cpp
 tests/GNUmakefile
 tests/logTest.cpp
@@ -185,7 +193,3 @@ tests/testHandlerTemplates.hpp
 tests/testNamedRetVal.cpp
 tests/threadLeakTest.cpp
 tests/versionTest.cpp
-examples/mtproc/mtproc.conf
-examples/lua/lua.conf
-examples/echo/echo.conf
-examples/pecho/pecho.conf

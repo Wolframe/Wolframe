@@ -123,7 +123,11 @@ bool ServerConfiguration::parse( boost::property_tree::ptree& pt, std::ostream& 
 			if ( ! getUnsignedShortValue( L1it, displayStr(), "threads", threads, os ))
 				return false;
 		}
-#if !defined(_WIN32)
+#if defined(_WIN32)
+		else if ( boost::algorithm::iequals( L1it->first, "daemon" ))	{
+			os << "WARNING: " << displayStr() << ": daemon is not defined on Windows" << std::endl;
+		}
+#else // #if defined(_WIN32)
 		else if ( boost::algorithm::iequals( L1it->first, "daemon" ))	{
 			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
 									L2it != L1it->second.end(); L2it++ )	{
@@ -146,7 +150,11 @@ bool ServerConfiguration::parse( boost::property_tree::ptree& pt, std::ostream& 
 			}
 		}
 #endif
-#if defined(_WIN32)
+#if !defined(_WIN32)
+		else if ( boost::algorithm::iequals( L1it->first, "service" ))	{
+			os << "WARNING: " << displayStr() << ": service is defined only on Windows" << std::endl;
+		}
+#else // #if defined(_WIN32)
 		else if ( boost::algorithm::iequals( L1it->first, "service" ))	{
 			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
 									L2it != L1it->second.end(); L2it++ )	{
