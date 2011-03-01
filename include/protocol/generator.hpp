@@ -113,6 +113,7 @@ struct FormatOutput
    void* cur() const                 {return (void*)((char*)m_ptr+m_pos);}
    unsigned int restsize() const     {return (m_pos<m_size)?(m_size-m_pos):0;}
    unsigned int pos() const          {return m_pos;}
+   unsigned int size() const         {return m_size;}
    void* ptr() const                 {return m_ptr;}
    void incr( unsigned int n)        {if ((m_pos+n)>=m_size) m_pos=m_size; else m_pos+=n;}
 

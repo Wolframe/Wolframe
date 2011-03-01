@@ -136,10 +136,29 @@ CommandDispatcher::Command CommandDispatcher::getCommand( protocol::InputBlock::
          }
          else
          {
-            if (!ProtocolParser::skipSpaces( itr, eoM) || !ProtocolParser::consumeEOLN( itr, eoM)) return unknown;
-            CommandDispatcher::Command rt = m_command;
-            resetCommand();
-            return rt;         
+            if (ProtocolParser::skipSpaces( itr, eoM))
+            {
+               if (!ProtocolParser::isEOLN( itr))
+               {
+                  LOG_ERROR << "two many arguments for command";
+                  resetCommand();
+                  return unknown;
+               }
+               else if (ProtocolParser::consumeEOLN( itr, eoM))
+               {
+                  CommandDispatcher::Command rt = m_command;
+                  resetCommand();
+                  return rt;
+               }
+               else
+               {
+                  return unknown;
+               }
+            }
+            else
+            {
+               return unknown;
+            }
          }
          //no break here !
       }
@@ -166,6 +185,7 @@ CommandDispatcher::IOState CommandDispatcher::call( int& returnCode)
          LOG_ERROR << "illegal call in this state (not running)";
          throw (IllegalState());
       }
+
       case ArgumentsParsed:
       {
          LOG_DEBUG << "call of '" << m_instance->mt[ m_methodIdx].name << "'";
@@ -191,7 +211,7 @@ CommandDispatcher::IOState CommandDispatcher::call( int& returnCode)
                case protocol::Generator::Init:
                case protocol::Generator::Processing:
                case protocol::Generator::EndOfInput:
-                  if (m_context.output && m_context.output->pos()) return WriteOutput;
+                  if (m_context.output && (m_context.output->pos() > 0 || m_context.output->size() == 0)) return WriteOutput;
                   LOG_DATA << "End of Method Call";
                   resetCommand();
                   return Close;

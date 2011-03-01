@@ -24,11 +24,11 @@ static const char* getRandomAsciiString()
       //avoid random end of content:
       if (ii>=2 && rt[ii-2]=='\n' && rt[ii-1]=='.' && rt[ii]=='\n')
       {
-	 continue;
+         continue;
       }
       if (ii>=2 && rt[ii-2]=='\n' && rt[ii-1]=='.' && rt[ii]=='\r')
       {
-	 continue;
+         continue;
       }
       ii++;
    }
@@ -58,7 +58,7 @@ template <unsigned int InputBufferSize, unsigned int OutputBufferSize>
 struct OneEmptyLine :public TestDescription<InputBufferSize,OutputBufferSize>
 {
    typedef TestDescription<InputBufferSize,OutputBufferSize> ThisTestDescription;
-   OneEmptyLine() { ThisTestDescription::content.append("");};
+   OneEmptyLine() { ThisTestDescription::content.append("\r\n");};
 };
 template <unsigned int InputBufferSize, unsigned int OutputBufferSize>
 struct OneOneCharLine :public TestDescription<InputBufferSize,OutputBufferSize>
@@ -81,8 +81,8 @@ struct Random :public TestDescription<InputBufferSize,OutputBufferSize>
       unsigned int ii=0,nn=rand()%MaxNofLines+1;
       while (ii++<=nn)
       {
-	 ThisTestDescription::content.append( getRandomAsciiString());
-	 ThisTestDescription::content.append( "\r\n");
+         ThisTestDescription::content.append( getRandomAsciiString());
+         ThisTestDescription::content.append( "\r\n");
       }
    }
 };
@@ -95,7 +95,7 @@ static std::string escape( std::string& content)
    {
       if (content[ii] == '.' && (ii==0 || content[ii-1] == '\n'))
       {
-	 continue;
+         continue;
       }
       rt.push_back( content[ii]);
    }
@@ -115,8 +115,8 @@ public:
 protected:
    mtprocHandlerFixture() :ep( "127.0.0.1", 12345),connection(0) {}
 
-	virtual void SetUp()
-	{
+   virtual void SetUp()
+   {
       TestDescription test;
       connection = new mtproc::Connection( ep, test.inputBufferSize, test.outputBufferSize);
 
@@ -132,7 +132,7 @@ protected:
       expected.append( "\r\n.\r\nOK\r\n");
       input.append( "quit\r\n");
       expected.append( "BYE\r\n");
-	}
+   }
 
    virtual void TearDown()
    {
@@ -204,14 +204,14 @@ TYPED_TEST( mtprocHandlerFixture, ExpectedResult )
       unsigned int ii=0,nn=output.size();
       for (;ii<nn && output[ii]==this->expected[ii]; ii++);
       if (ii != nn) printf( "SIZE R=%lu,E=%lu,DIFF AT %u='%d %d %d %d|%d %d %d %d'\n",
-			    (unsigned long)output.size(), (unsigned long)this->expected.size(), ii, output[ii-2],output[ii-1],output[ii-0],output[ii+1],this->expected[ii-2],this->expected[ii-1],this->expected[ii-0],this->expected[ii+1]);
+                            (unsigned long)output.size(), (unsigned long)this->expected.size(), ii, output[ii-2],output[ii-1],output[ii-0],output[ii+1],this->expected[ii-2],this->expected[ii-1],this->expected[ii-0],this->expected[ii+1]);
 #endif
    EXPECT_EQ( output, this->expected);
 }
 
 int main( int argc, char **argv )
 {
-	::testing::InitGoogleTest( &argc, argv );
-	return RUN_ALL_TESTS();
+        ::testing::InitGoogleTest( &argc, argv );
+        return RUN_ALL_TESTS();
 }
 
