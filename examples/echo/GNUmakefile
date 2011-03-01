@@ -36,7 +36,7 @@ OBJS = \
 	$(TOPDIR)/src/posixMain.o
 
 CPP_BINS = \
-	wolframe-echo$(EXE)
+	echod$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

@@ -43,11 +43,11 @@ OBJS = \
 	$(TOPDIR)\src\winMain.obj
 
 CPP_BINS = \
-	wolframe-mtproc.exe
+	mtprocd.exe
 
 all: $(OBJS) $(CPP_BINS)
 
-wolframe-mtproc.exe: wolframe-mtproc.obj $(TOPDIR)\src\mtproc.lib
+mtprocd.exe: mtprocd.obj $(TOPDIR)\src\mtproc.lib
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 

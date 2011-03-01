@@ -38,7 +38,7 @@ OBJS = \
 	$(TOPDIR)/src/posixMain.o
 
 CPP_BINS = \
-	wolframe-lua$(EXE)
+	luad$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
@@ -54,4 +54,4 @@ localhost_test:
 
 run: $(CPP_BINS)
 	@echo "Running the Wolframe server..."
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./wolframe-lua -c wolframe-lua.conf -f
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./luad -c lua.conf -f

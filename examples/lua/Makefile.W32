@@ -42,11 +42,11 @@ OBJS = \
 	$(TOPDIR)\src\winMain.obj
 
 CPP_BINS = \
-	wolframe-lua.exe
+	luad.exe
 
 all: $(OBJS) $(CPP_BINS)
 
-wolframe-lua.exe: wolframe-lua.obj $(TOPDIR)\src\wolframe.lib $(OBJS)
+luad.exe: luad.obj $(TOPDIR)\src\wolframe.lib $(OBJS)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
@@ -64,5 +64,5 @@ run: $(CPP_BINS)
 	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >> test.bat
 	@-echo copy "$(LUA_DIR)\src\lua51.dll" . >> test.bat
 	@-echo echo Running the Wolframe server... >> test.bat
-	@-echo wolframe-lua.exe -c wolframe-lua.conf -d DATA >> test.bat
+	@-echo luad.exe -c luad.conf -d DATA >> test.bat
 	@-test.bat

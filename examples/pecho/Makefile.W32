@@ -41,11 +41,11 @@ OBJS = \
 	$(TOPDIR)\src\winMain.obj
 
 CPP_BINS = \
-	wolframe-pecho.exe
+	pechod.exe
 
 all: $(OBJS) $(CPP_BINS)
 
-wolframe-pecho.exe: wolframe-pecho.obj $(TOPDIR)\src\wolframe.lib
+pechod.exe: pechod.obj $(TOPDIR)\src\wolframe.lib
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 

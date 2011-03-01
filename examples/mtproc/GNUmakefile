@@ -38,7 +38,7 @@ OBJS = \
 	$(TOPDIR)/src/posixMain.o
 
 CPP_BINS = \
-	wolframe-mtproc$(EXE)
+	mtprocd$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
