@@ -13,7 +13,7 @@
 
 #define	MAX_STRING	128
 
-// The fixture for testing class SMERP::Version
+// The fixture for testing class Wolframe::Version
 class VersionFixture : public ::testing::Test	{
 protected:
 	// You can remove any or all of the following functions if its body is empty.

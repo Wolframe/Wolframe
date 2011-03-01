@@ -9,12 +9,12 @@
 
 namespace _Wolframe {
 	/// The connection handler
-	class smerpConnection : public Network::connectionHandler
+	class wolframeConnection : public Network::connectionHandler
 	{
 	public:
-		smerpConnection( const Network::LocalTCPendpoint& local );
-		smerpConnection( const Network::LocalSSLendpoint& local );
-		~smerpConnection();
+		wolframeConnection( const Network::LocalTCPendpoint& local );
+		wolframeConnection( const Network::LocalSSLendpoint& local );
+		~wolframeConnection();
 
 		void setPeer( const Network::RemoteTCPendpoint& remote );
 		void setPeer( const Network::RemoteSSLendpoint& remote );

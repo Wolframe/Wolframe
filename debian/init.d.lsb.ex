@@ -23,7 +23,7 @@
 # Suite 330, Boston, MA 02111-1307 USA
 #
 ### BEGIN INIT INFO
-# Provides:          smerp
+# Provides:          wolframe
 # Required-Start:    $network $local_fs
 # Required-Stop:
 # Should-Start:      $named
@@ -38,10 +38,10 @@
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
-DAEMON=/usr/sbin/smerp # Introduce the server's location here
-NAME=smerp             # Introduce the short server's name here
-DESC=smerp             # Introduce a short description here
-LOGDIR=/var/log/smerp  # Log directory to use
+DAEMON=/usr/sbin/wolframe # Introduce the server's location here
+NAME=wolframe             # Introduce the short server's name here
+DESC=wolframe             # Introduce a short description here
+LOGDIR=/var/log/wolframe  # Log directory to use
 
 PIDFILE=/var/run/$NAME.pid
 
@@ -68,7 +68,7 @@ DIETIME=10              # Time to wait for the server to die, in seconds
                         # when it actually did)
 
 LOGFILE=$LOGDIR/$NAME.log  # Server logfile
-#DAEMONUSER=smerp   # Users to run the daemons as. If this value
+#DAEMONUSER=wolframe    # Users to run the daemons as. If this value
                         # is set start-stop-daemon will chuid the server
 
 # Include defaults if available

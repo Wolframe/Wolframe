@@ -1,5 +1,5 @@
 #!/bin/sh
-# preinst script for smerp
+# preinst script for wolframe
 #
 # see: dh_installdeb(1)
 

@@ -1,5 +1,5 @@
 #!/bin/sh
-# postrm script for smerp
+# postrm script for wolframe
 #
 # see: dh_installdeb(1)
 

@@ -1,5 +1,5 @@
 //
-// smerpd.cpp
+// wolframed.cpp
 //
 
 // Super main function :)

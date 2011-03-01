@@ -1,20 +1,20 @@
-%define boost_version	1.44.0
+%define boost_version	1.46.0
 
-%define initscript	smerp.initd.RHEL
-%define configFile	smerp.conf
+%define initscript	wolframe.initd.RHEL
+%define configFile	wolframe.conf
 
-%define SMERP_user	smerp
-%define SMERP_group	smerp
+%define WOLFRAME_USR	wolframe
+%define WOLFRAME_GRP	wolframe
 
-Summary: Small and medium enterprise resource planning (SMERP)
-Name: SMERP
+Summary: Small and medium enterprise resource planning (Wolframe)
+Name: Wolframe
 Version: @VERSION@
 Release: 0.1
-License: SMERP License
+License: Wolframe License
 Group: Application/Business
-Source: smerp-%{version}.tar.bz2
+Source: wolframe-%{version}.tar.bz2
 
-URL: http://www.smerp.com/
+URL: http://www.wolframe.com/
 
 BuildRoot: %{_tmppath}/%{name}-root
 Requires: expat >= 1.95
@@ -25,29 +25,29 @@ BuildRequires: expat-devel >= 1.95
 BuildRequires: postgresql84-devel >= 8.4
 
 Distribution: rhel5
-Vendor: SMERP team
+Vendor: Wolframe team
 Packager: Mihai Barbos <mihai.barbos@gmail.com>
 
 %description
-The SMERP server and server utilities
+The Wolframe server and server utilities
 
 
 %package doc
-Summary: SMERP documentation
+Summary: Wolframe documentation
 Group: Application/Business
 
 %description doc
-The SMERP documentation.
+The Wolframe documentation.
 This package contains the one file html documentation,
 multiple file html documentation and the pdf documentation.
 
 
 %package client
-Summary: SMERP client
+Summary: Wolframe client
 Group: Application/Business
 
 %description client
-X client for the SMERP server.
+X client for the Wolframe server.
 
 
 %prep
@@ -55,7 +55,7 @@ X client for the SMERP server.
 
 
 %build
-LD_FLAGS=-Wl,-rpath=%{_libdir}/SMERP make all
+LD_FLAGS=-Wl,-rpath=%{_libdir}/Wolframe make all
 
 echo ======================= TESTING ==============================
 # make test
@@ -66,12 +66,12 @@ echo ===================== END OF TESTING =========================
 rm -rf $RPM_BUILD_ROOT
 make DESTDIR=$RPM_BUILD_ROOT install
 
-mkdir -p $RPM_BUILD_ROOT%{_libdir}/SMERP
+mkdir -p $RPM_BUILD_ROOT%{_libdir}/Wolframe
 for i in \
 	libboost_program_options.so.%{boost_version} libboost_system.so.%{boost_version} \
 	libboost_filesystem.so.%{boost_version} libboost_iostreams.so.%{boost_version} \
 	libboost_thread.so.%{boost_version} libboost_serialization.so.%{boost_version}; do
-    cp /usr/local/lib/$i $RPM_BUILD_ROOT%{_libdir}/SMERP/
+    cp /usr/local/lib/$i $RPM_BUILD_ROOT%{_libdir}/Wolframe/
 done
 
 mkdir -p $RPM_BUILD_ROOT%{_initrddir}
@@ -83,48 +83,48 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %pre
-getent group %{SMERP_group} >/dev/null || /usr/sbin/groupadd %{SMERP_group}
-getent passwd %{SMERP_user} >/dev/null || /usr/sbin/useradd -g %{SMERP_group} %{SMERP_user} -c "SMERP user" -d /dev/null
+getent group %{WOLFRAME_GRP} >/dev/null || /usr/sbin/groupadd %{WOLFRAME_GRP}
+getent passwd %{WOLFRAME_USR} >/dev/null || /usr/sbin/useradd -g %{WOLFRAME_GRP} %{WOLFRAME_USR} -c "Wolframe user" -d /dev/null
 
-# Don't enable SMERP server at install time, just inform root how this is done
+# Don't enable Wolframe server at install time, just inform root how this is done
 echo
-echo Use '/sbin/chkconfig --add smerp' and '/sbin/ckconfig semrp on' to enable the
-echo SMERP server at startup
+echo Use '/sbin/chkconfig --add wolframe' and '/sbin/ckconfig semrp on' to enable the
+echo Wolframe server at startup
 echo
 
 
 %preun
 if [ "$1" = 0 ]; then
-    /etc/init.d/smerp stop > /dev/null 2>&1
-    /sbin/chkconfig --del smerp
+    /etc/init.d/wolframe stop > /dev/null 2>&1
+    /sbin/chkconfig --del wolframe
 fi
 
 
 %postun
 if [ "$1" = 0 ]; then
-    /usr/sbin/userdel %{SMERP_user}
+    /usr/sbin/userdel %{WOLFRAME_USR}
 fi
 
 
 %files
 %defattr( -, root, root )
 %attr( 554, root, root) %{_initrddir}/%{name}
-%{_sbindir}/smerpd
-%dir %attr(0755, root, root) %{_sysconfdir}/smerp
-%config %attr(0755, root, root) %{_sysconfdir}/smerp/smerp.conf
-%attr(0755, SMERP_user, SMERP_group) %dir /var/log/smerp
-%attr(0755, SMERP_user, SMERP_group) %dir /var/run/smerp
+%{_sbindir}/wolframed
+%dir %attr(0755, root, root) %{_sysconfdir}/wolframe
+%config %attr(0755, root, root) %{_sysconfdir}/wolframe/wolframe.conf
+%attr(0755, WOLFRAME_USR, WOLFRAME_GRP) %dir /var/log/wolframe
+%attr(0755, WOLFRAME_USR, WOLFRAME_GRP) %dir /var/run/wolframe
 
-%dir %{_libdir}/smerp
-%{_libdir}/smerp/libpqxx-%{libpqxx_version}.so
-%{_libdir}/smerp/libboost_program_options.so.%{boost_version}
-%{_libdir}/smerp/libboost_system.so.%{boost_version}
-%{_libdir}/smerp/libboost_filesystem.so.%{boost_version}
-%{_libdir}/smerp/libboost_iostreams.so.%{boost_version}
-%{_libdir}/smerp/libboost_thread.so.%{boost_version}
-%{_libdir}/smerp/libboost_serialization.so.%{boost_version}
+%dir %{_libdir}/wolframe
+%{_libdir}/wolframe/libpqxx-%{libpqxx_version}.so
+%{_libdir}/wolframe/libboost_program_options.so.%{boost_version}
+%{_libdir}/wolframe/libboost_system.so.%{boost_version}
+%{_libdir}/wolframe/libboost_filesystem.so.%{boost_version}
+%{_libdir}/wolframe/libboost_iostreams.so.%{boost_version}
+%{_libdir}/wolframe/libboost_thread.so.%{boost_version}
+%{_libdir}/wolframe/libboost_serialization.so.%{boost_version}
 
-%dir %{_datadir}/smerp
+%dir %{_datadir}/wolframe
 %doc LICENSE
 
 

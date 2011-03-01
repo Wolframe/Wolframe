@@ -1,11 +1,11 @@
-# German translations for PACKAGE package.
-# Copyright (C) 2010 THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# Mihai Barbos <mihai.barbos@gmail.com>, 2010.
+# Wolframe server german language pack.
+# Copyright (C) 2010, 2011 Wolframe Team
+# This file is distributed under the same license as the Wolframe package.
+# Mihai Barbos <mihai.barbos@gmail.com>, 2010, 2011.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: SMERP\n"
+"Project-Id-Version: Wolframe\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-04-08 18:42+0300\n"
 "PO-Revision-Date: 2010-04-01 00:22+0100\n"

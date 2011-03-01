@@ -12,22 +12,22 @@
 #
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-DAEMON=/usr/sbin/smerp
-NAME=smerp
-DESC=smerp
+DAEMON=/usr/sbin/wolframe
+NAME=wolframe
+DESC=wolframe
 
 test -x $DAEMON || exit 0
 
-LOGDIR=/var/log/smerp
+LOGDIR=/var/log/wolframe
 PIDFILE=/var/run/$NAME.pid
 DODTIME=1                   # Time to wait for the server to die, in seconds
                             # If this value is set too low you might not
                             # let some servers to die gracefully and
                             # 'restart' will not work
 
-# Include smerp defaults if available
-if [ -f /etc/default/smerp ] ; then
-    . /etc/default/smerp
+# Include wolframe defaults if available
+if [ -f /etc/default/wolframe ] ; then
+    . /etc/default/wolframe
 fi
 
 set -e

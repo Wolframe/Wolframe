@@ -27,7 +27,7 @@ private:
 };
 
 
-// The fixture for testing SMERP::ObjectPool template
+// The fixture for testing Wolframe::ObjectPool template
 class ObjectPoolFixture : public ::testing::Test	{
 protected:
 	// Set-up work for each test here.

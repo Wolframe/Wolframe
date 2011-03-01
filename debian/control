@@ -1,4 +1,4 @@
-Source: smerp
+Source: wolframe
 Section: unknown
 Priority: extra
 Maintainer: Mihai Barbos <mihai.barbos@gmail.com>
@@ -6,13 +6,13 @@ Build-Depends: debhelper (>= 7)
 Standards-Version: 3.8.3
 Homepage: <insert the upstream URL, if relevant>
 
-Package: smerp
+Package: wolframe
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: <insert up to 60 chars description>
  <insert long description, indented with spaces>
 
-Package: smerp-doc
+Package: wolframe-doc
 Architecture: all
-Description: documentation for smerp
+Description: documentation for wolframe
  <insert long description, indented with spaces>

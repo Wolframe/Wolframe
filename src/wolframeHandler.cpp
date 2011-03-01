@@ -10,7 +10,7 @@
 
 namespace _Wolframe	{
 
-	smerpConnection::smerpConnection( const Network::LocalTCPendpoint& local )
+	wolframeConnection::wolframeConnection( const Network::LocalTCPendpoint& local )
 	{
 		LOG_TRACE << "Created connection handler for " << local.toString();
 		state_ = NEW;
@@ -20,7 +20,7 @@ namespace _Wolframe	{
 	}
 
 
-	smerpConnection::smerpConnection( const Network::LocalSSLendpoint& local )
+	wolframeConnection::wolframeConnection( const Network::LocalSSLendpoint& local )
 	{
 		LOG_TRACE << "Created connection handler (SSL) for " << local.toString();
 		state_ = NEW;
@@ -29,17 +29,17 @@ namespace _Wolframe	{
 		idleTimeout_ = 30;
 	}
 
-	smerpConnection::~smerpConnection()
+	wolframeConnection::~wolframeConnection()
 	{
 		LOG_TRACE << "Connection handler destroyed";
 	}
 
-	void smerpConnection::setPeer( const Network::RemoteTCPendpoint& remote )
+	void wolframeConnection::setPeer( const Network::RemoteTCPendpoint& remote )
 	{
 		LOG_TRACE << "Peer set to " << remote.toString();
 	}
 
-	void smerpConnection::setPeer( const Network::RemoteSSLendpoint& remote )
+	void wolframeConnection::setPeer( const Network::RemoteSSLendpoint& remote )
 	{
 		LOG_TRACE << "Peer set to " << remote.toString();
 		LOG_TRACE << "Peer Common Name: " << remote.commonName();
@@ -47,7 +47,7 @@ namespace _Wolframe	{
 
 
 	/// Handle a request and produce a reply.
-	const Network::NetworkOperation smerpConnection::nextOperation()
+	const Network::NetworkOperation wolframeConnection::nextOperation()
 	{
 		switch( state_ )	{
 		case NEW:	{
@@ -123,25 +123,25 @@ namespace _Wolframe	{
 
 	/// Parse incoming data. The return value indicates how much of the
 	/// input has been consumed.
-	void smerpConnection::networkInput( const void*, std::size_t bytesTransferred )
+	void wolframeConnection::networkInput( const void*, std::size_t bytesTransferred )
 	{
 		LOG_DATA << "network Input: Read " << bytesTransferred << " bytes";
 		dataSize_ += bytesTransferred;
 	}
 
-	void smerpConnection::timeoutOccured()
+	void wolframeConnection::timeoutOccured()
 	{
 		state_ = TIMEOUT;
 		LOG_TRACE << "Processor received timeout";
 	}
 
-	void smerpConnection::signalOccured()
+	void wolframeConnection::signalOccured()
 	{
 		state_ = SIGNALLED;
 		LOG_TRACE << "Processor received signal";
 	}
 
-	void smerpConnection::errorOccured( NetworkSignal signal )
+	void wolframeConnection::errorOccured( NetworkSignal signal )
 	{
 		switch( signal )	{
 		case END_OF_FILE:
@@ -167,12 +167,12 @@ namespace _Wolframe	{
 	/// ServerHandler PIMPL
 	Network::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const Network::LocalTCPendpoint& local )
 	{
-		return new smerpConnection( local );
+		return new wolframeConnection( local );
 	}
 
 	Network::connectionHandler* ServerHandler::ServerHandlerImpl::newSSLconnection( const Network::LocalSSLendpoint& local )
 	{
-		return new smerpConnection( local );
+		return new wolframeConnection( local );
 	}
 
 

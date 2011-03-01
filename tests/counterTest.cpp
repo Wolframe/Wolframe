@@ -15,7 +15,7 @@ _Wolframe::AtomicCounter< unsigned long >	ulCounter0;
 _Wolframe::AtomicCounter< int >		iCounter0;
 
 
-// The fixture for testing class SMERP::AtomicCounter
+// The fixture for testing class Wolframe::AtomicCounter
 class CounterFixture : public ::testing::Test	{
 protected:
 	// Set-up work for each test here.
