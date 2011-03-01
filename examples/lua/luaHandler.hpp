@@ -1,5 +1,5 @@
 //
-// smerpHandler.hpp - smerp main handler
+// luaHandler.hpp - wolframe main handler
 //
 
 #ifndef _Wolframe_HANDLER_HPP_INCLUDED
@@ -19,7 +19,7 @@ namespace _Wolframe {
 		echoConnection( const Network::LocalTCPendpoint& local );
 		echoConnection( const Network::LocalSSLendpoint& local );
 		~echoConnection();
-		
+
 		void setPeer( const Network::RemoteTCPendpoint& remote );
 		void setPeer( const Network::RemoteSSLendpoint& remote );
 

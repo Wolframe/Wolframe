@@ -29,7 +29,7 @@ function next_operation( )
 	
 	if state == "NEW" then
 		state = "HELLO_SENT"
-		return "WRITE", "Welcome to SMERP.\n"
+		return "WRITE", "Welcome to Wolframe.\n"
  	elseif state == "HELLO_SENT" then
 		if string.len( buffer ) == 0 then
 			state = "READ_INPUT"
@@ -41,7 +41,7 @@ function next_operation( )
 	elseif state == "READ_INPUT" or state == "OUTPUT_MSG" then
 		if string.sub( buffer, 1, 4 ) == "quit" then
 			state = "TERMINATE"
-			return "WRITE", "Thanks for using SMERP.\n"
+			return "WRITE", "Thanks for using Wolframe.\n"
 		else
 			pos = string.find( buffer, "\n" )
 			if pos then

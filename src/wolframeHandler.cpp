@@ -52,7 +52,7 @@ namespace _Wolframe	{
 		switch( state_ )	{
 		case NEW:	{
 				state_ = HELLO_SENT;
-				return Network::NetworkOperation( Network::SendString( "Welcome to SMERP.\n" ));
+				return Network::NetworkOperation( Network::SendString( "Welcome to Wolframe.\n" ));
 			}
 
 		case HELLO_SENT:	{
@@ -67,7 +67,7 @@ namespace _Wolframe	{
 		case OUTPUT_MSG:
 			if ( !strncmp( "quit", dataStart_, 4 ))	{
 				state_ = TERMINATE;
-				return Network::NetworkOperation( Network::SendString( "Thanks for using SMERP.\n" ));
+				return Network::NetworkOperation( Network::SendString( "Thanks for using Wolframe.\n" ));
 			}
 			else	{
 				char *s = dataStart_;

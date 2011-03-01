@@ -12,9 +12,9 @@ namespace _Wolframe	{
 	unsigned short	applicationRevisionVersion()			{ return 4; }
 	unsigned	applicationBuildVersion()			{ return 0; }
 
-	const char*	Configuration::defaultMainConfig()		{ return "/etc/wolframe-echo.conf"; }
-	const char*	Configuration::defaultUserConfig()		{ return "~/wolframe-echo.conf"; }
-	const char*	Configuration::defaultLocalConfig()		{ return "./wolframe-echo.conf"; }
+	const char*	Configuration::defaultMainConfig()		{ return "/etc/echo.conf"; }
+	const char*	Configuration::defaultUserConfig()		{ return "~/echo.conf"; }
+	const char*	Configuration::defaultLocalConfig()		{ return "./echo.conf"; }
 
 	unsigned short	Configuration::defaultTCPport()			{ return 7660; }
 	unsigned short	Configuration::defaultSSLport()			{ return 7960; }
