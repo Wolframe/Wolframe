@@ -122,7 +122,7 @@ namespace _Wolframe {
 
 	} // namespace Network
 
-	/// The SMERP server main
+	/// The server main
 	/// All it should do is to provide connection handlers
 
 	struct	HandlerConfiguration;

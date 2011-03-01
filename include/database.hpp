@@ -1,5 +1,5 @@
 //
-// database.hpp - SMERP base database class
+// database.hpp - Wolframe base database class
 //
 
 #include "appConfig.hpp"

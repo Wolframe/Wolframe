@@ -7,7 +7,7 @@
 namespace _Wolframe {
 	namespace Network {
 
-		/// Base class for network endpoints in SMERP
+		/// Base class for network endpoints
 		class ConnectionEndpoint
 		{
 		private:
