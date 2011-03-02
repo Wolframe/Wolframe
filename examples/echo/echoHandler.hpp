@@ -6,14 +6,15 @@
 #define _ECHO_HANDLER_HPP_INCLUDED
 
 #include "connectionHandler.hpp"
+#include "handlerConfig.hpp"
 
 namespace _Wolframe {
 	/// The connection handler
 	class echoConnection : public Network::connectionHandler
 	{
 	public:
-		echoConnection( const Network::LocalTCPendpoint& local );
-		echoConnection( const Network::LocalSSLendpoint& local );
+		echoConnection( const Network::LocalTCPendpoint& local, unsigned short timeout );
+		echoConnection( const Network::LocalSSLendpoint& local, unsigned short timeout );
 		~echoConnection();
 
 		void setPeer( const Network::RemoteTCPendpoint& remote );
@@ -60,8 +61,14 @@ namespace _Wolframe {
 	class ServerHandler::ServerHandlerImpl
 	{
 	public:
+		ServerHandlerImpl( const HandlerConfiguration *config )
+		{
+			timeout = config->echoConfig->timeout;
+		}
 		Network::connectionHandler* newConnection( const Network::LocalTCPendpoint& local );
 		Network::connectionHandler* newSSLconnection( const Network::LocalSSLendpoint& local );
+	private:
+		short unsigned timeout;
 	};
 
 } // namespace _Wolframe
