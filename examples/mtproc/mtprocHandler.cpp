@@ -30,7 +30,8 @@ struct Connection::Private
    {
       Init,                     //< start state, called first time in this session
       EnterCommand,             //< parse command
-      Processing,               //< running the dispatcher sub state machine; execute a command
+      Processing,               //< running the dispatcher sub state machine; execute a command without data input  
+      ProcessingInput,          //< running the dispatcher sub state machine; execute a command with data input
       ProtocolError,            //< a protocol error (bad command etc) appeared and the rest of the line has to be discarded
       DiscardInput,             //< reading and discarding data until end of data has been seen
       EndOfCommand,             //< cleanup after processing
@@ -38,7 +39,7 @@ struct Connection::Private
    };
    static const char* stateName( State i)
    {
-      static const char* ar[] = {"Init","EnterCommand","Processing","ProtocolError","CommandError","EndOfCommand","Terminate"};
+      static const char* ar[] = {"Init","EnterCommand","Processing","ProcessingInput","ProtocolError","CommandError","EndOfCommand","Terminate"};
       return ar[i];
    }
 
@@ -68,8 +69,8 @@ struct Connection::Private
       for (ii=0; str[ii]; ii++) buffer.push_back( str[ii]);
       if (arg)
       {
-	 buffer.push_back( ' ');
-	 for (ii=0; arg[ii]; ii++) buffer.push_back( arg[ii]);
+         buffer.push_back( ' ');
+         for (ii=0; arg[ii]; ii++) buffer.push_back( arg[ii]);
       }
       buffer.push_back( '\r');
       buffer.push_back( '\n');
@@ -83,26 +84,26 @@ struct Connection::Private
        input.setPos( nofBytes);
        itr = input.begin();
 
-       if (state == Processing || state == DiscardInput)
+       if (state == ProcessingInput || state == DiscardInput)
        {
-	  Input::iterator eoD = input.getEoD( itr);
-	  if (state == Processing)
-	  {
-	     commandDispatcher.protocolInput( itr, eoD, input.gotEoD());
-	  }
-	  end = input.end();
-	  if (eoD < end)
-	  {
-	     itr = eoD+1;
-	  }
-	  else
-	  {
-	     itr = end;
-	  }
+          Input::iterator eoD = input.getEoD( itr);
+          if (state == ProcessingInput)
+          {
+             commandDispatcher.protocolInput( itr, eoD, input.gotEoD());
+          }
+          end = input.end();
+          if (eoD < end)
+          {
+             itr = eoD+1;
+          }
+          else
+          {
+             itr = end;
+          }
        }
        else
        {
-	  end = input.end();
+          end = input.end();
        }
    }
 
@@ -125,148 +126,158 @@ struct Connection::Private
    {
       for (;;)
       {
-	 LOG_DATA << "Handler State: " << stateName(state);
+         LOG_DATA << "Handler State: " << stateName(state);
 
-	 switch( state)
-	 {
-	    case Init:
-	    {
-		//start:
-		state = EnterCommand;
-		return WriteLine( "OK expecting command");
-	    }
+         switch( state)
+         {
+            case Init:
+            {
+                //start:
+                state = EnterCommand;
+                return WriteLine( "OK expecting command");
+            }
 
-	    case EnterCommand:
-	    {
-		switch (commandDispatcher.getCommand( itr, end))
-		{
-		   case CommandDispatcher::empty:
-		   {
-		      state = EnterCommand;
-		      continue;
-		   }
-		   case CommandDispatcher::caps:
-		   {
-		      state = EnterCommand;
-		      return WriteLine( "OK", commandDispatcher.getCapabilities());
-		   }
-		   case CommandDispatcher::quit:
-		   {
-		      state = Terminate;
-		      return WriteLine( "BYE");
-		   }
-		   case CommandDispatcher::method:
-		   {
-		      input.resetEoD();
-		      state = Processing;
-		      continue;
-		   }
-		   case CommandDispatcher::unknown:
-		   {
-		      if (itr == end)
-		      {
-			 input.setPos( 0);
-			 return Network::ReadData( input.ptr(), input.size());
-		      }
-		      else
-		      {
-			 state = ProtocolError;
-			 return WriteLine( "BAD error in command line");
-		      }
-		   }
-		}
-	    }
+            case EnterCommand:
+            {
+                switch (commandDispatcher.getCommand( itr, end))
+                {
+                   case CommandDispatcher::empty:
+                   {
+                      state = EnterCommand;
+                      continue;
+                   }
+                   case CommandDispatcher::caps:
+                   {
+                      state = EnterCommand;
+                      return WriteLine( "OK", commandDispatcher.getCapabilities());
+                   }
+                   case CommandDispatcher::quit:
+                   {
+                      state = Terminate;
+                      return WriteLine( "BYE");
+                   }
+                   case CommandDispatcher::method:
+                   {
+                      input.resetEoD();
+                      state = Processing;
+                      continue;
+                   }
+                   case CommandDispatcher::unknown:
+                   {
+                      if (itr == end)
+                      {
+                         input.setPos( 0);
+                         return Network::ReadData( input.ptr(), input.size());
+                      }
+                      else
+                      {
+                         state = ProtocolError;
+                         return WriteLine( "BAD error in command line");
+                      }
+                   }
+                }
+            }
 
-	    case Processing:
-	    {
-		int returnCode = 0;
-		switch (commandDispatcher.call( returnCode))
-		{
-		   case CommandDispatcher::ReadInput:
-		   {
-		      input.setPos( 0);
-		      return Network::ReadData( input.ptr(), input.size());
-		   }
-		   case CommandDispatcher::WriteOutput:
-		   {
-		      void* content;
-		      unsigned int contentsize;
-		      bool hasOutput = commandDispatcher.getOutput( &content, &contentsize);
-		      commandDispatcher.setOutputBuffer( output.ptr(), output.size());
+            case Processing:
+            case ProcessingInput:
+            {
+                int returnCode = 0;
+                switch (commandDispatcher.call( returnCode))
+                {
+                   case CommandDispatcher::ReadInput:
+                   {
+                      if (state == Processing)
+                      {
+                         Input::iterator eoD = input.getEoD( itr);
+                         commandDispatcher.protocolInput( itr, eoD, input.gotEoD());
+                         continue;
+                      }
+                      else
+                      {
+                         input.setPos( 0);
+                         return Network::ReadData( input.ptr(), input.size());
+                      }
+                   }
+                   case CommandDispatcher::WriteOutput:
+                   {
+                      void* content;
+                      unsigned int contentsize;
+                      bool hasOutput = commandDispatcher.getOutput( &content, &contentsize);
+                      commandDispatcher.setOutputBuffer( output.ptr(), output.size());
 
-		      if (!hasOutput) continue;
+                      if (!hasOutput) continue;
 
-		      return Network::SendData( content, contentsize);
-		   }
-		   case CommandDispatcher::Close:
-		   {
-		      if (returnCode == 0)
-		      {
-			 state = (input.gotEoD())?EndOfCommand:DiscardInput;
-			 return WriteLine( "\r\n.\r\nOK");
-		      }
-		      else
-		      {
-			 state = DiscardInput;
-			 char ee[ 64];
-			 snprintf( ee, sizeof(ee), "%d", returnCode);
-			 return WriteLine( "\r\n.\r\nERR", ee);
-		      }
-		   }
-		}
-	    }
+                      return Network::SendData( content, contentsize);
+                   }
+                   case CommandDispatcher::Close:
+                   {
+                      if (returnCode == 0)
+                      {
+                         state = (input.gotEoD())?EndOfCommand:DiscardInput;
+                         return WriteLine( "\r\n.\r\nOK");
+                      }
+                      else
+                      {
+                         state = DiscardInput;
+                         char ee[ 64];
+                         snprintf( ee, sizeof(ee), "%d", returnCode);
+                         return WriteLine( "\r\n.\r\nERR", ee);
+                      }
+                   }
+                }
+            }
 
-	    case DiscardInput:
-	    {
-	       if (input.gotEoD())
-	       {
-		  state = EndOfCommand;
-		  continue;
-	       }
-	       else
-	       {
-		  input.setPos( 0);
-		  return Network::ReadData( input.ptr(), input.size());
-	       }
-	    }
+            case DiscardInput:
+            {
+               if (input.gotEoD())
+               {
+                  state = EndOfCommand;
+                  continue;
+               }
+               else
+               {
+                  input.setPos( 0);
+                  return Network::ReadData( input.ptr(), input.size());
+               }
+            }
 
-	    case EndOfCommand:
-	    {
-	       itr = input.getStart( itr);
-	       if (input.gotEoD_LF())
-	       {
-		  state = EnterCommand;
-		  continue;
-	       }
-	       else if (itr < end)
-	       {
-		  state = Init;
-		  return WriteLine( "BAD end of line in protocol after end of data");
-	       }
-	       else
-	       {
-		  input.setPos( 0);
-		  return Network::ReadData( input.ptr(), input.size());
-	       }
-	    }
+            case EndOfCommand:
+            {
+               itr = input.getStart( itr);
+               if (input.gotEoD_LF())
+               {
+                  state = EnterCommand;
+                  continue;
+               }
+               else if (itr < end)
+               {
+                  state = Init;
+                  return WriteLine( "BAD end of line in protocol after end of data");
+               }
+               else
+               {
+                  input.setPos( 0);
+                  return Network::ReadData( input.ptr(), input.size());
+               }
+            }
 
-	    case ProtocolError:
-	    {
-		if (!ProtocolParser::skipLine( itr, end) || !ProtocolParser::consumeEOLN( itr, end))
-		{
-		   input.setPos( 0);
-		   return Network::ReadData( input.ptr(), input.size());
-		}
-		state = Init;
-		continue;
-	    }
+            case ProtocolError:
+            {
+                if (!ProtocolParser::skipLine( itr, end) || !ProtocolParser::consumeEOLN( itr, end))
+                {
+                   input.setPos( 0);
+                   return Network::ReadData( input.ptr(), input.size());
+                }
+                state = Init;
+                continue;
+            }
 
-	    case Terminate:
-	    {
-		state = Terminate;
-		return Network::CloseConnection();
-	    }
-	 }//switch(..)
+            case Terminate:
+            {
+                state = Terminate;
+                return Network::CloseConnection();
+            }
+         }//switch(..)
       }//for(,,)
       return Network::CloseConnection();
    }
