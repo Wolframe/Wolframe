@@ -47,3 +47,7 @@ local_clean:
 local_distclean:
 
 local_install:
+
+run: $(CPP_BINS)
+	@echo "Running the Wolframe server..."
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./echod -c echo.conf -f
