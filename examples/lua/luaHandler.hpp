@@ -6,19 +6,25 @@
 #define _Wolframe_HANDLER_HPP_INCLUDED
 
 #include "connectionHandler.hpp"
+#include "handlerConfig.hpp"
 
 extern "C" {
 	#include <lua.h>
 }
 
 namespace _Wolframe {
+	class luaConfig {
+	public:
+		std::string script;
+	};
+
 	/// The connection handler
-	class echoConnection : public Network::connectionHandler
+	class luaConnection : public Network::connectionHandler
 	{
 	public:
-		echoConnection( const Network::LocalTCPendpoint& local );
-		echoConnection( const Network::LocalSSLendpoint& local );
-		~echoConnection();
+		luaConnection( const Network::LocalTCPendpoint& local, const luaConfig config );
+		luaConnection( const Network::LocalSSLendpoint& local, const luaConfig config );
+		~luaConnection();
 
 		void setPeer( const Network::RemoteTCPendpoint& remote );
 		void setPeer( const Network::RemoteSSLendpoint& remote );
@@ -35,6 +41,7 @@ namespace _Wolframe {
 		lua_State *l;
 		int counter;
 		int maxMemUsed;
+		const luaConfig config;
 		static const std::size_t buf_size = 8192;
 		char buf[buf_size];
 
@@ -47,8 +54,15 @@ namespace _Wolframe {
 	class ServerHandler::ServerHandlerImpl
 	{
 	public:
+		ServerHandlerImpl( const HandlerConfiguration *config ) {
+			config_.script = config->luaConfig->script;
+		}
+
 		Network::connectionHandler* newConnection( const Network::LocalTCPendpoint& local );
 		Network::connectionHandler* newSSLconnection( const Network::LocalSSLendpoint& local );
+
+	private:
+		luaConfig config_;
 	};
 
 } // namespace _Wolframe
