@@ -14,10 +14,11 @@ namespace _Wolframe {
 	{
 	public:
 		std::string		script;
+		bool			debug;
 
 		/// constructor
 		LuaConfiguration( const std::string& node, const std::string& header )
-			: ConfigurationBase( node, header )	{ }
+			: ConfigurationBase( node, header ), debug( false )	{ }
 		/// methods
 		bool parse( const boost::property_tree::ptree& pt, std::ostream& os );
 		bool check( std::ostream& os ) const;

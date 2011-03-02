@@ -82,7 +82,7 @@ namespace _Wolframe {
 		return 0;
 	}
 
-	void echoConnection::createVM( )
+	void luaConnection::createVM( )
 	{
 		LOG_TRACE << "Creating new Lua virtual machine";
 
@@ -112,9 +112,9 @@ namespace _Wolframe {
 		lua_call( l, 1, 0 );
 
 		// TODO: script location, also configurable
-		int res = luaL_loadfile( l, "echo.lua" /*TODO: how to get the handler config here?! handlerConfig->luaConfig->script*/ );
+		int res = luaL_loadfile( l, config.script.c_str( ) );
 		if( res != 0 ) {
-			LOG_FATAL << "Unable to load LUA code 'echo.lua': " << lua_tostring( l, -1 );
+			LOG_FATAL << "Unable to load LUA code '" << config.script << "': " << lua_tostring( l, -1 );
 			lua_pop( l, 1 );
 			throw new std::runtime_error( "Can't initialize LUA processor" );
 		}
@@ -144,7 +144,7 @@ namespace _Wolframe {
 		LOG_TRACE << "A new Lua virtual machine has been created";
 	}
 
-	void echoConnection::destroyVM( )
+	void luaConnection::destroyVM( )
 	{
 		LOG_TRACE << "Destroying the Lua virtual machine";
 
@@ -165,39 +165,39 @@ namespace _Wolframe {
 		LOG_TRACE << "Lua virtual machine has been destroyed";
 	}
 
-	void echoConnection::printMemStats( )
+	void luaConnection::printMemStats( )
 	{
 		int kbytes = lua_gc( l, LUA_GCCOUNT, 0 );
 		if( kbytes > maxMemUsed ) {
 			maxMemUsed = kbytes;
 		}
-		LOG_INFO << "LUA VM memory in use: " << kbytes << " kBytes (max. " << maxMemUsed << " kBytes)";
+		LOG_DEBUG << "LUA VM memory in use: " << kbytes << " kBytes (max. " << maxMemUsed << " kBytes)";
 	}
 
-	echoConnection::echoConnection( const Network::LocalTCPendpoint& local )
-		: counter( 0 ), maxMemUsed( 0 )
+	luaConnection::luaConnection( const Network::LocalTCPendpoint& local, const luaConfig config_ )
+		: counter( 0 ), maxMemUsed( 0 ), config( config_ )
 	{
 		LOG_TRACE << "Created connection handler for " << local.toString();
 		createVM( );
-		printMemStats( );
+		if( config.debug ) printMemStats( );
 	}
 
 
-	echoConnection::echoConnection( const Network::LocalSSLendpoint& local )
-		: counter( 0 ), maxMemUsed( 0 )
+	luaConnection::luaConnection( const Network::LocalSSLendpoint& local, const luaConfig config_ )
+		: counter( 0 ), maxMemUsed( 0 ), config( config_ ) 
 	{
 		LOG_TRACE << "Created connection handler (SSL) for " << local.toString();
 		createVM( );
-		printMemStats( );
+		if( config.debug ) printMemStats( );
 	}
 
-	echoConnection::~echoConnection()
+	luaConnection::~luaConnection()
 	{
 		LOG_TRACE << "Connection handler destroyed";
 		destroyVM( );
 	}
 
-	void echoConnection::setPeer( const Network::RemoteTCPendpoint& remote )
+	void luaConnection::setPeer( const Network::RemoteTCPendpoint& remote )
 	{
 		LOG_TRACE << "Peer set to " << remote.toString();
 
@@ -214,10 +214,10 @@ namespace _Wolframe {
 			lua_pop( l, 1 );
 			throw new std::runtime_error( "Error in LUA processor" );
 		}
-		printMemStats( );
+		if( config.debug ) printMemStats( );
 	}
 
-	void echoConnection::setPeer( const Network::RemoteSSLendpoint& remote )
+	void luaConnection::setPeer( const Network::RemoteSSLendpoint& remote )
 	{
 		LOG_TRACE << "Peer set to " << remote.toString();
 		LOG_TRACE << "Peer Common Name: " << remote.commonName();
@@ -236,11 +236,11 @@ namespace _Wolframe {
 			lua_pop( l, 1 );
 			throw new std::runtime_error( "Error in LUA processor" );
 		}
-		printMemStats( );
+		if( config.debug ) printMemStats( );
 	}
 
 	/// Handle a request and produce a reply.
-	const Network::NetworkOperation echoConnection::nextOperation()
+	const Network::NetworkOperation luaConnection::nextOperation()
 	{
 		lua_pushstring( l, "next_operation" );
 		lua_gettable( l, LUA_GLOBALSINDEX );
@@ -271,20 +271,20 @@ namespace _Wolframe {
 			LOG_FATAL << "Lua code returns '" << op << "', expecting one of 'READ', 'WRITE', 'CLOSE'!";
 			throw new std::runtime_error( "Error in LUA processor" );
 		}
-		printMemStats( );
+		if( config.debug ) printMemStats( );
 	}
 
 	// Parse incoming data. The data is copied from the temporary read buffer in
 	// the handler to the lua parameter passed by value (it's most likely not a good
 	// idea when using iterators later, we use too much copying around here!)
-	void echoConnection::networkInput( const void *begin, std::size_t bytesTransferred )
+	void luaConnection::networkInput( const void *begin, std::size_t bytesTransferred )
 	{
 		LOG_DATA << "network Input: Read " << bytesTransferred << " bytes";
 
 		counter++;
 		if( counter % 100 == 0 ) {
 			//(void)lua_gc( l, LUA_GCCOLLECT, 0 );
-			printMemStats( );
+			if( config.debug ) printMemStats( );
 		}
 
 		lua_pushstring( l, "network_input" );
@@ -297,7 +297,7 @@ namespace _Wolframe {
 		}
 	}
 
-	void echoConnection::timeoutOccured()
+	void luaConnection::timeoutOccured()
 	{
 		LOG_TRACE << "Processor received timeout";
 
@@ -311,7 +311,7 @@ namespace _Wolframe {
 		}
 	}
 
-	void echoConnection::signalOccured()
+	void luaConnection::signalOccured()
 	{
 		LOG_TRACE << "Processor received signal";
 
@@ -325,7 +325,7 @@ namespace _Wolframe {
 		}
 	}
 
-	void echoConnection::errorOccured( NetworkSignal signal )
+	void luaConnection::errorOccured( NetworkSignal signal )
 	{
 		const char *signal_s;
 
@@ -364,15 +364,15 @@ namespace _Wolframe {
 	/// ServerHandler PIMPL
 	Network::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const Network::LocalTCPendpoint& local )
 	{
-		return new echoConnection( local );
+		return new luaConnection( local, config_ );
 	}
 
 	Network::connectionHandler* ServerHandler::ServerHandlerImpl::newSSLconnection( const Network::LocalSSLendpoint& local )
 	{
-		return new echoConnection( local );
+		return new luaConnection( local, config_ );
 	}
 
-	ServerHandler::ServerHandler( const HandlerConfiguration* ) : impl_( new ServerHandlerImpl )	{}
+	ServerHandler::ServerHandler( const HandlerConfiguration *config ) : impl_( new ServerHandlerImpl( config ) )	{}
 
 	ServerHandler::~ServerHandler()	{ delete impl_; }
 

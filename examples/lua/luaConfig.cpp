@@ -17,6 +17,7 @@ void LuaConfiguration::print( std::ostream& os ) const
 {
 	os << displayStr() << std::endl;
 	os << "   LUA script: " << script << std::endl;
+	os << "        debug: " << ( debug ? "yes" : "no" ) << std::endl; 
 }
 
 
@@ -40,8 +41,10 @@ bool LuaConfiguration::parse( const boost::property_tree::ptree& pt, std::ostrea
 		if ( boost::algorithm::iequals( it->first, "script" ))	{
 			if ( ! Configuration::getStringValue( it, displayStr(), "script", script, os ))
 				return false;
-		}
-		else	{
+		} else if ( boost::algorithm::iequals( it->first, "debug" ))	{
+			if ( ! Configuration::getBoolValue( it, displayStr(), "debug", debug, os ))
+				return false;
+		} else {
 			os << displayStr() << ": unknown configuration option: <" << it->first << ">";
 			return false;
 		}
