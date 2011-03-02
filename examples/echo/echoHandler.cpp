@@ -10,23 +10,23 @@
 
 namespace _Wolframe {
 
-	echoConnection::echoConnection( const Network::LocalTCPendpoint& local )
+	echoConnection::echoConnection( const Network::LocalTCPendpoint& local, unsigned short timeout )
 	{
 		LOG_TRACE << "Created connection handler for " << local.toString();
 		state_ = NEW;
 		dataStart_ = NULL;
 		dataSize_ = 0;
-		idleTimeout_ = 30;
+		idleTimeout_ = timeout;
 	}
 
 
-	echoConnection::echoConnection( const Network::LocalSSLendpoint& local )
+	echoConnection::echoConnection( const Network::LocalSSLendpoint& local, unsigned short timeout )
 	{
 		LOG_TRACE << "Created connection handler (SSL) for " << local.toString();
 		state_ = NEW;
 		dataStart_ = NULL;
 		dataSize_ = 0;
-		idleTimeout_ = 30;
+		idleTimeout_ = timeout;
 	}
 
 	echoConnection::~echoConnection()
@@ -166,16 +166,16 @@ namespace _Wolframe {
 	/// ServerHandler PIMPL
 	Network::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const Network::LocalTCPendpoint& local )
 	{
-		return new echoConnection( local );
+		return new echoConnection( local, timeout );
 	}
 
 	Network::connectionHandler* ServerHandler::ServerHandlerImpl::newSSLconnection( const Network::LocalSSLendpoint& local )
 	{
-		return new echoConnection( local );
+		return new echoConnection( local, timeout );
 	}
 
 
-	ServerHandler::ServerHandler( const HandlerConfiguration* ) : impl_( new ServerHandlerImpl )	{}
+	ServerHandler::ServerHandler( const HandlerConfiguration *config ) : impl_( new ServerHandlerImpl( config ) )	{}
 
 	ServerHandler::~ServerHandler()	{ delete impl_; }
 
