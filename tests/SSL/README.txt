@@ -1,4 +1,4 @@
-SSL test files for SMERP
+SSL test files for Wolframe
 
 Generate a CA certificate:
   openssl req -config openssl.cnf -days 1825 -x509 -newkey rsa:2048 \
@@ -17,7 +17,7 @@ Delete the unnecessary files: xx.pem (xx means numeric), *.old *.req
 
 All passwords are xxyy.
 
-wolframed, wolframedpwd and SMERPclient are signed with CA
+wolframed, wolframedpwd and WolfClient are signed with CA
 client is signed with CAclient
 
 To build the CA directory copy / link CA certificates to the CA directory
@@ -30,8 +30,8 @@ List of files:
 
 README.txt		this file
 
-CA.cert.pem		SMERP CA certificate
-CA.key.pem		SMERP CA key
+CA.cert.pem		Wolframe CA certificate
+CA.key.pem		Wolframe CA key
 openssl.cnf		configuration file used in the commands above
 
 CAclient.cert.pem	another CA certificate
@@ -48,8 +48,8 @@ CAdir			CA directory
 client.crt		client certificate, signed with CAclient.cert
 client.key		key for client.crt
 
-SMERPclient.crt		client certificate signed with CA.cert
-SMERPclient.key		key for SMERPclient
+Wolfclient.crt		client certificate signed with CA.cert
+Wolfclient.key		key for Wolfclient
 
 wolframed.crt		server certificate (signed with CA.cert)
 wolframed.key		key for wolframed.crt
