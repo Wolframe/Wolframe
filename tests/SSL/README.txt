@@ -4,20 +4,20 @@ Generate a CA certificate:
   openssl req -config openssl.cnf -days 1825 -x509 -newkey rsa:2048 \
               -out CA.cert.pem -keyout CA.key.pem -outform PEM
 
-Generate a certificate request:
-  openssl req -config openssl.cnf -new -nodes -keyout smerpd.key \
-              -out smerpd.req -days 365
+Generate a certificate request (for wolframe):
+  openssl req -config openssl.cnf -new -nodes -keyout wolframed.key \
+              -out wolframed.req -days 365
 
-Sign a certificate
-  openssl ca -config openssl.cnf -policy policy_anything -out smerpd.crt \
-             -infiles smerpd.req
+Sign a certificate (for wolframe):
+  openssl ca -config openssl.cnf -policy policy_anything -out wolframed.crt \
+             -infiles wolframed.req
 
 Delete the unnecessary files: xx.pem (xx means numeric), *.old *.req
 
 
 All passwords are xxyy.
 
-smerpd, smerpdpwd and SMERPclient are signed with CA
+wolframed, wolframedpwd and SMERPclient are signed with CA
 client is signed with CAclient
 
 To build the CA directory copy / link CA certificates to the CA directory
@@ -51,9 +51,8 @@ client.key		key for client.crt
 SMERPclient.crt		client certificate signed with CA.cert
 SMERPclient.key		key for SMERPclient
 
-smerpd.crt		server certificate (signed with CA.cert)
-smerpd.key		key for smerpd.crt
+wolframed.crt		server certificate (signed with CA.cert)
+wolframed.key		key for wolframed.crt
 
-smerpdpwd.crt		same as smerpd but password protected
-smerpdpwd.key		key for smerpdpwd.crt
-
+wolframedpwd.crt	server certificate (signed with CA.cert)
+wolframedpwd.key	same as for wolframed but password protected
