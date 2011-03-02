@@ -20,9 +20,9 @@ ApplicationConfiguration::ApplicationConfiguration()
 
 	handlerConfig = new _Wolframe::HandlerConfiguration();
 
-	section["server"] = 0, conf.push_back( srvConfig );
-	section["logging"] = 1, conf.push_back( logConfig );
-	section["timeout"] = 2, conf.push_back( handlerConfig->echoConfig );
+	addConfig( srvConfig );
+	addConfig( logConfig );
+	addConfig( handlerConfig->echoConfig );
 }
 
 	} // namespace Configuration

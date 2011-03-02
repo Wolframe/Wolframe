@@ -38,6 +38,19 @@ const char* ApplicationConfiguration::chooseFile( const char *globalFile, const 
 }
 
 
+bool ApplicationConfiguration::addConfig( ConfigurationBase *config )
+{
+	// check if the label already exists
+	if ( section_.find( config->root() ) != section_.end() )
+		return false;
+
+	std::size_t pos = conf_.size();
+	section_[ config->root() ] = pos;
+	conf_.push_back( config );
+	return true;
+}
+
+
 bool ApplicationConfiguration::parse ( const char *filename, std::ostream& os )
 {
 	configFile = resolvePath( boost::filesystem::absolute( filename ).string() );
@@ -53,9 +66,9 @@ bool ApplicationConfiguration::parse ( const char *filename, std::ostream& os )
 
 		for ( boost::property_tree::ptree::const_iterator it = pt.begin();
 								it != pt.end(); it++ )	{
-			std::map< std::string, int >::iterator confIt;
-			if (( confIt = section.find( it->first ) ) != section.end() )	{
-				if ( ! conf[ confIt->second ]->parse( pt.get_child( it->first ), os ))
+			std::map< std::string, std::size_t >::iterator confIt;
+			if (( confIt = section_.find( it->first ) ) != section_.end() )	{
+				if ( ! conf_[ confIt->second ]->parse( pt.get_child( it->first ), os ))
 					return false;
 			}
 			else	{
@@ -102,17 +115,17 @@ void ApplicationConfiguration::print( std::ostream& os ) const
 #if !defined(_WIN32)
 	os << "Run in foreground: " << (foreground ? "yes" : "no") << std::endl;
 #endif
-	for ( std::size_t i = 0; i < conf.size(); i++ )	{
+	for ( std::size_t i = 0; i < conf_.size(); i++ )	{
 		os << std::endl;
-		conf[ i ]->print( os );
+		conf_[ i ]->print( os );
 	}
 }
 
 /// Check if the application configuration makes sense
 bool ApplicationConfiguration::check( std::ostream& os ) const
 {
-	for ( std::size_t i = 0; i < conf.size(); i++ )
-		if ( ! conf[ i ]->check( os ))
+	for ( std::size_t i = 0; i < conf_.size(); i++ )
+		if ( ! conf_[ i ]->check( os ))
 			return false;
 	return true;
 }

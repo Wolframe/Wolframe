@@ -10,20 +10,20 @@
 namespace _Wolframe {
 	namespace Configuration {
 
-ApplicationConfiguration::ApplicationConfiguration()
-{
-	// server
-	srvConfig = new Configuration::ServerConfiguration( "server", "Server" );
+		ApplicationConfiguration::ApplicationConfiguration()
+		{
+			// server
+			srvConfig = new Configuration::ServerConfiguration( "server", "Server" );
 
-	// logging
-	logConfig = new Configuration::LoggerConfiguration( "logging", "Logging" );
+			// logging
+			logConfig = new Configuration::LoggerConfiguration( "logging", "Logging" );
 
-	handlerConfig = new _Wolframe::HandlerConfiguration();
+			handlerConfig = new _Wolframe::HandlerConfiguration();
 
-	section["server"] = 0, conf.push_back( srvConfig );
-	section["logging"] = 1, conf.push_back( logConfig );
-	section["lua"] = 2, conf.push_back( handlerConfig->luaConfig );
-}
+			addConfig( srvConfig );
+			addConfig( logConfig );
+			addConfig( handlerConfig->luaConfig );
+		}
 
 	} // namespace Configuration
 } // namespace _Wolframe

@@ -50,8 +50,10 @@ namespace _Wolframe {
 						       const char *userFile,
 						       const char *localFile );
 		private:
-			std::vector< ConfigurationBase* >	conf;
-			std::map< std::string, int >		section;
+			std::vector< ConfigurationBase* >	conf_;
+			std::map< std::string, std::size_t >	section_;
+
+			bool addConfig( ConfigurationBase *config );
 		};
 	} // namespace Configuration
 } // namespace _Wolframe
