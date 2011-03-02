@@ -34,10 +34,11 @@ tests/protocolArgumentParsing-gTest
 tests/poolTest
 tests/resolvePathTest
 tests/authTest
-examples/echo/smerp-echo
-examples/pecho/smerp-pecho
-examples/xmlselect/smerp-xmlselect
-examples/mtproc/smerp-mtproc
-examples/lua/smerp-lua
+tests/mtprocHandler-gTest
+examples/echo/echod
+examples/lua/luad
+examples/mtproc/mtprocd
+examples/pecho/pechod
 clients/qt/qtclient
 moc_*.cpp
+clients/qt/.history
