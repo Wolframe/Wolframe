@@ -26,14 +26,14 @@ PLATFORM_SDK_DIR = C:\Program Files\Microsoft SDKs\Windows\v7.0
 
 # version of the boost library
 
-BOOST_VERSION = 1_45
+BOOST_VERSION = 1_46
 
 # base dir where boost is installed
 
 #BOOST_DIR = C:\Programme\boost\boost_$(BOOST_VERSION)
 #BOOST_DIR = C:\Program Files\boost\boost_$(BOOST_VERSION)
 #BOOST_DIR = D:\Programme\boost\boost_$(BOOST_VERSION)
-BOOST_DIR = C:\Cygwin\home\Andreas\boost_1_45_0
+BOOST_DIR = C:\Cygwin\home\Andreas\boost_1_46_0
 #BOOST_DIR = C:\Cygwin\home\Administrator\boost_1_45_0
 #BOOST_DIR = D:\boost\boost_1_45_0
 
@@ -50,8 +50,10 @@ BOOST_MT = -mt
 #BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib"
 
 # self-compiled
-BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\stage\lib"
+#BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\stage\lib"
 #BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib\Win32"
+
+BOOST_LDFLAGS = /LIBPATH:$(BOOST_DIR)\lib64
 
 # OpenSSL (http://www.slproweb.com/products/Win32OpenSSL.html)
 ##############################################################

@@ -12,10 +12,7 @@ Prerequisites
 Boost
 -----
 
-Get boost from http://boostpro.com
-
-Boost 1.44 needs an essential patch, see:
-https://svn.boost.org/trac/boost/ticket/4487
+Get boost from http://boostpro.com or http://boost.teeks99.com
 
 Install for instance into C:\Program Files\Boost\Boost_1_44
 
@@ -32,6 +29,16 @@ bootstrap
 .\bjam
 
 set BOOST_DIR to C:\<myhome>\boost-1_44_0
+
+Notes on special Boost versions
+-------------------------------
+
+Boost 1.44
+----------
+
+Boost 1.44 needs an essential patch, see:
+https://svn.boost.org/trac/boost/ticket/4487
+
 
 Compile and install openssl
 ---------------------------
