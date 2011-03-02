@@ -28,7 +28,7 @@ namespace _Wolframe {
 	};
 
 
-	/// SMERP handler configuration structure
+	/// Wolframe handler configuration structure
 	struct HandlerConfiguration
 	{
 	public:

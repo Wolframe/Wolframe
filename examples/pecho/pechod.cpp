@@ -1,5 +1,5 @@
 //
-// smerpd.cpp
+// pechod.cpp
 //
 
 // Super main function :)
