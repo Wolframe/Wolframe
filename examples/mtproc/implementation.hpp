@@ -5,25 +5,45 @@
 namespace _Wolframe {
 namespace mtproc {
 
-//example mtprocHandler object implementation in C++ish form
-struct Method::Data :public Instance
+struct Implementation :public Instance
 {
-   //*methods (context->data points to this)
+   //* constructor/destructor of data
+   static Method::Data* createData();
+   static void destroyData( Method::Data* data);
+
+   //* methods (context->data points to this)
 
    //echo the content
-   static int echo( Context* context, unsigned int argc, const char** argv);
+   static int echo( Method::Context* context, unsigned int argc, const char** argv);
 
    //echo the arguments without referencing content
-   static int printarg( Context* context, unsigned int argc, const char** argv);
+   static int printarg( Method::Context* context, unsigned int argc, const char** argv);
 
-   //data
-   Data()
+   Implementation()
    {
-      static Method mt_[3] = {{"echo",&echo},{"parg",&printarg},{0,0}};
-      mt = mt_;
-      data = this;
+      static Method mt[3] = {{"echo",&echo},{"parg",&printarg},{0,0}};
+      m_mt = mt;
+      m_data = 0;
+      m_createData = &createData;
+      m_destroyData = &destroyData;
    }
-};
+   
+   bool init()
+   {
+      if (m_data) destroyData( m_data);
+      m_data = createData();
+      return (!!m_data);
+   }
+
+   void done()
+   {
+      if (m_data)
+      {
+         destroyData( m_data);
+         m_data = 0;
+      }
+   }
+}; 
 
 }}//namespace
 #endif

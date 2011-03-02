@@ -1,26 +1,62 @@
 #include "implementation.hpp"
 #include "logger.hpp"
 #include "generators/char_isolatin1.hpp"
+#include <new>
 
 using namespace _Wolframe::mtproc;
 
-int Method::Data::echo( Context* ctx, unsigned int, const char**)
+//example mtprocHandler object implementation in C++ish form
+struct Method::Data
 {
-   LOG_DATA << "Method Call";
+   char buf;
+   protocol::Generator input;
+   protocol::FormatOutput output;
 
-   if (!ctx->contentIterator) ctx->contentIterator = new protocol::Generator( generator::CharIsoLatin1::GetNext);
-   if (!ctx->output) ctx->output = new protocol::FormatOutput( generator::CharIsoLatin1::Print);
-   char ch;
-   while (ctx->contentIterator->getNext( &ch, 1))
+   Data() :buf(0),input(generator::CharIsoLatin1::GetNext),output(generator::CharIsoLatin1::Print){}
+};
+
+
+Method::Data* Implementation::createData()
+{
+   return new (std::nothrow) Method::Data();
+}
+
+void Implementation::destroyData( Method::Data* data)
+{
+   delete data;
+}
+
+int Implementation::echo( Method::Context* ctx, unsigned int, const char**)
+{
+   LOG_DATA << "Method Call echo";
+
+   if (!ctx->contentIterator)
    {
-      if (!ctx->output->print( 0, &ch, 1)) return 0;
+      ctx->contentIterator = &ctx->data->input;
+      ctx->output = &ctx->data->output;
+   }
+   if (ctx->data->buf != 0)
+   {
+      if (!ctx->output->print( 0, &ctx->data->buf, 1)) return 0;
+      ctx->data->buf = 0;
+   }
+   while (ctx->contentIterator->getNext( &ctx->data->buf, 1))
+   {
+      if (!ctx->output->print( 0, &ctx->data->buf, 1)) return 0;
+      ctx->data->buf = 0;
    }
    return 0;
 }
 
-int Method::Data::printarg( Context* ctx, unsigned int, const char**)
+int Implementation::printarg( Method::Context* ctx, unsigned int, const char**)
 {
-   if (!ctx->output) ctx->output = new protocol::FormatOutput( generator::CharIsoLatin1::Print);
+   LOG_DATA << "Method Call printarg";
+
+   if (!ctx->contentIterator)
+   {
+      ctx->contentIterator = &ctx->data->input;
+      ctx->output = &ctx->data->output;
+   }
    return 0;
 }
 

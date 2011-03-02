@@ -18,7 +18,7 @@ void CommandDispatcher::resetCommand()
    if (m_instance)
    {
       m_state = Init;
-      m_context.init( m_instance->data);
+      m_context.init( m_instance->m_data);
    }
    else
    {
@@ -40,17 +40,11 @@ void CommandDispatcher::init( const char** protocolCmds, Instance* instance)
          m_parser.add( protocolCmds[ ii]);
       }
    }
-   if (instance)
+   if (instance && instance->m_mt)
    {
-      m_context.data = instance->data;
-      m_context.contentIterator = 0;
-
-      if (instance->mt)
+      for( unsigned int ii=0; instance->m_mt[ii].call && instance->m_mt[ii].name; ii++)
       {
-         for( unsigned int ii=0; instance->mt[ii].call && instance->mt[ii].name; ii++)
-         {
-            m_parser.add( instance->mt[ii].name);
-         }
+         m_parser.add( instance->m_mt[ii].name);
       }
    }
 }
@@ -188,19 +182,19 @@ CommandDispatcher::IOState CommandDispatcher::call( int& returnCode)
 
       case ArgumentsParsed:
       {
-         LOG_DEBUG << "call of '" << m_instance->mt[ m_methodIdx].name << "'";
+         LOG_DEBUG << "call of '" << m_instance->m_mt[ m_methodIdx].name << "'";
          m_argc = m_argBuffer.argc()+1;
-         m_argv = m_argBuffer.argv( m_instance->mt[ m_methodIdx].name);
+         m_argv = m_argBuffer.argv( m_instance->m_mt[ m_methodIdx].name);
          m_state = Running;
          //no break here !
       }
 
       case Running:
       {
-         returnCode = m_instance->mt[ m_methodIdx].call( &m_context, m_argc, m_argv);
+         returnCode = m_instance->m_mt[ m_methodIdx].call( &m_context, m_argc, m_argv);
          if (returnCode != 0)
          {
-            LOG_ERROR << "error " << returnCode << " calling '" << m_instance->mt[ m_methodIdx].name << "'";
+            LOG_ERROR << "error " << returnCode << " calling '" << m_instance->m_mt[ m_methodIdx].name << "'";
             resetCommand();
             return Close;
          }
@@ -218,7 +212,7 @@ CommandDispatcher::IOState CommandDispatcher::call( int& returnCode)
 
                case protocol::Generator::Error:
                   returnCode = m_context.contentIterator->getError();
-                  LOG_ERROR << "error " << returnCode << ") in generator calling '" << m_instance->mt[ m_methodIdx].name << "'";
+                  LOG_ERROR << "error " << returnCode << ") in generator calling '" << m_instance->m_mt[ m_methodIdx].name << "'";
                   resetCommand();
                   return Close;
 
@@ -242,16 +236,16 @@ const char* CommandDispatcher::getCapabilities()
 {
    m_lineBuffer.init();
    unsigned int ii;
-   if (m_instance && m_instance->mt)
+   if (m_instance && m_instance->m_mt)
    {
-      for (ii=0; m_instance->mt[ii].call && m_instance->mt[ii].name; ii++)
+      for (ii=0; m_instance->m_mt[ii].call && m_instance->m_mt[ii].name; ii++)
       {
          if (ii>0)
          {
             m_lineBuffer.push_back( ',');
             m_lineBuffer.push_back( ' ');
          }
-         m_lineBuffer.append( m_instance->mt[ii].name);
+         m_lineBuffer.append( m_instance->m_mt[ii].name);
       }
    }
    return m_lineBuffer.c_str();

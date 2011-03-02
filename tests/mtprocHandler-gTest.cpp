@@ -123,7 +123,7 @@ protected:
       input.clear();
       expected.clear();
       input.append( "echo\r\n");
-      expected.append( "OK expecting command\r\n");
+      expected.append( "OK expecting command\r\n\r\n");
 
       input.append( test.content);
       expected.append( escape( test.content));

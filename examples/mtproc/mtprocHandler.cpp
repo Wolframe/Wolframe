@@ -58,7 +58,7 @@ struct Connection::Private
    InputIterator end;                         //< iterator pointing to end of message buffer
 
    //3. implementation
-   Method::Data object;
+   Implementation object;
 
    //* helper methods for I/O
    //helper function to send a line message with CRLF termination as C string
@@ -77,6 +77,19 @@ struct Connection::Private
       const char* msg = buffer.c_str();
       buffer.init();
       return Network::SendData( msg, ii+2);
+   }
+
+   void passInput()
+   { 
+      Input::iterator eoD = input.getEoD( itr);
+      if (state == Processing) state = ProcessingInput;
+
+      if (state == ProcessingInput)
+      {
+         commandDispatcher.protocolInput( itr, eoD, input.gotEoD());
+      }
+      end = input.end();
+      itr = (eoD < end) ? (eoD+1):end;
    }
 
    void networkInput( const void*, std::size_t nofBytes)
@@ -117,9 +130,13 @@ struct Connection::Private
    {
        itr = input.begin();
        end = input.end();
+       object.init();
        commandDispatcher.init( &object);
    }
-   ~Private()  {}
+   ~Private()
+   {
+       object.done();
+   }
 
    //statemachine of the processor
    const Operation nextOperation()
@@ -188,8 +205,7 @@ struct Connection::Private
                    {
                       if (state == Processing)
                       {
-                         Input::iterator eoD = input.getEoD( itr);
-                         commandDispatcher.protocolInput( itr, eoD, input.gotEoD());
+                         passInput();
                          continue;
                       }
                       else
@@ -213,12 +229,19 @@ struct Connection::Private
                    {
                       if (returnCode == 0)
                       {
-                         state = (input.gotEoD())?EndOfCommand:DiscardInput;
+                         if (state == Processing)
+                         {
+                            state = Init;
+                         }
+                         else
+                         {
+                            state = (input.gotEoD())?EndOfCommand:DiscardInput;
+                         }
                          return WriteLine( "\r\n.\r\nOK");
                       }
                       else
                       {
-                         state = DiscardInput;
+                         state = (state == Processing)?Init:DiscardInput;
                          char ee[ 64];
                          snprintf( ee, sizeof(ee), "%d", returnCode);
                          return WriteLine( "\r\n.\r\nERR", ee);

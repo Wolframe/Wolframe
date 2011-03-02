@@ -18,7 +18,10 @@ struct Method
       protocol::FormatOutput* output;
       
       Context()                   :data(0),contentIterator(0),output(0){}
-      void init( Data* p_data=0)  {data=p_data;contentIterator=0;output=0;}
+      void init( Data* d=0)       {data=d;contentIterator=0;output=0;}
+
+      typedef Data* (*DataConstructor)();
+      typedef void (*DataDestructor)( Data* context);
    };
    //Method call
    //@return 0, in case of success, errorcode for client in case of error
@@ -31,11 +34,13 @@ struct Method
 //current instance with data of the processor
 struct Instance
 {
-   const Method* mt;
-   Method::Data* data;
+   const Method* m_mt;
+   Method::Data* m_data;
+   Method::Context::DataConstructor m_createData;
+   Method::Context::DataDestructor m_destroyData;
 
-   Instance()                    :mt(0),data(0){}
-   Instance( const Instance& o)  :mt(o.mt),data(o.data){}
+   Instance()                    :m_mt(0),m_data(0),m_createData(0),m_destroyData(0){}
+   Instance( const Instance& o)  :m_mt(o.m_mt),m_data(o.m_data),m_createData(o.m_createData),m_destroyData(o.m_destroyData){}
 };
 
 }}//namespace
