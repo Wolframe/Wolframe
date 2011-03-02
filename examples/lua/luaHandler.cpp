@@ -171,7 +171,7 @@ namespace _Wolframe {
 		if( kbytes > maxMemUsed ) {
 			maxMemUsed = kbytes;
 		}
-		LOG_INFO << "LUA VM memory in use: " << kbytes << " kBytes (max. " << maxMemUsed << " kBytes)";
+		LOG_DEBUG << "LUA VM memory in use: " << kbytes << " kBytes (max. " << maxMemUsed << " kBytes)";
 	}
 
 	luaConnection::luaConnection( const Network::LocalTCPendpoint& local, const luaConfig config_ )
@@ -179,7 +179,7 @@ namespace _Wolframe {
 	{
 		LOG_TRACE << "Created connection handler for " << local.toString();
 		createVM( );
-		printMemStats( );
+		if( config.debug ) printMemStats( );
 	}
 
 
@@ -188,7 +188,7 @@ namespace _Wolframe {
 	{
 		LOG_TRACE << "Created connection handler (SSL) for " << local.toString();
 		createVM( );
-		printMemStats( );
+		if( config.debug ) printMemStats( );
 	}
 
 	luaConnection::~luaConnection()
@@ -214,7 +214,7 @@ namespace _Wolframe {
 			lua_pop( l, 1 );
 			throw new std::runtime_error( "Error in LUA processor" );
 		}
-		printMemStats( );
+		if( config.debug ) printMemStats( );
 	}
 
 	void luaConnection::setPeer( const Network::RemoteSSLendpoint& remote )
@@ -236,7 +236,7 @@ namespace _Wolframe {
 			lua_pop( l, 1 );
 			throw new std::runtime_error( "Error in LUA processor" );
 		}
-		printMemStats( );
+		if( config.debug ) printMemStats( );
 	}
 
 	/// Handle a request and produce a reply.
@@ -271,7 +271,7 @@ namespace _Wolframe {
 			LOG_FATAL << "Lua code returns '" << op << "', expecting one of 'READ', 'WRITE', 'CLOSE'!";
 			throw new std::runtime_error( "Error in LUA processor" );
 		}
-		printMemStats( );
+		if( config.debug ) printMemStats( );
 	}
 
 	// Parse incoming data. The data is copied from the temporary read buffer in
@@ -284,7 +284,7 @@ namespace _Wolframe {
 		counter++;
 		if( counter % 100 == 0 ) {
 			//(void)lua_gc( l, LUA_GCCOLLECT, 0 );
-			printMemStats( );
+			if( config.debug ) printMemStats( );
 		}
 
 		lua_pushstring( l, "network_input" );
