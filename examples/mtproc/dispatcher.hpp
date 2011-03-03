@@ -68,7 +68,7 @@ public:
    Command getCommand( protocol::InputBlock::iterator& itr, protocol::InputBlock::iterator& eoM);
 
    //call the function (first or subsequent call)
-   enum IOState {ReadInput,WriteOutput,Close};
+   enum IOState {ReadInput,WriteOutput,Close,Error};
    IOState call( int& returnCode);
 
    //pass a protocol data input chunk to the processors generator function
@@ -79,6 +79,9 @@ public:
 
    //get the capabilities message
    const char* getCapabilities();
+
+   //return true, if the currently executed command has I/O
+   bool commandHasIO() const;
 };
 
 }}//namespace

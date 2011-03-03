@@ -21,7 +21,7 @@ struct Implementation :public Instance
 
    Implementation()
    {
-      static Method mt[3] = {{"echo",&echo},{"parg",&printarg},{0,0}};
+      static Method mt[3] = {{"echo",&echo,true},{"parg",&printarg,true},{0,0,false}};
       m_mt = mt;
       m_data = 0;
       m_createData = &createData;

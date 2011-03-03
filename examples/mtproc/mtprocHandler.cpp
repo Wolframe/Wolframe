@@ -82,7 +82,6 @@ struct Connection::Private
    void passInput()
    { 
       Input::iterator eoD = input.getEoD( itr);
-      if (state == Processing) state = ProcessingInput;
 
       if (state == ProcessingInput)
       {
@@ -105,14 +104,7 @@ struct Connection::Private
              commandDispatcher.protocolInput( itr, eoD, input.gotEoD());
           }
           end = input.end();
-          if (eoD < end)
-          {
-             itr = eoD+1;
-          }
-          else
-          {
-             itr = end;
-          }
+          itr = (eoD < end)? (eoD+1):end;
        }
        else
        {
@@ -202,9 +194,9 @@ struct Connection::Private
                 switch (commandDispatcher.call( returnCode))
                 {
                    case CommandDispatcher::ReadInput:
-                   {
-                      if (state == Processing)
+                      if (state == Processing) 
                       {
+                         state = ProcessingInput;
                          passInput();
                          continue;
                       }
@@ -213,7 +205,7 @@ struct Connection::Private
                          input.setPos( 0);
                          return Network::ReadData( input.ptr(), input.size());
                       }
-                   }
+
                    case CommandDispatcher::WriteOutput:
                    {
                       void* content;
@@ -221,35 +213,44 @@ struct Connection::Private
                       bool hasOutput = commandDispatcher.getOutput( &content, &contentsize);
                       commandDispatcher.setOutputBuffer( output.ptr(), output.size());
 
-                      if (!hasOutput) continue;
-
-                      return Network::SendData( content, contentsize);
+                      if (!hasOutput) continue; else return Network::SendData( content, contentsize);
                    }
+
                    case CommandDispatcher::Close:
                    {
-                      if (returnCode == 0)
+                      if (commandDispatcher.commandHasIO())
                       {
-                         if (state == Processing)
-                         {
-                            state = Init;
-                         }
-                         else
-                         {
-                            state = (input.gotEoD())?EndOfCommand:DiscardInput;
-                         }
+                         if (state == Processing) passInput();
+                         state = (input.gotEoD())?EndOfCommand:DiscardInput;
                          return WriteLine( "\r\n.\r\nOK");
                       }
                       else
                       {
-                         state = (state == Processing)?Init:DiscardInput;
-                         char ee[ 64];
-                         snprintf( ee, sizeof(ee), "%d", returnCode);
+                         state = Init;
+                         return WriteLine( "\r\nOK");
+                      }
+                   }
+
+                   case CommandDispatcher::Error:
+                   {
+                      char ee[ 64];
+                      snprintf( ee, sizeof(ee), "%d", returnCode);
+
+                      if (commandDispatcher.commandHasIO())
+                      {
+                         if (state == Processing) passInput();
+                         state = (input.gotEoD())?EndOfCommand:DiscardInput;
                          return WriteLine( "\r\n.\r\nERR", ee);
+                      }
+                      else
+                      {
+                         state = Init;
+                         return WriteLine( "\r\nERR", ee);
                       }
                    }
                 }
             }
-
+           
             case DiscardInput:
             {
                if (input.gotEoD())
@@ -301,7 +302,7 @@ struct Connection::Private
                 return Network::CloseConnection();
             }
          }//switch(..)
-      }//for(,,)
+      }//for(;;)
       return Network::CloseConnection();
    }
 };

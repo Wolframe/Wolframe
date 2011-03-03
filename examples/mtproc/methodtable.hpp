@@ -29,7 +29,9 @@ struct Method
    
    const char* name;
    Call call;
+   bool hasIO;
 };
+
 
 //current instance with data of the processor
 struct Instance
@@ -39,8 +41,8 @@ struct Instance
    Method::Context::DataConstructor m_createData;
    Method::Context::DataDestructor m_destroyData;
 
-   Instance()                    :m_mt(0),m_data(0),m_createData(0),m_destroyData(0){}
-   Instance( const Instance& o)  :m_mt(o.m_mt),m_data(o.m_data),m_createData(o.m_createData),m_destroyData(o.m_destroyData){}
+   Instance()                     :m_mt(0),m_data(0),m_createData(0),m_destroyData(0){}
+   Instance( const Instance& o)   :m_mt(o.m_mt),m_data(o.m_data),m_createData(o.m_createData),m_destroyData(o.m_destroyData){}
 };
 
 }}//namespace

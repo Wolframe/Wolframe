@@ -1,6 +1,6 @@
 #ifndef _Wolframe_PROTOCOL_PARSER_HPP_INCLUDED
 #define _Wolframe_PROTOCOL_PARSER_HPP_INCLUDED
-#include <exception>
+#include <stdexcept>
 
 namespace _Wolframe {
 namespace protocol {
@@ -71,7 +71,7 @@ class CmdParser :public Parser
 {      
 public:
    //exception for illegal parser definition (too many commands). 
-   struct Bad :public std::exception {Bad() {};};
+   struct Bad :public std::logic_error {Bad():std::logic_error("too many elements in CmdParser") {};};
    
    CmdParser() :size(0){};
    ~CmdParser() {};

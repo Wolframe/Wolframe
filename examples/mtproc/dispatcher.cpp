@@ -165,6 +165,11 @@ CommandDispatcher::Command CommandDispatcher::getCommand( protocol::InputBlock::
    throw (IllegalState());
 }
 
+bool CommandDispatcher::commandHasIO() const
+{
+   return (m_command == method && m_instance && m_instance->m_mt[ m_methodIdx].hasIO);
+}
+
 CommandDispatcher::IOState CommandDispatcher::call( int& returnCode)
 {
    LOG_DATA << "Dispatcher Call";
@@ -190,44 +195,58 @@ CommandDispatcher::IOState CommandDispatcher::call( int& returnCode)
       }
 
       case Running:
-      {
-         returnCode = m_instance->m_mt[ m_methodIdx].call( &m_context, m_argc, m_argv);
-         if (returnCode != 0)
+         for (;;)
          {
-            LOG_ERROR << "error " << returnCode << " calling '" << m_instance->m_mt[ m_methodIdx].name << "'";
-            resetCommand();
-            return Close;
-         }
-         if (m_context.contentIterator)
-         {
-            switch (m_context.contentIterator->state())
+            returnCode = m_instance->m_mt[ m_methodIdx].call( &m_context, m_argc, m_argv);
+            if (returnCode != 0)
             {
-               case protocol::Generator::Init:
-               case protocol::Generator::Processing:
-               case protocol::Generator::EndOfInput:
-                  if (m_context.output && (m_context.output->pos() > 0 || m_context.output->size() == 0)) return WriteOutput;
-                  LOG_DATA << "End of Method Call";
-                  resetCommand();
-                  return Close;
-
-               case protocol::Generator::Error:
-                  returnCode = m_context.contentIterator->getError();
-                  LOG_ERROR << "error " << returnCode << ") in generator calling '" << m_instance->m_mt[ m_methodIdx].name << "'";
-                  resetCommand();
-                  return Close;
-
-               case protocol::Generator::EndOfMessage:
-                  return ReadInput;
+               LOG_ERROR << "error " << returnCode << " calling '" << m_instance->m_mt[ m_methodIdx].name << "'";
+               return Error;
             }
-         }
-         else
-         {
-            if (m_context.output && m_context.output->pos()) return WriteOutput;
-            LOG_DATA << "End of Method Call";
-            resetCommand();
-            return Close;
-         }
-      }
+            if (m_context.contentIterator)
+            {
+               switch (m_context.contentIterator->state())
+               {
+                  case protocol::Generator::Init:
+                  case protocol::Generator::Processing:
+                  case protocol::Generator::EndOfInput:
+                     if (m_context.output && (m_context.output->pos() > 0 || m_context.output->size() == 0))
+                     {
+                        if (commandHasIO()) return WriteOutput;
+                        LOG_ERROR << "error printed in method '" << m_instance->m_mt[ m_methodIdx].name << "' declared to have no output";
+                        return Error;
+                     }
+                     else
+                     {
+                        LOG_DATA << "End of Method Call";
+                        return Close;
+                     }
+                  case protocol::Generator::Error:
+                     returnCode = m_context.contentIterator->getError();
+                     LOG_ERROR << "error " << returnCode << ") in generator calling '" << m_instance->m_mt[ m_methodIdx].name << "'";
+                     return Error;
+
+                  case protocol::Generator::EndOfMessage:
+                     if (commandHasIO()) return ReadInput;
+                     m_context.contentIterator->protocolInput( 0, 0, true);
+                     continue;
+               }
+            }
+            else
+            {
+               if (m_context.output && (m_context.output->pos() > 0 || m_context.output->size() == 0))
+               {
+                  if (commandHasIO()) return WriteOutput;
+                  LOG_ERROR << "error printed in method '" << m_instance->m_mt[ m_methodIdx].name << "' declared to have no output";
+                  return Error;
+               }
+               else
+               {
+                  LOG_DATA << "End of Method Call";
+                  return Close;
+               }
+            }
+         }//for(;;)
    }
    return Close;
 }
