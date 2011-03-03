@@ -11,6 +11,7 @@
 #include <boost/property_tree/ptree.hpp>
 
 //// forward declaration for boost::property_tree
+//// we should make this work one day
 //namespace boost	{
 //	namespace property_tree	{
 //		struct	ptree;
@@ -22,15 +23,13 @@ namespace _Wolframe {
 
 		struct ConfigurationBase	{
 		public:
-			ConfigurationBase( const std::string& rt, const std::string& ds )
-								{ root_ = rt; dispStr_ = ds; }
+			ConfigurationBase( const std::string& dispName )
+								{ dispName_ = dispName; }
 
-//			virtual ~ConfigurationBase();
+			const std::string& displayName() const	{ return dispName_; }
 
-			const std::string& root() const		{ return root_; }
-			const std::string& displayStr()	const	{ return dispStr_; }
-
-			virtual bool parse( const boost::property_tree::ptree& pt, std::ostream& os ) = 0;
+			virtual bool parse( const boost::property_tree::ptree& pt, const std::string& nodeName,
+					    std::ostream& os ) = 0;
 
 			/// Check if the server configuration makes sense
 			///
@@ -46,8 +45,7 @@ namespace _Wolframe {
 			///
 			virtual void print( std::ostream& os ) const = 0;
 		private:
-			std::string	root_;
-			std::string	dispStr_;
+			std::string	dispName_;
 		};
 
 	} // namespace Configuration

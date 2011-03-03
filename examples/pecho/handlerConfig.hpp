@@ -16,10 +16,10 @@ namespace _Wolframe {
 		unsigned short		timeout;
 
 		/// constructor
-		EchoConfiguration( const std::string& node, const std::string& header )
-			: ConfigurationBase( node, header )	{ timeout = 0; }
+		EchoConfiguration( const std::string& printName )
+			: ConfigurationBase( printName )	{ timeout = 0; }
 		/// methods
-		bool parse( const boost::property_tree::ptree& pt, std::ostream& os );
+		bool parse( const boost::property_tree::ptree& pt, const std::string& nodeName, std::ostream& os );
 		bool check( std::ostream& os ) const;
 		void print( std::ostream& os ) const;
 
@@ -37,7 +37,7 @@ namespace _Wolframe {
 		/// constructor
 		HandlerConfiguration()
 		{
-			echoConfig = new EchoConfiguration( "timeout", "Echo Server" );
+			echoConfig = new EchoConfiguration( "Echo Server" );
 		}
 	};
 

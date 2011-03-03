@@ -45,10 +45,10 @@ namespace _Wolframe {
 			std::list<Network::ServerSSLendpoint> SSLaddress;
 
 			/// constructor
-			ServerConfiguration( const std::string& node, const std::string& header );
+			ServerConfiguration();
 
 			/// methods
-			bool parse( const boost::property_tree::ptree& pt, std::ostream& os );
+			bool parse( const boost::property_tree::ptree& pt, const std::string& node, std::ostream& os );
 			bool check( std::ostream& os ) const;
 			void print( std::ostream& os ) const;
 
@@ -85,10 +85,10 @@ namespace _Wolframe {
 #endif // !defined( _WIN32 )
 
 			/// constructor
-			LoggerConfiguration( const std::string& node, const std::string& header );
+			LoggerConfiguration();
 
 			/// methods
-			bool parse( const boost::property_tree::ptree& pt, std::ostream& os );
+			bool parse( const boost::property_tree::ptree& pt, const std::string& node, std::ostream& os );
 			bool check( std::ostream& os ) const;
 			void print( std::ostream& os ) const;
 
@@ -111,10 +111,10 @@ namespace _Wolframe {
 			unsigned short		connections;
 
 			/// constructor
-			DatabaseConfiguration( const std::string& node, const std::string& header )
-				: ConfigurationBase( node, header )	{ port = 0; connections = 0; }
+			DatabaseConfiguration()
+				: ConfigurationBase( "Database Server" )	{ port = 0; connections = 0; }
 			/// methods
-			bool parse( const boost::property_tree::ptree& pt, std::ostream& os );
+			bool parse( const boost::property_tree::ptree& pt, const std::string& node, std::ostream& os );
 			bool check( std::ostream& os ) const;
 			void print( std::ostream& os ) const;
 

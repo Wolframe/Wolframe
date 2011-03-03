@@ -13,16 +13,16 @@ namespace _Wolframe {
 		ApplicationConfiguration::ApplicationConfiguration()
 		{
 			// server
-			srvConfig = new Configuration::ServerConfiguration( "server", "Server" );
+			srvConfig = new Configuration::ServerConfiguration();
 
 			// logging
-			logConfig = new Configuration::LoggerConfiguration( "logging", "Logging" );
+			logConfig = new Configuration::LoggerConfiguration();
 
 			handlerConfig = new _Wolframe::HandlerConfiguration();
 
-			addConfig( srvConfig );
-			addConfig( logConfig );
-			addConfig( handlerConfig->echoConfig );
+			addConfig( "server", srvConfig );
+			addConfig( "logging", logConfig );
+			addConfig( "timeout", handlerConfig->echoConfig );
 		}
 
 	} // namespace Configuration

@@ -20,7 +20,7 @@ namespace _Wolframe	{
 
 void DatabaseConfiguration::print( std::ostream& os ) const
 {
-	os << displayStr() << std::endl;
+	os << displayName() << std::endl;
 	if ( host.empty())
 		os << "   Database host: local unix domain socket" << std::endl;
 	else
@@ -43,30 +43,30 @@ bool DatabaseConfiguration::check( std::ostream& os ) const
 }
 
 
-bool DatabaseConfiguration::parse( const boost::property_tree::ptree& pt, std::ostream& os )
+bool DatabaseConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& /* nodeName */, std::ostream& os )
 {
 	for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
 		if ( boost::algorithm::iequals( it->first, "host" ))	{
-			if ( !getStringValue( it, displayStr(), "host", host, os ))		return false;
+			if ( !getStringValue( it, displayName(), "host", host, os ))		return false;
 		}
 		else if ( boost::algorithm::iequals( it->first, "port" ))	{
-			if ( !getUnsignedShortValue( it, displayStr(), "port", port, os ))	return false;
+			if ( !getUnsignedShortValue( it, displayName(), "port", port, os ))	return false;
 		}
 		else if ( boost::algorithm::iequals( it->first, "name" ))	{
-			if ( !getStringValue( it, displayStr(), "name", name, os ))		return false;
+			if ( !getStringValue( it, displayName(), "name", name, os ))		return false;
 		}
 		else if ( boost::algorithm::iequals( it->first, "user" ))	{
-			if ( !getStringValue( it, displayStr(), "user", user, os ))		return false;
+			if ( !getStringValue( it, displayName(), "user", user, os ))		return false;
 		}
 		else if ( boost::algorithm::iequals( it->first, "password" ))	{
-			if ( !getStringValue( it, displayStr(), "password", password, os ))	return false;
+			if ( !getStringValue( it, displayName(), "password", password, os ))	return false;
 		}
 		else if ( boost::algorithm::iequals( it->first, "connections" ))	{
-			if ( !getUnsignedShortValue( it, displayStr(), "connections", connections, os ))
+			if ( !getUnsignedShortValue( it, displayName(), "connections", connections, os ))
 												return false;
 		}
 		else	{
-			os << displayStr() << ": unknown configuration option: <" << it->first << ">";
+			os << displayName() << ": unknown configuration option: <" << it->first << ">";
 			return false;
 		}
 	}

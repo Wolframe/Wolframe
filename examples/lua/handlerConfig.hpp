@@ -17,10 +17,10 @@ namespace _Wolframe {
 		bool			debug;
 
 		/// constructor
-		LuaConfiguration( const std::string& node, const std::string& header )
-			: ConfigurationBase( node, header ), debug( false )	{ }
+		LuaConfiguration( const std::string& printName )
+			: ConfigurationBase( printName ), debug( false )	{ }
 		/// methods
-		bool parse( const boost::property_tree::ptree& pt, std::ostream& os );
+		bool parse( const boost::property_tree::ptree& pt, const std::string& nodeName, std::ostream& os );
 		bool check( std::ostream& os ) const;
 		void print( std::ostream& os ) const;
 
@@ -38,7 +38,7 @@ namespace _Wolframe {
 		/// constructor
 		HandlerConfiguration()
 		{
-			luaConfig = new LuaConfiguration( "lua", "Lua Example Server" );
+			luaConfig = new LuaConfiguration( "Lua Example Server" );
 		}
 	};
 

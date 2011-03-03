@@ -15,9 +15,9 @@ namespace _Wolframe	{
 
 void LuaConfiguration::print( std::ostream& os ) const
 {
-	os << displayStr() << std::endl;
+	os << displayName() << std::endl;
 	os << "   LUA script: " << script << std::endl;
-	os << "        debug: " << ( debug ? "yes" : "no" ) << std::endl; 
+	os << "        debug: " << ( debug ? "yes" : "no" ) << std::endl;
 }
 
 
@@ -35,17 +35,17 @@ bool LuaConfiguration::check( std::ostream& os ) const
 }
 
 
-bool LuaConfiguration::parse( const boost::property_tree::ptree& pt, std::ostream& os )
+bool LuaConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& /* nodeName */, std::ostream& os )
 {
 	for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
 		if ( boost::algorithm::iequals( it->first, "script" ))	{
-			if ( ! Configuration::getStringValue( it, displayStr(), "script", script, os ))
+			if ( ! Configuration::getStringValue( it, displayName(), "script", script, os ))
 				return false;
 		} else if ( boost::algorithm::iequals( it->first, "debug" ))	{
-			if ( ! Configuration::getBoolValue( it, displayStr(), "debug", debug, os ))
+			if ( ! Configuration::getBoolValue( it, displayName(), "debug", debug, os ))
 				return false;
 		} else {
-			os << displayStr() << ": unknown configuration option: <" << it->first << ">";
+			os << displayName() << ": unknown configuration option: <" << it->first << ">";
 			return false;
 		}
 	}

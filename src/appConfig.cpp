@@ -38,14 +38,14 @@ const char* ApplicationConfiguration::chooseFile( const char *globalFile, const 
 }
 
 
-bool ApplicationConfiguration::addConfig( ConfigurationBase *config )
+bool ApplicationConfiguration::addConfig( const std::string& nodeName, ConfigurationBase *config )
 {
 	// check if the label already exists
-	if ( section_.find( config->root() ) != section_.end() )
+	if ( section_.find( nodeName ) != section_.end() )
 		return false;
 
 	std::size_t pos = conf_.size();
-	section_[ config->root() ] = pos;
+	section_[ nodeName ] = pos;
 	conf_.push_back( config );
 	return true;
 }
@@ -68,7 +68,8 @@ bool ApplicationConfiguration::parse ( const char *filename, std::ostream& os )
 								it != pt.end(); it++ )	{
 			std::map< std::string, std::size_t >::iterator confIt;
 			if (( confIt = section_.find( it->first ) ) != section_.end() )	{
-				if ( ! conf_[ confIt->second ]->parse( pt.get_child( it->first ), os ))
+//				if ( ! conf_[ confIt->second ]->parse( pt.get_child( it->first ), os ))
+				if ( ! conf_[ confIt->second ]->parse( it->second, it->first, os ))
 					return false;
 			}
 			else	{

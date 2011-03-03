@@ -19,8 +19,8 @@ namespace _Wolframe	{
 	namespace	Configuration	{
 
 
-LoggerConfiguration::LoggerConfiguration( const std::string& node, const std::string& header )
-	: ConfigurationBase( node, header )
+LoggerConfiguration::LoggerConfiguration()
+	: ConfigurationBase( "Logging" )
 {
 	logToStderr = false;
 	stderrLogLevel = LogLevel::LOGLEVEL_UNDEFINED;
@@ -44,7 +44,7 @@ LoggerConfiguration::LoggerConfiguration( const std::string& node, const std::st
 
 void LoggerConfiguration::print( std::ostream& os ) const
 {
-	os << displayStr() << std::endl;
+	os << displayName() << std::endl;
 	if ( logToStderr )
 		os << "   Log to stderr, level " << stderrLogLevel << std::endl;
 	else
@@ -104,13 +104,13 @@ void LoggerConfiguration::foreground( LogLevel::Level debugLevel, bool useConfig
 }
 
 
-bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, std::ostream& os )
+bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& /* node */, std::ostream& os )
 {
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		// stderr logging
 		if ( boost::algorithm::iequals( L1it->first, "stderr" ))	{
 			if ( logToStderr )	{
-				os << displayStr() << ": stderr channel already defined";
+				os << displayName() << ": stderr channel already defined";
 				return false;
 			}
 			logToStderr = true;
@@ -120,19 +120,19 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, std::ost
 				if ( boost::algorithm::iequals( L2it->first, "level" ))	{
 					LogLevel::Level lvl = LogLevel::str2LogLevel( L2it->second.get_value<std::string>() );
 					if ( lvl ==  LogLevel::LOGLEVEL_UNDEFINED )	{
-						os << displayStr() << ": unknown log level: "
+						os << displayName() << ": unknown log level: "
 								<< L2it->second.get_value<std::string>();
 						return false;
 					}
 					if ( stderrLogLevel != LogLevel::LOGLEVEL_UNDEFINED )	{
-						os << displayStr() << ": stderr log level already defined. Second value: "
+						os << displayName() << ": stderr log level already defined. Second value: "
 								<< L2it->second.get_value<std::string>();
 						return false;
 					}
 					stderrLogLevel = lvl;
 				}
 				else	{
-					os << displayStr() << ": stderr: unknown configuration option: <"
+					os << displayName() << ": stderr: unknown configuration option: <"
 							<< L2it->first << ">";
 					return false;
 
@@ -142,7 +142,7 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, std::ost
 		// logfile
 		else if ( boost::algorithm::iequals( L1it->first, "logFile" ))	{
 			if ( logToFile )	{
-				os << displayStr() << ": logfile channel already defined";
+				os << displayName() << ": logfile channel already defined";
 				return false;
 			}
 			logToFile = true;
@@ -152,12 +152,12 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, std::ost
 				if ( boost::algorithm::iequals( L2it->first, "level" ))	{
 					LogLevel::Level lvl = LogLevel::str2LogLevel( L2it->second.get_value<std::string>() );
 					if ( lvl == LogLevel::LOGLEVEL_UNDEFINED )	{
-						os << displayStr() << ": logfile: unknown log level: "
+						os << displayName() << ": logfile: unknown log level: "
 								<< L2it->second.get_value<std::string>();
 						return false;
 					}
 					if ( logFileLogLevel != LogLevel::LOGLEVEL_UNDEFINED )	{
-						os << displayStr() << ": logfile: log level already defined. Second value: "
+						os << displayName() << ": logfile: log level already defined. Second value: "
 								<< L2it->second.get_value<std::string>();
 						return false;
 					}
@@ -165,23 +165,23 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, std::ost
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "filename" ))	{
 					if ( ! logFile.empty() )	{
-						os << displayStr() << ": log file already defined. Second value: "
+						os << displayName() << ": log file already defined. Second value: "
 								<< L2it->second.get_value<std::string>();
 						return false;
 					}
 					std::string fName = L2it->second.get_value<std::string>();
 					if ( fName.empty() )	{
-						os << displayStr() << ": logfile: empty filename";
+						os << displayName() << ": logfile: empty filename";
 						return false;
 					}
 					if ( ! boost::filesystem::path( fName ).is_absolute() )	{
-						os << displayStr() << ": logfile: filename must be absolute: " << fName;
+						os << displayName() << ": logfile: filename must be absolute: " << fName;
 						return false;
 					}
 					logFile = fName;
 				}
 				else	{
-					os << displayStr() << ": logfile: unknown configuration option: <"
+					os << displayName() << ": logfile: unknown configuration option: <"
 							<< L2it->first << ">";
 					return false;
 
@@ -191,13 +191,13 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, std::ost
 #if defined( _WIN32 )
 		// syslog
 		else if ( boost::algorithm::iequals( L1it->first, "syslog" ))	{
-			os << "WARNING: " << displayStr() << ": syslog is not defined on Windows";
+			os << "WARNING: " << displayName() << ": syslog is not defined on Windows";
 		}
 #else // if defined( _WIN32 )
 		// syslog
 		else if ( boost::algorithm::iequals( L1it->first, "syslog" ))	{
 			if ( logToSyslog )	{
-				os << displayStr() << ": syslog channel already defined";
+				os << displayName() << ": syslog channel already defined";
 				return false;
 			}
 			logToSyslog = true;
@@ -207,12 +207,12 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, std::ost
 				if ( boost::algorithm::iequals( L2it->first, "level" ))	{
 					LogLevel::Level lvl = LogLevel::str2LogLevel( L2it->second.get_value<std::string>() );
 					if ( lvl == LogLevel::LOGLEVEL_UNDEFINED )	{
-						os << displayStr() << ": syslog: unknown log level: "
+						os << displayName() << ": syslog: unknown log level: "
 								<< L2it->second.get_value<std::string>();
 						return false;
 					}
 					if ( syslogLogLevel != LogLevel::LOGLEVEL_UNDEFINED )	{
-						os << displayStr() << ": syslog: log level already defined. Second value: "
+						os << displayName() << ": syslog: log level already defined. Second value: "
 								<< L2it->second.get_value<std::string>();
 						return false;
 					}
@@ -221,12 +221,12 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, std::ost
 				else if ( boost::algorithm::iequals( L2it->first, "facility" ))	{
 					SyslogFacility::Facility fclt = SyslogFacility::str2SyslogFacility( L2it->second.get_value<std::string>() );
 					if ( fclt == SyslogFacility::_Wolframe_SYSLOG_FACILITY_UNDEFINED )	{
-						os << displayStr() << ": syslog: unknown facility: "
+						os << displayName() << ": syslog: unknown facility: "
 								<< L2it->second.get_value<std::string>();
 						return false;
 					}
 					if ( syslogFacility != SyslogFacility::_Wolframe_SYSLOG_FACILITY_UNDEFINED )	{
-						os << displayStr() << ": syslog: facility already defined. Second value: "
+						os << displayName() << ": syslog: facility already defined. Second value: "
 								<< L2it->second.get_value<std::string>();
 						return false;
 					}
@@ -234,19 +234,19 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, std::ost
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "ident" ))	{
 					if ( ! syslogIdent.empty() )	{
-						os << displayStr() << ": syslog: ident already defined. Second value: "
+						os << displayName() << ": syslog: ident already defined. Second value: "
 								<< L2it->second.get_value<std::string>();
 						return false;
 					}
 					std::string ident = L2it->second.get_value<std::string>();
 					if ( ident.empty() )	{
-						os << displayStr() << ": syslog: empty ident";
+						os << displayName() << ": syslog: empty ident";
 						return false;
 					}
 					syslogIdent = ident;
 				}
 				else	{
-					os << displayStr() << ": syslog: unknown configuration option: <"
+					os << displayName() << ": syslog: unknown configuration option: <"
 							<< L2it->first << ">";
 					return false;
 				}
@@ -256,13 +256,13 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, std::ost
 
 #if !defined( _WIN32 )
 		else if ( boost::algorithm::iequals( L1it->first, "eventlog" ))	{
-			os << "WARNING: " << displayStr() << ": event log is defined only on Windows";
+			os << "WARNING: " << displayName() << ": event log is defined only on Windows";
 		}
 #else // if !defined( _WIN32 )
 		// event log
 		else if ( boost::algorithm::iequals( L1it->first, "eventlog" ))	{
 			if ( logToEventlog )	{
-				os << displayStr() << ": eventlog channel already defined";
+				os << displayName() << ": eventlog channel already defined";
 				return false;
 			}
 			logToEventlog = true;
@@ -272,12 +272,12 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, std::ost
 				if ( boost::algorithm::iequals( L2it->first, "level" ))	{
 					LogLevel::Level lvl = LogLevel::str2LogLevel( L2it->second.get_value<std::string>() );
 					if ( lvl == LogLevel::LOGLEVEL_UNDEFINED )	{
-						os << displayStr() << ": eventlog: unknown log level: "
+						os << displayName() << ": eventlog: unknown log level: "
 								<< L2it->second.get_value<std::string>();
 						return false;
 					}
 					if ( eventlogLogLevel != LogLevel::LOGLEVEL_UNDEFINED )	{
-						os << displayStr() << ": eventlog: log level already defined. Second value: "
+						os << displayName() << ": eventlog: log level already defined. Second value: "
 								<< L2it->second.get_value<std::string>();
 						return false;
 					}
@@ -285,32 +285,32 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, std::ost
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "name" ))	{
 					if ( ! eventlogLogName.empty() )	{
-						os << displayStr() << ": eventlog: name already defined. Second value: "
+						os << displayName() << ": eventlog: name already defined. Second value: "
 								<< L2it->second.get_value<std::string>();
 						return false;
 					}
 					std::string eName = L2it->second.get_value<std::string>();
 					if ( eName.empty() )	{
-						os << displayStr() << ": eventlog: empty name";
+						os << displayName() << ": eventlog: empty name";
 						return false;
 					}
 					eventlogLogName = eName;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "source" ))	{
 					if ( ! eventlogSource.empty() )	{
-						os << displayStr() << ": eventlog: source already defined. Second value: "
+						os << displayName() << ": eventlog: source already defined. Second value: "
 								<< L2it->second.get_value<std::string>();
 						return false;
 					}
 					std::string eSource = L2it->second.get_value<std::string>();
 					if ( eSource.empty() )	{
-						os << displayStr() << ": eventlog: empty source";
+						os << displayName() << ": eventlog: empty source";
 						return false;
 					}
 					eventlogSource = eSource;
 				}
 				else	{
-					os << displayStr() << ": syslog: unknown configuration option: <"
+					os << displayName() << ": syslog: unknown configuration option: <"
 							<< L2it->first << ">";
 					return false;
 				}
@@ -319,7 +319,7 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, std::ost
 #endif	// defined( _WIN32 )
 		// unknown log method
 		else	{
-			os << displayStr() << ": unknown configuration option: <" << L1it->first << ">";
+			os << displayName() << ": unknown configuration option: <" << L1it->first << ">";
 			return false;
 		}
 	}

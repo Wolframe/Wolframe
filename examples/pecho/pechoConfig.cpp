@@ -18,7 +18,7 @@ namespace _Wolframe	{
 
 void EchoConfiguration::print( std::ostream& os ) const
 {
-	os << displayStr() << std::endl;
+	os << displayName() << std::endl;
 	os << "   Timeout: " << timeout << std::endl;
 }
 
@@ -31,15 +31,15 @@ bool EchoConfiguration::check( std::ostream& ) const
 }
 
 
-bool EchoConfiguration::parse( const boost::property_tree::ptree& pt, std::ostream& os )
+bool EchoConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& /* nodeName */, std::ostream& os )
 {
 	for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
 		if ( boost::algorithm::iequals( it->first, "timeout" ))	{
-			if ( !Configuration::getUnsignedShortValue( it, displayStr(), "timeout", timeout, os ))
+			if ( !Configuration::getUnsignedShortValue( it, displayName(), "timeout", timeout, os ))
 				return false;
 		}
 		else	{
-			os << displayStr() << ": unknown configuration option: <" << it->first << ">";
+			os << displayName() << ": unknown configuration option: <" << it->first << ">";
 			return false;
 		}
 	}

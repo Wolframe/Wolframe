@@ -20,8 +20,8 @@ namespace _Wolframe	{
 	namespace	Configuration	{
 
 // Constructor
-ServerConfiguration::ServerConfiguration( const std::string& node, const std::string& header )
-	: ConfigurationBase( node, header )
+ServerConfiguration::ServerConfiguration()
+	: ConfigurationBase( "Server" )
 {
 	threads = 0;
 	maxConnections = 0;
@@ -116,35 +116,35 @@ ServerConfiguration::ServerConfiguration( const std::string& node, const std::st
 
 
 /// Parse the configuration
-bool ServerConfiguration::parse( const boost::property_tree::ptree& pt, std::ostream& os )
+bool ServerConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& /* node */, std::ostream& os )
 {
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "threads" ))	{
-			if ( ! getUnsignedShortValue( L1it, displayStr(), "threads", threads, os ))
+			if ( ! getUnsignedShortValue( L1it, displayName(), "threads", threads, os ))
 				return false;
 		}
 #if defined(_WIN32)
 		else if ( boost::algorithm::iequals( L1it->first, "daemon" ))	{
-			os << "WARNING: " << displayStr() << ": daemon is not defined on Windows" << std::endl;
+			os << "WARNING: " << displayName() << ": daemon is not defined on Windows" << std::endl;
 		}
 #else // #if defined(_WIN32)
 		else if ( boost::algorithm::iequals( L1it->first, "daemon" ))	{
 			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
 									L2it != L1it->second.end(); L2it++ )	{
 				if ( boost::algorithm::iequals( L2it->first, "user" ))	{
-					if ( ! getStringValue( L2it, displayStr(), "user", user, os ))
+					if ( ! getStringValue( L2it, displayName(), "user", user, os ))
 						return false;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "group" ))	{
-					if ( ! getStringValue( L2it, displayStr(), "group", group, os ))
+					if ( ! getStringValue( L2it, displayName(), "group", group, os ))
 						return false;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "pidFile" ))	{
-					if ( ! getStringValue( L2it, displayStr(), "pidFile", pidFile, os ))
+					if ( ! getStringValue( L2it, displayName(), "pidFile", pidFile, os ))
 						return false;
 				}
 				else	{
-					os << displayStr() << ": daemon: unknown configuration option: <" << L2it->first << ">";
+					os << displayName() << ": daemon: unknown configuration option: <" << L2it->first << ">";
 					return false;
 				}
 			}
@@ -152,26 +152,26 @@ bool ServerConfiguration::parse( const boost::property_tree::ptree& pt, std::ost
 #endif
 #if !defined(_WIN32)
 		else if ( boost::algorithm::iequals( L1it->first, "service" ))	{
-			os << "WARNING: " << displayStr() << ": service is defined only on Windows" << std::endl;
+			os << "WARNING: " << displayName() << ": service is defined only on Windows" << std::endl;
 		}
 #else // #if defined(_WIN32)
 		else if ( boost::algorithm::iequals( L1it->first, "service" ))	{
 			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
 									L2it != L1it->second.end(); L2it++ )	{
 				if ( boost::algorithm::iequals( L2it->first, "serviceName" ))	{
-					if ( ! getStringValue( L2it, displayStr(), "serviceName", serviceName, os ))
+					if ( ! getStringValue( L2it, displayName(), "serviceName", serviceName, os ))
 						return false;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "displayName" ))	{
-					if ( ! getStringValue( L2it, displayStr(), "displayName", serviceDisplayName, os ))
+					if ( ! getStringValue( L2it, displayName(), "displayName", serviceDisplayName, os ))
 						return false;
 				}
 				else if ( boost::algorithm::iequals( L1it->first, "description" ))	{
-					if ( ! getStringValue( L2it, displayStr(), "description", serviceDescription, os ))
+					if ( ! getStringValue( L2it, displayName(), "description", serviceDescription, os ))
 						return false;
 				}
 				else	{
-					os << displayStr() << ": service: unknown configuration option: <" << L2it->first << ">";
+					os << displayName() << ": service: unknown configuration option: <" << L2it->first << ">";
 					return false;
 				}
 			}
@@ -187,7 +187,7 @@ bool ServerConfiguration::parse( const boost::property_tree::ptree& pt, std::ost
 			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
 									L2it != L1it->second.end(); L2it++ )	{
 				if ( boost::algorithm::iequals( L2it->first, "maxConnections" ))	{
-					if ( ! getUnsignedShortValue( L2it, displayStr(), "maxConnections", maxConnections, os ))
+					if ( ! getUnsignedShortValue( L2it, displayName(), "maxConnections", maxConnections, os ))
 						return false;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "socket" ))	{
@@ -197,23 +197,23 @@ bool ServerConfiguration::parse( const boost::property_tree::ptree& pt, std::ost
 					for ( boost::property_tree::ptree::const_iterator L3it = L2it->second.begin();
 											L3it != L2it->second.end(); L3it++ )	{
 						if ( boost::algorithm::iequals( L3it->first, "host" ))	{
-							if ( ! getHostnameValue( L3it, displayStr(), "host", host, os ))
+							if ( ! getHostnameValue( L3it, displayName(), "host", host, os ))
 								return false;
 						}
 						else if ( boost::algorithm::iequals( L3it->first, "address" ))	{
-							if ( ! getHostnameValue( L3it, displayStr(), "address", host, os ))
+							if ( ! getHostnameValue( L3it, displayName(), "address", host, os ))
 								return false;
 						}
 						else if ( boost::algorithm::iequals( L3it->first, "port" ))	{
-							if ( ! getUnsignedShortValue( L3it, displayStr(), "port", port, os ))
+							if ( ! getUnsignedShortValue( L3it, displayName(), "port", port, os ))
 								return false;
 						}
 						else if ( boost::algorithm::iequals( L3it->first, "maxConnections" ))	{
-							if ( ! getUnsignedShortValue( L3it, displayStr(), "maxConnections", maxConn, os ))
+							if ( ! getUnsignedShortValue( L3it, displayName(), "maxConnections", maxConn, os ))
 								return false;
 						}
 						else	{
-							os << displayStr() << ": socket: unknown configuration option: <" << L3it->first << ">";
+							os << displayName() << ": socket: unknown configuration option: <" << L3it->first << ">";
 							return false;
 						}
 					}
@@ -235,43 +235,43 @@ bool ServerConfiguration::parse( const boost::property_tree::ptree& pt, std::ost
 					for ( boost::property_tree::ptree::const_iterator L3it = L2it->second.begin();
 											L3it != L2it->second.end(); L3it++ )	{
 						if ( boost::algorithm::iequals( L3it->first, "host" ))	{
-							if ( ! getHostnameValue( L3it, displayStr(), "host", host, os ))
+							if ( ! getHostnameValue( L3it, displayName(), "host", host, os ))
 								return false;
 						}
 						else if ( boost::algorithm::iequals( L3it->first, "address" ))	{
-							if ( ! getHostnameValue( L3it, displayStr(), "address", host, os ))
+							if ( ! getHostnameValue( L3it, displayName(), "address", host, os ))
 								return false;
 						}
 						else if ( boost::algorithm::iequals( L3it->first, "port" ))	{
-							if ( ! getUnsignedShortValue( L3it, displayStr(), "port", port, os ))
+							if ( ! getUnsignedShortValue( L3it, displayName(), "port", port, os ))
 								return false;
 						}
 						else if ( boost::algorithm::iequals( L3it->first, "maxConnections" ))	{
-							if ( ! getUnsignedShortValue( L3it, displayStr(), "maxConnections", maxConn, os ))
+							if ( ! getUnsignedShortValue( L3it, displayName(), "maxConnections", maxConn, os ))
 								return false;
 						}
 						else if ( boost::algorithm::iequals( L3it->first, "certificate" ))	{
-							if ( ! getHostnameValue( L3it, displayStr(), "certificate", certFile, os ))
+							if ( ! getHostnameValue( L3it, displayName(), "certificate", certFile, os ))
 								return false;
 						}
 						else if ( boost::algorithm::iequals( L3it->first, "key" ))	{
-							if ( ! getHostnameValue( L3it, displayStr(), "key", keyFile, os ))
+							if ( ! getHostnameValue( L3it, displayName(), "key", keyFile, os ))
 								return false;
 						}
 						else if ( boost::algorithm::iequals( L3it->first, "CAdirectory" ))	{
-							if ( ! getHostnameValue( L3it, displayStr(), "CAdirectory", CAdirectory, os ))
+							if ( ! getHostnameValue( L3it, displayName(), "CAdirectory", CAdirectory, os ))
 								return false;
 						}
 						else if ( boost::algorithm::iequals( L3it->first, "CAchainFile" ))	{
-							if ( ! getHostnameValue( L3it, displayStr(), "CAchainFile", CAchainFile, os ))
+							if ( ! getHostnameValue( L3it, displayName(), "CAchainFile", CAchainFile, os ))
 								return false;
 						}
 						else if ( boost::algorithm::iequals( L3it->first, "verify" ))	{
-							if ( ! getBoolValue( L3it, displayStr(), "verify", verify, os ))
+							if ( ! getBoolValue( L3it, displayName(), "verify", verify, os ))
 								return false;
 						}
 						else	{
-							os << displayStr() << ": socket: unknown configuration option: <" << L3it->first << ">";
+							os << displayName() << ": socket: unknown configuration option: <" << L3it->first << ">";
 							return false;
 						}
 					}
@@ -284,13 +284,13 @@ bool ServerConfiguration::parse( const boost::property_tree::ptree& pt, std::ost
 					SSLaddress.push_back( lep );
 				}
 				else	{
-					os << displayStr() << ": listen: unknown configuration option: <" << L2it->first << ">";
+					os << displayName() << ": listen: unknown configuration option: <" << L2it->first << ">";
 					return false;
 				}
 			}
 		}
 		else	{
-			os << displayStr() << ": unknown configuration option: <" << L1it->first << ">";
+			os << displayName() << ": unknown configuration option: <" << L1it->first << ">";
 			return false;
 		}
 	}

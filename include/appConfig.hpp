@@ -53,7 +53,7 @@ namespace _Wolframe {
 			std::vector< ConfigurationBase* >	conf_;
 			std::map< std::string, std::size_t >	section_;
 
-			bool addConfig( ConfigurationBase *config );
+			bool addConfig( const std::string& nodeName, ConfigurationBase *config );
 		};
 	} // namespace Configuration
 } // namespace _Wolframe

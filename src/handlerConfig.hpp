@@ -19,7 +19,7 @@ namespace _Wolframe {
 		/// constructor
 		HandlerConfiguration()
 		{
-			database = new Configuration::DatabaseConfiguration( "database", "Database Server" );
+			database = new Configuration::DatabaseConfiguration();
 //			auth = ...
 		}
 	};
