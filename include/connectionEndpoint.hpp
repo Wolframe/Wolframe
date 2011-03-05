@@ -3,6 +3,7 @@
 
 #include <string>
 #include <sstream>
+#include <ctime>
 
 namespace _Wolframe {
 	namespace Network {
@@ -40,7 +41,12 @@ namespace _Wolframe {
 		{
 		public:
 			RemoteTCPendpoint( const std::string& Host, unsigned short Port )
-				: ConnectionEndpoint( Host, Port )	{}
+				: ConnectionEndpoint( Host, Port )	{ connectionTime_ = time( NULL ); }
+
+			time_t connectionTime() const			{ return connectionTime_; }
+
+		private:
+			time_t	connectionTime_;
 		};
 
 
@@ -56,14 +62,42 @@ namespace _Wolframe {
 		{
 		public:
 			RemoteSSLendpoint( const std::string& Host, unsigned short Port )
-				: ConnectionEndpoint( Host, Port )	{}
-			RemoteSSLendpoint( const std::string& Host, unsigned short Port,
-					   const std::string& CN )
-						   : ConnectionEndpoint( Host, Port )	{ CN_ = CN; }
+				: ConnectionEndpoint( Host, Port )	{ connectionTime_ = time( NULL );
+									  certSerialNumber_ = 0;
+									  certNotBefore_ = 0;
+									  certNotAfter_ = 0;
+									}
 
-			const std::string& commonName() const		{ return CN_; }
+			RemoteSSLendpoint( const std::string& Host, unsigned short Port,
+					  unsigned long serialNumber, time_t notBefore, time_t notAfter,
+					  const std::string& issuer,
+					  const std::string& subject, const std::string& commonName )
+				: ConnectionEndpoint( Host, Port )	{ connectionTime_ = time( NULL );
+									  certSerialNumber_ = serialNumber;
+									  certIssuer_ = issuer;
+									  certNotBefore_ = notBefore;
+									  certNotAfter_ = notAfter;
+									  certSubject_ = subject;
+									  certCommonName_ = commonName;
+									}
+
+			time_t connectionTime() const				{ return connectionTime_; }
+			/// SSL certificate information
+			unsigned long certSerialNumber() const			{ return certSerialNumber_; }
+			const std::string& certIssuer() const			{ return certIssuer_; }
+			time_t certNotBefore() const				{ return certNotBefore_; }
+			time_t certNotAfter() const				{ return certNotAfter_; }
+			const std::string& certSubject() const			{ return certSubject_; }
+			const std::string& certCommonName() const		{ return certCommonName_; }
+
 		private:
-			std::string	CN_;
+			time_t		connectionTime_;
+			unsigned long	certSerialNumber_;
+			std::string	certIssuer_;
+			time_t		certNotBefore_;
+			time_t		certNotAfter_;
+			std::string	certSubject_;
+			std::string	certCommonName_;
 		};
 
 	} // namespace Network

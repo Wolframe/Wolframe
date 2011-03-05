@@ -184,7 +184,7 @@ namespace _Wolframe {
 
 
 	luaConnection::luaConnection( const Network::LocalSSLendpoint& local, const luaConfig config_ )
-		: counter( 0 ), maxMemUsed( 0 ), config( config_ ) 
+		: counter( 0 ), maxMemUsed( 0 ), config( config_ )
 	{
 		LOG_TRACE << "Created connection handler (SSL) for " << local.toString();
 		createVM( );
@@ -220,7 +220,7 @@ namespace _Wolframe {
 	void luaConnection::setPeer( const Network::RemoteSSLendpoint& remote )
 	{
 		LOG_TRACE << "Peer set to " << remote.toString();
-		LOG_TRACE << "Peer Common Name: " << remote.commonName();
+		LOG_TRACE << "Peer Common Name: " << remote.certCommonName();
 
 		lua_pushstring( l, "new_connection" );
 		lua_gettable( l, LUA_GLOBALSINDEX );
@@ -229,7 +229,7 @@ namespace _Wolframe {
 		std::stringstream ss;
 		ss << port;
 		lua_pushstring( l, ss.str( ).c_str( ) );
-		lua_pushstring( l, remote.commonName( ).c_str( ) );
+		lua_pushstring( l, remote.certCommonName( ).c_str( ) );
 		int res = lua_pcall( l, 3, 0, 0 );
 		if( res != 0 ) {
 			LOG_FATAL << "Unable to call 'new_connection' function: " << lua_tostring( l, -1 );

@@ -36,13 +36,17 @@ namespace _Wolframe	{
 
 	void wolframeConnection::setPeer( const Network::RemoteTCPendpoint& remote )
 	{
-		LOG_TRACE << "Peer set to " << remote.toString();
+		LOG_TRACE << "Peer set to " << remote.toString() << ", connected at " << remote.connectionTime();
 	}
 
 	void wolframeConnection::setPeer( const Network::RemoteSSLendpoint& remote )
 	{
-		LOG_TRACE << "Peer set to " << remote.toString();
-		LOG_TRACE << "Peer Common Name: " << remote.commonName();
+		LOG_TRACE << "Peer set to " << remote.toString() << ", connected at " << remote.connectionTime();
+		LOG_TRACE << "Peer SSL certificate number " << remote.certSerialNumber()
+			  << ", issued by: " << remote.certIssuer();
+		LOG_TRACE << "Peer SSL certificate valid from " << remote.certNotBefore() << " to " << remote.certNotAfter();
+		LOG_TRACE << "Peer SSL certificate subject: " << remote.certSubject();
+		LOG_TRACE << "Peer SSL certificate Common Name: " << remote.certCommonName();
 	}
 
 

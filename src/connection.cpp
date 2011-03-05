@@ -148,23 +148,36 @@ void SSLconnection::handleHandshake( const boost::system::error_code& e )
 			X509*	peerCert;
 			char	buf[2048];
 			int	res = -1;
+			/// SSL certificate information
+			unsigned long serialNumber = 0;
+			std::string issuer;
+			time_t notBefore = 0;
+			time_t notAfter = 0;
+			std::string subject;
+			std::string commonName;
 
-			SSL*	ssl = SSLsocket_.impl()->ssl;
+			SSL* ssl = SSLsocket_.impl()->ssl;
 
 			memset( buf, 0, 2048 );
 			peerCert = SSL_get_peer_certificate( ssl );
-			if ( peerCert )
-				res = X509_NAME_get_text_by_NID( X509_get_subject_name( peerCert ),
-								 NID_commonName, buf, 2047 );
+			if ( peerCert )	{
+				X509_NAME_oneline( X509_get_issuer_name( peerCert ), buf, 2047 );
+				issuer = std::string( buf );
+
+				X509_NAME_oneline( X509_get_subject_name( peerCert ), buf, 2047 );
+				subject = std::string( buf );
+
+// this one should be interpreted from subject
+				if (( res = X509_NAME_get_text_by_NID( X509_get_subject_name( peerCert ),
+								      NID_commonName, buf, 2047 )) != -1 )
+					commonName = std::string( buf );
+			}
 			connList_.push( boost::static_pointer_cast< SSLconnection >( shared_from_this()) );
 
-			if ( res != -1 )
-				connectionHandler_->setPeer( RemoteSSLendpoint( SSLsocket_.lowest_layer().remote_endpoint().address().to_string(),
-										SSLsocket_.lowest_layer().remote_endpoint().port(),
-										buf ));
-			else
-				connectionHandler_->setPeer( RemoteSSLendpoint( SSLsocket_.lowest_layer().remote_endpoint().address().to_string(),
-										SSLsocket_.lowest_layer().remote_endpoint().port()));
+			connectionHandler_->setPeer( RemoteSSLendpoint( SSLsocket_.lowest_layer().remote_endpoint().address().to_string(),
+								       SSLsocket_.lowest_layer().remote_endpoint().port(),
+								       serialNumber, notBefore, notAfter,
+								       issuer, subject, commonName ));
 			nextOperation();
 		}
 	}

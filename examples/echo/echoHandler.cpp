@@ -34,17 +34,21 @@ namespace _Wolframe {
 		LOG_TRACE << "Connection handler destroyed";
 	}
 
+
 	void echoConnection::setPeer( const Network::RemoteTCPendpoint& remote )
 	{
-		LOG_TRACE << "Peer set to " << remote.toString();
+		LOG_TRACE << "Peer set to " << remote.toString() << ", connected at " << remote.connectionTime();
 	}
 
 	void echoConnection::setPeer( const Network::RemoteSSLendpoint& remote )
 	{
-		LOG_TRACE << "Peer set to " << remote.toString();
-		LOG_TRACE << "Peer Common Name: " << remote.commonName();
+		LOG_TRACE << "Peer set to " << remote.toString() << ", connected at " << remote.connectionTime();
+		LOG_TRACE << "Peer SSL certificate number " << remote.certSerialNumber()
+			  << ", issued by: " << remote.certIssuer();
+		LOG_TRACE << "Peer SSL certificate valid from " << remote.certNotBefore() << " to " << remote.certNotAfter();
+		LOG_TRACE << "Peer SSL certificate subject: " << remote.certSubject();
+		LOG_TRACE << "Peer SSL certificate Common Name: " << remote.certCommonName();
 	}
-
 
 	/// Handle a request and produce a reply.
 	const Network::NetworkOperation echoConnection::nextOperation()
