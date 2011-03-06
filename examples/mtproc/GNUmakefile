@@ -31,7 +31,6 @@ endif
 OBJS = \
 	appProperties.o \
 	appConfigDefinition.o \
-	mtprocConfig.o \
 	implementation.o \
 	dispatcher.o \
 	mtprocHandler.o \

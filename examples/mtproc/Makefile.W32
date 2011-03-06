@@ -36,7 +36,6 @@ INCLUDE_LIBS = \
 OBJS = \
 	appProperties.obj \
 	appConfigDefinition.obj \
-	mtprocConfig.obj \
 	implementation.obj \
 	dispatcher.obj \
 	mtprocHandler.obj \

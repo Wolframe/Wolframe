@@ -81,13 +81,11 @@ examples/mtproc/dispatcher.cpp
 examples/mtproc/dispatcher.hpp
 examples/mtproc/generators/char_isolatin1.hpp
 examples/mtproc/GNUmakefile
-examples/mtproc/handlerConfig.hpp
 examples/mtproc/implementation.cpp
 examples/mtproc/implementation.hpp
 examples/mtproc/Makefile.W32
 examples/mtproc/methodtable.hpp
 examples/mtproc/mtproc.conf
-examples/mtproc/mtprocConfig.cpp
 examples/mtproc/mtprocd.cpp
 examples/mtproc/mtprocHandler.cpp
 examples/mtproc/mtprocHandler.hpp
@@ -196,3 +194,4 @@ tests/versionTest.cpp
 include/SSLcertificateInfo.hpp
 src/SSLcertificateInfo.cpp
 src/serverEndpoint.cpp
+src/configService.cpp

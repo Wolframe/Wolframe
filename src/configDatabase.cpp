@@ -18,6 +18,14 @@ static const unsigned short DEFAULT_DB_CONNECTIONS = 4;
 namespace _Wolframe	{
 	namespace	Configuration	{
 
+DatabaseConfiguration::DatabaseConfiguration() : ConfigurationBase( "Database Server" )
+{
+	port = 0;
+	connections = 0;
+	acquireTimeout = 0;
+}
+
+
 void DatabaseConfiguration::print( std::ostream& os ) const
 {
 	os << displayName() << std::endl;
@@ -29,6 +37,7 @@ void DatabaseConfiguration::print( std::ostream& os ) const
 	os << "   Database user: " << (user.empty() ? "(not specified - same as server user)" : user)
 		 << ", password: " << (password.empty() ? "(not specified - no password used)" : password) << std::endl;
 	os << "   Database connections: " << connections << std::endl;
+	os << "   Acquire database connection timeout: " << acquireTimeout << std::endl;
 }
 
 
@@ -63,6 +72,10 @@ bool DatabaseConfiguration::parse( const boost::property_tree::ptree& pt, const 
 		}
 		else if ( boost::algorithm::iequals( it->first, "connections" ))	{
 			if ( !getUnsignedShortValue( it, displayName(), "connections", connections, os ))
+												return false;
+		}
+		else if ( boost::algorithm::iequals( it->first, "acquireTimeout" ))	{
+			if ( !getUnsignedShortValue( it, displayName(), "acquireTimeout", acquireTimeout, os ))
 												return false;
 		}
 		else	{

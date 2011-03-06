@@ -12,17 +12,23 @@ namespace _Wolframe {
 
 		ApplicationConfiguration::ApplicationConfiguration()
 		{
-			// server
-			srvConfig = new Configuration::ServerConfiguration();
-
+			// daemon / service configuration
+			serviceConf = new _Wolframe::Configuration::ServiceConfiguration();
+			// network server
+			serverConf = new _Wolframe::Network::ServerConfiguration();
 			// logging
-			logConfig = new Configuration::LoggerConfiguration();
+			loggerConf = new Configuration::LoggerConfiguration();
 
-			handlerConfig = new _Wolframe::HandlerConfiguration();
+			handlerConf = new _Wolframe::HandlerConfiguration();
 
-			addConfig( "server", srvConfig );
-			addConfig( "logging", logConfig );
-			addConfig( "lua", handlerConfig->luaConfig );
+			// add both sections, the parse function will select the
+			// appropriate action
+			addConfig( "service", serviceConf );
+			addConfig( "daemon", serviceConf );
+
+			addConfig( "listen", serverConf );
+			addConfig( "logging", loggerConf );
+			addConfig( "lua", handlerConf->luaConfig );
 		}
 
 	} // namespace Configuration

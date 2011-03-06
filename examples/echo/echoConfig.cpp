@@ -19,7 +19,7 @@ namespace _Wolframe	{
 void EchoConfiguration::print( std::ostream& os ) const
 {
 	os << displayName() << std::endl;
-	os << "   Timeout: " << timeout << std::endl;
+	os << "   Idle timeout: " << timeout << std::endl;
 }
 
 

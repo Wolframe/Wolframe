@@ -6,10 +6,9 @@
 #include "commandLine.hpp"
 #include "standardConfigs.hpp"
 
-#include "miscUtils.hpp"
-
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
+#include "miscUtils.hpp"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/info_parser.hpp>
@@ -44,9 +43,22 @@ bool ApplicationConfiguration::addConfig( const std::string& nodeName, Configura
 	if ( section_.find( nodeName ) != section_.end() )
 		return false;
 
-	std::size_t pos = conf_.size();
+	// find the appropriate index in the configurations vector
+	std::vector< ConfigurationBase* >::const_iterator it = conf_.begin();
+	std::size_t pos = 0;
+	bool found = false;
+	for( ; it != conf_.end(); it++, pos++ )	{
+		if ( *it == config )	{
+			found = true;
+			break;
+		}
+	}
+	if ( !found )	{
+		pos = conf_.size();
+		conf_.push_back( config );
+	}
 	section_[ nodeName ] = pos;
-	conf_.push_back( config );
+
 	return true;
 }
 
@@ -64,16 +76,15 @@ bool ApplicationConfiguration::parse ( const char *filename, std::ostream& os )
 	try	{
 		read_info( filename, pt );
 
-		for ( boost::property_tree::ptree::const_iterator it = pt.begin();
-								it != pt.end(); it++ )	{
+		for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
 			std::map< std::string, std::size_t >::iterator confIt;
 			if (( confIt = section_.find( it->first ) ) != section_.end() )	{
-//				if ( ! conf_[ confIt->second ]->parse( pt.get_child( it->first ), os ))
 				if ( ! conf_[ confIt->second ]->parse( it->second, it->first, os ))
 					return false;
 			}
 			else	{
-				os << "Unknown configuration option " << it->first;
+				os << "ERROR: configuration root: Unknown configuration option <" << it->first
+				   << ">" << std::endl;
 				return false;
 			}
 		}
@@ -101,12 +112,13 @@ void ApplicationConfiguration::finalize( const CmdLineConfig& cmdLine )
 	foreground = cmdLine.foreground;
 #endif
 	if ( foreground )
-		logConfig->foreground( cmdLine.debugLevel, cmdLine.useLogConfig );
+		loggerConf->foreground( cmdLine.debugLevel, cmdLine.useLogConfig );
 #if !defined(_WIN32)
-	srvConfig->override( cmdLine.user, cmdLine.group );
+	serviceConf->override( cmdLine.user, cmdLine.group );
+	serviceConf->setCanonicalPathes( configFile );
 #endif
-	srvConfig->setCanonicalPathes( configFile );
-	logConfig->setCanonicalPathes( configFile );
+	serverConf->setCanonicalPathes( configFile );
+	loggerConf->setCanonicalPathes( configFile );
 }
 
 

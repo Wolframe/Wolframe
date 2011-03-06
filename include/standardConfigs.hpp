@@ -18,29 +18,15 @@
 
 
 namespace _Wolframe {
-	namespace Configuration	{
+	namespace Network	{
 
-		/// server configuration
+		/// network server configuration
 		struct ServerConfiguration : public _Wolframe::Configuration::ConfigurationBase	{
 		public:
-#if !defined( _WIN32 )
-			// daemon configuration
-			std::string		user;
-			std::string		group;
-			std::string		pidFile;
-#endif
-#if defined( _WIN32 )
-			// service configuration
-			std::string		serviceName;
-			std::string		serviceDisplayName;
-			std::string		serviceDescription;
-#endif // !defined( _WIN32 )
-			// server configuration
 			unsigned short		threads;
-
 			unsigned short		maxConnections;
 
-			// network configuration
+			// listen on
 			std::list<Network::ServerTCPendpoint> address;
 			std::list<Network::ServerSSLendpoint> SSLaddress;
 
@@ -56,12 +42,45 @@ namespace _Wolframe {
 
 //			Not implemented yet, inherited from base for the time being
 //			bool test( std::ostream& os ) const;
-
-#if !defined( _WIN32 )
-			void override( const std::string& user, const std::string& group );
-#endif // !defined( _WIN32 )
 		};
 
+	} // namespace Network
+
+
+	namespace Configuration	{
+
+	/// daemon / service configuration
+	struct ServiceConfiguration : public _Wolframe::Configuration::ConfigurationBase	{
+	public:
+#if !defined( _WIN32 )
+		// daemon configuration
+		std::string		user;
+		std::string		group;
+		std::string		pidFile;
+#endif
+#if defined( _WIN32 )
+		// Windows service configuration
+		std::string		serviceName;
+		std::string		serviceDisplayName;
+		std::string		serviceDescription;
+#endif // !defined( _WIN32 )
+
+		/// constructor
+		ServiceConfiguration();
+
+		/// methods
+		bool parse( const boost::property_tree::ptree& pt, const std::string& node, std::ostream& os );
+		bool check( std::ostream& os ) const;
+		void print( std::ostream& os ) const;
+
+//			Not implemented yet, inherited from base for the time being
+//			bool test( std::ostream& os ) const;
+
+#if !defined( _WIN32 )
+		void setCanonicalPathes( const std::string& referencePath );
+		void override( const std::string& user, const std::string& group );
+#endif // !defined( _WIN32 )
+	};
 
 		/// logger configuration
 		struct LoggerConfiguration : public _Wolframe::Configuration::ConfigurationBase
@@ -113,10 +132,11 @@ namespace _Wolframe {
 			std::string		user;
 			std::string		password;
 			unsigned short		connections;
+			unsigned short		acquireTimeout;
 
 			/// constructor
-			DatabaseConfiguration()
-				: ConfigurationBase( "Database Server" )	{ port = 0; connections = 0; }
+			DatabaseConfiguration();
+
 			/// methods
 			bool parse( const boost::property_tree::ptree& pt, const std::string& node, std::ostream& os );
 			bool check( std::ostream& os ) const;

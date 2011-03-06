@@ -13,28 +13,32 @@
 
 namespace _Wolframe {
 
+	// forward declarations for configuration elements
 	struct HandlerConfiguration;
+	namespace Network	{
+		struct ServerConfiguration;
+	} // namespace Network
 
 	namespace Configuration	{
 
-		struct CmdLineConfig;		// forward declaration for the command line structure
-
-		struct ServerConfiguration;	// forward declarations for configuration elements
+		struct ServiceConfiguration;
 		struct LoggerConfiguration;
-
+		struct CmdLineConfig;		// forward declaration for the command line structure
 
 		/// application configuration structure
 		struct ApplicationConfiguration	{
-			std::string			configFile;
+			std::string				configFile;
 			// from command line
-			bool				foreground;
+			bool					foreground;
 
-			// server configuration
-			ServerConfiguration		*srvConfig;
+			// daemon / service configuration
+			ServiceConfiguration			*serviceConf;
+			// network server configuration
+			_Wolframe::Network::ServerConfiguration	*serverConf;
 			// logger configuration
-			LoggerConfiguration		*logConfig;
+			LoggerConfiguration			*loggerConf;
 
-			_Wolframe::HandlerConfiguration	*handlerConfig;
+			_Wolframe::HandlerConfiguration		*handlerConf;
 
 		public:
 			ApplicationConfiguration();
