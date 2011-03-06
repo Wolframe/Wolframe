@@ -368,11 +368,13 @@ Connection::Connection( const Network::LocalTCPendpoint& local, unsigned int inp
    LOG_TRACE << "Created connection handler for " << local.toString();
 }
 
+#ifdef WITH_SSL
 Connection::Connection( const Network::LocalSSLendpoint& local)
 {
    data = new Private(8,8);
    LOG_TRACE << "Created connection handler (SSL) for " << local.toString();
 }
+#endif // WITH_SSL
 
 Connection::~Connection()
 {
@@ -385,10 +387,12 @@ void Connection::setPeer( const Network::RemoteTCPendpoint& remote)
    LOG_TRACE << "Peer set to " << remote.toString();
 }
 
+#ifdef WITH_SSL
 void Connection::setPeer( const Network::RemoteSSLendpoint& remote)
 {
    LOG_TRACE << "Peer set to " << remote.toString();
 }
+#endif // WITH_SSL
 
 void Connection::networkInput( const void* bytes, std::size_t nofBytes)
 {
@@ -421,10 +425,12 @@ Network::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( con
    return new pecho::Connection( local );
 }
 
+#ifdef WITH_SSL
 Network::connectionHandler* ServerHandler::ServerHandlerImpl::newSSLconnection( const Network::LocalSSLendpoint& local )
 {
    return new pecho::Connection( local );
 }
+#endif
 
 ServerHandler::ServerHandler( const HandlerConfiguration* ) : impl_( new ServerHandlerImpl ) {}
 
@@ -435,8 +441,10 @@ Network::connectionHandler* ServerHandler::newConnection( const Network::LocalTC
    return impl_->newConnection( local );
 }
 
+#ifdef WITH_SSL
 Network::connectionHandler* ServerHandler::newSSLconnection( const Network::LocalSSLendpoint& local )
 {
    return impl_->newSSLconnection( local );
 }
+#endif
 

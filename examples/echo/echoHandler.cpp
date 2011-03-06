@@ -22,7 +22,7 @@ namespace _Wolframe {
 		idleTimeout_ = timeout;
 	}
 
-
+#ifdef WITH_SSL
 	echoConnection::echoConnection( const Network::LocalSSLendpoint& local, unsigned short timeout )
 	{
 		LOG_TRACE << "Created connection handler (SSL) for " << local.toString();
@@ -31,6 +31,7 @@ namespace _Wolframe {
 		dataSize_ = 0;
 		idleTimeout_ = timeout;
 	}
+#endif // WITH_SSL
 
 	echoConnection::~echoConnection()
 	{
@@ -43,6 +44,7 @@ namespace _Wolframe {
 		LOG_TRACE << "Peer set to " << remote.toString() << ", connected at " << remote.connectionTime();
 	}
 
+#ifdef WITH_SSL
 	void echoConnection::setPeer( const Network::RemoteSSLendpoint& remote )
 	{
 		LOG_TRACE << "Peer set to " << remote.toString() << ", connected at " << remote.connectionTime();
@@ -55,6 +57,7 @@ namespace _Wolframe {
 			LOG_TRACE << "Peer SSL certificate Common Name: " << remote.SSLcertInfo()->commonName();
 		}
 	}
+#endif // WITH_SSL
 
 	/// Handle a request and produce a reply.
 	const Network::NetworkOperation echoConnection::nextOperation()
@@ -178,12 +181,12 @@ namespace _Wolframe {
 	{
 		return new echoConnection( local, timeout );
 	}
-
+#ifdef WITH_SSL
 	Network::connectionHandler* ServerHandler::ServerHandlerImpl::newSSLconnection( const Network::LocalSSLendpoint& local )
 	{
 		return new echoConnection( local, timeout );
 	}
-
+#endif // WITH_SSL
 
 	ServerHandler::ServerHandler( const HandlerConfiguration *config ) : impl_( new ServerHandlerImpl( config ) )	{}
 
@@ -193,10 +196,11 @@ namespace _Wolframe {
 	{
 		return impl_->newConnection( local );
 	}
-
+#ifdef WITH_SSL
 	Network::connectionHandler* ServerHandler::newSSLconnection( const Network::LocalSSLendpoint& local )
 	{
 		return impl_->newSSLconnection( local );
 	}
+#endif // WITH_SSL
 
 } // namespace _Wolframe

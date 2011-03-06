@@ -117,7 +117,9 @@ namespace _Wolframe {
 
 			/// Set the remote peer. The connection is up now.
 			virtual void setPeer( const RemoteTCPendpoint& remote ) = 0;
+#ifdef WITH_SSL
 			virtual void setPeer( const RemoteSSLendpoint& remote ) = 0;
+#endif // WITH_SSL
 		};
 
 	} // namespace Network
@@ -135,7 +137,10 @@ namespace _Wolframe {
 
 		/// Create a new connection handler and return a pointer to it
 		Network::connectionHandler* newConnection( const Network::LocalTCPendpoint& local );
+#ifdef WITH_SSL
 		Network::connectionHandler* newSSLconnection( const Network::LocalSSLendpoint& local );
+#endif // WITH_SSL
+
 	private:
 		ServerHandler( const ServerHandler& );
 		ServerHandler& operator = ( const ServerHandler& );

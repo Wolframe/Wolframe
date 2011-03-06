@@ -12,6 +12,7 @@
 namespace _Wolframe	{
 	namespace Network	{
 
+#ifdef WITH_SSL
 /// set SSL files path to absolute pathes
 void ServerSSLendpoint::setAbsolutePath( const std::string& refPath )
 {
@@ -44,6 +45,7 @@ void ServerSSLendpoint::setAbsolutePath( const std::string& refPath )
 			CAchain_ = resolvePath( CAchain_);
 	}
 }
+#endif // WITH_SSL
 
 	} // namespace Network
 } // namespace _Wolframe

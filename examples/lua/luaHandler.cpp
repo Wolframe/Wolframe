@@ -183,7 +183,7 @@ namespace _Wolframe {
 		if( config.debug ) printMemStats( );
 	}
 
-
+#ifdef WITH_SSL
 	luaConnection::luaConnection( const Network::LocalSSLendpoint& local, const luaConfig config_ )
 		: counter( 0 ), maxMemUsed( 0 ), config( config_ )
 	{
@@ -191,6 +191,7 @@ namespace _Wolframe {
 		createVM( );
 		if( config.debug ) printMemStats( );
 	}
+#endif // WITH_SSL
 
 	luaConnection::~luaConnection()
 	{
@@ -218,6 +219,7 @@ namespace _Wolframe {
 		if( config.debug ) printMemStats( );
 	}
 
+#ifdef WITH_SSL
 	void luaConnection::setPeer( const Network::RemoteSSLendpoint& remote )
 	{
 		LOG_TRACE << "Peer set to " << remote.toString();
@@ -243,6 +245,7 @@ namespace _Wolframe {
 		}
 		if( config.debug ) printMemStats( );
 	}
+#endif // WITH_SSL
 
 	/// Handle a request and produce a reply.
 	const Network::NetworkOperation luaConnection::nextOperation()
@@ -371,12 +374,12 @@ namespace _Wolframe {
 	{
 		return new luaConnection( local, config_ );
 	}
-
+#ifdef WITH_SSL
 	Network::connectionHandler* ServerHandler::ServerHandlerImpl::newSSLconnection( const Network::LocalSSLendpoint& local )
 	{
 		return new luaConnection( local, config_ );
 	}
-
+#endif // WITH_SSL
 	ServerHandler::ServerHandler( const HandlerConfiguration *config ) : impl_( new ServerHandlerImpl( config ) )	{}
 
 	ServerHandler::~ServerHandler()	{ delete impl_; }
@@ -385,10 +388,10 @@ namespace _Wolframe {
 	{
 		return impl_->newConnection( local );
 	}
-
+#ifdef WITH_SSL
 	Network::connectionHandler* ServerHandler::newSSLconnection( const Network::LocalSSLendpoint& local )
 	{
 		return impl_->newSSLconnection( local );
 	}
-
+#endif // WITH_SSL
 } // namespace _Wolframe

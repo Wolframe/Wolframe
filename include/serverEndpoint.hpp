@@ -24,6 +24,7 @@ namespace _Wolframe	{
 	};
 
 
+#ifdef WITH_SSL
 	/// SSL connection server endpoint
 	class ServerSSLendpoint : public ServerTCPendpoint
 	{
@@ -56,6 +57,7 @@ namespace _Wolframe	{
 		std::string	CAchain_;
 		bool		verify_;
 	};
+#endif // WITH_SSL
 
 	} // namespace Network
 } // namespace _Wolframe

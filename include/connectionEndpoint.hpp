@@ -53,7 +53,7 @@ namespace _Wolframe {
 			time_t	connectionTime_;
 		};
 
-
+#ifdef WITH_SSL
 		/// SSL connection endpoints
 		class LocalSSLendpoint : public ConnectionEndpoint
 		{
@@ -88,6 +88,7 @@ namespace _Wolframe {
 			time_t				connectionTime_;
 			const SSLcertificateInfo	*sslInfo_;
 		};
+#endif // WITH_SSL
 
 	} // namespace Network
 } // namespace _Wolframe

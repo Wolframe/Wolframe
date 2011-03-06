@@ -32,12 +32,6 @@
 static const int DEFAULT_SERVICE_TIMEOUT = 5000;
 
 
-// DUMMY
-namespace _Wolframe	{
-	struct HandlerConfiguration	{
-	};
-}
-
 boost::function0<void> consoleCtrlFunction;
 
 BOOL WINAPI consoleCtrlHandler(DWORD ctrlType)
@@ -266,9 +260,8 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 		LOG_NOTICE << "Starting service";
 
 // run server in background thread(s).
-		_Wolframe::ServerHandler	handler( config.handlerConfig );
-		_Wolframe::Network::server s( config.srvConfig->address, config.srvConfig->SSLaddress,
-								handler, config.srvConfig->threads, config.srvConfig->maxConnections );
+		_Wolframe::ServerHandler handler( config.handlerConfig );
+		_Wolframe::Network::server s( config.srvConfig, handler );
 		boost::thread t( boost::bind( &_Wolframe::Network::server::run, &s ));
 
 // we are up and running now (hopefully), signal this to the SCM
@@ -399,7 +392,7 @@ int _Wolframe_winMain( int argc, char* argv[] )
 		if( cmdLineCfg.command == _Wolframe::Configuration::CmdLineConfig::RUN_SERVICE ) {
 			// if started as service we dispatch the service thread now
 			SERVICE_TABLE_ENTRY dispatch_table[2] =
-				{ { const_cast<char *>( config.srvConfig->serviceName.c_str( ) ), service_main },
+				{ { const_cast<char *>( config.serviceConf->serviceName.c_str( ) ), service_main },
 				{ NULL, NULL } };
 
 			// pass configuration to service main
@@ -426,9 +419,8 @@ int _Wolframe_winMain( int argc, char* argv[] )
 
 		LOG_NOTICE << "Starting server";
 
-		_Wolframe::ServerHandler	handler( config.handlerConfig );
-		_Wolframe::Network::server s( config.srvConfig->address, config.srvConfig->SSLaddress,
-					   handler, config.srvConfig->threads, config.srvConfig->maxConnections );
+		_Wolframe::ServerHandler handler( config.handlerConf );
+		_Wolframe::Network::server s( *config.serverConf, handler );
 
 		// Set console control handler to allow server to be stopped.
 		consoleCtrlFunction = boost::bind(&_Wolframe::Network::server::stop, &s);

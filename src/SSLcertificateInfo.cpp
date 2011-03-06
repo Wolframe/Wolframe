@@ -2,6 +2,8 @@
 // SSLcertificateInfo.cpp
 //
 
+#ifdef WITH_SSL
+
 #include "SSLcertificateInfo.hpp"
 
 #include <string>
@@ -124,3 +126,6 @@ namespace _Wolframe {
 
 	} // namespace Network
 } // namespace _Wolframe
+
+
+#endif // WITH_SSL

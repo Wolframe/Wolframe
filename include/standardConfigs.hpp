@@ -28,7 +28,9 @@ namespace _Wolframe {
 
 			// listen on
 			std::list<Network::ServerTCPendpoint> address;
+#ifdef WITH_SSL
 			std::list<Network::ServerSSLendpoint> SSLaddress;
+#endif // WITH_SSL
 
 			/// constructor
 			ServerConfiguration();

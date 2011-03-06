@@ -51,6 +51,7 @@ ServerConfiguration::ServerConfiguration()
 				os << std::endl;
 			}
 		}
+#ifdef WITH_SSL
 		if ( SSLaddress.size() > 0 )	{
 			std::list<Network::ServerSSLendpoint>::const_iterator it = SSLaddress.begin();
 			os << "           SSL: " << it->toString();
@@ -75,13 +76,14 @@ ServerConfiguration::ServerConfiguration()
 				os << "                   verify client: " << (it->verifyClientCert() ? "yes" : "no") << std::endl;
 			}
 		}
+#endif // WITH_SSL
 	}
 
 	/// Check if the server configuration makes sense
+#ifdef WITH_SSL
 	bool ServerConfiguration::check( std::ostream& os ) const
 	{
-		bool	correct = true;
-
+		bool correct = true;
 		for ( std::list<Network::ServerSSLendpoint>::const_iterator it = SSLaddress.begin();
 										it != SSLaddress.end(); ++it )	{
 			// if it listens to SSL a certificate file and a key file are required
@@ -103,6 +105,12 @@ ServerConfiguration::ServerConfiguration()
 		}
 		return correct;
 	}
+#else
+	bool ServerConfiguration::check( std::ostream& /* os */ ) const
+	{
+		return true;
+	}
+#endif // WITH_SSL
 
 
 /// Parse the configuration
@@ -215,6 +223,7 @@ bool ServerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 					return false;
 				}
 			}
+#ifdef WITH_SSL
 			if ( port == 0 )
 				port = defaultSSLport();
 
@@ -222,6 +231,7 @@ bool ServerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 							certFile, keyFile,
 							verify, CAdirectory, CAchainFile );
 			SSLaddress.push_back( lep );
+#endif // WITH_SSL
 		}
 		else	{
 			os << displayName() << ": unknown configuration option: <" << L1it->first << ">";
@@ -231,12 +241,17 @@ bool ServerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 	return true;
 }
 
-
+#ifdef WITH_SSL
 void ServerConfiguration::setCanonicalPathes( const std::string& refPath )
 {
 	for ( std::list<Network::ServerSSLendpoint>::iterator it = SSLaddress.begin(); it != SSLaddress.end(); ++it )
 		it->setAbsolutePath( refPath );
 }
+#else
+void ServerConfiguration::setCanonicalPathes( const std::string& /* refPath */ )
+{
+}
+#endif // WITH_SSL
 
 	} // namespace Network
 } // namespace _Wolframe

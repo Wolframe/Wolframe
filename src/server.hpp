@@ -13,7 +13,7 @@
 #include "serverEndpoint.hpp"
 #include "acceptor.hpp"
 #include "connectionHandler.hpp"
-#include "atomicCounter.hpp"
+#include "standardConfigs.hpp"
 
 namespace _Wolframe {
 	namespace Network	{
@@ -24,10 +24,8 @@ namespace _Wolframe {
 			/// public interface
 		public:
 			/// Construct the server
-			explicit server( const std::list<ServerTCPendpoint>& TCPserver,
-					 const std::list<ServerSSLendpoint>& SSLserver,
-					 _Wolframe::ServerHandler& serverHandler,
-					 unsigned threads, unsigned maxConnections );
+			explicit server( const ServerConfiguration& config,
+					 _Wolframe::ServerHandler& serverHandler );
 
 			/// Destruct the server
 			~server();
@@ -43,16 +41,16 @@ namespace _Wolframe {
 
 		private:
 			/// The number of threads that will call io_service::run().
-			std::size_t				threadPoolSize_;
+			std::size_t		threadPoolSize_;
 
 			/// The io_service used to perform asynchronous operations.
-			boost::asio::io_service			IOservice_;
-			/// The vector(s) of connection acceptors.
-			std::vector<acceptor*>			acceptor_;
+			boost::asio::io_service	IOservice_;
+			/// The list(s) of connection acceptors.
+			std::list<acceptor*>	acceptor_;
 #ifdef WITH_SSL
-			std::vector<SSLacceptor*>		SSLacceptor_;
+			std::list<SSLacceptor*>	SSLacceptor_;
 #endif // WITH_SSL
-			GlobalConnectionList			globalList_;
+			GlobalConnectionList	globalList_;
 		};
 
 	} // namespace Network

@@ -25,7 +25,7 @@ namespace _Wolframe	{
 		idleTimeout_ = 30;
 	}
 
-
+#ifdef WITH_SSL
 	wolframeConnection::wolframeConnection( const Network::LocalSSLendpoint& local )
 	{
 		LOG_TRACE << "Created connection handler (SSL) for " << local.toString();
@@ -34,6 +34,7 @@ namespace _Wolframe	{
 		dataSize_ = 0;
 		idleTimeout_ = 30;
 	}
+#endif // WITH_SSL
 
 	wolframeConnection::~wolframeConnection()
 	{
@@ -45,6 +46,7 @@ namespace _Wolframe	{
 		LOG_TRACE << "Peer set to " << remote.toString() << ", connected at " << remote.connectionTime();
 	}
 
+#ifdef WITH_SSL
 	void wolframeConnection::setPeer( const Network::RemoteSSLendpoint& remote )
 	{
 		LOG_TRACE << "Peer set to " << remote.toString() << ", connected at " << remote.connectionTime();
@@ -57,7 +59,7 @@ namespace _Wolframe	{
 			LOG_TRACE << "Peer SSL certificate Common Name: " << remote.SSLcertInfo()->commonName();
 		}
 	}
-
+#endif // WITH_SSL
 
 	/// Handle a request and produce a reply.
 	const Network::NetworkOperation wolframeConnection::nextOperation()
@@ -183,10 +185,12 @@ namespace _Wolframe	{
 		return new wolframeConnection( local );
 	}
 
+#ifdef WITH_SSL
 	Network::connectionHandler* ServerHandler::ServerHandlerImpl::newSSLconnection( const Network::LocalSSLendpoint& local )
 	{
 		return new wolframeConnection( local );
 	}
+#endif // WITH_SSL
 
 
 	ServerHandler::ServerHandler( const HandlerConfiguration* ) : impl_( new ServerHandlerImpl )	{}
@@ -198,9 +202,11 @@ namespace _Wolframe	{
 		return impl_->newConnection( local );
 	}
 
+//#ifdef WITH_SSL
 	Network::connectionHandler* ServerHandler::newSSLconnection( const Network::LocalSSLendpoint& local )
 	{
 		return impl_->newSSLconnection( local );
 	}
+//#endif // WITH_SSL
 
 } // namespace _Wolframe

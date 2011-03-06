@@ -13,14 +13,16 @@ namespace _Wolframe {
 	{
 	public:
 		wolframeConnection( const Network::LocalTCPendpoint& local );
+#ifdef WITH_SSL
 		wolframeConnection( const Network::LocalSSLendpoint& local );
+#endif // WITH_SSL
 		~wolframeConnection();
 
 		void setPeer( const Network::RemoteTCPendpoint& remote );
+#ifdef WITH_SSL
 		void setPeer( const Network::RemoteSSLendpoint& remote );
-
-		/// Parse incoming data. The return value indicates how much of the
-		/// input has been consumed.
+#endif // WITH_SSL
+		/// Parse / get the incoming data.
 		void networkInput( const void *begin, std::size_t bytesTransferred );
 
 		void timeoutOccured();
@@ -60,7 +62,9 @@ namespace _Wolframe {
 	{
 	public:
 		Network::connectionHandler* newConnection( const Network::LocalTCPendpoint& local );
+#ifdef WITH_SSL
 		Network::connectionHandler* newSSLconnection( const Network::LocalSSLendpoint& local );
+#endif // WITH_SSL
 	};
 
 } // namespace _Wolframe

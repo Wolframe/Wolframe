@@ -17,17 +17,14 @@
 namespace _Wolframe {
 	namespace Network	{
 
-		server::server( const std::list<ServerTCPendpoint>& TCPserver,
-				WOLFRAME_UNUSED const std::list<ServerSSLendpoint>& SSLserver,
-				_Wolframe::ServerHandler& serverHandler,
-				unsigned threads, unsigned maxConnections )
-					: threadPoolSize_( threads ),
+		server::server( const ServerConfiguration& config, _Wolframe::ServerHandler& serverHandler )
+					: threadPoolSize_( config.threads ),
 					IOservice_(),
-					globalList_( maxConnections )
+					globalList_( config.maxConnections )
 		{
 			int i = 0;
-			for ( std::list<ServerTCPendpoint>::const_iterator it = TCPserver.begin();
-									it != TCPserver.end(); it++ )	{
+			for ( std::list<ServerTCPendpoint>::const_iterator it = config.address.begin();
+									it != config.address.end(); it++ )	{
 				acceptor* acptr = new acceptor( IOservice_,
 								it->host(), it->port(), it->maxConnections(),
 								globalList_,
@@ -38,8 +35,8 @@ namespace _Wolframe {
 			LOG_DEBUG << i << " network acceptor(s) created.";
 #ifdef WITH_SSL
 			i = 0;
-			for ( std::list<ServerSSLendpoint>::const_iterator it = SSLserver.begin();
-									it != SSLserver.end(); it++ )	{
+			for ( std::list<ServerSSLendpoint>::const_iterator it = config.SSLaddress.begin();
+									it != config.SSLaddress.end(); it++ )	{
 				SSLacceptor* acptr = new SSLacceptor( IOservice_,
 								      it->certificate(), it->key(),
 								      it->verifyClientCert(),
@@ -60,13 +57,16 @@ namespace _Wolframe {
 		{
 			LOG_TRACE << "Server destructor called";
 
-			std::size_t	i;
-			for ( i = 0; i < acceptor_.size(); i++ )
-				delete acceptor_[i];
+			std::size_t	i = 0;
+			for ( std::list< acceptor* >::iterator it = acceptor_.begin();
+									it != acceptor_.end(); it++, i++ )
+				delete *it;
 			LOG_TRACE << i << " acceptor(s) deleted";
 #ifdef WITH_SSL
-			for ( i = 0; i < SSLacceptor_.size(); i++ )
-				delete SSLacceptor_[i];
+			i = 0;
+			for ( std::list< SSLacceptor* >::iterator it = SSLacceptor_.begin();
+									it != SSLacceptor_.end(); it++, i++ )
+				delete *it;
 			LOG_TRACE << i << " SSL acceptor(s) deleted";
 #endif // WITH_SSL
 		}
@@ -97,13 +97,16 @@ namespace _Wolframe {
 		{
 			LOG_DEBUG << "Network server received a shutdown request";
 
-			std::size_t	i;
-			for ( i = 0; i < acceptor_.size(); i++ )
-				acceptor_[i]->stop();
+			std::size_t	i = 0;
+			for ( std::list< acceptor* >::iterator it = acceptor_.begin();
+									it != acceptor_.end(); it++, i++ )
+				(*it)->stop();
 			LOG_DEBUG << i << " acceptor(s) signaled to stop";
 #ifdef WITH_SSL
-			for ( i = 0; i < SSLacceptor_.size(); i++ )
-				SSLacceptor_[i]->stop();
+			i = 0;
+			for ( std::list< SSLacceptor* >::iterator it = SSLacceptor_.begin();
+									it != SSLacceptor_.end(); it++, i++ )
+				(*it)->stop();
 			LOG_DEBUG << i << " SSL acceptor(s) signaled to stop";
 #endif // WITH_SSL
 		}
