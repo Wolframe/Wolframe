@@ -236,6 +236,8 @@ namespace _Wolframe {
 		lua_pushstring( l, ss.str( ).c_str( ) );
 		if ( remote.SSLcertInfo() )	{
 			lua_pushstring( l, remote.SSLcertInfo()->commonName().c_str());
+		} else {
+			lua_pushnil( l );
 		}
 		int res = lua_pcall( l, 3, 0, 0 );
 		if( res != 0 ) {
