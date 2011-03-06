@@ -224,7 +224,7 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 
 		// Run server in background thread(s).
 		_Wolframe::ServerHandler handler( config.handlerConf );
-		_Wolframe::Network::server s( *config.serverConf, handler );
+		_Wolframe::Network::server s( config.serverConf, handler );
 		boost::thread t( boost::bind( &_Wolframe::Network::server::run, &s ));
 
 		// Restore previous signals.
