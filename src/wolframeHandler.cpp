@@ -202,11 +202,11 @@ namespace _Wolframe	{
 		return impl_->newConnection( local );
 	}
 
-//#ifdef WITH_SSL
+#ifdef WITH_SSL
 	Network::connectionHandler* ServerHandler::newSSLconnection( const Network::LocalSSLendpoint& local )
 	{
 		return impl_->newSSLconnection( local );
 	}
-//#endif // WITH_SSL
+#endif // WITH_SSL
 
 } // namespace _Wolframe
