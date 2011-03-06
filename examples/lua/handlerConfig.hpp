@@ -21,6 +21,7 @@ namespace _Wolframe {
 			: ConfigurationBase( printName ), debug( false )	{ }
 		/// methods
 		bool parse( const boost::property_tree::ptree& pt, const std::string& nodeName, std::ostream& os );
+		void setCanonicalPathes( const std::string& refPath );
 		bool check( std::ostream& os ) const;
 		void print( std::ostream& os ) const;
 

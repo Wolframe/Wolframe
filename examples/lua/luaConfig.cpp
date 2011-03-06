@@ -5,6 +5,10 @@
 #include "handlerConfig.hpp"
 #include "configHelpers.hpp"
 
+#define BOOST_FILESYSTEM_VERSION 3
+#include <boost/filesystem.hpp>
+#include "miscUtils.hpp"
+
 #include <boost/property_tree/ptree.hpp>
 #include <boost/algorithm/string.hpp>
 
@@ -41,6 +45,9 @@ bool LuaConfiguration::parse( const boost::property_tree::ptree& pt, const std::
 		if ( boost::algorithm::iequals( it->first, "script" ))	{
 			if ( ! Configuration::getStringValue( it, displayName(), "script", script, os ))
 				return false;
+			if ( ! boost::filesystem::path( script ).is_absolute() )
+				os << "WARNING: " << displayName() << ": script file path is not absolute: "
+								   << script << std::endl;
 		} else if ( boost::algorithm::iequals( it->first, "debug" ))	{
 			if ( ! Configuration::getBoolValue( it, displayName(), "debug", debug, os ))
 				return false;
@@ -52,5 +59,17 @@ bool LuaConfiguration::parse( const boost::property_tree::ptree& pt, const std::
 
 	return true;
 }
+
+void LuaConfiguration::setCanonicalPathes( const std::string& refPath )
+{
+	if ( ! script.empty() )	{
+		if ( ! boost::filesystem::path( script ).is_absolute() )
+			script = resolvePath( boost::filesystem::absolute( script,
+							boost::filesystem::path( refPath ).branch_path()).string());
+		else
+			script = resolvePath( script );
+	}
+}
+
 
 } // namespace _Wolframe

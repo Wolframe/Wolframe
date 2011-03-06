@@ -115,10 +115,9 @@ void ApplicationConfiguration::finalize( const CmdLineConfig& cmdLine )
 		loggerConf->foreground( cmdLine.debugLevel, cmdLine.useLogConfig );
 #if !defined(_WIN32)
 	serviceConf->override( cmdLine.user, cmdLine.group );
-	serviceConf->setCanonicalPathes( configFile );
 #endif
-	serverConf->setCanonicalPathes( configFile );
-	loggerConf->setCanonicalPathes( configFile );
+	for( std::size_t i = 0; i <  conf_.size(); i++ )
+		conf_[i]->setCanonicalPathes( configFile );
 }
 
 

@@ -31,6 +31,8 @@ namespace _Wolframe {
 			virtual bool parse( const boost::property_tree::ptree& pt, const std::string& nodeName,
 					    std::ostream& os ) = 0;
 
+			virtual void setCanonicalPathes( const std::string& /* referencePath */ )	{}
+
 			/// Check if the server configuration makes sense
 			///
 			/// Be aware that this function does NOT test if the configuration

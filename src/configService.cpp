@@ -75,7 +75,7 @@ bool ServiceConfiguration::parse( const boost::property_tree::ptree& pt, const s
 				if ( ! getStringValue( it, displayName(), "pidFile", pidFile, os ))
 					return false;
 				if ( ! boost::filesystem::path( pidFile ).is_absolute() )
-					os << "WARNING: " << displayName() << ": pid file is not absolute: "
+					os << "WARNING: " << displayName() << ": pid file path is not absolute: "
 									   << pidFile << std::endl;
 			}
 			else	{
