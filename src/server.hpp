@@ -24,7 +24,7 @@ namespace _Wolframe {
 			/// public interface
 		public:
 			/// Construct the server
-			explicit server( const ServerConfiguration& config,
+                        explicit server( const ServerConfiguration* config,
 					 _Wolframe::ServerHandler& serverHandler );
 
 			/// Destruct the server

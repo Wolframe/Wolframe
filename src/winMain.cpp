@@ -67,7 +67,7 @@ static void registerEventlog( const _Wolframe::Configuration::ApplicationConfigu
 
 // choose the key for the EventLog registry entry
 	_snprintf( key, 256, "SYSTEM\\CurrentControlSet\\Services\\EventLog\\%s\\%s",
-		config.logConfig->eventlogLogName.c_str( ), config.logConfig->eventlogSource.c_str( ) );
+		config.loggerConf->eventlogLogName.c_str( ), config.loggerConf->eventlogSource.c_str( ) );
 	(void)RegCreateKeyEx( HKEY_LOCAL_MACHINE, key, 0, NULL, REG_OPTION_NON_VOLATILE,
 		KEY_SET_VALUE, NULL, &h, &disposition );
 
@@ -97,9 +97,9 @@ static void deregisterEventlog( const _Wolframe::Configuration::ApplicationConfi
 	LONG res;
 
 	_snprintf( key, 256, "SYSTEM\\CurrentControlSet\\Services\\EventLog\\%s",
-		config.logConfig->eventlogLogName.c_str( ) );
+		config.loggerConf->eventlogLogName.c_str( ) );
 	res = RegOpenKeyEx( HKEY_LOCAL_MACHINE, key, 0, KEY_WRITE, &h );
-	(void)RegDeleteKey( h, config.logConfig->eventlogSource.c_str( ) );
+	(void)RegDeleteKey( h, config.loggerConf->eventlogSource.c_str( ) );
 }
 
 static void installAsService( const _Wolframe::Configuration::ApplicationConfiguration& config )
@@ -117,14 +117,14 @@ static void installAsService( const _Wolframe::Configuration::ApplicationConfigu
 
 // create the service
 	SC_HANDLE service = CreateService( scm,
-		config.srvConfig->serviceName.c_str( ), config.srvConfig->serviceDisplayName.c_str( ),
+		config.serviceConf->serviceName.c_str( ), config.serviceConf->serviceDisplayName.c_str( ),
 		SERVICE_ALL_ACCESS, SERVICE_WIN32_OWN_PROCESS,
 		SERVICE_DEMAND_START, SERVICE_ERROR_NORMAL,
 		os.str( ).c_str( ), NULL, NULL, NULL, NULL, NULL );
 
 // set description of the service
 	SERVICE_DESCRIPTION descr;
-	descr.lpDescription = (LPTSTR)config.srvConfig->serviceDescription.c_str( );
+	descr.lpDescription = (LPTSTR)config.serviceConf->serviceDescription.c_str( );
 	(void)ChangeServiceConfig2( service, SERVICE_CONFIG_DESCRIPTION, &descr );
 
 // free handles
@@ -138,7 +138,7 @@ static void remove_as_service( const _Wolframe::Configuration::ApplicationConfig
 	SC_HANDLE scm = (SC_HANDLE)OpenSCManager( NULL, SERVICES_ACTIVE_DATABASE, SC_MANAGER_ALL_ACCESS );
 
 // get service handle of the service to delete (identified by service name)
-	SC_HANDLE service = OpenService( scm, config.srvConfig->serviceName.c_str( ), SERVICE_ALL_ACCESS );
+	SC_HANDLE service = OpenService( scm, config.serviceConf->serviceName.c_str( ), SERVICE_ALL_ACCESS );
 
 // remove the service
 	(void)DeleteService( service );
@@ -233,14 +233,14 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 		config.finalize( cmdLineCfg );
 
 // create the final logger based on the configuration
-		_Wolframe::LogBackend::instance().setLogfileLevel( config.logConfig->logFileLogLevel );
-		_Wolframe::LogBackend::instance().setLogfileName( config.logConfig->logFile );
-		_Wolframe::LogBackend::instance().setEventlogLevel( config.logConfig->eventlogLogLevel );
-		_Wolframe::LogBackend::instance().setEventlogSource( config.logConfig->eventlogSource );
-		_Wolframe::LogBackend::instance().setEventlogLog( config.logConfig->eventlogLogName );
+		_Wolframe::LogBackend::instance().setLogfileLevel( config.loggerConf->logFileLogLevel );
+		_Wolframe::LogBackend::instance().setLogfileName( config.loggerConf->logFile );
+		_Wolframe::LogBackend::instance().setEventlogLevel( config.loggerConf->eventlogLogLevel );
+		_Wolframe::LogBackend::instance().setEventlogSource( config.loggerConf->eventlogSource );
+		_Wolframe::LogBackend::instance().setEventlogLog( config.loggerConf->eventlogLogName );
 
 // register the event callback where we get called by Windows and the SCM
-		serviceStatusHandle = RegisterServiceCtrlHandler( config.srvConfig->serviceName.c_str( ), serviceCtrlFunction );
+		serviceStatusHandle = RegisterServiceCtrlHandler( config.serviceConf->serviceName.c_str( ), serviceCtrlFunction );
 		if( serviceStatusHandle == 0 ) {
 			LOG_FATAL << "Unable to register service control handler function";
 			return;
@@ -260,8 +260,8 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 		LOG_NOTICE << "Starting service";
 
 // run server in background thread(s).
-		_Wolframe::ServerHandler handler( config.handlerConfig );
-		_Wolframe::Network::server s( config.srvConfig, handler );
+		_Wolframe::ServerHandler handler( config.handlerConf );
+		_Wolframe::Network::server s( config.serverConf, handler );
 		boost::thread t( boost::bind( &_Wolframe::Network::server::run, &s ));
 
 // we are up and running now (hopefully), signal this to the SCM
@@ -304,13 +304,10 @@ WAIT_FOR_STOP_EVENT:
 int _Wolframe_winMain( int argc, char* argv[] )
 {
 	try	{
-		_Wolframe::Version		appVersion( _Wolframe::applicationMajorVersion(), _Wolframe::applicationMinorVersion(),
-										_Wolframe::applicationRevisionVersion(), _Wolframe::applicationBuildVersion() );
+		_Wolframe::Version  appVersion( _Wolframe::applicationMajorVersion(), _Wolframe::applicationMinorVersion(),
+						_Wolframe::applicationRevisionVersion(), _Wolframe::applicationBuildVersion() );
 		_Wolframe::Configuration::CmdLineConfig	cmdLineCfg;
 		const char		*configFile = NULL;
-
-// it's just a DUMMY for now
-		_Wolframe::HandlerConfiguration	handlerConfig;
 
 		if ( !cmdLineCfg.parse( argc, argv ))	{	// there was an error parsing the command line
 			std::cerr << cmdLineCfg.errMsg() << std::endl << std::endl;
@@ -415,12 +412,12 @@ int _Wolframe_winMain( int argc, char* argv[] )
 
 		// Create the final logger based on the configuration, this is the
 		// foreground mode in a console, so we start only the stderr logger
-		_Wolframe::LogBackend::instance().setConsoleLevel( config.logConfig->stderrLogLevel );
+		_Wolframe::LogBackend::instance().setConsoleLevel( config.loggerConf->stderrLogLevel );
 
 		LOG_NOTICE << "Starting server";
 
 		_Wolframe::ServerHandler handler( config.handlerConf );
-		_Wolframe::Network::server s( *config.serverConf, handler );
+		_Wolframe::Network::server s( config.serverConf, handler );
 
 		// Set console control handler to allow server to be stopped.
 		consoleCtrlFunction = boost::bind(&_Wolframe::Network::server::stop, &s);
