@@ -5,8 +5,14 @@
 #include "wolframeHandler.hpp"
 #include "logger.hpp"
 
+#ifdef WITH_SSL
+#include "SSLcertificateInfo.hpp"
+#endif
+
 #include <string>
 #include <cstring>
+
+#include "boost/date_time/posix_time/posix_time.hpp"		// to print time_t structures
 
 namespace _Wolframe	{
 
@@ -42,11 +48,14 @@ namespace _Wolframe	{
 	void wolframeConnection::setPeer( const Network::RemoteSSLendpoint& remote )
 	{
 		LOG_TRACE << "Peer set to " << remote.toString() << ", connected at " << remote.connectionTime();
-		LOG_TRACE << "Peer SSL certificate number " << remote.certSerialNumber()
-			  << ", issued by: " << remote.certIssuer();
-		LOG_TRACE << "Peer SSL certificate valid from " << remote.certNotBefore() << " to " << remote.certNotAfter();
-		LOG_TRACE << "Peer SSL certificate subject: " << remote.certSubject();
-		LOG_TRACE << "Peer SSL certificate Common Name: " << remote.certCommonName();
+		if ( remote.SSLcertInfo() )	{
+			LOG_TRACE << "Peer SSL certificate serial number " << remote.SSLcertInfo()->serialNumber()
+				  << ", issued by: " << remote.SSLcertInfo()->issuer();
+			LOG_TRACE << "Peer SSL certificate valid from " << boost::posix_time::from_time_t( remote.SSLcertInfo()->notBefore())
+				  << " to " <<  boost::posix_time::from_time_t( remote.SSLcertInfo()->notAfter());
+			LOG_TRACE << "Peer SSL certificate subject: " << remote.SSLcertInfo()->subject();
+			LOG_TRACE << "Peer SSL certificate Common Name: " << remote.SSLcertInfo()->commonName();
+		}
 	}
 
 

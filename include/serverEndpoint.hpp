@@ -5,7 +5,7 @@
 #include "connectionEndpoint.hpp"
 
 namespace _Wolframe	{
-namespace Network	{
+	namespace Network	{
 
 	/// No encryption server endpoint
 	class ServerTCPendpoint : public ConnectionEndpoint
@@ -28,12 +28,6 @@ namespace Network	{
 	class ServerSSLendpoint : public ServerTCPendpoint
 	{
 		friend class server;
-	private:
-		std::string	cert_;
-		std::string	key_;
-		std::string	CAdir_;
-		std::string	CAchain_;
-		bool		verify_;
 	public:
 		ServerSSLendpoint( const std::string& Host, unsigned short Port, unsigned maxConn,
 				   const std::string& Certificate, const std::string& Key,
@@ -52,9 +46,18 @@ namespace Network	{
 		const std::string& CAdirectory() const	{ return CAdir_; }
 		const std::string& CAchain() const	{ return CAchain_; }
 		bool verifyClientCert() const		{ return verify_; }
+
+		void setAbsolutePath( const std::string& referencePath );
+
+	private:
+		std::string	cert_;
+		std::string	key_;
+		std::string	CAdir_;
+		std::string	CAchain_;
+		bool		verify_;
 	};
 
-} // namespace Network
+	} // namespace Network
 } // namespace _Wolframe
 
 #endif // _SERVER_ENDPOINT_HPP_INCLUDED

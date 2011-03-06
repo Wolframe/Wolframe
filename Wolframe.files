@@ -193,3 +193,6 @@ tests/testHandlerTemplates.hpp
 tests/testNamedRetVal.cpp
 tests/threadLeakTest.cpp
 tests/versionTest.cpp
+include/SSLcertificateInfo.hpp
+src/SSLcertificateInfo.cpp
+src/serverEndpoint.cpp

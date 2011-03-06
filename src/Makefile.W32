@@ -57,6 +57,8 @@ LOCAL_STATIC_LIB_OBJS = \
 	protocol_ioblocks.obj \
 	acceptor.obj \
 	getPassword.obj \
+	SSLcertificateInfo.obj \
+	serverEndpoint.obj \
 	connection.obj \
 	server.obj \
 	authentication.obj \

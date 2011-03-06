@@ -1,3 +1,7 @@
+//
+// connectionEndpoint.hpp
+//
+
 #ifndef _CONNECTION_ENDPOINT_HPP_INCLUDED
 #define _CONNECTION_ENDPOINT_HPP_INCLUDED
 
@@ -58,46 +62,31 @@ namespace _Wolframe {
 				: ConnectionEndpoint( Host, Port )	{}
 		};
 
+
+		/// forward declaration for SSL certificate info
+		class SSLcertificateInfo;
+
 		class RemoteSSLendpoint : public ConnectionEndpoint
 		{
 		public:
 			RemoteSSLendpoint( const std::string& Host, unsigned short Port )
 				: ConnectionEndpoint( Host, Port )	{ connectionTime_ = time( NULL );
-									  certSerialNumber_ = 0;
-									  certNotBefore_ = 0;
-									  certNotAfter_ = 0;
+									  sslInfo_ = NULL;
 									}
 
 			RemoteSSLendpoint( const std::string& Host, unsigned short Port,
-					  unsigned long serialNumber, time_t notBefore, time_t notAfter,
-					  const std::string& issuer,
-					  const std::string& subject, const std::string& commonName )
+					  const SSLcertificateInfo *sslInfo )
 				: ConnectionEndpoint( Host, Port )	{ connectionTime_ = time( NULL );
-									  certSerialNumber_ = serialNumber;
-									  certIssuer_ = issuer;
-									  certNotBefore_ = notBefore;
-									  certNotAfter_ = notAfter;
-									  certSubject_ = subject;
-									  certCommonName_ = commonName;
+									  sslInfo_ = sslInfo;
 									}
 
-			time_t connectionTime() const				{ return connectionTime_; }
+			time_t connectionTime() const			{ return connectionTime_; }
 			/// SSL certificate information
-			unsigned long certSerialNumber() const			{ return certSerialNumber_; }
-			const std::string& certIssuer() const			{ return certIssuer_; }
-			time_t certNotBefore() const				{ return certNotBefore_; }
-			time_t certNotAfter() const				{ return certNotAfter_; }
-			const std::string& certSubject() const			{ return certSubject_; }
-			const std::string& certCommonName() const		{ return certCommonName_; }
+			const SSLcertificateInfo* SSLcertInfo() const	{ return sslInfo_; }
 
 		private:
-			time_t		connectionTime_;
-			unsigned long	certSerialNumber_;
-			std::string	certIssuer_;
-			time_t		certNotBefore_;
-			time_t		certNotAfter_;
-			std::string	certSubject_;
-			std::string	certCommonName_;
+			time_t				connectionTime_;
+			const SSLcertificateInfo	*sslInfo_;
 		};
 
 	} // namespace Network

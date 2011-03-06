@@ -52,6 +52,8 @@ namespace _Wolframe {
 			bool check( std::ostream& os ) const;
 			void print( std::ostream& os ) const;
 
+			void setCanonicalPathes( const std::string& referencePath );
+
 //			Not implemented yet, inherited from base for the time being
 //			bool test( std::ostream& os ) const;
 
@@ -91,6 +93,8 @@ namespace _Wolframe {
 			bool parse( const boost::property_tree::ptree& pt, const std::string& node, std::ostream& os );
 			bool check( std::ostream& os ) const;
 			void print( std::ostream& os ) const;
+
+			void setCanonicalPathes( const std::string& referencePath );
 
 //			Not implemented yet, inherited from base for the time being
 //			bool test( std::ostream& os ) const;

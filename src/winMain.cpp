@@ -236,11 +236,8 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 		}
 // configuration file has been parsed successfully
 // build the final configuration
-		config.finalize( cmdLineCfg );		
+		config.finalize( cmdLineCfg, errMsg );
 
-		// it's just a DUMMY for now
-		_Wolframe::HandlerConfiguration	handlerConfig;
-		
 // create the final logger based on the configuration
 		_Wolframe::LogBackend::instance().setLogfileLevel( config.logConfig->logFileLogLevel );
 		_Wolframe::LogBackend::instance().setLogfileName( config.logConfig->logFile );
@@ -360,7 +357,7 @@ int _Wolframe_winMain( int argc, char* argv[] )
 		}
 // configuration file has been parsed successfully
 // build the final configuration
-		config.finalize( cmdLineCfg );
+		config.finalize( cmdLineCfg, errMsg );
 
 // Check the configuration
 		if ( cmdLineCfg.command == _Wolframe::Configuration::CmdLineConfig::CHECK_CONFIG )	{

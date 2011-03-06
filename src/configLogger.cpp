@@ -4,6 +4,7 @@
 
 #include "standardConfigs.hpp"
 #include "configHelpers.hpp"
+#include "miscUtils.hpp"
 
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
@@ -174,11 +175,10 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 						os << displayName() << ": logfile: empty filename";
 						return false;
 					}
-					if ( ! boost::filesystem::path( fName ).is_absolute() )	{
-						os << displayName() << ": logfile: filename must be absolute: " << fName;
-						return false;
-					}
 					logFile = fName;
+					if ( ! boost::filesystem::path( logFile ).is_absolute() )
+						os << "WARNING: " << displayName() << ": log file is not absolute: "
+										   << logFile << std::endl;
 				}
 				else	{
 					os << displayName() << ": logfile: unknown configuration option: <"
@@ -191,7 +191,7 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 #if defined( _WIN32 )
 		// syslog
 		else if ( boost::algorithm::iequals( L1it->first, "syslog" ))	{
-			os << "WARNING: " << displayName() << ": syslog is not defined on Windows";
+			os << "WARNING: " << displayName() << ": syslog is not defined on Windows" << std::endl;
 		}
 #else // if defined( _WIN32 )
 		// syslog
@@ -256,7 +256,7 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 
 #if !defined( _WIN32 )
 		else if ( boost::algorithm::iequals( L1it->first, "eventlog" ))	{
-			os << "WARNING: " << displayName() << ": event log is defined only on Windows";
+			os << "WARNING: " << displayName() << ": event log is defined only on Windows" << std::endl;
 		}
 #else // if !defined( _WIN32 )
 		// event log
@@ -326,6 +326,17 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 	return true;
 }
 
+
+void LoggerConfiguration::setCanonicalPathes( const std::string& refPath )
+{
+	if ( ! logFile.empty() )	{
+		if ( ! boost::filesystem::path( logFile ).is_absolute() )
+			logFile = resolvePath( boost::filesystem::absolute( logFile,
+								boost::filesystem::path( refPath ).branch_path()).string());
+		else
+			logFile = resolvePath( logFile );
+	}
+}
 
 	} // namespace Configuration
 } // namespace _Wolframe

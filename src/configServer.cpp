@@ -8,6 +8,7 @@
 
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
+#include "miscUtils.hpp"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/algorithm/string.hpp>
@@ -93,7 +94,7 @@ ServerConfiguration::ServerConfiguration()
 		bool	correct = true;
 
 		for ( std::list<Network::ServerSSLendpoint>::const_iterator it = SSLaddress.begin();
-									it != SSLaddress.end(); ++it )	{
+										it != SSLaddress.end(); ++it )	{
 			// if it listens to SSL a certificate file and a key file are required
 			if ( it->certificate().empty() )	{
 				os << "No SSL certificate specified for " << it->toString() << std::endl;
@@ -106,8 +107,8 @@ ServerConfiguration::ServerConfiguration()
 			// verify client SSL certificate needs either certificate dir or chain file
 			if ( it->verifyClientCert() && it->CAdirectory().empty() && it->CAchain().empty() )	{
 				os << "Client SSL certificate verification requested but no CA "
-						"directory or CA chain file specified for "
-						<< it->toString() << std::endl;
+				      "directory or CA chain file specified for "
+				   << it->toString() << std::endl;
 				correct = false;
 			}
 		}
@@ -142,6 +143,9 @@ bool ServerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 				else if ( boost::algorithm::iequals( L2it->first, "pidFile" ))	{
 					if ( ! getStringValue( L2it, displayName(), "pidFile", pidFile, os ))
 						return false;
+					if ( ! boost::filesystem::path( pidFile ).is_absolute() )
+						os << "WARNING: " << displayName() << ": pid file is not absolute: "
+										   << pidFile << std::endl;
 				}
 				else	{
 					os << displayName() << ": daemon: unknown configuration option: <" << L2it->first << ">";
@@ -253,18 +257,30 @@ bool ServerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 						else if ( boost::algorithm::iequals( L3it->first, "certificate" ))	{
 							if ( ! getHostnameValue( L3it, displayName(), "certificate", certFile, os ))
 								return false;
+							if ( ! boost::filesystem::path( certFile ).is_absolute() )
+								os << "WARNING: " << displayName() << ": certificate file is not absolute: "
+												   << certFile << std::endl;
 						}
 						else if ( boost::algorithm::iequals( L3it->first, "key" ))	{
 							if ( ! getHostnameValue( L3it, displayName(), "key", keyFile, os ))
 								return false;
+							if ( ! boost::filesystem::path( keyFile ).is_absolute() )
+								os << "WARNING: " << displayName() << ": key file is not absolute: "
+												   << keyFile << std::endl;
 						}
 						else if ( boost::algorithm::iequals( L3it->first, "CAdirectory" ))	{
 							if ( ! getHostnameValue( L3it, displayName(), "CAdirectory", CAdirectory, os ))
 								return false;
+							if ( ! boost::filesystem::path( CAdirectory ).is_absolute() )
+								os << "WARNING: " << displayName() << ": CA directory is not absolute: "
+												   << CAdirectory << std::endl;
 						}
 						else if ( boost::algorithm::iequals( L3it->first, "CAchainFile" ))	{
 							if ( ! getHostnameValue( L3it, displayName(), "CAchainFile", CAchainFile, os ))
 								return false;
+							if ( ! boost::filesystem::path( CAchainFile ).is_absolute() )
+								os << "WARNING: " << displayName() << ": CA chain file is not absolute: "
+												   << CAchainFile << std::endl;
 						}
 						else if ( boost::algorithm::iequals( L3it->first, "verify" ))	{
 							if ( ! getBoolValue( L3it, displayName(), "verify", verify, os ))
@@ -298,17 +314,31 @@ bool ServerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 }
 
 
-#if !defined(_WIN32)
-	/// Override the server configuration with command line arguments
-	void ServerConfiguration::override( const std::string& usr, const std::string& grp )
-	{
-		if ( !usr.empty())
-			user = usr;
-		if ( !grp.empty())
-			group = grp;
+void ServerConfiguration::setCanonicalPathes( const std::string& refPath )
+{
+	if ( ! pidFile.empty() )	{
+		if ( ! boost::filesystem::path( pidFile ).is_absolute() )
+			pidFile = resolvePath( boost::filesystem::absolute( pidFile,
+							boost::filesystem::path( refPath ).branch_path()).string());
+		else
+			pidFile = resolvePath( pidFile );
 	}
-#endif
 
+	for ( std::list<Network::ServerSSLendpoint>::iterator it = SSLaddress.begin(); it != SSLaddress.end(); ++it )
+		it->setAbsolutePath( refPath );
+}
+
+
+#if !defined(_WIN32)
+/// Override the server configuration with command line arguments
+void ServerConfiguration::override( const std::string& usr, const std::string& grp )
+{
+	if ( !usr.empty())
+		user = usr;
+	if ( !grp.empty())
+		group = grp;
+}
+#endif
 
 	} // namespace Configuration
 } // namespace _Wolframe

@@ -7,6 +7,10 @@
 #include "logger.hpp"
 #include "connectionHandler.hpp"
 
+#ifdef WITH_SSL
+#include "SSLcertificateInfo.hpp"
+#endif
+
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -144,40 +148,19 @@ void SSLconnection::handleHandshake( const boost::system::error_code& e )
 			socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
 		}
 		else	{
-			// Extract the common name from the client cert
-			X509*	peerCert;
-			char	buf[2048];
-			int	res = -1;
-			/// SSL certificate information
-			unsigned long serialNumber = 0;
-			std::string issuer;
-			time_t notBefore = 0;
-			time_t notAfter = 0;
-			std::string subject;
-			std::string commonName;
-
 			SSL* ssl = SSLsocket_.impl()->ssl;
+			X509* peerCert = SSL_get_peer_certificate( ssl );
+			SSLcertificateInfo* certInfo = NULL;
 
-			memset( buf, 0, 2048 );
-			peerCert = SSL_get_peer_certificate( ssl );
 			if ( peerCert )	{
-				X509_NAME_oneline( X509_get_issuer_name( peerCert ), buf, 2047 );
-				issuer = std::string( buf );
-
-				X509_NAME_oneline( X509_get_subject_name( peerCert ), buf, 2047 );
-				subject = std::string( buf );
-
-// this one should be interpreted from subject
-				if (( res = X509_NAME_get_text_by_NID( X509_get_subject_name( peerCert ),
-								      NID_commonName, buf, 2047 )) != -1 )
-					commonName = std::string( buf );
+				certInfo = new SSLcertificateInfo( peerCert );
 			}
-			connList_.push( boost::static_pointer_cast< SSLconnection >( shared_from_this()) );
-
 			connectionHandler_->setPeer( RemoteSSLendpoint( SSLsocket_.lowest_layer().remote_endpoint().address().to_string(),
 								       SSLsocket_.lowest_layer().remote_endpoint().port(),
-								       serialNumber, notBefore, notAfter,
-								       issuer, subject, commonName ));
+								       certInfo ));
+
+			connList_.push( boost::static_pointer_cast< SSLconnection >( shared_from_this()) );
+
 			nextOperation();
 		}
 	}

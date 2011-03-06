@@ -111,12 +111,12 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 			std::cerr << errMsg.str() << std::endl << std::endl;
 			return _Wolframe::ErrorCodes::FAILURE;
 		}
-		else if ( ! errMsg.str().empty() )
+		if ( ! errMsg.str().empty() )
 			std::cerr << errMsg.str() << std::endl;
+
 // configuration file has been parsed successfully
 // finalize the application configuration
 		config.finalize( cmdLineCfg );
-
 
 // now here we know where to log to on stderr
 		_Wolframe::LogBackend::instance().setConsoleLevel( config.logConfig->stderrLogLevel );

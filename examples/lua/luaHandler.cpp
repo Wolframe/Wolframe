@@ -4,6 +4,7 @@
 
 #include "luaHandler.hpp"
 #include "logger.hpp"
+#include "SSLcertificateInfo.hpp"
 
 #include <string>
 #include <cstring>
@@ -220,7 +221,9 @@ namespace _Wolframe {
 	void luaConnection::setPeer( const Network::RemoteSSLendpoint& remote )
 	{
 		LOG_TRACE << "Peer set to " << remote.toString();
-		LOG_TRACE << "Peer Common Name: " << remote.certCommonName();
+		if ( remote.SSLcertInfo() )	{
+			LOG_TRACE << "Peer SSL certificate Common Name: " << remote.SSLcertInfo()->commonName();
+		}
 
 		lua_pushstring( l, "new_connection" );
 		lua_gettable( l, LUA_GLOBALSINDEX );
@@ -229,7 +232,9 @@ namespace _Wolframe {
 		std::stringstream ss;
 		ss << port;
 		lua_pushstring( l, ss.str( ).c_str( ) );
-		lua_pushstring( l, remote.certCommonName( ).c_str( ) );
+		if ( remote.SSLcertInfo() )	{
+			lua_pushstring( l, remote.SSLcertInfo()->commonName().c_str());
+		}
 		int res = lua_pcall( l, 3, 0, 0 );
 		if( res != 0 ) {
 			LOG_FATAL << "Unable to call 'new_connection' function: " << lua_tostring( l, -1 );

@@ -105,6 +105,8 @@ void ApplicationConfiguration::finalize( const CmdLineConfig& cmdLine )
 #if !defined(_WIN32)
 	srvConfig->override( cmdLine.user, cmdLine.group );
 #endif
+	srvConfig->setCanonicalPathes( configFile );
+	logConfig->setCanonicalPathes( configFile );
 }
 
 
