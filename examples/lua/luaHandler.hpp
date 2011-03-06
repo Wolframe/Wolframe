@@ -16,7 +16,7 @@ namespace _Wolframe {
 	class luaConfig {
 	public:
 		std::string script;
-		bool debug;
+		bool printMemStats;
 	};
 
 	/// The connection handler
@@ -60,7 +60,7 @@ namespace _Wolframe {
 	public:
 		ServerHandlerImpl( const HandlerConfiguration *config ) {
 			config_.script = config->luaConfig->script;
-			config_.debug = config->luaConfig->debug;
+			config_.printMemStats = config->luaConfig->printMemStats;
 		}
 
 		Network::connectionHandler* newConnection( const Network::LocalTCPendpoint& local );

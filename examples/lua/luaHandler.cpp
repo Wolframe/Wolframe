@@ -180,7 +180,7 @@ namespace _Wolframe {
 	{
 		LOG_TRACE << "Created connection handler for " << local.toString();
 		createVM( );
-		if( config.debug ) printMemStats( );
+		if( config.printMemStats ) printMemStats( );
 	}
 
 #ifdef WITH_SSL
@@ -189,7 +189,7 @@ namespace _Wolframe {
 	{
 		LOG_TRACE << "Created connection handler (SSL) for " << local.toString();
 		createVM( );
-		if( config.debug ) printMemStats( );
+		if( config.printMemStats ) printMemStats( );
 	}
 #endif // WITH_SSL
 
@@ -216,7 +216,7 @@ namespace _Wolframe {
 			lua_pop( l, 1 );
 			throw new std::runtime_error( "Error in LUA processor" );
 		}
-		if( config.debug ) printMemStats( );
+		if( config.printMemStats ) printMemStats( );
 	}
 
 #ifdef WITH_SSL
@@ -243,7 +243,7 @@ namespace _Wolframe {
 			lua_pop( l, 1 );
 			throw new std::runtime_error( "Error in LUA processor" );
 		}
-		if( config.debug ) printMemStats( );
+		if( config.printMemStats ) printMemStats( );
 	}
 #endif // WITH_SSL
 
@@ -279,7 +279,7 @@ namespace _Wolframe {
 			LOG_FATAL << "Lua code returns '" << op << "', expecting one of 'READ', 'WRITE', 'CLOSE'!";
 			throw new std::runtime_error( "Error in LUA processor" );
 		}
-		if( config.debug ) printMemStats( );
+		if( config.printMemStats ) printMemStats( );
 	}
 
 	// Parse incoming data. The data is copied from the temporary read buffer in
@@ -292,7 +292,7 @@ namespace _Wolframe {
 		counter++;
 		if( counter % 100 == 0 ) {
 			//(void)lua_gc( l, LUA_GCCOLLECT, 0 );
-			if( config.debug ) printMemStats( );
+			if( config.printMemStats ) printMemStats( );
 		}
 
 		lua_pushstring( l, "network_input" );
