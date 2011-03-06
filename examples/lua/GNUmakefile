@@ -21,9 +21,13 @@ INCLUDE_LIBS = \
 	-lboost_filesystem \
 	$(TOPDIR)/src/libwolframe.a \
 	$(LUA_LIBS) -ldl
+
 # openssl
 
 ifdef WITH_SSL
+
+INCLUDE_CPPFLAGS += \
+	-DWITH_SSL
 
 INCLUDE_LIBS += \
 	$(OPENSSL_LIBS)
