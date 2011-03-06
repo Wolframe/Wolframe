@@ -21,7 +21,6 @@ void LuaConfiguration::print( std::ostream& os ) const
 {
 	os << displayName() << std::endl;
 	os << "   LUA script: " << script << std::endl;
-	os << "       printMemStats: " << ( printMemStats ? "yes" : "no" ) << std::endl;
 }
 
 
@@ -48,9 +47,6 @@ bool LuaConfiguration::parse( const boost::property_tree::ptree& pt, const std::
 			if ( ! boost::filesystem::path( script ).is_absolute() )
 				os << "WARNING: " << displayName() << ": script file path is not absolute: "
 								   << script << std::endl;
-		} else if ( boost::algorithm::iequals( it->first, "printMemStats" ))	{
-			if ( ! Configuration::getBoolValue( it, displayName(), "printMemStats", printMemStats, os ))
-				return false;
 		} else {
 			os << displayName() << ": unknown configuration option: <" << it->first << ">";
 			return false;

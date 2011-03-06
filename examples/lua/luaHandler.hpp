@@ -16,7 +16,6 @@ namespace _Wolframe {
 	class luaConfig {
 	public:
 		std::string script;
-		bool printMemStats;
 	};
 
 	/// The connection handler
@@ -43,8 +42,6 @@ namespace _Wolframe {
 
 	private:
 		lua_State *l;
-		int counter;
-		int maxMemUsed;
 		const luaConfig config;
 		static const std::size_t buf_size = 8192;
 		char buf[buf_size];
@@ -60,7 +57,6 @@ namespace _Wolframe {
 	public:
 		ServerHandlerImpl( const HandlerConfiguration *config ) {
 			config_.script = config->luaConfig->script;
-			config_.printMemStats = config->luaConfig->printMemStats;
 		}
 
 		Network::connectionHandler* newConnection( const Network::LocalTCPendpoint& local );

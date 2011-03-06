@@ -166,30 +166,31 @@ namespace _Wolframe {
 		LOG_TRACE << "Lua virtual machine has been destroyed";
 	}
 
+#if 0
+// maybe later with a SIGHUP?
 	void luaConnection::printMemStats( )
 	{
 		int kbytes = lua_gc( l, LUA_GCCOUNT, 0 );
 		if( kbytes > maxMemUsed ) {
 			maxMemUsed = kbytes;
 		}
-		LOG_DEBUG << "LUA VM memory in use: " << kbytes << " kBytes (max. " << maxMemUsed << " kBytes)";
+		LOG_NOTICE << "LUA VM memory in use: " << kbytes << " kBytes (max. " << maxMemUsed << " kBytes)";
 	}
+#endif
 
 	luaConnection::luaConnection( const Network::LocalTCPendpoint& local, const luaConfig config_ )
-		: counter( 0 ), maxMemUsed( 0 ), config( config_ )
+		: config( config_ )
 	{
 		LOG_TRACE << "Created connection handler for " << local.toString();
 		createVM( );
-		if( config.printMemStats ) printMemStats( );
 	}
 
 #ifdef WITH_SSL
 	luaConnection::luaConnection( const Network::LocalSSLendpoint& local, const luaConfig config_ )
-		: counter( 0 ), maxMemUsed( 0 ), config( config_ )
+		: config( config_ )
 	{
 		LOG_TRACE << "Created connection handler (SSL) for " << local.toString();
 		createVM( );
-		if( config.printMemStats ) printMemStats( );
 	}
 #endif // WITH_SSL
 
@@ -216,7 +217,6 @@ namespace _Wolframe {
 			lua_pop( l, 1 );
 			throw new std::runtime_error( "Error in LUA processor" );
 		}
-		if( config.printMemStats ) printMemStats( );
 	}
 
 #ifdef WITH_SSL
@@ -245,7 +245,6 @@ namespace _Wolframe {
 			lua_pop( l, 1 );
 			throw new std::runtime_error( "Error in LUA processor" );
 		}
-		if( config.printMemStats ) printMemStats( );
 	}
 #endif // WITH_SSL
 
@@ -281,7 +280,6 @@ namespace _Wolframe {
 			LOG_FATAL << "Lua code returns '" << op << "', expecting one of 'READ', 'WRITE', 'CLOSE'!";
 			throw new std::runtime_error( "Error in LUA processor" );
 		}
-		if( config.printMemStats ) printMemStats( );
 	}
 
 	// Parse incoming data. The data is copied from the temporary read buffer in
@@ -290,12 +288,6 @@ namespace _Wolframe {
 	void luaConnection::networkInput( const void *begin, std::size_t bytesTransferred )
 	{
 		LOG_DATA << "network Input: Read " << bytesTransferred << " bytes";
-
-		counter++;
-		if( counter % 100 == 0 ) {
-			//(void)lua_gc( l, LUA_GCCOLLECT, 0 );
-			if( config.printMemStats ) printMemStats( );
-		}
 
 		lua_pushstring( l, "network_input" );
 		lua_gettable( l, LUA_GLOBALSINDEX );
