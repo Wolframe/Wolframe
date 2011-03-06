@@ -5,7 +5,7 @@ SUBDIRS =
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
 INCLUDE_CPPFLAGS = \
-	/D_WIN32_WINNT=0x403
+	/D_WIN32_WINNT=0x500
 
 INCLUDE_DIRS = \
 	/I. \
@@ -14,6 +14,9 @@ INCLUDE_DIRS = \
 	/I"$(PLATFORM_SDK_DIR)\Include"
 
 # Note: libraries are picked automatically on Windows!
+# TODO: better probing and correct library path based on Arch and
+# platform SDK version
+#SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib\x64"
 SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib"
 INCLUDE_LDFLAGS = \
 	$(SDK_LDFLAGS) $(BOOST_LDFLAGS)

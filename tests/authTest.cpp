@@ -27,12 +27,6 @@ static void print_usage( ) {
 
 int main( int argc, const char *argv[] )
 {
-	if( argc != 2 ) {
-		cerr << "usage: testAuth <authentication method>" << endl;
-		print_usage( );
-		return 1;
-	}
-
 // register some authentication methods
 	AuthenticatorFactory::properties props;
 	props.push_back( AuthenticatorFactory::property( "filename", std::string( "passwd" ) ) );
@@ -43,6 +37,13 @@ int main( int argc, const char *argv[] )
 	props2.push_back( AuthenticatorFactory::property( "service", std::string( "wolframe" ) ) );
 	AuthenticatorFactory::instance( ).registerAuthenticator( "PAM", CreatePAMAuthenticator, props2 );
 #endif
+
+// check parameters
+	if( argc != 2 ) {
+		cerr << "usage: testAuth <authentication method>" << endl;
+		print_usage( );
+		return 1;
+	}
 
 // check if authentication method exists
 	vector<string> mechs = AuthenticatorFactory::instance( ).getAvailableMechs( );
