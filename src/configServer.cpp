@@ -316,6 +316,7 @@ bool ServerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 
 void ServerConfiguration::setCanonicalPathes( const std::string& refPath )
 {
+#if !defined( _WIN32 )
 	if ( ! pidFile.empty() )	{
 		if ( ! boost::filesystem::path( pidFile ).is_absolute() )
 			pidFile = resolvePath( boost::filesystem::absolute( pidFile,
@@ -323,6 +324,7 @@ void ServerConfiguration::setCanonicalPathes( const std::string& refPath )
 		else
 			pidFile = resolvePath( pidFile );
 	}
+#endif // !defined( _WIN32 )
 
 	for ( std::list<Network::ServerSSLendpoint>::iterator it = SSLaddress.begin(); it != SSLaddress.end(); ++it )
 		it->setAbsolutePath( refPath );
