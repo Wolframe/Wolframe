@@ -33,9 +33,9 @@ BOOST_VERSION = 1_46
 #BOOST_DIR = C:\Programme\boost\boost_$(BOOST_VERSION)
 #BOOST_DIR = C:\Program Files\boost\boost_$(BOOST_VERSION)
 #BOOST_DIR = D:\Programme\boost\boost_$(BOOST_VERSION)
-BOOST_DIR = C:\Cygwin\home\Andreas\boost_1_46_0
-#BOOST_DIR = C:\Cygwin\home\Administrator\boost_1_45_0
-#BOOST_DIR = D:\boost\boost_1_45_0
+BOOST_DIR = C:\Cygwin\home\Andreas\boost_$(BOOST_VERSION)
+#BOOST_DIR = C:\Cygwin\home\Administrator\boost_$(BOOST_VERSION)
+#BOOST_DIR = D:\boost\
 
 # visual studio version used for compiling
 
