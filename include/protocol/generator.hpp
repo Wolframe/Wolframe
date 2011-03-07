@@ -19,8 +19,7 @@ namespace protocol {
 //{
 //   if (!g->getNext( b, n)) 
 //   {
-//      if (g->state() == Generator::EndOfInput) return false;
-//      nativeCallYield();
+//      if (g->state() == Generator::EndOfMessage) nativeCallYield(); else return false;
 //   }
 //   return true;
 //}
@@ -30,16 +29,14 @@ struct Generator
 {
    enum State
    {
-      Init,           //after initialization
-      Processing,     //processing
+      Open,           //serving data
       EndOfMessage,   //EWOULDBLK -> have to yield
-      EndOfInput,     //EOF
       Error           //an error occurred
    };
    //Get next element call
-   typedef int (*GetNext)( Generator* this_, void* buffer, unsigned int buffersize);
+   typedef bool (*GetNext)( Generator* this_, void* buffer, unsigned int buffersize);
 
-   int getNext( void* buffer, unsigned int buffersize)
+   bool getNext( void* buffer, unsigned int buffersize)
    {
       return m_getNext( this, buffer, buffersize);
    }
@@ -68,7 +65,7 @@ struct Generator
       return *this;
    }
 
-   Generator( const GetNext& gn) :m_ptr(0),m_pos(0),m_size(0),m_gotEoD(false),m_state(Init),m_errorCode(0),m_getNext(gn){}
+   Generator( const GetNext& gn) :m_ptr(0),m_pos(0),m_size(0),m_gotEoD(false),m_state(Open),m_errorCode(0),m_getNext(gn){}
 
    int getError() const              {return m_errorCode;}
    bool gotEoD() const               {return m_gotEoD;}
@@ -108,6 +105,11 @@ struct FormatOutput
       m_ptr = data;
       m_size = datasize;
       m_pos = 0;
+   }
+
+   void init()
+   {
+      init( 0, 0);
    }
 
    void* cur() const                 {return (void*)((char*)m_ptr+m_pos);}

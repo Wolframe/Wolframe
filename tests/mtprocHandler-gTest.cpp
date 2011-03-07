@@ -11,12 +11,13 @@
 
 using namespace _Wolframe;
 
-static const char* getRandomAsciiString()
+static const char* getRandomAsciiString( unsigned int maxStringSize=4096)
 {
    enum {MaxStringSize=4096};
+   if (maxStringSize > MaxStringSize || maxStringSize == 0) return 0;
    static char rt[ MaxStringSize+1];
 
-   unsigned int ii=0,nn=rand()%MaxStringSize+1;
+   unsigned int ii=0,nn=rand()%maxStringSize+1;
    while (ii<nn && rand()%104 != 103)
    {
       rt[ii] = 32+rand()%96;
@@ -72,7 +73,7 @@ struct OneLine :public TestDescription<InputBufferSize,OutputBufferSize>
    typedef TestDescription<InputBufferSize,OutputBufferSize> ThisTestDescription;
    OneLine() { ThisTestDescription::content.append("Hello world!\r\n");};
 };
-template <unsigned int InputBufferSize, unsigned int OutputBufferSize, unsigned int MaxNofLines>
+template <unsigned int InputBufferSize, unsigned int OutputBufferSize, unsigned int MaxNofLines, unsigned int MaxStringSize=4096>
 struct Random :public TestDescription<InputBufferSize,OutputBufferSize>
 {
    typedef TestDescription<InputBufferSize,OutputBufferSize> ThisTestDescription;
@@ -81,7 +82,7 @@ struct Random :public TestDescription<InputBufferSize,OutputBufferSize>
       unsigned int ii=0,nn=rand()%MaxNofLines+1;
       while (ii++<=nn)
       {
-         ThisTestDescription::content.append( getRandomAsciiString());
+         ThisTestDescription::content.append( getRandomAsciiString( MaxStringSize));
          ThisTestDescription::content.append( "\r\n");
       }
    }
@@ -175,7 +176,6 @@ typedef ::testing::Types<
    OneEmptyLine<3,4>,
    OneOneCharLine<3,4>,
    OneLine<3,4>,
-   Random<3,4,24000>,
    Empty<2,1>,
    OneEmptyLine<2,1>,
    OneOneCharLine<2,1>,
@@ -188,10 +188,12 @@ typedef ::testing::Types<
    Random<3,2,1000>,
    Empty<4,3>,
    OneEmptyLine<4,3>,
-   OneOneCharLine<4,3>,
    OneLine<4,3>,
-   Random<4,3,24000>
+   OneOneCharLine<127,127>,
+   Random<2,7,4000,32>,
+   Random<7,2,4000,32>
    > MyTypes;
+
 TYPED_TEST_CASE( mtprocHandlerFixture, MyTypes);
 
 TYPED_TEST( mtprocHandlerFixture, ExpectedResult )
