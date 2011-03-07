@@ -1,5 +1,8 @@
-#include "implementation_c.h"
+#include "implementation_lua.h"
 #include "methodtable_c.h"
+#include "lua.h"
+#include "lualib.h"
+#include "lauxlib.h"
 #include <string.h>
 #include <malloc.h>
 #define UNUSED(x) ( (void)(x) )
@@ -9,6 +12,7 @@ typedef struct
    char buf; 
    ContentIterator input;
    FormatOutput output;
+   lua_State* lua;
 }
 MethodData;
 
@@ -63,45 +67,25 @@ static bool print( FormatOutput* this_, int type_, void* element, unsigned int e
    }
 }
 
-static int echo( MethodContext* ctx, unsigned int argc, const char** argv)
+static int luacall_withData( MethodContext* ctx, unsigned int argc, const char** argv)
 {
-   MethodData* data = (MethodData*)ctx->data;
+   //MethodData* data = (MethodData*)ctx->data;
+   UNUSED(ctx);
    UNUSED(argc);
    UNUSED(argv);
-
-   if (!ctx->contentIterator)
-   {
-      ctx->contentIterator = &data->input;
-      ctx->formatOutput = &data->output;
-   }
-   if (data->buf != 0)
-   {
-      if (!data->output.m_print( &data->output, 0, &data->buf, 1)) return 0;
-      data->buf = 0;
-   }
-   while (ctx->contentIterator->m_getNext( ctx->contentIterator, &data->buf, 1))
-   {
-      if (!data->output.m_print( &data->output, 0, &data->buf, 1)) return 0;
-      data->buf = 0;
-   }
    return 0;
 }
 
-static int printarg( MethodContext* ctx, unsigned int argc, const char** argv)
+static int luacall_withoutData( MethodContext* ctx, unsigned int argc, const char** argv)
 {
-   MethodData* data = (MethodData*)ctx->data;
+   //MethodData* data = (MethodData*)ctx->data;
+   UNUSED(ctx);
    UNUSED(argc);
    UNUSED(argv);
-
-   if (!ctx->contentIterator)
-   {
-      ctx->contentIterator = &data->input;
-      ctx->formatOutput = &data->output;
-   }
    return 0;
 }
 
-static const Method methodTable[3] = {{"echo",&echo,true},{"parg",&printarg,false},{0,0,false}};
+static const Method methodTable[3] = {{"echo",&luacall_withData,true},{"parg",&luacall_withoutData,false},{0,0,false}};
 
 static MethodDataP createMethodData(void)
 {
@@ -109,17 +93,25 @@ static MethodDataP createMethodData(void)
    if (rt == NULL) return NULL;
    rt->input.m_getNext = &getNext;
    rt->output.m_print = &print;
+   rt->lua = luaL_newstate();
+   if (rt->lua == NULL)
+   {
+      free( rt);
+      return NULL;
+   }
    return (MethodDataP)rt;
 }
 
 static void destroyMethodData( MethodDataP d)
 {
+   MethodData* this_ = (MethodData*)d;
+   lua_close( this_->lua);
    free( d);
 }
 
 static Implementation implementation = { methodTable, 0, &createMethodData, &destroyMethodData };
 
-void* mtproc_getImplementation(void)
+void* mtproc_getImplementation_Lua(void)
 {
    return &implementation;
 }
