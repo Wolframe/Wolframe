@@ -90,7 +90,7 @@ PECHO_GTEST_OBJS=$(TOPDIR)/examples/pecho/pechoHandler.o
 pechoHandler-gTest$(EXE): pechoHandler-gTest.o $(PECHO_GTEST_OBJS) $(TOPDIR)/src/libwolframe.a
 	$(CCPP_LINK) -o $@ $(LDFLAGS) $(PECHO_GTEST_OBJS) $(OBJS) $< $(LIBS)
 
-MTPROC_GTEST_OBJS=$(TOPDIR)/examples/mtproc/mtprocHandler.o $(TOPDIR)/examples/mtproc/implementation.o $(TOPDIR)/examples/mtproc/dispatcher.o
+MTPROC_GTEST_OBJS=$(TOPDIR)/examples/mtproc/mtprocHandler.o $(TOPDIR)/examples/mtproc/implementation.o $(TOPDIR)/examples/mtproc/implementation_c.o $(TOPDIR)/examples/mtproc/dispatcher.o
 mtprocHandler-gTest$(EXE): mtprocHandler-gTest.o $(MTPROC_GTEST_OBJS) $(TOPDIR)/src/libwolframe.a
 	$(CCPP_LINK) -o $@ $(LDFLAGS) $(MTPROC_GTEST_OBJS) $(OBJS) $< $(LIBS)
 endif
