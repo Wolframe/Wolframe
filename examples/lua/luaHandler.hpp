@@ -12,10 +12,14 @@ extern "C" {
 	#include <lua.h>
 }
 
+#include <list>
+#include <map>
+
 namespace _Wolframe {
 	class luaConfig {
 	public:
 		std::string script;
+		std::list<std::string> preload_libs;
 	};
 
 	/// The connection handler
@@ -45,6 +49,14 @@ namespace _Wolframe {
 		const luaConfig config;
 		static const std::size_t buf_size = 8192;
 		char buf[buf_size];
+		
+		typedef int (*ModuleEntryFunc)( lua_State *l );
+		typedef struct {
+			std::string moduleName;
+			ModuleEntryFunc moduleInit;
+		} luaInitModule;
+		
+		const std::map<std::string, luaInitModule> knownLuaModules;
 
 		void createVM( );
 		void destroyVM( );
@@ -57,6 +69,7 @@ namespace _Wolframe {
 	public:
 		ServerHandlerImpl( const HandlerConfiguration *config ) {
 			config_.script = config->luaConfig->script;
+			config_.preload_libs = config->luaConfig->preload_libs;
 		}
 
 		Network::connectionHandler* newConnection( const Network::LocalTCPendpoint& local );

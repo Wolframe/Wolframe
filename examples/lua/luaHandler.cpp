@@ -99,6 +99,8 @@ namespace _Wolframe {
 		//luaL_openlibs( l );
 		// or open them individually, see:
 		// http://stackoverflow.com/questions/966162/best-way-to-omit-lua-standard-libraries
+		for( std::list<std::string>::const_iterator it = config.preload_libs.begin( ); it != config.preload_libs.end( ); it++ ) {
+		}
 		lua_pushcfunction( l, luaopen_base );
 		lua_pushstring( l, "" );
 		lua_call( l, 1, 0 );

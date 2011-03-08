@@ -7,6 +7,8 @@
 
 #include "standardConfigs.hpp"
 
+#include <list>
+
 namespace _Wolframe {
 
 	/// echo configuration
@@ -14,6 +16,7 @@ namespace _Wolframe {
 	{
 	public:
 		std::string		script;
+		std::list<std::string>	preload_libs;
 
 		/// constructor
 		LuaConfiguration( const std::string& printName )
