@@ -4,7 +4,7 @@
 #include <malloc.h>
 #define UNUSED(x) ( (void)(x) )
 
-typedef struct
+typedef struct MethodDataT
 {
    char buf; 
    ContentIterator input;

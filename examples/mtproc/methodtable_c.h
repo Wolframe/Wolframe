@@ -7,7 +7,7 @@
 *    - example/mtproc/methodtable.hpp
 */
 
-typedef struct MethodData* MethodDataP;
+typedef struct MethodDataT* MethodDataP;
 
 typedef enum
 {
