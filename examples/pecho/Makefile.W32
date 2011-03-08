@@ -25,6 +25,12 @@ INCLUDE_LIBS = \
 
 !IFDEF WITH_SSL
 
+INCLUDE_DIRS = \
+	$(INCLUDE_DIRS)	/I"$(OPENSSL_DIR)\include"
+
+INCLUDE_CPPFLAGS = \
+	$(INCLUDE_CPPFLAGS) /DWITH_SSL
+
 INCLUDE_LDFLAGS = \
 	$(INCLUDE_LDFLAGS) /LIBPATH:"$(OPENSSL_DIR)\lib"
 
@@ -56,3 +62,11 @@ local_clean:
 local_distclean:
 
 local_test:
+
+run: $(CPP_BINS)
+	@-echo @echo off > test.bat
+	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat
+	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >> test.bat
+	@-echo echo Running the Wolframe server... >> test.bat
+	@-echo pechod.exe -c pecho.conf -d DATA >> test.bat
+	@-test.bat
