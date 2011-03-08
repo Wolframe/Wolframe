@@ -16,10 +16,17 @@ extern "C" {
 #include <map>
 
 namespace _Wolframe {
+	typedef int (*LuaModuleEntryFunc)( lua_State *l );
+	typedef struct {
+		std::string moduleName;
+		LuaModuleEntryFunc moduleInit;
+	} LuaModuleDefinition;
+		
 	class luaConfig {
 	public:
 		std::string script;
 		std::list<std::string> preload_libs;
+		std::map<std::string, LuaModuleDefinition> knownLuaModules;
 	};
 
 	/// The connection handler
@@ -48,15 +55,7 @@ namespace _Wolframe {
 		lua_State *l;
 		const luaConfig config;
 		static const std::size_t buf_size = 8192;
-		char buf[buf_size];
-		
-		typedef int (*ModuleEntryFunc)( lua_State *l );
-		typedef struct {
-			std::string moduleName;
-			ModuleEntryFunc moduleInit;
-		} luaInitModule;
-		
-		const std::map<std::string, luaInitModule> knownLuaModules;
+		char buf[buf_size];		
 
 		void createVM( );
 		void destroyVM( );
@@ -67,10 +66,7 @@ namespace _Wolframe {
 	class ServerHandler::ServerHandlerImpl
 	{
 	public:
-		ServerHandlerImpl( const HandlerConfiguration *config ) {
-			config_.script = config->luaConfig->script;
-			config_.preload_libs = config->luaConfig->preload_libs;
-		}
+		ServerHandlerImpl( const HandlerConfiguration *config );
 
 		Network::connectionHandler* newConnection( const Network::LocalTCPendpoint& local );
 #ifdef WITH_SSL

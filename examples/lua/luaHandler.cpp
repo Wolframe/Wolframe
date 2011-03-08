@@ -94,25 +94,19 @@ namespace _Wolframe {
 			throw new std::runtime_error( "Can't initialize LUA processor" );
 		}
 
-		// TODO: open standard libraries, most likely something to configure later,
-		// the plain echo processor should work without any lua libraries
-		//luaL_openlibs( l );
-		// or open them individually, see:
+		// Open lua libraries based on configuration, see
 		// http://stackoverflow.com/questions/966162/best-way-to-omit-lua-standard-libraries
 		for( std::list<std::string>::const_iterator it = config.preload_libs.begin( ); it != config.preload_libs.end( ); it++ ) {
+			std::map<std::string, LuaModuleDefinition>::const_iterator it2 = config.knownLuaModules.find( *it );
+			if( it2 != config.knownLuaModules.end( ) ) {
+				LOG_TRACE << "LUA initializing library '" << *it << "'";
+				lua_pushcfunction( l, it2->second.moduleInit );
+				lua_pushstring( l, it2->second.moduleName.c_str( ) );
+				lua_call( l, 1, 0 );
+			} else {
+				LOG_ERROR << "Can't load unknown LUA library '" << *it << "'!";
+			}
 		}
-		lua_pushcfunction( l, luaopen_base );
-		lua_pushstring( l, "" );
-		lua_call( l, 1, 0 );
-		lua_pushcfunction( l, luaopen_package );
-		lua_pushstring( l, LUA_LOADLIBNAME );
-		lua_call( l, 1, 0 );
-		lua_pushcfunction( l, luaopen_io );
-		lua_pushstring( l, LUA_IOLIBNAME );
-		lua_call( l, 1, 0 );
-		lua_pushcfunction( l, luaopen_string );
-		lua_pushstring( l, LUA_STRLIBNAME );
-		lua_call( l, 1, 0 );
 
 		// TODO: script location, also configurable
 		int res = luaL_loadfile( l, config.script.c_str( ) );
@@ -366,6 +360,38 @@ namespace _Wolframe {
 
 
 	/// ServerHandler PIMPL
+
+	ServerHandler::ServerHandlerImpl::ServerHandlerImpl( const HandlerConfiguration *config ) {
+		config_.script = config->luaConfig->script;
+		config_.preload_libs = config->luaConfig->preload_libs;
+		
+		LuaModuleDefinition x;
+		x.moduleName = "";
+		x.moduleInit = luaopen_base;
+		config_.knownLuaModules["base"] = x;
+		x.moduleName = LUA_TABLIBNAME;
+		x.moduleInit = luaopen_table;
+		config_.knownLuaModules[LUA_TABLIBNAME] = x;
+		x.moduleName = LUA_IOLIBNAME;
+		x.moduleInit = luaopen_io;
+		config_.knownLuaModules[LUA_IOLIBNAME] = x;
+		x.moduleName = LUA_OSLIBNAME;
+		x.moduleInit = luaopen_os;
+		config_.knownLuaModules[LUA_OSLIBNAME] = x;
+		x.moduleName = LUA_STRLIBNAME;
+		x.moduleInit = luaopen_string;
+		config_.knownLuaModules[LUA_STRLIBNAME] = x;
+		x.moduleName = LUA_MATHLIBNAME;
+		x.moduleInit = luaopen_math;
+		config_.knownLuaModules[LUA_MATHLIBNAME] = x;
+		x.moduleName = LUA_DBLIBNAME;
+		x.moduleInit = luaopen_debug;
+		config_.knownLuaModules[LUA_DBLIBNAME] = x;
+		x.moduleName = LUA_LOADLIBNAME;
+		x.moduleInit = luaopen_package;
+		config_.knownLuaModules[LUA_LOADLIBNAME] = x;
+	}
+
 	Network::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const Network::LocalTCPendpoint& local )
 	{
 		return new luaConnection( local, config_ );

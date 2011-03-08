@@ -31,7 +31,7 @@ void LuaConfiguration::print( std::ostream& os ) const
 }
 
 
-/// Check if the database configuration makes sense
+/// Check if the Lua configuration makes sense
 bool LuaConfiguration::check( std::ostream& os ) const
 {
 	bool correct = true;
