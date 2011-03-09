@@ -61,3 +61,7 @@ local_clean:
 local_distclean:
 
 local_install:
+
+run: $(CPP_BINS)
+	@echo "Running the Wolframe mtproc example..."
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./mtprocd -c mtproc.conf -f
