@@ -84,8 +84,8 @@ struct Connection::Private
       for (ii=0; str[ii]; ii++) buffer.push_back( str[ii]);
       if (arg)
       {
-         buffer.push_back( ' ');
-         for (ii=0; arg[ii]; ii++) buffer.push_back( arg[ii]);
+	 buffer.push_back( ' ');
+	 for (ii=0; arg[ii]; ii++) buffer.push_back( arg[ii]);
       }
       buffer.push_back( '\r');
       buffer.push_back( '\n');
@@ -100,7 +100,7 @@ struct Connection::Private
 
       if (state == ProcessingInput)
       {
-         commandDispatcher.protocolInput( itr, eoD, input.gotEoD());
+	 commandDispatcher.protocolInput( itr, eoD, input.gotEoD());
       }
       end = input.end();
       itr = (eoD < end) ? (eoD+1):end;
@@ -113,17 +113,17 @@ struct Connection::Private
 
        if (state == ProcessingInput || state == DiscardInput)
        {
-          Input::iterator eoD = input.getEoD( itr);
-          if (state == ProcessingInput)
-          {
-             commandDispatcher.protocolInput( itr, eoD, input.gotEoD());
-          }
-          end = input.end();
-          itr = (eoD < end)? (eoD+1):end;
+	  Input::iterator eoD = input.getEoD( itr);
+	  if (state == ProcessingInput)
+	  {
+	     commandDispatcher.protocolInput( itr, eoD, input.gotEoD());
+	  }
+	  end = input.end();
+	  itr = (eoD < end)? (eoD+1):end;
        }
        else
        {
-          end = input.end();
+	  end = input.end();
        }
    }
 
@@ -150,192 +150,185 @@ struct Connection::Private
    {
       for (;;)
       {
-         LOG_DATA << "Handler State: " << stateName(state);
+	 LOG_DATA << "Handler State: " << stateName(state);
 
-         switch( state)
-         {
-            case Init:
-            {
-                //start:
-                state = EnterCommand;
-                return WriteLine( "OK expecting command");
-            }
+	 switch( state)
+	 {
+	    case Init:
+	    {
+		//start:
+		state = EnterCommand;
+		return WriteLine( "OK expecting command");
+	    }
 
-            case EnterCommand:
-            {
-                switch (commandDispatcher.getCommand( itr, end))
-                {
-                   case CommandDispatcher::empty:
-                   {
-                      state = EnterCommand;
-                      continue;
-                   }
-                   case CommandDispatcher::caps:
-                   {
-                      state = EnterCommand;
-                      return WriteLine( "OK", commandDispatcher.getCapabilities());
-                   }
-                   case CommandDispatcher::quit:
-                   {
-                      state = Terminate;
-                      return WriteLine( "BYE");
-                   }
-                   case CommandDispatcher::method:
-                   {
-                      input.resetEoD();
-                      state = Processing;
-                      continue;
-                   }
-                   case CommandDispatcher::unknown:
-                   {
-                      if (itr == end)
-                      {
-                         input.setPos( 0);
-                         return Network::ReadData( input.ptr(), input.size());
-                      }
-                      else
-                      {
-                         state = ProtocolError;
-                         return WriteLine( "BAD error in command line");
-                      }
-                   }
-                }
-            }
+	    case EnterCommand:
+	    {
+		switch (commandDispatcher.getCommand( itr, end))
+		{
+		   case CommandDispatcher::empty:
+		   {
+		      state = EnterCommand;
+		      continue;
+		   }
+		   case CommandDispatcher::caps:
+		   {
+		      state = EnterCommand;
+		      return WriteLine( "OK", commandDispatcher.getCapabilities());
+		   }
+		   case CommandDispatcher::quit:
+		   {
+		      state = Terminate;
+		      return WriteLine( "BYE");
+		   }
+		   case CommandDispatcher::method:
+		   {
+		      input.resetEoD();
+		      state = Processing;
+		      continue;
+		   }
+		   case CommandDispatcher::unknown:
+		   {
+		      if (itr == end)
+		      {
+			 input.setPos( 0);
+			 return Network::ReadData( input.ptr(), input.size());
+		      }
+		      else
+		      {
+			 state = ProtocolError;
+			 return WriteLine( "BAD error in command line");
+		      }
+		   }
+		}
+	    }
 
-            case Processing:
-            case ProcessingInput:
-            {
-                int returnCode = 0;
-                switch (commandDispatcher.call( returnCode))
-                {
-                   case CommandDispatcher::ReadInput:
-                      if (state == Processing)
-                      {
-                         state = ProcessingInput;
-                         passInput();
-                         continue;
-                      }
-                      else
-                      {
-                         input.setPos( 0);
-                         return Network::ReadData( input.ptr(), input.size());
-                      }
+	    case Processing:
+	    case ProcessingInput:
+	    {
+		int returnCode = 0;
+		switch (commandDispatcher.call( returnCode))
+		{
+		   case CommandDispatcher::ReadInput:
+		      if (state == Processing)
+		      {
+			 state = ProcessingInput;
+			 passInput();
+			 continue;
+		      }
+		      else
+		      {
+			 input.setPos( 0);
+			 return Network::ReadData( input.ptr(), input.size());
+		      }
 
-                   case CommandDispatcher::WriteOutput:
-                   {
-                      void* content;
-                      unsigned int contentsize;
-                      bool hasOutput = commandDispatcher.getOutput( &content, &contentsize);
-                      commandDispatcher.setOutputBuffer( output.ptr(), output.size());
+		   case CommandDispatcher::WriteOutput:
+		   {
+		      void* content;
+		      unsigned int contentsize;
+		      bool hasOutput = commandDispatcher.getOutput( &content, &contentsize);
+		      commandDispatcher.setOutputBuffer( output.ptr(), output.size());
 
-                      if (!hasOutput) continue; else return Network::SendData( content, contentsize);
-                   }
+		      if (!hasOutput) continue; else return Network::SendData( content, contentsize);
+		   }
 
-                   case CommandDispatcher::Close:
-                   {
-                      if (commandDispatcher.commandHasIO())
-                      {
-                         if (state == Processing) passInput();
-                         state = (input.gotEoD())?EndOfCommand:DiscardInput;
-                         return WriteLine( "\r\n.\r\nOK");
-                      }
-                      else
-                      {
-                         state = Init;
-                         return WriteLine( "\r\nOK");
-                      }
-                   }
+		   case CommandDispatcher::Close:
+		   {
+		      if (commandDispatcher.commandHasIO())
+		      {
+			 if (state == Processing) passInput();
+			 state = (input.gotEoD())?EndOfCommand:DiscardInput;
+			 return WriteLine( "\r\n.\r\nOK");
+		      }
+		      else
+		      {
+			 state = Init;
+			 return WriteLine( "\r\nOK");
+		      }
+		   }
 
-                   case CommandDispatcher::Error:
-                   {
-                      char ee[ 64];
-                      snprintf( ee, sizeof(ee), "%d", returnCode);
+		   case CommandDispatcher::Error:
+		   {
+		      char ee[ 64];
+		      snprintf( ee, sizeof(ee), "%d", returnCode);
 
-                      if (commandDispatcher.commandHasIO())
-                      {
-                         if (state == Processing) passInput();
-                         state = (input.gotEoD())?EndOfCommand:DiscardInput;
-                         return WriteLine( "\r\n.\r\nERR", ee);
-                      }
-                      else
-                      {
-                         state = Init;
-                         return WriteLine( "\r\nERR", ee);
-                      }
-                   }
-                }
-            }
+		      if (commandDispatcher.commandHasIO())
+		      {
+			 if (state == Processing) passInput();
+			 state = (input.gotEoD())?EndOfCommand:DiscardInput;
+			 return WriteLine( "\r\n.\r\nERR", ee);
+		      }
+		      else
+		      {
+			 state = Init;
+			 return WriteLine( "\r\nERR", ee);
+		      }
+		   }
+		}
+	    }
 
-            case DiscardInput:
-            {
-               if (input.gotEoD())
-               {
-                  state = EndOfCommand;
-                  continue;
-               }
-               else
-               {
-                  input.setPos( 0);
-                  return Network::ReadData( input.ptr(), input.size());
-               }
-            }
+	    case DiscardInput:
+	    {
+	       if (input.gotEoD())
+	       {
+		  state = EndOfCommand;
+		  continue;
+	       }
+	       else
+	       {
+		  input.setPos( 0);
+		  return Network::ReadData( input.ptr(), input.size());
+	       }
+	    }
 
-            case EndOfCommand:
-            {
-               itr = input.getStart( itr);
-               if (input.gotEoD_LF())
-               {
-                  state = EnterCommand;
-                  continue;
-               }
-               else if (itr < end)
-               {
-                  state = Init;
-                  return WriteLine( "BAD end of line in protocol after end of data");
-               }
-               else
-               {
-                  input.setPos( 0);
-                  return Network::ReadData( input.ptr(), input.size());
-               }
-            }
+	    case EndOfCommand:
+	    {
+	       itr = input.getStart( itr);
+	       if (input.gotEoD_LF())
+	       {
+		  state = EnterCommand;
+		  continue;
+	       }
+	       else if (itr < end)
+	       {
+		  state = Init;
+		  return WriteLine( "BAD end of line in protocol after end of data");
+	       }
+	       else
+	       {
+		  input.setPos( 0);
+		  return Network::ReadData( input.ptr(), input.size());
+	       }
+	    }
 
-            case ProtocolError:
-            {
-                if (!ProtocolParser::skipLine( itr, end) || !ProtocolParser::consumeEOLN( itr, end))
-                {
-                   input.setPos( 0);
-                   return Network::ReadData( input.ptr(), input.size());
-                }
-                state = Init;
-                continue;
-            }
+	    case ProtocolError:
+	    {
+		if (!ProtocolParser::skipLine( itr, end) || !ProtocolParser::consumeEOLN( itr, end))
+		{
+		   input.setPos( 0);
+		   return Network::ReadData( input.ptr(), input.size());
+		}
+		state = Init;
+		continue;
+	    }
 
-            case Terminate:
-            {
-                state = Terminate;
-                return Network::CloseConnection();
-            }
-         }//switch(..)
+	    case Terminate:
+	    {
+		state = Terminate;
+		return Network::CloseConnection();
+	    }
+	 }//switch(..)
       }//for(;;)
       return Network::CloseConnection();
    }
 };
 
 
-Connection::Connection( const Network::LocalTCPendpoint& local, unsigned int inputBufferSize, unsigned int outputBufferSize)
+Connection::Connection( const Network::LocalEndpoint& local, unsigned int inputBufferSize, unsigned int outputBufferSize)
 {
    data = new Private( inputBufferSize, outputBufferSize);
    LOG_TRACE << "Created connection handler for " << local.toString();
 }
 
-#ifdef WITH_SSL
-Connection::Connection( const Network::LocalSSLendpoint& local)
-{
-   data = new Private(8,8);
-   LOG_TRACE << "Created connection handler (SSL) for " << local.toString();
-}
-#endif // WITH_SSL
 
 Connection::~Connection()
 {
@@ -343,17 +336,11 @@ Connection::~Connection()
    delete data;
 }
 
-void Connection::setPeer( const Network::RemoteTCPendpoint& remote)
+void Connection::setPeer( const Network::RemoteEndpoint& remote)
 {
    LOG_TRACE << "Peer set to " << remote.toString();
 }
 
-#ifdef WITH_SSL
-void Connection::setPeer( const Network::RemoteSSLendpoint& remote)
-{
-   LOG_TRACE << "Peer set to " << remote.toString();
-}
-#endif // WITH_SSL
 
 void Connection::networkInput( const void* bytes, std::size_t nofBytes)
 {
@@ -386,31 +373,17 @@ const Connection::Operation Connection::nextOperation()
 }
 
 /// ServerHandler PIMPL
-Network::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const Network::LocalTCPendpoint& local )
+Network::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const Network::LocalEndpoint& local )
 {
    return new mtproc::Connection( local );
 }
 
-#ifdef WITH_SSL
-Network::connectionHandler* ServerHandler::ServerHandlerImpl::newSSLconnection( const Network::LocalSSLendpoint& local )
-{
-   return new mtproc::Connection( local );
-}
-#endif // WITH_SSL
 
 ServerHandler::ServerHandler( const HandlerConfiguration* ) : impl_( new ServerHandlerImpl ) {}
 
 ServerHandler::~ServerHandler()  { delete impl_; }
 
-Network::connectionHandler* ServerHandler::newConnection( const Network::LocalTCPendpoint& local )
+Network::connectionHandler* ServerHandler::newConnection( const Network::LocalEndpoint& local )
 {
    return impl_->newConnection( local );
 }
-
-#ifdef WITH_SSL
-Network::connectionHandler* ServerHandler::newSSLconnection( const Network::LocalSSLendpoint& local )
-{
-   return impl_->newSSLconnection( local );
-}
-#endif // WITH_SSL
-

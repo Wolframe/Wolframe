@@ -67,12 +67,17 @@ LOCAL_STATIC_LIB_OBJS = \
 	protocol_ioblocks.o \
 	acceptor.o \
 	getPassword.o \
-	SSLcertificateInfo.o \
 	serverEndpoint.o \
 	connection.o \
 	server.o \
 	authentication.o \
 	authentication_textfile.o
+
+#SSL
+ifdef WITH_SSL
+LOCAL_STATIC_LIB_OBJS += \
+	SSLcertificateInfo.o
+endif
 
 # pam
 ifdef WITH_PAM

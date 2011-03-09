@@ -2,12 +2,11 @@
 // SSLcertificateInfo.cpp
 //
 
-#ifdef WITH_SSL
-
 #include "SSLcertificateInfo.hpp"
 
 #include <string>
 #include <cstring>
+#include <openssl/x509.h>
 
 
 static time_t timeFromASN1( const ASN1_TIME *aTime )
@@ -97,7 +96,7 @@ namespace _Wolframe {
 		static const std::size_t BUFFER_SIZE = 2048;
 		static const std::size_t BUFFER_SPACE = BUFFER_SIZE - 1;
 
-		SSLcertificateInfo::SSLcertificateInfo( X509 *cert )
+		SSLcertificateInfo::SSLcertificateInfo( X509* cert )
 		{
 			char	buf[ BUFFER_SIZE + 1 ];
 
@@ -126,6 +125,3 @@ namespace _Wolframe {
 
 	} // namespace Network
 } // namespace _Wolframe
-
-
-#endif // WITH_SSL

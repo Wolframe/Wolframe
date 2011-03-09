@@ -68,6 +68,13 @@ LOCAL_STATIC_LIB_OBJS = \
 	authentication.obj \
 	authentication_textfile.obj
 
+#SSL
+
+!IFDEF WITH_SSL
+LOCAL_STATIC_LIB_OBJS = $(LOCAL_STATIC_LIB_OBJS) \
+	SSLcertificateInfo.obj
+!ENDIF
+
 OBJS = \
 	$(LOCAL_STATIC_LIB_OBJS) \
 	appProperties.obj \

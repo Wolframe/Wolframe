@@ -13,25 +13,37 @@
 
 namespace _Wolframe {
 
-	echoConnection::echoConnection( const Network::LocalTCPendpoint& local, unsigned short timeout )
+	echoConnection::echoConnection( const Network::LocalEndpoint& local, unsigned short timeout )
 	{
-		LOG_TRACE << "Created connection handler for " << local.toString();
+		_Wolframe::Network::ConnectionEndpoint::ConnectionType type = local.type();
+
+		switch ( type )	{
+		case _Wolframe::Network::ConnectionEndpoint::TCP_CONNECTION:	{
+			const _Wolframe::Network::LocalTCPendpoint& lcl = static_cast<const _Wolframe::Network::LocalTCPendpoint&>( local );
+			LOG_TRACE << "Created connection handler for " << lcl.toString();
+			break;
+		}
+#ifdef WITH_SSL
+		case _Wolframe::Network::ConnectionEndpoint::SSL_CONNECTION:	{
+			const _Wolframe::Network::LocalSSLendpoint& lcl = static_cast<const _Wolframe::Network::LocalSSLendpoint&>( local );
+			LOG_TRACE << "Created connection handler (SSL) for " << lcl.toString();
+			break;
+		}
+#else
+		case _Wolframe::Network::ConnectionEndpoint::SSL_CONNECTION:
+#endif // WITH_SSL
+		default:
+			LOG_FATAL << "Impossible local connection type !";
+			abort();
+		}
+
+
 		state_ = NEW;
 		dataStart_ = NULL;
 		dataSize_ = 0;
 		idleTimeout_ = timeout;
 	}
 
-#ifdef WITH_SSL
-	echoConnection::echoConnection( const Network::LocalSSLendpoint& local, unsigned short timeout )
-	{
-		LOG_TRACE << "Created connection handler (SSL) for " << local.toString();
-		state_ = NEW;
-		dataStart_ = NULL;
-		dataSize_ = 0;
-		idleTimeout_ = timeout;
-	}
-#endif // WITH_SSL
 
 	echoConnection::~echoConnection()
 	{
@@ -39,25 +51,40 @@ namespace _Wolframe {
 	}
 
 
-	void echoConnection::setPeer( const Network::RemoteTCPendpoint& remote )
+	void echoConnection::setPeer( const Network::RemoteEndpoint& remote )
 	{
-		LOG_TRACE << "Peer set to " << remote.toString() << ", connected at " << remote.connectionTime();
+		_Wolframe::Network::ConnectionEndpoint::ConnectionType type = remote.type();
+
+		switch ( type )	{
+		case _Wolframe::Network::ConnectionEndpoint::TCP_CONNECTION:	{
+			const _Wolframe::Network::RemoteTCPendpoint& rmt = static_cast<const _Wolframe::Network::RemoteTCPendpoint&>( remote );
+			LOG_TRACE << "Peer set to " << rmt.toString() << ", connected at " << rmt.connectionTime();
+			break;
+		}
+#ifdef WITH_SSL
+		case _Wolframe::Network::ConnectionEndpoint::SSL_CONNECTION:	{
+			const _Wolframe::Network::RemoteSSLendpoint& rmt = static_cast<const _Wolframe::Network::RemoteSSLendpoint&>( remote );
+			LOG_TRACE << "Peer set to " << rmt.toString() << ", connected at " << boost::posix_time::from_time_t( rmt.connectionTime());
+			if ( rmt.SSLcertInfo() )	{
+				LOG_TRACE << "Peer SSL certificate serial number " << rmt.SSLcertInfo()->serialNumber()
+					  << ", issued by: " << rmt.SSLcertInfo()->issuer();
+				LOG_TRACE << "Peer SSL certificate valid from " << boost::posix_time::from_time_t( rmt.SSLcertInfo()->notBefore())
+					  << " to " <<  boost::posix_time::from_time_t( rmt.SSLcertInfo()->notAfter());
+				LOG_TRACE << "Peer SSL certificate subject: " << rmt.SSLcertInfo()->subject();
+				LOG_TRACE << "Peer SSL certificate Common Name: " << rmt.SSLcertInfo()->commonName();
+			}
+			break;
+		}
+#else
+		case _Wolframe::Network::ConnectionEndpoint::SSL_CONNECTION:
+#endif // WITH_SSL
+		default:
+			LOG_FATAL << "Impossible remote connection type !";
+			abort();
+		}
+
 	}
 
-#ifdef WITH_SSL
-	void echoConnection::setPeer( const Network::RemoteSSLendpoint& remote )
-	{
-		LOG_TRACE << "Peer set to " << remote.toString() << ", connected at " << remote.connectionTime();
-		if ( remote.SSLcertInfo() )	{
-			LOG_TRACE << "Peer SSL certificate serial number " << remote.SSLcertInfo()->serialNumber()
-				  << ", issued by: " << remote.SSLcertInfo()->issuer();
-			LOG_TRACE << "Peer SSL certificate valid from " << boost::posix_time::from_time_t( remote.SSLcertInfo()->notBefore())
-				  << " to " <<  boost::posix_time::from_time_t( remote.SSLcertInfo()->notAfter());
-			LOG_TRACE << "Peer SSL certificate subject: " << remote.SSLcertInfo()->subject();
-			LOG_TRACE << "Peer SSL certificate Common Name: " << remote.SSLcertInfo()->commonName();
-		}
-	}
-#endif // WITH_SSL
 
 	/// Handle a request and produce a reply.
 	const Network::NetworkOperation echoConnection::nextOperation()
@@ -177,30 +204,19 @@ namespace _Wolframe {
 
 
 	/// ServerHandler PIMPL
-	Network::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const Network::LocalTCPendpoint& local )
+	Network::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const Network::LocalEndpoint& local )
 	{
 		return new echoConnection( local, timeout );
 	}
-#ifdef WITH_SSL
-	Network::connectionHandler* ServerHandler::ServerHandlerImpl::newSSLconnection( const Network::LocalSSLendpoint& local )
-	{
-		return new echoConnection( local, timeout );
-	}
-#endif // WITH_SSL
 
+	/// Outside face of the PIMPL
 	ServerHandler::ServerHandler( const HandlerConfiguration *config ) : impl_( new ServerHandlerImpl( config ) )	{}
 
 	ServerHandler::~ServerHandler()	{ delete impl_; }
 
-	Network::connectionHandler* ServerHandler::newConnection( const Network::LocalTCPendpoint& local )
+	Network::connectionHandler* ServerHandler::newConnection( const Network::LocalEndpoint& local )
 	{
 		return impl_->newConnection( local );
 	}
-#ifdef WITH_SSL
-	Network::connectionHandler* ServerHandler::newSSLconnection( const Network::LocalSSLendpoint& local )
-	{
-		return impl_->newSSLconnection( local );
-	}
-#endif // WITH_SSL
 
 } // namespace _Wolframe

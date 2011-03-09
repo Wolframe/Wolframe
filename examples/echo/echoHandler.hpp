@@ -13,16 +13,12 @@ namespace _Wolframe {
 	class echoConnection : public Network::connectionHandler
 	{
 	public:
-		echoConnection( const Network::LocalTCPendpoint& local, unsigned short timeout );
-#ifdef WITH_SSL
-		echoConnection( const Network::LocalSSLendpoint& local, unsigned short timeout );
-#endif // WITH_SSL
+		echoConnection( const Network::LocalEndpoint& local, unsigned short timeout );
+
 		~echoConnection();
 
-		void setPeer( const Network::RemoteTCPendpoint& remote );
-#ifdef WITH_SSL
-		void setPeer( const Network::RemoteSSLendpoint& remote );
-#endif // WITH_SSL
+		void setPeer( const Network::RemoteEndpoint& remote );
+
 		/// Parse incoming data. The return value indicates how much of the
 		/// input has been consumed.
 		void networkInput( const void *begin, std::size_t bytesTransferred );
@@ -68,10 +64,8 @@ namespace _Wolframe {
 		{
 			timeout = config->echoConfig->timeout;
 		}
-		Network::connectionHandler* newConnection( const Network::LocalTCPendpoint& local );
-#ifdef WITH_SSL
-		Network::connectionHandler* newSSLconnection( const Network::LocalSSLendpoint& local );
-#endif // WITH_SSL
+		Network::connectionHandler* newConnection( const Network::LocalEndpoint& local );
+
 	private:
 		short unsigned timeout;
 	};

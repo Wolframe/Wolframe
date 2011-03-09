@@ -12,16 +12,11 @@ namespace _Wolframe {
 	class wolframeConnection : public Network::connectionHandler
 	{
 	public:
-		wolframeConnection( const Network::LocalTCPendpoint& local );
-#ifdef WITH_SSL
-		wolframeConnection( const Network::LocalSSLendpoint& local );
-#endif // WITH_SSL
+		wolframeConnection( const Network::LocalEndpoint& local );
 		~wolframeConnection();
 
-		void setPeer( const Network::RemoteTCPendpoint& remote );
-#ifdef WITH_SSL
-		void setPeer( const Network::RemoteSSLendpoint& remote );
-#endif // WITH_SSL
+		void setPeer( const Network::RemoteEndpoint& remote );
+
 		/// Parse / get the incoming data.
 		void networkInput( const void *begin, std::size_t bytesTransferred );
 
@@ -61,10 +56,7 @@ namespace _Wolframe {
 	class ServerHandler::ServerHandlerImpl
 	{
 	public:
-		Network::connectionHandler* newConnection( const Network::LocalTCPendpoint& local );
-#ifdef WITH_SSL
-		Network::connectionHandler* newSSLconnection( const Network::LocalSSLendpoint& local );
-#endif // WITH_SSL
+		Network::connectionHandler* newConnection( const Network::LocalEndpoint& local );
 	};
 
 } // namespace _Wolframe

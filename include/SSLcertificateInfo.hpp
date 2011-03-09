@@ -2,8 +2,6 @@
 #define _SSL_CERTIFICATE_INFO_HPP_INCLUDED
 
 
-#ifdef WITH_SSL
-
 #include <string>
 #include <ctime>
 #include <openssl/x509.h>
@@ -14,7 +12,7 @@ namespace _Wolframe {
 		class SSLcertificateInfo
 		{
 		public:
-			SSLcertificateInfo( X509 *cert );
+			SSLcertificateInfo( X509* cert );
 
 			long serialNumber() const		{ return serialNumber_; }
 			const std::string& issuer() const	{ return issuer_; }
@@ -33,7 +31,5 @@ namespace _Wolframe {
 
 	} // namespace Network
 } // namespace _Wolframe
-
-#endif // WITH_SSL
 
 #endif // _SSL_CERTIFICATE_INFO_HPP_INCLUDED

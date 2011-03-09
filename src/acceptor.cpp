@@ -166,7 +166,7 @@ SSLacceptor::SSLacceptor( boost::asio::io_service& IOservice,
 	boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve( query );
 	endpoint.port( port );
 
-	connectionHandler *handler = srvHandler_.newSSLconnection( LocalSSLendpoint( host, port ));
+	connectionHandler *handler = srvHandler_.newConnection( LocalSSLendpoint( host, port ));
 	newConnection_ = SSLconnection_ptr( new SSLconnection( IOservice_, SSLcontext_, connList_, handler ));
 
 	acceptor_.open( endpoint.protocol() );
@@ -194,7 +194,7 @@ void SSLacceptor::handleAccept( const boost::system::error_code& e )
 		LOG_DEBUG << "Received new connection on " << identifier_;
 		newConnection_->start();
 
-		connectionHandler *handler = srvHandler_.newSSLconnection( LocalSSLendpoint( acceptor_.local_endpoint().address().to_string(),
+		connectionHandler *handler = srvHandler_.newConnection( LocalSSLendpoint( acceptor_.local_endpoint().address().to_string(),
 											     acceptor_.local_endpoint().port() ));
 		newConnection_.reset( new SSLconnection( IOservice_, SSLcontext_, connList_, handler ));
 		acceptor_.async_accept( newConnection_->socket().lowest_layer(),

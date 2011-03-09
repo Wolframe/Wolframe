@@ -15,37 +15,93 @@ namespace _Wolframe {
 		/// Base class for network endpoints
 		class ConnectionEndpoint
 		{
-		private:
-			std::string	host_;
-			unsigned short	port_;
 		public:
-			ConnectionEndpoint( const std::string& Host, unsigned short Port )
-			{ host_ = Host; port_ = Port; }
+			enum ConnectionType	{
+				TCP_CONNECTION,
+				SSL_CONNECTION
+			};
 
-			const std::string& host() const	{ return host_; }
-			unsigned short port() const	{ return port_; }
+			ConnectionEndpoint( const std::string& Host, unsigned short Port, ConnectionType tp )
+			{
+				host_ = Host;
+				port_ = Port;
+				type_ = tp;
+			}
+
+			const std::string& host() const		{ return host_; }
+			unsigned short port() const		{ return port_; }
+			ConnectionType type() const		{ return type_; }
+
 			std::string toString() const
 			{
 				std::ostringstream o;
 				o << host_ << ":" << port_;
 				return o.str();
 			}
+
+		private:
+			std::string	host_;
+			unsigned short	port_;
+			ConnectionType	type_;
 		};
 
 
-		/// No encryption endpoints
-		class LocalTCPendpoint : public ConnectionEndpoint
+		/// Local connection endpoints
+		/// base class for local endpoint
+		class LocalEndpoint : public ConnectionEndpoint
+		{
+		public:
+			LocalEndpoint( const std::string& Host, unsigned short Port,
+				      ConnectionType tp )
+				: ConnectionEndpoint( Host, Port, tp )	{}
+		};
+
+		/// local unencrypted endpoint
+		class LocalTCPendpoint : public LocalEndpoint
 		{
 		public:
 			LocalTCPendpoint( const std::string& Host, unsigned short Port )
-				: ConnectionEndpoint( Host, Port )	{}
+				: LocalEndpoint( Host, Port, TCP_CONNECTION )	{}
 		};
 
-		class RemoteTCPendpoint : public ConnectionEndpoint
+#ifdef WITH_SSL
+		/// local SSL connection endpoint
+		class LocalSSLendpoint : public LocalEndpoint
+		{
+		public:
+			LocalSSLendpoint( const std::string& Host, unsigned short Port )
+				: LocalEndpoint( Host, Port, SSL_CONNECTION )	{}
+		};
+#endif // WITH_SSL
+
+
+		/// Remote connection endpoints
+		/// base class for remote endpoint
+		class RemoteEndpoint : public ConnectionEndpoint
+		{
+		public:
+			RemoteEndpoint( const std::string& Host, unsigned short Port,
+				       ConnectionType tp )
+				: ConnectionEndpoint( Host, Port, tp )
+			{
+				connectionTime_ = time( NULL );
+			}
+
+			time_t connectionTime() const			{ return connectionTime_; }
+
+		private:
+			time_t	connectionTime_;
+		};
+
+		/// remote unencrypted endpoint
+		class RemoteTCPendpoint : public RemoteEndpoint
 		{
 		public:
 			RemoteTCPendpoint( const std::string& Host, unsigned short Port )
-				: ConnectionEndpoint( Host, Port )	{ connectionTime_ = time( NULL ); }
+				: RemoteEndpoint( Host, Port, TCP_CONNECTION )
+			{
+				connectionTime_ = time( NULL );
+			}
 
 			time_t connectionTime() const			{ return connectionTime_; }
 
@@ -54,31 +110,27 @@ namespace _Wolframe {
 		};
 
 #ifdef WITH_SSL
-		/// SSL connection endpoints
-		class LocalSSLendpoint : public ConnectionEndpoint
-		{
-		public:
-			LocalSSLendpoint( const std::string& Host, unsigned short Port )
-				: ConnectionEndpoint( Host, Port )	{}
-		};
-
-
 		/// forward declaration for SSL certificate info
 		class SSLcertificateInfo;
 
-		class RemoteSSLendpoint : public ConnectionEndpoint
+		/// remote SSL connection endpoint
+		class RemoteSSLendpoint : public RemoteEndpoint
 		{
 		public:
 			RemoteSSLendpoint( const std::string& Host, unsigned short Port )
-				: ConnectionEndpoint( Host, Port )	{ connectionTime_ = time( NULL );
-									  sslInfo_ = NULL;
-									}
+				: RemoteEndpoint( Host, Port, SSL_CONNECTION )
+			{
+				connectionTime_ = time( NULL );
+				sslInfo_ = NULL;
+			}
 
 			RemoteSSLendpoint( const std::string& Host, unsigned short Port,
 					  const SSLcertificateInfo *sslInfo )
-				: ConnectionEndpoint( Host, Port )	{ connectionTime_ = time( NULL );
-									  sslInfo_ = sslInfo;
-									}
+				: RemoteEndpoint( Host, Port, SSL_CONNECTION )
+			{
+				connectionTime_ = time( NULL );
+				sslInfo_ = sslInfo;
+			}
 
 			time_t connectionTime() const			{ return connectionTime_; }
 			/// SSL certificate information

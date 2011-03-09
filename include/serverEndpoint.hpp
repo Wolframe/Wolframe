@@ -11,30 +11,31 @@ namespace _Wolframe	{
 	class ServerTCPendpoint : public ConnectionEndpoint
 	{
 	public:
-		ServerTCPendpoint( const std::string& Host, unsigned short Port, unsigned maxConn = 0 )
-			: ConnectionEndpoint( Host, Port )
+		ServerTCPendpoint( const std::string& Host, unsigned short Port,
+				  unsigned short maxConn = 0 )
+			: ConnectionEndpoint( Host, Port, TCP_CONNECTION )
 		{
 			maxConnections_ = maxConn;
 		}
 
-		unsigned maxConnections() const	{ return maxConnections_; }
+		unsigned short maxConnections() const	{ return maxConnections_; }
 
 	private:
-		unsigned	maxConnections_;
+		unsigned short	maxConnections_;
 	};
 
 
-#ifdef WITH_SSL
 	/// SSL connection server endpoint
-	class ServerSSLendpoint : public ServerTCPendpoint
+	class ServerSSLendpoint : public ConnectionEndpoint
 	{
 		friend class server;
 	public:
-		ServerSSLendpoint( const std::string& Host, unsigned short Port, unsigned maxConn,
+		ServerSSLendpoint( const std::string& Host, unsigned short Port, unsigned short maxConn,
 				   const std::string& Certificate, const std::string& Key,
 				   bool verify, const std::string& CAdir, const std::string& CAchainFile )
-			: ServerTCPendpoint( Host, Port, maxConn )
+			: ConnectionEndpoint( Host, Port, SSL_CONNECTION )
 		{
+			maxConnections_ = maxConn;
 			cert_ = Certificate;
 			key_ = Key;
 			verify_ = verify;
@@ -42,6 +43,7 @@ namespace _Wolframe	{
 			CAchain_ = CAchainFile;
 		}
 
+		unsigned short maxConnections() const	{ return maxConnections_; }
 		const std::string& certificate() const	{ return cert_; }
 		const std::string& key() const		{ return key_; }
 		const std::string& CAdirectory() const	{ return CAdir_; }
@@ -51,13 +53,13 @@ namespace _Wolframe	{
 		void setAbsolutePath( const std::string& referencePath );
 
 	private:
+		unsigned short	maxConnections_;
 		std::string	cert_;
 		std::string	key_;
 		std::string	CAdir_;
 		std::string	CAchain_;
 		bool		verify_;
 	};
-#endif // WITH_SSL
 
 	} // namespace Network
 } // namespace _Wolframe
