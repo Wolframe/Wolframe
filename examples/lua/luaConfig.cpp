@@ -70,17 +70,30 @@ bool LuaConfiguration::check( std::ostream& os ) const
 {
 	bool correct = true;
 
+	// is there a script?
 	if( script.empty( ) ) {
 		os << "No Lua script given" << std::endl;
 		correct = false;
 	}
-	
+
+	// are the configured preload libraries known?
 	for( std::list<std::string>::const_iterator it = preload_libs.begin( ); it != preload_libs.end( ); it++ ) {
 		std::map<std::string, LuaModuleDefinition>::const_iterator it2 = knownLuaModules.find( *it );
 		if( it2 == knownLuaModules.end( ) ) {
 			os << "Unknown LUA preload library '" << *it << "'" << std::endl;
 			correct = false;
 		}
+	}
+	
+	// does the Lua script pass a syntax check?
+	lua_State *l = luaL_newstate( );
+	if( l ) {
+		if( luaL_loadfile( l, script.c_str( ) ) ) {
+			os << "Syntax error in lua script: " << lua_tostring( l, -1 ) << std::endl;
+			lua_pop( l, 1 );
+			correct = false;
+		}
+		lua_close( l );
 	}
 
 	return correct;
