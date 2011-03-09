@@ -9,26 +9,10 @@
 #include "handlerConfig.hpp"
 
 extern "C" {
-	#include <lua.h>
+	#include "lua.h"
 }
 
-#include <list>
-#include <map>
-
 namespace _Wolframe {
-	typedef int (*LuaModuleEntryFunc)( lua_State *l );
-	typedef struct {
-		std::string moduleName;
-		LuaModuleEntryFunc moduleInit;
-	} LuaModuleDefinition;
-		
-	class luaConfig {
-	public:
-		std::string script;
-		std::list<std::string> preload_libs;
-		std::map<std::string, LuaModuleDefinition> knownLuaModules;
-	};
-
 	/// The connection handler
 	class luaConnection : public Network::connectionHandler
 	{

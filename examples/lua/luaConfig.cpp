@@ -14,8 +14,42 @@
 
 #include <ostream>
 
+extern "C" {
+	#include "lualib.h"
+	#include "lauxlib.h"
+}
 
 namespace _Wolframe	{
+
+LuaConfiguration::LuaConfiguration( const std::string& printName )
+	: ConfigurationBase( printName )
+{
+	LuaModuleDefinition x;
+	x.moduleName = "";
+	x.moduleInit = luaopen_base;
+	knownLuaModules["base"] = x;
+	x.moduleName = LUA_TABLIBNAME;
+	x.moduleInit = luaopen_table;
+	knownLuaModules[LUA_TABLIBNAME] = x;
+	x.moduleName = LUA_IOLIBNAME;
+	x.moduleInit = luaopen_io;
+	knownLuaModules[LUA_IOLIBNAME] = x;
+	x.moduleName = LUA_OSLIBNAME;
+	x.moduleInit = luaopen_os;
+	knownLuaModules[LUA_OSLIBNAME] = x;
+	x.moduleName = LUA_STRLIBNAME;
+	x.moduleInit = luaopen_string;
+	knownLuaModules[LUA_STRLIBNAME] = x;
+	x.moduleName = LUA_MATHLIBNAME;
+	x.moduleInit = luaopen_math;
+	knownLuaModules[LUA_MATHLIBNAME] = x;
+	x.moduleName = LUA_DBLIBNAME;
+	x.moduleInit = luaopen_debug;
+	knownLuaModules[LUA_DBLIBNAME] = x;
+	x.moduleName = LUA_LOADLIBNAME;
+	x.moduleInit = luaopen_package;
+	knownLuaModules[LUA_LOADLIBNAME] = x;
+}
 
 void LuaConfiguration::print( std::ostream& os ) const
 {
@@ -36,9 +70,30 @@ bool LuaConfiguration::check( std::ostream& os ) const
 {
 	bool correct = true;
 
+	// is there a script?
 	if( script.empty( ) ) {
 		os << "No Lua script given" << std::endl;
 		correct = false;
+	}
+
+	// are the configured preload libraries known?
+	for( std::list<std::string>::const_iterator it = preload_libs.begin( ); it != preload_libs.end( ); it++ ) {
+		std::map<std::string, LuaModuleDefinition>::const_iterator it2 = knownLuaModules.find( *it );
+		if( it2 == knownLuaModules.end( ) ) {
+			os << "Unknown LUA preload library '" << *it << "'" << std::endl;
+			correct = false;
+		}
+	}
+	
+	// does the Lua script pass a syntax check?
+	lua_State *l = luaL_newstate( );
+	if( l ) {
+		if( luaL_loadfile( l, script.c_str( ) ) ) {
+			os << "Syntax error in lua script: " << lua_tostring( l, -1 ) << std::endl;
+			lua_pop( l, 1 );
+			correct = false;
+		}
+		lua_close( l );
 	}
 
 	return correct;
