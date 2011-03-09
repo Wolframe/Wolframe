@@ -104,11 +104,13 @@ namespace _Wolframe {
 				lua_pushstring( l, it2->second.moduleName.c_str( ) );
 				lua_call( l, 1, 0 );
 			} else {
-				LOG_ERROR << "Can't load unknown LUA library '" << *it << "'!";
+				// we should not get here! the configuration checked should croak before
+				LOG_FATAL << "Can't load unknown LUA library '" << *it << "'!";
+				throw new std::runtime_error( "Can't initialize LUA processor" );
 			}
 		}
 
-		// TODO: script location, also configurable
+		// script location, also configurable
 		int res = luaL_loadfile( l, config.script.c_str( ) );
 		if( res != 0 ) {
 			LOG_FATAL << "Unable to load LUA code '" << config.script << "': " << lua_tostring( l, -1 );
@@ -363,33 +365,8 @@ namespace _Wolframe {
 
 	ServerHandler::ServerHandlerImpl::ServerHandlerImpl( const HandlerConfiguration *config ) {
 		config_.script = config->luaConfig->script;
-		config_.preload_libs = config->luaConfig->preload_libs;
-		
-		LuaModuleDefinition x;
-		x.moduleName = "";
-		x.moduleInit = luaopen_base;
-		config_.knownLuaModules["base"] = x;
-		x.moduleName = LUA_TABLIBNAME;
-		x.moduleInit = luaopen_table;
-		config_.knownLuaModules[LUA_TABLIBNAME] = x;
-		x.moduleName = LUA_IOLIBNAME;
-		x.moduleInit = luaopen_io;
-		config_.knownLuaModules[LUA_IOLIBNAME] = x;
-		x.moduleName = LUA_OSLIBNAME;
-		x.moduleInit = luaopen_os;
-		config_.knownLuaModules[LUA_OSLIBNAME] = x;
-		x.moduleName = LUA_STRLIBNAME;
-		x.moduleInit = luaopen_string;
-		config_.knownLuaModules[LUA_STRLIBNAME] = x;
-		x.moduleName = LUA_MATHLIBNAME;
-		x.moduleInit = luaopen_math;
-		config_.knownLuaModules[LUA_MATHLIBNAME] = x;
-		x.moduleName = LUA_DBLIBNAME;
-		x.moduleInit = luaopen_debug;
-		config_.knownLuaModules[LUA_DBLIBNAME] = x;
-		x.moduleName = LUA_LOADLIBNAME;
-		x.moduleInit = luaopen_package;
-		config_.knownLuaModules[LUA_LOADLIBNAME] = x;
+		config_.preload_libs = config->luaConfig->preload_libs;		
+		config_.knownLuaModules = config->luaConfig->knownLuaModules;
 	}
 
 	Network::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const Network::LocalTCPendpoint& local )

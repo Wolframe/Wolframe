@@ -8,19 +8,38 @@
 #include "standardConfigs.hpp"
 
 #include <list>
+#include <map>
+
+extern "C" {
+	#include <lua.h>
+}
 
 namespace _Wolframe {
+
+	typedef int (*LuaModuleEntryFunc)( lua_State *l );
+	typedef struct {
+		std::string moduleName;
+		LuaModuleEntryFunc moduleInit;
+	} LuaModuleDefinition;
+		
+	class luaConfig {
+	public:
+		std::string script;
+		std::list<std::string> preload_libs;
+		std::map<std::string, LuaModuleDefinition> knownLuaModules;
+	};
 
 	/// echo configuration
 	struct LuaConfiguration : public _Wolframe::Configuration::ConfigurationBase
 	{
 	public:
-		std::string		script;
-		std::list<std::string>	preload_libs;
+		std::string					script;
+		std::list<std::string>				preload_libs;
+		std::map<std::string, LuaModuleDefinition>	knownLuaModules;
 
 		/// constructor
-		LuaConfiguration( const std::string& printName )
-			: ConfigurationBase( printName ) { }
+		LuaConfiguration( const std::string& printName );
+		
 		/// methods
 		bool parse( const boost::property_tree::ptree& pt, const std::string& nodeName, std::ostream& os );
 		void setCanonicalPathes( const std::string& refPath );
