@@ -40,7 +40,6 @@ namespace _Wolframe	{
 			abort();
 		}
 
-
 		state_ = NEW;
 		dataStart_ = NULL;
 		dataSize_ = 0;

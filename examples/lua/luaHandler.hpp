@@ -17,16 +17,12 @@ namespace _Wolframe {
 	class luaConnection : public Network::connectionHandler
 	{
 	public:
-		luaConnection( const Network::LocalTCPendpoint& local, const luaConfig config );
-#ifdef WITH_SSL
-		luaConnection( const Network::LocalSSLendpoint& local, const luaConfig config );
-#endif // WITH_SSL
+		luaConnection( const Network::LocalEndpoint& local, const luaConfig config );
+
 		~luaConnection();
 
-		void setPeer( const Network::RemoteTCPendpoint& remote );
-#ifdef WITH_SSL
-		void setPeer( const Network::RemoteSSLendpoint& remote );
-#endif // WITH_SSL
+		void setPeer( const Network::RemoteEndpoint& remote );
+
 		void networkInput( const void *begin, std::size_t bytesTransferred );
 		void timeoutOccured();
 		void signalOccured();
@@ -39,7 +35,7 @@ namespace _Wolframe {
 		lua_State *l;
 		const luaConfig config;
 		static const std::size_t buf_size = 8192;
-		char buf[buf_size];		
+		char buf[buf_size];
 
 		void createVM( );
 		void destroyVM( );
@@ -52,10 +48,7 @@ namespace _Wolframe {
 	public:
 		ServerHandlerImpl( const HandlerConfiguration *config );
 
-		Network::connectionHandler* newConnection( const Network::LocalTCPendpoint& local );
-#ifdef WITH_SSL
-		Network::connectionHandler* newSSLconnection( const Network::LocalSSLendpoint& local );
-#endif // WITH_SSL
+		Network::connectionHandler* newConnection( const Network::LocalEndpoint& local );
 
 	private:
 		luaConfig config_;

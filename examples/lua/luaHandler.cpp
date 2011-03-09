@@ -11,6 +11,8 @@
 #include <stdexcept>
 #include <sstream>
 
+#include "boost/date_time/posix_time/posix_time.hpp"		// to print time_t structures
+
 extern "C" {
 	#include "lua.h"
 	#include "lualib.h"
@@ -176,21 +178,34 @@ namespace _Wolframe {
 	}
 #endif
 
-	luaConnection::luaConnection( const Network::LocalTCPendpoint& local, const luaConfig config_ )
+	luaConnection::luaConnection( const Network::LocalEndpoint& local, const luaConfig config_ )
 		: config( config_ )
 	{
-		LOG_TRACE << "Created connection handler for " << local.toString();
+		_Wolframe::Network::ConnectionEndpoint::ConnectionType type = local.type();
+
+		switch ( type )	{
+		case _Wolframe::Network::ConnectionEndpoint::TCP_CONNECTION:	{
+			const _Wolframe::Network::LocalTCPendpoint& lcl = static_cast<const _Wolframe::Network::LocalTCPendpoint&>( local );
+			LOG_TRACE << "Created connection handler for " << lcl.toString();
+			break;
+		}
+#ifdef WITH_SSL
+		case _Wolframe::Network::ConnectionEndpoint::SSL_CONNECTION:	{
+			const _Wolframe::Network::LocalSSLendpoint& lcl = static_cast<const _Wolframe::Network::LocalSSLendpoint&>( local );
+			LOG_TRACE << "Created connection handler (SSL) for " << lcl.toString();
+			break;
+		}
+#else
+		case _Wolframe::Network::ConnectionEndpoint::SSL_CONNECTION:
+#endif // WITH_SSL
+		default:
+			LOG_FATAL << "Impossible local connection type !";
+			abort();
+		}
+
 		createVM( );
 	}
 
-#ifdef WITH_SSL
-	luaConnection::luaConnection( const Network::LocalSSLendpoint& local, const luaConfig config_ )
-		: config( config_ )
-	{
-		LOG_TRACE << "Created connection handler (SSL) for " << local.toString();
-		createVM( );
-	}
-#endif // WITH_SSL
 
 	luaConnection::~luaConnection()
 	{
@@ -198,10 +213,38 @@ namespace _Wolframe {
 		destroyVM( );
 	}
 
-	void luaConnection::setPeer( const Network::RemoteTCPendpoint& remote )
+	void luaConnection::setPeer( const Network::RemoteEndpoint& remote )
 	{
-		LOG_TRACE << "Peer set to " << remote.toString();
+		_Wolframe::Network::ConnectionEndpoint::ConnectionType type = remote.type();
 
+		switch ( type )	{
+		case _Wolframe::Network::ConnectionEndpoint::TCP_CONNECTION:	{
+			const _Wolframe::Network::RemoteTCPendpoint& rmt = static_cast<const _Wolframe::Network::RemoteTCPendpoint&>( remote );
+			LOG_TRACE << "Peer set to " << rmt.toString() << ", connected at " << rmt.connectionTime();
+			break;
+		}
+#ifdef WITH_SSL
+		case _Wolframe::Network::ConnectionEndpoint::SSL_CONNECTION:	{
+			const _Wolframe::Network::RemoteSSLendpoint& rmt = static_cast<const _Wolframe::Network::RemoteSSLendpoint&>( remote );
+			LOG_TRACE << "Peer set to " << rmt.toString() << ", connected at " << boost::posix_time::from_time_t( rmt.connectionTime());
+			if ( rmt.SSLcertInfo() )	{
+				LOG_TRACE << "Peer SSL certificate serial number " << rmt.SSLcertInfo()->serialNumber()
+					  << ", issued by: " << rmt.SSLcertInfo()->issuer();
+				LOG_TRACE << "Peer SSL certificate valid from " << boost::posix_time::from_time_t( rmt.SSLcertInfo()->notBefore())
+					  << " to " <<  boost::posix_time::from_time_t( rmt.SSLcertInfo()->notAfter());
+				LOG_TRACE << "Peer SSL certificate subject: " << rmt.SSLcertInfo()->subject();
+				LOG_TRACE << "Peer SSL certificate Common Name: " << rmt.SSLcertInfo()->commonName();
+			}
+			break;
+		}
+#else
+		case _Wolframe::Network::ConnectionEndpoint::SSL_CONNECTION:
+#endif // WITH_SSL
+		default:
+			LOG_FATAL << "Impossible remote connection type !";
+			abort();
+		}
+////----------------------------
 		lua_pushstring( l, "new_connection" );
 		lua_gettable( l, LUA_GLOBALSINDEX );
 		lua_pushstring( l, remote.host( ).c_str( ) );
@@ -217,34 +260,34 @@ namespace _Wolframe {
 		}
 	}
 
-#ifdef WITH_SSL
-	void luaConnection::setPeer( const Network::RemoteSSLendpoint& remote )
-	{
-		LOG_TRACE << "Peer set to " << remote.toString();
-		if ( remote.SSLcertInfo() )	{
-			LOG_TRACE << "Peer SSL certificate Common Name: " << remote.SSLcertInfo()->commonName();
-		}
+//#ifdef WITH_SSL
+//	void luaConnection::setPeer( const Network::RemoteSSLendpoint& remote )
+//	{
+//		LOG_TRACE << "Peer set to " << remote.toString();
+//		if ( remote.SSLcertInfo() )	{
+//			LOG_TRACE << "Peer SSL certificate Common Name: " << remote.SSLcertInfo()->commonName();
+//		}
 
-		lua_pushstring( l, "new_connection" );
-		lua_gettable( l, LUA_GLOBALSINDEX );
-		lua_pushstring( l, remote.host( ).c_str( ) );
-		unsigned short port = remote.port( );
-		std::stringstream ss;
-		ss << port;
-		lua_pushstring( l, ss.str( ).c_str( ) );
-		if ( remote.SSLcertInfo() )	{
-			lua_pushstring( l, remote.SSLcertInfo()->commonName().c_str());
-		} else {
-			lua_pushnil( l );
-		}
-		int res = lua_pcall( l, 3, 0, 0 );
-		if( res != 0 ) {
-			LOG_FATAL << "Unable to call 'new_connection' function: " << lua_tostring( l, -1 );
-			lua_pop( l, 1 );
-			throw new std::runtime_error( "Error in LUA processor" );
-		}
-	}
-#endif // WITH_SSL
+//		lua_pushstring( l, "new_connection" );
+//		lua_gettable( l, LUA_GLOBALSINDEX );
+//		lua_pushstring( l, remote.host( ).c_str( ) );
+//		unsigned short port = remote.port( );
+//		std::stringstream ss;
+//		ss << port;
+//		lua_pushstring( l, ss.str( ).c_str( ) );
+//		if ( remote.SSLcertInfo() )	{
+//			lua_pushstring( l, remote.SSLcertInfo()->commonName().c_str());
+//		} else {
+//			lua_pushnil( l );
+//		}
+//		int res = lua_pcall( l, 3, 0, 0 );
+//		if( res != 0 ) {
+//			LOG_FATAL << "Unable to call 'new_connection' function: " << lua_tostring( l, -1 );
+//			lua_pop( l, 1 );
+//			throw new std::runtime_error( "Error in LUA processor" );
+//		}
+//	}
+//#endif // WITH_SSL
 
 	/// Handle a request and produce a reply.
 	const Network::NetworkOperation luaConnection::nextOperation()
@@ -365,32 +408,22 @@ namespace _Wolframe {
 
 	ServerHandler::ServerHandlerImpl::ServerHandlerImpl( const HandlerConfiguration *config ) {
 		config_.script = config->luaConfig->script;
-		config_.preload_libs = config->luaConfig->preload_libs;		
+		config_.preload_libs = config->luaConfig->preload_libs;
 		config_.knownLuaModules = config->luaConfig->knownLuaModules;
 	}
 
-	Network::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const Network::LocalTCPendpoint& local )
+	Network::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const Network::LocalEndpoint& local )
 	{
 		return new luaConnection( local, config_ );
 	}
-#ifdef WITH_SSL
-	Network::connectionHandler* ServerHandler::ServerHandlerImpl::newSSLconnection( const Network::LocalSSLendpoint& local )
-	{
-		return new luaConnection( local, config_ );
-	}
-#endif // WITH_SSL
+
 	ServerHandler::ServerHandler( const HandlerConfiguration *config ) : impl_( new ServerHandlerImpl( config ) )	{}
 
 	ServerHandler::~ServerHandler()	{ delete impl_; }
 
-	Network::connectionHandler* ServerHandler::newConnection( const Network::LocalTCPendpoint& local )
+	Network::connectionHandler* ServerHandler::newConnection( const Network::LocalEndpoint& local )
 	{
 		return impl_->newConnection( local );
 	}
-#ifdef WITH_SSL
-	Network::connectionHandler* ServerHandler::newSSLconnection( const Network::LocalSSLendpoint& local )
-	{
-		return impl_->newSSLconnection( local );
-	}
-#endif // WITH_SSL
+
 } // namespace _Wolframe
