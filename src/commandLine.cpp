@@ -49,6 +49,7 @@ namespace _Wolframe {
 #if !defined(_WIN32)
 			foreground = false;
 #endif
+			useLogConfig = false;
 			debugLevel = DEFAULT_DEBUG_LEVEL;
 		}
 

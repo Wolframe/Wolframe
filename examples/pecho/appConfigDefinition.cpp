@@ -31,5 +31,13 @@ namespace _Wolframe {
 			addConfig( "timeout", handlerConf->pechoConfig );
 		}
 
+		ApplicationConfiguration::~ApplicationConfiguration()
+		{
+			if ( serviceConf ) delete serviceConf;
+			if ( serverConf )delete serverConf;
+			if ( loggerConf ) delete loggerConf;
+			if ( handlerConf ) delete handlerConf;
+		}
+
 	} // namespace Configuration
 } // namespace _Wolframe

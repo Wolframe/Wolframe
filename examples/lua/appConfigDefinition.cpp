@@ -31,5 +31,13 @@ namespace _Wolframe {
 			addConfig( "lua", handlerConf->luaConfig );
 		}
 
+		ApplicationConfiguration::~ApplicationConfiguration()
+		{
+			if ( serviceConf ) delete serviceConf;
+			if ( serverConf )delete serverConf;
+			if ( loggerConf ) delete loggerConf;
+			if ( handlerConf ) delete handlerConf;
+		}
+
 	} // namespace Configuration
 } // namespace _Wolframe

@@ -31,5 +31,14 @@ namespace _Wolframe {
 			addConfig( "database", handlerConf->database );
 		}
 
+
+		ApplicationConfiguration::~ApplicationConfiguration()
+		{
+			if ( serviceConf ) delete serviceConf;
+			if ( serverConf )delete serverConf;
+			if ( loggerConf ) delete loggerConf;
+			if ( handlerConf ) delete handlerConf;
+		}
+
 	} // namespace Configuration
 } // namespace _Wolframe

@@ -23,8 +23,8 @@ public:
 	}
 
 protected:
-	Singleton() {}
-	~Singleton() {}
+	Singleton()	{}
+	~Singleton()	{}
 
 	static void init() // never throws
 	{

@@ -39,6 +39,11 @@ namespace _Wolframe {
 		{
 			echoConfig = new EchoConfiguration( "Echo Server" );
 		}
+
+		~HandlerConfiguration()
+		{
+			if ( echoConfig ) delete echoConfig;
+		}
 	};
 
 

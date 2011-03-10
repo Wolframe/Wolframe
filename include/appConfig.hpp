@@ -42,6 +42,7 @@ namespace _Wolframe {
 
 		public:
 			ApplicationConfiguration();
+			~ApplicationConfiguration();
 
 			bool parse( const char *filename, std::ostream& os );
 			void finalize( const CmdLineConfig& cmdLine );

@@ -22,6 +22,12 @@ namespace _Wolframe {
 			database = new Configuration::DatabaseConfiguration();
 //			auth = ...
 		}
+
+		~HandlerConfiguration()
+		{
+			if ( database ) delete database;
+//			auth = ...
+		}
 	};
 
 

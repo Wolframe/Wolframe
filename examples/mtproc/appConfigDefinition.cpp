@@ -26,5 +26,12 @@ namespace _Wolframe {
 			addConfig( "logging", loggerConf );
 		}
 
+		ApplicationConfiguration::~ApplicationConfiguration()
+		{
+			if ( serviceConf ) delete serviceConf;
+			if ( serverConf )delete serverConf;
+			if ( loggerConf ) delete loggerConf;
+		}
+
 	} // namespace Configuration
 } // namespace _Wolframe

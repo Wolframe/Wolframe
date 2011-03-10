@@ -39,6 +39,13 @@ namespace _Wolframe {
 		{
 			pechoConfig = new pEchoConfiguration( "pEcho Server" );
 		}
+
+		/// destructor
+		~HandlerConfiguration()
+		{
+			if ( pechoConfig ) delete pechoConfig;
+		}
+
 	};
 
 
