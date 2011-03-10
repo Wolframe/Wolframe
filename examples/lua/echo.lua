@@ -15,10 +15,13 @@ function destroy( )
 end
 
 -- called when a client connection gets established
-function new_connection( remote_host, remote_port, common_name )
+function new_connection( remote_host, remote_port, ssl )
 	log( "TRACE",  "LUA: new_connection called from " .. remote_host .. " (port: " .. remote_port .. ")" )
-	if common_name then
-		log( "TRACE", "LUA: encrypted connection, CN is ", common_name )
+	if ssl then
+		log( "TRACE", "LUA: encrypted connection, got the following SSL data from the client:" )
+		for k, v in pairs( ssl ) do
+			log( "TRACE", "LUA: SSL data ", k, ": ", v )
+		end
 	end
 	state = "NEW"
 end

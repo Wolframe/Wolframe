@@ -212,7 +212,7 @@ namespace _Wolframe {
 				LOG_TRACE << "Peer SSL certificate subject: " << rmt.SSLcertInfo()->subject();
 				LOG_TRACE << "Peer SSL certificate Common Name: " << rmt.SSLcertInfo()->commonName();
 			} else {
-				LOG_TRACE << "No SSL information available, illegal client certificate?";
+				LOG_TRACE << "No SSL information available, illegal client certificate or server is not requesting a client certificate";
 			}
 		}
 #endif // WITH_SSL
@@ -229,9 +229,30 @@ namespace _Wolframe {
 			if ( rmt.SSLcertInfo( ) ) {
 				lua_newtable( l );
 				int top = lua_gettop( l );
+
 				lua_pushstring( l, "serialNumber" );
 				lua_pushinteger( l, rmt.SSLcertInfo()->serialNumber( ) );
 				lua_settable( l, top );
+				
+				lua_pushstring( l, "issuer" );
+				lua_pushstring( l, rmt.SSLcertInfo()->issuer( ).c_str( ) );
+				lua_settable( l, top );
+				
+				lua_pushstring( l, "valid_from" );
+				lua_pushstring( l, boost::posix_time::to_simple_string( boost::posix_time::from_time_t( rmt.SSLcertInfo()->notBefore( ) ) ).c_str( ) );
+				lua_settable( l, top );
+
+				lua_pushstring( l, "valid_to" );
+				lua_pushstring( l, boost::posix_time::to_simple_string( boost::posix_time::from_time_t( rmt.SSLcertInfo()->notAfter( ) ) ).c_str( ) );
+				lua_settable( l, top );				
+				
+				lua_pushstring( l, "subject" );
+				lua_pushstring( l, rmt.SSLcertInfo( )->subject( ).c_str( ) );
+				lua_settable( l, top );				
+
+				lua_pushstring( l, "common_name" );
+				lua_pushstring( l, rmt.SSLcertInfo( )->commonName( ).c_str( ) );
+				lua_settable( l, top );				
 			} else {
 				lua_pushnil( l );
 			}
