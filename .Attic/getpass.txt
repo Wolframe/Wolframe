@@ -1,0 +1,441 @@
+   [1]cplusplus.com
+   [2]C++ : [3]Forums : [4]UNIX/Linux Programming : Is there an
+   alternative to getpass?
+   Search: _____________ Search
+
+        [5]C++
+   [6]Information
+   [7]Documentation
+   [8]Reference
+   [9]Articles
+   [10]Sourcecode
+   [11]Forums
+           [12]Forums
+   [13]Beginners
+   [14]Windows Programming
+   [15]UNIX/Linux Programming
+   [16]General C++ Programm...
+   [17]Articles
+   [18]Lounge
+   [19]Jobs
+
+post   Is there an alternative to getpass?
+
+   [20]unregistered (171)   [21]Link to this post Feb 18, 2011 at 1:55pm
+   UTC
+   for concealing password input since the man page indicates that it is
+   obsolete
+   [22]chrisname (4127)   [23]Link to this post Feb 18, 2011 at 1:55pm UTC
+   I'm not sure of an alternative, but I have nothing to do, so here's one
+   I wrote:
+   getpassword.h
+   1
+   2
+   3
+   4
+   5
+   6
+   7
+   8
+   9
+   10
+   11
+   12
+   13
+   14
+   15
+   16
+   17
+   18
+   19
+   20
+   21
+   22
+   23
+   24
+   25
+   26
+   27
+   28
+   29
+   30
+   31
+   32
+   33
+   34
+   35
+   36
+   37
+   38
+   39
+   40
+   41
+   42
+   43
+   44
+   45
+   46
+   47
+   48
+   49
+   50
+   51
+   52
+#ifndef _GETPASSWORD_H
+#define _GETPASSWORD_H
+
+#ifdef __cplusplus
+# include <cstdio>
+# include <cstdlib>
+#else
+# include <stdio.h>
+# include <stdlib.h>
+#endif
+
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(WINDOWS)\
+    || defined(__WINDOWS__)
+# ifndef WINDOWS
+#  define WINDOWS
+# endif
+#elif defined(unix) || defined(UNIX) || defined(__UNIX__) || defined(POSIX)    \
+      || defined(__POSIX__) || defined(CYGWIN)
+# ifndef POSIX
+#  define POSIX
+# endif
+#endif
+
+#if defined(WINDOWS)
+# include <windows.h>
+#elif defined(POSIX)
+# include <unistd.h>
+# include <termios.h>
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/**
+ * \brief Read a password without character echoing.
+ * \note Input ends only when an EOF or LF character is encountered.
+ * \param prompt Password prompt, if NULL "Password: " is used. If empty ("")
+ * no prompt is used.
+ * \param buffer Somewhere to store the password. This will be made larger if
+ * necessary, although the enlargening operation will be slow. If NULL, the func
+tion fails.
+ * \param replacement Character to print instead of printing input characters.
+ * If this is '\0'; none is used.
+ * \return 0 on success or -1 on error.
+ */
+int getpassword(const char* prompt, char** buffer, unsigned* sz, char replacemen
+t);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* ! _GETPASSWORD_H */
+
+   getpassword.c
+   1
+   2
+   3
+   4
+   5
+   6
+   7
+   8
+   9
+   10
+   11
+   12
+   13
+   14
+   15
+   16
+   17
+   18
+   19
+   20
+   21
+   22
+   23
+   24
+   25
+   26
+   27
+   28
+   29
+   30
+   31
+   32
+   33
+   34
+   35
+   36
+   37
+   38
+   39
+   40
+   41
+   42
+   43
+   44
+   45
+   46
+   47
+   48
+   49
+   50
+   51
+   52
+   53
+   54
+   55
+   56
+   57
+   58
+   59
+   60
+   61
+   62
+   63
+   64
+   65
+   66
+   67
+   68
+   69
+   70
+   71
+   72
+   73
+   74
+   75
+   76
+   77
+   78
+   79
+   80
+   81
+   82
+   83
+   84
+   85
+   86
+   87
+   88
+   89
+   90
+   91
+   92
+   93
+   94
+   95
+   96
+   97
+#include "getpassword.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/**
+ * \brief Read a password without character echoing.
+ * \note Input ends only when an EOF or LF character is encountered.
+ * \param prompt Password prompt, if NULL "Password: " is used. If empty ("")
+ * no prompt is used.
+ * \param buffer Somewhere to store the password. This will be made larger if
+ * necessary, although the enlargening operation will be slow. If NULL, the func
+tion fails.
+ * \param replacement Character to print instead of printing input characters.
+ * If this is '\0'; none is used.
+ * \return 0 on success or -1 on error.
+ */
+int getpassword(const char* prompt, char** buffer, unsigned* sz, char replacemen
+t)
+{
+        if (!buffer)
+                return -1;
+
+        /*
+         * Decide what prompt to print, if any, and then print it
+         */
+        const char* default_prompt = "Password: ";
+        if (prompt != NULL) {
+                fprintf(stderr, "%s", prompt);
+        } else if (prompt != "") {
+                fprintf(stderr, "%s", default_prompt);
+        }
+
+        /*
+         * Disable character echoing and line buffering
+         */
+#if defined(WINDOWS)
+        HANDLE hstdin = GetStdHandle(STD_INPUT_HANDLE);
+        DWORD mode;
+
+        if (!GetConsoleMode(hstdin, &mode))
+                return -1;
+
+        if (hstdin == INVALID_HANDLE_VALUE || !(SetConsoleMode(hstdin, 0))
+                return -1; /* Failed to disable buffering */
+#elif defined(POSIX)
+        struct termios tty_attr;
+
+        if (tcgetattr(STDIN_FILENO, &tty_attr) < 0)
+                return -1;
+
+        const tcflag_t c_lflag = tty_attr.c_lflag; /* Allows us to restore this
+later */
+        tty_attr.c_lflag &= ~ICANON;
+        tty_attr.c_lflag &= ~ECHO;
+
+        if (tcsetattr(STDIN_FILENO, 0, &tty_attr) < 0)
+                return -1;
+#endif
+
+        int i = 0,
+            c = 0;
+        for (; (c = getchar()) != '\n' && c != EOF; ++i) {
+                /*
+                 * If the buffer gets too full, expand it
+                 */
+                if (i > *sz) {
+                        if (!realloc(*buffer, *sz))
+                                return -1;
+                        (*sz) += 1;
+                }
+
+                if (replacement)
+                        putchar(replacement);
+
+                (*buffer)[i] = c;
+        }
+
+        if (replacement)
+                putchar('\n');
+
+        /*
+         * Re-enable character echoing and line buffering
+         */
+#if defined(WINDOWS)
+        if (!SetConsoleMode(hstdin, mode))
+                return -1;
+#elif defined(POSIX)
+        tty_attr.c_lflag = c_lflag;
+
+        if (tcsetattr(STDIN_FILENO, 0, &tty_attr) < 0)
+                return -1;
+#endif
+        return 0;
+}
+
+#ifdef __cplusplus
+}
+#endif
+
+   main.c (just to show it working)
+   1
+   2
+   3
+   4
+   5
+   6
+   7
+   8
+   9
+   10
+   11
+   12
+   13
+   14
+   15
+   16
+   17
+   18
+   19
+   20
+   21
+   22
+   23
+   24
+   25
+   26
+   27
+#include "getpassword.h"
+
+#ifdef __cplusplus
+# include <cstdio>
+# include <cstdlib>
+# include <cstring>
+#else
+# include <stdio.h>
+# include <stdlib.h>
+# include <string.h>
+#endif
+
+#define BUFFERSIZE 4
+
+int main()
+{
+        const char* validpassword = "OpenSesame";
+        unsigned len = BUFFERSIZE;
+        char* buffer = (char*)calloc(len, 1);
+
+        getpassword("Password: ", &buffer, &len, '*');
+
+        printf("%s.\n", (strcmp(validpassword, buffer) == 0) ? "Accepted" : "Rej
+ected");
+
+        free(buffer);
+        return 0;
+}
+
+   It works a little like the C getline() function in that the buffer you
+   supply is expanded if necessary, although it might be slow to resize
+   the buffer for every character that is too large. This means that it's
+   safe from buffer overflow. It also has an advantage over getpass() in
+   that you can specify a character to print instead of just turning
+   character echoing off. It also works on Windows, but it isn't
+   completely portable - it won't work on just any system that happens to
+   have a working C library unless that library contains POSIX or Windows
+   API extensions. The code works with a C or C++ compiler.
+   I haven't tested the Windows code but it should work.
+   I got the Windows API code from here:
+   [24]http://www.cplusplus.com/forum/beginner/3329/#msg13776
+   Last edited on Feb 18, 2011 at 1:55pm UTC
+   This topic is archived - New replies not allowed.
+   [25]Home page | [26]Privacy policy
+   © cplusplus.com, 2000-2010 - All rights reserved - v2.3
+   [27]Spotted an error? contact us
+
+References
+
+   1. http://www.cplusplus.com/
+   2. http://www.cplusplus.com/
+   3. http://www.cplusplus.com/forum/
+   4. http://www.cplusplus.com/forum/unices/
+   5. http://www.cplusplus.com/
+   6. http://www.cplusplus.com/info/
+   7. http://www.cplusplus.com/doc/
+   8. http://www.cplusplus.com/reference/
+   9. http://www.cplusplus.com/articles/
+  10. http://www.cplusplus.com/src/
+  11. http://www.cplusplus.com/forum/
+  12. http://www.cplusplus.com/forum/
+  13. http://www.cplusplus.com/forum/beginner/
+  14. http://www.cplusplus.com/forum/windows/
+  15. http://www.cplusplus.com/forum/unices/
+  16. http://www.cplusplus.com/forum/general/
+  17. http://www.cplusplus.com/forum/articles/
+  18. http://www.cplusplus.com/forum/lounge/
+  19. http://www.cplusplus.com/forum/jobs/
+  20. http://www.cplusplus.com/member/unregistered/
+  21. http://www.cplusplus.com/forum/unices/27735/#msg148534
+  22. http://www.cplusplus.com/member/chrisname/
+  23. http://www.cplusplus.com/forum/unices/27735/#msg148555
+  24. http://www.cplusplus.com/forum/beginner/3329/#msg13776
+  25. http://www.cplusplus.com/
+  26. http://www.cplusplus.com/member/privacy.cgi
+  27. http://www.cplusplus.com/member/contact.form?referrer=http://www.cplusplus.com/forum/unices/27735/
