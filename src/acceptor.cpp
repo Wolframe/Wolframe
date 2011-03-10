@@ -134,19 +134,21 @@ SSLacceptor::SSLacceptor( boost::asio::io_service& IOservice,
 		exit( 1 );
 	}
 //		SSLcontext_->use_tmp_dh_file( "dh4096.pem" );
+
+	if ( ! CAchainFile.empty() )	{
+		if ( SSLcontext_.load_verify_file( CAchainFile, ec ) != 0 )	{
+			LOG_FATAL << ec.message() << " loading SSL CA chain file: " << CAchainFile;
+			exit( 1 );
+		}
+	}
+	if ( ! CAdirectory.empty() )	{
+		if ( SSLcontext_.add_verify_path( CAdirectory, ec ) != 0 )	{
+			LOG_FATAL << ec.message() << " setting CA directory: " << CAdirectory;
+			exit( 1 );
+		}
+	}
+
 	if ( verify )	{
-		if ( ! CAchainFile.empty() )	{
-			if ( SSLcontext_.load_verify_file( CAchainFile, ec ) != 0 )	{
-				LOG_FATAL << ec.message() << " loading SSL CA chain file: " << CAchainFile;
-				exit( 1 );
-			}
-		}
-		if ( ! CAdirectory.empty() )	{
-			if ( SSLcontext_.add_verify_path( CAdirectory, ec ) != 0 )	{
-				LOG_FATAL << ec.message() << " setting CA directory: " << CAdirectory;
-				exit( 1 );
-			}
-		}
 		if ( CAchainFile.empty() && CAdirectory.empty() )	{
 			LOG_FATAL << "Either a CA directory or a CA chain file is required";
 			exit( 1 );
@@ -156,7 +158,8 @@ SSLacceptor::SSLacceptor( boost::asio::io_service& IOservice,
 		LOG_DEBUG << "SSL client certificate verification set to VERIFY";
 	}
 	else	{
-		SSLcontext_.set_verify_mode( boost::asio::ssl::context::verify_none );
+//		SSLcontext_.set_verify_mode( boost::asio::ssl::context::verify_none );
+		SSLcontext_.set_verify_mode( boost::asio::ssl::context::verify_peer );
 		LOG_DEBUG << "SSL client certificate verification set to NONE";
 	}
 

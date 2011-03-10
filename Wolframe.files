@@ -195,3 +195,5 @@ include/SSLcertificateInfo.hpp
 src/SSLcertificateInfo.cpp
 src/serverEndpoint.cpp
 src/configService.cpp
+docs/wolframe.conf-man.xml
+docs/wolframed-man.xml
