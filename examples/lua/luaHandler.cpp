@@ -238,11 +238,11 @@ namespace _Wolframe {
 				lua_pushstring( l, rmt.SSLcertInfo()->issuer( ).c_str( ) );
 				lua_settable( l, top );
 				
-				lua_pushstring( l, "valid_from" );
+				lua_pushstring( l, "validFrom" );
 				lua_pushstring( l, boost::posix_time::to_simple_string( boost::posix_time::from_time_t( rmt.SSLcertInfo()->notBefore( ) ) ).c_str( ) );
 				lua_settable( l, top );
 
-				lua_pushstring( l, "valid_to" );
+				lua_pushstring( l, "validTo" );
 				lua_pushstring( l, boost::posix_time::to_simple_string( boost::posix_time::from_time_t( rmt.SSLcertInfo()->notAfter( ) ) ).c_str( ) );
 				lua_settable( l, top );				
 				
@@ -250,7 +250,7 @@ namespace _Wolframe {
 				lua_pushstring( l, rmt.SSLcertInfo( )->subject( ).c_str( ) );
 				lua_settable( l, top );				
 
-				lua_pushstring( l, "common_name" );
+				lua_pushstring( l, "commonName" );
 				lua_pushstring( l, rmt.SSLcertInfo( )->commonName( ).c_str( ) );
 				lua_settable( l, top );				
 			} else {

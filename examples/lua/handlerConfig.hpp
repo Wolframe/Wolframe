@@ -62,6 +62,10 @@ namespace _Wolframe {
 		{
 			luaConfig = new LuaConfiguration( "Lua Example Server" );
 		}
+
+		virtual ~HandlerConfiguration( ) {
+			delete luaConfig;
+		}
 	};
 
 
