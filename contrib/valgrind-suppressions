@@ -18,7 +18,6 @@
    Memcheck:Leak
    fun:malloc
    fun:getdelim
-   fun:getline
    fun:getpass
    fun:_ZN9_Wolframe14Authentication11getPasswordEv
    ...
