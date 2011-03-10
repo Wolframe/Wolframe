@@ -7,6 +7,7 @@
 #include <QByteArray>
 #include <QTcpSocket>
 #include <QFile>
+#include <QList>
 
 namespace _Wolframe {
 	namespace QtClient {
@@ -46,10 +47,10 @@ void WolframeClient::initializeSsl( )
 {
 	if( m_initializedSsl ) return;
 
-	reinterpret_cast<QSslSocket *>( m_socket )->addCaCertificate( 
-		getCertificate( "./CA.cert.pem" ) );
-	reinterpret_cast<QSslSocket *>( m_socket )->addCaCertificate(
-		getCertificate( "./CAclient.cert.pem" ) );
+	QList<QSslCertificate> certs;
+	certs.append( getCertificate( "./CA.cert.pem" ) );
+	certs.append( getCertificate( "./CAclient.cert.pem" ) );
+	reinterpret_cast<QSslSocket *>( m_socket )->addCaCertificates( certs );
 	reinterpret_cast<QSslSocket *>( m_socket )->setLocalCertificate(
 		getCertificate( "./client.crt" ) );
 	reinterpret_cast<QSslSocket *>( m_socket )->setPrivateKey( "./client.key" );
