@@ -36,14 +36,14 @@ namespace _Wolframe {
 			ServerConfiguration();
 
 			/// methods
-			bool parse( const boost::property_tree::ptree& pt, const std::string& node, std::ostream& os );
-			bool check( std::ostream& os ) const;
+			bool parse( const boost::property_tree::ptree& pt, const std::string& node );
+			bool check() const;
 			void print( std::ostream& os ) const;
 
 			void setCanonicalPathes( const std::string& referencePath );
 
 //			Not implemented yet, inherited from base for the time being
-//			bool test( std::ostream& os ) const;
+//			bool test() const;
 		};
 
 	} // namespace Network
@@ -71,12 +71,12 @@ namespace _Wolframe {
 		ServiceConfiguration();
 
 		/// methods
-		bool parse( const boost::property_tree::ptree& pt, const std::string& node, std::ostream& os );
-		bool check( std::ostream& os ) const;
+		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
+		bool check() const;
 		void print( std::ostream& os ) const;
 
 //			Not implemented yet, inherited from base for the time being
-//			bool test( std::ostream& os ) const;
+//			bool test() const;
 
 #if !defined( _WIN32 )
 		void setCanonicalPathes( const std::string& referencePath );
@@ -111,14 +111,14 @@ namespace _Wolframe {
 			LoggerConfiguration();
 
 			/// methods
-			bool parse( const boost::property_tree::ptree& pt, const std::string& node, std::ostream& os );
-			bool check( std::ostream& os ) const;
+			bool parse( const boost::property_tree::ptree& pt, const std::string& node );
+			bool check() const;
 			void print( std::ostream& os ) const;
 
 			void setCanonicalPathes( const std::string& referencePath );
 
 //			Not implemented yet, inherited from base for the time being
-//			bool test( std::ostream& os ) const;
+//			bool test() const;
 
 			void foreground( LogLevel::Level debugLevel, bool useConfig );
 		};
@@ -140,12 +140,12 @@ namespace _Wolframe {
 			DatabaseConfiguration();
 
 			/// methods
-			bool parse( const boost::property_tree::ptree& pt, const std::string& node, std::ostream& os );
-			bool check( std::ostream& os ) const;
+			bool parse( const boost::property_tree::ptree& pt, const std::string& node );
+			bool check() const;
 			void print( std::ostream& os ) const;
 
 //			Not implemented yet, inherited from base for the time being
-//			bool test( std::ostream& os ) const;
+//			bool test() const;
 		};
 
 	} // namespace Configuration

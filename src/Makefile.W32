@@ -54,7 +54,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	logBackend.obj \
 	configHelpers.obj \
 	configService.obj \
-	configServer.obj \
 	configLogger.obj \
 	configDatabase.obj \
 	appConfig.obj \
@@ -64,6 +63,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	SSLcertificateInfo.obj \
 	serverEndpoint.obj \
 	connection.obj \
+	serverConfig.obj \
 	server.obj \
 	authentication.obj \
 	authentication_textfile.obj

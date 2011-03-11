@@ -60,7 +60,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	logBackend.o \
 	configHelpers.o \
 	configService.o \
-	configServer.o \
 	configLogger.o \
 	configDatabase.o \
 	appConfig.o \
@@ -69,6 +68,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	getPassword.o \
 	serverEndpoint.o \
 	connection.o \
+	serverConfig.o \
 	server.o \
 	authentication.o \
 	authentication_textfile.o

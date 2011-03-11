@@ -5,6 +5,7 @@
 #include "standardConfigs.hpp"
 #include "configHelpers.hpp"
 #include "appProperties.hpp"
+#include "logger.hpp"
 
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
@@ -81,23 +82,23 @@ ServerConfiguration::ServerConfiguration()
 
 	/// Check if the server configuration makes sense
 #ifdef WITH_SSL
-	bool ServerConfiguration::check( std::ostream& os ) const
+	bool ServerConfiguration::check() const
 	{
 		bool correct = true;
 		for ( std::list<Network::ServerSSLendpoint>::const_iterator it = SSLaddress.begin();
 										it != SSLaddress.end(); ++it )	{
 			// if it listens to SSL a certificate file and a key file are required
 			if ( it->certificate().empty() )	{
-				os << "No SSL certificate specified for " << it->toString() << std::endl;
+				LOG_ERROR << "No SSL certificate specified for " << it->toString() << std::endl;
 				correct = false;
 			}
 			if ( it->key().empty() )	{
-				os << "No SSL key specified for " << it->toString() << std::endl;
+				LOG_ERROR << "No SSL key specified for " << it->toString() << std::endl;
 				correct = false;
 			}
 			// verify client SSL certificate needs either certificate dir or chain file
 			if ( it->verifyClientCert() && it->CAdirectory().empty() && it->CAchain().empty() )	{
-				os << "Client SSL certificate verification requested but no CA "
+				LOG_ERROR << "Client SSL certificate verification requested but no CA "
 				      "directory or CA chain file specified for "
 				   << it->toString() << std::endl;
 				correct = false;
@@ -106,7 +107,7 @@ ServerConfiguration::ServerConfiguration()
 		return correct;
 	}
 #else
-	bool ServerConfiguration::check( std::ostream& /* os */ ) const
+	bool ServerConfiguration::check() const
 	{
 		return true;
 	}
@@ -114,7 +115,7 @@ ServerConfiguration::ServerConfiguration()
 
 
 /// Parse the configuration
-bool ServerConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& /* node */, std::ostream& os )
+bool ServerConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& /* node */ )
 {
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "threads" ))	{
@@ -148,7 +149,7 @@ bool ServerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 						return false;
 				}
 				else	{
-					os << displayName() << ": socket: unknown configuration option: <" << L2it->first << ">";
+					LOG_ERROR << displayName() << ": socket: unknown configuration option: <" << L2it->first << ">";
 					return false;
 				}
 			}
@@ -218,7 +219,7 @@ bool ServerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 						return false;
 				}
 				else	{
-					os << displayName() << ": SSLsocket: unknown configuration option: <"
+					LOG_ERROR << displayName() << ": SSLsocket: unknown configuration option: <"
 							    << L2it->first << ">";
 					return false;
 				}
@@ -234,8 +235,8 @@ bool ServerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 #endif // WITH_SSL
 		}
 		else	{
-			os << displayName() << ": unknown configuration option: <" << L1it->first << ">";
-			return false;
+			LOG_WARNING << displayName() << ": unknown configuration option: <" << L1it->first << ">";
+//			return false;
 		}
 	}
 	return true;

@@ -5,6 +5,7 @@
 #include "standardConfigs.hpp"
 #include "configHelpers.hpp"
 #include "appProperties.hpp"
+#include "logger.hpp"
 
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
@@ -47,18 +48,18 @@ namespace _Wolframe	{
 
 
 	/// Check if the server configuration makes sense
-	bool ServiceConfiguration::check( std::ostream& /* os */ ) const
+	bool ServiceConfiguration::check() const
 	{
 		return true;
 	}
 
 
 /// Parse the configuration
-bool ServiceConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& node, std::ostream& os )
+bool ServiceConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& node )
 {
 #if defined(_WIN32)
 	if ( boost::algorithm::iequals( node, "daemon" ))	{
-		os << "WARNING: daemon: section is not valid on Windows" << std::endl;
+		LOG_WARNING << "daemon: section is not valid on Windows" << std::endl;
 	}
 #else // #if defined(_WIN32)
 	if ( boost::algorithm::iequals( node, "daemon" ))	{
@@ -75,12 +76,12 @@ bool ServiceConfiguration::parse( const boost::property_tree::ptree& pt, const s
 				if ( ! getStringValue( it, displayName(), "pidFile", pidFile, os ))
 					return false;
 				if ( ! boost::filesystem::path( pidFile ).is_absolute() )
-					os << "WARNING: " << displayName() << ": pid file path is not absolute: "
+					LOG_WARNING << displayName() << ": pid file path is not absolute: "
 									   << pidFile << std::endl;
 			}
 			else	{
-				os << displayName() << ": unknown configuration option: <" << it->first << ">";
-				return false;
+				LOG_WARNING << displayName() << ": unknown configuration option: <" << it->first << ">";
+//				return false;
 			}
 		}
 	}
@@ -105,8 +106,8 @@ bool ServiceConfiguration::parse( const boost::property_tree::ptree& pt, const s
 					return false;
 			}
 			else	{
-				os << displayName() << ": unknown configuration option: <" << it->first << ">";
-				return false;
+				LOG_WARNING << displayName() << ": unknown configuration option: <" << it->first << ">";
+//				return false;
 			}
 		}
 		if ( serviceName.empty() )
@@ -118,8 +119,8 @@ bool ServiceConfiguration::parse( const boost::property_tree::ptree& pt, const s
 	}
 #endif
 	else	{
-		os << displayName() << ": unknown configuration option: <" << node << ">";
-		return false;
+		LOG_WARNING << displayName() << ": unknown configuration option: <" << node << ">";
+//		return false;
 	}
 	return true;
 }

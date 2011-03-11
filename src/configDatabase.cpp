@@ -5,6 +5,7 @@
 
 #include "standardConfigs.hpp"
 #include "configHelpers.hpp"
+#include "logger.hpp"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/algorithm/string.hpp>
@@ -42,10 +43,10 @@ void DatabaseConfiguration::print( std::ostream& os ) const
 
 
 /// Check if the database configuration makes sense
-bool DatabaseConfiguration::check( std::ostream& os ) const
+bool DatabaseConfiguration::check() const
 {
 	if ( connections == 0 )	{
-		os << "Invalid number of connections: " << connections;
+		LOG_ERROR << "Invalid number of connections: " << connections;
 		return false;
 	}
 	return true;
@@ -79,8 +80,8 @@ bool DatabaseConfiguration::parse( const boost::property_tree::ptree& pt, const 
 												return false;
 		}
 		else	{
-			os << displayName() << ": unknown configuration option: <" << it->first << ">";
-			return false;
+			LOG_WARNING << displayName() << ": unknown configuration option: <" << it->first << ">";
+//			return false;
 		}
 	}
 	if ( connections == 0 )
