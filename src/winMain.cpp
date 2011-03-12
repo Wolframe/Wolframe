@@ -223,7 +223,6 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 
 		_Wolframe::Configuration::ApplicationConfiguration config;
 		if ( !config.parse( configFile ))	// there was an error parsing the configuration file
-			LOG_FATAL << errMsg.str();
 			return;
 // configuration file has been parsed successfully
 // build the final configuration
