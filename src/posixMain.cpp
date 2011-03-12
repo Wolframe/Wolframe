@@ -147,14 +147,14 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 			if( boost::filesystem::exists( config.serviceConf->pidFile ) ) {
 				boost::interprocess::file_lock lock( config.serviceConf->pidFile.c_str( ) );
 				if( lock.try_lock( ) ) {
-					std::cerr << "Pidfile is locked, another daemon running?" << std::endl;
+					LOG_ERROR << "Pidfile is locked, another daemon running?";
 					return _Wolframe::ErrorCodes::FAILURE;
 				}
 			}
 
 			// daemonize, lose process group, terminal output, etc.
 			if( daemon( 0, 0 ) ) {
-				std::cerr << "Daemonizing server failed" << std::endl;
+				LOG_CRITICAL << "Daemonizing server failed";
 				return _Wolframe::ErrorCodes::FAILURE;
 			}
 
