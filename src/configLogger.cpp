@@ -25,21 +25,21 @@ LoggerConfiguration::LoggerConfiguration()
 	: ConfigurationBase( "Logging" )
 {
 	logToStderr = false;
-	stderrLogLevel = LogLevel::LOGLEVEL_UNDEFINED;
+	stderrLogLevel = Logging::LogLevel::LOGLEVEL_UNDEFINED;
 	logToFile = false;
 	// std::string		logFile;
-	logFileLogLevel = LogLevel::LOGLEVEL_UNDEFINED;
+	logFileLogLevel = Logging::LogLevel::LOGLEVEL_UNDEFINED;
 	// std::string		logFileIdent;
 #if !defined( _WIN32 )
 	logToSyslog = false;
-	syslogFacility = SyslogFacility::_Wolframe_SYSLOG_FACILITY_UNDEFINED;
-	syslogLogLevel = LogLevel::LOGLEVEL_UNDEFINED;
+	syslogFacility = Logging::SyslogFacility::WOLFRAME_SYSLOG_FACILITY_UNDEFINED;
+	syslogLogLevel = Logging::LogLevel::LOGLEVEL_UNDEFINED;
 	// std::string		syslogIdent;
 #else
 	logToEventlog = false;
 	// std::string		eventlogLogName;
 	// std::string		eventlogSource;
-	eventlogLogLevel = LogLevel::LOGLEVEL_UNDEFINED;
+	eventlogLogLevel = Logging::LogLevel::LOGLEVEL_UNDEFINED;
 #endif // !defined( _WIN32 )
 }
 
@@ -85,21 +85,21 @@ bool LoggerConfiguration::check() const
 
 
 /// Modify the logging parameters according to the command line
-void LoggerConfiguration::foreground( LogLevel::Level debugLevel, bool useConfig )
+void LoggerConfiguration::foreground( Logging::LogLevel::Level debugLevel, bool useConfig )
 {
 	logToStderr = true;
-	if ( debugLevel != LogLevel::LOGLEVEL_UNDEFINED )
+	if ( debugLevel != Logging::LogLevel::LOGLEVEL_UNDEFINED )
 		stderrLogLevel = debugLevel;
 
 	if ( ! useConfig )	{
 		logToFile = false;
 		logFile.clear();
-		logFileLogLevel = LogLevel::LOGLEVEL_UNDEFINED;
+		logFileLogLevel = Logging::LogLevel::LOGLEVEL_UNDEFINED;
 		logFileIdent.clear();
 #if !defined( _WIN32 )
 		logToSyslog = false;
-		syslogFacility = SyslogFacility::_Wolframe_SYSLOG_FACILITY_UNDEFINED;
-		syslogLogLevel = LogLevel::LOGLEVEL_UNDEFINED;
+		syslogFacility = Logging::SyslogFacility::WOLFRAME_SYSLOG_FACILITY_UNDEFINED;
+		syslogLogLevel = Logging::LogLevel::LOGLEVEL_UNDEFINED;
 		syslogIdent.clear();
 #endif // !defined( _WIN32 )
 	}
@@ -116,17 +116,17 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 				return false;
 			}
 			logToStderr = true;
-			stderrLogLevel = LogLevel::LOGLEVEL_UNDEFINED;
+			stderrLogLevel = Logging::LogLevel::LOGLEVEL_UNDEFINED;
 			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
 									L2it != L1it->second.end(); L2it++ )	{
 				if ( boost::algorithm::iequals( L2it->first, "level" ))	{
-					LogLevel::Level lvl = LogLevel::str2LogLevel( L2it->second.get_value<std::string>() );
-					if ( lvl ==  LogLevel::LOGLEVEL_UNDEFINED )	{
+					Logging::LogLevel::Level lvl = Logging::LogLevel::str2LogLevel( L2it->second.get_value<std::string>() );
+					if ( lvl ==  Logging::LogLevel::LOGLEVEL_UNDEFINED )	{
 						LOG_ERROR << displayName() << ": unknown log level: "
 								<< L2it->second.get_value<std::string>();
 						return false;
 					}
-					if ( stderrLogLevel != LogLevel::LOGLEVEL_UNDEFINED )	{
+					if ( stderrLogLevel != Logging::LogLevel::LOGLEVEL_UNDEFINED )	{
 						LOG_ERROR << displayName() << ": stderr log level already defined. Second value: "
 								<< L2it->second.get_value<std::string>();
 						return false;
@@ -148,17 +148,17 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 				return false;
 			}
 			logToFile = true;
-			logFileLogLevel = LogLevel::LOGLEVEL_UNDEFINED;
+			logFileLogLevel = Logging::LogLevel::LOGLEVEL_UNDEFINED;
 			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
 			L2it != L1it->second.end(); L2it++ )	{
 				if ( boost::algorithm::iequals( L2it->first, "level" ))	{
-					LogLevel::Level lvl = LogLevel::str2LogLevel( L2it->second.get_value<std::string>() );
-					if ( lvl == LogLevel::LOGLEVEL_UNDEFINED )	{
+					Logging::LogLevel::Level lvl = Logging::LogLevel::str2LogLevel( L2it->second.get_value<std::string>() );
+					if ( lvl == Logging::LogLevel::LOGLEVEL_UNDEFINED )	{
 						LOG_ERROR << displayName() << ": logfile: unknown log level: "
 								<< L2it->second.get_value<std::string>();
 						return false;
 					}
-					if ( logFileLogLevel != LogLevel::LOGLEVEL_UNDEFINED )	{
+					if ( logFileLogLevel != Logging::LogLevel::LOGLEVEL_UNDEFINED )	{
 						LOG_ERROR << displayName() << ": logfile: log level already defined. Second value: "
 								<< L2it->second.get_value<std::string>();
 						return false;
@@ -201,17 +201,17 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 				return false;
 			}
 			logToSyslog = true;
-			syslogLogLevel = LogLevel::LOGLEVEL_UNDEFINED;
+			syslogLogLevel = Logging::LogLevel::LOGLEVEL_UNDEFINED;
 			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
 			L2it != L1it->second.end(); L2it++ )	{
 				if ( boost::algorithm::iequals( L2it->first, "level" ))	{
-					LogLevel::Level lvl = LogLevel::str2LogLevel( L2it->second.get_value<std::string>() );
-					if ( lvl == LogLevel::LOGLEVEL_UNDEFINED )	{
+					Logging::LogLevel::Level lvl = Logging::LogLevel::str2LogLevel( L2it->second.get_value<std::string>() );
+					if ( lvl == Logging::LogLevel::LOGLEVEL_UNDEFINED )	{
 						LOG_ERROR << displayName() << ": syslog: unknown log level: "
 								<< L2it->second.get_value<std::string>();
 						return false;
 					}
-					if ( syslogLogLevel != LogLevel::LOGLEVEL_UNDEFINED )	{
+					if ( syslogLogLevel != Logging::LogLevel::LOGLEVEL_UNDEFINED )	{
 						LOG_ERROR << displayName() << ": syslog: log level already defined. Second value: "
 								<< L2it->second.get_value<std::string>();
 						return false;
@@ -219,13 +219,13 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 					syslogLogLevel = lvl;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "facility" ))	{
-					SyslogFacility::Facility fclt = SyslogFacility::str2SyslogFacility( L2it->second.get_value<std::string>() );
-					if ( fclt == SyslogFacility::_Wolframe_SYSLOG_FACILITY_UNDEFINED )	{
+					Logging::SyslogFacility::Facility fclt = Logging::SyslogFacility::str2SyslogFacility( L2it->second.get_value<std::string>() );
+					if ( fclt == Logging::SyslogFacility::WOLFRAME_SYSLOG_FACILITY_UNDEFINED )	{
 						LOG_ERROR << displayName() << ": syslog: unknown facility: "
 								<< L2it->second.get_value<std::string>();
 						return false;
 					}
-					if ( syslogFacility != SyslogFacility::_Wolframe_SYSLOG_FACILITY_UNDEFINED )	{
+					if ( syslogFacility != Logging::SyslogFacility::WOLFRAME_SYSLOG_FACILITY_UNDEFINED )	{
 						LOG_ERROR << displayName() << ": syslog: facility already defined. Second value: "
 								<< L2it->second.get_value<std::string>();
 						return false;
@@ -266,17 +266,17 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 				return false;
 			}
 			logToEventlog = true;
-			eventlogLogLevel = LogLevel::LOGLEVEL_UNDEFINED;
+			eventlogLogLevel = Logging::LogLevel::LOGLEVEL_UNDEFINED;
 			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
 			L2it != L1it->second.end(); L2it++ )	{
 				if ( boost::algorithm::iequals( L2it->first, "level" ))	{
-					LogLevel::Level lvl = LogLevel::str2LogLevel( L2it->second.get_value<std::string>() );
-					if ( lvl == LogLevel::LOGLEVEL_UNDEFINED )	{
+					Logging::LogLevel::Level lvl = Logging::LogLevel::str2LogLevel( L2it->second.get_value<std::string>() );
+					if ( lvl == Logging::LogLevel::LOGLEVEL_UNDEFINED )	{
 						LOG_ERROR << displayName() << ": eventlog: unknown log level: "
 								<< L2it->second.get_value<std::string>();
 						return false;
 					}
-					if ( eventlogLogLevel != LogLevel::LOGLEVEL_UNDEFINED )	{
+					if ( eventlogLogLevel != Logging::LogLevel::LOGLEVEL_UNDEFINED )	{
 						LOG_ERROR << displayName() << ": eventlog: log level already defined. Second value: "
 								<< L2it->second.get_value<std::string>();
 						return false;

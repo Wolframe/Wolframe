@@ -8,40 +8,40 @@
 #include <iostream>
 
 namespace _Wolframe {
+	namespace Logging {
 
 	class SyslogFacility {
 	public:
 		enum Facility	{
-			_Wolframe_SYSLOG_FACILITY_KERN,		/// kernel messages
-			_Wolframe_SYSLOG_FACILITY_USER,		/// random user-level messages
-			_Wolframe_SYSLOG_FACILITY_MAIL,		/// mail system
-			_Wolframe_SYSLOG_FACILITY_DAEMON,		/// system daemons
-			_Wolframe_SYSLOG_FACILITY_AUTH,		/// security/authorization messages
-			_Wolframe_SYSLOG_FACILITY_SYSLOG,		/// messages generated internally by syslog
-			_Wolframe_SYSLOG_FACILITY_LPR,		/// line printer subsystem
-			_Wolframe_SYSLOG_FACILITY_NEWS,		/// network news subsystem
-			_Wolframe_SYSLOG_FACILITY_UUCP,		/// UUCP subsystem
-			_Wolframe_SYSLOG_FACILITY_CRON,		/// cron/at daemons
-			_Wolframe_SYSLOG_FACILITY_AUTHPRIV,	/// security/authorization messages
-			_Wolframe_SYSLOG_FACILITY_FTP,		/// FTP daemon
-			_Wolframe_SYSLOG_FACILITY_NTP,		/// NTP daemon (on FreeBSD)
-			_Wolframe_SYSLOG_FACILITY_SECURITY,	/// security subsystem (on FreeBSD)
-			_Wolframe_SYSLOG_FACILITY_CONSOLE,		/// /dev/console output (on FreeBSD)
-			_Wolframe_SYSLOG_FACILITY_AUDIT,		/// audit (on Solaris 10)
-			_Wolframe_SYSLOG_FACILITY_LOCAL0,		/// local facility 0
-			_Wolframe_SYSLOG_FACILITY_LOCAL1,		/// local facility 1
-			_Wolframe_SYSLOG_FACILITY_LOCAL2,		/// local facility 2
-			_Wolframe_SYSLOG_FACILITY_LOCAL3,		/// local facility 3
-			_Wolframe_SYSLOG_FACILITY_LOCAL4,		/// local facility 4
-			_Wolframe_SYSLOG_FACILITY_LOCAL5,		/// local facility 5
-			_Wolframe_SYSLOG_FACILITY_LOCAL6,		/// local facility 6
-			_Wolframe_SYSLOG_FACILITY_LOCAL7,		/// local facility 7
-			_Wolframe_SYSLOG_FACILITY_UNDEFINED	/// placeholder
+			WOLFRAME_SYSLOG_FACILITY_KERN,		/// kernel messages
+			WOLFRAME_SYSLOG_FACILITY_USER,		/// random user-level messages
+			WOLFRAME_SYSLOG_FACILITY_MAIL,		/// mail system
+			WOLFRAME_SYSLOG_FACILITY_DAEMON,	/// system daemons
+			WOLFRAME_SYSLOG_FACILITY_AUTH,		/// security/authorization messages
+			WOLFRAME_SYSLOG_FACILITY_SYSLOG,	/// messages generated internally by syslog
+			WOLFRAME_SYSLOG_FACILITY_LPR,		/// line printer subsystem
+			WOLFRAME_SYSLOG_FACILITY_NEWS,		/// network news subsystem
+			WOLFRAME_SYSLOG_FACILITY_UUCP,		/// UUCP subsystem
+			WOLFRAME_SYSLOG_FACILITY_CRON,		/// cron/at daemons
+			WOLFRAME_SYSLOG_FACILITY_AUTHPRIV,	/// security/authorization messages
+			WOLFRAME_SYSLOG_FACILITY_FTP,		/// FTP daemon
+			WOLFRAME_SYSLOG_FACILITY_NTP,		/// NTP daemon (on FreeBSD)
+			WOLFRAME_SYSLOG_FACILITY_SECURITY,	/// security subsystem (on FreeBSD)
+			WOLFRAME_SYSLOG_FACILITY_CONSOLE,	/// /dev/console output (on FreeBSD)
+			WOLFRAME_SYSLOG_FACILITY_AUDIT,		/// audit (on Solaris 10)
+			WOLFRAME_SYSLOG_FACILITY_LOCAL0,	/// local facility 0
+			WOLFRAME_SYSLOG_FACILITY_LOCAL1,	/// local facility 1
+			WOLFRAME_SYSLOG_FACILITY_LOCAL2,	/// local facility 2
+			WOLFRAME_SYSLOG_FACILITY_LOCAL3,	/// local facility 3
+			WOLFRAME_SYSLOG_FACILITY_LOCAL4,	/// local facility 4
+			WOLFRAME_SYSLOG_FACILITY_LOCAL5,	/// local facility 5
+			WOLFRAME_SYSLOG_FACILITY_LOCAL6,	/// local facility 6
+			WOLFRAME_SYSLOG_FACILITY_LOCAL7,	/// local facility 7
+			WOLFRAME_SYSLOG_FACILITY_UNDEFINED	/// placeholder
 		};
 
 		static Facility str2SyslogFacility( const std::string str );
 	};
-
 
 	// map enum values to strings
 	template< typename CharT, typename TraitsT >
@@ -61,6 +61,7 @@ namespace _Wolframe {
 		return s;
 	}
 
+	} // namespace Logging
 } // namespace _Wolframe
 
 

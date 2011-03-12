@@ -89,22 +89,22 @@ namespace _Wolframe {
 		{
 		public:
 			bool			logToStderr;
-			LogLevel::Level		stderrLogLevel;
+			Logging::LogLevel::Level		stderrLogLevel;
 
 			bool			logToFile;
 			std::string		logFile;
-			LogLevel::Level		logFileLogLevel;
+			Logging::LogLevel::Level		logFileLogLevel;
 			std::string		logFileIdent;
 #if !defined( _WIN32 )
 			bool			logToSyslog;
-			SyslogFacility::Facility syslogFacility;
-			LogLevel::Level		syslogLogLevel;
+			Logging::SyslogFacility::Facility syslogFacility;
+			Logging::LogLevel::Level		syslogLogLevel;
 			std::string		syslogIdent;
 #else
 			bool			logToEventlog;
 			std::string		eventlogLogName;
 			std::string		eventlogSource;
-			LogLevel::Level		eventlogLogLevel;
+			Logging::LogLevel::Level		eventlogLogLevel;
 #endif // !defined( _WIN32 )
 
 			/// constructor
@@ -120,7 +120,7 @@ namespace _Wolframe {
 //			Not implemented yet, inherited from base for the time being
 //			bool test() const;
 
-			void foreground( LogLevel::Level debugLevel, bool useConfig );
+			void foreground( Logging::LogLevel::Level debugLevel, bool useConfig );
 		};
 
 

@@ -76,9 +76,9 @@ namespace _Wolframe {
 			}
 		}
 
-		_Wolframe::Logger( _Wolframe::LogBackend::instance() ).Get(
-			_Wolframe::LogComponent::LOGCOMPONENT_LUA,
-			_Wolframe::LogLevel::str2LogLevel( logLevel ) ) << os.str( );
+		_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get(
+			_Wolframe::Logging::LogComponent::LOGCOMPONENT_LUA,
+			_Wolframe::Logging::LogLevel::str2LogLevel( logLevel ) ) << os.str( );
 
 		lua_pop( _l, n );
 

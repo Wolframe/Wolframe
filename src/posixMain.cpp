@@ -45,15 +45,15 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 {
 // i18n global stuff
 	if ( setlocale( LC_ALL, "" ) == NULL )	{
-		std::cerr << "Unable to set locale. Falling back to default." << std::endl;
+		LOG_ERROR << "Unable to set locale. Falling back to default.";
 	}
 	else	{
 		if ( bindtextdomain( "Wolframe", "../po" ) == NULL )	{
-			std::cerr << "Not enough memory to bind textdomain" << std::endl;
+			LOG_FATAL << "Not enough memory to bind textdomain";
 			return _Wolframe::ErrorCodes::FAILURE;
 		}
 		if ( textdomain( "Wolframe" ) == NULL )	{
-			std::cerr << "Not enough memory to set textdomain" << std::endl;
+			LOG_FATAL << "Not enough memory to set textdomain";
 			return _Wolframe::ErrorCodes::FAILURE;
 		}
 	}
@@ -68,7 +68,7 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 		const char *configFile;
 
 		if ( !cmdLineCfg.parse( argc, argv ))	{	// there was an error parsing the command line
-			std::cerr << cmdLineCfg.errMsg() << std::endl << std::endl;
+			LOG_ERROR << cmdLineCfg.errMsg() << std::endl;
 			cmdLineCfg.usage( std::cerr );
 			std::cerr << std::endl;
 			return _Wolframe::ErrorCodes::FAILURE;
@@ -76,7 +76,7 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 // command line has been parsed successfully
 // if cmdLineCfg.errMsg() is not empty than we have a warning
 		if ( !cmdLineCfg.errMsg().empty() )	// there was a warning parsing the command line
-			std::cerr << "BOO:" << cmdLineCfg.errMsg() << std::endl << std::endl;
+			LOG_ERROR << cmdLineCfg.errMsg();
 
 // if we have to print the version or the help do it and exit
 		if ( cmdLineCfg.command == _Wolframe::Configuration::CmdLineConfig::PRINT_VERSION )	{
@@ -100,7 +100,7 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 												  _Wolframe::Configuration::defaultUserConfig(),
 												  _Wolframe::Configuration::defaultLocalConfig() );
 		if ( configFile == NULL )	{	// there is no configuration file
-			std::cerr << gettext ( "MOMOMO: no configuration file found !" ) << std::endl << std::endl;
+			LOG_FATAL << gettext ( "no configuration file found !" );
 			return _Wolframe::ErrorCodes::FAILURE;
 		}
 
@@ -114,7 +114,7 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 		config.finalize( cmdLineCfg );
 
 // now here we know where to log to on stderr
-		_Wolframe::LogBackend::instance().setConsoleLevel( config.loggerConf->stderrLogLevel );
+		_Wolframe::Logging::LogBackend::instance().setConsoleLevel( config.loggerConf->stderrLogLevel );
 
 // Check the configuration
 		if ( cmdLineCfg.command == _Wolframe::Configuration::CmdLineConfig::CHECK_CONFIG )	{
@@ -161,9 +161,9 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 			// now here we lost constrol over the console, we should
 			// create a temporary logger which at least tells what's
 			// going on in the syslog
-			_Wolframe::LogBackend::instance().setSyslogLevel( config.loggerConf->syslogLogLevel );
-			_Wolframe::LogBackend::instance().setSyslogFacility( config.loggerConf->syslogFacility );
-			_Wolframe::LogBackend::instance().setSyslogIdent( config.loggerConf->syslogIdent );
+			_Wolframe::Logging::LogBackend::instance().setSyslogLevel( config.loggerConf->syslogLogLevel );
+			_Wolframe::Logging::LogBackend::instance().setSyslogFacility( config.loggerConf->syslogFacility );
+			_Wolframe::Logging::LogBackend::instance().setSyslogIdent( config.loggerConf->syslogIdent );
 
 			// if we are root we can drop privileges now
 			struct group *groupent;
@@ -197,8 +197,8 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 
 			// Create the final logger based on the configuration
 			// file logger only here to get the right permissions
-			_Wolframe::LogBackend::instance().setLogfileLevel( config.loggerConf->logFileLogLevel );
-			_Wolframe::LogBackend::instance().setLogfileName( config.loggerConf->logFile );
+			_Wolframe::Logging::LogBackend::instance().setLogfileLevel( config.loggerConf->logFileLogLevel );
+			_Wolframe::Logging::LogBackend::instance().setLogfileName( config.loggerConf->logFile );
 		}
 
 		// Block all signals for background thread.

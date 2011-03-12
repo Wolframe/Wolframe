@@ -16,6 +16,7 @@
 
 
 namespace _Wolframe {
+	namespace Logging {
 
 	class LogBackend : public Singleton< LogBackend >
 	{
@@ -74,32 +75,33 @@ namespace _Wolframe {
 		Logger& operator= ( const Logger& );
 	};
 
+	} // namespace Logging
 } // namespace _Wolframe
 
 
 // shortcut macros
-#define LOG_DATA	_Wolframe::Logger( _Wolframe::LogBackend::instance() ).Get( _Wolframe::LogComponent::LOGCOMPONENT_NONE, _Wolframe::LogLevel::LOGLEVEL_DATA )
-#define LOG_TRACE	_Wolframe::Logger( _Wolframe::LogBackend::instance() ).Get( _Wolframe::LogComponent::LOGCOMPONENT_NONE, _Wolframe::LogLevel::LOGLEVEL_TRACE )
-#define LOG_DEBUG	_Wolframe::Logger( _Wolframe::LogBackend::instance() ).Get( _Wolframe::LogComponent::LOGCOMPONENT_NONE, _Wolframe::LogLevel::LOGLEVEL_DEBUG )
-#define LOG_INFO	_Wolframe::Logger( _Wolframe::LogBackend::instance() ).Get( _Wolframe::LogComponent::LOGCOMPONENT_NONE, _Wolframe::LogLevel::LOGLEVEL_INFO )
-#define LOG_NOTICE	_Wolframe::Logger( _Wolframe::LogBackend::instance() ).Get( _Wolframe::LogComponent::LOGCOMPONENT_NONE, _Wolframe::LogLevel::LOGLEVEL_NOTICE )
-#define LOG_WARNING	_Wolframe::Logger( _Wolframe::LogBackend::instance() ).Get( _Wolframe::LogComponent::LOGCOMPONENT_NONE, _Wolframe::LogLevel::LOGLEVEL_WARNING )
-#define LOG_ERROR	_Wolframe::Logger( _Wolframe::LogBackend::instance() ).Get( _Wolframe::LogComponent::LOGCOMPONENT_NONE, _Wolframe::LogLevel::LOGLEVEL_ERROR )
-#define LOG_SEVERE	_Wolframe::Logger( _Wolframe::LogBackend::instance() ).Get( _Wolframe::LogComponent::LOGCOMPONENT_NONE, _Wolframe::LogLevel::LOGLEVEL_SEVERE )
-#define LOG_CRITICAL	_Wolframe::Logger( _Wolframe::LogBackend::instance() ).Get( _Wolframe::LogComponent::LOGCOMPONENT_NONE, _Wolframe::LogLevel::LOGLEVEL_CRITICAL )
-#define LOG_ALERT	_Wolframe::Logger( _Wolframe::LogBackend::instance() ).Get( _Wolframe::LogComponent::LOGCOMPONENT_NONE, _Wolframe::LogLevel::LOGLEVEL_ALERT )
-#define LOG_FATAL	_Wolframe::Logger( _Wolframe::LogBackend::instance() ).Get( _Wolframe::LogComponent::LOGCOMPONENT_NONE, _Wolframe::LogLevel::LOGLEVEL_FATAL )
+#define LOG_DATA	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogComponent::LOGCOMPONENT_NONE, _Wolframe::Logging::LogLevel::LOGLEVEL_DATA )
+#define LOG_TRACE	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogComponent::LOGCOMPONENT_NONE, _Wolframe::Logging::LogLevel::LOGLEVEL_TRACE )
+#define LOG_DEBUG	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogComponent::LOGCOMPONENT_NONE, _Wolframe::Logging::LogLevel::LOGLEVEL_DEBUG )
+#define LOG_INFO	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogComponent::LOGCOMPONENT_NONE, _Wolframe::Logging::LogLevel::LOGLEVEL_INFO )
+#define LOG_NOTICE	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogComponent::LOGCOMPONENT_NONE, _Wolframe::Logging::LogLevel::LOGLEVEL_NOTICE )
+#define LOG_WARNING	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogComponent::LOGCOMPONENT_NONE, _Wolframe::Logging::LogLevel::LOGLEVEL_WARNING )
+#define LOG_ERROR	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogComponent::LOGCOMPONENT_NONE, _Wolframe::Logging::LogLevel::LOGLEVEL_ERROR )
+#define LOG_SEVERE	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogComponent::LOGCOMPONENT_NONE, _Wolframe::Logging::LogLevel::LOGLEVEL_SEVERE )
+#define LOG_CRITICAL	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogComponent::LOGCOMPONENT_NONE, _Wolframe::Logging::LogLevel::LOGLEVEL_CRITICAL )
+#define LOG_ALERT	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogComponent::LOGCOMPONENT_NONE, _Wolframe::Logging::LogLevel::LOGLEVEL_ALERT )
+#define LOG_FATAL	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogComponent::LOGCOMPONENT_NONE, _Wolframe::Logging::LogLevel::LOGLEVEL_FATAL )
 
-#define LOG_NETWORK_DATA	_Wolframe::Logger( _Wolframe::LogBackend::instance() ).Get( _Wolframe::LogComponent::LOGCOMPONENT_NETWORK, _Wolframe::LogLevel::LOGLEVEL_DATA )
-#define LOG_NETWORK_TRACE	_Wolframe::Logger( _Wolframe::LogBackend::instance() ).Get( _Wolframe::LogComponent::LOGCOMPONENT_NETWORK, _Wolframe::LogLevel::LOGLEVEL_TRACE )
-#define LOG_NETWORK_DEBUG	_Wolframe::Logger( _Wolframe::LogBackend::instance() ).Get( _Wolframe::LogComponent::LOGCOMPONENT_NETWORK, _Wolframe::LogLevel::LOGLEVEL_DEBUG )
-#define LOG_NETWORK_INFO	_Wolframe::Logger( _Wolframe::LogBackend::instance() ).Get( _Wolframe::LogComponent::LOGCOMPONENT_NETWORK, _Wolframe::LogLevel::LOGLEVEL_INFO )
-#define LOG_NETWORK_NOTICE	_Wolframe::Logger( _Wolframe::LogBackend::instance() ).Get( _Wolframe::LogComponent::LOGCOMPONENT_NETWORK, _Wolframe::LogLevel::LOGLEVEL_NOTICE )
-#define LOG_NETWORK_WARNING	_Wolframe::Logger( _Wolframe::LogBackend::instance() ).Get( _Wolframe::LogComponent::LOGCOMPONENT_NETWORK, _Wolframe::LogLevel::LOGLEVEL_WARNING )
-#define LOG_NETWORK_ERROR	_Wolframe::Logger( _Wolframe::LogBackend::instance() ).Get( _Wolframe::LogComponent::LOGCOMPONENT_NETWORK, _Wolframe::LogLevel::LOGLEVEL_ERROR )
-#define LOG_NETWORK_SEVERE	_Wolframe::Logger( _Wolframe::LogBackend::instance() ).Get( _Wolframe::LogComponent::LOGCOMPONENT_NETWORK, _Wolframe::LogLevel::LOGLEVEL_SEVERE )
-#define LOG_NETWORK_CRITICAL	_Wolframe::Logger( _Wolframe::LogBackend::instance() ).Get( _Wolframe::LogComponent::LOGCOMPONENT_NETWORK, _Wolframe::LogLevel::LOGLEVEL_CRITICAL )
-#define LOG_NETWORK_ALERT	_Wolframe::Logger( _Wolframe::LogBackend::instance() ).Get( _Wolframe::LogComponent::LOGCOMPONENT_NETWORK, _Wolframe::LogLevel::LOGLEVEL_ALERT )
-#define LOG_NETWORK_FATAL	_Wolframe::Logger( _Wolframe::LogBackend::instance() ).Get( _Wolframe::LogComponent::LOGCOMPONENT_NETWORK, _Wolframe::LogLevel::LOGLEVEL_FATAL )
+#define LOG_NETWORK_DATA	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogComponent::LOGCOMPONENT_NETWORK, _Wolframe::Logging::LogLevel::LOGLEVEL_DATA )
+#define LOG_NETWORK_TRACE	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogComponent::LOGCOMPONENT_NETWORK, _Wolframe::Logging::LogLevel::LOGLEVEL_TRACE )
+#define LOG_NETWORK_DEBUG	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogComponent::LOGCOMPONENT_NETWORK, _Wolframe::Logging::LogLevel::LOGLEVEL_DEBUG )
+#define LOG_NETWORK_INFO	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogComponent::LOGCOMPONENT_NETWORK, _Wolframe::Logging::LogLevel::LOGLEVEL_INFO )
+#define LOG_NETWORK_NOTICE	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogComponent::LOGCOMPONENT_NETWORK, _Wolframe::Logging::LogLevel::LOGLEVEL_NOTICE )
+#define LOG_NETWORK_WARNING	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogComponent::LOGCOMPONENT_NETWORK, _Wolframe::Logging::LogLevel::LOGLEVEL_WARNING )
+#define LOG_NETWORK_ERROR	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogComponent::LOGCOMPONENT_NETWORK, _Wolframe::Logging::LogLevel::LOGLEVEL_ERROR )
+#define LOG_NETWORK_SEVERE	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogComponent::LOGCOMPONENT_NETWORK, _Wolframe::Logging::LogLevel::LOGLEVEL_SEVERE )
+#define LOG_NETWORK_CRITICAL	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogComponent::LOGCOMPONENT_NETWORK, _Wolframe::Logging::LogLevel::LOGLEVEL_CRITICAL )
+#define LOG_NETWORK_ALERT	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogComponent::LOGCOMPONENT_NETWORK, _Wolframe::Logging::LogLevel::LOGLEVEL_ALERT )
+#define LOG_NETWORK_FATAL	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogComponent::LOGCOMPONENT_NETWORK, _Wolframe::Logging::LogLevel::LOGLEVEL_FATAL )
 
 #endif // _LOGGER_HPP_INCLUDED

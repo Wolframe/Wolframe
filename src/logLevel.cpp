@@ -8,6 +8,7 @@
 #include <boost/algorithm/string.hpp>
 
 namespace _Wolframe {
+	namespace Logging {
 
 	LogLevel::Level LogLevel::str2LogLevel( const std::string str )
 	{
@@ -27,4 +28,5 @@ namespace _Wolframe {
 		else				return LogLevel::LOGLEVEL_UNDEFINED;
 	}
 
+	} // namespace Logging
 } // namespace _Wolframe

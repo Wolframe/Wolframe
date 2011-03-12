@@ -8,6 +8,7 @@
 #include <iostream>
 
 namespace _Wolframe {
+	namespace Logging {
 
 	class LogComponent {
 	public:
@@ -38,6 +39,7 @@ namespace _Wolframe {
 		return s;
 	}
 
+	} // namespace Logging
 } // namespace _Wolframe
 
 

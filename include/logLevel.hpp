@@ -8,6 +8,7 @@
 #include <iostream>
 
 namespace _Wolframe {
+	namespace Logging {
 
 	class LogLevel {
 	public:
@@ -46,6 +47,7 @@ namespace _Wolframe {
 		return s;
 	}
 
+	} // namespace Logging
 } // namespace _Wolframe
 
 

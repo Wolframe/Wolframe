@@ -19,6 +19,7 @@
 #endif // defined( _WIN32 )
 
 namespace _Wolframe {
+	namespace Logging {
 
 	/// Logger backends
 	class ConsoleLogBackend
@@ -154,6 +155,7 @@ namespace _Wolframe {
 #endif // _WIN32
 	};
 
+	} // namespace Logging
 } // namespace _Wolframe
 
 #endif // _LOG_BACKEND_HPP_INCLUDED

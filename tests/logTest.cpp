@@ -5,27 +5,29 @@
 #include "logger.hpp"
 #include <gtest/gtest.h>
 
+using namespace _Wolframe::Logging;
+
 // The fixture for testing class _Wolframe::Logging
 class LoggingFixture : public ::testing::Test
 {
 	private:
-		_Wolframe::LogBackend& logBack;
+		LogBackend& logBack;
 		
 	protected:
 		LoggingFixture( ) :
-			logBack( _Wolframe::LogBackend::instance( ) ) 
+			logBack( LogBackend::instance( ) ) 
 		{
 			// in order not to spoil the output of gtest :-)
-			logBack.setConsoleLevel( _Wolframe::LogLevel::LOGLEVEL_UNDEFINED );
+			logBack.setConsoleLevel( LogLevel::LOGLEVEL_UNDEFINED );
 
-			logBack.setLogfileLevel( _Wolframe::LogLevel::LOGLEVEL_DATA );
+			logBack.setLogfileLevel( LogLevel::LOGLEVEL_DATA );
 			logBack.setLogfileName( "logTest.log" );
 #ifndef _WIN32
-			logBack.setSyslogLevel( _Wolframe::LogLevel::LOGLEVEL_DATA );
-			logBack.setSyslogFacility( _Wolframe::SyslogFacility::_Wolframe_SYSLOG_FACILITY_USER );
+			logBack.setSyslogLevel( LogLevel::LOGLEVEL_DATA );
+			logBack.setSyslogFacility( SyslogFacility::WOLFRAME_SYSLOG_FACILITY_USER );
 			logBack.setSyslogIdent( "logTest" );
 #else
-			logBack.setEventlogLevel( _Wolframe::LogLevel::LOGLEVEL_DATA );
+			logBack.setEventlogLevel( LogLevel::LOGLEVEL_DATA );
 			logBack.setEventlogSource( "logTest" );
 			logBack.setEventlogLog( "Application" );
 #endif

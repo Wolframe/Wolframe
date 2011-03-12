@@ -35,7 +35,7 @@ namespace _Wolframe	{
 			std::string	user;
 			std::string	group;
 #endif
-			LogLevel::Level	debugLevel;
+			Logging::LogLevel::Level	debugLevel;
 			std::string	cfgFile;
 			bool		useLogConfig;
 		private:
