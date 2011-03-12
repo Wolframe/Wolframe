@@ -105,14 +105,9 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 		}
 
 		_Wolframe::Configuration::ApplicationConfiguration config;
-		std::stringstream errMsg;
 
-		if ( !config.parse( configFile, errMsg ))	{	// there was an error parsing the configuration file
-			std::cerr << errMsg.str() << std::endl << std::endl;
+		if ( !config.parse( configFile ))	// there was an error parsing the configuration file
 			return _Wolframe::ErrorCodes::FAILURE;
-		}
-		if ( ! errMsg.str().empty() )
-			std::cerr << errMsg.str() << std::endl;
 
 // configuration file has been parsed successfully
 // finalize the application configuration
@@ -124,25 +119,17 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 // Check the configuration
 		if ( cmdLineCfg.command == _Wolframe::Configuration::CmdLineConfig::CHECK_CONFIG )	{
 			std::cout << gettext( "BOBOBO version " ) << appVersion.toString() << std::endl;
-			if ( config.check( errMsg ) )	{
-				if ( errMsg.str().empty() )	{
-					std::cout << "Configuration OK" << std::endl << std::endl;
-					return _Wolframe::ErrorCodes::OK;
-				}
-				else	{
-					std::cout << "WARNING: " << errMsg.str() << std::endl << std::endl;
-					return _Wolframe::ErrorCodes::OK;
-				}
+			if ( config.check() )	{
+				std::cout << "Configuration OK" << std::endl << std::endl;
+				return _Wolframe::ErrorCodes::OK;
 			}
 			else	{
-				std::cout << "ERROR: " << errMsg.str() << std::endl << std::endl;
-				return _Wolframe::ErrorCodes::OK;
+				return _Wolframe::ErrorCodes::FAILURE;
 			}
 		}
 
 		if ( cmdLineCfg.command == _Wolframe::Configuration::CmdLineConfig::PRINT_CONFIG )	{
-			std::cout << std::endl << gettext( "BOBOBO version " )
-				<< appVersion.toString() << std::endl;
+			std::cout << std::endl << gettext( "BOBOBO version " ) << appVersion.toString() << std::endl;
 			config.print( std::cout );
 			std::cout << std::endl;
 			return _Wolframe::ErrorCodes::OK;

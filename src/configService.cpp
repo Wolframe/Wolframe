@@ -65,15 +65,15 @@ bool ServiceConfiguration::parse( const boost::property_tree::ptree& pt, const s
 	if ( boost::algorithm::iequals( node, "daemon" ))	{
 		for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
 			if ( boost::algorithm::iequals( it->first, "user" ))	{
-				if ( ! getStringValue( it, displayName(), "user", user, os ))
+				if ( ! getStringValue( it, displayName(), "user", user ))
 					return false;
 			}
 			else if ( boost::algorithm::iequals( it->first, "group" ))	{
-				if ( ! getStringValue( it, displayName(), "group", group, os ))
+				if ( ! getStringValue( it, displayName(), "group", group ))
 					return false;
 			}
 			else if ( boost::algorithm::iequals( it->first, "pidFile" ))	{
-				if ( ! getStringValue( it, displayName(), "pidFile", pidFile, os ))
+				if ( ! getStringValue( it, displayName(), "pidFile", pidFile ))
 					return false;
 				if ( ! boost::filesystem::path( pidFile ).is_absolute() )
 					LOG_WARNING << displayName() << ": pid file path is not absolute: "
@@ -88,21 +88,21 @@ bool ServiceConfiguration::parse( const boost::property_tree::ptree& pt, const s
 #endif
 #if !defined(_WIN32)
 	else if ( boost::algorithm::iequals( node, "service" ))	{
-		os << "WARNING: service: section is valid only on Windows" << std::endl;
+		LOG_WARNING << "service: section is valid only on Windows" << std::endl;
 	}
 #else // #if defined(_WIN32)
 	else if ( boost::algorithm::iequals( node, "service" ))	{
 		for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
 			if ( boost::algorithm::iequals( it->first, "serviceName" ))	{
-				if ( ! getStringValue( it, displayName(), "serviceName", serviceName, os ))
+				if ( ! getStringValue( it, displayName(), "serviceName", serviceName ))
 					return false;
 			}
 			else if ( boost::algorithm::iequals( it->first, "displayName" ))	{
-				if ( ! getStringValue( it, displayName(), "displayName", serviceDisplayName, os ))
+				if ( ! getStringValue( it, displayName(), "displayName", serviceDisplayName ))
 					return false;
 			}
 			else if ( boost::algorithm::iequals( it->first, "description" ))	{
-				if ( ! getStringValue( it, displayName(), "description", serviceDescription, os ))
+				if ( ! getStringValue( it, displayName(), "description", serviceDescription ))
 					return false;
 			}
 			else	{

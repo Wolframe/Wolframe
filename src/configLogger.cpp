@@ -106,7 +106,7 @@ void LoggerConfiguration::foreground( LogLevel::Level debugLevel, bool useConfig
 }
 
 
-bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& /* node */, std::ostream& os )
+bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& /* node */ )
 {
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		// stderr logging
@@ -178,8 +178,7 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 					}
 					logFile = fName;
 					if ( ! boost::filesystem::path( logFile ).is_absolute() )
-						LOG_WARNING << displayName() << ": log file is not absolute: "
-										   << logFile << std::endl;
+						LOG_WARNING << displayName() << ": log file is not absolute: " << logFile;
 				}
 				else	{
 					LOG_WARNING << displayName() << ": logfile: unknown configuration option: <"
@@ -192,7 +191,7 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 #if defined( _WIN32 )
 		// syslog
 		else if ( boost::algorithm::iequals( L1it->first, "syslog" ))	{
-			LOG_WARNING << displayName() << ": syslog is not defined on Windows" << std::endl;
+			LOG_WARNING << displayName() << ": syslog is not defined on Windows";
 		}
 #else // if defined( _WIN32 )
 		// syslog

@@ -19,12 +19,12 @@ namespace _Wolframe {
 		EchoConfiguration( const std::string& printHeader )
 			: ConfigurationBase( printHeader )	{ timeout = 0; }
 		/// methods
-		bool parse( const boost::property_tree::ptree& pt, const std::string& nodeName, std::ostream& os );
-		bool check( std::ostream& os ) const;
+		bool parse( const boost::property_tree::ptree& pt, const std::string& nodeName );
+		bool check() const;
 		void print( std::ostream& os ) const;
 
 //			Not implemented yet, inherited from base for the time being
-//			bool test( std::ostream& os ) const;
+//			bool test() const;
 	};
 
 

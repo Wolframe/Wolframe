@@ -5,6 +5,7 @@
 #include "appConfig.hpp"
 #include "commandLine.hpp"
 #include "standardConfigs.hpp"
+#include "logger.hpp"
 
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
@@ -63,11 +64,11 @@ bool ApplicationConfiguration::addConfig( const std::string& nodeName, Configura
 }
 
 
-bool ApplicationConfiguration::parse ( const char *filename, std::ostream& os )
+bool ApplicationConfiguration::parse ( const char *filename )
 {
 	configFile = resolvePath( boost::filesystem::absolute( filename ).string() );
 	if ( !boost::filesystem::exists( configFile ))	{
-		os << "Configuration file " << configFile << " does not exist.";
+		LOG_FATAL << "Configuration file " << configFile << " does not exist.";
 		return false;
 	}
 
@@ -79,19 +80,19 @@ bool ApplicationConfiguration::parse ( const char *filename, std::ostream& os )
 		for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
 			std::map< std::string, std::size_t >::iterator confIt;
 			if (( confIt = section_.find( it->first ) ) != section_.end() )	{
-				if ( ! conf_[ confIt->second ]->parse( it->second, it->first, os ))
+				if ( ! conf_[ confIt->second ]->parse( it->second, it->first ))
 					return false;
 			}
 			else	{
-				os << "ERROR: configuration root: Unknown configuration option <" << it->first
-				   << ">" << std::endl;
-				return false;
+				LOG_ERROR << "configuration root: Unknown configuration option <"
+					  << it->first << ">" << std::endl;
+//				return false;
 			}
 		}
 
 	}
 	catch( std::exception& e)	{
-		os << e.what();
+		LOG_FATAL << e.what();
 		return false;
 	}
 	return true;
@@ -136,10 +137,10 @@ void ApplicationConfiguration::print( std::ostream& os ) const
 }
 
 /// Check if the application configuration makes sense
-bool ApplicationConfiguration::check( std::ostream& os ) const
+bool ApplicationConfiguration::check() const
 {
 	for ( std::size_t i = 0; i < conf_.size(); i++ )
-		if ( ! conf_[ i ]->check( os ))
+		if ( ! conf_[ i ]->check())
 			return false;
 	return true;
 }

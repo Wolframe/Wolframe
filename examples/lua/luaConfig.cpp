@@ -4,6 +4,7 @@
 
 #include "handlerConfig.hpp"
 #include "configHelpers.hpp"
+#include "logger.hpp"
 
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
@@ -66,13 +67,13 @@ void LuaConfiguration::print( std::ostream& os ) const
 
 
 /// Check if the Lua configuration makes sense
-bool LuaConfiguration::check( std::ostream& os ) const
+bool LuaConfiguration::check() const
 {
 	bool correct = true;
 
 	// is there a script?
 	if( script.empty( ) ) {
-		os << "No Lua script given" << std::endl;
+		LOG_ERROR << "No Lua script given";
 		correct = false;
 	}
 
@@ -80,16 +81,16 @@ bool LuaConfiguration::check( std::ostream& os ) const
 	for( std::list<std::string>::const_iterator it = preload_libs.begin( ); it != preload_libs.end( ); it++ ) {
 		std::map<std::string, LuaModuleDefinition>::const_iterator it2 = knownLuaModules.find( *it );
 		if( it2 == knownLuaModules.end( ) ) {
-			os << "Unknown LUA preload library '" << *it << "'" << std::endl;
+			LOG_ERROR << "Unknown LUA preload library '" << *it << "'";
 			correct = false;
 		}
 	}
-	
+
 	// does the Lua script pass a syntax check?
 	lua_State *l = luaL_newstate( );
 	if( l ) {
 		if( luaL_loadfile( l, script.c_str( ) ) ) {
-			os << "Syntax error in lua script: " << lua_tostring( l, -1 ) << std::endl;
+			LOG_ERROR << "Syntax error in lua script: " << lua_tostring( l, -1 );
 			lua_pop( l, 1 );
 			correct = false;
 		}
@@ -100,23 +101,23 @@ bool LuaConfiguration::check( std::ostream& os ) const
 }
 
 
-bool LuaConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& /* nodeName */, std::ostream& os )
+bool LuaConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& /* nodeName */ )
 {
 	for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
 		if ( boost::algorithm::iequals( it->first, "script" ))	{
-			if ( ! Configuration::getStringValue( it, displayName(), "script", script, os ))
+			if ( ! Configuration::getStringValue( it, displayName(), "script", script ))
 				return false;
 			if ( ! boost::filesystem::path( script ).is_absolute() )
-				os << "WARNING: " << displayName() << ": script file path is not absolute: "
-								   << script << std::endl;
+				LOG_WARNING << displayName() << ": script file path is not absolute: "
+					    << script << std::endl;
 		} else if ( boost::algorithm::iequals( it->first, "preload_lib" ))	{
 			std::string preload_lib;
-			if ( ! Configuration::getStringValue( it, displayName(), "preload_lib", preload_lib, os ))
+			if ( ! Configuration::getStringValue( it, displayName(), "preload_lib", preload_lib ))
 				return false;
 			preload_libs.push_back( preload_lib );
 		} else {
-			os << displayName() << ": unknown configuration option: <" << it->first << ">";
-			return false;
+			LOG_WARNING << displayName() << ": unknown configuration option: <" << it->first << ">";
+//			return false;
 		}
 	}
 

@@ -41,9 +41,11 @@ namespace _Wolframe {
 			/// these functions are not implemented / implementable yet
 			// virtual bool test() const = 0;
 			virtual bool test() const
-								{ os << "Not implemented yet !" << std::endl; return false; }
+			{
+				std::cerr << "Not implemented yet !" << std::endl; return false;
+			}
 
-			///
+			/// Print the configuration
 			virtual void print( std::ostream& os ) const = 0;
 		private:
 			std::string	dispName_;

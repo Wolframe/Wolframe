@@ -7,6 +7,7 @@
 
 #include "configurationBase.hpp"
 
+#include <cstddef>
 #include <string>
 #include <map>
 #include <vector>
@@ -44,11 +45,11 @@ namespace _Wolframe {
 			ApplicationConfiguration();
 			~ApplicationConfiguration();
 
-			bool parse( const char *filename, std::ostream& os );
+			bool parse( const char *filename );
 			void finalize( const CmdLineConfig& cmdLine );
 
-			bool check( std::ostream& os ) const;
-			bool test( std::ostream& os ) const;
+			bool check() const;
+			bool test() const;
 			void print( std::ostream& os ) const;
 
 			static const char* chooseFile( const char *globalFile,

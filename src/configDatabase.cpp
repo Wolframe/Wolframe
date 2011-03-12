@@ -53,30 +53,30 @@ bool DatabaseConfiguration::check() const
 }
 
 
-bool DatabaseConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& /* nodeName */, std::ostream& os )
+bool DatabaseConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& /* nodeName */ )
 {
 	for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
 		if ( boost::algorithm::iequals( it->first, "host" ))	{
-			if ( !getStringValue( it, displayName(), "host", host, os ))		return false;
+			if ( !getStringValue( it, displayName(), "host", host ))		return false;
 		}
 		else if ( boost::algorithm::iequals( it->first, "port" ))	{
-			if ( !getUnsignedShortValue( it, displayName(), "port", port, os ))	return false;
+			if ( !getUnsignedShortValue( it, displayName(), "port", port ))		return false;
 		}
 		else if ( boost::algorithm::iequals( it->first, "name" ))	{
-			if ( !getStringValue( it, displayName(), "name", name, os ))		return false;
+			if ( !getStringValue( it, displayName(), "name", name ))		return false;
 		}
 		else if ( boost::algorithm::iequals( it->first, "user" ))	{
-			if ( !getStringValue( it, displayName(), "user", user, os ))		return false;
+			if ( !getStringValue( it, displayName(), "user", user ))		return false;
 		}
 		else if ( boost::algorithm::iequals( it->first, "password" ))	{
-			if ( !getStringValue( it, displayName(), "password", password, os ))	return false;
+			if ( !getStringValue( it, displayName(), "password", password ))	return false;
 		}
 		else if ( boost::algorithm::iequals( it->first, "connections" ))	{
-			if ( !getUnsignedShortValue( it, displayName(), "connections", connections, os ))
+			if ( !getUnsignedShortValue( it, displayName(), "connections", connections ))
 												return false;
 		}
 		else if ( boost::algorithm::iequals( it->first, "acquireTimeout" ))	{
-			if ( !getUnsignedShortValue( it, displayName(), "acquireTimeout", acquireTimeout, os ))
+			if ( !getUnsignedShortValue( it, displayName(), "acquireTimeout", acquireTimeout ))
 												return false;
 		}
 		else	{

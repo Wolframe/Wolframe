@@ -4,6 +4,7 @@
 
 #include "handlerConfig.hpp"
 #include "configHelpers.hpp"
+#include "logger.hpp"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/algorithm/string.hpp>
@@ -24,23 +25,23 @@ void EchoConfiguration::print( std::ostream& os ) const
 
 
 /// Check if the database configuration makes sense
-bool EchoConfiguration::check( std::ostream& ) const
+bool EchoConfiguration::check() const
 {
 
 	return true;
 }
 
 
-bool EchoConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& /* nodeName */, std::ostream& os )
+bool EchoConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& /* nodeName */ )
 {
 	for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
 		if ( boost::algorithm::iequals( it->first, "idle" ))	{
-			if ( !Configuration::getUnsignedShortValue( it, displayName(), "idle", timeout, os ))
+			if ( !Configuration::getUnsignedShortValue( it, displayName(), "idle", timeout ))
 				return false;
 		}
 		else	{
-			os << displayName() << ": unknown configuration option: <" << it->first << ">";
-			return false;
+			LOG_WARNING << displayName() << ": unknown configuration option: <" << it->first << ">";
+//			return false;
 		}
 	}
 //	if ( timeout == 0 )

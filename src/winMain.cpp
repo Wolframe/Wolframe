@@ -221,13 +221,11 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 		cmdLineCfg.command = _Wolframe::Configuration::CmdLineConfig::RUN_SERVICE;
 		const char *configFile = serviceConfig.c_str( ); // configuration comes from main thread
 
-		std::stringstream	errMsg;
 		_Wolframe::Configuration::ApplicationConfiguration config;
-		if ( !config.parse( configFile, errMsg ))	{	// there was an error parsing the configuration file
+		if ( !config.parse( configFile ))	// there was an error parsing the configuration file
 			// TODO: a hen and egg problem here with event logging and where to know where to log to
 			// LOG_FATAL << errMsg.str();
 			return;
-		}
 // configuration file has been parsed successfully
 // build the final configuration
 		config.finalize( cmdLineCfg );
@@ -340,23 +338,20 @@ int _Wolframe_winMain( int argc, char* argv[] )
 		}
 
 		_Wolframe::Configuration::ApplicationConfiguration config;
-		std::stringstream	errMsg;
-		if ( !config.parse( configFile, errMsg ))	{	// there was an error parsing the configuration file
-			std::cerr << errMsg.str() << std::endl << std::endl;
+		if ( !config.parse( configFile, errMsg ))	// there was an error parsing the configuration file
 			return _Wolframe::ErrorCodes::FAILURE;
-		}
+
 // configuration file has been parsed successfully
 // build the final configuration
 		config.finalize( cmdLineCfg );
 
 // Check the configuration
 		if ( cmdLineCfg.command == _Wolframe::Configuration::CmdLineConfig::CHECK_CONFIG )	{
-			if ( config.check( errMsg ) )	{
+			if ( config.check() )	{
 				std::cout << "Configuration OK" << std::endl << std::endl;
 				return _Wolframe::ErrorCodes::OK;
 			}
 			else	{
-				std::cout << errMsg.str() << std::endl << std::endl;
 				return _Wolframe::ErrorCodes::OK;
 			}
 		}
