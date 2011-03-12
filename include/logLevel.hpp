@@ -16,14 +16,14 @@ namespace _Wolframe {
 			LOGLEVEL_DATA,		/// log everything, including data
 			LOGLEVEL_TRACE,		/// trace functions calls
 			LOGLEVEL_DEBUG,		/// log operations
-			LOGLEVEL_INFO,
-			LOGLEVEL_NOTICE,
-			LOGLEVEL_WARNING,
-			LOGLEVEL_ERROR,
-			LOGLEVEL_SEVERE,
-			LOGLEVEL_CRITICAL,
-			LOGLEVEL_ALERT,
-			LOGLEVEL_FATAL,
+			LOGLEVEL_INFO,		/// information message
+			LOGLEVEL_NOTICE,	/// normal but significant condition
+			LOGLEVEL_WARNING,	/// warning condition
+			LOGLEVEL_ERROR,		/// normal error condition
+			LOGLEVEL_SEVERE,	/// severe error condition
+			LOGLEVEL_CRITICAL,	/// critical error condition
+			LOGLEVEL_ALERT,		/// action must be taken immediately
+			LOGLEVEL_FATAL,		/// system is unusable
 			LOGLEVEL_UNDEFINED	/// log this only under special conditions
 		};
 
