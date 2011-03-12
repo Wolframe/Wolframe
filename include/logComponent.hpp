@@ -14,6 +14,7 @@ namespace _Wolframe {
 	public:
 		enum Component	{
 			LOGCOMPONENT_NONE,		/// no loging component
+			LOGCOMPONENT_LOGGING,		/// internal logger errors
 			LOGCOMPONENT_LUA,		/// lua processor
 			LOGCOMPONENT_NETWORK,		/// networking
 			LOGCOMPONENT_AUTH,		/// authentication
@@ -30,7 +31,7 @@ namespace _Wolframe {
 								  LogComponent::Component l )
 	{
 		static const CharT *const str[] = {
-			"", "Lua", "Network", "Auth" };
+			"", "Logging", "Lua", "Network", "Auth" };
 		if( static_cast< size_t >( l ) < ( sizeof( str ) / sizeof( *str ) ) ) {
 			s << str[l];
 		} else {

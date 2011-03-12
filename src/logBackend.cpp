@@ -109,8 +109,12 @@ void LogfileBackend::reopen( )
 		logFile_.open( filename_.c_str( ), std::ios_base::app );
 		isOpen_ = true;
 	} catch( const std::ofstream::failure& e ) {
-		//TODO: introduce system exceptions
-		std::cerr << "ERROR: " << e.what( ) << std::endl;
+		_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get(
+			_Wolframe::Logging::LogComponent::LOGCOMPONENT_LOGGING,
+			_Wolframe::Logging::LogLevel::LOGLEVEL_CRITICAL )
+		/* LOG_CRITICAL */ << "Can't open logfile '" << filename_ << "'";
+		// TODO: e.what() displays "basic_ios::clear" always, how to get
+		// decent error messages here?
 	}
 }
 
