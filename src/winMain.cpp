@@ -223,19 +223,18 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 
 		_Wolframe::Configuration::ApplicationConfiguration config;
 		if ( !config.parse( configFile ))	// there was an error parsing the configuration file
-			// TODO: a hen and egg problem here with event logging and where to know where to log to
-			// LOG_FATAL << errMsg.str();
+			LOG_FATAL << errMsg.str();
 			return;
 // configuration file has been parsed successfully
 // build the final configuration
 		config.finalize( cmdLineCfg );
 
 // create the final logger based on the configuration
-		_Wolframe::LogBackend::instance().setLogfileLevel( config.loggerConf->logFileLogLevel );
-		_Wolframe::LogBackend::instance().setLogfileName( config.loggerConf->logFile );
-		_Wolframe::LogBackend::instance().setEventlogLevel( config.loggerConf->eventlogLogLevel );
-		_Wolframe::LogBackend::instance().setEventlogSource( config.loggerConf->eventlogSource );
-		_Wolframe::LogBackend::instance().setEventlogLog( config.loggerConf->eventlogLogName );
+		_Wolframe::Logging::LogBackend::instance().setLogfileLevel( config.loggerConf->logFileLogLevel );
+		_Wolframe::Logging::LogBackend::instance().setLogfileName( config.loggerConf->logFile );
+		_Wolframe::Logging::LogBackend::instance().setEventlogLevel( config.loggerConf->eventlogLogLevel );
+		_Wolframe::Logging::LogBackend::instance().setEventlogSource( config.loggerConf->eventlogSource );
+		_Wolframe::Logging::LogBackend::instance().setEventlogLog( config.loggerConf->eventlogLogName );
 
 // register the event callback where we get called by Windows and the SCM
 		serviceStatusHandle = RegisterServiceCtrlHandler( config.serviceConf->serviceName.c_str( ), serviceCtrlFunction );
@@ -338,7 +337,7 @@ int _Wolframe_winMain( int argc, char* argv[] )
 		}
 
 		_Wolframe::Configuration::ApplicationConfiguration config;
-		if ( !config.parse( configFile, errMsg ))	// there was an error parsing the configuration file
+		if ( !config.parse( configFile ))	// there was an error parsing the configuration file
 			return _Wolframe::ErrorCodes::FAILURE;
 
 // configuration file has been parsed successfully
@@ -407,7 +406,7 @@ int _Wolframe_winMain( int argc, char* argv[] )
 
 		// Create the final logger based on the configuration, this is the
 		// foreground mode in a console, so we start only the stderr logger
-		_Wolframe::LogBackend::instance().setConsoleLevel( config.loggerConf->stderrLogLevel );
+		_Wolframe::Logging::LogBackend::instance().setConsoleLevel( config.loggerConf->stderrLogLevel );
 
 		LOG_NOTICE << "Starting server";
 
