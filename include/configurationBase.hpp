@@ -7,6 +7,7 @@
 
 #include <string>
 #include <ostream>
+#include <iostream>
 
 #include <boost/property_tree/ptree.hpp>
 
