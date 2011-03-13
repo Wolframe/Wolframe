@@ -8,7 +8,6 @@
 
 // no macros here, name clash with variables in syslog.h, so
 // undefine them here..
-// also they should not be used here because of reentrance problems
 #undef LOG_DATA
 #undef LOG_TRACE
 #undef LOG_DEBUG
@@ -60,7 +59,7 @@ inline void ConsoleLogBackend::log( WOLFRAME_UNUSED const LogComponent::Componen
 {
 	if ( level >= logLevel_ ) {
 		std::cerr << level << ": " << msg << std::endl;
-		std::cerr.flush();
+		std::cerr.flush( );
 	}
 }
 
@@ -75,7 +74,7 @@ LogfileBackend::LogfileBackend( )
 {
 	logLevel_ = LogLevel::LOGLEVEL_UNDEFINED;
 	isOpen_ = false;
-	// we don't open a primarily unknown logfile, wait for setFilename
+	// we can't open the logfile here, wait for setFilename
 }
 
 LogfileBackend::~LogfileBackend( )
@@ -109,12 +108,13 @@ void LogfileBackend::reopen( )
 		logFile_.open( filename_.c_str( ), std::ios_base::app );
 		isOpen_ = true;
 	} catch( const std::ofstream::failure& e ) {
-		_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get(
+		isOpen_ = false;
+		_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance( ) ).Get(
 			_Wolframe::Logging::LogComponent::LOGCOMPONENT_LOGGING,
 			_Wolframe::Logging::LogLevel::LOGLEVEL_CRITICAL )
 		/* LOG_CRITICAL */ << "Can't open logfile '" << filename_ << "'";
 		// TODO: e.what() displays "basic_ios::clear" always, how to get
-		// decent error messages here?
+		// decent error messages here? I fear the C++ standard doesn't help here..
 	}
 }
 
@@ -370,7 +370,7 @@ inline void EventlogBackend::log( WOLFRAME_UNUSED const LogComponent::Component 
 	if ( level >= logLevel_ ) {
 		LPCSTR msg_arr[1];
 		msg_arr[0] = (LPSTR)msg.c_str( );
-		(void)ReportEvent(
+		BOOL res = ReportEvent(
 			eventSource_,
 			levelToEventlogLevel( level ),
 			categoryId_,
@@ -380,6 +380,12 @@ inline void EventlogBackend::log( WOLFRAME_UNUSED const LogComponent::Component 
 			0, // no binary data
 			msg_arr, // array of strings to log (msg.c_str() for now)
 			NULL ); // no binary data
+		if( !res ) {
+			_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance( ) ).Get(
+			_Wolframe::Logging::LogComponent::LOGCOMPONENT_LOGGING,
+			_Wolframe::Logging::LogLevel::LOGLEVEL_CRITICAL )
+			/* LOG_CRITICAL */ << "Can't report event to event log: " << GetLastError( ) << "'";
+		}
 	}
 }
 

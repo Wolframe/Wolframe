@@ -59,17 +59,21 @@ static void registrySetWord( HKEY h, TCHAR *name, DWORD value ) {
 }
 
 // initializes the Event Logger
-static void registerEventlog( const _Wolframe::Configuration::ApplicationConfiguration& config )
+static bool registerEventlog( const _Wolframe::Configuration::ApplicationConfiguration& config )
 {
 	char key[256];
 	HKEY h = 0;
 	DWORD disposition;
-
+	
 // choose the key for the EventLog registry entry
 	_snprintf( key, 256, "SYSTEM\\CurrentControlSet\\Services\\EventLog\\%s\\%s",
 		config.loggerConf->eventlogLogName.c_str( ), config.loggerConf->eventlogSource.c_str( ) );
-	(void)RegCreateKeyEx( HKEY_LOCAL_MACHINE, key, 0, NULL, REG_OPTION_NON_VOLATILE,
+	LONG ret = RegCreateKeyEx( HKEY_LOCAL_MACHINE, key, 0, NULL, REG_OPTION_NON_VOLATILE,
 		KEY_SET_VALUE, NULL, &h, &disposition );
+	if( ret != ERROR_SUCCESS ) {
+		LOG_CRITICAL << "RegCreateKeyEx with key '" << key << "' failed";
+		return false;
+	}
 
 // retrieve absolute path of binary
 	TCHAR binary_path[MAX_PATH];
@@ -87,26 +91,45 @@ static void registerEventlog( const _Wolframe::Configuration::ApplicationConfigu
 	registrySetWord( h, "CategoryCount", (DWORD)1 );
 
 	(void)RegCloseKey( h );
+	
+	return true;
 }
 
-static void deregisterEventlog( const _Wolframe::Configuration::ApplicationConfiguration& config )
+static bool deregisterEventlog( const _Wolframe::Configuration::ApplicationConfiguration& config )
 {
 	char key[256];
 	HKEY h = 0;
 	DWORD disposition;
 	LONG res;
 
+// open registry, we need write rights to change it
 	_snprintf( key, 256, "SYSTEM\\CurrentControlSet\\Services\\EventLog\\%s",
 		config.loggerConf->eventlogLogName.c_str( ) );
 	res = RegOpenKeyEx( HKEY_LOCAL_MACHINE, key, 0, KEY_WRITE, &h );
-	(void)RegDeleteKey( h, config.loggerConf->eventlogSource.c_str( ) );
+	if( res != ERROR_SUCCESS ) {
+		LOG_CRITICAL << "RegOpenKeyEx with key '" << key << "' failed";
+		return false;
+	}
+
+// remove event log registry entry	
+	res = RegDeleteKey( h, config.loggerConf->eventlogSource.c_str( ) );
+	if( res != ERROR_SUCCESS ) {
+		LOG_CRITICAL << "RegDeleteKey with key '" << key << "' failed";
+		return false;
+	}
+	
+	return true;
 }
 
-static void installAsService( const _Wolframe::Configuration::ApplicationConfiguration& config )
+static bool installAsService( const _Wolframe::Configuration::ApplicationConfiguration& config )
 {
 // get service control manager
 	SC_HANDLE scm = (SC_HANDLE)OpenSCManager( NULL, SERVICES_ACTIVE_DATABASE, SC_MANAGER_ALL_ACCESS );
-
+	if( scm == NULL ) {
+		LOG_CRITICAL << "OpenSCManager for service registration failed";
+		return false;
+	}
+	
 // retrieve absolute path of binary
 	TCHAR binary_path[MAX_PATH];
 	DWORD res = GetModuleFileName( NULL, binary_path, MAX_PATH );
@@ -121,6 +144,10 @@ static void installAsService( const _Wolframe::Configuration::ApplicationConfigu
 		SERVICE_ALL_ACCESS, SERVICE_WIN32_OWN_PROCESS,
 		SERVICE_DEMAND_START, SERVICE_ERROR_NORMAL,
 		os.str( ).c_str( ), NULL, NULL, NULL, NULL, NULL );
+	if( service == NULL ) {
+		LOG_CRITICAL << "CreateService during service registration failed";
+		return false;
+	}
 
 // set description of the service
 	SERVICE_DESCRIPTION descr;
@@ -130,22 +157,37 @@ static void installAsService( const _Wolframe::Configuration::ApplicationConfigu
 // free handles
 	(void)CloseServiceHandle( service );
 	(void)CloseServiceHandle( scm );
+	
+	return true;
 }
 
-static void remove_as_service( const _Wolframe::Configuration::ApplicationConfiguration& config )
+static bool removeAsService( const _Wolframe::Configuration::ApplicationConfiguration& config )
 {
 // get service control manager
 	SC_HANDLE scm = (SC_HANDLE)OpenSCManager( NULL, SERVICES_ACTIVE_DATABASE, SC_MANAGER_ALL_ACCESS );
+	if( scm == NULL ) {
+		LOG_CRITICAL << "OpenSCManager for service deregistration failed";
+		return false;
+	}
 
 // get service handle of the service to delete (identified by service name)
 	SC_HANDLE service = OpenService( scm, config.serviceConf->serviceName.c_str( ), SERVICE_ALL_ACCESS );
+	if( service == NULL ) {
+		LOG_CRITICAL << "OpenService during service deregistration failed";
+		return false;
+	}
 
 // remove the service
-	(void)DeleteService( service );
+	if( !DeleteService( service ) ) {
+		LOG_CRITICAL << "Can't delete service";
+		return false;
+	}
 
 // free handles
 	(void)CloseServiceHandle( service );
 	(void)CloseServiceHandle( scm );
+	
+	return true;
 }
 
 // state and helper variables for the service
@@ -300,6 +342,9 @@ WAIT_FOR_STOP_EVENT:
 int _Wolframe_winMain( int argc, char* argv[] )
 {
 	try	{
+		// create initial console logger, so we see things going wrong
+		_Wolframe::Logging::LogBackend::instance().setConsoleLevel( _Wolframe::Logging::LogLevel::LOGLEVEL_ERROR );
+		
 		_Wolframe::Version  appVersion( _Wolframe::applicationMajorVersion(), _Wolframe::applicationMinorVersion(),
 						_Wolframe::applicationRevisionVersion(), _Wolframe::applicationBuildVersion() );
 		_Wolframe::Configuration::CmdLineConfig	cmdLineCfg;
@@ -366,15 +411,15 @@ int _Wolframe_winMain( int argc, char* argv[] )
 		}
 
 		if ( cmdLineCfg.command == _Wolframe::Configuration::CmdLineConfig::INSTALL_SERVICE ) {
-			registerEventlog( config );
-			installAsService( config );
+			if( !registerEventlog( config ) ) return _Wolframe::ErrorCodes::FAILURE;
+			if( !installAsService( config ) ) return _Wolframe::ErrorCodes::FAILURE;
 			std::cout << "Installed as Windows service" << std::endl << std::endl;
 			return _Wolframe::ErrorCodes::OK;
 		}
 
 		if ( cmdLineCfg.command == _Wolframe::Configuration::CmdLineConfig::REMOVE_SERVICE ) {
-			remove_as_service( config );
-			deregisterEventlog( config );
+			if( !removeAsService( config ) ) return _Wolframe::ErrorCodes::FAILURE;
+			(void)deregisterEventlog( config );
 			std::cout << "Removed as Windows service" << std::endl << std::endl;
 			return _Wolframe::ErrorCodes::OK;
 		}
