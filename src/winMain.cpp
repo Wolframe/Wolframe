@@ -271,6 +271,7 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 		config.finalize( cmdLineCfg );
 
 // create the final logger based on the configuration
+		_Wolframe::Logging::LogBackend::instance().setConsoleLevel( config.loggerConf->stderrLogLevel );
 		_Wolframe::Logging::LogBackend::instance().setLogfileLevel( config.loggerConf->logFileLogLevel );
 		_Wolframe::Logging::LogBackend::instance().setLogfileName( config.loggerConf->logFile );
 		_Wolframe::Logging::LogBackend::instance().setEventlogLevel( config.loggerConf->eventlogLogLevel );
@@ -351,7 +352,7 @@ int _Wolframe_winMain( int argc, char* argv[] )
 		const char		*configFile = NULL;
 
 		if ( !cmdLineCfg.parse( argc, argv ))	{	// there was an error parsing the command line
-			std::cerr << cmdLineCfg.errMsg() << std::endl << std::endl;
+			LOG_ERROR << cmdLineCfg.errMsg() << std::endl;
 			cmdLineCfg.usage( std::cerr );
 			std::cerr << std::endl;
 			return _Wolframe::ErrorCodes::FAILURE;
@@ -359,7 +360,7 @@ int _Wolframe_winMain( int argc, char* argv[] )
 // command line has been parsed successfully
 // if cmdLineCfg.errMsg() is not empty than we have a warning
 		if ( !cmdLineCfg.errMsg().empty() )	// there was a warning parsing the command line
-			std::cerr << "BOO:" << cmdLineCfg.errMsg() << std::endl << std::endl;
+			LOG_ERROR << cmdLineCfg.errMsg();
 
 // if we have to print the version or the help do it and exit
 		if ( cmdLineCfg.command == _Wolframe::Configuration::CmdLineConfig::PRINT_VERSION )	{
@@ -368,7 +369,7 @@ int _Wolframe_winMain( int argc, char* argv[] )
 		}
 		if ( cmdLineCfg.command == _Wolframe::Configuration::CmdLineConfig::PRINT_HELP )	{
 			cmdLineCfg.usage( std::cout );
-			std::cerr << std::endl;
+			std::cout << std::endl;
 			return _Wolframe::ErrorCodes::OK;
 		}
 
@@ -376,7 +377,7 @@ int _Wolframe_winMain( int argc, char* argv[] )
 		if ( !cmdLineCfg.cfgFile.empty() )	// if it has been specified than that's The One ! (and only)
 			configFile = cmdLineCfg.cfgFile.c_str();
 		if ( configFile == NULL )	{	// there is no configuration file
-			std::cerr << "MOMOMO: no configuration file found !" << std::endl << std::endl;
+			LOG_FATAL << "no configuration file found !";
 			return _Wolframe::ErrorCodes::FAILURE;
 		}
 
