@@ -67,6 +67,29 @@ See 'examples\lua\README'
 Compile and install Qt
 ----------------------
 
-See 'http://qtnode.net/wiki/Qt4_with_Visual_Studio'.
+Easiest is to get a precompiled MSVC version of the SDK.
 
-Then adapt QT_DIR in 'makefiles\nmake\config.mk'
+If you insist on compiling on your own:
+
+Get the MinGW version of the SDK.
+
+Make sure the SDK variables for compilation and linking are set correctly:
+
+set INCLUDE=%INCLUDE%;D:\Programme\Microsoft Platform SDK\include
+set LIB=%LIB%;D:\Programme\Microsoft Platform SDK\lib
+
+Clean up first the MinGW build with:
+
+nmake confclean
+del bin\*.dll bin\*.exe
+del lib\*.a
+
+Configure and build it with:
+
+configure -platform win32-msvc2005 -release
+nmake
+
+See also http://qtnode.net/wiki/Qt4_with_Visual_Studio.
+
+Finally adapt QT_DIR in 'makefiles\nmake\config.mk'.
+
