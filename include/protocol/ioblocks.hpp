@@ -7,13 +7,13 @@ namespace _Wolframe {
 namespace protocol {
 
 //@section protocolIOBlocks
-//defines the processed blocks for output from and input to the processor 
+//defines the processed blocks for output from and input to the processor
 //  that reads the input through iterators of the input blocks and prints via the output blocks.
 
 
 //memory block for network messages
 class MemBlock
-{  
+{
 public:
    MemBlock();
    MemBlock( unsigned int p_size);
@@ -42,11 +42,11 @@ public:
    //random access operators
    char operator[]( size_type idx) const         {if (idx>=m_pos) throw ArrayBoundReadError(); return charptr()[idx];}
    char& operator[]( size_type idx)              {if (idx>=m_pos) throw ArrayBoundReadError(); return charptr()[idx];}
-  
+
 private:
    void* m_ptr;
-   unsigned int m_size;
-   unsigned int m_pos;
+   std::size_t m_size;
+   std::size_t m_pos;
    bool m_allocated;
 };
 
@@ -62,7 +62,7 @@ public:
    {
       enum State {SRC,LF,LF_DOT,LF_DOT_CR,LF_DOT_CR_LF};
    };
-   
+
    InputBlock()                                         :m_eodState(EoD::SRC){}
    InputBlock( unsigned int p_size)                     :MemBlock(p_size),m_eodState(EoD::SRC){}
    InputBlock( void* p_ptr, unsigned int p_size)        :MemBlock(p_ptr,p_size),m_eodState(EoD::SRC){}
@@ -71,14 +71,14 @@ public:
    //random access iterators
    typedef array::iterator_t<const InputBlock,size_type,char,char,const char*> const_iterator;
    typedef array::iterator_t<InputBlock,size_type,char,char&,char*> iterator;
-   
+
    const_iterator begin() const                         {const_iterator rt(this); return rt;}
    iterator begin()                                     {iterator rt(this); return rt;}
    const_iterator at( unsigned int pos_) const          {const_iterator rt(this); return rt+pos_;}
    iterator at( unsigned int pos_)                      {iterator rt(this); return rt+pos_;}
    const_iterator end() const                           {return const_iterator(this)+pos();}
    iterator end()                                       {return iterator(this)+pos();}
-   
+
    //end of data calculation and markup
    iterator getEoD( iterator start)
    {
@@ -95,12 +95,12 @@ public:
    {
       if (m_eodState == EoD::LF_DOT_CR && itr < end() && *itr == '\n')
       {
-         m_eodState = EoD::LF_DOT_CR_LF;
-         return itr+(size_type)1;
+	 m_eodState = EoD::LF_DOT_CR_LF;
+	 return itr+(size_type)1;
       }
       else
       {
-         return itr;
+	 return itr;
       }
    }
 
@@ -112,7 +112,7 @@ private:
 
 
 
-//output interface based on a memory block. 
+//output interface based on a memory block.
 // print as buffer is available and then order to "ship" what you printed.
 class OutputBlock :public MemBlock
 {
@@ -120,7 +120,7 @@ public:
    OutputBlock( unsigned int p_size)                    :MemBlock(p_size) {}
    OutputBlock( void* p_ptr, unsigned int p_size)       :MemBlock(p_ptr,p_size) {}
    OutputBlock( const OutputBlock& o)                   :MemBlock(o) {}
-   
+
    //return true if the buffer is empty
    bool empty() const
    {
