@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <string>
+#include <TCHAR.h>
 #include <boost/asio.hpp>
 #include <boost/function.hpp>
 #include <boost/thread.hpp>
@@ -51,7 +52,7 @@ BOOL WINAPI consoleCtrlHandler(DWORD ctrlType)
 }
 
 static void registrySetString( HKEY h, TCHAR *name, TCHAR *value ) {
-	(void)RegSetValueEx( h, name, 0, REG_EXPAND_SZ, (LPBYTE)value, strlen( value ) );
+	(void)RegSetValueEx( h, name, 0, REG_EXPAND_SZ, (LPBYTE)value, (DWORD)_tcslen( value ) );
 }
 
 static void registrySetWord( HKEY h, TCHAR *name, DWORD value ) {
@@ -80,15 +81,15 @@ static bool registerEventlog( const _Wolframe::Configuration::ApplicationConfigu
 	DWORD res = GetModuleFileName( NULL, binary_path, MAX_PATH );
 
 // register resources in the service binary itself as message source
-	registrySetString( h, "EventMessageFile", binary_path );
-	registrySetString( h, "CategoryMessageFile", binary_path );
+	registrySetString( h, TEXT( "EventMessageFile" ), binary_path );
+	registrySetString( h, TEXT( "CategoryMessageFile" ), binary_path );
 
 // supported event types
 	DWORD eventTypes = EVENTLOG_ERROR_TYPE | EVENTLOG_WARNING_TYPE | EVENTLOG_INFORMATION_TYPE;
-	registrySetWord( h, "TypesSupported", eventTypes );
+	registrySetWord( h, TEXT( "TypesSupported" ), eventTypes );
 
 // exactly one category for now (Wolframe)
-	registrySetWord( h, "CategoryCount", (DWORD)1 );
+	registrySetWord( h, TEXT( "CategoryCount" ), (DWORD)1 );
 
 	(void)RegCloseKey( h );
 	

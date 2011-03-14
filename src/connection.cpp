@@ -36,7 +36,7 @@ void GlobalConnectionList::addList( SocketConnectionList< SSLconnection_ptr >* l
 
 bool GlobalConnectionList::isFull()
 {
-	unsigned conns = 0;
+	std::size_t conns = 0;
 
 	for ( std::list< SocketConnectionList< connection_ptr >* >::iterator it = connList_.begin();
 									it != connList_.end(); it++ )

@@ -60,9 +60,9 @@ int InputBlock::getEoDpos( unsigned int offset)
 {
    if (pos()<=offset) return -1;
 
-   unsigned int bufsize = pos()-offset;
+   std::size_t bufsize = pos()-offset;
    char* buf = charptr()+offset;
-   unsigned int bufpos=0,eatsize=0,dstsize=0;
+   std::size_t bufpos=0,eatsize=0,dstsize=0;
    int eodpos = -1;
    
    while (bufpos<bufsize)
@@ -108,7 +108,7 @@ int InputBlock::getEoDpos( unsigned int offset)
          }
          else if (buf[bufpos] == '\n')
          {
-            eodpos = dstsize++;   //< define EoD
+            eodpos = (int)dstsize++;   //< define EoD
             m_eodState = EoD::LF_DOT_CR_LF;
             bufpos++;
             eatsize = bufpos;
