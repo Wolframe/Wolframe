@@ -113,7 +113,7 @@ static bool deregisterEventlog( const _Wolframe::Configuration::ApplicationConfi
 	}
 
 // remove event log registry entry	
-	res = RegDeleteKey( h, config.loggerConf->eventlogSource.c_str( ) );
+	res = RegDeleteKey( h, key );
 	if( res != ERROR_SUCCESS ) {
 		LOG_CRITICAL << "RegDeleteKey with key '" << key << "' failed";
 		return false;
