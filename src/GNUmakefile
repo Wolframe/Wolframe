@@ -60,6 +60,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	logBackend.o \
 	configHelpers.o \
 	configService.o \
+	serviceBanner.o \
 	configLogger.o \
 	configDatabase.o \
 	appConfig.o \

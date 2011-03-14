@@ -21,7 +21,8 @@ namespace _Wolframe {
 	namespace Network	{
 
 		/// network server configuration
-		struct ServerConfiguration : public _Wolframe::Configuration::ConfigurationBase	{
+		struct ServerConfiguration : public _Wolframe::Configuration::ConfigurationBase
+		{
 		public:
 			unsigned short		threads;
 			unsigned short		maxConnections;
@@ -52,7 +53,8 @@ namespace _Wolframe {
 	namespace Configuration	{
 
 	/// daemon / service configuration
-	struct ServiceConfiguration : public _Wolframe::Configuration::ConfigurationBase	{
+	struct ServiceConfiguration : public _Wolframe::Configuration::ConfigurationBase
+	{
 	public:
 #if !defined( _WIN32 )
 		// daemon configuration
@@ -83,6 +85,42 @@ namespace _Wolframe {
 		void override( const std::string& user, const std::string& group );
 #endif // !defined( _WIN32 )
 	};
+
+
+	/// Service signature
+	struct ServiceBanner : public _Wolframe::Configuration::ConfigurationBase
+	{
+		enum SignatureTokens	{
+			PRODUCT_NAME,
+			VERSION_MAJOR,
+			VERSION_MINOR,
+			VERSION_REVISION,
+			PRODUCT_OS,
+			NONE,
+			UNDEFINED
+		};
+	public:
+		/// data members
+		SignatureTokens	tokens;
+		bool		serverName;
+		bool		serverNameDefined;
+
+		/// constructor
+		ServiceBanner() : ConfigurationBase( "Service Banner" ),
+						tokens( UNDEFINED ),
+						serverName( false ),
+						serverNameDefined( false )	{}
+
+		/// methods
+		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
+		bool check() const;
+		void print( std::ostream& os ) const;
+
+//			Not implemented yet, inherited from base for the time being
+//			bool test() const;
+		const std::string toString() const;
+	};
+
 
 		/// logger configuration
 		struct LoggerConfiguration : public _Wolframe::Configuration::ConfigurationBase

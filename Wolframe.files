@@ -199,3 +199,4 @@ tests/testHandlerTemplates.hpp
 tests/testNamedRetVal.cpp
 tests/threadLeakTest.cpp
 tests/versionTest.cpp
+src/serviceBanner.cpp

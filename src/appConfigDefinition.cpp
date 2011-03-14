@@ -26,6 +26,9 @@ namespace _Wolframe {
 			addConfig( "service", serviceConf );
 			addConfig( "daemon", serviceConf );
 
+			addConfig( "ServerTokens", handlerConf->banner );
+			addConfig( "ServerSignature", handlerConf->banner );
+
 			addConfig( "listen", serverConf );
 			addConfig( "logging", loggerConf );
 			addConfig( "database", handlerConf->database );

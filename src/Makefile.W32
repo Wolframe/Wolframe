@@ -54,6 +54,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	logBackend.obj \
 	configHelpers.obj \
 	configService.obj \
+	serviceBanner.obj \
 	configLogger.obj \
 	configDatabase.obj \
 	appConfig.obj \

@@ -9,22 +9,26 @@
 
 namespace _Wolframe {
 
-	/// Wolrame handler configuration structure
+	/// Wolframe handler configuration structure
 	struct HandlerConfiguration
 	{
 	public:
 		Configuration::DatabaseConfiguration		*database;
+		Configuration::ServiceBanner			*banner;
 //		Configuration::AuthenticationConfiguration	*auth;
 
 		/// constructor
 		HandlerConfiguration()
 		{
+			banner = new Configuration::ServiceBanner();
 			database = new Configuration::DatabaseConfiguration();
+
 //			auth = ...
 		}
 
 		~HandlerConfiguration()
 		{
+			if ( banner ) delete banner;
 			if ( database ) delete database;
 //			auth = ...
 		}
