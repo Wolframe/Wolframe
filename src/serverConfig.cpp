@@ -119,11 +119,11 @@ bool ServerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 {
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "threads" ))	{
-			if ( ! getUnsignedShortValue( L1it, displayName(), "threads", threads ))
+			if ( ! getUnsignedShortValue( L1it->second, displayName(), "threads", threads ))
 				return false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "maxConnections" ))	{
-			if ( ! getUnsignedShortValue( L1it, displayName(), "maxConnections", maxConnections ))
+			if ( ! getUnsignedShortValue( L1it->second, displayName(), "maxConnections", maxConnections ))
 				return false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "socket" ))	{
@@ -133,19 +133,19 @@ bool ServerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
 										L2it != L1it->second.end(); L2it++ )	{
 				if ( boost::algorithm::iequals( L2it->first, "host" ))	{
-					if ( ! getHostnameValue( L2it, displayName(), "host", host ))
+					if ( ! getHostnameValue( L2it->second, displayName(), "host", host ))
 						return false;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "address" ))	{
-					if ( ! getHostnameValue( L2it, displayName(), "address", host ))
+					if ( ! getHostnameValue( L2it->second, displayName(), "address", host ))
 						return false;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "port" ))	{
-					if ( ! getUnsignedShortValue( L2it, displayName(), "port", port ))
+					if ( ! getUnsignedShortValue( L2it->second, displayName(), "port", port ))
 						return false;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "maxConnections" ))	{
-					if ( ! getUnsignedShortValue( L2it, displayName(), "maxConnections", maxConn ))
+					if ( ! getUnsignedShortValue( L2it->second, displayName(), "maxConnections", maxConn ))
 						return false;
 				}
 				else	{
@@ -171,51 +171,51 @@ bool ServerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
 										L2it != L1it->second.end(); L2it++ )	{
 				if ( boost::algorithm::iequals( L2it->first, "host" ))	{
-					if ( ! getHostnameValue( L2it, displayName(), "host", host ))
+					if ( ! getHostnameValue( L2it->second, displayName(), "host", host ))
 						return false;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "address" ))	{
-					if ( ! getHostnameValue( L2it, displayName(), "address", host ))
+					if ( ! getHostnameValue( L2it->second, displayName(), "address", host ))
 						return false;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "port" ))	{
-					if ( ! getUnsignedShortValue( L2it, displayName(), "port", port ))
+					if ( ! getUnsignedShortValue( L2it->second, displayName(), "port", port ))
 						return false;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "maxConnections" ))	{
-					if ( ! getUnsignedShortValue( L2it, displayName(), "maxConnections", maxConn ))
+					if ( ! getUnsignedShortValue( L2it->second, displayName(), "maxConnections", maxConn ))
 						return false;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "certificate" ))	{
-					if ( ! getHostnameValue( L2it, displayName(), "certificate", certFile ))
+					if ( ! getHostnameValue( L2it->second, displayName(), "certificate", certFile ))
 						return false;
 					if ( ! boost::filesystem::path( certFile ).is_absolute() )
 						LOG_WARNING << displayName() << ": certificate file is not absolute: "
 							    << certFile << std::endl;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "key" ))	{
-					if ( ! getHostnameValue( L2it, displayName(), "key", keyFile ))
+					if ( ! getHostnameValue( L2it->second, displayName(), "key", keyFile ))
 						return false;
 					if ( ! boost::filesystem::path( keyFile ).is_absolute() )
 						LOG_WARNING << displayName() << ": key file is not absolute: "
 							    << keyFile << std::endl;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "CAdirectory" ))	{
-					if ( ! getHostnameValue( L2it, displayName(), "CAdirectory", CAdirectory ))
+					if ( ! getHostnameValue( L2it->second, displayName(), "CAdirectory", CAdirectory ))
 						return false;
 					if ( ! boost::filesystem::path( CAdirectory ).is_absolute() )
 						LOG_WARNING << displayName() << ": CA directory is not absolute: "
 							    << CAdirectory << std::endl;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "CAchainFile" ))	{
-					if ( ! getHostnameValue( L2it, displayName(), "CAchainFile", CAchainFile ))
+					if ( ! getHostnameValue( L2it->second, displayName(), "CAchainFile", CAchainFile ))
 						return false;
 					if ( ! boost::filesystem::path( CAchainFile ).is_absolute() )
 						LOG_WARNING << displayName() << ": CA chain file is not absolute: "
 							    << CAchainFile << std::endl;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "verify" ))	{
-					if ( ! getBoolValue( L2it, displayName(), "verify", verify ))
+					if ( ! getBoolValue( L2it->second, displayName(), "verify", verify ))
 						return false;
 				}
 				else	{

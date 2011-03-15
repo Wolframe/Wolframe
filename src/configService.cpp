@@ -65,15 +65,15 @@ bool ServiceConfiguration::parse( const boost::property_tree::ptree& pt, const s
 	if ( boost::algorithm::iequals( node, "daemon" ))	{
 		for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
 			if ( boost::algorithm::iequals( it->first, "user" ))	{
-				if ( ! getStringValue( it, displayName(), "user", user ))
+				if ( ! getStringValue( it->second, displayName(), "user", user ))
 					return false;
 			}
 			else if ( boost::algorithm::iequals( it->first, "group" ))	{
-				if ( ! getStringValue( it, displayName(), "group", group ))
+				if ( ! getStringValue( it->second, displayName(), "group", group ))
 					return false;
 			}
 			else if ( boost::algorithm::iequals( it->first, "pidFile" ))	{
-				if ( ! getStringValue( it, displayName(), "pidFile", pidFile ))
+				if ( ! getStringValue( it->second, displayName(), "pidFile", pidFile ))
 					return false;
 				if ( ! boost::filesystem::path( pidFile ).is_absolute() )
 					LOG_WARNING << displayName() << ": pid file path is not absolute: "
@@ -94,15 +94,15 @@ bool ServiceConfiguration::parse( const boost::property_tree::ptree& pt, const s
 	else if ( boost::algorithm::iequals( node, "service" ))	{
 		for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
 			if ( boost::algorithm::iequals( it->first, "serviceName" ))	{
-				if ( ! getStringValue( it, displayName(), "serviceName", serviceName ))
+				if ( ! getStringValue( it->second, displayName(), "serviceName", serviceName ))
 					return false;
 			}
 			else if ( boost::algorithm::iequals( it->first, "displayName" ))	{
-				if ( ! getStringValue( it, displayName(), "displayName", serviceDisplayName ))
+				if ( ! getStringValue( it->second, displayName(), "displayName", serviceDisplayName ))
 					return false;
 			}
 			else if ( boost::algorithm::iequals( it->first, "description" ))	{
-				if ( ! getStringValue( it, displayName(), "description", serviceDescription ))
+				if ( ! getStringValue( it->second, displayName(), "description", serviceDescription ))
 					return false;
 			}
 			else	{

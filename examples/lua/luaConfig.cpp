@@ -105,14 +105,14 @@ bool LuaConfiguration::parse( const boost::property_tree::ptree& pt, const std::
 {
 	for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
 		if ( boost::algorithm::iequals( it->first, "script" ))	{
-			if ( ! Configuration::getStringValue( it, displayName(), "script", script ))
+			if ( ! Configuration::getStringValue( it->second, displayName(), "script", script ))
 				return false;
 			if ( ! boost::filesystem::path( script ).is_absolute() )
 				LOG_WARNING << displayName() << ": script file path is not absolute: "
 					    << script << std::endl;
 		} else if ( boost::algorithm::iequals( it->first, "preload_lib" ))	{
 			std::string preload_lib;
-			if ( ! Configuration::getStringValue( it, displayName(), "preload_lib", preload_lib ))
+			if ( ! Configuration::getStringValue( it->second, displayName(), "preload_lib", preload_lib ))
 				return false;
 			preload_libs.push_back( preload_lib );
 		} else {

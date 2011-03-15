@@ -57,26 +57,26 @@ bool DatabaseConfiguration::parse( const boost::property_tree::ptree& pt, const 
 {
 	for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
 		if ( boost::algorithm::iequals( it->first, "host" ))	{
-			if ( !getStringValue( it, displayName(), "host", host ))		return false;
+			if ( !getStringValue( it->second, displayName(), "host", host ))		return false;
 		}
 		else if ( boost::algorithm::iequals( it->first, "port" ))	{
-			if ( !getUnsignedShortValue( it, displayName(), "port", port ))		return false;
+			if ( !getUnsignedShortValue( it->second, displayName(), "port", port ))		return false;
 		}
 		else if ( boost::algorithm::iequals( it->first, "name" ))	{
-			if ( !getStringValue( it, displayName(), "name", name ))		return false;
+			if ( !getStringValue( it->second, displayName(), "name", name ))		return false;
 		}
 		else if ( boost::algorithm::iequals( it->first, "user" ))	{
-			if ( !getStringValue( it, displayName(), "user", user ))		return false;
+			if ( !getStringValue( it->second, displayName(), "user", user ))		return false;
 		}
 		else if ( boost::algorithm::iequals( it->first, "password" ))	{
-			if ( !getStringValue( it, displayName(), "password", password ))	return false;
+			if ( !getStringValue( it->second, displayName(), "password", password ))	return false;
 		}
 		else if ( boost::algorithm::iequals( it->first, "connections" ))	{
-			if ( !getUnsignedShortValue( it, displayName(), "connections", connections ))
+			if ( !getUnsignedShortValue( it->second, displayName(), "connections", connections ))
 												return false;
 		}
 		else if ( boost::algorithm::iequals( it->first, "acquireTimeout" ))	{
-			if ( !getUnsignedShortValue( it, displayName(), "acquireTimeout", acquireTimeout ))
+			if ( !getUnsignedShortValue( it->second, displayName(), "acquireTimeout", acquireTimeout ))
 												return false;
 		}
 		else	{

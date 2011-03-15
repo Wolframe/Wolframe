@@ -36,7 +36,7 @@ bool EchoConfiguration::parse( const boost::property_tree::ptree& pt, const std:
 {
 	for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
 		if ( boost::algorithm::iequals( it->first, "idle" ))	{
-			if ( !Configuration::getUnsignedShortValue( it, displayName(), "idle", timeout ))
+			if ( !Configuration::getUnsignedShortValue( it->second, displayName(), "idle", timeout ))
 				return false;
 		}
 		else	{

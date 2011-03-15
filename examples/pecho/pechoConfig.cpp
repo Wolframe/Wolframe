@@ -36,7 +36,7 @@ bool pEchoConfiguration::parse( const boost::property_tree::ptree& pt, const std
 {
 	for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
 		if ( boost::algorithm::iequals( it->first, "idle" ))	{
-			if ( !Configuration::getUnsignedShortValue( it, displayName(), "timeout", timeout ))
+			if ( !Configuration::getUnsignedShortValue( it->second, displayName(), "timeout", timeout ))
 				return false;
 		}
 		else	{

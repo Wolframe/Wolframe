@@ -9,16 +9,16 @@
 namespace _Wolframe {
 	namespace Configuration	{
 
-		bool getBoolValue( boost::property_tree::ptree::const_iterator it, const std::string& module,
+		bool getBoolValue( const boost::property_tree::ptree& pt, const std::string& module,
 				   const std::string& name, bool& value );
 
-		bool getStringValue( boost::property_tree::ptree::const_iterator it, const std::string& module,
+		bool getStringValue( const boost::property_tree::ptree& pt, const std::string& module,
 				     const std::string& name, std::string& value );
 
-		bool getHostnameValue( boost::property_tree::ptree::const_iterator it, const std::string& module,
+		bool getHostnameValue( const boost::property_tree::ptree& pt, const std::string& module,
 				       const std::string& name, std::string& value );
 
-		bool getUnsignedShortValue( boost::property_tree::ptree::const_iterator it, const std::string& module,
+		bool getUnsignedShortValue( const boost::property_tree::ptree& pt, const std::string& module,
 					    const std::string& name, unsigned short& value );
 
 	} // namespace Configuration
