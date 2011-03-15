@@ -1,0 +1,7 @@
+<!-- Wolframe Service Development Kit documentation -->
+
+<!ENTITY SDKpreface			SYSTEM "Preface.xml">
+
+<!ENTITY SDKintroduction		SYSTEM "Introduction.xml">
+
+<!ENTITY SDKappendix			SYSTEM "Appendix.xml">

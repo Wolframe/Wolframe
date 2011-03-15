@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
+<svg width="20cm" height="14cm" viewBox="173 79 397 262" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <g>
+    <rect style="fill: #ffffff" x="416" y="83" width="153" height="257"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="416" y="83" width="153" height="257"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="176" y="80" width="144" height="93"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="176" y="80" width="144" height="93"/>
+  </g>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="732.5" y="447">
+    <tspan x="732.5" y="447"></tspan>
+  </text>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="320" y1="126.5" x2="408.711" y2="205.046"/>
+    <polygon style="fill: #000000" points="414.326,210.018 403.524,207.132 408.711,205.046 410.153,199.645 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="414.326,210.018 403.524,207.132 408.711,205.046 410.153,199.645 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="416" y1="211.5" x2="326.063" y2="286.848"/>
+    <polygon style="fill: #000000" points="320.314,291.664 324.768,281.409 326.063,286.848 331.19,289.075 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="320.314,291.664 324.768,281.409 326.063,286.848 331.19,289.075 "/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="174.6" y="246.6" width="144" height="93"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="174.6" y="246.6" width="144" height="93"/>
+  </g>
+</svg>

@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS =
+SUBDIRS = SDK
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

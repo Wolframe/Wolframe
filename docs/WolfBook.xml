@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [
+
+	<!ENTITY % xinclude		SYSTEM	"XInclude.mod">
+	%xinclude;
+
+	<!ENTITY % AppSrvEntities	SYSTEM	"AppServer/AppServer.ent">
+	%DocProcEnt;
+
+	<!ENTITY % SDKentities		SYSTEM	"SDK/SDK.ent">
+	%SDKentities;
+
+<!-- book data -->
+	<!ENTITY BookSetVersion		SYSTEM "version.txt">
+	<!ENTITY BookSetPublicationDate	SYSTEM "publicationDate.txt">
+
+]>
+	
+<set>
+	<setinfo>
+		<title>Wolframe documentation</title>
+		<copyright>
+			<year>2011</year>
+			<holder>Project Wolframe</holder>
+		</copyright>
+		<edition>version &BookSetVersion;</edition>
+		<pubdate>&BookSetPublicationDate;</pubdate>
+	</setinfo>
+
+	<book id="book_AppServer">
+		<title>Wolframe Application Server</title>
+		<subtitle>Application Building Manual</subtitle>
+		<titleabbrev>WAS</titleabbrev>
+		<bookinfo>
+			<date>&BookPublicationDate;</date>
+			<issuenum>Version &BookSetVersion;</issuenum>
+			<authorblurb><para>[ C O N F I D E N T I A L ]</para></authorblurb>
+			<pubdate>&BookSetPublicationDate; version &BookSetVersion;</pubdate>
+
+			<copyright>
+				<year>2011</year>
+				<holder>Project Wolframe</holder>
+			</copyright>
+			<legalnotice>
+				<para>Legal bla bla</para>
+			</legalnotice>
+		</bookinfo>
+
+		<index>
+			<title>Index</title>
+		</index>
+	</book>
+
+
+	<book id="book_SDK">
+		<title>Building Wolframe Services</title>
+		<title>Service Development Kit</title>
+		<titleabbrev>SDK</titleabbrev>
+		<bookinfo>
+			<date>&BookPublicationDate;</date>
+			<issuenum>Version &BookSetVersion;</issuenum>
+			<authorblurb><para>[ C O N F I D E N T I A L ]</para></authorblurb>
+			<pubdate>&BookSetPublicationDate; version &BookSetVersion;</pubdate>
+
+			<copyright>
+				<year>2011</year>
+				<holder>Project Wolframe</holder>
+			</copyright>
+			<legalnotice>
+				<para>Legal bla bla</para>
+			</legalnotice>
+		</bookinfo>
+
+		&SDKpreface;
+		&SDKintroduction;
+		&SDKappendix;
+
+		<index>
+			<title>Index</title>
+		</index>
+	</book>
+</set>
+
+
+
