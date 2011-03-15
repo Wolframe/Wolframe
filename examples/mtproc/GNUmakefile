@@ -45,7 +45,7 @@ OBJS = \
 
 ifdef WITH_LUA
 OBJS += \
-	implementation_lua.o
+	luatypes.o
 endif
 
 

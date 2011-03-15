@@ -12,12 +12,13 @@ typedef struct MethodDataT
 }
 MethodData;
 
-static bool getNext( ContentIterator* this_, void* buffer, unsigned int buffersize)
+static bool getNext( ContentIterator* this_, ElementType* type, void* buffer, unsigned int buffersize, unsigned int* bufferpos)
 {
    char* in = (char*)this_->m_ptr;
    unsigned int nn = this_->m_size - this_->m_pos;
+   *type = Value;
 
-   if (buffersize == 0)
+   if (buffersize == *bufferpos)
    {
       this_->m_state = Error;
       this_->m_errorCode = 1;
@@ -41,7 +42,8 @@ static bool getNext( ContentIterator* this_, void* buffer, unsigned int buffersi
       this_->m_state = Open;
       *(char*)buffer = *in;
       this_->m_pos += 1;
-      return true;
+      *bufferpos += 1;
+      return 1;
    }
 }
 
@@ -66,6 +68,8 @@ static bool print( FormatOutput* this_, int type_, void* element, unsigned int e
 static int echo( MethodContext* ctx, unsigned int argc, const char** argv)
 {
    MethodData* data = (MethodData*)ctx->data;
+   unsigned int bb = 0;
+   ElementType type; 
    UNUSED(argc);
    UNUSED(argv);
 
@@ -79,10 +83,11 @@ static int echo( MethodContext* ctx, unsigned int argc, const char** argv)
       if (!data->output.m_print( &data->output, 0, &data->buf, 1)) return 0;
       data->buf = 0;
    }
-   while (ctx->contentIterator->m_getNext( ctx->contentIterator, &data->buf, 1))
+   while (ctx->contentIterator->m_getNext( ctx->contentIterator, &type, &data->buf, 1, &bb))
    {
       if (!data->output.m_print( &data->output, 0, &data->buf, 1)) return 0;
       data->buf = 0;
+      bb = 0;
    }
    return 0;
 }

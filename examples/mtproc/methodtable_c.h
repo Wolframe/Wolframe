@@ -17,9 +17,18 @@ typedef enum
 }
 ContentIteratorState;
 
+typedef enum
+{
+   OpenTag,         //Open new hierarchy level
+   Attribute,       //Attribute Name
+   Value,           //Content or attribute Value
+   CloseTag         //Close current hierarchy level
+}
+ElementType;
+
 typedef struct ContentIterator* ContentIteratorP;
 
-typedef bool (*GetNext)( ContentIteratorP this_, void* buffer, unsigned int buffersize);
+typedef bool (*GetNext)( ContentIteratorP this_, ElementType* type, void* buffer, unsigned int buffersize, unsigned int* bufferpos);
 
 typedef struct ContentIterator
 {

@@ -5,24 +5,6 @@ namespace _Wolframe {
 namespace protocol {
 
 //@section protocolGeneratorInterface
-//Defines the building block for generators as iterator concept in interpreted languages 
-//having a form of 'yield' instruction (LUA,Python,etc.).
-//the protocol passes the content to process to the generator.
-
-//Behind a generator are things hidden from the processor:
-// - different levels of source transformation and filtering (for example XML Path selection and charset mapping)
-// - state handling for different action of the protocol handler in yield
-
-//@example generator function in C for the processor:
-//
-//bool nativeGeneratorCall( Generator* g, const void* b, unsigned int* n)
-//{
-//   if (!g->getNext( b, n)) 
-//   {
-//      if (g->state() == Generator::EndOfMessage) nativeCallYield(); else return false;
-//   }
-//   return true;
-//}
 
 //interface for (non STL conform) iterator over input content elements
 struct Generator
@@ -33,12 +15,21 @@ struct Generator
       EndOfMessage,   //EWOULDBLK -> have to yield
       Error           //an error occurred
    };
-   //Get next element call
-   typedef bool (*GetNext)( Generator* this_, void* buffer, unsigned int buffersize);
 
-   bool getNext( void* buffer, unsigned int buffersize)
+   enum ElementType
    {
-      return m_getNext( this, buffer, buffersize);
+      OpenTag,         //Open new hierarchy level
+      Attribute,       //Attribute Name
+      Value,           //Content or attribute Value
+      CloseTag         //Close current hierarchy level
+   };
+
+   //Get next element call
+   typedef bool (*GetNext)( Generator* this_, ElementType* type, void* buffer, unsigned int buffersize, unsigned int* bufferpos);
+
+   bool getNext( ElementType* type, void* buffer, unsigned int buffersize, unsigned int* bufferpos)
+   {
+      return m_getNext( this, type, buffer, buffersize, bufferpos);
    }
 
    State state() const

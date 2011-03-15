@@ -40,10 +40,13 @@ int Implementation::echo( Method::Context* ctx, unsigned int, const char**)
       if (!ctx->output->print( 0, &ctx->data->buf, 1)) return 0;
       ctx->data->buf = 0;
    }
-   while (ctx->contentIterator->getNext( &ctx->data->buf, 1))
+   protocol::Generator::ElementType type;
+   unsigned int bp = 0;
+   while (ctx->contentIterator->getNext( &type, &ctx->data->buf, 1, &bp))
    {
       if (!ctx->output->print( 0, &ctx->data->buf, 1)) return 0;
       ctx->data->buf = 0;
+      bp = 0;
    }
    return 0;
 }
