@@ -7,13 +7,11 @@
 #include <cstdarg>
 #include <cstdio>
 
-#include "miscUtils.h"
 #include "ErrorCode.hpp"
 #include "appException.hpp"
 
 
 static const size_t WHAT_BUFFER_SIZE = 255;
-static const size_t XML_BUFFER_SIZE = 512;
 
 
 namespace _Wolframe	{
@@ -31,17 +29,6 @@ appException::appException( ErrorCode::Error error, ErrorSeverity::Severity seve
 	va_end( ap );
 
 	what_ = std::string( buf );
-}
-
-
-std::string appException::docRepoAnswer()
-{
-	char	buf[XML_BUFFER_SIZE];
-
-	snprintf( buf, XML_BUFFER_SIZE, "<answer>\n\t<result>ERROR</result>\n\t<errorCode>%d</errorCode>\n\t<info>%s</info>\n</answer>\n",
-					(int)error_, XMLencode( what_ ).c_str() );
-
-	return std::string( buf );
 }
 
 
