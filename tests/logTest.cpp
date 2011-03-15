@@ -34,7 +34,7 @@ class LoggingFixture : public ::testing::Test
 		}
 };
 
-TEST_F( LoggingFixture, Macros )
+TEST_F( LoggingFixture, LogMacrosWithoutComponent )
 {
 	LOG_FATAL	<< "fatal error";
 	LOG_ALERT	<< "alert";
@@ -47,7 +47,10 @@ TEST_F( LoggingFixture, Macros )
 	LOG_DEBUG	<< "debug message";
 	LOG_TRACE	<< "debug message with tracing";
 	LOG_DATA	<< "debug message with tracing and data";
+}
 
+TEST_F( LoggingFixture, LogMacrosWithComponent )
+{
 	LOG_NETWORK_FATAL	<< "fatal error";
 	LOG_NETWORK_ALERT	<< "alert";
 	LOG_NETWORK_CRITICAL	<< "critical error";
@@ -60,6 +63,13 @@ TEST_F( LoggingFixture, Macros )
 	LOG_NETWORK_TRACE	<< "debug message with tracing";
 	LOG_NETWORK_DATA	<< "debug message with tracing and data";
 }
+
+/* doesn't work yet
+TEST_F( LoggingFixture, LogSystemErrorMarkers )
+{
+	LOG_ERROR	<< "open failed, reason: " << Logger::LogStrerror;
+}
+*/
 
 int main( int argc, char **argv )
 {
