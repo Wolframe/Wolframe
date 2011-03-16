@@ -5,6 +5,15 @@
 #ifndef _LOGGER_HPP_INCLUDED
 #define _LOGGER_HPP_INCLUDED
 
+#ifdef _WIN32
+#include <tchar.h>
+#include <windows.h>
+#include <strsafe.h>
+#else
+#include <errno.h>
+#include <cstring>
+#endif
+
 #include "singleton.hpp"
 #include "logLevel.hpp"
 #include "logSyslogFacility.hpp"
@@ -14,11 +23,6 @@
 #include <fstream>
 #include <sstream>
 
-#ifdef _WIN32
-#include <tchar.h>
-#include <windows.h>
-#include <strsafe.h>
-#endif
 
 #include "unused.h"
 
@@ -99,8 +103,16 @@ namespace _Wolframe {
 
 template< typename CharT, typename TraitsT >
 inline std::basic_ostream< CharT, TraitsT > &operator<< ( 	std::basic_ostream< CharT, TraitsT >& os,
-								const WOLFRAME_UNUSED _Wolframe::Logging::Logger::LogStrerrorT s ) {
-	os << "MARKER";
+								const WOLFRAME_UNUSED _Wolframe::Logging::Logger::LogStrerrorT s )
+{
+	char errbuf[512];
+
+	// TODO: this is the GNU version, we can't somehow force
+	// the portable one!?
+	char *ss = strerror_r( errno, errbuf, 512 );
+
+	os << ss;
+
 	return os;
 }
 
@@ -108,10 +120,10 @@ inline std::basic_ostream< CharT, TraitsT > &operator<< ( 	std::basic_ostream< C
 
 template< typename CharT, typename TraitsT >
 inline std::basic_ostream< CharT, TraitsT > &operator<< ( 	std::basic_ostream< CharT, TraitsT >& os,
-								const WOLFRAME_UNUSED _Wolframe::Logging::Logger::LogWinerrorT s ) {
+								const WOLFRAME_UNUSED _Wolframe::Logging::Logger::LogWinerrorT s )
+{
 	DWORD last_error = GetLastError( );
 	TCHAR errbuf[512];
-	
 	LPVOID werrbuf;
 	DWORD wbuf_size;
 	DWORD wres;

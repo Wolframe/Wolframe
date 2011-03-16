@@ -74,8 +74,10 @@ TEST_F( LoggingFixture, LogMacrosWithComponent )
 #ifndef _WIN32
 TEST_F( LoggingFixture, LogSystemErrorMarkersUnix )
 {
-	(void)open( "bla", O_RDONLY, 0 );
-	LOG_ERROR << "open failed, reason: " << LogStrerror;
+	int fd = open( "bla", O_RDONLY, 0 );
+	if( fd == -1 ) {
+		LOG_ERROR << "open failed, reason: " << LogStrerror;
+	}
 }
 #endif
 
