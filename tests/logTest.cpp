@@ -5,6 +5,11 @@
 #include "logger.hpp"
 #include <gtest/gtest.h>
 
+#ifndef _WIN32
+#include <sys/stat.h>
+#include <fcntl.h>
+#endif
+
 using namespace _Wolframe::Logging;
 
 // The fixture for testing class _Wolframe::Logging
@@ -64,12 +69,13 @@ TEST_F( LoggingFixture, LogMacrosWithComponent )
 	LOG_NETWORK_DATA	<< "debug message with tracing and data";
 }
 
-/* doesn't work yet
-TEST_F( LoggingFixture, LogSystemErrorMarkers )
+#ifndef _WIN32
+TEST_F( LoggingFixture, LogSystemErrorMarkersUnix )
 {
-	LOG_ERROR	<< "open failed, reason: " << Logger::LogStrerror;
+	open( "bla", O_RDONLY, 0 );
+//	LOG_ERROR	<< "open failed, reason: " << Logger::LogStrerror;
 }
-*/
+#endif
 
 int main( int argc, char **argv )
 {
