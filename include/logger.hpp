@@ -101,6 +101,8 @@ namespace _Wolframe {
 // template functions for error markers in the output stream
 // e.g. LOG_ERROR << "f() had a booboo, reason: " << Logger::LogStrerrorT
 
+#ifndef _WIN32
+
 template< typename CharT, typename TraitsT >
 inline std::basic_ostream< CharT, TraitsT > &operator<< ( 	std::basic_ostream< CharT, TraitsT >& os,
 								const WOLFRAME_UNUSED _Wolframe::Logging::Logger::LogStrerrorT s )
@@ -115,6 +117,8 @@ inline std::basic_ostream< CharT, TraitsT > &operator<< ( 	std::basic_ostream< C
 
 	return os;
 }
+
+#endif // !defined( _WIN32 )
 
 #ifdef _WIN32
 
@@ -151,7 +155,7 @@ inline std::basic_ostream< CharT, TraitsT > &operator<< ( 	std::basic_ostream< C
 	return os;
 }
 
-#endif // defined _WIN32
+#endif // defined( _WIN32 )
 
 // shortcut macros
 #define LOG_DATA	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogComponent::LOGCOMPONENT_NONE, _Wolframe::Logging::LogLevel::LOGLEVEL_DATA )
