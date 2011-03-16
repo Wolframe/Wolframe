@@ -75,7 +75,7 @@ TEST_F( LoggingFixture, LogMacrosWithComponent )
 TEST_F( LoggingFixture, LogSystemErrorMarkersUnix )
 {
 	(void)open( "bla", O_RDONLY, 0 );
-	LOG_ERROR	<< "open failed, reason: " << Logger::LogStrerror;
+	LOG_ERROR << "open failed, reason: " << Logger::LogStrerror;
 }
 #endif
 
@@ -83,8 +83,10 @@ TEST_F( LoggingFixture, LogSystemErrorMarkersUnix )
 TEST_F( LoggingFixture, LogSystemErrorMarkersWin )
 {
 	OFSTRUCT s;
-	(void)OpenFile( "bla", &s, OF_READ );
-	LOG_ERROR	<< "OpenFile failed, reason: " << Logger::LogWinerror;
+	HFILE h = OpenFile( "bla", &s, OF_READ );
+	if( h == HFILE_ERROR ) {
+		LOG_ERROR << "OpenFile failed, reason: " << _Wolframe::Logging::Logger::LogWinerror;
+	}
 }
 #endif
 

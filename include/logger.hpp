@@ -14,6 +14,12 @@
 #include <fstream>
 #include <sstream>
 
+#ifdef _WIN32
+#include <tchar.h>
+#include <windows.h>
+#include <strsafe.h>
+#endif
+
 #include "unused.h"
 
 namespace _Wolframe {
@@ -65,7 +71,7 @@ namespace _Wolframe {
 
 		typedef struct { int _dummy; } LogStrerrorT;
 		static const LogStrerrorT LogStrerror;
-		typedef struct { int _dummy; } LogWinerrorT;
+		typedef struct LogWinerrorT { int _dummy; } LogWinerrorT;
 		static const LogWinerrorT LogWinerror;
 		
 	protected:
@@ -94,12 +100,42 @@ inline std::basic_ostream< CharT, TraitsT > &operator<< ( 	std::basic_ostream< C
 	return os;
 }
 
+#ifdef _WIN32
+
 template< typename CharT, typename TraitsT >
 inline std::basic_ostream< CharT, TraitsT > &operator<< ( 	std::basic_ostream< CharT, TraitsT >& os,
 								const WOLFRAME_UNUSED _Wolframe::Logging::Logger::LogWinerrorT s ) {
-	os << "MARKER";
+	DWORD last_error = GetLastError( );
+	TCHAR errbuf[512];
+	
+	LPVOID werrbuf;
+	DWORD wbuf_size;
+	DWORD wres;
+	
+	wres = FormatMessage(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER |
+		FORMAT_MESSAGE_FROM_SYSTEM |
+		FORMAT_MESSAGE_IGNORE_INSERTS |
+		FORMAT_MESSAGE_MAX_WIDTH_MASK,
+		NULL,			// message is from system
+		last_error,		// code of last error (GetLastError)
+		0,			// default language (TODO: fit to i18n of rest)
+		(LPTSTR)&werrbuf,	// use LocalAlloc for the message string
+		0,			// minimal allocation size
+		NULL );			// no arguments to the message
+		
+	if( wres == 0 ) {
+		StringCbCopy( errbuf, 512, _T( "No message available" ) );
+	}
+
+	StringCbCopy( errbuf, 512, (LPCTSTR)werrbuf );
+	
+	os << errbuf;
+	
 	return os;
 }
+
+#endif // defined _WIN32
 
 // shortcut macros
 #define LOG_DATA	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogComponent::LOGCOMPONENT_NONE, _Wolframe::Logging::LogLevel::LOGLEVEL_DATA )
