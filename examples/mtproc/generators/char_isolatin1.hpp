@@ -1,6 +1,7 @@
 #ifndef _Wolframe_PROTOCOL_GENERATOR_CHAR_ISOLATIN1_HPP_INCLUDED
 #define _Wolframe_PROTOCOL_GENERATOR_CHAR_ISOLATIN1_HPP_INCLUDED
 #include "protocol/generator.hpp"
+#include "protocol/formatoutput.hpp"
 #include <cstring>
 
 namespace _Wolframe {
@@ -14,10 +15,10 @@ struct CharIsoLatin1
    typedef protocol::FormatOutput FormatOutput;
 
    enum ErrorCodes {Ok=0,ErrBufferTooSmall=1};
-   static bool GetNext( Generator* this_, Generator::ElementType* type, void* buffer, unsigned int buffersize, unsigned int* bufferpos)
+   static bool GetNext( Generator* this_, Generator::ElementType* type, void* buffer, Generator::size_type buffersize, Generator::size_type* bufferpos)
    {
       char* in = (char*)this_->ptr();
-      unsigned int nn = this_->size();
+      Generator::size_type nn = this_->size();
       *type = Generator::Value;
 
       if (buffersize == *bufferpos)
@@ -48,10 +49,10 @@ struct CharIsoLatin1
       }
    }
 
-   static bool Print( FormatOutput* this_, int, void* element, unsigned int elementsize)
+   static bool Print( FormatOutput* this_, FormatOutput::ElementType, void* element, FormatOutput::size_type elementsize)
    {
       char* out = (char*)this_->cur();
-      unsigned int nn = this_->restsize();
+      FormatOutput::size_type nn = this_->restsize();
 
       if (elementsize > nn)
       {

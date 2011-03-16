@@ -1,7 +1,7 @@
 -- predefined objects by the system
 -- 1) input
 -- 2) output
--- 3) "object pool" (not used yet here)
+-- 3) "object pool" - not used yet here
 
 
 -- [readTable] returns the table desribed by argument (propertytree,XML,etc..)
@@ -10,7 +10,7 @@ function readTable( itr)
 	local table = {}
 
 	-- index(): generator to assign content that is not labeled with an attribute name. not really needed for config, but XML
-	local i = 0
+	local i = -1
 	function index()
 		i=i+1
 		return i
@@ -37,7 +37,7 @@ end
 -- this example does not expect arguments
 function echo()
 	-- load the generator with closure type from a loadable module
-	filter = require "filter.Char.IsoLatin1"
+	filter = require "filter.char.IsoLatin1"
 
 	-- define the filter functions of I/O
 	input.as filter.get

@@ -15,39 +15,39 @@ namespace protocol {
 class MemBlock
 {
 public:
-   MemBlock();
-   MemBlock( unsigned int p_size);
-   MemBlock( void* p_ptr, unsigned int p_size);
-   MemBlock( const MemBlock& o);
-   ~MemBlock();
+	//element typedefs
+	typedef char value_type;
+	typedef std::size_t size_type;
 
-   MemBlock& operator=( const MemBlock& o);
+	MemBlock();
+	MemBlock( size_type p_size);
+	MemBlock( void* p_ptr, size_type p_size);
+	MemBlock( const MemBlock& o);
+	~MemBlock();
 
-   void setPos( unsigned int p_pos=0)            {m_pos = p_pos;}
-   void set( void* p_ptr, unsigned int p_size);
-   void* ptr()                                   {return m_ptr;}
-   const void* ptr() const                       {return m_ptr;}
-   char* charptr()                               {return (char*)m_ptr;}
-   const char* charptr() const                   {return (const char*)m_ptr;}
-   unsigned int size() const                     {return m_size;}
-   unsigned int pos() const                      {return m_pos;}
+	MemBlock& operator=( const MemBlock& o);
 
-   //access violation exceptions
-   struct ArrayBoundReadError                    :public std::logic_error {ArrayBoundReadError():std::logic_error("ABR"){}};
+	void setPos( size_type p_pos=0)				{m_pos = p_pos;}
+	void set( void* p_ptr, size_type p_size);
+	void* ptr()						{return m_ptr;}
+	const void* ptr() const					{return m_ptr;}
+	char* charptr()						{return (char*)m_ptr;}
+	const char* charptr() const				{return (const char*)m_ptr;}
+	size_type size() const					{return m_size;}
+	size_type pos() const					{return m_pos;}
 
-   //element typedefs
-   typedef char value_type;
-   typedef unsigned int size_type;
+	//access violation exceptions
+	struct ArrayBoundReadError				:public std::logic_error {ArrayBoundReadError():std::logic_error("ABR"){}};
 
-   //random access operators
-   char operator[]( size_type idx) const         {if (idx>=m_pos) throw ArrayBoundReadError(); return charptr()[idx];}
-   char& operator[]( size_type idx)              {if (idx>=m_pos) throw ArrayBoundReadError(); return charptr()[idx];}
+	//random access operators
+	char operator[]( size_type idx) const			{if (idx>=m_pos) throw ArrayBoundReadError(); return charptr()[idx];}
+	char& operator[]( size_type idx)			{if (idx>=m_pos) throw ArrayBoundReadError(); return charptr()[idx];}
 
 private:
-   void* m_ptr;
-   std::size_t m_size;
-   std::size_t m_pos;
-   bool m_allocated;
+	void* m_ptr;
+	std::size_t m_size;
+	std::size_t m_pos;
+	bool m_allocated;
 };
 
 
@@ -58,55 +58,55 @@ private:
 class InputBlock  :public MemBlock
 {
 public:
-   struct EoD
-   {
-      enum State {SRC,LF,LF_DOT,LF_DOT_CR,LF_DOT_CR_LF};
-   };
+	struct EoD
+	{
+		enum State {SRC,LF,LF_DOT,LF_DOT_CR,LF_DOT_CR_LF};
+	};
 
-   InputBlock()                                         :m_eodState(EoD::SRC){}
-   InputBlock( unsigned int p_size)                     :MemBlock(p_size),m_eodState(EoD::SRC){}
-   InputBlock( void* p_ptr, unsigned int p_size)        :MemBlock(p_ptr,p_size),m_eodState(EoD::SRC){}
-   InputBlock( const InputBlock& o)                     :MemBlock(o),m_eodState(o.m_eodState){}
+	InputBlock()						:m_eodState(EoD::SRC){}
+	InputBlock( size_type p_size)				:MemBlock(p_size),m_eodState(EoD::SRC){}
+	InputBlock( void* p_ptr, size_type p_size)		:MemBlock(p_ptr,p_size),m_eodState(EoD::SRC){}
+	InputBlock( const InputBlock& o)			:MemBlock(o),m_eodState(o.m_eodState){}
 
-   //random access iterators
-   typedef array::iterator_t<const InputBlock,size_type,char,char,const char*> const_iterator;
-   typedef array::iterator_t<InputBlock,size_type,char,char&,char*> iterator;
+	//random access iterators
+	typedef array::iterator_t<const InputBlock,size_type,char,char,const char*> const_iterator;
+	typedef array::iterator_t<InputBlock,size_type,char,char&,char*> iterator;
 
-   const_iterator begin() const                         {const_iterator rt(this); return rt;}
-   iterator begin()                                     {iterator rt(this); return rt;}
-   const_iterator at( unsigned int pos_) const          {const_iterator rt(this); return rt+pos_;}
-   iterator at( unsigned int pos_)                      {iterator rt(this); return rt+pos_;}
-   const_iterator end() const                           {return const_iterator(this)+pos();}
-   iterator end()                                       {return iterator(this)+pos();}
+	const_iterator begin() const				{const_iterator rt(this); return rt;}
+	iterator begin()					{iterator rt(this); return rt;}
+	const_iterator at( size_type pos_) const		{const_iterator rt(this); return rt+pos_;}
+	iterator at( size_type pos_)				{iterator rt(this); return rt+pos_;}
+	const_iterator end() const				{return const_iterator(this)+pos();}
+	iterator end()						{return iterator(this)+pos();}
 
-   //end of data calculation and markup
-   iterator getEoD( iterator start)
-   {
-      int eodpos = getEoDpos( start-begin());
-      return (eodpos>=0)?(start+eodpos):end();
-   }
+	//end of data calculation and markup
+	iterator getEoD( iterator start)
+	{
+		int eodpos = getEoDpos( start-begin());
+		return (eodpos>=0)?(start+eodpos):end();
+	}
 
-   void resetEoD()                                      {m_eodState=EoD::SRC;}
+	void resetEoD()						{m_eodState=EoD::SRC;}
 
-   bool gotEoD() const                                  {return m_eodState>=EoD::LF_DOT_CR;}
-   bool gotEoD_LF() const                               {return m_eodState>=EoD::LF_DOT_CR_LF;}
+	bool gotEoD() const					{return m_eodState>=EoD::LF_DOT_CR;}
+	bool gotEoD_LF() const					{return m_eodState>=EoD::LF_DOT_CR_LF;}
 
-   iterator getStart( const iterator itr)
-   {
-      if (m_eodState == EoD::LF_DOT_CR && itr < end() && *itr == '\n')
-      {
-	 m_eodState = EoD::LF_DOT_CR_LF;
-	 return itr+(size_type)1;
-      }
-      else
-      {
-	 return itr;
-      }
-   }
+	iterator getStart( const iterator itr)
+	{
+		if (m_eodState == EoD::LF_DOT_CR && itr < end() && *itr == '\n')
+		{
+			m_eodState = EoD::LF_DOT_CR_LF;
+			return itr+(size_type)1;
+		}
+		else
+		{
+			return itr;
+		}
+	}
 
 private:
-   int getEoDpos( unsigned int offset);
-   EoD::State m_eodState;
+	int getEoDpos( size_type offset);
+	EoD::State m_eodState;
 };
 
 
@@ -117,42 +117,42 @@ private:
 class OutputBlock :public MemBlock
 {
 public:
-   OutputBlock( unsigned int p_size)                    :MemBlock(p_size) {}
-   OutputBlock( void* p_ptr, unsigned int p_size)       :MemBlock(p_ptr,p_size) {}
-   OutputBlock( const OutputBlock& o)                   :MemBlock(o) {}
+	OutputBlock( size_type p_size)				:MemBlock(p_size) {}
+	OutputBlock( void* p_ptr, size_type p_size)		:MemBlock(p_ptr,p_size) {}
+	OutputBlock( const OutputBlock& o)			:MemBlock(o) {}
 
-   //return true if the buffer is empty
-   bool empty() const
-   {
-      return (pos()==0);
-   }
+	//return true if the buffer is empty
+	bool empty() const
+	{
+		return (pos()==0);
+	}
 
-   //print one character to the output
-   bool print( char ch)
-   {
-      if (pos() == size()) return false;
-      charptr()[ pos()] = ch;
-      setPos( pos() + 1);
-      return true;
-   }
+	//print one character to the output
+	bool print( char ch)
+	{
+		if (pos() == size()) return false;
+		charptr()[ pos()] = ch;
+		setPos( pos() + 1);
+		return true;
+	}
 
-   //forward the output buffer cursor
-   bool incPos( unsigned int nn)
-   {
-      if (pos()+nn >= size()) return false;
-      setPos( pos() + nn);
-      return true;
-   }
+	//forward the output buffer cursor
+	bool incPos( size_type nn)
+	{
+		if (pos()+nn >= size()) return false;
+		setPos( pos() + nn);
+		return true;
+	}
 
-   //pointer to the rest of the output buffer block
-   const char* rest() const                            {return charptr() + pos();}
-   char* rest()                                        {return charptr() + pos();}
+	//pointer to the rest of the output buffer block
+	const char* rest() const				{return charptr() + pos();}
+	char* rest()						{return charptr() + pos();}
 
-   //size of the rest of the output buffer (how many characters can be written)
-   unsigned int restsize() const                       {return size()-pos();}
+	//size of the rest of the output buffer (how many characters can be written)
+	size_type restsize() const				{return size()-pos();}
 
-   //release a written memory block
-   void release()                                      {setPos(0);}
+	//release a written memory block
+	void release()						{setPos(0);}
 };
 
 } // namespace protocol

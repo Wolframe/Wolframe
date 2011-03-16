@@ -1,4 +1,5 @@
 #include "luatypes.hpp"
+#include "protocol/formatoutput.hpp"
 #include <stdexcept>
 extern "C"
 {

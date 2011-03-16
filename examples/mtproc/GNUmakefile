@@ -40,6 +40,7 @@ OBJS = \
 	implementation.o \
 	implementation_c.o \
 	dispatcher.o \
+	generators/propertyTree.o \
 	mtprocHandler.o \
 	$(TOPDIR)/src/posixMain.o
 

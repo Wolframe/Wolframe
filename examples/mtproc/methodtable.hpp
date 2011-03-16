@@ -1,6 +1,7 @@
 #ifndef _Wolframe_METHODTABLE_HPP_INCLUDED
 #define _Wolframe_METHODTABLE_HPP_INCLUDED
 #include "protocol/generator.hpp"
+#include "protocol/formatoutput.hpp"
 
 namespace _Wolframe {
 namespace mtproc {

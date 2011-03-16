@@ -76,6 +76,7 @@ TEST_CPP_BINS += \
 	poolTest$(EXE) \
 	logTest$(EXE) \
 	protocolArgumentParsing-gTest$(EXE) \
+	ptreeGenerator-gTest$(EXE) \
 	pechoHandler-gTest$(EXE) \
 	mtprocHandler-gTest$(EXE)
 endif
@@ -97,6 +98,9 @@ MTPROC_GTEST_OBJS = \
 	$(TOPDIR)/examples/mtproc/dispatcher.o
 mtprocHandler-gTest$(EXE): mtprocHandler-gTest.o $(MTPROC_GTEST_OBJS) $(TOPDIR)/src/libwolframe.a
 	$(CCPP_LINK) -o $@ $(LDFLAGS) $(MTPROC_GTEST_OBJS) $(OBJS) $< $(LIBS)
+
+ptreeGenerator-gTest$(EXE): ptreeGenerator-gTest.o  $(TOPDIR)/examples/mtproc/generators/propertyTree.o $(TOPDIR)/src/libwolframe.a
+	$(CCPP_LINK) -o $@ $(LDFLAGS)  $(TOPDIR)/examples/mtproc/generators/propertyTree.o $(OBJS) $< $(LIBS)
 endif
 
 local_all:
