@@ -4,7 +4,7 @@
 -- 3) "object pool" (not used yet here)
 
 
--- readTable returns the table desribed by argument (propertytree,XML,etc..)
+-- [readTable] returns the table desribed by argument (propertytree,XML,etc..)
 -- @param itr :generator function (iterator with its closure):
 function readTable( itr)
 	local table = {}
@@ -24,13 +24,17 @@ function readTable( itr)
 	return table
 end
 
+-- [readConfig] is called by the connectionHandler to process the configuration.
+-- another function might be defined for checking the configuration
+-- the handler reads the configuration to get the (this) script to execute and calls it with an iterator over its configuration
 config = {}
 function readConfig( itr)
 	-- read config as table with the content of "/main/sub/A" addressable as config["main"]["sub"]["A"]
 	config = readTable( itr)
 end
 
--- does the echo does not expect arguments
+-- [echo] does the processing
+-- this example does not expect arguments
 function echo()
 	-- load the generator with closure type from a loadable module
 	filter = require "filter.Char.IsoLatin1"
