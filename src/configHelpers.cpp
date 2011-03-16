@@ -29,8 +29,8 @@ bool getBoolValue( const boost::property_tree::ptree& pt, const std::string& mod
 		value = true;
 		return true;
 	}
-	LOG_ERROR << module << ": invalid logical value for " << name << ": <"
-		  << pt.get_value<std::string>() << ">";
+	LOG_ERROR << module << ": invalid logical value for " << name << ": \""
+		  << pt.get_value<std::string>() << "\"";
 	return false;
 }
 
@@ -44,8 +44,8 @@ bool getStringValue( const boost::property_tree::ptree& pt, const std::string& m
 	}
 	value = pt.get_value<std::string>();
 	if ( value.empty() )	{
-		LOG_ERROR << module << ": invalid value for " << name << ": <"
-			  << pt.get_value<std::string>() << ">";
+		LOG_ERROR << module << ": invalid value for " << name << ": \""
+			  << pt.get_value<std::string>() << "\"";
 		return false;
 	}
 	return true;
@@ -61,8 +61,8 @@ bool getHostnameValue( const boost::property_tree::ptree& pt, const std::string&
 	}
 	value = pt.get_value<std::string>();
 	if ( value.empty() )	{
-		LOG_ERROR << module << ": invalid value for " << name << ": <"
-			  << pt.get_value<std::string>() << ">";
+		LOG_ERROR << module << ": invalid value for " << name << ": \""
+			  << pt.get_value<std::string>() << "\"";
 		return false;
 	}
 	if ( value == "*" )
@@ -80,8 +80,8 @@ bool getUnsignedShortValue( const boost::property_tree::ptree& pt, const std::st
 	}
 	value = pt.get_value<unsigned short>();
 	if ( value == 0 )	{
-		LOG_ERROR << module << ": invalid value for " << name << ": <"
-			  << pt.get_value<std::string>() << ">";
+		LOG_ERROR << module << ": invalid value for " << name << ": \""
+			  << pt.get_value<std::string>() << "\"";
 		return false;
 	}
 	return true;

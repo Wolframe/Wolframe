@@ -1,13 +1,9 @@
 #!/usr/bin/expect
 #
 #
-# You can extend this idea to save any arbitrary information across rlogin
-# Don Libes - Oct 17, 1991.
+# Start a wolframe daemon and check the configuration
 
-set prompt "(%|#|\\$) $" ;# default prompt
-catch {set prompt $env(EXPECT_PROMPT)}
-
+set timeout 5
 eval spawn ../../src/wolframed -c ../config/wolframe-posix.conf -t
-set timeout 60
-expect eof exit timeout {send_user "timed out\n"; exit} -re $prompt
-send "cd [pwd]\r"
+
+wait
