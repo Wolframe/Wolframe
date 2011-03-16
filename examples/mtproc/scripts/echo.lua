@@ -1,3 +1,9 @@
+-- predefined objects by the system
+-- 1) input
+-- 2) output
+-- 3) "object pool" (not used yet here)
+
+
 -- readTable returns the table desribed by argument (propertytree,XML,etc..)
 -- @param itr :generator function (iterator with its closure):
 function readTable( itr)
@@ -15,13 +21,13 @@ function readTable( itr)
 	-- 2) values to attributes
 	-- 3) content enumerated from 0:
 	for t,v in itr() do table[t or index()] = v or readTable( itr) end
-	return table;
+	return table
 end
 
-config = {};
+config = {}
 function readConfig( itr)
 	-- read config as table with the content of "/main/sub/A" addressable as config["main"]["sub"]["A"]
-	config = readTable( itr);
+	config = readTable( itr)
 end
 
 -- does the echo does not expect arguments
@@ -34,6 +40,6 @@ function echo()
 	output.as filter.put
 
 	-- do the echo (no real echo, because not buffering lines)
-	for ch in input.read() do output.write( ch);
+	for ch in input.read() do output.write( ch) end
 end
 
