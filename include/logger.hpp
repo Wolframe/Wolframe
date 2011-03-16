@@ -88,6 +88,7 @@ namespace _Wolframe {
 	};
 
 	const Logger::LogStrerrorT LogStrerror = { 1 };
+	const Logger::LogWinerrorT LogWinerror = { 2 };
 		
 	} // namespace Logging
 } // namespace _Wolframe

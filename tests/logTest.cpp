@@ -85,7 +85,7 @@ TEST_F( LoggingFixture, LogSystemErrorMarkersWin )
 	OFSTRUCT s;
 	HFILE h = OpenFile( "bla", &s, OF_READ );
 	if( h == HFILE_ERROR ) {
-		LOG_ERROR << "OpenFile failed, reason: " << _Wolframe::Logging::Logger::LogWinerror;
+		LOG_ERROR << "OpenFile failed, reason: " << LogWinerror;
 	}
 }
 #endif
