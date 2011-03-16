@@ -80,6 +80,7 @@ Make sure the SDK variables for compilation and linking are set correctly:
 
 set INCLUDE=%INCLUDE%;D:\Programme\Microsoft Platform SDK\include;D:\Programme\OpenSSL\include
 set LIB=%LIB%;D:\Programme\Microsoft Platform SDK\lib;D:\Programme\OpenSSL\lib
+set PATH=%PATH%;D:\Programme\Microsoft Platform SDK\bin
 
 Clean up first the MinGW build with:
 

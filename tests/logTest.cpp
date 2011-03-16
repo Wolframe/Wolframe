@@ -8,6 +8,8 @@
 #ifndef _WIN32
 #include <sys/stat.h>
 #include <fcntl.h>
+#else
+#include <windows.h>
 #endif
 
 using namespace _Wolframe::Logging;
@@ -72,8 +74,19 @@ TEST_F( LoggingFixture, LogMacrosWithComponent )
 #ifndef _WIN32
 TEST_F( LoggingFixture, LogSystemErrorMarkersUnix )
 {
-	open( "bla", O_RDONLY, 0 );
-//	LOG_ERROR	<< "open failed, reason: " << Logger::LogStrerror;
+	(void)open( "bla", O_RDONLY, 0 );
+	LOG_ERROR << "open failed, reason: " << LogStrerror;
+}
+#endif
+
+#ifdef _WIN32
+TEST_F( LoggingFixture, LogSystemErrorMarkersWin )
+{
+	OFSTRUCT s;
+	HFILE h = OpenFile( "bla", &s, OF_READ );
+	if( h == HFILE_ERROR ) {
+		LOG_ERROR << "OpenFile failed, reason: " << LogWinerror;
+	}
 }
 #endif
 
