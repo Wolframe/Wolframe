@@ -14,6 +14,7 @@
 #include <fstream>
 #include <sstream>
 
+#include "unused.h"
 
 namespace _Wolframe {
 	namespace Logging {
@@ -62,6 +63,11 @@ namespace _Wolframe {
 
 		std::ostringstream& Get( LogComponent::Component component_, LogLevel::Level level );
 
+		typedef struct { int _dummy; } LogStrerrorT;
+		static const LogStrerrorT LogStrerror;
+		typedef struct { int _dummy; } LogWinerrorT;
+		static const LogWinerrorT LogWinerror;
+		
 	protected:
 		std::ostringstream os_;
 
@@ -74,10 +80,26 @@ namespace _Wolframe {
 		Logger( const Logger& );
 		Logger& operator= ( const Logger& );
 	};
-
+		
 	} // namespace Logging
 } // namespace _Wolframe
 
+// template functions for error markers in the output stream
+// e.g. LOG_ERROR << "f() had a booboo, reason: " << Logger::LogStrerrorT
+
+template< typename CharT, typename TraitsT >
+inline std::basic_ostream< CharT, TraitsT > &operator<< ( 	std::basic_ostream< CharT, TraitsT >& os,
+								const WOLFRAME_UNUSED _Wolframe::Logging::Logger::LogStrerrorT s ) {
+	os << "MARKER";
+	return os;
+}
+
+template< typename CharT, typename TraitsT >
+inline std::basic_ostream< CharT, TraitsT > &operator<< ( 	std::basic_ostream< CharT, TraitsT >& os,
+								const WOLFRAME_UNUSED _Wolframe::Logging::Logger::LogWinerrorT s ) {
+	os << "MARKER";
+	return os;
+}
 
 // shortcut macros
 #define LOG_DATA	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogComponent::LOGCOMPONENT_NONE, _Wolframe::Logging::LogLevel::LOGLEVEL_DATA )
