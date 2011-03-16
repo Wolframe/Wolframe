@@ -75,7 +75,7 @@ TEST_F( LoggingFixture, LogMacrosWithComponent )
 TEST_F( LoggingFixture, LogSystemErrorMarkersUnix )
 {
 	(void)open( "bla", O_RDONLY, 0 );
-	LOG_ERROR << "open failed, reason: " << Logger::LogStrerror;
+	LOG_ERROR << "open failed, reason: " << LogStrerror;
 }
 #endif
 

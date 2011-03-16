@@ -86,9 +86,12 @@ namespace _Wolframe {
 		Logger( const Logger& );
 		Logger& operator= ( const Logger& );
 	};
+
+	const Logger::LogStrerrorT LogStrerror = { 1 };
 		
 	} // namespace Logging
 } // namespace _Wolframe
+
 
 // template functions for error markers in the output stream
 // e.g. LOG_ERROR << "f() had a booboo, reason: " << Logger::LogStrerrorT
