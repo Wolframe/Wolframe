@@ -41,7 +41,8 @@ namespace _Wolframe {
 		LuaConfiguration( const std::string& printName );
 
 		/// methods
-		bool parse( const boost::property_tree::ptree& pt, const std::string& nodeName );
+		bool parse( const boost::property_tree::ptree::const_iterator it,
+			    const std::string& nodeName );
 		void setCanonicalPathes( const std::string& refPath );
 		bool check() const;
 		void print( std::ostream& os ) const;

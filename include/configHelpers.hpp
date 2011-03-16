@@ -9,33 +9,34 @@
 namespace _Wolframe {
 	namespace Configuration	{
 
-		bool getBoolValue( const boost::property_tree::ptree& pt, const std::string& module,
-				   const std::string& name, bool& value );
+		bool getBoolValue( const boost::property_tree::ptree::const_iterator it,
+				   const std::string& module, bool& value );
 
-		bool getBoolValue( const boost::property_tree::ptree& pt, const std::string& module,
-				   const std::string& name, bool& value, bool& valueIsSet );
+		bool getBoolValue( const boost::property_tree::ptree::const_iterator it,
+				   const std::string& module, bool& value, bool& valueIsSet );
 
 
-		bool getStringValue( const boost::property_tree::ptree& pt, const std::string& module,
-				     const std::string& name, std::string& value );
+		bool getStringValue( const boost::property_tree::ptree::const_iterator it,
+				     const std::string& module, std::string& value );
 
-		bool getHostnameValue( const boost::property_tree::ptree& pt, const std::string& module,
-				       const std::string& name, std::string& value );
+		bool getHostnameValue( const boost::property_tree::ptree::const_iterator it,
+				       const std::string& module, std::string& value );
 
-		bool getUnsignedShortValue( const boost::property_tree::ptree& pt, const std::string& module,
-					    const std::string& name, unsigned short& value );
 
-		template <typename T>
-		bool getNonZeroIntValue( const boost::property_tree::ptree& pt, const std::string& module,
-					 const std::string& name, T& value );
+		bool getUnsignedShortValue( const boost::property_tree::ptree::const_iterator it,
+					    const std::string& module, unsigned short& value );
 
 		template <typename T>
-		bool getIntegerValue( const boost::property_tree::ptree& pt, const std::string& module,
-				      const std::string& name, T& value );
+		bool getNonZeroIntValue( const boost::property_tree::ptree::const_iterator it,
+					 const std::string& module, T& value );
 
 		template <typename T>
-		bool getIntegerValue( const boost::property_tree::ptree& pt, const std::string& module,
-				      const std::string& name, T& value, bool& valueIsSet );
+		bool getIntegerValue( const boost::property_tree::ptree::const_iterator it,
+				      const std::string& module, T& value );
+
+		template <typename T>
+		bool getIntegerValue( const boost::property_tree::ptree::const_iterator it,
+				      const std::string& module, T& value, bool& valueIsSet );
 
 	} // namespace Configuration
 } // namespace _Wolframe

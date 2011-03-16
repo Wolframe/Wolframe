@@ -29,7 +29,8 @@ namespace _Wolframe {
 
 			const std::string& displayName() const	{ return dispName_; }
 
-			virtual bool parse( const boost::property_tree::ptree& pt, const std::string& nodeName ) = 0;
+			virtual bool parse( const boost::property_tree::ptree::const_iterator it,
+					   const std::string& nodeName ) = 0;
 
 			virtual void setCanonicalPathes( const std::string& /* referencePath */ )	{}
 

@@ -106,9 +106,11 @@ void LoggerConfiguration::foreground( Logging::LogLevel::Level debugLevel, bool 
 }
 
 
-bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& /* node */ )
+bool LoggerConfiguration::parse( const boost::property_tree::ptree::const_iterator it,
+				 const std::string& /* node */ )
 {
-	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
+	for ( boost::property_tree::ptree::const_iterator L1it = it->second.begin();
+								L1it != it->second.end(); L1it++ )	{
 		// stderr logging
 		if ( boost::algorithm::iequals( L1it->first, "stderr" ))	{
 			if ( logToStderr )	{
@@ -137,7 +139,6 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 					LOG_WARNING << displayName() << ": stderr: unknown configuration option: <"
 							<< L2it->first << ">";
 //					return false;
-
 				}
 			}
 		}
@@ -184,7 +185,6 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 					LOG_WARNING << displayName() << ": logfile: unknown configuration option: <"
 							<< L2it->first << ">";
 //					return false;
-
 				}
 			}
 		}
