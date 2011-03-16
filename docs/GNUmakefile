@@ -9,6 +9,13 @@ local_all:
 doc: wolframed.8 wolframe.conf.5
 	cd $(TOPDIR); doxygen docs/doxygen.conf
 
+# xmllint --noout --xinclude --postvalid --noent WolfBook.xml
+#
+#	@$(XSLTPROC) --xinclude --stringparam draft.mode yes \
+#		-o output/docRepo-pdf.fo eurospider-pdf.xsl Book.xml
+#	DESTDIR=/ fop -fo output/docRepo-pdf.fo -pdf output/docRepo.pdf
+#	rm output/docRepo-pdf.fo
+
 XSLT_MAN_PARAMS = \
 	--param man.charmap.use.subset "0" \
 	--param make.year.ranges "1" \

@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+<!DOCTYPE set PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
 	"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [
 
 	<!ENTITY % xinclude		SYSTEM	"XInclude.mod">
 	%xinclude;
 
 	<!ENTITY % AppSrvEntities	SYSTEM	"AppServer/AppServer.ent">
-	%DocProcEnt;
+	%AppSrvEntities;
 
 	<!ENTITY % SDKentities		SYSTEM	"SDK/SDK.ent">
 	%SDKentities;
 
-<!-- book data -->
-	<!ENTITY BookSetVersion		SYSTEM "version.txt">
-	<!ENTITY BookSetPublicationDate	SYSTEM "publicationDate.txt">
+<!-- book set data -->
+	<!ENTITY BookSetVersion		SYSTEM "WolfBookVersion.txt">
+	<!ENTITY BookSetPublicationDate	SYSTEM "WolfBookDate.txt">
 
 ]>
 	
@@ -33,7 +33,7 @@
 		<subtitle>Application Building Manual</subtitle>
 		<titleabbrev>WAS</titleabbrev>
 		<bookinfo>
-			<date>&BookPublicationDate;</date>
+			<date>&BookSetPublicationDate;</date>
 			<issuenum>Version &BookSetVersion;</issuenum>
 			<authorblurb><para>[ C O N F I D E N T I A L ]</para></authorblurb>
 			<pubdate>&BookSetPublicationDate; version &BookSetVersion;</pubdate>
@@ -52,13 +52,12 @@
 		</index>
 	</book>
 
-
 	<book id="book_SDK">
 		<title>Building Wolframe Services</title>
-		<title>Service Development Kit</title>
+		<subtitle>Service Development Kit</subtitle>
 		<titleabbrev>SDK</titleabbrev>
 		<bookinfo>
-			<date>&BookPublicationDate;</date>
+			<date>&BookSetPublicationDate;</date>
 			<issuenum>Version &BookSetVersion;</issuenum>
 			<authorblurb><para>[ C O N F I D E N T I A L ]</para></authorblurb>
 			<pubdate>&BookSetPublicationDate; version &BookSetVersion;</pubdate>
@@ -81,6 +80,3 @@
 		</index>
 	</book>
 </set>
-
-
-
