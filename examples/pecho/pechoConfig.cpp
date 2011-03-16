@@ -32,15 +32,18 @@ bool pEchoConfiguration::check() const
 }
 
 
-bool pEchoConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& /* nodeName */ )
+bool pEchoConfiguration::parse( const boost::property_tree::ptree::const_iterator it,
+				const std::string& /* nodeName */ )
 {
-	for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
-		if ( boost::algorithm::iequals( it->first, "idle" ))	{
-			if ( !Configuration::getUnsignedShortValue( it->second, displayName(), "timeout", timeout ))
+	for ( boost::property_tree::ptree::const_iterator L1it = it->second.begin();
+								L1it != it->second.end(); L1it++ )	{
+		if ( boost::algorithm::iequals( L1it->first, "idle" ))	{
+			if ( !Configuration::getUnsignedShortValue( L1it, displayName(), timeout ))
 				return false;
 		}
 		else	{
-			LOG_WARNING << displayName() << ": unknown configuration option: <" << it->first << ">";
+			LOG_WARNING << displayName() << ": unknown configuration option: <"
+				    << L1it->first << ">";
 //			return false;
 		}
 	}

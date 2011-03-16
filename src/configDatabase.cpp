@@ -53,34 +53,37 @@ bool DatabaseConfiguration::check() const
 }
 
 
-bool DatabaseConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& /* nodeName */ )
+bool DatabaseConfiguration::parse( const boost::property_tree::ptree::const_iterator it,
+				   const std::string& /* nodeName */ )
 {
-	for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
-		if ( boost::algorithm::iequals( it->first, "host" ))	{
-			if ( !getStringValue( it->second, displayName(), "host", host ))		return false;
+	for ( boost::property_tree::ptree::const_iterator L1it = it->second.begin();
+							L1it != it->second.end(); L1it++ )	{
+		if ( boost::algorithm::iequals( L1it->first, "host" ))	{
+			if ( !getStringValue( L1it, displayName(), host ))		return false;
 		}
-		else if ( boost::algorithm::iequals( it->first, "port" ))	{
-			if ( !getUnsignedShortValue( it->second, displayName(), "port", port ))		return false;
+		else if ( boost::algorithm::iequals( L1it->first, "port" ))	{
+			if ( !getUnsignedShortValue( L1it, displayName(), port ))	return false;
 		}
-		else if ( boost::algorithm::iequals( it->first, "name" ))	{
-			if ( !getStringValue( it->second, displayName(), "name", name ))		return false;
+		else if ( boost::algorithm::iequals( L1it->first, "name" ))	{
+			if ( !getStringValue( L1it, displayName(), name ))		return false;
 		}
-		else if ( boost::algorithm::iequals( it->first, "user" ))	{
-			if ( !getStringValue( it->second, displayName(), "user", user ))		return false;
+		else if ( boost::algorithm::iequals( L1it->first, "user" ))	{
+			if ( !getStringValue( L1it, displayName(), user ))		return false;
 		}
-		else if ( boost::algorithm::iequals( it->first, "password" ))	{
-			if ( !getStringValue( it->second, displayName(), "password", password ))	return false;
+		else if ( boost::algorithm::iequals( L1it->first, "password" ))	{
+			if ( !getStringValue( L1it, displayName(), password ))		return false;
 		}
-		else if ( boost::algorithm::iequals( it->first, "connections" ))	{
-			if ( !getUnsignedShortValue( it->second, displayName(), "connections", connections ))
-												return false;
+		else if ( boost::algorithm::iequals( L1it->first, "connections" ))	{
+			if ( !getUnsignedShortValue( L1it, displayName(), connections ))
+											return false;
 		}
-		else if ( boost::algorithm::iequals( it->first, "acquireTimeout" ))	{
-			if ( !getUnsignedShortValue( it->second, displayName(), "acquireTimeout", acquireTimeout ))
-												return false;
+		else if ( boost::algorithm::iequals( L1it->first, "acquireTimeout" ))	{
+			if ( !getUnsignedShortValue( L1it, displayName(), acquireTimeout ))
+											return false;
 		}
 		else	{
-			LOG_WARNING << displayName() << ": unknown configuration option: <" << it->first << ">";
+			LOG_WARNING << displayName() << ": unknown configuration option: <"
+				    << L1it->first << ">";
 //			return false;
 		}
 	}
@@ -89,7 +92,6 @@ bool DatabaseConfiguration::parse( const boost::property_tree::ptree& pt, const 
 
 	return true;
 }
-
 
 	} // namespace Configuration
 } // namespace _Wolframe

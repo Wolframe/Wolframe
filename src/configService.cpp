@@ -55,7 +55,8 @@ namespace _Wolframe	{
 
 
 /// Parse the configuration
-bool ServiceConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& node )
+bool ServiceConfiguration::parse( const boost::property_tree::ptree::const_iterator it,
+				  const std::string& node )
 {
 #if defined(_WIN32)
 	if ( boost::algorithm::iequals( node, "daemon" ))	{
@@ -63,24 +64,26 @@ bool ServiceConfiguration::parse( const boost::property_tree::ptree& pt, const s
 	}
 #else // #if defined(_WIN32)
 	if ( boost::algorithm::iequals( node, "daemon" ))	{
-		for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
-			if ( boost::algorithm::iequals( it->first, "user" ))	{
-				if ( ! getStringValue( it->second, displayName(), "user", user ))
+		for ( boost::property_tree::ptree::const_iterator L1it = it->second.begin();
+								L1it != it->second.end(); L1it++ )	{
+			if ( boost::algorithm::iequals( L1it->first, "user" ))	{
+				if ( ! getStringValue( L1it, displayName(), user ))
 					return false;
 			}
-			else if ( boost::algorithm::iequals( it->first, "group" ))	{
-				if ( ! getStringValue( it->second, displayName(), "group", group ))
+			else if ( boost::algorithm::iequals( L1it->first, "group" ))	{
+				if ( ! getStringValue( L1it, displayName(), group ))
 					return false;
 			}
-			else if ( boost::algorithm::iequals( it->first, "pidFile" ))	{
-				if ( ! getStringValue( it->second, displayName(), "pidFile", pidFile ))
+			else if ( boost::algorithm::iequals( L1it->first, "pidFile" ))	{
+				if ( ! getStringValue( L1it, displayName(), pidFile ))
 					return false;
 				if ( ! boost::filesystem::path( pidFile ).is_absolute() )
 					LOG_WARNING << displayName() << ": pid file path is not absolute: "
-									   << pidFile << std::endl;
+						    << pidFile << std::endl;
 			}
 			else	{
-				LOG_WARNING << displayName() << ": unknown configuration option: <" << it->first << ">";
+				LOG_WARNING << displayName() << ": unknown configuration option: <"
+					    << L1it->first << ">";
 //				return false;
 			}
 		}
@@ -92,21 +95,23 @@ bool ServiceConfiguration::parse( const boost::property_tree::ptree& pt, const s
 	}
 #else // #if defined(_WIN32)
 	else if ( boost::algorithm::iequals( node, "service" ))	{
-		for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
-			if ( boost::algorithm::iequals( it->first, "serviceName" ))	{
-				if ( ! getStringValue( it->second, displayName(), "serviceName", serviceName ))
+		for ( boost::property_tree::ptree::const_iterator L1it = it->second.begin();
+								L1it != it->second.end(); L1it++ )	{
+			if ( boost::algorithm::iequals( L1it->first, "serviceName" ))	{
+				if ( ! getStringValue( L1it, displayName(), serviceName ))
 					return false;
 			}
-			else if ( boost::algorithm::iequals( it->first, "displayName" ))	{
-				if ( ! getStringValue( it->second, displayName(), "displayName", serviceDisplayName ))
+			else if ( boost::algorithm::iequals( L1it->first, "displayName" ))	{
+				if ( ! getStringValue( L1it, displayName(), serviceDisplayName ))
 					return false;
 			}
-			else if ( boost::algorithm::iequals( it->first, "description" ))	{
-				if ( ! getStringValue( it->second, displayName(), "description", serviceDescription ))
+			else if ( boost::algorithm::iequals( L1it->first, "description" ))	{
+				if ( ! getStringValue( L1it, displayName(), serviceDescription ))
 					return false;
 			}
 			else	{
-				LOG_WARNING << displayName() << ": unknown configuration option: <" << it->first << ">";
+				LOG_WARNING << displayName() << ": unknown configuration option: <"
+					    << L1it->first << ">";
 //				return false;
 			}
 		}

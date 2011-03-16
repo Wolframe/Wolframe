@@ -1,5 +1,5 @@
 //
-//
+// serviceBanner.cpp
 //
 
 #include "standardConfigs.hpp"
@@ -33,26 +33,28 @@ static ServiceBanner::SignatureTokens strToToken( std::string& str )
 
 /// Service signature
 
-bool ServiceBanner::parse( const boost::property_tree::ptree& pt, const std::string& node )
+bool ServiceBanner::parse( const boost::property_tree::ptree::const_iterator it,
+			   const std::string& node )
 {
 	if ( boost::algorithm::iequals( node, "ServerTokens" ))	{
 		std::string val;
-		if ( !getStringValue( pt, displayName(), "ServerTokens", val ))
+		if ( !getStringValue( it, displayName(), val ))
 			return false;
 		else	{
 			if (( tokens = strToToken( val )) == ServiceBanner::UNDEFINED )	{
-				LOG_ERROR << displayName() << ": unknown ServerTokens option: <"
-					  << val << ">";
+				LOG_ERROR << displayName() << ": unknown ServerTokens option: \""
+					  << val << "\"";
 				return false;
 			}
 		}
 	}
 	else if ( boost::algorithm::iequals( node, "ServerSignature" ))	{
-		if ( !getBoolValue( pt, displayName(), "ServerSignature", serverName, serverNameDefined ))
+		if ( !getBoolValue( it, displayName(), serverName, serverNameDefined ))
 			return false;
 	}
 	else	{
-		LOG_FATAL << displayName() << ": unknown configuration option: \"" << node << "\"";
+		LOG_FATAL << displayName() << ": called with unknown configuration option: \""
+			  << node << "\"";
 		return false;
 	}
 	return true;

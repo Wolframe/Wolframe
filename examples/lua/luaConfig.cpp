@@ -101,22 +101,25 @@ bool LuaConfiguration::check() const
 }
 
 
-bool LuaConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& /* nodeName */ )
+bool LuaConfiguration::parse( const boost::property_tree::ptree::const_iterator it,
+			      const std::string& /* nodeName */ )
 {
-	for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
-		if ( boost::algorithm::iequals( it->first, "script" ))	{
-			if ( ! Configuration::getStringValue( it->second, displayName(), "script", script ))
+	for ( boost::property_tree::ptree::const_iterator L1it = it->second.begin();
+							L1it != it->second.end(); L1it++ )	{
+		if ( boost::algorithm::iequals( L1it->first, "script" ))	{
+			if ( ! Configuration::getStringValue( L1it, displayName(), script ))
 				return false;
 			if ( ! boost::filesystem::path( script ).is_absolute() )
 				LOG_WARNING << displayName() << ": script file path is not absolute: "
 					    << script << std::endl;
-		} else if ( boost::algorithm::iequals( it->first, "preload_lib" ))	{
+		} else if ( boost::algorithm::iequals( L1it->first, "preload_lib" ))	{
 			std::string preload_lib;
-			if ( ! Configuration::getStringValue( it->second, displayName(), "preload_lib", preload_lib ))
+			if ( ! Configuration::getStringValue( L1it, displayName(), preload_lib ))
 				return false;
 			preload_libs.push_back( preload_lib );
 		} else {
-			LOG_WARNING << displayName() << ": unknown configuration option: <" << it->first << ">";
+			LOG_WARNING << displayName() << ": unknown configuration option: <"
+				    << L1it->first << ">";
 //			return false;
 		}
 	}

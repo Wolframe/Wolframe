@@ -37,7 +37,8 @@ namespace _Wolframe {
 			ServerConfiguration();
 
 			/// methods
-			bool parse( const boost::property_tree::ptree& pt, const std::string& node );
+			bool parse( const boost::property_tree::ptree::const_iterator it,
+				    const std::string& node );
 			bool check() const;
 			void print( std::ostream& os ) const;
 
@@ -73,7 +74,8 @@ namespace _Wolframe {
 		ServiceConfiguration();
 
 		/// methods
-		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
+		bool parse( const boost::property_tree::ptree::const_iterator it,
+			    const std::string& node );
 		bool check() const;
 		void print( std::ostream& os ) const;
 
@@ -112,7 +114,8 @@ namespace _Wolframe {
 						serverNameDefined( false )	{}
 
 		/// methods
-		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
+		bool parse( const boost::property_tree::ptree::const_iterator it,
+			    const std::string& node );
 		bool check() const;
 		void print( std::ostream& os ) const;
 
@@ -142,14 +145,15 @@ namespace _Wolframe {
 			bool			logToEventlog;
 			std::string		eventlogLogName;
 			std::string		eventlogSource;
-			Logging::LogLevel::Level		eventlogLogLevel;
+			Logging::LogLevel::Level eventlogLogLevel;
 #endif // !defined( _WIN32 )
 
 			/// constructor
 			LoggerConfiguration();
 
 			/// methods
-			bool parse( const boost::property_tree::ptree& pt, const std::string& node );
+			bool parse( const boost::property_tree::ptree::const_iterator it,
+				    const std::string& node );
 			bool check() const;
 			void print( std::ostream& os ) const;
 
@@ -178,7 +182,8 @@ namespace _Wolframe {
 			DatabaseConfiguration();
 
 			/// methods
-			bool parse( const boost::property_tree::ptree& pt, const std::string& node );
+			bool parse( const boost::property_tree::ptree::const_iterator it,
+				    const std::string& node );
 			bool check() const;
 			void print( std::ostream& os ) const;
 
@@ -188,6 +193,5 @@ namespace _Wolframe {
 
 	} // namespace Configuration
 } // namespace _Wolframe
-
 
 #endif // _STANDARD_CONFIGS_HPP_INCLUDED
