@@ -1,9 +1,0 @@
-#!/usr/bin/expect
-#
-#
-# Start a wolframe daemon and check the configuration
-
-set timeout 5
-eval spawn ../../src/wolframed -c ../config/wolframe-posix.conf -t
-
-wait

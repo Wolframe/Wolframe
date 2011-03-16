@@ -48,13 +48,11 @@ bool ServiceBanner::parse( const boost::property_tree::ptree& pt, const std::str
 		}
 	}
 	else if ( boost::algorithm::iequals( node, "ServerSignature" ))	{
-		if ( !getBoolValue( pt, displayName(), "ServerSignature", serverName ))
+		if ( !getBoolValue( pt, displayName(), "ServerSignature", serverName, serverNameDefined ))
 			return false;
-		else
-			serverNameDefined = true;
 	}
 	else	{
-		LOG_WARNING << displayName() << ": unknown configuration option: <" << node << ">";
+		LOG_FATAL << displayName() << ": unknown configuration option: \"" << node << "\"";
 		return false;
 	}
 	return true;
@@ -92,7 +90,7 @@ void ServiceBanner::print( std::ostream& os ) const
 	case PRODUCT_OS:	os << "product name, revision and OS"; break;
 	case NONE:		os << "none"; break;
 	case UNDEFINED:
-	default:		os << " NOT DEFINED !"; break;
+	default:		os << "NOT DEFINED !"; break;
 	}
 	os << std::endl;
 	os << "   Print service name: " << ( serverName ? "yes" : "no" ) << std::endl;

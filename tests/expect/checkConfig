@@ -1,0 +1,26 @@
+#!/usr/bin/expect
+#
+# Start a wolframe daemon and check the configuration
+#
+# Arguments:
+#     configuration file
+#     wolframed return code
+#     error / warning message
+#
+
+if { [llength $argv] == 0 } {
+    puts "usage: checkConfig <config file> <return code> <error / warning message>"
+    exit 1
+}
+
+set config [lindex $argv 0]
+set retval [lindex $argv 1]
+set errmsg [lindex $argv 2]
+
+set timeout 3
+spawn ../../src/wolframed -c $config -p
+
+puts "$errmsg $config $retval"
+
+expect "BOBOBO version 0.0.4.0"	{ send "momo" }
+# wait

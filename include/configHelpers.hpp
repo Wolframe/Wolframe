@@ -28,6 +28,11 @@ namespace _Wolframe {
 		template <typename T>
 		bool getNonZeroIntValue( const boost::property_tree::ptree& pt, const std::string& module,
 					 const std::string& name, T& value );
+
+		template <typename T>
+		bool getIntegerValue( const boost::property_tree::ptree& pt, const std::string& module,
+				      const std::string& name, T& value );
+
 		template <typename T>
 		bool getIntegerValue( const boost::property_tree::ptree& pt, const std::string& module,
 				      const std::string& name, T& value, bool& valueIsSet );

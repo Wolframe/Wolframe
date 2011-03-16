@@ -35,6 +35,32 @@ bool getBoolValue( const boost::property_tree::ptree& pt, const std::string& mod
 }
 
 
+bool getBoolValue( const boost::property_tree::ptree& pt, const std::string& module,
+		   const std::string& name, bool& value, bool& valueIsSet )
+{
+	std::string s = pt.get_value<std::string>();
+	boost::to_upper( s );
+	boost::trim( s );
+	if ( valueIsSet )	{
+		LOG_ERROR << module << ": " << name << " redefined";
+		return false;
+	}
+	if ( s == "NO" || s == "FALSE" || s == "0" || s == "OFF" )	{
+		value = false;
+		valueIsSet = true;
+		return true;
+	}
+	if ( s == "YES" || s == "TRUE" || s == "1" || s == "ON" )	{
+		value = true;
+		valueIsSet = true;
+		return true;
+	}
+	LOG_ERROR << module << ": invalid logical value for " << name << ": \""
+		  << pt.get_value<std::string>() << "\"";
+	return false;
+}
+
+
 bool getStringValue( const boost::property_tree::ptree& pt, const std::string& module,
 		     const std::string& name, std::string& value )
 {

@@ -119,11 +119,11 @@ bool ServerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 {
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "threads" ))	{
-			if ( ! getUnsignedShortValue( L1it->second, displayName(), "threads", threads ))
+			if ( ! getUnsignedShortValue( L1it->second, displayName(), L1it->first, threads ))
 				return false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "maxConnections" ))	{
-			if ( ! getUnsignedShortValue( L1it->second, displayName(), "maxConnections", maxConnections ))
+			if ( ! getUnsignedShortValue( L1it->second, displayName(), L1it->first, maxConnections ))
 				return false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "socket" ))	{
@@ -167,7 +167,8 @@ bool ServerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 			std::string	keyFile;
 			std::string	CAdirectory;
 			std::string	CAchainFile;
-			bool		verify;
+			bool		verify = false;
+			bool		verifySet = false;
 			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
 										L2it != L1it->second.end(); L2it++ )	{
 				if ( boost::algorithm::iequals( L2it->first, "host" ))	{
@@ -215,7 +216,7 @@ bool ServerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 							    << CAchainFile << std::endl;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "verify" ))	{
-					if ( ! getBoolValue( L2it->second, displayName(), "verify", verify ))
+					if ( ! getBoolValue( L2it->second, displayName(), "verify", verify, verifySet ))
 						return false;
 				}
 				else	{
