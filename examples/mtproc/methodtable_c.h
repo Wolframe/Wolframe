@@ -28,13 +28,13 @@ ElementType;
 
 typedef struct ContentIterator* ContentIteratorP;
 
-typedef bool (*GetNext)( ContentIteratorP this_, ElementType* type, void* buffer, unsigned int buffersize, unsigned int* bufferpos);
+typedef bool (*GetNext)( ContentIteratorP this_, ElementType* type, void* buffer, size_t buffersize, size_t* bufferpos);
 
 typedef struct ContentIterator
 {
    void* m_ptr;
-   unsigned int m_pos;
-   unsigned int m_size;
+   size_t m_pos;
+   size_t m_size;
    bool m_gotEoD;
    ContentIteratorState m_state;
    int m_errorCode;
@@ -44,13 +44,13 @@ ContentIterator;
 
 typedef struct FormatOutput* FormatOutputP;
 
-typedef bool (*Print)( FormatOutputP this_, int type, void* element, unsigned int elementsize);
+typedef bool (*Print)( FormatOutputP this_, int type, void* element, size_t elementsize);
 
 typedef struct FormatOutput
 {
    void* m_ptr;
-   unsigned int m_pos;
-   unsigned int m_size;
+   size_t m_pos;
+   size_t m_size;
    Print m_print;
 }
 FormatOutput;

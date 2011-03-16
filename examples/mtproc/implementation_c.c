@@ -12,10 +12,10 @@ typedef struct MethodDataT
 }
 MethodData;
 
-static bool getNext( ContentIterator* this_, ElementType* type, void* buffer, unsigned int buffersize, unsigned int* bufferpos)
+static bool getNext( ContentIterator* this_, ElementType* type, void* buffer, size_t buffersize, size_t* bufferpos)
 {
    char* in = (char*)this_->m_ptr;
-   unsigned int nn = this_->m_size - this_->m_pos;
+   size_t nn = this_->m_size - this_->m_pos;
    *type = Value;
 
    if (buffersize == *bufferpos)
@@ -47,10 +47,10 @@ static bool getNext( ContentIterator* this_, ElementType* type, void* buffer, un
    }
 }
 
-static bool print( FormatOutput* this_, int type_, void* element, unsigned int elementsize)
+static bool print( FormatOutput* this_, int type_, void* element, size_t elementsize)
 {
    char* out = (char*)this_->m_ptr + this_->m_pos;
-   unsigned int nn = this_->m_size - this_->m_pos;
+   size_t nn = this_->m_size - this_->m_pos;
    UNUSED(type_);
 
    if (elementsize > nn)
