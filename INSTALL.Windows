@@ -6,6 +6,7 @@ Prerequisites
 - boost 1.43.0 or later
 - optionally (WITH_SSL) openssl 0.9.8 or later
 - optionally (WITH_GTEST) gtest 1.5.0 or later
+- optionally (WITH_EXPECT) expect and ActiveTcl
 - optionally (WITH_LUA) lua 5.1.x
 - optionally (WITH_QT) Qt 4, 4.5.x or later
 
@@ -58,6 +59,17 @@ link /lib /nologo /LIBPATH:"C:\Programme\Microsoft Platform SDK\lib" /out:gtest.
 Then adapt:
 
 GTEST_DIR=C:\<myhome>\gtest-1.5.0
+
+Install Tcl and Expect
+----------------------
+
+Download from http://www.activestate.com/activetcl/ 
+
+Install ActiveTcl 8.5 to C:\tcl8.5
+
+Insteall Expect 1.1:
+
+teacup install Expect
 
 Compile and install Lua
 -----------------------
