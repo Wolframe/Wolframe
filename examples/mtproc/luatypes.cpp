@@ -1,6 +1,7 @@
 #include "luatypes.hpp"
 #include "protocol/formatoutput.hpp"
 #include <stdexcept>
+#include <cstddef>
 extern "C"
 {
 #include "lua.h"
@@ -27,8 +28,8 @@ struct GeneratorClosure
 	protocol::Generator::ElementType type;
 	char* value;
 	char* buf;
-	unsigned int bufsize;
-	unsigned int bufpos;
+	std::size_t bufsize;
+	std::size_t bufpos;
 
 	void init()
 	{

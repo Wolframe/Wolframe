@@ -200,3 +200,4 @@ tests/testNamedRetVal.cpp
 tests/threadLeakTest.cpp
 tests/versionTest.cpp
 src/serviceBanner.cpp
+examples/mtproc/luatypes.cpp

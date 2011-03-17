@@ -1,8 +1,14 @@
 #ifndef _Wolframe_METHODTABLE_C_H_INCLUDED
 #define _Wolframe_METHODTABLE_C_H_INCLUDED
-#include <stdbool.h> 
 
-/* Parallel definitions for the POD data structures usable in plain C defined in 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include <stdbool.h>
+#include <stddef.h>
+
+/* Parallel definitions for the POD data structures usable in plain C defined in
 *    - include/protocol/generator.hpp
 *    - example/mtproc/methodtable.hpp
 */
@@ -71,7 +77,7 @@ typedef void (*DestroyMethodData)( MethodDataP);
 
 //method of the processor
 typedef struct Method
-{   
+{
    const char* name;
    MethodCall call;
    bool hasIO;
@@ -87,6 +93,10 @@ typedef struct Implementation
 
 } Implementation;
 
+#ifdef __cplusplus
+}
 #endif
+
+#endif /* _Wolframe_METHODTABLE_C_H_INCLUDED */
 
 

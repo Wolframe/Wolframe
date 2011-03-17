@@ -6,7 +6,7 @@
 
 typedef struct MethodDataT
 {
-   char buf; 
+   char buf;
    ContentIterator input;
    FormatOutput output;
 }
@@ -28,13 +28,13 @@ static bool getNext( ContentIterator* this_, ElementType* type, void* buffer, si
    {
       if (this_->m_gotEoD)
       {
-         this_->m_state = Open;
-         return false;
+	 this_->m_state = Open;
+	 return false;
       }
       else
-      { 
-         this_->m_state = EndOfMessage;
-         return false;
+      {
+	 this_->m_state = EndOfMessage;
+	 return false;
       }
    }
    else
@@ -68,8 +68,8 @@ static bool print( FormatOutput* this_, int type_, void* element, size_t element
 static int echo( MethodContext* ctx, unsigned int argc, const char** argv)
 {
    MethodData* data = (MethodData*)ctx->data;
-   unsigned int bb = 0;
-   ElementType type; 
+   size_t bb = 0;
+   ElementType type;
    UNUSED(argc);
    UNUSED(argv);
 
