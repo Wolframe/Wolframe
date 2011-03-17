@@ -187,6 +187,7 @@ ifeq "$(PLATFORM)" "LINUX"
 ifeq "$(LINUX_DIST)" "arch"
 XSLT_VERSION ?= $(shell pacman -Q | grep docbook-xsl | cut -f 2 -d ' ' | cut -f 1 -d -)
 XSLT_MAN_STYLESHEET ?= /usr/share/xml/docbook/xsl-stylesheets-$(XSLT_VERSION)/manpages/docbook.xsl
+XSLT_HTML_STYLESHEET ?= /usr/share/xml/docbook/xsl-stylesheets-$(XSLT_VERSION)/xhtml/docbook.xsl
 endif
 
 # Ubuntu 10.04 TLS, 10.10, Debian 5.0

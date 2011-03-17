@@ -3,7 +3,6 @@ Available targets:
 
 make [all]	       create all artifacts
 make test	       create test binaries and execute tests
-make doc               build the documentation
 make clean             clean up build artifacts
 make distclean         clean up all generated artifacts
 make install           install (set 'DESTDIR' and 'prefix' at will)
@@ -28,3 +27,7 @@ WITH_GTEST=1           use Google Unit testing library
 
 Example:
 make WITH_SSL=1 WITH_GTEST=1 WITH_LUA=1 WITH_QT=1 WITH_PAM=1
+
+To build the documentation call:
+
+cd docs; make help
