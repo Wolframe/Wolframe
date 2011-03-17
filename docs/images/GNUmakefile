@@ -5,7 +5,7 @@ SUBDIRS =
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 IMAGES = \
-	overview.svg 
+	overview.svg
 
 # Generate graphic files from diagrams
 .SUFFIXES: .svg .dia

@@ -16,7 +16,7 @@
 			<title>Overview</title>
 			<mediaobject>
 				<imageobject>
-					<imagedata fileref="overview.svg" format="SVG"
+					<imagedata fileref="images/overview.svg" format="SVG"
 						scalefit="1" width="100%" contentdepth="100%"/>
 				</imageobject>
 				<caption><para><!-- Image Description --></para></caption>

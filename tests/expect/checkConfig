@@ -5,22 +5,30 @@
 # Arguments:
 #     configuration file
 #     wolframed return code
-#     error / warning message
+#     error / warning / ok message
 #
 
-if { [llength $argv] == 0 } {
-    puts "usage: checkConfig <config file> <return code> <error / warning message>"
+if { [llength $argv] != 3 } {
+    puts "usage: checkConfig <config file> <return code> <error / warning / ok message>"
     exit 1
 }
 
-set config [lindex $argv 0]
-set retval [lindex $argv 1]
-set errmsg [lindex $argv 2]
+set config [lindex $argv 0]		;# 1st script argument
+set retval [lindex $argv 1]		;# 2nd script argument
+set outmsg [lindex $argv 2]		;# 3rd script argument
+
+puts "Configuration file: $config, expecting exit code $retval and message \"$outmsg\""
 
 set timeout 3
-spawn ../../src/wolframed -c $config -p
+spawn ../../src/wolframed -c $config -f
 
-puts "$errmsg $config $retval"
+puts "$outmsg $config $retval"
 
-expect "BOBOBO version 0.0.4.0"	{ send "momo" }
-# wait
+expect 	{
+	timeout		{ send_user "oops\n" }
+	"$outmsg\r"	{ send_user "momo\n" }
+	eof		{ send_user "that's bad\n" }
+}
+
+catch wait reason
+puts $reason
