@@ -34,13 +34,13 @@ doc-html: WolfBook.html
 
 doc-pdf: WolfBook.pdf
 
-WolfBook.pdf: WolfBook.fop
+%.pdf: %.fop
 	fop -fo $< -pdf $@
 
-WolfBook.fop: WolfBook.xml
+%.fop: %.xml
 	$(XSLT_PDF) $< > $@
 
-WolfBook.html: WolfBook.xml
+%.html: %.xml
 	$(XSLT_HTML) $< >$@
 
 wolframed.8: wolframed-man.xml
