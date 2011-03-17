@@ -16,7 +16,12 @@ XSLT_MAN = \
 
 XSLT_HTML = \
 	$(XSLTPROC) --nonet --xinclude \
-	$(XSLT_HTML_STYLESHEET)
+	--stringparam draft.mode yes \
+	output-html.xsl
+
+XSLT_PDF = \
+	$(XSLTPROC) --nonet --xinclude \
+	output-pdf.xsl
 
 local_all:
 
@@ -26,12 +31,14 @@ doc-doxygen:
 	cd $(TOPDIR); doxygen docs/doxygen.conf
 	
 doc-html: WolfBook.html
-# xmllint --noout --xinclude --postvalid --noent WolfBook.xml
-#
-#	@$(XSLTPROC) --xinclude --stringparam draft.mode yes \
-#		-o output/docRepo-pdf.fo eurospider-pdf.xsl Book.xml
-#	DESTDIR=/ fop -fo output/docRepo-pdf.fo -pdf output/docRepo.pdf
-#	rm output/docRepo-pdf.fo
+
+doc-pdf: WolfBook.pdf
+
+WolfBook.pdf: WolfBook.fop
+	fop -fo $< -pdf $@
+
+WolfBook.fop: WolfBook.xml
+	$(XSLT_PDF) $< > $@
 
 WolfBook.html: WolfBook.xml
 	$(XSLT_HTML) $< >$@
@@ -45,7 +52,7 @@ wolframe.conf.5: wolframe.conf-man.xml
 local_all:
 
 local_clean:
-	-rm -rf doxygen/* WolfBook.html
+	-rm -rf doxygen/* WolfBook.html WolfBook.fop WolfBook.pdf
 
 local_distclean:
 
