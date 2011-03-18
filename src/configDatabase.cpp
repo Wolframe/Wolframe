@@ -62,7 +62,8 @@ bool DatabaseConfiguration::parse( const boost::property_tree::ptree::const_iter
 			if ( !getStringValue( L1it, displayName(), host ))		return false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "port" ))	{
-			if ( !getUnsignedShortValue( L1it, displayName(), port ))	return false;
+			if ( !getNonZeroIntValue<unsigned short>( L1it, displayName(), port ))
+											return false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "name" ))	{
 			if ( !getStringValue( L1it, displayName(), name ))		return false;
@@ -74,11 +75,11 @@ bool DatabaseConfiguration::parse( const boost::property_tree::ptree::const_iter
 			if ( !getStringValue( L1it, displayName(), password ))		return false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "connections" ))	{
-			if ( !getUnsignedShortValue( L1it, displayName(), connections ))
+			if ( !getNonZeroIntValue<unsigned short>( L1it, displayName(), connections ))
 											return false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "acquireTimeout" ))	{
-			if ( !getUnsignedShortValue( L1it, displayName(), acquireTimeout ))
+			if ( !getNonZeroIntValue<unsigned short>( L1it, displayName(), acquireTimeout ))
 											return false;
 		}
 		else	{

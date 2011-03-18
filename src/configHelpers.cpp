@@ -97,8 +97,9 @@ bool getHostnameValue( const boost::property_tree::ptree::const_iterator it,
 }
 
 
-bool getUnsignedShortValue( const boost::property_tree::ptree::const_iterator it,
-			    const std::string& module, unsigned short& value )
+template <typename T>
+bool getNonZeroIntValue( const boost::property_tree::ptree::const_iterator it,
+			 const std::string& module, T& value )
 {
 	if ( value != 0 )	{
 		LOG_ERROR << module << ": " << it->first << " redefined";
@@ -113,6 +114,23 @@ bool getUnsignedShortValue( const boost::property_tree::ptree::const_iterator it
 	return true;
 }
 
+/*
+template <typename T>
+bool getIntegerValue( const boost::property_tree::ptree::const_iterator it,
+		      const std::string& module, T& value );
+
+template <typename T>
+bool getIntegerValue( const boost::property_tree::ptree::const_iterator it,
+		      const std::string& module, T& value, bool& valueIsSet );
+
+template <typename T>
+bool getIntegerValue( const boost::property_tree::ptree::const_iterator it,
+		      const std::string& module, T& value, bool& valueIsSet,
+		      T lowerLimit, T upperLimit );
+*/
+
+template bool getNonZeroIntValue<unsigned short>( const boost::property_tree::ptree::const_iterator it,
+						  const std::string& module, unsigned short& value );
 
 	} // namespace Configuration
 } // namespace _Wolframe

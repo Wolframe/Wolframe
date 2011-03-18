@@ -22,10 +22,6 @@ namespace _Wolframe {
 		bool getHostnameValue( const boost::property_tree::ptree::const_iterator it,
 				       const std::string& module, std::string& value );
 
-
-		bool getUnsignedShortValue( const boost::property_tree::ptree::const_iterator it,
-					    const std::string& module, unsigned short& value );
-
 		template <typename T>
 		bool getNonZeroIntValue( const boost::property_tree::ptree::const_iterator it,
 					 const std::string& module, T& value );
@@ -37,6 +33,11 @@ namespace _Wolframe {
 		template <typename T>
 		bool getIntegerValue( const boost::property_tree::ptree::const_iterator it,
 				      const std::string& module, T& value, bool& valueIsSet );
+
+		template <typename T>
+		bool getIntegerValue( const boost::property_tree::ptree::const_iterator it,
+				      const std::string& module, T& value, bool& valueIsSet,
+				      T lowerLimit, T upperLimit );
 
 	} // namespace Configuration
 } // namespace _Wolframe

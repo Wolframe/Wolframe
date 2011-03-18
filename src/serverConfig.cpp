@@ -121,11 +121,11 @@ bool ServerConfiguration::parse( const boost::property_tree::ptree::const_iterat
 	for ( boost::property_tree::ptree::const_iterator L1it = it->second.begin();
 								L1it != it->second.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "threads" ))	{
-			if ( ! getUnsignedShortValue( L1it, displayName(), threads ))
+			if ( ! getNonZeroIntValue<unsigned short>( L1it, displayName(), threads ))
 				return false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "maxConnections" ))	{
-			if ( ! getUnsignedShortValue( L1it, displayName(), maxConnections ))
+			if ( ! getNonZeroIntValue<unsigned short>( L1it, displayName(), maxConnections ))
 				return false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "socket" ))	{
@@ -143,11 +143,11 @@ bool ServerConfiguration::parse( const boost::property_tree::ptree::const_iterat
 						return false;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "port" ))	{
-					if ( ! getUnsignedShortValue( L2it, displayName(), port ))
+					if ( ! getNonZeroIntValue<unsigned short>( L2it, displayName(), port ))
 						return false;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "maxConnections" ))	{
-					if ( ! getUnsignedShortValue( L2it, displayName(), maxConn ))
+					if ( ! getNonZeroIntValue<unsigned short>( L2it, displayName(), maxConn ))
 						return false;
 				}
 				else	{
@@ -182,11 +182,11 @@ bool ServerConfiguration::parse( const boost::property_tree::ptree::const_iterat
 						return false;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "port" ))	{
-					if ( ! getUnsignedShortValue( L2it, displayName(), port ))
+					if ( ! getNonZeroIntValue<unsigned short>( L2it, displayName(), port ))
 						return false;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "maxConnections" ))	{
-					if ( ! getUnsignedShortValue( L2it, displayName(), maxConn ))
+					if ( ! getNonZeroIntValue<unsigned short>( L2it, displayName(), maxConn ))
 						return false;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "certificate" ))	{
