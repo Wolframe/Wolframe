@@ -14,6 +14,7 @@ ABa:
 - Windows:
   - username, password for service credentials
   - clean up native Win32 string mess in service code
+  - log when service gets installed and uninstalled
 - Logger:
   - check out categoryid
   - have markers for OS errors and for components
