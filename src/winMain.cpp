@@ -352,7 +352,7 @@ int _Wolframe_winMain( int argc, char* argv[] )
 {
 	try	{
 		// create initial console logger, so we see things going wrong
-		_Wolframe::Logging::LogBackend::instance().setConsoleLevel( _Wolframe::Logging::LogLevel::LOGLEVEL_ERROR );
+		_Wolframe::Logging::LogBackend::instance().setConsoleLevel( _Wolframe::Logging::LogLevel::LOGLEVEL_INFO );
 		
 		_Wolframe::Version  appVersion( _Wolframe::applicationMajorVersion(), _Wolframe::applicationMinorVersion(),
 						_Wolframe::applicationRevisionVersion(), _Wolframe::applicationBuildVersion() );
@@ -422,14 +422,14 @@ int _Wolframe_winMain( int argc, char* argv[] )
 		if ( cmdLineCfg.command == _Wolframe::Configuration::CmdLineConfig::INSTALL_SERVICE ) {
 			if( !registerEventlog( config ) ) return _Wolframe::ErrorCodes::FAILURE;
 			if( !installAsService( config ) ) return _Wolframe::ErrorCodes::FAILURE;
-			std::cout << "Installed as Windows service" << std::endl << std::endl;
+			LOG_INFO << "Installed as Windows service '" << config.serviceConf->serviceName.c_str( ) << "'";
 			return _Wolframe::ErrorCodes::OK;
 		}
 
 		if ( cmdLineCfg.command == _Wolframe::Configuration::CmdLineConfig::REMOVE_SERVICE ) {
 			if( !removeAsService( config ) ) return _Wolframe::ErrorCodes::FAILURE;
 			(void)deregisterEventlog( config );
-			std::cout << "Removed as Windows service" << std::endl << std::endl;
+			LOG_INFO << "Removed as Windows service '" << config.serviceConf->serviceName.c_str( ) << "'";
 			return _Wolframe::ErrorCodes::OK;
 		}
 
