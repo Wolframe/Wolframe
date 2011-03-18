@@ -106,7 +106,7 @@ namespace _Wolframe {
 
 	private:
 		LogLevel::Level logLevel_;
-		DWORD categoryId_;
+		WORD categoryId_;
 		HANDLE eventSource_;
 		std::string log_;
 		std::string source_;

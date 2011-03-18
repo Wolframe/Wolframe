@@ -18,12 +18,15 @@
 # /Zi: enable debug information
 # /MD: multithreaded runtime
 # /W <n>: show warnings (level 1 to 4)
+# using /W2 for now, /W3 shows lots of problems in boost/asio/openssl (size_t -> int conversion)
+# /Wp64: warn about possible 64-bit issues
 # /Wall: enable all warnings (produces tons of warnings!)
 # /WX: tread warnings as errors
 # /D_SCL_SECURE_NO_WARNINGS=1: disable security CRT warnings in C library
+# /D_CRT_SECURE_NO_WARNINGS=1: dito
 
 # compilation flags and compilers (release)
-COMMON_COMPILE_FLAGS = /MD /D_SCL_SECURE_NO_WARNINGS=1 /WX /nologo /O2 /EHsc /c $(INCLUDE_DIRS)
+COMMON_COMPILE_FLAGS = /MD /D_SCL_SECURE_NO_WARNINGS=1 /D_CRT_SECURE_NO_WARNINGS=1 /W2 /Wp64 /WX /nologo /O2 /EHsc /c $(INCLUDE_DIRS)
 
 # compilation flags and compilers (debug)
 #COMMON_COMPILE_FLAGS = /MDd /ZI /nologo /EHsc /c $(INCLUDE_DIRS) /RTC1

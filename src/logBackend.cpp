@@ -2,9 +2,14 @@
 // logger.cpp
 //
 
+#include <ostream>
+#include <iostream>
+#include <sstream>
+
 #include "logger.hpp"
 #include "logBackend.hpp"
 #include "logComponent.hpp"
+#include "wolframemsg.h"
 
 // no macros here, name clash with variables in syslog.h, so
 // undefine them here..
@@ -20,8 +25,6 @@
 #undef LOG_ALERT
 #undef LOG_FATAL
 
-#include <ostream>
-
 #if !defined( _WIN32 )
 #include <syslog.h>
 #include <sys/time.h>
@@ -30,8 +33,6 @@
 #if defined( _WIN32 )
 #include "wolframemsg.h"
 #endif // defined( _WIN32 )
-
-#include <sstream>
 
 #include "unused.h"
 
@@ -107,7 +108,7 @@ void LogfileBackend::reopen( )
 	try {
 		logFile_.open( filename_.c_str( ), std::ios_base::app );
 		isOpen_ = true;
-	} catch( const std::ofstream::failure& e ) {
+	} catch( const std::ofstream::failure& ) {
 		isOpen_ = false;
 		_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance( ) ).Get(
 			_Wolframe::Logging::LogComponent::LOGCOMPONENT_LOGGING,
@@ -290,7 +291,9 @@ void SyslogBackend::reopen( )
 EventlogBackend::EventlogBackend( )
 {
 	logLevel_ = LogLevel::LOGLEVEL_UNDEFINED;
-	categoryId_ = 1 | 0x0FFF0000L; // the one category we have at the moment in the resource
+	// the one category we have at the moment in the resource
+	// was '1 | 0x0FFF0000' before, why?!
+	categoryId_ = WOLFRAME_CATEGORY;
 	log_ = "Application";
 	source_ = "<undefined>";
 	eventSource_ = RegisterEventSource( NULL, source_.c_str( ) );
@@ -321,7 +324,7 @@ void EventlogBackend::setSource( const std::string source )
 	reopen( );
 }
 
-static DWORD levelToEventlogLevel( const LogLevel::Level level )
+static WORD levelToEventlogLevel( const LogLevel::Level level )
 {
 	switch( level )	{
 		case LogLevel::LOGLEVEL_DATA:
