@@ -83,8 +83,8 @@ endif
 
 include $(TOPDIR)/makefiles/gmake/sub.mk
 
-logTest: $(TOPDIR)/src/libwolframe.a
-authTest: $(TOPDIR)/src/libwolframe.a
+logTest$(EXE): logTest.o $(TOPDIR)/src/logBackend.o
+authTest$(EXE): $(TOPDIR)/src/libwolframe.a
 
 ifdef WITH_GTEST
 PECHO_GTEST_OBJS=$(TOPDIR)/examples/pecho/pechoHandler.o

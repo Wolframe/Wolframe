@@ -7,9 +7,11 @@
 
 #ifdef _WIN32
 #include <tchar.h>
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <strsafe.h>
 #else
+#define _XOPEN_SOURCE 600
 #include <errno.h>
 #include <cstring>
 #endif
@@ -109,11 +111,13 @@ inline std::basic_ostream< CharT, TraitsT > &operator<< ( 	std::basic_ostream< C
 {
 	char errbuf[512];
 
-	// TODO: this is the GNU version, we can't somehow force
-	// the portable one!?
+#if defined( __USE_GNU )
 	char *ss = strerror_r( errno, errbuf, 512 );
-
 	os << ss;
+#else
+	int res = strerror_r( errno, errbuf, 512 );
+	os << errbuf;
+#endif // defined( __USE_GNU )
 
 	return os;
 }
