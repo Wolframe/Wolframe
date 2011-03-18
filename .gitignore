@@ -35,6 +35,7 @@ tests/poolTest
 tests/resolvePathTest
 tests/authTest
 tests/mtprocHandler-gTest
+tests/ptreeGenerator-gTest
 examples/echo/echod
 examples/lua/luad
 examples/mtproc/mtprocd
