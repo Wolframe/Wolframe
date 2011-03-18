@@ -11,7 +11,6 @@
 #include <windows.h>
 #include <strsafe.h>
 #else
-#define _XOPEN_SOURCE 600
 #include <errno.h>
 #include <cstring>
 #endif
