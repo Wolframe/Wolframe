@@ -21,7 +21,7 @@
 # using /W2 for now, /W3 shows lots of problems in boost/asio/openssl (size_t -> int conversion)
 # /Wp64: warn about possible 64-bit issues
 # /Wall: enable all warnings (produces tons of warnings!)
-# /WX: tread warnings as errors
+# /WX: treat warnings as errors
 # /D_SCL_SECURE_NO_WARNINGS=1: disable security CRT warnings in C library
 # /D_CRT_SECURE_NO_WARNINGS=1: dito
 
