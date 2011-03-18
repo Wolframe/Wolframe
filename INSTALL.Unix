@@ -130,8 +130,10 @@ Required packages: boost and boost-libs
 Optional packages: openssl, lua, qt, gtest (from the AUR), pam
 
 For building the documentation you need 'xsltproc', 'docbook-xsl' and 'doxygen'.
-'fop'.
+'fop' (together with 'java-batik', 'java-commons-io', 'java-avalon-framework',
+'java-commons-logging', 'java-xmlgraphics-commons')
 
 Change /etc/fop.conf and make sure it contains the line:
 CLASSPATH="$CLASSPATH:/usr/share/java/batik/xml-apis-ext.jar"
 
+When rebuilding the SVG images of the documentation you also need 'dia'.
