@@ -67,7 +67,7 @@ local_all:
 
 local_clean:
 
-qtclient.exe: qtclient.obj $(OBJS)
+qtclient.exe: qtclient.obj
 
 moc_MainWindow.cpp: MainWindow.hpp
 	$(QT_DIR)\bin\moc.exe $(MOC_FLAGS) -I. MainWindow.hpp -o moc_MainWindow.cpp
