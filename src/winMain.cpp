@@ -72,7 +72,7 @@ static bool registerEventlog( const _Wolframe::Configuration::ApplicationConfigu
 	LONG ret = RegCreateKeyEx( HKEY_LOCAL_MACHINE, key, 0, NULL, REG_OPTION_NON_VOLATILE,
 		KEY_SET_VALUE, NULL, &h, &disposition );
 	if( ret != ERROR_SUCCESS ) {
-		LOG_CRITICAL << "RegCreateKeyEx with key '" << key << "' failed";
+		LOG_CRITICAL << "RegCreateKeyEx with key '" << key << "' failed: " << _Wolframe::Logging::LogWinerror;
 		return false;
 	}
 
@@ -108,14 +108,14 @@ static bool deregisterEventlog( const _Wolframe::Configuration::ApplicationConfi
 		config.loggerConf->eventlogLogName.c_str( ) );
 	res = RegOpenKeyEx( HKEY_LOCAL_MACHINE, key, 0, KEY_WRITE, &h );
 	if( res != ERROR_SUCCESS ) {
-		LOG_CRITICAL << "RegOpenKeyEx with key '" << key << "' failed";
+		LOG_CRITICAL << "RegOpenKeyEx with key '" << key << "' failed: " << _Wolframe::Logging::LogWinerror;
 		return false;
 	}
 
 // remove event log registry entry	
 	res = RegDeleteKey( h, key );
 	if( res != ERROR_SUCCESS ) {
-		LOG_CRITICAL << "RegDeleteKey with key '" << key << "' failed";
+		LOG_CRITICAL << "RegDeleteKey with key '" << key << "' failed: " << _Wolframe::Logging::LogWinerror;
 		return false;
 	}
 	
@@ -127,7 +127,7 @@ static bool installAsService( const _Wolframe::Configuration::ApplicationConfigu
 // get service control manager
 	SC_HANDLE scm = (SC_HANDLE)OpenSCManager( NULL, SERVICES_ACTIVE_DATABASE, SC_MANAGER_ALL_ACCESS );
 	if( scm == NULL ) {
-		LOG_CRITICAL << "OpenSCManager for service registration failed";
+		LOG_CRITICAL << "OpenSCManager for service registration failed: " << _Wolframe::Logging::LogWinerror;
 		return false;
 	}
 	
@@ -146,7 +146,7 @@ static bool installAsService( const _Wolframe::Configuration::ApplicationConfigu
 		SERVICE_DEMAND_START, SERVICE_ERROR_NORMAL,
 		os.str( ).c_str( ), NULL, NULL, NULL, NULL, NULL );
 	if( service == NULL ) {
-		LOG_CRITICAL << "CreateService during service registration failed";
+		LOG_CRITICAL << "CreateService during service registration failed: " << _Wolframe::Logging::LogWinerror;
 		return false;
 	}
 
@@ -167,20 +167,20 @@ static bool removeAsService( const _Wolframe::Configuration::ApplicationConfigur
 // get service control manager
 	SC_HANDLE scm = (SC_HANDLE)OpenSCManager( NULL, SERVICES_ACTIVE_DATABASE, SC_MANAGER_ALL_ACCESS );
 	if( scm == NULL ) {
-		LOG_CRITICAL << "OpenSCManager for service deregistration failed";
+		LOG_CRITICAL << "OpenSCManager for service deregistration failed: " << _Wolframe::Logging::LogWinerror;
 		return false;
 	}
 
 // get service handle of the service to delete (identified by service name)
 	SC_HANDLE service = OpenService( scm, config.serviceConf->serviceName.c_str( ), SERVICE_ALL_ACCESS );
 	if( service == NULL ) {
-		LOG_CRITICAL << "OpenService during service deregistration failed";
+		LOG_CRITICAL << "OpenService during service deregistration failed: " << _Wolframe::Logging::LogWinerror;
 		return false;
 	}
 
 // remove the service
 	if( !DeleteService( service ) ) {
-		LOG_CRITICAL << "Can't delete service";
+		LOG_CRITICAL << "Can't delete service: " << _Wolframe::Logging::LogWinerror;
 		return false;
 	}
 
@@ -228,7 +228,7 @@ static void service_report_status(	DWORD currentState,
 	}
 
 	if( !SetServiceStatus( serviceStatusHandle, &serviceStatus ) ) {
-		LOG_FATAL << "Unable to report service state " << currentState << " to SCM";
+		LOG_FATAL << "Unable to report service state " << currentState << " to SCM: " << _Wolframe::Logging::LogWinerror;
 		return;
 	}
 }
@@ -282,7 +282,7 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 // register the event callback where we get called by Windows and the SCM
 		serviceStatusHandle = RegisterServiceCtrlHandler( config.serviceConf->serviceName.c_str( ), serviceCtrlFunction );
 		if( serviceStatusHandle == 0 ) {
-			LOG_FATAL << "Unable to register service control handler function";
+			LOG_FATAL << "Unable to register service control handler function: " << _Wolframe::Logging::LogWinerror;
 			return;
 		}
 
@@ -292,7 +292,7 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 // register a stop event
 		serviceStopEvent = CreateEvent( NULL, TRUE, FALSE, NULL );
 		if( serviceStopEvent == NULL ) {
-			LOG_FATAL << "Unable to create the stop event for the termination of the service";
+			LOG_FATAL << "Unable to create the stop event for the termination of the service: " << _Wolframe::Logging::LogWinerror;
 			service_report_status( SERVICE_STOPPED, NO_ERROR, DEFAULT_SERVICE_TIMEOUT );
 			return;
 		}
@@ -321,9 +321,16 @@ WAIT_FOR_STOP_EVENT:
 // we could do something periodic here
 				goto WAIT_FOR_STOP_EVENT;
 
-			default:
+			case WAIT_ABANDONED:
+// this is bad, not really sure how we could recover from this one. For
+// now let's assume that stopping here is safer, so treat it like a successful
+// event, but log the fact we run into that state
+				LOG_CRITICAL << "Waiting for stop event in service main resulted in WAIT_ABANDONED!";
+				break;
+				
+			case WAIT_FAILED:
 // error, stop now immediatelly
-				LOG_FATAL << "Waiting for stop event in service main failed, stopping now";
+				LOG_FATAL << "Waiting for stop event in service main failed, stopping now" << _Wolframe::Logging::LogWinerror;
 				s.stop( );
 				service_report_status( SERVICE_STOPPED, NO_ERROR, DEFAULT_SERVICE_TIMEOUT );
 				return;
@@ -441,7 +448,7 @@ int _Wolframe_winMain( int argc, char* argv[] )
 					config.foreground = true;
 				} else {
 					// TODO: mmh? what are we doing here? No longer here
-					LOG_FATAL << "Unable to dispatch service control dispatcher";
+					LOG_FATAL << "Unable to dispatch service control dispatcher: " << _Wolframe::Logging::LogWinerror;
 					return _Wolframe::ErrorCodes::FAILURE;
 				}
 			} else {
@@ -467,7 +474,7 @@ int _Wolframe_winMain( int argc, char* argv[] )
 		s.run();
 	}
 	catch (std::exception& e)	{
-		std::cerr << "exception: " << e.what() << "\n";
+		LOG_ERROR << "Got exception: " << e.what( );
 		return _Wolframe::ErrorCodes::FAILURE;
 	}
 	LOG_NOTICE << "Server stopped";

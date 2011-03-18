@@ -13,16 +13,17 @@
 
 # TODO: which flags to enable?
 # /nologo: disable MS disclaimer
-# /MT: create a multi-thread binary
 # /EHsc: enable C++ exception handling
 # /Ox: optimize what you can
 # /Zi: enable debug information
-# /MTD: create multi-threaded debug binary
-# /we<n>: show warnings (level 1 to 4)
-# /Wall: enable all warnings
+# /MD: multithreaded runtime
+# /W <n>: show warnings (level 1 to 4)
+# /Wall: enable all warnings (produces tons of warnings!)
+# /WX: tread warnings as errors
+# /D_SCL_SECURE_NO_WARNINGS=1: disable security CRT warnings in C library
 
 # compilation flags and compilers (release)
-COMMON_COMPILE_FLAGS = /MD /nologo /O2 /EHsc /c $(INCLUDE_DIRS)
+COMMON_COMPILE_FLAGS = /MD /D_SCL_SECURE_NO_WARNINGS=1 /WX /nologo /O2 /EHsc /c $(INCLUDE_DIRS)
 
 # compilation flags and compilers (debug)
 #COMMON_COMPILE_FLAGS = /MDd /ZI /nologo /EHsc /c $(INCLUDE_DIRS) /RTC1
