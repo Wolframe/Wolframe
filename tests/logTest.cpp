@@ -59,17 +59,17 @@ TEST_F( LoggingFixture, LogMacrosWithoutComponent )
 
 TEST_F( LoggingFixture, LogMacrosWithComponent )
 {
-	LOG_NETWORK_FATAL	<< "fatal error";
-	LOG_NETWORK_ALERT	<< "alert";
-	LOG_NETWORK_CRITICAL	<< "critical error";
-	LOG_NETWORK_SEVERE	<< "severe error";
-	LOG_NETWORK_ERROR	<< "an error";
-	LOG_NETWORK_WARNING	<< "a warning";
-	LOG_NETWORK_NOTICE	<< "a notice";
-	LOG_NETWORK_INFO 	<< "an info";
-	LOG_NETWORK_DEBUG	<< "debug message";
-	LOG_NETWORK_TRACE	<< "debug message with tracing";
-	LOG_NETWORK_DATA	<< "debug message with tracing and data";
+	LOG_FATAL	<< "fatal error";
+	LOG_ALERT	<< "alert";
+	LOG_CRITICAL	<< "critical error";
+	LOG_SEVERE	<< "severe error";
+	LOG_ERROR	<< "an error";
+	LOG_WARNING	<< "a warning";
+	LOG_NOTICE	<< "a notice";
+	LOG_INFO 	<< "an info";
+	LOG_DEBUG	<< "debug message";
+	LOG_TRACE	<< "debug message with tracing";
+	LOG_DATA	<< "debug message with tracing and data";
 }
 
 #ifndef _WIN32

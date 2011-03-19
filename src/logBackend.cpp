@@ -8,7 +8,6 @@
 
 #include "logger.hpp"
 #include "logBackend.hpp"
-#include "logComponent.hpp"
 
 // no macros here, name clash with variables in syslog.h, so
 // undefine them here..
@@ -55,7 +54,7 @@ void ConsoleLogBackend::setLevel( const LogLevel::Level level )
 	logLevel_ = level;
 }
 
-inline void ConsoleLogBackend::log( WOLFRAME_UNUSED const LogComponent::Component component, const LogLevel::Level level, const std::string& msg )
+inline void ConsoleLogBackend::log( WOLFRAME_UNUSED const LogComponent component, const LogLevel::Level level, const std::string& msg )
 {
 	if ( level >= logLevel_ ) {
 		std::cerr << level << ": " << msg << std::endl;
@@ -110,8 +109,8 @@ void LogfileBackend::reopen( )
 	} catch( const std::ofstream::failure& ) {
 		isOpen_ = false;
 		_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance( ) ).Get(
-			_Wolframe::Logging::LogComponent::LOGCOMPONENT_LOGGING,
 			_Wolframe::Logging::LogLevel::LOGLEVEL_CRITICAL )
+			/* TODO: marker */
 		/* LOG_CRITICAL */ << "Can't open logfile '" << filename_ << "'";
 		// TODO: e.what() displays "basic_ios::clear" always, how to get
 		// decent error messages here? I fear the C++ standard doesn't help here..
@@ -148,11 +147,12 @@ static inline std::string timestamp( void )
 #endif // !defined( _WIN32 )
 }
 
-inline void LogfileBackend::log( const LogComponent::Component component, const LogLevel::Level level, const std::string& msg )
+inline void LogfileBackend::log( const LogComponent component, const LogLevel::Level level, const std::string& msg )
 {
 	if( level >= logLevel_ && isOpen_ ) {
 		logFile_	<< timestamp( ) << " "
-				<< component << ( component == LogComponent::LOGCOMPONENT_NONE ? "" : " - " )
+				<< component.str( )
+				<< ( component == LogNone ? "" : " - " )
 				<< level << ": " << msg << std::endl;
 		logFile_.flush( );
 	}
@@ -266,11 +266,12 @@ void SyslogBackend::setIdent( const std::string ident )
 	reopen( );
 }
 
-inline void SyslogBackend::log( const LogComponent::Component component, const LogLevel::Level level, const std::string& msg )
+inline void SyslogBackend::log( const LogComponent component, const LogLevel::Level level, const std::string& msg )
 {
 	if ( level >= logLevel_ ) {
 		std::ostringstream os;
-		os	<< component << ( component == LogComponent::LOGCOMPONENT_NONE ? "" : " - " )
+		os	<< component.str( )
+			<< ( component == LogNone ? "" : " - " )
 			<< msg;
 		syslog( levelToSyslogLevel( level ), "%s", os.str( ).c_str( ) );
 	}
@@ -367,7 +368,7 @@ static DWORD messageIdToEventlogId( DWORD eventLogLevel )
 	return( eventId | 0x0FFF0000L | ( mask << 30 ) );
 }
 
-inline void EventlogBackend::log( WOLFRAME_UNUSED const LogComponent::Component component, const LogLevel::Level level, const std::string& msg )
+inline void EventlogBackend::log( WOLFRAME_UNUSED const LogComponent component, const LogLevel::Level level, const std::string& msg )
 {
 	if ( level >= logLevel_ ) {
 		LPCSTR msg_arr[1];
@@ -461,7 +462,7 @@ void LogBackend::LogBackendImpl::setEventlogSource( const std::string source )
 }
 #endif // defined( _WIN32 )
 
-inline void LogBackend::LogBackendImpl::log( const LogComponent::Component component, const LogLevel::Level level, const std::string& msg )
+inline void LogBackend::LogBackendImpl::log( const LogComponent component, const LogLevel::Level level, const std::string& msg )
 {
 	consoleLogger_.log( component, level, msg );
 	logfileLogger_.log( component, level, msg );
@@ -501,7 +502,7 @@ void LogBackend::setEventlogLog( const std::string log )	{ impl_->setEventlogLog
 void LogBackend::setEventlogSource( const std::string source )	{ impl_->setEventlogSource( source ); }
 #endif // _WIN32
 
-void LogBackend::log( const LogComponent::Component component, const LogLevel::Level level, const std::string& msg )	{ impl_->log( component, level, msg ); }
+void LogBackend::log( const LogComponent component, const LogLevel::Level level, const std::string& msg )	{ impl_->log( component, level, msg ); }
 
 
 // Logger
@@ -515,9 +516,9 @@ Logger::~Logger( )
 	logBk_.log( component_, msgLevel_, os_.str( ) );
 }
 
-std::ostringstream& Logger::Get( LogComponent::Component component, LogLevel::Level level )
+std::ostringstream& Logger::Get( LogLevel::Level level )
 {
-	component_ = component;
+	component_ = LogNone;
 	msgLevel_ = level;
 	return os_;
 }

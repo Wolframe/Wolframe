@@ -31,7 +31,7 @@ namespace _Wolframe {
 
 		void setLevel( const LogLevel::Level level );
 
-		void log( const LogComponent::Component component, const LogLevel::Level level, const std::string& msg );
+		void log( const LogComponent component, const LogLevel::Level level, const std::string& msg );
 
 		void reopen( );
 		
@@ -52,7 +52,7 @@ namespace _Wolframe {
 
 		void reopen( );
 
-		void log( const LogComponent::Component component, const LogLevel::Level level, const std::string& msg );
+		void log( const LogComponent component, const LogLevel::Level level, const std::string& msg );
 
 	private:
 		LogLevel::Level logLevel_;
@@ -75,7 +75,7 @@ namespace _Wolframe {
 
 		void setIdent( const std::string ident );
 
-		void log( const LogComponent::Component component, const LogLevel::Level level, const std::string& msg );
+		void log( const LogComponent component, const LogLevel::Level level, const std::string& msg );
 
 		void reopen( );
 
@@ -100,7 +100,7 @@ namespace _Wolframe {
 
 		void setSource( const std::string source );
 
-		void log( const LogComponent::Component component, const LogLevel::Level level, const std::string& msg );
+		void log( const LogComponent component, const LogLevel::Level level, const std::string& msg );
 
 		void reopen( );
 
@@ -142,7 +142,7 @@ namespace _Wolframe {
 		void setEventlogSource( const std::string source );
 #endif // _WIN32
 
-		void log( const LogComponent::Component component, const LogLevel::Level level, const std::string& msg );
+		void log( const LogComponent component, const LogLevel::Level level, const std::string& msg );
 
 	private:
 		ConsoleLogBackend consoleLogger_;
