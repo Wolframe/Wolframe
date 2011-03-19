@@ -9,7 +9,6 @@
 #include "logger.hpp"
 #include "logBackend.hpp"
 #include "logComponent.hpp"
-#include "wolframemsg.h"
 
 // no macros here, name clash with variables in syslog.h, so
 // undefine them here..
