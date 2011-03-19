@@ -61,10 +61,11 @@ namespace _Wolframe {
 			}
 		}
 
-		static LogComponent LogLogging;
-		static LogComponent LogLua;
-		static LogComponent LogNetwork;
-		static LogComponent LogAuth;			
+		static const LogComponent LogNone;
+		static const LogComponent LogLogging;
+		static const LogComponent LogLua;
+		static const LogComponent LogNetwork;
+		static const LogComponent LogAuth;			
 	};
 
 	class LogBackend : public Singleton< LogBackend >

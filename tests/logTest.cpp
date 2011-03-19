@@ -59,7 +59,6 @@ TEST_F( LoggingFixture, LogMacrosWithoutComponent )
 
 TEST_F( LoggingFixture, LogMacrosWithComponent )
 {
-/*
 	LOG_FATAL	<< LogComponent::LogLogging << "fatal error";
 	LOG_ALERT	<< LogComponent::LogLogging << "alert";
 	LOG_CRITICAL	<< LogComponent::LogLogging << "critical error";
@@ -71,7 +70,6 @@ TEST_F( LoggingFixture, LogMacrosWithComponent )
 	LOG_DEBUG	<< LogComponent::LogLogging << "debug message";
 	LOG_TRACE	<< LogComponent::LogLogging << "debug message with tracing";
 	LOG_DATA	<< LogComponent::LogLogging << "debug message with tracing and data";
-*/
 }
 
 TEST_F( LoggingFixture, LogStandardValues )

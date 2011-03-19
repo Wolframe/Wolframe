@@ -37,11 +37,11 @@
 namespace _Wolframe {
 	namespace Logging {
 
-	LogComponent LogNone( LogComponent::LOGCOMPONENT_NONE );
-	LogComponent LogLogging( LogComponent::LOGCOMPONENT_LOGGING );
-	LogComponent LogNetwork( LogComponent::LOGCOMPONENT_NETWORK );
-	LogComponent LogAuth( LogComponent::LOGCOMPONENT_AUTH );
-	LogComponent LogLua( LogComponent::LOGCOMPONENT_LUA );
+	const LogComponent LogComponent::LogNone( LogComponent::LOGCOMPONENT_NONE );
+	const LogComponent LogComponent::LogLogging( LogComponent::LOGCOMPONENT_LOGGING );
+	const LogComponent LogComponent::LogNetwork( LogComponent::LOGCOMPONENT_NETWORK );
+	const LogComponent LogComponent::LogAuth( LogComponent::LOGCOMPONENT_AUTH );
+	const LogComponent LogComponent::LogLua( LogComponent::LOGCOMPONENT_LUA );
 
 	// map components
 	Logger& operator<<( Logger& logger, LogComponent c )
@@ -144,7 +144,7 @@ void LogfileBackend::reopen( )
 		isOpen_ = false;
 		_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance( ) ).Get(
 			_Wolframe::Logging::LogLevel::LOGLEVEL_CRITICAL )
-//			<< _Wolframe::Logging::LogComponent::LogLogging
+			<< _Wolframe::Logging::LogComponent::LogLogging
 			<< "Can't open logfile '" << filename_ << "'";
 		// TODO: e.what() displays "basic_ios::clear" always, how to get
 		// decent error messages here? I fear the C++ standard doesn't help here..
@@ -186,7 +186,7 @@ inline void LogfileBackend::log( const LogComponent component, const LogLevel::L
 	if( level >= logLevel_ && isOpen_ ) {
 		logFile_	<< timestamp( ) << " "
 				<< component.str( )
-				<< ( component == LogNone ? "" : " - " )
+				<< ( component == LogComponent::LogNone ? "" : " - " )
 				<< level << ": " << msg << std::endl;
 		logFile_.flush( );
 	}
@@ -305,7 +305,7 @@ inline void SyslogBackend::log( const LogComponent component, const LogLevel::Le
 	if ( level >= logLevel_ ) {
 		std::ostringstream os;
 		os	<< component.str( )
-			<< ( component == LogNone ? "" : " - " )
+			<< ( component == LogComponent::LogNone ? "" : " - " )
 			<< msg;
 		syslog( levelToSyslogLevel( level ), "%s", os.str( ).c_str( ) );
 	}
@@ -553,7 +553,7 @@ Logger::~Logger( )
 
 Logger& Logger::Get( LogLevel::Level level )
 {
-	component_ = LogNone;
+	component_ = LogComponent::LogNone;
 	msgLevel_ = level;
 	return *this;
 }
