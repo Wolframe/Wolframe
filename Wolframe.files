@@ -116,7 +116,6 @@ include/connectionHandler.hpp
 include/database.hpp
 include/ErrorCodes.hpp
 include/GNUmakefile
-include/logComponent.hpp
 include/logger.hpp
 include/logLevel.hpp
 include/logSyslogFacility.hpp

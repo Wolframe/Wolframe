@@ -256,7 +256,7 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree::const_iterat
 
 #if !defined( _WIN32 )
 		else if ( boost::algorithm::iequals( L1it->first, "eventlog" ))	{
-			LOG_WARNING << displayName() << ": event log is defined only on Windows" << std::endl;
+			LOG_WARNING << displayName() << ": event log is defined only on Windows";
 		}
 #else // if !defined( _WIN32 )
 		// event log

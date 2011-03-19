@@ -87,7 +87,7 @@ bool ApplicationConfiguration::parse ( const char *filename )
 			}
 			else	{
 				LOG_WARNING << "configuration root: Unknown configuration option <"
-					  << it->first << ">" << std::endl;
+					  << it->first << ">";
 //				return false;
 			}
 		}

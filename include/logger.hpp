@@ -61,17 +61,11 @@ namespace _Wolframe {
 			}
 		}
 
-		static const LogComponent LogLoging;
-		static const LogComponent LogLua;
-		static const LogComponent LogNetwork;
-		static const LogComponent LogAuth;			
+		static LogComponent LogLogging;
+		static LogComponent LogLua;
+		static LogComponent LogNetwork;
+		static LogComponent LogAuth;			
 	};
-
-	const LogComponent LogNone( LogComponent::LOGCOMPONENT_NONE );
-	const LogComponent LogLoging( LogComponent::LOGCOMPONENT_LOGGING );
-	const LogComponent LogNetwork( LogComponent::LOGCOMPONENT_NETWORK );
-	const LogComponent LogAuth( LogComponent::LOGCOMPONENT_AUTH );
-	const LogComponent LogLua( LogComponent::LOGCOMPONENT_LUA );
 
 	class LogBackend : public Singleton< LogBackend >
 	{
@@ -115,14 +109,18 @@ namespace _Wolframe {
 
 		~Logger( );
 
-		std::ostringstream& Get( LogLevel::Level level );
+		Logger& Get( LogLevel::Level level );
 
 		// OS error logging markers
 		typedef struct { int _dummy; } LogStrerrorT;
-		static const LogStrerrorT LogStrerror;
 		typedef struct LogWinerrorT { int _dummy; } LogWinerrorT;
+		static const LogStrerrorT LogStrerror;
 		static const LogWinerrorT LogWinerror;
 				
+		template<typename T> friend Logger& operator<<( Logger& logger, T thing );
+		friend Logger& operator<<( Logger& logger, LogComponent thing );
+		friend Logger& operator<<( Logger& logger, Logger::LogStrerrorT t );
+		
 	protected:
 		std::ostringstream os_;
 
@@ -138,78 +136,56 @@ namespace _Wolframe {
 
 	const Logger::LogStrerrorT LogStrerror = { 1 };
 	const Logger::LogWinerrorT LogWinerror = { 2 };
-		
-	} // namespace Logging
-} // namespace _Wolframe
-
-
-// template functions for error markers in the output stream
-// e.g. LOG_ERROR << "f() had a booboo, reason: " << Logger::LogStrerrorT
-
-#ifndef _WIN32
-
-template< typename CharT, typename TraitsT >
-inline std::basic_ostream< CharT, TraitsT > &operator<< ( 	std::basic_ostream< CharT, TraitsT >& os,
-								const WOLFRAME_UNUSED _Wolframe::Logging::Logger::LogStrerrorT s )
-{
-	char errbuf[512];
-
-#if defined( __USE_GNU )
-	char *ss = strerror_r( errno, errbuf, 512 );
-	os << ss;
-#else
-	int res = strerror_r( errno, errbuf, 512 );
-	os << errbuf;
-#endif // defined( __USE_GNU )
-
-	return os;
-}
-
-#endif // !defined( _WIN32 )
+	
+	// template functions for logging, default is we search for the << operator
+	// and log with this one..
+	template<typename T>
+	Logger& operator<<( Logger& logger, T t )
+	{
+		logger.os_ << t;
+		return logger;
+	}
 
 #ifdef _WIN32
 
-template< typename CharT, typename TraitsT >
-inline std::basic_ostream< CharT, TraitsT > &operator<< ( 	std::basic_ostream< CharT, TraitsT >& os,
-								const WOLFRAME_UNUSED _Wolframe::Logging::Logger::LogWinerrorT s )
-{
-	DWORD last_error = GetLastError( );
-	TCHAR errbuf[512];
-	LPVOID werrbuf;
-	DWORD wbuf_size;
-	DWORD wres;
-	
-	wres = FormatMessage(
-		FORMAT_MESSAGE_ALLOCATE_BUFFER |
-		FORMAT_MESSAGE_FROM_SYSTEM |
-		FORMAT_MESSAGE_IGNORE_INSERTS |
-		FORMAT_MESSAGE_MAX_WIDTH_MASK,
-		NULL,			// message is from system
-		last_error,		// code of last error (GetLastError)
-		0,			// default language (TODO: fit to i18n of rest)
-		(LPTSTR)&werrbuf,	// use LocalAlloc for the message string
-		0,			// minimal allocation size
-		NULL );			// no arguments to the message
+// TODO
+	template< typename CharT, typename TraitsT >
+	inline std::basic_ostream< CharT, TraitsT > &operator<< ( 	std::basic_ostream< CharT, TraitsT >& os,
+									const WOLFRAME_UNUSED _Wolframe::Logging::Logger::LogWinerrorT s )
+	{
+		DWORD last_error = GetLastError( );
+		TCHAR errbuf[512];
+		LPVOID werrbuf;
+		DWORD wbuf_size;
+		DWORD wres;
 		
-	if( wres == 0 ) {
-		StringCbCopy( errbuf, 512, _T( "No message available" ) );
+		wres = FormatMessage(
+			FORMAT_MESSAGE_ALLOCATE_BUFFER |
+			FORMAT_MESSAGE_FROM_SYSTEM |
+			FORMAT_MESSAGE_IGNORE_INSERTS |
+			FORMAT_MESSAGE_MAX_WIDTH_MASK,
+			NULL,			// message is from system
+			last_error,		// code of last error (GetLastError)
+			0,			// default language (TODO: fit to i18n of rest)
+			(LPTSTR)&werrbuf,	// use LocalAlloc for the message string
+			0,			// minimal allocation size
+			NULL );			// no arguments to the message
+			
+		if( wres == 0 ) {
+			StringCbCopy( errbuf, 512, _T( "No message available" ) );
+		}
+	
+		StringCbCopy( errbuf, 512, (LPCTSTR)werrbuf );
+		
+		os << errbuf;
+		
+		return os;
 	}
 
-	StringCbCopy( errbuf, 512, (LPCTSTR)werrbuf );
-	
-	os << errbuf;
-	
-	return os;
-}
-
 #endif // defined( _WIN32 )
-
-// map components
-template< typename CharT, typename TraitsT >
-inline std::basic_ostream< CharT, TraitsT > &operator<< ( std::basic_ostream< CharT, TraitsT >& s,
-							  _Wolframe::Logging::LogComponent l )
-{
-}
+			
+	} // namespace Logging
+} // namespace _Wolframe
 
 // shortcut macros
 #define LOG_DATA	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogLevel::LOGLEVEL_DATA )

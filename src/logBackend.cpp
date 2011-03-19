@@ -37,6 +37,40 @@
 namespace _Wolframe {
 	namespace Logging {
 
+	LogComponent LogNone( LogComponent::LOGCOMPONENT_NONE );
+	LogComponent LogLogging( LogComponent::LOGCOMPONENT_LOGGING );
+	LogComponent LogNetwork( LogComponent::LOGCOMPONENT_NETWORK );
+	LogComponent LogAuth( LogComponent::LOGCOMPONENT_AUTH );
+	LogComponent LogLua( LogComponent::LOGCOMPONENT_LUA );
+
+	// map components
+	Logger& operator<<( Logger& logger, LogComponent c )
+	{
+		logger.component_ = c;
+		return logger;
+	}
+
+	// template functions for error markers in the output stream
+	// e.g. LOG_ERROR << "f() had a booboo, reason: " << Logger::LogStrerror
+#ifndef _WIN32
+	Logger& operator<<( Logger& logger, WOLFRAME_UNUSED Logger::LogStrerrorT t )
+	{
+		char errbuf[512];
+
+#if defined( __USE_GNU )
+		char *ss = strerror_r( errno, errbuf, 512 );
+		logger.os_ << ss;
+#else
+		int res = strerror_r( errno, errbuf, 512 );
+		logger.os_ << errbuf;
+#endif // defined( __USE_GNU )
+		logger.os_ << " (errno: " << errno << ")";
+
+		return logger;
+	}
+
+#endif // !defined( _WIN32 )
+
 // ConsoleLogBackend
 
 ConsoleLogBackend::ConsoleLogBackend( )
@@ -110,8 +144,8 @@ void LogfileBackend::reopen( )
 		isOpen_ = false;
 		_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance( ) ).Get(
 			_Wolframe::Logging::LogLevel::LOGLEVEL_CRITICAL )
-			/* TODO: marker */
-		/* LOG_CRITICAL */ << "Can't open logfile '" << filename_ << "'";
+//			<< _Wolframe::Logging::LogComponent::LogLogging
+			<< "Can't open logfile '" << filename_ << "'";
 		// TODO: e.what() displays "basic_ios::clear" always, how to get
 		// decent error messages here? I fear the C++ standard doesn't help here..
 	}
@@ -387,7 +421,8 @@ inline void EventlogBackend::log( WOLFRAME_UNUSED const LogComponent component, 
 			_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance( ) ).Get(
 			_Wolframe::Logging::LogComponent::LOGCOMPONENT_LOGGING,
 			_Wolframe::Logging::LogLevel::LOGLEVEL_CRITICAL )
-			/* LOG_CRITICAL */ << "Can't report event to event log: " << GetLastError( ) << "'";
+				<< _Wolframe::Logging::LogComponent::LogLogging
+				<< "Can't report event to event log: " << _Wolframe::Logging::LogWinerror;
 		}
 	}
 }
@@ -516,11 +551,11 @@ Logger::~Logger( )
 	logBk_.log( component_, msgLevel_, os_.str( ) );
 }
 
-std::ostringstream& Logger::Get( LogLevel::Level level )
+Logger& Logger::Get( LogLevel::Level level )
 {
 	component_ = LogNone;
 	msgLevel_ = level;
-	return os_;
+	return *this;
 }
 
 	} // namespace Logging

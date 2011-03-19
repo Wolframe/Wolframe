@@ -111,7 +111,7 @@ bool LuaConfiguration::parse( const boost::property_tree::ptree::const_iterator 
 				return false;
 			if ( ! boost::filesystem::path( script ).is_absolute() )
 				LOG_WARNING << displayName() << ": script file path is not absolute: "
-					    << script << std::endl;
+					    << script;
 		} else if ( boost::algorithm::iequals( L1it->first, "preload_lib" ))	{
 			std::string preload_lib;
 			if ( ! Configuration::getStringValue( L1it, displayName(), preload_lib ))
@@ -120,7 +120,7 @@ bool LuaConfiguration::parse( const boost::property_tree::ptree::const_iterator 
 		} else {
 			LOG_WARNING << displayName() << ": unknown configuration option: <"
 				    << L1it->first << ">";
-//			return false;
+			return false;
 		}
 	}
 

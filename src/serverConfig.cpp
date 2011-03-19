@@ -89,18 +89,18 @@ ServerConfiguration::ServerConfiguration()
 										it != SSLaddress.end(); ++it )	{
 			// if it listens to SSL a certificate file and a key file are required
 			if ( it->certificate().empty() )	{
-				LOG_ERROR << "No SSL certificate specified for " << it->toString() << std::endl;
+				LOG_ERROR << "No SSL certificate specified for " << it->toString();
 				correct = false;
 			}
 			if ( it->key().empty() )	{
-				LOG_ERROR << "No SSL key specified for " << it->toString() << std::endl;
+				LOG_ERROR << "No SSL key specified for " << it->toString();
 				correct = false;
 			}
 			// verify client SSL certificate needs either certificate dir or chain file
 			if ( it->verifyClientCert() && it->CAdirectory().empty() && it->CAchain().empty() )	{
 				LOG_ERROR << "Client SSL certificate verification requested but no CA "
 				      "directory or CA chain file specified for "
-				   << it->toString() << std::endl;
+				   << it->toString();
 				correct = false;
 			}
 		}
@@ -194,28 +194,28 @@ bool ServerConfiguration::parse( const boost::property_tree::ptree::const_iterat
 						return false;
 					if ( ! boost::filesystem::path( certFile ).is_absolute() )
 						LOG_WARNING << displayName() << ": certificate file is not absolute: "
-							    << certFile << std::endl;
+							    << certFile;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "key" ))	{
 					if ( ! getHostnameValue( L2it, displayName(), keyFile ))
 						return false;
 					if ( ! boost::filesystem::path( keyFile ).is_absolute() )
 						LOG_WARNING << displayName() << ": key file is not absolute: "
-							    << keyFile << std::endl;
+							    << keyFile;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "CAdirectory" ))	{
 					if ( ! getHostnameValue( L2it, displayName(), CAdirectory ))
 						return false;
 					if ( ! boost::filesystem::path( CAdirectory ).is_absolute() )
 						LOG_WARNING << displayName() << ": CA directory is not absolute: "
-							    << CAdirectory << std::endl;
+							    << CAdirectory;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "CAchainFile" ))	{
 					if ( ! getHostnameValue( L2it, displayName(), CAchainFile ))
 						return false;
 					if ( ! boost::filesystem::path( CAchainFile ).is_absolute() )
 						LOG_WARNING << displayName() << ": CA chain file is not absolute: "
-							    << CAchainFile << std::endl;
+							    << CAchainFile;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "verify" ))	{
 					if ( ! getBoolValue( L2it, displayName(), verify, verifySet ))

@@ -60,7 +60,7 @@ bool ServiceConfiguration::parse( const boost::property_tree::ptree::const_itera
 {
 #if defined(_WIN32)
 	if ( boost::algorithm::iequals( node, "daemon" ))	{
-		LOG_WARNING << "daemon: section is not valid on Windows" << std::endl;
+		LOG_WARNING << "daemon: section is not valid on Windows";
 	}
 #else // #if defined(_WIN32)
 	if ( boost::algorithm::iequals( node, "daemon" ))	{
@@ -79,7 +79,7 @@ bool ServiceConfiguration::parse( const boost::property_tree::ptree::const_itera
 					return false;
 				if ( ! boost::filesystem::path( pidFile ).is_absolute() )
 					LOG_WARNING << displayName() << ": pid file path is not absolute: "
-						    << pidFile << std::endl;
+						    << pidFile;
 			}
 			else	{
 				LOG_WARNING << displayName() << ": unknown configuration option: <"
@@ -91,7 +91,7 @@ bool ServiceConfiguration::parse( const boost::property_tree::ptree::const_itera
 #endif
 #if !defined(_WIN32)
 	else if ( boost::algorithm::iequals( node, "service" ))	{
-		LOG_WARNING << "service: section is valid only on Windows" << std::endl;
+		LOG_WARNING << "service: section is valid only on Windows";
 	}
 #else // #if defined(_WIN32)
 	else if ( boost::algorithm::iequals( node, "service" ))	{

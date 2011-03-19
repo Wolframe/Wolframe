@@ -68,7 +68,8 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 		const char *configFile;
 
 		if ( !cmdLineCfg.parse( argc, argv ))	{	// there was an error parsing the command line
-			LOG_ERROR << cmdLineCfg.errMsg() << std::endl;
+			LOG_ERROR << cmdLineCfg.errMsg();
+			std::cerr << std::endl;
 			cmdLineCfg.usage( std::cerr );
 			std::cerr << std::endl;
 			return _Wolframe::ErrorCodes::FAILURE;

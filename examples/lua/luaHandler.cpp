@@ -78,7 +78,9 @@ namespace _Wolframe {
 
 		_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get(
 			// TODO:add component log marker
-			_Wolframe::Logging::LogLevel::str2LogLevel( logLevel ) ) << os.str( );
+			_Wolframe::Logging::LogLevel::str2LogLevel( logLevel ) )
+//			<< _Wolframe::Logging::LogComponent::LogLua
+			<< os.str( );
 
 		lua_pop( _l, n );
 

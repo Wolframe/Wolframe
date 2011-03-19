@@ -59,17 +59,29 @@ TEST_F( LoggingFixture, LogMacrosWithoutComponent )
 
 TEST_F( LoggingFixture, LogMacrosWithComponent )
 {
-	LOG_FATAL	<< "fatal error";
-	LOG_ALERT	<< "alert";
-	LOG_CRITICAL	<< "critical error";
-	LOG_SEVERE	<< "severe error";
-	LOG_ERROR	<< "an error";
-	LOG_WARNING	<< "a warning";
-	LOG_NOTICE	<< "a notice";
-	LOG_INFO 	<< "an info";
-	LOG_DEBUG	<< "debug message";
-	LOG_TRACE	<< "debug message with tracing";
-	LOG_DATA	<< "debug message with tracing and data";
+/*
+	LOG_FATAL	<< LogComponent::LogLogging << "fatal error";
+	LOG_ALERT	<< LogComponent::LogLogging << "alert";
+	LOG_CRITICAL	<< LogComponent::LogLogging << "critical error";
+	LOG_SEVERE	<< LogComponent::LogLogging << "severe error";
+	LOG_ERROR	<< LogComponent::LogLogging << "an error";
+	LOG_WARNING	<< LogComponent::LogLogging << "a warning";
+	LOG_NOTICE	<< LogComponent::LogLogging << "a notice";
+	LOG_INFO 	<< LogComponent::LogLogging << "an info";
+	LOG_DEBUG	<< LogComponent::LogLogging << "debug message";
+	LOG_TRACE	<< LogComponent::LogLogging << "debug message with tracing";
+	LOG_DATA	<< LogComponent::LogLogging << "debug message with tracing and data";
+*/
+}
+
+TEST_F( LoggingFixture, LogStandardValues )
+{
+	std::string s = "a string";
+	LOG_INFO << "string: '" << s << "'";
+	const char *c = "a C string";
+	LOG_INFO << "char constant: '" << c << "'";
+	LOG_INFO << "integer: " << 47;
+	LOG_INFO << "double: " << 4.71;
 }
 
 #ifndef _WIN32
