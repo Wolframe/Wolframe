@@ -5,16 +5,6 @@
 #ifndef _LOGGER_HPP_INCLUDED
 #define _LOGGER_HPP_INCLUDED
 
-#ifdef _WIN32
-#include <tchar.h>
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#include <strsafe.h>
-#else
-#include <errno.h>
-#include <cstring>
-#endif
-
 #include "singleton.hpp"
 #include "logLevel.hpp"
 #include "logSyslogFacility.hpp"
@@ -51,15 +41,7 @@ namespace _Wolframe {
 		
 		LogComponent( const enum Component& c = LOGCOMPONENT_NONE ) : _component( c ) { }
 		
-		const char* str( ) const {
-			static const char *const s[] = {
-				"", "Logging", "Lua", "Network", "Auth" };
-			if( static_cast< size_t >( _component ) < ( sizeof( s ) / sizeof( *s ) ) ) {
-				return s[_component];
-			} else {
-				return "";
-			}
-		}
+		const char* str( ) const;
 
 		static const LogComponent LogNone;
 		static const LogComponent LogLogging;
@@ -134,9 +116,6 @@ namespace _Wolframe {
 		Logger( const Logger& );
 		Logger& operator= ( const Logger& );
 	};
-
-	const Logger::LogStrerrorT LogStrerror = { 1 };
-	const Logger::LogWinerrorT LogWinerror = { 2 };
 	
 	// template functions for logging, default is we search for the << operator
 	// and log with this one..
@@ -146,44 +125,6 @@ namespace _Wolframe {
 		logger.os_ << t;
 		return logger;
 	}
-
-#ifdef _WIN32
-
-// TODO
-	template< typename CharT, typename TraitsT >
-	inline std::basic_ostream< CharT, TraitsT > &operator<< ( 	std::basic_ostream< CharT, TraitsT >& os,
-									const WOLFRAME_UNUSED _Wolframe::Logging::Logger::LogWinerrorT s )
-	{
-		DWORD last_error = GetLastError( );
-		TCHAR errbuf[512];
-		LPVOID werrbuf;
-		DWORD wbuf_size;
-		DWORD wres;
-		
-		wres = FormatMessage(
-			FORMAT_MESSAGE_ALLOCATE_BUFFER |
-			FORMAT_MESSAGE_FROM_SYSTEM |
-			FORMAT_MESSAGE_IGNORE_INSERTS |
-			FORMAT_MESSAGE_MAX_WIDTH_MASK,
-			NULL,			// message is from system
-			last_error,		// code of last error (GetLastError)
-			0,			// default language (TODO: fit to i18n of rest)
-			(LPTSTR)&werrbuf,	// use LocalAlloc for the message string
-			0,			// minimal allocation size
-			NULL );			// no arguments to the message
-			
-		if( wres == 0 ) {
-			StringCbCopy( errbuf, 512, _T( "No message available" ) );
-		}
-	
-		StringCbCopy( errbuf, 512, (LPCTSTR)werrbuf );
-		
-		os << errbuf;
-		
-		return os;
-	}
-
-#endif // defined( _WIN32 )
 			
 	} // namespace Logging
 } // namespace _Wolframe

@@ -23,6 +23,17 @@
 #undef LOG_ALERT
 #undef LOG_FATAL
 
+// for strerror, errno, FormatMessage, GetLastError
+#ifdef _WIN32
+#include <tchar.h>
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <strsafe.h>
+#else
+#include <errno.h>
+#include <cstring>
+#endif
+
 #if !defined( _WIN32 )
 #include <syslog.h>
 #include <sys/time.h>
@@ -42,6 +53,19 @@ namespace _Wolframe {
 	const LogComponent LogComponent::LogNetwork( LogComponent::LOGCOMPONENT_NETWORK );
 	const LogComponent LogComponent::LogAuth( LogComponent::LOGCOMPONENT_AUTH );
 	const LogComponent LogComponent::LogLua( LogComponent::LOGCOMPONENT_LUA );
+
+	const char* LogComponent::str( ) const {
+		static const char *const s[] = {
+			"", "Logging", "Network", "Auth", "Lua" };
+		if( static_cast< size_t >( _component ) < ( sizeof( s ) / sizeof( *s ) ) ) {
+			return s[_component];
+		} else {
+			return "";
+		}
+	}
+
+	const Logger::LogStrerrorT Logger::LogStrerror = { 1 };
+	const Logger::LogWinerrorT Logger::LogWinerror = { 2 };
 
 	// map components
 	Logger& operator<<( Logger& logger, LogComponent c )
@@ -68,8 +92,40 @@ namespace _Wolframe {
 
 		return logger;
 	}
-
 #endif // !defined( _WIN32 )
+
+#ifdef _WIN32
+	Logger& operator<<( Logger& logger, WOLFRAME_UNUSED Logger::LogWinerrorT t )
+	{
+		DWORD last_error = GetLastError( );
+		TCHAR errbuf[512];
+		LPVOID werrbuf;
+		DWORD wbuf_size;
+		DWORD wres;
+		
+		wres = FormatMessage(
+			FORMAT_MESSAGE_ALLOCATE_BUFFER |
+			FORMAT_MESSAGE_FROM_SYSTEM |
+			FORMAT_MESSAGE_IGNORE_INSERTS |
+			FORMAT_MESSAGE_MAX_WIDTH_MASK,
+			NULL,			// message is from system
+			last_error,		// code of last error (GetLastError)
+			0,			// default language (TODO: fit to i18n of rest)
+			(LPTSTR)&werrbuf,	// use LocalAlloc for the message string
+			0,			// minimal allocation size
+			NULL );			// no arguments to the message
+			
+		if( wres == 0 ) {
+			StringCbCopy( errbuf, 512, _T( "No message available" ) );
+		}
+	
+		StringCbCopy( errbuf, 512, (LPCTSTR)werrbuf );
+		
+		os << errbuf;
+		
+		return os;
+	}
+#endif // defined( _WIN32 )
 
 // ConsoleLogBackend
 

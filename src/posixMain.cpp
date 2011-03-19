@@ -155,7 +155,7 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 
 			// daemonize, lose process group, terminal output, etc.
 			if( daemon( 0, 0 ) ) {
-				LOG_CRITICAL << "Daemonizing server failed";
+				LOG_CRITICAL << "Daemonizing server failed: " << _Wolframe::Logging::Logger::LogStrerror;
 				return _Wolframe::ErrorCodes::FAILURE;
 			}
 
@@ -170,20 +170,25 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 			struct group *groupent;
 			struct passwd *passwdent;
 
-			groupent = getgrnam( config.serviceConf->group.c_str( ) );
 			passwdent = getpwnam( config.serviceConf->user.c_str( ) );
-			if( groupent == NULL || passwdent == NULL ) {
-				LOG_CRITICAL << "Illegal group '" << config.serviceConf->group << "' or user '" << config.serviceConf->user << "'";
+			if( passwdent == NULL ) {
+				LOG_CRITICAL << "Illegal user '" << config.serviceConf->user << "': " << _Wolframe::Logging::Logger::LogStrerror;
+				return _Wolframe::ErrorCodes::FAILURE;
+			}
+
+			groupent = getgrnam( config.serviceConf->group.c_str( ) );
+			if( groupent == NULL ) {
+				LOG_CRITICAL << "Illegal group '" << config.serviceConf->group << "': " << _Wolframe::Logging::Logger::LogStrerror;
 				return _Wolframe::ErrorCodes::FAILURE;
 			}
 
 			if( setgid( groupent->gr_gid ) < 0 ) {
-				LOG_CRITICAL << "setgid for group '" << config.serviceConf->group << "' failed!";
+				LOG_CRITICAL << "setgid for group '" << config.serviceConf->group << "' failed: " << _Wolframe::Logging::Logger::LogStrerror;
 				return _Wolframe::ErrorCodes::FAILURE;
 			}
 
 			if( setuid( passwdent->pw_uid ) < 0 ) {
-				LOG_CRITICAL << "setgid for user '" << config.serviceConf->user << "' failed!";
+				LOG_CRITICAL << "setgid for user '" << config.serviceConf->user << "' failed: " << _Wolframe::Logging::Logger::LogStrerror;
 				return _Wolframe::ErrorCodes::FAILURE;
 			}
 
