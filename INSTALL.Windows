@@ -6,7 +6,7 @@ Prerequisites
 - boost 1.43.0 or later
 - optionally (WITH_SSL) openssl 0.9.8 or later
 - optionally (WITH_GTEST) gtest 1.5.0 or later
-- optionally (WITH_EXPECT) expect and ActiveTcl
+- optionally: expect and Tcl 8.4 or later
 - optionally (WITH_LUA) lua 5.1.x
 - optionally (WITH_QT) Qt 4, 4.5.x or later
 
