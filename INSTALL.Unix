@@ -18,31 +18,58 @@ Prerequisites
   - doxygen: for documentation for programmers
   - dia: to convert images to svg
 
+Configuration of the build
+--------------------------
+
+First the build system tries to determine automatically
+the paths of the software.
+
+Use 'make help' to find out which options exist (e.g. WITH_SSL).
+
+Use 'make <config options> config' to see what variables
+the system would use to build Wolframe.
+
+If you get 'NOT SUPPLIED ON THIS PLATFORM' for some variables
+you have either to port the system in 'makefiles/gmake/platform.mk'
+or you can build and configure your own version of the package.
+
+In this case copy 'makefiles/gmake/config.mk.template' to your
+home directory as '~/config.mk'. Customize '~/config.mk' as needed.
+
 Compile and install boost
 -------------------------
 
-./bootstrap.sh --prefix=/somewhere/boost-1_44_0
-./bjam
+./bootstrap.sh --prefix=/usr/local/boost-1.46.1
+./bjam install
 
-configure Wolframe in makefiles/gmake/config.mk and
-set BOOST_DIR to /somewhere/boost-1_44_0.
+configure Wolframe in ~/config.mk and
+set BOOST_DIR to /usr/local/boost-1.46.1.
 
 Compile and install openssl
 ---------------------------
 
+Unless you have a good reason, use the openssl library of
+your Linux system.
+
 Compile and install gtest
 -------------------------
 
-./configure
+./configure --prefix=/usr/local/gtest-1.5.0
 make
+make install
 
-configure Wolframe in makefiles/gmake/config.mk and
-set GTEST_DIR accordingly.
+configure Wolframe in ~/config.mk and
+set GTEST_DIR to /usr/local/gtest-1.5.0.
 
 Compile and install Lua
 -----------------------
 
-See 'examples/lua/README'
+./configure --prefix=/usr/local/lua-5.1.4
+make
+make install
+
+configure Wolframe in ~/config.mk and
+set LUA_DIR to /usr/local/lua-5.1.4.
 
 Compile and install Qt
 ----------------------
@@ -53,6 +80,9 @@ cd src/3rdparty/webkit/JavaScriptCore/
 make
 cd -
 make install
+
+confiugre Wolframe in ~/config.mk and
+set QT_DIR to /usr/local/qt-4.7.2
 
 A note on Linux Distributions
 =============================
