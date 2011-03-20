@@ -12,6 +12,11 @@ Prerequisites
 - optionally (WITH_LUA) lua 5.1.x
 - optionally (WITH_QT) Qt 4, 4.5.x or later
 - optionally (WITH_PAM)
+- optionally: expect and Tcl 8.4 or later
+- optionally (for building the documentation):
+  - xsltproc, docboox-xsl-stylesheet: for docbook
+  - doxygen: for documentation for programmers
+  - dia: to convert images to svg
 
 Compile and install boost
 -------------------------
@@ -44,6 +49,9 @@ Compile and install Qt
 
 ./configure --prefix /usr/local/qt-4.7.2 -openssl
 make
+cd src/3rdparty/webkit/JavaScriptCore/
+make
+cd -
 make install
 
 A note on Linux Distributions
@@ -55,10 +63,12 @@ RHEL/Centos/SL 5.5
 
 Optional packages:
 Fetch from epel/rpmforge whatever: lua-devel (5.1)
-Fetch from normal repository: openssl-devel, pam-devel (0.99.6), qt-devel (4.2.1)
+Fetch from normal repository: openssl-devel, pam-devel (0.99.6)
 
 Boost is not available in a decent version (1.33), build your own one.
+
 Qt (4.2.1) is too old, compile your own one.
+
 For building the documentation you need 'libxslt', 'doxygen' and
 'docbook-style-xsl' (from epel).
 
