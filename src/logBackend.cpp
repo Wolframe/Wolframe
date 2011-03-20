@@ -121,9 +121,9 @@ namespace _Wolframe {
 	
 		StringCbCopy( errbuf, 512, (LPCTSTR)werrbuf );
 		
-		os << errbuf;
+		logger.os_ << errbuf;
 		
-		return os;
+		return logger;
 	}
 #endif // defined( _WIN32 )
 
@@ -475,10 +475,9 @@ inline void EventlogBackend::log( WOLFRAME_UNUSED const LogComponent component, 
 			NULL ); // no binary data
 		if( !res ) {
 			_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance( ) ).Get(
-			_Wolframe::Logging::LogComponent::LOGCOMPONENT_LOGGING,
 			_Wolframe::Logging::LogLevel::LOGLEVEL_CRITICAL )
 				<< _Wolframe::Logging::LogComponent::LogLogging
-				<< "Can't report event to event log: " << _Wolframe::Logging::LogWinerror;
+				<< "Can't report event to event log: " << Logger::LogWinerror;;
 		}
 	}
 }

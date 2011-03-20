@@ -13,9 +13,6 @@
 #include <fstream>
 #include <sstream>
 
-
-#include "unused.h"
-
 namespace _Wolframe {
 	namespace Logging {
 
@@ -103,6 +100,7 @@ namespace _Wolframe {
 		template<typename T> friend Logger& operator<<( Logger& logger, T thing );
 		friend Logger& operator<<( Logger& logger, LogComponent thing );
 		friend Logger& operator<<( Logger& logger, Logger::LogStrerrorT t );
+		friend Logger& operator<<( Logger& logger, Logger::LogWinerrorT t );
 		
 	protected:
 		std::ostringstream os_;
