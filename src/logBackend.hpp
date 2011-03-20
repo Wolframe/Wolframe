@@ -110,6 +110,9 @@ namespace _Wolframe {
 		HANDLE eventSource_;
 		std::string log_;
 		std::string source_;
+		PSID sid_;
+
+		void calculateSid( );		
 	};
 #endif // _WIN32
 

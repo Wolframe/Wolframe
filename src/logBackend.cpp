@@ -23,6 +23,19 @@
 #undef LOG_ALERT
 #undef LOG_FATAL
 
+// our private shortcut macros
+#define _LOG_DATA	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogLevel::LOGLEVEL_DATA )
+#define _LOG_TRACE	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogLevel::LOGLEVEL_TRACE )
+#define _LOG_DEBUG	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogLevel::LOGLEVEL_DEBUG )
+#define _LOG_INFO	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogLevel::LOGLEVEL_INFO )
+#define _LOG_NOTICE	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogLevel::LOGLEVEL_NOTICE )
+#define _LOG_WARNING	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogLevel::LOGLEVEL_WARNING )
+#define _LOG_ERROR	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogLevel::LOGLEVEL_ERROR )
+#define _LOG_SEVERE	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogLevel::LOGLEVEL_SEVERE )
+#define _LOG_CRITICAL	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogLevel::LOGLEVEL_CRITICAL )
+#define _LOG_ALERT	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogLevel::LOGLEVEL_ALERT )
+#define _LOG_FATAL	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogLevel::LOGLEVEL_FATAL )
+
 // for strerror, errno, FormatMessage, GetLastError
 #ifdef _WIN32
 #include <tchar.h>
@@ -198,12 +211,11 @@ void LogfileBackend::reopen( )
 		isOpen_ = true;
 	} catch( const std::ofstream::failure& ) {
 		isOpen_ = false;
-		_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance( ) ).Get(
-			_Wolframe::Logging::LogLevel::LOGLEVEL_CRITICAL )
-			<< _Wolframe::Logging::LogComponent::LogLogging
-			<< "Can't open logfile '" << filename_ << "'";
+		_LOG_CRITICAL	<< _Wolframe::Logging::LogComponent::LogLogging
+				<< "Can't open logfile '" << filename_ << "'";
 		// TODO: e.what() displays "basic_ios::clear" always, how to get
-		// decent error messages here? I fear the C++ standard doesn't help here..
+		// decent error messages here? I fear the C++ standard doesn't
+		// help here..
 	}
 }
 
@@ -387,10 +399,16 @@ EventlogBackend::EventlogBackend( )
 	log_ = "Application";
 	source_ = "<undefined>";
 	eventSource_ = RegisterEventSource( NULL, source_.c_str( ) );
+	sid_ = NULL;
 }
 
 EventlogBackend::~EventlogBackend( )
 {
+	if( sid_ != NULL ) {
+		free( sid_ );
+		sid_ = NULL;
+	}
+
 	if( eventSource_ ) {
 		(void)DeregisterEventSource( eventSource_ );
 		eventSource_ = 0;
@@ -468,25 +486,100 @@ inline void EventlogBackend::log( WOLFRAME_UNUSED const LogComponent component, 
 			levelToEventlogLevel( level ),
 			categoryId_,
 			messageIdToEventlogId( level ),
-			NULL, // SID of the user owning the process, not now, later..
+			sid_, // SID of the user owning the process, not now, later..
 			1, // at the moment no strings to replace, just the message itself
 			0, // no binary data
 			msg_arr, // array of strings to log (msg.c_str() for now)
 			NULL ); // no binary data
 		if( !res ) {
-			_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance( ) ).Get(
-			_Wolframe::Logging::LogLevel::LOGLEVEL_CRITICAL )
-				<< _Wolframe::Logging::LogComponent::LogLogging
-				<< "Can't report event to event log: " << Logger::LogWinerror;;
+			_LOG_CRITICAL	<< _Wolframe::Logging::LogComponent::LogLogging
+					<< "Can't report event to event log: "
+					<< Logger::LogWinerror;
 		}
 	}
 }
 
 void EventlogBackend::reopen( )
+
 {
+// deferring calculation of SID for logging, avoid reentrance trouble in
+// the constructor
+	if( !sid_ )
+		calculateSid( );
+
 	if( eventSource_ )
 		(void)DeregisterEventSource( eventSource_ );
 	eventSource_ = RegisterEventSource( NULL, source_.c_str( ) );
+}
+
+void EventlogBackend::calculateSid( )
+{
+// get the token for the current process token 'tokenProcess' with proper rights,
+// process is only a pseudoToken (which we also don't have to close)
+	HANDLE tokenProcess = NULL;
+	HANDLE process = GetCurrentProcess( );
+	if( process == NULL ) {
+		_LOG_CRITICAL	<< _Wolframe::Logging::LogComponent::LogLogging
+				<< "Unable to get current process handle (GetCurrentProcess): "
+				<< Logger::LogWinerror;
+		return;
+	}
+	if( !OpenProcessToken( process, TOKEN_QUERY, &tokenProcess ) ) {
+		_LOG_CRITICAL	<< _Wolframe::Logging::LogComponent::LogLogging
+				<< "Unable to get process token of current process (OpenProcessToken): "
+				<< Logger::LogWinerror;
+		return;
+	}
+
+// get the required size to store the user token and allocate memory for it */
+	DWORD tokenUserSize = 0;
+	(void)GetTokenInformation( tokenProcess, TokenUser, NULL, 0, &tokenUserSize );
+	PTOKEN_USER tokenUser = (PTOKEN_USER)malloc( tokenUserSize * sizeof( BYTE ) );
+	if( tokenUser == NULL ) {
+		_LOG_CRITICAL	<< _Wolframe::Logging::LogComponent::LogLogging
+				<< "Unable to get memory to store user token (malloc)";
+		CloseHandle( tokenProcess );
+		return;
+	}
+
+// get the user token
+	if( !GetTokenInformation( tokenProcess, TokenUser, (LPVOID)tokenUser, tokenUserSize, &tokenUserSize ) ) {
+		_LOG_CRITICAL	<< _Wolframe::Logging::LogComponent::LogLogging
+				<< "Unable to get user token (GetTokenInformation): "
+				<< Logger::LogWinerror;
+		free( tokenUser );
+		CloseHandle( tokenProcess );
+		return;
+	}
+
+// make a local copy of the sid because it and return that one
+	PSID tokenSid = (PSID)tokenUser->User.Sid;
+	DWORD sidSize = GetLengthSid( tokenSid );
+	sid_ = (PSID)malloc( sidSize );
+	if( sid_ != NULL ) {
+		if( !CopySid( sidSize, sid_, tokenSid ) ) {
+			_LOG_CRITICAL	<< _Wolframe::Logging::LogComponent::LogLogging
+					<< "Unable to make a copy of the current SID (CopySid): "
+					<< Logger::LogWinerror;
+			free( tokenSid );
+			free( tokenUser );
+			CloseHandle( tokenProcess );
+			return;
+		}
+	} else {
+		_LOG_CRITICAL	<< _Wolframe::Logging::LogComponent::LogLogging
+				<< "Unable to get memory to store copy of user token (malloc)";
+		free( tokenSid );
+		free( tokenUser );
+		CloseHandle( tokenProcess );
+		return;
+	}
+
+// the process handle is a pseudo handle which doesn't need closing,
+// all others have to be freed
+	free( tokenSid );
+	free( tokenUser );
+	CloseHandle( tokenProcess );
 }
 
 #endif // defined( _WIN32 )
