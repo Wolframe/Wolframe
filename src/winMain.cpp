@@ -104,16 +104,18 @@ static bool deregisterEventlog( const _Wolframe::Configuration::ApplicationConfi
 	LONG res;
 
 // open registry, we need write rights to change it
-	_snprintf( key, 256, "SYSTEM\\CurrentControlSet\\Services\\EventLog\\%s",
-		config.loggerConf->eventlogLogName.c_str( ) );
-	res = RegOpenKeyEx( HKEY_LOCAL_MACHINE, key, 0, KEY_WRITE, &h );
-	if( res != ERROR_SUCCESS ) {
-		LOG_CRITICAL << "RegOpenKeyEx with key '" << key << "' failed: " << _Wolframe::Logging::Logger::LogWinerror;
-		return false;
-	}
+//	_snprintf( key, 256, "SYSTEM\\CurrentControlSet\\Services\\EventLog\\%s",////
+//		config.loggerConf->eventlogLogName.c_str( ) );
+//	res = RegOpenKeyEx( HKEY_LOCAL_MACHINE, key, 0, KEY_WRITE, &h );
+//	if( res != ERROR_SUCCESS ) {
+//		LOG_CRITICAL << "RegOpenKeyEx with key '" << key << "' failed: " << _Wolframe::Logging::Logger::LogWinerror;
+//		return false;
+//	}
 
 // remove event log registry entry	
-	res = RegDeleteKey( h, key );
+	_snprintf( key, 256, "SYSTEM\\CurrentControlSet\\Services\\EventLog\\%s\\%s",
+		config.loggerConf->eventlogLogName.c_str( ), config.loggerConf->eventlogSource.c_str( ) );
+	res = RegDeleteKey( HKEY_LOCAL_MACHINE, key );
 	if( res != ERROR_SUCCESS ) {
 		LOG_CRITICAL << "RegDeleteKey with key '" << key << "' failed: " << _Wolframe::Logging::Logger::LogWinerror;
 		return false;
