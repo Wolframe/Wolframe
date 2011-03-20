@@ -1,0 +1,18 @@
+TOPDIR = ..\..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+configTest: $(TOPDIR)/src/wolframed
+
+local_all:
+
+local_clean:
+
+local_distclean:
+
+local_test:
+	@-D:\Tcl8.5\bin\tclsh.exe testEcho

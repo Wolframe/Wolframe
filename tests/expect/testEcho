@@ -8,6 +8,8 @@
 #     error / warning / ok message
 #
 
+package require Expect
+
 if { [llength $argv] != 3 } {
     puts "usage: checkConfig <config file> <return code> <error / warning / ok message>"
     exit 1
