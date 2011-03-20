@@ -43,6 +43,8 @@ Compile and install Qt
 ----------------------
 
 ./configure --prefix /usr/local/qt-4.7.2 -openssl
+make
+make install
 
 A note on Linux Distributions
 =============================
