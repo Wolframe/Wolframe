@@ -88,8 +88,8 @@ static bool registerEventlog( const _Wolframe::Configuration::ApplicationConfigu
 	DWORD eventTypes = EVENTLOG_ERROR_TYPE | EVENTLOG_WARNING_TYPE | EVENTLOG_INFORMATION_TYPE;
 	registrySetWord( h, TEXT( "TypesSupported" ), eventTypes );
 
-// exactly one category for now (Wolframe)
-	registrySetWord( h, TEXT( "CategoryCount" ), (DWORD)1 );
+// must be in sync with LogComponent in logger.hpp and 'logComponentToCategoryId' in logBackend.cpp
+	registrySetWord( h, TEXT( "CategoryCount" ), (DWORD)5 );
 
 	(void)RegCloseKey( h );
 	
