@@ -1,36 +1,40 @@
 #!/usr/bin/expect
 #
-# Start a wolframe daemon and check the configuration
-#
-# Arguments:
-#     configuration file
-#     wolframed return code
-#     error / warning / ok message
+# Start a wolframe daemon and communicate with it
 #
 
 package require Expect
 
-if { [llength $argv] != 3 } {
-    puts "usage: checkConfig <config file> <return code> <error / warning / ok message>"
-    exit 1
-}
-
-set config [lindex $argv 0]		;# 1st script argument
-set retval [lindex $argv 1]		;# 2nd script argument
-set outmsg [lindex $argv 2]		;# 3rd script argument
-
-puts "Configuration file: $config, expecting exit code $retval and message \"$outmsg\""
+set config wolframe.conf
 
 set timeout 3
-spawn ../../src/wolframed -c $config -f
+set serverpid [spawn ../../src/wolframed -c $config -f]
 
-puts "$outmsg $config $retval"
+puts "wolframed started with configuration file: $config (pid: $serverpid)"
+# allow the server to start
+sleep 2
+
+set timeout 3
+spawn telnet localhost 7661
 
 expect 	{
-	timeout		{ send_user "oops\n" }
-	"$outmsg\r"	{ send_user "momo\n" }
-	eof		{ send_user "that's bad\n" }
+	timeout		{ send_user " --> oops. timeout occured waiting for server banner\n" }
+	eof		{ send_user " --> EOF waiting for server banner: that's bad\n" }
+	"Welcome to Wolframe.\r"	{ send_user " --> Connected.\n" }
 }
 
-catch wait reason
-puts $reason
+set message "Momo fofo gogo"
+send "$message\r"
+expect "$message"
+
+set message "lkewlewmjfdlmfewjl"
+send "$message\r"
+expect "$message"
+
+set timeout 1
+send "quit\r"
+expect "Thanks for using Wolframe."
+expect 	{
+	timeout		{ send_user " --> oops. timeout occured\n" }
+	eof		{ send_user " --> Connection closed. OK\n" }
+}
