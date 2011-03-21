@@ -1,13 +1,12 @@
 %define boost_version	1.46.1
 
 %define initscript	wolframe.initd.RHEL
-%define configFile	wolframe.conf
 
 %define WOLFRAME_USR	wolframe
 %define WOLFRAME_GRP	wolframe
 
 Summary: Small and medium enterprise resource planning (Wolframe)
-Name: Wolframe
+Name: wolframe
 Version: 0.0.1
 Release: 0.1
 License: Wolframe License
@@ -56,7 +55,9 @@ X client for the Wolframe server.
 
 
 %build
-LD_FLAGS=-Wl,-rpath=%{_libdir}/Wolframe make all
+LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make all \
+	WITH_SSL=1 WITH_GTEST=1 WITH_LUA=1 WITH_QT=1 WITH_PAM=1 \
+	sysconfdir=/etc
 
 echo ======================= TESTING ==============================
 # make test
@@ -65,19 +66,21 @@ echo ===================== END OF TESTING =========================
 
 %install
 rm -rf $RPM_BUILD_ROOT
-make DESTDIR=$RPM_BUILD_ROOT install
+make DESTDIR=$RPM_BUILD_ROOT install \
+	WITH_SSL=1 WITH_GTEST=1 WITH_LUA=1 WITH_QT=1 WITH_PAM=1 \
+	sysconfdir=$RPM_BUILD_ROOT/etc
 
-mkdir -p $RPM_BUILD_ROOT%{_libdir}/Wolframe
+mkdir -p $RPM_BUILD_ROOT%{_libdir}/wolframe
 for i in \
 	libboost_program_options.so.%{boost_version} libboost_system.so.%{boost_version} \
 	libboost_filesystem.so.%{boost_version} libboost_thread.so.%{boost_version}; do
 # Aba: TODO: boost dir from config.mk outside?
-#    cp /usr/local/lib/$i $RPM_BUILD_ROOT%{_libdir}/Wolframe/
-    cp /usr/local/boost-%{boost_version}/lib/$i $RPM_BUILD_ROOT%{_libdir}/Wolframe/
+#    cp /usr/local/lib/$i $RPM_BUILD_ROOT%{_libdir}/wolframe/
+    cp /usr/local/boost-%{boost_version}/lib/$i $RPM_BUILD_ROOT%{_libdir}/wolframe/
 done
 
 mkdir -p $RPM_BUILD_ROOT%{_initrddir}
-cp %{initscript} $RPM_BUILD_ROOT%{_initrddir}/%{name}
+cp redhat/%{initscript} $RPM_BUILD_ROOT%{_initrddir}/%{name}
 
 
 %clean
@@ -107,33 +110,31 @@ if [ "$1" = 0 ]; then
     /usr/sbin/userdel %{WOLFRAME_USR}
 fi
 
-
 %files
 %defattr( -, root, root )
 %attr( 554, root, root) %{_initrddir}/%{name}
 %{_sbindir}/wolframed
 %dir %attr(0755, root, root) %{_sysconfdir}/wolframe
 %config %attr(0755, root, root) %{_sysconfdir}/wolframe/wolframe.conf
-%attr(0755, WOLFRAME_USR, WOLFRAME_GRP) %dir /var/log/wolframe
-%attr(0755, WOLFRAME_USR, WOLFRAME_GRP) %dir /var/run/wolframe
+#%attr(0755, WOLFRAME_USR, WOLFRAME_GRP) %dir /var/log/wolframe
+#%attr(0755, WOLFRAME_USR, WOLFRAME_GRP) %dir /var/run/wolframe
 
-%dir %{_libdir}/Wolframe
-#%{_libdir}/wolframe/libpqxx-%{libpqxx_version}.so
+%dir %{_libdir}/wolframe
 %{_libdir}/wolframe/libboost_program_options.so.%{boost_version}
 %{_libdir}/wolframe/libboost_system.so.%{boost_version}
 %{_libdir}/wolframe/libboost_filesystem.so.%{boost_version}
-%{_libdir}/wolframe/libboost_iostreams.so.%{boost_version}
 %{_libdir}/wolframe/libboost_thread.so.%{boost_version}
-%{_libdir}/wolframe/libboost_serialization.so.%{boost_version}
 
-%dir %{_datadir}/wolframe
-%doc LICENSE
+#%dir %{_datadir}/wolframe
+#%doc LICENSE
 
 
 %files doc
 
 
 %files client
+%dir %{_bindir}
+%{_bindir}/qtclient
 
 
 %changelog
