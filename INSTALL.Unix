@@ -112,6 +112,9 @@ Optional packages: openssl-devel, lua-devel (5.1), qt4-devel, gtest-devel (1.4),
                    pam-devel (1.1.1)
 
 For building the documentation you need 'libxslt', 'docbook-style-xsl' and 'doxygen'.
+For building the PDF wolfbook install 'fop'.
+
+When rebuilding the SVG images of the documentation you also need 'dia'.
 
 Ubuntu 10.04.1 LTS
 ------------------
