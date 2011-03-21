@@ -1,0 +1,22 @@
+; config helpers test configuration
+; property tree info file
+
+bool-true	{
+	true0	1
+	true1	yEs
+	true2	true
+	true3	ON
+}
+
+bool-false	{
+	false0	0
+	false1	nO
+	false2	false
+	false3	ofF
+}
+
+bool-wrong	{
+	wrong0
+	wrong1	""
+	wrong2	blabla
+}

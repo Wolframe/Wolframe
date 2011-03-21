@@ -39,40 +39,145 @@
 
 #include <boost/property_tree/ptree.hpp>
 
+#include "logger.hpp"
+
 namespace _Wolframe {
-	namespace Configuration	{
+namespace Configuration	{
 
-		bool getBoolValue( const boost::property_tree::ptree::const_iterator it,
-				   const std::string& module, bool& value );
+/// Get a boolean value from the property tree
+///\param[in]	it	property tree iterator pointing to the node
+///\param[in]	module	reference to the module name. Used only for
+///			error logging
+///\param[out]	value	the (boolean) value read
+///\return	true if it succeeds or false otherwise and logs the error
+bool getBoolValue( const boost::property_tree::ptree::const_iterator it,
+		  const std::string& module, bool& value );
 
-		bool getBoolValue( const boost::property_tree::ptree::const_iterator it,
-				   const std::string& module, bool& value, bool& valueIsSet );
+
+/// Get a boolean value from the property tree
+///\param[in]	it	property tree iterator pointing to the node
+///\param[in]	module	reference to the module name. Used only for
+///			error logging
+///\param[out]	value	the (boolean) value read
+///\param[in,out] valueIsSet	flag to signal if the value is set
+///			if set, the function will log an error and fail
+///\return	true if it succeeds or false otherwise and logs the error
+bool getBoolValue( const boost::property_tree::ptree::const_iterator it,
+		  const std::string& module, bool& value, bool& valueIsSet );
 
 
-		bool getStringValue( const boost::property_tree::ptree::const_iterator it,
-				     const std::string& module, std::string& value );
+/// Get a string value from the property tree. If the input string is
+/// not empty, it will be considered set and the function will log
+/// an error and fail.
+///\param[in]	it	property tree iterator pointing to the node
+///\param[in]	module	reference to the module name. Used only for
+///			error logging
+///\param[in,out] value	the string read
+///\return	true if it succeeds or false otherwise and logs the error
+bool getStringValue( const boost::property_tree::ptree::const_iterator it,
+		    const std::string& module, std::string& value );
 
-		bool getHostnameValue( const boost::property_tree::ptree::const_iterator it,
-				       const std::string& module, std::string& value );
 
-		template <typename T>
-		bool getNonZeroIntValue( const boost::property_tree::ptree::const_iterator it,
-					 const std::string& module, T& value );
+/// Similar to getStringValue but if the value read is "*" it will be
+/// replaced with "0.0.0.0"
+bool getHostnameValue( const boost::property_tree::ptree::const_iterator it,
+		      const std::string& module, std::string& value );
 
-		template <typename T>
-		bool getIntegerValue( const boost::property_tree::ptree::const_iterator it,
-				      const std::string& module, T& value );
 
-		template <typename T>
-		bool getIntegerValue( const boost::property_tree::ptree::const_iterator it,
-				      const std::string& module, T& value, bool& valueIsSet );
+/// Get a non zero intger value. A value of 0 is considered uninitialized.
+/// A non-zero value when calling the function will cause the function to fail.
+///\param[in]	it	property tree iterator pointing to the node
+///\param[in]	module	reference to the module name. Used only for
+///			error logging
+///\param[in,out] value	the integer value read
+///\return	true if it succeeds or false otherwise and logs the error
+template <typename T>
+bool getNonZeroIntValue( const boost::property_tree::ptree::const_iterator it,
+			const std::string& module, T& value )
+{
+	if ( value != 0 )	{
+		LOG_ERROR << module << ": " << it->first << " redefined";
+		return false;
+	}
+	value = it->second.get_value<T>();
+	if ( value == 0 )	{
+		LOG_ERROR << module << ": invalid value for " << it->first << ": \""
+			  << it->second.get_value<std::string>() << "\"";
+		return false;
+	}
+	return true;
+}
 
-		template <typename T>
-		bool getIntegerValue( const boost::property_tree::ptree::const_iterator it,
-				      const std::string& module, T& value, bool& valueIsSet,
-				      T lowerLimit, T upperLimit );
 
-	} // namespace Configuration
+/// Get an intger value.
+///\param[in]	it	property tree iterator pointing to the node
+///\param[in]	module	reference to the module name. Used only for
+///			error logging
+///\param[out]	value	the integer value read
+///\return	true if it succeeds or false otherwise and logs the error
+template <typename T>
+bool getIntegerValue( const boost::property_tree::ptree::const_iterator it,
+		     const std::string& module, T& value )
+{
+	value = it->second.get_value<T>();
+	return true;
+}
+
+
+/// Get an zero intger value.
+///\param[in]	it	property tree iterator pointing to the node
+///\param[in]	module	reference to the module name. Used only for
+///			error logging
+///\param[out]	value	the integer value read
+///\param[in,out] valueIsSet	flag to signal if the value is set
+///\return	true if it succeeds or false otherwise and logs the error
+template <typename T>
+bool getIntegerValue( const boost::property_tree::ptree::const_iterator it,
+		     const std::string& module, T& value, bool& valueIsSet )
+{
+	if ( valueIsSet )	{
+		LOG_ERROR << module << ": " << it->first << " redefined";
+		return false;
+	}
+	value = it->second.get_value<T>();
+	valueIsSet = true;
+	return true;
+}
+
+
+/// Get an zero intger value.
+///\param[in]	it	property tree iterator pointing to the node
+///\param[in]	module	reference to the module name. Used only for
+///			error logging
+///\param[out]	value	the integer value read
+///\param[in,out] valueIsSet	flag to signal if the value is set
+///\param[in]	lowerLimit	the lowest acceptable value
+///\param[in]	upperLimit	the highest acceptable value
+///\return	true if it succeeds or false otherwise and logs the error
+template <typename T>
+bool getIntegerValue( const boost::property_tree::ptree::const_iterator it,
+		     const std::string& module, T& value, bool& valueIsSet,
+		     T lowerLimit, T upperLimit )
+{
+	if ( valueIsSet )	{
+		LOG_ERROR << module << ": " << it->first << " redefined";
+		return false;
+	}
+	value = it->second.get_value<T>();
+	if ( value < lowerLimit )	{
+		LOG_ERROR << module << ": invalid value (too low) for " << it->first << ": \""
+			  << it->second.get_value<std::string>() << "\"";
+		return false;
+	}
+	if ( value > upperLimit )	{
+		LOG_ERROR << module << ": invalid value (too high) for " << it->first << ": \""
+			  << it->second.get_value<std::string>() << "\"";
+		return false;
+	}
+	return true;
+}
+
+} // namespace Configuration
 } // namespace _Wolframe
 
 

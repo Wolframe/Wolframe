@@ -47,20 +47,8 @@ namespace _Wolframe	{
 bool getBoolValue( const boost::property_tree::ptree::const_iterator it,
 		   const std::string& module, bool& value )
 {
-	std::string s = it->second.get_value<std::string>();
-	boost::to_upper( s );
-	boost::trim( s );
-	if ( s == "NO" || s == "FALSE" || s == "0" || s == "OFF" )	{
-		value = false;
-		return true;
-	}
-	if ( s == "YES" || s == "TRUE" || s == "1" || s == "ON" )	{
-		value = true;
-		return true;
-	}
-	LOG_ERROR << module << ": invalid logical value for " << it->first << ": \""
-		  << it->second.get_value<std::string>() << "\"";
-	return false;
+	bool	dummy = false;
+	return getBoolValue( it, module, value, dummy );
 }
 
 
@@ -115,42 +103,6 @@ bool getHostnameValue( const boost::property_tree::ptree::const_iterator it,
 		value = "0.0.0.0";
 	return ret;
 }
-
-
-template <typename T>
-bool getNonZeroIntValue( const boost::property_tree::ptree::const_iterator it,
-			 const std::string& module, T& value )
-{
-	if ( value != 0 )	{
-		LOG_ERROR << module << ": " << it->first << " redefined";
-		return false;
-	}
-	value = it->second.get_value<unsigned short>();
-	if ( value == 0 )	{
-		LOG_ERROR << module << ": invalid value for " << it->first << ": \""
-			  << it->second.get_value<std::string>() << "\"";
-		return false;
-	}
-	return true;
-}
-
-/*
-template <typename T>
-bool getIntegerValue( const boost::property_tree::ptree::const_iterator it,
-		      const std::string& module, T& value );
-
-template <typename T>
-bool getIntegerValue( const boost::property_tree::ptree::const_iterator it,
-		      const std::string& module, T& value, bool& valueIsSet );
-
-template <typename T>
-bool getIntegerValue( const boost::property_tree::ptree::const_iterator it,
-		      const std::string& module, T& value, bool& valueIsSet,
-		      T lowerLimit, T upperLimit );
-*/
-
-template bool getNonZeroIntValue<unsigned short>( const boost::property_tree::ptree::const_iterator it,
-						  const std::string& module, unsigned short& value );
 
 	} // namespace Configuration
 } // namespace _Wolframe

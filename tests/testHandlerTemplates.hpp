@@ -1,5 +1,5 @@
 //
-// pechoHandler.hpp - simple echo handler example
+// testHandlerTemplates.hpp - simple echo handler example
 //
 
 #ifndef _Wolframe_TEST_HANDLER_TEMPLATES_HPP_INCLUDED
@@ -38,40 +38,40 @@ namespace test
    {
       for (;;)
       {
-         NetworkOperation netop( connection.nextOperation());
-         
-         switch (netop.operation())
-         {
-            case NetworkOperation::READ:
-            {
-               char* data = const_cast<char*>((char*)netop.data());
-               unsigned int size = netop.size();
-               unsigned int ii;
-               for (ii=0; ii<size && *in; ii++,in++) data[ii]=*in;
+	 NetworkOperation netop( connection.nextOperation());
 
-               connection.networkInput( (void*)data, ii);
-            }
-            break;
-            
-            case NetworkOperation::WRITE:
-            {
-               char* data = (char*)netop.data();
-               std::size_t ii,size = netop.size();                  
-               for (ii=0; ii<size; ii++)
-               {
-                  out.push_back( data[ ii]);
-               }
-            }
-            break;
-            
-            case NetworkOperation::CLOSE:
-               return 0;
-               
-            default:
-               continue;
-         }
+	 switch (netop.operation())
+	 {
+	    case NetworkOperation::READ:
+	    {
+	       char* data = const_cast<char*>((char*)netop.data());
+	       unsigned int size = netop.size();
+	       unsigned int ii;
+	       for (ii=0; ii<size && *in; ii++,in++) data[ii]=*in;
+
+	       connection.networkInput( (void*)data, ii);
+	    }
+	    break;
+
+	    case NetworkOperation::WRITE:
+	    {
+	       char* data = (char*)netop.data();
+	       std::size_t ii,size = netop.size();
+	       for (ii=0; ii<size; ii++)
+	       {
+		  out.push_back( data[ ii]);
+	       }
+	    }
+	    break;
+
+	    case NetworkOperation::CLOSE:
+	       return 0;
+
+	    default:
+	       continue;
+	 }
       }
-      return 1;      
+      return 1;
    }
 }}//namespace _Wolframe::test
 #endif

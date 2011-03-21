@@ -200,3 +200,6 @@ tests/threadLeakTest.cpp
 tests/versionTest.cpp
 src/serviceBanner.cpp
 examples/mtproc/luatypes.cpp
+tests/configHelpersTest.cpp
+header.txt
+tests/configHelpersTest.info
