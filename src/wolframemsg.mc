@@ -16,9 +16,33 @@ LanguageNames = (
 ;// field is quite small.
 
 MessageId = 1
-SymbolicName = WOLFRAME_CATEGORY
+SymbolicName = WOLFRAME_CATEGORY_NONE
 Language = English
-Wolframe
+None
+.
+
+MessageId = 2
+SymbolicName = WOLFRAME_CATEGORY_LOGGING
+Language = English
+None
+.
+
+MessageId = 3
+SymbolicName = WOLFRAME_CATEGORY_NETWORK
+Language = English
+None
+.
+
+MessageId = 4
+SymbolicName = WOLFRAME_CATEGORY_AUTH
+Language = English
+None
+.
+
+MessageId = 5
+SymbolicName = WOLFRAME_CATEGORY_LUA
+Language = English
+None
 .
 
 ;// event log severity levels (severity bits)

@@ -24,8 +24,7 @@ namespace _Wolframe {
 			LOGCOMPONENT_LOGGING,		/// internal logger errors
 			LOGCOMPONENT_NETWORK,		/// networking
 			LOGCOMPONENT_AUTH,		/// authentication
-			LOGCOMPONENT_LUA,		/// lua processor
-			LOGCOMPONENT_DUMMY
+			LOGCOMPONENT_LUA		/// lua processor
 		};
 		
 	private:
@@ -35,6 +34,8 @@ namespace _Wolframe {
 		bool operator==( const LogComponent& o ) const {
 			return _component == o._component;
 		}
+		
+		enum Component component( ) const { return _component; }
 		
 		LogComponent( const enum Component& c = LOGCOMPONENT_NONE ) : _component( c ) { }
 		

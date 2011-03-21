@@ -395,7 +395,6 @@ EventlogBackend::EventlogBackend( )
 	logLevel_ = LogLevel::LOGLEVEL_UNDEFINED;
 	// the one category we have at the moment in the resource
 	// was '1 | 0x0FFF0000' before, why?!
-	categoryId_ = WOLFRAME_CATEGORY;
 	log_ = "Application";
 	source_ = "<undefined>";
 	eventSource_ = RegisterEventSource( NULL, source_.c_str( ) );
@@ -476,6 +475,18 @@ static DWORD messageIdToEventlogId( DWORD eventLogLevel )
 	return( eventId | 0x0FFF0000L | ( mask << 30 ) );
 }
 
+static WORD logComponentToCategoryId( const LogComponent c )
+{
+	switch( c.component( ) ) {
+		case LogComponent::LOGCOMPONENT_NONE:		return WOLFRAME_CATEGORY_NONE;
+		case LogComponent::LOGCOMPONENT_LOGGING:	return WOLFRAME_CATEGORY_LOGGING;
+		case LogComponent::LOGCOMPONENT_NETWORK:	return WOLFRAME_CATEGORY_NETWORK;
+		case LogComponent::LOGCOMPONENT_AUTH:		return WOLFRAME_CATEGORY_AUTH;
+		case LogComponent::LOGCOMPONENT_LUA:		return WOLFRAME_CATEGORY_LUA;
+		default:									return WOLFRAME_CATEGORY_NONE;
+	};
+}
+
 inline void EventlogBackend::log( WOLFRAME_UNUSED const LogComponent component, const LogLevel::Level level, const std::string& msg )
 {
 	if ( level >= logLevel_ ) {
@@ -484,7 +495,7 @@ inline void EventlogBackend::log( WOLFRAME_UNUSED const LogComponent component, 
 		BOOL res = ReportEvent(
 			eventSource_,
 			levelToEventlogLevel( level ),
-			categoryId_,
+			logComponentToCategoryId( component ),
 			messageIdToEventlogId( level ),
 			sid_, // SID of the user owning the process, not now, later..
 			1, // at the moment no strings to replace, just the message itself
