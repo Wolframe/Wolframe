@@ -1,0 +1,109 @@
+#!/bin/bash
+#
+# Init file for the Worlframe daemon
+#
+# chkconfig: 345 95 5
+# description: Wolframe Dameon
+#
+# processname: wolframed
+# config: /etc/wolframe/wolframe.conf
+# pidfile: /var/run/wolframe/wolframed.pid
+
+# source function library
+. /etc/rc.d/init.d/functions
+
+# pull in sysconfig settings
+#[ -f /etc/sysconfig/wolframed ] && . /etc/sysconfig/wolframed
+
+RETVAL=0
+prog="wolframed"
+WOLFRAMED="wolframed"
+OPTIONS=
+CONFIGFILE=/etc/wolframe/wolframe.conf
+PIDFILE=/var/run/wolframe/wolframed.pid
+
+runlevel=$(set -- $(runlevel); eval "echo \$$#" )
+
+do_restart_sanity_check()
+{
+	$WOLFRAMED -c $CONFIGFILE -t
+	RETVAL=$?
+	if [ ! "$RETVAL" = 0 ]; then
+		failure $"Configuration file is invalid"
+		echo
+	fi
+}
+
+start()
+{
+	echo -n $"Starting $prog: "
+	$WOLFRAMED -c $CONFIGFILE $OPTIONS && success || failure
+	RETVAL=$?
+	[ "$RETVAL" = 0 ] && touch /var/lock/subsys/wolframed
+	echo
+}
+
+stop()
+{
+	echo -n $"Stopping $prog: "
+	if [ -n "`pidof $WOLFRAMED`" ] ; then
+	    killproc -p $WOLFRAMED
+	else
+	    failure $"Stopping $prog"
+	fi
+	RETVAL=$?
+	# if we are in halt or reboot runlevel kill all running sessions
+	# so the TCP connections are closed cleanly
+	if [ "x$runlevel" = x0 -o "x$runlevel" = x6 ] ; then
+	    killall $prog 2>/dev/null
+	fi
+	[ "$RETVAL" = 0 ] && rm -f /var/lock/subsys/wolframed
+	echo
+}
+
+reload()
+{
+	echo -n $"Reloading $prog: "
+	if [ -n "`pidof $WOLFRAMED`" ] ; then
+	    killproc $WOLFRAMED -HUP
+	else
+	    failure $"Reloading $prog"
+	fi
+	RETVAL=$?
+	echo
+}
+
+case "$1" in
+	start)
+		start
+		;;
+	stop)
+		stop
+		;;
+	restart)
+		stop
+		start
+		;;
+	reload)
+		reload
+		;;
+	condrestart)
+		if [ -f /var/lock/subsys/wolframed ] ; then
+			do_restart_sanity_check
+			if [ "$RETVAL" = 0 ] ; then
+				stop
+				# avoid race
+				sleep 3
+				start
+			fi
+		fi
+		;;
+	status)
+		status -p $PIDFILE $WOLFRAMED
+		RETVAL=$?
+		;;
+	*)
+		echo $"Usage: $0 {start|stop|restart|reload|condrestart|status}"
+		RETVAL=1
+esac
+exit $RETVAL

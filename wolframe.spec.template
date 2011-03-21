@@ -1,4 +1,4 @@
-%define boost_version	1.46.0
+%define boost_version	1.46.1
 
 %define initscript	wolframe.initd.RHEL
 %define configFile	wolframe.conf
@@ -8,11 +8,11 @@
 
 Summary: Small and medium enterprise resource planning (Wolframe)
 Name: Wolframe
-Version: @VERSION@
+Version: 0.0.1
 Release: 0.1
 License: Wolframe License
 Group: Application/Business
-Source: wolframe-%{version}.tar.bz2
+Source: %{name}-%{version}.tar.bz2
 
 URL: http://www.wolframe.com/
 
@@ -20,9 +20,10 @@ BuildRoot: %{_tmppath}/%{name}-root
 Requires: expat >= 1.95
 BuildRequires: zlib-devel >= 1.2.3
 BuildRequires: openssl-devel >= 0.9.8
-BuildRequires: bzip2-devel >= 1.0.3
 BuildRequires: expat-devel >= 1.95
-BuildRequires: postgresql84-devel >= 8.4
+BuildRequires: postgresql-devel >= 8.1
+BuildRequires: lua-devel >= 5.1.4
+BuildRequires: pam-devel >= 0.99
 
 Distribution: rhel5
 Vendor: Wolframe team
@@ -69,9 +70,10 @@ make DESTDIR=$RPM_BUILD_ROOT install
 mkdir -p $RPM_BUILD_ROOT%{_libdir}/Wolframe
 for i in \
 	libboost_program_options.so.%{boost_version} libboost_system.so.%{boost_version} \
-	libboost_filesystem.so.%{boost_version} libboost_iostreams.so.%{boost_version} \
-	libboost_thread.so.%{boost_version} libboost_serialization.so.%{boost_version}; do
-    cp /usr/local/lib/$i $RPM_BUILD_ROOT%{_libdir}/Wolframe/
+	libboost_filesystem.so.%{boost_version} libboost_thread.so.%{boost_version}; do
+# Aba: TODO: boost dir from config.mk outside?
+#    cp /usr/local/lib/$i $RPM_BUILD_ROOT%{_libdir}/Wolframe/
+    cp /usr/local/boost-%{boost_version}/lib/$i $RPM_BUILD_ROOT%{_libdir}/Wolframe/
 done
 
 mkdir -p $RPM_BUILD_ROOT%{_initrddir}
@@ -115,8 +117,8 @@ fi
 %attr(0755, WOLFRAME_USR, WOLFRAME_GRP) %dir /var/log/wolframe
 %attr(0755, WOLFRAME_USR, WOLFRAME_GRP) %dir /var/run/wolframe
 
-%dir %{_libdir}/wolframe
-%{_libdir}/wolframe/libpqxx-%{libpqxx_version}.so
+%dir %{_libdir}/Wolframe
+#%{_libdir}/wolframe/libpqxx-%{libpqxx_version}.so
 %{_libdir}/wolframe/libboost_program_options.so.%{boost_version}
 %{_libdir}/wolframe/libboost_system.so.%{boost_version}
 %{_libdir}/wolframe/libboost_filesystem.so.%{boost_version}
