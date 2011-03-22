@@ -2,6 +2,10 @@ TOPDIR = ..
 
 SUBDIRS =
 
+ifdef WITH_EXPECT
+SUBDIRS += expect
+endif
+
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
 INCLUDE_CPPFLAGS = \

@@ -2,6 +2,11 @@ TOPDIR = ..
 
 SUBDIRS =
 
+!IFDEF WITH_EXPECT
+SUBDIRS = \
+	$(SUBDIRS) expect
+!ENDIF
+
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
 INCLUDE_CPPFLAGS = \
