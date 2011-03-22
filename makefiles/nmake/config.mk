@@ -96,3 +96,8 @@ LUA_INCLUDE_DIRS = "$(LUA_DIR)\src"
 LUA_LDFLAGS = /LIBPATH:"$(LUA_DIR)\src"
 LUA_LIBS = lua51.lib
 
+# Tcl (for testing with Expect)
+###############################
+
+TCL_DIR = C:\Tcl
+EXPECT = $(TCL_DIR)\bin\tclsh.exe

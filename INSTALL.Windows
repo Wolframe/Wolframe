@@ -64,10 +64,12 @@ Install Tcl and Expect
 ----------------------
 
 Download from http://www.activestate.com/activetcl/ 
+(32-bit version, the 64-bit version had no Expect available,
+at least at the time of writting)
 
 Install ActiveTcl 8.5 to C:\tcl8.5
 
-Insteall Expect 1.1:
+Install Expect 1.1 with:
 
 teacup install Expect
 

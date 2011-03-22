@@ -15,4 +15,4 @@ local_clean:
 local_distclean:
 
 local_test:
-	@-D:\Tcl8.5\bin\tclsh.exe testEcho
+	@-$(EXPECT) testEcho
