@@ -1,4 +1,5 @@
 %define boost_version	1.46.1
+%define qt_version	4.7.2
 
 %define initscript	wolframe.initd.RHEL
 
@@ -79,6 +80,12 @@ for i in \
     cp /usr/local/boost-%{boost_version}/lib/$i $RPM_BUILD_ROOT%{_libdir}/wolframe/
 done
 
+mkdir -p $RPM_BUILD_ROOT%{_libdir}/wolframe
+for i in libQtCore.so.4 libQtGui.so.4 libQtNetwork.so.4 libQtXml.so.4; do
+# Aba TODO: qtdir from config.mk?
+    cp /usr/local/qt-%{qt_version}/lib/$i $RPM_BUILD_ROOT%{_libdir}/wolframe/
+done
+
 mkdir -p $RPM_BUILD_ROOT%{_initrddir}
 cp redhat/%{initscript} $RPM_BUILD_ROOT%{_initrddir}/%{name}
 
@@ -135,7 +142,11 @@ fi
 %files client
 %dir %{_bindir}
 %{_bindir}/qtclient
-
+%dir %{_libdir}/wolframe
+%{_libdir}/wolframe/libQtCore.so.4
+%{_libdir}/wolframe/libQtGui.so.4
+%{_libdir}/wolframe/libQtNetwork.so.4
+%{_libdir}/wolframe/libQtXml.so.4
 
 %changelog
 * Sun Aug 29 2010 Mihai Barbos <mihai.barbos@gmail.com> 0.9.0-0.1
