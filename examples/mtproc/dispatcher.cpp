@@ -49,7 +49,7 @@ void CommandDispatcher::init( const char** protocolCmds, Instance* instance)
 	}
 }
 
-void CommandDispatcher::protocolInput( protocol::InputBlock::iterator& start, protocol::InputBlock::iterator& end, bool eoD)
+void CommandDispatcher::protocolInput( InputBlock::iterator& start, InputBlock::iterator& end, bool eoD)
 {
 	if (m_context.contentIterator)
 	{
@@ -90,7 +90,7 @@ CommandDispatcher::CommandDispatcher( Instance* instance)
 	init( instance);
 }
 
-CommandDispatcher::Command CommandDispatcher::getCommand( protocol::InputBlock::iterator& itr, protocol::InputBlock::iterator& eoM)
+CommandDispatcher::Command CommandDispatcher::getCommand( InputBlock::iterator& itr, InputBlock::iterator& eoM)
 {
 	LOG_DATA << "Dispatcher State: " << stateName(m_state);
 

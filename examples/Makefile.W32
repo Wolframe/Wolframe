@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = echo pecho
+SUBDIRS = echo pecho mtproc
 # mtproc breaks on Windows
 
 !IFDEF WITH_LUA

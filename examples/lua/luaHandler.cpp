@@ -19,6 +19,7 @@ extern "C" {
 	#include "lauxlib.h"
 }
 
+// Aba: for snprintf, maybe better to use ostringstream?
 #ifndef _WIN32
 #define __STDC_FORMAT_MACROS
 #include <cstdio>

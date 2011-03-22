@@ -5,8 +5,17 @@
 extern "C" {
 #endif
 
+#ifndef _WIN32
 #include <stdbool.h>
 #include <stddef.h>
+#else
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#define bool BOOL
+#define false FALSE
+#define true TRUE
+#define size_t SIZE_T
+#endif
 
 /* Parallel definitions for the POD data structures usable in plain C defined in
 *    - include/protocol/generator.hpp

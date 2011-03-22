@@ -10,6 +10,12 @@
 #include "implementation.hpp"
 #include "implementation_c.h"
 
+#ifndef _WIN32
+#include <cstdio>
+#else
+#define snprintf _snprintf
+#endif
+
 using namespace _Wolframe;
 using namespace _Wolframe::mtproc;
 

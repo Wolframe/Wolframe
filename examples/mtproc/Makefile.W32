@@ -11,13 +11,12 @@ INCLUDE_DIRS = \
 	/I. \
 	/I$(TOPDIR)\include \
 	/I"$(BOOST_DIR)" \
-	/I"$(PLATFORM_SDK_DIR)\Include"
+	/I"$(PLATFORM_SDK_DIR)\Include" \
 
 # Note: libraries are picked automatically on Windows!
 SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib"
 INCLUDE_LDFLAGS = \
 	$(SDK_LDFLAGS) $(BOOST_LDFLAGS)
-
 INCLUDE_LIBS = \
 	Advapi32.lib
 
@@ -33,20 +32,42 @@ INCLUDE_LIBS = \
 
 !ENDIF
 
+# Lua
+
+!IFDEF WITH_LUA
+
+INCLUDE_DIRS = \
+	$(INCLUDE_DIRS) /I$(LUA_INCLUDE_DIRS)
+
+INCLUDE_LDFLAGS = \
+	$(INCLUDE_LDFLAGS) $(LUA_LDFLAGS)
+
+INCLUDE_LIBS = \
+	$(INCLUDE_LIBS) $(LUA_LIBS)
+
+!ENDIF
+
 OBJS = \
 	appProperties.obj \
 	appConfigDefinition.obj \
 	implementation.obj \
+	implementation_c.obj \
 	dispatcher.obj \
+	generators\propertyTree.obj \
 	mtprocHandler.obj \
 	$(TOPDIR)\src\winMain.obj
+
+!IFDEF WITH_LUA
+OBJS = \
+	$(OBJS) luatypes.obj
+!ENDIF
 
 CPP_BINS = \
 	mtprocd.exe
 
 all: $(OBJS) $(CPP_BINS)
 
-mtprocd.exe: mtprocd.obj $(TOPDIR)\src\mtproc.lib
+mtprocd.exe: mtprocd.obj $(TOPDIR)\src\wolframe.lib
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
