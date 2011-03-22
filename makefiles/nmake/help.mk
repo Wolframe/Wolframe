@@ -17,6 +17,7 @@ WITH_QT=1              build code depending on Qt
 Avaliable optional features during testing only:
 
 WITH_GTEST=1           use Google Unit testing library
+WITH_EXPECT=1          use Expect/Tcl for system testing
 
 Example:
-nmake /nologo /f Makefile.W32 WITH_SSL=1 WITH_GTEST=1 WITH_LUA=1 WITH_QT=1
+nmake /nologo /f Makefile.W32 WITH_SSL=1 WITH_GTEST=1 WITH_EXPECT=1 WITH_LUA=1 WITH_QT=1

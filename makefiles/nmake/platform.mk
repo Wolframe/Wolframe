@@ -40,3 +40,10 @@ OPENSSL_LIBS = libeay32.lib ssleay32.lib
 !IFDEF WITH_GTEST
 GTEST_LIBS = gtest.lib
 !ENDIF
+
+# Tcl (for testing with Expect)
+###############################
+
+!IFDEF WITH_EXPECT
+EXPECT = $(TCL_DIR)\bin\tclsh.exe
+!ENDIF

@@ -100,4 +100,3 @@ LUA_LIBS = lua51.lib
 ###############################
 
 TCL_DIR = C:\Tcl
-EXPECT = $(TCL_DIR)\bin\tclsh.exe
