@@ -42,16 +42,7 @@
 #include <fstream>
 #include <sstream>
 
-/**
- * \addgroup _Wolframe
- * @{
- */
 namespace _Wolframe {
-
-	/**
-	 * \addgroup Logging
-	 * @{
-	 */
 	namespace Logging {
 
 	class LogComponent
@@ -164,10 +155,7 @@ namespace _Wolframe {
 	}
 			
 	} // namespace Logging
-	/** @} */ // \addgroup Logging
-
 } // namespace _Wolframe
-/** @} */ // \addgroup _Wolframe
 
 // shortcut macros
 #define LOG_DATA	_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get( _Wolframe::Logging::LogLevel::LOGLEVEL_DATA )
