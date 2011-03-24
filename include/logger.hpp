@@ -70,10 +70,19 @@ namespace _Wolframe {
 		
 		const char* str( ) const;
 
+		/// ostream marker for absence of component (usually not used directly)
 		static const LogComponent LogNone;
+
+		/// ostream marker for the logging component
 		static const LogComponent LogLogging;
+
+		/// ostream marker for the Lua handler
 		static const LogComponent LogLua;
+
+		/// ostream marker for networking part
 		static const LogComponent LogNetwork;
+
+		/// ostream marker for authentication component
 		static const LogComponent LogAuth;			
 	};
 
