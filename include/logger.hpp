@@ -31,6 +31,11 @@
 
 ************************************************************************/
 
+///
+/// \file logger.hpp
+/// \brief Top-level include file for logging
+///
+
 #ifndef _LOGGER_HPP_INCLUDED
 #define _LOGGER_HPP_INCLUDED
 
