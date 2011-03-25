@@ -32,7 +32,7 @@
 ************************************************************************/
 
 ///
-/// \file logger.cpp
+/// \file logBackend.cpp
 /// \brief implementation of logging backends
 ///
 
@@ -95,31 +95,8 @@
 namespace _Wolframe {
 	namespace Logging {
 
-	const LogComponent LogComponent::LogNone( LogComponent::LOGCOMPONENT_NONE );
-	const LogComponent LogComponent::LogLogging( LogComponent::LOGCOMPONENT_LOGGING );
-	const LogComponent LogComponent::LogNetwork( LogComponent::LOGCOMPONENT_NETWORK );
-	const LogComponent LogComponent::LogAuth( LogComponent::LOGCOMPONENT_AUTH );
-	const LogComponent LogComponent::LogLua( LogComponent::LOGCOMPONENT_LUA );
-
-	const char* LogComponent::str( ) const {
-		static const char *const s[] = {
-			"", "Logging", "Network", "Auth", "Lua" };
-		if( static_cast< size_t >( _component ) < ( sizeof( s ) / sizeof( *s ) ) ) {
-			return s[_component];
-		} else {
-			return "";
-		}
-	}
-
 	const Logger::LogStrerrorT Logger::LogStrerror = { 1 };
 	const Logger::LogWinerrorT Logger::LogWinerror = { 2 };
-
-	// map components
-	Logger& operator<<( Logger& logger, LogComponent c )
-	{
-		logger.component_ = c;
-		return logger;
-	}
 
 	// template functions for error markers in the output stream
 	// e.g. LOG_ERROR << "f() had a booboo, reason: " << Logger::LogStrerror
