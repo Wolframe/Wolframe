@@ -2,7 +2,6 @@
 // commandLine.cpp
 //
 
-#include "logLevel.hpp"
 #include "commandLine.hpp"
 
 #include <boost/program_options.hpp>

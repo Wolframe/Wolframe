@@ -7,10 +7,10 @@
 
 #include "configurationBase.hpp"
 #include "serverEndpoint.hpp"
-#include "logLevel.hpp"
+#include "logger/logLevel.hpp"
 
 #if !defined( _WIN32 )
-#include "logSyslogFacility.hpp"
+#include "logger/logSyslogFacility.hpp"
 #endif	// !defined( _WIN32 )
 
 #include <string>

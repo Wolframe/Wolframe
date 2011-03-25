@@ -5,7 +5,7 @@
 #ifndef _COMMANDLINE_HPP_INCLUDED
 #define _COMMANDLINE_HPP_INCLUDED
 
-#include "logLevel.hpp"
+#include "logger/logLevel.hpp"
 
 #include <string>
 #include <boost/program_options.hpp>

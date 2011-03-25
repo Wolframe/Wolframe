@@ -40,8 +40,8 @@
 #define _LOGGER_HPP_INCLUDED
 
 #include "singleton.hpp"
-#include "logLevel.hpp"
-#include "logSyslogFacility.hpp"
+#include "logger/logLevel.hpp"
+#include "logger/logSyslogFacility.hpp"
 
 #include <string>
 #include <fstream>
@@ -54,11 +54,11 @@ namespace _Wolframe {
 	{
 	public:
 		enum Component {
-			LOGCOMPONENT_NONE,		/// no loging component
-			LOGCOMPONENT_LOGGING,		/// internal logger errors
-			LOGCOMPONENT_NETWORK,		/// networking
-			LOGCOMPONENT_AUTH,		/// authentication
-			LOGCOMPONENT_LUA		/// lua processor
+			LOGCOMPONENT_NONE,		///< no loging component
+			LOGCOMPONENT_LOGGING,		///< internal logger errors
+			LOGCOMPONENT_NETWORK,		///< networking
+			LOGCOMPONENT_AUTH,		///< authentication
+			LOGCOMPONENT_LUA		///< lua processor
 		};
 		
 	private:
@@ -138,7 +138,13 @@ namespace _Wolframe {
 		// OS error logging markers
 		typedef struct { int _dummy; } LogStrerrorT;
 		typedef struct LogWinerrorT { int _dummy; } LogWinerrorT;
+
+		/// output stream marker for logging the strerror of the last
+		/// Windows API call in human readable format
 		static const LogStrerrorT LogStrerror;
+
+		/// output stream marker for logging the Windows error of the last
+		/// Windows API call in human readable format
 		static const LogWinerrorT LogWinerror;
 				
 		template<typename T> friend Logger& operator<<( Logger& logger, T thing );
@@ -159,8 +165,8 @@ namespace _Wolframe {
 		Logger& operator= ( const Logger& );
 	};
 	
-	// template functions for logging, default is we search for the << operator
-	// and log with this one..
+	/// template functions for logging, default is we search for the << operator
+	/// and log with this one..
 	template<typename T>
 	Logger& operator<<( Logger& logger, T t )
 	{
