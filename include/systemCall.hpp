@@ -13,20 +13,6 @@
 namespace _Wolframe {
 namespace syscall {
 
-class Function;
-
-class Connector
-{
-private:
-	struct Data;
-public:
-	Data* m_data;
-	Connector() :m_data(0) {};
-	virtual ~Connector(){};
-	virtual int open( const boost::property_tree::ptree& cfg, unsigned int idx);
-	virtual int call( const Function* fun);
-	virtual const char* fetch( unsigned int row, unsigned int col);
-};
 
 class Function
 {
@@ -91,14 +77,6 @@ public:
 		}
 
 	}
-
-	template <typename ArgumentType>
-	Command& operator()( const char* name, const ArgumentType& value)
-	{
-		addParameter( name, value);
-		return this;
-	}
-
 private:
 	friend class Connector;
 	struct Parameter
@@ -110,6 +88,68 @@ private:
 	const char* m_name;
 	Error m_error;
 };
+
+
+class Result
+{
+	const char* operator()( unsigned int i, unsigned int j)
+	{
+		if (i>=m_rows || j>=m_cols || idx[ i*m_rows + m_cols] == 0) return 0;
+		return (m_value.c_str() + idx[ i*m_rows + m_cols]);
+	}
+
+private;
+	friend class Connector;
+	unsigned int m_rows;
+	unsigned int m_cols;
+	std::vector<std::size_t> m_idx;
+	std::string m_value;
+
+	Result() :m_rows(0),m_cols(0){}
+
+	void clear()
+	{
+		m_rows=0;
+		m_cols=0;
+		m_idx.clear();
+		m_value.clear();
+	}
+
+	void init( unsigned int rows_, unsigned int cols_)
+	{
+		clear();
+		m_rows = rows_;
+		m_cols = cols_;
+	}
+
+	void push( const char* result)
+	{
+		m_value.push_back('\0');
+		if (result)
+		{
+			m_idx.push_back( m_value.size());
+			m_value.append( result);
+		}
+		else
+		{
+			m_idx.push_back( 0);
+		}
+	}
+};
+
+
+class Connector
+{
+private:
+	struct Data;
+public:
+	Data* m_data;
+	Connector() :m_data(0) {};
+	virtual ~Connector(){};
+	virtual int open( const boost::property_tree::ptree& cfg, unsigned int idx);
+	virtual int call( const Function& fun, Result& res);
+};
+
 
 
 class ConnectorPool :public ObjectPool<Connector>
@@ -124,7 +164,7 @@ class ConnectorPool :public ObjectPool<Connector>
 		unsigned int ii;
 		for (ii=0; ii<nofInstances; ii++)
 		{
-			Connector* conn = new Connector();
+			Connector* conn = new ConnectorI();
 			int err = conn->open( config, ii);
 			if (err)
 			{
@@ -136,10 +176,10 @@ class ConnectorPool :public ObjectPool<Connector>
 		}
 	}
 
-	struct Element :public Function
+	struct Item :public Function
 	{
 	public:
-		Element( ConnectorPool* pool, const char* name) :m_pool(pool),m_conn(0),m_fun(0)
+		Item( ConnectorPool* pool, const char* name) :m_pool(pool),m_conn(0),m_fun(0)
 		{
 			m_conn = pool->get();
 			if (!m_conn)
@@ -148,7 +188,7 @@ class ConnectorPool :public ObjectPool<Connector>
 				throw Refused();
 			}
 		}
-		~Element()
+		~Item()
 		{
 			if (m_conn)
 			{
@@ -158,13 +198,13 @@ class ConnectorPool :public ObjectPool<Connector>
 		}
 
 		template <typename ArgumentType>
-		Element& operator()( const char* name, const ArgumentType& value)
+		Item& operator()( const char* name, const ArgumentType& value)
 		{
 			addParameter( name, value);
 			return *this;
 		}
 
-		bool exec( std::vector<std::string>& result)
+		bool exec( Result& result)
 		{
 			Function::Error rt = m_fun.getError();
 			if (rt == Function::Ok)
@@ -189,9 +229,9 @@ class ConnectorPool :public ObjectPool<Connector>
 		Connector* m_conn;
 	};
 
-	boost::shared_ptr<Element> function( const char* name)
+	boost::shared_ptr<Item> function( const char* name)
 	{
-		return boost::shared_ptr<Element>( new Element( this, name));
+		return boost::shared_ptr<Item>( new Item( this, name));
 	}
 };
 

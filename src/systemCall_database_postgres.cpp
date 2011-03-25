@@ -7,21 +7,11 @@ using namespace _Wolframe::syscall;
 struct Connector::Data
 {
 	PGconn* m_conn;
-	PGresult* m_result;
-	unsigned int m_cols;
-	unsigned int m_rows;
 
-	Data() :m_conn(0),m_result(0),m_cols(0),m_rows(0){}
+	Data() :m_conn(0)
 	~Data()
 	{
-		if (m_result) PQclear(m_result);
 		if (m_conn) PQfinish(m_conn);
-	}
-	void init()
-	{
-		if (m_result) PQclear(m_result);
-		m_cols = 0;
-		m_rows = 0;
 	}
 };
 
@@ -43,10 +33,11 @@ int Connector::open( const boost::property_tree::ptree& cfg, unsigned int idx)
 	return 0;
 }
 
-int Connector::call( const Function& fun)
+int Connector::call( const Function& fun, Result& result)
 {
 	std::string cmd;
 	data->init();
+	result.clear();
 
 	try
 	{
@@ -71,8 +62,8 @@ int Connector::call( const Function& fun)
 		LOG_ERROR << "out of memory building database command";
 		return -1;
 	}
-	data->m_result = PQexec( data->m_conn, cmd);
-	if (!data->m_result)
+	PGresult* res = PQexec( data->m_conn, cmd);
+	if (!res)
 	{
 		LOG_ERROR << "out of memory executing database command";
 		return -1;
@@ -87,15 +78,15 @@ int Connector::call( const Function& fun)
 		{
 			try
 			{
-				data->m_rows = PQntuples( data->m_result);
-				data->m_cols = PQnfields( data->m_result);
+				int rowsize = PQntuples( res);
+				int colsize = PQnfields( res);
 
-				for (int kk=0; kk<resSize; kk++)
+				result.init( rowsize, colsize);
+				for (int row=0; row<rowsize; row++)
 				{
-					char* rr = PQgetvalue( res, kk, 0);
-					if (!rr)
+					for (int col=0; col<colsize; col++)
 					{
-						result.push_back( rr);
+						result.push( PQgetvalue( res, row, col));
 					}
 				}
 			}
@@ -112,15 +103,6 @@ int Connector::call( const Function& fun)
 		}
 		return rt;
 	}
-}
-
-const char* Connector::fetch( unsigned int row, unsigned int col);
-{
-	if (row >= data->m_rows || col >= data->m_cols)
-	{
-		LOG_ERROR << "database result index out of range";
-		return 0;
-	}
-	return PQgetvalue( res, row, col);
+	PQclear( res);
 }
 
