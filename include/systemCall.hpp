@@ -77,8 +77,18 @@ public:
 		}
 
 	}
+
+	const Parameter& operator[]( unsigned int idx) const
+	{
+		return m_param[ idx];
+	}
+
+	const char* name() const
+	{
+		return m_name;
+	}
+
 private:
-	friend class Connector;
 	struct Parameter
 	{
 		const char* m_name;	//< name of parameter, use index if 0
@@ -97,13 +107,6 @@ class Result
 		if (i>=m_rows || j>=m_cols || idx[ i*m_rows + m_cols] == 0) return 0;
 		return (m_value.c_str() + idx[ i*m_rows + m_cols]);
 	}
-
-private;
-	friend class Connector;
-	unsigned int m_rows;
-	unsigned int m_cols;
-	std::vector<std::size_t> m_idx;
-	std::string m_value;
 
 	Result() :m_rows(0),m_cols(0){}
 
@@ -135,6 +138,12 @@ private;
 			m_idx.push_back( 0);
 		}
 	}
+
+private:
+	unsigned int m_rows;
+	unsigned int m_cols;
+	std::vector<std::size_t> m_idx;
+	std::string m_value;
 };
 
 
@@ -176,10 +185,10 @@ class ConnectorPool :public ObjectPool<Connector>
 		}
 	}
 
-	struct Item :public Function
+	struct PoolFunction :public Function
 	{
 	public:
-		Item( ConnectorPool* pool, const char* name) :m_pool(pool),m_conn(0),m_fun(0)
+		PoolFunction( ConnectorPool* pool, const char* name) :m_pool(pool),m_conn(0),m_fun(0)
 		{
 			m_conn = pool->get();
 			if (!m_conn)
@@ -188,7 +197,7 @@ class ConnectorPool :public ObjectPool<Connector>
 				throw Refused();
 			}
 		}
-		~Item()
+		~PoolFunction()
 		{
 			if (m_conn)
 			{
@@ -198,7 +207,7 @@ class ConnectorPool :public ObjectPool<Connector>
 		}
 
 		template <typename ArgumentType>
-		Item& operator()( const char* name, const ArgumentType& value)
+		PoolFunction& operator()( const char* name, const ArgumentType& value)
 		{
 			addParameter( name, value);
 			return *this;
@@ -229,7 +238,7 @@ class ConnectorPool :public ObjectPool<Connector>
 		Connector* m_conn;
 	};
 
-	boost::shared_ptr<Item> function( const char* name)
+	boost::shared_ptr<PoolFunction> function( const char* name)
 	{
 		return boost::shared_ptr<Item>( new Item( this, name));
 	}
