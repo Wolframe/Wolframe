@@ -5,12 +5,10 @@
 #ifndef _OBJECT_POOL_HPP_INCLUDED
 #define _OBJECT_POOL_HPP_INCLUDED
 
-
 #include <list>
 
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
-
 
 namespace _Wolframe	{
 
@@ -56,13 +54,21 @@ namespace _Wolframe	{
 			cond_.notify_one();
 		}
 
+		void release ( objectType* obj )	{
+			{
+				boost::lock_guard<boost::mutex> lock( mutex_ );
+				available_.push_back( obj );
+			}
+			cond_.notify_one();
+		}
+
 		unsigned timeout()		{ return timeout_; }
 		void timeout( unsigned to )	{ timeout_ = to; }
 	private:
-		std::list< objectType* >		available_;
-		boost::mutex				mutex_;
-		boost::condition_variable		cond_;
-		unsigned				timeout_;
+		std::list< objectType* >	available_;
+		boost::mutex			mutex_;
+		boost::condition_variable	cond_;
+		unsigned			timeout_;
 	};
 
 } // namespace _Wolframe

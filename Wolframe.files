@@ -210,3 +210,4 @@ tests/testNamedRetVal.cpp
 tests/threadLeakTest.cpp
 tests/versionTest.cpp
 header.txt
+tests/configHelpersTest.info

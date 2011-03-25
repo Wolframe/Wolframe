@@ -20,3 +20,18 @@ bool-wrong	{
 	wrong1	""
 	wrong2	blabla
 }
+
+
+ushortNZ-valid	{
+	ushort0		1
+	ushort1		15247
+	ushort2		1557
+}
+
+ushortNZ-invalid	{
+	ushort0		0
+;	ushort1		-1
+	ushort2		1.557
+	ushort3		1blabla3
+	ushort4		5441351423245
+}
