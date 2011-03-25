@@ -42,6 +42,7 @@
 #include "singleton.hpp"
 #include "logger/logLevel.hpp"
 #include "logger/logSyslogFacility.hpp"
+#include "logger/logComponent.hpp"
 
 #include <string>
 #include <fstream>
@@ -49,47 +50,6 @@
 
 namespace _Wolframe {
 	namespace Logging {
-
-	class LogComponent
-	{
-	public:
-		enum Component {
-			LOGCOMPONENT_NONE,		///< no loging component
-			LOGCOMPONENT_LOGGING,		///< internal logger errors
-			LOGCOMPONENT_NETWORK,		///< networking
-			LOGCOMPONENT_AUTH,		///< authentication
-			LOGCOMPONENT_LUA		///< lua processor
-		};
-		
-	private:
-		enum Component _component;
-
-	public:			
-		bool operator==( const LogComponent& o ) const {
-			return _component == o._component;
-		}
-		
-		enum Component component( ) const { return _component; }
-		
-		LogComponent( const enum Component& c = LOGCOMPONENT_NONE ) : _component( c ) { }
-		
-		const char* str( ) const;
-
-		/// ostream marker for absence of component (usually not used directly)
-		static const LogComponent LogNone;
-
-		/// ostream marker for the logging component
-		static const LogComponent LogLogging;
-
-		/// ostream marker for the Lua handler
-		static const LogComponent LogLua;
-
-		/// ostream marker for networking part
-		static const LogComponent LogNetwork;
-
-		/// ostream marker for authentication component
-		static const LogComponent LogAuth;			
-	};
 
 	class LogBackend : public Singleton< LogBackend >
 	{
