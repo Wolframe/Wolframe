@@ -40,8 +40,9 @@
 #define _LOG_BACKEND_IMPL_HPP_INCLUDED
 
 #include "appConfig.hpp"
-#include "logger/logLevel.hpp"
-#include "logger/logSyslogFacility.hpp"
+
+#include "logBackendConsole.hpp"
+#include "logBackendFile.hpp"
 
 #include <string>
 #include <fstream>
@@ -54,46 +55,6 @@
 
 namespace _Wolframe {
 	namespace Logging {
-
-	/// Logger backends
-	class ConsoleLogBackend
-	{
-	public:
-		ConsoleLogBackend( );
-
-		~ConsoleLogBackend( );
-
-		void setLevel( const LogLevel::Level level );
-
-		void log( const LogComponent component, const LogLevel::Level level, const std::string& msg );
-
-		void reopen( );
-		
-	private:
-		LogLevel::Level	logLevel_;
-	};
-
-	class LogfileBackend
-	{
-	public:
-		LogfileBackend( );
-
-		~LogfileBackend( );
-
-		void setLevel( const LogLevel::Level level );
-
-		void setFilename( const std::string filename );
-
-		void reopen( );
-
-		void log( const LogComponent component, const LogLevel::Level level, const std::string& msg );
-
-	private:
-		LogLevel::Level logLevel_;
-		std::ofstream logFile_;
-		std::string filename_;
-		bool isOpen_;
-	};
 
 #ifndef _WIN32
 	class SyslogBackend

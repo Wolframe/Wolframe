@@ -58,8 +58,10 @@ LOCAL_STATIC_LIB_OBJS = \
 	logLevel.o \
 	logSyslogFacility.o \
 	logComponent.o \
-	logBackendImpl.o \
 	logger.o \
+	logBackendImpl.o \
+	logBackendConsole.o \
+	logBackendFile.o \
 	configHelpers.o \
 	configService.o \
 	serviceBanner.o \

@@ -42,6 +42,7 @@
 
 #include "logger.hpp"
 #include "logBackendImpl.hpp"
+#include "logBackendConsole.hpp"
 
 // no macros here, name clash with variables in syslog.h, so
 // undefine them here..
@@ -94,126 +95,6 @@
 
 namespace _Wolframe {
 	namespace Logging {
-
-// ConsoleLogBackend
-
-ConsoleLogBackend::ConsoleLogBackend( )
-{
-	logLevel_ = LogLevel::LOGLEVEL_ERROR;
-}
-
-ConsoleLogBackend::~ConsoleLogBackend( )
-{
-	/* nothing to do here */
-}
-
-void ConsoleLogBackend::setLevel( const LogLevel::Level level )
-{
-	logLevel_ = level;
-}
-
-inline void ConsoleLogBackend::log( WOLFRAME_UNUSED const LogComponent component, const LogLevel::Level level, const std::string& msg )
-{
-	if ( level >= logLevel_ ) {
-		std::cerr << level << ": " << msg << std::endl;
-		std::cerr.flush( );
-	}
-}
-
-void ConsoleLogBackend::reopen( )
-{
-	/* nothing to do here */
-}
-
-// LogfileBackend
-
-LogfileBackend::LogfileBackend( )
-{
-	logLevel_ = LogLevel::LOGLEVEL_UNDEFINED;
-	isOpen_ = false;
-	// we can't open the logfile here, wait for setFilename
-}
-
-LogfileBackend::~LogfileBackend( )
-{
-	if( isOpen_ ) {
-		logFile_.close( );
-	}
-}
-
-void LogfileBackend::setLevel( const LogLevel::Level level )
-{
-	logLevel_ = level;
-}
-
-void LogfileBackend::setFilename( const std::string filename )
-{
-	filename_ = filename;
-	reopen( );
-}
-
-void LogfileBackend::reopen( )
-{
-	if( isOpen_ ) {
-		logFile_.close( );
-		isOpen_ = false;
-	}
-
-	logFile_.exceptions( logFile_.badbit | logFile_.failbit );
-
-	try {
-		logFile_.open( filename_.c_str( ), std::ios_base::app );
-		isOpen_ = true;
-	} catch( const std::ofstream::failure& ) {
-		isOpen_ = false;
-		_LOG_CRITICAL	<< _Wolframe::Logging::LogComponent::LogLogging
-				<< "Can't open logfile '" << filename_ << "'";
-		// TODO: e.what() displays "basic_ios::clear" always, how to get
-		// decent error messages here? I fear the C++ standard doesn't
-		// help here..
-	}
-}
-
-static inline std::string timestamp( void )
-{
-#if !defined( _WIN32 )
-	time_t t;
-	struct tm lt;
-	char buf[32];
-
-	time( &t );
-	localtime_r( &t, &lt );
-	strftime( buf, 32, "%b %e %X", &lt );
-
-	return buf;
-#else // !defined( _WIN32)
-	SYSTEMTIME t;
-	SYSTEMTIME lt;
-	TCHAR buf1[16];
-	TCHAR buf2[16];
-
-	GetSystemTime( &t );
-	GetLocalTime( &lt );
-
-	(void)GetDateFormat( LOCALE_USER_DEFAULT, 0, &lt, NULL, buf1, 16 );
-	(void)GetTimeFormat( LOCALE_USER_DEFAULT, 0, &lt, NULL, buf2, 16 );
-
-	std::ostringstream oss;
-	oss << buf1 << " " << buf2;
-	return oss.str( );
-#endif // !defined( _WIN32 )
-}
-
-inline void LogfileBackend::log( const LogComponent component, const LogLevel::Level level, const std::string& msg )
-{
-	if( level >= logLevel_ && isOpen_ ) {
-		logFile_	<< timestamp( ) << " "
-				<< component.str( )
-				<< ( component == LogComponent::LogNone ? "" : " - " )
-				<< level << ": " << msg << std::endl;
-		logFile_.flush( );
-	}
-}
 
 // SyslogBackend
 
