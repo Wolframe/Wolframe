@@ -50,8 +50,6 @@
 
 #include "wolframemsg.h"
 
-#include "unused.h"
-
 namespace _Wolframe {
 	namespace Logging {
 
@@ -228,7 +226,7 @@ void EventlogBackend::calculateSid( )
 		return;
 	}
 
-// make a local copy of the sid because it and return that one
+// make a local copy of the sid and return that one
 	PSID tokenSid = (PSID)tokenUser->User.Sid;
 	DWORD sidSize = GetLengthSid( tokenSid );
 	sid_ = (PSID)malloc( sidSize );
