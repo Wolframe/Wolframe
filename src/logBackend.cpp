@@ -95,62 +95,6 @@
 namespace _Wolframe {
 	namespace Logging {
 
-	const Logger::LogStrerrorT Logger::LogStrerror = { 1 };
-	const Logger::LogWinerrorT Logger::LogWinerror = { 2 };
-
-	// template functions for error markers in the output stream
-	// e.g. LOG_ERROR << "f() had a booboo, reason: " << Logger::LogStrerror
-#ifndef _WIN32
-	Logger& operator<<( Logger& logger, WOLFRAME_UNUSED Logger::LogStrerrorT t )
-	{
-		char errbuf[512];
-
-#if defined( __USE_GNU )
-		char *ss = strerror_r( errno, errbuf, 512 );
-		logger.os_ << ss;
-#else
-		int res = strerror_r( errno, errbuf, 512 );
-		logger.os_ << errbuf;
-#endif // defined( __USE_GNU )
-		logger.os_ << " (errno: " << errno << ")";
-
-		return logger;
-	}
-#endif // !defined( _WIN32 )
-
-#ifdef _WIN32
-	Logger& operator<<( Logger& logger, WOLFRAME_UNUSED Logger::LogWinerrorT t )
-	{
-		DWORD last_error = GetLastError( );
-		TCHAR errbuf[512];
-		LPVOID werrbuf;
-		DWORD wbuf_size;
-		DWORD wres;
-		
-		wres = FormatMessage(
-			FORMAT_MESSAGE_ALLOCATE_BUFFER |
-			FORMAT_MESSAGE_FROM_SYSTEM |
-			FORMAT_MESSAGE_IGNORE_INSERTS |
-			FORMAT_MESSAGE_MAX_WIDTH_MASK,
-			NULL,			// message is from system
-			last_error,		// code of last error (GetLastError)
-			0,			// default language (TODO: fit to i18n of rest)
-			(LPTSTR)&werrbuf,	// use LocalAlloc for the message string
-			0,			// minimal allocation size
-			NULL );			// no arguments to the message
-			
-		if( wres == 0 ) {
-			StringCbCopy( errbuf, 512, _T( "No message available" ) );
-		}
-	
-		StringCbCopy( errbuf, 512, (LPCTSTR)werrbuf );
-		
-		logger.os_ << errbuf;
-		
-		return logger;
-	}
-#endif // defined( _WIN32 )
-
 // ConsoleLogBackend
 
 ConsoleLogBackend::ConsoleLogBackend( )
@@ -708,25 +652,6 @@ void LogBackend::setEventlogSource( const std::string source )	{ impl_->setEvent
 #endif // _WIN32
 
 void LogBackend::log( const LogComponent component, const LogLevel::Level level, const std::string& msg )	{ impl_->log( component, level, msg ); }
-
-
-// Logger
-
-Logger::Logger( LogBackend& backend ) :	logBk_( backend )
-{
-}
-
-Logger::~Logger( )
-{
-	logBk_.log( component_, msgLevel_, os_.str( ) );
-}
-
-Logger& Logger::Get( LogLevel::Level level )
-{
-	component_ = LogComponent::LogNone;
-	msgLevel_ = level;
-	return *this;
-}
 
 	} // namespace Logging
 } // namespace _Wolframe

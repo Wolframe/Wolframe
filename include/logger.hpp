@@ -45,7 +45,6 @@
 #include "logger/logComponent.hpp"
 
 #include <string>
-#include <fstream>
 #include <sstream>
 
 namespace _Wolframe {
