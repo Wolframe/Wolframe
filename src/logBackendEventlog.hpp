@@ -32,69 +32,52 @@
 ************************************************************************/
 
 ///
-/// \file logBackendImpl.hpp
-/// \brief header file for the logging backend implementation
+/// \file logBackendEventlog.hpp
+/// \brief header file for logging to the Windows event logger
 ///
 
-#ifndef _LOG_BACKEND_IMPL_HPP_INCLUDED
-#define _LOG_BACKEND_IMPL_HPP_INCLUDED
+#ifndef _LOG_BACKEND_EVENTLOG_HPP_INCLUDED
+#define _LOG_BACKEND_EVENTLOG_HPP_INCLUDED
 
-#include "logger/logBackend.hpp"
-#include "logBackendConsole.hpp"
-#include "logBackendFile.hpp"
-#if !defined( _WIN32 )
-#include "logBackendSyslog.hpp"
-#endif // !defined( _WIN32 )
+#include "logger/logLevel.hpp"
+#include "logger/logComponent.hpp"
+
 #if defined( _WIN32 )
-#include "logBackendEventlog.hpp"
+#define WIN32_MEAN_AND_LEAN
+#include <windows.h>
 #endif // defined( _WIN32 )
 
 namespace _Wolframe {
 	namespace Logging {
 
-	class LogBackend::LogBackendImpl
+	class EventlogBackend
 	{
 	public:
-		LogBackendImpl( );
+		EventlogBackend( );
 
-		~LogBackendImpl( );
+		~EventlogBackend( );
 
-		void setConsoleLevel( const LogLevel::Level level );
-		
-		void setLogfileLevel( const LogLevel::Level level );
-		
-		void setLogfileName( const std::string filename );
+		void setLevel( const LogLevel::Level level );
 
-#ifndef _WIN32
-		void setSyslogLevel( const LogLevel::Level level );
+		void setLog( const std::string log );
 
-		void setSyslogFacility( const SyslogFacility::Facility facility );
-
-		void setSyslogIdent( const std::string ident );
-#endif // _WIN32
-
-#ifdef _WIN32
-		void setEventlogLevel( const LogLevel::Level level );
-
-		void setEventlogLog( const std::string log );
-
-		void setEventlogSource( const std::string source );
-#endif // _WIN32
+		void setSource( const std::string source );
 
 		void log( const LogComponent component, const LogLevel::Level level, const std::string& msg );
 
+		void reopen( );
+
 	private:
-		ConsoleLogBackend consoleLogger_;
-		LogfileBackend logfileLogger_;
-#ifndef _WIN32
-		SyslogBackend syslogLogger_;
-#endif // _WIN32
-#ifdef _WIN32
-		EventlogBackend eventlogLogger_;
-#endif // _WIN32
+		LogLevel::Level logLevel_;
+		HANDLE eventSource_;
+		std::string log_;
+		std::string source_;
+		PSID sid_;
+
+		void calculateSid( );		
 	};
 
 	} // namespace Logging
 } // namespace _Wolframe
 
-#endif // _LOG_BACKEND_IMPL_HPP_INCLUDED
+#endif // _LOG_BACKEND_EVENTLOG_HPP_INCLUDED

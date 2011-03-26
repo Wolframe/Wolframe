@@ -56,6 +56,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	logBackendImpl.obj \
 	logBackendConsole.obj \
 	logBackendFile.obj \
+	logBackendEventlog.obj \
 	configHelpers.obj \
 	serviceConfig.obj \
 	serviceBanner.obj \
@@ -99,7 +100,7 @@ wolframemsg.dll: wolframemsg.res
 	$(LINK) /dll /nologo /noentry /MACHINE:x86 /out:$@ $?
 wolframemsg.res: wolframemsg.rc
 wolframemsg.rc: wolframemsg.mc
-logBackend.obj: wolframemsg.rc
+logBackendEventlog.obj: wolframemsg.rc
 
 $(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
 	$(LINK) /lib /nologo /out:$@ $(LDFLAGS) $(LIBS) $?
