@@ -39,14 +39,13 @@
 #ifndef _LOG_BACKEND_IMPL_HPP_INCLUDED
 #define _LOG_BACKEND_IMPL_HPP_INCLUDED
 
-#include "appConfig.hpp"
-
 #include "logBackendConsole.hpp"
 #include "logBackendFile.hpp"
+#if !defined( _WIN32 )
+#include "logBackendSyslog.hpp"
+#endif // !defined( _WIN32 )
 
 #include <string>
-#include <fstream>
-#include <sstream>
 
 #if defined( _WIN32 )
 #define WIN32_MEAN_AND_LEAN
@@ -55,31 +54,6 @@
 
 namespace _Wolframe {
 	namespace Logging {
-
-#ifndef _WIN32
-	class SyslogBackend
-	{
-	public:
-		SyslogBackend( );
-
-		~SyslogBackend( );
-
-		void setLevel( const LogLevel::Level level );
-
-		void setFacility( const SyslogFacility::Facility facility );
-
-		void setIdent( const std::string ident );
-
-		void log( const LogComponent component, const LogLevel::Level level, const std::string& msg );
-
-		void reopen( );
-
-	private:
-		LogLevel::Level logLevel_;
-		int facility_;
-		std::string ident_;
-	};
-#endif // _WIN32
 
 #ifdef _WIN32
 	class EventlogBackend
