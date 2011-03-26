@@ -124,7 +124,6 @@ TEST_F( ConfigFixture, unsigned_short )	{
 	for ( ; it != pt.get_child( "ushortNZ-invalid" ).end(); it++ )	{
 		val = 0;
 		ret = getNonZeroIntValue<unsigned short>( it, "Config Helpers unsigned short Test - invalid", val );
-		std::cout << val << std::endl;
 		ASSERT_TRUE( !ret && ( val == 0 ));
 	}
 }

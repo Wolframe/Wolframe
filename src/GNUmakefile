@@ -64,10 +64,10 @@ LOCAL_STATIC_LIB_OBJS = \
 	logBackendFile.o \
 	logBackendSyslog.o \
 	configHelpers.o \
-	configService.o \
+	serviceConfig.o \
 	serviceBanner.o \
-	configLogger.o \
-	configDatabase.o \
+	loggerConfig.o \
+	databaseConfig.o \
 	appConfig.o \
 	protocol_ioblocks.o \
 	acceptor.o \

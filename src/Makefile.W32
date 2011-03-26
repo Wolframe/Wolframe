@@ -57,10 +57,10 @@ LOCAL_STATIC_LIB_OBJS = \
 	logBackendConsole.obj \
 	logBackendFile.obj \
 	configHelpers.obj \
-	configService.obj \
+	serviceConfig.obj \
 	serviceBanner.obj \
-	configLogger.obj \
-	configDatabase.obj \
+	loggerConfig.obj \
+	databaseConfig.obj \
 	appConfig.obj \
 	protocol_ioblocks.obj \
 	acceptor.obj \
