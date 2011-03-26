@@ -39,63 +39,30 @@
 #ifndef _LOGGER_HPP_INCLUDED
 #define _LOGGER_HPP_INCLUDED
 
-#include "singleton.hpp"
 #include "logger/logLevel.hpp"
 #include "logger/logSyslogFacility.hpp"
 #include "logger/logComponent.hpp"
+#include "logger/logBackend.hpp"
 
-#include <string>
 #include <sstream>
 
 namespace _Wolframe {
 	namespace Logging {
 
-	class LogBackend : public Singleton< LogBackend >
-	{
-	public:
-		LogBackend( );
-
-		~LogBackend( );
-
-		void setConsoleLevel( const LogLevel::Level level );
-		
-		void setLogfileLevel( const LogLevel::Level level );
-
-		void setLogfileName( const std::string filename );
-
-#ifndef _WIN32
-		void setSyslogLevel( const LogLevel::Level level );
-
-		void setSyslogFacility( const SyslogFacility::Facility facility );
-
-		void setSyslogIdent( const std::string ident );
-#endif // _WIN32
-
-#ifdef _WIN32
-		void setEventlogLevel( const LogLevel::Level level );
-
-		void setEventlogLog( const std::string log );
-
-		void setEventlogSource( const std::string source );
-#endif // _WIN32
-
-		void log( const LogComponent component, const LogLevel::Level level, const std::string& msg );
-
-	private:
-		class LogBackendImpl;
-		LogBackendImpl	*impl_;
-	};
-
 	class Logger {
 	public:
+		/// create a logger and connect it to a backend, typically
+		/// not called directly
 		Logger( LogBackend& backend );
 
 		~Logger( );
 
 		Logger& Get( LogLevel::Level level );
 
-		// OS error logging markers
+		/// OS error logging marker for Unix errors
 		typedef struct { int _dummy; } LogStrerrorT;
+
+		/// OS error logging marker for Windows errors
 		typedef struct LogWinerrorT { int _dummy; } LogWinerrorT;
 
 		/// output stream marker for logging the strerror of the last

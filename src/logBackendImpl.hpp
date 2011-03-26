@@ -36,8 +36,8 @@
 /// \brief header file for the logging backend implementation
 ///
 
-#ifndef _LOG_BACKEND_HPP_INCLUDED
-#define _LOG_BACKEND_HPP_INCLUDED
+#ifndef _LOG_BACKEND_IMPL_HPP_INCLUDED
+#define _LOG_BACKEND_IMPL_HPP_INCLUDED
 
 #include "appConfig.hpp"
 #include "logger/logLevel.hpp"
@@ -194,4 +194,4 @@ namespace _Wolframe {
 	} // namespace Logging
 } // namespace _Wolframe
 
-#endif // _LOG_BACKEND_HPP_INCLUDED
+#endif // _LOG_BACKEND_IMPL_HPP_INCLUDED

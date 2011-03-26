@@ -41,7 +41,7 @@
 #include <sstream>
 
 #include "logger.hpp"
-#include "logBackend.hpp"
+#include "logBackendImpl.hpp"
 
 // no macros here, name clash with variables in syslog.h, so
 // undefine them here..
@@ -442,7 +442,7 @@ static WORD logComponentToCategoryId( const LogComponent c )
 	};
 }
 
-inline void EventlogBackend::log( WOLFRAME_UNUSED const LogComponent component, const LogLevel::Level level, const std::string& msg )
+inline void EventlogBackend::log( const LogComponent component, const LogLevel::Level level, const std::string& msg )
 {
 	if ( level >= logLevel_ ) {
 		LPCSTR msg_arr[1];

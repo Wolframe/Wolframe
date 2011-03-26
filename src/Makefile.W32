@@ -52,7 +52,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	logLevel.obj \
 	logSyslogFacility.obj \
 	logComponent.obj \
-	logBackend.obj \
+	logBackendImpl.obj \
 	logger.obj \
 	configHelpers.obj \
 	configService.obj \

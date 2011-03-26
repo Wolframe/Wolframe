@@ -122,7 +122,7 @@ Logger& operator<<( Logger& logger, WOLFRAME_UNUSED Logger::LogWinerrorT t )
 	
 	logger.os_ << errbuf;
 
-	logger.os_ << "(errcode: " << last_error << ")";
+	logger.os_ << " (errcode: " << last_error << ")";
 	
 	return logger;
 }
