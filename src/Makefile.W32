@@ -45,10 +45,7 @@ INCLUDE_LIBS = \
 LOCAL_STATIC_LIB = \
 	wolframe.lib
 
-LOCAL_STATIC_LIB_OBJS = \
-	version.obj \
-	resolvePath.obj \
-	commandLine.obj \
+LOGGER_OBJS = \
 	logger\logLevel.obj \
 	logger\logSyslogFacility.obj \
 	logger\logComponent.obj \
@@ -57,6 +54,16 @@ LOCAL_STATIC_LIB_OBJS = \
 	logger\logBackendEventlog.obj \
 	logger\logBackendImpl.obj \
 	logger\logger.obj \
+
+AAA_OBJS = \
+	aaa\authentication.obj \
+	aaa\authentication_textfile.obj
+
+LOCAL_STATIC_LIB_OBJS = \
+	version.obj \
+	resolvePath.obj \
+	commandLine.obj \
+	$(LOGGER_OBJS) \
 	configHelpers.obj \
 	serviceConfig.obj \
 	serviceBanner.obj \
@@ -70,8 +77,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	connection.obj \
 	serverConfig.obj \
 	server.obj \
-	authentication.obj \
-	authentication_textfile.obj
+	$(AAA_OBJS)
 
 #SSL
 

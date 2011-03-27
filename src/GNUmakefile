@@ -51,10 +51,7 @@ endif
 LOCAL_STATIC_LIB = \
 	libwolframe.a
 
-LOCAL_STATIC_LIB_OBJS = \
-	version.o \
-	resolvePath.o \
-	commandLine.o \
+LOGGER_OBJS = \
 	logger/logLevel.o \
 	logger/logSyslogFacility.o \
 	logger/logComponent.o \
@@ -62,7 +59,22 @@ LOCAL_STATIC_LIB_OBJS = \
 	logger/logBackendFile.o \
 	logger/logBackendSyslog.o \
 	logger/logBackendImpl.o \
-	logger/logger.o \
+	logger/logger.o
+
+AAA_OBJS = \
+	aaa/authentication.o \
+	aaa/authentication_textfile.o
+
+ifdef WITH_PAM
+AAA_OBJS += \
+	aaa/authentication_pam.o
+endif
+
+LOCAL_STATIC_LIB_OBJS = \
+	version.o \
+	resolvePath.o \
+	commandLine.o \
+	$(LOGGER_OBJS) \
 	configHelpers.o \
 	serviceConfig.o \
 	serviceBanner.o \
@@ -76,8 +88,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	connection.o \
 	serverConfig.o \
 	server.o \
-	authentication.o \
-	authentication_textfile.o
+	$(AAA_OBJS)
 
 #SSL
 ifdef WITH_SSL
@@ -85,11 +96,6 @@ LOCAL_STATIC_LIB_OBJS += \
 	SSLcertificateInfo.o
 endif
 
-# pam
-ifdef WITH_PAM
-LOCAL_STATIC_LIB_OBJS += \
-	authentication_pam.o
-endif
 
 OBJS = \
 	$(LOCAL_STATIC_LIB_OBJS) \
