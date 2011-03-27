@@ -5,15 +5,13 @@
 #ifndef _AUTHENTICATION_TEXTFILE_HPP_INCLUDED
 #define _AUTHENTICATION_TEXTFILE_HPP_INCLUDED
 
-#include "aaa/authentication.hpp"
+#include "AAA/authentication.hpp"
 
 #include <map>
 #include <string>
 
 namespace _Wolframe {
 	namespace Authentication {
-
-Authenticator *CreateTextFileAuthenticator( AuthenticatorFactory::properties props );
 
 class TextFileAuthenticator : public Authenticator {
 	private:

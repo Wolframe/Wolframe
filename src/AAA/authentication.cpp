@@ -2,7 +2,7 @@
 // authentication.cpp
 //
 
-#include "aaa/authentication.hpp"
+#include "AAA/authentication.hpp"
 
 namespace _Wolframe {
 	namespace Authentication {

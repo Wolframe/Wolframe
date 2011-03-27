@@ -5,7 +5,7 @@
 #ifndef _Wolframe_AUTHENTICATION_PAM_HPP_INCLUDED
 #define _Wolframe_AUTHENTICATION_PAM_HPP_INCLUDED
 
-#include "aaa/authentication.hpp"
+#include "AAA/authentication.hpp"
 
 #ifdef WITH_PAM
 

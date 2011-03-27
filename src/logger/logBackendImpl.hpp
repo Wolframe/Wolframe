@@ -40,13 +40,13 @@
 #define _LOG_BACKEND_IMPL_HPP_INCLUDED
 
 #include "logger/logBackend.hpp"
-#include "logBackendConsole.hpp"
-#include "logBackendFile.hpp"
+#include "logger/logBackendConsole.hpp"
+#include "logger/logBackendFile.hpp"
 #if !defined( _WIN32 )
-#include "logBackendSyslog.hpp"
+#include "logger/logBackendSyslog.hpp"
 #endif // !defined( _WIN32 )
 #if defined( _WIN32 )
-#include "logBackendEventlog.hpp"
+#include "logger/logBackendEventlog.hpp"
 #endif // defined( _WIN32 )
 
 namespace _Wolframe {
