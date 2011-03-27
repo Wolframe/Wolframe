@@ -59,6 +59,7 @@ X client for the Wolframe server.
 LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make all \
 	WITH_SSL=1 WITH_GTEST=1 WITH_LUA=1 WITH_QT=1 WITH_PAM=1 \
 	sysconfdir=/etc
+cd docs; make doc-doxygen
 
 echo ======================= TESTING ==============================
 # make test
@@ -70,6 +71,7 @@ rm -rf $RPM_BUILD_ROOT
 make DESTDIR=$RPM_BUILD_ROOT install \
 	WITH_SSL=1 WITH_GTEST=1 WITH_LUA=1 WITH_QT=1 WITH_PAM=1 \
 	sysconfdir=$RPM_BUILD_ROOT/etc
+cd docs && make DESTDIR=$RPM_BUILD_ROOT install && cd ..
 
 mkdir -p $RPM_BUILD_ROOT%{_libdir}/wolframe
 for i in \
@@ -137,7 +139,8 @@ fi
 
 
 %files doc
-
+%dir %{_datadir}/doc/wolframe
+%{_datadir}/doc/wolframe/html
 
 %files client
 %dir %{_bindir}
