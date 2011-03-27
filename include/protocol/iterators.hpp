@@ -1,13 +1,49 @@
+/************************************************************************
+Copyright (C) 2011 Project Wolframe.
+All rights reserved.
+
+This file is part of Project Wolframe.
+
+Commercial Usage
+Licensees holding valid Project Wolframe Commercial licenses may
+use this file in accordance with the Project Wolframe
+Commercial License Agreement provided with the Software or,
+alternatively, in accordance with the terms contained
+in a written agreement between the licensee and Project Wolframe.
+
+GNU General Public License Usage
+Alternatively, you can redistribute this file and/or modify it
+under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Wolframe is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Wolframe. If not, see <http://www.gnu.org/licenses/>.
+
+If you have questions regarding the use of this file, please contact
+Project Wolframe.
+
+************************************************************************/
 #ifndef _Wolframe_PROTOCOL_ITERATORS_HPP_INCLUDED
 #define _Wolframe_PROTOCOL_ITERATORS_HPP_INCLUDED
 #include <iterator>
 
+/// \file protocol/iterators.hpp
+/// \brief iterator types of the protocol input blocks
+
 namespace _Wolframe {
 namespace protocol {
 
+///\brief namespace for distiguishing iterator class fom other
 namespace array
 {
-//template for random access iterators for arrays as used by the protocol
+///! \class iterator_t
+///  \brief template for random access iterators for arrays as used by the protocol
 template <class array_type_, typename size_type_, typename value_type_, typename access_type_, typename deref_type_>
 class iterator_t
 {
@@ -57,8 +93,8 @@ public:
 	deref_type ptr()							{return (deref_type)(m_this->ptr()) + m_idx;}
 
 private:
-	array_type* m_this;	//< the array is accessed over the structure this, to catch ABR/ABW for sure
-	size_type m_idx;
+	array_type* m_this;	///< reference to the array iterated. The array is accessed over the structure (*m_this)[ m_idx] to catch ABR/ABW (Array Bounds Read/Write)
+	size_type m_idx;        ///< iterator position index
 };
 }//namespace array
 
