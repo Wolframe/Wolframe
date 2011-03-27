@@ -56,5 +56,9 @@ local_clean:
 
 local_distclean:
 
+local_install:
+	$(INSTALL) -d -m 0755 $(datadir)/doc/wolframe
+	cp -R doxygen/html/ $(datadir)/doc/wolframe
+
 local_test:
 	xmllint --noout --xinclude --postvalid --noent WolfBook.xml
