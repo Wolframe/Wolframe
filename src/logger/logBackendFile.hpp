@@ -39,10 +39,8 @@
 #ifndef _LOG_BACKEND_FILE_HPP_INCLUDED
 #define _LOG_BACKEND_FILE_HPP_INCLUDED
 
-#include "appConfig.hpp"
 #include "logger/logLevel.hpp"
 #include "logger/logBackend.hpp"
-#include "logBackendConsole.hpp"
 
 #include <fstream>
 

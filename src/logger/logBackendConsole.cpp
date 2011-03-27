@@ -36,11 +36,9 @@
 /// \brief implementation of the console backend
 ///
 
-#include <iostream>
+#include "logger/logBackendConsole.hpp"
 
-//#include "logger.hpp"
-#include "logBackendImpl.hpp"
-#include "logBackendConsole.hpp"
+#include <iostream>
 
 #include "unused.h"
 

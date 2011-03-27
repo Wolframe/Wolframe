@@ -37,7 +37,6 @@
 ///
 
 #include "logger.hpp"
-#include "logBackendImpl.hpp"
 #include "logBackendFile.hpp"
 
 namespace _Wolframe {
