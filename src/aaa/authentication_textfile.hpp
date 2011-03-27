@@ -5,7 +5,7 @@
 #ifndef _AUTHENTICATION_TEXTFILE_HPP_INCLUDED
 #define _AUTHENTICATION_TEXTFILE_HPP_INCLUDED
 
-#include "authentication.hpp"
+#include "aaa/authentication.hpp"
 
 #include <map>
 #include <string>

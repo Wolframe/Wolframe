@@ -96,17 +96,17 @@ OBJS = \
 CPP_BINS = \
 	wolframed.exe
 
-all: $(OBJS) $(CPP_BINS) wolframemsg.dll
+all: $(OBJS) $(CPP_BINS) logger\wolframemsg.dll
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-wolframed.exe: wolframed.obj wolframemsg.res
+wolframed.exe: wolframed.obj logger\wolframemsg.res
 
-wolframemsg.dll: wolframemsg.res
+logger\wolframemsg.dll: logger\wolframemsg.res
 	$(LINK) /dll /nologo /noentry /MACHINE:x86 /out:$@ $?
-wolframemsg.res: wolframemsg.rc
-wolframemsg.rc: wolframemsg.mc
-logBackendEventlog.obj: wolframemsg.rc
+logger\wolframemsg.res: logger\wolframemsg.rc
+logger\wolframemsg.rc: logger\wolframemsg.mc
+logger\logBackendEventlog.obj: logger\wolframemsg.rc
 
 $(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
 	$(LINK) /lib /nologo /out:$@ $(LDFLAGS) $(LIBS) $?
@@ -114,7 +114,7 @@ $(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
 local_all: $(LOCAL_STATIC_LIB)
 
 local_clean:
-	@-erase MSG*.bin wolframemsg.rc wolframemsg.h wolframemsg.res wolframemsg.dll 2>NUL
+	@-erase MSG*.bin logger\wolframemsg.rc logger\wolframemsg.h logger\wolframemsg.res logger\wolframemsg.dll 2>NUL
 	@-erase $(LOCAL_STATIC_LIB) 2>NUL
 	@-erase test.bat 2>NUL
 
