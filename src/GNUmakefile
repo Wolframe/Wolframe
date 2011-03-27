@@ -55,14 +55,14 @@ LOCAL_STATIC_LIB_OBJS = \
 	version.o \
 	resolvePath.o \
 	commandLine.o \
-	logLevel.o \
-	logSyslogFacility.o \
-	logComponent.o \
-	logger.o \
-	logBackendImpl.o \
-	logBackendConsole.o \
-	logBackendFile.o \
-	logBackendSyslog.o \
+	logger/logLevel.o \
+	logger/logSyslogFacility.o \
+	logger/logComponent.o \
+	logger/logger.o \
+	logger/logBackendImpl.o \
+	logger/logBackendConsole.o \
+	logger/logBackendFile.o \
+	logger/logBackendSyslog.o \
 	configHelpers.o \
 	serviceConfig.o \
 	serviceBanner.o \
