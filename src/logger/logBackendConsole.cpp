@@ -36,6 +36,9 @@
 /// \brief implementation of the console backend
 ///
 
+// TODO: why!!!? logLevel.hpp with << definition should be enough
+#include "logger.hpp"
+#include "logger/logLevel.hpp"
 #include "logger/logBackendConsole.hpp"
 
 #include <iostream>

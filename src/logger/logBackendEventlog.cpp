@@ -49,6 +49,8 @@
 
 #include "wolframemsg.h"
 
+#include "logger.hpp" // TODO: just for LOG_ macros, should not be like this!
+
 namespace _Wolframe {
 	namespace Logging {
 
