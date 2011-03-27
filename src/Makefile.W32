@@ -56,8 +56,8 @@ LOGGER_OBJS = \
 	logger\logger.obj \
 
 AAA_OBJS = \
-	aaa\authentication.obj \
-	aaa\authentication_textfile.obj
+	AAA\authentication.obj \
+	AAA\authentication_textfile.obj
 
 LOCAL_STATIC_LIB_OBJS = \
 	version.obj \

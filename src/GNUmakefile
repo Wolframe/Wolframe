@@ -62,12 +62,12 @@ LOGGER_OBJS = \
 	logger/logger.o
 
 AAA_OBJS = \
-	aaa/authentication.o \
-	aaa/authentication_textfile.o
+	AAA/authentication.o \
+	AAA/authentication_textfile.o
 
 ifdef WITH_PAM
 AAA_OBJS += \
-	aaa/authentication_pam.o
+	AAA/authentication_pam.o
 endif
 
 LOCAL_STATIC_LIB_OBJS = \

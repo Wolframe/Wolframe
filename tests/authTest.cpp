@@ -2,7 +2,7 @@
 #include <string>
 #include <algorithm>
 
-#include "aaa/authentication.hpp"
+#include "AAA/authentication.hpp"
 //#include "authentication_textfile.hpp"
 //#ifdef WITH_PAM
 //#include "authentication_pam.hpp"
