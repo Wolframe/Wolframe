@@ -49,14 +49,14 @@ LOCAL_STATIC_LIB_OBJS = \
 	version.obj \
 	resolvePath.obj \
 	commandLine.obj \
-	logLevel.obj \
-	logSyslogFacility.obj \
-	logComponent.obj \
-	logger.obj \
-	logBackendImpl.obj \
-	logBackendConsole.obj \
-	logBackendFile.obj \
-	logBackendEventlog.obj \
+	logger\logLevel.obj \
+	logger\logSyslogFacility.obj \
+	logger\logComponent.obj \
+	logger\logBackendConsole.obj \
+	logger\logBackendFile.obj \
+	logger\logBackendEventlog.obj \
+	logger\logBackendImpl.obj \
+	logger\logger.obj \
 	configHelpers.obj \
 	serviceConfig.obj \
 	serviceBanner.obj \
