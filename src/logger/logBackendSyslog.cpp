@@ -36,9 +36,9 @@
 /// \brief implementation of logging to syslog
 ///
 
-#include "logger.hpp"
-#include "logBackendImpl.hpp"
 #include "logBackendSyslog.hpp"
+
+#include <sstream>
 
 // no macros here, name clash with variables in syslog.h, so
 // undefine them here..

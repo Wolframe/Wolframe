@@ -42,8 +42,6 @@
 #include "logger/logLevel.hpp"
 #include "logger/logComponent.hpp"
 
-#include <string>
-
 namespace _Wolframe {
 	namespace Logging {
 

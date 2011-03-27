@@ -13,8 +13,6 @@
 namespace _Wolframe {
 	namespace Authentication {
 
-Authenticator *CreateTextFileAuthenticator( AuthenticatorFactory::properties props );
-
 class TextFileAuthenticator : public Authenticator {
 	private:
 		std::map< std::string, std::string > m_creds;

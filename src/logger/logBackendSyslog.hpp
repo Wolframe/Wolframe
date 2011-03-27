@@ -39,10 +39,9 @@
 #ifndef _LOG_BACKEND_SYSLOG_HPP_INCLUDED
 #define _LOG_BACKEND_SYSLOG_HPP_INCLUDED
 
-#include <string>
-
-#include "logger/logSyslogFacility.hpp"
 #include "logger/logLevel.hpp"
+#include "logger/logComponent.hpp"
+#include "logger/logSyslogFacility.hpp"
 
 namespace _Wolframe {
 	namespace Logging {
