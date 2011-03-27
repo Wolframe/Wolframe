@@ -43,8 +43,6 @@
 
 #include <iostream>
 
-#include "unused.h"
-
 namespace _Wolframe {
 	namespace Logging {
 
@@ -63,7 +61,7 @@ void ConsoleLogBackend::setLevel( const LogLevel::Level level )
 	logLevel_ = level;
 }
 
-void ConsoleLogBackend::log( WOLFRAME_UNUSED const LogComponent component, const LogLevel::Level level, const std::string& msg )
+void ConsoleLogBackend::log( const LogComponent /* component */, const LogLevel::Level level, const std::string& msg )
 {
 	if ( level >= logLevel_ ) {
 		std::cerr << level << ": " << msg << std::endl;

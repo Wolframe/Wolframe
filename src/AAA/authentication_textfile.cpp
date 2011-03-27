@@ -5,6 +5,7 @@
 #include "AAA/authentication_textfile.hpp"
 
 #include <boost/algorithm/string.hpp>
+#include <boost/thread/thread.hpp>
 
 #include <stdexcept>
 #include <fstream>
@@ -56,18 +57,21 @@ Step::AuthStep TextFileAuthenticator::nextStep( )
 // user not in text file
 			if( it == m_creds.end( ) ) {
 				m_state = _Wolframe_TEXTFILE_STATE_NEED_LOGIN;
-				return Step::_Wolframe_AUTH_STEP_FAIL;
+				goto FAIL;
 			}
 // user found, but password doesn't match			
 			if( it->second != m_pass ) {
 				m_state = _Wolframe_TEXTFILE_STATE_NEED_LOGIN;
-				return Step::_Wolframe_AUTH_STEP_FAIL;			
+				goto FAIL;
 			}
 			
 // everythink is peachy
 			m_state = _Wolframe_TEXTFILE_STATE_NEED_LOGIN;
 			return Step::_Wolframe_AUTH_STEP_SUCCESS;
 	}
+
+FAIL:
+	boost::this_thread::sleep( boost::posix_time::seconds( 1 ) );
 
 	return Step::_Wolframe_AUTH_STEP_FAIL;
 }

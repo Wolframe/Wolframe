@@ -1,3 +1,35 @@
+/************************************************************************
+
+ Copyright (C) 2011 Project Wolframe.
+ All rights reserved.
+
+ This file is part of Project Wolframe.
+
+ Commercial Usage
+    Licensees holding valid Project Wolframe Commercial licenses may
+    use this file in accordance with the Project Wolframe
+    Commercial License Agreement provided with the Software or,
+    alternatively, in accordance with the terms contained
+    in a written agreement between the licensee and Project Wolframe.
+
+ GNU General Public License Usage
+    Alternatively, you can redistribute this file and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Wolframe is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Wolframe.  If not, see <http://www.gnu.org/licenses/>.
+
+ If you have questions regarding the use of this file, please contact
+ Project Wolframe.
+
+************************************************************************/
 //
 // standard configuration structures
 //
@@ -18,38 +50,81 @@
 
 
 namespace _Wolframe {
-	namespace Network	{
+namespace Network	{
 
-		/// network server configuration
-		struct ServerConfiguration : public _Wolframe::Configuration::ConfigurationBase
-		{
-		public:
-			unsigned short		threads;
-			unsigned short		maxConnections;
+	/// network server configuration
+	struct ServerConfiguration : public _Wolframe::Configuration::ConfigurationBase
+	{
+	public:
+		unsigned short		threads;
+		unsigned short		maxConnections;
 
-			// listen on
-			std::list<Network::ServerTCPendpoint> address;
-#ifdef WITH_SSL
-			std::list<Network::ServerSSLendpoint> SSLaddress;
-#endif // WITH_SSL
+		// listen on
+		std::list<Network::ServerTCPendpoint> address;
+	#ifdef WITH_SSL
+		std::list<Network::ServerSSLendpoint> SSLaddress;
+	#endif // WITH_SSL
 
-			/// constructor
-			ServerConfiguration();
+		/// constructor
+		ServerConfiguration();
 
-			/// methods
-			bool parse( const boost::property_tree::ptree::const_iterator it,
-				    const std::string& node );
-			bool check() const;
-			void print( std::ostream& os ) const;
+		/// methods
+		bool parse( const boost::property_tree::ptree::const_iterator it,
+			    const std::string& node );
+		bool check() const;
+		void print( std::ostream& os ) const;
 
-			void setCanonicalPathes( const std::string& referencePath );
+		void setCanonicalPathes( const std::string& referencePath );
+
+		//			Not implemented yet, inherited from base for the time being
+		//			bool test() const;
+	};
+
+} // namespace Network
+
+namespace Logging	{
+
+	/// logger configuration
+	struct LoggerConfiguration : public _Wolframe::Configuration::ConfigurationBase
+	{
+	public:
+		bool			logToStderr;
+		Logging::LogLevel::Level		stderrLogLevel;
+
+		bool			logToFile;
+		std::string		logFile;
+		Logging::LogLevel::Level		logFileLogLevel;
+		std::string		logFileIdent;
+#if !defined( _WIN32 )
+		bool			logToSyslog;
+		Logging::SyslogFacility::Facility syslogFacility;
+		Logging::LogLevel::Level		syslogLogLevel;
+		std::string		syslogIdent;
+#else
+		bool			logToEventlog;
+		std::string		eventlogLogName;
+		std::string		eventlogSource;
+		Logging::LogLevel::Level eventlogLogLevel;
+#endif // !defined( _WIN32 )
+
+		/// constructor
+		LoggerConfiguration();
+
+		/// methods
+		bool parse( const boost::property_tree::ptree::const_iterator it,
+			    const std::string& node );
+		bool check() const;
+		void print( std::ostream& os ) const;
+
+		void setCanonicalPathes( const std::string& referencePath );
 
 //			Not implemented yet, inherited from base for the time being
 //			bool test() const;
-		};
 
-	} // namespace Network
+		void foreground( Logging::LogLevel::Level debugLevel, bool useConfig );
+	};
 
+} // namespace Logging
 
 	namespace Configuration	{
 

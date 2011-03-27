@@ -3,10 +3,6 @@
 #include <algorithm>
 
 #include "AAA/authentication.hpp"
-//#include "authentication_textfile.hpp"
-//#ifdef WITH_PAM
-//#include "authentication_pam.hpp"
-//#endif
 #include "getPassword.hpp"
 
 using namespace std;
