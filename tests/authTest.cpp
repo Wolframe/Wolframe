@@ -2,11 +2,11 @@
 #include <string>
 #include <algorithm>
 
-#include "authentication.hpp"
-#include "authentication_textfile.hpp"
-#ifdef WITH_PAM
-#include "authentication_pam.hpp"
-#endif
+#include "aaa/authentication.hpp"
+//#include "authentication_textfile.hpp"
+//#ifdef WITH_PAM
+//#include "authentication_pam.hpp"
+//#endif
 #include "getPassword.hpp"
 
 using namespace std;

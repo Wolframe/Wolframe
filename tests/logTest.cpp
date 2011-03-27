@@ -5,7 +5,7 @@
 #include "logger.hpp"
 #include <gtest/gtest.h>
 
-#ifndef _WIN32
+#if !defined( _WIN32 )
 #include <sys/stat.h>
 #include <fcntl.h>
 #else
