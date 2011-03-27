@@ -30,9 +30,9 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// mtprocHandler.cpp
-//
+///
+/// \file mtprocHandler.cpp
+///
 
 #include "protocol.hpp"
 #include "protocol/ioblocks.hpp"

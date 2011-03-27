@@ -30,9 +30,10 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// mtprocHandler.hpp - simple method table processor connection handler
-//
+///
+/// \file mtprocHandler.hpp
+/// \brief simple method table processor connection handler
+///
 
 #ifndef _Wolframe_PROTOCOL_MTPROC_HANDLER_HPP_INCLUDED
 #define _Wolframe_PROTOCOL_MTPROC_HANDLER_HPP_INCLUDED
