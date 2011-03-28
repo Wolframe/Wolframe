@@ -34,7 +34,7 @@ Project Wolframe.
 #include <iterator>
 
 /// \file protocol/iterators.hpp
-/// \brief iterator types of the protocol input blocks
+/// \brief Iterator types of the protocol input blocks
 
 namespace _Wolframe {
 namespace protocol {
@@ -42,13 +42,17 @@ namespace protocol {
 ///\brief namespace for distiguishing iterator class fom other
 namespace array
 {
-///! \class iterator_t
-///  \brief template for random access iterators for arrays as used by the protocol
+/// \class iterator_t
+/// \brief template for STL conform random access iterators for arrays as used by the protocol
+/// \tparam array_type_ type of array this iterator iterates on
+/// \tparam size_type_ random access iterator size_type
+/// \tparam value_type_ random access iterator value_type
+/// \tparam access_type_ random access iterator type of value dereferenced with '*' access operator on iterator_t
+/// \tparam deref_type_ random access iterator deref_type
 template <class array_type_, typename size_type_, typename value_type_, typename access_type_, typename deref_type_>
 class iterator_t
 {
 public:
-	//STL traits and typedefs
 	typedef array_type_ array_type;
 	typedef access_type_ access_type;
 	typedef deref_type_ deref_type;

@@ -31,7 +31,7 @@ Project Wolframe.
 ************************************************************************/
 ///
 /// \file protocol/parser.hpp
-/// \brief parsing functions of the lexical elements of the protocol like commands, lines and tokens
+/// \brief Parsing functions of the lexical elements of the protocol like commands, lines and tokens
 ///
 
 #ifndef _Wolframe_PROTOCOL_PARSER_HPP_INCLUDED
@@ -47,7 +47,10 @@ namespace protocol {
 class Parser
 {
 public:
-	/// \brief go to the next non space
+	/// \brief Go to the next non space
+	/// \tparam IteratorType iterator type used as input for parsing
+	/// \param [in,out] src input iterator
+	/// \param [in] end iterator marking end of input block
 	template <typename IteratorType>
 	static bool skipSpaces( IteratorType& src, IteratorType& end)
 	{
@@ -55,7 +58,10 @@ public:
 		return (src<end);
 	}
 
-	/// \brief go to the end of line without consuming it
+	/// \brief Go to the end of line without consuming it
+	/// \tparam IteratorType iterator type used as input for parsing
+	/// \param [in,out] src input iterator
+	/// \param [in] end iterator marking end of input block
 	template <typename IteratorType>
 	static bool skipLine( IteratorType& src, IteratorType& end)
 	{
@@ -63,7 +69,10 @@ public:
 		return (src<end);
 	}
 
-	/// \brief consume the end of line
+	/// \brief Consume the end of line
+	/// \tparam IteratorType iterator type used as input for parsing
+	/// \param [in,out] src input iterator
+	/// \param [in] end iterator marking end of input block
 	template <typename IteratorType>
 	static bool consumeEOLN( IteratorType& src, IteratorType& end)
 	{
@@ -75,21 +84,23 @@ public:
 		return true;
 	}
 
-	/// \brief return true, if the end of line has been reached
+	/// \brief Return true if the end of line has been reached
+	/// \tparam IteratorType iterator type used as input for parsing
+	/// \param [in] src input iterator
 	template <typename IteratorType>
 	static bool isEOLN( IteratorType& src)
 	{
 		return (*src == '\r' || *src == '\n');
 	}
 
-	/// \brief parse the current line and write its contents to a buffer
-	/// go to the end of line and write it to buffer, starting with the first non space.
-	/// after call the iterator is pointing to the end of line char or at the EOF char.
-	/// \remark end of lines or trailing spaces are not implicitely consumed because this leads to intermediate states that cannot be handled
-	/// \remark control characters are mapped to space (ascii 32) before writing them to 'buf'
-	/// \param src input iterator
-	/// \param end input iterator marking the end of input
-	/// \param buf output buffer with a minimal subset of std::string interface
+	/// \brief Parse the current line and write its contents to a buffer
+	/// Go to the end of line and write it to buffer, starting with the first non space.
+	/// After call the iterator is pointing to the end of line char or at the EOF char.
+	/// \remark End of lines or trailing spaces are not implicitely consumed because this leads to intermediate states that cannot be handled
+	/// \remark Control characters are mapped to space (ascii 32) before writing them to 'buf'
+	/// \param [in,out] src input iterator
+	/// \param [in] end input iterator marking the end of input
+	/// \param [in,out] buf output buffer with a minimal subset of std::string interface
 	/// \return true, if the line was consumed completely
 	template <typename IteratorType, typename BufferType>
 	static bool getLine( IteratorType& src, IteratorType& end, BufferType& buf)
@@ -106,37 +117,49 @@ public:
 	}
 };
 
-///
 /// \class CmdParser
-/// \brief parser for ascii protocol commands
+/// \exception Bad
+/// \brief Parser for ascii protocol commands
+/// \tparam buffer type to use. (std::string or a buffer structure defined in protocol/buffers.hpp)
 ///
 template <typename CmdBufferType>
 class CmdParser :public Parser
 {
 public:
-	///
 	/// \class Bad
-	/// \brief exception for illegal parser definition (too many commands).
+	/// \brief Exception for illegal protocol parser definition (too many commands).
 	///
 	/// \remark The parsers are exception free at processing time. Only add and the operator '[]' for automata construction throw.
 	///
-	struct Bad :public std::logic_error {Bad():std::logic_error("too many elements in CmdParser") {};};
+	class Bad :public std::logic_error {public: Bad():std::logic_error("too many elements in CmdParser") {};};
 
+	/// \brief Constructor
+	///
 	CmdParser() :m_size(0){};
+
+	/// \brief Destructor
+	///
 	~CmdParser() {};
 
+	/// \brief Copy constructor
+	/// \param [in] o CmdParser to copy
+	///
 	CmdParser( const CmdParser& o) :m_size(o.m_size)
 	{
 		for (unsigned int ii=0; ii<m_size; ii++) m_elem[ii]=o.m_elem[ii];
 	};
 
+	///
+	/// \brief Reset parser command definitions
+	///
 	void init()
 	{
 		m_size = 0;
 	};
 
 	///
-	/// \brief add a command to the protocol parser (case insensitive)
+	/// \brief Add a command to the protocol parser (case insensitive)
+	/// \param [in] cmd command to define
 	///
 	void add( const char* cmd)
 	{
@@ -147,7 +170,8 @@ public:
 	};
 
 	///
-	/// \brief element by element assignement
+	/// \brief Assignement copy
+	/// \param [in] o CmdParser to copy
 	///
 	CmdParser& operator=( const CmdParser& o)
 	{
@@ -157,7 +181,8 @@ public:
 	};
 
 	///
-	/// \brief define a parser with a null terminated array of protocol parser commands
+	/// \brief Constructor
+	/// \param [in] cmd null-terminated array of commands to define
 	///
 	CmdParser( const char** cmd)
 	{
@@ -165,7 +190,9 @@ public:
 	};
 
 	///
-	/// \brief define a command. The index of the command is counted from 0 with one increment per add.
+	/// \brief Defines a command. The index of the command is counted from 0 with one increment per add.
+	/// \param [in] cmd command to define
+	/// \remarks synonym for add(const char*)
 	///
 	CmdParser& operator[]( const char* cmd)
 	{
@@ -174,9 +201,13 @@ public:
 	};
 
 	///
-	/// \brief parse the next command.
+	/// \brief Parse the next command.
+	/// \tparam IteratorType iterator type used as input for parsing
+	/// \param [in,out] src input iterator
+	/// \param [in] end input iterator marking the end of input
+	/// \param [in,out] buf the command buffer used
 	/// \return the index of the command in the order of definition counted from 0 for the first command or return -1, if the command could not be recognized
-	/// \remark at end of buffer -1 is returned also. If \c src equals \c end after call and -1 was returned then the method has to be called again with new data.
+	/// \remark At the end of buffer -1 is returned also. If \c src equals \c end after call and -1 was returned then the method has to be called again with new data.
 	///
 	template <typename IteratorType>
 	int getCommand( IteratorType& src, IteratorType& end, CmdBufferType& buf) const
@@ -190,18 +221,18 @@ public:
 
 		if (*buf == -1)
 		{
-			buf.init();
+			buf.clear();
 			return -1;
 		}
 		for (unsigned int ii=0; ii<m_size; ii++)
 		{
 			if (m_elem[ii] == *buf)
 			{
-				buf.init();
+				buf.clear();
 				return (int)ii;
 			}
 		}
-		buf.init();
+		buf.clear();
 		return -1;
 	}
   

@@ -32,7 +32,7 @@ Project Wolframe.
 #ifndef _Wolframe_PROTOCOL_IO_BLOCKS_HPP_INCLUDED
 #define _Wolframe_PROTOCOL_IO_BLOCKS_HPP_INCLUDED
 /// \file protocol/ioblocks.hpp
-/// \brief network message blocks as seen from the protocol with the input iterator classes and print functions
+/// \brief Network message blocks as seen from the protocol with the input iterator classes and print functions
 
 #include "iterators.hpp"
 #include <stdexcept>
@@ -41,14 +41,8 @@ namespace _Wolframe {
 namespace protocol {
 
 ///
-/// \section protocol IO Blocks
-/// \brief defines the processed blocks for output from and input to the processor
-/// The application processor reads the input through iterators of the input blocks and prints via the output blocks.
-///
-
-///
 /// \class MemBlock
-/// \brief memory block for network messages
+/// \brief Memory block base structure for input/output network messages of the protocol
 ///
 class MemBlock
 {
@@ -57,43 +51,58 @@ public:
 	typedef char value_type;		///< basic STL vector typedefs
 	typedef std::size_t size_type;		///< basic STL vector typedefs
 
+	/// \brief Constructor
 	MemBlock();
+	/// \brief Constructor
+	/// \param [in] p_size size of the memory block to allocate
 	MemBlock( size_type p_size);
+	/// \param [in] p_ptr pointer to the memory block (not allocated on your own)
+	/// \param [in] p_size size of the memory block p_ptr
 	MemBlock( void* p_ptr, size_type p_size);
+	/// \brief Copy constructor
+	/// \param [in] o MemBlock to copy
 	MemBlock( const MemBlock& o);
+	/// \brief Destructor
 	~MemBlock();
 
-	/// \brief assignement operator
+	/// \brief Copy assignement operator
+	/// \param [in] o MemBlock to copy
 	MemBlock& operator=( const MemBlock& o);
 
-	/// \brief set the current cursor byte position
+	/// \brief Set the current cursor byte position
+	/// \param [in] p_pos new cursor position in bytes from the memory block start
 	void setPos( size_type p_pos=0)				{m_pos = p_pos;}
 
-	/// \brief set the buffer to be used by this class (as non allocated by this class)
+	/// \brief Set the buffer to be used by this class (as non allocated by this class)
+	/// \param [in] p_ptr new buffer to use
+	/// \param [in] p_size size of buffer to use
 	void set( void* p_ptr, size_type p_size);
 
-	/// \brief constant void pointer to start of buffer
+	/// \brief Constant void pointer to start of buffer
 	void* ptr()						{return m_ptr;}
-	/// \brief constant void pointer to start of buffer
+	/// \brief Constant void pointer to start of buffer
 	const void* ptr() const					{return m_ptr;}
 
-	/// \brief constant char pointer to start of buffer
+	/// \brief Constant char pointer to start of buffer
 	char* charptr()						{return (char*)m_ptr;}
-	/// \brief constant char pointer to start of buffer
+	/// \brief Constant char pointer to start of buffer
 	const char* charptr() const				{return (const char*)m_ptr;}
 
-	/// \brief allocation size of the buffer in bytes
+	/// \brief Allocation size of the buffer in bytes
 	size_type size() const					{return m_size;}
 
-	/// \brief current byte position of the cursor (input or output)
+	/// \brief Current byte position of the cursor (input or output)
 	size_type pos() const					{return m_pos;}
 
-	/// \brief access violation exceptions
+	/// \exception ArrayBoundReadError
+	/// \brief Protocol memory block access violation exception
 	struct ArrayBoundReadError				:public std::logic_error {ArrayBoundReadError():std::logic_error("ABR"){}};
 
-	/// \brief const random access operator
+	/// \brief random access operator on const
+	/// \param [in] idx index of element to access
 	char operator[]( size_type idx) const			{if (idx>=m_pos) throw ArrayBoundReadError(); return charptr()[idx];}
-	/// \brief random access operator
+	/// \brief random access operator on reference type
+	/// \param [in] idx index of element to access
 	char& operator[]( size_type idx)			{if (idx>=m_pos) throw ArrayBoundReadError(); return charptr()[idx];}
 
 private:
@@ -107,14 +116,14 @@ private:
 
 ///
 /// \class InputBlock
-/// \brief input memory block for network input with iterators for the processing of the data
+/// \brief Input memory block of the protocol for network input with iterators for the processing of the data
 ///
 class InputBlock  :public MemBlock
 {
 public:
 	///
 	/// \class EoD
-	/// \brief states of the automaton recognizing end of data and unescaping escape sequences in data
+	/// \brief States of the automaton recognizing end of data and unescaping escape sequences in data
 	///
 	/// See method getEoD(iterator)
 	///
@@ -135,45 +144,59 @@ public:
 		};
 	};
 
+	/// \brief Constructor
 	InputBlock()						:m_eodState(EoD::SRC){}
+	/// \brief Constructor
+	/// \param [in] p_size size of the memory block in bytes to allocate
 	InputBlock( size_type p_size)				:MemBlock(p_size),m_eodState(EoD::SRC){}
+	/// \brief Constructor
+	/// \param [in] p_ptr pointer to the memory block to use (do not allocate it on your own)
+	/// \param [in] p_size size of the memory block in bytes
 	InputBlock( void* p_ptr, size_type p_size)		:MemBlock(p_ptr,p_size),m_eodState(EoD::SRC){}
+	/// \brief Copy constructor
+	/// \param [in] o InputBlock to copy
 	InputBlock( const InputBlock& o)			:MemBlock(o),m_eodState(o.m_eodState){}
 
-	/// \brief random access const iterator
+	/// \brief Random access const iterator
 	typedef array::iterator_t<const InputBlock,size_type,char,char,const char*> const_iterator;
-	/// \brief random access iterator
+	/// \brief Random access iterator
 	typedef array::iterator_t<InputBlock,size_type,char,char&,char*> iterator;
 
-	/// \brief get the starting const iterator
+	/// \brief Get the starting const iterator
 	const_iterator begin() const				{const_iterator rt(this); return rt;}
-	/// \brief get the starting iterator
+	/// \brief Get the starting iterator
 	iterator begin()					{iterator rt(this); return rt;}
-	/// \brief random access to a const iterator
+	/// \brief Random access to a const iterator
+	/// \param [in] pos_ position from where to get the iterator
 	const_iterator at( size_type pos_) const		{const_iterator rt(this); return rt+pos_;}
-	/// \brief random access to an iterator
+	/// \brief Random access to an iterator
+	/// \param [in] pos_ position from where to get the iterator
 	iterator at( size_type pos_)				{iterator rt(this); return rt+pos_;}
-	/// \brief get the end of block const iterator
+	/// \brief Get the end of block const iterator
 	const_iterator end() const				{return const_iterator(this)+pos();}
-	/// \brief get the end of block iterator
+	/// \brief Get the end of block iterator
 	iterator end()						{return iterator(this)+pos();}
 
-	/// \brief end of data calculation and unescaping of LF_DOT sequences
+	/// \brief End of data calculation and unescaping of LF_DOT sequences
+	/// \param [in] start where to start searching for the end of data marker
 	iterator getEoD( iterator start)
 	{
 		int eodpos = getEoDpos( start-begin());
 		return (eodpos>=0)?(start+eodpos):end();
 	}
 
-	/// \brief reset end of data state machine
+	/// \brief Reset end of data state machine
 	void resetEoD()						{m_eodState=EoD::SRC;}
 
-	/// \brief return true if end of data was recognized with the last call of getEoD(iterator)
+	/// \brief Return true if end of data was recognized with the last call of getEoD(iterator)
 	bool gotEoD() const					{return m_eodState>=EoD::LF_DOT_CR;}
-	/// \brief return true if we have consumed also the terminating LineFeed after the end of data
+
+	/// \brief Return true if we have consumed also the terminating LineFeed after the end of data
 	bool gotEoD_LF() const					{return m_eodState>=EoD::LF_DOT_CR_LF;}
 
-	/// \brief consume the terminating LineFeed after the end of data
+	/// \brief Consume the terminating LF after the end of data
+	/// \param [in] itr where to check for the terminating LF
+	/// \return iterator pointing at position after the consumed LF
 	iterator getStart( const iterator itr)
 	{
 		if (m_eodState == EoD::LF_DOT_CR && itr < end() && *itr == '\n')
@@ -188,9 +211,9 @@ public:
 	}
 
 private:
-	/// \brief implementation of the end of data recognition and linefeed,dot escaping state machine
+	/// \brief Implementation of the end of data recognition and linefeed,dot escaping state machine
 	int getEoDpos( size_type offset);
-	/// \brief state of end of data recognition
+	/// \brief State of end of data recognition
 	EoD::State m_eodState;
 };
 
@@ -198,24 +221,32 @@ private:
 
 
 /// \class OutputBlock
-/// \brief output interface based on a memory block.
+/// \brief Protocol output buffer
 ///
 /// Print as buffer is available and then order to "ship" what you printed.
 ///
 class OutputBlock :public MemBlock
 {
 public:
+	/// \brief Constructor
+	/// \param [in] p_size size of the memory block in bytes to allocate
 	OutputBlock( size_type p_size)				:MemBlock(p_size) {}
+	/// \brief Constructor
+	/// \param [in] p_ptr pointer to the memory block to use (do not allocate it on your own)
+	/// \param [in] p_size size of the memory block in bytes
 	OutputBlock( void* p_ptr, size_type p_size)		:MemBlock(p_ptr,p_size) {}
+	/// \brief Copy constructor
+	/// \param [in] o OutputBlock to copy
 	OutputBlock( const OutputBlock& o)			:MemBlock(o) {}
 
-	//return true if the buffer is empty
+	/// \brief Return true if the buffer is empty
 	bool empty() const
 	{
 		return (pos()==0);
 	}
 
-	//print one character to the output
+	/// \brief Print one character to the output
+	/// \param [in] ch the character to print
 	bool print( char ch)
 	{
 		if (pos() == size()) return false;
@@ -224,7 +255,8 @@ public:
 		return true;
 	}
 
-	//forward the output buffer cursor
+	/// \brief Skip the output buffer cursor by some bytes
+	/// \param [in] nn the number of bytes to skip
 	bool incPos( size_type nn)
 	{
 		if (pos()+nn >= size()) return false;
@@ -232,14 +264,15 @@ public:
 		return true;
 	}
 
-	//pointer to the rest of the output buffer block
+	/// \brief Returns a const pointer to the rest of the output buffer block
 	const char* rest() const				{return charptr() + pos();}
+	/// \brief Returns a pointer to the rest of the output buffer block
 	char* rest()						{return charptr() + pos();}
 
-	//size of the rest of the output buffer (how many characters can be written)
+	/// \brief Returns the size of the rest of the output buffer (how many characters can be written)
 	size_type restsize() const				{return size()-pos();}
 
-	//release a written memory block
+	/// \brief Release a written memory block (reset cursor position)
 	void release()						{setPos(0);}
 };
 

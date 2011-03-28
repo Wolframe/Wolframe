@@ -40,9 +40,9 @@ void CommandDispatcher::resetCommand()
 {
 	m_methodIdx = 0;
 	m_command = unknown;
-	m_lineBuffer.init();
-	m_argBuffer.init();
-	m_cmdBuffer.init();
+	m_lineBuffer.clear();
+	m_argBuffer.clear();
+	m_cmdBuffer.clear();
 	m_argc = 0;
 	m_argv = 0;
 
@@ -267,7 +267,7 @@ CommandDispatcher::IOState CommandDispatcher::call( int& returnCode)
 
 const char* CommandDispatcher::getCapabilities()
 {
-	m_lineBuffer.init();
+	m_lineBuffer.clear();
 	unsigned int ii;
 	if (m_instance && m_instance->m_mt)
 	{

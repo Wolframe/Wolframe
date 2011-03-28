@@ -118,7 +118,7 @@ struct Connection::Private
 	Operation WriteLine( const char* str, const char* arg=0)
 	{
 		unsigned int ii;
-		buffer.init();
+		buffer.clear();
 		for (ii=0; str[ii]; ii++) buffer.push_back( str[ii]);
 		if (arg)
 		{
@@ -128,7 +128,7 @@ struct Connection::Private
 		buffer.push_back( '\r');
 		buffer.push_back( '\n');
 		const char* msg = buffer.c_str();
-		buffer.init();
+		buffer.clear();
 		return Network::SendData( msg, ii+2);
 	}
 

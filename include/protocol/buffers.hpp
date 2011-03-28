@@ -31,92 +31,153 @@ Project Wolframe.
 ************************************************************************/
 #ifndef _Wolframe_PROTOCOL_BUFFERS_HPP_INCLUDED
 #define _Wolframe_PROTOCOL_BUFFERS_HPP_INCLUDED
+///
 /// \file protocol/buffers.hpp
-/// \brief buffers used by protocol parsers to buffer the commands and their arguments
-
+/// \brief Defines the buffers used by protocol parsers to buffer the commands and their arguments.
+///
+/// All buffers defined in this module are preallocated fixed size and implement a subset of the std::string interface for appending data.
+/// This interface is used by the buffering parsing methods defined in protocol/parser.hpp.
+/// The protocol uses fixed size buffers because protocol messages are not considered to have a size defined by the client for security reasons.
+/// The buffers are not used for buffering processed data. Data is passed as memory blocks of the type defined in protocol/ioblocks.hpp
+/// to the application processors.
+///
 #include <cstddef>
 #include <boost/cstdint.hpp>
 
 namespace _Wolframe {
 namespace protocol {
 
-//@section protocolBuffers
-//defines some buffers that can be used by 'protocol::Parser::getLine' to prefilter and 
-// buffer data in the form needed for processing in the current context of the protocol.
-// all buffers in this module have a minimal subset of std::string interface
-// required by the 'BufferType' argument of 'getLine'
-
-//* constant size buffer of single byte characters
+///
+/// \class Buffer
+/// \brief Constant size single byte (ASCII) character buffer that implements a subset of the std::string interface.
+/// \tparam SIZE maximum number of character bytes buffered (without terminating 0 byte that is counted extra)
+///
 template <unsigned int SIZE=128>
 class Buffer
 {
 private:
-	typedef std::size_t size_type;
-	enum {Size=SIZE};
-	size_type m_pos;
-	char m_buf[ Size+1];
+	typedef std::size_t size_type;		///< size type of this buffer vector
+
+	/// \brief Some buffer constants
+	enum
+	{
+		Size=SIZE			///< maximume size of the buffer in bytes as enum definition
+	};
+	size_type m_pos;			///< current cursor position of the buffer (number of added characters)
+	char m_buf[ Size+1];			///< buffer content
 
 public:
 	Buffer()				:m_pos(0){}
-	void init()				{m_pos=0;}
+	///\brief Clear the buffer content
+	void clear()				{m_pos=0;}
+	///\brief Append one character
 	void push_back( char ch)		{if (m_pos<Size) m_buf[m_pos++]=ch;}
+	///\brief Append a 0-terminated string
 	void append( const char* cc)		{unsigned int ii=0; while(m_pos<Size && cc[ii]) m_buf[m_pos++]=cc[ii++];}
-	unsigned int size() const		{return m_pos;}
+	///\brief Return the number of characters in the buffer
+	size_type size() const			{return m_pos;}
+	///\brief Return the buffer content as 0-terminated string
 	const char* c_str()			{m_buf[m_pos]=0; return m_buf;}
 };
 
-//buffer for the currently parsed command. 
+///
+/// \class CmdBuffer
+/// \brief Buffer for the currently parsed command
+///
+/// The command is encoded as integer type because protocol commands are not considered to be loo long because name clashes are not an issue here.
+/// There are only a fixed number of commands. The names of protocol commands are first level names that are implemented hardcoded by the protocol
+/// and not defined in the application processor.
+///
 struct CmdBuffer
 {
-	typedef boost::int_least64_t ValueType;	//< stores the command name with a maximum of 10 characters (6 bit per character = case insensitive alpha or digit)
-	unsigned int m_pos;			//< current position
-	ValueType m_value;
+	typedef boost::int_least64_t ValueType;		///< stores the command name with a maximum of 10 characters (6 bit per character = case insensitive alpha or digit)
+	unsigned int m_pos;				///< current cursor position
+	ValueType m_value;				///< the currently parsed command
+
+	/// \brief Some buffer constants
 	enum
 	{
-		MaxCommandLen=(sizeof(ValueType)/6)
+		MaxCommandLen=(sizeof(ValueType)/6)	///< the maximum length of a command in ASCII characters
 	};
 
 	CmdBuffer() 								:m_pos(0),m_value(0) {}
 	CmdBuffer( const CmdBuffer& o)  :m_pos(o.m_pos),m_value(o.m_value)	{}
-	void init()								{m_pos=0;m_value=0;}
+
+	/// \brief Reset the command buffer state
+	void clear()								{m_pos=0;m_value=0;}
   
-	//feed context with the next input character (case insensitive)
+	/// \brief Feed context with the next input character (case insensitive)
 	void push_back( char ch)
 	{
-		if (m_pos >= MaxCommandLen) {init(); return;}
+		if (m_pos >= MaxCommandLen) {clear(); return;}
 		if (ch >= 'a' && ch <= 'z') {m_value = (m_value << 6) | (ch-'a'); return;}
 		if (ch >= 'A' && ch <= 'Z') {m_value = (m_value << 6) | (ch-'A'); return;}
 		if (ch >= '0' && ch <= '9') {m_value = (m_value << 6) | (ch+26-'0'); return;}
-		init();
+		clear();
 	}
 
+	/// \brief Number of characters parsed for the command
 	unsigned int size() const {return m_pos;}
+
+	/// \brief Return the command parsed
 	operator ValueType() const {return m_value;}
+
+	/// \brief Return the command parsed
 	ValueType operator*() const {return m_value;}
 };
 
 
-//* buffer for multi argument parsing (fixed array of null terminated byte character strings)
-// beside splitting the input by blanks it parses escaping and quoted strings:
-//  -escaping is done with backslash, strings can be single or double quoted
-//  -the maximum number of arguments parsed is fix (16). more arguments are appended to the 16th argument
+/// \class CArgBuffer
+/// \brief Buffer for multi argument parsing (fixed array of null terminated byte character strings)
+///
+/// This buffer splits the input, A sequence of characters by blanks and it parses escaping and quoted strings in the following way:
+/// Escaping is done with backslash, strings can be single or double quoted.
+/// The maximum number of arguments parsed is fix (16). More arguments are appended to the 16th argument.
+/// A string is starting with a quote and terminating with the same non escaped quote or with the end of line.
+/// Only blanks are splitting elements.
+///
+/// \tparam Buffer buffer type with an interface as _Wolframe::protocol::Buffer, a subset of the std::string interface used for buffering the elements of the argument vector.
 template <class Buffer>
 class CArgBuffer
 {
 private:
-	enum {Size=16};
-	enum State {EndToken,Empty,Content,ContentEsc,SQContent,SQContentEsc,DQContent,DQContentEsc};
-	unsigned int m_pos;
-	unsigned int m_buf[ Size];
-	const char* m_sbuf[ Size];
-	State m_state;
-	Buffer* m_content;
+	/// \brief Some buffer constants
+	enum
+	{
+		Size=16					///< maximum number of arguments buffered
+	};
+	/// \enum State
+	/// \brief States of this buffer
+	enum State
+	{
+		EndToken,				///< end of a token but no separating blank read yet.
+		Empty,					///< end of token or just initialized. next non blank character starts a new token.
+		Content,				///< parsing a sub token defined by non blank and not quote characters
+		ContentEsc,				///< escape encountered in State::Content state
+		SQContent,				///< parsing a sub token starting with a single quote
+		SQContentEsc,				///< escape encountered in State::SQContent state
+		DQContent,				///< parsing a sub token starting with a double quote
+		DQContentEsc				///< escape encountered in State::DQContent state
+	};
+	unsigned int m_pos;				///< cursor position in the parsed token vector
+	unsigned int m_buf[ Size];			///< the parsed token vector buffer
+	const char* m_sbuf[ Size];			///< the parsed token vector as array of 0-terminated strings
+	State m_state;					///< the buffer state
+	Buffer* m_content;				///< the buffer used as element buffer of the tokens (passed by the constructor)
 
+	/// \brief Action performed in the statemachine for opening a new token parsed
 	void openArg()					{if (m_pos<Size) m_buf[m_pos++]=m_content->size();}
 
 public:
+	/// \brief Constructor
+	/// \param [in] c buffer to use for the content passed by reference (owned by the caller, but used by this class)
 	CArgBuffer( Buffer* c)				:m_pos(0),m_state(Empty),m_content(c) {m_buf[0]=0;m_sbuf[0]=0;}
-	void init()					{m_pos=0;m_buf[0]=0;m_sbuf[0]=0;m_content->init();}
+
+	/// \brief Clear the buffer content
+	void clear()					{m_pos=0;m_buf[0]=0;m_sbuf[0]=0;m_content->clear();}
+
+	/// \brief Add the next character of the parsed content
+	/// \param [in] ch character to process next
 	void push_back( char ch)
 	{
 		switch (m_state)
@@ -188,11 +249,18 @@ public:
 				break;
 		}
 	};
+
+	/// \brief Number of tokens parsed
 	unsigned int size() const				{return m_pos;}
+
+	/// \brief Get the element with index 'idx' or 0, if it does not exist
+	/// \param [in] idx index of the argument to get
+	/// \return the argument with index idx counted from 0
 	const char* operator[]( unsigned int idx) const		{return (idx<m_pos)?m_content->c_str()+m_buf[idx]:0;}
 
-	//return an array of 0-terminated strings as convenient in C for program arguments
-	//@remark the return value of this function may not be valid anymore after a new call of push_back
+	/// \brief Return a 0-terminated array of 0-terminated strings as convenient in C for program arguments
+	/// \param [in] cmdname optional command name to return as first element of the array as convenient for C argc/argv
+	/// \remark the return value of this function may not be valid anymore after a new call of push_back. So it should only be used after parsing
 	const char** argv( const char* cmdname=0)
 	{
 		if (m_sbuf[0]==0)
@@ -204,6 +272,8 @@ public:
 		}
 		return m_sbuf;
 	}
+
+	/// \brief Synonym of size. Convenient in C for the number of program arguments
 	unsigned int argc() const				{return m_pos;}
 };
 

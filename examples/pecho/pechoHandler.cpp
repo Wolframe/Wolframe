@@ -97,12 +97,12 @@ struct Connection::Private
    Operation WriteLine( const char* str)
    {
       unsigned int ii;
-      buffer.init();
+      buffer.clear();
       for (ii=0; str[ii]; ii++) buffer.push_back( str[ii]);
       buffer.push_back( '\r');
       buffer.push_back( '\n');
       const char* msg = buffer.c_str();
-      buffer.init();
+      buffer.clear();
       return Network::SendData( msg, ii+2);
    }
    //output of one character with return code true/false for success/failure
@@ -246,7 +246,7 @@ struct Connection::Private
 		  else
 		  {
 		     state = Init;
-		     buffer.init();
+		     buffer.clear();
 		     return WriteLine( "BAD command line");
 		  }
 	       }

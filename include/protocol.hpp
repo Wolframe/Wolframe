@@ -29,10 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///
 /// \file protocol.hpp
-/// \brief top-level include file for the protocol implementation
-///
+/// \brief Top-level include file for the protocol implementation
 
 #ifndef _Wolframe_PROTOCOL_HPP_INCLUDED
 #define _Wolframe_PROTOCOL_HPP_INCLUDED
