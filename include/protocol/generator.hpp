@@ -40,7 +40,7 @@ namespace _Wolframe {
 namespace protocol {
 
 /// \class Generator
-/// \brief closure class with iterator function for iterating on network input content elements
+/// \brief generator data with iterator function for iterating on network input content elements
 struct Generator
 {
 	typedef std::size_t size_type;
@@ -78,7 +78,7 @@ struct Generator
 		return m_state;
 	}
 
-	/// \brief feed the closure with network input
+	/// \brief feed the generator with network input
 	void protocolInput( void* data, size_type datasize, bool eoD)
 	{
 		m_gotEoD = eoD;
