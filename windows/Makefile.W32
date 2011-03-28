@@ -1,0 +1,45 @@
+TOPDIR = ..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_CPPFLAGS = \
+	/D_WIN32_WINNT=0x500
+
+INCLUDE_DIRS = \
+	/I. \
+	/I"$(PLATFORM_SDK_DIR)\Include"
+
+# Note: libraries are picked automatically on Windows!
+# TODO: better probing and correct library path based on Arch and
+# platform SDK version
+#SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib\x64"
+SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib"
+INCLUDE_LDFLAGS = \
+	$(SDK_LDFLAGS)
+
+INCLUDE_LIBS = \
+	Ole32.lib
+
+CPP_BINS = \
+	uuidgen.exe
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+WIX_DIR = C:\Programme\Windows Installer XML v3.5
+CANDLE = "$(WIX_DIR)\bin\candle.exe"
+LIGHT = "$(WIX_DIR)\bin\light.exe"
+
+local_all: $(CPP_BINS)
+	$(CANDLE) /nologo wolframe.wxs
+	$(LIGHT) wolframe.wixobj
+
+#uuidgen.exe: uuidgen.obj
+	
+local_clean:
+	@-erase wolframe.wixobj 2>NUL
+
+local_distclean:
+
+local_test:
