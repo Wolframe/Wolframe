@@ -19,3 +19,8 @@ void A::print( const int x ) const
 {
 	return impl->print( x );
 }
+
+void A::print( const char*& s ) const
+{
+	return impl->print( s );
+}

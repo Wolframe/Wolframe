@@ -11,6 +11,7 @@ class A::AImpl {
 		int f( const int x );
 
 		void print( const int x ) const;
+		void print( const char*& s ) const;
 };
 
 #endif

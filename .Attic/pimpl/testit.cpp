@@ -10,7 +10,7 @@ int main( )
 
 	std::cout << a.f( 47 ) << std::endl;
 	a << 47;
-//	a << "bla";
+	a << "bla";
 //	std::cout << ai.f( 42 ) << std::endl;
 
 	return 0;
