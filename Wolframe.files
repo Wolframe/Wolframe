@@ -222,3 +222,4 @@ tests/testHandlerTemplates.hpp
 tests/testNamedRetVal.cpp
 tests/threadLeakTest.cpp
 tests/versionTest.cpp
+.Attic/printers.c
