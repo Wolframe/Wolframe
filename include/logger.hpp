@@ -41,6 +41,7 @@
 
 #include "logger/logLevel.hpp"
 #include "logger/logSyslogFacility.hpp"
+#include "logger/logError.hpp"
 #include "logger/logComponent.hpp"
 #include "logger/logBackend.hpp"
 
@@ -59,24 +60,9 @@ namespace _Wolframe {
 
 		Logger& Get( LogLevel::Level level );
 
-		/// OS error logging marker for Unix errors
-		typedef struct { int _dummy; } LogStrerrorT;
-
-		/// OS error logging marker for Windows errors
-		typedef struct LogWinerrorT { int _dummy; } LogWinerrorT;
-
-		/// output stream marker for logging the strerror of the last
-		/// Windows API call in human readable format
-		static const LogStrerrorT LogStrerror;
-
-		/// output stream marker for logging the Windows error of the last
-		/// Windows API call in human readable format
-		static const LogWinerrorT LogWinerror;
-				
 		template<typename T> friend Logger& operator<<( Logger& logger, T thing );
-		friend Logger& operator<<( Logger& logger, LogComponent thing );
-		friend Logger& operator<<( Logger& logger, Logger::LogStrerrorT t );
-		friend Logger& operator<<( Logger& logger, Logger::LogWinerrorT t );
+		friend Logger& operator<<( Logger& logger, LogComponent c );
+		friend Logger& operator<<( Logger& logger, LogError e );
 		
 	protected:
 		std::ostringstream os_;

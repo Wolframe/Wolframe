@@ -32,30 +32,50 @@
 ************************************************************************/
 
 ///
-/// \file logger.cpp
-/// \brief implementation of top-level logger functionality
+/// \file logError.hpp
+/// \brief Error markers for logger output stream
 ///
 
-#include "logger.hpp"
+#ifndef _LOG_ERROR_HPP_INCLUDED
+#define _LOG_ERROR_HPP_INCLUDED
 
 namespace _Wolframe {
 	namespace Logging {
 
-Logger::Logger( LogBackend& backend ) :	logBk_( backend )
-{
-}
+	class LogError {
+	public:
+		/// Internal enum representing possible error conversion
+		/// methods
+		enum Error {
+			LOGERROR_UNDEF,		///< undefined
+			LOGERROR_STRERROR,	///< Posix strerror_r
+			LOGERROR_WINERROR	///< Windows GetLastError/FormatMessage
+		};
 
-Logger::~Logger( )
-{
-	logBk_.log( component_, msgLevel_, os_.str( ) );
-}
+	private:
+		enum Error _error;
 
-Logger& Logger::Get( LogLevel::Level level )
-{
-	component_ = LogComponent::LogNone;
-	msgLevel_ = level;
-	return *this;
-}
+	public:
+		bool operator==( const LogError& e ) const {
+			return _error == e._error;
+		}
 
+		enum Error error( ) const {
+			return _error;
+		}
+
+		LogError( const enum Error& e = LOGERROR_UNDEF ) : _error( e ) { }
+
+		/// output stream marker for logging the strerror of the last
+		/// POSIX system call in human readable format
+		static const LogError LogStrerror;
+
+		/// output stream marker for logging the Windows error of the last
+		/// Windows API call in human readable format
+		static const LogError LogWinerror;
+	};
+	
 	} // namespace Logging
 } // namespace _Wolframe
+
+#endif // _LOG_ERROR_HPP_INCLUDED

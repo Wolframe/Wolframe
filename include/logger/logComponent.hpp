@@ -64,7 +64,9 @@ namespace _Wolframe {
 			return _component == o._component;
 		}
 		
-		enum Component component( ) const { return _component; }
+		enum Component component( ) const {
+			return _component;
+		}
 		
 		LogComponent( const enum Component& c = LOGCOMPONENT_NONE ) : _component( c ) { }
 		

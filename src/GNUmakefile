@@ -55,6 +55,7 @@ LOGGER_OBJS = \
 	logger/logLevel.o \
 	logger/logSyslogFacility.o \
 	logger/logComponent.o \
+	logger/logError.o \
 	logger/logBackendConsole.o \
 	logger/logBackendFile.o \
 	logger/logBackendSyslog.o \

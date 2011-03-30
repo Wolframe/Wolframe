@@ -87,7 +87,7 @@ TEST_F( LoggingFixture, LogSystemErrorMarkersUnix )
 {
 	int fd = open( "bla", O_RDONLY, 0 );
 	if( fd == -1 ) {
-		LOG_ERROR << "open failed, reason: " << Logger::LogStrerror;
+		LOG_ERROR << "open failed, reason: " << LogError::LogStrerror;
 	}
 }
 #endif
@@ -98,7 +98,7 @@ TEST_F( LoggingFixture, LogSystemErrorMarkersWin )
 	OFSTRUCT s;
 	HFILE h = OpenFile( "bla", &s, OF_READ );
 	if( h == HFILE_ERROR ) {
-		LOG_ERROR << "OpenFile failed, reason: " << Logger::LogWinerror;
+		LOG_ERROR << "OpenFile failed, reason: " << LogError::LogWinerror;
 	}
 }
 #endif
