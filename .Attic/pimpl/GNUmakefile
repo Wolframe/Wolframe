@@ -2,7 +2,7 @@ TOPDIR = ../..
 
 SUBDIRS =
 
-OBJS = AImpl.o A.o
+OBJS = A.o AImpl.o BImpl.o
 
 CPP_BINS = testit
 
