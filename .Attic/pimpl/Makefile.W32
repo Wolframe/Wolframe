@@ -1,0 +1,19 @@
+TOPDIR = ..\..
+
+SUBDIRS =
+
+OBJS = A.obj AImpl.obj BImpl.obj
+
+CPP_BINS = testit.exe
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+testit.exe: testit.obj
+
+local_all: $(OBJS) $(CPP_BINS)
+
+local_clean:
+
+local_distclean:
+
+local_test:
