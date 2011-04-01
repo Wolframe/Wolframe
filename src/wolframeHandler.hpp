@@ -40,11 +40,20 @@
 #include "connectionHandler.hpp"
 
 namespace _Wolframe {
+	/// The global server container
+	class wolframeHandler
+	{
+	public:
+		wolframeHandler( const HandlerConfiguration* config );
+		~wolframeHandler();
+	};
+
+
 	/// The connection handler
 	class wolframeConnection : public Network::connectionHandler
 	{
 	public:
-		wolframeConnection( const Network::LocalEndpoint& local );
+		wolframeConnection( const wolframeHandler& context, const Network::LocalEndpoint& local );
 		~wolframeConnection();
 
 		void setPeer( const Network::RemoteEndpoint& remote );
@@ -88,7 +97,11 @@ namespace _Wolframe {
 	class ServerHandler::ServerHandlerImpl
 	{
 	public:
+		ServerHandlerImpl( const HandlerConfiguration *config );
+		~ServerHandlerImpl();
 		Network::connectionHandler* newConnection( const Network::LocalEndpoint& local );
+	private:
+		wolframeHandler	globalContext_;
 	};
 
 } // namespace _Wolframe

@@ -48,7 +48,8 @@
 
 namespace _Wolframe	{
 
-	wolframeConnection::wolframeConnection( const Network::LocalEndpoint& local )
+	wolframeConnection::wolframeConnection( const wolframeHandler& /* context */,
+						const Network::LocalEndpoint& local )
 	{
 		_Wolframe::Network::ConnectionEndpoint::ConnectionType type = local.type();
 
@@ -235,14 +236,32 @@ namespace _Wolframe	{
 	}
 
 
+	/// The server handler global context
+	wolframeHandler::wolframeHandler( const HandlerConfiguration* /* config */ )
+	{
+		LOG_TRACE << "Global context created";
+	}
+
+	wolframeHandler::~wolframeHandler()
+	{
+		LOG_TRACE << "Global context destroyed";
+	}
+
+
 	/// ServerHandler PIMPL
 	Network::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const Network::LocalEndpoint& local )
 	{
-		return new wolframeConnection( local );
+		return new wolframeConnection( globalContext_, local );
 	}
 
+	ServerHandler::ServerHandlerImpl::ServerHandlerImpl( const HandlerConfiguration* config )
+		: globalContext_( config )	{}
+
+	ServerHandler::ServerHandlerImpl::~ServerHandlerImpl()	{}
+
 	/// Outside face of the PIMPL
-	ServerHandler::ServerHandler( const HandlerConfiguration* ) : impl_( new ServerHandlerImpl )	{}
+	ServerHandler::ServerHandler( const HandlerConfiguration* config )
+		: impl_( new ServerHandlerImpl( config ) )	{}
 
 	ServerHandler::~ServerHandler()	{ delete impl_; }
 
