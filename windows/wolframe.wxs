@@ -1,17 +1,25 @@
 <?xml version='1.0'?>
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
-   <Product Id='{09E1E9CC-6AE6-4207-B7FE-F47CFDB2861F}' Name='Wolframe' Language='1033' 
-            Version='1.0.0.0' Manufacturer='Wolframe Team' UpgradeCode='{64361569-C468-42DE-95A1-901DDDE84D13}' >
-      <Package Description='Wolframe Windows Installer Package'
-               Comments='The Wolframe framework'
-               Manufacturer='Wolframe Team' InstallerVersion='200' Compressed='yes' />
+	<Product Id='{09E1E9CC-6AE6-4207-B7FE-F47CFDB2861F}' Name='Wolframe' Language='1033' 
+	         Version='1.0.0.0' Manufacturer='Wolframe Team' UpgradeCode='{64361569-C468-42DE-95A1-901DDDE84D13}' >
+		<Package Description='Wolframe Windows Installer Package'
+		         Comments='The Wolframe framework'
+	             Manufacturer='Wolframe Team' InstallerVersion='200' Compressed='yes' />
 
-      <Directory Id='TARGETDIR' Name='SourceDir'>
-         <Component Id='MyComponent' Guid='{6999FF89-95FC-4E6B-867B-7AC19839284E}' />
-      </Directory>
+		<Media Id='1' Cabinet='wolframe.cab' EmbedCab='yes' />
+		
+		<Directory Id='TARGETDIR' Name='SourceDir'>
+			<Directory Id='ProgramFilesFolder' Name='PFiles'>
+				<Directory Id='MyDir' Name='Wolframe'>
+					<Component Id='MyComponent' Guid='{6999FF89-95FC-4E6B-867B-7AC19839284E}'>
+						<File Id='readme' Name='readme.txt' DiskId='1' Source='readme.txt' />
+					</Component>
+				</Directory>
+			</Directory>
+		</Directory>
 
-      <Feature Id='MyFeature' Title='My 1st Feature' Level='1'>
-         <ComponentRef Id='MyComponent' />
-      </Feature>
-   </Product>
+		<Feature Id='MyFeature' Title='My 1st Feature' Level='1'>
+			<ComponentRef Id='MyComponent' />
+		</Feature>
+	</Product>
 </Wix>
