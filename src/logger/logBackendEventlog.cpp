@@ -169,7 +169,7 @@ void EventlogBackend::log( const LogComponent component, const LogLevel::Level l
 		if( !res ) {
 			LOG_CRITICAL	<< _Wolframe::Logging::LogComponent::LogLogging
 					<< "Can't report event to event log: "
-					<< Logger::LogWinerror;
+					<< LogError::LogWinerror;
 		}
 	}
 }
@@ -196,13 +196,13 @@ void EventlogBackend::calculateSid( )
 	if( process == NULL ) {
 		LOG_CRITICAL	<< _Wolframe::Logging::LogComponent::LogLogging
 				<< "Unable to get current process handle (GetCurrentProcess): "
-				<< Logger::LogWinerror;
+				<< LogError::LogWinerror;
 		return;
 	}
 	if( !OpenProcessToken( process, TOKEN_QUERY, &tokenProcess ) ) {
 		LOG_CRITICAL	<< _Wolframe::Logging::LogComponent::LogLogging
 				<< "Unable to get process token of current process (OpenProcessToken): "
-				<< Logger::LogWinerror;
+				<< LogError::LogWinerror;
 		return;
 	}
 
@@ -221,7 +221,7 @@ void EventlogBackend::calculateSid( )
 	if( !GetTokenInformation( tokenProcess, TokenUser, (LPVOID)tokenUser, tokenUserSize, &tokenUserSize ) ) {
 		LOG_CRITICAL	<< _Wolframe::Logging::LogComponent::LogLogging
 				<< "Unable to get user token (GetTokenInformation): "
-				<< Logger::LogWinerror;
+				<< LogError::LogWinerror;
 		free( tokenUser );
 		CloseHandle( tokenProcess );
 		return;
@@ -235,7 +235,7 @@ void EventlogBackend::calculateSid( )
 		if( !CopySid( sidSize, sid_, tokenSid ) ) {
 			LOG_CRITICAL	<< _Wolframe::Logging::LogComponent::LogLogging
 					<< "Unable to make a copy of the current SID (CopySid): "
-					<< Logger::LogWinerror;
+					<< LogError::LogWinerror;
 			free( tokenSid );
 			free( tokenUser );
 			CloseHandle( tokenProcess );

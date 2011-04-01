@@ -50,11 +50,11 @@ BOOST_MT = -mt
 #BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib"
 
 # self-compiled
-BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\stage\lib"
-BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib\Win32"
+#BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\stage\lib"
+#BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib\Win32"
 
 # precompiled libraries from http://boost.teeks99.com
-#BOOST_LDFLAGS = /LIBPATH:$(BOOST_DIR)\lib32
+BOOST_LDFLAGS = /LIBPATH:$(BOOST_DIR)\lib32
 #BOOST_LDFLAGS = /LIBPATH:$(BOOST_DIR)\lib64
 
 # OpenSSL (http://www.slproweb.com/products/Win32OpenSSL.html)
