@@ -149,7 +149,7 @@ extern void syslog (int __pri, char *__fmt, ...);
 
 /* Wolframe specific function, set the hostname and port for logging through
  * the configuration programatically */
-extern void set_syslogd_data(const char *hostname, unsigned short port);
+extern void set_syslogd_data(const char *__hostname, unsigned short __port);
 
 #ifdef __cplusplus
 }

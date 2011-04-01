@@ -32,20 +32,38 @@
 ************************************************************************/
 
 ///
-/// \file syslog_win32.h
+/// \file syslog_win32.c
 /// \brief implementation of a syslog client on Windows
 ///
 
 #include "logger/syslog_win32.h"
 
+#define WIN_MEAN_AND_LEAN
+#include "windows.h"
+
+static BOOL initialized = FALSE;
+
 void openlog( const char* ident, int option, int facility )
 {
+	WSADATA wsd;
+	if( WSAStartup( MAKEWORD( 2, 2 ), &wsd ) != 0 ) return;
+
+	initialized = TRUE;
 }
 
 void syslog( int pri, char* fmt, ... )
 {
+	if( !initialized ) return;
 }
 
 void closelog( )
+{
+	if( !initialized ) return;
+	
+    WSACleanup( );
+	initialized = FALSE;	
+}
+
+void set_syslogd_data( const char *hostname, unsigned short port )
 {
 }
