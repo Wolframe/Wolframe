@@ -38,20 +38,40 @@
 
 #include "logger/syslog_win32.h"
 
-#define WIN_MEAN_AND_LEAN
-#include "windows.h"
+#include <Winsock2.h>
 
 static BOOL initialized = FALSE;
+static int log_mask = 0xFF;
 
 void openlog( const char* ident, int option, int facility )
 {
 	WSADATA wsd;
+	
+	if( initialized ) return ;
+	
 	if( WSAStartup( MAKEWORD( 2, 2 ), &wsd ) != 0 ) return;
 
 	initialized = TRUE;
 }
 
 void syslog( int pri, char* fmt, ... )
+{
+	va_list ap;
+	va_start( ap, fmt );
+	vsyslog( pri, fmt, ap );
+	va_end( ap );
+}
+
+extern int setlogmask( int mask )
+{
+	int old_mask = log_mask;
+	
+	if( mask ) log_mask = mask;	
+	
+	return old_mask;
+}
+	
+void vsyslog( int pri, char* fmt, va_list ap )
 {
 	if( !initialized ) return;
 }

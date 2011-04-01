@@ -74,6 +74,8 @@
 extern "C" {
 #endif
 
+#include <stdarg.h>
+
 /*
  * priorities/facilities are encoded into a single 32-bit quantity, where the
  * bottom 3 bits are the priority (0-7) and the top 28 bits are the facility
@@ -146,6 +148,16 @@ extern void openlog (const char *__ident, int __option, int __facility);
 
 /* Generate a log message using FMT string and option arguments.  */
 extern void syslog (int __pri, char *__fmt, ...);
+
+/* Set the log mask level. */
+extern int setlogmask( int __mask );
+
+/******************************************************************************
+ * vsyslog
+ *
+ * Generate a log message using FMT and using arguments pointed to by AP.
+ */
+void vsyslog( int __pri, char* __fmt, va_list __ap );
 
 /* Wolframe specific function, set the hostname and port for logging through
  * the configuration programatically */
