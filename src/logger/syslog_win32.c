@@ -32,58 +32,20 @@
 ************************************************************************/
 
 ///
-/// \file logBackend.hpp
-/// \brief Interface for the logging backend
+/// \file syslog_win32.h
+/// \brief implementation of a syslog client on Windows
 ///
 
-#ifndef _LOG_BACKEND_HPP_INCLUDED
-#define _LOG_BACKEND_HPP_INCLUDED
+#include "logger/syslog_win32.h"
 
-#include "singleton.hpp"
-#include "logger/logLevel.hpp"
-#include "logger/logSyslogFacility.hpp"
-#include "logger/logComponent.hpp"
+void openlog( const char* ident, int option, int facility )
+{
+}
 
-#include <string>
+void syslog( int pri, char* fmt, ... )
+{
+}
 
-namespace _Wolframe {
-	namespace Logging {
-
-	class LogBackend : public Singleton< LogBackend >
-	{
-	public:
-		LogBackend( );
-
-		~LogBackend( );
-
-		void setConsoleLevel( const LogLevel::Level level );
-		
-		void setLogfileLevel( const LogLevel::Level level );
-
-		void setLogfileName( const std::string filename );
-
-		void setSyslogLevel( const LogLevel::Level level );
-
-		void setSyslogFacility( const SyslogFacility::Facility facility );
-
-		void setSyslogIdent( const std::string ident );
-
-#if defined( _WIN32 )
-		void setEventlogLevel( const LogLevel::Level level );
-
-		void setEventlogLog( const std::string log );
-
-		void setEventlogSource( const std::string source );
-#endif // defined( _WIN32 )
-
-		void log( const LogComponent component, const LogLevel::Level level, const std::string& msg );
-
-	private:
-		class LogBackendImpl;
-		LogBackendImpl	*impl_;
-	};
-
-	} // namespace Logging
-} // namespace _Wolframe
-
-#endif // _LOG_BACKEND_HPP_INCLUDED
+void closelog( )
+{
+}

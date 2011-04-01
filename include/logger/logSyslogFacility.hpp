@@ -68,5 +68,4 @@ namespace _Wolframe {
 	} // namespace Logging
 } // namespace _Wolframe
 
-
 #endif // _LOG_SYSLOG_FACILITY_HPP_INCLUDED

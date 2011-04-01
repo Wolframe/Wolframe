@@ -86,5 +86,4 @@ namespace _Wolframe {
 	} // namespace Logging
 } // namespace _Wolframe
 
-
 #endif // _LOG_LEVEL_HPP_INCLUDED

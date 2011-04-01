@@ -66,7 +66,6 @@ void LogBackend::LogBackendImpl::setLogfileName( const std::string filename )
 	logfileLogger_.setFilename( filename );
 }
 
-#if !defined( _WIN32 )
 void LogBackend::LogBackendImpl::setSyslogLevel( const LogLevel::Level level )
 {
 	syslogLogger_.setLevel( level );
@@ -81,7 +80,6 @@ void LogBackend::LogBackendImpl::setSyslogIdent( const std::string ident )
 {
 	syslogLogger_.setIdent( ident );
 }
-#endif // !defined( _WIN32 )
 
 #if defined( _WIN32 )
 void LogBackend::LogBackendImpl::setEventlogLevel( const LogLevel::Level level )
@@ -104,9 +102,7 @@ inline void LogBackend::LogBackendImpl::log( const LogComponent component, const
 {
 	consoleLogger_.log( component, level, msg );
 	logfileLogger_.log( component, level, msg );
-#if !defined( _WIN32 )
 	syslogLogger_.log( component, level, msg );
-#endif // !defined( _WIN32 )
 #if defined( _WIN32 )
 	eventlogLogger_.log( component, level, msg );
 #endif // defined( _WIN32 )
@@ -123,21 +119,19 @@ void LogBackend::setLogfileLevel( const LogLevel::Level level )	{ impl_->setLogf
 
 void LogBackend::setLogfileName( const std::string filename )	{ impl_->setLogfileName( filename );}
 
-#ifndef _WIN32
 void LogBackend::setSyslogLevel( const LogLevel::Level level )	{ impl_->setSyslogLevel( level );}
 
 void LogBackend::setSyslogFacility( const SyslogFacility::Facility facility )	{ impl_->setSyslogFacility( facility );}
 
 void LogBackend::setSyslogIdent( const std::string ident )	{ impl_->setSyslogIdent( ident );}
-#endif // _WIN32
 
-#ifdef _WIN32
+#if defined( _WIN32 )
 void LogBackend::setEventlogLevel( const LogLevel::Level level )	{ impl_->setEventlogLevel( level );}
 
 void LogBackend::setEventlogLog( const std::string log )	{ impl_->setEventlogLog( log ); }
 
 void LogBackend::setEventlogSource( const std::string source )	{ impl_->setEventlogSource( source ); }
-#endif // _WIN32
+#endif // defined( _WIN32 )
 
 void LogBackend::log( const LogComponent component, const LogLevel::Level level, const std::string& msg )	{ impl_->log( component, level, msg ); }
 

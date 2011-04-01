@@ -70,8 +70,11 @@
 #include <cstring> 
 
 #include <errno.h>
+#if !defined( _WIN32 )
 #include <syslog.h>
-#include <sys/time.h>
+#else
+#include "logger/syslog_win32.h"
+#endif
 
 namespace _Wolframe {
 	namespace Logging {

@@ -1,3 +1,36 @@
+/************************************************************************
+
+ Copyright (C) 2011 Project Wolframe.
+ All rights reserved.
+
+ This file is part of Project Wolframe.
+
+ Commercial Usage
+    Licensees holding valid Project Wolframe Commercial licenses may
+    use this file in accordance with the Project Wolframe
+    Commercial License Agreement provided with the Software or,
+    alternatively, in accordance with the terms contained
+    in a written agreement between the licensee and Project Wolframe.
+
+ GNU General Public License Usage
+    Alternatively, you can redistribute this file and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Wolframe is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Wolframe.  If not, see <http://www.gnu.org/licenses/>.
+
+ If you have questions regarding the use of this file, please contact
+ Project Wolframe.
+
+************************************************************************/
+
 /*
  * Copyright (c) 1982, 1986, 1988, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -29,15 +62,17 @@
  *	@(#)syslog.h	8.1 (Berkeley) 6/2/93
  */
 
-#ifndef _SYS_SYSLOG_H
-#define _SYS_SYSLOG_H 1
+///
+/// \file syslog_win32.h
+/// \brief syslog header file on Windows
+///
 
-#include <features.h>
-#define __need___va_list
-#include <stdarg.h>
+#ifndef _SYSLOG_WIN32_HPP_INCLUDED
+#define _SYSLOG_WIN32_HPP_INCLUDED
 
-/* This file defines _PATH_LOG.  */
-#include <bits/syslog-path.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*
  * priorities/facilities are encoded into a single 32-bit quantity, where the
@@ -61,33 +96,6 @@
 				/* extract priority */
 #define	LOG_PRI(p)	((p) & LOG_PRIMASK)
 #define	LOG_MAKEPRI(fac, pri)	(((fac) << 3) | (pri))
-
-#ifdef SYSLOG_NAMES
-#define	INTERNAL_NOPRI	0x10	/* the "no priority" priority */
-				/* mark "facility" */
-#define	INTERNAL_MARK	LOG_MAKEPRI(LOG_NFACILITIES, 0)
-typedef struct _code {
-	char	*c_name;
-	int	c_val;
-} CODE;
-
-CODE prioritynames[] =
-  {
-    { "alert", LOG_ALERT },
-    { "crit", LOG_CRIT },
-    { "debug", LOG_DEBUG },
-    { "emerg", LOG_EMERG },
-    { "err", LOG_ERR },
-    { "error", LOG_ERR },		/* DEPRECATED */
-    { "info", LOG_INFO },
-    { "none", INTERNAL_NOPRI },		/* INTERNAL */
-    { "notice", LOG_NOTICE },
-    { "panic", LOG_EMERG },		/* DEPRECATED */
-    { "warn", LOG_WARNING },		/* DEPRECATED */
-    { "warning", LOG_WARNING },
-    { NULL, -1 }
-  };
-#endif
 
 /* facility codes */
 #define	LOG_KERN	(0<<3)	/* kernel messages */
@@ -118,55 +126,11 @@ CODE prioritynames[] =
 				/* facility of pri */
 #define	LOG_FAC(p)	(((p) & LOG_FACMASK) >> 3)
 
-#ifdef SYSLOG_NAMES
-CODE facilitynames[] =
-  {
-    { "auth", LOG_AUTH },
-    { "authpriv", LOG_AUTHPRIV },
-    { "cron", LOG_CRON },
-    { "daemon", LOG_DAEMON },
-    { "ftp", LOG_FTP },
-    { "kern", LOG_KERN },
-    { "lpr", LOG_LPR },
-    { "mail", LOG_MAIL },
-    { "mark", INTERNAL_MARK },		/* INTERNAL */
-    { "news", LOG_NEWS },
-    { "security", LOG_AUTH },		/* DEPRECATED */
-    { "syslog", LOG_SYSLOG },
-    { "user", LOG_USER },
-    { "uucp", LOG_UUCP },
-    { "local0", LOG_LOCAL0 },
-    { "local1", LOG_LOCAL1 },
-    { "local2", LOG_LOCAL2 },
-    { "local3", LOG_LOCAL3 },
-    { "local4", LOG_LOCAL4 },
-    { "local5", LOG_LOCAL5 },
-    { "local6", LOG_LOCAL6 },
-    { "local7", LOG_LOCAL7 },
-    { NULL, -1 }
-  };
-#endif
-
-/*
- * arguments to setlogmask.
- */
-#define	LOG_MASK(pri)	(1 << (pri))		/* mask for one priority */
-#define	LOG_UPTO(pri)	((1 << ((pri)+1)) - 1)	/* all priorities through pri */
-
 /*
  * Option flags for openlog.
- *
- * LOG_ODELAY no longer does anything.
- * LOG_NDELAY is the inverse of what it used to be.
  */
 #define	LOG_PID		0x01	/* log the pid with each message */
 #define	LOG_CONS	0x02	/* log on the console if errors in sending */
-#define	LOG_ODELAY	0x04	/* delay open until first syslog() (default) */
-#define	LOG_NDELAY	0x08	/* don't delay open */
-#define	LOG_NOWAIT	0x10	/* don't wait for console forks: DEPRECATED */
-#define	LOG_PERROR	0x20	/* log to stderr as well */
-
-__BEGIN_DECLS
 
 /* Close descriptor used to write to system logger.
 
@@ -178,38 +142,17 @@ extern void closelog (void);
 
    This function is a possible cancellation point and therefore not
    marked with __THROW.  */
-extern void openlog (__const char *__ident, int __option, int __facility);
+extern void openlog (const char *__ident, int __option, int __facility);
 
-/* Set the log mask level.  */
-extern int setlogmask (int __mask) __THROW;
+/* Generate a log message using FMT string and option arguments.  */
+extern void syslog (int __pri, char *__fmt, ...);
 
-/* Generate a log message using FMT string and option arguments.
+/* Wolframe specific function, set the hostname and port for logging through
+ * the configuration programatically */
+extern void set_syslogd_data(const char *hostname, unsigned short port);
 
-   This function is a possible cancellation point and therefore not
-   marked with __THROW.  */
-extern void syslog (int __pri, __const char *__fmt, ...)
-     __attribute__ ((__format__ (__printf__, 2, 3)));
-
-#ifdef __USE_BSD
-/* Generate a log message using FMT and using arguments pointed to by AP.
-
-   This function is not part of POSIX and therefore no official
-   cancellation point.  But due to similarity with an POSIX interface
-   or due to the implementation it is a cancellation point and
-   therefore not marked with __THROW.  */
-extern void vsyslog (int __pri, __const char *__fmt, __gnuc_va_list __ap)
-     __attribute__ ((__format__ (__printf__, 2, 0)));
+#ifdef __cplusplus
+}
 #endif
 
-
-/* Define some macros helping to catch buffer overflows.  */
-#if __USE_FORTIFY_LEVEL > 0 && defined __extern_always_inline
-# include <bits/syslog.h>
-#endif
-#ifdef __LDBL_COMPAT
-# include <bits/syslog-ldbl.h>
-#endif
-
-__END_DECLS
-
-#endif /* sys/syslog.h */
+#endif // _SYSLOG_WIN32_HPP_INCLUDED

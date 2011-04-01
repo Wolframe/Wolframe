@@ -42,9 +42,7 @@
 #include "logger/logBackend.hpp"
 #include "logger/logBackendConsole.hpp"
 #include "logger/logBackendFile.hpp"
-#if !defined( _WIN32 )
 #include "logger/logBackendSyslog.hpp"
-#endif // !defined( _WIN32 )
 #if defined( _WIN32 )
 #include "logger/logBackendEventlog.hpp"
 #endif // defined( _WIN32 )
@@ -65,30 +63,26 @@ namespace _Wolframe {
 		
 		void setLogfileName( const std::string filename );
 
-#ifndef _WIN32
 		void setSyslogLevel( const LogLevel::Level level );
 
 		void setSyslogFacility( const SyslogFacility::Facility facility );
 
 		void setSyslogIdent( const std::string ident );
-#endif // _WIN32
 
-#ifdef _WIN32
+#if defined( _WIN32 )
 		void setEventlogLevel( const LogLevel::Level level );
 
 		void setEventlogLog( const std::string log );
 
 		void setEventlogSource( const std::string source );
-#endif // _WIN32
+#endif // defined( _WIN32 )
 
 		void log( const LogComponent component, const LogLevel::Level level, const std::string& msg );
 
 	private:
 		ConsoleLogBackend consoleLogger_;
 		LogfileBackend logfileLogger_;
-#ifndef _WIN32
 		SyslogBackend syslogLogger_;
-#endif // _WIN32
 #ifdef _WIN32
 		EventlogBackend eventlogLogger_;
 #endif // _WIN32

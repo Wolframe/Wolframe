@@ -52,6 +52,8 @@ LOGGER_OBJS = \
 	logger\logError.obj \
 	logger\logBackendConsole.obj \
 	logger\logBackendFile.obj \
+	logger\logBackendSyslog.obj \
+	logger\syslog_win32.obj \
 	logger\logBackendEventlog.obj \
 	logger\logBackendImpl.obj \
 	logger\logger.obj \
