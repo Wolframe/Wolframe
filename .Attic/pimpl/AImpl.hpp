@@ -10,8 +10,8 @@ class A::AImpl {
 
 		int f( const int x );
 
-		virtual void print( const int x ) const;
-		virtual void print( const char*& s ) const;
+		void print( const int x ) const;
+		void print( const char*& s ) const;
 };
 
 #endif

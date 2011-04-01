@@ -1,8 +1,7 @@
 #include "A.hpp"
 #include "AImpl.hpp"
-#include "BImpl.hpp"
 
-A::A( ) : impl( new BImpl<A::AImpl> )
+A::A( ) : impl( new A::AImpl )
 {
 }
 

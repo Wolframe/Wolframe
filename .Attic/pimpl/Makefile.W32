@@ -2,7 +2,7 @@ TOPDIR = ..\..
 
 SUBDIRS =
 
-OBJS = A.obj AImpl.obj BImpl.obj
+OBJS = A.obj AImpl.obj
 
 CPP_BINS = testit.exe
 
