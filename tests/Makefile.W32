@@ -28,7 +28,7 @@ INCLUDE_LDFLAGS = \
 # Gtest
 
 INCLUDE_LIBS = \
-	Advapi32.lib
+	Advapi32.lib Ws2_32.lib
 
 !IFDEF WITH_GTEST
 
