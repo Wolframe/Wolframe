@@ -99,5 +99,5 @@ LUA_LIBS = lua51.lib
 # Tcl 8.5 and Expect
 ####################
 
-TCL_DIR = C:\Tcl
+TCL_DIR = C:\Tcl8.5
 EXPECT = $(TCL_DIR)\bin\tclsh.exe
