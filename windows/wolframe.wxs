@@ -11,11 +11,14 @@
 		<Media Id='1' Cabinet='wolframe.cab' EmbedCab='yes' />
 		
 		<Directory Id='TARGETDIR' Name='SourceDir'>
+			<!-- TODO: 32-bit/64-bit switch -->
 			<Directory Id='ProgramFilesFolder' Name='PFiles'>
-				<Directory Id='MyDir' Name='Wolframe'>
-					<Component Id='MyComponent' Guid='{6999FF89-95FC-4E6B-867B-7AC19839284E}'>
-						<File Id='license' Name='license.txt' DiskId='1' Source='license.txt' />
-					</Component>
+				<Directory Id='WolframeGroup' Name='Wolframe Group'>
+					<Directory Id='MainDir' Name='Wolframe'>
+						<Component Id='MyComponent' Guid='{6999FF89-95FC-4E6B-867B-7AC19839284E}'>
+							<File Id='license' Name='license.txt' DiskId='1' Source='license.txt' />
+						</Component>
+					</Directory>
 				</Directory>
 			</Directory>
 		</Directory>
