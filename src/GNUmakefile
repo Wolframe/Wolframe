@@ -62,13 +62,13 @@ LOGGER_OBJS = \
 	logger/logBackendImpl.o \
 	logger/logger.o
 
-AAA_OBJS = \
-	AAA/authentication.o \
-	AAA/authentication_textfile.o
+AAAA_OBJS = \
+	AAAA/authentication.o \
+	AAAA/authentication_textfile.o
 
 ifdef WITH_PAM
-AAA_OBJS += \
-	AAA/authentication_pam.o
+AAAA_OBJS += \
+	AAAA/authentication_pam.o
 endif
 
 LOCAL_STATIC_LIB_OBJS = \
@@ -89,7 +89,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	connection.o \
 	serverConfig.o \
 	server.o \
-	$(AAA_OBJS)
+	$(AAAA_OBJS)
 
 #SSL
 ifdef WITH_SSL

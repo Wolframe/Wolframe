@@ -38,16 +38,11 @@
 
 #include "logger/logLevel.hpp"
 
-#include <string>
-#include <boost/algorithm/string.hpp>
-
 namespace _Wolframe {
 	namespace Logging {
 
-	LogLevel::Level LogLevel::str2LogLevel( const std::string str )
+	LogLevel::Level LogLevel::strToLogLevel( const std::string s )
 	{
-		std::string s = boost::algorithm::to_upper_copy( str );
-		boost::algorithm::trim( s );
 		if( s == "DATA" )		return LogLevel::LOGLEVEL_DATA;
 		else if( s == "TRACE" )		return LogLevel::LOGLEVEL_TRACE;
 		else if( s == "DEBUG" )		return LogLevel::LOGLEVEL_DEBUG;

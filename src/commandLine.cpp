@@ -142,7 +142,7 @@ namespace _Wolframe {
 					std::string s = str;
 					boost::trim( s );
 					boost::to_upper( s );
-					debugLevel = Logging::LogLevel::str2LogLevel( s );
+					debugLevel = Logging::LogLevel::strToLogLevel( s );
 					if ( debugLevel == Logging::LogLevel::LOGLEVEL_UNDEFINED )	{
 						errMsg_ = "invalid debug level \"";
 						errMsg_ += str;
