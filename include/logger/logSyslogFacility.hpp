@@ -7,7 +7,8 @@
 #ifndef _LOG_SYSLOG_FACILITY_HPP_INCLUDED
 #define _LOG_SYSLOG_FACILITY_HPP_INCLUDED
 
-#include <iostream>
+#include <string>
+#include <iosfwd>
 
 namespace _Wolframe {
 	namespace Logging {
@@ -43,7 +44,7 @@ namespace _Wolframe {
 		};
 
 		/// convert string to a syslog facility
-		static Facility str2SyslogFacility( const std::string str );
+		static Facility strToSyslogFacility( const std::string str );
 	};
 
 	/// map enum values to strings

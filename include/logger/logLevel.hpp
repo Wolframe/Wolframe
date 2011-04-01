@@ -39,7 +39,8 @@
 #ifndef _LOG_LEVEL_HPP_INCLUDED
 #define _LOG_LEVEL_HPP_INCLUDED
 
-#include <iostream>
+#include <string>
+#include <iosfwd>
 
 namespace _Wolframe {
 	namespace Logging {
@@ -62,7 +63,7 @@ namespace _Wolframe {
 		};
 
 		/// convert string to a loglevel
-		static Level str2LogLevel( const std::string str );
+		static Level strToLogLevel( const std::string str );
 	};
 
 

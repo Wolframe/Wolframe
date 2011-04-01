@@ -56,9 +56,9 @@ LOGGER_OBJS = \
 	logger\logBackendImpl.obj \
 	logger\logger.obj \
 
-AAA_OBJS = \
-	AAA\authentication.obj \
-	AAA\authentication_textfile.obj
+AAAA_OBJS = \
+	AAAA\authentication.obj \
+	AAAA\authentication_textfile.obj
 
 LOCAL_STATIC_LIB_OBJS = \
 	version.obj \
@@ -78,7 +78,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	connection.obj \
 	serverConfig.obj \
 	server.obj \
-	$(AAA_OBJS)
+	$(AAAA_OBJS)
 
 #SSL
 

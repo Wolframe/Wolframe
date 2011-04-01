@@ -18,7 +18,7 @@ ifeq "$(COMPILER)" "gcc"
 GCC_MAJOR_VERSION ?=	$(shell $(TOPDIR)/makefiles/gmake/guess_env --gcc-major-version $(CC) "$(CURDIR)" $(TOPDIR))
 GCC_MINOR_VERSION ?=	$(shell $(TOPDIR)/makefiles/gmake/guess_env --gcc-minor-version $(CC) "$(CURDIR)" $(TOPDIR))
 
-# -Werror: troubles boost too much, too many warnings
+# -Werror: troubles Qt in qvector2d.h
 # -Wswitch-default: not good for switches with enums
 # -Wsystem-headers: bad idea, as header files are usually happily broken :-)
 # -Wtraditional: we don't want to program tradition K&R C anymore!

@@ -78,7 +78,7 @@ namespace _Wolframe {
 		}
 
 		_Wolframe::Logging::Logger( _Wolframe::Logging::LogBackend::instance() ).Get(
-			_Wolframe::Logging::LogLevel::str2LogLevel( logLevel ) )
+			_Wolframe::Logging::LogLevel::strToLogLevel( logLevel ) )
 			<< _Wolframe::Logging::LogComponent::LogLua
 			<< os.str( );
 

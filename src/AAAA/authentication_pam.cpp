@@ -2,7 +2,7 @@
 // authentication_pam.cpp
 //
 
-#include "AAA/authentication_pam.hpp"
+#include "AAAA/authentication_pam.hpp"
 
 #ifdef WITH_PAM
 

@@ -5,7 +5,7 @@
 #ifndef _Wolframe_AUTHENTICATION_PAM_HPP_INCLUDED
 #define _Wolframe_AUTHENTICATION_PAM_HPP_INCLUDED
 
-#include "AAA/authentication.hpp"
+#include "AAAA/authentication.hpp"
 
 #ifdef WITH_PAM
 
@@ -24,8 +24,6 @@ typedef struct {
 	std::string errmsg;
 	pam_handle_t *h;
 } pam_appdata;
-
-Authenticator *CreatePAMAuthenticator( AuthenticatorFactory::properties props );
 
 class PAMAuthenticator : public Authenticator {
 	private:

@@ -38,16 +38,11 @@
 
 #include "logger/logSyslogFacility.hpp"
 
-#include <string>
-#include <boost/algorithm/string.hpp>
-
 namespace _Wolframe {
 	namespace Logging {
 
-	SyslogFacility::Facility SyslogFacility::str2SyslogFacility( const std::string str )
+	SyslogFacility::Facility SyslogFacility::strToSyslogFacility( const std::string s )
 	{
-		std::string s = boost::algorithm::to_upper_copy( str );
-		boost::algorithm::trim( s );
 		if( s == "KERN" )		return SyslogFacility::WOLFRAME_SYSLOG_FACILITY_KERN;
 		else if( s == "USER" )		return SyslogFacility::WOLFRAME_SYSLOG_FACILITY_USER;
 		else if( s == "MAIL" )		return SyslogFacility::WOLFRAME_SYSLOG_FACILITY_MAIL;

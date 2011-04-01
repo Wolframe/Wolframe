@@ -154,7 +154,9 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree::const_iterat
 			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
 									L2it != L1it->second.end(); L2it++ )	{
 				if ( boost::algorithm::iequals( L2it->first, "level" ))	{
-					Logging::LogLevel::Level lvl = Logging::LogLevel::str2LogLevel( L2it->second.get_value<std::string>() );
+					std::string s = boost::algorithm::to_upper_copy( L2it->second.get_value<std::string>() );
+					boost::algorithm::trim( s );
+					Logging::LogLevel::Level lvl = Logging::LogLevel::strToLogLevel( s );
 					if ( lvl ==  Logging::LogLevel::LOGLEVEL_UNDEFINED )	{
 						LOG_ERROR << displayName() << ": unknown log level: "
 								<< L2it->second.get_value<std::string>();
@@ -185,7 +187,9 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree::const_iterat
 			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
 			L2it != L1it->second.end(); L2it++ )	{
 				if ( boost::algorithm::iequals( L2it->first, "level" ))	{
-					Logging::LogLevel::Level lvl = Logging::LogLevel::str2LogLevel( L2it->second.get_value<std::string>() );
+					std::string s = boost::algorithm::to_upper_copy( L2it->second.get_value<std::string>() );
+					boost::algorithm::trim( s );
+					Logging::LogLevel::Level lvl = Logging::LogLevel::strToLogLevel( s );
 					if ( lvl == Logging::LogLevel::LOGLEVEL_UNDEFINED )	{
 						LOG_ERROR << displayName() << ": logfile: unknown log level: "
 								<< L2it->second.get_value<std::string>();
@@ -237,7 +241,9 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree::const_iterat
 			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
 			L2it != L1it->second.end(); L2it++ )	{
 				if ( boost::algorithm::iequals( L2it->first, "level" ))	{
-					Logging::LogLevel::Level lvl = Logging::LogLevel::str2LogLevel( L2it->second.get_value<std::string>() );
+					std::string s = boost::algorithm::to_upper_copy( L2it->second.get_value<std::string>() );
+					boost::algorithm::trim( s );
+					Logging::LogLevel::Level lvl = Logging::LogLevel::strToLogLevel( s );
 					if ( lvl == Logging::LogLevel::LOGLEVEL_UNDEFINED )	{
 						LOG_ERROR << displayName() << ": syslog: unknown log level: "
 								<< L2it->second.get_value<std::string>();
@@ -251,7 +257,9 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree::const_iterat
 					syslogLogLevel = lvl;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "facility" ))	{
-					Logging::SyslogFacility::Facility fclt = Logging::SyslogFacility::str2SyslogFacility( L2it->second.get_value<std::string>() );
+					std::string s = boost::algorithm::to_upper_copy( L2it->second.get_value<std::string>() );
+					boost::algorithm::trim( s );
+					Logging::SyslogFacility::Facility fclt = Logging::SyslogFacility::strToSyslogFacility( s );
 					if ( fclt == Logging::SyslogFacility::WOLFRAME_SYSLOG_FACILITY_UNDEFINED )	{
 						LOG_ERROR << displayName() << ": syslog: unknown facility: "
 								<< L2it->second.get_value<std::string>();
@@ -302,7 +310,9 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree::const_iterat
 			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
 			L2it != L1it->second.end(); L2it++ )	{
 				if ( boost::algorithm::iequals( L2it->first, "level" ))	{
-					Logging::LogLevel::Level lvl = Logging::LogLevel::str2LogLevel( L2it->second.get_value<std::string>() );
+					std::string s = boost::algorithm::to_upper_copy( L2it->second.get_value<std::string>() );
+					boost::algorithm::trim( s );				
+					Logging::LogLevel::Level lvl = Logging::LogLevel::strToLogLevel( s );
 					if ( lvl == Logging::LogLevel::LOGLEVEL_UNDEFINED )	{
 						LOG_ERROR << displayName() << ": eventlog: unknown log level: "
 								<< L2it->second.get_value<std::string>();
