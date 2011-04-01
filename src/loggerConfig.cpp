@@ -310,7 +310,9 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree::const_iterat
 			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
 			L2it != L1it->second.end(); L2it++ )	{
 				if ( boost::algorithm::iequals( L2it->first, "level" ))	{
-					Logging::LogLevel::Level lvl = Logging::LogLevel::str2LogLevel( L2it->second.get_value<std::string>() );
+					std::string s = boost::algorithm::to_upper_copy( L2it->second.get_value<std::string>() );
+					boost::algorithm::trim( s );				
+					Logging::LogLevel::Level lvl = Logging::LogLevel::strToLogLevel( s );
 					if ( lvl == Logging::LogLevel::LOGLEVEL_UNDEFINED )	{
 						LOG_ERROR << displayName() << ": eventlog: unknown log level: "
 								<< L2it->second.get_value<std::string>();
