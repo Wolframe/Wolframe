@@ -31,16 +31,20 @@ WIX_DIR = C:\Programme\Windows Installer XML v3.5
 WIX_DIR = C:\Program Files (x86)\Windows Installer XML v3.5
 CANDLE = "$(WIX_DIR)\bin\candle.exe"
 LIGHT = "$(WIX_DIR)\bin\light.exe"
+SMOKE = "$(WIX_DIR)\bin\smoke.exe"
 
 local_all: $(CPP_BINS)
 	$(CANDLE) /nologo wolframe.wxs
-	$(LIGHT) wolframe.wixobj
+	$(LIGHT) /nologo wolframe.wixobj
 
 #uuidgen.exe: uuidgen.obj
 	
 local_clean:
-	@-erase wolframe.wixobj 2>NUL
+	@-erase wolframe.wixobj wolframe.wixpdb wolframe.msi 2>NUL
 
 local_distclean:
 
-local_test:
+local_test: wolframe.msi
+	$(SMOKE) wolframe.msi
+	
+	
