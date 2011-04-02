@@ -41,9 +41,7 @@
 #include "serverEndpoint.hpp"
 #include "logger/logLevel.hpp"
 
-#if !defined( _WIN32 )
 #include "logger/logSyslogFacility.hpp"
-#endif	// !defined( _WIN32 )
 
 #include <string>
 #include <list>
@@ -95,17 +93,16 @@ namespace Logging	{
 		std::string		logFile;
 		Logging::LogLevel::Level		logFileLogLevel;
 		std::string		logFileIdent;
-#if !defined( _WIN32 )
 		bool			logToSyslog;
 		Logging::SyslogFacility::Facility syslogFacility;
 		Logging::LogLevel::Level		syslogLogLevel;
 		std::string		syslogIdent;
-#else
+#if defined( _WIN32 )
 		bool			logToEventlog;
 		std::string		eventlogLogName;
 		std::string		eventlogSource;
 		Logging::LogLevel::Level eventlogLogLevel;
-#endif // !defined( _WIN32 )
+#endif // defined( _WIN32 )
 
 		/// constructor
 		LoggerConfiguration();
@@ -211,17 +208,16 @@ namespace Logging	{
 			std::string		logFile;
 			Logging::LogLevel::Level		logFileLogLevel;
 			std::string		logFileIdent;
-#if !defined( _WIN32 )
 			bool			logToSyslog;
 			Logging::SyslogFacility::Facility syslogFacility;
 			Logging::LogLevel::Level		syslogLogLevel;
 			std::string		syslogIdent;
-#else
+#if defined( _WIN32 )
 			bool			logToEventlog;
 			std::string		eventlogLogName;
 			std::string		eventlogSource;
 			Logging::LogLevel::Level eventlogLogLevel;
-#endif // !defined( _WIN32 )
+#endif // defined( _WIN32 )
 
 			/// constructor
 			LoggerConfiguration();

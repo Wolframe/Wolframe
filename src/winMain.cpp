@@ -268,6 +268,9 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 		_Wolframe::Logging::LogBackend::instance().setConsoleLevel( config.loggerConf->stderrLogLevel );
 		_Wolframe::Logging::LogBackend::instance().setLogfileLevel( config.loggerConf->logFileLogLevel );
 		_Wolframe::Logging::LogBackend::instance().setLogfileName( config.loggerConf->logFile );
+		_Wolframe::Logging::LogBackend::instance().setSyslogLevel( config.loggerConf->syslogLogLevel );
+		_Wolframe::Logging::LogBackend::instance().setSyslogFacility( config.loggerConf->syslogFacility );
+		_Wolframe::Logging::LogBackend::instance().setSyslogIdent( config.loggerConf->syslogIdent );
 		_Wolframe::Logging::LogBackend::instance().setEventlogLevel( config.loggerConf->eventlogLogLevel );
 		_Wolframe::Logging::LogBackend::instance().setEventlogSource( config.loggerConf->eventlogSource );
 		_Wolframe::Logging::LogBackend::instance().setEventlogLog( config.loggerConf->eventlogLogName );

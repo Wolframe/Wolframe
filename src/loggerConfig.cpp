@@ -62,17 +62,16 @@ LoggerConfiguration::LoggerConfiguration()
 	// std::string		logFile;
 	logFileLogLevel = Logging::LogLevel::LOGLEVEL_UNDEFINED;
 	// std::string		logFileIdent;
-#if !defined( _WIN32 )
 	logToSyslog = false;
 	syslogFacility = Logging::SyslogFacility::WOLFRAME_SYSLOG_FACILITY_UNDEFINED;
 	syslogLogLevel = Logging::LogLevel::LOGLEVEL_UNDEFINED;
 	// std::string		syslogIdent;
-#else
+#if defined( _WIN32 )
 	logToEventlog = false;
 	// std::string		eventlogLogName;
 	// std::string		eventlogSource;
 	eventlogLogLevel = Logging::LogLevel::LOGLEVEL_UNDEFINED;
-#endif // !defined( _WIN32 )
+#endif // defined( _WIN32 )
 }
 
 
@@ -88,12 +87,10 @@ void LoggerConfiguration::print( std::ostream& os ) const
 	else
 		os << "   Log to file: DISABLED" << std::endl;
 
-#if !defined(_WIN32)
 	if ( logToSyslog )
 		os << "   Log to syslog: facility " << syslogFacility << ", level " << syslogLogLevel << std::endl;
 	else
 		os << "   Log to syslog: DISABLED" << std::endl;
-#endif	// !defined( _WIN32 )
 
 #if defined(_WIN32)
 	if ( logToEventlog )
@@ -128,12 +125,10 @@ void LoggerConfiguration::foreground( Logging::LogLevel::Level debugLevel, bool 
 		logFile.clear();
 		logFileLogLevel = Logging::LogLevel::LOGLEVEL_UNDEFINED;
 		logFileIdent.clear();
-#if !defined( _WIN32 )
 		logToSyslog = false;
 		syslogFacility = Logging::SyslogFacility::WOLFRAME_SYSLOG_FACILITY_UNDEFINED;
 		syslogLogLevel = Logging::LogLevel::LOGLEVEL_UNDEFINED;
 		syslogIdent.clear();
-#endif // !defined( _WIN32 )
 	}
 }
 
@@ -224,12 +219,6 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree::const_iterat
 				}
 			}
 		}
-#if defined( _WIN32 )
-		// syslog
-		else if ( boost::algorithm::iequals( L1it->first, "syslog" ))	{
-			LOG_WARNING << displayName() << ": syslog is not defined on Windows";
-		}
-#else // if defined( _WIN32 )
 		// syslog
 		else if ( boost::algorithm::iequals( L1it->first, "syslog" ))	{
 			if ( logToSyslog )	{
@@ -292,7 +281,6 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree::const_iterat
 				}
 			}
 		}
-#endif	// !defined( _WIN32 )
 
 #if !defined( _WIN32 )
 		else if ( boost::algorithm::iequals( L1it->first, "eventlog" ))	{
