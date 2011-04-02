@@ -30,15 +30,16 @@ class LoggingFixture : public ::testing::Test
 
 			logBack.setLogfileLevel( LogLevel::LOGLEVEL_DATA );
 			logBack.setLogfileName( "logTest.log" );
-#ifndef _WIN32
 			logBack.setSyslogLevel( LogLevel::LOGLEVEL_DATA );
 			logBack.setSyslogFacility( SyslogFacility::WOLFRAME_SYSLOG_FACILITY_USER );
-			logBack.setSyslogIdent( "logTest" );
-#else
+			logBack.setSyslogIdent( "logTest" );			
+#if defined( _WIN32_ )
+			logBack.setSyslogHost( "localhost" );
+			logBack.setSyslogPort( 514 );
 			logBack.setEventlogLevel( LogLevel::LOGLEVEL_DATA );
 			logBack.setEventlogSource( "logTest" );
 			logBack.setEventlogLog( "Application" );
-#endif
+#endif // defined( _WIN32 _ )
 		}
 };
 

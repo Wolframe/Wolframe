@@ -84,7 +84,7 @@ SyslogBackend::SyslogBackend( )
 	logLevel_ = LogLevel::LOGLEVEL_UNDEFINED;
 	ident_ = "<undefined>";
 	facility_ = SyslogFacility::WOLFRAME_SYSLOG_FACILITY_DAEMON;
-	openlog( ident_.c_str( ), LOG_CONS | LOG_PID, facility_ );
+	openlog( ident_.c_str( ), LOG_PID, facility_ );
 }
 
 SyslogBackend::~SyslogBackend( )
@@ -198,7 +198,7 @@ void SyslogBackend::log( const LogComponent component, const LogLevel::Level lev
 void SyslogBackend::reopen( )
 {
 	closelog( );
-	openlog( ident_.c_str( ), LOG_CONS | LOG_PID, facility_ );
+	openlog( ident_.c_str( ), LOG_PID, facility_ );
 }
 
 	} // namespace Logging

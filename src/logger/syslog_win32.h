@@ -129,10 +129,15 @@ extern "C" {
 #define	LOG_FAC(p)	(((p) & LOG_FACMASK) >> 3)
 
 /*
+ * arguments to setlogmask.
+ */
+#define LOG_MASK(pri)   (1 << (pri))            /* mask for one priority */
+#define LOG_UPTO(pri)   ((1 << ((pri)+1)) - 1)  /* all priorities through pri */
+
+/*
  * Option flags for openlog.
  */
 #define	LOG_PID		0x01	/* log the pid with each message */
-#define	LOG_CONS	0x02	/* log on the console if errors in sending */
 
 /* Close descriptor used to write to system logger.
 
@@ -146,22 +151,18 @@ extern void closelog (void);
    marked with __THROW.  */
 extern void openlog (const char *__ident, int __option, int __facility);
 
-/* Generate a log message using FMT string and option arguments.  */
-extern void syslog (int __pri, char *__fmt, ...);
-
 /* Set the log mask level. */
 extern int setlogmask( int __mask );
 
-/******************************************************************************
- * vsyslog
- *
- * Generate a log message using FMT and using arguments pointed to by AP.
- */
+/* Generate a log message using FMT string and option arguments.  */
+extern void syslog (int __pri, char *__fmt, ...);
+
+/* Generate a log message using FMT and using arguments pointed to by AP. */
 void vsyslog( int __pri, char* __fmt, va_list __ap );
 
 /* Wolframe specific function, set the hostname and port for logging through
  * the configuration programatically */
-extern void set_syslogd_data(const char *__hostname, unsigned short __port);
+extern void set_syslogd_data( const char *__hostname, unsigned short __port );
 
 #ifdef __cplusplus
 }
