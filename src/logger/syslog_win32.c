@@ -170,9 +170,9 @@ void openlog( const char* ident, int option, int facility )
 	size = sizeof( datagram_size );
 	if( getsockopt( sock, SOL_SOCKET, SO_MAX_MSG_SIZE, (char *)&datagram_size, &size ) != 0 ) goto DONE;
 	if( datagram_size > sizeof( datagram ) ) datagram_size = sizeof( datagram );
-		
-	/* ??syslog_facility = facility ? facility : LOG_USER; */
-    syslog_facility = facility;
+	
+	/* set global facility and ident */
+	syslog_facility = facility ? facility : LOG_USER;
 	syslog_ident = ident;
 
 	/* by RFC 3164 we should put here the name of the local machine */
@@ -253,7 +253,7 @@ void vsyslog( int pri, char* fmt, va_list ap )
 	/* from RFC 3164: .. hh:mm:ss is the local time. .. */
 	GetLocalTime( &t );
 	
-	/* the PRI and the HEADER with TIMESTAMP and HOSTNAME aas
+	/* the PRI and the HEADER with TIMESTAMP and HOSTNAME as
 	 * well as the TAG field of the MSG part
 	 */
 	len = _snprintf_s( datagram, datagram_size, _TRUNCATE, "<%d>%s %2d %02d:%02d:%02d %s %s%s: ",
@@ -262,19 +262,8 @@ void vsyslog( int pri, char* fmt, va_list ap )
 
 	/* append now the formatted user message */
 	(void)_vsnprintf_s( datagram + len, datagram_size - len, _TRUNCATE, fmt, ap );
-		
-		/* TODO: should we really strip newlines at the end?
-		    char *p;
-    p = strchr( datagramm, '\n' );
-    if( p )
-        *p = 0;
-    p = strchr( datagramm, '\r' );
-    if( p ) 
-        *p = 0;
-*/
 
-puts( datagram );
-
+	/* send as datagram, we are not really interested in errors here */
     (void)sendto( sock, datagram, strlen( datagram ), 0, (SOCKADDR *)&sa_logger, sizeof( SOCKADDR_IN ) );
 }
 
