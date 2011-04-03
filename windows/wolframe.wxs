@@ -15,16 +15,22 @@
 			<Directory Id='ProgramFilesFolder' Name='PFiles'>
 				<Directory Id='WolframeGroup' Name='Wolframe Group'>
 					<Directory Id='MainDir' Name='Wolframe'>
-						<Component Id='MyComponent' Guid='{6999FF89-95FC-4E6B-867B-7AC19839284E}'>
+						<Component Id='License' Guid='{6999FF89-95FC-4E6B-867B-7AC19839284E}'>
 							<File Id='license' Name='license.txt' DiskId='1' Source='license.txt' />
 						</Component>
+						<Directory Id='BinDir' Name='bin'>
+							<Component Id='ServiceBinary' Guid='{112265CD-F35C-49B5-A4A1-F685B32BC208}'>
+								<File Id='wolframed' Name='wolframed.exe' DiskId='1' Source='..\src\wolframed.exe' />
+							</Component>
+						</Directory>
 					</Directory>
 				</Directory>
 			</Directory>
 		</Directory>
 
-		<Feature Id='MyFeature' Title='My 1st Feature' Level='1'>
-			<ComponentRef Id='MyComponent' />
+		<Feature Id='Complete' Level='1'>
+			<ComponentRef Id='License' />
+			<ComponentRef Id='ServiceBinary' />
 		</Feature>
 	</Product>
 </Wix>
