@@ -46,6 +46,10 @@ namespace _Wolframe {
 	public:
 		wolframeHandler( const HandlerConfiguration* config );
 		~wolframeHandler();
+
+		const std::string& banner() const	{ return banner_; }
+	private:
+		const std::string	banner_;
 	};
 
 
@@ -79,6 +83,12 @@ namespace _Wolframe {
 			TERMINATE,
 			FINISHED
 		};
+		/// Back link to global context
+		const wolframeHandler&		globalCtx_;
+
+		/// Connection endpoints
+		const Network::LocalEndpoint*	localEP_;
+		const Network::RemoteEndpoint*	remoteEP_;
 
 		static const std::size_t ReadBufSize = 8192;
 		/// The state of the processor FSM

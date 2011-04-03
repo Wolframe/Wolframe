@@ -7,6 +7,7 @@
 #include "logger.hpp"
 
 #include <string>
+#include <stdexcept>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/algorithm/string.hpp>
 
@@ -32,7 +33,6 @@ static ServiceBanner::SignatureTokens strToToken( std::string& str )
 }
 
 /// Service signature
-
 bool ServiceBanner::parse( const boost::property_tree::ptree::const_iterator it,
 			   const std::string& node )
 {
@@ -41,7 +41,7 @@ bool ServiceBanner::parse( const boost::property_tree::ptree::const_iterator it,
 		if ( !getStringValue( it, displayName(), val ))
 			return false;
 		else	{
-			if (( tokens = strToToken( val )) == ServiceBanner::UNDEFINED )	{
+			if (( tokens_ = strToToken( val )) == ServiceBanner::UNDEFINED )	{
 				LOG_ERROR << displayName() << ": unknown ServerTokens option: \""
 					  << val << "\"";
 				return false;
@@ -49,7 +49,7 @@ bool ServiceBanner::parse( const boost::property_tree::ptree::const_iterator it,
 		}
 	}
 	else if ( boost::algorithm::iequals( node, "ServerSignature" ))	{
-		if ( !getBoolValue( it, displayName(), serverName, serverNameDefined ))
+		if ( !getBoolValue( it, displayName(), serverName_, serverNameDefined_ ))
 			return false;
 	}
 	else	{
@@ -63,7 +63,7 @@ bool ServiceBanner::parse( const boost::property_tree::ptree::const_iterator it,
 
 bool ServiceBanner::check() const
 {
-	switch ( tokens )	{
+	switch ( tokens_ )	{
 	case PRODUCT_NAME:
 	case VERSION_MAJOR:
 	case VERSION_MINOR:
@@ -73,7 +73,7 @@ bool ServiceBanner::check() const
 	case UNDEFINED:
 		return true;
 	default:
-		LOG_ERROR << "Unknown value for ServiceBanner::tokens: " << (int)tokens;
+		LOG_ERROR << "Unknown value for ServiceBanner::tokens: " << (int)tokens_;
 		return false;
 	}
 	// for stupid compilers
@@ -84,7 +84,7 @@ void ServiceBanner::print( std::ostream& os ) const
 {
 	os << displayName() << std::endl;
 	os << "   Service banner: ";
-	switch ( tokens )	{
+	switch ( tokens_ )	{
 	case PRODUCT_NAME:	os << "product name only"; break;
 	case VERSION_MAJOR:	os << "product name and major version"; break;
 	case VERSION_MINOR:	os << "product name and minor version"; break;
@@ -95,16 +95,28 @@ void ServiceBanner::print( std::ostream& os ) const
 	default:		os << "NOT DEFINED !"; break;
 	}
 	os << std::endl;
-	os << "   Print service name: " << ( serverName ? "yes" : "no" ) << std::endl;
+	os << "   Print service name: " << ( serverName_ ? "yes" : "no" ) << std::endl;
 }
 
 
-const std::string ServiceBanner::toString() const
+std::string ServiceBanner::toString() const
 {
-	std::string ret;
-	ret = "bla bla";
-	return ret;
+	std::string	banner;
+
+	switch ( tokens_ )	{
+	case PRODUCT_NAME:	banner = "Wolframe"; break;
+	case VERSION_MAJOR:	banner = "Wolframe 0"; break;
+	case VERSION_MINOR:	banner = "Wolframe 0.0"; break;
+	case VERSION_REVISION:	banner = "Wolframe 0.0.4"; break;
+	case PRODUCT_OS:	banner = "Wolframe 0.0.4 on Linux"; break;
+	case NONE:		break;
+	case UNDEFINED:
+	default:		throw std::domain_error( "ServiceBanner: unknown ServerTokens value" );
+	}
+	if ( serverName_ )
+		banner = "GogoServer " + banner;
+
+	return banner;
 }
 
-	} // namespace Configuration
-} // namespace _Wolframe
+}} // namespace _Wolframe::Configuration

@@ -36,6 +36,8 @@
 
 #include "wolframeHandler.hpp"
 #include "logger.hpp"
+#include "standardConfigs.hpp"
+#include "handlerConfig.hpp"
 
 #ifdef WITH_SSL
 #include "SSLcertificateInfo.hpp"
@@ -48,21 +50,24 @@
 
 namespace _Wolframe	{
 
-	wolframeConnection::wolframeConnection( const wolframeHandler& /* context */,
+	wolframeConnection::wolframeConnection( const wolframeHandler& context,
 						const Network::LocalEndpoint& local )
+		: globalCtx_( context )
 	{
-		_Wolframe::Network::ConnectionEndpoint::ConnectionType type = local.type();
+		localEP_ = &local;
+		remoteEP_ = NULL;
+		_Wolframe::Network::ConnectionEndpoint::ConnectionType type = localEP_->type();
 
 		switch ( type )	{
 		case _Wolframe::Network::ConnectionEndpoint::TCP_CONNECTION:	{
-			const _Wolframe::Network::LocalTCPendpoint& lcl = static_cast<const _Wolframe::Network::LocalTCPendpoint&>( local );
-			LOG_TRACE << "Created connection handler for " << lcl.toString();
+			const _Wolframe::Network::LocalTCPendpoint* lcl = static_cast<const _Wolframe::Network::LocalTCPendpoint*>( localEP_ );
+			LOG_TRACE << "Created connection handler for " << lcl->toString();
 			break;
 		}
 #ifdef WITH_SSL
 		case _Wolframe::Network::ConnectionEndpoint::SSL_CONNECTION:	{
-			const _Wolframe::Network::LocalSSLendpoint& lcl = static_cast<const _Wolframe::Network::LocalSSLendpoint&>( local );
-			LOG_TRACE << "Created connection handler (SSL) for " << lcl.toString();
+			const _Wolframe::Network::LocalSSLendpoint* lcl = static_cast<const _Wolframe::Network::LocalSSLendpoint*>( localEP_ );
+			LOG_TRACE << "Created connection handler (SSL) for " << lcl->toString();
 			break;
 		}
 #else
@@ -87,25 +92,26 @@ namespace _Wolframe	{
 
 	void wolframeConnection::setPeer( const Network::RemoteEndpoint& remote )
 	{
-		_Wolframe::Network::ConnectionEndpoint::ConnectionType type = remote.type();
+		remoteEP_ = &remote;
+		_Wolframe::Network::ConnectionEndpoint::ConnectionType type = remoteEP_->type();
 
 		switch ( type )	{
 		case _Wolframe::Network::ConnectionEndpoint::TCP_CONNECTION:	{
-			const _Wolframe::Network::RemoteTCPendpoint& rmt = static_cast<const _Wolframe::Network::RemoteTCPendpoint&>( remote );
-			LOG_TRACE << "Peer set to " << rmt.toString() << ", connected at " << rmt.connectionTime();
+			const _Wolframe::Network::RemoteTCPendpoint* rmt = static_cast<const _Wolframe::Network::RemoteTCPendpoint*>( remoteEP_ );
+			LOG_TRACE << "Peer set to " << rmt->toString() << ", connected at " << rmt->connectionTime();
 			break;
 		}
 #ifdef WITH_SSL
 		case _Wolframe::Network::ConnectionEndpoint::SSL_CONNECTION:	{
-			const _Wolframe::Network::RemoteSSLendpoint& rmt = static_cast<const _Wolframe::Network::RemoteSSLendpoint&>( remote );
-			LOG_TRACE << "Peer set to " << rmt.toString() << ", connected at " << boost::posix_time::from_time_t( rmt.connectionTime());
-			if ( rmt.SSLcertInfo() )	{
-				LOG_TRACE << "Peer SSL certificate serial number " << rmt.SSLcertInfo()->serialNumber()
-					  << ", issued by: " << rmt.SSLcertInfo()->issuer();
-				LOG_TRACE << "Peer SSL certificate valid from " << boost::posix_time::from_time_t( rmt.SSLcertInfo()->notBefore())
-					  << " to " <<  boost::posix_time::from_time_t( rmt.SSLcertInfo()->notAfter());
-				LOG_TRACE << "Peer SSL certificate subject: " << rmt.SSLcertInfo()->subject();
-				LOG_TRACE << "Peer SSL certificate Common Name: " << rmt.SSLcertInfo()->commonName();
+			const _Wolframe::Network::RemoteSSLendpoint* rmt = static_cast<const _Wolframe::Network::RemoteSSLendpoint*>( remoteEP_ );
+			LOG_TRACE << "Peer set to " << rmt->toString() << ", connected at " << boost::posix_time::from_time_t( rmt->connectionTime());
+			if ( rmt->SSLcertInfo() )	{
+				LOG_TRACE << "Peer SSL certificate serial number " << rmt->SSLcertInfo()->serialNumber()
+					  << ", issued by: " << rmt->SSLcertInfo()->issuer();
+				LOG_TRACE << "Peer SSL certificate valid from " << boost::posix_time::from_time_t( rmt->SSLcertInfo()->notBefore())
+					  << " to " <<  boost::posix_time::from_time_t( rmt->SSLcertInfo()->notAfter());
+				LOG_TRACE << "Peer SSL certificate subject: " << rmt->SSLcertInfo()->subject();
+				LOG_TRACE << "Peer SSL certificate Common Name: " << rmt->SSLcertInfo()->commonName();
 			}
 			break;
 		}
@@ -124,7 +130,11 @@ namespace _Wolframe	{
 		switch( state_ )	{
 		case NEW:	{
 				state_ = HELLO_SENT;
-				return Network::NetworkOperation( Network::SendString( "Welcome to Wolframe.\n" ));
+				if ( ! globalCtx_.banner().empty() )
+					outMsg_ = globalCtx_.banner() + "\nOK\n";
+				else
+					outMsg_ = "OK\n";
+				return Network::NetworkOperation( Network::SendString( outMsg_ ));
 			}
 
 		case HELLO_SENT:	{
@@ -237,9 +247,11 @@ namespace _Wolframe	{
 
 
 	/// The server handler global context
-	wolframeHandler::wolframeHandler( const HandlerConfiguration* /* config */ )
+	wolframeHandler::wolframeHandler( const HandlerConfiguration* config )
+		: banner_( config->banner->toString() )
 	{
-		LOG_TRACE << "Global context created";
+//		banner_ = config->banner->toString();
+		LOG_TRACE << "Global context: banner: <" << banner_ << ">";
 	}
 
 	wolframeHandler::~wolframeHandler()

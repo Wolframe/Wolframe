@@ -162,8 +162,9 @@ namespace Logging	{
 
 
 	/// Service signature
-	struct ServiceBanner : public _Wolframe::Configuration::ConfigurationBase
+	class ServiceBanner : public _Wolframe::Configuration::ConfigurationBase
 	{
+	public:
 		enum SignatureTokens	{
 			PRODUCT_NAME,
 			VERSION_MAJOR,
@@ -173,17 +174,12 @@ namespace Logging	{
 			NONE,
 			UNDEFINED
 		};
-	public:
-		/// data members
-		SignatureTokens	tokens;
-		bool		serverName;
-		bool		serverNameDefined;
 
 		/// constructor
 		ServiceBanner() : ConfigurationBase( "Service Banner" ),
-						tokens( UNDEFINED ),
-						serverName( false ),
-						serverNameDefined( false )	{}
+						tokens_( UNDEFINED ),
+						serverName_( false ),
+						serverNameDefined_( false )	{}
 
 		/// methods
 		bool parse( const boost::property_tree::ptree::const_iterator it,
@@ -193,7 +189,12 @@ namespace Logging	{
 
 //			Not implemented yet, inherited from base for the time being
 //			bool test() const;
-		const std::string toString() const;
+		std::string toString() const;
+	private:
+		/// data members
+		SignatureTokens	tokens_;
+		bool		serverName_;
+		bool		serverNameDefined_;
 	};
 
 
