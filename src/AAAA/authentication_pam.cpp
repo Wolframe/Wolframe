@@ -190,7 +190,7 @@ Step::AuthStep PAMAuthenticator::nextStep( )
 				throw std::runtime_error( ss.str( ) );
 			}
 // everything went ok, so authentication succeeded with for example pam_rootok.so withou
-// requiring a password.. intetionally no break here :-)
+// requiring a password.. intentionally no break here :-)
 
 // authenticate: are we who we claim to be?
 		case _Wolframe_PAM_STATE_HAS_PASS:

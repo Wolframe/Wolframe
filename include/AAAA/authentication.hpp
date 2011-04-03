@@ -153,6 +153,9 @@ extern Authenticator *CreateTextFileAuthenticator( AuthenticatorFactory::propert
 #if defined( WITH_PAM )
 extern Authenticator *CreatePAMAuthenticator( AuthenticatorFactory::properties props );
 #endif // defined( WITH_PAM )
+#if defined( WITH_SQLITE3 )
+extern Authenticator *CreateDbSqlite3Authenticator( AuthenticatorFactory::properties props );
+#endif // defined( WITH_SQLITE3 )
 
 } // namespace Authentication
 } // namespace _Wolframe

@@ -48,6 +48,24 @@ INCLUDE_LIBS += \
 
 endif
 
+# sqlite3
+
+ifdef WITH_SQLITE3
+
+INCLUDE_CPPFLAGS += \
+	-DWITH_SQLITE3
+
+INCLUDE_DIRS += \
+	-I$(SQLITE3_INCLUDE_DIR)
+
+INCLUDE_LDFLAGS += \
+	-L$(SQLITE3_LIB_DIR)
+
+INCLUDE_LIBS += \
+	$(SQLITE3_LIBS)
+
+endif
+
 LOCAL_STATIC_LIB = \
 	libwolframe.a
 
@@ -69,6 +87,11 @@ AAAA_OBJS = \
 ifdef WITH_PAM
 AAAA_OBJS += \
 	AAAA/authentication_pam.o
+endif
+
+ifdef WITH_SQLITE3
+AAAA_OBJS += \
+	AAAA/authentication_db_sqlite3.o
 endif
 
 LOCAL_STATIC_LIB_OBJS = \

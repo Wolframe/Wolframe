@@ -8,10 +8,6 @@
 using namespace std;
 using namespace _Wolframe::Authentication;
 
-#ifndef _WIN32
-#include <unistd.h>
-#endif
-
 static void print_usage( ) {
 // get list of available authentication methods
 	vector<string> mechs = AuthenticatorFactory::instance( ).getAvailableMechs( );
@@ -32,6 +28,12 @@ int main( int argc, const char *argv[] )
 	AuthenticatorFactory::properties props2;
 	props2.push_back( AuthenticatorFactory::property( "service", std::string( "wolframe" ) ) );
 	AuthenticatorFactory::instance( ).registerAuthenticator( "PAM", CreatePAMAuthenticator, props2 );
+#endif
+
+#ifdef WITH_SQLITE3
+	AuthenticatorFactory::properties props3;
+	props3.push_back( AuthenticatorFactory::property( "filename", std::string( "passwd.db" ) ) );
+	AuthenticatorFactory::instance( ).registerAuthenticator( "DBSQLITE3", CreateDbSqlite3Authenticator, props3 );
 #endif
 
 // check parameters

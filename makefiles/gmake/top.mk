@@ -103,6 +103,13 @@ ifdef WITH_PAM
 	@echo "PAM_LIB_DIR: $(PAM_LIB_DIR)"
 	@echo "PAM_LIBS: $(PAM_LIBS)"
 endif
+ifdef WITH_SQLITE3
+	@echo
+	@echo "SQLITE3_DIR: $(SQLITE3_DIR)"
+	@echo "SQLITE3_INCLUDE_DIR: $(SQLITE3_INCLUDE_DIR)"
+	@echo "SQLITE3_LIB_DIR: $(SQLITE3_LIB_DIR)"
+	@echo "SQLITE3_LIBS: $(SQLITE3_LIBS)"
+endif
 
 .PHONY: init-po
 init-po:

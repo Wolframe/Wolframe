@@ -63,6 +63,24 @@ INCLUDE_LIBS += \
 
 endif
 
+# sqlite3
+
+ifdef WITH_SQLITE3
+
+INCLUDE_CPPFLAGS += \
+	-DWITH_SQLITE3
+
+INCLUDE_DIRS += \
+	-I$(SQLITE3_INCLUDE_DIR)
+
+INCLUDE_LDFLAGS += \
+	-L$(SQLITE3_LIB_DIR)
+
+INCLUDE_LIBS += \
+	$(SQLITE3_LIBS)
+
+endif
+
 TEST_OBJS =
 #	$(TOPDIR)/examples/pecho/pechoHandler.o
 

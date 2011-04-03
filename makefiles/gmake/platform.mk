@@ -548,3 +548,20 @@ endif
 
 endif
 endif
+
+# Sqlite3
+#########
+
+ifdef WITH_SQLITE3
+
+ifeq "$(PLATFORM)" "LINUX"
+
+ifeq "$(LINUX_DIST)" "arch"
+SQLITE3_DIR ?= /usr
+SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
+SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
+SQLITE3_LIBS ?= -lsqlite3
+endif
+
+endif
+endif

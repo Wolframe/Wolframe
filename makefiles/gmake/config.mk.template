@@ -95,3 +95,16 @@
 #PAM_INCLUDE_DIR = $(PAM_DIR)/include
 #PAM_LIB_DIR = $(PAM_DIR)/lib
 #PAM_LIBS = -lpam
+
+# Sqlite 3
+##########
+
+#SQLITE3_DIR=/usr/local
+
+# usual layout
+#SQLITE3_INCLUDE_DIR = $(SQLITE3_DIR)/include
+#SQLITE3_LIB_DIR = $(SQLITE3_DIR)/lib
+#SQLITE3_LIBS = -lsqlite3
+
+# Postgresql 8.x, 9.x
+#####################
