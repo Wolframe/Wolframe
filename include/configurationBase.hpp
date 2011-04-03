@@ -59,7 +59,7 @@ namespace _Wolframe {
 			///			It has no processing purpose
 			ConfigurationBase( const std::string& name )	{ dispName_ = name; }
 
-			/// The diplay string (name) of the configuration section
+			/// The display string (name) of the configuration section
 			///\return	a reference to the name set by the constructor
 			const std::string& displayName() const		{ return dispName_; }
 

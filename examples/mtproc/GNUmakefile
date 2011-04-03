@@ -41,6 +41,7 @@ OBJS = \
 	implementation_c.o \
 	dispatcher.o \
 	generators/propertyTree.o \
+	luaconfig.o \
 	mtprocHandler.o \
 	$(TOPDIR)/src/posixMain.o
 
