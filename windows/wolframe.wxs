@@ -16,7 +16,7 @@
 				<Directory Id='WolframeGroup' Name='Wolframe Group'>
 					<Directory Id='INSTALLDIR' Name='Wolframe'>
 						<Component Id='License' Guid='{6999FF89-95FC-4E6B-867B-7AC19839284E}'>
-							<File Id='license' Name='license.txt' DiskId='1' Source='license.txt' />
+							<File Id='license' Name='license.rtf' DiskId='1' Source='license.rtf' />
 						</Component>
 						<Directory Id='BinDir' Name='bin'>
 							<Component Id='ServiceBinary' Guid='{112265CD-F35C-49B5-A4A1-F685B32BC208}'>
@@ -42,6 +42,8 @@
 			</Feature>
 
 		</Feature>
+		
+		<WixVariable Id="WixUILicenseRtf" Value="license.rtf" />
 		
 		<UIRef Id="WixUI_Mondo" />
 		<UIRef Id="WixUI_ErrorProgressText" />
