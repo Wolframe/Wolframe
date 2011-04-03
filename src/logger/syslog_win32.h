@@ -162,7 +162,7 @@ void vsyslog( int __pri, char* __fmt, va_list __ap );
 
 /* Wolframe specific function, set the hostname and port for logging through
  * the configuration programatically */
-extern void set_syslogd_data( const char *__hostname, unsigned short __port );
+extern void set_syslogd_destination( const char *__hostname, const char *__service );
 
 #ifdef __cplusplus
 }

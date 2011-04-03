@@ -60,9 +60,15 @@
  * some small other things like added documentation.
 */
 
+/* TODOS:
+ * - reset logmask in openlog?
+ * - handle more options
+ */
+
 #include "logger/syslog_win32.h"
 
 #include <Winsock2.h>
+#include <ws2tcpip.h>
 #include <string.h>
 #include <stdio.h>
 
@@ -75,63 +81,22 @@ static int syslog_facility = 0;
 static char str_pid[40];
 static char local_hostname[MAX_COMPUTERNAME_LENGTH+4];
 
-static char syslog_hostname[MAX_COMPUTERNAME_LENGTH+4] = "localhost";
-static unsigned short syslog_port = 0;
+static char syslog_hostname[256] = "localhost";
+static char syslog_service[256] = "514";
 
 /* UDP socket and data to use for sending messages */
-static SOCKADDR_IN sa_logger;
+static SOCKADDR_STORAGE sa_logger;
 static SOCKET sock = INVALID_SOCKET;
 #define SYSLOG_DGRAM_SIZE 1024
 static char datagram[SYSLOG_DGRAM_SIZE];
 static int datagram_size = SYSLOG_DGRAM_SIZE;
 
-/******************************************************************************
- * init_logger_addr
- *
- * Read configuration file syslog.host. This file should contain host address
- * and, optionally, port. Initialize sa_logger. If the configuration file does
- * not exist, use localhost:514.
- * Returns: 0 - ok, -1 - error.
- *
-static void init_logger_addr()
-{
-    char pathname[ FILENAME_MAX ];
-    char *p;
-    FILE *fd;
-    char host[256];
-    struct hostent * phe;
-
-    memset( &sa_logger, 0, sizeof(SOCKADDR_IN) );
-    sa_logger.sin_family = AF_INET;
-
-    phe = gethostbyname( host );
-    if( !phe )
-        goto use_default;
-
-    memcpy( &sa_logger.sin_addr.s_addr, phe->h_addr, phe->h_length );
-
-    if( p )
-        sa_logger.sin_port = htons( (unsigned short) strtoul( p, NULL, 0 ) );
-    else
-        sa_logger.sin_port = htons( SYSLOG_PORT );
-    return;
-
-use_default:
-}
-
-void openlog( char* ident, int option, int facility )
-{
-
-    init_logger_addr();
-*/
-
-/* reset logmask?
- * handle more options
- */
 void openlog( const char* ident, int option, int facility )
 {
 	BOOL failed = TRUE;
 	WSADATA wsd;
+	struct addrinfo hints;
+	struct addrinfo *result = NULL;
 	SOCKADDR_IN sa_local;
 	int size;
     DWORD n;
@@ -145,20 +110,29 @@ void openlog( const char* ident, int option, int facility )
 	if( WSAStartup( MAKEWORD( 2, 2 ), &wsd ) != 0 ) goto DONE;
 	wsa_initialized = TRUE;
 
-	/* Get the socket address and port of the logging destination */
+	/* tell getaddrinfo what we want */
+	memset( &hints, 0, sizeof( struct addrinfo ) );
+	hints.ai_flags = 0;
+	hints.ai_family = AF_INET;
+	hints.ai_socktype = SOCK_DGRAM;
+	hints.ai_protocol = IPPROTO_UDP;
+ 
+	/* resolve the domain name into a list of addresses */
+	if( getaddrinfo( syslog_hostname, syslog_service, &hints, &result ) != 0 ) goto DONE;
+
+	/* Compose the socket address and port of the logging destination */
     memset( &sa_logger, 0, sizeof( SOCKADDR_IN ) );
-    sa_logger.sin_family = AF_INET;
-	sa_logger.sin_addr.S_un.S_addr = htonl( 0x7F000001 );
-	sa_logger.sin_port = htons( 514 );
+	memcpy( &sa_logger, result->ai_addr, result->ai_addrlen );
 
 	/* Create a UDP socket */
-	/* for 1..100 loop? needed? */
-	sock = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP /* was 0? */ );
+	sock = socket( result->ai_family, result->ai_socktype, result->ai_protocol );
 	if( sock == INVALID_SOCKET ) goto DONE;
-
+	
 	/* from RFC 3164: The client should connect from a constant port, if possible
-	 * also port 514. but if we are on the same machine with loopback the port
-	 * is taken?
+	 * also port 514.
+	 *
+	 * But if we are on the same machine with loopback the port is taken?
+	 * Should we try 514 and if it is taken take a fixed different one?
 	 */
 	
 	/* bind to the socket */
@@ -279,9 +253,10 @@ void closelog( )
 	initialized = FALSE;	
 }
 
-void set_syslogd_data( const char *hostname, unsigned short port )
+void set_syslogd_destination( const char *hostname, const char *service )
 {
 	strncpy( syslog_hostname, hostname,
-		( strlen( hostname ) > MAX_COMPUTERNAME_LENGTH ) ? strlen( hostname ) : MAX_COMPUTERNAME_LENGTH );
-	syslog_port = port;
+		( strlen( hostname ) > 255 ) ? strlen( hostname ) : 255 );
+	strncpy( syslog_service, service,
+		( strlen( service ) > 255 ) ? strlen( service ) : 255 );
 }
