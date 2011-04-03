@@ -14,7 +14,7 @@
 			<!-- TODO: 32-bit/64-bit switch -->
 			<Directory Id='ProgramFilesFolder' Name='PFiles'>
 				<Directory Id='WolframeGroup' Name='Wolframe Group'>
-					<Directory Id='MainDir' Name='Wolframe'>
+					<Directory Id='INSTALLDIR' Name='Wolframe'>
 						<Component Id='License' Guid='{6999FF89-95FC-4E6B-867B-7AC19839284E}'>
 							<File Id='license' Name='license.txt' DiskId='1' Source='license.txt' />
 						</Component>
@@ -28,9 +28,23 @@
 			</Directory>
 		</Directory>
 
-		<Feature Id='Complete' Level='1'>
-			<ComponentRef Id='License' />
-			<ComponentRef Id='ServiceBinary' />
+		<Feature Id='Complete' Title='Complete' Description='The complete package.'
+		         Display='expand' Level='1' ConfigurableDirectory='INSTALLDIR'>
+			<Feature Id='MainProgram' Title='Program' Description='The main executable.' Level='1'>
+				<ComponentRef Id='License' />
+				<ComponentRef Id='ServiceBinary' />
+			</Feature>
+			
+			<Feature Id='Documentation' Title='Manual' Description='The Wolbones usage manual.' Level='1000'>
+			</Feature>
+
+			<Feature Id='SDK' Title='SDK' Description='The programming SDK.' Level='1000'>
+			</Feature>
+
 		</Feature>
+		
+		<UIRef Id="WixUI_Mondo" />
+		<UIRef Id="WixUI_ErrorProgressText" />
+
 	</Product>
 </Wix>
