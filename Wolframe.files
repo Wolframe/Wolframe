@@ -110,7 +110,7 @@ examples/xmlselect/xmlIterator.cpp
 examples/xmlselect/xmlIterator.hpp
 GNUmakefile
 header.txt
-include/AAA/authentication.hpp
+include/AAAA/authentication.hpp
 include/appConfig.hpp
 include/appProperties.hpp
 include/atomicCounter.hpp
@@ -142,11 +142,11 @@ include/standardConfigs.hpp
 include/systemCall.hpp
 include/version.hpp
 Makefile.W32
-src/AAA/authentication.cpp
-src/AAA/authentication_pam.cpp
-src/AAA/authentication_pam.hpp
-src/AAA/authentication_textfile.cpp
-src/AAA/authentication_textfile.hpp
+src/AAAA/authentication.cpp
+src/AAAA/authentication_pam.cpp
+src/AAAA/authentication_pam.hpp
+src/AAAA/authentication_textfile.cpp
+src/AAAA/authentication_textfile.hpp
 src/acceptor.cpp
 src/acceptor.hpp
 src/appConfig.cpp
@@ -223,3 +223,5 @@ tests/testNamedRetVal.cpp
 tests/threadLeakTest.cpp
 tests/versionTest.cpp
 .Attic/printers.c
+src/AAAA/authentication_db_sqlite3.hpp
+src/AAAA/authentication_db_sqlite3.cpp
