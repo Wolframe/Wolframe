@@ -1,5 +1,6 @@
 <?xml version='1.0'?>
-<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
 	<Product Name='Wolframe' Version='0.0.1' Manufacturer='Wolframe Team'
 	         Language='1033' Codepage='1252'
 	         Id='{09E1E9CC-6AE6-4207-B7FE-F47CFDB2861F}' 
@@ -26,13 +27,39 @@
 					</Directory>
 				</Directory>
 			</Directory>
+			
+			<Directory Id="ProgramMenuFolder">
+				<Directory Id="ApplicationProgramsFolder" Name="Wolframe"/>
+			</Directory>
+			
 		</Directory>
+
+		<DirectoryRef Id="ApplicationProgramsFolder">
+			<Component Id="ApplicationShortcut" Guid="{989CD261-D90C-4AEA-80BA-E1EB9931B2F8}">
+				<util:InternetShortcut Id="WolframeHomePage"
+				                       Name="Wolframe Home Page"
+				                       Target="http://www.wolframe.net/"/>
+
+				<!-- Product code must be in sync with product code of the WXS! -->
+				<Shortcut Id="UninstallProduct"             
+                          Name="Uninstall Wolframe"
+                          Description="Uninstalls Wolframe"
+                          Target="[System64Folder]msiexec.exe"
+                          Arguments="/x {09E1E9CC-6AE6-4207-B7FE-F47CFDB2861F}"/>
+
+				<RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
+				<RegistryValue Root="HKCU" Key="Software\WolframeGroup\Wolframe"
+				               Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+			</Component>
+		</DirectoryRef>
+
 
 		<Feature Id='Complete' Title='Complete' Description='The complete package.'
 		         Display='expand' Level='1' ConfigurableDirectory='INSTALLDIR'>
 			<Feature Id='MainProgram' Title='Program' Description='The main executable.' Level='1'>
 				<ComponentRef Id='License' />
 				<ComponentRef Id='ServiceBinary' />
+				<ComponentRef Id="ApplicationShortcut" />
 			</Feature>
 			
 			<Feature Id='Documentation' Title='Manual' Description='The Wolbones usage manual.' Level='1000'>
