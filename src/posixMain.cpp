@@ -49,6 +49,7 @@
 #include "server.hpp"
 #include "ErrorCodes.hpp"
 #include "logger.hpp"
+//#include "appSingleton.hpp"
 
 #include "connectionHandler.hpp"
 
@@ -96,6 +97,11 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 						    _Wolframe::applicationMinorVersion(),
 						    _Wolframe::applicationRevisionVersion(),
 						    _Wolframe::applicationBuildVersion() );
+//		_Wolframe::ApplicationSingleton	appSingleton = _Wolframe::ApplicationSingleton::instance();
+//		appSingleton.version( _Wolframe::Version( _Wolframe::applicationMajorVersion(),
+//							  _Wolframe::applicationMinorVersion(),
+//							  _Wolframe::applicationRevisionVersion(),
+//							  _Wolframe::applicationBuildVersion() ));
 		_Wolframe::Configuration::CmdLineConfig   cmdLineCfg;
 		const char *configFile;
 

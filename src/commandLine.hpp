@@ -48,7 +48,7 @@ namespace _Wolframe	{
 			std::string errMsg( void )		{ return errMsg_; }
 			void usage( std::ostream& os ) const	{ options_.print( os ); }
 		};
-	} // namespace Configuration
-} // namespace _Wolframe
+
+}} // namespace _Wolframe::Configuration
 
 #endif // _COMMANDLINE_HPP_INCLUDED
