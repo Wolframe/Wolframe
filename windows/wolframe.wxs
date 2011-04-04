@@ -39,6 +39,14 @@
 				<util:InternetShortcut Id="WolframeHomePage"
 				                       Name="Wolframe Home Page"
 				                       Target="http://www.wolframe.net/"/>
+
+				<!-- Product code must be in sync with product code of the WXS! -->
+				<Shortcut Id="UninstallProduct"             
+                          Name="Uninstall Wolframe"
+                          Description="Uninstalls Wolframe"
+                          Target="[System64Folder]msiexec.exe"
+                          Arguments="/x {09E1E9CC-6AE6-4207-B7FE-F47CFDB2861F}"/>
+
 				<RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
 				<RegistryValue Root="HKCU" Key="Software\WolframeGroup\Wolframe"
 				               Name="installed" Type="integer" Value="1" KeyPath="yes"/>
