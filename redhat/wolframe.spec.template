@@ -6,6 +6,13 @@
 %define WOLFRAME_USR	wolframe
 %define WOLFRAME_GRP	wolframe
 
+%define with_ssl	0
+%define with_postgresql	0
+%define with_sqlite	0
+%define with_lua	0
+%define with_pam	0
+%define with_qt		0
+ 
 Summary: Small and medium enterprise resource planning (Wolframe)
 Name: wolframe
 Version: 0.0.1
@@ -17,13 +24,26 @@ Source: %{name}-%{version}.tar.bz2
 URL: http://www.wolframe.com/
 
 BuildRoot: %{_tmppath}/%{name}-root
-Requires: expat >= 1.95
-BuildRequires: zlib-devel >= 1.2.3
+%if %{with_ssl}
 BuildRequires: openssl-devel >= 0.9.8
-BuildRequires: expat-devel >= 1.95
+Requires: openssl >= 0.9.8
+%endif
+%if %{with_postgresql}
 BuildRequires: postgresql-devel >= 8.1
-BuildRequires: lua-devel >= 5.1.4
+Requires: postgresql >= 8.1
+%endif
+%if %{with_sqlite}
+BuildRequires: sqlite-devel >= 3.0
+Requires: sqlite3 >= 3.0
+%endif
+%if %{with_lua}
+BuildRequires: lua-devel >= 5.1
+Requires: lua >= 5.1
+%endif
+%if %{with_pam}
 BuildRequires: pam-devel >= 0.99
+Requires: pam >= 0.99
+%endif
 
 Distribution: rhel5
 Vendor: Wolframe team
@@ -57,7 +77,16 @@ X client for the Wolframe server.
 
 %build
 LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make all \
-	WITH_SSL=1 WITH_GTEST=1 WITH_LUA=1 WITH_QT=1 WITH_PAM=1 \
+%if %{with_ssl}
+	WITH_SSL=1 \
+%endif
+%if %{with_lua}
+	WITH_LUA=1 \
+%endif
+%if %{with_pam}
+	WITH_PAM=1 \
+%endif
+	WITH_QT=1 \
 	sysconfdir=/etc
 cd docs; make doc-doxygen
 
@@ -69,7 +98,16 @@ echo ===================== END OF TESTING =========================
 %install
 rm -rf $RPM_BUILD_ROOT
 make DESTDIR=$RPM_BUILD_ROOT install \
-	WITH_SSL=1 WITH_GTEST=1 WITH_LUA=1 WITH_QT=1 WITH_PAM=1 \
+%if %{with_ssl}
+	WITH_SSL=1 \
+%endif
+%if %{with_lua}
+	WITH_LUA=1 \
+%endif
+%if %{with_pam}
+	WITH_PAM=1 \
+%endif
+	WITH_QT=1 \
 	sysconfdir=$RPM_BUILD_ROOT/etc
 cd docs && make DESTDIR=$RPM_BUILD_ROOT install && cd ..
 
