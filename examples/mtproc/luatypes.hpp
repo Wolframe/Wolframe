@@ -38,10 +38,10 @@ Project Wolframe.
 #include "methodtable.hpp"
 #include "luaconfig.hpp"
 #include "protocol/generator.hpp"
+#include "protocol/formatoutput.hpp"
 
 namespace _Wolframe {
 namespace mtproc {
-
 
 
 class Interpreter
@@ -53,7 +53,7 @@ class Interpreter
 	Interpreter();
 	~Interpreter();
 
-	bool passConfig( const char* method, protocol::Generator* config);
+	bool passConfig( );
 	int call( unsigned int argc, const char** argv);
 };
 

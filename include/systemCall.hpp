@@ -1,18 +1,15 @@
-//
-// function.hpp
-//
-#ifndef _FUNCTION_HPP_INCLUDED
-#define _FUNCTION_HPP_INCLUDED
+#ifndef _SYSTEMCALL_HPP_INCLUDED
+#define _SYSTEMCALL_HPP_INCLUDED
 #include <ctype.h>
 #include <vector>
-#include <boost/property_tree/ptree.hpp>
 #include "objectPool.hpp"
 #include "logger.hpp"
 
-//\brief interface for system function calls like database function calls
+/// \file systemCall.hpp
+/// \brief interface for system function calls like database function calls
+
 namespace _Wolframe {
 namespace syscall {
-
 
 class Function
 {
@@ -147,34 +144,31 @@ private:
 };
 
 
-class Connector
+class ConnectorBase
 {
-private:
-	struct Data;
 public:
-	Data* m_data;
-	Connector() :m_data(0) {};
-	virtual ~Connector(){};
-	virtual int open( const boost::property_tree::ptree& cfg, unsigned int idx);
-	virtual int call( const Function& fun, Result& res);
+	ConnectorBase(){};
+	virtual ~ConnectorBase(){};
+
+	virtual ConnectorBase* duplicate()=0;
+	virtual int open()=0;
+	virtual int call( const Function& fun, Result& res)=0;
 };
 
 
-
-class ConnectorPool :public ObjectPool<Connector>
+class ConnectorPool :public ObjectPool<ConnectorBase>
 {
 	struct Refused :public std::runtime_error {Refused() :std::runtime_error("refused system object request"){}};
 
 	ConnectorPool( const char* cn) :m_connectorName(cn){};
 
-	template <class ConnectorI>
-	bool open( const boost::property_tree::ptree& config, unsigned int nofInstances)
+	bool open( ConnectorBase* conn, unsigned int nofInstances)
 	{
 		unsigned int ii;
 		for (ii=0; ii<nofInstances; ii++)
 		{
-			Connector* conn = new ConnectorI();
-			int err = conn->open( config, ii);
+			ConnectorBase* ci = (ii==nofInstances-1)?conn:conn->duplicate();
+			int err = ci->open();
 			if (err)
 			{
 				LOG_ERROR << "failed to open "<< m_connectorName << " connector. error code:" << err;
@@ -235,7 +229,7 @@ class ConnectorPool :public ObjectPool<Connector>
 
 	private:
 		ConnectorPool* m_pool;
-		Connector* m_conn;
+		ConnectorBase* m_conn;
 	};
 
 	boost::shared_ptr<PoolFunction> function( const char* name)

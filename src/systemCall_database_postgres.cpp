@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-#include "systemCall.hpp"
+#include "systemCall_database_postgres.hpp"
 #include "logger.hpp"
 #include <postgresql/libpq-fe.h>
 
@@ -51,10 +51,15 @@ virtual ~Connector()
 	if (data) delete data;
 }
 
-int Connector::open( const boost::property_tree::ptree& cfg, unsigned int idx)
+int Connector::open()
 {
 	if (data) delete data;
-	data = new data;
+	data = new (std::nothrow) Data;
+	if (!data)
+	{
+		LOG_ERROR << "memory allocation error opening database connection";
+		return -1;
+	}
 	data->m_conn = PQconnectdb("host=127.0.0.1 user=test password=test dbname=test");
 	if (!conn || PQstatus( conn) != CONNECTION_OK)
 	{

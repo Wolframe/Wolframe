@@ -49,9 +49,13 @@ namespace lua {
 class LuaConfiguration :public Configuration::ConfigurationBase
 {
 public:
+	/// \brief module load function for a lua state
+	/// \param ls lua state to initialize with the load of the module for this state object
+	typedef int (*LuaModuleLoad)( lua_State *ls);
+
 	/// \brief constructor
 	/// \param name configuration base name
-	LuaConfiguration( const std::string& name ) :ConfigurationBase(name){}
+	LuaConfiguration( const std::string& name) :ConfigurationBase(name){}
 
 	/// \brief interface implementation of ConfigurationBase::parse(const boost::property_tree::ptree&, const std::string&)
 	virtual bool parse( const boost::property_tree::ptree&, const std::string&);
@@ -65,7 +69,7 @@ public:
 	/// \brief interface implementation of ConfigurationBase::print(std::ostream& os) const
 	virtual void print( std::ostream&);
 
-	/// \brief loads the configuration settings for the lua virtual machine
+	/// \brief loads the configuration settings for a lua virtual machine state
 	/// \param[in,out] ls lua state to initialize
 	/// \return true if success, else false
 	bool load( lua_State* ls) const;
@@ -85,10 +89,10 @@ public:
 		Module(){}
 		/// \brief constructor
 		/// \param module name
-		Module( const std::string& name_)	:m_type(Undefined),m_name(name_){}
+		Module( const std::string& name_)	:m_type(Undefined),m_name(name_),m_load(0){}
 		/// \brief copy constructor
 		/// \param module to copy
-		Module( const Module& o)		:m_name(o.m_name),m_path(o.m_path){}
+		Module( const Module& o)		:m_name(o.m_name),m_path(o.m_path),m_load(o.m_load){}
 
 		/// \brief Canonical module file path decomposition based on the application reference path
 		/// Initialize the absolute path of this module by combining the application reference path with the module file name.
@@ -108,10 +112,15 @@ public:
 		/// \return the type of the module
 		const Type& type() const		{return m_type;}
 
+		/// \brief loads the configuration settings for a lua virtual machine state
+		/// \param[in,out] ls lua state to initialize
+		/// \return true if success, else false
+		bool load( lua_State* ls) const;
 	private:
 		Type m_type;				///< type of the module
 		std::string m_name;			///< name of the module
 		std::string m_path;			///< full path of the module
+		LuaModuleLoad m_load;
 	};
 	/// \brief return the main module
 	const Module& main() const			{return m_main;}

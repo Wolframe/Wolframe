@@ -45,8 +45,9 @@ extern "C" {
 	#include <lua.h>
 }
 
-typedef int (*LuaModuleEntryFunc)( lua_State *l);
-static LuaModuleEntryFunc getLuaModuleEntryFunc( const char* name)
+using namespace _Wolframe::mtproc::lua;
+
+static LuaConfiguration::LuaModuleLoad getLuaModuleEntryFunc( const char* name)
 {
 	if (strcmp(name,"base") == 0) return luaopen_base;
 	if (strcmp(name,LUA_TABLIBNAME) == 0) return luaopen_table;
@@ -59,8 +60,6 @@ static LuaModuleEntryFunc getLuaModuleEntryFunc( const char* name)
 	return 0;
 }
 
-
-using namespace _Wolframe::mtproc::lua;
 
 bool LuaConfiguration::parse( const boost::property_tree::ptree& parentNode, const std::string&)
 {
@@ -106,7 +105,8 @@ bool LuaConfiguration::parse( const boost::property_tree::ptree& parentNode, con
 
 void LuaConfiguration::Module::setCanonicalPath( const std::string& refPath)
 {
-	if (!getLuaModuleEntryFunc( m_name.c_str()))
+	m_load = getLuaModuleEntryFunc( m_name.c_str());
+	if (m_load)
 	{
 		m_type = PreloadLib;
 	}
@@ -142,6 +142,29 @@ void LuaConfiguration::setCanonicalPathes( const std::string& refPath)
 	}
 }
 
+bool LuaConfiguration::Module::load( lua_State* ls) const
+{
+	if (m_load)
+	{
+		lua_pushcfunction( ls, m_load);
+		lua_pushstring( ls, m_name.c_str());
+		if (lua_pcall( ls, 1, 1, 0) != 0)
+		{
+			LOG_ERROR << "Runtime error when loading base module " << m_name << ":" << lua_tostring( ls, -1);
+			return false;
+		}
+	}
+	else if (m_type == Script)
+	{
+		if (luaL_loadfile( ls, m_path.c_str()))
+		{
+			LOG_ERROR << "Syntax error in lua submodule script " << m_name << ":" << lua_tostring( ls, -1);
+			lua_pop( ls, 1);
+			return false;
+		}
+	}
+	return true;
+}
 
 bool LuaConfiguration::load( lua_State *ls) const
 {
@@ -149,38 +172,15 @@ bool LuaConfiguration::load( lua_State *ls) const
 	{
 		if (it->type() == Module::PreloadLib)
 		{
-			LuaModuleEntryFunc ef;
-			if (it->path().size() == 0)
-			{
-				ef = getLuaModuleEntryFunc( it->name().c_str());
-				lua_pushcfunction( ls, ef);
-				lua_pushstring( ls, it->name().c_str());
-				if (lua_pcall( ls, 1, 1, 0) != 0)
-				{
-					LOG_ERROR << "Runtime error when loading base module " << it->name() << ":" << lua_tostring( ls, -1);
-					return false;
-				}
-			}
+			if (!it->load( ls)) return false;
 		}
 	}
 	for (std::list<Module>::const_iterator it = m_modules.begin(); it != m_modules.end(); it++)
 	{
-		if (it->type() == Module::Script)
+		if (it->type() != Module::PreloadLib)
 		{
-			if (luaL_loadfile( ls, it->name().c_str()))
-			{
-				LOG_ERROR << "Syntax error in lua submodule script " << it->name() << ":" << lua_tostring( ls, -1);
-				lua_pop( ls, 1);
-				return false;
-			}
-
+			if (!it->load( ls)) return false;
 		}
-	}
-	if (luaL_loadfile( ls, m_main.name().c_str()))
-	{
-		LOG_ERROR << "Syntax error in lua main script " << m_main.name() << ":" << lua_tostring( ls, -1);
-		lua_pop( ls, 1);
-		return false;
 	}
 	return true;
 }
