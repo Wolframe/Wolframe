@@ -4,6 +4,9 @@
 
 #include <string>
 #include <ctime>
+
+#ifdef WITH_SSL
+
 #include <openssl/x509.h>
 
 namespace _Wolframe {
@@ -31,5 +34,7 @@ namespace _Wolframe {
 
 	} // namespace Network
 } // namespace _Wolframe
+
+#endif // defined( WITH_SSL )
 
 #endif // _SSL_CERTIFICATE_INFO_HPP_INCLUDED
