@@ -34,7 +34,7 @@ Requires: postgresql >= 8.1
 %endif
 %if %{with_sqlite}
 BuildRequires: sqlite-devel >= 3.0
-Requires: sqlite3 >= 3.0
+Requires: sqlite >= 3.0
 %endif
 %if %{with_lua}
 BuildRequires: lua-devel >= 5.1
