@@ -53,8 +53,8 @@ public:
 	/// \param name configuration base name
 	LuaConfiguration( const std::string& name ) :ConfigurationBase(name){}
 
-	/// \brief interface implementation of ConfigurationBase::parse(const boost::property_tree::ptree::const_iterator, const std::string&)
-	virtual bool parse( const boost::property_tree::ptree::const_iterator, const std::string&);
+	/// \brief interface implementation of ConfigurationBase::parse(const boost::property_tree::ptree&, const std::string&)
+	virtual bool parse( const boost::property_tree::ptree&, const std::string&);
 
 	/// \brief interface implementation of ConfigurationBase::setCanonicalPathes(const std::string&)
 	virtual void setCanonicalPathes( const std::string&);

@@ -68,9 +68,10 @@ namespace _Wolframe {
 			///\param[in]	it		iterator to the property tree node
 			///\param[in]	nodeName	the label of the node. It should be
 			///				the same (case insensitive) as it->first
-			virtual bool parse( const boost::property_tree::ptree::const_iterator it,
-					   const std::string& nodeName ) = 0;
-
+			virtual bool parse( const boost::property_tree::ptree& pt,
+					    const std::string& nodeName ) = 0;
+//			virtual bool parse( const boost::property_tree::ptree::const_iterator it,
+//					   const std::string& nodeName ) = 0;
 			/// Set the pathes in the configuration to absolute values
 			///\param[in]	referencePath	use this path as reference when
 			///				computing the absolute pathes

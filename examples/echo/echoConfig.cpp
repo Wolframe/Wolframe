@@ -32,13 +32,12 @@ bool EchoConfiguration::check() const
 }
 
 
-bool EchoConfiguration::parse( const boost::property_tree::ptree::const_iterator it,
-			       const std::string& /* nodeName */ )
+bool EchoConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& /* nodeName */ )
 {
-	for ( boost::property_tree::ptree::const_iterator L1it = it->second.begin();
-								L1it != it->second.end(); L1it++ )	{
+	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "idle" ))	{
-			if ( !Configuration::getNonZeroIntValue<unsigned short>( L1it, displayName(), timeout ))
+			if ( !Configuration::getNonZeroIntValue<unsigned short>( L1it->second, L1it->first,
+										 displayName(), timeout ))
 				return false;
 		}
 		else	{

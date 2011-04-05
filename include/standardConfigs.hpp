@@ -67,8 +67,7 @@ namespace Network	{
 		ServerConfiguration();
 
 		/// methods
-		bool parse( const boost::property_tree::ptree::const_iterator it,
-			    const std::string& node );
+		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 		bool check() const;
 		void print( std::ostream& os ) const;
 
@@ -108,8 +107,7 @@ namespace Logging	{
 		LoggerConfiguration();
 
 		/// methods
-		bool parse( const boost::property_tree::ptree::const_iterator it,
-			    const std::string& node );
+		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 		bool check() const;
 		void print( std::ostream& os ) const;
 
@@ -146,8 +144,7 @@ namespace Logging	{
 		ServiceConfiguration();
 
 		/// methods
-		bool parse( const boost::property_tree::ptree::const_iterator it,
-			    const std::string& node );
+		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 		bool check() const;
 		void print( std::ostream& os ) const;
 
@@ -182,8 +179,7 @@ namespace Logging	{
 						serverNameDefined_( false )	{}
 
 		/// methods
-		bool parse( const boost::property_tree::ptree::const_iterator it,
-			    const std::string& node );
+		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 		bool check() const;
 		void print( std::ostream& os ) const;
 
@@ -205,7 +201,8 @@ namespace Logging	{
 			bool			logToStderr;
 			Logging::LogLevel::Level		stderrLogLevel;
 
-			bool			logToFile;
+			bool	 // namespace
+		logToFile;
 			std::string		logFile;
 			Logging::LogLevel::Level		logFileLogLevel;
 			std::string		logFileIdent;
@@ -224,8 +221,7 @@ namespace Logging	{
 			LoggerConfiguration();
 
 			/// methods
-			bool parse( const boost::property_tree::ptree::const_iterator it,
-				    const std::string& node );
+			bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 			bool check() const;
 			void print( std::ostream& os ) const;
 
@@ -254,8 +250,7 @@ namespace Logging	{
 			DatabaseConfiguration();
 
 			/// methods
-			bool parse( const boost::property_tree::ptree::const_iterator it,
-				    const std::string& node );
+			bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 			bool check() const;
 			void print( std::ostream& os ) const;
 
@@ -263,7 +258,6 @@ namespace Logging	{
 //			bool test() const;
 		};
 
-	} // namespace Configuration
-} // namespace _Wolframe
+}} // namespace _Wolframe::Configuration
 
 #endif // _STANDARD_CONFIGS_HPP_INCLUDED

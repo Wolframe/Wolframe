@@ -94,6 +94,7 @@ OBJS = \
 	appProperties.obj \
 	appConfigDefinition.obj \
 	wolframeHandler.obj \
+	database.obj \
 	winMain.obj
 
 CPP_BINS = \

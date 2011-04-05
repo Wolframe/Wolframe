@@ -133,11 +133,9 @@ void LoggerConfiguration::foreground( Logging::LogLevel::Level debugLevel, bool 
 }
 
 
-bool LoggerConfiguration::parse( const boost::property_tree::ptree::const_iterator it,
-				 const std::string& /* node */ )
+bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& /* node */ )
 {
-	for ( boost::property_tree::ptree::const_iterator L1it = it->second.begin();
-								L1it != it->second.end(); L1it++ )	{
+	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		// stderr logging
 		if ( boost::algorithm::iequals( L1it->first, "stderr" ))	{
 			if ( logToStderr )	{
@@ -299,7 +297,7 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree::const_iterat
 			L2it != L1it->second.end(); L2it++ )	{
 				if ( boost::algorithm::iequals( L2it->first, "level" ))	{
 					std::string s = boost::algorithm::to_upper_copy( L2it->second.get_value<std::string>() );
-					boost::algorithm::trim( s );				
+					boost::algorithm::trim( s );
 					Logging::LogLevel::Level lvl = Logging::LogLevel::strToLogLevel( s );
 					if ( lvl == Logging::LogLevel::LOGLEVEL_UNDEFINED )	{
 						LOG_ERROR << displayName() << ": eventlog: unknown log level: "

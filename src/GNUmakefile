@@ -126,6 +126,7 @@ OBJS = \
 	appProperties.o \
 	appConfigDefinition.o \
 	wolframeHandler.o \
+	database.o \
 	posixMain.o
 
 CPP_BINS = \

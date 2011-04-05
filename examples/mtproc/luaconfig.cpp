@@ -62,21 +62,16 @@ static LuaModuleEntryFunc getLuaModuleEntryFunc( const char* name)
 
 using namespace _Wolframe::mtproc::lua;
 
-bool LuaConfiguration::parse( const boost::property_tree::ptree::const_iterator parentNode, const std::string& nodeName)
+bool LuaConfiguration::parse( const boost::property_tree::ptree& parentNode, const std::string&)
 {
 	std::string name;
 	unsigned int cnt_main = 0;
 
-	if (!boost::algorithm::iequals( parentNode->first, nodeName))
-	{
-		LOG_ERROR << displayName() << ": got different configuration than expected ('" << parentNode->first << "' instead of '" << nodeName << "'";
-		return false;
-	}
-	for ( boost::property_tree::ptree::const_iterator it = parentNode->second.begin(); it != parentNode->second.end(); it++)
+	for ( boost::property_tree::ptree::const_iterator it = parentNode.begin(); it != parentNode.end(); it++)
 	{
 		if (boost::algorithm::iequals( it->first, "main"))
 		{
-			if (!Configuration::getStringValue( it, displayName(), name)) return false;
+			if (!Configuration::getStringValue( it->second, it->first, displayName(), name)) return false;
 			if (name.size() == 0)
 			{
 				LOG_ERROR << displayName() << ": empty name for the main script is illegal (configuration option <main>)";
@@ -87,7 +82,7 @@ bool LuaConfiguration::parse( const boost::property_tree::ptree::const_iterator 
 		}
 		else if (boost::algorithm::iequals( it->first, "module"))
 		{
-			if (!Configuration::getStringValue( it, displayName(), name)) return false;
+			if (!Configuration::getStringValue( it->second, it->first, displayName(), name)) return false;
 			if (name.size() == 0)
 			{
 				LOG_ERROR << displayName() << ": empty name for a module is illegal (configuration option <module>)";

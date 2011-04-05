@@ -51,7 +51,7 @@ namespace Configuration	{
 ///			error logging
 ///\param[out]	value	the (boolean) value read
 ///\return	true if it succeeds or false otherwise and logs the error
-bool getBoolValue( const boost::property_tree::ptree::const_iterator it,
+bool getBoolValue( const boost::property_tree::ptree& pt, const std::string& name,
 		   const std::string& module, bool& value );
 
 
@@ -63,7 +63,7 @@ bool getBoolValue( const boost::property_tree::ptree::const_iterator it,
 ///\param[in,out] valueIsSet	flag to signal if the value is set
 ///			if set, the function will log an error and fail
 ///\return	true if it succeeds or false otherwise and logs the error
-bool getBoolValue( const boost::property_tree::ptree::const_iterator it,
+bool getBoolValue( const boost::property_tree::ptree& pt, const std::string& name,
 		   const std::string& module, bool& value, bool& valueIsSet );
 
 
@@ -75,13 +75,13 @@ bool getBoolValue( const boost::property_tree::ptree::const_iterator it,
 ///			error logging
 ///\param[in,out] value	the string read
 ///\return	true if it succeeds or false otherwise and logs the error
-bool getStringValue( const boost::property_tree::ptree::const_iterator it,
+bool getStringValue( const boost::property_tree::ptree& pt, const std::string& name,
 		     const std::string& module, std::string& value );
 
 
 /// Similar to getStringValue but if the value read is "*" it will be
 /// replaced with "0.0.0.0"
-bool getHostnameValue( const boost::property_tree::ptree::const_iterator it,
+bool getHostnameValue( const boost::property_tree::ptree& pt, const std::string& name,
 		       const std::string& module, std::string& value );
 
 
@@ -93,25 +93,25 @@ bool getHostnameValue( const boost::property_tree::ptree::const_iterator it,
 ///\param[in,out] value	the integer value read
 ///\return	true if it succeeds or false otherwise and logs the error
 template <typename T>
-bool getNonZeroIntValue( const boost::property_tree::ptree::const_iterator it,
+bool getNonZeroIntValue( const boost::property_tree::ptree& pt, const std::string& name,
 			 const std::string& module, T& value )
 {
 	if ( value != 0 )	{
-		LOG_ERROR << module << ": " << it->first << " redefined";
+		LOG_ERROR << module << ": " << name << " redefined";
 		return false;
 	}
 
-	std::string s = it->second.get_value<std::string>();
+	std::string s = pt.get_value<std::string>();
 	try	{
 		value = boost::lexical_cast<T>( s );
 	}
 	catch( boost::bad_lexical_cast& e )	{
-		LOG_ERROR << module << ": invalid value for " << it->first << ": \"" << s << "\"";
+		LOG_ERROR << module << ": invalid value for " << name << ": \"" << s << "\"";
 		return false;
 	}
 
 	if ( value == 0 )	{
-		LOG_ERROR << module << ": invalid value for " << it->first << ": \"" << s << "\"";
+		LOG_ERROR << module << ": invalid value for " << name << ": \"" << s << "\"";
 		return false;
 	}
 	return true;
@@ -125,15 +125,15 @@ bool getNonZeroIntValue( const boost::property_tree::ptree::const_iterator it,
 ///\param[out]	value	the integer value read
 ///\return	true if it succeeds or false otherwise and logs the error
 template <typename T>
-bool getNumberValue( const boost::property_tree::ptree::const_iterator it,
+bool getNumberValue( const boost::property_tree::ptree& pt, const std::string& name,
 		     const std::string& module, T& value )
 {
-	std::string s = it->second.get_value<std::string>();
+	std::string s = pt.get_value<std::string>();
 	try	{
 		value = boost::lexical_cast<T>( s );
 	}
 	catch( boost::bad_lexical_cast& e )	{
-		LOG_ERROR << module << ": invalid value for " << it->first << ": \"" << s << "\"";
+		LOG_ERROR << module << ": invalid value for " << name << ": \"" << s << "\"";
 		return false;
 	}
 	return true;
@@ -148,19 +148,19 @@ bool getNumberValue( const boost::property_tree::ptree::const_iterator it,
 ///\param[in,out] valueIsSet	flag to signal if the value is set
 ///\return	true if it succeeds or false otherwise and logs the error
 template <typename T>
-bool getNumberValue( const boost::property_tree::ptree::const_iterator it,
+bool getNumberValue( const boost::property_tree::ptree& pt, const std::string& name,
 		     const std::string& module, T& value, bool& valueIsSet )
 {
 	if ( valueIsSet )	{
-		LOG_ERROR << module << ": " << it->first << " redefined";
+		LOG_ERROR << module << ": " << name << " redefined";
 		return false;
 	}
-	std::string s = it->second.get_value<std::string>();
+	std::string s = pt.get_value<std::string>();
 	try	{
 		value = boost::lexical_cast<T>( s );
 	}
 	catch( boost::bad_lexical_cast& e )	{
-		LOG_ERROR << module << ": invalid value for " << it->first << ": \"" << s << "\"";
+		LOG_ERROR << module << ": invalid value for " << name << ": \"" << s << "\"";
 		return false;
 	}
 	valueIsSet = true;
@@ -179,30 +179,30 @@ bool getNumberValue( const boost::property_tree::ptree::const_iterator it,
 ///\param[in]	upperLimit	the highest acceptable value
 ///\return	true if it succeeds or false otherwise and logs the error
 template <typename T>
-bool getNumberValue( const boost::property_tree::ptree::const_iterator it,
+bool getNumberValue( const boost::property_tree::ptree& pt, const std::string& name,
 		     const std::string& module, T& value, bool& valueIsSet,
 		     T lowerLimit, T upperLimit )
 {
 	if ( valueIsSet )	{
-		LOG_ERROR << module << ": " << it->first << " redefined";
+		LOG_ERROR << module << ": " << name << " redefined";
 		return false;
 	}
-	std::string s = it->second.get_value<std::string>();
+	std::string s = pt.get_value<std::string>();
 	try	{
 		value = boost::lexical_cast<T>( s );
 	}
 	catch( boost::bad_lexical_cast& e )	{
-		LOG_ERROR << module << ": invalid value for " << it->first << ": \"" << s << "\"";
+		LOG_ERROR << module << ": invalid value for " << name << ": \"" << s << "\"";
 		return false;
 	}
 	if ( value < lowerLimit )	{
-		LOG_ERROR << module << ": invalid value (too low) for " << it->first << ": \""
-			  << it->second.get_value<std::string>() << "\"";
+		LOG_ERROR << module << ": invalid value (too low) for " << name << ": \""
+			  << pt.get_value<std::string>() << "\"";
 		return false;
 	}
 	if ( value > upperLimit )	{
-		LOG_ERROR << module << ": invalid value (too high) for " << it->first << ": \""
-			  << it->second.get_value<std::string>() << "\"";
+		LOG_ERROR << module << ": invalid value (too high) for " << name << ": \""
+			  << pt.get_value<std::string>() << "\"";
 		return false;
 	}
 	return true;

@@ -113,7 +113,7 @@ bool ApplicationConfiguration::parse ( const char *filename )
 		for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
 			std::map< std::string, std::size_t >::iterator confIt;
 			if (( confIt = section_.find( it->first ) ) != section_.end() )	{
-				if ( ! conf_[ confIt->second ]->parse( it, confIt->first ))
+				if ( ! conf_[ confIt->second ]->parse( it->second, confIt->first ))
 //					return false;
 					retVal = false;
 			}

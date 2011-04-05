@@ -57,7 +57,7 @@ class Step {
 public:
 	enum AuthStep {
 		_Wolframe_AUTH_STEP_SUCCESS,		/// successful authentication
-		_Wolframe_AUTH_STEP_FAIL,			/// authentication failed
+		_Wolframe_AUTH_STEP_FAIL,		/// authentication failed
 		_Wolframe_AUTH_STEP_SEND_DATA,		/// we need to send some data
 		_Wolframe_AUTH_STEP_RECV_DATA,		/// we require some data
 		_Wolframe_AUTH_STEP_GET_ERROR		/// error occurred
@@ -65,10 +65,10 @@ public:
 };
 
 // virtual base for all authentication methods
-class Authenticator {	
+class Authenticator {
 	public:
 		virtual ~Authenticator( ) { }
-		
+
 		// get next step in authentication
 		virtual Step::AuthStep nextStep( ) = 0;
 
@@ -76,7 +76,7 @@ class Authenticator {
 		// the kind of data the Authenticator expects
 		// (e.g. "login", "password", "md5")
 		virtual std::string token( ) = 0;
-		
+
 		// the authenticator wants us to send out data
 		// (for instance a challenge). The message has
 		// to be send to the client
@@ -84,7 +84,7 @@ class Authenticator {
 		// token() gives you the kind of data (which
 		// depends on the authentication method)
 		virtual std::string sendData( ) = 0;
-		
+
 		// the authenticator can't continue without getting
 		// some data (for instance we need a password)
 		//
@@ -107,32 +107,32 @@ class AuthenticatorFactory : public Singleton< AuthenticatorFactory> {
 				: name( _name ), value( _value ) { }
 			std::string name;
 			boost::any value;
-			
+
 			bool operator==( const std::string &_name ) const
 			{
 				return name == _name;
 			}
 		};
 		typedef std::list<property> properties;
-		
+
 		typedef Authenticator* (*CreateAuthenticatorFunc)( properties props );
-		
+
 	private:
 		std::map<std::string, Authenticator *> m_authenticators;
 
 	public:
 		AuthenticatorFactory( );
 		virtual ~AuthenticatorFactory( );
-		
+
 		void registerAuthenticator(	std::string _method,
 						CreateAuthenticatorFunc _createf,
 						properties _props );
-		
+
 		void unregisterAuthenticator( std::string _method );
-		
+
 		// get a specific authenticator identified by method
 		Authenticator* getAuthenticator( const std::string method );
-		
+
 		// get the list of all currently available authentication methods
 		std::vector<std::string> getAvailableMechs( );
 };

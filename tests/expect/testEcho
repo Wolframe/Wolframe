@@ -23,11 +23,11 @@ expect 	{
 	"Welcome to Wolframe.\r"	{ send_user " --> Connected.\n" }
 }
 
-set message "Momo fofo gogo"
+set message "1 short line"
 send "$message\r"
 expect "$message"
 
-set message "lkewlewmjfdlmfewjl"
+set message "2nd short line with üèöéäà°§"
 send "$message\r"
 expect "$message"
 

@@ -226,3 +226,8 @@ tests/versionTest.cpp
 src/AAAA/authentication_db_sqlite3.hpp
 src/AAAA/authentication_db_sqlite3.cpp
 src/appSingleton.hpp
+examples/mtproc/luaconfig.hpp
+examples/mtproc/luaconfig.cpp
+tests/expect/testEcho
+src/database.hpp
+src/database.cpp

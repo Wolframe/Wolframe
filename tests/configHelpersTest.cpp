@@ -74,20 +74,20 @@ TEST_F( ConfigFixture, bool )	{
 
 	boost::property_tree::ptree::const_iterator it = pt.get_child( "bool-true" ).begin();
 	for ( ; it != pt.get_child( "bool-true" ).end(); it++ )	{
-		ret = getBoolValue( it, "Config Helpers bool test - true", val );
+		ret = getBoolValue( it->second, it->first, "Config Helpers bool test - true", val );
 		ASSERT_TRUE( ret && val );
 	}
 
 	it = pt.get_child( "bool-false" ).begin();
 	for ( ; it != pt.get_child( "bool-false" ).end(); it++ )	{
-		ret = getBoolValue( it, "Config Helpers bool test - false", val );
+		ret = getBoolValue( it->second, it->first, "Config Helpers bool test - false", val );
 		ASSERT_TRUE( ret && !val );
 	}
 
 	val = false;
 	it = pt.get_child( "bool-wrong" ).begin();
 	for ( ; it != pt.get_child( "bool-wrong" ).end(); it++ )	{
-		ret = getBoolValue( it, "Config Helpers bool test - wrong", val );
+		ret = getBoolValue( it->second, it->first, "Config Helpers bool test - wrong", val );
 		ASSERT_TRUE( !ret && !val );
 	}
 
@@ -95,7 +95,7 @@ TEST_F( ConfigFixture, bool )	{
 	for ( ; it != pt.get_child( "bool-true" ).end(); it++ )	{
 		bool isSet = false;
 		val = false;
-		ret = getBoolValue( it, "Config Helpers bool test, isSet flag - set", val, isSet );
+		ret = getBoolValue( it->second, it->first, "Config Helpers bool test, isSet flag - set", val, isSet );
 		ASSERT_TRUE( ret && val && isSet );
 	}
 
@@ -103,7 +103,7 @@ TEST_F( ConfigFixture, bool )	{
 	it = pt.get_child( "bool-true" ).begin();
 	for ( ; it != pt.get_child( "bool-true" ).end(); it++ )	{
 		bool isSet = true;
-		ret = getBoolValue( it, "Config Helpers bool test, isSet flag - set", val, isSet );
+		ret = getBoolValue( it->second, it->first, "Config Helpers bool test, isSet flag - set", val, isSet );
 		ASSERT_TRUE( !ret && val && isSet );
 	}
 }
@@ -116,14 +116,14 @@ TEST_F( ConfigFixture, unsigned_short )	{
 	boost::property_tree::ptree::const_iterator it = pt.get_child( "ushortNZ-valid" ).begin();
 	for ( ; it != pt.get_child( "ushortNZ-valid" ).end(); it++ )	{
 		val = 0;
-		ret = getNonZeroIntValue<unsigned short>( it, "Config Helpers unsigned short Test - valid", val );
+		ret = getNonZeroIntValue<unsigned short>( it->second, it->first, "Config Helpers unsigned short Test - valid", val );
 		ASSERT_TRUE( ret && ( val > 0 ));
 	}
 
 	it = pt.get_child( "ushortNZ-invalid" ).begin();
 	for ( ; it != pt.get_child( "ushortNZ-invalid" ).end(); it++ )	{
 		val = 0;
-		ret = getNonZeroIntValue<unsigned short>( it, "Config Helpers unsigned short Test - invalid", val );
+		ret = getNonZeroIntValue<unsigned short>( it->second, it->first, "Config Helpers unsigned short Test - invalid", val );
 		ASSERT_TRUE( !ret && ( val == 0 ));
 	}
 }
