@@ -78,7 +78,7 @@ X client for the Wolframe server.
 %build
 LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make all \
 	WITH_SSL=%{with_ssl} WITH_SQLITE3=%{with_sqlite} \
-	WITH_LUA=%{with_lua} WITH_PATH=%{with_pam} \
+	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_QT=1 \
 	sysconfdir=/etc
 cd docs; make doc-doxygen
@@ -92,7 +92,7 @@ echo ===================== END OF TESTING =========================
 rm -rf $RPM_BUILD_ROOT
 make DESTDIR=$RPM_BUILD_ROOT install \
 	WITH_SSL=%{with_ssl} WITH_SQLITE3=%{with_sqlite} \
-	WITH_LUA=%{with_lua} WITH_PATH=%{with_pam} \
+	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_QT=1 \
 	sysconfdir=$RPM_BUILD_ROOT/etc
 cd docs && make DESTDIR=$RPM_BUILD_ROOT install && cd ..
