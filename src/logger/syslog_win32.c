@@ -99,7 +99,7 @@ void openlog( const char* ident, int option, int facility )
 	struct addrinfo *result = NULL;
 	SOCKADDR_IN sa_local;
 	int size;
-    DWORD n;
+	DWORD n;
 	
 	/* allow idempotent calls, first options are taken, use closelog
 	 * before openlog if you want to reconfigure the syslog interface
@@ -121,7 +121,7 @@ void openlog( const char* ident, int option, int facility )
 	if( getaddrinfo( syslog_hostname, syslog_service, &hints, &result ) != 0 ) goto DONE;
 
 	/* Compose the socket address and port of the logging destination */
-    memset( &sa_logger, 0, sizeof( SOCKADDR_IN ) );
+	memset( &sa_logger, 0, sizeof( SOCKADDR_IN ) );
 	memcpy( &sa_logger, result->ai_addr, result->ai_addrlen );
 
 	/* Create a UDP socket */
@@ -150,13 +150,13 @@ void openlog( const char* ident, int option, int facility )
 	syslog_ident = ident;
 
 	/* by RFC 3164 we should put here the name of the local machine */
-    n = sizeof( local_hostname );
-    if( !GetComputerName( local_hostname, &n ) ) goto DONE;
+	n = sizeof( local_hostname );
+	if( !GetComputerName( local_hostname, &n ) ) goto DONE;
 	
 	/* interpret options, currently we use only LOG_PID */
 	if( option & LOG_PID )
 		_snprintf_s( str_pid, sizeof( str_pid ), _TRUNCATE, "[%lu]", GetCurrentProcessId( ) );
-    else
+	else
 		str_pid[0] = '\0';
 	
 	/* install C cleanup function */
@@ -166,17 +166,18 @@ void openlog( const char* ident, int option, int facility )
 	failed = FALSE;
 	
 DONE:
-    if( failed ) {
-        if( sock != INVALID_SOCKET ) {
+	if( failed ) {
+		if( sock != INVALID_SOCKET ) {
 			closesocket( sock );
 			sock = INVALID_SOCKET;
 		}
-        if( wsa_initialized ) {
+		if( wsa_initialized ) {
 			wsa_initialized = FALSE;
 			WSACleanup( );
 		}
-    }
-    initialized = !failed;
+	}
+	
+	initialized = !failed;
 }
 
 extern int setlogmask( int mask )
@@ -206,7 +207,7 @@ void vsyslog( int pri, char* fmt, va_list ap )
 	 *
 	 * Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec
 	 */
-    static char *month[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+	static char *month[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
 	                        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
 	int len;
@@ -238,7 +239,7 @@ void vsyslog( int pri, char* fmt, va_list ap )
 	(void)_vsnprintf_s( datagram + len, datagram_size - len, _TRUNCATE, fmt, ap );
 
 	/* send as datagram, we are not really interested in errors here */
-    (void)sendto( sock, datagram, strlen( datagram ), 0, (SOCKADDR *)&sa_logger, sizeof( SOCKADDR_IN ) );
+	(void)sendto( sock, datagram, strlen( datagram ), 0, (SOCKADDR *)&sa_logger, sizeof( SOCKADDR_IN ) );
 }
 
 void closelog( )
@@ -248,7 +249,7 @@ void closelog( )
 	if( sock != INVALID_SOCKET ) (void)closesocket( sock );
 	if( wsa_initialized ) WSACleanup( );
 
-    sock = INVALID_SOCKET;
+	sock = INVALID_SOCKET;
 	wsa_initialized	= FALSE;
 	initialized = FALSE;	
 }
