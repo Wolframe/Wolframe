@@ -15,4 +15,4 @@ local_clean:
 local_distclean:
 
 local_test:
-	@-$(EXPECT) testEcho
+	@-"$(EXPECT)" testEcho
