@@ -65,8 +65,10 @@ local_test:
 
 run: $(CPP_BINS)
 	@-echo @echo off > test.bat
+!IFDEF WITH_SSL
 	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat
 	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >> test.bat
+!ENDIF
 	@-echo echo Running the Wolframe server... >> test.bat
 	@-echo pechod.exe -c pecho.conf -d DATA >> test.bat
 	@-test.bat
