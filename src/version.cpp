@@ -40,6 +40,12 @@
 
 namespace _Wolframe {
 
+Version::Version()
+{
+	major_ = minor_ = revision_ = build_ = 0;
+	hasRevision_ = hasBuild_ = false;
+}
+
 Version::Version( unsigned short M, unsigned short m )
 {
 	major_ = M, minor_ = m;
@@ -85,7 +91,7 @@ bool Version::operator> ( const Version &other ) const
 }
 
 
-std::string Version::toString()
+std::string Version::toString() const
 {
 	std::ostringstream	o;
 

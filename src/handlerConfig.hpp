@@ -13,15 +13,15 @@ namespace _Wolframe {
 	struct HandlerConfiguration
 	{
 	public:
-		Configuration::DatabaseConfiguration		*database;
-		Configuration::ServiceBanner			*banner;
-//		Configuration::AuthenticationConfiguration	*auth;
+		Database::DatabaseConfiguration	*database;
+		Configuration::ServiceBanner	*banner;
+//		AAAA::AAAAConfiguration		*auth;
 
 		/// constructor
 		HandlerConfiguration()
 		{
 			banner = new Configuration::ServiceBanner();
-			database = new Configuration::DatabaseConfiguration();
+			database = new Database::DatabaseConfiguration();
 
 //			auth = ...
 		}

@@ -233,31 +233,36 @@ namespace Logging	{
 			void foreground( Logging::LogLevel::Level debugLevel, bool useConfig );
 		};
 
+	} // namespace Configuration
 
-		/// database configuration
-		struct DatabaseConfiguration : public _Wolframe::Configuration::ConfigurationBase
-		{
-		public:
-			std::string		host;
-			unsigned short		port;
-			std::string		name;
-			std::string		user;
-			std::string		password;
-			unsigned short		connections;
-			unsigned short		acquireTimeout;
+	namespace Database	{
 
-			/// constructor
-			DatabaseConfiguration();
+	/// database configuration
+	struct DatabaseConfiguration : public _Wolframe::Configuration::ConfigurationBase
+	{
+	public:
+		std::string		host;
+		unsigned short		port;
+		std::string		name;
+		std::string		user;
+		std::string		password;
+		unsigned short		connections;
+		unsigned short		acquireTimeout;
 
-			/// methods
-			bool parse( const boost::property_tree::ptree& pt, const std::string& node );
-			bool check() const;
-			void print( std::ostream& os ) const;
+		/// constructor
+		DatabaseConfiguration();
 
-//			Not implemented yet, inherited from base for the time being
-//			bool test() const;
-		};
+		/// methods
+		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
+		bool check() const;
+		void print( std::ostream& os ) const;
 
-}} // namespace _Wolframe::Configuration
+		//			Not implemented yet, inherited from base for the time being
+		//			bool test() const;
+	};
+
+	} // namespace Database
+
+} // namespace _Wolframe
 
 #endif // _STANDARD_CONFIGS_HPP_INCLUDED

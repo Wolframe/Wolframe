@@ -49,7 +49,7 @@ static const unsigned short DEFAULT_DB_CONNECTIONS = 4;
 
 
 namespace _Wolframe	{
-	namespace	Configuration	{
+namespace Database	{
 
 DatabaseConfiguration::DatabaseConfiguration() : ConfigurationBase( "Database Server" )
 {
@@ -87,6 +87,8 @@ bool DatabaseConfiguration::check() const
 
 bool DatabaseConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& /* nodeName */ )
 {
+	using namespace _Wolframe::Configuration;
+
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "host" ))	{
 			if ( !getStringValue( L1it->second, L1it->first, displayName(), host ))	return false;
@@ -125,5 +127,4 @@ bool DatabaseConfiguration::parse( const boost::property_tree::ptree& pt, const 
 	return true;
 }
 
-	} // namespace Configuration
-} // namespace _Wolframe
+}} // namespace _Wolframe::Database

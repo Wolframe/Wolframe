@@ -45,8 +45,8 @@ namespace _Wolframe	{
 class ApplicationSingleton : public Singleton< ApplicationSingleton >
 {
 public:
-	const Version& version() const;
-	void version( const Version& ver );
+	const Version& version() const		{ return version_; }
+	void version( const Version& ver )	{ version_ = ver; }
 private:
 	Version	version_;
 };

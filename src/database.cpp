@@ -35,3 +35,15 @@
 //
 
 #include "database.hpp"
+#include "standardConfigs.hpp"
+#include "logger.hpp"
+
+namespace _Wolframe	{
+namespace Database	{
+
+Database::Database( DatabaseConfiguration& /* config */ )
+{
+	LOG_TRACE << "Database object created :P";
+}
+
+}} // namespace _Wolframe::Database

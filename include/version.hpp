@@ -14,6 +14,7 @@ namespace _Wolframe {
 		unsigned	build_;
 		bool		hasBuild_;
 	public:
+		Version();
 		Version( unsigned short M, unsigned short m );
 		Version( unsigned short M, unsigned short m, unsigned short r );
 		Version( unsigned short M, unsigned short m, unsigned short r, unsigned b );
@@ -31,7 +32,7 @@ namespace _Wolframe {
 		bool operator< ( const Version &other ) const	{ return ( other > *this ); }
 		bool operator<= ( const Version &other ) const	{ return !( *this > other ); }
 
-		std::string toString();
+		std::string toString() const;
 	};
 
 } // namespace _Wolframe

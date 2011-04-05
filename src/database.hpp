@@ -37,4 +37,16 @@
 #ifndef _DATABASE_HPP_INCLUDED
 #define _DATABASE_HPP_INCLUDED
 
+#include "standardConfigs.hpp"
+
+namespace _Wolframe	{
+namespace Database	{
+
+class Database	{
+public:
+	Database( DatabaseConfiguration& config );
+};
+
+}} // namespace _Wolframe::Database
+
 #endif // _DATABASE_HPP_INCLUDED

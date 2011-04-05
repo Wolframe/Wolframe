@@ -49,7 +49,7 @@
 #include "server.hpp"
 #include "ErrorCodes.hpp"
 #include "logger.hpp"
-//#include "appSingleton.hpp"
+#include "appSingleton.hpp"
 
 #include "connectionHandler.hpp"
 
@@ -93,15 +93,15 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 // end of i18n global stuff
 
 	try	{
-		_Wolframe::Version	appVersion( _Wolframe::applicationMajorVersion(),
-						    _Wolframe::applicationMinorVersion(),
-						    _Wolframe::applicationRevisionVersion(),
-						    _Wolframe::applicationBuildVersion() );
-//		_Wolframe::ApplicationSingleton	appSingleton = _Wolframe::ApplicationSingleton::instance();
-//		appSingleton.version( _Wolframe::Version( _Wolframe::applicationMajorVersion(),
-//							  _Wolframe::applicationMinorVersion(),
-//							  _Wolframe::applicationRevisionVersion(),
-//							  _Wolframe::applicationBuildVersion() ));
+//		_Wolframe::Version	appVersion( _Wolframe::applicationMajorVersion(),
+//						    _Wolframe::applicationMinorVersion(),
+//						    _Wolframe::applicationRevisionVersion(),
+//						    _Wolframe::applicationBuildVersion() );
+		_Wolframe::ApplicationSingleton& appSingleton = _Wolframe::ApplicationSingleton::instance();
+		appSingleton.version( _Wolframe::Version( _Wolframe::applicationMajorVersion(),
+							  _Wolframe::applicationMinorVersion(),
+							  _Wolframe::applicationRevisionVersion(),
+							  _Wolframe::applicationBuildVersion() ));
 		_Wolframe::Configuration::CmdLineConfig   cmdLineCfg;
 		const char *configFile;
 
@@ -120,12 +120,12 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 // if we have to print the version or the help do it and exit
 		if ( cmdLineCfg.command == _Wolframe::Configuration::CmdLineConfig::PRINT_VERSION )	{
 			std::cout << std::endl << gettext( "BOBOBO version " )
-				<< appVersion.toString() << std::endl << std::endl;
+				  << appSingleton.version().toString() << std::endl << std::endl;
 			return _Wolframe::ErrorCodes::OK;
 		}
 		if ( cmdLineCfg.command == _Wolframe::Configuration::CmdLineConfig::PRINT_HELP )	{
 			std::cout << std::endl << _Wolframe::applicationName() << gettext( "BOBOBO version " )
-				<< appVersion.toString() << std::endl;
+				  << appSingleton.version().toString() << std::endl;
 			cmdLineCfg.usage( std::cout );
 			std::cout << std::endl;
 			return _Wolframe::ErrorCodes::OK;
@@ -157,7 +157,7 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 
 // Check the configuration
 		if ( cmdLineCfg.command == _Wolframe::Configuration::CmdLineConfig::CHECK_CONFIG )	{
-			std::cout << gettext( "BOBOBO version " ) << appVersion.toString() << std::endl;
+			std::cout << gettext( "BOBOBO version " ) << appSingleton.version().toString() << std::endl;
 			if ( config.check() )	{
 				std::cout << "Configuration OK" << std::endl << std::endl;
 				return _Wolframe::ErrorCodes::OK;
@@ -168,7 +168,7 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 		}
 
 		if ( cmdLineCfg.command == _Wolframe::Configuration::CmdLineConfig::PRINT_CONFIG )	{
-			std::cout << std::endl << gettext( "BOBOBO version " ) << appVersion.toString() << std::endl;
+			std::cout << std::endl << gettext( "BOBOBO version " ) << appSingleton.version().toString() << std::endl;
 			config.print( std::cout );
 			std::cout << std::endl;
 			return _Wolframe::ErrorCodes::OK;
