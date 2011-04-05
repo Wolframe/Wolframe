@@ -6,12 +6,12 @@
 %define WOLFRAME_USR	wolframe
 %define WOLFRAME_GRP	wolframe
 
-%define with_ssl	0
-%define with_postgresql	0
-%define with_sqlite	0
-%define with_lua	0
-%define with_pam	0
-%define with_qt		0
+%define with_ssl	1
+%define with_postgresql	1
+%define with_sqlite	1
+%define with_lua	1
+%define with_pam	1
+%define with_qt		1
  
 Summary: Small and medium enterprise resource planning (Wolframe)
 Name: wolframe
@@ -77,15 +77,8 @@ X client for the Wolframe server.
 
 %build
 LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make all \
-%if %{with_ssl}
-	WITH_SSL=1 \
-%endif
-%if %{with_lua}
-	WITH_LUA=1 \
-%endif
-%if %{with_pam}
-	WITH_PAM=1 \
-%endif
+	WITH_SSL=%{with_ssl} WITH_SQLITE3=%{with_sqlite} \
+	WITH_LUA=%{with_lua} WITH_PATH=%{with_pam} \
 	WITH_QT=1 \
 	sysconfdir=/etc
 cd docs; make doc-doxygen
@@ -98,15 +91,8 @@ echo ===================== END OF TESTING =========================
 %install
 rm -rf $RPM_BUILD_ROOT
 make DESTDIR=$RPM_BUILD_ROOT install \
-%if %{with_ssl}
-	WITH_SSL=1 \
-%endif
-%if %{with_lua}
-	WITH_LUA=1 \
-%endif
-%if %{with_pam}
-	WITH_PAM=1 \
-%endif
+	WITH_SSL=%{with_ssl} WITH_SQLITE3=%{with_sqlite} \
+	WITH_LUA=%{with_lua} WITH_PATH=%{with_pam} \
 	WITH_QT=1 \
 	sysconfdir=$RPM_BUILD_ROOT/etc
 cd docs && make DESTDIR=$RPM_BUILD_ROOT install && cd ..
