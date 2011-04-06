@@ -9,6 +9,7 @@
 %define with_ssl	1
 %define with_postgresql	1
 %define with_sqlite	1
+%define with_pgsql	1
 %define with_lua	1
 %define with_pam	1
 %define with_qt		1
@@ -35,6 +36,10 @@ Requires: postgresql >= 8.1
 %if %{with_sqlite}
 BuildRequires: sqlite-devel >= 3.0
 Requires: sqlite >= 3.0
+%endif
+%if %{with_pgsql}
+BuildRequires: postgresql-devel >= 8.1
+Requires: postgresql-libs >= 8.1
 %endif
 %if %{with_lua}
 BuildRequires: lua-devel >= 5.1
@@ -81,7 +86,7 @@ Qt client for the Wolframe server.
 LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make all \
 	WITH_SSL=%{with_ssl} WITH_SQLITE3=%{with_sqlite} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
-	WITH_QT=%{with_qt} \
+	WITH_PGSQL=%{with_pgsql} WITH_QT=%{with_qt} \
 	sysconfdir=/etc
 cd docs; make doc-doxygen
 
@@ -95,7 +100,7 @@ rm -rf $RPM_BUILD_ROOT
 make DESTDIR=$RPM_BUILD_ROOT install \
 	WITH_SSL=%{with_ssl} WITH_SQLITE3=%{with_sqlite} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
-	WITH_QT=%{with_qt} \
+	WITH_PGSQL=%{with_pgsql} WITH_QT=%{with_qt} \
 	sysconfdir=$RPM_BUILD_ROOT/etc
 cd docs && make DESTDIR=$RPM_BUILD_ROOT install && cd ..
 
