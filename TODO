@@ -15,12 +15,14 @@ ABa:
   - username, password for service credentials
   - clean up native Win32 string mess in service code
   - log when service gets installed and uninstalled
+  - do some packaging with Wix
+    - have merge modules for all optional parts (should be do
+      merge modules for OpenSSL? legal?)
 - Logger:
-  - check out categoryid
-  - have markers for OS errors and for components
-- 64-bit on Windows, issues with Qt, boost at least
-- Debian 5.0: Qt client can't load designer library and run correctly, don'y know why?
-- RHEL 5: no decent qt available
+  - get better interface in logger.hpp (inheriting basic::ostream
+    instead of templating?)
+- 64-bit on Windows
+  - trouble with Qt
 
 PF:
 
