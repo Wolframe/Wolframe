@@ -20,11 +20,6 @@ public:
 	Connector( const Configuration* cfg) :m_cfg(cfg){};
 	virtual ~Connector(){};
 
-	virtual Connector* duplicate()
-	{
-		return new Connector( m_cfg);
-	}
-
 	virtual int open();
 	virtual int call( const Function& fun, Result& res);
 

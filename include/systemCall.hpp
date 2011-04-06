@@ -150,93 +150,9 @@ public:
 	ConnectorBase(){};
 	virtual ~ConnectorBase(){};
 
-	virtual ConnectorBase* duplicate()=0;
-	virtual int open()=0;
 	virtual int call( const Function& fun, Result& res)=0;
 };
 
-
-class ConnectorPool :public ObjectPool<ConnectorBase>
-{
-	struct Refused :public std::runtime_error {Refused() :std::runtime_error("refused system object request"){}};
-
-	ConnectorPool( const char* cn) :m_connectorName(cn){};
-
-	bool open( ConnectorBase* conn, unsigned int nofInstances)
-	{
-		unsigned int ii;
-		for (ii=0; ii<nofInstances; ii++)
-		{
-			ConnectorBase* ci = (ii==nofInstances-1)?conn:conn->duplicate();
-			int err = ci->open();
-			if (err)
-			{
-				LOG_ERROR << "failed to open "<< m_connectorName << " connector. error code:" << err;
-				delete conn;
-				return false;
-			}
-			add( conn);
-		}
-	}
-
-	struct PoolFunction :public Function
-	{
-	public:
-		PoolFunction( ConnectorPool* pool, const char* name) :m_pool(pool),m_conn(0),m_fun(0)
-		{
-			m_conn = pool->get();
-			if (!m_conn)
-			{
-				LOG_ERROR << "failed to get "<< m_connectorName << " object for system call";
-				throw Refused();
-			}
-		}
-		~PoolFunction()
-		{
-			if (m_conn)
-			{
-				m_conn = m_pool->add(m_conn);
-				m_conn = 0;
-			}
-		}
-
-		template <typename ArgumentType>
-		PoolFunction& operator()( const char* name, const ArgumentType& value)
-		{
-			addParameter( name, value);
-			return *this;
-		}
-
-		bool exec( Result& result)
-		{
-			Function::Error rt = m_fun.getError();
-			if (rt == Function::Ok)
-			{
-				int err = m_conn->call( fun, result);
-				if (err)
-				{
-					LOG_ERROR << "error " << err << " in " << m_connectorName << " calling function " << m_fun.m_name;
-					return false;
-				}
-			}
-			else
-			{
-				LOG_ERROR << "error calling function " << m_fun.m_name << ":" << Function::getErrorName( rt);
-				return false;
-			}
-			return true;
-		}
-
-	private:
-		ConnectorPool* m_pool;
-		ConnectorBase* m_conn;
-	};
-
-	boost::shared_ptr<PoolFunction> function( const char* name)
-	{
-		return boost::shared_ptr<Item>( new Item( this, name));
-	}
-};
 
 }}//namespace
 #endif
