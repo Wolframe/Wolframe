@@ -234,27 +234,34 @@ CommandDispatcher::IOState CommandDispatcher::call( int& returnCode)
 					LOG_ERROR << "error " << returnCode << " calling '" << m_instance->m_mt[ m_methodIdx].name << "'";
 					return Error;
 				}
-				if (!m_context.contentIterator || m_context.contentIterator->state() == protocol::Generator::Open)
-				{
-					if (m_context.output && (m_context.output->pos() > 0 || m_context.output->size() == 0))
-					{
-						if (commandHasIO()) return WriteOutput;
-						LOG_ERROR << "error printed in method '" << m_instance->m_mt[ m_methodIdx].name << "' declared to have no output";
-						return Error;
-					}
-					else
-					{
-						LOG_DATA << "end of method call";
-						return Close;
-					}
-				}
-				else switch (m_context.contentIterator->state())
+				Generator::State istate = (m_context.contentIterator)?m_context.contentIterator->state():protocol::Generator::Open;
+
+				switch (istate)
 				{
 					case protocol::Generator::Open:
+						if (m_context.output && (m_context.output->pos() > 0 || m_context.output->size() == 0))
+						{
+							if (commandHasIO())
+							{
+								return WriteOutput;
+							}
+							LOG_ERROR << "error printed in method '" << m_instance->m_mt[ m_methodIdx].name << "' declared to have no output";
+							return Error;
+						}
+						else
+						{
+							LOG_DATA << "end of method call";
+							return Close;
+						}
+
 					case protocol::Generator::EndOfMessage:
-						if (commandHasIO()) return ReadInput;
+						if (commandHasIO())
+						{
+							return ReadInput;
+						}
 						m_context.contentIterator->protocolInput( 0, 0, true);
 						continue;
+
 					case protocol::Generator::Error:
 						returnCode = m_context.contentIterator->getError();
 						LOG_ERROR << "error " << returnCode << ") in generator calling '" << m_instance->m_mt[ m_methodIdx].name << "'";

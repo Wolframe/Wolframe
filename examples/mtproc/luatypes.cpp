@@ -165,11 +165,6 @@ Interpreter::~Interpreter()
 	delete state;
 }
 
-bool Interpreter::passConfig( const char* , protocol::Generator* )
-{
-	return true;
-}
-
 int Interpreter::call( unsigned int , const char**)
 {
 	return 0;

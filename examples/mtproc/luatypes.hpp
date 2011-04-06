@@ -37,8 +37,6 @@ Project Wolframe.
 #define _Wolframe_LUATYPES_HPP_INCLUDED
 #include "methodtable.hpp"
 #include "luaconfig.hpp"
-#include "protocol/generator.hpp"
-#include "protocol/formatoutput.hpp"
 
 namespace _Wolframe {
 namespace mtproc {
@@ -53,7 +51,6 @@ class Interpreter
 	Interpreter();
 	~Interpreter();
 
-	bool passConfig( const char* , protocol::Generator* );
 	int call( unsigned int argc, const char** argv);
 };
 
