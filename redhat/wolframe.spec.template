@@ -63,13 +63,15 @@ This package contains the one file html documentation,
 multiple file html documentation and the pdf documentation.
 
 
+%if %{with_qt}
 %package client
 Summary: Wolframe client
 Group: Application/Business
 
 %description client
-X client for the Wolframe server.
+Qt client for the Wolframe server.
 
+%endif
 
 %prep
 %setup
@@ -79,7 +81,7 @@ X client for the Wolframe server.
 LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make all \
 	WITH_SSL=%{with_ssl} WITH_SQLITE3=%{with_sqlite} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
-	WITH_QT=1 \
+	WITH_QT=%{with_qt} \
 	sysconfdir=/etc
 cd docs; make doc-doxygen
 
@@ -93,7 +95,7 @@ rm -rf $RPM_BUILD_ROOT
 make DESTDIR=$RPM_BUILD_ROOT install \
 	WITH_SSL=%{with_ssl} WITH_SQLITE3=%{with_sqlite} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
-	WITH_QT=1 \
+	WITH_QT=%{with_qt} \
 	sysconfdir=$RPM_BUILD_ROOT/etc
 cd docs && make DESTDIR=$RPM_BUILD_ROOT install && cd ..
 
@@ -106,11 +108,13 @@ for i in \
     cp /usr/local/boost-%{boost_version}/lib/$i $RPM_BUILD_ROOT%{_libdir}/wolframe/
 done
 
+%if %{with_qt}
 mkdir -p $RPM_BUILD_ROOT%{_libdir}/wolframe
 for i in libQtCore.so.4 libQtGui.so.4 libQtNetwork.so.4 libQtXml.so.4; do
 # Aba TODO: qtdir from config.mk?
     cp /usr/local/qt-%{qt_version}/lib/$i $RPM_BUILD_ROOT%{_libdir}/wolframe/
 done
+%endif
 
 mkdir -p $RPM_BUILD_ROOT%{_initrddir}
 cp redhat/%{initscript} $RPM_BUILD_ROOT%{_initrddir}/%{name}
@@ -166,6 +170,7 @@ fi
 %dir %{_datadir}/doc/wolframe
 %{_datadir}/doc/wolframe/html
 
+%if %{with_qt}
 %files client
 %dir %{_bindir}
 %{_bindir}/qtclient
@@ -174,6 +179,7 @@ fi
 %{_libdir}/wolframe/libQtGui.so.4
 %{_libdir}/wolframe/libQtNetwork.so.4
 %{_libdir}/wolframe/libQtXml.so.4
+%endif
 
 %changelog
 * Sun Aug 29 2010 Mihai Barbos <mihai.barbos@gmail.com> 0.9.0-0.1
