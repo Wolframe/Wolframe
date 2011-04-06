@@ -70,7 +70,6 @@ TEST_F( VersionFixture, Members )	{
 	ASSERT_STREQ( ver->toString().c_str(), verStr );
 }
 
-
 // Tests the Version operators
 TEST_F( VersionFixture, Operators )	{
 	ASSERT_TRUE( *ver != *ver0 );
@@ -79,6 +78,12 @@ TEST_F( VersionFixture, Operators )	{
 	ASSERT_FALSE( *ver == *ver0 );
 	ASSERT_FALSE( *ver < *ver0 );
 	ASSERT_FALSE( *ver <= *ver0 );
+}
+
+// Tests the Version pattern printing
+TEST_F( VersionFixture, Printing )	{
+	ASSERT_STREQ( ver->toString( "%M.%m.%r.%b" ).c_str(), verStr );
+	ASSERT_STRNE( ver->toString( "%M.%m.%r" ).c_str(), verStr );
 }
 
 

@@ -33,6 +33,14 @@ namespace _Wolframe {
 		bool operator<= ( const Version &other ) const	{ return !( *this > other ); }
 
 		std::string toString() const;
+		/// format string: (% is the escape character)
+		/// %% - %
+		/// %M - major version
+		/// %m - minor version
+		/// %r - revision
+		/// %b - build
+		/// all other characters are send directly to the output
+		std::string toString( const std::string& format ) const;
 	};
 
 } // namespace _Wolframe

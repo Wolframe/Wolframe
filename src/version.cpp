@@ -105,5 +105,32 @@ std::string Version::toString() const
 	return o.str();
 }
 
-} // namespace _Wolframe
+std::string Version::toString( const std::string& format ) const
+{
+	std::ostringstream	o;
+	bool			escaped = false;
 
+	for ( std::string::const_iterator it = format.begin(); it != format.end(); it++ )
+	{
+		if ( escaped )	{
+			switch( *it )	{
+			case '%': o << *it; break;
+			case 'M': o << major_; break;
+			case 'm': o << minor_;	break;
+			case 'r': if ( hasRevision_ ) o << revision_; break;
+			case 'b': if ( hasBuild_ ) o << build_; break;
+			default: o << *it;
+			}
+			escaped = false;
+		}
+		else	{
+			if ( *it == '%' )
+				escaped = true;
+			else
+				o << *it;
+		}
+	}
+	return o.str();
+}
+
+} // namespace _Wolframe

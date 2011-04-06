@@ -37,6 +37,7 @@
 #include "standardConfigs.hpp"
 #include "configHelpers.hpp"
 #include "logger.hpp"
+#include "appSingleton.hpp"
 
 #include <string>
 #include <stdexcept>
@@ -44,7 +45,7 @@
 #include <boost/algorithm/string.hpp>
 
 namespace _Wolframe {
-	namespace Configuration	{
+namespace Configuration	{
 
 
 static ServiceBanner::SignatureTokens strToToken( std::string& str )
@@ -135,11 +136,21 @@ std::string ServiceBanner::toString() const
 	std::string	banner;
 
 	switch ( tokens_ )	{
-	case PRODUCT_NAME:	banner = "Wolframe"; break;
-	case VERSION_MAJOR:	banner = "Wolframe 0"; break;
-	case VERSION_MINOR:	banner = "Wolframe 0.0"; break;
-	case VERSION_REVISION:	banner = "Wolframe 0.0.4"; break;
-	case PRODUCT_OS:	banner = "Wolframe 0.0.4 on Linux"; break;
+	case PRODUCT_NAME:
+		banner = "Wolframe";
+		break;
+	case VERSION_MAJOR:
+		banner = "Wolframe " + _Wolframe::ApplicationSingleton::instance().version().toString( "version %M" );
+		break;
+	case VERSION_MINOR:
+		banner = "Wolframe " + _Wolframe::ApplicationSingleton::instance().version().toString( "version %M.%m" );
+		break;
+	case VERSION_REVISION:
+		banner = "Wolframe " + _Wolframe::ApplicationSingleton::instance().version().toString( "version %M.%m.%r" );
+		break;
+	case PRODUCT_OS:
+		banner = "Wolframe " + _Wolframe::ApplicationSingleton::instance().version().toString( "version %M.%m.%r" ) + " OS";
+		break;
 	case NONE:		break;
 	case UNDEFINED:
 	default:		throw std::domain_error( "ServiceBanner: unknown ServerTokens value" );

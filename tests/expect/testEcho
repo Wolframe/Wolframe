@@ -18,9 +18,9 @@ set timeout 3
 spawn telnet localhost 7661
 
 expect 	{
-	timeout		{ send_user " --> oops. timeout occured waiting for server banner\n" }
-	eof		{ send_user " --> EOF waiting for server banner: that's bad\n" }
-	"Welcome to Wolframe.\r"	{ send_user " --> Connected.\n" }
+	timeout	{ send_user " --> oops. timeout occured waiting for server banner\n" }
+	eof	{ send_user " --> EOF waiting for server banner: that's bad\n" }
+	"OK.\r"	{ send_user " --> Connected.\n" }
 }
 
 set message "1 short line"
@@ -33,8 +33,8 @@ expect "$message"
 
 set timeout 1
 send "quit\r"
-expect "Thanks for using Wolframe."
+expect "Bye."
 expect 	{
-	timeout		{ send_user " --> oops. timeout occured\n" }
-	eof		{ send_user " --> Connection closed. OK\n" }
+	timeout	{ send_user " --> oops. timeout occured\n" }
+	eof	{ send_user " --> Connection closed. OK\n" }
 }
