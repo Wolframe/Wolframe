@@ -53,7 +53,6 @@ class Interpreter
 	Interpreter();
 	~Interpreter();
 
-	bool passConfig( );
 	bool passConfig( const char* , protocol::Generator* );
 	int call( unsigned int argc, const char** argv);
 };
