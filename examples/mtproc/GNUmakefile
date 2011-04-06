@@ -24,7 +24,7 @@ INCLUDE_LIBS = \
 
 # openssl
 
-ifdef WITH_SSL
+ifeq ($(WITH_SSL),1)
 
 INCLUDE_CPPFLAGS += \
 	-DWITH_SSL
@@ -45,7 +45,7 @@ OBJS = \
 	mtprocHandler.o \
 	$(TOPDIR)/src/posixMain.o
 
-ifdef WITH_LUA
+ifeq ($(WITH_LUA),1)
 OBJS += \
 	luatypes.o
 endif

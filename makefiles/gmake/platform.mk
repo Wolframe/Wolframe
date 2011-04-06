@@ -20,6 +20,14 @@
 -include $(HOME)/config.mk
 -include $(TOPDIR)/makefiles/gmake/platform.mk.vars
 
+# set up defaults for the build switches
+WITH_SSL ?= 0
+WITH_LUA ?= 0
+WITH_PAM ?= 0
+WITH_SQLITE3 ?= 0
+WITH_PGSQL ?= 0
+WITH_QT ?= 0
+
 PLATFORM ?=		$(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_env --platform $(CC) "$(CURDIR)" $(TOPDIR))
 OS_MAJOR_VERSION ?=	$(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_env --os-major-version $(CC) "$(CURDIR)" $(TOPDIR))
 OS_MINOR_VERSION ?=	$(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_env --os-minor-version $(CC) "$(CURDIR)" $(TOPDIR))
@@ -278,7 +286,7 @@ endif
 # OpenSSL
 #########
 
-ifdef WITH_SSL
+ifeq ($(WITH_SSL),1)
 
 ifeq "$(PLATFORM)" "LINUX"
 
@@ -291,7 +299,7 @@ endif
 # Google Unit testing gtest
 ###########################
 
-ifdef WITH_GTEST
+ifeq ($(WITH_GTEST),1)
 
 ifeq "$(PLATFORM)" "LINUX" 
 
@@ -361,7 +369,7 @@ endif
 # Qt 4 (http://qt.nokia.com/products/)
 ######################################
 
-ifdef WITH_QT
+ifeq ($(WITH_QT),1)
 
 ifeq "$(PLATFORM)" "LINUX"
 
@@ -426,7 +434,7 @@ endif
 # Lua 5.1
 #########
 
-ifdef WITH_LUA
+ifeq ($(WITH_LUA),1)
 
 ifeq "$(PLATFORM)" "LINUX"
 
@@ -492,7 +500,7 @@ endif
 # PAM 1.1.3
 ###########
 
-ifdef WITH_PAM
+ifeq ($(WITH_PAM),1)
 
 ifeq "$(PLATFORM)" "LINUX"
 
@@ -552,7 +560,7 @@ endif
 # Sqlite3
 #########
 
-ifdef WITH_SQLITE3
+ifeq ($(WITH_SQLITE3),1)
 
 ifeq "$(PLATFORM)" "LINUX"
 
@@ -581,7 +589,7 @@ endif
 # Postgresql
 ############
 
-ifdef WITH_PGSQL
+ifeq ($(WITH_PGSQL),1)
 
 ifeq "$(PLATFORM)" "LINUX"
 

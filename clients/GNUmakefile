@@ -2,7 +2,7 @@ TOPDIR = ..
 
 SUBDIRS =
 
-ifdef WITH_QT
+ifeq ($(WITH_QT),1)
 SUBDIRS += qt
 endif
 

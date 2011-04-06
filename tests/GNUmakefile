@@ -2,7 +2,7 @@ TOPDIR = ..
 
 SUBDIRS =
 
-ifdef WITH_EXPECT
+ifeq ($(WITH_EXPECT),1)
 SUBDIRS += expect
 endif
 
@@ -20,7 +20,7 @@ INCLUDE_DIRS = \
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR)
 
-ifdef WITH_GTEST
+ifeq ($(WITH_GTEST),1)
 INCLUDE_CPPFLAGS += \
 	-I$(GTEST_INCLUDE_DIR)
 
@@ -33,12 +33,16 @@ INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_filesystem -lboost_system -lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_program_options \
-	$(TOPDIR)/src/libwolframe.a \
+	$(TOPDIR)/src/libwolframe.a
+
+ifeq ($(WITH_GTEST),1)
+INCLUDE_LIBS += \
 	$(GTEST_LIBS)
+endif
 
 # openssl
 
-ifdef WITH_SSL
+ifeq ($(WITH_SSL),1)
 
 INCLUDE_LIBS += \
 	$(OPENSSL_LIBS)
@@ -47,7 +51,7 @@ endif
 
 # pam
 
-ifdef WITH_PAM
+ifeq ($(WITH_PAM),1)
 
 INCLUDE_CPPFLAGS += \
 	-DWITH_PAM
@@ -65,7 +69,7 @@ endif
 
 # sqlite3
 
-ifdef WITH_SQLITE3
+ifeq ($(WITH_SQLITE3),1)
 
 INCLUDE_CPPFLAGS += \
 	-DWITH_SQLITE3
@@ -88,7 +92,7 @@ TEST_CPP_BINS = \
 	threadLeakTest$(EXE) \
 	authTest$(EXE)
 
-ifdef WITH_GTEST
+ifeq ($(WITH_GTEST),1)
 TEST_CPP_BINS += \
 	testNamedRetVal$(EXE) \
 	versionTest$(EXE) \
@@ -109,7 +113,7 @@ include $(TOPDIR)/makefiles/gmake/sub.mk
 logTest$(EXE): $(TOPDIR)/src/libwolframe.a
 authTest$(EXE): $(TOPDIR)/src/libwolframe.a
 
-ifdef WITH_GTEST
+ifeq ($(WITH_GTEST),1)
 PECHO_GTEST_OBJS=$(TOPDIR)/examples/pecho/pechoHandler.o
 pechoHandler-gTest$(EXE): pechoHandler-gTest.o $(PECHO_GTEST_OBJS) $(TOPDIR)/src/libwolframe.a
 	$(CCPP_LINK) -o $@ $(LDFLAGS) $(PECHO_GTEST_OBJS) $(OBJS) $< $(LIBS)
@@ -136,7 +140,7 @@ local_clean:
 local_distclean:
 
 local_test:
-ifdef WITH_GTEST
+ifeq ($(WITH_GTEST),1)
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./testNamedRetVal
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./logTest

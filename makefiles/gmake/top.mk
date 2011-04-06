@@ -72,45 +72,45 @@ endif
 	@echo "BOOST_LIBRARY_TAG: $(BOOST_LIBRARY_TAG)"
 	@echo
 	@echo "Optional Dependencies:"
-ifdef WITH_SSL
+ifeq ($(WITH_SSL),1)
 	@echo
 	@echo "OPENSSL_DIR: $(OPENSSL_DIR)"
 	@echo "OPENSSL_LIBS: $(OPENSSL_LIBS)"
 endif
-ifdef WITH_LUA
+ifeq ($(WITH_LUA),1)
 	@echo
 	@echo "LUA_INCLUDE_DIR: $(LUA_INCLUDE_DIR)"
 	@echo "LUA_LIB_DIR: $(LUA_LIB_DIR)"
 	@echo "LUA_LIBS: $(LUA_LIBS)"
 endif
-ifdef WITH_QT
+ifeq ($(WITH_QT),1)
 	@echo
 	@echo "QT_DIR: $(QT_DIR)"
 	@echo "QT_INCLUDE_DIR: $(QT_INCLUDE_DIR)"
 	@echo "QT_LIB_DIR: $(QT_LIB_DIR)"
 endif
-ifdef WITH_GTEST
+ifeq ($(WITH_GTEST),1)
 	@echo
 	@echo "GTEST_DIR: $(GTEST_DIR)"
 	@echo "GTEST_INCLUDE_DIR: $(GTEST_INCLUDE_DIR)"
 	@echo "GTEST_LIB_DIR: $(GTEST_LIB_DIR)"
 	@echo "GTEST_LIBS: $(GTEST_LIBS)"
 endif
-ifdef WITH_PAM
+ifeq ($(WITH_PAM),1)
 	@echo
 	@echo "PAM_DIR: $(PAM_DIR)"
 	@echo "PAM_INCLUDE_DIR: $(PAM_INCLUDE_DIR)"
 	@echo "PAM_LIB_DIR: $(PAM_LIB_DIR)"
 	@echo "PAM_LIBS: $(PAM_LIBS)"
 endif
-ifdef WITH_SQLITE3
+ifeq ($(WITH_SQLITE3),1)
 	@echo
 	@echo "SQLITE3_DIR: $(SQLITE3_DIR)"
 	@echo "SQLITE3_INCLUDE_DIR: $(SQLITE3_INCLUDE_DIR)"
 	@echo "SQLITE3_LIB_DIR: $(SQLITE3_LIB_DIR)"
 	@echo "SQLITE3_LIBS: $(SQLITE3_LIBS)"
 endif
-ifdef WITH_PGSQL
+ifeq ($(WITH_PGSQL),1)
 	@echo
 	@echo "PGSQL_DIR: $(PGSQL_DIR)"
 	@echo "PGSQL_INCLUDE_DIR: $(PGSQL_INCLUDE_DIR)"

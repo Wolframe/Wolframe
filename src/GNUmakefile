@@ -20,7 +20,7 @@ INCLUDE_LIBS = \
 
 # openssl
 
-ifdef WITH_SSL
+ifeq ($(WITH_SSL),1)
 
 INCLUDE_CPPFLAGS += \
 	-DWITH_SSL
@@ -32,7 +32,7 @@ endif
 
 # pam
 
-ifdef WITH_PAM
+ifeq ($(WITH_PAM),1)
 
 INCLUDE_CPPFLAGS += \
 	-DWITH_PAM
@@ -50,7 +50,7 @@ endif
 
 # sqlite3
 
-ifdef WITH_SQLITE3
+ifeq ($(WITH_SQLITE3),1)
 
 INCLUDE_CPPFLAGS += \
 	-DWITH_SQLITE3
@@ -68,7 +68,7 @@ endif
 
 # Postgresql
 
-ifdef WITH_PGSQL
+ifeq ($(WITH_PGSQL),1)
 
 INCLUDE_CPPFLAGS += \
 	-DWITH_PGSQL
@@ -101,12 +101,12 @@ AAAA_OBJS = \
 	AAAA/authentication.o \
 	AAAA/authentication_textfile.o
 
-ifdef WITH_PAM
+ifeq ($(WITH_PAM),1)
 AAAA_OBJS += \
 	AAAA/authentication_pam.o
 endif
 
-ifdef WITH_SQLITE3
+ifeq ($(WITH_SQLITE3),1)
 AAAA_OBJS += \
 	AAAA/authentication_db_sqlite3.o
 endif
@@ -131,15 +131,8 @@ LOCAL_STATIC_LIB_OBJS = \
 	server.o \
 	$(AAAA_OBJS)
 
-# Postgresql
-
-ifdef WITH_PGSQL
-#LOCAL_STATIC_LIB_OBJS += \
-#	systemCall_database_postgres.o
-endif
-
 #SSL
-ifdef WITH_SSL
+ifeq ($(WITH_SSL),1)
 LOCAL_STATIC_LIB_OBJS += \
 	SSLcertificateInfo.o
 endif

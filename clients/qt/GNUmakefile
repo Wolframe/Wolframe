@@ -26,7 +26,7 @@ MOC_FLAGS = \
 
 # openssl
 
-ifdef WITH_SSL
+ifeq ($(WITH_SSL),1)
 
 INCLUDE_CPPFLAGS += \
 	-DWITH_SSL
