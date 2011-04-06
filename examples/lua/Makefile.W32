@@ -52,7 +52,7 @@ CPP_BINS = \
 
 all: $(OBJS) $(CPP_BINS)
 
-luad.exe: luad.obj $(TOPDIR)\src\wolframe.lib $(OBJS)
+luad.exe: luad.obj $(TOPDIR)\src\wolframe.lib
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 

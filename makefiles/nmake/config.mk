@@ -17,7 +17,7 @@
 #PLATFORM_SDK_DIR = C:\Programme\Microsoft Platform SDK
 #PLATFORM_SDK_DIR = C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2
 #PLATFORM_SDK_DIR = D:\Programme\Microsoft Platform SDK
-PLATFORM_SDK_DIR = C:\Program Files\Microsoft SDKs\Windows\v6.0A
+#PLATFORM_SDK_DIR = C:\Program Files\Microsoft SDKs\Windows\v6.0A
 #PLATFORM_SDK_DIR = C:\Program Files\Microsoft SDKs\Windows\v7.0
 #PLATFORM_SDK_DIR = C:\Program Files\Microsoft SDKs\Windows\v7.1
 #PLATFORM_SDK_DIR = C:\Program Files\Microsoft SDKs\Windows\v6.0A
