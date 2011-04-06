@@ -1,3 +1,35 @@
+/************************************************************************
+
+ Copyright (C) 2011 Project Wolframe.
+ All rights reserved.
+
+ This file is part of Project Wolframe.
+
+ Commercial Usage
+    Licensees holding valid Project Wolframe Commercial licenses may
+    use this file in accordance with the Project Wolframe
+    Commercial License Agreement provided with the Software or,
+    alternatively, in accordance with the terms contained
+    in a written agreement between the licensee and Project Wolframe.
+
+ GNU General Public License Usage
+    Alternatively, you can redistribute this file and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Wolframe is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Wolframe.  If not, see <http://www.gnu.org/licenses/>.
+
+ If you have questions regarding the use of this file, please contact
+ Project Wolframe.
+
+************************************************************************/
 //
 // server.cpp
 //
@@ -17,14 +49,14 @@
 namespace _Wolframe {
 	namespace Network	{
 
-                server::server( const ServerConfiguration* config, _Wolframe::ServerHandler& serverHandler )
-                                        : threadPoolSize_( config->threads ),
+		server::server( const ServerConfiguration* config, _Wolframe::ServerHandler& serverHandler )
+					: threadPoolSize_( config->threads ),
 					IOservice_(),
-                                        globalList_( config->maxConnections )
+					globalList_( config->maxConnections )
 		{
 			int i = 0;
-                        for ( std::list<ServerTCPendpoint>::const_iterator it = config->address.begin();
-                                                                        it != config->address.end(); it++ )	{
+			for ( std::list<ServerTCPendpoint>::const_iterator it = config->address.begin();
+									it != config->address.end(); it++ )	{
 				acceptor* acptr = new acceptor( IOservice_,
 								it->host(), it->port(), it->maxConnections(),
 								globalList_,
@@ -35,8 +67,8 @@ namespace _Wolframe {
 			LOG_DEBUG << i << " network acceptor(s) created.";
 #ifdef WITH_SSL
 			i = 0;
-                        for ( std::list<ServerSSLendpoint>::const_iterator it = config->SSLaddress.begin();
-                                                                        it != config->SSLaddress.end(); it++ )	{
+			for ( std::list<ServerSSLendpoint>::const_iterator it = config->SSLaddress.begin();
+									it != config->SSLaddress.end(); it++ )	{
 				SSLacceptor* acptr = new SSLacceptor( IOservice_,
 								      it->certificate(), it->key(),
 								      it->verifyClientCert(),

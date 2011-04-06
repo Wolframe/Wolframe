@@ -1,3 +1,35 @@
+/************************************************************************
+
+ Copyright (C) 2011 Project Wolframe.
+ All rights reserved.
+
+ This file is part of Project Wolframe.
+
+ Commercial Usage
+    Licensees holding valid Project Wolframe Commercial licenses may
+    use this file in accordance with the Project Wolframe
+    Commercial License Agreement provided with the Software or,
+    alternatively, in accordance with the terms contained
+    in a written agreement between the licensee and Project Wolframe.
+
+ GNU General Public License Usage
+    Alternatively, you can redistribute this file and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Wolframe is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Wolframe.  If not, see <http://www.gnu.org/licenses/>.
+
+ If you have questions regarding the use of this file, please contact
+ Project Wolframe.
+
+************************************************************************/
 //
 // application exception class
 //
@@ -17,9 +49,9 @@ class appException : public std::exception
 {
 public:
 	appException( ErrorCode::Error error, ErrorSeverity::Severity severity, const char* Format, ... );
-	~appException() throw ()	{};
+	~appException() throw ()	{}
 
-	ErrorCode::Error error()			{ return error_; };
+	ErrorCode::Error error()			{ return error_; }
 	ErrorSeverity::Severity severity( void )	{ return severity_; }
 	const char* what() const throw()		{ return what_.c_str(); }
 private:
@@ -40,9 +72,9 @@ class systemException : public std::exception
 public:
 	systemException( ErrorCode::Error error, ErrorSeverity::Severity severity,
 		ErrorModule::Module module = ErrorModule::UNKNOWN, const char* msg = NULL );
-	~systemException() throw ()	{};
+	~systemException() throw ()	{}
 
-	ErrorCode::Error error()			{ return error_; };
+	ErrorCode::Error error()			{ return error_; }
 	ErrorSeverity::Severity severity()		{ return severity_; }
 	ErrorModule::Module module()			{ return module_; }
 	const char* msg()				{ return msg_; }

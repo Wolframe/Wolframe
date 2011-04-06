@@ -1,3 +1,35 @@
+/************************************************************************
+
+ Copyright (C) 2011 Project Wolframe.
+ All rights reserved.
+
+ This file is part of Project Wolframe.
+
+ Commercial Usage
+    Licensees holding valid Project Wolframe Commercial licenses may
+    use this file in accordance with the Project Wolframe
+    Commercial License Agreement provided with the Software or,
+    alternatively, in accordance with the terms contained
+    in a written agreement between the licensee and Project Wolframe.
+
+ GNU General Public License Usage
+    Alternatively, you can redistribute this file and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Wolframe is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Wolframe.  If not, see <http://www.gnu.org/licenses/>.
+
+ If you have questions regarding the use of this file, please contact
+ Project Wolframe.
+
+************************************************************************/
 //
 // winMain.cpp
 //
@@ -65,7 +97,7 @@ static bool registerEventlog( const _Wolframe::Configuration::ApplicationConfigu
 	char key[256];
 	HKEY h = 0;
 	DWORD disposition;
-	
+
 // choose the key for the EventLog registry entry
 	_snprintf( key, 256, "SYSTEM\\CurrentControlSet\\Services\\EventLog\\%s\\%s",
 		config.loggerConf->eventlogLogName.c_str( ), config.loggerConf->eventlogSource.c_str( ) );
@@ -92,7 +124,7 @@ static bool registerEventlog( const _Wolframe::Configuration::ApplicationConfigu
 	registrySetWord( h, TEXT( "CategoryCount" ), (DWORD)5 );
 
 	(void)RegCloseKey( h );
-	
+
 	return true;
 }
 
@@ -103,7 +135,7 @@ static bool deregisterEventlog( const _Wolframe::Configuration::ApplicationConfi
 	DWORD disposition;
 	LONG res;
 
-// remove event log registry entry	
+// remove event log registry entry
 	_snprintf( key, 256, "SYSTEM\\CurrentControlSet\\Services\\EventLog\\%s\\%s",
 		config.loggerConf->eventlogLogName.c_str( ), config.loggerConf->eventlogSource.c_str( ) );
 	res = RegDeleteKey( HKEY_LOCAL_MACHINE, key );
@@ -111,7 +143,7 @@ static bool deregisterEventlog( const _Wolframe::Configuration::ApplicationConfi
 		LOG_CRITICAL << "RegDeleteKey with key '" << key << "' failed: " << _Wolframe::Logging::LogError::LogWinerror;
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -123,7 +155,7 @@ static bool installAsService( const _Wolframe::Configuration::ApplicationConfigu
 		LOG_CRITICAL << "OpenSCManager for service registration failed: " << _Wolframe::Logging::LogError::LogWinerror;
 		return false;
 	}
-	
+
 // retrieve absolute path of binary
 	TCHAR binary_path[MAX_PATH];
 	DWORD res = GetModuleFileName( NULL, binary_path, MAX_PATH );
@@ -151,7 +183,7 @@ static bool installAsService( const _Wolframe::Configuration::ApplicationConfigu
 // free handles
 	(void)CloseServiceHandle( service );
 	(void)CloseServiceHandle( scm );
-	
+
 	return true;
 }
 
@@ -180,7 +212,7 @@ static bool removeAsService( const _Wolframe::Configuration::ApplicationConfigur
 // free handles
 	(void)CloseServiceHandle( service );
 	(void)CloseServiceHandle( scm );
-	
+
 	return true;
 }
 
@@ -323,7 +355,7 @@ WAIT_FOR_STOP_EVENT:
 // event, but log the fact we run into that state
 				LOG_CRITICAL << "Waiting for stop event in service main resulted in WAIT_ABANDONED!";
 				break;
-				
+
 			case WAIT_FAILED:
 // error, stop now immediatelly
 				LOG_FATAL << "Waiting for stop event in service main failed, stopping now" << _Wolframe::Logging::LogError::LogWinerror;
@@ -349,7 +381,7 @@ int _Wolframe_winMain( int argc, char* argv[] )
 	try	{
 		// create initial console logger, so we see things going wrong
 		_Wolframe::Logging::LogBackend::instance().setConsoleLevel( _Wolframe::Logging::LogLevel::LOGLEVEL_INFO );
-		
+
 		_Wolframe::Version  appVersion( _Wolframe::applicationMajorVersion(), _Wolframe::applicationMinorVersion(),
 						_Wolframe::applicationRevisionVersion(), _Wolframe::applicationBuildVersion() );
 		_Wolframe::Configuration::CmdLineConfig	cmdLineCfg;
