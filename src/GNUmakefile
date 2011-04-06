@@ -66,6 +66,23 @@ INCLUDE_LIBS += \
 
 endif
 
+# Postgresql
+
+ifdef WITH_PGSQL
+
+INCLUDE_CPPFLAGS += \
+	-DWITH_PGSQL
+
+INCLUDE_DIRS += \
+	-I$(PGSQL_INCLUDE_DIR)
+
+INCLUDE_LDFLAGS += \
+	-L$(PGSQL_LIB_DIR)
+
+INCLUDE_LIBS += \
+	$(PGSQL_LIBS)
+endif
+
 LOCAL_STATIC_LIB = \
 	libwolframe.a
 
@@ -113,6 +130,13 @@ LOCAL_STATIC_LIB_OBJS = \
 	serverConfig.o \
 	server.o \
 	$(AAAA_OBJS)
+
+# Postgresql
+
+ifdef WITH_PGSQL
+#LOCAL_STATIC_LIB_OBJS += \
+#	systemCall_database_postgres.o
+endif
 
 #SSL
 ifdef WITH_SSL

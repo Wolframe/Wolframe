@@ -99,7 +99,7 @@
 # Sqlite 3
 ##########
 
-#SQLITE3_DIR=/usr/local
+#SQLITE3_DIR = /usr/local
 
 # usual layout
 #SQLITE3_INCLUDE_DIR = $(SQLITE3_DIR)/include
@@ -108,3 +108,10 @@
 
 # Postgresql 8.x, 9.x
 #####################
+
+#PGSQL_DIR = /usr/local
+
+# usual layout
+#PGSQL_INCLUDE_DIR = $(PGSQL_DIR)/include
+#PGSQL_LIB_DIR = $(PGSQL_DIR)/lib
+#PGSQL_LIBS = -lpq

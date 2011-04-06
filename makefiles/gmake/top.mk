@@ -110,6 +110,13 @@ ifdef WITH_SQLITE3
 	@echo "SQLITE3_LIB_DIR: $(SQLITE3_LIB_DIR)"
 	@echo "SQLITE3_LIBS: $(SQLITE3_LIBS)"
 endif
+ifdef WITH_PGSQL
+	@echo
+	@echo "PGSQL_DIR: $(PGSQL_DIR)"
+	@echo "PGSQL_INCLUDE_DIR: $(PGSQL_INCLUDE_DIR)"
+	@echo "PGSQL_LIB_DIR: $(PGSQL_LIB_DIR)"
+	@echo "PGSQL_LIBS: $(PGSQL_LIBS)"
+endif
 
 .PHONY: init-po
 init-po:

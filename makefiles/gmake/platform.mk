@@ -577,3 +577,32 @@ endif
 
 endif
 endif
+
+# Postgresql
+############
+
+ifdef WITH_PGSQL
+
+ifeq "$(PLATFORM)" "LINUX"
+
+ifeq "$(LINUX_DIST)" "arch"
+PGSQL_DIR ?= /usr
+PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include
+PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
+PGSQL_LIBS ?= -lpq
+endif
+
+ifeq "$(LINUX_DIST)" "redhat"
+
+# RHEL5
+ifeq "$(LINUX_REV)" "5"
+PGSQL_DIR ?= /usr
+PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include
+PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
+PGSQL_LIBS ?= -lpq
+endif
+
+endif
+
+endif
+endif
