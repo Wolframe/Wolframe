@@ -7,7 +7,7 @@
 	         UpgradeCode='{64361569-C468-42DE-95A1-901DDDE84D13}' >
 		<Package Description='Wolframe Windows Installer Package'
 		         Comments='The Wolframe framework'
-		         Manufacturer='Wolframe Team' InstallerVersion='200' Compressed='yes' />
+		         Manufacturer='Wolframe Team' InstallerVersion='300' Compressed='yes' />
 
 		<Media Id='1' Cabinet='wolframe.cab' EmbedCab='yes' />
 		
@@ -32,6 +32,12 @@
 				<Directory Id="ApplicationProgramsFolder" Name="Wolframe"/>
 			</Directory>
 			
+			<!-- merge module for the C runtime, TODO: depends on VCxxx
+			     this also generates tons of LGHTxxx warnings, so maybe
+			     enable it only at the very end of deployment.. :-)
+			  -->
+			<Merge Id="CRT" Language="0" SourceFile="C:\Program Files\Common Files\Merge Modules\Microsoft_VC90_CRT_x86.msm" DiskId="1" />
+
 		</Directory>
 
 		<DirectoryRef Id="ApplicationProgramsFolder">
@@ -57,9 +63,10 @@
 		<Feature Id='Complete' Title='Complete' Description='The complete package.'
 		         Display='expand' Level='1' ConfigurableDirectory='INSTALLDIR'>
 			<Feature Id='MainProgram' Title='Program' Description='The main executable.' Level='1'>
-				<ComponentRef Id='License' />
-				<ComponentRef Id='ServiceBinary' />
-				<ComponentRef Id="ApplicationShortcut" />
+				<ComponentRef Id='License'/>
+				<ComponentRef Id='ServiceBinary'/>
+				<ComponentRef Id="ApplicationShortcut"/>
+				<MergeRef Id="CRT"/>
 			</Feature>
 			
 			<Feature Id='Documentation' Title='Manual' Description='The Wolbones usage manual.' Level='1000'>
@@ -70,7 +77,7 @@
 
 		</Feature>
 		
-		<WixVariable Id="WixUILicenseRtf" Value="license.rtf" />
+		<WixVariable Id="WixUILicenseRtf" Value="license.rtf"/>
 		
 		<UIRef Id="WixUI_Mondo" />
 		<UIRef Id="WixUI_ErrorProgressText" />

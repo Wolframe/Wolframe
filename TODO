@@ -11,6 +11,10 @@ ABa:
   - SASL
 - makefiles
   - merge po stuff from WolfBones with the funny script in po :-)
+  - warning LNK4006: __NULL_IMPORT_DESCRIPTOR in src (because we
+    link the library and the executable twice with library dependencies,
+    we should link only the resulting binary, this is exactly the
+    opposite of shared libraries on Unix)
 - Windows:
   - username, password for service credentials
   - clean up native Win32 string mess in service code
