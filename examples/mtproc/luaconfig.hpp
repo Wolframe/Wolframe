@@ -63,6 +63,9 @@ public:
 	/// \brief interface implementation of ConfigurationBase::setCanonicalPathes(const std::string&)
 	virtual void setCanonicalPathes( const std::string&);
 
+	/// \brief interface implementation of ConfigurationBase::test() const
+	virtual bool test() const;
+
 	/// \brief interface implementation of ConfigurationBase::check() const
 	virtual bool check() const;
 
@@ -85,9 +88,9 @@ public:
 		};
 		static const char* typeName( Type t)	{const char* ar[3] = {"undefined", "script", "preloaded library"}; return ar[t];}
 
-		/// \brief constructor
+		/// \brief Constructor
 		Module(){}
-		/// \brief constructor
+		/// \brief Constructor
 		/// \param module name
 		Module( const std::string& name_)	:m_type(Undefined),m_name(name_),m_load(0){}
 		/// \brief copy constructor
@@ -100,22 +103,27 @@ public:
 		/// \param[in] refPath the application reference path
 		void setCanonicalPath( const std::string& refPath);
 
-		/// \brief return the name of the module
+		/// \brief Return the name of the module
 		/// \return the plain name of the module
 		const std::string& name() const		{return m_name;}
 
-		/// \brief return the full path of the module
+		/// \brief Return the full path of the module
 		/// \return the full path of the module
 		const std::string& path() const		{return m_path;}
 
-		/// \brief return the type of the module
+		/// \brief Return the type of the module
 		/// \return the type of the module
 		const Type& type() const		{return m_type;}
 
-		/// \brief loads the configuration settings for a lua virtual machine state
+		/// \brief Loads the configuration settings for a lua virtual machine state
 		/// \param[in,out] ls lua state to initialize
 		/// \return true if success, else false
 		bool load( lua_State* ls) const;
+
+		/// \brief Checks the module configuratin (does the module exist)
+		/// \return true if success, else false
+		virtual bool check() const;
+
 	private:
 		Type m_type;				///< type of the module
 		std::string m_name;			///< name of the module

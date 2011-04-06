@@ -166,6 +166,25 @@ bool LuaConfiguration::Module::load( lua_State* ls) const
 	return true;
 }
 
+bool LuaConfiguration::Module::check() const
+{
+	switch (m_type)
+	{
+		case PreloadLib:
+			break;
+		case Script:
+			if (!boost::filesystem::exists( m_path))
+			{
+				LOG_ERROR << "Script " << m_name << " ( " << m_path << ") does not exist";
+				return false;
+			}
+			break;
+		case Undefined:
+			break;
+	}
+	return true;
+}
+
 bool LuaConfiguration::load( lua_State *ls) const
 {
 	for (std::list<Module>::const_iterator it = m_modules.begin(); it != m_modules.end(); it++)
@@ -186,6 +205,16 @@ bool LuaConfiguration::load( lua_State *ls) const
 }
 
 bool LuaConfiguration::check() const
+{
+	bool rt = true;
+	for (std::list<Module>::const_iterator it = m_modules.begin(); it != m_modules.end(); it++)
+	{
+		rt &= it->check();
+	}
+	return rt;
+}
+
+bool LuaConfiguration::test() const
 {
 	lua_State *ls = luaL_newstate();
 	if (!ls)
