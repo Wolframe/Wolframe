@@ -100,6 +100,7 @@ Compile and install Qt
 ----------------------
 
 Easiest is to get a precompiled MSVC version of the SDK.
+But this version is missing SSL support.
 
 If you insist on compiling on your own:
 
