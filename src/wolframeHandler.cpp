@@ -149,7 +149,7 @@ namespace _Wolframe	{
 		case OUTPUT_MSG:
 			if ( !strncmp( "quit", dataStart_, 4 ))	{
 				state_ = TERMINATE;
-				return Network::NetworkOperation( Network::SendString( "Bye.\n" ));
+				return Network::NetworkOperation( Network::SendString( "Bye\n" ));
 			}
 			else	{
 				char *s = dataStart_;

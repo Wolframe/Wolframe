@@ -3,7 +3,7 @@ TOPDIR = ..
 SUBDIRS =
 
 ifeq ($(WITH_EXPECT),1)
-SUBDIRS += expect
+SUBDIRS += expect config
 endif
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
