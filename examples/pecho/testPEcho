@@ -5,12 +5,12 @@
 
 package require Expect
 
-set config echo.conf
+set config pecho.conf
 
 set timeout 3
-set serverpid [spawn ./echod -c $config -f]
+set serverpid [spawn ./pechod -c $config -f]
 
-puts "wolframe echo started with configuration file: $config (pid: $serverpid)"
+puts "wolframe echo with protocol started with configuration file: $config (pid: $serverpid)"
 # allow the server to start
 sleep 2
 
@@ -21,16 +21,19 @@ if { [catch {
 	expect 	{
 		timeout	{ return "--> oops. timeout occured waiting for server banner\n" }
 		eof	{ return "--> EOF waiting for server banner: that's bad\n" }
-		"Welcome to Wolframe.\r"	{ send_user " --> Connected.\n" }
+		"OK expecting command\r"	{ send_user " --> Connected.\n" }
 	}
 
 	set message "1 short line"
 	send "$message\r"
-	expect "$message"
+	expect "BAD unknown command\r"
+	expect "OK expecting command\r"
 
-	set message "2nd short line with üèöéäà°§"
-	send "$message\r"
-	expect "$message"
+	send "echo tolower\r"
+	expect "OK enter data"
+	set message "2nd Short Line With üèöéäà°§"
+	send "$message\r.\r"
+	expect "$message\r"
 
 	set timeout 1
 	send "quit\r"
