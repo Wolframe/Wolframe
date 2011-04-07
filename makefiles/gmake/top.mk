@@ -47,7 +47,8 @@ uninstall:
 
 .PHONY: test
 test: all
-	@$(MAKE) -C tests test
+	@test -z "$(SUBDIRS)" || ( set -e; for d in $(SUBDIRS)""; do \
+	  (set -e; $(MAKE) -C $$d test || exit 1); done)
 
 .PHONY: help
 help:

@@ -51,7 +51,7 @@ local_distclean:
 
 local_install:
 
-local_test: \
+local_test:
 	./testEcho
 
 run: $(CPP_BINS)
