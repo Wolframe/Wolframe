@@ -1,6 +1,7 @@
 <?xml version='1.0'?>
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'
-     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
+     xmlns:firewall="http://schemas.microsoft.com/wix/FirewallExtension">
 	<Product Name='Wolframe' Version='0.0.1' Manufacturer='Wolframe Team'
 	         Language='1033' Codepage='1252'
 	         Id='{09E1E9CC-6AE6-4207-B7FE-F47CFDB2861F}' 
@@ -22,6 +23,8 @@
 						<Directory Id='BinDir' Name='bin'>
 							<Component Id='ServiceBinary' Guid='{112265CD-F35C-49B5-A4A1-F685B32BC208}'>
 								<File Id='wolframed' Name='wolframed.exe' DiskId='1' Source='..\src\wolframed.exe' />
+								<firewall:FirewallException Id="Protocol" Name='Wolframe Protocol' Port='7661' Protocol='tcp' Scope='any'/>
+								<firewall:FirewallException Id="SSLProtocol" Name='Wolframe Protocol (SSL)' Port='7961' Protocol='tcp' Scope='any'/>
 							</Component>
 						</Directory>
 					</Directory>
@@ -73,8 +76,8 @@
 				<ComponentRef Id="ApplicationShortcut"/>
 			</Feature>
 
-			<!-- AllowAdvertise="no" Display="hidden" ? -->
-			<Feature Id="VCRedist" Title="Visual C++ 9.0 Runtime" Level="1">
+			<Feature Id="VCRedist" Title="Visual C++ 9.0 Runtime" Level="1"
+			         AllowAdvertise="no" Display="hidden">
 				<MergeRef Id="VCRedist"/>
 			</Feature>
 			

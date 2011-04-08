@@ -35,8 +35,8 @@ LIGHT = "$(WIX_DIR)\bin\light.exe"
 SMOKE = "$(WIX_DIR)\bin\smoke.exe"
 
 local_all: $(CPP_BINS)
-	$(CANDLE) /nologo -ext WixUIExtension -ext WixUtilExtension wolframe.wxs
-	$(LIGHT) /nologo -ext WixUIExtension -ext WixUtilExtension wolframe.wixobj
+	$(CANDLE) /nologo -ext WixUIExtension -ext WixUtilExtension -ext WixFirewallExtension wolframe.wxs
+	$(LIGHT) /nologo -ext WixUIExtension -ext WixUtilExtension -ext WixFirewallExtension wolframe.wixobj
 
 #uuidgen.exe: uuidgen.obj
 	
