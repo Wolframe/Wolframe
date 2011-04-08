@@ -39,11 +39,11 @@
 #include "logger.hpp"
 
 namespace _Wolframe	{
-namespace Database	{
+namespace db	{
 
 Database::Database( DatabaseConfiguration& /* config */ )
 {
 	LOG_TRACE << "Database object created :P";
 }
 
-}} // namespace _Wolframe::Database
+}} // namespace _Wolframe::db

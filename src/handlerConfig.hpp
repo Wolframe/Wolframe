@@ -38,6 +38,7 @@
 #define _HANDLERCONFIG_HPP_INCLUDED
 
 #include "standardConfigs.hpp"
+#include "database.hpp"
 
 namespace _Wolframe {
 
@@ -45,7 +46,7 @@ namespace _Wolframe {
 	struct HandlerConfiguration
 	{
 	public:
-		Database::DatabaseConfiguration	*database;
+		db::DatabaseConfiguration	*database;
 		Configuration::ServiceBanner	*banner;
 //		AAAA::AAAAConfiguration		*auth;
 
@@ -53,7 +54,7 @@ namespace _Wolframe {
 		HandlerConfiguration()
 		{
 			banner = new Configuration::ServiceBanner();
-			database = new Database::DatabaseConfiguration();
+			database = new db::DatabaseConfiguration();
 
 //			auth = ...
 		}

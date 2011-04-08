@@ -1,44 +1,84 @@
+/************************************************************************
+
+ Copyright (C) 2011 Project Wolframe.
+ All rights reserved.
+
+ This file is part of Project Wolframe.
+
+ Commercial Usage
+    Licensees holding valid Project Wolframe Commercial licenses may
+    use this file in accordance with the Project Wolframe
+    Commercial License Agreement provided with the Software or,
+    alternatively, in accordance with the terms contained
+    in a written agreement between the licensee and Project Wolframe.
+
+ GNU General Public License Usage
+    Alternatively, you can redistribute this file and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Wolframe is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Wolframe.  If not, see <http://www.gnu.org/licenses/>.
+
+ If you have questions regarding the use of this file, please contact
+ Project Wolframe.
+
+************************************************************************/
 //
 // database.hpp - Wolframe base database class
 //
 
-#include "appConfig.hpp"
-
+#include "configurationBase.hpp"
 
 #ifndef _DATABASE_HPP_INCLUDED
 #define _DATABASE_HPP_INCLUDED
 
 namespace _Wolframe	{
-	namespace Database	{
+namespace db	{
 
-		/// database type
-		enum DatabaseType	{
-			DBTYPE_POSTGRESQL,
-			DBTYPE_SQLITE
-		};
+/// database type
+enum DatabaseType	{
+	DBTYPE_POSTGRESQL,
+	DBTYPE_SQLITE
+};
 
-		/// database configuration
-		struct DatabaseConfig : public _Wolframe::ConfigurationBase
-		{
-		public:
-			DatabaseType		type;
-			std::string		host;
-			unsigned short		port;
-			std::string		name;
-			std::string		user;
-			std::string		password;
-			unsigned short		connections;
-			unsigned short		timeout;
+/// database configuration
+struct DatabaseConfiguration : public _Wolframe::Configuration::ConfigurationBase
+{
+public:
+	DatabaseType		type;
+	std::string		host;
+	unsigned short		port;
+	std::string		name;
+	std::string		user;
+	std::string		password;
+	unsigned short		connections;
+	unsigned short		acquireTimeout;
 
-		/// ConfigurationBase virtual functions
-			DatabaseConfig() : _Wolframe::ConfigurationBase( "database" )	{}
-			bool parse();
-			bool check();
-			bool test();
-			void print( std::ostream& os ) const;
-		};
+	/// constructor
+	DatabaseConfiguration();
 
-	} // namespace Database
-} // namespace _Wolframe
+	/// methods
+	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
+	bool check() const;
+	void print( std::ostream& os ) const;
+
+	//			Not implemented yet, inherited from base for the time being
+	//			bool test() const;
+};
+
+/// database base class
+class Database	{
+public:
+	Database( DatabaseConfiguration& config );
+};
+
+}} // namespace _Wolframe::db
 
 #endif // _DATABASE_HPP_INCLUDED

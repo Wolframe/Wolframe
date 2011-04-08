@@ -46,54 +46,55 @@
 
 namespace _Wolframe {
 
-	// forward declarations for configuration elements
-	namespace Network { struct ServerConfiguration;	}
-	namespace Logging { struct LoggerConfiguration;	}
-	struct HandlerConfiguration;
+// forward declarations for configuration elements
+namespace Network { struct ServerConfiguration;	}
+namespace Logging { struct LoggerConfiguration;	}
+struct HandlerConfiguration;
 
 
-	namespace Configuration	{
+namespace Configuration	{
 
-		struct ServiceConfiguration;
-		struct LoggerConfiguration;
-		struct CmdLineConfig;		// forward declaration for the command line structure
+struct ServiceConfiguration;
+struct LoggerConfiguration;
+struct CmdLineConfig;		// forward declaration for the command line structure
 
-		/// application configuration structure
-		struct ApplicationConfiguration	{
-			std::string				configFile;
-			// from command line
-			bool					foreground;
+/// application configuration structure
+struct ApplicationConfiguration	{
+	std::string				configFile;
+	// from command line
+	bool					foreground;
 
-			// daemon / service configuration
-			ServiceConfiguration			*serviceConf;
-			// network server configuration
-			_Wolframe::Network::ServerConfiguration	*serverConf;
-			// logger configuration
-			_Wolframe::Logging::LoggerConfiguration	*loggerConf;
+	// daemon / service configuration
+	ServiceConfiguration			*serviceConf;
+	// network server configuration
+	_Wolframe::Network::ServerConfiguration	*serverConf;
+	// logger configuration
+	_Wolframe::Logging::LoggerConfiguration	*loggerConf;
 
-			_Wolframe::HandlerConfiguration		*handlerConf;
+	_Wolframe::HandlerConfiguration		*handlerConf;
 
-		public:
-			ApplicationConfiguration();
-			~ApplicationConfiguration();
+public:
+	ApplicationConfiguration();
+	~ApplicationConfiguration();
 
-			bool parse( const char *filename );
-			void finalize( const CmdLineConfig& cmdLine );
+	bool parse( const char *filename );
+	void finalize( const CmdLineConfig& cmdLine );
 
-			bool check() const;
-			bool test() const;
-			void print( std::ostream& os ) const;
+	bool check() const;
+	bool test() const;
+	void print( std::ostream& os ) const;
 
-			static const char* chooseFile( const char *globalFile,
-						       const char *userFile,
-						       const char *localFile );
-		private:
-			std::vector< ConfigurationBase* >	conf_;
-			std::map< std::string, std::size_t >	section_;
+	static const char* chooseFile( const char *globalFile,
+				       const char *userFile,
+				       const char *localFile );
+private:
+	std::vector< ConfigurationBase* >	conf_;
+	std::map< std::string, std::size_t >	section_;
 
-			bool addConfig( const std::string& nodeName, ConfigurationBase *config );
-		};
-	} // namespace Configuration
+	bool addConfig( const std::string& nodeName, ConfigurationBase *config );
+};
+
+} // namespace Configuration
 } // namespace _Wolframe
 
 #endif // _APP_CONFIG_HPP_INCLUDED

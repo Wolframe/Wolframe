@@ -177,7 +177,6 @@ src/connection.cpp
 src/connection.hpp
 src/databaseConfig.cpp
 src/database.cpp
-src/database.hpp
 src/exceptionBase.hpp
 src/getPassword.cpp
 src/getPassword.hpp

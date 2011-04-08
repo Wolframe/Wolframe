@@ -34,8 +34,7 @@
 // database configuration functions
 //
 
-
-#include "standardConfigs.hpp"
+#include "database.hpp"
 #include "configHelpers.hpp"
 #include "logger.hpp"
 
@@ -44,12 +43,10 @@
 
 #include <ostream>
 
-
 static const unsigned short DEFAULT_DB_CONNECTIONS = 4;
 
-
 namespace _Wolframe	{
-namespace Database	{
+namespace db	{
 
 DatabaseConfiguration::DatabaseConfiguration() : ConfigurationBase( "Database Server" )
 {
@@ -127,4 +124,4 @@ bool DatabaseConfiguration::parse( const boost::property_tree::ptree& pt, const 
 	return true;
 }
 
-}} // namespace _Wolframe::Database
+}} // namespace _Wolframe::db
