@@ -90,7 +90,10 @@
 		</Feature>
 		
 		<WixVariable Id="WixUILicenseRtf" Value="license.rtf"/>
-		
+<!-- TODO: find better image here
+		<WixVariable Id="WixUIDialogBmp" Value="wolframe.bmp"/>-->
+		<Property Id="WIXUI_EXITDIALOGOPTIONALTEXT" Value="Check out http://www.wolframe.net for additional information." />
+
 		<UIRef Id="WixUI_Mondo" />
 		<UIRef Id="WixUI_ErrorProgressText" />
 
