@@ -42,6 +42,7 @@ CCPPFLAGS = $(CCPP_COMPILE_FLAGS) $(PLATFORM_COMPILE_FLAGS) $(INCLUDE_CPPFLAGS) 
 CC = cl.exe
 CCPP = cl.exe
 MC = "$(PLATFORM_SDK_DIR)\Bin\mc.exe"
+MT = mt.exe
 RC = "$(PLATFORM_SDK_DIR)\Bin\rc.exe"
 
 # linking flags (release)
@@ -70,6 +71,7 @@ CCPP_LINK = link.exe
 
 .obj.exe:
 	$(CCPP_LINK) $(LDFLAGS) $(LIBS) /out:$@ $(OBJS) $**
+	$(MT) -manifest $@.manifest -outputresource:$@;1
 
 .mc.rc:
 	$(MC) -h $(@D) -r $(@D) $<
