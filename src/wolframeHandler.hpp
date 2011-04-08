@@ -38,6 +38,7 @@
 #define _Wolframe_HANDLER_HPP_INCLUDED
 
 #include "connectionHandler.hpp"
+#include "database.hpp"
 
 namespace _Wolframe {
 	/// The global server container
@@ -48,8 +49,10 @@ namespace _Wolframe {
 		~wolframeHandler();
 
 		const std::string& banner() const	{ return banner_; }
+		const db::Database& db() const		{ return db_; }
 	private:
 		const std::string	banner_;
+		_Wolframe::db::Database	db_;
 	};
 
 

@@ -41,9 +41,12 @@
 namespace _Wolframe	{
 namespace db	{
 
-Database::Database( DatabaseConfiguration& /* config */ )
+Database::Database( DatabaseConfiguration& config )
 {
 	LOG_TRACE << "Database object created :P";
+	LOG_TRACE << "    host: " << config.host << ":" << config.port;
+	LOG_TRACE << "    database: " << config.name;
+	LOG_TRACE << "    credentials: " << config.user << " / " << config.password;
 }
 
 }} // namespace _Wolframe::db

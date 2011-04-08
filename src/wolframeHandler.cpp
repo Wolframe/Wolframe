@@ -248,7 +248,8 @@ void wolframeConnection::errorOccured( NetworkSignal signal )
 
 /// The server handler global context
 wolframeHandler::wolframeHandler( const HandlerConfiguration* config )
-	: banner_( config->banner->toString() )
+	: banner_( config->banner->toString() ),
+	  db_( *config->database )
 {
 	//		banner_ = config->banner->toString();
 	LOG_TRACE << "Global context: banner: <" << banner_ << ">";
