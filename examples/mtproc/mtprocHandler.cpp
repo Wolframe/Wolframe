@@ -129,7 +129,7 @@ struct Connection::Private
 		buffer.push_back( '\n');
 		const char* msg = buffer.c_str();
 		buffer.clear();
-		return Network::SendData( msg, ii+2);
+		return net::SendData( msg, ii+2);
 	}
 
 	void passInput()
@@ -229,7 +229,7 @@ struct Connection::Private
 							if (itr == end)
 							{
 								input.setPos( 0);
-								return Network::ReadData( input.ptr(), input.size());
+								return net::ReadData( input.ptr(), input.size());
 							}
 							else
 							{
@@ -256,7 +256,7 @@ struct Connection::Private
 							else
 							{
 								input.setPos( 0);
-								return Network::ReadData( input.ptr(), input.size());
+								return net::ReadData( input.ptr(), input.size());
 							}
 
 						case CommandDispatcher::WriteOutput:
@@ -266,7 +266,7 @@ struct Connection::Private
 							bool hasOutput = commandDispatcher.getOutput( &content, &contentsize);
 							commandDispatcher.setOutputBuffer( output.ptr(), output.size());
 
-							if (!hasOutput) continue; else return Network::SendData( content, contentsize);
+							if (!hasOutput) continue; else return net::SendData( content, contentsize);
 						}
 
 						case CommandDispatcher::Close:
@@ -314,7 +314,7 @@ struct Connection::Private
 					else
 					{
 						input.setPos( 0);
-						return Network::ReadData( input.ptr(), input.size());
+						return net::ReadData( input.ptr(), input.size());
 					}
 				}
 
@@ -334,7 +334,7 @@ struct Connection::Private
 					else
 					{
 						input.setPos( 0);
-						return Network::ReadData( input.ptr(), input.size());
+						return net::ReadData( input.ptr(), input.size());
 					}
 				}
 
@@ -343,7 +343,7 @@ struct Connection::Private
 					if (!ProtocolParser::skipLine( itr, end) || !ProtocolParser::consumeEOLN( itr, end))
 					{
 						input.setPos( 0);
-						return Network::ReadData( input.ptr(), input.size());
+						return net::ReadData( input.ptr(), input.size());
 					}
 					state = Init;
 					continue;
@@ -352,16 +352,16 @@ struct Connection::Private
 				case Terminate:
 				{
 					state = Terminate;
-					return Network::CloseConnection();
+					return net::CloseConnection();
 				}
 			}//switch(..)
 		}//for(;;)
-		return Network::CloseConnection();
+		return net::CloseConnection();
 	}
 };
 
 
-Connection::Connection( const Network::LocalEndpoint& local, unsigned int inputBufferSize, unsigned int outputBufferSize)
+Connection::Connection( const net::LocalEndpoint& local, unsigned int inputBufferSize, unsigned int outputBufferSize)
 {
 	data = new Private( inputBufferSize, outputBufferSize);
 	LOG_TRACE << "Created connection handler for " << local.toString();
@@ -374,7 +374,7 @@ Connection::~Connection()
 	delete data;
 }
 
-void Connection::setPeer( const Network::RemoteEndpoint& remote)
+void Connection::setPeer( const net::RemoteEndpoint& remote)
 {
 	LOG_TRACE << "Peer set to " << remote.toString();
 }
@@ -411,7 +411,7 @@ const Connection::Operation Connection::nextOperation()
 }
 
 /// ServerHandler PIMPL
-Network::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const Network::LocalEndpoint& local )
+net::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const net::LocalEndpoint& local )
 {
 	return new mtproc::Connection( local );
 }
@@ -421,7 +421,7 @@ ServerHandler::ServerHandler( const HandlerConfiguration* ) : impl_( new ServerH
 
 ServerHandler::~ServerHandler()  { delete impl_; }
 
-Network::connectionHandler* ServerHandler::newConnection( const Network::LocalEndpoint& local )
+net::connectionHandler* ServerHandler::newConnection( const net::LocalEndpoint& local )
 {
 	return impl_->newConnection( local );
 }

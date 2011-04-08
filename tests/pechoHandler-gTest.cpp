@@ -109,7 +109,7 @@ class pechoHandlerFixture : public ::testing::Test
 public:
    std::string input;
    std::string expected;
-   Network::LocalTCPendpoint ep;
+   net::LocalTCPendpoint ep;
    pecho::Connection* connection;
 
 protected:

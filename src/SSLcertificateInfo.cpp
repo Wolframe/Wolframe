@@ -123,37 +123,36 @@ static time_t timeFromASN1( const ASN1_TIME *aTime )
 }
 
 namespace _Wolframe {
-	namespace Network {
+namespace net {
 
-		static const std::size_t BUFFER_SIZE = 2048;
-		static const std::size_t BUFFER_SPACE = BUFFER_SIZE - 1;
+static const std::size_t BUFFER_SIZE = 2048;
+static const std::size_t BUFFER_SPACE = BUFFER_SIZE - 1;
 
-		SSLcertificateInfo::SSLcertificateInfo( X509* cert )
-		{
-			char	buf[ BUFFER_SIZE + 1 ];
+SSLcertificateInfo::SSLcertificateInfo( X509* cert )
+{
+	char	buf[ BUFFER_SIZE + 1 ];
 
-			serialNumber_ = ASN1_INTEGER_get( X509_get_serialNumber( cert ));
+	serialNumber_ = ASN1_INTEGER_get( X509_get_serialNumber( cert ));
 
-			memset( buf, 0, BUFFER_SIZE );
-			X509_NAME_oneline( X509_get_issuer_name( cert ), buf, BUFFER_SPACE );
-			issuer_ = std::string( buf );
+	memset( buf, 0, BUFFER_SIZE );
+	X509_NAME_oneline( X509_get_issuer_name( cert ), buf, BUFFER_SPACE );
+	issuer_ = std::string( buf );
 
-			ASN1_TIME *at = X509_get_notBefore( cert );
-			notBefore_ = timeFromASN1( at );
+	ASN1_TIME *at = X509_get_notBefore( cert );
+	notBefore_ = timeFromASN1( at );
 
-			at = X509_get_notAfter( cert );
-			notAfter_ = timeFromASN1( at );
+	at = X509_get_notAfter( cert );
+	notAfter_ = timeFromASN1( at );
 
-			memset( buf, 0, BUFFER_SIZE );
-			X509_NAME_oneline( X509_get_subject_name( cert ), buf, BUFFER_SPACE );
-			subject_ = std::string( buf );
+	memset( buf, 0, BUFFER_SIZE );
+	X509_NAME_oneline( X509_get_subject_name( cert ), buf, BUFFER_SPACE );
+	subject_ = std::string( buf );
 
-			// this one should be maybe be interpreted differently
-			memset( buf, 0, BUFFER_SIZE );
-			if ( X509_NAME_get_text_by_NID( X509_get_subject_name( cert ),
-								      NID_commonName, buf, 2047 ) != -1 )
-				commonName_ = std::string( buf );
-		}
+	// this one should be maybe be interpreted differently
+	memset( buf, 0, BUFFER_SIZE );
+	if ( X509_NAME_get_text_by_NID( X509_get_subject_name( cert ),
+						      NID_commonName, buf, 2047 ) != -1 )
+		commonName_ = std::string( buf );
+}
 
-	} // namespace Network
-} // namespace _Wolframe
+}} // namespace _Wolframe::net

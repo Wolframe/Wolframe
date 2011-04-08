@@ -42,7 +42,7 @@
 #include <boost/filesystem.hpp>
 
 namespace _Wolframe	{
-	namespace Network	{
+	namespace net	{
 
 #ifdef WITH_SSL
 /// set SSL files path to absolute pathes
@@ -79,6 +79,6 @@ void ServerSSLendpoint::setAbsolutePath( const std::string& refPath )
 }
 #endif // WITH_SSL
 
-	} // namespace Network
+	} // namespace net
 } // namespace _Wolframe
 

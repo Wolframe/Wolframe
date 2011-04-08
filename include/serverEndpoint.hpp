@@ -38,7 +38,7 @@
 #include "connectionEndpoint.hpp"
 
 namespace _Wolframe	{
-namespace Network	{
+namespace net	{
 
 	/// No encryption server endpoint
 	class ServerTCPendpoint : public ConnectionEndpoint
@@ -97,6 +97,6 @@ namespace Network	{
 		bool		verify_;
 	};
 
-}} // namespace _Wolframe::Network
+}} // namespace _Wolframe::net
 
 #endif // _SERVER_ENDPOINT_HPP_INCLUDED

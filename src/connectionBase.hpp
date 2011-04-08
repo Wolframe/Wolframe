@@ -50,7 +50,7 @@
 #include "logger.hpp"
 
 namespace _Wolframe {
-	namespace Network {
+namespace net {
 
 	/// Represents a single connection from a client.
 	template< typename socketType >
@@ -293,7 +293,6 @@ namespace _Wolframe {
 
 	};
 
-} // namespace Network
-} // namespace _Wolframe
+}} // namespace _Wolframe::net
 
 #endif // _CONNECTION_BASE_HPP_INCLUDED

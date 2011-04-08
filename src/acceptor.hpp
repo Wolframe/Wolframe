@@ -50,7 +50,7 @@
 #include "connectionHandler.hpp"
 
 namespace _Wolframe {
-	namespace Network {
+namespace net {
 
 /// acceptor class of the Wolframe network server.
 class acceptor: private boost::noncopyable
@@ -137,7 +137,6 @@ private:
 
 #endif // WITH_SSL
 
-	} // namespace Network
-} // namespace _Wolframe
+}} // namespace _Wolframe::net
 
 #endif // _NETWORK_ACCEPTOR_HPP_INCLUDED

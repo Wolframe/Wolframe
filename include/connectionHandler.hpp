@@ -44,7 +44,7 @@
 #include "connectionEndpoint.hpp"
 
 namespace _Wolframe {
-	namespace Network {
+	namespace net {
 
 		/// Base class for a network operation. It should never be accessed directly by
 		/// the user code
@@ -151,7 +151,7 @@ namespace _Wolframe {
 			virtual void setPeer( const RemoteEndpoint& remote ) = 0;
 		};
 
-	} // namespace Network
+	} // namespace net
 
 	/// The server main
 	/// All it should do is to provide connection handlers
@@ -165,7 +165,7 @@ namespace _Wolframe {
 		~ServerHandler();
 
 		/// Create a new connection handler and return a pointer to it
-		Network::connectionHandler* newConnection( const Network::LocalEndpoint& local );
+		net::connectionHandler* newConnection( const net::LocalEndpoint& local );
 
 	private:
 		ServerHandler( const ServerHandler& );

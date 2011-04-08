@@ -10,7 +10,7 @@
 #include <openssl/x509.h>
 
 namespace _Wolframe {
-	namespace Network {
+	namespace net {
 
 		class SSLcertificateInfo
 		{
@@ -32,7 +32,7 @@ namespace _Wolframe {
 			std::string commonName_;
 		};
 
-	} // namespace Network
+	} // namespace net
 } // namespace _Wolframe
 
 #endif // defined( WITH_SSL )

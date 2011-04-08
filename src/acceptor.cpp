@@ -46,7 +46,7 @@
 
 
 namespace _Wolframe {
-namespace Network {
+namespace net {
 
 acceptor::acceptor( boost::asio::io_service& IOservice,
 		    const std::string& host, unsigned short port, unsigned maxConnections,
@@ -264,5 +264,4 @@ void SSLacceptor::handleStop()
 
 #endif // WITH_SSL
 
-} // namespace Network
-} // namespace _Wolframe
+}} // namespace _Wolframe::net

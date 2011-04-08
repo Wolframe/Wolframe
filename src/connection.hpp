@@ -48,7 +48,7 @@
 #include "atomicCounter.hpp"
 
 namespace _Wolframe {
-namespace Network {
+namespace net {
 
 	class connection;		// forward declaration for connection_ptr
 	typedef boost::shared_ptr< connection > connection_ptr;
@@ -198,7 +198,6 @@ namespace Network {
 
 #endif // WITH_SSL
 
-} // namespace Network
-} // namespace _Wolframe
+}} // namespace _Wolframe::net
 
 #endif // _CONNECTION_HPP_INCLUDED

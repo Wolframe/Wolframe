@@ -45,16 +45,16 @@ namespace _Wolframe {
 namespace mtproc {
 
 	/// The connection handler
-	class Connection : public Network::connectionHandler
+	class Connection : public net::connectionHandler
 	{
 	public:
-		typedef Network::NetworkOperation Operation;
+		typedef net::NetworkOperation Operation;
 
-		Connection( const Network::LocalEndpoint& local, unsigned int inputBufferSize=128, unsigned int outputBufferSize=128);
+		Connection( const net::LocalEndpoint& local, unsigned int inputBufferSize=128, unsigned int outputBufferSize=128);
 
 		virtual ~Connection();
 
-		virtual void setPeer( const Network::RemoteEndpoint& remote);
+		virtual void setPeer( const net::RemoteEndpoint& remote);
 
 		/// Handle a request and produce a reply.
 		virtual const Operation nextOperation();
@@ -78,7 +78,7 @@ namespace mtproc {
 	class ServerHandler::ServerHandlerImpl
 	{
 	public:
-		Network::connectionHandler* newConnection( const Network::LocalEndpoint& local);
+		net::connectionHandler* newConnection( const net::LocalEndpoint& local);
 
 	};
 

@@ -54,13 +54,13 @@ namespace _Wolframe {
 
 
 	/// The connection handler
-	class wolframeConnection : public Network::connectionHandler
+	class wolframeConnection : public net::connectionHandler
 	{
 	public:
-		wolframeConnection( const wolframeHandler& context, const Network::LocalEndpoint& local );
+		wolframeConnection( const wolframeHandler& context, const net::LocalEndpoint& local );
 		~wolframeConnection();
 
-		void setPeer( const Network::RemoteEndpoint& remote );
+		void setPeer( const net::RemoteEndpoint& remote );
 
 		/// Parse / get the incoming data.
 		void networkInput( const void *begin, std::size_t bytesTransferred );
@@ -70,7 +70,7 @@ namespace _Wolframe {
 		void errorOccured( NetworkSignal );
 
 		/// Handle a request and produce a reply.
-		const Network::NetworkOperation nextOperation();
+		const net::NetworkOperation nextOperation();
 
 	private:
 		enum State	{
@@ -87,8 +87,8 @@ namespace _Wolframe {
 		const wolframeHandler&		globalCtx_;
 
 		/// Connection endpoints
-		const Network::LocalEndpoint*	localEP_;
-		const Network::RemoteEndpoint*	remoteEP_;
+		const net::LocalEndpoint*	localEP_;
+		const net::RemoteEndpoint*	remoteEP_;
 
 		static const std::size_t ReadBufSize = 8192;
 		/// The state of the processor FSM
@@ -109,7 +109,7 @@ namespace _Wolframe {
 	public:
 		ServerHandlerImpl( const HandlerConfiguration *config );
 		~ServerHandlerImpl();
-		Network::connectionHandler* newConnection( const Network::LocalEndpoint& local );
+		net::connectionHandler* newConnection( const net::LocalEndpoint& local );
 	private:
 		wolframeHandler	globalContext_;
 	};

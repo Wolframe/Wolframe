@@ -48,7 +48,7 @@
 
 
 namespace _Wolframe {
-namespace Network	{
+namespace net	{
 
 	/// network server configuration
 	struct ServerConfiguration : public _Wolframe::Configuration::ConfigurationBase
@@ -58,9 +58,9 @@ namespace Network	{
 		unsigned short		maxConnections;
 
 		// listen on
-		std::list<Network::ServerTCPendpoint> address;
+		std::list<net::ServerTCPendpoint> address;
 	#ifdef WITH_SSL
-		std::list<Network::ServerSSLendpoint> SSLaddress;
+		std::list<net::ServerSSLendpoint> SSLaddress;
 	#endif // WITH_SSL
 
 		/// constructor
@@ -77,7 +77,7 @@ namespace Network	{
 		//			bool test() const;
 	};
 
-} // namespace Network
+} // namespace net
 
 namespace Logging	{
 

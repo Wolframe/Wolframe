@@ -15,16 +15,16 @@ template <typename T>
 class connectionBase :public T
 {
 public:
-   connectionBase() :T(T::READ) {};
+   connectionBase() :T(T::READ) {}
    const void* data()                    { return T::data(); }
    std::size_t size()                    { return T::size(); }
    typename T::Operation operation()     { return T::operation(); }
 };
 
-class NetworkOperation :public connectionBase<Network::NetworkOperation>
+class NetworkOperation :public connectionBase<net::NetworkOperation>
 {
 public:
-   NetworkOperation( const Network::NetworkOperation& o)
+   NetworkOperation( const net::NetworkOperation& o)
    {
       std::memcpy( this, ((char*)&o), sizeof(*this));
    };

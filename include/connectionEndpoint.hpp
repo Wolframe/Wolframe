@@ -10,7 +10,7 @@
 #include <ctime>
 
 namespace _Wolframe {
-	namespace Network {
+	namespace net {
 
 		/// Base class for network endpoints
 		class ConnectionEndpoint
@@ -142,7 +142,7 @@ namespace _Wolframe {
 		};
 #endif // WITH_SSL
 
-	} // namespace Network
+	} // namespace net
 } // namespace _Wolframe
 
 #endif // _CONNECTION_ENDPOINT_HPP_INCLUDED

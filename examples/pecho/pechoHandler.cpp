@@ -103,7 +103,7 @@ struct Connection::Private
       buffer.push_back( '\n');
       const char* msg = buffer.c_str();
       buffer.clear();
-      return Network::SendData( msg, ii+2);
+      return net::SendData( msg, ii+2);
    }
    //output of one character with return code true/false for success/failure
    bool print( char ch)
@@ -218,7 +218,7 @@ struct Connection::Private
 		      if (itr == eoM)
 		      {
 			 input.setPos( 0);
-			 return Network::ReadData( input.ptr(), input.size());
+			 return net::ReadData( input.ptr(), input.size());
 		      }
 		      else
 		      {
@@ -234,14 +234,14 @@ struct Connection::Private
 	       if (!ProtocolParser::skipSpaces( itr, eoM))
 	       {
 		  input.setPos( 0);
-		  return Network::ReadData( input.ptr(), input.size());
+		  return net::ReadData( input.ptr(), input.size());
 	       }
 	       if (!ProtocolParser::consumeEOLN( itr, eoM))
 	       {
 		  if (itr == eoM)
 		  {
 		     input.setPos( 0);
-		     return Network::ReadData( input.ptr(), input.size());
+		     return net::ReadData( input.ptr(), input.size());
 		  }
 		  else
 		  {
@@ -272,7 +272,7 @@ struct Connection::Private
 	       if (!ProtocolParser::skipSpaces( itr, eoM))
 	       {
 		  input.setPos( 0);
-		  return Network::ReadData( input.ptr(), input.size());
+		  return net::ReadData( input.ptr(), input.size());
 	       }
 
 	       switch (parser.getCommand( itr, eoM, cmdBuffer))
@@ -301,7 +301,7 @@ struct Connection::Private
 		     if (itr == eoM)
 		     {
 			input.setPos( 0);
-			return Network::ReadData( input.ptr(), input.size());
+			return net::ReadData( input.ptr(), input.size());
 		     }
 		     else
 		     {
@@ -321,7 +321,7 @@ struct Connection::Private
 	       if (!ProtocolParser::skipSpaces( itr, eoM))
 	       {
 		  input.setPos( 0);
-		  return Network::ReadData( input.ptr(), input.size());
+		  return net::ReadData( input.ptr(), input.size());
 	       }
 	       if (!ProtocolParser::isEOLN( itr))
 	       {
@@ -352,7 +352,7 @@ struct Connection::Private
 		if (echoState == EoM)
 		{
 		   input.setPos( 0);
-		   return Network::ReadData( input.ptr(), input.size());
+		   return net::ReadData( input.ptr(), input.size());
 		}
 
 		if (echoState == EoD)
@@ -367,7 +367,7 @@ struct Connection::Private
 		void* content = output.ptr();
 		std::size_t size = output.pos();
 		if (size == 0) continue;
-		return Network::SendData( content, size);
+		return net::SendData( content, size);
 	    }
 
 	    case HandleError:
@@ -375,7 +375,7 @@ struct Connection::Private
 		if (!ProtocolParser::skipLine( itr, eoM) || !ProtocolParser::consumeEOLN( itr, eoM))
 		{
 		   input.setPos( 0);
-		   return Network::ReadData( input.ptr(), input.size());
+		   return net::ReadData( input.ptr(), input.size());
 		}
 		state = Init;
 		continue;
@@ -384,16 +384,16 @@ struct Connection::Private
 	    case Terminate:
 	    {
 		state = Terminate;
-		return Network::CloseConnection();
+		return net::CloseConnection();
 	    }
 	 }//switch(..)
       }//for(,,)
-      return Network::CloseConnection();
+      return net::CloseConnection();
    }
 };
 
 
-Connection::Connection( const Network::LocalEndpoint& local, unsigned int inputBufferSize, unsigned int outputBufferSize)
+Connection::Connection( const net::LocalEndpoint& local, unsigned int inputBufferSize, unsigned int outputBufferSize)
 {
    data = new Private( inputBufferSize, outputBufferSize);
    LOG_TRACE << "Created connection handler for " << local.toString();
@@ -405,7 +405,7 @@ Connection::~Connection()
    delete data;
 }
 
-void Connection::setPeer( const Network::RemoteEndpoint& remote)
+void Connection::setPeer( const net::RemoteEndpoint& remote)
 {
    LOG_TRACE << "Peer set to " << remote.toString();
 }
@@ -436,7 +436,7 @@ const Connection::Operation Connection::nextOperation()
 }
 
 /// ServerHandler PIMPL
-Network::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const Network::LocalEndpoint& local )
+net::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const net::LocalEndpoint& local )
 {
    return new pecho::Connection( local );
 }
@@ -446,7 +446,7 @@ ServerHandler::ServerHandler( const HandlerConfiguration* ) : impl_( new ServerH
 
 ServerHandler::~ServerHandler()  { delete impl_; }
 
-Network::connectionHandler* ServerHandler::newConnection( const Network::LocalEndpoint& local )
+net::connectionHandler* ServerHandler::newConnection( const net::LocalEndpoint& local )
 {
    return impl_->newConnection( local );
 }

@@ -14,14 +14,14 @@ extern "C" {
 
 namespace _Wolframe {
 	/// The connection handler
-	class luaConnection : public Network::connectionHandler
+	class luaConnection : public net::connectionHandler
 	{
 	public:
-		luaConnection( const Network::LocalEndpoint& local, const luaConfig config );
+		luaConnection( const net::LocalEndpoint& local, const luaConfig config );
 
 		~luaConnection();
 
-		void setPeer( const Network::RemoteEndpoint& remote );
+		void setPeer( const net::RemoteEndpoint& remote );
 
 		void networkInput( const void *begin, std::size_t bytesTransferred );
 		void timeoutOccured();
@@ -29,7 +29,7 @@ namespace _Wolframe {
 		void errorOccured( NetworkSignal );
 
 		/// Handle a request and produce a reply.
-		const Network::NetworkOperation nextOperation();
+		const net::NetworkOperation nextOperation();
 
 	private:
 		lua_State *l;
@@ -48,7 +48,7 @@ namespace _Wolframe {
 	public:
 		ServerHandlerImpl( const HandlerConfiguration *config );
 
-		Network::connectionHandler* newConnection( const Network::LocalEndpoint& local );
+		net::connectionHandler* newConnection( const net::LocalEndpoint& local );
 
 	private:
 		luaConfig config_;

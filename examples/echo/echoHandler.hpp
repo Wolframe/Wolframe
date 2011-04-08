@@ -10,14 +10,14 @@
 
 namespace _Wolframe {
 	/// The connection handler
-	class echoConnection : public Network::connectionHandler
+	class echoConnection : public net::connectionHandler
 	{
 	public:
-		echoConnection( const Network::LocalEndpoint& local, unsigned short timeout );
+		echoConnection( const net::LocalEndpoint& local, unsigned short timeout );
 
 		~echoConnection();
 
-		void setPeer( const Network::RemoteEndpoint& remote );
+		void setPeer( const net::RemoteEndpoint& remote );
 
 		/// Parse incoming data. The return value indicates how much of the
 		/// input has been consumed.
@@ -28,7 +28,7 @@ namespace _Wolframe {
 		void errorOccured( NetworkSignal );
 
 		/// Handle a request and produce a reply.
-		const Network::NetworkOperation nextOperation();
+		const net::NetworkOperation nextOperation();
 
 	private:
 		enum State	{
@@ -64,7 +64,7 @@ namespace _Wolframe {
 		{
 			timeout = config->echoConfig->timeout;
 		}
-		Network::connectionHandler* newConnection( const Network::LocalEndpoint& local );
+		net::connectionHandler* newConnection( const net::LocalEndpoint& local );
 
 	private:
 		short unsigned timeout;

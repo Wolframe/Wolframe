@@ -48,7 +48,7 @@
 #include "standardConfigs.hpp"		// for server configuration
 
 namespace _Wolframe {
-	namespace Network	{
+	namespace net	{
 
 		/// The top-level class of the Wolframe network server.
 		class server: private boost::noncopyable
@@ -85,7 +85,7 @@ namespace _Wolframe {
 			GlobalConnectionList	globalList_;
 		};
 
-	} // namespace Network
+	} // namespace net
 } // namespace _Wolframe
 
 #endif // _NETWORK_SERVER_HPP_INCLUDED

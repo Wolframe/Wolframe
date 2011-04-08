@@ -47,7 +47,7 @@
 #include "unused.h"
 
 namespace _Wolframe {
-	namespace Network	{
+	namespace net	{
 
 		server::server( const ServerConfiguration* config, _Wolframe::ServerHandler& serverHandler )
 					: threadPoolSize_( config->threads ),
@@ -151,5 +151,5 @@ namespace _Wolframe {
 			IOservice_.stop();
 		}
 
-	} // namespace Network
+	} // namespace net
 } // namespace _Wolframe

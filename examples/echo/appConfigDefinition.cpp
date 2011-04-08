@@ -47,7 +47,7 @@ namespace _Wolframe {
 			// daemon / service configuration
 			serviceConf = new _Wolframe::Configuration::ServiceConfiguration();
 			// network server
-			serverConf = new _Wolframe::Network::ServerConfiguration();
+			serverConf = new _Wolframe::net::ServerConfiguration();
 			// logging
 			loggerConf = new _Wolframe::Logging::LoggerConfiguration();
 

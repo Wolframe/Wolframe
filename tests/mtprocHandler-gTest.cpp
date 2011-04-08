@@ -110,7 +110,7 @@ class mtprocHandlerFixture : public ::testing::Test
 public:
    std::string input;
    std::string expected;
-   Network::LocalTCPendpoint ep;
+   net::LocalTCPendpoint ep;
    mtproc::Connection* connection;
 
 protected:
