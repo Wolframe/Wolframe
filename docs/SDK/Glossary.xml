@@ -1,0 +1,108 @@
+<glossary>
+	<title>Glossary</title>
+	<para>
+		This is the glossary for the Wolframe Service Development Kit. Although it
+		covers most of the terms used in the Wolframe world, some terms might be skipped
+		if they are rarely used in the SDK context. These terms are explained in the
+		Application Building Manual
+	</para>
+
+<glossdiv><title>E</title>
+
+	<glossentry id="xml"><glossterm>Extensible Markup Language</glossterm>
+		<acronym>XML</acronym>
+		<abbrev>ISO 8879:1986</abbrev>
+		<glossdef>
+			<para>Some reasonable definition here. BTW, this just an example.</para>
+			<glossseealso otherterm="xml">loop to XML</glossseealso>
+		</glossdef>
+	</glossentry>
+
+</glossdiv>
+
+<glossdiv><title>Our glossary</title>
+
+	<glossentry><glossterm>Application Processor</glossterm>
+		<glossdef>
+			<para>The module that executes the scripts of the user application called by the
+				connection handler. An application processor is assigned to exactly one connection
+				handler during its lifetime.</para>
+		</glossdef>
+	</glossentry>
+
+	<glossentry><glossterm>Application Processor Program</glossterm>
+		<glossdef>
+			<para>Program or script executed by the application processor.
+				The program or script works with input, output and system calls
+				as only interface to the system. System exceptions, signals and events
+				are handled in the background through yield execution.</para>
+		</glossdef>
+	</glossentry>
+
+	<glossentry><glossterm>Connection Handler</glossterm>
+		<glossdef>
+			<para>Interface for the networking to one client/server connection during its whole lifetime.</para>
+		</glossdef>
+	</glossentry>
+
+	<glossentry><glossterm>Closure</glossterm>
+		<glossdef>
+			<glossseealso><ulink url="http://en.wikipedia.org/wiki/Closure_%28computer_science%29">wikipedia</ulink></glossseealso>
+		</glossdef>
+	</glossentry>
+
+	<glossentry id="EoD" ><glossterm>End Of Data</glossterm>
+		<abbrev>EoD</abbrev>
+		<glossdef>
+			<para>Marks the end of the content to be processed by the application processor.
+				End of data is marked with CR LF '.' CR LF or LF '.' LF.
+				For passing lines with a dot '.' at the start of a content line,
+				the client has to escape an LF '.' in the content with LF '.' '.'.</para>
+			<glossseealso otherterm="EoM">EoM</glossseealso>
+		</glossdef>
+	</glossentry>
+
+	<glossentry id="EoM"><glossterm>End Of Message</glossterm>
+		<abbrev>EoM</abbrev>
+		<glossdef>
+			<para>Marks the end of a network input message.
+				End of message is handled by the application processor generator function
+				without showing up to the application processor program (yield execution).</para>
+			<glossseealso otherterm="EoD">EoD</glossseealso>
+		</glossdef>
+	</glossentry>
+
+	<glossentry><glossterm>Generator</glossterm>
+		<glossdef>
+			<para>Generators are defined for the application processor to implement
+				iterators on network input or system call results.</para>
+			<glossseealso><ulink url="http://en.wikipedia.org/wiki/Generator_%28computer_science%29">wikipedia</ulink></glossseealso>
+		</glossdef>
+	</glossentry>
+
+	<glossentry><glossterm>Network Input</glossterm>
+		<glossdef>
+			<para>Data passed from the networking framework to the connection handler for processing.</para>
+		</glossdef>
+	</glossentry>
+
+	<glossentry><glossterm>Application Reference Path</glossterm>
+		<glossdef>
+			<para>The application server defines this file path where all relative paths
+			defined in the configuration refer to.</para>
+		</glossdef>
+	</glossentry>
+
+	<glossentry><glossterm>Yield execution</glossterm>
+		<glossdef>
+			<para>The application processor yields execution and gives control
+				back to the connection handler, when it cannot continue execution.
+				The connection handler has to resume with an action returned
+				to the networking framework, that fetches the resources needed by
+				the application processor to continue.</para>
+			<glossseealso><ulink url="http://en.wikipedia.org/wiki/Coroutine">wikipedia yield in coroutine</ulink></glossseealso>
+		</glossdef>
+	</glossentry>
+
+</glossdiv>
+</glossary>
