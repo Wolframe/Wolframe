@@ -46,7 +46,7 @@ namespace _Wolframe {
 	struct HandlerConfiguration
 	{
 	public:
-		db::DatabaseConfiguration	*database;
+		db::Configuration	*database;
 		config::ServiceBanner	*banner;
 //		AAAA::AAAAConfiguration		*auth;
 
@@ -54,7 +54,7 @@ namespace _Wolframe {
 		HandlerConfiguration()
 		{
 			banner = new config::ServiceBanner();
-			database = new db::DatabaseConfiguration();
+			database = new db::Configuration();
 
 //			auth = ...
 		}

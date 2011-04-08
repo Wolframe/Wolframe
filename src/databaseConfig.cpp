@@ -35,6 +35,7 @@
 //
 
 #include "database.hpp"
+#include "connectionBase.hpp"
 #include "configHelpers.hpp"
 #include "logger.hpp"
 
@@ -48,7 +49,7 @@ static const unsigned short DEFAULT_DB_CONNECTIONS = 4;
 namespace _Wolframe	{
 namespace db	{
 
-DatabaseConfiguration::DatabaseConfiguration() : ConfigurationBase( "Database Server" )
+Configuration::Configuration() : _Wolframe::config::ConfigurationBase( "Database Server" )
 {
 	port = 0;
 	connections = 0;
@@ -56,7 +57,7 @@ DatabaseConfiguration::DatabaseConfiguration() : ConfigurationBase( "Database Se
 }
 
 
-void DatabaseConfiguration::print( std::ostream& os ) const
+void Configuration::print( std::ostream& os ) const
 {
 	os << displayName() << std::endl;
 	if ( host.empty())
@@ -72,7 +73,7 @@ void DatabaseConfiguration::print( std::ostream& os ) const
 
 
 /// Check if the database configuration makes sense
-bool DatabaseConfiguration::check() const
+bool Configuration::check() const
 {
 	if ( connections == 0 )	{
 		LOG_ERROR << "Invalid number of connections: " << connections;
@@ -82,7 +83,7 @@ bool DatabaseConfiguration::check() const
 }
 
 
-bool DatabaseConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& /* nodeName */ )
+bool Configuration::parse( const boost::property_tree::ptree& pt, const std::string& /* nodeName */ )
 {
 	using namespace _Wolframe::config;
 

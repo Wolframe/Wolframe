@@ -49,7 +49,7 @@ enum DatabaseType	{
 };
 
 /// database configuration
-struct DatabaseConfiguration : public _Wolframe::config::ConfigurationBase
+struct Configuration : public _Wolframe::config::ConfigurationBase
 {
 public:
 	DatabaseType		type;
@@ -62,7 +62,7 @@ public:
 	unsigned short		acquireTimeout;
 
 	/// constructor
-	DatabaseConfiguration();
+	Configuration();
 
 	/// methods
 	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
@@ -76,7 +76,7 @@ public:
 /// database base class
 class Database	{
 public:
-	Database( DatabaseConfiguration& config );
+	Database( Configuration& config );
 };
 
 }} // namespace _Wolframe::db
