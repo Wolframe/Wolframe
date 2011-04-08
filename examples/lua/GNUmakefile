@@ -55,7 +55,8 @@ local_distclean:
 
 local_install:
 
-localhost_test:
+local_test:
+	./testLua
 
 run: $(CPP_BINS)
 	@echo "Running the Wolframe server..."
