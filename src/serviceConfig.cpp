@@ -49,41 +49,40 @@
 #include <string>
 #include <ostream>
 
-
-namespace _Wolframe	{
-	namespace Configuration	{
+namespace _Wolframe {
+namespace config {
 
 // Constructor
 #if !defined(_WIN32)	// Unix daemon
-	ServiceConfiguration::ServiceConfiguration() : ConfigurationBase( "Daemon" )	{}
+ServiceConfiguration::ServiceConfiguration() : ConfigurationBase( "Daemon" )	{}
 #else
-	ServiceConfiguration::ServiceConfiguration() : ConfigurationBase( "Service" )	{}
+ServiceConfiguration::ServiceConfiguration() : ConfigurationBase( "Service" )	{}
 #endif
 
 
 // Server configuration functions
-	void ServiceConfiguration::print( std::ostream& os ) const
-	{
-		os << displayName() << std::endl;
+void ServiceConfiguration::print( std::ostream& os ) const
+{
+	os << displayName() << std::endl;
 #if !defined(_WIN32)	// Unix daemon
-		os << "   Run as " << (user.empty() ? "(not specified)" : user) << ":"
-				<< (group.empty() ? "(not specified)" : group) << std::endl;
-		os << "   PID file: " << pidFile << std::endl;
+	os << "   Run as " << (user.empty() ? "(not specified)" : user) << ":"
+	   << (group.empty() ? "(not specified)" : group) << std::endl;
+	os << "   PID file: " << pidFile << std::endl;
 #else
-		// Windows service
-		os << "   When run as service" << std::endl
-				<< "      Name: " << serviceName << std::endl
-				<< "      Displayed name: " << serviceDisplayName << std::endl
-				<< "      Description: " << serviceDescription << std::endl;
+	// Windows service
+	os << "   When run as service" << std::endl
+	   << "      Name: " << serviceName << std::endl
+	   << "      Displayed name: " << serviceDisplayName << std::endl
+	   << "      Description: " << serviceDescription << std::endl;
 #endif
-	}
+}
 
 
-	/// Check if the server configuration makes sense
-	bool ServiceConfiguration::check() const
-	{
-		return true;
-	}
+/// Check if the server configuration makes sense
+bool ServiceConfiguration::check() const
+{
+	return true;
+}
 
 
 /// Parse the configuration
@@ -115,7 +114,6 @@ bool ServiceConfiguration::parse( const boost::property_tree::ptree& pt,
 			else	{
 				LOG_WARNING << displayName() << ": unknown configuration option: <"
 					    << L1it->first << ">";
-//				return false;
 			}
 		}
 	}
@@ -142,7 +140,6 @@ bool ServiceConfiguration::parse( const boost::property_tree::ptree& pt,
 			else	{
 				LOG_WARNING << displayName() << ": unknown configuration option: <"
 					    << L1it->first << ">";
-//				return false;
 			}
 		}
 		if ( serviceName.empty() )
@@ -155,7 +152,6 @@ bool ServiceConfiguration::parse( const boost::property_tree::ptree& pt,
 #endif
 	else	{
 		LOG_WARNING << displayName() << ": unknown configuration option: <" << node << ">";
-//		return false;
 	}
 	return true;
 }
@@ -167,7 +163,7 @@ void ServiceConfiguration::setCanonicalPathes( const std::string& refPath )
 	if ( ! pidFile.empty() )	{
 		if ( ! boost::filesystem::path( pidFile ).is_absolute() )
 			pidFile = resolvePath( boost::filesystem::absolute( pidFile,
-							boost::filesystem::path( refPath ).branch_path()).string());
+									    boost::filesystem::path( refPath ).branch_path()).string());
 		else
 			pidFile = resolvePath( pidFile );
 	}
@@ -184,6 +180,5 @@ void ServiceConfiguration::override( const std::string& usr, const std::string& 
 }
 #endif // !defined(_WIN32)
 
-	} // namespace Configuration
-} // namespace _Wolframe
+}} // namespace _Wolframe::config
 

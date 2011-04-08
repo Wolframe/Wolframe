@@ -49,13 +49,13 @@
 #include <ostream>
 
 
-using namespace _Wolframe::Configuration;
+using namespace _Wolframe::config;
 
 namespace _Wolframe	{
 namespace net	{
 
 // Constructor
-ServerConfiguration::ServerConfiguration()
+Configuration::Configuration()
 	: ConfigurationBase( "Network Server" )
 {
 	threads = 0;
@@ -64,7 +64,7 @@ ServerConfiguration::ServerConfiguration()
 
 
 // Server configuration functions
-void ServerConfiguration::print( std::ostream& os ) const
+void Configuration::print( std::ostream& os ) const
 {
 	os << displayName() << std::endl;
 	os << "   Number of client threads: " << threads << std::endl;
@@ -114,7 +114,7 @@ void ServerConfiguration::print( std::ostream& os ) const
 
 /// Check if the server configuration makes sense
 #ifdef WITH_SSL
-bool ServerConfiguration::check() const
+bool Configuration::check() const
 {
 	bool correct = true;
 	for ( std::list<net::ServerSSLendpoint>::const_iterator it = SSLaddress.begin();
@@ -139,7 +139,7 @@ bool ServerConfiguration::check() const
 	return correct;
 }
 #else
-bool ServerConfiguration::check() const
+bool Configuration::check() const
 {
 	return true;
 }
@@ -147,7 +147,7 @@ bool ServerConfiguration::check() const
 
 
 /// Parse the configuration
-bool ServerConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& /* node */ )
+bool Configuration::parse( const boost::property_tree::ptree& pt, const std::string& /* node */ )
 {
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "threads" ))	{
@@ -286,13 +286,13 @@ bool ServerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 }
 
 #ifdef WITH_SSL
-void ServerConfiguration::setCanonicalPathes( const std::string& refPath )
+void Configuration::setCanonicalPathes( const std::string& refPath )
 {
 	for ( std::list<net::ServerSSLendpoint>::iterator it = SSLaddress.begin(); it != SSLaddress.end(); ++it )
 		it->setAbsolutePath( refPath );
 }
 #else
-void ServerConfiguration::setCanonicalPathes( const std::string& /* refPath */ )
+void Configuration::setCanonicalPathes( const std::string& /* refPath */ )
 {
 }
 #endif // WITH_SSL

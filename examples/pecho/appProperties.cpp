@@ -12,14 +12,14 @@ namespace _Wolframe	{
 	unsigned short	applicationRevisionVersion()			{ return 4; }
 	unsigned	applicationBuildVersion()			{ return 0; }
 
-	const char*	Configuration::defaultMainConfig()		{ return "/etc/wolframe-pecho.conf"; }
-	const char*	Configuration::defaultUserConfig()		{ return "~/wolframe-pecho.conf"; }
-	const char*	Configuration::defaultLocalConfig()		{ return "./wolframe-pecho.conf"; }
+	const char*	config::defaultMainConfig()		{ return "/etc/wolframe-pecho.conf"; }
+	const char*	config::defaultUserConfig()		{ return "~/wolframe-pecho.conf"; }
+	const char*	config::defaultLocalConfig()		{ return "./wolframe-pecho.conf"; }
 
-	unsigned short	Configuration::defaultTCPport()			{ return 7660; }
-	unsigned short	Configuration::defaultSSLport()			{ return 7960; }
+	unsigned short	config::defaultTCPport()			{ return 7660; }
+	unsigned short	config::defaultSSLport()			{ return 7960; }
 
-	const char*	Configuration::defaultServiceName()		{ return "wolframe-pecho"; }
+	const char*	config::defaultServiceName()		{ return "wolframe-pecho"; }
 #if defined( _WIN32 )
 	const char*	Configuration::defaultServiceDisplayName()	{ return "Wolframe ECHO Daemon"; }
 	const char*	Configuration::defaultServiceDescription()	{ return "a Wolframe daemon for echo"; }

@@ -10,7 +10,7 @@
 namespace _Wolframe {
 
 	/// echo configuration
-	struct pEchoConfiguration : public _Wolframe::Configuration::ConfigurationBase
+	struct pEchoConfiguration : public _Wolframe::config::ConfigurationBase
 	{
 	public:
 		unsigned short		timeout;

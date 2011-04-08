@@ -38,42 +38,40 @@
 #include "standardConfigs.hpp"
 #include "handlerConfig.hpp"
 
-
 namespace _Wolframe {
-	namespace Configuration {
+namespace config {
 
-		ApplicationConfiguration::ApplicationConfiguration()
-		{
-			// daemon / service configuration
-			serviceConf = new _Wolframe::Configuration::ServiceConfiguration();
-			// network server
-			serverConf = new _Wolframe::net::ServerConfiguration();
-			// logging
-			loggerConf = new _Wolframe::Logging::LoggerConfiguration();
+ApplicationConfiguration::ApplicationConfiguration()
+{
+	// daemon / service configuration
+	serviceConf = new _Wolframe::config::ServiceConfiguration();
+	// network server
+	serverConf = new _Wolframe::net::Configuration();
+	// logging
+	loggerConf = new _Wolframe::Logging::LoggerConfiguration();
 
-			handlerConf = new _Wolframe::HandlerConfiguration();
+	handlerConf = new _Wolframe::HandlerConfiguration();
 
-			// add both sections, the parse function will select the
-			// appropriate action
-			addConfig( "service", serviceConf );
-			addConfig( "daemon", serviceConf );
+	// add both sections, the parse function will select the
+	// appropriate action
+	addConfig( "service", serviceConf );
+	addConfig( "daemon", serviceConf );
 
-			addConfig( "ServerTokens", handlerConf->banner );
-			addConfig( "ServerSignature", handlerConf->banner );
+	addConfig( "ServerTokens", handlerConf->banner );
+	addConfig( "ServerSignature", handlerConf->banner );
 
-			addConfig( "listen", serverConf );
-			addConfig( "logging", loggerConf );
-			addConfig( "database", handlerConf->database );
-		}
+	addConfig( "listen", serverConf );
+	addConfig( "logging", loggerConf );
+	addConfig( "database", handlerConf->database );
+}
 
 
-		ApplicationConfiguration::~ApplicationConfiguration()
-		{
-			if ( serviceConf ) delete serviceConf;
-			if ( serverConf )delete serverConf;
-			if ( loggerConf ) delete loggerConf;
-			if ( handlerConf ) delete handlerConf;
-		}
+ApplicationConfiguration::~ApplicationConfiguration()
+{
+	if ( serviceConf ) delete serviceConf;
+	if ( serverConf )delete serverConf;
+	if ( loggerConf ) delete loggerConf;
+	if ( handlerConf ) delete handlerConf;
+}
 
-	} // namespace Configuration
-} // namespace _Wolframe
+}} // namespace _Wolframe::config

@@ -53,7 +53,7 @@
 
 
 namespace _Wolframe {
-	namespace Configuration {
+namespace config {
 
 const char* ApplicationConfiguration::chooseFile( const char *globalFile, const char *userFile, const char *localFile )
 {
@@ -178,5 +178,4 @@ bool ApplicationConfiguration::check() const
 	return true;
 }
 
-	} // namespace Configuration
-} // namespace _Wolframe
+}} // namespace _Wolframe::config

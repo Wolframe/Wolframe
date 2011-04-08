@@ -47,13 +47,13 @@ namespace _Wolframe {
 	{
 	public:
 		db::DatabaseConfiguration	*database;
-		Configuration::ServiceBanner	*banner;
+		config::ServiceBanner	*banner;
 //		AAAA::AAAAConfiguration		*auth;
 
 		/// constructor
 		HandlerConfiguration()
 		{
-			banner = new Configuration::ServiceBanner();
+			banner = new config::ServiceBanner();
 			database = new db::DatabaseConfiguration();
 
 //			auth = ...

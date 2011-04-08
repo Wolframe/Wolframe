@@ -102,7 +102,7 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 							  _Wolframe::applicationMinorVersion(),
 							  _Wolframe::applicationRevisionVersion(),
 							  _Wolframe::applicationBuildVersion() ));
-		_Wolframe::Configuration::CmdLineConfig   cmdLineCfg;
+		_Wolframe::config::CmdLineConfig   cmdLineCfg;
 		const char *configFile;
 
 		if ( !cmdLineCfg.parse( argc, argv ))	{	// there was an error parsing the command line
@@ -118,12 +118,12 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 			LOG_ERROR << cmdLineCfg.errMsg();
 
 // if we have to print the version or the help do it and exit
-		if ( cmdLineCfg.command == _Wolframe::Configuration::CmdLineConfig::PRINT_VERSION )	{
+		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::PRINT_VERSION )	{
 			std::cout << std::endl << gettext( "BOBOBO version " )
 				  << appSingleton.version().toString() << std::endl << std::endl;
 			return _Wolframe::ErrorCodes::OK;
 		}
-		if ( cmdLineCfg.command == _Wolframe::Configuration::CmdLineConfig::PRINT_HELP )	{
+		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::PRINT_HELP )	{
 			std::cout << std::endl << _Wolframe::applicationName() << gettext( "BOBOBO version " )
 				  << appSingleton.version().toString() << std::endl;
 			cmdLineCfg.usage( std::cout );
@@ -135,15 +135,15 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 		if ( !cmdLineCfg.cfgFile.empty() )	// if it has been specified than that's The One ! (and only)
 			configFile = cmdLineCfg.cfgFile.c_str();
 		else
-			configFile = _Wolframe::Configuration::ApplicationConfiguration::chooseFile( _Wolframe::Configuration::defaultMainConfig(),
-												  _Wolframe::Configuration::defaultUserConfig(),
-												  _Wolframe::Configuration::defaultLocalConfig() );
+			configFile = _Wolframe::config::ApplicationConfiguration::chooseFile( _Wolframe::config::defaultMainConfig(),
+												  _Wolframe::config::defaultUserConfig(),
+												  _Wolframe::config::defaultLocalConfig() );
 		if ( configFile == NULL )	{	// there is no configuration file
 			LOG_FATAL << gettext ( "no configuration file found !" );
 			return _Wolframe::ErrorCodes::FAILURE;
 		}
 
-		_Wolframe::Configuration::ApplicationConfiguration config;
+		_Wolframe::config::ApplicationConfiguration config;
 
 		if ( !config.parse( configFile ))	// there was an error parsing the configuration file
 			return _Wolframe::ErrorCodes::FAILURE;
@@ -156,7 +156,7 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 		_Wolframe::Logging::LogBackend::instance().setConsoleLevel( config.loggerConf->stderrLogLevel );
 
 // Check the configuration
-		if ( cmdLineCfg.command == _Wolframe::Configuration::CmdLineConfig::CHECK_CONFIG )	{
+		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::CHECK_CONFIG )	{
 			std::cout << gettext( "BOBOBO version " ) << appSingleton.version().toString() << std::endl;
 			if ( config.check() )	{
 				std::cout << "Configuration OK" << std::endl << std::endl;
@@ -167,14 +167,14 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 			}
 		}
 
-		if ( cmdLineCfg.command == _Wolframe::Configuration::CmdLineConfig::PRINT_CONFIG )	{
+		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::PRINT_CONFIG )	{
 			std::cout << std::endl << gettext( "BOBOBO version " ) << appSingleton.version().toString() << std::endl;
 			config.print( std::cout );
 			std::cout << std::endl;
 			return _Wolframe::ErrorCodes::OK;
 		}
 
-		if ( cmdLineCfg.command == _Wolframe::Configuration::CmdLineConfig::TEST_CONFIG )	{
+		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::TEST_CONFIG )	{
 			std::cout << "Not implemented yet" << std::endl << std::endl;
 			return _Wolframe::ErrorCodes::OK;
 		}

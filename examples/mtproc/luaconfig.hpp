@@ -46,7 +46,7 @@ namespace _Wolframe {
 namespace mtproc {
 namespace lua {
 
-class LuaConfiguration :public Configuration::ConfigurationBase
+class LuaConfiguration :public config::ConfigurationBase
 {
 public:
 	/// \brief module load function for a lua state

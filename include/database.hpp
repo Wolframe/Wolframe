@@ -49,7 +49,7 @@ enum DatabaseType	{
 };
 
 /// database configuration
-struct DatabaseConfiguration : public _Wolframe::Configuration::ConfigurationBase
+struct DatabaseConfiguration : public _Wolframe::config::ConfigurationBase
 {
 public:
 	DatabaseType		type;

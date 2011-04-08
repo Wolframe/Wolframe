@@ -47,22 +47,22 @@ namespace _Wolframe	{
 	unsigned short		applicationRevisionVersion();
 	unsigned		applicationBuildVersion();
 
-	namespace Configuration	{
+namespace config	{
 
-		const char*	defaultMainConfig();
-		const char*	defaultUserConfig();
-		const char*	defaultLocalConfig();
+	const char*	defaultMainConfig();
+	const char*	defaultUserConfig();
+	const char*	defaultLocalConfig();
 
-		unsigned short	defaultTCPport();
-		unsigned short	defaultSSLport();
+	unsigned short	defaultTCPport();
+	unsigned short	defaultSSLport();
 
-		const char*	defaultServiceName();
-#if defined( _WIN32 )
-		const char*	defaultServiceDisplayName();
-		const char*	defaultServiceDescription();
-#endif // defined( _WIN32 )
+	const char*	defaultServiceName();
+	#if defined( _WIN32 )
+	const char*	defaultServiceDisplayName();
+	const char*	defaultServiceDescription();
+	#endif // defined( _WIN32 )
 
-	} // namespace Configuration
+} // namespace config
 } // namespace _Wolframe
 
 #endif // _APP_PROPERTIES_HPP_INCLUDED

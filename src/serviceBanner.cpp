@@ -45,7 +45,7 @@
 #include <boost/algorithm/string.hpp>
 
 namespace _Wolframe {
-namespace Configuration	{
+namespace config	{
 
 
 static ServiceBanner::SignatureTokens strToToken( std::string& str )

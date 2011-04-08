@@ -51,7 +51,7 @@ namespace _Wolframe {
 namespace net	{
 
 	/// network server configuration
-	struct ServerConfiguration : public _Wolframe::Configuration::ConfigurationBase
+	struct Configuration : public _Wolframe::config::ConfigurationBase
 	{
 	public:
 		unsigned short		threads;
@@ -64,7 +64,7 @@ namespace net	{
 	#endif // WITH_SSL
 
 		/// constructor
-		ServerConfiguration();
+		Configuration();
 
 		/// methods
 		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
@@ -82,7 +82,7 @@ namespace net	{
 namespace Logging	{
 
 	/// logger configuration
-	struct LoggerConfiguration : public _Wolframe::Configuration::ConfigurationBase
+	struct LoggerConfiguration : public _Wolframe::config::ConfigurationBase
 	{
 	public:
 		bool			logToStderr;
@@ -121,10 +121,10 @@ namespace Logging	{
 
 } // namespace Logging
 
-	namespace Configuration	{
+namespace config	{
 
 	/// daemon / service configuration
-	struct ServiceConfiguration : public _Wolframe::Configuration::ConfigurationBase
+	struct ServiceConfiguration : public _Wolframe::config::ConfigurationBase
 	{
 	public:
 #if !defined( _WIN32 )
@@ -159,7 +159,7 @@ namespace Logging	{
 
 
 	/// Service signature
-	class ServiceBanner : public _Wolframe::Configuration::ConfigurationBase
+	class ServiceBanner : public _Wolframe::config::ConfigurationBase
 	{
 	public:
 		enum SignatureTokens	{
@@ -194,47 +194,46 @@ namespace Logging	{
 	};
 
 
-		/// logger configuration
-		struct LoggerConfiguration : public _Wolframe::Configuration::ConfigurationBase
-		{
-		public:
-			bool			logToStderr;
-			Logging::LogLevel::Level		stderrLogLevel;
+	/// logger configuration
+	struct LoggerConfiguration : public _Wolframe::config::ConfigurationBase
+	{
+	public:
+		bool			logToStderr;
+		Logging::LogLevel::Level		stderrLogLevel;
 
-			bool	 // namespace
-		logToFile;
-			std::string		logFile;
-			Logging::LogLevel::Level		logFileLogLevel;
-			std::string		logFileIdent;
-			bool			logToSyslog;
-			Logging::SyslogFacility::Facility syslogFacility;
-			Logging::LogLevel::Level		syslogLogLevel;
-			std::string		syslogIdent;
+		bool	 // namespace
+	logToFile;
+		std::string		logFile;
+		Logging::LogLevel::Level		logFileLogLevel;
+		std::string		logFileIdent;
+		bool			logToSyslog;
+		Logging::SyslogFacility::Facility syslogFacility;
+		Logging::LogLevel::Level		syslogLogLevel;
+		std::string		syslogIdent;
 #if defined( _WIN32 )
-			bool			logToEventlog;
-			std::string		eventlogLogName;
-			std::string		eventlogSource;
-			Logging::LogLevel::Level eventlogLogLevel;
+		bool			logToEventlog;
+		std::string		eventlogLogName;
+		std::string		eventlogSource;
+		Logging::LogLevel::Level eventlogLogLevel;
 #endif // defined( _WIN32 )
 
-			/// constructor
-			LoggerConfiguration();
+		/// constructor
+		LoggerConfiguration();
 
-			/// methods
-			bool parse( const boost::property_tree::ptree& pt, const std::string& node );
-			bool check() const;
-			void print( std::ostream& os ) const;
+		/// methods
+		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
+		bool check() const;
+		void print( std::ostream& os ) const;
 
-			void setCanonicalPathes( const std::string& referencePath );
+		void setCanonicalPathes( const std::string& referencePath );
 
 //			Not implemented yet, inherited from base for the time being
 //			bool test() const;
 
-			void foreground( Logging::LogLevel::Level debugLevel, bool useConfig );
-		};
+		void foreground( Logging::LogLevel::Level debugLevel, bool useConfig );
+	};
 
-	} // namespace Configuration
-
+} // namespace config
 } // namespace _Wolframe
 
 #endif // _STANDARD_CONFIGS_HPP_INCLUDED

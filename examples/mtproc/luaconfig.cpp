@@ -70,7 +70,7 @@ bool LuaConfiguration::parse( const boost::property_tree::ptree& parentNode, con
 	{
 		if (boost::algorithm::iequals( it->first, "main"))
 		{
-			if (!Configuration::getStringValue( it->second, it->first, displayName(), name)) return false;
+			if (!config::getStringValue( it->second, it->first, displayName(), name)) return false;
 			if (name.size() == 0)
 			{
 				LOG_ERROR << displayName() << ": empty name for the main script is illegal (configuration option <main>)";
@@ -81,7 +81,7 @@ bool LuaConfiguration::parse( const boost::property_tree::ptree& parentNode, con
 		}
 		else if (boost::algorithm::iequals( it->first, "module"))
 		{
-			if (!Configuration::getStringValue( it->second, it->first, displayName(), name)) return false;
+			if (!config::getStringValue( it->second, it->first, displayName(), name)) return false;
 			if (name.size() == 0)
 			{
 				LOG_ERROR << displayName() << ": empty name for a module is illegal (configuration option <module>)";

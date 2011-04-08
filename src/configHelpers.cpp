@@ -41,7 +41,7 @@
 #include <ostream>
 
 namespace _Wolframe	{
-	namespace	Configuration	{
+namespace config	{
 
 
 bool getBoolValue( const boost::property_tree::ptree& pt, const std::string& name,
@@ -104,5 +104,4 @@ bool getHostnameValue( const boost::property_tree::ptree& pt, const std::string&
 	return ret;
 }
 
-	} // namespace Configuration
-} // namespace _Wolframe
+}} // namespace _Wolframe::config

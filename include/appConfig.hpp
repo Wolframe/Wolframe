@@ -47,12 +47,12 @@
 namespace _Wolframe {
 
 // forward declarations for configuration elements
-namespace net { struct ServerConfiguration;	}
+namespace net { struct Configuration;	}
 namespace Logging { struct LoggerConfiguration;	}
 struct HandlerConfiguration;
 
 
-namespace Configuration	{
+namespace config	{
 
 struct ServiceConfiguration;
 struct LoggerConfiguration;
@@ -67,7 +67,7 @@ struct ApplicationConfiguration	{
 	// daemon / service configuration
 	ServiceConfiguration			*serviceConf;
 	// network server configuration
-	_Wolframe::net::ServerConfiguration	*serverConf;
+	_Wolframe::net::Configuration	*serverConf;
 	// logger configuration
 	_Wolframe::Logging::LoggerConfiguration	*loggerConf;
 
@@ -94,7 +94,7 @@ private:
 	bool addConfig( const std::string& nodeName, ConfigurationBase *config );
 };
 
-} // namespace Configuration
+} // namespace config
 } // namespace _Wolframe
 
 #endif // _APP_CONFIG_HPP_INCLUDED

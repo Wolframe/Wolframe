@@ -43,7 +43,7 @@
 #include "logger.hpp"
 
 namespace _Wolframe {
-namespace Configuration	{
+namespace config {
 
 /// Get a boolean value from the property tree
 ///\param[in]	it	property tree iterator pointing to the node
@@ -208,8 +208,6 @@ bool getNumberValue( const boost::property_tree::ptree& pt, const std::string& n
 	return true;
 }
 
-} // namespace Configuration
-} // namespace _Wolframe
-
+}} // namespace _Wolframe::config
 
 #endif // _CONFIG_HELPERS_HPP_INCLUDED

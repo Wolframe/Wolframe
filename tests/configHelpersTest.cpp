@@ -40,7 +40,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/info_parser.hpp>
 
-using namespace _Wolframe::Configuration;
+using namespace _Wolframe::config;
 
 // The fixture for tests
 class ConfigFixture : public ::testing::Test	{

@@ -49,7 +49,7 @@
 namespace _Wolframe {
 	namespace net	{
 
-		server::server( const ServerConfiguration* config, _Wolframe::ServerHandler& serverHandler )
+		server::server( const Configuration* config, _Wolframe::ServerHandler& serverHandler )
 					: threadPoolSize_( config->threads ),
 					IOservice_(),
 					globalList_( config->maxConnections )
