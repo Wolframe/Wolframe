@@ -44,8 +44,6 @@
 #include "serverEndpoint.hpp"
 #include "connectionHandler.hpp"
 
-#include "unused.h"
-
 namespace _Wolframe {
 	namespace net	{
 
