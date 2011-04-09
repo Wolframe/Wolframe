@@ -39,7 +39,7 @@
 #include "logger/logSyslogFacility.hpp"
 
 namespace _Wolframe {
-	namespace Logging {
+	namespace log {
 
 	SyslogFacility::Facility SyslogFacility::strToSyslogFacility( const std::string s )
 	{
@@ -70,5 +70,5 @@ namespace _Wolframe {
 		else				return SyslogFacility::WOLFRAME_SYSLOG_FACILITY_UNDEFINED;
 	}
 
-	} // namespace Logging
+	} // namespace log
 } // namespace _Wolframe

@@ -50,7 +50,7 @@
 #endif // defined( _WIN32 )
 
 namespace _Wolframe {
-	namespace Logging {
+	namespace log {
 
 	class LogfileBackend
 	{
@@ -74,7 +74,7 @@ namespace _Wolframe {
 		bool isOpen_;
 	};
 
-	} // namespace Logging
+	} // namespace log
 } // namespace _Wolframe
 
 #endif // _LOG_BACKEND_FILE_HPP_INCLUDED

@@ -79,28 +79,28 @@ namespace net	{
 
 } // namespace net
 
-namespace Logging	{
+namespace log	{
 
 	/// logger configuration
 	struct LoggerConfiguration : public _Wolframe::config::ConfigurationBase
 	{
 	public:
 		bool			logToStderr;
-		Logging::LogLevel::Level		stderrLogLevel;
+		LogLevel::Level		stderrLogLevel;
 
 		bool			logToFile;
 		std::string		logFile;
-		Logging::LogLevel::Level		logFileLogLevel;
+		LogLevel::Level		logFileLogLevel;
 		std::string		logFileIdent;
 		bool			logToSyslog;
-		Logging::SyslogFacility::Facility syslogFacility;
-		Logging::LogLevel::Level		syslogLogLevel;
+		SyslogFacility::Facility syslogFacility;
+		LogLevel::Level		syslogLogLevel;
 		std::string		syslogIdent;
 #if defined( _WIN32 )
 		bool			logToEventlog;
 		std::string		eventlogLogName;
 		std::string		eventlogSource;
-		Logging::LogLevel::Level eventlogLogLevel;
+		LogLevel::Level eventlogLogLevel;
 #endif // defined( _WIN32 )
 
 		/// constructor
@@ -116,10 +116,10 @@ namespace Logging	{
 //			Not implemented yet, inherited from base for the time being
 //			bool test() const;
 
-		void foreground( Logging::LogLevel::Level debugLevel, bool useConfig );
+		void foreground( LogLevel::Level debugLevel, bool useConfig );
 	};
 
-} // namespace Logging
+} // namespace log
 
 namespace config	{
 
@@ -199,22 +199,22 @@ namespace config	{
 	{
 	public:
 		bool			logToStderr;
-		Logging::LogLevel::Level		stderrLogLevel;
+		log::LogLevel::Level		stderrLogLevel;
 
 		bool	 // namespace
 	logToFile;
 		std::string		logFile;
-		Logging::LogLevel::Level		logFileLogLevel;
+		log::LogLevel::Level		logFileLogLevel;
 		std::string		logFileIdent;
 		bool			logToSyslog;
-		Logging::SyslogFacility::Facility syslogFacility;
-		Logging::LogLevel::Level		syslogLogLevel;
+		log::SyslogFacility::Facility syslogFacility;
+		log::LogLevel::Level		syslogLogLevel;
 		std::string		syslogIdent;
 #if defined( _WIN32 )
 		bool			logToEventlog;
 		std::string		eventlogLogName;
 		std::string		eventlogSource;
-		Logging::LogLevel::Level eventlogLogLevel;
+		log::LogLevel::Level eventlogLogLevel;
 #endif // defined( _WIN32 )
 
 		/// constructor
@@ -230,7 +230,7 @@ namespace config	{
 //			Not implemented yet, inherited from base for the time being
 //			bool test() const;
 
-		void foreground( Logging::LogLevel::Level debugLevel, bool useConfig );
+		void foreground( log::LogLevel::Level debugLevel, bool useConfig );
 	};
 
 } // namespace config

@@ -52,7 +52,7 @@
 #include "logger.hpp" // TODO: just for LOG_ macros, should not be like this!
 
 namespace _Wolframe {
-	namespace Logging {
+	namespace log {
 
 EventlogBackend::EventlogBackend( )
 {
@@ -167,7 +167,7 @@ void EventlogBackend::log( const LogComponent component, const LogLevel::Level l
 			msg_arr, // array of strings to log (msg.c_str() for now)
 			NULL ); // no binary data
 		if( !res ) {
-			LOG_CRITICAL	<< _Wolframe::Logging::LogComponent::LogLogging
+			LOG_CRITICAL	<< _Wolframe::log::LogComponent::LogLogging
 					<< "Can't report event to event log: "
 					<< LogError::LogWinerror;
 		}
@@ -194,13 +194,13 @@ void EventlogBackend::calculateSid( )
 	HANDLE tokenProcess = NULL;
 	HANDLE process = GetCurrentProcess( );
 	if( process == NULL ) {
-		LOG_CRITICAL	<< _Wolframe::Logging::LogComponent::LogLogging
+		LOG_CRITICAL	<< _Wolframe::log::LogComponent::LogLogging
 				<< "Unable to get current process handle (GetCurrentProcess): "
 				<< LogError::LogWinerror;
 		return;
 	}
 	if( !OpenProcessToken( process, TOKEN_QUERY, &tokenProcess ) ) {
-		LOG_CRITICAL	<< _Wolframe::Logging::LogComponent::LogLogging
+		LOG_CRITICAL	<< _Wolframe::log::LogComponent::LogLogging
 				<< "Unable to get process token of current process (OpenProcessToken): "
 				<< LogError::LogWinerror;
 		return;
@@ -211,7 +211,7 @@ void EventlogBackend::calculateSid( )
 	(void)GetTokenInformation( tokenProcess, TokenUser, NULL, 0, &tokenUserSize );
 	PTOKEN_USER tokenUser = (PTOKEN_USER)malloc( tokenUserSize * sizeof( BYTE ) );
 	if( tokenUser == NULL ) {
-		LOG_CRITICAL	<< _Wolframe::Logging::LogComponent::LogLogging
+		LOG_CRITICAL	<< _Wolframe::log::LogComponent::LogLogging
 				<< "Unable to get memory to store user token (malloc)";
 		CloseHandle( tokenProcess );
 		return;
@@ -219,7 +219,7 @@ void EventlogBackend::calculateSid( )
 
 // get the user token
 	if( !GetTokenInformation( tokenProcess, TokenUser, (LPVOID)tokenUser, tokenUserSize, &tokenUserSize ) ) {
-		LOG_CRITICAL	<< _Wolframe::Logging::LogComponent::LogLogging
+		LOG_CRITICAL	<< _Wolframe::log::LogComponent::LogLogging
 				<< "Unable to get user token (GetTokenInformation): "
 				<< LogError::LogWinerror;
 		free( tokenUser );
@@ -233,7 +233,7 @@ void EventlogBackend::calculateSid( )
 	sid_ = (PSID)malloc( sidSize );
 	if( sid_ != NULL ) {
 		if( !CopySid( sidSize, sid_, tokenSid ) ) {
-			LOG_CRITICAL	<< _Wolframe::Logging::LogComponent::LogLogging
+			LOG_CRITICAL	<< _Wolframe::log::LogComponent::LogLogging
 					<< "Unable to make a copy of the current SID (CopySid): "
 					<< LogError::LogWinerror;
 			free( tokenSid );
@@ -242,7 +242,7 @@ void EventlogBackend::calculateSid( )
 			return;
 		}
 	} else {
-		LOG_CRITICAL	<< _Wolframe::Logging::LogComponent::LogLogging
+		LOG_CRITICAL	<< _Wolframe::log::LogComponent::LogLogging
 				<< "Unable to get memory to store copy of user token (malloc)";
 		free( tokenSid );
 		free( tokenUser );
@@ -257,5 +257,5 @@ void EventlogBackend::calculateSid( )
 	CloseHandle( tokenProcess );
 }
 
-	} // namespace Logging
+	} // namespace log
 } // namespace _Wolframe

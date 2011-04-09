@@ -104,7 +104,7 @@ static bool registerEventlog( const _Wolframe::config::ApplicationConfiguration&
 	LONG ret = RegCreateKeyEx( HKEY_LOCAL_MACHINE, key, 0, NULL, REG_OPTION_NON_VOLATILE,
 		KEY_SET_VALUE, NULL, &h, &disposition );
 	if( ret != ERROR_SUCCESS ) {
-		LOG_CRITICAL << "RegCreateKeyEx with key '" << key << "' failed: " << _Wolframe::Logging::LogError::LogWinerror;
+		LOG_CRITICAL << "RegCreateKeyEx with key '" << key << "' failed: " << _Wolframe::log::LogError::LogWinerror;
 		return false;
 	}
 
@@ -140,7 +140,7 @@ static bool deregisterEventlog( const _Wolframe::config::ApplicationConfiguratio
 		config.loggerConf->eventlogLogName.c_str( ), config.loggerConf->eventlogSource.c_str( ) );
 	res = RegDeleteKey( HKEY_LOCAL_MACHINE, key );
 	if( res != ERROR_SUCCESS ) {
-		LOG_CRITICAL << "RegDeleteKey with key '" << key << "' failed: " << _Wolframe::Logging::LogError::LogWinerror;
+		LOG_CRITICAL << "RegDeleteKey with key '" << key << "' failed: " << _Wolframe::log::LogError::LogWinerror;
 		return false;
 	}
 
@@ -152,7 +152,7 @@ static bool installAsService( const _Wolframe::config::ApplicationConfiguration&
 // get service control manager
 	SC_HANDLE scm = (SC_HANDLE)OpenSCManager( NULL, SERVICES_ACTIVE_DATABASE, SC_MANAGER_ALL_ACCESS );
 	if( scm == NULL ) {
-		LOG_CRITICAL << "OpenSCManager for service registration failed: " << _Wolframe::Logging::LogError::LogWinerror;
+		LOG_CRITICAL << "OpenSCManager for service registration failed: " << _Wolframe::log::LogError::LogWinerror;
 		return false;
 	}
 
@@ -171,7 +171,7 @@ static bool installAsService( const _Wolframe::config::ApplicationConfiguration&
 		SERVICE_DEMAND_START, SERVICE_ERROR_NORMAL,
 		os.str( ).c_str( ), NULL, NULL, NULL, NULL, NULL );
 	if( service == NULL ) {
-		LOG_CRITICAL << "CreateService during service registration failed: " << _Wolframe::Logging::LogError::LogWinerror;
+		LOG_CRITICAL << "CreateService during service registration failed: " << _Wolframe::log::LogError::LogWinerror;
 		return false;
 	}
 
@@ -192,20 +192,20 @@ static bool removeAsService( const _Wolframe::config::ApplicationConfiguration& 
 // get service control manager
 	SC_HANDLE scm = (SC_HANDLE)OpenSCManager( NULL, SERVICES_ACTIVE_DATABASE, SC_MANAGER_ALL_ACCESS );
 	if( scm == NULL ) {
-		LOG_CRITICAL << "OpenSCManager for service deregistration failed: " << _Wolframe::Logging::LogError::LogWinerror;
+		LOG_CRITICAL << "OpenSCManager for service deregistration failed: " << _Wolframe::log::LogError::LogWinerror;
 		return false;
 	}
 
 // get service handle of the service to delete (identified by service name)
 	SC_HANDLE service = OpenService( scm, config.serviceConf->serviceName.c_str( ), SERVICE_ALL_ACCESS );
 	if( service == NULL ) {
-		LOG_CRITICAL << "OpenService during service deregistration failed: " << _Wolframe::Logging::LogError::LogWinerror;
+		LOG_CRITICAL << "OpenService during service deregistration failed: " << _Wolframe::log::LogError::LogWinerror;
 		return false;
 	}
 
 // remove the service
 	if( !DeleteService( service ) ) {
-		LOG_CRITICAL << "Can't delete service: " << _Wolframe::Logging::LogError::LogWinerror;
+		LOG_CRITICAL << "Can't delete service: " << _Wolframe::log::LogError::LogWinerror;
 		return false;
 	}
 
@@ -253,7 +253,7 @@ static void service_report_status(	DWORD currentState,
 	}
 
 	if( !SetServiceStatus( serviceStatusHandle, &serviceStatus ) ) {
-		LOG_FATAL << "Unable to report service state " << currentState << " to SCM: " << _Wolframe::Logging::LogError::LogWinerror;
+		LOG_FATAL << "Unable to report service state " << currentState << " to SCM: " << _Wolframe::log::LogError::LogWinerror;
 		return;
 	}
 }
@@ -297,20 +297,20 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 		config.finalize( cmdLineCfg );
 
 // create the final logger based on the configuration
-		_Wolframe::Logging::LogBackend::instance().setConsoleLevel( config.loggerConf->stderrLogLevel );
-		_Wolframe::Logging::LogBackend::instance().setLogfileLevel( config.loggerConf->logFileLogLevel );
-		_Wolframe::Logging::LogBackend::instance().setLogfileName( config.loggerConf->logFile );
-		_Wolframe::Logging::LogBackend::instance().setSyslogLevel( config.loggerConf->syslogLogLevel );
-		_Wolframe::Logging::LogBackend::instance().setSyslogFacility( config.loggerConf->syslogFacility );
-		_Wolframe::Logging::LogBackend::instance().setSyslogIdent( config.loggerConf->syslogIdent );
-		_Wolframe::Logging::LogBackend::instance().setEventlogLevel( config.loggerConf->eventlogLogLevel );
-		_Wolframe::Logging::LogBackend::instance().setEventlogSource( config.loggerConf->eventlogSource );
-		_Wolframe::Logging::LogBackend::instance().setEventlogLog( config.loggerConf->eventlogLogName );
+		_Wolframe::log::LogBackend::instance().setConsoleLevel( config.loggerConf->stderrLogLevel );
+		_Wolframe::log::LogBackend::instance().setLogfileLevel( config.loggerConf->logFileLogLevel );
+		_Wolframe::log::LogBackend::instance().setLogfileName( config.loggerConf->logFile );
+		_Wolframe::log::LogBackend::instance().setSyslogLevel( config.loggerConf->syslogLogLevel );
+		_Wolframe::log::LogBackend::instance().setSyslogFacility( config.loggerConf->syslogFacility );
+		_Wolframe::log::LogBackend::instance().setSyslogIdent( config.loggerConf->syslogIdent );
+		_Wolframe::log::LogBackend::instance().setEventlogLevel( config.loggerConf->eventlogLogLevel );
+		_Wolframe::log::LogBackend::instance().setEventlogSource( config.loggerConf->eventlogSource );
+		_Wolframe::log::LogBackend::instance().setEventlogLog( config.loggerConf->eventlogLogName );
 
 // register the event callback where we get called by Windows and the SCM
 		serviceStatusHandle = RegisterServiceCtrlHandler( config.serviceConf->serviceName.c_str( ), serviceCtrlFunction );
 		if( serviceStatusHandle == 0 ) {
-			LOG_FATAL << "Unable to register service control handler function: " << _Wolframe::Logging::LogError::LogWinerror;
+			LOG_FATAL << "Unable to register service control handler function: " << _Wolframe::log::LogError::LogWinerror;
 			return;
 		}
 
@@ -320,7 +320,7 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 // register a stop event
 		serviceStopEvent = CreateEvent( NULL, TRUE, FALSE, NULL );
 		if( serviceStopEvent == NULL ) {
-			LOG_FATAL << "Unable to create the stop event for the termination of the service: " << _Wolframe::Logging::LogError::LogWinerror;
+			LOG_FATAL << "Unable to create the stop event for the termination of the service: " << _Wolframe::log::LogError::LogWinerror;
 			service_report_status( SERVICE_STOPPED, NO_ERROR, DEFAULT_SERVICE_TIMEOUT );
 			return;
 		}
@@ -358,7 +358,7 @@ WAIT_FOR_STOP_EVENT:
 
 			case WAIT_FAILED:
 // error, stop now immediatelly
-				LOG_FATAL << "Waiting for stop event in service main failed, stopping now" << _Wolframe::Logging::LogError::LogWinerror;
+				LOG_FATAL << "Waiting for stop event in service main failed, stopping now" << _Wolframe::log::LogError::LogWinerror;
 				s.stop( );
 				service_report_status( SERVICE_STOPPED, NO_ERROR, DEFAULT_SERVICE_TIMEOUT );
 				return;
@@ -380,7 +380,7 @@ int _Wolframe_winMain( int argc, char* argv[] )
 {
 	try	{
 		// create initial console logger, so we see things going wrong
-		_Wolframe::Logging::LogBackend::instance().setConsoleLevel( _Wolframe::Logging::LogLevel::LOGLEVEL_INFO );
+		_Wolframe::log::LogBackend::instance().setConsoleLevel( _Wolframe::log::LogLevel::LOGLEVEL_INFO );
 
 		_Wolframe::Version  appVersion( _Wolframe::applicationMajorVersion(), _Wolframe::applicationMinorVersion(),
 						_Wolframe::applicationRevisionVersion(), _Wolframe::applicationBuildVersion() );
@@ -476,7 +476,7 @@ int _Wolframe_winMain( int argc, char* argv[] )
 					config.foreground = true;
 				} else {
 					// TODO: mmh? what are we doing here? No longer here
-					LOG_FATAL << "Unable to dispatch service control dispatcher: " << _Wolframe::Logging::LogError::LogWinerror;
+					LOG_FATAL << "Unable to dispatch service control dispatcher: " << _Wolframe::log::LogError::LogWinerror;
 					return _Wolframe::ErrorCodes::FAILURE;
 				}
 			} else {
@@ -487,7 +487,7 @@ int _Wolframe_winMain( int argc, char* argv[] )
 
 		// Create the final logger based on the configuration, this is the
 		// foreground mode in a console, so we start only the stderr logger
-		_Wolframe::Logging::LogBackend::instance().setConsoleLevel( config.loggerConf->stderrLogLevel );
+		_Wolframe::log::LogBackend::instance().setConsoleLevel( config.loggerConf->stderrLogLevel );
 
 		LOG_NOTICE << "Starting server";
 

@@ -47,7 +47,7 @@
 #include <string>
 
 namespace _Wolframe {
-	namespace Logging {
+	namespace log {
 
 	class LogBackend : public Singleton< LogBackend >
 	{
@@ -83,7 +83,7 @@ namespace _Wolframe {
 		LogBackendImpl	*impl_;
 	};
 
-	} // namespace Logging
+	} // namespace log
 } // namespace _Wolframe
 
 #endif // _LOG_BACKEND_HPP_INCLUDED

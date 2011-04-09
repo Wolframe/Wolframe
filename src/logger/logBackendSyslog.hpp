@@ -44,7 +44,7 @@
 #include "logger/logSyslogFacility.hpp"
 
 namespace _Wolframe {
-	namespace Logging {
+	namespace log {
 
 	class SyslogBackend
 	{
@@ -69,7 +69,7 @@ namespace _Wolframe {
 		std::string ident_;
 	};
 
-	} // namespace Logging
+	} // namespace log
 } // namespace _Wolframe
 
 #endif // _LOG_BACKEND_SYSLOG_HPP_INCLUDED

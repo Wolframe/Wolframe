@@ -55,7 +55,7 @@
 #endif
 
 namespace _Wolframe {
-	namespace Logging {
+	namespace log {
 
 	const LogError LogError::LogStrerror( LogError::LOGERROR_STRERROR );
 	const LogError LogError::LogWinerror( LogError::LOGERROR_WINERROR );
@@ -131,5 +131,5 @@ Logger& operator<<( Logger& logger, LogError e )
 	}
 }
 
-	} // namespace Logging
+	} // namespace log
 } // namespace _Wolframe

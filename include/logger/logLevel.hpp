@@ -43,7 +43,7 @@
 #include <iosfwd>
 
 namespace _Wolframe {
-	namespace Logging {
+	namespace log {
 
 	class LogLevel {
 	public:
@@ -83,7 +83,7 @@ namespace _Wolframe {
 		return s;
 	}
 
-	} // namespace Logging
+	} // namespace log
 } // namespace _Wolframe
 
 #endif // _LOG_LEVEL_HPP_INCLUDED

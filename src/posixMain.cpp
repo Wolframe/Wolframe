@@ -153,7 +153,7 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 		config.finalize( cmdLineCfg );
 
 // now here we know where to log to on stderr
-		_Wolframe::Logging::LogBackend::instance().setConsoleLevel( config.loggerConf->stderrLogLevel );
+		_Wolframe::log::LogBackend::instance().setConsoleLevel( config.loggerConf->stderrLogLevel );
 
 // Check the configuration
 		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::CHECK_CONFIG )	{
@@ -193,16 +193,16 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 
 			// daemonize, lose process group, terminal output, etc.
 			if( daemon( 0, 0 ) ) {
-				LOG_CRITICAL << "Daemonizing server failed: " << _Wolframe::Logging::LogError::LogStrerror;
+				LOG_CRITICAL << "Daemonizing server failed: " << _Wolframe::log::LogError::LogStrerror;
 				return _Wolframe::ErrorCodes::FAILURE;
 			}
 
 			// now here we lost constrol over the console, we should
 			// create a temporary logger which at least tells what's
 			// going on in the syslog
-			_Wolframe::Logging::LogBackend::instance().setSyslogLevel( config.loggerConf->syslogLogLevel );
-			_Wolframe::Logging::LogBackend::instance().setSyslogFacility( config.loggerConf->syslogFacility );
-			_Wolframe::Logging::LogBackend::instance().setSyslogIdent( config.loggerConf->syslogIdent );
+			_Wolframe::log::LogBackend::instance().setSyslogLevel( config.loggerConf->syslogLogLevel );
+			_Wolframe::log::LogBackend::instance().setSyslogFacility( config.loggerConf->syslogFacility );
+			_Wolframe::log::LogBackend::instance().setSyslogIdent( config.loggerConf->syslogIdent );
 
 			// if we are root we can drop privileges now
 			struct group *groupent;
@@ -210,23 +210,23 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 
 			passwdent = getpwnam( config.serviceConf->user.c_str( ) );
 			if( passwdent == NULL ) {
-				LOG_CRITICAL << "Illegal user '" << config.serviceConf->user << "': " << _Wolframe::Logging::LogError::LogStrerror;
+				LOG_CRITICAL << "Illegal user '" << config.serviceConf->user << "': " << _Wolframe::log::LogError::LogStrerror;
 				return _Wolframe::ErrorCodes::FAILURE;
 			}
 
 			groupent = getgrnam( config.serviceConf->group.c_str( ) );
 			if( groupent == NULL ) {
-				LOG_CRITICAL << "Illegal group '" << config.serviceConf->group << "': " << _Wolframe::Logging::LogError::LogStrerror;
+				LOG_CRITICAL << "Illegal group '" << config.serviceConf->group << "': " << _Wolframe::log::LogError::LogStrerror;
 				return _Wolframe::ErrorCodes::FAILURE;
 			}
 
 			if( setgid( groupent->gr_gid ) < 0 ) {
-				LOG_CRITICAL << "setgid for group '" << config.serviceConf->group << "' failed: " << _Wolframe::Logging::LogError::LogStrerror;
+				LOG_CRITICAL << "setgid for group '" << config.serviceConf->group << "' failed: " << _Wolframe::log::LogError::LogStrerror;
 				return _Wolframe::ErrorCodes::FAILURE;
 			}
 
 			if( setuid( passwdent->pw_uid ) < 0 ) {
-				LOG_CRITICAL << "setgid for user '" << config.serviceConf->user << "' failed: " << _Wolframe::Logging::LogError::LogStrerror;
+				LOG_CRITICAL << "setgid for user '" << config.serviceConf->user << "' failed: " << _Wolframe::log::LogError::LogStrerror;
 				return _Wolframe::ErrorCodes::FAILURE;
 			}
 
@@ -241,8 +241,8 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 
 			// Create the final logger based on the configuration
 			// file logger only here to get the right permissions
-			_Wolframe::Logging::LogBackend::instance().setLogfileLevel( config.loggerConf->logFileLogLevel );
-			_Wolframe::Logging::LogBackend::instance().setLogfileName( config.loggerConf->logFile );
+			_Wolframe::log::LogBackend::instance().setLogfileLevel( config.loggerConf->logFileLogLevel );
+			_Wolframe::log::LogBackend::instance().setLogfileName( config.loggerConf->logFile );
 		}
 
 		// Block all signals for background thread.

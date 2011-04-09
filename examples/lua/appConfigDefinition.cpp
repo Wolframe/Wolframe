@@ -48,7 +48,7 @@ ApplicationConfiguration::ApplicationConfiguration()
 	// network server
 	serverConf = new _Wolframe::net::Configuration();
 	// logging
-	loggerConf = new _Wolframe::Logging::LoggerConfiguration();
+	loggerConf = new _Wolframe::log::LoggerConfiguration();
 
 	handlerConf = new _Wolframe::HandlerConfiguration();
 

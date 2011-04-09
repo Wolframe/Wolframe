@@ -40,7 +40,7 @@
 #include "logger/logBackendFile.hpp"
 
 namespace _Wolframe {
-	namespace Logging {
+	namespace log {
 
 LogfileBackend::LogfileBackend( )
 {
@@ -81,7 +81,7 @@ void LogfileBackend::reopen( )
 		isOpen_ = true;
 	} catch( const std::ofstream::failure& ) {
 		isOpen_ = false;
-		LOG_CRITICAL	<< _Wolframe::Logging::LogComponent::LogLogging
+		LOG_CRITICAL	<< _Wolframe::log::LogComponent::LogLogging
 				<< "Can't open logfile '" << filename_ << "'";
 		// TODO: e.what() displays "basic_ios::clear" always, how to get
 		// decent error messages here? I fear the C++ standard doesn't
@@ -130,5 +130,5 @@ void LogfileBackend::log( const LogComponent component, const LogLevel::Level le
 	}
 }
 
-	} // namespace Logging
+	} // namespace log
 } // namespace _Wolframe

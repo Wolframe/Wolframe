@@ -48,7 +48,7 @@
 #endif // defined( _WIN32 )
 
 namespace _Wolframe {
-	namespace Logging {
+	namespace log {
 
 	class LogBackend::LogBackendImpl
 	{
@@ -88,7 +88,7 @@ namespace _Wolframe {
 #endif // _WIN32
 	};
 
-	} // namespace Logging
+	} // namespace log
 } // namespace _Wolframe
 
 #endif // _LOG_BACKEND_IMPL_HPP_INCLUDED

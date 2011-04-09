@@ -11,7 +11,7 @@
 #include <iosfwd>
 
 namespace _Wolframe {
-	namespace Logging {
+	namespace log {
 
 	class SyslogFacility {
 	public:
@@ -65,7 +65,7 @@ namespace _Wolframe {
 		return s;
 	}
 
-	} // namespace Logging
+	} // namespace log
 } // namespace _Wolframe
 
 #endif // _LOG_SYSLOG_FACILITY_HPP_INCLUDED

@@ -43,7 +43,7 @@
 #include "logger/logComponent.hpp"
 
 namespace _Wolframe {
-	namespace Logging {
+	namespace log {
 
 	class ConsoleLogBackend
 	{
@@ -62,7 +62,7 @@ namespace _Wolframe {
 		LogLevel::Level	logLevel_;
 	};
 
-	} // namespace Logging
+	} // namespace log
 } // namespace _Wolframe
 
 #endif // _LOG_BACKEND_CONSOLE_HPP_INCLUDED

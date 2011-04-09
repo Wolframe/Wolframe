@@ -44,7 +44,7 @@
 #include <iostream>
 
 namespace _Wolframe {
-	namespace Logging {
+	namespace log {
 
 ConsoleLogBackend::ConsoleLogBackend( )
 {
@@ -74,5 +74,5 @@ void ConsoleLogBackend::reopen( )
 	// nothing to do here
 }
 
-	} // namespace Logging
+	} // namespace log
 } // namespace _Wolframe

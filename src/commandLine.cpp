@@ -46,7 +46,7 @@ namespace prgOpts = boost::program_options;
 namespace _Wolframe {
 namespace config {
 
-static const Logging::LogLevel::Level DEFAULT_DEBUG_LEVEL = Logging::LogLevel::LOGLEVEL_INFO;
+static const log::LogLevel::Level DEFAULT_DEBUG_LEVEL = log::LogLevel::LOGLEVEL_INFO;
 
 CmdLineConfig::CmdLineConfig()
 {
@@ -174,8 +174,8 @@ bool CmdLineConfig::parse( int argc, char* argv[] )
 			std::string s = str;
 			boost::trim( s );
 			boost::to_upper( s );
-			debugLevel = Logging::LogLevel::strToLogLevel( s );
-			if ( debugLevel == Logging::LogLevel::LOGLEVEL_UNDEFINED )	{
+			debugLevel = log::LogLevel::strToLogLevel( s );
+			if ( debugLevel == log::LogLevel::LOGLEVEL_UNDEFINED )	{
 				errMsg_ = "invalid debug level \"";
 				errMsg_ += str;
 				errMsg_ += "\"";

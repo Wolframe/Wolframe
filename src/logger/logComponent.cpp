@@ -41,7 +41,7 @@
 #include <ostream>
 
 namespace _Wolframe {
-	namespace Logging {
+	namespace log {
 
 	const LogComponent LogComponent::LogNone( LogComponent::LOGCOMPONENT_NONE );
 	const LogComponent LogComponent::LogLogging( LogComponent::LOGCOMPONENT_LOGGING );
@@ -69,5 +69,5 @@ namespace _Wolframe {
 		return logger;
 	}
 
-	} // namespace Logging
+	} // namespace log
 } // namespace _Wolframe

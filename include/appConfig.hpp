@@ -48,7 +48,7 @@ namespace _Wolframe {
 
 // forward declarations for configuration elements
 namespace net { struct Configuration;	}
-namespace Logging { struct LoggerConfiguration;	}
+namespace log { struct LoggerConfiguration;	}
 struct HandlerConfiguration;
 
 
@@ -69,7 +69,7 @@ struct ApplicationConfiguration	{
 	// network server configuration
 	_Wolframe::net::Configuration	*serverConf;
 	// logger configuration
-	_Wolframe::Logging::LoggerConfiguration	*loggerConf;
+	_Wolframe::log::LoggerConfiguration	*loggerConf;
 
 	_Wolframe::HandlerConfiguration		*handlerConf;
 

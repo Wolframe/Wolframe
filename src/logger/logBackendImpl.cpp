@@ -39,7 +39,7 @@
 #include "logBackendImpl.hpp"
 
 namespace _Wolframe {
-	namespace Logging {
+	namespace log {
 
 LogBackend::LogBackendImpl::LogBackendImpl( )
 {
@@ -135,5 +135,5 @@ void LogBackend::setEventlogSource( const std::string source )	{ impl_->setEvent
 
 void LogBackend::log( const LogComponent component, const LogLevel::Level level, const std::string& msg )	{ impl_->log( component, level, msg ); }
 
-	} // namespace Logging
+	} // namespace log
 } // namespace _Wolframe

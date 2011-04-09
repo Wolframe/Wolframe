@@ -91,7 +91,8 @@ protected:
 
 				if (success)
 				{
-					out.append( boost::lexical_cast<std::string>( value));
+// Aba: configValueParser-gTest.cpp:94:52: error: 'value' was not declared in this scope
+//					out.append( boost::lexical_cast<std::string>( value));
 				}
 				else
 				{

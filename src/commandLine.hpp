@@ -67,7 +67,7 @@ struct CmdLineConfig	{
 	std::string	user;
 	std::string	group;
 #endif
-	Logging::LogLevel::Level	debugLevel;
+	log::LogLevel::Level	debugLevel;
 	std::string	cfgFile;
 	bool		useLogConfig;
 private:

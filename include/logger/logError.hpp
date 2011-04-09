@@ -40,7 +40,7 @@
 #define _LOG_ERROR_HPP_INCLUDED
 
 namespace _Wolframe {
-	namespace Logging {
+	namespace log {
 
 	class LogError {
 	public:
@@ -75,7 +75,7 @@ namespace _Wolframe {
 		static const LogError LogWinerror;
 	};
 	
-	} // namespace Logging
+	} // namespace log
 } // namespace _Wolframe
 
 #endif // _LOG_ERROR_HPP_INCLUDED

@@ -13,9 +13,9 @@
 #include <windows.h>
 #endif
 
-using namespace _Wolframe::Logging;
+using namespace _Wolframe::log;
 
-// The fixture for testing class _Wolframe::Logging
+// The fixture for testing class _Wolframe::log
 class LoggingFixture : public ::testing::Test
 {
 	private:

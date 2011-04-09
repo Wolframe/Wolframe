@@ -46,7 +46,7 @@
 #include <windows.h>
 
 namespace _Wolframe {
-	namespace Logging {
+	namespace log {
 
 	class EventlogBackend
 	{
@@ -75,7 +75,7 @@ namespace _Wolframe {
 		void calculateSid( );		
 	};
 
-	} // namespace Logging
+	} // namespace log
 } // namespace _Wolframe
 
 #endif // _LOG_BACKEND_EVENTLOG_HPP_INCLUDED

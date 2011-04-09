@@ -39,7 +39,7 @@
 #include "logger/logLevel.hpp"
 
 namespace _Wolframe {
-	namespace Logging {
+	namespace log {
 
 	LogLevel::Level LogLevel::strToLogLevel( const std::string s )
 	{
@@ -57,5 +57,5 @@ namespace _Wolframe {
 		else				return LogLevel::LOGLEVEL_UNDEFINED;
 	}
 
-	} // namespace Logging
+	} // namespace log
 } // namespace _Wolframe

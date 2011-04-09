@@ -40,7 +40,7 @@
 #define _LOG_COMPONENT_HPP_INCLUDED
 
 namespace _Wolframe {
-	namespace Logging {
+	namespace log {
 
 	class LogComponent
 	{
@@ -88,7 +88,7 @@ namespace _Wolframe {
 		static const LogComponent LogAuth;			
 	};
 			
-	} // namespace Logging
+	} // namespace log
 } // namespace _Wolframe
 
 #endif // _LOG_COMPONENT_HPP_INCLUDED
