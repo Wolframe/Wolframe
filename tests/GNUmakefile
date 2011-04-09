@@ -103,6 +103,7 @@ TEST_CPP_BINS += \
 	poolTest$(EXE) \
 	logTest$(EXE) \
 	protocolArgumentParsing-gTest$(EXE) \
+	configValueParser-gTest$(EXE) \
 	ptreeGenerator-gTest$(EXE) \
 	pechoHandler-gTest$(EXE) \
 	mtprocHandler-gTest$(EXE)
