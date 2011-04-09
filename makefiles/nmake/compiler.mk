@@ -71,7 +71,7 @@ CCPP_LINK = link.exe
 
 .obj.exe:
 	$(CCPP_LINK) $(LDFLAGS) $(LIBS) /out:$@ $(OBJS) $**
-	$(MT) -manifest $@.manifest -outputresource:$@;1
+	$(MT) -nologo -manifest $@.manifest -outputresource:$@;1
 
 .mc.rc:
 	$(MC) -h $(@D) -r $(@D) $<

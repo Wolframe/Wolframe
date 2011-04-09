@@ -21,8 +21,8 @@ namespace _Wolframe	{
 
 	const char*	config::defaultServiceName()		{ return "wolframe-pecho"; }
 #if defined( _WIN32 )
-	const char*	Configuration::defaultServiceDisplayName()	{ return "Wolframe ECHO Daemon"; }
-	const char*	Configuration::defaultServiceDescription()	{ return "a Wolframe daemon for echo"; }
+	const char*	config::defaultServiceDisplayName()	{ return "Wolframe ECHO Daemon"; }
+	const char*	config::defaultServiceDescription()	{ return "a Wolframe daemon for echo"; }
 #endif // defined( _WIN32 )
 
 } // namespace _Wolframe

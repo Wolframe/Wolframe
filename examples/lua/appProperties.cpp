@@ -21,8 +21,8 @@ namespace _Wolframe	{
 
 	const char*	config::defaultServiceName()		{ return "Wolframe-lua"; }
 #if defined( _WIN32 )
-	const char*	Configuration::defaultServiceDisplayName()	{ return "Wolframe lua ECHO Daemon"; }
-	const char*	Configuration::defaultServiceDescription()	{ return "a wolframe daemon for lua echoing"; }
+	const char*	config::defaultServiceDisplayName()	{ return "Wolframe lua ECHO Daemon"; }
+	const char*	config::defaultServiceDescription()	{ return "a wolframe daemon for lua echoing"; }
 #endif // defined( _WIN32 )
 
 } // namespace _Wolframe

@@ -21,8 +21,8 @@ namespace _Wolframe	{
 
 	const char*	config::defaultServiceName()		{ return "mtproc"; }
 #if defined( _WIN32 )
-	const char*	Configuration::defaultServiceDisplayName()	{ return "Wolframe mtproc Daemon"; }
-	const char*	Configuration::defaultServiceDescription()	{ return "a daemon for mtprocing"; }
+	const char*	config::defaultServiceDisplayName()	{ return "Wolframe mtproc Daemon"; }
+	const char*	config::defaultServiceDescription()	{ return "a daemon for mtprocing"; }
 #endif // defined( _WIN32 )
 
 } // namespace _Wolframe
