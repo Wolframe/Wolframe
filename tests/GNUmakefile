@@ -86,7 +86,6 @@ INCLUDE_LIBS += \
 endif
 
 TEST_OBJS =
-#	$(TOPDIR)/examples/pecho/pechoHandler.o
 
 TEST_CPP_BINS = \
 	threadLeakTest$(EXE) \

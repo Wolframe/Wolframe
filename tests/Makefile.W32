@@ -42,6 +42,15 @@ INCLUDE_LIBS = \
 	$(INCLUDE_LIBS) $(GTEST_LIBS)
 !ENDIF
 
+# sqlite3
+
+!IFDEF WITH_SQLITE3
+
+INCLUDE_CPPFLAGS = \
+	$(INCLUDE_CPPFLAGS) /DWITH_SQLITE3
+
+!ENDIF
+
 TEST_CPP_BINS = \
 	threadLeakTest.exe \
 	authTest.exe
