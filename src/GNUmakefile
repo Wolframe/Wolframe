@@ -111,6 +111,15 @@ AAAA_OBJS += \
 	AAAA/authentication_db_sqlite3.o
 endif
 
+DB_OBJS =
+
+# Sqlite3
+
+ifeq ($(WITH_SQLITE3),1)
+DB_OBJS += \
+	db/sdsqlite/sdsqlite.o
+endif
+
 LOCAL_STATIC_LIB_OBJS = \
 	version.o \
 	resolvePath.o \
@@ -129,6 +138,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	connection.o \
 	serverConfig.o \
 	server.o \
+	$(DB_OBJS) \
 	$(AAAA_OBJS)
 
 #SSL
@@ -136,7 +146,6 @@ ifeq ($(WITH_SSL),1)
 LOCAL_STATIC_LIB_OBJS += \
 	SSLcertificateInfo.o
 endif
-
 
 OBJS = \
 	$(LOCAL_STATIC_LIB_OBJS) \

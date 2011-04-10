@@ -22,100 +22,17 @@ Authenticator *CreateDbSqlite3Authenticator( AuthenticatorFactory::properties pr
 
 DbSqlite3Authenticator::DbSqlite3Authenticator( const std::string _filename )
 {
-	int rc;
-
 	m_filename = _filename;
 
-	rc = sqlite3_open( m_filename.c_str( ), &m_db );
-	if( rc != SQLITE_OK ) {
-		std::ostringstream ss;
-		ss	<< "sqlite3_open failed with database file " << m_filename << ": "
-			<< sqlite3_errmsg( m_db );
-		(void)sqlite3_close( m_db );
-		throw std::runtime_error( ss.str( ) );
-	}
+	m_db.open( m_filename );
 	
 	m_state = _Wolframe_TEXTFILE_STATE_NEED_LOGIN;
 }
 
 DbSqlite3Authenticator::~DbSqlite3Authenticator( )
 {
-	(void)sqlite3_close( m_db );
+	m_db.close( );
 }
-
-#if 0
-// TODO: for this we should use a DB abstraction layer (like sqlitexx) or
-// apr_db_sqlite3, or dbi, or ... :-)
-#if SQLITE_VERSION_NUMBER >= 3005000
-	rc = sqlite3_prepare_v2( db, "select * from a where b>=$1 and b<=$2",
-		-1, &stmt, &ptr );
-#else
-	rc = sqlite3_prepare( db, "select * from a where b>=$1 and b<=$2",
-		-1, &stmt, &ptr );
-#endif
-	if( rc != SQLITE_OK ) {
-		fprintf( stderr, "Unable to prepare statement: %s\n", sqlite3_errmsg( db ) );
-		(void)sqlite3_close( db );
-		exit( 1 );
-	}
-	rc = sqlite3_bind_int( stmt, 1, 3 );
-	if( rc != SQLITE_OK ) {
-		fprintf( stderr, "Unable to bind first parameter: %s\n", sqlite3_errmsg( db ) );
-		(void)sqlite3_finalize( stmt );
-		(void)sqlite3_close( db );
-		exit( 1 );
-	}
-	rc = sqlite3_bind_int( stmt, 2, 4 );
-	if( rc != SQLITE_OK ) {
-		fprintf( stderr, "Unable to bind second parameter: %s\n", sqlite3_errmsg( db ) );
-		(void)sqlite3_finalize( stmt );
-		(void)sqlite3_close( db );
-		exit( 1 );
-	}
-	printf( "number of bind parameters: %d (MUST: 2)\n", sqlite3_bind_parameter_count( stmt ) );
-
-	rc = sqlite3_step( stmt );
-	while( rc == SQLITE_ROW ) {
-		switch( rc ) {
-			case SQLITE_ROW:
-				printf( "nof columns: %d\n", sqlite3_data_count( stmt ) );
-				for( i = 0; i < sqlite3_data_count( stmt ); i++ ) {
-					const char *colname = sqlite3_column_name( stmt, i );
-					int data_type = sqlite3_column_type( stmt, i );
-					switch( data_type ) {
-						case SQLITE_INTEGER: {
-							int value = sqlite3_column_int( stmt, i );
-							printf( "%s(%d) = %d\n", colname, data_type, value );
-						}
-						break;
-
-						case SQLITE_TEXT: {
-							const unsigned char *value = sqlite3_column_text( stmt, i );
-							printf( "%s(%d) = %s\n", colname, data_type, value );
-						}
-						break;
-					}
-				}
-				break;
-	
-			default:
-				fprintf( stderr, "Unable to step through statement: %s\n", sqlite3_errmsg( db ) );
-				(void)sqlite3_finalize( stmt );
-				(void)sqlite3_close( db );
-				exit( 1 );
-		}
-		rc = sqlite3_step( stmt );
-	}
-
-	/* finalize prepared statement */
-	rc = sqlite3_finalize( stmt );
-	if( rc != SQLITE_OK ) {
-		fprintf( stderr, "Unable to finalize statement: %s\n", sqlite3_errmsg( db ) );
-		(void)sqlite3_close( db );
-		exit( 1 );
-	}
-
-#endif
 
 Step::AuthStep DbSqlite3Authenticator::nextStep( )
 {

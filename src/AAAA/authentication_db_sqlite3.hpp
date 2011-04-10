@@ -10,7 +10,7 @@
 #include <map>
 #include <string>
 
-#include "sqlite3.h"
+#include "db/sdsqlite/sdsqlite.h"
 
 namespace _Wolframe {
 	namespace Authentication {
@@ -25,7 +25,7 @@ class DbSqlite3Authenticator : public Authenticator {
 			_Wolframe_TEXTFILE_STATE_COMPUTE
 		} m_state;
 
-		sqlite3* m_db;
+		sd::sqlite m_db;
 		std::string m_filename;
 		
 		std::string m_token;
