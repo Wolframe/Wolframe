@@ -13,12 +13,12 @@
 #include "db/sdsqlite/sdsqlite.h"
 
 namespace _Wolframe {
-	namespace Authentication {
+namespace AAAA {
 
 class DbSqlite3Authenticator : public Authenticator {
 	private:
 		std::map< std::string, std::string > m_creds;
-		
+
 		enum {
 			_Wolframe_DB_SQLITE3_STATE_NEED_LOGIN,
 			_Wolframe_DB_SQLITE3_STATE_NEED_PASS,
@@ -27,11 +27,11 @@ class DbSqlite3Authenticator : public Authenticator {
 
 		sd::sqlite m_db;
 		std::string m_filename;
-		
+
 		std::string m_token;
 		std::string m_login;
 		std::string m_pass;
-				
+
 	public:
 		DbSqlite3Authenticator( const std::string _filename );
 		virtual ~DbSqlite3Authenticator( );
@@ -42,7 +42,6 @@ class DbSqlite3Authenticator : public Authenticator {
 		virtual std::string getError( );
 };
 
-} // namespace Authentication
-} // namespace _Wolframe
+}} // namespace _Wolframe::AAAA
 
 #endif // _AUTHENTICATION_DB_SQLITE3_HPP_INCLUDED

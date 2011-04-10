@@ -6,7 +6,7 @@
 #include "getPassword.hpp"
 
 using namespace std;
-using namespace _Wolframe::Authentication;
+using namespace _Wolframe::AAAA;
 
 static void print_usage( ) {
 // get list of available authentication methods

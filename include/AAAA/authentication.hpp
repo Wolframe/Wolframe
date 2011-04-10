@@ -50,7 +50,7 @@
 #include "singleton.hpp"
 
 namespace _Wolframe {
-	namespace Authentication {
+namespace AAAA {
 
 // the basic steps the authenticator can be in
 class Step {
@@ -157,7 +157,6 @@ extern Authenticator *CreatePAMAuthenticator( AuthenticatorFactory::properties p
 extern Authenticator *CreateDbSqlite3Authenticator( AuthenticatorFactory::properties props );
 #endif // defined( WITH_SQLITE3 )
 
-} // namespace Authentication
-} // namespace _Wolframe
+}} // namespace _Wolframe::AAAA
 
 #endif // _AUTHENTICATION_HPP_INCLUDED

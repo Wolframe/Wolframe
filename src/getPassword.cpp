@@ -37,7 +37,7 @@
 #include <string>
 
 namespace _Wolframe {
-	namespace Authentication {
+namespace AAAA {
 
 #if !defined(_WIN32)
 
@@ -94,5 +94,4 @@ namespace _Wolframe {
 #endif // defined(_WIN32)
 
 
-} // namespace Authentication
-} // namespace _Wolframe
+}} // namespace _Wolframe::AAAA

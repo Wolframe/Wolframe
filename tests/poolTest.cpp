@@ -63,14 +63,14 @@ private:
 class ObjectPoolFixture : public ::testing::Test	{
 protected:
 	// Set-up work for each test here.
-	// You can remove any or all of the following functions if its body is empty.
 	ObjectPoolFixture()	{
 		srand((unsigned)time(0));
-		noThreads = (int)( rand() % 32 );
-		poolSize = (int)( rand() % 32 );
+		noThreads = 1 + (int)( rand() % 32 );
+		poolSize = 1 + (int)( rand() % 16 );
 		times = (unsigned long)( rand() % 200000 );
 		timesSleep = (unsigned long)( rand() % 50000 );
-
+		std::cout << noThreads << " threads, " << poolSize << " elements in the pool, "
+			  << times << " iterations" << std::endl;
 	}
 
 	// Clean-up work that doesn't throw exceptions here.
@@ -78,10 +78,8 @@ protected:
 	}
 
 
-	// If the constructor and destructor are not enough for setting up
-	// and cleaning up each test, you can define the following methods:
-	//   Code here will be called immediately after the constructor (right
-	//   before each test).
+	// Code here will be called immediately after the constructor (right
+	// before each test).
 	virtual void SetUp() {
 		for ( unsigned long i = 0; i < poolSize; i++ )	{
 			testObject *tstObj = new testObject();
@@ -90,8 +88,8 @@ protected:
 		}
 	}
 
-	//   Code here will be called immediately after each test (right
-	//   before the destructor).
+	// Code here will be called immediately after each test (right
+	// before the destructor).
 	virtual void TearDown() {
 		for ( unsigned long i = 0; i < poolSize; i++ )
 			objPool.get();

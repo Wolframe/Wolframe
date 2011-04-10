@@ -31,43 +31,14 @@
 
 ************************************************************************/
 //
-// authentication_textfile.hpp
+// accountant implementation
 //
 
-#ifndef _AUTHENTICATION_TEXTFILE_HPP_INCLUDED
-#define _AUTHENTICATION_TEXTFILE_HPP_INCLUDED
-
-#include "AAAA/authentication.hpp"
-
-#include <map>
-#include <string>
+#include "AAAAprovider.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
 
-class TextFileAuthenticator : public Authenticator {
-	private:
-		std::map< std::string, std::string > m_creds;
-
-		enum {
-			_Wolframe_TEXTFILE_STATE_NEED_LOGIN,
-			_Wolframe_TEXTFILE_STATE_NEED_PASS,
-			_Wolframe_TEXTFILE_STATE_COMPUTE
-		} m_state;
-
-		std::string m_token;
-		std::string m_login;
-		std::string m_pass;
-
-	public:
-		TextFileAuthenticator( const std::string _filename );
-		virtual Step::AuthStep nextStep( );
-		virtual std::string sendData( );
-		virtual std::string token( );
-		virtual void receiveData( const std::string data );
-		virtual std::string getError( );
-};
 
 }} // namespace _Wolframe::AAAA
 
-#endif // _AUTHENTICATION_TEXTFILE_HPP_INCLUDED

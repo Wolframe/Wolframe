@@ -245,3 +245,9 @@ windows/Makefile.W32
 windows/uuidgen.c
 include/config/valueParser.hpp
 tests/configValueParser-gTest.cpp
+src/AAAA/AAAAprovider.hpp
+src/AAAA/authenticator.cpp
+src/AAAA/authorizer.cpp
+src/AAAA/auditor.cpp
+src/AAAA/accountant.cpp
+src/AAAA/AAAAprovider.cpp

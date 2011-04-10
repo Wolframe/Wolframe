@@ -1,3 +1,35 @@
+/************************************************************************
+
+ Copyright (C) 2011 Project Wolframe.
+ All rights reserved.
+
+ This file is part of Project Wolframe.
+
+ Commercial Usage
+    Licensees holding valid Project Wolframe Commercial licenses may
+    use this file in accordance with the Project Wolframe
+    Commercial License Agreement provided with the Software or,
+    alternatively, in accordance with the terms contained
+    in a written agreement between the licensee and Project Wolframe.
+
+ GNU General Public License Usage
+    Alternatively, you can redistribute this file and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Wolframe is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Wolframe.  If not, see <http://www.gnu.org/licenses/>.
+
+ If you have questions regarding the use of this file, please contact
+ Project Wolframe.
+
+************************************************************************/
 //
 // authentication_pam.cpp
 //
@@ -13,7 +45,7 @@
 #include <stdexcept>
 
 namespace _Wolframe {
-	namespace Authentication {
+namespace AAAA {
 
 Authenticator *CreatePAMAuthenticator( AuthenticatorFactory::properties props )
 {
@@ -24,7 +56,7 @@ Authenticator *CreatePAMAuthenticator( AuthenticatorFactory::properties props )
 
 static int pam_conv_func(	int nmsg, const struct pam_message **msg,
 				struct pam_response **reply, void *appdata_ptr );
-				
+
 PAMAuthenticator::PAMAuthenticator( const std::string _service )
 	: m_service( _service )
 {
@@ -97,7 +129,7 @@ static int pam_conv_func(	int nmsg, const struct pam_message **msg,
 	for( i = 0; i < nmsg; i++ ) {
 		if( msg[i]->msg == NULL ) {
 			std::ostringstream ss;
-			
+
 			ss	<< "Bad message number " << i
 				<< " of type " << msg_style_to_str( m->msg_style )
 				<< " is not supposed to be NULL!";
@@ -129,7 +161,7 @@ static int pam_conv_func(	int nmsg, const struct pam_message **msg,
 				rc = pam_get_item( appdata->h, PAM_USER_PROMPT, &login_prompt_union.v );
 				if( rc != PAM_SUCCESS ) {
 					std::ostringstream ss;
-					
+
 					ss	<< "pam_get_item( PAM_USER_PROMPT) failed with error "
 						<< pam_strerror( appdata->h, rc ) << "(" << rc << ")";
 					appdata->errmsg = ss.str( );
@@ -174,12 +206,12 @@ error:
 Step::AuthStep PAMAuthenticator::nextStep( )
 {
 	int rc = 0;
-	
+
 	switch( m_state ) {
 		case _Wolframe_PAM_STATE_NEED_LOGIN:
 			m_token = "login";
 			return Step::_Wolframe_AUTH_STEP_RECV_DATA;
-			
+
 		case _Wolframe_PAM_STATE_HAS_LOGIN:
 // TODO: the service name must be a CONSTANT due to security reasons!
 			rc = pam_start( m_service.c_str( ), m_appdata.login.c_str( ), &m_conv, &m_appdata.h );
@@ -238,7 +270,7 @@ Step::AuthStep PAMAuthenticator::nextStep( )
 				return Step::_Wolframe_AUTH_STEP_SUCCESS;
 			else
 				return Step::_Wolframe_AUTH_STEP_FAIL;
-		
+
 		case _Wolframe_PAM_STATE_ERROR:
 			(void)pam_end( m_appdata.h, rc );
 			m_appdata.h = NULL;
@@ -246,11 +278,11 @@ Step::AuthStep PAMAuthenticator::nextStep( )
 			m_appdata.pass = "";
 			m_state = _Wolframe_PAM_STATE_NEED_LOGIN;
 			return Step::_Wolframe_AUTH_STEP_FAIL;
-			
+
 		case _Wolframe_PAM_STATE_NEED_PASS:
 			throw new std::runtime_error( "Illegal state in PAMAuthenticator::nextStep!" );
 			break;
-		
+
 		default:
 			throw new std::runtime_error( "Unknown state in PAMAuthenticator::nextStep!" );
 			break;
@@ -271,10 +303,10 @@ std::string PAMAuthenticator::sendData( )
 		case _Wolframe_PAM_STATE_HAS_PASS:
 			throw new std::runtime_error( "Illegal state in PAMAuthenticator::sendData!" );
 			break;
-		
+
 		default:
 			throw new std::runtime_error( "Unknown state in PAMAuthenticator::sendData!" );
-			break;			
+			break;
 	}
 
 	return 0;
@@ -292,20 +324,20 @@ void PAMAuthenticator::receiveData( const std::string data )
 			m_appdata.login = data;
 			m_state = _Wolframe_PAM_STATE_HAS_LOGIN;
 			break;
-		
+
 		case _Wolframe_PAM_STATE_NEED_PASS:
 			m_appdata.has_pass = true;
 			m_appdata.pass = data;
 			m_state = _Wolframe_PAM_STATE_HAS_PASS;
 			break;
 
-// TODO: application exception		
+// TODO: application exception
 		case _Wolframe_PAM_STATE_HAS_LOGIN:
 		case _Wolframe_PAM_STATE_HAS_PASS:
 		case _Wolframe_PAM_STATE_ERROR:
 			throw new std::runtime_error( "Illegal state in PAMAuthenticator::receiveData!" );
 			break;
-		
+
 		default:
 			throw new std::runtime_error( "Unknown state in PAMAuthenticator::receiveData!" );
 			break;
@@ -317,7 +349,6 @@ std::string PAMAuthenticator::getError( )
 	return m_error;
 }
 
-} // namespace Authentication
-} // namespace _Wolframe
+}} // namespace _Wolframe::AAAA
 
 #endif // WITH_PAM

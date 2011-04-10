@@ -40,12 +40,11 @@
 #include <string>
 
 namespace _Wolframe {
-	namespace Authentication {
+namespace AAAA {
 
-		std::string getLogin( );
-		std::string getPassword( );
+std::string getLogin( );
+std::string getPassword( );
 
-	} // namespace Authentication
-} // namespace _Wolframe
+}} // namespace _Wolframe::AAAA
 
 #endif // _GET_PASSWORD_HPP_INCLUDED

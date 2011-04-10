@@ -13,7 +13,7 @@
 #include <fstream>
 
 namespace _Wolframe {
-	namespace Authentication {
+namespace AAAA {
 
 Authenticator *CreateDbSqlite3Authenticator( AuthenticatorFactory::properties props )
 {
@@ -27,7 +27,7 @@ DbSqlite3Authenticator::DbSqlite3Authenticator( const std::string _filename )
 	m_filename = _filename;
 
 	m_db.open( m_filename );
-	
+
 	m_state = _Wolframe_DB_SQLITE3_STATE_NEED_LOGIN;
 }
 
@@ -42,12 +42,12 @@ Step::AuthStep DbSqlite3Authenticator::nextStep( )
 		case _Wolframe_DB_SQLITE3_STATE_NEED_LOGIN:
 			m_token = "login";
 			return Step::_Wolframe_AUTH_STEP_RECV_DATA;
-		
+
 		case _Wolframe_DB_SQLITE3_STATE_NEED_PASS:
 			// TODO: cram, not password in plain!
 			m_token = "password";
 			return Step::_Wolframe_AUTH_STEP_RECV_DATA;
-			
+
 		case _Wolframe_DB_SQLITE3_STATE_COMPUTE:
 // check if user is in the sqlite table
 			sd::sql q( m_db );
@@ -63,7 +63,7 @@ Step::AuthStep DbSqlite3Authenticator::nextStep( )
 				m_state = _Wolframe_DB_SQLITE3_STATE_NEED_LOGIN;
 				goto FAIL;
 			}
-			
+
 // everythink is peachy
 			m_state = _Wolframe_DB_SQLITE3_STATE_NEED_LOGIN;
 			return Step::_Wolframe_AUTH_STEP_SUCCESS;
@@ -93,13 +93,13 @@ void DbSqlite3Authenticator::receiveData( const std::string data )
 			m_login = data;
 			m_state = _Wolframe_DB_SQLITE3_STATE_NEED_PASS;
 			break;
-		
+
 		case _Wolframe_DB_SQLITE3_STATE_NEED_PASS:
 			m_pass = data;
 			m_state = _Wolframe_DB_SQLITE3_STATE_COMPUTE;
 			break;
 
-// TODO: application exception		
+// TODO: application exception
 		case _Wolframe_DB_SQLITE3_STATE_COMPUTE:
 			throw new std::runtime_error( "Illegal state in auhenticator" );
 			break;
@@ -111,5 +111,4 @@ std::string DbSqlite3Authenticator::getError( )
 	return "";
 }
 
-} // namespace Authentication
-} // namespace _Wolframe
+}} // namespace _Wolframe::AAAA

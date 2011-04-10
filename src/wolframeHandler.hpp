@@ -39,6 +39,7 @@
 
 #include "connectionHandler.hpp"
 #include "database.hpp"
+#include "AAAA/AAAAprovider.hpp"
 
 namespace _Wolframe {
 	/// The global server container
@@ -50,9 +51,11 @@ namespace _Wolframe {
 
 		const std::string& banner() const	{ return banner_; }
 		const db::Database& db() const		{ return db_; }
+		const AAAA::AAAAprovider& aaaa()	{ return aaaa_; }
 	private:
-		const std::string	banner_;
-		_Wolframe::db::Database	db_;
+		const std::string		banner_;
+		_Wolframe::db::Database		db_;
+		_Wolframe::AAAA::AAAAprovider	aaaa_;
 	};
 
 

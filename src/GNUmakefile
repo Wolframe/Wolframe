@@ -99,7 +99,12 @@ LOGGER_OBJS = \
 
 AAAA_OBJS = \
 	AAAA/authentication.o \
-	AAAA/authentication_textfile.o
+	AAAA/authentication_textfile.o \
+	AAAA/AAAAprovider.o \
+	AAAA/authenticator.o \
+	AAAA/authorizer.o \
+	AAAA/accountant.o \
+	AAAA/auditor.o
 
 ifeq ($(WITH_PAM),1)
 AAAA_OBJS += \

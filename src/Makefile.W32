@@ -60,7 +60,12 @@ LOGGER_OBJS = \
 
 AAAA_OBJS = \
 	AAAA\authentication.obj \
-	AAAA\authentication_textfile.obj
+	AAAA\authentication_textfile.obj \
+	AAAA/AAAAprovider.obj \
+	AAAA/authenticator.obj \
+	AAAA/authorizer.obj \
+	AAAA/accountant.obj \
+	AAAA/auditor.obj
 
 LOCAL_STATIC_LIB_OBJS = \
 	version.obj \

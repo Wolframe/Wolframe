@@ -31,43 +31,43 @@
 
 ************************************************************************/
 //
-// authentication_textfile.hpp
+// AAAA provider implementation
 //
 
-#ifndef _AUTHENTICATION_TEXTFILE_HPP_INCLUDED
-#define _AUTHENTICATION_TEXTFILE_HPP_INCLUDED
-
-#include "AAAA/authentication.hpp"
-
-#include <map>
-#include <string>
+#include "AAAAprovider.hpp"
+#include "configurationBase.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
 
-class TextFileAuthenticator : public Authenticator {
-	private:
-		std::map< std::string, std::string > m_creds;
+Configuration::Configuration() : _Wolframe::config::ConfigurationBase( "AAAA Provider" )
+{
+}
 
-		enum {
-			_Wolframe_TEXTFILE_STATE_NEED_LOGIN,
-			_Wolframe_TEXTFILE_STATE_NEED_PASS,
-			_Wolframe_TEXTFILE_STATE_COMPUTE
-		} m_state;
+/// methods
+bool Configuration::parse( const boost::property_tree::ptree& /* pt */, const std::string& /* node */ )
+{
+	return true;
+}
 
-		std::string m_token;
-		std::string m_login;
-		std::string m_pass;
+bool Configuration::check() const
+{
+	return true;
+}
 
-	public:
-		TextFileAuthenticator( const std::string _filename );
-		virtual Step::AuthStep nextStep( );
-		virtual std::string sendData( );
-		virtual std::string token( );
-		virtual void receiveData( const std::string data );
-		virtual std::string getError( );
-};
+void Configuration::print( std::ostream& os ) const
+{
+	os << displayName() << " configuration :)";
+}
+
+
+AAAAprovider::AAAAprovider( const Configuration& /* conf */ )
+	: authenticator_(),
+	  authorizer_(),
+	  accountant_(),
+	  auditor_()
+{
+}
 
 }} // namespace _Wolframe::AAAA
 
-#endif // _AUTHENTICATION_TEXTFILE_HPP_INCLUDED

@@ -242,7 +242,7 @@ void SSLacceptor::handleAccept( const boost::system::error_code& e )
 
 std::string SSLacceptor::getPassword()
 {
-	return _Wolframe::Authentication::getPassword();
+	return _Wolframe::AAAA::getPassword();
 }
 
 void SSLacceptor::stop()

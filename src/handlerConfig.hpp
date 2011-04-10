@@ -39,6 +39,7 @@
 
 #include "standardConfigs.hpp"
 #include "database.hpp"
+#include "AAAA/AAAAprovider.hpp"
 
 namespace _Wolframe {
 
@@ -48,15 +49,14 @@ namespace _Wolframe {
 	public:
 		db::Configuration	*database;
 		config::ServiceBanner	*banner;
-//		AAAA::AAAAConfiguration		*auth;
+		AAAA::Configuration	*aaaa;
 
 		/// constructor
 		HandlerConfiguration()
 		{
 			banner = new config::ServiceBanner();
 			database = new db::Configuration();
-
-//			auth = ...
+			aaaa = new AAAA::Configuration();
 		}
 
 		~HandlerConfiguration()

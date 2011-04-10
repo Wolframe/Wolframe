@@ -108,19 +108,17 @@ bool ApplicationConfiguration::parse ( const char *filename )
 	boost::property_tree::ptree	pt;
 	try	{
 		read_info( filename, pt );
-		bool retVal = true;
 
+		bool retVal = true;
 		for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
 			std::map< std::string, std::size_t >::iterator confIt;
 			if (( confIt = section_.find( it->first ) ) != section_.end() )	{
 				if ( ! conf_[ confIt->second ]->parse( it->second, confIt->first ))
-//					return false;
 					retVal = false;
 			}
 			else	{
 				LOG_WARNING << "configuration root: Unknown configuration option <"
-					  << it->first << ">";
-//				return false;
+					    << it->first << ">";
 			}
 		}
 		return retVal;
