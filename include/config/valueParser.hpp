@@ -270,6 +270,26 @@ public:
 		}
 		return true;
 	}
+	/// \brief Get the value of a configration token with a domain restriction that is checked
+	/// \tparam ValueType type of the returned value
+	/// \tparam Domain domain of the returned value to check
+	/// \param[in] name name of the element in the configuration
+	/// \param[in] token string value of the element in the configuration
+	/// \param[out] value returned value of the token
+	/// \param[in] domain domain of the parsed value
+	/// \param[in,out] isDefined flag that is set when the value is defined. If the flag is set when the method is called an error message is logged and the command fails.
+	/// \return bool true, if success, else false
+	template <typename Value, class Domain>
+	static bool getValue( const char* name, const string& token, Value& value, const Domain& domain, bool& isDefined)
+	{
+		if (isDefined)
+		{
+			LOG_ERROR << "duplicate definition of configuration element <" << name << ">";
+			return false;
+		}
+		isDefined = true;
+		return getValue( name, token, value, domain);
+	}
 };
 
 }}//namespace
