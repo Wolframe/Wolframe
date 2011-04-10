@@ -35,21 +35,27 @@
 //
 
 #include "appProperties.hpp"
+#include "version.hpp"
 
 namespace _Wolframe	{
+	static const unsigned short APP_MAJOR_VERSION = 0;
+	static const unsigned short APP_MINOR_VERSION = 0;
+	static const unsigned short APP_REVISION = 5;
+	static const unsigned short APP_BUILD = 0;
 
-	const char*	applicationName()				{ return "Wolframe"; }
-	unsigned short	applicationMajorVersion()			{ return 0; }
-	unsigned short	applicationMinorVersion()			{ return 0; }
-	unsigned short	applicationRevisionVersion()			{ return 4; }
-	unsigned	applicationBuildVersion()			{ return 0; }
+	const char*	applicationName()			{ return "Wolframe"; }
+	const Version	applicationVersion()			{ return Version( APP_MAJOR_VERSION,
+										  APP_MINOR_VERSION
+										  ,APP_REVISION
+//										  ,APP_BUILD
+										  ); }
 
 	const char*	config::defaultMainConfig()		{ return "/etc/wolframe.conf"; }
 	const char*	config::defaultUserConfig()		{ return "~/wolframe.conf"; }
 	const char*	config::defaultLocalConfig()		{ return "./wolframe.conf"; }
 
-	unsigned short	config::defaultTCPport()			{ return 7660; }
-	unsigned short	config::defaultSSLport()			{ return 7960; }
+	unsigned short	config::defaultTCPport()		{ return 7660; }
+	unsigned short	config::defaultSSLport()		{ return 7960; }
 
 	const char*	config::defaultServiceName()		{ return "wolframe"; }
 #if defined( _WIN32 )

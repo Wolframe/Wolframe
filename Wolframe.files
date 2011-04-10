@@ -243,3 +243,5 @@ tests/threadLeakTest.cpp
 tests/versionTest.cpp
 windows/Makefile.W32
 windows/uuidgen.c
+include/config/valueParser.hpp
+tests/configValueParser-gTest.cpp
