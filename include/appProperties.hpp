@@ -42,10 +42,7 @@
 namespace _Wolframe	{
 
 	const char*		applicationName();
-	unsigned short		applicationMajorVersion();
-	unsigned short		applicationMinorVersion();
-	unsigned short		applicationRevisionVersion();
-	unsigned		applicationBuildVersion();
+	const Version		applicationVersion();
 
 namespace config	{
 

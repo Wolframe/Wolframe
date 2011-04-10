@@ -93,15 +93,9 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 // end of i18n global stuff
 
 	try	{
-//		_Wolframe::Version	appVersion( _Wolframe::applicationMajorVersion(),
-//						    _Wolframe::applicationMinorVersion(),
-//						    _Wolframe::applicationRevisionVersion(),
-//						    _Wolframe::applicationBuildVersion() );
 		_Wolframe::ApplicationSingleton& appSingleton = _Wolframe::ApplicationSingleton::instance();
-		appSingleton.version( _Wolframe::Version( _Wolframe::applicationMajorVersion(),
-							  _Wolframe::applicationMinorVersion(),
-							  _Wolframe::applicationRevisionVersion(),
-							  _Wolframe::applicationBuildVersion() ));
+		appSingleton.version( _Wolframe::Version( _Wolframe::applicationVersion() ));
+
 		_Wolframe::config::CmdLineConfig   cmdLineCfg;
 		const char *configFile;
 
@@ -119,12 +113,12 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 
 // if we have to print the version or the help do it and exit
 		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::PRINT_VERSION )	{
-			std::cout << std::endl << gettext( "BOBOBO version " )
+			std::cout << std::endl << _Wolframe::applicationName() << gettext( " version " )
 				  << appSingleton.version().toString() << std::endl << std::endl;
 			return _Wolframe::ErrorCodes::OK;
 		}
 		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::PRINT_HELP )	{
-			std::cout << std::endl << _Wolframe::applicationName() << gettext( "BOBOBO version " )
+			std::cout << std::endl << _Wolframe::applicationName() << gettext( " version " )
 				  << appSingleton.version().toString() << std::endl;
 			cmdLineCfg.usage( std::cout );
 			std::cout << std::endl;
@@ -136,8 +130,8 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 			configFile = cmdLineCfg.cfgFile.c_str();
 		else
 			configFile = _Wolframe::config::ApplicationConfiguration::chooseFile( _Wolframe::config::defaultMainConfig(),
-												  _Wolframe::config::defaultUserConfig(),
-												  _Wolframe::config::defaultLocalConfig() );
+											      _Wolframe::config::defaultUserConfig(),
+											      _Wolframe::config::defaultLocalConfig() );
 		if ( configFile == NULL )	{	// there is no configuration file
 			LOG_FATAL << gettext ( "no configuration file found !" );
 			return _Wolframe::ErrorCodes::FAILURE;
@@ -157,7 +151,8 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 
 // Check the configuration
 		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::CHECK_CONFIG )	{
-			std::cout << gettext( "BOBOBO version " ) << appSingleton.version().toString() << std::endl;
+			std::cout << _Wolframe::applicationName() << gettext( " version " )
+				  << appSingleton.version().toString() << std::endl;
 			if ( config.check() )	{
 				std::cout << "Configuration OK" << std::endl << std::endl;
 				return _Wolframe::ErrorCodes::OK;
@@ -168,7 +163,8 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 		}
 
 		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::PRINT_CONFIG )	{
-			std::cout << std::endl << gettext( "BOBOBO version " ) << appSingleton.version().toString() << std::endl;
+			std::cout << std::endl << _Wolframe::applicationName() << gettext( " version " )
+				  << appSingleton.version().toString() << std::endl;
 			config.print( std::cout );
 			std::cout << std::endl;
 			return _Wolframe::ErrorCodes::OK;

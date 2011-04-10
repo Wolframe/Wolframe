@@ -382,8 +382,9 @@ int _Wolframe_winMain( int argc, char* argv[] )
 		// create initial console logger, so we see things going wrong
 		_Wolframe::log::LogBackend::instance().setConsoleLevel( _Wolframe::log::LogLevel::LOGLEVEL_INFO );
 
-		_Wolframe::Version  appVersion( _Wolframe::applicationMajorVersion(), _Wolframe::applicationMinorVersion(),
-						_Wolframe::applicationRevisionVersion(), _Wolframe::applicationBuildVersion() );
+		_Wolframe::ApplicationSingleton& appSingleton = _Wolframe::ApplicationSingleton::instance();
+		appSingleton.version( _Wolframe::Version( _Wolframe::applicationVersion() ));
+
 		_Wolframe::config::CmdLineConfig	cmdLineCfg;
 		const char		*configFile = NULL;
 
@@ -400,7 +401,8 @@ int _Wolframe_winMain( int argc, char* argv[] )
 
 // if we have to print the version or the help do it and exit
 		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::PRINT_VERSION )	{
-			std::cout << "BOBOBO version " << appVersion.toString() << std::endl << std::endl;
+			std::cout << _Wolframe::applicationName() << " version "
+				  << appSingleton.version().toString() << std::endl << std::endl;
 			return _Wolframe::ErrorCodes::OK;
 		}
 		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::PRINT_HELP )	{
