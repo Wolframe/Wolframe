@@ -2,6 +2,8 @@
 // authentication_db_sqlite3.cpp
 //
 
+// TODO: compare hashes, add a cram
+
 #include "AAAA/authentication_db_sqlite3.hpp"
 
 #include <boost/algorithm/string.hpp>
@@ -26,7 +28,7 @@ DbSqlite3Authenticator::DbSqlite3Authenticator( const std::string _filename )
 
 	m_db.open( m_filename );
 	
-	m_state = _Wolframe_TEXTFILE_STATE_NEED_LOGIN;
+	m_state = _Wolframe_DB_SQLITE3_STATE_NEED_LOGIN;
 }
 
 DbSqlite3Authenticator::~DbSqlite3Authenticator( )
@@ -37,35 +39,37 @@ DbSqlite3Authenticator::~DbSqlite3Authenticator( )
 Step::AuthStep DbSqlite3Authenticator::nextStep( )
 {
 	switch( m_state ) {
-		case _Wolframe_TEXTFILE_STATE_NEED_LOGIN:
+		case _Wolframe_DB_SQLITE3_STATE_NEED_LOGIN:
 			m_token = "login";
 			return Step::_Wolframe_AUTH_STEP_RECV_DATA;
 		
-		case _Wolframe_TEXTFILE_STATE_NEED_PASS:
+		case _Wolframe_DB_SQLITE3_STATE_NEED_PASS:
 			// TODO: cram, not password in plain!
 			m_token = "password";
 			return Step::_Wolframe_AUTH_STEP_RECV_DATA;
 			
-		case _Wolframe_TEXTFILE_STATE_COMPUTE:
+		case _Wolframe_DB_SQLITE3_STATE_COMPUTE:
 // check if user is in the sqlite table
-// TODO: select from users where login=XXXX		
-//			if( it == m_creds.end( ) ) {
-//				m_state = _Wolframe_TEXTFILE_STATE_NEED_LOGIN;
-//				goto FAIL;
-//			}
+			sd::sql q( m_db );
+			q << "select password from users where login=?" << m_login;
+			if( !q.step( ) ) {
+				m_state = _Wolframe_DB_SQLITE3_STATE_NEED_LOGIN;
+				goto FAIL;
+			}
 // user found, but password doesn't match
-// TODO: compare hashes, add a cram
-//			if( it->second != m_pass ) {
-//				m_state = _Wolframe_TEXTFILE_STATE_NEED_LOGIN;
-//				goto FAIL;
-//			}
+			std::string password;
+			q >> password;
+			if( password != m_pass ) {
+				m_state = _Wolframe_DB_SQLITE3_STATE_NEED_LOGIN;
+				goto FAIL;
+			}
 			
 // everythink is peachy
-			m_state = _Wolframe_TEXTFILE_STATE_NEED_LOGIN;
+			m_state = _Wolframe_DB_SQLITE3_STATE_NEED_LOGIN;
 			return Step::_Wolframe_AUTH_STEP_SUCCESS;
 	}
 
-//FAIL:
+FAIL:
 	boost::this_thread::sleep( boost::posix_time::seconds( 1 ) );
 
 	return Step::_Wolframe_AUTH_STEP_FAIL;
@@ -85,18 +89,18 @@ std::string DbSqlite3Authenticator::token( )
 void DbSqlite3Authenticator::receiveData( const std::string data )
 {
 	switch( m_state ) {
-		case _Wolframe_TEXTFILE_STATE_NEED_LOGIN:
+		case _Wolframe_DB_SQLITE3_STATE_NEED_LOGIN:
 			m_login = data;
-			m_state = _Wolframe_TEXTFILE_STATE_NEED_PASS;
+			m_state = _Wolframe_DB_SQLITE3_STATE_NEED_PASS;
 			break;
 		
-		case _Wolframe_TEXTFILE_STATE_NEED_PASS:
+		case _Wolframe_DB_SQLITE3_STATE_NEED_PASS:
 			m_pass = data;
-			m_state = _Wolframe_TEXTFILE_STATE_COMPUTE;
+			m_state = _Wolframe_DB_SQLITE3_STATE_COMPUTE;
 			break;
 
 // TODO: application exception		
-		case _Wolframe_TEXTFILE_STATE_COMPUTE:
+		case _Wolframe_DB_SQLITE3_STATE_COMPUTE:
 			throw new std::runtime_error( "Illegal state in auhenticator" );
 			break;
 	}
