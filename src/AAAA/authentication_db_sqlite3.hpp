@@ -20,9 +20,9 @@ class DbSqlite3Authenticator : public Authenticator {
 		std::map< std::string, std::string > m_creds;
 		
 		enum {
-			_Wolframe_TEXTFILE_STATE_NEED_LOGIN,
-			_Wolframe_TEXTFILE_STATE_NEED_PASS,
-			_Wolframe_TEXTFILE_STATE_COMPUTE
+			_Wolframe_DB_SQLITE3_STATE_NEED_LOGIN,
+			_Wolframe_DB_SQLITE3_STATE_NEED_PASS,
+			_Wolframe_DB_SQLITE3_STATE_COMPUTE
 		} m_state;
 
 		sd::sqlite m_db;
