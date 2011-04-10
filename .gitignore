@@ -37,6 +37,8 @@ tests/authTest
 tests/mtprocHandler-gTest
 tests/ptreeGenerator-gTest
 tests/configHelpersTest
+tests/configValueParser-gTest
+tests/passwd.db
 examples/echo/echod
 examples/lua/luad
 examples/mtproc/mtprocd
