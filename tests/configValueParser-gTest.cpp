@@ -63,6 +63,7 @@ protected:
 
 						bool value = false;
 						success = Parser::getValue( name.c_str(), in, value, booleanDomain);
+						out = boost::lexical_cast<std::string>( value);
 					}
 					break;
 					case int_1_10_:
@@ -71,32 +72,30 @@ protected:
 
 						int value = -1;
 						success = Parser::getValue( name.c_str(), in, value, range_1_10);
+						out = boost::lexical_cast<std::string>( value);
 					}
 					break;
 					case int_:
 					{
 						int value = -1;
 						success = Parser::getValue( name.c_str(), in, value);
+						out = boost::lexical_cast<std::string>( value);
 					}
 					break;
 					case short_:
 					{
 						short value = -1;
 						success = Parser::getValue( name.c_str(), in, value);
+						out = boost::lexical_cast<std::string>( value);
 					}
 					break;
 					case enum_:
 					break;
 				}//switch(..)
 
-				if (success)
+				if (!success)
 				{
-// Aba: configValueParser-gTest.cpp:94:52: error: 'value' was not declared in this scope
-//					out.append( boost::lexical_cast<std::string>( value));
-				}
-				else
-				{
-					out.append( "!error");
+					out = "!error";
 				}
 				expected.push_back( testDescription[ tt].out);
 				output.push_back( out);
