@@ -215,8 +215,11 @@ void	sql::prepare(const std::string& stmt)
 	reset();
 	
 	// prepare the statement
-//	if(sqlite3_prepare(db_.handle(), stmt.c_str(), static_cast<int>(stmt.length()), &stmt_, 0) != SQLITE_OK)
+#if SQLITE_VERSION_NUMBER >= 3005000
 	if(sqlite3_prepare_v2(db_.handle(), stmt.c_str(), static_cast<int>(stmt.length()), &stmt_, 0) != SQLITE_OK)
+#else
+	if(sqlite3_prepare(db_.handle(), stmt.c_str(), static_cast<int>(stmt.length()), &stmt_, 0) != SQLITE_OK)
+#endif
 		throw db_error(stmt + " " + sqlite3_errmsg(db_.handle()));
 	
 	// find out the number of columns to extract or bind

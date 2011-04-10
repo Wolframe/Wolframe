@@ -6,12 +6,11 @@
 %define WOLFRAME_USR	wolframe
 %define WOLFRAME_GRP	wolframe
 
-%define with_ssl	0
-%define with_postgresql	0
-%define with_sqlite	0
-%define with_pgsql	0
-%define with_lua	0
-%define with_pam	0
+%define with_ssl	1
+%define with_sqlite	1
+%define with_pgsql	1
+%define with_lua	1
+%define with_pam	1
 %define with_qt		0
  
 Summary: Small and medium enterprise resource planning (Wolframe)
@@ -29,7 +28,7 @@ BuildRoot: %{_tmppath}/%{name}-root
 BuildRequires: openssl-devel >= 0.9.8
 Requires: openssl >= 0.9.8
 %endif
-%if %{with_postgresql}
+%if %{with_pgsql}
 BuildRequires: postgresql-devel >= 8.1
 Requires: postgresql >= 8.1
 %endif
