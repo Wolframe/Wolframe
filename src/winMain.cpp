@@ -49,6 +49,7 @@
 #include "server.hpp"
 #include "ErrorCodes.hpp"
 #include "logger.hpp"
+#include "appSingleton.hpp"
 
 #include "connectionHandler.hpp"
 
