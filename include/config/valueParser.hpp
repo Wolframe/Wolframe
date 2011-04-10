@@ -47,8 +47,9 @@ namespace config {
 
 /// \class Parser
 /// \brief Configuration parser for parsing the tokens of the configuration
-struct Parser
+class Parser
 {
+public:
 	typedef std::string string;
 
 	/// \class BaseTypeDomain
@@ -183,6 +184,43 @@ struct Parser
 	private:
 		unsigned int m_size;	///< number of elements in the enumeration
 		const char** m_ar;	///< string representation of the elements in the enumeration
+	};
+
+	/// \class BoolDomain
+	/// \brief Describes the value domain of a boolean value as enumeration of all possible values
+	struct BoolDomain :public EnumDomain
+	{
+	private:
+		enum {NofBooleanEnum=8};
+
+		/// \brief returns the accepted string representations of a boolean
+		static const char** booleanEnum()
+		{
+			static const char* ar[] = {"false", "true", "0", "1", "off", "on", "no", "yes"};
+			return ar;
+		}
+		/// \brief Returns the boolean value of an accepted token
+		/// \param booleanEnumValue index in booleanEnum()
+		static bool getBooleanValue( unsigned int booleanEnumIdx)
+		{
+			return (booleanEnumIdx & 1);
+		}
+
+	public:
+		/// \constructor
+		BoolDomain() :EnumDomain( NofBooleanEnum, booleanEnum()){}
+
+		/// \brief Parses a boolean value
+		/// \param[out] value parsed value returned
+		/// \param[in] token token string to parse
+		/// \param[out] explanation error string that will be part of the log message
+		bool parse( bool& value, const string& token, string& explanation) const
+		{
+			unsigned int enumval = 0;
+			bool rt = EnumDomain::parse( enumval, token, explanation);
+			value = getBooleanValue( enumval);
+			return rt;
+		}
 	};
 
 	/// \brief Get the value of a configration token without additional domain restriction

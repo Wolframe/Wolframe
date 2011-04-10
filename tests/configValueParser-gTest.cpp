@@ -17,10 +17,24 @@ struct TestDescription
 	const char* in;
 	const char* out;
 };
+
+enum {NofTestEnumElements=3};
+static const char* testEnumElements[ NofTestEnumElements] = {"Hello", "world", "!"};
+
 static const TestDescription testDescription[] =
 {
+	{enum_,"Hello","0"},
+	{enum_,"World","1"},
+	{enum_,"!","2"},
+	{enum_,"!!","!error"},
 	{bool_,"true","1"},
 	{bool_,"false","0"},
+	{bool_,"ON","1"},
+	{bool_,"off","0"},
+	{bool_,"YES","1"},
+	{bool_,"nO","0"},
+	{bool_,"0","0"},
+	{bool_,"1","1"},
 	{int_,"-123","-123"},
 	{short_,"323333","!error"},
 	{int_1_10_,"1","1"},
@@ -58,11 +72,8 @@ protected:
 					break;
 					case bool_:
 					{
-						static const char* booleanValues[] = {"false","true"};
-						Parser::EnumDomain booleanDomain( 2, booleanValues);
-
 						bool value = false;
-						success = Parser::getValue( name.c_str(), in, value, booleanDomain);
+						success = Parser::getValue( name.c_str(), in, value, Parser::BoolDomain());
 						out = boost::lexical_cast<std::string>( value);
 					}
 					break;
@@ -90,6 +101,13 @@ protected:
 					}
 					break;
 					case enum_:
+					{
+						Parser::EnumDomain enumDomain( NofTestEnumElements, testEnumElements);
+
+						unsigned int value = 0;
+						success = Parser::getValue( name.c_str(), in, value, enumDomain);
+						out = boost::lexical_cast<std::string>( value);
+					}
 					break;
 				}//switch(..)
 
