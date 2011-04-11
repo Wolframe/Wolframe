@@ -12,6 +12,7 @@
 %define with_lua	1
 %define with_pam	1
 %define with_qt		0
+%define with_examples	0
  
 Summary: Small and medium enterprise resource planning (Wolframe)
 Name: wolframe
@@ -86,6 +87,7 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make all \
 	WITH_SSL=%{with_ssl} WITH_SQLITE3=%{with_sqlite} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_PGSQL=%{with_pgsql} WITH_QT=%{with_qt} \
+	WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=/etc
 cd docs; make doc-doxygen
 
@@ -100,6 +102,7 @@ make DESTDIR=$RPM_BUILD_ROOT install \
 	WITH_SSL=%{with_ssl} WITH_SQLITE3=%{with_sqlite} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_PGSQL=%{with_pgsql} WITH_QT=%{with_qt} \
+	WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=$RPM_BUILD_ROOT/etc
 cd docs && make DESTDIR=$RPM_BUILD_ROOT install && cd ..
 

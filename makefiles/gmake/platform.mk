@@ -27,6 +27,7 @@ WITH_PAM ?= 0
 WITH_SQLITE3 ?= 0
 WITH_PGSQL ?= 0
 WITH_QT ?= 0
+WITH_EXAMPLES ?= 1
 
 PLATFORM ?=		$(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_env --platform $(CC) "$(CURDIR)" $(TOPDIR))
 OS_MAJOR_VERSION ?=	$(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_env --os-major-version $(CC) "$(CURDIR)" $(TOPDIR))

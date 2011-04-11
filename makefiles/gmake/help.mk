@@ -22,6 +22,7 @@ WITH_QT=1              build code depending on Qt
 WITH_PAM=1             build authentication code with PAM
 WITH_SQLITE3=1         build AAAA and DB connectors for Sqlite3
 WITH_PGSQL=1           build AAAA and DB connectors for PostgreSql
+WITH_EXAMPLES=0        do not build and test the examples (default is on)
 
 Avaliable optional features during testing only:
 
