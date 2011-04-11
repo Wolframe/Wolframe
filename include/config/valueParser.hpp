@@ -230,10 +230,10 @@ public:
 	/// \param[out] value returned value of the token
 	/// \return bool true, if success, else false
 	template <typename ValueType>
-	static bool getValue( const char* name, const string& token, ValueType& value)
+	static bool getValue( const char* module, const char* name, const string& token, ValueType& value)
 	{
 		BaseTypeDomain domain;
-		return getValue<ValueType,BaseTypeDomain>( name, token, value, domain);
+		return getValue<ValueType,BaseTypeDomain>( module, name, token, value, domain);
 	}
 
 	/// \brief Get the value of a configration token with a domain restriction that is checked
@@ -245,7 +245,7 @@ public:
 	/// \param[in] domain domain of the parsed value
 	/// \return bool true, if success, else false
 	template <typename Value, class Domain>
-	static bool getValue( const char* name, const string& token, Value& value, const Domain& domain)
+	static bool getValue( const char* module, const char* name, const string& token, Value& value, const Domain& domain)
 	{
 		using std::bad_alloc;
 		using std::exception;
@@ -254,18 +254,27 @@ public:
 			string errorExplanation;
 			if (!domain.parse( value, token, errorExplanation) || !domain.check( value, errorExplanation))
 			{
-				LOG_ERROR << "invalid value '" << token << "'for configuration element <" << name << "> (" << errorExplanation << ")";
+				if ( module != NULL && *module != '\0' )
+					LOG_ERROR << module << ": invalid value '" << token << "'for configuration element <" << name << "> (" << errorExplanation << ")";
+				else
+					LOG_ERROR << "invalid value '" << token << "'for configuration element <" << name << "> (" << errorExplanation << ")";
 				return false;
 			}
 		}
 		catch (bad_alloc)
 		{
-			LOG_ERROR << "out of memory when parsing configuration element <" << name << ">";
+			if ( module != NULL && *module != '\0' )
+				LOG_ERROR << module << ": out of memory when parsing configuration element <" << name << ">";
+			else
+				LOG_ERROR << "out of memory when parsing configuration element <" << name << ">";
 			return false;
 		}
 		catch (exception e)
 		{
-			LOG_ERROR << "illegal value for configuration element <" << name << "> (" << e.what() << ")";
+			if ( module != NULL && *module != '\0' )
+				LOG_ERROR << module << ": illegal value for configuration element <" << name << "> (" << e.what() << ")";
+			else
+				LOG_ERROR << "illegal value for configuration element <" << name << "> (" << e.what() << ")";
 			return false;
 		}
 		return true;
@@ -280,18 +289,22 @@ public:
 	/// \param[in,out] isDefined flag that is set when the value is defined. If the flag is set when the method is called an error message is logged and the command fails.
 	/// \return bool true, if success, else false
 	template <typename Value, class Domain>
-	static bool getValue( const char* name, const string& token, Value& value, const Domain& domain, bool& isDefined)
+	static bool getValue( const char* module, const char* name,
+			      const string& token, Value& value, const Domain& domain, bool& isDefined)
 	{
 		if (isDefined)
 		{
-			LOG_ERROR << "duplicate definition of configuration element <" << name << ">";
+			if ( module != NULL && *module != '\0' )
+				LOG_ERROR << module << ": duplicate definition of configuration element <" << name << ">";
+			else
+				LOG_ERROR << "duplicate definition of configuration element <" << name << ">";
 			return false;
 		}
 		isDefined = true;
-		return getValue( name, token, value, domain);
+		return getValue( module, name, token, value, domain);
 	}
 };
 
-}}//namespace
+}} //namespace
 #endif
 

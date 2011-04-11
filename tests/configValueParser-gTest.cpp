@@ -73,7 +73,7 @@ protected:
 					case bool_:
 					{
 						bool value = false;
-						success = Parser::getValue( name.c_str(), in, value, Parser::BoolDomain());
+						success = Parser::getValue( "", name.c_str(), in, value, Parser::BoolDomain());
 						out = boost::lexical_cast<std::string>( value);
 					}
 					break;
@@ -82,21 +82,21 @@ protected:
 						Parser::RangeDomain<int> range_1_10( 1,10);
 
 						int value = -1;
-						success = Parser::getValue( name.c_str(), in, value, range_1_10);
+						success = Parser::getValue( "", name.c_str(), in, value, range_1_10);
 						out = boost::lexical_cast<std::string>( value);
 					}
 					break;
 					case int_:
 					{
 						int value = -1;
-						success = Parser::getValue( name.c_str(), in, value);
+						success = Parser::getValue( "", name.c_str(), in, value);
 						out = boost::lexical_cast<std::string>( value);
 					}
 					break;
 					case short_:
 					{
 						short value = -1;
-						success = Parser::getValue( name.c_str(), in, value);
+						success = Parser::getValue( "", name.c_str(), in, value);
 						out = boost::lexical_cast<std::string>( value);
 					}
 					break;
@@ -105,7 +105,7 @@ protected:
 						Parser::EnumDomain enumDomain( NofTestEnumElements, testEnumElements);
 
 						unsigned int value = 0;
-						success = Parser::getValue( name.c_str(), in, value, enumDomain);
+						success = Parser::getValue( "", name.c_str(), in, value, enumDomain);
 						out = boost::lexical_cast<std::string>( value);
 					}
 					break;

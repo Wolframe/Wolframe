@@ -36,13 +36,15 @@
 
 #include "database.hpp"
 #include "connectionBase.hpp"
-#include "configHelpers.hpp"
+#include "config/valueParser.hpp"		// *** !
+#include "configHelpers.hpp"			// *** !
 #include "logger.hpp"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/algorithm/string.hpp>
 
 #include <ostream>
+#include <string>
 
 static const unsigned short DEFAULT_DB_CONNECTIONS = 4;
 
@@ -86,43 +88,46 @@ bool Configuration::check() const
 bool Configuration::parse( const boost::property_tree::ptree& pt, const std::string& /* nodeName */ )
 {
 	using namespace _Wolframe::config;
+	bool retVal = true;
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "host" ))	{
-			if ( !getStringValue( L1it->second, L1it->first, displayName(), host ))	return false;
+			if ( !Parser::getValue( displayName().c_str(), L1it->first.c_str(), L1it->second.get_value<std::string>(), host ))
+				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "port" ))	{
-			if ( !getNonZeroIntValue<unsigned short>( L1it->second, L1it->first, displayName(), port ))
-												return false;
+			if ( !Parser::getValue(displayName().c_str(),  L1it->first.c_str(), L1it->second.get_value<std::string>(), port, Parser::RangeDomain<unsigned short>( 1, 65535 ) ))
+				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "name" ))	{
-			if ( !getStringValue( L1it->second, L1it->first, displayName(), name ))	return false;
+			if ( !Parser::getValue( displayName().c_str(), L1it->first.c_str(), L1it->second.get_value<std::string>(), name ))
+				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "user" ))	{
-			if ( !getStringValue( L1it->second, L1it->first, displayName(), user ))	return false;
+			if ( !Parser::getValue( displayName().c_str(), L1it->first.c_str(), L1it->second.get_value<std::string>(), user ))
+				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "password" ))	{
-			if ( !getStringValue( L1it->second, L1it->first, displayName(), password ))
-												return false;
+			if ( !Parser::getValue( displayName().c_str(), L1it->first.c_str(), L1it->second.get_value<std::string>(), password ))
+				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "connections" ))	{
-			if ( !getNonZeroIntValue<unsigned short>( L1it->second, L1it->first, displayName(), connections ))
-												return false;
+			if ( !Parser::getValue( displayName().c_str(), L1it->first.c_str(), L1it->second.get_value<std::string>(), connections ))
+				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "acquireTimeout" ))	{
-			if ( !getNonZeroIntValue<unsigned short>( L1it->second, L1it->first, displayName(), acquireTimeout ))
-												return false;
+			if ( !Parser::getValue( displayName().c_str(), L1it->first.c_str(), L1it->second.get_value<std::string>(), acquireTimeout ))
+				retVal = false;
 		}
 		else	{
 			LOG_WARNING << displayName() << ": unknown configuration option: <"
 				    << L1it->first << ">";
-//			return false;
 		}
 	}
 	if ( connections == 0 )
 		connections = DEFAULT_DB_CONNECTIONS;
 
-	return true;
+	return retVal;
 }
 
 }} // namespace _Wolframe::db
