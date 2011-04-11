@@ -100,7 +100,7 @@ public:
 	/// \remark Control characters are mapped to space (ascii 32) before writing them to 'buf'
 	/// \param [in,out] src input iterator
 	/// \param [in] end input iterator marking the end of input
-	/// \param [in,out] buf output buffer with a minimal subset of std::string interface
+	/// \param [in,out] buf output buffer implementing the STL back insertion sequence interface
 	/// \return true, if the line was consumed completely
 	template <typename IteratorType, typename BufferType>
 	static bool getLine( IteratorType& src, IteratorType& end, BufferType& buf)
@@ -120,7 +120,7 @@ public:
 /// \class CmdParser
 /// \exception Bad
 /// \brief Parser for ascii protocol commands
-/// \tparam buffer type to use. (std::string or a buffer structure defined in protocol/buffers.hpp)
+/// \tparam buffer type to use, implementing the STL back insertion sequence interface
 ///
 template <typename CmdBufferType>
 class CmdParser :public Parser
@@ -205,7 +205,7 @@ public:
 	/// \tparam IteratorType iterator type used as input for parsing
 	/// \param [in,out] src input iterator
 	/// \param [in] end input iterator marking the end of input
-	/// \param [in,out] buf the command buffer used
+	/// \param [in,out] buf the command buffer implementing the STL back insertion sequence interface
 	/// \return the index of the command in the order of definition counted from 0 for the first command or return -1, if the command could not be recognized
 	/// \remark At the end of buffer -1 is returned also. If \c src equals \c end after call and -1 was returned then the method has to be called again with new data.
 	///
