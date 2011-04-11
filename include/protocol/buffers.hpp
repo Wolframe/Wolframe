@@ -35,7 +35,7 @@ Project Wolframe.
 /// \file protocol/buffers.hpp
 /// \brief Defines the buffers used by protocol parsers to buffer the commands and their arguments.
 ///
-/// All buffers defined in this module are preallocated fixed size and implement a subset of the std::string interface for appending data.
+/// All buffers defined in this module are preallocated fixed size and implement a subset of STL back insertion sequence interface for appending data.
 /// This interface is used by the buffering parsing methods defined in protocol/parser.hpp.
 /// The protocol uses fixed size buffers because protocol messages are not considered to have a size defined by the client for security reasons.
 /// The buffers are not used for buffering processed data. Data is passed as memory blocks of the type defined in protocol/ioblocks.hpp
@@ -49,7 +49,8 @@ namespace protocol {
 
 ///
 /// \class Buffer
-/// \brief Constant size single byte (ASCII) character buffer that implements a subset of the std::string interface.
+/// \brief Constant size single byte (ASCII) character buffer that implements a subset of the std::string interface
+///  The buffer implements the STL back insertion sequence interface required by the protocol parser.
 /// \tparam SIZE maximum number of character bytes buffered (without terminating 0 byte that is counted extra)
 ///
 template <unsigned int SIZE=128>
@@ -83,10 +84,10 @@ public:
 ///
 /// \class CmdBuffer
 /// \brief Buffer for the currently parsed command
-///
-/// The command is encoded as integer type because protocol commands are not considered to be loo long because name clashes are not an issue here.
-/// There are only a fixed number of commands. The names of protocol commands are first level names that are implemented hardcoded by the protocol
-/// and not defined in the application processor.
+///  The buffer implements the STL back insertion sequence interface required by the protocol parser.
+///  The command is encoded as integer type because protocol commands are not considered to be loo long because name clashes are not an issue here.
+///  There are only a fixed number of commands. The names of protocol commands are first level names that are implemented hardcoded by the protocol
+///  and not defined in the application processor.
 ///
 struct CmdBuffer
 {
@@ -129,6 +130,7 @@ struct CmdBuffer
 
 /// \class CArgBuffer
 /// \brief Buffer for multi argument parsing (fixed array of null terminated byte character strings)
+///  The buffer implements the STL back insertion sequence interface required by the protocol parser.
 ///
 /// This buffer splits the input, A sequence of characters by blanks and it parses escaping and quoted strings in the following way:
 /// Escaping is done with backslash, strings can be single or double quoted.
