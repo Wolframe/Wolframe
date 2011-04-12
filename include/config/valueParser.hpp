@@ -199,20 +199,21 @@ public:
 		enum {NofBooleanEnum=8};
 
 		/// \brief returns the accepted string representations of a boolean
+		/// \return enumeration of valid boolean values
 		static const char** booleanEnum()
 		{
 			static const char* ar[] = {"false", "true", "0", "1", "off", "on", "no", "yes"};
 			return ar;
 		}
 		/// \brief Returns the boolean value of an accepted token
-		/// \param booleanEnumValue index in booleanEnum()
+		/// \param booleanEnumIdx index in booleanEnum()
 		static bool getBooleanValue( unsigned int booleanEnumIdx)
 		{
 			return (booleanEnumIdx & 1);
 		}
 
 	public:
-		/// \constructor
+		/// \brief Constructor
 		BoolDomain() :EnumDomain( NofBooleanEnum, booleanEnum()){}
 
 		/// \brief Parses a boolean value
@@ -232,6 +233,7 @@ public:
 	///  This is the implementation of the getValue function. All other instances of the interface refer to this function.
 	/// \tparam Value type of the returned value
 	/// \tparam Domain domain of the returned value to check
+	/// \param[in] module identifier of the current configuration scope
 	/// \param[in] name name of the element in the configuration
 	/// \param[in] token string value of the element in the configuration
 	/// \param[out] value returned value of the token
@@ -293,6 +295,7 @@ public:
 
 	/// \brief Get the value of a configration token without additional domain restriction
 	/// \tparam Value type of the returned value
+	/// \param[in] module identifier of the current configuration scope
 	/// \param[in] name name of the element in the configuration
 	/// \param[in] token string value of the element in the configuration
 	/// \param[out] value returned value of the token
@@ -308,6 +311,7 @@ public:
 	/// \brief Get the value of a configration token with a domain restriction that is checked
 	/// \tparam Value type of the returned value
 	/// \tparam Domain domain of the returned value to check
+	/// \param[in] module identifier of the current configuration scope
 	/// \param[in] decl name,token tuple representing an element definition in the configuration
 	///   See definition of getValue(const char*,const std::pair<const std::string,const std::string>&,Value&,const Domain&,bool*).
 	///   Only difference is that we convert the decl structure from a property tree element and check if it is a name value assignement.
@@ -332,11 +336,11 @@ public:
 
 	/// \brief Get the value of a configration token without additional domain restriction
 	/// \tparam Value type of the returned value
+	/// \param[in] module identifier of the current configuration scope
 	/// \param[in] decl name,token tuple representing an element definition in the configuration
 	///   See definition of getValue(const char*,const std::pair<const std::string,const std::string>&,Value&,bool*).
 	///   Only difference is that we convert the decl structure from a property tree element and check if it is a name value assignement.
 	/// \param[out] value returned value of the token
-	/// \param[in] domain domain of the parsed value
 	/// \param[in,out] isDefined (optional) flag that is set when the value is defined.
 	///  If the flag is set when the method is called an error message is logged and the command fails.
 	/// \return bool true, if success, else false
