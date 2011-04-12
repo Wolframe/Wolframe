@@ -41,8 +41,11 @@ Project Wolframe.
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/utility/value_init.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/limits.hpp>
 #include <string>
 #include <ostream>
+#include <utility>
 
 namespace _Wolframe {
 namespace config {
@@ -103,7 +106,7 @@ public:
 		/// \brief Constructor
 		/// \param[in] min minimal allowed value of the range
 		/// \param[in] max maximal allowed value of the range
-		RangeDomain( const DomainValueType& min, const DomainValueType& max) :m_min(min),m_max(max){}
+		RangeDomain( const DomainValueType& min, const DomainValueType& max=std::numeric_limits<DomainValueType>::max()) :m_min(min),m_max(max){}
 
 		/// \brief Get the description of the set of values allowed as string for the error log message
 		string getDomainDescription() const
@@ -225,34 +228,40 @@ public:
 		}
 	};
 
-	/// \brief Get the value of a configration token without additional domain restriction
-	/// \tparam ValueType type of the returned value
-	/// \param[in] name name of the element in the configuration
-	/// \param[in] token string value of the element in the configuration
-	/// \param[out] value returned value of the token
-	/// \return bool true, if success, else false
-	template <typename ValueType>
-	static bool getValue( const char* module, const char* name, const string& token, ValueType& value)
-	{
-		BaseTypeDomain domain;
-		return getValue<ValueType,BaseTypeDomain>( module, name, token, value, domain);
-	}
-
 	/// \brief Get the value of a configration token with a domain restriction that is checked
-	/// \tparam ValueType type of the returned value
+	///  This is the implementation of the getValue function. All other instances of the interface refer to this function.
+	/// \tparam Value type of the returned value
 	/// \tparam Domain domain of the returned value to check
 	/// \param[in] name name of the element in the configuration
 	/// \param[in] token string value of the element in the configuration
 	/// \param[out] value returned value of the token
 	/// \param[in] domain domain of the parsed value
+	/// \param[in,out] isDefined (optional) flag that is set when the value is defined.
+	///  If the flag is set when the method is called an error message is logged and the command fails.
 	/// \return bool true, if success, else false
 	template <typename Value, class Domain>
-	static bool getValue( const char* module, const char* name, const string& token, Value& value, const Domain& domain)
+	static bool getValue( const char* module, const char* name, const string& token, Value& value, const Domain& domain, bool* isDefined=0)
 	{
 		using std::bad_alloc;
 		using std::exception;
 		try
 		{
+			if (isDefined)
+			{
+				if (*isDefined)
+				{
+					if ( module != NULL && *module != '\0' )
+					{
+						LOG_ERROR << module << ": duplicate definition of configuration element <" << name << ">";
+					}
+					else
+					{
+						LOG_ERROR << "duplicate definition of configuration element <" << name << ">";
+					}
+					return false;
+				}
+				*isDefined = true;
+			}
 			string errorExplanation;
 			if (!domain.parse( value, token, errorExplanation) || !domain.check( value, errorExplanation))
 			{
@@ -282,29 +291,59 @@ public:
 		return true;
 	}
 
-	/// \brief Get the value of a configration token with a domain restriction that is checked
-	/// \tparam ValueType type of the returned value
-	/// \tparam Domain domain of the returned value to check
+	/// \brief Get the value of a configration token without additional domain restriction
+	/// \tparam Value type of the returned value
 	/// \param[in] name name of the element in the configuration
 	/// \param[in] token string value of the element in the configuration
 	/// \param[out] value returned value of the token
+	/// \param[in,out] isDefined (optional) flag that is set when the value is defined.
+	///  If the flag is set when the method is called an error message is logged and the command fails.
+	/// \return bool true, if success, else false
+	template <typename Value>
+	static bool getValue( const char* module, const char* name, const string& token, Value& value, bool* isDefined=0)
+	{
+		return getValue<Value,BaseTypeDomain>( module, name, token, value, BaseTypeDomain(), isDefined);
+	}
+
+	/// \brief Get the value of a configration token with a domain restriction that is checked
+	/// \tparam Value type of the returned value
+	/// \tparam Domain domain of the returned value to check
+	/// \param[in] decl name,token tuple representing an element definition in the configuration
+	///   See definition of getValue(const char*,const std::pair<const std::string,const std::string>&,Value&,const Domain&,bool*).
+	///   Only difference is that we convert the decl structure from a property tree element and check if it is a name value assignement.
+	/// \param[out] value returned value of the token
 	/// \param[in] domain domain of the parsed value
-	/// \param[in,out] isDefined flag that is set when the value is defined. If the flag is set when the method is called an error message is logged and the command fails.
+	/// \param[in,out] isDefined (optional) flag that is set when the value is defined.
+	///  If the flag is set when the method is called an error message is logged and the command fails.
 	/// \return bool true, if success, else false
 	template <typename Value, class Domain>
-	static bool getValue( const char* module, const char* name,
-			      const string& token, Value& value, const Domain& domain, bool& isDefined)
+	static bool getValue( const char* module, const std::pair<const std::string, const boost::property_tree::ptree>& decl, Value& value, const Domain& domain, bool* isDefined=0)
 	{
-		if (isDefined)
+		try
 		{
-			if ( module != NULL && *module != '\0' )
-				LOG_ERROR << module << ": duplicate definition of configuration element <" << name << ">";
-			else
-				LOG_ERROR << "duplicate definition of configuration element <" << name << ">";
-			return false;
+			return getValue( module, decl.first.c_str(), decl.second.get_value<std::string>(), value, domain, isDefined);
 		}
-		isDefined = true;
-		return getValue( module, name, token, value, domain);
+		catch (boost::property_tree::ptree_bad_data)
+		{
+			LOG_ERROR << "illegal value for configuration element <" << decl.first.c_str() << "> (structure and not an atomic value)";
+		};
+		return false;
+	}
+
+	/// \brief Get the value of a configration token without additional domain restriction
+	/// \tparam Value type of the returned value
+	/// \param[in] decl name,token tuple representing an element definition in the configuration
+	///   See definition of getValue(const char*,const std::pair<const std::string,const std::string>&,Value&,bool*).
+	///   Only difference is that we convert the decl structure from a property tree element and check if it is a name value assignement.
+	/// \param[out] value returned value of the token
+	/// \param[in] domain domain of the parsed value
+	/// \param[in,out] isDefined (optional) flag that is set when the value is defined.
+	///  If the flag is set when the method is called an error message is logged and the command fails.
+	/// \return bool true, if success, else false
+	template <typename Value>
+	static bool getValue( const char* module, const std::pair<const std::string, const boost::property_tree::ptree>& decl, Value& value, bool* isDefined=0)
+	{
+		return getValue<Value,BaseTypeDomain>( module, decl, value, BaseTypeDomain(), isDefined);
 	}
 };
 

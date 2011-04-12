@@ -92,31 +92,31 @@ bool Configuration::parse( const boost::property_tree::ptree& pt, const std::str
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "host" ))	{
-			if ( !Parser::getValue( displayName().c_str(), L1it->first.c_str(), L1it->second.get_value<std::string>(), host ))
+			if ( !Parser::getValue( displayName().c_str(), *L1it, host ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "port" ))	{
-			if ( !Parser::getValue(displayName().c_str(),  L1it->first.c_str(), L1it->second.get_value<std::string>(), port, Parser::RangeDomain<unsigned short>( 1, 65535 ) ))
+			if ( !Parser::getValue( displayName().c_str(), *L1it, port, Parser::RangeDomain<unsigned short>( 1 )))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "name" ))	{
-			if ( !Parser::getValue( displayName().c_str(), L1it->first.c_str(), L1it->second.get_value<std::string>(), name ))
+			if ( !Parser::getValue( displayName().c_str(), *L1it, name ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "user" ))	{
-			if ( !Parser::getValue( displayName().c_str(), L1it->first.c_str(), L1it->second.get_value<std::string>(), user ))
+			if ( !Parser::getValue( displayName().c_str(), *L1it, user ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "password" ))	{
-			if ( !Parser::getValue( displayName().c_str(), L1it->first.c_str(), L1it->second.get_value<std::string>(), password ))
+			if ( !Parser::getValue( displayName().c_str(), *L1it, password ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "connections" ))	{
-			if ( !Parser::getValue( displayName().c_str(), L1it->first.c_str(), L1it->second.get_value<std::string>(), connections ))
+			if ( !Parser::getValue( displayName().c_str(), *L1it, connections ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "acquireTimeout" ))	{
-			if ( !Parser::getValue( displayName().c_str(), L1it->first.c_str(), L1it->second.get_value<std::string>(), acquireTimeout ))
+			if ( !Parser::getValue( displayName().c_str(), *L1it, acquireTimeout ))
 				retVal = false;
 		}
 		else	{
