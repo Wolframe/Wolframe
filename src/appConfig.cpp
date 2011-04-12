@@ -45,6 +45,7 @@
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/info_parser.hpp>
+#include <boost/property_tree/xml_parser.hpp>
 
 #include <boost/algorithm/string.hpp>
 
@@ -108,9 +109,12 @@ bool ApplicationConfiguration::parse ( const char *filename )
 	boost::property_tree::ptree	pt;
 	try	{
 		read_info( filename, pt );
+//		read_xml( filename, pt );
 
 		bool retVal = true;
 		for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
+			if ( it->first == "<xmlcomment>" )
+				continue;
 			std::map< std::string, std::size_t >::iterator confIt;
 			if (( confIt = section_.find( it->first ) ) != section_.end() )	{
 				if ( ! conf_[ confIt->second ]->parse( it->second, confIt->first ))
@@ -123,8 +127,8 @@ bool ApplicationConfiguration::parse ( const char *filename )
 		}
 		return retVal;
 	}
-	catch( std::exception& e)	{
-		LOG_FATAL << e.what();
+	catch( std::exception& e )	{
+		LOG_FATAL << "Parsing configuration: " << e.what();
 		return false;
 	}
 }

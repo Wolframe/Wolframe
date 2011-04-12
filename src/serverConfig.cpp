@@ -186,8 +186,7 @@ bool Configuration::parse( const boost::property_tree::ptree& pt, const std::str
 						return false;
 				}
 				else	{
-					LOG_ERROR << displayName() << ": socket: unknown configuration option: <" << L2it->first << ">";
-					return false;
+					LOG_WARNING << displayName() << ": socket: unknown configuration option: <" << L2it->first << ">";
 				}
 			}
 			if ( port == 0 )
@@ -264,7 +263,6 @@ bool Configuration::parse( const boost::property_tree::ptree& pt, const std::str
 				else	{
 					LOG_WARNING << displayName() << ": SSLsocket: unknown configuration option: <"
 						    << L2it->first << ">";
-					//					return false;
 				}
 			}
 #ifdef WITH_SSL
@@ -279,7 +277,6 @@ bool Configuration::parse( const boost::property_tree::ptree& pt, const std::str
 		}
 		else	{
 			LOG_WARNING << displayName() << ": unknown configuration option: <" << L1it->first << ">";
-			//			return false;
 		}
 	}
 	return true;
