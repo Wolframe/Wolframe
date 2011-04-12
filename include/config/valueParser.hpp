@@ -230,7 +230,6 @@ public:
 	};
 
 	/// \brief Get the value of a configration token with a domain restriction that is checked
-	///  This is the implementation of the getValue function. All other instances of the interface refer to this function.
 	/// \tparam Value type of the returned value
 	/// \tparam Domain domain of the returned value to check
 	/// \param[in] module identifier of the current configuration scope
