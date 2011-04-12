@@ -34,7 +34,7 @@ if { [catch {
 
 	set timeout 1
 	send "quit\r"
-	expect "Thanks for using Wolframe."
+	expect "Thank you for using Wolframe."
 	expect 	{
 		timeout	{ send_user " --> oops. timeout occured\n"; return 1 }
 		eof	{ send_user " --> Connection closed. OK\n" }

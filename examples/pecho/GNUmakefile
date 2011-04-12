@@ -52,4 +52,4 @@ local_distclean:
 local_install:
 
 local_test:
-#	./testPEcho
+	./testPEcho

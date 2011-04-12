@@ -310,4 +310,4 @@ public:
 
 }} // namespace _Wolframe::config
 
-#endif _Wolframe_CONFIG_VALUE_PARSER_HPP_INCLUDED
+#endif // _Wolframe_CONFIG_VALUE_PARSER_HPP_INCLUDED

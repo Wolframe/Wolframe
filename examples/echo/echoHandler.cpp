@@ -106,7 +106,7 @@ const net::NetworkOperation echoConnection::nextOperation()
 	case OUTPUT_MSG:
 		if ( !strncmp( "quit", dataStart_, 4 ))	{
 			state_ = TERMINATE;
-			return net::NetworkOperation( net::SendString( "Thanks for using Wolframe.\n" ));
+			return net::NetworkOperation( net::SendString( "Thank you for using Wolframe.\n" ));
 		}
 		else	{
 			char *s = dataStart_;

@@ -105,13 +105,12 @@ std::string Version::toString() const
 	return o.str();
 }
 
-std::string Version::toString( const std::string& format ) const
+std::string Version::toString( const char* format ) const
 {
 	std::ostringstream	o;
 	bool			escaped = false;
 
-	for ( std::string::const_iterator it = format.begin(); it != format.end(); it++ )
-	{
+	for ( const char *it = format; *it != '\0'; it++ )	{
 		if ( escaped )	{
 			switch( *it )	{
 			case '%': o << *it; break;
