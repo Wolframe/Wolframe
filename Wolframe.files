@@ -37,9 +37,6 @@ makefiles/nmake/top.mk
 .Attic/pimpl/testit.cpp
 .Attic/printers.c
 .Attic/SSLtest.c
-.Attic/systemCall_database_postgres.cpp
-.Attic/systemCall_database_postgres.hpp
-.Attic/systemCall.hpp
 .Attic/testLeak.cpp
 clients/GNUmakefile
 clients/Makefile.W32
@@ -128,8 +125,10 @@ include/appConfig.hpp
 include/appProcessor.hpp
 include/appProperties.hpp
 include/atomicCounter.hpp
+include/config/configVar.hpp
 include/configHelpers.hpp
 include/configurationBase.hpp
+include/config/valueParser.hpp
 include/connectionEndpoint.hpp
 include/connectionHandler.hpp
 include/database.hpp
@@ -156,6 +155,10 @@ include/SSLcertificateInfo.hpp
 include/standardConfigs.hpp
 include/version.hpp
 Makefile.W32
+src/AAAA/AAAAprovider.cpp
+src/AAAA/AAAAprovider.hpp
+src/AAAA/accountant.cpp
+src/AAAA/auditor.cpp
 src/AAAA/authentication.cpp
 src/AAAA/authentication_db_sqlite3.cpp
 src/AAAA/authentication_db_sqlite3.hpp
@@ -163,6 +166,8 @@ src/AAAA/authentication_pam.cpp
 src/AAAA/authentication_pam.hpp
 src/AAAA/authentication_textfile.cpp
 src/AAAA/authentication_textfile.hpp
+src/AAAA/authenticator.cpp
+src/AAAA/authorizer.cpp
 src/acceptor.cpp
 src/acceptor.hpp
 src/appConfig.cpp
@@ -177,6 +182,11 @@ src/connection.cpp
 src/connection.hpp
 src/databaseConfig.cpp
 src/database.cpp
+src/db/sdsqlite/sdsqlite.cpp
+src/db/sdsqlite/sdsqlite.h
+src/db/sdsqlite/sqlite3.c
+src/db/sdsqlite/sqlite3ext.h
+src/db/sdsqlite/sqlite3.h
 src/exceptionBase.hpp
 src/getPassword.cpp
 src/getPassword.hpp
@@ -211,7 +221,6 @@ src/server.hpp
 src/serviceBanner.cpp
 src/serviceConfig.cpp
 src/SSLcertificateInfo.cpp
-src/unused.h
 src/version.cpp
 src/winMain.cpp
 src/wolframe.conf
@@ -221,6 +230,7 @@ src/wolframeHandler.hpp
 tests/authTest.cpp
 tests/config/GNUmakefile
 tests/configHelpersTest.cpp
+tests/configValueParser-gTest.cpp
 tests/config/wolframe-posix.conf
 tests/config/wolframe-win.conf
 tests/counterTest.cpp
@@ -243,11 +253,3 @@ tests/threadLeakTest.cpp
 tests/versionTest.cpp
 windows/Makefile.W32
 windows/uuidgen.c
-include/config/valueParser.hpp
-tests/configValueParser-gTest.cpp
-src/AAAA/AAAAprovider.hpp
-src/AAAA/authenticator.cpp
-src/AAAA/authorizer.cpp
-src/AAAA/auditor.cpp
-src/AAAA/accountant.cpp
-src/AAAA/AAAAprovider.cpp

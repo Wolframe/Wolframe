@@ -29,10 +29,12 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-#ifndef _Wolframe_CONFIGURATION_PARSER_HPP_INCLUDED
-#define _Wolframe_CONFIGURATION_PARSER_HPP_INCLUDED
 /// \file config/valueParser.hpp
 /// \brief Parser for the configuration tokens
+
+#ifndef _Wolframe_CONFIG_VALUE_PARSER_HPP_INCLUDED
+#define _Wolframe_CONFIG_VALUE_PARSER_HPP_INCLUDED
+
 #include "logger.hpp"
 #include <stdexcept>
 #include <boost/type_traits.hpp>
@@ -279,6 +281,7 @@ public:
 		}
 		return true;
 	}
+
 	/// \brief Get the value of a configration token with a domain restriction that is checked
 	/// \tparam ValueType type of the returned value
 	/// \tparam Domain domain of the returned value to check
@@ -305,6 +308,6 @@ public:
 	}
 };
 
-}} //namespace
-#endif
+}} // namespace _Wolframe::config
 
+#endif _Wolframe_CONFIG_VALUE_PARSER_HPP_INCLUDED
