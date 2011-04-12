@@ -69,6 +69,25 @@ struct GeneratorClosure
 	};
 };
 
+#if 0
+struct LuaFilter
+{
+	boost::shared_ptr<protocol::Generator> generator;
+};
+
+struct LuaInput
+{
+        protocol::Generator*& appProcessorInput;
+};
+#endif
+
+// Design
+// protocol::Generator* is a boost::shared_ptr object containig a boost::shared_ptr<protocol::Generator>
+// A module luafilters exists that defines a global table "filter" with all create filter functions defined as member variables. referencing such an element
+// does calling the function returning a new filter.
+// A module luasystem exists that defines a global table "system" with reference to all system interfaces from the processing context as objects
+// defined. (for example "input" and "output")  input has a function input.as(f) with a filter f as argument and a function get.
+
 static int generatorNextStringTuple( lua_State* ls)
 {
 	GeneratorClosure* closure = (GeneratorClosure*)luaL_checkudata( ls, lua_upvalueindex( 1), luaname::GeneratorClosure);
