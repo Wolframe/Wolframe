@@ -72,13 +72,13 @@ void Configuration::print( std::ostream& os ) const
 
 	if ( address.size() > 0 )	{
 		std::list<net::ServerTCPendpoint>::const_iterator it = address.begin();
-		os << "   Unencrypted: " << it->toString() << ", group <" << it->group() << ">";
+		os << "   Unencrypted: " << it->toString() << ", name '" << it->name() << "'";
 		if ( it->maxConnections() != 0 )
 			os << ", maximum " << it->maxConnections() << " client connections";
 		os << std::endl;
 
 		for ( ++it; it != address.end(); ++it )	{
-			os << "                " << it->toString() << ", group <" << it->group() << ">";
+			os << "                " << it->toString() << ", name '" << it->name() << "'";
 			if ( it->maxConnections() != 0 )
 				os << ", maximum " << it->maxConnections() << " client connections";
 			os << std::endl;
@@ -87,7 +87,7 @@ void Configuration::print( std::ostream& os ) const
 #ifdef WITH_SSL
 	if ( SSLaddress.size() > 0 )	{
 		std::list<net::ServerSSLendpoint>::const_iterator it = SSLaddress.begin();
-		os << "           SSL: " << it->toString() << ", group <" << it->group() << ">";
+		os << "           SSL: " << it->toString() << ", name '" << it->name() << "'";
 		if ( it->maxConnections() != 0 )
 			os << ", maximum " << it->maxConnections() << " client connections";
 		os << std::endl;
@@ -98,7 +98,7 @@ void Configuration::print( std::ostream& os ) const
 		os << "                   CA chain file: " << (it->CAchain().empty() ? "(none)" : it->CAchain()) << std::endl;
 		os << "                   verify client certificate: " << (it->verifyClientCert() ? "yes" : "no") << std::endl;
 		for ( ++it; it != SSLaddress.end(); ++it )	{
-			os << "                " << it->toString() << ", group <" << it->group() << ">";
+			os << "                " << it->toString() << ", name '" << it->name() << "'";
 			if ( it->maxConnections() != 0 )
 				os << ", maximum " << it->maxConnections() << " client connections";
 			os << std::endl;
@@ -160,7 +160,7 @@ bool Configuration::parse( const boost::property_tree::ptree& pt, const std::str
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "socket" ))	{
 			std::string	host;
-			std::string	group;
+			std::string	name;
 			unsigned short	port = 0;
 			unsigned short	maxConn = 0;
 			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
@@ -177,8 +177,8 @@ bool Configuration::parse( const boost::property_tree::ptree& pt, const std::str
 					if ( ! getNonZeroIntValue<unsigned short>( L2it->second, L2it->first, displayName(), port ))
 						return false;
 				}
-				else if ( boost::algorithm::iequals( L2it->first, "group" ))	{
-					if ( ! getStringValue( L2it->second, L2it->first, displayName(), group ))
+				else if ( boost::algorithm::iequals( L2it->first, "name" ))	{
+					if ( ! getStringValue( L2it->second, L2it->first, displayName(), name ))
 						return false;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "maxConnections" ))	{
@@ -192,12 +192,12 @@ bool Configuration::parse( const boost::property_tree::ptree& pt, const std::str
 			if ( port == 0 )
 				port = defaultTCPport();
 
-			net::ServerTCPendpoint lep( host, port, group, maxConn );
+			net::ServerTCPendpoint lep( host, port, name, maxConn );
 			address.push_back( lep );
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "SSLsocket" ))	{
 			std::string	host;
-			std::string	group;
+			std::string	name;
 			unsigned short	port = 0;
 			unsigned short	maxConn = 0;
 			std::string	certFile;
@@ -220,8 +220,8 @@ bool Configuration::parse( const boost::property_tree::ptree& pt, const std::str
 					if ( ! getNonZeroIntValue<unsigned short>( L2it->second, L2it->first, displayName(), port ))
 						return false;
 				}
-				else if ( boost::algorithm::iequals( L2it->first, "group" ))	{
-					if ( ! getStringValue( L2it->second, L2it->first, displayName(), group ))
+				else if ( boost::algorithm::iequals( L2it->first, "name" ))	{
+					if ( ! getStringValue( L2it->second, L2it->first, displayName(), name ))
 						return false;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "maxConnections" ))	{
@@ -269,7 +269,7 @@ bool Configuration::parse( const boost::property_tree::ptree& pt, const std::str
 			if ( port == 0 )
 				port = defaultSSLport();
 
-			net::ServerSSLendpoint lep( host, port, group, maxConn,
+			net::ServerSSLendpoint lep( host, port, name, maxConn,
 						    certFile, keyFile,
 						    verify, CAdirectory, CAchainFile );
 			SSLaddress.push_back( lep );

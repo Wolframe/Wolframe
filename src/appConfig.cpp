@@ -36,7 +36,7 @@
 
 #include "appConfig.hpp"
 #include "commandLine.hpp"
-#include "standardConfigs.hpp"
+#include "standardConfigs.hpp"		// fuck-up - idiotic interaction with ...
 #include "logger.hpp"
 
 #define BOOST_FILESYSTEM_VERSION 3
@@ -51,6 +51,7 @@
 
 #include <string>
 #include <ostream>
+#include <stdexcept>
 
 
 namespace _Wolframe {
@@ -97,7 +98,7 @@ bool ApplicationConfiguration::addConfig( const std::string& nodeName, Configura
 }
 
 
-bool ApplicationConfiguration::parse ( const char *filename )
+bool ApplicationConfiguration::parse ( const char *filename, ConfigFileType type )
 {
 	configFile = resolvePath( boost::filesystem::absolute( filename ).string() );
 	if ( !boost::filesystem::exists( configFile ))	{
@@ -108,13 +109,48 @@ bool ApplicationConfiguration::parse ( const char *filename )
 	// Create an empty property tree object
 	boost::property_tree::ptree	pt;
 	try	{
-		read_info( filename, pt );
-//		read_xml( filename, pt );
+		switch ( type )	{
+		case CONFIG_INFO:
+			read_info( filename, pt );
+			forced_ = true;
+			type_ = CONFIG_INFO;
+			break;
+		case CONFIG_XML:
+			read_xml( filename, pt, boost::property_tree::xml_parser::no_comments |
+						boost::property_tree::xml_parser::trim_whitespace );
+			pt = pt.get_child( "configuration" );
+			forced_ = true;
+			type_ = CONFIG_XML;
+			break;
+		case CONFIG_UNDEFINED:	{
+			forced_ = false;
+			try	{
+				read_xml( filename, pt, boost::property_tree::xml_parser::no_comments |
+							boost::property_tree::xml_parser::trim_whitespace );
+				pt = pt.get_child( "configuration" );
+				type_ = CONFIG_XML;
+			}
+			catch( boost::property_tree::xml_parser::xml_parser_error )	{
+				try	{
+					read_info( filename, pt );
+					type_ = CONFIG_INFO;
+				}
+				catch( boost::property_tree::info_parser::info_parser_error& )	{
+					throw std::logic_error( "cannot guess configuration file type" );
+				}
+			}
+			break;
+		}
+		default:
+			throw std::domain_error( "unknown configuration file type forced" );
+		}
 
 		bool retVal = true;
 		for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
-			if ( it->first == "<xmlcomment>" )
-				continue;
+			LOG_TRACE << "Configuration : parsing root element '" << it->first << "'";
+//			if ( it->first == "<xmlcomment>" )
+//				continue;
+//			std::cout << it->first << std::endl;
 			std::map< std::string, std::size_t >::iterator confIt;
 			if (( confIt = section_.find( it->first ) ) != section_.end() )	{
 				if ( ! conf_[ confIt->second ]->parse( it->second, confIt->first ))
@@ -125,6 +161,7 @@ bool ApplicationConfiguration::parse ( const char *filename )
 					    << it->first << ">";
 			}
 		}
+		LOG_TRACE << "Configuration : parsing finished " << (retVal ? "OK" : "with errors");
 		return retVal;
 	}
 	catch( std::exception& e )	{
@@ -161,6 +198,8 @@ void ApplicationConfiguration::print( std::ostream& os ) const
 {
 
 	os << "Configuration file: " << configFile << std::endl;
+	os << "Configuration file type: " << (type_ == CONFIG_INFO ? "info" : "xml")
+	   << (forced_ ? " (forced)" : " (detected)" ) << std::endl;
 	// Unix daemon
 #if !defined(_WIN32)
 	os << "Run in foreground: " << (foreground ? "yes" : "no") << std::endl;

@@ -36,6 +36,7 @@
 
 #include "standardConfigs.hpp"
 #include "configHelpers.hpp"
+#include "config/valueParser.hpp"
 #include "logger.hpp"
 #include "appSingleton.hpp"
 
@@ -81,7 +82,8 @@ bool ServiceBanner::parse( const boost::property_tree::ptree& pt, const std::str
 		}
 	}
 	else if ( boost::algorithm::iequals( node, "ServerSignature" ))	{
-		if ( !getBoolValue( pt, node, displayName(), serverName_, serverNameDefined_ ))
+		if ( !Parser::getValue( displayName().c_str(), node.c_str(), pt.get_value<std::string>(),
+				       serverName_, Parser::BoolDomain(), &serverNameDefined_ ))
 			return false;
 	}
 	else	{

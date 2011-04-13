@@ -209,7 +209,7 @@ public:
 		/// \param booleanEnumIdx index in booleanEnum()
 		static bool getBooleanValue( unsigned int booleanEnumIdx)
 		{
-			return (booleanEnumIdx & 1);
+			return (booleanEnumIdx & 0x01);
 		}
 
 	public:
@@ -254,11 +254,11 @@ public:
 					LOG_ERROR << loggingScope(module) << "duplicate definition of configuration element <" << name << ">";
 					return false;
 				}
-				*isDefined = true;
 			}
 			string errorExplanation;
 			if (domain.parse( value, token, errorExplanation) && domain.check( value, errorExplanation))
 			{
+				if (isDefined) *isDefined = true;
 				return true;
 			}
 			LOG_ERROR << loggingScope(module) << "invalid value '" << token << "'for configuration element <" << name << "> (" << errorExplanation << ")";

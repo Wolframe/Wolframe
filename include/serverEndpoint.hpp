@@ -45,15 +45,15 @@ namespace net	{
 	{
 	public:
 		ServerTCPendpoint( const std::string& Host, unsigned short Port,
-				   const std::string& Group, unsigned short maxConn = 0 )
+				   const std::string& Name, unsigned short maxConn = 0 )
 			: ConnectionEndpoint( Host, Port, TCP_CONNECTION ),
-			  group_( Group ), maxConnections_( maxConn )	{}
+			  name_( Name ), maxConnections_( maxConn )	{}
 
 		unsigned short maxConnections() const	{ return maxConnections_; }
-		const std::string& group() const	{ return group_; }
+		const std::string& name() const		{ return name_; }
 
 	private:
-		const std::string	group_;
+		const std::string	name_;
 		const unsigned short	maxConnections_;
 	};
 
@@ -64,11 +64,11 @@ namespace net	{
 		friend class server;
 	public:
 		ServerSSLendpoint( const std::string& Host, unsigned short Port,
-				   const std::string& Group, unsigned short maxConn,
+				   const std::string& Name, unsigned short maxConn,
 				   const std::string& Certificate, const std::string& Key,
 				   bool verify, const std::string& CAdir, const std::string& CAchainFile )
 			: ConnectionEndpoint( Host, Port, SSL_CONNECTION ),
-			  group_( Group ), maxConnections_( maxConn )
+			  name_( Name ), maxConnections_( maxConn )
 		{
 			cert_ = Certificate;
 			key_ = Key;
@@ -78,7 +78,7 @@ namespace net	{
 		}
 
 		unsigned short maxConnections() const	{ return maxConnections_; }
-		const std::string& group() const	{ return group_; }
+		const std::string& name() const		{ return name_; }
 		const std::string& certificate() const	{ return cert_; }
 		const std::string& key() const		{ return key_; }
 		const std::string& CAdirectory() const	{ return CAdir_; }
@@ -88,13 +88,13 @@ namespace net	{
 		void setAbsolutePath( const std::string& referencePath );
 
 	private:
-		const std::string	group_;
+		const std::string	name_;
 		const unsigned short	maxConnections_;
-		std::string	cert_;
-		std::string	key_;
-		std::string	CAdir_;
-		std::string	CAchain_;
-		bool		verify_;
+		std::string		cert_;
+		std::string		key_;
+		std::string		CAdir_;
+		std::string		CAchain_;
+		bool			verify_;
 	};
 
 }} // namespace _Wolframe::net

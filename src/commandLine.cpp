@@ -68,6 +68,8 @@ CmdLineConfig::CmdLineConfig()
 			( "foreground,f", "run in foreground (logs only on stderr)" )
 		#endif
 			( "config-file,c", prgOpts::value<std::string>(), "configuration file" )
+			( "config-xml", "force configuration file parsing to xml" )
+			( "config-info", "force configuration file parsing to info" )
 			( "debug,d", prgOpts::value<std::string>(), "set debug level (active only with --foreground)" )
 			( "use-config-logging", "log according to the configuration file (active only with --foreground)" )
 		#if !defined(_WIN32)
@@ -80,6 +82,7 @@ CmdLineConfig::CmdLineConfig()
 #if !defined(_WIN32)
 	foreground = false;
 #endif
+	cfgType = ApplicationConfiguration::CONFIG_UNDEFINED;
 	useLogConfig = false;
 	debugLevel = DEFAULT_DEBUG_LEVEL;
 }
@@ -169,6 +172,26 @@ bool CmdLineConfig::parse( int argc, char* argv[] )
 		if ( clMap.count( "use-config-logging" ))
 			useLogConfig = true;
 
+		if ( clMap.count( "config-xml" ))	{
+			if ( cfgType == ApplicationConfiguration::CONFIG_UNDEFINED ||
+					cfgType == ApplicationConfiguration::CONFIG_XML )
+				cfgType = ApplicationConfiguration::CONFIG_XML;
+			else	{
+				errMsg_ = "configuration file cannot be forced to more than one type";
+				return false;
+			}
+		}
+
+		if ( clMap.count( "config-info" ))	{
+			if ( cfgType == ApplicationConfiguration::CONFIG_UNDEFINED ||
+					cfgType == ApplicationConfiguration::CONFIG_INFO )
+				cfgType = ApplicationConfiguration::CONFIG_INFO;
+			else	{
+				errMsg_ = "configuration file cannot be forced to more than one type";
+				return false;
+			}
+		}
+
 		if ( clMap.count( "debug" ))	{
 			std::string str = clMap["debug"].as<std::string>();
 			std::string s = str;
@@ -176,9 +199,8 @@ bool CmdLineConfig::parse( int argc, char* argv[] )
 			boost::to_upper( s );
 			debugLevel = log::LogLevel::strToLogLevel( s );
 			if ( debugLevel == log::LogLevel::LOGLEVEL_UNDEFINED )	{
-				errMsg_ = "invalid debug level \"";
-				errMsg_ += str;
-				errMsg_ += "\"";
+				errMsg_ = "invalid debug level '";
+				errMsg_ += str,	errMsg_ += "'";
 				return false;
 			}
 		}
@@ -194,10 +216,9 @@ bool CmdLineConfig::parse( int argc, char* argv[] )
 #endif
 
 		return true;
-
 	}
 	catch( std::exception& e )	{
-		errMsg_ = errMsg_ += e.what();
+		errMsg_ = e.what();
 		return false;
 	}
 }

@@ -125,7 +125,6 @@ include/appConfig.hpp
 include/appProcessor.hpp
 include/appProperties.hpp
 include/atomicCounter.hpp
-include/config/configVar.hpp
 include/configHelpers.hpp
 include/configurationBase.hpp
 include/config/valueParser.hpp

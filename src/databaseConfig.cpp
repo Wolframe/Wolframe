@@ -36,8 +36,7 @@
 
 #include "database.hpp"
 #include "connectionBase.hpp"
-#include "config/valueParser.hpp"		// *** !
-#include "configHelpers.hpp"			// *** !
+#include "config/valueParser.hpp"
 #include "logger.hpp"
 
 #include <boost/property_tree/ptree.hpp>

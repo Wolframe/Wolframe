@@ -74,10 +74,16 @@ struct ApplicationConfiguration	{
 	_Wolframe::HandlerConfiguration		*handlerConf;
 
 public:
+	enum ConfigFileType	{
+		CONFIG_INFO,
+		CONFIG_XML,
+		CONFIG_UNDEFINED
+	};
+
 	ApplicationConfiguration();
 	~ApplicationConfiguration();
 
-	bool parse( const char *filename );
+	bool parse( const char *filename, ConfigFileType type );
 	void finalize( const CmdLineConfig& cmdLine );
 
 	bool check() const;
@@ -88,6 +94,8 @@ public:
 				       const char *userFile,
 				       const char *localFile );
 private:
+	ConfigFileType				type_;
+	bool					forced_;
 	std::vector< ConfigurationBase* >	conf_;
 	std::map< std::string, std::size_t >	section_;
 

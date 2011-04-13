@@ -139,8 +139,11 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 
 		_Wolframe::config::ApplicationConfiguration config;
 
-		if ( !config.parse( configFile ))	// there was an error parsing the configuration file
+		if ( !config.parse( configFile, cmdLineCfg.cfgType ))	{
+			// there was an error parsing the configuration file
+			LOG_FATAL << "Error parsing the configuration file";
 			return _Wolframe::ErrorCodes::FAILURE;
+		}
 
 // configuration file has been parsed successfully
 // finalize the application configuration

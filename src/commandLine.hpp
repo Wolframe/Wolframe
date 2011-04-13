@@ -38,6 +38,7 @@
 #define _COMMANDLINE_HPP_INCLUDED
 
 #include "logger/logLevel.hpp"
+#include "appConfig.hpp"
 
 #include <string>
 #include <boost/program_options.hpp>
@@ -67,11 +68,12 @@ struct CmdLineConfig	{
 	std::string	user;
 	std::string	group;
 #endif
-	log::LogLevel::Level	debugLevel;
-	std::string	cfgFile;
-	bool		useLogConfig;
+	log::LogLevel::Level				debugLevel;
+	std::string					cfgFile;
+	ApplicationConfiguration::ConfigFileType	cfgType;
+	bool						useLogConfig;
 private:
-	std::string	errMsg_;
+	std::string					errMsg_;
 	boost::program_options::options_description	options_;
 
 public:
