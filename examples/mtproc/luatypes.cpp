@@ -31,6 +31,7 @@ Project Wolframe.
 ************************************************************************/
 #include "luatypes.hpp"
 #include "protocol/formatoutput.hpp"
+#include "protocol/generator.hpp"
 #include <stdexcept>
 #include <cstddef>
 extern "C"
@@ -45,17 +46,14 @@ using namespace mtproc;
 
 namespace luaname
 {
-	static const char* GeneratorClosure = "wolframe.GeneratorClosure";
-#if 0 //not used yet
-	static const char* GeneratorType = "wolframe.GeneratorType";
-	static const char* FormatOutputClosure = "wolframe.FormatOutputClosure";
-	static const char* FormatOutputType = "wolframe.FormatOutputType";
-#endif
+	static const char* GeneratorClosure = "wolframe.InputGeneratorClosure";
+	static const char* Input = "wolframe.Input";
+	static const char* Generator = "wolframe.InputGenerator";
 }
 
 struct GeneratorClosure
 {
-	protocol::Generator* generator;
+	boost::shared_ptr<protocol::Generator> generator;
 	protocol::Generator::ElementType type;
 	char* value;
 	char* buf;
@@ -69,20 +67,20 @@ struct GeneratorClosure
 	};
 };
 
-#if 0
-struct LuaFilter
+struct LuaInput
 {
 	boost::shared_ptr<protocol::Generator> generator;
 };
 
-struct LuaInput
-{
-        protocol::Generator*& appProcessorInput;
-};
-#endif
-
 // Design
-// protocol::Generator* is a boost::shared_ptr object containig a boost::shared_ptr<protocol::Generator>
+/// input is an object LuaInput with a shared_ptr reference to the application processor contexts input generator reference it is predefined at
+/// application processor startup. It has a function at(f) defining the filter and a function get() returning the input iterator function with closure.
+///
+/// A lua filter is a lua function. input.as(f) expects a function f that returns a boost::shared_ptr<protocol::Generator*>.
+/// This is then assigned to the input generator after getting its buffer. Why shared_ptr<>, because we want to be able to free it, in any context
+/// also when it is created in a dll.
+///
+///
 // A module luafilters exists that defines a global table "filter" with all create filter functions defined as member variables. referencing such an element
 // does calling the function returning a new filter.
 // A module luasystem exists that defines a global table "system" with reference to all system interfaces from the processing context as objects
