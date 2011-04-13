@@ -251,45 +251,29 @@ public:
 			{
 				if (*isDefined)
 				{
-					if ( module != NULL && *module != '\0' )
-					{
-						LOG_ERROR << module << ": duplicate definition of configuration element <" << name << ">";
-					}
-					else
-					{
-						LOG_ERROR << "duplicate definition of configuration element <" << name << ">";
-					}
+					LOG_ERROR << loggingScope(module) << "duplicate definition of configuration element <" << name << ">";
 					return false;
 				}
 				*isDefined = true;
 			}
 			string errorExplanation;
-			if (!domain.parse( value, token, errorExplanation) || !domain.check( value, errorExplanation))
+			if (domain.parse( value, token, errorExplanation) && domain.check( value, errorExplanation))
 			{
-				if ( module != NULL && *module != '\0' )
-					LOG_ERROR << module << ": invalid value '" << token << "'for configuration element <" << name << "> (" << errorExplanation << ")";
-				else
-					LOG_ERROR << "invalid value '" << token << "'for configuration element <" << name << "> (" << errorExplanation << ")";
-				return false;
+				return true;
 			}
+			LOG_ERROR << loggingScope(module) << "invalid value '" << token << "'for configuration element <" << name << "> (" << errorExplanation << ")";
+			return false;
 		}
 		catch (bad_alloc)
 		{
-			if ( module != NULL && *module != '\0' )
-				LOG_ERROR << module << ": out of memory when parsing configuration element <" << name << ">";
-			else
-				LOG_ERROR << "out of memory when parsing configuration element <" << name << ">";
+			LOG_ERROR << loggingScope(module) << "out of memory when parsing configuration element <" << name << ">";
 			return false;
 		}
 		catch (exception e)
 		{
-			if ( module != NULL && *module != '\0' )
-				LOG_ERROR << module << ": illegal value for configuration element <" << name << "> (" << e.what() << ")";
-			else
-				LOG_ERROR << "illegal value for configuration element <" << name << "> (" << e.what() << ")";
+			LOG_ERROR << loggingScope(module) << "illegal value for configuration element <" << name << "> (" << e.what() << ")";
 			return false;
 		}
-		return true;
 	}
 
 	/// \brief Get the value of a configration token without additional domain restriction
@@ -328,9 +312,14 @@ public:
 		}
 		catch (boost::property_tree::ptree_bad_data)
 		{
-			LOG_ERROR << "illegal value for configuration element <" << decl.first.c_str() << "> (structure and not an atomic value)";
+			LOG_ERROR << loggingScope(module) << "illegal value for configuration element <" << decl.first.c_str() << ">";
+			return false;
+		}
+		catch (std::bad_alloc)
+		{
+			LOG_ERROR << loggingScope(module) << "out of memory when parsing configuration element <" << decl.first.c_str() << ">";
+			return false;
 		};
-		return false;
 	}
 
 	/// \brief Get the value of a configration token without additional domain restriction
@@ -347,6 +336,20 @@ public:
 	static bool getValue( const char* module, const std::pair<const std::string, const boost::property_tree::ptree>& decl, Value& value, bool* isDefined=0)
 	{
 		return getValue<Value,BaseTypeDomain>( module, decl, value, BaseTypeDomain(), isDefined);
+	}
+
+private:
+	/// \brief Return the header of a configuration parse error message issued, specifying the definition scope of the variable value parsed
+	/// \param[in] scope scope identifier
+	static const std::string loggingScope( const char* scope)
+	{
+		std::string rt;
+		if (scope && *scope)
+		{
+			rt.append( scope);
+			rt.append( ": ");
+		}
+		return rt;
 	}
 };
 
