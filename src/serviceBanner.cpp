@@ -69,17 +69,23 @@ static ServiceBanner::SignatureTokens strToToken( std::string& str )
 /// Service signature
 bool ServiceBanner::parse( const boost::property_tree::ptree& pt, const std::string& node )
 {
+////	enum { NofSrvTokensEnum = 6 };
+////	static const char* SrvTokensEnum[ NofSrvTokensEnum ] = {
+////		"ProductOnly", "Major", "Minor", "Revision", "OS", "None"
+////	};
+
+//	Parser::EnumDomain SrvTokensDomain( NofSrvTokensEnum, SrvTokensEnum );
+
 	if ( boost::algorithm::iequals( node, "ServerTokens" ))	{
-		std::string val;
-		if ( !getStringValue( pt, node, displayName(), val ))
+		bool tokensDefined = ( tokens_ != UNDEFINED );
+		std::string	val;
+//		if ( !Parser::getValue( displayName().c_str(), node.c_str(), pt.get_value<std::string>(),
+//					val, SrvTokensDomain, &tokensDefined ))
+		if ( !Parser::getValue( displayName().c_str(), node.c_str(), pt.get_value<std::string>(),
+					val, &tokensDefined ))
+
 			return false;
-		else	{
-			if (( tokens_ = strToToken( val )) == ServiceBanner::UNDEFINED )	{
-				LOG_ERROR << displayName() << ": unknown ServerTokens option: \""
-					  << val << "\"";
-				return false;
-			}
-		}
+		tokens_ = strToToken( val );
 	}
 	else if ( boost::algorithm::iequals( node, "ServerSignature" ))	{
 		if ( !Parser::getValue( displayName().c_str(), node.c_str(), pt.get_value<std::string>(),

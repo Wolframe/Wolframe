@@ -1,0 +1,21 @@
+<glossary>
+	<title>Glossary</title>
+	<para>
+		This is the glossary for the Wolframe Service Development Kit. Although it
+		covers most of the terms used in the Wolframe world, some terms might be skipped
+		if they are rarely used in the SDK context. These terms are explained in the
+		Application Building Manual
+	</para>
+
+<glossdiv><title>Our glossary</title>
+
+	<glossentry><glossterm>Application Processor</glossterm>
+		<glossdef>
+			<para>The module that executes the scripts of the user application called by the
+				connection handler. An application processor is assigned to exactly one connection
+				handler during its lifetime.</para>
+		</glossdef>
+	</glossentry>
+
+</glossdiv>
+</glossary>

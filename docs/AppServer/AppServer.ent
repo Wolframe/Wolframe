@@ -1,1 +1,10 @@
 <!-- Wolframe Application Server documentation -->
+
+<!ENTITY AppPreface			SYSTEM "Preface.xml">
+
+<!ENTITY AppIntroduction		SYSTEM "Introduction.xml">
+<!ENTITY AppSSL				SYSTEM "SSL.xml">
+
+<!ENTITY AppAppendix			SYSTEM "Appendix.xml">
+
+<!ENTITY AppGlossary			SYSTEM "Glossary.xml">
