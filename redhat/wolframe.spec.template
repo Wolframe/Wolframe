@@ -11,6 +11,7 @@
 %define with_pgsql	1
 %define with_lua	1
 %define with_pam	1
+%define with_sasl	1
 %define with_qt		0
 %define with_examples	0
  
@@ -49,6 +50,10 @@ Requires: lua >= 5.1
 BuildRequires: pam-devel >= 0.99
 Requires: pam >= 0.99
 %endif
+%if %{with_sasl}
+BuildRequires: cyrus-sasl-devel >= 2.1.22
+Requires: cyrus-sasl-lib >= 2.1.22
+%endif
 
 Distribution: rhel5
 Vendor: Wolframe team
@@ -86,7 +91,8 @@ Qt client for the Wolframe server.
 LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make all \
 	WITH_SSL=%{with_ssl} WITH_SQLITE3=%{with_sqlite} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
-	WITH_PGSQL=%{with_pgsql} WITH_QT=%{with_qt} \
+	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
+	WITH_QT=%{with_qt} \
 	WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=/etc
 cd docs; make doc-doxygen
@@ -101,7 +107,8 @@ rm -rf $RPM_BUILD_ROOT
 make DESTDIR=$RPM_BUILD_ROOT install \
 	WITH_SSL=%{with_ssl} WITH_SQLITE3=%{with_sqlite} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
-	WITH_PGSQL=%{with_pgsql} WITH_QT=%{with_qt} \
+	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
+	WITH_QT=%{with_qt} \
 	WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=$RPM_BUILD_ROOT/etc
 cd docs && make DESTDIR=$RPM_BUILD_ROOT install && cd ..
