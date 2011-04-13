@@ -573,6 +573,18 @@ SASL_LIB_DIR ?= $(SASL_DIR)/lib
 SASL_LIBS ?= -lsasl2
 endif
 
+ifeq "$(LINUX_DIST)" "redhat"
+
+# RHEL5
+ifeq "$(LINUX_REV)" "5"
+SASL_DIR ?= /usr
+SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
+SASL_LIB_DIR ?= $(SASL_DIR)/lib
+SASL_LIBS ?= -lsasl2
+endif
+
+endif
+
 endif
 endif
 
