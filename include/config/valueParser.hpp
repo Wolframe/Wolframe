@@ -308,6 +308,11 @@ public:
 	{
 		try
 		{
+			if (decl.second.begin() != decl.second.end())
+			{
+				LOG_ERROR << loggingScope(module) << "atomic value expected for configuration element <" << decl.first.c_str() << ">";
+				return false;
+			}
 			return getValue( module, decl.first.c_str(), decl.second.get_value<std::string>(), value, domain, isDefined);
 		}
 		catch (boost::property_tree::ptree_bad_data)

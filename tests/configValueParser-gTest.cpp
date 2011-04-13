@@ -4,12 +4,13 @@
 
 #include "config/valueParser.hpp"
 #include <gtest/gtest.h>
-#include <stdlib.h>
+#include <boost/property_tree/xml_parser.hpp>
+#include <iostream>
 
 using namespace _Wolframe;
 using namespace config;
 
-enum TestType {undefined_,bool_,short_,int_,int_1_10_,enum_};
+enum TestType {undefined_,xml_,bool_,short_,int_,int_1_10_,enum_};
 
 struct TestDescription
 {
@@ -37,7 +38,9 @@ static const TestDescription testDescription[] =
 	{bool_,"1","1"},
 	{int_,"-123","-123"},
 	{short_,"323333","!error"},
-	{int_1_10_,"1","1"},
+	{xml_,"<cfg>text</cfg>","text"},
+	{xml_,"<cfg><val>1</val></cfg>","!error"},
+	{xml_,"<cfg><val>true</val></cfg>","!error"},
 	{int_1_10_,"2","2"},
 	{int_1_10_,"10","10"},
 	{int_1_10_,"11","!error"},
@@ -45,6 +48,16 @@ static const TestDescription testDescription[] =
 	{undefined_,0,0}
 };
 
+typedef std::pair<const std::string,const boost::property_tree::ptree> PtNode;
+
+static const PtNode getPropertyTreeDef( const std::string& name, const std::string& content)
+{
+	std::istringstream in( content);
+	boost::property_tree::ptree pt;
+	read_xml( in, pt, boost::property_tree::xml_parser::no_comments);
+	boost::property_tree::ptree::const_iterator it = pt.begin();
+	return PtNode( name, it->second);
+}
 
 class ProtocolArgumentParsingFixture : public ::testing::Test
 {
@@ -70,6 +83,13 @@ protected:
 				{
 					case undefined_:
 					break;
+					case xml_:
+					{
+						std::string value;
+						success = Parser::getValue( "", getPropertyTreeDef( name, in), value);
+						out = value;
+					}
+					break;
 					case bool_:
 					{
 						bool value = false;
@@ -79,10 +99,8 @@ protected:
 					break;
 					case int_1_10_:
 					{
-						Parser::RangeDomain<int> range_1_10( 1,10);
-
 						int value = -1;
-						success = Parser::getValue( "", name.c_str(), in, value, range_1_10);
+						success = Parser::getValue( "", name.c_str(), in, value, Parser::RangeDomain<int>( 1,10));
 						out = boost::lexical_cast<std::string>( value);
 					}
 					break;
@@ -103,7 +121,6 @@ protected:
 					case enum_:
 					{
 						Parser::EnumDomain enumDomain( NofTestEnumElements, testEnumElements);
-
 						unsigned int value = 0;
 						success = Parser::getValue( "", name.c_str(), in, value, enumDomain);
 						out = boost::lexical_cast<std::string>( value);
