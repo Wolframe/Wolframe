@@ -11,6 +11,9 @@
 	<!ENTITY % SDKentities		SYSTEM	"SDK/SDK.ent">
 	%SDKentities;
 
+	<!ENTITY % CommonEntities	SYSTEM	"Common/Common.ent">
+	%CommonEntities;
+
 <!-- book set data -->
 	<!ENTITY BookSetVersion		SYSTEM "WolfBookVersion.txt">
 	<!ENTITY BookSetPublicationDate	SYSTEM "WolfBookDate.txt">
@@ -47,6 +50,12 @@
 			</legalnotice>
 		</bookinfo>
 
+		&AppPreface;
+		&AppIntroduction;
+		&AppSSL;
+		&AppAppendix;
+		&AppGlossary;
+
 		<index>
 			<title>Index</title>
 		</index>
@@ -79,5 +88,6 @@
 		<index>
 			<title>Index</title>
 		</index>
+		&GPLlicense;
 	</book>
 </set>
