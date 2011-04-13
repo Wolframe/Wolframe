@@ -58,6 +58,7 @@ class SaslAuthenticator : public Authenticator {
 
 	public:
 		SaslAuthenticator( );
+		virtual ~SaslAuthenticator( );
 		virtual Step::AuthStep nextStep( );
 		virtual std::string sendData( );
 		virtual std::string token( );

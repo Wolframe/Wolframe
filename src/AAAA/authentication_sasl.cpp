@@ -41,6 +41,8 @@
 
 #include <stdexcept>
 
+#include "sasl/sasl.h"
+
 namespace _Wolframe {
 namespace AAAA {
 
@@ -53,7 +55,13 @@ Authenticator *CreateSaslAuthenticator( AuthenticatorFactory::properties props )
 
 SaslAuthenticator::SaslAuthenticator( )
 {
+	sasl_server_init( NULL, "test" );
 	m_state = _Wolframe_SASL_STATE_NEED_LOGIN;
+}
+
+SaslAuthenticator::~SaslAuthenticator( )
+{
+	sasl_done( );
 }
 
 Step::AuthStep SaslAuthenticator::nextStep( )
