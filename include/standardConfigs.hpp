@@ -199,22 +199,22 @@ namespace config	{
 	{
 	public:
 		bool			logToStderr;
-		log::LogLevel::Level		stderrLogLevel;
+		log::LogLevel::Level	stderrLogLevel;
 
 		bool	 // namespace
 	logToFile;
 		std::string		logFile;
-		log::LogLevel::Level		logFileLogLevel;
+		log::LogLevel::Level	logFileLogLevel;
 		std::string		logFileIdent;
 		bool			logToSyslog;
 		log::SyslogFacility::Facility syslogFacility;
-		log::LogLevel::Level		syslogLogLevel;
+		log::LogLevel::Level	syslogLogLevel;
 		std::string		syslogIdent;
 #if defined( _WIN32 )
 		bool			logToEventlog;
 		std::string		eventlogLogName;
 		std::string		eventlogSource;
-		log::LogLevel::Level eventlogLogLevel;
+		log::LogLevel::Level	eventlogLogLevel;
 #endif // defined( _WIN32 )
 
 		/// constructor

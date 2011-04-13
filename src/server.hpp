@@ -48,44 +48,43 @@
 #include "standardConfigs.hpp"		// for server configuration
 
 namespace _Wolframe {
-	namespace net	{
+namespace net	{
 
-		/// The top-level class of the Wolframe network server.
-		class server: private boost::noncopyable
-		{
-			/// public interface
-		public:
-			/// Construct the server
-			explicit server( const Configuration* config,
-					 _Wolframe::ServerHandler& serverHandler );
+/// The top-level class of the Wolframe network server.
+class server: private boost::noncopyable
+{
+	/// public interface
+public:
+	/// Construct the server
+	explicit server( const Configuration* config,
+			 _Wolframe::ServerHandler& serverHandler );
 
-			/// Destruct the server
-			~server();
+	/// Destruct the server
+	~server();
 
-			/// Run the server's io_service loop.
-			void run();
+	/// Run the server's io_service loop.
+	void run();
 
-			/// Stop the server. Outstanding asynchronous operations will be completed.
-			void stop();
+	/// Stop the server. Outstanding asynchronous operations will be completed.
+	void stop();
 
-			/// Abort the server. Outstanding asynchronous operations will be aborted.
-			void abort();
+	/// Abort the server. Outstanding asynchronous operations will be aborted.
+	void abort();
 
-		private:
-			/// The number of threads that will call io_service::run().
-			std::size_t		threadPoolSize_;
+private:
+	/// The number of threads that will call io_service::run().
+	std::size_t		threadPoolSize_;
 
-			/// The io_service used to perform asynchronous operations.
-			boost::asio::io_service	IOservice_;
-			/// The list(s) of connection acceptors.
-			std::list<acceptor*>	acceptor_;
+	/// The io_service used to perform asynchronous operations.
+	boost::asio::io_service	IOservice_;
+	/// The list(s) of connection acceptors.
+	std::list<acceptor*>	acceptor_;
 #ifdef WITH_SSL
-			std::list<SSLacceptor*>	SSLacceptor_;
+	std::list<SSLacceptor*>	SSLacceptor_;
 #endif // WITH_SSL
-			GlobalConnectionList	globalList_;
-		};
+	GlobalConnectionList	globalList_;
+};
 
-	} // namespace net
-} // namespace _Wolframe
+}} // namespace _Wolframe::net
 
 #endif // _NETWORK_SERVER_HPP_INCLUDED
