@@ -583,6 +583,14 @@ SASL_LIB_DIR ?= $(SASL_DIR)/lib
 SASL_LIBS ?= -lsasl2
 endif
 
+# Fedora 14
+ifeq "$(LINUX_REV)" "14"
+SASL_DIR ?= /usr
+SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
+SASL_LIB_DIR ?= $(SASL_DIR)/lib
+SASL_LIBS ?= -lsasl2
+endif
+
 endif
 
 endif
@@ -612,6 +620,14 @@ SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
 SQLITE3_LIBS ?= -lsqlite3
 endif
 
+# Fedora 14
+ifeq "$(LINUX_REV)" "14"
+SQLITE3_DIR ?= /usr
+SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
+SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
+SQLITE3_LIBS ?= -lsqlite3
+endif
+
 endif
 
 endif
@@ -635,6 +651,14 @@ ifeq "$(LINUX_DIST)" "redhat"
 
 # RHEL5
 ifeq "$(LINUX_REV)" "5"
+PGSQL_DIR ?= /usr
+PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include
+PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
+PGSQL_LIBS ?= -lpq
+endif
+
+# Fedora 14
+ifeq "$(LINUX_REV)" "14"
 PGSQL_DIR ?= /usr
 PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include
 PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
