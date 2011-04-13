@@ -69,23 +69,35 @@ static ServiceBanner::SignatureTokens strToToken( std::string& str )
 /// Service signature
 bool ServiceBanner::parse( const boost::property_tree::ptree& pt, const std::string& node )
 {
-////	enum { NofSrvTokensEnum = 6 };
-////	static const char* SrvTokensEnum[ NofSrvTokensEnum ] = {
-////		"ProductOnly", "Major", "Minor", "Revision", "OS", "None"
-////	};
+/* // this does not compile
+	enum { NofSrvTokensEnum = 6 };
+	static const char* SrvTokensEnum[ NofSrvTokensEnum ] = {
+		"ProductOnly", "Major", "Minor", "Revision", "OS", "None"
+	};
 
-//	Parser::EnumDomain SrvTokensDomain( NofSrvTokensEnum, SrvTokensEnum );
+	Parser::EnumDomain SrvTokensDomain( NofSrvTokensEnum, SrvTokensEnum );
 
 	if ( boost::algorithm::iequals( node, "ServerTokens" ))	{
 		bool tokensDefined = ( tokens_ != UNDEFINED );
+
+	if ( !Parser::getValue( displayName().c_str(), node.c_str(), pt.get_value<std::string>(),
+					tokens_, SrvTokensDomain, &tokensDefined ))
+		return false;
+
+*/
+/* // using this instead */
+	if ( boost::algorithm::iequals( node, "ServerTokens" ))	{
+		bool tokensDefined = ( tokens_ != UNDEFINED );
 		std::string	val;
-//		if ( !Parser::getValue( displayName().c_str(), node.c_str(), pt.get_value<std::string>(),
-//					val, SrvTokensDomain, &tokensDefined ))
 		if ( !Parser::getValue( displayName().c_str(), node.c_str(), pt.get_value<std::string>(),
 					val, &tokensDefined ))
-
 			return false;
 		tokens_ = strToToken( val );
+		if ( tokens_ == UNDEFINED )	{
+			LOG_FATAL << displayName() << ": Unknown option '" << val << "' for " << node;
+			return false;
+		}
+/* // end of substituted code */
 	}
 	else if ( boost::algorithm::iequals( node, "ServerSignature" ))	{
 		if ( !Parser::getValue( displayName().c_str(), node.c_str(), pt.get_value<std::string>(),
@@ -93,8 +105,8 @@ bool ServiceBanner::parse( const boost::property_tree::ptree& pt, const std::str
 			return false;
 	}
 	else	{
-		LOG_FATAL << displayName() << ": called with unknown configuration option: \""
-			  << node << "\"";
+		LOG_FATAL << displayName() << ": called with unknown configuration option: '"
+			  << node << "'";
 		return false;
 	}
 	return true;

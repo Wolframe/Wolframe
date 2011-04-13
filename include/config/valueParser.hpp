@@ -175,7 +175,7 @@ public:
 			unsigned int ii;
 			value = boost::value_initialized<ValueType>();
 
-			for (ii=0; ii<m_size; ii++,value++)
+			for (ii=0; ii<m_size; ii++, value++)
 			{
 				if (boost::algorithm::iequals( token, m_ar[ii]))
 				{
@@ -202,7 +202,7 @@ public:
 		/// \return enumeration of valid boolean values
 		static const char** booleanEnum()
 		{
-			static const char* ar[] = {"false", "true", "0", "1", "off", "on", "no", "yes"};
+			static const char* ar[ NofBooleanEnum ] = {"false", "true", "0", "1", "off", "on", "no", "yes"};
 			return ar;
 		}
 		/// \brief Returns the boolean value of an accepted token
