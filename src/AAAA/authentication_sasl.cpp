@@ -40,7 +40,6 @@
 #include <boost/thread/thread.hpp>
 
 #include <stdexcept>
-#include <fstream>
 
 namespace _Wolframe {
 namespace AAAA {
@@ -48,28 +47,12 @@ namespace AAAA {
 Authenticator *CreateSaslAuthenticator( AuthenticatorFactory::properties props )
 {
 	return new SaslAuthenticator(
-		findprop<std::string>( props, "filename" )
+//		findprop<std::string>( props, "filename" )
 	);
 }
 
-SaslAuthenticator::SaslAuthenticator( const std::string _filename )
+SaslAuthenticator::SaslAuthenticator( )
 {
-	std::ifstream f;
-
-	f.open( _filename.c_str( ), std::ifstream::in );
-	if( f.good( ) ) {
-		while( !f.eof( ) ) {
-			char line[256];
-			f.getline( line, 255 );
-			std::vector<std::string> v;
-			split( v, line, boost::is_any_of( "\t" ) );
-			if( v.size( ) == 2 ) {
-				m_creds.insert( std::make_pair<std::string, std::string>( v[0], v[1] ) );
-			}
-		}
-		f.close( );
-	}
-
 	m_state = _Wolframe_SASL_STATE_NEED_LOGIN;
 }
 
@@ -85,14 +68,13 @@ Step::AuthStep SaslAuthenticator::nextStep( )
 			return Step::_Wolframe_AUTH_STEP_RECV_DATA;
 
 		case _Wolframe_SASL_STATE_COMPUTE:
-			std::map<std::string, std::string>::const_iterator it = m_creds.find( m_login );
-// user not in text file
-			if( it == m_creds.end( ) ) {
+// user not found
+			if( false ) {
 				m_state = _Wolframe_SASL_STATE_NEED_LOGIN;
 				goto FAIL;
 			}
 // user found, but password doesn't match
-			if( it->second != m_pass ) {
+			if( false ) {
 				m_state = _Wolframe_SASL_STATE_NEED_LOGIN;
 				goto FAIL;
 			}

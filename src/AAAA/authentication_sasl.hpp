@@ -39,7 +39,6 @@
 
 #include "AAAA/authentication.hpp"
 
-#include <map>
 #include <string>
 
 namespace _Wolframe {
@@ -47,8 +46,6 @@ namespace AAAA {
 
 class SaslAuthenticator : public Authenticator {
 	private:
-		std::map< std::string, std::string > m_creds;
-
 		enum {
 			_Wolframe_SASL_STATE_NEED_LOGIN,
 			_Wolframe_SASL_STATE_NEED_PASS,
@@ -60,7 +57,7 @@ class SaslAuthenticator : public Authenticator {
 		std::string m_pass;
 
 	public:
-		SaslAuthenticator( const std::string _filename );
+		SaslAuthenticator( );
 		virtual Step::AuthStep nextStep( );
 		virtual std::string sendData( );
 		virtual std::string token( );

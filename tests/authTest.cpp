@@ -36,6 +36,11 @@ int main( int argc, const char *argv[] )
 	AuthenticatorFactory::instance( ).registerAuthenticator( "DBSQLITE3", CreateDbSqlite3Authenticator, props3 );
 #endif
 
+#ifdef WITH_SASL
+	AuthenticatorFactory::properties props4;
+	AuthenticatorFactory::instance( ).registerAuthenticator( "SASL", CreateSaslAuthenticator, props4 );
+#endif
+
 // check parameters
 	if( argc != 2 ) {
 		cerr << "usage: testAuth <authentication method>" << endl;

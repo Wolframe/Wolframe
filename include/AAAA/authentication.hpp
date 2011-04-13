@@ -150,9 +150,15 @@ template<class T> T findprop( AuthenticatorFactory::properties _props, const std
 }
 
 extern Authenticator *CreateTextFileAuthenticator( AuthenticatorFactory::properties props );
+
 #if defined( WITH_PAM )
 extern Authenticator *CreatePAMAuthenticator( AuthenticatorFactory::properties props );
 #endif // defined( WITH_PAM )
+
+#if defined( WITH_SASL )
+extern Authenticator *CreateSaslAuthenticator( AuthenticatorFactory::properties props );
+#endif // defineD( WITH_SASL) 
+
 #if defined( WITH_SQLITE3 )
 extern Authenticator *CreateDbSqlite3Authenticator( AuthenticatorFactory::properties props );
 #endif // defined( WITH_SQLITE3 )
