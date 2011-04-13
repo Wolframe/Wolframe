@@ -8,11 +8,17 @@ Prerequisites
 - GNU make
 - boost 1.43.0 or later
 - optionally (WITH_SSL) openssl 0.9.8 or later
-- optionally (WITH_GTEST) gtest 1.3.0 or later
 - optionally (WITH_LUA) lua 5.1.x
-- optionally (WITH_QT) Qt 4, 4.5.x or later
-- optionally (WITH_PAM)
-- optionally (WITH_EXPECT) expect and Tcl 8.4 or later
+- for the optional Qt client
+  - optionally (WITH_QT) Qt 4, 4.5.x or later
+- for optional authentication mechanisms:
+  - optionally (WITH_PAM)
+  - optionally (WITH_SASL)
+  - optionally (WITH_SQLITE3)
+  - optionally (WITH_PGSQL)
+- optionally for testing:
+  - optionally (WITH_GTEST) gtest 1.3.0 or later
+  - optionally (WITH_EXPECT) expect and Tcl 8.4 or later
 - optionally (for building the documentation):
   - xsltproc, docboox-xsl-stylesheet: for docbook
   - doxygen: for documentation for programmers
@@ -90,10 +96,10 @@ A note on Linux Distributions
 RHEL/Centos/SL 5.5
 ------------------
 
-
 Optional packages:
 Fetch from epel/rpmforge whatever: lua-devel (5.1)
-Fetch from normal repository: openssl-devel, pam-devel (0.99.6)
+Fetch from normal repository: openssl-devel, pam-devel (0.99.6), cyrus-sasl-devel (2.1.22),
+                              sqlite-devel (3.3.6), postgresql-devel (8.1.23)
 
 Boost is not available in a decent version (1.33), build your own one.
 
@@ -109,7 +115,8 @@ No problems with the supplied packages at all, everything builds out of the box:
 
 Required packages: boost-devel (1.44)
 Optional packages: openssl-devel, lua-devel (5.1), qt4-devel, gtest-devel (1.4),
-                   pam-devel (1.1.1)
+                   pam-devel (1.1.1), cyrus-sasl-devel (2.1.23),
+                   sqlite-devel (3.6.23), postgresql-devel (8.4.7)
 
 For building the documentation you need 'libxslt', 'docbook-style-xsl' and 'doxygen'.
 For building the PDF wolfbook install 'fop'.
@@ -120,7 +127,8 @@ Ubuntu 10.04.1 LTS
 ------------------
 
 Optional packages: liblua5.1-dev, libgtest-dev (1.3, a little bit old), libqt4-dev,
-                   libpam-dev
+                   libpam-dev (1.1.1), libsasl2-dev (2.1.23),
+                   libsqlite3-dev (3.6.22), libpq-dev (8.4.7)
 
 libboost-dev is 1.40, too old, missing asio features and property_tree, build
 you own boost. gcc on Debian complains a lot about boost header files..
@@ -174,7 +182,8 @@ Archlinux
 ---------
 
 Required packages: boost and boost-libs
-Optional packages: openssl, lua, qt, gtest (from the AUR), pam
+Optional packages: openssl, lua, qt, gtest (from the AUR), pam, libsasl,
+                   sqlite3, postgresql-libs
 
 For building the documentation you need 'xsltproc', 'docbook-xsl' and 'doxygen'.
 'fop' (together with 'java-batik', 'java-commons-io', 'java-avalon-framework',
