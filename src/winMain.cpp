@@ -381,7 +381,7 @@ int _Wolframe_winMain( int argc, char* argv[] )
 {
 	try	{
 		// create initial console logger, so we see things going wrong
-		_Wolframe::log::LogBackend::instance().setConsoleLevel( _Wolframe::log::LogLevel::LOGLEVEL_INFO );
+		_Wolframe::log::LogBackend::instance().setConsoleLevel( _Wolframe::log::LogLevel::LOGLEVEL_WARNING );
 
 		_Wolframe::ApplicationSingleton& appSingleton = _Wolframe::ApplicationSingleton::instance();
 		appSingleton.version( _Wolframe::Version( _Wolframe::applicationVersion() ));

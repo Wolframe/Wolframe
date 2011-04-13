@@ -104,6 +104,13 @@ ifeq ($(WITH_PAM),1)
 	@echo "PAM_LIB_DIR: $(PAM_LIB_DIR)"
 	@echo "PAM_LIBS: $(PAM_LIBS)"
 endif
+ifeq ($(WITH_SASL),1)
+	@echo
+	@echo "SASL_DIR: $(SASL_DIR)"
+	@echo "SASL_INCLUDE_DIR: $(SASL_INCLUDE_DIR)"
+	@echo "SASL_LIB_DIR: $(SASL_LIB_DIR)"
+	@echo "SASL_LIBS: $(SASL_LIBS)"
+endif
 ifeq ($(WITH_SQLITE3),1)
 	@echo
 	@echo "SQLITE3_DIR: $(SQLITE3_DIR)"

@@ -76,6 +76,9 @@
 
 int _Wolframe_posixMain( int argc, char* argv[] )
 {
+// default logger (to console, warning level)
+	_Wolframe::log::LogBackend::instance().setConsoleLevel( _Wolframe::log::LogLevel::LOGLEVEL_WARNING );
+
 // i18n global stuff
 	if ( setlocale( LC_ALL, "" ) == NULL )	{
 		LOG_ERROR << "Unable to set locale. Falling back to default.";

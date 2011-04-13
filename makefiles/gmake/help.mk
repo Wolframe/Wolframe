@@ -19,6 +19,7 @@ Available optional features:
 WITH_SSL=1             use OpenSSL additionally for communication encryption
 WITH_LUA=1             build code depending on Lua
 WITH_QT=1              build code depending on Qt
+WITH_SASL=1            build authentication code with Cyrus SASL2
 WITH_PAM=1             build authentication code with PAM
 WITH_SQLITE3=1         build AAAA and DB connectors for Sqlite3
 WITH_PGSQL=1           build AAAA and DB connectors for PostgreSql
@@ -31,7 +32,7 @@ WITH_EXPECT=1          use Expect/Tcl for system testing
 
 Example:
 make WITH_SSL=1 WITH_GTEST=1 WITH_LUA=1 WITH_EXPECT=1 WITH_QT=1 WITH_PAM=1 \
-     WITH_SQLITE3=1 WITH_PGSQL=1
+     WITH_SASL2=1 WITH_SQLITE3=1 WITH_PGSQL=1
 
 To build the documentation call:
 
