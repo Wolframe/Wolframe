@@ -33,6 +33,7 @@ Project Wolframe.
 #define _Wolframe_METHODTABLE_HPP_INCLUDED
 #include "protocol/generator.hpp"
 #include "protocol/formatoutput.hpp"
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace mtproc {
@@ -46,11 +47,11 @@ struct Method
    struct Context
    {
       Data* data;
-      protocol::Generator* contentIterator;
-      protocol::FormatOutput* output;
+      boost::shared_ptr<protocol::Generator> contentIterator;
+      boost::shared_ptr<protocol::FormatOutput> output;
       
-      Context()                   :data(0),contentIterator(0),output(0){}
-      void init( Data* d=0)       {data=d;contentIterator=0;output=0;}
+      Context()                   :data(0){}
+      void init( Data* d=0)       {data=d;contentIterator.reset();output.reset();}
 
       typedef Data* (*DataConstructor)();
       typedef void (*DataDestructor)( Data* context);

@@ -40,10 +40,14 @@ using namespace _Wolframe::mtproc;
 struct Method::Data
 {
 	char buf;
-	protocol::Generator input;
-	protocol::FormatOutput output;
+	boost::shared_ptr<protocol::Generator> input;
+	boost::shared_ptr<protocol::FormatOutput> output;
 
-	Data() :buf(0),input(generator::CharIsoLatin1::GetNext),output(generator::CharIsoLatin1::Print){}
+	Data() :buf(0)
+	{
+		input = boost::shared_ptr<protocol::Generator>( new protocol::Generator( generator::CharIsoLatin1::GetNext));
+		output = boost::shared_ptr<protocol::FormatOutput>( new protocol::FormatOutput( generator::CharIsoLatin1::Print));
+	}
 };
 
 
@@ -63,8 +67,8 @@ int Implementation::echo( Method::Context* ctx, unsigned int, const char**)
 
 	if (!ctx->contentIterator)
 	{
-		ctx->contentIterator = &ctx->data->input;
-		ctx->output = &ctx->data->output;
+		ctx->contentIterator = ctx->data->input;
+		ctx->output = ctx->data->output;
 	}
 	if (ctx->data->buf != 0)
 	{
@@ -89,8 +93,8 @@ int Implementation::printarg( Method::Context* ctx, unsigned int, const char**)
 
 	if (!ctx->contentIterator)
 	{
-		ctx->contentIterator = &ctx->data->input;
-		ctx->output = &ctx->data->output;
+		ctx->contentIterator = ctx->data->input;
+		ctx->output = ctx->data->output;
 	}
 	return 0;
 }

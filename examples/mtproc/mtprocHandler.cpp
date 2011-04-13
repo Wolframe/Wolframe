@@ -40,7 +40,6 @@
 #include "logger.hpp"
 #include "dispatcher.hpp"
 #include "implementation.hpp"
-#include "implementation_c.h"
 
 #ifndef _WIN32
 #include <cstdio>
@@ -50,20 +49,6 @@
 
 using namespace _Wolframe;
 using namespace _Wolframe::mtproc;
-
-#undef MTPROC_PROCESSOR_ANSIC
-#ifdef MTPROC_PROCESSOR_ANSIC
-struct MyImplementation :public Implementation
-{
-	MyImplementation()
-	{
-		MyImplementation* THIS = (MyImplementation*)mtproc_getImplementation();
-		*this = *THIS;
-	}
-};
-#else
-typedef Implementation MyImplementation;
-#endif
 
 struct Connection::Private
 {
@@ -111,7 +96,7 @@ struct Connection::Private
 	InputIterator end;				//< iterator pointing to end of message buffer
 
 	//3. implementation
-	MyImplementation object;
+	Implementation object;
 
 	//* helper methods for I/O
 	//helper function to send a line message with CRLF termination as C string
