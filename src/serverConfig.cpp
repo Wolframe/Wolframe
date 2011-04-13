@@ -68,7 +68,8 @@ void Configuration::print( std::ostream& os ) const
 {
 	os << displayName() << std::endl;
 	os << "   Number of client threads: " << threads << std::endl;
-	os << "   Maximum number of connections (global): " << maxConnections << std::endl;
+	if ( maxConnections > 0 )
+		os << "   Maximum number of connections (global): " << maxConnections << std::endl;
 
 	if ( address.size() > 0 )	{
 		std::list<net::ServerTCPendpoint>::const_iterator it = address.begin();
@@ -113,10 +114,22 @@ void Configuration::print( std::ostream& os ) const
 }
 
 /// Check if the server configuration makes sense
-#ifdef WITH_SSL
 bool Configuration::check() const
 {
 	bool correct = true;
+
+	// check the interface definitions
+	size_t interfaces = address.size();
+#ifdef WITH_SSL
+	interfaces += SSLaddress.size();
+#endif // WITH_SSL
+	if ( ! interfaces > 0 )	{
+		correct = false;
+		LOG_FATAL << "No server interfaces defined";
+	}
+
+	// check SSL consistency
+#ifdef WITH_SSL
 	for ( std::list<net::ServerSSLendpoint>::const_iterator it = SSLaddress.begin();
 	      it != SSLaddress.end(); ++it )	{
 		// if it listens to SSL a certificate file and a key file are required
@@ -136,14 +149,9 @@ bool Configuration::check() const
 			correct = false;
 		}
 	}
+#endif // WITH_SSL
 	return correct;
 }
-#else
-bool Configuration::check() const
-{
-	return true;
-}
-#endif // WITH_SSL
 
 
 /// Parse the configuration

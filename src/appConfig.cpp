@@ -57,6 +57,17 @@
 namespace _Wolframe {
 namespace config {
 
+static bool plausibleConfig( boost::property_tree::ptree& pt )
+{
+	size_t lvl1, lvl2;
+	lvl1 = lvl2 = 0;
+	for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++, lvl1++ )
+		lvl2 += it->second.size();
+	if ( lvl1 >= lvl2 || lvl1 == 0 )
+		return false;
+	return true;
+}
+
 const char* ApplicationConfiguration::chooseFile( const char *globalFile, const char *userFile, const char *localFile )
 {
 	if ( globalFile != NULL )
@@ -113,7 +124,12 @@ bool ApplicationConfiguration::parse ( const char *filename, ConfigFileType type
 		case CONFIG_INFO:
 			read_info( filename, pt );
 			forced_ = true;
-			type_ = CONFIG_INFO;
+			if ( plausibleConfig( pt ) )
+				type_ = CONFIG_INFO;
+			else	{
+				LOG_FATAL << "Configuration file is probably not INFO (" << filename << ")";
+				return false;
+			}
 			break;
 		case CONFIG_XML:
 			read_xml( filename, pt, boost::property_tree::xml_parser::no_comments |
@@ -128,16 +144,30 @@ bool ApplicationConfiguration::parse ( const char *filename, ConfigFileType type
 				read_xml( filename, pt, boost::property_tree::xml_parser::no_comments |
 							boost::property_tree::xml_parser::trim_whitespace );
 				pt = pt.get_child( "configuration" );
-				type_ = CONFIG_XML;
+				if ( plausibleConfig( pt ) )
+					type_ = CONFIG_XML;
+				else	{
+					LOG_FATAL << "Cannot guess configuration file type: " << filename;
+					return false;
+				}
 			}
 			catch( boost::property_tree::xml_parser::xml_parser_error )	{
 				try	{
 					read_info( filename, pt );
-					type_ = CONFIG_INFO;
+					if ( plausibleConfig( pt ) )
+						type_ = CONFIG_INFO;
+					else	{
+						LOG_FATAL << "Cannot guess configuration file type: " << filename;
+						return false;
+					}
 				}
 				catch( boost::property_tree::info_parser::info_parser_error& )	{
 					throw std::logic_error( "cannot guess configuration file type" );
 				}
+			}
+			catch( boost::property_tree::ptree_bad_path )	{
+				LOG_FATAL << "Invalid XML configuration file: " << filename;
+				return false;
 			}
 			break;
 		}
@@ -157,8 +187,8 @@ bool ApplicationConfiguration::parse ( const char *filename, ConfigFileType type
 					retVal = false;
 			}
 			else	{
-				LOG_WARNING << "configuration root: Unknown configuration option <"
-					    << it->first << ">";
+				LOG_WARNING << "configuration root: Unknown configuration option '"
+					    << it->first << "'";
 			}
 		}
 		LOG_TRACE << "Configuration : parsing finished " << (retVal ? "OK" : "with errors");

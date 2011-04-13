@@ -291,7 +291,7 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 		const char *configFile = serviceConfig.c_str( ); // configuration comes from main thread
 
 		_Wolframe::config::ApplicationConfiguration config;
-		if ( !config.parse( configFile ))	// there was an error parsing the configuration file
+		if ( !config.parse( configFile, cmdLineCfg.cfgType ))	// there was an error parsing the configuration file
 			return;
 // configuration file has been parsed successfully
 // build the final configuration
@@ -421,7 +421,7 @@ int _Wolframe_winMain( int argc, char* argv[] )
 		}
 
 		_Wolframe::config::ApplicationConfiguration config;
-		if ( !config.parse( configFile ))	// there was an error parsing the configuration file
+		if ( !config.parse( configFile, cmdLineCfg.cfgType ))	// there was an error parsing the configuration file
 			return _Wolframe::ErrorCodes::FAILURE;
 
 // configuration file has been parsed successfully
