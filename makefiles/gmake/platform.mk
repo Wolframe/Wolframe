@@ -573,6 +573,22 @@ SASL_LIB_DIR ?= $(SASL_DIR)/lib
 SASL_LIBS ?= -lsasl2
 endif
 
+# Ubuntu 10.04 TLS, 10.10, Debian 5.0
+ifeq "$(LINUX_DIST)" "debian"
+ifeq "$(LINUX_REV)" "squeeze/sid"
+SASL_DIR ?= /usr
+SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
+SASL_LIB_DIR ?= $(SASL_DIR)/lib
+SASL_LIBS ?= -lsasl2
+endif
+ifeq "$(LINUX_REV)" "5"
+SASL_DIR ?= /usr
+SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
+SASL_LIB_DIR ?= $(SASL_DIR)/lib
+SASL_LIBS ?= -lsasl2
+endif
+endif
+
 ifeq "$(LINUX_DIST)" "redhat"
 
 # RHEL5
@@ -610,6 +626,22 @@ SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
 SQLITE3_LIBS ?= -lsqlite3
 endif
 
+# Ubuntu 10.04 TLS, 10.10, Debian 5.0
+ifeq "$(LINUX_DIST)" "debian"
+ifeq "$(LINUX_REV)" "squeeze/sid"
+SQLITE3_DIR ?= /usr
+SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
+SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
+SQLITE3_LIBS ?= -lsqlite3
+endif
+ifeq "$(LINUX_REV)" "5"
+SQLITE3_DIR ?= /usr
+SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
+SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
+SQLITE3_LIBS ?= -lsqlite3
+endif
+endif
+
 ifeq "$(LINUX_DIST)" "redhat"
 
 # RHEL5
@@ -645,6 +677,22 @@ PGSQL_DIR ?= /usr
 PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include
 PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
 PGSQL_LIBS ?= -lpq
+endif
+
+# Ubuntu 10.04 TLS, 10.10, Debian 5.0
+ifeq "$(LINUX_DIST)" "debian"
+ifeq "$(LINUX_REV)" "squeeze/sid"
+PGSQL_DIR ?= /usr
+PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include
+PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
+PGSQL_LIBS ?= -lpq
+endif
+ifeq "$(LINUX_REV)" "5"
+PGSQL_DIR ?= /usr
+PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include
+PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
+PGSQL_LIBS ?= -lpq
+endif
 endif
 
 ifeq "$(LINUX_DIST)" "redhat"
