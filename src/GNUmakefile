@@ -48,6 +48,24 @@ INCLUDE_LIBS += \
 
 endif
 
+# sasl
+
+ifeq ($(WITH_SASL),1)
+
+INCLUDE_CPPFLAGS += \
+	-DWITH_SASL
+
+INCLUDE_DIRS += \
+	-I$(SASL_INCLUDE_DIR)
+
+INCLUDE_LDFLAGS += \
+	-L$(SASL_LIB_DIR)
+
+INCLUDE_LIBS += \
+	$(SASL_LIBS)
+
+endif
+
 # sqlite3
 
 ifeq ($(WITH_SQLITE3),1)
@@ -109,6 +127,11 @@ AAAA_OBJS = \
 ifeq ($(WITH_PAM),1)
 AAAA_OBJS += \
 	AAAA/authentication_pam.o
+endif
+
+ifeq ($(WITH_SASL),1)
+AAAA_OBJS += \
+	AAAA/authentication_sasl.o
 endif
 
 ifeq ($(WITH_SQLITE3),1)

@@ -23,6 +23,7 @@
 # set up defaults for the build switches
 WITH_SSL ?= 0
 WITH_LUA ?= 0
+WITH_SASL ?= 0
 WITH_PAM ?= 0
 WITH_SQLITE3 ?= 0
 WITH_PGSQL ?= 0
@@ -553,6 +554,23 @@ PAM_DIR ?= /usr
 PAM_INCLUDE_DIR ?= $(PAM_DIR)/include
 PAM_LIB_DIR ?= /lib
 PAM_LIBS ?= -lpam
+endif
+
+endif
+endif
+
+# Curys SASL2
+#############
+
+ifeq ($(WITH_SASL),1)
+
+ifeq "$(PLATFORM)" "LINUX"
+
+ifeq "$(LINUX_DIST)" "arch"
+SASL_DIR ?= /usr
+SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
+SASL_LIB_DIR ?= $(SASL_DIR)/lib
+SASL_LIBS ?= -lsasl2
 endif
 
 endif
