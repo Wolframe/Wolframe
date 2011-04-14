@@ -51,7 +51,8 @@ namespace AAAA {
 Authenticator *CreateSaslAuthenticator( AuthenticatorFactory::properties props )
 {
 	return new SaslAuthenticator(
-		findprop<std::string>( props, "appname" )
+		findprop<std::string>( props, "appname" ),
+		findprop<std::string>( props, "service" )
 	);
 }
 
@@ -74,8 +75,11 @@ static int sasl_my_log( void *context, int priority, const char *message )
 	return SASL_OK;
 }
 
-SaslAuthenticator::SaslAuthenticator( const std::string appName ) : m_appName( appName )
+SaslAuthenticator::SaslAuthenticator( const std::string appName, const std::string service )
+	: m_appName( appName ),
+	  m_service( service )
 {
+// register callbacks
 	callbacks[0].id = SASL_CB_LOG;
 	callbacks[0].proc = (int (*)( ))&sasl_my_log;
 	callbacks[0].context = this;
@@ -83,11 +87,27 @@ SaslAuthenticator::SaslAuthenticator( const std::string appName ) : m_appName( a
 	callbacks[1].proc = NULL;
 	callbacks[1].context = NULL;
 
+// initialize the SASL library
 	int result = sasl_server_init( callbacks, "test" );
 	if( result != SASL_OK ) {
 		throw new std::runtime_error( "Failed to initialize libsasl" );
 	}
+
+// create authentication session (TODO: must be outside constructor and callable from outside!)
+/*
+	result = sasl_server_new( m_service,
 	
+			   localdomain,
+			   userdomain,
+			   iplocal,
+			   ipremote,
+			   NULL,
+			   serverlast,
+			   &conn);
+  if (result != SASL_OK)
+    saslfail(result, "Allocating sasl connection state", NULL);
+  
+*/	
 	m_state = _Wolframe_SASL_STATE_NEED_LOGIN;
 }
 
