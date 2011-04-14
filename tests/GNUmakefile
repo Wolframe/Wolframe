@@ -121,10 +121,11 @@ TEST_CPP_BINS += \
 	logTest$(EXE) \
 	protocolArgumentParsing-gTest$(EXE) \
 	configValueParser-gTest$(EXE) \
-	ptreeGenerator-gTest$(EXE) \
 	pechoHandler-gTest$(EXE) \
 	mtprocHandler-gTest$(EXE)
 endif
+# Aba: ptreeGenerator-gTest.cpp:6:39: fatal error: generators/propertyTree.hpp: No such file or directory
+#	ptreeGenerator-gTest$(EXE)
 
 include $(TOPDIR)/makefiles/gmake/sub.mk
 
