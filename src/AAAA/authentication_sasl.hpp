@@ -41,6 +41,8 @@
 
 #include <string>
 
+#include "sasl/sasl.h"
+
 namespace _Wolframe {
 namespace AAAA {
 
@@ -52,12 +54,17 @@ class SaslAuthenticator : public Authenticator {
 			_Wolframe_SASL_STATE_COMPUTE
 		} m_state;
 
+		sasl_callback_t callbacks[2];
+
+		std::string m_appName;
+		std::string m_service;
+		
 		std::string m_token;
 		std::string m_login;
 		std::string m_pass;
 
 	public:
-		SaslAuthenticator( );
+		SaslAuthenticator( const std::string appName, const std::string service );
 		virtual ~SaslAuthenticator( );
 		virtual Step::AuthStep nextStep( );
 		virtual std::string sendData( );

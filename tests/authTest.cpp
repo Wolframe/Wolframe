@@ -38,6 +38,8 @@ int main( int argc, const char *argv[] )
 
 #ifdef WITH_SASL
 	AuthenticatorFactory::properties props4;
+	props4.push_back( AuthenticatorFactory::property( "appname", std::string( "authTest" ) ) );
+	props4.push_back( AuthenticatorFactory::property( "service", std::string( "wolframe" ) ) );
 	AuthenticatorFactory::instance( ).registerAuthenticator( "SASL", CreateSaslAuthenticator, props4 );
 #endif
 

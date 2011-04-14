@@ -43,19 +43,71 @@
 
 #include "sasl/sasl.h"
 
+#include "logger.hpp"
+
 namespace _Wolframe {
 namespace AAAA {
 
 Authenticator *CreateSaslAuthenticator( AuthenticatorFactory::properties props )
 {
 	return new SaslAuthenticator(
-//		findprop<std::string>( props, "filename" )
+		findprop<std::string>( props, "appname" ),
+		findprop<std::string>( props, "service" )
 	);
 }
 
-SaslAuthenticator::SaslAuthenticator( )
+static int sasl_my_log( void *context, int priority, const char *message )
 {
-	sasl_server_init( NULL, "test" );
+	if( message == NULL ) return SASL_BADPARAM;
+	
+	_Wolframe::log::LogLevel::Level level;
+	
+	switch( priority ) {
+		case SASL_LOG_ERR:	level = _Wolframe::log::LogLevel::LOGLEVEL_ERROR; break;
+		case SASL_LOG_NOTE:	level = _Wolframe::log::LogLevel::LOGLEVEL_NOTICE; break;
+		default:		level = _Wolframe::log::LogLevel::LOGLEVEL_INFO; break;
+	}
+
+	_Wolframe::log::Logger( _Wolframe::log::LogBackend::instance() ).Get( level )
+		<< _Wolframe::log::LogComponent::LogAuth
+		<< "SASL " << message;
+
+	return SASL_OK;
+}
+
+SaslAuthenticator::SaslAuthenticator( const std::string appName, const std::string service )
+	: m_appName( appName ),
+	  m_service( service )
+{
+// register callbacks
+	callbacks[0].id = SASL_CB_LOG;
+	callbacks[0].proc = (int (*)( ))&sasl_my_log;
+	callbacks[0].context = this;
+	callbacks[1].id = SASL_CB_LIST_END;
+	callbacks[1].proc = NULL;
+	callbacks[1].context = NULL;
+
+// initialize the SASL library
+	int result = sasl_server_init( callbacks, "test" );
+	if( result != SASL_OK ) {
+		throw new std::runtime_error( "Failed to initialize libsasl" );
+	}
+
+// create authentication session (TODO: must be outside constructor and callable from outside!)
+/*
+	result = sasl_server_new( m_service,
+	
+			   localdomain,
+			   userdomain,
+			   iplocal,
+			   ipremote,
+			   NULL,
+			   serverlast,
+			   &conn);
+  if (result != SASL_OK)
+    saslfail(result, "Allocating sasl connection state", NULL);
+  
+*/	
 	m_state = _Wolframe_SASL_STATE_NEED_LOGIN;
 }
 
