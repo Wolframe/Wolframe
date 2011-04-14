@@ -89,34 +89,41 @@ bool PostgreSQLconfig::parse( const std::string& module, const boost::property_t
 {
 	using namespace _Wolframe::config;
 	bool retVal = true;
+	bool portDefined, connDefined, aTdefined;
+	portDefined = connDefined = aTdefined = false;
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "host" ))	{
-			if ( !Parser::getValue( module.c_str(), *L1it, host ))
+			bool isDefined = ( !host.empty());
+			if ( !Parser::getValue( module.c_str(), *L1it, host, &isDefined ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "port" ))	{
-			if ( !Parser::getValue( module.c_str(), *L1it, port, Parser::RangeDomain<unsigned short>( 1 )))
+			if ( !Parser::getValue( module.c_str(), *L1it, port,
+						Parser::RangeDomain<unsigned short>( 1 ), &portDefined ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "name" ))	{
-			if ( !Parser::getValue( module.c_str(), *L1it, name ))
+			bool isDefined = ( !name.empty());
+			if ( !Parser::getValue( module.c_str(), *L1it, name, &isDefined ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "user" ))	{
-			if ( !Parser::getValue( module.c_str(), *L1it, user ))
+			bool isDefined = ( !user.empty());
+			if ( !Parser::getValue( module.c_str(), *L1it, user, &isDefined ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "password" ))	{
-			if ( !Parser::getValue( module.c_str(), *L1it, password ))
+			bool isDefined = ( !password.empty());
+			if ( !Parser::getValue( module.c_str(), *L1it, password, &isDefined ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "connections" ))	{
-			if ( !Parser::getValue( module.c_str(), *L1it, connections ))
+			if ( !Parser::getValue( module.c_str(), *L1it, connections, &connDefined ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "acquireTimeout" ))	{
-			if ( !Parser::getValue( module.c_str(), *L1it, acquireTimeout ))
+			if ( !Parser::getValue( module.c_str(), *L1it, acquireTimeout, &aTdefined ))
 				retVal = false;
 		}
 		else	{
@@ -159,7 +166,8 @@ bool SQLiteConfig::parse( const std::string& module, const boost::property_tree:
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "filename" ))	{
-			if ( !Parser::getValue( module.c_str(), *L1it, filename ))
+			bool isDefined = ( !filename.empty());
+			if ( !Parser::getValue( module.c_str(), *L1it, filename, &isDefined ))
 				retVal = false;
 			if ( ! boost::filesystem::path( filename ).is_absolute() )
 				LOG_WARNING << module << ": database file path is not absolute: "

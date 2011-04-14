@@ -109,7 +109,7 @@ Project Wolframe.
 	<database>
 		<type>SQLite</type>
 		<server>
-			<filename>localhost</filename>
+			<filename>localhost.db</filename>
 			<flag>On</flag>
 		</server>
 <!--		<type>PostgreSQL</type>

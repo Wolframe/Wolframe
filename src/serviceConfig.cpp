@@ -35,7 +35,7 @@
 //
 
 #include "standardConfigs.hpp"
-#include "configHelpers.hpp"
+#include "config/valueParser.hpp"
 #include "appProperties.hpp"
 #include "logger.hpp"
 
@@ -89,6 +89,7 @@ bool ServiceConfiguration::check() const
 bool ServiceConfiguration::parse( const boost::property_tree::ptree& pt,
 				  const std::string& node )
 {
+	bool retVal = true;
 #if defined(_WIN32)
 	if ( boost::algorithm::iequals( node, "daemon" ))	{
 		LOG_WARNING << "daemon: section is not valid on Windows";
@@ -97,23 +98,26 @@ bool ServiceConfiguration::parse( const boost::property_tree::ptree& pt,
 	if ( boost::algorithm::iequals( node, "daemon" ))	{
 		for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 			if ( boost::algorithm::iequals( L1it->first, "user" ))	{
-				if ( ! getStringValue( L1it->second, L1it->first, displayName(), user ))
-					return false;
+				bool isDefined = ( !user.empty());
+				if ( !Parser::getValue( displayName().c_str(), *L1it, user, &isDefined ))
+					retVal = false;
 			}
 			else if ( boost::algorithm::iequals( L1it->first, "group" ))	{
-				if ( ! getStringValue( L1it->second, L1it->first, displayName(), group ))
-					return false;
+				bool isDefined = ( !group.empty());
+				if ( !Parser::getValue( displayName().c_str(), *L1it, group, &isDefined ))
+					retVal = false;
 			}
 			else if ( boost::algorithm::iequals( L1it->first, "pidFile" ))	{
-				if ( ! getStringValue( L1it->second, L1it->first, displayName(), pidFile ))
-					return false;
+				bool isDefined = ( !pidFile.empty());
+				if ( !Parser::getValue( displayName().c_str(), *L1it, pidFile, &isDefined ))
+					retVal = false;
 				if ( ! boost::filesystem::path( pidFile ).is_absolute() )
 					LOG_WARNING << displayName() << ": pid file path is not absolute: "
 						    << pidFile;
 			}
 			else	{
-				LOG_WARNING << displayName() << ": unknown configuration option: <"
-					    << L1it->first << ">";
+				LOG_WARNING << displayName() << ": unknown configuration option: '"
+					    << L1it->first << "'";
 			}
 		}
 	}
@@ -126,20 +130,23 @@ bool ServiceConfiguration::parse( const boost::property_tree::ptree& pt,
 	else if ( boost::algorithm::iequals( node, "service" ))	{
 		for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 			if ( boost::algorithm::iequals( L1it->first, "serviceName" ))	{
-				if ( ! getStringValue( L1it->second, L1it->first, displayName(), serviceName ))
-					return false;
+				bool isDefined = ( !serviceName.empty());
+				if ( !Parser::getValue( displayName().c_str(), *L1it, serviceName, &isDefined ))
+					retVal = false;
 			}
 			else if ( boost::algorithm::iequals( L1it->first, "displayName" ))	{
-				if ( ! getStringValue( L1it->second, L1it->first, displayName(), serviceDisplayName ))
-					return false;
+				bool isDefined = ( !serviceDisplayName.empty());
+				if ( !Parser::getValue( displayName().c_str(), *L1it, serviceDisplayName, &isDefined ))
+					retVal = false;
 			}
 			else if ( boost::algorithm::iequals( L1it->first, "description" ))	{
-				if ( ! getStringValue( L1it->second, L1it->first, displayName(), serviceDescription ))
-					return false;
+				bool isDefined = ( !serviceDescription.empty());
+				if ( !Parser::getValue( displayName().c_str(), *L1it, serviceDescription, &isDefined ))
+					retVal = false;
 			}
 			else	{
-				LOG_WARNING << displayName() << ": unknown configuration option: <"
-					    << L1it->first << ">";
+				LOG_WARNING << displayName() << ": unknown configuration option: '"
+					    << L1it->first << "'";
 			}
 		}
 		if ( serviceName.empty() )
@@ -151,19 +158,21 @@ bool ServiceConfiguration::parse( const boost::property_tree::ptree& pt,
 	}
 #endif
 	else	{
-		LOG_WARNING << displayName() << ": unknown configuration option: <" << node << ">";
+		LOG_WARNING << displayName() << ": unknown configuration option: '" << node << "'";
 	}
-	return true;
+	return retVal;
 }
 
 
 #if !defined(_WIN32)
 void ServiceConfiguration::setCanonicalPathes( const std::string& refPath )
 {
+	using namespace boost::filesystem;
+
 	if ( ! pidFile.empty() )	{
-		if ( ! boost::filesystem::path( pidFile ).is_absolute() )
-			pidFile = resolvePath( boost::filesystem::absolute( pidFile,
-									    boost::filesystem::path( refPath ).branch_path()).string());
+		if ( ! path( pidFile ).is_absolute() )
+			pidFile = resolvePath( absolute( pidFile,
+							 path( refPath ).branch_path()).string());
 		else
 			pidFile = resolvePath( pidFile );
 	}
