@@ -41,6 +41,8 @@ Project Wolframe.
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/utility/value_init.hpp>
+#include <boost/type_traits/is_enum.hpp>
+#include <boost/utility.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/limits.hpp>
 #include <string>
@@ -49,6 +51,12 @@ Project Wolframe.
 
 namespace _Wolframe {
 namespace config {
+
+namespace utils {
+template <typename T> typename boost::enable_if<boost::is_enum<T>, T>::type increment( const T& i) { return (T)((int)i + 1); }
+template <typename T> typename boost::disable_if<boost::is_enum<T>, T>::type increment( const T& i) { T rt = i; return ++rt; }
+}//namespace
+
 
 /// \class Parser
 /// \brief Configuration parser for parsing the tokens of the configuration
@@ -175,7 +183,7 @@ public:
 			unsigned int ii;
 			value = boost::value_initialized<ValueType>();
 
-			for (ii=0; ii<m_size; ii++, value++)
+			for (ii=0; ii<m_size; ii++, value=utils::increment(value))
 			{
 				if (boost::algorithm::iequals( token, m_ar[ii]))
 				{
