@@ -123,7 +123,7 @@ bool Configuration::check() const
 #ifdef WITH_SSL
 	interfaces += SSLaddress.size();
 #endif // WITH_SSL
-	if ( ! interfaces > 0 )	{
+	if ( !( interfaces > 0 ) )	{
 		correct = false;
 		LOG_FATAL << "No server interfaces defined";
 	}
