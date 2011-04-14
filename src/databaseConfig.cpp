@@ -39,6 +39,10 @@
 #include "config/valueParser.hpp"
 #include "logger.hpp"
 
+#define BOOST_FILESYSTEM_VERSION 3
+#include <boost/filesystem.hpp>
+#include "miscUtils.hpp"
+
 #include <boost/property_tree/ptree.hpp>
 #include <boost/algorithm/string.hpp>
 
@@ -50,76 +54,73 @@ static const unsigned short DEFAULT_DB_CONNECTIONS = 4;
 namespace _Wolframe	{
 namespace db	{
 
-Configuration::Configuration() : _Wolframe::config::ConfigurationBase( "Database Server" )
+//***  PostgreSQL functions  ********************************************
+PostgreSQLconfig::PostgreSQLconfig() : DatabaseConfigBase( DBTYPE_POSTGRESQL )
 {
 	port = 0;
 	connections = 0;
 	acquireTimeout = 0;
 }
 
-
-void Configuration::print( std::ostream& os ) const
+void PostgreSQLconfig::print( std::ostream& os ) const
 {
-	os << displayName() << std::endl;
+	os << "   PostgreSQL server:" << std::endl;
 	if ( host.empty())
-		os << "   Database host: local unix domain socket" << std::endl;
+		os << "      Database host: local unix domain socket" << std::endl;
 	else
-		os << "   Database host: " << host << ":" << port << std::endl;
-	os << "   Database name: " << (name.empty() ? "(not specified - server user default)" : name) << std::endl;
-	os << "   Database user: " << (user.empty() ? "(not specified - same as server user)" : user)
-		 << ", password: " << (password.empty() ? "(not specified - no password used)" : password) << std::endl;
-	os << "   Database connections: " << connections << std::endl;
-	os << "   Acquire database connection timeout: " << acquireTimeout << std::endl;
+		os << "      Database host: " << host << ":" << port << std::endl;
+	os << "      Database name: " << (name.empty() ? "(not specified - server user default)" : name) << std::endl;
+	os << "      Database user: " << (user.empty() ? "(not specified - same as server user)" : user)
+	   << ", password: " << (password.empty() ? "(not specified - no password used)" : password) << std::endl;
+	os << "      Database connections: " << connections << std::endl;
+	os << "      Acquire database connection timeout: " << acquireTimeout << std::endl;
 }
 
-
-/// Check if the database configuration makes sense
-bool Configuration::check() const
+bool PostgreSQLconfig::check( const std::string& module ) const
 {
 	if ( connections == 0 )	{
-		LOG_ERROR << "Invalid number of connections: " << connections;
+		LOG_ERROR << module << "number of database connections cannot be 0";
 		return false;
 	}
 	return true;
 }
 
-
-bool Configuration::parse( const boost::property_tree::ptree& pt, const std::string& /* nodeName */ )
+bool PostgreSQLconfig::parse( const std::string& module, const boost::property_tree::ptree& pt )
 {
 	using namespace _Wolframe::config;
 	bool retVal = true;
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "host" ))	{
-			if ( !Parser::getValue( displayName().c_str(), *L1it, host ))
+			if ( !Parser::getValue( module.c_str(), *L1it, host ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "port" ))	{
-			if ( !Parser::getValue( displayName().c_str(), *L1it, port, Parser::RangeDomain<unsigned short>( 1 )))
+			if ( !Parser::getValue( module.c_str(), *L1it, port, Parser::RangeDomain<unsigned short>( 1 )))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "name" ))	{
-			if ( !Parser::getValue( displayName().c_str(), *L1it, name ))
+			if ( !Parser::getValue( module.c_str(), *L1it, name ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "user" ))	{
-			if ( !Parser::getValue( displayName().c_str(), *L1it, user ))
+			if ( !Parser::getValue( module.c_str(), *L1it, user ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "password" ))	{
-			if ( !Parser::getValue( displayName().c_str(), *L1it, password ))
+			if ( !Parser::getValue( module.c_str(), *L1it, password ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "connections" ))	{
-			if ( !Parser::getValue( displayName().c_str(), *L1it, connections ))
+			if ( !Parser::getValue( module.c_str(), *L1it, connections ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "acquireTimeout" ))	{
-			if ( !Parser::getValue( displayName().c_str(), *L1it, acquireTimeout ))
+			if ( !Parser::getValue( module.c_str(), *L1it, acquireTimeout ))
 				retVal = false;
 		}
 		else	{
-			LOG_WARNING << displayName() << ": unknown configuration option: <"
+			LOG_WARNING << module << ": unknown configuration option: <"
 				    << L1it->first << ">";
 		}
 	}
@@ -127,6 +128,150 @@ bool Configuration::parse( const boost::property_tree::ptree& pt, const std::str
 		connections = DEFAULT_DB_CONNECTIONS;
 
 	return retVal;
+}
+
+//***  SQLite functions  ************************************************
+SQLiteConfig::SQLiteConfig() : DatabaseConfigBase( DBTYPE_SQLITE )
+{
+	flag = false;
+}
+
+void SQLiteConfig::print( std::ostream& os ) const
+{
+	os << "   SQLite database:" << std::endl;
+	os << "      Filename: " << filename << std::endl;
+	os << "      Flags: " << (flag ? "True Flag" : "False Flag");
+}
+
+bool SQLiteConfig::check( const std::string& module ) const
+{
+	if ( filename.empty() )	{
+		LOG_ERROR << module << "SQLite database filename cannot be empty";
+		return false;
+	}
+	return true;
+}
+
+bool SQLiteConfig::parse( const std::string& module, const boost::property_tree::ptree& pt )
+{
+	using namespace _Wolframe::config;
+	bool retVal = true;
+
+	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
+		if ( boost::algorithm::iequals( L1it->first, "filename" ))	{
+			if ( !Parser::getValue( module.c_str(), *L1it, filename ))
+				retVal = false;
+			if ( ! boost::filesystem::path( filename ).is_absolute() )
+				LOG_WARNING << module << ": database file path is not absolute: "
+					    << filename;
+		}
+		else if ( boost::algorithm::iequals( L1it->first, "flag" ))	{
+			if ( !Parser::getValue( module.c_str(), *L1it, flag, Parser::BoolDomain() ))
+				retVal = false;
+		}
+		else	{
+			LOG_WARNING << module << ": unknown configuration option: '"
+				    << L1it->first << "'";
+		}
+	}
+	return retVal;
+}
+
+void SQLiteConfig::setCanonicalPathes( const std::string& refPath )
+{
+	using namespace boost::filesystem;
+
+	if ( ! filename.empty() )	{
+		if ( ! path( filename ).is_absolute() )
+			filename = resolvePath( absolute( filename,
+							  path( refPath ).branch_path()).string());
+		else
+			filename = resolvePath( filename );
+	}
+}
+
+
+//***  Generic database functions  **************************************
+void Configuration::print( std::ostream& os ) const
+{
+	os << displayName() << std::endl;
+	for ( std::list<DatabaseConfigBase*>::const_iterator it = dbConfig_.begin();
+								it != dbConfig_.end(); it++ )	{
+		(*it)->print( os );
+	}
+}
+
+
+/// Check if the database configuration makes sense
+bool Configuration::check() const
+{
+	bool correct = true;
+	for ( std::list<DatabaseConfigBase*>::const_iterator it = dbConfig_.begin();
+								it != dbConfig_.end(); it++ )	{
+		if ( !(*it)->check( displayName() ))
+			correct = false;
+	}
+	return correct;
+}
+
+
+bool Configuration::parse( const boost::property_tree::ptree& pt, const std::string& /* nodeName */ )
+{
+	using namespace _Wolframe::config;
+	bool retVal = true;
+	DatabaseType type = DBTYPE_UNKNOWN;
+
+	enum { NofDBtypes = 2 };
+	static const char* DBtypesEnum[ NofDBtypes ] = { "PostgreSQL", "SQLite"	};
+	Parser::EnumDomain DBtypesDomain( NofDBtypes, DBtypesEnum );
+
+	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
+		if ( boost::algorithm::iequals( L1it->first, "type" ))	{
+			if ( !Parser::getValue( displayName().c_str(), *L1it, type, DBtypesDomain ))
+				retVal = false;
+		}
+		else if ( boost::algorithm::iequals( L1it->first, "server" ))	{
+			switch ( type )	{
+			case DBTYPE_POSTGRESQL:	{
+				PostgreSQLconfig* cfg = new PostgreSQLconfig();
+				if ( cfg->parse( displayName(), L1it->second ))
+					dbConfig_.push_back( cfg );
+				else	{
+					delete cfg;
+					retVal = false;
+				}
+				break;
+			}
+			case DBTYPE_SQLITE:	{
+				SQLiteConfig* cfg = new SQLiteConfig();
+				if ( cfg->parse( displayName(), L1it->second ))
+					dbConfig_.push_back( cfg );
+				else	{
+					retVal = false;
+					delete cfg;
+				}
+				break;
+			}
+			case DBTYPE_UNKNOWN:
+				LOG_ERROR << displayName() << "database type must be defined first";
+				retVal = false;
+				break;
+			}
+		}
+		else	{
+			LOG_WARNING << displayName() << ": unknown configuration option: <"
+				    << L1it->first << ">";
+		}
+	}
+	return retVal;
+}
+
+void Configuration::setCanonicalPathes( const std::string& refPath )
+{
+	for ( std::list<DatabaseConfigBase*>::const_iterator it = dbConfig_.begin();
+								it != dbConfig_.end(); it++ )	{
+		(*it)->setCanonicalPathes( refPath );
+	}
 }
 
 }} // namespace _Wolframe::db

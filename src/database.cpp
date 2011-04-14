@@ -38,15 +38,32 @@
 #include "standardConfigs.hpp"
 #include "logger.hpp"
 
+#include <boost/algorithm/string.hpp>
+
 namespace _Wolframe	{
 namespace db	{
 
-Database::Database( Configuration& config )
+Database::Database( Configuration& /* config */ )
 {
-	LOG_TRACE << "Database object created :P";
-	LOG_TRACE << "    host: " << config.host << ":" << config.port;
-	LOG_TRACE << "    database: " << config.name;
-	LOG_TRACE << "    credentials: " << config.user << " / " << config.password;
+	LOG_TRACE << "Database object created";
+}
+
+DatabaseType Database::strToType( const char *str )
+{
+	if ( boost::algorithm::iequals( str, "PostgreSQL" ))	return DBTYPE_POSTGRESQL;
+	else if ( boost::algorithm::iequals( str, "SQLite" ))	return DBTYPE_SQLITE;
+	else return DBTYPE_UNKNOWN;
+}
+
+std::string& Database::typeToStr( DatabaseType type )
+{
+	static std::string	retVal[ 3 ] = { "PostgreSQL", "SQLite", "UNKNOWN" };
+	switch ( type )	{
+	case DBTYPE_POSTGRESQL:	return retVal[0];
+	case DBTYPE_SQLITE:	return retVal[1];
+	case DBTYPE_UNKNOWN:
+	default:		return retVal[2];
+	}
 }
 
 }} // namespace _Wolframe::db

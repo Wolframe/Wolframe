@@ -34,10 +34,12 @@
 // database.hpp - Wolframe base database class
 //
 
-#include "configurationBase.hpp"
-
 #ifndef _DATABASE_HPP_INCLUDED
 #define _DATABASE_HPP_INCLUDED
+
+#include <list>
+
+#include "configurationBase.hpp"
 
 namespace _Wolframe	{
 namespace db	{
@@ -45,38 +47,79 @@ namespace db	{
 /// database type
 enum DatabaseType	{
 	DBTYPE_POSTGRESQL,
-	DBTYPE_SQLITE
+	DBTYPE_SQLITE,
+	DBTYPE_UNKNOWN
 };
+
+struct	DatabaseConfigBase
+{
+	const DatabaseType	type;
+public:
+	DatabaseConfigBase( DatabaseType Type )	: type( Type )	{}
+//	virtual ~DatabaseConfigBase();
+
+	virtual bool parse( const std::string& module, const boost::property_tree::ptree& pt ) = 0;
+	virtual bool check( const std::string& module ) const = 0;
+	virtual void print( std::ostream& os ) const = 0;
+	virtual void setCanonicalPathes( const std::string& /* referencePath */ )	{}
+};
+
+
+struct	PostgreSQLconfig : public DatabaseConfigBase
+{
+	std::string	host;
+	unsigned short	port;
+	std::string	name;
+	std::string	user;
+	std::string	password;
+	unsigned short	connections;
+	unsigned short	acquireTimeout;
+public:
+	PostgreSQLconfig();
+	bool parse( const std::string& module, const boost::property_tree::ptree& pt );
+	bool check( const std::string& module ) const;
+	void print( std::ostream& os ) const;
+};
+
+struct	SQLiteConfig : public DatabaseConfigBase
+{
+
+	std::string	filename;
+	bool		flag;
+public:
+	SQLiteConfig();
+	bool parse( const std::string& module, const boost::property_tree::ptree& pt );
+	bool check( const std::string& module ) const;
+	void print( std::ostream& os ) const;
+	virtual void setCanonicalPathes( const std::string& referencePath );
+};
+
 
 /// database configuration
 struct Configuration : public _Wolframe::config::ConfigurationBase
 {
 public:
-	DatabaseType		type;
-	std::string		host;
-	unsigned short		port;
-	std::string		name;
-	std::string		user;
-	std::string		password;
-	unsigned short		connections;
-	unsigned short		acquireTimeout;
+	std::list<DatabaseConfigBase*>	dbConfig_;
 
 	/// constructor
-	Configuration();
+	Configuration() : _Wolframe::config::ConfigurationBase( "Database Server" )	{}
 
 	/// methods
 	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 	bool check() const;
 	void print( std::ostream& os ) const;
+	virtual void setCanonicalPathes( const std::string& referencePath );
 
-	//			Not implemented yet, inherited from base for the time being
-	//			bool test() const;
+//	Not implemented yet, inherited from base for the time being
+//	bool test() const;
 };
 
 /// database base class
 class Database	{
 public:
 	Database( Configuration& config );
+	static DatabaseType strToType( const char *str );
+	static std::string& typeToStr( DatabaseType type );
 };
 
 }} // namespace _Wolframe::db

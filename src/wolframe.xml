@@ -107,16 +107,23 @@ Project Wolframe.
 
 	<!--	Database configuration -->
 	<database>
-		<host>localhost</host>		<!--	Database host. Uses the unix socket if not defined -->
-		<port>5432</port>		<!--	Database port. Uses the default port if not defined -->
-		<name>wolframe</name>		<!--	Database name -->
-		<user>wolframe</user>		<!--	Database user -->
-		<password>blabla</password>	<!--	Password for the database user -->
-		<connections>5</connections>	<!--	number of parallel connections to the database
-							Default is 4 -->
-		<acquireTimeout>10</acquireTimeout><!--	maximum allowed time to acquire a database connection -->
+		<type>SQLite</type>
+		<server>
+			<filename>localhost</filename>
+			<flag>On</flag>
+		</server>
+<!--		<type>PostgreSQL</type>
+		<server>
+			<host>localhost</host>
+			<port>5432</port>
+			<name>wolframe</name>
+			<user>wolframe</user>
+			<password>blabla</password>
+			<connections>5</connections>
+			<acquireTimeout>10</acquireTimeout>
+		</server>
+-->
 	</database>
-
 
 	<!--	Logging parameters -->
 	<logging>

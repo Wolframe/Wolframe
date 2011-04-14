@@ -94,7 +94,7 @@ bool ServiceBanner::parse( const boost::property_tree::ptree& pt, const std::str
 			return false;
 		tokens_ = strToToken( val );
 		if ( tokens_ == UNDEFINED )	{
-			LOG_FATAL << displayName() << ": Unknown option '" << val << "' for " << node;
+			LOG_ERROR << displayName() << ": Unknown option '" << val << "' for " << node;
 			return false;
 		}
 /* // end of substituted code */

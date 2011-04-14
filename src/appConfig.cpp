@@ -124,12 +124,7 @@ bool ApplicationConfiguration::parse ( const char *filename, ConfigFileType type
 		case CONFIG_INFO:
 			read_info( filename, pt );
 			forced_ = true;
-			if ( plausibleConfig( pt ) )
-				type_ = CONFIG_INFO;
-			else	{
-				LOG_FATAL << "Configuration file is probably not INFO (" << filename << ")";
-				return false;
-			}
+			type_ = CONFIG_INFO;
 			break;
 		case CONFIG_XML:
 			read_xml( filename, pt, boost::property_tree::xml_parser::no_comments |
@@ -157,7 +152,7 @@ bool ApplicationConfiguration::parse ( const char *filename, ConfigFileType type
 					if ( plausibleConfig( pt ) )
 						type_ = CONFIG_INFO;
 					else	{
-						LOG_FATAL << "Cannot guess configuration file type: " << filename;
+						LOG_FATAL << "Cannot guess configuration file type or invalid XML: " << filename;
 						return false;
 					}
 				}
@@ -195,7 +190,7 @@ bool ApplicationConfiguration::parse ( const char *filename, ConfigFileType type
 		return retVal;
 	}
 	catch( std::exception& e )	{
-		LOG_FATAL << "Parsing configuration: " << e.what();
+		LOG_ERROR << "Parsing configuration: " << e.what();
 		return false;
 	}
 }
