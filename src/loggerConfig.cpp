@@ -163,8 +163,8 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 					stderrLogLevel = lvl;
 				}
 				else	{
-					LOG_WARNING << displayName() << ": stderr: unknown configuration option: <"
-							<< L2it->first << ">";
+					LOG_WARNING << displayName() << ": stderr: unknown configuration option: '"
+							<< L2it->first << "'";
 //					return false;
 				}
 			}
@@ -211,8 +211,8 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 						LOG_WARNING << displayName() << ": log file is not absolute: " << logFile;
 				}
 				else	{
-					LOG_WARNING << displayName() << ": logfile: unknown configuration option: <"
-							<< L2it->first << ">";
+					LOG_WARNING << displayName() << ": logfile: unknown configuration option: '"
+							<< L2it->first << "'";
 //					return false;
 				}
 			}
@@ -273,8 +273,8 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 					syslogIdent = ident;
 				}
 				else	{
-					LOG_WARNING << displayName() << ": syslog: unknown configuration option: <"
-							<< L2it->first << ">";
+					LOG_WARNING << displayName() << ": syslog: unknown configuration option: '"
+							<< L2it->first << "'";
 //					return false;
 				}
 			}
@@ -338,8 +338,8 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 					eventlogSource = eSource;
 				}
 				else	{
-					LOG_WARNING << displayName() << ": syslog: unknown configuration option: <"
-							<< L2it->first << ">";
+					LOG_WARNING << displayName() << ": syslog: unknown configuration option: '"
+							<< L2it->first << "'";
 //					return false;
 				}
 			}
@@ -347,7 +347,7 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 #endif	// defined( _WIN32 )
 		// unknown log method
 		else	{
-			LOG_WARNING << displayName() << ": unknown configuration option: <" << L1it->first << ">";
+			LOG_WARNING << displayName() << ": unknown configuration option: '" << L1it->first << "'";
 //			return false;
 		}
 	}

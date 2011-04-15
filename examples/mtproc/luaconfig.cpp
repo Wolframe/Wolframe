@@ -91,7 +91,7 @@ bool LuaConfiguration::parse( const boost::property_tree::ptree& parentNode, con
 		}
 		else
 		{
-			LOG_WARNING << displayName() << ": unknown configuration option: <" << it->first << ">";
+			LOG_WARNING << displayName() << ": unknown configuration option: '" << it->first << "'";
 			return false;
 		}
 	}

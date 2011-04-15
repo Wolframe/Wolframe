@@ -41,8 +41,8 @@ bool pEchoConfiguration::parse( const boost::property_tree::ptree& pt, const std
 				return false;
 		}
 		else	{
-			LOG_WARNING << displayName() << ": unknown configuration option: <"
-				    << L1it->first << ">";
+			LOG_WARNING << displayName() << ": unknown configuration option: '"
+				    << L1it->first << "'";
 //			return false;
 		}
 	}

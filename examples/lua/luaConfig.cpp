@@ -117,8 +117,8 @@ bool LuaConfiguration::parse( const boost::property_tree::ptree& pt, const std::
 				return false;
 			preload_libs.push_back( preload_lib );
 		} else {
-			LOG_WARNING << displayName() << ": unknown configuration option: <"
-				    << L1it->first << ">";
+			LOG_WARNING << displayName() << ": unknown configuration option: '"
+				    << L1it->first << "'";
 			return false;
 		}
 	}

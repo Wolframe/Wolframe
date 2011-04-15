@@ -259,7 +259,7 @@ public:
 			{
 				if (*isDefined)
 				{
-					LOG_ERROR << loggingScope(module) << "duplicate definition of configuration element <" << name << ">";
+					LOG_ERROR << loggingScope(module) << "duplicate definition of configuration element '" << name << "'";
 					return false;
 				}
 			}
@@ -269,17 +269,17 @@ public:
 				if (isDefined) *isDefined = true;
 				return true;
 			}
-			LOG_ERROR << loggingScope(module) << "invalid value '" << token << "'for configuration element <" << name << "> (" << errorExplanation << ")";
+			LOG_ERROR << loggingScope(module) << "invalid value '" << token << "'for configuration element '" << name << "' (" << errorExplanation << ")";
 			return false;
 		}
 		catch (bad_alloc)
 		{
-			LOG_ERROR << loggingScope(module) << "out of memory when parsing configuration element <" << name << ">";
+			LOG_ERROR << loggingScope(module) << "out of memory when parsing configuration element '" << name << "'";
 			return false;
 		}
 		catch (exception e)
 		{
-			LOG_ERROR << loggingScope(module) << "illegal value for configuration element <" << name << "> (" << e.what() << ")";
+			LOG_ERROR << loggingScope(module) << "illegal value for configuration element '" << name << "' (" << e.what() << ")";
 			return false;
 		}
 	}
@@ -318,19 +318,19 @@ public:
 		{
 			if (decl.second.begin() != decl.second.end())
 			{
-				LOG_ERROR << loggingScope(module) << "atomic value expected for configuration element <" << decl.first.c_str() << ">";
+				LOG_ERROR << loggingScope(module) << "atomic value expected for configuration element '" << decl.first.c_str() << "'";
 				return false;
 			}
 			return getValue( module, decl.first.c_str(), decl.second.get_value<std::string>(), value, domain, isDefined);
 		}
 		catch (boost::property_tree::ptree_bad_data)
 		{
-			LOG_ERROR << loggingScope(module) << "illegal value for configuration element <" << decl.first.c_str() << ">";
+			LOG_ERROR << loggingScope(module) << "illegal value for configuration element '" << decl.first.c_str() << "'";
 			return false;
 		}
 		catch (std::bad_alloc)
 		{
-			LOG_ERROR << loggingScope(module) << "out of memory when parsing configuration element <" << decl.first.c_str() << ">";
+			LOG_ERROR << loggingScope(module) << "out of memory when parsing configuration element '" << decl.first.c_str() << "'";
 			return false;
 		};
 	}

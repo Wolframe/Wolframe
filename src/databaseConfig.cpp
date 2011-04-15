@@ -127,8 +127,8 @@ bool PostgreSQLconfig::parse( const std::string& module, const boost::property_t
 				retVal = false;
 		}
 		else	{
-			LOG_WARNING << module << ": unknown configuration option: <"
-				    << L1it->first << ">";
+			LOG_WARNING << module << ": unknown configuration option: '"
+				    << L1it->first << "'";
 		}
 	}
 	if ( connections == 0 )
@@ -267,8 +267,8 @@ bool Configuration::parse( const boost::property_tree::ptree& pt, const std::str
 			}
 		}
 		else	{
-			LOG_WARNING << displayName() << ": unknown configuration option: <"
-				    << L1it->first << ">";
+			LOG_WARNING << displayName() << ": unknown configuration option: '"
+				    << L1it->first << "'";
 		}
 	}
 	return retVal;
