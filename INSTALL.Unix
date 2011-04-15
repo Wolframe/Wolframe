@@ -140,8 +140,9 @@ When rebuilding the SVG images of the documentation you also need 'dia'.
 Ubuntu 10.10 Server
 -------------------
 
-Optional packages: libssl-dev, liblua5.1-dev, libqt4-dev, libgtest-dev (1.5),
-                   libpam-dev
+Optional packages: libssl-dev, liblua5.1-dev, libqt4-dev (4.7.0),
+                   libgtest-dev (1.5), libpam-dev (1.1.1), libsasl2-dev (2.1.23),
+                   libsqlite3-dev (3.7.2), libpq-dev (8.4.7)
 
 libboost-dev is 1.42, only missing some new filesystem stuff, but you'll have to
 compile your own one.
