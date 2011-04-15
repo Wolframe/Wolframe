@@ -96,6 +96,14 @@
 #PAM_LIB_DIR = $(PAM_DIR)/lib
 #PAM_LIBS = -lpam
 
+# Cyrus SASL2
+#############
+
+#SASL_DIR = /home/user/cyrus-sasl
+#SASL_INCLUDE_DIR = $(SASL_DIR)/include
+#SASL_LIB_DIR = $(SASL_DIR)/lib
+#SASL_LIBS = -lsasl2
+
 # Sqlite 3
 ##########
 

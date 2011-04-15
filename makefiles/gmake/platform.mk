@@ -559,7 +559,7 @@ endif
 endif
 endif
 
-# Curys SASL2
+# Cyrus SASL2
 #############
 
 ifeq ($(WITH_SASL),1)
