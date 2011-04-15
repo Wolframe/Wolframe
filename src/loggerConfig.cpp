@@ -52,9 +52,7 @@
 namespace _Wolframe	{
 namespace log	{
 
-
-LoggerConfiguration::LoggerConfiguration()
-	: ConfigurationBase( "Logging" )
+LoggerConfiguration::LoggerConfiguration() : ConfigurationBase( "Logging" )
 {
 	logToStderr = false;
 	stderrLogLevel = log::LogLevel::LOGLEVEL_UNDEFINED;
@@ -196,19 +194,14 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 					logFileLogLevel = lvl;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "filename" ))	{
-					if ( ! logFile.empty() )	{
-						LOG_ERROR << displayName() << ": log file already defined. Second value: "
-								<< L2it->second.get_value<std::string>();
-						return false;
+					bool isDefined = ( ! logFile.empty());
+					if ( ! config::Parser::getValue( displayName().c_str(), *L2it, logFile, &isDefined ))
+						retVal = false;
+					else	{
+						if ( ! boost::filesystem::path( logFile ).is_absolute() )
+							LOG_WARNING << displayName() << ": log file is not absolute: '"
+								    << logFile <<"'";
 					}
-					std::string fName = L2it->second.get_value<std::string>();
-					if ( fName.empty() )	{
-						LOG_ERROR << displayName() << ": logfile: empty filename";
-						return false;
-					}
-					logFile = fName;
-					if ( ! boost::filesystem::path( logFile ).is_absolute() )
-						LOG_WARNING << displayName() << ": log file is not absolute: " << logFile;
 				}
 				else
 					LOG_WARNING << displayName() << ": logfile: unknown configuration option: '"
@@ -258,17 +251,9 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 					syslogFacility = fclt;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "ident" ))	{
-					if ( ! syslogIdent.empty() )	{
-						LOG_ERROR << displayName() << ": syslog: ident already defined. Second value: "
-								<< L2it->second.get_value<std::string>();
-						return false;
-					}
-					std::string ident = L2it->second.get_value<std::string>();
-					if ( ident.empty() )	{
-						LOG_ERROR << displayName() << ": syslog: empty ident";
-						return false;
-					}
-					syslogIdent = ident;
+					bool isDefined = ( ! syslogIdent.empty());
+					if ( ! config::Parser::getValue( displayName().c_str(), *L2it, syslogIdent, &isDefined ))
+						retVal = false;
 				}
 				else
 					LOG_WARNING << displayName() << ": syslog: unknown configuration option: '"
@@ -308,30 +293,14 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 					eventlogLogLevel = lvl;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "name" ))	{
-					if ( ! eventlogLogName.empty() )	{
-						LOG_ERROR << displayName() << ": eventlog: name already defined. Second value: "
-								<< L2it->second.get_value<std::string>();
-						return false;
-					}
-					std::string eName = L2it->second.get_value<std::string>();
-					if ( eName.empty() )	{
-						LOG_ERROR << displayName() << ": eventlog: empty name";
-						return false;
-					}
-					eventlogLogName = eName;
+					bool isDefined = ( ! eventlogLogName.empty());
+					if ( ! config::Parser::getValue( displayName().c_str(), *L2it, eventlogLogName, &isDefined ))
+						retVal = false;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "source" ))	{
-					if ( ! eventlogSource.empty() )	{
-						LOG_ERROR << displayName() << ": eventlog: source already defined. Second value: "
-								<< L2it->second.get_value<std::string>();
-						return false;
-					}
-					std::string eSource = L2it->second.get_value<std::string>();
-					if ( eSource.empty() )	{
-						LOG_ERROR << displayName() << ": eventlog: empty source";
-						return false;
-					}
-					eventlogSource = eSource;
+					bool isDefined = ( ! eventlogSource.empty());
+					if ( ! config::Parser::getValue( displayName().c_str(), *L2it, eventlogSource, &isDefined ))
+						retVal = false;
 				}
 				else
 					LOG_WARNING << displayName() << ": syslog: unknown configuration option: '"
