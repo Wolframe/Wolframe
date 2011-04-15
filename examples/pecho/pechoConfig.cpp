@@ -3,7 +3,7 @@
 //
 
 #include "handlerConfig.hpp"
-#include "configHelpers.hpp"
+#include "config/valueParser.hpp"
 #include "logger.hpp"
 
 #include <boost/property_tree/ptree.hpp>
@@ -27,29 +27,27 @@ void pEchoConfiguration::print( std::ostream& os ) const
 /// Check if the database configuration makes sense
 bool pEchoConfiguration::check() const
 {
-
 	return true;
 }
 
 
 bool pEchoConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& /* nodeName */ )
 {
+	bool retVal = true;
+
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "idle" ))	{
-			if ( !config::getNonZeroIntValue<unsigned short>( L1it->second, L1it->first,
-										 displayName(), timeout ))
-				return false;
+			if ( !config::Parser::getValue( displayName().c_str(), *L1it, timeout ))
+				retVal = false;
 		}
-		else	{
+		else
 			LOG_WARNING << displayName() << ": unknown configuration option: '"
 				    << L1it->first << "'";
-//			return false;
-		}
 	}
 //	if ( timeout == 0 )
 //		timeout = DEFAULT_TIMEOUT;
 
-	return true;
+	return retVal;
 }
 
 } // namespace _Wolframe

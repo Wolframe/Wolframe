@@ -169,9 +169,11 @@ bool SQLiteConfig::parse( const std::string& module, const boost::property_tree:
 			bool isDefined = ( !filename.empty());
 			if ( !Parser::getValue( module.c_str(), *L1it, filename, &isDefined ))
 				retVal = false;
-			if ( ! boost::filesystem::path( filename ).is_absolute() )
-				LOG_WARNING << module << ": database file path is not absolute: "
-					    << filename;
+			else	{
+				if ( ! boost::filesystem::path( filename ).is_absolute() )
+					LOG_WARNING << module << ": database file path is not absolute: "
+						    << filename;
+			}
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "flag" ))	{
 			if ( !Parser::getValue( module.c_str(), *L1it, flag, Parser::BoolDomain() ))
@@ -266,10 +268,9 @@ bool Configuration::parse( const boost::property_tree::ptree& pt, const std::str
 				break;
 			}
 		}
-		else	{
+		else
 			LOG_WARNING << displayName() << ": unknown configuration option: '"
 				    << L1it->first << "'";
-		}
 	}
 	return retVal;
 }

@@ -111,9 +111,11 @@ bool ServiceConfiguration::parse( const boost::property_tree::ptree& pt,
 				bool isDefined = ( !pidFile.empty());
 				if ( !Parser::getValue( displayName().c_str(), *L1it, pidFile, &isDefined ))
 					retVal = false;
-				if ( ! boost::filesystem::path( pidFile ).is_absolute() )
-					LOG_WARNING << displayName() << ": pid file path is not absolute: "
-						    << pidFile;
+				else	{
+					if ( ! boost::filesystem::path( pidFile ).is_absolute() )
+						LOG_WARNING << displayName() << ": pid file path is not absolute: "
+							    << pidFile;
+				}
 			}
 			else	{
 				LOG_WARNING << displayName() << ": unknown configuration option: '"

@@ -3,7 +3,7 @@
 //
 
 #include "handlerConfig.hpp"
-#include "configHelpers.hpp"
+#include "config/valueParser.hpp"
 #include "logger.hpp"
 
 #define BOOST_FILESYSTEM_VERSION 3
@@ -103,18 +103,23 @@ bool LuaConfiguration::check() const
 
 bool LuaConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& /* nodeName */ )
 {
+	bool retVal = true;
+
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin();
 							L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "script" ))	{
-			if ( ! config::getStringValue( L1it->second, L1it->first, displayName(), script ))
-				return false;
-			if ( ! boost::filesystem::path( script ).is_absolute() )
-				LOG_WARNING << displayName() << ": script file path is not absolute: "
-					    << script;
+			bool isDefined = ( !script.empty());
+			if ( !config::Parser::getValue( displayName().c_str(), *L1it, script, &isDefined ))
+				retVal = false;
+			else	{
+				if ( ! boost::filesystem::path( script ).is_absolute() )
+					LOG_WARNING << displayName() << ": script file path is not absolute: "
+						    << script;
+			}
 		} else if ( boost::algorithm::iequals( L1it->first, "preload_lib" ))	{
 			std::string preload_lib;
-			if ( ! config::getStringValue( L1it->second, L1it->first, displayName(), preload_lib ))
-				return false;
+			if ( !config::Parser::getValue( displayName().c_str(), *L1it, preload_lib ))
+				retVal = false;
 			preload_libs.push_back( preload_lib );
 		} else {
 			LOG_WARNING << displayName() << ": unknown configuration option: '"
@@ -128,10 +133,11 @@ bool LuaConfiguration::parse( const boost::property_tree::ptree& pt, const std::
 
 void LuaConfiguration::setCanonicalPathes( const std::string& refPath )
 {
+	using namespace boost::filesystem;
 	if ( ! script.empty() )	{
-		if ( ! boost::filesystem::path( script ).is_absolute() )
-			script = resolvePath( boost::filesystem::absolute( script,
-							boost::filesystem::path( refPath ).branch_path()).string());
+		if ( ! path( script ).is_absolute() )
+			script = resolvePath( absolute( script,
+							path( refPath ).branch_path()).string());
 		else
 			script = resolvePath( script );
 	}

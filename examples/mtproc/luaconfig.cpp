@@ -36,7 +36,7 @@
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include <ostream>
-#include "configHelpers.hpp"
+#include "config/valueParser.hpp"
 #include "miscUtils.hpp"
 
 extern "C" {
@@ -70,7 +70,8 @@ bool LuaConfiguration::parse( const boost::property_tree::ptree& parentNode, con
 	{
 		if (boost::algorithm::iequals( it->first, "main"))
 		{
-			if (!config::getStringValue( it->second, it->first, displayName(), name)) return false;
+			if ( !config::Parser::getValue( displayName().c_str(), *it, name )) return false;
+
 			if (name.size() == 0)
 			{
 				LOG_ERROR << displayName() << ": empty name for the main script is illegal (configuration option <main>)";
@@ -81,7 +82,7 @@ bool LuaConfiguration::parse( const boost::property_tree::ptree& parentNode, con
 		}
 		else if (boost::algorithm::iequals( it->first, "module"))
 		{
-			if (!config::getStringValue( it->second, it->first, displayName(), name)) return false;
+			if ( !config::Parser::getValue( displayName().c_str(), *it, name )) return false;
 			if (name.size() == 0)
 			{
 				LOG_ERROR << displayName() << ": empty name for a module is illegal (configuration option <module>)";
@@ -92,7 +93,6 @@ bool LuaConfiguration::parse( const boost::property_tree::ptree& parentNode, con
 		else
 		{
 			LOG_WARNING << displayName() << ": unknown configuration option: '" << it->first << "'";
-			return false;
 		}
 	}
 	if (cnt_main == 0)
