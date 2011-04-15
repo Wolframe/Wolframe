@@ -54,8 +54,8 @@ namespace _Wolframe	{
 	const char*	config::defaultUserConfig()		{ return "~/wolframe.conf"; }
 	const char*	config::defaultLocalConfig()		{ return "./wolframe.conf"; }
 
-	unsigned short	config::defaultTCPport()		{ return 7660; }
-	unsigned short	config::defaultSSLport()		{ return 7960; }
+	unsigned short	net::defaultTCPport()			{ return 7660; }
+	unsigned short	net::defaultSSLport()			{ return 7960; }
 
 	const char*	config::defaultServiceName()		{ return "wolframe"; }
 #if defined( _WIN32 )

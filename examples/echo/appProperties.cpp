@@ -21,8 +21,8 @@ namespace _Wolframe	{
 	const char*	config::defaultUserConfig()		{ return "~/echo.conf"; }
 	const char*	config::defaultLocalConfig()		{ return "./echo.conf"; }
 
-	unsigned short	config::defaultTCPport()		{ return 7660; }
-	unsigned short	config::defaultSSLport()		{ return 7960; }
+	unsigned short	net::defaultTCPport()			{ return 7660; }
+	unsigned short	net::defaultSSLport()			{ return 7960; }
 
 	const char*	config::defaultServiceName()		{ return "wolframe-echo"; }
 #if defined( _WIN32 )

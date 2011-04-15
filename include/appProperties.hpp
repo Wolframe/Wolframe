@@ -50,16 +50,17 @@ namespace config	{
 	const char*	defaultUserConfig();
 	const char*	defaultLocalConfig();
 
-	unsigned short	defaultTCPport();
-	unsigned short	defaultSSLport();
-
 	const char*	defaultServiceName();
 	#if defined( _WIN32 )
 	const char*	defaultServiceDisplayName();
 	const char*	defaultServiceDescription();
 	#endif // defined( _WIN32 )
-
 } // namespace config
+
+namespace net	{
+	unsigned short	defaultTCPport();
+	unsigned short	defaultSSLport();
+} // namespace net
 } // namespace _Wolframe
 
 #endif // _APP_PROPERTIES_HPP_INCLUDED
