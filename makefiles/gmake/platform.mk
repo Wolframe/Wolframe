@@ -513,6 +513,13 @@ PAM_LIB_DIR ?= /lib
 PAM_LIBS ?= -lpam
 endif
 
+ifeq "$(LINUX_DIST)" "slackware"
+PAM_DIR ?= NOT SUPPLIED ON THIS PLATFORM
+PAM_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
+PAM_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
+PAM_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
+endif
+
 # Ubuntu 10.04 TLS, 10.10, Debian 5.0
 ifeq "$(LINUX_DIST)" "debian"
 ifeq "$(LINUX_REV)" "squeeze/sid"
@@ -567,6 +574,13 @@ ifeq ($(WITH_SASL),1)
 ifeq "$(PLATFORM)" "LINUX"
 
 ifeq "$(LINUX_DIST)" "arch"
+SASL_DIR ?= /usr
+SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
+SASL_LIB_DIR ?= $(SASL_DIR)/lib
+SASL_LIBS ?= -lsasl2
+endif
+
+ifeq "$(LINUX_DIST)" "slackware"
 SASL_DIR ?= /usr
 SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
 SASL_LIB_DIR ?= $(SASL_DIR)/lib
@@ -633,6 +647,13 @@ SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
 SQLITE3_LIBS ?= -lsqlite3
 endif
 
+ifeq "$(LINUX_DIST)" "slackware"
+SQLITE3_DIR ?= /usr
+SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
+SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib  
+SQLITE3_LIBS ?= -lsqlite3
+endif
+
 # Ubuntu 10.04 TLS, 10.10, Debian 5.0
 ifeq "$(LINUX_DIST)" "debian"
 ifeq "$(LINUX_REV)" "squeeze/sid"
@@ -687,6 +708,13 @@ ifeq ($(WITH_PGSQL),1)
 ifeq "$(PLATFORM)" "LINUX"
 
 ifeq "$(LINUX_DIST)" "arch"
+PGSQL_DIR ?= /usr
+PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include
+PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
+PGSQL_LIBS ?= -lpq
+endif
+
+ifeq "$(LINUX_DIST)" "slackware"
 PGSQL_DIR ?= /usr
 PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include
 PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib

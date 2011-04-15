@@ -188,6 +188,9 @@ compile your own one.
 openssl and qt are there (select the correct "disk" sets while installing).
 gtest and lua are missing, compile your own ones.
 
+PAM doesn't exist on Slackware it may be build manually.
+Postgresql doesn't exist on Slackware, build your own one.
+
 Archlinux
 ---------
 
