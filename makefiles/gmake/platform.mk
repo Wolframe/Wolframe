@@ -609,6 +609,13 @@ endif
 
 endif
 
+ifeq "$(LINUX_DIST)" "suse"
+SASL_DIR ?= /usr
+SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
+SASL_LIB_DIR ?= $(SASL_DIR)/lib
+SASL_LIBS ?= -lsasl2
+endif
+
 endif
 endif
 
@@ -662,6 +669,13 @@ endif
 
 endif
 
+ifeq "$(LINUX_DIST)" "suse"
+SQLITE3_DIR ?= /usr
+SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
+SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
+SQLITE3_LIBS ?= -lsqlite3
+endif
+
 endif
 endif
 
@@ -713,6 +727,13 @@ PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
 PGSQL_LIBS ?= -lpq
 endif
 
+endif
+
+ifeq "$(LINUX_DIST)" "suse"
+PGSQL_DIR ?= /usr
+PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include
+PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
+PGSQL_LIBS ?= -lpq
 endif
 
 endif
