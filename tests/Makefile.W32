@@ -62,7 +62,6 @@ TEST_CPP_BINS = \
 	versionTest.exe \
 	counterTest.exe \
 	resolvePathTest.exe \
-	configHelpersTest.exe \
 	singletonTest.exe \
 	poolTest.exe \
 	logTest.exe \
@@ -86,7 +85,6 @@ testNamedRetVal.exe: testNamedRetVal.obj
 versionTest.exe: versionTest.obj $(TOPDIR)\src\wolframe.lib
 counterTest.exe: counterTest.obj $(TOPDIR)\src\wolframe.lib
 resolvePathTest.exe: resolvePathTest.obj $(TOPDIR)\src\wolframe.lib
-configHelpersTest.exe: configHelpersTest.obj $(TOPDIR)\src\wolframe.lib
 singletonTest.exe: singletonTest.obj $(TOPDIR)\src\wolframe.lib
 poolTest.exe: poolTest.obj $(TOPDIR)\src\wolframe.lib
 logTest.exe: logTest.obj $(TOPDIR)\src\wolframe.lib
@@ -115,7 +113,6 @@ local_test:
 	@-echo versionTest >> test.bat
 	@-echo counterTest >> test.bat
 	@-echo resolvePathTest >> test.bat
-	@-echo configHelpersTest >> test.bat
 	@-echo singletonTest >> test.bat
 	@-echo poolTest >> test.bat
 	@-echo protocolArgumentParsing-gTest >> test.bat

@@ -35,7 +35,7 @@
 //
 
 #include "standardConfigs.hpp"
-#include "configHelpers.hpp"
+#include "config/valueParser.hpp"
 #include "miscUtils.hpp"
 #include "logger.hpp"
 
@@ -135,6 +135,8 @@ void LoggerConfiguration::foreground( log::LogLevel::Level debugLevel, bool useC
 
 bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& /* node */ )
 {
+	bool retVal = true;
+
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		// stderr logging
 		if ( boost::algorithm::iequals( L1it->first, "stderr" ))	{
@@ -162,11 +164,9 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 					}
 					stderrLogLevel = lvl;
 				}
-				else	{
+				else
 					LOG_WARNING << displayName() << ": stderr: unknown configuration option: '"
 							<< L2it->first << "'";
-//					return false;
-				}
 			}
 		}
 		// logfile
@@ -210,11 +210,9 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 					if ( ! boost::filesystem::path( logFile ).is_absolute() )
 						LOG_WARNING << displayName() << ": log file is not absolute: " << logFile;
 				}
-				else	{
+				else
 					LOG_WARNING << displayName() << ": logfile: unknown configuration option: '"
 							<< L2it->first << "'";
-//					return false;
-				}
 			}
 		}
 		// syslog
@@ -272,11 +270,9 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 					}
 					syslogIdent = ident;
 				}
-				else	{
+				else
 					LOG_WARNING << displayName() << ": syslog: unknown configuration option: '"
 							<< L2it->first << "'";
-//					return false;
-				}
 			}
 		}
 
@@ -337,30 +333,28 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 					}
 					eventlogSource = eSource;
 				}
-				else	{
+				else
 					LOG_WARNING << displayName() << ": syslog: unknown configuration option: '"
 							<< L2it->first << "'";
-//					return false;
-				}
 			}
 		}
 #endif	// defined( _WIN32 )
 		// unknown log method
-		else	{
+		else
 			LOG_WARNING << displayName() << ": unknown configuration option: '" << L1it->first << "'";
-//			return false;
-		}
 	}
-	return true;
+	return retVal;
 }
 
 
 void LoggerConfiguration::setCanonicalPathes( const std::string& refPath )
 {
+	using namespace boost::filesystem;
+
 	if ( ! logFile.empty() )	{
-		if ( ! boost::filesystem::path( logFile ).is_absolute() )
-			logFile = resolvePath( boost::filesystem::absolute( logFile,
-								boost::filesystem::path( refPath ).branch_path()).string());
+		if ( ! path( logFile ).is_absolute() )
+			logFile = resolvePath( absolute( logFile,
+							 path( refPath ).branch_path()).string());
 		else
 			logFile = resolvePath( logFile );
 	}

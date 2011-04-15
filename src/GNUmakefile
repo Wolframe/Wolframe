@@ -153,7 +153,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	resolvePath.o \
 	commandLine.o \
 	$(LOGGER_OBJS) \
-	configHelpers.o \
 	serviceConfig.o \
 	serviceBanner.o \
 	loggerConfig.o \

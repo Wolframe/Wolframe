@@ -125,7 +125,6 @@ include/appConfig.hpp
 include/appProcessor.hpp
 include/appProperties.hpp
 include/atomicCounter.hpp
-include/configHelpers.hpp
 include/configurationBase.hpp
 include/config/valueParser.hpp
 include/connectionEndpoint.hpp
@@ -177,7 +176,6 @@ src/appProperties.cpp
 src/appSingleton.hpp
 src/commandLine.cpp
 src/commandLine.hpp
-src/configHelpers.cpp
 src/connectionBase.hpp
 src/connection.cpp
 src/connection.hpp
@@ -230,7 +228,6 @@ src/wolframeHandler.cpp
 src/wolframeHandler.hpp
 tests/authTest.cpp
 tests/config/GNUmakefile
-tests/configHelpersTest.cpp
 tests/configValueParser-gTest.cpp
 tests/config/wolframe-posix.conf
 tests/config/wolframe-win.conf

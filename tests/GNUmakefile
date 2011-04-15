@@ -115,7 +115,6 @@ TEST_CPP_BINS += \
 	versionTest$(EXE) \
 	counterTest$(EXE) \
 	resolvePathTest$(EXE) \
-	configHelpersTest$(EXE) \
 	singletonTest$(EXE) \
 	poolTest$(EXE) \
 	logTest$(EXE) \
@@ -164,8 +163,6 @@ ifeq ($(WITH_GTEST),1)
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./counterTest
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./resolvePathTest
-	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./configHelpersTest
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./singletonTest
 	@echo

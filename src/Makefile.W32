@@ -94,7 +94,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	resolvePath.obj \
 	commandLine.obj \
 	$(LOGGER_OBJS) \
-	configHelpers.obj \
 	serviceConfig.obj \
 	serviceBanner.obj \
 	loggerConfig.obj \
