@@ -113,8 +113,9 @@ struct Connection::Private
 		buffer.push_back( '\r');
 		buffer.push_back( '\n');
 		const char* msg = buffer.c_str();
+		unsigned int msgsize = buffer.size();
 		buffer.clear();
-		return net::SendData( msg, ii+2);
+		return net::SendData( msg, msgsize);
 	}
 
 	void passInput()
@@ -193,7 +194,7 @@ struct Connection::Private
 							state = EnterCommand;
 							continue;
 						}
-						case CommandDispatcher::caps:
+						case CommandDispatcher::capa:
 						{
 							state = EnterCommand;
 							return WriteLine( "OK", commandDispatcher.getCapabilities());

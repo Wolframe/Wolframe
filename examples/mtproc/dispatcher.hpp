@@ -45,7 +45,7 @@ namespace mtproc {
 struct CommandDispatcher
 {
 public:
-	enum Command {unknown=-1, empty=0, caps, quit, method};
+	enum Command {unknown=-1, empty=0, capa, quit, method};
 
 private:
 	//exception thrown in case of an illegal state (internal error, must not happen)
@@ -93,7 +93,7 @@ public:
 	//initialize the prcessed data object with all its methods and some default protocol commands
 	void init( Instance* instance)
 	{
-		static const char* cmd[4] = {"","caps","quit", 0};
+		static const char* cmd[4] = {"","capa","quit", 0};
 		init( cmd, instance);
 	}
 

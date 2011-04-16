@@ -39,12 +39,12 @@ OBJS = \
 	appConfigDefinition.o \
 	implementation.o \
 	dispatcher.o \
-	luaconfig.o \
 	mtprocHandler.o \
 	$(TOPDIR)/src/posixMain.o
 
 ifeq ($(WITH_LUA),1)
 OBJS += \
+	luaconfig.o \
 	luatypes.o
 endif
 

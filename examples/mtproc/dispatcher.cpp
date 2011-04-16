@@ -286,7 +286,7 @@ const char* CommandDispatcher::getCapabilities()
 				m_lineBuffer.push_back( ' ');
 			}
 			m_lineBuffer.append( m_instance->m_mt[ii].name);
-			if (m_instance->m_mt[ii].hasIO) m_lineBuffer.push_back( '>');
+			if (m_instance->m_mt[ii].hasIO) m_lineBuffer.append( "[]");
 		}
 	}
 	return m_lineBuffer.c_str();

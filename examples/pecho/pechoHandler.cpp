@@ -185,8 +185,8 @@ struct Connection::Private
 	    case EnterCommand:
 	    {
 		//parsing the command:
-		enum Command {empty, caps, echo, quit};
-		static const char* cmd[5] = {"","caps","echo","quit",0};
+		enum Command {empty, capa, echo, quit};
+		static const char* cmd[5] = {"","capa","echo","quit",0};
 		//... the empty command is for an empty line for not bothering the client with obscure error messages.
 		//    the next state should read one character for sure otherwise it may result in an endless loop
 		static const ProtocolParser parser(cmd);
@@ -198,10 +198,10 @@ struct Connection::Private
 		      state = EmptyLine;
 		      continue;
 		   }
-		   case caps:
+		   case capa:
 		   {
 		      state = EnterCommand;
-		      return WriteLine( "OK caps echo[tolower|toupper] quit");
+		      return WriteLine( "OK capa echo[tolower|toupper] quit");
 		   }
 		   case echo:
 		   {
