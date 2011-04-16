@@ -8,19 +8,35 @@ INCLUDE_CPPFLAGS =
 
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include \
-	-I$(BOOST_INCLUDE_DIR) \
-	-I$(LUA_INCLUDE_DIR)
+	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LDFLAGS = \
-	-L$(BOOST_LIB_DIR) \
-	-L$(LUA_LIB_DIR)
+	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_program_options \
 	-lboost_filesystem \
 	$(TOPDIR)/src/libwolframe.a \
-	$(LUA_LIBS) -ldl
+	-ldl
+
+# lua
+
+ifeq ($(WITH_LUA),1)
+
+INCLUDE_CPPFLAGS += \
+	-DWITH_LUA
+
+INCLUDE_DIRS += \
+	-I$(LUA_INCLUDE_DIR)
+
+INCLUDE_LDFLAGS += \
+	-L$(LUA_LIB_DIR)
+
+INCLUDE_LIBS += \
+	$(LUA_LIBS)
+
+endif
 
 # openssl
 
