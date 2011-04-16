@@ -205,6 +205,8 @@ void SQLiteConfig::setCanonicalPathes( const std::string& refPath )
 void Configuration::print( std::ostream& os ) const
 {
 	os << displayName() << std::endl;
+	if ( dbConfig_.size() > 1 )
+		os << "   Strategy: " << Database::strategyToStr( strategy ) << std::endl;
 	for ( std::list<DatabaseConfigBase*>::const_iterator it = dbConfig_.begin();
 								it != dbConfig_.end(); it++ )	{
 		(*it)->print( os );
@@ -232,12 +234,21 @@ bool Configuration::parse( const boost::property_tree::ptree& pt, const std::str
 	DatabaseType type = DBTYPE_UNKNOWN;
 
 	enum { NofDBtypes = 2 };
-	static const char* DBtypesEnum[ NofDBtypes ] = { "PostgreSQL", "SQLite"	};
+	static const char* DBtypesEnum[ NofDBtypes ] = { "PostgreSQL", "SQLite" };
 	Parser::EnumDomain DBtypesDomain( NofDBtypes, DBtypesEnum );
+
+	enum { NofDBstrategies = 2 };
+	static const char* DBstrategies[ NofDBstrategies ] = { "round-robin", "failover" };
+	Parser::EnumDomain DBstrategyDomain( NofDBstrategies, DBstrategies );
+
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "type" ))	{
 			if ( !Parser::getValue( displayName().c_str(), *L1it, type, DBtypesDomain ))
+				retVal = false;
+		}
+		else if ( boost::algorithm::iequals( L1it->first, "strategy" ))	{
+			if ( !Parser::getValue( displayName().c_str(), *L1it, strategy, DBstrategyDomain ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "server" ))	{
