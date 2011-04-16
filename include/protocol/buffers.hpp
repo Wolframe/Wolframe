@@ -241,7 +241,7 @@ public:
 				{
 					case '\"': m_state = EndToken; break;
 					case '\\': m_state = DQContentEsc; break;
-					default:	m_content->push_back(ch); break;
+					default:   m_content->push_back(ch); break;
 				}
 				break;
 

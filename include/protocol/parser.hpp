@@ -37,6 +37,8 @@ Project Wolframe.
 #ifndef _Wolframe_PROTOCOL_PARSER_HPP_INCLUDED
 #define _Wolframe_PROTOCOL_PARSER_HPP_INCLUDED
 #include <stdexcept>
+#include <boost/cstdint.hpp>
+#include <boost/array.hpp>
 
 namespace _Wolframe {
 namespace protocol {
@@ -117,45 +119,80 @@ public:
 	}
 };
 
-/// \class CmdParser
+/// \class CmdMap
 /// \exception Bad
-/// \brief Parser for ascii protocol commands
-/// \tparam buffer type to use, implementing the STL back insertion sequence interface
-///
-template <typename CmdBufferType>
-class CmdParser :public Parser
+/// \brief implements a map for a fixed set of protocol commands
+struct CmdMap :public boost::array<boost::int_least64_t, 32>
 {
-public:
 	/// \class Bad
 	/// \brief Exception for illegal protocol parser definition (too many commands).
 	///
-	/// \remark The parsers are exception free at processing time. Only add and the operator '[]' for automata construction throw.
+	/// \remark The map is exception free at processing time but not on insert
 	///
-	class Bad :public std::logic_error {public: Bad():std::logic_error("too many elements in CmdParser") {};};
+	class Bad :public std::logic_error {public: Bad():std::logic_error("too many elements in CmdParser") {}};
 
+	CmdMap() :m_size(0) {}
+	CmdMap( const CmdMap& o) :boost::array<boost::int_least64_t, 32>(*this),m_size(o.m_size) {}
+	/// \brief retrieve a defined commands index from the map
+	/// \param val value to retrieve
+	/// \return the index of the command or -1 if not found
+	int get( const value_type& val) const
+	{
+		unsigned int nofMatches = 0;
+		int rt = -1;
+		for (size_type ii=0; ii<m_size; ii++)
+		{
+			if ((*this)[ii] == val)
+			{
+				if (nofMatches == 0) rt = (int)ii;
+				nofMatches++;
+			}
+		}
+		return rt;
+	}
+
+	/// \brief insert a command into the map. Throws an exception if the limit is reached
+	/// \param val value to insert
+	void insert( const value_type& val)
+	{
+		if (m_size == max_size()) throw Bad();
+		(*this)[m_size++] = val;
+	}
+private:
+	size_type m_size;
+};
+
+
+/// \class CmdParser
+/// \exception Bad
+/// \brief Parser for ascii protocol commands
+/// \tparam CmdBufferType buffer type to use, implementing the STL back insertion sequence interface
+/// \tparam CmdMapType map for the commands defined, implementing the STL back insertion sequence interface for adding and a get(value_type) method for matching
+///
+template <typename CmdBufferType, class CmdMapType=CmdMap>
+class CmdParser :public Parser
+{
+public:
 	/// \brief Constructor
 	///
-	CmdParser() :m_size(0){};
+	CmdParser() {}
 
 	/// \brief Destructor
 	///
-	~CmdParser() {};
+	~CmdParser() {}
 
 	/// \brief Copy constructor
 	/// \param [in] o CmdParser to copy
 	///
-	CmdParser( const CmdParser& o) :m_size(o.m_size)
-	{
-		for (unsigned int ii=0; ii<m_size; ii++) m_elem[ii]=o.m_elem[ii];
-	};
+	CmdParser( const CmdParser& o)  :m_cmdmap(o.m_cmdmap) {}
 
 	///
 	/// \brief Reset parser command definitions
 	///
 	void init()
 	{
-		m_size = 0;
-	};
+		m_cmdmap = CmdMapType();
+	}
 
 	///
 	/// \brief Add a command to the protocol parser (case insensitive)
@@ -165,9 +202,8 @@ public:
 	{
 		CmdBufferType ct;
 		for (unsigned int ii=0; cmd[ii]; ii++) ct.push_back(cmd[ii]);
-		if (m_size == MaxNofCommands) throw Bad();
-		m_elem[m_size++] = *ct;
-	};
+		m_cmdmap.insert( *ct);
+	}
 
 	///
 	/// \brief Assignement copy
@@ -175,10 +211,9 @@ public:
 	///
 	CmdParser& operator=( const CmdParser& o)
 	{
-		m_size = o.m_size;
-		for (unsigned int ii=0; ii<m_size; ii++) m_elem[ii]=o.m_elem[ii];
+		m_cmdmap = o.m_cmdmap;
 		return *this;
-	};
+	}
 
 	///
 	/// \brief Constructor
@@ -187,7 +222,7 @@ public:
 	CmdParser( const char** cmd)
 	{
 		for (unsigned int ii=0; cmd[ii]; ii++) add(cmd[ii]);
-	};
+	}
 
 	///
 	/// \brief Defines a command. The index of the command is counted from 0 with one increment per add.
@@ -198,7 +233,7 @@ public:
 	{
 		add( cmd);
 		return *this;
-	};
+	}
 
 	///
 	/// \brief Parse the next command.
@@ -218,29 +253,13 @@ public:
 			++src;
 		}
 		if (src == end) return -1;
-
-		if (*buf == -1)
-		{
-			buf.clear();
-			return -1;
-		}
-		for (unsigned int ii=0; ii<m_size; ii++)
-		{
-			if (m_elem[ii] == *buf)
-			{
-				buf.clear();
-				return (int)ii;
-			}
-		}
+		int rt = m_cmdmap.get(*buf);
 		buf.clear();
-		return -1;
+		return rt;
 	}
   
 private:
-	enum {MaxNofCommands=32};					///< the maximum number commands that can be defined for a command parser
-	typedef typename CmdBufferType::ValueType CmdValueType;		///< value type of a command coded as integer
-	CmdValueType m_elem[ MaxNofCommands];				///< commands of the parser in order of their definition
-	unsigned int m_size;						///< number of commands defined
+	CmdMapType m_cmdmap;						///< commands of the parser
 };
 
 } // namespace protocol
