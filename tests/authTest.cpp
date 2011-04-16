@@ -70,6 +70,7 @@ int main( int argc, const char *argv[] )
 		if( step == Step::_Wolframe_AUTH_STEP_SEND_DATA ) {
 			string token = a->token( );
 			string data = a->sendData( );
+			
 			cout << "S: " << token << " " << data << endl;
 
 // the authenticate needs some specific input from the client
@@ -79,11 +80,15 @@ int main( int argc, const char *argv[] )
 			if( token == "password" ) {
 				string pass = getPassword( );
 				a->receiveData( pass );
+				
+				cout << "C: " << token << " *****" << endl;
 // login name required
 			} else if( token == "login" ) {
 				string login = getLogin( );
 				cout << "login is: " << login << endl;
 				a->receiveData( login );
+
+				cout << "C: " << token << " " << login << endl;
 			} else {
 				cerr << "authenticator requests unknown token '" << token << "'" << endl;
 				return 1;
