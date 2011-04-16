@@ -33,6 +33,20 @@
 //
 // authentication_sasl.cpp
 //
+//  Basic Server model:
+//   1. call sasl_server_init() at startup to load plug-ins
+//   2. On connection, call sasl_server_new()
+//   3. call sasl_listmech() and send list to client]
+//   4. after client AUTH command, call sasl_server_start(), goto 5a
+//   5. call sasl_server_step()
+//   5a. If SASL_CONTINUE, output to client, wait response, repeat 5
+//   5b. If SASL error, then goto 7
+//   5c. If SASL_OK, move on
+//   6. continue with application protocol until connection closes
+//      call sasl_getprop to get username
+//      call sasl_getprop/sasl_encode/sasl_decode() if using security layer
+//   7. call sasl_dispose(), may return to step 2
+//   8. call sasl_done() when program terminates
 
 #include "AAAA/authentication_sasl.hpp"
 
@@ -40,6 +54,7 @@
 #include <boost/thread/thread.hpp>
 
 #include <stdexcept>
+#include <sstream>
 
 #include "sasl/sasl.h"
 
@@ -56,11 +71,13 @@ Authenticator *CreateSaslAuthenticator( AuthenticatorFactory::properties props )
 	);
 }
 
-static int sasl_my_log( void *context, int priority, const char *message )
+static int sasl_my_log( void* /* context */, int priority, const char *message )
 {
 	if( message == NULL ) return SASL_BADPARAM;
 	
 	_Wolframe::log::LogLevel::Level level;
+	
+	std::cout << "SASL log" << priority << ": " << message << std::endl;
 	
 	switch( priority ) {
 		case SASL_LOG_ERR:	level = _Wolframe::log::LogLevel::LOGLEVEL_ERROR; break;
@@ -80,35 +97,22 @@ SaslAuthenticator::SaslAuthenticator( const std::string appName, const std::stri
 	  m_service( service )
 {
 // register callbacks
-	callbacks[0].id = SASL_CB_LOG;
-	callbacks[0].proc = (int (*)( ))&sasl_my_log;
-	callbacks[0].context = this;
-	callbacks[1].id = SASL_CB_LIST_END;
-	callbacks[1].proc = NULL;
-	callbacks[1].context = NULL;
+	m_callbacks[0].id = SASL_CB_LOG;
+	m_callbacks[0].proc = (int (*)( ))&sasl_my_log;
+	m_callbacks[0].context = this;
+	m_callbacks[1].id = SASL_CB_LIST_END;
+	m_callbacks[1].proc = NULL;
+	m_callbacks[1].context = NULL;
 
 // initialize the SASL library
-	int result = sasl_server_init( callbacks, "test" );
+	int result = sasl_server_init( m_callbacks, "test" );
 	if( result != SASL_OK ) {
-		throw new std::runtime_error( "Failed to initialize libsasl" );
+		std::ostringstream ss;
+		ss << "Failed to initialize libsasl: " << sasl_errstring( result, NULL, NULL ) << "(" << result << ")";
+		throw new std::runtime_error( ss.str( ) );
 	}
 
-// create authentication session (TODO: must be outside constructor and callable from outside!)
-/*
-	result = sasl_server_new( m_service,
-	
-			   localdomain,
-			   userdomain,
-			   iplocal,
-			   ipremote,
-			   NULL,
-			   serverlast,
-			   &conn);
-  if (result != SASL_OK)
-    saslfail(result, "Allocating sasl connection state", NULL);
-  
-*/	
-	m_state = _Wolframe_SASL_STATE_NEED_LOGIN;
+	m_state = _Wolframe_SASL_STATE_NEW;
 }
 
 SaslAuthenticator::~SaslAuthenticator( )
@@ -118,7 +122,57 @@ SaslAuthenticator::~SaslAuthenticator( )
 
 Step::AuthStep SaslAuthenticator::nextStep( )
 {
+	int result;
+	const char *mechs;
+	unsigned int len_mechs;
+	int nof_mechs;
+	
 	switch( m_state ) {
+		case _Wolframe_SASL_STATE_NEW:
+// create authentication session
+			result = sasl_server_new( m_service.c_str( ),
+				NULL,	// localdomain
+				NULL,	// userdomain
+				NULL,	// iplocal
+				NULL,	// ipremote
+				NULL,	// per connection callbacks
+				0,	// flags (SASL_SUCCESS_DATA)
+				&m_connection );
+			if( result != SASL_OK ) {
+				std::ostringstream ss;
+				ss	<< "Failed to allocate SASL connection state: " << sasl_errstring( result, NULL, NULL )
+					<< "(" << result << "), " << sasl_errdetail( m_connection );
+				m_error = ss.str( );
+				m_state = _Wolframe_SASL_STATE_ERROR;
+				return Step::_Wolframe_AUTH_STEP_GET_ERROR;
+			}
+
+// get list of available SASL mechs, go into negiotation
+			result = sasl_listmech(
+				m_connection,
+				NULL,		// ext_authid
+				NULL,		// prefix of result
+				" ",		// separator of mechs
+				NULL,		// suffix of result
+				&mechs,		// list of mechs
+				&len_mechs,	// length of mech string
+				&nof_mechs );	// number of mechs
+			if( result != SASL_OK ) {
+				std::ostringstream ss;
+				ss	<< "Generating list of SASL mechs failed" << sasl_errstring( result, NULL, NULL )
+					<< "(" << result << "), " << sasl_errdetail( m_connection );
+				m_error = ss.str( );
+				m_state = _Wolframe_SASL_STATE_ERROR;
+				return Step::_Wolframe_AUTH_STEP_GET_ERROR;
+			}
+			m_token = "SASL_mechs";
+			m_data = std::string( mechs );
+			m_state = _Wolframe_SASL_STATE_NEGOTIATE_MECHS;
+			return Step::_Wolframe_AUTH_STEP_SEND_DATA;
+		
+		case _Wolframe_SASL_STATE_NEGOTIATE_MECHS:
+			return Step::_Wolframe_AUTH_STEP_FAIL;
+			
 		case _Wolframe_SASL_STATE_NEED_LOGIN:
 			m_token = "login";
 			return Step::_Wolframe_AUTH_STEP_RECV_DATA;
@@ -153,7 +207,7 @@ FAIL:
 // never used
 std::string SaslAuthenticator::sendData( )
 {
-	return 0;
+	return m_data;
 }
 
 std::string SaslAuthenticator::token( )

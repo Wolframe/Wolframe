@@ -60,7 +60,8 @@ public:
 		_Wolframe_AUTH_STEP_FAIL,		/// authentication failed
 		_Wolframe_AUTH_STEP_SEND_DATA,		/// we need to send some data
 		_Wolframe_AUTH_STEP_RECV_DATA,		/// we require some data
-		_Wolframe_AUTH_STEP_GET_ERROR		/// error occurred
+		_Wolframe_AUTH_STEP_GET_ERROR,		/// error occurred
+		_Wolframe_AUTH_STEP_NEXT		/// call next step
 	};
 };
 

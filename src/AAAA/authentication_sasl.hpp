@@ -49,16 +49,22 @@ namespace AAAA {
 class SaslAuthenticator : public Authenticator {
 	private:
 		enum {
+			_Wolframe_SASL_STATE_NEW,
+			_Wolframe_SASL_STATE_NEGOTIATE_MECHS,
 			_Wolframe_SASL_STATE_NEED_LOGIN,
 			_Wolframe_SASL_STATE_NEED_PASS,
-			_Wolframe_SASL_STATE_COMPUTE
+			_Wolframe_SASL_STATE_COMPUTE,
+			_Wolframe_SASL_STATE_ERROR
 		} m_state;
 
-		sasl_callback_t callbacks[2];
+		sasl_callback_t m_callbacks[2];
+		sasl_conn_t *m_connection;
 
 		std::string m_appName;
 		std::string m_service;
 		
+		std::string m_error;
+		std::string m_data;
 		std::string m_token;
 		std::string m_login;
 		std::string m_pass;

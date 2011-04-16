@@ -70,6 +70,7 @@ int main( int argc, const char *argv[] )
 		if( step == Step::_Wolframe_AUTH_STEP_SEND_DATA ) {
 			string token = a->token( );
 			string data = a->sendData( );
+			cout << "S: " << token << " " << data << endl;
 
 // the authenticate needs some specific input from the client
 		} else if( step == Step::_Wolframe_AUTH_STEP_RECV_DATA ) {
@@ -91,6 +92,8 @@ int main( int argc, const char *argv[] )
 // an error occurred, get error message and print it
 		} else if( step == Step::_Wolframe_AUTH_STEP_GET_ERROR ) {
 			cerr << "ERROR: " << a->getError( ) << endl;
+		} else if( step == Step::_Wolframe_AUTH_STEP_NEXT ) {
+			// call next step only, nothing special to do
 		}
 // next step
 		step = a->nextStep( );
