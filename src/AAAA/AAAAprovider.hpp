@@ -38,6 +38,7 @@
 #define _AAAA_PROVIDER_HPP_INCLUDED
 
 #include "configurationBase.hpp"
+#include <string>
 
 namespace _Wolframe {
 namespace AAAA {
@@ -49,16 +50,37 @@ namespace AAAA {
 	};
 
 
-	class AuthenticatorConfiguration : public _Wolframe::config::ConfigurationBase
+	/// Authentication type
+	enum AuthenticationType	{
+		AUTH_UNKNOWN
+	};
+
+
+	struct	AuthenticationConfigBase
+	{
+		const AuthenticationType	type;
+	public:
+		AuthenticationConfigBase( AuthenticationType Type )	: type( Type )	{}
+	//	virtual ~DatabaseConfigBase();
+
+		virtual bool parse( const std::string& module, const boost::property_tree::ptree& pt ) = 0;
+		virtual bool check( const std::string& module ) const = 0;
+		virtual void print( std::ostream& os ) const = 0;
+		virtual void setCanonicalPathes( const std::string& /* referencePath */ )	{}
+	};
+
+
+	class AuthenticationConfiguration : public _Wolframe::config::ConfigurationBase
 	{
 	public:
 		/// constructor
-		AuthenticatorConfiguration();
+		AuthenticationConfiguration();
 
 		/// methods
 		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 		bool check() const;
 		void print( std::ostream& os ) const;
+		void setCanonicalPathes( const std::string& referencePath );
 
 		// bool test() const;	// Not implemented yet, inherited from base
 	};
@@ -70,58 +92,23 @@ namespace AAAA {
 	};
 
 
-	class AuthorizerConfiguration : public _Wolframe::config::ConfigurationBase
-	{
-	public:
-		/// constructor
-		AuthorizerConfiguration();
-
-		/// methods
-		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
-		bool check() const;
-		void print( std::ostream& os ) const;
-
-		// bool test() const;	// Not implemented yet, inherited from base
-	};
-
 	class Authorizer
 	{
 	public:
-//		Authorizer( AuthenticatorConfiguration& conf );
 	};
 
 
-	class AccountantConfiguration : public _Wolframe::config::ConfigurationBase
+	class AuditConfiguration : public _Wolframe::config::ConfigurationBase
 	{
 	public:
 		/// constructor
-		AccountantConfiguration();
+		AuditConfiguration();
 
 		/// methods
 		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 		bool check() const;
 		void print( std::ostream& os ) const;
-
-		// bool test() const;	// Not implemented yet, inherited from base
-	};
-
-	class Accountant
-	{
-	public:
-//		Accountant( AccountantConfiguration& conf );
-	};
-
-
-	class AuditorConfiguration : public _Wolframe::config::ConfigurationBase
-	{
-	public:
-		/// constructor
-		AuditorConfiguration();
-
-		/// methods
-		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
-		bool check() const;
-		void print( std::ostream& os ) const;
+		void setCanonicalPathes( const std::string& referencePath );
 
 		// bool test() const;	// Not implemented yet, inherited from base
 	};
@@ -143,6 +130,7 @@ namespace AAAA {
 		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 		bool check() const;
 		void print( std::ostream& os ) const;
+		void setCanonicalPathes( const std::string& referencePath );
 
 		// bool test() const;	// Not implemented yet, inherited from base
 	};
@@ -154,12 +142,10 @@ namespace AAAA {
 
 		const Authenticator& authenticator()	{ return authenticator_; }
 		const Authorizer& authorizer()		{ return authorizer_; }
-		const Accountant& accountant()		{ return accountant_; }
 		const Auditor& auditor()		{ return auditor_; }
 	private:
 		const Authenticator	authenticator_;
 		const Authorizer	authorizer_;
-		const Accountant	accountant_;
 		const Auditor		auditor_;
 	};
 

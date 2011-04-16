@@ -81,7 +81,6 @@ AAAA_OBJS = \
 	AAAA\AAAAprovider.obj \
 	AAAA\authenticator.obj \
 	AAAA\authorizer.obj \
-	AAAA\accountant.obj \
 	AAAA\auditor.obj
 
 !IFDEF WITH_SQLITE3

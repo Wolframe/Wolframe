@@ -60,11 +60,14 @@ void Configuration::print( std::ostream& os ) const
 	os << displayName() << " configuration :)";
 }
 
+void Configuration::setCanonicalPathes( const std::string& /* referencePath */ )
+{
+}
+
 
 AAAAprovider::AAAAprovider( const Configuration& /* conf */ )
 	: authenticator_(),
 	  authorizer_(),
-	  accountant_(),
 	  auditor_()
 {
 }

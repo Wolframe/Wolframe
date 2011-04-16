@@ -52,6 +52,7 @@ ApplicationConfiguration::ApplicationConfiguration()
 
 	handlerConf = new _Wolframe::HandlerConfiguration();
 
+
 	// add both sections, the parse function will select the
 	// appropriate action
 	addConfig( "service", serviceConf );
@@ -63,6 +64,7 @@ ApplicationConfiguration::ApplicationConfiguration()
 	addConfig( "listen", serverConf );
 	addConfig( "logging", loggerConf );
 	addConfig( "database", handlerConf->database );
+	addConfig( "aaaa", handlerConf->aaaa );
 }
 
 

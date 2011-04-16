@@ -121,7 +121,6 @@ AAAA_OBJS = \
 	AAAA/AAAAprovider.o \
 	AAAA/authenticator.o \
 	AAAA/authorizer.o \
-	AAAA/accountant.o \
 	AAAA/auditor.o
 
 ifeq ($(WITH_PAM),1)

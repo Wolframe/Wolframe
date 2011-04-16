@@ -155,7 +155,6 @@ include/version.hpp
 Makefile.W32
 src/AAAA/AAAAprovider.cpp
 src/AAAA/AAAAprovider.hpp
-src/AAAA/accountant.cpp
 src/AAAA/auditor.cpp
 src/AAAA/authentication.cpp
 src/AAAA/authentication_db_sqlite3.cpp

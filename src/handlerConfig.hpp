@@ -63,7 +63,7 @@ namespace _Wolframe {
 		{
 			if ( banner ) delete banner;
 			if ( database ) delete database;
-//			auth = ...
+			if ( aaaa ) delete aaaa;
 		}
 	};
 
