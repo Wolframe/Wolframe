@@ -33,7 +33,7 @@ tests/pechoHandler-gTest
 tests/protocolArgumentParsing-gTest
 tests/poolTest
 tests/resolvePathTest
-tests/authTest
+tests/AAAA/authTest
 tests/mtprocHandler-gTest
 tests/ptreeGenerator-gTest
 tests/configHelpersTest
