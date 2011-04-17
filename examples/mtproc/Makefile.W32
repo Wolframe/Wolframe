@@ -51,9 +51,7 @@ OBJS = \
 	appProperties.obj \
 	appConfigDefinition.obj \
 	implementation.obj \
-	implementation_c.obj \
 	dispatcher.obj \
-	generators\propertyTree.obj \
 	mtprocHandler.obj \
 	$(TOPDIR)\src\winMain.obj
 

@@ -132,6 +132,14 @@ struct CmdMap :public boost::array<boost::int_least64_t, 32>
 	class Bad :public std::logic_error {public: Bad():std::logic_error("too many elements in CmdParser") {}};
 
 	CmdMap() :m_size(0) {}
+	// ABa: Got C4355: 'this' : used in base member initializer list,
+	// see http://stackoverflow.com/questions/2031940/how-to-use-boostarray-with-unknown-size-as-object-variable
+	// see http://stackoverflow.com/questions/4994850/standard-vector-and-boost-array-which-is-faster
+	// on the other hand maybe this is just a pseudo warning worth switching off because our
+	// constructor body here is empty,
+	// see http://bytes.com/topic/net/answers/264514-warning-c4355-used-base-member-initializer-list
+	// I personally would use a vector.. :-)
+	#pragma warning(disable:4355)
 	CmdMap( const CmdMap& o) :boost::array<boost::int_least64_t, 32>(*this),m_size(o.m_size) {}
 	/// \brief retrieve a defined commands index from the map
 	/// \param val value to retrieve
