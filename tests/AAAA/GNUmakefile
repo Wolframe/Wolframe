@@ -116,3 +116,8 @@ local_test:
 	@./checkAuthTextFileUnknownUser
 	@./checkAuthTextFileWrongPass
 	@./checkAuthTextFileOk
+ifeq ($(WITH_SQLITE3),1)
+	@./checkAuthDbSqlite3UnknownUser
+	@./checkAuthDbSqlite3WrongPass
+	@./checkAuthDbSqlite3Ok
+endif

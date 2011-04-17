@@ -68,4 +68,11 @@ local_clean:
 local_distclean:
 
 local_test:
-	@-"$(EXPECT)" checkAuth
+	@-"$(EXPECT)" checkAuthTextFileUnknownUser
+	@-"$(EXPECT)" checkAuthTextFileWrongPass
+	@-"$(EXPECT)" checkAuthTextFileOk
+!IFDEF WITH_SQLITE3
+	@-"$(EXPECT)" checkAuthDbSqlite3UnknownUser
+	@-"$(EXPECT)" checkAuthDbSqlite3WrongPass
+	@-"$(EXPECT)" checkAuthDbSqlite3Ok
+!ENDIF

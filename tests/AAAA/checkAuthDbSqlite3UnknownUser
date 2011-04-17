@@ -1,0 +1,21 @@
+#!/usr/bin/expect
+#
+# Checks an authentication method
+#
+
+set timeout 1
+log_user 0
+
+puts -nonewline "Authentication DBSQLITE3 unknown user - "
+
+spawn ./authTest DBSQLITE3
+
+expect "login: "
+send "test2\r"
+expect "Enter your password:"
+send "xx\r"
+expect {
+	"Authentication succeeded!"	{ puts "ERROR" }
+	"Authentication failed!"	{ puts "OK" }
+	timeout 			{ puts "Timeout" }
+}
