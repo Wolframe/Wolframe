@@ -1,6 +1,6 @@
-TOPDIR = ..
+TOPDIR = ..\..
 
-SUBDIRS = AAAA
+SUBDIRS =
 
 !IFDEF WITH_EXPECT
 SUBDIRS = \
@@ -15,8 +15,6 @@ INCLUDE_CPPFLAGS = \
 INCLUDE_DIRS = \
 	/I$(TOPDIR)\include /I. \
 	/I$(TOPDIR)\src \
-	-I$(TOPDIR)\examples\pecho \
-	-I$(TOPDIR)\examples\mtproc \
 	/I"$(BOOST_DIR)" \
 	/I"$(PLATFORM_SDK_DIR)\Include"
 
@@ -42,8 +40,18 @@ INCLUDE_LIBS = \
 	$(INCLUDE_LIBS) $(GTEST_LIBS)
 !ENDIF
 
+# sqlite3
+
+!IFDEF WITH_SQLITE3
+
+INCLUDE_CPPFLAGS = \
+	$(INCLUDE_CPPFLAGS) /DWITH_SQLITE3
+
+!ENDIF
+
 TEST_CPP_BINS = \
-	threadLeakTest.exe
+	threadLeakTest.exe \
+	authTest.exe
 
 !IFDEF WITH_GTEST
 TEST_CPP_BINS = \
@@ -68,6 +76,7 @@ all: $(OBJS) $(CPP_BINS)
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 threadLeakTest.exe: threadLeakTest.obj $(TOPDIR)\src\wolframe.lib
+authTest.exe: authTest.obj $(TOPDIR)\src\wolframe.lib
 
 !IFDEF WITH_GTEST
 testNamedRetVal.exe: testNamedRetVal.obj

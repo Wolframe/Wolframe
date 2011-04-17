@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS =
+SUBDIRS = AAAA
 
 ifeq ($(WITH_EXPECT),1)
 SUBDIRS += expect config
@@ -20,22 +20,21 @@ INCLUDE_DIRS = \
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR)
 
+INCLUDE_LIBS = \
+	-lboost_thread$(BOOST_LIBRARY_TAG) \
+	-lboost_filesystem -lboost_system -lboost_thread$(BOOST_LIBRARY_TAG) \
+	-lboost_program_options \
+	$(TOPDIR)/src/libwolframe.a
+
+# gtest
+
 ifeq ($(WITH_GTEST),1)
 INCLUDE_CPPFLAGS += \
 	-I$(GTEST_INCLUDE_DIR)
 
 INCLUDE_LDFLAGS += \
 	-L$(GTEST_LIB_DIR)
-endif
 
-INCLUDE_LIBS = \
-	-lboost_unit_test_framework \
-	-lboost_thread$(BOOST_LIBRARY_TAG) \
-	-lboost_filesystem -lboost_system -lboost_thread$(BOOST_LIBRARY_TAG) \
-	-lboost_program_options \
-	$(TOPDIR)/src/libwolframe.a
-
-ifeq ($(WITH_GTEST),1)
 INCLUDE_LIBS += \
 	$(GTEST_LIBS)
 endif
@@ -49,65 +48,10 @@ INCLUDE_LIBS += \
 
 endif
 
-# pam
-
-ifeq ($(WITH_PAM),1)
-
-INCLUDE_CPPFLAGS += \
-	-DWITH_PAM
-
-INCLUDE_DIRS += \
-	-I$(PAM_INCLUDE_DIR)
-
-INCLUDE_LDFLAGS += \
-	-L$(PAM_LIB_DIR)
-
-INCLUDE_LIBS += \
-	$(PAM_LIBS)
-
-endif
-
-# sasl
-
-ifeq ($(WITH_SASL),1)
-
-INCLUDE_CPPFLAGS += \
-	-DWITH_SASL
-
-INCLUDE_DIRS += \
-	-I$(SASL_INCLUDE_DIR)
-
-INCLUDE_LDFLAGS += \
-	-L$(SASL_LIB_DIR)
-
-INCLUDE_LIBS += \
-	$(SASL_LIBS)
-
-endif
-
-# sqlite3
-
-ifeq ($(WITH_SQLITE3),1)
-
-INCLUDE_CPPFLAGS += \
-	-DWITH_SQLITE3
-
-INCLUDE_DIRS += \
-	-I$(SQLITE3_INCLUDE_DIR)
-
-INCLUDE_LDFLAGS += \
-	-L$(SQLITE3_LIB_DIR)
-
-INCLUDE_LIBS += \
-	$(SQLITE3_LIBS)
-
-endif
-
 TEST_OBJS =
 
 TEST_CPP_BINS = \
-	threadLeakTest$(EXE) \
-	authTest$(EXE)
+	threadLeakTest$(EXE)
 
 ifeq ($(WITH_GTEST),1)
 TEST_CPP_BINS += \
@@ -127,7 +71,6 @@ endif
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 logTest$(EXE): $(TOPDIR)/src/libwolframe.a
-authTest$(EXE): $(TOPDIR)/src/libwolframe.a
 
 ifeq ($(WITH_GTEST),1)
 PECHO_GTEST_OBJS=$(TOPDIR)/examples/pecho/pechoHandler.o
