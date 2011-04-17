@@ -51,6 +51,8 @@ class SaslAuthenticator : public Authenticator {
 		enum {
 			_Wolframe_SASL_STATE_NEW,
 			_Wolframe_SASL_STATE_NEGOTIATE_MECHS,
+			_Wolframe_SASL_STATE_INITIAL_DATA,
+			_Wolframe_SASL_STATE_START,
 			_Wolframe_SASL_STATE_NEED_LOGIN,
 			_Wolframe_SASL_STATE_NEED_PASS,
 			_Wolframe_SASL_STATE_COMPUTE,
@@ -62,6 +64,8 @@ class SaslAuthenticator : public Authenticator {
 
 		std::string m_appName;
 		std::string m_service;
+		std::string m_mech;
+		std::string m_client_data;
 		
 		std::string m_error;
 		std::string m_data;

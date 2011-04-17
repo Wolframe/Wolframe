@@ -70,8 +70,17 @@ int main( int argc, const char *argv[] )
 		if( step == Step::_Wolframe_AUTH_STEP_SEND_DATA ) {
 			string token = a->token( );
 			string data = a->sendData( );
-			
-			cout << "S: " << token << " " << data << endl;
+
+#ifdef WITH_SASL
+// SASL mechanisms offered by the server
+			if( token == "SASL_mechs" ) {
+				cout << "Available SASL mechs: " << data << endl;
+			} else {
+#else
+			if( true ) {
+#endif // WITH_SASL
+				cerr << "authenticator sends us unknown token '" << token << "'" << endl;
+			}
 
 // the authenticate needs some specific input from the client
 		} else if( step == Step::_Wolframe_AUTH_STEP_RECV_DATA ) {
@@ -81,14 +90,24 @@ int main( int argc, const char *argv[] )
 				string pass = getPassword( );
 				a->receiveData( pass );
 				
-				cout << "C: " << token << " *****" << endl;
 // login name required
 			} else if( token == "login" ) {
 				string login = getLogin( );
 				cout << "login is: " << login << endl;
 				a->receiveData( login );
-
-				cout << "C: " << token << " " << login << endl;
+#ifdef WITH_SASL
+// SASL mechanism to use
+			} else if( token == "SASL_mech" ) {
+				char mech[256];
+				cout << "Choose a SASL mech: "; cout.flush( );
+				cin.getline( mech, 256 );
+				a->receiveData( mech );
+			} else if( token == "SASL_data" ) {
+				char data[256];
+				cout << "SASL data: "; cout.flush( );
+				cin.getline( data, 256 );
+				a->receiveData( data );				
+#endif // WITH_SASL
 			} else {
 				cerr << "authenticator requests unknown token '" << token << "'" << endl;
 				return 1;

@@ -126,6 +126,8 @@ Step::AuthStep SaslAuthenticator::nextStep( )
 	const char *mechs;
 	unsigned int len_mechs;
 	int nof_mechs;
+	const char *out;
+	unsigned int out_len;
 	
 	switch( m_state ) {
 		case _Wolframe_SASL_STATE_NEW:
@@ -171,7 +173,27 @@ Step::AuthStep SaslAuthenticator::nextStep( )
 			return Step::_Wolframe_AUTH_STEP_SEND_DATA;
 		
 		case _Wolframe_SASL_STATE_NEGOTIATE_MECHS:
-			return Step::_Wolframe_AUTH_STEP_FAIL;
+			m_token = "SASL_mech";
+			m_state = _Wolframe_SASL_STATE_NEGOTIATE_MECHS;
+			return Step::_Wolframe_AUTH_STEP_RECV_DATA;
+		
+		case _Wolframe_SASL_STATE_INITIAL_DATA:
+			m_token = "SASL_data";
+			m_state = _Wolframe_SASL_STATE_START;
+			return Step::_Wolframe_AUTH_STEP_RECV_DATA;
+			
+		case _Wolframe_SASL_STATE_START:
+// client picked a mech
+			result = sasl_server_start(
+				m_connection,
+				m_mech.c_str( ),	// mech choosen by client
+				m_client_data.c_str( ),	// optional client data
+				m_client_data.length( ),// length of client data
+				&out,			// server data
+				&out_len );		// length of server data
+			m_token = "SASL_data";
+			m_data = std::string( out );
+			return Step::_Wolframe_AUTH_STEP_SEND_DATA;
 			
 		case _Wolframe_SASL_STATE_NEED_LOGIN:
 			m_token = "login";
@@ -218,9 +240,14 @@ std::string SaslAuthenticator::token( )
 void SaslAuthenticator::receiveData( const std::string data )
 {
 	switch( m_state ) {
-		case _Wolframe_SASL_STATE_NEED_LOGIN:
-			m_login = data;
-			m_state = _Wolframe_SASL_STATE_NEED_PASS;
+		case _Wolframe_SASL_STATE_NEGOTIATE_MECHS:
+			m_mech = data;
+			m_state = _Wolframe_SASL_STATE_INITIAL_DATA;
+			break;
+		
+		case _Wolframe_SASL_STATE_INITIAL_DATA:
+			m_client_data = data;
+			m_state = _Wolframe_SASL_STATE_START;
 			break;
 
 		case _Wolframe_SASL_STATE_NEED_PASS:
@@ -237,7 +264,7 @@ void SaslAuthenticator::receiveData( const std::string data )
 
 std::string SaslAuthenticator::getError( )
 {
-	return "";
+	return m_error;
 }
 
 }} // namespace _Wolframe::AAAA
