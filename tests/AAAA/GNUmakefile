@@ -113,4 +113,6 @@ local_clean:
 local_distclean:
 
 local_test:
-	./checkAuth
+	@./checkAuthTextFileUnknownUser
+	@./checkAuthTextFileWrongPass
+	@./checkAuthTextFileOk

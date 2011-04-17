@@ -6,7 +6,7 @@
 set timeout 1
 log_user 0
 
-puts -nonewline "Authentication TEXT_FILE failed - "
+puts -nonewline "Authentication TEXT_FILE succesfull - "
 
 spawn ./authTest TEXT_FILE
 

@@ -1,0 +1,21 @@
+#!/usr/bin/expect
+#
+# Checks an authentication method
+#
+
+set timeout 1
+log_user 0
+
+puts -nonewline "Authentication TEXT_FILE wrong password - "
+
+spawn ./authTest TEXT_FILE
+
+expect "login: "
+send "test\r"
+expect "Enter your password:"
+send "x\r"
+expect {
+	"Authentication succeeded!"	{ puts "ERROR" }
+	"Authentication failed!"	{ puts "OK" }
+	timeout 			{ puts "Timeout" }
+}
