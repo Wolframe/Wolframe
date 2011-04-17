@@ -94,8 +94,9 @@ int main( int argc, const char *argv[] )
 				
 // login name required
 			} else if( token == "login" ) {
-				string login = getLogin( );
-				cout << "login is: " << login << endl;
+				char login[256];
+				cout << "login: "; cout.flush( );
+				cin.getline( login, 256 );
 				a->receiveData( login );
 #ifdef WITH_SASL
 // SASL mechanism to use

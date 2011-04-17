@@ -3,28 +3,19 @@
 # Checks an authentication method
 #
 
-if { [llength $argv] != 1 } {
-    puts "usage: checkAuth <method>"
-    exit 1
-}
+set timeout 1
+log_user 0
 
-set method [lindex $argv 0]             ;# 1st script argument
+puts -nonewline "Authentication TEXT_FILE failed - "
 
-set timeout 3
-spawn ./authTest $method
+spawn ./authTest TEXT_FILE
 
-expect 	{
-	timeout		{ send_user "Process timed out.\n" }
-#	"$outmsg\r"	{ puts "Got expected message in: $expect_out(buffer)\n" }
-#	"$outmsg\r"	{ puts "Got expected message: $expect_out(0,string)\n" }
-	eof		{ puts "Got EOF before the expected message.\n" }
-}
-
-catch wait reason
-set procid [lindex $reason 0]
-if { [lindex $reason 2] == 0 } {
-    set retval [lindex $reason 3]
-    puts "Pid $procid return code: $retval\n"
-} else {
-    puts "Pid $procid, some execution error occured. wait returned $reason\n"
+expect "login: "
+send "test\r"
+expect "Enter your password:"
+send "xx\r"
+expect {
+	"Authentication succeeded!"	{ puts "OK" }
+	"Authentication failed!"	{ puts "ERROR" }
+	timeout 			{ puts "Timeout" }
 }
