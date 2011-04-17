@@ -75,6 +75,8 @@ int main( int argc, const char *argv[] )
 // SASL mechanisms offered by the server
 			if( token == "SASL_mechs" ) {
 				cout << "Available SASL mechs: " << data << endl;
+			} else if( token == "SASL_data" ) {
+				cout << "Got SASL data: " << data << endl;
 			} else {
 #else
 			if( true ) {

@@ -113,3 +113,4 @@ local_clean:
 local_distclean:
 
 local_test:
+	./checkAuth

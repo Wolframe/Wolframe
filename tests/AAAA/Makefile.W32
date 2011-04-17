@@ -50,69 +50,22 @@ INCLUDE_CPPFLAGS = \
 !ENDIF
 
 TEST_CPP_BINS = \
-	threadLeakTest.exe \
 	authTest.exe
 
-!IFDEF WITH_GTEST
-TEST_CPP_BINS = \
-	$(TEST_CPP_BINS) \
-	testNamedRetVal.exe \
-	versionTest.exe \
-	counterTest.exe \
-	resolvePathTest.exe \
-	singletonTest.exe \
-	poolTest.exe \
-	logTest.exe \
-	protocolArgumentParsing-gTest.exe
-# broken on windows
-#	pechoHandler-gTest.exe
-#	mtprocHandler-gTest.exe
-!ENDIF
-
-OBJS = \
+OBJS =
 
 all: $(OBJS) $(CPP_BINS)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-threadLeakTest.exe: threadLeakTest.obj $(TOPDIR)\src\wolframe.lib
 authTest.exe: authTest.obj $(TOPDIR)\src\wolframe.lib
-
-!IFDEF WITH_GTEST
-testNamedRetVal.exe: testNamedRetVal.obj
-versionTest.exe: versionTest.obj $(TOPDIR)\src\wolframe.lib
-counterTest.exe: counterTest.obj $(TOPDIR)\src\wolframe.lib
-resolvePathTest.exe: resolvePathTest.obj $(TOPDIR)\src\wolframe.lib
-singletonTest.exe: singletonTest.obj $(TOPDIR)\src\wolframe.lib
-poolTest.exe: poolTest.obj $(TOPDIR)\src\wolframe.lib
-logTest.exe: logTest.obj $(TOPDIR)\src\wolframe.lib
-protocolArgumentParsing-gTest.exe: protocolArgumentParsing-gTest.obj
-
-pechoHandler-gTest.exe: pechoHandler-gTest.obj
-
-MTPROC_GTEST_OBJS=$(TOPDIR)\examples\mtproc\mtprocHandler.obj $(TOPDIR)\examples\mtproc\implementation.obj $(TOPDIR)\examples\mtproc\dispatcher.obj
-mtprocHandler-gTest.exe: mtprocHandler-gTest.obj $(MTPROC_GTEST_OBJS) $(TOPDIR)\src\libwolframe.lib
-
-!ENDIF
 
 local_all:
 
 local_clean:
-	@-erase test.bat logTest.log 2>NUL
+	@-erase test.bat 2>NUL
 
 local_distclean:
 
 local_test:
-	@-echo @echo off > test.bat
-	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
-!IFDEF WITH_GTEST
-	@-echo testNamedRetVal >> test.bat
-	@-echo logTest >> test.bat
-	@-echo versionTest >> test.bat
-	@-echo counterTest >> test.bat
-	@-echo resolvePathTest >> test.bat
-	@-echo singletonTest >> test.bat
-	@-echo poolTest >> test.bat
-	@-echo protocolArgumentParsing-gTest >> test.bat
-!ENDIF
-	@-test.bat
+	@-"$(EXPECT)" checkAuth

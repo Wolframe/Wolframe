@@ -80,8 +80,13 @@ static int sasl_my_log( void* /* context */, int priority, const char *message )
 	std::cout << "SASL log" << priority << ": " << message << std::endl;
 	
 	switch( priority ) {
-		case SASL_LOG_ERR:	level = _Wolframe::log::LogLevel::LOGLEVEL_ERROR; break;
+		case SASL_LOG_ERR:
+		case SASL_LOG_FAIL:	level = _Wolframe::log::LogLevel::LOGLEVEL_ERROR; break;
+		case SASL_LOG_WARN:	level = _Wolframe::log::LogLevel::LOGLEVEL_WARNING; break;
 		case SASL_LOG_NOTE:	level = _Wolframe::log::LogLevel::LOGLEVEL_NOTICE; break;
+		case SASL_LOG_DEBUG:	level = _Wolframe::log::LogLevel::LOGLEVEL_DEBUG; break;
+		case SASL_LOG_TRACE:	level = _Wolframe::log::LogLevel::LOGLEVEL_TRACE; break;
+		case SASL_LOG_PASS:	level = _Wolframe::log::LogLevel::LOGLEVEL_DATA; break;
 		default:		level = _Wolframe::log::LogLevel::LOGLEVEL_INFO; break;
 	}
 

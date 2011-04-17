@@ -1,0 +1,30 @@
+#!/usr/bin/expect
+#
+# Checks an authentication method
+#
+
+if { [llength $argv] != 1 } {
+    puts "usage: checkAuth <method>"
+    exit 1
+}
+
+set method [lindex $argv 0]             ;# 1st script argument
+
+set timeout 3
+spawn ./authTest $method
+
+expect 	{
+	timeout		{ send_user "Process timed out.\n" }
+#	"$outmsg\r"	{ puts "Got expected message in: $expect_out(buffer)\n" }
+#	"$outmsg\r"	{ puts "Got expected message: $expect_out(0,string)\n" }
+	eof		{ puts "Got EOF before the expected message.\n" }
+}
+
+catch wait reason
+set procid [lindex $reason 0]
+if { [lindex $reason 2] == 0 } {
+    set retval [lindex $reason 3]
+    puts "Pid $procid return code: $retval\n"
+} else {
+    puts "Pid $procid, some execution error occured. wait returned $reason\n"
+}
