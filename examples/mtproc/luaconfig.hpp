@@ -46,16 +46,16 @@ namespace _Wolframe {
 namespace mtproc {
 namespace lua {
 
-class LuaConfiguration :public config::ConfigurationBase
+class Configuration :public config::ConfigurationBase
 {
 public:
 	/// \brief module load function for a lua state
 	/// \param ls lua state to initialize with the load of the module for this state object
-	typedef int (*LuaModuleLoad)( lua_State *ls);
+	typedef int (*ModuleLoad)( lua_State *ls);
 
 	/// \brief constructor
 	/// \param name configuration base name
-	LuaConfiguration( const std::string& name) :ConfigurationBase(name){}
+	Configuration( const std::string& name) :ConfigurationBase(name){}
 
 	/// \brief interface implementation of ConfigurationBase::parse(const boost::property_tree::ptree&, const std::string&)
 	virtual bool parse( const boost::property_tree::ptree&, const std::string&);
@@ -128,7 +128,7 @@ public:
 		Type m_type;				///< type of the module
 		std::string m_name;			///< name of the module
 		std::string m_path;			///< full path of the module
-		LuaModuleLoad m_load;
+		ModuleLoad m_load;
 	};
 	/// \brief return the main module
 	const Module& main() const			{return m_main;}

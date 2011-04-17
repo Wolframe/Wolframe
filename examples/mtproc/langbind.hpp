@@ -30,30 +30,67 @@ Project Wolframe.
 
 ************************************************************************/
 ///
-/// \file luatypes.hpp
-/// \brief interface to lua application processor
+/// \file langbind.hpp
+/// \brief interface for application processor scripting language to system objects
 ///
-#ifndef _Wolframe_LUATYPES_HPP_INCLUDED
-#define _Wolframe_LUATYPES_HPP_INCLUDED
-#include "langbind.hpp"
-#include "luaconfig.hpp"
+#ifndef _Wolframe_LANGBIND_HPP_INCLUDED
+#define _Wolframe_LANGBIND_HPP_INCLUDED
+#include "protocol/formatoutput.hpp"
+#include "protocol/generator.hpp"
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace mtproc {
 
-class Interpreter
+struct Input
 {
-	struct State;
+	boost::shared_ptr<protocol::Generator> m_generator;
 
-	Interpreter( System* system, const lua::Configuration& config, Input& input, Output& output);
-	~Interpreter();
+	Input(){};
+	Input( const Input& o) :m_generator(o.m_generator){}
+	~Input(){};
+};
 
-	virtual int call( unsigned int argc, const char** argv);
+struct Output
+{
+	boost::shared_ptr<protocol::FormatOutput> m_formatoutput;
+
+	Output(){};
+	Output( const Output& o) :m_formatoutput(o.m_formatoutput){}
+	~Output(){};
+};
+
+struct System
+{
+	System(){}
+	~System(){}
+
+	protocol::Generator* createGenerator( const char* name) const;
+	protocol::FormatOutput* createFormatOutput( const char* name) const;
+};
+
+class GeneratorClosure
+{
+public:
+	enum ItemType {EndOfData,Data,DoYield,Error};
+
+	GeneratorClosure() :m_type(protocol::Generator::Value),m_value(0),m_buf(0),m_bufsize(0),m_bufpos(0){}
+
+	void init()
+	{
+		m_bufpos = 0;
+		m_value = 0;
+	}
+
+	ItemType fetch( const char*& e1, const char*& e2);
+
 private:
-	Input m_input;
-	Output m_output;
-	System* m_system;
-	State* m_state;
+	boost::shared_ptr<protocol::Generator> m_generator;
+	protocol::Generator::ElementType m_type;
+	char* m_value;
+	char* m_buf;
+	std::size_t m_bufsize;
+	std::size_t m_bufpos;
 };
 
 }}//namespace

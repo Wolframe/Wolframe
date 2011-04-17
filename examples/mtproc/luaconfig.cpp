@@ -47,7 +47,7 @@ extern "C" {
 
 using namespace _Wolframe::mtproc::lua;
 
-static LuaConfiguration::LuaModuleLoad getLuaModuleEntryFunc( const char* name)
+static Configuration::ModuleLoad getLuaModuleEntryFunc( const char* name)
 {
 	if (strcmp(name,"base") == 0) return luaopen_base;
 	if (strcmp(name,LUA_TABLIBNAME) == 0) return luaopen_table;
@@ -61,7 +61,7 @@ static LuaConfiguration::LuaModuleLoad getLuaModuleEntryFunc( const char* name)
 }
 
 
-bool LuaConfiguration::parse( const boost::property_tree::ptree& parentNode, const std::string&)
+bool Configuration::parse( const boost::property_tree::ptree& parentNode, const std::string&)
 {
 	std::string name;
 	unsigned int cnt_main = 0;
@@ -103,7 +103,7 @@ bool LuaConfiguration::parse( const boost::property_tree::ptree& parentNode, con
 	return true;
 }
 
-void LuaConfiguration::Module::setCanonicalPath( const std::string& refPath)
+void Configuration::Module::setCanonicalPath( const std::string& refPath)
 {
 	m_load = getLuaModuleEntryFunc( m_name.c_str());
 	if (m_load)
@@ -126,7 +126,7 @@ void LuaConfiguration::Module::setCanonicalPath( const std::string& refPath)
 	}
 }
 
-void LuaConfiguration::setCanonicalPathes( const std::string& refPath)
+void Configuration::setCanonicalPathes( const std::string& refPath)
 {
 	m_main.setCanonicalPath( refPath);
 	for (std::list<Module>::iterator it = m_modules.begin(); it != m_modules.end(); it++)
@@ -142,7 +142,7 @@ void LuaConfiguration::setCanonicalPathes( const std::string& refPath)
 	}
 }
 
-bool LuaConfiguration::Module::load( lua_State* ls) const
+bool Configuration::Module::load( lua_State* ls) const
 {
 	if (m_load)
 	{
@@ -166,7 +166,7 @@ bool LuaConfiguration::Module::load( lua_State* ls) const
 	return true;
 }
 
-bool LuaConfiguration::Module::check() const
+bool Configuration::Module::check() const
 {
 	switch (m_type)
 	{
@@ -185,7 +185,7 @@ bool LuaConfiguration::Module::check() const
 	return true;
 }
 
-bool LuaConfiguration::load( lua_State *ls) const
+bool Configuration::load( lua_State *ls) const
 {
 	for (std::list<Module>::const_iterator it = m_modules.begin(); it != m_modules.end(); it++)
 	{
@@ -204,7 +204,7 @@ bool LuaConfiguration::load( lua_State *ls) const
 	return true;
 }
 
-bool LuaConfiguration::check() const
+bool Configuration::check() const
 {
 	bool rt = true;
 	for (std::list<Module>::const_iterator it = m_modules.begin(); it != m_modules.end(); it++)
@@ -214,7 +214,7 @@ bool LuaConfiguration::check() const
 	return rt;
 }
 
-bool LuaConfiguration::test() const
+bool Configuration::test() const
 {
 	lua_State *ls = luaL_newstate();
 	if (!ls)
@@ -227,7 +227,7 @@ bool LuaConfiguration::test() const
 	return rt;
 }
 
-void LuaConfiguration::print( std::ostream& os)
+void Configuration::print( std::ostream& os)
 {
 	os << "Configuration of " << displayName() << ":" << std::endl;
 	os << "   Main Script: " << m_main.name() << " (" << m_main.path() << ")" << std::endl;

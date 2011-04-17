@@ -37,8 +37,9 @@ Project Wolframe.
 #ifndef _Wolframe_PROTOCOL_PARSER_HPP_INCLUDED
 #define _Wolframe_PROTOCOL_PARSER_HPP_INCLUDED
 #include <stdexcept>
+#include <algorithm>
+#include <vector>
 #include <boost/cstdint.hpp>
-#include <boost/array.hpp>
 
 namespace _Wolframe {
 namespace protocol {
@@ -121,53 +122,24 @@ public:
 
 /// \class CmdMap
 /// \exception Bad
-/// \brief implements a map for a fixed set of protocol commands
-struct CmdMap :public boost::array<boost::int_least64_t, 32>
+/// \brief implements a map for set of protocol commands
+struct CmdMap :public std::vector<boost::int_least64_t>
 {
-	/// \class Bad
-	/// \brief Exception for illegal protocol parser definition (too many commands).
-	///
-	/// \remark The map is exception free at processing time but not on insert
-	///
-	class Bad :public std::logic_error {public: Bad():std::logic_error("too many elements in CmdParser") {}};
-
-	CmdMap() :m_size(0) {}
-	// ABa: Got C4355: 'this' : used in base member initializer list,
-	// see http://stackoverflow.com/questions/2031940/how-to-use-boostarray-with-unknown-size-as-object-variable
-	// see http://stackoverflow.com/questions/4994850/standard-vector-and-boost-array-which-is-faster
-	// on the other hand maybe this is just a pseudo warning worth switching off because our
-	// constructor body here is empty,
-	// see http://bytes.com/topic/net/answers/264514-warning-c4355-used-base-member-initializer-list
-	// I personally would use a vector.. :-)
-	#pragma warning(disable:4355)
-	CmdMap( const CmdMap& o) :boost::array<boost::int_least64_t, 32>(*this),m_size(o.m_size) {}
 	/// \brief retrieve a defined commands index from the map
 	/// \param val value to retrieve
 	/// \return the index of the command or -1 if not found
 	int get( const value_type& val) const
 	{
-		unsigned int nofMatches = 0;
-		int rt = -1;
-		for (size_type ii=0; ii<m_size; ii++)
-		{
-			if ((*this)[ii] == val)
-			{
-				if (nofMatches == 0) rt = (int)ii;
-				nofMatches++;
-			}
-		}
-		return rt;
+		const_iterator itr = std::find( begin(), end(), val);
+		return itr==end()?-1:(int)(itr - begin());
 	}
 
 	/// \brief insert a command into the map. Throws an exception if the limit is reached
 	/// \param val value to insert
 	void insert( const value_type& val)
 	{
-		if (m_size == max_size()) throw Bad();
-		(*this)[m_size++] = val;
+		push_back( val);
 	}
-private:
-	size_type m_size;
 };
 
 

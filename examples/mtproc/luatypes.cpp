@@ -30,6 +30,8 @@ Project Wolframe.
 
 ************************************************************************/
 #include "luatypes.hpp"
+#include "logger.hpp"
+#include "langbind.hpp"
 #include "protocol/formatoutput.hpp"
 #include "protocol/generator.hpp"
 #include <stdexcept>
@@ -48,28 +50,34 @@ namespace luaname
 {
 	static const char* GeneratorClosure = "wolframe.InputGeneratorClosure";
 	static const char* Input = "wolframe.Input";
+	static const char* Output = "wolframe.Output";
+	static const char* System = "wolframe.System";
 	static const char* Generator = "wolframe.InputGenerator";
 }
 
-struct GeneratorClosure
+template <class ObjectType>
+struct LuaObject :public ObjectType
 {
-	boost::shared_ptr<protocol::Generator> generator;
-	protocol::Generator::ElementType type;
-	char* value;
-	char* buf;
-	std::size_t bufsize;
-	std::size_t bufpos;
+	LuaObject( const ObjectType& o)   :ObjectType(o) {}
 
-	void init()
+	static int destroy( lua_State* ls)
 	{
-		bufpos = 0;
-		value = 0;
-	};
-};
-
-struct LuaInput
-{
-	boost::shared_ptr<protocol::Generator> generator;
+		LuaObject *THIS = *(LuaObject**)lua_touserdata( ls, 1);
+		if (THIS) THIS->~LuaObject();
+		return 0;
+	}
+	static void create( lua_State* ls, const char* metatableName)
+	{
+		luaL_newmetatable( ls, metatableName);
+		/* set its __gc field */
+		lua_pushstring( ls, "__gc");
+		lua_pushcfunction( ls, destroy);
+		lua_settable( ls, -3);
+	}
+	void *operator new( unsigned int num_bytes, lua_State* ls)
+	{
+		return lua_newuserdata( ls, num_bytes);
+	}
 };
 
 // Design
@@ -86,104 +94,120 @@ struct LuaInput
 // A module luasystem exists that defines a global table "system" with reference to all system interfaces from the processing context as objects
 // defined. (for example "input" and "output")  input has a function input.as(f) with a filter f as argument and a function get.
 
-static int generatorNextStringTuple( lua_State* ls)
+static int generatorGetNext( lua_State* ls)
 {
+	const char* item[2];
 	GeneratorClosure* closure = (GeneratorClosure*)luaL_checkudata( ls, lua_upvalueindex( 1), luaname::GeneratorClosure);
-	if (closure == 0 || closure->bufsize == 0)
+	if (closure == 0)
 	{
 		luaL_error( ls, "calling undefined iterator");
 		return 0;
 	}
-	if (closure->generator->getNext( &closure->type, closure->buf, closure->bufsize-1, &closure->bufpos))
+	switch (closure->fetch( item[0], item[1]))
 	{
-		switch (closure->generator->state())
-		{
-			case protocol::Generator::EndOfMessage:
-				return lua_yield( ls, 0);
+		case GeneratorClosure::DoYield:
+			return lua_yield( ls, 0);
 
-			case protocol::Generator::Error:
-				luaL_error( ls, "error in iterator (%d)", closure->generator->getError());
-				return 0;
+		case GeneratorClosure::EndOfData:
+			return 0;
 
-			case protocol::Generator::Open:
-				lua_pushnil( ls);
-				lua_pushnil( ls);
-				return 2;
-		}
-	}
-	else
-	{
-		switch (closure->type)
-		{
-			case protocol::Generator::OpenTag:
-				closure->buf[ closure->bufpos] = 0;
-				lua_pushstring( ls, closure->buf);
-				lua_pushnil( ls);
-				closure->init();
-				return 2;
+		case GeneratorClosure::Error:
+			luaL_error( ls, "error in iterator");
+			return 0;
 
-			case protocol::Generator::Value:
-				closure->buf[ closure->bufpos] = 0;
-				if (closure->value)
-				{
-					lua_pushstring( ls, closure->buf);
-					lua_pushstring( ls, closure->value);
-				}
-				else
-								closure->init();
-				return 2;
-
-			 case protocol::Generator::Attribute:
-				closure->buf[ closure->bufpos++] = 0;
-				if (closure->value)
-				{
-					luaL_error( ls, "illegal state produced by generator");
-					closure->init();
-					return 0;
-				}
-				else
-				{
-					closure->value = closure->buf+closure->bufpos;
-					return generatorNextStringTuple( ls);
-				}
-			 case protocol::Generator::CloseTag:
-				lua_pushnil( ls);
-				lua_pushnil( ls);
-				closure->init();
-				return 2;
-		}
+		case GeneratorClosure::Data:
+			if (item[0]) lua_pushstring( ls, item[0]); else lua_pushnil( ls);
+			if (item[1]) lua_pushstring( ls, item[1]); else lua_pushnil( ls);
+			return 2;
 	}
 	luaL_error( ls, "illegal state produced by generator");
 	return 0;
 }
 
+static void createInput( lua_State* ls, Input& input)
+{
+	LuaObject<Input>::create( ls, luaname::Input);
+	(void)new (ls) LuaObject<Input>( input);
+	luaL_getmetatable( ls, luaname::Input);
+	lua_setmetatable( ls, -2);
+	lua_setglobal( ls, "input");
+}
+
+static void createOutput( lua_State* ls, Output& output)
+{
+	LuaObject<Output>::create( ls, luaname::Output);
+	(void)new (ls) LuaObject<Output>( output);
+	luaL_getmetatable( ls, luaname::Output);
+	lua_setmetatable( ls, -2);
+	lua_setglobal( ls, "output");
+}
+
+static void createSystem( lua_State* ls, System* system)
+{
+	luaL_newmetatable( ls, luaname::System);
+	lua_settable( ls, -1);
+	System** ref = (System**)lua_newuserdata( ls, sizeof(System*));
+	luaL_getmetatable( ls, luaname::System);
+	lua_setmetatable( ls, -2);
+	*ref = system;
+	lua_setglobal( ls, "system");
+}
+
 struct Interpreter::State
 {
-	lua_State* lua;
+	lua_State* ls;
+	lua_State* thread;
 
-	State()
+	State( const lua::Configuration& config) :ls(0),thread(0)
 	{
-		lua = luaL_newstate();
-		if (!lua) throw std::bad_alloc();
+		ls = luaL_newstate();
+		if (!ls) throw std::bad_alloc();
+		if (!config.load( ls)) throw std::bad_alloc();
 	}
 	~State()
 	{
-		lua_close( lua);
+		if (ls) lua_close( ls);
 	}
 };
 
-Interpreter::Interpreter()
+Interpreter::Interpreter( System* system, const lua::Configuration& config, Input& input, Output& output)
+		:m_input(input),m_output(output),m_system(system)
 {
-	state = new State();
+	m_state = new State( config);
+	createSystem( m_state->ls, m_system);
+	createInput( m_state->ls, m_input);
+	createOutput( m_state->ls, m_output);
 }
 
 Interpreter::~Interpreter()
 {
-	delete state;
+	delete m_state;
 }
 
-int Interpreter::call( unsigned int , const char**)
+int Interpreter::call( unsigned int argc, const char** argv)
 {
-	return 0;
+	int rt;
+	if (argc == 0)
+	{
+		LOG_ERROR << "interpreter called with no arguments (first argument funtion name missing)";
+		return -1;
+	}
+
+	if (!m_state->thread)
+	{
+		m_state->thread = lua_newthread( m_state->ls);
+		for (unsigned int ii=0; ii<argc; ii++)
+		{
+			if (argv[ii]) lua_pushstring( m_state->ls, argv[ii]); else lua_pushnil( m_state->ls);
+		}
+		rt = lua_resume( m_state->thread, argc-1);
+		if (rt==LUA_YIELD) rt = 0;
+	}
+	else
+	{
+		rt = lua_resume( m_state->thread, 0);
+		if (rt==LUA_YIELD) rt = 0;
+	}
+	return rt;
 }
 

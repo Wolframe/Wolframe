@@ -56,6 +56,7 @@ OBJS = \
 	implementation.o \
 	dispatcher.o \
 	mtprocHandler.o \
+	langbind.o \
 	$(TOPDIR)/src/posixMain.o
 
 ifeq ($(WITH_LUA),1)
