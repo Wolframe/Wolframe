@@ -2,11 +2,9 @@ TOPDIR = ..\..
 
 SUBDIRS =
 
-!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
-
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-configTest: $(TOPDIR)/src/wolframed
+configTest: $(TOPDIR)\src\wolframed.exe
 
 local_all:
 
@@ -16,3 +14,5 @@ local_distclean:
 
 local_test:
 	@-"$(EXPECT)" testEcho
+	@-"$(EXPECT)" testPEcho
+	@-"$(EXPECT)" testMtProc
