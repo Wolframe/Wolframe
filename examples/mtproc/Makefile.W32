@@ -57,7 +57,7 @@ OBJS = \
 
 !IFDEF WITH_LUA
 OBJS = \
-	$(OBJS) luatypes.obj
+	$(OBJS) luaconfig.obj luatypes.obj
 !ENDIF
 
 CPP_BINS = \
