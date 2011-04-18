@@ -121,7 +121,6 @@ public:
 };
 
 /// \class CmdMap
-/// \exception Bad
 /// \brief implements a map for set of protocol commands
 struct CmdMap :public std::vector<boost::int_least64_t>
 {
@@ -141,7 +140,35 @@ struct CmdMap :public std::vector<boost::int_least64_t>
 		push_back( val);
 	}
 };
+#ifdef NNNLASHKJDASJLHDSKJD
+struct CmdMap :public std::vector<std::string>
+{
+	/// \brief retrieve a defined commands index from the map
+	/// \param val value to retrieve
+	/// \return the index of the command or -1 if not found or not determined enough
+	int get( const char* value) const
+	{
+		int rt = -1;
+		unsigned int cnt = 0;
+		for (const_iterator itr = begin(); itr != end(); itr++)
+		{
+			if (boost::algorithm::starts_with( *itr, value))
+			{
+				if (!cnt) rt = itr-begin();
+				cnt++;
+			}
+		}
+		return (cnt==1) rt:-1;
+	}
 
+	/// \brief insert a command into the map.
+	/// \param val value to insert
+	void insert( const value_type& val)
+	{
+		push_back( val);
+	}
+};
+#endif
 
 /// \class CmdParser
 /// \exception Bad

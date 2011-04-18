@@ -31,51 +31,24 @@
 
 ************************************************************************/
 //
-// tests singleton, especially cleanup and live time issues when destructing
+// strPrefix.cpp
 //
 
-#include "singleton.hpp"
+#include "miscUtils.hpp"
+#include <ctype.h>
 
-#include <gtest/gtest.h>
-
-#include <string>
-
-class TestObject : public Singleton< TestObject > {
-private:
-	std::string *somedata;
-
-public:
-	TestObject( ) {
-		somedata = new std::string( "bla" );
-	}
-
-	virtual ~TestObject( ) {
-		delete somedata;
-	}
-};
-
-// The fixture for testing _Wolframe::Singleton
-class SingletonFixture : public ::testing::Test	{
-protected:
-	SingletonFixture( ) {
-	}
-
-	virtual ~SingletonFixture( ) {
-	}
-};
-
-// Tests to check basic functionality of the singleton
-// (implicitly tests for memory leaks in the destructor of
-// the test object)
-TEST_F( SingletonFixture, basic ) {
-	TestObject *o1 = &TestObject::instance( );
-	TestObject *o2 = &TestObject::instance( );
-
-	ASSERT_EQ( o1, o2 );
-}
-
-int main( int argc, char *argv[] )
+int commandCmp( const char *str, const char *command )
 {
-	::testing::InitGoogleTest( &argc, argv );
-	return RUN_ALL_TESTS( );
+	int	s, c;
+
+	do	{
+		s = toupper( *str++ );
+		c = toupper( *command++ );
+//		str++, command++;
+	}
+	while ( s && s == c);
+	if ( s == 0 )
+		return( 0 );
+	else
+		return s - c;
 }
