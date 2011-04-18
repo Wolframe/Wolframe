@@ -74,7 +74,7 @@ struct LuaObject :public ObjectType
 		lua_pushcfunction( ls, destroy);
 		lua_settable( ls, -3);
 	}
-	void *operator new( unsigned int num_bytes, lua_State* ls)
+	void *operator new( size_t num_bytes, lua_State* ls)
 	{
 		return lua_newuserdata( ls, num_bytes);
 	}
