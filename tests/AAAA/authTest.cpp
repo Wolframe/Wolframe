@@ -4,6 +4,7 @@
 
 #include "AAAA/authentication.hpp"
 #include "getPassword.hpp"
+#include "base64.hpp"
 
 using namespace std;
 using namespace _Wolframe::AAAA;
@@ -109,7 +110,8 @@ int main( int argc, const char *argv[] )
 				char data[256];
 				cout << "SASL data: "; cout.flush( );
 				cin.getline( data, 256 );
-				a->receiveData( data );				
+				string decoded = _Wolframe::base64::base64_decode( string( data ) );
+				a->receiveData( decoded );
 #endif // WITH_SASL
 			} else {
 				cerr << "authenticator requests unknown token '" << token << "'" << endl;

@@ -89,6 +89,7 @@ AAAA_OBJS = $(AAAA_OBJS) \
 !ENDIF
 
 LOCAL_STATIC_LIB_OBJS = \
+	base64.obj \
 	version.obj \
 	resolvePath.obj \
 	commandLine.obj \

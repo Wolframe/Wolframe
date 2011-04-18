@@ -148,6 +148,7 @@ DB_OBJS += \
 endif
 
 LOCAL_STATIC_LIB_OBJS = \
+	base64.o \
 	version.o \
 	resolvePath.o \
 	commandCmp.o \

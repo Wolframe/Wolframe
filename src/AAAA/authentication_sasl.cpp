@@ -192,7 +192,7 @@ Step::AuthStep SaslAuthenticator::nextStep( )
 			result = sasl_server_start(
 				m_connection,
 				m_mech.c_str( ),	// mech choosen by client
-				m_client_data.c_str( ),	// optional client data
+				m_client_data.data( ),	// optional client data
 				m_client_data.length( ),// length of client data
 				&out,			// server data
 				&out_len );		// length of server data
@@ -259,7 +259,7 @@ void SaslAuthenticator::receiveData( const std::string data )
 			m_state = _Wolframe_SASL_STATE_INITIAL_DATA;
 			break;
 		
-		case _Wolframe_SASL_STATE_INITIAL_DATA:
+		case _Wolframe_SASL_STATE_START:
 			m_client_data = data;
 			m_state = _Wolframe_SASL_STATE_START;
 			break;
