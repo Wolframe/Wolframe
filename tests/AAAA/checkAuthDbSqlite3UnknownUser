@@ -3,8 +3,8 @@
 # Checks an authentication method
 #
 
-set timeout 1
-log_user 0
+set timeout 2
+exp_log_user 0
 
 puts -nonewline "Authentication DBSQLITE3 unknown user - "
 

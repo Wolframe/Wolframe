@@ -19,19 +19,6 @@ INCLUDE_LIBS = \
 	-lboost_system \
 	$(TOPDIR)/src/libwolframe.a
 
-# gtest
-
-ifeq ($(WITH_GTEST),1)
-INCLUDE_CPPFLAGS += \
-	-I$(GTEST_INCLUDE_DIR)
-
-INCLUDE_LDFLAGS += \
-	-L$(GTEST_LIB_DIR)
-
-INCLUDE_LIBS += \
-	$(GTEST_LIBS)
-endif
-
 # openssl
 
 ifeq ($(WITH_SSL),1)
@@ -113,11 +100,11 @@ local_clean:
 local_distclean:
 
 local_test:
-	@./checkAuthTextFileUnknownUser
-	@./checkAuthTextFileWrongPass
-	@./checkAuthTextFileOk
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./checkAuthTextFileUnknownUser
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./checkAuthTextFileWrongPass
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./checkAuthTextFileOk
 ifeq ($(WITH_SQLITE3),1)
-	@./checkAuthDbSqlite3UnknownUser
-	@./checkAuthDbSqlite3WrongPass
-	@./checkAuthDbSqlite3Ok
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./checkAuthDbSqlite3UnknownUser
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./checkAuthDbSqlite3WrongPass
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./checkAuthDbSqlite3Ok
 endif
