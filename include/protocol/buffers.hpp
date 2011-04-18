@@ -79,52 +79,7 @@ public:
 	size_type size() const			{return m_pos;}
 	///\brief Return the buffer content as 0-terminated string
 	const char* c_str()			{m_buf[m_pos]=0; return m_buf;}
-};
-
-///
-/// \class CmdBuffer
-/// \brief Buffer for the currently parsed command
-///  The buffer implements the STL back insertion sequence interface required by the protocol parser.
-///  The command is encoded as integer type because protocol commands are not considered to be loo long because name clashes are not an issue here.
-///  There are only a fixed number of commands. The names of protocol commands are first level names that are implemented hardcoded by the protocol
-///  and not defined in the application processor.
-///
-struct CmdBuffer
-{
-	typedef boost::int_least64_t ValueType;		///< stores the command name with a maximum of 10 characters (6 bit per character = case insensitive alpha or digit)
-	unsigned int m_pos;				///< current cursor position
-	ValueType m_value;				///< the currently parsed command
-
-	/// \brief Some buffer constants
-	enum
-	{
-		MaxCommandLen=(sizeof(ValueType)/6)	///< the maximum length of a command in ASCII characters
-	};
-
-	CmdBuffer() 								:m_pos(0),m_value(0) {}
-	CmdBuffer( const CmdBuffer& o)  :m_pos(o.m_pos),m_value(o.m_value)	{}
-
-	/// \brief Reset the command buffer state
-	void clear()								{m_pos=0;m_value=0;}
-  
-	/// \brief Feed context with the next input character (case insensitive)
-	void push_back( char ch)
-	{
-		if (m_pos >= MaxCommandLen) {clear(); return;}
-		if (ch >= 'a' && ch <= 'z') {m_value = (m_value << 6) | (ch-'a'); return;}
-		if (ch >= 'A' && ch <= 'Z') {m_value = (m_value << 6) | (ch-'A'); return;}
-		if (ch >= '0' && ch <= '9') {m_value = (m_value << 6) | (ch+26-'0'); return;}
-		clear();
-	}
-
-	/// \brief Number of characters parsed for the command
-	unsigned int size() const {return m_pos;}
-
-	/// \brief Return the command parsed
-	operator ValueType() const {return m_value;}
-
-	/// \brief Return the command parsed
-	ValueType operator*() const {return m_value;}
+	operator const char*()			{return c_str();};
 };
 
 

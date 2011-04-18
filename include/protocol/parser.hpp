@@ -40,6 +40,7 @@ Project Wolframe.
 #include <algorithm>
 #include <vector>
 #include <boost/cstdint.hpp>
+#include <boost/algorithm/string.hpp>
 
 namespace _Wolframe {
 namespace protocol {
@@ -122,43 +123,31 @@ public:
 
 /// \class CmdMap
 /// \brief implements a map for set of protocol commands
-struct CmdMap :public std::vector<boost::int_least64_t>
-{
-	/// \brief retrieve a defined commands index from the map
-	/// \param val value to retrieve
-	/// \return the index of the command or -1 if not found
-	int get( const value_type& val) const
-	{
-		const_iterator itr = std::find( begin(), end(), val);
-		return itr==end()?-1:(int)(itr - begin());
-	}
-
-	/// \brief insert a command into the map. Throws an exception if the limit is reached
-	/// \param val value to insert
-	void insert( const value_type& val)
-	{
-		push_back( val);
-	}
-};
-#ifdef NNNLASHKJDASJLHDSKJD
+/// \remark implementation as vector because the set of commands is expected to be small.
 struct CmdMap :public std::vector<std::string>
 {
 	/// \brief retrieve a defined commands index from the map
 	/// \param val value to retrieve
 	/// \return the index of the command or -1 if not found or not determined enough
-	int get( const char* value) const
+	int operator []( const char* value) const
 	{
 		int rt = -1;
 		unsigned int cnt = 0;
+		unsigned int valuesize = strlen(value);
+
 		for (const_iterator itr = begin(); itr != end(); itr++)
 		{
 			if (boost::algorithm::starts_with( *itr, value))
 			{
+				if (valuesize == itr->size())
+				{
+					return itr-begin(); ///< exact match is always returned
+				}
 				if (!cnt) rt = itr-begin();
 				cnt++;
 			}
 		}
-		return (cnt==1) rt:-1;
+		return (cnt==1) ? rt:-1;
 	}
 
 	/// \brief insert a command into the map.
@@ -168,7 +157,6 @@ struct CmdMap :public std::vector<std::string>
 		push_back( val);
 	}
 };
-#endif
 
 /// \class CmdParser
 /// \exception Bad
@@ -207,9 +195,7 @@ public:
 	///
 	void add( const char* cmd)
 	{
-		CmdBufferType ct;
-		for (unsigned int ii=0; cmd[ii]; ii++) ct.push_back(cmd[ii]);
-		m_cmdmap.insert( *ct);
+		m_cmdmap.insert( cmd);
 	}
 
 	///
@@ -256,11 +242,12 @@ public:
 	{
 		while (src < end && *src > 32)
 		{
-			buf.push_back( *src);
+			char ch = *src;
 			++src;
+			buf.push_back( ch);
 		}
 		if (src == end) return -1;
-		int rt = m_cmdmap.get(*buf);
+		int rt = m_cmdmap[ buf];
 		buf.clear();
 		return rt;
 	}

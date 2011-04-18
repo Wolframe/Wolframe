@@ -66,12 +66,10 @@ private:
 	static const char* stateName( State s) {const char* ar[]={"Null","Init","Parsing","Selected","ArgumentsParsed","Running"}; return ar[s];}
 
 
-	typedef protocol::CmdBuffer CmdBuffer;			//< buffer type for protocol commands
-	typedef protocol::CmdParser<CmdBuffer> ProtocolParser;	//< parser type for the protocol
 	typedef protocol::Buffer<256> LineBuffer;		//< buffer type for the command argument strings
+	typedef protocol::CmdParser<LineBuffer> ProtocolParser;	//< parser type for the protocol
 	typedef protocol::CArgBuffer<LineBuffer> ArgBuffer;	//< buffer type for the command arguments
 
-	CmdBuffer m_cmdBuffer;			//< buffer for the command
 	LineBuffer m_lineBuffer;		//< buffer for the argument strings
 	ArgBuffer m_argBuffer;			//< buffer for the arguments
 	ProtocolParser m_parser;		//< parser for the commands

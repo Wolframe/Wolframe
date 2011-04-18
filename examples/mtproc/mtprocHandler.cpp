@@ -59,8 +59,7 @@ struct Connection::Private
 
 	//* typedefs for input output buffers
 	typedef protocol::Buffer<128> LineBuffer;			//< buffer for one line of input/output
-	typedef protocol::CmdBuffer CmdBuffer;				//< buffer for protocol commands
-	typedef protocol::CmdParser<CmdBuffer> ProtocolParser;		//< parser for the protocol
+	typedef protocol::CmdParser<LineBuffer> ProtocolParser;		//< parser for the protocol
 
 	//* typedefs for state variables and buffers
 	//list of processor states
@@ -87,7 +86,6 @@ struct Connection::Private
 	CommandDispatcher commandDispatcher;		//< state of the processor in the command execution phase (protocol sub statemachine)
 
 	//2. buffers and context
-	CmdBuffer cmdBuffer;				//< context (sub state) for partly parsed protocol commands
 	LineBuffer buffer;				//< context (sub state) for partly parsed input lines
 	Input input;					//< buffer for network read messages
 	Output output;					//< buffer for network write messages

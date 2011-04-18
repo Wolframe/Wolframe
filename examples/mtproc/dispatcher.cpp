@@ -42,7 +42,6 @@ void CommandDispatcher::resetCommand()
 	m_command = unknown;
 	m_lineBuffer.clear();
 	m_argBuffer.clear();
-	m_cmdBuffer.clear();
 	m_argc = 0;
 	m_argv = 0;
 
@@ -137,7 +136,7 @@ CommandDispatcher::Command CommandDispatcher::getCommand( InputBlock::iterator& 
 		}
 		case Parsing:
 		{
-			int ci = m_parser.getCommand( itr, eoM, m_cmdBuffer);
+			int ci = m_parser.getCommand( itr, eoM, m_lineBuffer);
 			if (ci >= unknown && ci < method)
 			{
 				if (ci == unknown) return unknown;
