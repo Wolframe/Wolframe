@@ -3,8 +3,10 @@
 # Checks an authentication method
 #
 
+package require Expect
+
 set timeout 2
-exp_log_user 0
+log_user 0
 
 puts -nonewline "Authentication TEXT_FILE succesfull - "
 
