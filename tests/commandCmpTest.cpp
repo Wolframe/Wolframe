@@ -31,47 +31,21 @@
 
 ************************************************************************/
 //
-// tests singleton, especially cleanup and live time issues when destructing
+// tests command compare function
 //
 
-#include "singleton.hpp"
+#include "miscUtils.hpp"
 
 #include <gtest/gtest.h>
 
-#include <string>
-
-class TestObject : public Singleton< TestObject > {
-private:
-	std::string *somedata;
-
-public:
-	TestObject( ) {
-		somedata = new std::string( "bla" );
-	}
-
-	virtual ~TestObject( ) {
-		delete somedata;
-	}
-};
-
-// The fixture for testing _Wolframe::Singleton
-class SingletonFixture : public ::testing::Test	{
-protected:
-	SingletonFixture( ) {
-	}
-
-	virtual ~SingletonFixture( ) {
-	}
-};
-
-// Tests to check basic functionality of the singleton
-// (implicitly tests for memory leaks in the destructor of
-// the test object)
-TEST_F( SingletonFixture, basic ) {
-	TestObject *o1 = &TestObject::instance( );
-	TestObject *o2 = &TestObject::instance( );
-
-	ASSERT_EQ( o1, o2 );
+// Tests to check basic functionality of the command string compare
+TEST( commandCmp, basic ) {
+	ASSERT_EQ( commandCmp( "capa", "CAPABILITIES" ), 0 );
+	ASSERT_EQ( commandCmp( "CAPA", "capabilities" ), 0 );
+	ASSERT_GT( commandCmp( "caps", "CAPABILITIES" ), 0 );
+	ASSERT_GT( commandCmp( "CAPs", "capabilities" ), 0 );
+	ASSERT_LT( commandCmp( "cap-", "CAPABILITIES" ), 0 );
+	ASSERT_LT( commandCmp( "CAP-", "capabilities" ), 0 );
 }
 
 int main( int argc, char *argv[] )
@@ -79,3 +53,4 @@ int main( int argc, char *argv[] )
 	::testing::InitGoogleTest( &argc, argv );
 	return RUN_ALL_TESTS( );
 }
+
