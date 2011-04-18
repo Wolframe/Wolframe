@@ -59,11 +59,12 @@ class SaslAuthenticator : public Authenticator {
 			_Wolframe_SASL_STATE_ERROR
 		} m_state;
 
-		sasl_callback_t m_callbacks[2];
+		sasl_callback_t m_callbacks[3];
 		sasl_conn_t *m_connection;
 
 		std::string m_appName;
 		std::string m_service;
+		std::string m_confpath;
 		std::string m_mech;
 		std::string m_client_data;
 		
@@ -74,13 +75,15 @@ class SaslAuthenticator : public Authenticator {
 		std::string m_pass;
 
 	public:
-		SaslAuthenticator( const std::string appName, const std::string service );
+		SaslAuthenticator( const std::string appName, const std::string service, const std::string confpath );
 		virtual ~SaslAuthenticator( );
 		virtual Step::AuthStep nextStep( );
 		virtual std::string sendData( );
 		virtual std::string token( );
 		virtual void receiveData( const std::string data );
 		virtual std::string getError( );
+
+		std::string getConfPath( ) { return m_confpath; }
 };
 
 }} // namespace _Wolframe::AAAA

@@ -67,7 +67,8 @@ Authenticator *CreateSaslAuthenticator( AuthenticatorFactory::properties props )
 {
 	return new SaslAuthenticator(
 		findprop<std::string>( props, "appname" ),
-		findprop<std::string>( props, "service" )
+		findprop<std::string>( props, "service" ),
+		findprop<std::string>( props, "confpath" )
 	);
 }
 
@@ -76,8 +77,6 @@ static int sasl_my_log( void* /* context */, int priority, const char *message )
 	if( message == NULL ) return SASL_BADPARAM;
 	
 	_Wolframe::log::LogLevel::Level level;
-	
-	std::cout << "SASL log" << priority << ": " << message << std::endl;
 	
 	switch( priority ) {
 		case SASL_LOG_ERR:
@@ -97,17 +96,30 @@ static int sasl_my_log( void* /* context */, int priority, const char *message )
 	return SASL_OK;
 }
 
-SaslAuthenticator::SaslAuthenticator( const std::string appName, const std::string service )
+static int sasl_my_getconfpath( void* context, char **path )
+{
+	SaslAuthenticator *a = (SaslAuthenticator *)context;
+	*path = strdup( a->getConfPath( ).c_str( ) );
+	if( !*path ) return SASL_FAIL;
+
+	return SASL_OK;
+}
+
+SaslAuthenticator::SaslAuthenticator( const std::string appName, const std::string service, const std::string confpath )
 	: m_appName( appName ),
-	  m_service( service )
+	  m_service( service ),
+	  m_confpath( confpath )
 {
 // register callbacks
 	m_callbacks[0].id = SASL_CB_LOG;
 	m_callbacks[0].proc = (int (*)( ))&sasl_my_log;
 	m_callbacks[0].context = this;
-	m_callbacks[1].id = SASL_CB_LIST_END;
-	m_callbacks[1].proc = NULL;
-	m_callbacks[1].context = NULL;
+	m_callbacks[1].id = SASL_CB_GETCONFPATH;
+	m_callbacks[1].proc = (int (*)( ))&sasl_my_getconfpath;
+	m_callbacks[1].context = this;
+	m_callbacks[2].id = SASL_CB_LIST_END;
+	m_callbacks[2].proc = NULL;
+	m_callbacks[2].context = NULL;
 
 // initialize the SASL library
 	int result = sasl_server_init( m_callbacks, "test" );
