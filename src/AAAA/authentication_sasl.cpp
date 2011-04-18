@@ -166,7 +166,7 @@ Step::AuthStep SaslAuthenticator::nextStep( )
 				&nof_mechs );	// number of mechs
 			if( result != SASL_OK ) {
 				std::ostringstream ss;
-				ss	<< "Generating list of SASL mechs failed" << sasl_errstring( result, NULL, NULL )
+				ss	<< "Generating list of SASL mechs failed: " << sasl_errstring( result, NULL, NULL )
 					<< "(" << result << "), " << sasl_errdetail( m_connection );
 				m_error = ss.str( );
 				m_state = _Wolframe_SASL_STATE_ERROR;
@@ -196,6 +196,15 @@ Step::AuthStep SaslAuthenticator::nextStep( )
 				m_client_data.length( ),// length of client data
 				&out,			// server data
 				&out_len );		// length of server data
+			if( result != SASL_OK ) {
+				std::ostringstream ss;
+				ss	<< "Starting SASL server failed: " << sasl_errstring( result, NULL, NULL )
+					<< "(" << result << "), " << sasl_errdetail( m_connection );
+				m_error = ss.str( );
+				m_state = _Wolframe_SASL_STATE_ERROR;
+				return Step::_Wolframe_AUTH_STEP_GET_ERROR;
+			}
+
 			m_token = "SASL_data";
 			m_data = std::string( out );
 			return Step::_Wolframe_AUTH_STEP_SEND_DATA;
