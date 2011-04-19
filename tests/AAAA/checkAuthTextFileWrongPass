@@ -8,9 +8,9 @@ package require Expect
 set timeout 2
 log_user 0
 
-puts -nonewline "Authentication TEXT_FILE wrong password - "
+puts -nonewline "Authentication TEXTFILE wrong password - "
 
-spawn ./authTest TEXT_FILE
+spawn ./authTest TEXTFILE
 
 expect "login: "
 send "test\r"

@@ -23,7 +23,7 @@ int main( int argc, const char *argv[] )
 // register some authentication methods
 	AuthenticatorFactory::properties props;
 	props.push_back( AuthenticatorFactory::property( "filename", std::string( "passwd" ) ) );
-	AuthenticatorFactory::instance( ).registerAuthenticator( "TEXT_FILE", CreateTextFileAuthenticator, props );
+	AuthenticatorFactory::instance( ).registerAuthenticator( "TEXTFILE", CreateTextFileAuthenticator, props );
 
 #ifdef WITH_PAM
 	AuthenticatorFactory::properties props2;
