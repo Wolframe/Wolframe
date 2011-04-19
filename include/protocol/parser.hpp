@@ -41,6 +41,7 @@ Project Wolframe.
 #include <vector>
 #include <boost/cstdint.hpp>
 #include <boost/algorithm/string.hpp>
+#include <ctype.h>
 
 namespace _Wolframe {
 namespace protocol {
