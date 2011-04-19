@@ -1,0 +1,25 @@
+#!/usr/bin/expect
+#
+# Checks an authentication method
+#
+
+package require Expect
+
+set timeout 2
+log_user 0
+
+puts -nonewline "Authentication SASL PLAIN unknown user - "
+
+spawn ./authTest SASL
+
+expect "Choose a SASL mech:"
+send "PLAIN\r"
+expect "SASL data: "
+# perl -MMIME::Base64 -e 'print encode_base64("test2\0test2\0xx");'
+send "dGVzdDIAdGVzdDIAeHg=\r"
+
+expect {
+	"Authentication succeeded!"	{ puts "ERROR" }
+	"Authentication failed!"	{ puts "OK" }
+	timeout 			{ puts "Timeout" }
+}

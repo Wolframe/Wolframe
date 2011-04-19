@@ -8,7 +8,7 @@ package require Expect
 set timeout 2
 log_user 0
 
-puts -nonewline "Authentication DBSQLITE3 succesfull - "
+puts -nonewline "Authentication DBSQLITE3 successfull - "
 
 spawn ./authTest DBSQLITE3
 

@@ -108,3 +108,9 @@ ifeq ($(WITH_SQLITE3),1)
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./checkAuthDbSqlite3WrongPass
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./checkAuthDbSqlite3Ok
 endif
+ifeq ($(WITH_SASL),1)
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./checkAuthSaslWrongMech
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./checkAuthSaslPlainUnknownUser
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./checkAuthSaslPlainWrongPass
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./checkAuthSaslPlainOk
+endif

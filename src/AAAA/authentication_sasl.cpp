@@ -208,7 +208,16 @@ Step::AuthStep SaslAuthenticator::nextStep( )
 				m_client_data.length( ),// length of client data
 				&out,			// server data
 				&out_len );		// length of server data
-			if( result != SASL_OK ) {
+
+// already authenticated
+			if( result == SASL_OK ) {
+				// TODO: cleanup
+				m_state = _Wolframe_SASL_STATE_NEW;
+				return Step::_Wolframe_AUTH_STEP_SUCCESS;
+			}
+
+// an error occurred?
+			if( result != SASL_CONTINUE ) {
 				std::ostringstream ss;
 				ss	<< "Starting SASL server failed: " << sasl_errstring( result, NULL, NULL )
 					<< "(" << result << "), " << sasl_errdetail( m_connection );
@@ -217,6 +226,7 @@ Step::AuthStep SaslAuthenticator::nextStep( )
 				return Step::_Wolframe_AUTH_STEP_GET_ERROR;
 			}
 
+// otherwise authentication continues, but now server has to send something
 			m_token = "SASL_data";
 			m_data = std::string( out );
 			return Step::_Wolframe_AUTH_STEP_SEND_DATA;
