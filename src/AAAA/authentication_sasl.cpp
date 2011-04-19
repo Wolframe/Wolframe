@@ -121,6 +121,8 @@ SaslAuthenticator::SaslAuthenticator( const std::string appName, const std::stri
 	m_callbacks[2].proc = NULL;
 	m_callbacks[2].context = NULL;
 
+	m_connection = NULL;
+	
 // initialize the SASL library
 	int result = sasl_server_init( m_callbacks, "test" );
 	if( result != SASL_OK ) {
@@ -212,6 +214,7 @@ Step::AuthStep SaslAuthenticator::nextStep( )
 // already authenticated
 			if( result == SASL_OK ) {
 				sasl_dispose( &m_connection );
+				m_connection = NULL;
 				m_state = _Wolframe_SASL_STATE_NEW;
 				return Step::_Wolframe_AUTH_STEP_SUCCESS;
 			}
@@ -229,14 +232,56 @@ Step::AuthStep SaslAuthenticator::nextStep( )
 // otherwise authentication continues, but now the server has to send something
 			m_token = "SASL_data";
 			m_data = std::string( out );
+			m_state = _Wolframe_SASL_STATE_WAIT;
 			return Step::_Wolframe_AUTH_STEP_SEND_DATA;
 		
+		case _Wolframe_SASL_STATE_WAIT:
+// data has been sent by server, await client data now
+			m_token = "SASL_data";
+			return Step::_Wolframe_AUTH_STEP_RECV_DATA;
+		
+		case _Wolframe_SASL_STATE_STEP:
+// data received from client, executing next SASL step now
+			result = sasl_server_step(
+				m_connection,
+				m_client_data.data( ),		// client data
+				m_client_data.length( ),	// size of client data
+				&out,				// server data
+				&out_len );			// length of server data
+
+// authenticated
+			if( result == SASL_OK ) {
+				sasl_dispose( &m_connection );
+				m_connection = NULL;
+				m_state = _Wolframe_SASL_STATE_NEW;
+				return Step::_Wolframe_AUTH_STEP_SUCCESS;
+			}
+
+// an error occurred?
+			if( result != SASL_CONTINUE ) {
+				std::ostringstream ss;
+				ss	<< "A step in SASL server failed: " << sasl_errstring( result, NULL, NULL )
+					<< "(" << result << "), " << sasl_errdetail( m_connection );
+				m_error = ss.str( );
+				m_state = _Wolframe_SASL_STATE_ERROR;
+				return Step::_Wolframe_AUTH_STEP_GET_ERROR;
+			}
+
+// otherwise authentication continues, server has to send something
+			m_token = "SASL_data";
+			m_data = std::string( out );
+			m_state = _Wolframe_SASL_STATE_WAIT;
+			return Step::_Wolframe_AUTH_STEP_SEND_DATA;
+			
 		case _Wolframe_SASL_STATE_ERROR:
 			goto FAIL;
 	}
 
 FAIL:
-	if( m_connection != NULL ) sasl_dispose( &m_connection );
+	if( m_connection != NULL ) {
+		sasl_dispose( &m_connection );
+		m_connection = NULL;
+	}
 
 	boost::this_thread::sleep( boost::posix_time::seconds( 1 ) );
 
@@ -244,7 +289,6 @@ FAIL:
 	return Step::_Wolframe_AUTH_STEP_FAIL;			
 }
 
-// never used
 std::string SaslAuthenticator::sendData( )
 {
 	return m_data;
@@ -268,11 +312,16 @@ void SaslAuthenticator::receiveData( const std::string data )
 			m_state = _Wolframe_SASL_STATE_START;
 			break;
 
+		case _Wolframe_SASL_STATE_WAIT:
+			m_client_data = data;
+			m_state = _Wolframe_SASL_STATE_STEP;
+		
 		case _Wolframe_SASL_STATE_NEW:
 		case _Wolframe_SASL_STATE_INITIAL_DATA:
+		case _Wolframe_SASL_STATE_STEP:
 		case _Wolframe_SASL_STATE_ERROR:
 			// TODO: application exception
-			throw new std::runtime_error( "Illegal state in auhenticator" );
+			throw std::runtime_error( "Illegal state in auhenticator" );
 			break;
 	}
 }

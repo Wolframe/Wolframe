@@ -53,6 +53,8 @@ class SaslAuthenticator : public Authenticator {
 			_Wolframe_SASL_STATE_NEGOTIATE_MECHS,
 			_Wolframe_SASL_STATE_INITIAL_DATA,
 			_Wolframe_SASL_STATE_START,
+			_Wolframe_SASL_STATE_WAIT,
+			_Wolframe_SASL_STATE_STEP,
 			_Wolframe_SASL_STATE_ERROR
 		} m_state;
 
