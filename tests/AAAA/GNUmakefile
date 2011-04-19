@@ -96,10 +96,14 @@ local_all:
 local_clean:
 	-rm -f $(TEST_CPP_BINS)
 	-rm -f *.o
+	-rm -f sasl.db
 
 local_distclean:
 
-local_test:
+sasl.db:
+	echo "xx" | /usr/sbin/saslpasswd2 -f sasl.db -p test
+
+local_test: sasl.db
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./checkAuthTextFileUnknownUser
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./checkAuthTextFileWrongPass
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./checkAuthTextFileOk
