@@ -5,6 +5,7 @@
 
 package require Expect
 source base64.tcl
+source md5.tcl
 
 set timeout 2
 #log_user 0
@@ -15,14 +16,38 @@ spawn ./authTest SASL
 
 expect "Choose a SASL mech:"
 send "DIGEST-MD5\r"
+
+# no initial client data, server will send us a challenge
 expect "SASL data: "
-# perl -MMIME::Base64 -e 'print encode_base64("test\0test\0xx");'
-send "dGVzdAB0ZXN0AHh4\r"
+send "\r"
+
+# awaiting challenge
 expect -re "Got SASL data: nonce=\"(.*)\",realm=\"(.*)\",qop=\"auth\",charset=utf-8,algorithm=md5-sess"
-set response "username=\"test\",realm=\"$expect_out(2,string)\",nonce=\"$expect_out(1,string)\",cnonce=\"\x\",nc=\"00000001\",serv-type=\"test\",response=\"xx\",digest-uri=\"wolframe/localhost\",charset=utf-8,algorithm=md5-sess"
-set encoded [base64::encode -maxlen 9999 $response]
+set realm $expect_out(2,string)
+set nonce $expect_out(1,string)
+set cnonce "733388383847373838"
+set nc "00000001"
+set digestUri "wolframe/localhost"
+set qop "auth"
+
+# do the response value calculations
+set X "test:$realm:xx"
+set Y [md5::md5 "$X"]
+set A1 "$Y:$nonce:$cnonce"
+set A2 "AUTHENTICATE:$digestUri"
+set HA1 [md5::md5 $A1]
+set HA2 [md5::md5 $A2]
+set KD "$HA1:$nonce:$nc:$cnonce:$qop:$HA2"
+set Z [md5::md5 $KD]
+set response $Z
+puts "\n\nX: $X\nY: $Y\nA1: $A1\nA2: $A2\nHA1: $HA1\nHA2: $HA2\nKD: $KD\nZ: $Z\n"
+
+# compose final answer
+#set answer "username=\"test\",realm=\"$realm\",nonce=\"$nonce\",cnonce=\"$cnonce\",nc=\"$nc\",qop=\"$qop\",serv-type=\"test\",digest-uri=\"$digestUri\",response=\"$response\",charset=utf-8,algorithm=md5-sess"
+set answer "username=\"test\",realm=\"$realm\",nonce=\"$nonce\",nc=\"$nc\",cnonce=\"$cnonce\",digest-uri=\"$digestUri\",response=\"aaa\""
+set encoded [base64::encode -maxlen 9999 $answer]
 send "$encoded\r"
-puts $response
+puts $answer
 
 expect {
 	"Authentication succeeded!"	{ puts "OK" }
