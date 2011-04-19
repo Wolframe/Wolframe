@@ -46,12 +46,6 @@ extern "C"
 using namespace _Wolframe;
 using namespace mtproc;
 
-/* Is there because MSVC croaks:
-   luatypes.cpp(130) : warning C4291: 'void *LuaObject<ObjectType>::operator new(size_t,lua_State *)' :
-   no matching operator delete found; memory will not be freed if initialization throws an exception
-*/
-#pragma warning(disable : 4291)
-
 namespace luaname
 {
 	static const char* GeneratorClosure = "wolframe.InputGeneratorClosure";
@@ -72,6 +66,7 @@ struct LuaObject :public ObjectType
 		if (THIS) THIS->~LuaObject();
 		return 0;
 	}
+
 	static void create( lua_State* ls, const char* metatableName)
 	{
 		luaL_newmetatable( ls, metatableName);
@@ -83,8 +78,13 @@ struct LuaObject :public ObjectType
 	
 	void* operator new (std::size_t num_bytes, lua_State* ls) throw( )
 	{
-		return lua_newuserdata( ls, num_bytes);
+		void* rt = lua_newuserdata( ls, num_bytes);
+		if (rt == 0) throw std::bad_alloc();
 	}
+
+	/// \brief does nothing because the LUA garbage collector does the job.
+	/// \warning CAUTION: DO NOT CALL THIS FUNCTION ! DOES NOT WORK ON MSVC 9.0. (The compiler links with the std delete)
+	void operator delete (void*, void* ) {}
 };
 
 // Design
