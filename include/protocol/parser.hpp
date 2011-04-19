@@ -128,9 +128,9 @@ public:
 struct CmdMap :public std::vector<std::string>
 {
 	/// \brief predicate for case insensitive comparison in boost::algorithm::starts_with
-	struct ToLowerPredicate
+	struct ToUpperPredicate
 	{
-		bool operator()( const char& ch1, const char& ch2) const {return tolower(ch1)==tolower(ch2);}
+		bool operator()( const char& ch1, const char& ch2) const {return ch1==toupper(ch2);}
 	};
 
 	/// \brief retrieve a defined commands index from the map
@@ -144,7 +144,7 @@ struct CmdMap :public std::vector<std::string>
 
 		for (const_iterator itr = begin(); itr != end(); itr++)
 		{
-			if (boost::algorithm::starts_with( *itr, value, ToLowerPredicate()))
+			if (boost::algorithm::starts_with( *itr, value, ToUpperPredicate()))
 			{
 				if (valuesize == itr->size())
 				{
@@ -161,7 +161,7 @@ struct CmdMap :public std::vector<std::string>
 	/// \param val value to insert
 	void insert( const value_type& val)
 	{
-		push_back( val);
+		push_back( boost::algorithm::to_upper_copy( val));
 	}
 };
 

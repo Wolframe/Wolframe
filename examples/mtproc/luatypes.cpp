@@ -51,8 +51,7 @@ namespace luaname
 	static const char* GeneratorClosure = "wolframe.InputGeneratorClosure";
 	static const char* Input = "wolframe.Input";
 	static const char* Output = "wolframe.Output";
-	static const char* System = "wolframe.System";
-	static const char* Generator = "wolframe.InputGenerator";
+	static const char* Filter = "wolframe.Filter";
 }
 
 template <class ObjectType>
@@ -75,41 +74,42 @@ struct LuaObject :public ObjectType
 		lua_pushcfunction( ls, destroy);
 		lua_settable( ls, -3);
 	}
-	
+
+	typedef int (*Method)( lua_State *ls);
+	static void defineMethod( lua_State* ls, const char* metatableName, const char* name, Method method)
+	{
+		luaL_getmetatable( ls, metatableName);
+		lua_pushstring( ls, name);
+		lua_pushcfunction( ls, method);
+		lua_settable( ls, -3);
+	}
+
 	void* operator new (std::size_t num_bytes, lua_State* ls) throw( )
 	{
 		void* rt = lua_newuserdata( ls, num_bytes);
 		if (rt == 0) throw std::bad_alloc();
+		return rt;
 	}
 
 	/// \brief does nothing because the LUA garbage collector does the job.
 	/// \warning CAUTION: DO NOT CALL THIS FUNCTION ! DOES NOT WORK ON MSVC 9.0. (The compiler links with the std delete)
 	void operator delete (void*, void* ) {}
+
+	static void createGlobal( lua_State* ls, const char* metatableName, const char* name, const ObjectType& instance)
+	{
+		create( ls, metatableName);
+		(void)new (ls) LuaObject( instance);
+		luaL_getmetatable( ls, metatableName);
+		lua_setmetatable( ls, -2);
+		lua_setglobal( ls, name);
+	}
 };
 
-// Design
-/// input is an object LuaInput with a shared_ptr reference to the application processor contexts input generator reference it is predefined at
-/// application processor startup. It has a function at(f) defining the filter and a function get() returning the input iterator function with closure.
-///
-/// A lua filter is a lua function. input.as(f) expects a function f that returns a boost::shared_ptr<protocol::Generator*>.
-/// This is then assigned to the input generator after getting its buffer. Why shared_ptr<>, because we want to be able to free it, in any context
-/// also when it is created in a dll.
-///
-///
-// A module luafilters exists that defines a global table "filter" with all create filter functions defined as member variables. referencing such an element
-// does calling the function returning a new filter.
-// A module luasystem exists that defines a global table "system" with reference to all system interfaces from the processing context as objects
-// defined. (for example "input" and "output")  input has a function input.as(f) with a filter f as argument and a function get.
-
-static int generatorGetNext( lua_State* ls)
+static int function_generator( lua_State* ls)
 {
 	const char* item[2];
-	GeneratorClosure* closure = (GeneratorClosure*)luaL_checkudata( ls, lua_upvalueindex( 1), luaname::GeneratorClosure);
-	if (closure == 0)
-	{
-		luaL_error( ls, "calling undefined iterator");
-		return 0;
-	}
+	GeneratorClosure* closure = (GeneratorClosure*)lua_touserdata( ls, lua_upvalueindex( 1));
+
 	switch (closure->fetch( item[0], item[1]))
 	{
 		case GeneratorClosure::DoYield:
@@ -131,33 +131,33 @@ static int generatorGetNext( lua_State* ls)
 	return 0;
 }
 
-static void createInput( lua_State* ls, Input& input)
+static int function_filter( lua_State* ls)
 {
-	LuaObject<Input>::create( ls, luaname::Input);
-	(void)new (ls) LuaObject<Input>( input);
-	luaL_getmetatable( ls, luaname::Input);
-	lua_setmetatable( ls, -2);
-	lua_setglobal( ls, "input");
+	void* ud = lua_touserdata( ls, lua_upvalueindex(1));
+	System* system = (System*) ud;
+	if (lua_gettop( ls) != 1) return luaL_error( ls, "invalid number of arguments (1 string as parameter expected)");
+	if (!lua_isstring( ls, 1)) return luaL_error( ls, "invalid type of argument (string expected)");
+	const char* name = lua_tostring( ls, 1);
+	(void)new (ls) LuaObject<Filter>( Filter( system, name));
+	return 1;
 }
 
-static void createOutput( lua_State* ls, Output& output)
+static int function_as( lua_State* )
 {
-	LuaObject<Output>::create( ls, luaname::Output);
-	(void)new (ls) LuaObject<Output>( output);
-	luaL_getmetatable( ls, luaname::Output);
-	lua_setmetatable( ls, -2);
-	lua_setglobal( ls, "output");
+	/// TODO: switch the filter of input or output object
+	return 0;
 }
 
-static void createSystem( lua_State* ls, System* system)
+static void create_function_filter( lua_State* ls, System* system)
 {
-	luaL_newmetatable( ls, luaname::System);
-	lua_settable( ls, -1);
-	System** ref = (System**)lua_newuserdata( ls, sizeof(System*));
-	luaL_getmetatable( ls, luaname::System);
-	lua_setmetatable( ls, -2);
-	*ref = system;
-	lua_setglobal( ls, "system");
+	lua_pushlightuserdata( ls, system);
+	lua_pushcclosure( ls, &function_filter, 1);
+
+	lua_pushstring( ls, "filter");
+	lua_pushcfunction( ls, &function_filter);
+	lua_settable( ls, LUA_REGISTRYINDEX);
+
+	LuaObject<Filter>::create( ls, luaname::Filter);
 }
 
 struct Interpreter::State
@@ -181,9 +181,14 @@ Interpreter::Interpreter( System* system, const lua::Configuration& config, Inpu
 		:m_input(input),m_output(output),m_system(system)
 {
 	m_state = new State( config);
-	createSystem( m_state->ls, m_system);
-	createInput( m_state->ls, m_input);
-	createOutput( m_state->ls, m_output);
+
+	LuaObject<Input>::createGlobal( m_state->ls, luaname::Input, "input", m_input);
+	LuaObject<Input>::defineMethod( m_state->ls, luaname::Input, "as", &function_as);
+
+	LuaObject<Output>::createGlobal( m_state->ls, luaname::Output, "output", m_output);
+	LuaObject<Output>::defineMethod( m_state->ls, luaname::Output, "as", &function_as);
+
+	create_function_filter( m_state->ls, m_system);
 }
 
 Interpreter::~Interpreter()

@@ -63,10 +63,25 @@ struct Output
 struct System
 {
 	System(){}
-	~System(){}
+	virtual ~System(){}
 
-	protocol::Generator* createGenerator( const char* name) const;
-	protocol::FormatOutput* createFormatOutput( const char* name) const;
+	virtual protocol::Generator* createGenerator( const char* name) const;
+	virtual protocol::FormatOutput* createFormatOutput( const char* name) const;
+};
+
+struct Filter
+{
+	boost::shared_ptr<protocol::FormatOutput> m_formatoutput;
+	boost::shared_ptr<protocol::Generator> m_generator;
+
+	Filter( System* system, const char* name)
+		:m_formatoutput(system->createFormatOutput(name))
+		,m_generator(system->createGenerator(name)){}
+
+	Filter( const Filter& o)
+		:m_formatoutput(o.m_formatoutput)
+		,m_generator(o.m_generator){}
+	~Filter(){};
 };
 
 class GeneratorClosure
