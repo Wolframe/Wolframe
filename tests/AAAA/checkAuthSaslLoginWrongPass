@@ -8,7 +8,7 @@ package require Expect
 set timeout 2
 log_user 0
 
-puts -nonewline "Authentication SASL LOGIN successfull - "
+puts -nonewline "Authentication SASL LOGIN wrong password - "
 
 spawn ./authTest SASL
 
@@ -20,12 +20,12 @@ send "\r"
 expect "Got SASL data: Username:"
 # perl -MMIME::Base64 -e 'print encode_base64("test");'
 send "dGVzdA==\r"
-# perl -MMIME::Base64 -e 'print encode_base64("xx");'
 expect "Got SASL data: Password:"
-send "eHg=\r"
+# perl -MMIME::Base64 -e 'print encode_base64("x");'
+send "eA==\r"
 
 expect {
-	"Authentication succeeded!"	{ puts "OK" }
-	"Authentication failed!"	{ puts "ERROR" }
+	"Authentication succeeded!"	{ puts "ERROR" }
+	"Authentication failed!"	{ puts "OK" }
 	timeout 			{ puts "Timeout" }
 }

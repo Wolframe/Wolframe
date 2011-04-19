@@ -315,6 +315,7 @@ void SaslAuthenticator::receiveData( const std::string data )
 		case _Wolframe_SASL_STATE_WAIT:
 			m_client_data = data;
 			m_state = _Wolframe_SASL_STATE_STEP;
+			break;
 		
 		case _Wolframe_SASL_STATE_NEW:
 		case _Wolframe_SASL_STATE_INITIAL_DATA:
