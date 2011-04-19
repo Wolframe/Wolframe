@@ -53,9 +53,6 @@ class SaslAuthenticator : public Authenticator {
 			_Wolframe_SASL_STATE_NEGOTIATE_MECHS,
 			_Wolframe_SASL_STATE_INITIAL_DATA,
 			_Wolframe_SASL_STATE_START,
-			_Wolframe_SASL_STATE_NEED_LOGIN,
-			_Wolframe_SASL_STATE_NEED_PASS,
-			_Wolframe_SASL_STATE_COMPUTE,
 			_Wolframe_SASL_STATE_ERROR
 		} m_state;
 
@@ -71,8 +68,6 @@ class SaslAuthenticator : public Authenticator {
 		std::string m_error;
 		std::string m_data;
 		std::string m_token;
-		std::string m_login;
-		std::string m_pass;
 
 	public:
 		SaslAuthenticator( const std::string appName, const std::string service, const std::string confpath );

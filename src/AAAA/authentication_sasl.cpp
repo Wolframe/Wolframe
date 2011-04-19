@@ -211,7 +211,7 @@ Step::AuthStep SaslAuthenticator::nextStep( )
 
 // already authenticated
 			if( result == SASL_OK ) {
-				// TODO: cleanup
+				sasl_dispose( &m_connection );
 				m_state = _Wolframe_SASL_STATE_NEW;
 				return Step::_Wolframe_AUTH_STEP_SUCCESS;
 			}
@@ -226,40 +226,22 @@ Step::AuthStep SaslAuthenticator::nextStep( )
 				return Step::_Wolframe_AUTH_STEP_GET_ERROR;
 			}
 
-// otherwise authentication continues, but now server has to send something
+// otherwise authentication continues, but now the server has to send something
 			m_token = "SASL_data";
 			m_data = std::string( out );
 			return Step::_Wolframe_AUTH_STEP_SEND_DATA;
-			
-		case _Wolframe_SASL_STATE_NEED_LOGIN:
-			m_token = "login";
-			return Step::_Wolframe_AUTH_STEP_RECV_DATA;
-
-		case _Wolframe_SASL_STATE_NEED_PASS:
-			m_token = "password";
-			return Step::_Wolframe_AUTH_STEP_RECV_DATA;
-
-		case _Wolframe_SASL_STATE_COMPUTE:
-// user not found
-			if( false ) {
-				m_state = _Wolframe_SASL_STATE_NEED_LOGIN;
-				goto FAIL;
-			}
-// user found, but password doesn't match
-			if( false ) {
-				m_state = _Wolframe_SASL_STATE_NEED_LOGIN;
-				goto FAIL;
-			}
-
-// everythink is peachy
-			m_state = _Wolframe_SASL_STATE_NEED_LOGIN;
-			return Step::_Wolframe_AUTH_STEP_SUCCESS;
+		
+		case _Wolframe_SASL_STATE_ERROR:
+			goto FAIL;
 	}
 
 FAIL:
+	if( m_connection != NULL ) sasl_dispose( &m_connection );
+
 	boost::this_thread::sleep( boost::posix_time::seconds( 1 ) );
 
-	return Step::_Wolframe_AUTH_STEP_FAIL;
+	m_state = _Wolframe_SASL_STATE_NEW;
+	return Step::_Wolframe_AUTH_STEP_FAIL;			
 }
 
 // never used
@@ -286,13 +268,10 @@ void SaslAuthenticator::receiveData( const std::string data )
 			m_state = _Wolframe_SASL_STATE_START;
 			break;
 
-		case _Wolframe_SASL_STATE_NEED_PASS:
-			m_pass = data;
-			m_state = _Wolframe_SASL_STATE_COMPUTE;
-			break;
-
-// TODO: application exception
-		case _Wolframe_SASL_STATE_COMPUTE:
+		case _Wolframe_SASL_STATE_NEW:
+		case _Wolframe_SASL_STATE_INITIAL_DATA:
+		case _Wolframe_SASL_STATE_ERROR:
+			// TODO: application exception
 			throw new std::runtime_error( "Illegal state in auhenticator" );
 			break;
 	}
