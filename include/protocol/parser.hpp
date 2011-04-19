@@ -126,6 +126,12 @@ public:
 /// \remark implementation as vector because the set of commands is expected to be small.
 struct CmdMap :public std::vector<std::string>
 {
+	/// \brief predicate for case insensitive comparison in boost::algorithm::starts_with
+	struct ToLowerPredicate
+	{
+		bool operator()( const char& ch1, const char& ch2) const {return tolower(ch1)==tolower(ch2);}
+	};
+
 	/// \brief retrieve a defined commands index from the map
 	/// \param val value to retrieve
 	/// \return the index of the command or -1 if not found or not determined enough
@@ -137,7 +143,7 @@ struct CmdMap :public std::vector<std::string>
 
 		for (const_iterator itr = begin(); itr != end(); itr++)
 		{
-			if (boost::algorithm::starts_with( *itr, value))
+			if (boost::algorithm::starts_with( *itr, value, ToLowerPredicate()))
 			{
 				if (valuesize == itr->size())
 				{
