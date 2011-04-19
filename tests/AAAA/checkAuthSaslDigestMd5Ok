@@ -1,0 +1,31 @@
+#!/usr/bin/expect
+#
+# Checks an authentication method
+#
+
+package require Expect
+source base64.tcl
+
+set timeout 2
+#log_user 0
+
+puts -nonewline "Authentication SASL DIGEST-MD5 successfull - "
+
+spawn ./authTest SASL
+
+expect "Choose a SASL mech:"
+send "DIGEST-MD5\r"
+expect "SASL data: "
+# perl -MMIME::Base64 -e 'print encode_base64("test\0test\0xx");'
+send "dGVzdAB0ZXN0AHh4\r"
+expect -re "Got SASL data: nonce=\"(.*)\",realm=\"(.*)\",qop=\"auth\",charset=utf-8,algorithm=md5-sess"
+set response "username=\"test\",realm=\"$expect_out(2,string)\",nonce=\"$expect_out(1,string)\",cnonce=\"\x\",nc=\"00000001\",serv-type=\"test\",response=\"xx\",digest-uri=\"wolframe/localhost\",charset=utf-8,algorithm=md5-sess"
+set encoded [base64::encode -maxlen 9999 $response]
+send "$encoded\r"
+puts $response
+
+expect {
+	"Authentication succeeded!"	{ puts "OK" }
+	"Authentication failed!"	{ puts "ERROR" }
+	timeout 			{ puts "Timeout" }
+}

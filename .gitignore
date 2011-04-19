@@ -34,6 +34,7 @@ tests/protocolArgumentParsing-gTest
 tests/poolTest
 tests/resolvePathTest
 tests/AAAA/authTest
+tests/AAAA/sasl.db
 tests/mtprocHandler-gTest
 tests/ptreeGenerator-gTest
 tests/configHelpersTest
