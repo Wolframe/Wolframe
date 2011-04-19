@@ -175,7 +175,6 @@ src/appConfig.cpp
 src/appConfigDefinition.cpp
 src/appProperties.cpp
 src/appSingleton.hpp
-src/commandCmp.cpp
 src/commandLine.cpp
 src/commandLine.hpp
 src/connectionBase.hpp
@@ -231,7 +230,6 @@ src/wolframeHandler.hpp
 tests/AAAA/authTest.cpp
 tests/AAAA/GNUmakefile
 tests/AAAA/Makefile.W32
-tests/commandCmpTest.cpp
 tests/config/GNUmakefile
 tests/configValueParser-gTest.cpp
 tests/config/wolframe-posix.conf

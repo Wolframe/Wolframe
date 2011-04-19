@@ -151,7 +151,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	base64.o \
 	version.o \
 	resolvePath.o \
-	commandCmp.o \
 	commandLine.o \
 	$(LOGGER_OBJS) \
 	serviceConfig.o \
