@@ -108,9 +108,9 @@ int main( int argc, const char *argv[] )
 				cin.getline( mech, 256 );
 				a->receiveData( mech );
 			} else if( token == "SASL_data" ) {
-				char data[256];
+				char data[1024];
 				cout << "SASL data: "; cout.flush( );
-				cin.getline( data, 256 );
+				cin.getline( data, 1024 );
 				string decoded = _Wolframe::base64::base64_decode( string( data ) );
 				a->receiveData( decoded );
 #endif // WITH_SASL
