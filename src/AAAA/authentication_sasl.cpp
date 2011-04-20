@@ -206,7 +206,7 @@ Step::AuthStep SaslAuthenticator::nextStep( )
 			result = sasl_server_start(
 				m_connection,
 				m_mech.c_str( ),	// mech choosen by client
-				m_client_data.data( ),	// optional client data
+				( m_client_data.length( ) == 0 ? NULL :m_client_data.data( ) ),	// optional client data
 				m_client_data.length( ),// length of client data
 				&out,			// server data
 				&out_len );		// length of server data

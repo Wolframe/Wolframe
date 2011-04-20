@@ -10,7 +10,7 @@ source md5.tcl
 set timeout 3
 log_user 0
 
-puts -nonewline "Authentication SASL CRAM MD5 successfull - "
+puts -nonewline "Authentication SASL CRAM MD5 unknown user - "
 
 spawn ./authTest SASL
 
@@ -20,7 +20,7 @@ expect "SASL data: "
 send "\r"
 expect -re "Got SASL data: (<.*>)"
 
-set user "test"
+set user "test2"
 set challenge $expect_out(1,string)
 set password "xx"
 set reply [md5::hmac $password $challenge]
@@ -30,7 +30,7 @@ set encoded [base64::encode -maxlen 9999 "$user $reply"]
 send "$encoded\r"
 
 expect {
-	"Authentication succeeded!"	{ puts "OK" }
-	"Authentication failed!"	{ puts "ERROR" }
+	"Authentication succeeded!"	{ puts "ERROR" }
+	"Authentication failed!"	{ puts "OK" }
 	timeout 			{ puts "Timeout" }
 }

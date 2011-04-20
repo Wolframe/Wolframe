@@ -122,4 +122,7 @@ ifeq ($(WITH_SASL),1)
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./checkAuthSaslLoginWrongPass
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./checkAuthSaslLoginOk
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./checkAuthSaslDigestMd5Ok
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./checkAuthSaslCramMd5UnknownUser
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./checkAuthSaslCramMd5WrongPass
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./checkAuthSaslCramMd5Ok
 endif
