@@ -43,6 +43,12 @@ extern "C"
 #include "lauxlib.h"
 }
 
+// Aba: temporarily only
+#ifdef _WIN32
+#pragma warning(disable:4291)
+#pragma warning(disable:4297)
+#endif
+
 using namespace _Wolframe;
 using namespace mtproc;
 
