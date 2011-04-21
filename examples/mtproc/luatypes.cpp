@@ -148,6 +148,8 @@ static int function_filter( lua_State* ls)
 	return 1;
 }
 
+static int function_as( lua_State* ){}
+
 #if 0 /// commented out
 void* toudata_udkey( lua_State* L, int index, const char* id)
 {
@@ -159,11 +161,7 @@ void* toudata_udkey( lua_State* L, int index, const char* id)
 	lua_pop(L,2);
 	return p1 == p2 ? lua_touserdata(L, index) : NULL;
 }
-#endif
 
-static int function_as( lua_State* ){}
-
-#if 0 /// commented out
 static int function_as( lua_State* ls)
 {
 	if (lua_gettop( ls) != 2) return luaL_error( ls, "invalid number of arguments (1 filter type value as parameter of method 'as' expected)");
@@ -176,9 +174,15 @@ static int function_as( lua_State* ls)
 	}
 	else if (input)
 	{
+		boost::shared_ptr<protocol::Generator> filtergenerator( filter);
+		*filtergenerator = *input->m_generator;
+		input->m_generator = filtergenerator;
 	}
 	else if (output)
 	{
+		boost::shared_ptr<protocol::FormatOutput> filteroutput( filter->m_formatoutput);
+		*filteroutput = *output->m_formatoutput;
+		output->m_formatoutput = filteroutput;
 	}
 	else
 	{
