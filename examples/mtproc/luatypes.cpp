@@ -43,12 +43,6 @@ extern "C"
 #include "lauxlib.h"
 }
 
-// Aba: temporarily only
-#ifdef _WIN32
-#pragma warning(disable:4291)
-#pragma warning(disable:4297)
-#endif
-
 using namespace _Wolframe;
 using namespace mtproc;
 
@@ -90,7 +84,7 @@ struct LuaObject :public ObjectType
 		lua_settable( ls, -3);
 	}
 
-	void* operator new (std::size_t num_bytes, lua_State* ls) throw( )
+	void* operator new (std::size_t num_bytes, lua_State* ls) throw (std::bad_alloc)
 	{
 		void* rt = lua_newuserdata( ls, num_bytes);
 		if (rt == 0) throw std::bad_alloc();
@@ -99,7 +93,8 @@ struct LuaObject :public ObjectType
 
 	/// \brief does nothing because the LUA garbage collector does the job.
 	/// \warning CAUTION: DO NOT CALL THIS FUNCTION ! DOES NOT WORK ON MSVC 9.0. (The compiler links with the std delete)
-	void operator delete (void*, void* ) {}
+	///          (just avoids C4291 warning)
+	void operator delete (void *, lua_State* ls ) {}
 
 	static void createGlobal( lua_State* ls, const char* metatableName, const char* name, const ObjectType& instance)
 	{
