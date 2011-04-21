@@ -94,7 +94,7 @@ struct LuaObject :public ObjectType
 	/// \brief does nothing because the LUA garbage collector does the job.
 	/// \warning CAUTION: DO NOT CALL THIS FUNCTION ! DOES NOT WORK ON MSVC 9.0. (The compiler links with the std delete)
 	///          (just avoids C4291 warning)
-	void operator delete (void *, lua_State* ls ) {}
+	void operator delete (void *, lua_State* ) {}
 
 	static void createGlobal( lua_State* ls, const char* metatableName, const char* name, const ObjectType& instance)
 	{
