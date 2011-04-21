@@ -72,22 +72,22 @@ bool ServiceBanner::parse( const boost::property_tree::ptree& pt, const std::str
 	if ( boost::algorithm::iequals( node, "ServerTokens" ))	{
 		bool tokensDefined = ( tokens_ != UNDEFINED );
 		std::string	val;
-		if ( !Parser::getValue( sectionName().c_str(), node.c_str(), pt.get_value<std::string>(),
+		if ( !Parser::getValue( logPrefix().c_str(), node.c_str(), pt.get_value<std::string>(),
 					val, &tokensDefined ))
 			return false;
 		tokens_ = strToToken( val );
 		if ( tokens_ == UNDEFINED )	{
-			LOG_ERROR << sectionName() << ": Unknown option '" << val << "' for " << node;
+			LOG_ERROR << logPrefix() << ": Unknown option '" << val << "' for " << node;
 			return false;
 		}
 	}
 	else if ( boost::algorithm::iequals( node, "ServerSignature" ))	{
-		if ( !Parser::getValue( sectionName().c_str(), node.c_str(), pt.get_value<std::string>(),
+		if ( !Parser::getValue( logPrefix().c_str(), node.c_str(), pt.get_value<std::string>(),
 				       serverName_, Parser::BoolDomain(), &serverNameDefined_ ))
 			return false;
 	}
 	else	{
-		LOG_FATAL << sectionName() << ": called with unknown configuration option: '"
+		LOG_FATAL << logPrefix() << ": called with unknown configuration option: '"
 			  << node << "'";
 		return false;
 	}

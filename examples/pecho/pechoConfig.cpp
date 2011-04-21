@@ -37,11 +37,11 @@ bool pEchoConfiguration::parse( const boost::property_tree::ptree& pt, const std
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "idle" ))	{
-			if ( !config::Parser::getValue( sectionName().c_str(), *L1it, timeout ))
+			if ( !config::Parser::getValue( logPrefix().c_str(), *L1it, timeout ))
 				retVal = false;
 		}
 		else
-			LOG_WARNING << sectionName() << ": unknown configuration option: '"
+			LOG_WARNING << logPrefix() << ": unknown configuration option: '"
 				    << L1it->first << "'";
 	}
 //	if ( timeout == 0 )

@@ -58,17 +58,14 @@ enum DatabaseStrategy	{
 	DBSTRATEGY_UNKNOWN
 };
 
-struct	DatabaseConfigBase
+struct	DatabaseConfigBase : public config::ConfigurationBase
 {
 	const DatabaseType	type;
 public:
-	DatabaseConfigBase( DatabaseType Type )	: type( Type )	{}
+	DatabaseConfigBase( DatabaseType Type,
+			    const char* name, const char* logParent, const char* logName )
+		: ConfigurationBase( name, logParent, logName ), type( Type )	{}
 //	virtual ~DatabaseConfigBase();
-
-	virtual bool parse( const std::string& module, const boost::property_tree::ptree& pt ) = 0;
-	virtual bool check( const std::string& module ) const = 0;
-	virtual void print( std::ostream& os, size_t indent ) const = 0;
-	virtual void setCanonicalPathes( const std::string& /* referencePath */ )	{}
 };
 
 
@@ -82,9 +79,9 @@ struct	PostgreSQLconfig : public DatabaseConfigBase
 	unsigned short	connections;
 	unsigned short	acquireTimeout;
 public:
-	PostgreSQLconfig();
-	bool parse( const std::string& module, const boost::property_tree::ptree& pt );
-	bool check( const std::string& module ) const;
+	PostgreSQLconfig( const char* name, const char* logParent, const char* logName );
+	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
+	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 };
 
@@ -94,9 +91,9 @@ struct	SQLiteConfig : public DatabaseConfigBase
 	std::string	filename;
 	bool		flag;
 public:
-	SQLiteConfig();
-	bool parse( const std::string& module, const boost::property_tree::ptree& pt );
-	bool check( const std::string& module ) const;
+	SQLiteConfig( const char* name, const char* logParent, const char* logName );
+	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
+	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 	virtual void setCanonicalPathes( const std::string& referencePath );
 };

@@ -65,7 +65,7 @@ Configuration::Configuration()
 // Server configuration functions
 void Configuration::print( std::ostream& os, size_t /* indent */ ) const
 {
-	os << sectionName() << std::endl;
+	os<< sectionName() << std::endl;
 	os << "   Number of client threads: " << threads << std::endl;
 	if ( maxConnections > 0 )
 		os << "   Maximum number of connections (global): " << maxConnections << std::endl;
@@ -163,12 +163,12 @@ bool Configuration::parse( const boost::property_tree::ptree& pt, const std::str
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "threads" ))	{
-			if ( ! config::Parser::getValue( sectionName().c_str(), *L1it, threads,
+			if ( ! config::Parser::getValue( logPrefix().c_str(), *L1it, threads,
 							 config::Parser::RangeDomain<unsigned short>( 1 ), &threadsDefined ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "maxConnections" ))	{
-			if ( ! config::Parser::getValue( sectionName().c_str(), *L1it, maxConnections, &maxConnDefined ))
+			if ( ! config::Parser::getValue( logPrefix().c_str(), *L1it, maxConnections, &maxConnDefined ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "socket" ))	{
@@ -184,7 +184,7 @@ bool Configuration::parse( const boost::property_tree::ptree& pt, const std::str
 				if ( boost::algorithm::iequals( L2it->first, "host" ) ||
 						boost::algorithm::iequals( L2it->first, "address" ))	{
 					bool isDefined = ( ! host.empty());
-					if ( ! config::Parser::getValue( sectionName().c_str(), *L2it, host, &isDefined ))
+					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, host, &isDefined ))
 						retVal = false;
 					else	{
 						if ( host == "*" )
@@ -192,22 +192,22 @@ bool Configuration::parse( const boost::property_tree::ptree& pt, const std::str
 					}
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "port" ))	{
-					if ( !config::Parser::getValue( sectionName().c_str(), *L2it, port,
+					if ( !config::Parser::getValue( logPrefix().c_str(), *L2it, port,
 									config::Parser::RangeDomain<unsigned short>( 1 ),
 									&portDefined ))
 						retVal = false;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "name" ))	{
 					bool isDefined = ( ! name.empty());
-					if ( ! config::Parser::getValue( sectionName().c_str(), *L2it, name, &isDefined ))
+					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, name, &isDefined ))
 						retVal = false;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "maxConnections" ))	{
-					if ( !config::Parser::getValue( sectionName().c_str(), *L2it, maxConn, &connDefined ))
+					if ( !config::Parser::getValue( logPrefix().c_str(), *L2it, maxConn, &connDefined ))
 						retVal = false;
 				}
 				else
-					LOG_WARNING << sectionName() << ": socket: unknown configuration option: '"
+					LOG_WARNING << logPrefix() << ": socket: unknown configuration option: '"
 						    << L2it->first << "'";
 			}
 			if ( port == 0 )
@@ -234,7 +234,7 @@ bool Configuration::parse( const boost::property_tree::ptree& pt, const std::str
 				if ( boost::algorithm::iequals( L2it->first, "host" ) ||
 						boost::algorithm::iequals( L2it->first, "address" ))	{
 					bool isDefined = ( ! host.empty());
-					if ( ! config::Parser::getValue( sectionName().c_str(), *L2it, host, &isDefined ))
+					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, host, &isDefined ))
 						retVal = false;
 					else	{
 						if ( host == "*" )
@@ -242,68 +242,68 @@ bool Configuration::parse( const boost::property_tree::ptree& pt, const std::str
 					}
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "port" ))	{
-					if ( !config::Parser::getValue( sectionName().c_str(), *L2it, port,
+					if ( !config::Parser::getValue( logPrefix().c_str(), *L2it, port,
 									config::Parser::RangeDomain<unsigned short>( 1 ),
 									&portDefined ))
 						retVal = false;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "name" ))	{
 					bool isDefined = ( ! name.empty());
-					if ( ! config::Parser::getValue( sectionName().c_str(), *L2it, name, &isDefined ))
+					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, name, &isDefined ))
 						retVal = false;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "maxConnections" ))	{
-					if ( !config::Parser::getValue( sectionName().c_str(), *L2it, maxConn, &connDefined ))
+					if ( !config::Parser::getValue( logPrefix().c_str(), *L2it, maxConn, &connDefined ))
 						retVal = false;
 				}
 
 				else if ( boost::algorithm::iequals( L2it->first, "certificate" ))	{
 					bool isDefined = ( ! certFile.empty());
-					if ( ! config::Parser::getValue( sectionName().c_str(), *L2it, certFile, &isDefined ))
+					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, certFile, &isDefined ))
 						retVal = false;
 					else	{
 						if ( ! boost::filesystem::path( certFile ).is_absolute() )
-							LOG_WARNING << sectionName() << ": certificate file is not absolute: '"
+							LOG_WARNING << logPrefix() << ": certificate file is not absolute: '"
 								    << certFile << "'";
 					}
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "key" ))	{
 					bool isDefined = ( ! keyFile.empty());
-					if ( ! config::Parser::getValue( sectionName().c_str(), *L2it, keyFile, &isDefined ))
+					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, keyFile, &isDefined ))
 						retVal = false;
 					else	{
 						if ( ! boost::filesystem::path( keyFile ).is_absolute() )
-							LOG_WARNING << sectionName() << ": key file is not absolute: "
+							LOG_WARNING << logPrefix() << ": key file is not absolute: "
 								    << keyFile << "'";
 					}
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "CAdirectory" ))	{
 					bool isDefined = ( ! CAdirectory.empty());
-					if ( ! config::Parser::getValue( sectionName().c_str(), *L2it, CAdirectory, &isDefined ))
+					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, CAdirectory, &isDefined ))
 						retVal = false;
 					else	{
 						if ( ! boost::filesystem::path( CAdirectory ).is_absolute() )
-							LOG_WARNING << sectionName() << ": CA directory is not absolute: "
+							LOG_WARNING << logPrefix() << ": CA directory is not absolute: "
 								    << CAdirectory << "'";
 					}
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "CAchainFile" ))	{
 					bool isDefined = ( ! CAchainFile.empty());
-					if ( ! config::Parser::getValue( sectionName().c_str(), *L2it, CAchainFile, &isDefined ))
+					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, CAchainFile, &isDefined ))
 						retVal = false;
 					else	{
 						if ( ! boost::filesystem::path( CAchainFile ).is_absolute() )
-							LOG_WARNING << sectionName() << ": CA chain file is not absolute: "
+							LOG_WARNING << logPrefix() << ": CA chain file is not absolute: "
 								    << CAchainFile << "'";
 					}
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "verify" ))	{
-					if ( ! config::Parser::getValue( sectionName().c_str(), *L2it, verify,
+					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, verify,
 									 config::Parser::BoolDomain(), &verifyDefined ))
 						return false;
 				}
 				else
-					LOG_WARNING << sectionName() << ": SSLsocket: unknown configuration option: '"
+					LOG_WARNING << logPrefix() << ": SSLsocket: unknown configuration option: '"
 						    << L2it->first << "'";
 			}
 #ifdef WITH_SSL
@@ -317,7 +317,7 @@ bool Configuration::parse( const boost::property_tree::ptree& pt, const std::str
 #endif // WITH_SSL
 		}
 		else	{
-			LOG_WARNING << sectionName() << ": unknown configuration option: '" << L1it->first << "'";
+			LOG_WARNING << logPrefix() << ": unknown configuration option: '" << L1it->first << "'";
 		}
 	}
 	if ( threads == 0 )
