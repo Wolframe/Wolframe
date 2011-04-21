@@ -52,7 +52,7 @@ LuaConfiguration::LuaConfiguration( const std::string& printName )
 	knownLuaModules[LUA_LOADLIBNAME] = x;
 }
 
-void LuaConfiguration::print( std::ostream& os ) const
+void LuaConfiguration::print( std::ostream& os, size_t /* indent */ ) const
 {
 	os << displayName() << std::endl;
 	os << "   LUA script: " << script << std::endl;

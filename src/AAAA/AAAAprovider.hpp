@@ -65,7 +65,7 @@ namespace AAAA {
 
 		virtual bool parse( const std::string& module, const boost::property_tree::ptree& pt ) = 0;
 		virtual bool check( const std::string& module ) const = 0;
-		virtual void print( std::ostream& os ) const = 0;
+		virtual void print( std::ostream& os, size_t indent ) const = 0;
 		virtual void setCanonicalPathes( const std::string& /* referencePath */ )	{}
 	};
 
@@ -79,7 +79,7 @@ namespace AAAA {
 		/// methods
 		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 		bool check() const;
-		void print( std::ostream& os ) const;
+		void print( std::ostream& os, size_t indent ) const;
 		void setCanonicalPathes( const std::string& referencePath );
 
 		// bool test() const;	// Not implemented yet, inherited from base
@@ -107,7 +107,7 @@ namespace AAAA {
 		/// methods
 		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 		bool check() const;
-		void print( std::ostream& os ) const;
+		void print( std::ostream& os, size_t indent ) const;
 		void setCanonicalPathes( const std::string& referencePath );
 
 		// bool test() const;	// Not implemented yet, inherited from base
@@ -129,7 +129,7 @@ namespace AAAA {
 		/// methods
 		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 		bool check() const;
-		void print( std::ostream& os ) const;
+		void print( std::ostream& os, size_t indent ) const;
 		void setCanonicalPathes( const std::string& referencePath );
 
 		// bool test() const;	// Not implemented yet, inherited from base

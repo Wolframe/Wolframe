@@ -69,7 +69,7 @@ namespace net	{
 		/// methods
 		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 		bool check() const;
-		void print( std::ostream& os ) const;
+		void print( std::ostream& os, size_t indent ) const;
 
 		void setCanonicalPathes( const std::string& referencePath );
 
@@ -109,7 +109,7 @@ namespace log	{
 		/// methods
 		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 		bool check() const;
-		void print( std::ostream& os ) const;
+		void print( std::ostream& os, size_t indent ) const;
 
 		void setCanonicalPathes( const std::string& referencePath );
 
@@ -146,7 +146,7 @@ namespace config	{
 		/// methods
 		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 		bool check() const;
-		void print( std::ostream& os ) const;
+		void print( std::ostream& os, size_t indent ) const;
 
 //			Not implemented yet, inherited from base for the time being
 //			bool test() const;
@@ -177,15 +177,15 @@ namespace config	{
 						tokens_( UNDEFINED ),
 						serverName_( false ),
 						serverNameDefined_( false )	{}
-
 		/// methods
+		std::string toString() const;
+
 		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 		bool check() const;
-		void print( std::ostream& os ) const;
+		void print( std::ostream& os, size_t indent ) const;
 
-//			Not implemented yet, inherited from base for the time being
-//			bool test() const;
-		std::string toString() const;
+//		Not implemented yet, inherited from base for the time being
+//		bool test() const;
 	private:
 		/// data members
 		SignatureTokens	tokens_;

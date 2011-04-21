@@ -63,7 +63,7 @@ Configuration::Configuration()
 
 
 // Server configuration functions
-void Configuration::print( std::ostream& os ) const
+void Configuration::print( std::ostream& os, size_t /* indent */ ) const
 {
 	os << displayName() << std::endl;
 	os << "   Number of client threads: " << threads << std::endl;

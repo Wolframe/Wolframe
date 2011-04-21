@@ -57,11 +57,11 @@ public:
 	///\param[in]	name	the name that will be displayed for this
 	///			configuration section in messages (log, print ...)
 	///			It has no processing purpose
-	ConfigurationBase( const std::string& name )	{ dispName_ = name; }
+	ConfigurationBase( const std::string& name )	{ sectionName_ = name; }
 
 	/// The display string (name) of the configuration section
 	///\return	a reference to the name set by the constructor
-	const std::string& displayName() const		{ return dispName_; }
+	const std::string& displayName() const		{ return sectionName_; }
 
 	/// Parse the configuration section (virtual function)
 	/// This function must be implemented
@@ -94,9 +94,13 @@ public:
 	/// This function is supposed to print the running configuration, this means
 	/// all the configuration parameters, not only those that were set in the
 	/// configuration file.
-	virtual void print( std::ostream& os ) const = 0;
+	///\param[in]	os	stream to use for printing
+	///\param[in]	indent	print indented with this number of spaces
+	virtual void print( std::ostream& os, size_t indent = 0 ) const = 0;
 private:
-	std::string	dispName_;
+	std::string	sectionName_;
+	std::string	logName_;
+	std::string	logPrefix_;
 };
 
 }} // namespace _Wolframe::config

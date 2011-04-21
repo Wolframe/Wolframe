@@ -227,7 +227,7 @@ bool Configuration::test() const
 	return rt;
 }
 
-void Configuration::print( std::ostream& os)
+void Configuration::print( std::ostream& os, size_t /* indent */)
 {
 	os << "Configuration of " << displayName() << ":" << std::endl;
 	os << "   Main Script: " << m_main.name() << " (" << m_main.path() << ")" << std::endl;

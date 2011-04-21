@@ -231,7 +231,7 @@ void ApplicationConfiguration::print( std::ostream& os ) const
 #endif
 	for ( std::size_t i = 0; i < conf_.size(); i++ )	{
 		os << std::endl;
-		conf_[ i ]->print( os );
+		conf_[ i ]->print( os, 0 );
 	}
 }
 

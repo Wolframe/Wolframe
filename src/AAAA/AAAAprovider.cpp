@@ -55,7 +55,7 @@ bool Configuration::check() const
 	return true;
 }
 
-void Configuration::print( std::ostream& os ) const
+void Configuration::print( std::ostream& os, size_t /* indent */ ) const
 {
 	os << displayName() << " configuration :)";
 }

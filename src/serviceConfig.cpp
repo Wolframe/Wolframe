@@ -61,7 +61,7 @@ ServiceConfiguration::ServiceConfiguration() : ConfigurationBase( "Service" )	{}
 
 
 // Server configuration functions
-void ServiceConfiguration::print( std::ostream& os ) const
+void ServiceConfiguration::print( std::ostream& os, size_t /* indent */ ) const
 {
 	os << displayName() << std::endl;
 #if !defined(_WIN32)	// Unix daemon

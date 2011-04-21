@@ -114,7 +114,7 @@ bool ServiceBanner::check() const
 }
 
 
-void ServiceBanner::print( std::ostream& os ) const
+void ServiceBanner::print( std::ostream& os, size_t /* indent */ ) const
 {
 	os << displayName() << std::endl;
 	os << "   Service banner: ";

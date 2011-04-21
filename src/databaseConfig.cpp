@@ -62,7 +62,7 @@ PostgreSQLconfig::PostgreSQLconfig() : DatabaseConfigBase( DBTYPE_POSTGRESQL )
 	acquireTimeout = 0;
 }
 
-void PostgreSQLconfig::print( std::ostream& os ) const
+void PostgreSQLconfig::print( std::ostream& os, size_t /* indent */ ) const
 {
 	os << "   PostgreSQL server:" << std::endl;
 	if ( host.empty())
@@ -143,7 +143,7 @@ SQLiteConfig::SQLiteConfig() : DatabaseConfigBase( DBTYPE_SQLITE )
 	flag = false;
 }
 
-void SQLiteConfig::print( std::ostream& os ) const
+void SQLiteConfig::print( std::ostream& os, size_t /* indent */ ) const
 {
 	os << "   SQLite database:" << std::endl;
 	os << "      Filename: " << filename << std::endl;
@@ -202,14 +202,14 @@ void SQLiteConfig::setCanonicalPathes( const std::string& refPath )
 
 
 //***  Generic database functions  **************************************
-void Configuration::print( std::ostream& os ) const
+void Configuration::print( std::ostream& os, size_t /* indent */ ) const
 {
 	os << displayName() << std::endl;
 	if ( dbConfig_.size() > 1 )
 		os << "   Strategy: " << Database::strategyToStr( strategy ) << std::endl;
 	for ( std::list<DatabaseConfigBase*>::const_iterator it = dbConfig_.begin();
 								it != dbConfig_.end(); it++ )	{
-		(*it)->print( os );
+		(*it)->print( os, 0 );
 	}
 }
 

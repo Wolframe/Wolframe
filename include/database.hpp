@@ -67,7 +67,7 @@ public:
 
 	virtual bool parse( const std::string& module, const boost::property_tree::ptree& pt ) = 0;
 	virtual bool check( const std::string& module ) const = 0;
-	virtual void print( std::ostream& os ) const = 0;
+	virtual void print( std::ostream& os, size_t indent ) const = 0;
 	virtual void setCanonicalPathes( const std::string& /* referencePath */ )	{}
 };
 
@@ -85,7 +85,7 @@ public:
 	PostgreSQLconfig();
 	bool parse( const std::string& module, const boost::property_tree::ptree& pt );
 	bool check( const std::string& module ) const;
-	void print( std::ostream& os ) const;
+	void print( std::ostream& os, size_t indent ) const;
 };
 
 struct	SQLiteConfig : public DatabaseConfigBase
@@ -97,7 +97,7 @@ public:
 	SQLiteConfig();
 	bool parse( const std::string& module, const boost::property_tree::ptree& pt );
 	bool check( const std::string& module ) const;
-	void print( std::ostream& os ) const;
+	void print( std::ostream& os, size_t indent ) const;
 	virtual void setCanonicalPathes( const std::string& referencePath );
 };
 
@@ -116,7 +116,7 @@ public:
 	/// methods
 	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 	bool check() const;
-	void print( std::ostream& os ) const;
+	void print( std::ostream& os, size_t indent ) const;
 	virtual void setCanonicalPathes( const std::string& referencePath );
 
 //	Not implemented yet, inherited from base for the time being

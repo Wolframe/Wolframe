@@ -69,8 +69,8 @@ public:
 	/// \brief interface implementation of ConfigurationBase::check() const
 	virtual bool check() const;
 
-	/// \brief interface implementation of ConfigurationBase::print(std::ostream& os) const
-	virtual void print( std::ostream&);
+	/// \brief interface implementation of ConfigurationBase::print(std::ostream& os, size_t indent) const
+	virtual void print( std::ostream&, size_t indent);
 
 	/// \brief loads the configuration settings for a lua virtual machine state
 	/// \param[in,out] ls lua state to initialize

@@ -73,7 +73,7 @@ LoggerConfiguration::LoggerConfiguration() : ConfigurationBase( "Logging" )
 }
 
 
-void LoggerConfiguration::print( std::ostream& os ) const
+void LoggerConfiguration::print( std::ostream& os, size_t /* indent */ ) const
 {
 	os << displayName() << std::endl;
 	if ( logToStderr )

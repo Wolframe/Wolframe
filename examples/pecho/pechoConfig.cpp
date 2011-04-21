@@ -17,7 +17,7 @@ static const unsigned short DEFAULT_TIMEOUT = 180;
 
 namespace _Wolframe	{
 
-void pEchoConfiguration::print( std::ostream& os ) const
+void pEchoConfiguration::print( std::ostream& os, size_t /* indent */ ) const
 {
 	os << displayName() << std::endl;
 	os << "   Idle timeout: " << timeout << std::endl;
