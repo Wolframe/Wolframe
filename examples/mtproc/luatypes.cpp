@@ -143,7 +143,7 @@ static int function_filter( lua_State* ls)
 	return 1;
 }
 
-static int function_as( lua_State* ){}
+static int function_as( lua_State* ){/*Aba??*/return 0;}
 
 #if 0 /// commented out
 void* toudata_udkey( lua_State* L, int index, const char* id)
