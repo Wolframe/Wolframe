@@ -43,12 +43,6 @@ extern "C"
 #include "lauxlib.h"
 }
 
-// Aba: temporarily only
-#ifdef _WIN32
-#pragma warning(disable:4291)
-#pragma warning(disable:4297)
-#endif
-
 using namespace _Wolframe;
 using namespace mtproc;
 
@@ -90,7 +84,7 @@ struct LuaObject :public ObjectType
 		lua_settable( ls, -3);
 	}
 
-	void* operator new (std::size_t num_bytes, lua_State* ls) throw( )
+	void* operator new (std::size_t num_bytes, lua_State* ls) throw (std::bad_alloc)
 	{
 		void* rt = lua_newuserdata( ls, num_bytes);
 		if (rt == 0) throw std::bad_alloc();
@@ -99,7 +93,8 @@ struct LuaObject :public ObjectType
 
 	/// \brief does nothing because the LUA garbage collector does the job.
 	/// \warning CAUTION: DO NOT CALL THIS FUNCTION ! DOES NOT WORK ON MSVC 9.0. (The compiler links with the std delete)
-	void operator delete (void*, void* ) {}
+	///          (just avoids C4291 warning)
+	void operator delete (void *, lua_State* ls ) {}
 
 	static void createGlobal( lua_State* ls, const char* metatableName, const char* name, const ObjectType& instance)
 	{
@@ -148,6 +143,8 @@ static int function_filter( lua_State* ls)
 	return 1;
 }
 
+static int function_as( lua_State* ){/*Aba??*/return 0;}
+
 #if 0 /// commented out
 void* toudata_udkey( lua_State* L, int index, const char* id)
 {
@@ -159,11 +156,7 @@ void* toudata_udkey( lua_State* L, int index, const char* id)
 	lua_pop(L,2);
 	return p1 == p2 ? lua_touserdata(L, index) : NULL;
 }
-#endif
 
-static int function_as( lua_State* ){}
-
-#if 0 /// commented out
 static int function_as( lua_State* ls)
 {
 	if (lua_gettop( ls) != 2) return luaL_error( ls, "invalid number of arguments (1 filter type value as parameter of method 'as' expected)");
@@ -176,9 +169,15 @@ static int function_as( lua_State* ls)
 	}
 	else if (input)
 	{
+		boost::shared_ptr<protocol::Generator> filtergenerator( filter);
+		*filtergenerator = *input->m_generator;
+		input->m_generator = filtergenerator;
 	}
 	else if (output)
 	{
+		boost::shared_ptr<protocol::FormatOutput> filteroutput( filter->m_formatoutput);
+		*filteroutput = *output->m_formatoutput;
+		output->m_formatoutput = filteroutput;
 	}
 	else
 	{
