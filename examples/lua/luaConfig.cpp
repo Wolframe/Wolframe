@@ -22,8 +22,8 @@ extern "C" {
 
 namespace _Wolframe	{
 
-LuaConfiguration::LuaConfiguration( const std::string& printName )
-	: ConfigurationBase( printName )
+LuaConfiguration::LuaConfiguration()
+	: ConfigurationBase( "Lua Example Server", NULL, "Lua Example configuration " )
 {
 	LuaModuleDefinition x;
 	x.moduleName = "";
@@ -54,7 +54,7 @@ LuaConfiguration::LuaConfiguration( const std::string& printName )
 
 void LuaConfiguration::print( std::ostream& os, size_t /* indent */ ) const
 {
-	os << displayName() << std::endl;
+	os << sectionName() << std::endl;
 	os << "   LUA script: " << script << std::endl;
 	if( !preload_libs.empty( ) ) {
 		os << "       preload modules: ";
@@ -109,20 +109,20 @@ bool LuaConfiguration::parse( const boost::property_tree::ptree& pt, const std::
 							L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "script" ))	{
 			bool isDefined = ( !script.empty());
-			if ( !config::Parser::getValue( displayName().c_str(), *L1it, script, &isDefined ))
+			if ( !config::Parser::getValue( sectionName().c_str(), *L1it, script, &isDefined ))
 				retVal = false;
 			else	{
 				if ( ! boost::filesystem::path( script ).is_absolute() )
-					LOG_WARNING << displayName() << ": script file path is not absolute: "
+					LOG_WARNING << sectionName() << ": script file path is not absolute: "
 						    << script;
 			}
 		} else if ( boost::algorithm::iequals( L1it->first, "preload_lib" ))	{
 			std::string preload_lib;
-			if ( !config::Parser::getValue( displayName().c_str(), *L1it, preload_lib ))
+			if ( !config::Parser::getValue( sectionName().c_str(), *L1it, preload_lib ))
 				retVal = false;
 			preload_libs.push_back( preload_lib );
 		} else {
-			LOG_WARNING << displayName() << ": unknown configuration option: '"
+			LOG_WARNING << sectionName() << ": unknown configuration option: '"
 				    << L1it->first << "'";
 			return false;
 		}

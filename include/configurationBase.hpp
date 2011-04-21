@@ -57,11 +57,23 @@ public:
 	///\param[in]	name	the name that will be displayed for this
 	///			configuration section in messages (log, print ...)
 	///			It has no processing purpose
-	ConfigurationBase( const std::string& name )	{ sectionName_ = name; }
+	///\param[in]	name	the name that will be displayed for this
+	///			configuration section in messages (log, print ...)
+	///			It has no processing purpose
+	ConfigurationBase( const char* name, const char* logParent, const char* logName )
+	{
+		sectionName_ = name ? name : "";
+		logPrefix_ = logParent ? logParent : "";
+		logPrefix_ += logName ? logName : "";
+	}
 
 	/// The display string (name) of the configuration section
 	///\return	a reference to the name set by the constructor
-	const std::string& displayName() const		{ return sectionName_; }
+	const std::string& sectionName() const		{ return sectionName_; }
+
+	/// The prefix for logging messages for this configuration section
+	///\return	a reference to the prefix set by the constructor
+	const std::string& logPrefix() const		{ return logPrefix_; }
 
 	/// Parse the configuration section (virtual function)
 	/// This function must be implemented
@@ -99,7 +111,6 @@ public:
 	virtual void print( std::ostream& os, size_t indent = 0 ) const = 0;
 private:
 	std::string	sectionName_;
-	std::string	logName_;
 	std::string	logPrefix_;
 };
 

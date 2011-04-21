@@ -204,7 +204,7 @@ void SQLiteConfig::setCanonicalPathes( const std::string& refPath )
 //***  Generic database functions  **************************************
 void Configuration::print( std::ostream& os, size_t /* indent */ ) const
 {
-	os << displayName() << std::endl;
+	os << sectionName() << std::endl;
 	if ( dbConfig_.size() > 1 )
 		os << "   Strategy: " << Database::strategyToStr( strategy ) << std::endl;
 	for ( std::list<DatabaseConfigBase*>::const_iterator it = dbConfig_.begin();
@@ -220,7 +220,7 @@ bool Configuration::check() const
 	bool correct = true;
 	for ( std::list<DatabaseConfigBase*>::const_iterator it = dbConfig_.begin();
 								it != dbConfig_.end(); it++ )	{
-		if ( !(*it)->check( displayName() ))
+		if ( !(*it)->check( sectionName() ))
 			correct = false;
 	}
 	return correct;
@@ -244,18 +244,18 @@ bool Configuration::parse( const boost::property_tree::ptree& pt, const std::str
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "type" ))	{
-			if ( !Parser::getValue( displayName().c_str(), *L1it, type, DBtypesDomain ))
+			if ( !Parser::getValue( sectionName().c_str(), *L1it, type, DBtypesDomain ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "strategy" ))	{
-			if ( !Parser::getValue( displayName().c_str(), *L1it, strategy, DBstrategyDomain ))
+			if ( !Parser::getValue( sectionName().c_str(), *L1it, strategy, DBstrategyDomain ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "server" ))	{
 			switch ( type )	{
 			case DBTYPE_POSTGRESQL:	{
 				PostgreSQLconfig* cfg = new PostgreSQLconfig();
-				if ( cfg->parse( displayName(), L1it->second ))
+				if ( cfg->parse( sectionName(), L1it->second ))
 					dbConfig_.push_back( cfg );
 				else	{
 					delete cfg;
@@ -265,7 +265,7 @@ bool Configuration::parse( const boost::property_tree::ptree& pt, const std::str
 			}
 			case DBTYPE_SQLITE:	{
 				SQLiteConfig* cfg = new SQLiteConfig();
-				if ( cfg->parse( displayName(), L1it->second ))
+				if ( cfg->parse( sectionName(), L1it->second ))
 					dbConfig_.push_back( cfg );
 				else	{
 					retVal = false;
@@ -274,13 +274,13 @@ bool Configuration::parse( const boost::property_tree::ptree& pt, const std::str
 				break;
 			}
 			case DBTYPE_UNKNOWN:
-				LOG_ERROR << displayName() << "database type must be defined first";
+				LOG_ERROR << sectionName() << "database type must be defined first";
 				retVal = false;
 				break;
 			}
 		}
 		else
-			LOG_WARNING << displayName() << ": unknown configuration option: '"
+			LOG_WARNING << sectionName() << ": unknown configuration option: '"
 				    << L1it->first << "'";
 	}
 	return retVal;

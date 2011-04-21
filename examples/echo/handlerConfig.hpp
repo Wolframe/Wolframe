@@ -16,8 +16,8 @@ namespace _Wolframe {
 		unsigned short		timeout;
 
 		/// constructor
-		EchoConfiguration( const std::string& printHeader )
-			: ConfigurationBase( printHeader )	{ timeout = 0; }
+		EchoConfiguration() : ConfigurationBase( "Echo Server", NULL, "Echo Server configuration" )
+								{ timeout = 0; }
 		/// methods
 		bool parse( const boost::property_tree::ptree& pt, const std::string& nodeName );
 		bool check() const;
@@ -37,7 +37,7 @@ namespace _Wolframe {
 		/// constructor
 		HandlerConfiguration()
 		{
-			echoConfig = new EchoConfiguration( "Echo Server" );
+			echoConfig = new EchoConfiguration();
 		}
 
 		~HandlerConfiguration()

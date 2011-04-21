@@ -38,7 +38,7 @@ namespace _Wolframe {
 		std::map<std::string, LuaModuleDefinition>	knownLuaModules;
 
 		/// constructor
-		LuaConfiguration( const std::string& printName );
+		LuaConfiguration();
 
 		/// methods
 		bool parse( const boost::property_tree::ptree& pt, const std::string& nodeName );
@@ -60,7 +60,7 @@ namespace _Wolframe {
 		/// constructor
 		HandlerConfiguration()
 		{
-			luaConfig = new LuaConfiguration( "Lua Example Server" );
+			luaConfig = new LuaConfiguration();
 		}
 
 		virtual ~HandlerConfiguration( ) {

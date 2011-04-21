@@ -110,7 +110,7 @@ public:
 	std::list<DatabaseConfigBase*>	dbConfig_;
 
 	/// constructor
-	Configuration() : _Wolframe::config::ConfigurationBase( "Database Server" ),
+	Configuration() : _Wolframe::config::ConfigurationBase( "Database(s)", NULL, "Database configuration" ),
 				strategy( DBSTRATEGY_UNKNOWN )	{}
 
 	/// methods

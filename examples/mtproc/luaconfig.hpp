@@ -55,7 +55,7 @@ public:
 
 	/// \brief constructor
 	/// \param name configuration base name
-	Configuration( const std::string& name) :ConfigurationBase(name){}
+	Configuration( const char* name, const char* prefix) :ConfigurationBase(name, NULL, prefix){}
 
 	/// \brief interface implementation of ConfigurationBase::parse(const boost::property_tree::ptree&, const std::string&)
 	virtual bool parse( const boost::property_tree::ptree&, const std::string&);

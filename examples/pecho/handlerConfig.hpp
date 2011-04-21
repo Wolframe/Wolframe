@@ -16,15 +16,15 @@ namespace _Wolframe {
 		unsigned short		timeout;
 
 		/// constructor
-		pEchoConfiguration( const std::string& printName )
-			: ConfigurationBase( printName )	{ timeout = 0; }
+		pEchoConfiguration() : ConfigurationBase( "pEcho Server", NULL,  "pEcho Server configuration" )
+											{ timeout = 0; }
 		/// methods
 		bool parse( const boost::property_tree::ptree& pt, const std::string& nodeName );
 		bool check() const;
 		void print( std::ostream& os, size_t indent ) const;
 
-//			Not implemented yet, inherited from base for the time being
-//			bool test() const;
+//		Not implemented yet, inherited from base for the time being
+//		bool test() const;
 	};
 
 
@@ -37,7 +37,7 @@ namespace _Wolframe {
 		/// constructor
 		HandlerConfiguration()
 		{
-			pechoConfig = new pEchoConfiguration( "pEcho Server" );
+			pechoConfig = new pEchoConfiguration();
 		}
 
 		/// destructor
@@ -45,9 +45,7 @@ namespace _Wolframe {
 		{
 			if ( pechoConfig ) delete pechoConfig;
 		}
-
 	};
-
 
 } // namespace _Wolframe
 

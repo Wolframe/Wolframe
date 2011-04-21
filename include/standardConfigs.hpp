@@ -173,7 +173,7 @@ namespace config	{
 		};
 
 		/// constructor
-		ServiceBanner() : ConfigurationBase( "Service Banner" ),
+		ServiceBanner() : ConfigurationBase( "Service Banner", NULL, "Service banner" ),
 						tokens_( UNDEFINED ),
 						serverName_( false ),
 						serverNameDefined_( false )	{}

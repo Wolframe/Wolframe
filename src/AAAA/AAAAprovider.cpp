@@ -40,7 +40,7 @@
 namespace _Wolframe {
 namespace AAAA {
 
-Configuration::Configuration() : _Wolframe::config::ConfigurationBase( "AAAA Provider" )
+Configuration::Configuration() : _Wolframe::config::ConfigurationBase( "AAAA", NULL, "AAAA configuration"  )
 {
 }
 
@@ -57,7 +57,7 @@ bool Configuration::check() const
 
 void Configuration::print( std::ostream& os, size_t /* indent */ ) const
 {
-	os << displayName() << " configuration :)";
+	os << sectionName() << " configuration :)";
 }
 
 void Configuration::setCanonicalPathes( const std::string& /* referencePath */ )

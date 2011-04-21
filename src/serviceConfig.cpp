@@ -54,16 +54,16 @@ namespace config {
 
 // Constructor
 #if !defined(_WIN32)	// Unix daemon
-ServiceConfiguration::ServiceConfiguration() : ConfigurationBase( "Daemon" )	{}
+ServiceConfiguration::ServiceConfiguration() : ConfigurationBase( "Daemon", NULL, "Daemon configuration" )	{}
 #else
-ServiceConfiguration::ServiceConfiguration() : ConfigurationBase( "Service" )	{}
+ServiceConfiguration::ServiceConfiguration() : ConfigurationBase( "Service", NULL, "Service configuration" )	{}
 #endif
 
 
 // Server configuration functions
 void ServiceConfiguration::print( std::ostream& os, size_t /* indent */ ) const
 {
-	os << displayName() << std::endl;
+	os << sectionName() << std::endl;
 #if !defined(_WIN32)	// Unix daemon
 	os << "   Run as " << (user.empty() ? "(not specified)" : user) << ":"
 	   << (group.empty() ? "(not specified)" : group) << std::endl;
@@ -99,26 +99,26 @@ bool ServiceConfiguration::parse( const boost::property_tree::ptree& pt,
 		for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 			if ( boost::algorithm::iequals( L1it->first, "user" ))	{
 				bool isDefined = ( !user.empty());
-				if ( !Parser::getValue( displayName().c_str(), *L1it, user, &isDefined ))
+				if ( !Parser::getValue( sectionName().c_str(), *L1it, user, &isDefined ))
 					retVal = false;
 			}
 			else if ( boost::algorithm::iequals( L1it->first, "group" ))	{
 				bool isDefined = ( !group.empty());
-				if ( !Parser::getValue( displayName().c_str(), *L1it, group, &isDefined ))
+				if ( !Parser::getValue( sectionName().c_str(), *L1it, group, &isDefined ))
 					retVal = false;
 			}
 			else if ( boost::algorithm::iequals( L1it->first, "pidFile" ))	{
 				bool isDefined = ( !pidFile.empty());
-				if ( !Parser::getValue( displayName().c_str(), *L1it, pidFile, &isDefined ))
+				if ( !Parser::getValue( sectionName().c_str(), *L1it, pidFile, &isDefined ))
 					retVal = false;
 				else	{
 					if ( ! boost::filesystem::path( pidFile ).is_absolute() )
-						LOG_WARNING << displayName() << ": pid file path is not absolute: "
+						LOG_WARNING << sectionName() << ": pid file path is not absolute: "
 							    << pidFile;
 				}
 			}
 			else	{
-				LOG_WARNING << displayName() << ": unknown configuration option: '"
+				LOG_WARNING << sectionName() << ": unknown configuration option: '"
 					    << L1it->first << "'";
 			}
 		}
@@ -160,7 +160,7 @@ bool ServiceConfiguration::parse( const boost::property_tree::ptree& pt,
 	}
 #endif
 	else	{
-		LOG_WARNING << displayName() << ": unknown configuration option: '" << node << "'";
+		LOG_WARNING << sectionName() << ": unknown configuration option: '" << node << "'";
 	}
 	return retVal;
 }

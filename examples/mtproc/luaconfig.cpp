@@ -70,11 +70,11 @@ bool Configuration::parse( const boost::property_tree::ptree& parentNode, const 
 	{
 		if (boost::algorithm::iequals( it->first, "main"))
 		{
-			if ( !config::Parser::getValue( displayName().c_str(), *it, name )) return false;
+			if ( !config::Parser::getValue( sectionName().c_str(), *it, name )) return false;
 
 			if (name.size() == 0)
 			{
-				LOG_ERROR << displayName() << ": empty name for the main script is illegal (configuration option <main>)";
+				LOG_ERROR << sectionName() << ": empty name for the main script is illegal (configuration option <main>)";
 				return false;
 			}
 			m_main = Module( name);
@@ -82,22 +82,22 @@ bool Configuration::parse( const boost::property_tree::ptree& parentNode, const 
 		}
 		else if (boost::algorithm::iequals( it->first, "module"))
 		{
-			if ( !config::Parser::getValue( displayName().c_str(), *it, name )) return false;
+			if ( !config::Parser::getValue( sectionName().c_str(), *it, name )) return false;
 			if (name.size() == 0)
 			{
-				LOG_ERROR << displayName() << ": empty name for a module is illegal (configuration option <module>)";
+				LOG_ERROR << sectionName() << ": empty name for a module is illegal (configuration option <module>)";
 				return false;
 			}
 			m_modules.push_back( Module( name));
 		}
 		else
 		{
-			LOG_WARNING << displayName() << ": unknown configuration option: '" << it->first << "'";
+			LOG_WARNING << sectionName() << ": unknown configuration option: '" << it->first << "'";
 		}
 	}
 	if (cnt_main == 0)
 	{
-		LOG_ERROR << displayName() << ": main script to execute is not defined (configuration option <module>";
+		LOG_ERROR << sectionName() << ": main script to execute is not defined (configuration option <module>";
 		return false;
 	}
 	return true;
@@ -133,7 +133,7 @@ void Configuration::setCanonicalPathes( const std::string& refPath)
 	{
 		if (it->type() != Module::Undefined)
 		{
-			LOG_ERROR << displayName() << ": canonical path set twice, second definition ignored";
+			LOG_ERROR << sectionName() << ": canonical path set twice, second definition ignored";
 		}
 		else
 		{
@@ -229,7 +229,7 @@ bool Configuration::test() const
 
 void Configuration::print( std::ostream& os, size_t /* indent */)
 {
-	os << "Configuration of " << displayName() << ":" << std::endl;
+	os << "Configuration of " << sectionName() << ":" << std::endl;
 	os << "   Main Script: " << m_main.name() << " (" << m_main.path() << ")" << std::endl;
 
 	if( !m_modules.empty())
