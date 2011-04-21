@@ -143,11 +143,49 @@ static int function_filter( lua_State* ls)
 	return 1;
 }
 
-static int function_as( lua_State* )
+static int function_as( lua_State* ){}
+
+#if 0 /// commented out
+void* toudata_udkey( lua_State* L, int index, const char* id)
 {
-	/// TODO: switch the filter of input or output object
+	lua_getmetatable(L,index);
+	const void* p1 = lua_topointer(L,-1);
+	luaL_getmetatable(L,id);
+	const void* p2 = lua_topointer(L,-1);
+
+	lua_pop(L,2);
+	return p1 == p2 ? lua_touserdata(L, index) : NULL;
+}
+
+static int function_as( lua_State* ls)
+{
+	if (lua_gettop( ls) != 2) return luaL_error( ls, "invalid number of arguments (1 filter type value as parameter of method 'as' expected)");
+	LuaObject<Input>* input = toudata_udkey ( ls, 1, luaname::Input);
+	LuaObject<Output>* output = toudata_udkey( ls, 1, luaname::Output);
+	LuaObject<Filter>* filter = (LuaObject<Filter>*) toudata_udkey( ls, 2);
+	if (!filter)
+	{
+		luaL_error( ls, "filter type value expected as first argument");
+	}
+	else if (input)
+	{
+		boost::shared_ptr<protocol::Generator> filtergenerator( filter);
+		*filtergenerator = *input->m_generator;
+		input->m_generator = filtergenerator;
+	}
+	else if (output)
+	{
+		boost::shared_ptr<protocol::FormatOutput> filteroutput( filter->m_formatoutput);
+		*filteroutput = *output->m_formatoutput;
+		output->m_formatoutput = filteroutput;
+	}
+	else
+	{
+		luaL_error( ls, "unexpected error: object of mehod unknown or corrupt");
+	}
 	return 0;
 }
+#endif
 
 static void create_function_filter( lua_State* ls, System* system)
 {
