@@ -44,16 +44,17 @@ set response $Z
 #puts "\n\nX: $X\nY: $Y\nA1: $A1\nA2: $A2\nHA1: $HA1\nHA2: $HA2\nKD: $KD\nZ: $Z\n"
 
 # compose final answer
-set answer "username=\"test\",realm=\"$realm\",nonce=\"$nonce\",nc=\"$nc\",cnonce=\"$cnonce\",qop=\"$qop\",digest-uri=\"$digestUri\",response=\"$response\""
+set answer "username=\"test2\",realm=\"$realm\",nonce=\"$nonce\",nc=\"$nc\",cnonce=\"$cnonce\",qop=\"$qop\",digest-uri=\"$digestUri\",response=\"$response\""
 send "$answer\r"
 
 # successfull authentication
-expect -re "Got SASL data: rspauth=(.*)"
-send "\r"
+#expect -re "Got SASL data: rspauth=(.*)"
+#send "\r"
 
 expect {
-	"Authentication succeeded!"	{ puts "OK" }
+	"Authentication succeeded!"	{ puts "ERROR" }
 	"Authentication failed!"	{ puts "ERROR" }
+	"ERROR: SASL no secret in database"	{ puts "OK" }
 	"ERROR:"			{ puts "ERROR" }
 	timeout 			{ puts "Timeout" }
 }

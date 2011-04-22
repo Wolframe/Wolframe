@@ -18,11 +18,9 @@ expect "SASL data: "
 # no initial client data, server will ask for it
 send "\r"
 expect "Got SASL data: Username:"
-# perl -MMIME::Base64 -e 'print encode_base64("test");'
-send "dGVzdA==\r"
-# perl -MMIME::Base64 -e 'print encode_base64("xx");'
+send "test\r"
 expect "Got SASL data: Password:"
-send "eHg=\r"
+send "xx\r"
 
 expect {
 	"Authentication succeeded!"	{ puts "OK" }

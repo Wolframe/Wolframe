@@ -15,8 +15,7 @@ spawn ./authTest SASL
 expect "Choose a SASL mech:"
 send "PLAIN\r"
 expect "SASL data: "
-# perl -MMIME::Base64 -e 'print encode_base64("test\0test\0x");'
-send "dGVzdAB0ZXN0AHg=\r"
+send "test\0test\0x\r"
 
 expect {
 	"Authentication succeeded!"	{ puts "ERROR" }

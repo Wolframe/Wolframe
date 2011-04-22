@@ -4,7 +4,6 @@
 #
 
 package require Expect
-source base64.tcl
 source md5.tcl
 
 set timeout 3
@@ -24,10 +23,8 @@ set challenge $expect_out(1,string)
 set user "test"
 set password "xxx"
 set reply [md5::hmac $password $challenge]
-# for debugging
-#puts "$password '$challenge' => $reply"
-set encoded [base64::encode -maxlen 9999 "$user $reply"]
-send "$encoded\r"
+set answer "$user $reply"
+send "$answer\r"
 
 expect {
 	"Authentication succeeded!"	{ puts "ERROR" }
