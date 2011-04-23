@@ -1,6 +1,7 @@
 TOPDIR = ..
 
 SUBDIRS = AAAA
+#db
 
 !IFDEF WITH_EXPECT
 SUBDIRS = \

@@ -1,0 +1,73 @@
+TOPDIR = ..\..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_CPPFLAGS = \
+	/D_WIN32_WINNT=0x504
+
+INCLUDE_DIRS = \
+	/I$(TOPDIR)\include /I. \
+	/I$(TOPDIR)\src \
+	/I"$(BOOST_DIR)" \
+	/I"$(PLATFORM_SDK_DIR)\Include"
+
+# Note: libraries are picked automatically on Windows!
+SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib"
+INCLUDE_LDFLAGS = \
+	$(SDK_LDFLAGS) $(BOOST_LDFLAGS)
+
+# Gtest
+
+INCLUDE_LIBS = \
+	Advapi32.lib Ws2_32.lib
+
+!IFDEF WITH_GTEST
+
+INCLUDE_DIRS = \
+	$(INCLUDE_DIRS)	/I"$(GTEST_INCLUDE_DIR)"
+
+INCLUDE_LDFLAGS = \
+	$(INCLUDE_LDFLAGS) /LIBPATH:"$(GTEST_LIB_DIR)"
+
+INCLUDE_LIBS = \
+	$(INCLUDE_LIBS) $(GTEST_LIBS)
+!ENDIF
+
+# sqlite3
+
+!IFDEF WITH_SQLITE3
+
+INCLUDE_CPPFLAGS = \
+	$(INCLUDE_CPPFLAGS) /DWITH_SQLITE3
+
+!ENDIF
+
+TEST_CPP_BINS = \
+	authTest.exe
+
+OBJS =
+
+all: $(OBJS) $(CPP_BINS)
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+authTest.exe: authTest.obj $(TOPDIR)\src\wolframe.lib
+
+local_all:
+
+local_clean:
+	@-erase test.bat 2>NUL
+
+local_distclean:
+
+local_test:
+	@-"$(EXPECT)" checkAuthTextFileUnknownUser
+	@-"$(EXPECT)" checkAuthTextFileWrongPass
+	@-"$(EXPECT)" checkAuthTextFileOk
+!IFDEF WITH_SQLITE3
+	@-"$(EXPECT)" checkAuthDbSqlite3UnknownUser
+	@-"$(EXPECT)" checkAuthDbSqlite3WrongPass
+	@-"$(EXPECT)" checkAuthDbSqlite3Ok
+!ENDIF
