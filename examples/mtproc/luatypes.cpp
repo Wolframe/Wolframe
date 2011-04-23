@@ -45,6 +45,7 @@ extern "C"
 
 using namespace _Wolframe;
 using namespace mtproc;
+using namespace lua;
 
 namespace luaname
 {
@@ -298,7 +299,7 @@ static void create_function_filter( lua_State* ls, System* system)
 	LuaObject<Filter>::create( ls, luaname::Filter);
 }
 
-struct Interpreter::State
+struct AppProcessor::State
 {
 	lua_State* ls;
 	lua_State* thread;
@@ -315,7 +316,7 @@ struct Interpreter::State
 	}
 };
 
-Interpreter::Interpreter( System* system, const lua::Configuration& config, Input& input, Output& output)
+AppProcessor::AppProcessor( System* system, const lua::Configuration& config, Input& input, Output& output)
 		:m_input(input),m_output(output),m_system(system)
 {
 	m_state = new State( config);
@@ -331,17 +332,17 @@ Interpreter::Interpreter( System* system, const lua::Configuration& config, Inpu
 	create_function_filter( m_state->ls, m_system);
 }
 
-Interpreter::~Interpreter()
+AppProcessor::~AppProcessor()
 {
 	delete m_state;
 }
 
-int Interpreter::call( unsigned int argc, const char** argv)
+int AppProcessor::call( unsigned int argc, const char** argv)
 {
 	int rt;
 	if (argc == 0)
 	{
-		LOG_ERROR << "interpreter called with no arguments (first argument funtion name missing)";
+		LOG_ERROR << "lua interpreter called with no arguments (first argument funtion name missing)";
 		return -1;
 	}
 

@@ -40,12 +40,9 @@
 #include "logger.hpp"
 #include "dispatcher.hpp"
 #include "implementation.hpp"
-
-#ifndef _WIN32
-#include <cstdio>
-#else
-#define snprintf _snprintf
-#endif
+#include <boost/lexical_cast.hpp>
+#include "luaconfig.hpp"
+#include "luatypes.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::mtproc;
@@ -270,19 +267,18 @@ struct Connection::Private
 
 						case CommandDispatcher::Error:
 						{
-							char ee[ 64];
-							snprintf( ee, sizeof(ee), "%d", returnCode);
+							std::string ee = boost::lexical_cast<std::string>( returnCode);
 
 							if (commandDispatcher.commandHasIO())
 							{
 								if (state == Processing) passInput();
 								state = (input.gotEoD())?EndOfCommand:DiscardInput;
-								return WriteLine( "\r\n.\r\nERR", ee);
+								return WriteLine( "\r\n.\r\nERR", ee.c_str());
 							}
 							else
 							{
 								state = Init;
-								return WriteLine( "\r\nERR", ee);
+								return WriteLine( "\r\nERR", ee.c_str());
 							}
 						}
 					}

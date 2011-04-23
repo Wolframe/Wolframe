@@ -36,6 +36,7 @@ Project Wolframe.
 #ifndef _Wolframe_MTPROC_IMPLEMENTATION_HPP_INCLUDED
 #define _Wolframe_MTPROC_IMPLEMENTATION_HPP_INCLUDED
 #include "methodtable.hpp"
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace mtproc {
