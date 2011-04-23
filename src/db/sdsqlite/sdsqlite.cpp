@@ -29,6 +29,7 @@
 #include <cassert>
 #include <cstring>
 #include <cstdlib>
+#include <iostream>
 
 namespace sd
 {

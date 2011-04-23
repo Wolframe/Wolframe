@@ -57,14 +57,13 @@ protected:
 // Tests the Version constructors and members
 TEST_F( DbSqliteFixture, BasicOps )
 {
-	db << "create table a(b text)";
+	db << "create table a(b integer)";
 
-	sd::sql ins( db );
-	ins << "insert into a(b) values(?)";
 	int data[4] = { 34, 22, 5, 54 };
 	for( int i = 0; i < 4; i++ ) {
+		sd::sql ins( db );
+		ins << "insert into a(b) values(?)";
 		ins << data[i];
-		ins.step( );
 	}
 
 	sd::sql q( db );
