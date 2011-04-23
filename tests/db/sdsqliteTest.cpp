@@ -17,6 +17,8 @@
 
 #include "sdsqlite.h"
 
+#include <iostream>
+
 // The fixture for testing class sdsqlite
 class DbSqliteFixture : public ::testing::Test {
 protected:
@@ -36,6 +38,7 @@ protected:
 	//   before each test).
 	virtual void SetUp( )
 	{
+		(void)unlink( "test.db" );
 		db.open( "test.db" );
 	}
 
@@ -56,23 +59,30 @@ TEST_F( DbSqliteFixture, BasicOps )
 {
 	db << "create table a(b integer)";
 
-	db << "insert into a(b) values(5)";
-	db << "insert into a(b) values(22)";
-	db << "insert into a(b) values(34)";
-	db << "insert into a(b) values(54)";
+	sd::sql ins( db );
+	ins << "insert into a(b) values(?)";
+	int data[4] = { 34, 22, 5, 54 };
+	db << "begin transaction";
+	for( int i = 0; i < 4; i++ ) {
+		ins << data[i];
+	}
+	db << "commit transaction";
 
 	sd::sql q( db );
-	q << "select * from a where b >? order by b" << 7;
+	q << "select b from a where b >? order by b" << 7;
 	int count = 0;
-	int b[10];
-	while( q.step( ) ) {
+	int b[5] = { 0, 0, 0, 0, 0};
+	while( count < 5 && q.step( ) ) {
 		q >> b[count];
 		count++;
 	}
 
-	ASSERT_EQ( b[0], 22 );
-	ASSERT_EQ( b[1], 34 );
-	ASSERT_EQ( b[2], 54 );
+	ASSERT_EQ( count, 3 );
+	if( count > 0 ) {
+		ASSERT_EQ( b[0], 22 );
+		ASSERT_EQ( b[1], 34 );
+		ASSERT_EQ( b[2], 54 );
+	}
 }
 
 int main( int argc, char **argv )

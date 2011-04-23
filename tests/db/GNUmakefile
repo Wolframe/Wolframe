@@ -73,7 +73,6 @@ endif
 local_all:
 
 local_clean:
-	-rm -f $(TEST_CPP_BINS)
 
 local_distclean:
 
