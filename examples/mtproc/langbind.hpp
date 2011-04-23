@@ -38,26 +38,33 @@ Project Wolframe.
 #include "protocol/formatoutput.hpp"
 #include "protocol/generator.hpp"
 #include <boost/shared_ptr.hpp>
+#include <stack>
+#include <string>
 
 namespace _Wolframe {
 namespace mtproc {
 
-struct Input
-{
-	boost::shared_ptr<protocol::Generator> m_generator;
-
-	Input(){};
-	Input( const Input& o) :m_generator(o.m_generator){}
-	~Input(){};
-};
-
 struct Output
 {
-	boost::shared_ptr<protocol::FormatOutput> m_formatoutput;
+	enum ItemType {Data,DoYield,Error};
 
-	Output(){};
-	Output( const Output& o) :m_formatoutput(o.m_formatoutput){}
-	~Output(){};
+	Output() :m_state(0){}
+	Output( const Output& o) :m_formatoutput(o.m_formatoutput),m_state(0){}
+	~Output(){}
+
+	/// \brief print the next element
+	/// \param[in] e1 first element
+	/// \param[in] e1size first element size
+	/// \param[in] e2 second element
+	/// \param[in] e2size second element size
+	/// \return state returned
+	ItemType print( const char* e1, unsigned int e1size, const char* e2, unsigned int e2size);
+
+public:
+	boost::shared_ptr<protocol::FormatOutput> m_formatoutput;	///< format output reference
+private:
+	unsigned int m_state;						///< current state for outputs with more than one elements
+	std::stack<std::string> m_opentags;				///< stack of open tags
 };
 
 struct System
@@ -67,6 +74,15 @@ struct System
 
 	virtual protocol::Generator* createGenerator( const char* name) const;
 	virtual protocol::FormatOutput* createFormatOutput( const char* name) const;
+};
+
+struct Input
+{
+	boost::shared_ptr<protocol::Generator> m_generator;
+
+	Input(){};
+	Input( const Input& o) :m_generator(o.m_generator){}
+	~Input(){};
 };
 
 struct Filter
@@ -84,12 +100,13 @@ struct Filter
 	~Filter(){};
 };
 
-class GeneratorClosure
+class InputGeneratorClosure
 {
 public:
 	enum ItemType {EndOfData,Data,DoYield,Error};
 
-	GeneratorClosure() :m_type(protocol::Generator::Value),m_value(0),m_buf(0),m_bufsize(0),m_bufpos(0){}
+	InputGeneratorClosure( const boost::shared_ptr<protocol::Generator>& ig)
+		:m_generator(ig),m_type(protocol::Generator::Value),m_value(0),m_buf(0),m_bufsize(0),m_bufpos(0){}
 
 	void init()
 	{
@@ -97,15 +114,21 @@ public:
 		m_value = 0;
 	}
 
-	ItemType fetch( const char*& e1, const char*& e2);
+	/// \brief get the next pair of elements
+	/// \param[out] e1 first element
+	/// \param[out] e1size first element size
+	/// \param[out] e2 second element
+	/// \param[out] e2size second element size
+	/// \return state returned
+	ItemType fetch( const char*& e1, unsigned int& e1size, const char*& e2, unsigned int& e2size);
 
 private:
-	boost::shared_ptr<protocol::Generator> m_generator;
-	protocol::Generator::ElementType m_type;
-	char* m_value;
-	char* m_buf;
-	std::size_t m_bufsize;
-	std::size_t m_bufpos;
+	boost::shared_ptr<protocol::Generator> m_generator;	///< rerefence to input with filter
+	protocol::Generator::ElementType m_type;		///< current state (last value type parsed)
+	char* m_value;						///< pointer to local copy of value in m_buf
+	char* m_buf;						///< pointer to buffer for local copies of returned values
+	std::size_t m_bufsize;					///< allocation size of m_buf
+	std::size_t m_bufpos;					///< number of bytes filled in m_buf
 };
 
 }}//namespace
