@@ -40,6 +40,80 @@
 
 namespace _Wolframe {
 	namespace db {
+		namespace sqlite3pp {
 
+// db_error
+
+db_error::db_error( const std::string &err ) : std::runtime_error( err )
+{
+}
+
+// result
+
+result::result( )
+{
+}
+
+// connection
+
+connection::connection( ) : m_db( 0 ), m_db_extern( false )
+{
+}
+
+connection::connection( const std::string &filename )
+{
+	open( filename );
+}
+
+connection::connection( sqlite3 *h )
+{
+	open( h );
+}
+
+connection::~connection( )
+{
+	close( );
+}
+
+void connection::open( const std::string &filename )
+ {
+	int res;
+
+	res = sqlite3_open( filename.c_str( ), &m_db );
+	if( res != SQLITE_OK )
+		throw db_error( sqlite3_errmsg( m_db ) );
+	if( !m_db )
+		throw db_error( "Out of memory, got NULL as handle!" );
+
+	m_db_extern = false;
+}
+
+void connection::open( sqlite3 *h )
+{
+	m_db = h;
+	m_db_extern = true;
+}
+
+void connection::close( )
+{
+	if( m_db && !m_db_extern ) {
+		sqlite3_close( m_db );
+		m_db = 0;
+	}
+}
+
+result connection::exec( const std::string &sql )
+{
+	int res;
+	result noresult;
+
+	res = sqlite3_exec( m_db, sql.c_str( ), 0, 0, NULL );
+	if( res != SQLITE_OK )
+		throw db_error( sqlite3_errmsg( m_db ) );
+
+	return noresult;
+}
+
+		} // namespace sqlite3pp
 	} // namespace db
 } // namespace _Wolframe

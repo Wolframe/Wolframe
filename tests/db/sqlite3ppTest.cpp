@@ -15,11 +15,11 @@
 #include <unistd.h>
 #endif // !defined _WIN32
 
-#include "sdsqlite.h"
+#include "db/sqlite3/sqlite3pp.hpp"
 
-#include <iostream>
+using namespace _Wolframe::db::sqlite3pp;
 
-// The fixture for testing class sdsqlite
+// The fixture for testing classes in sqlite3pp
 class DbSqliteFixture : public ::testing::Test {
 protected:
 	// Set-up work for each test here.
@@ -51,12 +51,15 @@ protected:
 	}
 
 	// Objects declared here can be used by all tests in the test case.	
-	sd::sqlite db;
+	connection db;
 };
 
 // Tests the Version constructors and members
 TEST_F( DbSqliteFixture, BasicOps )
 {
+	db.exec( "create table a(b integer)" );
+
+/*
 	db << "create table a(b integer)";
 
 	int data[4] = { 34, 22, 5, 54 };
@@ -81,6 +84,7 @@ TEST_F( DbSqliteFixture, BasicOps )
 		ASSERT_EQ( b[1], 34 );
 		ASSERT_EQ( b[2], 54 );
 	}
+*/
 }
 
 int main( int argc, char **argv )

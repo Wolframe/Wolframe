@@ -36,8 +36,94 @@
 /// \brief header file for the sqlite C++ layer
 ///
 
+#include <string>
+#include <stdexcept>
+
+#include "sqlite3.h"
+
 namespace _Wolframe {
 	namespace db {
+		namespace sqlite3pp {
 
+	class db_error : std::runtime_error {
+		public:
+			explicit db_error( const std::string &err );
+	};
+
+	class result {
+		public:
+			result( );
+
+			unsigned int rows_affected( );
+			
+	};
+
+	class sql {
+		public:
+			sql( std::string &sql );
+	};
+
+	class connection;
+
+	class transaction {
+		public:
+			// create a new transation in a given connection and
+			// with a given name, if scoped define the default
+			// action (commit or abort) at destruction time
+			transaction( connection &c, const std::string &name, bool commit_on_destruct = true );
+
+			// end transaction
+
+			void commit( );
+			void rollback( );
+
+			// execute a sql statement, checking results
+			result exec( sql &s );
+
+			// execute a string statement directly, checking
+			// is unimportant
+			result exec( const std::string &sql );
+	};
+
+	class connection {
+		public:
+			// create connection (still in closed style)
+			connection( );
+
+			// create connection from a C layer handler
+			connection( sqlite3 *handle );
+
+			// create connection with a filename
+			connection( const std::string &filename );
+
+			// implicitly rollbacks all outstanding transactions
+			// and closes the database file
+			~connection( );
+
+			// get internal handle of the Sqlite3 C layer
+			sqlite3 *handle( );
+
+			// open connection with a given filename
+			void open( const std::string &filename );
+
+			// open connection from existing sqlite3 C layer handle
+			void open( sqlite3 *handle );
+
+			// close connection, close outstanding transactions
+			// (rollback), abort running sql statements
+			void close( );
+
+			// execute a sql statement
+			result exec( sql &s );
+
+			// execute a string statement directly
+			result exec( const std::string &sql );
+
+		private:
+			sqlite3 *m_db;
+			bool m_db_extern;
+	};
+
+		} // namespace sqlite3pp
 	} // namespace db
 } // namespace _Wolframe

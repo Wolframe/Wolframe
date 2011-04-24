@@ -8,7 +8,7 @@ INCLUDE_CPPFLAGS = \
 
 INCLUDE_DIRS = \
 	-I$(TOPDIR)/include -I. \
-	-I$(TOPDIR)/src/db/sdsqlite \
+	-I$(TOPDIR)/src \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LDFLAGS = \

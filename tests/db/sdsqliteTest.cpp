@@ -15,9 +15,7 @@
 #include <unistd.h>
 #endif // !defined _WIN32
 
-#include "sdsqlite.h"
-
-#include <iostream>
+#include "db/sdsqlite/sdsqlite.h"
 
 // The fixture for testing class sdsqlite
 class DbSqliteFixture : public ::testing::Test {
