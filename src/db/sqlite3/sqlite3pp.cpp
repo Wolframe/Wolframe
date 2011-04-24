@@ -38,6 +38,8 @@
 
 #include "db/sqlite3/sqlite3pp.hpp"
 
+#include <sstream>
+
 namespace _Wolframe {
 	namespace db {
 		namespace sqlite3pp {
@@ -56,16 +58,19 @@ result::result( )
 
 // connection
 
-connection::connection( ) : m_db( 0 ), m_db_extern( false )
+connection::connection( )
+	: m_db( 0 ), m_db_extern( false ), m_trans_cnt( 0 )
 {
 }
 
 connection::connection( const std::string &filename )
+	: m_db( 0 ), m_db_extern( false ), m_trans_cnt( 0 )
 {
 	open( filename );
 }
 
 connection::connection( sqlite3 *h )
+	: m_db( 0 ), m_db_extern( false ), m_trans_cnt( 0 )
 {
 	open( h );
 }
@@ -102,6 +107,11 @@ void connection::close( )
 	}
 }
 
+sqlite3 *connection::handle( )
+{
+	return m_db;
+}
+
 result connection::exec( const std::string &sql )
 {
 	int res;
@@ -112,6 +122,79 @@ result connection::exec( const std::string &sql )
 		throw db_error( sqlite3_errmsg( m_db ) );
 
 	return noresult;
+}
+
+// transaction
+
+transaction::transaction( connection &c, const std::string &name, bool commit_on_destruct, bool implicit_begin )
+	: m_connection( c ), m_name( name ),
+	  m_commit_on_destruct( commit_on_destruct ),
+	  m_implicit_begin( implicit_begin ),
+	  m_state( TX_NASCENT )
+{
+}
+
+transaction::transaction( connection &c, bool commit_on_destruct, bool implicit_begin )
+	: m_connection( c ),
+	  m_commit_on_destruct( commit_on_destruct ),
+	  m_implicit_begin( implicit_begin ),
+	  m_state( TX_NASCENT )
+{
+	std::ostringstream ss;
+	c.m_trans_cnt++;
+	ss << "trans_" << c.m_trans_cnt;
+	m_name = ss.str( );
+
+	if( implicit_begin )
+		begin( );
+}
+
+transaction::~transaction( )
+{
+	if( m_state == TX_ACTIVE ) {
+		if( m_commit_on_destruct )
+			commit( );
+		else
+			rollback( );
+	}
+}
+
+result transaction::exec( const std::string &sql )
+{
+	if( m_state != TX_ACTIVE )
+		throw db_error( "exec() unexpected at this time" );
+
+	return m_connection.exec( sql );
+}
+
+void transaction::begin( )
+{
+	if( m_state == TX_NASCENT ) {
+		exec( "begin" );
+		m_state = TX_ACTIVE;
+	} else {
+		throw db_error( "begin() unexpected at this time" );
+	}
+}
+
+void transaction::commit( )
+{
+	if( m_state == TX_ACTIVE ) {
+		exec( "commit" );
+		m_state = TX_COMMITTED;
+	} else {
+		throw db_error( "commit() unexpected at this time" );
+	}
+}
+
+void transaction::rollback( )
+{
+	if( m_state == TX_ACTIVE ) {
+		exec( "rollback" );
+		m_state = TX_ABORTED;
+	} else {
+		throw db_error( "rollback() unexpected at this time" );
+	}
 }
 
 		} // namespace sqlite3pp

@@ -17,6 +17,8 @@
 
 #include "db/sqlite3/sqlite3pp.hpp"
 
+#include <iostream>
+
 using namespace _Wolframe::db::sqlite3pp;
 
 // The fixture for testing classes in sqlite3pp
@@ -57,11 +59,16 @@ protected:
 // Tests the Version constructors and members
 TEST_F( DbSqliteFixture, BasicOps )
 {
-	db.exec( "create table a(b integer)" );
+	try {
+		db.exec( "create table a(b integer)" );
 
+		transaction t( db );
+
+		t.commit( );
+	} catch( db_error &e ) {
+		std::cerr << "Got exception: " << std::endl;
+	}
 /*
-	db << "create table a(b integer)";
-
 	int data[4] = { 34, 22, 5, 54 };
 	for( int i = 0; i < 4; i++ ) {
 		sd::sql ins( db );

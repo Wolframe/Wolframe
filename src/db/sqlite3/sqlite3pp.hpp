@@ -48,6 +48,8 @@ namespace _Wolframe {
 	class db_error : std::runtime_error {
 		public:
 			explicit db_error( const std::string &err );
+
+		
 	};
 
 	class result {
@@ -67,22 +69,48 @@ namespace _Wolframe {
 
 	class transaction {
 		public:
+
 			// create a new transation in a given connection and
 			// with a given name, if scoped define the default
 			// action (commit or abort) at destruction time
-			transaction( connection &c, const std::string &name, bool commit_on_destruct = true );
+			transaction( connection &c, const std::string &name, bool commit_on_destruct = true, bool implicit_begin = true );
+
+			// create a new unnamed transaction (the library
+			// creates a dummy transaction name)
+			transaction( connection &c, bool commit_on_destruct = true, bool implicit_begin = true );
+
+			~transaction( );
+
+			// begin transaction explicitly
+			void begin( );
 
 			// end transaction
-
 			void commit( );
 			void rollback( );
 
 			// execute a sql statement, checking results
 			result exec( sql &s );
 
-			// execute a string statement directly, checking
-			// is unimportant
+			// execute a string statement directly
 			result exec( const std::string &sql );
+
+		private:
+			// back reference to the connection
+			connection &m_connection;
+
+			std::string m_name;
+
+			bool m_commit_on_destruct;
+			bool m_implicit_begin;
+
+			typedef enum {
+				TX_NASCENT,
+				TX_ACTIVE,
+				TX_COMMITTED,
+				TX_ABORTED
+			} tx_state;
+
+			tx_state m_state;
 	};
 
 	class connection {
@@ -119,9 +147,12 @@ namespace _Wolframe {
 			// execute a string statement directly
 			result exec( const std::string &sql );
 
+			friend class transaction;
+
 		private:
 			sqlite3 *m_db;
 			bool m_db_extern;
+			unsigned int m_trans_cnt;
 	};
 
 		} // namespace sqlite3pp
