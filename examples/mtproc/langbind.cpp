@@ -43,12 +43,25 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace _Wolframe::mtproc;
 
-GeneratorClosure::ItemType GeneratorClosure::fetch( const char*& e1, const char*& e2)
+InputGeneratorClosure::ItemType InputGeneratorClosure::fetch( const char*& e1, unsigned int& e1size, const char*& e2, unsigned int& e2size)
 {
 	if (m_bufsize == 0)
 	{
 		return EndOfData;
 	}
+	if (m_value)
+	{
+		e1 = m_buf;
+		e1size = m_bufpos;
+	}
+	else
+	{
+		e1 = 0;
+		e1size = 0;
+	}
+	e2 = 0;
+	e2size = 0;
+
 	if (!m_generator->getNext( &m_type, m_buf, m_bufsize-1, &m_bufpos))
 	{
 		switch (m_generator->state())
@@ -62,8 +75,6 @@ GeneratorClosure::ItemType GeneratorClosure::fetch( const char*& e1, const char*
 
 			case protocol::Generator::Open:
 				LOG_DATA << "end of input";
-				e1 = 0;
-				e2 = 0;
 				return EndOfData;
 		}
 	}
@@ -74,7 +85,7 @@ GeneratorClosure::ItemType GeneratorClosure::fetch( const char*& e1, const char*
 			case protocol::Generator::OpenTag:
 				m_buf[ m_bufpos] = 0;
 				e1 = m_buf;
-				e2 = 0;
+				e1size = m_bufpos;
 				init();
 				return Data;
 
@@ -82,13 +93,13 @@ GeneratorClosure::ItemType GeneratorClosure::fetch( const char*& e1, const char*
 				m_buf[ m_bufpos] = 0;
 				if (m_value)
 				{
-					e1 = m_buf;
 					e2 = m_value;
+					e2size = m_bufpos -e1size -1;
 				}
 				else
 				{
-					e1 = 0;
 					e2 = m_buf;
+					e2size = m_bufpos;
 					init();
 				}
 				return Data;
@@ -104,11 +115,9 @@ GeneratorClosure::ItemType GeneratorClosure::fetch( const char*& e1, const char*
 				else
 				{
 					m_value = m_buf+m_bufpos;
-					return fetch( e1, e2);
+					return fetch( e1, e1size, e2, e2size);
 				}
 			 case protocol::Generator::CloseTag:
-				e1 = 0;
-				e2 = 0;
 				init();
 				return Data;
 		}
@@ -119,7 +128,7 @@ GeneratorClosure::ItemType GeneratorClosure::fetch( const char*& e1, const char*
 
 protocol::Generator* System::createGenerator( const char* name) const
 {
-	if (boost::algorithm::iequals( name, "char-isolatin1")) return new protocol::Generator( generator::CharIsoLatin1::GetNext);
+	if (boost::algorithm::iequals( name, "char-isolatin1")) return new filter::CharIsoLatin1::Generator();
 
 	LOG_ERROR << "unknown input filter function '" << name << "'";
 	return 0;
@@ -127,11 +136,100 @@ protocol::Generator* System::createGenerator( const char* name) const
 
 protocol::FormatOutput* System::createFormatOutput( const char* name) const
 {
-	if (boost::algorithm::iequals( name, "char-isolatin1")) return new protocol::FormatOutput( generator::CharIsoLatin1::Print);
+	if (boost::algorithm::iequals( name, "char-isolatin1")) return new filter::CharIsoLatin1::FormatOutput();
 
 	LOG_ERROR << "unknown output filter function '" << name << "'";
 	return 0;
 }
+
+Output::ItemType Output::print( const char* e1, unsigned int e1size, const char* e2, unsigned int e2size)
+{
+	try
+	{
+		if (e1)
+		{
+			if (e2)
+			{
+				switch (m_state)
+				{
+					case 0:
+						if (!m_formatoutput->print( protocol::FormatOutput::Attribute, e1, e1size)) break;
+						m_state ++;
+					case 1:
+						if (!m_formatoutput->print( protocol::FormatOutput::Value, e2, e2size)) break;
+						m_state ++;
+					case 2:
+						m_state = 0;
+						return Data;
+				}
+				int err = m_formatoutput->getError();
+				if (err)
+				{
+					LOG_ERROR << "error in format output (" << err << ")";
+					return Error;
+				}
+				return DoYield;
+			}
+			else
+			{
+				m_opentags.push( std::string( e1, e1size));
+
+				if (!m_formatoutput->print( protocol::FormatOutput::OpenTag, e1, e1size))
+				{
+					int err = m_formatoutput->getError();
+					if (err)
+					{
+						LOG_ERROR << "error in format output (" << err << ")";
+						return Error;
+					}
+					return DoYield;
+				}
+				return Data;
+			}
+		}
+		else if (e2)
+		{
+			if (!m_formatoutput->print( protocol::FormatOutput::Value, e2, e2size))
+			{
+				int err = m_formatoutput->getError();
+				if (err)
+				{
+					LOG_ERROR << "error in format output (" << err << ")";
+					return Error;
+				}
+				return DoYield;
+			}
+			return Data;
+		}
+		else
+		{
+			if (m_opentags.empty())
+			{
+				LOG_ERROR << "error in tag hierarchy of format output: more tags closed than opened";
+				return Error;
+			}
+			if (!m_formatoutput->print( protocol::FormatOutput::CloseTag, m_opentags.top().c_str(), m_opentags.top().size()))
+			{
+				int err = m_formatoutput->getError();
+				if (err)
+				{
+					LOG_ERROR << "error in format output (" << err << ")";
+					return Error;
+				}
+				return DoYield;
+			}
+			m_opentags.pop();
+			return Data;
+		}
+	}
+	catch (std::bad_alloc)
+	{
+		LOG_ERROR << "out of memory in format output";
+		return Error;
+	}
+}
+
+
 
 
 

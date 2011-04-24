@@ -64,19 +64,12 @@ struct FormatOutput
 		CloseTag	///< Close current hierarchy level
 	};
 
-	/// \related FormatOutput
-	/// \brief Print next element call function type
-	/// \param [in] type type of element to print
-	/// \param [in] element content of element to print
-	/// \param [in] elementsize size of element to print in bytes
-	/// \return true, on success, false, if failed
-	///
-	/// The output function is not a method, because it should also be possible to write an ANSI C implmentation of an output function with related data.
-	typedef bool (*Print)( FormatOutput* this_, ElementType type, void* element, size_type elementsize);
-
 	/// \brief Constructor
 	/// \param [in] op print function pointer
-	FormatOutput( const Print& op) :m_ptr(0),m_pos(0),m_size(0),m_print(op){}
+	FormatOutput()
+		:m_ptr(0),m_pos(0),m_size(0),m_errorCode(0){}
+
+	virtual ~FormatOutput(){}
 
 	/// \brief Assignement of the data members
 	/// \param [in] o format output to assign the data members of
@@ -86,6 +79,7 @@ struct FormatOutput
 		m_ptr = o.m_ptr;
 		m_pos = o.m_pos;
 		m_size = o.m_size;
+		m_errorCode = o.m_errorCode;
 		return *this;
 	}
 
@@ -99,6 +93,7 @@ struct FormatOutput
 		m_ptr = data;
 		m_size = datasize;
 		m_pos = 0;
+		m_errorCode = 0;
 	}
 
 	/// \brief Empty initialization to force a yield execution
@@ -127,16 +122,17 @@ struct FormatOutput
 	/// \param [in] element content of element to print
 	/// \param [in] elementsize size of element to print in bytes
 	/// \return true, on success, false, if failed
-	bool print( ElementType type, void* element, size_type elementsize)
-	{
-		return m_print( this, type, element, elementsize);
-	}
+	///
+	virtual bool print( ElementType type, const void* element, size_type elementsize)=0;
+
+	/// \brief Get error code in case of error state
+	int getError() const			{return m_errorCode;}
 
 private:
 	void* m_ptr;		///< pointer to print buffer
 	size_type m_pos;	///< current cursor position in print buffer
 	size_type m_size;	///< size of print buffer in bytes
-	Print m_print;		///< pointer to print function implementation
+	int m_errorCode;	///< error code
 };
 
 }}//namespace

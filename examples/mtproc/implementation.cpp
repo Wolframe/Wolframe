@@ -45,8 +45,8 @@ struct Method::Data
 
 	Data() :buf(0)
 	{
-		input = boost::shared_ptr<protocol::Generator>( new protocol::Generator( generator::CharIsoLatin1::GetNext));
-		output = boost::shared_ptr<protocol::FormatOutput>( new protocol::FormatOutput( generator::CharIsoLatin1::Print));
+		input = boost::shared_ptr<protocol::Generator>( new filter::CharIsoLatin1::Generator());
+		output = boost::shared_ptr<protocol::FormatOutput>( new filter::CharIsoLatin1::FormatOutput());
 	}
 };
 

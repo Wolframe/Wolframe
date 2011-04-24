@@ -37,16 +37,18 @@ Project Wolframe.
 #define _Wolframe_LUATYPES_HPP_INCLUDED
 #include "langbind.hpp"
 #include "luaconfig.hpp"
+#include "appProcessor.hpp"
 
 namespace _Wolframe {
 namespace mtproc {
+namespace lua {
 
-class Interpreter
+class AppProcessor :public app::AppProcessorBase
 {
 	struct State;
 
-	Interpreter( System* system, const lua::Configuration& config, Input& input, Output& output);
-	~Interpreter();
+	AppProcessor( System* system, const lua::Configuration& config, Input& input, Output& output);
+	~AppProcessor();
 
 	virtual int call( unsigned int argc, const char** argv);
 private:
@@ -56,6 +58,6 @@ private:
 	State* m_state;
 };
 
-}}//namespace
+}}}//namespace
 #endif
 

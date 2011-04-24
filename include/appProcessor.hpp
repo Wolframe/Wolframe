@@ -37,10 +37,16 @@ Project Wolframe.
 #define _Wolframe_APPLICATION_PROCESSOR_HPP_INCLUDED
 
 namespace _Wolframe {
-namespace aproc {
+namespace app {
 
-struct Context;
-typedef int (*Call)( Context* context, unsigned int argc, const char** argv);
+class AppProcessorBase
+{
+public:
+	AppProcessorBase(){}
+	virtual ~AppProcessorBase(){}
+
+	virtual int call( unsigned int argc, const char** argv)=0;
+};
 
 }}//namespace
 #endif

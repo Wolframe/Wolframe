@@ -45,10 +45,10 @@ extern "C"
 
 using namespace _Wolframe;
 using namespace mtproc;
+using namespace lua;
 
 namespace luaname
 {
-	static const char* GeneratorClosure = "wolframe.InputGeneratorClosure";
 	static const char* Input = "wolframe.Input";
 	static const char* Output = "wolframe.Output";
 	static const char* Filter = "wolframe.Filter";
@@ -91,10 +91,24 @@ struct LuaObject :public ObjectType
 		return rt;
 	}
 
+
 	/// \brief does nothing because the LUA garbage collector does the job.
 	/// \warning CAUTION: DO NOT CALL THIS FUNCTION ! DOES NOT WORK ON MSVC 9.0. (The compiler links with the std delete)
 	///          (just avoids C4291 warning)
 	void operator delete (void *, lua_State* ) {}
+
+	template <class Orig>
+	static void push_luastack( lua_State* ls, const Orig& o)
+	{
+		try
+		{
+			(void*)new (ls) LuaObject( o);
+		}
+		catch (std::bad_alloc)
+		{
+			luaL_error( ls, "memory allocation error in lua context");
+		}
+	}
 
 	static void createGlobal( lua_State* ls, const char* metatableName, const char* name, const ObjectType& instance)
 	{
@@ -106,29 +120,82 @@ struct LuaObject :public ObjectType
 	}
 };
 
-static int function_generator( lua_State* ls)
+static int function_inputGenerator( lua_State* ls)
 {
 	const char* item[2];
-	GeneratorClosure* closure = (GeneratorClosure*)lua_touserdata( ls, lua_upvalueindex( 1));
+	unsigned int itemsize[2];
 
-	switch (closure->fetch( item[0], item[1]))
+	InputGeneratorClosure* closure = (InputGeneratorClosure*)lua_touserdata( ls, lua_upvalueindex( 1));
+
+	switch (closure->fetch( item[0], itemsize[0], item[1], itemsize[1]))
 	{
-		case GeneratorClosure::DoYield:
+		case InputGeneratorClosure::DoYield:
 			return lua_yield( ls, 0);
 
-		case GeneratorClosure::EndOfData:
+		case InputGeneratorClosure::EndOfData:
 			return 0;
 
-		case GeneratorClosure::Error:
+		case InputGeneratorClosure::Error:
 			luaL_error( ls, "error in iterator");
 			return 0;
 
-		case GeneratorClosure::Data:
+		case InputGeneratorClosure::Data:
 			if (item[0]) lua_pushstring( ls, item[0]); else lua_pushnil( ls);
 			if (item[1]) lua_pushstring( ls, item[1]); else lua_pushnil( ls);
 			return 2;
 	}
 	luaL_error( ls, "illegal state produced by generator");
+	return 0;
+}
+
+static int function_output_print( lua_State* ls)
+{
+	const char* item[2] = {0,0};
+	std::size_t itemsize[2] = {0,0};
+
+	Output* output = (Output*) lua_touserdata( ls, 1);
+
+	if (lua_gettop( ls) == 0)
+	{
+	}
+	else if (lua_gettop( ls) == 1)
+	{
+		if (lua_isnil( ls, 1)) {}
+		else if ((item[1]=lua_tolstring( ls, 1, &itemsize[1])) == 0)
+		{
+			luaL_error( ls, "invalid type of argument (convertable to string or nil expected)");
+		}
+	}
+	else if (lua_gettop( ls) == 2)
+	{
+		if (lua_isnil( ls, 1)) {}
+		else if ((item[0]=lua_tolstring( ls, 1, &itemsize[0])) == 0)
+		{
+			luaL_error( ls, "invalid type of first argument (convertable to string or nil expected)");
+		}
+		if (lua_isnil( ls, 2)) {}
+		else if ((item[1]=lua_tolstring( ls, 2, &itemsize[1])) == 0)
+		{
+			luaL_error( ls, "invalid type of second argument (convertable to string or nil expected)");
+		}
+	}
+	else
+	{
+		return luaL_error( ls, "too many arguments in call of format output print");
+	}
+	switch (output->print( item[0], itemsize[0], item[1], itemsize[1]))
+	{
+		case Output::DoYield:
+			return lua_yield( ls, 0);
+
+		case Output::Error:
+			luaL_error( ls, "error in format output print");
+			return 0;
+
+		case Output::Data:
+			return 0;
+	}
+	luaL_error( ls, "illegal state produced by format output print");
 	return 0;
 }
 
@@ -139,39 +206,57 @@ static int function_filter( lua_State* ls)
 	if (lua_gettop( ls) != 1) return luaL_error( ls, "invalid number of arguments (1 string as parameter expected)");
 	if (!lua_isstring( ls, 1)) return luaL_error( ls, "invalid type of argument (string expected)");
 	const char* name = lua_tostring( ls, 1);
-	(void)new (ls) LuaObject<Filter>( Filter( system, name));
+	LuaObject<Filter>::push_luastack( ls, Filter( system, name));
 	return 1;
 }
 
-static int function_as( lua_State* ){/*Aba??*/return 0;}
-
-#if 0 /// commented out
-void* toudata_udkey( lua_State* L, int index, const char* id)
+void* toudata_udkey( lua_State* ls, int index, const char* id)
 {
-	lua_getmetatable(L,index);
-	const void* p1 = lua_topointer(L,-1);
-	luaL_getmetatable(L,id);
-	const void* p2 = lua_topointer(L,-1);
+	lua_getmetatable( ls,index);
+	const void* p1 = lua_topointer( ls,-1);
+	luaL_getmetatable( ls,id);
+	const void* p2 = lua_topointer( ls,-1);
 
-	lua_pop(L,2);
-	return p1 == p2 ? lua_touserdata(L, index) : NULL;
+	lua_pop( ls,2);
+	return p1 == p2 ? lua_touserdata( ls, index) : NULL;
 }
 
-static int function_as( lua_State* ls)
+static int function_input_as( lua_State* ls)
 {
-	if (lua_gettop( ls) != 2) return luaL_error( ls, "invalid number of arguments (1 filter type value as parameter of method 'as' expected)");
-	LuaObject<Input>* input = toudata_udkey ( ls, 1, luaname::Input);
-	LuaObject<Output>* output = toudata_udkey( ls, 1, luaname::Output);
-	LuaObject<Filter>* filter = (LuaObject<Filter>*) toudata_udkey( ls, 2);
+	if (lua_gettop( ls) != 2)
+	{
+		return luaL_error( ls, "invalid number of arguments (1 filter type value as parameter of method 'as' expected)");
+	}
+	LuaObject<Input>* input = (LuaObject<Input>*) lua_touserdata( ls, 1);
+	LuaObject<Filter>* filter = (LuaObject<Filter>*) toudata_udkey( ls, 2, luaname::Filter);
 	if (!filter)
 	{
 		luaL_error( ls, "filter type value expected as first argument");
 	}
 	else if (input)
 	{
-		boost::shared_ptr<protocol::Generator> filtergenerator( filter);
+		boost::shared_ptr<protocol::Generator> filtergenerator( filter->m_generator);
 		*filtergenerator = *input->m_generator;
 		input->m_generator = filtergenerator;
+	}
+	else
+	{
+		luaL_error( ls, "unexpected error: object of mehod 'as' is not input or corrupt");
+	}
+	return 0;
+}
+
+static int function_output_as( lua_State* ls)
+{
+	if (lua_gettop( ls) != 2)
+	{
+		return luaL_error( ls, "invalid number of arguments (1 filter type value as parameter of method 'as' expected)");
+	}
+	LuaObject<Output>* output = (LuaObject<Output>*) lua_touserdata( ls, 1);
+	LuaObject<Filter>* filter = (LuaObject<Filter>*) toudata_udkey( ls, 2, luaname::Filter);
+	if (!filter)
+	{
+		luaL_error( ls, "filter type value expected as first argument");
 	}
 	else if (output)
 	{
@@ -181,11 +266,26 @@ static int function_as( lua_State* ls)
 	}
 	else
 	{
-		luaL_error( ls, "unexpected error: object of mehod unknown or corrupt");
+		luaL_error( ls, "unexpected error: object of mehod 'as' is not output or corrupt");
 	}
 	return 0;
 }
-#endif
+
+static int function_input_get( lua_State* ls)
+{
+	if (lua_gettop( ls) != 1)
+	{
+		return luaL_error( ls, "invalid number of arguments (no arguments for method 'get' expected)");
+	}
+	LuaObject<Input>* input = (LuaObject<Input>*) lua_touserdata( ls, 1);
+	if (!input->m_generator.get())
+	{
+		return luaL_error( ls, "no filter defined for input with input.as(...)");
+	}
+	LuaObject<InputGeneratorClosure>::push_luastack( ls, input->m_generator);
+	lua_pushcclosure( ls, &function_inputGenerator, 1);
+	return 1;
+}
 
 static void create_function_filter( lua_State* ls, System* system)
 {
@@ -199,7 +299,7 @@ static void create_function_filter( lua_State* ls, System* system)
 	LuaObject<Filter>::create( ls, luaname::Filter);
 }
 
-struct Interpreter::State
+struct AppProcessor::State
 {
 	lua_State* ls;
 	lua_State* thread;
@@ -216,31 +316,33 @@ struct Interpreter::State
 	}
 };
 
-Interpreter::Interpreter( System* system, const lua::Configuration& config, Input& input, Output& output)
+AppProcessor::AppProcessor( System* system, const lua::Configuration& config, Input& input, Output& output)
 		:m_input(input),m_output(output),m_system(system)
 {
 	m_state = new State( config);
 
 	LuaObject<Input>::createGlobal( m_state->ls, luaname::Input, "input", m_input);
-	LuaObject<Input>::defineMethod( m_state->ls, luaname::Input, "as", &function_as);
+	LuaObject<Input>::defineMethod( m_state->ls, luaname::Input, "as", &function_input_as);
+	LuaObject<Input>::defineMethod( m_state->ls, luaname::Input, "get", &function_input_get);
 
 	LuaObject<Output>::createGlobal( m_state->ls, luaname::Output, "output", m_output);
-	LuaObject<Output>::defineMethod( m_state->ls, luaname::Output, "as", &function_as);
+	LuaObject<Output>::defineMethod( m_state->ls, luaname::Output, "as", &function_output_as);
+	LuaObject<Output>::defineMethod( m_state->ls, luaname::Output, "print", &function_output_print);
 
 	create_function_filter( m_state->ls, m_system);
 }
 
-Interpreter::~Interpreter()
+AppProcessor::~AppProcessor()
 {
 	delete m_state;
 }
 
-int Interpreter::call( unsigned int argc, const char** argv)
+int AppProcessor::call( unsigned int argc, const char** argv)
 {
 	int rt;
 	if (argc == 0)
 	{
-		LOG_ERROR << "interpreter called with no arguments (first argument funtion name missing)";
+		LOG_ERROR << "lua interpreter called with no arguments (first argument funtion name missing)";
 		return -1;
 	}
 

@@ -63,16 +63,6 @@ struct Generator
 		CloseTag	///< close current hierarchy level
 	};
 
-	/// \brief Get next element call
-	/// \param [in,out] this_ pointer to this
-	/// \param [out] type element type parsed
-	/// \param [in,out] buffer for returned elements
-	/// \param [in] buffersize size of the buffer for the returned elements
-	/// \param [in,out] bufferpos before parsed element in and bufferpos after parsed element out
-	/// \return true, if success, false, if not.
-	/// \remark Check the generator state when false is returned
-	typedef bool (*GetNext)( Generator* this_, ElementType* type, void* buffer, size_type buffersize, size_type* bufferpos);
-
 	/// \brief Get next element call as methof call
 	/// \param [out] type element type parsed
 	/// \param [in,out] buffer for returned elements
@@ -80,10 +70,7 @@ struct Generator
 	/// \param [in,out] bufferpos before parsed element in and bufferpos after parsed element out
 	/// \return true, if success, false, if not.
 	/// \remark Check the generator state when false is returned
-	bool getNext( ElementType* type, void* buffer, size_type buffersize, size_type* bufferpos)
-	{
-		return m_getNext( this, type, buffer, buffersize, bufferpos);
-	}
+	virtual bool getNext( ElementType* type, void* buffer, size_type buffersize, size_type* bufferpos)=0;
 
 	/// \brief Return the current state
 	/// \return the current state
@@ -119,7 +106,8 @@ struct Generator
 
 	/// \brief Constructor
 	/// \param [in] gn GetNext function pointer
-	Generator( const GetNext& gn) :m_ptr(0),m_pos(0),m_size(0),m_gotEoD(false),m_state(Open),m_errorCode(0),m_getNext(gn){}
+	Generator() :m_ptr(0),m_pos(0),m_size(0),m_gotEoD(false),m_state(Open),m_errorCode(0){}
+	virtual ~Generator(){}
 
 	/// \brief Get error code in case of error state
 	int getError() const				{return m_errorCode;}
@@ -144,7 +132,6 @@ private:
 	bool m_gotEoD;		///< got end of data flag
 	State m_state;		///< generator state
 	int m_errorCode;	///< error code
-	GetNext m_getNext;	///< get next method pointer
 };
 
 }}//namespace
