@@ -65,6 +65,7 @@ TEST_CPP_BINS =
 
 ifeq ($(WITH_GTEST),1)
 TEST_CPP_BINS += \
+	sqlite3ppTest$(EXE) \
 	sdsqliteTest$(EXE)
 endif
 
@@ -79,4 +80,5 @@ local_distclean:
 local_test:
 ifeq ($(WITH_SQLITE3),1)
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./sdsqliteTest
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./sqlite3ppTest
 endif

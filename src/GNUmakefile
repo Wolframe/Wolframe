@@ -144,6 +144,7 @@ DB_OBJS =
 
 ifeq ($(WITH_SQLITE3),1)
 DB_OBJS += \
+	db/sqlite3/sqlite3pp.o \
 	db/sdsqlite/sdsqlite.o
 endif
 
