@@ -48,3 +48,4 @@ clients/qt/qtclient
 moc_*.cpp
 clients/qt/.history
 tests/db/sdsqliteTest
+tests/db/sqlite3ppTest
