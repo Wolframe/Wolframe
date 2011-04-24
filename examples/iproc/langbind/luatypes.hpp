@@ -40,21 +40,22 @@ Project Wolframe.
 #include "appProcessor.hpp"
 
 namespace _Wolframe {
-namespace mtproc {
+namespace iproc {
 namespace lua {
 
 class AppProcessor :public app::AppProcessorBase
 {
+public:
 	struct State;
 
-	AppProcessor( System* system, const lua::Configuration& config, Input& input, Output& output);
+	AppProcessor( app::System* system, const lua::Configuration& config, app::Input& input, app::Output& output);
 	~AppProcessor();
 
-	virtual int call( unsigned int argc, const char** argv);
+	virtual CallResult call( unsigned int argc, const char** argv);
 private:
-	Input m_input;
-	Output m_output;
-	System* m_system;
+	app::Input m_input;
+	app::Output m_output;
+	app::System* m_system;
 	State* m_state;
 };
 

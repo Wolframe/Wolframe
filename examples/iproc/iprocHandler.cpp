@@ -31,65 +31,77 @@
 
 ************************************************************************/
 ///
-/// \file mtprocHandler.cpp
+/// \file iprocHandler.cpp
 ///
 
 #include "protocol.hpp"
 #include "protocol/ioblocks.hpp"
-#include "mtprocHandler.hpp"
+#include "iprocHandler.hpp"
 #include "logger.hpp"
-#include "dispatcher.hpp"
-#include "implementation.hpp"
+#include "langbind.hpp"
 #include <boost/lexical_cast.hpp>
 
+#if WITH_LUA
+#include "langbind/luaconfig.hpp"
+#include "langbind/luatypes.hpp"
+typedef _Wolframe::iproc::lua::AppProcessor Processor;
+#endif
+
 using namespace _Wolframe;
-using namespace _Wolframe::mtproc;
+using namespace _Wolframe::iproc;
 
 struct Connection::Private
 {
 	//* typedefs for input output blocks and input iterators
-	typedef protocol::InputBlock Input;				//< input buffer type
-	typedef protocol::OutputBlock Output;				//< output buffer type
-	typedef protocol::InputBlock::iterator InputIterator;		//< iterator type for protocol commands
+	typedef protocol::InputBlock Input;				///< input buffer type
+	typedef protocol::OutputBlock Output;				///< output buffer type
+	typedef protocol::InputBlock::iterator InputIterator;		///< iterator type for protocol commands
 
 	//* typedefs for input output buffers
-	typedef protocol::Buffer<128> LineBuffer;			//< buffer for one line of input/output
-	typedef protocol::CmdParser<LineBuffer> ProtocolParser;		//< parser for the protocol
+	typedef protocol::Buffer<256> LineBuffer;			///< buffer for one line of input/output
+	typedef protocol::CmdParser<LineBuffer> ProtocolParser;		///< parser for the protocol
+	typedef protocol::CArgBuffer<LineBuffer> ArgBuffer;		///< buffer type for the command arguments
 
 	//* typedefs for state variables and buffers
 	//list of processor states
 	enum State
 	{
-		Init,					//< start state, called first time in this session
-		EnterCommand,				//< parse command
-		Processing,				//< running the dispatcher sub state machine; execute a command without data input
-		ProcessingInput,			//< running the dispatcher sub state machine; execute a command with data input
-		ProtocolError,				//< a protocol error (bad command etc) appeared and the rest of the line has to be discarded
-		DiscardInput,				//< reading and discarding data until end of data has been seen
-		EndOfCommand,				//< cleanup after processing
-		Terminate				//< terminate processing (close for network)
+		Init,					///< start state, called first time in this session
+		EnterCommand,				///< parse command
+		ParseArgs,				///< parse command arguments
+		Processing,				///< running a command
+		ProcessingInput,			///< running a command with data input
+		ProtocolError,				///< a protocol error (bad command etc) appeared and the rest of the line has to be discarded
+		DiscardInput,				///< reading and discarding data until end of data has been seen
+		EndOfCommand,				///< cleanup after processing
+		Terminate				///< terminate processing (close for network)
 	};
 	static const char* stateName( State i)
 	{
-		static const char* ar[] = {"Init","EnterCommand","Processing","ProcessingInput","ProtocolError","CommandError","EndOfCommand","Terminate"};
+		static const char* ar[] = {"Init","EnterCommand","ParseArgs", "Processing","ProcessingInput","ProtocolError","CommandError","EndOfCommand","Terminate"};
 		return ar[i];
 	}
 
 	//* all state variables of this processor
 	//1. states
-	State state;					//< state of the processor (protocol main statemachine)
-	CommandDispatcher commandDispatcher;		//< state of the processor in the command execution phase (protocol sub statemachine)
+	State state;					///< state of the processor (protocol main statemachine)
 
 	//2. buffers and context
-	LineBuffer buffer;				//< context (sub state) for partly parsed input lines
-	Input input;					//< buffer for network read messages
-	Output output;					//< buffer for network write messages
+	LineBuffer buffer;				///< context (sub state) for partly parsed input lines
+	ArgBuffer argBuffer;				///< buffer for the arguments
+	unsigned int cmdidx;				///< command parsed
+
+	Input input;					///< buffer for network read messages
+	Output output;					///< buffer for network write messages
 	//3. Iterators
-	InputIterator itr;				//< iterator to scan protocol input
-	InputIterator end;				//< iterator pointing to end of message buffer
+	InputIterator itr;				///< iterator to scan protocol input
+	InputIterator end;				///< iterator pointing to end of message buffer
 
 	//3. implementation
-	Implementation object;
+	app::System app_system;				///< interface to system functions and loaded resources
+	app::Input app_input;				///< network input interface for the interpreter
+	app::Output app_output;				///< network output interface for the interpreter
+	Processor processor;				///< the interpreter state
 
 	//* helper methods for I/O
 	//helper function to send a line message with CRLF termination as C string
@@ -108,6 +120,7 @@ struct Connection::Private
 		const char* msg = buffer.c_str();
 		unsigned int msgsize = buffer.size();
 		buffer.clear();
+		argBuffer.clear();
 		return net::SendData( msg, msgsize);
 	}
 
@@ -117,7 +130,7 @@ struct Connection::Private
 
 		if (state == ProcessingInput)
 		{
-			commandDispatcher.protocolInput( itr, eoD, input.gotEoD());
+			app_input.m_generator->protocolInput( itr.ptr(), eoD-itr, input.gotEoD());
 		}
 		end = input.end();
 		itr = (eoD < end) ? (eoD+1):end;
@@ -133,7 +146,7 @@ struct Connection::Private
 			Input::iterator eoD = input.getEoD( itr);
 			if (state == ProcessingInput)
 			{
-				commandDispatcher.protocolInput( itr, eoD, input.gotEoD());
+				app_input.m_generator->protocolInput( itr.ptr(), eoD-itr, input.gotEoD());
 			}
 			end = input.end();
 			itr = (eoD < end)? (eoD+1):end;
@@ -149,22 +162,18 @@ struct Connection::Private
 		state = Terminate;
 	}
 
-	//* interface
-	Private( unsigned int inputBufferSize, unsigned int outputBufferSize)	:state(Init),input(inputBufferSize),output(outputBufferSize)
+	Private( const lua::Configuration& config, unsigned int inputBufferSize, unsigned int outputBufferSize)	:state(Init),argBuffer(&buffer),input(inputBufferSize),output(outputBufferSize),processor(&app_system,config,app_input,app_output)
 	{
 		itr = input.begin();
 		end = input.end();
-		object.init();
-		commandDispatcher.init( &object);
-	}
-	~Private()
-	{
-		object.done();
 	}
 
 	//statemachine of the processor
 	const Operation nextOperation()
 	{
+		enum Command {empty, capa, run, quit};
+		static const char* cmd[5] = {"","capa","run","quit",0};
+
 		for (;;)
 		{
 			LOG_DATA << "Handler State: " << stateName(state);
@@ -175,47 +184,101 @@ struct Connection::Private
 				{
 					//start:
 					state = EnterCommand;
+					buffer.clear();
+					argBuffer.clear();
 					return WriteLine( "OK expecting command");
 				}
 
 				case EnterCommand:
 				{
-					switch (commandDispatcher.getCommand( itr, end))
+					//the empty command is for an empty line for not bothering the client with obscure error messages.
+					//the next state should read one character for sure otherwise it may result in an endless loop
+					static const ProtocolParser parser(cmd);
+					Command cmd = parser.getCommand( itr, eoM, buffer);
+					cmdidx = cmd;
+					switch (cmd)
 					{
-						case CommandDispatcher::empty:
+						case empty:
+						case capa:
+						case run:
+						case quit:
 						{
-							state = EnterCommand;
+							state = ParseArgs;
 							continue;
 						}
-						case CommandDispatcher::capa:
+						default:
 						{
-							state = EnterCommand;
-							return WriteLine( "OK", commandDispatcher.getCapabilities());
-						}
-						case CommandDispatcher::quit:
-						{
-							state = Terminate;
-							return WriteLine( "BYE");
-						}
-						case CommandDispatcher::method:
-						{
-							input.resetEoD();
-							state = Processing;
-							continue;
-						}
-						case CommandDispatcher::unknown:
-						{
-							if (itr == end)
+							if (itr == eoM)
 							{
 								input.setPos( 0);
 								return net::ReadData( input.ptr(), input.size());
 							}
 							else
 							{
-								state = ProtocolError;
-								return WriteLine( "BAD error in command line");
+								state = HandleError;
+								return WriteLine( "BAD unknown command");
 							}
 						}
+					}
+				}
+
+				case ParseArgs:
+				{
+					if (!ProtocolParser::getLine( itr, eoM, m_argBuffer))
+					{
+						if (itr == eoM)
+						{
+							input.setPos( 0);
+							return net::ReadData( input.ptr(), input.size());
+						}
+						else
+						{
+							state = HandleError;
+							return WriteLine( "BAD arguments");
+						}
+					}
+					Command cmd = (Command)cmdidx;
+					switch (cmd)
+					{
+						case empty:
+							if (m_argBuffer.argc())
+							{
+								state = ProtocolError;
+								return WriteLine( "BAD command");
+							}
+							else
+							{
+								buffer.clear();
+								argBuffer.clear();
+								state = EnterCommand;
+								continue;
+							}
+						case capa:
+							if (m_argBuffer.argc())
+							{
+								state = ProtocolError;
+								return WriteLine( "BAD command arguments");
+							}
+							else
+							{
+								return WriteLine( "OK capa run quit");
+								state = Init;
+								continue;
+							}
+						case quit:
+							if (m_argBuffer.argc())
+							{
+								state = ProtocolError;
+								return WriteLine( "BAD command arguments");
+							}
+							else
+							{
+								state = Terminate;
+								continue;
+							}
+						case run:
+							state = Processing;
+							continue;
 					}
 				}
 
@@ -223,7 +286,10 @@ struct Connection::Private
 				case ProcessingInput:
 				{
 					int returnCode = 0;
-					switch (commandDispatcher.call( returnCode))
+					const char* argv = m_argBuffer.argv( "run");
+					unsigned int argc = m_argBuffer.argc( "run");
+
+					switch (processor.call( argc, argv))
 					{
 						case CommandDispatcher::ReadInput:
 							if (state == Processing)
@@ -339,9 +405,9 @@ struct Connection::Private
 };
 
 
-Connection::Connection( const net::LocalEndpoint& local, unsigned int inputBufferSize, unsigned int outputBufferSize)
+Connection::Connection( const net::LocalEndpoint& local, const AppConfiguration& config)
 {
-	data = new Private( inputBufferSize, outputBufferSize);
+	data = new Private( config.input_bufsize(), config.output_bufsize());
 	LOG_TRACE << "Created connection handler for " << local.toString();
 }
 
@@ -391,7 +457,7 @@ const Connection::Operation Connection::nextOperation()
 /// ServerHandler PIMPL
 net::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const net::LocalEndpoint& local )
 {
-	return new mtproc::Connection( local );
+	return new iproc::Connection( local );
 }
 
 

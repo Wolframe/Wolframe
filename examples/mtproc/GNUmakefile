@@ -56,15 +56,7 @@ OBJS = \
 	implementation.o \
 	dispatcher.o \
 	mtprocHandler.o \
-	langbind.o \
 	$(TOPDIR)/src/posixMain.o
-
-ifeq ($(WITH_LUA),1)
-OBJS += \
-	luaconfig.o \
-	luatypes.o
-endif
-
 
 CPP_BINS = \
 	mtprocd$(EXE)

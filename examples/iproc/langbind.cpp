@@ -41,7 +41,8 @@ Project Wolframe.
 #include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
-using namespace _Wolframe::mtproc;
+using namespace iproc;
+using namespace app;
 
 InputGeneratorClosure::ItemType InputGeneratorClosure::fetch( const char*& e1, unsigned int& e1size, const char*& e2, unsigned int& e2size)
 {

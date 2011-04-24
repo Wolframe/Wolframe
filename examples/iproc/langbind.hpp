@@ -42,7 +42,7 @@ Project Wolframe.
 #include <string>
 
 namespace _Wolframe {
-namespace mtproc {
+namespace app {
 
 struct Output
 {

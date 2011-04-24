@@ -147,6 +147,34 @@ public:
 		DomainValueType m_max;		///< maximal allowed value of the range
 	};
 
+	/// \class RangeDomain
+	/// \brief Describes a value domain for a value that must differ from its default (empty) initialization
+	/// \tparam DomainValueType type of the value the range is formed of
+	template <typename DomainValueType>
+	struct NonEmptyDomain :public BaseTypeDomain
+	{
+		/// \brief constructor
+		NonEmptyDomain(){};
+
+		/// \brief Checks if the configuration value is in the expected domain, e.g. non empty
+		/// \tparam ValueType type of the value to check
+		/// \param[in] val value to check, if its in this domain
+		/// \param[out] explanation part of the error message in case of error explaining why it failed
+		template <typename ValueType>
+		bool check( const ValueType& val, string& explanation) const
+		{
+			ValueType empty = boost::value_initialized<ValueType>();
+			if (val == empty)
+			{
+				explanation = "value expected to be other than '";
+				explanation.append( boost::lexical_cast<std::string>( empty));
+				explanation.append( "'");
+				return false;
+			}
+			return true;
+		}
+	};
+
 	/// \class EnumDomain
 	/// \brief Describes a value domain for an enumerable fixed set of values
 	struct EnumDomain :public BaseTypeDomain

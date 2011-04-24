@@ -44,8 +44,9 @@ extern "C"
 }
 
 using namespace _Wolframe;
-using namespace mtproc;
+using namespace iproc;
 using namespace lua;
+using namespace app;
 
 namespace luaname
 {
@@ -337,13 +338,13 @@ AppProcessor::~AppProcessor()
 	delete m_state;
 }
 
-int AppProcessor::call( unsigned int argc, const char** argv)
+CallResult AppProcessor::call( unsigned int argc, const char** argv)
 {
-	int rt;
+	CallResult rt = Ok;
 	if (argc == 0)
 	{
 		LOG_ERROR << "lua interpreter called with no arguments (first argument funtion name missing)";
-		return -1;
+		return Error;
 	}
 
 	if (!m_state->thread)
@@ -354,12 +355,12 @@ int AppProcessor::call( unsigned int argc, const char** argv)
 			if (argv[ii]) lua_pushstring( m_state->ls, argv[ii]); else lua_pushnil( m_state->ls);
 		}
 		rt = lua_resume( m_state->thread, argc-1);
-		if (rt==LUA_YIELD) rt = 0;
+		if (rt==LUA_YIELD) rt = Yield;
 	}
 	else
 	{
 		rt = lua_resume( m_state->thread, 0);
-		if (rt==LUA_YIELD) rt = 0;
+		if (rt==LUA_YIELD) rt = Yield;
 	}
 	return rt;
 }

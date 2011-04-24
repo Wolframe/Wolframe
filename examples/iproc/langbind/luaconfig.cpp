@@ -45,7 +45,7 @@ extern "C" {
 	#include <lua.h>
 }
 
-using namespace _Wolframe::mtproc::lua;
+using namespace _Wolframe::iproc::lua;
 
 static Configuration::ModuleLoad getLuaModuleEntryFunc( const char* name)
 {
@@ -70,25 +70,22 @@ bool Configuration::parse( const boost::property_tree::ptree& parentNode, const 
 	{
 		if (boost::algorithm::iequals( it->first, "main"))
 		{
-			if ( !config::Parser::getValue( logPrefix().c_str(), *it, name )) return false;
-
-			if (name.size() == 0)
-			{
-				LOG_ERROR << logPrefix() << ": empty name for the main script is illegal (configuration option <main>)";
-				return false;
-			}
+			if ( !config::Parser::getValue( logPrefix().c_str(), *it, name, NonEmptyDomain())) return false;
 			m_main = Module( name);
 			cnt_main ++;
 		}
 		else if (boost::algorithm::iequals( it->first, "module"))
 		{
-			if ( !config::Parser::getValue( logPrefix().c_str(), *it, name )) return false;
-			if (name.size() == 0)
-			{
-				LOG_ERROR << logPrefix() << ": empty name for a module is illegal (configuration option <module>)";
-				return false;
-			}
+			if ( !config::Parser::getValue( logPrefix().c_str(), *it, name, NonEmptyDomain())) return false;
 			m_modules.push_back( Module( name));
+		}
+		else if (boost::algorithm::iequals( it->first, "input_buffer"))
+		{
+			if (!config::Parser::getValue( logPrefix().c_str(), *it, m_input_bufsize, RangeDomain<unsigned int>(1,(1<<20)))) return false;
+		}
+		else if (boost::algorithm::iequals( it->first, "output_buffer"))
+		{
+			if (!config::Parser::getValue( logPrefix().c_str(), *it, m_output_bufsize, RangeDomain<unsigned int>(1,(1<<20)))) return false;
 		}
 		else
 		{
