@@ -6,7 +6,7 @@
 #define _HANDLERCONFIG_HPP_INCLUDED
 
 #include "standardConfigs.hpp"
-#if WITH_LUA
+#ifdef WITH_LUA
 #include "langbind/luaconfig.hpp"
 namespace _Wolframe {
 struct AppConfiguration :public _Wolframe::iproc::lua::Configuration

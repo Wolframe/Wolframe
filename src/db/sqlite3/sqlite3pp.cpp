@@ -53,13 +53,22 @@ db_error::db_error( const std::string &err ) : std::runtime_error( err )
 // result
 
 result::result( )
+	: m_stmt( 0 )
 {
-	sqlite3_finalize( m_stmt );
+}
+
+result::~result( )
+{
+	if( m_stmt )
+		sqlite3_finalize( m_stmt );
 }
 
 unsigned int result::rows_affected( )
 {
-	return sqlite3_changes( sqlite3_db_handle( m_stmt ) );
+	if( m_stmt )
+		return sqlite3_changes( sqlite3_db_handle( m_stmt ) );
+	else
+		throw db_error( "rows_affected() called with illegal statement" );
 }
 
 // connection

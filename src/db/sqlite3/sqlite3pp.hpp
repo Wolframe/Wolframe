@@ -54,6 +54,8 @@ namespace _Wolframe {
 		public:
 			result( );
 
+			~result( );
+
 			// number of rows affected (0 for queries and
 			// DDL commands usually, >0 for deletions and
 			// inserts/updates
