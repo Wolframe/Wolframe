@@ -45,7 +45,7 @@ public:
 	AppProcessorBase(){}
 	virtual ~AppProcessorBase(){}
 
-	enum CallResult {Ok, Error, YieldRead, YieldWrite}:
+	enum CallResult {Ok, Error, YieldRead, YieldWrite};
 
 	virtual CallResult call( unsigned int argc, const char** argv)=0;
 };

@@ -231,7 +231,7 @@ public:
 	}
 
 	/// \brief Synonym of size. Convenient in C for the number of program arguments
-	unsigned int argc( const char* cmdname=0) const		{(void)argv(cmdname); return m_pos;}
+	unsigned int argc( const char* cmdname=0)		{(void)argv(cmdname); return m_pos;}
 };
 
 } // namespace protocol
