@@ -59,6 +59,7 @@ public:
 	}
 
 	virtual CallResult call( unsigned int argc, const char** argv, bool CommandHasIO);
+
 private:
 	const lua::Configuration* m_config;
 	app::Input m_input;

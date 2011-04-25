@@ -304,8 +304,9 @@ struct AppProcessor::State
 {
 	lua_State* ls;
 	lua_State* thread;
+	int threadref;
 
-	State( const lua::Configuration& config) :ls(0),thread(0)
+	State( const lua::Configuration& config) :ls(0),thread(0),threadref(0)
 	{
 		ls = luaL_newstate();
 		if (!ls) throw std::bad_alloc();
@@ -390,7 +391,20 @@ AppProcessor::CallResult AppProcessor::call( unsigned int argc, const char** arg
 
 	if (!m_state->thread)
 	{
+		// create thread for the call execution
 		m_state->thread = lua_newthread( m_state->ls);
+		m_state->threadref = luaL_ref( m_state->ls, LUA_REGISTRYINDEX);
+
+		// initialize input:
+		boost::shared_ptr<protocol::Generator> filtergenerator( m_system->createGenerator());
+		*filtergenerator = *m_input.m_generator;
+		m_input.m_generator = filtergenerator;
+
+		// initialize output:
+		boost::shared_ptr<protocol::FormatOutput> filteroutput( m_system->createFormatOutput());
+		*filteroutput = *m_output.m_formatoutput;
+		m_output.m_formatoutput = filteroutput;
+
 		for (unsigned int ii=0; ii<argc; ii++)
 		{
 			if (argv[ii]) lua_pushstring( m_state->ls, argv[ii]); else lua_pushnil( m_state->ls);
@@ -407,8 +421,17 @@ AppProcessor::CallResult AppProcessor::call( unsigned int argc, const char** arg
 	}
 	else if (rt != 0)
 	{
+		luaL_unref( m_state->ls, LUA_REGISTRYINDEX, m_state->threadref);
+		m_state->threadref = 0;
+		m_state->thread = 0;
 		LOG_ERROR << "error " << rt << ")  calling '" << argv[0] << "'";
 		return Error;
+	}
+	else
+	{
+		luaL_unref( m_state->ls, LUA_REGISTRYINDEX, m_state->threadref);
+		m_state->threadref = 0;
+		m_state->thread = 0;
 	}
 	return Ok;
 }

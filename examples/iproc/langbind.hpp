@@ -72,8 +72,8 @@ struct System
 	System(){}
 	virtual ~System(){}
 
-	virtual protocol::Generator* createGenerator( const char* name) const;
-	virtual protocol::FormatOutput* createFormatOutput( const char* name) const;
+	virtual protocol::Generator* createGenerator( const char* name=0) const;
+	virtual protocol::FormatOutput* createFormatOutput( const char* name=0) const;
 };
 
 struct Input
