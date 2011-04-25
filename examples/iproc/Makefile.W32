@@ -1,0 +1,90 @@
+TOPDIR = ..\..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_CPPFLAGS = \
+	/D_WIN32_WINNT=0x504
+
+INCLUDE_DIRS = \
+	/I. \
+	/I$(TOPDIR)\include \
+	/I"$(BOOST_DIR)" \
+	/I"$(PLATFORM_SDK_DIR)\Include" \
+
+# Note: libraries are picked automatically on Windows!
+SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib"
+INCLUDE_LDFLAGS = \
+	$(SDK_LDFLAGS) $(BOOST_LDFLAGS)
+INCLUDE_LIBS = \
+	Advapi32.lib
+
+# openssl
+
+!IFDEF WITH_SSL
+
+INCLUDE_LDFLAGS = \
+	$(INCLUDE_LDFLAGS) /LIBPATH:"$(OPENSSL_DIR)\lib"
+
+INCLUDE_LIBS = \
+	$(INCLUDE_LIBS) $(OPENSSL_LIBS)
+
+!ENDIF
+
+# Lua
+
+!IFDEF WITH_LUA
+
+INCLUDE_DIRS = \
+	$(INCLUDE_DIRS) /I$(LUA_INCLUDE_DIRS)
+
+INCLUDE_LDFLAGS = \
+	$(INCLUDE_LDFLAGS) $(LUA_LDFLAGS)
+
+INCLUDE_LIBS = \
+	$(INCLUDE_LIBS) $(LUA_LIBS)
+
+!ENDIF
+
+OBJS = \
+	appProperties.obj \
+	appConfigDefinition.obj \
+	langbind.obj \
+	iprocHandler.obj \
+	$(TOPDIR)\src\winMain.obj
+
+!IFDEF WITH_LUA
+OBJS = \
+	$(OBJS) langbind\luaconfig.obj langbind\luatypes.obj
+!ENDIF
+
+CPP_BINS = \
+	iprocd.exe
+
+all: $(OBJS) $(CPP_BINS)
+
+iprocd.exe: iprocd.obj $(TOPDIR)\src\wolframe.lib
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+local_all:
+
+local_clean:
+
+local_distclean:
+
+local_test:
+
+run: $(CPP_BINS)
+	@-echo @echo off > test.bat
+!IFDEF WITH_SSL
+	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat
+	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >> test.bat
+!ENDIF
+!IFDEF WITH_LUA
+	@-echo copy "$(LUA_DIR)\src\lua51.dll" . >> test.bat
+!ENDIF
+	@-echo echo Running the Wolframe server... >> test.bat
+	@-echo iprocd.exe -c iproc.conf -d DATA >> test.bat
+	@-test.bat
