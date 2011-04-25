@@ -128,6 +128,7 @@ InputGeneratorClosure::ItemType InputGeneratorClosure::fetch( const char*& e1, u
 
 protocol::Generator* System::createGenerator( const char* name) const
 {
+	if (!name) return new filter::CharIsoLatin1::Generator(); //< default input generator
 	if (boost::algorithm::iequals( name, "char-isolatin1")) return new filter::CharIsoLatin1::Generator();
 
 	LOG_ERROR << "unknown input filter function '" << name << "'";
@@ -136,6 +137,7 @@ protocol::Generator* System::createGenerator( const char* name) const
 
 protocol::FormatOutput* System::createFormatOutput( const char* name) const
 {
+	if (!name) return new filter::CharIsoLatin1::FormatOutput(); //< default output filter
 	if (boost::algorithm::iequals( name, "char-isolatin1")) return new filter::CharIsoLatin1::FormatOutput();
 
 	LOG_ERROR << "unknown output filter function '" << name << "'";
