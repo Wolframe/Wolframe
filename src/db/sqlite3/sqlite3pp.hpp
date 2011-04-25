@@ -45,11 +45,9 @@ namespace _Wolframe {
 	namespace db {
 		namespace sqlite3pp {
 
-	class db_error : std::runtime_error {
+	class db_error : public std::runtime_error {
 		public:
-			explicit db_error( const std::string &err );
-
-		
+			explicit db_error( const std::string &err );		
 	};
 
 	class result {

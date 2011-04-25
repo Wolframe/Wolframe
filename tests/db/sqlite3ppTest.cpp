@@ -64,9 +64,11 @@ TEST_F( DbSqliteFixture, BasicOps )
 
 		transaction t( db );
 
+		t.exec( "insert into a(b) values(7)" );
+
 		t.commit( );
 	} catch( db_error &e ) {
-		std::cerr << "Got exception: " << std::endl;
+		std::cerr << "Got exception: " << e.what( ) << std::endl;
 	}
 /*
 	int data[4] = { 34, 22, 5, 54 };

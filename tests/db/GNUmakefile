@@ -19,15 +19,6 @@ INCLUDE_LIBS = \
 	-lboost_system \
 	$(TOPDIR)/src/libwolframe.a
 
-# openssl
-
-ifeq ($(WITH_SSL),1)
-
-INCLUDE_LIBS += \
-	$(OPENSSL_LIBS)
-
-endif
-
 # sqlite3
 
 ifeq ($(WITH_SQLITE3),1)
@@ -68,6 +59,8 @@ TEST_CPP_BINS += \
 	sqlite3ppTest$(EXE) \
 	sdsqliteTest$(EXE)
 endif
+
+sqlite3ppTest$(EXE): $(TOPDIR)/src/libwolframe.a
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

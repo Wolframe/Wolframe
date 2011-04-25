@@ -162,7 +162,7 @@ transaction::~transaction( )
 result transaction::exec( const std::string &sql )
 {
 	if( m_state != TX_ACTIVE )
-		throw db_error( "exec() unexpected at this time" );
+		throw db_error( "exec('" + sql + "') unexpected at this time" );
 
 	return m_connection.exec( sql );
 }
@@ -170,8 +170,8 @@ result transaction::exec( const std::string &sql )
 void transaction::begin( )
 {
 	if( m_state == TX_NASCENT ) {
-		exec( "begin" );
 		m_state = TX_ACTIVE;
+		exec( "begin" );
 	} else {
 		throw db_error( "begin() unexpected at this time" );
 	}
