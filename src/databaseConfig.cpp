@@ -67,11 +67,13 @@ void PostgreSQLconfig::print( std::ostream& os, size_t indent ) const
 {
 	std::string indStr( indent, ' ' );
 	os << indStr << "PostgreSQL server:" << std::endl;
+	if ( ! ID().empty() )
+		os << indStr << "   ID: " << ID() << std::endl;
 	if ( host.empty())
 		os << indStr << "   Database host: local unix domain socket" << std::endl;
 	else
 		os << indStr << "   Database host: " << host << ":" << port << std::endl;
-	os << indStr << "   Database name: " << (name.empty() ? "(not specified - server user default)" : name) << std::endl;
+	os << indStr << "   Database name: " << (dbName.empty() ? "(not specified - server user default)" : dbName) << std::endl;
 	os << indStr << "   Database user: " << (user.empty() ? "(not specified - same as server user)" : user)
 	   << ", password: " << (password.empty() ? "(not specified - no password used)" : password) << std::endl;
 	os << indStr << "   Database connections: " << connections << std::endl;
@@ -95,7 +97,15 @@ bool PostgreSQLconfig::parse( const boost::property_tree::ptree& pt, const std::
 	portDefined = connDefined = aTdefined = false;
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
-		if ( boost::algorithm::iequals( L1it->first, "host" ))	{
+		if ( boost::algorithm::iequals( L1it->first, "identifier" ))	{
+			bool isDefined = ( ! ID().empty() );
+			std::string id;
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, id, &isDefined ))
+				retVal = false;
+			else
+				ID( id );
+		}
+		else if ( boost::algorithm::iequals( L1it->first, "host" ))	{
 			bool isDefined = ( !host.empty());
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, host, &isDefined ))
 				retVal = false;
@@ -106,8 +116,8 @@ bool PostgreSQLconfig::parse( const boost::property_tree::ptree& pt, const std::
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "name" ))	{
-			bool isDefined = ( !name.empty());
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, name, &isDefined ))
+			bool isDefined = ( !dbName.empty());
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, dbName, &isDefined ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "user" ))	{
@@ -151,8 +161,10 @@ void SQLiteConfig::print( std::ostream& os, size_t indent ) const
 	std::string indStr( indent, ' ' );
 
 	os << indStr << "SQLite database:" << std::endl;
+	if ( ! ID().empty() )
+		os << indStr << "   ID: " << ID() << std::endl;
 	os << indStr << "   Filename: " << filename << std::endl;
-	os << indStr << "   Flags: " << (flag ? "True Flag" : "False Flag");
+	os << indStr << "   Flags: " << (flag ? "True Flag" : "False Flag") << std::endl;
 }
 
 bool SQLiteConfig::check() const
@@ -170,8 +182,17 @@ bool SQLiteConfig::parse( const boost::property_tree::ptree& pt, const std::stri
 	bool retVal = true;
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
-		if ( boost::algorithm::iequals( L1it->first, "filename" ))	{
-			bool isDefined = ( !filename.empty());
+		if ( boost::algorithm::iequals( L1it->first, "identifier" ))	{
+			bool isDefined = ( ! ID().empty() );
+			std::string id;
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, id, &isDefined ))
+				retVal = false;
+			else
+				ID( id );
+		}
+		else if ( boost::algorithm::iequals( L1it->first, "file" ) ||
+			  boost::algorithm::iequals( L1it->first, "filename" ))	{
+			bool isDefined = ( ! filename.empty() );
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, filename, &isDefined ))
 				retVal = false;
 			else	{
@@ -207,15 +228,24 @@ void SQLiteConfig::setCanonicalPathes( const std::string& refPath )
 
 
 //***  Generic database functions  **************************************
+Configuration::~Configuration()
+{
+	for ( std::list<DatabaseConfigBase*>::const_iterator it = dbConfig_.begin();
+								it != dbConfig_.end(); it++ )
+		delete *it;
+}
+
 void Configuration::print( std::ostream& os, size_t /* indent */ ) const
 {
 	os << sectionName() << std::endl;
-	if ( dbConfig_.size() > 1 )
-		os << "   Strategy: " << Database::strategyToStr( strategy ) << std::endl;
-	for ( std::list<DatabaseConfigBase*>::const_iterator it = dbConfig_.begin();
+	if ( dbConfig_.size() > 0 )	{
+		for ( std::list<DatabaseConfigBase*>::const_iterator it = dbConfig_.begin();
 								it != dbConfig_.end(); it++ )	{
-		(*it)->print( os, 3 );
+			(*it)->print( os, 3 );
+		}
 	}
+	else
+		os << "   None configured" << std::endl;
 }
 
 
@@ -231,57 +261,28 @@ bool Configuration::check() const
 	return correct;
 }
 
-
-bool Configuration::parse( const boost::property_tree::ptree& pt, const std::string& /* nodeName */ )
+bool Configuration::parse( const boost::property_tree::ptree& pt, const std::string& nodeName )
 {
 	using namespace _Wolframe::config;
 	bool retVal = true;
-	DatabaseType type = DBTYPE_UNKNOWN;
-
-	enum { NofDBtypes = 2 };
-	static const char* DBtypesEnum[ NofDBtypes ] = { "PostgreSQL", "SQLite" };
-	Parser::EnumDomain DBtypesDomain( NofDBtypes, DBtypesEnum );
-
-	enum { NofDBstrategies = 2 };
-	static const char* DBstrategies[ NofDBstrategies ] = { "round-robin", "failover" };
-	Parser::EnumDomain DBstrategyDomain( NofDBstrategies, DBstrategies );
-
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
-		if ( boost::algorithm::iequals( L1it->first, "type" ))	{
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, type, DBtypesDomain ))
+		if ( boost::algorithm::iequals( L1it->first, "PostgreSQL" ))	{
+			PostgreSQLconfig* cfg = new PostgreSQLconfig( "PostgreSQL server", logPrefix().c_str(), "PostgreSQL" );
+			if ( cfg->parse( L1it->second, L1it->first ))
+				dbConfig_.push_back( cfg );
+			else	{
+				delete cfg;
 				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "strategy" ))	{
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, strategy, DBstrategyDomain ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "server" ))	{
-			switch ( type )	{
-			case DBTYPE_POSTGRESQL:	{
-				PostgreSQLconfig* cfg = new PostgreSQLconfig( "PostgreSQL server", logPrefix().c_str(), "PostgreSQL" );
-				if ( cfg->parse( L1it->second, L1it->first ))
-					dbConfig_.push_back( cfg );
-				else	{
-					delete cfg;
-					retVal = false;
-				}
-				break;
 			}
-			case DBTYPE_SQLITE:	{
-				SQLiteConfig* cfg = new SQLiteConfig( "SQLite database", logPrefix().c_str(), "SQLite" );
-				if ( cfg->parse( L1it->second, L1it->first ))
-					dbConfig_.push_back( cfg );
-				else	{
-					retVal = false;
-					delete cfg;
-				}
-				break;
-			}
-			case DBTYPE_UNKNOWN:
-				LOG_ERROR << logPrefix() << "database type must be defined first";
+		}
+		else if ( boost::algorithm::iequals( L1it->first, "SQLite" ))	{
+			SQLiteConfig* cfg = new SQLiteConfig( "SQLite database", logPrefix().c_str(), "SQLite" );
+			if ( cfg->parse( L1it->second, L1it->first ))
+				dbConfig_.push_back( cfg );
+			else	{
 				retVal = false;
-				break;
+				delete cfg;
 			}
 		}
 		else

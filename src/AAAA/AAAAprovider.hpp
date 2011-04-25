@@ -61,7 +61,7 @@ namespace AAAA {
 		const AuthenticationType	type;
 	public:
 		AuthenticationConfigBase( AuthenticationType Type )	: type( Type )	{}
-	//	virtual ~DatabaseConfigBase();
+	//	virtual ~AuthenticationConfigBase();
 
 		virtual bool parse( const std::string& module, const boost::property_tree::ptree& pt ) = 0;
 		virtual bool check( const std::string& module ) const = 0;
@@ -70,7 +70,7 @@ namespace AAAA {
 	};
 
 
-	class AuthenticationConfiguration : public _Wolframe::config::ConfigurationBase
+	class AuthenticationConfiguration : public config::ConfigurationBase
 	{
 	public:
 		/// constructor
@@ -98,7 +98,7 @@ namespace AAAA {
 	};
 
 
-	class AuditConfiguration : public _Wolframe::config::ConfigurationBase
+	class AuditConfiguration : public config::ConfigurationBase
 	{
 	public:
 		/// constructor
@@ -120,7 +120,7 @@ namespace AAAA {
 	};
 
 
-	class Configuration : public _Wolframe::config::ConfigurationBase
+	class Configuration : public config::ConfigurationBase
 	{
 	public:
 		/// constructor

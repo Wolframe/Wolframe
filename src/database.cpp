@@ -66,22 +66,4 @@ std::string& Database::typeToStr( DatabaseType type )
 	}
 }
 
-DatabaseStrategy Database::strToStrategy( const char *str )
-{
-	if ( boost::algorithm::iequals( str, "round-robin" ))		return DBSTRATEGY_ROUND_ROBIN;
-	else if ( boost::algorithm::iequals( str, "roundrobin" ))	return DBSTRATEGY_ROUND_ROBIN;
-	else if ( boost::algorithm::iequals( str, "failover" ))		return DBSTRATEGY_FAILOVER;
-	else return DBSTRATEGY_UNKNOWN;
-}
-
-std::string& Database::strategyToStr( DatabaseStrategy strategy )
-{
-	static std::string	retVal[ 3 ] = { "round-robin", "failover", "UNKNOWN" };
-	switch ( strategy )	{
-	case DBSTRATEGY_ROUND_ROBIN:	return retVal[0];
-	case DBSTRATEGY_FAILOVER:	return retVal[1];
-	case DBSTRATEGY_UNKNOWN:
-	default:			return retVal[2];
-	}
-}
 }} // namespace _Wolframe::db

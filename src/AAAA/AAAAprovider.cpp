@@ -57,7 +57,7 @@ bool Configuration::check() const
 
 void Configuration::print( std::ostream& os, size_t /* indent */ ) const
 {
-	os << sectionName() << " configuration :)";
+	os << sectionName() << " configuration :)" << std::endl;
 }
 
 void Configuration::setCanonicalPathes( const std::string& /* referencePath */ )

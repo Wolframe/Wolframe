@@ -51,29 +51,29 @@ enum DatabaseType	{
 	DBTYPE_UNKNOWN
 };
 
-/// database strategy
-enum DatabaseStrategy	{
-	DBSTRATEGY_ROUND_ROBIN,
-	DBSTRATEGY_FAILOVER,
-	DBSTRATEGY_UNKNOWN
-};
 
-struct	DatabaseConfigBase : public config::ConfigurationBase
+class	DatabaseConfigBase : public config::ConfigurationBase
 {
-	const DatabaseType	type;
 public:
 	DatabaseConfigBase( DatabaseType Type,
 			    const char* name, const char* logParent, const char* logName )
-		: ConfigurationBase( name, logParent, logName ), type( Type )	{}
+		: ConfigurationBase( name, logParent, logName ), type_( Type )	{}
 //	virtual ~DatabaseConfigBase();
+	DatabaseType type() const			{ return type_; }
+	void ID( const std::string& id )		{ ID_ = id; }
+	const std::string& ID() const			{ return ID_; }
+private:
+	const DatabaseType	type_;
+	std::string		ID_;
 };
 
 
+/// PostgreSQL server connection configuration
 struct	PostgreSQLconfig : public DatabaseConfigBase
 {
 	std::string	host;
 	unsigned short	port;
-	std::string	name;
+	std::string	dbName;
 	std::string	user;
 	std::string	password;
 	unsigned short	connections;
@@ -85,9 +85,10 @@ public:
 	void print( std::ostream& os, size_t indent ) const;
 };
 
+
+/// SQLite database configuration
 struct	SQLiteConfig : public DatabaseConfigBase
 {
-
 	std::string	filename;
 	bool		flag;
 public:
@@ -99,16 +100,15 @@ public:
 };
 
 
-/// database configuration
+/// database configurations
 struct Configuration : public _Wolframe::config::ConfigurationBase
 {
 public:
-	DatabaseStrategy		strategy;
 	std::list<DatabaseConfigBase*>	dbConfig_;
 
-	/// constructor
-	Configuration() : _Wolframe::config::ConfigurationBase( "Database(s)", NULL, "Database configuration" ),
-				strategy( DBSTRATEGY_UNKNOWN )	{}
+	/// constructor & destructor
+	Configuration() : _Wolframe::config::ConfigurationBase( "Database(s)", NULL, "Database configuration" )	{}
+	~Configuration();
 
 	/// methods
 	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
@@ -126,8 +126,6 @@ public:
 	Database( Configuration& config );
 	static DatabaseType strToType( const char *str );
 	static std::string& typeToStr( DatabaseType type );
-	static DatabaseStrategy strToStrategy( const char *str );
-	static std::string& strategyToStr( DatabaseStrategy strategy );
 };
 
 }} // namespace _Wolframe::db

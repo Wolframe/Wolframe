@@ -40,14 +40,6 @@
 
 #include <boost/property_tree/ptree.hpp>
 
-//// forward declaration for boost::property_tree
-//// we should make this work one day
-//namespace boost	{
-//	namespace property_tree	{
-//		struct	ptree;
-//	}
-//}
-
 namespace _Wolframe {
 namespace config	{
 
@@ -56,15 +48,18 @@ public:
 	/// Class constructor.
 	///\param[in]	name	the name that will be displayed for this
 	///			configuration section in messages (log, print ...)
-	///			It has no processing purpose
-	///\param[in]	name	the name that will be displayed for this
-	///			configuration section in messages (log, print ...)
-	///			It has no processing purpose
+	///			It has no other processing purpose
+	///\param[in]	logParent the logging prefix of the parent.
+	///\param[in]	logName	the logging name of this section. Combined with
+	///			the logParent parameter will form the whole logging
+	///			prefix for of the section.
 	ConfigurationBase( const char* name, const char* logParent, const char* logName )
 	{
 		sectionName_ = name ? name : "";
 		logPrefix_ = logParent ? logParent : "";
-		logPrefix_ += logName ? logName : "";
+		if ( logName && *logName != '\0' )	{
+			logPrefix_ += ": "; logPrefix_ += logName;
+		}
 	}
 
 	/// The display string (name) of the configuration section
