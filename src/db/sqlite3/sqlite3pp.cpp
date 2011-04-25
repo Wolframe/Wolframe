@@ -56,6 +56,12 @@ result::result( )
 {
 }
 
+unsigned int result::rows_affected( )
+{
+	// TODO
+	return 0;
+}
+
 // connection
 
 connection::connection( )
@@ -115,13 +121,27 @@ sqlite3 *connection::handle( )
 result connection::exec( const std::string &sql )
 {
 	int res;
-	result noresult;
+	const char *tail;
+	result result;
 
-	res = sqlite3_exec( m_db, sql.c_str( ), 0, 0, NULL );
-	if( res != SQLITE_OK )
+#if SQLITE_VERSION_NUMBER >= 3005000
+	res = sqlite3_prepare_v2( m_db, sql.c_str( ), -1, &result.m_stmt, &tail );
+#else
+	res = sqlite3_prepare( m_db, sql.c_str( ), -1, &result.m_stmt, &tail );
+#endif
+	if( res != SQLITE_OK ) 
 		throw db_error( sqlite3_errmsg( m_db ) );
 
-	return noresult;
+	res = sqlite3_step( result.m_stmt );
+	if( res == SQLITE_DONE ) {
+	} else if( res == SQLITE_ROW ) {
+	} else if( res == SQLITE_BUSY ) {
+		// TODO: if in a transaction, do a rollback
+	} else {
+		throw db_error( sqlite3_errmsg( m_db ) );
+	}
+
+	return result;
 }
 
 // transaction

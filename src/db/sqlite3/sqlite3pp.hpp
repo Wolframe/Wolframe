@@ -54,8 +54,15 @@ namespace _Wolframe {
 		public:
 			result( );
 
+			// number of rows affected (0 for queries and
+			// DDL commands usually, >0 for deletions and
+			// inserts/updates
 			unsigned int rows_affected( );
-			
+
+			friend class connection;
+
+		private:
+			sqlite3_stmt *m_stmt;
 	};
 
 	class sql {
