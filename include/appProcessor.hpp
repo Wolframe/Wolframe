@@ -47,7 +47,8 @@ public:
 
 	enum CallResult {Ok, Error, YieldRead, YieldWrite};
 
-	virtual CallResult call( unsigned int argc, const char** argv)=0;
+	virtual bool getCommand( const char* protocolCmd, const char*& functionName, bool& hasIO) const=0;
+	virtual CallResult call( unsigned int argc, const char** argv, bool CommandHasIO)=0;
 };
 
 }}//namespace

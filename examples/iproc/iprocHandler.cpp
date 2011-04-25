@@ -81,6 +81,12 @@ struct Connection::Private
 		static const char* ar[] = {"Init","EnterCommand","ParseArgs", "Processing","ProcessingInput","ProtocolError","CommandError","EndOfCommand","Terminate"};
 		return ar[i];
 	}
+	enum Command {empty, capa, run, quit};
+	static const char* commandName( Command c)
+	{
+		const char* ar[] = {"empty", "capa", "run", "quit", 0};
+		return ar[c];
+	}
 
 	//* all state variables of this processor
 	//1. states
@@ -89,7 +95,7 @@ struct Connection::Private
 	//2. buffers and context
 	LineBuffer buffer;				///< context (sub state) for partly parsed input lines
 	ArgBuffer argBuffer;				///< buffer for the arguments
-	unsigned int cmdidx;				///< command parsed
+	Command cmdidx;					///< command parsed
 
 	Input input;					///< buffer for network read messages
 	Output output;					///< buffer for network write messages
@@ -102,6 +108,8 @@ struct Connection::Private
 	app::Input app_input;				///< network input interface for the interpreter
 	app::Output app_output;				///< network output interface for the interpreter
 	Processor processor;				///< the interpreter state
+	const char* functionName;			///< name of the method to execute
+	bool functionHasIO;				///< true if the method to execute does content data processing (input/output)
 
 	//* helper methods for I/O
 	//helper function to send a line message with CRLF termination as C string
@@ -162,7 +170,14 @@ struct Connection::Private
 		state = Terminate;
 	}
 
-	Private( const lua::Configuration& config, unsigned int inputBufferSize, unsigned int outputBufferSize)	:state(Init),argBuffer(&buffer),input(inputBufferSize),output(outputBufferSize),processor(&app_system,config,app_input,app_output)
+	Private( const lua::Configuration* config)
+		:state(Init)
+		,argBuffer(&buffer)
+		,input(config->input_bufsize())
+		,output(config->output_bufsize())
+		,processor(&app_system, config, app_input,app_output)
+		,functionName(0)
+		,functionHasIO(false)
 	{
 		itr = input.begin();
 		end = input.end();
@@ -171,9 +186,6 @@ struct Connection::Private
 	//statemachine of the processor
 	const Operation nextOperation()
 	{
-		enum Command {empty, capa, run, quit};
-		static const char* cmd[5] = {"","capa","run","quit",0};
-
 		for (;;)
 		{
 			LOG_DATA << "Handler State: " << stateName(state);
@@ -191,12 +203,14 @@ struct Connection::Private
 
 				case EnterCommand:
 				{
+					functionName = 0;
+					functionHasIO = false;
+
 					//the empty command is for an empty line for not bothering the client with obscure error messages.
 					//the next state should read one character for sure otherwise it may result in an endless loop
-					static const ProtocolParser parser(cmd);
-					Command cmd = parser.getCommand( itr, eoM, buffer);
-					cmdidx = cmd;
-					switch (cmd)
+					static const ProtocolParser parser(&commandName);
+					cmdidx = (Command)parser.getCommand( itr, end, buffer);
+					switch (cmdidx)
 					{
 						case empty:
 						case capa:
@@ -208,14 +222,14 @@ struct Connection::Private
 						}
 						default:
 						{
-							if (itr == eoM)
+							if (itr == end)
 							{
 								input.setPos( 0);
 								return net::ReadData( input.ptr(), input.size());
 							}
 							else
 							{
-								state = HandleError;
+								state = ProtocolError;
 								return WriteLine( "BAD unknown command");
 							}
 						}
@@ -224,24 +238,23 @@ struct Connection::Private
 
 				case ParseArgs:
 				{
-					if (!ProtocolParser::getLine( itr, eoM, m_argBuffer))
+					if (!ProtocolParser::getLine( itr, end, argBuffer))
 					{
-						if (itr == eoM)
+						if (itr == end)
 						{
 							input.setPos( 0);
 							return net::ReadData( input.ptr(), input.size());
 						}
 						else
 						{
-							state = HandleError;
+							state = ProtocolError;
 							return WriteLine( "BAD arguments");
 						}
 					}
-					Command cmd = (Command)cmdidx;
-					switch (cmd)
+					switch (cmdidx)
 					{
 						case empty:
-							if (m_argBuffer.argc())
+							if (argBuffer.argc())
 							{
 								state = ProtocolError;
 								return WriteLine( "BAD command");
@@ -254,7 +267,7 @@ struct Connection::Private
 								continue;
 							}
 						case capa:
-							if (m_argBuffer.argc())
+							if (argBuffer.argc())
 							{
 								state = ProtocolError;
 								return WriteLine( "BAD command arguments");
@@ -266,7 +279,7 @@ struct Connection::Private
 								continue;
 							}
 						case quit:
-							if (m_argBuffer.argc())
+							if (argBuffer.argc())
 							{
 								state = ProtocolError;
 								return WriteLine( "BAD command arguments");
@@ -277,6 +290,12 @@ struct Connection::Private
 								continue;
 							}
 						case run:
+							if (!processor.getCommand( "run", functionName, functionHasIO))
+							{
+								LOG_ERROR << "Command for 'run' not defined in configuration";
+								state = ProtocolError;
+								return WriteLine( "BAD command not defined");
+							}
 							state = Processing;
 							continue;
 					}
@@ -286,12 +305,12 @@ struct Connection::Private
 				case ProcessingInput:
 				{
 					int returnCode = 0;
-					const char* argv = m_argBuffer.argv( "run");
-					unsigned int argc = m_argBuffer.argc( "run");
+					const char** argv = argBuffer.argv( functionName);
+					unsigned int argc = argBuffer.argc( functionName);
 
-					switch (processor.call( argc, argv))
+					switch (processor.call( argc, argv, functionHasIO))
 					{
-						case CommandDispatcher::ReadInput:
+						case Processor::YieldRead:
 							if (state == Processing)
 							{
 								state = ProcessingInput;
@@ -304,19 +323,30 @@ struct Connection::Private
 								return net::ReadData( input.ptr(), input.size());
 							}
 
-						case CommandDispatcher::WriteOutput:
+						case Processor::YieldWrite:
 						{
-							void* content;
-							unsigned int contentsize;
-							bool hasOutput = commandDispatcher.getOutput( &content, &contentsize);
-							commandDispatcher.setOutputBuffer( output.ptr(), output.size());
+							void* content = app_output.m_formatoutput->ptr();
+							unsigned int contentsize = app_output.m_formatoutput->pos();
+							if (!functionHasIO)
+							{
+								LOG_WARNING << "output of function '" << functionName << "' that has no IO configured is ignored";
+								contentsize = 0;
+							}
+							app_output.m_formatoutput->init( output.ptr(), output.size());
 
-							if (!hasOutput) continue; else return net::SendData( content, contentsize);
+							if (contentsize == 0)
+							{
+								continue;
+							}
+							else
+							{
+								return net::SendData( content, contentsize);
+							}
 						}
 
-						case CommandDispatcher::Close:
+						case Processor::Ok:
 						{
-							if (commandDispatcher.commandHasIO())
+							if (functionHasIO)
 							{
 								if (state == Processing) passInput();
 								state = (input.gotEoD())?EndOfCommand:DiscardInput;
@@ -329,11 +359,11 @@ struct Connection::Private
 							}
 						}
 
-						case CommandDispatcher::Error:
+						case Processor::Error:
 						{
 							std::string ee = boost::lexical_cast<std::string>( returnCode);
 
-							if (commandDispatcher.commandHasIO())
+							if (functionHasIO)
 							{
 								if (state == Processing) passInput();
 								state = (input.gotEoD())?EndOfCommand:DiscardInput;
@@ -405,9 +435,9 @@ struct Connection::Private
 };
 
 
-Connection::Connection( const net::LocalEndpoint& local, const AppConfiguration& config)
+Connection::Connection( const net::LocalEndpoint& local, const AppConfiguration* config)
 {
-	data = new Private( config.input_bufsize(), config.output_bufsize());
+	data = new Private( config);
 	LOG_TRACE << "Created connection handler for " << local.toString();
 }
 
@@ -427,11 +457,6 @@ void Connection::setPeer( const net::RemoteEndpoint& remote)
 void Connection::networkInput( const void* bytes, std::size_t nofBytes)
 {
 	data->networkInput( bytes, nofBytes);
-}
-
-void Connection::initObject( Instance* instance)
-{
-	data->commandDispatcher.init( instance);
 }
 
 void Connection::timeoutOccured()
@@ -457,11 +482,11 @@ const Connection::Operation Connection::nextOperation()
 /// ServerHandler PIMPL
 net::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const net::LocalEndpoint& local )
 {
-	return new iproc::Connection( local );
+	return new iproc::Connection( local, m_config->m_appConfig);
 }
 
 
-ServerHandler::ServerHandler( const HandlerConfiguration* ) : impl_( new ServerHandlerImpl ) {}
+ServerHandler::ServerHandler( const HandlerConfiguration* cfg ) : impl_( new ServerHandlerImpl( cfg) ) {}
 
 ServerHandler::~ServerHandler()  { delete impl_; }
 

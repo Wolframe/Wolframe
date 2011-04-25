@@ -223,6 +223,20 @@ public:
 	{
 		for (unsigned int ii=0; cmd[ii]; ii++) add(cmd[ii]);
 	}
+	///
+	/// \brief Constructor
+	/// \tparam ENUM enumeration type for the command
+	/// \param [in] getCmdName function mapping the enums to their names
+	///
+	template <typename ENUM>
+	CmdParser( const char* (*getCmdName)(ENUM c))
+	{
+		const char* cn;
+		for (unsigned int ii=0; ((cn=getCmdName((ENUM)ii)) != 0); ii++)
+		{
+			add( cn);
+		}
+	}
 
 	///
 	/// \brief Defines a command. The index of the command is counted from 0 with one increment per add.

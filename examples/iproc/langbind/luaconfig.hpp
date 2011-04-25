@@ -137,6 +137,16 @@ public:
 	const std::list<Module>& modules() const	{return m_modules;}
 	unsigned int input_bufsize() const		{return m_input_bufsize;}
 	unsigned int output_bufsize() const		{return m_output_bufsize;}
+
+	/// \brief Return the name of the function to execute for a command
+	/// \param[in] protocolcmd command from the protocol
+	/// \return script function name to execute
+	const char* scriptFunctionName( const char*) const		{return "run";}
+
+	/// \brief Tell wheter the command has IO (protocol command content) or not
+	/// \param[in] protocolcmd command from the protocol
+	/// \return true, if the command has IO, false, if not
+	bool scriptFunctionHasIO( const char*) const			{return true;}
 private:
 	Module m_main;					///< main module
 	std::list<Module> m_modules;			///< list of modules without the main

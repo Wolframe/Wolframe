@@ -23,15 +23,15 @@ namespace _Wolframe {
 struct HandlerConfiguration
 {
 public:
-	AppConfiguration *m_config;
+	AppConfiguration *m_appConfig;
 
 	HandlerConfiguration()
 	{
-		m_config = new AppConfiguration();
+		m_appConfig = new AppConfiguration();
 	}
 
 	virtual ~HandlerConfiguration( ) {
-		if (m_config) delete m_config;
+		if (m_appConfig) delete m_appConfig;
 	}
 };
 

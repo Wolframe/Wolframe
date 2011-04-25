@@ -49,7 +49,7 @@ namespace iproc {
 	public:
 		typedef net::NetworkOperation Operation;
 
-		Connection( const net::LocalEndpoint& local, const AppConfiguration& config);
+		Connection( const net::LocalEndpoint& local, const AppConfiguration* config);
 
 		virtual ~Connection();
 
@@ -74,8 +74,12 @@ namespace iproc {
 	class ServerHandler::ServerHandlerImpl
 	{
 	public:
-		net::connectionHandler* newConnection( const net::LocalEndpoint& local);
+		ServerHandlerImpl( const HandlerConfiguration *config)
+			:m_config(config){}
 
+		net::connectionHandler* newConnection( const net::LocalEndpoint& local);
+	private:
+		const HandlerConfiguration* m_config;
 	};
 
 } // namespace _Wolframe

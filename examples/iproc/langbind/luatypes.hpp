@@ -48,11 +48,19 @@ class AppProcessor :public app::AppProcessorBase
 public:
 	struct State;
 
-	AppProcessor( app::System* system, const lua::Configuration& config, app::Input& input, app::Output& output);
+	AppProcessor( app::System* system, const lua::Configuration* config, app::Input& input, app::Output& output);
 	~AppProcessor();
 
-	virtual CallResult call( unsigned int argc, const char** argv);
+	virtual bool getCommand( const char* protocolCmd, const char*& functionName, bool& hasIO) const
+	{
+		functionName = m_config->scriptFunctionName( protocolCmd);
+		hasIO = m_config->scriptFunctionHasIO( protocolCmd);
+		return (functionName != 0);
+	}
+
+	virtual CallResult call( unsigned int argc, const char** argv, bool CommandHasIO);
 private:
+	const lua::Configuration* m_config;
 	app::Input m_input;
 	app::Output m_output;
 	app::System* m_system;

@@ -60,7 +60,7 @@ ApplicationConfiguration::ApplicationConfiguration()
 
 	addConfig( "listen", serverConf );
 	addConfig( "logging", loggerConf );
-	addConfig( "application", handlerConf->m_config);
+	addConfig( "application", handlerConf->m_appConfig);
 }
 
 ApplicationConfiguration::~ApplicationConfiguration()

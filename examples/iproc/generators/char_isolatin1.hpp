@@ -5,8 +5,6 @@
 #include <cstring>
 
 namespace _Wolframe {
-namespace mtproc {
-
 namespace filter {
 
 struct CharIsoLatin1
@@ -71,7 +69,6 @@ struct CharIsoLatin1
 	};
 };
 
-}//namespace generator1
 }}//namespace
 #endif
 
