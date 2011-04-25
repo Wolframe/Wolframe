@@ -45,7 +45,10 @@ public:
 	AppProcessorBase(){}
 	virtual ~AppProcessorBase(){}
 
-	virtual int call( unsigned int argc, const char** argv)=0;
+	enum CallResult {Ok, Error, YieldRead, YieldWrite};
+
+	virtual bool getCommand( const char* protocolCmd, const char*& functionName, bool& hasIO) const=0;
+	virtual CallResult call( unsigned int argc, const char** argv, bool CommandHasIO)=0;
 };
 
 }}//namespace

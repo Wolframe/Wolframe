@@ -32,8 +32,8 @@
 ************************************************************************/
 /// \file luaconfig.hpp
 /// \brief Configuration of the lua application processor
-#ifndef _MTPROC_LUA_CONFIG_HPP_INCLUDED
-#define _MTPROC_LUA_CONFIG_HPP_INCLUDED
+#ifndef _iproc_LUA_CONFIG_HPP_INCLUDED
+#define _iproc_LUA_CONFIG_HPP_INCLUDED
 #include "standardConfigs.hpp"
 #include <string>
 #include <vector>
@@ -43,7 +43,7 @@ extern "C" {
 }
 
 namespace _Wolframe {
-namespace mtproc {
+namespace iproc {
 namespace lua {
 
 class Configuration :public config::ConfigurationBase
@@ -54,7 +54,8 @@ public:
 	typedef int (*ModuleLoad)( lua_State *ls);
 
 	/// \brief constructor
-	/// \param name configuration base name
+	/// \param name configuration name
+	/// \param prefix configuration prefix
 	Configuration( const char* name, const char* prefix) :ConfigurationBase(name, NULL, prefix){}
 
 	/// \brief interface implementation of ConfigurationBase::parse(const boost::property_tree::ptree&, const std::string&)
@@ -70,7 +71,7 @@ public:
 	virtual bool check() const;
 
 	/// \brief interface implementation of ConfigurationBase::print(std::ostream& os, size_t indent) const
-	virtual void print( std::ostream&, size_t indent);
+	virtual void print( std::ostream&, size_t indent=0) const;
 
 	/// \brief loads the configuration settings for a lua virtual machine state
 	/// \param[in,out] ls lua state to initialize
@@ -128,15 +129,29 @@ public:
 		Type m_type;				///< type of the module
 		std::string m_name;			///< name of the module
 		std::string m_path;			///< full path of the module
-		ModuleLoad m_load;
+		ModuleLoad m_load;			///< function to load the module into the interpreter context
 	};
 	/// \brief return the main module
 	const Module& main() const			{return m_main;}
 	/// \brief return the list of modules without the main
 	const std::list<Module>& modules() const	{return m_modules;}
+	unsigned int input_bufsize() const		{return m_input_bufsize;}
+	unsigned int output_bufsize() const		{return m_output_bufsize;}
+
+	/// \brief Return the name of the function to execute for a command
+	/// \param[in] protocolcmd command from the protocol
+	/// \return script function name to execute
+	const char* scriptFunctionName( const char*) const		{return "run";}
+
+	/// \brief Tell wheter the command has IO (protocol command content) or not
+	/// \param[in] protocolcmd command from the protocol
+	/// \return true, if the command has IO, false, if not
+	bool scriptFunctionHasIO( const char*) const			{return true;}
 private:
 	Module m_main;					///< main module
 	std::list<Module> m_modules;			///< list of modules without the main
+	unsigned int m_input_bufsize;			///< size of input network message buffers in bytes
+	unsigned int m_output_bufsize;			///< size of output network message buffers in bytes
 };
 
 }}}//namespace

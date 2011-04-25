@@ -53,13 +53,19 @@ endif
 OBJS = \
 	appProperties.o \
 	appConfigDefinition.o \
-	implementation.o \
-	dispatcher.o \
-	mtprocHandler.o \
+	iprocHandler.o \
+	langbind.o \
 	$(TOPDIR)/src/posixMain.o
 
+ifeq ($(WITH_LUA),1)
+OBJS += \
+	langbind/luaconfig.o \
+	langbind/luatypes.o
+endif
+
+
 CPP_BINS = \
-	mtprocd$(EXE)
+	iprocd$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
@@ -72,5 +78,5 @@ local_distclean:
 local_install:
 
 run: $(CPP_BINS)
-	@echo "Running the Wolframe mtproc example..."
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./mtprocd -c mtproc.conf -f
+	@echo "Running the Wolframe iproc example..."
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./iprocd -c iproc.conf -f

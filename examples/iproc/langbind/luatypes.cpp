@@ -44,8 +44,9 @@ extern "C"
 }
 
 using namespace _Wolframe;
-using namespace mtproc;
+using namespace iproc;
 using namespace lua;
+using namespace app;
 
 namespace luaname
 {
@@ -316,10 +317,10 @@ struct AppProcessor::State
 	}
 };
 
-AppProcessor::AppProcessor( System* system, const lua::Configuration& config, Input& input, Output& output)
-		:m_input(input),m_output(output),m_system(system)
+AppProcessor::AppProcessor( System* system, const lua::Configuration* config, Input& input, Output& output)
+		:m_config(config),m_input(input),m_output(output),m_system(system)
 {
-	m_state = new State( config);
+	m_state = new State( *config);
 
 	LuaObject<Input>::createGlobal( m_state->ls, luaname::Input, "input", m_input);
 	LuaObject<Input>::defineMethod( m_state->ls, luaname::Input, "as", &function_input_as);
@@ -337,14 +338,55 @@ AppProcessor::~AppProcessor()
 	delete m_state;
 }
 
-int AppProcessor::call( unsigned int argc, const char** argv)
+static AppProcessor::CallResult getYieldState( protocol::Generator* in, protocol::FormatOutput* fo, const char* methodName, bool commandHasIO)
 {
-	int rt;
+	if (fo->getError())
+	{
+		LOG_ERROR << "error " << fo->getError() << ") in format output when calling '" << methodName << "'";
+		return AppProcessor::Error;
+	}
+	protocol::Generator::State istate = in->state();
+
+	switch (istate)
+	{
+		case protocol::Generator::Open:
+			if (fo->size() == 0)
+			{
+				LOG_ERROR << "error printed in method '" << methodName << "' declared to have no output";
+				return AppProcessor::Error;
+			}
+			return AppProcessor::YieldWrite;
+
+		case protocol::Generator::EndOfMessage:
+			if (commandHasIO)
+			{
+				return AppProcessor::YieldRead;
+			}
+			else
+			{
+				in->protocolInput( 0, 0, true);
+				return AppProcessor::Ok;
+			}
+
+		case protocol::Generator::Error:
+		{
+			int returnCode = in->getError();
+			LOG_ERROR << "error " << returnCode << ") in input generator when calling '" << methodName << "'";
+			return AppProcessor::Error;
+		}
+	}
+	LOG_ERROR << "illegal state of input generator when calling '" << methodName << "'";
+	return AppProcessor::Error;
+}
+
+AppProcessor::CallResult AppProcessor::call( unsigned int argc, const char** argv, bool commandHasIO)
+{
 	if (argc == 0)
 	{
 		LOG_ERROR << "lua interpreter called with no arguments (first argument funtion name missing)";
-		return -1;
+		return Error;
 	}
+	int rt = 0;
 
 	if (!m_state->thread)
 	{
@@ -354,13 +396,20 @@ int AppProcessor::call( unsigned int argc, const char** argv)
 			if (argv[ii]) lua_pushstring( m_state->ls, argv[ii]); else lua_pushnil( m_state->ls);
 		}
 		rt = lua_resume( m_state->thread, argc-1);
-		if (rt==LUA_YIELD) rt = 0;
 	}
 	else
 	{
 		rt = lua_resume( m_state->thread, 0);
-		if (rt==LUA_YIELD) rt = 0;
 	}
-	return rt;
+	if (rt == LUA_YIELD)
+	{
+		return getYieldState( m_input.m_generator.get(), m_output.m_formatoutput.get(), argv[0], commandHasIO);
+	}
+	else if (rt != 0)
+	{
+		LOG_ERROR << "error " << rt << ")  calling '" << argv[0] << "'";
+		return Error;
+	}
+	return Ok;
 }
 
