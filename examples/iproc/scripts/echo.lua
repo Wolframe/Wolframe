@@ -1,7 +1,7 @@
 -- predefined objects by the system
 -- 1) input
 -- 2) output
--- 3) "object pool" - not used yet here
+-- 3) function filter( name: string)
 
 
 -- [readTable] returns the table desribed by argument (propertytree,XML,etc..)
@@ -24,26 +24,21 @@ function readTable( itr)
 	return table
 end
 
--- [readConfig] is called by the connectionHandler to process the configuration.
--- another function might be defined for checking the configuration
--- the handler reads the configuration to get the (this) script to execute and calls it with an iterator over its configuration
-config = {}
-function readConfig( itr)
-	-- read config as table with the content of "/main/sub/A" addressable as config["main"]["sub"]["A"]
-	config = readTable( itr)
+function readInput( itr)
+	return readTable( itr)
 end
 
--- [echo] does the processing
+-- [run] does the processing (echo input)
 -- this example does not expect arguments
-function echo()
+function run_echo()
 	-- load the generator with closure type from a loadable module
-	filter = require "filter.char.IsoLatin1"
+	iof = filter( "filter.char.IsoLatin1")
 
 	-- define the filter functions of I/O
-	input.as filter.get
-	output.as filter.put
+	input.as iof
+	output.as iof
 
 	-- do the echo (no real echo, because not buffering lines)
-	for ch in input.read() do output.write( ch) end
+	for ch in input.get() do output.print( ch) end
 end
 
