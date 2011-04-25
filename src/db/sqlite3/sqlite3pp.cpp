@@ -54,12 +54,12 @@ db_error::db_error( const std::string &err ) : std::runtime_error( err )
 
 result::result( )
 {
+	sqlite3_finalize( m_stmt );
 }
 
 unsigned int result::rows_affected( )
 {
-	// TODO
-	return 0;
+	return sqlite3_changes( sqlite3_db_handle( m_stmt ) );
 }
 
 // connection

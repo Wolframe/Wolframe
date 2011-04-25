@@ -60,11 +60,15 @@ protected:
 TEST_F( DbSqliteFixture, BasicOps )
 {
 	try {
-		db.exec( "create table a(b integer)" );
+		result r;
+
+		r = db.exec( "create table a(b integer)" );
+		ASSERT_EQ( r.rows_affected( ), 0 );
 
 		transaction t( db );
 
-		t.exec( "insert into a(b) values(7)" );
+		r = t.exec( "insert into a(b) values(7)" );
+		ASSERT_EQ( r.rows_affected( ), 1 );
 
 		t.commit( );
 	} catch( db_error &e ) {
