@@ -154,7 +154,7 @@ public:
 	struct NonEmptyDomain :public BaseTypeDomain
 	{
 		/// \brief constructor
-		NonEmptyDomain(){};
+		NonEmptyDomain(){}
 
 		/// \brief Checks if the configuration value is in the expected domain, e.g. non empty
 		/// \tparam ValueType type of the value to check

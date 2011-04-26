@@ -36,33 +36,15 @@
 
 #include "AAAAprovider.hpp"
 #include "configurationBase.hpp"
+#include "logger.hpp"
+
+#include <boost/property_tree/ptree.hpp>
+#include <boost/algorithm/string.hpp>
+
+#include <ostream>
 
 namespace _Wolframe {
 namespace AAAA {
-
-Configuration::Configuration() : _Wolframe::config::ConfigurationBase( "AAAA", NULL, "AAAA configuration"  )
-{
-}
-
-/// methods
-bool Configuration::parse( const boost::property_tree::ptree& /* pt */, const std::string& /* node */ )
-{
-	return true;
-}
-
-bool Configuration::check() const
-{
-	return true;
-}
-
-void Configuration::print( std::ostream& os, size_t /* indent */ ) const
-{
-	os << sectionName() << " configuration :)" << std::endl;
-}
-
-void Configuration::setCanonicalPathes( const std::string& /* referencePath */ )
-{
-}
 
 
 AAAAprovider::AAAAprovider( const Configuration& /* conf */ )
@@ -70,6 +52,63 @@ AAAAprovider::AAAAprovider( const Configuration& /* conf */ )
 	  authorizer_(),
 	  auditor_()
 {
+}
+
+
+Configuration::Configuration() : config::ConfigurationBase( "AAAA", NULL, "AAAA configuration"  ),
+	auth( "Authentication", logPrefix().c_str(), "Authentication" ),
+	audit( "Auditing", logPrefix().c_str(), "Auditing" )
+{
+}
+
+
+/// methods
+void Configuration::print( std::ostream& os, size_t /* indent */ ) const
+{
+	os << sectionName() << std::endl;
+	auth.print( os, 3 );
+	audit.print( os, 3 );
+}
+
+
+/// Check if the database configuration makes sense
+bool Configuration::check() const
+{
+	bool correct = true;
+
+	if ( !auth.check() )
+		correct = false;
+	if ( !audit.check() )
+		correct = false;
+
+	return correct;
+}
+
+bool Configuration::parse( const boost::property_tree::ptree& pt, const std::string& /* nodeName */ )
+{
+	using namespace _Wolframe::config;
+	bool retVal = true;
+
+	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
+		if ( boost::algorithm::iequals( L1it->first, "Authentication" ))	{
+			if ( ! auth.parse( L1it->second, L1it->first ))
+				retVal = false;
+		}
+		else if ( boost::algorithm::iequals( L1it->first, "Audit" ))	{
+			if ( ! audit.parse( L1it->second, L1it->first ))
+				retVal = false;
+		}
+		else
+			LOG_WARNING << logPrefix() << ": unknown configuration option: '"
+				    << L1it->first << "'";
+	}
+	return retVal;
+}
+
+void Configuration::setCanonicalPathes( const std::string& refPath )
+{
+	auth.setCanonicalPathes( refPath );
+	audit.setCanonicalPathes( refPath );
 }
 
 }} // namespace _Wolframe::AAAA

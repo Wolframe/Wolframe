@@ -34,11 +34,39 @@
 // auditor implementation
 //
 
+#include "logger.hpp"
 #include "AAAAprovider.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
 
+/// constructor
+AuditConfiguration::AuditConfiguration( const char* cfgName, const char* logParent, const char* logName )
+	: config::ConfigurationBase( cfgName, logParent, logName )
+{
+}
+
+/// methods
+bool AuditConfiguration::parse( const boost::property_tree::ptree& /*pt*/, const std::string& /*node*/ )
+{
+	return true;
+}
+
+bool AuditConfiguration::check() const
+{
+	return true;
+}
+
+void AuditConfiguration::print( std::ostream& os, size_t indent ) const
+{
+	std::string indStr( indent, ' ' );
+
+	os << indStr << sectionName() << ":" << std::endl;
+}
+
+void AuditConfiguration::setCanonicalPathes( const std::string& /*referencePath*/ )
+{
+}
 
 }} // namespace _Wolframe::AAAA
 

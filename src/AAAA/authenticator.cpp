@@ -34,10 +34,38 @@
 // authenticator implementation
 //
 
+#include "logger.hpp"
 #include "AAAAprovider.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
 
+/// constructor
+AuthenticationConfiguration::AuthenticationConfiguration( const char* cfgName, const char* logParent, const char* logName)
+	: config::ConfigurationBase( cfgName, logParent, logName )
+{
+}
+
+/// methods
+bool AuthenticationConfiguration::parse( const boost::property_tree::ptree& /*pt*/, const std::string& /*node*/ )
+{
+	return true;
+}
+
+bool AuthenticationConfiguration::check() const
+{
+	return true;
+}
+
+void AuthenticationConfiguration::print( std::ostream& os, size_t indent ) const
+{
+	std::string indStr( indent, ' ' );
+
+	os << indStr << sectionName() << ":" << std::endl;
+}
+
+void AuthenticationConfiguration::setCanonicalPathes( const std::string& /* referencePath */ )
+{
+}
 
 }} // namespace _Wolframe::AAAA

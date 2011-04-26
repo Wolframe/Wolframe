@@ -55,7 +55,7 @@ namespace _Wolframe	{
 namespace db	{
 
 //***  PostgreSQL functions  ********************************************
-PostgreSQLconfig::PostgreSQLconfig( const char* cfgName, const char* logParent, const char* logName)
+PostgreSQLconfig::PostgreSQLconfig( const char* cfgName, const char* logParent, const char* logName )
 	: DatabaseConfigBase( DBTYPE_POSTGRESQL, cfgName, logParent, logName )
 {
 	port = 0;
@@ -66,7 +66,8 @@ PostgreSQLconfig::PostgreSQLconfig( const char* cfgName, const char* logParent, 
 void PostgreSQLconfig::print( std::ostream& os, size_t indent ) const
 {
 	std::string indStr( indent, ' ' );
-	os << indStr << "PostgreSQL server:" << std::endl;
+
+	os << indStr << sectionName() << ":" << std::endl;
 	if ( ! ID().empty() )
 		os << indStr << "   ID: " << ID() << std::endl;
 	if ( host.empty())
@@ -160,7 +161,7 @@ void SQLiteConfig::print( std::ostream& os, size_t indent ) const
 {
 	std::string indStr( indent, ' ' );
 
-	os << indStr << "SQLite database:" << std::endl;
+	os << indStr << sectionName() << ":" << std::endl;
 	if ( ! ID().empty() )
 		os << indStr << "   ID: " << ID() << std::endl;
 	os << indStr << "   Filename: " << filename << std::endl;
@@ -261,7 +262,7 @@ bool Configuration::check() const
 	return correct;
 }
 
-bool Configuration::parse( const boost::property_tree::ptree& pt, const std::string& nodeName )
+bool Configuration::parse( const boost::property_tree::ptree& pt, const std::string& /* nodeName */ )
 {
 	using namespace _Wolframe::config;
 	bool retVal = true;
@@ -281,8 +282,8 @@ bool Configuration::parse( const boost::property_tree::ptree& pt, const std::str
 			if ( cfg->parse( L1it->second, L1it->first ))
 				dbConfig_.push_back( cfg );
 			else	{
-				retVal = false;
 				delete cfg;
+				retVal = false;
 			}
 		}
 		else
