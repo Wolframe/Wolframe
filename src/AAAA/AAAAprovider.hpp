@@ -64,8 +64,13 @@ private:
 	const AuthenticationType	m_type;
 public:
 	/// constructor
-	AuthenticationConfigBase( const AuthenticationType Type )	{ m_type = Type; }
-//	AuthenticationConfigBase();
+	AuthenticationConfigBase( const AuthenticationType Type,
+				  const char* name, const char* logParent, const char* logName )
+		: config::ConfigurationBase( name, logParent, logName ),
+		  m_type( Type )
+	{}
+
+	//	AuthenticationConfigBase();
 
 	AuthenticationType type() const		{ return m_type; }
 	/// methods
