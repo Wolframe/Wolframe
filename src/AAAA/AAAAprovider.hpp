@@ -54,8 +54,19 @@ public:
 
 /// Authentication type
 enum AuthenticationType	{
-	AUTH_UNKNOWN
+	AUTH_WFDB,		///< Wolframe proprietary authentification
+	AUTH_PAM,		///< *NIX PAM authentification
+	AUTH_SASL,		///< SASL authentification (Cyrus SASL)
+	AUTH_LDAP,		///< LDAP authentification
+	AUTH_UNKNOWN		///< Unknown authentification (i.e. none)
 };
+
+enum AuditType	{
+	AUDIT_FILE,		///< Standard text file auditing (list of entries)
+	AUDIT_DATABASE,		///< Database audit entries
+	AUDIT_UNKNOWN		///< Unknown method (i.e. none)
+};
+
 
 
 class AuthenticationConfigBase : public config::ConfigurationBase
@@ -78,7 +89,29 @@ public:
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 	void setCanonicalPathes( const std::string& referencePath );
+	// bool test() const;	// Not implemented yet, inherited from base
+};
 
+class AuditConfigBase : public config::ConfigurationBase
+{
+private:
+	const AuditType	m_type;
+public:
+	/// constructor
+	AuditConfigBase( const AuditType Type,
+			 const char* name, const char* logParent, const char* logName )
+		: config::ConfigurationBase( name, logParent, logName ),
+		  m_type( Type )
+	{}
+
+	//	AuditConfigBase();
+
+	AuditType type() const			{ return m_type; }
+	/// methods
+	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
+	bool check() const;
+	void print( std::ostream& os, size_t indent ) const;
+	void setCanonicalPathes( const std::string& referencePath );
 	// bool test() const;	// Not implemented yet, inherited from base
 };
 
@@ -125,6 +158,8 @@ public:
 	void setCanonicalPathes( const std::string& referencePath );
 
 	// bool test() const;	// Not implemented yet, inherited from base
+private:
+	std::list<AuditConfigBase*>	m_authConfig;
 };
 
 class Auditor
