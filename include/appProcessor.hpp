@@ -39,7 +39,8 @@ Project Wolframe.
 namespace _Wolframe {
 namespace app {
 
-/// \brief abstract base class for the application processor interface
+/// \class AppProcessorBase
+/// \brief abstract base class for the application processor interface representing one instance
 class AppProcessorBase
 {
 public:
@@ -48,7 +49,8 @@ public:
 	/// \brief destructor
 	virtual ~AppProcessorBase(){}
 
-	/// \brief call state
+	/// \enum CallResult
+	/// \brief enumeration of call states of this application processor instance
 	enum CallResult
 	{
 		Ok,			///< successful termination of call
@@ -60,12 +62,14 @@ public:
 	/// \param[in] protocolCmd protocol command
 	/// \param[out] name of application processor script function to execute 
 	/// \param[out] hasIO true, if the application processor script function processes data from network input, false else
+	/// \return true, if the command exists
 	virtual bool getCommand( const char* protocolCmd, const char*& functionName, bool& hasIO) const=0;
 
 	/// \brief function call of an application processor script function 
 	/// \param[in] argc number of arguments inclusing the script function name as first argument
 	/// \param[in] argv array of arguments inclusing the script function name as first argument
 	/// \param[in] commandHasIO true, if the command processes data from network input, false else
+	/// \return application processor instance call state
 	virtual CallResult call( unsigned int argc, const char** argv, bool commandHasIO)=0;
 };
 
