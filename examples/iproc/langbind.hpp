@@ -44,12 +44,22 @@ Project Wolframe.
 namespace _Wolframe {
 namespace app {
 
+/// \brief output as seen from the application processor program
 struct Output
 {
-	enum ItemType {Data,DoYield,Error};
-
+	/// \brief output state
+	enum ItemType
+	{
+		Data,		///< normal processing
+		DoYield,	///< yield because rest of buffer not sufficient to complete operation
+		Error		///< logic error in output. Operation is not possible 
+	};
+	/// \brief constructor
 	Output() :m_state(0){}
+	/// \brief copy constructor
+	/// \param[in] o copied item
 	Output( const Output& o) :m_formatoutput(o.m_formatoutput),m_state(0){}
+	/// \brief destructor
 	~Output(){}
 
 	/// \brief print the next element
@@ -67,47 +77,77 @@ private:
 	std::stack<std::string> m_opentags;				///< stack of open tags
 };
 
+/// \brief system function call interface as seen from the application processor program
 struct System
 {
+	/// \brief constructor
 	System(){}
+	/// \brief destructor
 	virtual ~System(){}
 
+	/// \brief create a new input filter function
+	/// \param[in] name name of the filter or the default filter if not specified
 	virtual protocol::Generator* createGenerator( const char* name=0) const;
+	/// \brief create a new format output filter function
+	/// \param[in] name name of the filter or the default filter if not specified
 	virtual protocol::FormatOutput* createFormatOutput( const char* name=0) const;
 };
 
+/// \brief input as seen from the application processor program
 struct Input
 {
-	boost::shared_ptr<protocol::Generator> m_generator;
+	boost::shared_ptr<protocol::Generator> m_generator;		///< input generator function defined by the associated input filter
 
+	/// \brief constructor
 	Input(){};
+	/// \brief copy constructor
+	/// \param[in] o copied item
 	Input( const Input& o) :m_generator(o.m_generator){}
+	/// \brief destructor
 	~Input(){};
 };
 
+/// \brief input/output filter as seen from the application processor program
 struct Filter
 {
-	boost::shared_ptr<protocol::FormatOutput> m_formatoutput;
-	boost::shared_ptr<protocol::Generator> m_generator;
+	boost::shared_ptr<protocol::FormatOutput> m_formatoutput;		///< format output function
+	boost::shared_ptr<protocol::Generator> m_generator;			///< input generator function
 
+	/// \brief constructor
+	/// \param[in] system reference to system function call interface 
+	/// \param[in] name name of the filter as defined in the system
 	Filter( System* system, const char* name)
 		:m_formatoutput(system->createFormatOutput(name))
 		,m_generator(system->createGenerator(name)){}
 
+	/// \brief copy constructor
+	/// \param[in] o copied item
 	Filter( const Filter& o)
 		:m_formatoutput(o.m_formatoutput)
 		,m_generator(o.m_generator){}
+	/// \brief destructor
 	~Filter(){};
 };
 
+/// \brief generator closure for the input iterator (in Lua returned by 'input.get()')
 class InputGeneratorClosure
 {
 public:
-	enum ItemType {EndOfData,Data,DoYield,Error};
+	/// \brief input loop state
+	enum ItemType
+	{
+		EndOfData,		///< End of processed content reached
+		Data,				///< normal processing, loop can continue
+		DoYield,			///< have to yield and request more network input
+		Error				///< have to stop processing because of an error
+	};
 
+	/// \brief constructor
+	/// \param[in] ig input generator reference from input
 	InputGeneratorClosure( const boost::shared_ptr<protocol::Generator>& ig)
 		:m_generator(ig),m_type(protocol::Generator::Value),m_value(0),m_buf(0),m_bufsize(0),m_bufpos(0){}
 
+	/// \brief internal buffer reset
 	void init()
 	{
 		m_bufpos = 0;
