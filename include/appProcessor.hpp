@@ -39,16 +39,34 @@ Project Wolframe.
 namespace _Wolframe {
 namespace app {
 
+/// \brief abstract base class for the application processor interface
 class AppProcessorBase
 {
 public:
+	/// \brief constructor
 	AppProcessorBase(){}
+	/// \brief destructor
 	virtual ~AppProcessorBase(){}
 
-	enum CallResult {Ok, Error, YieldRead, YieldWrite};
-
+	/// \brief call state
+	enum CallResult
+	{
+		Ok,			///< successful termination of call
+		Error,		///< termination of call with error (not completed)
+		YieldRead,		///< call interrupted with request for more network input
+		YieldWrite		///< call interrupted with request for sending data from the write buffer that is full
+	};
+	/// \brief get the application processor script function to execute for a protocol command (as defined in configuration)
+	/// \param[in] protocolCmd protocol command
+	/// \param[out] name of application processor script function to execute 
+	/// \param[out] hasIO true, if the application processor script function processes data from network input, false else
 	virtual bool getCommand( const char* protocolCmd, const char*& functionName, bool& hasIO) const=0;
-	virtual CallResult call( unsigned int argc, const char** argv, bool CommandHasIO)=0;
+
+	/// \brief function call of an application processor script function 
+	/// \param[in] argc number of arguments inclusing the script function name as first argument
+	/// \param[in] argv array of arguments inclusing the script function name as first argument
+	/// \param[in] commandHasIO true, if the command processes data from network input, false else
+	virtual CallResult call( unsigned int argc, const char** argv, bool commandHasIO)=0;
 };
 
 }}//namespace
