@@ -72,7 +72,9 @@ DB_OBJS =
 !IFDEF WITH_SQLITE3
 DB_OBJS = $(DB_OBJS) \
 	db\sdsqlite\sqlite3.obj \
-	db\sdsqlite\sdsqlite.obj
+	db\sdsqlite\sdsqlite.obj \
+	db\sqlite3\sqlite3.obj \
+	db\sqlite3\sqlite3pp.obj
 !ENDIF
 
 AAAA_OBJS = \
