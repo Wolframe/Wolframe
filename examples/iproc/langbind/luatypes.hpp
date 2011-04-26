@@ -43,14 +43,29 @@ namespace _Wolframe {
 namespace iproc {
 namespace lua {
 
+/// \class AppProcessor
+/// \brief application processor instance for processing calls as Lua script
 class AppProcessor :public app::AppProcessorBase
 {
 public:
+	/// \class State
+	/// \brief state of the application processor instance
 	struct State;
 
+	/// \brief constructor
+	/// \param[in] system read only reference to system call interface
+	/// \param[in] config read only reference to the configuration of this application processor
+	/// \param[in] input input of this application processor instance
+	/// \param[in] output output of this application processor instance
 	AppProcessor( app::System* system, const lua::Configuration* config, app::Input& input, app::Output& output);
+	/// \brief destructor
 	~AppProcessor();
 
+	/// \brief get command implemenation (see app::AppProcessorBase::getCommand(const char*,const char*&,bool&)const)
+	/// \param[in] protocolCmd protocol command
+	/// \param[out] functionName associated Lua script function name
+	/// \param[out] hasIO true if associated Lua script function is processing content from network I/O
+	/// \return true, if the command is defined in configuration
 	virtual bool getCommand( const char* protocolCmd, const char*& functionName, bool& hasIO) const
 	{
 		functionName = m_config->scriptFunctionName( protocolCmd);
@@ -58,14 +73,18 @@ public:
 		return (functionName != 0);
 	}
 
+	/// \brief execute the Lua script (see app::AppProcessorBase::call(unsigned int, const char**,bool))
+	/// \param[in] argc number of arguments
+	/// \param[in] argc array of arguments
+	/// \return call state
 	virtual CallResult call( unsigned int argc, const char** argv, bool CommandHasIO);
 
 private:
-	const lua::Configuration* m_config;
-	app::Input m_input;
-	app::Output m_output;
-	app::System* m_system;
-	State* m_state;
+	const lua::Configuration* m_config;		///< reference to configuration
+	app::Input m_input;				///< input
+	app::Output m_output;			///< output
+	app::System* m_system;			///< reference to system call interface
+	State* m_state;				///< application procesor instance state
 };
 
 }}}//namespace
