@@ -64,7 +64,7 @@ private:
 	const AuthenticationType	m_type;
 public:
 	/// constructor
-	AuthenticationConfigBase( const AuthenticationType type );
+	AuthenticationConfigBase( const AuthenticationType Type )	{ m_type = Type; }
 //	AuthenticationConfigBase();
 
 	AuthenticationType type() const		{ return m_type; }
