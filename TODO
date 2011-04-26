@@ -27,6 +27,9 @@ ABa:
     instead of templating?)
 - 64-bit on Windows
   - trouble with Qt
+http://www.gotw.ca/publications/using_auto_ptr_effectively.htm
+http://www.goingware.com/tips/member-pointers.html
+http://debea.net/trac/doxygen/stable/html/dba_example_queries.html
 
 PF:
 
