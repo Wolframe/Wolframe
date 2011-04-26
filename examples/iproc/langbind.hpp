@@ -44,9 +44,11 @@ Project Wolframe.
 namespace _Wolframe {
 namespace app {
 
+/// \class Output
 /// \brief output as seen from the application processor program
 struct Output
 {
+	/// \enum ItemType
 	/// \brief output state
 	enum ItemType
 	{
@@ -77,6 +79,7 @@ private:
 	std::stack<std::string> m_opentags;				///< stack of open tags
 };
 
+/// \class System
 /// \brief system function call interface as seen from the application processor program
 struct System
 {
@@ -93,6 +96,7 @@ struct System
 	virtual protocol::FormatOutput* createFormatOutput( const char* name=0) const;
 };
 
+/// \class Input
 /// \brief input as seen from the application processor program
 struct Input
 {
@@ -107,6 +111,7 @@ struct Input
 	~Input(){};
 };
 
+/// \class Filter
 /// \brief input/output filter as seen from the application processor program
 struct Filter
 {
@@ -129,10 +134,12 @@ struct Filter
 	~Filter(){};
 };
 
+/// \class InputGeneratorClosure
 /// \brief generator closure for the input iterator (in Lua returned by 'input.get()')
 class InputGeneratorClosure
 {
 public:
+	/// \enum ItemType
 	/// \brief input loop state
 	enum ItemType
 	{
