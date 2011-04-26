@@ -38,6 +38,7 @@
 
 #include <string>
 #include <stdexcept>
+#include <memory>
 
 #include "sqlite3.h"
 
@@ -53,6 +54,7 @@ namespace _Wolframe {
 	class result {
 		public:
 			result( );
+			result( sqlite3_stmt *stmt );
 
 			~result( );
 
@@ -96,10 +98,10 @@ namespace _Wolframe {
 			void rollback( );
 
 			// execute a sql statement, checking results
-			result exec( sql &s );
+			std::auto_ptr<result> exec( sql &s );
 
 			// execute a string statement directly
-			result exec( const std::string &sql );
+			std::auto_ptr<result> exec( const std::string &sql );
 
 		private:
 			// back reference to the connection
@@ -149,10 +151,10 @@ namespace _Wolframe {
 			void close( );
 
 			// execute a sql statement
-			result exec( sql &s );
+			std::auto_ptr<result> exec( sql &s );
 
 			// execute a string statement directly
-			result exec( const std::string &sql );
+			std::auto_ptr<result> exec( const std::string &sql );
 
 			friend class transaction;
 

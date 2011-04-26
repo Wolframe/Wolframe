@@ -57,6 +57,11 @@ result::result( )
 {
 }
 
+result::result( sqlite3_stmt *stmt )
+	: m_stmt( stmt )
+{
+}
+
 result::~result( )
 {
 	if( m_stmt )
@@ -127,21 +132,21 @@ sqlite3 *connection::handle( )
 	return m_db;
 }
 
-result connection::exec( const std::string &sql )
+std::auto_ptr<result> connection::exec( const std::string &sql )
 {
 	int res;
 	const char *tail;
-	result result;
+	sqlite3_stmt *stmt;
 
 #if SQLITE_VERSION_NUMBER >= 3005000
-	res = sqlite3_prepare_v2( m_db, sql.c_str( ), -1, &result.m_stmt, &tail );
+	res = sqlite3_prepare_v2( m_db, sql.c_str( ), -1, &stmt, &tail );
 #else
-	res = sqlite3_prepare( m_db, sql.c_str( ), -1, &result.m_stmt, &tail );
+	res = sqlite3_prepare( m_db, sql.c_str( ), -1, &stmt, &tail );
 #endif
 	if( res != SQLITE_OK ) 
 		throw db_error( sqlite3_errmsg( m_db ) );
 
-	res = sqlite3_step( result.m_stmt );
+	res = sqlite3_step( stmt );
 	if( res == SQLITE_DONE ) {
 	} else if( res == SQLITE_ROW ) {
 	} else if( res == SQLITE_BUSY ) {
@@ -150,7 +155,7 @@ result connection::exec( const std::string &sql )
 		throw db_error( sqlite3_errmsg( m_db ) );
 	}
 
-	return result;
+	return std::auto_ptr<result>( new result( stmt ) );
 }
 
 // transaction
@@ -188,7 +193,7 @@ transaction::~transaction( )
 	}
 }
 
-result transaction::exec( const std::string &sql )
+std::auto_ptr<result> transaction::exec( const std::string &sql )
 {
 	if( m_state != TX_ACTIVE )
 		throw db_error( "exec('" + sql + "') unexpected at this time" );

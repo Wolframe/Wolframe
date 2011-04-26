@@ -60,17 +60,17 @@ protected:
 TEST_F( DbSqliteFixture, BasicOps )
 {
 	try {
-		result r;
+		std::auto_ptr<result> r;
 
 		// executed directly outside a transactional context
 		r = db.exec( "create table a(b integer)" );
-		ASSERT_EQ( r.rows_affected( ), 0 );
+		ASSERT_EQ( r->rows_affected( ), 0 );
 
 		// execute inside transaction (data feed)
 		transaction t( db );
 
 		r = t.exec( "insert into a(b) values(7)" );
-		ASSERT_EQ( r.rows_affected( ), 1 );
+		ASSERT_EQ( r->rows_affected( ), 1 );
 
 		t.commit( );
 	} catch( db_error &e ) {
