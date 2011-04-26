@@ -148,7 +148,9 @@ std::auto_ptr<result> connection::exec( const std::string &sql )
 
 	res = sqlite3_step( stmt );
 	if( res == SQLITE_DONE ) {
+		// return result, keep stmt in auto_ptr
 	} else if( res == SQLITE_ROW ) {
+		// return result, keep stmt in auto_ptr
 	} else if( res == SQLITE_BUSY ) {
 		// TODO: if in a transaction, do a rollback
 	} else {
