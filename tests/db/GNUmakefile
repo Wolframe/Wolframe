@@ -70,7 +70,7 @@ local_clean:
 
 local_distclean:
 
-local_test:
+local_test: $(TEST_CPP_BINS)
 ifeq ($(WITH_SQLITE3),1)
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./sdsqliteTest
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./sqlite3ppTest
