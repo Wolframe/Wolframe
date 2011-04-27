@@ -26,18 +26,29 @@ DbSqlite3Authenticator::DbSqlite3Authenticator( const std::string _filename )
 {
 	m_filename = _filename;
 
-	m_db.open( m_filename );
+	int res = sqlite3_open( m_filename.c_str( ), &m_db );
+	if( res != SQLITE_OK ) {
+		std::ostringstream oss;
+		oss << "Unable to open Sqlite3 database '" << m_filename << ": " << sqlite3_errmsg( m_db );
+		throw std::runtime_error( oss.str( ) );
+	}
 
 	m_state = _Wolframe_DB_SQLITE3_STATE_NEED_LOGIN;
 }
 
 DbSqlite3Authenticator::~DbSqlite3Authenticator( )
 {
-	m_db.close( );
+	sqlite3_close( m_db );
 }
 
 Step::AuthStep DbSqlite3Authenticator::nextStep( )
 {
+	int rc;
+	sqlite3_stmt *stmt;
+	std::string sql;
+	const char *tail;
+	const char *pass;
+
 	switch( m_state ) {
 		case _Wolframe_DB_SQLITE3_STATE_NEED_LOGIN:
 			m_token = "login";
@@ -49,20 +60,41 @@ Step::AuthStep DbSqlite3Authenticator::nextStep( )
 			return Step::_Wolframe_AUTH_STEP_RECV_DATA;
 
 		case _Wolframe_DB_SQLITE3_STATE_COMPUTE:
+			sql = "select password from users where login=?";
 // check if user is in the sqlite table
-			sd::sql q( m_db );
-			q << "select password from users where login=?" << m_login;
-			if( !q.step( ) ) {
+#if SQLITE_VERSION_NUMBER >= 3005000
+			rc = sqlite3_prepare_v2( m_db, sql.c_str( ), -1, &stmt, &tail );
+#else
+			rc = sqlite3_prepare( m_db, sql.c_str( ), -1, &stmt, &tail );
+#endif
+			if( rc != SQLITE_OK ) {
+				std::ostringstream oss;
+				oss << "Unable to prepare SQL statement '" << sql << ": " << sqlite3_errmsg( m_db );
+				throw std::runtime_error( oss.str( ) );
+			}
+
+			rc = sqlite3_bind_text( stmt, 1, m_login.c_str( ), m_login.length( ), SQLITE_STATIC );
+			if( rc != SQLITE_OK ) {
+				std::ostringstream oss;
+				oss << "Unable to bind parameter login in '" << sql << ": " << sqlite3_errmsg( m_db );
+				throw std::runtime_error( oss.str( ) );
+			}
+
+			rc = sqlite3_step( stmt );
+			if( rc == SQLITE_DONE ) {
 				m_state = _Wolframe_DB_SQLITE3_STATE_NEED_LOGIN;
 				goto FAIL;
+			} else if( rc == SQLITE_ROW ) {
+				pass = (const char *)sqlite3_column_text( stmt, 0 );
 			}
+
 // user found, but password doesn't match
-			std::string password;
-			q >> password;
-			if( password != m_pass ) {
+			if( strcmp( pass, m_pass.c_str( ) ) != 0 ) {
 				m_state = _Wolframe_DB_SQLITE3_STATE_NEED_LOGIN;
 				goto FAIL;
 			}
+
+			sqlite3_finalize( stmt );
 
 // everythink is peachy
 			m_state = _Wolframe_DB_SQLITE3_STATE_NEED_LOGIN;
@@ -70,6 +102,8 @@ Step::AuthStep DbSqlite3Authenticator::nextStep( )
 	}
 
 FAIL:
+	sqlite3_finalize( stmt );
+
 	boost::this_thread::sleep( boost::posix_time::seconds( 1 ) );
 
 	return Step::_Wolframe_AUTH_STEP_FAIL;

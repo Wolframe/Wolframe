@@ -1,5 +1,0 @@
-http://blog.earthbrowser.com/2009/05/sqlite-c-wrapper-so-you-dont-have-to.html
-
-Fixed small compilation issues:
-- shadowed what paramter
-- old sqlite api and non-v2 prepare

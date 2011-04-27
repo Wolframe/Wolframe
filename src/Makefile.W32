@@ -42,14 +42,6 @@ INCLUDE_LIBS = \
 
 !ENDIF
 
-# Sqlite3
-
-!IFDEF WITH_SQLITE3
-
-INCLUDE_DIRS = \
-	$(INCLUDE_DIRS) /I$(TOPDIR)\src\db\sdsqlite
-
-!ENDIF
 
 LOCAL_STATIC_LIB = \
 	wolframe.lib
@@ -67,16 +59,6 @@ LOGGER_OBJS = \
 	logger\logBackendImpl.obj \
 	logger\logger.obj \
 
-DB_OBJS =
-
-!IFDEF WITH_SQLITE3
-DB_OBJS = $(DB_OBJS) \
-	db\sdsqlite\sqlite3.obj \
-	db\sdsqlite\sdsqlite.obj \
-	db\sqlite3\sqlite3.obj \
-	db\sqlite3\sqlite3pp.obj
-!ENDIF
-
 AAAA_OBJS = \
 	AAAA\authentication.obj \
 	AAAA\authentication_textfile.obj \
@@ -85,10 +67,10 @@ AAAA_OBJS = \
 	AAAA\authorizer.obj \
 	AAAA\auditor.obj
 
-!IFDEF WITH_SQLITE3
-AAAA_OBJS = $(AAAA_OBJS) \
-	AAAA\authentication_db_sqlite3.obj
-!ENDIF
+#!IFDEF WITH_SQLITE3
+#AAAA_OBJS = $(AAAA_OBJS) \
+#	AAAA\authentication_db_sqlite3.obj
+#!ENDIF
 
 LOCAL_STATIC_LIB_OBJS = \
 	version.obj \
@@ -107,7 +89,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	connection.obj \
 	serverConfig.obj \
 	server.obj \
-	$(DB_OBJS) \
 	$(AAAA_OBJS)
 
 #SSL
