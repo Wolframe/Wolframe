@@ -46,6 +46,8 @@ namespace _Wolframe {
 namespace iproc {
 namespace lua {
 
+/// \class Configuration
+/// \brief configuration object of the lua application processor
 class Configuration :public config::ConfigurationBase
 {
 public:
@@ -83,18 +85,23 @@ public:
 	class Module
 	{
 	public:
+		/// \enum Type
+		/// \brief type of the module
 		enum Type
 		{
-			Undefined, Script, PreloadLib
+			Undefined,	///< unknown (cannot be loaded)
+			Script,		///< lua script with helper functions
+			PreloadLib	///< one of the lua preload core library
 		};
+		/// \brief returns the module type 't' as descriptive string for an error or status message
 		static const char* typeName( Type t)	{const char* ar[3] = {"undefined", "script", "preloaded library"}; return ar[t];}
 
-		/// \brief Constructor
+		/// \brief Default constructor
 		Module(){}
 		/// \brief Constructor
 		/// \param module name
 		Module( const std::string& name_)	:m_type(Undefined),m_name(name_),m_load(0){}
-		/// \brief copy constructor
+		/// \brief Copy constructor
 		/// \param module to copy
 		Module( const Module& o)		:m_name(o.m_name),m_path(o.m_path),m_load(o.m_load){}
 
@@ -135,7 +142,10 @@ public:
 	const Module& main() const			{return m_main;}
 	/// \brief return the list of modules without the main
 	const std::list<Module>& modules() const	{return m_modules;}
+
+	/// \brief return size of the buffer used for input network messages in bytes
 	unsigned int input_bufsize() const		{return m_input_bufsize;}
+	/// \brief return size of the buffer used for output network messages in bytes
 	unsigned int output_bufsize() const		{return m_output_bufsize;}
 
 	/// \brief Return the name of the function to execute for a command
