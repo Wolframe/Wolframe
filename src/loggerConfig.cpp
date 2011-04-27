@@ -269,7 +269,7 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 		// event log
 		else if ( boost::algorithm::iequals( L1it->first, "eventlog" ))	{
 			if ( logToEventlog )	{
-				LOG_ERROR << displayName() << ": eventlog channel already defined";
+				LOG_ERROR << logPrefix() << ": eventlog channel already defined";
 				return false;
 			}
 			logToEventlog = true;
@@ -281,12 +281,12 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 					boost::algorithm::trim( s );
 					log::LogLevel::Level lvl = log::LogLevel::strToLogLevel( s );
 					if ( lvl == log::LogLevel::LOGLEVEL_UNDEFINED )	{
-						LOG_ERROR << displayName() << ": eventlog: unknown log level: "
+						LOG_ERROR << logPrefix() << ": eventlog: unknown log level: "
 								<< L2it->second.get_value<std::string>();
 						return false;
 					}
 					if ( eventlogLogLevel != log::LogLevel::LOGLEVEL_UNDEFINED )	{
-						LOG_ERROR << displayName() << ": eventlog: log level already defined. Second value: "
+						LOG_ERROR << logPrefix() << ": eventlog: log level already defined. Second value: "
 								<< L2it->second.get_value<std::string>();
 						return false;
 					}
@@ -294,16 +294,16 @@ bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, const st
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "name" ))	{
 					bool isDefined = ( ! eventlogLogName.empty());
-					if ( ! config::Parser::getValue( displayName().c_str(), *L2it, eventlogLogName, &isDefined ))
+					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, eventlogLogName, &isDefined ))
 						retVal = false;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "source" ))	{
 					bool isDefined = ( ! eventlogSource.empty());
-					if ( ! config::Parser::getValue( displayName().c_str(), *L2it, eventlogSource, &isDefined ))
+					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, eventlogSource, &isDefined ))
 						retVal = false;
 				}
 				else
-					LOG_WARNING << displayName() << ": syslog: unknown configuration option: '"
+					LOG_WARNING << logPrefix() << ": syslog: unknown configuration option: '"
 							<< L2it->first << "'";
 			}
 		}

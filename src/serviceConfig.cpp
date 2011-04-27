@@ -133,21 +133,21 @@ bool ServiceConfiguration::parse( const boost::property_tree::ptree& pt,
 		for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 			if ( boost::algorithm::iequals( L1it->first, "serviceName" ))	{
 				bool isDefined = ( !serviceName.empty());
-				if ( !Parser::getValue( displayName().c_str(), *L1it, serviceName, &isDefined ))
+				if ( !Parser::getValue( logPrefix().c_str(), *L1it, serviceName, &isDefined ))
 					retVal = false;
 			}
 			else if ( boost::algorithm::iequals( L1it->first, "displayName" ))	{
 				bool isDefined = ( !serviceDisplayName.empty());
-				if ( !Parser::getValue( displayName().c_str(), *L1it, serviceDisplayName, &isDefined ))
+				if ( !Parser::getValue( logPrefix().c_str(), *L1it, serviceDisplayName, &isDefined ))
 					retVal = false;
 			}
 			else if ( boost::algorithm::iequals( L1it->first, "description" ))	{
 				bool isDefined = ( !serviceDescription.empty());
-				if ( !Parser::getValue( displayName().c_str(), *L1it, serviceDescription, &isDefined ))
+				if ( !Parser::getValue( logPrefix().c_str(), *L1it, serviceDescription, &isDefined ))
 					retVal = false;
 			}
 			else	{
-				LOG_WARNING << displayName() << ": unknown configuration option: '"
+				LOG_WARNING << logPrefix() << ": unknown configuration option: '"
 					    << L1it->first << "'";
 			}
 		}
