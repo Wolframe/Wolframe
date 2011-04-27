@@ -7,7 +7,7 @@
 
 #include "standardConfigs.hpp"
 #ifdef WITH_LUA
-#include "langbind/luaconfig.hpp"
+#include "langbind/luaConfig.hpp"
 namespace _Wolframe {
 struct AppConfiguration :public _Wolframe::iproc::lua::Configuration
 {

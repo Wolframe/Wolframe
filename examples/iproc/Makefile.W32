@@ -50,13 +50,13 @@ INCLUDE_LIBS = \
 OBJS = \
 	appProperties.obj \
 	appConfigDefinition.obj \
-	langbind.obj \
+	langbind/appObjects.obj \
 	iprocHandler.obj \
 	$(TOPDIR)\src\winMain.obj
 
 !IFDEF WITH_LUA
 OBJS = \
-	$(OBJS) langbind\luaconfig.obj langbind\luatypes.obj
+	$(OBJS) langbind\luaConfig.obj langbind\luaAppProcessor.obj
 !ENDIF
 
 CPP_BINS = \

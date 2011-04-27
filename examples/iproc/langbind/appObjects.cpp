@@ -33,7 +33,7 @@ Project Wolframe.
 /// \file langbind.cpp
 /// \brief interface implementation for application processor scripting language to system objects
 ///
-#include "langbind.hpp"
+#include "appObjects.hpp"
 #include "logger.hpp"
 #include "protocol/inputfilter.hpp"
 #include "protocol/formatoutput.hpp"

@@ -38,12 +38,12 @@
 #include "protocol/ioblocks.hpp"
 #include "iprocHandler.hpp"
 #include "logger.hpp"
-#include "langbind.hpp"
+#include "langbind/appObjects.hpp"
 #include <boost/lexical_cast.hpp>
 
 #if WITH_LUA
-#include "langbind/luaconfig.hpp"
-#include "langbind/luatypes.hpp"
+#include "langbind/luaConfig.hpp"
+#include "langbind/luaAppProcessor.hpp"
 typedef _Wolframe::iproc::lua::AppProcessor Processor;
 #endif
 

@@ -29,9 +29,9 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-#include "luatypes.hpp"
+#include "luaAppProcessor.hpp"
 #include "logger.hpp"
-#include "langbind.hpp"
+#include "appObjects.hpp"
 #include "protocol/formatoutput.hpp"
 #include "protocol/inputfilter.hpp"
 #include <stdexcept>

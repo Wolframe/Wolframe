@@ -30,13 +30,13 @@ Project Wolframe.
 
 ************************************************************************/
 ///
-/// \file luatypes.hpp
-/// \brief interface to lua application processor
+/// \file luaAppProcessor.hpp
+/// \brief interface to the lua application processor
 ///
 #ifndef _Wolframe_LUATYPES_HPP_INCLUDED
 #define _Wolframe_LUATYPES_HPP_INCLUDED
-#include "langbind.hpp"
-#include "luaconfig.hpp"
+#include "luaConfig.hpp"
+#include "appObjects.hpp"
 #include "appProcessor.hpp"
 
 namespace _Wolframe {
