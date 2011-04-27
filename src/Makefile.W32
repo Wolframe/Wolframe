@@ -67,10 +67,11 @@ AAAA_OBJS = \
 	AAAA\authorizer.obj \
 	AAAA\auditor.obj
 
-#!IFDEF WITH_SQLITE3
-#AAAA_OBJS = $(AAAA_OBJS) \
-#	AAAA\authentication_db_sqlite3.obj
-#!ENDIF
+!IFDEF WITH_SQLITE3
+AAAA_OBJS = $(AAAA_OBJS) \
+	AAAA\authentication_db_sqlite3.obj \
+	AAAA\sqlite3.obj
+!ENDIF
 
 LOCAL_STATIC_LIB_OBJS = \
 	version.obj \
