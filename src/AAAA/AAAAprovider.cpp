@@ -90,7 +90,8 @@ bool Configuration::parse( const boost::property_tree::ptree& pt, const std::str
 	bool retVal = true;
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
-		if ( boost::algorithm::iequals( L1it->first, "Authentication" ))	{
+		if ( boost::algorithm::iequals( L1it->first, "Authentication" ) ||
+				boost::algorithm::iequals( L1it->first, "Auth" ))	{
 			if ( ! auth.parse( L1it->second, L1it->first ))
 				retVal = false;
 		}
