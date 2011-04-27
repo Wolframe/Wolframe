@@ -31,7 +31,7 @@ Project Wolframe.
 ************************************************************************/
 #ifndef _Wolframe_METHODTABLE_HPP_INCLUDED
 #define _Wolframe_METHODTABLE_HPP_INCLUDED
-#include "protocol/generator.hpp"
+#include "protocol/inputfilter.hpp"
 #include "protocol/formatoutput.hpp"
 #include <boost/shared_ptr.hpp>
 
@@ -47,7 +47,7 @@ struct Method
    struct Context
    {
       Data* data;
-      boost::shared_ptr<protocol::Generator> contentIterator;
+      boost::shared_ptr<protocol::InputFilter> contentIterator;
       boost::shared_ptr<protocol::FormatOutput> output;
       
       Context()                   :data(0){}

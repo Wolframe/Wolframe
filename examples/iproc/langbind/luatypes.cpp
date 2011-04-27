@@ -33,7 +33,7 @@ Project Wolframe.
 #include "logger.hpp"
 #include "langbind.hpp"
 #include "protocol/formatoutput.hpp"
-#include "protocol/generator.hpp"
+#include "protocol/inputfilter.hpp"
 #include <stdexcept>
 #include <cstddef>
 extern "C"
@@ -121,31 +121,31 @@ struct LuaObject :public ObjectType
 	}
 };
 
-static int function_inputGenerator( lua_State* ls)
+static int function_inputFilter( lua_State* ls)
 {
 	const char* item[2];
 	unsigned int itemsize[2];
 
-	InputGeneratorClosure* closure = (InputGeneratorClosure*)lua_touserdata( ls, lua_upvalueindex( 1));
+	InputFilterClosure* closure = (InputFilterClosure*)lua_touserdata( ls, lua_upvalueindex( 1));
 
 	switch (closure->fetch( item[0], itemsize[0], item[1], itemsize[1]))
 	{
-		case InputGeneratorClosure::DoYield:
+		case InputFilterClosure::DoYield:
 			return lua_yield( ls, 0);
 
-		case InputGeneratorClosure::EndOfData:
+		case InputFilterClosure::EndOfData:
 			return 0;
 
-		case InputGeneratorClosure::Error:
+		case InputFilterClosure::Error:
 			luaL_error( ls, "error in iterator");
 			return 0;
 
-		case InputGeneratorClosure::Data:
+		case InputFilterClosure::Data:
 			if (item[0]) lua_pushstring( ls, item[0]); else lua_pushnil( ls);
 			if (item[1]) lua_pushstring( ls, item[1]); else lua_pushnil( ls);
 			return 2;
 	}
-	luaL_error( ls, "illegal state produced by generator");
+	luaL_error( ls, "illegal state produced by input filter");
 	return 0;
 }
 
@@ -236,9 +236,9 @@ static int function_input_as( lua_State* ls)
 	}
 	else if (input)
 	{
-		boost::shared_ptr<protocol::Generator> filtergenerator( filter->m_generator);
-		*filtergenerator = *input->m_generator;
-		input->m_generator = filtergenerator;
+		boost::shared_ptr<protocol::InputFilter> inputfilter( filter->m_inputfilter);
+		*inputfilter = *input->m_inputfilter;
+		input->m_inputfilter = inputfilter;
 	}
 	else
 	{
@@ -279,12 +279,12 @@ static int function_input_get( lua_State* ls)
 		return luaL_error( ls, "invalid number of arguments (no arguments for method 'get' expected)");
 	}
 	LuaObject<Input>* input = (LuaObject<Input>*) lua_touserdata( ls, 1);
-	if (!input->m_generator.get())
+	if (!input->m_inputfilter.get())
 	{
 		return luaL_error( ls, "no filter defined for input with input.as(...)");
 	}
-	LuaObject<InputGeneratorClosure>::push_luastack( ls, input->m_generator);
-	lua_pushcclosure( ls, &function_inputGenerator, 1);
+	LuaObject<InputFilterClosure>::push_luastack( ls, input->m_inputfilter);
+	lua_pushcclosure( ls, &function_inputFilter, 1);
 	return 1;
 }
 
@@ -339,18 +339,18 @@ AppProcessor::~AppProcessor()
 	delete m_state;
 }
 
-static AppProcessor::CallResult getYieldState( protocol::Generator* in, protocol::FormatOutput* fo, const char* methodName, bool commandHasIO)
+static AppProcessor::CallResult getYieldState( protocol::InputFilter* in, protocol::FormatOutput* fo, const char* methodName, bool commandHasIO)
 {
 	if (fo->getError())
 	{
 		LOG_ERROR << "error " << fo->getError() << ") in format output when calling '" << methodName << "'";
 		return AppProcessor::Error;
 	}
-	protocol::Generator::State istate = in->state();
+	protocol::InputFilter::State istate = in->state();
 
 	switch (istate)
 	{
-		case protocol::Generator::Open:
+		case protocol::InputFilter::Open:
 			if (fo->size() == 0)
 			{
 				LOG_ERROR << "error printed in method '" << methodName << "' declared to have no output";
@@ -358,7 +358,7 @@ static AppProcessor::CallResult getYieldState( protocol::Generator* in, protocol
 			}
 			return AppProcessor::YieldWrite;
 
-		case protocol::Generator::EndOfMessage:
+		case protocol::InputFilter::EndOfMessage:
 			if (commandHasIO)
 			{
 				return AppProcessor::YieldRead;
@@ -369,14 +369,14 @@ static AppProcessor::CallResult getYieldState( protocol::Generator* in, protocol
 				return AppProcessor::Ok;
 			}
 
-		case protocol::Generator::Error:
+		case protocol::InputFilter::Error:
 		{
 			int returnCode = in->getError();
-			LOG_ERROR << "error " << returnCode << ") in input generator when calling '" << methodName << "'";
+			LOG_ERROR << "error " << returnCode << ") in input filter when calling '" << methodName << "'";
 			return AppProcessor::Error;
 		}
 	}
-	LOG_ERROR << "illegal state of input generator when calling '" << methodName << "'";
+	LOG_ERROR << "illegal state of input filter when calling '" << methodName << "'";
 	return AppProcessor::Error;
 }
 
@@ -396,9 +396,9 @@ AppProcessor::CallResult AppProcessor::call( unsigned int argc, const char** arg
 		m_state->threadref = luaL_ref( m_state->ls, LUA_REGISTRYINDEX);
 
 		// initialize input:
-		boost::shared_ptr<protocol::Generator> filtergenerator( m_system->createGenerator());
-		*filtergenerator = *m_input.m_generator;
-		m_input.m_generator = filtergenerator;
+		boost::shared_ptr<protocol::InputFilter> inputfilter( m_system->createInputFilter());
+		*inputfilter = *m_input.m_inputfilter;
+		m_input.m_inputfilter = inputfilter;
 
 		// initialize output:
 		boost::shared_ptr<protocol::FormatOutput> filteroutput( m_system->createFormatOutput());
@@ -417,7 +417,7 @@ AppProcessor::CallResult AppProcessor::call( unsigned int argc, const char** arg
 	}
 	if (rt == LUA_YIELD)
 	{
-		return getYieldState( m_input.m_generator.get(), m_output.m_formatoutput.get(), argv[0], commandHasIO);
+		return getYieldState( m_input.m_inputfilter.get(), m_output.m_formatoutput.get(), argv[0], commandHasIO);
 	}
 	else if (rt != 0)
 	{

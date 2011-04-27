@@ -138,7 +138,7 @@ struct Connection::Private
 
 		if (state == ProcessingInput)
 		{
-			app_input.m_generator->protocolInput( itr.ptr(), eoD-itr, input.gotEoD());
+			app_input.m_inputfilter->protocolInput( itr.ptr(), eoD-itr, input.gotEoD());
 		}
 		end = input.end();
 		itr = (eoD < end) ? (eoD+1):end;
@@ -154,7 +154,7 @@ struct Connection::Private
 			Input::iterator eoD = input.getEoD( itr);
 			if (state == ProcessingInput)
 			{
-				app_input.m_generator->protocolInput( itr.ptr(), eoD-itr, input.gotEoD());
+				app_input.m_inputfilter->protocolInput( itr.ptr(), eoD-itr, input.gotEoD());
 			}
 			end = input.end();
 			itr = (eoD < end)? (eoD+1):end;

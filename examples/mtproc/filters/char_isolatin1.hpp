@@ -1,6 +1,6 @@
-#ifndef _Wolframe_PROTOCOL_GENERATOR_CHAR_ISOLATIN1_HPP_INCLUDED
-#define _Wolframe_PROTOCOL_GENERATOR_CHAR_ISOLATIN1_HPP_INCLUDED
-#include "protocol/generator.hpp"
+#ifndef _Wolframe_FILTER_CHAR_ISOLATIN1_HPP_INCLUDED
+#define _Wolframe_FILTER_CHAR_ISOLATIN1_HPP_INCLUDED
+#include "protocol/inputfilter.hpp"
 #include "protocol/formatoutput.hpp"
 #include <cstring>
 
@@ -31,7 +31,7 @@ struct CharIsoLatin1
 		}
 	};
 
-	struct Generator :public protocol::Generator
+	struct InputFilter :public protocol::InputFilter
 	{
 		enum ErrorCodes {Ok=0,ErrBufferTooSmall=1};
 
@@ -71,7 +71,7 @@ struct CharIsoLatin1
 	};
 };
 
-}//namespace generator1
+}//namespace InputFilter1
 }}//namespace
 #endif
 

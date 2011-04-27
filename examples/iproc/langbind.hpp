@@ -36,7 +36,7 @@ Project Wolframe.
 #ifndef _Wolframe_LANGBIND_HPP_INCLUDED
 #define _Wolframe_LANGBIND_HPP_INCLUDED
 #include "protocol/formatoutput.hpp"
-#include "protocol/generator.hpp"
+#include "protocol/inputfilter.hpp"
 #include <boost/shared_ptr.hpp>
 #include <stack>
 #include <string>
@@ -90,7 +90,7 @@ struct System
 
 	/// \brief create a new input filter function
 	/// \param[in] name name of the filter or the default filter if not specified
-	virtual protocol::Generator* createGenerator( const char* name=0) const;
+	virtual protocol::InputFilter* createInputFilter( const char* name=0) const;
 	/// \brief create a new format output filter function
 	/// \param[in] name name of the filter or the default filter if not specified
 	virtual protocol::FormatOutput* createFormatOutput( const char* name=0) const;
@@ -100,13 +100,13 @@ struct System
 /// \brief input as seen from the application processor program
 struct Input
 {
-	boost::shared_ptr<protocol::Generator> m_generator;		///< input generator function defined by the associated input filter
+	boost::shared_ptr<protocol::InputFilter> m_inputfilter;		///< input is defined by the associated input filter
 
 	/// \brief constructor
 	Input(){};
 	/// \brief copy constructor
 	/// \param[in] o copied item
-	Input( const Input& o) :m_generator(o.m_generator){}
+	Input( const Input& o) :m_inputfilter(o.m_inputfilter){}
 	/// \brief destructor
 	~Input(){};
 };
@@ -115,28 +115,28 @@ struct Input
 /// \brief input/output filter as seen from the application processor program
 struct Filter
 {
-	boost::shared_ptr<protocol::FormatOutput> m_formatoutput;		///< format output function
-	boost::shared_ptr<protocol::Generator> m_generator;			///< input generator function
+	boost::shared_ptr<protocol::FormatOutput> m_formatoutput;		///< format output
+	boost::shared_ptr<protocol::InputFilter> m_inputfilter;			///< input filter
 
 	/// \brief constructor
 	/// \param[in] system reference to system function call interface 
 	/// \param[in] name name of the filter as defined in the system
 	Filter( System* system, const char* name)
 		:m_formatoutput(system->createFormatOutput(name))
-		,m_generator(system->createGenerator(name)){}
+		,m_inputfilter(system->createInputFilter(name)){}
 
 	/// \brief copy constructor
 	/// \param[in] o copied item
 	Filter( const Filter& o)
 		:m_formatoutput(o.m_formatoutput)
-		,m_generator(o.m_generator){}
+		,m_inputfilter(o.m_inputfilter){}
 	/// \brief destructor
 	~Filter(){};
 };
 
-/// \class InputGeneratorClosure
-/// \brief generator closure for the input iterator (in Lua returned by 'input.get()')
-class InputGeneratorClosure
+/// \class InputFilterClosure
+/// \brief closure for the input iterator (in Lua returned by 'input.get()')
+class InputFilterClosure
 {
 public:
 	/// \enum ItemType
@@ -150,9 +150,9 @@ public:
 	};
 
 	/// \brief constructor
-	/// \param[in] ig input generator reference from input
-	InputGeneratorClosure( const boost::shared_ptr<protocol::Generator>& ig)
-		:m_generator(ig),m_type(protocol::Generator::Value),m_value(0),m_buf(0),m_bufsize(0),m_bufpos(0){}
+	/// \param[in] ig input filter reference from input
+	InputFilterClosure( const boost::shared_ptr<protocol::InputFilter>& ig)
+		:m_inputfilter(ig),m_type(protocol::InputFilter::Value),m_value(0),m_buf(0),m_bufsize(0),m_bufpos(0){}
 
 	/// \brief internal buffer reset
 	void init()
@@ -170,8 +170,8 @@ public:
 	ItemType fetch( const char*& e1, unsigned int& e1size, const char*& e2, unsigned int& e2size);
 
 private:
-	boost::shared_ptr<protocol::Generator> m_generator;	///< rerefence to input with filter
-	protocol::Generator::ElementType m_type;		///< current state (last value type parsed)
+	boost::shared_ptr<protocol::InputFilter> m_inputfilter;	///< rerefence to input with filter
+	protocol::InputFilter::ElementType m_type;		///< current state (last value type parsed)
 	char* m_value;						///< pointer to local copy of value in m_buf
 	char* m_buf;						///< pointer to buffer for local copies of returned values
 	std::size_t m_bufsize;					///< allocation size of m_buf

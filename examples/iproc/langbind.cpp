@@ -35,15 +35,15 @@ Project Wolframe.
 ///
 #include "langbind.hpp"
 #include "logger.hpp"
-#include "protocol/generator.hpp"
+#include "protocol/inputfilter.hpp"
 #include "protocol/formatoutput.hpp"
-#include "generators/char_isolatin1.hpp"
+#include "filters/char_isolatin1.hpp"
 #include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
 using namespace app;
 
-InputGeneratorClosure::ItemType InputGeneratorClosure::fetch( const char*& e1, unsigned int& e1size, const char*& e2, unsigned int& e2size)
+InputFilterClosure::ItemType InputFilterClosure::fetch( const char*& e1, unsigned int& e1size, const char*& e2, unsigned int& e2size)
 {
 	if (m_bufsize == 0)
 	{
@@ -62,18 +62,18 @@ InputGeneratorClosure::ItemType InputGeneratorClosure::fetch( const char*& e1, u
 	e2 = 0;
 	e2size = 0;
 
-	if (!m_generator->getNext( &m_type, m_buf, m_bufsize-1, &m_bufpos))
+	if (!m_inputfilter->getNext( &m_type, m_buf, m_bufsize-1, &m_bufpos))
 	{
-		switch (m_generator->state())
+		switch (m_inputfilter->state())
 		{
-			case protocol::Generator::EndOfMessage:
+			case protocol::InputFilter::EndOfMessage:
 				return DoYield;
 
-			case protocol::Generator::Error:
-				LOG_ERROR << "error in iterator (" << m_generator->getError() << ")";
+			case protocol::InputFilter::Error:
+				LOG_ERROR << "error in iterator (" << m_inputfilter->getError() << ")";
 				return Error;
 
-			case protocol::Generator::Open:
+			case protocol::InputFilter::Open:
 				LOG_DATA << "end of input";
 				return EndOfData;
 		}
@@ -82,14 +82,14 @@ InputGeneratorClosure::ItemType InputGeneratorClosure::fetch( const char*& e1, u
 	{
 		switch (m_type)
 		{
-			case protocol::Generator::OpenTag:
+			case protocol::InputFilter::OpenTag:
 				m_buf[ m_bufpos] = 0;
 				e1 = m_buf;
 				e1size = m_bufpos;
 				init();
 				return Data;
 
-			case protocol::Generator::Value:
+			case protocol::InputFilter::Value:
 				m_buf[ m_bufpos] = 0;
 				if (m_value)
 				{
@@ -104,7 +104,7 @@ InputGeneratorClosure::ItemType InputGeneratorClosure::fetch( const char*& e1, u
 				}
 				return Data;
 
-			 case protocol::Generator::Attribute:
+			 case protocol::InputFilter::Attribute:
 				m_buf[ m_bufpos++] = 0;
 				if (m_value)
 				{
@@ -117,7 +117,7 @@ InputGeneratorClosure::ItemType InputGeneratorClosure::fetch( const char*& e1, u
 					m_value = m_buf+m_bufpos;
 					return fetch( e1, e1size, e2, e2size);
 				}
-			 case protocol::Generator::CloseTag:
+			 case protocol::InputFilter::CloseTag:
 				init();
 				return Data;
 		}
@@ -126,10 +126,10 @@ InputGeneratorClosure::ItemType InputGeneratorClosure::fetch( const char*& e1, u
 	return Error;
 }
 
-protocol::Generator* System::createGenerator( const char* name) const
+protocol::InputFilter* System::createInputFilter( const char* name) const
 {
-	if (!name) return new filter::CharIsoLatin1::Generator(); //< default input generator
-	if (boost::algorithm::iequals( name, "char-isolatin1")) return new filter::CharIsoLatin1::Generator();
+	if (!name) return new filter::CharIsoLatin1::InputFilter(); //< default input filter
+	if (boost::algorithm::iequals( name, "char-isolatin1")) return new filter::CharIsoLatin1::InputFilter();
 
 	LOG_ERROR << "unknown input filter function '" << name << "'";
 	return 0;
