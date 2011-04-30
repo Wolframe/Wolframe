@@ -101,7 +101,6 @@ public:
 	//	AuditConfigBase();
 
 	AuditType type() const			{ return m_type; }
-	/// methods
 };
 
 
@@ -132,6 +131,43 @@ public:
 class Authorizer
 {
 public:
+};
+
+
+class FileAuditConfig : public AuditConfigBase
+{
+public:
+	FileAuditConfig( const char* cfgName, const char* logParent, const char* logName )
+		: AuditConfigBase( AUDIT_FILE, cfgName, logParent, logName )
+	{}
+	// ~FileAuditConfig();
+
+	/// methods
+	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
+	bool check() const;
+	void print( std::ostream& os, size_t indent ) const;
+	void setCanonicalPathes( const std::string& referencePath );
+
+private:
+	std::string	file;
+};
+
+
+class DatabaseAuditConfig : public AuditConfigBase
+{
+public:
+	DatabaseAuditConfig( const char* cfgName, const char* logParent, const char* logName )
+		: AuditConfigBase( AUDIT_FILE, cfgName, logParent, logName )
+	{}
+	// ~DatabaseAuditConfig();
+
+	/// methods
+	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
+	bool check() const;
+	void print( std::ostream& os, size_t indent ) const;
+	void setCanonicalPathes( const std::string& referencePath );
+
+private:
 };
 
 

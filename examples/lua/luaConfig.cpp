@@ -128,7 +128,7 @@ bool LuaConfiguration::parse( const boost::property_tree::ptree& pt, const std::
 		}
 	}
 
-	return true;
+	return retVal;
 }
 
 void LuaConfiguration::setCanonicalPathes( const std::string& refPath )

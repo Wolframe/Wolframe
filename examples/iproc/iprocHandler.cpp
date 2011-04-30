@@ -38,12 +38,12 @@
 #include "protocol/ioblocks.hpp"
 #include "iprocHandler.hpp"
 #include "logger.hpp"
-#include "langbind.hpp"
+#include "langbind/appObjects.hpp"
 #include <boost/lexical_cast.hpp>
 
 #if WITH_LUA
-#include "langbind/luaconfig.hpp"
-#include "langbind/luatypes.hpp"
+#include "langbind/luaConfig.hpp"
+#include "langbind/luaAppProcessor.hpp"
 typedef _Wolframe::iproc::lua::AppProcessor Processor;
 #endif
 
@@ -138,7 +138,7 @@ struct Connection::Private
 
 		if (state == ProcessingInput)
 		{
-			app_input.m_generator->protocolInput( itr.ptr(), eoD-itr, input.gotEoD());
+			app_input.m_inputfilter->protocolInput( itr.ptr(), eoD-itr, input.gotEoD());
 		}
 		end = input.end();
 		itr = (eoD < end) ? (eoD+1):end;
@@ -154,7 +154,7 @@ struct Connection::Private
 			Input::iterator eoD = input.getEoD( itr);
 			if (state == ProcessingInput)
 			{
-				app_input.m_generator->protocolInput( itr.ptr(), eoD-itr, input.gotEoD());
+				app_input.m_inputfilter->protocolInput( itr.ptr(), eoD-itr, input.gotEoD());
 			}
 			end = input.end();
 			itr = (eoD < end)? (eoD+1):end;

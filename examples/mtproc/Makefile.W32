@@ -32,21 +32,6 @@ INCLUDE_LIBS = \
 
 !ENDIF
 
-# Lua
-
-!IFDEF WITH_LUA
-
-INCLUDE_DIRS = \
-	$(INCLUDE_DIRS) /I$(LUA_INCLUDE_DIRS)
-
-INCLUDE_LDFLAGS = \
-	$(INCLUDE_LDFLAGS) $(LUA_LDFLAGS)
-
-INCLUDE_LIBS = \
-	$(INCLUDE_LIBS) $(LUA_LIBS)
-
-!ENDIF
-
 OBJS = \
 	appProperties.obj \
 	appConfigDefinition.obj \
@@ -54,11 +39,6 @@ OBJS = \
 	dispatcher.obj \
 	mtprocHandler.obj \
 	$(TOPDIR)\src\winMain.obj
-
-!IFDEF WITH_LUA
-OBJS = \
-	$(OBJS) luaconfig.obj luatypes.obj
-!ENDIF
 
 CPP_BINS = \
 	mtprocd.exe

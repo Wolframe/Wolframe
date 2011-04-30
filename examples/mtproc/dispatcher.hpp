@@ -104,7 +104,7 @@ public:
 	enum IOState {ReadInput,WriteOutput,Close,Error};
 	IOState call( int& returnCode);
 
-	//pass a protocol data input chunk to the processors generator function
+	//pass a protocol data input chunk to the processors input filter function
 	void protocolInput( protocol::InputBlock::iterator& start, protocol::InputBlock::iterator& end, bool eoD);
 
 	bool getOutput( void** output, unsigned int* outputsize);

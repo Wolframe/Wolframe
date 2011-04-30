@@ -54,13 +54,13 @@ OBJS = \
 	appProperties.o \
 	appConfigDefinition.o \
 	iprocHandler.o \
-	langbind.o \
+	langbind/appObjects.o \
 	$(TOPDIR)/src/posixMain.o
 
 ifeq ($(WITH_LUA),1)
 OBJS += \
-	langbind/luaconfig.o \
-	langbind/luatypes.o
+	langbind/luaConfig.o \
+	langbind/luaAppProcessor.o
 endif
 
 

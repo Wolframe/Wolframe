@@ -100,6 +100,16 @@ public:
 };
 
 
+/// database reference class
+class DatabaseConfigReference	{
+public:
+	DatabaseConfigReference( const std::string& name ) : m_id( name )	{}
+	const std::string& DBid() const				{ return m_id; }
+private:
+	const std::string	m_id;
+};
+
+
 /// database configurations
 struct Configuration : public _Wolframe::config::ConfigurationBase
 {
@@ -119,6 +129,7 @@ public:
 //	Not implemented yet, inherited from base for the time being
 //	bool test() const;
 };
+
 
 /// database base class
 class Database	{

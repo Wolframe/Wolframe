@@ -233,11 +233,11 @@ CommandDispatcher::IOState CommandDispatcher::call( int& returnCode)
 					LOG_ERROR << "error " << returnCode << " calling '" << m_instance->m_mt[ m_methodIdx].name << "'";
 					return Error;
 				}
-				Generator::State istate = (m_context.contentIterator)?m_context.contentIterator->state():protocol::Generator::Open;
+				InputFilter::State istate = (m_context.contentIterator)?m_context.contentIterator->state():protocol::InputFilter::Open;
 
 				switch (istate)
 				{
-					case protocol::Generator::Open:
+					case protocol::InputFilter::Open:
 						if (m_context.output && (m_context.output->pos() > 0 || m_context.output->size() == 0))
 						{
 							if (commandHasIO())
@@ -253,7 +253,7 @@ CommandDispatcher::IOState CommandDispatcher::call( int& returnCode)
 							return Close;
 						}
 
-					case protocol::Generator::EndOfMessage:
+					case protocol::InputFilter::EndOfMessage:
 						if (commandHasIO())
 						{
 							return ReadInput;
@@ -261,9 +261,9 @@ CommandDispatcher::IOState CommandDispatcher::call( int& returnCode)
 						m_context.contentIterator->protocolInput( 0, 0, true);
 						continue;
 
-					case protocol::Generator::Error:
+					case protocol::InputFilter::Error:
 						returnCode = m_context.contentIterator->getError();
-						LOG_ERROR << "error " << returnCode << ") in generator calling '" << m_instance->m_mt[ m_methodIdx].name << "'";
+						LOG_ERROR << "error " << returnCode << ") in input filter when calling '" << m_instance->m_mt[ m_methodIdx].name << "'";
 						return Error;
 				}
 			}//for(;;)

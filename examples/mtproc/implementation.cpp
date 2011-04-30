@@ -31,7 +31,7 @@ Project Wolframe.
 ************************************************************************/
 #include "implementation.hpp"
 #include "logger.hpp"
-#include "generators/char_isolatin1.hpp"
+#include "filters/char_isolatin1.hpp"
 #include <new>
 
 using namespace _Wolframe::mtproc;
@@ -40,12 +40,12 @@ using namespace _Wolframe::mtproc;
 struct Method::Data
 {
 	char buf;
-	boost::shared_ptr<protocol::Generator> input;
+	boost::shared_ptr<protocol::InputFilter> input;
 	boost::shared_ptr<protocol::FormatOutput> output;
 
 	Data() :buf(0)
 	{
-		input = boost::shared_ptr<protocol::Generator>( new filter::CharIsoLatin1::Generator());
+		input = boost::shared_ptr<protocol::InputFilter>( new filter::CharIsoLatin1::InputFilter());
 		output = boost::shared_ptr<protocol::FormatOutput>( new filter::CharIsoLatin1::FormatOutput());
 	}
 };
@@ -75,8 +75,8 @@ int Implementation::echo( Method::Context* ctx, unsigned int, const char**)
 		if (!ctx->output->print( protocol::FormatOutput::Value, &ctx->data->buf, 1)) return 0;
 		ctx->data->buf = 0;
 	}
-	protocol::Generator::ElementType type;
-	protocol::Generator::size_type bp = 0;
+	protocol::InputFilter::ElementType type;
+	protocol::InputFilter::size_type bp = 0;
 
 	while (ctx->contentIterator->getNext( &type, &ctx->data->buf, 1, &bp))
 	{

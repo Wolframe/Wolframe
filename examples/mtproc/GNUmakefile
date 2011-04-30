@@ -20,24 +20,6 @@ INCLUDE_LIBS = \
 	$(TOPDIR)/src/libwolframe.a \
 	-ldl
 
-# lua
-
-ifeq ($(WITH_LUA),1)
-
-INCLUDE_CPPFLAGS += \
-	-DWITH_LUA
-
-INCLUDE_DIRS += \
-	-I$(LUA_INCLUDE_DIR)
-
-INCLUDE_LDFLAGS += \
-	-L$(LUA_LIB_DIR)
-
-INCLUDE_LIBS += \
-	$(LUA_LIBS)
-
-endif
-
 # openssl
 
 ifeq ($(WITH_SSL),1)
