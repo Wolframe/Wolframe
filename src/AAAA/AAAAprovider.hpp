@@ -74,7 +74,7 @@ class AuthenticationConfigBase : public config::ConfigurationBase
 private:
 	const AuthenticationType	m_type;
 public:
-	/// constructor
+	/// constructor a
 	AuthenticationConfigBase( const AuthenticationType Type,
 				  const char* name, const char* logParent, const char* logName )
 		: config::ConfigurationBase( name, logParent, logName ),
