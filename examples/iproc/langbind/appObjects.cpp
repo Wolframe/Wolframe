@@ -45,7 +45,7 @@ using namespace app;
 
 InputFilterClosure::ItemType InputFilterClosure::fetch( const char*& e1, unsigned int& e1size, const char*& e2, unsigned int& e2size)
 {
-	if (m_bufsize == 0)
+	if (!m_inputfilter.get())
 	{
 		return EndOfData;
 	}
@@ -146,6 +146,11 @@ protocol::FormatOutput* System::createFormatOutput( const char* name) const
 
 Output::ItemType Output::print( const char* e1, unsigned int e1size, const char* e2, unsigned int e2size)
 {
+	if (!m_formatoutput.get())
+	{
+		LOG_ERROR << "no output sink defined (output ignored)";
+		return Error;
+	}
 	try
 	{
 		if (e1)

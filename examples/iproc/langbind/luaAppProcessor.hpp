@@ -57,7 +57,7 @@ public:
 	/// \param[in] config read only reference to the configuration of this application processor
 	/// \param[in] input input of this application processor instance
 	/// \param[in] output output of this application processor instance
-	AppProcessor( app::System* system, const lua::Configuration* config, app::Input& input, app::Output& output);
+	AppProcessor( app::System* system, const lua::Configuration* config);
 	/// \brief destructor
 	~AppProcessor();
 
@@ -73,15 +73,24 @@ public:
 		return (functionName != 0);
 	}
 
+	/// \brief get command implemenation (see app::AppProcessorBase::setIO(boost::shared_ptr<protocol::InputFilter>, boost::shared_ptr<protocol::FormatOutput>)
+	/// \param[in] in input filter reference
+	/// \param[in] out format output reference
+	virtual void setIO( boost::shared_ptr<protocol::InputFilter> in, boost::shared_ptr<protocol::FormatOutput> out)
+	{
+		m_input.m_inputfilter = in;
+		m_output.m_formatoutput = out;
+	}
+
 	/// \brief execute the Lua script (see app::AppProcessorBase::call(unsigned int, const char**,bool))
 	/// \param[in] argc number of arguments
 	/// \param[in] argc array of arguments
 	/// \return call state
-	virtual CallResult call( unsigned int argc, const char** argv, bool CommandHasIO);
+	virtual CallResult call( unsigned int argc, const char** argv);
 
 private:
-	const lua::Configuration* m_config;		///< reference to configuration
-	app::Input m_input;				///< input
+	const lua::Configuration* m_config;	///< reference to configuration
+	app::Input m_input;			///< input
 	app::Output m_output;			///< output
 	app::System* m_system;			///< reference to system call interface
 	State* m_state;				///< application procesor instance state

@@ -223,7 +223,11 @@ public:
 		if (m_sbuf[0]==0)
 		{
 			unsigned int ii=0;
-			if (cmdname) m_sbuf[ii++] = cmdname;
+			if (cmdname)
+			{
+				m_sbuf[ii++] = cmdname;
+				if (m_pos < Size) m_pos++;
+			}
 			for (;ii<m_pos; ii++) m_sbuf[ii]=m_content->c_str()+m_buf[ii];
 			if (ii<m_pos) m_sbuf[ii]=0;
 		}

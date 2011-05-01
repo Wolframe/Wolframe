@@ -13,11 +13,13 @@ struct CharIsoLatin1
 	{
 		virtual bool print( ElementType, const void* element, size_type elementsize)
 		{
+			setState( Open);
 			char* out = (char*)cur();
 			size_type nn = restsize();
 
 			if (elementsize > nn)
 			{
+				setState( EndOfBuffer);
 				return false;
 			}
 			else

@@ -30,7 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-/// \file luaconfig.hpp
+/// \file luaConfig.hpp
 /// \brief Configuration of the lua application processor
 #ifndef _iproc_LUA_CONFIG_HPP_INCLUDED
 #define _iproc_LUA_CONFIG_HPP_INCLUDED
@@ -58,7 +58,7 @@ public:
 	/// \brief constructor
 	/// \param name configuration name
 	/// \param prefix configuration prefix
-	Configuration( const char* name, const char* prefix) :ConfigurationBase(name, NULL, prefix){}
+	Configuration( const char* name, const char* prefix) :ConfigurationBase(name, NULL, prefix),m_input_bufsize(512),m_output_bufsize(512){}
 
 	/// \brief interface implementation of ConfigurationBase::parse(const boost::property_tree::ptree&, const std::string&)
 	virtual bool parse( const boost::property_tree::ptree&, const std::string&);
@@ -91,25 +91,29 @@ public:
 		{
 			Undefined,	///< unknown (cannot be loaded)
 			Script,		///< lua script with helper functions
-			PreloadLib	///< one of the lua preload core library
+			PreloadLib,	///< one of the lua preload core library
+			UserLib		///< a user defined library
 		};
 		/// \brief returns the module type 't' as descriptive string for an error or status message
 		static const char* typeName( Type t)	{const char* ar[3] = {"undefined", "script", "preloaded library"}; return ar[t];}
 
 		/// \brief Default constructor
-		Module(){}
+		Module()							:m_type(Undefined),m_load(0){}
 		/// \brief Constructor
 		/// \param module name
-		Module( const std::string& name_)	:m_type(Undefined),m_name(name_),m_load(0){}
+		Module( const std::string& name_, Type type_=Undefined)		:m_type(type_),m_name(name_),m_load(0) {if (type_==Undefined) setType();}
 		/// \brief Copy constructor
 		/// \param module to copy
-		Module( const Module& o)		:m_name(o.m_name),m_path(o.m_path),m_load(o.m_load){}
+		Module( const Module& o)					:m_type(o.m_type),m_name(o.m_name),m_path(o.m_path),m_load(o.m_load){}
 
 		/// \brief Canonical module file path decomposition based on the application reference path
 		/// Initialize the absolute path of this module by combining the application reference path with the module file name.
 		/// remove all path parts from the name. After this call the module name is the plain name abd path the full path of the module.
 		/// \param[in] refPath the application reference path
 		void setCanonicalPath( const std::string& refPath);
+
+		/// \brief Determines the type of the module
+		void setType();
 
 		/// \brief Return the name of the module
 		/// \return the plain name of the module
@@ -151,7 +155,7 @@ public:
 	/// \brief Return the name of the function to execute for a command
 	/// \param[in] protocolcmd command from the protocol
 	/// \return script function name to execute
-	const char* scriptFunctionName( const char*) const		{return "run";}
+	const char* scriptFunctionName( const char*) const		{return "run_echo";}
 
 	/// \brief Tell wheter the command has IO (protocol command content) or not
 	/// \param[in] protocolcmd command from the protocol

@@ -49,6 +49,15 @@ struct FormatOutput
 {
 	typedef std::size_t size_type;	///< size_type of the output vector
 
+	/// \enum State
+	/// \brief State of the output used in the application processor iterating loop to decide wheter to yield execution or not.
+	enum State
+	{
+		Open,		///< serving data - normal input processing
+		EndOfBuffer,	///< have to yield processing because the print buffer size is not sufficient
+		Error		///< have to stop processing with an error
+	};
+
 	/// \enum ElementType
 	/// \brief Hierarchical ouput structure element type
 	///
@@ -67,7 +76,7 @@ struct FormatOutput
 	/// \brief Constructor
 	/// \param [in] op print function pointer
 	FormatOutput()
-		:m_ptr(0),m_pos(0),m_size(0),m_errorCode(0){}
+		:m_ptr(0),m_pos(0),m_size(0),m_errorCode(0),m_state(Open){}
 
 	virtual ~FormatOutput(){}
 
@@ -80,6 +89,7 @@ struct FormatOutput
 		m_pos = o.m_pos;
 		m_size = o.m_size;
 		m_errorCode = o.m_errorCode;
+		m_state = o.m_state;
 		return *this;
 	}
 
@@ -128,11 +138,24 @@ struct FormatOutput
 	/// \brief Get error code in case of error state
 	int getError() const			{return m_errorCode;}
 
+	/// \brief Set format output state with error code
+	/// \param [in] s new state
+	/// \param [in] e (optional) error code to set
+	void setState( State s, int e=0)		{m_state=s;m_errorCode=e;}
+
+	/// \brief Return the current state
+	/// \return the current state
+	State state() const
+	{
+		return m_state;
+	}
+
 private:
 	void* m_ptr;		///< pointer to print buffer
 	size_type m_pos;	///< current cursor position in print buffer
 	size_type m_size;	///< size of print buffer in bytes
 	int m_errorCode;	///< error code
+	State m_state;		///< state
 };
 
 }}//namespace
