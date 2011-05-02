@@ -17,7 +17,6 @@ WITH_SQLITE3=1         build AAAA and DB connectors for Sqlite3
 
 Avaliable optional features during testing only:
 
-WITH_GTEST=1           use Google Unit testing library
 WITH_EXPECT=1          use Expect/Tcl for system testing
 
 Example:

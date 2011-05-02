@@ -1,6 +1,6 @@
 TOPDIR = .
 
-SUBDIRS = src tests examples clients
+SUBDIRS = src gtest tests examples clients
 
 PACKAGE_NAME = wolframe
 PACKAGE_VERSION = 0.0.1

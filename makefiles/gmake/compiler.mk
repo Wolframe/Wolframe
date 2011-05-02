@@ -37,6 +37,9 @@ GCC_MINOR_VERSION ?=	$(shell $(TOPDIR)/makefiles/gmake/guess_env --gcc-minor-ver
 # TODO: reenable -O2
 # -Waggregate-return: is for K&R code and mostly useless nowadays
 # -Wno-long-long: some boost code header require 'long long'
+# -Wundef: is troubling gtest and is against the C/C++ standard anyway
+# -Wvariadic-macros: set -Wno-variadic-macros; troubles gtest, which is happilly
+# mixing C99 and C++98 features, let's hope c++0 sorts this out
 
 # compilation flags and compilers
 COMMON_COMPILE_FLAGS = \
@@ -47,7 +50,7 @@ COMMON_COMPILE_FLAGS = \
 	-Wunused -Wno-import \
 	-Wformat -Wformat-y2k -Wformat-nonliteral -Wformat-security -Wformat-y2k \
 	-Wswitch-enum -Wunknown-pragmas -Wfloat-equal \
-	-Wundef -Wshadow -Wpointer-arith \
+	-Wshadow -Wpointer-arith \
 	-Wcast-qual -Wcast-align \
 	-Wwrite-strings \
 	-Wmissing-noreturn \
@@ -56,9 +59,10 @@ COMMON_COMPILE_FLAGS = \
 	-Wdisabled-optimization
 ifeq "$(GCC_MAJOR_VERSION)" "4"
 COMMON_COMPILE_FLAGS += \
-	-Wfatal-errors -Wmissing-include-dirs -Wvariadic-macros \
+	-Wfatal-errors -Wmissing-include-dirs \
 	-Wvolatile-register-var \
-	-Wstrict-aliasing=2 -Wextra -Winit-self
+	-Wstrict-aliasing=2 -Wextra -Winit-self \
+	-Wno-variadic-macros
 # -Wconversion had to meanings before gcc 4.3 (warn about ABI changes when porting
 # old K&R code without function prototypes) and warn about conversions loosing
 # precision. So we enable only -Wconversion (not -Wtraditional-conversion) for gcc

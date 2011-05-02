@@ -8,7 +8,8 @@ INCLUDE_CPPFLAGS =
 
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include \
-	-I$(BOOST_INCLUDE_DIR)
+	-I$(BOOST_INCLUDE_DIR) \
+	-I$(TOPDIR)/gtest/include
 
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR)
@@ -17,6 +18,7 @@ INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_program_options \
 	-lboost_filesystem \
+	$(TOPDIR)/gtest/gtest-all.o \
 	$(TOPDIR)/src/libwolframe.a \
 	-ldl
 
@@ -69,23 +71,11 @@ CPP_BINS = \
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
-ifeq ($(WITH_GTEST),1)
 TEST_BINS += \
 	tests/iprocHandlerTest$(EXE)
 
-GTEST_CPPFLAGS += \
-	-I$(GTEST_INCLUDE_DIR)
-
-GTEST_LDFLAGS += \
-	-L$(GTEST_LIB_DIR)
-
-GTEST_LIBS += \
-	$(GTEST_LIBS)
-
 tests/iprocHandlerTest$(EXE): tests/iprocHandlerTest.o $(IPROC_GTEST_OBJS) $(TOPDIR)/src/libwolframe.a
-	$(CCPP_LINK) -o $@ $(LDFLAGS) -L$(GTEST_LIB_DIR) -L$(LUA_LIB_DIR) $(LUA_LIBS) $(IPROC_GTEST_OBJS) $(OBJS) $< $(LIBS) $(GTEST_LIBS)
-endif
-
+	$(CCPP_LINK) -o $@ $(LDFLAGS) -L$(LUA_LIB_DIR) $(LUA_LIBS) $(IPROC_GTEST_OBJS) $(OBJS) $< $(LIBS)
 
 
 local_all: $(CPP_BINS)

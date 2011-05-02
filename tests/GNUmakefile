@@ -16,7 +16,8 @@ INCLUDE_DIRS = \
 	-I$(TOPDIR)/examples/pecho \
 	-I$(TOPDIR)/examples/mtproc \
 	-I$(TOPDIR)/examples/iproc \
-	-I$(BOOST_INCLUDE_DIR)
+	-I$(BOOST_INCLUDE_DIR) \
+	-I$(TOPDIR)/gtest/include
 
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR)
@@ -25,20 +26,8 @@ INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_filesystem -lboost_system -lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_program_options \
+	$(TOPDIR)/gtest/gtest-all.o \
 	$(TOPDIR)/src/libwolframe.a
-
-# gtest
-
-ifeq ($(WITH_GTEST),1)
-INCLUDE_CPPFLAGS += \
-	-I$(GTEST_INCLUDE_DIR)
-
-INCLUDE_LDFLAGS += \
-	-L$(GTEST_LIB_DIR)
-
-INCLUDE_LIBS += \
-	$(GTEST_LIBS)
-endif
 
 # openssl
 
@@ -52,10 +41,7 @@ endif
 TEST_OBJS =
 
 TEST_CPP_BINS = \
-	threadLeakTest$(EXE)
-
-ifeq ($(WITH_GTEST),1)
-TEST_CPP_BINS += \
+	threadLeakTest$(EXE) \
 	testNamedRetVal$(EXE) \
 	versionTest$(EXE) \
 	counterTest$(EXE) \
@@ -67,7 +53,7 @@ TEST_CPP_BINS += \
 	configValueParser-gTest$(EXE) \
 	pechoHandler-gTest$(EXE) \
 	mtprocHandler-gTest$(EXE)
-endif
+
 ifeq ($(WITH_LUA),1)
 TEST_CPP_BINS += \
 	iprocHandlerTest$(EXE)
@@ -77,7 +63,6 @@ endif
 
 logTest$(EXE): $(TOPDIR)/src/libwolframe.a
 
-ifeq ($(WITH_GTEST),1)
 PECHO_GTEST_OBJS=$(TOPDIR)/examples/pecho/pechoHandler.o
 pechoHandler-gTest$(EXE): pechoHandler-gTest.o $(PECHO_GTEST_OBJS) $(TOPDIR)/src/libwolframe.a
 	$(CCPP_LINK) -o $@ $(LDFLAGS) $(PECHO_GTEST_OBJS) $(OBJS) $< $(LIBS)
@@ -88,7 +73,6 @@ MTPROC_GTEST_OBJS = \
 	$(TOPDIR)/examples/mtproc/dispatcher.o
 mtprocHandler-gTest$(EXE): mtprocHandler-gTest.o $(MTPROC_GTEST_OBJS) $(TOPDIR)/src/libwolframe.a
 	$(CCPP_LINK) -o $@ $(LDFLAGS) $(MTPROC_GTEST_OBJS) $(OBJS) $< $(LIBS)
-endif
 
 local_all:
 
@@ -100,7 +84,6 @@ local_clean:
 local_distclean:
 
 local_test:
-ifeq ($(WITH_GTEST),1)
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./testNamedRetVal
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./logTest
@@ -124,6 +107,5 @@ ifeq ($(WITH_LUA),1)
 endif
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./mtprocHandler-gTest
-endif
 	@echo
 	@echo
