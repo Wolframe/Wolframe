@@ -41,11 +41,9 @@
 #include "langbind/appObjects.hpp"
 #include <boost/lexical_cast.hpp>
 
-#if WITH_LUA
 #include "langbind/luaConfig.hpp"
 #include "langbind/luaAppProcessor.hpp"
 typedef _Wolframe::iproc::lua::AppProcessor Processor;
-#endif
 
 using namespace _Wolframe;
 using namespace _Wolframe::iproc;
@@ -90,26 +88,26 @@ struct Connection::Private
 
 	//* all state variables of this processor
 	//1. states
-	State state;					///< state of the processor (protocol main statemachine)
+	State state;						///< state of the processor (protocol main statemachine)
 
 	//2. buffers and context
-	LineBuffer buffer;				///< context (sub state) for partly parsed input lines
-	ArgBuffer argBuffer;				///< buffer for the arguments
-	Command cmdidx;					///< command parsed
+	LineBuffer buffer;					///< context (sub state) for partly parsed input lines
+	ArgBuffer argBuffer;					///< buffer for the arguments
+	Command cmdidx;						///< command parsed
 
-	Input input;					///< buffer for network read messages
-	Output output;					///< buffer for network write messages
+	Input input;						///< buffer for network read messages
+	Output output;						///< buffer for network write messages
 	//3. Iterators
-	InputIterator itr;				///< iterator to scan protocol input
-	InputIterator end;				///< iterator pointing to end of message buffer
+	InputIterator itr;					///< iterator to scan protocol input
+	InputIterator end;					///< iterator pointing to end of message buffer
 
 	//3. implementation
-	app::System app_system;				///< interface to system functions and loaded resources
-	app::Input app_input;				///< network input interface for the interpreter
-	app::Output app_output;				///< network output interface for the interpreter
-	Processor processor;				///< the interpreter state
-	const char* functionName;			///< name of the method to execute
-	bool functionHasIO;				///< true if the method to execute does content data processing (input/output)
+	app::System app_system;					///< interface to system functions and loaded resources
+	boost::shared_ptr<protocol::InputFilter> inputfilter;	///< network input interface for the interpreter
+	boost::shared_ptr<protocol::FormatOutput> formatoutput;	///< network output interface for the interpreter
+	Processor processor;					///< the interpreter state
+	const char* functionName;				///< name of the method to execute
+	bool functionHasIO;					///< true if the method to execute does content data processing (input/output)
 
 	//* helper methods for I/O
 	//helper function to send a line message with CRLF termination as C string
@@ -138,7 +136,7 @@ struct Connection::Private
 
 		if (state == ProcessingInput)
 		{
-			app_input.m_inputfilter->protocolInput( itr.ptr(), eoD-itr, input.gotEoD());
+			inputfilter->protocolInput( itr.ptr(), eoD-itr, input.gotEoD());
 		}
 		end = input.end();
 		itr = (eoD < end) ? (eoD+1):end;
@@ -154,7 +152,7 @@ struct Connection::Private
 			Input::iterator eoD = input.getEoD( itr);
 			if (state == ProcessingInput)
 			{
-				app_input.m_inputfilter->protocolInput( itr.ptr(), eoD-itr, input.gotEoD());
+				inputfilter->protocolInput( itr.ptr(), eoD-itr, input.gotEoD());
 			}
 			end = input.end();
 			itr = (eoD < end)? (eoD+1):end;
@@ -175,7 +173,7 @@ struct Connection::Private
 		,argBuffer(&buffer)
 		,input(config->input_bufsize())
 		,output(config->output_bufsize())
-		,processor(&app_system, config, app_input,app_output)
+		,processor(&app_system, config)
 		,functionName(0)
 		,functionHasIO(false)
 	{
@@ -296,6 +294,17 @@ struct Connection::Private
 								state = ProtocolError;
 								return WriteLine( "BAD command not defined");
 							}
+							if (functionHasIO)
+							{
+								inputfilter.reset( app_system.createInputFilter());
+								formatoutput.reset( app_system.createFormatOutput());
+								processor.setIO( inputfilter, formatoutput);
+							}
+							else
+							{
+								inputfilter.reset();
+								formatoutput.reset();
+							}
 							state = Processing;
 							continue;
 					}
@@ -304,11 +313,10 @@ struct Connection::Private
 				case Processing:
 				case ProcessingInput:
 				{
-					int returnCode = 0;
 					const char** argv = argBuffer.argv( functionName);
 					unsigned int argc = argBuffer.argc( functionName);
 
-					switch (processor.call( argc, argv, functionHasIO))
+					switch (processor.call( argc, argv))
 					{
 						case Processor::YieldRead:
 							if (state == Processing)
@@ -325,14 +333,14 @@ struct Connection::Private
 
 						case Processor::YieldWrite:
 						{
-							void* content = app_output.m_formatoutput->ptr();
-							unsigned int contentsize = app_output.m_formatoutput->pos();
+							void* content = formatoutput->ptr();
+							unsigned int contentsize = formatoutput->pos();
 							if (!functionHasIO)
 							{
 								LOG_WARNING << "output of function '" << functionName << "' that has no IO configured is ignored";
 								contentsize = 0;
 							}
-							app_output.m_formatoutput->init( output.ptr(), output.size());
+							formatoutput->init( output.ptr(), output.size());
 
 							if (contentsize == 0)
 							{
@@ -361,18 +369,16 @@ struct Connection::Private
 
 						case Processor::Error:
 						{
-							std::string ee = boost::lexical_cast<std::string>( returnCode);
-
 							if (functionHasIO)
 							{
 								if (state == Processing) passInput();
 								state = (input.gotEoD())?EndOfCommand:DiscardInput;
-								return WriteLine( "\r\n.\r\nERR", ee.c_str());
+								return WriteLine( "\r\n.\r\nERR");
 							}
 							else
 							{
 								state = Init;
-								return WriteLine( "\r\nERR", ee.c_str());
+								return WriteLine( "\r\nERR");
 							}
 						}
 					}

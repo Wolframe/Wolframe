@@ -6,7 +6,6 @@
 #define _HANDLERCONFIG_HPP_INCLUDED
 
 #include "standardConfigs.hpp"
-#ifdef WITH_LUA
 #include "langbind/luaConfig.hpp"
 namespace _Wolframe {
 struct AppConfiguration :public _Wolframe::iproc::lua::Configuration
@@ -14,9 +13,7 @@ struct AppConfiguration :public _Wolframe::iproc::lua::Configuration
 	AppConfiguration() :_Wolframe::iproc::lua::Configuration( "lua iproc", "iproc") {}
 };
 }//namespace
-#else
-#error No application processor language defined (Lua)
-#endif
+
 
 namespace _Wolframe {
 

@@ -51,7 +51,7 @@ struct InputFilter
 	{
 		Open,		///< serving data - normal input processing
 		EndOfMessage,	///< have to yield processing because end of message reached
-		Error		///< have to yield with error and stop processing with an error 
+		Error		///< have to stop processing with an error
 	};
 	/// \enum ElementType
 	/// \brief Content element type that describes the role of the element in the structured input

@@ -56,7 +56,7 @@ OBJS = \
 
 !IFDEF WITH_LUA
 OBJS = \
-	$(OBJS) langbind\luaConfig.obj langbind\luaAppProcessor.obj
+	$(OBJS) langbind/appLog.obj langbind\luaConfig.obj langbind\luaAppProcessor.obj
 !ENDIF
 
 CPP_BINS = \

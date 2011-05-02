@@ -31,6 +31,7 @@ Project Wolframe.
 ************************************************************************/
 #include "luaAppProcessor.hpp"
 #include "logger.hpp"
+#include "luaLog.hpp"
 #include "appObjects.hpp"
 #include "protocol/formatoutput.hpp"
 #include "protocol/inputfilter.hpp"
@@ -55,6 +56,17 @@ namespace luaname
 	static const char* Filter = "wolframe.Filter";
 }
 
+static void* toudata_udkey( lua_State* ls, int index, const char* id)
+{
+	lua_getmetatable( ls,index);
+	const void* p1 = lua_topointer( ls,-1);
+	luaL_getmetatable( ls,id);
+	const void* p2 = lua_topointer( ls,-1);
+
+	lua_pop( ls,2);
+	return p1 == p2 ? lua_touserdata( ls, index) : NULL;
+}
+
 template <class ObjectType>
 struct LuaObject :public ObjectType
 {
@@ -67,22 +79,33 @@ struct LuaObject :public ObjectType
 		return 0;
 	}
 
-	static void create( lua_State* ls, const char* metatableName)
+	static void create( lua_State* ls, const char* metatableName, const luaL_Reg* mt=0)
 	{
-		luaL_newmetatable( ls, metatableName);
-		/* set its __gc field */
-		lua_pushstring( ls, "__gc");
-		lua_pushcfunction( ls, destroy);
-		lua_settable( ls, -3);
+		// see (http://lua-users.org/wiki/BindingWithMembersAndMethods)
+		// and (http://lua-users.org/wiki/BindingWithMetatableAndClosures)
+		lua_pushstring( ls, metatableName);
+		lua_newtable( ls);
+		int methods = lua_gettop( ls);
+		lua_newtable( ls);
+		int metatable = lua_gettop( ls);
+
+		lua_pushliteral( ls, "__index");	// add index event to metatable
+		lua_pushvalue( ls, methods);
+		lua_settable( ls, metatable);
+
+		lua_pushliteral( ls, "__metatable");
+		lua_pushvalue( ls, methods);
+		lua_settable( ls, metatable);
+
+		luaL_openlib( ls, 0, getMetamethods(), 0);
+		if (mt) luaL_openlib( ls, 0, mt, 0);
+		lua_settable( ls, LUA_GLOBALSINDEX);
 	}
 
-	typedef int (*Method)( lua_State *ls);
-	static void defineMethod( lua_State* ls, const char* metatableName, const char* name, Method method)
+	static const luaL_Reg* getMetamethods()
 	{
-		luaL_getmetatable( ls, metatableName);
-		lua_pushstring( ls, name);
-		lua_pushcfunction( ls, method);
-		lua_settable( ls, -3);
+		static luaL_Reg ar[2] = {{"__gc", destroy},{0,0}};
+		return ar;
 	}
 
 	void* operator new (std::size_t num_bytes, lua_State* ls) throw (std::bad_alloc)
@@ -96,14 +119,16 @@ struct LuaObject :public ObjectType
 	/// \brief does nothing because the LUA garbage collector does the job.
 	/// \warning CAUTION: DO NOT CALL THIS FUNCTION ! DOES NOT WORK ON MSVC 9.0. (The compiler links with the std delete)
 	///          (just avoids C4291 warning)
-	void operator delete (void *, lua_State* ) {}
+	void operator delete (void *, lua_State*) {}
 
 	template <class Orig>
-	static void push_luastack( lua_State* ls, const Orig& o)
+	static void push_luastack( lua_State* ls, const Orig& o, const char* metatableName)
 	{
 		try
 		{
 			(void*)new (ls) LuaObject( o);
+			luaL_getmetatable( ls, metatableName);
+			lua_setmetatable( ls, -2);
 		}
 		catch (std::bad_alloc)
 		{
@@ -111,13 +136,22 @@ struct LuaObject :public ObjectType
 		}
 	}
 
-	static void createGlobal( lua_State* ls, const char* metatableName, const char* name, const ObjectType& instance)
+	static void createGlobal( lua_State* ls, const char* metatableName, const char* name, const ObjectType& instance, const luaL_Reg* mt=0)
 	{
-		create( ls, metatableName);
+		create( ls, metatableName, mt);
 		(void)new (ls) LuaObject( instance);
 		luaL_getmetatable( ls, metatableName);
 		lua_setmetatable( ls, -2);
 		lua_setglobal( ls, name);
+	}
+
+	static bool setGlobal( lua_State* ls, const char* metatableName, const char* name, const ObjectType& instance)
+	{
+		lua_getglobal( ls, name);
+		LuaObject* obj = (LuaObject*) toudata_udkey( ls, -1, metatableName);
+		if (!obj) return false;
+		*obj = instance;
+		return true;
 	}
 };
 
@@ -207,19 +241,8 @@ static int function_filter( lua_State* ls)
 	if (lua_gettop( ls) != 1) return luaL_error( ls, "invalid number of arguments (1 string as parameter expected)");
 	if (!lua_isstring( ls, 1)) return luaL_error( ls, "invalid type of argument (string expected)");
 	const char* name = lua_tostring( ls, 1);
-	LuaObject<Filter>::push_luastack( ls, Filter( system, name));
+	LuaObject<Filter>::push_luastack( ls, Filter( system, name), luaname::Filter);
 	return 1;
-}
-
-void* toudata_udkey( lua_State* ls, int index, const char* id)
-{
-	lua_getmetatable( ls,index);
-	const void* p1 = lua_topointer( ls,-1);
-	luaL_getmetatable( ls,id);
-	const void* p2 = lua_topointer( ls,-1);
-
-	lua_pop( ls,2);
-	return p1 == p2 ? lua_touserdata( ls, index) : NULL;
 }
 
 static int function_input_as( lua_State* ls)
@@ -237,7 +260,10 @@ static int function_input_as( lua_State* ls)
 	else if (input)
 	{
 		boost::shared_ptr<protocol::InputFilter> inputfilter( filter->m_inputfilter);
-		*inputfilter = *input->m_inputfilter;
+		if (input->m_inputfilter.get())
+		{
+			*inputfilter = *input->m_inputfilter;
+		}
 		input->m_inputfilter = inputfilter;
 	}
 	else
@@ -262,7 +288,10 @@ static int function_output_as( lua_State* ls)
 	else if (output)
 	{
 		boost::shared_ptr<protocol::FormatOutput> filteroutput( filter->m_formatoutput);
-		*filteroutput = *output->m_formatoutput;
+		if (output->m_formatoutput.get())
+		{
+			*filteroutput = *output->m_formatoutput;
+		}
 		output->m_formatoutput = filteroutput;
 	}
 	else
@@ -278,25 +307,37 @@ static int function_input_get( lua_State* ls)
 	{
 		return luaL_error( ls, "invalid number of arguments (no arguments for method 'get' expected)");
 	}
+/*[-]*/LOG_ERROR << "DEBUG: '" << lua_typename( ls, lua_type( ls, 0)) << "'";
 	LuaObject<Input>* input = (LuaObject<Input>*) lua_touserdata( ls, 1);
 	if (!input->m_inputfilter.get())
 	{
 		return luaL_error( ls, "no filter defined for input with input.as(...)");
 	}
-	LuaObject<InputFilterClosure>::push_luastack( ls, input->m_inputfilter);
+	LuaObject<InputFilterClosure>::push_luastack( ls, input->m_inputfilter, luaname::Filter);
 	lua_pushcclosure( ls, &function_inputFilter, 1);
 	return 1;
 }
 
-static void create_function_filter( lua_State* ls, System* system)
+static int function_yield( lua_State* ls)
 {
+	int ii,nn=lua_gettop( ls);
+	for (ii=0; ii<nn; ii++) lua_pushvalue( ls, ii);
+	return lua_yield( ls, ii);
+}
+
+static void create_global_functions( lua_State* ls, System* system)
+{
+	//yield( )
+	lua_pushliteral( ls, "yield");
+	lua_pushcfunction( ls, &function_yield);
+	lua_settable( ls, LUA_GLOBALSINDEX);
+
+	//filter( )
 	lua_pushlightuserdata( ls, system);
 	lua_pushcclosure( ls, &function_filter, 1);
-
-	lua_pushstring( ls, "filter");
+	lua_pushliteral( ls, "filter");
 	lua_pushcfunction( ls, &function_filter);
-	lua_settable( ls, LUA_REGISTRYINDEX);
-
+	lua_settable( ls, LUA_GLOBALSINDEX);
 	LuaObject<Filter>::create( ls, luaname::Filter);
 }
 
@@ -305,12 +346,13 @@ struct AppProcessor::State
 	lua_State* ls;
 	lua_State* thread;
 	int threadref;
+	lua_State* env;
 
-	State( const lua::Configuration& config) :ls(0),thread(0),threadref(0)
+	State( const lua::Configuration& config) :ls(0),thread(0),threadref(0),env(0)
 	{
-		ls = luaL_newstate();
+		env = ls = luaL_newstate();
 		if (!ls) throw std::bad_alloc();
-		if (!config.load( ls)) throw std::bad_alloc();
+		if (!config.load( ls)) throw std::runtime_error( "cannot load application processor from configuration");
 	}
 	~State()
 	{
@@ -318,20 +360,27 @@ struct AppProcessor::State
 	}
 };
 
-AppProcessor::AppProcessor( System* system, const lua::Configuration* config, Input& input, Output& output)
-		:m_config(config),m_input(input),m_output(output),m_system(system)
+static const luaL_Reg input_methodtable[ 3] =
+{
+	{"as",&function_input_as},
+	{"get",&function_input_get},
+	{0,0}
+};
+
+static const luaL_Reg output_methodtable[ 3] =
+{
+	{"as",&function_output_as},
+	{"get",&function_output_print},
+	{0,0}
+};
+
+AppProcessor::AppProcessor( System* system, const lua::Configuration* config)
+		:m_config(config),m_system(system)
 {
 	m_state = new State( *config);
-
-	LuaObject<Input>::createGlobal( m_state->ls, luaname::Input, "input", m_input);
-	LuaObject<Input>::defineMethod( m_state->ls, luaname::Input, "as", &function_input_as);
-	LuaObject<Input>::defineMethod( m_state->ls, luaname::Input, "get", &function_input_get);
-
-	LuaObject<Output>::createGlobal( m_state->ls, luaname::Output, "output", m_output);
-	LuaObject<Output>::defineMethod( m_state->ls, luaname::Output, "as", &function_output_as);
-	LuaObject<Output>::defineMethod( m_state->ls, luaname::Output, "print", &function_output_print);
-
-	create_function_filter( m_state->ls, m_system);
+	LuaObject<Input>::createGlobal( m_state->ls, luaname::Input, "input", m_input, input_methodtable);
+	LuaObject<Output>::createGlobal( m_state->ls, luaname::Output, "output", m_output, output_methodtable);
+	create_global_functions( m_state->ls, m_system);
 }
 
 AppProcessor::~AppProcessor()
@@ -339,7 +388,7 @@ AppProcessor::~AppProcessor()
 	delete m_state;
 }
 
-static AppProcessor::CallResult getYieldState( protocol::InputFilter* in, protocol::FormatOutput* fo, const char* methodName, bool commandHasIO)
+static AppProcessor::CallResult getYieldState( protocol::InputFilter* in, protocol::FormatOutput* fo, const char* methodName)
 {
 	if (fo->getError())
 	{
@@ -351,23 +400,10 @@ static AppProcessor::CallResult getYieldState( protocol::InputFilter* in, protoc
 	switch (istate)
 	{
 		case protocol::InputFilter::Open:
-			if (fo->size() == 0)
-			{
-				LOG_ERROR << "error printed in method '" << methodName << "' declared to have no output";
-				return AppProcessor::Error;
-			}
 			return AppProcessor::YieldWrite;
 
 		case protocol::InputFilter::EndOfMessage:
-			if (commandHasIO)
-			{
-				return AppProcessor::YieldRead;
-			}
-			else
-			{
-				in->protocolInput( 0, 0, true);
-				return AppProcessor::Ok;
-			}
+			return AppProcessor::YieldRead;
 
 		case protocol::InputFilter::Error:
 		{
@@ -380,7 +416,7 @@ static AppProcessor::CallResult getYieldState( protocol::InputFilter* in, protoc
 	return AppProcessor::Error;
 }
 
-AppProcessor::CallResult AppProcessor::call( unsigned int argc, const char** argv, bool commandHasIO)
+AppProcessor::CallResult AppProcessor::call( unsigned int argc, const char** argv)
 {
 	if (argc == 0)
 	{
@@ -393,38 +429,66 @@ AppProcessor::CallResult AppProcessor::call( unsigned int argc, const char** arg
 	{
 		// create thread for the call execution
 		m_state->thread = lua_newthread( m_state->ls);
+
+		// prevent garbage collecting of thread (http://permalink.gmane.org/gmane.comp.lang.lua.general/22680)
+		lua_pushvalue( m_state->ls, -1);
 		m_state->threadref = luaL_ref( m_state->ls, LUA_REGISTRYINDEX);
 
-		// initialize input:
-		boost::shared_ptr<protocol::InputFilter> inputfilter( m_system->createInputFilter());
-		*inputfilter = *m_input.m_inputfilter;
-		m_input.m_inputfilter = inputfilter;
+		// (http://medek.wordpress.com/page/2/)
+		// create a local environment with a link to global environment via the '__index' metamethod
+		lua_newtable( m_state->ls);
+		lua_pushvalue( m_state->ls, -1);
+		lua_setmetatable( m_state->ls, -2); //Set itself as metatable
+		lua_pushvalue( m_state->ls, LUA_GLOBALSINDEX);
+		lua_setfield( m_state->ls, -2, "__index");
+		lua_setfenv( m_state->ls, -2);
+		lua_pop( m_state->ls, 1);
 
-		// initialize output:
-		boost::shared_ptr<protocol::FormatOutput> filteroutput( m_system->createFormatOutput());
-		*filteroutput = *m_output.m_formatoutput;
-		m_output.m_formatoutput = filteroutput;
-
-		for (unsigned int ii=0; ii<argc; ii++)
+		if (m_input.m_inputfilter.get())
 		{
-			if (argv[ii]) lua_pushstring( m_state->ls, argv[ii]); else lua_pushnil( m_state->ls);
+			if (!LuaObject<Input>::setGlobal( m_state->ls, luaname::Input, "input", m_input))
+			{
+				LOG_ERROR << "Failed to initialize input. It possibly has been redefined as a value of different type";
+			}
+		}
+		if (m_output.m_formatoutput.get())
+		{
+			if (!LuaObject<Output>::setGlobal( m_state->ls, luaname::Output, "output", m_output))
+			{
+				LOG_ERROR << "Failed to initialize output. It possibly has been redefined as a value of different type";
+			}
+		}
+		// call the function (for the first time)
+		lua_getglobal( m_state->thread, argv[0]);
+		for (unsigned int ii=1; ii<argc; ii++)
+		{
+			if (argv[ii]) lua_pushstring( m_state->thread, argv[ii]); else lua_pushnil( m_state->thread);
 		}
 		rt = lua_resume( m_state->thread, argc-1);
 	}
 	else
 	{
+		// call the function (subsequently until termination)
 		rt = lua_resume( m_state->thread, 0);
 	}
 	if (rt == LUA_YIELD)
 	{
-		return getYieldState( m_input.m_inputfilter.get(), m_output.m_formatoutput.get(), argv[0], commandHasIO);
+		if (m_input.m_inputfilter.get())
+		{
+			return getYieldState( m_input.m_inputfilter.get(), m_output.m_formatoutput.get(), argv[0]);
+		}
+		else
+		{
+			return YieldWrite;
+		}
 	}
 	else if (rt != 0)
 	{
+		const char* msg = lua_tostring( m_state->thread, -1);
+		LOG_ERROR << "error calling '" << argv[0] << "':" << msg;
 		luaL_unref( m_state->ls, LUA_REGISTRYINDEX, m_state->threadref);
 		m_state->threadref = 0;
 		m_state->thread = 0;
-		LOG_ERROR << "error " << rt << ")  calling '" << argv[0] << "'";
 		return Error;
 	}
 	else

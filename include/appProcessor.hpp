@@ -65,12 +65,16 @@ public:
 	/// \return true, if the command exists
 	virtual bool getCommand( const char* protocolCmd, const char*& functionName, bool& hasIO) const=0;
 
+	/// \brief define input and output interface of the application processor
+	/// \param[in] in input filter reference
+	/// \param[in] out format output reference
+	virtual void setIO( boost::shared_ptr<protocol::InputFilter> in, boost::shared_ptr<protocol::FormatOutput> out)=0;
+
 	/// \brief function call of an application processor script function 
 	/// \param[in] argc number of arguments inclusing the script function name as first argument
 	/// \param[in] argv array of arguments inclusing the script function name as first argument
-	/// \param[in] commandHasIO true, if the command processes data from network input, false else
 	/// \return application processor instance call state
-	virtual CallResult call( unsigned int argc, const char** argv, bool commandHasIO)=0;
+	virtual CallResult call( unsigned int argc, const char** argv)=0;
 };
 
 }}//namespace

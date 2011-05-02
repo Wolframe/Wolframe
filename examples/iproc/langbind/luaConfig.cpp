@@ -38,6 +38,7 @@
 #include <ostream>
 #include "config/valueParser.hpp"
 #include "miscUtils.hpp"
+#include "luaLog.hpp"
 
 extern "C" {
 	#include <lualib.h>
@@ -49,7 +50,6 @@ using namespace _Wolframe::iproc::lua;
 
 static Configuration::ModuleLoad getLuaModuleEntryFunc( const char* name)
 {
-	if (strcmp(name,"base") == 0) return luaopen_base;
 	if (strcmp(name,LUA_TABLIBNAME) == 0) return luaopen_table;
 	if (strcmp(name,LUA_IOLIBNAME) == 0) return luaopen_io;
 	if (strcmp(name,LUA_OSLIBNAME) == 0) return luaopen_os;
@@ -60,6 +60,21 @@ static Configuration::ModuleLoad getLuaModuleEntryFunc( const char* name)
 	return 0;
 }
 
+void Configuration::Module::setType()
+{
+	if (m_type == Configuration::Module::Undefined)
+	{
+		m_load = getLuaModuleEntryFunc( m_name.c_str());
+		if (m_load)
+		{
+			m_type = PreloadLib;
+		}
+		else
+		{
+			m_type = Script;
+		}
+	}
+}
 
 bool Configuration::parse( const boost::property_tree::ptree& parentNode, const std::string&)
 {
@@ -71,7 +86,7 @@ bool Configuration::parse( const boost::property_tree::ptree& parentNode, const 
 		if (boost::algorithm::iequals( it->first, "main"))
 		{
 			if ( !config::Parser::getValue( logPrefix().c_str(), *it, name, config::Parser::NonEmptyDomain<std::string>())) return false;
-			m_main = Module( name);
+			m_main = Module( name, Module::Script);
 			cnt_main ++;
 		}
 		else if (boost::algorithm::iequals( it->first, "module"))
@@ -102,14 +117,8 @@ bool Configuration::parse( const boost::property_tree::ptree& parentNode, const 
 
 void Configuration::Module::setCanonicalPath( const std::string& refPath)
 {
-	m_load = getLuaModuleEntryFunc( m_name.c_str());
-	if (m_load)
+	if (m_type == Script)
 	{
-		m_type = PreloadLib;
-	}
-	else
-	{
-		m_type = Script;
 		boost::filesystem::path pt(m_name);
 		if (pt.is_absolute())
 		{
@@ -128,20 +137,17 @@ void Configuration::setCanonicalPathes( const std::string& refPath)
 	m_main.setCanonicalPath( refPath);
 	for (std::list<Module>::iterator it = m_modules.begin(); it != m_modules.end(); it++)
 	{
-		if (it->type() != Module::Undefined)
-		{
-			LOG_ERROR << logPrefix() << ": canonical path set twice, second definition ignored";
-		}
-		else
-		{
-			it->setCanonicalPath( refPath);
-		}
+		it->setCanonicalPath( refPath);
 	}
 }
 
 bool Configuration::Module::load( lua_State* ls) const
 {
-	if (m_load)
+	if (m_type == PreloadLib && m_load)
+	{
+		m_load(ls);
+	}
+	else if (m_type == UserLib)
 	{
 		lua_pushcfunction( ls, m_load);
 		lua_pushstring( ls, m_name.c_str());
@@ -155,10 +161,26 @@ bool Configuration::Module::load( lua_State* ls) const
 	{
 		if (luaL_loadfile( ls, m_path.c_str()))
 		{
-			LOG_ERROR << "Syntax error in lua submodule script " << m_name << ":" << lua_tostring( ls, -1);
+			LOG_ERROR << "Failed to load script '" << m_name << "' from file '" << m_path << "':" << lua_tostring( ls, -1);
 			lua_pop( ls, 1);
 			return false;
 		}
+		// register logging function
+		lua_pushstring( ls, "printlog");
+		lua_pushcfunction( ls, &printLog);
+		lua_settable( ls, LUA_GLOBALSINDEX);
+
+		// call main, we may have to initialize LUA modules there
+		if (lua_pcall( ls, 0, LUA_MULTRET, 0) != 0)
+		{
+			LOG_FATAL << "Unable to call main entry of script: " << lua_tostring( ls, -1 );
+			lua_pop( ls, 1 );
+			throw new std::runtime_error( "Can't initialize LUA processor" );
+		}
+	}
+	else
+	{
+		LOG_WARNING << "Could not load module '" << m_name << "'";
 	}
 	return true;
 }
@@ -168,6 +190,7 @@ bool Configuration::Module::check() const
 	switch (m_type)
 	{
 		case PreloadLib:
+		case UserLib:
 			break;
 		case Script:
 			if (!boost::filesystem::exists( m_path))
@@ -184,6 +207,7 @@ bool Configuration::Module::check() const
 
 bool Configuration::load( lua_State *ls) const
 {
+	luaopen_base( ls);
 	for (std::list<Module>::const_iterator it = m_modules.begin(); it != m_modules.end(); it++)
 	{
 		if (it->type() == Module::PreloadLib)
@@ -198,6 +222,7 @@ bool Configuration::load( lua_State *ls) const
 			if (!it->load( ls)) return false;
 		}
 	}
+	m_main.load( ls);
 	return true;
 }
 

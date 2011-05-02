@@ -15,6 +15,7 @@ INCLUDE_DIRS = \
 	-I$(TOPDIR)/src \
 	-I$(TOPDIR)/examples/pecho \
 	-I$(TOPDIR)/examples/mtproc \
+	-I$(TOPDIR)/examples/iproc \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LDFLAGS = \
@@ -67,6 +68,10 @@ TEST_CPP_BINS += \
 	pechoHandler-gTest$(EXE) \
 	mtprocHandler-gTest$(EXE)
 endif
+ifeq ($(WITH_LUA),1)
+TEST_CPP_BINS += \
+	iprocHandlerTest$(EXE)
+endif
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
@@ -83,7 +88,6 @@ MTPROC_GTEST_OBJS = \
 	$(TOPDIR)/examples/mtproc/dispatcher.o
 mtprocHandler-gTest$(EXE): mtprocHandler-gTest.o $(MTPROC_GTEST_OBJS) $(TOPDIR)/src/libwolframe.a
 	$(CCPP_LINK) -o $@ $(LDFLAGS) $(MTPROC_GTEST_OBJS) $(OBJS) $< $(LIBS)
-
 endif
 
 local_all:
@@ -114,6 +118,10 @@ ifeq ($(WITH_GTEST),1)
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./protocolArgumentParsing-gTest
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./pechoHandler-gTest
+ifeq ($(WITH_LUA),1)
+	@echo
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./iprocHandlerTest
+endif
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./mtprocHandler-gTest
 endif
