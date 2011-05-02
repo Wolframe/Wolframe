@@ -74,14 +74,12 @@ class AuthenticationConfigBase : public config::ConfigurationBase
 private:
 	const AuthenticationType	m_type;
 public:
-	/// constructor a
+	/// constructor
 	AuthenticationConfigBase( const AuthenticationType Type,
 				  const char* name, const char* logParent, const char* logName )
 		: config::ConfigurationBase( name, logParent, logName ),
 		  m_type( Type )
 	{}
-
-	//	AuthenticationConfigBase();
 
 	AuthenticationType type() const		{ return m_type; }
 };
@@ -97,8 +95,6 @@ public:
 		: config::ConfigurationBase( name, logParent, logName ),
 		  m_type( Type )
 	{}
-
-	//	AuditConfigBase();
 
 	AuditType type() const			{ return m_type; }
 };
