@@ -1321,16 +1321,16 @@ AssertionResult CmpHelperEQ(const char* expected_expression,
     return AssertionSuccess();
   }
 
-#ifdef _MSC_VER
-# pragma warning(enable:4389)
-#endif
-
   return EqFailure(expected_expression,
                    actual_expression,
                    FormatForComparisonFailureMessage(expected, actual),
                    FormatForComparisonFailureMessage(actual, expected),
                    false);
 }
+
+#ifdef _MSC_VER
+# pragma warning(pop)          // Restores the warning state.
+#endif
 
 // With this overloaded version, we allow anonymous enums to be used
 // in {ASSERT|EXPECT}_EQ when compiled with gcc 4, as anonymous enums
