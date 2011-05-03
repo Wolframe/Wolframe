@@ -1322,7 +1322,7 @@ AssertionResult CmpHelperEQ(const char* expected_expression,
   }
 
 #ifdef _MSC_VER
-#pragma GCC diagnostic error "-Wsign-compare"
+# pragma warning(enable:4389)
 #endif
 
   return EqFailure(expected_expression,
