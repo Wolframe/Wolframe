@@ -159,9 +159,9 @@ bool Configuration::Module::load( lua_State* ls) const
 	}
 	else if (m_type == Script)
 	{
-		if (luaL_loadfile( ls, m_path.c_str()))
+		if (luaL_loadfile( ls, m_path.empty()?m_name.c_str():m_path.c_str()))
 		{
-			LOG_ERROR << "Failed to load script '" << m_name << "' from file '" << m_path << "':" << lua_tostring( ls, -1);
+			LOG_ERROR << "Failed to load script '" << m_name << "':" << lua_tostring( ls, -1);
 			lua_pop( ls, 1);
 			return false;
 		}
@@ -222,7 +222,7 @@ bool Configuration::load( lua_State *ls) const
 			if (!it->load( ls)) return false;
 		}
 	}
-	m_main.load( ls);
+	if (!m_main.load( ls)) return false;
 	return true;
 }
 

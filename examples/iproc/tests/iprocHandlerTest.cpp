@@ -13,18 +13,23 @@
 #include <boost/lexical_cast.hpp>
 
 using namespace _Wolframe;
+using namespace iproc;
 
-struct TestConfiguration :public AppConfiguration
+struct TestConfiguration :public lua::Configuration
 {
-	TestConfiguration(){}
-	TestConfiguration( const TestConfiguration& o) :AppConfiguration(o){}
+	TestConfiguration()
+		:lua::Configuration( "iproc", "test-iproc"){}
+	TestConfiguration( const TestConfiguration& o) :lua::Configuration(o){}
 	TestConfiguration( int bufferSizeInput, int bufferSizeOutput)
+		:lua::Configuration( "iproc", "test-iproc")
 	{
 		boost::property_tree::ptree pt;
 		pt.put("main", "test.lua");
 		pt.put("input_buffer", boost::lexical_cast<std::string>( bufferSizeOutput));
 		pt.put("output_buffer", boost::lexical_cast<std::string>( bufferSizeInput));
+		setCanonicalPathes( ".");
 		if (!parse( pt, "test")) throw std::logic_error( "Bad Configuration");
+		if (!test()) throw std::logic_error( "Error in Configuration");
 		setCanonicalPathes( ".");
 	}
 };

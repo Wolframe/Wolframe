@@ -60,6 +60,7 @@ OBJS = \
 ifeq ($(WITH_LUA),1)
 OBJS += \
 	langbind/luaLog.o \
+	langbind/luaDebug.o \
 	langbind/luaConfig.o \
 	langbind/luaAppProcessor.o
 endif

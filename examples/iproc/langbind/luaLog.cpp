@@ -31,81 +31,44 @@
 
 ************************************************************************/
 #include "luaLog.hpp"
+#include "luaDebug.hpp"
 #include "logger.hpp"
+#include <string>
 
-extern "C" {
+extern "C"
+{
+#include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
-#include "lua.h"
 }
 
 using namespace _Wolframe;
 using namespace iproc;
 using namespace lua;
 
-// Aba: for snprintf, maybe better to use ostringstream?
-#ifndef _WIN32
-#define __STDC_FORMAT_MACROS
-#include <cstdio>
-#include <inttypes.h>
-#else
-#define snprintf _snprintf
-#define PRIxPTR "%p"
-#endif
-
 int _Wolframe::iproc::lua::printLog( lua_State *ls)
 {
 	/* first parameter maps to a log level, rest gets printed depending on
 	 * whether it's a string or a number
 	 */
-	const char *logLevel = luaL_checkstring( ls, 1 );
+	int ii,nn = lua_gettop(ls);
+	if (nn <= 0) luaL_error( ls, "no arguments passed to logger");
 
-	std::ostringstream os;
-	int n = lua_gettop( ls ) - 1;
-	int i = 2;
-	for( ; n--; i++ ) {
-		int type = lua_type( ls, i );
+	const char *logLevel = luaL_checkstring( ls, 1);
+	std::string logmsg;
 
-		switch( type ) {
-		case LUA_TNIL:
-			os << "nil";
-			break;
-
-		case LUA_TSTRING: {
-			const char *v = lua_tostring( ls, i );
-			os << v;
-		}
-		break;
-
-		case LUA_TNUMBER: {
-			lua_Number v = lua_tonumber( ls, i );
-			os << v;
-		}
-		break;
-
-		case LUA_TFUNCTION: {
-			lua_CFunction f = lua_tocfunction( ls, i );
-			char buf[33];
-			snprintf( buf, 32, "function[%016" PRIxPTR "]", (uintptr_t)f );
-			os << buf;
-		}
-		break;
-
-		case LUA_TTABLE:
-			// TODO
-
-		default:
-			os << "<unknown>";
+	for (ii=2; ii<=nn; ii++)
+	{
+		if (!getDescription( ls, ii, logmsg))
+		{
+			luaL_error( ls, "failed to map printLog arguments to a string");
 		}
 	}
 
 	_Wolframe::log::Logger( _Wolframe::log::LogBackend::instance() ).Get(
 				_Wolframe::log::LogLevel::strToLogLevel( logLevel ) )
 		<< _Wolframe::log::LogComponent::LogLua
-		<< os.str( );
-
-	lua_pop( ls, n );
-
+		<< logmsg;
 	return 0;
 }
 
