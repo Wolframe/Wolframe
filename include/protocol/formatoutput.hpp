@@ -114,14 +114,19 @@ struct FormatOutput
 	}
 
 	/// \brief Get the current cursor position as pointer for the next print
+	/// \return the current cursor position (where to print the next element to)
 	void* cur() const			{return (void*)((char*)m_ptr+m_pos);}
 	/// \brief Get the size of the buffer left for printing the next element
+	/// \return the size of the buffer left for printing
 	size_type restsize() const		{return (m_pos<m_size)?(m_size-m_pos):0;}
 	/// \brief Get the current cursor position
+	/// \return the cursor position
 	size_type pos() const			{return m_pos;}
 	/// \brief Get the allocation size of the buffer
+	/// \return the buffer size allocated
 	size_type size() const			{return m_size;}
 	/// \brief Get the pointer to the start of the buffer
+	/// \return the buffer start 
 	void* ptr() const			{return m_ptr;}
 	/// \brief Shift current cursor poition by some bytes
 	/// \param [in] n number of bytes to shift
@@ -136,6 +141,7 @@ struct FormatOutput
 	virtual bool print( ElementType type, const void* element, size_type elementsize)=0;
 
 	/// \brief Get error code in case of error state
+	/// \return the error code
 	int getError() const			{return m_errorCode;}
 
 	/// \brief Set format output state with error code

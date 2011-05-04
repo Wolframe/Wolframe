@@ -86,10 +86,11 @@ local_distclean:
 
 local_install:
 
-local_test: $(TEST_BINS)
-	cd tests
+local_test:
 
-# DISABLED UNTIL THEY WORK: && ./iprocHandlerTest$(EXE)
+# DISABLED UNTIL THEY WORK:
+# local_test: $(TEST_BINS)
+#	cd tests && ./iprocHandlerTest$(EXE)
 
 run: $(CPP_BINS)
 	@echo "Running the Wolframe iproc example..."

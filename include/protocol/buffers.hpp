@@ -72,13 +72,19 @@ public:
 	///\brief Clear the buffer content
 	void clear()				{m_pos=0;}
 	///\brief Append one character
+	///\param[in] ch the character to append
 	void push_back( char ch)		{if (m_pos<Size) m_buf[m_pos++]=ch;}
 	///\brief Append a 0-terminated string
+	///\param[in] cc the string to append
 	void append( const char* cc)		{unsigned int ii=0; while(m_pos<Size && cc[ii]) m_buf[m_pos++]=cc[ii++];}
 	///\brief Return the number of characters in the buffer
+	///\return the number of characters (bytes)
 	size_type size() const			{return m_pos;}
 	///\brief Return the buffer content as 0-terminated string
+	///\return the C-string
 	const char* c_str()			{m_buf[m_pos]=0; return m_buf;}
+	///\brief cast operator for direct access
+	///\return the C-string
 	operator const char*()			{return c_str();};
 };
 
@@ -127,14 +133,14 @@ private:
 
 public:
 	/// \brief Constructor
-	/// \param [in] c buffer to use for the content passed by reference (owned by the caller, but used by this class)
+	/// \param[in] c buffer to use for the content passed by reference (owned by the caller, but used by this class)
 	CArgBuffer( Buffer* c)				:m_pos(0),m_state(Empty),m_content(c) {m_buf[0]=0;m_sbuf[0]=0;}
 
 	/// \brief Clear the buffer content
 	void clear()					{m_pos=0;m_buf[0]=0;m_sbuf[0]=0;m_content->clear();}
 
 	/// \brief Add the next character of the parsed content
-	/// \param [in] ch character to process next
+	/// \param[in] ch character to process next
 	void push_back( char ch)
 	{
 		switch (m_state)
@@ -208,16 +214,18 @@ public:
 	};
 
 	/// \brief Number of tokens parsed
+	/// \return the number of tokens in the array parsed
 	unsigned int size() const				{return m_pos;}
 
 	/// \brief Get the element with index 'idx' or 0, if it does not exist
-	/// \param [in] idx index of the argument to get
+	/// \param[in] idx index of the argument to get
 	/// \return the argument with index idx counted from 0
 	const char* operator[]( unsigned int idx) const		{return (idx<m_pos)?m_content->c_str()+m_buf[idx]:0;}
 
 	/// \brief Return a 0-terminated array of 0-terminated strings as convenient in C for program arguments
-	/// \param [in] cmdname optional command name to return as first element of the array as convenient for C argc/argv
+	/// \param[in] cmdname optional command name to return as first element of the array as convenient for C argc/argv
 	/// \remark the return value of this function may not be valid anymore after a new call of push_back. So it should only be used after parsing
+	/// \return array of arguments up to 'Size' (with or without the command itself as in C argc/argv)
 	const char** argv( const char* cmdname=0)
 	{
 		if (m_sbuf[0]==0)
@@ -235,6 +243,8 @@ public:
 	}
 
 	/// \brief Synonym of size. Convenient in C for the number of program arguments
+	/// \param[in] cmdname (optional) name of the command to include as first element of the argument array (and therefore to add to the count returned) 
+	/// \return number of arguments (with or without the command itself as in C argc/argv)
 	unsigned int argc( const char* cmdname=0)		{(void)argv(cmdname); return m_pos;}
 };
 
