@@ -56,7 +56,7 @@ namespace db	{
 
 //***  PostgreSQL functions  ********************************************
 PostgreSQLconfig::PostgreSQLconfig( const char* cfgName, const char* logParent, const char* logName )
-	: DatabaseConfigBase( DBTYPE_POSTGRESQL, cfgName, logParent, logName )
+	: DatabaseConfig( DBTYPE_POSTGRESQL, cfgName, logParent, logName )
 {
 	port = 0;
 	connections = 0;
@@ -152,7 +152,7 @@ bool PostgreSQLconfig::parse( const boost::property_tree::ptree& pt, const std::
 
 //***  SQLite functions  ************************************************
 SQLiteConfig::SQLiteConfig( const char* name, const char* logParent, const char* logName )
-	: DatabaseConfigBase( DBTYPE_SQLITE, name, logParent, logName )
+	: DatabaseConfig( DBTYPE_SQLITE, name, logParent, logName )
 {
 	flag = false;
 }
@@ -231,7 +231,7 @@ void SQLiteConfig::setCanonicalPathes( const std::string& refPath )
 //***  Generic database functions  **************************************
 Configuration::~Configuration()
 {
-	for ( std::list<DatabaseConfigBase*>::const_iterator it = dbConfig_.begin();
+	for ( std::list<DatabaseConfig*>::const_iterator it = dbConfig_.begin();
 								it != dbConfig_.end(); it++ )
 		delete *it;
 }
@@ -240,7 +240,7 @@ void Configuration::print( std::ostream& os, size_t /* indent */ ) const
 {
 	os << sectionName() << std::endl;
 	if ( dbConfig_.size() > 0 )	{
-		for ( std::list<DatabaseConfigBase*>::const_iterator it = dbConfig_.begin();
+		for ( std::list<DatabaseConfig*>::const_iterator it = dbConfig_.begin();
 								it != dbConfig_.end(); it++ )	{
 			(*it)->print( os, 3 );
 		}
@@ -254,7 +254,7 @@ void Configuration::print( std::ostream& os, size_t /* indent */ ) const
 bool Configuration::check() const
 {
 	bool correct = true;
-	for ( std::list<DatabaseConfigBase*>::const_iterator it = dbConfig_.begin();
+	for ( std::list<DatabaseConfig*>::const_iterator it = dbConfig_.begin();
 								it != dbConfig_.end(); it++ )	{
 		if ( !(*it)->check() )
 			correct = false;
@@ -295,10 +295,72 @@ bool Configuration::parse( const boost::property_tree::ptree& pt, const std::str
 
 void Configuration::setCanonicalPathes( const std::string& refPath )
 {
-	for ( std::list<DatabaseConfigBase*>::const_iterator it = dbConfig_.begin();
+	for ( std::list<DatabaseConfig*>::const_iterator it = dbConfig_.begin();
 								it != dbConfig_.end(); it++ )	{
 		(*it)->setCanonicalPathes( refPath );
 	}
+}
+
+
+SingleDBConfiguration::~SingleDBConfiguration()
+{
+	if ( m_dbConfig )
+		delete m_dbConfig;
+}
+
+void SingleDBConfiguration::print( std::ostream& os, size_t indent ) const
+{
+	os << sectionName() << std::endl;
+	if ( m_dbConfig )	{
+		m_dbConfig->print( os, indent + 3 );
+	}
+	else
+		os << "   None configured" << std::endl;
+}
+
+
+/// Check if the database configuration makes sense
+bool SingleDBConfiguration::check() const
+{
+	if ( m_dbConfig )
+		return m_dbConfig->check();
+	return false;
+}
+
+bool SingleDBConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& /* nodeName */ )
+{
+	using namespace _Wolframe::config;
+	bool retVal = true;
+
+	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
+		if ( boost::algorithm::iequals( L1it->first, "PostgreSQL" ))	{
+			PostgreSQLconfig* cfg = new PostgreSQLconfig( "PostgreSQL server", logPrefix().c_str(), "PostgreSQL" );
+			if ( cfg->parse( L1it->second, L1it->first ))
+				m_dbConfig = cfg;
+			else	{
+				delete cfg;
+				retVal = false;
+			}
+		}
+		else if ( boost::algorithm::iequals( L1it->first, "SQLite" ))	{
+			SQLiteConfig* cfg = new SQLiteConfig( "SQLite database", logPrefix().c_str(), "SQLite" );
+			if ( cfg->parse( L1it->second, L1it->first ))
+				m_dbConfig = cfg;
+			else	{
+				delete cfg;
+				retVal = false;
+			}
+		}
+		else
+			LOG_WARNING << logPrefix() << ": unknown configuration option: '"
+				    << L1it->first << "'";
+	}
+	return retVal;
+}
+
+void SingleDBConfiguration::setCanonicalPathes( const std::string& refPath )
+{
+	m_dbConfig->setCanonicalPathes( refPath );
 }
 
 }} // namespace _Wolframe::db

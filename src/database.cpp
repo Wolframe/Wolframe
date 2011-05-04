@@ -52,17 +52,19 @@ DatabaseType Database::strToType( const char *str )
 {
 	if ( boost::algorithm::iequals( str, "PostgreSQL" ))	return DBTYPE_POSTGRESQL;
 	else if ( boost::algorithm::iequals( str, "SQLite" ))	return DBTYPE_SQLITE;
+	else if ( boost::algorithm::iequals( str, "Reference" ))return DBTYPE_REFERENCE;
 	else return DBTYPE_UNKNOWN;
 }
 
 std::string& Database::typeToStr( DatabaseType type )
 {
-	static std::string	retVal[ 3 ] = { "PostgreSQL", "SQLite", "UNKNOWN" };
+	static std::string	retVal[ 4 ] = { "Reference to database", "PostgreSQL", "SQLite", "UNKNOWN" };
 	switch ( type )	{
-	case DBTYPE_POSTGRESQL:	return retVal[0];
-	case DBTYPE_SQLITE:	return retVal[1];
+	case DBTYPE_REFERENCE:	return retVal[0];
+	case DBTYPE_POSTGRESQL:	return retVal[1];
+	case DBTYPE_SQLITE:	return retVal[2];
 	case DBTYPE_UNKNOWN:
-	default:		return retVal[2];
+	default:		return retVal[3];
 	}
 }
 

@@ -193,7 +193,6 @@ src/AAAA/authentication_sasl.hpp
 src/AAAA/authentication_textfile.cpp
 src/AAAA/authentication_textfile.hpp
 src/AAAA/authenticator.cpp
-src/AAAA/authorizer.cpp
 src/acceptor.cpp
 src/acceptor.hpp
 src/appConfig.cpp

@@ -145,7 +145,7 @@ public:
 	void setCanonicalPathes( const std::string& referencePath );
 
 private:
-	std::string	file;
+	std::string	m_file;
 };
 
 
@@ -155,7 +155,7 @@ public:
 	DatabaseAuditConfig( const char* cfgName, const char* logParent, const char* logName )
 		: AuditConfigBase( AUDIT_FILE, cfgName, logParent, logName )
 	{}
-	// ~DatabaseAuditConfig();
+	~DatabaseAuditConfig();
 
 	/// methods
 	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
@@ -172,6 +172,7 @@ class AuditConfiguration : public config::ConfigurationBase
 public:
 	/// constructor
 	AuditConfiguration( const char* cfgName, const char* logParent, const char* logName );
+	~AuditConfiguration();
 
 	/// methods
 	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
@@ -208,18 +209,15 @@ public:
 	// bool test() const;	// Not implemented yet, inherited from base
 };
 
+
 class AAAAprovider
 {
 public:
 	AAAAprovider( const Configuration& conf );
-
-	const Authenticator& authenticator()	{ return authenticator_; }
-	const Authorizer& authorizer()		{ return authorizer_; }
-	const Auditor& auditor()		{ return auditor_; }
+	~AAAAprovider();
 private:
-	const Authenticator	authenticator_;
-	const Authorizer	authorizer_;
-	const Auditor		auditor_;
+	std::list<Authenticator*>	m_authenticators;
+	std::list<Auditor*>		m_auditors;
 };
 
 }} // namespace _Wolframe::AAAA

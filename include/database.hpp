@@ -46,30 +46,32 @@ namespace db	{
 
 /// database type
 enum DatabaseType	{
+	DBTYPE_REFERENCE,
 	DBTYPE_POSTGRESQL,
 	DBTYPE_SQLITE,
 	DBTYPE_UNKNOWN
 };
 
 
-class	DatabaseConfigBase : public config::ConfigurationBase
+class	DatabaseConfig : public _Wolframe::config::ConfigurationBase
 {
 public:
-	DatabaseConfigBase( DatabaseType Type,
-			    const char* name, const char* logParent, const char* logName )
-		: ConfigurationBase( name, logParent, logName ), type_( Type )	{}
-//	virtual ~DatabaseConfigBase();
-	DatabaseType type() const			{ return type_; }
-	void ID( const std::string& id )		{ ID_ = id; }
-	const std::string& ID() const			{ return ID_; }
+	DatabaseConfig( DatabaseType Type,
+			const char* name, const char* logParent, const char* logName )
+		: ConfigurationBase( name, logParent, logName ), m_type( Type )  {}
+//     virtual ~DatabaseConfigBase();
+
+	DatabaseType type() const			{ return m_type; }
+	void ID( const std::string& id )		{ m_ID = id; }
+	const std::string& ID() const			{ return m_ID; }
 private:
-	const DatabaseType	type_;
-	std::string		ID_;
+	const DatabaseType	m_type;
+	std::string		m_ID;
 };
 
 
 /// PostgreSQL server connection configuration
-struct	PostgreSQLconfig : public DatabaseConfigBase
+struct	PostgreSQLconfig : public DatabaseConfig
 {
 	std::string	host;
 	unsigned short	port;
@@ -87,7 +89,7 @@ public:
 
 
 /// SQLite database configuration
-struct	SQLiteConfig : public DatabaseConfigBase
+struct	SQLiteConfig : public DatabaseConfig
 {
 	std::string	filename;
 	bool		flag;
@@ -101,12 +103,13 @@ public:
 
 
 /// database reference class
-class DatabaseConfigReference	{
+class ReferenceConfig : public DatabaseConfig
+{
 public:
-	DatabaseConfigReference( const std::string& name ) : m_id( name )	{}
-	const std::string& DBid() const				{ return m_id; }
-private:
-	const std::string	m_id;
+	ReferenceConfig(const char* name, const char* logParent, const char* logName );
+	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
+	bool check() const;
+	void print( std::ostream& os, size_t indent ) const;
 };
 
 
@@ -114,10 +117,10 @@ private:
 struct Configuration : public _Wolframe::config::ConfigurationBase
 {
 public:
-	std::list<DatabaseConfigBase*>	dbConfig_;
+	std::list<DatabaseConfig*>	dbConfig_;
 
 	/// constructor & destructor
-	Configuration() : _Wolframe::config::ConfigurationBase( "Database(s)", NULL, "Database configuration" )	{}
+	Configuration() : ConfigurationBase( "Database(s)", NULL, "Database configuration" )	{}
 	~Configuration();
 
 	/// methods
@@ -130,6 +133,23 @@ public:
 //	bool test() const;
 };
 
+struct SingleDBConfiguration : public _Wolframe::config::ConfigurationBase
+{
+public:
+	DatabaseConfig*	m_dbConfig;
+
+	/// constructor & destructor
+	SingleDBConfiguration( const char* name, const char* logParent, const char* logName )
+		: ConfigurationBase( name, logParent, logName )	{}
+	~SingleDBConfiguration();
+
+	/// methods
+	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
+	bool check() const;
+	void print( std::ostream& os, size_t indent ) const;
+	virtual void setCanonicalPathes( const std::string& referencePath );
+};
+
 
 /// database base class
 class Database	{
@@ -137,6 +157,10 @@ public:
 	Database( Configuration& config );
 	static DatabaseType strToType( const char *str );
 	static std::string& typeToStr( DatabaseType type );
+
+	const std::string& ID() const	{ return m_id; }
+private:
+	const std::string	m_id;
 };
 
 }} // namespace _Wolframe::db

@@ -120,7 +120,6 @@ AAAA_OBJS = \
 	AAAA/authentication_textfile.o \
 	AAAA/AAAAprovider.o \
 	AAAA/authenticator.o \
-	AAAA/authorizer.o \
 	AAAA/auditor.o
 
 ifeq ($(WITH_PAM),1)

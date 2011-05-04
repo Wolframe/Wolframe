@@ -48,10 +48,17 @@ namespace AAAA {
 
 
 AAAAprovider::AAAAprovider( const Configuration& /* conf */ )
-	: authenticator_(),
-	  authorizer_(),
-	  auditor_()
 {
+}
+
+AAAAprovider::~AAAAprovider()
+{
+	for ( std::list<Authenticator*>::const_iterator it = m_authenticators.begin();
+								it != m_authenticators.end(); it++ )
+		delete *it;
+	for ( std::list<Auditor*>::const_iterator it = m_auditors.begin();
+								it != m_auditors.end(); it++ )
+		delete *it;
 }
 
 

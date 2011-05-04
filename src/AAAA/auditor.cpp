@@ -35,10 +35,91 @@
 //
 
 #include "logger.hpp"
+#include "config/valueParser.hpp"
 #include "AAAAprovider.hpp"
+#include "database.hpp"
+
+#include "boost/algorithm/string.hpp"
+#define BOOST_FILESYSTEM_VERSION 3
+#include <boost/filesystem.hpp>
+#include "miscUtils.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
+
+bool FileAuditConfig::parse( const boost::property_tree::ptree& pt, const std::string& node )
+{
+	using namespace _Wolframe::config;
+	bool retVal = true;
+
+	if ( boost::algorithm::iequals( node, "file" ) || boost::algorithm::iequals( node, "filename" ))	{
+		bool isDefined = ( ! m_file.empty() );
+		if ( !Parser::getValue( logPrefix().c_str(), node.c_str(),
+					pt.get_value<std::string>(), m_file, &isDefined ))
+			retVal = false;
+		else	{
+			if ( ! boost::filesystem::path( m_file ).is_absolute() )
+				LOG_WARNING << logPrefix() << ": audit file path is not absolute: "
+					    << m_file;
+		}
+	}
+	else	{
+		LOG_WARNING << logPrefix() << ": unknown configuration option: '" << node << "'";
+	}
+	return retVal;
+}
+
+bool FileAuditConfig::check() const
+{
+	if ( m_file.empty() )	{
+		LOG_ERROR << logPrefix() << "Audit filename cannot be empty";
+		return false;
+	}
+	return true;
+}
+
+void FileAuditConfig::print( std::ostream& os, size_t indent ) const
+{
+	std::string indStr( indent, ' ' );
+
+	os << indStr << sectionName() << ": " << m_file << std::endl;
+}
+
+void FileAuditConfig::setCanonicalPathes( const std::string& refPath )
+{
+	using namespace boost::filesystem;
+
+	if ( ! m_file.empty() )	{
+		if ( ! path( m_file ).is_absolute() )
+			m_file = resolvePath( absolute( m_file,
+							path( refPath ).branch_path()).string());
+		else
+			m_file = resolvePath( m_file );
+	}
+}
+
+
+DatabaseAuditConfig::~DatabaseAuditConfig()
+{
+}
+
+bool DatabaseAuditConfig::parse( const boost::property_tree::ptree& /*pt*/, const std::string& /*node*/ )
+{
+	return true;
+}
+
+bool DatabaseAuditConfig::check() const
+{
+	return true;
+}
+
+void DatabaseAuditConfig::print( std::ostream& /*os*/, size_t /*indent*/ ) const
+{
+}
+
+void DatabaseAuditConfig::setCanonicalPathes( const std::string& /*referencePath*/ )
+{
+}
 
 /// constructor
 AuditConfiguration::AuditConfiguration( const char* cfgName, const char* logParent, const char* logName )
@@ -46,26 +127,81 @@ AuditConfiguration::AuditConfiguration( const char* cfgName, const char* logPare
 {
 }
 
-/// methods
-bool AuditConfiguration::parse( const boost::property_tree::ptree& /*pt*/, const std::string& /*node*/ )
+AuditConfiguration::~AuditConfiguration()
 {
-	return true;
+	for ( std::list<AuditConfigBase*>::const_iterator it = m_auditConfig.begin();
+								it != m_auditConfig.end(); it++ )
+		delete *it;
 }
+
+
+/// methods
+bool AuditConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& /*nodeName*/ )
+{
+	using namespace _Wolframe::config;
+	bool retVal = true;
+
+	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
+		if ( boost::algorithm::iequals( L1it->first, "file" ))	{
+			FileAuditConfig* cfg = new FileAuditConfig( "File", logPrefix().c_str(), "file" );
+			if ( cfg->parse( L1it->second, L1it->first ))
+				m_auditConfig.push_back( cfg );
+			else	{
+				delete cfg;
+				retVal = false;
+			}
+		}
+		else if ( boost::algorithm::iequals( L1it->first, "database" ))	{
+			DatabaseAuditConfig* cfg = new DatabaseAuditConfig( "Database", logPrefix().c_str(), "database" );
+			if ( cfg->parse( L1it->second, L1it->first ))
+				m_auditConfig.push_back( cfg );
+			else	{
+				delete cfg;
+				retVal = false;
+			}
+		}
+		else
+			LOG_WARNING << logPrefix() << ": unknown configuration option: '"
+				    << L1it->first << "'";
+	}
+	return retVal;
+}
+
 
 bool AuditConfiguration::check() const
 {
-	return true;
+	bool correct = true;
+	for ( std::list<AuditConfigBase*>::const_iterator it = m_auditConfig.begin();
+								it != m_auditConfig.end(); it++ )	{
+		if ( !(*it)->check() )
+			correct = false;
+	}
+	return correct;
 }
+
 
 void AuditConfiguration::print( std::ostream& os, size_t indent ) const
 {
 	std::string indStr( indent, ' ' );
 
 	os << indStr << sectionName() << ":" << std::endl;
+	if ( m_auditConfig.size() > 0 )	{
+		for ( std::list<AuditConfigBase*>::const_iterator it = m_auditConfig.begin();
+								it != m_auditConfig.end(); it++ )	{
+			(*it)->print( os, indent + 3 );
+		}
+	}
+	else
+		os << "   None configured" << std::endl;
 }
 
-void AuditConfiguration::setCanonicalPathes( const std::string& /*referencePath*/ )
+
+void AuditConfiguration::setCanonicalPathes( const std::string& referencePath )
 {
+	for ( std::list<AuditConfigBase*>::const_iterator it = m_auditConfig.begin();
+								it != m_auditConfig.end(); it++ )	{
+		(*it)->setCanonicalPathes( referencePath );
+	}
 }
 
 }} // namespace _Wolframe::AAAA
