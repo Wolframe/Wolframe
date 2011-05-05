@@ -31,14 +31,13 @@
 
 ************************************************************************/
 //
-// AAAA provider
+// auditing objects
 //
 
-#ifndef _AAAA_PROVIDER_HPP_INCLUDED
-#define _AAAA_PROVIDER_HPP_INCLUDED
+#ifndef _AUDITOR_HPP_INCLUDED
+#define _AUDITOR_HPP_INCLUDED
 
 #include "configurationBase.hpp"
-#include "auditor.hpp"
 #include "database.hpp"
 
 #include <string>
@@ -47,45 +46,82 @@
 namespace _Wolframe {
 namespace AAAA {
 
-class User
-{
-public:
-	User();
+
+enum AuditType	{
+	AUDIT_FILE,		///< Standard text file auditing (list of entries)
+	AUDIT_DATABASE,		///< Database audit entries
+	AUDIT_UNKNOWN		///< Unknown method (i.e. none)
 };
 
-
-/// Authentication type
-enum AuthenticationType	{
-	AUTH_WOLFRAME,		///< Wolframe proprietary authentification
-	AUTH_PAM,		///< *NIX PAM authentification
-	AUTH_SASL,		///< SASL authentification (Cyrus SASL)
-	AUTH_LDAP,		///< LDAP authentification
-	AUTH_UNKNOWN		///< Unknown authentification (i.e. none)
-};
-
-
-class AuthenticationConfigBase : public config::ConfigurationBase
+class AuditConfigBase : public config::ConfigurationBase
 {
 private:
-	const AuthenticationType	m_type;
+	const AuditType	m_type;
 public:
 	/// constructor
-	AuthenticationConfigBase( const AuthenticationType Type,
-				  const char* name, const char* logParent, const char* logName )
+	AuditConfigBase( const AuditType Type,
+			 const char* name, const char* logParent, const char* logName )
 		: config::ConfigurationBase( name, logParent, logName ),
 		  m_type( Type )
 	{}
 
-	AuthenticationType type() const		{ return m_type; }
+	AuditType type() const			{ return m_type; }
 };
 
 
-class AuthenticationConfiguration : public config::ConfigurationBase
+class FileAuditConfig : public AuditConfigBase
+{
+	friend class FileAuditor;
+public:
+	FileAuditConfig( const char* cfgName, const char* logParent, const char* logName )
+		: AuditConfigBase( AUDIT_FILE, cfgName, logParent, logName )
+	{}
+	// ~FileAuditConfig();
+
+	/// methods
+	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
+	bool check() const;
+	void print( std::ostream& os, size_t indent ) const;
+	void setCanonicalPathes( const std::string& referencePath );
+
+private:
+	std::string	m_file;
+};
+
+
+class DatabaseAuditConfig : public AuditConfigBase
+{
+	friend class DatabaseAuditor;
+public:
+	DatabaseAuditConfig( const char* cfgName, const char* logParent, const char* logName )
+		: AuditConfigBase( AUDIT_DATABASE, cfgName, logParent, logName ),
+		  m_dbConfig( "", logParent, "" )	{}
+
+	/// methods
+	bool parse( const boost::property_tree::ptree& pt, const std::string& node )
+								{ return m_dbConfig.parse( pt, node ); }
+	bool check() const					{ return m_dbConfig.check(); }
+	void print( std::ostream& os, size_t indent ) const	{
+		std::string indStr( indent, ' ' );
+		os << indStr << sectionName() << ": " << std::endl;
+		m_dbConfig.print( os, indent + 3 );
+	}
+
+	void setCanonicalPathes( const std::string& refPath )	{ m_dbConfig.setCanonicalPathes( refPath ); }
+
+private:
+	db::SingleDBConfiguration	m_dbConfig;
+};
+
+
+class AuditConfiguration : public config::ConfigurationBase
 {
 	friend class AAAAprovider;
 public:
 	/// constructor
-	AuthenticationConfiguration( const char* cfgName, const char* logParent, const char* logName );
+	AuditConfiguration( const char* cfgName, const char* logParent, const char* logName )
+		: config::ConfigurationBase( cfgName, logParent, logName )	{}
+	~AuditConfiguration();
 
 	/// methods
 	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
@@ -95,53 +131,36 @@ public:
 
 	// bool test() const;	// Not implemented yet, inherited from base
 private:
-	std::list<AuthenticationConfigBase*>	m_config;
-};
-
-class Authenticator
-{
-public:
-	//		Authenticator( AuthenticatorConfiguration& conf );
+	std::list<AuditConfigBase*>	m_config;
 };
 
 
-class Authorizer
+class Auditor
 {
 public:
+	virtual bool resolveDB( db::DBprovider& /*db*/ )	{ return true; }
 };
 
 
-struct Configuration : public config::ConfigurationBase
+class FileAuditor : public Auditor
 {
-	friend class AAAAprovider;
 public:
-	/// constructor
-	Configuration();
-
-	/// methods
-	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
-	bool check() const;
-	void print( std::ostream& os, size_t indent ) const;
-	void setCanonicalPathes( const std::string& referencePath );
-
-	// bool test() const;	// Not implemented yet, inherited from base
+	FileAuditor( FileAuditConfig& config );
 private:
-	AuthenticationConfiguration	auth;
-	AuditConfiguration		audit;
+	std::string	m_file;
 };
 
 
-class AAAAprovider
+class DatabaseAuditor : public Auditor
 {
 public:
-	AAAAprovider( const Configuration& conf );
-	~AAAAprovider();
+	DatabaseAuditor( DatabaseAuditConfig& config );
 	bool resolveDB( db::DBprovider& db );
 private:
-	std::list<Authenticator*>	m_authenticators;
-	std::list<Auditor*>		m_auditors;
+	std::string	m_dbLabel;
+	db::Database*	m_db;
 };
 
 }} // namespace _Wolframe::AAAA
 
-#endif // _AAAA_PROVIDER_HPP_INCLUDED
+#endif // _AUDITOR_HPP_INCLUDED

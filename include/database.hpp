@@ -103,16 +103,15 @@ public:
 
 
 /// database reference class
-class ReferenceConfig : public DatabaseConfig
+struct ReferenceConfig : public DatabaseConfig
 {
+	std::string	m_ref;
 public:
 	ReferenceConfig( const char* name, const char* logParent, const char* logName )
 		: DatabaseConfig( DBTYPE_REFERENCE, name, logParent, logName )	{}
 	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
-private:
-	std::string	m_ref;
 };
 
 
@@ -188,7 +187,7 @@ public:
 	DBprovider( const Configuration& config );
 	~DBprovider();
 
-	const Database* database( std::string& ID ) const;
+	Database* database( std::string& ID ) const;
 
 private:
 	std::list<Database*>	m_db;

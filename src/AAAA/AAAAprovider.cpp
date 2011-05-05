@@ -47,8 +47,26 @@ namespace _Wolframe {
 namespace AAAA {
 
 
-AAAAprovider::AAAAprovider( const Configuration& /* conf */ )
+AAAAprovider::AAAAprovider( const Configuration& config )
 {
+	for ( std::list<AuditConfigBase*>::const_iterator it = config.audit.m_config.begin();
+							it != config.audit.m_config.end(); it++ )	{
+		switch( (*it)->type() )	{
+		case AUDIT_FILE:	{
+			FileAuditor* auditor = new FileAuditor( static_cast<FileAuditConfig&>(**it) );
+			m_auditors.push_back( auditor );
+		}
+			break;
+		case AUDIT_DATABASE:	{
+			DatabaseAuditor* auditor = new DatabaseAuditor( static_cast<DatabaseAuditConfig&>(**it) );
+			m_auditors.push_back( auditor );
+		}
+			break;
+		case AUDIT_UNKNOWN:
+		default:
+			throw std::domain_error( "Unknown auditing mechanism type in AAAAprovider constructor" );
+		}
+	}
 }
 
 AAAAprovider::~AAAAprovider()
@@ -59,6 +77,15 @@ AAAAprovider::~AAAAprovider()
 	for ( std::list<Auditor*>::const_iterator it = m_auditors.begin();
 								it != m_auditors.end(); it++ )
 		delete *it;
+}
+
+bool AAAAprovider::resolveDB( db::DBprovider& db )
+{
+	for ( std::list<Auditor*>::const_iterator it = m_auditors.begin();
+								it != m_auditors.end(); it++ )
+		if ( ! (*it)->resolveDB( db ) )
+			return false;
+	return true;
 }
 
 

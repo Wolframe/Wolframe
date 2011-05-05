@@ -94,6 +94,7 @@ DBprovider::DBprovider( const Configuration& config )
 			break;
 		case DBTYPE_REFERENCE:
 			throw std::domain_error( "Database reference in DBprovider constructor" );
+		case DBTYPE_UNKNOWN:
 		default:
 			throw std::domain_error( "Unknown database type in DBprovider constructor" );
 		}
@@ -108,7 +109,7 @@ DBprovider::~DBprovider()
 }
 
 
-const Database* DBprovider::database( std::string& id ) const
+Database* DBprovider::database( std::string& id ) const
 {
 	for ( std::list<Database*>::const_iterator it = m_db.begin(); it != m_db.end(); it++ )	{
 		if ( (*it)->ID() == id )

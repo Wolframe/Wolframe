@@ -235,12 +235,20 @@ bool ReferenceConfig::parse( const boost::property_tree::ptree& pt, const std::s
 	if ( !config::Parser::getValue( logPrefix().c_str(), node.c_str(),
 					pt.get_value<std::string>(), m_ref, &labelDefined ))
 		return false;
+	if ( m_ref.empty() )	{
+		LOG_ERROR << logPrefix() << "Database reference label is empty";
+		return false;
+	}
 	return true;
 }
 
 bool ReferenceConfig::check() const
 {
-	return m_ref.empty() ? false : true;
+	if ( m_ref.empty() )	{
+		LOG_ERROR << "Database reference label is empty";
+		return false;
+	}
+	return true;
 }
 
 void ReferenceConfig::print( std::ostream& os, size_t indent ) const
@@ -359,7 +367,6 @@ bool SingleDBConfiguration::parse( const boost::property_tree::ptree& pt, const 
 	bool retVal = true;
 
 	std::string label = pt.get_value<std::string>();
-	std::cout << "DB REFERENCE: '" << label << "'" << std::endl;
 	if ( ! label.empty() )	{
 		ReferenceConfig* cfg = new ReferenceConfig( "Reference", logPrefix().c_str(), "reference" );
 		if ( cfg->parse( pt, nodeName ))
@@ -402,6 +409,12 @@ bool SingleDBConfiguration::parse( const boost::property_tree::ptree& pt, const 
 			}
 		}
 	}
+
+	if ( ! m_dbConfig )	{
+		LOG_ERROR << logPrefix() << ": database label without definition";
+		retVal = false;
+	}
+
 	return retVal;
 }
 

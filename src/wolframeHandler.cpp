@@ -253,8 +253,11 @@ wolframeHandler::wolframeHandler( const HandlerConfiguration* config )
 	  m_aaaa( *(config->aaaa))
 {
 	LOG_TRACE << "Global context: banner: <" << m_banner << ">";
-	m_aaaa.resolveDB( m_db );
-	LOG_TRACE << "AAAA database refernces resolved";
+	if ( ! m_aaaa.resolveDB( m_db ) )	{
+		LOG_FATAL << "Cannot resolve database references for AAAA services";
+		exit( 1 );
+	}
+	LOG_TRACE << "AAAA database references resolved";
 }
 
 wolframeHandler::~wolframeHandler()
