@@ -248,12 +248,13 @@ void wolframeConnection::errorOccured( NetworkSignal signal )
 
 /// The server handler global context
 wolframeHandler::wolframeHandler( const HandlerConfiguration* config )
-	: banner_( config->banner->toString() ),
-	  db_( *(config->database)),
-	  aaaa_( *(config->aaaa))
+	: m_banner( config->banner->toString() ),
+	  m_db( *(config->database)),
+	  m_aaaa( *(config->aaaa))
 {
-	//		banner_ = config->banner->toString();
-	LOG_TRACE << "Global context: banner: <" << banner_ << ">";
+	LOG_TRACE << "Global context: banner: <" << m_banner << ">";
+	m_aaaa.resolveDB( m_db );
+	LOG_TRACE << "AAAA database refernces resolved";
 }
 
 wolframeHandler::~wolframeHandler()

@@ -49,13 +49,13 @@ namespace _Wolframe {
 		wolframeHandler( const HandlerConfiguration* config );
 		~wolframeHandler();
 
-		const std::string& banner() const	{ return banner_; }
-		const db::Database& db() const		{ return db_; }
-		const AAAA::AAAAprovider& aaaa()	{ return aaaa_; }
+		const std::string& banner() const	{ return m_banner; }
+		const db::DBprovider db() const		{ return m_db; }
+		const AAAA::AAAAprovider& aaaa()	{ return m_aaaa; }
 	private:
-		const std::string		banner_;
-		_Wolframe::db::Database		db_;
-		_Wolframe::AAAA::AAAAprovider	aaaa_;
+		const std::string		m_banner;
+		_Wolframe::db::DBprovider	m_db;
+		_Wolframe::AAAA::AAAAprovider	m_aaaa;
 	};
 
 

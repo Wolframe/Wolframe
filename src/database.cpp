@@ -43,11 +43,6 @@
 namespace _Wolframe	{
 namespace db	{
 
-Database::Database( Configuration& /* config */ )
-{
-	LOG_TRACE << "Database object created";
-}
-
 DatabaseType Database::strToType( const char *str )
 {
 	if ( boost::algorithm::iequals( str, "PostgreSQL" ))	return DBTYPE_POSTGRESQL;
@@ -67,5 +62,60 @@ std::string& Database::typeToStr( DatabaseType type )
 	default:		return retVal[3];
 	}
 }
+
+
+PostgreSQLDatabase::PostgreSQLDatabase( const PostgreSQLconfig* config )
+	: Database( DBTYPE_POSTGRESQL, config->ID())
+{
+	LOG_NOTICE << "PostgreSQL database '" << config->ID() << "' created";
+}
+
+SQLiteDatabase::SQLiteDatabase( const SQLiteConfig* config )
+	: Database( DBTYPE_SQLITE, config->ID())
+{
+	LOG_NOTICE << "SQLite database '" << config->ID() << "' created";
+}
+
+
+DBprovider::DBprovider( const Configuration& config )
+{
+	for ( std::list<DatabaseConfig*>::const_iterator it = config.dbConfig_.begin();
+							it != config.dbConfig_.end(); it++ )	{
+		switch( (*it)->type() )	{
+		case DBTYPE_POSTGRESQL:	{
+			PostgreSQLDatabase* db = new PostgreSQLDatabase( static_cast<PostgreSQLconfig*>(*it) );
+			m_db.push_back( db );
+		}
+			break;
+		case DBTYPE_SQLITE:	{
+			SQLiteDatabase* db = new SQLiteDatabase( static_cast<SQLiteConfig*>(*it) );
+			m_db.push_back( db );
+		}
+			break;
+		case DBTYPE_REFERENCE:
+			throw std::domain_error( "Database reference in DBprovider constructor" );
+		default:
+			throw std::domain_error( "Unknown database type in DBprovider constructor" );
+		}
+	}
+}
+
+DBprovider::~DBprovider()
+{
+	for ( std::list<Database*>::const_iterator it = m_db.begin();
+								it != m_db.end(); it++ )
+		delete *it;
+}
+
+
+const Database* DBprovider::database( std::string& id ) const
+{
+	for ( std::list<Database*>::const_iterator it = m_db.begin(); it != m_db.end(); it++ )	{
+		if ( (*it)->ID() == id )
+			return *it;
+	}
+	return NULL;
+}
+
 
 }} // namespace _Wolframe::db

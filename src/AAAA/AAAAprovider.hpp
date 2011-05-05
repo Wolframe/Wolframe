@@ -38,6 +38,7 @@
 #define _AAAA_PROVIDER_HPP_INCLUDED
 
 #include "configurationBase.hpp"
+#include "database.hpp"
 
 #include <string>
 #include <list>
@@ -153,17 +154,23 @@ class DatabaseAuditConfig : public AuditConfigBase
 {
 public:
 	DatabaseAuditConfig( const char* cfgName, const char* logParent, const char* logName )
-		: AuditConfigBase( AUDIT_FILE, cfgName, logParent, logName )
-	{}
-	~DatabaseAuditConfig();
+		: AuditConfigBase( AUDIT_FILE, cfgName, logParent, logName ),
+		  m_dbConfig( "", logParent, "" )	{}
 
 	/// methods
-	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
-	bool check() const;
-	void print( std::ostream& os, size_t indent ) const;
-	void setCanonicalPathes( const std::string& referencePath );
+	bool parse( const boost::property_tree::ptree& pt, const std::string& node )
+								{ return m_dbConfig.parse( pt, node ); }
+	bool check() const					{ return m_dbConfig.check(); }
+	void print( std::ostream& os, size_t indent ) const	{
+		std::string indStr( indent, ' ' );
+		os << indStr << sectionName() << ": " << std::endl;
+		m_dbConfig.print( os, indent + 3 );
+	}
+
+	void setCanonicalPathes( const std::string& refPath )	{ m_dbConfig.setCanonicalPathes( refPath ); }
 
 private:
+	db::SingleDBConfiguration	m_dbConfig;
 };
 
 
@@ -215,6 +222,7 @@ class AAAAprovider
 public:
 	AAAAprovider( const Configuration& conf );
 	~AAAAprovider();
+	void resolveDB( db::DBprovider& /*db*/ )	{};
 private:
 	std::list<Authenticator*>	m_authenticators;
 	std::list<Auditor*>		m_auditors;

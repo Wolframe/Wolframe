@@ -106,10 +106,13 @@ public:
 class ReferenceConfig : public DatabaseConfig
 {
 public:
-	ReferenceConfig(const char* name, const char* logParent, const char* logName );
+	ReferenceConfig( const char* name, const char* logParent, const char* logName )
+		: DatabaseConfig( DBTYPE_REFERENCE, name, logParent, logName )	{}
 	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
+private:
+	std::string	m_ref;
 };
 
 
@@ -140,7 +143,7 @@ public:
 
 	/// constructor & destructor
 	SingleDBConfiguration( const char* name, const char* logParent, const char* logName )
-		: ConfigurationBase( name, logParent, logName )	{}
+		: ConfigurationBase( name, logParent, logName )	{ m_dbConfig = NULL; }
 	~SingleDBConfiguration();
 
 	/// methods
@@ -151,16 +154,44 @@ public:
 };
 
 
-/// database base class
+/// database base classes
 class Database	{
 public:
-	Database( Configuration& config );
+	Database( DatabaseType t, const std::string id ) : m_type( t ), m_id( id )	{}
 	static DatabaseType strToType( const char *str );
 	static std::string& typeToStr( DatabaseType type );
 
 	const std::string& ID() const	{ return m_id; }
+	DatabaseType type() const	{ return m_type; }
 private:
+	const DatabaseType	m_type;
 	const std::string	m_id;
+};
+
+
+class PostgreSQLDatabase : public Database	{
+public:
+	PostgreSQLDatabase( const PostgreSQLconfig* config );
+private:
+};
+
+
+class SQLiteDatabase : public Database	{
+public:
+	SQLiteDatabase( const SQLiteConfig* config );
+private:
+};
+
+
+class DBprovider	{
+public:
+	DBprovider( const Configuration& config );
+	~DBprovider();
+
+	const Database* database( std::string& ID ) const;
+
+private:
+	std::list<Database*>	m_db;
 };
 
 }} // namespace _Wolframe::db

@@ -54,10 +54,6 @@ TEST_CPP_BINS = \
 	pechoHandler-gTest$(EXE) \
 	mtprocHandler-gTest$(EXE)
 
-ifeq ($(WITH_LUA),1)
-TEST_CPP_BINS += \
-	iprocHandlerTest$(EXE)
-endif
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
@@ -101,10 +97,6 @@ local_test:
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./protocolArgumentParsing-gTest
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./pechoHandler-gTest
-ifeq ($(WITH_LUA),1)
-	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./iprocHandlerTest
-endif
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./mtprocHandler-gTest
 	@echo

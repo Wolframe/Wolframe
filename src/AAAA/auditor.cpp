@@ -81,7 +81,6 @@ bool FileAuditConfig::check() const
 void FileAuditConfig::print( std::ostream& os, size_t indent ) const
 {
 	std::string indStr( indent, ' ' );
-
 	os << indStr << sectionName() << ": " << m_file << std::endl;
 }
 
@@ -98,28 +97,6 @@ void FileAuditConfig::setCanonicalPathes( const std::string& refPath )
 	}
 }
 
-
-DatabaseAuditConfig::~DatabaseAuditConfig()
-{
-}
-
-bool DatabaseAuditConfig::parse( const boost::property_tree::ptree& /*pt*/, const std::string& /*node*/ )
-{
-	return true;
-}
-
-bool DatabaseAuditConfig::check() const
-{
-	return true;
-}
-
-void DatabaseAuditConfig::print( std::ostream& /*os*/, size_t /*indent*/ ) const
-{
-}
-
-void DatabaseAuditConfig::setCanonicalPathes( const std::string& /*referencePath*/ )
-{
-}
 
 /// constructor
 AuditConfiguration::AuditConfiguration( const char* cfgName, const char* logParent, const char* logName )

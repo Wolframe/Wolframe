@@ -228,6 +228,28 @@ void SQLiteConfig::setCanonicalPathes( const std::string& refPath )
 }
 
 
+//***  Database reference functions  **************************************
+bool ReferenceConfig::parse( const boost::property_tree::ptree& pt, const std::string& node )
+{
+	bool labelDefined = ( ! m_ref.empty() );
+	if ( !config::Parser::getValue( logPrefix().c_str(), node.c_str(),
+					pt.get_value<std::string>(), m_ref, &labelDefined ))
+		return false;
+	return true;
+}
+
+bool ReferenceConfig::check() const
+{
+	return m_ref.empty() ? false : true;
+}
+
+void ReferenceConfig::print( std::ostream& os, size_t indent ) const
+{
+	std::string indStr( indent, ' ' );
+	os << indStr << sectionName() << ": " << (m_ref.empty() ? "Undefined!" : m_ref) << std::endl;
+}
+
+
 //***  Generic database functions  **************************************
 Configuration::~Configuration()
 {
@@ -310,9 +332,13 @@ SingleDBConfiguration::~SingleDBConfiguration()
 
 void SingleDBConfiguration::print( std::ostream& os, size_t indent ) const
 {
-	os << sectionName() << std::endl;
+	if ( ! sectionName().empty() )	{
+		std::string indStr( indent, ' ' );
+		os << indStr << sectionName() << ":" << std::endl;
+		indent += 3;
+	}
 	if ( m_dbConfig )	{
-		m_dbConfig->print( os, indent + 3 );
+		m_dbConfig->print( os, indent );
 	}
 	else
 		os << "   None configured" << std::endl;
@@ -327,33 +353,54 @@ bool SingleDBConfiguration::check() const
 	return false;
 }
 
-bool SingleDBConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& /* nodeName */ )
+bool SingleDBConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& nodeName )
 {
 	using namespace _Wolframe::config;
 	bool retVal = true;
 
-	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
-		if ( boost::algorithm::iequals( L1it->first, "PostgreSQL" ))	{
-			PostgreSQLconfig* cfg = new PostgreSQLconfig( "PostgreSQL server", logPrefix().c_str(), "PostgreSQL" );
-			if ( cfg->parse( L1it->second, L1it->first ))
-				m_dbConfig = cfg;
-			else	{
-				delete cfg;
+	std::string label = pt.get_value<std::string>();
+	std::cout << "DB REFERENCE: '" << label << "'" << std::endl;
+	if ( ! label.empty() )	{
+		ReferenceConfig* cfg = new ReferenceConfig( "Reference", logPrefix().c_str(), "reference" );
+		if ( cfg->parse( pt, nodeName ))
+			m_dbConfig = cfg;
+		else	{
+			delete cfg;
+			retVal = false;
+		}
+	}
+	else	{
+		for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
+			if ( m_dbConfig != NULL )	{
+				LOG_ERROR << logPrefix() << ": database already defined: '"
+					    << L1it->first << "'";
 				retVal = false;
 			}
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "SQLite" ))	{
-			SQLiteConfig* cfg = new SQLiteConfig( "SQLite database", logPrefix().c_str(), "SQLite" );
-			if ( cfg->parse( L1it->second, L1it->first ))
-				m_dbConfig = cfg;
 			else	{
-				delete cfg;
-				retVal = false;
+				if ( boost::algorithm::iequals( L1it->first, "PostgreSQL" ))	{
+					PostgreSQLconfig* cfg = new PostgreSQLconfig( "PostgreSQL server",
+										      logPrefix().c_str(), "PostgreSQL" );
+					if ( cfg->parse( L1it->second, L1it->first ))
+						m_dbConfig = cfg;
+					else	{
+						delete cfg;
+						retVal = false;
+					}
+				}
+				else if ( boost::algorithm::iequals( L1it->first, "SQLite" ))	{
+					SQLiteConfig* cfg = new SQLiteConfig( "SQLite database", logPrefix().c_str(), "SQLite" );
+					if ( cfg->parse( L1it->second, L1it->first ))
+						m_dbConfig = cfg;
+					else	{
+						delete cfg;
+						retVal = false;
+					}
+				}
+				else
+					LOG_WARNING << logPrefix() << ": unknown configuration option: '"
+						    << L1it->first << "'";
 			}
 		}
-		else
-			LOG_WARNING << logPrefix() << ": unknown configuration option: '"
-				    << L1it->first << "'";
 	}
 	return retVal;
 }
