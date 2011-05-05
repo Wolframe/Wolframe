@@ -311,3 +311,4 @@ windows/wolframe.xml
 XML/configuration.rng
 XML/database.rng
 XML/logging.rng
+src/AAAA/authenticator.hpp

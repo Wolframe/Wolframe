@@ -105,12 +105,6 @@ public:
 };
 
 
-class Authorizer
-{
-public:
-};
-
-
 struct Configuration : public config::ConfigurationBase
 {
 	friend class AAAAprovider;
