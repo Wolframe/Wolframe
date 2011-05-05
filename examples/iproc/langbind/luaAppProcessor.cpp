@@ -451,9 +451,6 @@ AppProcessor::CallResult AppProcessor::call( unsigned int argc, const char** arg
 				LOG_ERROR << "Failed to initialize output. It possibly has been redefined as a value of different type";
 			}
 		}
-lua_getglobal( m_state->thread, "input");
-/*[-]*/LOG_INFO << "INPUT " << getDescription( m_state->thread, -1);
-
 		// call the function (for the first time)
 		lua_getglobal( m_state->thread, argv[0]);
 		for (unsigned int ii=1; ii<argc; ii++)
