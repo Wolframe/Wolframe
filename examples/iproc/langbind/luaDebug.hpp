@@ -30,58 +30,23 @@
  Project Wolframe.
 
 ************************************************************************/
-///
-/// \file iprocHandler.hpp
-/// \brief simple method table processor connection handler
-///
+/// \file luaLog.hpp
+/// \brief Logger interface for the lua application processor
+#ifndef _iproc_LUA_DEBUG_HPP_INCLUDED
+#define _iproc_LUA_DEBUG_HPP_INCLUDED
+#include <string>
 
-#ifndef _Wolframe_PROTOCOL_iproc_HANDLER_HPP_INCLUDED
-#define _Wolframe_PROTOCOL_iproc_HANDLER_HPP_INCLUDED
-#include "connectionHandler.hpp"
-#include "handlerConfig.hpp"
+extern "C" {
+#include "lua.h"
+}
 
 namespace _Wolframe {
 namespace iproc {
+namespace lua {
 
-	/// The connection handler
-	class Connection : public net::connectionHandler
-	{
-	public:
-		typedef net::NetworkOperation Operation;
+std::string getDescription( lua_State *ls, int index);
+bool getDescription( lua_State *ls, int index, std::string& ret);
 
-		Connection( const net::LocalEndpoint& local, const lua::Configuration* config);
+}}}//namespace
+#endif
 
-		virtual ~Connection();
-
-		virtual void setPeer( const net::RemoteEndpoint& remote);
-
-		/// Handle a request and produce a reply.
-		virtual const Operation nextOperation();
-		virtual void networkInput( const void *begin, std::size_t bytesTransferred);
-
-		virtual void timeoutOccured();
-		virtual void signalOccured();
-		virtual void errorOccured( NetworkSignal);
-	public:
-		struct Private;
-	private:
-		Private* data;
-	};
-
-} // namespace iproc
-
-	/// The server handler container
-	class ServerHandler::ServerHandlerImpl
-	{
-	public:
-		ServerHandlerImpl( const HandlerConfiguration *config)
-			:m_config(config){}
-
-		net::connectionHandler* newConnection( const net::LocalEndpoint& local);
-	private:
-		const HandlerConfiguration* m_config;
-	};
-
-} // namespace _Wolframe
-
-#endif // _Wolframe_PROTOCOL_iproc_HANDLER_HPP_INCLUDED

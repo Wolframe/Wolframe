@@ -441,7 +441,7 @@ struct Connection::Private
 };
 
 
-Connection::Connection( const net::LocalEndpoint& local, const AppConfiguration* config)
+Connection::Connection( const net::LocalEndpoint& local, const lua::Configuration* config)
 {
 	data = new Private( config);
 	LOG_TRACE << "Created connection handler for " << local.toString();

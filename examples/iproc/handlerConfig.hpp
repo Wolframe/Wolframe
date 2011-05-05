@@ -7,24 +7,17 @@
 
 #include "standardConfigs.hpp"
 #include "langbind/luaConfig.hpp"
-namespace _Wolframe {
-struct AppConfiguration :public _Wolframe::iproc::lua::Configuration
-{
-	AppConfiguration() :_Wolframe::iproc::lua::Configuration( "lua iproc", "iproc") {}
-};
-}//namespace
-
 
 namespace _Wolframe {
 
 struct HandlerConfiguration
 {
 public:
-	AppConfiguration *m_appConfig;
+	iproc::lua::Configuration *m_appConfig;
 
 	HandlerConfiguration()
 	{
-		m_appConfig = new AppConfiguration();
+		m_appConfig = new iproc::lua::Configuration( "lua iproc", "iproc");
 	}
 
 	virtual ~HandlerConfiguration( ) {

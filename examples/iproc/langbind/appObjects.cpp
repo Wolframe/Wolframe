@@ -30,7 +30,7 @@ Project Wolframe.
 
 ************************************************************************/
 ///
-/// \file langbind.cpp
+/// \file appObjects.cpp
 /// \brief interface implementation for application processor scripting language to system objects
 ///
 #include "appObjects.hpp"

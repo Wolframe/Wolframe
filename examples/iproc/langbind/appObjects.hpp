@@ -30,7 +30,7 @@ Project Wolframe.
 
 ************************************************************************/
 ///
-/// \file langbind.hpp
+/// \file appObjects.hpp
 /// \brief interface for application processor scripting language to system objects
 ///
 #ifndef _Wolframe_LANGBIND_HPP_INCLUDED
