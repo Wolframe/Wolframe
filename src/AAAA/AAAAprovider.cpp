@@ -46,9 +46,32 @@
 namespace _Wolframe {
 namespace AAAA {
 
-
 AAAAprovider::AAAAprovider( const Configuration& config )
 {
+	for ( std::list<AuthenticationConfigBase*>::const_iterator it = config.auth.m_config.begin();
+							it != config.auth.m_config.end(); it++ )	{
+		switch( (*it)->type() )	{
+		case AUTH_DATABASE:	{
+			DatabaseAuth* auth = new DatabaseAuth( static_cast<DatabaseAuthConfig&>(**it) );
+			m_authenticators.push_back( auth );
+		}
+			break;
+		case AUTH_TEXTFILE:	{
+			TextFileAuth* auth = new TextFileAuth( static_cast<TextFileAuthConfig&>(**it) );
+			m_authenticators.push_back( auth );
+		}
+			break;
+		case AUTH_PAM:
+		case AUTH_SASL:
+		case AUTH_LDAP:
+			LOG_ERROR << "Auth method not implemented yet";
+			break;
+		case AUTH_UNKNOWN:
+		default:
+			throw std::domain_error( "Unknown auditing mechanism type in AAAAprovider constructor" );
+		}
+	}
+
 	for ( std::list<AuditConfigBase*>::const_iterator it = config.audit.m_config.begin();
 							it != config.audit.m_config.end(); it++ )	{
 		switch( (*it)->type() )	{
@@ -71,17 +94,22 @@ AAAAprovider::AAAAprovider( const Configuration& config )
 
 AAAAprovider::~AAAAprovider()
 {
-	for ( std::list<Authenticator*>::const_iterator it = m_authenticators.begin();
+	for ( std::list<GlobalAuthenticatorBase*>::const_iterator it = m_authenticators.begin();
 								it != m_authenticators.end(); it++ )
 		delete *it;
-	for ( std::list<Auditor*>::const_iterator it = m_auditors.begin();
+	for ( std::list<GlobalAuditorBase*>::const_iterator it = m_auditors.begin();
 								it != m_auditors.end(); it++ )
 		delete *it;
 }
 
 bool AAAAprovider::resolveDB( db::DBprovider& db )
 {
-	for ( std::list<Auditor*>::const_iterator it = m_auditors.begin();
+	for ( std::list<GlobalAuthenticatorBase*>::const_iterator it = m_authenticators.begin();
+								it != m_authenticators.end(); it++ )
+		if ( ! (*it)->resolveDB( db ) )
+			return false;
+
+	for ( std::list<GlobalAuditorBase*>::const_iterator it = m_auditors.begin();
 								it != m_auditors.end(); it++ )
 		if ( ! (*it)->resolveDB( db ) )
 			return false;

@@ -48,6 +48,7 @@ FileAuditor::FileAuditor( FileAuditConfig& config )
 	LOG_NOTICE << "File auditor created with file '" << m_file << "'";
 }
 
+
 DatabaseAuditor::DatabaseAuditor( DatabaseAuditConfig& config )
 {
 	switch ( config.m_dbConfig.m_dbConfig->type() )	{

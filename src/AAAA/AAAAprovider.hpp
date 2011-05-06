@@ -39,6 +39,7 @@
 
 #include "configurationBase.hpp"
 #include "auditor.hpp"
+#include "authenticator.hpp"
 #include "database.hpp"
 
 #include <string>
@@ -50,58 +51,11 @@ namespace AAAA {
 class User
 {
 public:
-	User();
-};
+	User( const char* name ) : m_name( name )	{}
 
-
-/// Authentication type
-enum AuthenticationType	{
-	AUTH_WOLFRAME,		///< Wolframe proprietary authentification
-	AUTH_PAM,		///< *NIX PAM authentification
-	AUTH_SASL,		///< SASL authentification (Cyrus SASL)
-	AUTH_LDAP,		///< LDAP authentification
-	AUTH_UNKNOWN		///< Unknown authentification (i.e. none)
-};
-
-
-class AuthenticationConfigBase : public config::ConfigurationBase
-{
+	const std::string& username() const		{ return m_name; }
 private:
-	const AuthenticationType	m_type;
-public:
-	/// constructor
-	AuthenticationConfigBase( const AuthenticationType Type,
-				  const char* name, const char* logParent, const char* logName )
-		: config::ConfigurationBase( name, logParent, logName ),
-		  m_type( Type )
-	{}
-
-	AuthenticationType type() const		{ return m_type; }
-};
-
-
-class AuthenticationConfiguration : public config::ConfigurationBase
-{
-	friend class AAAAprovider;
-public:
-	/// constructor
-	AuthenticationConfiguration( const char* cfgName, const char* logParent, const char* logName );
-
-	/// methods
-	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
-	bool check() const;
-	void print( std::ostream& os, size_t indent ) const;
-	void setCanonicalPathes( const std::string& referencePath );
-
-	// bool test() const;	// Not implemented yet, inherited from base
-private:
-	std::list<AuthenticationConfigBase*>	m_config;
-};
-
-class Authenticator
-{
-public:
-	//		Authenticator( AuthenticatorConfiguration& conf );
+	const std::string	m_name;
 };
 
 
@@ -132,8 +86,8 @@ public:
 	~AAAAprovider();
 	bool resolveDB( db::DBprovider& db );
 private:
-	std::list<Authenticator*>	m_authenticators;
-	std::list<Auditor*>		m_auditors;
+	std::list<GlobalAuthenticatorBase*>	m_authenticators;
+	std::list<GlobalAuditorBase*>		m_auditors;
 };
 
 }} // namespace _Wolframe::AAAA

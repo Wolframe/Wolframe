@@ -53,6 +53,7 @@ enum AuditType	{
 	AUDIT_UNKNOWN		///< Unknown method (i.e. none)
 };
 
+
 class AuditConfigBase : public config::ConfigurationBase
 {
 private:
@@ -76,7 +77,6 @@ public:
 	FileAuditConfig( const char* cfgName, const char* logParent, const char* logName )
 		: AuditConfigBase( AUDIT_FILE, cfgName, logParent, logName )
 	{}
-	// ~FileAuditConfig();
 
 	/// methods
 	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
@@ -120,7 +120,7 @@ class AuditConfiguration : public config::ConfigurationBase
 public:
 	/// constructor
 	AuditConfiguration( const char* cfgName, const char* logParent, const char* logName )
-		: config::ConfigurationBase( cfgName, logParent, logName )	{}
+		: ConfigurationBase( cfgName, logParent, logName )	{}
 	~AuditConfiguration();
 
 	/// methods
@@ -135,14 +135,14 @@ private:
 };
 
 
-class Auditor
+class GlobalAuditorBase
 {
 public:
 	virtual bool resolveDB( db::DBprovider& /*db*/ )	{ return true; }
 };
 
 
-class FileAuditor : public Auditor
+class FileAuditor : public GlobalAuditorBase
 {
 public:
 	FileAuditor( FileAuditConfig& config );
@@ -151,7 +151,7 @@ private:
 };
 
 
-class DatabaseAuditor : public Auditor
+class DatabaseAuditor : public GlobalAuditorBase
 {
 public:
 	DatabaseAuditor( DatabaseAuditConfig& config );

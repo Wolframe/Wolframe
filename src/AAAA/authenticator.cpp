@@ -35,37 +35,58 @@
 //
 
 #include "logger.hpp"
-#include "AAAAprovider.hpp"
+#include "authenticator.hpp"
+#include "database.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
 
-/// constructor
-AuthenticationConfiguration::AuthenticationConfiguration( const char* cfgName, const char* logParent, const char* logName)
-	: config::ConfigurationBase( cfgName, logParent, logName )
+TextFileAuth::TextFileAuth( TextFileAuthConfig& config )
 {
+	m_file = config.m_file;
+	LOG_NOTICE << "File authenticator created with file '" << m_file << "'";
 }
 
-/// methods
-bool AuthenticationConfiguration::parse( const boost::property_tree::ptree& /*pt*/, const std::string& /*node*/ )
+
+DatabaseAuth::DatabaseAuth( DatabaseAuthConfig& config )
 {
+	switch ( config.m_dbConfig.m_dbConfig->type() )	{
+	case db::DBTYPE_POSTGRESQL:	{
+		LOG_NOTICE << "Database authenticator with PostgreSQL";
+		m_db = new db::PostgreSQLDatabase( static_cast<db::PostgreSQLconfig*>(config.m_dbConfig.m_dbConfig) );
+	}
+		break;
+	case db::DBTYPE_SQLITE:	{
+		LOG_NOTICE << "Database authenticator with SQLite";
+		m_db = new db::SQLiteDatabase( static_cast<db::SQLiteConfig*>(config.m_dbConfig.m_dbConfig) );
+	}
+		break;
+	case db::DBTYPE_REFERENCE:	{
+		LOG_NOTICE << "Database authenticator with database reference";
+		m_db = NULL;
+		m_dbLabel = ( static_cast<db::ReferenceConfig*>(config.m_dbConfig.m_dbConfig) )->m_ref;
+	}
+		break;
+	case db::DBTYPE_UNKNOWN:
+	default:
+		throw std::domain_error( "Unknown database type in database authenticator constructor" );
+	}
+}
+
+bool DatabaseAuth::resolveDB( db::DBprovider& db )
+{
+	if ( m_db == NULL && ! m_dbLabel.empty() )	{
+		m_db = db.database( m_dbLabel );
+		if ( m_db )	{
+			LOG_NOTICE << "Database authenticator: database reference set to '" << m_dbLabel << "'";
+			return true;
+		}
+		else	{
+			LOG_ERROR << "Database authenticator: database labeled '" << m_dbLabel << "' not found !";
+			return false;
+		}
+	}
 	return true;
-}
-
-bool AuthenticationConfiguration::check() const
-{
-	return true;
-}
-
-void AuthenticationConfiguration::print( std::ostream& os, size_t indent ) const
-{
-	std::string indStr( indent, ' ' );
-
-	os << indStr << sectionName() << ":" << std::endl;
-}
-
-void AuthenticationConfiguration::setCanonicalPathes( const std::string& /* referencePath */ )
-{
 }
 
 }} // namespace _Wolframe::AAAA

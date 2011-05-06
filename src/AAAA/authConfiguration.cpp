@@ -31,12 +31,12 @@
 
 ************************************************************************/
 //
-// audit configuration implementation
+// authentication configuration
 //
 
 #include "logger.hpp"
 #include "config/valueParser.hpp"
-#include "auditor.hpp"
+#include "authenticator.hpp"
 #include "database.hpp"
 
 #include "boost/algorithm/string.hpp"
@@ -47,8 +47,8 @@
 namespace _Wolframe {
 namespace AAAA {
 
-/// Audit to file
-bool FileAuditConfig::parse( const boost::property_tree::ptree& pt, const std::string& node )
+/// Text file authentication
+bool TextFileAuthConfig::parse( const boost::property_tree::ptree& pt, const std::string& node )
 {
 	using namespace _Wolframe::config;
 	bool retVal = true;
@@ -60,7 +60,7 @@ bool FileAuditConfig::parse( const boost::property_tree::ptree& pt, const std::s
 			retVal = false;
 		else	{
 			if ( ! boost::filesystem::path( m_file ).is_absolute() )
-				LOG_WARNING << logPrefix() << ": audit file path is not absolute: "
+				LOG_WARNING << logPrefix() << ": authentication file path is not absolute: "
 					    << m_file;
 		}
 	}
@@ -70,22 +70,22 @@ bool FileAuditConfig::parse( const boost::property_tree::ptree& pt, const std::s
 	return retVal;
 }
 
-bool FileAuditConfig::check() const
+bool TextFileAuthConfig::check() const
 {
 	if ( m_file.empty() )	{
-		LOG_ERROR << logPrefix() << "Audit filename cannot be empty";
+		LOG_ERROR << logPrefix() << "Authentication filename cannot be empty";
 		return false;
 	}
 	return true;
 }
 
-void FileAuditConfig::print( std::ostream& os, size_t indent ) const
+void TextFileAuthConfig::print( std::ostream& os, size_t indent ) const
 {
 	std::string indStr( indent, ' ' );
 	os << indStr << sectionName() << ": " << m_file << std::endl;
 }
 
-void FileAuditConfig::setCanonicalPathes( const std::string& refPath )
+void TextFileAuthConfig::setCanonicalPathes( const std::string& refPath )
 {
 	using namespace boost::filesystem;
 
@@ -100,23 +100,23 @@ void FileAuditConfig::setCanonicalPathes( const std::string& refPath )
 
 
 /// constructor
-AuditConfiguration::~AuditConfiguration()
+AuthenticationConfiguration::~AuthenticationConfiguration()
 {
-	for ( std::list<AuditConfigBase*>::const_iterator it = m_config.begin();
+	for ( std::list<AuthenticationConfigBase*>::const_iterator it = m_config.begin();
 								it != m_config.end(); it++ )
 		delete *it;
 }
 
 
 /// methods
-bool AuditConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& /*nodeName*/ )
+bool AuthenticationConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& /*nodeName*/ )
 {
 	using namespace _Wolframe::config;
 	bool retVal = true;
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "file" ))	{
-			FileAuditConfig* cfg = new FileAuditConfig( "File", logPrefix().c_str(), "file" );
+			TextFileAuthConfig* cfg = new TextFileAuthConfig( "File", logPrefix().c_str(), "file" );
 			if ( cfg->parse( L1it->second, L1it->first ))
 				m_config.push_back( cfg );
 			else	{
@@ -125,7 +125,7 @@ bool AuditConfiguration::parse( const boost::property_tree::ptree& pt, const std
 			}
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "database" ))	{
-			DatabaseAuditConfig* cfg = new DatabaseAuditConfig( "Database", logPrefix().c_str(), "database" );
+			DatabaseAuthConfig* cfg = new DatabaseAuthConfig( "Database", logPrefix().c_str(), "database" );
 			if ( cfg->parse( L1it->second, L1it->first ))
 				m_config.push_back( cfg );
 			else	{
@@ -141,10 +141,10 @@ bool AuditConfiguration::parse( const boost::property_tree::ptree& pt, const std
 }
 
 
-bool AuditConfiguration::check() const
+bool AuthenticationConfiguration::check() const
 {
 	bool correct = true;
-	for ( std::list<AuditConfigBase*>::const_iterator it = m_config.begin();
+	for ( std::list<AuthenticationConfigBase*>::const_iterator it = m_config.begin();
 								it != m_config.end(); it++ )	{
 		if ( !(*it)->check() )
 			correct = false;
@@ -153,13 +153,13 @@ bool AuditConfiguration::check() const
 }
 
 
-void AuditConfiguration::print( std::ostream& os, size_t indent ) const
+void AuthenticationConfiguration::print( std::ostream& os, size_t indent ) const
 {
 	std::string indStr( indent, ' ' );
 
 	os << indStr << sectionName() << ":" << std::endl;
 	if ( m_config.size() > 0 )	{
-		for ( std::list<AuditConfigBase*>::const_iterator it = m_config.begin();
+		for ( std::list<AuthenticationConfigBase*>::const_iterator it = m_config.begin();
 								it != m_config.end(); it++ )	{
 			(*it)->print( os, indent + 3 );
 		}
@@ -169,11 +169,11 @@ void AuditConfiguration::print( std::ostream& os, size_t indent ) const
 }
 
 
-void AuditConfiguration::setCanonicalPathes( const std::string& referencePath )
+void AuthenticationConfiguration::setCanonicalPathes( const std::string& refPath )
 {
-	for ( std::list<AuditConfigBase*>::const_iterator it = m_config.begin();
+	for ( std::list<AuthenticationConfigBase*>::const_iterator it = m_config.begin();
 								it != m_config.end(); it++ )	{
-		(*it)->setCanonicalPathes( referencePath );
+		(*it)->setCanonicalPathes( refPath );
 	}
 }
 

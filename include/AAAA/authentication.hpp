@@ -30,7 +30,6 @@
  Project Wolframe.
 
 ************************************************************************/
-
 ///
 /// \file authentication.hpp
 /// \brief top-level header file for authentication
@@ -158,7 +157,7 @@ extern Authenticator *CreatePAMAuthenticator( AuthenticatorFactory::properties p
 
 #if defined( WITH_SASL )
 extern Authenticator *CreateSaslAuthenticator( AuthenticatorFactory::properties props );
-#endif // defineD( WITH_SASL) 
+#endif // defineD( WITH_SASL)
 
 #if defined( WITH_SQLITE3 )
 extern Authenticator *CreateDbSqlite3Authenticator( AuthenticatorFactory::properties props );
