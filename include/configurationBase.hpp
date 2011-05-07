@@ -58,7 +58,7 @@ public:
 		sectionName_ = name ? name : "";
 		logPrefix_ = logParent ? logParent : "";
 		if ( logName && *logName != '\0' )	{
-			logPrefix_ += ": "; logPrefix_ += logName;
+			logPrefix_ += logName; logPrefix_ += ": ";
 		}
 	}
 

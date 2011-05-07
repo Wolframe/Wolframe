@@ -63,9 +63,9 @@ DatabaseAuditor::DatabaseAuditor( DatabaseAuditConfig& config )
 	}
 		break;
 	case db::DBTYPE_REFERENCE:	{
-		LOG_NOTICE << "Database auditor with database reference";
 		m_db = NULL;
 		m_dbLabel = ( static_cast<db::ReferenceConfig*>(config.m_dbConfig.m_dbConfig) )->m_ref;
+		LOG_NOTICE << "Database auditor with database reference '" << m_dbLabel << "'";
 	}
 		break;
 	case db::DBTYPE_UNKNOWN:
@@ -79,7 +79,7 @@ bool DatabaseAuditor::resolveDB( db::DBprovider& db )
 	if ( m_db == NULL && ! m_dbLabel.empty() )	{
 		m_db = db.database( m_dbLabel );
 		if ( m_db )	{
-			LOG_NOTICE << "Database audit: database reference set to '" << m_dbLabel << "'";
+			LOG_NOTICE << "Database audit: database reference '" << m_dbLabel << "' resolved";
 			return true;
 		}
 		else	{

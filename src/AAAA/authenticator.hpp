@@ -78,7 +78,7 @@ class DatabaseAuthConfig : public AuthenticationConfigBase
 public:
 	DatabaseAuthConfig( const char* cfgName, const char* logParent, const char* logName )
 		: AuthenticationConfigBase( AUTH_DATABASE, cfgName, logParent, logName ),
-		  m_dbConfig( "", logParent, "" )	{}
+		  m_dbConfig( "", logParent, "Database" )	{}
 
 	/// methods
 	bool parse( const boost::property_tree::ptree& pt, const std::string& node )

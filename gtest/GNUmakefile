@@ -10,7 +10,7 @@ gtest-all.o: src/gtest-all.cc
 	g++ -o gtest-all.o -Iinclude -I. -g -Wall -Wextra -c src/gtest-all.cc
 
 local_clean:
-	@-rm gtest-all.o
+	@-rm -f gtest-all.o
 
 local_distclean:
 

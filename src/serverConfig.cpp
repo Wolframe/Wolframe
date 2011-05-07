@@ -207,7 +207,7 @@ bool Configuration::parse( const boost::property_tree::ptree& pt, const std::str
 						retVal = false;
 				}
 				else
-					LOG_WARNING << logPrefix() << ": socket: unknown configuration option: '"
+					LOG_WARNING << logPrefix() << "socket: unknown configuration option: '"
 						    << L2it->first << "'";
 			}
 			if ( port == 0 )
@@ -263,7 +263,7 @@ bool Configuration::parse( const boost::property_tree::ptree& pt, const std::str
 						retVal = false;
 					else	{
 						if ( ! boost::filesystem::path( certFile ).is_absolute() )
-							LOG_WARNING << logPrefix() << ": certificate file is not absolute: '"
+							LOG_WARNING << logPrefix() << "certificate file is not absolute: '"
 								    << certFile << "'";
 					}
 				}
@@ -273,7 +273,7 @@ bool Configuration::parse( const boost::property_tree::ptree& pt, const std::str
 						retVal = false;
 					else	{
 						if ( ! boost::filesystem::path( keyFile ).is_absolute() )
-							LOG_WARNING << logPrefix() << ": key file is not absolute: "
+							LOG_WARNING << logPrefix() << "key file is not absolute: "
 								    << keyFile << "'";
 					}
 				}
@@ -283,7 +283,7 @@ bool Configuration::parse( const boost::property_tree::ptree& pt, const std::str
 						retVal = false;
 					else	{
 						if ( ! boost::filesystem::path( CAdirectory ).is_absolute() )
-							LOG_WARNING << logPrefix() << ": CA directory is not absolute: "
+							LOG_WARNING << logPrefix() << "CA directory is not absolute: "
 								    << CAdirectory << "'";
 					}
 				}
@@ -293,7 +293,7 @@ bool Configuration::parse( const boost::property_tree::ptree& pt, const std::str
 						retVal = false;
 					else	{
 						if ( ! boost::filesystem::path( CAchainFile ).is_absolute() )
-							LOG_WARNING << logPrefix() << ": CA chain file is not absolute: "
+							LOG_WARNING << logPrefix() << "CA chain file is not absolute: "
 								    << CAchainFile << "'";
 					}
 				}
@@ -303,7 +303,7 @@ bool Configuration::parse( const boost::property_tree::ptree& pt, const std::str
 						return false;
 				}
 				else
-					LOG_WARNING << logPrefix() << ": SSLsocket: unknown configuration option: '"
+					LOG_WARNING << logPrefix() << "SSLsocket: unknown configuration option: '"
 						    << L2it->first << "'";
 			}
 #ifdef WITH_SSL
@@ -317,7 +317,7 @@ bool Configuration::parse( const boost::property_tree::ptree& pt, const std::str
 #endif // WITH_SSL
 		}
 		else	{
-			LOG_WARNING << logPrefix() << ": unknown configuration option: '" << L1it->first << "'";
+			LOG_WARNING << logPrefix() << "unknown configuration option: '" << L1it->first << "'";
 		}
 	}
 	if ( threads == 0 )
