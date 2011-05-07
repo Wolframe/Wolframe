@@ -1,6 +1,12 @@
 TOPDIR = .
 
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
 SUBDIRS = src gtest tests examples clients
+
+!IFDEF WITH_SSL
+SUBDIRS = lua $(SUBDIRS)
+!ENDIF
 
 PACKAGE_NAME = wolframe
 PACKAGE_VERSION = 0.0.1

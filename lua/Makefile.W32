@@ -1,11 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = echo pecho mtproc iproc
-
-!IFDEF WITH_LUA
-SUBDIRS = \
-	$(SUBDIRS) lua
-!ENDIF
+SUBDIRS = src
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 

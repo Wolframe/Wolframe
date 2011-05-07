@@ -1,0 +1,76 @@
+TOPDIR = ..\..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_CPPFLAGS = \
+	/D_WIN32_WINNT=0x504
+
+INCLUDE_DIRS = \
+	/I. \
+	/I"$(PLATFORM_SDK_DIR)\Include"
+
+# Note: libraries are picked automatically on Windows!
+# TODO: better probing and correct library path based on Arch and
+# platform SDK version
+#SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib\x64"
+SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib"
+INCLUDE_LDFLAGS = \
+	$(SDK_LDFLAGS)
+
+INCLUDE_LIBS =
+
+OBJS = \
+	lapi.obj \
+	lauxlib.obj \
+	lbaselib.obj \
+	lcoco.obj \
+	lcode.obj \
+	ldblib.obj \
+	ldebug.obj \
+	ldo.obj \
+	ldump.obj \
+	lfunc.obj \
+	lgc.obj \
+	linit.obj \
+	liolib.obj \
+	llex.obj \
+	lmathlib.obj \
+	lmem.obj \
+	loadlib.obj \
+	lobject.obj \
+	lopcodes.obj \
+	loslib.obj \
+	lparser.obj \
+	lstate.obj \
+	lstring.obj \
+	lstrlib.obj \
+	ltable.obj \
+	ltablib.obj \
+	ltm.obj \
+	lundump.obj \
+	lvm.obj \
+	lzio.obj \
+	print.obj
+
+LIBRARIES = \
+	lua.lib
+	
+BINS = \
+	luac.exe lua.exe
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+lua.exe: lua.obj
+luac.exe: luac.obj
+lua.lib: $(OBJS)
+	$(LINK) /lib /nologo /out:$@ $(LDFLAGS) $(LIBS) $?
+
+local_all: $(LIBRARIES) $(BINS) 
+
+local_clean:
+
+local_distclean:
+
+local_test:

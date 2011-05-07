@@ -6,7 +6,8 @@ Prerequisites
 - boost 1.43.0 or later
 - optionally (WITH_SSL) openssl 0.9.8 or later
 - optionally (WITH_EXPECT) Expect and Tcl 8.4 or later
-- optionally (WITH_LUA) lua 5.1.x
+- optionally (WITH_LUA) lua 5.1.4 with LuaCoco-1.1.6
+  (integrated in subdir 'lua')
 - optionally (WITH_QT) Qt 4, 4.5.x or later
 - optionally for packaging: Wix 3.5 or later
 
@@ -69,18 +70,6 @@ Telnet is not enable by default, enable it in "Control Panel",
 "Windows Features" or call:
 
 pkgmgr /iu:"TelnetClient"
-
-Compile and install Lua
------------------------
-
-Get lua 5.1.4 or newer, on Windows use 'luavs.bat' from the lua sources
-to build it. Execute in the root directory of lua 'etc\luavc.bat' (in a SDK Shell).
-
-If you have an old Windows SWK which doesn't set LIBPATH and INCLUDES
-use the supplied 'examples\lua\luavs.bat' script and set PLATFORM_SDK_DIR there
-correctly.
-
-Finally adapt LUA_DIR in 'makefiles\nmake\config.mk'.
 
 Compile and install Qt
 ----------------------

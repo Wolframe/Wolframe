@@ -37,26 +37,27 @@ INCLUDE_LIBS = \
 !IFDEF WITH_LUA
 
 INCLUDE_DIRS = \
-	$(INCLUDE_DIRS) /I$(LUA_INCLUDE_DIRS)
-
-INCLUDE_LDFLAGS = \
-	$(INCLUDE_LDFLAGS) $(LUA_LDFLAGS)
+	$(INCLUDE_DIRS) /I$(TOPDIR)\lua\src
 
 INCLUDE_LIBS = \
-	$(INCLUDE_LIBS) $(LUA_LIBS)
+	$(INCLUDE_LIBS) $(TOPDIR)\lua\src\lua.lib
 
 !ENDIF
 
 OBJS = \
 	appProperties.obj \
 	appConfigDefinition.obj \
-	langbind/appObjects.obj \
 	iprocHandler.obj \
+	langbind\appObjects.obj \
 	$(TOPDIR)\src\winMain.obj
 
 !IFDEF WITH_LUA
 OBJS = \
-	$(OBJS) langbind/appLog.obj langbind/appDebug.obj langbind\luaConfig.obj langbind\luaAppProcessor.obj
+	$(OBJS) \
+	langbind\luaLog.obj \
+	langbind\luaDebug.obj \
+	langbind\luaConfig.obj \
+	langbind\luaAppProcessor.obj
 !ENDIF
 
 CPP_BINS = \

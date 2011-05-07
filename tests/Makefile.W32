@@ -2,10 +2,11 @@ TOPDIR = ..
 
 SUBDIRS = AAAA
 
-!IFDEF WITH_EXPECT
-SUBDIRS = \
-	$(SUBDIRS) expect
-!ENDIF
+# all broken on windows due to working telnet
+#!IFDEF WITH_EXPECT
+#SUBDIRS = \
+#	$(SUBDIRS) expect
+#!ENDIF
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
@@ -15,8 +16,9 @@ INCLUDE_CPPFLAGS = \
 INCLUDE_DIRS = \
 	/I$(TOPDIR)\include /I. \
 	/I$(TOPDIR)\src \
-	-I$(TOPDIR)\examples\pecho \
-	-I$(TOPDIR)\examples\mtproc \
+	/I$(TOPDIR)\examples\pecho \
+	/I$(TOPDIR)\examples\mtproc \
+	/I$(TOPDIR)\examples\iproc \
 	/I"$(BOOST_DIR)" \
 	/I"$(PLATFORM_SDK_DIR)\Include" \
 	/I$(TOPDIR)\gtest\include
@@ -39,10 +41,12 @@ TEST_CPP_BINS = \
 	singletonTest.exe \
 	poolTest.exe \
 	logTest.exe \
-	protocolArgumentParsing-gTest.exe
+	protocolArgumentParsing-gTest.exe \
+	configValueParser-gTest.exe
 # broken on windows
 #	pechoHandler-gTest.exe
 #	mtprocHandler-gTest.exe
+
 
 OBJS = \
 
@@ -59,11 +63,14 @@ resolvePathTest.exe: resolvePathTest.obj $(TOPDIR)\src\wolframe.lib
 singletonTest.exe: singletonTest.obj $(TOPDIR)\src\wolframe.lib
 poolTest.exe: poolTest.obj $(TOPDIR)\src\wolframe.lib
 logTest.exe: logTest.obj $(TOPDIR)\src\wolframe.lib
-protocolArgumentParsing-gTest.exe: protocolArgumentParsing-gTest.obj
-pechoHandler-gTest.exe: pechoHandler-gTest.obj
+protocolArgumentParsing-gTest.exe: protocolArgumentParsing-gTest.obj $(TOPDIR)\src\wolframe.lib
+configValueParser-gTest.exe: configValueParser-gTest.obj $(TOPDIR)\src\wolframe.lib
+# broken on windows
+#pechoHandler-gTest.exe: pechoHandler-gTest.obj
 
-MTPROC_GTEST_OBJS=$(TOPDIR)\examples\mtproc\mtprocHandler.obj $(TOPDIR)\examples\mtproc\implementation.obj $(TOPDIR)\examples\mtproc\dispatcher.obj
-mtprocHandler-gTest.exe: mtprocHandler-gTest.obj $(MTPROC_GTEST_OBJS) $(TOPDIR)\src\libwolframe.lib
+# broken on windows
+#MTPROC_GTEST_OBJS=$(TOPDIR)\examples\mtproc\mtprocHandler.obj $(TOPDIR)\examples\mtproc\implementation.obj $(TOPDIR)\examples\mtproc\dispatcher.obj
+#mtprocHandler-gTest.exe: mtprocHandler-gTest.obj $(MTPROC_GTEST_OBJS) $(TOPDIR)\src\libwolframe.lib
 
 local_all:
 
@@ -79,8 +86,13 @@ local_test:
 	@-echo logTest >> test.bat
 	@-echo versionTest >> test.bat
 	@-echo counterTest >> test.bat
+# broken on windows: gives wrong path canonization results
 	@-echo resolvePathTest >> test.bat
 	@-echo singletonTest >> test.bat
 	@-echo poolTest >> test.bat
 	@-echo protocolArgumentParsing-gTest >> test.bat
+# broken on windows
+#	@-echo pechoHandler-gTest >> test.bat
+#	@-echo mtprocHandler-gTest >> test.bat
+	@echo
 	@-test.bat
