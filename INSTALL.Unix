@@ -8,7 +8,8 @@ Prerequisites
 - GNU make
 - boost 1.43.0 or later
 - optionally (WITH_SSL) openssl 0.9.8 or later
-- optionally (WITH_LUA) lua 5.1.x
+- optionally (WITH_LUA) lua 5.1.4 with LuaCoco-1.1.6
+  (integrated in subdir 'lua')
 - for the optional Qt client
   - optionally (WITH_QT) Qt 4, 4.5.x or later
 - for optional authentication mechanisms:
@@ -56,16 +57,6 @@ Compile and install openssl
 Unless you have a good reason, use the openssl library of
 your Linux system.
 
-Compile and install Lua
------------------------
-
-./configure --prefix=/usr/local/lua-5.1.4
-make
-make install
-
-configure Wolframe in ~/config.mk and
-set LUA_DIR to /usr/local/lua-5.1.4.
-
 Compile and install Qt
 ----------------------
 
@@ -86,7 +77,6 @@ RHEL/Centos/SL 5.5
 ------------------
 
 Optional packages:
-Fetch from epel/rpmforge whatever: lua-devel (5.1)
 Fetch from normal repository: openssl-devel, pam-devel (0.99.6), cyrus-sasl-devel (2.1.22),
                               sqlite-devel (3.3.6), postgresql-devel (8.1.23)
 
@@ -103,7 +93,7 @@ Fedora 14
 No problems with the supplied packages at all, everything builds out of the box:
 
 Required packages: boost-devel (1.44)
-Optional packages: openssl-devel, lua-devel (5.1), qt4-devel,
+Optional packages: openssl-devel, qt4-devel,
                    pam-devel (1.1.1), cyrus-sasl-devel (2.1.23),
                    sqlite-devel (3.6.23), postgresql-devel (8.4.7)
 
@@ -115,7 +105,7 @@ When rebuilding the SVG images of the documentation you also need 'dia'.
 Ubuntu 10.04.1 LTS
 ------------------
 
-Optional packages: liblua5.1-dev, libqt4-dev,
+Optional packages: libqt4-dev,
                    libpam-dev (1.1.1), libsasl2-dev (2.1.23),
                    libsqlite3-dev (3.6.22), libpq-dev (8.4.7)
 
@@ -129,7 +119,7 @@ When rebuilding the SVG images of the documentation you also need 'dia'.
 Ubuntu 10.10 Server
 -------------------
 
-Optional packages: libssl-dev, liblua5.1-dev, libqt4-dev (4.7.0),
+Optional packages: libssl-dev, libqt4-dev (4.7.0),
                    libpam-dev (1.1.1), libsasl2-dev (2.1.23),
                    libsqlite3-dev (3.7.2), libpq-dev (8.4.7)
 
@@ -143,7 +133,7 @@ When rebuilding the SVG images of the documentation you also need 'dia'.
 Debian 5.0
 ----------
 
-Optional packages: liblua5.1-dev, libqt4-dev, libpam-dev (1.0.1),
+Optional packages: libqt4-dev, libpam-dev (1.0.1),
                    libsasl2-dev (2.1.22), libsqlite3-dev (3.5.9),
                    libpq-dev (8.3.14)
 
@@ -162,9 +152,6 @@ Optional packages: qt-devel (4.6.3), pam-devel (1.1.1), cyrus-sasl-devel (2.1.23
 boost is 1.42, only missing some new filesystem stuff, but you'll have to
 compile your own one.
 
-there is a liblua5_1 but no traces of a development library, build your own
-(for this you need readline-devel, ncurses-devel packages)
-
 Slackware 13.1
 --------------
 
@@ -181,7 +168,7 @@ Archlinux
 ---------
 
 Required packages: boost and boost-libs
-Optional packages: openssl, lua, qt, pam, libsasl,
+Optional packages: openssl, qt, pam, libsasl,
                    sqlite3, postgresql-libs
 
 For building the documentation you need 'xsltproc', 'docbook-xsl' and 'doxygen'.

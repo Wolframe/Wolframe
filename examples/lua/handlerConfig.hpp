@@ -11,7 +11,7 @@
 #include <map>
 
 extern "C" {
-	#include <lua.h>
+	#include "lua.h"
 }
 
 namespace _Wolframe {

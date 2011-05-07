@@ -4,7 +4,6 @@
 # - BOOST_DIR
 # - OPENSSL_DIR
 # - QT_DIR
-# - LUA_DIR
 
 # IMPORTANT:
 # please customize for new platforms or leave commented out for
@@ -56,20 +55,6 @@
 # usual layout, may differ
 #QT_INCLUDE_DIR = $(QT_DIR)/include
 #QT_LIB_DIR = $(QT_DIR)/lib
-
-# Lua 5.1
-#########
-
-# self-compiled
-#LUA_DIR = /home/user/lua-5.1.4
-
-# system-wide
-#LUA_DIR = /usr
-
-# usual layout
-#LUA_INCLUDE_DIR = $(LUA_DIR)/include
-#LUA_LIB_DIR = $(LUA_DIR)/lib
-#LUA_LIBS = -llua
 
 # PAM 1.1.3
 ###########

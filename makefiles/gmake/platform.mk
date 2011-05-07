@@ -298,6 +298,17 @@ endif
 
 endif
 
+# Lua 5.1
+#########
+
+ifeq ($(WITH_LUA),1)
+
+ifeq "$(PLATFORM)" "LINUX"
+LUA_PLATFORM=linux
+endif
+
+endif
+
 # Qt 4 (http://qt.nokia.com/products/)
 ######################################
 
@@ -361,72 +372,6 @@ endif
 
 endif
 
-endif
-
-# Lua 5.1
-#########
-
-ifeq ($(WITH_LUA),1)
-
-ifeq "$(PLATFORM)" "LINUX"
-
-ifeq "$(LINUX_DIST)" "arch"
-LUA_DIR ?= /usr
-LUA_INCLUDE_DIR ?= $(LUA_DIR)/include
-LUA_LIB_DIR ?= $(LUA_DIR)/lib
-LUA_LIBS ?= -llua
-endif
-
-ifeq "$(LINUX_DIST)" "slackware"
-LUA_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LUA_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LUA_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
-endif
-
-# Ubuntu 10.04 TLS, 10.10, Debian 5.0
-ifeq "$(LINUX_DIST)" "debian"
-ifeq "$(LINUX_REV)" "squeeze/sid"
-LUA_DIR ?= /usr
-LUA_INCLUDE_DIR ?= $(LUA_DIR)/include/lua5.1
-LUA_LIB_DIR ?= $(LUA_DIR)/lib
-LUA_LIBS ?= -llua5.1
-endif
-ifeq "$(LINUX_REV)" "5"
-LUA_DIR ?= /usr
-LUA_INCLUDE_DIR ?= $(LUA_DIR)/include/lua5.1
-LUA_LIB_DIR ?= $(LUA_DIR)/lib
-LUA_LIBS ?= -llua5.1
-endif
-endif
-
-ifeq "$(LINUX_DIST)" "suse"
-LUA_DIR ?= /usr
-LUA_INCLUDE_DIR ?= $(LUA_DIR)/include
-LUA_LIB_DIR ?= $(LUA_DIR)/lib
-LUA_LIBS ?= -llua
-endif
-
-ifeq "$(LINUX_DIST)" "redhat"
-
-# Fedora 14
-ifeq "$(LINUX_REV)" "14"
-LUA_DIR ?= /usr
-LUA_INCLUDE_DIR ?= $(LUA_DIR)/include
-LUA_LIB_DIR ?= $(LUA_DIR)/lib
-LUA_LIBS ?= -llua
-endif
-
-# RHEL 5
-ifeq "$(LINUX_REV)" "5"
-LUA_DIR ?= /usr
-LUA_INCLUDE_DIR ?= $(LUA_DIR)/include
-LUA_LIB_DIR ?= $(LUA_DIR)/lib
-LUA_LIBS ?= -llua
-endif
-
-endif
-
-endif
 endif
 
 # PAM 1.1.3

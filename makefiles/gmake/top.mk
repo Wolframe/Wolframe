@@ -80,9 +80,7 @@ ifeq ($(WITH_SSL),1)
 endif
 ifeq ($(WITH_LUA),1)
 	@echo
-	@echo "LUA_INCLUDE_DIR: $(LUA_INCLUDE_DIR)"
-	@echo "LUA_LIB_DIR: $(LUA_LIB_DIR)"
-	@echo "LUA_LIBS: $(LUA_LIBS)"
+	@echo "LUA platform: $(LUA_PLATFORM)"
 endif
 ifeq ($(WITH_QT),1)
 	@echo

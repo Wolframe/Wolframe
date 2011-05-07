@@ -29,13 +29,10 @@ INCLUDE_CPPFLAGS += \
 	-DWITH_LUA
 
 INCLUDE_DIRS += \
-	-I$(LUA_INCLUDE_DIR)
-
-INCLUDE_LDFLAGS += \
-	-L$(LUA_LIB_DIR)
+	-I$(TOPDIR)/lua/src
 
 INCLUDE_LIBS += \
-	$(LUA_LIBS)
+	$(TOPDIR)/lua/src/liblua.a
 endif
 
 # openssl

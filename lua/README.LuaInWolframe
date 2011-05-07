@@ -1,0 +1,11 @@
+Lua 5.1.4 with LuaCoco 1.1.6 patch integrated
+
+Don't use the lua from the system, it won't work!
+
+Makefile has been renamed to 'Makefile.orig'.
+LUA_PLATFORM flag is set in 'platform.mk' and passed as
+PLAT=$(LUA_PLATFORM) parameter to the original
+makefile.
+
+'GNUmakefile' and 'Makefile.w32' are added for the
+Wolframe projects.
