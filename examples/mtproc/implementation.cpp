@@ -32,6 +32,7 @@ Project Wolframe.
 #include "implementation.hpp"
 #include "logger.hpp"
 #include "filters/char_isolatin1.hpp"
+#include <boost/shared_ptr.hpp>
 #include <new>
 
 using namespace _Wolframe::mtproc;

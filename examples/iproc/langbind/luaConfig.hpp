@@ -58,7 +58,7 @@ public:
 	/// \brief constructor
 	/// \param name configuration name
 	/// \param prefix configuration prefix
-	Configuration( const char* name, const char* prefix) :ConfigurationBase(name, NULL, prefix),m_input_bufsize(512),m_output_bufsize(512){}
+	Configuration( const char* name, const char* prefix) :ConfigurationBase(name, NULL, prefix),m_input_bufsize(512),m_output_bufsize(512),m_cthread_stacksize(1024){}
 
 	/// \brief interface implementation of ConfigurationBase::parse(const boost::property_tree::ptree&, const std::string&)
 	virtual bool parse( const boost::property_tree::ptree&, const std::string&);
@@ -151,6 +151,8 @@ public:
 	unsigned int input_bufsize() const		{return m_input_bufsize;}
 	/// \brief return size of the buffer used for output network messages in bytes
 	unsigned int output_bufsize() const		{return m_output_bufsize;}
+	/// \brief return stack size in bytes of lua c thread executing command
+	unsigned int cthread_stacksize() const		{return m_cthread_stacksize;}
 
 	/// \brief Return the name of the function to execute for a command
 	/// \param[in] protocolcmd command from the protocol
@@ -166,6 +168,7 @@ private:
 	std::list<Module> m_modules;			///< list of modules without the main
 	unsigned int m_input_bufsize;			///< size of input network message buffers in bytes
 	unsigned int m_output_bufsize;			///< size of output network message buffers in bytes
+	unsigned int m_cthread_stacksize;		///< stack size in bytes of lua c thread executing command (2nd param of lua_newcthread(lua_State*))
 };
 
 }}}//namespace

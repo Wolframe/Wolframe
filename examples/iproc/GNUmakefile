@@ -18,6 +18,7 @@ INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_program_options \
 	-lboost_filesystem \
+	-ldl \
 	$(TOPDIR)/gtest/gtest-all.o \
 	$(TOPDIR)/src/libwolframe.a \
 	-ldl
@@ -56,7 +57,6 @@ OBJS = \
 
 ifeq ($(WITH_LUA),1)
 OBJS += \
-	langbind/luaLog.o \
 	langbind/luaDebug.o \
 	langbind/luaConfig.o \
 	langbind/luaAppProcessor.o
@@ -72,8 +72,8 @@ CPP_BINS = \
 TEST_BINS += \
 	tests/iprocHandlerTest$(EXE)
 
-tests/iprocHandlerTest$(EXE): tests/iprocHandlerTest.o $(IPROC_GTEST_OBJS) $(TOPDIR)/src/libwolframe.a
-	$(CCPP_LINK) -o $@ $(LDFLAGS) -L$(LUA_LIB_DIR) $(LUA_LIBS) $(IPROC_GTEST_OBJS) $(OBJS) $< $(LIBS)
+tests/iprocHandlerTest$(EXE): tests/iprocHandlerTest.o $(OBJS) $(TOPDIR)/src/libwolframe.a
+	$(CCPP_LINK) -o $@ $(LDFLAGS) $(OBJS) $< $(LIBS)
 
 
 local_all: $(CPP_BINS)

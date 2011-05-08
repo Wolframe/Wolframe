@@ -31,7 +31,6 @@
 
 ************************************************************************/
 #include "luaDebug.hpp"
-#include "luaLog.hpp"
 #include "logger.hpp"
 #include <boost/lexical_cast.hpp>
 

@@ -29,7 +29,6 @@ struct TestConfiguration :public lua::Configuration
 		pt.put("output_buffer", boost::lexical_cast<std::string>( bufferSizeInput));
 		setCanonicalPathes( ".");
 		if (!parse( pt, "test")) throw std::logic_error( "Bad Configuration");
-		if (!test()) throw std::logic_error( "Error in Configuration");
 		setCanonicalPathes( ".");
 	}
 };
@@ -229,16 +228,21 @@ TYPED_TEST( iprocHandlerFixture, ExpectedResult )
 #ifdef _Wolframe_LOWLEVEL_DEBUG
 		unsigned int ii=0,nn=output.size();
 		for (;ii<nn && output[ii]==this->expected[ii]; ii++);
-		if (ii != nn) printf( "SIZE R=%lu,E=%lu,DIFF AT %u='%d %d %d %d|%d %d %d %d'\n",
-									 (unsigned long)output.size(), (unsigned long)this->expected.size(), ii, output[ii-2],output[ii-1],output[ii-0],output[ii+1],this->expected[ii-2],this->expected[ii-1],this->expected[ii-0],this->expected[ii+1]);
+		if (ii != nn)
+		{
+			printf( "SIZE R=%lu,E=%lu,DIFF AT %u='%d %d %d %d|%d %d %d %d'\n",
+				(unsigned long)output.size(), (unsigned long)this->expected.size(), ii,
+				output[ii-2],output[ii-1],output[ii-0],output[ii+1],
+				this->expected[ii-2],this->expected[ii-1],this->expected[ii-0],this->expected[ii+1]);
+		}
 #endif
 	EXPECT_EQ( output, this->expected);
 }
 
 int main( int argc, char **argv )
 {
-		  ::testing::InitGoogleTest( &argc, argv );
-		  _Wolframe::log::LogBackend::instance().setConsoleLevel( _Wolframe::log::LogLevel::LOGLEVEL_DATA );
-		  return RUN_ALL_TESTS();
+		::testing::InitGoogleTest( &argc, argv );
+		_Wolframe::log::LogBackend::instance().setConsoleLevel( _Wolframe::log::LogLevel::LOGLEVEL_DATA );
+		return RUN_ALL_TESTS();
 }
 

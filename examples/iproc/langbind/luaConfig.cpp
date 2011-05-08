@@ -31,6 +31,7 @@
 
 ************************************************************************/
 #include "luaConfig.hpp"
+#include "luaDebug.hpp"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/algorithm/string.hpp>
 #define BOOST_FILESYSTEM_VERSION 3
@@ -38,7 +39,6 @@
 #include <ostream>
 #include "config/valueParser.hpp"
 #include "miscUtils.hpp"
-#include "luaLog.hpp"
 
 extern "C" {
 	#include <lualib.h>
@@ -102,6 +102,10 @@ bool Configuration::parse( const boost::property_tree::ptree& parentNode, const 
 		{
 			if (!config::Parser::getValue( logPrefix().c_str(), *it, m_output_bufsize, config::Parser::RangeDomain<unsigned int>(1,(1<<20)))) return false;
 		}
+		else if (boost::algorithm::iequals( it->first, "cstacksize"))
+		{
+			if (!config::Parser::getValue( logPrefix().c_str(), *it, m_cthread_stacksize, config::Parser::RangeDomain<unsigned int>(64,(1<<20)))) return false;
+		}
 		else
 		{
 			LOG_WARNING << logPrefix() << ": unknown configuration option: '" << it->first << "'";
@@ -141,6 +145,32 @@ void Configuration::setCanonicalPathes( const std::string& refPath)
 	}
 }
 
+static int function_printlog( lua_State *ls)
+{
+	/* first parameter maps to a log level, rest gets printed depending on
+	 * whether it's a string or a number
+	 */
+	int ii,nn = lua_gettop(ls);
+	if (nn <= 0) luaL_error( ls, "no arguments passed to logger");
+
+	const char *logLevel = luaL_checkstring( ls, 1);
+	std::string logmsg;
+
+	for (ii=2; ii<=nn; ii++)
+	{
+		if (!getDescription( ls, ii, logmsg))
+		{
+			luaL_error( ls, "failed to map printLog arguments to a string");
+		}
+	}
+
+	_Wolframe::log::Logger( _Wolframe::log::LogBackend::instance() ).Get(
+				_Wolframe::log::LogLevel::strToLogLevel( logLevel ) )
+		<< _Wolframe::log::LogComponent::LogLua
+		<< logmsg;
+	return 0;
+}
+
 bool Configuration::Module::load( lua_State* ls) const
 {
 	if (m_type == PreloadLib && m_load)
@@ -165,9 +195,9 @@ bool Configuration::Module::load( lua_State* ls) const
 			lua_pop( ls, 1);
 			return false;
 		}
-		// register logging function
+		// register logging function already here because then it can be used in the script initilization part
 		lua_pushstring( ls, "printlog");
-		lua_pushcfunction( ls, &printLog);
+		lua_pushcfunction( ls, &function_printlog);
 		lua_settable( ls, LUA_GLOBALSINDEX);
 
 		// call main, we may have to initialize LUA modules there

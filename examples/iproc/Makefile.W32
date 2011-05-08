@@ -54,7 +54,6 @@ OBJS = \
 !IFDEF WITH_LUA
 OBJS = \
 	$(OBJS) \
-	langbind\luaLog.obj \
 	langbind\luaDebug.obj \
 	langbind\luaConfig.obj \
 	langbind\luaAppProcessor.obj

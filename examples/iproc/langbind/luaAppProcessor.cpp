@@ -31,7 +31,6 @@ Project Wolframe.
 ************************************************************************/
 #include "luaAppProcessor.hpp"
 #include "luaDebug.hpp"
-#include "luaLog.hpp"
 #include "appObjects.hpp"
 #include "logger.hpp"
 #include "protocol/formatoutput.hpp"
@@ -43,6 +42,7 @@ extern "C"
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
+#include "lcoco.h"
 }
 
 using namespace _Wolframe;
@@ -55,6 +55,7 @@ namespace luaname
 	static const char* Input = "wolframe.Input";
 	static const char* Output = "wolframe.Output";
 	static const char* Filter = "wolframe.Filter";
+	static const char* InputFilterClosure = "wolframe.InputFilterClosure";
 }
 
 static void* toudata_udkey( lua_State* ls, int index, const char* id)
@@ -68,22 +69,55 @@ static void* toudata_udkey( lua_State* ls, int index, const char* id)
 	return p1 == p2 ? lua_touserdata( ls, index) : NULL;
 }
 
+namespace
+{
+template <class ObjectType>
+const char* metaTableName()					{return 0;}
+template <> const char* metaTableName<Input>()			{return luaname::Input;}
+template <> const char* metaTableName<Output>()			{return luaname::Output;}
+template <> const char* metaTableName<Filter>()			{return luaname::Filter;}
+template <> const char* metaTableName<InputFilterClosure>()	{return luaname::InputFilterClosure;}
+}//anonymous namespace
+
+
 template <class ObjectType>
 struct LuaObject :public ObjectType
 {
-	LuaObject( const ObjectType& o)   :ObjectType(o) {}
+	const char* m_mtname;
+
+	LuaObject( const ObjectType& o)
+		:ObjectType(o),m_mtname(metaTableName<ObjectType>()) {check();}
+
+	void check() const
+	{
+		if (m_mtname != metaTableName<ObjectType>())
+		{
+			LOG_ERROR << "inconsistency in data";
+		}
+	}
+	operator ObjectType*()
+	{
+		check();
+		return this;
+	}
+	operator const ObjectType*() const
+	{
+		check();
+		return this;
+	}
 
 	static int destroy( lua_State* ls)
 	{
-		LuaObject *THIS = *(LuaObject**)lua_touserdata( ls, 1);
+		LuaObject *THIS = (LuaObject*)lua_touserdata( ls, 1);
+		THIS->check();
 		if (THIS) THIS->~LuaObject();
 		return 0;
 	}
 
-	static void create( lua_State* ls, const char* metatableName, const luaL_Reg* mt)
+	static void create( lua_State* ls, const luaL_Reg* mt)
 	{
-		luaL_openlib( ls, metatableName, mt, 0);
-		luaL_newmetatable( ls, metatableName);
+		luaL_openlib( ls, metaTableName<ObjectType>(), mt, 0);
+		luaL_newmetatable( ls, metaTableName<ObjectType>());
 		luaL_openlib( ls, 0, getMetamethods(), 0);
 
 		lua_pushliteral( ls, "__index");
@@ -115,12 +149,12 @@ struct LuaObject :public ObjectType
 	void operator delete (void *, lua_State*) {}
 
 	template <class Orig>
-	static void push_luastack( lua_State* ls, const Orig& o, const char* metatableName)
+	static void push_luastack( lua_State* ls, const Orig& o)
 	{
 		try
 		{
 			(void*)new (ls) LuaObject( o);
-			luaL_getmetatable( ls, metatableName);
+			luaL_getmetatable( ls, metaTableName<ObjectType>());
 			lua_setmetatable( ls, -2);
 		}
 		catch (std::bad_alloc)
@@ -129,40 +163,40 @@ struct LuaObject :public ObjectType
 		}
 	}
 
-	static void createGlobal( lua_State* ls, const char* metatableName, const char* name, const ObjectType& instance, const luaL_Reg* mt=0)
+	static void createGlobal( lua_State* ls, const char* name, const ObjectType& instance, const luaL_Reg* mt=0)
 	{
-		create( ls, metatableName, mt);
-		(void)new (ls) LuaObject( instance);
-		luaL_getmetatable( ls, metatableName);
+		create( ls, mt);
+		new (ls) LuaObject( instance);
+		luaL_getmetatable( ls, metaTableName<ObjectType>());
 		lua_setmetatable( ls, -2);
 		lua_setglobal( ls, name);
 	}
 
-	static bool setGlobal( lua_State* ls, const char* metatableName, const char* name, const ObjectType& instance)
+	static bool setGlobal( lua_State* ls, const char* name, const ObjectType& instance)
 	{
 		lua_getglobal( ls, name);
-		LuaObject* obj = (LuaObject*) toudata_udkey( ls, -1, metatableName);
+		LuaObject* obj = (LuaObject*) toudata_udkey( ls, -1, metaTableName<ObjectType>());
 		if (!obj) return false;
 		*obj = instance;
 		return true;
 	}
 
-	static LuaObject* getSelf( lua_State* ls, const char* metatableName, const char* name, const char* method, int nofParam=-1)
+	static LuaObject* getSelf( lua_State* ls, const char* name, const char* method)
 	{
-		if (lua_gettop( ls) == 0)
+		LuaObject* self;
+		if (lua_gettop( ls) == 0 || (self=(LuaObject*) toudata_udkey( ls, 1, metaTableName<ObjectType>())) == 0)
 		{
-			luaL_error( ls, "'%s' get needs self parameter (%s:%s() instead of %s.%s())", name, name, method, name, method);
+			luaL_error( ls, "'%s' needs self parameter (%s:%s() instead of %s.%s())", name, name, method, name, method);
 		}
-		if (nofParam != -1 && lua_gettop( ls) != nofParam+1)
-		{
-			luaL_error( ls, "invalid number of arguments (%d additional arguments for method '%s:%s' expected)", nofParam, name, method);
-		}
-		LuaObject* self = (LuaObject*) toudata_udkey( ls, 1, metatableName);
-		if (!self)
-		{
-			luaL_error( ls, "'%s' get needs self parameter %s:%s()", name, name, method);
-		}
+		self->check();
 		return self;
+	}
+
+	static LuaObject* get( lua_State* ls, int index)
+	{
+		LuaObject* rt = (LuaObject*) toudata_udkey( ls, index, metaTableName<ObjectType>());
+		rt->check();
+		return rt;
 	}
 };
 
@@ -176,7 +210,7 @@ static int function_inputFilter( lua_State* ls)
 	switch (closure->fetch( item[0], itemsize[0], item[1], itemsize[1]))
 	{
 		case InputFilterClosure::DoYield:
-			return lua_yield( ls, 0);
+			goto EXIT_YIELD;
 
 		case InputFilterClosure::EndOfData:
 			return 0;
@@ -192,6 +226,8 @@ static int function_inputFilter( lua_State* ls)
 	}
 	luaL_error( ls, "illegal state produced by input filter");
 	return 0;
+EXIT_YIELD:
+	return lua_yield( ls, 0);
 }
 
 static int function_output_print( lua_State* ls)
@@ -199,7 +235,7 @@ static int function_output_print( lua_State* ls)
 	const char* item[2] = {0,0};
 	std::size_t itemsize[2] = {0,0};
 
-	Output* output = LuaObject<Output>::getSelf( ls, luaname::Output, "output", "print");
+	Output* output = LuaObject<Output>::getSelf( ls, "output", "print");
 	if (lua_gettop( ls) == 2)
 	{
 		if (lua_isnil( ls, 2)) {}
@@ -228,7 +264,7 @@ static int function_output_print( lua_State* ls)
 	switch (output->print( item[0], itemsize[0], item[1], itemsize[1]))
 	{
 		case Output::DoYield:
-			return lua_yield( ls, 0);
+			goto EXIT_YIELD;
 
 		case Output::Error:
 			luaL_error( ls, "error in format output print");
@@ -239,6 +275,8 @@ static int function_output_print( lua_State* ls)
 	}
 	luaL_error( ls, "illegal state produced by format output print");
 	return 0;
+EXIT_YIELD:
+	return lua_yield( ls, 0);
 }
 
 static int function_filter( lua_State* ls)
@@ -248,21 +286,21 @@ static int function_filter( lua_State* ls)
 	if (lua_gettop( ls) != 1) return luaL_error( ls, "invalid number of arguments (1 string as parameter expected)");
 	if (!lua_isstring( ls, 1)) return luaL_error( ls, "invalid type of argument (string expected)");
 	const char* name = lua_tostring( ls, 1);
-	LuaObject<Filter>::push_luastack( ls, Filter( system, name), luaname::Filter);
+	LuaObject<Filter>::push_luastack( ls, Filter( system, name));
 	return 1;
 }
 
 static int function_input_as( lua_State* ls)
 {
-	Input* input = LuaObject<Input>::getSelf( ls, luaname::Input, "input", "as");
+	Input* input = LuaObject<Input>::getSelf( ls, "input", "as");
 	if (lua_gettop( ls) != 2)
 	{
-		luaL_error( ls, "invalid number of arguments (1 filter type value as parameter of method 'as' expected)");
+		luaL_error( ls, "filter type value as parameter of method 'input:as' expected");
 	}
-	Filter* filter = (Filter*) toudata_udkey( ls, 2, luaname::Filter);
+	Filter* filter = LuaObject<Filter>::get( ls, 2);
 	if (!filter)
 	{
-		luaL_error( ls, "filter type value expected as first argument");
+		luaL_error( ls, "filter type value expected as first argument of input:as");
 	}
 	boost::shared_ptr<protocol::InputFilter> inputfilter( filter->m_inputfilter);
 	if (input->m_inputfilter.get())
@@ -275,15 +313,15 @@ static int function_input_as( lua_State* ls)
 
 static int function_output_as( lua_State* ls)
 {
-	Output* output = LuaObject<Output>::getSelf( ls, luaname::Output, "output", "as");
+	Output* output = LuaObject<Output>::getSelf( ls, "output", "as");
 	if (lua_gettop( ls) != 2)
 	{
-		luaL_error( ls, "invalid number of arguments (1 filter type value as parameter of method 'as' expected)");
+		luaL_error( ls, "filter type value as parameter of method 'output:as' expected");
 	}
-	LuaObject<Filter>* filter = (LuaObject<Filter>*) toudata_udkey( ls, 2, luaname::Filter);
+	Filter* filter = LuaObject<Filter>::get( ls, 2);
 	if (!filter)
 	{
-		luaL_error( ls, "filter type value expected as first argument");
+		luaL_error( ls, "filter type value expected as first argument of method 'output:as'");
 	}
 	boost::shared_ptr<protocol::FormatOutput> filteroutput( filter->m_formatoutput);
 	if (output->m_formatoutput.get())
@@ -296,12 +334,16 @@ static int function_output_as( lua_State* ls)
 
 static int function_input_get( lua_State* ls)
 {
-	Input* input = LuaObject<Input>::getSelf( ls, luaname::Input, "input", "get", 0);
+	Input* input = LuaObject<Input>::getSelf( ls, "input", "get");
+	if (lua_gettop( ls) != 1)
+	{
+		luaL_error( ls, "no arguments expected for input:get");
+	}
 	if (!input->m_inputfilter.get())
 	{
-		return luaL_error( ls, "no filter defined for input with input.as(...)");
+		return luaL_error( ls, "no filter defined for input with input:as");
 	}
-	LuaObject<InputFilterClosure>::push_luastack( ls, input->m_inputfilter, luaname::Filter);
+	LuaObject<InputFilterClosure>::push_luastack( ls, InputFilterClosure( input->m_inputfilter));
 	lua_pushcclosure( ls, &function_inputFilter, 1);
 	return 1;
 }
@@ -331,7 +373,8 @@ static void create_global_functions( lua_State* ls, System* system)
 	lua_pushliteral( ls, "filter");
 	lua_pushcfunction( ls, &function_filter);
 	lua_settable( ls, LUA_GLOBALSINDEX);
-	LuaObject<Filter>::create( ls, luaname::Filter, filter_methodtable);
+
+	LuaObject<Filter>::create( ls, filter_methodtable);
 }
 
 struct AppProcessor::State
@@ -371,8 +414,8 @@ AppProcessor::AppProcessor( System* system, const lua::Configuration* config)
 		:m_config(config),m_system(system)
 {
 	m_state = new State( *config);
-	LuaObject<Input>::createGlobal( m_state->ls, luaname::Input, "input", m_input, input_methodtable);
-	LuaObject<Output>::createGlobal( m_state->ls, luaname::Output, "output", m_output, output_methodtable);
+	LuaObject<Input>::createGlobal( m_state->ls, "input", m_input, input_methodtable);
+	LuaObject<Output>::createGlobal( m_state->ls, "output", m_output, output_methodtable);
 	create_global_functions( m_state->ls, m_system);
 }
 
@@ -421,7 +464,7 @@ AppProcessor::CallResult AppProcessor::call( unsigned int argc, const char** arg
 	if (!m_state->thread)
 	{
 		// create thread for the call execution
-		m_state->thread = lua_newthread( m_state->ls);
+		m_state->thread = lua_newcthread( m_state->ls, m_config->cthread_stacksize());
 
 		// prevent garbage collecting of thread (http://permalink.gmane.org/gmane.comp.lang.lua.general/22680)
 		lua_pushvalue( m_state->ls, -1);
@@ -439,14 +482,14 @@ AppProcessor::CallResult AppProcessor::call( unsigned int argc, const char** arg
 
 		if (m_input.m_inputfilter.get())
 		{
-			if (!LuaObject<Input>::setGlobal( m_state->ls, luaname::Input, "input", m_input))
+			if (!LuaObject<Input>::setGlobal( m_state->ls, "input", m_input))
 			{
 				LOG_ERROR << "Failed to initialize input. It possibly has been redefined as a value of different type";
 			}
 		}
 		if (m_output.m_formatoutput.get())
 		{
-			if (!LuaObject<Output>::setGlobal( m_state->ls, luaname::Output, "output", m_output))
+			if (!LuaObject<Output>::setGlobal( m_state->ls, "output", m_output))
 			{
 				LOG_ERROR << "Failed to initialize output. It possibly has been redefined as a value of different type";
 			}
