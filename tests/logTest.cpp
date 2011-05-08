@@ -104,12 +104,21 @@ TEST_F( LoggingFixture, LogSystemErrorMarkersWin )
 }
 #endif
 
-static int f( int a, int b )
+// fast function
+static int f1( int a, int b )
 {
 	return a+b;
 }
 
-TEST_F( LoggingFixture, PerformanceLoggerNoLogger )
+// slow function
+static int f2( int a, int b )
+{
+	char *s = (char *)malloc( 100000000 );
+	free( s );
+	return a+b;
+}
+
+TEST_F( LoggingFixture, PerformanceLoggerNoLoggerFastFunc )
 {
 	// switch off logging code, measure overhead
 	logBack.setConsoleLevel( LogLevel::LOGLEVEL_UNDEFINED );
@@ -121,11 +130,11 @@ TEST_F( LoggingFixture, PerformanceLoggerNoLogger )
 #endif // defined( _WIN32 _ )
 
 	for( int i = 0; i < 100000; i++ ) {
-		f( 2, 2 );
+		f1( 2, 2 );
 	}
 }
 
-TEST_F( LoggingFixture, PerformanceLoggerSwitchedOffLogger )
+TEST_F( LoggingFixture, PerformanceLoggerSwitchedOffLoggerFastFunc )
 {
 	// switch off logging code, measure overhead
 	logBack.setConsoleLevel( LogLevel::LOGLEVEL_UNDEFINED );
@@ -137,7 +146,40 @@ TEST_F( LoggingFixture, PerformanceLoggerSwitchedOffLogger )
 #endif // defined( _WIN32 _ )
 
 	for( int i = 0; i < 100000; i++ ) {
-		f( 2, 2 );
+		f1( 2, 2 );
+		LOG_TRACE << "test";
+	}
+}
+
+TEST_F( LoggingFixture, PerformanceLoggerNoLoggerSlowFunc )
+{
+	// switch off logging code, measure overhead
+	logBack.setConsoleLevel( LogLevel::LOGLEVEL_UNDEFINED );
+
+	logBack.setLogfileLevel( LogLevel::LOGLEVEL_UNDEFINED );
+	logBack.setSyslogLevel( LogLevel::LOGLEVEL_UNDEFINED );
+#if defined( _WIN32_ )
+	logBack.setEventlogLevel( LogLevel::LOGLEVEL_UNDEFINED );
+#endif // defined( _WIN32 _ )
+
+	for( int i = 0; i < 100000; i++ ) {
+		f2( 2, 2 );
+	}
+}
+
+TEST_F( LoggingFixture, PerformanceLoggerSwitchedOffLoggerSlowFunc )
+{
+	// switch off logging code, measure overhead
+	logBack.setConsoleLevel( LogLevel::LOGLEVEL_UNDEFINED );
+
+	logBack.setLogfileLevel( LogLevel::LOGLEVEL_UNDEFINED );
+	logBack.setSyslogLevel( LogLevel::LOGLEVEL_UNDEFINED );
+#if defined( _WIN32_ )
+	logBack.setEventlogLevel( LogLevel::LOGLEVEL_UNDEFINED );
+#endif // defined( _WIN32 _ )
+
+	for( int i = 0; i < 100000; i++ ) {
+		f2( 2, 2 );
 		LOG_TRACE << "test";
 	}
 }
