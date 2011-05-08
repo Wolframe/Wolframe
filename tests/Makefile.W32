@@ -41,11 +41,11 @@ TEST_CPP_BINS = \
 	singletonTest.exe \
 	poolTest.exe \
 	logTest.exe \
-	protocolArgumentParsing-gTest.exe \
-	configValueParser-gTest.exe
+	protocolArgumentParsing.exe \
+	configValueParser.exe
 # broken on windows
-#	pechoHandler-gTest.exe
-#	mtprocHandler-gTest.exe
+#	pechoHandler.exe
+#	mtprocHandler.exe
 
 
 OBJS = \
@@ -63,14 +63,14 @@ resolvePathTest.exe: resolvePathTest.obj $(TOPDIR)\src\wolframe.lib
 singletonTest.exe: singletonTest.obj $(TOPDIR)\src\wolframe.lib
 poolTest.exe: poolTest.obj $(TOPDIR)\src\wolframe.lib
 logTest.exe: logTest.obj $(TOPDIR)\src\wolframe.lib
-protocolArgumentParsing-gTest.exe: protocolArgumentParsing-gTest.obj $(TOPDIR)\src\wolframe.lib
-configValueParser-gTest.exe: configValueParser-gTest.obj $(TOPDIR)\src\wolframe.lib
+protocolArgumentParsing.exe: protocolArgumentParsing.obj $(TOPDIR)\src\wolframe.lib
+configValueParser.exe: configValueParser.obj $(TOPDIR)\src\wolframe.lib
 # broken on windows
-#pechoHandler-gTest.exe: pechoHandler-gTest.obj
+#pechoHandler.exe: pechoHandler.obj
 
 # broken on windows
 #MTPROC_GTEST_OBJS=$(TOPDIR)\examples\mtproc\mtprocHandler.obj $(TOPDIR)\examples\mtproc\implementation.obj $(TOPDIR)\examples\mtproc\dispatcher.obj
-#mtprocHandler-gTest.exe: mtprocHandler-gTest.obj $(MTPROC_GTEST_OBJS) $(TOPDIR)\src\libwolframe.lib
+#mtprocHandler.exe: mtprocHandler.obj $(MTPROC_GTEST_OBJS) $(TOPDIR)\src\libwolframe.lib
 
 local_all:
 
@@ -90,9 +90,9 @@ local_test:
 	@-echo resolvePathTest >> test.bat
 	@-echo singletonTest >> test.bat
 	@-echo poolTest >> test.bat
-	@-echo protocolArgumentParsing-gTest >> test.bat
+	@-echo protocolArgumentParsing >> test.bat
 # broken on windows
-#	@-echo pechoHandler-gTest >> test.bat
-#	@-echo mtprocHandler-gTest >> test.bat
+#	@-echo pechoHandler >> test.bat
+#	@-echo mtprocHandler >> test.bat
 	@echo
 	@-test.bat

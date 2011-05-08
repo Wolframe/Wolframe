@@ -49,10 +49,10 @@ TEST_CPP_BINS = \
 	singletonTest$(EXE) \
 	poolTest$(EXE) \
 	logTest$(EXE) \
-	protocolArgumentParsing-gTest$(EXE) \
-	configValueParser-gTest$(EXE) \
-	pechoHandler-gTest$(EXE) \
-	mtprocHandler-gTest$(EXE)
+	protocolArgumentParsing$(EXE) \
+	configValueParser$(EXE) \
+	pechoHandler$(EXE) \
+	mtprocHandler$(EXE)
 
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
@@ -60,14 +60,14 @@ TEST_CPP_BINS = \
 logTest$(EXE): $(TOPDIR)/src/libwolframe.a
 
 PECHO_GTEST_OBJS=$(TOPDIR)/examples/pecho/pechoHandler.o
-pechoHandler-gTest$(EXE): pechoHandler-gTest.o $(PECHO_GTEST_OBJS) $(TOPDIR)/src/libwolframe.a
+pechoHandler$(EXE): pechoHandler.o $(PECHO_GTEST_OBJS) $(TOPDIR)/src/libwolframe.a
 	$(CCPP_LINK) -o $@ $(LDFLAGS) $(PECHO_GTEST_OBJS) $(OBJS) $< $(LIBS)
 
 MTPROC_GTEST_OBJS = \
 	$(TOPDIR)/examples/mtproc/mtprocHandler.o \
 	$(TOPDIR)/examples/mtproc/implementation.o \
 	$(TOPDIR)/examples/mtproc/dispatcher.o
-mtprocHandler-gTest$(EXE): mtprocHandler-gTest.o $(MTPROC_GTEST_OBJS) $(TOPDIR)/src/libwolframe.a
+mtprocHandler$(EXE): mtprocHandler.o $(MTPROC_GTEST_OBJS) $(TOPDIR)/src/libwolframe.a
 	$(CCPP_LINK) -o $@ $(LDFLAGS) $(MTPROC_GTEST_OBJS) $(OBJS) $< $(LIBS)
 
 local_all:
@@ -94,10 +94,10 @@ local_test:
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./poolTest
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./protocolArgumentParsing-gTest
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./protocolArgumentParsing
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./pechoHandler-gTest
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./pechoHandler
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./mtprocHandler-gTest
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./mtprocHandler
 	@echo
 	@echo
