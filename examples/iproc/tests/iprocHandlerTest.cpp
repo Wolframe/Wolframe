@@ -226,23 +226,23 @@ TYPED_TEST( iprocHandlerFixture, ExpectedResult )
 	EXPECT_EQ( 0, test::runTestIO( itr, output, *this->connection));
 #define _Wolframe_LOWLEVEL_DEBUG
 #ifdef _Wolframe_LOWLEVEL_DEBUG
-		unsigned int ii=0,nn=output.size();
-		for (;ii<nn && output[ii]==this->expected[ii]; ii++);
-		if (ii != nn)
-		{
-			printf( "SIZE R=%lu,E=%lu,DIFF AT %u='%d %d %d %d|%d %d %d %d'\n",
-				(unsigned long)output.size(), (unsigned long)this->expected.size(), ii,
-				output[ii-2],output[ii-1],output[ii-0],output[ii+1],
-				this->expected[ii-2],this->expected[ii-1],this->expected[ii-0],this->expected[ii+1]);
-		}
+	unsigned int ii=0,nn=output.size();
+	for (;ii<nn && output[ii]==this->expected[ii]; ii++);
+	if (ii != nn)
+	{
+		printf( "SIZE R=%lu,E=%lu,DIFF AT %u='%d %d %d %d|%d %d %d %d'\n",
+			(unsigned long)output.size(), (unsigned long)this->expected.size(), ii,
+			output[ii-2],output[ii-1],output[ii-0],output[ii+1],
+			this->expected[ii-2],this->expected[ii-1],this->expected[ii-0],this->expected[ii+1]);
+	}
 #endif
 	EXPECT_EQ( output, this->expected);
 }
 
 int main( int argc, char **argv )
 {
-		::testing::InitGoogleTest( &argc, argv );
-		_Wolframe::log::LogBackend::instance().setConsoleLevel( _Wolframe::log::LogLevel::LOGLEVEL_DATA );
-		return RUN_ALL_TESTS();
+	::testing::InitGoogleTest( &argc, argv );
+	_Wolframe::log::LogBackend::instance().setConsoleLevel( _Wolframe::log::LogLevel::LOGLEVEL_DATA );
+	return RUN_ALL_TESTS();
 }
 

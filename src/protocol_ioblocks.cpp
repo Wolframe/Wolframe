@@ -82,7 +82,10 @@ MemBlock& MemBlock::operator=( const MemBlock& o)
 
 static void moveInput( char* buf, std::size_t& dstsize, std::size_t& eatsize, std::size_t& bufpos)
 {
-	if (dstsize != eatsize) std::memmove( buf+dstsize, buf+eatsize, bufpos-eatsize);
+	if (dstsize != eatsize)
+	{
+		std::memmove( buf+dstsize, buf+eatsize, bufpos-eatsize);
+	}
 	dstsize += bufpos-eatsize;
 	eatsize = bufpos;
 }
@@ -154,16 +157,14 @@ int InputBlock::getEoDpos( size_type offset)
 		else if (m_eodState == EoD::LF_DOT_CR)
 		{
 			if (buf[bufpos] == '\n') bufpos++;
-			if (bufpos == bufsize) moveInput( buf, dstsize, eatsize, bufpos);
 			m_eodState = EoD::LF_DOT_CR_LF;
 		}
 		else //if (m_eodState == EoD::LF_DOT_CR_LF)
 		{
 			bufpos = bufsize;
-			moveInput( buf, dstsize, eatsize, bufpos);
 		}
 	}
-	setPos( offset+dstsize);	//.. adjust buffer size to the bytes really printed
+	setPos( pos() - eatsize + dstsize);	//.. adjust buffer size to the bytes really printed
 	return eodpos;
 }
 }}//namespace

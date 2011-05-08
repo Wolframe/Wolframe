@@ -82,7 +82,7 @@ struct Connection::Private
 	enum Command {empty, capa, run, quit};
 	static const char* commandName( Command c)
 	{
-		const char* ar[] = {"empty", "capa", "run", "quit", 0};
+		const char* ar[] = {"", "capa", "run", "quit", 0};
 		return ar[c];
 	}
 
@@ -257,12 +257,22 @@ struct Connection::Private
 								state = ProtocolError;
 								return WriteLine( "BAD command");
 							}
-							else
+							else if (ProtocolParser::consumeEOLN( itr, end))
 							{
 								buffer.clear();
 								argBuffer.clear();
 								state = EnterCommand;
 								continue;
+							}
+							else if (itr == end)
+							{
+								input.setPos( 0);
+								return net::ReadData( input.ptr(), input.size());
+							}
+							else
+							{
+								state = ProtocolError;
+								return WriteLine( "BAD command");
 							}
 						case capa:
 							if (argBuffer.argc())
@@ -273,7 +283,7 @@ struct Connection::Private
 							else
 							{
 								return WriteLine( "OK capa run quit");
-								state = Init;
+								state = EnterCommand;
 								continue;
 							}
 						case quit:
