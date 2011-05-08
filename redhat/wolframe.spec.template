@@ -42,10 +42,6 @@ Requires: sqlite >= 3.0
 BuildRequires: postgresql-devel >= 8.1
 Requires: postgresql-libs >= 8.1
 %endif
-%if %{with_lua}
-BuildRequires: lua-devel >= 5.1
-Requires: lua >= 5.1
-%endif
 %if %{with_pam}
 BuildRequires: pam-devel >= 0.99
 Requires: pam >= 0.99
