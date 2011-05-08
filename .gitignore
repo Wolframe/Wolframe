@@ -50,3 +50,5 @@ clients/qt/.history
 tests/db/sdsqliteTest
 tests/db/sqlite3ppTest
 examples/iproc/iprocd
+lua/src/lua
+lua/src/luac
