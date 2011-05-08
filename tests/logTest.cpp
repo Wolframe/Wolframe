@@ -18,7 +18,7 @@ using namespace _Wolframe::log;
 // The fixture for testing class _Wolframe::log
 class LoggingFixture : public ::testing::Test
 {
-	private:
+	protected:
 		LogBackend& logBack;
 		
 	protected:
@@ -103,6 +103,44 @@ TEST_F( LoggingFixture, LogSystemErrorMarkersWin )
 	}
 }
 #endif
+
+static int f( int a, int b )
+{
+	return a+b;
+}
+
+TEST_F( LoggingFixture, PerformanceLoggerNoLogger )
+{
+	// switch off logging code, measure overhead
+	logBack.setConsoleLevel( LogLevel::LOGLEVEL_UNDEFINED );
+
+	logBack.setLogfileLevel( LogLevel::LOGLEVEL_UNDEFINED );
+	logBack.setSyslogLevel( LogLevel::LOGLEVEL_UNDEFINED );
+#if defined( _WIN32_ )
+	logBack.setEventlogLevel( LogLevel::LOGLEVEL_UNDEFINED );
+#endif // defined( _WIN32 _ )
+
+	for( int i = 0; i < 100000; i++ ) {
+		f( 2, 2 );
+	}
+}
+
+TEST_F( LoggingFixture, PerformanceLoggerSwitchedOffLogger )
+{
+	// switch off logging code, measure overhead
+	logBack.setConsoleLevel( LogLevel::LOGLEVEL_UNDEFINED );
+
+	logBack.setLogfileLevel( LogLevel::LOGLEVEL_UNDEFINED );
+	logBack.setSyslogLevel( LogLevel::LOGLEVEL_UNDEFINED );
+#if defined( _WIN32_ )
+	logBack.setEventlogLevel( LogLevel::LOGLEVEL_UNDEFINED );
+#endif // defined( _WIN32 _ )
+
+	for( int i = 0; i < 100000; i++ ) {
+		f( 2, 2 );
+		LOG_TRACE << "test";
+	}
+}
 
 int main( int argc, char **argv )
 {
