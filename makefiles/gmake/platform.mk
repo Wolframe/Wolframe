@@ -304,7 +304,8 @@ endif
 ifeq ($(WITH_LUA),1)
 
 ifeq "$(PLATFORM)" "LINUX"
-LUA_PLATFORM=linux
+LUA_PLATFORM_CFLAGS = -DLUA_USE_LINUX
+LUA_PLATFORM_LDFLAGS = -ldl
 endif
 
 endif

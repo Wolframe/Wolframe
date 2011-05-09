@@ -1,14 +1,12 @@
 TOPDIR = ..
 
-SUBDIRS =
+SUBDIRS = src
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 local_all:
-	$(MAKE) -f Makefile.orig PLAT=$(LUA_PLATFORM)
 
 local_clean:
-	$(MAKE) -f Makefile.orig PLAT=$(LUA_PLATFORM) clean
 
 local_distclean:
 

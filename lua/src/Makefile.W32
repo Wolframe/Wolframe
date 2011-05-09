@@ -57,13 +57,8 @@ OBJS = \
 LIBRARIES = \
 	lua.lib
 	
-BINS = \
-	luac.exe lua.exe
-
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-lua.exe: lua.obj
-luac.exe: luac.obj
 lua.lib: $(OBJS)
 	$(LINK) /lib /nologo /out:$@ $(LDFLAGS) $(LIBS) $?
 
