@@ -68,6 +68,8 @@ public:
 		  m_type( Type )
 	{}
 
+	virtual ~AuthenticationConfigBase()	{}
+
 	AuthenticationType type() const		{ return m_type; }
 };
 

@@ -62,6 +62,8 @@ public:
 		}
 	}
 
+	virtual ~ConfigurationBase()	{}
+
 	/// The display string (name) of the configuration section
 	///\return	a reference to the name set by the constructor
 	const std::string& sectionName() const		{ return sectionName_; }

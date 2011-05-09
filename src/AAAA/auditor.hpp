@@ -66,6 +66,8 @@ public:
 		  m_type( Type )
 	{}
 
+	virtual ~AuditConfigBase()	{}
+
 	AuditType type() const			{ return m_type; }
 };
 
