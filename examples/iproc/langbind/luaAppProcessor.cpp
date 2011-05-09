@@ -341,6 +341,20 @@ static const luaL_Reg filter_methodtable[ 1] =
 	{0,0}
 };
 
+static const luaL_Reg input_methodtable[ 3] =
+{
+	{"as",&function_input_as},
+	{"get",&function_input_get},
+	{0,0}
+};
+
+static const luaL_Reg output_methodtable[ 3] =
+{
+	{"as",&function_output_as},
+	{"print",&function_output_print},
+	{0,0}
+};
+
 static void create_global_functions( lua_State* ls, System* system)
 {
 	//yield( )
@@ -375,20 +389,6 @@ struct AppProcessor::State
 	{
 		if (ls) lua_close( ls);
 	}
-};
-
-static const luaL_Reg input_methodtable[ 3] =
-{
-	{"as",&function_input_as},
-	{"get",&function_input_get},
-	{0,0}
-};
-
-static const luaL_Reg output_methodtable[ 3] =
-{
-	{"as",&function_output_as},
-	{"print",&function_output_print},
-	{0,0}
 };
 
 AppProcessor::AppProcessor( System* system, const lua::Configuration* config)
