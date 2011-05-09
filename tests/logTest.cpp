@@ -118,6 +118,12 @@ static int f2( int a, int b )
 	return a+b;
 }
 
+// inlined fast function
+static inline int f3( int a, int b )
+{
+	return a+b;
+}
+
 TEST_F( LoggingFixture, PerformanceLoggerNoLoggerFastFunc )
 {
 	// switch off logging code, measure overhead
@@ -147,6 +153,39 @@ TEST_F( LoggingFixture, PerformanceLoggerSwitchedOffLoggerFastFunc )
 
 	for( int i = 0; i < 100000; i++ ) {
 		f1( 2, 2 );
+		LOG_TRACE << "test";
+	}
+}
+
+TEST_F( LoggingFixture, PerformanceLoggerNoLoggerFastFuncInline )
+{
+	// switch off logging code, measure overhead
+	logBack.setConsoleLevel( LogLevel::LOGLEVEL_UNDEFINED );
+
+	logBack.setLogfileLevel( LogLevel::LOGLEVEL_UNDEFINED );
+	logBack.setSyslogLevel( LogLevel::LOGLEVEL_UNDEFINED );
+#if defined( _WIN32_ )
+	logBack.setEventlogLevel( LogLevel::LOGLEVEL_UNDEFINED );
+#endif // defined( _WIN32 _ )
+
+	for( int i = 0; i < 100000; i++ ) {
+		f3( 2, 2 );
+	}
+}
+
+TEST_F( LoggingFixture, PerformanceLoggerSwitchedOffLoggerFastFuncInline )
+{
+	// switch off logging code, measure overhead
+	logBack.setConsoleLevel( LogLevel::LOGLEVEL_UNDEFINED );
+
+	logBack.setLogfileLevel( LogLevel::LOGLEVEL_UNDEFINED );
+	logBack.setSyslogLevel( LogLevel::LOGLEVEL_UNDEFINED );
+#if defined( _WIN32_ )
+	logBack.setEventlogLevel( LogLevel::LOGLEVEL_UNDEFINED );
+#endif // defined( _WIN32 _ )
+
+	for( int i = 0; i < 100000; i++ ) {
+		f3( 2, 2 );
 		LOG_TRACE << "test";
 	}
 }
