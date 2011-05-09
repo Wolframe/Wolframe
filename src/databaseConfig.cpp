@@ -140,7 +140,7 @@ bool PostgreSQLconfig::parse( const boost::property_tree::ptree& pt, const std::
 				retVal = false;
 		}
 		else	{
-			LOG_WARNING << logPrefix() << ": unknown configuration option: '"
+			LOG_WARNING << logPrefix() << "unknown configuration option: '"
 				    << L1it->first << "'";
 		}
 	}
@@ -198,7 +198,7 @@ bool SQLiteConfig::parse( const boost::property_tree::ptree& pt, const std::stri
 				retVal = false;
 			else	{
 				if ( ! boost::filesystem::path( filename ).is_absolute() )
-					LOG_WARNING << logPrefix() << ": database file path is not absolute: "
+					LOG_WARNING << logPrefix() << "database file path is not absolute: "
 						    << filename;
 			}
 		}
@@ -207,7 +207,7 @@ bool SQLiteConfig::parse( const boost::property_tree::ptree& pt, const std::stri
 				retVal = false;
 		}
 		else	{
-			LOG_WARNING << logPrefix() << ": unknown configuration option: '"
+			LOG_WARNING << logPrefix() << "unknown configuration option: '"
 				    << L1it->first << "'";
 		}
 	}
@@ -317,7 +317,7 @@ bool Configuration::parse( const boost::property_tree::ptree& pt, const std::str
 			}
 		}
 		else
-			LOG_WARNING << logPrefix() << ": unknown configuration option: '"
+			LOG_WARNING << logPrefix() << "unknown configuration option: '"
 				    << L1it->first << "'";
 	}
 	return retVal;
@@ -379,7 +379,7 @@ bool SingleDBConfiguration::parse( const boost::property_tree::ptree& pt, const 
 	else	{
 		for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 			if ( m_dbConfig != NULL )	{
-				LOG_ERROR << logPrefix() << ": database already defined: '"
+				LOG_ERROR << logPrefix() << "database already defined: '"
 					    << L1it->first << "'";
 				retVal = false;
 			}
@@ -404,14 +404,14 @@ bool SingleDBConfiguration::parse( const boost::property_tree::ptree& pt, const 
 					}
 				}
 				else
-					LOG_WARNING << logPrefix() << ": unknown configuration option: '"
+					LOG_WARNING << logPrefix() << "unknown configuration option: '"
 						    << L1it->first << "'";
 			}
 		}
 	}
 
 	if ( ! m_dbConfig )	{
-		LOG_ERROR << logPrefix() << ": database label without definition";
+		LOG_ERROR << logPrefix() << "database label without definition";
 		retVal = false;
 	}
 

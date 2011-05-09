@@ -54,7 +54,7 @@ struct Output
 	{
 		Data,		///< normal processing
 		DoYield,	///< yield because rest of buffer not sufficient to complete operation
-		Error		///< logic error in output. Operation is not possible 
+		Error		///< logic error in output. Operation is not possible
 	};
 	/// \brief constructor
 	Output() :m_state(0){}
@@ -103,12 +103,12 @@ struct Input
 	boost::shared_ptr<protocol::InputFilter> m_inputfilter;		///< input is defined by the associated input filter
 
 	/// \brief constructor
-	Input(){};
+	Input(){}
 	/// \brief copy constructor
 	/// \param[in] o copied item
 	Input( const Input& o) :m_inputfilter(o.m_inputfilter){}
 	/// \brief destructor
-	~Input(){};
+	~Input(){}
 };
 
 /// \class Filter
@@ -119,7 +119,7 @@ struct Filter
 	boost::shared_ptr<protocol::InputFilter> m_inputfilter;			///< input filter
 
 	/// \brief constructor
-	/// \param[in] system reference to system function call interface 
+	/// \param[in] system reference to system function call interface
 	/// \param[in] name name of the filter as defined in the system
 	Filter( System* system, const char* name)
 		:m_formatoutput(system->createFormatOutput(name))
@@ -131,7 +131,7 @@ struct Filter
 		:m_formatoutput(o.m_formatoutput)
 		,m_inputfilter(o.m_inputfilter){}
 	/// \brief destructor
-	~Filter(){};
+	~Filter(){}
 };
 
 /// \class InputFilterClosure

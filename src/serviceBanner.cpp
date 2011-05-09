@@ -77,7 +77,7 @@ bool ServiceBanner::parse( const boost::property_tree::ptree& pt, const std::str
 			return false;
 		tokens_ = strToToken( val );
 		if ( tokens_ == UNDEFINED )	{
-			LOG_ERROR << logPrefix() << ": Unknown option '" << val << "' for " << node;
+			LOG_ERROR << logPrefix() << "Unknown option '" << val << "' for " << node;
 			return false;
 		}
 	}
@@ -87,7 +87,7 @@ bool ServiceBanner::parse( const boost::property_tree::ptree& pt, const std::str
 			return false;
 	}
 	else	{
-		LOG_FATAL << logPrefix() << ": called with unknown configuration option: '"
+		LOG_FATAL << logPrefix() << "called with unknown configuration option: '"
 			  << node << "'";
 		return false;
 	}

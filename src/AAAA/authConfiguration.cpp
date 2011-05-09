@@ -60,12 +60,12 @@ bool TextFileAuthConfig::parse( const boost::property_tree::ptree& pt, const std
 			retVal = false;
 		else	{
 			if ( ! boost::filesystem::path( m_file ).is_absolute() )
-				LOG_WARNING << logPrefix() << ": authentication file path is not absolute: "
+				LOG_WARNING << logPrefix() << "authentication file path is not absolute: "
 					    << m_file;
 		}
 	}
 	else	{
-		LOG_WARNING << logPrefix() << ": unknown configuration option: '" << node << "'";
+		LOG_WARNING << logPrefix() << "unknown configuration option: '" << node << "'";
 	}
 	return retVal;
 }
@@ -134,7 +134,7 @@ bool AuthenticationConfiguration::parse( const boost::property_tree::ptree& pt, 
 			}
 		}
 		else
-			LOG_WARNING << logPrefix() << ": unknown configuration option: '"
+			LOG_WARNING << logPrefix() << "unknown configuration option: '"
 				    << L1it->first << "'";
 	}
 	return retVal;

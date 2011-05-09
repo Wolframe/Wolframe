@@ -60,12 +60,12 @@ bool FileAuditConfig::parse( const boost::property_tree::ptree& pt, const std::s
 			retVal = false;
 		else	{
 			if ( ! boost::filesystem::path( m_file ).is_absolute() )
-				LOG_WARNING << logPrefix() << ": audit file path is not absolute: "
+				LOG_WARNING << logPrefix() << "audit file path is not absolute: "
 					    << m_file;
 		}
 	}
 	else	{
-		LOG_WARNING << logPrefix() << ": unknown configuration option: '" << node << "'";
+		LOG_WARNING << logPrefix() << "unknown configuration option: '" << node << "'";
 	}
 	return retVal;
 }
@@ -134,7 +134,7 @@ bool AuditConfiguration::parse( const boost::property_tree::ptree& pt, const std
 			}
 		}
 		else
-			LOG_WARNING << logPrefix() << ": unknown configuration option: '"
+			LOG_WARNING << logPrefix() << "unknown configuration option: '"
 				    << L1it->first << "'";
 	}
 	return retVal;
