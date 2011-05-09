@@ -104,6 +104,7 @@ sasl.db:
 	echo "xx" | /usr/sbin/saslpasswd2 -f sasl.db -p test
 
 local_test: sasl.db
+ifeq ($(WITH_EXPECT),1)
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./checkAuthTextFileUnknownUser
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./checkAuthTextFileWrongPass
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./checkAuthTextFileOk
@@ -126,4 +127,5 @@ ifeq ($(WITH_SASL),1)
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./checkAuthSaslCramMd5UnknownUser
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./checkAuthSaslCramMd5WrongPass
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./checkAuthSaslCramMd5Ok
+endif
 endif
