@@ -152,7 +152,10 @@ public:
 	/// \brief constructor
 	/// \param[in] ig input filter reference from input
 	InputFilterClosure( const boost::shared_ptr<protocol::InputFilter>& ig)
-		:m_inputfilter(ig),m_type(protocol::InputFilter::Value),m_value(0),m_buf(0),m_bufsize(0),m_bufpos(0){}
+		:m_inputfilter(ig),m_type(protocol::InputFilter::Value),m_value(0),m_buf(0),m_bufsize(ig->getGenBufferSize()),m_bufpos(0)
+	{
+		m_buf = new char[ m_bufsize];
+	}
 
 	/// \brief internal buffer reset
 	void init()

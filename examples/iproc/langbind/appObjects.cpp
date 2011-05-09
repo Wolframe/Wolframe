@@ -45,7 +45,7 @@ using namespace app;
 
 InputFilterClosure::ItemType InputFilterClosure::fetch( const char*& e1, unsigned int& e1size, const char*& e2, unsigned int& e2size)
 {
-	if (!m_inputfilter.get())
+	if (!m_inputfilter.get() || m_bufsize==0)
 	{
 		return EndOfData;
 	}

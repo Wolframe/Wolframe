@@ -83,33 +83,13 @@ template <> const char* metaTableName<InputFilterClosure>()	{return luaname::Inp
 template <class ObjectType>
 struct LuaObject :public ObjectType
 {
-	const char* m_mtname;
-
 	LuaObject( const ObjectType& o)
-		:ObjectType(o),m_mtname(metaTableName<ObjectType>()) {check();}
-
-	void check() const
-	{
-		if (m_mtname != metaTableName<ObjectType>())
-		{
-			LOG_ERROR << "inconsistency in data";
-		}
-	}
-	operator ObjectType*()
-	{
-		check();
-		return this;
-	}
-	operator const ObjectType*() const
-	{
-		check();
-		return this;
-	}
+		:ObjectType(o) {}
+	LuaObject() {}
 
 	static int destroy( lua_State* ls)
 	{
 		LuaObject *THIS = (LuaObject*)lua_touserdata( ls, 1);
-		THIS->check();
 		if (THIS) THIS->~LuaObject();
 		return 0;
 	}
@@ -188,95 +168,96 @@ struct LuaObject :public ObjectType
 		{
 			luaL_error( ls, "'%s' needs self parameter (%s:%s() instead of %s.%s())", name, name, method, name, method);
 		}
-		self->check();
 		return self;
 	}
 
 	static LuaObject* get( lua_State* ls, int index)
 	{
 		LuaObject* rt = (LuaObject*) toudata_udkey( ls, index, metaTableName<ObjectType>());
-		rt->check();
 		return rt;
 	}
 };
 
 static int function_inputFilter( lua_State* ls)
 {
-	const char* item[2];
-	unsigned int itemsize[2];
-
-	InputFilterClosure* closure = (InputFilterClosure*)lua_touserdata( ls, lua_upvalueindex( 1));
-
-	switch (closure->fetch( item[0], itemsize[0], item[1], itemsize[1]))
+	for (;;)
 	{
-		case InputFilterClosure::DoYield:
-			goto EXIT_YIELD;
+		const char* item[2];
+		unsigned int itemsize[2];
 
-		case InputFilterClosure::EndOfData:
-			return 0;
+		InputFilterClosure* closure = (InputFilterClosure*)lua_touserdata( ls, lua_upvalueindex( 1));
 
-		case InputFilterClosure::Error:
-			luaL_error( ls, "error in iterator");
-			return 0;
+		switch (closure->fetch( item[0], itemsize[0], item[1], itemsize[1]))
+		{
+			case InputFilterClosure::DoYield:
+				lua_yield( ls, 0);
+				continue;
 
-		case InputFilterClosure::Data:
-			if (item[0]) lua_pushstring( ls, item[0]); else lua_pushnil( ls);
-			if (item[1]) lua_pushstring( ls, item[1]); else lua_pushnil( ls);
-			return 2;
+			case InputFilterClosure::EndOfData:
+				return 0;
+
+			case InputFilterClosure::Error:
+				luaL_error( ls, "error in iterator");
+				return 0;
+
+			case InputFilterClosure::Data:
+				if (item[0]) lua_pushstring( ls, item[0]); else lua_pushboolean( ls, 0);
+				if (item[1]) lua_pushstring( ls, item[1]); else lua_pushboolean( ls, 0);
+				return 2;
+		}
+		luaL_error( ls, "illegal state produced by input filter");
+		return 0;
 	}
-	luaL_error( ls, "illegal state produced by input filter");
-	return 0;
-EXIT_YIELD:
-	return lua_yield( ls, 0);
+}
+
+static const char* get_printop( lua_State* ls, int index, std::size_t& size)
+{
+	const char* rt = 0;
+	if (lua_isnil( ls, index) || (lua_isboolean( ls, index) && !lua_toboolean( ls, index))) {}
+	else if ((rt=lua_tolstring( ls, 2, &size)) == 0)
+	{
+		luaL_error( ls, "invalid type of argument %d (convertable to string or nil or false expected)", index);
+	}
+	return rt;
 }
 
 static int function_output_print( lua_State* ls)
 {
-	const char* item[2] = {0,0};
-	std::size_t itemsize[2] = {0,0};
+	for (;;)
+	{
+		const char* item[2] = {0,0};
+		std::size_t itemsize[2] = {0,0};
 
-	Output* output = LuaObject<Output>::getSelf( ls, "output", "print");
-	if (lua_gettop( ls) == 2)
-	{
-		if (lua_isnil( ls, 2)) {}
-		else if ((item[1]=lua_tolstring( ls, 2, &itemsize[1])) == 0)
+		Output* output = LuaObject<Output>::getSelf( ls, "output", "print");
+		if (lua_gettop( ls) == 2)
 		{
-			luaL_error( ls, "invalid type of argument (convertable to string or nil expected)");
+			item[1] = get_printop( ls, 2, itemsize[1]);
 		}
-	}
-	else if (lua_gettop( ls) == 3)
-	{
-		if (lua_isnil( ls, 2)) {}
-		else if ((item[0]=lua_tolstring( ls, 2, &itemsize[0])) == 0)
+		else if (lua_gettop( ls) == 3)
 		{
-			luaL_error( ls, "invalid type of first argument (convertable to string or nil expected)");
+			item[0] = get_printop( ls, 2, itemsize[0]);
+			item[1] = get_printop( ls, 3, itemsize[1]);
 		}
-		if (lua_isnil( ls, 3)) {}
-		else if ((item[1]=lua_tolstring( ls, 3, &itemsize[1])) == 0)
+		else
 		{
-			luaL_error( ls, "invalid type of second argument (convertable to string or nil expected)");
+			return luaL_error( ls, "too many arguments in call of format output print");
 		}
-	}
-	else
-	{
-		return luaL_error( ls, "too many arguments in call of format output print");
-	}
-	switch (output->print( item[0], itemsize[0], item[1], itemsize[1]))
-	{
-		case Output::DoYield:
-			goto EXIT_YIELD;
+		switch (output->print( item[0], itemsize[0], item[1], itemsize[1]))
+		{
+			case Output::DoYield:
+				lua_yield( ls, 0);
+				continue;
 
-		case Output::Error:
-			luaL_error( ls, "error in format output print");
-			return 0;
+			case Output::Error:
+				luaL_error( ls, "error in format output print");
+				return 0;
 
-		case Output::Data:
-			return 0;
+			case Output::Data:
+				return 0;
+		}
+		luaL_error( ls, "illegal state produced by format output print");
+		return 0;
 	}
-	luaL_error( ls, "illegal state produced by format output print");
-	return 0;
-EXIT_YIELD:
-	return lua_yield( ls, 0);
 }
 
 static int function_filter( lua_State* ls)
@@ -343,7 +324,7 @@ static int function_input_get( lua_State* ls)
 	{
 		return luaL_error( ls, "no filter defined for input with input:as");
 	}
-	LuaObject<InputFilterClosure>::push_luastack( ls, InputFilterClosure( input->m_inputfilter));
+	LuaObject<InputFilterClosure>::push_luastack( ls, input->m_inputfilter);
 	lua_pushcclosure( ls, &function_inputFilter, 1);
 	return 1;
 }

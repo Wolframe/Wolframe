@@ -154,7 +154,7 @@ int InputBlock::getEoDpos( size_type offset)
 		}
 		else if (m_eodState == EoD::LF_DOT_CR)
 		{
-			if (buf[bufpos] == '\n') bufpos++;
+			if (buf[bufpos] == '\n') eatsize=++bufpos;
 			if (bufpos == bufsize) moveInput( buf, dstsize, eatsize, bufpos);
 			m_eodState = EoD::LF_DOT_CR_LF;
 		}

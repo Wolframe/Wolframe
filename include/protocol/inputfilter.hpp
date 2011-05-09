@@ -43,6 +43,8 @@ namespace protocol {
 /// \brief Input filter generator data with iterator function for the application processor to iterate on network input content elements
 struct InputFilter
 {
+	enum {DefaultBufferSize=1024};
+
 	typedef std::size_t size_type;
 
 	/// \enum State
@@ -106,7 +108,7 @@ struct InputFilter
 
 	/// \brief Constructor
 	/// \param [in] gn GetNext function pointer
-	InputFilter() :m_ptr(0),m_pos(0),m_size(0),m_gotEoD(false),m_state(Open),m_errorCode(0){}
+	InputFilter() :m_ptr(0),m_pos(0),m_size(0),m_gotEoD(false),m_state(Open),m_errorCode(0),m_genbufsize(DefaultBufferSize){}
 	/// \brief destructor
 	virtual ~InputFilter(){}
 
@@ -124,7 +126,13 @@ struct InputFilter
 	/// \brief Set input filter generator state with error code
 	/// \param [in] s new state
 	/// \param [in] e (optional) error code to set
-	void setState( State s, int e=0)		{m_state=s;m_errorCode=e;}
+	void setState( State s, int e=0)		{m_state=s;m_errorCode=e;}	
+	/// \brief Set the size of the buffer used for the generated elements
+	/// \param [in] bufsize size of the buffer in bytes
+	void setGenBufferSize( size_type bufsize)	{m_genbufsize = bufsize;}
+	/// \brief Get the size of the buffer used for the generated elements
+	/// \return bufsize size of the buffer in bytes
+	size_type getGenBufferSize() const		{return m_genbufsize;}
 
 private:
 	void* m_ptr;		///< pointer to network input buffer
@@ -133,6 +141,7 @@ private:
 	bool m_gotEoD;		///< got end of data flag
 	State m_state;		///< state
 	int m_errorCode;	///< error code
+	size_type m_genbufsize;	///< element buffer size (the buffer itself is managed by the client of this class)
 };
 
 }}//namespace

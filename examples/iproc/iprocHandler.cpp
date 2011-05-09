@@ -76,7 +76,7 @@ struct Connection::Private
 	};
 	static const char* stateName( State i)
 	{
-		static const char* ar[] = {"Init","EnterCommand","ParseArgs", "Processing","ProcessingInput","ProtocolError","CommandError","EndOfCommand","Terminate"};
+		static const char* ar[] = {"Init","EnterCommand","ParseArgs", "Processing","ProcessingInput","ProtocolError","DiscardInput","EndOfCommand","Terminate"};
 		return ar[i];
 	}
 	enum Command {empty, capa, run, quit};
