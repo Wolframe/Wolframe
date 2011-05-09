@@ -142,6 +142,7 @@ protected:
 };
 
 typedef ::testing::Types<
+	OneEmptyLine<3,3>,
 	OneEmptyLine<2,2>,
 	Empty<1,1>,
 	OneEmptyLine<1,1>,
@@ -153,7 +154,6 @@ typedef ::testing::Types<
 	OneLine<2,2>,
 	Random<2,2,2000>,
 	Empty<3,3>,
-	OneEmptyLine<3,3>,
 	OneOneCharLine<3,3>,
 	OneLine<3,3>,
 	Random<3,3,2000>,

@@ -137,15 +137,13 @@ int InputBlock::getEoDpos( size_type offset)
 			{
 				eodpos = (int)dstsize++;  //< define EoD
 				m_eodState = EoD::LF_DOT_CR;
-				bufpos++;
-				eatsize = bufpos;
+				eatsize = ++bufpos;
 			}
 			else if (buf[bufpos] == '\n')
 			{
 				eodpos = (int)dstsize++;	//< define EoD
 				m_eodState = EoD::LF_DOT_CR_LF;
-				bufpos++;
-				eatsize = bufpos;
+				eatsize = ++bufpos;
 			}
 			else
 			{
@@ -157,11 +155,13 @@ int InputBlock::getEoDpos( size_type offset)
 		else if (m_eodState == EoD::LF_DOT_CR)
 		{
 			if (buf[bufpos] == '\n') bufpos++;
+			if (bufpos == bufsize) moveInput( buf, dstsize, eatsize, bufpos);
 			m_eodState = EoD::LF_DOT_CR_LF;
 		}
 		else //if (m_eodState == EoD::LF_DOT_CR_LF)
 		{
 			bufpos = bufsize;
+			moveInput( buf, dstsize, eatsize, bufpos);
 		}
 	}
 	setPos( pos() - eatsize + dstsize);	//.. adjust buffer size to the bytes really printed
