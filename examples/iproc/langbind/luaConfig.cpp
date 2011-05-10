@@ -163,11 +163,17 @@ static int function_printlog( lua_State *ls)
 			luaL_error( ls, "failed to map printLog arguments to a string");
 		}
 	}
-
-	_Wolframe::log::Logger( _Wolframe::log::LogBackend::instance() ).Get(
-				_Wolframe::log::LogLevel::strToLogLevel( logLevel ) )
-		<< _Wolframe::log::LogComponent::LogLua
-		<< logmsg;
+	_Wolframe::log::LogLevel::Level lv = _Wolframe::log::LogLevel::strToLogLevel( logLevel);
+	if (lv == LogLevel::LOGLEVEL_UNDEFINED)
+	{
+		luaL_error( ls, "printLog called with undefined loglevel '%s' as first argument", logLevel);
+	}
+	else
+	{
+		_Wolframe::log::Logger( _Wolframe::log::LogBackend::instance() ).Get( lv )
+			<< _Wolframe::log::LogComponent::LogLua
+			<< logmsg;
+	}
 	return 0;
 }
 
