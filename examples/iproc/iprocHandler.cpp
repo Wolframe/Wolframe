@@ -413,11 +413,13 @@ struct Connection::Private
 					itr = input.getStart( itr);
 					if (input.gotEoD_LF())
 					{
+						input.resetEoD();
 						state = EnterCommand;
 						continue;
 					}
 					else if (itr < end)
 					{
+						input.resetEoD();
 						state = Init;
 						return WriteLine( "BAD end of line in protocol after end of data");
 					}
