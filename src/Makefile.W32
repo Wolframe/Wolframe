@@ -57,6 +57,7 @@ LOGGER_OBJS = \
 	logger\syslog_win32.obj \
 	logger\logBackendEventlog.obj \
 	logger\logBackendImpl.obj \
+	logger\loggerConfig.obj \
 	logger\logger.obj \
 
 AAAA_OBJS = \
@@ -81,7 +82,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	$(LOGGER_OBJS) \
 	serviceConfig.obj \
 	serviceBanner.obj \
-	loggerConfig.obj \
 	databaseConfig.obj \
 	appConfig.obj \
 	protocol_ioblocks.obj \
