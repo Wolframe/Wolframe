@@ -118,5 +118,4 @@ Database* DBprovider::database( std::string& id ) const
 	return NULL;
 }
 
-
 }} // namespace _Wolframe::db

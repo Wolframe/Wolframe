@@ -212,6 +212,7 @@ lua/etc/min.c
 lua/etc/noparser.c
 lua/GNUmakefile
 lua/Makefile.W32
+lua/src/GNUmakefile
 lua/src/lapi.c
 lua/src/lapi.h
 lua/src/lauxlib.c
@@ -308,7 +309,6 @@ src/getPassword.cpp
 src/getPassword.hpp
 src/GNUmakefile
 src/handlerConfig.hpp
-src/loggerConfig.cpp
 src/logger/logBackendConsole.cpp
 src/logger/logBackendConsole.hpp
 src/logger/logBackendEventlog.cpp
@@ -321,6 +321,7 @@ src/logger/logBackendSyslog.cpp
 src/logger/logBackendSyslog.hpp
 src/logger/logComponent.cpp
 src/logger/logError.cpp
+src/logger/loggerConfig.cpp
 src/logger/logger.cpp
 src/logger/logLevel.cpp
 src/logger/logSyslogFacility.cpp

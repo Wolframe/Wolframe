@@ -113,6 +113,7 @@ LOGGER_OBJS = \
 	logger/logBackendFile.o \
 	logger/logBackendSyslog.o \
 	logger/logBackendImpl.o \
+	logger/loggerConfig.o \
 	logger/logger.o
 
 AAAA_OBJS = \
@@ -146,7 +147,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	$(LOGGER_OBJS) \
 	serviceConfig.o \
 	serviceBanner.o \
-	loggerConfig.o \
 	databaseConfig.o \
 	appConfig.o \
 	protocol_ioblocks.o \
