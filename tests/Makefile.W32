@@ -65,12 +65,12 @@ poolTest.exe: poolTest.obj $(TOPDIR)\src\wolframe.lib
 logTest.exe: logTest.obj $(TOPDIR)\src\wolframe.lib
 protocolArgumentParsing.exe: protocolArgumentParsing.obj $(TOPDIR)\src\wolframe.lib
 configValueParser.exe: configValueParser.obj $(TOPDIR)\src\wolframe.lib
-# broken on windows
-#pechoHandler.exe: pechoHandler.obj
 
-# broken on windows
-#MTPROC_GTEST_OBJS=$(TOPDIR)\examples\mtproc\mtprocHandler.obj $(TOPDIR)\examples\mtproc\implementation.obj $(TOPDIR)\examples\mtproc\dispatcher.obj
-#mtprocHandler.exe: mtprocHandler.obj $(MTPROC_GTEST_OBJS) $(TOPDIR)\src\libwolframe.lib
+PECHO_GTEST_OBJS=$(TOPDIR)\examples\pecho\pechoHandler.obj 
+pechoHandler.exe: pechoHandler.obj $(PECHO_GTEST_OBJS) $(TOPDIR)\src\wolframe.lib
+
+MTPROC_GTEST_OBJS=$(TOPDIR)\examples\mtproc\mtprocHandler.obj $(TOPDIR)\examples\mtproc\implementation.obj $(TOPDIR)\examples\mtproc\dispatcher.obj
+mtprocHandler.exe: mtprocHandler.obj $(MTPROC_GTEST_OBJS) $(TOPDIR)\src\wolframe.lib
 
 local_all:
 
@@ -91,8 +91,7 @@ local_test:
 	@-echo singletonTest >> test.bat
 	@-echo poolTest >> test.bat
 	@-echo protocolArgumentParsing >> test.bat
-# broken on windows
-#	@-echo pechoHandler >> test.bat
-#	@-echo mtprocHandler >> test.bat
+	@-echo pechoHandler >> test.bat
+	@-echo mtprocHandler >> test.bat
 	@echo
 	@-test.bat
