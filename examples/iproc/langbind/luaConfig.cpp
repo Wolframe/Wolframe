@@ -164,7 +164,7 @@ static int function_printlog( lua_State *ls)
 		}
 	}
 	_Wolframe::log::LogLevel::Level lv = _Wolframe::log::LogLevel::strToLogLevel( logLevel);
-	if (lv == LogLevel::LOGLEVEL_UNDEFINED)
+	if (lv == _Wolframe::log::LogLevel::LOGLEVEL_UNDEFINED)
 	{
 		luaL_error( ls, "printLog called with undefined loglevel '%s' as first argument", logLevel);
 	}
