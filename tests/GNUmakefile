@@ -50,25 +50,26 @@ TEST_CPP_BINS = \
 	poolTest$(EXE) \
 	logTest$(EXE) \
 	protocolArgumentParsing$(EXE) \
-	configValueParser$(EXE) \
-	pechoHandler$(EXE) \
-	mtprocHandler$(EXE)
-
+	configValueParser$(EXE)
+# \
+#	pechoHandler$(EXE) \
+#	mtprocHandler$(EXE)
+# TEMPORARILY DISABLED SOME TESTS
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 logTest$(EXE): $(TOPDIR)/src/libwolframe.a
 
-PECHO_GTEST_OBJS=$(TOPDIR)/examples/pecho/pechoHandler.o
-pechoHandler$(EXE): pechoHandler.o $(PECHO_GTEST_OBJS) $(TOPDIR)/src/libwolframe.a
-	$(CCPP_LINK) -o $@ $(LDFLAGS) $(PECHO_GTEST_OBJS) $(OBJS) $< $(LIBS)
-
-MTPROC_GTEST_OBJS = \
-	$(TOPDIR)/examples/mtproc/mtprocHandler.o \
-	$(TOPDIR)/examples/mtproc/implementation.o \
-	$(TOPDIR)/examples/mtproc/dispatcher.o
-mtprocHandler$(EXE): mtprocHandler.o $(MTPROC_GTEST_OBJS) $(TOPDIR)/src/libwolframe.a
-	$(CCPP_LINK) -o $@ $(LDFLAGS) $(MTPROC_GTEST_OBJS) $(OBJS) $< $(LIBS)
+#PECHO_GTEST_OBJS=$(TOPDIR)/examples/pecho/pechoHandler.o
+#pechoHandler$(EXE): pechoHandler.o $(PECHO_GTEST_OBJS) $(TOPDIR)/src/libwolframe.a
+#	$(CCPP_LINK) -o $@ $(LDFLAGS) $(PECHO_GTEST_OBJS) $(OBJS) $< $(LIBS)
+#
+#MTPROC_GTEST_OBJS = \
+#	$(TOPDIR)/examples/mtproc/mtprocHandler.o \
+#	$(TOPDIR)/examples/mtproc/implementation.o \
+#	$(TOPDIR)/examples/mtproc/dispatcher.o
+#mtprocHandler$(EXE): mtprocHandler.o $(MTPROC_GTEST_OBJS) $(TOPDIR)/src/libwolframe.a
+#	$(CCPP_LINK) -o $@ $(LDFLAGS) $(MTPROC_GTEST_OBJS) $(OBJS) $< $(LIBS)
 
 local_all:
 
@@ -96,8 +97,8 @@ local_test:
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./protocolArgumentParsing
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./pechoHandler
+#	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./pechoHandler
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./mtprocHandler
+#	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./mtprocHandler
 	@echo
 	@echo
