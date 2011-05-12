@@ -151,8 +151,11 @@ static int function_printlog( lua_State *ls)
 	 * whether it's a string or a number
 	 */
 	int ii,nn = lua_gettop(ls);
-	if (nn <= 0) luaL_error( ls, "no arguments passed to logger");
-
+	if (nn <= 0)
+	{
+		LOG_ERROR << "no arguments passed to 'printlog'";
+		return 0;
+	}
 	const char *logLevel = luaL_checkstring( ls, 1);
 	std::string logmsg;
 
@@ -160,13 +163,13 @@ static int function_printlog( lua_State *ls)
 	{
 		if (!getDescription( ls, ii, logmsg))
 		{
-			luaL_error( ls, "failed to map printLog arguments to a string");
+			LOG_ERROR << "failed to map 'printLog' arguments to a string";
 		}
 	}
 	_Wolframe::log::LogLevel::Level lv = _Wolframe::log::LogLevel::strToLogLevel( logLevel);
 	if (lv == _Wolframe::log::LogLevel::LOGLEVEL_UNDEFINED)
 	{
-		luaL_error( ls, "printLog called with undefined loglevel '%s' as first argument", logLevel);
+		LOG_ERROR << "'printLog' called with undefined loglevel '" << logLevel << "' as first argument";
 	}
 	else
 	{

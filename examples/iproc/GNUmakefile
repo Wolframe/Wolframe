@@ -75,7 +75,6 @@ TEST_BINS += \
 tests/iprocHandlerTest$(EXE): tests/iprocHandlerTest.o $(OBJS) $(TOPDIR)/src/libwolframe.a
 	$(CCPP_LINK) -o $@ $(LDFLAGS) $(OBJS) $< $(LIBS)
 
-
 local_all: $(CPP_BINS)
 
 local_clean:
@@ -84,11 +83,8 @@ local_distclean:
 
 local_install:
 
-local_test:
-
-# DISABLED UNTIL THEY WORK:
-# local_test: $(TEST_BINS)
-#	cd tests && ./iprocHandlerTest$(EXE)
+local_test: $(TEST_BINS)
+	cd tests && ./iprocHandlerTest$(EXE)
 
 run: $(CPP_BINS)
 	@echo "Running the Wolframe iproc example..."

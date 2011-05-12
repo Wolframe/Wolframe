@@ -58,7 +58,7 @@ public:
 	/// \brief constructor
 	/// \param name configuration name
 	/// \param prefix configuration prefix
-	Configuration( const char* name, const char* prefix) :ConfigurationBase(name, NULL, prefix),m_input_bufsize(512),m_output_bufsize(512),m_cthread_stacksize(1024){}
+	Configuration( const char* name, const char* prefix) :ConfigurationBase(name, NULL, prefix),m_input_bufsize(512),m_output_bufsize(512),m_cthread_stacksize(2048){}
 
 	/// \brief interface implementation of ConfigurationBase::parse(const boost::property_tree::ptree&, const std::string&)
 	virtual bool parse( const boost::property_tree::ptree&, const std::string&);

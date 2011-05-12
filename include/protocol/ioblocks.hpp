@@ -189,26 +189,7 @@ public:
 	void resetEoD()						{m_eodState=EoD::SRC;}
 
 	/// \brief Return true if end of data was recognized with the last call of getEoD(iterator)
-	bool gotEoD() const					{return m_eodState>=EoD::LF_DOT_CR;}
-
-	/// \brief Return true if we have consumed also the terminating LineFeed after the end of data
-	bool gotEoD_LF() const					{return m_eodState>=EoD::LF_DOT_CR_LF;}
-
-	/// \brief Consume the terminating LF after the end of data
-	/// \param [in] itr where to check for the terminating LF
-	/// \return iterator pointing at position after the consumed LF
-	iterator getStart( const iterator itr)
-	{
-		if (m_eodState == EoD::LF_DOT_CR && itr < end() && *itr == '\n')
-		{
-			m_eodState = EoD::LF_DOT_CR_LF;
-			return itr+(size_type)1;
-		}
-		else
-		{
-			return itr;
-		}
-	}
+	bool gotEoD() const					{return m_eodState>=EoD::LF_DOT_CR_LF;}
 
 private:
 	/// \brief Implementation of the end of data recognition and linefeed,dot escaping state machine

@@ -68,15 +68,13 @@ struct Connection::Private
 		EnterCommand,				///< parse command
 		ParseArgs,				///< parse command arguments
 		Processing,				///< running a command
-		ProcessingInput,			///< running a command with data input
 		ProtocolError,				///< a protocol error (bad command etc) appeared and the rest of the line has to be discarded
 		DiscardInput,				///< reading and discarding data until end of data has been seen
-		EndOfCommand,				///< cleanup after processing
-		Terminate				///< terminate processing (close for network)
+		Terminate				///< terminate application processor session (close for network)
 	};
 	static const char* stateName( State i)
 	{
-		static const char* ar[] = {"Init","EnterCommand","ParseArgs", "Processing","ProcessingInput","ProtocolError","DiscardInput","EndOfCommand","Terminate"};
+		static const char* ar[] = {"Init","EnterCommand","ParseArgs","Processing","ProtocolError","DiscardInput","Terminate"};
 		return ar[i];
 	}
 	enum Command {empty, capa, run, quit};
@@ -133,11 +131,7 @@ struct Connection::Private
 	void passInput()
 	{
 		Input::iterator eoD = input.getEoD( itr);
-
-		if (state == ProcessingInput)
-		{
-			inputfilter->protocolInput( itr.ptr(), eoD-itr, input.gotEoD());
-		}
+		inputfilter->protocolInput( itr.ptr(), eoD-itr, input.gotEoD());
 		end = input.end();
 		itr = (eoD < end) ? (eoD+1):end;
 	}
@@ -147,10 +141,10 @@ struct Connection::Private
 		input.setPos( nofBytes);
 		itr = input.begin();
 
-		if (state == ProcessingInput || state == DiscardInput)
+		if (state == Processing || state == DiscardInput)
 		{
 			Input::iterator eoD = input.getEoD( itr);
-			if (state == ProcessingInput)
+			if (state == Processing)
 			{
 				inputfilter->protocolInput( itr.ptr(), eoD-itr, input.gotEoD());
 			}
@@ -308,6 +302,8 @@ struct Connection::Private
 							{
 								inputfilter.reset( app_system.createInputFilter());
 								formatoutput.reset( app_system.createFormatOutput());
+								passInput();
+								formatoutput->init( output.ptr(), output.size());
 								processor.setIO( inputfilter, formatoutput);
 							}
 							else
@@ -321,7 +317,6 @@ struct Connection::Private
 				}
 
 				case Processing:
-				case ProcessingInput:
 				{
 					const char** argv = argBuffer.argv( functionName);
 					unsigned int argc = argBuffer.argc( functionName);
@@ -329,17 +324,8 @@ struct Connection::Private
 					switch (processor.call( argc, argv))
 					{
 						case Processor::YieldRead:
-							if (state == Processing)
-							{
-								state = ProcessingInput;
-								passInput();
-								continue;
-							}
-							else
-							{
-								input.setPos( 0);
-								return net::ReadData( input.ptr(), input.size());
-							}
+							input.setPos( 0);
+							return net::ReadData( input.ptr(), input.size());
 
 						case Processor::YieldWrite:
 						{
@@ -351,23 +337,14 @@ struct Connection::Private
 								contentsize = 0;
 							}
 							formatoutput->init( output.ptr(), output.size());
-
-							if (contentsize == 0)
-							{
-								continue;
-							}
-							else
-							{
-								return net::SendData( content, contentsize);
-							}
+							return net::SendData( content, contentsize);
 						}
 
 						case Processor::Ok:
 						{
 							if (functionHasIO)
 							{
-								if (state == Processing) passInput();
-								state = (input.gotEoD())?EndOfCommand:DiscardInput;
+								state = DiscardInput;
 								return WriteLine( "\r\n.\r\nOK");
 							}
 							else
@@ -381,8 +358,7 @@ struct Connection::Private
 						{
 							if (functionHasIO)
 							{
-								if (state == Processing) passInput();
-								state = (input.gotEoD())?EndOfCommand:DiscardInput;
+								state = DiscardInput;
 								return WriteLine( "\r\n.\r\nERR");
 							}
 							else
@@ -398,30 +374,8 @@ struct Connection::Private
 				{
 					if (input.gotEoD())
 					{
-						state = EndOfCommand;
-						continue;
-					}
-					else
-					{
-						input.setPos( 0);
-						return net::ReadData( input.ptr(), input.size());
-					}
-				}
-
-				case EndOfCommand:
-				{
-					itr = input.getStart( itr);
-					if (input.gotEoD_LF())
-					{
-						input.resetEoD();
 						state = EnterCommand;
 						continue;
-					}
-					else if (itr < end)
-					{
-						input.resetEoD();
-						state = Init;
-						return WriteLine( "BAD end of line in protocol after end of data");
 					}
 					else
 					{

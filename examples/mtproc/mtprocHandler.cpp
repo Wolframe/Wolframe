@@ -66,12 +66,11 @@ struct Connection::Private
 		ProcessingInput,			//< running the dispatcher sub state machine; execute a command with data input
 		ProtocolError,				//< a protocol error (bad command etc) appeared and the rest of the line has to be discarded
 		DiscardInput,				//< reading and discarding data until end of data has been seen
-		EndOfCommand,				//< cleanup after processing
 		Terminate				//< terminate processing (close for network)
 	};
 	static const char* stateName( State i)
 	{
-		static const char* ar[] = {"Init","EnterCommand","Processing","ProcessingInput","ProtocolError","CommandError","EndOfCommand","Terminate"};
+		static const char* ar[] = {"Init","EnterCommand","Processing","ProcessingInput","ProtocolError","CommandError","Terminate"};
 		return ar[i];
 	}
 
@@ -120,7 +119,7 @@ struct Connection::Private
 			commandDispatcher.protocolInput( itr, eoD, input.gotEoD());
 		}
 		end = input.end();
-		itr = (eoD < end) ? (eoD+1):end;
+		itr = (eoD < end) ? eoD:end;
 	}
 
 	void networkInput( const void*, std::size_t nofBytes)
@@ -136,7 +135,7 @@ struct Connection::Private
 				commandDispatcher.protocolInput( itr, eoD, input.gotEoD());
 			}
 			end = input.end();
-			itr = (eoD < end)? (eoD+1):end;
+			itr = (eoD < end)? eoD:end;
 		}
 		else
 		{
@@ -253,7 +252,7 @@ struct Connection::Private
 							if (commandDispatcher.commandHasIO())
 							{
 								if (state == Processing) passInput();
-								state = (input.gotEoD())?EndOfCommand:DiscardInput;
+								state = DiscardInput;
 								return WriteLine( "\r\n.\r\nOK");
 							}
 							else
@@ -270,7 +269,7 @@ struct Connection::Private
 							if (commandDispatcher.commandHasIO())
 							{
 								if (state == Processing) passInput();
-								state = (input.gotEoD())?EndOfCommand:DiscardInput;
+								state = DiscardInput;
 								return WriteLine( "\r\n.\r\nERR", ee.c_str());
 							}
 							else
@@ -286,28 +285,8 @@ struct Connection::Private
 				{
 					if (input.gotEoD())
 					{
-						state = EndOfCommand;
-						continue;
-					}
-					else
-					{
-						input.setPos( 0);
-						return net::ReadData( input.ptr(), input.size());
-					}
-				}
-
-				case EndOfCommand:
-				{
-					itr = input.getStart( itr);
-					if (input.gotEoD_LF())
-					{
 						state = EnterCommand;
 						continue;
-					}
-					else if (itr < end)
-					{
-						state = Init;
-						return WriteLine( "BAD end of line in protocol after end of data");
 					}
 					else
 					{

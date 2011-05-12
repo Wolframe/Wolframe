@@ -62,12 +62,11 @@ struct Connection::Private
 		ProcessingAfterWrite,
 		Processing,
 		HandleError,
-		EndOfCommand,
 		Terminate
 	};
 	static const char* stateName( State i)
 	{
-		static const char* ar[] = {"Init","EnterCommand","EmptyLine","EnterMode","StartProcessing","ProcessingAfterWrite","Processing","HandleError","EndOfCommand","Terminate"};
+		static const char* ar[] = {"Init","EnterCommand","EmptyLine","EnterMode","StartProcessing","ProcessingAfterWrite","Processing","HandleError","Terminate"};
 		return ar[i];
 	}
 	//substate of processing (how we do processing)
@@ -126,9 +125,13 @@ struct Connection::Private
 	{
 		for (;;)
 		{
-			if (itr == eoD)
+			if (itr == eoM)
 			{
-				if (itr == eoM) return EoM; else return EoD;
+				if (input.gotEoD()) return EoD; else return EoM;
+			}
+			else if (itr == eoD)
+			{
+				return EoD;
 			}
 			if (output.restsize() == 0) return bufferFull;
 			print(*itr);
@@ -354,8 +357,7 @@ struct Connection::Private
 					}
 					if (echoState == EoD)
 					{
-						++itr;
-						state = EndOfCommand;
+						state = Init;
 					}
 					else
 					{
@@ -365,23 +367,6 @@ struct Connection::Private
 					std::size_t size = output.pos();
 					if (size == 0) continue;
 					return net::SendData( content, size);
-				}
-
-				case EndOfCommand:
-				{
-					if (itr == eoM)
-					{
-						input.setPos( 0);
-						return net::ReadData( input.ptr(), input.size());
-					}
-					itr = input.getStart( itr);
-					if (input.gotEoD_LF())
-					{
-						state = Init;
-						continue;
-					}
-					state = Init;
-					return WriteLine( "BAD end of line in protocol after end of data");
 				}
 
 				case HandleError:

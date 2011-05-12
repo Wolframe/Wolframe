@@ -113,8 +113,8 @@ struct Random :public TestDescription<InputBufferSize,OutputBufferSize>
 		unsigned int ii=0,nn=rand()%MaxNofLines+1;
 		while (ii++<=nn)
 		{
-	ThisTestDescription::content.append( getRandomAsciiString());
-	ThisTestDescription::content.append( "\r\n");
+			ThisTestDescription::content.append( getRandomAsciiString());
+			ThisTestDescription::content.append( "\r\n\r\n");
 		}
 	}
 };
@@ -162,7 +162,7 @@ protected:
 		expected.append( escape( test.content));
 
 		input.append( ".\r\n");
-		expected.append( "OK expecting command\r\n");
+		expected.append( "\r\nOK expecting command\r\n");
 		input.append( "quit\r\n");
 		expected.append( "BYE\r\n");
 	}

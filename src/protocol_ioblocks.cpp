@@ -79,25 +79,13 @@ MemBlock& MemBlock::operator=( const MemBlock& o)
 	return *this;
 }
 
-
-static void moveInput( char* buf, std::size_t& dstsize, std::size_t& eatsize, std::size_t& bufpos)
-{
-	if (dstsize != eatsize)
-	{
-		std::memmove( buf+dstsize, buf+eatsize, bufpos-eatsize);
-	}
-	dstsize += bufpos-eatsize;
-	eatsize = bufpos;
-}
-
 int InputBlock::getEoDpos( size_type offset)
 {
 	if (pos()<=offset) return -1;
 
 	std::size_t bufsize = pos()-offset;
 	char* buf = charptr()+offset;
-	std::size_t bufpos=0,eatsize=0,dstsize=0;
-	int eodpos = -1;
+	std::size_t bufpos=0;
 
 	while (bufpos<bufsize)
 	{
@@ -107,13 +95,11 @@ int InputBlock::getEoDpos( size_type offset)
 			if (cc)
 			{
 				bufpos = cc - buf + 1;
-				if (bufpos == bufsize) moveInput( buf, dstsize, eatsize, bufpos);
 				m_eodState = EoD::LF;
 			}
 			else
 			{
 				bufpos = bufsize;
-				moveInput( buf, dstsize, eatsize, bufpos);
 			}
 		}
 		else if (m_eodState == EoD::LF)
@@ -121,13 +107,13 @@ int InputBlock::getEoDpos( size_type offset)
 			if (buf[bufpos] == '.')
 			{
 				m_eodState = EoD::LF_DOT;
-				moveInput( buf, dstsize, eatsize, bufpos);
-				eatsize = ++bufpos;
+				std::memmove( buf+bufpos, buf+bufpos+1, bufsize-bufpos-1);
+				bufsize -= 1;
+				setPos( bufsize + offset);
 			}
 			else
 			{
-				bufpos++;
-				if (bufpos == bufsize) moveInput( buf, dstsize, eatsize, bufpos);
+				++bufpos;
 				m_eodState = EoD::SRC;
 			}
 		}
@@ -135,37 +121,29 @@ int InputBlock::getEoDpos( size_type offset)
 		{
 			if (buf[bufpos] == '\r')
 			{
-				eodpos = (int)dstsize++;  //< define EoD
 				m_eodState = EoD::LF_DOT_CR;
-				eatsize = ++bufpos;
 			}
 			else if (buf[bufpos] == '\n')
 			{
-				eodpos = (int)dstsize++;	//< define EoD
 				m_eodState = EoD::LF_DOT_CR_LF;
-				eatsize = ++bufpos;
 			}
 			else
 			{
-				bufpos++;
-				if (bufpos == bufsize) moveInput( buf, dstsize, eatsize, bufpos);
 				m_eodState = EoD::SRC;
 			}
+			++bufpos;
 		}
 		else if (m_eodState == EoD::LF_DOT_CR)
 		{
-			if (buf[bufpos] == '\n') eatsize=++bufpos;
-			if (bufpos == bufsize) moveInput( buf, dstsize, eatsize, bufpos);
+			if (buf[bufpos] == '\n')
+			{
+				++bufpos;
+			}
 			m_eodState = EoD::LF_DOT_CR_LF;
-		}
-		else //if (m_eodState == EoD::LF_DOT_CR_LF)
-		{
-			bufpos = bufsize;
-			moveInput( buf, dstsize, eatsize, bufpos);
+			return bufpos;
 		}
 	}
-	setPos( pos() - eatsize + dstsize);	//.. adjust buffer size to the bytes really printed
-	return eodpos;
+	return -1;
 }
 }}//namespace
 
