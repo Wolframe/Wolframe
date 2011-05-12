@@ -185,7 +185,7 @@ protected:
 		expected.append( escape( test.content));
 
 		input.append( ".\r\n");
-		expected.append( "\r\n.\r\nOK\r\n");
+		expected.append( "\r\n\r\n.\r\nOK\r\n");
 		input.append( "quit\r\n");
 		expected.append( "BYE\r\n");
 	}
@@ -274,7 +274,7 @@ TYPED_TEST( iprocHandlerFixture, ExpectedResult )
 int main( int argc, char **argv )
 {
 	::testing::InitGoogleTest( &argc, argv );
-	_Wolframe::log::LogBackend::instance().setConsoleLevel( _Wolframe::log::LogLevel::LOGLEVEL_DATA );
+	_Wolframe::log::LogBackend::instance().setConsoleLevel( _Wolframe::log::LogLevel::LOGLEVEL_INFO );
 	return RUN_ALL_TESTS();
 }
 

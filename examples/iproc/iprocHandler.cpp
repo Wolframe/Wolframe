@@ -70,11 +70,12 @@ struct Connection::Private
 		Processing,				///< running a command
 		ProtocolError,				///< a protocol error (bad command etc) appeared and the rest of the line has to be discarded
 		DiscardInput,				///< reading and discarding data until end of data has been seen
+		FlushOutput,				///< state for sending end of data after flushing the output buffers after a call
 		Terminate				///< terminate application processor session (close for network)
 	};
 	static const char* stateName( State i)
 	{
-		static const char* ar[] = {"Init","EnterCommand","ParseArgs","Processing","ProtocolError","DiscardInput","Terminate"};
+		static const char* ar[] = {"Init","EnterCommand","ParseArgs","Processing","ProtocolError","DiscardInput","FlushOutput","Terminate"};
 		return ar[i];
 	}
 	enum Command {empty, capa, run, quit};
@@ -133,7 +134,7 @@ struct Connection::Private
 		Input::iterator eoD = input.getEoD( itr);
 		inputfilter->protocolInput( itr.ptr(), eoD-itr, input.gotEoD());
 		end = input.end();
-		itr = (eoD < end) ? (eoD+1):end;
+		itr = (eoD < end) ? eoD:end;
 	}
 
 	void networkInput( const void*, std::size_t nofBytes)
@@ -149,7 +150,7 @@ struct Connection::Private
 				inputfilter->protocolInput( itr.ptr(), eoD-itr, input.gotEoD());
 			}
 			end = input.end();
-			itr = (eoD < end)? (eoD+1):end;
+			itr = (eoD < end)? eoD:end;
 		}
 		else
 		{
@@ -289,7 +290,7 @@ struct Connection::Private
 							else
 							{
 								state = Terminate;
-								continue;
+								return WriteLine( "BYE");
 							}
 						case run:
 							if (!processor.getCommand( "run", functionName, functionHasIO))
@@ -344,8 +345,25 @@ struct Connection::Private
 						{
 							if (functionHasIO)
 							{
-								state = DiscardInput;
-								return WriteLine( "\r\n.\r\nOK");
+								state = FlushOutput;
+								void* content = formatoutput->ptr();
+								unsigned int contentsize = formatoutput->pos();
+
+								formatoutput->init( output.ptr(), output.size());
+								if (contentsize)
+								{
+									if (!functionHasIO)
+									{
+										LOG_WARNING << "output of function '" << functionName << "' that has no IO configured is ignored";
+										contentsize = 0;
+									}
+									else
+									{
+										formatoutput->init( output.ptr(), output.size());
+										return net::SendData( content, contentsize);
+									}
+								}
+								continue;
 							}
 							else
 							{
@@ -368,6 +386,12 @@ struct Connection::Private
 							}
 						}
 					}
+				}
+
+				case FlushOutput:
+				{
+					state = DiscardInput;
+					return WriteLine( "\r\n.\r\nOK");
 				}
 
 				case DiscardInput:
@@ -397,7 +421,6 @@ struct Connection::Private
 
 				case Terminate:
 				{
-					state = Terminate;
 					return net::CloseConnection();
 				}
 			}//switch(..)
