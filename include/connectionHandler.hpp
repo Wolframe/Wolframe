@@ -63,11 +63,11 @@ namespace _Wolframe {
 						   unsigned to = 0 )
 						{ operation_ = op,  data_ = d; size_ = s; timeout_ = to; }
 
-			unsigned timeout()	{ return timeout_; }
-			const void* data()	{ return (const void*)data_; }
-			void* buffer()		{ return data_; }
-			std::size_t size()	{ return size_; }
-			Operation operation()	{ return operation_; }
+			unsigned timeout() const	{ return timeout_; }
+			const void* data() const	{ return (const void*)data_; }
+			void* buffer()			{ return data_; }
+			std::size_t size() const	{ return size_; }
+			Operation operation() const	{ return operation_; }
 
 		private:
 			Operation	operation_;
