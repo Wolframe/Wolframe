@@ -174,7 +174,6 @@ gtest/include/gtest/internal/gtest-type-util.h
 gtest/Makefile.W32
 gtest/src/gtest-internal-inl.h
 header.txt
-include/AAAA/authentication.hpp
 include/appConfig.hpp
 include/appProcessor.hpp
 include/appProperties.hpp
@@ -278,6 +277,7 @@ src/AAAA/auditConfiguration.cpp
 src/AAAA/auditor.cpp
 src/AAAA/auditor.hpp
 src/AAAA/authConfiguration.cpp
+src/AAAA/authentication.hpp
 src/AAAA/authentication.cpp
 src/AAAA/authentication_db_sqlite3.cpp
 src/AAAA/authentication_db_sqlite3.hpp
