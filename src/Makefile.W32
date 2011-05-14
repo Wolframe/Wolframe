@@ -61,7 +61,6 @@ LOGGER_OBJS = \
 	logger\logger.obj \
 
 AAAA_OBJS = \
-	AAAA\authentication.obj \
 	AAAA\authentication_textfile.obj \
 	AAAA\AAAAprovider.obj \
 	AAAA\authConfiguration.obj \
