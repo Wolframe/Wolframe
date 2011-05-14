@@ -52,3 +52,4 @@ tests/db/sqlite3ppTest
 examples/iproc/iprocd
 lua/src/lua
 lua/src/luac
+examples/iproc/tests/iprocHandlerTest

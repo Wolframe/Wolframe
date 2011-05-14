@@ -63,15 +63,6 @@
 namespace _Wolframe {
 namespace AAAA {
 
-Authenticator *CreateSaslAuthenticator( AuthenticatorFactory::properties props )
-{
-	return new SaslAuthenticator(
-		findprop<std::string>( props, "appname" ),
-		findprop<std::string>( props, "service" ),
-		findprop<std::string>( props, "confpath" )
-	);
-}
-
 static int sasl_my_log( void* /* context */, int priority, const char *message )
 {
 	if( message == NULL ) return SASL_BADPARAM;

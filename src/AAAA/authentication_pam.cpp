@@ -47,13 +47,6 @@
 namespace _Wolframe {
 namespace AAAA {
 
-Authenticator *CreatePAMAuthenticator( AuthenticatorFactory::properties props )
-{
-	return new PAMAuthenticator(
-		findprop<std::string>( props, "service" )
-	);
-}
-
 static int pam_conv_func(	int nmsg, const struct pam_message **msg,
 				struct pam_response **reply, void *appdata_ptr );
 

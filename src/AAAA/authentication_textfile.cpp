@@ -45,13 +45,6 @@
 namespace _Wolframe {
 namespace AAAA {
 
-Authenticator *CreateTextFileAuthenticator( AuthenticatorFactory::properties props )
-{
-	return new TextFileAuthenticator(
-		findprop<std::string>( props, "filename" )
-	);
-}
-
 TextFileAuthenticator::TextFileAuthenticator( const std::string _filename )
 {
 	std::ifstream f;

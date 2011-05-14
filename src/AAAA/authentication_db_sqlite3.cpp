@@ -15,13 +15,6 @@
 namespace _Wolframe {
 namespace AAAA {
 
-Authenticator *CreateDbSqlite3Authenticator( AuthenticatorFactory::properties props )
-{
-	return new DbSqlite3Authenticator(
-		findprop<std::string>( props, "filename" )
-	);
-}
-
 DbSqlite3Authenticator::DbSqlite3Authenticator( const std::string _filename )
 {
 	m_filename = _filename;

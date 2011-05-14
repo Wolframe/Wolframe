@@ -2,48 +2,43 @@
 #include <string>
 #include <algorithm>
 
-#include "AAAA/authentication.hpp"
+#include "AAAA/authentication_textfile.hpp"
+#include "AAAA/authentication_pam.hpp"
+#include "AAAA/authentication_db_sqlite3.hpp"
+#include "AAAA/authentication_sasl.hpp"
+
 #include "getPassword.hpp"
 
 using namespace std;
 using namespace _Wolframe::AAAA;
 
 static void print_usage( ) {
-// get list of available authentication methods
-	vector<string> mechs = AuthenticatorFactory::instance( ).getAvailableMechs( );
-	cerr << "Available authentication methods: ";	
-	for( vector<string>::const_iterator it = mechs.begin( ); it != mechs.end( ); it++ )
-		cerr << *it << " ";
-	cerr << endl;
+	cerr << "Available authentication methods: DBSQLITE3 PAM SASL TEXTFILE";
+}
+
+static Authenticator* getAuthenticator( const std::string s )
+{
+	if( s == "TEXTFILE" ) {
+		return new TextFileAuthenticator( "passwd" );
+#ifdef WITH_PAM
+	} else if( s == "PAM" ) {
+		return new PAMAuthenticator( "wolframe" );
+#endif
+#ifdef WITH_SQLITE3
+	} else if( s == "DBSQLITE3" ) {
+		return new DbSqlite3Authenticator( "passwd.db" );
+#endif
+#ifdef WITH_SASL
+	} else if( s == "SASL" ) {
+		return new SaslAuthenticator( "authTest", "wolframe", "." );
+#endif
+	} else {
+		return 0;
+	}
 }
 
 int main( int argc, const char *argv[] )
 {
-// register some authentication methods
-	AuthenticatorFactory::properties props;
-	props.push_back( AuthenticatorFactory::property( "filename", std::string( "passwd" ) ) );
-	AuthenticatorFactory::instance( ).registerAuthenticator( "TEXTFILE", CreateTextFileAuthenticator, props );
-
-#ifdef WITH_PAM
-	AuthenticatorFactory::properties props2;
-	props2.push_back( AuthenticatorFactory::property( "service", std::string( "wolframe" ) ) );
-	AuthenticatorFactory::instance( ).registerAuthenticator( "PAM", CreatePAMAuthenticator, props2 );
-#endif
-
-#ifdef WITH_SQLITE3
-	AuthenticatorFactory::properties props3;
-	props3.push_back( AuthenticatorFactory::property( "filename", std::string( "passwd.db" ) ) );
-	AuthenticatorFactory::instance( ).registerAuthenticator( "DBSQLITE3", CreateDbSqlite3Authenticator, props3 );
-#endif
-
-#ifdef WITH_SASL
-	AuthenticatorFactory::properties props4;
-	props4.push_back( AuthenticatorFactory::property( "appname", std::string( "authTest" ) ) );
-	props4.push_back( AuthenticatorFactory::property( "service", std::string( "wolframe" ) ) );
-	props4.push_back( AuthenticatorFactory::property( "confpath", std::string( "." ) ) );
-	AuthenticatorFactory::instance( ).registerAuthenticator( "SASL", CreateSaslAuthenticator, props4 );
-#endif
-
 // check parameters
 	if( argc != 2 ) {
 		cerr << "usage: testAuth <authentication method>" << endl;
@@ -51,16 +46,12 @@ int main( int argc, const char *argv[] )
 		return 1;
 	}
 
-// check if authentication method exists
-	vector<string> mechs = AuthenticatorFactory::instance( ).getAvailableMechs( );
-	vector<string>::const_iterator it = find( mechs.begin( ), mechs.end( ), argv[1] );
-	if( it == mechs.end( ) ) {
+// get a specific authenticator			
+	Authenticator *a = getAuthenticator( argv[1] );
+	if( !a ) {
 		print_usage( );
 		return 1;
 	}
-
-// get a specific authenticator			
-	Authenticator *a = AuthenticatorFactory::instance( ).getAuthenticator( argv[1] );
 	
 // go in a loop where we do what the authenticator tells us, in
 // the simplest case it asks us for a login and a password
