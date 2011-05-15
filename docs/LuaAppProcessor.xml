@@ -1,0 +1,82 @@
+<!-- Lua Application Processor -->
+<chapter>
+	<title>Implementing Wolframe Applications With Lua</title>
+
+	<sect1>
+		<title>Introduction</title>
+		<para>
+		You can write applications in <code>Wolframe</code> with <code>Lua</code>. A tutorial for the use of <code>Lua</code>
+		is not provided here.
+		For an introduction into programming with <code>Lua</code> see http://www.lua.org. The official manual also
+		available as book is very good. <code>Wolframe</code> introduces some <code>Lua</code> interface to access
+		input, output and database. The <code>Lua</code> application layer doesn't deal with protocol or
+		encryption issues. The application layer gets just an iterator over the input content to process,
+		an output stream interface for data content to return to the client, an interface to store and retrieve data
+		from databases and access to other devices. In the following section we describe this interfaces.
+		</para>
+
+		<title>Interfaces</title>
+		<sect2>
+			<title>Filters</title>
+			<para>
+			The application input and output can be of different form. This depends on the kind
+			of application and the kind of client accessing the service. For different forms
+			of input and output <code>Wolframe</code> provides you filters. Filters are <code>Lua</code>
+			objects without visible properties for the application. The system provides a global function
+			<code>
+			 filter( )
+			</code>
+			with the name of the filter as string as parameter. If you for example want to process
+			data as XML in the character set encoding UTF-8 you need to get a filter by calling
+			<code>
+			 filter( "XML:UTF-8" )
+			</code>
+			The object returned by this function can be attached to input or output. You can have
+			different filters for input and output, but only one at a time. But you can switch the filter
+			during processing. You even have to do so for processing XML. The XML header is in ASCII
+			and the body is in the character set encoding defined in the header. So you process the
+			header with one filter. After the header is processed you attach another filter to
+			input and maybe to output too, depending on the XML header attributes.
+			</para>
+			<title>Input</title>
+			<para>
+			Input is a accessed over a global variable input. This object has the following methods:
+			<code>
+			 input:as( f )
+			</code>
+			attaches a filter f to the input. Subsequent calls of <code>input:get()</code> will apply this
+			filter f to get the input elements to process.
+			<code>
+			 input:get( )
+			 </code>
+			returns a function with closure to iterate over the input. The returned function returns one
+			or two values depending on the filter. Unstructured input returns one value, the input element.
+			Structured input returns the element content as first value and the attribute or tag as second
+			value. If one of them is not available, then a boolean <code>false</code> is retured in its place.
+			An XML tag for example is returned as <code>false</code>;tagname. An attribute, value pair
+			is returned as value;name. A content element is returned as value;<code>false</code> or
+			value;<code>nil</code>, depending on the filter type.
+			A close tag is returned as a pair of boolean <code>false</code> values
+			(<code>false</code>;<code>false</code>).
+			The reason for using <code>false</code>, instead of <code>nil</code>, is the special treatment
+			of <code>nil</code> in a <code>Lua</code> for loop. <code>nil</code> is always terminating the
+			iteration, no matter what follows this <code>nil</code>. <code>nil</code> is returned at the
+			end of the data or, if the iteration started in a subsection of the content, as the last tag of
+			context the iteration has started closes. The later construct is used when you delegate the
+			content processing of subsections.
+			</para>
+			<title>Output</title>
+			<para>
+			Output is a accessed over a global variable output. This object has the following methods:
+			<code>
+			 input:as( f )
+			 </code>
+			attaches a filter f to the output. Subsequent calls of print() will apply this filter f to print the output elements returned as content to the client.
+			 input:print( c, t)
+			 input:print( c)
+			prints an element to the output. Omitting t, means that an untagged content element is printed. The same happens when you call print with nil or <code>false</code> as second parameter t. With c passed as <code>nil</code> or <code>false</code> you print a open tag or close tag, depending on t. t is a tag name for open tag and <code>nil</code> or <code>false</code> for a close previous tag. With c,t as non <code>nil</code> or <code>false</code> values you print an attribute value assignement.
+			</para>
+		</sect2>
+		<para></para>
+	</sect1>
+</chapter>
