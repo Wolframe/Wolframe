@@ -86,7 +86,6 @@ local_test:
 	@-echo poolTest >> test.bat
 	@-echo protocolArgumentParsing >> test.bat
 	@-echo pechoHandler >> test.bat
-	@-echo mtprocHandler >> test.bat
 	@echo
 	@-test.bat
 
