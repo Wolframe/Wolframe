@@ -5,8 +5,8 @@
 	<sect1>
 		<title>Introduction</title>
 		<para>
-		You can write applications in <code>Wolframe</code> with <code>Lua</code>. A tutorial for the use of <code>Lua</code>
-		is not provided here.
+		You can write applications in <code>Wolframe</code> with <code>Lua</code>. A tutorial for the use of 
+		<code>Lua</code> is not provided here.
 		For an introduction into programming with <code>Lua</code> see http://www.lua.org. The official manual also
 		available as book is very good. <code>Wolframe</code> introduces some <code>Lua</code> interface to access
 		input, output and database. The <code>Lua</code> application layer doesn't deal with protocol or
@@ -85,6 +85,109 @@
 			an attribute value assignement.
 			</para>
 		</sect2>
+		<title>Examples</title>
+		<sect2>		
+			<title>Example 1: An echo processor</title>
+			<para>This example echoes the input line by line. It uses the default filter that is a line 
+				iterator for text in the default character set encoding.</para>
+			<code>
+			 function run_example1( )
+			 	for c in input:get() do
+		 			output:print( c)
+		 		end
+			 end
+			</code>
+			<title>Example 2: An echo processor for well formed tagged content</title>
+			<para>This example processes well formed tagged content, an XML without a header in a predefined encoding. 
+
+ function run_example2( )
+ 	input:as( filter( "XML:Isolatin"))
+ 	output:as( filter( "XML:Isolatin"))
+ 	for c,t in input:get() do
+ 		output:print( c, t)
+ 	end
+ end
+
+=== Example 3: An XML echo processor ===
+This example procedure will extract the character set encoding from the XML header an echo the document in the same encoding. If the encoding is not specified, then it will assumed to be UTF-8.
+
+ function run_example3( )
+ 	input:as( filter( "XML:Header"))
+ 	f = filter( "XML:UTF-8")
+ 	for c,t in input:get() do
+ 		if t == "charset" then
+ 			f = filter( "XML:" + c )
+ 		end
+ 		output:print( c, t)
+ 	end
+ 	input:as( f)
+ 	for c,t in input:get() do
+ 		output:print( c, t)
+ 	end
+ end
+
+=== Example 4: An XML echo processor ===
+This example does the same as example3 but treats the content of the tag "content" in an own procedure. 
+
+ function process_content( itr)
+ 	for c in itr do
+ 		output:print( c)
+ 	end
+ end
+ 
+ function run_example4( )
+ 	input:as( filter( "XML:Header"))
+ 	f = filter( "XML:UTF-8")
+ 	for c,t in input:get() do
+ 		if t == "charset" then
+ 			f = filter( "XML:" + c )
+ 		end
+ 		output:print( c, t)
+ 	end
+ 	input:as( f)
+ 	for c,t in input:get() do
+ 		output:print( c, t)
+ 		if t = "content" then
+ 			process_content( input:get())
+ 			output:print( false, false)
+ 		end
+ 	end
+ end
+
+=== Example 5: Load XML into a table ===
+This example procedure load the content of the XML document into a global table under the unverified (!) assumption that every element appears only once.
+
+ function load_table( itr)
+ 	rt = {}
+ 	i = 0
+ 	function idx()
+ 		i = i + 1
+ 		return i
+ 	end
+ 	for c,t in itr do
+ 		rt[ t or idx() ] = c or load_table( itr )
+ 	end
+ end
+ inputtable = {}
+ function run_example5( )
+ 	input:as( filter( "XML:Header"))
+ 	f = filter( "XML:UTF-8")
+ 	for c,t in input:get() do
+ 		if t == "charset" then
+ 			f = filter( "XML:" + c )
+ 		end
+ 		output:print( c, t)
+ 	end
+ 	input:as( f)
+ 	inputtable = load_table( input:get())
+ end
+
+=== Example 6: Using the database ===
+
+
+=== Motivation ===
+The parameters of the output instruction correspond to the input iterators return values. The parameters have the same order and the same meaning. The input and output operations look not very intuitive. But it is easy to create a table as shown in example 5.
+
 		<para></para>
 	</sect1>
 </chapter>
