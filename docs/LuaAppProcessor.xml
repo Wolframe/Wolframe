@@ -131,67 +131,70 @@
 			</code>
 			<title>Example 4: An XML echo processor</title>
 			<para>This example does the same as example3 but treats the content of the tag "content" in an 
-				own procedure. 
+				own procedure. </para>
+			<code>
+			 function process_content( itr)
+			 	for c in itr do
+			 		output:print( c)
+			 	end
+			 end 
 
- function process_content( itr)
- 	for c in itr do
- 		output:print( c)
- 	end
- end
- 
- function run_example4( )
- 	input:as( filter( "XML:Header"))
- 	f = filter( "XML:UTF-8")
- 	for c,t in input:get() do
- 		if t == "charset" then
- 			f = filter( "XML:" + c )
- 		end
- 		output:print( c, t)
- 	end
- 	input:as( f)
- 	for c,t in input:get() do
- 		output:print( c, t)
- 		if t = "content" then
- 			process_content( input:get())
- 			output:print( false, false)
- 		end
- 	end
- end
-
-=== Example 5: Load XML into a table ===
-This example procedure load the content of the XML document into a global table under the unverified (!) assumption that every element appears only once.
-
- function load_table( itr)
- 	rt = {}
- 	i = 0
- 	function idx()
- 		i = i + 1
- 		return i
- 	end
- 	for c,t in itr do
- 		rt[ t or idx() ] = c or load_table( itr )
- 	end
- end
- inputtable = {}
- function run_example5( )
- 	input:as( filter( "XML:Header"))
- 	f = filter( "XML:UTF-8")
- 	for c,t in input:get() do
- 		if t == "charset" then
- 			f = filter( "XML:" + c )
- 		end
- 		output:print( c, t)
- 	end
- 	input:as( f)
- 	inputtable = load_table( input:get())
- end
-
-=== Example 6: Using the database ===
-
-
-=== Motivation ===
-The parameters of the output instruction correspond to the input iterators return values. The parameters have the same order and the same meaning. The input and output operations look not very intuitive. But it is easy to create a table as shown in example 5.
-
-		<para></para>
+			 function run_example4( )
+			 	input:as( filter( "XML:Header"))
+			 	f = filter( "XML:UTF-8")
+			 	for c,t in input:get() do
+			 		if t == "charset" then
+			 			f = filter( "XML:" + c )
+			 		end
+			 		output:print( c, t)
+			 	end
+			 	input:as( f)
+			 	for c,t in input:get() do
+			 		output:print( c, t)
+			 		if t = "content" then
+			 			process_content( input:get())
+			 			output:print( false, false)
+			 		end
+			 	end
+			 end
+			</code>
+			<title>Example 5: Load XML into a table</title>
+			<para>This example procedure load the content of the XML document into a global table under 
+				the unverified (!) assumption that every element appears only once.</para>
+			<code>
+			 function load_table( itr)
+				rt = {}
+			 	i = 0
+			 	function idx()
+			 		i = i + 1
+			 		return i
+			 	end
+			 	for c,t in itr do
+			 		rt[ t or idx() ] = c or load_table( itr )
+			 	end
+			 end
+			 inputtable = {}
+			 function run_example5( )
+			 	input:as( filter( "XML:Header"))
+			 	f = filter( "XML:UTF-8")
+			 	for c,t in input:get() do
+			 		if t == "charset" then
+			 			f = filter( "XML:" + c )
+			 		end
+			 		output:print( c, t)
+			 	end
+			 	input:as( f)
+			 	inputtable = load_table( input:get())
+			 end
+			</code>
+			<title>Example 6: Using the database</title>
+		</sect2>
+		<sect2>
+			<title>Motivation</title>
+			<para>The parameters of the output instruction correspond to the input iterators return values. 
+				The parameters have the same order and the same meaning. The input and output operations 
+				look not very intuitive. But it is easy to create a table as shown in example 5.
+			</para>
+		</sect2>
 	</sect1>
 </chapter>
