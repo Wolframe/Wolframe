@@ -17,7 +17,6 @@ INCLUDE_DIRS = \
 	/I$(TOPDIR)\include /I. \
 	/I$(TOPDIR)\src \
 	/I$(TOPDIR)\examples\pecho \
-	/I$(TOPDIR)\examples\mtproc \
 	/I$(TOPDIR)\examples\iproc \
 	/I"$(BOOST_DIR)" \
 	/I"$(PLATFORM_SDK_DIR)\Include" \
@@ -43,8 +42,7 @@ TEST_CPP_BINS = \
 	logTest.exe \
 	protocolArgumentParsing.exe \
 	configValueParser.exe \
-	pechoHandler.exe \
-	mtprocHandler.exe
+	pechoHandler.exe
 
 
 OBJS = \
@@ -67,9 +65,6 @@ configValueParser.exe: configValueParser.obj $(TOPDIR)\src\wolframe.lib
 
 PECHO_GTEST_OBJS=$(TOPDIR)\examples\pecho\pechoHandler.obj
 pechoHandler.exe: pechoHandler.obj $(PECHO_GTEST_OBJS) $(TOPDIR)\src\wolframe.lib
-
-MTPROC_GTEST_OBJS=$(TOPDIR)\examples\mtproc\mtprocHandler.obj $(TOPDIR)\examples\mtproc\implementation.obj $(TOPDIR)\examples\mtproc\dispatcher.obj
-mtprocHandler.exe: mtprocHandler.obj $(MTPROC_GTEST_OBJS) $(TOPDIR)\src\wolframe.lib
 
 local_all:
 
