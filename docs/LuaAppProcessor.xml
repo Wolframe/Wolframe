@@ -98,36 +98,40 @@
 			 end
 			</code>
 			<title>Example 2: An echo processor for well formed tagged content</title>
-			<para>This example processes well formed tagged content, an XML without a header in a predefined encoding. 
-
- function run_example2( )
- 	input:as( filter( "XML:Isolatin"))
- 	output:as( filter( "XML:Isolatin"))
- 	for c,t in input:get() do
- 		output:print( c, t)
- 	end
- end
-
-=== Example 3: An XML echo processor ===
-This example procedure will extract the character set encoding from the XML header an echo the document in the same encoding. If the encoding is not specified, then it will assumed to be UTF-8.
-
- function run_example3( )
- 	input:as( filter( "XML:Header"))
- 	f = filter( "XML:UTF-8")
- 	for c,t in input:get() do
- 		if t == "charset" then
- 			f = filter( "XML:" + c )
- 		end
- 		output:print( c, t)
- 	end
- 	input:as( f)
- 	for c,t in input:get() do
- 		output:print( c, t)
- 	end
- end
-
-=== Example 4: An XML echo processor ===
-This example does the same as example3 but treats the content of the tag "content" in an own procedure. 
+			<para>This example processes well formed tagged content, an XML without a header in a 
+				predefined encoding. </para>
+			<code>
+			 function run_example2( )
+			 	input:as( filter( "XML:Isolatin"))
+			 	output:as( filter( "XML:Isolatin"))
+			 	for c,t in input:get() do
+			 		output:print( c, t)
+			 	end
+			 end
+			<code>
+			<title>Example 3: An XML echo processor</title>
+			<para>This example procedure will extract the character set encoding from the XML header an 
+				echo the document in the same encoding. If the encoding is not specified, then it 
+				will assumed to be UTF-8.</para>
+			<code>
+			 function run_example3( )
+			 	input:as( filter( "XML:Header"))
+			 	f = filter( "XML:UTF-8")
+			 	for c,t in input:get() do
+			 		if t == "charset" then
+ 						f = filter( "XML:" + c )
+			 		end
+			 		output:print( c, t)
+			 	end
+			 	input:as( f)
+			 	for c,t in input:get() do
+			 		output:print( c, t)
+			 	end
+			 end
+			</code>
+			<title>Example 4: An XML echo processor</title>
+			<para>This example does the same as example3 but treats the content of the tag "content" in an 
+				own procedure. 
 
  function process_content( itr)
  	for c in itr do
