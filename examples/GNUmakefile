@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = echo pecho mtproc iproc
+SUBDIRS = echo pecho iproc
 
 ifeq ($(WITH_LUA),1)
 SUBDIRS += lua

@@ -15,4 +15,3 @@ local_distclean:
 local_test:
 	@-"$(EXPECT)" testEcho
 	@-"$(EXPECT)" testPEcho
-	@-"$(EXPECT)" testMtProc

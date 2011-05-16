@@ -17,5 +17,4 @@ local_distclean:
 local_test:
 	./testEcho
 	./testPecho
-	./testMtProc
 
