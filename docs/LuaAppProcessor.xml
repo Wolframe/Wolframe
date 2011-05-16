@@ -69,12 +69,20 @@
 			<para>
 			Output is a accessed over a global variable output. This object has the following methods:
 			<code>
-			 input:as( f )
+			 output:as( f )
 			 </code>
-			attaches a filter f to the output. Subsequent calls of print() will apply this filter f to print the output elements returned as content to the client.
-			 input:print( c, t)
-			 input:print( c)
-			prints an element to the output. Omitting t, means that an untagged content element is printed. The same happens when you call print with nil or <code>false</code> as second parameter t. With c passed as <code>nil</code> or <code>false</code> you print a open tag or close tag, depending on t. t is a tag name for open tag and <code>nil</code> or <code>false</code> for a close previous tag. With c,t as non <code>nil</code> or <code>false</code> values you print an attribute value assignement.
+			attaches a filter f to the output. Subsequent calls of <code>print()</code> will apply this 
+			filter f to print the output elements returned as content to the client.
+			 <code>
+			 output:print( c, t)
+			 output:print( c)
+			 </code>
+			prints an element to the output. Omitting t, means that an untagged content element is printed. 
+			The same happens when you call print with nil or <code>false</code> as second parameter t. 
+			With c passed as <code>nil</code> or <code>false</code> you print a open tag or close tag, 
+			depending on t. t is a tag name for open tag and <code>nil</code> or <code>false</code> for
+			a close previous tag. With c,t as non <code>nil</code> or <code>false</code> values you print
+			an attribute value assignement.
 			</para>
 		</sect2>
 		<para></para>
