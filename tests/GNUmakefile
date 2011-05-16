@@ -50,8 +50,7 @@ TEST_CPP_BINS = \
 	logTest$(EXE) \
 	protocolArgumentParsing$(EXE) \
 	configValueParser$(EXE) \
-	pechoHandler$(EXE) \
-	mtprocHandler$(EXE)
+	pechoHandler$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
@@ -60,13 +59,6 @@ logTest$(EXE): $(TOPDIR)/src/libwolframe.a
 PECHO_GTEST_OBJS=$(TOPDIR)/examples/pecho/pechoHandler.o
 pechoHandler$(EXE): pechoHandler.o $(PECHO_GTEST_OBJS) $(TOPDIR)/src/libwolframe.a
 	$(CCPP_LINK) -o $@ $(LDFLAGS) $(PECHO_GTEST_OBJS) $(OBJS) $< $(LIBS)
-
-MTPROC_GTEST_OBJS = \
-	$(TOPDIR)/examples/mtproc/mtprocHandler.o \
-	$(TOPDIR)/examples/mtproc/implementation.o \
-	$(TOPDIR)/examples/mtproc/dispatcher.o
-mtprocHandler$(EXE): mtprocHandler.o $(MTPROC_GTEST_OBJS) $(TOPDIR)/src/libwolframe.a
-	$(CCPP_LINK) -o $@ $(LDFLAGS) $(MTPROC_GTEST_OBJS) $(OBJS) $< $(LIBS)
 
 local_all:
 
