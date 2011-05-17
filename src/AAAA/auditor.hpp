@@ -49,26 +49,20 @@ namespace AAAA {
 
 enum AuditType	{
 	AUDIT_FILE,		///< Standard text file auditing (list of entries)
-	AUDIT_DATABASE,		///< Database audit entries
-	AUDIT_UNKNOWN		///< Unknown method (i.e. none)
+	AUDIT_DATABASE		///< Database audit entries
 };
 
 
 class AuditConfigBase : public config::ConfigurationBase
 {
-private:
-	const AuditType	m_type;
 public:
 	/// constructor
-	AuditConfigBase( const AuditType Type,
-			 const char* name, const char* logParent, const char* logName )
-		: config::ConfigurationBase( name, logParent, logName ),
-		  m_type( Type )
-	{}
+	AuditConfigBase( const char* name, const char* logParent, const char* logName )
+		: config::ConfigurationBase( name, logParent, logName )		{}
 
 	virtual ~AuditConfigBase()	{}
 
-	AuditType type() const			{ return m_type; }
+	virtual AuditType type() const = 0;
 };
 
 
@@ -77,8 +71,9 @@ class FileAuditConfig : public AuditConfigBase
 	friend class FileAuditor;
 public:
 	FileAuditConfig( const char* cfgName, const char* logParent, const char* logName )
-		: AuditConfigBase( AUDIT_FILE, cfgName, logParent, logName )
-	{}
+		: AuditConfigBase( cfgName, logParent, logName ){}
+
+	AuditType type() const					{ return AUDIT_FILE; }
 
 	/// methods
 	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
@@ -96,8 +91,10 @@ class DatabaseAuditConfig : public AuditConfigBase
 	friend class DatabaseAuditor;
 public:
 	DatabaseAuditConfig( const char* cfgName, const char* logParent, const char* logName )
-		: AuditConfigBase( AUDIT_DATABASE, cfgName, logParent, logName ),
-		  m_dbConfig( "", logParent, "" )	{}
+		: AuditConfigBase( cfgName, logParent, logName ),
+		  m_dbConfig( "", logParent, "" )		{}
+
+	AuditType type() const					{ return AUDIT_DATABASE; }
 
 	/// methods
 	bool parse( const boost::property_tree::ptree& pt, const std::string& node )

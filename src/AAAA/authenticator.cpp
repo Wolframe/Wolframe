@@ -67,7 +67,6 @@ DatabaseAuth::DatabaseAuth( DatabaseAuthConfig& config )
 		LOG_NOTICE << "Database authenticator with database reference '" << m_dbLabel << "'";
 	}
 		break;
-	case db::DBTYPE_UNKNOWN:
 	default:
 		throw std::domain_error( "Unknown database type in database authenticator constructor" );
 	}

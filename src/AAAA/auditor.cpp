@@ -68,7 +68,6 @@ DatabaseAuditor::DatabaseAuditor( DatabaseAuditConfig& config )
 		LOG_NOTICE << "Database auditor with database reference '" << m_dbLabel << "'";
 	}
 		break;
-	case db::DBTYPE_UNKNOWN:
 	default:
 		throw std::domain_error( "Unknown database type in database auditor constructor" );
 	}

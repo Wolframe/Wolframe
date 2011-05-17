@@ -48,24 +48,21 @@ namespace db	{
 enum DatabaseType	{
 	DBTYPE_REFERENCE,
 	DBTYPE_POSTGRESQL,
-	DBTYPE_SQLITE,
-	DBTYPE_UNKNOWN
+	DBTYPE_SQLITE
 };
 
 
 class	DatabaseConfig : public _Wolframe::config::ConfigurationBase
 {
 public:
-	DatabaseConfig( DatabaseType Type,
-			const char* name, const char* logParent, const char* logName )
-		: ConfigurationBase( name, logParent, logName ), m_type( Type )  {}
-//     virtual ~DatabaseConfigBase();
+	DatabaseConfig( const char* name, const char* logParent, const char* logName )
+		: ConfigurationBase( name, logParent, logName ){}
+	virtual ~DatabaseConfig()			{}
 
-	DatabaseType type() const			{ return m_type; }
+	virtual DatabaseType type() const = 0;
 	void ID( const std::string& id )		{ m_ID = id; }
 	const std::string& ID() const			{ return m_ID; }
 private:
-	const DatabaseType	m_type;
 	std::string		m_ID;
 };
 
@@ -81,6 +78,8 @@ struct	PostgreSQLconfig : public DatabaseConfig
 	unsigned short	connections;
 	unsigned short	acquireTimeout;
 public:
+	virtual DatabaseType type() const		{ return DBTYPE_POSTGRESQL; }
+
 	PostgreSQLconfig( const char* name, const char* logParent, const char* logName );
 	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 	bool check() const;
@@ -94,6 +93,8 @@ struct	SQLiteConfig : public DatabaseConfig
 	std::string	filename;
 	bool		flag;
 public:
+	virtual DatabaseType type() const		{ return DBTYPE_SQLITE; }
+
 	SQLiteConfig( const char* name, const char* logParent, const char* logName );
 	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 	bool check() const;
@@ -107,8 +108,10 @@ struct ReferenceConfig : public DatabaseConfig
 {
 	std::string	m_ref;
 public:
+	virtual DatabaseType type() const		{ return DBTYPE_REFERENCE; }
+
 	ReferenceConfig( const char* name, const char* logParent, const char* logName )
-		: DatabaseConfig( DBTYPE_REFERENCE, name, logParent, logName )	{}
+		: DatabaseConfig( name, logParent, logName )	{}
 	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;

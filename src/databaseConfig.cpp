@@ -56,7 +56,7 @@ namespace db	{
 
 //***  PostgreSQL functions  ********************************************
 PostgreSQLconfig::PostgreSQLconfig( const char* cfgName, const char* logParent, const char* logName )
-	: DatabaseConfig( DBTYPE_POSTGRESQL, cfgName, logParent, logName )
+	: DatabaseConfig( cfgName, logParent, logName )
 {
 	port = 0;
 	connections = 0;
@@ -152,7 +152,7 @@ bool PostgreSQLconfig::parse( const boost::property_tree::ptree& pt, const std::
 
 //***  SQLite functions  ************************************************
 SQLiteConfig::SQLiteConfig( const char* name, const char* logParent, const char* logName )
-	: DatabaseConfig( DBTYPE_SQLITE, name, logParent, logName )
+	: DatabaseConfig( name, logParent, logName )
 {
 	flag = false;
 }

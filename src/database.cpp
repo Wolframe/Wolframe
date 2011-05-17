@@ -48,18 +48,19 @@ DatabaseType Database::strToType( const char *str )
 	if ( boost::algorithm::iequals( str, "PostgreSQL" ))	return DBTYPE_POSTGRESQL;
 	else if ( boost::algorithm::iequals( str, "SQLite" ))	return DBTYPE_SQLITE;
 	else if ( boost::algorithm::iequals( str, "Reference" ))return DBTYPE_REFERENCE;
-	else return DBTYPE_UNKNOWN;
+	else
+		throw std::domain_error( "Unknown database type in Database::strToType(...)" );
 }
 
 std::string& Database::typeToStr( DatabaseType type )
 {
-	static std::string	retVal[ 4 ] = { "Reference to database", "PostgreSQL", "SQLite", "UNKNOWN" };
+	static std::string	retVal[ 3 ] = { "Reference to database", "PostgreSQL", "SQLite" };
 	switch ( type )	{
 	case DBTYPE_REFERENCE:	return retVal[0];
 	case DBTYPE_POSTGRESQL:	return retVal[1];
 	case DBTYPE_SQLITE:	return retVal[2];
-	case DBTYPE_UNKNOWN:
-	default:		return retVal[3];
+	default:
+		throw std::domain_error( "Unknown database type in Database::typeToStr(...)" );
 	}
 }
 
@@ -94,7 +95,6 @@ DBprovider::DBprovider( const Configuration& config )
 			break;
 		case DBTYPE_REFERENCE:
 			throw std::domain_error( "Database reference in DBprovider constructor" );
-		case DBTYPE_UNKNOWN:
 		default:
 			throw std::domain_error( "Unknown database type in DBprovider constructor" );
 		}

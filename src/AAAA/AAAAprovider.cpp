@@ -85,7 +85,6 @@ AAAAprovider::AAAAprovider( const Configuration& config )
 			m_auditors.push_back( auditor );
 		}
 			break;
-		case AUDIT_UNKNOWN:
 		default:
 			throw std::domain_error( "Unknown auditing mechanism type in AAAAprovider constructor" );
 		}

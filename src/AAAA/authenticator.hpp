@@ -58,19 +58,14 @@ enum AuthenticationType	{
 
 class AuthenticationConfigBase : public config::ConfigurationBase
 {
-private:
-	const AuthenticationType	m_type;
 public:
 	/// constructor
-	AuthenticationConfigBase( const AuthenticationType Type,
-				  const char* name, const char* logParent, const char* logName )
-		: config::ConfigurationBase( name, logParent, logName ),
-		  m_type( Type )
-	{}
+	AuthenticationConfigBase( const char* name, const char* logParent, const char* logName )
+		: config::ConfigurationBase( name, logParent, logName ){}
 
-	virtual ~AuthenticationConfigBase()	{}
+	virtual ~AuthenticationConfigBase()			{}
 
-	AuthenticationType type() const		{ return m_type; }
+	virtual AuthenticationType type() const = 0;
 };
 
 
@@ -79,8 +74,10 @@ class DatabaseAuthConfig : public AuthenticationConfigBase
 	friend class DatabaseAuth;
 public:
 	DatabaseAuthConfig( const char* cfgName, const char* logParent, const char* logName )
-		: AuthenticationConfigBase( AUTH_DATABASE, cfgName, logParent, logName ),
+		: AuthenticationConfigBase( cfgName, logParent, logName ),
 		  m_dbConfig( "", logParent, "Database" )	{}
+
+	virtual AuthenticationType type() const			{ return AUTH_DATABASE; }
 
 	/// methods
 	bool parse( const boost::property_tree::ptree& pt, const std::string& node )
@@ -104,8 +101,9 @@ class TextFileAuthConfig : public AuthenticationConfigBase
 	friend class TextFileAuth;
 public:
 	TextFileAuthConfig( const char* cfgName, const char* logParent, const char* logName )
-		: AuthenticationConfigBase( AUTH_TEXTFILE, cfgName, logParent, logName )
-	{}
+		: AuthenticationConfigBase( cfgName, logParent, logName ){}
+
+	virtual AuthenticationType type() const			{ return AUTH_TEXTFILE; }
 
 	/// methods
 	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
