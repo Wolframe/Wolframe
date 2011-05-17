@@ -23,7 +23,7 @@ XSLT_PDF = \
 	$(XSLTPROC) --nonet --xinclude \
 	output-pdf.xsl
 
-local_all:
+local_all: doc-man doc-doxygen doc-html doc-pdf
 
 doc-man: wolframed.8 wolframe.conf.5
 
@@ -48,8 +48,6 @@ wolframed.8: wolframed-man.xml
 
 wolframe.conf.5: wolframe.conf-man.xml
 	$(XSLT_MAN) $<
-
-local_all:
 
 local_clean:
 	-rm -rf doxygen/* WolfBook.html WolfBook.fop WolfBook.pdf
