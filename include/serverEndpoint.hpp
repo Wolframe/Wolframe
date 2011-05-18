@@ -41,25 +41,25 @@ namespace _Wolframe	{
 namespace net	{
 
 	/// No encryption server endpoint
-	class ServerTCPendpoint : public ConnectionEndpoint
+	class ServerTCPendpoint : public LocalTCPendpoint
 	{
 	public:
 		ServerTCPendpoint( const std::string& Host, unsigned short Port,
 				   const std::string& Name, unsigned short maxConn = 0 )
-			: ConnectionEndpoint( Host, Port, TCP_CONNECTION ),
-			  name_( Name ), maxConnections_( maxConn )	{}
+			: LocalTCPendpoint( Host, Port ),
+			  m_name( Name ), m_maxConn( maxConn )	{}
 
-		unsigned short maxConnections() const	{ return maxConnections_; }
-		const std::string& name() const		{ return name_; }
+		unsigned short maxConnections() const		{ return m_maxConn; }
+		const std::string& name() const			{ return m_name; }
 
 	private:
-		const std::string	name_;
-		const unsigned short	maxConnections_;
+		const std::string	m_name;
+		const unsigned short	m_maxConn;
 	};
 
 
 	/// SSL connection server endpoint
-	class ServerSSLendpoint : public ConnectionEndpoint
+	class ServerSSLendpoint : public LocalSSLendpoint
 	{
 		friend class server;
 	public:
@@ -67,8 +67,7 @@ namespace net	{
 				   const std::string& Name, unsigned short maxConn,
 				   const std::string& Certificate, const std::string& Key,
 				   bool verify, const std::string& CAdir, const std::string& CAchainFile )
-			: ConnectionEndpoint( Host, Port, SSL_CONNECTION ),
-			  name_( Name ), maxConnections_( maxConn )
+			: LocalSSLendpoint( Host, Port ), m_name( Name ), m_maxConn( maxConn )
 		{
 			cert_ = Certificate;
 			key_ = Key;
@@ -77,8 +76,8 @@ namespace net	{
 			CAchain_ = CAchainFile;
 		}
 
-		unsigned short maxConnections() const	{ return maxConnections_; }
-		const std::string& name() const		{ return name_; }
+		unsigned short maxConnections() const	{ return m_maxConn; }
+		const std::string& name() const		{ return m_name; }
 		const std::string& certificate() const	{ return cert_; }
 		const std::string& key() const		{ return key_; }
 		const std::string& CAdirectory() const	{ return CAdir_; }
@@ -88,8 +87,8 @@ namespace net	{
 		void setAbsolutePath( const std::string& referencePath );
 
 	private:
-		const std::string	name_;
-		const unsigned short	maxConnections_;
+		const std::string	m_name;
+		const unsigned short	m_maxConn;
 		std::string		cert_;
 		std::string		key_;
 		std::string		CAdir_;

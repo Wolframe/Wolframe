@@ -21,28 +21,29 @@ namespace _Wolframe {
 				SSL_CONNECTION
 			};
 
-			ConnectionEndpoint( const std::string& Host, unsigned short Port, ConnectionType tp )
-			{
-				host_ = Host;
-				port_ = Port;
-				type_ = tp;
-			}
+			enum EndPoint	{
+				LOCAL_ENDPOINT,
+				REMOTE_ENDPOINT
+			};
 
-			const std::string& host() const		{ return host_; }
-			unsigned short port() const		{ return port_; }
-			ConnectionType type() const		{ return type_; }
+			ConnectionEndpoint( const std::string& Host, unsigned short Port )
+				: m_host( Host ), m_port( Port )	{}
+
+			const std::string& host() const			{ return m_host; }
+			unsigned short port() const			{ return m_port; }
+			virtual ConnectionType type() const = 0;
+			virtual EndPoint endpoint() const = 0;
 
 			std::string toString() const
 			{
 				std::ostringstream o;
-				o << host_ << ":" << port_;
+				o << m_host << ":" << m_port;
 				return o.str();
 			}
 
 		private:
-			std::string	host_;
-			unsigned short	port_;
-			ConnectionType	type_;
+			const std::string	m_host;
+			const unsigned short	m_port;
 		};
 
 
@@ -51,9 +52,18 @@ namespace _Wolframe {
 		class LocalEndpoint : public ConnectionEndpoint
 		{
 		public:
-			LocalEndpoint( const std::string& Host, unsigned short Port,
-				      ConnectionType tp )
-				: ConnectionEndpoint( Host, Port, tp )	{}
+			LocalEndpoint( const std::string& Host, unsigned short Port )
+				: ConnectionEndpoint( Host, Port )
+			{
+				m_connectionTime = time( NULL );
+			}
+
+			virtual ConnectionType type() const = 0;
+			EndPoint endpoint() const			{ return LOCAL_ENDPOINT; }
+			time_t connectionTime() const			{ return m_connectionTime; }
+
+		private:
+			time_t	m_connectionTime;
 		};
 
 		/// local unencrypted endpoint
@@ -61,7 +71,9 @@ namespace _Wolframe {
 		{
 		public:
 			LocalTCPendpoint( const std::string& Host, unsigned short Port )
-				: LocalEndpoint( Host, Port, TCP_CONNECTION )	{}
+				: LocalEndpoint( Host, Port )		{}
+
+			ConnectionType type() const			{ return TCP_CONNECTION; }
 		};
 
 #ifdef WITH_SSL
@@ -70,7 +82,9 @@ namespace _Wolframe {
 		{
 		public:
 			LocalSSLendpoint( const std::string& Host, unsigned short Port )
-				: LocalEndpoint( Host, Port, SSL_CONNECTION )	{}
+				: LocalEndpoint( Host, Port )		{}
+
+			ConnectionType type() const			{ return SSL_CONNECTION; }
 		};
 #endif // WITH_SSL
 
@@ -80,17 +94,18 @@ namespace _Wolframe {
 		class RemoteEndpoint : public ConnectionEndpoint
 		{
 		public:
-			RemoteEndpoint( const std::string& Host, unsigned short Port,
-				       ConnectionType tp )
-				: ConnectionEndpoint( Host, Port, tp )
+			RemoteEndpoint( const std::string& Host, unsigned short Port )
+				: ConnectionEndpoint( Host, Port )
 			{
-				connectionTime_ = time( NULL );
+				m_connectionTime = time( NULL );
 			}
+			virtual ConnectionType type() const = 0;
+			EndPoint endpoint() const			{ return REMOTE_ENDPOINT; }
 
-			time_t connectionTime() const			{ return connectionTime_; }
+			time_t connectionTime() const			{ return m_connectionTime; }
 
 		private:
-			time_t	connectionTime_;
+			time_t	m_connectionTime;
 		};
 
 		/// remote unencrypted endpoint
@@ -98,15 +113,9 @@ namespace _Wolframe {
 		{
 		public:
 			RemoteTCPendpoint( const std::string& Host, unsigned short Port )
-				: RemoteEndpoint( Host, Port, TCP_CONNECTION )
-			{
-				connectionTime_ = time( NULL );
-			}
+				: RemoteEndpoint( Host, Port )		{}
 
-			time_t connectionTime() const			{ return connectionTime_; }
-
-		private:
-			time_t	connectionTime_;
+			ConnectionType type() const			{ return TCP_CONNECTION; }
 		};
 
 #ifdef WITH_SSL
@@ -118,27 +127,19 @@ namespace _Wolframe {
 		{
 		public:
 			RemoteSSLendpoint( const std::string& Host, unsigned short Port )
-				: RemoteEndpoint( Host, Port, SSL_CONNECTION )
-			{
-				connectionTime_ = time( NULL );
-				sslInfo_ = NULL;
-			}
+				: RemoteEndpoint( Host, Port ), m_SSLinfo( NULL )	{}
 
 			RemoteSSLendpoint( const std::string& Host, unsigned short Port,
-					  const SSLcertificateInfo *sslInfo )
-				: RemoteEndpoint( Host, Port, SSL_CONNECTION )
-			{
-				connectionTime_ = time( NULL );
-				sslInfo_ = sslInfo;
-			}
+					   const SSLcertificateInfo *SSLinfo )
+				: RemoteEndpoint( Host, Port ), m_SSLinfo( SSLinfo )	{}
 
-			time_t connectionTime() const			{ return connectionTime_; }
+			ConnectionType type() const			{ return SSL_CONNECTION; }
+
 			/// SSL certificate information
-			const SSLcertificateInfo* SSLcertInfo() const	{ return sslInfo_; }
+			const SSLcertificateInfo* SSLcertInfo() const	{ return m_SSLinfo; }
 
 		private:
-			time_t				connectionTime_;
-			const SSLcertificateInfo	*sslInfo_;
+			const SSLcertificateInfo	*m_SSLinfo;
 		};
 #endif // WITH_SSL
 
