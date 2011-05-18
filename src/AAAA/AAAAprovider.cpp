@@ -116,7 +116,7 @@ bool AAAAprovider::resolveDB( db::DBprovider& db )
 }
 
 
-Configuration::Configuration() : config::ConfigurationBase( "AAAA", NULL, "AAAA configuration"  ),
+Configuration::Configuration() : config::OLD_ConfigurationBase( "AAAA", NULL, "AAAA configuration"  ),
 	auth( "Authentication", logPrefix().c_str(), "Authentication" ),
 	audit( "Auditing", logPrefix().c_str(), "Auditing" )
 {

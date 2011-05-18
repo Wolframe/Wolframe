@@ -51,7 +51,7 @@ namespace _Wolframe {
 namespace net	{
 
 	/// network server configuration
-	struct Configuration : public _Wolframe::config::ConfigurationBase
+	struct Configuration : public _Wolframe::config::OLD_ConfigurationBase
 	{
 	public:
 		unsigned short		threads;
@@ -82,7 +82,7 @@ namespace net	{
 namespace log	{
 
 	/// logger configuration
-	struct LoggerConfiguration : public _Wolframe::config::ConfigurationBase
+	struct LoggerConfiguration : public _Wolframe::config::OLD_ConfigurationBase
 	{
 	public:
 		bool			logToStderr;
@@ -124,7 +124,7 @@ namespace log	{
 namespace config	{
 
 	/// daemon / service configuration
-	struct ServiceConfiguration : public _Wolframe::config::ConfigurationBase
+	struct ServiceConfiguration : public _Wolframe::config::OLD_ConfigurationBase
 	{
 	public:
 #if !defined( _WIN32 )
@@ -159,7 +159,7 @@ namespace config	{
 
 
 	/// Service signature
-	class ServiceBanner : public _Wolframe::config::ConfigurationBase
+	class ServiceBanner : public _Wolframe::config::OLD_ConfigurationBase
 	{
 	public:
 		enum SignatureTokens	{
@@ -173,7 +173,7 @@ namespace config	{
 		};
 
 		/// constructor
-		ServiceBanner() : ConfigurationBase( "Service Banner", NULL, "Service banner" ),
+		ServiceBanner() : OLD_ConfigurationBase( "Service Banner", NULL, "Service banner" ),
 						tokens_( UNDEFINED ),
 						serverName_( false ),
 						serverNameDefined_( false )	{}
@@ -195,7 +195,7 @@ namespace config	{
 
 
 	/// logger configuration
-	struct LoggerConfiguration : public _Wolframe::config::ConfigurationBase
+	struct LoggerConfiguration : public _Wolframe::config::OLD_ConfigurationBase
 	{
 	public:
 		bool			logToStderr;

@@ -43,7 +43,7 @@
 namespace _Wolframe {
 namespace config	{
 
-struct ConfigurationBase	{
+class OLD_ConfigurationBase	{
 public:
 	/// Class constructor.
 	///\param[in]	name	the name that will be displayed for this
@@ -53,7 +53,7 @@ public:
 	///\param[in]	logName	the logging name of this section. Combined with
 	///			the logParent parameter will form the whole logging
 	///			prefix for of the section.
-	ConfigurationBase( const char* name, const char* logParent, const char* logName )
+	OLD_ConfigurationBase( const char* name, const char* logParent, const char* logName )
 	{
 		sectionName_ = name ? name : "";
 		logPrefix_ = logParent ? logParent : "";
@@ -62,7 +62,7 @@ public:
 		}
 	}
 
-	virtual ~ConfigurationBase()	{}
+	virtual ~OLD_ConfigurationBase()	{}
 
 	/// The display string (name) of the configuration section
 	///\return	a reference to the name set by the constructor

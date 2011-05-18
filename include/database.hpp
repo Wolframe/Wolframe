@@ -52,11 +52,11 @@ enum DatabaseType	{
 };
 
 
-class	DatabaseConfig : public _Wolframe::config::ConfigurationBase
+class	DatabaseConfig : public _Wolframe::config::OLD_ConfigurationBase
 {
 public:
 	DatabaseConfig( const char* name, const char* logParent, const char* logName )
-		: ConfigurationBase( name, logParent, logName ){}
+		: OLD_ConfigurationBase( name, logParent, logName ){}
 	virtual ~DatabaseConfig()			{}
 
 	virtual DatabaseType type() const = 0;
@@ -119,13 +119,13 @@ public:
 
 
 /// database configurations
-struct Configuration : public _Wolframe::config::ConfigurationBase
+struct Configuration : public _Wolframe::config::OLD_ConfigurationBase
 {
 public:
 	std::list<DatabaseConfig*>	dbConfig_;
 
 	/// constructor & destructor
-	Configuration() : ConfigurationBase( "Database(s)", NULL, "Database configuration" )	{}
+	Configuration() : OLD_ConfigurationBase( "Database(s)", NULL, "Database configuration" )	{}
 	~Configuration();
 
 	/// methods
@@ -138,14 +138,14 @@ public:
 //	bool test() const;
 };
 
-struct SingleDBConfiguration : public _Wolframe::config::ConfigurationBase
+struct SingleDBConfiguration : public _Wolframe::config::OLD_ConfigurationBase
 {
 public:
 	DatabaseConfig*	m_dbConfig;
 
 	/// constructor & destructor
 	SingleDBConfiguration( const char* name, const char* logParent, const char* logName )
-		: ConfigurationBase( name, logParent, logName )	{ m_dbConfig = NULL; }
+		: OLD_ConfigurationBase( name, logParent, logName )	{ m_dbConfig = NULL; }
 	~SingleDBConfiguration();
 
 	/// methods

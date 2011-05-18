@@ -99,6 +99,7 @@ namespace _Wolframe {
 			{
 				m_connectionTime = time( NULL );
 			}
+
 			virtual ConnectionType type() const = 0;
 			EndPoint endpoint() const			{ return REMOTE_ENDPOINT; }
 

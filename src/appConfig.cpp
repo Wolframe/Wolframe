@@ -83,14 +83,14 @@ const char* ApplicationConfiguration::chooseFile( const char *globalFile, const 
 }
 
 
-bool ApplicationConfiguration::addConfig( const std::string& nodeName, ConfigurationBase *config )
+bool ApplicationConfiguration::addConfig( const std::string& nodeName, OLD_ConfigurationBase *config )
 {
 	// check if the label already exists
 	if ( section_.find( nodeName ) != section_.end() )
 		return false;
 
 	// find the appropriate index in the configurations vector
-	std::vector< ConfigurationBase* >::const_iterator it = conf_.begin();
+	std::vector< OLD_ConfigurationBase* >::const_iterator it = conf_.begin();
 	std::size_t pos = 0;
 	bool found = false;
 	for( ; it != conf_.end(); it++, pos++ )	{

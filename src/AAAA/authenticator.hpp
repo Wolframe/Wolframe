@@ -56,12 +56,12 @@ enum AuthenticationType	{
 };
 
 
-class AuthenticationConfigBase : public config::ConfigurationBase
+class AuthenticationConfigBase : public config::OLD_ConfigurationBase
 {
 public:
 	/// constructor
 	AuthenticationConfigBase( const char* name, const char* logParent, const char* logName )
-		: config::ConfigurationBase( name, logParent, logName ){}
+		: config::OLD_ConfigurationBase( name, logParent, logName ){}
 
 	virtual ~AuthenticationConfigBase()			{}
 
@@ -117,13 +117,13 @@ private:
 
 
 /******************************************************************************************************/
-class AuthenticationConfiguration : public config::ConfigurationBase
+class AuthenticationConfiguration : public config::OLD_ConfigurationBase
 {
 	friend class AAAAprovider;
 public:
 	/// constructor
 	AuthenticationConfiguration( const char* cfgName, const char* logParent, const char* logName )
-		: ConfigurationBase( cfgName, logParent, logName )	{}
+		: OLD_ConfigurationBase( cfgName, logParent, logName )	{}
 	~AuthenticationConfiguration();
 
 	/// methods

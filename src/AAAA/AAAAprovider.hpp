@@ -59,7 +59,7 @@ private:
 };
 
 
-struct Configuration : public config::ConfigurationBase
+struct Configuration : public config::OLD_ConfigurationBase
 {
 	friend class AAAAprovider;
 public:

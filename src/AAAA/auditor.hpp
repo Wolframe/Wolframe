@@ -53,12 +53,12 @@ enum AuditType	{
 };
 
 
-class AuditConfigBase : public config::ConfigurationBase
+class AuditConfigBase : public config::OLD_ConfigurationBase
 {
 public:
 	/// constructor
 	AuditConfigBase( const char* name, const char* logParent, const char* logName )
-		: config::ConfigurationBase( name, logParent, logName )		{}
+		: config::OLD_ConfigurationBase( name, logParent, logName )		{}
 
 	virtual ~AuditConfigBase()	{}
 
@@ -113,13 +113,13 @@ private:
 };
 
 
-class AuditConfiguration : public config::ConfigurationBase
+class AuditConfiguration : public config::OLD_ConfigurationBase
 {
 	friend class AAAAprovider;
 public:
 	/// constructor
 	AuditConfiguration( const char* cfgName, const char* logParent, const char* logName )
-		: ConfigurationBase( cfgName, logParent, logName )	{}
+		: OLD_ConfigurationBase( cfgName, logParent, logName )	{}
 	~AuditConfiguration();
 
 	/// methods

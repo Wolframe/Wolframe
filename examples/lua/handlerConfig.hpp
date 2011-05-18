@@ -30,7 +30,7 @@ namespace _Wolframe {
 	};
 
 	/// echo configuration
-	struct LuaConfiguration : public _Wolframe::config::ConfigurationBase
+	struct LuaConfiguration : public _Wolframe::config::OLD_ConfigurationBase
 	{
 	public:
 		std::string					script;

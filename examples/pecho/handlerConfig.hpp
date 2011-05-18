@@ -10,13 +10,13 @@
 namespace _Wolframe {
 
 	/// echo configuration
-	struct pEchoConfiguration : public _Wolframe::config::ConfigurationBase
+	struct pEchoConfiguration : public _Wolframe::config::OLD_ConfigurationBase
 	{
 	public:
 		unsigned short		timeout;
 
 		/// constructor
-		pEchoConfiguration() : ConfigurationBase( "pEcho Server", NULL,  "pEcho Server configuration" )
+		pEchoConfiguration() : OLD_ConfigurationBase( "pEcho Server", NULL,  "pEcho Server configuration" )
 											{ timeout = 0; }
 		/// methods
 		bool parse( const boost::property_tree::ptree& pt, const std::string& nodeName );
