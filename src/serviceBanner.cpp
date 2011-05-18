@@ -44,6 +44,11 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/algorithm/string.hpp>
 
+//////// Just for temporary testing purposes ////////
+#include "configurationBase.hpp"
+#include "configParserBase.hpp"
+//////// Just for temporary testing purposes ////////
+
 namespace _Wolframe {
 namespace config	{
 

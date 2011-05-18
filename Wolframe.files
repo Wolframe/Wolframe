@@ -368,3 +368,4 @@ tests/expect/testPecho
 tests/expect/testEcho
 tests/expect/Makefile.W32
 tests/expect/GNUmakefile
+include/configParserBase.hpp
