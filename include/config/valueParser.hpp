@@ -96,7 +96,7 @@ public:
 			{
 				value = boost::lexical_cast<ValueType>( token);
 			}
-			catch (bad_lexical_cast e)
+			catch (bad_lexical_cast& e)
 			{
 				explanation = e.what();
 				return false;
@@ -300,12 +300,12 @@ public:
 			LOG_ERROR << loggingScope(module) << "invalid value '" << token << "'for configuration element '" << name << "' (" << errorExplanation << ")";
 			return false;
 		}
-		catch (bad_alloc)
+		catch (bad_alloc&)
 		{
 			LOG_ERROR << loggingScope(module) << "out of memory when parsing configuration element '" << name << "'";
 			return false;
 		}
-		catch (exception e)
+		catch (exception& e)
 		{
 			LOG_ERROR << loggingScope(module) << "illegal value for configuration element '" << name << "' (" << e.what() << ")";
 			return false;
@@ -351,12 +351,12 @@ public:
 			}
 			return getValue( module, decl.first.c_str(), decl.second.get_value<std::string>(), value, domain, isDefined);
 		}
-		catch (boost::property_tree::ptree_bad_data)
+		catch (boost::property_tree::ptree_bad_data&)
 		{
 			LOG_ERROR << loggingScope(module) << "illegal value for configuration element '" << decl.first.c_str() << "'";
 			return false;
 		}
-		catch (std::bad_alloc)
+		catch (std::bad_alloc&)
 		{
 			LOG_ERROR << loggingScope(module) << "out of memory when parsing configuration element '" << decl.first.c_str() << "'";
 			return false;
