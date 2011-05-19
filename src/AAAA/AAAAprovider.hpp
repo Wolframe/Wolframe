@@ -51,11 +51,40 @@ namespace AAAA {
 class User
 {
 public:
-	User( const char* name ) : m_name( name )	{}
+	User( const char* uname ) : m_name( uname )	{}
 
-	const std::string& username() const		{ return m_name; }
+	const std::string& name() const			{ return m_name; }
 private:
 	const std::string	m_name;
+};
+
+
+class _AuthenticationChannel_
+{
+public:
+	_AuthenticationChannel_()			{}
+	~_AuthenticationChannel_()			{}
+};
+
+class _AuthorizationChannel_
+{
+public:
+	_AuthorizationChannel_()			{}
+	~_AuthorizationChannel_()			{}
+};
+
+class _AuditChannel_
+{
+public:
+	_AuditChannel_()				{}
+	~_AuditChannel_()				{}
+};
+
+class _AccountingChannel_
+{
+public:
+	_AccountingChannel_()				{}
+	~_AccountingChannel_()				{}
 };
 
 
@@ -85,6 +114,11 @@ public:
 	AAAAprovider( const Configuration& conf );
 	~AAAAprovider();
 	bool resolveDB( db::DBprovider& db );
+
+	_AuthenticationChannel_* authenticationChannel() const	{ return NULL; }
+	_AuthorizationChannel_* authorizationChannel() const	{ return NULL; }
+	_AuditChannel_* auditChannel() const			{ return NULL; }
+	_AccountingChannel_* accountingChannel() const		{ return NULL; }
 private:
 	std::list<GlobalAuthenticatorBase*>	m_authenticators;
 	std::list<GlobalAuditorBase*>		m_auditors;

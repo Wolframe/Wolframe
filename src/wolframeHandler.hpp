@@ -51,7 +51,7 @@ namespace _Wolframe {
 
 		const std::string& banner() const	{ return m_banner; }
 		const db::DBprovider db() const		{ return m_db; }
-		const AAAA::AAAAprovider& aaaa()	{ return m_aaaa; }
+		const AAAA::AAAAprovider& aaaa() const	{ return m_aaaa; }
 	private:
 		const std::string		m_banner;
 		_Wolframe::db::DBprovider	m_db;
@@ -90,11 +90,17 @@ namespace _Wolframe {
 			FINISHED
 		};
 		/// Back link to global context
-		const wolframeHandler&		globalCtx_;
-
+		const wolframeHandler&		m_globalCtx;
+///*************
+		db::_DatabaseChannel_*		m_db;
+		AAAA::_AuthenticationChannel_*	m_authentication;
+		AAAA::_AuthorizationChannel_*	m_authorization;
+		AAAA::_AuditChannel_*		m_audit;
+		AAAA::_AccountingChannel_*	m_accounting;
+///*************
 		/// Connection endpoints
-		const net::LocalEndpoint*	localEP_;
-		const net::RemoteEndpoint*	remoteEP_;
+		const net::LocalEndpoint*	m_localEP;
+		const net::RemoteEndpoint*	m_remoteEP;
 
 		static const std::size_t ReadBufSize = 8192;
 		/// The state of the processor FSM

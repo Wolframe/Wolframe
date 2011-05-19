@@ -157,40 +157,59 @@ public:
 
 
 /// database base classes
-class Database	{
+class Database
+{
 public:
-	Database( DatabaseType t, const std::string id ) : m_type( t ), m_id( id )	{}
+	Database( const std::string id ) : m_id( id )	{}
+	virtual ~Database()				{}
+
+	const std::string& ID() const			{ return m_id; }
+	virtual DatabaseType type() const = 0;
+
 	static DatabaseType strToType( const char *str );
 	static std::string& typeToStr( DatabaseType type );
-
-	const std::string& ID() const	{ return m_id; }
-	DatabaseType type() const	{ return m_type; }
 private:
-	const DatabaseType	m_type;
 	const std::string	m_id;
 };
 
 
-class PostgreSQLDatabase : public Database	{
+class _DatabaseChannel_
+{
+public:
+	_DatabaseChannel_()				{}
+	~_DatabaseChannel_()				{}
+};
+
+
+class PostgreSQLDatabase : public Database
+{
 public:
 	PostgreSQLDatabase( const PostgreSQLconfig* config );
+
+	DatabaseType type() const			{ return DBTYPE_POSTGRESQL; }
 private:
 };
 
 
-class SQLiteDatabase : public Database	{
+class SQLiteDatabase : public Database
+{
 public:
 	SQLiteDatabase( const SQLiteConfig* config );
+
+	DatabaseType type() const			{ return DBTYPE_SQLITE; }
 private:
 };
 
 
-class DBprovider	{
+class DBprovider
+{
 public:
 	DBprovider( const Configuration& config );
 	~DBprovider();
 
 	Database* database( std::string& ID ) const;
+
+	_DatabaseChannel_* channel() const		{ return NULL; }
 
 private:
 	std::list<Database*>	m_db;

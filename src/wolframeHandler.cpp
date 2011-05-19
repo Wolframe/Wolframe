@@ -52,21 +52,21 @@ namespace _Wolframe	{
 
 wolframeConnection::wolframeConnection( const wolframeHandler& context,
 					const net::LocalEndpoint& local )
-	: globalCtx_( context )
+	: m_globalCtx( context )
 {
-	localEP_ = &local;
-	remoteEP_ = NULL;
-	_Wolframe::net::ConnectionEndpoint::ConnectionType type = localEP_->type();
+	m_localEP = &local;
+	m_remoteEP = NULL;
+	_Wolframe::net::ConnectionEndpoint::ConnectionType type = m_localEP->type();
 
 	switch ( type )	{
 	case _Wolframe::net::ConnectionEndpoint::TCP_CONNECTION:	{
-		const _Wolframe::net::LocalTCPendpoint* lcl = static_cast<const _Wolframe::net::LocalTCPendpoint*>( localEP_ );
+		const _Wolframe::net::LocalTCPendpoint* lcl = static_cast<const _Wolframe::net::LocalTCPendpoint*>( m_localEP );
 		LOG_TRACE << "Created connection handler for " << lcl->toString();
 		break;
 	}
 #ifdef WITH_SSL
 	case _Wolframe::net::ConnectionEndpoint::SSL_CONNECTION:	{
-		const _Wolframe::net::LocalSSLendpoint* lcl = static_cast<const _Wolframe::net::LocalSSLendpoint*>( localEP_ );
+		const _Wolframe::net::LocalSSLendpoint* lcl = static_cast<const _Wolframe::net::LocalSSLendpoint*>( m_localEP );
 		LOG_TRACE << "Created connection handler (SSL) for " << lcl->toString();
 		break;
 	}
@@ -82,28 +82,41 @@ wolframeConnection::wolframeConnection( const wolframeHandler& context,
 	dataStart_ = NULL;
 	dataSize_ = 0;
 	idleTimeout_ = 30;
+
+	m_db = m_globalCtx.db().channel();
+
+	m_authentication = m_globalCtx.aaaa().authenticationChannel();
+	m_authorization = m_globalCtx.aaaa().authorizationChannel();
+	m_audit = m_globalCtx.aaaa().auditChannel();
+	m_accounting = m_globalCtx.aaaa().accountingChannel();
 }
 
 
 wolframeConnection::~wolframeConnection()
 {
+	if ( m_db )		delete m_db;
+	if ( m_authentication )	delete m_authentication;
+	if ( m_authorization )	delete m_authorization;
+	if ( m_audit )		delete m_audit;
+	if ( m_accounting )	delete m_accounting;
+
 	LOG_TRACE << "Connection handler destroyed";
 }
 
 void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
 {
-	remoteEP_ = &remote;
-	_Wolframe::net::ConnectionEndpoint::ConnectionType type = remoteEP_->type();
+	m_remoteEP = &remote;
+	_Wolframe::net::ConnectionEndpoint::ConnectionType type = m_remoteEP->type();
 
 	switch ( type )	{
 	case _Wolframe::net::ConnectionEndpoint::TCP_CONNECTION:	{
-		const _Wolframe::net::RemoteTCPendpoint* rmt = static_cast<const _Wolframe::net::RemoteTCPendpoint*>( remoteEP_ );
+		const _Wolframe::net::RemoteTCPendpoint* rmt = static_cast<const _Wolframe::net::RemoteTCPendpoint*>( m_remoteEP );
 		LOG_TRACE << "Peer set to " << rmt->toString() << ", connected at " << rmt->connectionTime();
 		break;
 	}
 #ifdef WITH_SSL
 	case _Wolframe::net::ConnectionEndpoint::SSL_CONNECTION:	{
-		const _Wolframe::net::RemoteSSLendpoint* rmt = static_cast<const _Wolframe::net::RemoteSSLendpoint*>( remoteEP_ );
+		const _Wolframe::net::RemoteSSLendpoint* rmt = static_cast<const _Wolframe::net::RemoteSSLendpoint*>( m_remoteEP );
 		LOG_TRACE << "Peer set to " << rmt->toString() << ", connected at " << boost::posix_time::from_time_t( rmt->connectionTime());
 		if ( rmt->SSLcertInfo() )	{
 			LOG_TRACE << "Peer SSL certificate serial number " << rmt->SSLcertInfo()->serialNumber()
@@ -130,8 +143,8 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 	switch( state_ )	{
 	case NEW:	{
 		state_ = HELLO_SENT;
-		if ( ! globalCtx_.banner().empty() )
-			outMsg_ = globalCtx_.banner() + "\nOK\n";
+		if ( ! m_globalCtx.banner().empty() )
+			outMsg_ = m_globalCtx.banner() + "\nOK\n";
 		else
 			outMsg_ = "OK\n";
 		return net::NetworkOperation( net::SendString( outMsg_ ));

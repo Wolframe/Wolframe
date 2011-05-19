@@ -66,13 +66,13 @@ std::string& Database::typeToStr( DatabaseType type )
 
 
 PostgreSQLDatabase::PostgreSQLDatabase( const PostgreSQLconfig* config )
-	: Database( DBTYPE_POSTGRESQL, config->ID())
+	: Database( config->ID())
 {
 	LOG_NOTICE << "PostgreSQL database '" << config->ID() << "' created";
 }
 
 SQLiteDatabase::SQLiteDatabase( const SQLiteConfig* config )
-	: Database( DBTYPE_SQLITE, config->ID())
+	: Database( config->ID())
 {
 	LOG_NOTICE << "SQLite database '" << config->ID() << "' created";
 }
