@@ -23,7 +23,9 @@ XSLT_PDF = \
 	$(XSLTPROC) --nonet --xinclude \
 	output-pdf.xsl
 
-local_all: doc-man doc-doxygen doc-html doc-pdf
+local_all:
+
+doc: doc-man doc-doxygen doc-html doc-pdf
 
 doc-man: wolframed.8 wolframe.conf.5
 
