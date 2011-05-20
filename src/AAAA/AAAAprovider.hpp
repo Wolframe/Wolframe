@@ -64,6 +64,8 @@ class _AuthenticationChannel_
 public:
 	_AuthenticationChannel_()			{}
 	~_AuthenticationChannel_()			{}
+
+	void close()					{}
 };
 
 class _AuthorizationChannel_
@@ -71,6 +73,8 @@ class _AuthorizationChannel_
 public:
 	_AuthorizationChannel_()			{}
 	~_AuthorizationChannel_()			{}
+
+	void close()					{}
 };
 
 class _AuditChannel_
@@ -78,6 +82,8 @@ class _AuditChannel_
 public:
 	_AuditChannel_()				{}
 	~_AuditChannel_()				{}
+
+	void close()					{}
 };
 
 class _AccountingChannel_
@@ -85,6 +91,8 @@ class _AccountingChannel_
 public:
 	_AccountingChannel_()				{}
 	~_AccountingChannel_()				{}
+
+	void close()					{}
 };
 
 

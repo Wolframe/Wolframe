@@ -178,6 +178,8 @@ class _DatabaseChannel_
 public:
 	_DatabaseChannel_()				{}
 	~_DatabaseChannel_()				{}
+
+	void close()					{}
 };
 
 
