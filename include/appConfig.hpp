@@ -37,7 +37,7 @@
 #ifndef _APP_CONFIG_HPP_INCLUDED
 #define _APP_CONFIG_HPP_INCLUDED
 
-#include "configurationBase.hpp"
+#include "config/configurationBase.hpp"
 
 #include <cstddef>
 #include <string>
@@ -67,7 +67,7 @@ struct ApplicationConfiguration	{
 	// daemon / service configuration
 	ServiceConfiguration			*serviceConf;
 	// network server configuration
-	_Wolframe::net::Configuration	*serverConf;
+	_Wolframe::net::Configuration		*serverConf;
 	// logger configuration
 	_Wolframe::log::LoggerConfiguration	*loggerConf;
 
@@ -94,12 +94,12 @@ public:
 				       const char *userFile,
 				       const char *localFile );
 private:
-	ConfigFileType				type_;
-	bool					forced_;
-	std::vector< OLD_ConfigurationBase* >	conf_;
-	std::map< std::string, std::size_t >	section_;
+	ConfigFileType				m_type;
+	bool					m_forced;
+	std::vector< ConfigurationBase* >	m_conf;
+	std::map< std::string, std::size_t >	m_section;
 
-	bool addConfig( const std::string& nodeName, OLD_ConfigurationBase *config );
+	bool addConfig( const std::string& nodeName, ConfigurationBase *config );
 };
 
 } // namespace config

@@ -45,8 +45,8 @@
 #include <boost/algorithm/string.hpp>
 
 //////// Just for temporary testing purposes ////////
-#include "configurationBase.hpp"
-#include "configParserBase.hpp"
+#include "config/configurationBase.hpp"
+#include "config/configurationParser.hpp"
 //////// Just for temporary testing purposes ////////
 
 namespace _Wolframe {
@@ -70,33 +70,41 @@ static ServiceBanner::SignatureTokens strToToken( std::string& str )
 	return ServiceBanner::UNDEFINED;
 }
 
-/// Service signature
-bool ServiceBanner::parse( const boost::property_tree::ptree& pt, const std::string& node )
+
+/// Service signature parser
+template<>
+bool ConfigurationParser::parseConfig( ServiceBanner& cfg,
+				       const boost::property_tree::ptree& pt, const std::string& node )
 {
 
 	if ( boost::algorithm::iequals( node, "ServerTokens" ))	{
-		bool tokensDefined = ( tokens_ != UNDEFINED );
+		bool tokensDefined = ( cfg.tokens_ != ServiceBanner::UNDEFINED );
 		std::string	val;
-		if ( !Parser::getValue( logPrefix().c_str(), node.c_str(), pt.get_value<std::string>(),
+		if ( !Parser::getValue( cfg.logPrefix().c_str(), node.c_str(), pt.get_value<std::string>(),
 					val, &tokensDefined ))
 			return false;
-		tokens_ = strToToken( val );
-		if ( tokens_ == UNDEFINED )	{
-			LOG_ERROR << logPrefix() << "Unknown option '" << val << "' for " << node;
+		cfg.tokens_ = strToToken( val );
+		if ( cfg.tokens_ == ServiceBanner::UNDEFINED )	{
+			LOG_ERROR << cfg.logPrefix() << "Unknown option '" << val << "' for " << node;
 			return false;
 		}
 	}
 	else if ( boost::algorithm::iequals( node, "ServerSignature" ))	{
-		if ( !Parser::getValue( logPrefix().c_str(), node.c_str(), pt.get_value<std::string>(),
-				       serverName_, Parser::BoolDomain(), &serverNameDefined_ ))
+		if ( !Parser::getValue( cfg.logPrefix().c_str(), node.c_str(), pt.get_value<std::string>(),
+				       cfg.serverName_, Parser::BoolDomain(), &cfg.serverNameDefined_ ))
 			return false;
 	}
 	else	{
-		LOG_FATAL << logPrefix() << "called with unknown configuration option: '"
+		LOG_FATAL << cfg.logPrefix() << "called with unknown configuration option: '"
 			  << node << "'";
 		return false;
 	}
 	return true;
+}
+
+bool ServiceBanner::parse( const boost::property_tree::ptree& pt, const std::string& node )
+{
+	return ConfigurationParser::parseConfig( *this, pt, node );
 }
 
 

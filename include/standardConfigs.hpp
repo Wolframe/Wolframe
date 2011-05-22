@@ -37,7 +37,7 @@
 #ifndef _STANDARD_CONFIGS_HPP_INCLUDED
 #define _STANDARD_CONFIGS_HPP_INCLUDED
 
-#include "configurationBase.hpp"
+#include "config/configurationBase.hpp"
 #include "serverEndpoint.hpp"
 #include "logger/logLevel.hpp"
 
@@ -51,7 +51,7 @@ namespace _Wolframe {
 namespace net	{
 
 	/// network server configuration
-	struct Configuration : public _Wolframe::config::OLD_ConfigurationBase
+	struct Configuration : public _Wolframe::config::ConfigurationBase
 	{
 	public:
 		unsigned short		threads;
@@ -82,7 +82,7 @@ namespace net	{
 namespace log	{
 
 	/// logger configuration
-	struct LoggerConfiguration : public _Wolframe::config::OLD_ConfigurationBase
+	struct LoggerConfiguration : public _Wolframe::config::ConfigurationBase
 	{
 	public:
 		bool			logToStderr;
@@ -124,7 +124,7 @@ namespace log	{
 namespace config	{
 
 	/// daemon / service configuration
-	struct ServiceConfiguration : public _Wolframe::config::OLD_ConfigurationBase
+	struct ServiceConfiguration : public _Wolframe::config::ConfigurationBase
 	{
 	public:
 #if !defined( _WIN32 )
@@ -159,8 +159,9 @@ namespace config	{
 
 
 	/// Service signature
-	class ServiceBanner : public _Wolframe::config::OLD_ConfigurationBase
+	class ServiceBanner : public _Wolframe::config::ConfigurationBase
 	{
+		friend class ConfigurationParser;
 	public:
 		enum SignatureTokens	{
 			PRODUCT_NAME,
@@ -173,7 +174,7 @@ namespace config	{
 		};
 
 		/// constructor
-		ServiceBanner() : OLD_ConfigurationBase( "Service Banner", NULL, "Service banner" ),
+		ServiceBanner() : ConfigurationBase( "Service Banner", NULL, "Service banner" ),
 						tokens_( UNDEFINED ),
 						serverName_( false ),
 						serverNameDefined_( false )	{}
@@ -181,12 +182,13 @@ namespace config	{
 		std::string toString() const;
 
 		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
+
 		bool check() const;
 		void print( std::ostream& os, size_t indent ) const;
 
 //		Not implemented yet, inherited from base for the time being
 //		bool test() const;
-	private:
+	protected:
 		/// data members
 		SignatureTokens	tokens_;
 		bool		serverName_;
@@ -195,7 +197,7 @@ namespace config	{
 
 
 	/// logger configuration
-	struct LoggerConfiguration : public _Wolframe::config::OLD_ConfigurationBase
+	struct LoggerConfiguration : public _Wolframe::config::ConfigurationBase
 	{
 	public:
 		bool			logToStderr;

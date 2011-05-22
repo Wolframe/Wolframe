@@ -37,7 +37,7 @@
 #ifndef _AAAA_PROVIDER_HPP_INCLUDED
 #define _AAAA_PROVIDER_HPP_INCLUDED
 
-#include "configurationBase.hpp"
+#include "config/configurationBase.hpp"
 #include "auditor.hpp"
 #include "authenticator.hpp"
 #include "database.hpp"
@@ -96,7 +96,7 @@ public:
 };
 
 
-struct Configuration : public config::OLD_ConfigurationBase
+struct Configuration : public config::ConfigurationBase
 {
 	friend class AAAAprovider;
 public:

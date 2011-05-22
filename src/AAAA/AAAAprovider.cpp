@@ -35,7 +35,7 @@
 //
 
 #include "AAAAprovider.hpp"
-#include "configurationBase.hpp"
+#include "config/configurationBase.hpp"
 #include "logger.hpp"
 
 #include <boost/property_tree/ptree.hpp>
@@ -116,7 +116,7 @@ bool AAAAprovider::resolveDB( db::DBprovider& db )
 }
 
 
-Configuration::Configuration() : config::OLD_ConfigurationBase( "AAAA", NULL, "AAAA configuration"  ),
+Configuration::Configuration() : config::ConfigurationBase( "AAAA", NULL, "AAAA configuration"  ),
 	auth( "Authentication", logPrefix().c_str(), "Authentication" ),
 	audit( "Auditing", logPrefix().c_str(), "Auditing" )
 {

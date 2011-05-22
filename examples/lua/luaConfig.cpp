@@ -23,7 +23,7 @@ extern "C" {
 namespace _Wolframe	{
 
 LuaConfiguration::LuaConfiguration()
-	: OLD_ConfigurationBase( "Lua Example Server", NULL, "Lua Example configuration " )
+	: ConfigurationBase( "Lua Example Server", NULL, "Lua Example configuration " )
 {
 	LuaModuleDefinition x;
 	x.moduleName = "";

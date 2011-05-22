@@ -55,7 +55,7 @@ static const unsigned short DEFAULT_NOF_THREADS = 4;
 
 // Constructor
 Configuration::Configuration()
-	: OLD_ConfigurationBase( "Network Server", NULL, "Network server configuration" )
+	: ConfigurationBase( "Network Server", NULL, "Network server configuration" )
 {
 	threads = 0;
 	maxConnections = 0;

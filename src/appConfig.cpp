@@ -83,27 +83,27 @@ const char* ApplicationConfiguration::chooseFile( const char *globalFile, const 
 }
 
 
-bool ApplicationConfiguration::addConfig( const std::string& nodeName, OLD_ConfigurationBase *config )
+bool ApplicationConfiguration::addConfig( const std::string& nodeName, ConfigurationBase *config )
 {
 	// check if the label already exists
-	if ( section_.find( nodeName ) != section_.end() )
+	if ( m_section.find( nodeName ) != m_section.end() )
 		return false;
 
 	// find the appropriate index in the configurations vector
-	std::vector< OLD_ConfigurationBase* >::const_iterator it = conf_.begin();
+	std::vector< ConfigurationBase* >::const_iterator it = m_conf.begin();
 	std::size_t pos = 0;
 	bool found = false;
-	for( ; it != conf_.end(); it++, pos++ )	{
+	for( ; it != m_conf.end(); it++, pos++ )	{
 		if ( *it == config )	{
 			found = true;
 			break;
 		}
 	}
 	if ( !found )	{
-		pos = conf_.size();
-		conf_.push_back( config );
+		pos = m_conf.size();
+		m_conf.push_back( config );
 	}
-	section_[ nodeName ] = pos;
+	m_section[ nodeName ] = pos;
 
 	return true;
 }
@@ -123,24 +123,24 @@ bool ApplicationConfiguration::parse ( const char *filename, ConfigFileType type
 		switch ( type )	{
 		case CONFIG_INFO:
 			read_info( filename, pt );
-			forced_ = true;
-			type_ = CONFIG_INFO;
+			m_forced = true;
+			m_type = CONFIG_INFO;
 			break;
 		case CONFIG_XML:
 			read_xml( filename, pt, boost::property_tree::xml_parser::no_comments |
 						boost::property_tree::xml_parser::trim_whitespace );
 			pt = pt.get_child( "configuration" );
-			forced_ = true;
-			type_ = CONFIG_XML;
+			m_forced = true;
+			m_type = CONFIG_XML;
 			break;
 		case CONFIG_UNDEFINED:	{
-			forced_ = false;
+			m_forced = false;
 			try	{
 				read_xml( filename, pt, boost::property_tree::xml_parser::no_comments |
 							boost::property_tree::xml_parser::trim_whitespace );
 				pt = pt.get_child( "configuration" );
 				if ( plausibleConfig( pt ) )
-					type_ = CONFIG_XML;
+					m_type = CONFIG_XML;
 				else	{
 					LOG_FATAL << "Cannot guess configuration file type: " << filename;
 					return false;
@@ -150,7 +150,7 @@ bool ApplicationConfiguration::parse ( const char *filename, ConfigFileType type
 				try	{
 					read_info( filename, pt );
 					if ( plausibleConfig( pt ) )
-						type_ = CONFIG_INFO;
+						m_type = CONFIG_INFO;
 					else	{
 						LOG_FATAL << "Cannot guess configuration file type or invalid XML: " << filename;
 						return false;
@@ -175,10 +175,9 @@ bool ApplicationConfiguration::parse ( const char *filename, ConfigFileType type
 			LOG_TRACE << "Configuration : parsing root element '" << it->first << "'";
 //			if ( it->first == "<xmlcomment>" )
 //				continue;
-//			std::cout << it->first << std::endl;
 			std::map< std::string, std::size_t >::iterator confIt;
-			if (( confIt = section_.find( it->first ) ) != section_.end() )	{
-				if ( ! conf_[ confIt->second ]->parse( it->second, confIt->first ))
+			if (( confIt = m_section.find( it->first ) ) != m_section.end() )	{
+				if ( ! m_conf[ confIt->second ]->parse( it->second, confIt->first ))
 					retVal = false;
 			}
 			else	{
@@ -214,8 +213,8 @@ void ApplicationConfiguration::finalize( const CmdLineConfig& cmdLine )
 #if !defined(_WIN32)
 	serviceConf->override( cmdLine.user, cmdLine.group );
 #endif
-	for( std::size_t i = 0; i <  conf_.size(); i++ )
-		conf_[i]->setCanonicalPathes( configFile );
+	for( std::size_t i = 0; i <  m_conf.size(); i++ )
+		m_conf[i]->setCanonicalPathes( configFile );
 }
 
 
@@ -223,23 +222,23 @@ void ApplicationConfiguration::print( std::ostream& os ) const
 {
 
 	os << "Configuration file: " << configFile << std::endl;
-	os << "Configuration file type: " << (type_ == CONFIG_INFO ? "info" : "xml")
-	   << (forced_ ? " (forced)" : " (detected)" ) << std::endl;
+	os << "Configuration file type: " << (m_type == CONFIG_INFO ? "info" : "xml")
+	   << (m_forced ? " (forced)" : " (detected)" ) << std::endl;
 	// Unix daemon
 #if !defined(_WIN32)
 	os << "Run in foreground: " << (foreground ? "yes" : "no") << std::endl;
 #endif
-	for ( std::size_t i = 0; i < conf_.size(); i++ )	{
+	for ( std::size_t i = 0; i < m_conf.size(); i++ )	{
 		os << std::endl;
-		conf_[ i ]->print( os, 0 );
+		m_conf[ i ]->print( os, 0 );
 	}
 }
 
 /// Check if the application configuration makes sense
 bool ApplicationConfiguration::check() const
 {
-	for ( std::size_t i = 0; i < conf_.size(); i++ )
-		if ( ! conf_[ i ]->check())
+	for ( std::size_t i = 0; i < m_conf.size(); i++ )
+		if ( ! m_conf[ i ]->check())
 			return false;
 	return true;
 }

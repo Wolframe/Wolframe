@@ -54,7 +54,7 @@ namespace config {
 
 // Constructor
 #if !defined(_WIN32)	// Unix daemon
-ServiceConfiguration::ServiceConfiguration() : OLD_ConfigurationBase( "Daemon", NULL, "Daemon configuration" )	{}
+ServiceConfiguration::ServiceConfiguration() : ConfigurationBase( "Daemon", NULL, "Daemon configuration" )	{}
 #else
 ServiceConfiguration::ServiceConfiguration() : ConfigurationBase( "Service", NULL, "Service configuration" )	{}
 #endif

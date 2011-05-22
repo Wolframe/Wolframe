@@ -39,7 +39,7 @@
 
 #include <list>
 
-#include "configurationBase.hpp"
+#include "config/configurationBase.hpp"
 
 namespace _Wolframe	{
 namespace db	{
@@ -52,11 +52,11 @@ enum DatabaseType	{
 };
 
 
-class	DatabaseConfig : public _Wolframe::config::OLD_ConfigurationBase
+class	DatabaseConfig : public _Wolframe::config::ConfigurationBase
 {
 public:
 	DatabaseConfig( const char* name, const char* logParent, const char* logName )
-		: OLD_ConfigurationBase( name, logParent, logName ){}
+		: ConfigurationBase( name, logParent, logName ){}
 	virtual ~DatabaseConfig()			{}
 
 	virtual DatabaseType type() const = 0;
@@ -81,6 +81,8 @@ public:
 	virtual DatabaseType type() const		{ return DBTYPE_POSTGRESQL; }
 
 	PostgreSQLconfig( const char* name, const char* logParent, const char* logName );
+	~PostgreSQLconfig()				{}
+
 	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
@@ -96,6 +98,8 @@ public:
 	virtual DatabaseType type() const		{ return DBTYPE_SQLITE; }
 
 	SQLiteConfig( const char* name, const char* logParent, const char* logName );
+	~SQLiteConfig()					{}
+
 	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
@@ -112,6 +116,8 @@ public:
 
 	ReferenceConfig( const char* name, const char* logParent, const char* logName )
 		: DatabaseConfig( name, logParent, logName )	{}
+	~ReferenceConfig()					{}
+
 	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
@@ -119,13 +125,13 @@ public:
 
 
 /// database configurations
-struct Configuration : public _Wolframe::config::OLD_ConfigurationBase
+struct Configuration : public _Wolframe::config::ConfigurationBase
 {
 public:
 	std::list<DatabaseConfig*>	dbConfig_;
 
 	/// constructor & destructor
-	Configuration() : OLD_ConfigurationBase( "Database(s)", NULL, "Database configuration" )	{}
+	Configuration() : ConfigurationBase( "Database(s)", NULL, "Database configuration" )	{}
 	~Configuration();
 
 	/// methods
@@ -138,14 +144,14 @@ public:
 //	bool test() const;
 };
 
-struct SingleDBConfiguration : public _Wolframe::config::OLD_ConfigurationBase
+struct SingleDBConfiguration : public _Wolframe::config::ConfigurationBase
 {
 public:
 	DatabaseConfig*	m_dbConfig;
 
 	/// constructor & destructor
 	SingleDBConfiguration( const char* name, const char* logParent, const char* logName )
-		: OLD_ConfigurationBase( name, logParent, logName )	{ m_dbConfig = NULL; }
+		: ConfigurationBase( name, logParent, logName )	{ m_dbConfig = NULL; }
 	~SingleDBConfiguration();
 
 	/// methods
@@ -187,6 +193,7 @@ class PostgreSQLDatabase : public Database
 {
 public:
 	PostgreSQLDatabase( const PostgreSQLconfig* config );
+	~PostgreSQLDatabase()				{}
 
 	DatabaseType type() const			{ return DBTYPE_POSTGRESQL; }
 private:
@@ -197,6 +204,7 @@ class SQLiteDatabase : public Database
 {
 public:
 	SQLiteDatabase( const SQLiteConfig* config );
+	~SQLiteDatabase()				{}
 
 	DatabaseType type() const			{ return DBTYPE_SQLITE; }
 private:

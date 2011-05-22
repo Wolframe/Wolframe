@@ -48,7 +48,7 @@ namespace lua {
 
 /// \class Configuration
 /// \brief configuration object of the lua application processor
-class Configuration :public config::OLD_ConfigurationBase
+class Configuration :public config::ConfigurationBase
 {
 public:
 	/// \brief module load function for a lua state
@@ -58,7 +58,7 @@ public:
 	/// \brief constructor
 	/// \param name configuration name
 	/// \param prefix configuration prefix
-	Configuration( const char* name, const char* prefix) :OLD_ConfigurationBase(name, NULL, prefix),m_input_bufsize(512),m_output_bufsize(512),m_cthread_stacksize(2048){}
+	Configuration( const char* name, const char* prefix) :ConfigurationBase(name, NULL, prefix),m_input_bufsize(512),m_output_bufsize(512),m_cthread_stacksize(2048){}
 
 	/// \brief interface implementation of ConfigurationBase::parse(const boost::property_tree::ptree&, const std::string&)
 	virtual bool parse( const boost::property_tree::ptree&, const std::string&);
