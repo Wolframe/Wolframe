@@ -49,10 +49,10 @@
 #include <ostream>
 
 
-namespace _Wolframe	{
-namespace log	{
+namespace _Wolframe {
+namespace log {
 
-LoggerConfiguration::LoggerConfiguration() : OLD_ConfigurationBase( "Logging", NULL, "Logging" )
+LoggerConfiguration::LoggerConfiguration() : ConfigurationBase( "Logging", NULL, "Logging" )
 {
 	logToStderr = false;
 	stderrLogLevel = log::LogLevel::LOGLEVEL_UNDEFINED;

@@ -166,7 +166,8 @@ include/appConfig.hpp
 include/appProcessor.hpp
 include/appProperties.hpp
 include/atomicCounter.hpp
-include/configurationBase.hpp
+include/config/configurationBase.hpp
+include/config/configurationParser.hpp
 include/config/valueParser.hpp
 include/connectionEndpoint.hpp
 include/connectionHandler.hpp
@@ -363,9 +364,3 @@ windows/wolframe.xml
 XML/configuration.rng
 XML/database.rng
 XML/logging.rng
-tests/expect/wolframe.conf
-tests/expect/testPecho
-tests/expect/testEcho
-tests/expect/Makefile.W32
-tests/expect/GNUmakefile
-include/configParserBase.hpp

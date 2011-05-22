@@ -31,49 +31,34 @@
 
 ************************************************************************/
 //
-// appConfigDefinition.cpp
+// configuration parser base class
 //
+///\note	This file is separated from configurationBase.hpp
+///		in order to keep boost/property_tree/ptree.hpp away
+///		from the dependencies of the configuration structures
 
-#include "appConfig.hpp"
-#include "standardConfigs.hpp"
-#include "handlerConfig.hpp"
+#ifndef _CONFIG_PARSER_HPP_INCLUDED
+#define _CONFIG_PARSER_HPP_INCLUDED
+
+#include <string>
+#include <boost/property_tree/ptree.hpp>
 
 namespace _Wolframe {
 namespace config {
 
-ApplicationConfiguration::ApplicationConfiguration()
+class ConfigurationParser
 {
-	// daemon / service configuration
-	serviceConf = new _Wolframe::config::ServiceConfiguration();
-	// network server
-	serverConf = new _Wolframe::net::Configuration();
-	// logging
-	loggerConf = new _Wolframe::log::LoggerConfiguration();
-
-	handlerConf = new _Wolframe::HandlerConfiguration();
-
-
-	// add both sections, the parse function will select the
-	// appropriate action
-	addConfig( "service", serviceConf );
-	addConfig( "daemon", serviceConf );
-
-	addConfig( "ServerTokens", handlerConf->banner );
-	addConfig( "ServerSignature", handlerConf->banner );
-
-	addConfig( "listen", serverConf );
-	addConfig( "logging", loggerConf );
-	addConfig( "database", handlerConf->database );
-	addConfig( "aaaa", handlerConf->aaaa );
-}
-
-
-ApplicationConfiguration::~ApplicationConfiguration()
-{
-	if ( serviceConf )	delete serviceConf;
-	if ( serverConf )	delete serverConf;
-	if ( loggerConf )	delete loggerConf;
-	if ( handlerConf )	delete handlerConf;
-}
+public:
+	/// Parse the configuration section
+	///\param[in]	pt		property tree node
+	///\param[in]	nodeName	the label of the node. It should be
+	///				the same (case insensitive) as it->first
+	template<typename T>
+	static bool parseConfig( T& config,
+				 const boost::property_tree::ptree& pt,
+				 const std::string& nodeName );
+};
 
 }} // namespace _Wolframe::config
+
+#endif // _CONFIG_PARSER_BASE_HPP_INCLUDED

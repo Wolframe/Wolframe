@@ -64,6 +64,6 @@ local_install:
 local_test:$(TEST_BINS)
 	cd tests && ./pechoHandlerTest$(EXE)
 ifeq ($(WITH_EXPECT),1)
-	./testPEcho
+	tests/testPEcho
 endif
 

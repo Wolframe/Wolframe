@@ -30,25 +30,20 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// configuration parser base class
-//
 
-#ifndef _CONFIG_PARSERBASE_HPP_INCLUDED
-#define _CONFIG_PARSERBASE_HPP_INCLUDED
+#ifndef _CONFIGURATION_BASE_HPP_INCLUDED
+#define _CONFIGURATION_BASE_HPP_INCLUDED
 
 #include <string>
 #include <ostream>
-#include <iostream>
 
-#include "configurationBase.hpp"
-
-#include <boost/property_tree/ptree.hpp>
+#include "config/configurationParser.hpp"
 
 namespace _Wolframe {
 namespace config	{
 
-class ConfigurationParserBase	{
+class ConfigurationBase
+{
 public:
 	/// Class constructor.
 	///\param[in]	name	the name that will be displayed for this
@@ -58,38 +53,59 @@ public:
 	///\param[in]	logName	the logging name of this section. Combined with
 	///			the logParent parameter will form the whole logging
 	///			prefix for of the section.
-	ConfigurationParserBase( const char* name, const char* logParent, const char* logName )
+	ConfigurationBase( const char* name, const char* logParent, const char* logName )
 	{
-		sectionName_ = name ? name : "";
-		logPrefix_ = logParent ? logParent : "";
+		m_sectionName = name ? name : "";
+		m_logPrefix = logParent ? logParent : "";
 		if ( logName && *logName != '\0' )	{
-			logPrefix_ += logName; logPrefix_ += ": ";
+			m_logPrefix += logName; m_logPrefix += ": ";
 		}
 	}
 
-	virtual ~ConfigurationParserBase()	{}
+	virtual ~ConfigurationBase()			{}
 
-	/// The display string (name) of the configuration section
+	///\brief The display string (name) for the configuration section
 	///\return	a reference to the name set by the constructor
-	const std::string& sectionName() const		{ return sectionName_; }
+	const std::string& sectionName() const		{ return m_sectionName; }
 
 	/// The prefix for logging messages for this configuration section
 	///\return	a reference to the prefix set by the constructor
-	const std::string& logPrefix() const		{ return logPrefix_; }
+	const std::string& logPrefix() const		{ return m_logPrefix; }
 
-	/// Parse the configuration section (virtual function)
-	/// This function must be implemented
-	///\param[in]	it		iterator to the property tree node
-	///\param[in]	nodeName	the label of the node. It should be
-	///				the same (case insensitive) as it->first
+	/// Set the pathes in the configuration to absolute values
+	///\param[in]	referencePath	use this path as reference when
+	///				computing the absolute pathes
+	virtual void setCanonicalPathes( const std::string& /* referencePath */ )	{}
+
+	/// Check if the server configuration makes sense
+	///
+	/// Be aware that this function does NOT test if the configuration
+	/// can be used. It only tests if it MAY be valid.
+	/// This function will log errors / warnings
+	///\return	true if the configuration has no errors, false
+	///		otherwise
+	virtual bool check() const			{ return true; }
+
+	// these functions are not implemented / implementable yet
+	// and I am not sure if it should be here or not
+	// virtual bool test() const = 0;
+
+	/// Print the configuration
+	/// This function is supposed to print the running configuration, this means
+	/// all the configuration parameters, not only those that were set in the
+	/// configuration file.
+	///\param[in]	os	stream to use for printing
+	///\param[in]	indent	print indented with this number of spaces
+	virtual void print( std::ostream& os, size_t indent = 0 ) const = 0;
+
+	// Temporary hack
 	virtual bool parse( const boost::property_tree::ptree& pt,
 			    const std::string& nodeName ) = 0;
-
 private:
-	std::string	sectionName_;
-	std::string	logPrefix_;
+	std::string	m_sectionName;
+	std::string	m_logPrefix;
 };
 
 }} // namespace _Wolframe::config
 
-#endif // _CONFIG_PARSERBASE_HPP_INCLUDED
+#endif // _CONFIGURATION_BASE_HPP_INCLUDED

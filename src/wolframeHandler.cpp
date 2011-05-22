@@ -85,17 +85,17 @@ wolframeConnection::wolframeConnection( const wolframeHandler& context,
 
 	// Get the database connection from the begining
 	// as it might be necessary for further checks
-	m_db = m_globalCtx.db().channel();
+//	m_db = m_globalCtx.db().channel();
 }
 
 
 wolframeConnection::~wolframeConnection()
 {
-	if ( m_db )		m_db->close();
-	if ( m_authentication )	m_authentication->close();
-	if ( m_authorization )	m_authorization->close();
-	if ( m_audit )		m_audit->close();
-	if ( m_accounting )	m_accounting->close();
+//	if ( m_db )		m_db->close();
+//	if ( m_authentication )	m_authentication->close();
+//	if ( m_authorization )	m_authorization->close();
+//	if ( m_audit )		m_audit->close();
+//	if ( m_accounting )	m_accounting->close();
 
 	LOG_TRACE << "Connection handler destroyed";
 }
@@ -137,10 +137,10 @@ void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
 	// Check here if the connection is allowed
 
 	// The AAAA stuf should also depend on peer properties
-	m_authentication = m_globalCtx.aaaa().authenticationChannel();
-	m_authorization = m_globalCtx.aaaa().authorizationChannel();
-	m_audit = m_globalCtx.aaaa().auditChannel();
-	m_accounting = m_globalCtx.aaaa().accountingChannel();
+//	m_authentication = m_globalCtx.aaaa().authenticationChannel();
+//	m_authorization = m_globalCtx.aaaa().authorizationChannel();
+//	m_audit = m_globalCtx.aaaa().auditChannel();
+//	m_accounting = m_globalCtx.aaaa().accountingChannel();
 }
 
 /// Handle a request and produce a reply.

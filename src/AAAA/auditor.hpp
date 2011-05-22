@@ -37,7 +37,7 @@
 #ifndef _AUDITOR_HPP_INCLUDED
 #define _AUDITOR_HPP_INCLUDED
 
-#include "configurationBase.hpp"
+#include "config/configurationBase.hpp"
 #include "database.hpp"
 
 #include <string>
@@ -53,12 +53,12 @@ enum AuditType	{
 };
 
 
-class AuditConfigBase : public config::OLD_ConfigurationBase
+class AuditConfigBase : public config::ConfigurationBase
 {
 public:
 	/// constructor
 	AuditConfigBase( const char* name, const char* logParent, const char* logName )
-		: config::OLD_ConfigurationBase( name, logParent, logName )		{}
+		: config::ConfigurationBase( name, logParent, logName )		{}
 
 	virtual ~AuditConfigBase()	{}
 
@@ -113,13 +113,13 @@ private:
 };
 
 
-class AuditConfiguration : public config::OLD_ConfigurationBase
+class AuditConfiguration : public config::ConfigurationBase
 {
 	friend class AAAAprovider;
 public:
 	/// constructor
 	AuditConfiguration( const char* cfgName, const char* logParent, const char* logName )
-		: OLD_ConfigurationBase( cfgName, logParent, logName )	{}
+		: ConfigurationBase( cfgName, logParent, logName )	{}
 	~AuditConfiguration();
 
 	/// methods
