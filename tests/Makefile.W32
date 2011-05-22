@@ -41,9 +41,7 @@ TEST_CPP_BINS = \
 	poolTest.exe \
 	logTest.exe \
 	protocolArgumentParsing.exe \
-	configValueParser.exe \
-	pechoHandler.exe
-
+	configValueParser.exe
 
 OBJS = \
 
@@ -62,9 +60,6 @@ poolTest.exe: poolTest.obj $(TOPDIR)\src\wolframe.lib
 logTest.exe: logTest.obj $(TOPDIR)\src\wolframe.lib
 protocolArgumentParsing.exe: protocolArgumentParsing.obj $(TOPDIR)\src\wolframe.lib
 configValueParser.exe: configValueParser.obj $(TOPDIR)\src\wolframe.lib
-
-PECHO_GTEST_OBJS=$(TOPDIR)\examples\pecho\pechoHandler.obj
-pechoHandler.exe: pechoHandler.obj $(PECHO_GTEST_OBJS) $(TOPDIR)\src\wolframe.lib
 
 local_all:
 
@@ -85,7 +80,6 @@ local_test:
 	@-echo singletonTest >> test.bat
 	@-echo poolTest >> test.bat
 	@-echo protocolArgumentParsing >> test.bat
-	@-echo pechoHandler >> test.bat
 	@echo
 	@-test.bat
 

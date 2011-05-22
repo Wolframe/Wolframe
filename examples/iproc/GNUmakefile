@@ -75,6 +75,7 @@ TEST_BINS += \
 tests/iprocHandlerTest$(EXE): tests/iprocHandlerTest.o $(OBJS) $(TOPDIR)/src/libwolframe.a
 	$(CCPP_LINK) -o $@ $(LDFLAGS) $(OBJS) $< $(LIBS)
 
+
 local_all: $(CPP_BINS)
 
 local_clean:

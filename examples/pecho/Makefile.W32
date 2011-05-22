@@ -49,9 +49,13 @@ OBJS = \
 CPP_BINS = \
 	pechod.exe
 
+TEST_CPP_BINS = \
+	tests/pechoHandlerTest$(EXE)
+
 all: $(OBJS) $(CPP_BINS)
 
 pechod.exe: pechod.obj $(TOPDIR)\src\wolframe.lib
+tests/pechoHandlerTest$(EXE): tests/pechoHandlerTest.obj $(TOPDIR)\src\wolframe.lib
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
@@ -62,6 +66,7 @@ local_clean:
 local_distclean:
 
 local_test:
+	@-echo tests/pechoHandlerTest >> test.bat
 
 run: $(CPP_BINS)
 	@-echo @echo off > test.bat

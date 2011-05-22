@@ -8,7 +8,8 @@ INCLUDE_CPPFLAGS =
 
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include \
-	-I$(BOOST_INCLUDE_DIR)
+	-I$(BOOST_INCLUDE_DIR) \
+	-I$(TOPDIR)/gtest/include
 
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR)
@@ -17,7 +18,9 @@ INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_program_options \
 	-lboost_filesystem \
-	$(TOPDIR)/src/libwolframe.a
+	-ldl \
+	$(TOPDIR)/src/libwolframe.a \
+	$(TOPDIR)/gtest/gtest-all.o
 
 # openssl
 
@@ -41,6 +44,13 @@ OBJS = \
 CPP_BINS = \
 	pechod$(EXE)
 
+
+TEST_BINS += \
+	tests/pechoHandlerTest$(EXE)
+
+tests/pechoHandlerTest$(EXE): tests/pechoHandlerTest.o $(OBJS) $(TOPDIR)/src/libwolframe.a
+	$(CCPP_LINK) -o $@ $(LDFLAGS) $(OBJS) $< $(LIBS)
+
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 local_all: $(CPP_BINS)
@@ -51,7 +61,9 @@ local_distclean:
 
 local_install:
 
-local_test:
+local_test:$(TEST_BINS)
+	cd tests && ./pechoHandlerTest$(EXE)
 ifeq ($(WITH_EXPECT),1)
 	./testPEcho
 endif
+

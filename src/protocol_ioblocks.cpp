@@ -37,14 +37,6 @@ Project Wolframe.
 namespace _Wolframe {
 namespace protocol {
 
-#ifdef _Wolframe_LOWLEVEL_DEBUG
-static const char* eodStateName( EODState e)
-{
-	static const char* ar[]={"SRC","LF","LF_DOT","LF_DOT_CR","LF_DOT_CR_LF"};
-	return ar[e-SRC];
-}
-#endif
-
 MemBlock::MemBlock()							:m_ptr(0),m_size(0),m_pos(0),m_allocated(false) {}
 MemBlock::MemBlock( size_type p_size)					:m_ptr(0),m_size(p_size),m_pos(0),m_allocated(false)
 {

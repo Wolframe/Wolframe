@@ -1,0 +1,59 @@
+#!/usr/bin/expect
+#
+# Start a wolframe daemon and communicate with it
+#
+
+package require Expect
+
+set config iproc.conf
+
+set timeout 3
+set serverpid [spawn ./iprocd -c $config -f]
+
+puts "wolframe echo with protocol started with configuration file: $config (pid: $serverpid)"
+# allow the server to start
+sleep 2
+
+set message "One Short Line With üèöéäà°§"
+set messageLow "one short line with üèöéäà°§"
+set messageUp "ONE SHORT LINE WITH üèöéäà°§"
+
+set timeout 3
+if { [catch {
+	spawn telnet localhost 7661
+
+	expect 	{
+		timeout	{ return "--> oops. timeout waiting for server banner\n" }
+		eof	{ return "--> EOF waiting for server banner: that's bad\n" }
+		"OK expecting command\r"	{ send_user " --> Connected.\n" }
+	}
+
+	set timeout 1
+	send "1 short line\r"
+	expect 	{
+		timeout	{ return "--> oops. timeout waiting for error / prompt\n" }
+		eof	{ return "--> EOF after bad input\n" }
+		"BAD unknown command\r\nOK expecting command\r"
+	}
+
+	send "run\r"
+	expect "OK enter data"
+	send "$message\r.\r"
+	expect "$message\r"
+
+	set timeout 1
+	send "quit\r"
+	expect 	{
+		"BYE"	{ send_user " --> Session terminated\n"}
+		timeout	{ send_user " --> oops. timeout waiting for BYE\n"; return 1 }
+		eof	{ send_user " --> Connection closed. OK\n" }
+	}
+	set timeout 1
+	expect 	{
+		timeout	{ send_user " --> oops. timeout waiting for EOF"; return 1 }
+		eof	{ send_user " --> Connection closed. OK\n" }
+	}
+} reason] } {
+	send_user "Error: $reason\n"
+	exit 1
+}

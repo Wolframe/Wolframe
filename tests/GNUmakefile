@@ -13,7 +13,6 @@ INCLUDE_CPPFLAGS = \
 INCLUDE_DIRS = \
 	-I$(TOPDIR)/include -I. \
 	-I$(TOPDIR)/src \
-	-I$(TOPDIR)/examples/pecho \
 	-I$(BOOST_INCLUDE_DIR) \
 	-I$(TOPDIR)/gtest/include
 
@@ -48,16 +47,11 @@ TEST_CPP_BINS = \
 	poolTest$(EXE) \
 	logTest$(EXE) \
 	protocolArgumentParsing$(EXE) \
-	configValueParser$(EXE) \
-	pechoHandler$(EXE)
+	configValueParser$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 logTest$(EXE): $(TOPDIR)/src/libwolframe.a
-
-PECHO_GTEST_OBJS=$(TOPDIR)/examples/pecho/pechoHandler.o
-pechoHandler$(EXE): pechoHandler.o $(PECHO_GTEST_OBJS) $(TOPDIR)/src/libwolframe.a
-	$(CCPP_LINK) -o $@ $(LDFLAGS) $(PECHO_GTEST_OBJS) $(OBJS) $< $(LIBS)
 
 local_all:
 

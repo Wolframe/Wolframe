@@ -64,7 +64,11 @@ CPP_BINS = \
 
 all: $(OBJS) $(CPP_BINS)
 
+TEST_CPP_BINS = \
+	tests/iprocHandlerTest$(EXE)
+
 iprocd.exe: iprocd.obj $(TOPDIR)\src\wolframe.lib
+tests/iprocHandlerTest$(EXE): tests/iprocHandlerTest.obj $(TOPDIR)\src\wolframe.lib
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
@@ -74,7 +78,8 @@ local_clean:
 
 local_distclean:
 
-local_test:
+local_test: tests/iprocHandlerTest$(EXE)
+	@-echo tests/iprocHandlerTest >> test.bat
 
 run: $(CPP_BINS)
 	@-echo @echo off > test.bat
