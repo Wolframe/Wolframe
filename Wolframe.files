@@ -135,6 +135,8 @@ examples/pecho/pechoConfig.cpp
 examples/pecho/pechod.cpp
 examples/pecho/pechoHandler.cpp
 examples/pecho/pechoHandler.hpp
+examples/pecho/tests/pechoHandlerTest.cpp
+examples/pecho/tests/testHandlerTemplates.hpp
 examples/xmlselect/xmlIterator.cpp
 examples/xmlselect/xmlIterator.hpp
 GNUmakefile
@@ -348,13 +350,10 @@ tests/expect/wolframe.conf
 tests/GNUmakefile
 tests/logTest.cpp
 tests/Makefile.W32
-tests/mtprocHandler.cpp
-tests/pechoHandler.cpp
 tests/poolTest.cpp
 tests/protocolArgumentParsing.cpp
 tests/resolvePathTest.cpp
 tests/singletonTest.cpp
-tests/testHandlerTemplates.hpp
 tests/testNamedRetVal.cpp
 tests/threadLeakTest.cpp
 tests/versionTest.cpp

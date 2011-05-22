@@ -58,9 +58,10 @@ public:
 		YieldRead,		///< call interrupted with request for more network input
 		YieldWrite		///< call interrupted with request for sending data from the write buffer that is full
 	};
+
 	/// \brief get the application processor script function to execute for a protocol command (as defined in configuration)
 	/// \param[in] protocolCmd protocol command
-	/// \param[out] name of application processor script function to execute 
+	/// \param[out] name of application processor script function to execute
 	/// \param[out] hasIO true, if the application processor script function processes data from network input, false else
 	/// \return true, if the command exists
 	virtual bool getCommand( const char* protocolCmd, const char*& functionName, bool& hasIO) const=0;
@@ -70,7 +71,7 @@ public:
 	/// \param[in] out format output reference
 	virtual void setIO( boost::shared_ptr<protocol::InputFilter> in, boost::shared_ptr<protocol::FormatOutput> out)=0;
 
-	/// \brief function call of an application processor script function 
+	/// \brief function call of an application processor script function
 	/// \param[in] argc number of arguments inclusing the script function name as first argument
 	/// \param[in] argv array of arguments inclusing the script function name as first argument
 	/// \return application processor instance call state

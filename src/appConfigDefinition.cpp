@@ -37,6 +37,7 @@
 #include "appConfig.hpp"
 #include "standardConfigs.hpp"
 #include "handlerConfig.hpp"
+#include "server.hpp"
 
 namespace _Wolframe {
 namespace config {

@@ -50,7 +50,7 @@
 //////// Just for temporary testing purposes ////////
 
 namespace _Wolframe {
-namespace config	{
+namespace config {
 
 
 static ServiceBanner::SignatureTokens strToToken( std::string& str )
@@ -73,8 +73,8 @@ static ServiceBanner::SignatureTokens strToToken( std::string& str )
 
 /// Service signature parser
 template<>
-bool ConfigurationParser::parseConfig( ServiceBanner& cfg,
-				       const boost::property_tree::ptree& pt, const std::string& node )
+bool ConfigurationParser::parse( ServiceBanner& cfg,
+				 const boost::property_tree::ptree& pt, const std::string& node )
 {
 
 	if ( boost::algorithm::iequals( node, "ServerTokens" ))	{
@@ -104,7 +104,7 @@ bool ConfigurationParser::parseConfig( ServiceBanner& cfg,
 
 bool ServiceBanner::parse( const boost::property_tree::ptree& pt, const std::string& node )
 {
-	return ConfigurationParser::parseConfig( *this, pt, node );
+	return ConfigurationParser::parse( *this, pt, node );
 }
 
 

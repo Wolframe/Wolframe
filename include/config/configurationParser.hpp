@@ -54,9 +54,8 @@ public:
 	///\param[in]	nodeName	the label of the node. It should be
 	///				the same (case insensitive) as it->first
 	template<typename T>
-	static bool parseConfig( T& config,
-				 const boost::property_tree::ptree& pt,
-				 const std::string& nodeName );
+	static bool parse( T& config,
+			   const boost::property_tree::ptree& pt, const std::string& nodeName );
 };
 
 }} // namespace _Wolframe::config
