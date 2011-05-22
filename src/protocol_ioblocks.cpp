@@ -52,6 +52,15 @@ MemBlock::~MemBlock()
 	if (m_allocated) delete [] (unsigned char*)m_ptr;
 }
 
+void MemBlock::set( void* p_ptr, size_type p_size)
+{
+	if (m_allocated) delete [] (unsigned char*)m_ptr;
+	m_size = p_size;
+	m_pos = 0;
+	m_ptr = p_ptr;
+	m_allocated = false;
+}
+
 MemBlock& MemBlock::operator=( const MemBlock& o)
 {
 	if (m_allocated) delete [] (unsigned char*)m_ptr;

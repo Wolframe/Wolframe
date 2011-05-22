@@ -91,8 +91,16 @@ public:
 	/// \brief Allocation size of the buffer in bytes
 	size_type size() const					{return m_size;}
 
+	/// \brief Get the size of the buffer left
+	/// \return the size of the buffer left
+	size_type restsize() const				{return (m_pos<m_size)?(m_size-m_pos):0;}
+
 	/// \brief Current byte position of the cursor (input or output)
 	size_type pos() const					{return m_pos;}
+
+	/// \brief Shift current cursor poition by some bytes
+	/// \param [in] n number of bytes to shift
+	void incr( size_type n)					{if ((m_pos+n)>=m_size) m_pos=m_size; else m_pos+=n;}
 
 	/// \exception ArrayBoundReadError
 	/// \brief Protocol memory block access violation exception
@@ -134,6 +142,8 @@ public:
 	///
 	struct EoD
 	{
+		/// \enum State
+		/// \brief enumeration of states for handling eoD
 		enum State
 		{
 			SRC,			///< parsing content
@@ -150,7 +160,7 @@ public:
 	/// \param [in] p_size size of the memory block in bytes to allocate
 	InputBlock( size_type p_size)				:MemBlock(p_size),m_eodState(EoD::SRC){}
 	/// \brief Constructor
-	/// \param [in] p_ptr pointer to the memory block to use (do not allocate it on your own)
+	/// \param [in] p_ptr pointer to the memory block to use
 	/// \param [in] p_size size of the memory block in bytes
 	InputBlock( void* p_ptr, size_type p_size)		:MemBlock(p_ptr,p_size),m_eodState(EoD::SRC){}
 	/// \brief Copy constructor
@@ -213,7 +223,7 @@ public:
 	/// \param [in] p_size size of the memory block in bytes to allocate
 	OutputBlock( size_type p_size)				:MemBlock(p_size) {}
 	/// \brief Constructor
-	/// \param [in] p_ptr pointer to the memory block to use (do not allocate it on your own)
+	/// \param [in] p_ptr pointer to the memory block to use
 	/// \param [in] p_size size of the memory block in bytes
 	OutputBlock( void* p_ptr, size_type p_size)		:MemBlock(p_ptr,p_size) {}
 	/// \brief Copy constructor
@@ -255,6 +265,87 @@ public:
 
 	/// \brief Release a written memory block (reset cursor position)
 	void release()						{setPos(0);}
+};
+
+/// \class ContentOutputBlock
+/// \brief Output buffer for content data where LF '.' sequences have to be escaped for the prococol
+///
+class ContentOutputBlock :public OutputBlock
+{
+public:
+	/// \brief Constructor
+	/// \param [in] p_ptr pointer to the memory block to use
+	/// \param [in] p_size size of the memory block in bytes
+	ContentOutputBlock( void* p_ptr, size_type p_size)	:OutputBlock(p_ptr,p_size),m_state(SRC) {}
+
+	/// \brief Default constructor
+	ContentOutputBlock()					:OutputBlock(0,0),m_state(SRC) {}
+
+	/// \enum State
+	/// \brief enumeration of states for escaping LF '.' sequences to LF '.' '.'
+	enum State
+	{
+		SRC,			///< parsing content
+		LF,			///< detected an LineFeed in state SRC
+		LF_DOT			///< LF and additional '.' not printed yet
+	};
+	State m_state;
+
+	bool print( const void* src, size_type nn)
+	{
+		State st = m_state;
+		size_type ii,kk=0,ee=size()-pos();
+		char* dst = charptr()+pos();
+		const char* cc = (const char*)src;
+
+		if (nn > ee) return false;
+		for (ii=0; ii<nn && kk<ee; ii++)
+		{
+			dst[kk++] = cc[ii];
+			if (st == SRC)
+			{
+				if (cc[ii] == '\n') st = LF;
+			}
+			else
+			{
+				if (cc[ii] == '.' && st == LF)
+				{
+					st = LF_DOT;
+					continue;
+				}
+				st = SRC;
+			}
+		}
+		if (ii == nn)
+		{
+			m_state = st;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	bool print( char ch)
+	{
+		if (!OutputBlock::print( ch)) return false;
+		if (m_state == SRC)
+		{
+			if (ch == '\n') m_state = LF;
+			return true;
+		}
+		if (ch == '.')
+		{
+			if (m_state == LF)
+			{
+				m_state = LF_DOT;
+				if (!OutputBlock::print( ch)) return false;
+			}
+			m_state = SRC;
+		}
+		return true;
+	}
 };
 
 } // namespace protocol

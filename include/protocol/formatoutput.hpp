@@ -35,6 +35,7 @@ Project Wolframe.
 /// \brief Output interfaces for the application processor
 
 #include <cstddef>
+#include "protocol/ioblocks.hpp"
 
 namespace _Wolframe {
 namespace protocol {
@@ -45,10 +46,8 @@ namespace protocol {
 /// The intention of this class is to get a thin binding of the scripting language
 /// in the application layer to the network output.
 ///
-struct FormatOutput
+	struct FormatOutput :public ContentOutputBlock
 {
-	typedef std::size_t size_type;	///< size_type of the output vector
-
 	/// \enum State
 	/// \brief State of the output used in the application processor iterating loop to decide wheter to yield execution or not.
 	enum State
@@ -76,7 +75,7 @@ struct FormatOutput
 	/// \brief Constructor
 	/// \param [in] op print function pointer
 	FormatOutput()
-		:m_ptr(0),m_pos(0),m_size(0),m_errorCode(0),m_state(Open){}
+		:m_errorCode(0),m_state(Open){}
 
 	virtual ~FormatOutput(){}
 
@@ -85,25 +84,23 @@ struct FormatOutput
 	/// \remark the output function specified with the constructor is not overwritten
 	FormatOutput& operator = (const FormatOutput& o)
 	{
-		m_ptr = o.m_ptr;
-		m_pos = o.m_pos;
-		m_size = o.m_size;
+		set( const_cast<void*>(o.ptr()), o.size());
+		setPos( o.pos());
 		m_errorCode = o.m_errorCode;
 		m_state = o.m_state;
 		return *this;
 	}
 
 	/// \brief Defines the buffer to use for output.
-	/// \param [in] data pointe to buffer to use
+	/// \param [in] data pointer to buffer to use
 	/// \param [in] datasize allocation size of data in bytes
 	///
 	/// Initializes the structure without touching the output function itself
 	void init( void* data, size_type datasize)
 	{
-		m_ptr = data;
-		m_size = datasize;
-		m_pos = 0;
+		set( data, datasize);
 		m_errorCode = 0;
+		m_state = Open;
 	}
 
 	/// \brief Empty initialization to force a yield execution
@@ -115,22 +112,7 @@ struct FormatOutput
 
 	/// \brief Get the current cursor position as pointer for the next print
 	/// \return the current cursor position (where to print the next element to)
-	void* cur() const			{return (void*)((char*)m_ptr+m_pos);}
-	/// \brief Get the size of the buffer left for printing the next element
-	/// \return the size of the buffer left for printing
-	size_type restsize() const		{return (m_pos<m_size)?(m_size-m_pos):0;}
-	/// \brief Get the current cursor position
-	/// \return the cursor position
-	size_type pos() const			{return m_pos;}
-	/// \brief Get the allocation size of the buffer
-	/// \return the buffer size allocated
-	size_type size() const			{return m_size;}
-	/// \brief Get the pointer to the start of the buffer
-	/// \return the buffer start 
-	void* ptr() const			{return m_ptr;}
-	/// \brief Shift current cursor poition by some bytes
-	/// \param [in] n number of bytes to shift
-	void incr( size_type n)			{if ((m_pos+n)>=m_size) m_pos=m_size; else m_pos+=n;}
+	void* cur() const			{return (void*)(charptr()+pos());}
 
 	/// \brief Print the next element to the buffer
 	/// \param [in] type type of element to print
@@ -157,9 +139,6 @@ struct FormatOutput
 	}
 
 private:
-	void* m_ptr;		///< pointer to print buffer
-	size_type m_pos;	///< current cursor position in print buffer
-	size_type m_size;	///< size of print buffer in bytes
 	int m_errorCode;	///< error code
 	State m_state;		///< state
 };
