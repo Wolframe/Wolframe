@@ -58,6 +58,7 @@ namespace net	{
 	};
 
 
+#ifdef WITH_SSL
 	/// SSL connection server endpoint
 	class ServerSSLendpoint : public LocalSSLendpoint
 	{
@@ -95,6 +96,7 @@ namespace net	{
 		std::string		CAchain_;
 		bool			verify_;
 	};
+#endif // WITH_SSL
 
 }} // namespace _Wolframe::net
 
