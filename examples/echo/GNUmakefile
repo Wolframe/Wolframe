@@ -52,7 +52,9 @@ local_distclean:
 local_install:
 
 local_test:
+ifeq ($(WITH_EXPECT),1)
 	./testEcho
+endif
 
 run: $(CPP_BINS)
 	@echo "Running the Wolframe server..."
