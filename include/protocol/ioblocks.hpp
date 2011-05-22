@@ -319,6 +319,7 @@ public:
 		if (ii == nn)
 		{
 			m_state = st;
+			incr( kk);
 			return true;
 		}
 		else

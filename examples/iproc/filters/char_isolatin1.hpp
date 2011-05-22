@@ -13,18 +13,13 @@ struct CharIsoLatin1
 	{
 		virtual bool print( ElementType, const void* element, size_type elementsize)
 		{
-			if (elementsize > restsize())
+			setState( Open);
+			if (!ContentOutputBlock::print( element, elementsize))
 			{
 				setState( EndOfBuffer);
 				return false;
 			}
-			else
-			{
-				setState( Open);
-				ContentOutputBlock::print( element, elementsize);
-				incr( elementsize);
-				return true;
-			}
+			return true;
 		}
 	};
 
