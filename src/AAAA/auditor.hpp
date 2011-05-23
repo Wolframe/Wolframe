@@ -69,6 +69,7 @@ public:
 class FileAuditConfig : public AuditConfigBase
 {
 	friend class FileAuditor;
+	friend class config::ConfigurationParser;
 public:
 	FileAuditConfig( const char* cfgName, const char* logParent, const char* logName )
 		: AuditConfigBase( cfgName, logParent, logName ){}
@@ -76,11 +77,11 @@ public:
 	AuditType type() const					{ return AUDIT_FILE; }
 
 	/// methods
-	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 	void setCanonicalPathes( const std::string& referencePath );
 
+	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 private:
 	std::string	m_file;
 };
@@ -89,6 +90,7 @@ private:
 class DatabaseAuditConfig : public AuditConfigBase
 {
 	friend class DatabaseAuditor;
+	friend class config::ConfigurationParser;
 public:
 	DatabaseAuditConfig( const char* cfgName, const char* logParent, const char* logName )
 		: AuditConfigBase( cfgName, logParent, logName ),
@@ -97,8 +99,6 @@ public:
 	AuditType type() const					{ return AUDIT_DATABASE; }
 
 	/// methods
-	bool parse( const boost::property_tree::ptree& pt, const std::string& node )
-								{ return m_dbConfig.parse( pt, node ); }
 	bool check() const					{ return m_dbConfig.check(); }
 	void print( std::ostream& os, size_t indent ) const	{
 		std::string indStr( indent, ' ' );
@@ -108,6 +108,7 @@ public:
 
 	void setCanonicalPathes( const std::string& refPath )	{ m_dbConfig.setCanonicalPathes( refPath ); }
 
+	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 private:
 	db::SingleDBConfiguration	m_dbConfig;
 };
@@ -116,6 +117,7 @@ private:
 class AuditConfiguration : public config::ConfigurationBase
 {
 	friend class AAAAprovider;
+	friend class config::ConfigurationParser;
 public:
 	/// constructor
 	AuditConfiguration( const char* cfgName, const char* logParent, const char* logName )
@@ -123,12 +125,13 @@ public:
 	~AuditConfiguration();
 
 	/// methods
-	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 	void setCanonicalPathes( const std::string& referencePath );
 
 	// bool test() const;	// Not implemented yet, inherited from base
+
+	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 private:
 	std::list<AuditConfigBase*>	m_config;
 };

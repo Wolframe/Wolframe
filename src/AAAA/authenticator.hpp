@@ -72,6 +72,7 @@ public:
 class DatabaseAuthConfig : public AuthenticationConfigBase
 {
 	friend class DatabaseAuth;
+	friend class config::ConfigurationParser;
 public:
 	DatabaseAuthConfig( const char* cfgName, const char* logParent, const char* logName )
 		: AuthenticationConfigBase( cfgName, logParent, logName ),
@@ -80,8 +81,6 @@ public:
 	virtual AuthenticationType type() const			{ return AUTH_DATABASE; }
 
 	/// methods
-	bool parse( const boost::property_tree::ptree& pt, const std::string& node )
-								{ return m_dbConfig.parse( pt, node ); }
 	bool check() const					{ return m_dbConfig.check(); }
 	void print( std::ostream& os, size_t indent ) const	{
 		std::string indStr( indent, ' ' );
@@ -91,6 +90,7 @@ public:
 
 	void setCanonicalPathes( const std::string& refPath )	{ m_dbConfig.setCanonicalPathes( refPath ); }
 
+	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 private:
 	db::SingleDBConfiguration	m_dbConfig;
 };
@@ -99,6 +99,7 @@ private:
 class TextFileAuthConfig : public AuthenticationConfigBase
 {
 	friend class TextFileAuth;
+	friend class config::ConfigurationParser;
 public:
 	TextFileAuthConfig( const char* cfgName, const char* logParent, const char* logName )
 		: AuthenticationConfigBase( cfgName, logParent, logName ){}
@@ -106,11 +107,11 @@ public:
 	virtual AuthenticationType type() const			{ return AUTH_TEXTFILE; }
 
 	/// methods
-	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 	void setCanonicalPathes( const std::string& referencePath );
 
+	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 private:
 	std::string	m_file;
 };
@@ -120,6 +121,7 @@ private:
 class AuthenticationConfiguration : public config::ConfigurationBase
 {
 	friend class AAAAprovider;
+	friend class config::ConfigurationParser;
 public:
 	/// constructor
 	AuthenticationConfiguration( const char* cfgName, const char* logParent, const char* logName )
@@ -127,12 +129,13 @@ public:
 	~AuthenticationConfiguration();
 
 	/// methods
-	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 	void setCanonicalPathes( const std::string& referencePath );
 
 	// bool test() const;	// Not implemented yet, inherited from base
+
+	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 private:
 	std::list<AuthenticationConfigBase*>	m_config;
 };

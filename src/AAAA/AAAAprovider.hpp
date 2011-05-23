@@ -99,17 +99,19 @@ public:
 struct Configuration : public config::ConfigurationBase
 {
 	friend class AAAAprovider;
+	friend class config::ConfigurationParser;
 public:
 	/// constructor
 	Configuration();
 
 	/// methods
-	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 	void setCanonicalPathes( const std::string& referencePath );
 
 	// bool test() const;	// Not implemented yet, inherited from base
+
+	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 private:
 	AuthenticationConfiguration	auth;
 	AuditConfiguration		audit;
