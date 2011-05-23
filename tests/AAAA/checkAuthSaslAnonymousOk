@@ -6,7 +6,7 @@
 package require Expect
 
 set timeout 2
-log_user 0
+#log_user 0
 
 puts -nonewline "Authentication SASL ANONYMOUS always successfull - "
 
