@@ -37,8 +37,8 @@ Project Wolframe.
 #include "logger.hpp"
 #include "protocol/inputfilter.hpp"
 #include "protocol/formatoutput.hpp"
-#include "filters/char_isolatin1.hpp"
 #include <boost/algorithm/string.hpp>
+#include "filters.hpp"
 
 using namespace _Wolframe;
 using namespace app;
@@ -128,8 +128,9 @@ InputFilterClosure::ItemType InputFilterClosure::fetch( const char*& e1, unsigne
 
 protocol::InputFilter* System::createInputFilter( const char* name) const
 {
-	if (!name) return new filter::CharIsoLatin1::InputFilter(); //< default input filter
-	if (boost::algorithm::iequals( name, "char-isolatin1")) return new filter::CharIsoLatin1::InputFilter();
+	if (!name) return new filter::CharFilter<textwolf::charset::IsoLatin1>::InputFilter(); //< default input filter
+	if (boost::algorithm::iequals( name, "char:isolatin1")) return new filter::CharFilter<textwolf::charset::IsoLatin1>::InputFilter();
+	if (boost::algorithm::iequals( name, "char:utf8")) return new filter::CharFilter<textwolf::charset::UTF8>::InputFilter();
 
 	LOG_ERROR << "unknown input filter function '" << name << "'";
 	return 0;
@@ -137,8 +138,8 @@ protocol::InputFilter* System::createInputFilter( const char* name) const
 
 protocol::FormatOutput* System::createFormatOutput( const char* name) const
 {
-	if (!name) return new filter::CharIsoLatin1::FormatOutput(); //< default output filter
-	if (boost::algorithm::iequals( name, "char-isolatin1")) return new filter::CharIsoLatin1::FormatOutput();
+	if (!name) return new filter::CharFilter<textwolf::charset::IsoLatin1>::FormatOutput(); //< default output filter
+	if (boost::algorithm::iequals( name, "char-isolatin1")) return new filter::CharFilter<textwolf::charset::IsoLatin1>::FormatOutput();
 
 	LOG_ERROR << "unknown output filter function '" << name << "'";
 	return 0;

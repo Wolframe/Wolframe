@@ -143,6 +143,10 @@ int InputBlock::getEoDpos( size_type offset)
 			m_eodState = EoD::LF_DOT_CR_LF;
 			return bufpos;
 		}
+		else
+		{
+			return bufpos;
+		}
 	}
 	return -1;
 }
