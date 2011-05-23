@@ -27,9 +27,7 @@ tests/versionTest
 tests/logTest
 tests/threadLeakTest
 tests/counterTest
-tests/pechoHandlerTest
 tests/xmlselectHandlerTest
-tests/pechoHandler
 tests/protocolArgumentParsing
 tests/poolTest
 tests/resolvePathTest
@@ -56,3 +54,4 @@ examples/iproc/tests/iprocHandlerTest
 docs/WolfBook.html
 docs/WolfBook.pdf
 docs/doxygen/
+examples/pecho/tests/pechoHandlerTest
