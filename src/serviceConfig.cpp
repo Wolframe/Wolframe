@@ -52,6 +52,94 @@
 namespace _Wolframe {
 namespace config {
 
+
+/// Parse the configuration
+template<>
+bool ConfigurationParser::parse( ServiceConfiguration& cfg,
+				 const boost::property_tree::ptree& pt, const std::string& node )
+{
+	bool retVal = true;
+#if defined(_WIN32)
+	if ( boost::algorithm::iequals( node, "daemon" ))	{
+		LOG_WARNING << "daemon: section is not valid on Windows";
+	}
+#else // #if defined(_WIN32)
+	if ( boost::algorithm::iequals( node, "daemon" ))	{
+		for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
+			if ( boost::algorithm::iequals( L1it->first, "user" ))	{
+				bool isDefined = ( !cfg.user.empty());
+				if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.user, &isDefined ))
+					retVal = false;
+			}
+			else if ( boost::algorithm::iequals( L1it->first, "group" ))	{
+				bool isDefined = ( !cfg.group.empty());
+				if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.group, &isDefined ))
+					retVal = false;
+			}
+			else if ( boost::algorithm::iequals( L1it->first, "pidFile" ))	{
+				bool isDefined = ( !cfg.pidFile.empty());
+				if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.pidFile, &isDefined ))
+					retVal = false;
+				else	{
+					if ( ! boost::filesystem::path( cfg.pidFile ).is_absolute() )
+						LOG_WARNING << cfg.logPrefix() << ": pid file path is not absolute: "
+							    << cfg.pidFile;
+				}
+			}
+			else	{
+				LOG_WARNING << cfg.logPrefix() << ": unknown configuration option: '"
+					    << L1it->first << "'";
+			}
+		}
+	}
+#endif
+#if !defined(_WIN32)
+	else if ( boost::algorithm::iequals( node, "service" ))	{
+		LOG_WARNING << "service: section is valid only on Windows";
+	}
+#else // #if defined(_WIN32)
+	else if ( boost::algorithm::iequals( node, "service" ))	{
+		for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
+			if ( boost::algorithm::iequals( L1it->first, "serviceName" ))	{
+				bool isDefined = ( !serviceName.empty());
+				if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.serviceName, &isDefined ))
+					retVal = false;
+			}
+			else if ( boost::algorithm::iequals( L1it->first, "displayName" ))	{
+				bool isDefined = ( !serviceDisplayName.empty());
+				if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.serviceDisplayName, &isDefined ))
+					retVal = false;
+			}
+			else if ( boost::algorithm::iequals( L1it->first, "description" ))	{
+				bool isDefined = ( !serviceDescription.empty());
+				if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.serviceDescription, &isDefined ))
+					retVal = false;
+			}
+			else	{
+				LOG_WARNING << cfg.logPrefix() << ": unknown configuration option: '"
+					    << L1it->first << "'";
+			}
+		}
+		if ( cfg.serviceName.empty() )
+			cfg.serviceName = defaultServiceName();
+		if ( cfg.serviceDisplayName.empty() )
+			cfg.serviceDisplayName = defaultServiceDisplayName();
+		if ( cfg.serviceDescription.empty() )
+			cfg.serviceDescription = defaultServiceDescription();
+	}
+#endif
+	else	{
+		LOG_WARNING << cfg.logPrefix() << ": unknown configuration option: '" << node << "'";
+	}
+	return retVal;
+}
+
+
+bool ServiceConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& node )
+{
+	return config::ConfigurationParser::parse( *this, pt, node );
+}
+
 // Constructor
 #if !defined(_WIN32)	// Unix daemon
 ServiceConfiguration::ServiceConfiguration() : ConfigurationBase( "Daemon", NULL, "Daemon configuration" )	{}
@@ -82,87 +170,6 @@ void ServiceConfiguration::print( std::ostream& os, size_t /* indent */ ) const
 bool ServiceConfiguration::check() const
 {
 	return true;
-}
-
-
-/// Parse the configuration
-bool ServiceConfiguration::parse( const boost::property_tree::ptree& pt,
-				  const std::string& node )
-{
-	bool retVal = true;
-#if defined(_WIN32)
-	if ( boost::algorithm::iequals( node, "daemon" ))	{
-		LOG_WARNING << "daemon: section is not valid on Windows";
-	}
-#else // #if defined(_WIN32)
-	if ( boost::algorithm::iequals( node, "daemon" ))	{
-		for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
-			if ( boost::algorithm::iequals( L1it->first, "user" ))	{
-				bool isDefined = ( !user.empty());
-				if ( !Parser::getValue( logPrefix().c_str(), *L1it, user, &isDefined ))
-					retVal = false;
-			}
-			else if ( boost::algorithm::iequals( L1it->first, "group" ))	{
-				bool isDefined = ( !group.empty());
-				if ( !Parser::getValue( logPrefix().c_str(), *L1it, group, &isDefined ))
-					retVal = false;
-			}
-			else if ( boost::algorithm::iequals( L1it->first, "pidFile" ))	{
-				bool isDefined = ( !pidFile.empty());
-				if ( !Parser::getValue( logPrefix().c_str(), *L1it, pidFile, &isDefined ))
-					retVal = false;
-				else	{
-					if ( ! boost::filesystem::path( pidFile ).is_absolute() )
-						LOG_WARNING << logPrefix() << ": pid file path is not absolute: "
-							    << pidFile;
-				}
-			}
-			else	{
-				LOG_WARNING << logPrefix() << ": unknown configuration option: '"
-					    << L1it->first << "'";
-			}
-		}
-	}
-#endif
-#if !defined(_WIN32)
-	else if ( boost::algorithm::iequals( node, "service" ))	{
-		LOG_WARNING << "service: section is valid only on Windows";
-	}
-#else // #if defined(_WIN32)
-	else if ( boost::algorithm::iequals( node, "service" ))	{
-		for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
-			if ( boost::algorithm::iequals( L1it->first, "serviceName" ))	{
-				bool isDefined = ( !serviceName.empty());
-				if ( !Parser::getValue( logPrefix().c_str(), *L1it, serviceName, &isDefined ))
-					retVal = false;
-			}
-			else if ( boost::algorithm::iequals( L1it->first, "displayName" ))	{
-				bool isDefined = ( !serviceDisplayName.empty());
-				if ( !Parser::getValue( logPrefix().c_str(), *L1it, serviceDisplayName, &isDefined ))
-					retVal = false;
-			}
-			else if ( boost::algorithm::iequals( L1it->first, "description" ))	{
-				bool isDefined = ( !serviceDescription.empty());
-				if ( !Parser::getValue( logPrefix().c_str(), *L1it, serviceDescription, &isDefined ))
-					retVal = false;
-			}
-			else	{
-				LOG_WARNING << logPrefix() << ": unknown configuration option: '"
-					    << L1it->first << "'";
-			}
-		}
-		if ( serviceName.empty() )
-			serviceName = defaultServiceName();
-		if ( serviceDisplayName.empty() )
-			serviceDisplayName = defaultServiceDisplayName();
-		if ( serviceDescription.empty() )
-			serviceDescription = defaultServiceDescription();
-	}
-#endif
-	else	{
-		LOG_WARNING << logPrefix() << ": unknown configuration option: '" << node << "'";
-	}
-	return retVal;
 }
 
 

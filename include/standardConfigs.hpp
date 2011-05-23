@@ -49,7 +49,6 @@
 
 namespace _Wolframe {
 namespace net	{
-
 	/// network server configuration
 	struct Configuration : public _Wolframe::config::ConfigurationBase
 	{
@@ -67,7 +66,6 @@ namespace net	{
 		Configuration();
 
 		/// methods
-		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 		bool check() const;
 		void print( std::ostream& os, size_t indent ) const;
 
@@ -75,6 +73,8 @@ namespace net	{
 
 		//			Not implemented yet, inherited from base for the time being
 		//			bool test() const;
+
+		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 	};
 
 } // namespace net
@@ -107,16 +107,17 @@ namespace log	{
 		LoggerConfiguration();
 
 		/// methods
-		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 		bool check() const;
 		void print( std::ostream& os, size_t indent ) const;
 
 		void setCanonicalPathes( const std::string& referencePath );
 
-//			Not implemented yet, inherited from base for the time being
-//			bool test() const;
+//		Not implemented yet, inherited from base for the time being
+//		bool test() const;
 
 		void foreground( LogLevel::Level debugLevel, bool useConfig );
+
+		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 	};
 
 } // namespace log
@@ -144,7 +145,6 @@ namespace config	{
 		ServiceConfiguration();
 
 		/// methods
-		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 		bool check() const;
 		void print( std::ostream& os, size_t indent ) const;
 
@@ -155,6 +155,8 @@ namespace config	{
 		void setCanonicalPathes( const std::string& referencePath );
 		void override( const std::string& user, const std::string& group );
 #endif // !defined( _WIN32 )
+
+		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 	};
 
 
@@ -181,58 +183,18 @@ namespace config	{
 		/// methods
 		std::string toString() const;
 
-		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
-
 		bool check() const;
 		void print( std::ostream& os, size_t indent ) const;
 
 //		Not implemented yet, inherited from base for the time being
 //		bool test() const;
+
+		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 	protected:
 		/// data members
 		SignatureTokens	tokens_;
 		bool		serverName_;
 		bool		serverNameDefined_;
-	};
-
-
-	/// logger configuration
-	struct LoggerConfiguration : public _Wolframe::config::ConfigurationBase
-	{
-	public:
-		bool			logToStderr;
-		log::LogLevel::Level	stderrLogLevel;
-
-		bool	 // namespace
-	logToFile;
-		std::string		logFile;
-		log::LogLevel::Level	logFileLogLevel;
-		std::string		logFileIdent;
-		bool			logToSyslog;
-		log::SyslogFacility::Facility syslogFacility;
-		log::LogLevel::Level	syslogLogLevel;
-		std::string		syslogIdent;
-#if defined( _WIN32 )
-		bool			logToEventlog;
-		std::string		eventlogLogName;
-		std::string		eventlogSource;
-		log::LogLevel::Level	eventlogLogLevel;
-#endif // defined( _WIN32 )
-
-		/// constructor
-		LoggerConfiguration();
-
-		/// methods
-		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
-		bool check() const;
-		void print( std::ostream& os ) const;
-
-		void setCanonicalPathes( const std::string& referencePath );
-
-//			Not implemented yet, inherited from base for the time being
-//			bool test() const;
-
-		void foreground( log::LogLevel::Level debugLevel, bool useConfig );
 	};
 
 } // namespace config
