@@ -51,8 +51,250 @@
 
 static const unsigned short DEFAULT_DB_CONNECTIONS = 4;
 
-namespace _Wolframe	{
-namespace db	{
+namespace _Wolframe {
+
+namespace config {
+
+/// Parse the PostgreSQL configuration
+template<>
+bool ConfigurationParser::parse( db::PostgreSQLconfig& cfg,
+				 const boost::property_tree::ptree& pt, const std::string& /*node*/ )
+{
+	using namespace _Wolframe::config;
+	bool retVal = true;
+	bool portDefined, connDefined, aTdefined;
+	portDefined = connDefined = aTdefined = false;
+
+	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
+		if ( boost::algorithm::iequals( L1it->first, "identifier" ))	{
+			bool isDefined = ( !cfg.ID().empty() );
+			std::string id;
+			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, id, &isDefined ))
+				retVal = false;
+			else
+				cfg.ID( id );
+		}
+		else if ( boost::algorithm::iequals( L1it->first, "host" ))	{
+			bool isDefined = ( !cfg.host.empty());
+			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.host, &isDefined ))
+				retVal = false;
+		}
+		else if ( boost::algorithm::iequals( L1it->first, "port" ))	{
+			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.port,
+						Parser::RangeDomain<unsigned short>( 1 ), &portDefined ))
+				retVal = false;
+		}
+		else if ( boost::algorithm::iequals( L1it->first, "name" ))	{
+			bool isDefined = ( !cfg.dbName.empty());
+			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.dbName, &isDefined ))
+				retVal = false;
+		}
+		else if ( boost::algorithm::iequals( L1it->first, "user" ))	{
+			bool isDefined = ( !cfg.user.empty());
+			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.user, &isDefined ))
+				retVal = false;
+		}
+		else if ( boost::algorithm::iequals( L1it->first, "password" ))	{
+			bool isDefined = ( !cfg.password.empty());
+			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.password, &isDefined ))
+				retVal = false;
+		}
+		else if ( boost::algorithm::iequals( L1it->first, "connections" ))	{
+			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.connections, &connDefined ))
+				retVal = false;
+		}
+		else if ( boost::algorithm::iequals( L1it->first, "acquireTimeout" ))	{
+			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.acquireTimeout, &aTdefined ))
+				retVal = false;
+		}
+		else	{
+			LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
+				    << L1it->first << "'";
+		}
+	}
+	if ( cfg.connections == 0 )
+		cfg.connections = DEFAULT_DB_CONNECTIONS;
+
+	return retVal;
+}
+
+/// Parse the SQLite configuration
+template<>
+bool ConfigurationParser::parse( db::SQLiteConfig& cfg,
+				 const boost::property_tree::ptree& pt, const std::string& /*node*/ )
+{
+	using namespace _Wolframe::config;
+	bool retVal = true;
+
+	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
+		if ( boost::algorithm::iequals( L1it->first, "identifier" ))	{
+			bool isDefined = ( !cfg.ID().empty() );
+			std::string id;
+			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, id, &isDefined ))
+				retVal = false;
+			else
+				cfg.ID( id );
+		}
+		else if ( boost::algorithm::iequals( L1it->first, "file" ) ||
+			  boost::algorithm::iequals( L1it->first, "filename" ))	{
+			bool isDefined = ( !cfg.filename.empty() );
+			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.filename, &isDefined ))
+				retVal = false;
+			else	{
+				if ( ! boost::filesystem::path( cfg.filename ).is_absolute() )
+					LOG_WARNING << cfg.logPrefix() << "database file path is not absolute: "
+						    << cfg.filename;
+			}
+		}
+		else if ( boost::algorithm::iequals( L1it->first, "flag" ))	{
+			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.flag, Parser::BoolDomain() ))
+				retVal = false;
+		}
+		else	{
+			LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
+				    << L1it->first << "'";
+		}
+	}
+	return retVal;
+}
+
+/// Parse the reference to db configuration
+template<>
+bool ConfigurationParser::parse( db::ReferenceConfig& cfg,
+				 const boost::property_tree::ptree& pt, const std::string& node )
+{
+	bool labelDefined = ( ! cfg.m_ref.empty() );
+	if ( !config::Parser::getValue( cfg.logPrefix().c_str(), node.c_str(),
+					pt.get_value<std::string>(), cfg.m_ref, &labelDefined ))
+		return false;
+	if ( cfg.m_ref.empty() )	{
+		LOG_ERROR << cfg.logPrefix() << "Database reference label is empty";
+		return false;
+	}
+	return true;
+}
+
+template<>
+bool ConfigurationParser::parse( db::Configuration& cfg,
+				 const boost::property_tree::ptree& pt, const std::string& /*node*/ )
+{
+	using namespace _Wolframe::config;
+	bool retVal = true;
+
+	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
+		if ( boost::algorithm::iequals( L1it->first, "PostgreSQL" ))	{
+			db::PostgreSQLconfig* config = new db::PostgreSQLconfig( "PostgreSQL server", cfg.logPrefix().c_str(), "PostgreSQL" );
+			if ( config->parse( L1it->second, L1it->first ))
+				cfg.dbConfig_.push_back( config );
+			else	{
+				delete config;
+				retVal = false;
+			}
+		}
+		else if ( boost::algorithm::iequals( L1it->first, "SQLite" ))	{
+			db::SQLiteConfig* config = new db::SQLiteConfig( "SQLite database", cfg.logPrefix().c_str(), "SQLite" );
+			if ( config->parse( L1it->second, L1it->first ))
+				cfg.dbConfig_.push_back( config );
+			else	{
+				delete config;
+				retVal = false;
+			}
+		}
+		else
+			LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
+				    << L1it->first << "'";
+	}
+	return retVal;
+}
+
+template<>
+bool ConfigurationParser::parse( db::SingleDBConfiguration& cfg,
+				 const boost::property_tree::ptree& pt, const std::string& node )
+{
+	using namespace _Wolframe::config;
+	bool retVal = true;
+
+	std::string label = pt.get_value<std::string>();
+	if ( ! label.empty() )	{
+		db::ReferenceConfig* config = new db::ReferenceConfig( "Reference", cfg.logPrefix().c_str(), "reference" );
+		if ( config->parse( pt, node ))
+			cfg.m_dbConfig = config;
+		else	{
+			delete config;
+			retVal = false;
+		}
+	}
+	else	{
+		for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
+			if ( cfg.m_dbConfig != NULL )	{
+				LOG_ERROR << cfg.logPrefix() << "database already defined: '"
+					    << L1it->first << "'";
+				retVal = false;
+			}
+			else	{
+				if ( boost::algorithm::iequals( L1it->first, "PostgreSQL" ))	{
+					db::PostgreSQLconfig* config = new db::PostgreSQLconfig( "PostgreSQL server",
+											 cfg.logPrefix().c_str(), "PostgreSQL" );
+					if ( config->parse( L1it->second, L1it->first ))
+						cfg.m_dbConfig = config;
+					else	{
+						delete config;
+						retVal = false;
+					}
+				}
+				else if ( boost::algorithm::iequals( L1it->first, "SQLite" ))	{
+					db::SQLiteConfig* config = new db::SQLiteConfig( "SQLite database", cfg.logPrefix().c_str(), "SQLite" );
+					if ( config->parse( L1it->second, L1it->first ))
+						cfg.m_dbConfig = config;
+					else	{
+						delete config;
+						retVal = false;
+					}
+				}
+				else
+					LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
+						    << L1it->first << "'";
+			}
+		}
+	}
+
+	if ( ! cfg.m_dbConfig )	{
+		LOG_ERROR << cfg.logPrefix() << "database label without definition";
+		retVal = false;
+	}
+
+	return retVal;
+}
+
+} // namespace config
+
+namespace db {
+
+bool PostgreSQLconfig::parse( const boost::property_tree::ptree& pt, const std::string& node )
+{
+	return config::ConfigurationParser::parse( *this, pt, node );
+}
+
+bool SQLiteConfig::parse( const boost::property_tree::ptree& pt, const std::string& node )
+{
+	return config::ConfigurationParser::parse( *this, pt, node );
+}
+
+bool ReferenceConfig::parse( const boost::property_tree::ptree& pt, const std::string& node )
+{
+	return config::ConfigurationParser::parse( *this, pt, node );
+}
+
+bool Configuration::parse( const boost::property_tree::ptree& pt, const std::string& node )
+{
+	return config::ConfigurationParser::parse( *this, pt, node );
+}
+
+bool SingleDBConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& node )
+{
+	return config::ConfigurationParser::parse( *this, pt, node );
+}
+
 
 //***  PostgreSQL functions  ********************************************
 PostgreSQLconfig::PostgreSQLconfig( const char* cfgName, const char* logParent, const char* logName )
@@ -90,65 +332,6 @@ bool PostgreSQLconfig::check() const
 	return true;
 }
 
-bool PostgreSQLconfig::parse( const boost::property_tree::ptree& pt, const std::string& /* nodeName */ )
-{
-	using namespace _Wolframe::config;
-	bool retVal = true;
-	bool portDefined, connDefined, aTdefined;
-	portDefined = connDefined = aTdefined = false;
-
-	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
-		if ( boost::algorithm::iequals( L1it->first, "identifier" ))	{
-			bool isDefined = ( ! ID().empty() );
-			std::string id;
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, id, &isDefined ))
-				retVal = false;
-			else
-				ID( id );
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "host" ))	{
-			bool isDefined = ( !host.empty());
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, host, &isDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "port" ))	{
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, port,
-						Parser::RangeDomain<unsigned short>( 1 ), &portDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "name" ))	{
-			bool isDefined = ( !dbName.empty());
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, dbName, &isDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "user" ))	{
-			bool isDefined = ( !user.empty());
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, user, &isDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "password" ))	{
-			bool isDefined = ( !password.empty());
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, password, &isDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "connections" ))	{
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, connections, &connDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "acquireTimeout" ))	{
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, acquireTimeout, &aTdefined ))
-				retVal = false;
-		}
-		else	{
-			LOG_WARNING << logPrefix() << "unknown configuration option: '"
-				    << L1it->first << "'";
-		}
-	}
-	if ( connections == 0 )
-		connections = DEFAULT_DB_CONNECTIONS;
-
-	return retVal;
-}
 
 //***  SQLite functions  ************************************************
 SQLiteConfig::SQLiteConfig( const char* name, const char* logParent, const char* logName )
@@ -177,43 +360,6 @@ bool SQLiteConfig::check() const
 	return true;
 }
 
-bool SQLiteConfig::parse( const boost::property_tree::ptree& pt, const std::string& /* nodeName */ )
-{
-	using namespace _Wolframe::config;
-	bool retVal = true;
-
-	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
-		if ( boost::algorithm::iequals( L1it->first, "identifier" ))	{
-			bool isDefined = ( ! ID().empty() );
-			std::string id;
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, id, &isDefined ))
-				retVal = false;
-			else
-				ID( id );
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "file" ) ||
-			  boost::algorithm::iequals( L1it->first, "filename" ))	{
-			bool isDefined = ( ! filename.empty() );
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, filename, &isDefined ))
-				retVal = false;
-			else	{
-				if ( ! boost::filesystem::path( filename ).is_absolute() )
-					LOG_WARNING << logPrefix() << "database file path is not absolute: "
-						    << filename;
-			}
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "flag" ))	{
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, flag, Parser::BoolDomain() ))
-				retVal = false;
-		}
-		else	{
-			LOG_WARNING << logPrefix() << "unknown configuration option: '"
-				    << L1it->first << "'";
-		}
-	}
-	return retVal;
-}
-
 void SQLiteConfig::setCanonicalPathes( const std::string& refPath )
 {
 	using namespace boost::filesystem;
@@ -229,19 +375,6 @@ void SQLiteConfig::setCanonicalPathes( const std::string& refPath )
 
 
 //***  Database reference functions  **************************************
-bool ReferenceConfig::parse( const boost::property_tree::ptree& pt, const std::string& node )
-{
-	bool labelDefined = ( ! m_ref.empty() );
-	if ( !config::Parser::getValue( logPrefix().c_str(), node.c_str(),
-					pt.get_value<std::string>(), m_ref, &labelDefined ))
-		return false;
-	if ( m_ref.empty() )	{
-		LOG_ERROR << logPrefix() << "Database reference label is empty";
-		return false;
-	}
-	return true;
-}
-
 bool ReferenceConfig::check() const
 {
 	if ( m_ref.empty() )	{
@@ -292,37 +425,6 @@ bool Configuration::check() const
 	return correct;
 }
 
-bool Configuration::parse( const boost::property_tree::ptree& pt, const std::string& /* nodeName */ )
-{
-	using namespace _Wolframe::config;
-	bool retVal = true;
-
-	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
-		if ( boost::algorithm::iequals( L1it->first, "PostgreSQL" ))	{
-			PostgreSQLconfig* cfg = new PostgreSQLconfig( "PostgreSQL server", logPrefix().c_str(), "PostgreSQL" );
-			if ( cfg->parse( L1it->second, L1it->first ))
-				dbConfig_.push_back( cfg );
-			else	{
-				delete cfg;
-				retVal = false;
-			}
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "SQLite" ))	{
-			SQLiteConfig* cfg = new SQLiteConfig( "SQLite database", logPrefix().c_str(), "SQLite" );
-			if ( cfg->parse( L1it->second, L1it->first ))
-				dbConfig_.push_back( cfg );
-			else	{
-				delete cfg;
-				retVal = false;
-			}
-		}
-		else
-			LOG_WARNING << logPrefix() << "unknown configuration option: '"
-				    << L1it->first << "'";
-	}
-	return retVal;
-}
-
 void Configuration::setCanonicalPathes( const std::string& refPath )
 {
 	for ( std::list<DatabaseConfig*>::const_iterator it = dbConfig_.begin();
@@ -331,7 +433,7 @@ void Configuration::setCanonicalPathes( const std::string& refPath )
 	}
 }
 
-
+//***************************************************
 SingleDBConfiguration::~SingleDBConfiguration()
 {
 	if ( m_dbConfig )
@@ -352,70 +454,12 @@ void SingleDBConfiguration::print( std::ostream& os, size_t indent ) const
 		os << "   None configured" << std::endl;
 }
 
-
 /// Check if the database configuration makes sense
 bool SingleDBConfiguration::check() const
 {
 	if ( m_dbConfig )
 		return m_dbConfig->check();
 	return false;
-}
-
-bool SingleDBConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& nodeName )
-{
-	using namespace _Wolframe::config;
-	bool retVal = true;
-
-	std::string label = pt.get_value<std::string>();
-	if ( ! label.empty() )	{
-		ReferenceConfig* cfg = new ReferenceConfig( "Reference", logPrefix().c_str(), "reference" );
-		if ( cfg->parse( pt, nodeName ))
-			m_dbConfig = cfg;
-		else	{
-			delete cfg;
-			retVal = false;
-		}
-	}
-	else	{
-		for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
-			if ( m_dbConfig != NULL )	{
-				LOG_ERROR << logPrefix() << "database already defined: '"
-					    << L1it->first << "'";
-				retVal = false;
-			}
-			else	{
-				if ( boost::algorithm::iequals( L1it->first, "PostgreSQL" ))	{
-					PostgreSQLconfig* cfg = new PostgreSQLconfig( "PostgreSQL server",
-										      logPrefix().c_str(), "PostgreSQL" );
-					if ( cfg->parse( L1it->second, L1it->first ))
-						m_dbConfig = cfg;
-					else	{
-						delete cfg;
-						retVal = false;
-					}
-				}
-				else if ( boost::algorithm::iequals( L1it->first, "SQLite" ))	{
-					SQLiteConfig* cfg = new SQLiteConfig( "SQLite database", logPrefix().c_str(), "SQLite" );
-					if ( cfg->parse( L1it->second, L1it->first ))
-						m_dbConfig = cfg;
-					else	{
-						delete cfg;
-						retVal = false;
-					}
-				}
-				else
-					LOG_WARNING << logPrefix() << "unknown configuration option: '"
-						    << L1it->first << "'";
-			}
-		}
-	}
-
-	if ( ! m_dbConfig )	{
-		LOG_ERROR << logPrefix() << "database label without definition";
-		retVal = false;
-	}
-
-	return retVal;
 }
 
 void SingleDBConfiguration::setCanonicalPathes( const std::string& refPath )
