@@ -46,7 +46,65 @@ extern "C" {
 	#include <lua.h>
 }
 
+namespace _Wolframe {
+namespace config {
+
+template<>
+bool ConfigurationParser::parse( _Wolframe::iproc::lua::Configuration& cfg,
+				 const boost::property_tree::ptree& parentNode, const std::string& /*node*/ )
+{
+	using namespace _Wolframe::iproc::lua;
+
+	std::string name;
+	unsigned int cnt_main = 0;
+
+	for ( boost::property_tree::ptree::const_iterator it = parentNode.begin(); it != parentNode.end(); it++)
+	{
+		if (boost::algorithm::iequals( it->first, "main"))
+		{
+			if ( !config::Parser::getValue( cfg.logPrefix().c_str(), *it, name, config::Parser::NonEmptyDomain<std::string>())) return false;
+			cfg.m_main = Configuration::Module( name, Configuration::Module::Script);
+			cnt_main ++;
+		}
+		else if (boost::algorithm::iequals( it->first, "module"))
+		{
+			if ( !config::Parser::getValue( cfg.logPrefix().c_str(), *it, name, config::Parser::NonEmptyDomain<std::string>())) return false;
+			cfg.m_modules.push_back( Configuration::Module( name));
+		}
+		else if (boost::algorithm::iequals( it->first, "input_buffer"))
+		{
+			if (!config::Parser::getValue( cfg.logPrefix().c_str(), *it, cfg.m_input_bufsize, config::Parser::RangeDomain<unsigned int>(1,(1<<20)))) return false;
+		}
+		else if (boost::algorithm::iequals( it->first, "output_buffer"))
+		{
+			if (!config::Parser::getValue( cfg.logPrefix().c_str(), *it, cfg.m_output_bufsize, config::Parser::RangeDomain<unsigned int>(1,(1<<20)))) return false;
+		}
+		else if (boost::algorithm::iequals( it->first, "cstacksize"))
+		{
+			if (!config::Parser::getValue( cfg.logPrefix().c_str(), *it, cfg.m_cthread_stacksize, config::Parser::RangeDomain<unsigned int>(64,(1<<20)))) return false;
+		}
+		else
+		{
+			LOG_WARNING << cfg.logPrefix() << ": unknown configuration option: '" << it->first << "'";
+		}
+	}
+	if (cnt_main == 0)
+	{
+		LOG_ERROR << cfg.logPrefix() << ": main script to execute is not defined (configuration option <module>";
+		return false;
+	}
+	return true;
+}
+
+}} // namespace _Wolframe::config
+
+
 using namespace _Wolframe::iproc::lua;
+
+bool Configuration::parse( const boost::property_tree::ptree& pt, const std::string& node )
+{
+	return config::ConfigurationParser::parse( *this, pt, node );
+}
 
 static Configuration::ModuleLoad getLuaModuleEntryFunc( const char* name)
 {
@@ -74,49 +132,6 @@ void Configuration::Module::setType()
 			m_type = Script;
 		}
 	}
-}
-
-bool Configuration::parse( const boost::property_tree::ptree& parentNode, const std::string&)
-{
-	std::string name;
-	unsigned int cnt_main = 0;
-
-	for ( boost::property_tree::ptree::const_iterator it = parentNode.begin(); it != parentNode.end(); it++)
-	{
-		if (boost::algorithm::iequals( it->first, "main"))
-		{
-			if ( !config::Parser::getValue( logPrefix().c_str(), *it, name, config::Parser::NonEmptyDomain<std::string>())) return false;
-			m_main = Module( name, Module::Script);
-			cnt_main ++;
-		}
-		else if (boost::algorithm::iequals( it->first, "module"))
-		{
-			if ( !config::Parser::getValue( logPrefix().c_str(), *it, name, config::Parser::NonEmptyDomain<std::string>())) return false;
-			m_modules.push_back( Module( name));
-		}
-		else if (boost::algorithm::iequals( it->first, "input_buffer"))
-		{
-			if (!config::Parser::getValue( logPrefix().c_str(), *it, m_input_bufsize, config::Parser::RangeDomain<unsigned int>(1,(1<<20)))) return false;
-		}
-		else if (boost::algorithm::iequals( it->first, "output_buffer"))
-		{
-			if (!config::Parser::getValue( logPrefix().c_str(), *it, m_output_bufsize, config::Parser::RangeDomain<unsigned int>(1,(1<<20)))) return false;
-		}
-		else if (boost::algorithm::iequals( it->first, "cstacksize"))
-		{
-			if (!config::Parser::getValue( logPrefix().c_str(), *it, m_cthread_stacksize, config::Parser::RangeDomain<unsigned int>(64,(1<<20)))) return false;
-		}
-		else
-		{
-			LOG_WARNING << logPrefix() << ": unknown configuration option: '" << it->first << "'";
-		}
-	}
-	if (cnt_main == 0)
-	{
-		LOG_ERROR << logPrefix() << ": main script to execute is not defined (configuration option <module>";
-		return false;
-	}
-	return true;
 }
 
 void Configuration::Module::setCanonicalPath( const std::string& refPath)

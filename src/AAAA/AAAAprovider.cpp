@@ -79,7 +79,6 @@ bool Configuration::parse( const boost::property_tree::ptree& pt, const std::str
 	return config::ConfigurationParser::parse( *this, pt, node );
 }
 
-
 AAAAprovider::AAAAprovider( const Configuration& config )
 {
 	for ( std::list<AuthenticationConfigBase*>::const_iterator it = config.auth.m_config.begin();

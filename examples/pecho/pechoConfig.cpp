@@ -11,13 +11,42 @@
 
 #include <ostream>
 
-
 static const unsigned short DEFAULT_TIMEOUT = 180;
 
+namespace _Wolframe {
+namespace config {
 
-namespace _Wolframe	{
+template<>
+bool ConfigurationParser::parse( pEchoConfiguration& cfg,
+				 const boost::property_tree::ptree& pt, const std::string& /*node*/ )
+{
+	bool retVal = true;
+	bool isSet = false;
 
-void pEchoConfiguration::print( std::ostream& os, size_t /* indent */ ) const
+	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
+		if ( boost::algorithm::iequals( L1it->first, "idle" ))	{
+			if ( !config::Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.timeout ))
+				retVal = false;
+			isSet = true;
+		}
+		else
+			LOG_WARNING << cfg.logPrefix() << ": unknown configuration option: '"
+				    << L1it->first << "'";
+	}
+	if ( !isSet )
+		cfg.timeout = DEFAULT_TIMEOUT;
+
+	return retVal;
+}
+
+} // namespace config
+
+bool pEchoConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& node )
+{
+	return config::ConfigurationParser::parse( *this, pt, node );
+}
+
+void pEchoConfiguration::print( std::ostream& os, size_t /*indent*/ ) const
 {
 	os << sectionName() << std::endl;
 	os << "   Idle timeout: " << timeout << std::endl;
@@ -28,26 +57,6 @@ void pEchoConfiguration::print( std::ostream& os, size_t /* indent */ ) const
 bool pEchoConfiguration::check() const
 {
 	return true;
-}
-
-
-bool pEchoConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& /* nodeName */ )
-{
-	bool retVal = true;
-
-	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
-		if ( boost::algorithm::iequals( L1it->first, "idle" ))	{
-			if ( !config::Parser::getValue( logPrefix().c_str(), *L1it, timeout ))
-				retVal = false;
-		}
-		else
-			LOG_WARNING << logPrefix() << ": unknown configuration option: '"
-				    << L1it->first << "'";
-	}
-//	if ( timeout == 0 )
-//		timeout = DEFAULT_TIMEOUT;
-
-	return retVal;
 }
 
 } // namespace _Wolframe

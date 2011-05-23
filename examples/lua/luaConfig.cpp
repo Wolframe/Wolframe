@@ -20,7 +20,48 @@ extern "C" {
 	#include "lauxlib.h"
 }
 
-namespace _Wolframe	{
+namespace _Wolframe {
+namespace config {
+
+template<>
+bool ConfigurationParser::parse( LuaConfiguration& cfg,
+				 const boost::property_tree::ptree& pt, const std::string& /*node*/ )
+{
+	bool retVal = true;
+
+	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin();
+							L1it != pt.end(); L1it++ )	{
+		if ( boost::algorithm::iequals( L1it->first, "script" ))	{
+			bool isDefined = ( !cfg.script.empty());
+			if ( !config::Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.script, &isDefined ))
+				retVal = false;
+			else	{
+				if ( ! boost::filesystem::path( cfg.script ).is_absolute() )
+					LOG_WARNING << cfg.logPrefix() << ": script file path is not absolute: "
+						    << cfg.script;
+			}
+		} else if ( boost::algorithm::iequals( L1it->first, "preload_lib" ))	{
+			std::string preload_lib;
+			if ( !config::Parser::getValue( cfg.logPrefix().c_str(), *L1it, preload_lib ))
+				retVal = false;
+			cfg.preload_libs.push_back( preload_lib );
+		} else {
+			LOG_WARNING << cfg.logPrefix() << ": unknown configuration option: '"
+				    << L1it->first << "'";
+			return false;
+		}
+	}
+
+	return retVal;
+}
+
+} // namespace config
+
+
+bool LuaConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& node )
+{
+	return config::ConfigurationParser::parse( *this, pt, node );
+}
 
 LuaConfiguration::LuaConfiguration()
 	: ConfigurationBase( "Lua Example Server", NULL, "Lua Example configuration " )
@@ -98,37 +139,6 @@ bool LuaConfiguration::check() const
 	}
 
 	return correct;
-}
-
-
-bool LuaConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& /* nodeName */ )
-{
-	bool retVal = true;
-
-	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin();
-							L1it != pt.end(); L1it++ )	{
-		if ( boost::algorithm::iequals( L1it->first, "script" ))	{
-			bool isDefined = ( !script.empty());
-			if ( !config::Parser::getValue( logPrefix().c_str(), *L1it, script, &isDefined ))
-				retVal = false;
-			else	{
-				if ( ! boost::filesystem::path( script ).is_absolute() )
-					LOG_WARNING << logPrefix() << ": script file path is not absolute: "
-						    << script;
-			}
-		} else if ( boost::algorithm::iequals( L1it->first, "preload_lib" ))	{
-			std::string preload_lib;
-			if ( !config::Parser::getValue( logPrefix().c_str(), *L1it, preload_lib ))
-				retVal = false;
-			preload_libs.push_back( preload_lib );
-		} else {
-			LOG_WARNING << logPrefix() << ": unknown configuration option: '"
-				    << L1it->first << "'";
-			return false;
-		}
-	}
-
-	return retVal;
 }
 
 void LuaConfiguration::setCanonicalPathes( const std::string& refPath )

@@ -50,6 +50,7 @@ namespace lua {
 /// \brief configuration object of the lua application processor
 class Configuration :public config::ConfigurationBase
 {
+	friend class _Wolframe::config::ConfigurationParser;
 public:
 	/// \brief module load function for a lua state
 	/// \param ls lua state to initialize with the load of the module for this state object
@@ -59,9 +60,6 @@ public:
 	/// \param name configuration name
 	/// \param prefix configuration prefix
 	Configuration( const char* name, const char* prefix) :ConfigurationBase(name, NULL, prefix),m_input_bufsize(512),m_output_bufsize(512),m_cthread_stacksize(2048){}
-
-	/// \brief interface implementation of ConfigurationBase::parse(const boost::property_tree::ptree&, const std::string&)
-	virtual bool parse( const boost::property_tree::ptree&, const std::string&);
 
 	/// \brief interface implementation of ConfigurationBase::setCanonicalPathes(const std::string&)
 	virtual void setCanonicalPathes( const std::string&);
@@ -74,7 +72,10 @@ public:
 
 	/// \brief interface implementation of ConfigurationBase::print(std::ostream& os, size_t indent) const
 	virtual void print( std::ostream&, size_t indent=0) const;
-
+//********
+	/// \brief interface implementation of ConfigurationBase::parse(const boost::property_tree::ptree&, const std::string&)
+	virtual bool parse( const boost::property_tree::ptree&, const std::string&);
+//********
 	/// \brief loads the configuration settings for a lua virtual machine state
 	/// \param[in,out] ls lua state to initialize
 	/// \return true if success, else false

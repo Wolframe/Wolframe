@@ -19,12 +19,13 @@ namespace _Wolframe {
 		EchoConfiguration() : ConfigurationBase( "Echo Server", NULL, "Echo Server configuration" )
 								{ timeout = 0; }
 		/// methods
-		bool parse( const boost::property_tree::ptree& pt, const std::string& nodeName );
 		bool check() const;
 		void print( std::ostream& os, size_t indent ) const;
 
-//			Not implemented yet, inherited from base for the time being
-//			bool test() const;
+//		Not implemented yet, inherited from base for the time being
+//		bool test() const;
+
+		bool parse( const boost::property_tree::ptree& pt, const std::string& nodeName );
 	};
 
 

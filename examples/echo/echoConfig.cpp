@@ -15,7 +15,11 @@
 static const unsigned short DEFAULT_TIMEOUT = 180;
 
 
-namespace _Wolframe	{
+namespace _Wolframe {
+namespace config {
+
+} // namespace config
+
 
 void EchoConfiguration::print( std::ostream& os, size_t /* indent */ ) const
 {
