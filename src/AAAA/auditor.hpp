@@ -107,8 +107,6 @@ public:
 	}
 
 	void setCanonicalPathes( const std::string& refPath )	{ m_dbConfig.setCanonicalPathes( refPath ); }
-
-	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 private:
 	db::SingleDBConfiguration	m_dbConfig;
 };
@@ -130,8 +128,6 @@ public:
 	void setCanonicalPathes( const std::string& referencePath );
 
 	// bool test() const;	// Not implemented yet, inherited from base
-
-	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 private:
 	std::list<AuditConfigBase*>	m_config;
 };

@@ -98,9 +98,6 @@ public:
 	///\param[in]	indent	print indented with this number of spaces
 	virtual void print( std::ostream& os, size_t indent = 0 ) const = 0;
 
-	// Temporary hack
-	virtual bool parse( const boost::property_tree::ptree& pt,
-			    const std::string& nodeName ) = 0;
 private:
 	std::string	m_sectionName;
 	std::string	m_logPrefix;

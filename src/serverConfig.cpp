@@ -234,11 +234,6 @@ bool ConfigurationParser::parse( net::Configuration& cfg,
 
 namespace net	{
 
-bool Configuration::parse( const boost::property_tree::ptree& pt, const std::string& node )
-{
-	return config::ConfigurationParser::parse( *this, pt, node );
-}
-
 // Constructor
 Configuration::Configuration()
 	: ConfigurationBase( "Network Server", NULL, "Network server configuration" )

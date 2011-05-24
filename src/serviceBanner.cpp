@@ -102,11 +102,6 @@ bool ConfigurationParser::parse( ServiceBanner& cfg,
 	return true;
 }
 
-bool ServiceBanner::parse( const boost::property_tree::ptree& pt, const std::string& node )
-{
-	return ConfigurationParser::parse( *this, pt, node );
-}
-
 
 bool ServiceBanner::check() const
 {

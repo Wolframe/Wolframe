@@ -41,11 +41,6 @@ bool ConfigurationParser::parse( pEchoConfiguration& cfg,
 
 } // namespace config
 
-bool pEchoConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& node )
-{
-	return config::ConfigurationParser::parse( *this, pt, node );
-}
-
 void pEchoConfiguration::print( std::ostream& os, size_t /*indent*/ ) const
 {
 	os << sectionName() << std::endl;

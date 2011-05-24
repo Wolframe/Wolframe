@@ -245,11 +245,6 @@ bool ConfigurationParser::parse( log::LoggerConfiguration& cfg,
 } // namespace config
 namespace log {
 
-bool LoggerConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& node )
-{
-	return config::ConfigurationParser::parse( *this, pt, node );
-}
-
 LoggerConfiguration::LoggerConfiguration() : ConfigurationBase( "Logging", NULL, "Logging" )
 {
 	logToStderr = false;

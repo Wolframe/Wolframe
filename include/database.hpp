@@ -83,7 +83,6 @@ public:
 	PostgreSQLconfig( const char* name, const char* logParent, const char* logName );
 	~PostgreSQLconfig()				{}
 
-	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 };
@@ -100,7 +99,6 @@ public:
 	SQLiteConfig( const char* name, const char* logParent, const char* logName );
 	~SQLiteConfig()					{}
 
-	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 	virtual void setCanonicalPathes( const std::string& referencePath );
@@ -118,7 +116,6 @@ public:
 		: DatabaseConfig( name, logParent, logName )	{}
 	~ReferenceConfig()					{}
 
-	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 };
@@ -135,7 +132,6 @@ public:
 	~Configuration();
 
 	/// methods
-	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 	virtual void setCanonicalPathes( const std::string& referencePath );
@@ -155,7 +151,6 @@ public:
 	~SingleDBConfiguration();
 
 	/// methods
-	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 	virtual void setCanonicalPathes( const std::string& referencePath );

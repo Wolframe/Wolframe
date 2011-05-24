@@ -57,7 +57,7 @@ bool ConfigurationParser::parse( AAAA::AuditConfiguration& cfg,
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "file" ))	{
 			AAAA::FileAuditConfig* config = new AAAA::FileAuditConfig( "File", cfg.logPrefix().c_str(), "file" );
-			if ( config->parse( L1it->second, L1it->first ))
+			if ( ConfigurationParser::parse( config, L1it->second, L1it->first ))
 				cfg.m_config.push_back( config );
 			else	{
 				delete config;
@@ -66,7 +66,7 @@ bool ConfigurationParser::parse( AAAA::AuditConfiguration& cfg,
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "database" ))	{
 			AAAA::DatabaseAuditConfig* config = new AAAA::DatabaseAuditConfig( "Database", cfg.logPrefix().c_str(), "database" );
-			if ( config->parse( L1it->second, L1it->first ))
+			if ( ConfigurationParser::parse( config, L1it->second, L1it->first ))
 				cfg.m_config.push_back( config );
 			else	{
 				delete config;
@@ -84,7 +84,7 @@ template<>
 bool ConfigurationParser::parse( AAAA::DatabaseAuditConfig& cfg,
 				 const boost::property_tree::ptree& pt, const std::string& node )
 {
-	return cfg.m_dbConfig.parse( pt, node );
+	return ConfigurationParser::parse( cfg.m_dbConfig, pt, node );
 }
 
 template<>
@@ -114,22 +114,6 @@ bool ConfigurationParser::parse( AAAA::FileAuditConfig& cfg,
 } // namespace config
 //*************************************************************************************************
 namespace AAAA {
-
-bool AuditConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& node )
-{
-	return config::ConfigurationParser::parse( *this, pt, node );
-}
-
-bool DatabaseAuditConfig::parse( const boost::property_tree::ptree& pt, const std::string& node )
-{
-	return config::ConfigurationParser::parse( *this, pt, node );
-}
-
-bool FileAuditConfig::parse( const boost::property_tree::ptree& pt, const std::string& node )
-{
-	return config::ConfigurationParser::parse( *this, pt, node );
-}
-//*************************************************************************************************
 
 /// Audit to file
 bool FileAuditConfig::check() const

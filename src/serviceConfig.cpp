@@ -135,11 +135,6 @@ bool ConfigurationParser::parse( ServiceConfiguration& cfg,
 }
 
 
-bool ServiceConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& node )
-{
-	return config::ConfigurationParser::parse( *this, pt, node );
-}
-
 // Constructor
 #if !defined(_WIN32)	// Unix daemon
 ServiceConfiguration::ServiceConfiguration() : ConfigurationBase( "Daemon", NULL, "Daemon configuration" )	{}

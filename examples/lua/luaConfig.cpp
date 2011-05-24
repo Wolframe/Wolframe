@@ -58,11 +58,6 @@ bool ConfigurationParser::parse( LuaConfiguration& cfg,
 } // namespace config
 
 
-bool LuaConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& node )
-{
-	return config::ConfigurationParser::parse( *this, pt, node );
-}
-
 LuaConfiguration::LuaConfiguration()
 	: ConfigurationBase( "Lua Example Server", NULL, "Lua Example configuration " )
 {

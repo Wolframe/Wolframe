@@ -101,11 +101,6 @@ bool ConfigurationParser::parse( _Wolframe::iproc::lua::Configuration& cfg,
 
 using namespace _Wolframe::iproc::lua;
 
-bool Configuration::parse( const boost::property_tree::ptree& pt, const std::string& node )
-{
-	return config::ConfigurationParser::parse( *this, pt, node );
-}
-
 static Configuration::ModuleLoad getLuaModuleEntryFunc( const char* name)
 {
 	if (strcmp(name,LUA_TABLIBNAME) == 0) return luaopen_table;

@@ -110,8 +110,6 @@ public:
 	void setCanonicalPathes( const std::string& referencePath );
 
 	// bool test() const;	// Not implemented yet, inherited from base
-
-	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 private:
 	AuthenticationConfiguration	auth;
 	AuditConfiguration		audit;

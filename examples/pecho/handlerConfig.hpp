@@ -24,8 +24,6 @@ namespace _Wolframe {
 
 //		Not implemented yet, inherited from base for the time being
 //		bool test() const;
-
-		bool parse( const boost::property_tree::ptree& pt, const std::string& nodeName );
 	};
 
 

@@ -173,11 +173,11 @@ bool ApplicationConfiguration::parse ( const char *filename, ConfigFileType type
 		bool retVal = true;
 		for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
 			LOG_TRACE << "Configuration : parsing root element '" << it->first << "'";
-//			if ( it->first == "<xmlcomment>" )
-//				continue;
+			if ( it->first == "<xmlcomment>" && m_type == CONFIG_XML )
+				continue;
 			std::map< std::string, std::size_t >::iterator confIt;
 			if (( confIt = m_section.find( it->first ) ) != m_section.end() )	{
-				if ( ! m_conf[ confIt->second ]->parse( it->second, confIt->first ))
+				if ( !ConfigurationParser::parse( *(m_conf[ confIt->second ]), it->second, confIt->first ))
 					retVal = false;
 			}
 			else	{

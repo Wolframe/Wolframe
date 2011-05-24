@@ -73,8 +73,6 @@ namespace net	{
 
 		//			Not implemented yet, inherited from base for the time being
 		//			bool test() const;
-
-		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 	};
 
 } // namespace net
@@ -116,8 +114,6 @@ namespace log	{
 //		bool test() const;
 
 		void foreground( LogLevel::Level debugLevel, bool useConfig );
-
-		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 	};
 
 } // namespace log
@@ -155,8 +151,6 @@ namespace config	{
 		void setCanonicalPathes( const std::string& referencePath );
 		void override( const std::string& user, const std::string& group );
 #endif // !defined( _WIN32 )
-
-		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 	};
 
 
@@ -188,8 +182,6 @@ namespace config	{
 
 //		Not implemented yet, inherited from base for the time being
 //		bool test() const;
-
-		bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 	protected:
 		/// data members
 		SignatureTokens	tokens_;

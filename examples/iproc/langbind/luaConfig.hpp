@@ -72,10 +72,7 @@ public:
 
 	/// \brief interface implementation of ConfigurationBase::print(std::ostream& os, size_t indent) const
 	virtual void print( std::ostream&, size_t indent=0) const;
-//********
-	/// \brief interface implementation of ConfigurationBase::parse(const boost::property_tree::ptree&, const std::string&)
-	virtual bool parse( const boost::property_tree::ptree&, const std::string&);
-//********
+
 	/// \brief loads the configuration settings for a lua virtual machine state
 	/// \param[in,out] ls lua state to initialize
 	/// \return true if success, else false

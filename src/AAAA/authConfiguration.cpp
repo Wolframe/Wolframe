@@ -52,7 +52,7 @@ template<>
 bool ConfigurationParser::parse( AAAA::DatabaseAuthConfig& cfg,
 				 const boost::property_tree::ptree& pt, const std::string& node )
 {
-	return cfg.m_dbConfig.parse( pt, node );
+	return ConfigurationParser::parse( cfg.m_dbConfig, pt, node );
 }
 
 template<>
@@ -89,7 +89,7 @@ bool ConfigurationParser::parse( AAAA::AuthenticationConfiguration& cfg,
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "file" ))	{
 			AAAA::TextFileAuthConfig* config = new AAAA::TextFileAuthConfig( "File", cfg.logPrefix().c_str(), "file" );
-			if ( config->parse( L1it->second, L1it->first ))
+			if ( ConfigurationParser::parse( config, L1it->second, L1it->first ))
 				cfg.m_config.push_back( config );
 			else	{
 				delete config;
@@ -98,7 +98,7 @@ bool ConfigurationParser::parse( AAAA::AuthenticationConfiguration& cfg,
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "database" ))	{
 			AAAA::DatabaseAuthConfig* config = new AAAA::DatabaseAuthConfig( "Database", cfg.logPrefix().c_str(), "database" );
-			if ( config->parse( L1it->second, L1it->first ))
+			if ( ConfigurationParser::parse( config, L1it->second, L1it->first ))
 				cfg.m_config.push_back( config );
 			else	{
 				delete config;
@@ -115,21 +115,6 @@ bool ConfigurationParser::parse( AAAA::AuthenticationConfiguration& cfg,
 } // namespace config
 
 namespace AAAA {
-bool DatabaseAuthConfig::parse( const boost::property_tree::ptree& pt, const std::string& node )
-{
-	return config::ConfigurationParser::parse( *this, pt, node );
-}
-
-bool TextFileAuthConfig::parse( const boost::property_tree::ptree& pt, const std::string& node )
-{
-	return config::ConfigurationParser::parse( *this, pt, node );
-}
-
-bool AuthenticationConfiguration::parse( const boost::property_tree::ptree& pt, const std::string& node )
-{
-	return config::ConfigurationParser::parse( *this, pt, node );
-}
-
 
 /// Text file authentication
 bool TextFileAuthConfig::check() const

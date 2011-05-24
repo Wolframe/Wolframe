@@ -56,11 +56,11 @@ bool ConfigurationParser::parse( AAAA::Configuration& cfg,
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "Authentication" ) ||
 				boost::algorithm::iequals( L1it->first, "Auth" ))	{
-			if ( ! cfg. auth.parse( L1it->second, L1it->first ))
+			if ( !ConfigurationParser::parse( cfg.auth, L1it->second, L1it->first ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "Audit" ))	{
-			if ( ! cfg.audit.parse( L1it->second, L1it->first ))
+			if ( !ConfigurationParser::parse( cfg.audit, L1it->second, L1it->first ))
 				retVal = false;
 		}
 		else
@@ -73,11 +73,6 @@ bool ConfigurationParser::parse( AAAA::Configuration& cfg,
 } // namespace config
 
 namespace AAAA {
-
-bool Configuration::parse( const boost::property_tree::ptree& pt, const std::string& node )
-{
-	return config::ConfigurationParser::parse( *this, pt, node );
-}
 
 AAAAprovider::AAAAprovider( const Configuration& config )
 {
