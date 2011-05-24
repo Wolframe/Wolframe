@@ -21,7 +21,7 @@ clean_recursive:
 clean: clean_recursive clean_po local_clean
 	-@rm -f *.bak 2>/dev/null
 	-@rm -f *~ 2>/dev/null
-	-@rm -f *.d port/*.d 2>/dev/null
+	-@rm -f *.d */*.d 2>/dev/null
 	-@rm -f $(BINS) $(CPP_BINS) $(TEST_BINS) $(TEST_CPP_BINS) 2>/dev/null
 	-@rm -f $(OBJS) $(CPP_OBJS) $(BIN_OBJS) $(TEST_BIN_OBJS) $(CPP_BIN_OBJS) $(TEST_CPP_BIN_OBJS) 2>/dev/null
 	-@rm -f exec/* 2>/dev/null
