@@ -283,6 +283,16 @@ BOOST_LIBRARY_TAG ?= -mt
 endif
 endif
 
+# RHEL5
+ifeq "$(LINUX_DIST)" "redhat"
+ifeq "$(LINUX_REV)" "5"
+BOOST_DIR ?= /usr
+BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
+BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
+BOOST_LIBRARY_TAG ?=
+endif
+endif
+
 endif
 
 # OpenSSL
