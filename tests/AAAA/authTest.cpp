@@ -13,7 +13,7 @@ using namespace std;
 using namespace _Wolframe::AAAA;
 
 static void print_usage( ) {
-	cerr << "Available authentication methods: DBSQLITE3 PAM SASL TEXTFILE";
+	cerr << "Available authentication methods: DBSQLITE3 PAM SASL TEXTFILE" << endl;
 }
 
 static Authenticator* getAuthenticator( const std::string s )
