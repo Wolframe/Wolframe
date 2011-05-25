@@ -327,7 +327,10 @@ public:
 		};
 	};
 
-	TextScanner( const Iterator& p_iterator)	:input(p_iterator),val(0),cur(0),state(0) {}
+	TextScanner( const Iterator& p_iterator)	:input(p_iterator),val(0),cur(0),state(0)
+	{
+		for (unsigned int ii=0; ii<sizeof(buf); ii++) buf[ii] = 0;
+	}
 	TextScanner( const TextScanner& orig)		:val(orig.val),cur(orig.cur),state(orig.state)
 	{
 		for (unsigned int ii=0; ii<sizeof(buf); ii++) buf[ii]=orig.buf[ii];
