@@ -30,7 +30,6 @@
  Project Wolframe.
 
 ************************************************************************/
-
 //
 // thread capable pool of objects
 //
@@ -39,6 +38,7 @@
 #define _OBJECT_POOL_HPP_INCLUDED
 
 #include <vector>
+#include <stdexcept>
 
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
@@ -49,29 +49,37 @@ namespace _Wolframe	{
 	template < typename objectType >
 	class ObjectPool	{
 	public:
-		ObjectPool( const unsigned to )	{ timeout_ = to; }
-		ObjectPool()			{ timeout_ = 0; }
-		~ObjectPool()			{}
+		ObjectPool( const unsigned to )	{ m_timeout = to; }
+		ObjectPool()			{ m_timeout = 0; }
+		~ObjectPool()	{
+			boost::lock_guard<boost::mutex> lock( m_availMutex );
+			if ( !m_availList.empty() )
+				throw std::logic_error( "ObjectPool not empty at destruction" );
+		}
 
-		std::size_t available()		{ return available_.size(); }
+		std::size_t available()		{ return m_availList.size(); }
 
 		objectType* get()	{
 			while( true )	{
-				boost::unique_lock<boost::mutex> lock( mutex_ );
-				if ( !available_.empty())	{
-					objectType* obj = available_.back();
-					available_.pop_back();
+				boost::unique_lock<boost::mutex> listLock( m_availMutex );
+				if ( !m_availList.empty())	{
+					objectType* obj = m_availList.back();
+					m_availList.pop_back();
+					listLock.unlock();
 					return obj;
 				}
 				else	{
-					if ( timeout_ == 0 )	{
-						while( available_.empty() )
-							cond_.wait( lock );
+					boost::unique_lock<boost::mutex> condLock( m_condMutex );
+					listLock.unlock();
+					if ( m_timeout == 0 )	{
+						while( m_availList.empty() )
+							m_cond.wait( condLock );
 					}
 					else {
-						boost::system_time absTime = boost::get_system_time() + boost::posix_time::seconds( timeout_ );
-						while( available_.empty() )
-							if ( ! cond_.timed_wait( lock, absTime ))
+						boost::system_time absTime = boost::get_system_time()
+								+ boost::posix_time::seconds( m_timeout );
+						while( m_availList.empty() )
+							if ( ! m_cond.timed_wait( condLock, absTime ))
 								return NULL;
 					}
 				}
@@ -81,19 +89,21 @@ namespace _Wolframe	{
 
 		void add ( objectType* obj )	{
 			{
-				boost::lock_guard<boost::mutex> lock( mutex_ );
-				available_.push_back( obj );
+				boost::lock_guard<boost::mutex> lock( m_availMutex );
+				m_availList.push_back( obj );
 			}
-			cond_.notify_one();
+			m_cond.notify_one();
 		}
 
-		unsigned timeout()		{ return timeout_; }
-		void timeout( unsigned to )	{ timeout_ = to; }
+		unsigned timeout()		{ return m_timeout; }
+		void timeout( unsigned to )	{ m_timeout = to; }
 	private:
-		std::vector< objectType* >	available_;
-		boost::mutex			mutex_;
-		boost::condition_variable	cond_;
-		unsigned			timeout_;
+		std::vector< objectType* >	m_availList;	///< list (vector really) of available objects
+		boost::mutex			m_availMutex;	///< mutex for accessing available object list
+								///  (vector, actually)
+		boost::mutex			m_condMutex;	///< condition variable associated mutex
+		boost::condition_variable	m_cond;		///< the condition variable
+		unsigned			m_timeout;	///< acquire timeout
 	};
 
 } // namespace _Wolframe
