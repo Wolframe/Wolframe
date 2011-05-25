@@ -144,7 +144,7 @@ public:
 class TextFileAuth : public GlobalAuthenticatorBase
 {
 public:
-	TextFileAuth( TextFileAuthConfig& config );
+	TextFileAuth( TextFileAuthConfig& conf );
 private:
 	std::string	m_file;
 };
@@ -153,7 +153,7 @@ private:
 class DatabaseAuth : public GlobalAuthenticatorBase
 {
 public:
-	DatabaseAuth( DatabaseAuthConfig& config );
+	DatabaseAuth( DatabaseAuthConfig& conf );
 	bool resolveDB( db::DBprovider& db );
 private:
 	std::string	m_dbLabel;

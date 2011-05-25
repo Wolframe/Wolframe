@@ -65,23 +65,23 @@ std::string& Database::typeToStr( DatabaseType type )
 }
 
 
-PostgreSQLDatabase::PostgreSQLDatabase( const PostgreSQLconfig* config )
-	: Database( config->ID())
+PostgreSQLDatabase::PostgreSQLDatabase( const PostgreSQLconfig* conf )
+	: Database( conf->ID())
 {
-	LOG_NOTICE << "PostgreSQL database '" << config->ID() << "' created";
+	LOG_NOTICE << "PostgreSQL database '" << conf->ID() << "' created";
 }
 
-SQLiteDatabase::SQLiteDatabase( const SQLiteConfig* config )
-	: Database( config->ID())
+SQLiteDatabase::SQLiteDatabase( const SQLiteConfig* conf )
+	: Database( conf->ID())
 {
-	LOG_NOTICE << "SQLite database '" << config->ID() << "' created";
+	LOG_NOTICE << "SQLite database '" << conf->ID() << "' created";
 }
 
 
-DBprovider::DBprovider( const Configuration& config )
+DBprovider::DBprovider( const Configuration& conf )
 {
-	for ( std::list<DatabaseConfig*>::const_iterator it = config.dbConfig_.begin();
-							it != config.dbConfig_.end(); it++ )	{
+	for ( std::list<DatabaseConfig*>::const_iterator it = conf.dbConfig_.begin();
+							it != conf.dbConfig_.end(); it++ )	{
 		switch( (*it)->type() )	{
 		case DBTYPE_POSTGRESQL:	{
 			PostgreSQLDatabase* db = new PostgreSQLDatabase( static_cast<PostgreSQLconfig*>(*it) );

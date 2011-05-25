@@ -34,6 +34,8 @@
 // auditor implementation
 //
 
+#include <stdexcept>
+
 #include "logger.hpp"
 #include "auditor.hpp"
 #include "database.hpp"
@@ -42,29 +44,29 @@ namespace _Wolframe {
 namespace AAAA {
 
 
-FileAuditor::FileAuditor( FileAuditConfig& config )
+FileAuditor::FileAuditor( FileAuditConfig& conf )
 {
-	m_file = config.m_file;
+	m_file = conf.m_file;
 	LOG_NOTICE << "File auditor created with file '" << m_file << "'";
 }
 
 
-DatabaseAuditor::DatabaseAuditor( DatabaseAuditConfig& config )
+DatabaseAuditor::DatabaseAuditor( DatabaseAuditConfig& conf )
 {
-	switch ( config.m_dbConfig.m_dbConfig->type() )	{
+	switch ( conf.m_dbConfig.m_dbConfig->type() )	{
 	case db::DBTYPE_POSTGRESQL:	{
 		LOG_NOTICE << "Database auditor with PostgreSQL";
-		m_db = new db::PostgreSQLDatabase( static_cast<db::PostgreSQLconfig*>(config.m_dbConfig.m_dbConfig) );
+		m_db = new db::PostgreSQLDatabase( static_cast<db::PostgreSQLconfig*>(conf.m_dbConfig.m_dbConfig) );
 	}
 		break;
 	case db::DBTYPE_SQLITE:	{
 		LOG_NOTICE << "Database auditor with SQLite";
-		m_db = new db::SQLiteDatabase( static_cast<db::SQLiteConfig*>(config.m_dbConfig.m_dbConfig) );
+		m_db = new db::SQLiteDatabase( static_cast<db::SQLiteConfig*>(conf.m_dbConfig.m_dbConfig) );
 	}
 		break;
 	case db::DBTYPE_REFERENCE:	{
 		m_db = NULL;
-		m_dbLabel = ( static_cast<db::ReferenceConfig*>(config.m_dbConfig.m_dbConfig) )->m_ref;
+		m_dbLabel = ( static_cast<db::ReferenceConfig*>(conf.m_dbConfig.m_dbConfig) )->m_ref;
 		LOG_NOTICE << "Database auditor with database reference '" << m_dbLabel << "'";
 	}
 		break;

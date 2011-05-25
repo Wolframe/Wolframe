@@ -35,8 +35,8 @@
 //
 
 #include "database.hpp"
-#include "connectionBase.hpp"
 #include "config/valueParser.hpp"
+#include "config/configurationParser.hpp"
 #include "logger.hpp"
 
 #define BOOST_FILESYSTEM_VERSION 3
@@ -183,20 +183,20 @@ bool ConfigurationParser::parse( db::Configuration& cfg,
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "PostgreSQL" ))	{
-			db::PostgreSQLconfig* config = new db::PostgreSQLconfig( "PostgreSQL server", cfg.logPrefix().c_str(), "PostgreSQL" );
-			if ( ConfigurationParser::parse( *config, L1it->second, L1it->first ))
-				cfg.dbConfig_.push_back( config );
+			db::PostgreSQLconfig* conf = new db::PostgreSQLconfig( "PostgreSQL server", cfg.logPrefix().c_str(), "PostgreSQL" );
+			if ( ConfigurationParser::parse( *conf, L1it->second, L1it->first ))
+				cfg.dbConfig_.push_back( conf );
 			else	{
-				delete config;
+				delete conf;
 				retVal = false;
 			}
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "SQLite" ))	{
-			db::SQLiteConfig* config = new db::SQLiteConfig( "SQLite database", cfg.logPrefix().c_str(), "SQLite" );
-			if ( ConfigurationParser::parse( *config, L1it->second, L1it->first ))
-				cfg.dbConfig_.push_back( config );
+			db::SQLiteConfig* conf = new db::SQLiteConfig( "SQLite database", cfg.logPrefix().c_str(), "SQLite" );
+			if ( ConfigurationParser::parse( *conf, L1it->second, L1it->first ))
+				cfg.dbConfig_.push_back( conf );
 			else	{
-				delete config;
+				delete conf;
 				retVal = false;
 			}
 		}
@@ -216,11 +216,11 @@ bool ConfigurationParser::parse( db::SingleDBConfiguration& cfg,
 
 	std::string label = pt.get_value<std::string>();
 	if ( ! label.empty() )	{
-		db::ReferenceConfig* config = new db::ReferenceConfig( "Reference", cfg.logPrefix().c_str(), "reference" );
-		if ( ConfigurationParser::parse( *config, pt, node ))
-			cfg.m_dbConfig = config;
+		db::ReferenceConfig* conf = new db::ReferenceConfig( "Reference", cfg.logPrefix().c_str(), "reference" );
+		if ( ConfigurationParser::parse( *conf, pt, node ))
+			cfg.m_dbConfig = conf;
 		else	{
-			delete config;
+			delete conf;
 			retVal = false;
 		}
 	}
@@ -233,21 +233,21 @@ bool ConfigurationParser::parse( db::SingleDBConfiguration& cfg,
 			}
 			else	{
 				if ( boost::algorithm::iequals( L1it->first, "PostgreSQL" ))	{
-					db::PostgreSQLconfig* config = new db::PostgreSQLconfig( "PostgreSQL server",
+					db::PostgreSQLconfig* conf = new db::PostgreSQLconfig( "PostgreSQL server",
 											 cfg.logPrefix().c_str(), "PostgreSQL" );
-					if ( ConfigurationParser::parse( *config, L1it->second, L1it->first ))
-						cfg.m_dbConfig = config;
+					if ( ConfigurationParser::parse( *conf, L1it->second, L1it->first ))
+						cfg.m_dbConfig = conf;
 					else	{
-						delete config;
+						delete conf;
 						retVal = false;
 					}
 				}
 				else if ( boost::algorithm::iequals( L1it->first, "SQLite" ))	{
-					db::SQLiteConfig* config = new db::SQLiteConfig( "SQLite database", cfg.logPrefix().c_str(), "SQLite" );
-					if ( ConfigurationParser::parse( *config, L1it->second, L1it->first ))
-						cfg.m_dbConfig = config;
+					db::SQLiteConfig* conf = new db::SQLiteConfig( "SQLite database", cfg.logPrefix().c_str(), "SQLite" );
+					if ( ConfigurationParser::parse( *conf, L1it->second, L1it->first ))
+						cfg.m_dbConfig = conf;
 					else	{
-						delete config;
+						delete conf;
 						retVal = false;
 					}
 				}

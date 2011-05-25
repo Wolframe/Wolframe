@@ -34,6 +34,8 @@
 // authenticator implementation
 //
 
+#include <stdexcept>
+
 #include "logger.hpp"
 #include "authenticator.hpp"
 #include "database.hpp"
@@ -41,29 +43,29 @@
 namespace _Wolframe {
 namespace AAAA {
 
-TextFileAuth::TextFileAuth( TextFileAuthConfig& config )
+TextFileAuth::TextFileAuth( TextFileAuthConfig& conf )
 {
-	m_file = config.m_file;
+	m_file = conf.m_file;
 	LOG_NOTICE << "File authenticator created with file '" << m_file << "'";
 }
 
 
-DatabaseAuth::DatabaseAuth( DatabaseAuthConfig& config )
+DatabaseAuth::DatabaseAuth( DatabaseAuthConfig& conf )
 {
-	switch ( config.m_dbConfig.m_dbConfig->type() )	{
+	switch ( conf.m_dbConfig.m_dbConfig->type() )	{
 	case db::DBTYPE_POSTGRESQL:	{
 		LOG_NOTICE << "Database authenticator with PostgreSQL";
-		m_db = new db::PostgreSQLDatabase( static_cast<db::PostgreSQLconfig*>(config.m_dbConfig.m_dbConfig) );
+		m_db = new db::PostgreSQLDatabase( static_cast<db::PostgreSQLconfig*>(conf.m_dbConfig.m_dbConfig) );
 	}
 		break;
 	case db::DBTYPE_SQLITE:	{
 		LOG_NOTICE << "Database authenticator with SQLite";
-		m_db = new db::SQLiteDatabase( static_cast<db::SQLiteConfig*>(config.m_dbConfig.m_dbConfig) );
+		m_db = new db::SQLiteDatabase( static_cast<db::SQLiteConfig*>(conf.m_dbConfig.m_dbConfig) );
 	}
 		break;
 	case db::DBTYPE_REFERENCE:	{
 		m_db = NULL;
-		m_dbLabel = ( static_cast<db::ReferenceConfig*>(config.m_dbConfig.m_dbConfig) )->m_ref;
+		m_dbLabel = ( static_cast<db::ReferenceConfig*>(conf.m_dbConfig.m_dbConfig) )->m_ref;
 		LOG_NOTICE << "Database authenticator with database reference '" << m_dbLabel << "'";
 	}
 		break;

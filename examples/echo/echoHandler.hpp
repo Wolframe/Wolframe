@@ -60,9 +60,9 @@ namespace _Wolframe {
 	class ServerHandler::ServerHandlerImpl
 	{
 	public:
-		ServerHandlerImpl( const HandlerConfiguration *config )
+		ServerHandlerImpl( const HandlerConfiguration *conf )
 		{
-			timeout = config->echoConfig->timeout;
+			timeout = conf->echoConfig->timeout;
 		}
 		net::connectionHandler* newConnection( const net::LocalEndpoint& local );
 

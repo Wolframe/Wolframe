@@ -88,20 +88,20 @@ bool ConfigurationParser::parse( AAAA::AuthenticationConfiguration& cfg,
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "file" ))	{
-			AAAA::TextFileAuthConfig* config = new AAAA::TextFileAuthConfig( "File", cfg.logPrefix().c_str(), "file" );
-			if ( ConfigurationParser::parse( config, L1it->second, L1it->first ))
-				cfg.m_config.push_back( config );
+			AAAA::TextFileAuthConfig* conf = new AAAA::TextFileAuthConfig( "File", cfg.logPrefix().c_str(), "file" );
+			if ( ConfigurationParser::parse( *conf, L1it->second, L1it->first ))
+				cfg.m_config.push_back( conf );
 			else	{
-				delete config;
+				delete conf;
 				retVal = false;
 			}
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "database" ))	{
-			AAAA::DatabaseAuthConfig* config = new AAAA::DatabaseAuthConfig( "Database", cfg.logPrefix().c_str(), "database" );
-			if ( ConfigurationParser::parse( config, L1it->second, L1it->first ))
-				cfg.m_config.push_back( config );
+			AAAA::DatabaseAuthConfig* conf = new AAAA::DatabaseAuthConfig( "Database", cfg.logPrefix().c_str(), "database" );
+			if ( ConfigurationParser::parse( *conf, L1it->second, L1it->first ))
+				cfg.m_config.push_back( conf );
 			else	{
-				delete config;
+				delete conf;
 				retVal = false;
 			}
 		}

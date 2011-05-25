@@ -163,7 +163,7 @@ struct	HandlerConfiguration;
 class ServerHandler : private boost::noncopyable
 {
 public:
-	ServerHandler( const HandlerConfiguration *config );
+	ServerHandler( const HandlerConfiguration* conf );
 	~ServerHandler();
 
 	/// Create a new connection handler and return a pointer to it

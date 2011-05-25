@@ -80,8 +80,6 @@ public:
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 	void setCanonicalPathes( const std::string& referencePath );
-
-	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
 private:
 	std::string	m_file;
 };
@@ -143,7 +141,7 @@ public:
 class FileAuditor : public GlobalAuditorBase
 {
 public:
-	FileAuditor( FileAuditConfig& config );
+	FileAuditor( FileAuditConfig& conf );
 private:
 	std::string	m_file;
 };
@@ -152,7 +150,7 @@ private:
 class DatabaseAuditor : public GlobalAuditorBase
 {
 public:
-	DatabaseAuditor( DatabaseAuditConfig& config );
+	DatabaseAuditor( DatabaseAuditConfig& conf );
 	bool resolveDB( db::DBprovider& db );
 private:
 	std::string	m_dbLabel;

@@ -87,8 +87,7 @@ class server: private boost::noncopyable
 	/// public interface
 public:
 	/// Construct the server
-	explicit server( const Configuration* config,
-			 _Wolframe::ServerHandler& serverHandler );
+	explicit server( const Configuration* conf, _Wolframe::ServerHandler& serverHandler );
 
 	/// Destruct the server
 	~server();

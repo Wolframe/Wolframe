@@ -38,6 +38,7 @@
 #include "standardConfigs.hpp"
 #include "handlerConfig.hpp"
 #include "server.hpp"
+#include "config/configurationParser.hpp"
 
 namespace _Wolframe {
 namespace config {
@@ -56,16 +57,16 @@ ApplicationConfiguration::ApplicationConfiguration()
 
 	// add both sections, the parse function will select the
 	// appropriate action
-	addConfig( "service", serviceConf );
-	addConfig( "daemon", serviceConf );
+	addConfig( "service", serviceConf, &ConfigurationParser::parseBase<config::ServiceConfiguration> );
+	addConfig( "daemon", serviceConf, &ConfigurationParser::parseBase<config::ServiceConfiguration> );
 
-	addConfig( "ServerTokens", handlerConf->banner );
-	addConfig( "ServerSignature", handlerConf->banner );
+	addConfig( "ServerTokens", handlerConf->banner, &ConfigurationParser::parseBase<config::ServiceBanner> );
+	addConfig( "ServerSignature", handlerConf->banner, &ConfigurationParser::parseBase<config::ServiceBanner> );
 
-	addConfig( "listen", serverConf );
-	addConfig( "logging", loggerConf );
-	addConfig( "database", handlerConf->database );
-	addConfig( "aaaa", handlerConf->aaaa );
+	addConfig( "listen", serverConf, &ConfigurationParser::parseBase<net::Configuration> );
+	addConfig( "logging", loggerConf, &ConfigurationParser::parseBase<log::LoggerConfiguration> );
+	addConfig( "database", handlerConf->database, &ConfigurationParser::parseBase<db::Configuration> );
+	addConfig( "aaaa", handlerConf->aaaa, &ConfigurationParser::parseBase<AAAA::Configuration> );
 }
 
 

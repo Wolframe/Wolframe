@@ -209,7 +209,7 @@ net::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const n
 }
 
 /// Outside face of the PIMPL
-ServerHandler::ServerHandler( const HandlerConfiguration *config ) : impl_( new ServerHandlerImpl( config ) )	{}
+ServerHandler::ServerHandler( const HandlerConfiguration *conf ) : impl_( new ServerHandlerImpl( conf ) )	{}
 
 ServerHandler::~ServerHandler()	{ delete impl_; }
 

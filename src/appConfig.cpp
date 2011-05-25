@@ -83,7 +83,8 @@ const char* ApplicationConfiguration::chooseFile( const char *globalFile, const 
 }
 
 
-bool ApplicationConfiguration::addConfig( const std::string& nodeName, ConfigurationBase *config )
+bool ApplicationConfiguration::addConfig( const std::string& nodeName, ConfigurationBase* conf,
+					  ParseFunc_t parseFunc )
 {
 	// check if the label already exists
 	if ( m_section.find( nodeName ) != m_section.end() )
@@ -94,14 +95,15 @@ bool ApplicationConfiguration::addConfig( const std::string& nodeName, Configura
 	std::size_t pos = 0;
 	bool found = false;
 	for( ; it != m_conf.end(); it++, pos++ )	{
-		if ( *it == config )	{
+		if ( *it == conf )	{
 			found = true;
 			break;
 		}
 	}
 	if ( !found )	{
 		pos = m_conf.size();
-		m_conf.push_back( config );
+		m_conf.push_back( conf );
+		m_parse.push_back( parseFunc  );
 	}
 	m_section[ nodeName ] = pos;
 
@@ -177,7 +179,8 @@ bool ApplicationConfiguration::parse ( const char *filename, ConfigFileType type
 				continue;
 			std::map< std::string, std::size_t >::iterator confIt;
 			if (( confIt = m_section.find( it->first ) ) != m_section.end() )	{
-				if ( !ConfigurationParser::parse( *(m_conf[ confIt->second ]), it->second, confIt->first ))
+				if ( ! m_parse[confIt->second]( *(m_conf[confIt->second]),
+								  it->second, confIt->first ))
 					retVal = false;
 			}
 			else	{

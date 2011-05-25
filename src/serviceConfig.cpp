@@ -36,6 +36,7 @@
 
 #include "standardConfigs.hpp"
 #include "config/valueParser.hpp"
+#include "config/configurationParser.hpp"
 #include "appProperties.hpp"
 #include "logger.hpp"
 

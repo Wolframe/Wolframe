@@ -46,7 +46,7 @@ namespace _Wolframe {
 	class wolframeHandler
 	{
 	public:
-		wolframeHandler( const HandlerConfiguration* config );
+		wolframeHandler( const HandlerConfiguration* conf );
 		~wolframeHandler();
 
 		const std::string& banner() const	{ return m_banner; }
@@ -119,7 +119,7 @@ namespace _Wolframe {
 	class ServerHandler::ServerHandlerImpl
 	{
 	public:
-		ServerHandlerImpl( const HandlerConfiguration *config );
+		ServerHandlerImpl( const HandlerConfiguration* conf );
 		~ServerHandlerImpl();
 		net::connectionHandler* newConnection( const net::LocalEndpoint& local );
 	private:

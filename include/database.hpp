@@ -187,7 +187,7 @@ public:
 class PostgreSQLDatabase : public Database
 {
 public:
-	PostgreSQLDatabase( const PostgreSQLconfig* config );
+	PostgreSQLDatabase( const PostgreSQLconfig* conf );
 	~PostgreSQLDatabase()				{}
 
 	DatabaseType type() const			{ return DBTYPE_POSTGRESQL; }
@@ -198,7 +198,7 @@ private:
 class SQLiteDatabase : public Database
 {
 public:
-	SQLiteDatabase( const SQLiteConfig* config );
+	SQLiteDatabase( const SQLiteConfig* conf );
 	~SQLiteDatabase()				{}
 
 	DatabaseType type() const			{ return DBTYPE_SQLITE; }
@@ -209,7 +209,7 @@ private:
 class DBprovider
 {
 public:
-	DBprovider( const Configuration& config );
+	DBprovider( const Configuration& conf );
 	~DBprovider();
 
 	Database* database( std::string& ID ) const;

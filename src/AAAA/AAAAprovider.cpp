@@ -36,6 +36,7 @@
 
 #include "AAAAprovider.hpp"
 #include "config/configurationBase.hpp"
+#include "config/configurationParser.hpp"
 #include "logger.hpp"
 
 #include <boost/property_tree/ptree.hpp>
@@ -74,10 +75,10 @@ bool ConfigurationParser::parse( AAAA::Configuration& cfg,
 
 namespace AAAA {
 
-AAAAprovider::AAAAprovider( const Configuration& config )
+AAAAprovider::AAAAprovider( const Configuration& conf )
 {
-	for ( std::list<AuthenticationConfigBase*>::const_iterator it = config.auth.m_config.begin();
-							it != config.auth.m_config.end(); it++ )	{
+	for ( std::list<AuthenticationConfigBase*>::const_iterator it = conf.auth.m_config.begin();
+							it != conf.auth.m_config.end(); it++ )	{
 		switch( (*it)->type() )	{
 		case AUTH_DATABASE:	{
 			DatabaseAuth* auth = new DatabaseAuth( static_cast<DatabaseAuthConfig&>(**it) );
@@ -100,8 +101,8 @@ AAAAprovider::AAAAprovider( const Configuration& config )
 		}
 	}
 
-	for ( std::list<AuditConfigBase*>::const_iterator it = config.audit.m_config.begin();
-							it != config.audit.m_config.end(); it++ )	{
+	for ( std::list<AuditConfigBase*>::const_iterator it = conf.audit.m_config.begin();
+							it != conf.audit.m_config.end(); it++ )	{
 		switch( (*it)->type() )	{
 		case AUDIT_FILE:	{
 			FileAuditor* auditor = new FileAuditor( static_cast<FileAuditConfig&>(**it) );

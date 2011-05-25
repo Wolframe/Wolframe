@@ -34,11 +34,11 @@
 // iprocHandler class unit tests using google test framework (gTest)
 //
 
-
 #include "iprocHandler.hpp"
 #include "connectionHandler.hpp"
 #include "langbind/luaConfig.hpp"
 #include "handlerConfig.hpp"
+#include "config/configurationParser.hpp"
 #include "testHandlerTemplates.hpp"
 #include <gtest/gtest.h>
 #include <stdlib.h>
@@ -60,7 +60,8 @@ struct TestConfiguration :public lua::Configuration
 		pt.put("input_buffer", boost::lexical_cast<std::string>( bufferSizeOutput));
 		pt.put("output_buffer", boost::lexical_cast<std::string>( bufferSizeInput));
 		setCanonicalPathes( ".");
-		if (!parse( pt, "test")) throw std::logic_error( "Bad Configuration");
+		if (!config::ConfigurationParser::parse<lua::Configuration>( *this, pt, "test"))
+			throw std::logic_error( "Bad Configuration");
 		setCanonicalPathes( ".");
 	}
 };
@@ -101,31 +102,31 @@ struct TestDescription
 	unsigned int outputBufferSize;
 	std::string content;
 
-	TestDescription() :inputBufferSize(InputBufferSize),outputBufferSize(OutputBufferSize) {};
+	TestDescription() :inputBufferSize(InputBufferSize),outputBufferSize(OutputBufferSize) {}
 };
 
 template <unsigned int InputBufferSize, unsigned int OutputBufferSize>
 struct Empty :public TestDescription<InputBufferSize,OutputBufferSize>
 {
-	Empty() {};
+	Empty() {}
 };
 template <unsigned int InputBufferSize, unsigned int OutputBufferSize>
 struct OneEmptyLine :public TestDescription<InputBufferSize,OutputBufferSize>
 {
 	typedef TestDescription<InputBufferSize,OutputBufferSize> ThisTestDescription;
-	OneEmptyLine() { ThisTestDescription::content.append("\r\n");};
+	OneEmptyLine() { ThisTestDescription::content.append("\r\n");}
 };
 template <unsigned int InputBufferSize, unsigned int OutputBufferSize>
 struct OneOneCharLine :public TestDescription<InputBufferSize,OutputBufferSize>
 {
 	typedef TestDescription<InputBufferSize,OutputBufferSize> ThisTestDescription;
-	OneOneCharLine() { ThisTestDescription::content.append("?\r\n");};
+	OneOneCharLine() { ThisTestDescription::content.append("?\r\n");}
 };
 template <unsigned int InputBufferSize, unsigned int OutputBufferSize>
 struct OneLine :public TestDescription<InputBufferSize,OutputBufferSize>
 {
 	typedef TestDescription<InputBufferSize,OutputBufferSize> ThisTestDescription;
-	OneLine() { ThisTestDescription::content.append("Hello world!\r\n");};
+	OneLine() { ThisTestDescription::content.append("Hello world!\r\n");}
 };
 template <unsigned int InputBufferSize, unsigned int OutputBufferSize, unsigned int MaxNofLines, unsigned int MaxStringSize=4096>
 struct Random :public TestDescription<InputBufferSize,OutputBufferSize>

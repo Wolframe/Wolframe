@@ -42,6 +42,7 @@
 
 #include <string>
 #include <boost/property_tree/ptree.hpp>
+#include "config/configurationBase.hpp"
 
 namespace _Wolframe {
 namespace config {
@@ -54,10 +55,16 @@ public:
 	///\param[in]	nodeName	the label of the node. It should be
 	///				the same (case insensitive) as it->first
 	template<typename T>
-	static bool parse( T& config,
+	static bool parse( T& configuration,
 			   const boost::property_tree::ptree& pt, const std::string& nodeName );
+	template<typename T>
+	static bool parseBase( ConfigurationBase& configuration,
+			       const boost::property_tree::ptree& pt, const std::string& nodeName )
+	{
+		return parse( dynamic_cast<T&>( configuration ), pt, nodeName );
+	}
 };
 
 }} // namespace _Wolframe::config
 
-#endif // _CONFIG_PARSER_BASE_HPP_INCLUDED
+#endif // _CONFIG_PARSER_HPP_INCLUDED

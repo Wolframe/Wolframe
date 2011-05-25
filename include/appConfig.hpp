@@ -38,6 +38,7 @@
 #define _APP_CONFIG_HPP_INCLUDED
 
 #include "config/configurationBase.hpp"
+#include "config/configurationParser.hpp"
 
 #include <cstddef>
 #include <string>
@@ -57,6 +58,8 @@ namespace config	{
 struct ServiceConfiguration;
 struct LoggerConfiguration;
 struct CmdLineConfig;		// forward declaration for the command line structure
+
+typedef bool (*ParseFunc_t)( ConfigurationBase&, const boost::property_tree::ptree&, const std::string& );
 
 /// application configuration structure
 struct ApplicationConfiguration	{
@@ -97,9 +100,10 @@ private:
 	ConfigFileType				m_type;
 	bool					m_forced;
 	std::vector< ConfigurationBase* >	m_conf;
+	std::vector< ParseFunc_t >		m_parse;
 	std::map< std::string, std::size_t >	m_section;
 
-	bool addConfig( const std::string& nodeName, ConfigurationBase *config );
+	bool addConfig( const std::string& nodeName, ConfigurationBase* conf, ParseFunc_t parseFunc );
 };
 
 } // namespace config

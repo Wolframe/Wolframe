@@ -37,10 +37,11 @@
 #include <string>
 #include <ostream>
 
-#include "config/configurationParser.hpp"
-
 namespace _Wolframe {
-namespace config	{
+namespace config {
+
+// forward definition for friends :)
+class ConfigurationParser;
 
 class ConfigurationBase
 {

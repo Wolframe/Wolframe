@@ -52,14 +52,14 @@ ApplicationConfiguration::ApplicationConfiguration()
 
 	handlerConf = new _Wolframe::HandlerConfiguration();
 
-	// add both, the parse function will select the
+	// add sections, the parse function will select the
 	// appropriate action
-	addConfig( "service", serviceConf );
-	addConfig( "daemon", serviceConf );
+	addConfig( "service", serviceConf, &ConfigurationParser::parseBase<config::ServiceConfiguration> );
+	addConfig( "daemon", serviceConf, &ConfigurationParser::parseBase<config::ServiceConfiguration> );
 
-	addConfig( "listen", serverConf );
-	addConfig( "logging", loggerConf );
-	addConfig( "timeout", handlerConf->echoConfig );
+	addConfig( "listen", serverConf, &ConfigurationParser::parseBase<net::Configuration> );
+	addConfig( "logging", loggerConf, &ConfigurationParser::parseBase<log::LoggerConfiguration> );
+	addConfig( "timeout", handlerConf->echoConfig, &ConfigurationParser::parseBase<EchoConfiguration> );
 }
 
 ApplicationConfiguration::~ApplicationConfiguration()

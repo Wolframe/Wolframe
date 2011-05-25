@@ -47,14 +47,14 @@
 namespace _Wolframe {
 namespace net	{
 
-server::server( const Configuration* config, _Wolframe::ServerHandler& serverHandler )
-	: threadPoolSize_( config->threads ),
+server::server( const Configuration* conf, _Wolframe::ServerHandler& serverHandler )
+	: threadPoolSize_( conf->threads ),
 	  IOservice_(),
-	  globalList_( config->maxConnections )
+	  globalList_( conf->maxConnections )
 {
 	int i = 0;
-	for ( std::list<ServerTCPendpoint>::const_iterator it = config->address.begin();
-	      it != config->address.end(); it++ )	{
+	for ( std::list<ServerTCPendpoint>::const_iterator it = conf->address.begin();
+	      it != conf->address.end(); it++ )	{
 		acceptor* acptr = new acceptor( IOservice_,
 						it->host(), it->port(), it->maxConnections(),
 						globalList_,
@@ -65,8 +65,8 @@ server::server( const Configuration* config, _Wolframe::ServerHandler& serverHan
 	LOG_DEBUG << i << " network acceptor(s) created.";
 #ifdef WITH_SSL
 	i = 0;
-	for ( std::list<ServerSSLendpoint>::const_iterator it = config->SSLaddress.begin();
-	      it != config->SSLaddress.end(); it++ )	{
+	for ( std::list<ServerSSLendpoint>::const_iterator it = conf->SSLaddress.begin();
+	      it != conf->SSLaddress.end(); it++ )	{
 		SSLacceptor* acptr = new SSLacceptor( IOservice_,
 						      it->certificate(), it->key(),
 						      it->verifyClientCert(),
