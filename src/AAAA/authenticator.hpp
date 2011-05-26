@@ -137,14 +137,15 @@ private:
 class GlobalAuthenticatorBase
 {
 public:
-	virtual bool resolveDB( db::DBprovider& /*db*/ )	{ return true; }
-
+	virtual	~GlobalAuthenticatorBase()			{}
+	virtual bool resolveDB( const db::DBprovider& /*db*/ )	{ return true; }
 };
 
 class TextFileAuth : public GlobalAuthenticatorBase
 {
 public:
-	TextFileAuth( TextFileAuthConfig& conf );
+	TextFileAuth( const TextFileAuthConfig& conf );
+	~TextFileAuth()						{}
 private:
 	std::string	m_file;
 };
@@ -153,11 +154,13 @@ private:
 class DatabaseAuth : public GlobalAuthenticatorBase
 {
 public:
-	DatabaseAuth( DatabaseAuthConfig& conf );
-	bool resolveDB( db::DBprovider& db );
+	DatabaseAuth( const DatabaseAuthConfig& conf );
+	~DatabaseAuth();
+
+	bool resolveDB( const db::DBprovider& db );
 private:
-	std::string	m_dbLabel;
-	db::Database*	m_db;
+	std::string		m_dbLabel;
+	const db::Database*	m_db;
 };
 
 }} // namespace _Wolframe::AAAA

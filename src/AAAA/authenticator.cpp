@@ -43,14 +43,14 @@
 namespace _Wolframe {
 namespace AAAA {
 
-TextFileAuth::TextFileAuth( TextFileAuthConfig& conf )
+TextFileAuth::TextFileAuth( const TextFileAuthConfig& conf )
 {
 	m_file = conf.m_file;
 	LOG_NOTICE << "File authenticator created with file '" << m_file << "'";
 }
 
 
-DatabaseAuth::DatabaseAuth( DatabaseAuthConfig& conf )
+DatabaseAuth::DatabaseAuth( const DatabaseAuthConfig& conf )
 {
 	switch ( conf.m_dbConfig.m_dbConfig->type() )	{
 	case db::DBTYPE_POSTGRESQL:	{
@@ -74,7 +74,18 @@ DatabaseAuth::DatabaseAuth( DatabaseAuthConfig& conf )
 	}
 }
 
-bool DatabaseAuth::resolveDB( db::DBprovider& db )
+DatabaseAuth::~DatabaseAuth()
+{
+	if ( m_dbLabel.empty() )	{	// it's not a reference
+		if ( m_db )
+			delete m_db;
+		else
+			throw std::logic_error( "No database in DatabaseAuth" );
+	}
+}
+
+
+bool DatabaseAuth::resolveDB( const db::DBprovider& db )
 {
 	if ( m_db == NULL && ! m_dbLabel.empty() )	{
 		m_db = db.database( m_dbLabel );
