@@ -146,7 +146,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	$(LOGGER_OBJS) \
 	serviceConfig.o \
 	serviceBanner.o \
-	databaseConfig.o \
+	database/databaseConfig.o \
 	appConfig.o \
 	protocol_ioblocks.o \
 	acceptor.o \
@@ -168,7 +168,7 @@ OBJS = \
 	appProperties.o \
 	appConfigDefinition.o \
 	wolframeHandler.o \
-	database.o \
+	database/database.o \
 	posixMain.o
 
 CPP_BINS = \

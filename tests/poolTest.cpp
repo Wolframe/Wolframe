@@ -35,6 +35,7 @@
 //
 
 #include <cstdlib>
+#include <cassert>
 #include <boost/thread/thread.hpp>
 
 #include "objectPool.hpp"
@@ -44,13 +45,22 @@
 class testObject	{
 public:
 	testObject()		{ threads = 0, uses = 0; }
-	void doSomething()	{ threads++, uses++;
-				  threads--;
-				}
-	void sleepSomething()	{ threads++, uses++;
-				  boost::this_thread::sleep( boost::posix_time::microseconds( 100 ) );
-				  threads--;
-				}
+	void doSomething()	{
+		assert( threads == 0 );
+		threads++, uses++;
+		assert( threads == 1 );
+		threads--;
+		assert( threads == 0 );
+	}
+	void sleepSomething()	{
+		assert( threads == 0 );
+		threads++, uses++;
+		assert( threads == 1 );
+		boost::this_thread::sleep( boost::posix_time::microseconds( rand() % 150 ));
+		assert( threads == 1 );
+		threads--;
+		assert( threads == 0 );
+	}
 	bool unused()		{ return threads == 0; }
 	unsigned long used()	{ return uses; }
 private:

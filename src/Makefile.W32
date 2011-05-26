@@ -81,7 +81,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	$(LOGGER_OBJS) \
 	serviceConfig.obj \
 	serviceBanner.obj \
-	databaseConfig.obj \
+	database\databaseConfig.obj \
 	appConfig.obj \
 	protocol_ioblocks.obj \
 	acceptor.obj \
@@ -104,7 +104,7 @@ OBJS = \
 	appProperties.obj \
 	appConfigDefinition.obj \
 	wolframeHandler.obj \
-	database.obj \
+	database/database.obj \
 	winMain.obj
 
 CPP_BINS = \

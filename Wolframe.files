@@ -92,7 +92,9 @@ examples/echo/Makefile.W32
 examples/GNUmakefile
 examples/iproc/appConfigDefinition.cpp
 examples/iproc/appProperties.cpp
-examples/iproc/filters/char_isolatin1.hpp
+examples/iproc/filters/char_filter.hpp
+examples/iproc/filters/filterBase.hpp
+examples/iproc/filters.hpp
 examples/iproc/filters/textwolf.hpp
 examples/iproc/filters/xml_filter.hpp
 examples/iproc/GNUmakefile
@@ -292,8 +294,8 @@ src/commandLine.hpp
 src/connectionBase.hpp
 src/connection.cpp
 src/connection.hpp
-src/databaseConfig.cpp
-src/database.cpp
+src/database/databaseConfig.cpp
+src/database/database.cpp
 src/exceptionBase.hpp
 src/getPassword.cpp
 src/getPassword.hpp
