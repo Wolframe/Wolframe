@@ -80,8 +80,8 @@ SQLiteDatabase::SQLiteDatabase( const SQLiteConfig* conf )
 
 DBprovider::DBprovider( const Configuration& conf )
 {
-	for ( std::list<DatabaseConfig*>::const_iterator it = conf.dbConfig_.begin();
-							it != conf.dbConfig_.end(); it++ )	{
+	for ( std::list<DatabaseConfig*>::const_iterator it = conf.m_dbConfig.begin();
+							it != conf.m_dbConfig.end(); it++ )	{
 		switch( (*it)->type() )	{
 		case DBTYPE_POSTGRESQL:	{
 			PostgreSQLDatabase* db = new PostgreSQLDatabase( static_cast<PostgreSQLconfig*>(*it) );
@@ -103,15 +103,16 @@ DBprovider::DBprovider( const Configuration& conf )
 
 DBprovider::~DBprovider()
 {
-	for ( std::list<Database*>::const_iterator it = m_db.begin();
-								it != m_db.end(); it++ )
+	for ( std::list< Database* >::const_iterator it = m_db.begin();
+							it != m_db.end(); it++ )
 		delete *it;
 }
 
 
-Database* DBprovider::database( std::string& id ) const
+const Database* DBprovider::database( std::string& id ) const
 {
-	for ( std::list<Database*>::const_iterator it = m_db.begin(); it != m_db.end(); it++ )	{
+	for ( std::list< Database* >::const_iterator it = m_db.begin();
+							it != m_db.end(); it++ )	{
 		if ( (*it)->ID() == id )
 			return *it;
 	}

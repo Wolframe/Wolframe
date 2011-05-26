@@ -134,14 +134,16 @@ private:
 class GlobalAuditorBase
 {
 public:
-	virtual bool resolveDB( db::DBprovider& /*db*/ )	{ return true; }
+	virtual ~GlobalAuditorBase()				{}
+	virtual bool resolveDB( const db::DBprovider& /*db*/ )	{ return true; }
 };
 
 
 class FileAuditor : public GlobalAuditorBase
 {
 public:
-	FileAuditor( FileAuditConfig& conf );
+	FileAuditor( const FileAuditConfig& conf );
+	~FileAuditor()						{}
 private:
 	std::string	m_file;
 };
@@ -150,11 +152,13 @@ private:
 class DatabaseAuditor : public GlobalAuditorBase
 {
 public:
-	DatabaseAuditor( DatabaseAuditConfig& conf );
-	bool resolveDB( db::DBprovider& db );
+	DatabaseAuditor( const DatabaseAuditConfig& conf );
+	~DatabaseAuditor();
+
+	bool resolveDB( const db::DBprovider& db );
 private:
-	std::string	m_dbLabel;
-	db::Database*	m_db;
+	std::string		m_dbLabel;
+	const db::Database*	m_db;
 };
 
 }} // namespace _Wolframe::AAAA
