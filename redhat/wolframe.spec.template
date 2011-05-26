@@ -50,6 +50,8 @@ Requires: pam >= 0.99
 BuildRequires: cyrus-sasl-devel >= 2.1.22
 Requires: cyrus-sasl-lib >= 2.1.22
 %endif
+BuildRequires: gcc-c++
+BuildRequires: doxygen
 
 Distribution: rhel5
 Vendor: Wolframe team
