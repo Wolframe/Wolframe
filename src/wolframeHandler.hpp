@@ -38,7 +38,7 @@
 #define _Wolframe_HANDLER_HPP_INCLUDED
 
 #include "connectionHandler.hpp"
-#include "database.hpp"
+#include "database/database.hpp"
 #include "AAAA/AAAAprovider.hpp"
 
 namespace _Wolframe {

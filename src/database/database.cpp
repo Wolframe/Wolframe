@@ -34,8 +34,10 @@
 // database.cpp
 //
 
-#include "database.hpp"
-#include "standardConfigs.hpp"
+#include "database/database.hpp"
+#include "database/PostgreSQL.hpp"
+
+//#include "standardConfigs.hpp"
 #include "logger.hpp"
 
 #include <boost/algorithm/string.hpp>
@@ -64,12 +66,6 @@ std::string& Database::typeToStr( DatabaseType type )
 	}
 }
 
-
-PostgreSQLDatabase::PostgreSQLDatabase( const PostgreSQLconfig* conf )
-	: Database( conf->ID())
-{
-	LOG_NOTICE << "PostgreSQL database '" << conf->ID() << "' created";
-}
 
 SQLiteDatabase::SQLiteDatabase( const SQLiteConfig* conf )
 	: Database( conf->ID())

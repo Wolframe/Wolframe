@@ -40,7 +40,7 @@
 #include <string>
 #include "config/configurationBase.hpp"
 
-#include "database.hpp"
+#include "database/database.hpp"
 
 namespace _Wolframe {
 namespace AAAA {

@@ -31,43 +31,19 @@
 
 ************************************************************************/
 //
-// handlerConfig.hpp
+// Wolframe PostgreSQL client view
 //
 
-#ifndef _HANDLERCONFIG_HPP_INCLUDED
-#define _HANDLERCONFIG_HPP_INCLUDED
-
-#include "standardConfigs.hpp"
-#include "database/database.hpp"
-#include "AAAA/AAAAprovider.hpp"
+#include "database/PostgreSQL.hpp"
 
 namespace _Wolframe {
+namespace db {
 
-	/// Wolframe handler configuration structure
-	struct HandlerConfiguration
-	{
-	public:
-		db::Configuration	*database;
-		config::ServiceBanner	*banner;
-		AAAA::Configuration	*aaaa;
+PostgreSQLDatabase::PostgreSQLDatabase( const PostgreSQLconfig* conf )
+	: Database( conf->ID())
+{
+	LOG_NOTICE << "PostgreSQL database '" << conf->ID() << "' created";
+}
 
-		/// constructor
-		HandlerConfiguration()
-		{
-			banner = new config::ServiceBanner();
-			database = new db::Configuration();
-			aaaa = new AAAA::Configuration();
-		}
+}} // _Wolframe::db
 
-		~HandlerConfiguration()
-		{
-			if ( banner ) delete banner;
-			if ( database ) delete database;
-			if ( aaaa ) delete aaaa;
-		}
-	};
-
-
-} // namespace _Wolframe
-
-#endif // _HANDLERCONFIG_HPP_INCLUDED

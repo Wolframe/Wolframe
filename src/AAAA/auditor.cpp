@@ -37,8 +37,10 @@
 #include <stdexcept>
 
 #include "logger.hpp"
-#include "auditor.hpp"
-#include "database.hpp"
+#include "AAAA/auditor.hpp"
+
+#include "database/database.hpp"
+#include "database/PostgreSQL.hpp"
 
 namespace _Wolframe {
 namespace AAAA {

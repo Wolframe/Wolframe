@@ -38,8 +38,8 @@
 #include "config/valueParser.hpp"
 #include "config/configurationBase.hpp"
 #include "config/configurationParser.hpp"
-#include "auditor.hpp"
-#include "database.hpp"
+#include "AAAA/auditor.hpp"
+#include "database/database.hpp"
 
 #include "boost/algorithm/string.hpp"
 #define BOOST_FILESYSTEM_VERSION 3

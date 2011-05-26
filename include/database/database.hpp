@@ -41,8 +41,8 @@
 #include "config/configurationBase.hpp"
 #include "logger.hpp"
 
-namespace _Wolframe	{
-namespace db	{
+namespace _Wolframe {
+namespace db {
 
 /// database type
 enum DatabaseType	{
@@ -52,7 +52,7 @@ enum DatabaseType	{
 };
 
 
-class	DatabaseConfig : public _Wolframe::config::ConfigurationBase
+class	DatabaseConfig : public config::ConfigurationBase
 {
 public:
 	DatabaseConfig( const char* name, const char* logParent, const char* logName )
@@ -64,27 +64,6 @@ public:
 	const std::string& ID() const			{ return m_ID; }
 private:
 	std::string		m_ID;
-};
-
-
-/// PostgreSQL server connection configuration
-struct	PostgreSQLconfig : public DatabaseConfig
-{
-	std::string	host;
-	unsigned short	port;
-	std::string	dbName;
-	std::string	user;
-	std::string	password;
-	unsigned short	connections;
-	unsigned short	acquireTimeout;
-public:
-	DatabaseType type() const			{ return DBTYPE_POSTGRESQL; }
-
-	PostgreSQLconfig( const char* name, const char* logParent, const char* logName );
-	~PostgreSQLconfig()				{}
-
-	bool check() const;
-	void print( std::ostream& os, size_t indent ) const;
 };
 
 
@@ -158,6 +137,28 @@ public:
 
 
 /// database base classes
+class _DatabaseRequest_
+{
+	virtual ~_DatabaseRequest_()			{}
+};
+
+class _DatabaseAnswer_
+{
+	virtual ~_DatabaseAnswer_()			{}
+};
+
+
+class _DatabaseChannel_
+{
+public:
+	_DatabaseChannel_()				{}
+	~_DatabaseChannel_()				{}
+
+	void close()					{}
+	void doDBstuff( _DatabaseRequest_&, _DatabaseAnswer_&){}
+};
+
+
 class Database
 {
 public:
@@ -169,29 +170,10 @@ public:
 
 	static DatabaseType strToType( const char *str );
 	static std::string& typeToStr( DatabaseType type );
+
+	const _DatabaseChannel_* channel() const	{ return NULL; }
 private:
 	const std::string	m_id;
-};
-
-
-class _DatabaseChannel_
-{
-public:
-	_DatabaseChannel_()				{}
-	~_DatabaseChannel_()				{}
-
-	void close()					{}
-};
-
-
-class PostgreSQLDatabase : public Database
-{
-public:
-	PostgreSQLDatabase( const PostgreSQLconfig* conf );
-	~PostgreSQLDatabase()				{}
-
-	DatabaseType type() const			{ return DBTYPE_POSTGRESQL; }
-private:
 };
 
 
@@ -213,9 +195,6 @@ public:
 	~DBprovider();
 
 	const Database* database( std::string& ID ) const;
-
-	_DatabaseChannel_* channel() const		{ return NULL; }
-
 private:
 	std::list<Database*>	m_db;
 };

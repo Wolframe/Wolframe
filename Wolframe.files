@@ -144,6 +144,12 @@ examples/pecho/tests/pechoHandlerTest.cpp
 examples/pecho/tests/testHandlerTemplates.hpp
 examples/xmlselect/xmlIterator.cpp
 examples/xmlselect/xmlIterator.hpp
+experimental/include/config/descriptionBase.hpp
+experimental/include/config/description.hpp
+experimental/include/config/structParser.hpp
+experimental/include/config/traits.hpp
+experimental/src/config_descriptionBase.cpp
+experimental/tests/configStructParser.cpp
 GNUmakefile
 gtest/GNUmakefile
 gtest/include/gtest/gtest-death-test.h
@@ -178,7 +184,7 @@ include/config/configurationParser.hpp
 include/config/valueParser.hpp
 include/connectionEndpoint.hpp
 include/connectionHandler.hpp
-include/database.hpp
+include/database/database.hpp
 include/ErrorCodes.hpp
 include/GNUmakefile
 include/logger.hpp
@@ -284,8 +290,6 @@ src/AAAA/authentication_textfile.cpp
 src/AAAA/authentication_textfile.hpp
 src/AAAA/authenticator.cpp
 src/AAAA/authenticator.hpp
-src/AAAA/sqlite3.c
-src/AAAA/sqlite3.h
 src/acceptor.cpp
 src/acceptor.hpp
 src/appConfig.cpp
@@ -299,6 +303,8 @@ src/connection.cpp
 src/connection.hpp
 src/database/databaseConfig.cpp
 src/database/database.cpp
+src/database/sqlite3.c
+src/database/sqlite3.h
 src/exceptionBase.hpp
 src/getPassword.cpp
 src/getPassword.hpp
@@ -368,3 +374,6 @@ windows/wolframe.xml
 XML/configuration.rng
 XML/database.rng
 XML/logging.rng
+src/database/postgresConfig.cpp
+include/database/PostgreSQL.hpp
+src/database/PostgreSQL.cpp

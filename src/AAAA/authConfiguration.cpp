@@ -38,7 +38,8 @@
 #include "config/valueParser.hpp"
 #include "config/configurationParser.hpp"
 #include "authenticator.hpp"
-#include "database.hpp"
+
+#include "database/database.hpp"
 
 #include "boost/algorithm/string.hpp"
 #define BOOST_FILESYSTEM_VERSION 3

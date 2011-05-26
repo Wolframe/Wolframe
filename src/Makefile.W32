@@ -111,7 +111,9 @@ OBJS = \
 	appProperties.obj \
 	appConfigDefinition.obj \
 	wolframeHandler.obj \
-	database/database.obj \
+	database\database.obj \
+	database\PostgreSQL.obj \
+	database\postgresConfig.obj \
 	winMain.obj
 
 CPP_BINS = \

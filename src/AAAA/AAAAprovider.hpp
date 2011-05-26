@@ -38,9 +38,9 @@
 #define _AAAA_PROVIDER_HPP_INCLUDED
 
 #include "config/configurationBase.hpp"
-#include "auditor.hpp"
+#include "AAAA/auditor.hpp"
 #include "authenticator.hpp"
-#include "database.hpp"
+#include "database/database.hpp"
 
 #include <string>
 #include <list>

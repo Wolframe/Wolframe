@@ -38,7 +38,9 @@
 
 #include "logger.hpp"
 #include "authenticator.hpp"
-#include "database.hpp"
+
+#include "database/database.hpp"
+#include "database/PostgreSQL.hpp"
 
 namespace _Wolframe {
 namespace AAAA {

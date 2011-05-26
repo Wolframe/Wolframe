@@ -38,7 +38,7 @@
 #define _AUDITOR_HPP_INCLUDED
 
 #include "config/configurationBase.hpp"
-#include "database.hpp"
+#include "database/database.hpp"
 
 #include <string>
 #include <list>

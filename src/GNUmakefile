@@ -172,6 +172,8 @@ OBJS = \
 	appConfigDefinition.o \
 	wolframeHandler.o \
 	database/database.o \
+	database/PostgreSQL.o \
+	database/postgresConfig.o \
 	posixMain.o
 
 CPP_BINS = \

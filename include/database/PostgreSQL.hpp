@@ -31,43 +31,48 @@
 
 ************************************************************************/
 //
-// handlerConfig.hpp
+// Wolframe PostgreSQL client view
 //
 
-#ifndef _HANDLERCONFIG_HPP_INCLUDED
-#define _HANDLERCONFIG_HPP_INCLUDED
-
-#include "standardConfigs.hpp"
 #include "database/database.hpp"
-#include "AAAA/AAAAprovider.hpp"
+#include "config/configurationBase.hpp"
+
+#ifndef _POSTGRESQL_HPP_INCLUDED
+#define _POSTGRESQL_HPP_INCLUDED
 
 namespace _Wolframe {
+namespace db {
 
-	/// Wolframe handler configuration structure
-	struct HandlerConfiguration
-	{
-	public:
-		db::Configuration	*database;
-		config::ServiceBanner	*banner;
-		AAAA::Configuration	*aaaa;
+/// PostgreSQL server connection configuration
+struct	PostgreSQLconfig : public DatabaseConfig
+{
+	std::string	host;
+	unsigned short	port;
+	std::string	dbName;
+	std::string	user;
+	std::string	password;
+	unsigned short	connections;
+	unsigned short	acquireTimeout;
+public:
+	DatabaseType type() const			{ return DBTYPE_POSTGRESQL; }
 
-		/// constructor
-		HandlerConfiguration()
-		{
-			banner = new config::ServiceBanner();
-			database = new db::Configuration();
-			aaaa = new AAAA::Configuration();
-		}
+	PostgreSQLconfig( const char* name, const char* logParent, const char* logName );
+	~PostgreSQLconfig()				{}
 
-		~HandlerConfiguration()
-		{
-			if ( banner ) delete banner;
-			if ( database ) delete database;
-			if ( aaaa ) delete aaaa;
-		}
-	};
+	bool check() const;
+	void print( std::ostream& os, size_t indent ) const;
+};
 
+class PostgreSQLDatabase : public Database
+{
+public:
+	PostgreSQLDatabase( const PostgreSQLconfig* conf );
+	~PostgreSQLDatabase()				{}
 
-} // namespace _Wolframe
+	DatabaseType type() const			{ return DBTYPE_POSTGRESQL; }
+private:
+};
 
-#endif // _HANDLERCONFIG_HPP_INCLUDED
+}} // _Wolframe::db
+
+#endif // _POSTGRESQL_HPP_INCLUDED
