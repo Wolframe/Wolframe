@@ -185,6 +185,7 @@ include/config/valueParser.hpp
 include/connectionEndpoint.hpp
 include/connectionHandler.hpp
 include/database/database.hpp
+include/database/PostgreSQL.hpp
 include/ErrorCodes.hpp
 include/GNUmakefile
 include/logger.hpp
@@ -303,6 +304,8 @@ src/connection.cpp
 src/connection.hpp
 src/database/databaseConfig.cpp
 src/database/database.cpp
+src/database/PostgreSQLconfig.cpp
+src/database/PostgreSQL.cpp
 src/database/sqlite3.c
 src/database/sqlite3.h
 src/exceptionBase.hpp
@@ -374,6 +377,6 @@ windows/wolframe.xml
 XML/configuration.rng
 XML/database.rng
 XML/logging.rng
-src/database/postgresConfig.cpp
-include/database/PostgreSQL.hpp
-src/database/PostgreSQL.cpp
+include/database/SQLite.hpp
+src/database/SQLiteConfig.cpp
+src/database/SQLite.cpp

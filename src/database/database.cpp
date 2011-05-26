@@ -36,6 +36,7 @@
 
 #include "database/database.hpp"
 #include "database/PostgreSQL.hpp"
+#include "database/SQLite.hpp"
 
 //#include "standardConfigs.hpp"
 #include "logger.hpp"
@@ -64,13 +65,6 @@ std::string& Database::typeToStr( DatabaseType type )
 	default:
 		throw std::domain_error( "Unknown database type in Database::typeToStr(...)" );
 	}
-}
-
-
-SQLiteDatabase::SQLiteDatabase( const SQLiteConfig* conf )
-	: Database( conf->ID())
-{
-	LOG_NOTICE << "SQLite database '" << conf->ID() << "' created";
 }
 
 

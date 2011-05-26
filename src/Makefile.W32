@@ -113,7 +113,9 @@ OBJS = \
 	wolframeHandler.obj \
 	database\database.obj \
 	database\PostgreSQL.obj \
-	database\postgresConfig.obj \
+	database\PostgreSQLconfig.obj \
+	database\SQLite.obj \
+	database\SQLiteConfig.obj \
 	winMain.obj
 
 CPP_BINS = \

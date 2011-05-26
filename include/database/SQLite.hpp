@@ -31,47 +31,43 @@
 
 ************************************************************************/
 //
-// Wolframe PostgreSQL client view
+// Wolframe SQLite client view
 //
 
 #include "database/database.hpp"
 
-#ifndef _POSTGRESQL_HPP_INCLUDED
-#define _POSTGRESQL_HPP_INCLUDED
+#ifndef _SQLITE_HPP_INCLUDED
+#define _SQLITE_HPP_INCLUDED
 
 namespace _Wolframe {
 namespace db {
 
-/// PostgreSQL server connection configuration
-struct PostgreSQLconfig : public DatabaseConfig
+/// SQLite database configuration
+struct SQLiteConfig : public DatabaseConfig
 {
-	std::string	host;
-	unsigned short	port;
-	std::string	dbName;
-	std::string	user;
-	std::string	password;
-	unsigned short	connections;
-	unsigned short	acquireTimeout;
+	std::string	filename;
+	bool		flag;
 public:
-	DatabaseType type() const			{ return DBTYPE_POSTGRESQL; }
+	DatabaseType type() const			{ return DBTYPE_SQLITE; }
 
-	PostgreSQLconfig( const char* name, const char* logParent, const char* logName );
-	~PostgreSQLconfig()				{}
+	SQLiteConfig( const char* name, const char* logParent, const char* logName );
+	~SQLiteConfig()					{}
 
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
+	virtual void setCanonicalPathes( const std::string& referencePath );
 };
 
-class PostgreSQLDatabase : public Database
+class SQLiteDatabase : public Database
 {
 public:
-	PostgreSQLDatabase( const PostgreSQLconfig* conf );
-	~PostgreSQLDatabase()				{}
+	SQLiteDatabase( const SQLiteConfig* conf );
+	~SQLiteDatabase()				{}
 
-	DatabaseType type() const			{ return DBTYPE_POSTGRESQL; }
+	DatabaseType type() const			{ return DBTYPE_SQLITE; }
 private:
 };
 
 }} // _Wolframe::db
 
-#endif // _POSTGRESQL_HPP_INCLUDED
+#endif // _SQLITE_HPP_INCLUDED

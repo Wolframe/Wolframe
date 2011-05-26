@@ -31,57 +31,66 @@
 
 ************************************************************************/
 //
-// Wolframe PostgreSQL client view implementation
+// Wolframe SQLite client view implementation
 //
 
-#include "database/PostgreSQL.hpp"
+#include "database/SQLite.hpp"
+
+#define BOOST_FILESYSTEM_VERSION 3
+#include <boost/filesystem.hpp>
+#include "miscUtils.hpp"
 
 namespace _Wolframe {
 namespace db {
 
-//***  PostgreSQL configuration functions  **********************************
-PostgreSQLconfig::PostgreSQLconfig( const char* cfgName, const char* logParent, const char* logName )
-	: DatabaseConfig( cfgName, logParent, logName )
+//***  SQLite configuration functions  **************************************
+SQLiteConfig::SQLiteConfig( const char* name, const char* logParent, const char* logName )
+	: DatabaseConfig( name, logParent, logName )
 {
-	port = 0;
-	connections = 0;
-	acquireTimeout = 0;
+	flag = false;
 }
 
-void PostgreSQLconfig::print( std::ostream& os, size_t indent ) const
+void SQLiteConfig::print( std::ostream& os, size_t indent ) const
 {
 	std::string indStr( indent, ' ' );
 
 	os << indStr << sectionName() << ":" << std::endl;
 	if ( ! ID().empty() )
 		os << indStr << "   ID: " << ID() << std::endl;
-	if ( host.empty())
-		os << indStr << "   Database host: local unix domain socket" << std::endl;
-	else
-		os << indStr << "   Database host: " << host << ":" << port << std::endl;
-	os << indStr << "   Database name: " << (dbName.empty() ? "(not specified - server user default)" : dbName) << std::endl;
-	os << indStr << "   Database user: " << (user.empty() ? "(not specified - same as server user)" : user)
-	   << ", password: " << (password.empty() ? "(not specified - no password used)" : password) << std::endl;
-	os << indStr << "   Database connections: " << connections << std::endl;
-	os << indStr << "   Acquire database connection timeout: " << acquireTimeout << std::endl;
+	os << indStr << "   Filename: " << filename << std::endl;
+	os << indStr << "   Flags: " << (flag ? "True Flag" : "False Flag") << std::endl;
 }
 
-bool PostgreSQLconfig::check() const
+bool SQLiteConfig::check() const
 {
-	if ( connections == 0 )	{
-		LOG_ERROR << logPrefix() << "number of database connections cannot be 0";
+	if ( filename.empty() )	{
+		LOG_ERROR << logPrefix() << "SQLite database filename cannot be empty";
 		return false;
 	}
 	return true;
 }
 
+void SQLiteConfig::setCanonicalPathes( const std::string& refPath )
+{
+	using namespace boost::filesystem;
 
-//***  PostgreSQL database functions  ***************************************
-PostgreSQLDatabase::PostgreSQLDatabase( const PostgreSQLconfig* conf )
+	if ( ! filename.empty() )	{
+		if ( ! path( filename ).is_absolute() )
+			filename = resolvePath( absolute( filename,
+							  path( refPath ).branch_path()).string());
+		else
+			filename = resolvePath( filename );
+	}
+}
+
+
+//***  SQLite database functions  *******************************************
+SQLiteDatabase::SQLiteDatabase( const SQLiteConfig* conf )
 	: Database( conf->ID())
 {
-	LOG_NOTICE << "PostgreSQL database '" << conf->ID() << "' created";
+	LOG_NOTICE << "SQLite database '" << conf->ID() << "' created";
 }
 
 }} // _Wolframe::db
+
 

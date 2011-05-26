@@ -41,6 +41,7 @@
 
 #include "database/database.hpp"
 #include "database/PostgreSQL.hpp"
+#include "database/SQLite.hpp"
 
 namespace _Wolframe {
 namespace AAAA {

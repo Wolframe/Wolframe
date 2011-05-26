@@ -52,7 +52,7 @@ enum DatabaseType	{
 };
 
 
-class	DatabaseConfig : public config::ConfigurationBase
+class DatabaseConfig : public config::ConfigurationBase
 {
 public:
 	DatabaseConfig( const char* name, const char* logParent, const char* logName )
@@ -64,23 +64,6 @@ public:
 	const std::string& ID() const			{ return m_ID; }
 private:
 	std::string		m_ID;
-};
-
-
-/// SQLite database configuration
-struct	SQLiteConfig : public DatabaseConfig
-{
-	std::string	filename;
-	bool		flag;
-public:
-	DatabaseType type() const			{ return DBTYPE_SQLITE; }
-
-	SQLiteConfig( const char* name, const char* logParent, const char* logName );
-	~SQLiteConfig()					{}
-
-	bool check() const;
-	void print( std::ostream& os, size_t indent ) const;
-	virtual void setCanonicalPathes( const std::string& referencePath );
 };
 
 
@@ -100,8 +83,8 @@ public:
 };
 
 
-/// database configurations
-struct Configuration : public _Wolframe::config::ConfigurationBase
+/// database configuration
+struct Configuration : public config::ConfigurationBase
 {
 public:
 	std::list<DatabaseConfig*>	m_dbConfig;
@@ -119,7 +102,7 @@ public:
 //	bool test() const;
 };
 
-struct SingleDBConfiguration : public _Wolframe::config::ConfigurationBase
+struct SingleDBConfiguration : public config::ConfigurationBase
 {
 public:
 	DatabaseConfig*	m_dbConfig;
@@ -174,17 +157,6 @@ public:
 	const _DatabaseChannel_* channel() const	{ return NULL; }
 private:
 	const std::string	m_id;
-};
-
-
-class SQLiteDatabase : public Database
-{
-public:
-	SQLiteDatabase( const SQLiteConfig* conf );
-	~SQLiteDatabase()				{}
-
-	DatabaseType type() const			{ return DBTYPE_SQLITE; }
-private:
 };
 
 

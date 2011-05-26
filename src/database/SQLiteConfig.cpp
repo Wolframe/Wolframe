@@ -31,28 +31,27 @@
 
 ************************************************************************/
 //
-// PostgreSQL configuration parser
+// SQLite configuration parser
 //
 
-#include "database/PostgreSQL.hpp"
+#include "database/SQLite.hpp"
 #include "config/valueParser.hpp"
 #include "config/configurationParser.hpp"
 
-
-static const unsigned short DEFAULT_POSTGRESQL_CONNECTIONS = 4;
+#define BOOST_FILESYSTEM_VERSION 3
+#include <boost/filesystem.hpp>
+#include "miscUtils.hpp"
 
 namespace _Wolframe {
 namespace config {
 
-/// Parse the PostgreSQL configuration
+/// Specialization of the ConfigurationParser::parse for the SQLite configuration
 template<>
-bool ConfigurationParser::parse( db::PostgreSQLconfig& cfg,
+bool ConfigurationParser::parse( db::SQLiteConfig& cfg,
 				 const boost::property_tree::ptree& pt, const std::string& /*node*/ )
 {
 	using namespace _Wolframe::config;
 	bool retVal = true;
-	bool portDefined, connDefined, aTdefined;
-	portDefined = connDefined = aTdefined = false;
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "identifier" ))	{
@@ -63,38 +62,19 @@ bool ConfigurationParser::parse( db::PostgreSQLconfig& cfg,
 			else
 				cfg.ID( id );
 		}
-		else if ( boost::algorithm::iequals( L1it->first, "host" ))	{
-			bool isDefined = ( !cfg.host.empty());
-			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.host, &isDefined ))
+		else if ( boost::algorithm::iequals( L1it->first, "file" ) ||
+			  boost::algorithm::iequals( L1it->first, "filename" ))	{
+			bool isDefined = ( !cfg.filename.empty() );
+			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.filename, &isDefined ))
 				retVal = false;
+			else	{
+				if ( ! boost::filesystem::path( cfg.filename ).is_absolute() )
+					LOG_WARNING << cfg.logPrefix() << "database file path is not absolute: "
+						    << cfg.filename;
+			}
 		}
-		else if ( boost::algorithm::iequals( L1it->first, "port" ))	{
-			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.port,
-						Parser::RangeDomain<unsigned short>( 1 ), &portDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "name" ))	{
-			bool isDefined = ( !cfg.dbName.empty());
-			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.dbName, &isDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "user" ))	{
-			bool isDefined = ( !cfg.user.empty());
-			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.user, &isDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "password" ))	{
-			bool isDefined = ( !cfg.password.empty());
-			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.password, &isDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "connections" ))	{
-			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.connections,
-						Parser::RangeDomain<unsigned short>( 1 ), &connDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "acquireTimeout" ))	{
-			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.acquireTimeout, &aTdefined ))
+		else if ( boost::algorithm::iequals( L1it->first, "flag" ))	{
+			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.flag, Parser::BoolDomain() ))
 				retVal = false;
 		}
 		else	{
@@ -102,9 +82,6 @@ bool ConfigurationParser::parse( db::PostgreSQLconfig& cfg,
 				    << L1it->first << "'";
 		}
 	}
-	if ( ! connDefined == 0 )
-		cfg.connections = DEFAULT_POSTGRESQL_CONNECTIONS;
-
 	return retVal;
 }
 
