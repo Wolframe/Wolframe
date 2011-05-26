@@ -116,6 +116,8 @@ LOGGER_OBJS = \
 	logger/loggerConfig.o \
 	logger/logger.o
 
+DB_OBJS =
+
 AAAA_OBJS = \
 	AAAA/authentication_textfile.o \
 	AAAA/AAAAprovider.o \
@@ -155,6 +157,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	connection.o \
 	serverConfig.o \
 	server.o \
+	$(DB_OBJS) \
 	$(AAAA_OBJS)
 
 #SSL
