@@ -44,28 +44,29 @@
 
 class testObject	{
 public:
-	testObject()		{ threads = 0, uses = 0; }
+	testObject()		{ m_threads = 0, m_uses = 0; }
 	void doSomething()	{
-		assert( threads == 0 );
-		threads++, uses++;
-		assert( threads == 1 );
-		threads--;
-		assert( threads == 0 );
+		assert( m_threads == 0 );
+		m_threads++, m_uses++;
+		assert( m_threads == 1 );
+		m_threads--;
+		assert( m_threads == 0 );
 	}
 	void sleepSomething()	{
-		assert( threads == 0 );
-		threads++, uses++;
-		assert( threads == 1 );
+		assert( m_threads == 0 );
+		m_threads++, m_uses++;
+		assert( m_threads == 1 );
 		boost::this_thread::sleep( boost::posix_time::microseconds( rand() % 150 ));
-		assert( threads == 1 );
-		threads--;
-		assert( threads == 0 );
+		assert( m_threads == 1 );
+		m_threads--;
+		assert( m_threads == 0 );
 	}
-	bool unused()		{ return threads == 0; }
-	unsigned long used()	{ return uses; }
+	bool unused()		{ return m_threads == 0; }
+	int threads()		{ return m_threads; }
+	unsigned long used()	{ return m_uses; }
 private:
-	int		threads;
-	unsigned long	uses;
+	int		m_threads;
+	unsigned long	m_uses;
 };
 
 
@@ -78,9 +79,8 @@ protected:
 		noThreads = 1 + (int)( rand() % 32 );
 		poolSize = 1 + (int)( rand() % 16 );
 		times = (unsigned long)( rand() % 200000 );
-		timesSleep = (unsigned long)( rand() % 50000 );
 		std::cout << noThreads << " threads, " << poolSize << " elements in the pool, "
-			  << times << " iterations" << std::endl;
+			  << times << " iterations, total "<< noThreads * times << std::endl;
 	}
 
 	// Clean-up work that doesn't throw exceptions here.
@@ -114,7 +114,6 @@ protected:
 	_Wolframe::ObjectPool< testObject >	objPool;
 	unsigned				poolSize;
 	unsigned long				times;
-	unsigned long				timesSleep;
 
 public:
 	static void testThread( _Wolframe::ObjectPool< testObject > *pool, unsigned count )
@@ -146,6 +145,7 @@ public:
 TEST_F( ObjectPoolFixture, noTimeout )	{
 	for ( unsigned long i = 0; i < poolSize; i++ )	{
 		ASSERT_EQ( tstObjs[i]->used(), 0 );
+		ASSERT_EQ( tstObjs[i]->threads(), 0 );
 	}
 
 	for ( int i = 0; i < noThreads; i++ )   {
@@ -163,16 +163,19 @@ TEST_F( ObjectPoolFixture, noTimeout )	{
 		used += tstObjs[i]->used();
 	}
 
+	for ( unsigned long i = 0; i < poolSize; i++ )
+		ASSERT_EQ( tstObjs[i]->threads(), 0 );
 	ASSERT_EQ( used, noThreads * times );
 }
 
 TEST_F( ObjectPoolFixture, noTimeoutSleep )	{
 	for ( unsigned long i = 0; i < poolSize; i++ )	{
 		ASSERT_EQ( tstObjs[i]->used(), 0 );
+		ASSERT_EQ( tstObjs[i]->threads(), 0 );
 	}
 
 	for ( int i = 0; i < noThreads; i++ )   {
-		boost::thread* thread = new boost::thread( &ObjectPoolFixture::sleepTestThread, &objPool, timesSleep );
+		boost::thread* thread = new boost::thread( &ObjectPoolFixture::sleepTestThread, &objPool, times );
 		threads.push_back( thread );
 	}
 	for ( int i = 0; i < noThreads; i++ )   {
@@ -186,13 +189,16 @@ TEST_F( ObjectPoolFixture, noTimeoutSleep )	{
 		used += tstObjs[i]->used();
 	}
 
-	ASSERT_EQ( used, noThreads * timesSleep );
+	for ( unsigned long i = 0; i < poolSize; i++ )
+		ASSERT_EQ( tstObjs[i]->threads(), 0 );
+	ASSERT_EQ( used, noThreads * times );
 }
 
 TEST_F( ObjectPoolFixture, Timeout )	{
 	objPool.timeout( 1 );
 	for ( unsigned long i = 0; i < poolSize; i++ )	{
 		ASSERT_EQ( tstObjs[i]->used(), 0 );
+		ASSERT_EQ( tstObjs[i]->threads(), 0 );
 	}
 
 	for ( int i = 0; i < noThreads; i++ )   {
@@ -210,6 +216,8 @@ TEST_F( ObjectPoolFixture, Timeout )	{
 		used += tstObjs[i]->used();
 	}
 
+	for ( unsigned long i = 0; i < poolSize; i++ )
+		ASSERT_EQ( tstObjs[i]->threads(), 0 );
 	ASSERT_EQ( used, noThreads * times );
 }
 
@@ -217,10 +225,11 @@ TEST_F( ObjectPoolFixture, TimeoutSleep )	{
 	objPool.timeout( 1 );
 	for ( unsigned long i = 0; i < poolSize; i++ )	{
 		ASSERT_EQ( tstObjs[i]->used(), 0 );
+		ASSERT_EQ( tstObjs[i]->threads(), 0 );
 	}
 
 	for ( int i = 0; i < noThreads; i++ )   {
-		boost::thread* thread = new boost::thread( &ObjectPoolFixture::sleepTestThread, &objPool, timesSleep );
+		boost::thread* thread = new boost::thread( &ObjectPoolFixture::sleepTestThread, &objPool, times );
 		threads.push_back( thread );
 	}
 	for ( int i = 0; i < noThreads; i++ )   {
@@ -234,7 +243,9 @@ TEST_F( ObjectPoolFixture, TimeoutSleep )	{
 		used += tstObjs[i]->used();
 	}
 
-	ASSERT_EQ( used, noThreads * timesSleep );
+	for ( unsigned long i = 0; i < poolSize; i++ )
+		ASSERT_EQ( tstObjs[i]->threads(), 0 );
+	ASSERT_EQ( used, noThreads * times );
 }
 
 TEST_F( ObjectPoolFixture, TestTimeout )	{
