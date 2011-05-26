@@ -60,6 +60,8 @@ LOGGER_OBJS = \
 	logger\loggerConfig.obj \
 	logger\logger.obj \
 
+DB_OBJS =
+
 AAAA_OBJS = \
 	AAAA\authentication_textfile.obj \
 	AAAA\AAAAprovider.obj \
@@ -71,7 +73,11 @@ AAAA_OBJS = \
 !IFDEF WITH_SQLITE3
 AAAA_OBJS = $(AAAA_OBJS) \
 	AAAA\authentication_db_sqlite3.obj \
-	AAAA\sqlite3.obj
+!ENDIF
+
+!IFDEF WITH_SQLITE3
+DB_OBJS = $(DB_OBJS) \
+	database\sqlite3.obj
 !ENDIF
 
 LOCAL_STATIC_LIB_OBJS = \
@@ -90,6 +96,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	connection.obj \
 	serverConfig.obj \
 	server.obj \
+	$(DB_OBJS) \
 	$(AAAA_OBJS)
 
 #SSL

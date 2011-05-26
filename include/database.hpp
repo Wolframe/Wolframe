@@ -38,8 +38,8 @@
 #define _DATABASE_HPP_INCLUDED
 
 #include <list>
-
 #include "config/configurationBase.hpp"
+#include "logger.hpp"
 
 namespace _Wolframe	{
 namespace db	{
@@ -78,7 +78,7 @@ struct	PostgreSQLconfig : public DatabaseConfig
 	unsigned short	connections;
 	unsigned short	acquireTimeout;
 public:
-	virtual DatabaseType type() const		{ return DBTYPE_POSTGRESQL; }
+	DatabaseType type() const			{ return DBTYPE_POSTGRESQL; }
 
 	PostgreSQLconfig( const char* name, const char* logParent, const char* logName );
 	~PostgreSQLconfig()				{}
@@ -94,7 +94,7 @@ struct	SQLiteConfig : public DatabaseConfig
 	std::string	filename;
 	bool		flag;
 public:
-	virtual DatabaseType type() const		{ return DBTYPE_SQLITE; }
+	DatabaseType type() const			{ return DBTYPE_SQLITE; }
 
 	SQLiteConfig( const char* name, const char* logParent, const char* logName );
 	~SQLiteConfig()					{}
@@ -110,7 +110,7 @@ struct ReferenceConfig : public DatabaseConfig
 {
 	std::string	m_ref;
 public:
-	virtual DatabaseType type() const		{ return DBTYPE_REFERENCE; }
+	DatabaseType type() const			{ return DBTYPE_REFERENCE; }
 
 	ReferenceConfig( const char* name, const char* logParent, const char* logName )
 		: DatabaseConfig( name, logParent, logName )	{}
@@ -125,7 +125,7 @@ public:
 struct Configuration : public _Wolframe::config::ConfigurationBase
 {
 public:
-	std::list<DatabaseConfig*>	dbConfig_;
+	std::list<DatabaseConfig*>	m_dbConfig;
 
 	/// constructor & destructor
 	Configuration() : ConfigurationBase( "Database(s)", NULL, "Database configuration" )	{}
@@ -212,7 +212,7 @@ public:
 	DBprovider( const Configuration& conf );
 	~DBprovider();
 
-	Database* database( std::string& ID ) const;
+	const Database* database( std::string& ID ) const;
 
 	_DatabaseChannel_* channel() const		{ return NULL; }
 

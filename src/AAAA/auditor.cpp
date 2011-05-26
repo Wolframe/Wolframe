@@ -44,14 +44,14 @@ namespace _Wolframe {
 namespace AAAA {
 
 
-FileAuditor::FileAuditor( FileAuditConfig& conf )
+FileAuditor::FileAuditor( const FileAuditConfig& conf )
 {
 	m_file = conf.m_file;
 	LOG_NOTICE << "File auditor created with file '" << m_file << "'";
 }
 
 
-DatabaseAuditor::DatabaseAuditor( DatabaseAuditConfig& conf )
+DatabaseAuditor::DatabaseAuditor( const DatabaseAuditConfig& conf )
 {
 	switch ( conf.m_dbConfig.m_dbConfig->type() )	{
 	case db::DBTYPE_POSTGRESQL:	{
@@ -75,7 +75,18 @@ DatabaseAuditor::DatabaseAuditor( DatabaseAuditConfig& conf )
 	}
 }
 
-bool DatabaseAuditor::resolveDB( db::DBprovider& db )
+DatabaseAuditor::~DatabaseAuditor()
+{
+	if ( m_dbLabel.empty() )	{	// it's not a reference
+		if ( m_db )
+			delete m_db;
+		else
+			throw std::logic_error( "No database in DatabaseAuditor" );
+	}
+}
+
+
+bool DatabaseAuditor::resolveDB( const db::DBprovider& db )
 {
 	if ( m_db == NULL && ! m_dbLabel.empty() )	{
 		m_db = db.database( m_dbLabel );

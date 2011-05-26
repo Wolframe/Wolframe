@@ -7,7 +7,7 @@ SUBDIRS =
 local_all: gtest-all.o
 
 gtest-all.o: src/gtest-all.cc
-	g++ -o gtest-all.o -Iinclude -I. -g -Wall -Wextra -c src/gtest-all.cc
+	$(CCPP) -o gtest-all.o -Iinclude -I. -g -Wall -Wextra -c src/gtest-all.cc
 
 local_clean:
 	@-rm -f gtest-all.o

@@ -185,7 +185,7 @@ bool ConfigurationParser::parse( db::Configuration& cfg,
 		if ( boost::algorithm::iequals( L1it->first, "PostgreSQL" ))	{
 			db::PostgreSQLconfig* conf = new db::PostgreSQLconfig( "PostgreSQL server", cfg.logPrefix().c_str(), "PostgreSQL" );
 			if ( ConfigurationParser::parse( *conf, L1it->second, L1it->first ))
-				cfg.dbConfig_.push_back( conf );
+				cfg.m_dbConfig.push_back( conf );
 			else	{
 				delete conf;
 				retVal = false;
@@ -194,7 +194,7 @@ bool ConfigurationParser::parse( db::Configuration& cfg,
 		else if ( boost::algorithm::iequals( L1it->first, "SQLite" ))	{
 			db::SQLiteConfig* conf = new db::SQLiteConfig( "SQLite database", cfg.logPrefix().c_str(), "SQLite" );
 			if ( ConfigurationParser::parse( *conf, L1it->second, L1it->first ))
-				cfg.dbConfig_.push_back( conf );
+				cfg.m_dbConfig.push_back( conf );
 			else	{
 				delete conf;
 				retVal = false;
@@ -368,17 +368,17 @@ void ReferenceConfig::print( std::ostream& os, size_t indent ) const
 //***  Generic database functions  **************************************
 Configuration::~Configuration()
 {
-	for ( std::list<DatabaseConfig*>::const_iterator it = dbConfig_.begin();
-								it != dbConfig_.end(); it++ )
+	for ( std::list<DatabaseConfig*>::const_iterator it = m_dbConfig.begin();
+								it != m_dbConfig.end(); it++ )
 		delete *it;
 }
 
 void Configuration::print( std::ostream& os, size_t /* indent */ ) const
 {
 	os << sectionName() << std::endl;
-	if ( dbConfig_.size() > 0 )	{
-		for ( std::list<DatabaseConfig*>::const_iterator it = dbConfig_.begin();
-								it != dbConfig_.end(); it++ )	{
+	if ( m_dbConfig.size() > 0 )	{
+		for ( std::list<DatabaseConfig*>::const_iterator it = m_dbConfig.begin();
+								it != m_dbConfig.end(); it++ )	{
 			(*it)->print( os, 3 );
 		}
 	}
@@ -391,8 +391,8 @@ void Configuration::print( std::ostream& os, size_t /* indent */ ) const
 bool Configuration::check() const
 {
 	bool correct = true;
-	for ( std::list<DatabaseConfig*>::const_iterator it = dbConfig_.begin();
-								it != dbConfig_.end(); it++ )	{
+	for ( std::list<DatabaseConfig*>::const_iterator it = m_dbConfig.begin();
+								it != m_dbConfig.end(); it++ )	{
 		if ( !(*it)->check() )
 			correct = false;
 	}
@@ -401,8 +401,8 @@ bool Configuration::check() const
 
 void Configuration::setCanonicalPathes( const std::string& refPath )
 {
-	for ( std::list<DatabaseConfig*>::const_iterator it = dbConfig_.begin();
-								it != dbConfig_.end(); it++ )	{
+	for ( std::list<DatabaseConfig*>::const_iterator it = m_dbConfig.begin();
+								it != m_dbConfig.end(); it++ )	{
 		(*it)->setCanonicalPathes( refPath );
 	}
 }
