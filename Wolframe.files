@@ -63,10 +63,12 @@ clients/qt/qtclient.cpp
 clients/qt/WolframeClient.cpp
 clients/qt/WolframeClient.hpp
 docs/AppServer/Appendix.xml
+docs/AppServer/AppServer.ent
 docs/AppServer/Glossary.xml
 docs/AppServer/Introduction.xml
 docs/AppServer/Preface.xml
 docs/AppServer/SSL.xml
+docs/Common/Common.ent
 docs/doxygen.conf
 docs/GNUmakefile
 docs/images/GNUmakefile
@@ -76,6 +78,7 @@ docs/SDK/Appendix.xml
 docs/SDK/Glossary.xml
 docs/SDK/Introduction.xml
 docs/SDK/Preface.xml
+docs/SDK/SDK.ent
 docs/WolfBook.xml
 docs/wolframe.conf-man.xml
 docs/wolframed-man.xml
