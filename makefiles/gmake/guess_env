@@ -89,8 +89,11 @@ fi
 
 # the compiler and version
 
-# what compiler do we have (we can't relly on it's name as it may be a cc link to the binary!)
+# do we have ccache or distcc in CC, then check the compiler, not the wrapper
 CC=$2
+CC=`echo $CC | sed 's/distcc//g' | sed 's/ccache//g'`
+
+# what compiler do we have (we can't relly on it's name as it may be a cc link to the binary!)
 (( $CC -v 2>&1 | $TAIL1 ) | grep -i GCC ) 2>/dev/null 1>/dev/null
 if test $? = 0; then
 	COMPILER='gcc'
