@@ -52,12 +52,6 @@ struct Description :public DescriptionBase
 		return *this;
 	}
 	Description(){}
-
-	template <typename Element>
-	Description( const char* name, Element Structure::*eptr)
-	{
-		(*this)(name,eptr);
-	}
 };
 
 }}// end namespace
