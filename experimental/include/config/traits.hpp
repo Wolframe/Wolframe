@@ -48,38 +48,36 @@ struct struct_ {};	///< the tag marks a type that is a structure with named elem
 struct vector_ {};	///< the tag marks a type that std::vector of any type
 struct atom_ {};	///< the tag marks a type is convertible from a string through boost::lexical_cast
 
+/// \brief conditional template for detecting if a type is a class with a static/member method description() returning a const pointer to a structure description as defined in config/descriptionBase.hpp
+/// see http://drdobbs.com/article/print?articleId=227500449&siteSectionName= "Checking Concept Without Concepts in C++"
+template<typename T,bool is_class_type=boost::is_class<T>::value>
+struct has_description_method: boost::false_type {};
 
 template<typename T>
-struct has_description_method
+struct has_description_method_noprm
 {
 	typedef char small_type;
 	struct large_type {small_type dummy[2];};
 
-	template<const DescriptionBase* (T::*)()> struct tester;
+	template<const DescriptionBase* (T::*)()> struct tester_member_signature;
+	template<const DescriptionBase* (*)()> struct tester_static_signature;
 
 	template<typename U>
-	static small_type has_matching_member(tester<&U::description>*);
+	static small_type has_matching_member(tester_member_signature<&U::description>*);
+	template<typename U>
+	static small_type has_matching_member(tester_static_signature<&U::description>*);
 	template<typename U>
 	static large_type has_matching_member(...);
 
+	/// \brief value with the boolean property corresponding has description static/member method without paramater
 	static const bool value=sizeof(has_matching_member<T>(0))==sizeof(small_type);
 };
 
 template<typename T>
-struct has_c_str_method
-{
-	typedef char small_type;
-	struct large_type {small_type dummy[2];};
+struct has_description_method<T,true>:
+	boost::integral_constant<bool, has_description_method_noprm<T>::value>
+{};
 
-	template<const char* (T::*)()> struct tester;
-
-	template<typename U>
-	static small_type has_matching_member(tester<&U::c_str>*);
-	template<typename U>
-	static large_type has_matching_member(...);
-
-	static const bool value=sizeof(has_matching_member<T>(0))==sizeof(small_type);
-};
 
 /// trait tag vector_
 /// returns vector_ if  std::vector<T::value_type> EQUALS T. This is true, when T is a std::vector of any kind
