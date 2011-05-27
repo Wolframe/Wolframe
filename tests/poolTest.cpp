@@ -118,22 +118,24 @@ protected:
 public:
 	static void testThread( _Wolframe::ObjectPool< testObject > *pool, unsigned count )
 	{
-		for ( std::size_t i = 0; i < count; i++ )	{
+		for ( std::size_t i = 0; i < count; )	{
 			testObject *tstObj = pool->get();
 			if ( tstObj != NULL )	{
 				tstObj->doSomething();
 				pool->add( tstObj );
+				i++;
 			}
 		}
 	}
 
 	static void sleepTestThread( _Wolframe::ObjectPool< testObject > *pool, unsigned count )
 	{
-		for ( std::size_t i = 0; i < count; i++ )	{
+		for ( std::size_t i = 0; i < count; )	{
 			testObject *tstObj = pool->get();
 			if ( tstObj != NULL )	{
 				tstObj->sleepSomething();
 				pool->add( tstObj );
+				i++;
 			}
 		}
 	}
