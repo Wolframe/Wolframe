@@ -83,19 +83,16 @@ struct has_description_method<T,true>:
 /// returns vector_ if  std::vector<T::value_type> EQUALS T. This is true, when T is a std::vector of any kind
 template <typename T>
 typename boost::enable_if_c<
-	boost::is_same< std::vector< typename T::value_type> ,T>::value
-	&& !has_c_str_method<T>::value
-	,vector_>::type getCategoryC( const T&) { return vector_();}
+	boost::is_same< std::vector< typename T::value_type> ,T>::value && !boost::is_same<std::string,T>::value
+	,vector_>::type getCategory( const T&) { return vector_();}
 
 
 /// trait tag struct_
 /// returns struct_ if T fulfills has a method description with no params returning a const pointer to a config::DescriptionBase
 template <typename T>
-typename boost::enable_if<
-	boost::is_class<T>,
-		boost::enable_if_c<
-			has_description_method<T>::value
-	,struct_> >::type getCategory( const T&) { return struct_();}
+typename boost::enable_if_c<
+		has_description_method<T>::value
+		,struct_>::type getCategory( const T&) { return struct_();}
 
 
 /// trait tag atom_
