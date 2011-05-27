@@ -167,7 +167,7 @@ static void parseElement1( const char* name, T& value, const boost::property_tre
 template <typename T>
 static void parseElement( const char* name, T& value, const boost::property_tree::ptree& pt)
 {
-	parseElement_( name, value, traits::get(value), pt);
+	parseElement_( name, value, traits::getCategory(value), pt);
 }
 
 }}// end namespace
