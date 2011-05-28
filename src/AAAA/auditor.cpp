@@ -42,10 +42,10 @@
 #include "database/database.hpp"
 #include "database/PostgreSQL.hpp"
 #include "database/SQLite.hpp"
+#include "database/DBreference.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
-
 
 FileAuditor::FileAuditor( const FileAuditConfig& conf )
 {

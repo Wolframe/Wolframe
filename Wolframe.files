@@ -380,3 +380,6 @@ XML/logging.rng
 include/database/SQLite.hpp
 src/database/SQLiteConfig.cpp
 src/database/SQLite.cpp
+include/database/DBreference.hpp
+src/database/DBreference.cpp
+src/database/DBreferenceConfig.cpp

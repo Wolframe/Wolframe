@@ -67,22 +67,6 @@ private:
 };
 
 
-/// database reference class
-struct ReferenceConfig : public DatabaseConfig
-{
-	std::string	m_ref;
-public:
-	DatabaseType type() const			{ return DBTYPE_REFERENCE; }
-
-	ReferenceConfig( const char* name, const char* logParent, const char* logName )
-		: DatabaseConfig( name, logParent, logName )	{}
-	~ReferenceConfig()					{}
-
-	bool check() const;
-	void print( std::ostream& os, size_t indent ) const;
-};
-
-
 /// database configuration
 struct Configuration : public config::ConfigurationBase
 {

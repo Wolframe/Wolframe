@@ -176,6 +176,8 @@ OBJS = \
 	database/PostgreSQLconfig.o \
 	database/SQLite.o \
 	database/SQLiteConfig.o \
+	database/DBreference.o \
+	database/DBreferenceConfig.o \
 	posixMain.o
 
 CPP_BINS = \

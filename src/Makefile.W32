@@ -116,6 +116,8 @@ OBJS = \
 	database\PostgreSQLconfig.obj \
 	database\SQLite.obj \
 	database\SQLiteConfig.obj \
+	database\DBreference.obj \
+	database\DBreferenceConfig.obj \
 	winMain.obj
 
 CPP_BINS = \

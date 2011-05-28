@@ -37,6 +37,7 @@
 #include "database/database.hpp"
 #include "database/PostgreSQL.hpp"
 #include "database/SQLite.hpp"
+#include "database/DBreference.hpp"
 
 #include "config/valueParser.hpp"
 #include "config/configurationParser.hpp"
@@ -54,22 +55,6 @@
 
 namespace _Wolframe {
 namespace config {
-
-/// Parse the reference to db configuration
-template<>
-bool ConfigurationParser::parse( db::ReferenceConfig& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& node )
-{
-	bool labelDefined = ( ! cfg.m_ref.empty() );
-	if ( !config::Parser::getValue( cfg.logPrefix().c_str(), node.c_str(),
-					pt.get_value<std::string>(), cfg.m_ref, &labelDefined ))
-		return false;
-	if ( cfg.m_ref.empty() )	{
-		LOG_ERROR << cfg.logPrefix() << "Database reference label is empty";
-		return false;
-	}
-	return true;
-}
 
 template<>
 bool ConfigurationParser::parse( db::Configuration& cfg,
@@ -166,25 +151,6 @@ bool ConfigurationParser::parse( db::SingleDBConfiguration& cfg,
 } // namespace config
 
 namespace db {
-
-
-
-//***  Database reference functions  **************************************
-bool ReferenceConfig::check() const
-{
-	if ( m_ref.empty() )	{
-		LOG_ERROR << "Database reference label is empty";
-		return false;
-	}
-	return true;
-}
-
-void ReferenceConfig::print( std::ostream& os, size_t indent ) const
-{
-	std::string indStr( indent, ' ' );
-	os << indStr << sectionName() << ": " << (m_ref.empty() ? "Undefined!" : m_ref) << std::endl;
-}
-
 
 //***  Generic database functions  **************************************
 Configuration::~Configuration()
