@@ -43,10 +43,9 @@ namespace _Wolframe {
 namespace db {
 
 /// SQLite database configuration
-struct SQLiteConfig : public DatabaseConfig
+class SQLiteConfig : public DatabaseConfig
 {
-	std::string	filename;
-	bool		flag;
+	friend class config::ConfigurationParser;
 public:
 	DatabaseType type() const			{ return DBTYPE_SQLITE; }
 
@@ -56,6 +55,9 @@ public:
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 	virtual void setCanonicalPathes( const std::string& referencePath );
+private:
+	std::string	filename;
+	bool		flag;
 };
 
 class SQLiteDatabase : public Database

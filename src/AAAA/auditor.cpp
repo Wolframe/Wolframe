@@ -69,7 +69,7 @@ DatabaseAuditor::DatabaseAuditor( const DatabaseAuditConfig& conf )
 		break;
 	case db::DBTYPE_REFERENCE:	{
 		m_db = NULL;
-		m_dbLabel = ( static_cast<db::ReferenceConfig*>(conf.m_dbConfig.m_dbConfig) )->m_ref;
+		m_dbLabel = ( static_cast<db::ReferenceConfig*>(conf.m_dbConfig.m_dbConfig) )->dbName();
 		LOG_NOTICE << "Database auditor with database reference '" << m_dbLabel << "'";
 	}
 		break;

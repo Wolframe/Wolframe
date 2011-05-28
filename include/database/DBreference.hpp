@@ -43,19 +43,22 @@ namespace _Wolframe {
 namespace db {
 
 /// database reference class
-/// nothe that this is a configuration class only
-struct ReferenceConfig : public DatabaseConfig
+/// note that this is a configuration class only
+class ReferenceConfig : public DatabaseConfig
 {
-	std::string	m_ref;
+	friend class config::ConfigurationParser;
 public:
 	DatabaseType type() const			{ return DBTYPE_REFERENCE; }
 
 	ReferenceConfig( const char* name, const char* logParent, const char* logName )
 		: DatabaseConfig( name, logParent, logName )	{}
-	~ReferenceConfig()					{}
 
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
+
+	const std::string& dbName()			{ return m_ref; }
+private:
+	std::string	m_ref;
 };
 
 }} // namespace _Wolframe::db

@@ -69,7 +69,7 @@ DatabaseAuth::DatabaseAuth( const DatabaseAuthConfig& conf )
 		break;
 	case db::DBTYPE_REFERENCE:	{
 		m_db = NULL;
-		m_dbLabel = ( static_cast<db::ReferenceConfig*>(conf.m_dbConfig.m_dbConfig) )->m_ref;
+		m_dbLabel = ( static_cast<db::ReferenceConfig*>(conf.m_dbConfig.m_dbConfig) )->dbName();
 		LOG_NOTICE << "Database authenticator with database reference '" << m_dbLabel << "'";
 	}
 		break;

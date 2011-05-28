@@ -43,15 +43,9 @@ namespace _Wolframe {
 namespace db {
 
 /// PostgreSQL server connection configuration
-struct PostgreSQLconfig : public DatabaseConfig
+class PostgreSQLconfig : public DatabaseConfig
 {
-	std::string	host;
-	unsigned short	port;
-	std::string	dbName;
-	std::string	user;
-	std::string	password;
-	unsigned short	connections;
-	unsigned short	acquireTimeout;
+	friend class config::ConfigurationParser;
 public:
 	DatabaseType type() const			{ return DBTYPE_POSTGRESQL; }
 
@@ -60,6 +54,14 @@ public:
 
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
+private:
+	std::string	host;
+	unsigned short	port;
+	std::string	dbName;
+	std::string	user;
+	std::string	password;
+	unsigned short	connections;
+	unsigned short	acquireTimeout;
 };
 
 class PostgreSQLDatabase : public Database
