@@ -75,13 +75,13 @@ class ObjectPoolFixture : public ::testing::Test	{
 protected:
 	// Set-up work for each test here.
 	ObjectPoolFixture()	{
-		srand((unsigned)time(0));
 		noThreads = 1 + (int)( rand() % 32 );
 		poolSize = 1 + (int)( rand() % 16 );
 		times = (unsigned long)( rand() % 200000 );
 		std::cout << noThreads << " threads, " << poolSize << " elements in the pool, "
 			  << times << " iterations, total "<< noThreads * times << std::endl;
 	}
+
 
 	// Clean-up work that doesn't throw exceptions here.
 	virtual ~ObjectPoolFixture()	{
