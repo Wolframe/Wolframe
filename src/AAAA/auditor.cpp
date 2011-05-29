@@ -42,6 +42,51 @@
 namespace _Wolframe {
 namespace AAAA {
 
+/// constructor
+AuditConfiguration::~AuditConfiguration()
+{
+	for ( std::list<AuditConfigurationBase*>::const_iterator it = m_config.begin();
+								it != m_config.end(); it++ )
+		delete *it;
+}
+
+
+/// methods
+bool AuditConfiguration::check() const
+{
+	bool correct = true;
+	for ( std::list<AuditConfigurationBase*>::const_iterator it = m_config.begin();
+								it != m_config.end(); it++ )	{
+		if ( !(*it)->check() )
+			correct = false;
+	}
+	return correct;
+}
+
+
+void AuditConfiguration::print( std::ostream& os, size_t indent ) const
+{
+	std::string indStr( indent, ' ' );
+
+	os << indStr << sectionName() << ":" << std::endl;
+	if ( m_config.size() > 0 )	{
+		for ( std::list<AuditConfigurationBase*>::const_iterator it = m_config.begin();
+								it != m_config.end(); it++ )	{
+			(*it)->print( os, indent + 3 );
+		}
+	}
+	else
+		os << "   None configured" << std::endl;
+}
+
+
+void AuditConfiguration::setCanonicalPathes( const std::string& referencePath )
+{
+	for ( std::list<AuditConfigurationBase*>::const_iterator it = m_config.begin();
+								it != m_config.end(); it++ )	{
+		(*it)->setCanonicalPathes( referencePath );
+	}
+}
 
 }} // namespace _Wolframe::AAAA
 

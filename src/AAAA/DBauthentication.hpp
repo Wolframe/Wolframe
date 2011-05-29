@@ -31,52 +31,56 @@
 
 ************************************************************************/
 //
-// audit configuration parser
+// database authenticator
 //
 
-#include "logger.hpp"
-#include "config/configurationParser.hpp"
-#include "auditor.hpp"
-#include "DBaudit.hpp"
-#include "FileAudit.hpp"
+#ifndef _DB_AUTHENTICATION_HPP_INCLUDED
+#define _DB_AUTHENTICATION_HPP_INCLUDED
 
-#include "boost/algorithm/string.hpp"
+#include "authenticator.hpp"
+#include "database/database.hpp"
 
 namespace _Wolframe {
-namespace config {
+namespace AAAA {
 
-template<>
-bool ConfigurationParser::parse( AAAA::AuditConfiguration& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& /*node*/ )
+class DatabaseAuthConfig : public AuthenticatorConfigBase
 {
-	using namespace _Wolframe::config;
-	bool retVal = true;
+	friend class DatabaseAuth;
+	friend class config::ConfigurationParser;
+public:
+	DatabaseAuthConfig( const char* cfgName, const char* logParent, const char* logName )
+		: AuthenticatorConfigBase( cfgName, logParent, logName ),
+		  m_dbConfig( "", logParent, "Database" )	{}
 
-	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
-		if ( boost::algorithm::iequals( L1it->first, "file" ))	{
-			AAAA::FileAuditConfig* conf = new AAAA::FileAuditConfig( "File", cfg.logPrefix().c_str(), "file" );
-			if ( ConfigurationParser::parse( *conf, L1it->second, L1it->first ))
-				cfg.m_config.push_back( conf );
-			else	{
-				delete conf;
-				retVal = false;
-			}
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "database" ))	{
-			AAAA::DatabaseAuditConfig* conf = new AAAA::DatabaseAuditConfig( "Database", cfg.logPrefix().c_str(), "database" );
-			if ( ConfigurationParser::parse( *conf, L1it->second, L1it->first ))
-				cfg.m_config.push_back( conf );
-			else	{
-				delete conf;
-				retVal = false;
-			}
-		}
-		else
-			LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
-				    << L1it->first << "'";
+	virtual AuthenticationType type() const			{ return AUTH_DATABASE; }
+
+	/// methods
+	bool check() const					{ return m_dbConfig.check(); }
+
+	void print( std::ostream& os, size_t indent ) const	{
+		std::string indStr( indent, ' ' );
+		os << indStr << sectionName() << ": " << std::endl;
+		m_dbConfig.print( os, indent + 3 );
 	}
-	return retVal;
-}
 
-}} // namespace _Wolframe::config
+	void setCanonicalPathes( const std::string& refPath )	{ m_dbConfig.setCanonicalPathes( refPath ); }
+private:
+	db::SingleDBConfiguration	m_dbConfig;
+};
 
+
+class DatabaseAuth : public AuthenticatorBase
+{
+public:
+	DatabaseAuth( const DatabaseAuthConfig& conf );
+	~DatabaseAuth();
+
+	bool resolveDB( const db::DBprovider& db );
+private:
+	std::string		m_dbLabel;
+	const db::Database*	m_db;
+};
+
+}} // namespace _Wolframe::AAAA
+
+#endif // _DB_AUTHENTICATION_HPP_INCLUDED

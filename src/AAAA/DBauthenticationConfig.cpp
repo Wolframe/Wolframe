@@ -31,52 +31,20 @@
 
 ************************************************************************/
 //
-// authentication configuration
+//
 //
 
-#include "logger.hpp"
-#include "config/configurationParser.hpp"
-#include "authenticator.hpp"
-#include "TextFileAuthentication.hpp"
 #include "DBauthentication.hpp"
-
-#include "boost/algorithm/string.hpp"
+#include "config/configurationParser.hpp"
 
 namespace _Wolframe {
 namespace config {
 
 template<>
-bool ConfigurationParser::parse( AAAA::AuthenticationConfiguration& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& /*node*/ )
+bool ConfigurationParser::parse( AAAA::DatabaseAuthConfig& cfg,
+				 const boost::property_tree::ptree& pt, const std::string& node )
 {
-	using namespace _Wolframe::config;
-	bool retVal = true;
-
-	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
-		if ( boost::algorithm::iequals( L1it->first, "file" ))	{
-			AAAA::TextFileAuthConfig* conf = new AAAA::TextFileAuthConfig( "File", cfg.logPrefix().c_str(), "file" );
-			if ( ConfigurationParser::parse( *conf, L1it->second, L1it->first ))
-				cfg.m_config.push_back( conf );
-			else	{
-				delete conf;
-				retVal = false;
-			}
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "database" ))	{
-			AAAA::DatabaseAuthConfig* conf = new AAAA::DatabaseAuthConfig( "Database", cfg.logPrefix().c_str(), "database" );
-			if ( ConfigurationParser::parse( *conf, L1it->second, L1it->first ))
-				cfg.m_config.push_back( conf );
-			else	{
-				delete conf;
-				retVal = false;
-			}
-		}
-		else
-			LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
-				    << L1it->first << "'";
-	}
-	return retVal;
+	return ConfigurationParser::parse( cfg.m_dbConfig, pt, node );
 }
 
 }} // namespace _Wolframe::config
-

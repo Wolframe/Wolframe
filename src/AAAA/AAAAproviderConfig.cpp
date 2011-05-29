@@ -31,52 +31,41 @@
 
 ************************************************************************/
 //
-// authentication configuration
+//
 //
 
 #include "logger.hpp"
+#include "AAAAprovider.hpp"
 #include "config/configurationParser.hpp"
-#include "authenticator.hpp"
-#include "TextFileAuthentication.hpp"
-#include "DBauthentication.hpp"
 
-#include "boost/algorithm/string.hpp"
+#include <boost/property_tree/ptree.hpp>
+#include <boost/algorithm/string.hpp>
 
 namespace _Wolframe {
 namespace config {
 
 template<>
-bool ConfigurationParser::parse( AAAA::AuthenticationConfiguration& cfg,
+bool ConfigurationParser::parse( AAAA::Configuration& cfg,
 				 const boost::property_tree::ptree& pt, const std::string& /*node*/ )
 {
 	using namespace _Wolframe::config;
 	bool retVal = true;
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
-		if ( boost::algorithm::iequals( L1it->first, "file" ))	{
-			AAAA::TextFileAuthConfig* conf = new AAAA::TextFileAuthConfig( "File", cfg.logPrefix().c_str(), "file" );
-			if ( ConfigurationParser::parse( *conf, L1it->second, L1it->first ))
-				cfg.m_config.push_back( conf );
-			else	{
-				delete conf;
+		if ( boost::algorithm::iequals( L1it->first, "Authentication" ) ||
+				boost::algorithm::iequals( L1it->first, "Auth" ))	{
+			if ( !ConfigurationParser::parse( cfg.auth, L1it->second, L1it->first ))
 				retVal = false;
-			}
 		}
-		else if ( boost::algorithm::iequals( L1it->first, "database" ))	{
-			AAAA::DatabaseAuthConfig* conf = new AAAA::DatabaseAuthConfig( "Database", cfg.logPrefix().c_str(), "database" );
-			if ( ConfigurationParser::parse( *conf, L1it->second, L1it->first ))
-				cfg.m_config.push_back( conf );
-			else	{
-				delete conf;
+		else if ( boost::algorithm::iequals( L1it->first, "Audit" ))	{
+			if ( !ConfigurationParser::parse( cfg.audit, L1it->second, L1it->first ))
 				retVal = false;
-			}
 		}
 		else
-			LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
+			LOG_WARNING << cfg.logPrefix() << ": unknown configuration option: '"
 				    << L1it->first << "'";
 	}
 	return retVal;
 }
 
 }} // namespace _Wolframe::config
-

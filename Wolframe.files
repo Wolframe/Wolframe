@@ -389,3 +389,10 @@ src/AAAA/DBauditConfig.cpp
 src/AAAA/FileAudit.hpp
 src/AAAA/FileAudit.cpp
 src/AAAA/FileAuditConfig.cpp
+src/AAAA/DBauthentication.hpp
+src/AAAA/TextFileAuthentication.hpp
+src/AAAA/DBauthenticationConfig.cpp
+src/AAAA/TextAuthenticationConfig.cpp
+src/AAAA/TextFileAuthentication.cpp
+src/AAAA/DBauthentication.cpp
+src/AAAA/AAAAproviderConfig.cpp

@@ -39,8 +39,6 @@
 
 #include "config/configurationBase.hpp"
 #include "auditor.hpp"
-#include "DBaudit.hpp"
-#include "FileAudit.hpp"
 #include "authenticator.hpp"
 #include "database/database.hpp"
 
@@ -98,7 +96,7 @@ public:
 };
 
 
-struct Configuration : public config::ConfigurationBase
+class Configuration : public config::ConfigurationBase
 {
 	friend class AAAAprovider;
 	friend class config::ConfigurationParser;
@@ -131,7 +129,7 @@ public:
 	_AccountingChannel_* accountingChannel() const		{ return NULL; }
 private:
 	std::list<AuthenticatorBase*>	m_authenticators;
-	std::list<AuditorBase*>			m_auditors;
+	std::list<AuditorBase*>		m_auditors;
 };
 
 }} // namespace _Wolframe::AAAA

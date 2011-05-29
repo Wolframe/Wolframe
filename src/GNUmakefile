@@ -121,8 +121,13 @@ DB_OBJS =
 AAAA_OBJS = \
 	AAAA/authentication_textfile.o \
 	AAAA/AAAAprovider.o \
+	AAAA/AAAAproviderConfig.o \
 	AAAA/authConfiguration.o \
 	AAAA/authenticator.o \
+	AAAA/DBauthentication.o \
+	AAAA/DBauthenticationConfig.o \
+	AAAA/TextFileAuthentication.o \
+	AAAA/TextAuthenticationConfig.o \
 	AAAA/auditConfiguration.o \
 	AAAA/auditor.o \
 	AAAA/DBaudit.o \

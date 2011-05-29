@@ -34,50 +34,22 @@
 // AAAA provider implementation
 //
 
+#include <stdexcept>
+
 #include "AAAAprovider.hpp"
-#include "config/configurationBase.hpp"
-#include "config/configurationParser.hpp"
 #include "logger.hpp"
 
-#include <boost/property_tree/ptree.hpp>
-#include <boost/algorithm/string.hpp>
-
-#include <ostream>
+#include "FileAudit.hpp"
+#include "DBaudit.hpp"
+#include "TextFileAuthentication.hpp"
+#include "DBauthentication.hpp"
 
 namespace _Wolframe {
-namespace config {
-
-template<>
-bool ConfigurationParser::parse( AAAA::Configuration& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& /*node*/ )
-{
-	using namespace _Wolframe::config;
-	bool retVal = true;
-
-	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
-		if ( boost::algorithm::iequals( L1it->first, "Authentication" ) ||
-				boost::algorithm::iequals( L1it->first, "Auth" ))	{
-			if ( !ConfigurationParser::parse( cfg.auth, L1it->second, L1it->first ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "Audit" ))	{
-			if ( !ConfigurationParser::parse( cfg.audit, L1it->second, L1it->first ))
-				retVal = false;
-		}
-		else
-			LOG_WARNING << cfg.logPrefix() << ": unknown configuration option: '"
-				    << L1it->first << "'";
-	}
-	return retVal;
-}
-
-} // namespace config
-
 namespace AAAA {
 
 AAAAprovider::AAAAprovider( const Configuration& conf )
 {
-	for ( std::list<AuthenticationConfigurationBase*>::const_iterator it = conf.auth.m_config.begin();
+	for ( std::list<AuthenticatorConfigBase*>::const_iterator it = conf.auth.m_config.begin();
 							it != conf.auth.m_config.end(); it++ )	{
 		switch( (*it)->type() )	{
 		case AUTH_DATABASE:	{
