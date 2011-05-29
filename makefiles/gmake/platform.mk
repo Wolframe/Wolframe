@@ -209,11 +209,16 @@ XSLT_MAN_STYLESHEET ?= /usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook
 endif
 endif
 
-# Fedora 14
 ifeq "$(LINUX_DIST)" "redhat"
 
 # Fedora 14
 ifeq "$(LINUX_REV)" "14"
+XSLT_VERSION ?= $(shell rpm -q --queryformat '%{VERSION}' docbook-style-xsl)
+XSLT_MAN_STYLESHEET ?= /usr/share/sgml/docbook/xsl-stylesheets-$(XSLT_VERSION)/manpages/docbook.xsl
+endif
+
+# Fedora 14
+ifeq "$(LINUX_REV)" "15"
 XSLT_VERSION ?= $(shell rpm -q --queryformat '%{VERSION}' docbook-style-xsl)
 XSLT_MAN_STYLESHEET ?= /usr/share/sgml/docbook/xsl-stylesheets-$(XSLT_VERSION)/manpages/docbook.xsl
 endif
@@ -283,6 +288,16 @@ BOOST_LIBRARY_TAG ?= -mt
 endif
 endif
 
+# Fedora 15
+ifeq "$(LINUX_DIST)" "redhat"
+ifeq "$(LINUX_REV)" "15"
+BOOST_DIR ?= /usr
+BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
+BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
+BOOST_LIBRARY_TAG ?= -mt
+endif
+endif
+
 # RHEL5
 ifeq "$(LINUX_DIST)" "redhat"
 ifeq "$(LINUX_REV)" "5"
@@ -343,6 +358,13 @@ ifeq "$(LINUX_DIST)" "redhat"
 
 # Fedora 14 puts Qt in a subdir in /usr/lib
 ifeq "$(LINUX_REV)" "14"
+QT_DIR ?= /usr/lib/qt4
+QT_INCLUDE_DIR ?= /usr/include
+QT_LIB_DIR ?= /usr/lib
+endif
+
+# Fedora 14 puts Qt in a subdir in /usr/lib
+ifeq "$(LINUX_REV)" "15"
 QT_DIR ?= /usr/lib/qt4
 QT_INCLUDE_DIR ?= /usr/include
 QT_LIB_DIR ?= /usr/lib
@@ -432,6 +454,14 @@ PAM_LIB_DIR ?= /lib
 PAM_LIBS ?= -lpam
 endif
 
+# Fedora 15
+ifeq "$(LINUX_REV)" "15"
+PAM_DIR ?= /usr
+PAM_INCLUDE_DIR ?= $(PAM_DIR)/include
+PAM_LIB_DIR ?= /lib
+PAM_LIBS ?= -lpam
+endif
+
 # RHEL5
 ifeq "$(LINUX_REV)" "5"
 PAM_DIR ?= /usr
@@ -507,6 +537,14 @@ SASL_LIB_DIR ?= $(SASL_DIR)/lib
 SASL_LIBS ?= -lsasl2
 endif
 
+# Fedora 15
+ifeq "$(LINUX_REV)" "15"
+SASL_DIR ?= /usr
+SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
+SASL_LIB_DIR ?= $(SASL_DIR)/lib
+SASL_LIBS ?= -lsasl2
+endif
+
 endif
 
 ifeq "$(LINUX_DIST)" "suse"
@@ -574,6 +612,14 @@ SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
 SQLITE3_LIBS ?= -lsqlite3
 endif
 
+# Fedora 15
+ifeq "$(LINUX_REV)" "15"
+SQLITE3_DIR ?= /usr
+SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
+SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
+SQLITE3_LIBS ?= -lsqlite3
+endif
+
 endif
 
 ifeq "$(LINUX_DIST)" "suse"
@@ -635,6 +681,14 @@ endif
 
 # Fedora 14
 ifeq "$(LINUX_REV)" "14"
+PGSQL_DIR ?= /usr
+PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include
+PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
+PGSQL_LIBS ?= -lpq
+endif
+
+# Fedora 15
+ifeq "$(LINUX_REV)" "15"
 PGSQL_DIR ?= /usr
 PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include
 PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
