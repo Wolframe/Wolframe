@@ -34,75 +34,55 @@
 // authenticator implementation
 //
 
-#include <stdexcept>
-
-#include "logger.hpp"
 #include "authenticator.hpp"
-
-#include "database/database.hpp"
-#include "database/PostgreSQL.hpp"
-#include "database/SQLite.hpp"
-#include "database/DBreference.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
 
-TextFileAuth::TextFileAuth( const TextFileAuthConfig& conf )
+/// constructor
+AuthenticationConfiguration::~AuthenticationConfiguration()
 {
-	m_file = conf.m_file;
-	LOG_NOTICE << "File authenticator created with file '" << m_file << "'";
+	for ( std::list<AuthenticatorConfigBase*>::const_iterator it = m_config.begin();
+								it != m_config.end(); it++ )
+		delete *it;
 }
 
 
-DatabaseAuth::DatabaseAuth( const DatabaseAuthConfig& conf )
+/// methods
+bool AuthenticationConfiguration::check() const
 {
-	switch ( conf.m_dbConfig.m_dbConfig->type() )	{
-	case db::DBTYPE_POSTGRESQL:	{
-		LOG_NOTICE << "Database authenticator with PostgreSQL";
-		m_db = new db::PostgreSQLDatabase( static_cast<db::PostgreSQLconfig*>(conf.m_dbConfig.m_dbConfig) );
+	bool correct = true;
+	for ( std::list<AuthenticatorConfigBase*>::const_iterator it = m_config.begin();
+								it != m_config.end(); it++ )	{
+		if ( !(*it)->check() )
+			correct = false;
 	}
-		break;
-	case db::DBTYPE_SQLITE:	{
-		LOG_NOTICE << "Database authenticator with SQLite";
-		m_db = new db::SQLiteDatabase( static_cast<db::SQLiteConfig*>(conf.m_dbConfig.m_dbConfig) );
-	}
-		break;
-	case db::DBTYPE_REFERENCE:	{
-		m_db = NULL;
-		m_dbLabel = ( static_cast<db::ReferenceConfig*>(conf.m_dbConfig.m_dbConfig) )->dbName();
-		LOG_NOTICE << "Database authenticator with database reference '" << m_dbLabel << "'";
-	}
-		break;
-	default:
-		throw std::domain_error( "Unknown database type in database authenticator constructor" );
-	}
-}
-
-DatabaseAuth::~DatabaseAuth()
-{
-	if ( m_dbLabel.empty() )	{	// it's not a reference
-		if ( m_db )
-			delete m_db;
-		else
-			throw std::logic_error( "No database in DatabaseAuth" );
-	}
+	return correct;
 }
 
 
-bool DatabaseAuth::resolveDB( const db::DBprovider& db )
+void AuthenticationConfiguration::print( std::ostream& os, size_t indent ) const
 {
-	if ( m_db == NULL && ! m_dbLabel.empty() )	{
-		m_db = db.database( m_dbLabel );
-		if ( m_db )	{
-			LOG_NOTICE << "Database authenticator: database reference '" << m_dbLabel << "' resolved";
-			return true;
-		}
-		else	{
-			LOG_ERROR << "Database authenticator: database labeled '" << m_dbLabel << "' not found !";
-			return false;
+	std::string indStr( indent, ' ' );
+
+	os << indStr << sectionName() << ":" << std::endl;
+	if ( m_config.size() > 0 )	{
+		for ( std::list<AuthenticatorConfigBase*>::const_iterator it = m_config.begin();
+								it != m_config.end(); it++ )	{
+			(*it)->print( os, indent + 3 );
 		}
 	}
-	return true;
+	else
+		os << "   None configured" << std::endl;
+}
+
+
+void AuthenticationConfiguration::setCanonicalPathes( const std::string& refPath )
+{
+	for ( std::list<AuthenticatorConfigBase*>::const_iterator it = m_config.begin();
+								it != m_config.end(); it++ )	{
+		(*it)->setCanonicalPathes( refPath );
+	}
 }
 
 }} // namespace _Wolframe::AAAA

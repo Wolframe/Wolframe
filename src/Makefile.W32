@@ -65,10 +65,19 @@ DB_OBJS =
 AAAA_OBJS = \
 	AAAA\authentication_textfile.obj \
 	AAAA\AAAAprovider.obj \
+	AAAA\AAAAproviderConfig.obj \
 	AAAA\authConfiguration.obj \
 	AAAA\authenticator.obj \
+	AAAA\DBauthentication.obj \
+	AAAA\DBauthenticationConfig.obj \
+	AAAA\TextFileAuthentication.obj \
+	AAAA\TextAuthenticationConfig.obj \
 	AAAA\auditConfiguration.obj \
-	AAAA\auditor.obj
+	AAAA\auditor.obj \
+	AAAA\DBaudit.obj \
+	AAAA\DBauditConfig.obj \
+	AAAA\FileAudit.obj \
+	AAAA\FileAuditConfig.obj
 
 !IFDEF WITH_SQLITE3
 AAAA_OBJS = $(AAAA_OBJS) \

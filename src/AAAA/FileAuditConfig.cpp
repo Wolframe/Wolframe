@@ -31,52 +31,43 @@
 
 ************************************************************************/
 //
-// authentication configuration
+// file audit configuration
 //
 
-#include "logger.hpp"
+#include "FileAudit.hpp"
 #include "config/configurationParser.hpp"
-#include "authenticator.hpp"
-#include "TextFileAuthentication.hpp"
-#include "DBauthentication.hpp"
+#include "config/valueParser.hpp"
 
-#include "boost/algorithm/string.hpp"
+#include <boost/algorithm/string.hpp>
+#define BOOST_FILESYSTEM_VERSION 3
+#include <boost/filesystem.hpp>
+#include "miscUtils.hpp"
 
 namespace _Wolframe {
 namespace config {
 
 template<>
-bool ConfigurationParser::parse( AAAA::AuthenticationConfiguration& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& /*node*/ )
+bool ConfigurationParser::parse( AAAA::FileAuditConfig& cfg,
+				 const boost::property_tree::ptree& pt, const std::string& node )
 {
 	using namespace _Wolframe::config;
 	bool retVal = true;
 
-	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
-		if ( boost::algorithm::iequals( L1it->first, "file" ))	{
-			AAAA::TextFileAuthConfig* conf = new AAAA::TextFileAuthConfig( "File", cfg.logPrefix().c_str(), "file" );
-			if ( ConfigurationParser::parse( *conf, L1it->second, L1it->first ))
-				cfg.m_config.push_back( conf );
-			else	{
-				delete conf;
-				retVal = false;
-			}
+	if ( boost::algorithm::iequals( node, "file" ) || boost::algorithm::iequals( node, "filename" ))	{
+		bool isDefined = ( ! cfg.m_file.empty() );
+		if ( !Parser::getValue( cfg.logPrefix().c_str(), node.c_str(),
+					pt.get_value<std::string>(), cfg.m_file, &isDefined ))
+			retVal = false;
+		else	{
+			if ( ! boost::filesystem::path( cfg.m_file ).is_absolute() )
+				LOG_WARNING << cfg.logPrefix() << "audit file path is not absolute: "
+					    << cfg.m_file;
 		}
-		else if ( boost::algorithm::iequals( L1it->first, "database" ))	{
-			AAAA::DatabaseAuthConfig* conf = new AAAA::DatabaseAuthConfig( "Database", cfg.logPrefix().c_str(), "database" );
-			if ( ConfigurationParser::parse( *conf, L1it->second, L1it->first ))
-				cfg.m_config.push_back( conf );
-			else	{
-				delete conf;
-				retVal = false;
-			}
-		}
-		else
-			LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
-				    << L1it->first << "'";
+	}
+	else	{
+		LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '" << node << "'";
 	}
 	return retVal;
 }
 
 }} // namespace _Wolframe::config
-

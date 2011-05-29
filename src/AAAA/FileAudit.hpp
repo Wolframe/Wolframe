@@ -31,52 +31,47 @@
 
 ************************************************************************/
 //
-// audit configuration parser
+// file audit
 //
 
-#include "logger.hpp"
-#include "config/configurationParser.hpp"
-#include "auditor.hpp"
-#include "DBaudit.hpp"
-#include "FileAudit.hpp"
+#ifndef _FILE_AUDIT_HPP_INCLUDED
+#define _FILE_AUDIT_HPP_INCLUDED
 
-#include "boost/algorithm/string.hpp"
+#include <string>
+
+#include "auditor.hpp"
 
 namespace _Wolframe {
-namespace config {
+namespace AAAA {
 
-template<>
-bool ConfigurationParser::parse( AAAA::AuditConfiguration& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& /*node*/ )
+class FileAuditConfig : public AuditConfigurationBase
 {
-	using namespace _Wolframe::config;
-	bool retVal = true;
+	friend class FileAuditor;
+	friend class config::ConfigurationParser;
+public:
+	FileAuditConfig( const char* cfgName, const char* logParent, const char* logName )
+		: AuditConfigurationBase( cfgName, logParent, logName ){}
 
-	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
-		if ( boost::algorithm::iequals( L1it->first, "file" ))	{
-			AAAA::FileAuditConfig* conf = new AAAA::FileAuditConfig( "File", cfg.logPrefix().c_str(), "file" );
-			if ( ConfigurationParser::parse( *conf, L1it->second, L1it->first ))
-				cfg.m_config.push_back( conf );
-			else	{
-				delete conf;
-				retVal = false;
-			}
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "database" ))	{
-			AAAA::DatabaseAuditConfig* conf = new AAAA::DatabaseAuditConfig( "Database", cfg.logPrefix().c_str(), "database" );
-			if ( ConfigurationParser::parse( *conf, L1it->second, L1it->first ))
-				cfg.m_config.push_back( conf );
-			else	{
-				delete conf;
-				retVal = false;
-			}
-		}
-		else
-			LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
-				    << L1it->first << "'";
-	}
-	return retVal;
-}
+	AuditType type() const					{ return AUDIT_FILE; }
 
-}} // namespace _Wolframe::config
+	/// methods
+	bool check() const;
+	void print( std::ostream& os, size_t indent ) const;
+	void setCanonicalPathes( const std::string& referencePath );
+private:
+	std::string	m_file;
+};
 
+
+class FileAuditor : public AuditorBase
+{
+public:
+	FileAuditor( const FileAuditConfig& conf );
+	~FileAuditor()						{}
+private:
+	std::string	m_file;
+};
+
+}} // namespace _Wolframe::AAAA
+
+#endif // _FILE_AUDIT_HPP_INCLUDED

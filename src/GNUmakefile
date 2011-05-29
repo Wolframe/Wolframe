@@ -116,15 +116,24 @@ LOGGER_OBJS = \
 	logger/loggerConfig.o \
 	logger/logger.o
 
-DB_OBJS =
+DB_OBJS = \
 
 AAAA_OBJS = \
 	AAAA/authentication_textfile.o \
 	AAAA/AAAAprovider.o \
+	AAAA/AAAAproviderConfig.o \
 	AAAA/authConfiguration.o \
 	AAAA/authenticator.o \
+	AAAA/DBauthentication.o \
+	AAAA/DBauthenticationConfig.o \
+	AAAA/TextFileAuthentication.o \
+	AAAA/TextAuthenticationConfig.o \
 	AAAA/auditConfiguration.o \
-	AAAA/auditor.o
+	AAAA/auditor.o \
+	AAAA/DBaudit.o \
+	AAAA/DBauditConfig.o \
+	AAAA/FileAudit.o \
+	AAAA/FileAuditConfig.o
 
 ifeq ($(WITH_PAM),1)
 AAAA_OBJS += \
@@ -137,6 +146,10 @@ AAAA_OBJS += \
 endif
 
 ifeq ($(WITH_SQLITE3),1)
+DB_OBJS = \
+	database/SQLite.o \
+	database/SQLiteConfig.o
+
 AAAA_OBJS += \
 	AAAA/authentication_db_sqlite3.o
 endif
@@ -174,11 +187,13 @@ OBJS = \
 	database/database.o \
 	database/PostgreSQL.o \
 	database/PostgreSQLconfig.o \
-	database/SQLite.o \
-	database/SQLiteConfig.o \
 	database/DBreference.o \
 	database/DBreferenceConfig.o \
 	posixMain.o
+# Aba: link trouble in dbTest!
+# also suggesting with_sqlite flags and DB_OBJS..
+#	database/SQLite.o
+#	database/SQLiteConfig.o
 
 CPP_BINS = \
 	wolframed$(EXE)

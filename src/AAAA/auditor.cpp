@@ -37,72 +37,55 @@
 #include <stdexcept>
 
 #include "logger.hpp"
-#include "AAAA/auditor.hpp"
-
-#include "database/database.hpp"
-#include "database/PostgreSQL.hpp"
-#include "database/SQLite.hpp"
-#include "database/DBreference.hpp"
+#include "auditor.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
 
-FileAuditor::FileAuditor( const FileAuditConfig& conf )
+/// constructor
+AuditConfiguration::~AuditConfiguration()
 {
-	m_file = conf.m_file;
-	LOG_NOTICE << "File auditor created with file '" << m_file << "'";
+	for ( std::list<AuditConfigurationBase*>::const_iterator it = m_config.begin();
+								it != m_config.end(); it++ )
+		delete *it;
 }
 
 
-DatabaseAuditor::DatabaseAuditor( const DatabaseAuditConfig& conf )
+/// methods
+bool AuditConfiguration::check() const
 {
-	switch ( conf.m_dbConfig.m_dbConfig->type() )	{
-	case db::DBTYPE_POSTGRESQL:	{
-		LOG_NOTICE << "Database auditor with PostgreSQL";
-		m_db = new db::PostgreSQLDatabase( static_cast<db::PostgreSQLconfig*>(conf.m_dbConfig.m_dbConfig) );
+	bool correct = true;
+	for ( std::list<AuditConfigurationBase*>::const_iterator it = m_config.begin();
+								it != m_config.end(); it++ )	{
+		if ( !(*it)->check() )
+			correct = false;
 	}
-		break;
-	case db::DBTYPE_SQLITE:	{
-		LOG_NOTICE << "Database auditor with SQLite";
-		m_db = new db::SQLiteDatabase( static_cast<db::SQLiteConfig*>(conf.m_dbConfig.m_dbConfig) );
-	}
-		break;
-	case db::DBTYPE_REFERENCE:	{
-		m_db = NULL;
-		m_dbLabel = ( static_cast<db::ReferenceConfig*>(conf.m_dbConfig.m_dbConfig) )->dbName();
-		LOG_NOTICE << "Database auditor with database reference '" << m_dbLabel << "'";
-	}
-		break;
-	default:
-		throw std::domain_error( "Unknown database type in database auditor constructor" );
-	}
-}
-
-DatabaseAuditor::~DatabaseAuditor()
-{
-	if ( m_dbLabel.empty() )	{	// it's not a reference
-		if ( m_db )
-			delete m_db;
-		else
-			throw std::logic_error( "No database in DatabaseAuditor" );
-	}
+	return correct;
 }
 
 
-bool DatabaseAuditor::resolveDB( const db::DBprovider& db )
+void AuditConfiguration::print( std::ostream& os, size_t indent ) const
 {
-	if ( m_db == NULL && ! m_dbLabel.empty() )	{
-		m_db = db.database( m_dbLabel );
-		if ( m_db )	{
-			LOG_NOTICE << "Database audit: database reference '" << m_dbLabel << "' resolved";
-			return true;
-		}
-		else	{
-			LOG_ERROR << "Database audit: database labeled '" << m_dbLabel << "' not found !";
-			return false;
+	std::string indStr( indent, ' ' );
+
+	os << indStr << sectionName() << ":" << std::endl;
+	if ( m_config.size() > 0 )	{
+		for ( std::list<AuditConfigurationBase*>::const_iterator it = m_config.begin();
+								it != m_config.end(); it++ )	{
+			(*it)->print( os, indent + 3 );
 		}
 	}
-	return true;
+	else
+		os << "   None configured" << std::endl;
+}
+
+
+void AuditConfiguration::setCanonicalPathes( const std::string& referencePath )
+{
+	for ( std::list<AuditConfigurationBase*>::const_iterator it = m_config.begin();
+								it != m_config.end(); it++ )	{
+		(*it)->setCanonicalPathes( referencePath );
+	}
 }
 
 }} // namespace _Wolframe::AAAA

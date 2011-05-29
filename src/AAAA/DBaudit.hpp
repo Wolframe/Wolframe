@@ -31,52 +31,55 @@
 
 ************************************************************************/
 //
-// audit configuration parser
+// database audit
 //
 
-#include "logger.hpp"
-#include "config/configurationParser.hpp"
 #include "auditor.hpp"
-#include "DBaudit.hpp"
-#include "FileAudit.hpp"
+#include "database/database.hpp"
 
-#include "boost/algorithm/string.hpp"
+#ifndef _DB_AUDIT_HPP_INCLUDED
+#define _DB_AUDIT_HPP_INCLUDED
 
 namespace _Wolframe {
-namespace config {
+namespace AAAA {
 
-template<>
-bool ConfigurationParser::parse( AAAA::AuditConfiguration& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& /*node*/ )
+class DatabaseAuditConfig : public AuditConfigurationBase
 {
-	using namespace _Wolframe::config;
-	bool retVal = true;
+	friend class DatabaseAuditor;
+	friend class config::ConfigurationParser;
+public:
+	DatabaseAuditConfig( const char* cfgName, const char* logParent, const char* logName )
+		: AuditConfigurationBase( cfgName, logParent, logName ),
+		  m_dbConfig( "", logParent, "" )		{}
 
-	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
-		if ( boost::algorithm::iequals( L1it->first, "file" ))	{
-			AAAA::FileAuditConfig* conf = new AAAA::FileAuditConfig( "File", cfg.logPrefix().c_str(), "file" );
-			if ( ConfigurationParser::parse( *conf, L1it->second, L1it->first ))
-				cfg.m_config.push_back( conf );
-			else	{
-				delete conf;
-				retVal = false;
-			}
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "database" ))	{
-			AAAA::DatabaseAuditConfig* conf = new AAAA::DatabaseAuditConfig( "Database", cfg.logPrefix().c_str(), "database" );
-			if ( ConfigurationParser::parse( *conf, L1it->second, L1it->first ))
-				cfg.m_config.push_back( conf );
-			else	{
-				delete conf;
-				retVal = false;
-			}
-		}
-		else
-			LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
-				    << L1it->first << "'";
+	AuditType type() const					{ return AUDIT_DATABASE; }
+
+	/// methods
+	bool check() const					{ return m_dbConfig.check(); }
+	void print( std::ostream& os, size_t indent ) const	{
+		std::string indStr( indent, ' ' );
+		os << indStr << sectionName() << ": " << std::endl;
+		m_dbConfig.print( os, indent + 3 );
 	}
-	return retVal;
-}
 
-}} // namespace _Wolframe::config
+	void setCanonicalPathes( const std::string& refPath )	{ m_dbConfig.setCanonicalPathes( refPath ); }
+private:
+	db::SingleDBConfiguration	m_dbConfig;
+};
 
+
+class DatabaseAuditor : public AuditorBase
+{
+public:
+	DatabaseAuditor( const DatabaseAuditConfig& conf );
+	~DatabaseAuditor();
+
+	bool resolveDB( const db::DBprovider& db );
+private:
+	std::string		m_dbLabel;
+	const db::Database*	m_db;
+};
+
+}} // namespace _Wolframe::AAAA
+
+#endif // _DB_AUDIT_HPP_INCLUDED

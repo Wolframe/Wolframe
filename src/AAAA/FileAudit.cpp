@@ -31,52 +31,54 @@
 
 ************************************************************************/
 //
-// authentication configuration
+// file audit implementation
 //
+#include <stdexcept>
 
 #include "logger.hpp"
-#include "config/configurationParser.hpp"
-#include "authenticator.hpp"
-#include "TextFileAuthentication.hpp"
-#include "DBauthentication.hpp"
+#include "FileAudit.hpp"
 
-#include "boost/algorithm/string.hpp"
+#define BOOST_FILESYSTEM_VERSION 3
+#include <boost/filesystem.hpp>
+#include "miscUtils.hpp"
 
 namespace _Wolframe {
-namespace config {
+namespace AAAA {
 
-template<>
-bool ConfigurationParser::parse( AAAA::AuthenticationConfiguration& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& /*node*/ )
+/// Audit to file
+bool FileAuditConfig::check() const
 {
-	using namespace _Wolframe::config;
-	bool retVal = true;
-
-	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
-		if ( boost::algorithm::iequals( L1it->first, "file" ))	{
-			AAAA::TextFileAuthConfig* conf = new AAAA::TextFileAuthConfig( "File", cfg.logPrefix().c_str(), "file" );
-			if ( ConfigurationParser::parse( *conf, L1it->second, L1it->first ))
-				cfg.m_config.push_back( conf );
-			else	{
-				delete conf;
-				retVal = false;
-			}
-		}
-		else if ( boost::algorithm::iequals( L1it->first, "database" ))	{
-			AAAA::DatabaseAuthConfig* conf = new AAAA::DatabaseAuthConfig( "Database", cfg.logPrefix().c_str(), "database" );
-			if ( ConfigurationParser::parse( *conf, L1it->second, L1it->first ))
-				cfg.m_config.push_back( conf );
-			else	{
-				delete conf;
-				retVal = false;
-			}
-		}
-		else
-			LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
-				    << L1it->first << "'";
+	if ( m_file.empty() )	{
+		LOG_ERROR << logPrefix() << "Audit filename cannot be empty";
+		return false;
 	}
-	return retVal;
+	return true;
 }
 
-}} // namespace _Wolframe::config
+void FileAuditConfig::print( std::ostream& os, size_t indent ) const
+{
+	std::string indStr( indent, ' ' );
+	os << indStr << sectionName() << ": " << m_file << std::endl;
+}
 
+void FileAuditConfig::setCanonicalPathes( const std::string& refPath )
+{
+	using namespace boost::filesystem;
+
+	if ( ! m_file.empty() )	{
+		if ( ! path( m_file ).is_absolute() )
+			m_file = resolvePath( absolute( m_file,
+							path( refPath ).branch_path()).string());
+		else
+			m_file = resolvePath( m_file );
+	}
+}
+
+
+FileAuditor::FileAuditor( const FileAuditConfig& conf )
+{
+	m_file = conf.m_file;
+	LOG_NOTICE << "File auditor created with file '" << m_file << "'";
+}
+
+}} // namespace _Wolframe::AAAA

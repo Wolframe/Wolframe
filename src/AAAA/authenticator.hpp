@@ -37,9 +37,8 @@
 #ifndef _AUTHENTICATOR_HPP_INCLUDED
 #define _AUTHENTICATOR_HPP_INCLUDED
 
-#include <string>
+#include <list>
 #include "config/configurationBase.hpp"
-
 #include "database/database.hpp"
 
 namespace _Wolframe {
@@ -56,60 +55,16 @@ enum AuthenticationType	{
 };
 
 
-class AuthenticationConfigBase : public config::ConfigurationBase
+class AuthenticatorConfigBase : public config::ConfigurationBase
 {
 public:
 	/// constructor
-	AuthenticationConfigBase( const char* name, const char* logParent, const char* logName )
+	AuthenticatorConfigBase( const char* name, const char* logParent, const char* logName )
 		: config::ConfigurationBase( name, logParent, logName ){}
 
-	virtual ~AuthenticationConfigBase()			{}
+	virtual ~AuthenticatorConfigBase()			{}
 
 	virtual AuthenticationType type() const = 0;
-};
-
-
-class DatabaseAuthConfig : public AuthenticationConfigBase
-{
-	friend class DatabaseAuth;
-	friend class config::ConfigurationParser;
-public:
-	DatabaseAuthConfig( const char* cfgName, const char* logParent, const char* logName )
-		: AuthenticationConfigBase( cfgName, logParent, logName ),
-		  m_dbConfig( "", logParent, "Database" )	{}
-
-	virtual AuthenticationType type() const			{ return AUTH_DATABASE; }
-
-	/// methods
-	bool check() const					{ return m_dbConfig.check(); }
-	void print( std::ostream& os, size_t indent ) const	{
-		std::string indStr( indent, ' ' );
-		os << indStr << sectionName() << ": " << std::endl;
-		m_dbConfig.print( os, indent + 3 );
-	}
-
-	void setCanonicalPathes( const std::string& refPath )	{ m_dbConfig.setCanonicalPathes( refPath ); }
-private:
-	db::SingleDBConfiguration	m_dbConfig;
-};
-
-
-class TextFileAuthConfig : public AuthenticationConfigBase
-{
-	friend class TextFileAuth;
-	friend class config::ConfigurationParser;
-public:
-	TextFileAuthConfig( const char* cfgName, const char* logParent, const char* logName )
-		: AuthenticationConfigBase( cfgName, logParent, logName ){}
-
-	virtual AuthenticationType type() const			{ return AUTH_TEXTFILE; }
-
-	/// methods
-	bool check() const;
-	void print( std::ostream& os, size_t indent ) const;
-	void setCanonicalPathes( const std::string& referencePath );
-private:
-	std::string	m_file;
 };
 
 
@@ -131,36 +86,15 @@ public:
 
 	// bool test() const;	// Not implemented yet, inherited from base
 private:
-	std::list<AuthenticationConfigBase*>	m_config;
+	std::list<AuthenticatorConfigBase*>	m_config;
 };
 
-class GlobalAuthenticatorBase
+
+class AuthenticatorBase
 {
 public:
-	virtual	~GlobalAuthenticatorBase()			{}
+	virtual	~AuthenticatorBase()				{}
 	virtual bool resolveDB( const db::DBprovider& /*db*/ )	{ return true; }
-};
-
-class TextFileAuth : public GlobalAuthenticatorBase
-{
-public:
-	TextFileAuth( const TextFileAuthConfig& conf );
-	~TextFileAuth()						{}
-private:
-	std::string	m_file;
-};
-
-
-class DatabaseAuth : public GlobalAuthenticatorBase
-{
-public:
-	DatabaseAuth( const DatabaseAuthConfig& conf );
-	~DatabaseAuth();
-
-	bool resolveDB( const db::DBprovider& db );
-private:
-	std::string		m_dbLabel;
-	const db::Database*	m_db;
 };
 
 }} // namespace _Wolframe::AAAA
