@@ -10,6 +10,8 @@
 #include <map>
 #include <string>
 
+#ifdef WITH_SQLITE3
+
 #include "sqlite3.h"
 
 namespace _Wolframe {
@@ -45,3 +47,5 @@ class DbSqlite3Authenticator : public Authenticator {
 }} // namespace _Wolframe::AAAA
 
 #endif // _AUTHENTICATION_DB_SQLITE3_HPP_INCLUDED
+
+#endif // WITH_SQLITE3
