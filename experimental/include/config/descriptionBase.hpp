@@ -45,16 +45,19 @@ namespace config {
 struct DescriptionBase
 {
 	typedef void (*Parse)( const char* name, void* ref, std::size_t ofs, const boost::property_tree::ptree& pt);
+	typedef void (*Print)( std::ostream& out, const char* name, const void* ref, std::size_t ofs, unsigned int indent);
+
 	struct Item
 	{
 		std::size_t m_ofs;
 		std::string m_name;
 		Parse m_parse;
+		Print m_print;
 
-	Item( std::size_t ofs, const std::string& name, Parse parse)
-		:m_ofs(ofs),m_name(name),m_parse(parse){}
+	Item( std::size_t ofs, const std::string& name, Parse parse, Print print)
+		:m_ofs(ofs),m_name(name),m_parse(parse),m_print(print){}
 	Item( const Item& o)
-		:m_ofs(o.m_ofs),m_name(o.m_name),m_parse(o.m_parse){}
+		:m_ofs(o.m_ofs),m_name(o.m_name),m_parse(o.m_parse),m_print(o.m_print){}
 	};
 	std::vector<Item> m_ar;
 
@@ -64,6 +67,10 @@ struct DescriptionBase
 	/// \param[out] error the error message in case of failure (return false)
 	/// \return true if Ok, false if failed
 	bool parse( void* configStruct, const boost::property_tree::ptree& pt, std::string& errmsg) const;
+
+	/// \brief Print the configuration structure with values from the configuration
+	/// \param[in,out] configStruct structure to print
+	void print( std::ostream& out, const char* name, const void* configStruct) const;
 };
 
 

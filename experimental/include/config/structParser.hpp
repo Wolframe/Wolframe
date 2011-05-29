@@ -70,7 +70,7 @@ struct ParseError
 
 /// \brief parses a structure according its description
 template <typename T>
-static void parseElement_( const char* name, T& value, const traits::struct_& tag, const boost::property_tree::ptree& pt)
+static void parseElement_( const char* name, T& value, const traits::struct_&, const boost::property_tree::ptree& pt)
 {
 	if (name)
 	{
@@ -87,7 +87,7 @@ static void parseElement_( const char* name, T& value, const traits::struct_& ta
 			{
 				if (boost::iequals( it->first, descr->m_ar[ii].m_name))
 				{
-					return descr->m_ar[ii].m_parse( descr->m_ar[ii].m_name.c_str(), &value, descr->m_ar[ii].m_ofs, it);
+					return descr->m_ar[ii].m_parse( descr->m_ar[ii].m_name.c_str(), &value, descr->m_ar[ii].m_ofs, it->second);
 				}
 			}
 		}
@@ -100,7 +100,7 @@ static void parseElement_( const char* name, T& value, const traits::vector_&, c
 {
 	if (!name)
 	{
-		throw ParseError( name, "invalid indirection in configuration description (set of set)");
+		throw ParseError( "?", "invalid indirection in configuration description (set of set)");
 	}
 
 	boost::property_tree::ptree::const_iterator end = pt.end();
@@ -125,7 +125,7 @@ static void parseElement_( const char* name, T& value, const traits::atom_&, con
 	}
 	else if (pt.begin() != pt.end())
 	{
-		throw ParseError( name, "configuration element not atomic");
+		throw ParseError( "", "configuration element not atomic");
 	}
 	value = pt.begin()->second.get_value<T>();
 }
@@ -161,6 +161,13 @@ static void parseElement1( const char* name, T& value, const boost::property_tre
 			throw ParseError( name, "duplicate definition");
 		}
 	}
+}
+
+/// \brief parses a all elements of a vector (n elements with same name in pt)
+template <typename T>
+static void parseElement_( const char* name, T&, const traits::pointer_&, const boost::property_tree::ptree&)
+{
+	throw ParseError( name, "pointer not supported in configuration description");
 }
 
 /// \brief the unified parse function

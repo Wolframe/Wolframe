@@ -35,6 +35,7 @@ Project Wolframe.
 #ifndef _Wolframe_CONFIG_DESCRIPTION_HPP_INCLUDED
 #define _Wolframe_CONFIG_DESCRIPTION_HPP_INCLUDED
 #include "config/structParser.hpp"
+#include "config/structPrinter.hpp"
 #include "config/descriptionBase.hpp"
 
 namespace _Wolframe {
@@ -47,7 +48,9 @@ struct Description :public DescriptionBase
 	Description& operator()( const char* name, Element Structure::*eptr)
 	{
 		std::size_t pp = (std::size_t)&(((Structure*)0)->*eptr);
-		Item e( pp, std::string(name), &_Wolframe::config::ElementParser<Element>::parse);
+		Item e( pp, std::string(name),
+			&_Wolframe::config::ElementParser<Element>::parse,
+			&_Wolframe::config::ElementPrinter<Element>::print);
 		m_ar.push_back( e);
 		return *this;
 	}
