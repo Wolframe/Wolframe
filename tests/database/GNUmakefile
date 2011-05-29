@@ -8,11 +8,15 @@ INCLUDE_CPPFLAGS =
 
 INCLUDE_DIRS = \
 	-I$(TOPDIR)/include -I. \
+	-I$(BOOST_INCLUDE_DIR) \
 	-I$(TOPDIR)/gtest/include
 
-INCLUDE_LDFLAGS =
+INCLUDE_LDFLAGS = \
+	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
+	-lboost_thread$(BOOST_LIBRARY_TAG) \
+	-lboost_filesystem -lboost_system -lboost_thread$(BOOST_LIBRARY_TAG) \
 	$(TOPDIR)/gtest/gtest-all.o \
 	$(TOPDIR)/src/libwolframe.a
 
