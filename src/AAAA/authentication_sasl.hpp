@@ -41,6 +41,8 @@
 
 #include <string>
 
+#ifdef WITH_SASL
+
 #include "sasl/sasl.h"
 
 namespace _Wolframe {
@@ -84,5 +86,7 @@ class SaslAuthenticator : public Authenticator {
 };
 
 }} // namespace _Wolframe::AAAA
+
+#endif // WITH_SASL
 
 #endif // _AUTHENTICATION_SASL_HPP_INCLUDED
