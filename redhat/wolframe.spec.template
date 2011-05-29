@@ -101,7 +101,6 @@ echo ===================== END OF TESTING =========================
 
 
 %install
-rm -rf $RPM_BUILD_ROOT
 make DESTDIR=$RPM_BUILD_ROOT install \
 	WITH_SSL=%{with_ssl} WITH_SQLITE3=%{with_sqlite} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
