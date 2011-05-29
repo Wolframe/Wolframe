@@ -40,12 +40,10 @@
 #include "config/configurationBase.hpp"
 #include "database/database.hpp"
 
-#include <string>
 #include <list>
 
 namespace _Wolframe {
 namespace AAAA {
-
 
 enum AuditType	{
 	AUDIT_FILE,		///< Standard text file auditing (list of entries)
@@ -53,60 +51,16 @@ enum AuditType	{
 };
 
 
-class AuditConfigBase : public config::ConfigurationBase
+class AuditConfigurationBase : public config::ConfigurationBase
 {
 public:
 	/// constructor
-	AuditConfigBase( const char* name, const char* logParent, const char* logName )
+	AuditConfigurationBase( const char* name, const char* logParent, const char* logName )
 		: config::ConfigurationBase( name, logParent, logName )		{}
 
-	virtual ~AuditConfigBase()	{}
+	virtual ~AuditConfigurationBase()	{}
 
 	virtual AuditType type() const = 0;
-};
-
-
-class FileAuditConfig : public AuditConfigBase
-{
-	friend class FileAuditor;
-	friend class config::ConfigurationParser;
-public:
-	FileAuditConfig( const char* cfgName, const char* logParent, const char* logName )
-		: AuditConfigBase( cfgName, logParent, logName ){}
-
-	AuditType type() const					{ return AUDIT_FILE; }
-
-	/// methods
-	bool check() const;
-	void print( std::ostream& os, size_t indent ) const;
-	void setCanonicalPathes( const std::string& referencePath );
-private:
-	std::string	m_file;
-};
-
-
-class DatabaseAuditConfig : public AuditConfigBase
-{
-	friend class DatabaseAuditor;
-	friend class config::ConfigurationParser;
-public:
-	DatabaseAuditConfig( const char* cfgName, const char* logParent, const char* logName )
-		: AuditConfigBase( cfgName, logParent, logName ),
-		  m_dbConfig( "", logParent, "" )		{}
-
-	AuditType type() const					{ return AUDIT_DATABASE; }
-
-	/// methods
-	bool check() const					{ return m_dbConfig.check(); }
-	void print( std::ostream& os, size_t indent ) const	{
-		std::string indStr( indent, ' ' );
-		os << indStr << sectionName() << ": " << std::endl;
-		m_dbConfig.print( os, indent + 3 );
-	}
-
-	void setCanonicalPathes( const std::string& refPath )	{ m_dbConfig.setCanonicalPathes( refPath ); }
-private:
-	db::SingleDBConfiguration	m_dbConfig;
 };
 
 
@@ -127,38 +81,15 @@ public:
 
 	// bool test() const;	// Not implemented yet, inherited from base
 private:
-	std::list<AuditConfigBase*>	m_config;
+	std::list<AuditConfigurationBase*>	m_config;
 };
 
 
-class GlobalAuditorBase
+class AuditorBase
 {
 public:
-	virtual ~GlobalAuditorBase()				{}
+	virtual ~AuditorBase()					{}
 	virtual bool resolveDB( const db::DBprovider& /*db*/ )	{ return true; }
-};
-
-
-class FileAuditor : public GlobalAuditorBase
-{
-public:
-	FileAuditor( const FileAuditConfig& conf );
-	~FileAuditor()						{}
-private:
-	std::string	m_file;
-};
-
-
-class DatabaseAuditor : public GlobalAuditorBase
-{
-public:
-	DatabaseAuditor( const DatabaseAuditConfig& conf );
-	~DatabaseAuditor();
-
-	bool resolveDB( const db::DBprovider& db );
-private:
-	std::string		m_dbLabel;
-	const db::Database*	m_db;
 };
 
 }} // namespace _Wolframe::AAAA

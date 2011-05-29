@@ -31,17 +31,43 @@
 
 ************************************************************************/
 //
-// auditor implementation
+// file audit configuration
 //
 
-#include <stdexcept>
+#include "FileAudit.hpp"
+#include "config/configurationParser.hpp"
+#include "config/valueParser.hpp"
 
-#include "logger.hpp"
-#include "auditor.hpp"
+#include <boost/algorithm/string.hpp>
+#define BOOST_FILESYSTEM_VERSION 3
+#include <boost/filesystem.hpp>
+#include "miscUtils.hpp"
 
 namespace _Wolframe {
-namespace AAAA {
+namespace config {
 
+template<>
+bool ConfigurationParser::parse( AAAA::FileAuditConfig& cfg,
+				 const boost::property_tree::ptree& pt, const std::string& node )
+{
+	using namespace _Wolframe::config;
+	bool retVal = true;
 
-}} // namespace _Wolframe::AAAA
+	if ( boost::algorithm::iequals( node, "file" ) || boost::algorithm::iequals( node, "filename" ))	{
+		bool isDefined = ( ! cfg.m_file.empty() );
+		if ( !Parser::getValue( cfg.logPrefix().c_str(), node.c_str(),
+					pt.get_value<std::string>(), cfg.m_file, &isDefined ))
+			retVal = false;
+		else	{
+			if ( ! boost::filesystem::path( cfg.m_file ).is_absolute() )
+				LOG_WARNING << cfg.logPrefix() << "audit file path is not absolute: "
+					    << cfg.m_file;
+		}
+	}
+	else	{
+		LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '" << node << "'";
+	}
+	return retVal;
+}
 
+}} // namespace _Wolframe::config

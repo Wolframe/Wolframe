@@ -56,26 +56,26 @@ enum AuthenticationType	{
 };
 
 
-class AuthenticationConfigBase : public config::ConfigurationBase
+class AuthenticationConfigurationBase : public config::ConfigurationBase
 {
 public:
 	/// constructor
-	AuthenticationConfigBase( const char* name, const char* logParent, const char* logName )
+	AuthenticationConfigurationBase( const char* name, const char* logParent, const char* logName )
 		: config::ConfigurationBase( name, logParent, logName ){}
 
-	virtual ~AuthenticationConfigBase()			{}
+	virtual ~AuthenticationConfigurationBase()			{}
 
 	virtual AuthenticationType type() const = 0;
 };
 
 
-class DatabaseAuthConfig : public AuthenticationConfigBase
+class DatabaseAuthConfig : public AuthenticationConfigurationBase
 {
 	friend class DatabaseAuth;
 	friend class config::ConfigurationParser;
 public:
 	DatabaseAuthConfig( const char* cfgName, const char* logParent, const char* logName )
-		: AuthenticationConfigBase( cfgName, logParent, logName ),
+		: AuthenticationConfigurationBase( cfgName, logParent, logName ),
 		  m_dbConfig( "", logParent, "Database" )	{}
 
 	virtual AuthenticationType type() const			{ return AUTH_DATABASE; }
@@ -94,13 +94,13 @@ private:
 };
 
 
-class TextFileAuthConfig : public AuthenticationConfigBase
+class TextFileAuthConfig : public AuthenticationConfigurationBase
 {
 	friend class TextFileAuth;
 	friend class config::ConfigurationParser;
 public:
 	TextFileAuthConfig( const char* cfgName, const char* logParent, const char* logName )
-		: AuthenticationConfigBase( cfgName, logParent, logName ){}
+		: AuthenticationConfigurationBase( cfgName, logParent, logName ){}
 
 	virtual AuthenticationType type() const			{ return AUTH_TEXTFILE; }
 
@@ -131,17 +131,17 @@ public:
 
 	// bool test() const;	// Not implemented yet, inherited from base
 private:
-	std::list<AuthenticationConfigBase*>	m_config;
+	std::list<AuthenticationConfigurationBase*>	m_config;
 };
 
-class GlobalAuthenticatorBase
+class AuthenticatorBase
 {
 public:
-	virtual	~GlobalAuthenticatorBase()			{}
+	virtual	~AuthenticatorBase()				{}
 	virtual bool resolveDB( const db::DBprovider& /*db*/ )	{ return true; }
 };
 
-class TextFileAuth : public GlobalAuthenticatorBase
+class TextFileAuth : public AuthenticatorBase
 {
 public:
 	TextFileAuth( const TextFileAuthConfig& conf );
@@ -151,7 +151,7 @@ private:
 };
 
 
-class DatabaseAuth : public GlobalAuthenticatorBase
+class DatabaseAuth : public AuthenticatorBase
 {
 public:
 	DatabaseAuth( const DatabaseAuthConfig& conf );

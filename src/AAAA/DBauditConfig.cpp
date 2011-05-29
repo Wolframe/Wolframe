@@ -31,17 +31,21 @@
 
 ************************************************************************/
 //
-// auditor implementation
+// database audit configuration implementation
 //
 
-#include <stdexcept>
-
-#include "logger.hpp"
-#include "auditor.hpp"
+#include "DBaudit.hpp"
+#include "config/configurationParser.hpp"
 
 namespace _Wolframe {
-namespace AAAA {
+namespace config {
 
+template<>
+bool ConfigurationParser::parse( AAAA::DatabaseAuditConfig& cfg,
+				 const boost::property_tree::ptree& pt, const std::string& node )
+{
+	return ConfigurationParser::parse( cfg.m_dbConfig, pt, node );
+}
 
-}} // namespace _Wolframe::AAAA
+}} // namespace _Wolframe::config
 

@@ -39,6 +39,8 @@
 #include "config/configurationBase.hpp"
 #include "config/configurationParser.hpp"
 #include "AAAA/auditor.hpp"
+#include "AAAA/DBaudit.hpp"
+#include "AAAA/FileAudit.hpp"
 #include "database/database.hpp"
 
 #include "boost/algorithm/string.hpp"
@@ -48,37 +50,6 @@
 
 namespace _Wolframe {
 namespace config {
-
-template<>
-bool ConfigurationParser::parse( AAAA::DatabaseAuditConfig& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& node )
-{
-	return ConfigurationParser::parse( cfg.m_dbConfig, pt, node );
-}
-
-template<>
-bool ConfigurationParser::parse( AAAA::FileAuditConfig& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& node )
-{
-	using namespace _Wolframe::config;
-	bool retVal = true;
-
-	if ( boost::algorithm::iequals( node, "file" ) || boost::algorithm::iequals( node, "filename" ))	{
-		bool isDefined = ( ! cfg.m_file.empty() );
-		if ( !Parser::getValue( cfg.logPrefix().c_str(), node.c_str(),
-					pt.get_value<std::string>(), cfg.m_file, &isDefined ))
-			retVal = false;
-		else	{
-			if ( ! boost::filesystem::path( cfg.m_file ).is_absolute() )
-				LOG_WARNING << cfg.logPrefix() << "audit file path is not absolute: "
-					    << cfg.m_file;
-		}
-	}
-	else	{
-		LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '" << node << "'";
-	}
-	return retVal;
-}
 
 template<>
 bool ConfigurationParser::parse( AAAA::AuditConfiguration& cfg,
@@ -117,40 +88,10 @@ bool ConfigurationParser::parse( AAAA::AuditConfiguration& cfg,
 //*************************************************************************************************
 namespace AAAA {
 
-/// Audit to file
-bool FileAuditConfig::check() const
-{
-	if ( m_file.empty() )	{
-		LOG_ERROR << logPrefix() << "Audit filename cannot be empty";
-		return false;
-	}
-	return true;
-}
-
-void FileAuditConfig::print( std::ostream& os, size_t indent ) const
-{
-	std::string indStr( indent, ' ' );
-	os << indStr << sectionName() << ": " << m_file << std::endl;
-}
-
-void FileAuditConfig::setCanonicalPathes( const std::string& refPath )
-{
-	using namespace boost::filesystem;
-
-	if ( ! m_file.empty() )	{
-		if ( ! path( m_file ).is_absolute() )
-			m_file = resolvePath( absolute( m_file,
-							path( refPath ).branch_path()).string());
-		else
-			m_file = resolvePath( m_file );
-	}
-}
-
-
 /// constructor
 AuditConfiguration::~AuditConfiguration()
 {
-	for ( std::list<AuditConfigBase*>::const_iterator it = m_config.begin();
+	for ( std::list<AuditConfigurationBase*>::const_iterator it = m_config.begin();
 								it != m_config.end(); it++ )
 		delete *it;
 }
@@ -160,7 +101,7 @@ AuditConfiguration::~AuditConfiguration()
 bool AuditConfiguration::check() const
 {
 	bool correct = true;
-	for ( std::list<AuditConfigBase*>::const_iterator it = m_config.begin();
+	for ( std::list<AuditConfigurationBase*>::const_iterator it = m_config.begin();
 								it != m_config.end(); it++ )	{
 		if ( !(*it)->check() )
 			correct = false;
@@ -175,7 +116,7 @@ void AuditConfiguration::print( std::ostream& os, size_t indent ) const
 
 	os << indStr << sectionName() << ":" << std::endl;
 	if ( m_config.size() > 0 )	{
-		for ( std::list<AuditConfigBase*>::const_iterator it = m_config.begin();
+		for ( std::list<AuditConfigurationBase*>::const_iterator it = m_config.begin();
 								it != m_config.end(); it++ )	{
 			(*it)->print( os, indent + 3 );
 		}
@@ -187,7 +128,7 @@ void AuditConfiguration::print( std::ostream& os, size_t indent ) const
 
 void AuditConfiguration::setCanonicalPathes( const std::string& referencePath )
 {
-	for ( std::list<AuditConfigBase*>::const_iterator it = m_config.begin();
+	for ( std::list<AuditConfigurationBase*>::const_iterator it = m_config.begin();
 								it != m_config.end(); it++ )	{
 		(*it)->setCanonicalPathes( referencePath );
 	}

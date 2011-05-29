@@ -124,7 +124,11 @@ AAAA_OBJS = \
 	AAAA/authConfiguration.o \
 	AAAA/authenticator.o \
 	AAAA/auditConfiguration.o \
-	AAAA/auditor.o
+	AAAA/auditor.o \
+	AAAA/DBaudit.o \
+	AAAA/DBauditConfig.o \
+	AAAA/FileAudit.o \
+	AAAA/FileAuditConfig.o
 
 ifeq ($(WITH_PAM),1)
 AAAA_OBJS += \

@@ -31,17 +31,54 @@
 
 ************************************************************************/
 //
-// auditor implementation
+// file audit implementation
 //
-
 #include <stdexcept>
 
 #include "logger.hpp"
-#include "auditor.hpp"
+#include "FileAudit.hpp"
+
+#define BOOST_FILESYSTEM_VERSION 3
+#include <boost/filesystem.hpp>
+#include "miscUtils.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
 
+/// Audit to file
+bool FileAuditConfig::check() const
+{
+	if ( m_file.empty() )	{
+		LOG_ERROR << logPrefix() << "Audit filename cannot be empty";
+		return false;
+	}
+	return true;
+}
+
+void FileAuditConfig::print( std::ostream& os, size_t indent ) const
+{
+	std::string indStr( indent, ' ' );
+	os << indStr << sectionName() << ": " << m_file << std::endl;
+}
+
+void FileAuditConfig::setCanonicalPathes( const std::string& refPath )
+{
+	using namespace boost::filesystem;
+
+	if ( ! m_file.empty() )	{
+		if ( ! path( m_file ).is_absolute() )
+			m_file = resolvePath( absolute( m_file,
+							path( refPath ).branch_path()).string());
+		else
+			m_file = resolvePath( m_file );
+	}
+}
+
+
+FileAuditor::FileAuditor( const FileAuditConfig& conf )
+{
+	m_file = conf.m_file;
+	LOG_NOTICE << "File auditor created with file '" << m_file << "'";
+}
 
 }} // namespace _Wolframe::AAAA
-

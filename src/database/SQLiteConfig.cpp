@@ -38,6 +38,7 @@
 #include "config/valueParser.hpp"
 #include "config/configurationParser.hpp"
 
+#include <boost/algorithm/string.hpp>
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include "miscUtils.hpp"

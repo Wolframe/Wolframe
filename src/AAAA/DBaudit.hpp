@@ -31,17 +31,55 @@
 
 ************************************************************************/
 //
-// auditor implementation
+// database audit
 //
 
-#include <stdexcept>
-
-#include "logger.hpp"
 #include "auditor.hpp"
+#include "database/database.hpp"
+
+#ifndef _DB_AUDIT_HPP_INCLUDED
+#define _DB_AUDIT_HPP_INCLUDED
 
 namespace _Wolframe {
 namespace AAAA {
 
+class DatabaseAuditConfig : public AuditConfigurationBase
+{
+	friend class DatabaseAuditor;
+	friend class config::ConfigurationParser;
+public:
+	DatabaseAuditConfig( const char* cfgName, const char* logParent, const char* logName )
+		: AuditConfigurationBase( cfgName, logParent, logName ),
+		  m_dbConfig( "", logParent, "" )		{}
+
+	AuditType type() const					{ return AUDIT_DATABASE; }
+
+	/// methods
+	bool check() const					{ return m_dbConfig.check(); }
+	void print( std::ostream& os, size_t indent ) const	{
+		std::string indStr( indent, ' ' );
+		os << indStr << sectionName() << ": " << std::endl;
+		m_dbConfig.print( os, indent + 3 );
+	}
+
+	void setCanonicalPathes( const std::string& refPath )	{ m_dbConfig.setCanonicalPathes( refPath ); }
+private:
+	db::SingleDBConfiguration	m_dbConfig;
+};
+
+
+class DatabaseAuditor : public AuditorBase
+{
+public:
+	DatabaseAuditor( const DatabaseAuditConfig& conf );
+	~DatabaseAuditor();
+
+	bool resolveDB( const db::DBprovider& db );
+private:
+	std::string		m_dbLabel;
+	const db::Database*	m_db;
+};
 
 }} // namespace _Wolframe::AAAA
 
+#endif // _DB_AUDIT_HPP_INCLUDED

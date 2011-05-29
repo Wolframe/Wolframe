@@ -185,7 +185,9 @@ include/config/valueParser.hpp
 include/connectionEndpoint.hpp
 include/connectionHandler.hpp
 include/database/database.hpp
+include/database/DBreference.hpp
 include/database/PostgreSQL.hpp
+include/database/SQLite.hpp
 include/ErrorCodes.hpp
 include/GNUmakefile
 include/logger.hpp
@@ -291,6 +293,7 @@ src/AAAA/authentication_textfile.cpp
 src/AAAA/authentication_textfile.hpp
 src/AAAA/authenticator.cpp
 src/AAAA/authenticator.hpp
+src/AAAA/DBaudit.hpp
 src/acceptor.cpp
 src/acceptor.hpp
 src/appConfig.cpp
@@ -304,10 +307,14 @@ src/connection.cpp
 src/connection.hpp
 src/database/databaseConfig.cpp
 src/database/database.cpp
+src/database/DBreferenceConfig.cpp
+src/database/DBreference.cpp
 src/database/PostgreSQLconfig.cpp
 src/database/PostgreSQL.cpp
 src/database/sqlite3.c
 src/database/sqlite3.h
+src/database/SQLiteConfig.cpp
+src/database/SQLite.cpp
 src/exceptionBase.hpp
 src/getPassword.cpp
 src/getPassword.hpp
@@ -377,9 +384,8 @@ windows/wolframe.xml
 XML/configuration.rng
 XML/database.rng
 XML/logging.rng
-include/database/SQLite.hpp
-src/database/SQLiteConfig.cpp
-src/database/SQLite.cpp
-include/database/DBreference.hpp
-src/database/DBreference.cpp
-src/database/DBreferenceConfig.cpp
+src/AAAA/DBaudit.cpp
+src/AAAA/DBauditConfig.cpp
+src/AAAA/FileAudit.hpp
+src/AAAA/FileAudit.cpp
+src/AAAA/FileAuditConfig.cpp

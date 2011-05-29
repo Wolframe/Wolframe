@@ -77,7 +77,7 @@ namespace AAAA {
 
 AAAAprovider::AAAAprovider( const Configuration& conf )
 {
-	for ( std::list<AuthenticationConfigBase*>::const_iterator it = conf.auth.m_config.begin();
+	for ( std::list<AuthenticationConfigurationBase*>::const_iterator it = conf.auth.m_config.begin();
 							it != conf.auth.m_config.end(); it++ )	{
 		switch( (*it)->type() )	{
 		case AUTH_DATABASE:	{
@@ -101,7 +101,7 @@ AAAAprovider::AAAAprovider( const Configuration& conf )
 		}
 	}
 
-	for ( std::list<AuditConfigBase*>::const_iterator it = conf.audit.m_config.begin();
+	for ( std::list<AuditConfigurationBase*>::const_iterator it = conf.audit.m_config.begin();
 							it != conf.audit.m_config.end(); it++ )	{
 		switch( (*it)->type() )	{
 		case AUDIT_FILE:	{
@@ -122,22 +122,22 @@ AAAAprovider::AAAAprovider( const Configuration& conf )
 
 AAAAprovider::~AAAAprovider()
 {
-	for ( std::list<GlobalAuthenticatorBase*>::const_iterator it = m_authenticators.begin();
+	for ( std::list<AuthenticatorBase*>::const_iterator it = m_authenticators.begin();
 								it != m_authenticators.end(); it++ )
 		delete *it;
-	for ( std::list<GlobalAuditorBase*>::const_iterator it = m_auditors.begin();
+	for ( std::list<AuditorBase*>::const_iterator it = m_auditors.begin();
 								it != m_auditors.end(); it++ )
 		delete *it;
 }
 
 bool AAAAprovider::resolveDB( db::DBprovider& db )
 {
-	for ( std::list<GlobalAuthenticatorBase*>::const_iterator it = m_authenticators.begin();
+	for ( std::list<AuthenticatorBase*>::const_iterator it = m_authenticators.begin();
 								it != m_authenticators.end(); it++ )
 		if ( ! (*it)->resolveDB( db ) )
 			return false;
 
-	for ( std::list<GlobalAuditorBase*>::const_iterator it = m_auditors.begin();
+	for ( std::list<AuditorBase*>::const_iterator it = m_auditors.begin();
 								it != m_auditors.end(); it++ )
 		if ( ! (*it)->resolveDB( db ) )
 			return false;

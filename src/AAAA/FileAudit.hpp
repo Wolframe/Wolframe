@@ -31,17 +31,47 @@
 
 ************************************************************************/
 //
-// auditor implementation
+// file audit
 //
 
-#include <stdexcept>
+#ifndef _FILE_AUDIT_HPP_INCLUDED
+#define _FILE_AUDIT_HPP_INCLUDED
 
-#include "logger.hpp"
+#include <string>
+
 #include "auditor.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
 
+class FileAuditConfig : public AuditConfigurationBase
+{
+	friend class FileAuditor;
+	friend class config::ConfigurationParser;
+public:
+	FileAuditConfig( const char* cfgName, const char* logParent, const char* logName )
+		: AuditConfigurationBase( cfgName, logParent, logName ){}
+
+	AuditType type() const					{ return AUDIT_FILE; }
+
+	/// methods
+	bool check() const;
+	void print( std::ostream& os, size_t indent ) const;
+	void setCanonicalPathes( const std::string& referencePath );
+private:
+	std::string	m_file;
+};
+
+
+class FileAuditor : public AuditorBase
+{
+public:
+	FileAuditor( const FileAuditConfig& conf );
+	~FileAuditor()						{}
+private:
+	std::string	m_file;
+};
 
 }} // namespace _Wolframe::AAAA
 
+#endif // _FILE_AUDIT_HPP_INCLUDED

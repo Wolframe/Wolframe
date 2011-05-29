@@ -38,7 +38,9 @@
 #define _AAAA_PROVIDER_HPP_INCLUDED
 
 #include "config/configurationBase.hpp"
-#include "AAAA/auditor.hpp"
+#include "auditor.hpp"
+#include "DBaudit.hpp"
+#include "FileAudit.hpp"
 #include "authenticator.hpp"
 #include "database/database.hpp"
 
@@ -128,8 +130,8 @@ public:
 	_AuditChannel_* auditChannel() const			{ return NULL; }
 	_AccountingChannel_* accountingChannel() const		{ return NULL; }
 private:
-	std::list<GlobalAuthenticatorBase*>	m_authenticators;
-	std::list<GlobalAuditorBase*>		m_auditors;
+	std::list<AuthenticatorBase*>	m_authenticators;
+	std::list<AuditorBase*>			m_auditors;
 };
 
 }} // namespace _Wolframe::AAAA
