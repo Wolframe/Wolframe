@@ -39,7 +39,7 @@ Project Wolframe.
 #include <string>
 #include <vector>
 #include <cstring>
-#include "config/traits.hpp"
+#include "traits.hpp"
 
 namespace _Wolframe {
 namespace config {
@@ -79,17 +79,11 @@ static void parseElement_( const char* name, T& value, const traits::struct_&, c
 	else
 	{
 		static const DescriptionBase* descr = T::description();
-		unsigned int ii,nn=descr->m_ar.size();
-		for (ii=0; ii<nn; ii++)
+		std::vector<DescriptionBase::Item>::const_iterator itr,end;
+
+		for (itr=descr->m_ar.begin(),end=descr->m_ar.end(); itr != end; ++itr)
 		{
-			boost::property_tree::ptree::const_iterator end = pt.end();
-			for (boost::property_tree::ptree::const_iterator it = pt.begin(); it != end; ++it)
-			{
-				if (boost::iequals( it->first, descr->m_ar[ii].m_name))
-				{
-					return descr->m_ar[ii].m_parse( descr->m_ar[ii].m_name.c_str(), &value, descr->m_ar[ii].m_ofs, it->second);
-				}
-			}
+			itr->m_parse( itr->m_name.c_str(), &value, itr->m_ofs, pt);
 		}
 	}
 }
@@ -127,7 +121,10 @@ static void parseElement_( const char* name, T& value, const traits::atom_&, con
 	{
 		throw ParseError( "", "configuration element not atomic");
 	}
-	value = pt.begin()->second.get_value<T>();
+	else
+	{
+		value = boost::lexical_cast<T>(pt.data());
+	}
 }
 
 /// \brief parses an element with indirection (searches it in pt)
@@ -151,6 +148,7 @@ static void parseElement1( const char* name, T& value, const boost::property_tre
 			{
 				throw ParseError( name, "illegal token type");
 			}
+			++it;
 			break;
 		}
 	}
