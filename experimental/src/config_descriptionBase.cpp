@@ -32,29 +32,23 @@ Project Wolframe.
 #include <boost/property_tree/ptree.hpp>
 #include <cstddef>
 
-#include "config/structParser.hpp"
-#include "config/structPrinter.hpp"
-#include "config/descriptionBase.hpp"
+#include "structParser.hpp"
+#include "structPrinter.hpp"
+#include "descriptionBase.hpp"
 
 using namespace _Wolframe::config;
 
-bool _Wolframe::config::DescriptionBase::parse( void* configStruct, const boost::property_tree::ptree& pt, std::string& errmsg) const
+bool DescriptionBase::parse( void* configStruct, const boost::property_tree::ptree& pt, std::string& errmsg) const
 {
 	try
 	{
 		try
 		{
-			unsigned int ii,nn=m_ar.size();
-			for (ii=0; ii<nn; ii++)
+			std::vector<DescriptionBase::Item>::const_iterator itr,end;
+
+			for (itr=m_ar.begin(),end=m_ar.end(); itr != end; ++itr)
 			{
-				boost::property_tree::ptree::const_iterator itr,end;
-				for (itr=pt.begin(),end=pt.end(); itr != end; ++itr)
-				{
-					if (boost::iequals( itr->first, m_ar[ii].m_name))
-					{
-						m_ar[ii].m_parse( m_ar[ii].m_name.c_str(), configStruct, m_ar[ii].m_ofs, itr->second);
-					}
-				}
+				itr->m_parse( itr->m_name.c_str(), configStruct, itr->m_ofs, pt);
 			}
 			return true;
 		}
@@ -75,7 +69,7 @@ bool _Wolframe::config::DescriptionBase::parse( void* configStruct, const boost:
 	return false;
 }
 
-void _Wolframe::config::DescriptionBase::print( std::ostream& out, const char* name, const void* configStruct) const
+void DescriptionBase::print( std::ostream& out, const char* name, const void* configStruct) const
 {
 	std::vector<Item>::const_iterator end = m_ar.end();
 	std::vector<Item>::const_iterator itr = m_ar.begin();
