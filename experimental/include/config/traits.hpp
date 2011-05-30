@@ -47,7 +47,7 @@ namespace traits
 struct struct_ {};	///< category tag for a structure with named elements
 struct vector_ {};	///< category tag for a std::vector of any type
 struct atom_ {};	///< category tag for a type that is convertible from a string through boost::lexical_cast
-struct pointer_ {};	///< category tag for a poiner type
+struct pointer_ {};	///< category tag for a pointer type
 
 /// \brief conditional template for detecting if a type is a class with a static/member method description() returning a const pointer to a structure description as defined in config/descriptionBase.hpp
 /// see http://drdobbs.com/article/print?articleId=227500449&siteSectionName= "Checking Concept Without Concepts in C++"
