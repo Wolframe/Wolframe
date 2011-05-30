@@ -86,10 +86,8 @@ public:
 	}
 
 	void add ( objectType* obj )	{
-		{
-			boost::lock_guard<boost::mutex> lock( m_mutex );
-			m_availList.push_back( obj );
-		}
+		boost::lock_guard<boost::mutex> lock( m_mutex );
+		m_availList.push_back( obj );
 		m_cond.notify_one();
 	}
 
