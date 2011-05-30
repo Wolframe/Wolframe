@@ -75,6 +75,7 @@ class ObjectPoolFixture : public ::testing::Test	{
 protected:
 	// Set-up work for each test here.
 	ObjectPoolFixture()	{
+		srand(clock());
 		noThreads = 1 + (int)( rand() % 32 );
 		poolSize = 1 + (int)( rand() % 16 );
 		times = (unsigned long)( rand() % 200000 );

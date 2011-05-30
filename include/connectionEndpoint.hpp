@@ -1,3 +1,35 @@
+/************************************************************************
+
+ Copyright (C) 2011 Project Wolframe.
+ All rights reserved.
+
+ This file is part of Project Wolframe.
+
+ Commercial Usage
+    Licensees holding valid Project Wolframe Commercial licenses may
+    use this file in accordance with the Project Wolframe
+    Commercial License Agreement provided with the Software or,
+    alternatively, in accordance with the terms contained
+    in a written agreement between the licensee and Project Wolframe.
+
+ GNU General Public License Usage
+    Alternatively, you can redistribute this file and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Wolframe is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Wolframe.  If not, see <http://www.gnu.org/licenses/>.
+
+ If you have questions regarding the use of this file, please contact
+ Project Wolframe.
+
+************************************************************************/
 //
 // connectionEndpoint.hpp
 //
@@ -10,141 +42,140 @@
 #include <ctime>
 
 namespace _Wolframe {
-	namespace net {
+namespace net {
 
-		/// Base class for network endpoints
-		class ConnectionEndpoint
-		{
-		public:
-			enum ConnectionType	{
-				TCP_CONNECTION,
-				SSL_CONNECTION
-			};
+/// Base class for network endpoints
+class ConnectionEndpoint
+{
+public:
+	enum ConnectionType	{
+		TCP_CONNECTION,
+		SSL_CONNECTION
+	};
 
-			enum EndPoint	{
-				LOCAL_ENDPOINT,
-				REMOTE_ENDPOINT
-			};
+	enum EndPoint	{
+		LOCAL_ENDPOINT,
+		REMOTE_ENDPOINT
+	};
 
-			ConnectionEndpoint( const std::string& Host, unsigned short Port )
-				: m_host( Host ), m_port( Port )	{}
+	ConnectionEndpoint( const std::string& Host, unsigned short Port )
+		: m_host( Host ), m_port( Port )	{}
 
-			const std::string& host() const			{ return m_host; }
-			unsigned short port() const			{ return m_port; }
-			virtual ConnectionType type() const = 0;
-			virtual EndPoint endpoint() const = 0;
+	const std::string& host() const			{ return m_host; }
+	unsigned short port() const			{ return m_port; }
+	virtual ConnectionType type() const = 0;
+	virtual EndPoint endpoint() const = 0;
 
-			std::string toString() const
-			{
-				std::ostringstream o;
-				o << m_host << ":" << m_port;
-				return o.str();
-			}
+	std::string toString() const
+	{
+		std::ostringstream o;
+		o << m_host << ":" << m_port;
+		return o.str();
+	}
 
-		private:
-			const std::string	m_host;
-			const unsigned short	m_port;
-		};
+private:
+	const std::string	m_host;
+	const unsigned short	m_port;
+};
 
 
-		/// Local connection endpoints
-		/// base class for local endpoint
-		class LocalEndpoint : public ConnectionEndpoint
-		{
-		public:
-			LocalEndpoint( const std::string& Host, unsigned short Port )
-				: ConnectionEndpoint( Host, Port )
-			{
-				m_connectionTime = time( NULL );
-			}
+/// Local connection endpoints
+/// base class for local endpoint
+class LocalEndpoint : public ConnectionEndpoint
+{
+public:
+	LocalEndpoint( const std::string& Host, unsigned short Port )
+		: ConnectionEndpoint( Host, Port )
+	{
+		m_connectionTime = time( NULL );
+	}
 
-			virtual ConnectionType type() const = 0;
-			EndPoint endpoint() const			{ return LOCAL_ENDPOINT; }
-			time_t connectionTime() const			{ return m_connectionTime; }
+	virtual ConnectionType type() const = 0;
+	EndPoint endpoint() const			{ return LOCAL_ENDPOINT; }
+	time_t connectionTime() const			{ return m_connectionTime; }
 
-		private:
-			time_t	m_connectionTime;
-		};
+private:
+	time_t	m_connectionTime;
+};
 
-		/// local unencrypted endpoint
-		class LocalTCPendpoint : public LocalEndpoint
-		{
-		public:
-			LocalTCPendpoint( const std::string& Host, unsigned short Port )
-				: LocalEndpoint( Host, Port )		{}
+/// local unencrypted endpoint
+class LocalTCPendpoint : public LocalEndpoint
+{
+public:
+	LocalTCPendpoint( const std::string& Host, unsigned short Port )
+		: LocalEndpoint( Host, Port )		{}
 
-			ConnectionType type() const			{ return TCP_CONNECTION; }
-		};
+	ConnectionType type() const			{ return TCP_CONNECTION; }
+};
 
 #ifdef WITH_SSL
-		/// local SSL connection endpoint
-		class LocalSSLendpoint : public LocalEndpoint
-		{
-		public:
-			LocalSSLendpoint( const std::string& Host, unsigned short Port )
-				: LocalEndpoint( Host, Port )		{}
+/// local SSL connection endpoint
+class LocalSSLendpoint : public LocalEndpoint
+{
+public:
+	LocalSSLendpoint( const std::string& Host, unsigned short Port )
+		: LocalEndpoint( Host, Port )		{}
 
-			ConnectionType type() const			{ return SSL_CONNECTION; }
-		};
+	ConnectionType type() const			{ return SSL_CONNECTION; }
+};
 #endif // WITH_SSL
 
 
-		/// Remote connection endpoints
-		/// base class for remote endpoint
-		class RemoteEndpoint : public ConnectionEndpoint
-		{
-		public:
-			RemoteEndpoint( const std::string& Host, unsigned short Port )
-				: ConnectionEndpoint( Host, Port )
-			{
-				m_connectionTime = time( NULL );
-			}
+/// Remote connection endpoints
+/// base class for remote endpoint
+class RemoteEndpoint : public ConnectionEndpoint
+{
+public:
+	RemoteEndpoint( const std::string& Host, unsigned short Port )
+		: ConnectionEndpoint( Host, Port )
+	{
+		m_connectionTime = time( NULL );
+	}
 
-			virtual ConnectionType type() const = 0;
-			EndPoint endpoint() const			{ return REMOTE_ENDPOINT; }
+	virtual ConnectionType type() const = 0;
+	EndPoint endpoint() const			{ return REMOTE_ENDPOINT; }
 
-			time_t connectionTime() const			{ return m_connectionTime; }
+	time_t connectionTime() const			{ return m_connectionTime; }
 
-		private:
-			time_t	m_connectionTime;
-		};
+private:
+	time_t	m_connectionTime;
+};
 
-		/// remote unencrypted endpoint
-		class RemoteTCPendpoint : public RemoteEndpoint
-		{
-		public:
-			RemoteTCPendpoint( const std::string& Host, unsigned short Port )
-				: RemoteEndpoint( Host, Port )		{}
+/// remote unencrypted endpoint
+class RemoteTCPendpoint : public RemoteEndpoint
+{
+public:
+	RemoteTCPendpoint( const std::string& Host, unsigned short Port )
+		: RemoteEndpoint( Host, Port )		{}
 
-			ConnectionType type() const			{ return TCP_CONNECTION; }
-		};
+	ConnectionType type() const			{ return TCP_CONNECTION; }
+};
 
 #ifdef WITH_SSL
-		/// forward declaration for SSL certificate info
-		class SSLcertificateInfo;
+/// forward declaration for SSL certificate info
+class SSLcertificateInfo;
 
-		/// remote SSL connection endpoint
-		class RemoteSSLendpoint : public RemoteEndpoint
-		{
-		public:
-			RemoteSSLendpoint( const std::string& Host, unsigned short Port )
-				: RemoteEndpoint( Host, Port ), m_SSLinfo( NULL )	{}
+/// remote SSL connection endpoint
+class RemoteSSLendpoint : public RemoteEndpoint
+{
+public:
+	RemoteSSLendpoint( const std::string& Host, unsigned short Port )
+		: RemoteEndpoint( Host, Port ), m_SSLinfo( NULL )	{}
 
-			RemoteSSLendpoint( const std::string& Host, unsigned short Port,
-					   const SSLcertificateInfo *SSLinfo )
-				: RemoteEndpoint( Host, Port ), m_SSLinfo( SSLinfo )	{}
+	RemoteSSLendpoint( const std::string& Host, unsigned short Port,
+			   const SSLcertificateInfo *SSLinfo )
+		: RemoteEndpoint( Host, Port ), m_SSLinfo( SSLinfo )	{}
 
-			ConnectionType type() const			{ return SSL_CONNECTION; }
+	ConnectionType type() const			{ return SSL_CONNECTION; }
 
-			/// SSL certificate information
-			const SSLcertificateInfo* SSLcertInfo() const	{ return m_SSLinfo; }
+	/// SSL certificate information
+	const SSLcertificateInfo* SSLcertInfo() const	{ return m_SSLinfo; }
 
-		private:
-			const SSLcertificateInfo	*m_SSLinfo;
-		};
+private:
+	const SSLcertificateInfo	*m_SSLinfo;
+};
 #endif // WITH_SSL
 
-	} // namespace net
-} // namespace _Wolframe
+}} // namespace _Wolframe::net
 
 #endif // _CONNECTION_ENDPOINT_HPP_INCLUDED
