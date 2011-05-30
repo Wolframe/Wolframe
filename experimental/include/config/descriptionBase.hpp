@@ -70,7 +70,7 @@ struct DescriptionBase
 
 	/// \brief Print the configuration structure with values from the configuration
 	/// \param[in,out] configStruct structure to print
-	void print( std::ostream& out, const char* name, const void* configStruct) const;
+	void print( std::ostream& out, const void* configStruct) const;
 };
 
 
