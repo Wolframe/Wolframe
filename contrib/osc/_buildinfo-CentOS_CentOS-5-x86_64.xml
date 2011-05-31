@@ -1,0 +1,145 @@
+<buildinfo project="home:andreas_baumann" repository="CentOS_CentOS-5" package="Wolframe" downloadurl="http://download.opensuse.org/repositories">
+  <arch>x86_64</arch>
+  <debuginfo>0</debuginfo>
+  <subpack>wolframe</subpack>
+  <subpack>wolframe-doc</subpack>
+  <bdep name="acl" preinstall="1" notmeta="1" version="2.2.39" release="6.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="attr" preinstall="1" notmeta="1" version="2.4.32" release="1.1" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="bash" preinstall="1" notmeta="1" version="3.2" release="24.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="bzip2" preinstall="1" version="1.0.3" release="6.el5_5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="coreutils" preinstall="1" notmeta="1" version="5.97" release="23.el5_4.2" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="diffutils" preinstall="1" notmeta="1" version="2.8.1" release="15.2.3.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="filesystem" preinstall="1" notmeta="1" version="2.4.0" release="3.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="glibc" preinstall="1" version="2.5" release="58" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="grep" preinstall="1" notmeta="1" version="2.5.1" release="55.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="libacl" preinstall="1" notmeta="1" version="2.2.39" release="6.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="libattr" preinstall="1" notmeta="1" version="2.4.32" release="1.1" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="libgcc" preinstall="1" notmeta="1" version="4.1.2" release="50.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="m4" preinstall="1" notmeta="1" version="1.4.5" release="3.el5.1" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="ncurses" preinstall="1" version="5.5" release="24.20060715" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="pam" preinstall="1" notmeta="1" version="0.99.6.2" release="6.el5_5.2" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="popt" preinstall="1" notmeta="1" version="1.10.2.3" release="22.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="readline" preinstall="1" notmeta="1" version="5.1" release="3.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="rpm" preinstall="1" version="4.4.2.3" release="22.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="sed" preinstall="1" notmeta="1" version="4.1.5" release="5.fc6" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="tar" preinstall="1" notmeta="1" epoch="2" version="1.15.1" release="30.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="zlib" preinstall="1" version="1.2.3" release="3" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="libtermcap" preinstall="1" notmeta="1" version="2.0.8" release="46.1" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="rpm-libs" preinstall="1" notmeta="1" version="4.4.2.3" release="22.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="pcre" preinstall="1" notmeta="1" version="6.6" release="6.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="info" preinstall="1" notmeta="1" version="4.8" release="14.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="libselinux" preinstall="1" notmeta="1" version="1.33.4" release="5.7.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="sqlite" preinstall="1" notmeta="1" version="3.3.6" release="5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="mktemp" preinstall="1" notmeta="1" epoch="3" version="1.5" release="23.2.2" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="elfutils-libelf" preinstall="1" notmeta="1" version="0.137" release="3.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="findutils" preinstall="1" notmeta="1" epoch="1" version="4.2.27" release="6.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="beecrypt" preinstall="1" notmeta="1" version="4.1.2" release="10.1.1" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="neon" preinstall="1" notmeta="1" version="0.25.5" release="10.el5_4.1" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="openssl" preinstall="1" notmeta="1" version="0.9.8e" release="12.el5_5.7" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="krb5-libs" preinstall="1" notmeta="1" version="1.6.1" release="55.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="e2fsprogs-libs" preinstall="1" notmeta="1" version="1.39" release="23.el5_5.1" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="expat" preinstall="1" notmeta="1" version="1.95.8" release="8.3.el5_5.3" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="bzip2-libs" preinstall="1" notmeta="1" version="1.0.3" release="6.el5_5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="libstdc++" preinstall="1" notmeta="1" version="4.1.2" release="50.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="setup" preinstall="1" runscripts="1" notmeta="1" version="2.5.58" release="7.el5" arch="noarch" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="libsepol" preinstall="1" notmeta="1" version="1.15.2" release="3.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="perl" preinstall="1" vminstall="1" epoch="4" version="5.8.8" release="32.el5_5.2" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="policycoreutils" preinstall="1" notmeta="1" version="1.33.12" release="14.8.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="nss" preinstall="1" notmeta="1" version="3.12.8" release="1.el5.centos" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="nspr" preinstall="1" notmeta="1" version="4.8.6" release="1.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="shadow-utils" preinstall="1" notmeta="1" epoch="2" version="4.0.17" release="18.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="util-linux" vminstall="1" notmeta="1" version="2.13" release="0.56.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="device-mapper" vminstall="1" version="1.02.55" release="2.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="centos-release" epoch="10" version="5" release="6.el5.centos.1" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="gcc-c++" version="4.1.2" release="50.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="doxygen" epoch="1" version="1.4.7" release="1.1" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="autoconf" version="2.59" release="12" arch="noarch" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="automake" version="1.9.6" release="2.3.el5" arch="noarch" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="binutils" version="2.17.50.0.6" release="14.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="gcc" version="4.1.2" release="50.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="gdbm" version="1.8.0" release="26.2.1" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="gettext" version="0.17" release="1.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="libtool" version="1.5.22" release="7.el5_4" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="rpm-build" version="4.4.2.3" release="22.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="centos-release-notes" version="5.5" release="0" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="libstdc++-devel" version="4.1.2" release="50.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="imake" version="1.0.2" release="3" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="libgomp" version="4.4.4" release="13.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="glibc-common" version="2.5" release="58" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="basesystem" version="8.0" release="5.1.1.el5.centos" arch="noarch" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="db4" version="4.3.29" release="10.el5_5.2" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="logrotate" version="3.7.4" release="9.el5_5.2" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="crontabs" version="1.10" release="8" arch="noarch" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="elfutils" version="0.137" release="3.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="glibc-headers" version="2.5" release="58" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="tzdata" version="2010l" release="1.el5" arch="noarch" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="mcstrans" version="0.2.11" release="3.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="elfutils-libs" version="0.137" release="3.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="audit-libs" version="1.7.18" release="2.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="cracklib-dicts" version="2.8.9" release="3.3" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="kernel-headers" version="2.6.18" release="238.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="libcap" version="1.10" release="26" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="python" version="2.4.3" release="43.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="keyutils-libs" version="1.2" release="1.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="expat-devel" notmeta="1" version="1.95.8" release="8.3.el5_5.3" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="bind-libs" notmeta="1" epoch="30" version="9.3.6" release="16.P1.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="bind-utils" notmeta="1" epoch="30" version="9.3.6" release="16.P1.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="bison" notmeta="1" version="2.3" release="2.1" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="cpio" notmeta="1" version="2.6" release="23.el5_4.1" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="cpp" notmeta="1" version="4.1.2" release="50.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="cracklib" notmeta="1" version="2.8.9" release="3.3" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="cvs" notmeta="1" version="1.11.22" release="7.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="e2fsprogs" notmeta="1" version="1.39" release="23.el5_5.1" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="file" notmeta="1" version="4.17" release="15.el5_3.1" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="flex" notmeta="1" version="2.5.4a" release="41.fc6" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="gawk" notmeta="1" version="3.1.5" release="14.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="gdbm-devel" notmeta="1" version="1.8.0" release="26.2.1" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="gettext-devel" notmeta="1" version="0.17" release="1.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="glibc-devel" notmeta="1" version="2.5" release="58" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="gpm" notmeta="1" version="1.20.1" release="74.1" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="groff" notmeta="1" version="1.18.1.1" release="11.1" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="gzip" notmeta="1" version="1.3.5" release="11.el5.centos.1" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="less" notmeta="1" version="436" release="7.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="make" notmeta="1" epoch="1" version="3.81" release="3.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="man" notmeta="1" version="1.6d" release="1.1" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="module-init-tools" notmeta="1" version="3.3" release="0.pre3.1.60.el5_5.1" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="ncurses-devel" notmeta="1" version="5.5" release="24.20060715" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="net-tools" notmeta="1" version="1.60" release="81.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="patch" notmeta="1" version="2.5.4" release="31.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="procinfo" notmeta="1" version="18" release="19" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="procps" notmeta="1" version="3.2.7" release="16.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="psmisc" notmeta="1" version="22.2" release="7" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="rcs" notmeta="1" version="5.7" release="30.1" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="strace" notmeta="1" version="4.5.18" release="5.el5_5.5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="texinfo" notmeta="1" version="4.8" release="14.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="unzip" notmeta="1" version="5.52" release="3.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="zlib-devel" notmeta="1" version="1.2.3" release="3" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="vim-enhanced" notmeta="1" epoch="2" version="7.0.109" release="7.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="initscripts" notmeta="1" version="8.45.33" release="1.el5.centos" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="bzip2-devel" notmeta="1" version="1.0.3" release="6.el5_5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="libselinux-python" notmeta="1" version="1.33.4" release="5.7.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="libselinux-utils" notmeta="1" version="1.33.4" release="5.7.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="libsemanage" notmeta="1" version="1.9.1" release="4.4.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="audit-libs-python" notmeta="1" version="1.7.18" release="2.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="vim-minimal" notmeta="1" epoch="2" version="7.0.109" release="7.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="mkinitrd" notmeta="1" version="5.1.19.6" release="68.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="chkconfig" notmeta="1" version="1.3.30.2" release="2.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="udev" notmeta="1" version="095" release="14.24.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="vim-common" notmeta="1" epoch="2" version="7.0.109" release="7.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="glib2" notmeta="1" version="2.12.3" release="4.el5_3.1" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="SysVinit" notmeta="1" version="2.86" release="15.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="dmraid" notmeta="1" version="1.0.0.rc13" release="63.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="lvm2" notmeta="1" version="2.02.74" release="5.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="hmaccalc" notmeta="1" version="0.9.6" release="3.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="nash" notmeta="1" version="5.1.19.6" release="68.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="device-mapper-multipath" notmeta="1" version="0.4.7" release="42.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="kpartx" notmeta="1" version="0.4.7" release="42.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="MAKEDEV" notmeta="1" version="3.23" release="1.2" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="dmraid-events" notmeta="1" version="1.0.0.rc13" release="63.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="device-mapper-event" notmeta="1" version="1.02.55" release="2.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="libsysfs" notmeta="1" version="2.0.0" release="6" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="sgpio" notmeta="1" version="1.2.0_10" release="2.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <bdep name="sysklogd" notmeta="1" version="1.4.1" release="46.el5" arch="x86_64" project="CentOS:CentOS-5" repository="standard"/>
+  <path project="home:andreas_baumann" repository="CentOS_CentOS-5"/>
+  <path project="CentOS:CentOS-5" repository="standard"/>
+</buildinfo>
