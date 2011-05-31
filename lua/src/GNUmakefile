@@ -15,7 +15,7 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS =
 
-OBJS = \
+LOCAL_STATIC_LIB_OBJS = \
 	lapi.o \
 	lauxlib.o \
 	lbaselib.o \
@@ -48,12 +48,19 @@ OBJS = \
 	lzio.o \
 	print.o
 
-STATIC_LIB = \
+LOCAL_STATIC_LIB = \
 	liblua.a
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
-local_all:
+$(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
+	ar rcs $(LOCAL_STATIC_LIB) $(LOCAL_STATIC_LIB_OBJS)
+
+local_all: $(LOCAL_STATIC_LIB)
+
+
+local_clean:
+	@rm -f $(LOCAL_STATIC_LIB)
 
 local_clean:
 
