@@ -48,6 +48,7 @@ struct struct_ {};	///< category tag for a structure with named elements
 struct vector_ {};	///< category tag for a std::vector of any type
 struct atom_ {};	///< category tag for a type that is convertible from a string through boost::lexical_cast
 struct pointer_ {};	///< category tag for a pointer type
+struct cfgbase_ {};	///< category tag for a struct derived from ConfigurationBase
 
 /// \brief conditional template for detecting if a type is a class with a static/member method description() returning a const pointer to a structure description as defined in config/descriptionBase.hpp
 /// see http://drdobbs.com/article/print?articleId=227500449&siteSectionName= "Checking Concept Without Concepts in C++"
@@ -89,7 +90,7 @@ typename boost::enable_if_c<
 
 
 /// \brief get category struct_ for a type
-/// returns struct_ if T fulfills has a method description with no params returning a const pointer to a config::DescriptionBase
+/// returns struct_ if T has a method description with no params returning a const pointer to a config::DescriptionBase
 template <typename T>
 typename boost::enable_if_c<
 	has_description_method<T>::value
@@ -103,12 +104,21 @@ typename boost::enable_if_c<
 	boost::is_arithmetic<T>::value || boost::is_same<std::string,T>::value
 	,atom_>::type getCategory( const T&) { return atom_();}
 
+
 /// \brief get category pointer_ for a type
-/// returns pointer_ if T T fulfills the is_pointer
+/// returns pointer_ if T T fulfills the is_pointer properry
 template <typename T>
 typename boost::enable_if_c<
 	boost::is_pointer<T>::value
 	,pointer_>::type getCategory( const T&) { return pointer_();}
+
+
+/// \brief get category pointer_ for a type
+/// returns cfgbase_ if T T fulfills the is_base_of<ConfigurationBase,T> properry
+template <typename T>
+typename boost::enable_if_c<
+	boost::is_base_of<ConfigurationBase,T>::value
+	,cfgbase_>::type getCategory( const T&) { return cfgbase_();}
 
 }}}// end namespace
 #endif
