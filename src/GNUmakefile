@@ -163,6 +163,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	serviceBanner.o \
 	database/databaseConfig.o \
 	appConfig.o \
+	config_descriptionBase.o \
 	protocol_ioblocks.o \
 	acceptor.o \
 	getPassword.o \

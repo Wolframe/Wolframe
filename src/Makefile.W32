@@ -96,6 +96,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	$(LOGGER_OBJS) \
 	serviceConfig.obj \
 	serviceBanner.obj \
+	config_descriptionBase.obj \
 	database\databaseConfig.obj \
 	appConfig.obj \
 	protocol_ioblocks.obj \

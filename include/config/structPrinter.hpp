@@ -39,6 +39,7 @@ Project Wolframe.
 #include <cstring>
 #include <iostream>
 #include "config/traits.hpp"
+#include "logger/logLevel.hpp"
 
 namespace _Wolframe {
 namespace config {
@@ -66,7 +67,7 @@ static void printElement_( std::ostream& out, const char* name, const T& value, 
 	const DescriptionBase* d = value.description();
 	std::vector<DescriptionBase::Item>::const_iterator itr,end;
 	print_indent( out, indent);
-	out << name << " {" << std::endl;
+	out << std::string(name?name:"") << " {" << std::endl;
 
 	for (itr=d->m_ar.begin(),end=d->m_ar.end(); itr != end; ++itr)
 	{
@@ -95,9 +96,37 @@ static void printElement_( std::ostream& out, const char* name, const T& value, 
 	out << name << " = '" << value << "'" << std::endl;
 }
 
-/// \brief prints a all elements of a vector
+/// \brief prints a bool element
 template <typename T>
-static void printElement_( std::ostream&, const char*, T&, const traits::pointer_&, unsigned int){}
+static void printElement_( std::ostream& out, const char* name, const T& value, const traits::bool_&, unsigned int indent)
+{
+	print_indent( out, indent);
+	out << name << " = '" << std::string(value?"true":"false") << "'" << std::endl;
+}
+
+/// \brief prints a log::LogLevel::Level element
+template <typename T>
+static void printElement_( std::ostream& out, const char* name, const T& value, const traits::loglevel_&, unsigned int indent)
+{
+	print_indent( out, indent);
+	out << name << " = '" << value << "'" << std::endl;
+}
+
+/// \brief prints a log::SyslogFacility::Facility element
+template <typename T>
+static void printElement_( std::ostream& out, const char* name, const T& value, const traits::syslogfacility_&, unsigned int indent)
+{
+	print_indent( out, indent);
+	out << name << " = '" << value << "'" << std::endl;
+}
+
+/// \brief stub for printing a pointer
+template <typename T>
+static void printElement_( std::ostream& out, const char* name, T&, const traits::pointer_&, unsigned int indent)
+{
+	print_indent( out, indent);
+	out << name << " = ?" << std::endl;
+}
 
 /// \brief the unified print function
 template <typename T>

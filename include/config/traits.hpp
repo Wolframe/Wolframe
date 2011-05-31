@@ -38,17 +38,22 @@ Project Wolframe.
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits.hpp>
 #include <boost/detail/select_type.hpp>
+#include "logger/logLevel.hpp"
 #include "config/descriptionBase.hpp"
+#include "config/configurationBase.hpp"
 
 namespace _Wolframe {
 namespace config {
 namespace traits
 {
-struct struct_ {};	///< category tag for a structure with named elements
-struct vector_ {};	///< category tag for a std::vector of any type
-struct atom_ {};	///< category tag for a type that is convertible from a string through boost::lexical_cast
-struct pointer_ {};	///< category tag for a pointer type
-struct cfgbase_ {};	///< category tag for a struct derived from ConfigurationBase
+struct struct_ {};		///< category tag for a structure with named elements
+struct vector_ {};		///< category tag for a std::vector of any type
+struct atom_ {};		///< category tag for a type that is convertible from a string through boost::lexical_cast
+struct bool_ {};		///< category tag for a boolean type
+struct pointer_ {};		///< category tag for a pointer type
+struct cfgbase_ {};		///< category tag for a struct derived from ConfigurationBase
+struct loglevel_ {};		///< category tag for a log level
+struct syslogfacility_ {};	///< category tag for a syslog facility
 
 /// \brief conditional template for detecting if a type is a class with a static/member method description() returning a const pointer to a structure description as defined in config/descriptionBase.hpp
 /// see http://drdobbs.com/article/print?articleId=227500449&siteSectionName= "Checking Concept Without Concepts in C++"
@@ -98,15 +103,39 @@ typename boost::enable_if_c<
 
 
 /// \brief get category atom_ for a type
-/// returns atom_ if T T fulfills the is_arithmetic condition or is a string
+/// returns atom_ if T fulfills the is_arithmetic condition or is a string
 template <typename T>
 typename boost::enable_if_c<
-	boost::is_arithmetic<T>::value || boost::is_same<std::string,T>::value
+	(boost::is_arithmetic<T>::value && !boost::is_same<bool,T>::value) || boost::is_same<std::string,T>::value
 	,atom_>::type getCategory( const T&) { return atom_();}
 
 
+/// \brief get category bool_ for a type
+/// returns bool_ if T is a bool
+template <typename T>
+typename boost::enable_if_c<
+	boost::is_same<bool,T>::value
+	,bool_>::type getCategory( const T&) { return bool_();}
+
+
+/// \brief get category loglevel_ for a type
+/// returns loglevel_ if T is a log level
+template <typename T>
+typename boost::enable_if_c<
+boost::is_same<log::LogLevel::Level,T>::value
+	,loglevel_>::type getCategory( const T&) { return loglevel_();}
+
+
+/// \brief get category syslogfacility_ for a type
+/// returns loglevel_ if T is a syslog facility
+template <typename T>
+typename boost::enable_if_c<
+boost::is_same<log::SyslogFacility::Facility,T>::value
+	,syslogfacility_>::type getCategory( const T&) { return syslogfacility_();}
+
+
 /// \brief get category pointer_ for a type
-/// returns pointer_ if T T fulfills the is_pointer properry
+/// returns pointer_ if T fulfills the is_pointer properry
 template <typename T>
 typename boost::enable_if_c<
 	boost::is_pointer<T>::value
@@ -114,7 +143,7 @@ typename boost::enable_if_c<
 
 
 /// \brief get category pointer_ for a type
-/// returns cfgbase_ if T T fulfills the is_base_of<ConfigurationBase,T> properry
+/// returns cfgbase_ if T fulfills the is_base_of<ConfigurationBase,T> properry
 template <typename T>
 typename boost::enable_if_c<
 	boost::is_base_of<ConfigurationBase,T>::value

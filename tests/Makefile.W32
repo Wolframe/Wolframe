@@ -40,6 +40,7 @@ TEST_CPP_BINS = \
 	singletonTest.exe \
 	poolTest.exe \
 	logTest.exe \
+	configStructParser.exe \
 	protocolArgumentParsing.exe \
 	configValueParser.exe
 

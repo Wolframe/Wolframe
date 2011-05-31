@@ -39,7 +39,8 @@ Project Wolframe.
 #include <string>
 #include <vector>
 #include <cstring>
-#include "traits.hpp"
+#include "config/valueParser.hpp"
+#include "config/traits.hpp"
 
 namespace _Wolframe {
 namespace config {
@@ -85,8 +86,32 @@ static void parseElement_( const char* name, T& value, const traits::struct_&, c
 		{
 			itr->m_parse( itr->m_name.c_str(), &value, itr->m_ofs, pt);
 		}
+		//check if all configuration elements are defined in the description
+		boost::property_tree::ptree::const_iterator pi,pe;
+		for (pi=pt.begin(),pe=pt.end(); pi != pe; pi++)
+		{
+			for (itr=descr->m_ar.begin(),end=descr->m_ar.end(); itr != end; ++itr)
+			{
+				if (boost::iequals( pi->first, itr->m_name.c_str())) break;
+			}
+			if (itr == end)
+			{
+				throw ParseError( pi->first,"undefined element");
+			}
+		}
 	}
 }
+
+/// \brief parses a configuration base class by calling its parse function
+template <typename T>
+static void parseElement_( const char* name, T& value, const traits::cfgbase_&, const boost::property_tree::ptree& pt)
+{
+	if (!parse( value, pt, name))
+	{
+		throw ParseError( name, "parse error");
+	}
+}
+
 
 /// \brief parses a all elements of a vector (n elements with same name in pt)
 template <typename T>
@@ -109,10 +134,12 @@ static void parseElement_( const char* name, T& value, const traits::vector_&, c
 	}
 }
 
-/// \brief parses an atomic element
-template <typename T>
-static void parseElement_( const char* name, T& value, const traits::atom_&, const boost::property_tree::ptree& pt)
+
+/// \brief parses an atomic element restricted by a value domain
+template <typename T, typename Domain>
+static void parseElement_( const char* name, T& value, const Domain& domain, const boost::property_tree::ptree& pt)
 {
+	std::string explanation;
 	if (name)
 	{
 		parseElement1( name, value, pt);
@@ -123,9 +150,60 @@ static void parseElement_( const char* name, T& value, const traits::atom_&, con
 	}
 	else
 	{
-		value = boost::lexical_cast<T>(pt.data());
+		if (!domain.parse( value, pt.data(), explanation))
+		{
+			throw ParseError( name, explanation);
+		}
 	}
 }
+
+
+/// \brief parses an atomic element
+template <typename T>
+static void parseElement_( const char* name, T& value, const traits::atom_&, const boost::property_tree::ptree& pt)
+{
+	static Parser::BaseTypeDomain domain;
+	parseElement_( name, value, domain, pt);
+}
+
+
+/// \brief parses a bool element
+template <typename T>
+static void parseElement_( const char* name, T& value, const traits::bool_&, const boost::property_tree::ptree& pt)
+{
+	static Parser::BoolDomain domain;
+	parseElement_( name, value, domain, pt);
+}
+
+
+/// \brief parses a log level element
+template <typename T>
+static void parseElement_( const char* name, T& value, const traits::loglevel_&, const boost::property_tree::ptree& pt)
+{
+	static const char* elems[] =
+	{
+		"DATA", "TRACE", "DEBUG", "INFO", "NOTICE", "WARNING", "ERROR", "SEVERE", "CRITICAL", "ALERT", "FATAL"
+	};
+	Parser::EnumDomain domain( 11U, elems);
+	parseElement_( name, value, domain, pt);
+}
+
+
+/// \brief parses an syslog facility element
+template <typename T>
+static void parseElement_( const char* name, T& value, const traits::syslogfacility_&, const boost::property_tree::ptree& pt)
+{
+	static const char* elems[] =
+	{
+		"KERN", "USER", "MAIL", "DAEMON", "AUTH", "SYSLOG", "LPR",
+		"NEWS", "UUCP", "CRON", "AUTHPRIV", "FTP", "NTP", "SECURITY",
+		"CONSOLE", "AUDIT", "LOCAL0", "LOCAL1", "LOCAL2", "LOCAL3",
+		"LOCAL4", "LOCAL5", "LOCAL6", "LOCAL7"
+	};
+	Parser::EnumDomain domain( 24U, elems);
+	parseElement_( name, value, domain, pt);
+}
+
 
 /// \brief parses an element with indirection (searches it in pt)
 template <typename T>
@@ -147,6 +225,10 @@ static void parseElement1( const char* name, T& value, const boost::property_tre
 			catch (boost::bad_lexical_cast e)
 			{
 				throw ParseError( name, "illegal token type");
+			}
+			catch (const std::exception& e)
+			{
+				throw ParseError( name, e.what());
 			}
 			++it;
 			break;

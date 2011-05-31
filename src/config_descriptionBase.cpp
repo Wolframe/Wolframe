@@ -32,9 +32,9 @@ Project Wolframe.
 #include <boost/property_tree/ptree.hpp>
 #include <cstddef>
 
-#include "structParser.hpp"
-#include "structPrinter.hpp"
-#include "descriptionBase.hpp"
+#include "config/structParser.hpp"
+#include "config/structPrinter.hpp"
+#include "config/descriptionBase.hpp"
 
 using namespace _Wolframe::config;
 

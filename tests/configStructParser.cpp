@@ -18,33 +18,46 @@ struct LoggerConfig
 {
 	struct ToStderr
 	{
-		int loglevel;
+		log::LogLevel::Level loglevel;
+
+		ToStderr()
+			:loglevel(log::LogLevel::LOGLEVEL_INFO){}
 
 		static const config::DescriptionBase* description();
 	};
 
 	struct ToFile
 	{
-		int loglevel;
+		log::LogLevel::Level loglevel;
 		std::string filename;
+
+		ToFile()
+			:loglevel(log::LogLevel::LOGLEVEL_INFO){}
 
 		static const config::DescriptionBase* description();
 	};
 
 	struct ToSyslog
 	{
-		int loglevel;
-		int facility;
+		log::LogLevel::Level loglevel;
+		log::SyslogFacility::Facility facility;
 		std::string ident;
+
+		ToSyslog()
+			:loglevel(log::LogLevel::LOGLEVEL_INFO)
+			,facility(log::SyslogFacility::WOLFRAME_SYSLOG_FACILITY_LOCAL2){}
 
 		static const config::DescriptionBase* description();
 	};
 
 	struct ToEventlog
 	{
-		int loglevel;
+		log::LogLevel::Level loglevel;
 		std::string name;
 		std::string source;
+
+		ToEventlog()
+			:loglevel(log::LogLevel::LOGLEVEL_INFO){}
 
 		static const config::DescriptionBase* description();
 	};
@@ -52,7 +65,7 @@ struct LoggerConfig
 	ToEventlog eventlog;
 	ToSyslog syslog;
 	ToFile filelog;
-	ToStderr stderrlog;
+	ToStderr stderr;
 
 	static const config::DescriptionBase* description();
 };
@@ -68,6 +81,9 @@ struct NetConfig
 		std::string address;
 		unsigned short port;
 		unsigned short maxConnections;
+
+		Endpoint()
+			:port(0),maxConnections(0){}
 
 		static const config::DescriptionBase* description();
 	};
@@ -85,10 +101,14 @@ struct NetConfig
 		std::string CAchainFile;
 		bool verify;
 
+		SSLEndpoint()
+			:port(0),maxConnections(0),verify(true){}
+
 		static const config::DescriptionBase* description();
 	};
 	std::vector<SSLEndpoint> SSLendpoints;
 
+	NetConfig() :threads(0),maxConnections(0) {}
 	static const config::DescriptionBase* description();
 };
 
@@ -103,6 +123,7 @@ struct DatabaseConfig
 	unsigned short connections;
 	unsigned short acquireTimeout;
 
+	DatabaseConfig() :port(0),connections(0),acquireTimeout(0) {}
 	static const config::DescriptionBase* description();
 };
 
@@ -161,7 +182,7 @@ const config::DescriptionBase* LoggerConfig::ToStderr::description()
 		ThisDescription()
 		{
 			(*this)
-			( "loglevel",		&LoggerConfig::ToStderr::loglevel);
+			( "level",		&LoggerConfig::ToStderr::loglevel);
 		}
 	};
 	static const ThisDescription rt;
@@ -175,7 +196,7 @@ const config::DescriptionBase* LoggerConfig::ToFile::description()
 		ThisDescription()
 		{
 			(*this)
-			( "loglevel",		&LoggerConfig::ToFile::loglevel)
+			( "level",		&LoggerConfig::ToFile::loglevel)
 			( "filename",		&LoggerConfig::ToFile::filename);
 		}
 	};
@@ -190,7 +211,7 @@ const config::DescriptionBase* LoggerConfig::ToSyslog::description()
 		ThisDescription()
 		{
 			(*this)
-			( "loglevel",		&LoggerConfig::ToSyslog::loglevel)
+			( "level",		&LoggerConfig::ToSyslog::loglevel)
 			( "facility",		&LoggerConfig::ToSyslog::facility)
 			( "ident",		&LoggerConfig::ToSyslog::ident);
 		}
@@ -206,7 +227,7 @@ const config::DescriptionBase* LoggerConfig::ToEventlog::description()
 		ThisDescription()
 		{
 			(*this)
-			( "loglevel",		&LoggerConfig::ToEventlog::loglevel)
+			( "level",		&LoggerConfig::ToEventlog::loglevel)
 			( "name",		&LoggerConfig::ToEventlog::name)
 			( "source",		&LoggerConfig::ToEventlog::source);
 		}
@@ -224,8 +245,8 @@ const config::DescriptionBase* LoggerConfig::description()
 			(*this)
 			( "eventlog",		&LoggerConfig::eventlog)
 			( "syslog",		&LoggerConfig::syslog)
-			( "filelog",		&LoggerConfig::filelog)
-			( "stderrlog",		&LoggerConfig::stderrlog);
+			( "logfile",		&LoggerConfig::filelog)
+			( "stderr",		&LoggerConfig::stderr);
 		}
 	};
 	static const ThisDescription rt;
@@ -316,7 +337,7 @@ const config::DescriptionBase* ServiceConfig::description()
 		ThisDescription()
 		{
 			(*this)
-			( "name",		&ServiceConfig::name)
+			( "servicename",	&ServiceConfig::name)
 			( "displayName",	&ServiceConfig::displayName)
 			( "description",	&ServiceConfig::descr);
 		}
@@ -350,7 +371,7 @@ const config::DescriptionBase* Configuration::description()
 			(*this)
 			( "service",		&Configuration::service)
 			( "daemon",		&Configuration::daemon)
-			( "logger",		&Configuration::logger)
+			( "logging",		&Configuration::logger)
 			( "net",		&Configuration::net);
 		}
 	};
@@ -359,10 +380,15 @@ const config::DescriptionBase* Configuration::description()
 }
 
 
-int main( int, const char**)
+int main( int argc, const char** argv)
 {
 	Configuration cfg;
-	std::string filename( "../src/wolframe.conf");
+
+	if (argc <= 1)
+	{
+		LOG_ERROR << "missing argument configuration file";
+	}
+	std::string filename( argv[1]);
 
 	std::string configfile = resolvePath( boost::filesystem::absolute( filename).string());
 	if ( !boost::filesystem::exists( configfile))	{
@@ -377,7 +403,7 @@ int main( int, const char**)
 		boost::property_tree::read_info( configfile, pt);
 		if (cfg.description()->parse( &cfg, pt, errmsg))
 		{
-			cfg.description()->print( std::cout, "wolframe", &cfg);
+			cfg.description()->print( std::cout, &cfg);
 		}
 	}
 	catch (std::exception& e)
