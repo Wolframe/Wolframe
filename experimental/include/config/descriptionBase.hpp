@@ -54,10 +54,10 @@ struct DescriptionBase
 		Parse m_parse;
 		Print m_print;
 
-	Item( std::size_t ofs, const std::string& name, Parse parse, Print print)
-		:m_ofs(ofs),m_name(name),m_parse(parse),m_print(print){}
-	Item( const Item& o)
-		:m_ofs(o.m_ofs),m_name(o.m_name),m_parse(o.m_parse),m_print(o.m_print){}
+		Item( std::size_t ofs, const std::string& name, Parse parse, Print print)
+			:m_ofs(ofs),m_name(name),m_parse(parse),m_print(print){}
+		Item( const Item& o)
+			:m_ofs(o.m_ofs),m_name(o.m_name),m_parse(o.m_parse),m_print(o.m_print){}
 	};
 	std::vector<Item> m_ar;
 
@@ -69,7 +69,8 @@ struct DescriptionBase
 	bool parse( void* configStruct, const boost::property_tree::ptree& pt, std::string& errmsg) const;
 
 	/// \brief Print the configuration structure with values from the configuration
-	/// \param[in,out] configStruct structure to print
+	/// \param[out] stream to print to
+	/// \param[in] configStruct structure to print
 	void print( std::ostream& out, const void* configStruct) const;
 };
 
