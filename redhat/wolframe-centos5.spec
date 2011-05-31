@@ -97,7 +97,7 @@ Qt client for the Wolframe server.
 cd %{_builddir}/boost_1_46_1
 ./bootstrap.sh --prefix=/tmp/boost-1.46.1 \
 	--with-libraries=thread,filesystem,system,program_options,date_time
-./bjam install
+./bjam %{?_smp_mflags} install
 
 cd %{_builddir}/%{name}-%{version}
 LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make help \
@@ -117,6 +117,7 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make config \
 	WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=/etc
 LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make all \
+	%{?_smp_mflags} \
 	BOOST_DIR=/tmp/boost-1.46.1 \
 	WITH_SSL=%{with_ssl} WITH_SQLITE3=%{with_sqlite} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
