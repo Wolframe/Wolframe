@@ -3,3 +3,4 @@ various contributions
 create_qtcreator_files.sh	- create *.files for qtcreator
 valgrind-suppressions		- known problems when testing
 				  with valgrind memcheck/leakcheck
+osc				- OpenSuse Build Service specific stuff
