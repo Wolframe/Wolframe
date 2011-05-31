@@ -1,6 +1,9 @@
 #!/usr/bin/perl -w
 
 use XML::DOM;
+
+#my $ARCH = "x86_64";
+my $ARCH = "i586";
  
 my $parser = new XML::DOM::Parser;
 my $doc = $parser->parsefile ("file.xml");
@@ -11,17 +14,15 @@ foreach my $p ( $doc->getElementsByTagName( 'bdep' ) ) {
   $release = $p->getAttribute( 'release' );
   $arch = $p->getAttribute( 'arch' );
   $n = "$package-$version-$release.$arch.rpm";
-  # /var/tmp/osbuild-packagecache/CentOS\:CentOS-5/standard/x86_64  
-  # yum-verify-1.1.16-14.el5.centos.1.noarch.rpm
   
-  $rpm = "/var/tmp/osbuild-packagecache/CentOS:CentOS-5/standard/x86_64/$n";
+  $rpm = "/var/tmp/osbuild-packagecache/CentOS:CentOS-5/standard/$ARCH/$n";
   
   if( ! -f $rpm ) {
 #    print "$rpm not found\n";
-    open POSSIBLES, "ls /var/tmp/osbuild-packagecache/CentOS\:CentOS-5/standard/x86_64/$package*.$arch.rpm |";
+    open POSSIBLES, "ls /var/tmp/osbuild-packagecache/CentOS\:CentOS-5/standard/$ARCH/$package*.$arch.rpm |";
     $nof = 0;
     foreach $possible (<POSSIBLES>) {
-      if( $possible =~ m@^/var/tmp/osbuild-packagecache/CentOS\:CentOS-5/standard/x86_64/(.+)-([^\-]+)-([^\-]+)\.([^\.]+)\.rpm$@ ) {
+      if( $possible =~ m@^/var/tmp/osbuild-packagecache/CentOS\:CentOS-5/standard/$ARCH/(.+)-([^\-]+)-([^\-]+)\.([^\.]+)\.rpm$@ ) {
         $new_package = $1;
         $new_version = $2;
         $new_release = $3;
@@ -41,7 +42,7 @@ foreach my $p ( $doc->getElementsByTagName( 'bdep' ) ) {
            print STDERR "ERROR: more than one package found for $n\n";
            exit 1;
         }
-      } elsif( $possible =~ m@/var/tmp/osbuild-packagecache/CentOS\:CentOS-5/standard/x86_64/([^\-]+)-((devel)|(libs))-([^\-]+)-([^\-]+)\.([^\.]+)\.rpm@ ) {
+      } elsif( $possible =~ m@/var/tmp/osbuild-packagecache/CentOS\:CentOS-5/standard/$ARCH/([^\-]+)-((devel)|(libs))-([^\-]+)-([^\-]+)\.([^\.]+)\.rpm@ ) {
         print "PROBLEM HERE: $possible\n";
         exit 1;
       } else  {
