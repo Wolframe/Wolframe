@@ -45,7 +45,8 @@ home directory as '~/config.mk'. Customize '~/config.mk' as needed.
 Compile and install boost
 -------------------------
 
-./bootstrap.sh --prefix=/usr/local/boost-1.46.1
+./bootstrap.sh --prefix=/usr/local/boost-1.46.1 \
+	--with-libraries=thread,filesystem,system,program_options,date_time
 ./bjam install
 
 configure Wolframe in ~/config.mk and
