@@ -186,11 +186,11 @@ fi
 %files client
 %dir %{_bindir}
 %{_bindir}/qtclient
-%dir %{_libdir}/wolframe
-%{_libdir}/wolframe/libQtCore.so.4
-%{_libdir}/wolframe/libQtGui.so.4
-%{_libdir}/wolframe/libQtNetwork.so.4
-%{_libdir}/wolframe/libQtXml.so.4
+#%dir %{_libdir}/wolframe
+#%{_libdir}/wolframe/libQtCore.so.4
+#%{_libdir}/wolframe/libQtGui.so.4
+#%{_libdir}/wolframe/libQtNetwork.so.4
+#%{_libdir}/wolframe/libQtXml.so.4
 %endif
 
 %changelog
