@@ -60,6 +60,8 @@ config:
 	@echo "--------------------------------"
 	@echo
 	@echo "Operating system: $(PLATFORM), $(OS_MAJOR_VERSION).$(OS_MINOR_VERSION)"
+	@echo "Architecture: $(ARCH)"
+	@echo "System library directory: $(LIBDIR)"
 ifeq "$(PLATFORM)" "LINUX"
 	@echo "Linux distribution: $(LINUX_DIST) $(LINUX_REV)"
 endif
@@ -87,6 +89,7 @@ ifeq ($(WITH_QT),1)
 	@echo "QT_DIR: $(QT_DIR)"
 	@echo "QT_INCLUDE_DIR: $(QT_INCLUDE_DIR)"
 	@echo "QT_LIB_DIR: $(QT_LIB_DIR)"
+	@echo "QT_MOC: $(QT_MOC)"
 endif
 ifeq ($(WITH_GTEST),1)
 	@echo

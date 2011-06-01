@@ -59,19 +59,19 @@ CPP_BINS = \
 local_all:
 
 moc_MainWindow.cpp: MainWindow.hpp
-	$(QT_DIR)/bin/moc $(MOC_FLAGS) MainWindow.hpp -o moc_MainWindow.cpp
+	$(QT_MOC) $(MOC_FLAGS) MainWindow.hpp -o moc_MainWindow.cpp
 
 moc_HistoryLineEdit.cpp: HistoryLineEdit.hpp
-	$(QT_DIR)/bin/moc $(MOC_FLAGS) HistoryLineEdit.hpp -o moc_HistoryLineEdit.cpp
+	$(QT_MOC) $(MOC_FLAGS) HistoryLineEdit.hpp -o moc_HistoryLineEdit.cpp
 
 moc_DebugTerminal.cpp: DebugTerminal.hpp
-	$(QT_DIR)/bin/moc $(MOC_FLAGS) DebugTerminal.hpp -o moc_DebugTerminal.cpp
+	$(QT_MOC) $(MOC_FLAGS) DebugTerminal.hpp -o moc_DebugTerminal.cpp
 
 moc_AbstractFormLoader.cpp: AbstractFormLoader.hpp
-	$(QT_DIR)/bin/moc $(MOC_FLAGS) AbstractFormLoader.hpp -o moc_AbstractFormLoader.cpp
+	$(QT_MOC) $(MOC_FLAGS) AbstractFormLoader.hpp -o moc_AbstractFormLoader.cpp
 
 moc_WolframeClient.cpp: WolframeClient.hpp
-	$(QT_DIR)/bin/moc $(MOC_FLAGS) WolframeClient.hpp -o moc_WolframeClient.cpp
+	$(QT_MOC) $(MOC_FLAGS) WolframeClient.hpp -o moc_WolframeClient.cpp
 
 local_clean:
 	@-rm -f moc_*.cpp

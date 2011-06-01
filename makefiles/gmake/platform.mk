@@ -30,6 +30,7 @@ WITH_PGSQL ?= 0
 WITH_QT ?= 0
 WITH_EXAMPLES ?= 1
 
+# variables guessed by 'guess_env'
 PLATFORM ?=		$(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_env --platform "$(CC)" "$(CURDIR)" $(TOPDIR))
 OS_MAJOR_VERSION ?=	$(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_env --os-major-version "$(CC)" "$(CURDIR)" $(TOPDIR))
 OS_MINOR_VERSION ?=	$(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_env --os-minor-version "$(CC)" "$(CURDIR)" $(TOPDIR))
@@ -37,6 +38,26 @@ COMPILER ?=		$(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_env --compiler "$(
 ifeq "$(PLATFORM)" "LINUX" 
 LINUX_DIST ?=		$(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_env --linux-dist "$(CC)" "$(CURDIR)" $(TOPDIR))
 LINUX_REV ?=		$(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_env --linux-rev "$(CC)" "$(CURDIR)" $(TOPDIR))
+endif
+
+# set library path on Intel/AMD
+ifeq "$(ARCH)" "x86"
+ifeq "$(LINUX_DIST)" "arch"
+LIBDIR=/usr/lib32
+else
+LIBDIR=/usr/lib
+endif
+else
+LIBDIR=/usr/lib
+endif
+ifeq "$(ARCH)" "x86_64"
+ifeq "$(LINUX_DIST)" "arch"
+LIBDIR=/usr/lib
+else
+LIBDIR=/usr/lib64
+endif
+else
+LIBDIR=/usr/lib
 endif
 
 # platform specific flags
@@ -346,34 +367,39 @@ ifeq "$(LINUX_DIST)" "arch"
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
+QT_MOC ?= $(QT_DIR)/bin/moc
 endif
 
 ifeq "$(LINUX_DIST)" "slackware"
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
+QT_MOC ?= $(QT_DIR)/bin/moc
 endif
 
 ifeq "$(LINUX_DIST)" "redhat"
 
 # Fedora 14 puts Qt in a subdir in /usr/lib
 ifeq "$(LINUX_REV)" "14"
-QT_DIR ?= /usr/lib/qt4
+QT_DIR ?= $(LIBDIR)/qt4
 QT_INCLUDE_DIR ?= /usr/include
-QT_LIB_DIR ?= /usr/lib
+QT_LIB_DIR ?= $(LIBDIR)
+QT_MOC ?= $(QT_DIR)/bin/moc
 endif
 
-# Fedora 14 puts Qt in a subdir in /usr/lib
+# Fedora 15 puts Qt in a subdir in /usr/lib
 ifeq "$(LINUX_REV)" "15"
-QT_DIR ?= /usr/lib/qt4
+QT_DIR ?= $(LIBDIR)/qt4
 QT_INCLUDE_DIR ?= /usr/include
-QT_LIB_DIR ?= /usr/lib
+QT_LIB_DIR ?= $(LIBDIR)
+QT_MOC ?= $(QT_DIR)/bin/moc
 endif
 
 ifeq "$(LINUX_REV)" "5"
 QT_DIR ?= /usr/lib/qt4
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
+QT_MOC ?= $(QT_DIR)/bin/moc
 endif
 
 endif
@@ -385,12 +411,14 @@ ifeq "$(LINUX_REV)" "squeeze/sid"
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include/qt4
 QT_LIB_DIR ?= $(QT_DIR)/lib
+QT_MOC ?= $(QT_DIR)/bin/moc
 endif
 
 ifeq "$(LINUX_REV)" "5"
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include/qt4
 QT_LIB_DIR ?= $(QT_DIR)/lib
+QT_MOC ?= $(QT_DIR)/bin/moc
 endif
 
 endif
@@ -400,6 +428,7 @@ ifeq "$(LINUX_REV)" "11"
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
+QT_MOC ?= $(QT_DIR)/bin/moc
 endif
 endif
 
