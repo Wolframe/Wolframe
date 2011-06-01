@@ -161,7 +161,7 @@ For building the documentation you need 'xsltproc', 'docbook-xsl' and 'doxygen'.
 
 When rebuilding the SVG images of the documentation you also need 'dia'.
 
-OpenSuSe 11.3
+OpenSuSe 11.4
 -------------
 
 Optional packages: qt-devel (4.6.3), pam-devel (1.1.1), cyrus-sasl-devel (2.1.23),
