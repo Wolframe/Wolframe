@@ -12,8 +12,8 @@
 %define with_lua	1
 %define with_pam	1
 %define with_sasl	1
-%define with_qt		0
-%define with_examples	0
+%define with_qt		1
+%define with_examples	1
  
 Summary: Small and medium enterprise resource planning (Wolframe)
 Name: wolframe
@@ -21,11 +21,22 @@ Version: 0.0.1
 Release: 0.1
 License: Wolframe License
 Group: Application/Business
-Source: %{name}-%{version}.tar.bz2
+Source0: %{name}-%{version}.tar.bz2
+Source1: boost_1_46_1.tar.bz2
 
-URL: http://www.wolframe.com/
+URL: http://www.wolframe.net/
+
+%define boost_version  1.46.1
 
 BuildRoot: %{_tmppath}/%{name}-root
+BuildRequires: redhat-release
+#BuildRequires: boost-devel >= 1.43
+#Requires: boost >= 1.43
+#Requires: boost-thread >= 1.43
+#Requires: boost-date-time >= 1.43
+#Requires: boost-filesystem >= 1.43
+#Requires: boost-program-options >= 1.43
+#Requires: boost-system >= 1.43
 %if %{with_ssl}
 BuildRequires: openssl-devel >= 0.9.8
 Requires: openssl >= 0.9.8
@@ -72,17 +83,44 @@ multiple file html documentation and the pdf documentation.
 Summary: Wolframe client
 Group: Application/Business
 
+BuildRequires: qt4-devel >= 4.5
+Requires: qt4 >= 4.5
+
 %description client
 Qt client for the Wolframe server.
 
 %endif
 
 %prep
-%setup
+%setup -T -D -b 0 -b 1
 
 
 %build
+cd %{_builddir}/boost_1_46_1
+./bootstrap.sh --prefix=/tmp/boost-1.46.1 \
+	--with-libraries=thread,filesystem,system,program_options,date_time
+./bjam %{?_smp_mflags} install
+
+cd %{_builddir}/%{name}-%{version}
+LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make help \
+	BOOST_DIR=/tmp/boost-1.46.1 \
+	WITH_SSL=%{with_ssl} WITH_SQLITE3=%{with_sqlite} \
+	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
+	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
+	WITH_QT=%{with_qt} \
+	WITH_EXAMPLES=%{with_examples} \
+	sysconfdir=/etc
+LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make config \
+	BOOST_DIR=/tmp/boost-1.46.1 \
+	WITH_SSL=%{with_ssl} WITH_SQLITE3=%{with_sqlite} \
+	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
+	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
+	WITH_QT=%{with_qt} \
+	WITH_EXAMPLES=%{with_examples} \
+	sysconfdir=/etc
 LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make all \
+	%{?_smp_mflags} \
+	BOOST_DIR=/tmp/boost-1.46.1 \
 	WITH_SSL=%{with_ssl} WITH_SQLITE3=%{with_sqlite} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
@@ -98,6 +136,7 @@ echo ===================== END OF TESTING =========================
 
 %install
 make DESTDIR=$RPM_BUILD_ROOT install \
+	BOOST_DIR=/tmp/boost-1.46.1 \
 	WITH_SSL=%{with_ssl} WITH_SQLITE3=%{with_sqlite} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
@@ -106,22 +145,16 @@ make DESTDIR=$RPM_BUILD_ROOT install \
 	sysconfdir=$RPM_BUILD_ROOT/etc
 cd docs && make DESTDIR=$RPM_BUILD_ROOT install && cd ..
 
+# copy local versions of shared libraries of boost for platforms missing a decent
+# version of boost
 mkdir -p $RPM_BUILD_ROOT%{_libdir}/wolframe
 for i in \
 	libboost_program_options.so.%{boost_version} libboost_system.so.%{boost_version} \
-	libboost_filesystem.so.%{boost_version} libboost_thread.so.%{boost_version}; do
-# Aba: TODO: boost dir from config.mk outside?
-#    cp /usr/local/lib/$i $RPM_BUILD_ROOT%{_libdir}/wolframe/
-    cp /usr/local/boost-%{boost_version}/lib/$i $RPM_BUILD_ROOT%{_libdir}/wolframe/
+	libboost_filesystem.so.%{boost_version} libboost_thread.so.%{boost_version} \
+	libboost_date_time.so.%{boost_version}; do
+    cp /tmp/boost-%{boost_version}/lib/$i $RPM_BUILD_ROOT%{_libdir}/wolframe/
 done
 
-%if %{with_qt}
-mkdir -p $RPM_BUILD_ROOT%{_libdir}/wolframe
-for i in libQtCore.so.4 libQtGui.so.4 libQtNetwork.so.4 libQtXml.so.4; do
-# Aba TODO: qtdir from config.mk?
-    cp /usr/local/qt-%{qt_version}/lib/$i $RPM_BUILD_ROOT%{_libdir}/wolframe/
-done
-%endif
 
 mkdir -p $RPM_BUILD_ROOT%{_initrddir}
 cp redhat/%{initscript} $RPM_BUILD_ROOT%{_initrddir}/%{name}
@@ -168,6 +201,7 @@ fi
 %{_libdir}/wolframe/libboost_system.so.%{boost_version}
 %{_libdir}/wolframe/libboost_filesystem.so.%{boost_version}
 %{_libdir}/wolframe/libboost_thread.so.%{boost_version}
+%{_libdir}/wolframe/libboost_date_time.so.%{boost_version}
 
 #%dir %{_datadir}/wolframe
 #%doc LICENSE
@@ -181,11 +215,11 @@ fi
 %files client
 %dir %{_bindir}
 %{_bindir}/qtclient
-%dir %{_libdir}/wolframe
-%{_libdir}/wolframe/libQtCore.so.4
-%{_libdir}/wolframe/libQtGui.so.4
-%{_libdir}/wolframe/libQtNetwork.so.4
-%{_libdir}/wolframe/libQtXml.so.4
+#%dir %{_libdir}/wolframe
+#%{_libdir}/wolframe/libQtCore.so.4
+#%{_libdir}/wolframe/libQtGui.so.4
+#%{_libdir}/wolframe/libQtNetwork.so.4
+#%{_libdir}/wolframe/libQtXml.so.4
 %endif
 
 %changelog
