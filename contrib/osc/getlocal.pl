@@ -2,8 +2,8 @@
 
 use XML::DOM;
 
-#my $ARCH = "x86_64";
-my $ARCH = "i586";
+my $ARCH = "x86_64";
+#my $ARCH = "i586";
  
 my $parser = new XML::DOM::Parser;
 my $doc = $parser->parsefile ("file.xml");
