@@ -60,9 +60,8 @@ local_all: $(LOCAL_STATIC_LIB)
 
 
 local_clean:
-	@rm -f $(LOCAL_STATIC_LIB)
-
-local_clean:
+	@rm -f $(LOCAL_STATIC_LIB) $(LOCAL_STATIC_LIB_OBJS)
+	@rm -f *.sho++
 
 local_distclean:
 
