@@ -79,6 +79,9 @@ multiple file html documentation and the pdf documentation.
 Summary: Wolframe client
 Group: Application/Business
 
+BuildRequires: qt4-devel >= 4.5
+Requires: qt4 >= 4.5
+
 %description client
 Qt client for the Wolframe server.
 
