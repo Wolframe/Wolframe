@@ -82,6 +82,9 @@ multiple file html documentation and the pdf documentation.
 Summary: Wolframe client
 Group: Application/Business
 
+BuildRequires: qt4-devel >= 4.5
+Requires: qt4 >= 4.5
+
 %description client
 Qt client for the Wolframe server.
 
@@ -211,11 +214,11 @@ fi
 %files client
 %dir %{_bindir}
 %{_bindir}/qtclient
-%dir %{_libdir}/wolframe
-%{_libdir}/wolframe/libQtCore.so.4
-%{_libdir}/wolframe/libQtGui.so.4
-%{_libdir}/wolframe/libQtNetwork.so.4
-%{_libdir}/wolframe/libQtXml.so.4
+#%dir %{_libdir}/wolframe
+#%{_libdir}/wolframe/libQtCore.so.4
+#%{_libdir}/wolframe/libQtGui.so.4
+#%{_libdir}/wolframe/libQtNetwork.so.4
+#%{_libdir}/wolframe/libQtXml.so.4
 %endif
 
 %changelog
