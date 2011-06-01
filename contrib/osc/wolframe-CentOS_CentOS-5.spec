@@ -1,3 +1,5 @@
+%define dist		centos5
+
 %define initscript	wolframe.initd.RHEL
 
 %define WOLFRAME_USR	wolframe

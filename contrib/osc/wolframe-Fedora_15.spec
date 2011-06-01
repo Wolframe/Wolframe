@@ -1,16 +1,18 @@
+%define dist		fc15
+
 %define initscript	wolframe.initd.RHEL
 
 %define WOLFRAME_USR	wolframe
 %define WOLFRAME_GRP	wolframe
 
-%define with_ssl	0
-%define with_sqlite	0
-%define with_pgsql	0
-%define with_lua	0
-%define with_pam	0
-%define with_sasl	0
-%define with_qt		0
-%define with_examples	0
+%define with_ssl	1
+%define with_sqlite	1
+%define with_pgsql	1
+%define with_lua	1
+%define with_pam	1
+%define with_sasl	1
+%define with_qt		1
+%define with_examples	1
  
 Summary: Small and medium enterprise resource planning (Wolframe)
 Name: wolframe
