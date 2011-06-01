@@ -38,10 +38,6 @@ BuildRequires: centos-release
 BuildRequires: openssl-devel >= 0.9.8
 Requires: openssl >= 0.9.8
 %endif
-%if %{with_pgsql}
-BuildRequires: postgresql-devel >= 8.1
-Requires: postgresql >= 8.1
-%endif
 %if %{with_sqlite}
 BuildRequires: sqlite-devel >= 3.0
 Requires: sqlite >= 3.0
