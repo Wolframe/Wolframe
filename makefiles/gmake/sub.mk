@@ -21,6 +21,11 @@ test: $(OBJS) $(TEST_OBJS) $(CPPOBJS) $(BIN_OBJS) $(BINS) $(CPP_BINS) $(TEST_BIN
 	@test -z "$(SUBDIRS)" || ( set -e; for d in $(SUBDIRS)""; do \
 	  (set -e; $(MAKE) -C $$d test || exit 1); done)
 
+.PHONY: longtest local_longtest
+longtest: test local_longtest
+	@test -z "$(SUBDIRS)" || ( set -e; for d in $(SUBDIRS)""; do \
+	  (set -e; $(MAKE) -C $$d longtest || exit 1); done)
+
 -include $(TOPDIR)/makefiles/gmake/depend.mk
 -include $(TOPDIR)/makefiles/gmake/clean.mk
 -include $(TOPDIR)/makefiles/gmake/install.mk

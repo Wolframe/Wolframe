@@ -9,6 +9,7 @@
 # - target 'clean'
 # - target 'distclean'
 # - target 'test'
+# - target 'longtest'
 # - target 'doc'
 # - target 'dist'
 # - target 'help'
@@ -49,6 +50,11 @@ uninstall:
 test: all
 	@test -z "$(SUBDIRS)" || ( set -e; for d in $(SUBDIRS)""; do \
 	  (set -e; $(MAKE) -C $$d test || exit 1); done)
+
+.PHONY: longtest
+longtest: test
+	@test -z "$(SUBDIRS)" || ( set -e; for d in $(SUBDIRS)""; do \
+	  (set -e; $(MAKE) -C $$d longtest || exit 1); done)
 
 .PHONY: help
 help:

@@ -20,6 +20,11 @@ test: local_test
 	@test -z "$(SUBDIRS)" || ( set -e; for d in $(SUBDIRS)""; do \
 	  (set -e; $(MAKE) -C $$d test || exit 1); done)
 
+.PHONY: longtest local_longtest
+longtest: local_longtest
+	@test -z "$(SUBDIRS)" || ( set -e; for d in $(SUBDIRS)""; do \
+	  (set -e; $(MAKE) -C $$d longtest || exit 1); done)
+
 .PHONY: help
 help:
 	@cat $(TOPDIR)/makefiles/gmake/dochelp.mk

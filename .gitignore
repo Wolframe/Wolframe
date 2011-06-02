@@ -38,10 +38,14 @@ tests/ptreeGenerator
 tests/configHelpersTest
 tests/configValueParser
 tests/commandCmpTest
+tests/configStructParser
+tests/database/dbTest
 examples/echo/echod
 examples/lua/luad
 examples/mtproc/mtprocd
 examples/pecho/pechod
+examples/iproc/tests/iprocHandlerTest
+examples/pecho/tests/pechoHandlerTest
 clients/qt/qtclient
 moc_*.cpp
 clients/qt/.history
@@ -50,8 +54,6 @@ tests/db/sqlite3ppTest
 examples/iproc/iprocd
 lua/src/lua
 lua/src/luac
-examples/iproc/tests/iprocHandlerTest
 docs/WolfBook.html
 docs/WolfBook.pdf
 docs/doxygen/
-examples/pecho/tests/pechoHandlerTest
