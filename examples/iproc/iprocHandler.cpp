@@ -34,413 +34,349 @@
 /// \file iprocHandler.cpp
 ///
 
-#include "protocol.hpp"
-#include "protocol/ioblocks.hpp"
 #include "iprocHandler.hpp"
 #include "logger.hpp"
-#include "langbind/appObjects.hpp"
-#include <boost/lexical_cast.hpp>
 
-#include "langbind/luaConfig.hpp"
-#include "langbind/luaAppProcessor.hpp"
-typedef _Wolframe::iproc::lua::AppProcessor Processor;
 
 using namespace _Wolframe;
 using namespace _Wolframe::iproc;
 
-struct Connection::Private
+net::NetworkOperation Connection::WriteLine( const char* str, const char* arg)
 {
-	//* typedefs for input output blocks and input iterators
-	typedef protocol::InputBlock Input;				///< input buffer type
-	typedef protocol::OutputBlock Output;				///< output buffer type
-	typedef protocol::InputBlock::iterator InputIterator;		///< iterator type for protocol commands
-
-	//* typedefs for input output buffers
-	typedef protocol::Buffer<256> LineBuffer;			///< buffer for one line of input/output
-	typedef protocol::CmdParser<LineBuffer> ProtocolParser;		///< parser for the protocol
-	typedef protocol::CArgBuffer<LineBuffer> ArgBuffer;		///< buffer type for the command arguments
-
-	//* typedefs for state variables and buffers
-	//list of processor states
-	enum State
+	unsigned int ii;
+	m_buffer.clear();
+	for (ii=0; str[ii]; ii++) m_buffer.push_back( str[ii]);
+	if (arg)
 	{
-		Init,					///< start state, called first time in this session
-		EnterCommand,				///< parse command
-		ParseArgs,				///< parse command arguments
-		Processing,				///< running a command
-		ProtocolError,				///< a protocol error (bad command etc) appeared and the rest of the line has to be discarded
-		DiscardInput,				///< reading and discarding data until end of data has been seen
-		FlushOutput,				///< state for sending end of data after flushing the output buffers after a call
-		Terminate				///< terminate application processor session (close for network)
-	};
-	static const char* stateName( State i)
-	{
-		static const char* ar[] = {"Init","EnterCommand","ParseArgs","Processing","ProtocolError","DiscardInput","FlushOutput","Terminate"};
-		return ar[i];
+		m_buffer.push_back( ' ');
+		for (ii=0; arg[ii]; ii++) m_buffer.push_back( arg[ii]);
 	}
-	enum Command {empty, capa, run, quit};
-	static const char* commandName( Command c)
+	m_buffer.push_back( '\r');
+	m_buffer.push_back( '\n');
+	const char* msg = m_buffer.c_str();
+	unsigned int msgsize = m_buffer.size();
+	m_buffer.clear();
+	m_argBuffer.clear();
+	return net::SendData( msg, msgsize);
+}
+
+void Connection::passInput()
+{
+	Input::iterator eoD = m_input.getEoD( m_itr);
+	m_inputfilter->protocolInput( m_itr.ptr(), eoD-m_itr, m_input.gotEoD());
+	m_end = m_input.end();
+	m_itr = (eoD < m_end) ? eoD:m_end;
+}
+
+void Connection::networkInput( const void*, std::size_t nofBytes)
+{
+	LOG_DATA << "ConnectionHandler got network input in state " << stateName(m_state);
+	m_input.setPos( nofBytes);
+	m_itr = m_input.begin();
+
+	if (m_state == Processing || m_state == DiscardInput)
 	{
-		const char* ar[] = {"", "capa", "run", "quit", 0};
-		return ar[c];
-	}
-
-	//* all state variables of this processor
-	//1. states
-	State state;						///< state of the processor (protocol main statemachine)
-
-	//2. buffers and context
-	LineBuffer buffer;					///< context (sub state) for partly parsed input lines
-	ArgBuffer argBuffer;					///< buffer for the arguments
-	Command cmdidx;						///< command parsed
-
-	Input input;						///< buffer for network read messages
-	Output output;						///< buffer for network write messages
-	//3. Iterators
-	InputIterator itr;					///< iterator to scan protocol input
-	InputIterator end;					///< iterator pointing to end of message buffer
-
-	//3. implementation
-	app::System app_system;					///< interface to system functions and loaded resources
-	boost::shared_ptr<protocol::InputFilter> inputfilter;	///< network input interface for the interpreter
-	boost::shared_ptr<protocol::FormatOutput> formatoutput;	///< network output interface for the interpreter
-	Processor processor;					///< the interpreter state
-	const char* functionName;				///< name of the method to execute
-	bool functionHasIO;					///< true if the method to execute does content data processing (input/output)
-
-	//* helper methods for I/O
-	//helper function to send a line message with CRLF termination as C string
-	Operation WriteLine( const char* str, const char* arg=0)
-	{
-		unsigned int ii;
-		buffer.clear();
-		for (ii=0; str[ii]; ii++) buffer.push_back( str[ii]);
-		if (arg)
+		Input::iterator eoD = m_input.getEoD( m_itr);
+		if (m_state == Processing)
 		{
-			buffer.push_back( ' ');
-			for (ii=0; arg[ii]; ii++) buffer.push_back( arg[ii]);
+			m_inputfilter->protocolInput( m_itr.ptr(), eoD-m_itr, m_input.gotEoD());
 		}
-		buffer.push_back( '\r');
-		buffer.push_back( '\n');
-		const char* msg = buffer.c_str();
-		unsigned int msgsize = buffer.size();
-		buffer.clear();
-		argBuffer.clear();
-		return net::SendData( msg, msgsize);
+		m_end = m_input.end();
+		m_itr = (eoD < m_end)? eoD:m_end;
 	}
-
-	void passInput()
+	else
 	{
-		Input::iterator eoD = input.getEoD( itr);
-		inputfilter->protocolInput( itr.ptr(), eoD-itr, input.gotEoD());
-		end = input.end();
-		itr = (eoD < end) ? eoD:end;
+		m_end = m_input.end();
 	}
+}
 
-	void networkInput( const void*, std::size_t nofBytes)
+void Connection::timeoutOccured()
+{
+	LOG_TRACE << "Got termination signal (timeout occurred)";
+	m_state = Terminate;
+}
+
+void Connection::signalOccured()
+{
+	LOG_TRACE << "Got termination signal (signal occurred)";
+	m_state = Terminate;
+}
+
+void Connection::errorOccured( NetworkSignal )
+{
+	LOG_TRACE << "Got termination signal (error occurred)";
+	m_state = Terminate;
+}
+
+const net::NetworkOperation Connection::nextOperation()
+{
+	for (;;)
 	{
-		input.setPos( nofBytes);
-		itr = input.begin();
+		LOG_DATA << "ConnectionHandler State: " << stateName(m_state);
 
-		if (state == Processing || state == DiscardInput)
+		switch( m_state)
 		{
-			Input::iterator eoD = input.getEoD( itr);
-			if (state == Processing)
+			case Init:
 			{
-				inputfilter->protocolInput( itr.ptr(), eoD-itr, input.gotEoD());
+				//start:
+				m_state = EnterCommand;
+				m_buffer.clear();
+				m_argBuffer.clear();
+				return WriteLine( "OK expecting command");
 			}
-			end = input.end();
-			itr = (eoD < end)? eoD:end;
-		}
-		else
-		{
-			end = input.end();
-		}
-	}
 
-	void signalTerminate()
-	{
-		state = Terminate;
-	}
-
-	Private( const lua::Configuration* config)
-		:state(Init)
-		,argBuffer(&buffer)
-		,input(config->input_bufsize())
-		,output(config->output_bufsize())
-		,processor(&app_system, config)
-		,functionName(0)
-		,functionHasIO(false)
-	{
-		itr = input.begin();
-		end = input.end();
-	}
-
-	//statemachine of the processor
-	const Operation nextOperation()
-	{
-		for (;;)
-		{
-			LOG_DATA << "Handler State: " << stateName(state);
-
-			switch( state)
+			case EnterCommand:
 			{
-				case Init:
-				{
-					//start:
-					state = EnterCommand;
-					buffer.clear();
-					argBuffer.clear();
-					return WriteLine( "OK expecting command");
-				}
+				m_functionName = 0;
+				m_functionHasIO = false;
 
-				case EnterCommand:
+				//the empty command is for an empty line for not bothering the client with obscure error messages.
+				//the next state should read one character for sure otherwise it may result in an endless loop
+				static const ProtocolParser parser(&commandName);
+				m_cmdidx = (Command)parser.getCommand( m_itr, m_end, m_buffer);
+				switch (m_cmdidx)
 				{
-					functionName = 0;
-					functionHasIO = false;
-
-					//the empty command is for an empty line for not bothering the client with obscure error messages.
-					//the next state should read one character for sure otherwise it may result in an endless loop
-					static const ProtocolParser parser(&commandName);
-					cmdidx = (Command)parser.getCommand( itr, end, buffer);
-					switch (cmdidx)
+					case empty:
+					case capa:
+					case run:
+					case quit:
 					{
-						case empty:
-						case capa:
-						case run:
-						case quit:
-						{
-							state = ParseArgs;
-							continue;
-						}
-						default:
-						{
-							if (itr == end)
-							{
-								input.setPos( 0);
-								return net::ReadData( input.ptr(), input.size());
-							}
-							else
-							{
-								state = ProtocolError;
-								return WriteLine( "BAD unknown command");
-							}
-						}
+						m_state = ParseArgs;
+						continue;
 					}
-				}
-
-				case ParseArgs:
-				{
-					if (!ProtocolParser::getLine( itr, end, argBuffer))
+					default:
 					{
-						if (itr == end)
+						if (m_itr == m_end)
 						{
-							input.setPos( 0);
-							return net::ReadData( input.ptr(), input.size());
+							m_input.setPos( 0);
+							return net::ReadData( m_input.ptr(), m_input.size());
 						}
 						else
 						{
-							state = ProtocolError;
-							return WriteLine( "BAD arguments");
-						}
-					}
-					switch (cmdidx)
-					{
-						case empty:
-							if (argBuffer.argc())
-							{
-								state = ProtocolError;
-								return WriteLine( "BAD command");
-							}
-							else if (ProtocolParser::consumeEOLN( itr, end))
-							{
-								buffer.clear();
-								argBuffer.clear();
-								state = EnterCommand;
-								continue;
-							}
-							else if (itr == end)
-							{
-								input.setPos( 0);
-								return net::ReadData( input.ptr(), input.size());
-							}
-							else
-							{
-								state = ProtocolError;
-								return WriteLine( "BAD command");
-							}
-						case capa:
-							if (argBuffer.argc())
-							{
-								state = ProtocolError;
-								return WriteLine( "BAD command arguments");
-							}
-							else
-							{
-								return WriteLine( "OK capa run quit");
-								state = EnterCommand;
-								continue;
-							}
-						case quit:
-							if (argBuffer.argc())
-							{
-								state = ProtocolError;
-								return WriteLine( "BAD command arguments");
-							}
-							else
-							{
-								state = Terminate;
-								return WriteLine( "BYE");
-							}
-						case run:
-							if (!processor.getCommand( "run", functionName, functionHasIO))
-							{
-								LOG_ERROR << "Command for 'run' not defined in configuration";
-								state = ProtocolError;
-								return WriteLine( "BAD command not defined");
-							}
-							if (functionHasIO)
-							{
-								inputfilter.reset( app_system.createInputFilter());
-								formatoutput.reset( app_system.createFormatOutput());
-								passInput();
-								formatoutput->init( output.ptr(), output.size());
-								processor.setIO( inputfilter, formatoutput);
-							}
-							else
-							{
-								inputfilter.reset();
-								formatoutput.reset();
-							}
-							state = Processing;
-							continue;
-					}
-				}
-
-				case Processing:
-				{
-					const char** argv = argBuffer.argv( functionName);
-					unsigned int argc = argBuffer.argc( functionName);
-
-					switch (processor.call( argc, argv))
-					{
-						case Processor::YieldRead:
-							input.setPos( 0);
-							return net::ReadData( input.ptr(), input.size());
-
-						case Processor::YieldWrite:
-						{
-							void* content = formatoutput->ptr();
-							unsigned int contentsize = formatoutput->pos();
-							if (!functionHasIO)
-							{
-								LOG_WARNING << "output of function '" << functionName << "' that has no IO configured is ignored";
-								contentsize = 0;
-							}
-							formatoutput->init( output.ptr(), output.size());
-							return net::SendData( content, contentsize);
-						}
-
-						case Processor::Ok:
-						{
-							if (functionHasIO)
-							{
-								state = FlushOutput;
-								void* content = formatoutput->ptr();
-								unsigned int contentsize = formatoutput->pos();
-
-								formatoutput->init( output.ptr(), output.size());
-								if (contentsize)
-								{
-									if (!functionHasIO)
-									{
-										LOG_WARNING << "output of function '" << functionName << "' that has no IO configured is ignored";
-										contentsize = 0;
-									}
-									else
-									{
-										formatoutput->init( output.ptr(), output.size());
-										return net::SendData( content, contentsize);
-									}
-								}
-								continue;
-							}
-							else
-							{
-								state = Init;
-								return WriteLine( "\r\nOK");
-							}
-						}
-
-						case Processor::Error:
-						{
-							if (functionHasIO)
-							{
-								state = DiscardInput;
-								return WriteLine( "\r\n.\r\nERR");
-							}
-							else
-							{
-								state = Init;
-								return WriteLine( "\r\nERR");
-							}
+							m_state = ProtocolError;
+							return WriteLine( "BAD unknown command");
 						}
 					}
 				}
+			}
 
-				case FlushOutput:
+			case ParseArgs:
+			{
+				if (!ProtocolParser::getLine( m_itr, m_end, m_argBuffer))
 				{
-					state = DiscardInput;
-					return WriteLine( "\r\n.\r\nOK");
-				}
-
-				case DiscardInput:
-				{
-					if (input.gotEoD())
+					if (m_itr == m_end)
 					{
-						state = EnterCommand;
-						continue;
+						m_input.setPos( 0);
+						return net::ReadData( m_input.ptr(), m_input.size());
 					}
 					else
 					{
-						input.setPos( 0);
-						return net::ReadData( input.ptr(), input.size());
+						m_state = ProtocolError;
+						return WriteLine( "BAD arguments");
 					}
 				}
-
-				case ProtocolError:
+				switch (m_cmdidx)
 				{
-					if (!ProtocolParser::skipLine( itr, end) || !ProtocolParser::consumeEOLN( itr, end))
+					case empty:
+						if (m_argBuffer.argc())
+						{
+							m_state = ProtocolError;
+							return WriteLine( "BAD command");
+						}
+						else if (ProtocolParser::consumeEOLN( m_itr, m_end))
+						{
+							m_buffer.clear();
+							m_argBuffer.clear();
+							m_state = EnterCommand;
+							continue;
+						}
+						else if (m_itr == m_end)
+						{
+							m_input.setPos( 0);
+							return net::ReadData( m_input.ptr(), m_input.size());
+						}
+						else
+						{
+							m_state = ProtocolError;
+							return WriteLine( "BAD command");
+						}
+					case capa:
+						if (m_argBuffer.argc())
+						{
+							m_state = ProtocolError;
+							return WriteLine( "BAD command arguments");
+						}
+						else
+						{
+							return WriteLine( "OK capa run quit");
+							m_state = EnterCommand;
+							continue;
+						}
+					case quit:
+						if (m_argBuffer.argc())
+						{
+							m_state = ProtocolError;
+							return WriteLine( "BAD command arguments");
+						}
+						else
+						{
+							m_state = Terminate;
+							return WriteLine( "BYE");
+						}
+					case run:
+						if (!m_processor.getCommand( "run", m_functionName, m_functionHasIO))
+						{
+							LOG_ERROR << "Command for 'run' not defined in configuration";
+							m_state = ProtocolError;
+							return WriteLine( "BAD command not defined");
+						}
+						if (m_functionHasIO)
+						{
+							m_inputfilter.reset( m_app_system.createInputFilter());
+							m_formatoutput.reset( m_app_system.createFormatOutput());
+							passInput();
+							m_formatoutput->init( m_output.ptr(), m_output.size());
+							m_processor.setIO( m_inputfilter, m_formatoutput);
+						}
+						else
+						{
+							m_inputfilter.reset();
+							m_formatoutput.reset();
+						}
+						m_state = Processing;
+						continue;
+				}
+			}
+
+			case Processing:
+			{
+				const char** argv = m_argBuffer.argv( m_functionName);
+				unsigned int argc = m_argBuffer.argc( m_functionName);
+
+				switch (m_processor.call( argc, argv))
+				{
+					case lua::AppProcessor::YieldRead:
+						m_input.setPos( 0);
+						return net::ReadData( m_input.ptr(), m_input.size());
+
+					case lua::AppProcessor::YieldWrite:
 					{
-						input.setPos( 0);
-						return net::ReadData( input.ptr(), input.size());
+						void* content = m_formatoutput->ptr();
+						unsigned int contentsize = m_formatoutput->pos();
+						if (!m_functionHasIO)
+						{
+							LOG_WARNING << "output of function '" << m_functionName << "' that has no IO configured is ignored";
+							contentsize = 0;
+						}
+						m_formatoutput->init( m_output.ptr(), m_output.size());
+						return net::SendData( content, contentsize);
 					}
-					state = Init;
+
+					case lua::AppProcessor::Ok:
+					{
+						if (m_functionHasIO)
+						{
+							m_state = FlushOutput;
+							void* content = m_formatoutput->ptr();
+							unsigned int contentsize = m_formatoutput->pos();
+
+							m_formatoutput->init( m_output.ptr(), m_output.size());
+							if (contentsize)
+							{
+								if (!m_functionHasIO)
+								{
+									LOG_WARNING << "output of function '" << m_functionName << "' that has no IO configured is ignored";
+									contentsize = 0;
+								}
+								else
+								{
+									m_formatoutput->init( m_output.ptr(), m_output.size());
+									return net::SendData( content, contentsize);
+								}
+							}
+							continue;
+						}
+						else
+						{
+							m_state = Init;
+							return WriteLine( "\r\nOK");
+						}
+					}
+
+					case lua::AppProcessor::Error:
+					{
+						if (m_functionHasIO)
+						{
+							m_state = DiscardInput;
+							return WriteLine( "\r\n.\r\nERR");
+						}
+						else
+						{
+							m_state = Init;
+							return WriteLine( "\r\nERR");
+						}
+					}
+				}
+			}
+
+			case FlushOutput:
+			{
+				m_state = DiscardInput;
+				return WriteLine( "\r\n.\r\nOK");
+			}
+
+			case DiscardInput:
+			{
+				if (m_input.gotEoD())
+				{
+					m_state = EnterCommand;
 					continue;
 				}
-
-				case Terminate:
+				else
 				{
-					return net::CloseConnection();
+					m_input.setPos( 0);
+					return net::ReadData( m_input.ptr(), m_input.size());
 				}
-			}//switch(..)
-		}//for(;;)
-		return net::CloseConnection();
-	}
-};
+			}
+
+			case ProtocolError:
+			{
+				if (!ProtocolParser::skipLine( m_itr, m_end) || !ProtocolParser::consumeEOLN( m_itr, m_end))
+				{
+					m_input.setPos( 0);
+					return net::ReadData( m_input.ptr(), m_input.size());
+				}
+				m_state = Init;
+				continue;
+			}
+
+			case Terminate:
+			{
+				return net::CloseConnection();
+			}
+		}//switch(..)
+	}//for(;;)
+	return net::CloseConnection();
+}
 
 
 Connection::Connection( const net::LocalEndpoint& local, const lua::Configuration* config)
+	:m_state(Init)
+	,m_argBuffer(&m_buffer)
+	,m_input(config->input_bufsize())
+	,m_output(config->output_bufsize())
+	,m_processor(&m_app_system, config)
+	,m_functionName(0)
+	,m_functionHasIO(false)
 {
-	data = new Private( config);
+	m_itr = m_input.begin();
+	m_end = m_input.end();
 	LOG_TRACE << "Created connection handler for " << local.toString();
 }
-
 
 Connection::~Connection()
 {
 	LOG_TRACE << "Connection handler destroyed";
-	delete data;
 }
 
 void Connection::setPeer( const net::RemoteEndpoint& remote)
@@ -448,42 +384,18 @@ void Connection::setPeer( const net::RemoteEndpoint& remote)
 	LOG_TRACE << "Peer set to " << remote.toString();
 }
 
-
-void Connection::networkInput( const void* bytes, std::size_t nofBytes)
-{
-	data->networkInput( bytes, nofBytes);
-}
-
-void Connection::timeoutOccured()
-{
-	data->signalTerminate();
-}
-
-void Connection::signalOccured()
-{
-	data->signalTerminate();
-}
-
-void Connection::errorOccured( NetworkSignal )
-{
-	data->signalTerminate();
-}
-
-const Connection::Operation Connection::nextOperation()
-{
-	return data->nextOperation();
-}
-
-/// ServerHandler PIMPL
 net::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const net::LocalEndpoint& local )
 {
 	return new iproc::Connection( local, m_config->m_appConfig);
 }
 
+ServerHandler::ServerHandler( const HandlerConfiguration* cfg )
+	:impl_( new ServerHandlerImpl( cfg) ) {}
 
-ServerHandler::ServerHandler( const HandlerConfiguration* cfg ) : impl_( new ServerHandlerImpl( cfg) ) {}
-
-ServerHandler::~ServerHandler()  { delete impl_; }
+ServerHandler::~ServerHandler()
+{
+	delete impl_;
+}
 
 net::connectionHandler* ServerHandler::newConnection( const net::LocalEndpoint& local )
 {
