@@ -59,7 +59,7 @@ Requires: cyrus-sasl-lib >= 2.1.22
 BuildRequires: gcc-c++
 BuildRequires: doxygen
 
-Distribution: rhel5
+Distribution: Redhat RHEL 5
 Vendor: Wolframe team
 Packager: Mihai Barbos <mihai.barbos@gmail.com>
 

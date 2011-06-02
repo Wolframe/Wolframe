@@ -1,6 +1,6 @@
-%define dist		fc15
+%define dist		sle11
 
-%define initscript	wolframe.initd.RHEL
+%define initscript	wolframe.initd.SuSE
 
 %define WOLFRAME_USR	wolframe
 %define WOLFRAME_GRP	wolframe
@@ -25,7 +25,7 @@ Source: %{name}-%{version}.tar.bz2
 URL: http://www.wolframe.net/
 
 BuildRoot: %{_tmppath}/%{name}-root
-BuildRequires: generic-release
+BuildRequires: openSUSE-release
 BuildRequires: boost-devel >= 1.43
 Requires: boost >= 1.43
 Requires: boost-thread >= 1.43
@@ -38,8 +38,8 @@ BuildRequires: openssl-devel >= 0.9.8
 Requires: openssl >= 0.9.8
 %endif
 %if %{with_sqlite}
-BuildRequires: sqlite-devel >= 3.0
-Requires: sqlite >= 3.0
+BuildRequires: sqlite3-devel >= 3.0
+Requires: sqlite3 >= 3.0
 %endif
 %if %{with_pgsql}
 BuildRequires: postgresql-devel >= 8.1
@@ -56,7 +56,7 @@ Requires: cyrus-sasl-lib >= 2.1.22
 BuildRequires: gcc-c++
 BuildRequires: doxygen
 
-Distribution: Fedora 15
+Distribution: SuSE SLE 11
 Vendor: Wolframe team
 Packager: Mihai Barbos <mihai.barbos@gmail.com>
 
@@ -79,8 +79,8 @@ multiple file html documentation and the pdf documentation.
 Summary: Wolframe client
 Group: Application/Business
 
-BuildRequires: qt4-devel >= 4.5
-Requires: qt4 >= 4.5
+BuildRequires: libqt4-devel >= 4.5
+Requires: libqt4 >= 4.5
 
 %description client
 Qt client for the Wolframe server.
