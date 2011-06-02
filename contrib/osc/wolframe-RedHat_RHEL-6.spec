@@ -207,11 +207,13 @@ fi
 
 
 %files doc
+%defattr( -, root, root )
 %dir %{_datadir}/doc/wolframe
 %{_datadir}/doc/wolframe/html
 
 %if %{with_qt}
 %files client
+%defattr( -, root, root )
 %dir %{_bindir}
 %{_bindir}/qtclient
 #%dir %{_libdir}/wolframe
