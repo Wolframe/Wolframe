@@ -47,6 +47,23 @@ INCLUDE_LIBS += \
 
 endif
 
+# Postgresql
+
+ifeq ($(WITH_PGSQL),1)
+
+INCLUDE_CPPFLAGS += \
+	-DWITH_PGSQL
+
+INCLUDE_DIRS += \
+	-I$(PGSQL_INCLUDE_DIR)
+
+INCLUDE_LDFLAGS += \
+	-L$(PGSQL_LIB_DIR)
+
+INCLUDE_LIBS += \
+	$(PGSQL_LIBS)
+endif
+
 TEST_OBJS =
 
 TEST_CPP_BINS = \

@@ -4,6 +4,10 @@
 #include "database/SQLite.hpp"
 #endif
 
+#ifdef WITH_PGSQL
+#include "database/PostgreSQL.hpp"
+#endif
+
 using namespace _Wolframe::db;
 
 class DbFixture : public ::testing::Test	{
@@ -33,6 +37,15 @@ TEST_F( DbFixture, Sqlite3 )
 	SQLiteConfig conf( "test.db", "test", "db" );
 	SQLiteDatabase db( &conf );
 	assert( db.type( ) == DBTYPE_SQLITE );
+}
+#endif
+
+#ifdef WITH_PGSQL
+TEST_F( DbFixture, Postgresql )
+{
+	PostgreSQLconfig conf( "wrong", "test", "db" );
+	PostgreSQLDatabase db( &conf );
+	assert( db.type( ) == DBTYPE_POSTGRESQL );
 }
 #endif
 
