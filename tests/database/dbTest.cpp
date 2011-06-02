@@ -41,7 +41,8 @@ protected:
 #ifdef WITH_SQLITE3
 TEST_F( DbFixture, Sqlite3 )
 {
-	SQLiteConfig conf( "test.db", "test", "db" );
+	SQLiteConfig conf( "test", "test", "db" );
+	conf.setCanonicalPathes( "test.db" );
 	SQLiteDatabase db( &conf );
 	assert( db.type( ) == DBTYPE_SQLITE );
 }
