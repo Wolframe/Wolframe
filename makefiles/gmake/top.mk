@@ -86,10 +86,6 @@ ifeq ($(WITH_SSL),1)
 	@echo "OPENSSL_DIR: $(OPENSSL_DIR)"
 	@echo "OPENSSL_LIBS: $(OPENSSL_LIBS)"
 endif
-ifeq ($(WITH_LUA),1)
-	@echo
-	@echo "LUA platform: $(LUA_PLATFORM)"
-endif
 ifeq ($(WITH_QT),1)
 	@echo
 	@echo "QT_DIR: $(QT_DIR)"
