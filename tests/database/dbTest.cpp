@@ -1,3 +1,5 @@
+#include "logger.hpp"
+
 #include <gtest/gtest.h>
 
 #ifdef WITH_SQLITE3
@@ -8,13 +10,18 @@
 #include "database/PostgreSQL.hpp"
 #endif
 
+using namespace _Wolframe::log;
 using namespace _Wolframe::db;
 
 class DbFixture : public ::testing::Test	{
 protected:
+	LogBackend& logBack;
 
 	DbFixture( )
+		: logBack( LogBackend::instance( ) )
 	{
+		logBack.setLogfileLevel( LogLevel::LOGLEVEL_DATA );
+		logBack.setLogfileName( "dbTest.log" );
 	}
 
 	virtual ~DbFixture( )

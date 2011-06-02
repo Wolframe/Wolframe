@@ -39,6 +39,10 @@
 #ifndef _SQLITE_HPP_INCLUDED
 #define _SQLITE_HPP_INCLUDED
 
+#ifdef WITH_SQLITE3
+#include "sqlite3.h"
+#endif
+
 namespace _Wolframe {
 namespace db {
 
@@ -46,6 +50,8 @@ namespace db {
 class SQLiteConfig : public DatabaseConfig
 {
 	friend class config::ConfigurationParser;
+	// Aba: for access to filename and flags during creation, or do you prefer getter functions?
+	friend class SQLiteDatabase;
 public:
 	DatabaseType type() const			{ return DBTYPE_SQLITE; }
 
@@ -64,10 +70,13 @@ class SQLiteDatabase : public Database
 {
 public:
 	SQLiteDatabase( const SQLiteConfig* conf );
-	~SQLiteDatabase()				{}
+	~SQLiteDatabase();
 
 	DatabaseType type() const			{ return DBTYPE_SQLITE; }
 private:
+#ifdef WITH_SQLITE3
+	sqlite3 *handle;
+#endif
 };
 
 }} // _Wolframe::db
