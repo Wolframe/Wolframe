@@ -4,9 +4,9 @@
 ** See Copyright Notice in lua.h
 */
 
-
-#include <errno.h>
+#define _XOPEN_SOURCE 600
 #include <stdio.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 
