@@ -169,7 +169,7 @@ getent passwd %{WOLFRAME_USR} >/dev/null || /usr/sbin/useradd -g %{WOLFRAME_GRP}
 
 # Don't enable Wolframe server at install time, just inform root how this is done
 echo
-echo Use '/sbin/chkconfig --add wolframe' and '/sbin/ckconfig semrp on' to enable the
+echo Use '/sbin/chkconfig --add wolframed' and '/sbin/ckconfig wolframed on' to enable the
 echo Wolframe server at startup
 echo
 

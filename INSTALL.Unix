@@ -74,14 +74,29 @@ set QT_DIR to /usr/local/qt-4.7.2
 A note on Linux Distributions
 =============================
 
-RHEL/Centos/SL 5.5
-------------------
+RHEL/Centos/SL 5
+----------------
 
 Optional packages:
 Fetch from normal repository: openssl-devel, pam-devel (0.99.6), cyrus-sasl-devel (2.1.22),
                               sqlite-devel (3.3.6), postgresql-devel (8.1.23)
 
 Boost is not available in a decent version (1.33), build your own one.
+
+Qt (4.2.1) is too old, compile your own one.
+
+For building the documentation you need 'libxslt', 'doxygen' and
+'docbook-style-xsl' (from epel).
+
+RHEL/Centos/SL 6
+----------------
+(TODO)
+
+Optional packages:
+Fetch from normal repository: openssl-devel, pam-devel (0.99.6), cyrus-sasl-devel (2.1.22),
+                              sqlite-devel (3.3.6), postgresql-devel (8.1.23)
+
+Boost is available in an almost usable version (1.39.0), build your own one.
 
 Qt (4.2.1) is too old, compile your own one.
 

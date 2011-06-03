@@ -107,6 +107,7 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make config \
 	WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=/etc
 LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make all \
+	%{?_smp_mflags} \
 	WITH_SSL=%{with_ssl} WITH_SQLITE3=%{with_sqlite} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
@@ -146,7 +147,7 @@ getent passwd %{WOLFRAME_USR} >/dev/null || /usr/sbin/useradd -g %{WOLFRAME_GRP}
 
 # Don't enable Wolframe server at install time, just inform root how this is done
 echo
-echo Use '/sbin/chkconfig --add wolframe' and '/sbin/ckconfig semrp on' to enable the
+echo Use '/sbin/chkconfig --add wolframed' and '/sbin/ckconfig wolframed on' to enable the
 echo Wolframe server at startup
 echo
 

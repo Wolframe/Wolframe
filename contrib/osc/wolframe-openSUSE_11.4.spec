@@ -26,13 +26,13 @@ URL: http://www.wolframe.net/
 
 BuildRoot: %{_tmppath}/%{name}-root
 BuildRequires: openSUSE-release
-BuildRequires: boost-devel >= 1.43
-Requires: boost >= 1.43
-Requires: boost-thread >= 1.43
-Requires: boost-date-time >= 1.43
-Requires: boost-filesystem >= 1.43
-Requires: boost-program-options >= 1.43
-Requires: boost-system >= 1.43
+BuildRequires: boost-devel >= 1.44.0
+Requires: boost >= 1.44.0
+Requires: libboost-thread1_44_0 >= 1.44.0
+Requires: libboost-date-time1_44_0 >= 1.44.0
+Requires: libboost-filesystem1_44_0 >= 1.44.0
+Requires: libboost-program-options1_44_0 >= 1.44.0
+Requires: libboost-system1_44_0 >= 1.44.0
 %if %{with_ssl}
 BuildRequires: openssl-devel >= 0.9.8
 Requires: openssl >= 0.9.8
@@ -50,8 +50,8 @@ BuildRequires: pam-devel >= 0.99
 Requires: pam >= 0.99
 %endif
 %if %{with_sasl}
-BuildRequires: cyrus-sasl-devel >= 2.1.22
-Requires: cyrus-sasl-lib >= 2.1.22
+BuildRequires: cyrus-sasl-devel >= 2.1.23
+Requires: cyrus-sasl >= 2.1.23
 %endif
 BuildRequires: gcc-c++
 BuildRequires: doxygen
@@ -107,6 +107,7 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make config \
 	WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=/etc
 LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make all \
+	%{?_smp_mflags} \
 	WITH_SSL=%{with_ssl} WITH_SQLITE3=%{with_sqlite} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
@@ -146,7 +147,7 @@ getent passwd %{WOLFRAME_USR} >/dev/null || /usr/sbin/useradd -g %{WOLFRAME_GRP}
 
 # Don't enable Wolframe server at install time, just inform root how this is done
 echo
-echo Use '/sbin/chkconfig --add wolframe' and '/sbin/ckconfig semrp on' to enable the
+echo Use '/sbin/chkconfig --add wolframed' and '/sbin/ckconfig wolframed on' to enable the
 echo Wolframe server at startup
 echo
 

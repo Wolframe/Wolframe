@@ -249,6 +249,11 @@ ifeq "$(LINUX_REV)" "5"
 XSLT_MAN_STYLESHEET ?= /usr/share/sgml/docbook/xsl-stylesheets/manpages/docbook.xsl
 endif
 
+# RHEL6
+ifeq "$(LINUX_REV)" "6"
+XSLT_MAN_STYLESHEET ?= /usr/share/sgml/docbook/xsl-stylesheets/manpages/docbook.xsl
+endif
+
 endif
 
 endif
@@ -350,6 +355,16 @@ BOOST_LIBRARY_TAG ?=
 endif
 endif
 
+# RHEL6
+ifeq "$(LINUX_DIST)" "redhat"
+ifeq "$(LINUX_REV)" "6"
+BOOST_DIR ?= /usr
+BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
+BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
+BOOST_LIBRARY_TAG ?=
+endif
+endif
+
 endif
 
 # OpenSSL
@@ -416,7 +431,16 @@ QT_LIB_DIR ?= $(LIBDIR)
 QT_MOC ?= $(QT_DIR)/bin/moc
 endif
 
+# RHEL 5
 ifeq "$(LINUX_REV)" "5"
+QT_DIR ?= /usr/lib/qt4
+QT_INCLUDE_DIR ?= $(QT_DIR)/include
+QT_LIB_DIR ?= $(QT_DIR)/lib
+QT_MOC ?= $(QT_DIR)/bin/moc
+endif
+
+# RHEL 6
+ifeq "$(LINUX_REV)" "6"
 QT_DIR ?= /usr/lib/qt4
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
@@ -529,6 +553,14 @@ PAM_LIB_DIR ?= /lib
 PAM_LIBS ?= -lpam  
 endif
 
+# RHEL6
+ifeq "$(LINUX_REV)" "6"
+PAM_DIR ?= /usr
+PAM_INCLUDE_DIR ?= $(PAM_DIR)/include
+PAM_LIB_DIR ?= /lib
+PAM_LIBS ?= -lpam  
+endif
+
 endif
 
 ifeq "$(LINUX_DIST)" "suse"
@@ -582,6 +614,14 @@ ifeq "$(LINUX_DIST)" "redhat"
 
 # RHEL5
 ifeq "$(LINUX_REV)" "5"
+SASL_DIR ?= /usr
+SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
+SASL_LIB_DIR ?= $(SASL_DIR)/lib
+SASL_LIBS ?= -lsasl2
+endif
+
+# RHEL6
+ifeq "$(LINUX_REV)" "6"
 SASL_DIR ?= /usr
 SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
 SASL_LIB_DIR ?= $(SASL_DIR)/lib
@@ -663,6 +703,14 @@ SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
 SQLITE3_LIBS ?= -lsqlite3
 endif
 
+# RHEL6
+ifeq "$(LINUX_REV)" "6"
+SQLITE3_DIR ?= /usr
+SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
+SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
+SQLITE3_LIBS ?= -lsqlite3
+endif
+
 # Fedora 14
 ifeq "$(LINUX_REV)" "14"
 SQLITE3_DIR ?= /usr
@@ -732,6 +780,14 @@ ifeq "$(LINUX_DIST)" "redhat"
 
 # RHEL5
 ifeq "$(LINUX_REV)" "5"
+PGSQL_DIR ?= /usr
+PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include
+PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
+PGSQL_LIBS ?= -lpq
+endif
+
+# RHEL6
+ifeq "$(LINUX_REV)" "6"
 PGSQL_DIR ?= /usr
 PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include
 PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
