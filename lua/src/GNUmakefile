@@ -53,6 +53,12 @@ LOCAL_STATIC_LIB = \
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
+# overwrite flags so they fit to how Lua people compile the software.
+# we get too many spurios errors and problems (for instance in abuild
+# checks on openSuSE). This doesn't mean they should not be fixed
+# though upstream!
+CFLAGS = -O2 -Wall
+
 $(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
 	ar rcs $(LOCAL_STATIC_LIB) $(LOCAL_STATIC_LIB_OBJS)
 
