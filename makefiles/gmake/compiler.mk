@@ -40,12 +40,11 @@ GCC_MINOR_VERSION ?=	$(shell $(TOPDIR)/makefiles/gmake/guess_env --gcc-minor-ver
 # -Wundef: is troubling gtest and is against the C/C++ standard anyway
 # -Wvariadic-macros: set -Wno-variadic-macros; troubles gtest, which is happilly
 # mixing C99 and C++98 features, let's hope c++0 sorts this out
-# Lua has big problmes with strict-aliasing, must fix later (OpenSuSE croaks in abuild)
 
 # compilation flags and compilers
 COMMON_COMPILE_FLAGS = \
 	-g -pipe \
-	-fno-strict-aliasing \
+	-fstrict-aliasing \
 	-pedantic -Wall \
 	-Wno-long-long \
 	-Wunused -Wno-import \
