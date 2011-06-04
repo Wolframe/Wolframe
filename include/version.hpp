@@ -55,10 +55,11 @@ namespace _Wolframe {
 		Version( unsigned short M, unsigned short m, unsigned short r );
 		Version( unsigned short M, unsigned short m, unsigned short r, unsigned b );
 
-		unsigned short major()		{ return major_; }
-		unsigned short minor()		{ return minor_; }
-		unsigned short revision()	{ return revision_; }
-		unsigned build()		{ return build_; }
+		// Aba: clashes on FreeBSD with sys/types.h major and minor
+		unsigned short Major()		{ return major_; }
+		unsigned short Minor()		{ return minor_; }
+		unsigned short Revision()	{ return revision_; }
+		unsigned Build()		{ return build_; }
 
 		bool operator== ( const Version &other ) const;
 		bool operator!= ( const Version &other ) const	{ return !( *this == other ); }

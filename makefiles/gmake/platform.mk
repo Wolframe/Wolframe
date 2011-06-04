@@ -384,6 +384,15 @@ endif
 
 endif
 
+ifeq "$(PLATFORM)" "FREEBSD"
+ifeq "$(OS_MAJOR_VERSION)" "8"
+BOOST_DIR ?= /usr/local
+BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
+BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
+BOOST_LIBRARY_TAG ?=
+endif
+endif
+
 # OpenSSL
 #########
 
@@ -393,6 +402,12 @@ ifeq "$(PLATFORM)" "LINUX"
 
 OPENSSL_LIBS ?= -lssl -lcrypto
 
+endif
+
+ifeq "$(PLATFORM)" "FREEBSD"
+ifeq "$(OS_MAJOR_VERSION)" "8"
+OPENSSL_LIBS ?= -lssl -lcrypto
+endif
 endif
 
 endif
@@ -405,6 +420,11 @@ ifeq ($(WITH_LUA),1)
 ifeq "$(PLATFORM)" "LINUX"
 LUA_PLATFORM_CFLAGS = -DLUA_USE_LINUX
 LUA_PLATFORM_LDFLAGS = -ldl
+endif
+
+ifeq "$(PLATFORM)" "FREEBSD"
+LUA_PLATFORM_CFLAGS = -DLUA_USE_POSIX
+LUA_PLATFORM_LDFLAGS =
 endif
 
 endif
@@ -604,6 +624,16 @@ PAM_LIBS ?= -lpam
 endif
 
 endif
+
+ifeq "$(PLATFORM)" "FREEBSD"
+ifeq "$(OS_MAJOR_VERSION)" "8"
+PAM_DIR ?= NOT SUPPLIED ON THIS PLATFORM
+PAM_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
+PAM_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
+PAM_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
+endif
+endif
+
 endif
 
 # Cyrus SASL2
@@ -694,6 +724,16 @@ SASL_LIBS ?= -lsasl2
 endif
 
 endif
+
+ifeq "$(PLATFORM)" "FREEBSD"
+ifeq "$(OS_MAJOR_VERSION)" "8"
+SASL_DIR ?= /usr/local
+SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
+SASL_LIB_DIR ?= $(SASL_DIR)/lib
+SASL_LIBS ?= -lsasl2
+endif
+endif
+
 endif
 
 # Sqlite3
@@ -784,6 +824,16 @@ SQLITE3_LIBS ?= -lsqlite3
 endif
 
 endif
+
+ifeq "$(PLATFORM)" "FREEBSD"
+ifeq "$(OS_MAJOR_VERSION)" "8"
+SQLITE3_DIR ?= /usr/local
+SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
+SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
+SQLITE3_LIBS ?= -lsqlite3
+endif
+endif
+
 endif
 
 # Postgresql
@@ -874,4 +924,29 @@ PGSQL_LIBS ?= -lpq
 endif
 
 endif
+
+ifeq "$(PLATFORM)" "FREEBSD"
+ifeq "$(OS_MAJOR_VERSION)" "8"
+PGSQL_DIR ?= /usr/local
+PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include
+PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
+PGSQL_LIBS ?= -lpq
+endif
+endif
+
+endif
+
+# Expect (for testing)
+######################
+
+ifeq ($(WITH_EXPECT),1)
+
+ifeq "$(PLATFORM)" "LINUX"
+EXPECT = /usr/bin/expect
+endif
+
+ifeq "$(PLATFORM)" "FREEBSD"
+EXPECT = /usr/local/bin/expect
+endif
+
 endif

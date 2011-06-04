@@ -63,10 +63,10 @@ protected:
 
 // Tests the Version constructors and members
 TEST_F( VersionFixture, Members )	{
-	ASSERT_EQ( ver->major(), major );
-	ASSERT_EQ( ver->minor(), minor );
-	ASSERT_EQ( ver->revision(), revision );
-	ASSERT_EQ( ver->build(), build );
+	ASSERT_EQ( ver->Major(), major );
+	ASSERT_EQ( ver->Minor(), minor );
+	ASSERT_EQ( ver->Revision(), revision );
+	ASSERT_EQ( ver->Build(), build );
 	ASSERT_STREQ( ver->toString().c_str(), verStr );
 }
 

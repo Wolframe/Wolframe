@@ -18,7 +18,7 @@ INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_program_options \
 	-lboost_filesystem \
-	-ldl \
+	$(LIBS_DL) \
 	$(TOPDIR)/src/libwolframe.a \
 	$(TOPDIR)/gtest/gtest-all.o
 
@@ -64,6 +64,6 @@ local_install:
 local_test:$(TEST_BINS)
 	cd tests && ./pechoHandlerTest$(EXE)
 ifeq ($(WITH_EXPECT),1)
-	tests/testPEcho
+	$(EXPECT) tests/testPEcho
 endif
 

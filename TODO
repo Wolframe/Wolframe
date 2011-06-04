@@ -27,6 +27,14 @@ ABa:
     instead of templating?)
 - 64-bit on Windows
   - trouble with Qt
+- *BSD
+  - OpenPAM instead of Linux-PAM
+  - FreeBSD 4.2 gcc ends in an internal compiler bug in boost.asio, nice.
+- packaging
+  - SLES
+    ... testing for pre/postinstall scripts that are not idempotent
+    /.build_patchrpmcheck_scr: line 1: /usr/sbin/groupadd: No such file or directory
+    preinstall script of wolframe-0.0.1-sle11.74.1.i586.rpm failed
 
 PF:
 

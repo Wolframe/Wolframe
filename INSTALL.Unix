@@ -4,7 +4,7 @@ Build Instructions
 Prerequisites
 -------------
 
-- gcc c++ 4.x
+- gcc c++ 4.2.x or later (preferably  512 MB RAM or Swap)
 - GNU make
 - boost 1.43.0 or later
 - optionally (WITH_SSL) openssl 0.9.8 or later
@@ -244,5 +244,8 @@ FreeBSD 8.2
 -----------
 
 Required packages: boost-libs (1.45.0)
-Optional packages: openssl, qt4-gui (4.7.1), pam, cyrus-sasl (2.1.23)
+Optional packages: qt4-gui (4.7.1), openpam, cyrus-sasl (2.1.23)
                    sqlite3 (3.7.4), postgresql (9.0.3)
+
+You need 'gmake' (3.81_4)
+

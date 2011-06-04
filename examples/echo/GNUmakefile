@@ -53,7 +53,7 @@ local_install:
 
 local_test:
 ifeq ($(WITH_EXPECT),1)
-	./testEcho
+	$(EXPECT) ./testEcho
 endif
 
 run: $(CPP_BINS)

@@ -19,7 +19,7 @@ INCLUDE_LIBS = \
 	-lboost_program_options \
 	-lboost_filesystem \
 	-lboost_date_time \
-	-ldl \
+	$(LIBS_DL) \
 	$(TOPDIR)/src/libwolframe.a \
 	$(TOPDIR)/lua/src/liblua.a
 
@@ -57,7 +57,7 @@ local_install:
 
 local_test:
 ifeq ($(WITH_EXPECT),1)
-	./testLua
+	$(EXPECT) ./testLua
 endif
 
 run: $(CPP_BINS)

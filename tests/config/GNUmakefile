@@ -15,4 +15,4 @@ local_clean:
 local_distclean:
 
 local_test:
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./checkConfig.sh
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./checkConfig.sh $(EXPECT)

@@ -15,6 +15,7 @@ local_clean:
 local_distclean:
 
 local_test:
-	./testEcho
-	./testPecho
-
+ifeq ($(WITH_EXPECT),1)
+	$(EXPECT) ./testEcho
+	$(EXPECT) ./testPecho
+endif

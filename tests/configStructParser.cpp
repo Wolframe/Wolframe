@@ -12,52 +12,55 @@
 
 using namespace _Wolframe;
 using namespace config;
-
+// see below
+using namespace _Wolframe::log;
 
 struct LoggerConfig
 {
 	struct ToStderr
 	{
-		log::LogLevel::Level loglevel;
+		// Aba: FreeBSD 8.2 says: "configStructParser.cpp:21: error: reference to 'log' is ambiguous",
+		// clash with math.h? Added a using namespace for logging stuff above.
+		LogLevel::Level loglevel;
 
 		ToStderr()
-			:loglevel(log::LogLevel::LOGLEVEL_INFO){}
+			:loglevel(LogLevel::LOGLEVEL_INFO){}
 
 		static const config::DescriptionBase* description();
 	};
 
 	struct ToFile
 	{
-		log::LogLevel::Level loglevel;
+		LogLevel::Level loglevel;
 		std::string filename;
 
 		ToFile()
-			:loglevel(log::LogLevel::LOGLEVEL_INFO){}
+			:loglevel(LogLevel::LOGLEVEL_INFO){}
 
 		static const config::DescriptionBase* description();
 	};
 
 	struct ToSyslog
 	{
-		log::LogLevel::Level loglevel;
-		log::SyslogFacility::Facility facility;
+		LogLevel::Level loglevel;
+		SyslogFacility::Facility facility;
 		std::string ident;
 
 		ToSyslog()
-			:loglevel(log::LogLevel::LOGLEVEL_INFO)
-			,facility(log::SyslogFacility::WOLFRAME_SYSLOG_FACILITY_LOCAL2){}
+			:loglevel(LogLevel::LOGLEVEL_INFO)
+			,facility(SyslogFacility::WOLFRAME_SYSLOG_FACILITY_LOCAL2){}
 
 		static const config::DescriptionBase* description();
 	};
 
 	struct ToEventlog
 	{
-		log::LogLevel::Level loglevel;
+		LogLevel::Level loglevel;
 		std::string name;
 		std::string source;
 
 		ToEventlog()
-			:loglevel(log::LogLevel::LOGLEVEL_INFO){}
+			:loglevel(LogLevel::LOGLEVEL_INFO){}
 
 		static const config::DescriptionBase* description();
 	};
