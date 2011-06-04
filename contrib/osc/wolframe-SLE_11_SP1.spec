@@ -20,22 +20,19 @@ Version: 0.0.1
 Release: 0.1
 License: Wolframe License
 Group: Application/Business
-Source0: %{name}-%{version}.tar.bz2
-Source1: boost_1_46_1.tar.bz2
+Source: %{name}-%{version}.tar.bz2
 
 URL: http://www.wolframe.net/
 
-%define boost_version  1.46.1
-
 BuildRoot: %{_tmppath}/%{name}-root
-BuildRequires: generic-release
-#BuildRequires: boost-devel >= 1.43
-#Requires: boost >= 1.43
-#Requires: boost-thread >= 1.43
-#Requires: boost-date-time >= 1.43
-#Requires: boost-filesystem >= 1.43
-#Requires: boost-program-options >= 1.43
-#Requires: boost-system >= 1.43
+BuildRequires: suse-release
+BuildRequires: boost-devel >= 1.44.0
+Requires: boost >= 1.44.0
+Requires: libboost-thread1_44_0 >= 1.44.0
+Requires: libboost-date-time1_44_0 >= 1.44.0
+Requires: libboost-filesystem1_44_0 >= 1.44.0
+Requires: libboost-program-options1_44_0 >= 1.44.0
+Requires: libboost-system1_44_0 >= 1.44.0
 %if %{with_ssl}
 BuildRequires: openssl-devel >= 0.9.8
 Requires: openssl >= 0.9.8
@@ -53,8 +50,8 @@ BuildRequires: pam-devel >= 0.99
 Requires: pam >= 0.99
 %endif
 %if %{with_sasl}
-BuildRequires: cyrus-sasl-devel >= 2.1.22
-Requires: cyrus-sasl-lib >= 2.1.22
+BuildRequires: cyrus-sasl-devel >= 2.1.23
+Requires: cyrus-sasl >= 2.1.23
 %endif
 BuildRequires: gcc-c++
 BuildRequires: doxygen
@@ -91,18 +88,11 @@ Qt client for the Wolframe server.
 %endif
 
 %prep
-%setup -T -D -b 0 -b 1
+%setup
 
 
 %build
-cd %{_builddir}/boost_1_46_1
-./bootstrap.sh --prefix=/tmp/boost-1.46.1 \
-	--with-libraries=thread,filesystem,system,program_options,date_time
-./bjam %{?_smp_mflags} install
-
-cd %{_builddir}/%{name}-%{version}
 LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make help \
-	BOOST_DIR=/tmp/boost-1.46.1 BOOST_LIBRARY_TAG= \
 	WITH_SSL=%{with_ssl} WITH_SQLITE3=%{with_sqlite} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
@@ -110,7 +100,6 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make help \
 	WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=/etc
 LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make config \
-	BOOST_DIR=/tmp/boost-1.46.1 BOOST_LIBRARY_TAG= \
 	WITH_SSL=%{with_ssl} WITH_SQLITE3=%{with_sqlite} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
@@ -119,7 +108,6 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make config \
 	sysconfdir=/etc
 LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make all \
 	%{?_smp_mflags} \
-	BOOST_DIR=/tmp/boost-1.46.1 BOOST_LIBRARY_TAG= \
 	WITH_SSL=%{with_ssl} WITH_SQLITE3=%{with_sqlite} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
@@ -135,7 +123,6 @@ echo ===================== END OF TESTING =========================
 
 %install
 make DESTDIR=$RPM_BUILD_ROOT install \
-	BOOST_DIR=/tmp/boost-1.46.1 BOOST_LIBRARY_TAG= \
 	WITH_SSL=%{with_ssl} WITH_SQLITE3=%{with_sqlite} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
@@ -144,16 +131,7 @@ make DESTDIR=$RPM_BUILD_ROOT install \
 	sysconfdir=$RPM_BUILD_ROOT/etc
 cd docs && make DESTDIR=$RPM_BUILD_ROOT install && cd ..
 
-# copy local versions of shared libraries of boost for platforms missing a decent
-# version of boost
 mkdir -p $RPM_BUILD_ROOT%{_libdir}/wolframe
-for i in \
-	libboost_program_options.so.%{boost_version} libboost_system.so.%{boost_version} \
-	libboost_filesystem.so.%{boost_version} libboost_thread.so.%{boost_version} \
-	libboost_date_time.so.%{boost_version}; do
-    cp /tmp/boost-%{boost_version}/lib/$i $RPM_BUILD_ROOT%{_libdir}/wolframe/
-done
-
 
 mkdir -p $RPM_BUILD_ROOT%{_initrddir}
 cp redhat/%{initscript} $RPM_BUILD_ROOT%{_initrddir}/%{name}
@@ -165,7 +143,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %pre
 getent group %{WOLFRAME_GRP} >/dev/null || /usr/sbin/groupadd %{WOLFRAME_GRP}
-getent passwd %{WOLFRAME_USR} >/dev/null || /usr/sbin/useradd -g %{WOLFRAME_GRP} %{WOLFRAME_USR} -c "Wolframe user" -d /dev/null
+getent passwd %{WOLFRAME_USR} >/dev/null || /usr/sbin/useradd -g %{WOLFRAME_GRP} %{WOLFRAME_USR} -c "Wolframe user"
 
 # Don't enable Wolframe server at install time, just inform root how this is done
 echo
@@ -196,11 +174,6 @@ fi
 #%attr(0755, WOLFRAME_USR, WOLFRAME_GRP) %dir /var/run/wolframe
 
 %dir %{_libdir}/wolframe
-%{_libdir}/wolframe/libboost_program_options.so.%{boost_version}
-%{_libdir}/wolframe/libboost_system.so.%{boost_version}
-%{_libdir}/wolframe/libboost_filesystem.so.%{boost_version}
-%{_libdir}/wolframe/libboost_thread.so.%{boost_version}
-%{_libdir}/wolframe/libboost_date_time.so.%{boost_version}
 
 #%dir %{_datadir}/wolframe
 #%doc LICENSE
