@@ -11,7 +11,8 @@ INCLUDE_DIRS = \
 	/I. \
 	/I$(TOPDIR)\include \
 	/I"$(BOOST_DIR)" \
-	/I"$(PLATFORM_SDK_DIR)\Include"
+	/I"$(PLATFORM_SDK_DIR)\Include" \
+	/I"$(TOPDIR)\sqlite3"
 
 # Note: libraries are picked automatically on Windows!
 # TODO: better probing and correct library path based on Arch and
@@ -42,6 +43,17 @@ INCLUDE_LIBS = \
 
 !ENDIF
 
+# sqlite3
+
+!IFDEF WITH_SQLITE3
+
+INCLUDE_CPPFLAGS = \
+	$(INCLUDE_CPPFLAGS) /DWITH_SQLITE3
+
+INCLUDE_DIRS = \
+	$(INCLUDE_DIRS)	/I"$(TOPDIR)\sqlite3"
+
+!ENDIF
 
 LOCAL_STATIC_LIB = \
 	wolframe.lib
@@ -80,13 +92,19 @@ AAAA_OBJS = \
 	AAAA\FileAuditConfig.obj
 
 !IFDEF WITH_SQLITE3
+DB_OBJS = $(DB_OBJS) \
+	database\SQLite.obj \
+	database\SQLiteConfig.obj \
+	$(TOPDIR)\sqlite3\sqlite3.obj
+
 AAAA_OBJS = $(AAAA_OBJS) \
 	AAAA\authentication_db_sqlite3.obj \
 !ENDIF
 
-!IFDEF WITH_SQLITE3
+!IFDEF WITH_PGSQL
 DB_OBJS = $(DB_OBJS) \
-	database\sqlite3.obj
+	database\PostgreSQL.obj \
+	database\PostgreSQLconfig.obj
 !ENDIF
 
 LOCAL_STATIC_LIB_OBJS = \
@@ -122,13 +140,15 @@ OBJS = \
 	appConfigDefinition.obj \
 	wolframeHandler.obj \
 	database\database.obj \
-	database\PostgreSQL.obj \
-	database\PostgreSQLconfig.obj \
-	database\SQLite.obj \
-	database\SQLiteConfig.obj \
 	database\DBreference.obj \
 	database\DBreferenceConfig.obj \
 	winMain.obj
+# Aba: link trouble in dbTest!
+# also suggesting with_sqlite flags and DB_OBJS..
+#	database\PostgreSQL.obj \
+#	database\PostgreSQLconfig.obj \
+#	database\SQLite.obj
+#	database\SQLiteConfig.obj
 
 CPP_BINS = \
 	wolframed.exe
@@ -166,5 +186,5 @@ run: $(CPP_BINS)
 	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >> test.bat
 !ENDIF
 	@-echo echo Running the Wolframe server... >> test.bat
-	@-echo wolframed.exe -c wolframe.conf -d DATA >> test.bat
+	@-echo wolframed.exe -c wolframe.xml -d DATA >> test.bat
 	@-test.bat

@@ -9,6 +9,7 @@
 # - target 'clean'
 # - target 'distclean'
 # - target 'test'
+# - target 'longtest'
 # - target 'doc'
 # - target 'dist'
 # - target 'help'
@@ -28,7 +29,10 @@ distclean:
 #	  (set -e; $(MAKE) -C $$d install || exit 1); done)
 
 test: all
-	@cd tests & $(MAKE) /nologo /f Makefile.W32 test
+	@if not "$(SUBDIRS)" == "" @for %%d IN ( $(SUBDIRS) ) do @cd %%d & $(MAKE) /nologo /f Makefile.w32 test & cd ..
+
+longtest: test
+	@if not "$(SUBDIRS)" == "" @for %%d IN ( $(SUBDIRS) ) do @cd %%d & $(MAKE) /nologo /f Makefile.w32 longtest & cd ..
 
 doc:
 	@cd docs & $(MAKE) /nologo /f Makefile.W32 doc

@@ -102,17 +102,17 @@ bool ConfigurationParser::parse( ServiceConfiguration& cfg,
 	else if ( boost::algorithm::iequals( node, "service" ))	{
 		for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 			if ( boost::algorithm::iequals( L1it->first, "serviceName" ))	{
-				bool isDefined = ( !serviceName.empty());
+				bool isDefined = ( !cfg.serviceName.empty());
 				if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.serviceName, &isDefined ))
 					retVal = false;
 			}
 			else if ( boost::algorithm::iequals( L1it->first, "displayName" ))	{
-				bool isDefined = ( !serviceDisplayName.empty());
+				bool isDefined = ( !cfg.serviceDisplayName.empty());
 				if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.serviceDisplayName, &isDefined ))
 					retVal = false;
 			}
 			else if ( boost::algorithm::iequals( L1it->first, "description" ))	{
-				bool isDefined = ( !serviceDescription.empty());
+				bool isDefined = ( !cfg.serviceDescription.empty());
 				if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.serviceDescription, &isDefined ))
 					retVal = false;
 			}

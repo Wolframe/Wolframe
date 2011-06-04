@@ -62,6 +62,14 @@ local_clean:
 local_distclean:
 
 local_test:
+# Aba: doesn't work on Windows yet, Windows telnet trouble
+#!IFDEF WITH_EXPECT
+#!IFDEF WITH_SSL
+#	@-copy "$(OPENSSL_DIR)\bin\libeay32.dll" .
+#	@-copy "$(OPENSSL_DIR)\bin\ssleay32.dll" .
+#!ENDIF
+#	@-"$(EXPECT)" testEcho
+#!ENDIF
 
 run: $(CPP_BINS)
 	@-echo @echo off > test.bat

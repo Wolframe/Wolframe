@@ -16,8 +16,6 @@ INCLUDE_CPPFLAGS = \
 INCLUDE_DIRS = \
 	/I$(TOPDIR)\include /I. \
 	/I$(TOPDIR)\src \
-	/I$(TOPDIR)\examples\pecho \
-	/I$(TOPDIR)\examples\iproc \
 	/I"$(BOOST_DIR)" \
 	/I"$(PLATFORM_SDK_DIR)\Include" \
 	/I$(TOPDIR)\gtest\include
@@ -40,9 +38,15 @@ TEST_CPP_BINS = \
 	singletonTest.exe \
 	poolTest.exe \
 	logTest.exe \
-	configStructParser.exe \
 	protocolArgumentParsing.exe \
 	configValueParser.exe
+# Aba: doesn't compile: configStructParser.exe
+# configStructParser.cpp(68) : error C2090: function returns array
+# configStructParser.cpp(68) : error C2528: '__iob_func' : pointer to reference is
+# illegal
+# configStructParser.cpp(249) : error C2589: '(' : illegal token on right side of
+# '::'
+# configStructParser.cpp(249) : error C2059: syntax error : '::'
 
 OBJS = \
 
@@ -60,6 +64,7 @@ singletonTest.exe: singletonTest.obj $(TOPDIR)\src\wolframe.lib
 poolTest.exe: poolTest.obj $(TOPDIR)\src\wolframe.lib
 logTest.exe: logTest.obj $(TOPDIR)\src\wolframe.lib
 protocolArgumentParsing.exe: protocolArgumentParsing.obj $(TOPDIR)\src\wolframe.lib
+configStructParser.exe: configStructParser.obj $(TOPDIR)\src\wolframe.lib
 configValueParser.exe: configValueParser.obj $(TOPDIR)\src\wolframe.lib
 
 local_all:
@@ -76,12 +81,16 @@ local_test:
 	@-echo logTest >> test.bat
 	@-echo versionTest >> test.bat
 	@-echo counterTest >> test.bat
-# broken on windows: gives wrong path canonization results
+# Aba: broken on windows: gives wrong path canonization results
 	@-echo resolvePathTest >> test.bat
 	@-echo singletonTest >> test.bat
-	@-echo poolTest >> test.bat
 	@-echo protocolArgumentParsing >> test.bat
 	@echo
 	@-test.bat
 
-# TEMPORARILY DISABLED SOME TESTS
+local_longtest:
+	@-echo @echo off > test.bat
+	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
+	@-echo poolTest >> test.bat
+	@echo
+	@-test.bat

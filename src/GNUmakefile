@@ -116,7 +116,7 @@ LOGGER_OBJS = \
 	logger/loggerConfig.o \
 	logger/logger.o
 
-DB_OBJS = \
+DB_OBJS =
 
 AAAA_OBJS = \
 	AAAA/authentication_textfile.o \

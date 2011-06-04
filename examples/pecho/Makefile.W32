@@ -11,7 +11,8 @@ INCLUDE_DIRS = \
 	/I. \
 	/I$(TOPDIR)\include \
 	/I"$(BOOST_DIR)" \
-	/I"$(PLATFORM_SDK_DIR)\Include"
+	/I"$(PLATFORM_SDK_DIR)\Include" \
+	/I$(TOPDIR)\gtest\include
 
 # Note: libraries are picked automatically on Windows!
 SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib"
@@ -19,7 +20,8 @@ INCLUDE_LDFLAGS = \
 	$(SDK_LDFLAGS) $(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
-	Advapi32.lib
+	Advapi32.lib \
+	$(TOPDIR)\gtest\gtest-all.obj
 
 # openssl
 
@@ -50,12 +52,13 @@ CPP_BINS = \
 	pechod.exe
 
 TEST_CPP_BINS = \
-	tests/pechoHandlerTest$(EXE)
+	tests\pechoHandlerTest$(EXE)
 
 all: $(OBJS) $(CPP_BINS)
 
 pechod.exe: pechod.obj $(TOPDIR)\src\wolframe.lib
-tests/pechoHandlerTest$(EXE): tests/pechoHandlerTest.obj $(TOPDIR)\src\wolframe.lib
+# Aba: doesn't work this way, I must investigate, obj gets build, exe not!
+tests\pechoHandlerTest$(EXE): tests\pechoHandlerTest.obj $(TOPDIR)\src\wolframe.lib
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
@@ -66,7 +69,10 @@ local_clean:
 local_distclean:
 
 local_test:
-	@-echo tests/pechoHandlerTest >> test.bat
+# Aba: doesn't work this way, I must investigate, obj gets build, exe not!
+#	@-echo tests\pechoHandlerTest > test.bat
+#	@echo
+#	@-test.bat
 
 run: $(CPP_BINS)
 	@-echo @echo off > test.bat

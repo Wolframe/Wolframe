@@ -12,13 +12,15 @@ INCLUDE_DIRS = \
 	/I$(TOPDIR)\include \
 	/I"$(BOOST_DIR)" \
 	/I"$(PLATFORM_SDK_DIR)\Include" \
+	/I$(TOPDIR)\gtest\include
 
 # Note: libraries are picked automatically on Windows!
 SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib"
 INCLUDE_LDFLAGS = \
 	$(SDK_LDFLAGS) $(BOOST_LDFLAGS)
 INCLUDE_LIBS = \
-	Advapi32.lib
+	Advapi32.lib \
+	$(TOPDIR)\gtest\gtest-all.obj
 
 # openssl
 
