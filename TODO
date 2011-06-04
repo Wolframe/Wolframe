@@ -29,7 +29,8 @@ ABa:
   - trouble with Qt
 - *BSD
   - OpenPAM instead of Linux-PAM
-  - FreeBSD 4.2 gcc ends in an internal compiler bug in boost.asio, nice.
+  - Qt not tested so far
+  - trouble with some expect tests, check!
 - packaging
   - SLES
     ... testing for pre/postinstall scripts that are not idempotent
