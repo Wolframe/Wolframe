@@ -29,6 +29,7 @@ URL: http://www.wolframe.net/
 
 BuildRoot: %{_tmppath}/%{name}-root
 BuildRequires: sles-release
+Requires: pwdutils >= 3.2
 #BuildRequires: boost-devel >= 1.43
 #Requires: boost >= 1.43
 #Requires: boost-thread >= 1.43
@@ -214,7 +215,7 @@ fi
 %if %{with_qt}
 %files client
 %defattr( -, root, root )
-%dir %{_bindir}
+#%dir %{_bindir}
 %{_bindir}/qtclient
 #%dir %{_libdir}/wolframe
 #%{_libdir}/wolframe/libQtCore.so.4
