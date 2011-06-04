@@ -325,6 +325,23 @@ endif
 
 endif
 
+# SUSE Linux Enterprise
+ifeq "$(LINUX_DIST)" "sles"
+
+ifeq "$(LINUX_REV)" "11"
+ifdef BOOST_DIR
+BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
+BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
+endif
+ifndef BOOST_DIR
+BOOST_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
+BOOST_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
+BOOST_LIBRARY_TAG ?= NOT SUPPLIED ON THIS PLATFORM
+endif
+endif
+
+endif
+
 # Fedora 14
 ifeq "$(LINUX_DIST)" "redhat"
 ifeq "$(LINUX_REV)" "14"
@@ -468,6 +485,15 @@ endif
 
 endif
 
+ifeq "$(LINUX_DIST)" "sles"
+ifeq "$(LINUX_REV)" "11"
+QT_DIR ?= /usr
+QT_INCLUDE_DIR ?= $(QT_DIR)/include
+QT_LIB_DIR ?= $(QT_DIR)/lib
+QT_MOC ?= $(QT_DIR)/bin/moc
+endif
+endif
+
 ifeq "$(LINUX_DIST)" "suse"
 
 ifeq "$(LINUX_REV)" "11.3"
@@ -563,6 +589,13 @@ endif
 
 endif
 
+ifeq "$(LINUX_DIST)" "sles"
+PAM_DIR ?= /usr
+PAM_INCLUDE_DIR ?= $(PAM_DIR)/include
+PAM_LIB_DIR ?= /lib
+PAM_LIBS ?= -lpam
+endif
+
 ifeq "$(LINUX_DIST)" "suse"
 PAM_DIR ?= /usr
 PAM_INCLUDE_DIR ?= $(PAM_DIR)/include
@@ -644,6 +677,13 @@ SASL_LIB_DIR ?= $(SASL_DIR)/lib
 SASL_LIBS ?= -lsasl2
 endif
 
+endif
+
+ifeq "$(LINUX_DIST)" "sles"
+SASL_DIR ?= /usr
+SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
+SASL_LIB_DIR ?= $(SASL_DIR)/lib
+SASL_LIBS ?= -lsasl2
 endif
 
 ifeq "$(LINUX_DIST)" "suse"
@@ -729,6 +769,13 @@ endif
 
 endif
 
+ifeq "$(LINUX_DIST)" "sles"
+SQLITE3_DIR ?= /usr
+SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
+SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
+SQLITE3_LIBS ?= -lsqlite3
+endif
+
 ifeq "$(LINUX_DIST)" "suse"
 SQLITE3_DIR ?= /usr
 SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
@@ -810,6 +857,13 @@ PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
 PGSQL_LIBS ?= -lpq
 endif
 
+endif
+
+ifeq "$(LINUX_DIST)" "sles"
+PGSQL_DIR ?= /usr
+PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include
+PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
+PGSQL_LIBS ?= -lpq
 endif
 
 ifeq "$(LINUX_DIST)" "suse"

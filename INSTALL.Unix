@@ -190,9 +190,22 @@ OpenSuSE 11.4
 
 No problems with the supplied packages at all, everything builds out of the box:
 
-Required pacakges: boost-devel (1.44.0)
+Required packages: boost-devel (1.44.0)
 Optional packages: qt-devel (4.7.1), pam-devel (1.1.3), cyrus-sasl-devel (2.1.23),
                    sqlite3-devel (3.7.5), postgresql-devel (9.0.3)
+
+For building the documentation you need 'libxslt', 'docbook-style-xsl' and 'doxygen'.
+For building the PDF wolfbook install 'fop'.
+
+When rebuilding the SVG images of the documentation you also need 'dia'.
+
+SLES 11 SP1
+-----------
+
+Optional packages: libqt4-devel (4.6.2), pam-devel (1.0.4), cyrus-sasl-devel (2.1.22),
+                   sqlite3-devel (3.6.4), postgresql-devel (8.3.9)
+
+boost is 1.36, compile your own one.
 
 For building the documentation you need 'libxslt', 'docbook-style-xsl' and 'doxygen'.
 For building the PDF wolfbook install 'fop'.
@@ -226,3 +239,10 @@ Change /etc/fop.conf and make sure it contains the line:
 CLASSPATH="$CLASSPATH:/usr/share/java/batik/xml-apis-ext.jar"
 
 When rebuilding the SVG images of the documentation you also need 'dia'.
+
+FreeBSD 8.2
+-----------
+
+Required packages: boost-libs (1.45.0)
+Optional packages: openssl, qt4-gui (4.7.1), pam, cyrus-sasl (2.1.23)
+                   sqlite3 (3.7.4), postgresql (9.0.3)

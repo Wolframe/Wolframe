@@ -76,7 +76,7 @@ dbTest$(EXE): $(TOPDIR)/src/libwolframe.a
 local_all:
 
 local_clean:
-	-rm -f dbTest.log
+	-rm -f dbTest.log test.db
 
 local_distclean:
 

@@ -42,7 +42,7 @@ protected:
 TEST_F( DbFixture, Sqlite3 )
 {
 	SQLiteConfig conf( "test", "test", "db" );
-	conf.setCanonicalPathes( "test.db" );
+	conf.setFilename( "test.db" );
 	SQLiteDatabase db( &conf );
 	assert( db.type( ) == DBTYPE_SQLITE );
 }

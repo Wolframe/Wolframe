@@ -61,6 +61,8 @@ public:
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 	virtual void setCanonicalPathes( const std::string& referencePath );
+	// Aba: not seen another way to set the filename programatically?!
+	void setFilename( const std::string _filename ) { filename = _filename; }
 private:
 	std::string	filename;
 	bool		flag;
