@@ -4,16 +4,8 @@ SUBDIRS =
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
-INCLUDE_CFLAGS = \
-	$(LUA_PLATFORM_CFLAGS)
-
-INCLUDE_DIRS = \
-	-I.
-
 INCLUDE_LDFLAGS = \
 	$(LUA_PLATFORM_LDFLAGS)
-
-INCLUDE_LIBS =
 
 LOCAL_STATIC_LIB_OBJS = \
 	lapi.o \
@@ -57,7 +49,7 @@ LOCAL_STATIC_LIB = \
 # we get too many spurios errors and problems (for instance in abuild
 # checks on openSuSE). This doesn't mean they should not be fixed
 # though upstream!
-CFLAGS = -O2 -Wall
+CFLAGS = -O2 -Wall $(LUA_PLATFORM_CFLAGS) -I.
 
 $(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
 	ar rcs $(LOCAL_STATIC_LIB) $(LOCAL_STATIC_LIB_OBJS)
