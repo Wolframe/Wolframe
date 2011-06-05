@@ -29,7 +29,7 @@ URL: http://www.wolframe.net/
 
 BuildRoot: %{_tmppath}/%{name}-root
 BuildRequires: sles-release
-Requires: pwdutils >= 3.2
+BuildRequires: pwdutils >= 3.2
 #BuildRequires: boost-devel >= 1.43
 #Requires: boost >= 1.43
 #Requires: boost-thread >= 1.43
