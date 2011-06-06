@@ -4,5 +4,6 @@ Links:
 - How to build on Debianish systems:
   http://ldn.linuxfoundation.org/article/opensuse-build-system-building-deb-packages
   http://en.opensuse.org/openSUSE:Build_Service_Debian_builds
-  - aptoncd: try to get a local repository of .deb files for local builds
+  apt-mirror
+
 
