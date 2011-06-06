@@ -35,6 +35,7 @@
 #ifndef _iproc_LUA_CONFIG_HPP_INCLUDED
 #define _iproc_LUA_CONFIG_HPP_INCLUDED
 #include "standardConfigs.hpp"
+#include "config/descriptionBase.hpp"
 #include <string>
 #include <vector>
 
@@ -45,6 +46,20 @@ extern "C" {
 namespace _Wolframe {
 namespace iproc {
 namespace lua {
+
+#if 0//[+]
+struct ConfigurationStruct
+{
+	std::string m_main;				///< main module
+	std::list<std::string> m_modules;		///< list of module names without the main
+	unsigned int m_input_bufsize;			///< size of input network message buffers in bytes
+	unsigned int m_output_bufsize;			///< size of output network message buffers in bytes
+	unsigned int m_cthread_stacksize;		///< stack size in bytes of lua c thread executing command (2nd param of lua_newcthread(lua_State*))
+
+
+	static const config::DescriptionBase* ConfigurationStruct::description();
+};
+#endif
 
 /// \class Configuration
 /// \brief configuration object of the lua application processor
