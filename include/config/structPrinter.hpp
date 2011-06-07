@@ -137,8 +137,8 @@ static void printElement( std::ostream& out, const char* name, const T& value, u
 
 #if 0
 /// \brief returns true, if the structure T matches to name
-template <typename T>
-static bool matchesElement_( const char* name, const T& value, const traits::struct_&)
+static template <typename T>
+typename boost::enable_if_c<has_description_method<T>::value,bool>::type matchesElement_( const char* name, const T& value)
 {
 	const DescriptionBase* d = value.description();
 	std::vector<DescriptionBase::Item>::const_iterator itr,end;
@@ -151,7 +151,22 @@ static bool matchesElement_( const char* name, const T& value, const traits::str
 			return (strcmp( name, p->c_str()) == 0);
 		}
 	}
+	return false;
 }
+
+static template <typename T>
+typename boost::disable_if_c<has_description_method<T>::value,bool>::type matchesElement_( const char* , const T&)
+{
+	return false;
+}
+
+static template <typename T>
+typename boost::disable_if_c<has_description_method<T>::value,void*>::type 
+findElement_( const T* value, const char* name, const char* type)
+{
+	return false;
+}
+
 #endif
 
 }}// end namespace
