@@ -135,6 +135,25 @@ static void printElement( std::ostream& out, const char* name, const T& value, u
 	printElement_( out, name, value, traits::getCategory(value), indent);
 }
 
+#if 0
+/// \brief returns true, if the structure T matches to name
+template <typename T>
+static bool matchesElement_( const char* name, const T& value, const traits::struct_&)
+{
+	const DescriptionBase* d = value.description();
+	std::vector<DescriptionBase::Item>::const_iterator itr,end;
+
+	for (itr=d->m_ar.begin(),end=d->m_ar.end(); itr != end; ++itr)
+	{
+		if (strcmp( itr->m_type.c_str(), "std::string") == 0)
+		{
+			const std::string* p = (const std::string*)(const void*)((const char*)(&value) + itr->m_ofs);
+			return (strcmp( name, p->c_str()) == 0);
+		}
+	}
+}
+#endif
+
 }}// end namespace
 #endif
 
