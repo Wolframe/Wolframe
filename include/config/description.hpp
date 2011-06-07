@@ -60,7 +60,9 @@ struct Description :public DescriptionBase
 		std::size_t pp = (std::size_t)&(((Structure*)0)->*eptr);
 		Item e( pp, std::string(name), type,
 			&_Wolframe::config::ElementParser<Element>::parse,
-			&_Wolframe::config::ElementPrinter<Element>::print);
+			&_Wolframe::config::ElementPrinter<Element>::print,
+			&_Wolframe::config::ElementPointer<Element>::matchesElement,
+			&_Wolframe::config::ElementPointer<Element>::findElement);
 		m_ar.push_back( e);
 		return *this;
 	}
