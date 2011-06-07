@@ -160,6 +160,12 @@ typename boost::disable_if_c<has_description_method<T>::value,bool>::type matche
 	return false;
 }
 
+static template <typename T>
+typename boost::disable_if_c<has_description_method<T>::value,void*>::type 
+findElement_( const T* value, const char* name, const char* type)
+{
+	return false;
+}
 
 #endif
 
