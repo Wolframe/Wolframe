@@ -51,12 +51,12 @@ struct DescriptionBase
 	{
 		std::size_t m_ofs;	///< member position offset in bytes from the start of the structure
 		std::string m_name;	///< member name
-		std::string m_type;	///< member type name
+		const char* m_type;	///< member type name
 		Parse m_parse;		///< parse member function
 		Print m_print;		///< print member function
 
-		Item( std::size_t ofs, const std::string& name, Parse parse, Print print)
-			:m_ofs(ofs),m_name(name),m_type(""),m_parse(parse),m_print(print){}
+		Item( std::size_t ofs, const std::string& name, const char* type, Parse parse, Print print)
+			:m_ofs(ofs),m_name(name),m_type(type),m_parse(parse),m_print(print){}
 		Item( const Item& o)
 			:m_ofs(o.m_ofs),m_name(o.m_name),m_type(o.m_type),m_parse(o.m_parse),m_print(o.m_print){}
 	};
