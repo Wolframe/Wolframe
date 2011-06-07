@@ -36,6 +36,7 @@ Project Wolframe.
 #define _Wolframe_CONFIG_DESCRIPTION_HPP_INCLUDED
 #include "config/structParser.hpp"
 #include "config/structPrinter.hpp"
+#include "config/structPointer.hpp"
 #include "config/descriptionBase.hpp"
 #include <typeinfo>
 #include <exception>
@@ -52,7 +53,7 @@ struct Description :public DescriptionBase
 		const char* type = 0;
 		try
 		{
-			type = typeof(Element).name();
+			type = typeid(Element).name();
 		}
 		catch (std::bad_typeid)
 		{}
