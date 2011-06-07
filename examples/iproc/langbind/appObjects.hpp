@@ -90,9 +90,11 @@ struct System
 
 	/// \brief create a new input filter function
 	/// \param[in] name name of the filter or the default filter if not specified
+	/// \param[in] buffersize size of buffer in bytes to use
 	virtual protocol::InputFilter* createInputFilter( const char* name=0) const;
 	/// \brief create a new format output filter function
 	/// \param[in] name name of the filter or the default filter if not specified
+	/// \param[in] buffersize size of buffer in bytes to use
 	virtual protocol::FormatOutput* createFormatOutput( const char* name=0) const;
 };
 

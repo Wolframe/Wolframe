@@ -36,6 +36,7 @@ Project Wolframe.
 #define _Wolframe_FILTERS_HPP_INCLUDED
 
 #include "filters/char_filter.hpp"
+#include "filters/line_filter.hpp"
 #include "filters/xml_filter.hpp"
 
 #endif //_Wolframe_PROTOCOL_HPP_INCLUDED
