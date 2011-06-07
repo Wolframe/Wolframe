@@ -163,6 +163,20 @@ For building the documentation you need 'xsltproc', 'docbook-xsl' and 'doxygen'.
 
 When rebuilding the SVG images of the documentation you also need 'dia'.
 
+Ubuntu 11.04
+------------
+
+Optional packages: libssl-dev (0.9.8o), libqt4-dev (4.7.2),
+                   libpam-dev (1.1.2), libsasl2-dev (2.1.23),
+                   libsqlite3-dev (3.7.4), libpq-dev (8.4.8)
+
+libboost-dev is 1.42, only missing some new filesystem stuff, but you'll have to
+compile your own one.
+
+For building the documentation you need 'xsltproc', 'docbook-xsl' and 'doxygen'.
+
+When rebuilding the SVG images of the documentation you also need 'dia'.
+
 Debian 5.0
 ----------
 
