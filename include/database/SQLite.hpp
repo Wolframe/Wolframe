@@ -50,19 +50,17 @@ namespace db {
 class SQLiteConfig : public DatabaseConfig
 {
 	friend class config::ConfigurationParser;
-	// Aba: for access to filename and flags during creation, or do you prefer getter functions?
 	friend class SQLiteDatabase;
 public:
 	DatabaseType type() const			{ return DBTYPE_SQLITE; }
 
 	SQLiteConfig( const char* name, const char* logParent, const char* logName );
+	SQLiteConfig( const std::string _filename )	{ filename = _filename; }
 	~SQLiteConfig()					{}
 
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 	virtual void setCanonicalPathes( const std::string& referencePath );
-	// Aba: not seen another way to set the filename programatically?!
-	void setFilename( const std::string _filename ) { filename = _filename; }
 private:
 	std::string	filename;
 	bool		flag;
