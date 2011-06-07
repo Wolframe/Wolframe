@@ -39,14 +39,8 @@ TEST_CPP_BINS = \
 	poolTest.exe \
 	logTest.exe \
 	protocolArgumentParsing.exe \
+	configStructParser.exe \
 	configValueParser.exe
-# Aba: doesn't compile: configStructParser.exe
-# configStructParser.cpp(68) : error C2090: function returns array
-# configStructParser.cpp(68) : error C2528: '__iob_func' : pointer to reference is
-# illegal
-# configStructParser.cpp(249) : error C2589: '(' : illegal token on right side of
-# '::'
-# configStructParser.cpp(249) : error C2059: syntax error : '::'
 
 OBJS = \
 

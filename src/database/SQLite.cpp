@@ -90,19 +90,11 @@ void SQLiteConfig::setCanonicalPathes( const std::string& refPath )
 SQLiteDatabase::SQLiteDatabase( const SQLiteConfig* conf )
 	: Database( conf->ID())
 {
-	int res = sqlite3_open( conf->filename.c_str( ), &handle );
-	if( res != SQLITE_OK ) {
-		LOG_ERROR << "Unable to open SQLite database '" << conf->filename << "': "
-			<< sqlite3_errmsg( handle );
-		throw std::runtime_error( "SQLLite database creation exception" );
-	}
-
 	LOG_NOTICE << "SQLite database '" << conf->ID() << "' created";
 }
 
 SQLiteDatabase::~SQLiteDatabase( )
 {
-	sqlite3_close( handle );
 }
 
 }} // _Wolframe::db
