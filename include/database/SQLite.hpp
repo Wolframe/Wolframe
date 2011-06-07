@@ -55,7 +55,6 @@ public:
 	DatabaseType type() const			{ return DBTYPE_SQLITE; }
 
 	SQLiteConfig( const char* name, const char* logParent, const char* logName );
-	SQLiteConfig( const std::string _filename )	{ filename = _filename; }
 	~SQLiteConfig()					{}
 
 	bool check() const;
