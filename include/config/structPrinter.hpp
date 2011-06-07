@@ -161,12 +161,27 @@ typename boost::disable_if_c<has_description_method<T>::value,bool>::type matche
 }
 
 static template <typename T>
-typename boost::disable_if_c<has_description_method<T>::value,void*>::type 
+typename boost::enable_if_c<boost::is_same<Category<T>,struct_>::value,bool>::type
 findElement_( const T* value, const char* name, const char* type)
 {
 	return false;
 }
 
+static template <typename T>
+typename boost::enable_if_c<boost::is_same<Category<T>,vector_>::value,bool>::type
+findElement_( const T* value, const char* name, const char* type)
+{
+	return false;
+}
+
+static template <typename T>
+typename boost::disable_if_c<
+	boost::is_same<Category<T>,vector_>::value 
+	|| boost::is_same<Category<T>,vector_>::value,bool>::type
+findElement_( const T*, const char*, const char*)
+{
+	return false;
+}
 #endif
 
 }}// end namespace
