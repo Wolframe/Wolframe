@@ -40,6 +40,7 @@ tests/configValueParser
 tests/commandCmpTest
 tests/configStructParser
 tests/database/dbTest
+tests/database/test.db
 examples/echo/echod
 examples/lua/luad
 examples/mtproc/mtprocd
