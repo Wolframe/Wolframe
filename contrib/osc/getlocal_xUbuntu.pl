@@ -2,8 +2,8 @@
 
 use XML::DOM;
 
-my $ARCH = "amd64";
-#my $ARCH = "i586";
+#my $ARCH = "amd64";
+my $ARCH = "i586";
  
 my $parser = new XML::DOM::Parser;
 my $doc = $parser->parsefile ("file.xml");
@@ -13,16 +13,16 @@ foreach my $p ( $doc->getElementsByTagName( 'bdep' ) ) {
   $version = $p->getAttribute( 'version' );
   $release = $p->getAttribute( 'release' );
   $arch = $p->getAttribute( 'arch' );
-  $n = "$package-$version-$release.$arch.deb";
+  $n = "${package}_$version-${release}_$arch.deb";
   
-  $rpm = "/var/tmp/osbuild-packagecache/Ubuntu\:10.10/standard/$ARCH/$n";
+  $rpm = "/var/tmp/osbuild-packagecache/Ubuntu\:11.04/standard/$ARCH/$n";
   
   if( ! -f $rpm ) {
 #    print "$rpm not found\n";
-    open POSSIBLES, "ls /var/tmp/osbuild-packagecache/Ubuntu\:10.10/standard/$ARCH/$package*_$arch.deb |";
+    open POSSIBLES, "ls /var/tmp/osbuild-packagecache/Ubuntu\:11.04/standard/$ARCH/$package*_$arch.deb |";
     $nof = 0;
     foreach $possible (<POSSIBLES>) {
-      if( $possible =~ m@^/var/tmp/osbuild-packagecache/Ubuntu\:10.10/standard/$ARCH/(.+)_([^\-]+)-([^\-]+)_([^\.]+)\.deb$@ ) {
+      if( $possible =~ m@^/var/tmp/osbuild-packagecache/Ubuntu\:11.04/standard/$ARCH/(.+)_([^\-]+)-([^\-]+)_([^\.]+)\.deb$@ ) {
         $new_package = $1;
         $new_version = $2;
         $new_release = $3;
@@ -42,7 +42,7 @@ foreach my $p ( $doc->getElementsByTagName( 'bdep' ) ) {
            print STDERR "ERROR: more than one package found for $n\n";
            exit 1;
         }
-      } elsif( $possible =~ m@^/var/tmp/osbuild-packagecache/Ubuntu\:10.10/standard/$ARCH/(.+)_([^\-]+)_([^\.]+)\.deb$@ ) {
+      } elsif( $possible =~ m@^/var/tmp/osbuild-packagecache/Ubuntu\:11.04/standard/$ARCH/(.+)_([^\-]+)_([^\.]+)\.deb$@ ) {
         $new_package = $1;
         $new_version = $2;
         $new_release = "none";
@@ -67,9 +67,23 @@ foreach my $p ( $doc->getElementsByTagName( 'bdep' ) ) {
         exit 1;
       }
     } 
-    if( $nof == 0 ) {
-      print STDERR "ERROR: no package found for $n\n";
-      exit 1;
+    if( $nof == 0 && $package ne 'libncurses5' && $package ne 'libacl1' ) {
+      $url_package = $package;
+      if( $package =~ /^lib/ ) {
+        $firstletter = substr( $package, 0, 4 );
+      } elsif( $package =~ /^([^-]*)\-(.*)/ ) {
+        $url_package = $1;
+        $firstletter = substr( $package, 0, 1 );
+      } else {
+        $firstletter = substr( $package, 0, 1 );
+      }
+      
+      print STDERR "INFO: no package found for $n, downloading..\n";
+      `cd /var/tmp/osbuild-packagecache/Ubuntu\:11.04/standard/$ARCH && apt-get download $package`;
+      if( $? != 0 ) {
+        print STDERR "\nERROR: APT failed!!\n\n";
+        exit 1;
+      }
     }
   }
 }
