@@ -55,7 +55,7 @@ struct ConfigurationStruct
 	unsigned int m_input_bufsize;			///< size of input network message buffers in bytes
 	unsigned int m_output_bufsize;			///< size of output network message buffers in bytes
 	unsigned int m_cthread_stacksize;		///< stack size in bytes of lua c thread executing command (2nd param of lua_newcthread(lua_State*))
-
+	unsigned int m_tag_stacksize			///< stack size in bytes for the tag hierarchy for the output
 
 	static const config::DescriptionBase* ConfigurationStruct::description();
 };
@@ -74,7 +74,13 @@ public:
 	/// \brief constructor
 	/// \param name configuration name
 	/// \param prefix configuration prefix
-	Configuration( const char* name, const char* prefix) :ConfigurationBase(name, NULL, prefix),m_input_bufsize(512),m_output_bufsize(512),m_cthread_stacksize(2048){}
+	Configuration( const char* name, const char* prefix)
+
+		:ConfigurationBase(name, NULL,prefix)
+		,m_input_bufsize(512)
+		,m_output_bufsize(512)
+		,m_cthread_stacksize(2048)
+		,m_tag_stacksize(512){}
 
 	/// \brief interface implementation of ConfigurationBase::setCanonicalPathes(const std::string&)
 	virtual void setCanonicalPathes( const std::string&);
@@ -166,6 +172,8 @@ public:
 	unsigned int output_bufsize() const		{return m_output_bufsize;}
 	/// \brief return stack size in bytes of lua c thread executing command
 	unsigned int cthread_stacksize() const		{return m_cthread_stacksize;}
+	/// \brief return stack size in bytes for the tag hierarchy for the output
+	unsigned int tag_stacksize() const		{return m_cthread_stacksize;}
 
 	/// \brief Return the name of the function to execute for a command
 	/// \param[in] protocolcmd command from the protocol
@@ -181,7 +189,8 @@ private:
 	std::list<Module> m_modules;			///< list of modules without the main
 	unsigned int m_input_bufsize;			///< size of input network message buffers in bytes
 	unsigned int m_output_bufsize;			///< size of output network message buffers in bytes
-	unsigned int m_cthread_stacksize;		///< stack size in bytes of lua c thread executing command (2nd param of lua_newcthread(lua_State*))
+	unsigned int m_cthread_stacksize;		///< stack size in bytes of lua c thread executing command
+	unsigned int m_tag_stacksize			///< stack size in bytes for the tag hierarchy for the output
 };
 
 }}}//namespace
