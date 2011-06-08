@@ -57,7 +57,6 @@ class DatabaseConfig : public config::ConfigurationBase
 public:
 	DatabaseConfig( const char* name, const char* logParent, const char* logName )
 		: ConfigurationBase( name, logParent, logName ){}
-	DatabaseConfig( ) {}
 	virtual ~DatabaseConfig()			{}
 
 	virtual DatabaseType type() const = 0;

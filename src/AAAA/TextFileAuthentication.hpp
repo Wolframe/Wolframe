@@ -45,7 +45,7 @@ namespace AAAA {
 
 class TextFileAuthConfig : public AuthenticatorConfigBase
 {
-	friend class TextFileAuth;
+	friend class TxtFileAuthContainer;
 	friend class config::ConfigurationParser;
 public:
 	TextFileAuthConfig( const char* cfgName, const char* logParent, const char* logName )
@@ -62,11 +62,11 @@ private:
 };
 
 
-class TextFileAuth : public AuthenticatorBase
+class TxtFileAuthContainer : public AuthenticatorBase
 {
 public:
-	TextFileAuth( const TextFileAuthConfig& conf );
-	~TextFileAuth()						{}
+	TxtFileAuthContainer( const TextFileAuthConfig& conf );
+	~TxtFileAuthContainer()						{}
 private:
 	std::string	m_file;
 };

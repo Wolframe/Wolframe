@@ -63,9 +63,6 @@ public:
 		}
 	}
 
-	ConfigurationBase( ) { }
-
-
 	virtual ~ConfigurationBase()			{}
 
 	///\brief The display string (name) for the configuration section

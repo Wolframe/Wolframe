@@ -36,6 +36,7 @@ Project Wolframe.
 #define _Wolframe_CONFIG_DESCRIPTION_HPP_INCLUDED
 #include "config/structParser.hpp"
 #include "config/structPrinter.hpp"
+#include "config/structPointer.hpp"
 #include "config/descriptionBase.hpp"
 #include <typeinfo>
 #include <exception>
@@ -52,14 +53,16 @@ struct Description :public DescriptionBase
 		const char* type = 0;
 		try
 		{
-			type = typeof(Element).name();
+			type = typeid(Element).name();
 		}
 		catch (std::bad_typeid)
 		{}
 		std::size_t pp = (std::size_t)&(((Structure*)0)->*eptr);
 		Item e( pp, std::string(name), type,
 			&_Wolframe::config::ElementParser<Element>::parse,
-			&_Wolframe::config::ElementPrinter<Element>::print);
+			&_Wolframe::config::ElementPrinter<Element>::print,
+			&_Wolframe::config::ElementPointer<Element>::matchesElement,
+			&_Wolframe::config::ElementPointer<Element>::findElement);
 		m_ar.push_back( e);
 		return *this;
 	}

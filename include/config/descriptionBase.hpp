@@ -46,19 +46,23 @@ struct DescriptionBase
 {
 	typedef void (*Parse)( const char* name, void* ref, std::size_t ofs, const boost::property_tree::ptree& pt);
 	typedef void (*Print)( std::ostream& out, const char* name, const void* ref, std::size_t ofs, unsigned int indent);
+	typedef bool (*MatchesElement)( const char* name, const void* value);
+	typedef void* (*FindElement)( const char* name, const void* value);
 
 	struct Item
 	{
-		std::size_t m_ofs;	///< member position offset in bytes from the start of the structure
-		std::string m_name;	///< member name
-		const char* m_type;	///< member type name
-		Parse m_parse;		///< parse member function
-		Print m_print;		///< print member function
+		std::size_t m_ofs;		///< member position offset in bytes from the start of the structure
+		std::string m_name;		///< member name
+		const char* m_type;		///< member type name
+		Parse m_parse;			///< parse member function
+		Print m_print;			///< print member function
+		MatchesElement m_matches;	///< check if a member matches
+		FindElement m_find;		///< find a member reference by name and type
 
-		Item( std::size_t ofs, const std::string& name, const char* type, Parse parse, Print print)
-			:m_ofs(ofs),m_name(name),m_type(type),m_parse(parse),m_print(print){}
+		Item( std::size_t ofs, const std::string& name, const char* type, Parse parse, Print print, MatchesElement matches, FindElement find)
+			:m_ofs(ofs),m_name(name),m_type(type),m_parse(parse),m_print(print),m_matches(matches),m_find(find){}
 		Item( const Item& o)
-			:m_ofs(o.m_ofs),m_name(o.m_name),m_type(o.m_type),m_parse(o.m_parse),m_print(o.m_print){}
+			:m_ofs(o.m_ofs),m_name(o.m_name),m_type(o.m_type),m_parse(o.m_parse),m_print(o.m_print),m_matches(o.m_matches),m_find(o.m_find){}
 	};
 	std::vector<Item> m_ar;
 

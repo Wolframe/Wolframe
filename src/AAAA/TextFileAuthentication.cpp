@@ -77,7 +77,7 @@ void TextFileAuthConfig::setCanonicalPathes( const std::string& refPath )
 }
 
 
-TextFileAuth::TextFileAuth( const TextFileAuthConfig& conf )
+TxtFileAuthContainer::TxtFileAuthContainer( const TextFileAuthConfig& conf )
 {
 	m_file = conf.m_file;
 	LOG_NOTICE << "File authenticator created with file '" << m_file << "'";

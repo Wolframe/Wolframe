@@ -144,7 +144,7 @@ struct UCS4
 	static unsigned int size( const char*)						{return Size;}
 	static char achar( const char* buf)						{return (buf[B3]|buf[B2]|buf[B1])?(char)-1:buf[B0];}
 	static UChar value( const char* buf)						{UChar res = (unsigned char)buf[B3]; res = (res << 8) + (unsigned char)buf[B2]; res = (res << 8) + (unsigned char)buf[B1]; return (res << 8) + (unsigned char)buf[B0];}
-	static unsigned int print( UChar chr, char* buf, unsigned int bufsize)		{buf[B0]=(char)chr; chr>>=8; buf[B1]=(char)chr; chr>>=8; buf[B2]=(char)chr; chr>>=8; buf[B3]=(char)chr; chr>>=8; return 4;}
+	static unsigned int print( UChar chr, char* buf, unsigned int bufsize)		{if (bufsize<4) return 0; buf[B0]=(char)chr; chr>>=8; buf[B1]=(char)chr; chr>>=8; buf[B2]=(char)chr; chr>>=8; buf[B3]=(char)chr; chr>>=8; return 4;}
 };
 
 struct UCS2LE :public UCS2<ByteOrder::LE> {};

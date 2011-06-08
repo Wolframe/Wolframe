@@ -25,7 +25,7 @@ struct FilterBase
 	typedef std::size_t size_type;
 
 	template <class InputCharset>
-	static size_type printToBuffer_( const char* src, unsigned int srcsize, char* buf, size_type bufsize)
+	static size_type printToBuffer_( const char* src, size_type srcsize, char* buf, size_type bufsize)
 	{
 		size_type bufpos = 0;
 		CharIterator itr( src, srcsize);
@@ -48,7 +48,7 @@ struct FilterBase
 		return printToBuffer_<InputCharset>( &ch, 1, buf, bufsize);
 	}
 
-	static size_type printToBuffer( const char* src, unsigned int srcsize, char* buf, size_type bufsize)
+	static size_type printToBuffer( const char* src, size_type srcsize, char* buf, size_type bufsize)
 	{
 		return printToBuffer_<AppCharset>( src, srcsize, buf, bufsize);
 	}
@@ -83,20 +83,21 @@ struct FilterBase
 
 		enum ErrorCodes {Ok,ErrConvBufferTooSmall, ErrTagStackExceedsLimit, ErrTagHierarchy, ErrIllegalState};
 
-		FormatOutputBase( unsigned int bufsize) :m_buf(new char[bufsize]),m_bufsize(bufsize),m_bufpos(0){}
+		FormatOutputBase( size_type bufsize) :m_buf(new char[bufsize]),m_bufsize(bufsize),m_bufpos(0){}
 
 		static size_type getAlign( size_type n)
 		{
 			return (sizeof(size_type) - (n & (sizeof(size_type)-1))) & (sizeof(size_type)-1);
 		}
 
-		unsigned int push( const void* element, size_type elementsize)
+		bool push( const void* element, size_type elementsize)
 		{
 			size_type align = getAlign( elementsize);
-			if (align + elementsize + sizeof(size_type) >= m_bufsize-m_bufpos) return 0;
+			if (align + elementsize + sizeof(size_type) >= m_bufsize-m_bufpos) return false;
 			std::memcpy( m_buf + m_bufpos, element, elementsize);
 			m_bufpos += elementsize + align + sizeof( size_type);
 			*(size_type*)(m_buf+m_bufpos-sizeof( size_type)) = elementsize;
+			return true;
 		}
 
 		bool top( const void*& element, size_type& elementsize)
@@ -119,7 +120,7 @@ struct FilterBase
 
 		bool printElem( char ch, size_type& bufpos)
 		{
-			size_type nn = printAsciiCharToBuffer( '<', m_buf, m_bufsize);
+			size_type nn = printAsciiCharToBuffer( ch, m_buf, m_bufsize);
 			if (nn == 0)
 			{
 				setState( EndOfBuffer);
@@ -141,7 +142,7 @@ struct FilterBase
 			return true;
 		}
 
-		bool printElem( const char* src, unsigned int srcsize, size_type& bufpos)
+		bool printElem( const char* src, size_type srcsize, size_type& bufpos)
 		{
 			size_type nn = printToBuffer( src, srcsize, m_buf+bufpos, m_bufsize-bufpos);
 			if (nn == 0)

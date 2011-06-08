@@ -74,12 +74,12 @@ DBprovider::DBprovider( const Configuration& conf )
 							it != conf.m_dbConfig.end(); it++ )	{
 		switch( (*it)->type() )	{
 		case DBTYPE_POSTGRESQL:	{
-			PostgreSQLDatabase* db = new PostgreSQLDatabase( static_cast<PostgreSQLconfig*>(*it) );
+			PostgreSQLDBcontainer* db = new PostgreSQLDBcontainer( static_cast<PostgreSQLconfig*>(*it) );
 			m_db.push_back( db );
 		}
 			break;
 		case DBTYPE_SQLITE:	{
-			SQLiteDatabase* db = new SQLiteDatabase( static_cast<SQLiteConfig*>(*it) );
+			SQLiteDBcontainer* db = new SQLiteDBcontainer( static_cast<SQLiteConfig*>(*it) );
 			m_db.push_back( db );
 		}
 			break;
