@@ -32,8 +32,8 @@ Project Wolframe.
 /// \file config/structPrinter.hpp
 /// \brief Prints the configuration structure
 
-#ifndef _Wolframe_CONFIG_STRUCTURE_PRINTER_HPP_INCLUDED
-#define _Wolframe_CONFIG_STRUCTURE_PRINTER_HPP_INCLUDED
+#ifndef _Wolframe_CONFIG_STRUCTURE_POINTER_HPP_INCLUDED
+#define _Wolframe_CONFIG_STRUCTURE_POINTER_HPP_INCLUDED
 #include <string>
 #include <vector>
 #include <cstring>
