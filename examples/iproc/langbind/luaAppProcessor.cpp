@@ -264,10 +264,25 @@ static int function_filter( lua_State* ls)
 {
 	void* ud = lua_touserdata( ls, lua_upvalueindex(1));
 	System* system = (System*) ud;
-	if (lua_gettop( ls) != 1) return luaL_error( ls, "invalid number of arguments (1 string as parameter expected)");
-	if (!lua_isstring( ls, 1)) return luaL_error( ls, "invalid type of argument (string expected)");
+	unsigned int nn = lua_gettop( ls);
+	unsigned int buffersize = 0;
+	if (nn == 0) return luaL_error( ls, "too few arguments for filter");
+	if (nn > 2) return luaL_error( ls, "too many arguments for filter");
+	if (nn == 2)
+	{
+		if (lua_type( ls, 2) != LUA_TNUMBER)
+		{
+			return luaL_error( ls, "invalid 2nd argument for filter (number expected)");
+		}
+		buffersize = lua_tonumber( ls, 2);
+	}
+	if (!lua_isstring( ls, 1))
+	{
+		return luaL_error( ls, "invalid type of argument (string expected)");
+	}
 	const char* name = lua_tostring( ls, 1);
-	LuaObject<Filter>::push_luastack( ls, Filter( system, name));
+
+	LuaObject<Filter>::push_luastack( ls, Filter( system, name, buffersize));
 	return 1;
 }
 
