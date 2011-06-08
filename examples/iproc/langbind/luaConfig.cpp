@@ -84,9 +84,9 @@ bool ConfigurationParser::parse( _Wolframe::iproc::lua::Configuration& cfg,
 		{
 			if (!config::Parser::getValue( cfg.logPrefix().c_str(), *it, cfg.m_cthread_stacksize, config::Parser::RangeDomain<unsigned int>(64,(1<<20)))) return false;
 		}
-		else if (boost::algorithm::iequals( it->first, "tagstacksize"))
+		else if (boost::algorithm::iequals( it->first, " filter_buffer"))
 		{
-			if (!config::Parser::getValue( cfg.logPrefix().c_str(), *it, cfg.m_tag_stacksize, config::Parser::RangeDomain<unsigned int>(64,(1<<20)))) return false;
+			if (!config::Parser::getValue( cfg.logPrefix().c_str(), *it, cfg. m_filter_bufsize, config::Parser::RangeDomain<unsigned int>(64,(1<<20)))) return false;
 		}
 		else
 		{
