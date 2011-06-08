@@ -77,7 +77,7 @@ bool PostgreSQLconfig::check() const
 
 
 //***  PostgreSQL database functions  ***************************************
-PostgreSQLDatabase::PostgreSQLDatabase( const PostgreSQLconfig* conf )
+PostgreSQLDBcontainer::PostgreSQLDBcontainer( const PostgreSQLconfig* conf )
 	: Database( conf->ID())
 {
 	LOG_NOTICE << "PostgreSQL database '" << conf->ID() << "' created";

@@ -64,11 +64,11 @@ private:
 	unsigned short	acquireTimeout;
 };
 
-class PostgreSQLDatabase : public Database
+class PostgreSQLDBcontainer : public Database
 {
 public:
-	PostgreSQLDatabase( const PostgreSQLconfig* conf );
-	~PostgreSQLDatabase()				{}
+	PostgreSQLDBcontainer( const PostgreSQLconfig* conf );
+	~PostgreSQLDBcontainer()			{}
 
 	DatabaseType type() const			{ return DBTYPE_POSTGRESQL; }
 private:

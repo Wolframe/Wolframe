@@ -60,11 +60,11 @@ private:
 	bool		flag;
 };
 
-class SQLiteDatabase : public Database
+class SQLiteDBcontainer : public Database
 {
 public:
-	SQLiteDatabase( const SQLiteConfig* conf );
-	~SQLiteDatabase();
+	SQLiteDBcontainer( const SQLiteConfig* conf );
+	~SQLiteDBcontainer();
 
 	DatabaseType type() const			{ return DBTYPE_SQLITE; }
 };

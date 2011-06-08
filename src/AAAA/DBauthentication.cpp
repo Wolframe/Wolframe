@@ -51,12 +51,12 @@ DatabaseAuth::DatabaseAuth( const DatabaseAuthConfig& conf )
 	switch ( conf.m_dbConfig.m_dbConfig->type() )	{
 	case db::DBTYPE_POSTGRESQL:	{
 		LOG_NOTICE << "Database authenticator with PostgreSQL";
-		m_db = new db::PostgreSQLDatabase( static_cast<db::PostgreSQLconfig*>(conf.m_dbConfig.m_dbConfig) );
+		m_db = new db::PostgreSQLDBcontainer( static_cast<db::PostgreSQLconfig*>(conf.m_dbConfig.m_dbConfig) );
 	}
 		break;
 	case db::DBTYPE_SQLITE:	{
 		LOG_NOTICE << "Database authenticator with SQLite";
-		m_db = new db::SQLiteDatabase( static_cast<db::SQLiteConfig*>(conf.m_dbConfig.m_dbConfig) );
+		m_db = new db::SQLiteDBcontainer( static_cast<db::SQLiteConfig*>(conf.m_dbConfig.m_dbConfig) );
 	}
 		break;
 	case db::DBTYPE_REFERENCE:	{
