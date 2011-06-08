@@ -9,8 +9,9 @@
 namespace _Wolframe {
 namespace filter {
 
-class XmlHeaderFilter;
-class XmlHeaderInputFilter;
+class XmlHeaderFilter;		///< forward declaration for declaring friends
+class XmlHeaderInputFilter;	///< forward declaration for declaring friends
+
 
 ///\class XmlFilter
 ///\brief XML filter template
@@ -28,7 +29,9 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 	///\brief format output filter for XML
 	struct FormatOutput :public FormatOutputBase
 	{
-		enum {TagBufferSize=1024};
+		enum {
+			TagBufferSize=1024	///< default size of buffer use for storing tag hierarchy of output
+		};
 		/// \brief Constructor
 		/// \param [in] bufsize (optional) size of internal buffer to use (for the tag hierarchy stack)
 		FormatOutput( unsigned int bufsize=TagBufferSize)
@@ -125,7 +128,7 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 			return false;
 		}
 	private:
-		XMLState m_xmlstate;
+		XMLState m_xmlstate;		///< current state of output
 	};
 
 	///\class InputFilter
@@ -133,23 +136,40 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 	struct InputFilter :public protocol::InputFilter
 	{
 		friend class XmlHeaderInputFilter;
-		enum ErrorCodes {Ok,ErrBrokenInputStream,ErrXML,ErrUnexpectedState};
+		///\enum ErrorCodes
+		///\brief Enumeration of error codes
+		enum ErrorCodes
+		{
+			Ok,			///< no error
+			ErrBrokenInputStream,	///< unexpected EoD
+			ErrXML,			///< error in input XML
+			ErrUnexpectedState	///< something unexpected happened
+		};
+		///\class EndOfMessageException
+		///\brief Exception thrown when EoM is reached and more data has to be read from input
 		struct EndOfMessageException {};
 
+		///\class Iterator
+		///\brief Input iterator as source for the XML scanner (throws EndOfMessageException on EoM)
 		struct Iterator
 		{
-			InputFilter* m_gen;
+			InputFilter* m_gen;	///< input for the iterator (from network message)
 
+			///\brief Empty constructor
 			Iterator() :m_gen(0) {}
+			///\brief Constructor
 			Iterator( InputFilter* gen) :m_gen(gen) {}
+			///\brief Copy constructor
 			Iterator( const Iterator& o) :m_gen(o.m_gen) {}
 
+			///\brief access operator (required by textwolf for an input iterator)
 			char operator*()
 			{
 				if (!m_gen->size()) throw EndOfMessageException();
 				return *(char*)m_gen->ptr();
 			}
 
+			///\brief prefix increment operator (required by textwolf for an input iterator)
 			Iterator& operator++()
 			{
 				m_gen->skip(1);
@@ -158,12 +178,13 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		};
 
 		typedef textwolf::XMLScanner<Iterator,IOCharset,AppCharset> XMLScanner;
-		char m_outputbuf;
-		Iterator m_src;
-		XMLScanner* m_scanner;
-		typename XMLScanner::iterator m_itr;
-		typename XMLScanner::iterator m_end;
+		char m_outputbuf;			///< dummy buffer of size 1
+		Iterator m_src;				///< source iterator
+		XMLScanner* m_scanner;			///< XML scanner
+		typename XMLScanner::iterator m_itr;	///< input iterator created from scanned XML from source iterator
+		typename XMLScanner::iterator m_end;	///< end of data (EoD) pointer
 
+		///\brief Constructor
 		InputFilter() :m_scanner(0)
 		{
 			m_src = Iterator(this);
@@ -172,11 +193,13 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 			m_end = m_scanner->end();
 		}
 
+		///\brief Destructor
 		virtual ~InputFilter()
 		{
 			delete m_scanner;
 		}
 
+		///\brief Implementation of protocol::InputFilter::getNext( ElementType*, void*, size_type, size_type*)
 		virtual bool getNext( ElementType* type, void* buffer, size_type buffersize, size_type* bufferpos)
 		{
 			m_scanner->setOutputBuffer( (char*)buffer + *bufferpos, buffersize - *bufferpos);
@@ -225,9 +248,12 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 ///\brief Input filter for the XML header only (returns EoD after the header)
 struct XmlHeaderInputFilter :public XmlFilter<textwolf::charset::IsoLatin1,textwolf::charset::IsoLatin1>::InputFilter
 {
+	///\brief Constructor
 	XmlHeaderInputFilter() {}
+	///\brief Destructor
 	virtual ~XmlHeaderInputFilter(){}
 
+	///\brief Implementation of protocol::InputFilter::getNext( ElementType*, void*, size_type, size_type*)
 	virtual bool getNext( ElementType* type, void* buffer, size_type buffersize, size_type* bufferpos)
 	{
 		m_scanner->setOutputBuffer( (char*)buffer + *bufferpos, buffersize - *bufferpos);
