@@ -123,8 +123,8 @@ struct Filter
 	/// \brief constructor
 	/// \param[in] system reference to system function call interface
 	/// \param[in] name name of the filter as defined in the system
-	Filter( System* system, const char* name)
-		:m_formatoutput(system->createFormatOutput(name))
+	Filter( System* system, const char* name, unsigned int buffersize=0)
+		:m_formatoutput(system->createFormatOutput(name,buffersize))
 		,m_inputfilter(system->createInputFilter(name)){}
 
 	/// \brief copy constructor
