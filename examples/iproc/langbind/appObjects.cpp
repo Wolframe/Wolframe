@@ -150,7 +150,7 @@ static std::size_t getName( char* buf, std::size_t bufsize, const char* name)
 	return ii;
 }
 
-protocol::InputFilter* System::createInputFilter( const char* name) const
+protocol::InputFilter* System::createInputFilter( const char* name, unsigned int ) const
 {
 	if (!name) return new filter::CharFilter<textwolf::charset::IsoLatin1>::InputFilter(); //< default input filter
 	char nm[32];
@@ -184,7 +184,7 @@ protocol::InputFilter* System::createInputFilter( const char* name) const
 	return 0;
 }
 
-protocol::FormatOutput* System::createFormatOutput( const char* name) const
+protocol::FormatOutput* System::createFormatOutput( const char* name, unsigned int buffersize) const
 {
 	if (!name) return new filter::CharFilter<textwolf::charset::IsoLatin1>::FormatOutput(); //< default output filter
 	char nm[32];
