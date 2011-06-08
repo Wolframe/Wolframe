@@ -53,12 +53,12 @@ AAAAprovider::AAAAprovider( const Configuration& conf )
 							it != conf.auth.m_config.end(); it++ )	{
 		switch( (*it)->type() )	{
 		case AUTH_DATABASE:	{
-			DatabaseAuth* auth = new DatabaseAuth( static_cast<DatabaseAuthConfig&>(**it) );
+			DBauthContainer* auth = new DBauthContainer( static_cast<DatabaseAuthConfig&>(**it) );
 			m_authenticators.push_back( auth );
 		}
 			break;
 		case AUTH_TEXTFILE:	{
-			TextFileAuth* auth = new TextFileAuth( static_cast<TextFileAuthConfig&>(**it) );
+			TxtFileAuthContainer* auth = new TxtFileAuthContainer( static_cast<TextFileAuthConfig&>(**it) );
 			m_authenticators.push_back( auth );
 		}
 			break;

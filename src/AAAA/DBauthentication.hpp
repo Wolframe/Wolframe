@@ -45,7 +45,7 @@ namespace AAAA {
 
 class DatabaseAuthConfig : public AuthenticatorConfigBase
 {
-	friend class DatabaseAuth;
+	friend class DBauthContainer;
 	friend class config::ConfigurationParser;
 public:
 	DatabaseAuthConfig( const char* cfgName, const char* logParent, const char* logName )
@@ -69,11 +69,11 @@ private:
 };
 
 
-class DatabaseAuth : public AuthenticatorBase
+class DBauthContainer : public AuthenticatorBase
 {
 public:
-	DatabaseAuth( const DatabaseAuthConfig& conf );
-	~DatabaseAuth();
+	DBauthContainer( const DatabaseAuthConfig& conf );
+	~DBauthContainer();
 
 	bool resolveDB( const db::DBprovider& db );
 private:

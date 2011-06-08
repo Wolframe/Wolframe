@@ -46,7 +46,7 @@
 namespace _Wolframe {
 namespace AAAA {
 
-DatabaseAuth::DatabaseAuth( const DatabaseAuthConfig& conf )
+DBauthContainer::DBauthContainer( const DatabaseAuthConfig& conf )
 {
 	switch ( conf.m_dbConfig.m_dbConfig->type() )	{
 	case db::DBTYPE_POSTGRESQL:	{
@@ -70,7 +70,7 @@ DatabaseAuth::DatabaseAuth( const DatabaseAuthConfig& conf )
 	}
 }
 
-DatabaseAuth::~DatabaseAuth()
+DBauthContainer::~DBauthContainer()
 {
 	if ( m_dbLabel.empty() )	{	// it's not a reference
 		if ( m_db )
@@ -81,7 +81,7 @@ DatabaseAuth::~DatabaseAuth()
 }
 
 
-bool DatabaseAuth::resolveDB( const db::DBprovider& db )
+bool DBauthContainer::resolveDB( const db::DBprovider& db )
 {
 	if ( m_db == NULL && ! m_dbLabel.empty() )	{
 		m_db = db.database( m_dbLabel );
