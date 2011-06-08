@@ -55,7 +55,7 @@ struct ConfigurationStruct
 	unsigned int m_input_bufsize;			///< size of input network message buffers in bytes
 	unsigned int m_output_bufsize;			///< size of output network message buffers in bytes
 	unsigned int m_cthread_stacksize;		///< stack size in bytes of lua c thread executing command (2nd param of lua_newcthread(lua_State*))
-	unsigned int m_filter_bufsize			///< default internal buffer size for filters in bytes if needed
+	unsigned int m_filter_bufsize;			///< default internal buffer size for filters in bytes if needed
 
 	static const config::DescriptionBase* ConfigurationStruct::description();
 };
@@ -190,7 +190,7 @@ private:
 	unsigned int m_input_bufsize;			///< size of input network message buffers in bytes
 	unsigned int m_output_bufsize;			///< size of output network message buffers in bytes
 	unsigned int m_cthread_stacksize;		///< stack size in bytes of lua c thread executing command
-	unsigned int m_tag_stacksize			///< stack size in bytes for the tag hierarchy for the output
+	unsigned int m_filter_bufsize;			///< stack size in bytes for the tag hierarchy for the output
 };
 
 }}}//namespace
