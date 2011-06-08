@@ -80,7 +80,7 @@ public:
 		,m_input_bufsize(512)
 		,m_output_bufsize(512)
 		,m_cthread_stacksize(2048)
-		,m_tag_stacksize(512){}
+		,m_filter_bufsize(512){}
 
 	/// \brief interface implementation of ConfigurationBase::setCanonicalPathes(const std::string&)
 	virtual void setCanonicalPathes( const std::string&);
