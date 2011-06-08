@@ -153,8 +153,14 @@ public:
 
 	/// \brief constructor
 	/// \param[in] ig input filter reference from input
-	InputFilterClosure( const boost::shared_ptr<protocol::InputFilter>& ig)
-		:m_inputfilter(ig),m_type(protocol::InputFilter::Value),m_value(0),m_buf(0),m_bufsize(ig->getGenBufferSize()),m_bufpos(0)
+	InputFilterClosure( const boost::shared_ptr<protocol::InputFilter>& ig)		
+		:m_inputfilter(ig)
+		,m_type(protocol::InputFilter::Value)
+		,m_value(0)
+		,m_buf(0)
+		,m_bufsize(ig->getGenBufferSize())
+		,m_bufpos(0)
+		,m_taglevel(0)
 	{
 		m_buf = new char[ m_bufsize];
 	}
@@ -181,6 +187,7 @@ private:
 	char* m_buf;						///< pointer to buffer for local copies of returned values
 	std::size_t m_bufsize;					///< allocation size of m_buf
 	std::size_t m_bufpos;					///< number of bytes filled in m_buf
+	std::size_t m_taglevel;					///< current level in tag hierarchy
 };
 
 }}//namespace
