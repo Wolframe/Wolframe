@@ -84,6 +84,10 @@ bool ConfigurationParser::parse( _Wolframe::iproc::lua::Configuration& cfg,
 		{
 			if (!config::Parser::getValue( cfg.logPrefix().c_str(), *it, cfg.m_cthread_stacksize, config::Parser::RangeDomain<unsigned int>(64,(1<<20)))) return false;
 		}
+		else if (boost::algorithm::iequals( it->first, "tagstacksize"))
+		{
+			if (!config::Parser::getValue( cfg.logPrefix().c_str(), *it, cfg.m_tag_stacksize, config::Parser::RangeDomain<unsigned int>(64,(1<<20)))) return false;
+		}
 		else
 		{
 			LOG_WARNING << cfg.logPrefix() << ": unknown configuration option: '" << it->first << "'";
