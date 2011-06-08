@@ -8,17 +8,27 @@
 namespace _Wolframe {
 namespace filter {
 
+///\class LineFilter 
+///\brief Line filter template (input/output line by line)
+///\tparam IOCharset character set encoding of input and output
+///\tparam AppCharset character set encoding of the application processor
 template <class IOCharset, class AppCharset=textwolf::charset::UTF8>
 struct LineFilter :FilterBase<IOCharset, AppCharset>
 {
 	typedef typename FilterBase<IOCharset, AppCharset>::FormatOutputBase FormatOutputBase;
 
+	///\class FormatOutput
 	struct FormatOutput :public FormatOutputBase
 	{
 		const char* m_eoln;
 
+		///\brief Constructor
 		FormatOutput( unsigned int bufsize=128, const char* eoln="\r\n") :FormatOutputBase(bufsize),m_eoln(eoln){}
 
+		///\brief Implementation of protocol::InputFilter::print(ElementType,const void*,size_type)
+		///\param [in] type type of the element to print
+		///\param [in] element pointer to the element to print
+		///\param [in] elementsize size of the element to print in bytes
 		virtual bool print( protocol::FormatOutput::ElementType type, const void* element, protocol::FormatOutput::size_type elementsize)
 		{
 			if (type == protocol::FormatOutput::Value)
@@ -37,10 +47,14 @@ struct LineFilter :FilterBase<IOCharset, AppCharset>
 		}
 	};
 
+	///\class InputFilter
 	struct InputFilter :public protocol::InputFilter
 	{
+		///\enum ErrorCodes
+		///\brief Enumeration of error codes
 		enum ErrorCodes {Ok=0,ErrBufferTooSmall=1};
 
+		///\brief Implementation of protocol::InputFilter::getNext( ElementType*, void*, size_type, size_type*)
 		virtual bool getNext( ElementType* type, void* buffer, size_type buffersize, size_type* bufferpos)
 		{
 			setState( Open);
@@ -71,5 +85,4 @@ struct LineFilter :FilterBase<IOCharset, AppCharset>
 
 }}//namespace
 #endif
-
 
