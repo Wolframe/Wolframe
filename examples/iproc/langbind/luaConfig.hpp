@@ -172,7 +172,7 @@ public:
 	unsigned int output_bufsize() const		{return m_output_bufsize;}
 	/// \brief return stack size in bytes of lua c thread executing command
 	unsigned int cthread_stacksize() const		{return m_cthread_stacksize;}
-	/// \brief return the default internal buffer size in bytes for filters (that need this)
+	/// \brief return the default internal buffer size in bytes for filters
 	unsigned int filter_bufsize() const		{return m_filter_bufsize;}
 
 	/// \brief Return the name of the function to execute for a command
@@ -190,7 +190,7 @@ private:
 	unsigned int m_input_bufsize;			///< size of input network message buffers in bytes
 	unsigned int m_output_bufsize;			///< size of output network message buffers in bytes
 	unsigned int m_cthread_stacksize;		///< stack size in bytes of lua c thread executing command
-	unsigned int m_filter_bufsize;			///< stack size in bytes for the tag hierarchy for the output
+	unsigned int m_filter_bufsize;			///< the default internal buffer size in bytes for filters
 };
 
 }}}//namespace
