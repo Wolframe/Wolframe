@@ -12,6 +12,10 @@ namespace filter {
 class XmlHeaderFilter;
 class XmlHeaderInputFilter;
 
+///\class XmlFilter
+///\brief XML filter template
+///\tparam IOCharset character set encoding of input and output
+///\tparam AppCharset character set encoding of the application processor
 template <class IOCharset, class AppCharset=textwolf::charset::UTF8>
 struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 {
@@ -20,20 +24,33 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 	typedef typename FormatOutputBase::ElementType ElementType;
 	typedef typename FormatOutputBase::size_type size_type;
 
+	///\class FormatOutput
+	///\brief format output filter for XML
 	struct FormatOutput :public FormatOutputBase
 	{
 		enum {TagBufferSize=1024};
-		FormatOutput( unsigned int bufsize=TagBufferSize) :FormatOutputBase(bufsize),m_xmlstate(Content){}
+		/// \brief Constructor
+		/// \param [in] bufsize (optional) size of internal buffer to use (for the tag hierarchy stack)
+		FormatOutput( unsigned int bufsize=TagBufferSize)
 
+			:FormatOutputBase(bufsize?bufsize:TagBufferSize)
+			,m_xmlstate(Content){}
+
+		///\enum XMLState
+		///\brief Enumeration of XML printer states
 		enum XMLState
 		{
-			Content,
-			Tag,
-			Attribute,
-			Header,
-			HeaderAttribute
+			Content,		///< processing content
+			Tag,			///< processing inside a tag defintion
+			Attribute,		///< processing inside a tag defintion, just read an attribute
+			Header,			///< processing inside a header defintion
+			HeaderAttribute		///< processing inside a header defintion, just read an attribute
 		};
 
+		///\brief Print one element of the XML
+		/// \param [in] type type of the element to print
+		/// \param [in] element pointer to the element to print
+		/// \param [in] elementsize size of the element to print in bytes
 		virtual bool print( ElementType type, const void* element, size_type elementsize)
 		{
 			size_type bufpos = FormatOutputBase::m_bufpos;
@@ -111,6 +128,8 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		XMLState m_xmlstate;
 	};
 
+	///\class InputFilter
+	///\brief input filter for XML
 	struct InputFilter :public protocol::InputFilter
 	{
 		friend class XmlHeaderInputFilter;
@@ -202,6 +221,8 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 };
 
 
+///\class XmlHeaderInputFilter
+///\brief Input filter for the XML header only (returns EoD after the header)
 struct XmlHeaderInputFilter :public XmlFilter<textwolf::charset::IsoLatin1,textwolf::charset::IsoLatin1>::InputFilter
 {
 	XmlHeaderInputFilter() {}
@@ -249,6 +270,8 @@ struct XmlHeaderInputFilter :public XmlFilter<textwolf::charset::IsoLatin1,textw
 	}
 };
 
+///\class XmlHeaderFilter 
+///\brief Filter for the XML header only
 struct XmlHeaderFilter :public XmlFilter<textwolf::charset::IsoLatin1,textwolf::charset::IsoLatin1>
 {
 	typedef XmlFilter<textwolf::charset::IsoLatin1,textwolf::charset::IsoLatin1> XmlFilterBase;
