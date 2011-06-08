@@ -83,6 +83,7 @@ InputFilterClosure::ItemType InputFilterClosure::fetch( const char*& e1, unsigne
 		switch (m_type)
 		{
 			case protocol::InputFilter::OpenTag:
+				m_taglevel += 1;
 				m_buf[ m_bufpos] = 0;
 				e2 = m_buf;
 				e2size = m_bufpos;
@@ -119,7 +120,15 @@ InputFilterClosure::ItemType InputFilterClosure::fetch( const char*& e1, unsigne
 				}
 			 case protocol::InputFilter::CloseTag:
 				init();
-				return Data;
+				if (m_taglevel == 0)
+				{
+					return EndOfData;
+				}
+				else
+				{
+					m_taglevel -= 1;
+					return Data;
+				}
 		}
 	}
 	LOG_DATA << "illegal state in iterator";
