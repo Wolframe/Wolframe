@@ -50,7 +50,7 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 			HeaderAttribute		///< processing inside a header defintion, just read an attribute
 		};
 
-		///\brief Print one element of the XML
+		///\brief Implementation of protocol::InputFilter::print(ElementType,const void*,size_type)
 		/// \param [in] type type of the element to print
 		/// \param [in] element pointer to the element to print
 		/// \param [in] elementsize size of the element to print in bytes
