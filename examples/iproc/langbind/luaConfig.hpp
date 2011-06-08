@@ -172,8 +172,8 @@ public:
 	unsigned int output_bufsize() const		{return m_output_bufsize;}
 	/// \brief return stack size in bytes of lua c thread executing command
 	unsigned int cthread_stacksize() const		{return m_cthread_stacksize;}
-	/// \brief return stack size in bytes for the tag hierarchy for the output
-	unsigned int tag_stacksize() const		{return m_cthread_stacksize;}
+	/// \brief return the default internal buffer size in bytes for filters (that need this)
+	unsigned int filter_bufsize() const		{return m_filter_bufsize;}
 
 	/// \brief Return the name of the function to execute for a command
 	/// \param[in] protocolcmd command from the protocol
