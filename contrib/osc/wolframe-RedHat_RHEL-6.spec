@@ -20,8 +20,8 @@ Version: 0.0.1
 Release: 0.1
 License: Wolframe License
 Group: Application/Business
-Source0: %{name}-%{version}.tar.bz2
-Source1: boost_1_46_1.tar.bz2
+Source0: %{name}_%{version}.tar.gz
+Source1: boost_1_46_1.tar.gz
 
 URL: http://www.wolframe.net/
 

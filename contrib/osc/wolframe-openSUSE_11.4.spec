@@ -20,7 +20,7 @@ Version: 0.0.1
 Release: 0.1
 License: Wolframe License
 Group: Application/Business
-Source: %{name}-%{version}.tar.bz2
+Source: %{name}-%{version}.tar.gz
 
 URL: http://www.wolframe.net/
 
