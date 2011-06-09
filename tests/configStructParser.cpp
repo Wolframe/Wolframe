@@ -1,13 +1,44 @@
-///
-/// \brief configuration lexem parser unit tests using google test framework (gTest)
-///
+/************************************************************************
+Copyright (C) 2011 Project Wolframe.
+All rights reserved.
+
+This file is part of Project Wolframe.
+
+Commercial Usage
+Licensees holding valid Project Wolframe Commercial licenses may
+use this file in accordance with the Project Wolframe
+Commercial License Agreement provided with the Software or,
+alternatively, in accordance with the terms contained
+in a written agreement between the licensee and Project Wolframe.
+
+GNU General Public License Usage
+Alternatively, you can redistribute this file and/or modify it
+under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Wolframe is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Wolframe. If not, see <http://www.gnu.org/licenses/>.
+
+If you have questions regarding the use of this file, please contact
+Project Wolframe.
+
+************************************************************************/
+/// \file configStructParser.cpp
+/// \brief test for configuration parser with wolframe example configuration
 
 #include "config/description.hpp"
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
+#pragma warning(disable:4996)
+#pragma warning(disable:4127)
 #include <iostream>
 #include <boost/property_tree/info_parser.hpp>
-#include "miscUtils.hpp"
 #include "logger.hpp"
 
 using namespace _Wolframe;
@@ -68,7 +99,7 @@ struct LoggerConfig
 	ToEventlog eventlog;
 	ToSyslog syslog;
 	ToFile filelog;
-	ToStderr stderr;
+	ToStderr _stderr;
 
 	static const config::DescriptionBase* description();
 };
@@ -249,7 +280,7 @@ const config::DescriptionBase* LoggerConfig::description()
 			( "eventlog",		&LoggerConfig::eventlog)
 			( "syslog",		&LoggerConfig::syslog)
 			( "logfile",		&LoggerConfig::filelog)
-			( "stderr",		&LoggerConfig::stderr);
+			( "stderr",		&LoggerConfig::_stderr);
 		}
 	};
 	static const ThisDescription rt;
@@ -389,13 +420,13 @@ int main( int argc, const char** argv)
 
 	if (argc <= 1)
 	{
-		LOG_ERROR << "missing argument configuration file";
+		std::cerr << "missing argument configuration file" << std::endl;
 	}
 	std::string filename( argv[1]);
 
-	std::string configfile = resolvePath( boost::filesystem::absolute( filename).string());
+	std::string configfile = boost::filesystem::absolute( filename).string();
 	if ( !boost::filesystem::exists( configfile))	{
-		LOG_ERROR << "Configuration file " << configfile << " does not exist.";
+		std::cerr << "Configuration file " << configfile << " does not exist." << std::endl;
 		return false;
 	}
 
@@ -415,10 +446,9 @@ int main( int argc, const char** argv)
 	}
 	if (!errmsg.empty())
 	{
-		LOG_ERROR << "Error in configuration: " << errmsg;
+		std::cerr << "Error in configuration: " << errmsg << std::endl;
 	}
 	return 0;
 }
-
 
 
