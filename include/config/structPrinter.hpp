@@ -90,7 +90,7 @@ static void printElement_( std::ostream& out, const char* name, const T& value, 
 
 /// \brief prints an atomic element
 template <typename T>
-static void printElement_( std::ostream& out, const char* name, const T& value, const traits::atom_&, unsigned int indent)
+static void printElement_( std::ostream& out, const char* name, const T& value, const traits::arithmetic_&, unsigned int indent)
 {
 	print_indent( out, indent);
 	out << name << " = '" << value << "'" << std::endl;
@@ -137,4 +137,5 @@ static void printElement( std::ostream& out, const char* name, const T& value, u
 
 }}// end namespace
 #endif
+
 
