@@ -111,7 +111,9 @@ const void* findElement_( const char* type, const char* name, const T* value, co
 	const char* elemtype = typeid( typename T::value_type).name();
 	if (strcmp( type, elemtype) == 0)
 	{
-		T::const_iterator itr,end;
+		// Aba, at least gcc insists on typename here
+		// ../include/config/structPointer.hpp:114:3: error: need ‘typename’ before ‘T:: const_iterator’ because ‘T’ is a dependent scope
+		typename T::const_iterator itr,end;
 		for (itr=value->begin(),end=value->end(); itr!=end; ++itr)
 		{
 			if (matchesElement_( name, &*itr, traits::getCategory( *itr)))
@@ -123,7 +125,8 @@ const void* findElement_( const char* type, const char* name, const T* value, co
 	}
 	else
 	{
-		T::const_iterator itr,end;
+		// see above
+		typename T::const_iterator itr,end;
 		for (itr=value->begin(),end=value->end(); itr!=end; ++itr)
 		{
 			const void* rr = findElement_( type, name, &*itr, traits::getCategory( *itr));
@@ -167,3 +170,4 @@ struct ElementPointer
 
 }}// end namespace
 
+#endif // _Wolframe_CONFIG_STRUCTURE_POINTER_HPP_INCLUDED
