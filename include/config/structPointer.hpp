@@ -44,6 +44,7 @@ Project Wolframe.
 namespace _Wolframe {
 namespace config {
 
+#if 0
 /// \brief returns true, if the structure T matches to name
 template <typename T>
 static typename boost::enable_if_c<boost::is_same<Category<T>,struct_>::value,bool>::type
@@ -150,19 +151,24 @@ findElement_( const char*, const char*, const T&)
 {
 	return false;
 }
+#endif
 
 template <typename Element>
 struct ElementPointer
 {
-	static bool matchesElement( const char* name, const void* value)
+//[-]	static bool matchesElement( const char* name, const void* value)
+	static bool matchesElement( const char* , const void*)
 	{
-		return matchesElement_( name, *(const Element*)value);
+		return true;
+//[-]		return matchesElement_( name, *(const Element*)value);
 	}
-	static const void* findElement( const char* name, const void* value)
+//[-]	static const void* findElement( const char* name, const void* value)
+	static const void* findElement( const char* , const void* )
 	{
-		const Element* ee = *(const Element*)value;
-		const char* type = typeid(Element).name();
-		return findElement_( type, name, ee);
+//[-]		const Element* ee = *(const Element*)value;
+//[-]		const char* type = typeid(Element).name();
+//[-]		return findElement_( type, name, ee);
+		return 0;
 	}
 };
 

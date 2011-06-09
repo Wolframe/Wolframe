@@ -38,6 +38,7 @@ Project Wolframe.
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits.hpp>
 #include <boost/detail/select_type.hpp>
+#include <boost/type_traits/function_traits.hpp>
 #include "logger/logLevel.hpp"
 #include "config/descriptionBase.hpp"
 #include "config/configurationBase.hpp"
@@ -148,6 +149,10 @@ template <typename T>
 typename boost::enable_if_c<
 	boost::is_base_of<ConfigurationBase,T>::value
 	,cfgbase_>::type getCategory( const T&) { return cfgbase_();}
+#if 0
+template<typename T>
+struct Category :public boost::function_result<getCategory(const T&)> {}
+#endif
 
 }}}// end namespace
 #endif

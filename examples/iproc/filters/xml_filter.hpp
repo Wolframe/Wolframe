@@ -32,13 +32,6 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		enum {
 			TagBufferSize=1024	///< default size of buffer use for storing tag hierarchy of output
 		};
-		/// \brief Constructor
-		/// \param [in] bufsize (optional) size of internal buffer to use (for the tag hierarchy stack)
-		FormatOutput( unsigned int bufsize=TagBufferSize)
-
-			:FormatOutputBase(bufsize?bufsize:TagBufferSize)
-			,m_xmlstate(Content){}
-
 		///\enum XMLState
 		///\brief Enumeration of XML printer states
 		enum XMLState
@@ -49,6 +42,13 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 			Header,			///< processing inside a header defintion
 			HeaderAttribute		///< processing inside a header defintion, just read an attribute
 		};
+
+		/// \brief Constructor
+		/// \param [in] bufsize (optional) size of internal buffer to use (for the tag hierarchy stack)
+		FormatOutput( unsigned int bufsize=TagBufferSize)
+
+			:FormatOutputBase(bufsize?bufsize:(unsigned int)TagBufferSize)
+			,m_xmlstate(Content){}
 
 		///\brief Implementation of protocol::InputFilter::print(ElementType,const void*,size_type)
 		///\param [in] type type of the element to print
