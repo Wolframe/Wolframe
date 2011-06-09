@@ -39,22 +39,25 @@ Project Wolframe.
 #include <boost/type_traits.hpp>
 #include <boost/detail/select_type.hpp>
 #include <boost/type_traits/function_traits.hpp>
-#include "logger/logLevel.hpp"
 #include "config/descriptionBase.hpp"
 #include "config/configurationBase.hpp"
+#include "logger/LogLevel.hpp"
 
 namespace _Wolframe {
 namespace config {
 namespace traits
 {
-struct struct_ {};		///< category tag for a structure with named elements
-struct vector_ {};		///< category tag for a std::vector of any type
-struct atom_ {};		///< category tag for a type that is convertible from a string through boost::lexical_cast
-struct bool_ {};		///< category tag for a boolean type
-struct pointer_ {};		///< category tag for a pointer type
-struct cfgbase_ {};		///< category tag for a struct derived from ConfigurationBase
-struct loglevel_ {};		///< category tag for a log level
-struct syslogfacility_ {};	///< category tag for a syslog facility
+struct nonstruct_ {};
+struct atom_ :public nonstruct_{};			///< category class for atom elements
+struct foreign_ :public nonstruct_{};		///< category class for externally defined elements
+struct struct_ {};								///< category tag for a structure with named elements
+struct vector_ :public nonstruct_{};		///< category tag for a std::vector of any type
+struct arithmetic_ :public atom_ {};		///< category tag for a type that is convertible from a string through boost::lexical_cast
+struct bool_ :public atom_ {};				///< category tag for a boolean type
+struct pointer_ :public atom_{};				///< category tag for a pointer type
+struct cfgbase_ :public foreign_{};			///< category tag for a struct derived from ConfigurationBase
+struct loglevel_ :public atom_{};			///< category tag for a log level
+struct syslogfacility_ :public atom_{};	///< category tag for a syslog facility
 
 /// \brief conditional template for detecting if a type is a class with a static/member method description() returning a const pointer to a structure description as defined in config/descriptionBase.hpp
 /// see http://drdobbs.com/article/print?articleId=227500449&siteSectionName= "Checking Concept Without Concepts in C++"
@@ -103,12 +106,12 @@ typename boost::enable_if_c<
 	,struct_>::type getCategory( const T&) { return struct_();}
 
 
-/// \brief get category atom_ for a type
-/// returns atom_ if T fulfills the is_arithmetic condition or is a string
+/// \brief get category arithmetic_ for a type
+/// returns arithmetic_ if T fulfills the is_arithmetic condition or is a string
 template <typename T>
 typename boost::enable_if_c<
 	(boost::is_arithmetic<T>::value && !boost::is_same<bool,T>::value) || boost::is_same<std::string,T>::value
-	,atom_>::type getCategory( const T&) { return atom_();}
+	,arithmetic_>::type getCategory( const T&) { return arithmetic_();}
 
 
 /// \brief get category bool_ for a type
@@ -149,10 +152,6 @@ template <typename T>
 typename boost::enable_if_c<
 	boost::is_base_of<ConfigurationBase,T>::value
 	,cfgbase_>::type getCategory( const T&) { return cfgbase_();}
-#if 0
-template<typename T>
-struct Category :public boost::function_result<getCategory(const T&)> {}
-#endif
 
 }}}// end namespace
 #endif
