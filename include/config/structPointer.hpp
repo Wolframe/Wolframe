@@ -147,7 +147,7 @@ const void* findElement_( const char*, const char*, const T*, const traits::atom
 	return 0;
 }
 
-/// \brief findElement_ for atom_
+/// \brief findElement_ for foreign_
 template <typename T>
 const void* findElement_( const char*, const char*, const T*, const traits::foreign_&)
 {

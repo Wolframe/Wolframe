@@ -47,7 +47,7 @@ struct DescriptionBase
 	typedef void (*Parse)( const char* name, void* ref, std::size_t ofs, const boost::property_tree::ptree& pt);
 	typedef void (*Print)( std::ostream& out, const char* name, const void* ref, std::size_t ofs, unsigned int indent);
 	typedef bool (*MatchesElement)( const char* name, const void* value);
-	typedef void* (*FindElement)( const char* name, const void* value);
+	typedef const void* (*FindElement)( const char* name, const void* value);
 
 	struct Item
 	{

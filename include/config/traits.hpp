@@ -47,17 +47,18 @@ namespace _Wolframe {
 namespace config {
 namespace traits
 {
-struct nonstruct_ {};
-struct atom_ :public nonstruct_{};			///< category class for atom elements
+struct nonstruct_ {};				///< category class for all except struct_
+struct atom_ :public nonstruct_{};		///< category class for atom elements
 struct foreign_ :public nonstruct_{};		///< category class for externally defined elements
-struct struct_ {};								///< category tag for a structure with named elements
+
+struct struct_ {};				///< category tag for a structure with named elements
 struct vector_ :public nonstruct_{};		///< category tag for a std::vector of any type
 struct arithmetic_ :public atom_ {};		///< category tag for a type that is convertible from a string through boost::lexical_cast
-struct bool_ :public atom_ {};				///< category tag for a boolean type
-struct pointer_ :public atom_{};				///< category tag for a pointer type
-struct cfgbase_ :public foreign_{};			///< category tag for a struct derived from ConfigurationBase
-struct loglevel_ :public atom_{};			///< category tag for a log level
-struct syslogfacility_ :public atom_{};	///< category tag for a syslog facility
+struct bool_ :public atom_ {};			///< category tag for a boolean type
+struct pointer_ :public atom_{};		///< category tag for a pointer type
+struct cfgbase_ :public foreign_{};		///< category tag for a struct derived from ConfigurationBase
+struct loglevel_ :public atom_{};		///< category tag for a log level
+struct syslogfacility_ :public atom_{};		///< category tag for a syslog facility
 
 /// \brief conditional template for detecting if a type is a class with a static/member method description() returning a const pointer to a structure description as defined in config/descriptionBase.hpp
 /// see http://drdobbs.com/article/print?articleId=227500449&siteSectionName= "Checking Concept Without Concepts in C++"
