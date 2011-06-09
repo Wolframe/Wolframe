@@ -160,7 +160,7 @@ static void parseElement_( const char* name, T& value, const Domain& domain, con
 
 /// \brief parses an atomic element
 template <typename T>
-static void parseElement_( const char* name, T& value, const traits::atom_&, const boost::property_tree::ptree& pt)
+static void parseElement_( const char* name, T& value, const traits::arithmetic_&, const boost::property_tree::ptree& pt)
 {
 	static Parser::BaseTypeDomain domain;
 	parseElement_( name, value, domain, pt);
