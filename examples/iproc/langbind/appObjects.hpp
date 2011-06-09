@@ -74,9 +74,9 @@ struct Output
 
 public:
 	boost::shared_ptr<protocol::FormatOutput> m_formatoutput;	///< format output reference
+
 private:
 	unsigned int m_state;						///< current state for outputs with more than one elements
-	std::stack<std::string> m_opentags;				///< stack of open tags
 };
 
 /// \class System

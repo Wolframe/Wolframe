@@ -253,8 +253,6 @@ Output::ItemType Output::print( const char* e1, unsigned int e1size, const char*
 			}
 			else
 			{
-				m_opentags.push( std::string( e1, e1size));
-
 				if (!m_formatoutput->print( protocol::FormatOutput::OpenTag, e1, e1size))
 				{
 					int err = m_formatoutput->getError();
@@ -284,12 +282,7 @@ Output::ItemType Output::print( const char* e1, unsigned int e1size, const char*
 		}
 		else
 		{
-			if (m_opentags.empty())
-			{
-				LOG_ERROR << "error in tag hierarchy of format output: more tags closed than opened";
-				return Error;
-			}
-			if (!m_formatoutput->print( protocol::FormatOutput::CloseTag, m_opentags.top().c_str(), m_opentags.top().size()))
+			if (!m_formatoutput->print( protocol::FormatOutput::CloseTag, 0, 0))
 			{
 				int err = m_formatoutput->getError();
 				if (err)
@@ -299,7 +292,6 @@ Output::ItemType Output::print( const char* e1, unsigned int e1size, const char*
 				}
 				return DoYield;
 			}
-			m_opentags.pop();
 			return Data;
 		}
 	}
