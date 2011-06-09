@@ -34,7 +34,6 @@ GCC_MINOR_VERSION ?=	$(shell $(TOPDIR)/makefiles/gmake/guess_env --gcc-minor-ver
 # -fstack-protector-all: does something funny to the shared objects..
 # -Wstack-protector makes no sense without SSP
 # everything implied by -Wall is not explicitly specified (gcc 4.2.3)
-# TODO: reenable -O2
 # -Waggregate-return: is for K&R code and mostly useless nowadays
 # -Wno-long-long: some boost code header require 'long long'
 # -Wundef: is troubling gtest and is against the C/C++ standard anyway
@@ -43,7 +42,7 @@ GCC_MINOR_VERSION ?=	$(shell $(TOPDIR)/makefiles/gmake/guess_env --gcc-minor-ver
 
 # compilation flags and compilers
 COMMON_COMPILE_FLAGS = \
-	-g -pipe \
+	-O2 -g -pipe \
 	-fstrict-aliasing \
 	-pedantic -Wall \
 	-Wno-long-long \
@@ -193,7 +192,6 @@ endif
 # -mt: enable mutlithreading (-D_REENTRANT for header files, -lthread for ld)
 # -errwarn=%all: convert all warnings to errors
 # -v: do more restrictive syntax checking
-# TODO: enable -O2
 
 ifeq "$(COMPILER)" "spro"
 STD99_COMPILE_FLAGS = \
