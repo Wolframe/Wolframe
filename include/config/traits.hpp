@@ -41,7 +41,7 @@ Project Wolframe.
 #include <boost/type_traits/function_traits.hpp>
 #include "config/descriptionBase.hpp"
 #include "config/configurationBase.hpp"
-#include "logger/LogLevel.hpp"
+#include "logger/logLevel.hpp"
 
 namespace _Wolframe {
 namespace config {
