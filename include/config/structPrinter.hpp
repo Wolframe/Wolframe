@@ -47,7 +47,7 @@ namespace config {
 template <typename Element>
 struct ElementPrinter
 {
-	static void print( std::ostream& out, const char* name, const void* st, std::size_t ofs, unsigned int indent)
+	static void print( std::ostream& out, const char* name, const void* st, /* Aba: was std::size_t */ unsigned int ofs, unsigned int indent)
 	{
 		printElement( out, name, *reinterpret_cast<const Element*>((char*)st + ofs), indent);
 	}

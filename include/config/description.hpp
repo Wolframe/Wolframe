@@ -58,6 +58,16 @@ struct Description :public DescriptionBase
 		catch (std::bad_typeid)
 		{}
 		std::size_t pp = (std::size_t)&(((Structure*)0)->*eptr);
+		// Aba: ../include/config/description.hpp:65:60: error: no matching function for call to
+		// ‘_Wolframe::config::DescriptionBase::Item::Item(size_t&, std::string, const char*&,
+		// void (*)(const char*, void*, unsigned int, const boost::property_tree::ptree&),
+		// void (*)(std::ostream&, const char*, const void*, unsigned int, unsigned int),
+		// bool (*)(const char*, const void*),
+		// const void* (*)(const char*, const void*))’
+		// static void parse( const char* name, void* st, std::size_t ofs, const boost::property_tree::ptree& pt)
+		// template <typename T> static void printElement( std::ostream& out, const char* name, const T& value, unsigned int indent)
+		// bool matchesElement_( const char* name, const T* value, const traits::struct_&)
+		// IMHO: size_t <-> int casts and const traits::struct_ is the problem
 		Item e( pp, std::string(name), type,
 			&_Wolframe::config::ElementParser<Element>::parse,
 			&_Wolframe::config::ElementPrinter<Element>::print,
