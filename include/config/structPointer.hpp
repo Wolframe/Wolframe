@@ -111,8 +111,6 @@ const void* findElement_( const char* type, const char* name, const T* value, co
 	const char* elemtype = typeid( typename T::value_type).name();
 	if (strcmp( type, elemtype) == 0)
 	{
-		// Aba, at least gcc insists on typename here
-		// ../include/config/structPointer.hpp:114:3: error: need ‘typename’ before ‘T:: const_iterator’ because ‘T’ is a dependent scope
 		typename T::const_iterator itr,end;
 		for (itr=value->begin(),end=value->end(); itr!=end; ++itr)
 		{
@@ -125,7 +123,6 @@ const void* findElement_( const char* type, const char* name, const T* value, co
 	}
 	else
 	{
-		// see above
 		typename T::const_iterator itr,end;
 		for (itr=value->begin(),end=value->end(); itr!=end; ++itr)
 		{

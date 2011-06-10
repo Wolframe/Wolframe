@@ -45,15 +45,12 @@ Project Wolframe.
 
 using namespace _Wolframe;
 using namespace config;
-// see below
 using namespace _Wolframe::log;
 
 struct LoggerConfig
 {
 	struct ToStderr
 	{
-		// Aba: FreeBSD 8.2 says: "configStructParser.cpp:21: error: reference to 'log' is ambiguous",
-		// clash with math.h? Added a using namespace for logging stuff above.
 		LogLevel::Level loglevel;
 
 		ToStderr()
