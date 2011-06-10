@@ -57,7 +57,7 @@ local_install:
 
 local_test:
 ifeq ($(WITH_EXPECT),1)
-	$(EXPECT) ./testLua
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) $(EXPECT) ./testLua
 endif
 
 run: $(CPP_BINS)

@@ -53,7 +53,7 @@ local_install:
 
 local_test:
 ifeq ($(WITH_EXPECT),1)
-	$(EXPECT) ./testEcho
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) $(EXPECT) ./testEcho
 endif
 
 run: $(CPP_BINS)

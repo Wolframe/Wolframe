@@ -62,8 +62,8 @@ local_distclean:
 local_install:
 
 local_test:$(TEST_BINS)
-	cd tests && ./pechoHandlerTest$(EXE)
+	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./pechoHandlerTest$(EXE)
 ifeq ($(WITH_EXPECT),1)
-	$(EXPECT) tests/testPEcho
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) $(EXPECT) tests/testPEcho
 endif
 
