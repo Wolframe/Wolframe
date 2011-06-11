@@ -20,3 +20,7 @@ apt-get install libboost1.46-dev libboost-thread1.46-dev libboost-system1.46-dev
 
 # add BOOST_DIR=/usr to the make in Wolframe
 
+How to build locally:
+
+# install osc and build (and all dependencies)
+osc build xUbuntu_11.04 i586 wolframe.dsc

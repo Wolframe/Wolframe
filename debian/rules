@@ -19,15 +19,19 @@ export DH_COMPAT=4
 # This has to be exported to make some magic below work.
 export DH_OPTIONS
 
+export WOLFRAME_PARAMS=BOOST_DIR=/usr WITH_SSL=1 WITH_SQLITE3=1 WITH_LUA=1 WITH_PAM=1 WITH_SASL=1 WITH_PGSQL=1 WITH_QT=1 WITH_EXAMPLES=1
+
 build: build-stamp
 build-stamp:
 	dh_testdir
 
 	# Add here commands to compile the package.
 	$(MAKE) help
-	$(MAKE) BOOST_DIR=/usr/local/boost-1.46.1 config
-	$(MAKE) BOOST_DIR=/usr/local/boost-1.46.1 all
-	cd docs; $(MAKE) doc
+	$(MAKE) $(WOLFRAME_PARAMS) config
+	$(MAKE) $(WOLFRAME_PARAMS) all
+	# Currently happilly broken, WolfBook.xml:91: parser error : Entity
+	# 'GPLlicense' not defined
+	# cd docs; $(MAKE) $(WOLFRAME_PARAMS) doc
 	# --- end custom part for compiling
 
 	touch build-stamp
@@ -51,7 +55,7 @@ install: build
 
 	# Add here commands to install the package
 	# The DESTDIR Has To Be Exactly  /usr/src/packages/BUILD/debian/<nameOfPackage>
-	$(MAKE) install DESTDIR=/usr/src/packages/BUILD/debian/wolframe
+	$(MAKE) install $(WOLFRAME_PARAMS) DESTDIR=/usr/src/packages/BUILD/debian/wolframe
 	# --- end custom part for installing
 
 # Build architecture-independent files here.

@@ -42,10 +42,24 @@
   <bdep name="initramfs-tools" preinstall="1" notmeta="1" version="0.98.8ubuntu3" arch="all" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="initscripts" preinstall="1" notmeta="1" version="2.87dsf" release="4ubuntu23" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="binutils" vminstall="1" version="2.21.0.20110327" release="2ubuntu3" arch="i386" project="Ubuntu:11.04" repository="standard"/>
-  <bdep name="libblkid1" vminstall="1" notmeta="1" version="2.17.2" release="9.1ubuntu4" arch="i386" project="Ubuntu:11.04" repository="standard"/>
-  <bdep name="libuuid1" vminstall="1" notmeta="1" version="2.17.2" release="9.1ubuntu4" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libblkid1" vminstall="1" version="2.17.2" release="9.1ubuntu4" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libuuid1" vminstall="1" version="2.17.2" release="9.1ubuntu4" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="mount" vminstall="1" notmeta="1" version="2.17.2" release="9.1ubuntu4" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="debhelper" version="8.1.2ubuntu4" arch="all" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libboost1.46-dev" version="1.46.1" release="5ubuntu2" arch="i386" project="home:andreas_baumann" repository="xUbuntu_11.04"/>
+  <bdep name="libboost-thread1.46-dev" version="1.46.1" release="5ubuntu2" arch="i386" project="home:andreas_baumann" repository="xUbuntu_11.04"/>
+  <bdep name="libboost-system1.46-dev" version="1.46.1" release="5ubuntu2" arch="i386" project="home:andreas_baumann" repository="xUbuntu_11.04"/>
+  <bdep name="libboost-program-options1.46-dev" version="1.46.1" release="5ubuntu2" arch="i386" project="home:andreas_baumann" repository="xUbuntu_11.04"/>
+  <bdep name="libboost-filesystem1.46-dev" version="1.46.1" release="5ubuntu2" arch="i386" project="home:andreas_baumann" repository="xUbuntu_11.04"/>
+  <bdep name="libssl-dev" version="0.9.8o" release="5ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libqt4-dev" epoch="4" version="4.7.2" release="0ubuntu6.1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libsasl2-dev" version="2.1.23.dfsg1" release="5ubuntu3" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libsqlite3-dev" version="3.7.4" release="2ubuntu5" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libpq-dev" version="8.4.8" release="0ubuntu0.11.04" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="xsltproc" version="1.1.26" release="6build1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="docbook-xsl" version="1.75.2+dfsg" release="5ubuntu1" arch="all" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="doxygen" version="1.7.3" release="6ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="graphviz" version="2.26.3" release="5ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="autoconf" version="2.67" release="2ubuntu1" arch="all" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="automake" epoch="1" version="1.11.1" release="1ubuntu1" arch="all" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="bzip2" version="1.0.5" release="6ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
@@ -57,6 +71,52 @@
   <bdep name="html2text" version="1.3.2a" release="15" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="dpkg-dev" version="1.16.0~ubuntu7" arch="all" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="man-db" version="2.5.9" release="4" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libicu44" version="4.4.2" release="2" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libboost-thread1.46.1" version="1.46.1" release="5ubuntu2" arch="i386" project="home:andreas_baumann" repository="xUbuntu_11.04"/>
+  <bdep name="libboost-date-time1.46-dev" version="1.46.1" release="5ubuntu2" arch="i386" project="home:andreas_baumann" repository="xUbuntu_11.04"/>
+  <bdep name="libboost-system1.46.1" version="1.46.1" release="5ubuntu2" arch="i386" project="home:andreas_baumann" repository="xUbuntu_11.04"/>
+  <bdep name="libboost-program-options1.46.1" version="1.46.1" release="5ubuntu2" arch="i386" project="home:andreas_baumann" repository="xUbuntu_11.04"/>
+  <bdep name="libboost-filesystem1.46.1" version="1.46.1" release="5ubuntu2" arch="i386" project="home:andreas_baumann" repository="xUbuntu_11.04"/>
+  <bdep name="zlib1g-dev" epoch="1" version="1.2.3.4.dfsg" release="3ubuntu3" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libssl0.9.8" version="0.9.8o" release="5ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libx11-dev" epoch="2" version="1.4.2" release="1ubuntu3" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libqtcore4" epoch="4" version="4.7.2" release="0ubuntu6.1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libqtgui4" epoch="4" version="4.7.2" release="0ubuntu6.1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libqt4-sql" epoch="4" version="4.7.2" release="0ubuntu6.1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libqt4-xml" epoch="4" version="4.7.2" release="0ubuntu6.1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libqt4-network" epoch="4" version="4.7.2" release="0ubuntu6.1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libqt4-dbus" epoch="4" version="4.7.2" release="0ubuntu6.1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libqt4-script" epoch="4" version="4.7.2" release="0ubuntu6.1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libqt4-xmlpatterns" epoch="4" version="4.7.2" release="0ubuntu6.1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libqt4-designer" epoch="4" version="4.7.2" release="0ubuntu6.1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libqt4-svg" epoch="4" version="4.7.2" release="0ubuntu6.1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libqt4-help" epoch="4" version="4.7.2" release="0ubuntu6.1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libqt4-declarative" epoch="4" version="4.7.2" release="0ubuntu6.1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libqt4-qt3support" epoch="4" version="4.7.2" release="0ubuntu6.1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libqt4-scripttools" epoch="4" version="4.7.2" release="0ubuntu6.1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libqt4-test" epoch="4" version="4.7.2" release="0ubuntu6.1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="qt4-qmake" epoch="4" version="4.7.2" release="0ubuntu6.1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libpam0g-dev" version="1.1.2" release="2ubuntu8.3" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libc6-dev" version="2.13" release="0ubuntu13" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libsasl2-modules" version="2.1.23.dfsg1" release="5ubuntu3" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libsqlite3-0" version="3.7.4" release="2ubuntu5" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libkrb5-dev" version="1.8.3+dfsg" release="5ubuntu2.1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="comerr-dev" version="2.1-1.41.14" release="1ubuntu3" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libpq5" version="8.4.8" release="0ubuntu0.11.04" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libxml2" version="2.7.8.dfsg" release="2" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libxslt1.1" version="1.1.26" release="6build1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="xml-core" version="0.13" arch="all" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="doxygen-latex" version="1.7.3" release="6ubuntu1" arch="all" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libx11-6" epoch="2" version="1.4.2" release="1ubuntu3" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libxt6" epoch="1" version="1.0.9" release="1ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libxmu6" epoch="2" version="1.1.0" release="1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libxaw7" epoch="2" version="1.0.9" release="2" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libcdt4" version="2.26.3" release="5ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libgraph4" version="2.26.3" release="5ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libcgraph5" version="2.26.3" release="5ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libgvc5" version="2.26.3" release="5ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libgvpr1" version="2.26.3" release="5ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libexpat1" version="2.0.1" release="7ubuntu3" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="m4" version="1.4.14" release="3" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="autotools-dev" version="20100122.1" arch="all" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="cpp" epoch="4" version="4.5.2" release="1ubuntu3" arch="i386" project="Ubuntu:11.04" repository="standard"/>
@@ -64,10 +124,8 @@
   <bdep name="gettext-base" version="0.18.1.1" release="3ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="libunistring0" version="0.9.3" release="3" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="libglib2.0-0" version="2.28.6" release="0ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
-  <bdep name="libxml2" version="2.7.8.dfsg" release="2" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="libgomp1" version="4.5.2" release="8ubuntu4" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="libcroco3" version="0.6.2" release="1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
-  <bdep name="libc6-dev" version="2.13" release="0ubuntu13" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="libdb4.8" version="4.8.30" release="5ubuntu2" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="libgdbm3" version="1.8.3" release="9ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="perl-modules" version="5.10.1" release="17ubuntu4.1" arch="all" project="Ubuntu:11.04" repository="standard"/>
@@ -79,8 +137,50 @@
   <bdep name="bsdmainutils" version="8.2.2" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="libpipeline1" version="1.2.0" release="1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="libmagic1" version="5.04" release="5ubuntu2" arch="i386" project="Ubuntu:11.04" repository="standard"/>
-  <bdep name="sensible-utils" version="0.0.6ubuntu2" arch="all" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="gcc-4.5-base" version="4.5.2" release="8ubuntu4" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libboost-serialization1.46-dev" version="1.46.1" release="5ubuntu2" arch="i386" project="home:andreas_baumann" repository="xUbuntu_11.04"/>
+  <bdep name="libboost-date-time1.46.1" version="1.46.1" release="5ubuntu2" arch="i386" project="home:andreas_baumann" repository="xUbuntu_11.04"/>
+  <bdep name="libxcb1-dev" version="1.7" release="2ubuntu2" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="x11proto-input-dev" version="2.0.1" release="1ubuntu1" arch="all" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="x11proto-kb-dev" version="1.0.5" release="1" arch="all" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="xtrans-dev" version="1.2.6" release="1" arch="all" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libxau-dev" epoch="1" version="1.0.6" release="1ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libxdmcp-dev" epoch="1" version="1.1.0" release="1ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="x11proto-core-dev" version="7.0.20" release="1" arch="all" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libxext6" epoch="2" version="1.2.0" release="2ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libsm6" epoch="2" version="1.2.0" release="1ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libxrender1" epoch="1" version="0.9.6" release="1ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libtiff4" version="3.9.4" release="5ubuntu6" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="fontconfig" version="2.8.0" release="2.1ubuntu3" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libaudio2" version="1.9.2" release="4ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libfontconfig1" version="2.8.0" release="2.1ubuntu3" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libpng12-0" version="1.2.44" release="1ubuntu3" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libice6" epoch="2" version="1.0.7" release="1ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libjpeg62" version="6b1" release="1ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libfreetype6" version="2.4.4" release="1ubuntu2" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libxi6" epoch="2" version="1.4.1" release="1ubuntu2" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libmng1" version="1.0.10" release="1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libpam0g" version="1.1.2" release="2ubuntu8.3" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="linux-libc-dev" version="2.6.38" release="8.42" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libc-dev-bin" version="2.13" release="0ubuntu13" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libsasl2-2" version="2.1.23.dfsg1" release="5ubuntu3" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="krb5-multidev" version="1.8.3+dfsg" release="5ubuntu2.1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libcomerr2" version="1.41.14" release="1ubuntu3" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libldap-2.4-2" version="2.4.23" release="6ubuntu6" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libkrb5-3" version="1.8.3+dfsg" release="5ubuntu2.1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libgssapi-krb5-2" version="1.8.3+dfsg" release="5ubuntu2.1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libgcrypt11" version="1.4.6" release="4ubuntu2" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="sgml-base" version="1.26+nmu1ubuntu1" arch="all" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="texlive-latex-extra" version="2009" release="10ubuntu1" arch="all" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="texlive-extra-utils" version="2009" release="10ubuntu1" arch="all" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="latex-xcolor" version="2.11" release="1" arch="all" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libx11-data" epoch="2" version="1.4.2" release="1ubuntu3" arch="all" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libxcb1" version="1.7" release="2ubuntu2" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libxpm4" epoch="1" version="3.5.9" release="1ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libpathplan4" version="2.26.3" release="5ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libcairo2" version="1.10.2" release="2ubuntu2" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libpango1.0-0" version="1.28.4" release="0ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="sensible-utils" version="0.0.6ubuntu2" arch="all" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="cpp-4.5" version="4.5.2" release="8ubuntu4" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="libgmp3c2" epoch="2" version="4.3.2+dfsg" release="1ubuntu3" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="libmpfr4" version="3.0.0" release="7" arch="i386" project="Ubuntu:11.04" repository="standard"/>
@@ -90,22 +190,89 @@
   <bdep name="libmpc2" version="0.9" release="1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="libcloog-ppl0" version="0.15.9" release="2" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="libelfg0" version="0.8.13" release="1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
-  <bdep name="linux-libc-dev" version="2.6.38" release="8.42" arch="i386" project="Ubuntu:11.04" repository="standard"/>
-  <bdep name="libc-dev-bin" version="2.13" release="0ubuntu13" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="liblzma2" version="5.0.0" release="2" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="g++-4.5" version="4.5.2" release="8ubuntu4" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="libtimedate-perl" version="1.2000" release="1" arch="all" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="libpam-modules" version="1.1.2" release="2ubuntu8.3" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="bsdutils" epoch="1" version="2.17.2" release="9.1ubuntu4" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libboost-serialization1.46.1" version="1.46.1" release="5ubuntu2" arch="i386" project="home:andreas_baumann" repository="xUbuntu_11.04"/>
+  <bdep name="libpthread-stubs0-dev" version="0.3" release="2" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="x11-common" epoch="1" version="7.6+4ubuntu3" arch="all" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libxau6" epoch="1" version="1.0.6" release="1ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libxdmcp6" epoch="1" version="1.1.0" release="1ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="fontconfig-config" version="2.8.0" release="2.1ubuntu3" arch="all" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="liblcms1" version="1.18.dfsg" release="1.2ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libk5crypto3" version="1.8.3+dfsg" release="5ubuntu2.1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libgssrpc4" version="1.8.3+dfsg" release="5ubuntu2.1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libkadm5srv-mit7" version="1.8.3+dfsg" release="5ubuntu2.1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libkadm5clnt-mit7" version="1.8.3+dfsg" release="5ubuntu2.1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libgnutls26" version="2.8.6" release="1ubuntu2" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libkeyutils1" version="1.4" release="4ubuntu2" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libkrb5support0" version="1.8.3+dfsg" release="5ubuntu2.1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libgpg-error0" version="1.10" release="0.2ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="preview-latex-style" version="11.86" release="2ubuntu1" arch="all" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="tex-common" version="2.09" arch="all" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="texlive-common" version="2009" release="11" arch="all" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="texlive-binaries" version="2009" release="8ubuntu2" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="texlive-latex-base" version="2009" release="11" arch="all" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="texlive-pictures" version="2009" release="11" arch="all" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="python" version="2.7.1" release="0ubuntu5" arch="all" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="texlive-base" version="2009" release="11" arch="all" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="texlive-latex-recommended" version="2009" release="11" arch="all" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libxcb-render0" version="1.7" release="2ubuntu2" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libxcb-shm0" version="1.7" release="2ubuntu2" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libpixman-1-0" version="0.20.2" release="0ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libxft2" version="2.2.0" release="2ubuntu2" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libthai0" version="0.1.14" release="2ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="libstdc++6-4.5-dev" version="4.5.2" release="8ubuntu4" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="libpam-modules-bin" version="1.1.2" release="2ubuntu8.3" arch="i386" project="Ubuntu:11.04" repository="standard"/>
-  <bdep name="libpam0g" version="1.1.2" release="2ubuntu8.3" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libpthread-stubs0" version="0.3" release="2" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="lsb-base" version="4.0" release="0ubuntu11" arch="all" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="ucf" version="3.0025+nmu1ubuntu1" arch="all" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libkdb5-4" version="1.8.3+dfsg" release="5ubuntu2.1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libtasn1-3" version="2.7" release="1ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libpoppler13" version="0.16.4" release="0ubuntu1.1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libkpathsea5" version="2009" release="8ubuntu2" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="ed" version="1.5" release="1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="luatex" version="0.65.0" release="1ubuntu3" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="python-minimal" version="2.7.1" release="0ubuntu5" arch="all" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="python2.7" version="2.7.1" release="5ubuntu2" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="mime-support" version="3.51" release="1ubuntu1" arch="all" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="texlive-doc-base" version="2009" release="2" arch="all" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libdatrie1" version="0.2.4" release="1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libthai-data" version="0.1.14" release="2ubuntu1" arch="all" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="mountall" version="2.25ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="sysvinit-utils" version="2.87dsf" release="4ubuntu23" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libudev0" version="167" release="0ubuntu3" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="ifupdown" version="0.6.10ubuntu4" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="ncurses-bin" version="5.7+20101128" release="1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="debconf" version="1.5.36ubuntu4" arch="all" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="python2.7-minimal" version="2.7.1" release="5ubuntu2" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libreadline6" version="6.2" release="0ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libncursesw5" version="5.7+20101128" release="1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="insserv" version="1.14.0" release="2" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="udev" version="167" release="0ubuntu3" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="plymouth" version="0.8.2" release="2ubuntu23" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="makedev" version="2.3.1" release="89ubuntu1" arch="all" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libplymouth2" version="0.8.2" release="2ubuntu23" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="adduser" version="3.112+nmu1ubuntu5" arch="all" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libusb-0.1-4" epoch="2" version="0.1.12" release="17" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libdrm2" version="2.4.23" release="1ubuntu6" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libdrm-nouveau1a" version="2.4.23" release="1ubuntu6" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libdrm-radeon1" version="2.4.23" release="1ubuntu6" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libdrm-intel1" version="2.4.23" release="1ubuntu6" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="initramfs-tools-bin" version="0.98.8ubuntu3" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="klibc-utils" version="1.5.20" release="1ubuntu6" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="busybox-initramfs" epoch="1" version="1.17.1" release="10ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libslang2" version="2.2.2" release="4ubuntu2" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libklibc" version="1.5.20" release="1ubuntu6" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="debconf-i18n" version="1.5.36ubuntu4" arch="all" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="liblocale-gettext-perl" version="1.05" release="6" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="libtext-iconv-perl" version="1.7" release="2" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="libtext-wrapi18n-perl" version="0.06" release="7" arch="all" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="libtext-charwidth-perl" version="0.04" release="6" arch="i386" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="ttf-dejavu-core" version="2.31" release="1" arch="all" project="Ubuntu:11.04" repository="standard"/>
+  <bdep name="libgd2-noxpm" version="2.0.36~rc1~dfsg" release="5ubuntu2" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="fakeroot" notmeta="1" version="1.14.4" release="1ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="bison" notmeta="1" epoch="1" version="2.4.1.dfsg" release="3" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="cpio" notmeta="1" version="2.11" release="7ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
@@ -130,37 +297,13 @@
   <bdep name="ncurses-base" notmeta="1" version="5.7+20101128" release="1" arch="all" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="locales" notmeta="1" version="2.13+git20100825" release="4" arch="all" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="dash" notmeta="1" version="0.5.5.1" release="7.2ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
-  <bdep name="sysvinit-utils" notmeta="1" version="2.87dsf" release="4ubuntu23" arch="i386" project="Ubuntu:11.04" repository="standard"/>
-  <bdep name="insserv" notmeta="1" version="1.14.0" release="2" arch="i386" project="Ubuntu:11.04" repository="standard"/>
-  <bdep name="lsb-base" notmeta="1" version="4.0" release="0ubuntu11" arch="all" project="Ubuntu:11.04" repository="standard"/>
-  <bdep name="libslang2" notmeta="1" version="2.2.2" release="4ubuntu2" arch="i386" project="Ubuntu:11.04" repository="standard"/>
-  <bdep name="mountall" notmeta="1" version="2.25ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
-  <bdep name="libudev0" notmeta="1" version="167" release="0ubuntu3" arch="i386" project="Ubuntu:11.04" repository="standard"/>
-  <bdep name="ifupdown" notmeta="1" version="0.6.10ubuntu4" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="libpam-runtime" notmeta="1" version="1.1.2" release="2ubuntu8.3" arch="all" project="Ubuntu:11.04" repository="standard"/>
-  <bdep name="initramfs-tools-bin" notmeta="1" version="0.98.8ubuntu3" arch="i386" project="Ubuntu:11.04" repository="standard"/>
-  <bdep name="klibc-utils" notmeta="1" version="1.5.20" release="1ubuntu6" arch="i386" project="Ubuntu:11.04" repository="standard"/>
-  <bdep name="busybox-initramfs" notmeta="1" epoch="1" version="1.17.1" release="10ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
-  <bdep name="udev" notmeta="1" version="167" release="0ubuntu3" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="update-inetd" notmeta="1" version="4.38" arch="all" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="install-info" notmeta="1" version="4.13a.dfsg.1" release="6ubuntu3" arch="i386" project="Ubuntu:11.04" repository="standard"/>
-  <bdep name="libncursesw5" notmeta="1" version="5.7+20101128" release="1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="libgpm2" notmeta="1" version="1.20.4" release="3.3ubuntu1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="vim-common" notmeta="1" epoch="2" version="7.3.035+hg~8fdc12103333" release="1ubuntu7" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="vim-runtime" notmeta="1" epoch="2" version="7.3.035+hg~8fdc12103333" release="1ubuntu7" arch="all" project="Ubuntu:11.04" repository="standard"/>
-  <bdep name="ncurses-bin" notmeta="1" version="5.7+20101128" release="1" arch="i386" project="Ubuntu:11.04" repository="standard"/>
-  <bdep name="plymouth" notmeta="1" version="0.8.2" release="2ubuntu23" arch="i386" project="Ubuntu:11.04" repository="standard"/>
-  <bdep name="makedev" notmeta="1" version="2.3.1" release="89ubuntu1" arch="all" project="Ubuntu:11.04" repository="standard"/>
-  <bdep name="libplymouth2" notmeta="1" version="0.8.2" release="2ubuntu23" arch="i386" project="Ubuntu:11.04" repository="standard"/>
-  <bdep name="libklibc" notmeta="1" version="1.5.20" release="1ubuntu6" arch="i386" project="Ubuntu:11.04" repository="standard"/>
-  <bdep name="adduser" notmeta="1" version="3.112+nmu1ubuntu5" arch="all" project="Ubuntu:11.04" repository="standard"/>
-  <bdep name="libusb-0.1-4" notmeta="1" epoch="2" version="0.1.12" release="17" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <bdep name="libfile-copy-recursive-perl" notmeta="1" version="0.38" release="1" arch="all" project="Ubuntu:11.04" repository="standard"/>
-  <bdep name="libdrm2" notmeta="1" version="2.4.23" release="1ubuntu6" arch="i386" project="Ubuntu:11.04" repository="standard"/>
-  <bdep name="libdrm-nouveau1a" notmeta="1" version="2.4.23" release="1ubuntu6" arch="i386" project="Ubuntu:11.04" repository="standard"/>
-  <bdep name="libdrm-radeon1" notmeta="1" version="2.4.23" release="1ubuntu6" arch="i386" project="Ubuntu:11.04" repository="standard"/>
-  <bdep name="libdrm-intel1" notmeta="1" version="2.4.23" release="1ubuntu6" arch="i386" project="Ubuntu:11.04" repository="standard"/>
-  <bdep name="libpng12-0" notmeta="1" version="1.2.44" release="1ubuntu3" arch="i386" project="Ubuntu:11.04" repository="standard"/>
   <path project="home:andreas_baumann" repository="xUbuntu_11.04"/>
   <path project="Ubuntu:11.04" repository="standard"/>
 </buildinfo>
