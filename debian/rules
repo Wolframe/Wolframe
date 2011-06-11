@@ -56,7 +56,7 @@ install: build
 
 	# Add here commands to install the package
 	# The DESTDIR Has To Be Exactly  /usr/src/packages/BUILD/debian/<nameOfPackage>
-	$(MAKE) install $(WOLFRAME_PARAMS) DESTDIR=/usr/src/packages/BUILD/debian/wolframe
+	$(MAKE) install $(WOLFRAME_PARAMS) sysconfdir=/usr/src/packages/BUILD/debian/wolframe/etc DESTDIR=/usr/src/packages/BUILD/debian/wolframe
 	# --- end custom part for installing
 
 # Build architecture-independent files here.
