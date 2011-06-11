@@ -32,6 +32,7 @@ build-stamp:
 	# Currently happilly broken, WolfBook.xml:91: parser error : Entity
 	# 'GPLlicense' not defined
 	# cd docs; $(MAKE) $(WOLFRAME_PARAMS) doc
+	cd docs; $(MAKE) $(WOLFRAME_PARAMS) doc-doxygen
 	# --- end custom part for compiling
 
 	touch build-stamp

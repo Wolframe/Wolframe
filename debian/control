@@ -17,13 +17,13 @@ Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: <insert up to 60 chars description>
  <insert long description, indented with spaces>
 
-Package: wolframe-client
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: <insert up to 60 chars description>
- <insert long description, indented with spaces>
+#Package: wolframe-client
+#Architecture: any
+#Depends: ${shlibs:Depends}, ${misc:Depends}
+#Description: <insert up to 60 chars description>
+# <insert long description, indented with spaces>
 
-Package: wolframe-doc
-Architecture: all
-Description: documentation for wolframe
- <insert long description, indented with spaces>
+#Package: wolframe-doc
+#Architecture: all
+#Description: documentation for wolframe
+# <insert long description, indented with spaces>
