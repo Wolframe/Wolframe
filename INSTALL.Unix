@@ -149,6 +149,10 @@ For building the documentation you need 'xsltproc', 'docbook-xsl' and 'doxygen'.
 
 When rebuilding the SVG images of the documentation you also need 'dia'.
 
+For running non-gtest tests you need 'expect'.
+
+For running the Sasl AAAA tests you need 'sasl2-bin'.
+
 Ubuntu 10.10 Server
 -------------------
 
@@ -163,6 +167,10 @@ For building the documentation you need 'xsltproc', 'docbook-xsl' and 'doxygen'.
 
 When rebuilding the SVG images of the documentation you also need 'dia'.
 
+For running non-gtest tests you need 'expect'.
+
+For running the Sasl AAAA tests you need 'sasl2-bin'.
+
 Ubuntu 11.04
 ------------
 
@@ -176,6 +184,10 @@ compile your own one.
 For building the documentation you need 'xsltproc', 'docbook-xsl' and 'doxygen'.
 
 When rebuilding the SVG images of the documentation you also need 'dia'.
+
+For running non-gtest tests you need 'expect'.
+
+For running the Sasl AAAA tests you need 'sasl2-bin'.
 
 Debian 5.0
 ----------
