@@ -57,12 +57,13 @@ struct Description :public DescriptionBase
 		}
 		catch (std::bad_typeid)
 		{}
+		DescriptionBase::Parse parse_ = &_Wolframe::config::ElementParser<Element>::parse;
+		DescriptionBase::Print print_ = _Wolframe::config::ElementPrinter<Element>::print;
+		DescriptionBase::MatchesElement matches_ = &_Wolframe::config::ElementPointer<Element>::matchesElement;
+		DescriptionBase::FindElement find_ = &_Wolframe::config::ElementPointer<Element>::findElement;
+
 		std::size_t pp = (std::size_t)&(((Structure*)0)->*eptr);
-		Item e( pp, std::string(name), type,
-			&_Wolframe::config::ElementParser<Element>::parse,
-			&_Wolframe::config::ElementPrinter<Element>::print,
-			&_Wolframe::config::ElementPointer<Element>::matchesElement,
-			&_Wolframe::config::ElementPointer<Element>::findElement);
+		Item e( pp, std::string(name), type, parse_, print_, matches_, find_);
 		m_ar.push_back( e);
 		return *this;
 	}

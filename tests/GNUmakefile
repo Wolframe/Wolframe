@@ -47,8 +47,8 @@ TEST_CPP_BINS = \
 	poolTest$(EXE) \
 	logTest$(EXE) \
 	protocolArgumentParsing$(EXE) \
-#	configStructParser$(EXE) \
-#	configValueParser$(EXE)
+	configValueParser$(EXE) \
+	configStructParser$(EXE) \
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
@@ -77,6 +77,10 @@ local_test:
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./singletonTest
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./protocolArgumentParsing
+	@echo
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./configValueParser
+	@echo
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./configStructParser $(TOPDIR)/src/wolframe.conf
 	@echo
 	@echo
 

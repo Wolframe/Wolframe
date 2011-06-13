@@ -68,6 +68,7 @@ private:
 	char m_buf[ Size+1];			///< buffer content
 
 public:
+	///\brief Constructor
 	Buffer()				:m_pos(0){}
 	///\brief Clear the buffer content
 	void clear()				{m_pos=0;}
