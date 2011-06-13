@@ -50,6 +50,7 @@ examples/pecho/tests/pechoHandlerTest
 clients/qt/qtclient
 moc_*.cpp
 clients/qt/.history
+clients/Android/local.properties
 tests/db/sdsqliteTest
 tests/db/sqlite3ppTest
 examples/iproc/iprocd
