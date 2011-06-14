@@ -7,9 +7,7 @@ XSBC-Original-Maintainer: Debian Boost Team <pkg-boost-devel@lists.alioth.debian
 Uploaders: Steve M. Robbins <smr@debian.org>, Domenico Andreoli <cavok@debian.org>
 Build-Depends: debhelper (>= 8), 
  zlib1g-dev, libbz2-dev, libicu-dev, 
- bison, flex, docbook-to-man, help2man, xsltproc, doxygen, 
- python, python-all-dev, 
- python3, python3-all-dev (>= 3.1)
+ bison, flex, docbook-to-man, help2man, xsltproc, doxygen
 Build-Conflicts: libopenmpi-dev (= 1.3.2-2)
 Vcs-Browser: http://svn.debian.org/wsvn/pkg-boost/boost/trunk/
 Vcs-Svn: svn://svn.debian.org/svn/pkg-boost/boost/trunk
@@ -38,7 +36,6 @@ Suggests: libboost1.46-doc,
  libboost-iostreams1.46-dev,
  libboost-math1.46-dev,
  libboost-program-options1.46-dev,
- libboost-python1.46-dev,
  libboost-random1.46-dev,
  libboost-regex1.46-dev,
  libboost-serialization1.46-dev,
@@ -68,7 +65,7 @@ Description: Boost C++ Libraries development files
  bcp, inspect, boostbook and quickbook.
  .
  For the following subprojects separate packages exist: date-time,
- filesystem, graph, iostreams, math, mpi, program_options, python,
+ filesystem, graph, iostreams, math, mpi, program_options,
  regex, serialization, signals, system, test, thread, and wave.
 
 Package: libboost1.46-doc
@@ -275,61 +272,6 @@ Description: program options library for C++
  Library to let program developers obtain program options, that is
  (name, value) pairs from the user, via conventional methods such as
  command line and config file.
-
-Package: libboost-python1.46.1
-Homepage: http://www.boost.org/libs/python/
-Architecture: any
-Section: python
-Depends: ${misc:Depends}, ${shlibs:Depends}, ${python:Depends}
-Breaks: ${python:Breaks}
-Description: Boost.Python Library 
- This package forms part of the Boost C++ Libraries collection.
- .
- The Boost Python Library is used to quickly and easily export a C++
- library to Python such that the Python interface is very similar to
- the C++ interface. It is designed to be minimally intrusive on your
- C++ design. In most cases, you should not have to alter your C++
- classes in any way in order to use them with Boost.Python.  The
- system should simply "reflect" your C++ classes and functions into
- Python. The major features of Boost.Python include support for:
- Subclassing extension types in Python, Overriding virtual functions
- in Python, Member function Overloading, Automatic wrapping of
- numeric operators among others.
-
-Package: libboost-python1.46-dev
-Homepage: http://www.boost.org/libs/python/
-Architecture: any
-Section: libdevel
-Depends: ${misc:Depends},
- libboost1.46-dev (= ${binary:Version}),
- libboost-python1.46.1 (= ${binary:Version}),
- python-dev, ${python:Depends},
- python (>= 2.5) | python-celementtree | python-elementtree,
- gccxml
-Suggests: libboost1.46-doc
-Conflicts: libboost-python1.42-dev
-Description: Boost.Python Library development files
- This package forms part of the Boost C++ Libraries collection.
- .
- The Boost Python Library is used to quickly and easily export a C++
- library to Python such that the Python interface is very similar to
- the C++ interface. It is designed to be minimally intrusive on your
- C++ design. In most cases, you should not have to alter your C++
- classes in any way in order to use them with Boost.Python.  The
- system should simply "reflect" your C++ classes and functions into
- Python. The major features of Boost.Python include support for:
- Subclassing extension types in Python, Overriding virtual functions
- in Python, Member function Overloading, Automatic wrapping of
- numeric operators among others.
- .
- This package also contains the pyste Boost.Python code generator that
- allows the user to specify classes and functions to be exported using
- a simple interface file, which following the Boost.Python's
- philosophy, is simple Python code.
- .
- This package allows development of a Python interface for all current
- versions of Python in Debian.  Code using this library will need also
- one of the Python development packages.
 
 Package: libboost-random1.46.1
 Homepage: http://www.boost.org/libs/random/
