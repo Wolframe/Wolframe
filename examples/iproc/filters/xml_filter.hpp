@@ -21,17 +21,29 @@ template <class IOCharset, class AppCharset=textwolf::charset::UTF8>
 struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 {
 	friend class XmlHeaderFilter;
-	typedef typename FilterBase<IOCharset, AppCharset>::FormatOutputBase FormatOutputBase;
-	typedef typename FormatOutputBase::ElementType ElementType;
-	typedef typename FormatOutputBase::size_type size_type;
+	typedef FilterBase<IOCharset, AppCharset> ThisFilterBase;
+	typedef typename protocol::FormatOutput::ElementType ElementType;
+	typedef typename protocol::FormatOutput::size_type size_type;
+	typedef textwolf::StaticBuffer BufferType;
 
 	///\class FormatOutput
 	///\brief format output filter for XML
-	struct FormatOutput :public FormatOutputBase
+	struct FormatOutput :public protocol::FormatOutput
 	{
 		enum {
 			TagBufferSize=1024	///< default size of buffer use for storing tag hierarchy of output
 		};
+
+		///\enum ErrorCodes
+		///\brief Enumeration of error codes
+		enum ErrorCodes
+		{
+			Ok,				///< no error
+			ErrTagStackExceedsLimit,	///< tack stack overflow
+			ErrTagHierarchy,		///< tack hierarchy error
+			ErrIllegalState			///< illegal state (should not happen)
+		};
+
 		///\enum XMLState
 		///\brief Enumeration of XML printer states
 		enum XMLState
@@ -43,11 +55,12 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 			HeaderAttribute		///< processing inside a header defintion, just read an attribute
 		};
 
-		/// \brief Constructor
-		/// \param [in] bufsize (optional) size of internal buffer to use (for the tag hierarchy stack)
+		///\brief Constructor
+		///\param [in] bufsize (optional) size of internal buffer to use (for the tag hierarchy stack)
 		FormatOutput( unsigned int bufsize=TagBufferSize)
-
-			:FormatOutputBase(bufsize?bufsize:(unsigned int)TagBufferSize)
+			:m_tagstk(new char[bufsize?bufsize:(unsigned int)TagBufferSize])
+			,m_tagstksize(bufsize?bufsize:(unsigned int)TagBufferSize)
+			,m_tagstkpos(0)
 			,m_xmlstate(Content){}
 
 		///\brief Implementation of protocol::InputFilter::print(ElementType,const void*,size_type)
@@ -56,78 +69,199 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		///\param [in] elementsize size of the element to print in bytes
 		virtual bool print( ElementType type, const void* element, size_type elementsize)
 		{
-			size_type bufpos = FormatOutputBase::m_bufpos;
+			BufferType buf( protocol::OutputBlock::rest(), protocol::OutputBlock::restsize());
+
 			const void* cltag;
 			size_type cltagsize;
 
 			switch (type)
 			{
-				case FormatOutputBase::OpenTag:
-					if (!printElem( '<', bufpos) || !printElem( (const char*)element, elementsize, bufpos)) return false;
+				case protocol::FormatOutput::OpenTag:
+					ThisFilterBase::printToBuffer( '<', buf);
+					ThisFilterBase::printToBuffer( (const char*)element, elementsize, buf);
 
-					setState( FormatOutputBase::Open);
-					m_xmlstate = ((const char*)(element))[0]=='?'?Header:Tag;
-
-					if (!printOutput( bufpos)) return false;
-
-					if (!push( element, elementsize))
+					if (buf.overflow())
 					{
-						setState( FormatOutputBase::Error, FormatOutputBase::ErrTagStackExceedsLimit);
+						setState( EndOfBuffer);
 						return false;
 					}
+					if (!pushTag( element, elementsize))
+					{
+						setState( Error, ErrTagStackExceedsLimit);
+						return false;
+					}
+					m_xmlstate = ((const char*)(element))[0]=='?'?Header:Tag;
+					incPos( buf.size());
+					setState( Open);
 					return true;
 
-				case FormatOutputBase::Attribute:
-					if (!printElem( (const char*)element, elementsize, bufpos) || !printElem( '=', bufpos)) return false;
+				case protocol::FormatOutput::Attribute:
+					ThisFilterBase::printToBuffer( (const char*)element, elementsize, buf);
+					ThisFilterBase::printToBuffer( '=', buf);
 
-					setState( FormatOutputBase::Open);
+					if (buf.overflow())
+					{
+						setState( EndOfBuffer);
+						return false;
+					}
 					m_xmlstate = (m_xmlstate==Header)?HeaderAttribute:Attribute;
-					return printOutput( bufpos);
+					incPos( buf.size());
+					setState( Open);
+					return true;
 
-				case FormatOutputBase::Value:
+				case protocol::FormatOutput::Value:
 					if (m_xmlstate == Attribute)
 					{
-						if (!printElem( '\'', bufpos) || !printElem( (const char*)element, elementsize, bufpos) || !printElem( '\'', bufpos)) return false;
+						printToBufferAttributeValue( (const char*)element, elementsize, buf);
+						if (buf.overflow())
+						{
+							setState( EndOfBuffer);
+							return false;
+						}
 						m_xmlstate = Tag;
 					}
 					else if (m_xmlstate == HeaderAttribute)
 					{
-						if (!printElem( '\'', bufpos) || !printElem( (const char*)element, elementsize, bufpos) || !printElem( '\'', bufpos)) return false;
+						printToBufferAttributeValue( (const char*)element, elementsize, buf);
+						if (buf.overflow())
+						{
+							setState( EndOfBuffer);
+							return false;
+						}
 						m_xmlstate = Header;
 					}
 					else
 					{
-						if (!printElem( ' ', bufpos) || !printElem( (const char*)element, elementsize, bufpos)) return false;
+						printToBufferContent( (const char*)element, elementsize, buf);
+						if (buf.overflow())
+						{
+							setState( EndOfBuffer);
+							return false;
+						}
 					}
-					return printOutput( bufpos);
+					incPos( buf.size());
+					setState( Open);
+					return true;
 
-				case FormatOutputBase::CloseTag:
-					if (!top( cltag, cltagsize) || !cltagsize)
+				case protocol::FormatOutput::CloseTag:
+					if (!topTag( cltag, cltagsize) || !cltagsize)
 					{
-						setState( FormatOutputBase::Error, FormatOutputBase::ErrTagHierarchy);
+						setState( Error, ErrTagHierarchy);
 						return false;
 					}
 					if (m_xmlstate == Header)
 					{
-						if (!printElem( (const char*)cltag+1, cltagsize-1, bufpos) || !printElem( "?>", bufpos)) return false;
+						printToBufferAttributeValue( (const char*)element, elementsize, buf);
+						ThisFilterBase::printToBuffer( '?', buf);
+						ThisFilterBase::printToBuffer( '>', buf);
 					}
 					else if (m_xmlstate == Tag)
 					{
-						if (!printElem( "/>", bufpos)) return false;
+						ThisFilterBase::printToBuffer( '/', buf);
+						ThisFilterBase::printToBuffer( '>', buf);
 					}
 					else
 					{
-						if (!printElem( "</", bufpos) || !printElem( (const char*)cltag, cltagsize, bufpos) || !printElem( '>', bufpos)) return false;
+						ThisFilterBase::printToBuffer( '<', buf);
+						ThisFilterBase::printToBuffer( '/', buf);
+						printToBufferAttributeValue( (const char*)element, elementsize, buf);
+						ThisFilterBase::printToBuffer( '>', buf);
 					}
-					if (!printOutput( bufpos)) return false;
 					m_xmlstate = Content;
-					FormatOutputBase::pop();
+					popTag();
+					incPos( buf.size());
+					setState( Open);
 					return true;
 			}
-			setState( FormatOutputBase::Error, FormatOutputBase::ErrIllegalState);
+			setState( Error, ErrIllegalState);
 			return false;
 		}
 	private:
+		///\brief print attribute value string
+		///\param [in] src pointer to attribute value string to print
+		///\param [in] srcsize size of src in bytes
+		///\param [in,out] buf buffer to print to
+		///\param [in] characters to escape
+		static void printToBufferAttributeValue( const char* src, size_type srcsize, BufferType& buf)
+		{
+			CharIterator itr( src, srcsize);
+			textwolf::TextScanner<CharIterator,AppCharset> ts( itr);
+
+			textwolf::UChar ch;
+			IOCharset::print( '\'', buf);
+			while ((ch = ts.chr()) != 0)
+			{
+				if (ch == '&') ThisFilterBase::printToBuffer( "&amp;", 5, buf);
+				else if (ch == '<') ThisFilterBase::printToBuffer( "&lt;", 4, buf);
+				else if (ch == '>') ThisFilterBase::printToBuffer( "&gt;", 4, buf);
+				else if (ch == '&') ThisFilterBase::printToBuffer( "&amp;", 5, buf);
+				else if (ch == '\'') ThisFilterBase::printToBuffer( "&apos;", 6, buf);
+				else if (ch == '\"') ThisFilterBase::printToBuffer( "&quot;", 6, buf);
+				else IOCharset::print( ch, buf);
+				++ts;
+			}
+			IOCharset::print( '\'', buf);
+		}
+
+		///\brief print content value string
+		///\param [in] src pointer to content string to print
+		///\param [in] srcsize size of src in bytes
+		///\param [in,out] buf buffer to print to
+		///\param [in] characters to escape
+		static void printToBufferContent( const char* src, size_type srcsize, BufferType& buf)
+		{
+			CharIterator itr( src, srcsize);
+			textwolf::TextScanner<CharIterator,AppCharset> ts( itr);
+
+			textwolf::UChar ch;
+			while ((ch = ts.chr()) != 0)
+			{
+				if (ch == '&') ThisFilterBase::printToBuffer( "&amp;", 5, buf);
+				else if (ch == '<') ThisFilterBase::printToBuffer( "&lt;", 4, buf);
+				else if (ch == '>') ThisFilterBase::printToBuffer( "&gt;", 4, buf);
+				else if (ch == '&') ThisFilterBase::printToBuffer( "&amp;", 5, buf);
+				else IOCharset::print( ch, buf);
+				++ts;
+			}
+			IOCharset::print( ' ', buf);
+		}
+
+		static size_type getAlign( size_type n)
+		{
+			return (sizeof(size_type) - (n & (sizeof(size_type)-1))) & (sizeof(size_type)-1);
+		}
+
+		bool pushTag( const void* element, size_type elementsize)
+		{
+			size_type align = getAlign( elementsize);
+			if (align + elementsize + sizeof(size_type) >= m_tagstksize-m_tagstkpos) return false;
+			std::memcpy( m_tagstk + m_tagstkpos, element, elementsize);
+			m_tagstkpos += elementsize + align + sizeof( size_type);
+			*(size_type*)(m_tagstk+m_tagstkpos-sizeof( size_type)) = elementsize;
+			return true;
+		}
+
+		bool topTag( const void*& element, size_type& elementsize)
+		{
+			if (m_tagstkpos < sizeof( size_type)) return false;
+			elementsize = *(size_type*)(m_tagstk+m_tagstkpos-sizeof( size_type));
+			size_type align = getAlign( elementsize);
+			if (align + elementsize + sizeof(size_type) > m_tagstkpos) return false;
+			element = m_tagstk + m_tagstkpos - elementsize + align + sizeof( size_type);
+			return true;
+		}
+
+		void popTag()
+		{
+			size_type elementsize = *(size_type*)(m_tagstk+m_tagstkpos-sizeof( size_type));
+			size_type align = getAlign( elementsize);
+			m_tagstkpos -= elementsize + align + sizeof( size_type);
+			if (m_tagstkpos >= m_tagstksize) throw std::logic_error( "element stack is corrupt");
+		}
+	private:
+		char* m_tagstk;			///< tag stack buffer
+		size_type m_tagstksize;		///< size of tag stack buffer in bytes
+		size_type m_tagstkpos;		///< used size of tag stack buffer in bytes
 		XMLState m_xmlstate;		///< current state of output
 	};
 
@@ -141,9 +275,10 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		enum ErrorCodes
 		{
 			Ok,			///< no error
+			ErrBufferTooSmall,	///< output buffer is too small to hold the element
 			ErrBrokenInputStream,	///< unexpected EoD
 			ErrXML,			///< error in input XML
-			ErrUnexpectedState	///< something unexpected happened
+			ErrUnexpectedState	///< something unexpected happened,
 		};
 		///\class EndOfMessageException
 		///\brief Exception thrown when EoM is reached and more data has to be read from input
@@ -177,18 +312,13 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 			}
 		};
 
-		typedef textwolf::XMLScanner<Iterator,IOCharset,AppCharset> XMLScanner;
-		char m_outputbuf;			///< dummy buffer of size 1
-		Iterator m_src;				///< source iterator
-		XMLScanner* m_scanner;			///< XML scanner
-		typename XMLScanner::iterator m_itr;	///< input iterator created from scanned XML from source iterator
-		typename XMLScanner::iterator m_end;	///< end of data (EoD) pointer
+		typedef textwolf::XMLScanner<Iterator,IOCharset,AppCharset,BufferType> XMLScanner;
 
 		///\brief Constructor
-		InputFilter() :m_scanner(0)
+		InputFilter() :m_outputbuf(1),m_scanner(0)
 		{
 			m_src = Iterator(this);
-			m_scanner = new XMLScanner( m_src, &m_outputbuf, 1);
+			m_scanner = new XMLScanner( m_src, m_outputbuf);
 			m_itr = m_scanner->begin();
 			m_end = m_scanner->end();
 		}
@@ -202,12 +332,18 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		///\brief Implementation of protocol::InputFilter::getNext( ElementType*, void*, size_type, size_type*)
 		virtual bool getNext( ElementType* type, void* buffer, size_type buffersize, size_type* bufferpos)
 		{
-			m_scanner->setOutputBuffer( (char*)buffer + *bufferpos, buffersize - *bufferpos);
+			BufferType buf( (char*)buffer + *bufferpos, buffersize - *bufferpos);
+			m_scanner->setOutputBuffer( buf);
 			try
 			{
 				setState( Open);
 				++m_itr;
-				*bufferpos += m_itr->size();
+				if (buf.overflow())
+				{
+					setState( protocol::InputFilter::Error, ErrBufferTooSmall);
+					return false;
+				}
+				*bufferpos += buf.size();
 				switch (m_itr->type())
 				{
 					case textwolf::XMLScannerBase::None: setState( Error, ErrBrokenInputStream); return false;
@@ -240,6 +376,12 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 			setState( Error, ErrUnexpectedState);
 			return false;
 		}
+	private:
+		BufferType m_outputbuf;			///< dummy buffer of size 1
+		Iterator m_src;				///< source iterator
+		XMLScanner* m_scanner;			///< XML scanner
+		typename XMLScanner::iterator m_itr;	///< input iterator created from scanned XML from source iterator
+		typename XMLScanner::iterator m_end;	///< end of data (EoD) pointer
 	};
 };
 
@@ -248,6 +390,8 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 ///\brief Input filter for the XML header only (returns EoD after the header)
 struct XmlHeaderInputFilter :public XmlFilter<textwolf::charset::IsoLatin1,textwolf::charset::IsoLatin1>::InputFilter
 {
+	typedef textwolf::StaticBuffer BufferType;
+
 	///\brief Constructor
 	XmlHeaderInputFilter() {}
 	///\brief Destructor
@@ -256,12 +400,18 @@ struct XmlHeaderInputFilter :public XmlFilter<textwolf::charset::IsoLatin1,textw
 	///\brief Implementation of protocol::InputFilter::getNext( ElementType*, void*, size_type, size_type*)
 	virtual bool getNext( ElementType* type, void* buffer, size_type buffersize, size_type* bufferpos)
 	{
-		m_scanner->setOutputBuffer( (char*)buffer + *bufferpos, buffersize - *bufferpos);
+		BufferType buf( (char*)buffer + *bufferpos, buffersize - *bufferpos);
+		m_scanner->setOutputBuffer( buf);
 		try
 		{
 			setState( Open);
 			++m_itr;
-			*bufferpos += m_itr->size();
+			if (buf.overflow())
+			{
+				setState( protocol::InputFilter::Error, ErrBufferTooSmall);
+				return false;
+			}
+			*bufferpos += buf.size();
 			switch (m_itr->type())
 			{
 				case textwolf::XMLScannerBase::None: setState( Error, ErrBrokenInputStream); return false;

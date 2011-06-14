@@ -198,11 +198,11 @@ protected:
 };
 
 typedef ::testing::Types<
+	OneLine<1,1>,
 	OneLine<200,200>,
 	Empty<1,1>,
 	OneEmptyLine<1,1>,
 	OneOneCharLine<1,1>,
-	OneLine<1,1>,
 	Random<1,1,2000>,
 	Empty<2,2>,
 	OneEmptyLine<2,2>,

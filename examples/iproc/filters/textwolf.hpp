@@ -59,7 +59,9 @@ namespace textwolf {
 }//namespace
 #else
 #include <stdint.h>
-typedef uint32_t UChar;
+namespace textwolf {
+	typedef uint32_t UChar;
+}//namespace
 #endif
 #endif
 
@@ -150,24 +152,30 @@ public:
 	///\brief Constructor
 	explicit StaticBuffer( unsigned int n)
 		:m_pos(0),m_size(n),m_ar(0),m_allocated(true) {m_ar=new char[n];}
+
 	///\brief Constructor
 	StaticBuffer( char* p, unsigned int n)
-		:m_pos(0),m_size(n),m_ar(p),m_allocated(false) {}
+		:m_pos(0),m_size(n),m_ar(p),m_allocated(false),m_overflow(false) {}
+
 	///\brief Destructor
 	~StaticBuffer()
 		{if (m_allocated) delete [] m_ar;}
 
 	///\brief Clear the buffer content
-	void clear()				{m_pos=0;}
+	void clear()				{m_pos=0;m_overflow=false;}
+
 	///\brief Append one character
 	///\param[in] ch the character to append
-	void push_back( char ch)		{if (m_pos<m_size) m_ar[m_pos++]=ch;}
+	void push_back( char ch)		{if (m_pos<m_size) m_ar[m_pos++]=ch; else m_overflow=true;}
+
 	///\brief Return the number of characters in the buffer
 	///\return the number of characters (bytes)
 	size_type size() const			{return m_pos;}
+
 	///\brief Return the buffer content as 0-terminated string
 	///\return the C-string
 	const char* ptr() const			{return m_ar;}
+
 	///\brief Shrinks the size of the buffer or expands it with c
 	///\param [in] n new size of the buffer
 	///\param [in] c fill character if n bigger than the current fill size
@@ -183,21 +191,34 @@ public:
 			while (n>m_pos) push_back(c);
 		}
 	}
+
+	///\brief random access of element
+	///\param [in] ii
+	///\return the character at this position
 	char operator []( unsigned int ii) const
 	{
 		if (ii > m_pos) throw exception( DimOutOfRange);
 		return m_ar[ii];
 	}
+
+	///\brief random access of element reference
+	///\param [in] ii
+	///\return the reference to the character at this position
 	char& at( unsigned int ii) const
 	{
 		if (ii > m_pos) throw exception( DimOutOfRange);
 		return m_ar[ii];
 	}
+
+	///\brief check for array bounds write
+	///\return true if a push_back would have caused an array bounds write
+	bool overflow() const			{return m_overflow;}
 private:
 	size_type m_pos;			///< current cursor position of the buffer (number of added characters)
 	size_type m_size;			///< allocation size of the buffer in bytes
 	char* m_ar;				///< buffer content
 	bool m_allocated;			///< true, if the buffer is allocated by this class and not passed by constructor
+	bool m_overflow;			///< true, if an array bounds write would have happened with push_back
 };
 
 /*! @} */

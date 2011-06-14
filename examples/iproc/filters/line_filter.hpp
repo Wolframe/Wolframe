@@ -15,33 +15,37 @@ namespace filter {
 template <class IOCharset, class AppCharset=textwolf::charset::UTF8>
 struct LineFilter :FilterBase<IOCharset, AppCharset>
 {
-	typedef typename FilterBase<IOCharset, AppCharset>::FormatOutputBase FormatOutputBase;
+	typedef FilterBase<IOCharset, AppCharset> ThisFilterBase;
+	typedef typename protocol::FormatOutput::ElementType ElementType;
+	typedef typename protocol::FormatOutput::size_type size_type;
+	typedef textwolf::StaticBuffer BufferType;
 
 	///\class FormatOutput
-	struct FormatOutput :public FormatOutputBase
+	struct FormatOutput :public protocol::FormatOutput
 	{
 		const char* m_eoln;
 
 		///\brief Constructor
-		FormatOutput( unsigned int bufsize=128, const char* eoln="\r\n") :FormatOutputBase(bufsize),m_eoln(eoln){}
+		///\param [in] eoln end of line marker
+		FormatOutput( const char* eoln="\r\n") :m_eoln(eoln){}
 
 		///\brief Implementation of protocol::InputFilter::print(ElementType,const void*,size_type)
 		///\param [in] type type of the element to print
 		///\param [in] element pointer to the element to print
 		///\param [in] elementsize size of the element to print in bytes
-		virtual bool print( protocol::FormatOutput::ElementType type, const void* element, protocol::FormatOutput::size_type elementsize)
+		virtual bool print( ElementType type, const void* element, size_type elementsize)
 		{
-			if (type == protocol::FormatOutput::Value)
+			if (type == Value)
 			{
-				protocol::FormatOutput::size_type bufpos=FormatOutputBase::m_bufpos;
-				if (!FormatOutputBase::printElem( (const char*)element, elementsize, bufpos)) return false;
-				if (!FormatOutputBase::printElem( m_eoln, bufpos)) return false;
-
-				if (!FormatOutputBase::ContentOutputBlock::print( FormatOutputBase::m_buf+FormatOutputBase::m_bufpos, bufpos-FormatOutputBase::m_bufpos))
+				BufferType buf( rest(), restsize());
+				ThisFilterBase::printToBuffer( (const char*)element, elementsize, buf);
+				ThisFilterBase::printToBuffer( (const char*)element, elementsize, buf);
+				if (buf.overflow())
 				{
-					protocol::FormatOutput::setState( protocol::FormatOutput::EndOfBuffer);
+					setState( EndOfBuffer);
 					return false;
 				}
+				incPos( buf.size());
 			}
 			return true;
 		}
@@ -57,25 +61,33 @@ struct LineFilter :FilterBase<IOCharset, AppCharset>
 		///\brief Implementation of protocol::InputFilter::getNext( ElementType*, void*, size_type, size_type*)
 		virtual bool getNext( ElementType* type, void* buffer, size_type buffersize, size_type* bufferpos)
 		{
+			BufferType buf( (char*)buffer + *bufferpos, buffersize - *bufferpos);
 			setState( Open);
 			*type = Value;
 			CharIterator itr( (char*)ptr(), size());
 			textwolf::TextScanner<CharIterator,AppCharset> ts( itr);
 
 			textwolf::UChar ch;
-			size_type pos = 0;
 			while ((ch = *itr) != 0)
 			{
 				if (ch == '\r') continue;
 				if (ch == '\n')
 				{
+					*bufferpos += buf.size();
 					++itr;
-					*bufferpos += pos;
 					skip( itr.pos());
 					return true;
 				}
-				size_type nn = IOCharset::print( ch, (char*)buffer+*bufferpos, buffersize-*bufferpos);
-				if (nn > 0) pos += nn; else return false;
+				else
+				{
+					AppCharset::print( ch, buf);
+					if (buf.overflow())
+					{
+						setState( protocol::InputFilter::Error, ErrBufferTooSmall);
+						return false;
+					}
+					++itr;
+				}
 			}
 			if (!gotEoD()) setState( EndOfMessage);
 			return false;

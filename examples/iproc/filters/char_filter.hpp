@@ -11,19 +11,20 @@ namespace filter {
 template <class IOCharset, class AppCharset=textwolf::charset::UTF8>
 struct CharFilter :FilterBase<IOCharset, AppCharset>
 {
-	typedef typename FilterBase<IOCharset, AppCharset>::FormatOutputBase FormatOutputBase;
+	typedef FilterBase<IOCharset, AppCharset> ThisFilterBase;
+	typedef typename protocol::FormatOutput::ElementType ElementType;
+	typedef typename protocol::FormatOutput::size_type size_type;
+	typedef textwolf::StaticBuffer BufferType;
 
-	struct FormatOutput :public FormatOutputBase
-	{
-		FormatOutput( unsigned int bufsize=32) :FormatOutputBase(bufsize){}
-	};
-
+	///\class InputFilter
+	///\brief input filter for single characters
 	struct InputFilter :public protocol::InputFilter
 	{
 		enum ErrorCodes {Ok=0,ErrBufferTooSmall=1};
 
 		virtual bool getNext( ElementType* type, void* buffer, size_type buffersize, size_type* bufferpos)
 		{
+			BufferType buf( (char*)buffer + *bufferpos, buffersize - *bufferpos);
 			setState( Open);
 			*type = Value;
 			CharIterator itr( (char*)ptr(), size());
@@ -32,17 +33,39 @@ struct CharFilter :FilterBase<IOCharset, AppCharset>
 			textwolf::UChar ch;
 			if ((ch = *itr) != 0)
 			{
-				size_type nn = IOCharset::print( ch, (char*)buffer+*bufferpos, buffersize-*bufferpos);
-				if (nn > 0)
+				AppCharset::print( ch, buf);
+				if (buf.overflow())
 				{
-					*bufferpos += nn;
-					++itr;
-					skip( itr.pos());
-					return true;
+					setState( protocol::InputFilter::Error, ErrBufferTooSmall);
+					return false;
 				}
+				*bufferpos += buf.size();
+				++itr;
+				skip( itr.pos());
+				return true;
 			}
 			if (!gotEoD()) setState( EndOfMessage);
 			return false;
+		}
+	};
+	///\class FormatOutput
+	///\brief format output filter for single characters
+	struct FormatOutput :public protocol::FormatOutput
+	{
+		virtual bool print( ElementType type, const void* element, size_type elementsize)
+		{
+			if (type == Value)
+			{
+				BufferType buf( rest(), restsize());
+				ThisFilterBase::printToBuffer( (const char*)element, elementsize, buf);
+				if (buf.overflow())
+				{
+					setState( EndOfBuffer);
+					return false;
+				}
+				incPos( buf.size());
+			}
+			return true;
 		}
 	};
 };
