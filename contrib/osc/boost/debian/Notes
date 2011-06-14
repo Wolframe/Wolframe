@@ -1,0 +1,42 @@
+	Thread Support
+	--------------
+
+All debian libraries are supposed to be built with _REENTRANT defined
+(policy 10.2).  We thus use "<define>_REENTRANT" on the bjam command
+line in debian/rules.
+
+
+	Documentation
+	-------------
+
+Generate the list of documentation files using wget going through
+localhost to get the source tree
+
+    path=boost_1_37_0
+    cd ~/public_html
+    ... unpack boost
+    cd /tmp
+    wget -r --no-parent --domains=localhost \
+	http://localhost/~steve/$path/index.html
+    cd localhost/....
+    rm -rf boost
+    for f in `find * -type f`; do \
+        test -f ~/public_html/$path/$f && echo $f;
+    done > df1
+    find * -name '*.htm' -or -name '*.html' > df2
+    cat df1 df2 | sort | uniq > documentation-files
+
+* need to symlink .../HTML/boost to /usr/include/boost; when put
+  the symlink into the deb, it got converted to a directory during
+  installation; use dh_link to do it
+
+* use -Nlibboost-doc with dh_compress to inhibit compressing files in the HTML
+  tree
+
+
+	Examples
+	--------
+
+List of example directories obtained using
+
+    find * -name 'example*' -type d | grep -v '/example.*/example' > debian/example-files

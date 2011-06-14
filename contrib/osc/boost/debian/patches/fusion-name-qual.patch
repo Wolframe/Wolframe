@@ -1,0 +1,22 @@
+--- boost1.42-1.42.0.orig/boost/fusion/container/map/detail/deref_data_impl.hpp
++++ boost1.42-1.42.0/boost/fusion/container/map/detail/deref_data_impl.hpp
+@@ -39,7 +39,7 @@
+             static type
+             call(It const& it)
+             {
+-                return deref(it).second;
++	         return boost::fusion::deref(it).second;
+             }
+         };
+     };
+--- boost1.42-1.42.0.orig/boost/fusion/container/map/detail/deref_impl.hpp
++++ boost1.42-1.42.0/boost/fusion/container/map/detail/deref_impl.hpp
+@@ -36,7 +36,7 @@
+             static type
+             call(It const& it)
+             {
+-                return at<typename It::index>(it.seq->get_data());
++	         return boost::fusion::at<typename It::index>(it.seq->get_data());
+             }
+         };
+     };

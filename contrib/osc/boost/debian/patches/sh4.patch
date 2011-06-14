@@ -1,0 +1,17 @@
+Add support for Renesas SH CPU.
+Patch based on initial work by Nobuhiro Iwamatsu
+See http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=535930
+
+--- boost1.42-1.42.0.orig/boost/smart_ptr/detail/sp_has_sync.hpp
++++ boost1.42-1.42.0/boost/smart_ptr/detail/sp_has_sync.hpp
+@@ -36,6 +36,10 @@
+ #undef BOOST_SP_HAS_SYNC
+ #endif
+ 
++#if defined( __sh__ )
++#undef BOOST_SP_HAS_SYNC
++#endif
++
+ #if defined( __sparc__ )
+ #undef BOOST_SP_HAS_SYNC
+ #endif
