@@ -160,7 +160,7 @@ build: build-stamp
 build-stamp: $(bjam) user-config.jam
 	dh_testdir
      
-	$(JAM) -j8 $(BJAMFLAGS) --without-python
+	$(JAM) $(BJAMFLAGS) --without-python
 
 	touch build-stamp
 
