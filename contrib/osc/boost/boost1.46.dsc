@@ -9,7 +9,7 @@ Homepage: http://www.boost.org/
 Standards-Version: 3.9.1
 Vcs-Browser: http://svn.debian.org/wsvn/pkg-boost/boost/trunk/
 Vcs-Svn: svn://svn.debian.org/svn/pkg-boost/boost/trunk
-Build-Depends: debhelper (>= 8), zlib1g-dev, libbz2-dev, libicu-dev, bison, flex, docbook-to-man, help2man, xsltproc, doxygen
+Build-Depends: debhelper (>= 4.1.16), zlib1g-dev, libbz2-dev, libicu-dev, bison, flex, docbook-to-man, help2man, xsltproc, doxygen
 Build-Conflicts: libopenmpi-dev (= 1.3.2-2)
 Original-Maintainer: Debian Boost Team <pkg-boost-devel@lists.alioth.debian.org>
 Files: 

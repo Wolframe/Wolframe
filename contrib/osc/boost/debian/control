@@ -5,7 +5,7 @@ Priority: optional
 Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
 XSBC-Original-Maintainer: Debian Boost Team <pkg-boost-devel@lists.alioth.debian.org>
 Uploaders: Steve M. Robbins <smr@debian.org>, Domenico Andreoli <cavok@debian.org>
-Build-Depends: debhelper (>= 8), 
+Build-Depends: debhelper (>= 4.1.16), 
  zlib1g-dev, libbz2-dev, libicu-dev, 
  bison, flex, docbook-to-man, help2man, xsltproc, doxygen
 Build-Conflicts: libopenmpi-dev (= 1.3.2-2)
