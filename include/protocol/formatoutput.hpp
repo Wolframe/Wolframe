@@ -46,7 +46,7 @@ namespace protocol {
 /// The intention of this class is to get a thin binding of the scripting language
 /// in the application layer to the network output.
 ///
-	struct FormatOutput :public ContentOutputBlock
+	struct FormatOutput :public OutputBlock
 {
 	/// \enum State
 	/// \brief State of the output used in the application processor iterating loop to decide wheter to yield execution or not.
@@ -75,7 +75,7 @@ namespace protocol {
 	/// \brief Constructor
 	/// \param [in] op print function pointer
 	FormatOutput()
-		:m_errorCode(0),m_state(Open){}
+		:OutputBlock(0,0),m_errorCode(0),m_state(Open){}
 
 	virtual ~FormatOutput(){}
 

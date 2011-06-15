@@ -18,7 +18,7 @@ struct LineFilter :FilterBase<IOCharset, AppCharset>
 	typedef FilterBase<IOCharset, AppCharset> ThisFilterBase;
 	typedef typename protocol::FormatOutput::ElementType ElementType;
 	typedef typename protocol::FormatOutput::size_type size_type;
-	typedef textwolf::StaticBuffer BufferType;
+	typedef protocol::EscapingBuffer<textwolf::StaticBuffer> BufferType;
 
 	///\class FormatOutput
 	struct FormatOutput :public protocol::FormatOutput

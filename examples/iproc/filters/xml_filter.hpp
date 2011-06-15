@@ -24,7 +24,7 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 	typedef FilterBase<IOCharset, AppCharset> ThisFilterBase;
 	typedef typename protocol::FormatOutput::ElementType ElementType;
 	typedef typename protocol::FormatOutput::size_type size_type;
-	typedef textwolf::StaticBuffer BufferType;
+	typedef protocol::EscapingBuffer<textwolf::StaticBuffer> BufferType;
 
 	///\class FormatOutput
 	///\brief format output filter for XML
@@ -315,7 +315,7 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		typedef textwolf::XMLScanner<Iterator,IOCharset,AppCharset,BufferType> XMLScanner;
 
 		///\brief Constructor
-		InputFilter() :m_outputbuf(1),m_scanner(0)
+		InputFilter() :m_outputbuf(0,0),m_scanner(0)
 		{
 			m_src = Iterator(this);
 			m_scanner = new XMLScanner( m_src, m_outputbuf);
@@ -390,7 +390,7 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 ///\brief Input filter for the XML header only (returns EoD after the header)
 struct XmlHeaderInputFilter :public XmlFilter<textwolf::charset::IsoLatin1,textwolf::charset::IsoLatin1>::InputFilter
 {
-	typedef textwolf::StaticBuffer BufferType;
+	typedef protocol::EscapingBuffer<textwolf::StaticBuffer> BufferType;
 
 	///\brief Constructor
 	XmlHeaderInputFilter() {}

@@ -28,7 +28,7 @@ template <class IOCharset, class AppCharset>
 struct FilterBase
 {
 	typedef std::size_t size_type;
-	typedef textwolf::StaticBuffer BufferType;
+	typedef protocol::EscapingBuffer<textwolf::StaticBuffer> BufferType;
 
 	///\param [in] src pointer to string to print
 	///\param [in] srcsize size of src in bytes
