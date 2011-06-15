@@ -236,8 +236,8 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		///\param [in,out] buf buffer to print to
 		static void printToBufferContent( const char* src, size_type srcsize, BufferType& buf)
 		{
-			static const char* estr[] = {"&lt;","&gt;","&amp;"};
-			static const char* echr = "<>&";
+			static const char* estr[] = {"&lt;","&gt;","&amp;","&nbsp;"};
+			static const char* echr = "<>& ";
 			printToBufferSubstChr( src, srcsize, buf, echr, estr);			
 		}
 #endif
