@@ -56,7 +56,25 @@ install: build
 
 	# Add here commands to install the package
 	# The DESTDIR Has To Be Exactly  /usr/src/packages/BUILD/debian/<nameOfPackage>
-	$(MAKE) install $(WOLFRAME_PARAMS) sysconfdir=/usr/src/packages/BUILD/debian/wolframe/etc DESTDIR=/usr/src/packages/BUILD/debian/wolframe
+
+	# main package
+	$(MAKE) install $(WOLFRAME_PARAMS) \
+		sysconfdir=/usr/src/packages/BUILD/debian/wolframe/etc \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe
+	cd clients; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
+		cd ..
+
+	# client package
+	cd clients; $(MAKE) install $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-client; \
+		cd ..
+
+	# documentation package
+#	cd docs; $(MAKE) install $(WOLFRAME_PARAMS) \
+#		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-doc; \
+#		cd ..
+	
 	# --- end custom part for installing
 
 # Build architecture-independent files here.
@@ -68,7 +86,7 @@ binary-arch: build install
 	dh_testdir
 	dh_testroot
 #	dh_installdebconf
-	dh_installdocs
+#	dh_installdocs
 	dh_installexamples
 	dh_installmenu
 #	dh_installlogrotate
