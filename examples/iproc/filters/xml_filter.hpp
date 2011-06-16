@@ -177,7 +177,6 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 			return false;
 		}
 	private:
-#if 0
 		///\brief print a character substitute or the character itself
 		///\param [in,out] buf buffer to print to
 		///\param [in] nof_echr number of elements in echr and estr
@@ -185,12 +184,12 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		///\param [in] estr ASCII strings to substitute with (array parallel to echr)
 		static void printEsc( char ch, BufferType& buf, unsigned int nof_echr, const char* echr, const char** estr)
 		{
-			const char* cc = memchr( echr, ch, nof_echr);
+			const char* cc = (const char*)memchr( echr, ch, nof_echr);
 			if (cc) 
 			{
-				unsinged int ii = 0;
-				const char* cc = estr[ cc-echr];
-				while (cc[ii]) IOCharset::print( cc[ii++], buf);
+				unsigned int ii = 0;
+				const char* tt = estr[ cc-echr];
+				while (cc[ii]) IOCharset::print( tt[ii++], buf);
 			}
 			else
 			{
@@ -232,11 +231,12 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		{
 			enum {nof_echr = 12};
 			static const char* estr[nof_echr] = {"&lt;", "&gt;", "&apos;", "&quot;", "&amp;", "&#0;", "&#8;", "&#9;", "&#10;", "&#13;", "&nbsp;"};
-			static const echr[nof_echr] = "<>'\"&\0\b\t\n\r ";
+			static const char echr[nof_echr+1] = "<>'\"&\0\b\t\n\r ";
 			IOCharset::print( '\'', buf);
 			printToBufferSubstChr( src, srcsize, buf, nof_echr, echr, estr);
 			IOCharset::print( '\'', buf);
 		}
+
 		///\brief print content value string
 		///\param [in] src pointer to content string to print
 		///\param [in] srcsize size of src in bytes
@@ -245,55 +245,8 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		{
 			enum {nof_echr = 10};
 			static const char* estr[nof_echr] = {"&lt;", "&gt;", "&amp;", "&#0;", "&#8;", "&#9;", "&#10;", "&#13;", "&nbsp;"};
-			static const echr[nof_echr] = "<>&\0\b\t\n\r ";
+			static const char echr[nof_echr+1] = "<>&\0\b\t\n\r ";
 			printToBufferSubstChr( src, srcsize, buf, nof_echr, echr, estr);			
-		}
-#endif
-		///\brief print attribute value string
-		///\param [in] src pointer to attribute value string to print
-		///\param [in] srcsize size of src in bytes
-		///\param [in,out] buf buffer to print to
-		static void printToBufferAttributeValue( const char* src, size_type srcsize, BufferType& buf)
-		{
-			CharIterator itr( src, srcsize);
-			textwolf::TextScanner<CharIterator,AppCharset> ts( itr);
-
-			textwolf::UChar ch;
-			IOCharset::print( '\'', buf);
-			while ((ch = ts.chr()) != 0)
-			{
-				if (ch == '&') ThisFilterBase::printToBuffer( "&amp;", 5, buf);
-				else if (ch == '<') ThisFilterBase::printToBuffer( "&lt;", 4, buf);
-				else if (ch == '>') ThisFilterBase::printToBuffer( "&gt;", 4, buf);
-				else if (ch == '&') ThisFilterBase::printToBuffer( "&amp;", 5, buf);
-				else if (ch == '\'') ThisFilterBase::printToBuffer( "&apos;", 6, buf);
-				else if (ch == '\"') ThisFilterBase::printToBuffer( "&quot;", 6, buf);
-				else IOCharset::print( ch, buf);
-				++ts;
-			}
-			IOCharset::print( '\'', buf);
-		}
-
-		///\brief print content value string
-		///\param [in] src pointer to content string to print
-		///\param [in] srcsize size of src in bytes
-		///\param [in,out] buf buffer to print to
-		static void printToBufferContent( const char* src, size_type srcsize, BufferType& buf)
-		{
-			CharIterator itr( src, srcsize);
-			textwolf::TextScanner<CharIterator,AppCharset> ts( itr);
-
-			textwolf::UChar ch;
-			while ((ch = ts.chr()) != 0)
-			{
-				if (ch == '&') ThisFilterBase::printToBuffer( "&amp;", 5, buf);
-				else if (ch == '<') ThisFilterBase::printToBuffer( "&lt;", 4, buf);
-				else if (ch == '>') ThisFilterBase::printToBuffer( "&gt;", 4, buf);
-				else if (ch == '&') ThisFilterBase::printToBuffer( "&amp;", 5, buf);
-				else IOCharset::print( ch, buf);
-				++ts;
-			}
-			IOCharset::print( ' ', buf);
 		}
 
 		static size_type getAlign( size_type n)

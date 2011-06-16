@@ -43,11 +43,11 @@
 #include <iostream>
 #include <limits>
 
-///\typedef UChar
-///\brief Unicode character type
 #ifdef BOOST_VERSION
 #include <boost/cstdint.hpp>
 namespace textwolf {
+	///\typedef UChar
+	///\brief Unicode character type
 	typedef boost::uint32_t UChar;
 }//namespace
 #else
@@ -55,11 +55,15 @@ namespace textwolf {
 #pragma warning(disable:4290)
 #include <BaseTsd.h>
 namespace textwolf {
+	///\typedef UChar
+	///\brief Unicode character type
 	typedef DWORD32 UChar;
 }//namespace
 #else
 #include <stdint.h>
 namespace textwolf {
+	///\typedef UChar
+	///\brief Unicode character type
 	typedef uint32_t UChar;
 }//namespace
 #endif
@@ -901,9 +905,8 @@ public:
 		ErrUnexpectedEndOfText,			///< unexpected end of text in the middle of the XML definition
 		ErrOutputBufferTooSmall,		///< scaned element in XML to big to fit in the buffer provided for it
 		ErrSyntaxToken,				///< a specific string expected as token in XML but does not match
-		ErrStringNotTerminated,			///< single or double quoted string in XML not terminated on the same line
-		ErrEntityEncodesCntrlChar,		///< control character < 32 encoded as entity. This is rejected
-		ErrUndefinedCharacterEntity,		///< symbolic character entity is not defined in the entity map defined by the XML scanner caller
+		ErrStringNotTerminated,			///< attribute string in XML not terminated on the same line
+		ErrUndefinedCharacterEntity,		///< named entity is not defined in the entity map 
 		ErrExpectedTagEnd,			///< expected end of tag
 		ErrExpectedEqual,			///< expected equal in tag attribute definition
 		ErrExpectedTagAttribute,		///< expected tag attribute
@@ -917,11 +920,11 @@ public:
 	///\return the error code as string
 	static const char* getErrorString( Error ee)
 	{
-		enum {NofErrors=15};
+		enum {NofErrors=14};
 		static const char* sError[NofErrors]
 			= {0,"ExpectedOpenTag", "ExpectedXMLTag","UnexpectedEndOfText",
 				"OutputBufferTooSmall","SyntaxToken","StringNotTerminated",
-				"EntityEncodesCntrlChar","UndefinedCharacterEntity","ExpectedTagEnd",
+				"UndefinedCharacterEntity","ExpectedTagEnd",
 				"ExpectedEqual", "ExpectedTagAttribute","ExpectedCDATATag","Internal",
 				"UnexpectedEndOfInput"
 		};
@@ -1273,11 +1276,6 @@ public:
 					fallbackEntity();
 					return true;
 				}
-				if (tokstate.value < 32)
-				{
-					error = ErrEntityEncodesCntrlChar;
-					return false;
-				}
 				push( (UChar)tokstate.value);
 				tokstate.init( TokState::ParsingToken);
 				src.skip();
@@ -1552,11 +1550,6 @@ public:
 			else
 			{
 				UChar ch = itr->second;
-				if (ch < 32)
-				{
-					error = ErrEntityEncodesCntrlChar;
-					return false;
-				}
 				push( ch);
 				return true;
 			}
