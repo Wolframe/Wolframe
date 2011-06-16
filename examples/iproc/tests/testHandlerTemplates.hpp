@@ -98,7 +98,6 @@ int runTestIO( char* in, std::string& out, Connection& connection)
 				std::size_t ii,size = netop.size();
 				for (ii=0; ii<size; ii++)
 				{
-/*[-]*/printf( "OUT %.2x\n", ch);
 					out.push_back( data[ ii]);
 				}
 			}

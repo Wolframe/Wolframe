@@ -36,7 +36,6 @@ Project Wolframe.
 
 #include "iterators.hpp"
 #include <stdexcept>
-/*[-]*/#include <stdio.h>
 
 namespace _Wolframe {
 namespace protocol {
@@ -251,7 +250,7 @@ public:
 	///\param [in] nn the number of bytes to skip
 	bool incPos( size_type nn)
 	{
-		if (pos()+nn >= size()) return false;
+		if (pos()+nn > size()) return false;
 		setPos( pos() + nn);
 		return true;
 	}
@@ -299,21 +298,20 @@ public:
 	///\brief redirect to BufferType::push_back(char) with escaping of LF DOT as LF DOT DOT
 	void push_back( char ch)
 	{
-/*[-]*/printf( "PUSH %.2x\n", ch);
 		BufferType::push_back( ch);
-		if (m_state == SRC)
+		if (ch == '\n')
 		{
-			if (ch == '\n') m_state = LF;
+			m_state = LF;
 		}
-		if (ch == '.')
+		else if (ch == '.')
 		{
 			if (m_state == LF)
 			{
 				m_state = LF_DOT;
 				BufferType::push_back( ch);
 			}
-			m_state = SRC;
 		}
+		m_state = SRC;
 	}
 private:
 	State m_state;		///< the current state of escaping LF DOT as LF DOT DOT

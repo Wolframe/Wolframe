@@ -57,8 +57,8 @@ struct TestConfiguration :public lua::Configuration
 	{
 		boost::property_tree::ptree pt;
 		pt.put("main", "test.lua");
-		pt.put("input_buffer", boost::lexical_cast<std::string>( bufferSizeOutput));
-		pt.put("output_buffer", boost::lexical_cast<std::string>( bufferSizeInput));
+		pt.put("input_buffer", boost::lexical_cast<std::string>( bufferSizeInput));
+		pt.put("output_buffer", boost::lexical_cast<std::string>( bufferSizeOutput));
 		setCanonicalPathes( ".");
 		if (!config::ConfigurationParser::parse<lua::Configuration>( *this, pt, "test"))
 			throw std::logic_error( "Bad Configuration");
@@ -182,7 +182,7 @@ protected:
 		input.append( "run\r\n");
 		expected.append( "OK expecting command\r\n\r\n");
 
-		input.append( test.content);
+		input.append( escape( test.content));
 		expected.append( escape( test.content));
 
 		input.append( ".\r\n");
@@ -203,7 +203,7 @@ typedef ::testing::Types<
 	Empty<1,1>,
 	OneEmptyLine<1,1>,
 	OneOneCharLine<1,1>,
-	Random<1,1,2000>,
+	Random<1,2,2000>,
 	Empty<2,2>,
 	OneEmptyLine<2,2>,
 	OneOneCharLine<2,2>,
@@ -223,7 +223,7 @@ typedef ::testing::Types<
 	OneEmptyLine<1,2>,
 	OneOneCharLine<1,2>,
 	OneLine<1,2>,
-	Random<1,2,1000>,
+	Random<3,2,1000>,
 	Empty<2,3>,
 	OneEmptyLine<2,3>,
 	OneOneCharLine<2,3>,
@@ -236,7 +236,7 @@ typedef ::testing::Types<
 	OneEmptyLine<2,1>,
 	OneOneCharLine<2,1>,
 	OneLine<2,1>,
-	Random<2,1,1000>,
+	Random<1,3,1000>,
 	Empty<3,2>,
 	OneEmptyLine<3,2>,
 	OneOneCharLine<3,2>,
@@ -267,6 +267,7 @@ TYPED_TEST( iprocHandlerFixture, ExpectedResult )
 			(unsigned long)output.size(), (unsigned long)this->expected.size(), ii,
 			output[ii-2],output[ii-1],output[ii-0],output[ii+1],
 			this->expected[ii-2],this->expected[ii-1],this->expected[ii-0],this->expected[ii+1]);
+		sleep(10);
 	}
 #endif
 	EXPECT_EQ( output, this->expected);

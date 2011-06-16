@@ -268,6 +268,12 @@ const net::NetworkOperation Connection::nextOperation()
 							LOG_WARNING << "output of function '" << m_functionName << "' that has no IO configured is ignored";
 							contentsize = 0;
 						}
+						else if (contentsize == 0)
+						{
+							LOG_ERROR << "buffer too small for one output element";
+							m_state = DiscardInput;
+							return WriteLine( "\r\n.\r\nERR");
+						}
 						m_formatoutput->init( m_output.ptr(), m_output.size());
 						return net::SendData( content, contentsize);
 					}
