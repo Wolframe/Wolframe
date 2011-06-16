@@ -62,7 +62,7 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 			:m_tagstk(new char[bufsize?bufsize:(unsigned int)TagBufferSize])
 			,m_tagstksize(bufsize?bufsize:(unsigned int)TagBufferSize)
 			,m_tagstkpos(0)
-			,m_xmlstate(Content)
+			,m_xmlstate(Tag)
 			,m_bufstate(EscBufferType::SRC){}
 
 		///\brief Implementation of protocol::InputFilter::print(ElementType,const void*,size_type)
@@ -136,6 +136,8 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 					}
 					else
 					{
+						if (m_xmlstate == Content) IOCharset::print( ' ', buf);
+
 						printToBufferContent( (const char*)element, elementsize, buf);
 						if (buf.overflow())
 						{
@@ -360,9 +362,30 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 			delete m_scanner;
 		}
 
+		struct ElementTypeMap :public textwolf::CharMap<int,-1,textwolf::XMLScannerBase::NofElementTypes>
+		{
+			ElementTypeMap()
+			{
+				(*this)
+				(textwolf::XMLScannerBase::None,-1)
+				(textwolf::XMLScannerBase::ErrorOccurred,-1)
+				(textwolf::XMLScannerBase::HeaderAttribName,(int)Attribute)
+				(textwolf::XMLScannerBase::HeaderAttribValue,(int)Value)
+				(textwolf::XMLScannerBase::HeaderEnd,(int)CloseTag)
+				(textwolf::XMLScannerBase::TagAttribName,(int)Attribute)
+				(textwolf::XMLScannerBase::TagAttribValue,(int)Value)
+				(textwolf::XMLScannerBase::OpenTag,(int)OpenTag)
+				(textwolf::XMLScannerBase::CloseTag,(int)CloseTag)
+				(textwolf::XMLScannerBase::CloseTagIm,(int)CloseTag)
+				(textwolf::XMLScannerBase::Content,(int)Value)
+				(textwolf::XMLScannerBase::Exit,(int)CloseTag);
+			}
+		};
+
 		///\brief Implementation of protocol::InputFilter::getNext( ElementType*, void*, size_type, size_type*)
 		virtual bool getNext( ElementType* type, void* buffer, size_type buffersize, size_type* bufferpos)
 		{
+			static const ElementTypeMap tmap;
 			BufferType buf( (char*)buffer + *bufferpos, buffersize - *bufferpos);
 			m_scanner->setOutputBuffer( buf);
 			try
@@ -375,20 +398,15 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 					return false;
 				}
 				*bufferpos += buf.size();
-				switch (m_itr->type())
+				int st = tmap[ m_itr->type()];
+				if (st == -1)
 				{
-					case textwolf::XMLScannerBase::None: setState( Error, ErrBrokenInputStream); return false;
-					case textwolf::XMLScannerBase::ErrorOccurred: setState( Error, ErrXML); return false;
-					case textwolf::XMLScannerBase::HeaderAttribName: *type = Attribute; return true;
-					case textwolf::XMLScannerBase::HeaderAttribValue: *type = Value; return true;
-					case textwolf::XMLScannerBase::HeaderEnd: *type = CloseTag; return true;
-					case textwolf::XMLScannerBase::TagAttribName: setState( Error, ErrXML); return false;
-					case textwolf::XMLScannerBase::TagAttribValue: setState( Error, ErrXML); return false;
-					case textwolf::XMLScannerBase::OpenTag: setState( Error, ErrXML); return false;
-					case textwolf::XMLScannerBase::CloseTag: setState( Error, ErrXML); return false;
-					case textwolf::XMLScannerBase::CloseTagIm: setState( Error, ErrXML); return false;
-					case textwolf::XMLScannerBase::Content: setState( Error, ErrXML); return false;
-					case textwolf::XMLScannerBase::Exit: setState( Error, ErrBrokenInputStream); return false;
+					setState( Error, ErrXML);
+					return false;
+				}
+				else
+				{
+					*type = (ElementType)st;
 				}
 			}
 			catch (EndOfMessageException)
@@ -423,6 +441,26 @@ struct XmlHeaderInputFilter :public XmlFilter<textwolf::charset::IsoLatin1,textw
 {
 	typedef textwolf::StaticBuffer BufferType;
 
+	struct ElementTypeMap :public textwolf::CharMap<int,-1,textwolf::XMLScannerBase::NofElementTypes>
+	{
+		ElementTypeMap()
+		{
+			(*this)
+			(textwolf::XMLScannerBase::None,-1)
+			(textwolf::XMLScannerBase::ErrorOccurred,-1)
+			(textwolf::XMLScannerBase::HeaderAttribName,(int)Attribute)
+			(textwolf::XMLScannerBase::HeaderAttribValue,(int)Value)
+			(textwolf::XMLScannerBase::HeaderEnd,(int)CloseTag)
+			(textwolf::XMLScannerBase::TagAttribName,-1)
+			(textwolf::XMLScannerBase::TagAttribValue,-1)
+			(textwolf::XMLScannerBase::OpenTag,-1)
+			(textwolf::XMLScannerBase::CloseTag,-1)
+			(textwolf::XMLScannerBase::CloseTagIm,-1)
+			(textwolf::XMLScannerBase::Content,-1)
+			(textwolf::XMLScannerBase::Exit,(int)CloseTag);
+		}
+	};
+
 	///\brief Constructor
 	XmlHeaderInputFilter() {}
 	///\brief Destructor
@@ -431,6 +469,7 @@ struct XmlHeaderInputFilter :public XmlFilter<textwolf::charset::IsoLatin1,textw
 	///\brief Implementation of protocol::InputFilter::getNext( ElementType*, void*, size_type, size_type*)
 	virtual bool getNext( ElementType* type, void* buffer, size_type buffersize, size_type* bufferpos)
 	{
+		static const ElementTypeMap tmap;
 		BufferType buf( (char*)buffer + *bufferpos, buffersize - *bufferpos);
 		m_scanner->setOutputBuffer( buf);
 		try
@@ -443,20 +482,15 @@ struct XmlHeaderInputFilter :public XmlFilter<textwolf::charset::IsoLatin1,textw
 				return false;
 			}
 			*bufferpos += buf.size();
-			switch (m_itr->type())
+			int st = tmap[ m_itr->type()];
+			if (st == -1)
 			{
-				case textwolf::XMLScannerBase::None: setState( Error, ErrBrokenInputStream); return false;
-				case textwolf::XMLScannerBase::ErrorOccurred: setState( Error, ErrXML); return false;
-				case textwolf::XMLScannerBase::HeaderAttribName: *type = Attribute; return true;
-				case textwolf::XMLScannerBase::HeaderAttribValue: *type = Value; return true;
-				case textwolf::XMLScannerBase::HeaderEnd: *type = CloseTag; return true;
-				case textwolf::XMLScannerBase::TagAttribName: *type = Attribute; return true;
-				case textwolf::XMLScannerBase::TagAttribValue: *type = Value; return true;
-				case textwolf::XMLScannerBase::OpenTag: *type = OpenTag; return true;
-				case textwolf::XMLScannerBase::CloseTag: *type = CloseTag; return true;
-				case textwolf::XMLScannerBase::CloseTagIm: *type = CloseTag; return true;
-				case textwolf::XMLScannerBase::Content: *type = Value; return true;
-				case textwolf::XMLScannerBase::Exit: *type = CloseTag; return true;
+				setState( Error, ErrXML);
+				return false;
+			}
+			else
+			{
+				*type = (ElementType)st;
 			}
 		}
 		catch (EndOfMessageException)
