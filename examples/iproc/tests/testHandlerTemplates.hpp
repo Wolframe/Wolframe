@@ -39,6 +39,7 @@
 #include "logger.hpp"
 #include <cstring>
 #include <iostream>
+/*[-]*/#include <stdio.h>
 
 namespace _Wolframe {
 namespace test {
@@ -97,6 +98,7 @@ int runTestIO( char* in, std::string& out, Connection& connection)
 				std::size_t ii,size = netop.size();
 				for (ii=0; ii<size; ii++)
 				{
+/*[-]*/printf( "OUT %.2x\n", ch);
 					out.push_back( data[ ii]);
 				}
 			}

@@ -31,8 +31,8 @@ Project Wolframe.
 ************************************************************************/
 #ifndef _Wolframe_PROTOCOL_FORMATOUTPUT_INTERFACE_HPP_INCLUDED
 #define _Wolframe_PROTOCOL_FORMATOUTPUT_INTERFACE_HPP_INCLUDED
-/// \file protocol/formatoutput.hpp
-/// \brief Output interfaces for the application processor
+///\file protocol/formatoutput.hpp
+///\brief Output interfaces for the application processor
 
 #include <cstddef>
 #include "protocol/ioblocks.hpp"
@@ -40,16 +40,16 @@ Project Wolframe.
 namespace _Wolframe {
 namespace protocol {
 
-/// \class FormatOutput
-/// \brief Provides an interface for the application processor for its hierarchically structured output like XML.
+///\class FormatOutput
+///\brief Provides an interface for the application processor for its hierarchically structured output like XML.
 ///
 /// The intention of this class is to get a thin binding of the scripting language
 /// in the application layer to the network output.
 ///
 	struct FormatOutput :public OutputBlock
 {
-	/// \enum State
-	/// \brief State of the output used in the application processor iterating loop to decide wheter to yield execution or not.
+	///\enum State
+	///\brief State of the output used in the application processor iterating loop to decide wheter to yield execution or not.
 	enum State
 	{
 		Open,		///< serving data - normal input processing
@@ -57,8 +57,8 @@ namespace protocol {
 		Error		///< have to stop processing with an error
 	};
 
-	/// \enum ElementType
-	/// \brief Hierarchical ouput structure element type
+	///\enum ElementType
+	///\brief Hierarchical ouput structure element type
 	///
 	/// Describes the role of the element in the output structure.
 	/// This information is interpreted by the engine to create the correct output string
@@ -72,16 +72,16 @@ namespace protocol {
 		CloseTag	///< Close current hierarchy level
 	};
 
-	/// \brief Constructor
-	/// \param [in] op print function pointer
+	///\brief Constructor
+	///\param [in] op print function pointer
 	FormatOutput()
 		:OutputBlock(0,0),m_errorCode(0),m_state(Open){}
 
 	virtual ~FormatOutput(){}
 
-	/// \brief Assignement of the data members
-	/// \param [in] o format output to assign the data members of
-	/// \remark the output function specified with the constructor is not overwritten
+	///\brief Assignement of the data members
+	///\param [in] o format output to assign the data members of
+	///\remark the output function specified with the constructor is not overwritten
 	FormatOutput& operator = (const FormatOutput& o)
 	{
 		set( const_cast<void*>(o.ptr()), o.size());
@@ -91,9 +91,9 @@ namespace protocol {
 		return *this;
 	}
 
-	/// \brief Defines the buffer to use for output.
-	/// \param [in] data pointer to buffer to use
-	/// \param [in] datasize allocation size of data in bytes
+	///\brief Defines the buffer to use for output.
+	///\param [in] data pointer to buffer to use
+	///\param [in] datasize allocation size of data in bytes
 	///
 	/// Initializes the structure without touching the output function itself
 	void init( void* data, size_type datasize)
@@ -103,36 +103,36 @@ namespace protocol {
 		m_state = Open;
 	}
 
-	/// \brief Empty initialization to force a yield execution
+	///\brief Empty initialization to force a yield execution
 	/// The forced yield execution signals the connectionHandler that it should define an output buffer for the application processor for printing.
 	void init()
 	{
 		init( 0, 0);
 	}
 
-	/// \brief Get the current cursor position as pointer for the next print
-	/// \return the current cursor position (where to print the next element to)
+	///\brief Get the current cursor position as pointer for the next print
+	///\return the current cursor position (where to print the next element to)
 	void* cur() const			{return (void*)(charptr()+pos());}
 
-	/// \brief Print the next element to the buffer
-	/// \param [in] type type of element to print
-	/// \param [in] element content of element to print
-	/// \param [in] elementsize size of element to print in bytes
-	/// \return true, on success, false, if failed
+	///\brief Print the next element to the buffer
+	///\param [in] type type of element to print
+	///\param [in] element content of element to print
+	///\param [in] elementsize size of element to print in bytes
+	///\return true, on success, false, if failed
 	///
 	virtual bool print( ElementType type, const void* element, size_type elementsize)=0;
 
-	/// \brief Get error code in case of error state
-	/// \return the error code
+	///\brief Get error code in case of error state
+	///\return the error code
 	int getError() const			{return m_errorCode;}
 
-	/// \brief Set format output state with error code
-	/// \param [in] s new state
-	/// \param [in] e (optional) error code to set
+	///\brief Set format output state with error code
+	///\param [in] s new state
+	///\param [in] e (optional) error code to set
 	void setState( State s, int e=0)		{m_state=s;m_errorCode=e;}
 
-	/// \brief Return the current state
-	/// \return the current state
+	///\brief Return the current state
+	///\return the current state
 	State state() const
 	{
 		return m_state;

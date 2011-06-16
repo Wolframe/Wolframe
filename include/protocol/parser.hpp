@@ -30,8 +30,8 @@ Project Wolframe.
 
 ************************************************************************/
 ///
-/// \file protocol/parser.hpp
-/// \brief Parsing functions of the lexical elements of the protocol like commands, lines and tokens
+///\file protocol/parser.hpp
+///\brief Parsing functions of the lexical elements of the protocol like commands, lines and tokens
 ///
 
 #ifndef _Wolframe_PROTOCOL_PARSER_HPP_INCLUDED
@@ -46,16 +46,16 @@ Project Wolframe.
 namespace _Wolframe {
 namespace protocol {
 ///
-/// \class Parser
-/// \brief helper functions for protocol parsing
+///\class Parser
+///\brief helper functions for protocol parsing
 ///
 class Parser
 {
 public:
-	/// \brief Go to the next non space
-	/// \tparam IteratorType iterator type used as input for parsing
-	/// \param [in,out] src input iterator
-	/// \param [in] end iterator marking end of input block
+	///\brief Go to the next non space
+	///\tparam IteratorType iterator type used as input for parsing
+	///\param [in,out] src input iterator
+	///\param [in] end iterator marking end of input block
 	template <typename IteratorType>
 	static bool skipSpaces( IteratorType& src, IteratorType& end)
 	{
@@ -63,10 +63,10 @@ public:
 		return (src<end);
 	}
 
-	/// \brief Go to the end of line without consuming it
-	/// \tparam IteratorType iterator type used as input for parsing
-	/// \param [in,out] src input iterator
-	/// \param [in] end iterator marking end of input block
+	///\brief Go to the end of line without consuming it
+	///\tparam IteratorType iterator type used as input for parsing
+	///\param [in,out] src input iterator
+	///\param [in] end iterator marking end of input block
 	template <typename IteratorType>
 	static bool skipLine( IteratorType& src, IteratorType& end)
 	{
@@ -74,10 +74,10 @@ public:
 		return (src<end);
 	}
 
-	/// \brief Consume the end of line
-	/// \tparam IteratorType iterator type used as input for parsing
-	/// \param [in,out] src input iterator
-	/// \param [in] end iterator marking end of input block
+	///\brief Consume the end of line
+	///\tparam IteratorType iterator type used as input for parsing
+	///\param [in,out] src input iterator
+	///\param [in] end iterator marking end of input block
 	template <typename IteratorType>
 	static bool consumeEOLN( IteratorType& src, IteratorType& end)
 	{
@@ -89,24 +89,24 @@ public:
 		return true;
 	}
 
-	/// \brief Return true if the end of line has been reached
-	/// \tparam IteratorType iterator type used as input for parsing
-	/// \param [in] src input iterator
+	///\brief Return true if the end of line has been reached
+	///\tparam IteratorType iterator type used as input for parsing
+	///\param [in] src input iterator
 	template <typename IteratorType>
 	static bool isEOLN( IteratorType& src)
 	{
 		return (*src == '\r' || *src == '\n');
 	}
 
-	/// \brief Parse the current line and write its contents to a buffer
+	///\brief Parse the current line and write its contents to a buffer
 	/// Go to the end of line and write it to buffer, starting with the first non space.
 	/// After call the iterator is pointing to the end of line char or at the EOF char.
-	/// \remark End of lines or trailing spaces are not implicitely consumed because this leads to intermediate states that cannot be handled
-	/// \remark Control characters are mapped to space (ascii 32) before writing them to 'buf'
-	/// \param [in,out] src input iterator
-	/// \param [in] end input iterator marking the end of input
-	/// \param [in,out] buf output buffer implementing the STL back insertion sequence interface
-	/// \return true, if the line was consumed completely
+	///\remark End of lines or trailing spaces are not implicitely consumed because this leads to intermediate states that cannot be handled
+	///\remark Control characters are mapped to space (ascii 32) before writing them to 'buf'
+	///\param [in,out] src input iterator
+	///\param [in] end input iterator marking the end of input
+	///\param [in,out] buf output buffer implementing the STL back insertion sequence interface
+	///\return true, if the line was consumed completely
 	template <typename IteratorType, typename BufferType>
 	static bool getLine( IteratorType& src, IteratorType& end, BufferType& buf)
 	{
@@ -122,20 +122,20 @@ public:
 	}
 };
 
-/// \class CmdMap
-/// \brief implements a map for set of protocol commands
-/// \remark implementation as vector because the set of commands is expected to be small.
+///\class CmdMap
+///\brief implements a map for set of protocol commands
+///\remark implementation as vector because the set of commands is expected to be small.
 struct CmdMap :public std::vector<std::string>
 {
-	/// \brief predicate for case insensitive comparison in boost::algorithm::starts_with
+	///\brief predicate for case insensitive comparison in boost::algorithm::starts_with
 	struct ToUpperPredicate
 	{
 		bool operator()( const char& ch1, const char& ch2) const {return ch1==toupper(ch2);}
 	};
 
-	/// \brief retrieve a defined commands index from the map
-	/// \param val value to retrieve
-	/// \return the index of the command or -1 if not found or not determined enough
+	///\brief retrieve a defined commands index from the map
+	///\param val value to retrieve
+	///\return the index of the command or -1 if not found or not determined enough
 	int operator []( const char* value) const
 	{
 		int rt = -1;
@@ -157,39 +157,39 @@ struct CmdMap :public std::vector<std::string>
 		return (cnt==1) ? rt:-1;
 	}
 
-	/// \brief insert a command into the map.
-	/// \param val value to insert
+	///\brief insert a command into the map.
+	///\param val value to insert
 	void insert( const value_type& val)
 	{
 		push_back( boost::algorithm::to_upper_copy( val));
 	}
 };
 
-/// \class CmdParser
-/// \exception Bad
-/// \brief Parser for ascii protocol commands
-/// \tparam CmdBufferType buffer type to use, implementing the STL back insertion sequence interface
-/// \tparam CmdMapType map for the commands defined, implementing the STL back insertion sequence interface for adding and a get(value_type) method for matching
+///\class CmdParser
+///\exception Bad
+///\brief Parser for ascii protocol commands
+///\tparam CmdBufferType buffer type to use, implementing the STL back insertion sequence interface
+///\tparam CmdMapType map for the commands defined, implementing the STL back insertion sequence interface for adding and a get(value_type) method for matching
 ///
 template <typename CmdBufferType, class CmdMapType=CmdMap>
 class CmdParser :public Parser
 {
 public:
-	/// \brief Constructor
+	///\brief Constructor
 	///
 	CmdParser() {}
 
-	/// \brief Destructor
+	///\brief Destructor
 	///
 	~CmdParser() {}
 
-	/// \brief Copy constructor
-	/// \param [in] o CmdParser to copy
+	///\brief Copy constructor
+	///\param [in] o CmdParser to copy
 	///
 	CmdParser( const CmdParser& o)  :m_cmdmap(o.m_cmdmap) {}
 
 	///
-	/// \brief Reset parser command definitions
+	///\brief Reset parser command definitions
 	///
 	void init()
 	{
@@ -197,8 +197,8 @@ public:
 	}
 
 	///
-	/// \brief Add a command to the protocol parser (case insensitive)
-	/// \param [in] cmd command to define
+	///\brief Add a command to the protocol parser (case insensitive)
+	///\param [in] cmd command to define
 	///
 	void add( const char* cmd)
 	{
@@ -206,8 +206,8 @@ public:
 	}
 
 	///
-	/// \brief Assignement copy
-	/// \param [in] o CmdParser to copy
+	///\brief Assignement copy
+	///\param [in] o CmdParser to copy
 	///
 	CmdParser& operator=( const CmdParser& o)
 	{
@@ -216,17 +216,17 @@ public:
 	}
 
 	///
-	/// \brief Constructor
-	/// \param [in] cmd null-terminated array of commands to define
+	///\brief Constructor
+	///\param [in] cmd null-terminated array of commands to define
 	///
 	CmdParser( const char** cmd)
 	{
 		for (unsigned int ii=0; cmd[ii]; ii++) add(cmd[ii]);
 	}
 	///
-	/// \brief Constructor
-	/// \tparam ENUM enumeration type for the command
-	/// \param [in] getCmdName function mapping the enums to their names
+	///\brief Constructor
+	///\tparam ENUM enumeration type for the command
+	///\param [in] getCmdName function mapping the enums to their names
 	///
 	template <typename ENUM>
 	CmdParser( const char* (*getCmdName)(ENUM c))
@@ -239,9 +239,9 @@ public:
 	}
 
 	///
-	/// \brief Defines a command. The index of the command is counted from 0 with one increment per add.
-	/// \param [in] cmd command to define
-	/// \remarks synonym for add(const char*)
+	///\brief Defines a command. The index of the command is counted from 0 with one increment per add.
+	///\param [in] cmd command to define
+	///\remarks synonym for add(const char*)
 	///
 	CmdParser& operator[]( const char* cmd)
 	{
@@ -250,13 +250,13 @@ public:
 	}
 
 	///
-	/// \brief Parse the next command.
-	/// \tparam IteratorType iterator type used as input for parsing
-	/// \param [in,out] src input iterator
-	/// \param [in] end input iterator marking the end of input
-	/// \param [in,out] buf the command buffer implementing the STL back insertion sequence interface
-	/// \return the index of the command in the order of definition counted from 0 for the first command or return -1, if the command could not be recognized
-	/// \remark At the end of buffer -1 is returned also. If \c src equals \c end after call and -1 was returned then the method has to be called again with new data.
+	///\brief Parse the next command.
+	///\tparam IteratorType iterator type used as input for parsing
+	///\param [in,out] src input iterator
+	///\param [in] end input iterator marking the end of input
+	///\param [in,out] buf the command buffer implementing the STL back insertion sequence interface
+	///\return the index of the command in the order of definition counted from 0 for the first command or return -1, if the command could not be recognized
+	///\remark At the end of buffer -1 is returned also. If \c src equals \c end after call and -1 was returned then the method has to be called again with new data.
 	///
 	template <typename IteratorType>
 	int getCommand( IteratorType& src, IteratorType& end, CmdBufferType& buf) const

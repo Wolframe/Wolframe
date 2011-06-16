@@ -24,7 +24,8 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 	typedef FilterBase<IOCharset, AppCharset> ThisFilterBase;
 	typedef typename protocol::FormatOutput::ElementType ElementType;
 	typedef typename protocol::FormatOutput::size_type size_type;
-	typedef protocol::EscapingBuffer<textwolf::StaticBuffer> BufferType;
+	typedef protocol::EscapingBuffer<textwolf::StaticBuffer> EscBufferType;
+	typedef textwolf::StaticBuffer BufferType;
 
 	///\class FormatOutput
 	///\brief format output filter for XML
@@ -61,7 +62,8 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 			:m_tagstk(new char[bufsize?bufsize:(unsigned int)TagBufferSize])
 			,m_tagstksize(bufsize?bufsize:(unsigned int)TagBufferSize)
 			,m_tagstkpos(0)
-			,m_xmlstate(Content){}
+			,m_xmlstate(Content)
+			,m_bufstate(EscBufferType::SRC){}
 
 		///\brief Implementation of protocol::InputFilter::print(ElementType,const void*,size_type)
 		///\param [in] type type of the element to print
@@ -69,7 +71,7 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		///\param [in] elementsize size of the element to print in bytes
 		virtual bool print( ElementType type, const void* element, size_type elementsize)
 		{
-			BufferType buf( protocol::OutputBlock::rest(), protocol::OutputBlock::restsize());
+			EscBufferType buf( rest(), restsize(), m_bufstate);
 
 			const void* cltag;
 			size_type cltagsize;
@@ -93,6 +95,7 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 					m_xmlstate = ((const char*)(element))[0]=='?'?Header:Tag;
 					incPos( buf.size());
 					setState( Open);
+					m_bufstate = buf.state();
 					return true;
 
 				case protocol::FormatOutput::Attribute:
@@ -107,6 +110,7 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 					m_xmlstate = (m_xmlstate==Header)?HeaderAttribute:Attribute;
 					incPos( buf.size());
 					setState( Open);
+					m_bufstate = buf.state();
 					return true;
 
 				case protocol::FormatOutput::Value:
@@ -138,9 +142,11 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 							setState( EndOfBuffer);
 							return false;
 						}
+						m_xmlstate = Content;
 					}
 					incPos( buf.size());
 					setState( Open);
+					m_bufstate = buf.state();
 					return true;
 
 				case protocol::FormatOutput::CloseTag:
@@ -171,6 +177,7 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 					popTag();
 					incPos( buf.size());
 					setState( Open);
+					m_bufstate = buf.state();
 					return true;
 			}
 			setState( Error, ErrIllegalState);
@@ -182,7 +189,7 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		///\param [in] nof_echr number of elements in echr and estr
 		///\param [in] echr ASCII characters to substitute
 		///\param [in] estr ASCII strings to substitute with (array parallel to echr)
-		static void printEsc( char ch, BufferType& buf, unsigned int nof_echr, const char* echr, const char** estr)
+		static void printEsc( char ch, EscBufferType& buf, unsigned int nof_echr, const char* echr, const char** estr)
 		{
 			const char* cc = (const char*)memchr( echr, ch, nof_echr);
 			if (cc) 
@@ -204,7 +211,7 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		///\param [in] nof_echr number of elements in echr and estr
 		///\param [in] echr ASCII characters to substitute
 		///\param [in] estr ASCII strings to substitute with (array parallel to echr)
-		static void printToBufferSubstChr( const char* src, size_type srcsize, BufferType& buf, unsigned int nof_echr, const char* echr, const char** estr)
+		static void printToBufferSubstChr( const char* src, size_type srcsize, EscBufferType& buf, unsigned int nof_echr, const char* echr, const char** estr)
 		{
 			CharIterator itr( src, srcsize);
 			textwolf::TextScanner<CharIterator,AppCharset> ts( itr);
@@ -227,7 +234,7 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		///\param [in] src pointer to attribute value string to print
 		///\param [in] srcsize size of src in bytes
 		///\param [in,out] buf buffer to print to
-		static void printToBufferAttributeValue( const char* src, size_type srcsize, BufferType& buf)
+		static void printToBufferAttributeValue( const char* src, size_type srcsize, EscBufferType& buf)
 		{
 			enum {nof_echr = 12};
 			static const char* estr[nof_echr] = {"&lt;", "&gt;", "&apos;", "&quot;", "&amp;", "&#0;", "&#8;", "&#9;", "&#10;", "&#13;", "&nbsp;"};
@@ -241,7 +248,7 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		///\param [in] src pointer to content string to print
 		///\param [in] srcsize size of src in bytes
 		///\param [in,out] buf buffer to print to
-		static void printToBufferContent( const char* src, size_type srcsize, BufferType& buf)
+		static void printToBufferContent( const char* src, size_type srcsize, EscBufferType& buf)
 		{
 			enum {nof_echr = 10};
 			static const char* estr[nof_echr] = {"&lt;", "&gt;", "&amp;", "&#0;", "&#8;", "&#9;", "&#10;", "&#13;", "&nbsp;"};
@@ -282,10 +289,11 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 			if (m_tagstkpos >= m_tagstksize) throw std::logic_error( "element stack is corrupt");
 		}
 	private:
-		char* m_tagstk;			///< tag stack buffer
-		size_type m_tagstksize;		///< size of tag stack buffer in bytes
-		size_type m_tagstkpos;		///< used size of tag stack buffer in bytes
-		XMLState m_xmlstate;		///< current state of output
+		char* m_tagstk;				///< tag stack buffer
+		size_type m_tagstksize;			///< size of tag stack buffer in bytes
+		size_type m_tagstkpos;			///< used size of tag stack buffer in bytes
+		XMLState m_xmlstate;			///< current state of output
+		typename EscBufferType::State m_bufstate;	///< state of escaping the output
 	};
 
 	///\class InputFilter
@@ -413,7 +421,7 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 ///\brief Input filter for the XML header only (returns EoD after the header)
 struct XmlHeaderInputFilter :public XmlFilter<textwolf::charset::IsoLatin1,textwolf::charset::IsoLatin1>::InputFilter
 {
-	typedef protocol::EscapingBuffer<textwolf::StaticBuffer> BufferType;
+	typedef textwolf::StaticBuffer BufferType;
 
 	///\brief Constructor
 	XmlHeaderInputFilter() {}

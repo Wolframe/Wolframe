@@ -36,6 +36,7 @@ Project Wolframe.
 
 #include "iterators.hpp"
 #include <stdexcept>
+/*[-]*/#include <stdio.h>
 
 namespace _Wolframe {
 namespace protocol {
@@ -274,12 +275,6 @@ template <class BufferType>
 class EscapingBuffer :public BufferType
 {
 public:
-	///\brief Constructor
-	///\param [in] p_ptr pointer to the memory block to use
-	///\param [in] p_size size of the memory block in bytes
-	EscapingBuffer( char* p_ptr, typename BufferType::size_type p_size)
-		:BufferType(p_ptr,p_size),m_state(SRC) {}
-
 	///\enum State
 	///\brief enumeration of states for escaping LF '.' sequences to LF '.' '.'
 	enum State
@@ -288,10 +283,23 @@ public:
 		LF,			///< detected an LineFeed in state SRC
 		LF_DOT			///< LF and additional '.' not printed yet
 	};
-	State m_state;
 
+	///\brief Constructor
+	///\param [in] p_ptr pointer to the memory block to use
+	///\param [in] p_size size of the memory block in bytes
+	EscapingBuffer( char* p_ptr, typename BufferType::size_type p_size, State p_state)
+		:BufferType(p_ptr,p_size),m_state(p_state) {}
+
+	///\brief get the current state of escaping LF DOT
+	State state() const
+	{
+		return m_state;
+	}
+
+	///\brief redirect to BufferType::push_back(char) with escaping of LF DOT as LF DOT DOT
 	void push_back( char ch)
 	{
+/*[-]*/printf( "PUSH %.2x\n", ch);
 		BufferType::push_back( ch);
 		if (m_state == SRC)
 		{
@@ -307,6 +315,8 @@ public:
 			m_state = SRC;
 		}
 	}
+private:
+	State m_state;		///< the current state of escaping LF DOT as LF DOT DOT
 };
 
 } // namespace protocol

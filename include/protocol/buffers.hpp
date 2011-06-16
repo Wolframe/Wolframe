@@ -32,8 +32,8 @@ Project Wolframe.
 #ifndef _Wolframe_PROTOCOL_BUFFERS_HPP_INCLUDED
 #define _Wolframe_PROTOCOL_BUFFERS_HPP_INCLUDED
 ///
-/// \file protocol/buffers.hpp
-/// \brief Defines the buffers used by protocol parsers to buffer the commands and their arguments.
+///\file protocol/buffers.hpp
+///\brief Defines the buffers used by protocol parsers to buffer the commands and their arguments.
 ///
 /// All buffers defined in this module are preallocated fixed size and implement a subset of STL back insertion sequence interface for appending data.
 /// This interface is used by the buffering parsing methods defined in protocol/parser.hpp.
@@ -48,10 +48,10 @@ namespace _Wolframe {
 namespace protocol {
 
 ///
-/// \class Buffer
-/// \brief Constant size single byte (ASCII) character buffer that implements a subset of the std::string interface
+///\class Buffer
+///\brief Constant size single byte (ASCII) character buffer that implements a subset of the std::string interface
 ///  The buffer implements the STL back insertion sequence interface required by the protocol parser.
-/// \tparam SIZE maximum number of character bytes buffered (without terminating 0 byte that is counted extra)
+///\tparam SIZE maximum number of character bytes buffered (without terminating 0 byte that is counted extra)
 ///
 template <unsigned int SIZE=128>
 class Buffer
@@ -59,7 +59,7 @@ class Buffer
 private:
 	typedef std::size_t size_type;		///< size type of this buffer vector
 
-	/// \brief Some buffer constants
+	///\brief Some buffer constants
 	enum
 	{
 		Size=SIZE			///< maximume size of the buffer in bytes as enum definition
@@ -90,8 +90,8 @@ public:
 };
 
 
-/// \class CArgBuffer
-/// \brief Buffer for multi argument parsing (fixed array of null terminated byte character strings)
+///\class CArgBuffer
+///\brief Buffer for multi argument parsing (fixed array of null terminated byte character strings)
 ///  The buffer implements the STL back insertion sequence interface required by the protocol parser.
 ///
 /// This buffer splits the input, A sequence of characters by blanks and it parses escaping and quoted strings in the following way:
@@ -100,18 +100,18 @@ public:
 /// A string is starting with a quote and terminating with the same non escaped quote or with the end of line.
 /// Only blanks are splitting elements.
 ///
-/// \tparam Buffer buffer type with an interface as _Wolframe::protocol::Buffer, a subset of the std::string interface used for buffering the elements of the argument vector.
+///\tparam Buffer buffer type with an interface as _Wolframe::protocol::Buffer, a subset of the std::string interface used for buffering the elements of the argument vector.
 template <class Buffer>
 class CArgBuffer
 {
 private:
-	/// \brief Some buffer constants
+	///\brief Some buffer constants
 	enum
 	{
 		Size=16					///< maximum number of arguments buffered
 	};
-	/// \enum State
-	/// \brief States of this buffer
+	///\enum State
+	///\brief States of this buffer
 	enum State
 	{
 		EndToken,				///< end of a token but no separating blank read yet.
@@ -129,19 +129,19 @@ private:
 	State m_state;					///< the buffer state
 	Buffer* m_content;				///< the buffer used as element buffer of the tokens (passed by the constructor)
 
-	/// \brief Action performed in the statemachine for opening a new token parsed
+	///\brief Action performed in the statemachine for opening a new token parsed
 	void openArg()					{if (m_pos<Size) m_buf[m_pos++]=m_content->size();}
 
 public:
-	/// \brief Constructor
-	/// \param[in] c buffer to use for the content passed by reference (owned by the caller, but used by this class)
+	///\brief Constructor
+	///\param[in] c buffer to use for the content passed by reference (owned by the caller, but used by this class)
 	CArgBuffer( Buffer* c)				:m_pos(0),m_state(Empty),m_content(c) {m_buf[0]=0;m_sbuf[0]=0;}
 
-	/// \brief Clear the buffer content
+	///\brief Clear the buffer content
 	void clear()					{m_pos=0;m_buf[0]=0;m_sbuf[0]=0;m_content->clear();}
 
-	/// \brief Add the next character of the parsed content
-	/// \param[in] ch character to process next
+	///\brief Add the next character of the parsed content
+	///\param[in] ch character to process next
 	void push_back( char ch)
 	{
 		switch (m_state)
@@ -214,19 +214,19 @@ public:
 		}
 	};
 
-	/// \brief Number of tokens parsed
-	/// \return the number of tokens in the array parsed
+	///\brief Number of tokens parsed
+	///\return the number of tokens in the array parsed
 	unsigned int size() const				{return m_pos;}
 
-	/// \brief Get the element with index 'idx' or 0, if it does not exist
-	/// \param[in] idx index of the argument to get
-	/// \return the argument with index idx counted from 0
+	///\brief Get the element with index 'idx' or 0, if it does not exist
+	///\param[in] idx index of the argument to get
+	///\return the argument with index idx counted from 0
 	const char* operator[]( unsigned int idx) const		{return (idx<m_pos)?m_content->c_str()+m_buf[idx]:0;}
 
-	/// \brief Return a 0-terminated array of 0-terminated strings as convenient in C for program arguments
-	/// \param[in] cmdname optional command name to return as first element of the array as convenient for C argc/argv
-	/// \remark the return value of this function may not be valid anymore after a new call of push_back. So it should only be used after parsing
-	/// \return array of arguments up to 'Size' (with or without the command itself as in C argc/argv)
+	///\brief Return a 0-terminated array of 0-terminated strings as convenient in C for program arguments
+	///\param[in] cmdname optional command name to return as first element of the array as convenient for C argc/argv
+	///\remark the return value of this function may not be valid anymore after a new call of push_back. So it should only be used after parsing
+	///\return array of arguments up to 'Size' (with or without the command itself as in C argc/argv)
 	const char** argv( const char* cmdname=0)
 	{
 		if (m_sbuf[0]==0)
@@ -243,9 +243,9 @@ public:
 		return m_sbuf;
 	}
 
-	/// \brief Synonym of size. Convenient in C for the number of program arguments
-	/// \param[in] cmdname (optional) name of the command to include as first element of the argument array (and therefore to add to the count returned) 
-	/// \return number of arguments (with or without the command itself as in C argc/argv)
+	///\brief Synonym of size. Convenient in C for the number of program arguments
+	///\param[in] cmdname (optional) name of the command to include as first element of the argument array (and therefore to add to the count returned)
+	///\return number of arguments (with or without the command itself as in C argc/argv)
 	unsigned int argc( const char* cmdname=0)		{(void)argv(cmdname); return m_pos;}
 };
 

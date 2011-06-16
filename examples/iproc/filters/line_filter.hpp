@@ -18,16 +18,16 @@ struct LineFilter :FilterBase<IOCharset, AppCharset>
 	typedef FilterBase<IOCharset, AppCharset> ThisFilterBase;
 	typedef typename protocol::FormatOutput::ElementType ElementType;
 	typedef typename protocol::FormatOutput::size_type size_type;
-	typedef protocol::EscapingBuffer<textwolf::StaticBuffer> BufferType;
+	typedef textwolf::StaticBuffer BufferType;
+	typedef protocol::EscapingBuffer<textwolf::StaticBuffer> EscBufferType;
 
 	///\class FormatOutput
 	struct FormatOutput :public protocol::FormatOutput
 	{
-		const char* m_eoln;
-
 		///\brief Constructor
 		///\param [in] eoln end of line marker
-		FormatOutput( const char* eoln="\r\n") :m_eoln(eoln){}
+		FormatOutput( const char* eoln="\r\n")
+			:m_eoln(eoln),m_bufstate(EscBufferType::SRC){}
 
 		///\brief Implementation of protocol::InputFilter::print(ElementType,const void*,size_type)
 		///\param [in] type type of the element to print
@@ -37,7 +37,7 @@ struct LineFilter :FilterBase<IOCharset, AppCharset>
 		{
 			if (type == Value)
 			{
-				BufferType buf( rest(), restsize());
+				EscBufferType buf( rest(), restsize(), m_bufstate);
 				ThisFilterBase::printToBuffer( (const char*)element, elementsize, buf);
 				ThisFilterBase::printToBuffer( (const char*)element, elementsize, buf);
 				if (buf.overflow())
@@ -46,9 +46,13 @@ struct LineFilter :FilterBase<IOCharset, AppCharset>
 					return false;
 				}
 				incPos( buf.size());
+				m_bufstate = buf.state();
 			}
 			return true;
 		}
+	private:
+		const char* m_eoln;				///< end of line marker
+		typename EscBufferType::State m_bufstate;	///< state of escaping the output
 	};
 
 	///\class InputFilter
