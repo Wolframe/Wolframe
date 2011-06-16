@@ -82,6 +82,10 @@ local_install:
 	$(INSTALL) -d -m 0755 $(bindir)
 	$(INSTALL) -m 0755 $(CPP_BINS) $(bindir)
 
+local_uninstall:
+	-rm -f $(bindir)/qtclient$(EXE)
+	-rmdir $(bindir)
+	
 FORMS = \
 	forms/form1.ui \
 	forms/form2.ui

@@ -21,6 +21,11 @@ export DH_OPTIONS
 
 export WOLFRAME_PARAMS=BOOST_DIR=/usr WITH_SSL=1 WITH_SQLITE3=1 WITH_LUA=1 WITH_PAM=1 WITH_SASL=1 WITH_PGSQL=1 WITH_QT=1 WITH_EXAMPLES=1
 
+ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+	NUMJOBS = $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+	WOLFRAME_PARAMS += -j$(NUMJOBS)
+endif
+
 build: build-stamp
 build-stamp:
 	dh_testdir
@@ -56,7 +61,25 @@ install: build
 
 	# Add here commands to install the package
 	# The DESTDIR Has To Be Exactly  /usr/src/packages/BUILD/debian/<nameOfPackage>
-	$(MAKE) install $(WOLFRAME_PARAMS) sysconfdir=/usr/src/packages/BUILD/debian/wolframe/etc DESTDIR=/usr/src/packages/BUILD/debian/wolframe
+
+	# main package
+	$(MAKE) install $(WOLFRAME_PARAMS) \
+		sysconfdir=/usr/src/packages/BUILD/debian/wolframe/etc \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe
+	cd clients; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
+		cd ..
+
+	# client package
+	cd clients; $(MAKE) install $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-client; \
+		cd ..
+
+	# documentation package
+#	cd docs; $(MAKE) install $(WOLFRAME_PARAMS) \
+#		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-doc; \
+#		cd ..
+	
 	# --- end custom part for installing
 
 # Build architecture-independent files here.

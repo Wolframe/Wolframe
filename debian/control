@@ -14,16 +14,16 @@ Homepage: http://www.wolframe.net
 Package: wolframe
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: <insert up to 60 chars description>
+Description: Wolframe Daemon
  <insert long description, indented with spaces>
 
-#Package: wolframe-client
-#Architecture: any
-#Depends: ${shlibs:Depends}, ${misc:Depends}
-#Description: <insert up to 60 chars description>
-# <insert long description, indented with spaces>
+Package: wolframe-client
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Qt client for Wolframe
+ <insert long description, indented with spaces>
 
-#Package: wolframe-doc
-#Architecture: all
-#Description: documentation for wolframe
-# <insert long description, indented with spaces>
+Package: wolframe-doc
+Architecture: all
+Description: documentation for Wolframe
+ <insert long description, indented with spaces>
