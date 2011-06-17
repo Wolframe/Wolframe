@@ -21,6 +21,8 @@ export DH_OPTIONS
 
 export WOLFRAME_PARAMS=BOOST_DIR=/usr WITH_SSL=1 WITH_SQLITE3=1 WITH_LUA=1 WITH_PAM=1 WITH_SASL=1 WITH_PGSQL=1 WITH_QT=1 WITH_EXAMPLES=1
 
+export BOOST_VERSION=1.46.1
+
 ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
 	NUMJOBS = $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
 	WOLFRAME_PARAMS += -j$(NUMJOBS)
@@ -33,7 +35,7 @@ build-stamp:
 	# Add here commands to compile the package.
 	$(MAKE) help
 	$(MAKE) $(WOLFRAME_PARAMS) config
-	$(MAKE) $(WOLFRAME_PARAMS) all
+	$(MAKE) LDFLAGS=-Wl,-rpath=/usr/lib/wolframe $(WOLFRAME_PARAMS) all
 	# Currently happilly broken, WolfBook.xml:91: parser error : Entity
 	# 'GPLlicense' not defined
 	# cd docs; $(MAKE) $(WOLFRAME_PARAMS) doc
@@ -69,6 +71,17 @@ install: build
 	cd clients; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
 		cd ..
+
+	# copy local versions of shared libraries of boost for platforms missing a decent
+	# version of boost
+	# TODO: lib, lib64, lib32
+	mkdir -p /usr/src/packages/BUILD/debian/wolframe/usr/lib/wolframe
+	for i in \
+		libboost_program_options.so.$(BOOST_VERSION) libboost_system.so.$(BOOST_VERSION) \
+		libboost_filesystem.so.$(BOOST_VERSION) libboost_thread.so.$(BOOST_VERSION) \
+		libboost_date_time.so.$(BOOST_VERSION); do \
+		cp /usr/lib/$$i /usr/src/packages/BUILD/debian/wolframe/usr/lib/wolframe; \
+	done
 
 	# client package
 	cd clients; $(MAKE) install $(WOLFRAME_PARAMS) \
