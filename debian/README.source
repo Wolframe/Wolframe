@@ -1,7 +1,8 @@
 wolframe for Debian
-----------------
+-------------------
 
-<this file describes information about the source package, see Debian policy
-manual section 4.14. You WILL either need to modify or delete this file>
+All debian specific build files are in 'debian/.'.
 
+Changes should always be done to the main GIT repository at
+git://github.com/mbarbos/Wolframe
 
