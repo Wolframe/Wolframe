@@ -1,9 +1,9 @@
 #!/bin/sh
-# postinst script for wolframe
-#
-# see: dh_installdeb(1)
 
-set -e
+# Debian postinst script for wolframe
+# - created a non-priviledged user to run the wolframe daemon
+
+# Author: Andreas Baumann <abaumann@yahoo.com>
 
 # summary of how this script can be called:
 #        * <postinst> `configure' <most-recently-configured-version>
@@ -17,18 +17,24 @@ set -e
 # for details, see http://www.debian.org/doc/debian-policy/ or
 # the debian-policy package
 
+# bail out on any error
+set -e
 
 case "$1" in
-    configure)
-    ;;
-
-    abort-upgrade|abort-remove|abort-deconfigure)
-    ;;
-
-    *)
-        echo "postinst called with unknown argument \`$1'" >&2
-        exit 1
-    ;;
+	configure)
+		getent group wolframe >/dev/null || \
+			groupadd wolframe
+		getent passwd wolframe >/dev/null || \
+			useradd -g wolframe -c "wolframe user" wolframe
+		;;
+	
+	abort-upgrade|abort-remove|abort-deconfigure)
+		;;
+	
+	*)
+		echo "postinst called with unknown argument \`$1'" >&2
+		exit 1
+		;;
 esac
 
 # dh_installdeb will replace this with shell code automatically
