@@ -274,7 +274,8 @@ static int function_filter( lua_State* ls)
 		{
 			return luaL_error( ls, "invalid 2nd argument for filter (number expected)");
 		}
-		buffersize = lua_tonumber( ls, 2);
+		// Aba: lua_tonumber returns double or int depending on compilation, safe to cast here?
+		buffersize = (unsigned int)lua_tonumber( ls, 2);
 	}
 	if (!lua_isstring( ls, 1))
 	{

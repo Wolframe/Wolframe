@@ -5,10 +5,13 @@ Prerequisites
 - Platform SDK 6.0a or later
 - boost 1.43.0 or later
 - optionally (WITH_SSL) openssl 0.9.8 or later
-- optionally (WITH_EXPECT) Expect and Tcl 8.4 or later
 - optionally (WITH_LUA) lua 5.1.4 with LuaCoco-1.1.6
   (integrated in subdir 'lua')
 - optionally (WITH_QT) Qt 4, 4.5.x or later
+- for optional authentication mechanisms:
+  - optionally (WITH_SQLITE3)
+  - optionally (WITH_PGSQL)
+- optionally (WITH_EXPECT) Expect and Tcl 8.4 or later
 - optionally for packaging: Wix 3.5 or later
 
 Boost

@@ -4,7 +4,7 @@ Build Instructions
 Prerequisites
 -------------
 
-- gcc c++ 4.2.x or later (preferably  512 MB RAM or Swap)
+- gcc c++ 4.2.x or later (preferably 512 MB RAM or Swap)
 - GNU make
 - boost 1.43.0 or later
 - optionally (WITH_SSL) openssl 0.9.8 or later

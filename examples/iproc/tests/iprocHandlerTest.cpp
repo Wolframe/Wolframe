@@ -43,6 +43,7 @@
 #include <gtest/gtest.h>
 #include <stdlib.h>
 #include <boost/lexical_cast.hpp>
+#include <boost/thread/thread.hpp>
 
 using namespace _Wolframe;
 using namespace iproc;
@@ -267,7 +268,7 @@ TYPED_TEST( iprocHandlerFixture, ExpectedResult )
 			(unsigned long)output.size(), (unsigned long)this->expected.size(), ii,
 			output[ii-2],output[ii-1],output[ii-0],output[ii+1],
 			this->expected[ii-2],this->expected[ii-1],this->expected[ii-0],this->expected[ii+1]);
-		sleep(10);
+		boost::this_thread::sleep( boost::posix_time::seconds( 10 ));
 	}
 #endif
 	EXPECT_EQ( output, this->expected);

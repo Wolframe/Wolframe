@@ -9,8 +9,12 @@
 namespace _Wolframe {
 namespace filter {
 
-class XmlHeaderFilter;		///< forward declaration for declaring friends
-class XmlHeaderInputFilter;	///< forward declaration for declaring friends
+// Aba: changed to structs, also the friends below. Windows CL doesn't like
+// mixing 'struct' and 'class', e.g.
+// warning C4099: '_Wolframe::filter::XmlHeaderInputFilter' : type name first
+// seen using 'struct' now seen using 'class'
+struct XmlHeaderFilter;		///< forward declaration for declaring friends
+struct XmlHeaderInputFilter;	///< forward declaration for declaring friends
 
 
 ///\class XmlFilter
@@ -20,7 +24,7 @@ class XmlHeaderInputFilter;	///< forward declaration for declaring friends
 template <class IOCharset, class AppCharset=textwolf::charset::UTF8>
 struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 {
-	friend class XmlHeaderFilter;
+	friend struct XmlHeaderFilter;
 	typedef FilterBase<IOCharset, AppCharset> ThisFilterBase;
 	typedef typename protocol::FormatOutput::ElementType ElementType;
 	typedef typename protocol::FormatOutput::size_type size_type;
@@ -302,7 +306,7 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 	///\brief input filter for XML
 	struct InputFilter :public protocol::InputFilter
 	{
-		friend class XmlHeaderInputFilter;
+		friend struct XmlHeaderInputFilter;
 		///\enum ErrorCodes
 		///\brief Enumeration of error codes
 		enum ErrorCodes

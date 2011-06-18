@@ -10,6 +10,8 @@ endif
 
 local_all:
 
+local_test:
+
 local_clean:
 
 local_distclean:
