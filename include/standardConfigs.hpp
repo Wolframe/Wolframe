@@ -149,7 +149,7 @@ namespace config	{
 
 #if !defined( _WIN32 )
 		void setCanonicalPathes( const std::string& referencePath );
-		void override( const std::string& user, const std::string& group );
+		void override( const std::string& user, const std::string& group, const std::string& pidFile );
 #endif // !defined( _WIN32 )
 	};
 

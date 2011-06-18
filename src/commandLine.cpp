@@ -76,6 +76,7 @@ CmdLineConfig::CmdLineConfig()
 			// Unix daemon options
 			( "user,u", prgOpts::value<std::string>(), "run as <user>" )
 			( "group,g", prgOpts::value<std::string>(), "run as <group>" )
+			( "pidfile", prgOpts::value<std::string>(), "use daemon pidfile <pidfile>" )
 		#endif
 			;
 	command = DEFAULT;
@@ -213,6 +214,8 @@ bool CmdLineConfig::parse( int argc, char* argv[] )
 			user = clMap["user"].as<std::string>();
 		if ( clMap.count( "group" ))
 			group = clMap["group"].as<std::string>();
+		if ( clMap.count( "pidfile" ))
+			pidFile = clMap["pidfile"].as<std::string>();
 #endif
 
 		return true;

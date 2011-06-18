@@ -185,12 +185,14 @@ void ServiceConfiguration::setCanonicalPathes( const std::string& refPath )
 
 
 /// Override the server configuration with command line arguments
-void ServiceConfiguration::override( const std::string& usr, const std::string& grp )
+void ServiceConfiguration::override( const std::string& usr, const std::string& grp, const std::string& pfile )
 {
 	if ( !usr.empty())
 		user = usr;
 	if ( !grp.empty())
 		group = grp;
+	if ( !pfile.empty())
+		pidFile = pfile;
 }
 #endif // !defined(_WIN32)
 

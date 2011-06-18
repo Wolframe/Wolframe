@@ -214,7 +214,7 @@ void ApplicationConfiguration::finalize( const CmdLineConfig& cmdLine )
 	if ( foreground )
 		loggerConf->foreground( cmdLine.debugLevel, cmdLine.useLogConfig );
 #if !defined(_WIN32)
-	serviceConf->override( cmdLine.user, cmdLine.group );
+	serviceConf->override( cmdLine.user, cmdLine.group, cmdLine.pidFile );
 #endif
 	for( std::size_t i = 0; i <  m_conf.size(); i++ )
 		m_conf[i]->setCanonicalPathes( configFile );

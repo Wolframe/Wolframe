@@ -67,6 +67,7 @@ struct CmdLineConfig	{
 	bool		foreground;
 	std::string	user;
 	std::string	group;
+	std::string	pidFile;
 #endif
 	log::LogLevel::Level				debugLevel;
 	std::string					cfgFile;
