@@ -1,10 +1,15 @@
-# Defaults for wolframe initscript
+# Defaults for the saned initscript, from sane-utils
 # sourced by /etc/init.d/wolframe
 # installed at /etc/default/wolframe by the maintainer scripts
 
-#
-# This is a POSIX shell fragment
-#
+# Set to yes to start wolframed automatically
+RUN=no
 
-# Additional options that are passed to the Daemon.
+# Set to the user saned should run as
+RUN_AS_USER=wolframe
+
+# Configuration file for the wolframe daemon.
+DAEMON_CONFIG=/etc/wolframe/wolframe.conf
+
+# Additional options that are passed to the wolframe daemon.
 DAEMON_OPTS=""

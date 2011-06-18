@@ -39,7 +39,7 @@
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
 DAEMON=/usr/sbin/wolframed # Introduce the server's location here
-NAME=wolframed             # Introduce the short server's name here
+NAME=wolframe             # Introduce the short server's name here
 DESC="wolframe daemon"             # Introduce a short description here
 LOGDIR=/var/log/wolframe  # Log directory to use
 
@@ -51,6 +51,7 @@ test -x $DAEMON || exit 0
 
 # Default options, these can be overriden by the information
 # at /etc/default/$NAME
+DAEMON_CONFIG=/etc/wolframe/wolframe.conf # location of the configuration file
 DAEMON_OPTS=""          # Additional options given to the server
 
 DIETIME=10              # Time to wait for the server to die, in seconds
@@ -126,13 +127,13 @@ running() {
 start_server() {
 # Start the process using the wrapper
         if [ -z "$DAEMONUSER" ] ; then
-            start_daemon -p $PIDFILE $DAEMON $DAEMON_OPTS
+            start_daemon -p $PIDFILE $DAEMON -c $DAEMON_CONFIG $DAEMON_OPTS
             errcode=$?
         else
 # if we are using a daemonuser then change the user id
             start-stop-daemon --start --quiet --pidfile $PIDFILE \
                         --chuid $DAEMONUSER \
-                        --exec $DAEMON -- $DAEMON_OPTS
+                        --exec $DAEMON -- -c $DAEMON_CONFIG $DAEMON_OPTS
             errcode=$?
         fi
         return $errcode
