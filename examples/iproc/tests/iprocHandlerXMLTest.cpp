@@ -46,6 +46,7 @@
 #include <fstream>
 #include <algorithm>
 #include <stdexcept>
+#include <stdio.h>
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
@@ -106,7 +107,13 @@ static std::string getDataFile( const char* name, const char* ext=0)
 
 static bool readFile( const char* fn, std::string& out)
 {
-	char buf[ 8192];
+	char buf[ 1];
+	FILE* gg = fopen( fn, "rb");
+	if (gg)
+	{
+		std::cerr << "FILE " << fn << " can be opened" << std::endl;
+		fclose( gg);
+	}
 	std::fstream ff( fn, std::ios::in | std::ios::binary);
 	while (ff.read( buf, sizeof(buf)))
 	{

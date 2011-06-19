@@ -54,12 +54,6 @@ public:
 		CLOSE
 	};
 
-	static const char* name( Operation i)
-	{
-		static const char* ar[] = {"READ","WRITE","CLOSE"};
-		return ar[i];
-	}
-
 	explicit NetworkOperation( const net::NetworkOperation& o)
 	{
 		std::memcpy( this, &o, sizeof(*this));
