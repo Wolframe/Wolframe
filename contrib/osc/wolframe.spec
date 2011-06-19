@@ -11,6 +11,7 @@
 %define rhel 1
 %endif
 
+%define centos 0
 %if 0%{?centos_version} == 501
 %define _dist centos5
 %define centos 1
