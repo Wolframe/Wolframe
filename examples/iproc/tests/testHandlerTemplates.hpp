@@ -54,6 +54,12 @@ public:
 		CLOSE
 	};
 
+	static const char* name( Operation i)
+	{
+		static const char* ar[] = {"READ","WRITE","CLOSE"};
+		return ar[i];
+	}
+
 	explicit NetworkOperation( const net::NetworkOperation& o)
 	{
 		std::memcpy( this, &o, sizeof(*this));
@@ -73,12 +79,11 @@ private:
 };
 
 template <class Connection>
-int runTestIO( char* in, std::string& out, Connection& connection)
+int runTestIO( char* in, char* end, std::string& out, Connection& connection)
 {
 	for (;;)
 	{
 		NetworkOperation netop( connection.nextOperation());
-
 		switch (netop.operation())
 		{
 			case NetworkOperation::READ:
@@ -86,8 +91,11 @@ int runTestIO( char* in, std::string& out, Connection& connection)
 				char* data = const_cast<char*>((char*)netop.data());
 				unsigned int size = netop.size();
 				unsigned int ii;
-				for (ii=0; ii<size && *in; ii++,in++) data[ii]=*in;
-
+				for (ii=0; ii<size && in<end; ii++,in++)
+				{
+					data[ii]=*in;
+				}
+				if (ii==0) return -1;
 				connection.networkInput( (void*)data, ii);
 			}
 			break;

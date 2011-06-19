@@ -69,9 +69,11 @@ CPP_BINS = \
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 TEST_BINS += \
-	tests/iprocHandlerTest$(EXE)
+	tests/iprocHandlerTest$(EXE) \
+	tests/iprocHandlerXMLTest$(EXE)
 
 tests/iprocHandlerTest$(EXE): tests/iprocHandlerTest.o $(OBJS) $(TOPDIR)/src/libwolframe.a
+tests/iprocHandlerXMLTest$(EXE): tests/iprocHandlerXMLTest.o $(OBJS) $(TOPDIR)/src/libwolframe.a
 
 local_all: $(CPP_BINS)
 
@@ -83,6 +85,7 @@ local_install:
 
 local_test: $(TEST_BINS)
 	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./iprocHandlerTest$(EXE)
+	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./iprocHandlerXMLTest$(EXE)
 
 run: $(CPP_BINS)
 	@echo "Running the Wolframe iproc example..."

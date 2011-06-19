@@ -76,7 +76,7 @@ public:
 	/// \param prefix configuration prefix
 	Configuration( const char* name, const char* prefix)
 
-		:ConfigurationBase(name, NULL,prefix)
+		:ConfigurationBase(name, NULL, prefix)
 		,m_input_bufsize(512)
 		,m_output_bufsize(512)
 		,m_cthread_stacksize(2048)
@@ -178,7 +178,7 @@ public:
 	/// \brief Return the name of the function to execute for a command
 	/// \param[in] protocolcmd command from the protocol
 	/// \return script function name to execute
-	const char* scriptFunctionName( const char*) const		{return "run_echo";}
+	const char* scriptFunctionName( const char* cmd) const		{return cmd;}
 
 	/// \brief Tell wheter the command has IO (protocol command content) or not
 	/// \param[in] protocolcmd command from the protocol
