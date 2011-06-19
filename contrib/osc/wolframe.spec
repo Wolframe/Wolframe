@@ -18,8 +18,10 @@
 %endif
 
 %define fedora 0
+%define fc14 0
 %if 0%{?fedora_version} == 14
 %define _dist fc14
+%define fc14 1
 %define fedora 1
 %endif
 %if 0%{?fedora_version} == 15
