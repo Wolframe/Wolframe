@@ -44,13 +44,6 @@
 namespace _Wolframe {
 namespace db {
 
-/// database type
-enum DatabaseType	{
-	DBTYPE_REFERENCE,
-	DBTYPE_POSTGRESQL,
-	DBTYPE_SQLITE
-};
-
 
 class DatabaseConfig : public config::ConfigurationBase
 {
@@ -59,32 +52,13 @@ public:
 		: ConfigurationBase( name, logParent, logName ){}
 	virtual ~DatabaseConfig()			{}
 
-	virtual DatabaseType type() const = 0;
+	virtual const char* type() const = 0;
 	void ID( const std::string& id )		{ m_ID = id; }
 	const std::string& ID() const			{ return m_ID; }
 private:
 	std::string		m_ID;
 };
 
-
-/// database configuration
-struct Configuration : public config::ConfigurationBase
-{
-public:
-	std::list<DatabaseConfig*>	m_dbConfig;
-
-	/// constructor & destructor
-	Configuration() : ConfigurationBase( "Database(s)", NULL, "Database configuration" )	{}
-	~Configuration();
-
-	/// methods
-	bool check() const;
-	void print( std::ostream& os, size_t indent ) const;
-	virtual void setCanonicalPathes( const std::string& referencePath );
-
-//	Not implemented yet, inherited from base for the time being
-//	bool test() const;
-};
 
 struct SingleDBConfiguration : public config::ConfigurationBase
 {
@@ -133,10 +107,7 @@ public:
 	virtual ~Database()				{}
 
 	const std::string& ID() const			{ return m_id; }
-	virtual DatabaseType type() const = 0;
-
-	static DatabaseType strToType( const char *str );
-	static std::string& typeToStr( DatabaseType type );
+	virtual const char* type() const = 0;
 
 	const _DatabaseChannel_* channel() const	{ return NULL; }
 private:
@@ -144,10 +115,45 @@ private:
 };
 
 
+class DatabaseContainer
+{
+public:
+	DatabaseContainer( const std::string id ) : m_id( id )	{}
+	virtual ~DatabaseContainer()				{}
+
+	const std::string& ID() const			{ return m_id; }
+	virtual const char* type() const = 0;
+
+private:
+	const std::string	m_id;
+};
+
+
+/// database configuration
+struct DBproviderConfig : public config::ConfigurationBase
+{
+public:
+	std::list<DatabaseConfig*>	m_dbConfig;
+
+	/// constructor & destructor
+	DBproviderConfig() : ConfigurationBase( "Database(s)", NULL, "Database configuration" )	{}
+	~DBproviderConfig();
+
+	/// methods
+	bool check() const;
+	void print( std::ostream& os, size_t indent ) const;
+	virtual void setCanonicalPathes( const std::string& referencePath );
+
+//	Not implemented yet, inherited from base for the time being
+//	bool test() const;
+};
+
+///
+///
 class DBprovider
 {
 public:
-	DBprovider( const Configuration& conf );
+	DBprovider( const DBproviderConfig& conf );
 	~DBprovider();
 
 	const Database* database( std::string& ID ) const;

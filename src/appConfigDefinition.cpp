@@ -65,7 +65,7 @@ ApplicationConfiguration::ApplicationConfiguration()
 
 	addConfig( "listen", serverConf, &ConfigurationParser::parseBase<net::Configuration> );
 	addConfig( "logging", loggerConf, &ConfigurationParser::parseBase<log::LoggerConfiguration> );
-	addConfig( "database", handlerConf->database, &ConfigurationParser::parseBase<db::Configuration> );
+	addConfig( "database", handlerConf->database, &ConfigurationParser::parseBase<db::DBproviderConfig> );
 	addConfig( "aaaa", handlerConf->aaaa, &ConfigurationParser::parseBase<AAAA::Configuration> );
 }
 
