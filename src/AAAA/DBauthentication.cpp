@@ -35,7 +35,7 @@
 //
 
 #include <stdexcept>
-
+#include <boost/algorithm/string.hpp>
 #include "logger.hpp"
 #include "DBauthentication.hpp"
 
@@ -48,26 +48,22 @@ namespace AAAA {
 
 DBauthContainer::DBauthContainer( const DatabaseAuthConfig& conf )
 {
-	switch ( conf.m_dbConfig.m_dbConfig->type() )	{
-	case db::DBTYPE_POSTGRESQL:	{
+	const char* dbType = conf.m_dbConfig.m_dbConfig->type();
+	if ( boost::algorithm::iequals( dbType, "PostgreSQL" ))	{
 		LOG_NOTICE << "Database authenticator with PostgreSQL";
 		m_db = new db::PostgreSQLDBcontainer( static_cast<db::PostgreSQLconfig*>(conf.m_dbConfig.m_dbConfig) );
 	}
-		break;
-	case db::DBTYPE_SQLITE:	{
+	else if ( boost::algorithm::iequals( dbType, "SQLite" ))	{
 		LOG_NOTICE << "Database authenticator with SQLite";
 		m_db = new db::SQLiteDBcontainer( static_cast<db::SQLiteConfig*>(conf.m_dbConfig.m_dbConfig) );
 	}
-		break;
-	case db::DBTYPE_REFERENCE:	{
+	else if ( boost::algorithm::iequals( dbType, "DB reference" ))	{
 		m_db = NULL;
 		m_dbLabel = ( static_cast<db::ReferenceConfig*>(conf.m_dbConfig.m_dbConfig) )->dbName();
 		LOG_NOTICE << "Database authenticator with database reference '" << m_dbLabel << "'";
 	}
-		break;
-	default:
+	else
 		throw std::domain_error( "Unknown database type in database authenticator constructor" );
-	}
 }
 
 DBauthContainer::~DBauthContainer()

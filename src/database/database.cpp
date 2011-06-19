@@ -46,48 +46,23 @@
 namespace _Wolframe	{
 namespace db	{
 
-DatabaseType Database::strToType( const char *str )
-{
-	if ( boost::algorithm::iequals( str, "PostgreSQL" ))	return DBTYPE_POSTGRESQL;
-	else if ( boost::algorithm::iequals( str, "SQLite" ))	return DBTYPE_SQLITE;
-	else if ( boost::algorithm::iequals( str, "Reference" ))return DBTYPE_REFERENCE;
-	else
-		throw std::domain_error( "Unknown database type in Database::strToType(...)" );
-}
-
-std::string& Database::typeToStr( DatabaseType type )
-{
-	static std::string	retVal[ 3 ] = { "Reference to database", "PostgreSQL", "SQLite" };
-	switch ( type )	{
-	case DBTYPE_REFERENCE:	return retVal[0];
-	case DBTYPE_POSTGRESQL:	return retVal[1];
-	case DBTYPE_SQLITE:	return retVal[2];
-	default:
-		throw std::domain_error( "Unknown database type in Database::typeToStr(...)" );
-	}
-}
-
-
-DBprovider::DBprovider( const Configuration& conf )
+DBprovider::DBprovider( const DBproviderConfig& conf )
 {
 	for ( std::list<DatabaseConfig*>::const_iterator it = conf.m_dbConfig.begin();
 							it != conf.m_dbConfig.end(); it++ )	{
-		switch( (*it)->type() )	{
-		case DBTYPE_POSTGRESQL:	{
+		const char* dbType = (*it)->type();
+		if ( boost::algorithm::iequals( dbType, "PostgreSQL" ))	{
 			PostgreSQLDBcontainer* db = new PostgreSQLDBcontainer( static_cast<PostgreSQLconfig*>(*it) );
 			m_db.push_back( db );
 		}
-			break;
-		case DBTYPE_SQLITE:	{
+		else if ( boost::algorithm::iequals( dbType, "SQLite" ))	{
 			SQLiteDBcontainer* db = new SQLiteDBcontainer( static_cast<SQLiteConfig*>(*it) );
 			m_db.push_back( db );
 		}
-			break;
-		case DBTYPE_REFERENCE:
+		else if ( boost::algorithm::iequals( dbType, "DB reference" ))
 			throw std::domain_error( "Database reference in DBprovider constructor" );
-		default:
+		else
 			throw std::domain_error( "Unknown database type in DBprovider constructor" );
-		}
 	}
 }
 

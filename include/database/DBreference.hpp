@@ -48,7 +48,7 @@ class ReferenceConfig : public DatabaseConfig
 {
 	friend class config::ConfigurationParser;
 public:
-	DatabaseType type() const			{ return DBTYPE_REFERENCE; }
+	const char* type() const			{ return "DB Reference"; }
 
 	ReferenceConfig( const char* name, const char* logParent, const char* logName )
 		: DatabaseConfig( name, logParent, logName )	{}

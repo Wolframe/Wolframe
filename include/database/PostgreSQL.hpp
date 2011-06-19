@@ -47,7 +47,7 @@ class PostgreSQLconfig : public DatabaseConfig
 {
 	friend class config::ConfigurationParser;
 public:
-	DatabaseType type() const			{ return DBTYPE_POSTGRESQL; }
+	const char* type() const			{ return "PostgreSQL"; }
 
 	PostgreSQLconfig( const char* name, const char* logParent, const char* logName );
 	~PostgreSQLconfig()				{}
@@ -69,8 +69,7 @@ class PostgreSQLDBcontainer : public Database
 public:
 	PostgreSQLDBcontainer( const PostgreSQLconfig* conf );
 	~PostgreSQLDBcontainer()			{}
-
-	DatabaseType type() const			{ return DBTYPE_POSTGRESQL; }
+	const char* type() const			{ return "PostgreSQL"; }
 private:
 };
 

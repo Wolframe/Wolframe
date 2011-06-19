@@ -57,7 +57,7 @@ namespace _Wolframe {
 namespace config {
 
 template<>
-bool ConfigurationParser::parse( db::Configuration& cfg,
+bool ConfigurationParser::parse( db::DBproviderConfig& cfg,
 				 const boost::property_tree::ptree& pt, const std::string& /*node*/ )
 {
 	using namespace _Wolframe::config;
@@ -153,14 +153,14 @@ bool ConfigurationParser::parse( db::SingleDBConfiguration& cfg,
 namespace db {
 
 //***  Generic database functions  **************************************
-Configuration::~Configuration()
+DBproviderConfig::~DBproviderConfig()
 {
 	for ( std::list<DatabaseConfig*>::const_iterator it = m_dbConfig.begin();
 								it != m_dbConfig.end(); it++ )
 		delete *it;
 }
 
-void Configuration::print( std::ostream& os, size_t /* indent */ ) const
+void DBproviderConfig::print( std::ostream& os, size_t /* indent */ ) const
 {
 	os << sectionName() << std::endl;
 	if ( m_dbConfig.size() > 0 )	{
@@ -175,7 +175,7 @@ void Configuration::print( std::ostream& os, size_t /* indent */ ) const
 
 
 /// Check if the database configuration makes sense
-bool Configuration::check() const
+bool DBproviderConfig::check() const
 {
 	bool correct = true;
 	for ( std::list<DatabaseConfig*>::const_iterator it = m_dbConfig.begin();
@@ -186,7 +186,7 @@ bool Configuration::check() const
 	return correct;
 }
 
-void Configuration::setCanonicalPathes( const std::string& refPath )
+void DBproviderConfig::setCanonicalPathes( const std::string& refPath )
 {
 	for ( std::list<DatabaseConfig*>::const_iterator it = m_dbConfig.begin();
 								it != m_dbConfig.end(); it++ )	{
