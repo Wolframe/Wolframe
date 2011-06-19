@@ -107,21 +107,13 @@ static std::string getDataFile( const char* name, const char* ext=0)
 
 static bool readFile( const char* fn, std::string& out)
 {
-	char buf[ 1];
-	FILE* gg = fopen( fn, "rb");
-	if (gg)
-	{
-		std::cerr << "FILE " << fn << " can be opened" << std::endl;
-		fclose( gg);
-	}
+	char buf;
 	std::fstream ff( fn, std::ios::in | std::ios::binary);
-	while (ff.read( buf, sizeof(buf)))
+	while (ff.read( &buf, sizeof(buf)))
 	{
-		out.append( buf, ff.gcount());
+		out.push_back( buf);
 	}
-	out.append( buf, ff.gcount());
-	if ((ff.rdstate() & std::ifstream::eofbit) != 0) return true;
-	return false;
+	return ((ff.rdstate() & std::ifstream::eofbit) != 0);
 }
 
 static void writeFile( const char* fn, const std::string& content)
