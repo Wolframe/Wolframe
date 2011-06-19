@@ -130,7 +130,7 @@ BuildRequires: pwdutils >= 3.2
 %endif
 
 %if !%{build_boost}
-BuildRequires: boost-devel >= 1.43   
+BuildRequires: boost-devel
 %if %{rhel} || %{centos} || %{fedora}
 Requires: boost >= 1.43
 Requires: boost-thread >= 1.43
