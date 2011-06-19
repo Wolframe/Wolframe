@@ -43,7 +43,7 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace app;
 
-InputFilterClosure::ItemType InputFilterClosure::fetch( const char*& e1, unsigned int& e1size, const char*& e2, unsigned int& e2size)
+InputFilterClosure::ItemType InputFilterClosure::fetch( const char*& tag, unsigned int& tagsize, const char*& val, unsigned int& valsize)
 {
 	if (!m_inputfilter.get() || m_bufsize==0)
 	{
@@ -51,16 +51,16 @@ InputFilterClosure::ItemType InputFilterClosure::fetch( const char*& e1, unsigne
 	}
 	if (m_value)
 	{
-		e2 = m_buf;
-		e2size = m_bufpos;
+		tag = m_buf;
+		tagsize = m_bufpos;
 	}
 	else
 	{
-		e2 = 0;
-		e2size = 0;
+		tag = 0;
+		tagsize = 0;
 	}
-	e1 = 0;
-	e1size = 0;
+	val = 0;
+	valsize = 0;
 
 	if (!m_inputfilter->getNext( &m_type, m_buf, m_bufsize-1, &m_bufpos))
 	{
@@ -85,8 +85,8 @@ InputFilterClosure::ItemType InputFilterClosure::fetch( const char*& e1, unsigne
 			case protocol::InputFilter::OpenTag:
 				m_taglevel += 1;
 				m_buf[ m_bufpos] = 0;
-				e2 = m_buf;
-				e2size = m_bufpos;
+				tag = m_buf;
+				tagsize = m_bufpos;
 				init();
 				return Data;
 
@@ -94,13 +94,13 @@ InputFilterClosure::ItemType InputFilterClosure::fetch( const char*& e1, unsigne
 				m_buf[ m_bufpos] = 0;
 				if (m_value)
 				{
-					e1 = m_value;
-					e1size = m_bufpos -e1size -1;
+					val = m_value;
+					valsize = m_bufpos -valsize -1;
 				}
 				else
 				{
-					e1 = m_buf;
-					e1size = m_bufpos;
+					val = m_buf;
+					valsize = m_bufpos;
 					init();
 				}
 				return Data;
@@ -116,7 +116,7 @@ InputFilterClosure::ItemType InputFilterClosure::fetch( const char*& e1, unsigne
 				else
 				{
 					m_value = m_buf+m_bufpos;
-					return fetch( e1, e1size, e2, e2size);
+					return fetch( tag, tagsize, val, valsize);
 				}
 			 case protocol::InputFilter::CloseTag:
 				init();
@@ -161,18 +161,31 @@ protocol::InputFilter* System::createInputFilter( const char* name, unsigned int
 	}
 
 	if (boost::algorithm::iequals( nm, "char:isolatin1")) return new filter::CharFilter<textwolf::charset::IsoLatin1>::InputFilter();
+
+	if (boost::algorithm::iequals( nm, "char:isolatin1") || boost::algorithm::iequals( nm, "char:iso88591"))
+	{
+		return new filter::CharFilter<textwolf::charset::IsoLatin1>::InputFilter();
+	}
 	if (boost::algorithm::iequals( nm, "char:utf8")) return new filter::CharFilter<textwolf::charset::UTF8>::InputFilter();
 	if (boost::algorithm::iequals( nm, "char:UCS2LE")) return new filter::CharFilter<textwolf::charset::UCS2LE>::InputFilter();
 	if (boost::algorithm::iequals( nm, "char:UCS2BE")) return new filter::CharFilter<textwolf::charset::UCS2BE>::InputFilter();
 	if (boost::algorithm::iequals( nm, "char:UCS4LE")) return new filter::CharFilter<textwolf::charset::UCS4LE>::InputFilter();
 	if (boost::algorithm::iequals( nm, "char:UCS4BE")) return new filter::CharFilter<textwolf::charset::UCS4BE>::InputFilter();
-	if (boost::algorithm::iequals( nm, "line:isolatin1")) return new filter::LineFilter<textwolf::charset::IsoLatin1>::InputFilter();
+
+	if (boost::algorithm::iequals( nm, "line:isolatin1") || boost::algorithm::iequals( nm, "line:iso88591"))
+	{
+		return new filter::LineFilter<textwolf::charset::IsoLatin1>::InputFilter();
+	}
 	if (boost::algorithm::iequals( nm, "line:utf8")) return new filter::LineFilter<textwolf::charset::UTF8>::InputFilter();
 	if (boost::algorithm::iequals( nm, "line:UCS2LE")) return new filter::LineFilter<textwolf::charset::UCS2LE>::InputFilter();
 	if (boost::algorithm::iequals( nm, "line:UCS2BE")) return new filter::LineFilter<textwolf::charset::UCS2BE>::InputFilter();
 	if (boost::algorithm::iequals( nm, "line:UCS4LE")) return new filter::LineFilter<textwolf::charset::UCS4LE>::InputFilter();
 	if (boost::algorithm::iequals( nm, "line:UCS4BE")) return new filter::LineFilter<textwolf::charset::UCS4BE>::InputFilter();
-	if (boost::algorithm::iequals( nm, "xml:isolatin1")) return new filter::XmlFilter<textwolf::charset::IsoLatin1>::InputFilter();
+
+	if (boost::algorithm::iequals( nm, "xml:isolatin1") || boost::algorithm::iequals( nm, "xml:iso88591"))
+	{
+		return new filter::XmlFilter<textwolf::charset::IsoLatin1>::InputFilter();
+	}
 	if (boost::algorithm::iequals( nm, "xml:utf8")) return new filter::XmlFilter<textwolf::charset::UTF8>::InputFilter();
 	if (boost::algorithm::iequals( nm, "xml:UCS2LE")) return new filter::XmlFilter<textwolf::charset::UCS2LE>::InputFilter();
 	if (boost::algorithm::iequals( nm, "xml:UCS2BE")) return new filter::XmlFilter<textwolf::charset::UCS2BE>::InputFilter();
@@ -218,7 +231,7 @@ protocol::FormatOutput* System::createFormatOutput( const char* name, unsigned i
 	return 0;
 }
 
-Output::ItemType Output::print( const char* e1, unsigned int e1size, const char* e2, unsigned int e2size)
+Output::ItemType Output::print( const char* tag, unsigned int tagsize, const char* val, unsigned int valsize)
 {
 	if (!m_formatoutput.get())
 	{
@@ -227,17 +240,17 @@ Output::ItemType Output::print( const char* e1, unsigned int e1size, const char*
 	}
 	try
 	{
-		if (e1)
+		if (tag)
 		{
-			if (e2)
+			if (val)
 			{
 				switch (m_state)
 				{
 					case 0:
-						if (!m_formatoutput->print( protocol::FormatOutput::Attribute, e1, e1size)) break;
+						if (!m_formatoutput->print( protocol::FormatOutput::Attribute, tag, tagsize)) break;
 						m_state ++;
 					case 1:
-						if (!m_formatoutput->print( protocol::FormatOutput::Value, e2, e2size)) break;
+						if (!m_formatoutput->print( protocol::FormatOutput::Value, val, valsize)) break;
 						m_state ++;
 					case 2:
 						m_state = 0;
@@ -253,7 +266,7 @@ Output::ItemType Output::print( const char* e1, unsigned int e1size, const char*
 			}
 			else
 			{
-				if (!m_formatoutput->print( protocol::FormatOutput::OpenTag, e1, e1size))
+				if (!m_formatoutput->print( protocol::FormatOutput::OpenTag, tag, tagsize))
 				{
 					int err = m_formatoutput->getError();
 					if (err)
@@ -266,9 +279,9 @@ Output::ItemType Output::print( const char* e1, unsigned int e1size, const char*
 				return Data;
 			}
 		}
-		else if (e2)
+		else if (val)
 		{
-			if (!m_formatoutput->print( protocol::FormatOutput::Value, e2, e2size))
+			if (!m_formatoutput->print( protocol::FormatOutput::Value, val, valsize))
 			{
 				int err = m_formatoutput->getError();
 				if (err)

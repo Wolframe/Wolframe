@@ -187,7 +187,7 @@ static int function_inputFilter( lua_State* ls)
 
 		InputFilterClosure* closure = (InputFilterClosure*)lua_touserdata( ls, lua_upvalueindex( 1));
 
-		switch (closure->fetch( item[0], itemsize[0], item[1], itemsize[1]))
+		switch (closure->fetch( item[1]/*tag*/, itemsize[1], item[0]/*val*/, itemsize[0]))
 		{
 			case InputFilterClosure::DoYield:
 				lua_yield( ls, 0);
@@ -242,7 +242,7 @@ static int function_output_print( lua_State* ls)
 		{
 			return luaL_error( ls, "too many arguments in call of format output print");
 		}
-		switch (output->print( item[0], itemsize[0], item[1], itemsize[1]))
+		switch (output->print( item[1]/*tag*/, itemsize[1], item[0]/*val*/, itemsize[0]))
 		{
 			case Output::DoYield:
 				lua_yield( ls, 0);
