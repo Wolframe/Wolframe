@@ -127,7 +127,7 @@ BuildRequires: generic-release
 %if %{suse}
 BuildRequires: openSUSE-release
 %endif
-%if %{sles}:
+%if %{sles}
 BuildRequires: sles-release
 BuildRequires: pwdutils >= 3.2
 %endif
