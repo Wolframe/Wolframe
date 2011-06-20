@@ -39,41 +39,23 @@
 #include "logger.hpp"
 #include "DBauthentication.hpp"
 
-#include "database/PostgreSQL.hpp"
-#include "database/SQLite.hpp"
-#include "database/DBreference.hpp"
-
 namespace _Wolframe {
 namespace AAAA {
 
 DBauthContainer::DBauthContainer( const DatabaseAuthConfig& conf )
 {
-	const char* dbType = conf.m_dbConfig.m_dbConfig->type();
-	if ( boost::algorithm::iequals( dbType, "PostgreSQL" ))	{
-		LOG_NOTICE << "Database authenticator with PostgreSQL";
-		m_db = new db::PostgreSQLDBcontainer( static_cast<db::PostgreSQLconfig*>(conf.m_dbConfig.m_dbConfig) );
-	}
-	else if ( boost::algorithm::iequals( dbType, "SQLite" ))	{
-		LOG_NOTICE << "Database authenticator with SQLite";
-		m_db = new db::SQLiteDBcontainer( static_cast<db::SQLiteConfig*>(conf.m_dbConfig.m_dbConfig) );
-	}
-	else if ( boost::algorithm::iequals( dbType, "DB reference" ))	{
-		m_db = NULL;
-		m_dbLabel = ( static_cast<db::ReferenceConfig*>(conf.m_dbConfig.m_dbConfig) )->dbName();
-		LOG_NOTICE << "Database authenticator with database reference '" << m_dbLabel << "'";
-	}
-	else
-		throw std::domain_error( "Unknown database type in database authenticator constructor" );
+	assert ( boost::algorithm::iequals( conf.m_dbConfig.type(), "DB reference" ));
+
+	m_db = NULL;
+	m_dbLabel = conf.m_dbConfig.dbName();
+	if ( m_dbLabel.empty() )
+		throw std::logic_error( "Empty database reference in DBauthContainer" );
+
+	LOG_NOTICE << "Database authenticator with database reference '" << m_dbLabel << "'";
 }
 
 DBauthContainer::~DBauthContainer()
 {
-	if ( m_dbLabel.empty() )	{	// it's not a reference
-		if ( m_db )
-			delete m_db;
-		else
-			throw std::logic_error( "No database in DatabaseAuth" );
-	}
 }
 
 

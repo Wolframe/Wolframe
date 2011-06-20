@@ -37,7 +37,6 @@
 #include "database/database.hpp"
 #include "database/PostgreSQL.hpp"
 #include "database/SQLite.hpp"
-#include "database/DBreference.hpp"
 
 #include "config/valueParser.hpp"
 #include "config/configurationParser.hpp"
@@ -89,65 +88,6 @@ bool ConfigurationParser::parse( db::DBproviderConfig& cfg,
 	return retVal;
 }
 
-template<>
-bool ConfigurationParser::parse( db::SingleDBConfiguration& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& node )
-{
-	using namespace _Wolframe::config;
-	bool retVal = true;
-
-	std::string label = pt.get_value<std::string>();
-	if ( ! label.empty() )	{
-		db::ReferenceConfig* conf = new db::ReferenceConfig( "Reference", cfg.logPrefix().c_str(), "reference" );
-		if ( ConfigurationParser::parse( *conf, pt, node ))
-			cfg.m_dbConfig = conf;
-		else	{
-			delete conf;
-			retVal = false;
-		}
-	}
-	else	{
-		for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
-			if ( cfg.m_dbConfig != NULL )	{
-				LOG_ERROR << cfg.logPrefix() << "database already defined: '"
-					    << L1it->first << "'";
-				retVal = false;
-			}
-			else	{
-				if ( boost::algorithm::iequals( L1it->first, "PostgreSQL" ))	{
-					db::PostgreSQLconfig* conf = new db::PostgreSQLconfig( "PostgreSQL server",
-											 cfg.logPrefix().c_str(), "PostgreSQL" );
-					if ( ConfigurationParser::parse( *conf, L1it->second, L1it->first ))
-						cfg.m_dbConfig = conf;
-					else	{
-						delete conf;
-						retVal = false;
-					}
-				}
-				else if ( boost::algorithm::iequals( L1it->first, "SQLite" ))	{
-					db::SQLiteConfig* conf = new db::SQLiteConfig( "SQLite database", cfg.logPrefix().c_str(), "SQLite" );
-					if ( ConfigurationParser::parse( *conf, L1it->second, L1it->first ))
-						cfg.m_dbConfig = conf;
-					else	{
-						delete conf;
-						retVal = false;
-					}
-				}
-				else
-					LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
-						    << L1it->first << "'";
-			}
-		}
-	}
-
-	if ( ! cfg.m_dbConfig )	{
-		LOG_ERROR << cfg.logPrefix() << "database label without definition";
-		retVal = false;
-	}
-
-	return retVal;
-}
-
 } // namespace config
 
 namespace db {
@@ -192,40 +132,6 @@ void DBproviderConfig::setCanonicalPathes( const std::string& refPath )
 								it != m_dbConfig.end(); it++ )	{
 		(*it)->setCanonicalPathes( refPath );
 	}
-}
-
-//***************************************************
-SingleDBConfiguration::~SingleDBConfiguration()
-{
-	if ( m_dbConfig )
-		delete m_dbConfig;
-}
-
-void SingleDBConfiguration::print( std::ostream& os, size_t indent ) const
-{
-	if ( ! sectionName().empty() )	{
-		std::string indStr( indent, ' ' );
-		os << indStr << sectionName() << ":" << std::endl;
-		indent += 3;
-	}
-	if ( m_dbConfig )	{
-		m_dbConfig->print( os, indent );
-	}
-	else
-		os << "   None configured" << std::endl;
-}
-
-/// Check if the database configuration makes sense
-bool SingleDBConfiguration::check() const
-{
-	if ( m_dbConfig )
-		return m_dbConfig->check();
-	return false;
-}
-
-void SingleDBConfiguration::setCanonicalPathes( const std::string& refPath )
-{
-	m_dbConfig->setCanonicalPathes( refPath );
 }
 
 }} // namespace _Wolframe::db

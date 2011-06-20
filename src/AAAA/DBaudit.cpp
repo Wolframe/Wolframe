@@ -40,44 +40,27 @@
 #include "logger.hpp"
 #include "DBaudit.hpp"
 
-#include "database/PostgreSQL.hpp"
-#include "database/SQLite.hpp"
-#include "database/DBreference.hpp"
-
 namespace _Wolframe {
 namespace AAAA {
 
-DatabaseAuditor::DatabaseAuditor( const DatabaseAuditConfig& conf )
+DBauditContainer::DBauditContainer( const DatabaseAuditConfig& conf )
 {
-	const char* dbType = conf.m_dbConfig.m_dbConfig->type();
-	if ( boost::algorithm::iequals( dbType, "PostgreSQL" ))	{
-		LOG_NOTICE << "Database auditor with PostgreSQL";
-		m_db = new db::PostgreSQLDBcontainer( static_cast<db::PostgreSQLconfig*>(conf.m_dbConfig.m_dbConfig) );
-	}
-	else if ( boost::algorithm::iequals( dbType, "SQLite" ))	{
-		LOG_NOTICE << "Database auditor with SQLite";
-		m_db = new db::SQLiteDBcontainer( static_cast<db::SQLiteConfig*>(conf.m_dbConfig.m_dbConfig) );
-	}
-	else if ( boost::algorithm::iequals( dbType, "DB reference" ))	{
-		m_db = NULL;
-		m_dbLabel = ( static_cast<db::ReferenceConfig*>(conf.m_dbConfig.m_dbConfig) )->dbName();
-		LOG_NOTICE << "Database auditor with database reference '" << m_dbLabel << "'";
-	}
-	else
-		throw std::domain_error( "Unknown database type in database auditor constructor" );
+	assert ( boost::algorithm::iequals( conf.m_dbConfig.type(), "DB reference" ));
+
+	m_db = NULL;
+	m_dbLabel = conf.m_dbConfig.dbName();
+
+	if ( m_dbLabel.empty() )
+		throw std::logic_error( "Empty database reference in DBauditContainer" );
+
+	LOG_NOTICE << "Database auditor with database reference '" << m_dbLabel << "'";
 }
 
-DatabaseAuditor::~DatabaseAuditor()
+DBauditContainer::~DBauditContainer()
 {
-	if ( m_dbLabel.empty() )	{	// it's not a reference
-		if ( m_db )
-			delete m_db;
-		else
-			throw std::logic_error( "No database in DatabaseAuditor" );
-	}
 }
 
-bool DatabaseAuditor::resolveDB( const db::DBprovider& db )
+bool DBauditContainer::resolveDB( const db::DBprovider& db )
 {
 	if ( m_db == NULL && ! m_dbLabel.empty() )	{
 		m_db = db.database( m_dbLabel );

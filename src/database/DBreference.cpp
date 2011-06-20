@@ -35,7 +35,6 @@
 //
 
 #include "database/database.hpp"
-#include "database/DBreference.hpp"
 #include "logger.hpp"
 
 #include <ostream>

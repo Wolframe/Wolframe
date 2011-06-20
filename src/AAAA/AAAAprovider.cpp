@@ -82,7 +82,7 @@ AAAAprovider::AAAAprovider( const Configuration& conf )
 		}
 			break;
 		case AUDIT_DATABASE:	{
-			DatabaseAuditor* auditor = new DatabaseAuditor( static_cast<DatabaseAuditConfig&>(**it) );
+			DBauditContainer* auditor = new DBauditContainer( static_cast<DatabaseAuditConfig&>(**it) );
 			m_auditors.push_back( auditor );
 		}
 			break;

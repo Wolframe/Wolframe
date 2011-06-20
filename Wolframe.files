@@ -189,7 +189,6 @@ include/config/valueParser.hpp
 include/connectionEndpoint.hpp
 include/connectionHandler.hpp
 include/database/database.hpp
-include/database/DBreference.hpp
 include/database/PostgreSQL.hpp
 include/database/SQLite.hpp
 include/ErrorCodes.hpp

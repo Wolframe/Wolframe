@@ -60,20 +60,23 @@ private:
 };
 
 
-struct SingleDBConfiguration : public config::ConfigurationBase
+/// database reference class
+/// note that this is a configuration class only
+class ReferenceConfig : public DatabaseConfig
 {
+	friend class config::ConfigurationParser;
 public:
-	DatabaseConfig*	m_dbConfig;
+	const char* type() const			{ return "DB Reference"; }
 
-	/// constructor & destructor
-	SingleDBConfiguration( const char* name, const char* logParent, const char* logName )
-		: ConfigurationBase( name, logParent, logName )	{ m_dbConfig = NULL; }
-	~SingleDBConfiguration();
+	ReferenceConfig( const char* name, const char* logParent, const char* logName )
+		: DatabaseConfig( name, logParent, logName )	{}
 
-	/// methods
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
-	virtual void setCanonicalPathes( const std::string& referencePath );
+
+	const std::string& dbName() const		{ return m_ref; }
+private:
+	std::string	m_ref;
 };
 
 

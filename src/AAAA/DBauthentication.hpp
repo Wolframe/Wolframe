@@ -59,13 +59,13 @@ public:
 
 	void print( std::ostream& os, size_t indent ) const	{
 		std::string indStr( indent, ' ' );
-		os << indStr << sectionName() << ": " << std::endl;
-		m_dbConfig.print( os, indent + 3 );
+		os << indStr << sectionName();
+		m_dbConfig.print( os, 0 );
 	}
 
 	void setCanonicalPathes( const std::string& refPath )	{ m_dbConfig.setCanonicalPathes( refPath ); }
 private:
-	db::SingleDBConfiguration	m_dbConfig;
+	db::ReferenceConfig	m_dbConfig;
 };
 
 

@@ -34,7 +34,7 @@
 // database reference configuration
 //
 
-#include "database/DBreference.hpp"
+#include "database/database.hpp"
 #include "config/valueParser.hpp"
 #include "config/configurationParser.hpp"
 
