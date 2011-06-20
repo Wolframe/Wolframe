@@ -108,12 +108,15 @@ static std::string getDataFile( const char* name, const char* ext=0)
 static bool readFile( const char* fn, std::string& out)
 {
 	char buf;
-	std::fstream ff( fn, std::ios::in | std::ios::binary);
+	std::fstream ff;
+	ff.open( fn, std::ios::in | std::ios::binary);
 	while (ff.read( &buf, sizeof(buf)))
 	{
 		out.push_back( buf);
 	}
-	return ((ff.rdstate() & std::ifstream::eofbit) != 0);
+	bool rt = ((ff.rdstate() & std::ifstream::eofbit) != 0);
+	ff.close();
+	return rt;
 }
 
 static void writeFile( const char* fn, const std::string& content)
@@ -131,12 +134,12 @@ TEST_F( XMLTestFixture, tests)
 		static int BufferSize[ NofBufferSizes] = {2,3,4,5,6,7,8,127};
 
 		std::string inputd;
-		const char* ifnam = getDataFile( testDescriptions[ti].datafile).c_str();
-		if (!readFile( ifnam, inputd)) throw std::runtime_error("could not read test input file");
+		std::string ifnam = getDataFile( testDescriptions[ti].datafile);
+		if (!readFile( ifnam.c_str(), inputd)) throw std::runtime_error("could not read test input file");
 
 		std::string expectd;
-		const char* efnam = getDataFile( testDescriptions[ti].datafile, ".exp").c_str();
-		readFile( efnam, expectd);
+		std::string efnam = getDataFile( testDescriptions[ti].datafile, ".exp");
+		readFile( efnam.c_str(), expectd);
 
 		net::LocalTCPendpoint  ep( "127.0.0.1", 12345);
 		iproc::Connection* connection = 0;
@@ -188,8 +191,8 @@ TEST_F( XMLTestFixture, tests)
 				ext.append( boost::lexical_cast<std::string>(BufferSize[ob]));
 				ext.append( ".out");
 
-				const char* ofnam = getDataFile( testDescriptions[ti].datafile, ext.c_str()).c_str();
-				writeFile( ofnam, prt_output);
+				std::string ofnam = getDataFile( testDescriptions[ti].datafile, ext.c_str());
+				writeFile( ofnam.c_str(), prt_output);
 			}
 		}
 	}
