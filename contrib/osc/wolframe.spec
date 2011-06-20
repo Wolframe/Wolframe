@@ -2,19 +2,19 @@
 ###
 
 %define rhel 0
-%if 0%{?rhel_version} == 501
+%if 0%{?rhel_version} >= 500 && 0%{?centos_version} <= 599
 %define dist rhel5
 %define rhel 1
 %{echo:Found OS: RHEL 5}
 %endif
-%if 0%{?rhel_version} == 600
+%if 0%{?rhel_version} == 600 && 0%{?rhel_version} == 699
 %define dist rhel6
 %define rhel 1
 %{echo:Found OS: RHEL 6}
 %endif
 
 %define centos 0
-%if 0%{?centos_version} == 501
+%if 0%{?centos_version} >= 500 && 0%{?centos_version} <= 599
 %define dist centos5
 %define centos 1
 %{echo:Found OS: Centos 5}
