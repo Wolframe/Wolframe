@@ -3,42 +3,65 @@
 
 %define rhel 0
 %if 0%{?rhel_version} == 501
-%define _dist rhel5
+%define dist rhel5
 %define rhel 1
+%{echo:Found OS: RHEL 5}
 %endif
 %if 0%{?rhel_version} == 600
-%define _dist rhel6
+%define dist rhel6
 %define rhel 1
+%{echo:Found OS: RHEL 6}
 %endif
 
 %define centos 0
 %if 0%{?centos_version} == 501
-%define _dist centos5
+%define dist centos5
 %define centos 1
+%{echo:Found OS: Centos 5}
 %endif
 
 %define fedora 0
 %define fc14 0
 %if 0%{?fedora_version} == 14
-%define _dist fc14
+%define dist fc14
 %define fc14 1
 %define fedora 1
+%{echo:Found OS: Fedora 14}
 %endif
 %if 0%{?fedora_version} == 15
-%define _dist fc15
+%define dist fc15
 %define fedora 1
+%{echo:Found OS: Fedora 15}
 %endif
 
 %define suse 0
 %if 0%{?suse_version} == 1140
-%define _dist osu114
+%define dist osu114
 %define suse 1
+%{echo:Found OS: openSuSE 11.40}
 %endif
 
 %define sles 0
 %if 0%{?sles_version} == 11
-%define _dist sle11
+%define dist sle11
 %define sles 1
+%{echo:Found OS: SLES 11}
+%endif
+
+%if %{rhel}
+%{echo:Canonic OS: RHEL}
+%endif
+%if %{centos}
+%{echo:Canonic OS: Centos}
+%endif
+%if %{fedora}
+%{echo:Canonic OS: Fedora}
+%endif
+%if %{suse}
+%{echo:Canonic OS: SuSE}
+%endif
+%if %{sles}
+%{echo:Canonic OS: SLES}
 %endif
 
 # define what to build
@@ -69,7 +92,7 @@
 
 %define boost_library_tag %{nil}
 %if %{fedora}
-%define boost_library_tag BOOST_LIBRARY_TAG =
+%define boost_library_tag BOOST_LIBRARY_TAG=
 %endif
 
 # build local boost for distributions which have a too old version
@@ -187,7 +210,7 @@ BuildRequires: doxygen
 
 # Check if 'Distribution' is really set by OBS (as mentioned in bacula)
 %if ! 0%{?opensuse_bs}
-Distribution: %{_dist}
+Distribution: %{dist}
 %endif
 
 Vendor: Wolframe team
@@ -356,8 +379,8 @@ fi
 #%attr(0755, WOLFRAME_USR, WOLFRAME_GRP) %dir /var/log/wolframe
 #%attr(0755, WOLFRAME_USR, WOLFRAME_GRP) %dir /var/run/wolframe
 
-%dir %{_libdir}/wolframe
 %if %{build_boost}
+%dir %{_libdir}/wolframe
 %{_libdir}/wolframe/libboost_program_options.so.%{boost_version}
 %{_libdir}/wolframe/libboost_system.so.%{boost_version}
 %{_libdir}/wolframe/libboost_filesystem.so.%{boost_version}
