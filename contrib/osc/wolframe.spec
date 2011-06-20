@@ -5,19 +5,16 @@
 %if 0%{?rhel_version} >= 500 && 0%{?centos_version} <= 599
 %define dist rhel5
 %define rhel 1
-%{echo:Found OS: RHEL 5}
 %endif
 %if 0%{?rhel_version} == 600 && 0%{?rhel_version} == 699
 %define dist rhel6
 %define rhel 1
-%{echo:Found OS: RHEL 6}
 %endif
 
 %define centos 0
 %if 0%{?centos_version} >= 500 && 0%{?centos_version} <= 599
 %define dist centos5
 %define centos 1
-%{echo:Found OS: Centos 5}
 %endif
 
 %define fedora 0
@@ -26,42 +23,22 @@
 %define dist fc14
 %define fc14 1
 %define fedora 1
-%{echo:Found OS: Fedora 14}
 %endif
 %if 0%{?fedora_version} == 15
 %define dist fc15
 %define fedora 1
-%{echo:Found OS: Fedora 15}
 %endif
 
 %define suse 0
 %if 0%{?suse_version} == 1140
 %define dist osu114
 %define suse 1
-%{echo:Found OS: openSuSE 11.40}
 %endif
 
 %define sles 0
 %if 0%{?sles_version} == 11
 %define dist sle11
 %define sles 1
-%{echo:Found OS: SLES 11}
-%endif
-
-%if %{rhel}
-%{echo:Canonic OS: RHEL}
-%endif
-%if %{centos}
-%{echo:Canonic OS: Centos}
-%endif
-%if %{fedora}
-%{echo:Canonic OS: Fedora}
-%endif
-%if %{suse}
-%{echo:Canonic OS: SuSE}
-%endif
-%if %{sles}
-%{echo:Canonic OS: SLES}
 %endif
 
 # define what to build
