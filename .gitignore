@@ -51,6 +51,7 @@ clients/qt/qtclient
 moc_*.cpp
 clients/qt/.history
 clients/Android/local.properties
+clients/Android/Wolframe.keystore
 tests/db/sdsqliteTest
 tests/db/sqlite3ppTest
 examples/iproc/iprocd
