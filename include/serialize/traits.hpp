@@ -29,36 +29,26 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file config/traits.hpp
+///\file serialize/traits.hpp
 ///\brief defines the traits for the type categories for dispatching parse functions deoending on the value type
 
-#ifndef _Wolframe_CONFIG_TRAITS_HPP_INCLUDED
-#define _Wolframe_CONFIG_TRAITS_HPP_INCLUDED
+#ifndef _Wolframe_SERIALIZE_TRAITS_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_TRAITS_HPP_INCLUDED
 #include <boost/lexical_cast.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits.hpp>
 #include <boost/detail/select_type.hpp>
 #include <boost/type_traits/function_traits.hpp>
-#include "config/descriptionBase.hpp"
-#include "config/configurationBase.hpp"
-#include "logger/logLevel.hpp"
+#include "serialize/descriptionBase.hpp"
 
 namespace _Wolframe {
-namespace config {
+namespace serialize {
 namespace traits
 {
-struct nonstruct_ {};				///< category class for all except struct_
-struct atom_ :public nonstruct_{};		///< category class for atom elements
-struct foreign_ :public nonstruct_{};		///< category class for externally defined elements
 
-struct struct_ {};				///< category tag for a structure with named elements
-struct vector_ :public nonstruct_{};		///< category tag for a std::vector of any type
-struct arithmetic_ :public atom_ {};		///< category tag for a type that is convertible from a string through boost::lexical_cast
-struct bool_ :public atom_ {};			///< category tag for a boolean type
-struct pointer_ :public atom_{};		///< category tag for a pointer type
-struct cfgbase_ :public foreign_{};		///< category tag for a struct derived from ConfigurationBase
-struct loglevel_ :public atom_{};		///< category tag for a log level
-struct syslogfacility_ :public atom_{};		///< category tag for a syslog facility
+struct struct_ {};		///< category tag for a structure with named elements
+struct vector_ {};		///< category tag for a std::vector of any type
+struct atomic_ {};		///< category tag for a type that is atomic
 
 ///\brief conditional template for detecting if a type is a class with a static/member method description() returning a const pointer to a structure description as defined in config/descriptionBase.hpp
 /// see http://drdobbs.com/article/print?articleId=227500449&siteSectionName= "Checking Concept Without Concepts in C++"
@@ -98,61 +88,19 @@ typename boost::enable_if_c<
 	boost::is_same< std::vector< typename T::value_type> ,T>::value && !boost::is_same<std::string,T>::value
 	,vector_>::type getCategory( const T&) { return vector_();}
 
-
 ///\brief get category struct_ for a type
-/// returns struct_ if T has a method description with no params returning a const pointer to a config::DescriptionBase
+/// returns struct_ if T has a method description with no params returning a const pointer to a serialize::DescriptionBase
 template <typename T>
 typename boost::enable_if_c<
 	has_description_method<T>::value
 	,struct_>::type getCategory( const T&) { return struct_();}
 
-
-///\brief get category arithmetic_ for a type
-/// returns arithmetic_ if T fulfills the is_arithmetic condition or is a string
+///\brief get category atomic_ for a type
+/// returns atomic_ if T fulfills the is_arithmetic condition or is a string
 template <typename T>
 typename boost::enable_if_c<
-	(boost::is_arithmetic<T>::value && !boost::is_same<bool,T>::value) || boost::is_same<std::string,T>::value
-	,arithmetic_>::type getCategory( const T&) { return arithmetic_();}
-
-
-///\brief get category bool_ for a type
-/// returns bool_ if T is a bool
-template <typename T>
-typename boost::enable_if_c<
-	boost::is_same<bool,T>::value
-	,bool_>::type getCategory( const T&) { return bool_();}
-
-
-///\brief get category loglevel_ for a type
-/// returns loglevel_ if T is a log level
-template <typename T>
-typename boost::enable_if_c<
-boost::is_same<log::LogLevel::Level,T>::value
-	,loglevel_>::type getCategory( const T&) { return loglevel_();}
-
-
-///\brief get category syslogfacility_ for a type
-/// returns loglevel_ if T is a syslog facility
-template <typename T>
-typename boost::enable_if_c<
-boost::is_same<log::SyslogFacility::Facility,T>::value
-	,syslogfacility_>::type getCategory( const T&) { return syslogfacility_();}
-
-
-///\brief get category pointer_ for a type
-/// returns pointer_ if T fulfills the is_pointer properry
-template <typename T>
-typename boost::enable_if_c<
-	boost::is_pointer<T>::value
-	,pointer_>::type getCategory( const T&) { return pointer_();}
-
-
-///\brief get category pointer_ for a type
-/// returns cfgbase_ if T fulfills the is_base_of<ConfigurationBase,T> properry
-template <typename T>
-typename boost::enable_if_c<
-	boost::is_base_of<ConfigurationBase,T>::value
-	,cfgbase_>::type getCategory( const T&) { return cfgbase_();}
+	(boost::is_arithmetic<T>::value || boost::is_same<std::string,T>::value)
+	,atomic_>::type getCategory( const T&) { return atomic_();}
 
 }}}// end namespace
 #endif

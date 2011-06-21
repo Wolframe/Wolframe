@@ -44,9 +44,15 @@ Project Wolframe.
 namespace _Wolframe {
 namespace config {
 
+///\brief Intrusive configuration description
+///\tparam Structure structure that is represented by this description
 template <class Structure>
 struct Description :public DescriptionBase
 {
+	///\brief Operator to build the configuration structure element by element
+	///\tparam Element element type
+	///\param name name of the element
+	///\param eptr pointer to member of the element
 	template <typename Element>
 	Description& operator()( const char* name, Element Structure::*eptr)
 	{

@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-/// \file config/descriptionBase.hpp
-/// \brief Defines the non intrusive description of a struct (the implementation is intrusive and defined in config/description.hpp)
+///\file config/descriptionBase.hpp
+///\brief Defines the non intrusive description of a struct (the implementation is intrusive and defined in config/description.hpp)
 
 #ifndef _Wolframe_CONFIG_DESCRIPTION_BASE_HPP_INCLUDED
 #define _Wolframe_CONFIG_DESCRIPTION_BASE_HPP_INCLUDED
@@ -42,6 +42,7 @@ Project Wolframe.
 namespace _Wolframe {
 namespace config {
 
+///\brief A configuration structure description
 struct DescriptionBase
 {
 	typedef void (*Parse)( const char* name, void* ref, std::size_t ofs, const boost::property_tree::ptree& pt);
@@ -49,6 +50,7 @@ struct DescriptionBase
 	typedef bool (*MatchesElement)( const char* name, const void* value);
 	typedef const void* (*FindElement)( const char* name, const void* value);
 
+	///\brief A description of one item of the configuration POD structure
 	struct Item
 	{
 		std::size_t m_ofs;		///< member position offset in bytes from the start of the structure
@@ -59,23 +61,25 @@ struct DescriptionBase
 		MatchesElement m_matches;	///< check if a member matches
 		FindElement m_find;		///< find a member reference by name and type
 
+		///\brief Constructor
 		Item( std::size_t ofs, const std::string& name, const char* type, Parse parse, Print print, MatchesElement matches, FindElement find)
 			:m_ofs(ofs),m_name(name),m_type(type),m_parse(parse),m_print(print),m_matches(matches),m_find(find){}
+		///\brief Copy constructor
 		Item( const Item& o)
 			:m_ofs(o.m_ofs),m_name(o.m_name),m_type(o.m_type),m_parse(o.m_parse),m_print(o.m_print),m_matches(o.m_matches),m_find(o.m_find){}
 	};
 	std::vector<Item> m_ar;
 
-	/// \brief Fills the configuration structure with values from the configuration
-	/// \param[in,out] configStruct structure to fill
-	/// \param[in] pt property tree with configurarion in its original form
-	/// \param[out] error the error message in case of failure (return false)
-	/// \return true if Ok, false if failed
+	///\brief Fills the configuration structure with values from the configuration
+	///\param[in,out] configStruct structure to fill
+	///\param[in] pt property tree with configurarion in its original form
+	///\param[out] errmsg the error message in case of failure (return false)
+	///\return true if Ok, false if failed
 	bool parse( void* configStruct, const boost::property_tree::ptree& pt, std::string& errmsg) const;
 
-	/// \brief Print the configuration structure with values from the configuration
-	/// \param[out] stream to print to
-	/// \param[in] configStruct structure to print
+	///\brief Print the configuration structure with values from the configuration
+	///\param[out] stream to print to
+	///\param[in] configStruct structure to print
 	void print( std::ostream& out, const void* configStruct) const;
 };
 

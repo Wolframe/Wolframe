@@ -50,7 +50,7 @@ namespace config {
 class ConfigurationParser
 {
 public:
-	/// Parse the configuration section
+	///\brief Parse the configuration section
 	///\param[in]	pt		property tree node
 	///\param[in]	nodeName	the label of the node. It should be
 	///				the same (case insensitive) as it->first

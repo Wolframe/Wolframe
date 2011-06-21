@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-/// \file config/structParser.hpp
-/// \brief Parser for the configuration structure
+///\file config/structParser.hpp
+///\brief Parser for the configuration structure
 
 #ifndef _Wolframe_CONFIG_STRUCTURE_PARSER_HPP_INCLUDED
 #define _Wolframe_CONFIG_STRUCTURE_PARSER_HPP_INCLUDED
@@ -69,7 +69,7 @@ struct ParseError
 	}
 };
 
-/// \brief parses a structure according its description
+///\brief parses a structure according its description
 template <typename T>
 static void parseElement_( const char* name, T& value, const traits::struct_&, const boost::property_tree::ptree& pt)
 {
@@ -102,7 +102,7 @@ static void parseElement_( const char* name, T& value, const traits::struct_&, c
 	}
 }
 
-/// \brief parses a configuration base class by calling its parse function
+///\brief parses a configuration base class by calling its parse function
 template <typename T>
 static void parseElement_( const char* name, T& value, const traits::cfgbase_&, const boost::property_tree::ptree& pt)
 {
@@ -113,7 +113,7 @@ static void parseElement_( const char* name, T& value, const traits::cfgbase_&, 
 }
 
 
-/// \brief parses a all elements of a vector (n elements with same name in pt)
+///\brief parses a all elements of a vector (n elements with same name in pt)
 template <typename T>
 static void parseElement_( const char* name, T& value, const traits::vector_&, const boost::property_tree::ptree& pt)
 {
@@ -135,7 +135,7 @@ static void parseElement_( const char* name, T& value, const traits::vector_&, c
 }
 
 
-/// \brief parses an atomic element restricted by a value domain
+///\brief parses an atomic element restricted by a value domain
 template <typename T, typename Domain>
 static void parseElement_( const char* name, T& value, const Domain& domain, const boost::property_tree::ptree& pt)
 {
@@ -158,7 +158,7 @@ static void parseElement_( const char* name, T& value, const Domain& domain, con
 }
 
 
-/// \brief parses an atomic element
+///\brief parses an atomic element
 template <typename T>
 static void parseElement_( const char* name, T& value, const traits::arithmetic_&, const boost::property_tree::ptree& pt)
 {
@@ -167,7 +167,7 @@ static void parseElement_( const char* name, T& value, const traits::arithmetic_
 }
 
 
-/// \brief parses a bool element
+///\brief parses a bool element
 template <typename T>
 static void parseElement_( const char* name, T& value, const traits::bool_&, const boost::property_tree::ptree& pt)
 {
@@ -176,7 +176,7 @@ static void parseElement_( const char* name, T& value, const traits::bool_&, con
 }
 
 
-/// \brief parses a log level element
+///\brief parses a log level element
 template <typename T>
 static void parseElement_( const char* name, T& value, const traits::loglevel_&, const boost::property_tree::ptree& pt)
 {
@@ -189,7 +189,7 @@ static void parseElement_( const char* name, T& value, const traits::loglevel_&,
 }
 
 
-/// \brief parses an syslog facility element
+///\brief parses an syslog facility element
 template <typename T>
 static void parseElement_( const char* name, T& value, const traits::syslogfacility_&, const boost::property_tree::ptree& pt)
 {
@@ -205,7 +205,7 @@ static void parseElement_( const char* name, T& value, const traits::syslogfacil
 }
 
 
-/// \brief parses an element with indirection (searches it in pt)
+///\brief parses an element with indirection (searches it in pt)
 template <typename T>
 static void parseElement1( const char* name, T& value, const boost::property_tree::ptree& pt)
 {
@@ -243,14 +243,14 @@ static void parseElement1( const char* name, T& value, const boost::property_tre
 	}
 }
 
-/// \brief parses a all elements of a vector (n elements with same name in pt)
+///\brief parses a all elements of a vector (n elements with same name in pt)
 template <typename T>
 static void parseElement_( const char* name, T&, const traits::pointer_&, const boost::property_tree::ptree&)
 {
 	throw ParseError( name, "pointer not supported in configuration description");
 }
 
-/// \brief the unified parse function
+///\brief the unified parse function
 template <typename T>
 static void parseElement( const char* name, T& value, const boost::property_tree::ptree& pt)
 {

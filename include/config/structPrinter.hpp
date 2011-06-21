@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-/// \file config/structPrinter.hpp
-/// \brief Prints the configuration structure
+///\file config/structPrinter.hpp
+///\brief Prints the configuration structure
 
 #ifndef _Wolframe_CONFIG_STRUCTURE_PRINTER_HPP_INCLUDED
 #define _Wolframe_CONFIG_STRUCTURE_PRINTER_HPP_INCLUDED
@@ -60,7 +60,7 @@ static void print_indent( std::ostream& out, unsigned int nn)
 	for (ii=0; ii<nn; ii++) out << INDENT;
 }
 
-/// \brief prints a structure according its description
+///\brief prints a structure according its description
 template <typename T>
 static void printElement_( std::ostream& out, const char* name, const T& value, const traits::struct_& , unsigned int indent)
 {
@@ -77,7 +77,7 @@ static void printElement_( std::ostream& out, const char* name, const T& value, 
 	out << "}" << std::endl;
 }
 
-/// \brief prints a all elements of a vector
+///\brief prints a all elements of a vector
 template <typename T>
 static void printElement_( std::ostream& out, const char* name, const T& value, const traits::vector_&, unsigned int indent)
 {
@@ -88,7 +88,7 @@ static void printElement_( std::ostream& out, const char* name, const T& value, 
 	}
 }
 
-/// \brief prints an atomic element
+///\brief prints an atomic element
 template <typename T>
 static void printElement_( std::ostream& out, const char* name, const T& value, const traits::arithmetic_&, unsigned int indent)
 {
@@ -96,7 +96,7 @@ static void printElement_( std::ostream& out, const char* name, const T& value, 
 	out << name << " = '" << value << "'" << std::endl;
 }
 
-/// \brief prints a bool element
+///\brief prints a bool element
 template <typename T>
 static void printElement_( std::ostream& out, const char* name, const T& value, const traits::bool_&, unsigned int indent)
 {
@@ -104,7 +104,7 @@ static void printElement_( std::ostream& out, const char* name, const T& value, 
 	out << name << " = '" << std::string(value?"true":"false") << "'" << std::endl;
 }
 
-/// \brief prints a log::LogLevel::Level element
+///\brief prints a log::LogLevel::Level element
 template <typename T>
 static void printElement_( std::ostream& out, const char* name, const T& value, const traits::loglevel_&, unsigned int indent)
 {
@@ -112,7 +112,7 @@ static void printElement_( std::ostream& out, const char* name, const T& value, 
 	out << name << " = '" << value << "'" << std::endl;
 }
 
-/// \brief prints a log::SyslogFacility::Facility element
+///\brief prints a log::SyslogFacility::Facility element
 template <typename T>
 static void printElement_( std::ostream& out, const char* name, const T& value, const traits::syslogfacility_&, unsigned int indent)
 {
@@ -120,7 +120,7 @@ static void printElement_( std::ostream& out, const char* name, const T& value, 
 	out << name << " = '" << value << "'" << std::endl;
 }
 
-/// \brief stub for printing a pointer
+///\brief stub for printing a pointer
 template <typename T>
 static void printElement_( std::ostream& out, const char* name, T&, const traits::pointer_&, unsigned int indent)
 {
@@ -128,7 +128,7 @@ static void printElement_( std::ostream& out, const char* name, T&, const traits
 	out << name << " = ?" << std::endl;
 }
 
-/// \brief the unified print function
+///\brief the unified print function
 template <typename T>
 static void printElement( std::ostream& out, const char* name, const T& value, unsigned int indent)
 {

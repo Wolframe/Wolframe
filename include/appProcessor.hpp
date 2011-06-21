@@ -30,8 +30,8 @@ Project Wolframe.
 
 ************************************************************************/
 ///
-/// \file appProcessor.hpp
-/// \brief the application processor interface
+///\file appProcessor.hpp
+///\brief the application processor interface
 ///
 #ifndef _Wolframe_APPLICATION_PROCESSOR_HPP_INCLUDED
 #define _Wolframe_APPLICATION_PROCESSOR_HPP_INCLUDED
@@ -39,42 +39,42 @@ Project Wolframe.
 namespace _Wolframe {
 namespace app {
 
-/// \class AppProcessorBase
-/// \brief abstract base class for the application processor interface representing one instance
+///\class AppProcessorBase
+///\brief Abstract base class for the application processor interface representing one instance
 class AppProcessorBase
 {
 public:
-	/// \brief constructor
+	///\brief Constructor
 	AppProcessorBase(){}
-	/// \brief destructor
+	///\brief Destructor
 	virtual ~AppProcessorBase(){}
 
-	/// \enum CallResult
-	/// \brief enumeration of call states of this application processor instance
+	///\enum CallResult
+	///\brief Enumeration of call states of this application processor instance
 	enum CallResult
 	{
-		Ok,			///< successful termination of call
+		Ok,		///< successful termination of call
 		Error,		///< termination of call with error (not completed)
-		YieldRead,		///< call interrupted with request for more network input
-		YieldWrite		///< call interrupted with request for sending data from the write buffer that is full
+		YieldRead,	///< call interrupted with request for more network input
+		YieldWrite	///< call interrupted with request for sending data from the write buffer that is full
 	};
 
-	/// \brief get the application processor script function to execute for a protocol command (as defined in configuration)
-	/// \param[in] protocolCmd protocol command
-	/// \param[out] name of application processor script function to execute
-	/// \param[out] hasIO true, if the application processor script function processes data from network input, false else
-	/// \return true, if the command exists
+	///\brief Get the application processor script function to execute for a protocol command (as defined in configuration)
+	///\param[in] protocolCmd protocol command
+	///\param[out] name of application processor script function to execute
+	///\param[out] hasIO true, if the application processor script function processes data from network input, false else
+	///\return true, if the command exists
 	virtual bool getCommand( const char* protocolCmd, const char*& functionName, bool& hasIO) const=0;
 
-	/// \brief define input and output interface of the application processor
-	/// \param[in] in input filter reference
-	/// \param[in] out format output reference
+	///\brief Define input and output interface of the application processor
+	///\param[in] in input filter reference
+	///\param[in] out format output reference
 	virtual void setIO( boost::shared_ptr<protocol::InputFilter> in, boost::shared_ptr<protocol::FormatOutput> out)=0;
 
-	/// \brief function call of an application processor script function
-	/// \param[in] argc number of arguments inclusing the script function name as first argument
-	/// \param[in] argv array of arguments inclusing the script function name as first argument
-	/// \return application processor instance call state
+	///\brief Function call of an application processor script function
+	///\param[in] argc number of arguments inclusing the script function name as first argument
+	///\param[in] argv array of arguments inclusing the script function name as first argument
+	///\return application processor instance call state
 	virtual CallResult call( unsigned int argc, const char** argv)=0;
 };
 

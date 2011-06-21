@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-/// \file config/structPrinter.hpp
-/// \brief Prints the configuration structure
+///\file config/structPrinter.hpp
+///\brief Prints the configuration structure
 
 #ifndef _Wolframe_CONFIG_STRUCTURE_POINTER_HPP_INCLUDED
 #define _Wolframe_CONFIG_STRUCTURE_POINTER_HPP_INCLUDED
@@ -45,7 +45,7 @@ Project Wolframe.
 namespace _Wolframe {
 namespace config {
 
-/// \brief returns true, if the structure T matches to name
+///\brief returns true, if the structure T matches to name
 template <typename T>
 bool matchesElement_( const char* name, const T* value, const traits::struct_&)
 {
@@ -70,7 +70,7 @@ bool matchesElement_( const char* , const T*, const traits::nonstruct_&)
 	return false;
 }
 
-/// \brief findElement_ for struct_
+///\brief findElement_ for struct_
 template <typename T>
 const void* findElement_( const char* type, const char* name, const T* value, const traits::struct_&)
 {
@@ -103,7 +103,7 @@ const void* findElement_( const char* type, const char* name, const T* value, co
 	return rt;
 }
 
-/// \brief findElement_ for vector_
+///\brief findElement_ for vector_
 template <typename T>
 const void* findElement_( const char* type, const char* name, const T* value, const traits::vector_&)
 {
@@ -137,14 +137,14 @@ const void* findElement_( const char* type, const char* name, const T* value, co
 	return rt;
 }
 
-/// \brief findElement_ for atom_
+///\brief findElement_ for atom_
 template <typename T>
 const void* findElement_( const char*, const char*, const T*, const traits::atom_&)
 {
 	return 0;
 }
 
-/// \brief findElement_ for foreign_
+///\brief findElement_ for foreign_
 template <typename T>
 const void* findElement_( const char*, const char*, const T*, const traits::foreign_&)
 {
