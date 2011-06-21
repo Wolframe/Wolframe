@@ -57,14 +57,16 @@ using namespace iproc;
 
 struct TestDescription
 {
+	const char* name;
 	const char* scriptfile;
 	const char* datafile;
 };
 
 static const TestDescription testDescriptions[] =
 {
-	{"xml.lua", "test_IsoLatin1.xml"},
-	{0,0}
+	{"echo_xml_IsoLatin1",	"test_echo_xml.lua",	"test_IsoLatin1.xml"},
+	{"echo_char_IsoLatin1",	"test_echo_char.lua",	"test_IsoLatin1.xml"},
+	{0,0,0}
 };
 
 struct TestConfiguration :public lua::Configuration
@@ -95,12 +97,12 @@ protected:
 	virtual void TearDown() {}
 };
 
-static std::string getDataFile( const char* name, const char* ext=0)
+static std::string getDataFile( const char* name, const char* type, const char* ext=0)
 {
 	boost::filesystem::path rt = boost::filesystem::current_path();
 	std::string datafile( name);
 	datafile.append( ext?ext:"");
-	rt /= "data";
+	rt /= type;
 	rt /= datafile;
 	return rt.string();
 }
@@ -133,13 +135,13 @@ TEST_F( XMLTestFixture, tests)
 		enum {NofBufferSizes=8};
 		static int BufferSize[ NofBufferSizes] = {2,3,4,5,6,7,8,127};
 
-		std::string inputd;
-		std::string ifnam = getDataFile( testDescriptions[ti].datafile);
-		if (!readFile( ifnam.c_str(), inputd)) throw std::runtime_error("could not read test input file");
+		std::string prt_input;
+		std::string ifnam = getDataFile( testDescriptions[ti].datafile, "data");
+		if (!readFile( ifnam.c_str(), prt_input)) throw std::runtime_error("could not read test input file");
 
-		std::string expectd;
-		std::string efnam = getDataFile( testDescriptions[ti].datafile, ".exp");
-		readFile( efnam.c_str(), expectd);
+		std::string prt_expect;
+		std::string efnam = getDataFile( testDescriptions[ti].name, "must", ".txt");
+		readFile( efnam.c_str(), prt_expect);
 
 		net::LocalTCPendpoint  ep( "127.0.0.1", 12345);
 		iproc::Connection* connection = 0;
@@ -148,51 +150,34 @@ TEST_F( XMLTestFixture, tests)
 		{
 			for (unsigned int ob=0; ob<NofBufferSizes; ob++)
 			{
+				std::string prt_output;
+
 				TestConfiguration config( testDescriptions[ti].scriptfile, BufferSize[ib], BufferSize[ob]);
 				connection = new iproc::Connection( ep, &config);
 
-				std::string prt_input;
-				std::string prt_output;
-				std::string prt_expect;
-
-				prt_input.append( "run\r\n");
-				prt_expect.append( "OK expecting command\r\n\r\n");
-
-				prt_input.append( inputd);
-				prt_expect.append( expectd);
-
-				prt_input.append( ".\r\n");
-				prt_expect.append( "\r\n\r\n.\r\nOK\r\n");
-				prt_input.append( "quit\r\n");
-				prt_expect.append( "BYE\r\n");
-
 				char* in_start = const_cast<char*>(prt_input.c_str());
 				char* in_end = const_cast<char*>(prt_input.c_str() + prt_input.size());
-
 				EXPECT_EQ( 0, test::runTestIO( in_start, in_end, prt_output, *connection));
-				ASSERT_EQ( prt_output, prt_expect);
 #define _Wolframe_LOWLEVEL_DEBUG
 #ifdef _Wolframe_LOWLEVEL_DEBUG
+				// write output to file to check the result
+				std::string ofnam = getDataFile( testDescriptions[ti].name, "result", ".txt");
+				writeFile( ofnam.c_str(), prt_output);
+				std::cerr << "write output to file '" << ofnam << "'" << std::endl;
+
 				unsigned int ii=0,nn=prt_output.size();
 				for (;ii<nn && prt_output[ii]==prt_expect[ii]; ii++);
 				if (ii != nn)
 				{
-					printf( "SIZE R=%lu,E=%lu,DIFF AT %u='%d %d %d %d|%d %d %d %d'\n",
+					printf( "TEST %s SIZE R=%lu,E=%lu,DIFF AT %u='%d %d %d %d|%d %d %d %d'\n",
+						testDescriptions[ti].name,
 						(unsigned long)prt_output.size(), (unsigned long)prt_expect.size(), ii,
 						prt_output[ii-2],prt_output[ii-1],prt_output[ii-0],prt_output[ii+1],
 						prt_expect[ii-2],prt_expect[ii-1],prt_expect[ii-0],prt_expect[ii+1]);
 					boost::this_thread::sleep( boost::posix_time::seconds( 10 ));
 				}
 #endif
-				std::string ext;
-				ext.push_back( '_');
-				ext.append( boost::lexical_cast<std::string>(BufferSize[ib]));
-				ext.push_back( '_');
-				ext.append( boost::lexical_cast<std::string>(BufferSize[ob]));
-				ext.append( ".out");
-
-				std::string ofnam = getDataFile( testDescriptions[ti].datafile, ext.c_str());
-				writeFile( ofnam.c_str(), prt_output);
+				ASSERT_EQ( prt_expect, prt_output);
 			}
 		}
 	}

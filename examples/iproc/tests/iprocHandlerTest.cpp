@@ -56,7 +56,7 @@ struct TestConfiguration :public lua::Configuration
 		:lua::Configuration( "iproc", "test-iproc")
 	{
 		boost::property_tree::ptree pt;
-		pt.put("main", "test.lua");
+		pt.put("main", "test_echo_char.lua");
 		pt.put("input_buffer", boost::lexical_cast<std::string>( bufferSizeInput));
 		pt.put("output_buffer", boost::lexical_cast<std::string>( bufferSizeOutput));
 		setCanonicalPathes( ".");
@@ -270,7 +270,7 @@ TYPED_TEST( iprocHandlerFixture, ExpectedResult )
 		boost::this_thread::sleep( boost::posix_time::seconds( 10 ));
 	}
 #endif
-	EXPECT_EQ( output, this->expected);
+	EXPECT_EQ( this->expected, output);
 }
 
 int main( int argc, char **argv )
