@@ -47,7 +47,7 @@ class SQLiteConfig : public DatabaseConfig
 {
 	friend class config::ConfigurationParser;
 public:
-	const char* type() const			{ return "SQLite"; }
+	const char* typeName() const			{ return "SQLite"; }
 
 	SQLiteConfig( const char* name, const char* logParent, const char* logName );
 	~SQLiteConfig()					{}
@@ -66,7 +66,7 @@ public:
 	SQLiteDBcontainer( const SQLiteConfig* conf );
 	~SQLiteDBcontainer();
 
-	const char* type() const			{ return "SQLite"; }
+	const char* typeName() const			{ return "SQLite"; }
 };
 
 }} // _Wolframe::db

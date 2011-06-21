@@ -50,7 +50,7 @@ DBprovider::DBprovider( const DBproviderConfig& conf )
 {
 	for ( std::list<DatabaseConfig*>::const_iterator it = conf.m_dbConfig.begin();
 							it != conf.m_dbConfig.end(); it++ )	{
-		const char* dbType = (*it)->type();
+		const char* dbType = (*it)->typeName();
 		if ( boost::algorithm::iequals( dbType, "PostgreSQL" ))	{
 			PostgreSQLDBcontainer* db = new PostgreSQLDBcontainer( static_cast<PostgreSQLconfig*>(*it) );
 			m_db.push_back( db );

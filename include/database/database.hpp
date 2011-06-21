@@ -45,14 +45,13 @@ namespace _Wolframe {
 namespace db {
 
 
-class DatabaseConfig : public config::ConfigurationBase
+class DatabaseConfig : public config::ModuleConfiguration
 {
 public:
 	DatabaseConfig( const char* name, const char* logParent, const char* logName )
-		: ConfigurationBase( name, logParent, logName ){}
+		: ModuleConfiguration( name, logParent, logName )	{}
 	virtual ~DatabaseConfig()			{}
 
-	virtual const char* type() const = 0;
 	void ID( const std::string& id )		{ m_ID = id; }
 	const std::string& ID() const			{ return m_ID; }
 private:
@@ -66,7 +65,7 @@ class ReferenceConfig : public DatabaseConfig
 {
 	friend class config::ConfigurationParser;
 public:
-	const char* type() const			{ return "DB Reference"; }
+	const char* typeName() const			{ return "DB Reference"; }
 
 	ReferenceConfig( const char* name, const char* logParent, const char* logName )
 		: DatabaseConfig( name, logParent, logName )	{}
@@ -110,7 +109,7 @@ public:
 	virtual ~Database()				{}
 
 	const std::string& ID() const			{ return m_id; }
-	virtual const char* type() const = 0;
+	virtual const char* typeName() const = 0;
 
 	const _DatabaseChannel_* channel() const	{ return NULL; }
 private:
