@@ -46,6 +46,7 @@ examples/lua/luad
 examples/mtproc/mtprocd
 examples/pecho/pechod
 examples/iproc/tests/iprocHandlerTest
+examples/iproc/tests/iprocHandlerXMLTest
 examples/pecho/tests/pechoHandlerTest
 clients/qt/qtclient
 moc_*.cpp
