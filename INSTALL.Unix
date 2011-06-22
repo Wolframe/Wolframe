@@ -21,6 +21,7 @@ Prerequisites
   - optionally (WITH_EXPECT) expect and Tcl 8.4 or later
 - optionally (for building the documentation):
   - xsltproc, docboox-xsl-stylesheet: for docbook
+  - fop: to produce a nice PDF documentation
   - doxygen: for documentation for programmers
   - dia: to convert images to svg
 
@@ -197,6 +198,19 @@ Optional packages: libqt4-dev, libpam-dev (1.0.1),
                    libpq-dev (8.3.14)
 
 libbost-dev is 1.34, far too old. Compile your own version.
+
+For building the documentation you need 'xsltproc', 'docbook-xsl' and 'doxygen'.
+
+When rebuilding the SVG images of the documentation you also need 'dia'.
+
+Debian 6.0
+----------
+
+Optional packages: libqt4-dev (4.6.3), libpam-dev (1.1.1),
+                   libsasl2-dev (2.1.23), libsqlite3-dev (3.7.3),
+                   libpq-dev (8.4.7)
+
+libboost-dev is 1.42, slightly too old. Compile your own version.
 
 For building the documentation you need 'xsltproc', 'docbook-xsl' and 'doxygen'.
 
