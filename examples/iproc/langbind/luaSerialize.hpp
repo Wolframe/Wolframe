@@ -60,39 +60,66 @@ extern "C"
 #include "lauxlib.h"
 }
 
+///\brief Implementation of the AppProcessorObject (serialize/descriptionBase.hpp) for LUA
 struct AppProcessorObject
 {
-	lua_State* ls;
+	lua_State* ls;		///< LUA State for the object to serialize/deserialize.
 };
 
+///\brief Object for intrusive construction of the serialize/deserialize function
+///\tparam Element type of element to serialize/deserialize
 template <typename Element>
 struct Serializer
 {
+	///\brief Serialization function implementation with non intrusive interface
+	///\param [out] st POD struct pointer to serialization result 
+	///\param [in] ofs member offset of the element serialization result in the POD structure 'st'
+	///\param [in] reference to LUA state from which to serialize. The object to serialize is expected as top on the stack (index -1)
 	static void serialize( void* st, std::size_t ofs, AppProcessorObject* appobj)
 	{
 		serializeElement( *reinterpret_cast<Element*>((char*)st + ofs), appobj);
 	}
+
+	///\brief Deserialization function implementation with non intrusive interface
+	///\param [in] st POD struct pointer to the serialized object to build the LUA structure from
+	///\param [in] ofs member offset of the serialized element in the POD structure 'st'
+	///\param [in] reference to LUA state in which the result of deserialization is retuned as top on the stack
 	static void deserialize( const void* st, std::size_t ofs, AppProcessorObject* appobj)
 	{
 		deserializeElement( *reinterpret_cast<Element*>((char*)st + ofs), appobj);
 	}
 };
 
+///\class Error
+///\brief exception for a serialization error to be caught by the caller of this module
 struct Error
 {
-	std::string m_location;
-	std::string m_message;
+	std::string m_location;		///< Where it happened
+	std::string m_message;		///< What happened
 
+	///\brief Constructor
+	///\param[in] location where it happened
+	///\param[in] message what happened	
 	Error( const std::string& location, const std::string& message)
 		:m_location(location),m_message(message){}
+
+	///\brief Constructor for chaining the location info
+	///\param[in] location where it happened
+	///\param[in] location what happened deeper in the scope
 	Error( const std::string& location, const Error& prev)
-		:m_location(location),m_message(prev.m_message)
+		:m_message(prev.m_message)
 	{
-		m_location.append( ".");
 		m_location.append( prev.m_location);
+		m_location.append( ".");
+		m_location.append( location);
 	}
 };
 
+///\brief cast a LUA value to an atomic serialized POD structure type in the definition
+///\tparam TYPE destination type to cast to
+///\param [out] dst destination to cast to
+///\param [in] lua state of the atomic type to cast from
+///\param [in] index address of the atomic type to cast from
 template <typename TYPE>
 void castAtom( TYPE& dst, lua_State* ls, int index)
 {
@@ -122,9 +149,9 @@ void castAtom( TYPE& dst, lua_State* ls, int index)
 }
 
 // tags for lua atomic types deserialization categories
-struct LUA_TBOOLEAN_ {};
-struct LUA_TNUMBER_ {};
-struct LUA_TSTRING_ {};
+struct LUA_TBOOLEAN_ {};	///< lua type boolean (LUA_TBOOLEAN)
+struct LUA_TNUMBER_ {};		///< lua type number (LUA_TNUMBER)
+struct LUA_TSTRING_ {};		///< lua type string (LUA_TSTRING)
 
 template <typename T>
 typename boost::enable_if_c
@@ -139,16 +166,22 @@ typename boost::enable_if_c
 	<!boost::is_arithmetic<T>::value,LUA_TSTRING_
 	>::type getLuaCategory( const T&) { return LUA_TSTRING_();}
 
+///\brief Deserialize a atomic type of LUA type number
+///\tparam TYPE serialized POD structure element type
 template <typename TYPE>
 void pushAtom_( const TYPE& src, const LUA_TNUMBER_&, lua_State* ls)
 {
 	lua_pushnumber( ls, boost::lexical_cast<Lua_Number>( src));
 }
+///\brief Deserialize a atomic type of LUA type boolean
+///\tparam TYPE serialized POD structure element type
 template <typename TYPE>
 void pushAtom_( const TYPE& src, const LUA_TBOOLEAN_&, lua_State* ls)
 {
 	lua_pushboolean( ls, boost::lexical_cast<bool>( src));
 }
+///\brief Deserialize a atomic type of LUA type string
+///\tparam TYPE serialized POD structure element type
 template <typename TYPE>
 void pushAtom_( const TYPE& src, const LUA_TSTRING_&, lua_State* ls)
 {
@@ -156,6 +189,8 @@ void pushAtom_( const TYPE& src, const LUA_TSTRING_&, lua_State* ls)
 	lua_pushstring( ls, str.c_str());
 }
 
+///\brief Deserialize a atomic type 
+///\tparam TYPE serialized POD structure element type
 template <typename TYPE>
 void pushAtom( const TYPE& src, lua_State* ls)
 {
