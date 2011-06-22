@@ -46,17 +46,17 @@
 namespace _Wolframe	{
 namespace db	{
 
-DBprovider::DBprovider( const DBproviderConfig& conf )
+DatabaseProvider::DatabaseProvider( const DBproviderConfig& conf )
 {
 	for ( std::list<DatabaseConfig*>::const_iterator it = conf.m_dbConfig.begin();
 							it != conf.m_dbConfig.end(); it++ )	{
 		const char* dbType = (*it)->typeName();
 		if ( boost::algorithm::iequals( dbType, "PostgreSQL" ))	{
-			PostgreSQLDBcontainer* db = new PostgreSQLDBcontainer( static_cast<PostgreSQLconfig*>(*it) );
+			PostgreSQLcontainer* db = new PostgreSQLcontainer( static_cast<PostgreSQLconfig*>(*it) );
 			m_db.push_back( db );
 		}
 		else if ( boost::algorithm::iequals( dbType, "SQLite" ))	{
-			SQLiteDBcontainer* db = new SQLiteDBcontainer( static_cast<SQLiteConfig*>(*it) );
+			SQLiteContainer* db = new SQLiteContainer( static_cast<SQLiteConfig*>(*it) );
 			m_db.push_back( db );
 		}
 		else if ( boost::algorithm::iequals( dbType, "DB reference" ))
@@ -66,20 +66,20 @@ DBprovider::DBprovider( const DBproviderConfig& conf )
 	}
 }
 
-DBprovider::~DBprovider()
+DatabaseProvider::~DatabaseProvider()
 {
-	for ( std::list< Database* >::const_iterator it = m_db.begin();
+	for ( std::list< DatabaseContainer* >::const_iterator it = m_db.begin();
 							it != m_db.end(); it++ )
 		delete *it;
 }
 
 
-const Database* DBprovider::database( std::string& id ) const
+const Database* DatabaseProvider::database( const std::string& id ) const
 {
-	for ( std::list< Database* >::const_iterator it = m_db.begin();
+	for ( std::list< DatabaseContainer* >::const_iterator it = m_db.begin();
 							it != m_db.end(); it++ )	{
 		if ( (*it)->ID() == id )
-			return *it;
+			return &(*it)->database();
 	}
 	return NULL;
 }

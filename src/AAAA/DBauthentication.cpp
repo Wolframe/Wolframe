@@ -59,7 +59,7 @@ DBauthContainer::~DBauthContainer()
 }
 
 
-bool DBauthContainer::resolveDB( const db::DBprovider& db )
+bool DBauthContainer::resolveDB( const db::DatabaseProvider& db )
 {
 	if ( m_db == NULL && ! m_dbLabel.empty() )	{
 		m_db = db.database( m_dbLabel );

@@ -102,7 +102,7 @@ AAAAprovider::~AAAAprovider()
 		delete *it;
 }
 
-bool AAAAprovider::resolveDB( db::DBprovider& db )
+bool AAAAprovider::resolveDB( db::DatabaseProvider& db )
 {
 	for ( std::list<AuthenticatorBase*>::const_iterator it = m_authenticators.begin();
 								it != m_authenticators.end(); it++ )

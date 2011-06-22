@@ -50,11 +50,11 @@ namespace _Wolframe {
 		~wolframeHandler();
 
 		const std::string& banner() const	{ return m_banner; }
-		const db::DBprovider db() const		{ return m_db; }
+		const db::DatabaseProvider db() const		{ return m_db; }
 		const AAAA::AAAAprovider& aaaa() const	{ return m_aaaa; }
 	private:
 		const std::string		m_banner;
-		_Wolframe::db::DBprovider	m_db;
+		_Wolframe::db::DatabaseProvider	m_db;
 		_Wolframe::AAAA::AAAAprovider	m_aaaa;
 	};
 
@@ -92,7 +92,7 @@ namespace _Wolframe {
 		/// Back link to global context
 		const wolframeHandler&		m_globalCtx;
 ///*************
-		db::_DatabaseChannel_*		m_db;
+		db::Database*			m_db;
 		AAAA::_AuthenticationChannel_*	m_authentication;
 		AAAA::_AuthorizationChannel_*	m_authorization;
 		AAAA::_AuditChannel_*		m_audit;

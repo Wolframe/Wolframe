@@ -46,6 +46,7 @@ namespace db {
 class PostgreSQLconfig : public DatabaseConfig
 {
 	friend class config::ConfigurationParser;
+	friend class PostgreSQLcontainer;
 public:
 	const char* typeName() const			{ return "PostgreSQL"; }
 
@@ -64,13 +65,38 @@ private:
 	unsigned short	acquireTimeout;
 };
 
-class PostgreSQLDBcontainer : public Database
+
+class PostgreSQLdatabase : public Database
 {
 public:
-	PostgreSQLDBcontainer( const PostgreSQLconfig* conf );
-	~PostgreSQLDBcontainer()			{}
+	PostgreSQLdatabase( const std::string& id,
+			    const std::string& host, unsigned short port, const std::string& dbName,
+			    const std::string& user, const std::string& password,
+			    unsigned short connections, unsigned short	acquireTimeout );
+	~PostgreSQLdatabase();
+
+	const std::string& ID() const			{ return m_ID; }
 	const char* typeName() const			{ return "PostgreSQL"; }
+	bool isOpen() const				{ return true; }
+	void close()					{}
+	bool doDBstuff( _DatabaseRequest_&, _DatabaseAnswer_& ){ return true; }
 private:
+	const std::string	m_ID;
+};
+
+
+class PostgreSQLcontainer : public DatabaseContainer
+{
+public:
+	PostgreSQLcontainer( const PostgreSQLconfig* conf );
+	~PostgreSQLcontainer();
+
+	const std::string& ID() const			{ return m_db.ID(); }
+	const char* typeName() const			{ return m_db.typeName(); }
+	virtual const Database& database()		{ return m_db; }
+
+private:
+	PostgreSQLdatabase	m_db;
 };
 
 }} // _Wolframe::db

@@ -121,7 +121,7 @@ class AAAAprovider
 public:
 	AAAAprovider( const Configuration& conf );
 	~AAAAprovider();
-	bool resolveDB( db::DBprovider& db );
+	bool resolveDB( db::DatabaseProvider& db );
 
 	_AuthenticationChannel_* authenticationChannel() const	{ return NULL; }
 	_AuthorizationChannel_* authorizationChannel() const	{ return NULL; }

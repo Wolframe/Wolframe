@@ -91,43 +91,28 @@ class _DatabaseAnswer_
 };
 
 
-class _DatabaseChannel_
-{
-public:
-	_DatabaseChannel_()				{}
-	~_DatabaseChannel_()				{}
-
-	void close()					{}
-	void doDBstuff( _DatabaseRequest_&, _DatabaseAnswer_&){}
-};
-
-
 class Database
 {
 public:
-	Database( const std::string id ) : m_id( id )	{}
 	virtual ~Database()				{}
 
-	const std::string& ID() const			{ return m_id; }
+	virtual const std::string& ID() const = 0;
 	virtual const char* typeName() const = 0;
 
-	const _DatabaseChannel_* channel() const	{ return NULL; }
-private:
-	const std::string	m_id;
+	virtual bool isOpen() const = 0;
+	virtual void close() = 0;
+	virtual bool doDBstuff( _DatabaseRequest_& request, _DatabaseAnswer_& answer ) = 0;
 };
 
 
 class DatabaseContainer
 {
 public:
-	DatabaseContainer( const std::string id ) : m_id( id )	{}
 	virtual ~DatabaseContainer()				{}
 
-	const std::string& ID() const			{ return m_id; }
-	virtual const char* type() const = 0;
-
-private:
-	const std::string	m_id;
+	virtual const std::string& ID() const = 0;
+	virtual const char* typeName() const = 0;
+	virtual const Database& database() = 0;
 };
 
 
@@ -145,22 +130,19 @@ public:
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 	virtual void setCanonicalPathes( const std::string& referencePath );
-
-//	Not implemented yet, inherited from base for the time being
-//	bool test() const;
 };
 
 ///
 ///
-class DBprovider
+class DatabaseProvider
 {
 public:
-	DBprovider( const DBproviderConfig& conf );
-	~DBprovider();
+	DatabaseProvider( const DBproviderConfig& conf );
+	~DatabaseProvider();
 
-	const Database* database( std::string& ID ) const;
+	const Database* database( const std::string& ID ) const;
 private:
-	std::list<Database*>	m_db;
+	std::list<DatabaseContainer*>	m_db;
 };
 
 }} // namespace _Wolframe::db

@@ -60,7 +60,7 @@ DBauditContainer::~DBauditContainer()
 {
 }
 
-bool DBauditContainer::resolveDB( const db::DBprovider& db )
+bool DBauditContainer::resolveDB( const db::DatabaseProvider& db )
 {
 	if ( m_db == NULL && ! m_dbLabel.empty() )	{
 		m_db = db.database( m_dbLabel );

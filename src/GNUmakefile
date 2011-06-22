@@ -191,7 +191,7 @@ OBJS = \
 	appProperties.o \
 	appConfigDefinition.o \
 	wolframeHandler.o \
-	database/database.o \
+	database/DBprovider.o \
 	database/DBreference.o \
 	database/DBreferenceConfig.o \
 	posixMain.o

@@ -75,7 +75,7 @@ public:
 	DBauthContainer( const DatabaseAuthConfig& conf );
 	~DBauthContainer();
 
-	bool resolveDB( const db::DBprovider& db );
+	bool resolveDB( const db::DatabaseProvider& db );
 private:
 	std::string		m_dbLabel;
 	const db::Database*	m_db;

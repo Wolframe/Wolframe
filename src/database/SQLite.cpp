@@ -87,13 +87,26 @@ void SQLiteConfig::setCanonicalPathes( const std::string& refPath )
 
 
 //***  SQLite database functions  *******************************************
-SQLiteDBcontainer::SQLiteDBcontainer( const SQLiteConfig* conf )
-	: Database( conf->ID())
+SQLiteDatabase::SQLiteDatabase(  const std::string& id,
+				 const std::string& filename, bool flag )
+	: m_ID( id ), m_filename( filename ), m_flag( flag )
 {
-	LOG_NOTICE << "SQLite database '" << conf->ID() << "' created";
+	LOG_NOTICE << "SQLite database '" << m_ID << "' created with "
+		   << "filename '" << m_filename << "'";
 }
 
-SQLiteDBcontainer::~SQLiteDBcontainer( )
+SQLiteDatabase::~SQLiteDatabase( )
+{
+}
+
+
+SQLiteContainer::SQLiteContainer( const SQLiteConfig* conf )
+	: m_db( conf->ID(), conf->filename, conf->flag )
+{
+	LOG_NOTICE << "SQLite database container for '" << conf->ID() << "' created";
+}
+
+SQLiteContainer::~SQLiteContainer( )
 {
 }
 

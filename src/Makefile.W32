@@ -139,7 +139,7 @@ OBJS = \
 	appProperties.obj \
 	appConfigDefinition.obj \
 	wolframeHandler.obj \
-	database\database.obj \
+	database\DBprovider.obj \
 	database\DBreference.obj \
 	database\DBreferenceConfig.obj \
 	winMain.obj

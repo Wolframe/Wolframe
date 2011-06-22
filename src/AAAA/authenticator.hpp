@@ -94,7 +94,7 @@ class AuthenticatorBase
 {
 public:
 	virtual	~AuthenticatorBase()				{}
-	virtual bool resolveDB( const db::DBprovider& /*db*/ )	{ return true; }
+	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ )	{ return true; }
 };
 
 }} // namespace _Wolframe::AAAA

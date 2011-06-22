@@ -77,10 +77,33 @@ bool PostgreSQLconfig::check() const
 
 
 //***  PostgreSQL database functions  ***************************************
-PostgreSQLDBcontainer::PostgreSQLDBcontainer( const PostgreSQLconfig* conf )
-	: Database( conf->ID())
+PostgreSQLdatabase::PostgreSQLdatabase( const std::string& id, const std::string& host,
+					unsigned short port, const std::string& dbName,
+					const std::string& user, const std::string& password,
+					unsigned short connections, unsigned short acquireTimeout )
+	: m_ID( id )
 {
-	LOG_NOTICE << "PostgreSQL database '" << conf->ID() << "' created";
+	LOG_NOTICE << "PostgreSQL database '" << m_ID << "' created with "
+		   << "server " << host << ":" << port << ", database '" << dbName
+		   << "', credentials: " << user << "/" << password
+		   << ", " << connections << " connections, " << acquireTimeout << "s timeout";
+}
+
+PostgreSQLdatabase::~PostgreSQLdatabase()
+{
+}
+
+
+PostgreSQLcontainer::PostgreSQLcontainer( const PostgreSQLconfig* conf )
+	: m_db( conf->ID(), conf->host, conf->port, conf->dbName,
+		  conf->user, conf->password,
+		  conf->connections, conf->acquireTimeout )
+{
+	LOG_NOTICE << "PostgreSQL database container for '" << conf->ID() << "' created";
+}
+
+PostgreSQLcontainer::~PostgreSQLcontainer()
+{
 }
 
 }} // _Wolframe::db

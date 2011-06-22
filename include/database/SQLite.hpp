@@ -31,7 +31,7 @@
 
 ************************************************************************/
 //
-// Wolframe SQLite client view
+// Wolframe SQLite client
 //
 
 #include "database/database.hpp"
@@ -46,6 +46,7 @@ namespace db {
 class SQLiteConfig : public DatabaseConfig
 {
 	friend class config::ConfigurationParser;
+	friend class SQLiteContainer;
 public:
 	const char* typeName() const			{ return "SQLite"; }
 
@@ -60,13 +61,37 @@ private:
 	bool		flag;
 };
 
-class SQLiteDBcontainer : public Database
+
+class SQLiteDatabase : public Database
 {
 public:
-	SQLiteDBcontainer( const SQLiteConfig* conf );
-	~SQLiteDBcontainer();
+	SQLiteDatabase( const std::string& id,
+			const std::string& filename, bool flag );
+	~SQLiteDatabase();
 
+	const std::string& ID() const			{ return m_ID; }
 	const char* typeName() const			{ return "SQLite"; }
+	bool isOpen() const				{ return true; }
+	void close()					{}
+	bool doDBstuff( _DatabaseRequest_&, _DatabaseAnswer_& ){ return true; }
+private:
+	const std::string	m_ID;
+	const std::string	m_filename;
+	bool			m_flag;
+};
+
+
+class SQLiteContainer : public DatabaseContainer
+{
+public:
+	SQLiteContainer( const SQLiteConfig* conf );
+	~SQLiteContainer();
+
+	const std::string& ID() const			{ return m_db.ID(); }
+	const char* typeName() const			{ return m_db.typeName(); }
+	virtual const Database& database()		{ return m_db; }
+private:
+	SQLiteDatabase	m_db;
 };
 
 }} // _Wolframe::db
