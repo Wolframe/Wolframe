@@ -34,7 +34,8 @@
 // Wolframe PostgreSQL client view
 //
 
-#include "database/database.hpp"
+#include "database.hpp"
+#include "databaseContainer.hpp"
 
 #ifndef _POSTGRESQL_HPP_INCLUDED
 #define _POSTGRESQL_HPP_INCLUDED

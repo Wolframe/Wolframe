@@ -34,6 +34,7 @@
 // Wolframe SQLite client view implementation
 //
 
+#include "logger.hpp"
 #include "database/SQLite.hpp"
 
 #define BOOST_FILESYSTEM_VERSION 3

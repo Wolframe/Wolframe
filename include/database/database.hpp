@@ -37,47 +37,10 @@
 #ifndef _DATABASE_HPP_INCLUDED
 #define _DATABASE_HPP_INCLUDED
 
-#include <list>
-#include "config/configurationBase.hpp"
-#include "logger.hpp"
+#include <string>
 
 namespace _Wolframe {
 namespace db {
-
-
-class DatabaseConfig : public config::ModuleConfiguration
-{
-public:
-	DatabaseConfig( const char* name, const char* logParent, const char* logName )
-		: ModuleConfiguration( name, logParent, logName )	{}
-	virtual ~DatabaseConfig()			{}
-
-	void ID( const std::string& id )		{ m_ID = id; }
-	const std::string& ID() const			{ return m_ID; }
-private:
-	std::string		m_ID;
-};
-
-
-/// database reference class
-/// note that this is a configuration class only
-class ReferenceConfig : public DatabaseConfig
-{
-	friend class config::ConfigurationParser;
-public:
-	const char* typeName() const			{ return "DB Reference"; }
-
-	ReferenceConfig( const char* name, const char* logParent, const char* logName )
-		: DatabaseConfig( name, logParent, logName )	{}
-
-	bool check() const;
-	void print( std::ostream& os, size_t indent ) const;
-
-	const std::string& dbName() const		{ return m_ref; }
-private:
-	std::string	m_ref;
-};
-
 
 /// database base classes
 class _DatabaseRequest_
@@ -102,47 +65,6 @@ public:
 	virtual bool isOpen() const = 0;
 	virtual void close() = 0;
 	virtual bool doDBstuff( _DatabaseRequest_& request, _DatabaseAnswer_& answer ) = 0;
-};
-
-
-class DatabaseContainer
-{
-public:
-	virtual ~DatabaseContainer()				{}
-
-	virtual const std::string& ID() const = 0;
-	virtual const char* typeName() const = 0;
-	virtual const Database& database() = 0;
-};
-
-
-/// database configuration
-struct DBproviderConfig : public config::ConfigurationBase
-{
-public:
-	std::list<DatabaseConfig*>	m_dbConfig;
-
-	/// constructor & destructor
-	DBproviderConfig() : ConfigurationBase( "Database(s)", NULL, "Database configuration" )	{}
-	~DBproviderConfig();
-
-	/// methods
-	bool check() const;
-	void print( std::ostream& os, size_t indent ) const;
-	virtual void setCanonicalPathes( const std::string& referencePath );
-};
-
-///
-///
-class DatabaseProvider
-{
-public:
-	DatabaseProvider( const DBproviderConfig& conf );
-	~DatabaseProvider();
-
-	const Database* database( const std::string& ID ) const;
-private:
-	std::list<DatabaseContainer*>	m_db;
 };
 
 }} // namespace _Wolframe::db

@@ -202,6 +202,7 @@ include/config/traits.hpp
 include/config/valueParser.hpp
 include/connectionEndpoint.hpp
 include/connectionHandler.hpp
+include/database/databaseContainer.hpp
 include/database/database.hpp
 include/database/PostgreSQL.hpp
 include/database/SQLite.hpp
@@ -341,6 +342,7 @@ src/connection.cpp
 src/connection.hpp
 src/database/databaseConfig.cpp
 src/database/DBprovider.cpp
+src/database/DBprovider.hpp
 src/database/DBreferenceConfig.cpp
 src/database/DBreference.cpp
 src/database/PostgreSQLconfig.cpp

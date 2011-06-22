@@ -34,6 +34,7 @@
 // Wolframe PostgreSQL client view implementation
 //
 
+#include "logger.hpp"
 #include "database/PostgreSQL.hpp"
 
 namespace _Wolframe {

@@ -34,7 +34,7 @@
 // database.cpp
 //
 
-#include "database/database.hpp"
+#include "DBprovider.hpp"
 #include "database/PostgreSQL.hpp"
 #include "database/SQLite.hpp"
 

@@ -35,6 +35,7 @@
 //
 
 #include "database/database.hpp"
+#include "databaseContainer.hpp"
 
 #ifndef _SQLITE_HPP_INCLUDED
 #define _SQLITE_HPP_INCLUDED
