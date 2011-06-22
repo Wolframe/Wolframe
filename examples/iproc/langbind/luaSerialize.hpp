@@ -70,7 +70,11 @@ struct Serializer
 {
 	static void serialize( void* st, std::size_t ofs, AppProcessorObject* appobj)
 	{
-		serializeElement( name, *reinterpret_cast<Element*>((char*)st + ofs), appobj);
+		serializeElement( *reinterpret_cast<Element*>((char*)st + ofs), appobj);
+	}
+	static void deserialize( const void* st, std::size_t ofs, AppProcessorObject* appobj)
+	{
+		deserializeElement( *reinterpret_cast<Element*>((char*)st + ofs), appobj);
 	}
 };
 
@@ -98,9 +102,11 @@ void castAtom( TYPE& dst, lua_State* ls, int index)
 		case LUA_TNUMBER:
 			dst = boost::lexical_cast<TYPE>( lua_tonumber( ls, index));
 			break;
+
 		case LUA_TBOOLEAN:
 			dst = boost::lexical_cast<TYPE>( lua_toboolean( ls, index));
 			break;
+
 		default:
 			lua_pushvalue( ls, index);
 			st = lua_tostring( ls, -1);
@@ -113,6 +119,47 @@ void castAtom( TYPE& dst, lua_State* ls, int index)
 			lua_pop( ls, 1);
 			throw boost::bad_lexical_cast( lua_typename(ls, index));
 	}
+}
+
+// tags for lua atomic types deserialization categories
+struct LUA_TBOOLEAN_ {};
+struct LUA_TNUMBER_ {};
+struct LUA_TSTRING_ {};
+
+template <typename T>
+typename boost::enable_if_c
+	<(boost::is_arithmetic<T>::value && !boost::is_same<bool,T>::value),LUA_TNUMBER_
+	>::type getLuaCategory( const T&) { return LUA_TNUMBER_();}
+template <typename T>
+typename boost::enable_if_c
+	<boost::is_same<bool,T>::value,LUA_TBOOLEAN_
+	>::type getLuaCategory( const T&) { return LUA_TBOOLEAN_();}
+template <typename T>
+typename boost::enable_if_c
+	<!boost::is_arithmetic<T>::value,LUA_TSTRING_
+	>::type getLuaCategory( const T&) { return LUA_TSTRING_();}
+
+template <typename TYPE>
+void pushAtom_( const TYPE& src, const LUA_TNUMBER_&, lua_State* ls)
+{
+	lua_pushnumber( ls, boost::lexical_cast<Lua_Number>( src));
+}
+template <typename TYPE>
+void pushAtom_( const TYPE& src, const LUA_TBOOLEAN_&, lua_State* ls)
+{
+	lua_pushboolean( ls, boost::lexical_cast<bool>( src));
+}
+template <typename TYPE>
+void pushAtom_( const TYPE& src, const LUA_TSTRING_&, lua_State* ls)
+{
+	std::string str( boost::lexical_cast<std::string>( src));
+	lua_pushstring( ls, str.c_str());
+}
+
+template <typename TYPE>
+void pushAtom( const TYPE& src, lua_State* ls)
+{
+	pushAtom_( src, getLuaCategory( src), ls);
 }
 
 template <typename T>
@@ -145,6 +192,20 @@ static void serializeElement_( T& value, const traits::struct_&, AppProcessorObj
 }
 
 template <typename T>
+static void deserializeElement_( const T& value, const traits::struct_&, AppProcessorObject* appobj)
+{
+	static const DescriptionBase* descr = T::description();
+	std::vector<DescriptionBase::Item>::const_iterator itr,end;
+
+	lua_newtable( ls);
+	for (itr=descr->m_ar.begin(),end=descr->m_ar.end(); itr != end; ++itr)
+	{
+		itr->m_deserialize( &value, itr->m_ofs, appobj);
+		lua_setfield( ls, -2, itr->m_name.c_str());
+	}
+}
+
+template <typename T>
 static void serializeElement_( T& value, const traits::vector_&, AppProcessorObject* appobj)
 {
 	if (lua_type (ls, -1) != LUA_TTABLE)
@@ -162,16 +223,44 @@ static void serializeElement_( T& value, const traits::vector_&, AppProcessorObj
 }
 
 template <typename T>
+static void deserializeElement_( const T& value, const traits::vector_&, AppProcessorObject* appobj)
+{
+	typename T::const_iterator itr,end;
+	lua_Number idx;
+
+	lua_newtable( ls);
+	for (idx=0,itr=value.begin(),end=value.end(); itr!=end; itr++)
+	{
+		lua_pushnumber( ls, idx);
+		idx += 1;
+		itr->m_deserialize( &*itr, 0, appobj);
+		lua_settable( ls, -2);
+	}
+}
+
+template <typename T>
 static void serializeElement_( T& value, const traits::atom_&, AppProcessorObject* appobj)
 {
 	castAtom( value, appobj->ls, -1);
 }
 
-///\brief The unified serialize/deserialize function template
+template <typename T>
+static void deserializeElement_( const T& value, const traits::atom_&, AppProcessorObject* appobj)
+{
+	pushAtom( value, appobj->ls);
+}
+
+///\brief The unified serialize function template
 template <typename T>
 static void serializeElement( T& value, AppProcessorObject* appobj)
 {
 	serializeElement_( value, traits::getCategory(value), appobj);
+}
+///\brief The unified deserialize function template
+template <typename T>
+static void deserializeElement( const T& value, AppProcessorObject* appobj)
+{
+	deserializeElement_( value, traits::getCategory(value), appobj);
 }
 
 }}}// end namespace
