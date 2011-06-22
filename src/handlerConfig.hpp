@@ -49,14 +49,14 @@ namespace _Wolframe {
 	public:
 		db::DBproviderConfig	*database;
 		config::ServiceBanner	*banner;
-		AAAA::Configuration	*aaaa;
+		AAAA::AAAAconfiguration	*aaaa;
 
 		/// constructor
 		HandlerConfiguration()
 		{
 			banner = new config::ServiceBanner();
 			database = new db::DBproviderConfig();
-			aaaa = new AAAA::Configuration();
+			aaaa = new AAAA::AAAAconfiguration();
 		}
 
 		~HandlerConfiguration()

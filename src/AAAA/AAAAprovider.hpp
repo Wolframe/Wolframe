@@ -40,6 +40,7 @@
 #include "config/configurationBase.hpp"
 #include "auditor.hpp"
 #include "authenticator.hpp"
+#include "authentication.hpp"
 #include "database/database.hpp"
 
 #include <string>
@@ -48,68 +49,18 @@
 namespace _Wolframe {
 namespace AAAA {
 
-class User
-{
-public:
-	User( const char* uname ) : m_name( uname )	{}
-
-	const std::string& name() const			{ return m_name; }
-private:
-	const std::string	m_name;
-};
-
-
-class _AuthenticationChannel_
-{
-public:
-	_AuthenticationChannel_()			{}
-	~_AuthenticationChannel_()			{}
-
-	void close()					{}
-};
-
-class _AuthorizationChannel_
-{
-public:
-	_AuthorizationChannel_()			{}
-	~_AuthorizationChannel_()			{}
-
-	void close()					{}
-};
-
-class _AuditChannel_
-{
-public:
-	_AuditChannel_()				{}
-	~_AuditChannel_()				{}
-
-	void close()					{}
-};
-
-class _AccountingChannel_
-{
-public:
-	_AccountingChannel_()				{}
-	~_AccountingChannel_()				{}
-
-	void close()					{}
-};
-
-
-class Configuration : public config::ConfigurationBase
+class AAAAconfiguration : public config::ConfigurationBase
 {
 	friend class AAAAprovider;
 	friend class config::ConfigurationParser;
 public:
 	/// constructor
-	Configuration();
+	AAAAconfiguration();
 
 	/// methods
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 	void setCanonicalPathes( const std::string& referencePath );
-
-	// bool test() const;	// Not implemented yet, inherited from base
 private:
 	AuthenticationConfiguration	auth;
 	AuditConfiguration		audit;
@@ -119,14 +70,11 @@ private:
 class AAAAprovider
 {
 public:
-	AAAAprovider( const Configuration& conf );
+	AAAAprovider( const AAAAconfiguration& conf );
 	~AAAAprovider();
 	bool resolveDB( db::DatabaseProvider& db );
 
-	_AuthenticationChannel_* authenticationChannel() const	{ return NULL; }
-	_AuthorizationChannel_* authorizationChannel() const	{ return NULL; }
-	_AuditChannel_* auditChannel() const			{ return NULL; }
-	_AccountingChannel_* accountingChannel() const		{ return NULL; }
+	Authenticator* authenticator() const		{ return NULL; }
 private:
 	std::list<AuthenticatorBase*>	m_authenticators;
 	std::list<AuditorBase*>		m_auditors;

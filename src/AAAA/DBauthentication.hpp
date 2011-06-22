@@ -52,7 +52,7 @@ public:
 		: AuthenticatorConfigBase( cfgName, logParent, logName ),
 		  m_dbConfig( "", logParent, "Database" )	{}
 
-	virtual AuthenticationType type() const			{ return AUTH_DATABASE; }
+	virtual const char* typeName() const			{ return "DatabaseAuth"; }
 
 	/// methods
 	bool check() const					{ return m_dbConfig.check(); }

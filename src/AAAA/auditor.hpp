@@ -45,12 +45,6 @@
 namespace _Wolframe {
 namespace AAAA {
 
-enum AuditType	{
-	AUDIT_FILE,		///< Standard text file auditing (list of entries)
-	AUDIT_DATABASE		///< Database audit entries
-};
-
-
 class AuditConfigurationBase : public config::ConfigurationBase
 {
 public:
@@ -60,7 +54,7 @@ public:
 
 	virtual ~AuditConfigurationBase()	{}
 
-	virtual AuditType type() const = 0;
+	virtual const char* typeName() const = 0;
 };
 
 

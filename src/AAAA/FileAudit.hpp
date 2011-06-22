@@ -52,7 +52,7 @@ public:
 	FileAuditConfig( const char* cfgName, const char* logParent, const char* logName )
 		: AuditConfigurationBase( cfgName, logParent, logName ){}
 
-	AuditType type() const					{ return AUDIT_FILE; }
+	const char* typeName() const			{ return "FileAudit"; }
 
 	/// methods
 	bool check() const;
@@ -67,7 +67,7 @@ class FileAuditor : public AuditorBase
 {
 public:
 	FileAuditor( const FileAuditConfig& conf );
-	~FileAuditor()						{}
+	~FileAuditor()					{}
 private:
 	std::string	m_file;
 };

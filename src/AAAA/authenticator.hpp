@@ -44,17 +44,6 @@
 namespace _Wolframe {
 namespace AAAA {
 
-/// Authentication type
-enum AuthenticationType	{
-	AUTH_DATABASE,		///< Wolframe proprietary authentification using db
-	AUTH_TEXTFILE,		///< Wolframe proprietary authentification
-	AUTH_PAM,		///< *NIX PAM authentification
-	AUTH_SASL,		///< SASL authentification (Cyrus SASL)
-	AUTH_LDAP,		///< LDAP authentification
-	AUTH_UNKNOWN		///< Unknown authentification (i.e. none)
-};
-
-
 class AuthenticatorConfigBase : public config::ConfigurationBase
 {
 public:
@@ -64,7 +53,7 @@ public:
 
 	virtual ~AuthenticatorConfigBase()			{}
 
-	virtual AuthenticationType type() const = 0;
+	virtual const char* typeName() const = 0;
 };
 
 

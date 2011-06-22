@@ -39,6 +39,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/thread/thread.hpp>
 
+#include <vector>
 #include <stdexcept>
 #include <fstream>
 

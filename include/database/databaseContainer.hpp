@@ -82,6 +82,8 @@ class DatabaseContainer
 public:
 	virtual ~DatabaseContainer()			{}
 
+//	virtual DatabaseContainer* create() const = 0;	// Use the default constructor
+
 	virtual const std::string& ID() const = 0;
 	virtual const char* typeName() const = 0;
 	virtual const Database& database() = 0;

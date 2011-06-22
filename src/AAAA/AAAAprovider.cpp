@@ -43,52 +43,42 @@
 #include "DBaudit.hpp"
 #include "TextFileAuthentication.hpp"
 #include "DBauthentication.hpp"
+#include "boost/algorithm/string.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
 
-AAAAprovider::AAAAprovider( const Configuration& conf )
+AAAAprovider::AAAAprovider( const AAAAconfiguration& conf )
 {
 	for ( std::list<AuthenticatorConfigBase*>::const_iterator it = conf.auth.m_config.begin();
 							it != conf.auth.m_config.end(); it++ )	{
-		switch( (*it)->type() )	{
-		case AUTH_DATABASE:	{
+		const char* type = (*it)->typeName();
+		if ( boost::algorithm::iequals( type, "DatabaseAuth" ))	{
 			DBauthContainer* auth = new DBauthContainer( static_cast<DatabaseAuthConfig&>(**it) );
 			m_authenticators.push_back( auth );
 		}
-			break;
-		case AUTH_TEXTFILE:	{
+		else if ( boost::algorithm::iequals( type, "TextFileAuth" ))	{
 			TxtFileAuthContainer* auth = new TxtFileAuthContainer( static_cast<TextFileAuthConfig&>(**it) );
 			m_authenticators.push_back( auth );
 		}
-			break;
-		case AUTH_PAM:
-		case AUTH_SASL:
-		case AUTH_LDAP:
-			LOG_ERROR << "Auth method not implemented yet";
-			break;
-		case AUTH_UNKNOWN:
-		default:
-			throw std::domain_error( "Unknown auditing mechanism type in AAAAprovider constructor" );
-		}
+		else
+			throw std::domain_error( "Unknown authentication mechanism type in AAAAprovider constructor" );
 	}
 
 	for ( std::list<AuditConfigurationBase*>::const_iterator it = conf.audit.m_config.begin();
 							it != conf.audit.m_config.end(); it++ )	{
-		switch( (*it)->type() )	{
-		case AUDIT_FILE:	{
+		const char* type = (*it)->typeName();
+
+		if ( boost::algorithm::iequals( type, "FileAudit" ))	{
 			FileAuditor* auditor = new FileAuditor( static_cast<FileAuditConfig&>(**it) );
 			m_auditors.push_back( auditor );
 		}
-			break;
-		case AUDIT_DATABASE:	{
+		if ( boost::algorithm::iequals( type, "DatabaseAudit" ))	{
 			DBauditContainer* auditor = new DBauditContainer( static_cast<DatabaseAuditConfig&>(**it) );
 			m_auditors.push_back( auditor );
 		}
-			break;
-		default:
+		else
 			throw std::domain_error( "Unknown auditing mechanism type in AAAAprovider constructor" );
-		}
 	}
 }
 
@@ -117,7 +107,7 @@ bool AAAAprovider::resolveDB( db::DatabaseProvider& db )
 }
 
 
-Configuration::Configuration() : config::ConfigurationBase( "AAAA", NULL, "AAAA configuration"  ),
+AAAAconfiguration::AAAAconfiguration() : config::ConfigurationBase( "AAAA", NULL, "AAAA configuration"  ),
 	auth( "Authentication", logPrefix().c_str(), "Authentication" ),
 	audit( "Auditing", logPrefix().c_str(), "Auditing" )
 {
@@ -125,7 +115,7 @@ Configuration::Configuration() : config::ConfigurationBase( "AAAA", NULL, "AAAA 
 
 
 /// methods
-void Configuration::print( std::ostream& os, size_t /* indent */ ) const
+void AAAAconfiguration::print( std::ostream& os, size_t /* indent */ ) const
 {
 	os << sectionName() << std::endl;
 	auth.print( os, 3 );
@@ -134,7 +124,7 @@ void Configuration::print( std::ostream& os, size_t /* indent */ ) const
 
 
 /// Check if the database configuration makes sense
-bool Configuration::check() const
+bool AAAAconfiguration::check() const
 {
 	bool correct = true;
 
@@ -146,7 +136,7 @@ bool Configuration::check() const
 	return correct;
 }
 
-void Configuration::setCanonicalPathes( const std::string& refPath )
+void AAAAconfiguration::setCanonicalPathes( const std::string& refPath )
 {
 	auth.setCanonicalPathes( refPath );
 	audit.setCanonicalPathes( refPath );

@@ -45,7 +45,7 @@ namespace _Wolframe {
 namespace config {
 
 template<>
-bool ConfigurationParser::parse( AAAA::Configuration& cfg,
+bool ConfigurationParser::parse( AAAA::AAAAconfiguration& cfg,
 				 const boost::property_tree::ptree& pt, const std::string& /*node*/ )
 {
 	using namespace _Wolframe::config;

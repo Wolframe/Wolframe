@@ -93,10 +93,10 @@ namespace _Wolframe {
 		const wolframeHandler&		m_globalCtx;
 ///*************
 		db::Database*			m_db;
-		AAAA::_AuthenticationChannel_*	m_authentication;
-		AAAA::_AuthorizationChannel_*	m_authorization;
-		AAAA::_AuditChannel_*		m_audit;
-		AAAA::_AccountingChannel_*	m_accounting;
+		AAAA::Authenticator*		m_authentication;
+//		AAAA::Authorizer*		m_authorization;
+//		AAAA::Auditor*			m_audit;
+//		AAAA::Accountant*		m_accounting;
 ///*************
 		/// Connection endpoints
 		const net::LocalEndpoint*	m_localEP;

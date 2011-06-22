@@ -51,7 +51,7 @@ public:
 	TextFileAuthConfig( const char* cfgName, const char* logParent, const char* logName )
 		: AuthenticatorConfigBase( cfgName, logParent, logName ){}
 
-	virtual AuthenticationType type() const			{ return AUTH_TEXTFILE; }
+	virtual const char* typeName() const			{ return "TextFileAuth"; }
 
 	/// methods
 	bool check() const;
@@ -66,7 +66,7 @@ class TxtFileAuthContainer : public AuthenticatorBase
 {
 public:
 	TxtFileAuthContainer( const TextFileAuthConfig& conf );
-	~TxtFileAuthContainer()						{}
+	~TxtFileAuthContainer()					{}
 private:
 	std::string	m_file;
 };

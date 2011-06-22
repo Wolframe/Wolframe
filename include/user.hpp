@@ -31,55 +31,25 @@
 
 ************************************************************************/
 //
-// database audit
+//
 //
 
-#include "auditor.hpp"
-#include "database/database.hpp"
-
-#ifndef _DB_AUDIT_HPP_INCLUDED
-#define _DB_AUDIT_HPP_INCLUDED
+#ifndef _USER_HPP_INCLUDED
+#define _USER_HPP_INCLUDED
 
 namespace _Wolframe {
 namespace AAAA {
 
-class DatabaseAuditConfig : public AuditConfigurationBase
-{
-	friend class DBauditContainer;
-	friend class config::ConfigurationParser;
-public:
-	DatabaseAuditConfig( const char* cfgName, const char* logParent, const char* logName )
-		: AuditConfigurationBase( cfgName, logParent, logName ),
-		  m_dbConfig( "", logParent, "" )		{}
-
-	const char* typeName() const				{ return "DatabaseAudit"; }
-
-	/// methods
-	bool check() const					{ return m_dbConfig.check(); }
-	void print( std::ostream& os, size_t indent ) const	{
-		std::string indStr( indent, ' ' );
-		os << indStr << sectionName();
-		m_dbConfig.print( os, 0 );
-	}
-
-	void setCanonicalPathes( const std::string& refPath )	{ m_dbConfig.setCanonicalPathes( refPath ); }
-private:
-	db::ReferenceConfig	m_dbConfig;
-};
-
-
-class DBauditContainer : public AuditorBase
+class User
 {
 public:
-	DBauditContainer( const DatabaseAuditConfig& conf );
-	~DBauditContainer();
+	User( const char* uname ) : m_name( uname )	{}
 
-	bool resolveDB( const db::DatabaseProvider& db );
+	const std::string& name() const			{ return m_name; }
 private:
-	std::string		m_dbLabel;
-	const db::Database*	m_db;
+	const std::string	m_name;
 };
 
 }} // namespace _Wolframe::AAAA
 
-#endif // _DB_AUDIT_HPP_INCLUDED
+#endif // _USER_HPP_INCLUDED
