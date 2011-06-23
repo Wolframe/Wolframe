@@ -42,9 +42,9 @@ namespace _Wolframe {
 namespace AAAA {
 
 // virtual base for all audit methods
-class Audithor {
+class Auditor {
 public:
-	virtual ~Audithor( ) { }
+	virtual ~Auditor( ) { }
 
 	// close the auditor
 	virtual void close( ) { }

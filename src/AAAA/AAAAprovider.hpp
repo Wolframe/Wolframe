@@ -70,17 +70,44 @@ private:
 };
 
 
+class AuthenticationGroup
+{
+public:
+	AuthenticationGroup( const std::list< AuthenticationConfiguration* >& confs );
+	~AuthenticationGroup();
+	bool resolveDB( db::DatabaseProvider& db );
+
+	Authenticator* authenticator()		{ return NULL; }
+private:
+	std::list<AuthenticationContainer*>	m_authenticators;
+};
+
+
+class AuditGroup
+{
+public:
+	AuditGroup( const std::list< AuditConfiguration* >& confs );
+	~AuditGroup();
+	bool resolveDB( db::DatabaseProvider& db );
+
+	Auditor* auditor()			{ return NULL; }
+private:
+	std::list<AuditContainer*>		m_auditors;
+};
+
+
 class AAAAprovider
 {
 public:
 	AAAAprovider( const AAAAconfiguration& conf );
-	~AAAAprovider();
+//	~AAAAprovider();
 	bool resolveDB( db::DatabaseProvider& db );
 
-	Authenticator* authenticator() const		{ return NULL; }
+	Authenticator* authenticator()		{ return m_authenticator.authenticator(); }
+	Auditor* auditor()			{ return m_auditor.auditor(); }
 private:
-	std::list<AuthenticationContainer*>	m_authenticators;
-	std::list<AuditContainer*>		m_auditors;
+	AuthenticationGroup	m_authenticator;
+	AuditGroup		m_auditor;
 };
 
 }} // namespace _Wolframe::AAAA

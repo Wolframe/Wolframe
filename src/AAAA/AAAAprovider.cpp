@@ -49,56 +49,87 @@ namespace _Wolframe {
 namespace AAAA {
 
 AAAAprovider::AAAAprovider( const AAAAconfiguration& conf )
+	: m_authenticator( conf.m_authConfig ),
+	  m_auditor( conf.m_auditConfig )	{}
+
+bool AAAAprovider::resolveDB( db::DatabaseProvider& db )
 {
-	for ( std::list<AuthenticationConfiguration*>::const_iterator it = conf.m_authConfig.begin();
-							it != conf.m_authConfig.end(); it++ )	{
+	if ( !m_authenticator.resolveDB( db ))
+		return false;
+	if ( !m_auditor.resolveDB( db ))
+		return false;
+	return true;
+}
+
+
+/***********************************************************************************/
+
+AuthenticationGroup::AuthenticationGroup( const std::list< AuthenticationConfiguration* >& confs )
+{
+	for ( std::list<AuthenticationConfiguration*>::const_iterator it = confs.begin();
+							it != confs.end(); it++ )	{
 		const char* type = (*it)->typeName();
 		if ( boost::algorithm::iequals( type, "DatabaseAuth" ))	{
-			DBauthContainer* auth = new DBauthContainer( static_cast<DatabaseAuthConfig&>(**it) );
-			m_authenticators.push_back( auth );
+			DBauthContainer* element = new DBauthContainer( static_cast<DatabaseAuthConfig&>(**it) );
+			m_authenticators.push_back( element );
 		}
 		else if ( boost::algorithm::iequals( type, "TextFileAuth" ))	{
-			TxtFileAuthContainer* auth = new TxtFileAuthContainer( static_cast<TextFileAuthConfig&>(**it) );
-			m_authenticators.push_back( auth );
+			TxtFileAuthContainer* element = new TxtFileAuthContainer( static_cast<TextFileAuthConfig&>(**it) );
+			m_authenticators.push_back( element );
 		}
 		else
 			throw std::domain_error( "Unknown authentication mechanism type in AAAAprovider constructor" );
 	}
+}
 
-	for ( std::list<AuditConfiguration*>::const_iterator it = conf.m_auditConfig.begin();
-							it != conf.m_auditConfig.end(); it++ )	{
+AuthenticationGroup::~AuthenticationGroup()
+{
+	for ( std::list<AuthenticationContainer*>::const_iterator it = m_authenticators.begin();
+								it != m_authenticators.end(); it++ )
+		delete *it;
+}
+
+bool AuthenticationGroup::resolveDB( db::DatabaseProvider& db )
+{
+	for ( std::list<AuthenticationContainer*>::const_iterator it = m_authenticators.begin();
+								it != m_authenticators.end(); it++ )
+		if ( ! (*it)->resolveDB( db ) )
+			return false;
+	return true;
+}
+
+
+/***********************************************************************************/
+
+AuditGroup::AuditGroup( const std::list< AuditConfiguration* >& confs )
+
+{
+	for ( std::list<AuditConfiguration*>::const_iterator it = confs.begin();
+							it != confs.end(); it++ )	{
 		const char* type = (*it)->typeName();
 
 		if ( boost::algorithm::iequals( type, "FileAudit" ))	{
-			FileAuditor* auditor = new FileAuditor( static_cast<FileAuditConfig&>(**it) );
-			m_auditors.push_back( auditor );
+			FileAuditor* element = new FileAuditor( static_cast<FileAuditConfig&>(**it) );
+			m_auditors.push_back( element );
 		}
 		if ( boost::algorithm::iequals( type, "DatabaseAudit" ))	{
-			DBauditContainer* auditor = new DBauditContainer( static_cast<DBauditConfig&>(**it) );
-			m_auditors.push_back( auditor );
+			DBauditContainer* element = new DBauditContainer( static_cast<DBauditConfig&>(**it) );
+			m_auditors.push_back( element );
 		}
 		else
 			throw std::domain_error( "Unknown auditing mechanism type in AAAAprovider constructor" );
 	}
 }
 
-AAAAprovider::~AAAAprovider()
+AuditGroup::~AuditGroup()
 {
-	for ( std::list<AuthenticationContainer*>::const_iterator it = m_authenticators.begin();
-								it != m_authenticators.end(); it++ )
-		delete *it;
 	for ( std::list<AuditContainer*>::const_iterator it = m_auditors.begin();
 								it != m_auditors.end(); it++ )
 		delete *it;
 }
 
-bool AAAAprovider::resolveDB( db::DatabaseProvider& db )
+bool AuditGroup::resolveDB( db::DatabaseProvider& db )
 {
-	for ( std::list<AuthenticationContainer*>::const_iterator it = m_authenticators.begin();
-								it != m_authenticators.end(); it++ )
-		if ( ! (*it)->resolveDB( db ) )
-			return false;
-
 	for ( std::list<AuditContainer*>::const_iterator it = m_auditors.begin();
 								it != m_auditors.end(); it++ )
 		if ( ! (*it)->resolveDB( db ) )
