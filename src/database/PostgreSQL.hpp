@@ -31,75 +31,79 @@
 
 ************************************************************************/
 //
-// Wolframe SQLite client
+// Wolframe PostgreSQL client
 //
 
 #include "database/database.hpp"
-#include "databaseContainer.hpp"
+#include "database/databaseContainer.hpp"
 
-#ifndef _SQLITE_HPP_INCLUDED
-#define _SQLITE_HPP_INCLUDED
+#ifndef _POSTGRESQL_HPP_INCLUDED
+#define _POSTGRESQL_HPP_INCLUDED
 
 namespace _Wolframe {
 namespace db {
 
-/// SQLite database configuration
-class SQLiteConfig : public DatabaseConfig
+/// PostgreSQL server connection configuration
+class PostgreSQLconfig : public DatabaseConfig
 {
 	friend class config::ConfigurationParser;
-	friend class SQLiteContainer;
+	friend class PostgreSQLcontainer;
 public:
-	const char* typeName() const			{ return "SQLite"; }
+	const char* typeName() const			{ return "PostgreSQL"; }
 
-	SQLiteConfig( const char* name, const char* logParent, const char* logName );
-	~SQLiteConfig()					{}
+	PostgreSQLconfig( const char* name, const char* logParent, const char* logName );
+	~PostgreSQLconfig()				{}
 
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
-	virtual void setCanonicalPathes( const std::string& referencePath );
 private:
-	std::string	filename;
-	bool		flag;
+	std::string	host;
+	unsigned short	port;
+	std::string	dbName;
+	std::string	user;
+	std::string	password;
+	unsigned short	connections;
+	unsigned short	acquireTimeout;
 };
 
 
-class SQLiteDatabase : public Database
+class PostgreSQLdatabase : public Database
 {
 public:
-	SQLiteDatabase( const std::string& id,
-			const std::string& filename, bool flag );
-	~SQLiteDatabase();
+	PostgreSQLdatabase( const std::string& id,
+			    const std::string& host, unsigned short port, const std::string& dbName,
+			    const std::string& user, const std::string& password,
+			    unsigned short connections, unsigned short	acquireTimeout );
+	~PostgreSQLdatabase();
 
 	const std::string& ID() const			{ return m_ID; }
-	const char* typeName() const			{ return "SQLite"; }
+	const char* typeName() const			{ return "PostgreSQL"; }
 	bool isOpen() const				{ return true; }
 	void close()					{}
 	bool doDBstuff( _DatabaseRequest_&, _DatabaseAnswer_& ){ return true; }
 private:
 	const std::string	m_ID;
-	const std::string	m_filename;
-	bool			m_flag;
 };
 
 
-class SQLiteContainer : public DatabaseContainer
+class PostgreSQLcontainer : public DatabaseContainer
 {
 public:
-	SQLiteContainer( const SQLiteConfig* conf );
-	~SQLiteContainer();
+	PostgreSQLcontainer( const PostgreSQLconfig& conf );
+	~PostgreSQLcontainer();
 
-	SQLiteContainer* create( const DatabaseConfig* conf ) const
+	PostgreSQLcontainer* create( const DatabaseConfig& conf ) const
 	{
-		return new SQLiteContainer( dynamic_cast< const SQLiteConfig* >( conf ));
+		return new PostgreSQLcontainer( dynamic_cast< const PostgreSQLconfig& >( conf ));
 	}
-
 	const std::string& ID() const			{ return m_db.ID(); }
 	const char* typeName() const			{ return m_db.typeName(); }
 	virtual const Database& database()		{ return m_db; }
+
 private:
-	SQLiteDatabase	m_db;
+	PostgreSQLdatabase	m_db;
 };
 
 }} // _Wolframe::db
 
-#endif // _SQLITE_HPP_INCLUDED
+#endif // _POSTGRESQL_HPP_INCLUDED

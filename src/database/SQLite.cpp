@@ -35,7 +35,7 @@
 //
 
 #include "logger.hpp"
-#include "database/SQLite.hpp"
+#include "SQLite.hpp"
 
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
@@ -101,10 +101,11 @@ SQLiteDatabase::~SQLiteDatabase( )
 }
 
 
-SQLiteContainer::SQLiteContainer( const SQLiteConfig* conf )
-	: m_db( conf->ID(), conf->filename, conf->flag )
+//***  SQLite database container  *******************************************
+SQLiteContainer::SQLiteContainer( const SQLiteConfig& conf )
+	: m_db( conf.ID(), conf.filename, conf.flag )
 {
-	LOG_NOTICE << "SQLite database container for '" << conf->ID() << "' created";
+	LOG_NOTICE << "SQLite database container for '" << conf.ID() << "' created";
 }
 
 SQLiteContainer::~SQLiteContainer( )

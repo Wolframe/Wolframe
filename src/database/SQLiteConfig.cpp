@@ -34,7 +34,7 @@
 // SQLite configuration parser
 //
 
-#include "database/SQLite.hpp"
+#include "SQLite.hpp"
 #include "config/valueParser.hpp"
 #include "config/configurationParser.hpp"
 

@@ -35,7 +35,7 @@
 //
 
 #include "logger.hpp"
-#include "database/PostgreSQL.hpp"
+#include "PostgreSQL.hpp"
 
 namespace _Wolframe {
 namespace db {
@@ -95,12 +95,13 @@ PostgreSQLdatabase::~PostgreSQLdatabase()
 }
 
 
-PostgreSQLcontainer::PostgreSQLcontainer( const PostgreSQLconfig* conf )
-	: m_db( conf->ID(), conf->host, conf->port, conf->dbName,
-		  conf->user, conf->password,
-		  conf->connections, conf->acquireTimeout )
+//***  PostgreSQL database container  ***************************************
+PostgreSQLcontainer::PostgreSQLcontainer( const PostgreSQLconfig& conf )
+	: m_db( conf.ID(), conf.host, conf.port, conf.dbName,
+		  conf.user, conf.password,
+		  conf.connections, conf.acquireTimeout )
 {
-	LOG_NOTICE << "PostgreSQL database container for '" << conf->ID() << "' created";
+	LOG_NOTICE << "PostgreSQL database container for '" << conf.ID() << "' created";
 }
 
 PostgreSQLcontainer::~PostgreSQLcontainer()

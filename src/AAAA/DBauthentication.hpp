@@ -76,6 +76,10 @@ public:
 	~DBauthContainer();
 
 	virtual const char* typeName() const	{ return "DatabaseAuth"; }
+	DBauthContainer* create( const AuthenticationConfiguration& conf ) const
+	{
+		return new DBauthContainer( dynamic_cast< const DatabaseAuthConfig& >( conf ));
+	}
 
 	bool resolveDB( const db::DatabaseProvider& db );
 private:

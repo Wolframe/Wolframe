@@ -43,6 +43,7 @@ namespace config {
 // forward definition for friends :)
 class ConfigurationParser;
 
+/// Base class for the configuration structures
 class ConfigurationBase
 {
 public:
@@ -74,9 +75,9 @@ public:
 	const std::string& logPrefix() const		{ return m_logPrefix; }
 
 	/// Set the pathes in the configuration to absolute values
-	///\param[in]	referencePath	use this path as reference when
-	///				computing the absolute pathes
-	virtual void setCanonicalPathes( const std::string& /* referencePath */ )	{}
+	///\param[in]	refPath	use this path as reference when computing
+	///			the absolute pathes
+	virtual void setCanonicalPathes( const std::string& /* refPath */ )	{}
 
 	/// Check if the server configuration makes sense
 	///

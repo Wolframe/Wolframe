@@ -35,10 +35,9 @@
 //
 
 #include "DBprovider.hpp"
-#include "database/PostgreSQL.hpp"
-#include "database/SQLite.hpp"
+#include "PostgreSQL.hpp"
+#include "SQLite.hpp"
 
-//#include "standardConfigs.hpp"
 #include "logger.hpp"
 
 #include <boost/algorithm/string.hpp>
@@ -52,11 +51,11 @@ DatabaseProvider::DatabaseProvider( const DBproviderConfig& conf )
 							it != conf.m_dbConfig.end(); it++ )	{
 		const char* dbType = (*it)->typeName();
 		if ( boost::algorithm::iequals( dbType, "PostgreSQL" ))	{
-			PostgreSQLcontainer* db = new PostgreSQLcontainer( static_cast<PostgreSQLconfig*>(*it) );
+			PostgreSQLcontainer* db = new PostgreSQLcontainer( dynamic_cast< const PostgreSQLconfig& >(**it) );
 			m_db.push_back( db );
 		}
 		else if ( boost::algorithm::iequals( dbType, "SQLite" ))	{
-			SQLiteContainer* db = new SQLiteContainer( static_cast<SQLiteConfig*>(*it) );
+			SQLiteContainer* db = new SQLiteContainer( dynamic_cast< const SQLiteConfig& >(**it) );
 			m_db.push_back( db );
 		}
 		else if ( boost::algorithm::iequals( dbType, "DB reference" ))

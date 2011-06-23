@@ -35,8 +35,8 @@
 //
 
 #include "DBprovider.hpp"
-#include "database/PostgreSQL.hpp"
-#include "database/SQLite.hpp"
+#include "PostgreSQL.hpp"
+#include "SQLite.hpp"
 
 #include "config/valueParser.hpp"
 #include "config/configurationParser.hpp"

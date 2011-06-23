@@ -70,6 +70,10 @@ public:
 	~FileAuditor()					{}
 
 	const char* typeName() const			{ return "FileAudit"; }
+	FileAuditor* create( const AuditConfiguration& conf ) const
+	{
+		return new FileAuditor( dynamic_cast< const FileAuditConfig& >( conf ));
+	}
 private:
 	std::string	m_file;
 };

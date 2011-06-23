@@ -34,7 +34,7 @@
 // PostgreSQL configuration parser
 //
 
-#include "database/PostgreSQL.hpp"
+#include "PostgreSQL.hpp"
 #include "config/valueParser.hpp"
 #include "config/configurationParser.hpp"
 

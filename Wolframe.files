@@ -63,6 +63,11 @@ clients/qt/HistoryLineEdit.hpp
 clients/qt/MainWindow.cpp
 clients/qt/MainWindow.hpp
 clients/qt/Makefile.W32
+clients/qt/moc_AbstractFormLoader.cpp
+clients/qt/moc_DebugTerminal.cpp
+clients/qt/moc_HistoryLineEdit.cpp
+clients/qt/moc_MainWindow.cpp
+clients/qt/moc_WolframeClient.cpp
 clients/qt/qtclient.cpp
 clients/qt/WolframeClient.cpp
 clients/qt/WolframeClient.hpp
@@ -204,8 +209,6 @@ include/connectionHandler.hpp
 include/database/databaseContainer.hpp
 include/database/database.hpp
 include/database/databaseReference.hpp
-include/database/PostgreSQL.hpp
-include/database/SQLite.hpp
 include/ErrorCodes.hpp
 include/GNUmakefile
 include/logger.hpp
@@ -223,6 +226,7 @@ include/protocol/inputfilter.hpp
 include/protocol/ioblocks.hpp
 include/protocol/iterators.hpp
 include/protocol/parser.hpp
+include/serialize/appProcessorSystemCall.hpp
 include/serialize/descriptionBase.hpp
 include/serialize/traits.hpp
 include/serverEndpoint.hpp
@@ -341,8 +345,10 @@ src/database/DBreferenceConfig.cpp
 src/database/DBreference.cpp
 src/database/PostgreSQLconfig.cpp
 src/database/PostgreSQL.cpp
+src/database/PostgreSQL.hpp
 src/database/SQLiteConfig.cpp
 src/database/SQLite.cpp
+src/database/SQLite.hpp
 src/exceptionBase.hpp
 src/getPassword.cpp
 src/getPassword.hpp

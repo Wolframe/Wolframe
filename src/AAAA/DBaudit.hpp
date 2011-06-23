@@ -75,6 +75,10 @@ public:
 	~DBauditContainer();
 
 	const char* typeName() const				{ return "DatabaseAudit"; }
+	DBauditContainer* create( const AuditConfiguration& conf ) const
+	{
+		return new DBauditContainer( dynamic_cast< const DBauditConfig& >( conf ));
+	}
 
 	bool resolveDB( const db::DatabaseProvider& db );
 private:

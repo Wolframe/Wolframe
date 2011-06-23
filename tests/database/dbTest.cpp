@@ -1,13 +1,13 @@
-#include "logger.hpp"
+#include "../include/logger.hpp"
 
 #include <gtest/gtest.h>
 
 #ifdef WITH_SQLITE3
-#include "database/SQLite.hpp"
+#include "../src/database/SQLite.hpp"
 #endif
 
 #ifdef WITH_PGSQL
-#include "database/PostgreSQL.hpp"
+#include "../src/database/PostgreSQL.hpp"
 #endif
 
 using namespace _Wolframe::log;
