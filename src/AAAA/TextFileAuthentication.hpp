@@ -38,18 +38,18 @@
 #define _TEXT_FILE_AUTHENTICATION_HPP_INCLUDED
 
 #include <string>
-#include "authenticator.hpp"
+#include "AAAA/authenticationContainer.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
 
-class TextFileAuthConfig : public AuthenticatorConfiguration
+class TextFileAuthConfig : public AuthenticationConfiguration
 {
 	friend class TxtFileAuthContainer;
 	friend class config::ConfigurationParser;
 public:
 	TextFileAuthConfig( const char* cfgName, const char* logParent, const char* logName )
-		: AuthenticatorConfiguration( cfgName, logParent, logName ){}
+		: AuthenticationConfiguration( cfgName, logParent, logName ){}
 
 	virtual const char* typeName() const			{ return "TextFileAuth"; }
 
@@ -67,6 +67,8 @@ class TxtFileAuthContainer : public AuthenticationContainer
 public:
 	TxtFileAuthContainer( const TextFileAuthConfig& conf );
 	~TxtFileAuthContainer()					{}
+
+	virtual const char* typeName() const			{ return "TextFileAuth"; }
 private:
 	std::string	m_file;
 };

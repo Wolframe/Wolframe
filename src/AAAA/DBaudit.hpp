@@ -34,7 +34,7 @@
 // database audit
 //
 
-#include "auditor.hpp"
+#include "AAAA/auditContainer.hpp"
 #include "database/databaseReference.hpp"
 
 #ifndef _DB_AUDIT_HPP_INCLUDED
@@ -43,13 +43,13 @@
 namespace _Wolframe {
 namespace AAAA {
 
-class DatabaseAuditConfig : public AuditorConfiguration
+class DBauditConfig : public AuditConfiguration
 {
 	friend class DBauditContainer;
 	friend class config::ConfigurationParser;
 public:
-	DatabaseAuditConfig( const char* cfgName, const char* logParent, const char* logName )
-		: AuditorConfiguration( cfgName, logParent, logName ),
+	DBauditConfig( const char* cfgName, const char* logParent, const char* logName )
+		: AuditConfiguration( cfgName, logParent, logName ),
 		  m_dbConfig( "", logParent, "" )		{}
 
 	const char* typeName() const				{ return "DatabaseAudit"; }
@@ -71,8 +71,10 @@ private:
 class DBauditContainer : public AuditContainer
 {
 public:
-	DBauditContainer( const DatabaseAuditConfig& conf );
+	DBauditContainer( const DBauditConfig& conf );
 	~DBauditContainer();
+
+	const char* typeName() const				{ return "DatabaseAudit"; }
 
 	bool resolveDB( const db::DatabaseProvider& db );
 private:

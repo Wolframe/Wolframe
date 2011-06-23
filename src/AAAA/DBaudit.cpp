@@ -43,7 +43,7 @@
 namespace _Wolframe {
 namespace AAAA {
 
-DBauditContainer::DBauditContainer( const DatabaseAuditConfig& conf )
+DBauditContainer::DBauditContainer( const DBauditConfig& conf )
 {
 	assert ( boost::algorithm::iequals( conf.m_dbConfig.typeName(), "DB reference" ));
 

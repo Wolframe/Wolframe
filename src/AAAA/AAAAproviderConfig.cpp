@@ -38,6 +38,11 @@
 #include "AAAAprovider.hpp"
 #include "config/configurationParser.hpp"
 
+#include "TextFileAuthentication.hpp"
+#include "DBauthentication.hpp"
+#include "FileAudit.hpp"
+#include "DBaudit.hpp"
+
 #include <boost/property_tree/ptree.hpp>
 #include <boost/algorithm/string.hpp>
 
@@ -54,12 +59,55 @@ bool ConfigurationParser::parse( AAAA::AAAAconfiguration& cfg,
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "Authentication" ) ||
 				boost::algorithm::iequals( L1it->first, "Auth" ))	{
-			if ( !ConfigurationParser::parse( cfg.auth, L1it->second, L1it->first ))
-				retVal = false;
+			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
+									L2it != L1it->second.end(); L2it++ )	{
+				if ( boost::algorithm::iequals( L2it->first, "file" ))	{
+					AAAA::TextFileAuthConfig* conf = new AAAA::TextFileAuthConfig( "File", cfg.logPrefix().c_str(), "file" );
+					if ( ConfigurationParser::parse( *conf, L2it->second, L2it->first ))
+						cfg.m_authConfig.push_back( conf );
+					else	{
+						delete conf;
+						retVal = false;
+					}
+				}
+				else if ( boost::algorithm::iequals( L2it->first, "database" ))	{
+					AAAA::DatabaseAuthConfig* conf = new AAAA::DatabaseAuthConfig( "Database", cfg.logPrefix().c_str(), "database" );
+					if ( ConfigurationParser::parse( *conf, L2it->second, L2it->first ))
+						cfg.m_authConfig.push_back( conf );
+					else	{
+						delete conf;
+						retVal = false;
+					}
+				}
+				else
+					LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
+						    << L2it->first << "'";
+			}
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "Audit" ))	{
-			if ( !ConfigurationParser::parse( cfg.audit, L1it->second, L1it->first ))
-				retVal = false;
+			for ( boost::property_tree::ptree::const_iterator L2it = pt.begin(); L2it != pt.end(); L2it++ )	{
+				if ( boost::algorithm::iequals( L2it->first, "file" ))	{
+					AAAA::FileAuditConfig* conf = new AAAA::FileAuditConfig( "File", cfg.logPrefix().c_str(), "file" );
+					if ( ConfigurationParser::parse( *conf, L2it->second, L2it->first ))
+						cfg.m_auditConfig.push_back( conf );
+					else	{
+						delete conf;
+						retVal = false;
+					}
+				}
+				else if ( boost::algorithm::iequals( L2it->first, "database" ))	{
+					AAAA::DBauditConfig* conf = new AAAA::DBauditConfig( "Database", cfg.logPrefix().c_str(), "database" );
+					if ( ConfigurationParser::parse( *conf, L2it->second, L2it->first ))
+						cfg.m_auditConfig.push_back( conf );
+					else	{
+						delete conf;
+						retVal = false;
+					}
+				}
+				else
+					LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
+						    << L2it->first << "'";
+			}
 		}
 		else
 			LOG_WARNING << cfg.logPrefix() << ": unknown configuration option: '"

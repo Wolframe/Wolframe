@@ -38,9 +38,11 @@
 #define _AAAA_PROVIDER_HPP_INCLUDED
 
 #include "config/configurationBase.hpp"
-#include "auditor.hpp"
-#include "authenticator.hpp"
-#include "authentication.hpp"
+#include "AAAA/authentication.hpp"
+#include "AAAA/authenticationContainer.hpp"
+#include "AAAA/audit.hpp"
+#include "AAAA/auditContainer.hpp"
+
 #include "database/database.hpp"
 
 #include <string>
@@ -54,16 +56,17 @@ class AAAAconfiguration : public config::ConfigurationBase
 	friend class AAAAprovider;
 	friend class config::ConfigurationParser;
 public:
-	/// constructor
+	/// x-structor
 	AAAAconfiguration();
+	~AAAAconfiguration();
 
 	/// methods
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 	void setCanonicalPathes( const std::string& referencePath );
 private:
-	AuthenticationConfiguration	auth;
-	AuditConfiguration		audit;
+	std::list< AuthenticationConfiguration* >	m_authConfig;
+	std::list< AuditConfiguration* >		m_auditConfig;
 };
 
 

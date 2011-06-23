@@ -39,18 +39,18 @@
 
 #include <string>
 
-#include "auditor.hpp"
+#include "AAAA/auditContainer.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
 
-class FileAuditConfig : public AuditorConfiguration
+class FileAuditConfig : public AuditConfiguration
 {
 	friend class FileAuditor;
 	friend class config::ConfigurationParser;
 public:
 	FileAuditConfig( const char* cfgName, const char* logParent, const char* logName )
-		: AuditorConfiguration( cfgName, logParent, logName ){}
+		: AuditConfiguration( cfgName, logParent, logName ){}
 
 	const char* typeName() const			{ return "FileAudit"; }
 
@@ -68,6 +68,8 @@ class FileAuditor : public AuditContainer
 public:
 	FileAuditor( const FileAuditConfig& conf );
 	~FileAuditor()					{}
+
+	const char* typeName() const			{ return "FileAudit"; }
 private:
 	std::string	m_file;
 };

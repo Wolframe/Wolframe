@@ -37,7 +37,7 @@
 #include "logger.hpp"
 #include "config/valueParser.hpp"
 #include "config/configurationParser.hpp"
-#include "authenticator.hpp"
+
 #include "TextFileAuthentication.hpp"
 
 #include "boost/algorithm/string.hpp"

@@ -63,11 +63,6 @@ clients/qt/HistoryLineEdit.hpp
 clients/qt/MainWindow.cpp
 clients/qt/MainWindow.hpp
 clients/qt/Makefile.W32
-clients/qt/moc_AbstractFormLoader.cpp
-clients/qt/moc_DebugTerminal.cpp
-clients/qt/moc_HistoryLineEdit.cpp
-clients/qt/moc_MainWindow.cpp
-clients/qt/moc_WolframeClient.cpp
 clients/qt/qtclient.cpp
 clients/qt/WolframeClient.cpp
 clients/qt/WolframeClient.hpp
@@ -187,6 +182,10 @@ gtest/include/gtest/internal/gtest-type-util.h
 gtest/Makefile.W32
 gtest/src/gtest-internal-inl.h
 header.txt
+include/AAAA/auditContainer.hpp
+include/AAAA/audit.hpp
+include/AAAA/authenticationContainer.hpp
+include/AAAA/authentication.hpp
 include/appConfig.hpp
 include/appProcessor.hpp
 include/appProperties.hpp
@@ -204,6 +203,7 @@ include/connectionEndpoint.hpp
 include/connectionHandler.hpp
 include/database/databaseContainer.hpp
 include/database/database.hpp
+include/database/databaseReference.hpp
 include/database/PostgreSQL.hpp
 include/database/SQLite.hpp
 include/ErrorCodes.hpp
@@ -302,21 +302,14 @@ sqlite3/sqlite3.h
 src/AAAA/AAAAproviderConfig.cpp
 src/AAAA/AAAAprovider.cpp
 src/AAAA/AAAAprovider.hpp
-src/AAAA/auditConfiguration.cpp
-src/AAAA/auditor.cpp
-src/AAAA/auditor.hpp
-src/AAAA/authConfiguration.cpp
 src/AAAA/authentication_db_sqlite3.cpp
 src/AAAA/authentication_db_sqlite3.hpp
-src/AAAA/authentication.hpp
 src/AAAA/authentication_pam.cpp
 src/AAAA/authentication_pam.hpp
 src/AAAA/authentication_sasl.cpp
 src/AAAA/authentication_sasl.hpp
 src/AAAA/authentication_textfile.cpp
 src/AAAA/authentication_textfile.hpp
-src/AAAA/authenticator.cpp
-src/AAAA/authenticator.hpp
 src/AAAA/DBauditConfig.cpp
 src/AAAA/DBaudit.cpp
 src/AAAA/DBaudit.hpp
@@ -422,4 +415,3 @@ windows/wolframe.xml
 XML/configuration.rng
 XML/database.rng
 XML/logging.rng
-include/database/databaseReference.hpp

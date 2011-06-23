@@ -37,19 +37,19 @@
 #ifndef _DB_AUTHENTICATION_HPP_INCLUDED
 #define _DB_AUTHENTICATION_HPP_INCLUDED
 
-#include "authenticator.hpp"
+#include "AAAA/authenticationContainer.hpp"
 #include "database/databaseReference.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
 
-class DatabaseAuthConfig : public AuthenticatorConfiguration
+class DatabaseAuthConfig : public AuthenticationConfiguration
 {
 	friend class DBauthContainer;
 	friend class config::ConfigurationParser;
 public:
 	DatabaseAuthConfig( const char* cfgName, const char* logParent, const char* logName )
-		: AuthenticatorConfiguration( cfgName, logParent, logName ),
+		: AuthenticationConfiguration( cfgName, logParent, logName ),
 		  m_dbConfig( "", logParent, "Database" )	{}
 
 	virtual const char* typeName() const			{ return "DatabaseAuth"; }
@@ -74,6 +74,8 @@ class DBauthContainer : public AuthenticationContainer
 public:
 	DBauthContainer( const DatabaseAuthConfig& conf );
 	~DBauthContainer();
+
+	virtual const char* typeName() const	{ return "DatabaseAuth"; }
 
 	bool resolveDB( const db::DatabaseProvider& db );
 private:

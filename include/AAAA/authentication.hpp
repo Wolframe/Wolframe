@@ -58,35 +58,39 @@ public:
 
 // virtual base for all authentication methods
 class Authenticator {
-	public:
-		virtual ~Authenticator( ) { }
+public:
+	virtual ~Authenticator( ) { }
 
-		// get next step in authentication
-		virtual Step::AuthStep nextStep( ) = 0;
+	// get next step in authentication
+	virtual Step::AuthStep nextStep( ) = 0;
 
-		// used when sending or receiving to indicate
-		// the kind of data the Authenticator expects
-		// (e.g. "login", "password", "md5")
-		virtual std::string token( ) = 0;
+	// used when sending or receiving to indicate
+	// the kind of data the Authenticator expects
+	// (e.g. "login", "password", "md5")
+	virtual std::string token( ) = 0;
 
-		// the authenticator wants us to send out data
-		// (for instance a challenge). The message has
-		// to be send to the client
-		//
-		// token() gives you the kind of data (which
-		// depends on the authentication method)
-		virtual std::string sendData( ) = 0;
+	// the authenticator wants us to send out data
+	// (for instance a challenge). The message has
+	// to be send to the client
+	//
+	// token() gives you the kind of data (which
+	// depends on the authentication method)
+	virtual std::string sendData( ) = 0;
 
-		// the authenticator can't continue without getting
-		// some data (for instance we need a password)
-		//
-		// token() indicates the kind of data the authenticator
-		// expects (depends on the authentication method)
-		virtual void receiveData( const std::string data ) = 0;
+	// the authenticator can't continue without getting
+	// some data (for instance we need a password)
+	//
+	// token() indicates the kind of data the authenticator
+	// expects (depends on the authentication method)
+	virtual void receiveData( const std::string data ) = 0;
 
-		// we got an error (which usually should be logged only,
-		// not sent to the client)
-		virtual std::string getError( ) = 0;
+	// we got an error (which usually should be logged only,
+	// not sent to the client)
+	virtual std::string getError( ) = 0;
+
+	// close the authenticator and destroy all
+	// sensible data
+	virtual void close( ) { }
 };
 
 }} // namespace _Wolframe::AAAA

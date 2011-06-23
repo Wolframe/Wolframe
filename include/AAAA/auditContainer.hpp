@@ -31,59 +31,41 @@
 
 ************************************************************************/
 //
-// authenticator
+// audit container base classes
 //
 
-#ifndef _AUTHENTICATOR_HPP_INCLUDED
-#define _AUTHENTICATOR_HPP_INCLUDED
+#ifndef _AUDIT_CONTAINER_HPP_INCLUDED
+#define _AUDIT_CONTAINER_HPP_INCLUDED
 
-#include <list>
 #include "config/configurationBase.hpp"
 #include "database/DBprovider.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
 
-class AuthenticatorConfiguration : public config::ModuleConfiguration
+class AuditConfiguration : public config::ModuleConfiguration
 {
+//	friend class AAAAprovider;
+//	friend class config::ConfigurationParser;
 public:
 	/// constructor
-	AuthenticatorConfiguration( const char* name, const char* logParent, const char* logName )
-		: config::ModuleConfiguration( name, logParent, logName ){}
-
-	virtual ~AuthenticatorConfiguration()				{}
+	AuditConfiguration( const char* cfgName, const char* logParent, const char* logName )
+		: ModuleConfiguration( cfgName, logParent, logName )	{}
+	virtual ~AuditConfiguration()					{}
 };
 
 
-/******************************************************************************************************/
-class AuthenticationConfiguration : public config::ConfigurationBase
-{
-	friend class AAAAprovider;
-	friend class config::ConfigurationParser;
-public:
-	/// constructor
-	AuthenticationConfiguration( const char* cfgName, const char* logParent, const char* logName )
-		: ConfigurationBase( cfgName, logParent, logName )	{}
-	~AuthenticationConfiguration();
-
-	/// methods
-	bool check() const;
-	void print( std::ostream& os, size_t indent ) const;
-	void setCanonicalPathes( const std::string& referencePath );
-
-	// bool test() const;	// Not implemented yet, inherited from base
-private:
-	std::list<AuthenticatorConfiguration*>	m_config;
-};
-
-
-class AuthenticationContainer
+class AuditContainer
 {
 public:
-	virtual	~AuthenticationContainer()				{}
+	virtual ~AuditContainer()	{}
+
+//	virtual AuditContainer* create( const AuditConfiguration* conf ) const = 0;
+
+	virtual const char* typeName() const = 0;
 	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ )	{ return true; }
 };
 
 }} // namespace _Wolframe::AAAA
 
-#endif // _AUTHENTICATOR_HPP_INCLUDED
+#endif // _AUDIT_CONTAINER_HPP_INCLUDED

@@ -41,7 +41,7 @@ namespace _Wolframe {
 namespace config {
 
 template<>
-bool ConfigurationParser::parse( AAAA::DatabaseAuditConfig& cfg,
+bool ConfigurationParser::parse( AAAA::DBauditConfig& cfg,
 				 const boost::property_tree::ptree& pt, const std::string& node )
 {
 	return ConfigurationParser::parse( cfg.m_dbConfig, pt, node );

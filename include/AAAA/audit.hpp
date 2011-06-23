@@ -30,60 +30,26 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// auditing objects
-//
+///
+/// \file audit.hpp
+/// \brief top-level header file for AAAA audit
+///
 
-#ifndef _AUDITOR_HPP_INCLUDED
-#define _AUDITOR_HPP_INCLUDED
-
-#include "config/configurationBase.hpp"
-#include "database/DBprovider.hpp"
-
-#include <list>
+#ifndef _AUDIT_HPP_INCLUDED
+#define _AUDIT_HPP_INCLUDED
 
 namespace _Wolframe {
 namespace AAAA {
 
-class AuditorConfiguration : public config::ModuleConfiguration
-{
+// virtual base for all audit methods
+class Audithor {
 public:
-	/// constructor
-	AuditorConfiguration( const char* name, const char* logParent, const char* logName )
-		: config::ModuleConfiguration( name, logParent, logName ){}
+	virtual ~Audithor( ) { }
 
-	virtual ~AuditorConfiguration()					{}
-};
-
-
-class AuditConfiguration : public config::ConfigurationBase
-{
-	friend class AAAAprovider;
-	friend class config::ConfigurationParser;
-public:
-	/// constructor
-	AuditConfiguration( const char* cfgName, const char* logParent, const char* logName )
-		: ConfigurationBase( cfgName, logParent, logName )	{}
-	~AuditConfiguration();
-
-	/// methods
-	bool check() const;
-	void print( std::ostream& os, size_t indent ) const;
-	void setCanonicalPathes( const std::string& referencePath );
-
-	// bool test() const;	// Not implemented yet, inherited from base
-private:
-	std::list<AuditorConfiguration*>	m_config;
-};
-
-
-class AuditContainer
-{
-public:
-	virtual ~AuditContainer()					{}
-	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ )	{ return true; }
+	// close the auditor
+	virtual void close( ) { }
 };
 
 }} // namespace _Wolframe::AAAA
 
-#endif // _AUDITOR_HPP_INCLUDED
+#endif // _AUDIT_HPP_INCLUDED

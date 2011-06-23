@@ -50,8 +50,8 @@ namespace AAAA {
 
 AAAAprovider::AAAAprovider( const AAAAconfiguration& conf )
 {
-	for ( std::list<AuthenticatorConfiguration*>::const_iterator it = conf.auth.m_config.begin();
-							it != conf.auth.m_config.end(); it++ )	{
+	for ( std::list<AuthenticationConfiguration*>::const_iterator it = conf.m_authConfig.begin();
+							it != conf.m_authConfig.end(); it++ )	{
 		const char* type = (*it)->typeName();
 		if ( boost::algorithm::iequals( type, "DatabaseAuth" ))	{
 			DBauthContainer* auth = new DBauthContainer( static_cast<DatabaseAuthConfig&>(**it) );
@@ -65,8 +65,8 @@ AAAAprovider::AAAAprovider( const AAAAconfiguration& conf )
 			throw std::domain_error( "Unknown authentication mechanism type in AAAAprovider constructor" );
 	}
 
-	for ( std::list<AuditorConfiguration*>::const_iterator it = conf.audit.m_config.begin();
-							it != conf.audit.m_config.end(); it++ )	{
+	for ( std::list<AuditConfiguration*>::const_iterator it = conf.m_auditConfig.begin();
+							it != conf.m_auditConfig.end(); it++ )	{
 		const char* type = (*it)->typeName();
 
 		if ( boost::algorithm::iequals( type, "FileAudit" ))	{
@@ -74,7 +74,7 @@ AAAAprovider::AAAAprovider( const AAAAconfiguration& conf )
 			m_auditors.push_back( auditor );
 		}
 		if ( boost::algorithm::iequals( type, "DatabaseAudit" ))	{
-			DBauditContainer* auditor = new DBauditContainer( static_cast<DatabaseAuditConfig&>(**it) );
+			DBauditContainer* auditor = new DBauditContainer( static_cast<DBauditConfig&>(**it) );
 			m_auditors.push_back( auditor );
 		}
 		else
@@ -107,10 +107,22 @@ bool AAAAprovider::resolveDB( db::DatabaseProvider& db )
 }
 
 
-AAAAconfiguration::AAAAconfiguration() : config::ConfigurationBase( "AAAA", NULL, "AAAA configuration"  ),
-	auth( "Authentication", logPrefix().c_str(), "Authentication" ),
-	audit( "Auditing", logPrefix().c_str(), "Auditing" )
+/***********************************************************************************/
+
+AAAAconfiguration::AAAAconfiguration()
+	: config::ConfigurationBase( "AAAA", NULL, "AAAA configuration"  )
+{}
+
+/// destructor
+AAAAconfiguration::~AAAAconfiguration()
 {
+	for ( std::list<AuthenticationConfiguration*>::const_iterator it = m_authConfig.begin();
+								it != m_authConfig.end(); it++ )
+		delete *it;
+
+	for ( std::list<AuditConfiguration*>::const_iterator it =m_auditConfig.begin();
+								it != m_auditConfig.end(); it++ )
+		delete *it;
 }
 
 
@@ -118,28 +130,47 @@ AAAAconfiguration::AAAAconfiguration() : config::ConfigurationBase( "AAAA", NULL
 void AAAAconfiguration::print( std::ostream& os, size_t /* indent */ ) const
 {
 	os << sectionName() << std::endl;
-	auth.print( os, 3 );
-	audit.print( os, 3 );
-}
+	os << "   Authentication" << std::endl;
+	for ( std::list<AuthenticationConfiguration*>::const_iterator it = m_authConfig.begin();
+								it != m_authConfig.end(); it++ )
+		(*it)->print( os, 6 );
 
+	os << "   Audit" << std::endl;
+	for ( std::list<AuditConfiguration*>::const_iterator it = m_auditConfig.begin();
+								it != m_auditConfig.end(); it++ )
+		(*it)->print( os, 6 );
+
+}
 
 /// Check if the database configuration makes sense
 bool AAAAconfiguration::check() const
 {
 	bool correct = true;
 
-	if ( !auth.check() )
-		correct = false;
-	if ( !audit.check() )
-		correct = false;
+	for ( std::list<AuthenticationConfiguration*>::const_iterator it = m_authConfig.begin();
+								it != m_authConfig.end(); it++ )	{
+		if ( !(*it)->check() )
+			correct = false;
+	}
+
+	for ( std::list<AuditConfiguration*>::const_iterator it = m_auditConfig.begin();
+								it != m_auditConfig.end(); it++ )	{
+		if ( !(*it)->check() )
+			correct = false;
+	}
 
 	return correct;
 }
 
 void AAAAconfiguration::setCanonicalPathes( const std::string& refPath )
 {
-	auth.setCanonicalPathes( refPath );
-	audit.setCanonicalPathes( refPath );
+	for ( std::list<AuthenticationConfiguration*>::const_iterator it = m_authConfig.begin();
+								it != m_authConfig.end(); it++ )
+		(*it)->setCanonicalPathes( refPath );
+
+	for ( std::list<AuditConfiguration*>::const_iterator it = m_auditConfig.begin();
+								it != m_auditConfig.end(); it++ )
+		(*it)->setCanonicalPathes( refPath );
 }
 
 }} // namespace _Wolframe::AAAA
