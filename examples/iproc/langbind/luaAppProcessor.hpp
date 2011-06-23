@@ -30,8 +30,8 @@ Project Wolframe.
 
 ************************************************************************/
 ///
-/// \file luaAppProcessor.hpp
-/// \brief interface to the lua application processor
+///\file luaAppProcessor.hpp
+///\brief interface to the lua application processor
 ///
 #ifndef _Wolframe_LUATYPES_HPP_INCLUDED
 #define _Wolframe_LUATYPES_HPP_INCLUDED
@@ -43,29 +43,29 @@ namespace _Wolframe {
 namespace iproc {
 namespace lua {
 
-/// \class AppProcessor
-/// \brief application processor instance for processing calls as Lua script
+///\class AppProcessor
+///\brief application processor instance for processing calls as Lua script
 class AppProcessor :public app::AppProcessorBase
 {
 public:
-	/// \class State
-	/// \brief state of the application processor instance
+	///\class State
+	///\brief State of the application processor instance
 	struct State;
 
-	/// \brief constructor
-	/// \param[in] system read only reference to system call interface
-	/// \param[in] config read only reference to the configuration of this application processor
-	/// \param[in] input input of this application processor instance
-	/// \param[in] output output of this application processor instance
-	AppProcessor( app::System* system, const lua::Configuration* config);
-	/// \brief destructor
+	///\brief Constructor
+	///\param[in] system system call interface
+	///\param[in] config read only reference to the configuration of this application processor
+	///\param[in] input input of this application processor instance
+	///\param[in] output output of this application processor instance
+	AppProcessor( const app::System& system, const lua::Configuration* config);
+	///\brief Destructor
 	~AppProcessor();
 
-	/// \brief get command implemenation (see app::AppProcessorBase::getCommand(const char*,const char*&,bool&)const)
-	/// \param[in] protocolCmd protocol command
-	/// \param[out] functionName associated Lua script function name
-	/// \param[out] hasIO true if associated Lua script function is processing content from network I/O
-	/// \return true, if the command is defined in configuration
+	///\brief Get command implemenation (see app::AppProcessorBase::getCommand(const char*,const char*&,bool&)const)
+	///\param[in] protocolCmd protocol command
+	///\param[out] functionName associated Lua script function name
+	///\param[out] hasIO true if associated Lua script function is processing content from network I/O
+	///\return true, if the command is defined in configuration
 	virtual bool getCommand( const char* protocolCmd, const char*& functionName, bool& hasIO) const
 	{
 		functionName = m_config->scriptFunctionName( protocolCmd);
@@ -73,26 +73,26 @@ public:
 		return (functionName != 0);
 	}
 
-	/// \brief get command implemenation (see app::AppProcessorBase::setIO(boost::shared_ptr<protocol::InputFilter>, boost::shared_ptr<protocol::FormatOutput>)
-	/// \param[in] in input filter reference
-	/// \param[in] out format output reference
+	///\brief Get command implemenation (see app::AppProcessorBase::setIO(boost::shared_ptr<protocol::InputFilter>, boost::shared_ptr<protocol::FormatOutput>)
+	///\param[in] in input filter reference
+	///\param[in] out format output reference
 	virtual void setIO( boost::shared_ptr<protocol::InputFilter> in, boost::shared_ptr<protocol::FormatOutput> out)
 	{
 		m_input.m_inputfilter = in;
 		m_output.m_formatoutput = out;
 	}
 
-	/// \brief execute the Lua script (see app::AppProcessorBase::call(unsigned int, const char**,bool))
-	/// \param[in] argc number of arguments
-	/// \param[in] argc array of arguments
-	/// \return call state
+	///\brief Execute the Lua script (see app::AppProcessorBase::call(unsigned int, const char**,bool))
+	///\param[in] argc number of arguments
+	///\param[in] argc array of arguments
+	///\return call state
 	virtual CallResult call( unsigned int argc, const char** argv);
 
 private:
 	const lua::Configuration* m_config;	///< reference to configuration
 	app::Input m_input;			///< input
 	app::Output m_output;			///< output
-	app::System* m_system;			///< reference to system call interface
+	app::System m_system;			///< system call interface
 	State* m_state;				///< application procesor instance state
 };
 

@@ -146,6 +146,9 @@ TEST_F( XMLTestFixture, tests)
 		net::LocalTCPendpoint  ep( "127.0.0.1", 12345);
 		iproc::Connection* connection = 0;
 
+		std::string ofnam = getDataFile( testDescriptions[ti].name, "result", ".txt");
+		std::cerr << "write output to file '" << ofnam << "'" << std::endl;
+
 		for (unsigned int ib=0; ib<NofBufferSizes; ib++)
 		{
 			for (unsigned int ob=0; ob<NofBufferSizes; ob++)
@@ -160,10 +163,8 @@ TEST_F( XMLTestFixture, tests)
 				EXPECT_EQ( 0, test::runTestIO( in_start, in_end, prt_output, *connection));
 #define _Wolframe_LOWLEVEL_DEBUG
 #ifdef _Wolframe_LOWLEVEL_DEBUG
-				// write output to file to check the result
-				std::string ofnam = getDataFile( testDescriptions[ti].name, "result", ".txt");
+				// write output to file to check the result in case of an error
 				writeFile( ofnam.c_str(), prt_output);
-				std::cerr << "write output to file '" << ofnam << "'" << std::endl;
 
 				unsigned int ii=0,nn=prt_output.size();
 				for (;ii<nn && prt_output[ii]==prt_expect[ii]; ii++);

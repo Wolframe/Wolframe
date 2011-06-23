@@ -31,8 +31,8 @@
 
 ************************************************************************/
 ///
-/// \file iprocHandler.hpp
-/// \brief example connection handler as processor executing lua scripts
+///\file iprocHandler.hpp
+///\brief example connection handler as processor executing lua scripts
 ///
 
 #ifndef _Wolframe_iproc_HANDLER_HPP_INCLUDED
@@ -43,6 +43,7 @@
 #include "langbind/appObjects.hpp"
 #include "langbind/luaConfig.hpp"
 #include "langbind/luaAppProcessor.hpp"
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace iproc {
@@ -51,30 +52,30 @@ namespace iproc {
 class Connection : public net::connectionHandler
 {
 public:
-	/// \brief Constructor
+	///\brief Constructor
 	Connection( const net::LocalEndpoint& local, const lua::Configuration* config);
 
-	/// \brief Destructor
+	///\brief Destructor
 	virtual ~Connection();
 
-	/// \brief Set the remote peer and indicate that the connection is up now.
-	/// \param [in] remote remote peer
+	///\brief Set the remote peer and indicate that the connection is up now.
+	///\param [in] remote remote peer
 	virtual void setPeer( const net::RemoteEndpoint& remote);
 
-	/// \brief Handle a request and produce a reply (statemachine of the processor)
+	///\brief Handle a request and produce a reply (statemachine of the processor)
 	virtual const net::NetworkOperation nextOperation();
 
-	/// \brief passes the network input to the processor
-	/// \param [in] begin start of the network input block.
-	/// \param [in] bytesTransferred number of bytes passed in the input block
-	/// \remark begin is ignored because it points always to the same block as given by the read network message
+	///\brief Passes the network input to the processor
+	///\param [in] begin start of the network input block.
+	///\param [in] bytesTransferred number of bytes passed in the input block
+	///\remark Begin is ignored because it points always to the same block as given by the read network message
 	virtual void networkInput( const void *begin, std::size_t bytesTransferred);
 
-	/// \brief indicate that a timeout has occurred and the connection will be terminated
+	///\brief Indicate that a timeout has occurred and the connection will be terminated
 	virtual void timeoutOccured();
-	/// \brief indicate that a signal has occurred and the connection will be terminated
+	///\brief Indicate that a signal has occurred and the connection will be terminated
 	virtual void signalOccured();
-	/// \brief indicate that an unrecoverable error has occurred and the connection will be terminated
+	///\brief Indicate that an unrecoverable error has occurred and the connection will be terminated
 	virtual void errorOccured( NetworkSignal);
 
 private:
@@ -85,11 +86,12 @@ private:
 	typedef protocol::Buffer<256> LineBuffer;				///< buffer for one line of input/output
 	typedef protocol::CmdParser<LineBuffer> ProtocolParser;			///< parser for the protocol
 	typedef protocol::CArgBuffer<LineBuffer> ArgBuffer;			///< buffer type for the command arguments
+
 	typedef boost::shared_ptr<protocol::InputFilter> InputFilterR;		///< reference to protocol input instance
 	typedef boost::shared_ptr<protocol::FormatOutput> FormatOutputR;	///< reference to format output instance
 
-	/// \enum State
-	/// \brief Enumeration of processor states
+	///\enum State
+	///\brief Enumeration of processor states
 	enum State
 	{
 		Init,				///< start state, called first time in this session
@@ -101,15 +103,15 @@ private:
 		FlushOutput,			///< state for sending end of data after flushing the output buffers after a call
 		Terminate			///< terminate application processor session (close for network)
 	};
-	/// \brief Returns the state as string for logging etc.
-	/// \param [in] i state to get as string
+	///\brief Returns the state as string for logging etc.
+	///\param [in] i state to get as string
 	static const char* stateName( State i)
 	{
 		static const char* ar[] = {"Init","EnterCommand","ParseArgs","Processing","ProtocolError","DiscardInput","FlushOutput","Terminate"};
 		return ar[i];
 	}
-	/// \enum State
-	/// \brief Enumeration of processor commands in the protocol after handshaking
+	///\enum State
+	///\brief Enumeration of processor commands in the protocol after handshaking
 	enum Command
 	{
 		empty,				///< empty line (to not get an error for no command)
@@ -117,8 +119,8 @@ private:
 		run,				///< call a lua script
 		quit				///< BYE and terminate
 	};
-	/// \brief Returns the command name as string for instantiating the protocol command parser
-	/// \param [in] c the command to get as string
+	///\brief Returns the command name as string for instantiating the protocol command parser
+	///\param [in] c the command to get as string
 	static const char* commandName( Command c)
 	{
 		const char* ar[] = {"", "capa", "run", "quit", 0};
@@ -137,19 +139,19 @@ private:
 	InputIterator m_itr;			///< iterator to scan protocol input
 	InputIterator m_end;			///< iterator pointing to end of message buffer
 
-	app::System m_app_system;		///< interface to system functions and loaded resources
+	app::System m_system;			///< interface to system functions like database and loaded resources
 	InputFilterR m_inputfilter;		///< network input interface for the interpreter
 	FormatOutputR m_formatoutput;		///< network output interface for the interpreter
 	lua::AppProcessor m_processor;		///< the interpreter state
 	const char* m_functionName;		///< name of the method to execute
 	bool m_functionHasIO;			///< true if the method to execute does content data processing (input/output)
 
-	/// \brief Helper function to send a line message with CRLF termination as C string
-	/// \param [in] str head of the line to write
-	/// \param [in] arg optional argument string of the line to write
+	///\brief Helper function to send a line message with CRLF termination as C string
+	///\param [in] str head of the line to write
+	///\param [in] arg optional argument string of the line to write
 	net::NetworkOperation WriteLine( const char* str, const char* arg=0);
 
-	/// \brief Passes the command data from protocol buffer to the processor
+	///\brief Passes the command data from protocol buffer to the processor
 	void passInput();
 };
 } // namespace iproc

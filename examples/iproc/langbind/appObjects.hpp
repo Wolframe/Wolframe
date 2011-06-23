@@ -30,8 +30,8 @@ Project Wolframe.
 
 ************************************************************************/
 ///
-/// \file appObjects.hpp
-/// \brief interface for application processor scripting language to system objects
+///\file appObjects.hpp
+///\brief interface for application processor scripting language to system objects
 ///
 #ifndef _Wolframe_LANGBIND_HPP_INCLUDED
 #define _Wolframe_LANGBIND_HPP_INCLUDED
@@ -44,32 +44,32 @@ Project Wolframe.
 namespace _Wolframe {
 namespace app {
 
-/// \class Output
-/// \brief output as seen from the application processor program
+///\class Output
+///\brief Output as seen from the application processor program
 struct Output
 {
-	/// \enum ItemType
-	/// \brief output state
+	///\enum ItemType
+	///\brief Output state
 	enum ItemType
 	{
 		Data,		///< normal processing
 		DoYield,	///< yield because rest of buffer not sufficient to complete operation
 		Error		///< logic error in output. Operation is not possible
 	};
-	/// \brief constructor
+	///\brief Constructor
 	Output() :m_state(0){}
-	/// \brief copy constructor
-	/// \param[in] o copied item
+	///\brief Copy constructor
+	///\param[in] o copied item
 	Output( const Output& o) :m_formatoutput(o.m_formatoutput),m_state(0){}
-	/// \brief destructor
+	///\brief Destructor
 	~Output(){}
 
-	/// \brief print the next element
-	/// \param[in] e1 first element
-	/// \param[in] e1size first element size
-	/// \param[in] e2 second element
-	/// \param[in] e2size second element size
-	/// \return state returned
+	///\brief Print the next element
+	///\param[in] e1 first element
+	///\param[in] e1size first element size
+	///\param[in] e2 second element
+	///\param[in] e2size second element size
+	///\return state returned
 	ItemType print( const char* e1, unsigned int e1size, const char* e2, unsigned int e2size);
 
 public:
@@ -79,80 +79,87 @@ private:
 	unsigned int m_state;						///< current state for outputs with more than one elements
 };
 
-/// \class System
-/// \brief system function call interface as seen from the application processor program
+///\class System
+///\brief System function call interface as seen from the application processor program
 struct System
 {
-	/// \brief constructor
+	///\brief Constructor
 	System(){}
-	/// \brief destructor
-	virtual ~System(){}
+	///\brief Copy constructor
+	///\param[in] o copied item
+	System( const System&){}
+	///\brief Destructor
+	~System(){}
 
-	/// \brief create a new input filter function
-	/// \param[in] name name of the filter or the default filter if not specified
-	/// \param[in] buffersize size of buffer in bytes to use
-	virtual protocol::InputFilter* createInputFilter( const char* name=0, unsigned int buffersize=0) const;
-	/// \brief create a new format output filter function
-	/// \param[in] name name of the filter or the default filter if not specified
-	/// \param[in] buffersize size of buffer in bytes to use
-	virtual protocol::FormatOutput* createFormatOutput( const char* name=0, unsigned int buffersize=0) const;
+	///\brief Create a new input filter function
+	///\param[in] name name of the filter or the default filter if not specified
+	///\param[in] buffersize size of buffer in bytes to use
+	protocol::InputFilter* createInputFilter( const char* name, unsigned int buffersize=0) const;
+	///\brief Create a new input filter function from the default
+	protocol::InputFilter* createDefaultInputFilter() const;
+	///\brief Create a new format output filter function
+	///\param[in] name name of the filter or the default filter if not specified
+	///\param[in] buffersize size of buffer in bytes to use
+	protocol::FormatOutput* createFormatOutput( const char* name, unsigned int buffersize=0) const;
+	///\brief Create a new format output filter function from the default
+	protocol::FormatOutput* createDefaultFormatOutput() const;
 };
 
-/// \class Input
-/// \brief input as seen from the application processor program
+///\class Input
+///\brief input as seen from the application processor program
 struct Input
 {
 	boost::shared_ptr<protocol::InputFilter> m_inputfilter;		///< input is defined by the associated input filter
 
-	/// \brief constructor
+	///\brief Constructor
 	Input(){}
-	/// \brief copy constructor
-	/// \param[in] o copied item
+	///\brief Copy constructor
+	///\param[in] o copied item
 	Input( const Input& o) :m_inputfilter(o.m_inputfilter){}
-	/// \brief destructor
+	///\brief Destructor
 	~Input(){}
 };
 
-/// \class Filter
-/// \brief input/output filter as seen from the application processor program
+///\class Filter
+///\brief input/output filter as seen from the application processor program
 struct Filter
 {
 	boost::shared_ptr<protocol::FormatOutput> m_formatoutput;		///< format output
 	boost::shared_ptr<protocol::InputFilter> m_inputfilter;			///< input filter
 
-	/// \brief constructor
-	/// \param[in] system reference to system function call interface
-	/// \param[in] name name of the filter as defined in the system
+	///\brief Constructor
+	///\param[in] system reference to system function call interface
+	///\param[in] name name of the filter as defined in the system
 	Filter( System* system, const char* name, unsigned int buffersize=0)
 		:m_formatoutput(system->createFormatOutput(name,buffersize))
 		,m_inputfilter(system->createInputFilter(name)){}
 
-	/// \brief copy constructor
-	/// \param[in] o copied item
+	///\brief Copy constructor
+	///\param[in] o copied item
 	Filter( const Filter& o)
 		:m_formatoutput(o.m_formatoutput)
 		,m_inputfilter(o.m_inputfilter){}
-	/// \brief destructor
+	///\brief Destructor
 	~Filter(){}
 };
 
-/// \class InputFilterClosure
-/// \brief closure for the input iterator (in Lua returned by 'input.get()')
+///\class InputFilterClosure
+///\brief Closure for the input iterator (in Lua returned by 'input.get()')
 class InputFilterClosure
 {
 public:
-	/// \enum ItemType
-	/// \brief input loop state
+	///\enum ItemType
+	///\brief Input loop state
 	enum ItemType
 	{
-		EndOfData,		///< End of processed content reached
-		Data,				///< normal processing, loop can continue
-		DoYield,			///< have to yield and request more network input
-		Error				///< have to stop processing because of an error
+		EndOfData,	///< End of processed content reached
+		Data,		///< normal processing, loop can continue
+		DoYield,	///< have to yield and request more network input
+		Error		///< have to stop processing because of an error
 	};
 
-	/// \brief constructor
-	/// \param[in] ig input filter reference from input
+	///\brief Constructor
+	///\param[in] ig input filter reference from input
 	InputFilterClosure( const boost::shared_ptr<protocol::InputFilter>& ig)		
 		:m_inputfilter(ig)
 		,m_type(protocol::InputFilter::Value)
@@ -165,19 +172,19 @@ public:
 		m_buf = new char[ m_bufsize];
 	}
 
-	/// \brief internal buffer reset
+	///\brief Internal buffer reset
 	void init()
 	{
 		m_bufpos = 0;
 		m_value = 0;
 	}
 
-	/// \brief get the next pair of elements
-	/// \param[out] e1 first element
-	/// \param[out] e1size first element size
-	/// \param[out] e2 second element
-	/// \param[out] e2size second element size
-	/// \return state returned
+	///\brief Get the next pair of elements
+	///\param[out] e1 first element
+	///\param[out] e1size first element size
+	///\param[out] e2 second element
+	///\param[out] e2size second element size
+	///\return state returned
 	ItemType fetch( const char*& e1, unsigned int& e1size, const char*& e2, unsigned int& e2size);
 
 private:
