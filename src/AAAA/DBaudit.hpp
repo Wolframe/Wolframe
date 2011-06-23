@@ -35,7 +35,7 @@
 //
 
 #include "auditor.hpp"
-#include "database/database.hpp"
+#include "database/databaseReference.hpp"
 
 #ifndef _DB_AUDIT_HPP_INCLUDED
 #define _DB_AUDIT_HPP_INCLUDED

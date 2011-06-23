@@ -40,7 +40,7 @@ Step::AuthStep DbSqlite3Authenticator::nextStep( )
 	sqlite3_stmt *stmt;
 	std::string sql;
 	const char *tail;
-	const char *pass;
+	const char *pass = NULL;
 
 	switch( m_state ) {
 		case _Wolframe_DB_SQLITE3_STATE_NEED_LOGIN:

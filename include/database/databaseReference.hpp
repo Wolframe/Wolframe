@@ -31,56 +31,36 @@
 
 ************************************************************************/
 //
-// database authenticator
+// databaseReference.hpp
 //
 
-#ifndef _DB_AUTHENTICATION_HPP_INCLUDED
-#define _DB_AUTHENTICATION_HPP_INCLUDED
+#ifndef _DATABASE_REFERENCE_HPP_INCLUDED
+#define _DATABASE_REFERENCE_HPP_INCLUDED
 
-#include "authenticator.hpp"
-#include "database/databaseReference.hpp"
+#include "databaseContainer.hpp"
 
 namespace _Wolframe {
-namespace AAAA {
+namespace db {
 
-class DatabaseAuthConfig : public AuthenticatorConfiguration
+/// database reference class
+/// note that this is a configuration class only
+class ReferenceConfig : public DatabaseConfig
 {
-	friend class DBauthContainer;
 	friend class config::ConfigurationParser;
 public:
-	DatabaseAuthConfig( const char* cfgName, const char* logParent, const char* logName )
-		: AuthenticatorConfiguration( cfgName, logParent, logName ),
-		  m_dbConfig( "", logParent, "Database" )	{}
+	const char* typeName() const			{ return "DB Reference"; }
 
-	virtual const char* typeName() const			{ return "DatabaseAuth"; }
+	ReferenceConfig( const char* name, const char* logParent, const char* logName )
+		: DatabaseConfig( name, logParent, logName )	{}
 
-	/// methods
-	bool check() const					{ return m_dbConfig.check(); }
+	bool check() const;
+	void print( std::ostream& os, size_t indent ) const;
 
-	void print( std::ostream& os, size_t indent ) const	{
-		std::string indStr( indent, ' ' );
-		os << indStr << sectionName();
-		m_dbConfig.print( os, 0 );
-	}
-
-	void setCanonicalPathes( const std::string& refPath )	{ m_dbConfig.setCanonicalPathes( refPath ); }
+	const std::string& dbName() const		{ return m_ref; }
 private:
-	db::ReferenceConfig	m_dbConfig;
+	std::string	m_ref;
 };
 
+}} // namespace _Wolframe::db
 
-class DBauthContainer : public AuthenticationContainer
-{
-public:
-	DBauthContainer( const DatabaseAuthConfig& conf );
-	~DBauthContainer();
-
-	bool resolveDB( const db::DatabaseProvider& db );
-private:
-	std::string		m_dbLabel;
-	const db::Database*	m_db;
-};
-
-}} // namespace _Wolframe::AAAA
-
-#endif // _DB_AUTHENTICATION_HPP_INCLUDED
+#endif // _DATABASE_REFERENCE_HPP_INCLUDED

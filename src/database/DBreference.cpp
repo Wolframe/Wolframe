@@ -34,7 +34,7 @@
 // database reference configuration functions
 //
 
-#include "database/databaseContainer.hpp"
+#include "database/databaseReference.hpp"
 #include "logger.hpp"
 
 #include <ostream>
