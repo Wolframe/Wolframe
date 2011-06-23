@@ -92,8 +92,10 @@ public:
 	PostgreSQLcontainer( const PostgreSQLconfig* conf );
 	~PostgreSQLcontainer();
 
-	PostgreSQLcontainer* create( const PostgreSQLconfig* conf ) const
-							{ return new PostgreSQLcontainer( conf ); }
+	PostgreSQLcontainer* create( const DatabaseConfig* conf ) const
+	{
+		return new PostgreSQLcontainer( dynamic_cast< const PostgreSQLconfig* >( conf ));
+	}
 	const std::string& ID() const			{ return m_db.ID(); }
 	const char* typeName() const			{ return m_db.typeName(); }
 	virtual const Database& database()		{ return m_db; }
