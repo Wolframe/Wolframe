@@ -56,6 +56,7 @@ private:
 	std::string		m_ID;
 };
 
+
 class DatabaseContainer
 {
 public:

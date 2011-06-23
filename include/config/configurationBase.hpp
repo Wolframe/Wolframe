@@ -121,6 +121,8 @@ public:
 
 	virtual ~ModuleConfiguration()			{}
 
+//	virtual ModuleConfiguration* create( const DatabaseConfig* conf ) const = 0;
+
 	virtual const char* typeName() const = 0;
 };
 
