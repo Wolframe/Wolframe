@@ -84,22 +84,22 @@ AAAAprovider::AAAAprovider( const AAAAconfiguration& conf )
 
 AAAAprovider::~AAAAprovider()
 {
-	for ( std::list<AuthenticatorBase*>::const_iterator it = m_authenticators.begin();
+	for ( std::list<AuthenticationContainer*>::const_iterator it = m_authenticators.begin();
 								it != m_authenticators.end(); it++ )
 		delete *it;
-	for ( std::list<AuditorBase*>::const_iterator it = m_auditors.begin();
+	for ( std::list<AuditContainer*>::const_iterator it = m_auditors.begin();
 								it != m_auditors.end(); it++ )
 		delete *it;
 }
 
 bool AAAAprovider::resolveDB( db::DatabaseProvider& db )
 {
-	for ( std::list<AuthenticatorBase*>::const_iterator it = m_authenticators.begin();
+	for ( std::list<AuthenticationContainer*>::const_iterator it = m_authenticators.begin();
 								it != m_authenticators.end(); it++ )
 		if ( ! (*it)->resolveDB( db ) )
 			return false;
 
-	for ( std::list<AuditorBase*>::const_iterator it = m_auditors.begin();
+	for ( std::list<AuditContainer*>::const_iterator it = m_auditors.begin();
 								it != m_auditors.end(); it++ )
 		if ( ! (*it)->resolveDB( db ) )
 			return false;

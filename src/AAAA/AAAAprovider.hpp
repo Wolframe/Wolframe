@@ -76,8 +76,8 @@ public:
 
 	Authenticator* authenticator() const		{ return NULL; }
 private:
-	std::list<AuthenticatorBase*>	m_authenticators;
-	std::list<AuditorBase*>		m_auditors;
+	std::list<AuthenticationContainer*>	m_authenticators;
+	std::list<AuditContainer*>		m_auditors;
 };
 
 }} // namespace _Wolframe::AAAA

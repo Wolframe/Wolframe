@@ -77,10 +77,10 @@ private:
 };
 
 
-class AuditorBase
+class AuditContainer
 {
 public:
-	virtual ~AuditorBase()					{}
+	virtual ~AuditContainer()					{}
 	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ )	{ return true; }
 };
 

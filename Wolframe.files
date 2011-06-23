@@ -229,6 +229,7 @@ include/serverEndpoint.hpp
 include/singleton.hpp
 include/SSLcertificateInfo.hpp
 include/standardConfigs.hpp
+include/user.hpp
 include/version.hpp
 lua/etc/all.c
 lua/etc/lua.hpp
@@ -421,4 +422,3 @@ windows/wolframe.xml
 XML/configuration.rng
 XML/database.rng
 XML/logging.rng
-include/user.hpp

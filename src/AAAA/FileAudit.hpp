@@ -63,7 +63,7 @@ private:
 };
 
 
-class FileAuditor : public AuditorBase
+class FileAuditor : public AuditContainer
 {
 public:
 	FileAuditor( const FileAuditConfig& conf );

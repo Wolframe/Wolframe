@@ -69,7 +69,7 @@ private:
 };
 
 
-class DBauthContainer : public AuthenticatorBase
+class DBauthContainer : public AuthenticationContainer
 {
 public:
 	DBauthContainer( const DatabaseAuthConfig& conf );

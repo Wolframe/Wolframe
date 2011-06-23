@@ -77,10 +77,10 @@ private:
 };
 
 
-class AuthenticatorBase
+class AuthenticationContainer
 {
 public:
-	virtual	~AuthenticatorBase()				{}
+	virtual	~AuthenticationContainer()				{}
 	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ )	{ return true; }
 };
 

@@ -88,6 +88,8 @@ public:
 	SQLiteContainer( const SQLiteConfig* conf );
 	~SQLiteContainer();
 
+	SQLiteContainer* create( const SQLiteConfig* conf ) const
+							{ return new SQLiteContainer( conf ); }
 	const std::string& ID() const			{ return m_db.ID(); }
 	const char* typeName() const			{ return m_db.typeName(); }
 	virtual const Database& database()		{ return m_db; }

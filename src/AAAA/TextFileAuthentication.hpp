@@ -62,7 +62,7 @@ private:
 };
 
 
-class TxtFileAuthContainer : public AuthenticatorBase
+class TxtFileAuthContainer : public AuthenticationContainer
 {
 public:
 	TxtFileAuthContainer( const TextFileAuthConfig& conf );

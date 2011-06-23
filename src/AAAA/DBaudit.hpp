@@ -68,7 +68,7 @@ private:
 };
 
 
-class DBauditContainer : public AuditorBase
+class DBauditContainer : public AuditContainer
 {
 public:
 	DBauditContainer( const DatabaseAuditConfig& conf );
