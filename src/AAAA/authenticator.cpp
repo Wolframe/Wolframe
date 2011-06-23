@@ -42,7 +42,7 @@ namespace AAAA {
 /// constructor
 AuthenticationConfiguration::~AuthenticationConfiguration()
 {
-	for ( std::list<AuthenticatorConfigBase*>::const_iterator it = m_config.begin();
+	for ( std::list<AuthenticatorConfiguration*>::const_iterator it = m_config.begin();
 								it != m_config.end(); it++ )
 		delete *it;
 }
@@ -52,7 +52,7 @@ AuthenticationConfiguration::~AuthenticationConfiguration()
 bool AuthenticationConfiguration::check() const
 {
 	bool correct = true;
-	for ( std::list<AuthenticatorConfigBase*>::const_iterator it = m_config.begin();
+	for ( std::list<AuthenticatorConfiguration*>::const_iterator it = m_config.begin();
 								it != m_config.end(); it++ )	{
 		if ( !(*it)->check() )
 			correct = false;
@@ -67,7 +67,7 @@ void AuthenticationConfiguration::print( std::ostream& os, size_t indent ) const
 
 	os << indStr << sectionName() << ":" << std::endl;
 	if ( m_config.size() > 0 )	{
-		for ( std::list<AuthenticatorConfigBase*>::const_iterator it = m_config.begin();
+		for ( std::list<AuthenticatorConfiguration*>::const_iterator it = m_config.begin();
 								it != m_config.end(); it++ )	{
 			(*it)->print( os, indent + 3 );
 		}
@@ -79,7 +79,7 @@ void AuthenticationConfiguration::print( std::ostream& os, size_t indent ) const
 
 void AuthenticationConfiguration::setCanonicalPathes( const std::string& refPath )
 {
-	for ( std::list<AuthenticatorConfigBase*>::const_iterator it = m_config.begin();
+	for ( std::list<AuthenticatorConfiguration*>::const_iterator it = m_config.begin();
 								it != m_config.end(); it++ )	{
 		(*it)->setCanonicalPathes( refPath );
 	}

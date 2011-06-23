@@ -37,6 +37,7 @@ Project Wolframe.
 #include "protocol/inputfilter.hpp"
 #include <stdexcept>
 #include <cstddef>
+#include <boost/lexical_cast.hpp>
 extern "C"
 {
 #include "lua.h"
@@ -52,6 +53,7 @@ using namespace app;
 
 namespace luaname
 {
+	static const char* System = "wolframe.System";
 	static const char* Input = "wolframe.Input";
 	static const char* Output = "wolframe.Output";
 	static const char* Filter = "wolframe.Filter";
@@ -77,6 +79,7 @@ template <> const char* metaTableName<Input>()			{return luaname::Input;}
 template <> const char* metaTableName<Output>()			{return luaname::Output;}
 template <> const char* metaTableName<Filter>()			{return luaname::Filter;}
 template <> const char* metaTableName<InputFilterClosure>()	{return luaname::InputFilterClosure;}
+template <> const char* metaTableName<System>()			{return luaname::System;}
 }//anonymous namespace
 
 
@@ -159,6 +162,17 @@ struct LuaObject :public ObjectType
 		if (!obj) return false;
 		*obj = instance;
 		return true;
+	}
+
+	static ObjectType* getGlobal( lua_State* ls, const char* name)
+	{
+		lua_getglobal( ls, name);
+		LuaObject* obj = (LuaObject*) toudata_udkey( ls, -1, metaTableName<ObjectType>());
+		if (!obj)
+		{
+			luaL_error( ls, "reserved global variable '%s' has been changed", name);
+		}
+		return obj;
 	}
 
 	static LuaObject* getSelf( lua_State* ls, const char* name, const char* method)
@@ -262,8 +276,6 @@ static int function_output_print( lua_State* ls)
 
 static int function_filter( lua_State* ls)
 {
-	void* ud = lua_touserdata( ls, lua_upvalueindex(1));
-	System* system = (System*) ud;
 	unsigned int nn = lua_gettop( ls);
 	unsigned int buffersize = 0;
 	if (nn == 0) return luaL_error( ls, "too few arguments for filter");
@@ -274,16 +286,24 @@ static int function_filter( lua_State* ls)
 		{
 			return luaL_error( ls, "invalid 2nd argument for filter (number expected)");
 		}
-		// Aba: lua_tonumber returns double or int depending on compilation, safe to cast here?
-		buffersize = (unsigned int)lua_tonumber( ls, 2);
+		try
+		{
+			buffersize = boost::lexical_cast<unsigned int>( lua_tonumber( ls, 2));
+		}
+		catch (...)
+		{
+			return luaL_error( ls, "invalid 2nd argument for filter (positive non fraction number expected)");
+		}
 	}
 	if (!lua_isstring( ls, 1))
 	{
 		return luaL_error( ls, "invalid type of argument (string expected)");
 	}
 	const char* name = lua_tostring( ls, 1);
+	app::System* system = LuaObject<System>::getGlobal( ls, "_Wolframe");
 
-	LuaObject<Filter>::push_luastack( ls, Filter( system, name, buffersize));
+	Filter ft( system, name, buffersize);
+	LuaObject<Filter>::push_luastack( ls, ft);
 	return 1;
 }
 
@@ -341,7 +361,7 @@ static int function_input_get( lua_State* ls)
 		return luaL_error( ls, "no filter defined for input with input:as");
 	}
 	LuaObject<InputFilterClosure>::push_luastack( ls, input->m_inputfilter);
-	lua_pushcclosure( ls, &function_inputFilter, 1);
+	lua_pushcclosure( ls, function_inputFilter, 1);
 	return 1;
 }
 
@@ -371,7 +391,12 @@ static const luaL_Reg output_methodtable[ 3] =
 	{0,0}
 };
 
-static void create_global_functions( lua_State* ls, System* system)
+static const luaL_Reg system_methodtable[ 1] =
+{
+	{0,0}
+};
+
+static void create_global_functions( lua_State* ls)
 {
 	//yield( )
 	lua_pushliteral( ls, "yield");
@@ -379,13 +404,9 @@ static void create_global_functions( lua_State* ls, System* system)
 	lua_settable( ls, LUA_GLOBALSINDEX);
 
 	//filter( )
-	lua_pushlightuserdata( ls, system);
-	lua_pushcclosure( ls, &function_filter, 1);
 	lua_pushliteral( ls, "filter");
 	lua_pushcfunction( ls, &function_filter);
 	lua_settable( ls, LUA_GLOBALSINDEX);
-
-	LuaObject<Filter>::create( ls, filter_methodtable);
 }
 
 struct AppProcessor::State
@@ -407,13 +428,14 @@ struct AppProcessor::State
 	}
 };
 
-AppProcessor::AppProcessor( System* system, const lua::Configuration* config)
+AppProcessor::AppProcessor( const app::System& system, const lua::Configuration* config)
 		:m_config(config),m_system(system)
 {
 	m_state = new State( *config);
 	LuaObject<Input>::createGlobal( m_state->ls, "input", m_input, input_methodtable);
 	LuaObject<Output>::createGlobal( m_state->ls, "output", m_output, output_methodtable);
-	create_global_functions( m_state->ls, m_system);
+	LuaObject<System>::createGlobal( m_state->ls, "_Wolframe", m_system, system_methodtable);
+	create_global_functions( m_state->ls);
 }
 
 AppProcessor::~AppProcessor()
