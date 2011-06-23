@@ -5,18 +5,56 @@
 namespace _Wolframe {
 namespace filter {
 
-struct CharIterator
+struct StrIterator
 {
 public:
-	CharIterator( const char* src, unsigned int size) :m_src(src),m_size(size),m_pos(0){}
+	StrIterator( const char* src, unsigned int size) :m_src(src),m_size(size),m_pos(0){}
 	char operator* () {return (m_pos < m_size)?m_src[m_pos]:0;}
-	CharIterator& operator++() {m_pos++; return *this;}
+	StrIterator& operator++() {m_pos++; return *this;}
 	unsigned int pos() const {return m_pos;}
 
 private:
 	const char* m_src;
 	unsigned int m_size;
 	unsigned int m_pos;
+};
+
+///\class SrcIterator
+///\brief Input iterator as source for the XML scanner (throws EndOfMessageException on EoM)
+struct SrcIterator
+{
+	///\class EoM
+	///\brief End of message exception
+	struct EoM{};
+
+	protocol::InputFilter* m_gen;		///< input for the iterator (from network message)
+
+	///\brief Empty constructor
+	SrcIterator()
+		:m_gen(0) {}
+
+	///\brief Constructor
+	SrcIterator( protocol::InputFilter* gen)
+		:m_gen(gen) {}
+
+	///\brief Copy constructor
+	///\param [in] o iterator to copy
+	SrcIterator( const SrcIterator& o)
+		:m_gen(o.m_gen) {}
+
+	///\brief access operator (required by textwolf for an input iterator)
+	char operator*()
+	{
+		if (!m_gen->size()) throw EoM();
+		return *(char*)m_gen->ptr();
+	}
+
+	///\brief prefix increment operator (required by textwolf for an input iterator)
+	SrcIterator& operator++()
+	{
+		m_gen->skip(1);
+		return *this;
+	}
 };
 
 ///\class FilterBase
@@ -35,8 +73,8 @@ struct FilterBase
 	///\param [in,out] buf buffer to print to
 	static void printToBuffer( const char* src, size_type srcsize, BufferType& buf)
 	{
-		CharIterator itr( src, srcsize);
-		textwolf::TextScanner<CharIterator,AppCharset> ts( itr);
+		StrIterator itr( src, srcsize);
+		textwolf::TextScanner<StrIterator,AppCharset> ts( itr);
 
 		textwolf::UChar ch;
 		while ((ch = ts.chr()) != 0)

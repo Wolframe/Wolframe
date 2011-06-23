@@ -37,7 +37,6 @@
 #include "iprocHandler.hpp"
 #include "logger.hpp"
 
-
 using namespace _Wolframe;
 using namespace _Wolframe::iproc;
 
@@ -362,6 +361,7 @@ const net::NetworkOperation Connection::nextOperation()
 			}
 		}//switch(..)
 	}//for(;;)
+
 	return net::CloseConnection();
 }
 

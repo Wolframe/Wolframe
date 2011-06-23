@@ -39,7 +39,6 @@
 #include "logger.hpp"
 #include <cstring>
 #include <iostream>
-/*[-]*/#include <stdio.h>
 
 namespace _Wolframe {
 namespace test {

@@ -23,8 +23,9 @@ struct CharFilter :FilterBase<IOCharset, AppCharset>
 	{
 		enum ErrorCodes
 		{
-			Ok=0,
-			ErrBufferTooSmall=1
+			Ok,
+			ErrBufferTooSmall,
+			ErrBrokenInput
 		};
 
 		///\brief implement interface member protocol::InputFilter::getNext( ElementType*,void*,size_type,size_type*)
@@ -33,27 +34,40 @@ struct CharFilter :FilterBase<IOCharset, AppCharset>
 			BufferType buf( (char*)buffer + *bufferpos, buffersize - *bufferpos);
 			setState( Open);
 			*type = Value;
-			CharIterator itr( (char*)ptr(), size());
-			textwolf::TextScanner<CharIterator,AppCharset> ts( itr);
-
-			textwolf::UChar ch;
-			if ((ch = *itr) != 0)
+			m_itr.setSource( SrcIterator( this));
+			try
 			{
-				AppCharset::print( ch, buf);
-				if (buf.overflow())
+				textwolf::UChar ch;
+				if ((ch = *m_itr) != 0)
 				{
-					setState( protocol::InputFilter::Error, ErrBufferTooSmall);
-					return false;
+					++m_itr;
+					AppCharset::print( ch, buf);
+					if (buf.overflow())
+					{
+						setState( Error, ErrBufferTooSmall);
+						return false;
+					}
+					*bufferpos += buf.size();
+					return true;
 				}
-				*bufferpos += buf.size();
-				++itr;
-				skip( itr.pos());
-				return true;
 			}
-			if (!gotEoD()) setState( EndOfMessage);
+			catch (SrcIterator::EoM)
+			{
+				if (!gotEoD())
+				{
+					setState( EndOfMessage);
+				}
+				else
+				{
+					setState( Open);
+				}
+			}
 			return false;
 		}
+	private:
+		textwolf::TextScanner<SrcIterator,AppCharset> m_itr;
 	};
+
 	///\class FormatOutput
 	///\brief format output filter for single characters
 	struct FormatOutput :public protocol::FormatOutput

@@ -219,8 +219,8 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		///\param [in] estr ASCII strings to substitute with (array parallel to echr)
 		static void printToBufferSubstChr( const char* src, size_type srcsize, EscBufferType& buf, unsigned int nof_echr, const char* echr, const char** estr)
 		{
-			CharIterator itr( src, srcsize);
-			textwolf::TextScanner<CharIterator,AppCharset> ts( itr);
+			StrIterator itr( src, srcsize);
+			textwolf::TextScanner<StrIterator,AppCharset> ts( itr);
 
 			textwolf::UChar ch;
 			while ((ch = ts.chr()) != 0)
@@ -317,44 +317,13 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 			ErrXML,			///< error in input XML
 			ErrUnexpectedState	///< something unexpected happened,
 		};
-		///\class EndOfMessageException
-		///\brief Exception thrown when EoM is reached and more data has to be read from input
-		struct EndOfMessageException {};
 
-		///\class Iterator
-		///\brief Input iterator as source for the XML scanner (throws EndOfMessageException on EoM)
-		struct Iterator
-		{
-			InputFilter* m_gen;	///< input for the iterator (from network message)
-
-			///\brief Empty constructor
-			Iterator() :m_gen(0) {}
-			///\brief Constructor
-			Iterator( InputFilter* gen) :m_gen(gen) {}
-			///\brief Copy constructor
-			Iterator( const Iterator& o) :m_gen(o.m_gen) {}
-
-			///\brief access operator (required by textwolf for an input iterator)
-			char operator*()
-			{
-				if (!m_gen->size()) throw EndOfMessageException();
-				return *(char*)m_gen->ptr();
-			}
-
-			///\brief prefix increment operator (required by textwolf for an input iterator)
-			Iterator& operator++()
-			{
-				m_gen->skip(1);
-				return *this;
-			}
-		};
-
-		typedef textwolf::XMLScanner<Iterator,IOCharset,AppCharset,BufferType> XMLScanner;
+		typedef textwolf::XMLScanner<SrcIterator,IOCharset,AppCharset,BufferType> XMLScanner;
 
 		///\brief Constructor
 		InputFilter() :m_outputbuf(0,0),m_scanner(0)
 		{
-			m_src = Iterator(this);
+			m_src = SrcIterator(this);
 			m_scanner = new XMLScanner( m_src, m_outputbuf);
 			m_itr = m_scanner->begin();
 			m_end = m_scanner->end();
@@ -411,9 +380,10 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 				else
 				{
 					*type = (ElementType)st;
+					return true;
 				}
 			}
-			catch (EndOfMessageException)
+			catch (SrcIterator::EoM)
 			{
 				if (gotEoD())
 				{
@@ -431,7 +401,7 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		}
 	private:
 		BufferType m_outputbuf;			///< dummy buffer of size 1
-		Iterator m_src;				///< source iterator
+		SrcIterator m_src;			///< source iterator
 		XMLScanner* m_scanner;			///< XML scanner
 		typename XMLScanner::iterator m_itr;	///< input iterator created from scanned XML from source iterator
 		typename XMLScanner::iterator m_end;	///< end of data (EoD) pointer
@@ -495,22 +465,21 @@ struct XmlHeaderInputFilter :public XmlFilter<textwolf::charset::IsoLatin1,textw
 			else
 			{
 				*type = (ElementType)st;
+				return true;
 			}
 		}
-		catch (EndOfMessageException)
+		catch (SrcIterator::EoM)
 		{
-			if (gotEoD())
+			if (!gotEoD())
 			{
-				setState( Error, ErrBrokenInputStream);
-				return false;
+				setState( EndOfMessage);
 			}
 			else
 			{
-				setState( EndOfMessage);
-				return false;
+				setState( Error, ErrXML);
 			}
+			return false;
 		};
-		setState( Error, ErrUnexpectedState);
 		return false;
 	}
 };

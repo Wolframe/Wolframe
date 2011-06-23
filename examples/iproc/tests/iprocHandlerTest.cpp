@@ -257,6 +257,7 @@ TYPED_TEST( iprocHandlerFixture, ExpectedResult )
 	std::string output;
 	char* itr = const_cast<char*>( this->input.c_str());
 	EXPECT_EQ( 0, test::runTestIO( itr, itr+this->input.size(), output, *this->connection));
+
 #define _Wolframe_LOWLEVEL_DEBUG
 #ifdef _Wolframe_LOWLEVEL_DEBUG
 	unsigned int ii=0,nn=output.size();

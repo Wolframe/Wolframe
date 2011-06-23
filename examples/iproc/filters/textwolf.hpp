@@ -621,18 +621,31 @@ public:
 	};
 
 	///\brief Constructor
-	///\param [in] p_iterator source iterator
+	TextScanner()
+		:val(0),cur(0),state(0)
+	{
+		for (unsigned int ii=0; ii<sizeof(buf); ii++) buf[ii] = 0;
+	}
+
 	TextScanner( const Iterator& p_iterator)
 			:input(p_iterator),val(0),cur(0),state(0)
 	{
 		for (unsigned int ii=0; ii<sizeof(buf); ii++) buf[ii] = 0;
 	}
+
 	///\brief Copy constructor
 	///\param [in] orig textscanner to copy
 	TextScanner( const TextScanner& orig)
 			:val(orig.val),cur(orig.cur),state(orig.state)
 	{
 		for (unsigned int ii=0; ii<sizeof(buf); ii++) buf[ii]=orig.buf[ii];
+	}
+
+	///\brief Initialize a new source iterator while keeping the state
+	///\param [in] p_iterator source iterator
+	void setSource( const Iterator& p_iterator)
+	{
+		input = p_iterator;
 	}
 
 	///\brief Get the unicode character of the current character
@@ -700,6 +713,12 @@ public:
 		cur = 0;
 		val = 0;
 		return *this;
+	}
+
+	///\brief see TextScanner::chr()
+	UChar operator*()
+	{
+		return chr();
 	}
 
 	///\brief Preincrement: Skip to the next character of the source

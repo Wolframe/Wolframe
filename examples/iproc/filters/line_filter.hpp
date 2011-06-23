@@ -60,7 +60,12 @@ struct LineFilter :FilterBase<IOCharset, AppCharset>
 	{
 		///\enum ErrorCodes
 		///\brief Enumeration of error codes
-		enum ErrorCodes {Ok=0,ErrBufferTooSmall=1};
+		enum ErrorCodes
+		{
+			Ok,
+			ErrBufferTooSmall,
+			ErrBrokenInput
+		};
 
 		///\brief Implementation of protocol::InputFilter::getNext( ElementType*, void*, size_type, size_type*)
 		virtual bool getNext( ElementType* type, void* buffer, size_type buffersize, size_type* bufferpos)
@@ -68,34 +73,46 @@ struct LineFilter :FilterBase<IOCharset, AppCharset>
 			BufferType buf( (char*)buffer + *bufferpos, buffersize - *bufferpos);
 			setState( Open);
 			*type = Value;
-			CharIterator itr( (char*)ptr(), size());
-			textwolf::TextScanner<CharIterator,AppCharset> ts( itr);
-
-			textwolf::UChar ch;
-			while ((ch = *itr) != 0)
+			m_itr.setSource( SrcIterator( this));
+			try
 			{
-				if (ch == '\r') continue;
-				if (ch == '\n')
+				textwolf::UChar ch;
+				while ((ch = *m_itr) != 0)
 				{
-					*bufferpos += buf.size();
-					++itr;
-					skip( itr.pos());
-					return true;
+					if (ch == '\r') continue;
+					if (ch == '\n')
+					{
+						*bufferpos += buf.size();
+						++m_itr;
+						return true;
+					}
+					else
+					{
+						AppCharset::print( ch, buf);
+						if (buf.overflow())
+						{
+							setState( protocol::InputFilter::Error, ErrBufferTooSmall);
+							return false;
+						}
+						++m_itr;
+					}
+				}
+			}
+			catch (SrcIterator::EoM)
+			{
+				if (!gotEoD())
+				{
+					setState( EndOfMessage);
 				}
 				else
 				{
-					AppCharset::print( ch, buf);
-					if (buf.overflow())
-					{
-						setState( protocol::InputFilter::Error, ErrBufferTooSmall);
-						return false;
-					}
-					++itr;
+					setState( Error, ErrBrokenInput);
 				}
 			}
-			if (!gotEoD()) setState( EndOfMessage);
 			return false;
 		}
+	private:
+		textwolf::TextScanner<SrcIterator,AppCharset> m_itr;
 	};
 };
 
