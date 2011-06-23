@@ -85,7 +85,8 @@ bool ConfigurationParser::parse( AAAA::AAAAconfiguration& cfg,
 			}
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "Audit" ))	{
-			for ( boost::property_tree::ptree::const_iterator L2it = pt.begin(); L2it != pt.end(); L2it++ )	{
+			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
+									L2it != L1it->second.end(); L2it++ )	{
 				if ( boost::algorithm::iequals( L2it->first, "file" ))	{
 					AAAA::FileAuditConfig* conf = new AAAA::FileAuditConfig( "File", cfg.logPrefix().c_str(), "file" );
 					if ( ConfigurationParser::parse( *conf, L2it->second, L2it->first ))
