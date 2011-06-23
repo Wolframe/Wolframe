@@ -29,12 +29,11 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file config/descriptionBase.hpp
+///\file serialize/descriptionBase.hpp
 ///\brief Defines the non intrusive description of an application processor object (the implementation is intrusive and defined in serialize/description.hpp)
 
 #ifndef _Wolframe_SERIALIZE_DESCRIPTION_BASE_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_DESCRIPTION_BASE_HPP_INCLUDED
-#include <boost/property_tree/ptree.hpp>
 #include <vector>
 #include <string>
 #include <cstddef>
