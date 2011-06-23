@@ -45,7 +45,7 @@ namespace AAAA {
 /// constructor
 AuditConfiguration::~AuditConfiguration()
 {
-	for ( std::list<AuditConfigurationBase*>::const_iterator it = m_config.begin();
+	for ( std::list<AuditorConfiguration*>::const_iterator it = m_config.begin();
 								it != m_config.end(); it++ )
 		delete *it;
 }
@@ -55,7 +55,7 @@ AuditConfiguration::~AuditConfiguration()
 bool AuditConfiguration::check() const
 {
 	bool correct = true;
-	for ( std::list<AuditConfigurationBase*>::const_iterator it = m_config.begin();
+	for ( std::list<AuditorConfiguration*>::const_iterator it = m_config.begin();
 								it != m_config.end(); it++ )	{
 		if ( !(*it)->check() )
 			correct = false;
@@ -70,7 +70,7 @@ void AuditConfiguration::print( std::ostream& os, size_t indent ) const
 
 	os << indStr << sectionName() << ":" << std::endl;
 	if ( m_config.size() > 0 )	{
-		for ( std::list<AuditConfigurationBase*>::const_iterator it = m_config.begin();
+		for ( std::list<AuditorConfiguration*>::const_iterator it = m_config.begin();
 								it != m_config.end(); it++ )	{
 			(*it)->print( os, indent + 3 );
 		}
@@ -82,7 +82,7 @@ void AuditConfiguration::print( std::ostream& os, size_t indent ) const
 
 void AuditConfiguration::setCanonicalPathes( const std::string& referencePath )
 {
-	for ( std::list<AuditConfigurationBase*>::const_iterator it = m_config.begin();
+	for ( std::list<AuditorConfiguration*>::const_iterator it = m_config.begin();
 								it != m_config.end(); it++ )	{
 		(*it)->setCanonicalPathes( referencePath );
 	}

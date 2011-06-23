@@ -39,14 +39,6 @@
 #define _AUTHENTICATION_HPP_INCLUDED
 
 #include <string>
-//#include <vector>
-//#include <map>
-//#include <list>
-//#include <stdexcept>
-//#include <sstream>
-//#include <boost/any.hpp>
-
-//#include "singleton.hpp"
 
 namespace _Wolframe {
 namespace AAAA {

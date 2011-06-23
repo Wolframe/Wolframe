@@ -50,7 +50,7 @@ namespace AAAA {
 
 AAAAprovider::AAAAprovider( const AAAAconfiguration& conf )
 {
-	for ( std::list<AuthenticatorConfigBase*>::const_iterator it = conf.auth.m_config.begin();
+	for ( std::list<AuthenticatorConfiguration*>::const_iterator it = conf.auth.m_config.begin();
 							it != conf.auth.m_config.end(); it++ )	{
 		const char* type = (*it)->typeName();
 		if ( boost::algorithm::iequals( type, "DatabaseAuth" ))	{
@@ -65,7 +65,7 @@ AAAAprovider::AAAAprovider( const AAAAconfiguration& conf )
 			throw std::domain_error( "Unknown authentication mechanism type in AAAAprovider constructor" );
 	}
 
-	for ( std::list<AuditConfigurationBase*>::const_iterator it = conf.audit.m_config.begin();
+	for ( std::list<AuditorConfiguration*>::const_iterator it = conf.audit.m_config.begin();
 							it != conf.audit.m_config.end(); it++ )	{
 		const char* type = (*it)->typeName();
 

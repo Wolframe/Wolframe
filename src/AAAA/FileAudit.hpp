@@ -44,13 +44,13 @@
 namespace _Wolframe {
 namespace AAAA {
 
-class FileAuditConfig : public AuditConfigurationBase
+class FileAuditConfig : public AuditorConfiguration
 {
 	friend class FileAuditor;
 	friend class config::ConfigurationParser;
 public:
 	FileAuditConfig( const char* cfgName, const char* logParent, const char* logName )
-		: AuditConfigurationBase( cfgName, logParent, logName ){}
+		: AuditorConfiguration( cfgName, logParent, logName ){}
 
 	const char* typeName() const			{ return "FileAudit"; }
 

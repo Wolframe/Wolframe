@@ -44,16 +44,14 @@
 namespace _Wolframe {
 namespace AAAA {
 
-class AuthenticatorConfigBase : public config::ConfigurationBase
+class AuthenticatorConfiguration : public config::ModuleConfiguration
 {
 public:
 	/// constructor
-	AuthenticatorConfigBase( const char* name, const char* logParent, const char* logName )
-		: config::ConfigurationBase( name, logParent, logName ){}
+	AuthenticatorConfiguration( const char* name, const char* logParent, const char* logName )
+		: config::ModuleConfiguration( name, logParent, logName ){}
 
-	virtual ~AuthenticatorConfigBase()			{}
-
-	virtual const char* typeName() const = 0;
+	virtual ~AuthenticatorConfiguration()				{}
 };
 
 
@@ -75,7 +73,7 @@ public:
 
 	// bool test() const;	// Not implemented yet, inherited from base
 private:
-	std::list<AuthenticatorConfigBase*>	m_config;
+	std::list<AuthenticatorConfiguration*>	m_config;
 };
 
 

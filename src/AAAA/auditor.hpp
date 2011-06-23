@@ -45,16 +45,14 @@
 namespace _Wolframe {
 namespace AAAA {
 
-class AuditConfigurationBase : public config::ConfigurationBase
+class AuditorConfiguration : public config::ModuleConfiguration
 {
 public:
 	/// constructor
-	AuditConfigurationBase( const char* name, const char* logParent, const char* logName )
-		: config::ConfigurationBase( name, logParent, logName )		{}
+	AuditorConfiguration( const char* name, const char* logParent, const char* logName )
+		: config::ModuleConfiguration( name, logParent, logName ){}
 
-	virtual ~AuditConfigurationBase()	{}
-
-	virtual const char* typeName() const = 0;
+	virtual ~AuditorConfiguration()					{}
 };
 
 
@@ -75,7 +73,7 @@ public:
 
 	// bool test() const;	// Not implemented yet, inherited from base
 private:
-	std::list<AuditConfigurationBase*>	m_config;
+	std::list<AuditorConfiguration*>	m_config;
 };
 
 
