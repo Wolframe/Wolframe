@@ -46,7 +46,7 @@ namespace AAAA {
 
 class FileAuditConfig : public AuditConfiguration
 {
-	friend class FileAuditor;
+	friend class FileAuditContainer;
 	friend class config::ConfigurationParser;
 public:
 	FileAuditConfig( const char* cfgName, const char* logParent, const char* logName )
@@ -63,16 +63,16 @@ private:
 };
 
 
-class FileAuditor : public AuditContainer
+class FileAuditContainer : public AuditContainer
 {
 public:
-	FileAuditor( const FileAuditConfig& conf );
-	~FileAuditor()					{}
+	FileAuditContainer( const FileAuditConfig& conf );
+	~FileAuditContainer()					{}
 
 	const char* typeName() const			{ return "FileAudit"; }
-	FileAuditor* create( const AuditConfiguration& conf ) const
-	{
-		return new FileAuditor( dynamic_cast< const FileAuditConfig& >( conf ));
+
+	static AuditContainer* create( const AuditConfiguration& conf )	{
+		return new FileAuditContainer( dynamic_cast< const FileAuditConfig& >( conf ));
 	}
 private:
 	std::string	m_file;

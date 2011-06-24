@@ -45,23 +45,30 @@
 namespace _Wolframe	{
 namespace db	{
 
+/****  Impersonating the module loader  ******************************************************/
+static const size_t noDBmodules = 2;
+static DBmoduleDescription
+dbModules[ noDBmodules ] = { DBmoduleDescription( "PostgreSQL", &PostgreSQLcontainer::create ),
+			     DBmoduleDescription( "SQLite", &SQLiteContainer::create ) };
+/****  End impersonating the module loader  **************************************************/
+
 DatabaseProvider::DatabaseProvider( const DBproviderConfig& conf )
 {
 	for ( std::list<DatabaseConfig*>::const_iterator it = conf.m_dbConfig.begin();
 							it != conf.m_dbConfig.end(); it++ )	{
 		const char* dbType = (*it)->typeName();
-		if ( boost::algorithm::iequals( dbType, "PostgreSQL" ))	{
-			PostgreSQLcontainer* db = new PostgreSQLcontainer( dynamic_cast< const PostgreSQLconfig& >(**it) );
-			m_db.push_back( db );
+		size_t i;
+		for ( i = 0; i < noDBmodules; i++ )	{
+			if ( boost::algorithm::iequals( dbModules[i].name, dbType ))	{
+				DatabaseContainer* container = dbModules[i].createFunc( **it );
+				m_db.push_back( container );
+				break;
+			}
 		}
-		else if ( boost::algorithm::iequals( dbType, "SQLite" ))	{
-			SQLiteContainer* db = new SQLiteContainer( dynamic_cast< const SQLiteConfig& >(**it) );
-			m_db.push_back( db );
+		if ( i >= noDBmodules )	{
+			LOG_ALERT << "DatabaseProvider: unknown database type '" << dbType << "'";
+			throw std::domain_error( "Unknown database type in DBprovider constructor. See log" );
 		}
-		else if ( boost::algorithm::iequals( dbType, "DB reference" ))
-			throw std::domain_error( "Database reference in DBprovider constructor" );
-		else
-			throw std::domain_error( "Unknown database type in DBprovider constructor" );
 	}
 }
 

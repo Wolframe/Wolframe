@@ -60,10 +60,18 @@ class AuditContainer
 public:
 	virtual ~AuditContainer()	{}
 
-	virtual AuditContainer* create( const AuditConfiguration& conf ) const = 0;
-
 	virtual const char* typeName() const = 0;
 	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ )	{ return true; }
+};
+
+
+struct AuditModuleDescription
+{
+	const char* name;
+	AuditContainer* ( *createFunc )( const AuditConfiguration& conf );
+
+	AuditModuleDescription( const char* n, AuditContainer* ( *f )( const AuditConfiguration& conf ) )
+		: name( n ), createFunc( f )	{}
 };
 
 }} // namespace _Wolframe::AAAA

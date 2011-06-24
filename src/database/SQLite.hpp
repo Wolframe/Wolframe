@@ -88,8 +88,7 @@ public:
 	SQLiteContainer( const SQLiteConfig& conf );
 	~SQLiteContainer();
 
-	SQLiteContainer* create( const DatabaseConfig& conf ) const
-	{
+	static DatabaseContainer* create( const DatabaseConfig& conf )	{
 		return new SQLiteContainer( dynamic_cast< const SQLiteConfig& >( conf ));
 	}
 

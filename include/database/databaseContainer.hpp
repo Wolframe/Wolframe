@@ -62,11 +62,19 @@ class DatabaseContainer
 public:
 	virtual ~DatabaseContainer()			{}
 
-	virtual DatabaseContainer* create( const DatabaseConfig& conf ) const = 0;
-
 	virtual const std::string& ID() const = 0;
 	virtual const char* typeName() const = 0;
 	virtual const Database& database() = 0;
+};
+
+
+struct DBmoduleDescription
+{
+	const char* name;
+	DatabaseContainer* ( *createFunc )( const DatabaseConfig& conf );
+
+	DBmoduleDescription( const char* n, DatabaseContainer* ( *f )( const DatabaseConfig& conf ) )
+		: name( n ), createFunc( f )	{}
 };
 
 }} // namespace _Wolframe::db

@@ -38,15 +38,28 @@
 
 #include "AAAAprovider.hpp"
 #include "logger.hpp"
+#include "boost/algorithm/string.hpp"
 
 #include "FileAudit.hpp"
 #include "DBaudit.hpp"
 #include "TextFileAuthentication.hpp"
 #include "DBauthentication.hpp"
-#include "boost/algorithm/string.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
+
+/****  Impersonating the module loader  ***************************************************************/
+static const size_t noAuthModules = 2;
+static AuthModuleDescription
+authModules[ noAuthModules ] = { AuthModuleDescription( "DatabaseAuth", &DBauthContainer::create ),
+			     AuthModuleDescription( "TextFileAuth", &TxtFileAuthContainer::create ) };
+
+static const size_t noAuditModules = 2;
+static AuditModuleDescription
+auditModules[ noAuditModules ] = { AuditModuleDescription( "DatabaseAudit", &DBauditContainer::create ),
+				   AuditModuleDescription( "FileAudit", &FileAuditContainer::create ) };
+/****  End impersonating the module loader  ***********************************************************/
+
 
 AAAAprovider::AAAAprovider( const AAAAconfiguration& conf )
 	: m_authenticator( conf.m_authConfig ),
@@ -63,22 +76,23 @@ bool AAAAprovider::resolveDB( db::DatabaseProvider& db )
 
 
 /***********************************************************************************/
-
 AuthenticationGroup::AuthenticationGroup( const std::list< AuthenticationConfiguration* >& confs )
 {
 	for ( std::list<AuthenticationConfiguration*>::const_iterator it = confs.begin();
 							it != confs.end(); it++ )	{
-		const char* type = (*it)->typeName();
-		if ( boost::algorithm::iequals( type, "DatabaseAuth" ))	{
-			DBauthContainer* element = new DBauthContainer( static_cast<DatabaseAuthConfig&>(**it) );
-			m_authenticators.push_back( element );
+		const char* authType = (*it)->typeName();
+		size_t i;
+		for ( i = 0; i < noAuthModules; i++ )	{
+			if ( boost::algorithm::iequals( authModules[i].name, authType ))	{
+				AuthenticationContainer* container = authModules[i].createFunc( **it );
+				m_authenticators.push_back( container );
+				break;
+			}
 		}
-		else if ( boost::algorithm::iequals( type, "TextFileAuth" ))	{
-			TxtFileAuthContainer* element = new TxtFileAuthContainer( static_cast<TextFileAuthConfig&>(**it) );
-			m_authenticators.push_back( element );
+		if ( i >= noAuthModules )	{
+			LOG_ALERT << "AuthenticationGroup: unknown authentication type '" << authType << "'";
+			throw std::domain_error( "Unknown authentication mechanism type in AAAAprovider constructor. See log" );
 		}
-		else
-			throw std::domain_error( "Unknown authentication mechanism type in AAAAprovider constructor" );
 	}
 }
 
@@ -100,24 +114,24 @@ bool AuthenticationGroup::resolveDB( db::DatabaseProvider& db )
 
 
 /***********************************************************************************/
-
 AuditGroup::AuditGroup( const std::list< AuditConfiguration* >& confs )
 
 {
 	for ( std::list<AuditConfiguration*>::const_iterator it = confs.begin();
 							it != confs.end(); it++ )	{
-		const char* type = (*it)->typeName();
-
-		if ( boost::algorithm::iequals( type, "FileAudit" ))	{
-			FileAuditor* element = new FileAuditor( static_cast<FileAuditConfig&>(**it) );
-			m_auditors.push_back( element );
+		const char* auditType = (*it)->typeName();
+		size_t i;
+		for ( i = 0; i < noAuditModules; i++ )	{
+			if ( boost::algorithm::iequals( auditModules[i].name, auditType ))	{
+				AuditContainer* container = auditModules[i].createFunc( **it );
+				m_auditors.push_back( container );
+				break;
+			}
 		}
-		if ( boost::algorithm::iequals( type, "DatabaseAudit" ))	{
-			DBauditContainer* element = new DBauditContainer( static_cast<DBauditConfig&>(**it) );
-			m_auditors.push_back( element );
+		if ( i >= noAuditModules )	{
+			LOG_ALERT << "AuditGroup: unknown audit type '" << auditType << "'";
+			throw std::domain_error( "Unknown auditing mechanism type in AAAAprovider constructor. See log" );
 		}
-		else
-			throw std::domain_error( "Unknown auditing mechanism type in AAAAprovider constructor" );
 	}
 }
 
@@ -139,7 +153,6 @@ bool AuditGroup::resolveDB( db::DatabaseProvider& db )
 
 
 /***********************************************************************************/
-
 AAAAconfiguration::AAAAconfiguration()
 	: config::ConfigurationBase( "AAAA", NULL, "AAAA configuration"  )
 {}

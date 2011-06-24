@@ -76,8 +76,8 @@ public:
 	~DBauthContainer();
 
 	virtual const char* typeName() const	{ return "DatabaseAuth"; }
-	DBauthContainer* create( const AuthenticationConfiguration& conf ) const
-	{
+
+	static AuthenticationContainer* create( const AuthenticationConfiguration& conf )	{
 		return new DBauthContainer( dynamic_cast< const DatabaseAuthConfig& >( conf ));
 	}
 

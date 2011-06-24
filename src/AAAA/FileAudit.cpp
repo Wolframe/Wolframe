@@ -75,7 +75,7 @@ void FileAuditConfig::setCanonicalPathes( const std::string& refPath )
 }
 
 
-FileAuditor::FileAuditor( const FileAuditConfig& conf )
+FileAuditContainer::FileAuditContainer( const FileAuditConfig& conf )
 {
 	m_file = conf.m_file;
 	LOG_NOTICE << "File auditor created with file '" << m_file << "'";

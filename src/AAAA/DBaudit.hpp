@@ -75,8 +75,8 @@ public:
 	~DBauditContainer();
 
 	const char* typeName() const				{ return "DatabaseAudit"; }
-	DBauditContainer* create( const AuditConfiguration& conf ) const
-	{
+
+	static AuditContainer* create( const AuditConfiguration& conf )	{
 		return new DBauditContainer( dynamic_cast< const DBauditConfig& >( conf ));
 	}
 

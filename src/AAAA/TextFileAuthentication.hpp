@@ -69,8 +69,8 @@ public:
 	~TxtFileAuthContainer()					{}
 
 	virtual const char* typeName() const			{ return "TextFileAuth"; }
-	TxtFileAuthContainer* create( const AuthenticationConfiguration& conf ) const
-	{
+
+	static AuthenticationContainer* create( const AuthenticationConfiguration& conf )	{
 		return new TxtFileAuthContainer( dynamic_cast< const TextFileAuthConfig& >( conf ));
 	}
 private:
