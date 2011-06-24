@@ -9,6 +9,7 @@ make \
 	WITH_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 \
 	dist-gz
 cp wolframe-$VERSION.tar.gz $OSC_HOME/wolframe_$VERSION.tar.gz
+cp contrib/osc/wolframe.spec $OSC_HOME/wolframe.spec
 
 SIZE=`stat -c '%s' $OSC_HOME/wolframe_$VERSION.tar.gz`
 CHKSUM=`md5sum $OSC_HOME/wolframe_$VERSION.tar.gz  | cut -f 1 -d' '`

@@ -34,11 +34,20 @@
 %define dist osu114
 %define suse 1
 %endif
+%if 0%{?suse_version} > 1140
+%define dist osu121
+%define suse 1
+%endif
 
 %define sles 0
 %if 0%{?sles_version} == 11
 %define dist sle11
 %define sles 1
+%endif
+
+%if 0%{?mdkversion} >= 201000 && 0%{?mdkversion} < 201100
+%define dist mandriva2010
+%define mandriva
 %endif
 
 # define what to build
@@ -152,8 +161,8 @@ Requires: libboost-system1_44_0 >= 1.44.0
 %endif
 
 %if %{with_ssl}
-BuildRequires: openssl-devel >= 0.9.8
-Requires: openssl >= 0.9.8
+BuildRequires: openssl-devel >= 0.9.7
+Requires: openssl >= 0.9.7
 %endif
 %if %{with_sqlite}
 %if %{rhel} || %{centos} || %{fedora}
@@ -166,17 +175,17 @@ Requires: sqlite3 >= 3.0
 %endif
 %endif
 %if %{with_pgsql}
-BuildRequires: postgresql-devel >= 8.1
-Requires: postgresql-libs >= 8.1
+BuildRequires: postgresql-devel >= 7.0
+Requires: postgresql-libs >= 7.0
 %endif
 %if %{with_pam}
-BuildRequires: pam-devel >= 0.99
-Requires: pam >= 0.99
+BuildRequires: pam-devel >= 0.77
+Requires: pam >= 0.77
 %endif
 %if %{with_sasl}
-BuildRequires: cyrus-sasl-devel >= 2.1.22
+BuildRequires: cyrus-sasl-devel >= 2.1.19
 %if %{rhel} || %{centos} || %{fedora}
-Requires: cyrus-sasl-lib >= 2.1.22
+Requires: cyrus-sasl-lib >= 2.1.19
 %endif
 %if %{suse} || %{sles}
 Requires: cyrus-sasl >= 2.1.22
