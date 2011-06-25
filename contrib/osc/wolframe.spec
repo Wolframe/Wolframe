@@ -49,12 +49,6 @@
 %define sles 1
 %endif
 
-%define mandriva 0
-%if 0%{?mdkversion} >= 201000 && 0%{?mdkversion} < 201100
-%define dist mandriva2010
-%define mandriva 1
-%endif
-
 # define what to build
 ###
 
@@ -70,11 +64,11 @@
 # version here
 
 %define with_qt		1
-%if %{rhel} || %{centos} || %{mandriva}
+%if %{rhel} || %{centos}
 %define with_qt		0
 %endif
 
-%if %{fedora} || %{suse} || %{sles} || %{mandriva}
+%if %{fedora} || %{suse} || %{sles}
 %define with_qt		1
 %endif
 
