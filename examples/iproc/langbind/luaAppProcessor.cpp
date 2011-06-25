@@ -82,13 +82,19 @@ template <> const char* metaTableName<InputFilterClosure>()	{return luaname::Inp
 template <> const char* metaTableName<System>()			{return luaname::System;}
 }//anonymous namespace
 
+static const luaL_Reg empty_methodtable[ 1] =
+{
+	{0,0}
+};
 
 template <class ObjectType>
 struct LuaObject :public ObjectType
 {
+	const char* m_name;
 	LuaObject( const ObjectType& o)
-		:ObjectType(o) {}
-	LuaObject() {}
+		:ObjectType(o),m_name(metaTableName<ObjectType>()) {}
+	LuaObject()
+		:m_name(metaTableName<ObjectType>()) {}
 
 	static int destroy( lua_State* ls)
 	{
@@ -97,9 +103,9 @@ struct LuaObject :public ObjectType
 		return 0;
 	}
 
-	static void create( lua_State* ls, const luaL_Reg* mt)
+	static void create( lua_State* ls, const luaL_Reg* mt=0)
 	{
-		luaL_openlib( ls, metaTableName<ObjectType>(), mt, 0);
+		luaL_openlib( ls, metaTableName<ObjectType>(), mt?mt:empty_methodtable, 0);
 		luaL_newmetatable( ls, metaTableName<ObjectType>());
 		luaL_openlib( ls, 0, getMetamethods(), 0);
 
@@ -125,6 +131,14 @@ struct LuaObject :public ObjectType
 		return rt;
 	}
 
+	void* operator new (std::size_t num_bytes, lua_State* ls, const char* mt) throw (std::bad_alloc)
+	{
+		void* rt = lua_newuserdata( ls, num_bytes);
+		if (rt == 0) throw std::bad_alloc();
+		luaL_getmetatable( ls, mt);
+		lua_setmetatable( ls, -2);
+		return rt;
+	}
 
 	/// \brief does nothing because the LUA garbage collector does the job.
 	/// \warning CAUTION: DO NOT CALL THIS FUNCTION ! DOES NOT WORK ON MSVC 9.0. (The compiler links with the std delete)
@@ -136,9 +150,8 @@ struct LuaObject :public ObjectType
 	{
 		try
 		{
-			(void*)new (ls) LuaObject( o);
-			luaL_getmetatable( ls, metaTableName<ObjectType>());
-			lua_setmetatable( ls, -2);
+			const char* mt = metaTableName<ObjectType>();
+			(void*)new (ls,mt) LuaObject( o);
 		}
 		catch (std::bad_alloc)
 		{
@@ -314,10 +327,12 @@ static int function_input_as( lua_State* ls)
 	{
 		luaL_error( ls, "filter type value as parameter of method 'input:as' expected");
 	}
-	Filter* filter = LuaObject<Filter>::get( ls, 2);
+	LuaObject<Filter>* filter = LuaObject<Filter>::get( ls, 2);
+
 	if (!filter)
 	{
-		luaL_error( ls, "filter type value expected as first argument of input:as");
+		const char* tn = lua_typename( ls, lua_type( ls, 2));
+		luaL_error( ls, "filter type value expected as first argument of input:as instead of %s", tn?tn:"UNKNOWN");
 	}
 	boost::shared_ptr<protocol::InputFilter> inputfilter( filter->m_inputfilter);
 	if (input->m_inputfilter.get())
@@ -338,7 +353,8 @@ static int function_output_as( lua_State* ls)
 	Filter* filter = LuaObject<Filter>::get( ls, 2);
 	if (!filter)
 	{
-		luaL_error( ls, "filter type value expected as first argument of method 'output:as'");
+		const char* tn = lua_typename( ls, lua_type( ls, 2));
+		luaL_error( ls, "filter type value expected as first argument of output:as instead of %s", tn?tn:"UNKNOWN");
 	}
 	boost::shared_ptr<protocol::FormatOutput> filteroutput( filter->m_formatoutput);
 	if (output->m_formatoutput.get())
@@ -371,11 +387,6 @@ static int function_yield( lua_State* ls)
 	for (ii=0; ii<nn; ii++) lua_pushvalue( ls, ii);
 	return lua_yield( ls, ii);
 }
-
-static const luaL_Reg filter_methodtable[ 1] =
-{
-	{0,0}
-};
 
 static const luaL_Reg input_methodtable[ 3] =
 {
@@ -435,6 +446,8 @@ AppProcessor::AppProcessor( const app::System& system, const lua::Configuration*
 	LuaObject<Input>::createGlobal( m_state->ls, "input", m_input, input_methodtable);
 	LuaObject<Output>::createGlobal( m_state->ls, "output", m_output, output_methodtable);
 	LuaObject<System>::createGlobal( m_state->ls, "_Wolframe", m_system, system_methodtable);
+	LuaObject<Filter>::create( m_state->ls);
+	LuaObject<InputFilterClosure>::create( m_state->ls);
 	create_global_functions( m_state->ls);
 }
 

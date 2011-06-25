@@ -4,6 +4,7 @@
 #include "protocol/formatoutput.hpp"
 #include "filters/filterBase.hpp"
 #include <cstring>
+#include <iostream>
 #include "textwolf.hpp"
 
 namespace _Wolframe {
@@ -325,7 +326,7 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		{
 			m_src = SrcIterator(this);
 			m_scanner = new XMLScanner( m_src, m_outputbuf);
-			m_itr = m_scanner->begin();
+			m_itr = m_scanner->begin(false);
 			m_end = m_scanner->end();
 		}
 
