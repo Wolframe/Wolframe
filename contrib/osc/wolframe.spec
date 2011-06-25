@@ -10,7 +10,7 @@
 %define dist rhel5
 %define rhel 1
 %endif
-%if 0%{?rhel_version} == 600 && 0%{?rhel_version} == 699
+%if 0%{?rhel_version} >= 600 && 0%{?rhel_version} <= 699
 %define dist rhel6
 %define rhel 1
 %endif
