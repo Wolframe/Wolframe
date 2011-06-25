@@ -37,6 +37,10 @@
 #include "database/database.hpp"
 #include "database/databaseContainer.hpp"
 
+#include <list>
+#include "objectPool.hpp"
+#include <postgresql/libpq-fe.h>
+
 #ifndef _POSTGRESQL_HPP_INCLUDED
 #define _POSTGRESQL_HPP_INCLUDED
 
@@ -80,9 +84,12 @@ public:
 	const char* typeName() const			{ return "PostgreSQL"; }
 	bool isOpen() const				{ return true; }
 	void close()					{}
-	bool doDBstuff( _DatabaseRequest_&, _DatabaseAnswer_& ){ return true; }
+	bool doTransaction( DatabaseRequest&, DatabaseAnswer& ){ return true; }
 private:
 	const std::string	m_ID;
+	std::string		m_connStr;
+	std::list< PGconn* >	m_connections;
+	ObjectPool< PGconn* >	m_connPool;
 };
 
 

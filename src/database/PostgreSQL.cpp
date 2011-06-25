@@ -37,6 +37,9 @@
 #include "logger.hpp"
 #include "PostgreSQL.hpp"
 
+#include <string>
+#include <sstream>
+
 namespace _Wolframe {
 namespace db {
 
@@ -77,24 +80,6 @@ bool PostgreSQLconfig::check() const
 }
 
 
-//***  PostgreSQL database functions  ***************************************
-PostgreSQLdatabase::PostgreSQLdatabase( const std::string& id, const std::string& host,
-					unsigned short port, const std::string& dbName,
-					const std::string& user, const std::string& password,
-					unsigned short connections, unsigned short acquireTimeout )
-	: m_ID( id )
-{
-	LOG_NOTICE << "PostgreSQL database '" << m_ID << "' created with "
-		   << "server " << host << ":" << port << ", database '" << dbName
-		   << "', credentials: " << user << "/" << password
-		   << ", " << connections << " connections, " << acquireTimeout << "s timeout";
-}
-
-PostgreSQLdatabase::~PostgreSQLdatabase()
-{
-}
-
-
 //***  PostgreSQL database container  ***************************************
 PostgreSQLcontainer::PostgreSQLcontainer( const PostgreSQLconfig& conf )
 	: m_db( conf.ID(), conf.host, conf.port, conf.dbName,
@@ -105,6 +90,71 @@ PostgreSQLcontainer::PostgreSQLcontainer( const PostgreSQLconfig& conf )
 }
 
 PostgreSQLcontainer::~PostgreSQLcontainer()
+{
+}
+
+
+//***  PostgreSQL database functions  ***************************************
+static std::string escConnElement( std::string element )
+{
+	std::string esc;
+	for ( std::string::const_iterator it = element.begin(); it != element.end(); it++ )	{
+		if ( *it == '\'' )
+			esc += "\\'";
+		else if ( *it == '\\' )
+			esc += "\\\\";
+		else
+			esc += *it;
+	}
+	return esc;
+}
+
+static std::string buildConnStr( const std::string& host, unsigned short port, const std::string& dbName,
+				 const std::string& user, const std::string& password )
+{
+	std::stringstream ss;
+
+	if ( ! host.empty())
+		ss << "host = '" << host << "'";
+	if ( port != 0 )	{
+		if ( ! ss.str().empty())
+			ss << " ";
+		ss << "port = " << port;
+	}
+	if ( ! dbName.empty())	{
+		if ( ! ss.str().empty())
+			ss << " ";
+		ss << "dbname = '" << escConnElement( dbName ) << "'";
+	}
+	if ( ! user.empty())	{
+		if ( ! ss.str().empty())
+			ss << " ";
+		ss << "user = '" << escConnElement( user ) << "'";
+		if ( ! password.empty())	{
+			if ( ! ss.str().empty())
+				ss << " ";
+			ss << "password = '" << escConnElement( password ) << "'";
+		}
+	}
+	return ss.str();
+}
+
+PostgreSQLdatabase::PostgreSQLdatabase( const std::string& id, const std::string& host,
+					unsigned short port, const std::string& dbName,
+					const std::string& user, const std::string& password,
+					unsigned short connections, unsigned short acquireTimeout )
+	: m_ID( id )
+{
+	LOG_DATA << "PostgreSQL database '" << m_ID << "' created with "
+		   << "server " << host << ":" << port << ", database '" << dbName
+		   << "', credentials: " << user << "/" << password
+		   << ", " << connections << " connections, " << acquireTimeout << "s timeout";
+	m_connStr = buildConnStr( host, port,  dbName, user, password );
+	LOG_DATA << "PostgreSQL connection string: <" << m_connStr << ">";
+}
+
+
+PostgreSQLdatabase::~PostgreSQLdatabase()
 {
 }
 

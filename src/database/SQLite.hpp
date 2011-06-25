@@ -74,7 +74,7 @@ public:
 	const char* typeName() const			{ return "SQLite"; }
 	bool isOpen() const				{ return true; }
 	void close()					{}
-	bool doDBstuff( _DatabaseRequest_&, _DatabaseAnswer_& ){ return true; }
+	bool doTransaction( DatabaseRequest&, DatabaseAnswer& ){ return true; }
 private:
 	const std::string	m_ID;
 	const std::string	m_filename;

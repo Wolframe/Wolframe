@@ -43,14 +43,14 @@ namespace _Wolframe {
 namespace db {
 
 /// database base classes
-class _DatabaseRequest_
+class DatabaseRequest
 {
-	virtual ~_DatabaseRequest_()			{}
+	virtual ~DatabaseRequest()			{}
 };
 
-class _DatabaseAnswer_
+class DatabaseAnswer
 {
-	virtual ~_DatabaseAnswer_()			{}
+	virtual ~DatabaseAnswer()			{}
 };
 
 
@@ -64,7 +64,7 @@ public:
 
 	virtual bool isOpen() const = 0;
 	virtual void close() = 0;
-	virtual bool doDBstuff( _DatabaseRequest_& request, _DatabaseAnswer_& answer ) = 0;
+	virtual bool doTransaction( DatabaseRequest& request, DatabaseAnswer& answer ) = 0;
 };
 
 }} // namespace _Wolframe::db
