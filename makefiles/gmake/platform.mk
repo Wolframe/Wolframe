@@ -327,19 +327,20 @@ endif
 
 ifeq "$(LINUX_DIST)" "suse"
 
-ifeq "$(LINUX_REV)" "11.3"
+ifeq "$(LINUX_REV)" "11.4"
 ifdef BOOST_DIR
 BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
 BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
 endif
 ifndef BOOST_DIR
-BOOST_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-BOOST_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-BOOST_LIBRARY_TAG ?= NOT SUPPLIED ON THIS PLATFORM
+BOOST_DIR ?= /usr
+BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
+BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
+BOOST_LIBRARY_TAG ?=
 endif
 endif
 
-ifeq "$(LINUX_REV)" "11.4"
+ifeq "$(LINUX_REV)" "12.1"
 ifdef BOOST_DIR
 BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
 BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
@@ -562,14 +563,14 @@ endif
 
 ifeq "$(LINUX_DIST)" "suse"
 
-ifeq "$(LINUX_REV)" "11.3"
+ifeq "$(LINUX_REV)" "11.4"
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
 QT_MOC ?= $(QT_DIR)/bin/moc
 endif
 
-ifeq "$(LINUX_REV)" "11.4"
+ifeq "$(LINUX_REV)" "12.1"
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib

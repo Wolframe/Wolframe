@@ -2,6 +2,10 @@
 ###
 
 %define rhel 0
+%if 0%{?rhel_version} >= 400 && 0%{?centos_version} <= 499
+%define dist rhel4
+%define rhel 1
+%endif
 %if 0%{?rhel_version} >= 500 && 0%{?centos_version} <= 599
 %define dist rhel5
 %define rhel 1
