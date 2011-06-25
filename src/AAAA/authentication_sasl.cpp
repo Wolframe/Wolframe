@@ -105,8 +105,11 @@ SaslAuthenticator::SaslAuthenticator( const std::string appName, const std::stri
 	m_callbacks[0].id = SASL_CB_LOG;
 	m_callbacks[0].proc = (int (*)( ))&sasl_my_log;
 	m_callbacks[0].context = this;
+// SASL_CB_GETCONFPATH appeared only in version 2.1.22
+#ifdef SASL_CB_GETCONFPATH
 	m_callbacks[1].id = SASL_CB_GETCONFPATH;
 	m_callbacks[1].proc = (int (*)( ))&sasl_my_getconfpath;
+#endif // SASL_CB_GETCONFPATH
 	m_callbacks[1].context = this;
 	m_callbacks[2].id = SASL_CB_LIST_END;
 	m_callbacks[2].proc = NULL;

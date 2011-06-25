@@ -4,10 +4,10 @@ Build Instructions
 Prerequisites
 -------------
 
-- gcc c++ 4.2.x or later (preferably 512 MB RAM or Swap)
+- gcc c++ 3.4.6 or later (preferably 512 MB RAM or Swap)
 - GNU make
 - boost 1.43.0 or later
-- optionally (WITH_SSL) openssl 0.9.8 or later
+- optionally (WITH_SSL) openssl 0.9.7 or later
 - optionally (WITH_LUA) lua 5.1.4 with LuaCoco-1.1.6
   (integrated in subdir 'lua')
 - for the optional Qt client
@@ -74,6 +74,24 @@ set QT_DIR to /usr/local/qt-4.7.2
 
 A note on Linux Distributions
 =============================
+
+RHEL/Centos/SL 4
+----------------
+
+Optional packages: openssl-devel (0.9.7a), pam-devel (0.77), cyrus-sasl-devel (2.1.19),
+                   sqlite-devel (3.3.6), postgresql-devel (7.4.30)
+
+Boost is not available in a decent version (1.32), build your own one.
+
+Qt (3.3.3) is too old, compile your own one.
+
+For building the documentation you need 'libxslt', 'doxygen' and
+'docbook-style-xsl' (from epel).
+
+Make is a little bit old (3.80), so you'll see some errors while compiling,
+they should not matter for a clean build:
+
+../../makefiles/gmake/depend.mk:74: no file name for `-include'
 
 RHEL/Centos/SL 5
 ----------------
