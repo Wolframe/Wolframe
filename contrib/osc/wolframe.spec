@@ -2,11 +2,11 @@
 ###
 
 %define rhel 0
-%if 0%{?rhel_version} >= 400 && 0%{?centos_version} <= 499
+%if 0%{?rhel_version} >= 400 && 0%{?rhel_version} <= 499
 %define dist rhel4
 %define rhel 1
 %endif
-%if 0%{?rhel_version} >= 500 && 0%{?centos_version} <= 599
+%if 0%{?rhel_version} >= 500 && 0%{?rhel_version} <= 599
 %define dist rhel5
 %define rhel 1
 %endif
@@ -49,9 +49,10 @@
 %define sles 1
 %endif
 
+%define mandriva 0
 %if 0%{?mdkversion} >= 201000 && 0%{?mdkversion} < 201100
 %define dist mandriva2010
-%define mandriva
+%define mandriva 1
 %endif
 
 # define what to build
@@ -69,11 +70,11 @@
 # version here
 
 %define with_qt		1
-%if %{rhel} || %{centos}
+%if %{rhel} || %{centos} || %{mandriva}
 %define with_qt		0
 %endif
 
-%if %{fedora} || %{suse} || %{sles}
+%if %{fedora} || %{suse} || %{sles} || %{mandriva}
 %define with_qt		1
 %endif
 
