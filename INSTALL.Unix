@@ -318,7 +318,7 @@ FreeBSD 8.2
 
 Required packages: boost-libs (1.45.0)
 Optional packages: qt4-gui (4.7.1), openpam, cyrus-sasl (2.1.23)
-                   sqlite3 (3.7.4), postgresql (9.0.3)
+                   sqlite3 (3.7.4), postgresql (9.0.3), libxml2 (2.7.8)
 
 You need 'gmake' (3.81_4)
 
