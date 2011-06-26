@@ -80,7 +80,7 @@ RHEL/Centos/SL 4
 ----------------
 
 Optional packages: openssl-devel (0.9.7a), pam-devel (0.77), cyrus-sasl-devel (2.1.19),
-                   sqlite-devel (3.3.6), postgresql-devel (7.4.30)
+                   sqlite-devel (3.3.6), postgresql-devel (7.4.30), libxml2-devel (2.6.16)
 
 Boost is not available in a decent version (1.32), build your own one.
 
