@@ -44,7 +44,7 @@
 namespace _Wolframe {
 namespace db {
 
-class DatabaseConfig : public config::ModuleConfiguration
+class DatabaseConfig : public module::ModuleConfiguration
 {
 public:
 	DatabaseConfig( const char* name, const char* logParent, const char* logName )
@@ -58,26 +58,14 @@ private:
 };
 
 
-class DatabaseContainer
+class DatabaseContainer : public module::ModuleContainer
 {
 public:
 	virtual ~DatabaseContainer()			{}
 
 	virtual const std::string& ID() const = 0;
-	virtual const char* typeName() const = 0;
 	virtual const Database& database() = 0;
 };
-
-
-struct DBmoduleDescription
-{
-	const char* name;
-	DatabaseContainer* ( *createFunc )( const DatabaseConfig& conf );
-public:
-	DBmoduleDescription( const char* n, DatabaseContainer* ( *f )( const DatabaseConfig& conf ) )
-		: name( n ), createFunc( f )	{}
-};
-
 
 }} // namespace _Wolframe::db
 

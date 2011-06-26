@@ -76,7 +76,7 @@ public:
 
 	const char* typeName() const				{ return "DatabaseAudit"; }
 
-	static AuditContainer* create( const AuditConfiguration& conf )	{
+	static module::ModuleContainer* create( const module::ModuleConfiguration& conf )	{
 		return new DBauditContainer( dynamic_cast< const DBauditConfig& >( conf ));
 	}
 

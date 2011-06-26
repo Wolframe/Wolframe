@@ -50,20 +50,20 @@ namespace AAAA {
 
 /****  Impersonating the module loader  ***************************************************************/
 static const size_t noAuthModules = 2;
-static AuthModuleDescription
-authModules[ noAuthModules ] = { AuthModuleDescription( "DatabaseAuth", &DBauthContainer::create ),
-			     AuthModuleDescription( "TextFileAuth", &TxtFileAuthContainer::create ) };
+static module::ModuleDescription
+authModules[ noAuthModules ] = { module::ModuleDescription( "DatabaseAuth", &DBauthContainer::create ),
+				 module::ModuleDescription( "TextFileAuth", &TxtFileAuthContainer::create ) };
 
 static const size_t noAuditModules = 2;
-static AuditModuleDescription
-auditModules[ noAuditModules ] = { AuditModuleDescription( "DatabaseAudit", &DBauditContainer::create ),
-				   AuditModuleDescription( "FileAudit", &FileAuditContainer::create ) };
+static module::ModuleDescription
+auditModules[ noAuditModules ] = { module::ModuleDescription( "DatabaseAudit", &DBauditContainer::create ),
+				   module::ModuleDescription( "FileAudit", &FileAuditContainer::create ) };
 /****  End impersonating the module loader  ***********************************************************/
 
 
 AAAAprovider::AAAAprovider( const AAAAconfiguration& conf )
-	: m_authenticator( conf.m_authConfig ),
-	  m_auditor( conf.m_auditConfig )	{}
+	: m_authenticator( conf.m_authConfig, authModules, noAuthModules ),
+	  m_auditor( conf.m_auditConfig, auditModules, noAuditModules )	{}
 
 bool AAAAprovider::resolveDB( db::DatabaseProvider& db )
 {
@@ -76,20 +76,21 @@ bool AAAAprovider::resolveDB( db::DatabaseProvider& db )
 
 
 /***********************************************************************************/
-AuthenticationGroup::AuthenticationGroup( const std::list< AuthenticationConfiguration* >& confs )
+AuthenticationGroup::AuthenticationGroup( const std::list< AuthenticationConfiguration* >& confs,
+					  module::ModuleDescription* description, size_t descrSize )
 {
 	for ( std::list<AuthenticationConfiguration*>::const_iterator it = confs.begin();
 							it != confs.end(); it++ )	{
 		const char* authType = (*it)->typeName();
 		size_t i;
-		for ( i = 0; i < noAuthModules; i++ )	{
-			if ( boost::algorithm::iequals( authModules[i].name, authType ))	{
-				AuthenticationContainer* container = authModules[i].createFunc( **it );
+		for ( i = 0; i < descrSize; i++ )	{
+			if ( boost::algorithm::iequals( description[i].name, authType ))	{
+				AuthenticationContainer* container = dynamic_cast< AuthenticationContainer* >( authModules[i].createFunc( **it ));
 				m_authenticators.push_back( container );
 				break;
 			}
 		}
-		if ( i >= noAuthModules )	{
+		if ( i >= descrSize )	{
 			LOG_ALERT << "AuthenticationGroup: unknown authentication type '" << authType << "'";
 			throw std::domain_error( "Unknown authentication mechanism type in AAAAprovider constructor. See log" );
 		}
@@ -114,21 +115,21 @@ bool AuthenticationGroup::resolveDB( db::DatabaseProvider& db )
 
 
 /***********************************************************************************/
-AuditGroup::AuditGroup( const std::list< AuditConfiguration* >& confs )
-
+AuditGroup::AuditGroup( const std::list< AuditConfiguration* >& confs,
+			module::ModuleDescription* description, size_t descrSize )
 {
 	for ( std::list<AuditConfiguration*>::const_iterator it = confs.begin();
 							it != confs.end(); it++ )	{
 		const char* auditType = (*it)->typeName();
 		size_t i;
-		for ( i = 0; i < noAuditModules; i++ )	{
-			if ( boost::algorithm::iequals( auditModules[i].name, auditType ))	{
-				AuditContainer* container = auditModules[i].createFunc( **it );
+		for ( i = 0; i < descrSize; i++ )	{
+			if ( boost::algorithm::iequals( description[i].name, auditType ))	{
+				AuditContainer* container = dynamic_cast< AuditContainer* >( auditModules[i].createFunc( **it ));
 				m_auditors.push_back( container );
 				break;
 			}
 		}
-		if ( i >= noAuditModules )	{
+		if ( i >= descrSize )	{
 			LOG_ALERT << "AuditGroup: unknown audit type '" << auditType << "'";
 			throw std::domain_error( "Unknown auditing mechanism type in AAAAprovider constructor. See log" );
 		}

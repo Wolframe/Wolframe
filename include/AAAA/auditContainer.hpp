@@ -43,7 +43,7 @@
 namespace _Wolframe {
 namespace AAAA {
 
-class AuditConfiguration : public config::ModuleConfiguration
+class AuditConfiguration : public module::ModuleConfiguration
 {
 //	friend class AAAAprovider;
 //	friend class config::ConfigurationParser;
@@ -55,23 +55,12 @@ public:
 };
 
 
-class AuditContainer
+class AuditContainer : public module::ModuleContainer
 {
 public:
 	virtual ~AuditContainer()	{}
 
-	virtual const char* typeName() const = 0;
 	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ )	{ return true; }
-};
-
-
-struct AuditModuleDescription
-{
-	const char* name;
-	AuditContainer* ( *createFunc )( const AuditConfiguration& conf );
-
-	AuditModuleDescription( const char* n, AuditContainer* ( *f )( const AuditConfiguration& conf ) )
-		: name( n ), createFunc( f )	{}
 };
 
 }} // namespace _Wolframe::AAAA

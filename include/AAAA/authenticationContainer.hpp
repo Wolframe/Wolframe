@@ -43,7 +43,7 @@
 namespace _Wolframe {
 namespace AAAA {
 
-class AuthenticationConfiguration : public config::ModuleConfiguration
+class AuthenticationConfiguration : public module::ModuleConfiguration
 {
 	friend class AAAAprovider;
 	friend class config::ConfigurationParser;
@@ -55,23 +55,12 @@ public:
 };
 
 
-class AuthenticationContainer
+class AuthenticationContainer : public module::ModuleContainer
 {
 public:
 	virtual	~AuthenticationContainer()				{}
 
-	virtual const char* typeName() const = 0;
 	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ )	{ return true; }
-};
-
-
-struct AuthModuleDescription
-{
-	const char* name;
-	AuthenticationContainer* ( *createFunc )( const AuthenticationConfiguration& conf );
-
-	AuthModuleDescription( const char* n, AuthenticationContainer* ( *f )( const AuthenticationConfiguration& conf ) )
-		: name( n ), createFunc( f )	{}
 };
 
 }} // namespace _Wolframe::AAAA

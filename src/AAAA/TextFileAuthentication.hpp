@@ -70,7 +70,7 @@ public:
 
 	virtual const char* typeName() const			{ return "TextFileAuth"; }
 
-	static AuthenticationContainer* create( const AuthenticationConfiguration& conf )	{
+	static module::ModuleContainer* create( const module::ModuleConfiguration& conf )	{
 		return new TxtFileAuthContainer( dynamic_cast< const TextFileAuthConfig& >( conf ));
 	}
 private:

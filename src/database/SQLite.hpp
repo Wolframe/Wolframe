@@ -88,10 +88,9 @@ public:
 	SQLiteContainer( const SQLiteConfig& conf );
 	~SQLiteContainer();
 
-	static DatabaseContainer* create( const DatabaseConfig& conf )	{
+	static module::ModuleContainer* create( const module::ModuleConfiguration& conf )	{
 		return new SQLiteContainer( dynamic_cast< const SQLiteConfig& >( conf ));
 	}
-
 	const std::string& ID() const			{ return m_db.ID(); }
 	const char* typeName() const			{ return m_db.typeName(); }
 	virtual const Database& database()		{ return m_db; }

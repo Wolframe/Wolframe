@@ -71,7 +71,7 @@ public:
 
 	const char* typeName() const			{ return "FileAudit"; }
 
-	static AuditContainer* create( const AuditConfiguration& conf )	{
+	static module::ModuleContainer* create( const module::ModuleConfiguration& conf )	{
 		return new FileAuditContainer( dynamic_cast< const FileAuditConfig& >( conf ));
 	}
 private:

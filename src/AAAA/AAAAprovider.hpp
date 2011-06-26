@@ -73,7 +73,8 @@ private:
 class AuthenticationGroup
 {
 public:
-	AuthenticationGroup( const std::list< AuthenticationConfiguration* >& confs );
+	AuthenticationGroup( const std::list< AuthenticationConfiguration* >& confs,
+			     module::ModuleDescription* description, size_t descrSize );
 	~AuthenticationGroup();
 	bool resolveDB( db::DatabaseProvider& db );
 
@@ -86,7 +87,8 @@ private:
 class AuditGroup
 {
 public:
-	AuditGroup( const std::list< AuditConfiguration* >& confs );
+	AuditGroup( const std::list< AuditConfiguration* >& confs,
+		    module::ModuleDescription* description, size_t descrSize );
 	~AuditGroup();
 	bool resolveDB( db::DatabaseProvider& db );
 

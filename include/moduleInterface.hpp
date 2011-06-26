@@ -42,9 +42,9 @@
 #include "config/configurationBase.hpp"
 
 namespace _Wolframe {
-namespace config {
+namespace module {
 
-class ModuleConfiguration : public ConfigurationBase
+class ModuleConfiguration : public config::ConfigurationBase
 {
 public:
 	/// Class constructor.
@@ -69,10 +69,11 @@ struct ModuleConfigConstructorDescript
 	const char* sectionTitle;
 	const char* sectionName;
 	ModuleConfiguration* (*createFunc)( const char* name, const char* logParent, const char* logName );
-	bool (*parseFunc)( ConfigurationBase&, const boost::property_tree::ptree&, const std::string& );
+	bool (*parseFunc)( config::ConfigurationBase&,
+			   const boost::property_tree::ptree&, const std::string& );
 public:
 	ModuleConfigConstructorDescript( const char* tn, const char* st, const char* sn,
-					 bool (*pf)( ConfigurationBase& configuration,
+					 bool (*pf)( config::ConfigurationBase& configuration,
 						     const boost::property_tree::ptree& pt,
 						     const std::string& node ),
 					 ModuleConfiguration* (*cf)( const char* name,
@@ -82,6 +83,23 @@ public:
 		  createFunc( cf ), parseFunc( pf )	{}
 };
 
-}} // namespace _Wolframe::config
+
+class ModuleContainer
+{
+public:
+	virtual ~ModuleContainer()			{}
+	virtual const char* typeName() const = 0;
+};
+
+struct ModuleDescription
+{
+	const char* name;
+	ModuleContainer* ( *createFunc )( const ModuleConfiguration& conf );
+public:
+	ModuleDescription( const char* n, ModuleContainer* ( *f )( const ModuleConfiguration& conf ) )
+		: name( n ), createFunc( f )	{}
+};
+
+}} // namespace _Wolframe::module
 
 #endif // _MODULE_CONFIGURATION_HPP_INCLUDED

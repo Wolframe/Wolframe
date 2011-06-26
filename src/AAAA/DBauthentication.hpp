@@ -77,7 +77,7 @@ public:
 
 	virtual const char* typeName() const	{ return "DatabaseAuth"; }
 
-	static AuthenticationContainer* create( const AuthenticationConfiguration& conf )	{
+	static module::ModuleContainer* create( const module::ModuleConfiguration& conf )	{
 		return new DBauthContainer( dynamic_cast< const DatabaseAuthConfig& >( conf ));
 	}
 

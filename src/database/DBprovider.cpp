@@ -47,9 +47,9 @@ namespace db	{
 
 /****  Impersonating the module loader  ******************************************************/
 static const size_t noDBmodules = 2;
-static DBmoduleDescription
-dbModules[ noDBmodules ] = { DBmoduleDescription( "PostgreSQL", &PostgreSQLcontainer::create ),
-			     DBmoduleDescription( "SQLite", &SQLiteContainer::create ) };
+static module::ModuleDescription
+dbModules[ noDBmodules ] = { module::ModuleDescription( "PostgreSQL", &PostgreSQLcontainer::create ),
+			     module::ModuleDescription( "SQLite", &SQLiteContainer::create ) };
 /****  End impersonating the module loader  **************************************************/
 
 DatabaseProvider::DatabaseProvider( const DBproviderConfig& conf )
@@ -60,7 +60,7 @@ DatabaseProvider::DatabaseProvider( const DBproviderConfig& conf )
 		size_t i;
 		for ( i = 0; i < noDBmodules; i++ )	{
 			if ( boost::algorithm::iequals( dbModules[i].name, dbType ))	{
-				DatabaseContainer* container = dbModules[i].createFunc( **it );
+				DatabaseContainer* container = dynamic_cast< DatabaseContainer* >( dbModules[i].createFunc( **it ));
 				m_db.push_back( container );
 				break;
 			}
