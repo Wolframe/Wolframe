@@ -105,26 +105,6 @@ private:
 	std::string	m_logPrefix;
 };
 
-
-class ModuleConfiguration : public ConfigurationBase
-{
-public:
-	/// Class constructor.
-	///\param[in]	name	the name that will be displayed for this
-	///			configuration section in messages (log, print ...)
-	///			It has no other processing purpose
-	///\param[in]	logParent the logging prefix of the parent.
-	///\param[in]	logName	the logging name of this section. Combined with
-	///			the logParent parameter will form the whole logging
-	///			prefix for of the section.
-	ModuleConfiguration( const char* name, const char* logParent, const char* logName )
-		: ConfigurationBase( name, logParent, logName )	{}
-
-	virtual ~ModuleConfiguration()			{}
-
-	virtual const char* typeName() const = 0;
-};
-
 }} // namespace _Wolframe::config
 
 #endif // _CONFIGURATION_BASE_HPP_INCLUDED

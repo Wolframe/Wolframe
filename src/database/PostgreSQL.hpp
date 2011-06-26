@@ -86,10 +86,10 @@ public:
 	void close()					{}
 	bool doTransaction( DatabaseRequest&, DatabaseAnswer& ){ return true; }
 private:
-	const std::string	m_ID;
-	std::string		m_connStr;
-	std::list< PGconn* >	m_connections;
-	ObjectPool< PGconn* >	m_connPool;
+	const std::string	m_ID;			//< database ID
+	std::string		m_connStr;		//< connection string
+	std::list< PGconn* >	m_connections;		//< list of DB connections
+	ObjectPool< PGconn* >	m_connPool;		//< pool of connections
 };
 
 

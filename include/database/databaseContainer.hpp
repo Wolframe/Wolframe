@@ -38,6 +38,7 @@
 #define _DATABASE_CONTAINER_HPP_INCLUDED
 
 #include "config/configurationBase.hpp"
+#include "moduleInterface.hpp"
 #include "database.hpp"
 
 namespace _Wolframe {

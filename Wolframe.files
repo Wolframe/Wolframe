@@ -218,6 +218,7 @@ include/logger/logError.hpp
 include/logger/logLevel.hpp
 include/logger/logSyslogFacility.hpp
 include/miscUtils.hpp
+include/moduleInterface.hpp
 include/objectPool.hpp
 include/protocol/buffers.hpp
 include/protocol/formatoutput.hpp
@@ -421,4 +422,3 @@ windows/wolframe.xml
 XML/configuration.rng
 XML/database.rng
 XML/logging.rng
-include/config/moduleConfiguration.hpp

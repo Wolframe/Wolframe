@@ -31,7 +31,7 @@
 
 ************************************************************************/
 //
-//
+///\file moduleInterface.hpp
 //
 
 #ifndef _MODULE_CONFIGURATION_HPP_INCLUDED
@@ -39,23 +39,58 @@
 
 #include <string>
 #include <boost/property_tree/ptree.hpp>
-#include "configurationBase.hpp"
+#include "config/configurationBase.hpp"
 
 namespace _Wolframe {
 namespace config {
 
-struct ModuleConfigDescription
+class ModuleConfiguration : public ConfigurationBase
+{
+public:
+	/// Class constructor.
+	///\param[in]	name	the name that will be displayed for this
+	///			configuration section in messages (log, print ...)
+	///			It has no other processing purpose
+	///\param[in]	logParent the logging prefix of the parent.
+	///\param[in]	logName	the logging name of this section. Combined with
+	///			the logParent parameter will form the whole logging
+	///			prefix for of the section.
+	ModuleConfiguration( const char* name, const char* logParent, const char* logName )
+		: ConfigurationBase( name, logParent, logName )	{}
+
+	virtual ~ModuleConfiguration()				{}
+
+	virtual const char* typeName() const = 0;
+};
+
+struct ModuleConfigConstructorDesc
 {
 	const char* typeName;
 	const char* sectionTitle;
 	const char* sectionName;
+	ModuleConfiguration* (*createFunc)( const char* name, const char* logParent, const char* logName );
 	bool (*parseFunc)( ConfigurationBase&, const boost::property_tree::ptree&, const std::string& );
 public:
-	ModuleConfigDescription( const char* tn, const char* st, const char* sn,
-				 bool (*f)( ConfigurationBase&,
-					    const boost::property_tree::ptree&, const std::string& ))
+	ModuleConfigConstructorDesc( const char* tn, const char* st, const char* sn,
+				     bool (*pf)( ConfigurationBase& configuration,
+						 const boost::property_tree::ptree& pt,
+						 const std::string& node ),
+				     ModuleConfiguration* (*cf)( const char* name,
+								 const char* logParent,
+								 const char* logName ) )
 		: typeName( tn ), sectionTitle( st ), sectionName( sn ),
-		  parseFunc( pf )	{}
+		  createFunc( cf ), parseFunc( pf )	{}
+};
+
+
+template < class T, class Tconf >
+struct ModuleConstructorDesc
+{
+	const char* name;
+	T* ( *createFunc )( const Tconf& conf );
+public:
+	ModuleConstructorDesc( const char* n, T* ( *f )( const Tconf& conf ) )
+		: name( n ), createFunc( f )	{}
 };
 
 }} // namespace _Wolframe::config

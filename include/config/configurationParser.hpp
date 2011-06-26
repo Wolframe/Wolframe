@@ -52,16 +52,17 @@ class ConfigurationParser
 public:
 	///\brief Parse the configuration section
 	///\param[in]	pt		property tree node
-	///\param[in]	nodeName	the label of the node. It should be
+	///\param[in]	node		the label of the node. It should be
 	///				the same (case insensitive) as it->first
 	template<typename T>
 	static bool parse( T& configuration,
-			   const boost::property_tree::ptree& pt, const std::string& nodeName );
+			   const boost::property_tree::ptree& pt, const std::string& node );
+
 	template<typename T>
 	static bool parseBase( ConfigurationBase& configuration,
-			       const boost::property_tree::ptree& pt, const std::string& nodeName )
+			       const boost::property_tree::ptree& pt, const std::string& node )
 	{
-		return parse( dynamic_cast<T&>( configuration ), pt, nodeName );
+		return parse( dynamic_cast<T&>( configuration ), pt, node );
 	}
 };
 
