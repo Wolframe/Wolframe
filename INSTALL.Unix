@@ -191,6 +191,8 @@ For running non-gtest tests you need 'expect'.
 
 For running the Sasl AAAA tests you need 'sasl2-bin'.
 
+For checking the validity of various XML files you need 'libxml2-utils' (for xmllint).
+
 Ubuntu 11.04
 ------------
 
