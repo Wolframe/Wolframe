@@ -63,7 +63,7 @@ public:
 	virtual const char* typeName() const = 0;
 };
 
-struct ModuleConfigConstructorDesc
+struct ModuleConfigConstructorDescript
 {
 	const char* typeName;
 	const char* sectionTitle;
@@ -71,26 +71,15 @@ struct ModuleConfigConstructorDesc
 	ModuleConfiguration* (*createFunc)( const char* name, const char* logParent, const char* logName );
 	bool (*parseFunc)( ConfigurationBase&, const boost::property_tree::ptree&, const std::string& );
 public:
-	ModuleConfigConstructorDesc( const char* tn, const char* st, const char* sn,
-				     bool (*pf)( ConfigurationBase& configuration,
-						 const boost::property_tree::ptree& pt,
-						 const std::string& node ),
-				     ModuleConfiguration* (*cf)( const char* name,
-								 const char* logParent,
-								 const char* logName ) )
+	ModuleConfigConstructorDescript( const char* tn, const char* st, const char* sn,
+					 bool (*pf)( ConfigurationBase& configuration,
+						     const boost::property_tree::ptree& pt,
+						     const std::string& node ),
+					 ModuleConfiguration* (*cf)( const char* name,
+								     const char* logParent,
+								     const char* logName ) )
 		: typeName( tn ), sectionTitle( st ), sectionName( sn ),
 		  createFunc( cf ), parseFunc( pf )	{}
-};
-
-
-template < class T, class Tconf >
-struct ModuleConstructorDesc
-{
-	const char* name;
-	T* ( *createFunc )( const Tconf& conf );
-public:
-	ModuleConstructorDesc( const char* n, T* ( *f )( const Tconf& conf ) )
-		: name( n ), createFunc( f )	{}
 };
 
 }} // namespace _Wolframe::config

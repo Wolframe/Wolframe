@@ -78,6 +78,7 @@ public:
 		: name( n ), createFunc( f )	{}
 };
 
+
 }} // namespace _Wolframe::db
 
 #endif // _DATABASE_CONTAINER_HPP_INCLUDED
