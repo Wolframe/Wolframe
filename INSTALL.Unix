@@ -80,7 +80,7 @@ RHEL/Centos/SL 4
 ----------------
 
 Optional packages: openssl-devel (0.9.7a), pam-devel (0.77), cyrus-sasl-devel (2.1.19),
-                   sqlite-devel (3.3.6), postgresql-devel (7.4.30)
+                   sqlite-devel (3.3.6), postgresql-devel (7.4.30), libxml2-devel (2.6.16)
 
 Boost is not available in a decent version (1.32), build your own one.
 
@@ -318,7 +318,7 @@ FreeBSD 8.2
 
 Required packages: boost-libs (1.45.0)
 Optional packages: qt4-gui (4.7.1), openpam, cyrus-sasl (2.1.23)
-                   sqlite3 (3.7.4), postgresql (9.0.3)
+                   sqlite3 (3.7.4), postgresql (9.0.3), libxml2 (2.7.8)
 
 You need 'gmake' (3.81_4)
 
