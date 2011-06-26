@@ -6,6 +6,10 @@ ifeq ($(WITH_EXPECT),1)
 SUBDIRS += expect config
 endif
 
+ifeq ($(WITH_LIBXML2),1)
+SUBDIRS += libxml2
+endif
+
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
 INCLUDE_CPPFLAGS = \

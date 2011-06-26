@@ -27,6 +27,7 @@ WITH_SASL ?= 0
 WITH_PAM ?= 0
 WITH_SQLITE3 ?= 0
 WITH_PGSQL ?= 0
+WITH_LIBXML2 ?= 0
 WITH_QT ?= 0
 WITH_EXAMPLES ?= 1
 
@@ -935,7 +936,9 @@ ifeq "$(PLATFORM)" "LINUX"
 ifeq "$(LINUX_DIST)" "arch"
 PGSQL_DIR ?= /usr
 PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include
+PGSQL_INCLUDE_DIRS = -I$(PGSQL_INCLUDE_DIR)
 PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
+PGSQL_LIB_DIRS = -L$(PGSQL_LIB_DIR)
 PGSQL_LIBS ?= -lpq
 endif
 
@@ -1035,6 +1038,26 @@ PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include
 PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
 PGSQL_LIBS ?= -lpq
 endif
+endif
+
+endif
+
+# libxml2
+#########
+
+ifeq ($(WITH_PGSQL),1)
+
+ifeq "$(PLATFORM)" "LINUX"
+
+ifeq "$(LINUX_DIST)" "arch"
+LIBXML2_DIR ?= /usr
+LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
+LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
+LIBXML2_LIB_DIR ?= $(LIBXML2_DIR)/lib
+LIBXML2_LIB_DIRS = -L$(LIBXML2_LIB_DIR)
+LIBXML2_LIBS ?= -lxml2
+endif
+
 endif
 
 endif

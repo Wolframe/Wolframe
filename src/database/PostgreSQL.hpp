@@ -39,7 +39,7 @@
 
 #include <list>
 #include "objectPool.hpp"
-#include <postgresql/libpq-fe.h>
+#include "libpq-fe.h"
 
 #ifndef _POSTGRESQL_HPP_INCLUDED
 #define _POSTGRESQL_HPP_INCLUDED
