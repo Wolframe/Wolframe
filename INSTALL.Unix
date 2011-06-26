@@ -160,7 +160,7 @@ Ubuntu 10.04.1 LTS
 
 Optional packages: libqt4-dev,
                    libpam-dev (1.1.1), libsasl2-dev (2.1.23),
-                   libsqlite3-dev (3.6.22), libpq-dev (8.4.7)
+                   libsqlite3-dev (3.6.22), libpq-dev (8.4.7), libxml2-dev (2.7.6)
 
 libboost-dev is 1.40, too old, missing asio features and property_tree, build
 you own boost. gcc on Debian complains a lot about boost header files..
@@ -172,6 +172,8 @@ When rebuilding the SVG images of the documentation you also need 'dia'.
 For running non-gtest tests you need 'expect'.
 
 For running the Sasl AAAA tests you need 'sasl2-bin'.
+
+For checking the validity of various XML files you need 'libxml2-utils' (for xmllint).
 
 Ubuntu 10.10 Server
 -------------------
