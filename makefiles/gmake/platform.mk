@@ -953,14 +953,18 @@ endif
 ifeq "$(LINUX_DIST)" "debian"
 ifeq "$(LINUX_REV)" "squeeze/sid"
 PGSQL_DIR ?= /usr
-PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include
+PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include/postgresql
+PGSQL_INCLUDE_DIRS = -I$(PGSQL_INCLUDE_DIR)
 PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
+PGSQL_LIB_DIRS = -L$(PGSQL_LIB_DIR)
 PGSQL_LIBS ?= -lpq
 endif
 ifeq "$(LINUX_REV)" "5"
 PGSQL_DIR ?= /usr
 PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include
+PGSQL_INCLUDE_DIRS = -I$(PGSQL_INCLUDE_DIR)
 PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
+PGSQL_LIB_DIRS = -L$(PGSQL_LIB_DIR)
 PGSQL_LIBS ?= -lpq
 endif
 ifeq "$(LINUX_REV)" "6"
