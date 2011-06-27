@@ -54,6 +54,11 @@ public:
 
 	const char* typeName() const				{ return "DatabaseAudit"; }
 
+	static module::ModuleConfiguration* create( const char* name,
+						    const char* logParent, const char* logName )	{
+		return new DBauditConfig( name, logParent, logName );
+	}
+
 	/// methods
 	bool check() const					{ return m_dbConfig.check(); }
 	void print( std::ostream& os, size_t indent ) const	{

@@ -53,6 +53,11 @@ public:
 
 	virtual const char* typeName() const			{ return "TextFileAuth"; }
 
+	static module::ModuleConfiguration* create( const char* name,
+						    const char* logParent, const char* logName )	{
+		return new TextFileAuthConfig( name, logParent, logName );
+	}
+
 	/// methods
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;

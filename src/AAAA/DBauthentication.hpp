@@ -54,6 +54,11 @@ public:
 
 	virtual const char* typeName() const			{ return "DatabaseAuth"; }
 
+	static module::ModuleConfiguration* create( const char* name,
+						    const char* logParent, const char* logName )	{
+		return new DatabaseAuthConfig( name, logParent, logName );
+	}
+
 	/// methods
 	bool check() const					{ return m_dbConfig.check(); }
 

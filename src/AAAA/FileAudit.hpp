@@ -54,6 +54,11 @@ public:
 
 	const char* typeName() const			{ return "FileAudit"; }
 
+	static module::ModuleConfiguration* create( const char* name,
+						    const char* logParent, const char* logName )	{
+		return new FileAuditConfig( name, logParent, logName );
+	}
+
 	/// methods
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
