@@ -118,3 +118,18 @@ Install all in one package. You may have to install libpq64
 as an add-on using the Stack Builder.
 
 Adapt PGSQL_DIR in 'makefiles\nmake\config.mk'.
+
+LibXML2
+-------
+
+32-bit Windows ports are available at http://www.zlatkovic.com/libxml.en.html.
+
+Adapt LIBXML2_DIR in 'makefiles\nmake\config.mk'.
+
+For 64-bit you have to compile your own.
+
+Note that 'libxml2' depends on 'libiconv' and 'zlib'! Also adapt
+ICONV_DIR and ZLIB_DIR.
+
+Make sure, all DLLs are executable otherwise you get an Application Load Error 0x22.
+

@@ -22,8 +22,6 @@ INCLUDE_LIBS = \
 
 endif
 
-TEST_OBJS =
-
 TEST_CPP_BINS = \
 	testlibxml1$(EXE)
 

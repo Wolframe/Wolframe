@@ -84,6 +84,13 @@ QT_DIR = D:\Qt\4.7.2
 
 PGSQL_DIR = D:\Program Files\PostgreSQL\9.0
 
+# libxml2
+#########
+
+LIBXML2_DIR = D:\Program Files\libxml2-2.7.8.win32
+ICONV_DIR = D:\Program Files\iconv-1.9.2.win32
+ZLIB_DIR = D:\Program Files\zlib-1.2.5
+
 # Tcl 8.5 and Expect
 ####################
 

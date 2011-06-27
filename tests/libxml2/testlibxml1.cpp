@@ -1,3 +1,6 @@
+// modified example, original from http://xmlsoft.org/examples/parse1.c
+
+#include <iostream>
 #include <libxml/parser.h>
 #include <libxml/tree.h>   
 
@@ -15,7 +18,7 @@ namespace
 int main( int argc, char** argv )
 {
 	LIBXML_TEST_VERSION
-
+	
 	if( argc != 2 ) {
 		return 1;
 	}
@@ -24,5 +27,9 @@ int main( int argc, char** argv )
 
 	xmlCleanupParser( );
 
+	xmlMemoryDump();
+
+	std::cout << "libxml test OK" << std::endl;
+	
 	return 0;
 }

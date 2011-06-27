@@ -8,6 +8,11 @@ SUBDIRS = AAAA
 #	$(SUBDIRS) expect
 #!ENDIF
 
+!IFDEF WITH_LIBXML2
+SUBDIRS = \
+	$(SUBDIRS) libxml2
+!ENDIF
+
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
 INCLUDE_CPPFLAGS = \
