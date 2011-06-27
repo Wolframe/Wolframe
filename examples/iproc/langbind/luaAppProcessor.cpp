@@ -144,6 +144,10 @@ struct LuaObject :public ObjectType
 	/// \warning CAUTION: DO NOT CALL THIS FUNCTION ! DOES NOT WORK ON MSVC 9.0. (The compiler links with the std delete)
 	/// (just avoids C4291 warning)
 	void operator delete (void *, lua_State*) {}
+	/// ABa: got a C4291 warning here again, not sure about the whole construct here..
+	/// an indicator could be that started the 'iprocd.exe' results in an error when
+	/// opening the processor!
+	void operator delete (void *, lua_State*, const char*) {}
 
 	template <class Orig>
 	static void push_luastack( lua_State* ls, const Orig& o)

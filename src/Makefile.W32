@@ -55,6 +55,21 @@ INCLUDE_DIRS = \
 
 !ENDIF
 
+# libpq
+
+!IFDEF WITH_PGSQL
+
+INCLUDE_CPPFLAGS = \
+	$(INCLUDE_CPPFLAGS) /DWITH_PGSQL
+
+INCLUDE_DIRS = \
+	$(INCLUDE_DIRS) /I"$(PGSQL_DIR)\include"
+
+INCLUDE_LIBS = \
+	$(INCLUDE_LIBS) "$(PGSQL_DIR)\lib\libpq.lib"
+
+!ENDIF
+
 LOCAL_STATIC_LIB = \
 	wolframe.lib
 

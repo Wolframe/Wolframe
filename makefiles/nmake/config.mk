@@ -78,6 +78,12 @@ OPENSSL_DIR = D:\Program Files\OpenSSL-1.0.0d
 #QT_DIR = /home/user/qt
 QT_DIR = D:\Qt\4.7.2
 
+# Postgresql libpq
+# (http://www.postgresql.org/)
+##############################
+
+PGSQL_DIR = D:\Program Files\PostgreSQL\9.0
+
 # Tcl 8.5 and Expect
 ####################
 

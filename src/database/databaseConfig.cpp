@@ -51,8 +51,12 @@
 #include <string>
 
 /****  Impersonating the module loader  ******************************************************/
+#ifdef WITH_PGSQL
 #include "PostgreSQL.hpp"
+#endif
+#ifdef WITH_SQLITE3
 #include "SQLite.hpp"
+#endif
 
 using namespace _Wolframe;
 
