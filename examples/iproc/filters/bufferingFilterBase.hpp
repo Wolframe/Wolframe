@@ -29,8 +29,11 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file buffeFilterBase.hpp
+///\file bufferingFilterBase.hpp
 ///\brief Base class definitions for filters that process the content as a whole
+
+namespace _Wolframe {
+namespace filter {
 
 template <class Container, class BufferType=std::string>
 struct BufferingInputFilter :public protocol::InputFilter
