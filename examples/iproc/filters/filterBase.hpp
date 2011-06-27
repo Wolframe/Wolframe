@@ -93,6 +93,64 @@ struct FilterBase
 	}
 };
 
+#if 0
+template <class Container, class BufferType=std::string>
+struct BufferingInputFilter :public protocol::InputFilter
+{
+	enum ErrorCodes
+	{
+		Ok,
+		ErrOutputBufferTooSmall
+	};
+
+	BufferingFilter()
+		:m_hasAll(false),m_content(0){}
+
+	~BufferingFilter()
+	{
+		if (m_content) delete m_content;
+	}
+
+	virtual void protocolInput( void* data, size_type datasize, bool eoD)
+	{
+		for (unsigned int ii=0; ii<datasize; ii++)
+		{
+			buffer.push_back( ((unsigned char*)data)[ii]);
+		}
+		if (eoD)
+		{
+			protocol::InputFilter::protocolInput( (void*)&m_buffer.at(0), m_buffer.size(), true);
+			m_content = new Container( ptr(), size());
+			m_itr = m_content->begin();
+			m_end = m_content->end();
+		}
+	}
+
+	virtual bool getNext( ElementType* type, void* buffer, size_type buffersize, size_type* bufferpos)
+	{
+		if (!gotEoD())
+		{
+			setState( EndOfMessage);
+			return false;
+		}
+		setState( Open);
+		if (buffersize - *bufferpos < m_itr->size())
+		{
+			setState( Error, ErrOutputBufferTooSmall);
+			return false;
+		}
+		memcpy( buffer, &m_itr->at(0), m_itr->size());
+		*bufferpos += m_itr->size();
+		++m_itr;
+	}
+private:
+	BufferType m_buffer;			///< STL back insertion sequence for buffering the input
+	Container* m_content;			///< Container that provides an iterator on the input
+	typename Container::iterator m_itr;	///< iterator
+	typename Container::iterator m_end;	///< end of input mark iterator
+};
+#endif
+
 }}//namespace
 #endif
 
