@@ -126,10 +126,9 @@ LibXML2
 
 Adapt LIBXML2_DIR in 'makefiles\nmake\config.mk'.
 
-For 64-bit you have to compile your own.
-
 Note that 'libxml2' depends on 'libiconv' and 'zlib'! Also adapt
 ICONV_DIR and ZLIB_DIR.
 
 Make sure, all DLLs are executable otherwise you get an Application Load Error 0x22.
 
+For 64-bit you have to compile your own libraries.
