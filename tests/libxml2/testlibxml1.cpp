@@ -27,8 +27,6 @@ int main( int argc, char** argv )
 
 	xmlCleanupParser( );
 
-	xmlMemoryDump();
-
 	std::cout << "libxml test OK" << std::endl;
 	
 	return 0;
