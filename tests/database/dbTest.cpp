@@ -1,13 +1,15 @@
-#include "../include/logger.hpp"
-
 #include <gtest/gtest.h>
 
+#include "logger.hpp"
+#include "database/database.hpp"
+
+// not happy here!
 #ifdef WITH_SQLITE3
-#include "../src/database/SQLite.hpp"
+#include "database/SQLite.hpp"
 #endif
 
 #ifdef WITH_PGSQL
-#include "../src/database/PostgreSQL.hpp"
+#include "database/PostgreSQL.hpp"
 #endif
 
 using namespace _Wolframe::log;
@@ -41,18 +43,16 @@ protected:
 #ifdef WITH_SQLITE3
 TEST_F( DbFixture, Sqlite3 )
 {
-//	SQLiteConfig conf( "test.db" );
-//	SQLiteDatabase db( &conf );
-//	assert( db.type( ) == DBTYPE_SQLITE );
+	SQLiteDatabase db( "test", "test.db", true );
+	ASSERT_STREQ( db.typeName( ), "SQLite" );
 }
 #endif
 
 #ifdef WITH_PGSQL
 TEST_F( DbFixture, Postgresql )
 {
-//	PostgreSQLconfig conf( "wrong", "test", "db" );
-//	PostgreSQLDatabase db( &conf );
-//	assert( db.type( ) == DBTYPE_POSTGRESQL );
+	PostgreSQLdatabase db( "test", "localhost", 5432, "test", "test", "xx", 10, 10, 10 );
+	ASSERT_STREQ( db.typeName( ), "PostgreSQL" );
 }
 #endif
 

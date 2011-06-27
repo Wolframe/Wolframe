@@ -7,7 +7,9 @@ SUBDIRS =
 INCLUDE_CPPFLAGS =
 
 INCLUDE_DIRS = \
-	-I$(TOPDIR)/include -I. \
+	-I$(TOPDIR)/include \
+	-I$(TOPDIR)/src \
+	-I. \
 	-I$(BOOST_INCLUDE_DIR) \
 	-I$(TOPDIR)/gtest/include
 

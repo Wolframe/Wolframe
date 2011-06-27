@@ -407,6 +407,10 @@ tests/expect/GNUmakefile
 tests/expect/Makefile.W32
 tests/expect/wolframe.conf
 tests/GNUmakefile
+tests/libxml2/GNUmakefile
+tests/libxml2/Makefile.W32
+tests/libxml2/testlibxml1.cpp
+tests/libxml2/test.xml
 tests/logTest.cpp
 tests/Makefile.W32
 tests/poolTest.cpp
