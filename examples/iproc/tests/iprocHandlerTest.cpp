@@ -163,37 +163,37 @@ template <class TestDescription>
 class iprocHandlerFixture : public ::testing::Test
 {
 public:
-	std::string input;
-	std::string expected;
+	std::string m_input;
+	std::string m_expected;
 	net::LocalTCPendpoint ep;
-	iproc::Connection* connection;
+	iproc::Connection* m_connection;
 	TestConfiguration config;
 protected:
-	iprocHandlerFixture() :ep( "127.0.0.1", 12345),connection(0) {}
+	iprocHandlerFixture() :ep( "127.0.0.1", 12345),m_connection(0) {}
 
 	virtual void SetUp()
 	{
 		TestDescription test;
 		config = TestConfiguration( test.inputBufferSize, test.outputBufferSize);
-		connection = new iproc::Connection( ep, &config);
+		m_connection = new iproc::Connection( ep, &config);
 
-		input.clear();
-		expected.clear();
-		input.append( "run\r\n");
-		expected.append( "OK expecting command\r\n\r\n");
+		m_input.clear();
+		m_expected.clear();
+		m_input.append( "run\r\n");
+		m_expected.append( "OK expecting command\r\n\r\n");
 
-		input.append( escape( test.content));
-		expected.append( escape( test.content));
+		m_input.append( escape( test.content));
+		m_expected.append( escape( test.content));
 
-		input.append( ".\r\n");
-		expected.append( "\r\n\r\n.\r\nOK\r\n");
-		input.append( "quit\r\n");
-		expected.append( "BYE\r\n");
+		m_input.append( ".\r\n");
+		m_expected.append( "\r\n\r\n.\r\nOK\r\n");
+		m_input.append( "quit\r\n");
+		m_expected.append( "BYE\r\n");
 	}
 
 	virtual void TearDown()
 	{
-		delete connection;
+		delete m_connection;
 	}
 };
 
@@ -255,23 +255,23 @@ TYPED_TEST_CASE( iprocHandlerFixture, MyTypes);
 TYPED_TEST( iprocHandlerFixture, ExpectedResult )
 {
 	std::string output;
-	char* itr = const_cast<char*>( this->input.c_str());
-	EXPECT_EQ( 0, test::runTestIO( itr, itr+this->input.size(), output, *this->connection));
+	char* itr = const_cast<char*>( this->m_input.c_str());
+	EXPECT_EQ( 0, test::runTestIO( itr, itr+this->m_input.size(), output, *this->m_connection));
 
 #define _Wolframe_LOWLEVEL_DEBUG
 #ifdef _Wolframe_LOWLEVEL_DEBUG
 	unsigned int ii=0,nn=output.size();
-	for (;ii<nn && output[ii]==this->expected[ii]; ii++);
+	for (;ii<nn && output[ii]==this->m_expected[ii]; ii++);
 	if (ii != nn)
 	{
 		printf( "SIZE R=%lu,E=%lu,DIFF AT %u='%d %d %d %d|%d %d %d %d'\n",
-			(unsigned long)output.size(), (unsigned long)this->expected.size(), ii,
+			(unsigned long)output.size(), (unsigned long)this->m_expected.size(), ii,
 			output[ii-2],output[ii-1],output[ii-0],output[ii+1],
-			this->expected[ii-2],this->expected[ii-1],this->expected[ii-0],this->expected[ii+1]);
+			this->m_expected[ii-2],this->m_expected[ii-1],this->m_expected[ii-0],this->m_expected[ii+1]);
 		boost::this_thread::sleep( boost::posix_time::seconds( 10 ));
 	}
 #endif
-	EXPECT_EQ( this->expected, output);
+	EXPECT_EQ( this->m_expected, output);
 }
 
 int main( int argc, char **argv )

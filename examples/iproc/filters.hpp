@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-/// \file filters.hpp
-/// \brief Top-level include file for the input/output filter implementations
+///\file filters.hpp
+///\brief Top-level include file for the input/output filter implementations
 
 #ifndef _Wolframe_FILTERS_HPP_INCLUDED
 #define _Wolframe_FILTERS_HPP_INCLUDED
