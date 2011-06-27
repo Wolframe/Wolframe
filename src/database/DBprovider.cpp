@@ -35,22 +35,25 @@
 //
 
 #include "DBprovider.hpp"
-#include "PostgreSQL.hpp"
-#include "SQLite.hpp"
 
 #include "logger.hpp"
 
 #include <boost/algorithm/string.hpp>
 
-namespace _Wolframe	{
-namespace db	{
-
 /****  Impersonating the module loader  ******************************************************/
+#include "PostgreSQL.hpp"
+#include "SQLite.hpp"
+
+using namespace _Wolframe;
+
 static const size_t noDBmodules = 2;
 static module::ModuleDescription
-dbModules[ noDBmodules ] = { module::ModuleDescription( "PostgreSQL", &PostgreSQLcontainer::create ),
-			     module::ModuleDescription( "SQLite", &SQLiteContainer::create ) };
+dbModules[ noDBmodules ] = { module::ModuleDescription( "PostgreSQL", &db::PostgreSQLcontainer::create ),
+			     module::ModuleDescription( "SQLite", &db::SQLiteContainer::create ) };
 /****  End impersonating the module loader  **************************************************/
+
+namespace _Wolframe	{
+namespace db	{
 
 DatabaseProvider::DatabaseProvider( const DBproviderConfig& conf )
 {

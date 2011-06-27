@@ -40,26 +40,27 @@
 #include "logger.hpp"
 #include "boost/algorithm/string.hpp"
 
+/****  Impersonating the module loader  ***************************************************************/
 #include "FileAudit.hpp"
 #include "DBaudit.hpp"
 #include "TextFileAuthentication.hpp"
 #include "DBauthentication.hpp"
 
-namespace _Wolframe {
-namespace AAAA {
+using namespace _Wolframe;
 
-/****  Impersonating the module loader  ***************************************************************/
 static const size_t noAuthModules = 2;
 static module::ModuleDescription
-authModules[ noAuthModules ] = { module::ModuleDescription( "DatabaseAuth", &DBauthContainer::create ),
-				 module::ModuleDescription( "TextFileAuth", &TxtFileAuthContainer::create ) };
+authModules[ noAuthModules ] = { module::ModuleDescription( "DatabaseAuth", &AAAA::DBauthContainer::create ),
+				 module::ModuleDescription( "TextFileAuth", &AAAA::TxtFileAuthContainer::create ) };
 
 static const size_t noAuditModules = 2;
 static module::ModuleDescription
-auditModules[ noAuditModules ] = { module::ModuleDescription( "DatabaseAudit", &DBauditContainer::create ),
-				   module::ModuleDescription( "FileAudit", &FileAuditContainer::create ) };
+auditModules[ noAuditModules ] = { module::ModuleDescription( "DatabaseAudit", &AAAA::DBauditContainer::create ),
+				   module::ModuleDescription( "FileAudit", &AAAA::FileAuditContainer::create ) };
 /****  End impersonating the module loader  ***********************************************************/
 
+namespace _Wolframe {
+namespace AAAA {
 
 AAAAprovider::AAAAprovider( const AAAAconfiguration& conf )
 	: m_authenticator( conf.m_authConfig, authModules, noAuthModules ),
