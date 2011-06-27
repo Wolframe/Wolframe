@@ -73,12 +73,12 @@ struct ModuleConfigConstructorDescript
 			   const boost::property_tree::ptree&, const std::string& );
 public:
 	ModuleConfigConstructorDescript( const char* tn, const char* st, const char* sn,
-					 bool (*pf)( config::ConfigurationBase& configuration,
-						     const boost::property_tree::ptree& pt,
-						     const std::string& node ),
 					 ModuleConfiguration* (*cf)( const char* name,
 								     const char* logParent,
-								     const char* logName ) )
+								     const char* logName ),
+					 bool (*pf)( config::ConfigurationBase& configuration,
+						     const boost::property_tree::ptree& pt,
+						     const std::string& node ) )
 		: typeName( tn ), sectionTitle( st ), sectionName( sn ),
 		  createFunc( cf ), parseFunc( pf )	{}
 };

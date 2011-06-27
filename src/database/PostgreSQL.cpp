@@ -71,7 +71,10 @@ void PostgreSQLconfig::print( std::ostream& os, size_t indent ) const
 	else
 		os << "   Connect timeout: " << connectTimeout << "s" << std::endl;
 	os << indStr << "   Database connections: " << connections << std::endl;
-	os << indStr << "   Acquire database connection timeout: " << acquireTimeout << std::endl;
+	if ( connectTimeout == 0 )
+		os << indStr << "   Acquire database connection timeout: 0 (wait indefinitely)" << std::endl;
+	else
+		os << indStr << "   Acquire database connection timeout: " << acquireTimeout << "s" << std::endl;
 }
 
 bool PostgreSQLconfig::check() const

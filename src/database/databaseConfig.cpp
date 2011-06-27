@@ -35,8 +35,6 @@
 //
 
 #include "DBprovider.hpp"
-#include "PostgreSQL.hpp"
-#include "SQLite.hpp"
 
 #include "config/valueParser.hpp"
 #include "config/configurationParser.hpp"
@@ -52,6 +50,22 @@
 #include <ostream>
 #include <string>
 
+/****  Impersonating the module loader  ******************************************************/
+#include "PostgreSQL.hpp"
+#include "SQLite.hpp"
+
+using namespace _Wolframe;
+
+static const size_t noDBconfigs = 2;
+static module::ModuleConfigConstructorDescript
+dbConfig[ noDBconfigs ] = { module::ModuleConfigConstructorDescript( "PostgreSQL", "PostgreSQL database", "PostgreSQL",
+			    &db::PostgreSQLconfig::create,
+			    &config::ConfigurationParser::parseBase<db::PostgreSQLconfig> ),
+			    module::ModuleConfigConstructorDescript( "SQLite", "SQLite database", "SQLite",
+			    &db::SQLiteConfig::create,
+			    &config::ConfigurationParser::parseBase<db::SQLiteConfig> ) };
+/****  End impersonating the module loader  **************************************************/
+
 namespace _Wolframe {
 namespace config {
 
@@ -63,25 +77,22 @@ bool ConfigurationParser::parse( db::DBproviderConfig& cfg,
 	bool retVal = true;
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
-		if ( boost::algorithm::iequals( L1it->first, "PostgreSQL" ))	{
-			db::PostgreSQLconfig* conf = new db::PostgreSQLconfig( "PostgreSQL server", cfg.logPrefix().c_str(), "PostgreSQL" );
-			if ( ConfigurationParser::parse( *conf, L1it->second, L1it->first ))
-				cfg.m_dbConfig.push_back( conf );
-			else	{
-				delete conf;
-				retVal = false;
+		size_t i;
+		for ( i = 0; i < noDBconfigs; i++ )	{
+			if ( boost::algorithm::iequals( dbConfig[i].typeName, L1it->first ))	{
+				db::DatabaseConfig* conf = dynamic_cast< db::DatabaseConfig* >( dbConfig[i].createFunc( dbConfig[i].sectionTitle,
+															cfg.logPrefix().c_str(),
+															dbConfig[i].sectionName ));
+				if ( dbConfig[i].parseFunc( *conf, L1it->second, L1it->first ))
+					cfg.m_dbConfig.push_back( conf );
+				else	{
+					delete conf;
+					retVal = false;
+				}
+				break;
 			}
 		}
-		else if ( boost::algorithm::iequals( L1it->first, "SQLite" ))	{
-			db::SQLiteConfig* conf = new db::SQLiteConfig( "SQLite database", cfg.logPrefix().c_str(), "SQLite" );
-			if ( ConfigurationParser::parse( *conf, L1it->second, L1it->first ))
-				cfg.m_dbConfig.push_back( conf );
-			else	{
-				delete conf;
-				retVal = false;
-			}
-		}
-		else
+		if ( i >= noDBconfigs )
 			LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
 				    << L1it->first << "'";
 	}

@@ -54,6 +54,11 @@ public:
 	SQLiteConfig( const char* name, const char* logParent, const char* logName );
 	~SQLiteConfig()					{}
 
+	static module::ModuleConfiguration* create( const char* name,
+						    const char* logParent, const char* logName )	{
+		return new SQLiteConfig( name, logParent, logName );
+	}
+
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 	virtual void setCanonicalPathes( const std::string& referencePath );

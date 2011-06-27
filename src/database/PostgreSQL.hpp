@@ -58,6 +58,11 @@ public:
 	PostgreSQLconfig( const char* name, const char* logParent, const char* logName );
 	~PostgreSQLconfig()				{}
 
+	static module::ModuleConfiguration* create( const char* name,
+						    const char* logParent, const char* logName )	{
+		return new PostgreSQLconfig( name, logParent, logName );
+	}
+
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 private:
