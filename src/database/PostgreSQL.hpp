@@ -66,6 +66,7 @@ private:
 	std::string	dbName;
 	std::string	user;
 	std::string	password;
+	unsigned short	connectTimeout;
 	unsigned short	connections;
 	unsigned short	acquireTimeout;
 };
@@ -77,7 +78,8 @@ public:
 	PostgreSQLdatabase( const std::string& id,
 			    const std::string& host, unsigned short port, const std::string& dbName,
 			    const std::string& user, const std::string& password,
-			    unsigned short connections, unsigned short	acquireTimeout );
+			    unsigned short connectTimeout,
+			    unsigned short connections, unsigned short acquireTimeout );
 	~PostgreSQLdatabase();
 
 	const std::string& ID() const			{ return m_ID; }

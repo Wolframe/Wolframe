@@ -66,6 +66,10 @@ void PostgreSQLconfig::print( std::ostream& os, size_t indent ) const
 	os << indStr << "   Database name: " << (dbName.empty() ? "(not specified - server user default)" : dbName) << std::endl;
 	os << indStr << "   Database user: " << (user.empty() ? "(not specified - same as server user)" : user)
 	   << ", password: " << (password.empty() ? "(not specified - no password used)" : password) << std::endl;
+	if ( connectTimeout == 0 )
+		os << "   Connect timeout: 0 (wait indefinitely)" << std::endl;
+	else
+		os << "   Connect timeout: " << connectTimeout << "s" << std::endl;
 	os << indStr << "   Database connections: " << connections << std::endl;
 	os << indStr << "   Acquire database connection timeout: " << acquireTimeout << std::endl;
 }
@@ -83,7 +87,7 @@ bool PostgreSQLconfig::check() const
 //***  PostgreSQL database container  ***************************************
 PostgreSQLcontainer::PostgreSQLcontainer( const PostgreSQLconfig& conf )
 	: m_db( conf.ID(), conf.host, conf.port, conf.dbName,
-		  conf.user, conf.password,
+		  conf.user, conf.password, conf.connectTimeout,
 		  conf.connections, conf.acquireTimeout )
 {
 	LOG_NOTICE << "PostgreSQL database container for '" << conf.ID() << "' created";
@@ -110,7 +114,8 @@ static std::string escConnElement( std::string element )
 }
 
 static std::string buildConnStr( const std::string& host, unsigned short port, const std::string& dbName,
-				 const std::string& user, const std::string& password )
+				 const std::string& user, const std::string& password,
+				 unsigned short connectTimeout )
 {
 	std::stringstream ss;
 
@@ -136,21 +141,26 @@ static std::string buildConnStr( const std::string& host, unsigned short port, c
 			ss << "password = '" << escConnElement( password ) << "'";
 		}
 	}
+	if ( connectTimeout != 0 )	{
+		if ( ! ss.str().empty())
+			ss << " ";
+		ss << "connect_timeout = " << connectTimeout;
+	}
 	return ss.str();
 }
 
-PostgreSQLdatabase::PostgreSQLdatabase( const std::string& id, const std::string& host,
-					unsigned short port, const std::string& dbName,
+PostgreSQLdatabase::PostgreSQLdatabase( const std::string& id,
+					const std::string& host, unsigned short port,
+					const std::string& dbName,
 					const std::string& user, const std::string& password,
+					unsigned short connectTimeout,
 					unsigned short connections, unsigned short acquireTimeout )
 	: m_ID( id )
 {
-	LOG_DATA << "PostgreSQL database '" << m_ID << "' created with "
-		   << "server " << host << ":" << port << ", database '" << dbName
-		   << "', credentials: " << user << "/" << password
-		   << ", " << connections << " connections, " << acquireTimeout << "s timeout";
-	m_connStr = buildConnStr( host, port,  dbName, user, password );
-	LOG_DATA << "PostgreSQL connection string: <" << m_connStr << ">";
+	m_connStr = buildConnStr( host, port,  dbName, user, password, connectTimeout );
+	LOG_DATA << "PostgreSQL database '" << m_ID << "' created with connection string <"
+		 << m_connStr << ">, " << connections << " connections, "
+		 << acquireTimeout << "s timeout";
 }
 
 

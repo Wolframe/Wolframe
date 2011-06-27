@@ -39,6 +39,7 @@
 #include "config/configurationParser.hpp"
 
 static const unsigned short DEFAULT_POSTGRESQL_CONNECTIONS = 4;
+static const unsigned short DEFAULT_CONNECTION_TIMEOUT = 30;
 
 namespace _Wolframe {
 namespace config {
@@ -50,8 +51,8 @@ bool ConfigurationParser::parse( db::PostgreSQLconfig& cfg,
 {
 	using namespace _Wolframe::config;
 	bool retVal = true;
-	bool portDefined, connDefined, aTdefined;
-	portDefined = connDefined = aTdefined = false;
+	bool portDefined, connDefined, aTdefined, cTdefined;
+	portDefined = connDefined = aTdefined = cTdefined = false;
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "identifier" ))	{
@@ -87,6 +88,10 @@ bool ConfigurationParser::parse( db::PostgreSQLconfig& cfg,
 			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.password, &isDefined ))
 				retVal = false;
 		}
+		else if ( boost::algorithm::iequals( L1it->first, "connectionTimeout" ))	{
+			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.connectTimeout, &cTdefined ))
+				retVal = false;
+		}
 		else if ( boost::algorithm::iequals( L1it->first, "connections" ))	{
 			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.connections,
 						Parser::RangeDomain<unsigned short>( 1 ), &connDefined ))
@@ -103,6 +108,8 @@ bool ConfigurationParser::parse( db::PostgreSQLconfig& cfg,
 	}
 	if ( ! connDefined == 0 )
 		cfg.connections = DEFAULT_POSTGRESQL_CONNECTIONS;
+	if ( ! cTdefined )
+		cfg.connectTimeout = DEFAULT_CONNECTION_TIMEOUT;
 
 	return retVal;
 }
