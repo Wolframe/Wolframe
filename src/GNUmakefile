@@ -73,6 +73,8 @@ ifeq ($(WITH_SQLITE3),1)
 INCLUDE_CPPFLAGS += \
 	-DWITH_SQLITE3
 
+ifeq ($(WITH_LOCAL_SQLITE3),0)
+
 INCLUDE_DIRS += \
 	-I$(SQLITE3_INCLUDE_DIR)
 
@@ -81,6 +83,8 @@ INCLUDE_LDFLAGS += \
 
 INCLUDE_LIBS += \
 	$(SQLITE3_LIBS)
+
+endif
 
 endif
 
@@ -145,6 +149,11 @@ ifeq ($(WITH_SQLITE3),1)
 DB_OBJS += \
 	database/SQLite.o \
 	database/SQLiteConfig.o
+
+ifeq ($(WITH_LOCAL_SQLITE3),1)
+DB_OBJS += \
+	$(TOPDIR)/sqlite3/sqlite3.o
+endif
 
 AAAA_OBJS += \
 	AAAA/authentication_db_sqlite3.o

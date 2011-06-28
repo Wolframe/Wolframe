@@ -26,6 +26,7 @@ WITH_LUA ?= 0
 WITH_SASL ?= 0
 WITH_PAM ?= 0
 WITH_SQLITE3 ?= 0
+WITH_LOCAL_SQLITE3 ?= 0
 WITH_PGSQL ?= 0
 WITH_LIBXML2 ?= 0
 WITH_QT ?= 0
@@ -817,6 +818,8 @@ endif
 
 ifeq ($(WITH_SQLITE3),1)
 
+ifeq ($(WITH_LOCAL_SQLITE3),0)
+
 ifeq "$(PLATFORM)" "LINUX"
 
 ifeq "$(LINUX_DIST)" "arch"
@@ -924,6 +927,11 @@ SQLITE3_LIBS ?= -lsqlite3
 endif
 endif
 
+endif
+
+endif
+
+ifeq ($(WITH_LOCAL_SQLITE3),1)
 endif
 
 # Postgresql
