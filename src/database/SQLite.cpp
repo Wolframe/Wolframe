@@ -100,6 +100,19 @@ SQLiteDatabase::~SQLiteDatabase( )
 {
 }
 
+bool SQLiteDatabase::isOpen( ) const
+{
+	return true;
+}
+
+void SQLiteDatabase::close( )
+{
+}
+
+bool SQLiteDatabase::doTransaction( DatabaseRequest&, DatabaseAnswer& )
+{
+	return true;
+}
 
 //***  SQLite database container  *******************************************
 SQLiteContainer::SQLiteContainer( const SQLiteConfig& conf )
