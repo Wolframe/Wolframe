@@ -82,21 +82,16 @@ local_distclean:
 
 local_test: $(TEST_CPP_BINS)
 	@-echo @echo off > test.bat
-	@-echo tests\iprocHandlerTest.exe >> test.bat
 !IFDEF WITH_SSL
-	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat
-	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >> test.bat
+	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" tests >> test.bat
+	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" tests >> test.bat
 !ENDIF
 !IFDEF WITH_LUA
 	@-echo copy "$(LUA_DIR)\src\lua51.dll" . >> test.bat
 !ENDIF
-# Aba, doesn't run Windows (path trouble when loading LUA script):
-# ERROR: Failed to load script 'test.lua':cannot open D:/cygwin\home\Andreas Bauma
-# nn\Wolframe\examples\iproc\test.lua: No such file or directory
-# unknown file: error: C++ exception with description "cannot load application pro
-# cessor from configuration" thrown in SetUp().
-# => temporarily disabled on Windows
-#	@-test.bat
+	@-echo cd tests >> test.bat
+	@-echo iprocHandlerTest.exe >> test.bat
+	@-test.bat
 
 run:
 	@-echo @echo off > test.bat
