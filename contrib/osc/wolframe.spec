@@ -166,8 +166,13 @@ Requires: openssl >= 0.9.7
 %endif
 %if %{with_sqlite}
 %if %{rhel} || %{centos} || %{fedora}
+%if %{rhel4}
+BuildRequires: sqlite-devel
+Requires: sqlite
+%else
 BuildRequires: sqlite-devel >= 3.0
 Requires: sqlite >= 3.0
+%endif
 %endif
 %if %{suse} || %{sles}
 BuildRequires: sqlite3-devel >= 3.0
