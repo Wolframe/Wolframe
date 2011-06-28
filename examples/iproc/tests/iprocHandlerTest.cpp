@@ -271,7 +271,7 @@ TYPED_TEST( iprocHandlerFixture, ExpectedResult )
 		boost::this_thread::sleep( boost::posix_time::seconds( 10 ));
 	}
 #endif
-	EXPECT_EQ( this->m_expected, output);
+	EXPECT_EQ( m_expected, output);
 }
 
 int main( int argc, char **argv )
