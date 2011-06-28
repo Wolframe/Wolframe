@@ -67,17 +67,14 @@ private:
 };
 
 
-class TxtFileAuthContainer : public AuthenticationContainer
+class TxtFileAuthContainer : public module::ModuleContainer< TxtFileAuthContainer, TextFileAuthConfig,
+		AuthenticationContainer, AuthenticationConfiguration >
 {
 public:
 	TxtFileAuthContainer( const TextFileAuthConfig& conf );
 	~TxtFileAuthContainer()					{}
 
 	virtual const char* typeName() const			{ return "TextFileAuth"; }
-
-	static module::ModuleContainer* create( const module::ModuleConfiguration& conf )	{
-		return new TxtFileAuthContainer( dynamic_cast< const TextFileAuthConfig& >( conf ));
-	}
 private:
 	std::string	m_file;
 };

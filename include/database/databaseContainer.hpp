@@ -58,7 +58,7 @@ private:
 };
 
 
-class DatabaseContainer : public module::ModuleContainer
+class DatabaseContainer
 {
 public:
 	virtual ~DatabaseContainer()			{}

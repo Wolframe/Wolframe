@@ -73,17 +73,14 @@ private:
 };
 
 
-class DBauditContainer : public AuditContainer
+class DBauditContainer : public module::ModuleContainer< DBauditContainer, DBauditConfig,
+		AuditContainer, AuditConfiguration >
 {
 public:
 	DBauditContainer( const DBauditConfig& conf );
 	~DBauditContainer();
 
 	const char* typeName() const				{ return "DatabaseAudit"; }
-
-	static module::ModuleContainer* create( const module::ModuleConfiguration& conf )	{
-		return new DBauditContainer( dynamic_cast< const DBauditConfig& >( conf ));
-	}
 
 	bool resolveDB( const db::DatabaseProvider& db );
 private:

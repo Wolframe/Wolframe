@@ -74,17 +74,14 @@ private:
 };
 
 
-class DBauthContainer : public AuthenticationContainer
+class DBauthContainer : public module::ModuleContainer< DBauthContainer, DatabaseAuthConfig,
+		AuthenticationContainer, AuthenticationConfiguration >
 {
 public:
 	DBauthContainer( const DatabaseAuthConfig& conf );
 	~DBauthContainer();
 
 	virtual const char* typeName() const	{ return "DatabaseAuth"; }
-
-	static module::ModuleContainer* create( const module::ModuleConfiguration& conf )	{
-		return new DBauthContainer( dynamic_cast< const DatabaseAuthConfig& >( conf ));
-	}
 
 	bool resolveDB( const db::DatabaseProvider& db );
 private:

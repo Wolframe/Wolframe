@@ -68,17 +68,14 @@ private:
 };
 
 
-class FileAuditContainer : public AuditContainer
+class FileAuditContainer : public module::ModuleContainer< FileAuditContainer, FileAuditConfig,
+		AuditContainer, AuditConfiguration >
 {
 public:
 	FileAuditContainer( const FileAuditConfig& conf );
 	~FileAuditContainer()					{}
 
 	const char* typeName() const			{ return "FileAudit"; }
-
-	static module::ModuleContainer* create( const module::ModuleConfiguration& conf )	{
-		return new FileAuditContainer( dynamic_cast< const FileAuditConfig& >( conf ));
-	}
 private:
 	std::string	m_file;
 };

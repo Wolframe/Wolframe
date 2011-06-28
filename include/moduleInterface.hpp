@@ -84,19 +84,25 @@ public:
 };
 
 
-class ModuleContainer
+template < class T, class Tconf, class Tcontainer, class TcontainerConf >
+class ModuleContainer : public Tcontainer
 {
 public:
 	virtual ~ModuleContainer()			{}
 	virtual const char* typeName() const = 0;
+
+	static Tcontainer* create( const TcontainerConf& conf )	{
+		return new T( dynamic_cast< const Tconf& >( conf ));
+	}
 };
 
+template < class T, class Tconf >
 struct ModuleDescription
 {
 	const char* name;
-	ModuleContainer* ( *createFunc )( const ModuleConfiguration& conf );
+	T* ( *createFunc )( const Tconf& conf );
 public:
-	ModuleDescription( const char* n, ModuleContainer* ( *f )( const ModuleConfiguration& conf ) )
+	ModuleDescription( const char* n, T* ( *f )( const Tconf& conf ) )
 		: name( n ), createFunc( f )	{}
 };
 

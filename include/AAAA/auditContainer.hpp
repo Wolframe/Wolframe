@@ -55,7 +55,7 @@ public:
 };
 
 
-class AuditContainer : public module::ModuleContainer
+class AuditContainer
 {
 public:
 	virtual ~AuditContainer()	{}

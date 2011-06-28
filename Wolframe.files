@@ -104,9 +104,11 @@ examples/echo/Makefile.W32
 examples/GNUmakefile
 examples/iproc/appConfigDefinition.cpp
 examples/iproc/appProperties.cpp
+examples/iproc/filters/bufferingFilterBase.hpp
 examples/iproc/filters/char_filter.hpp
 examples/iproc/filters/filterBase.hpp
 examples/iproc/filters.hpp
+examples/iproc/filters/libxml2_filter.hpp
 examples/iproc/filters/line_filter.hpp
 examples/iproc/filters/textwolf.hpp
 examples/iproc/filters/xml_filter.hpp
@@ -403,6 +405,7 @@ tests/config/wolframe-win.conf
 tests/counterTest.cpp
 tests/database/dbTest.cpp
 tests/database/GNUmakefile
+tests/database/Makefile.W32
 tests/expect/GNUmakefile
 tests/expect/Makefile.W32
 tests/expect/wolframe.conf

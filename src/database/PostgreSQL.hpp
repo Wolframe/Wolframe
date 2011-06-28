@@ -100,15 +100,13 @@ private:
 };
 
 
-class PostgreSQLcontainer : public DatabaseContainer
+class PostgreSQLcontainer : public module::ModuleContainer< PostgreSQLcontainer, PostgreSQLconfig,
+		DatabaseContainer, DatabaseConfig >
 {
 public:
 	PostgreSQLcontainer( const PostgreSQLconfig& conf );
 	~PostgreSQLcontainer();
 
-	static module::ModuleContainer* create( const module::ModuleConfiguration& conf )	{
-		return new PostgreSQLcontainer( dynamic_cast< const PostgreSQLconfig& >( conf ));
-	}
 	const std::string& ID() const			{ return m_db.ID(); }
 	const char* typeName() const			{ return m_db.typeName(); }
 	virtual const Database& database()		{ return m_db; }

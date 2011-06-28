@@ -47,9 +47,9 @@
 using namespace _Wolframe;
 
 static const size_t noDBmodules = 2;
-static module::ModuleDescription
-dbModules[ noDBmodules ] = { module::ModuleDescription( "PostgreSQL", &db::PostgreSQLcontainer::create ),
-			     module::ModuleDescription( "SQLite", &db::SQLiteContainer::create ) };
+static module::ModuleDescription< db::DatabaseContainer, db::DatabaseConfig >
+dbModules[ noDBmodules ] = { module::ModuleDescription< db::DatabaseContainer, db::DatabaseConfig >( "PostgreSQL", &db::PostgreSQLcontainer::create ),
+			     module::ModuleDescription< db::DatabaseContainer, db::DatabaseConfig >( "SQLite", &db::SQLiteContainer::create ) };
 /****  End impersonating the module loader  **************************************************/
 
 namespace _Wolframe	{
@@ -63,7 +63,7 @@ DatabaseProvider::DatabaseProvider( const DBproviderConfig& conf )
 		size_t i;
 		for ( i = 0; i < noDBmodules; i++ )	{
 			if ( boost::algorithm::iequals( dbModules[i].name, dbType ))	{
-				DatabaseContainer* container = dynamic_cast< DatabaseContainer* >( dbModules[i].createFunc( **it ));
+				DatabaseContainer* container = dbModules[i].createFunc( **it );
 				m_db.push_back( container );
 				break;
 			}

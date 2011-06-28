@@ -55,7 +55,7 @@ public:
 };
 
 
-class AuthenticationContainer : public module::ModuleContainer
+class AuthenticationContainer
 {
 public:
 	virtual	~AuthenticationContainer()				{}
