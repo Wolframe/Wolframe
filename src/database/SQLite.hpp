@@ -76,9 +76,8 @@ public:
 
 	const std::string& ID() const			{ return m_ID; }
 	const char* typeName() const			{ return "SQLite"; }
-	bool isOpen() const				{ return true; }
-	void close()					{}
-	bool doTransaction( DatabaseRequest&, DatabaseAnswer& ){ return true; }
+	bool doTransaction( DatabaseRequest&, DatabaseAnswer&,
+			    unsigned short, unsigned short ){ return true; }
 private:
 	const std::string	m_ID;
 	const std::string	m_filename;

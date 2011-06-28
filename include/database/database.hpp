@@ -62,9 +62,8 @@ public:
 	virtual const std::string& ID() const = 0;
 	virtual const char* typeName() const = 0;
 
-	virtual bool isOpen() const = 0;
-	virtual void close() = 0;
-	virtual bool doTransaction( DatabaseRequest& request, DatabaseAnswer& answer ) = 0;
+	virtual bool doTransaction( DatabaseRequest& request, DatabaseAnswer& answer,
+				    unsigned short timeout, unsigned short retries ) = 0;
 };
 
 }} // namespace _Wolframe::db
