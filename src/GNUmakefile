@@ -89,9 +89,7 @@ endif
 ifeq ($(WITH_LOCAL_SQLITE3),1)   
 
 INCLUDE_DIRS += \
-	
-DB_OBJS += \
-	$(TOPDIR)/sqlite3
+	-I$(TOPDIR)/sqlite3
 endif
 
 endif

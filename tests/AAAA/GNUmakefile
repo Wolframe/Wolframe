@@ -68,6 +68,8 @@ endif
 
 ifeq ($(WITH_SQLITE3),1)
 
+ifeq ($(WITH_LOCAL_SQLITE3),0)
+
 INCLUDE_CPPFLAGS += \
 	-DWITH_SQLITE3
 
@@ -79,6 +81,18 @@ INCLUDE_LDFLAGS += \
 
 INCLUDE_LIBS += \
 	$(SQLITE3_LIBS)
+
+endif
+
+ifeq ($(WITH_LOCAL_SQLITE3),1)
+
+INCLUDE_CPPFLAGS += \
+	-DWITH_SQLITE3
+
+INCLUDE_DIRS += \
+	-I$(TOPDIR)/sqlite3
+
+endif
 
 endif
 
