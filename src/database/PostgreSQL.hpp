@@ -34,15 +34,15 @@
 // Wolframe PostgreSQL client
 //
 
+#ifndef _POSTGRESQL_HPP_INCLUDED
+#define _POSTGRESQL_HPP_INCLUDED
+
 #include "database/database.hpp"
 #include "database/databaseContainer.hpp"
 
 #include <list>
 #include "objectPool.hpp"
 #include "libpq-fe.h"
-
-#ifndef _POSTGRESQL_HPP_INCLUDED
-#define _POSTGRESQL_HPP_INCLUDED
 
 namespace _Wolframe {
 namespace db {

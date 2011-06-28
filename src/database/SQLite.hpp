@@ -34,11 +34,15 @@
 // Wolframe SQLite client
 //
 
+#ifndef _SQLITE_HPP_INCLUDED
+#define _SQLITE_HPP_INCLUDED
+
 #include "database/database.hpp"
 #include "database/databaseContainer.hpp"
 
-#ifndef _SQLITE_HPP_INCLUDED
-#define _SQLITE_HPP_INCLUDED
+#include <list>
+#include "objectPool.hpp"
+#include "sqlite3.h"
 
 namespace _Wolframe {
 namespace db {
@@ -79,6 +83,8 @@ private:
 	const std::string	m_ID;
 	const std::string	m_filename;
 	bool			m_flag;
+	std::list< sqlite3* >	m_connections;		//< list of DB connections
+	ObjectPool< sqlite3* >	m_connPool;		//< pool of connections
 };
 
 
