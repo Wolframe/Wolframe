@@ -151,7 +151,7 @@ static std::string escape( std::string& content)
 	{
 		if (content[ii] == '.' && (ii==0 || content[ii-1] == '\n'))
 		{
-			continue;
+			rt.push_back( '.');
 		}
 		rt.push_back( content[ii]);
 	}
