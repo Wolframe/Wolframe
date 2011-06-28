@@ -71,7 +71,7 @@ class SQLiteDatabase : public Database
 {
 public:
 	SQLiteDatabase( const std::string& id,
-			const std::string& filename, bool flag );
+			const std::string& filename, unsigned short connections, bool flag );
 	~SQLiteDatabase();
 
 	const std::string& ID() const			{ return m_ID; }

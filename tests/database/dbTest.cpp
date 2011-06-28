@@ -43,7 +43,7 @@ protected:
 #ifdef WITH_SQLITE3
 TEST_F( DbFixture, Sqlite3 )
 {
-	SQLiteDatabase db( "test", "test.db", true );
+	SQLiteDatabase db( "test", "test.db", 1, true );
 	ASSERT_STREQ( db.typeName( ), "SQLite" );
 }
 #endif
