@@ -1,0 +1,75 @@
+TOPDIR = ..\..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_CPPFLAGS = \
+	/D_WIN32_WINNT=0x504
+
+INCLUDE_DIRS = \
+	/I. \
+	/I"$(TOPDIR)/include" \
+	/I"$(TOPDIR)/src" \
+	/I"$(TOPDIR)/gtest/include" \
+	/I"$(BOOST_DIR)" \
+	/I"$(TOPDIR)\gtest\include"	
+
+# Note: libraries are picked automatically on Windows!
+SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib"
+INCLUDE_LDFLAGS = \
+	$(SDK_LDFLAGS) $(BOOST_LDFLAGS)
+
+INCLUDE_LIBS = \
+	$(TOPDIR)\gtest\gtest-all.obj
+
+# sqlite3
+
+!IFDEF WITH_SQLITE3
+
+INCLUDE_CPPFLAGS = \
+	$(INCLUDE_CPPFLAGS) /DWITH_SQLITE3
+
+INCLUDE_DIRS = \
+	$(INCLUDE_DIRS)	/I"$(TOPDIR)\sqlite3"
+
+!ENDIF
+
+# Postgresql
+
+!IFDEF WITH_PGSQL
+
+INCLUDE_CPPFLAGS = \
+	$(INCLUDE_CPPFLAGS) /DWITH_PGSQL
+
+INCLUDE_DIRS = \
+	$(INCLUDE_DIRS) /I"$(PGSQL_DIR)\include"
+
+INCLUDE_LIBS = \
+	$(INCLUDE_LIBS) "$(PGSQL_DIR)\lib\libpq.lib"
+
+!ENDIF
+
+TEST_CPP_BINS = \
+	dbTest.exe
+
+all: $(OBJS) $(CPP_BINS)
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+dbTest.exe: dbTest.obj $(TOPDIR)\src\wolframe.lib
+
+local_all:
+
+local_clean:
+	@-erase test.bat 2>NUL
+
+local_distclean:
+
+local_test:
+	@-echo @echo off > test.bat
+!IFDEF WITH_PGSQL
+	@-echo copy "$(PGSQL_DIR)\lib\libpq.dll" . >> test.bat
+!ENDIF
+	@-echo dbTest >> test.bat
+	@-test.bat
