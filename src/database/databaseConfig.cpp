@@ -61,11 +61,11 @@
 using namespace _Wolframe;
 
 static const size_t noDBconfigs = 2;
-static module::ModuleConfigConstructorDescript
-dbConfig[ noDBconfigs ] = { module::ModuleConfigConstructorDescript( "PostgreSQL", "PostgreSQL database", "PostgreSQL",
+static module::ModuleConfigurationDescription< db::DatabaseConfig >
+dbConfig[ noDBconfigs ] = { module::ModuleConfigurationDescription< db::DatabaseConfig >( "PostgreSQL", "PostgreSQL database", "PostgreSQL",
 			    &db::PostgreSQLconfig::create,
 			    &config::ConfigurationParser::parseBase<db::PostgreSQLconfig> ),
-			    module::ModuleConfigConstructorDescript( "SQLite", "SQLite database", "SQLite",
+			    module::ModuleConfigurationDescription< db::DatabaseConfig >( "SQLite", "SQLite database", "SQLite",
 			    &db::SQLiteConfig::create,
 			    &config::ConfigurationParser::parseBase<db::SQLiteConfig> ) };
 /****  End impersonating the module loader  **************************************************/
@@ -84,9 +84,9 @@ bool ConfigurationParser::parse( db::DBproviderConfig& cfg,
 		size_t i;
 		for ( i = 0; i < noDBconfigs; i++ )	{
 			if ( boost::algorithm::iequals( dbConfig[i].typeName, L1it->first ))	{
-				db::DatabaseConfig* conf = dynamic_cast< db::DatabaseConfig* >( dbConfig[i].createFunc( dbConfig[i].sectionTitle,
-															cfg.logPrefix().c_str(),
-															dbConfig[i].sectionName ));
+				db::DatabaseConfig* conf = dbConfig[i].createFunc( dbConfig[i].sectionTitle,
+										   cfg.logPrefix().c_str(),
+										   dbConfig[i].sectionName );
 				if ( dbConfig[i].parseFunc( *conf, L1it->second, L1it->first ))
 					cfg.m_dbConfig.push_back( conf );
 				else	{

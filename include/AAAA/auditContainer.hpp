@@ -43,15 +43,17 @@
 namespace _Wolframe {
 namespace AAAA {
 
-class AuditConfiguration : public module::ModuleConfiguration
+class AuditConfiguration : public config::ConfigurationBase
 {
 //	friend class AAAAprovider;
 //	friend class config::ConfigurationParser;
 public:
 	/// constructor
 	AuditConfiguration( const char* cfgName, const char* logParent, const char* logName )
-		: ModuleConfiguration( cfgName, logParent, logName )	{}
+		: ConfigurationBase( cfgName, logParent, logName )	{}
 	virtual ~AuditConfiguration()					{}
+
+	virtual const char* typeName() const = 0;
 };
 
 

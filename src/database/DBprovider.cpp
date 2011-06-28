@@ -47,9 +47,9 @@
 using namespace _Wolframe;
 
 static const size_t noDBmodules = 2;
-static module::ModuleDescription< db::DatabaseContainer, db::DatabaseConfig >
-dbModules[ noDBmodules ] = { module::ModuleDescription< db::DatabaseContainer, db::DatabaseConfig >( "PostgreSQL", &db::PostgreSQLcontainer::create ),
-			     module::ModuleDescription< db::DatabaseContainer, db::DatabaseConfig >( "SQLite", &db::SQLiteContainer::create ) };
+static module::ModuleContainerDescription< db::DatabaseContainer, db::DatabaseConfig >
+dbModules[ noDBmodules ] = { module::ModuleContainerDescription< db::DatabaseContainer, db::DatabaseConfig >( "PostgreSQL", &db::PostgreSQLcontainer::create ),
+			     module::ModuleContainerDescription< db::DatabaseContainer, db::DatabaseConfig >( "SQLite", &db::SQLiteContainer::create ) };
 /****  End impersonating the module loader  **************************************************/
 
 namespace _Wolframe	{

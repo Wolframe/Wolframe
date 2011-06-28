@@ -44,7 +44,8 @@
 namespace _Wolframe {
 namespace module {
 
-class ModuleConfiguration : public config::ConfigurationBase
+template< class T, class Tbase >
+class ModuleConfiguration : public Tbase
 {
 public:
 	/// Class constructor.
@@ -56,53 +57,57 @@ public:
 	///			the logParent parameter will form the whole logging
 	///			prefix for of the section.
 	ModuleConfiguration( const char* name, const char* logParent, const char* logName )
-		: ConfigurationBase( name, logParent, logName )	{}
+		: Tbase( name, logParent, logName )	{}
 
 	virtual ~ModuleConfiguration()				{}
 
 	virtual const char* typeName() const = 0;
+	static Tbase* create( const char* name, const char* logParent, const char* logName )	{
+		return new T( name, logParent, logName );
+	}
 };
 
-struct ModuleConfigConstructorDescript
+template< class configBase >
+struct ModuleConfigurationDescription
 {
 	const char* typeName;
 	const char* sectionTitle;
 	const char* sectionName;
-	ModuleConfiguration* (*createFunc)( const char* name, const char* logParent, const char* logName );
+	configBase* (*createFunc)( const char* name, const char* logParent, const char* logName );
 	bool (*parseFunc)( config::ConfigurationBase&,
 			   const boost::property_tree::ptree&, const std::string& );
 public:
-	ModuleConfigConstructorDescript( const char* tn, const char* st, const char* sn,
-					 ModuleConfiguration* (*cf)( const char* name,
-								     const char* logParent,
-								     const char* logName ),
-					 bool (*pf)( config::ConfigurationBase& configuration,
-						     const boost::property_tree::ptree& pt,
-						     const std::string& node ) )
+	ModuleConfigurationDescription( const char* tn, const char* st, const char* sn,
+					configBase* (*cf)( const char* name,
+							   const char* logParent,
+							   const char* logName ),
+					bool (*pf)( config::ConfigurationBase& configuration,
+						    const boost::property_tree::ptree& pt,
+						    const std::string& node ) )
 		: typeName( tn ), sectionTitle( st ), sectionName( sn ),
 		  createFunc( cf ), parseFunc( pf )	{}
 };
 
 
-template < class T, class Tconf, class Tcontainer, class TcontainerConf >
-class ModuleContainer : public Tcontainer
+template < class T, class Tconf, class Tbase, class TbaseConf >
+class ModuleContainer : public Tbase
 {
 public:
 	virtual ~ModuleContainer()			{}
 	virtual const char* typeName() const = 0;
 
-	static Tcontainer* create( const TcontainerConf& conf )	{
+	static Tbase* create( const TbaseConf& conf )	{
 		return new T( dynamic_cast< const Tconf& >( conf ));
 	}
 };
 
 template < class T, class Tconf >
-struct ModuleDescription
+struct ModuleContainerDescription
 {
 	const char* name;
 	T* ( *createFunc )( const Tconf& conf );
 public:
-	ModuleDescription( const char* n, T* ( *f )( const Tconf& conf ) )
+	ModuleContainerDescription( const char* n, T* ( *f )( const Tconf& conf ) )
 		: name( n ), createFunc( f )	{}
 };
 

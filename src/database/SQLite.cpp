@@ -48,7 +48,7 @@ namespace db {
 
 //***  SQLite configuration functions  **************************************
 SQLiteConfig::SQLiteConfig( const char* name, const char* logParent, const char* logName )
-	: DatabaseConfig( name, logParent, logName )
+	: ModuleConfiguration< SQLiteConfig, DatabaseConfig >( name, logParent, logName )
 {
 	flag = false;
 }

@@ -44,7 +44,7 @@ namespace _Wolframe {
 namespace db {
 
 /// SQLite database configuration
-class SQLiteConfig : public DatabaseConfig
+class SQLiteConfig : public module::ModuleConfiguration< SQLiteConfig, DatabaseConfig >
 {
 	friend class config::ConfigurationParser;
 	friend class SQLiteContainer;
@@ -53,11 +53,6 @@ public:
 
 	SQLiteConfig( const char* name, const char* logParent, const char* logName );
 	~SQLiteConfig()					{}
-
-	static module::ModuleConfiguration* create( const char* name,
-						    const char* logParent, const char* logName )	{
-		return new SQLiteConfig( name, logParent, logName );
-	}
 
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
