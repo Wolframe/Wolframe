@@ -36,6 +36,7 @@
 
 #include "logger.hpp"
 #include "PostgreSQL.hpp"
+#include "database/databaseOperation.hpp"
 
 #include <string>
 #include <sstream>
@@ -158,17 +159,30 @@ PostgreSQLdatabase::PostgreSQLdatabase( const std::string& id,
 					const std::string& user, const std::string& password,
 					unsigned short connectTimeout,
 					unsigned short connections, unsigned short acquireTimeout )
-	: m_ID( id )
+	: m_ID( id ), m_connPool( acquireTimeout )
 {
 	m_connStr = buildConnStr( host, port,  dbName, user, password, connectTimeout );
-	LOG_DATA << "PostgreSQL database '" << m_ID << "' created with connection string <"
-		 << m_connStr << ">, " << connections << " connections, "
-		 << acquireTimeout << "s timeout";
+	LOG_DATA << "PostgreSQL database '" << m_ID << "' connection string <" << m_connStr << ">";
+	for ( size_t i = 0; i < connections; i++ )	{
+		PGconn* conn = PQconnectdb( m_connStr.c_str() );
+		if ( conn == NULL )
+			LOG_TRACE << "PostgreSQL PQconnectdb returned NULL";
+		else
+			m_connPool.add( conn );
+	}
+	LOG_DATA << "PostgreSQL database '" << m_ID << "' created with " << connections << " connections";
 }
 
 
 PostgreSQLdatabase::~PostgreSQLdatabase()
 {
+	m_connPool.timeout( 3 );
+
+	while ( m_connPool.available() )	{
+		PGconn* conn = m_connPool.get();
+		assert ( conn != NULL );
+		PQfinish( conn );
+	}
 }
 
 }} // _Wolframe::db

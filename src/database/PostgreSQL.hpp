@@ -58,8 +58,8 @@ public:
 	PostgreSQLconfig( const char* name, const char* logParent, const char* logName );
 	~PostgreSQLconfig()				{}
 
-	bool check() const;
-	void print( std::ostream& os, size_t indent ) const;
+	virtual bool check() const;
+	virtual void print( std::ostream& os, size_t indent ) const;
 private:
 	std::string	host;
 	unsigned short	port;
@@ -90,7 +90,7 @@ private:
 	const std::string	m_ID;			//< database ID
 	std::string		m_connStr;		//< connection string
 	std::list< PGconn* >	m_connections;		//< list of DB connections
-	ObjectPool< PGconn* >	m_connPool;		//< pool of connections
+	ObjectPool< PGconn >	m_connPool;		//< pool of connections
 };
 
 
@@ -101,8 +101,8 @@ public:
 	PostgreSQLcontainer( const PostgreSQLconfig& conf );
 	~PostgreSQLcontainer();
 
-	const std::string& ID() const			{ return m_db.ID(); }
-	const char* typeName() const			{ return m_db.typeName(); }
+	virtual const std::string& ID() const		{ return m_db.ID(); }
+	virtual const char* typeName() const		{ return m_db.typeName(); }
 	virtual const Database& database()		{ return m_db; }
 private:
 	PostgreSQLdatabase	m_db;

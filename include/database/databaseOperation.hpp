@@ -31,60 +31,43 @@
 
 ************************************************************************/
 //
-// database.hpp - Wolframe base database class
+// databaseOperation.hpp
 //
 
-#ifndef _DATABASE_HPP_INCLUDED
-#define _DATABASE_HPP_INCLUDED
+#ifndef _DATABASE_OPERATION_HPP_INCLUDED
+#define _DATABASE_OPERATION_HPP_INCLUDED
 
-#include <string>
+#include "database.hpp"
 
 namespace _Wolframe {
 namespace db {
 
-enum TransactionType	{
-	AUTHENTICATION,
-	AUTHORIZATION,
-	CLIENT_CONFIG,
-	OPERATION
+/***********************************************************************/
+
+namespace request {
+
+/// get a password string / digest for an user
+struct UserPassword : public DatabaseRequest
+{
+	virtual TransactionType type() const	{ return AUTHENTICATION; }
 };
 
-/// base class for database request
-class DatabaseRequest
-{
-public:
-	virtual ~DatabaseRequest()			{}
-	virtual TransactionType type() const = 0;
-};
+} // namespace request
+
+/***********************************************************************/
+
+namespace answer {
 
 /// base class for database answer
-class DatabaseAnswer
+struct UserPassword : public DatabaseAnswer
 {
-public:
-	enum AnswerType	{
-		USER_PASSWORD
-	};
-
-	virtual ~DatabaseAnswer()			{}
-	virtual TransactionType type() const = 0;
+	virtual TransactionType type() const	{ return AUTHENTICATION; }
 };
 
+} // namespace answer
 
-/// base class for database
-class Database
-{
-public:
-	virtual ~Database()				{}
-
-	virtual const std::string& ID() const = 0;
-	virtual const char* typeName() const = 0;
-
-	virtual bool doTransaction( DatabaseRequest& request, DatabaseAnswer& answer,
-				    unsigned short timeout, unsigned short retries ) = 0;
-	/* NOTE
-	 * There should be a connection to the auditing system somewhere */
-};
+/***********************************************************************/
 
 }} // namespace _Wolframe::db
 
-#endif // _DATABASE_HPP_INCLUDED
+#endif // _DATABASE_OPERATION_HPP_INCLUDED
