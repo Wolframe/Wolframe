@@ -72,12 +72,12 @@ class SQLiteDatabase : public Database
 public:
 	SQLiteDatabase( const std::string& id,
 			const std::string& filename, unsigned short connections, bool flag );
-	~SQLiteDatabase();
+	virtual ~SQLiteDatabase();
 
-	const std::string& ID() const			{ return m_ID; }
-	const char* typeName() const			{ return "SQLite"; }
-	bool doTransaction( DatabaseRequest&, DatabaseAnswer&,
-			    unsigned short, unsigned short ){ return true; }
+	virtual const std::string& ID() const		{ return m_ID; }
+	virtual const char* typeName() const		{ return "SQLite"; }
+	virtual bool doTransaction( DatabaseRequest&, DatabaseAnswer&,
+			    unsigned short, unsigned short );
 private:
 	const std::string	m_ID;
 	const std::string	m_filename;

@@ -80,11 +80,11 @@ public:
 			    const std::string& user, const std::string& password,
 			    unsigned short connectTimeout,
 			    unsigned short connections, unsigned short acquireTimeout );
-	~PostgreSQLdatabase();
+	virtual ~PostgreSQLdatabase();
 
-	const std::string& ID() const			{ return m_ID; }
-	const char* typeName() const			{ return "PostgreSQL"; }
-	bool doTransaction( DatabaseRequest&, DatabaseAnswer&,
+	virtual const std::string& ID() const		{ return m_ID; }
+	virtual const char* typeName() const		{ return "PostgreSQL"; }
+	virtual bool doTransaction( DatabaseRequest&, DatabaseAnswer&,
 			    unsigned short, unsigned short ){ return true; }
 private:
 	const std::string	m_ID;			//< database ID
