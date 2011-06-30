@@ -79,7 +79,7 @@ public:
 			    const std::string& host, unsigned short port, const std::string& dbName,
 			    const std::string& user, const std::string& password,
 			    unsigned short connectTimeout,
-			    unsigned short connections, unsigned short acquireTimeout );
+			    size_t connections, unsigned short acquireTimeout );
 	virtual ~PostgreSQLdatabase();
 
 	virtual const std::string& ID() const		{ return m_ID; }
@@ -89,6 +89,7 @@ public:
 private:
 	const std::string	m_ID;			//< database ID
 	std::string		m_connStr;		//< connection string
+	size_t			m_noConnections;	//< number of connections
 	std::list< PGconn* >	m_connections;		//< list of DB connections
 	ObjectPool< PGconn >	m_connPool;		//< pool of connections
 };
