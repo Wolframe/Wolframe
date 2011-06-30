@@ -49,10 +49,13 @@ THEMES = \
 
 local_test:
 
+HOST=localhost
+PORT=8081
+
 run: $(CPP_BINS)
-	@echo "Testing Wt webserver, connect to http://localhost:8080 now.."
+	@echo "Testing Wt webserver, connect to http://$(HOST):$(PORT) now.."
 	@./wtclient \
 		--docroot htdocs \
-		--http-address=localhost \
-		--http-port=8080
+		--http-address=$(HOST) \
+		--http-port=$(PORT)
 		-c etc/wt_config.xml
