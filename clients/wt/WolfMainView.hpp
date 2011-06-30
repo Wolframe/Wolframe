@@ -31,49 +31,43 @@
 
 ************************************************************************/
 
-#include "Wt/WApplication"
-#include "Wt/WOverlayLoadingIndicator"
+#ifndef _WOLF_MAIN_VIEW
+#define _WOLF_MAIN_VIEW
 
-#include "WolfMainView.hpp"
+#include "Wt/WContainerWidget"
+#include "Wt/WMenu"
+#include "Wt/WStackedWidget"
+#include "Wt/WText"
+#include "Wt/WSubMenuItem"
 
 using namespace Wt;
 
 namespace _Wolframe {
 	namespace WtClient {
 
-class WtClientApp : public WApplication
+class WolfMainView : public WContainerWidget
 {
-	private:
-		WolfMainView *main;
-
 	public:
-		WtClientApp( const WEnvironment &_env )
-			: WApplication( _env )
+		WolfMainView( WContainerWidget *_parent ) : WContainerWidget( _parent )
 		{
-			setTitle( "Wt Wolframe Client" );
-			useStyleSheet( "css/main.css" );
-			main = new WolfMainView( root( ) );
+// create the stack where the contents will be located
+ Wt::WStackedWidget *contents = new Wt::WStackedWidget(this);
+
+ // create a menu
+ Wt::WMenu *menu = new Wt::WMenu(contents, Wt::Horizontal, this);
+ menu->setRenderAsList(true);
+ menu->setStyleClass( WString("menu" ));
+
+ // add four items using the default lazy loading policy.
+ menu->addItem("Introduction", new Wt::WText("intro"));
+ menu->addItem("Download", new Wt::WText("Not yet available"));
+ menu->addItem("Demo", new Wt::WText("Not yet available"));
+ menu->addItem(new Wt::WMenuItem("Demo2", new Wt::WText("Not yet available")));
+
 		}
 };
 
 	} // namespace WtClient
 } // namespace _Wolframe
 
-namespace {
-
-using namespace _Wolframe::WtClient;
-
-WApplication *createApp( const WEnvironment &_env )
-{
-	WtClientApp *app = new WtClientApp( _env );
-	app->setLoadingIndicator( new WOverlayLoadingIndicator( ) );
-	return app;
-}
-
-}
-
-int main( int argc, char *argv[] )
-{
-	return WRun( argc, argv, &createApp );
-}
-
+#endif // _WOLF_MAIN_VIEW
