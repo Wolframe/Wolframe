@@ -81,8 +81,11 @@ public:
 
 	virtual bool doTransaction( DatabaseRequest& request, DatabaseAnswer& answer,
 				    unsigned short timeout, unsigned short retries ) = 0;
-	/* NOTE
-	 * There should be a connection to the auditing system somewhere */
+	/* NOTE */
+	/* There should be a connection to the auditing system somewhere */
+
+	/* we should also decide how we handle db encoding
+	virtual const char* encoding() const = 0; */
 };
 
 }} // namespace _Wolframe::db
