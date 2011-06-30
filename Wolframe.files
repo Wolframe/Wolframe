@@ -71,6 +71,10 @@ clients/qt/moc_WolframeClient.cpp
 clients/qt/qtclient.cpp
 clients/qt/WolframeClient.cpp
 clients/qt/WolframeClient.hpp
+clients/wt/etc/wt_config.xml
+clients/wt/GNUmakefile
+clients/wt/test.xml
+clients/wt/wtclient.cpp
 docs/AppServer/Appendix.xml
 docs/AppServer/AppServer.ent
 docs/AppServer/Glossary.xml
@@ -210,6 +214,7 @@ include/connectionEndpoint.hpp
 include/connectionHandler.hpp
 include/database/databaseContainer.hpp
 include/database/database.hpp
+include/database/databaseOperation.hpp
 include/database/databaseReference.hpp
 include/ErrorCodes.hpp
 include/GNUmakefile
@@ -429,4 +434,3 @@ windows/wolframe.xml
 XML/configuration.rng
 XML/database.rng
 XML/logging.rng
-include/database/databaseOperation.hpp
