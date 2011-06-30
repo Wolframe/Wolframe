@@ -30,64 +30,44 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// database.hpp - Wolframe base database class
-//
 
-#ifndef _DATABASE_HPP_INCLUDED
-#define _DATABASE_HPP_INCLUDED
+#ifndef _WOLF_MAIN_VIEW
+#define _WOLF_MAIN_VIEW
 
-#include <string>
+#include "Wt/WContainerWidget"
+#include "Wt/WMenu"
+#include "Wt/WStackedWidget"
+#include "Wt/WText"
+#include "Wt/WSubMenuItem"
+
+using namespace Wt;
 
 namespace _Wolframe {
-namespace db {
+	namespace WtClient {
 
-enum TransactionType	{
-	AUTHENTICATION,
-	AUTHORIZATION,
-	CLIENT_CONFIG,
-	OPERATION
-};
-
-/// base class for database request
-class DatabaseRequest
+class WolfMainView : public WContainerWidget
 {
-public:
-	virtual ~DatabaseRequest()			{}
-	virtual TransactionType type() const = 0;
+	public:
+		WolfMainView( WContainerWidget *_parent ) : WContainerWidget( _parent )
+		{
+// create the stack where the contents will be located
+ Wt::WStackedWidget *contents = new Wt::WStackedWidget(this);
+
+ // create a menu
+ Wt::WMenu *menu = new Wt::WMenu(contents, Wt::Horizontal, this);
+ menu->setRenderAsList(true);
+ menu->setStyleClass( WString("menu" ));
+
+ // add four items using the default lazy loading policy.
+ menu->addItem("Introduction", new Wt::WText("intro"));
+ menu->addItem("Download", new Wt::WText("Not yet available"));
+ menu->addItem("Demo", new Wt::WText("Not yet available"));
+ menu->addItem(new Wt::WMenuItem("Demo2", new Wt::WText("Not yet available")));
+
+		}
 };
 
-/// base class for database answer
-class DatabaseAnswer
-{
-public:
-	enum AnswerType	{
-		USER_PASSWORD
-	};
+	} // namespace WtClient
+} // namespace _Wolframe
 
-	virtual ~DatabaseAnswer()			{}
-	virtual TransactionType type() const = 0;
-};
-
-
-/// base class for database
-class Database
-{
-public:
-	virtual ~Database()				{}
-
-	virtual const std::string& ID() const = 0;
-	virtual const char* typeName() const = 0;
-
-	virtual bool doTransaction( DatabaseRequest& request, DatabaseAnswer& answer,
-				    unsigned short timeout, unsigned short retries ) = 0;
-	/* NOTE */
-	/* There should be a connection to the auditing system somewhere */
-
-	/* we should also decide how we handle db encoding
-	virtual const char* encoding() const = 0; */
-};
-
-}} // namespace _Wolframe::db
-
-#endif // _DATABASE_HPP_INCLUDED
+#endif // _WOLF_MAIN_VIEW

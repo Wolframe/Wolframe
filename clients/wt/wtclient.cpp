@@ -30,64 +30,50 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// database.hpp - Wolframe base database class
-//
 
-#ifndef _DATABASE_HPP_INCLUDED
-#define _DATABASE_HPP_INCLUDED
+#include "Wt/WApplication"
+#include "Wt/WOverlayLoadingIndicator"
 
-#include <string>
+#include "WolfMainView.hpp"
+
+using namespace Wt;
 
 namespace _Wolframe {
-namespace db {
+	namespace WtClient {
 
-enum TransactionType	{
-	AUTHENTICATION,
-	AUTHORIZATION,
-	CLIENT_CONFIG,
-	OPERATION
-};
-
-/// base class for database request
-class DatabaseRequest
+class WtClientApp : public WApplication
 {
-public:
-	virtual ~DatabaseRequest()			{}
-	virtual TransactionType type() const = 0;
+	private:
+		WolfMainView *main;
+
+	public:
+		WtClientApp( const WEnvironment &_env )
+			: WApplication( _env )
+		{
+			setTitle( "Wt Wolframe Client" );
+			useStyleSheet( "css/main.css" );
+			main = new WolfMainView( root( ) );
+		}
 };
 
-/// base class for database answer
-class DatabaseAnswer
+	} // namespace WtClient
+} // namespace _Wolframe
+
+namespace {
+
+using namespace _Wolframe::WtClient;
+
+WApplication *createApp( const WEnvironment &_env )
 {
-public:
-	enum AnswerType	{
-		USER_PASSWORD
-	};
+	WtClientApp *app = new WtClientApp( _env );
+	app->setLoadingIndicator( new WOverlayLoadingIndicator( ) );
+	return app;
+}
 
-	virtual ~DatabaseAnswer()			{}
-	virtual TransactionType type() const = 0;
-};
+}
 
-
-/// base class for database
-class Database
+int main( int argc, char *argv[] )
 {
-public:
-	virtual ~Database()				{}
+	return WRun( argc, argv, &createApp );
+}
 
-	virtual const std::string& ID() const = 0;
-	virtual const char* typeName() const = 0;
-
-	virtual bool doTransaction( DatabaseRequest& request, DatabaseAnswer& answer,
-				    unsigned short timeout, unsigned short retries ) = 0;
-	/* NOTE */
-	/* There should be a connection to the auditing system somewhere */
-
-	/* we should also decide how we handle db encoding
-	virtual const char* encoding() const = 0; */
-};
-
-}} // namespace _Wolframe::db
-
-#endif // _DATABASE_HPP_INCLUDED
