@@ -48,7 +48,7 @@ namespace db {
 
 //***  SQLite configuration functions  **************************************
 SQLiteConfig::SQLiteConfig( const char* name, const char* logParent, const char* logName )
-	: ModuleConfiguration< SQLiteConfig, DatabaseConfig >( name, logParent, logName )
+	: module::ModuleConfiguration< SQLiteConfig, DatabaseConfig >( name, logParent, logName )
 {
 	flag = false;
 }
@@ -102,7 +102,7 @@ SQLiteDatabase::SQLiteDatabase(  const std::string& id,
 		m_connections.push_back( handle );
 		m_connPool.add( &handle );
 	}
-	
+
 	LOG_NOTICE << "SQLite database '" << m_ID << "' created with "
 		   << "filename '" << m_filename << "'";
 }

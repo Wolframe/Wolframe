@@ -49,7 +49,7 @@ class TextFileAuthConfig :  public module::ModuleConfiguration< TextFileAuthConf
 	friend class config::ConfigurationParser;
 public:
 	TextFileAuthConfig( const char* cfgName, const char* logParent, const char* logName )
-		: ModuleConfiguration< TextFileAuthConfig, AuthenticationConfiguration >( cfgName, logParent, logName ) {}
+		: module::ModuleConfiguration< TextFileAuthConfig, AuthenticationConfiguration >( cfgName, logParent, logName ) {}
 
 	virtual const char* typeName() const			{ return "TextFileAuth"; }
 

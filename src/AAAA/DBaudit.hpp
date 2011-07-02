@@ -49,7 +49,7 @@ class DBauditConfig : public module::ModuleConfiguration< DBauditConfig, AuditCo
 	friend class config::ConfigurationParser;
 public:
 	DBauditConfig( const char* cfgName, const char* logParent, const char* logName )
-		: ModuleConfiguration< DBauditConfig, AuditConfiguration >( cfgName, logParent, logName ),
+		: module::ModuleConfiguration< DBauditConfig, AuditConfiguration >( cfgName, logParent, logName ),
 		  m_dbConfig( "", logParent, "" )		{}
 
 	const char* typeName() const				{ return "DatabaseAudit"; }

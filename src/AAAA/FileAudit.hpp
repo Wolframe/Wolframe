@@ -50,7 +50,7 @@ class FileAuditConfig : public module::ModuleConfiguration< FileAuditConfig, Aud
 	friend class config::ConfigurationParser;
 public:
 	FileAuditConfig( const char* cfgName, const char* logParent, const char* logName )
-		: ModuleConfiguration< FileAuditConfig, AuditConfiguration >( cfgName, logParent, logName ) {}
+		: module::ModuleConfiguration< FileAuditConfig, AuditConfiguration >( cfgName, logParent, logName ) {}
 
 	const char* typeName() const			{ return "FileAudit"; }
 

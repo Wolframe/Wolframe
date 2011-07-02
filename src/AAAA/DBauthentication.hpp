@@ -49,7 +49,7 @@ class DatabaseAuthConfig : public module::ModuleConfiguration< DatabaseAuthConfi
 	friend class config::ConfigurationParser;
 public:
 	DatabaseAuthConfig( const char* cfgName, const char* logParent, const char* logName )
-		: ModuleConfiguration< DatabaseAuthConfig, AuthenticationConfiguration >( cfgName, logParent, logName ),
+		: module::ModuleConfiguration< DatabaseAuthConfig, AuthenticationConfiguration >( cfgName, logParent, logName ),
 		  m_dbConfig( "", logParent, "Database" )	{}
 
 	virtual const char* typeName() const			{ return "DatabaseAuth"; }
