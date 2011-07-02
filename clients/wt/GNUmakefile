@@ -13,7 +13,7 @@ INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
-	-lwt -lwthttp -lwt \
+	-lwt -lwthttp -lwt -lwtext \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_signals -lboost_date_time -lboost_regex \
 	-lboost_program_options -lboost_filesystem
