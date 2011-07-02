@@ -78,20 +78,20 @@ bool ConfigurationParser::parse( ServiceBanner& cfg,
 {
 
 	if ( boost::algorithm::iequals( node, "ServerTokens" ))	{
-		bool tokensDefined = ( cfg.tokens_ != ServiceBanner::UNDEFINED );
+		bool tokensDefined = ( cfg.m_tokens != ServiceBanner::UNDEFINED );
 		std::string	val;
 		if ( !Parser::getValue( cfg.logPrefix().c_str(), node.c_str(), pt.get_value<std::string>(),
 					val, &tokensDefined ))
 			return false;
-		cfg.tokens_ = strToToken( val );
-		if ( cfg.tokens_ == ServiceBanner::UNDEFINED )	{
+		cfg.m_tokens = strToToken( val );
+		if ( cfg.m_tokens == ServiceBanner::UNDEFINED )	{
 			LOG_ERROR << cfg.logPrefix() << "Unknown option '" << val << "' for " << node;
 			return false;
 		}
 	}
 	else if ( boost::algorithm::iequals( node, "ServerSignature" ))	{
 		if ( !Parser::getValue( cfg.logPrefix().c_str(), node.c_str(), pt.get_value<std::string>(),
-				       cfg.serverName_, Parser::BoolDomain(), &cfg.serverNameDefined_ ))
+				       cfg.m_serverName, Parser::BoolDomain(), &cfg.m_serverNameDefined ))
 			return false;
 	}
 	else	{
@@ -105,7 +105,7 @@ bool ConfigurationParser::parse( ServiceBanner& cfg,
 
 bool ServiceBanner::check() const
 {
-	switch ( tokens_ )	{
+	switch ( m_tokens )	{
 	case PRODUCT_NAME:
 	case VERSION_MAJOR:
 	case VERSION_MINOR:
@@ -115,7 +115,7 @@ bool ServiceBanner::check() const
 	case UNDEFINED:
 		return true;
 	default:
-		LOG_ERROR << "Unknown value for ServiceBanner::tokens: " << (int)tokens_;
+		LOG_ERROR << "Unknown value for ServiceBanner::tokens: " << (int)m_tokens;
 		return false;
 	}
 	// for stupid compilers
@@ -126,7 +126,7 @@ void ServiceBanner::print( std::ostream& os, size_t /* indent */ ) const
 {
 	os << sectionName() << std::endl;
 	os << "   Service banner: ";
-	switch ( tokens_ )	{
+	switch ( m_tokens )	{
 	case PRODUCT_NAME:	os << "product name only"; break;
 	case VERSION_MAJOR:	os << "product name and major version"; break;
 	case VERSION_MINOR:	os << "product name and minor version"; break;
@@ -137,7 +137,7 @@ void ServiceBanner::print( std::ostream& os, size_t /* indent */ ) const
 	default:		os << "NOT DEFINED !"; break;
 	}
 	os << std::endl;
-	os << "   Print service name: " << ( serverName_ ? "yes" : "no" ) << std::endl;
+	os << "   Print service name: " << ( m_serverName ? "yes" : "no" ) << std::endl;
 }
 
 
@@ -145,7 +145,7 @@ std::string ServiceBanner::toString() const
 {
 	std::string	banner;
 
-	switch ( tokens_ )	{
+	switch ( m_tokens )	{
 	case PRODUCT_NAME:
 		banner = "Wolframe";
 		break;
@@ -165,7 +165,7 @@ std::string ServiceBanner::toString() const
 	case UNDEFINED:
 	default:		throw std::domain_error( "ServiceBanner: unknown ServerTokens value" );
 	}
-	if ( serverName_ )
+	if ( m_serverName )
 		banner = "GogoServer " + banner;
 
 	return banner;

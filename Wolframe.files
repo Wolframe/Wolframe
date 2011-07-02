@@ -73,7 +73,7 @@ clients/qt/WolframeClient.cpp
 clients/qt/WolframeClient.hpp
 clients/wt/etc/wt_config.xml
 clients/wt/GNUmakefile
-clients/wt/test.xml
+clients/wt/WolfMainView.hpp
 clients/wt/wtclient.cpp
 docs/AppServer/Appendix.xml
 docs/AppServer/AppServer.ent
@@ -226,6 +226,7 @@ include/logger/logLevel.hpp
 include/logger/logSyslogFacility.hpp
 include/miscUtils.hpp
 include/moduleInterface.hpp
+include/moduleLoaderConfig.hpp
 include/objectPool.hpp
 include/protocol/buffers.hpp
 include/protocol/formatoutput.hpp
@@ -381,6 +382,7 @@ src/logger/logSyslogFacility.cpp
 src/logger/syslog_win32.c
 src/logger/syslog_win32.h
 src/Makefile.W32
+src/moduleLoaderConfig.cpp
 src/posixMain.cpp
 src/protocol_ioblocks.cpp
 src/resolvePath.cpp

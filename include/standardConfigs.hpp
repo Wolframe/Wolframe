@@ -49,145 +49,143 @@
 
 namespace _Wolframe {
 namespace net	{
-	/// network server configuration
-	struct Configuration : public _Wolframe::config::ConfigurationBase
-	{
-	public:
-		unsigned short		threads;
-		unsigned short		maxConnections;
+/// network server configuration
+struct Configuration : public _Wolframe::config::ConfigurationBase
+{
+public:
+	unsigned short		threads;
+	unsigned short		maxConnections;
 
-		// listen on
-		std::list<net::ServerTCPendpoint> address;
-	#ifdef WITH_SSL
-		std::list<net::ServerSSLendpoint> SSLaddress;
-	#endif // WITH_SSL
+	// listen on
+	std::list<net::ServerTCPendpoint> address;
+#ifdef WITH_SSL
+	std::list<net::ServerSSLendpoint> SSLaddress;
+#endif // WITH_SSL
 
-		/// constructor
-		Configuration();
+	/// constructor
+	Configuration();
 
-		/// methods
-		bool check() const;
-		void print( std::ostream& os, size_t indent ) const;
+	/// methods
+	bool check() const;
+	void print( std::ostream& os, size_t indent ) const;
 
-		void setCanonicalPathes( const std::string& referencePath );
+	void setCanonicalPathes( const std::string& referencePath );
 
-		//			Not implemented yet, inherited from base for the time being
-		//			bool test() const;
-	};
+//	Not implemented yet, inherited from base for the time being
+//	bool test() const;
+};
 
 } // namespace net
 
 namespace log	{
 
-	/// logger configuration
-	struct LoggerConfiguration : public _Wolframe::config::ConfigurationBase
-	{
-	public:
-		bool			logToStderr;
-		LogLevel::Level		stderrLogLevel;
+/// logger configuration
+struct LoggerConfiguration : public _Wolframe::config::ConfigurationBase
+{
+public:
+	bool			logToStderr;
+	LogLevel::Level		stderrLogLevel;
 
-		bool			logToFile;
-		std::string		logFile;
-		LogLevel::Level		logFileLogLevel;
-		std::string		logFileIdent;
-		bool			logToSyslog;
-		SyslogFacility::Facility syslogFacility;
-		LogLevel::Level		syslogLogLevel;
-		std::string		syslogIdent;
+	bool			logToFile;
+	std::string		logFile;
+	LogLevel::Level		logFileLogLevel;
+	std::string		logFileIdent;
+	bool			logToSyslog;
+	SyslogFacility::Facility syslogFacility;
+	LogLevel::Level		syslogLogLevel;
+	std::string		syslogIdent;
 #if defined( _WIN32 )
-		bool			logToEventlog;
-		std::string		eventlogLogName;
-		std::string		eventlogSource;
-		LogLevel::Level eventlogLogLevel;
+	bool			logToEventlog;
+	std::string		eventlogLogName;
+	std::string		eventlogSource;
+	LogLevel::Level eventlogLogLevel;
 #endif // defined( _WIN32 )
 
-		/// constructor
-		LoggerConfiguration();
+	/// constructor
+	LoggerConfiguration();
 
-		/// methods
-		bool check() const;
-		void print( std::ostream& os, size_t indent ) const;
+	/// methods
+	bool check() const;
+	void print( std::ostream& os, size_t indent ) const;
 
-		void setCanonicalPathes( const std::string& referencePath );
+	void setCanonicalPathes( const std::string& referencePath );
 
-//		Not implemented yet, inherited from base for the time being
-//		bool test() const;
+//	Not implemented yet, inherited from base for the time being
+//	bool test() const;
 
-		void foreground( LogLevel::Level debugLevel, bool useConfig );
-	};
+	void foreground( LogLevel::Level debugLevel, bool useConfig );
+};
 
 } // namespace log
 
 namespace config	{
 
-	/// daemon / service configuration
-	struct ServiceConfiguration : public _Wolframe::config::ConfigurationBase
-	{
-	public:
+/// daemon / service configuration
+struct ServiceConfiguration : public _Wolframe::config::ConfigurationBase
+{
+public:
 #if !defined( _WIN32 )
-		// daemon configuration
-		std::string		user;
-		std::string		group;
-		std::string		pidFile;
+	// daemon configuration
+	std::string		user;
+	std::string		group;
+	std::string		pidFile;
 #endif
 #if defined( _WIN32 )
-		// Windows service configuration
-		std::string		serviceName;
-		std::string		serviceDisplayName;
-		std::string		serviceDescription;
+	// Windows service configuration
+	std::string		serviceName;
+	std::string		serviceDisplayName;
+	std::string		serviceDescription;
 #endif // !defined( _WIN32 )
 
-		/// constructor
-		ServiceConfiguration();
+	/// constructor
+	ServiceConfiguration();
 
-		/// methods
-		bool check() const;
-		void print( std::ostream& os, size_t indent ) const;
+	/// methods
+	bool check() const;
+	void print( std::ostream& os, size_t indent ) const;
 
-//			Not implemented yet, inherited from base for the time being
-//			bool test() const;
+//	Not implemented yet, inherited from base for the time being
+//	bool test() const;
 
 #if !defined( _WIN32 )
-		void setCanonicalPathes( const std::string& referencePath );
-		void override( const std::string& user, const std::string& group, const std::string& pidFile );
+	void setCanonicalPathes( const std::string& referencePath );
+	void override( const std::string& user, const std::string& group, const std::string& pidFile );
 #endif // !defined( _WIN32 )
+};
+
+
+/// Service signature
+class ServiceBanner : public _Wolframe::config::ConfigurationBase
+{
+	friend class ConfigurationParser;
+public:
+	enum SignatureTokens	{
+		PRODUCT_NAME,
+		VERSION_MAJOR,
+		VERSION_MINOR,
+		VERSION_REVISION,
+		PRODUCT_OS,
+		NONE,
+		UNDEFINED
 	};
 
+	/// constructor
+	ServiceBanner() : ConfigurationBase( "Service Banner", NULL, "Service banner" ),
+		m_tokens( UNDEFINED ), m_serverName( false ), m_serverNameDefined( false )	{}
+	/// methods
+	std::string toString() const;
 
-	/// Service signature
-	class ServiceBanner : public _Wolframe::config::ConfigurationBase
-	{
-		friend class ConfigurationParser;
-	public:
-		enum SignatureTokens	{
-			PRODUCT_NAME,
-			VERSION_MAJOR,
-			VERSION_MINOR,
-			VERSION_REVISION,
-			PRODUCT_OS,
-			NONE,
-			UNDEFINED
-		};
+	bool check() const;
+	void print( std::ostream& os, size_t indent ) const;
 
-		/// constructor
-		ServiceBanner() : ConfigurationBase( "Service Banner", NULL, "Service banner" ),
-						tokens_( UNDEFINED ),
-						serverName_( false ),
-						serverNameDefined_( false )	{}
-		/// methods
-		std::string toString() const;
-
-		bool check() const;
-		void print( std::ostream& os, size_t indent ) const;
-
-//		Not implemented yet, inherited from base for the time being
-//		bool test() const;
-	protected:
-		/// data members
-		SignatureTokens	tokens_;
-		bool		serverName_;
-		bool		serverNameDefined_;
-	};
+//	Not implemented yet, inherited from base for the time being
+//	bool test() const;
+protected:
+	/// data members
+	SignatureTokens	m_tokens;
+	bool		m_serverName;
+	bool		m_serverNameDefined;
+};
 
 } // namespace config
 } // namespace _Wolframe

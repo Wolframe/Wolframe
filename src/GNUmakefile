@@ -86,7 +86,7 @@ INCLUDE_LIBS += \
 
 endif
 
-ifeq ($(WITH_LOCAL_SQLITE3),1)   
+ifeq ($(WITH_LOCAL_SQLITE3),1)
 
 INCLUDE_DIRS += \
 	-I$(TOPDIR)/sqlite3
@@ -188,6 +188,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	connection.o \
 	serverConfig.o \
 	server.o \
+	moduleLoaderConfig.o \
 	$(DB_OBJS) \
 	$(AAAA_OBJS)
 

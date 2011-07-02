@@ -31,47 +31,39 @@
 
 ************************************************************************/
 //
-// handlerConfig.hpp
+// module loader configuration structure
 //
 
-#ifndef _HANDLERCONFIG_HPP_INCLUDED
-#define _HANDLERCONFIG_HPP_INCLUDED
+#ifndef _MODULE_LOADER_CONFIG_HPP_INCLUDED
+#define _MODULE_LOADER_CONFIG_HPP_INCLUDED
 
-#include "standardConfigs.hpp"
-#include "moduleLoaderConfig.hpp"
-#include "database/database.hpp"
-#include "AAAA/AAAAprovider.hpp"
+#include <list>
+#include <string>
+
+#include "config/configurationBase.hpp"
 
 namespace _Wolframe {
+namespace config {
 
-	/// Wolframe handler configuration structure
-	struct HandlerConfiguration
-	{
-	public:
-		db::DBproviderConfig	*database;
-		config::ModuleLoaderConfiguration *modules;
-		config::ServiceBanner	*banner;
-		AAAA::AAAAconfiguration	*aaaa;
+/// module loader configuration
+class ModuleLoaderConfiguration : public _Wolframe::config::ConfigurationBase
+{
+	friend class ConfigurationParser;
+public:
+	/// constructor
+	ModuleLoaderConfiguration() : ConfigurationBase( "Module(s) to load", NULL, "Module loader" )	{}
+	~ModuleLoaderConfiguration();
 
-		/// constructor
-		HandlerConfiguration()
-		{
-			banner = new config::ServiceBanner();
-			modules = new config::ModuleLoaderConfiguration();
-			database = new db::DBproviderConfig();
-			aaaa = new AAAA::AAAAconfiguration();
-		}
+	/// methods
+	bool check() const;
+	void print( std::ostream& os, size_t indent ) const;
+#if !defined( _WIN32 )
+	void setCanonicalPathes( const std::string& referencePath );
+#endif // !defined( _WIN32 )
+private:
+	std::list< std::string* >	m_moduleFile;
+};
 
-		~HandlerConfiguration()
-		{
-			if ( banner ) delete banner;
-			if ( modules ) delete modules;
-			if ( database ) delete database;
-			if ( aaaa ) delete aaaa;
-		}
-	};
+}} // namespace _Wolframe::config
 
-
-} // namespace _Wolframe
-
-#endif // _HANDLERCONFIG_HPP_INCLUDED
+#endif // _MODULE_LOADER_CONFIG_HPP_INCLUDED

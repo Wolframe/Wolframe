@@ -36,6 +36,7 @@
 
 #include "appConfig.hpp"
 #include "standardConfigs.hpp"
+#include "moduleLoaderConfig.hpp"
 #include "handlerConfig.hpp"
 #include "server.hpp"
 #include "config/configurationParser.hpp"
@@ -59,6 +60,8 @@ ApplicationConfiguration::ApplicationConfiguration()
 	// appropriate action
 	addConfig( "service", serviceConf, &ConfigurationParser::parseBase<config::ServiceConfiguration> );
 	addConfig( "daemon", serviceConf, &ConfigurationParser::parseBase<config::ServiceConfiguration> );
+
+	addConfig( "LoadModules", handlerConf->modules, &ConfigurationParser::parseBase<config::ModuleLoaderConfiguration> );
 
 	addConfig( "ServerTokens", handlerConf->banner, &ConfigurationParser::parseBase<config::ServiceBanner> );
 	addConfig( "ServerSignature", handlerConf->banner, &ConfigurationParser::parseBase<config::ServiceBanner> );
