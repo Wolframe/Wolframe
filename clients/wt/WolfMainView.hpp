@@ -35,9 +35,10 @@
 #define _WOLF_MAIN_VIEW
 
 #include "Wt/WContainerWidget"
-#include "Wt/WImage"
 #include "Wt/WText"
 #include "Wt/WGridLayout"
+#include "Wt/WScrollArea"
+#include "Wt/WScrollBar"
 
 #include "Wt/Ext/Menu"
 #include "Wt/Ext/ToolBar"
@@ -94,32 +95,17 @@ class WolfMainView : public WContainerWidget
 		{
 			Dialog dialog;
 			dialog.setWindowTitle( "About Wt" );
-			dialog.resize( 400,300 );
+			dialog.setAutoScrollBars( true );
 
 			Button *okButton = new Button( "Ok" );
 			okButton->activated( ).connect( SLOT( &dialog, Dialog::accept ) );
 			dialog.addButton( okButton );
 			okButton->setDefault( true );
 
-			WContainerWidget *theContents = new WContainerWidget( );
-			dialog.contents( )->addWidget( theContents );
-			WGridLayout *theLayout = new WGridLayout( );
-			theContents->setLayout( theLayout );
-
-/*
-			WImage *image = new WImage( "images/emweb_powered.jpg" );
-			theContents->addWidget( image );
-			theLayout->addWidget( image, 0, 0 );
-
-			image = new WImage( "images/wt.png" );
-			theContents->addWidget( image );
-			theLayout->addWidget( image, 0, 2 );
-*/
-
 			WText *text = new WText( tr( "about.wt" ), Wt::XHTMLText );
-			theContents->addWidget( text );
-			theLayout->addWidget( text, 0, 0 );
+			dialog.contents( )->addWidget( text );
 
+			dialog.resize( 500,300 );
 			dialog.exec( );
 		}
 };
