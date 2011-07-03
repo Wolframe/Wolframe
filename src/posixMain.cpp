@@ -181,6 +181,13 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 			return _Wolframe::ErrorCodes::OK;
 		}
 
+		// Check the configuration before starting the service
+		if ( !conf.check() )	{
+			std::cout << std::endl << "Daemon not started because of a configuration ERROR"
+				  << std::endl << std::endl;
+			return _Wolframe::ErrorCodes::FAILURE;
+		}
+
 		// Daemon stuff
 		if( !conf.foreground ) {
 			// Aba: maybe also in the foreground?
