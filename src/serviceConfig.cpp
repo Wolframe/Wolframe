@@ -83,12 +83,12 @@ bool ConfigurationParser::parse( ServiceConfiguration& cfg,
 					retVal = false;
 				else	{
 					if ( ! boost::filesystem::path( cfg.pidFile ).is_absolute() )
-						LOG_WARNING << cfg.logPrefix() << ": pid file path is not absolute: "
+						LOG_WARNING << cfg.logPrefix() << "pid file path is not absolute: "
 							    << cfg.pidFile;
 				}
 			}
 			else	{
-				LOG_WARNING << cfg.logPrefix() << ": unknown configuration option: '"
+				LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
 					    << L1it->first << "'";
 			}
 		}
@@ -117,7 +117,7 @@ bool ConfigurationParser::parse( ServiceConfiguration& cfg,
 					retVal = false;
 			}
 			else	{
-				LOG_WARNING << cfg.logPrefix() << ": unknown configuration option: '"
+				LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
 					    << L1it->first << "'";
 			}
 		}
@@ -130,7 +130,7 @@ bool ConfigurationParser::parse( ServiceConfiguration& cfg,
 	}
 #endif
 	else	{
-		LOG_WARNING << cfg.logPrefix() << ": unknown configuration option: '" << node << "'";
+		LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '" << node << "'";
 	}
 	return retVal;
 }

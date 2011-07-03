@@ -68,9 +68,9 @@ void PostgreSQLconfig::print( std::ostream& os, size_t indent ) const
 	os << indStr << "   Database user: " << (user.empty() ? "(not specified - same as server user)" : user)
 	   << ", password: " << (password.empty() ? "(not specified - no password used)" : password) << std::endl;
 	if ( connectTimeout == 0 )
-		os << "   Connect timeout: 0 (wait indefinitely)" << std::endl;
+		os << indStr << "   Connect timeout: 0 (wait indefinitely)" << std::endl;
 	else
-		os << "   Connect timeout: " << connectTimeout << "s" << std::endl;
+		os << indStr << "   Connect timeout: " << connectTimeout << "s" << std::endl;
 	os << indStr << "   Database connections: " << connections << std::endl;
 	if ( connectTimeout == 0 )
 		os << indStr << "   Acquire database connection timeout: 0 (wait indefinitely)" << std::endl;

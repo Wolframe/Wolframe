@@ -57,7 +57,7 @@ using namespace _Wolframe;
 
 static const size_t noProcModules = 1;
 static module::ModuleConfigurationDescription< WolframeProcConfig >
-procConfigs[ noProcModules ] = { module::ModuleConfigurationDescription< WolframeProcConfig >( "Echo processor", "echo", "echo processor",
+procConfigs[ noProcModules ] = { module::ModuleConfigurationDescription< WolframeProcConfig >( "echoProcessor", "Echo Processor", "echoProcessor",
 				 EchoProcConfig::create,
 				 &config::ConfigurationParser::parseBase< EchoProcConfig > ) };
 

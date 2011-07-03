@@ -64,7 +64,7 @@ bool ConfigurationParser::parse( EchoConfiguration& cfg,
 			isDefined = true;
 		}
 		else	{
-			LOG_WARNING << cfg.logPrefix() << ": unknown configuration option: '"
+			LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
 				    << L1it->first << "'";
 		}
 	}

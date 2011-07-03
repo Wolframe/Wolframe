@@ -55,13 +55,13 @@ bool ConfigurationParser::parse( EchoProcConfig& cfg,
 	bool isDefined = false;
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
-		if ( boost::algorithm::iequals( L1it->first, "idle" ))	{
+		if ( boost::algorithm::iequals( L1it->first, "timeout" ))	{
 			if ( !config::Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.m_timeout ))
 				retVal = false;
 			isDefined = true;
 		}
 		else	{
-			LOG_WARNING << cfg.logPrefix() << ": unknown configuration option: '"
+			LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
 				    << L1it->first << "'";
 		}
 	}
@@ -82,7 +82,10 @@ void EchoProcConfig::print( std::ostream& os, size_t indent ) const
 {
 	std::string indStr( indent, ' ' );
 	os << indStr << sectionName() << std::endl;
-	os << indStr << "   Idle timeout: " << m_timeout << std::endl;
+	if ( m_timeout > 0 )
+		os << indStr << "   Idle timeout: " << m_timeout << "s" << std::endl;
+	else
+		os << indStr << "   Idle timeout: no timeout" << std::endl;
 }
 
 void EchoProcConfig::setCanonicalPathes( const std::string& /*refPath*/ )
