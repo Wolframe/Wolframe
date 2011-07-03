@@ -31,51 +31,50 @@
 
 ************************************************************************/
 //
-// DBprovider.hpp
+// Wolframe processor group
 //
 
-#ifndef _DATABASE_PROVIDER_HPP_INCLUDED
-#define _DATABASE_PROVIDER_HPP_INCLUDED
+#ifndef _WOLFRAME_PROCESSOR_GROUP_HPP_INCLUDED
+#define _WOLFRAME_PROCESSOR_GROUP_HPP_INCLUDED
+
+#include "config/configurationBase.hpp"
+#include "moduleInterface.hpp"
+#include "WolframeProcContainer.hpp"
 
 #include <list>
-#include "config/configurationBase.hpp"
-#include "database/database.hpp"
-#include "database/databaseContainer.hpp"
 
 namespace _Wolframe {
-namespace db {
 
-/// database configuration
-class DBproviderConfig : public config::ConfigurationBase
+class WolframeProcGroupConfig : public config::ConfigurationBase
 {
-	friend class DatabaseProvider;
+	friend class WolframeProcGroup;
 	friend class config::ConfigurationParser;
 public:
+	std::list<WolframeProcConfig*>	m_procConfig;
+
 	/// constructor & destructor
-	DBproviderConfig() : ConfigurationBase( "Database(s)", NULL, "Database configuration" )	{}
-	~DBproviderConfig();
+	WolframeProcGroupConfig()
+		: ConfigurationBase( "Processor(s)", NULL, "Processor configuration" )	{}
+	~WolframeProcGroupConfig();
 
 	/// methods
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 	virtual void setCanonicalPathes( const std::string& referencePath );
-private:
-	std::list<DatabaseConfig*>	m_dbConfig;
 };
 
-///
-///
-class DatabaseProvider
+
+class WolframeProcGroup
 {
 public:
-	DatabaseProvider( const DBproviderConfig& conf );
-	~DatabaseProvider();
+	WolframeProcGroup( const WolframeProcGroupConfig& conf );
+	~WolframeProcGroup();
 
-	const Database* database( const std::string& ID ) const;
+	const WolframeProcessorChannel* procChannel() const;
 private:
-	std::list<DatabaseContainer*>	m_db;
+	std::list<WolframeProcContainer*>	m_proc;
 };
 
-}} // namespace _Wolframe::db
+} // namespace _Wolframe
 
-#endif // _DATABASE_PROVIDER_HPP_INCLUDED
+#endif // _WOLFRAME_PROCESSOR_GROUP_HPP_INCLUDED

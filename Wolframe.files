@@ -436,3 +436,9 @@ windows/wolframe.xml
 XML/configuration.rng
 XML/database.rng
 XML/logging.rng
+include/WolframeProcessor.hpp
+include/WolframeProcContainer.hpp
+src/WolframeProcGroup.hpp
+src/WolframeProcGroup.cpp
+src/echoProcessor.cpp
+src/echoProcessor.hpp

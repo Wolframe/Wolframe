@@ -39,8 +39,9 @@
 
 #include "standardConfigs.hpp"
 #include "moduleLoaderConfig.hpp"
-#include "database/database.hpp"
+#include "database/DBprovider.hpp"
 #include "AAAA/AAAAprovider.hpp"
+#include "WolframeProcGroup.hpp"
 
 namespace _Wolframe {
 
@@ -52,6 +53,7 @@ namespace _Wolframe {
 		config::ModuleLoaderConfiguration *modules;
 		config::ServiceBanner	*banner;
 		AAAA::AAAAconfiguration	*aaaa;
+		WolframeProcGroupConfig	*proc;
 
 		/// constructor
 		HandlerConfiguration()
@@ -60,6 +62,7 @@ namespace _Wolframe {
 			modules = new config::ModuleLoaderConfiguration();
 			database = new db::DBproviderConfig();
 			aaaa = new AAAA::AAAAconfiguration();
+			proc = new WolframeProcGroupConfig();
 		}
 
 		~HandlerConfiguration()
@@ -68,6 +71,7 @@ namespace _Wolframe {
 			if ( modules ) delete modules;
 			if ( database ) delete database;
 			if ( aaaa ) delete aaaa;
+			if ( proc ) delete proc;
 		}
 	};
 

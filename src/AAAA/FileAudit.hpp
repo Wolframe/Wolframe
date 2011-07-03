@@ -68,7 +68,7 @@ class FileAuditContainer : public module::ModuleContainer< FileAuditContainer, F
 {
 public:
 	FileAuditContainer( const FileAuditConfig& conf );
-	~FileAuditContainer()					{}
+	~FileAuditContainer()				{}
 
 	const char* typeName() const			{ return "FileAudit"; }
 private:

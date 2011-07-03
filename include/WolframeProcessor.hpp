@@ -31,51 +31,33 @@
 
 ************************************************************************/
 //
-// DBprovider.hpp
+// Wolframe processor base class
 //
 
-#ifndef _DATABASE_PROVIDER_HPP_INCLUDED
-#define _DATABASE_PROVIDER_HPP_INCLUDED
-
-#include <list>
-#include "config/configurationBase.hpp"
-#include "database/database.hpp"
-#include "database/databaseContainer.hpp"
+#ifndef _WOLFRAME_PROCESSOR_HPP_INCLUDED
+#define _WOLFRAME_PROCESSOR_HPP_INCLUDED
 
 namespace _Wolframe {
-namespace db {
 
-/// database configuration
-class DBproviderConfig : public config::ConfigurationBase
-{
-	friend class DatabaseProvider;
-	friend class config::ConfigurationParser;
-public:
-	/// constructor & destructor
-	DBproviderConfig() : ConfigurationBase( "Database(s)", NULL, "Database configuration" )	{}
-	~DBproviderConfig();
-
-	/// methods
-	bool check() const;
-	void print( std::ostream& os, size_t indent ) const;
-	virtual void setCanonicalPathes( const std::string& referencePath );
-private:
-	std::list<DatabaseConfig*>	m_dbConfig;
-};
-
-///
-///
-class DatabaseProvider
+/// base class for Wolframe processors channels
+class WolframeProcessorChannel
 {
 public:
-	DatabaseProvider( const DBproviderConfig& conf );
-	~DatabaseProvider();
+	virtual ~WolframeProcessorChannel()		{}
 
-	const Database* database( const std::string& ID ) const;
-private:
-	std::list<DatabaseContainer*>	m_db;
+	virtual void close() const = 0;
 };
 
-}} // namespace _Wolframe::db
 
-#endif // _DATABASE_PROVIDER_HPP_INCLUDED
+/// base class for Wolframe processors
+class WolframeProcessor
+{
+public:
+	virtual ~WolframeProcessor()			{}
+
+	virtual const char* typeName() const = 0;
+};
+
+} // namespace _Wolframe
+
+#endif // _WOLFRAME_PROCESSOR_HPP_INCLUDED

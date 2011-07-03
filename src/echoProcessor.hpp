@@ -31,51 +31,48 @@
 
 ************************************************************************/
 //
-// DBprovider.hpp
+// echo processor
 //
 
-#ifndef _DATABASE_PROVIDER_HPP_INCLUDED
-#define _DATABASE_PROVIDER_HPP_INCLUDED
+#ifndef _ECHO_PROCESSOR_HPP_INCLUDED
+#define _ECHO_PROCESSOR_HPP_INCLUDED
 
-#include <list>
-#include "config/configurationBase.hpp"
-#include "database/database.hpp"
-#include "database/databaseContainer.hpp"
+#include "WolframeProcContainer.hpp"
+#include "moduleInterface.hpp"
 
 namespace _Wolframe {
-namespace db {
 
-/// database configuration
-class DBproviderConfig : public config::ConfigurationBase
+class EchoProcConfig : public module::ModuleConfiguration< EchoProcConfig, WolframeProcConfig >
 {
-	friend class DatabaseProvider;
+	friend class EchoProcContainer;
 	friend class config::ConfigurationParser;
 public:
-	/// constructor & destructor
-	DBproviderConfig() : ConfigurationBase( "Database(s)", NULL, "Database configuration" )	{}
-	~DBproviderConfig();
+	EchoProcConfig( const char* cfgName, const char* logParent, const char* logName )
+		: module::ModuleConfiguration< EchoProcConfig, WolframeProcConfig >( cfgName, logParent, logName ) {}
+
+	const char* typeName() const			{ return "EchoProcessor"; }
 
 	/// methods
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
-	virtual void setCanonicalPathes( const std::string& referencePath );
+	void setCanonicalPathes( const std::string& referencePath );
 private:
-	std::list<DatabaseConfig*>	m_dbConfig;
+	unsigned short	m_timeout;
 };
 
-///
-///
-class DatabaseProvider
+
+class EchoProcContainer : public module::ModuleContainer< EchoProcContainer, EchoProcConfig,
+		WolframeProcContainer, WolframeProcConfig >
 {
 public:
-	DatabaseProvider( const DBproviderConfig& conf );
-	~DatabaseProvider();
+	EchoProcContainer( const EchoProcConfig& conf );
+	~EchoProcContainer()				{}
 
-	const Database* database( const std::string& ID ) const;
-private:
-	std::list<DatabaseContainer*>	m_db;
+	virtual const char* typeName() const		{ return "EchoProcessor"; }
+//	virtual const WolframeProcessor& processor()	{ return NULL; }
+
 };
 
-}} // namespace _Wolframe::db
+} // namespace _Wolframe
 
-#endif // _DATABASE_PROVIDER_HPP_INCLUDED
+#endif // _ECHO_PROCESSOR_HPP_INCLUDED
