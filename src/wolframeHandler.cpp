@@ -269,7 +269,8 @@ void wolframeConnection::errorOccured( NetworkSignal signal )
 wolframeHandler::wolframeHandler( const HandlerConfiguration* conf )
 	: m_banner( conf->banner->toString() ),
 	  m_db( *(conf->database)),
-	  m_aaaa( *(conf->aaaa))
+	  m_aaaa( *(conf->aaaa)),
+	  m_procGroup( *(conf->proc))
 {
 	LOG_TRACE << "Global context: banner: <" << m_banner << ">";
 	if ( ! m_aaaa.resolveDB( m_db ) )	{

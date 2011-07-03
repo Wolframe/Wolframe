@@ -70,7 +70,7 @@ bool ConfigurationParser::parse( LuaConfiguration& cfg,
 				retVal = false;
 			else	{
 				if ( ! boost::filesystem::path( cfg.script ).is_absolute() )
-					LOG_WARNING << cfg.logPrefix() << ": script file path is not absolute: "
+					LOG_WARNING << cfg.logPrefix() << "script file path is not absolute: "
 						    << cfg.script;
 			}
 		} else if ( boost::algorithm::iequals( L1it->first, "preload_lib" ))	{
@@ -79,7 +79,7 @@ bool ConfigurationParser::parse( LuaConfiguration& cfg,
 				retVal = false;
 			cfg.preload_libs.push_back( preload_lib );
 		} else {
-			LOG_WARNING << cfg.logPrefix() << ": unknown configuration option: '"
+			LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
 				    << L1it->first << "'";
 			return false;
 		}

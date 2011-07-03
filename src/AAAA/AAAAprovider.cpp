@@ -158,8 +158,8 @@ bool AuditGroup::resolveDB( db::DatabaseProvider& db )
 
 /***********************************************************************************/
 AAAAconfiguration::AAAAconfiguration()
-	: config::ConfigurationBase( "AAAA", NULL, "AAAA configuration"  )
-{}
+	: config::ConfigurationBase( "AAAA", NULL, "AAAA configuration"  ),
+	  m_allowAnonymous( false )	{}
 
 /// destructor
 AAAAconfiguration::~AAAAconfiguration()
@@ -179,6 +179,7 @@ void AAAAconfiguration::print( std::ostream& os, size_t /* indent */ ) const
 {
 	os << sectionName() << std::endl;
 	os << "   Authentication" << std::endl;
+	os << "      Allow anonymous login: " << (m_allowAnonymous ? "yes" : "no") << std::endl;
 	for ( std::list<AuthenticationConfiguration*>::const_iterator it = m_authConfig.begin();
 								it != m_authConfig.end(); it++ )
 		(*it)->print( os, 6 );

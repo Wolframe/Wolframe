@@ -31,35 +31,32 @@
 
 ************************************************************************/
 //
-// echo configuration functions
+// echo processor implementation
 //
 
-#include "handlerConfig.hpp"
-#include "config/valueParser.hpp"
-#include "config/configurationParser.hpp"
 #include "logger.hpp"
+#include "echoProcessor.hpp"
 
+#include "config/configurationParser.hpp"
+#include "config/valueParser.hpp"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/algorithm/string.hpp>
 
 #include <ostream>
 
-
-static const unsigned short DEFAULT_TIMEOUT = 180;
-
 namespace _Wolframe {
 namespace config {
 
 template<>
-bool ConfigurationParser::parse( EchoConfiguration& cfg,
+bool ConfigurationParser::parse( EchoProcConfig& cfg,
 				 const boost::property_tree::ptree& pt, const std::string& /*node*/ )
 {
 	bool retVal = true;
 	bool isDefined = false;
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
-		if ( boost::algorithm::iequals( L1it->first, "idle" ))	{
-			if ( !config::Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.timeout ))
+		if ( boost::algorithm::iequals( L1it->first, "timeout" ))	{
+			if ( !config::Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.m_timeout ))
 				retVal = false;
 			isDefined = true;
 		}
@@ -69,25 +66,37 @@ bool ConfigurationParser::parse( EchoConfiguration& cfg,
 		}
 	}
 	if ( ! isDefined )
-		cfg.timeout = DEFAULT_TIMEOUT;
+		cfg.m_timeout = 0;
 
 	return retVal;
 }
 
 } // namespace config
 
-
-void EchoConfiguration::print( std::ostream& os, size_t /* indent */ ) const
-{
-	os << sectionName() << std::endl;
-	os << "   Idle timeout: " << timeout << std::endl;
-}
-
-
-/// Check if the database configuration makes sense
-bool EchoConfiguration::check() const
+bool EchoProcConfig::check() const
 {
 	return true;
 }
 
+void EchoProcConfig::print( std::ostream& os, size_t indent ) const
+{
+	std::string indStr( indent, ' ' );
+	os << indStr << sectionName() << std::endl;
+	if ( m_timeout > 0 )
+		os << indStr << "   Idle timeout: " << m_timeout << "s" << std::endl;
+	else
+		os << indStr << "   Idle timeout: no timeout" << std::endl;
+}
+
+void EchoProcConfig::setCanonicalPathes( const std::string& /*refPath*/ )
+{
+}
+
+
+EchoProcContainer::EchoProcContainer( const EchoProcConfig& /*conf*/ )
+{
+	LOG_NOTICE << "echo processor container created";
+}
+
 } // namespace _Wolframe
+

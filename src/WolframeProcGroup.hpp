@@ -31,63 +31,50 @@
 
 ************************************************************************/
 //
-// echo configuration functions
+// Wolframe processor group
 //
 
-#include "handlerConfig.hpp"
-#include "config/valueParser.hpp"
-#include "config/configurationParser.hpp"
-#include "logger.hpp"
+#ifndef _WOLFRAME_PROCESSOR_GROUP_HPP_INCLUDED
+#define _WOLFRAME_PROCESSOR_GROUP_HPP_INCLUDED
 
-#include <boost/property_tree/ptree.hpp>
-#include <boost/algorithm/string.hpp>
+#include "config/configurationBase.hpp"
+#include "moduleInterface.hpp"
+#include "WolframeProcContainer.hpp"
 
-#include <ostream>
-
-
-static const unsigned short DEFAULT_TIMEOUT = 180;
+#include <list>
 
 namespace _Wolframe {
-namespace config {
 
-template<>
-bool ConfigurationParser::parse( EchoConfiguration& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& /*node*/ )
+class WolframeProcGroupConfig : public config::ConfigurationBase
 {
-	bool retVal = true;
-	bool isDefined = false;
+	friend class WolframeProcGroup;
+	friend class config::ConfigurationParser;
+public:
+	std::list<WolframeProcConfig*>	m_procConfig;
 
-	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
-		if ( boost::algorithm::iequals( L1it->first, "idle" ))	{
-			if ( !config::Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.timeout ))
-				retVal = false;
-			isDefined = true;
-		}
-		else	{
-			LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
-				    << L1it->first << "'";
-		}
-	}
-	if ( ! isDefined )
-		cfg.timeout = DEFAULT_TIMEOUT;
+	/// constructor & destructor
+	WolframeProcGroupConfig()
+		: ConfigurationBase( "Processor(s)", NULL, "Processor configuration" )	{}
+	~WolframeProcGroupConfig();
 
-	return retVal;
-}
-
-} // namespace config
+	/// methods
+	bool check() const;
+	void print( std::ostream& os, size_t indent ) const;
+	virtual void setCanonicalPathes( const std::string& referencePath );
+};
 
 
-void EchoConfiguration::print( std::ostream& os, size_t /* indent */ ) const
+class WolframeProcGroup
 {
-	os << sectionName() << std::endl;
-	os << "   Idle timeout: " << timeout << std::endl;
-}
+public:
+	WolframeProcGroup( const WolframeProcGroupConfig& conf );
+	~WolframeProcGroup();
 
-
-/// Check if the database configuration makes sense
-bool EchoConfiguration::check() const
-{
-	return true;
-}
+	const WolframeProcessorChannel* procChannel() const;
+private:
+	std::list<WolframeProcContainer*>	m_proc;
+};
 
 } // namespace _Wolframe
+
+#endif // _WOLFRAME_PROCESSOR_GROUP_HPP_INCLUDED

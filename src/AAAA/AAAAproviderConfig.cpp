@@ -37,6 +37,7 @@
 #include "logger.hpp"
 #include "AAAAprovider.hpp"
 #include "config/configurationParser.hpp"
+#include "config/valueParser.hpp"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/algorithm/string.hpp>
@@ -77,30 +78,38 @@ bool ConfigurationParser::parse( AAAA::AAAAconfiguration& cfg,
 {
 	using namespace _Wolframe::config;
 	bool retVal = true;
+	bool allowAnonDefined = false;
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "Authentication" ) ||
 				boost::algorithm::iequals( L1it->first, "Auth" ))	{
 			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
 									L2it != L1it->second.end(); L2it++ )	{
-				size_t i;
-				for ( i = 0; i < noAuthConfigs; i++ )	{
-					if ( boost::algorithm::iequals( authConfig[i].typeName, L2it->first ))	{
-						AAAA::AuthenticationConfiguration* conf = authConfig[i].createFunc( authConfig[i].sectionTitle,
-														    cfg.logPrefix().c_str(),
-														    authConfig[i].sectionName );
-						if ( authConfig[i].parseFunc( *conf, L2it->second, L2it->first ))
-							cfg.m_authConfig.push_back( conf );
-						else	{
-							delete conf;
-							retVal = false;
-						}
-						break;
-					}
+				if ( boost::algorithm::iequals( "allowAnonymous", L2it->first ))	{
+					if ( ! Parser::getValue( cfg.logPrefix().c_str(), *L2it, cfg.m_allowAnonymous,
+								 Parser::BoolDomain(), &allowAnonDefined ))
+						retVal = false;
 				}
-				if ( i >= noAuthConfigs )
-					LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
-						    << L2it->first << "'";
+				else {
+					size_t i;
+					for ( i = 0; i < noAuthConfigs; i++ )	{
+						if ( boost::algorithm::iequals( authConfig[i].typeName, L2it->first ))	{
+							AAAA::AuthenticationConfiguration* conf = authConfig[i].createFunc( authConfig[i].sectionTitle,
+															    cfg.logPrefix().c_str(),
+															    authConfig[i].sectionName );
+							if ( authConfig[i].parseFunc( *conf, L2it->second, L2it->first ))
+								cfg.m_authConfig.push_back( conf );
+							else	{
+								delete conf;
+								retVal = false;
+							}
+							break;
+						}
+					}
+					if ( i >= noAuthConfigs )
+						LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
+							    << L2it->first << "'";
+				}
 			}
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "Audit" ))	{
@@ -127,7 +136,7 @@ bool ConfigurationParser::parse( AAAA::AAAAconfiguration& cfg,
 			}
 		}
 		else
-			LOG_WARNING << cfg.logPrefix() << ": unknown configuration option: '"
+			LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
 				    << L1it->first << "'";
 	}
 	return retVal;

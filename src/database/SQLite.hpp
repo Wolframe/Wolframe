@@ -95,7 +95,7 @@ public:
 	~SQLiteContainer();
 
 	const std::string& ID() const			{ return m_db.ID(); }
-	const char* typeName() const			{ return m_db.typeName(); }
+	virtual const char* typeName() const		{ return m_db.typeName(); }
 	virtual const Database& database()		{ return m_db; }
 private:
 	SQLiteDatabase	m_db;

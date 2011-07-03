@@ -31,63 +31,48 @@
 
 ************************************************************************/
 //
-// echo configuration functions
+// echo processor
 //
 
-#include "handlerConfig.hpp"
-#include "config/valueParser.hpp"
-#include "config/configurationParser.hpp"
-#include "logger.hpp"
+#ifndef _ECHO_PROCESSOR_HPP_INCLUDED
+#define _ECHO_PROCESSOR_HPP_INCLUDED
 
-#include <boost/property_tree/ptree.hpp>
-#include <boost/algorithm/string.hpp>
-
-#include <ostream>
-
-
-static const unsigned short DEFAULT_TIMEOUT = 180;
+#include "WolframeProcContainer.hpp"
+#include "moduleInterface.hpp"
 
 namespace _Wolframe {
-namespace config {
 
-template<>
-bool ConfigurationParser::parse( EchoConfiguration& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& /*node*/ )
+class EchoProcConfig : public module::ModuleConfiguration< EchoProcConfig, WolframeProcConfig >
 {
-	bool retVal = true;
-	bool isDefined = false;
+	friend class EchoProcContainer;
+	friend class config::ConfigurationParser;
+public:
+	EchoProcConfig( const char* cfgName, const char* logParent, const char* logName )
+		: module::ModuleConfiguration< EchoProcConfig, WolframeProcConfig >( cfgName, logParent, logName ) {}
 
-	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
-		if ( boost::algorithm::iequals( L1it->first, "idle" ))	{
-			if ( !config::Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.timeout ))
-				retVal = false;
-			isDefined = true;
-		}
-		else	{
-			LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
-				    << L1it->first << "'";
-		}
-	}
-	if ( ! isDefined )
-		cfg.timeout = DEFAULT_TIMEOUT;
+	const char* typeName() const			{ return "EchoProcessor"; }
 
-	return retVal;
-}
-
-} // namespace config
+	/// methods
+	bool check() const;
+	void print( std::ostream& os, size_t indent ) const;
+	void setCanonicalPathes( const std::string& referencePath );
+private:
+	unsigned short	m_timeout;
+};
 
 
-void EchoConfiguration::print( std::ostream& os, size_t /* indent */ ) const
+class EchoProcContainer : public module::ModuleContainer< EchoProcContainer, EchoProcConfig,
+		WolframeProcContainer, WolframeProcConfig >
 {
-	os << sectionName() << std::endl;
-	os << "   Idle timeout: " << timeout << std::endl;
-}
+public:
+	EchoProcContainer( const EchoProcConfig& conf );
+	~EchoProcContainer()				{}
 
+	virtual const char* typeName() const		{ return "EchoProcessor"; }
+//	virtual const WolframeProcessor& processor()	{ return NULL; }
 
-/// Check if the database configuration makes sense
-bool EchoConfiguration::check() const
-{
-	return true;
-}
+};
 
 } // namespace _Wolframe
+
+#endif // _ECHO_PROCESSOR_HPP_INCLUDED

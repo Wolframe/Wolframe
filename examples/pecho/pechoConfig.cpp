@@ -63,7 +63,7 @@ bool ConfigurationParser::parse( pEchoConfiguration& cfg,
 			isSet = true;
 		}
 		else
-			LOG_WARNING << cfg.logPrefix() << ": unknown configuration option: '"
+			LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
 				    << L1it->first << "'";
 	}
 	if ( !isSet )

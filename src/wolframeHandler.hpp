@@ -40,6 +40,7 @@
 #include "connectionHandler.hpp"
 #include "database/database.hpp"
 #include "AAAA/AAAAprovider.hpp"
+#include "WolframeProcGroup.hpp"
 
 namespace _Wolframe {
 	/// The global server container
@@ -49,13 +50,15 @@ namespace _Wolframe {
 		wolframeHandler( const HandlerConfiguration* conf );
 		~wolframeHandler();
 
-		const std::string& banner() const	{ return m_banner; }
-		const db::DatabaseProvider db() const		{ return m_db; }
-		const AAAA::AAAAprovider& aaaa() const	{ return m_aaaa; }
+		const std::string& banner() const		{ return m_banner; }
+		const db::DatabaseProvider& db() const		{ return m_db; }
+		const AAAA::AAAAprovider& aaaa() const		{ return m_aaaa; }
+		const WolframeProcGroup& procGroup() const	{ return m_procGroup; }
 	private:
 		const std::string		m_banner;
-		_Wolframe::db::DatabaseProvider	m_db;
-		_Wolframe::AAAA::AAAAprovider	m_aaaa;
+		db::DatabaseProvider		m_db;
+		AAAA::AAAAprovider		m_aaaa;
+		WolframeProcGroup		m_procGroup;
 	};
 
 
@@ -98,6 +101,8 @@ namespace _Wolframe {
 //		AAAA::Auditor*			m_audit;
 //		AAAA::Accountant*		m_accounting;
 ///*************
+		WolframeProcessorChannel*	m_proc;
+
 		/// Connection endpoints
 		const net::LocalEndpoint*	m_localEP;
 		const net::RemoteEndpoint*	m_remoteEP;

@@ -90,12 +90,12 @@ bool ConfigurationParser::parse( _Wolframe::iproc::lua::Configuration& cfg,
 		}
 		else
 		{
-			LOG_WARNING << cfg.logPrefix() << ": unknown configuration option: '" << it->first << "'";
+			LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '" << it->first << "'";
 		}
 	}
 	if (cnt_main == 0)
 	{
-		LOG_ERROR << cfg.logPrefix() << ": main script to execute is not defined (configuration option <module>";
+		LOG_ERROR << cfg.logPrefix() << "main script to execute is not defined (configuration option <module>";
 		return false;
 	}
 	return true;

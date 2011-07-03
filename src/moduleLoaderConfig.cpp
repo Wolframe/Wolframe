@@ -117,7 +117,19 @@ void ModuleLoaderConfiguration::print( std::ostream& os, size_t /* indent */ ) c
 /// Check if the server configuration makes sense
 bool ModuleLoaderConfiguration::check() const
 {
-	return true;
+	bool retVal = true;
+	for ( std::list< std::string* >::const_iterator it1 = m_moduleFile.begin();
+						      it1 != m_moduleFile.end(); it1++ )	{
+		std::list< std::string* >::const_iterator it2 = it1;
+		it2++;
+		for ( ; it2 != m_moduleFile.end(); it2++ )
+			if ( boost::algorithm::iequals( **it1, **it2 ))	{
+				LOG_ERROR << "duplicate module file: '" << **it1 << "'";
+				retVal = false;
+			}
+	}
+
+	return retVal;
 }
 
 

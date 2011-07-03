@@ -46,11 +46,11 @@ namespace _Wolframe {
 namespace db {
 
 /// database configuration
-struct DBproviderConfig : public config::ConfigurationBase
+class DBproviderConfig : public config::ConfigurationBase
 {
+	friend class DatabaseProvider;
+	friend class config::ConfigurationParser;
 public:
-	std::list<DatabaseConfig*>	m_dbConfig;
-
 	/// constructor & destructor
 	DBproviderConfig() : ConfigurationBase( "Database(s)", NULL, "Database configuration" )	{}
 	~DBproviderConfig();
@@ -59,6 +59,8 @@ public:
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 	virtual void setCanonicalPathes( const std::string& referencePath );
+private:
+	std::list<DatabaseConfig*>	m_dbConfig;
 };
 
 ///
