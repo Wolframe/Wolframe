@@ -65,6 +65,7 @@ public:
 	void print( std::ostream& os, size_t indent ) const;
 	void setCanonicalPathes( const std::string& referencePath );
 private:
+	bool						m_allowAnonymous;
 	std::list< AuthenticationConfiguration* >	m_authConfig;
 	std::list< AuditConfiguration* >		m_auditConfig;
 };
