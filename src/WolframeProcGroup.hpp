@@ -40,6 +40,8 @@
 #include "config/configurationBase.hpp"
 #include "moduleInterface.hpp"
 #include "WolframeProcContainer.hpp"
+#include "database/database.hpp"
+#include "database/DBprovider.hpp"
 
 #include <list>
 
@@ -50,8 +52,6 @@ class WolframeProcGroupConfig : public config::ConfigurationBase
 	friend class WolframeProcGroup;
 	friend class config::ConfigurationParser;
 public:
-	std::list<WolframeProcConfig*>	m_procConfig;
-
 	/// constructor & destructor
 	WolframeProcGroupConfig()
 		: ConfigurationBase( "Processor(s)", NULL, "Processor configuration" )	{}
@@ -61,6 +61,9 @@ public:
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 	virtual void setCanonicalPathes( const std::string& referencePath );
+private:
+	std::string				m_dbLabel;
+	std::list<WolframeProcConfig*>		m_procConfig;
 };
 
 
@@ -70,8 +73,12 @@ public:
 	WolframeProcGroup( const WolframeProcGroupConfig& conf );
 	~WolframeProcGroup();
 
+	bool resolveDB( db::DatabaseProvider& db );
+
 	const WolframeProcessorChannel* procChannel() const;
 private:
+	std::string				m_dbLabel;
+	const db::Database*			m_db;
 	std::list<WolframeProcContainer*>	m_proc;
 };
 

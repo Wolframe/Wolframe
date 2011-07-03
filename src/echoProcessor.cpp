@@ -95,7 +95,7 @@ void EchoProcConfig::setCanonicalPathes( const std::string& /*refPath*/ )
 
 EchoProcContainer::EchoProcContainer( const EchoProcConfig& /*conf*/ )
 {
-	LOG_NOTICE << "echo processor container created";
+	LOG_NOTICE << "Echo processor container created";
 }
 
 } // namespace _Wolframe

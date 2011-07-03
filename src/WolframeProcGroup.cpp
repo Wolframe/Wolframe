@@ -76,24 +76,31 @@ bool ConfigurationParser::parse( WolframeProcGroupConfig& cfg,
 	bool retVal = true;
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
-		size_t i;
-		for ( i = 0; i < noProcModules; i++ )	{
-			if ( boost::algorithm::iequals( procConfigs[i].typeName, L1it->first ))	{
-				WolframeProcConfig* conf = procConfigs[i].createFunc( procConfigs[i].sectionTitle,
-										     cfg.logPrefix().c_str(),
-										     procConfigs[i].sectionName );
-				if ( procConfigs[i].parseFunc( *conf, L1it->second, L1it->first ))
-					cfg.m_procConfig.push_back( conf );
-				else	{
-					delete conf;
-					retVal = false;
-				}
-				break;
-			}
+		if ( boost::algorithm::iequals( "database", L1it->first ))	{
+			bool isDefined = ( ! cfg.m_dbLabel.empty());
+			if ( ! Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.m_dbLabel, &isDefined ))
+				retVal = false;
 		}
-		if ( i >= noProcModules )
-			LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
-				    << L1it->first << "'";
+		else	{
+			size_t i;
+			for ( i = 0; i < noProcModules; i++ )	{
+				if ( boost::algorithm::iequals( procConfigs[i].typeName, L1it->first ))	{
+					WolframeProcConfig* conf = procConfigs[i].createFunc( procConfigs[i].sectionTitle,
+											      cfg.logPrefix().c_str(),
+											      procConfigs[i].sectionName );
+					if ( procConfigs[i].parseFunc( *conf, L1it->second, L1it->first ))
+						cfg.m_procConfig.push_back( conf );
+					else	{
+						delete conf;
+						retVal = false;
+					}
+					break;
+				}
+			}
+			if ( i >= noProcModules )
+				LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
+					    << L1it->first << "'";
+		}
 	}
 	return retVal;
 }
@@ -112,6 +119,7 @@ WolframeProcGroupConfig::~WolframeProcGroupConfig()
 void WolframeProcGroupConfig::print( std::ostream& os, size_t /* indent */ ) const
 {
 	os << sectionName() << std::endl;
+	os << "   Database: " << (m_dbLabel.empty() ? "(none)" : m_dbLabel) << std::endl;
 	if ( m_procConfig.size() > 0 )	{
 		for ( std::list<WolframeProcConfig*>::const_iterator it = m_procConfig.begin();
 								it != m_procConfig.end(); it++ )	{
@@ -127,6 +135,10 @@ void WolframeProcGroupConfig::print( std::ostream& os, size_t /* indent */ ) con
 bool WolframeProcGroupConfig::check() const
 {
 	bool correct = true;
+//	if ( m_dbLabel.empty() )	{
+//		LOG_ERROR << logPrefix() << "referenced database ID cannot be empty";
+//		correct = false;
+//	}
 	for ( std::list<WolframeProcConfig*>::const_iterator it = m_procConfig.begin();
 								it != m_procConfig.end(); it++ )	{
 		if ( !(*it)->check() )
@@ -146,6 +158,9 @@ void WolframeProcGroupConfig::setCanonicalPathes( const std::string& refPath )
 /**** WolframeProcGroup ************************************************/
 WolframeProcGroup::WolframeProcGroup( const WolframeProcGroupConfig& conf )
 {
+	m_db = NULL;
+	if ( !conf.m_dbLabel.empty())
+		m_dbLabel = conf.m_dbLabel;
 	for ( std::list<WolframeProcConfig*>::const_iterator it = conf.m_procConfig.begin();
 								it != conf.m_procConfig.end(); it++ )	{
 		const char* procType = (*it)->typeName();
@@ -169,6 +184,22 @@ WolframeProcGroup::~WolframeProcGroup()
 	for ( std::list< WolframeProcContainer* >::const_iterator it = m_proc.begin();
 							it != m_proc.end(); it++ )
 		delete *it;
+}
+
+bool WolframeProcGroup::resolveDB( db::DatabaseProvider& db )
+{
+	if ( m_db == NULL && ! m_dbLabel.empty() )	{
+		m_db = db.database( m_dbLabel );
+		if ( m_db )	{
+			LOG_NOTICE << "Processor database: database reference '" << m_dbLabel << "' resolved";
+			return true;
+		}
+		else	{
+			LOG_ERROR << "Processor database: database labeled '" << m_dbLabel << "' not found !";
+			return false;
+		}
+	}
+	return true;
 }
 
 } // namespace _Wolframe

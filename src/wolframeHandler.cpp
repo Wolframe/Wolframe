@@ -278,6 +278,11 @@ wolframeHandler::wolframeHandler( const HandlerConfiguration* conf )
 		exit( 1 );
 	}
 	LOG_TRACE << "AAAA database references resolved";
+	if ( ! m_procGroup.resolveDB( m_db ) )	{
+		LOG_FATAL << "Cannot resolve database reference for processor group";
+		exit( 1 );
+	}
+	LOG_TRACE << "Processor group database reference resolved";
 }
 
 wolframeHandler::~wolframeHandler()
