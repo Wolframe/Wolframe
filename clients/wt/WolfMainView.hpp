@@ -62,7 +62,7 @@ class WolfMainView : public WContainerWidget
 			MenuItem *item;
 			
 			toolBar->addButton( "File", menu );
-			menu->addItem( "Exit" );
+			menu->addItem( "Logoff" );
 
 			menu = new Menu( );
 			toolBar->addButton( "Forms", menu );
@@ -88,7 +88,20 @@ class WolfMainView : public WContainerWidget
 		
 		void showAbout( )
 		{
-			MessageBox::show( "wtclient", "wtclient", Ok );
+			Dialog dialog;
+			dialog.setWindowTitle( "About Wolfbones" );
+			dialog.setAutoScrollBars( true );
+
+			Button *okButton = new Button( "Ok" );
+			okButton->activated( ).connect( SLOT( &dialog, Dialog::accept ) );
+			dialog.addButton( okButton );
+			okButton->setDefault( true );
+
+			WText *text = new WText( tr( "about.wolframe" ), Wt::XHTMLText );
+			dialog.contents( )->addWidget( text );
+
+			dialog.resize( 500,300 );
+			dialog.exec( );
 		}
 
 		void showWtAbout( )
