@@ -133,6 +133,8 @@ class WolfMainView : public WContainerWidget
 			south->setCollapsible( true );
 			south->setAnimate( true );
 			south->setCollapsed( true );
+			south->expanded( ).connect( SLOT( this, WolfMainView::enableDebugWindow ) );
+			south->collapsed( ).connect( SLOT( this, WolfMainView::disableDebugWindow ) );
 			south->setLayout( new WFitLayout( ) );
 			south->layout( )->addWidget( new WText( "blabla" ) );
 			theLayout->addWidget( south, WBorderLayout::South );
@@ -182,6 +184,16 @@ class WolfMainView : public WContainerWidget
 		{
 			south->setCollapsed( !south->isCollapsed( ) );
 			menuItemDebugWindow->setChecked( !south->isCollapsed( ) );
+		}
+
+		void enableDebugWindow( )
+		{
+			menuItemDebugWindow->setChecked( true );
+		}
+
+		void disableDebugWindow( )
+		{
+			menuItemDebugWindow->setChecked( false );
 		}
 };
 
