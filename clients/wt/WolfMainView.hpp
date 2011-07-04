@@ -44,6 +44,7 @@
 #include "Wt/Ext/ToolBar"
 #include "Wt/Ext/Dialog"
 #include "Wt/Ext/Container"
+#include "Wt/Ext/LineEdit"
 
 using namespace Wt;
 using namespace Wt::Ext;
@@ -136,7 +137,7 @@ class WolfMainView : public WContainerWidget
 			south->expanded( ).connect( SLOT( this, WolfMainView::enableDebugWindow ) );
 			south->collapsed( ).connect( SLOT( this, WolfMainView::disableDebugWindow ) );
 			south->setLayout( new WFitLayout( ) );
-			south->layout( )->addWidget( new WText( "blabla" ) );
+			south->layout( )->addWidget( new LineEdit( "blabla" ) );
 			theLayout->addWidget( south, WBorderLayout::South );
 		}
 		
