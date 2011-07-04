@@ -105,7 +105,7 @@ class AAAAprovider
 {
 public:
 	AAAAprovider( const AAAAconfiguration& conf );
-//	~AAAAprovider();
+	~AAAAprovider()				{}
 	bool resolveDB( db::DatabaseProvider& db );
 
 	Authenticator* authenticator()		{ return m_authenticator.authenticator(); }

@@ -111,6 +111,19 @@ public:
 		: name( n ), createFunc( f )	{}
 };
 
+
+///
+class LoadableModuleDescription
+{
+
+};
+
+
+extern "C" {
+	LoadableModuleDescription* modDesc();
+}
+
+
 }} // namespace _Wolframe::module
 
 #endif // _MODULE_CONFIGURATION_HPP_INCLUDED
