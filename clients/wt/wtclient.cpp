@@ -51,12 +51,12 @@ class WtClientApp : public WApplication
 			: WApplication( _env )
 		{
 			setTitle( "Wt Wolframe Client" );
-			useStyleSheet( "css/main.css" );
+//			useStyleSheet( "css/main.css" );
 			setLoadingIndicator( new WOverlayLoadingIndicator( ) );
 			messageResourceBundle( ).use( "wtclient" );
 			main = new WolfMainView( root( ) );
 //			useStyleSheet( "ext/resources/css/xtheme-gray.css" );
-			useStyleSheet( "ext/resources/css/xtheme-slate.css" );
+//			useStyleSheet( "ext/resources/css/xtheme-slate.css" );
 		}
 };
 

@@ -72,8 +72,12 @@ class WolfMainView : public WContainerWidget
 			menu = new Menu( );
 			toolBar->addButton( "Themes", menu );
 			item = menu->addItem( "default" );
+			item->setChecked( true );
+			item->setCheckable( true );
 			item = menu->addItem( "gray" );
+			item->setCheckable( true );
 			item = menu->addItem( "slate" );
+			item->setCheckable( true );
 
 			menu = new Menu( );
 			toolBar->addButton( "Help", menu );
