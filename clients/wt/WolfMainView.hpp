@@ -36,13 +36,12 @@
 
 #include "Wt/WContainerWidget"
 #include "Wt/WText"
-#include "Wt/WGridLayout"
-#include "Wt/WScrollArea"
+#include "Wt/WBorderLayout"
+#include "Wt/WFitLayout"
 #include "Wt/WScrollBar"
 
 #include "Wt/Ext/Menu"
 #include "Wt/Ext/ToolBar"
-#include "Wt/Ext/MessageBox"
 #include "Wt/Ext/Dialog"
 #include "Wt/Ext/Container"
 
@@ -54,10 +53,24 @@ namespace _Wolframe {
 
 class WolfMainView : public WContainerWidget
 {
+	private:
+		Panel *south;
+		MenuItem *menuItemDebugWindow;
+
 	public:
 		WolfMainView( WContainerWidget *_parent ) : WContainerWidget( _parent )
 		{
-			ToolBar *toolBar = new ToolBar( this );
+			resize( WLength::Auto, WLength( 100, WLength::Percentage ) );
+
+			WBorderLayout *theLayout = new WBorderLayout( this );
+
+			// north: a menu bar
+
+			Panel *north = new Panel( );
+			north->setBorder( false );
+			north->resize( WLength::Auto, 35 );
+
+			ToolBar *toolBar = new ToolBar( );
 			Menu *menu = new Menu( );
 			MenuItem *item;
 			
@@ -90,7 +103,39 @@ class WolfMainView : public WContainerWidget
 			item = menu->addItem( "About Wt" );
 			item->activated( ).connect( SLOT( this, WolfMainView::showWtAbout ) );
 			menu->addSeparator( );
-			menu->addItem( "Debug Window" );			
+			menuItemDebugWindow = menu->addItem( "Debug Window" );
+			menuItemDebugWindow->setChecked( false );
+			menuItemDebugWindow->setCheckable( true );
+			menuItemDebugWindow->activated( ).connect( SLOT( this, WolfMainView::toggleDebugWindow ) );
+
+			north->setLayout( new WFitLayout( ) );
+			north->layout( )->addWidget( toolBar );
+			theLayout->addWidget( north, WBorderLayout::North );
+
+			// center: main forms
+			Panel *center = new Panel( );
+			center->setBorder( false );
+			center->setResizable( true );
+			center->resize( WLength::Auto, 250 );
+			center->setCollapsible( true );
+			center->setAnimate( true );
+			center->setLayout( new WFitLayout( ) );
+			center->layout( )->addWidget( new WText( "form" ) );
+			theLayout->addWidget( center, WBorderLayout::Center );
+
+			// south: a debug window, resizeable
+
+			south = new Panel( );
+			south->setTitle( "Debug Window" );
+			south->setBorder( false );
+			south->resize( WLength::Auto, 55 );
+			south->setResizable( true );
+			south->setCollapsible( true );
+			south->setAnimate( true );
+			south->setCollapsed( true );
+			south->setLayout( new WFitLayout( ) );
+			south->layout( )->addWidget( new WText( "blabla" ) );
+			theLayout->addWidget( south, WBorderLayout::South );
 		}
 		
 		void showAbout( )
@@ -131,6 +176,12 @@ class WolfMainView : public WContainerWidget
 
 		void chooseTheme( bool )
 		{
+		}
+
+		void toggleDebugWindow( )
+		{
+			south->setCollapsed( !south->isCollapsed( ) );
+			menuItemDebugWindow->setChecked( !south->isCollapsed( ) );
 		}
 };
 
