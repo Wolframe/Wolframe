@@ -74,18 +74,21 @@ class WolfMainView : public WContainerWidget
 			item = menu->addItem( "default" );
 			item->setChecked( true );
 			item->setCheckable( true );
+			item->toggled( ).connect( SLOT( this, WolfMainView::chooseTheme ) );
 			item = menu->addItem( "gray" );
 			item->setCheckable( true );
+			item->toggled( ).connect( SLOT( this, WolfMainView::chooseTheme ) );
 			item = menu->addItem( "slate" );
 			item->setCheckable( true );
+			item->toggled( ).connect( SLOT( this, WolfMainView::chooseTheme ) );
 
 			menu = new Menu( );
 			toolBar->addButton( "Help", menu );
 			item = menu->addItem( "About" );
-			item->activated( ).connect( this, &WolfMainView::showAbout );
+			item->activated( ).connect( SLOT( this, WolfMainView::showAbout ) );
 			menu->addSeparator( );
 			item = menu->addItem( "About Wt" );
-			item->activated( ).connect( this, &WolfMainView::showWtAbout );
+			item->activated( ).connect( SLOT( this, WolfMainView::showWtAbout ) );
 			menu->addSeparator( );
 			menu->addItem( "Debug Window" );			
 		}
@@ -124,6 +127,10 @@ class WolfMainView : public WContainerWidget
 
 			dialog.resize( 500,300 );
 			dialog.exec( );
+		}
+
+		void chooseTheme( bool )
+		{
 		}
 };
 
