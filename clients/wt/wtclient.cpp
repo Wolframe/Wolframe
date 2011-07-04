@@ -55,6 +55,8 @@ class WtClientApp : public WApplication
 			setLoadingIndicator( new WOverlayLoadingIndicator( ) );
 			messageResourceBundle( ).use( "wtclient" );
 			main = new WolfMainView( root( ) );
+//			useStyleSheet( "ext/resources/css/xtheme-gray.css" );
+			useStyleSheet( "ext/resources/css/xtheme-slate.css" );
 		}
 };
 
