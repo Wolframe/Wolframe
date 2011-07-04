@@ -73,7 +73,7 @@ class WolfMainView : public WContainerWidget
 			toolBar->addButton( "Themes", menu );
 			item = menu->addItem( "default" );
 			item = menu->addItem( "gray" );
-			item = menu->addItem( "vista" );
+			item = menu->addItem( "slate" );
 
 			menu = new Menu( );
 			toolBar->addButton( "Help", menu );
