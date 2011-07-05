@@ -19,6 +19,7 @@ INCLUDE_LIBS = \
 	-lboost_program_options -lboost_filesystem
 
 OBJS = \
+	WolfMainView.o
 
 CPP_BINS = \
 	wtclient$(EXE)

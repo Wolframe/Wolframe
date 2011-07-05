@@ -51,7 +51,6 @@ class WtClientApp : public WApplication
 			: WApplication( _env )
 		{
 			setTitle( "Wt Wolframe Client" );
-//			useStyleSheet( "css/main.css" );
 			setLoadingIndicator( new WOverlayLoadingIndicator( ) );
 			messageResourceBundle( ).use( "wtclient" );
 			main = new WolfMainView( root( ) );
