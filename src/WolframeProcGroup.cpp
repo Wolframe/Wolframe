@@ -69,7 +69,7 @@ namespace _Wolframe {
 namespace config {
 
 template<>
-bool ConfigurationParser::parse( WolframeProcGroupConfig& cfg,
+bool ConfigurationParser::parse( proc::ProcessorGroupConfig& cfg,
 				 const boost::property_tree::ptree& pt, const std::string& /*node*/ )
 {
 	using namespace _Wolframe::config;
@@ -108,15 +108,17 @@ bool ConfigurationParser::parse( WolframeProcGroupConfig& cfg,
 } // namespace config
 
 
-//***  Generic database functions  **************************************
-WolframeProcGroupConfig::~WolframeProcGroupConfig()
+//***  Processor Group Configuration  ************************************
+namespace proc {
+
+ProcessorGroupConfig::~ProcessorGroupConfig()
 {
 	for ( std::list<WolframeProcConfig*>::const_iterator it = m_procConfig.begin();
 								it != m_procConfig.end(); it++ )
 		delete *it;
 }
 
-void WolframeProcGroupConfig::print( std::ostream& os, size_t /* indent */ ) const
+void ProcessorGroupConfig::print( std::ostream& os, size_t /* indent */ ) const
 {
 	os << sectionName() << std::endl;
 	os << "   Database: " << (m_dbLabel.empty() ? "(none)" : m_dbLabel) << std::endl;
@@ -132,7 +134,7 @@ void WolframeProcGroupConfig::print( std::ostream& os, size_t /* indent */ ) con
 
 
 /// Check if the database configuration makes sense
-bool WolframeProcGroupConfig::check() const
+bool ProcessorGroupConfig::check() const
 {
 	bool correct = true;
 //	if ( m_dbLabel.empty() )	{
@@ -147,7 +149,7 @@ bool WolframeProcGroupConfig::check() const
 	return correct;
 }
 
-void WolframeProcGroupConfig::setCanonicalPathes( const std::string& refPath )
+void ProcessorGroupConfig::setCanonicalPathes( const std::string& refPath )
 {
 	for ( std::list<WolframeProcConfig*>::const_iterator it = m_procConfig.begin();
 								it != m_procConfig.end(); it++ )	{
@@ -155,8 +157,8 @@ void WolframeProcGroupConfig::setCanonicalPathes( const std::string& refPath )
 	}
 }
 
-/**** WolframeProcGroup ************************************************/
-WolframeProcGroup::WolframeProcGroup( const WolframeProcGroupConfig& conf )
+//**** Processor Group **************************************************
+ProcessorGroup::ProcessorGroup( const ProcessorGroupConfig& conf )
 {
 	m_db = NULL;
 	if ( !conf.m_dbLabel.empty())
@@ -179,14 +181,14 @@ WolframeProcGroup::WolframeProcGroup( const WolframeProcGroupConfig& conf )
 	}
 }
 
-WolframeProcGroup::~WolframeProcGroup()
+ProcessorGroup::~ProcessorGroup()
 {
 	for ( std::list< WolframeProcContainer* >::const_iterator it = m_proc.begin();
 							it != m_proc.end(); it++ )
 		delete *it;
 }
 
-bool WolframeProcGroup::resolveDB( db::DatabaseProvider& db )
+bool ProcessorGroup::resolveDB( db::DatabaseProvider& db )
 {
 	if ( m_db == NULL && ! m_dbLabel.empty() )	{
 		m_db = db.database( m_dbLabel );
@@ -202,4 +204,5 @@ bool WolframeProcGroup::resolveDB( db::DatabaseProvider& db )
 	return true;
 }
 
+} // namespace proc
 } // namespace _Wolframe

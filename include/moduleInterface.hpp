@@ -44,6 +44,13 @@
 namespace _Wolframe {
 namespace module {
 
+enum ModuleType	{
+	DATABASE_MODULE,
+	AUTHENTICATION_MODULE,
+	AUDIT_MODULE,
+	PROCESSOR_MODULE
+};
+
 template< class T, class Tbase >
 class ModuleConfiguration : public Tbase
 {
@@ -59,7 +66,7 @@ public:
 	ModuleConfiguration( const char* name, const char* logParent, const char* logName )
 		: Tbase( name, logParent, logName )	{}
 
-	virtual ~ModuleConfiguration()				{}
+	virtual ~ModuleConfiguration()			{}
 
 	virtual const char* typeName() const = 0;
 	static Tbase* create( const char* name, const char* logParent, const char* logName )	{
@@ -108,7 +115,7 @@ struct ModuleContainerDescription
 	T* ( *createFunc )( const Tconf& conf );
 public:
 	ModuleContainerDescription( const char* n, T* ( *f )( const Tconf& conf ) )
-		: name( n ), createFunc( f )	{}
+		: name( n ), createFunc( f )		{}
 };
 
 

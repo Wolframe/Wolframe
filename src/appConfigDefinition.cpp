@@ -70,7 +70,7 @@ ApplicationConfiguration::ApplicationConfiguration()
 	addConfig( "logging", loggerConf, &ConfigurationParser::parseBase<log::LoggerConfiguration> );
 	addConfig( "database", handlerConf->database, &ConfigurationParser::parseBase<db::DBproviderConfig> );
 	addConfig( "aaaa", handlerConf->aaaa, &ConfigurationParser::parseBase<AAAA::AAAAconfiguration> );
-	addConfig( "Processor", handlerConf->proc, &ConfigurationParser::parseBase<WolframeProcGroupConfig> );
+	addConfig( "Processor", handlerConf->proc, &ConfigurationParser::parseBase<proc::ProcessorGroupConfig> );
 
 }
 

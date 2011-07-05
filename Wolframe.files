@@ -75,6 +75,7 @@ clients/wt/etc/wt_config.xml
 clients/wt/GNUmakefile
 clients/wt/WolfMainView.hpp
 clients/wt/wtclient.cpp
+clients/wt/wtclient.xml
 docs/AppServer/Appendix.xml
 docs/AppServer/AppServer.ent
 docs/AppServer/Glossary.xml
@@ -226,7 +227,6 @@ include/logger/logLevel.hpp
 include/logger/logSyslogFacility.hpp
 include/miscUtils.hpp
 include/moduleInterface.hpp
-include/moduleLoaderConfig.hpp
 include/objectPool.hpp
 include/protocol/buffers.hpp
 include/protocol/formatoutput.hpp
@@ -244,6 +244,8 @@ include/SSLcertificateInfo.hpp
 include/standardConfigs.hpp
 include/user.hpp
 include/version.hpp
+include/WolframeProcContainer.hpp
+include/WolframeProcessor.hpp
 lua/etc/all.c
 lua/etc/lua.hpp
 lua/etc/min.c
@@ -358,6 +360,8 @@ src/database/PostgreSQL.hpp
 src/database/SQLiteConfig.cpp
 src/database/SQLite.cpp
 src/database/SQLite.hpp
+src/echoProcessor.cpp
+src/echoProcessor.hpp
 src/exceptionBase.hpp
 src/getPassword.cpp
 src/getPassword.hpp
@@ -383,6 +387,7 @@ src/logger/syslog_win32.c
 src/logger/syslog_win32.h
 src/Makefile.W32
 src/moduleLoaderConfig.cpp
+src/moduleLoaderConfig.hpp
 src/posixMain.cpp
 src/protocol_ioblocks.cpp
 src/resolvePath.cpp
@@ -399,6 +404,8 @@ src/wolframe.conf
 src/wolframed.cpp
 src/wolframeHandler.cpp
 src/wolframeHandler.hpp
+src/WolframeProcGroup.cpp
+src/WolframeProcGroup.hpp
 src/wolframe.xml
 tests/AAAA/authTest.cpp
 tests/AAAA/GNUmakefile
@@ -436,9 +443,3 @@ windows/wolframe.xml
 XML/configuration.rng
 XML/database.rng
 XML/logging.rng
-include/WolframeProcessor.hpp
-include/WolframeProcContainer.hpp
-src/WolframeProcGroup.hpp
-src/WolframeProcGroup.cpp
-src/echoProcessor.cpp
-src/echoProcessor.hpp

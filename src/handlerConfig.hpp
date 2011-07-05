@@ -49,11 +49,11 @@ namespace _Wolframe {
 	struct HandlerConfiguration
 	{
 	public:
-		db::DBproviderConfig	*database;
+		db::DBproviderConfig		*database;
 		config::ModuleLoaderConfiguration *modules;
-		config::ServiceBanner	*banner;
-		AAAA::AAAAconfiguration	*aaaa;
-		WolframeProcGroupConfig	*proc;
+		config::ServiceBanner		*banner;
+		AAAA::AAAAconfiguration		*aaaa;
+		proc::ProcessorGroupConfig	*proc;
 
 		/// constructor
 		HandlerConfiguration()
@@ -62,7 +62,7 @@ namespace _Wolframe {
 			modules = new config::ModuleLoaderConfiguration();
 			database = new db::DBproviderConfig();
 			aaaa = new AAAA::AAAAconfiguration();
-			proc = new WolframeProcGroupConfig();
+			proc = new proc::ProcessorGroupConfig();
 		}
 
 		~HandlerConfiguration()

@@ -46,16 +46,17 @@
 #include <list>
 
 namespace _Wolframe {
+namespace proc {
 
-class WolframeProcGroupConfig : public config::ConfigurationBase
+class ProcessorGroupConfig : public config::ConfigurationBase
 {
-	friend class WolframeProcGroup;
+	friend class ProcessorGroup;
 	friend class config::ConfigurationParser;
 public:
 	/// constructor & destructor
-	WolframeProcGroupConfig()
+	ProcessorGroupConfig()
 		: ConfigurationBase( "Processor(s)", NULL, "Processor configuration" )	{}
-	~WolframeProcGroupConfig();
+	~ProcessorGroupConfig();
 
 	/// methods
 	bool check() const;
@@ -67,21 +68,21 @@ private:
 };
 
 
-class WolframeProcGroup
+class ProcessorGroup
 {
 public:
-	WolframeProcGroup( const WolframeProcGroupConfig& conf );
-	~WolframeProcGroup();
+	ProcessorGroup( const ProcessorGroupConfig& conf );
+	~ProcessorGroup();
 
 	bool resolveDB( db::DatabaseProvider& db );
 
-	const WolframeProcessorChannel* procChannel() const;
+	const ProcessorChannel* procChannel() const;
 private:
 	std::string				m_dbLabel;
 	const db::Database*			m_db;
 	std::list<WolframeProcContainer*>	m_proc;
 };
 
-} // namespace _Wolframe
+}} // namespace _Wolframe::proc
 
 #endif // _WOLFRAME_PROCESSOR_GROUP_HPP_INCLUDED

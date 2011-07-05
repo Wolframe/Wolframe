@@ -53,12 +53,12 @@ namespace _Wolframe {
 		const std::string& banner() const		{ return m_banner; }
 		const db::DatabaseProvider& db() const		{ return m_db; }
 		const AAAA::AAAAprovider& aaaa() const		{ return m_aaaa; }
-		const WolframeProcGroup& procGroup() const	{ return m_procGroup; }
+		const proc::ProcessorGroup& procGroup() const	{ return m_procGroup; }
 	private:
 		const std::string		m_banner;
 		db::DatabaseProvider		m_db;
 		AAAA::AAAAprovider		m_aaaa;
-		WolframeProcGroup		m_procGroup;
+		proc::ProcessorGroup		m_procGroup;
 	};
 
 
@@ -101,7 +101,7 @@ namespace _Wolframe {
 //		AAAA::Auditor*			m_audit;
 //		AAAA::Accountant*		m_accounting;
 ///*************
-		WolframeProcessorChannel*	m_proc;
+		proc::ProcessorChannel*		m_proc;
 
 		/// Connection endpoints
 		const net::LocalEndpoint*	m_localEP;

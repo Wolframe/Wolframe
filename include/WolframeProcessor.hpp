@@ -38,26 +38,28 @@
 #define _WOLFRAME_PROCESSOR_HPP_INCLUDED
 
 namespace _Wolframe {
+namespace proc {
+
 
 /// base class for Wolframe processors channels
-class WolframeProcessorChannel
+class ProcessorChannel
 {
 public:
-	virtual ~WolframeProcessorChannel()		{}
+	virtual ~ProcessorChannel()		{}
 
 	virtual void close() const = 0;
 };
 
 
 /// base class for Wolframe processors
-class WolframeProcessor
+class Processor
 {
 public:
-	virtual ~WolframeProcessor()			{}
+	virtual ~Processor()			{}
 
 	virtual const char* typeName() const = 0;
 };
 
-} // namespace _Wolframe
+}} // namespace _Wolframe::proc
 
 #endif // _WOLFRAME_PROCESSOR_HPP_INCLUDED
