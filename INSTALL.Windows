@@ -48,9 +48,11 @@ https://svn.boost.org/trac/boost/ticket/4487
 Compile and install openssl
 ---------------------------
 
-Easiest is to get the native Windows binary version from
+Easiest is to get the native Windows binary version from:
 
 http://www.slproweb.com/products/Win32OpenSSL.html
+
+Despite the name you get also 64-bit versions there.
 
 Do not copy the OpenSSL binaries to the Windows system directory, copy
 them to the Bin subdirectory of the OpenSSL installation directory!

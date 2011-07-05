@@ -96,6 +96,6 @@ ZLIB_DIR = D:\Program Files\zlib-1.2.5
 # Tcl 8.5 and Expect
 ####################
 
-#TCL_DIR = D:\Tcl8.5
-TCL_DIR = D:\Program Files\Tcl8.5.9
+TCL_DIR = C:\Program Files (x86)\Tcl8.5.9
+#TCL_DIR = D:\Program Files\Tcl8.5.9
 EXPECT = $(TCL_DIR)\bin\tclsh.exe
