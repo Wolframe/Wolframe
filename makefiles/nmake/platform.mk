@@ -22,6 +22,16 @@
 #			-DOS_MAJOR_VERSION=$(OS_MAJOR_VERSION) \
 #			-DOS_MINOR_VERSION=$(OS_MINOR_VERSION)
 
+# Microsoft Platform SDK
+########################
+
+# TODO: add an easy detection for destination architecture
+# even not sure we should do this as the Windows SDK cmd.exe
+# usually sets the %LIB% and %INCLUDE% variables correctly
+# (but in VC80)
+SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib\x64"
+#SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib"
+
 # Boost
 #######
 

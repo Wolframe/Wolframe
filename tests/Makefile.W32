@@ -26,7 +26,6 @@ INCLUDE_DIRS = \
 	/I$(TOPDIR)\gtest\include
 
 # Note: libraries are picked automatically on Windows!
-SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib"
 INCLUDE_LDFLAGS = \
 	$(SDK_LDFLAGS) $(BOOST_LDFLAGS)
 

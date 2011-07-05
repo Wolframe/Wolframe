@@ -17,8 +17,6 @@ INCLUDE_DIRS = \
 # Note: libraries are picked automatically on Windows!
 # TODO: better probing and correct library path based on Arch and
 # platform SDK version
-SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib\x64"
-#SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib"
 INCLUDE_LDFLAGS = \
 	$(SDK_LDFLAGS) $(BOOST_LDFLAGS)
 
