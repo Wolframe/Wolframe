@@ -2,7 +2,7 @@ TOPDIR = .
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
-SUBDIRS = src gtest tests examples clients
+SUBDIRS = gtest src tests examples clients
 
 !IFDEF WITH_SSL
 SUBDIRS = lua $(SUBDIRS)

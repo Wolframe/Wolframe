@@ -17,8 +17,8 @@ INCLUDE_DIRS = \
 # Note: libraries are picked automatically on Windows!
 # TODO: better probing and correct library path based on Arch and
 # platform SDK version
-#SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib\x64"
-SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib"
+SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib\x64"
+#SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib"
 INCLUDE_LDFLAGS = \
 	$(SDK_LDFLAGS) $(BOOST_LDFLAGS)
 
@@ -135,6 +135,9 @@ LOCAL_STATIC_LIB_OBJS = \
 	connection.obj \
 	serverConfig.obj \
 	server.obj \
+	moduleLoaderConfig.obj \
+	WolframeProcGroup.obj \
+	echoProcessor.obj \
 	$(DB_OBJS) \
 	$(AAAA_OBJS)
 
@@ -195,6 +198,10 @@ run: $(CPP_BINS)
 !IFDEF WITH_SSL
 	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat
 	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >> test.bat
+!ENDIF
+!IFDEF WITH_PGSQL
+	@-echo copy "$(PGSQL_DIR)\lib\libpq.dll" . >> test.bat
+	@-echo copy "$(PGSQL_DIR)\bin\libintl.dll" . >> test.bat
 !ENDIF
 	@-echo echo Running the Wolframe server... >> test.bat
 	@-echo wolframed.exe -c wolframe.xml -d DATA >> test.bat

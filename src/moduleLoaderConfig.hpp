@@ -57,9 +57,7 @@ public:
 	/// methods
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
-#if !defined( _WIN32 )
 	void setCanonicalPathes( const std::string& referencePath );
-#endif // !defined( _WIN32 )
 private:
 	std::list< std::string* >	m_moduleFile;
 };

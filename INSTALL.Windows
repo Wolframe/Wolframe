@@ -52,6 +52,9 @@ Easiest is to get the native Windows binary version from
 
 http://www.slproweb.com/products/Win32OpenSSL.html
 
+Do not copy the OpenSSL binaries to the Windows system directory, copy
+them to the Bin subdirectory of the OpenSSL installation directory!
+
 Install Tcl and Expect
 ----------------------
 

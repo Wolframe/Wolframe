@@ -132,7 +132,6 @@ bool ModuleLoaderConfiguration::check() const
 	return retVal;
 }
 
-
 void ModuleLoaderConfiguration::setCanonicalPathes( const std::string& refPath )
 {
 	using namespace boost::filesystem;
