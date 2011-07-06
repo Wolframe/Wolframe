@@ -40,6 +40,26 @@
 #include <boost/asio/ssl.hpp>
 #endif // WITH_SSL
 
+namespace {
+
+class WolfClient
+{
+	private:
+		boost::asio::ip::tcp::socket m_socket;
+
+	public:
+		WolfClient( boost::asio::io_service& io_service )
+			: m_socket( io_service )
+		{
+		}
+
+		void start( boost::asio::ip::tcp::resolver::iterator endpoint_iter )
+		{
+		}
+};
+
+}
+
 int main( int argc, char *argv[] )
 {
 	if( argc != 3 ) {
@@ -58,9 +78,13 @@ int main( int argc, char *argv[] )
 
 	boost::asio::io_service io_service;
 	boost::asio::ip::tcp::resolver resolver( io_service );
-	boost::asio::ip::tcp::resolver::query query( host, argv[2] );
-        boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve( query );
-        endpoint.port( port );
+	WolfClient c( io_service );
+	c.start( resolver.resolve( boost::asio::ip::tcp::resolver::query( host, argv[2] ) ) );
+	io_service.run( );
+//	c.start( boost::asio::ip::tcp::resolver::query query( host, argv[2] );
+
+//        boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve( query );
+  //      endpoint.port( port );
 
 	return 0;
 }
