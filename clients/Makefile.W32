@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS =
+SUBDIRS = cli
 
 !IFDEF WITH_QT
 SUBDIRS = \
