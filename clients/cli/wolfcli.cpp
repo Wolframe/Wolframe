@@ -31,7 +31,36 @@
 
 ************************************************************************/
 
-int main( void )
+#include <iostream>
+#include <cstdlib>
+
+#include <boost/bind.hpp>
+#include <boost/asio.hpp>
+#ifdef WITH_SSL
+#include <boost/asio/ssl.hpp>
+#endif // WITH_SSL
+
+int main( int argc, char *argv[] )
 {
+	if( argc != 3 ) {
+		std::cerr << "Usage: wolfcli <host> <port>" << std::endl;
+		return 1;
+	}
+	char *host = argv[1];
+	int iport;
+	iport = atoi( argv[2] );
+	if( iport == 0 || iport == INT_MAX || iport == INT_MIN ||
+            iport > USHRT_MAX ) {
+		std::cerr << "Illegal port '" << argv[2] << "'!" << std::endl;
+		return 1;
+	}
+	unsigned short port = iport;
+
+	boost::asio::io_service io_service;
+	boost::asio::ip::tcp::resolver resolver( io_service );
+	boost::asio::ip::tcp::resolver::query query( host, argv[2] );
+        boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve( query );
+        endpoint.port( port );
+
 	return 0;
 }
