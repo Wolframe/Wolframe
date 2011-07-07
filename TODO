@@ -5,6 +5,8 @@ MBa:
 
 ABa:
 
+- wolfcli
+  - netcat with authentication and SSL
 - authentication
   - LDAP
   - AD/Windows Kerberos
@@ -25,17 +27,10 @@ ABa:
 - Logger:
   - get better interface in logger.hpp (inheriting basic::ostream
     instead of templating?)
-- 64-bit on Windows
-  - trouble with Qt
 - *BSD
   - OpenPAM instead of Linux-PAM
   - Qt not tested so far
   - trouble with some expect tests, check!
-- packaging
-  - SLES
-    ... testing for pre/postinstall scripts that are not idempotent
-    /.build_patchrpmcheck_scr: line 1: /usr/sbin/groupadd: No such file or directory
-    preinstall script of wolframe-0.0.1-sle11.74.1.i586.rpm failed
 
 PF:
 

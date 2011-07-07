@@ -75,7 +75,7 @@ OPENSSL_DIR = C:\Program Files\OpenSSL
 # take the VC2008 version SDK Opensource, not the MinGW one
 ############################################################
 
-QT_DIR = C:\Qt\4.7.1
+QT_DIR = C:\Qt\4.7.3
 #QT_DIR = /home/user/qt
 #QT_DIR = D:\Qt\4.7.2
 
