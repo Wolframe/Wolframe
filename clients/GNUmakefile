@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS =
+SUBDIRS = cli
 
 ifeq ($(WITH_QT),1)
 SUBDIRS += qt

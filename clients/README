@@ -1,0 +1,8 @@
+various clients
+
+cli	- text mode CLI using boost and optionally OpenSSL,
+          basically a netcat/nc with authentication and
+          encryption
+Android - Android based cell-phone client
+qt      - Qt client
+wt      - Wt client (web frontend)
