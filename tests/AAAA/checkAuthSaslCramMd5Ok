@@ -6,7 +6,7 @@
 package require Expect
 source md5.tcl
 
-set timeout 3
+set timeout 5
 log_user 0
 
 puts -nonewline "Authentication SASL CRAM MD5 successfull - "

@@ -5,7 +5,7 @@
 
 package require Expect
 
-set timeout 2
+set timeout 5
 log_user 0
 
 puts -nonewline "Authentication TEXTFILE wrong password - "
