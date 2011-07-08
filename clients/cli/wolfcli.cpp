@@ -48,10 +48,16 @@ class WolfClient
 		boost::asio::ip::tcp::socket m_socket;
 		boost::asio::deadline_timer m_deadline_timer;
 		boost::asio::streambuf m_input_buffer;
+		unsigned short m_connect_timeout;
+		unsigned short m_read_timeout;
 
 	public:
-		WolfClient( boost::asio::io_service& io_service )
-			: m_socket( io_service ), m_deadline_timer( io_service )
+		WolfClient(	boost::asio::io_service& io_service,
+				unsigned short connect_timeout,
+				unsigned short read_timeout )
+			: m_socket( io_service ), m_deadline_timer( io_service ),
+			  m_connect_timeout( connect_timeout ),
+			  m_read_timeout( read_timeout )
 		{
 		}
 
@@ -65,7 +71,7 @@ class WolfClient
 	private:
 		void start_connect( boost::asio::ip::tcp::resolver::iterator endpoint_iter )
 		{
-			m_deadline_timer.expires_from_now( boost::posix_time::seconds( 60 ) );
+			m_deadline_timer.expires_from_now( boost::posix_time::seconds( m_connect_timeout ) );
 
 			m_socket.async_connect( endpoint_iter->endpoint( ),
 				boost::bind( &WolfClient::handle_connect, this, _1, endpoint_iter ) );
@@ -87,7 +93,7 @@ class WolfClient
 
 		void start_read( )
 		{
-			m_deadline_timer.expires_from_now( boost::posix_time::seconds( 30 ) );
+			m_deadline_timer.expires_from_now( boost::posix_time::seconds( m_read_timeout ) );
 			boost::asio::async_read_until( m_socket, m_input_buffer, '\n',
 				boost::bind( &WolfClient::handle_read, this, _1 ) );
 		}
@@ -157,13 +163,9 @@ int main( int argc, char *argv[] )
 
 	boost::asio::io_service io_service;
 	boost::asio::ip::tcp::resolver resolver( io_service );
-	WolfClient c( io_service );
+	WolfClient c( io_service, 20, 5 );
 	c.start( resolver.resolve( boost::asio::ip::tcp::resolver::query( host, argv[2] ) ) );
 	io_service.run( );
-//	c.start( boost::asio::ip::tcp::resolver::query query( host, argv[2] );
-
-//        boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve( query );
-  //      endpoint.port( port );
 
 	return 0;
 }
