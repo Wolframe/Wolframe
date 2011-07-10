@@ -32,8 +32,10 @@
 ************************************************************************/
 
 #include <iostream>
-#include <cstdlib>
 
+#include <boost/program_options.hpp>
+
+#include <boost/thread.hpp>
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 #ifdef WITH_SSL
@@ -45,6 +47,7 @@ namespace {
 class WolfClient
 {
 	private:
+		boost::asio::io_service& m_io_service;
 		boost::asio::ip::tcp::socket m_socket;
 		boost::asio::deadline_timer m_deadline_timer;
 		boost::asio::streambuf m_input_buffer;
@@ -55,7 +58,8 @@ class WolfClient
 		WolfClient(	boost::asio::io_service& io_service,
 				unsigned short connect_timeout,
 				unsigned short read_timeout )
-			: m_socket( io_service ), m_deadline_timer( io_service ),
+			: m_io_service( io_service ),
+			  m_socket( io_service ), m_deadline_timer( io_service ),
 			  m_connect_timeout( connect_timeout ),
 			  m_read_timeout( read_timeout )
 		{
@@ -66,6 +70,16 @@ class WolfClient
 			start_connect( endpoint_iter );
 
 			m_deadline_timer.async_wait( boost::bind( &WolfClient::check_deadline, this ) );
+		}
+
+		void stop( )
+		{
+			m_io_service.stop( );
+		}
+
+		void write( const char *s )
+		{
+			start_write( );
 		}
 
 	private:
@@ -81,14 +95,14 @@ class WolfClient
 		{
 			if( ec ) {
 				m_socket.close( );
-				std::cerr << "Connect error: " << ec.message( ) << std::endl;
+				m_io_service.stop( );
+				std::cerr << "Connect error: " << ec.message( ) << " (" << ec.value( ) << ")" << std::endl;
 				return;
 			}
 
 			std::cerr << "Connected to " << endpoint_iter->endpoint( ) << std::endl;
 
 			start_read( );
-			start_write( );
 		}
 
 		void start_read( )
@@ -101,7 +115,8 @@ class WolfClient
 		void handle_read( const boost::system::error_code &ec )
 		{
 			if( ec ) {
-				std::cerr << "Error reading: " << ec.message( ) << std::endl;
+				m_io_service.stop( );
+				std::cerr << "Read error: " << ec.message( ) << " (" << ec.value( ) << ")" << std::endl;
 				return;
 			}
 
@@ -118,14 +133,15 @@ class WolfClient
 
 		void start_write( )
 		{
-			boost::asio::async_write( m_socket, boost::asio::buffer( "\n", 1 ),
+			boost::asio::async_write( m_socket, boost::asio::buffer( "ping\n", 1 ),
 				boost::bind( &WolfClient::handle_write, this, _1 ) );
 		}
 
 		void handle_write( const boost::system::error_code &ec )
 		{
 			if( ec ) {
-				std::cerr << "Error writing: " << ec.message( ) << std::endl;
+				m_io_service.stop( );
+				std::cerr << "Write error: " << ec.message( ) << " (" << ec.value( ) << ")" << std::endl;
 				return;
 			}
 		}
@@ -145,27 +161,43 @@ class WolfClient
 
 }
 
+namespace {
+
+void read_from_stdin( WolfClient *c )
+{
+	char line[2048];
+	do {
+		std::cin.getline( line, 2048, '\n' );
+		if( !std::cin.eof( ) ) {
+			c->write( line );
+		}
+	} while( !std::cin.eof( ) );
+
+	c->stop( );
+}
+
+}
+
 int main( int argc, char *argv[] )
 {
+        boost::program_options::options_description options;
+
 	if( argc != 3 ) {
 		std::cerr << "Usage: wolfcli <host> <port>" << std::endl;
 		return 1;
 	}
 	char *host = argv[1];
-	int iport;
-	iport = atoi( argv[2] );
-	if( iport == 0 || iport == INT_MAX || iport == INT_MIN ||
-            iport > USHRT_MAX ) {
-		std::cerr << "Illegal port '" << argv[2] << "'!" << std::endl;
-		return 1;
-	}
-	unsigned short port = iport;
+	char *port = argv[2];
 
 	boost::asio::io_service io_service;
 	boost::asio::ip::tcp::resolver resolver( io_service );
 	WolfClient c( io_service, 20, 5 );
-	c.start( resolver.resolve( boost::asio::ip::tcp::resolver::query( host, argv[2] ) ) );
-	io_service.run( );
+	c.start( resolver.resolve( boost::asio::ip::tcp::resolver::query( host, port ) ) );
 
-	return 0;
+	boost::thread netthread( boost::bind( &boost::asio::io_service::run, &io_service ) );
+	boost::thread stdinthread( read_from_stdin, &c );
+
+	netthread.join( );
+	// no sense to wait for stdin thread to wait here, we have a broken connection!
 }
+
