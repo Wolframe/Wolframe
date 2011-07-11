@@ -53,6 +53,7 @@ class WolfClient
 		boost::asio::ip::tcp::socket m_socket;
 		boost::asio::deadline_timer m_deadline_timer;
 		boost::asio::streambuf m_input_buffer;
+		std::string m_output_buffer;
 		unsigned short m_connect_timeout;
 		unsigned short m_read_timeout;
 
@@ -82,7 +83,10 @@ class WolfClient
 
 		void write( const char *s )
 		{
-			start_write( s );
+			m_output_buffer.append( s );
+			m_output_buffer.append( "\n" );
+
+			start_write( );
 		}
 
 	private:
@@ -137,9 +141,10 @@ class WolfClient
 			start_read( );
 		}
 
-		void start_write( const char *s )
+		void start_write( )
 		{
-			boost::asio::async_write( m_socket, boost::asio::buffer( s, strlen( s ) ),
+			boost::asio::async_write( m_socket,  boost::asio::buffer( m_output_buffer,
+				m_output_buffer.size( ) ),
 				boost::bind( &WolfClient::handle_write, this, _1 ) );
 		}
 
@@ -177,8 +182,6 @@ void read_from_stdin( WolfClient *c )
 	do {
 		std::cin.getline( line, 2048, '\n' );
 		if( !std::cin.eof( ) ) {
-			line[strlen( line )] = '\n';
-			line[strlen( line )+1] = '\0';
 			c->write( line );
 		}
 	} while( !std::cin.eof( ) );
