@@ -443,3 +443,7 @@ windows/wolframe.xml
 XML/configuration.rng
 XML/database.rng
 XML/logging.rng
+.Attic/loadModule/Makefile.W32
+.Attic/loadModule/GNUmakefile
+.Attic/loadModule/cross.cpp
+.Attic/loadModule/moduleBase.hpp
