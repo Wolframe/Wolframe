@@ -33,6 +33,8 @@
 
 #include <iostream>
 
+#include <cstring>
+
 #include <boost/program_options.hpp>
 
 #include <boost/thread.hpp>
@@ -74,12 +76,13 @@ class WolfClient
 
 		void stop( )
 		{
+			// TODO: send outstanding network data!
 			m_io_service.stop( );
 		}
 
 		void write( const char *s )
 		{
-			start_write( );
+			start_write( s );
 		}
 
 	private:
@@ -131,9 +134,9 @@ class WolfClient
 			start_read( );
 		}
 
-		void start_write( )
+		void start_write( const char *s )
 		{
-			boost::asio::async_write( m_socket, boost::asio::buffer( "ping\n", 1 ),
+			boost::asio::async_write( m_socket, boost::asio::buffer( s, strlen( s ) ),
 				boost::bind( &WolfClient::handle_write, this, _1 ) );
 		}
 
@@ -144,6 +147,8 @@ class WolfClient
 				std::cerr << "Write error: " << ec.message( ) << " (" << ec.value( ) << ")" << std::endl;
 				return;
 			}
+
+			start_read( );
 		}
 
 		void check_deadline( )
@@ -169,6 +174,8 @@ void read_from_stdin( WolfClient *c )
 	do {
 		std::cin.getline( line, 2048, '\n' );
 		if( !std::cin.eof( ) ) {
+			line[strlen( line )] = '\n';
+			line[strlen( line )+1] = '\0';
 			c->write( line );
 		}
 	} while( !std::cin.eof( ) );
@@ -199,5 +206,7 @@ int main( int argc, char *argv[] )
 
 	netthread.join( );
 	// no sense to wait for stdin thread to wait here, we have a broken connection!
+	// we can't set interruptions points either! So it's either this or a POSIX pipe
+	// or WaitForObject on the stdin handle (using or writing asio extensions)
 }
 
