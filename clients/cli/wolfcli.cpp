@@ -117,6 +117,9 @@ class WolfClient
 
 		void handle_read( const boost::system::error_code &ec )
 		{
+			// EOF is ok in certain conditions (for instance after having stopped to
+			// receive data from stdin)
+			// TODO: if ec.value( ) == EOF(code?) -> return;
 			if( ec ) {
 				m_io_service.stop( );
 				std::cerr << "Read error: " << ec.message( ) << " (" << ec.value( ) << ")" << std::endl;
