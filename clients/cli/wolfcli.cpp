@@ -143,9 +143,11 @@ class WolfClient
 
 		void start_write( )
 		{
-			boost::asio::async_write( m_socket,  boost::asio::buffer( m_output_buffer,
-				m_output_buffer.size( ) ),
-				boost::bind( &WolfClient::handle_write, this, _1 ) );
+			boost::asio::write( m_socket, boost::asio::buffer( m_output_buffer,
+				m_output_buffer.size( ) ) );
+//			boost::asio::async_write( m_socket,  boost::asio::buffer( m_output_buffer,
+//				m_output_buffer.size( ) ),
+//				boost::bind( &WolfClient::handle_write, this, _1 ) );
 		}
 
 		void handle_write( const boost::system::error_code &ec )
