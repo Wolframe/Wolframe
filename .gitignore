@@ -54,6 +54,7 @@ moc_*.cpp
 clients/qt/.history
 clients/Android/local.properties
 clients/Android/Wolframe.keystore
+clients/cli/wolfcli
 tests/db/sdsqliteTest
 tests/db/sqlite3ppTest
 examples/iproc/iprocd
@@ -63,3 +64,4 @@ docs/WolfBook.html
 docs/WolfBook.pdf
 docs/doxygen/
 clients/wt/wtclient
+src/primary.db
