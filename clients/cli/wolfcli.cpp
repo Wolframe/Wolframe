@@ -184,13 +184,39 @@ void read_from_stdin( WolfClient *c )
 int main( int argc, char *argv[] )
 {
         boost::program_options::options_description options;
+	boost::program_options::positional_options_description pd;
 
-	if( argc != 3 ) {
-		std::cerr << "Usage: wolfcli <host> <port>" << std::endl;
+	options.add_options( )
+		( "version,v", "print version" )
+		( "help,h", "print help message" )
+		( "host", "the host to connect to" )
+		( "port", "the port to connect to" )
+		;
+	pd.add( "host", 1 ).add( "port", 1 );
+
+	boost::program_options::variables_map map;
+	store( boost::program_options::command_line_parser( argc, argv )
+		.options( options ).positional( pd ).run( ), map );
+	notify( map );
+
+	if( map.count( "help" ) ) {
+		std::cout << "Usage: wolfcli [options] <host> <port>" << std::endl;
+		std::cout << "Options:" << std::endl;
+		options.print( std::cout );
 		return 1;
 	}
-	char *host = argv[1];
-	char *port = argv[2];
+
+	if( !map.count( "host" ) ) {
+		std::cerr << "ERROR: a host name or IP is required as first argument!" << std::endl;
+		return 1;
+	}
+	if( !map.count( "port" ) ) {
+		std::cerr << "ERROR: a port is required as second argument!" << std::endl;
+		return 1;
+	}
+
+	char *host = argv[argc-2];
+	char *port = argv[argc-1];
 
 	boost::asio::io_service io_service;
 	boost::asio::ip::tcp::resolver resolver( io_service );
