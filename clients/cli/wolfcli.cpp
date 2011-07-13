@@ -145,20 +145,8 @@ class WolfClient
 		{
 			boost::asio::write( m_socket, boost::asio::buffer( m_output_buffer,
 				m_output_buffer.size( ) ) );
-//			boost::asio::async_write( m_socket,  boost::asio::buffer( m_output_buffer,
-//				m_output_buffer.size( ) ),
-//				boost::bind( &WolfClient::handle_write, this, _1 ) );
-		}
 
-		void handle_write( const boost::system::error_code &ec )
-		{
-			if( ec ) {
-				m_io_service.stop( );
-				std::cerr << "Write error: " << ec.message( ) << " (" << ec.value( ) << ")" << std::endl;
-				return;
-			}
-
-			start_read( );
+			m_output_buffer.clear( );
 		}
 
 		void check_deadline( )
