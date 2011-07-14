@@ -189,6 +189,11 @@ int main( int argc, char *argv[] )
 	options.add_options( )
 		( "version,v", "print version" )
 		( "help,h", "print help message" )
+		( "connect-timeout", "in seconds, how long to wait for connect" )
+		( "read-timeout", "in seconds, terminate after inactivity" )
+#ifdef WITH_SSL
+		( "ssl,S", "use SSL encryption" )
+#endif
 		( "host", "the host to connect to" )
 		( "port", "the port to connect to" )
 		;
@@ -220,6 +225,17 @@ int main( int argc, char *argv[] )
 
 	boost::asio::io_service io_service;
 	boost::asio::ip::tcp::resolver resolver( io_service );
+
+#ifdef WITH_SSL
+	if( map.count( "ssl" ) ) {
+		boost::asio::ssl::context ctx( io_service, boost::asio::ssl::context::sslv23 );
+		ctx.set_options( boost::asio::ssl::context::default_workarounds
+			| boost::asio::ssl::context::no_sslv2 );
+		ctx.set_verify_mode( boost::asio::ssl::context::verify_peer );
+//		ctx.load_verify_file( "ca.pem" );
+	}
+#endif
+
 	WolfClient c( io_service, 20, 5 );
 	c.start( resolver.resolve( boost::asio::ip::tcp::resolver::query( host, port ) ) );
 
