@@ -105,6 +105,21 @@ private:
 	std::string	m_logPrefix;
 };
 
+
+///
+///
+///
+class ContainerConfiguration : public ConfigurationBase
+{
+public:
+	/// constructor
+	ContainerConfiguration( const char* cfgName, const char* logParent, const char* logName )
+		: ConfigurationBase( cfgName, logParent, logName )	{}
+	virtual ~ContainerConfiguration()				{}
+
+	virtual const char* typeName() const = 0;
+};
+
 }} // namespace _Wolframe::config
 
 #endif // _CONFIGURATION_BASE_HPP_INCLUDED
