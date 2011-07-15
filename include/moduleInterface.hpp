@@ -51,6 +51,31 @@ enum ModuleType	{
 	PROCESSOR_MODULE
 };
 
+
+//class ModuleConfiguration : public config::ConfigurationBase
+//{
+//public:
+//	/// Class constructor.
+//	///\param[in]	name	the name that will be displayed for this
+//	///			configuration section in messages (log, print ...)
+//	///			It has no other processing purpose
+//	///\param[in]	logParent the logging prefix of the parent.
+//	///\param[in]	logName	the logging name of this section. Combined with
+//	///			the logParent parameter will form the whole logging
+//	///			prefix for of the section.
+//	ModuleConfiguration( const char* name, const char* logParent, const char* logName )
+//		: config::ConfigurationBase( name, logParent, logName )	{}
+
+//	virtual ~ModuleConfiguration()			{}
+
+//	virtual const char* typeName() const = 0;
+
+//	static ModuleConfiguration* create( const char* name, const char* logParent, const char* logName )	{
+//		return new ModuleConfiguration( name, logParent, logName );
+//	}
+//};
+
+
 template< class T, class Tbase >
 class ModuleConfiguration : public Tbase
 {

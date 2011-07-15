@@ -42,6 +42,7 @@
 #include "AAAA/authenticationContainer.hpp"
 #include "AAAA/audit.hpp"
 #include "AAAA/auditContainer.hpp"
+#include "moduleInterface.hpp"
 
 #include "database/database.hpp"
 
@@ -66,16 +67,16 @@ public:
 	void setCanonicalPathes( const std::string& referencePath );
 private:
 	bool						m_allowAnonymous;
-	std::list< AuthenticationConfiguration* >	m_authConfig;
-	std::list< AuditConfiguration* >		m_auditConfig;
+	std::list< config::ContainerConfiguration* >	m_authConfig;
+	std::list< config::ContainerConfiguration* >	m_auditConfig;
 };
 
 
 class AuthenticationGroup
 {
 public:
-	AuthenticationGroup( const std::list< AuthenticationConfiguration* >& confs,
-			     module::ModuleContainerDescription<AuthenticationContainer, AuthenticationConfiguration>* description,
+	AuthenticationGroup( const std::list< config::ContainerConfiguration* >& confs,
+			     module::ModuleContainerDescription<AuthenticationContainer, config::ContainerConfiguration>* description,
 			     size_t descrSize );
 	~AuthenticationGroup();
 	bool resolveDB( db::DatabaseProvider& db );
@@ -89,8 +90,8 @@ private:
 class AuditGroup
 {
 public:
-	AuditGroup( const std::list< AuditConfiguration* >& confs,
-		    module::ModuleContainerDescription< AuditContainer, AuditConfiguration >* description,
+	AuditGroup( const std::list< config::ContainerConfiguration* >& confs,
+		    module::ModuleContainerDescription< AuditContainer, config::ContainerConfiguration >* description,
 		    size_t descrSize );
 	~AuditGroup();
 	bool resolveDB( db::DatabaseProvider& db );
