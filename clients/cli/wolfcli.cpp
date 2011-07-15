@@ -48,6 +48,98 @@ namespace {
 
 class WolfClient
 {
+	public:
+		virtual void start( boost::asio::ip::tcp::resolver::iterator endpoint_iter ) = 0;
+		virtual void stop( ) = 0;
+		virtual void write( const char *s ) = 0;
+};
+
+#ifdef WITH_SSL
+class SSLWolfClient : public WolfClient
+{
+	private:
+		boost::asio::io_service& m_io_service;
+		boost::asio::ssl::stream<boost::asio::ip::tcp::socket> m_socket;
+		boost::asio::deadline_timer m_deadline_timer;
+		boost::asio::streambuf m_input_buffer;
+		std::string m_output_buffer;
+		unsigned short m_connect_timeout;
+		unsigned short m_read_timeout;
+
+	public:
+		SSLWolfClient(	boost::asio::io_service& io_service,
+			  	boost::asio::ssl::context& ctx,
+				unsigned short connect_timeout,
+				unsigned short read_timeout )
+			: m_io_service( io_service ),
+			  m_socket( io_service, ctx ), m_deadline_timer( io_service ),
+			  m_connect_timeout( connect_timeout ),
+			  m_read_timeout( read_timeout )
+		{
+		}
+
+		void start( boost::asio::ip::tcp::resolver::iterator endpoint_iter )
+		{
+			start_connect( endpoint_iter );
+
+			m_deadline_timer.async_wait( boost::bind( &SSLWolfClient::check_deadline, this ) );
+		}
+
+		void stop( )
+		{
+		}
+
+		void write( const char *s )
+		{
+		}
+
+	private:
+		void start_connect( boost::asio::ip::tcp::resolver::iterator endpoint_iter )
+		{
+			m_deadline_timer.expires_from_now( boost::posix_time::seconds( m_connect_timeout ) );
+
+			m_socket.async_connect( endpoint_iter->endpoint( ),
+				boost::bind( &SSLWolfClient::handle_connect, this, _1, endpoint_iter ) );
+		}
+
+		void handle_connect( const boost::system::error_code &ec, boost::asio::ip::tcp::resolver::iterator endpoint_iter )
+		{
+			if( ec ) {
+				m_socket.lowest_layer( ).close( );
+				m_io_service.stop( );
+				std::cerr << "Connect error: " << ec.message( ) << " (" << ec.value( ) << ")" << std::endl;
+				return;
+			}
+
+			std::cerr << "Connected to " << endpoint_iter->endpoint( ) << std::endl;
+
+			m_deadline_timer.expires_from_now( boost::posix_time::seconds( m_connect_timeout ) );
+
+			m_socket.async_handshake( boost::asio::ssl::stream_base::client,
+				boost::bind(&SSLWolfClient::handle_handshake, this, boost::asio::placeholders::error ) );
+		}
+
+		void handle_handshake( const boost::system::error_code &ec )
+		{
+		}
+
+		void check_deadline( )
+		{
+			if( m_deadline_timer.expires_at( ) <= boost::asio::deadline_timer::traits_type::now( ) ) {
+				std::cerr << "Timeout on read.. terminating connection" << std::endl;
+				m_socket.close( );
+				m_deadline_timer.expires_at( boost::posix_time::pos_infin );
+				return;
+			}
+
+			m_deadline_timer.async_wait( boost::bind( &PlainWolfClient::check_deadline, this ) );
+		}
+
+};
+#endif
+
+class PlainWolfClient : public WolfClient
+{
 	private:
 		boost::asio::io_service& m_io_service;
 		boost::asio::ip::tcp::socket m_socket;
@@ -58,9 +150,9 @@ class WolfClient
 		unsigned short m_read_timeout;
 
 	public:
-		WolfClient(	boost::asio::io_service& io_service,
-				unsigned short connect_timeout,
-				unsigned short read_timeout )
+		PlainWolfClient(	boost::asio::io_service& io_service,
+					unsigned short connect_timeout,
+					unsigned short read_timeout )
 			: m_io_service( io_service ),
 			  m_socket( io_service ), m_deadline_timer( io_service ),
 			  m_connect_timeout( connect_timeout ),
@@ -72,7 +164,7 @@ class WolfClient
 		{
 			start_connect( endpoint_iter );
 
-			m_deadline_timer.async_wait( boost::bind( &WolfClient::check_deadline, this ) );
+			m_deadline_timer.async_wait( boost::bind( &PlainWolfClient::check_deadline, this ) );
 		}
 
 		void stop( )
@@ -95,7 +187,7 @@ class WolfClient
 			m_deadline_timer.expires_from_now( boost::posix_time::seconds( m_connect_timeout ) );
 
 			m_socket.async_connect( endpoint_iter->endpoint( ),
-				boost::bind( &WolfClient::handle_connect, this, _1, endpoint_iter ) );
+				boost::bind( &PlainWolfClient::handle_connect, this, _1, endpoint_iter ) );
 		}
 
 		void handle_connect( const boost::system::error_code &ec, boost::asio::ip::tcp::resolver::iterator endpoint_iter )
@@ -116,7 +208,7 @@ class WolfClient
 		{
 			m_deadline_timer.expires_from_now( boost::posix_time::seconds( m_read_timeout ) );
 			boost::asio::async_read_until( m_socket, m_input_buffer, '\n',
-				boost::bind( &WolfClient::handle_read, this, _1 ) );
+				boost::bind( &PlainWolfClient::handle_read, this, _1 ) );
 		}
 
 		void handle_read( const boost::system::error_code &ec )
@@ -158,8 +250,9 @@ class WolfClient
 				return;
 			}
 
-			m_deadline_timer.async_wait( boost::bind( &WolfClient::check_deadline, this ) );
+			m_deadline_timer.async_wait( boost::bind( &PlainWolfClient::check_deadline, this ) );
 		}
+
 };
 
 }
@@ -227,24 +320,36 @@ int main( int argc, char *argv[] )
 	boost::asio::ip::tcp::resolver resolver( io_service );
 
 #ifdef WITH_SSL
+	boost::asio::ssl::context ctx( io_service, boost::asio::ssl::context::sslv23 );
 	if( map.count( "ssl" ) ) {
-		boost::asio::ssl::context ctx( io_service, boost::asio::ssl::context::sslv23 );
 		ctx.set_options( boost::asio::ssl::context::default_workarounds
 			| boost::asio::ssl::context::no_sslv2 );
 		ctx.set_verify_mode( boost::asio::ssl::context::verify_peer );
 //		ctx.load_verify_file( "ca.pem" );
 	}
-#endif
+#endif // WITH_SSL
 
-	WolfClient c( io_service, 20, 5 );
-	c.start( resolver.resolve( boost::asio::ip::tcp::resolver::query( host, port ) ) );
+	WolfClient *c;
+#ifdef WITH_SSL
+	if( map.count( "ssl" ) ) {
+		c = new SSLWolfClient( io_service, ctx, 20, 5 );
+	} else {
+#endif // WITH_SSL
+		c = new PlainWolfClient( io_service, 20, 5 );
+#ifdef WITH_SSL
+	}
+#endif // WITH_SSL
+
+	c->start( resolver.resolve( boost::asio::ip::tcp::resolver::query( host, port ) ) );
 
 	boost::thread netthread( boost::bind( &boost::asio::io_service::run, &io_service ) );
-	boost::thread stdinthread( read_from_stdin, &c );
+	boost::thread stdinthread( read_from_stdin, c );
 
 	netthread.join( );
 	// no sense to wait for stdin thread to wait here, we have a broken connection!
 	// we can't set interruptions points either! So it's either this or a POSIX pipe
 	// or WaitForObject on the stdin handle (using or writing asio extensions)
+
+	delete c;
 }
 
