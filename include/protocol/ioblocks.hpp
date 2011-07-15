@@ -309,9 +309,14 @@ public:
 			{
 				m_state = LF_DOT;
 				BufferType::push_back( ch);
+
 			}
+			m_state = SRC;
 		}
-		m_state = SRC;
+		else
+		{
+			m_state = SRC;
+		}
 	}
 private:
 	State m_state;		///< the current state of escaping LF DOT as LF DOT DOT
