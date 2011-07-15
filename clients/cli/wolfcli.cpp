@@ -98,7 +98,7 @@ class SSLWolfClient : public WolfClient
 		{
 			m_deadline_timer.expires_from_now( boost::posix_time::seconds( m_connect_timeout ) );
 
-			m_socket.async_connect( endpoint_iter->endpoint( ),
+			m_socket.lowest_layer( ).async_connect( endpoint_iter->endpoint( ),
 				boost::bind( &SSLWolfClient::handle_connect, this, _1, endpoint_iter ) );
 		}
 
@@ -127,12 +127,12 @@ class SSLWolfClient : public WolfClient
 		{
 			if( m_deadline_timer.expires_at( ) <= boost::asio::deadline_timer::traits_type::now( ) ) {
 				std::cerr << "Timeout on read.. terminating connection" << std::endl;
-				m_socket.close( );
+				m_socket.lowest_layer( ).close( );
 				m_deadline_timer.expires_at( boost::posix_time::pos_infin );
 				return;
 			}
 
-			m_deadline_timer.async_wait( boost::bind( &PlainWolfClient::check_deadline, this ) );
+			m_deadline_timer.async_wait( boost::bind( &SSLWolfClient::check_deadline, this ) );
 		}
 
 };
