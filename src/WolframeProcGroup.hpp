@@ -63,8 +63,8 @@ public:
 	void print( std::ostream& os, size_t indent ) const;
 	virtual void setCanonicalPathes( const std::string& referencePath );
 private:
-	std::string				m_dbLabel;
-	std::list<WolframeProcConfig*>		m_procConfig;
+	std::string					m_dbLabel;
+	std::list< config::ContainerConfiguration* >	m_procConfig;
 };
 
 
