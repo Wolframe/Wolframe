@@ -48,7 +48,7 @@ namespace _Wolframe {
 namespace db {
 
 /// SQLite database configuration
-class SQLiteConfig : public module::ModuleConfiguration< SQLiteConfig, config::ContainerConfiguration >
+class SQLiteConfig : public module::ModuleConfiguration< SQLiteConfig >
 {
 	friend class config::ConfigurationParser;
 	friend class SQLiteContainer;
@@ -89,7 +89,7 @@ private:
 
 
 class SQLiteContainer : public module::ModuleContainer< SQLiteContainer, SQLiteConfig,
-		DatabaseContainer, config::ContainerConfiguration >
+		DatabaseContainer >
 {
 public:
 	SQLiteContainer( const SQLiteConfig& conf );

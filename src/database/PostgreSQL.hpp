@@ -48,7 +48,7 @@ namespace _Wolframe {
 namespace db {
 
 /// PostgreSQL server connection configuration
-class PostgreSQLconfig : public module::ModuleConfiguration< PostgreSQLconfig, config::ContainerConfiguration >
+class PostgreSQLconfig : public module::ModuleConfiguration< PostgreSQLconfig >
 {
 	friend class config::ConfigurationParser;
 	friend class PostgreSQLcontainer;
@@ -97,7 +97,7 @@ private:
 
 
 class PostgreSQLcontainer : public module::ModuleContainer< PostgreSQLcontainer, PostgreSQLconfig,
-		DatabaseContainer, config::ContainerConfiguration >
+		DatabaseContainer >
 {
 public:
 	PostgreSQLcontainer( const PostgreSQLconfig& conf );

@@ -43,13 +43,13 @@
 namespace _Wolframe {
 namespace AAAA {
 
-class DBauditConfig : public module::ModuleConfiguration< DBauditConfig, config::ContainerConfiguration >
+class DBauditConfig : public module::ModuleConfiguration< DBauditConfig >
 {
 	friend class DBauditContainer;
 	friend class config::ConfigurationParser;
 public:
 	DBauditConfig( const char* cfgName, const char* logParent, const char* logName )
-		: module::ModuleConfiguration< DBauditConfig, config::ContainerConfiguration >( cfgName, logParent, logName ),
+		: module::ModuleConfiguration< DBauditConfig >( cfgName, logParent, logName ),
 		  m_dbConfig( "", logParent, "" )		{}
 
 	const char* typeName() const				{ return "DatabaseAudit"; }
@@ -69,7 +69,7 @@ private:
 
 
 class DBauditContainer : public module::ModuleContainer< DBauditContainer, DBauditConfig,
-		AuditContainer, config::ContainerConfiguration >
+		AuditContainer >
 {
 public:
 	DBauditContainer( const DBauditConfig& conf );

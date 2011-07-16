@@ -76,8 +76,8 @@ enum ModuleType	{
 //};
 
 
-template< class T, class Tbase >
-class ModuleConfiguration : public Tbase
+template< class T >
+class ModuleConfiguration : public config::ContainerConfiguration
 {
 public:
 	/// Class constructor.
@@ -89,12 +89,12 @@ public:
 	///			the logParent parameter will form the whole logging
 	///			prefix for of the section.
 	ModuleConfiguration( const char* name, const char* logParent, const char* logName )
-		: Tbase( name, logParent, logName )	{}
+		: config::ContainerConfiguration( name, logParent, logName )	{}
 
 	virtual ~ModuleConfiguration()			{}
 
 	virtual const char* typeName() const = 0;
-	static Tbase* create( const char* name, const char* logParent, const char* logName )	{
+	static config::ContainerConfiguration* create( const char* name, const char* logParent, const char* logName )	{
 		return new T( name, logParent, logName );
 	}
 };
@@ -121,14 +121,14 @@ public:
 };
 
 
-template < class T, class Tconf, class Tbase, class TbaseConf >
+template < class T, class Tconf, class Tbase >
 class ModuleContainer : public Tbase
 {
 public:
 	virtual ~ModuleContainer()			{}
 	virtual const char* typeName() const = 0;
 
-	static Tbase* create( const TbaseConf& conf )	{
+	static Tbase* create( const config::ContainerConfiguration& conf )	{
 		return new T( dynamic_cast< const Tconf& >( conf ));
 	}
 };
