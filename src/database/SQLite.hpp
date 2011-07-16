@@ -48,7 +48,7 @@ namespace _Wolframe {
 namespace db {
 
 /// SQLite database configuration
-class SQLiteConfig : public module::ModuleConfiguration< SQLiteConfig, DatabaseConfig >
+class SQLiteConfig : public module::ModuleConfiguration< SQLiteConfig, config::ContainerConfiguration >
 {
 	friend class config::ConfigurationParser;
 	friend class SQLiteContainer;
@@ -62,6 +62,7 @@ public:
 	void print( std::ostream& os, size_t indent ) const;
 	virtual void setCanonicalPathes( const std::string& referencePath );
 private:
+	std::string	m_ID;
 	std::string	filename;
 	bool		flag;
 };
@@ -88,7 +89,7 @@ private:
 
 
 class SQLiteContainer : public module::ModuleContainer< SQLiteContainer, SQLiteConfig,
-		DatabaseContainer, DatabaseConfig >
+		DatabaseContainer, config::ContainerConfiguration >
 {
 public:
 	SQLiteContainer( const SQLiteConfig& conf );

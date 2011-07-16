@@ -60,7 +60,7 @@ public:
 	void print( std::ostream& os, size_t indent ) const;
 	virtual void setCanonicalPathes( const std::string& referencePath );
 private:
-	std::list<DatabaseConfig*>	m_dbConfig;
+	std::list< config::ContainerConfiguration* >	m_dbConfig;
 };
 
 ///
@@ -73,7 +73,7 @@ public:
 
 	const Database* database( const std::string& ID ) const;
 private:
-	std::list<DatabaseContainer*>	m_db;
+	std::list< DatabaseContainer* >	m_db;
 };
 
 }} // namespace _Wolframe::db

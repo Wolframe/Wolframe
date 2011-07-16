@@ -44,14 +44,14 @@ namespace db {
 
 /// database reference class
 /// note that this is a configuration class only
-class ReferenceConfig : public DatabaseConfig
+class ReferenceConfig : public config::ContainerConfiguration
 {
 	friend class config::ConfigurationParser;
 public:
 	const char* typeName() const			{ return "DB Reference"; }
 
 	ReferenceConfig( const char* name, const char* logParent, const char* logName )
-		: DatabaseConfig( name, logParent, logName )	{}
+		: config::ContainerConfiguration( name, logParent, logName )	{}
 
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;

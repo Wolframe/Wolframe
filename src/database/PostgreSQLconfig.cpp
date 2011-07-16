@@ -56,12 +56,12 @@ bool ConfigurationParser::parse( db::PostgreSQLconfig& cfg,
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "identifier" ))	{
-			bool isDefined = ( !cfg.ID().empty() );
+			bool isDefined = ( !cfg.m_ID.empty() );
 			std::string id;
 			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, id, &isDefined ))
 				retVal = false;
 			else
-				cfg.ID( id );
+				cfg.m_ID = id;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "host" ))	{
 			bool isDefined = ( !cfg.host.empty());

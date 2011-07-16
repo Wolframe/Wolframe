@@ -37,6 +37,7 @@
 #include "logger.hpp"
 #include "PostgreSQL.hpp"
 #include "database/databaseOperation.hpp"
+#include "libpq-fe.h"
 
 #include <string>
 #include <sstream>
@@ -46,7 +47,7 @@ namespace db {
 
 //***  PostgreSQL configuration functions  **********************************
 PostgreSQLconfig::PostgreSQLconfig( const char* cfgName, const char* logParent, const char* logName )
-	: module::ModuleConfiguration< PostgreSQLconfig, DatabaseConfig >( cfgName, logParent, logName )
+	: module::ModuleConfiguration< PostgreSQLconfig, config::ContainerConfiguration >( cfgName, logParent, logName )
 {
 	port = 0;
 	connections = 0;
@@ -58,8 +59,8 @@ void PostgreSQLconfig::print( std::ostream& os, size_t indent ) const
 	std::string indStr( indent, ' ' );
 
 	os << indStr << sectionName() << ":" << std::endl;
-	if ( ! ID().empty() )
-		os << indStr << "   ID: " << ID() << std::endl;
+	if ( ! m_ID.empty() )
+		os << indStr << "   ID: " << m_ID << std::endl;
 	if ( host.empty())
 		os << indStr << "   Database host: local unix domain socket" << std::endl;
 	else
@@ -90,11 +91,11 @@ bool PostgreSQLconfig::check() const
 
 //***  PostgreSQL database container  ***************************************
 PostgreSQLcontainer::PostgreSQLcontainer( const PostgreSQLconfig& conf )
-	: m_db( conf.ID(), conf.host, conf.port, conf.dbName,
+	: m_db( conf.m_ID, conf.host, conf.port, conf.dbName,
 		  conf.user, conf.password, conf.connectTimeout,
 		  conf.connections, conf.acquireTimeout )
 {
-	LOG_NOTICE << "PostgreSQL database container for '" << conf.ID() << "' created";
+	LOG_NOTICE << "PostgreSQL database container for '" << conf.m_ID << "' created";
 }
 
 PostgreSQLcontainer::~PostgreSQLcontainer()

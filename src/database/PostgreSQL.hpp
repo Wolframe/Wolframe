@@ -48,7 +48,7 @@ namespace _Wolframe {
 namespace db {
 
 /// PostgreSQL server connection configuration
-class PostgreSQLconfig : public module::ModuleConfiguration< PostgreSQLconfig, DatabaseConfig >
+class PostgreSQLconfig : public module::ModuleConfiguration< PostgreSQLconfig, config::ContainerConfiguration >
 {
 	friend class config::ConfigurationParser;
 	friend class PostgreSQLcontainer;
@@ -61,6 +61,7 @@ public:
 	virtual bool check() const;
 	virtual void print( std::ostream& os, size_t indent ) const;
 private:
+	std::string	m_ID;
 	std::string	host;
 	unsigned short	port;
 	std::string	dbName;
@@ -96,7 +97,7 @@ private:
 
 
 class PostgreSQLcontainer : public module::ModuleContainer< PostgreSQLcontainer, PostgreSQLconfig,
-		DatabaseContainer, DatabaseConfig >
+		DatabaseContainer, config::ContainerConfiguration >
 {
 public:
 	PostgreSQLcontainer( const PostgreSQLconfig& conf );

@@ -61,11 +61,11 @@
 using namespace _Wolframe;
 
 static const size_t noDBconfigs = 2;
-static module::ModuleConfigurationDescription< db::DatabaseConfig >
-dbConfig[ noDBconfigs ] = { module::ModuleConfigurationDescription< db::DatabaseConfig >( "PostgreSQL", "PostgreSQL database", "PostgreSQL",
+static module::ModuleConfigurationDescription< config::ContainerConfiguration >
+dbConfig[ noDBconfigs ] = { module::ModuleConfigurationDescription< config::ContainerConfiguration >( "PostgreSQL", "PostgreSQL database", "PostgreSQL",
 			    &db::PostgreSQLconfig::create,
 			    &config::ConfigurationParser::parseBase<db::PostgreSQLconfig> ),
-			    module::ModuleConfigurationDescription< db::DatabaseConfig >( "SQLite", "SQLite database", "SQLite",
+			    module::ModuleConfigurationDescription< config::ContainerConfiguration >( "SQLite", "SQLite database", "SQLite",
 			    &db::SQLiteConfig::create,
 			    &config::ConfigurationParser::parseBase<db::SQLiteConfig> ) };
 /****  End impersonating the module loader  **************************************************/
@@ -84,9 +84,9 @@ bool ConfigurationParser::parse( db::DBproviderConfig& cfg,
 		size_t i;
 		for ( i = 0; i < noDBconfigs; i++ )	{
 			if ( boost::algorithm::iequals( dbConfig[i].typeName, L1it->first ))	{
-				db::DatabaseConfig* conf = dbConfig[i].createFunc( dbConfig[i].sectionTitle,
-										   cfg.logPrefix().c_str(),
-										   dbConfig[i].sectionName );
+				config::ContainerConfiguration* conf = dbConfig[i].createFunc( dbConfig[i].sectionTitle,
+											       cfg.logPrefix().c_str(),
+											       dbConfig[i].sectionName );
 				if ( dbConfig[i].parseFunc( *conf, L1it->second, L1it->first ))
 					cfg.m_dbConfig.push_back( conf );
 				else	{
@@ -110,7 +110,7 @@ namespace db {
 //***  Generic database functions  **************************************
 DBproviderConfig::~DBproviderConfig()
 {
-	for ( std::list<DatabaseConfig*>::const_iterator it = m_dbConfig.begin();
+	for ( std::list< config::ContainerConfiguration* >::const_iterator it = m_dbConfig.begin();
 								it != m_dbConfig.end(); it++ )
 		delete *it;
 }
@@ -119,7 +119,7 @@ void DBproviderConfig::print( std::ostream& os, size_t /* indent */ ) const
 {
 	os << sectionName() << std::endl;
 	if ( m_dbConfig.size() > 0 )	{
-		for ( std::list<DatabaseConfig*>::const_iterator it = m_dbConfig.begin();
+		for ( std::list< config::ContainerConfiguration* >::const_iterator it = m_dbConfig.begin();
 								it != m_dbConfig.end(); it++ )	{
 			(*it)->print( os, 3 );
 		}
@@ -133,7 +133,7 @@ void DBproviderConfig::print( std::ostream& os, size_t /* indent */ ) const
 bool DBproviderConfig::check() const
 {
 	bool correct = true;
-	for ( std::list<DatabaseConfig*>::const_iterator it = m_dbConfig.begin();
+	for ( std::list< config::ContainerConfiguration* >::const_iterator it = m_dbConfig.begin();
 								it != m_dbConfig.end(); it++ )	{
 		if ( !(*it)->check() )
 			correct = false;
@@ -143,7 +143,7 @@ bool DBproviderConfig::check() const
 
 void DBproviderConfig::setCanonicalPathes( const std::string& refPath )
 {
-	for ( std::list<DatabaseConfig*>::const_iterator it = m_dbConfig.begin();
+	for ( std::list< config::ContainerConfiguration* >::const_iterator it = m_dbConfig.begin();
 								it != m_dbConfig.end(); it++ )	{
 		(*it)->setCanonicalPathes( refPath );
 	}
