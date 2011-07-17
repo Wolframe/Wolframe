@@ -203,7 +203,7 @@ void echoConnection::errorOccured( NetworkSignal signal )
 
 
 /// ServerHandler PIMPL
-net::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const net::LocalEndpoint& local )
+net::ConnectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const net::LocalEndpoint& local )
 {
 	return new echoConnection( local, timeout );
 }
@@ -213,7 +213,7 @@ ServerHandler::ServerHandler( const HandlerConfiguration *conf ) : impl_( new Se
 
 ServerHandler::~ServerHandler()	{ delete impl_; }
 
-net::connectionHandler* ServerHandler::newConnection( const net::LocalEndpoint& local )
+net::ConnectionHandler* ServerHandler::newConnection( const net::LocalEndpoint& local )
 {
 	return impl_->newConnection( local );
 }

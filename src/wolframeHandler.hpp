@@ -44,11 +44,11 @@
 
 namespace _Wolframe {
 	/// The global server container
-	class wolframeHandler
+	class WolframeHandler
 	{
 	public:
-		wolframeHandler( const HandlerConfiguration* conf );
-		~wolframeHandler();
+		WolframeHandler( const HandlerConfiguration* conf );
+		~WolframeHandler();
 
 		const std::string& banner() const		{ return m_banner; }
 		const db::DatabaseProvider& db() const		{ return m_db; }
@@ -63,10 +63,10 @@ namespace _Wolframe {
 
 
 	/// The connection handler
-	class wolframeConnection : public net::connectionHandler
+	class wolframeConnection : public net::ConnectionHandler
 	{
 	public:
-		wolframeConnection( const wolframeHandler& context, const net::LocalEndpoint& local );
+		wolframeConnection( const WolframeHandler& context, const net::LocalEndpoint& local );
 		~wolframeConnection();
 
 		void setPeer( const net::RemoteEndpoint& remote );
@@ -93,7 +93,7 @@ namespace _Wolframe {
 			FINISHED
 		};
 		/// Back link to global context
-		const wolframeHandler&		m_globalCtx;
+		const WolframeHandler&		m_globalCtx;
 ///*************
 		db::Database*			m_db;
 		AAAA::Authenticator*		m_authentication;
@@ -126,9 +126,9 @@ namespace _Wolframe {
 	public:
 		ServerHandlerImpl( const HandlerConfiguration* conf );
 		~ServerHandlerImpl();
-		net::connectionHandler* newConnection( const net::LocalEndpoint& local );
+		net::ConnectionHandler* newConnection( const net::LocalEndpoint& local );
 	private:
-		wolframeHandler	globalContext_;
+		WolframeHandler	m_globalContext;
 	};
 
 } // namespace _Wolframe

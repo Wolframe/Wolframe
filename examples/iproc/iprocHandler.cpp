@@ -390,7 +390,7 @@ void Connection::setPeer( const net::RemoteEndpoint& remote)
 	LOG_TRACE << "Peer set to " << remote.toString();
 }
 
-net::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const net::LocalEndpoint& local )
+net::ConnectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const net::LocalEndpoint& local )
 {
 	return new iproc::Connection( local, m_config->m_appConfig);
 }
@@ -403,7 +403,7 @@ ServerHandler::~ServerHandler()
 	delete impl_;
 }
 
-net::connectionHandler* ServerHandler::newConnection( const net::LocalEndpoint& local )
+net::ConnectionHandler* ServerHandler::newConnection( const net::LocalEndpoint& local )
 {
 	return impl_->newConnection( local );
 }

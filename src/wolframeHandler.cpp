@@ -50,7 +50,7 @@
 
 namespace _Wolframe	{
 
-wolframeConnection::wolframeConnection( const wolframeHandler& context,
+wolframeConnection::wolframeConnection( const WolframeHandler& context,
 					const net::LocalEndpoint& local )
 	: m_globalCtx( context )
 {
@@ -266,7 +266,7 @@ void wolframeConnection::errorOccured( NetworkSignal signal )
 
 
 /// The server handler global context
-wolframeHandler::wolframeHandler( const HandlerConfiguration* conf )
+WolframeHandler::WolframeHandler( const HandlerConfiguration* conf )
 	: m_banner( conf->banner->toString() ),
 	  m_db( *(conf->database)),
 	  m_aaaa( *(conf->aaaa)),
@@ -285,20 +285,20 @@ wolframeHandler::wolframeHandler( const HandlerConfiguration* conf )
 	LOG_TRACE << "Processor group database reference resolved";
 }
 
-wolframeHandler::~wolframeHandler()
+WolframeHandler::~WolframeHandler()
 {
 	LOG_TRACE << "Global context destroyed";
 }
 
 
 /// ServerHandler PIMPL
-net::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const net::LocalEndpoint& local )
+net::ConnectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const net::LocalEndpoint& local )
 {
-	return new wolframeConnection( globalContext_, local );
+	return new wolframeConnection( m_globalContext, local );
 }
 
 ServerHandler::ServerHandlerImpl::ServerHandlerImpl( const HandlerConfiguration* conf )
-	: globalContext_( conf )	{}
+	: m_globalContext( conf )	{}
 
 ServerHandler::ServerHandlerImpl::~ServerHandlerImpl()	{}
 
@@ -308,7 +308,7 @@ ServerHandler::ServerHandler( const HandlerConfiguration* conf )
 
 ServerHandler::~ServerHandler()	{ delete impl_; }
 
-net::connectionHandler* ServerHandler::newConnection( const net::LocalEndpoint& local )
+net::ConnectionHandler* ServerHandler::newConnection( const net::LocalEndpoint& local )
 {
 	return impl_->newConnection( local );
 }

@@ -49,7 +49,7 @@ namespace _Wolframe {
 namespace iproc {
 
 /// The connection handler
-class Connection : public net::connectionHandler
+class Connection : public net::ConnectionHandler
 {
 public:
 	///\brief Constructor
@@ -164,7 +164,7 @@ public:
 	ServerHandlerImpl( const HandlerConfiguration *config)
 		:m_config(config){}
 
-	net::connectionHandler* newConnection( const net::LocalEndpoint& local);
+	net::ConnectionHandler* newConnection( const net::LocalEndpoint& local);
 private:
 	const HandlerConfiguration* m_config;
 };

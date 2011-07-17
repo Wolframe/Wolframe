@@ -435,7 +435,7 @@ const Connection::Operation Connection::nextOperation()
 }
 
 /// ServerHandler PIMPL
-net::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const net::LocalEndpoint& local )
+net::ConnectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const net::LocalEndpoint& local )
 {
 		return new pecho::Connection( local );
 }
@@ -445,7 +445,7 @@ ServerHandler::ServerHandler( const HandlerConfiguration* ) : impl_( new ServerH
 
 ServerHandler::~ServerHandler()  { delete impl_; }
 
-net::connectionHandler* ServerHandler::newConnection( const net::LocalEndpoint& local )
+net::ConnectionHandler* ServerHandler::newConnection( const net::LocalEndpoint& local )
 {
 		return impl_->newConnection( local );
 }

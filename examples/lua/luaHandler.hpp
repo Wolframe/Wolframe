@@ -14,7 +14,7 @@ extern "C" {
 
 namespace _Wolframe {
 	/// The connection handler
-	class luaConnection : public net::connectionHandler
+	class luaConnection : public net::ConnectionHandler
 	{
 	public:
 		luaConnection( const net::LocalEndpoint& local, const luaConfig config );
@@ -48,7 +48,7 @@ namespace _Wolframe {
 	public:
 		ServerHandlerImpl( const HandlerConfiguration *config );
 
-		net::connectionHandler* newConnection( const net::LocalEndpoint& local );
+		net::ConnectionHandler* newConnection( const net::LocalEndpoint& local );
 
 	private:
 		luaConfig config_;
