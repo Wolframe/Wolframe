@@ -94,6 +94,7 @@ public:
 	virtual ~ModuleConfiguration()			{}
 
 	virtual const char* typeName() const = 0;
+
 	static config::ContainerConfiguration* create( const char* name, const char* logParent, const char* logName )	{
 		return new T( name, logParent, logName );
 	}

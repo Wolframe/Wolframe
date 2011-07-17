@@ -70,15 +70,25 @@ public:
 };
 
 
-/// base class for database
+/// Base class for database(s).
+///
+/// All databases should derive from this class.
 class Database
 {
 public:
 	virtual ~Database()				{}
 
+	/// Database identification.
+	/// All databases must have an identifier as they are referenced using this identifier.
+	/// The identifier must be unique (of course).
 	virtual const std::string& ID() const = 0;
+
+	/// Database type (module type).
+	/// All database implementations need a type (name).
+	/// Type names should be unique.
 	virtual const char* typeName() const = 0;
 
+	/// Perform a database transaction.
 	virtual bool doTransaction( DatabaseRequest& request, DatabaseAnswer& answer,
 				    unsigned short timeout, unsigned short retries ) = 0;
 	/* NOTE */
