@@ -121,6 +121,16 @@ class SSLWolfClient : public WolfClient
 
 		void handle_handshake( const boost::system::error_code &ec )
 		{
+			if( ec ) {
+				m_socket.lowest_layer( ).close( );
+				m_io_service.stop( );
+				std::cerr << "Handshake error: " << ec.message( ) << " (" << ec.value( ) << ")" << std::endl;
+				return;
+			}
+
+			std::cerr << "SSL handshake succeeded" << std::endl;
+
+			start_read( );
 		}
 
 		void check_deadline( )
@@ -135,6 +145,34 @@ class SSLWolfClient : public WolfClient
 			m_deadline_timer.async_wait( boost::bind( &SSLWolfClient::check_deadline, this ) );
 		}
 
+		void start_read( )
+		{
+			m_deadline_timer.expires_from_now( boost::posix_time::seconds( m_read_timeout ) );
+			boost::asio::async_read_until( m_socket, m_input_buffer, '\n',
+				boost::bind( &SSLWolfClient::handle_read, this, _1 ) );
+		}
+
+		void handle_read( const boost::system::error_code &ec )
+		{
+			// EOF is ok in certain conditions (for instance after having stopped to
+			// receive data from stdin)
+			// TODO: if ec.value( ) == EOF(code?) -> return;
+			if( ec ) {
+				m_io_service.stop( );
+				std::cerr << "Read error: " << ec.message( ) << " (" << ec.value( ) << ")" << std::endl;
+				return;
+			}
+
+			std::string line;
+			std::istream is( &m_input_buffer );
+			std::getline( is, line );
+
+			if( !line.empty( ) ) {
+				std::cout << line << std::endl;
+			}
+
+			start_read( );
+		}
 };
 #endif
 
