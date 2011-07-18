@@ -79,7 +79,7 @@ public:
 	///\param [in,out] src input iterator
 	///\param [in] end iterator marking end of input block
 	template <typename IteratorType>
-	static bool consumeEOLN( IteratorType& src, IteratorType& end)
+	static bool consumeEOL( IteratorType& src, IteratorType& end)
 	{
 		if (src == end) return false;
 		if (*src == '\r') src++;
@@ -93,7 +93,7 @@ public:
 	///\tparam IteratorType iterator type used as input for parsing
 	///\param [in] src input iterator
 	template <typename IteratorType>
-	static bool isEOLN( IteratorType& src)
+	static bool isEOL( IteratorType& src)
 	{
 		return (*src == '\r' || *src == '\n');
 	}

@@ -182,7 +182,7 @@ const net::NetworkOperation Connection::nextOperation()
 							m_state = ProtocolError;
 							return WriteLine( "BAD command");
 						}
-						else if (ProtocolParser::consumeEOLN( m_itr, m_end))
+						else if (ProtocolParser::consumeEOL( m_itr, m_end))
 						{
 							m_buffer.clear();
 							m_argBuffer.clear();
@@ -346,7 +346,7 @@ const net::NetworkOperation Connection::nextOperation()
 
 			case ProtocolError:
 			{
-				if (!ProtocolParser::skipLine( m_itr, m_end) || !ProtocolParser::consumeEOLN( m_itr, m_end))
+				if (!ProtocolParser::skipLine( m_itr, m_end) || !ProtocolParser::consumeEOL( m_itr, m_end))
 				{
 					m_input.setPos( 0);
 					return net::ReadData( m_input.ptr(), m_input.size());

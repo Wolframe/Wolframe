@@ -237,7 +237,7 @@ struct Connection::Private
 						input.setPos( 0);
 						return net::ReadData( input.ptr(), input.size());
 					}
-					if (!ProtocolParser::consumeEOLN( itr, eoM))
+					if (!ProtocolParser::consumeEOL( itr, eoM))
 					{
 						if (itr == eoM)
 						{
@@ -324,7 +324,7 @@ struct Connection::Private
 						input.setPos( 0);
 						return net::ReadData( input.ptr(), input.size());
 					}
-					if (!ProtocolParser::isEOLN( itr))
+					if (!ProtocolParser::isEOL( itr))
 					{
 						state = Init;
 						return WriteLine( "BAD too many arguments");
@@ -371,7 +371,7 @@ struct Connection::Private
 
 				case HandleError:
 				{
-					if (!ProtocolParser::skipLine( itr, eoM) || !ProtocolParser::consumeEOLN( itr, eoM))
+					if (!ProtocolParser::skipLine( itr, eoM) || !ProtocolParser::consumeEOL( itr, eoM))
 					{
 						input.setPos( 0);
 						return net::ReadData( input.ptr(), input.size());

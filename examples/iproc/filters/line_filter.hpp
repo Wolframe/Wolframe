@@ -42,7 +42,7 @@ Project Wolframe.
 namespace _Wolframe {
 namespace filter {
 
-///\class LineFilter 
+///\class LineFilter
 ///\brief Line filter template (input/output line by line)
 ///\tparam IOCharset character set encoding of input and output
 ///\tparam AppCharset character set encoding of the application processor
@@ -59,9 +59,9 @@ struct LineFilter :FilterBase<IOCharset, AppCharset>
 	struct FormatOutput :public protocol::FormatOutput
 	{
 		///\brief Constructor
-		///\param [in] eoln end of line marker
-		FormatOutput( const char* eoln="\r\n")
-			:m_eoln(eoln),m_bufstate(EscBufferType::SRC){}
+		///\param [in] EOL end-of-line marker
+		FormatOutput( const char* EOL="\r\n")
+			:m_eolMarker(EOL),m_bufstate(EscBufferType::SRC){}
 
 		///\brief Implementation of protocol::InputFilter::print(ElementType,const void*,size_type)
 		///\param [in] type type of the element to print
@@ -85,7 +85,7 @@ struct LineFilter :FilterBase<IOCharset, AppCharset>
 			return true;
 		}
 	private:
-		const char* m_eoln;				///< end of line marker
+		const char* m_eolMarker;			///< end of line marker
 		typename EscBufferType::State m_bufstate;	///< state of escaping the output
 	};
 
