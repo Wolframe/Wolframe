@@ -79,8 +79,8 @@ wolframeConnection::wolframeConnection( const WolframeHandler& context,
 	}
 
 	m_state = NEW;
-	dataStart_ = NULL;
-	dataSize_ = 0;
+	m_dataStart = NULL;
+	m_dataSize = 0;
 	idleTimeout_ = 30;
 
 	// Get the database connection from the begining
@@ -108,7 +108,7 @@ void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
 
 	switch ( type )	{
 	case net::ConnectionEndpoint::TCP_CONNECTION:	{
-		const net::RemoteTCPendpoint* rmt = static_cast<const net::RemoteTCPendpoint*>( m_remoteEP );
+		const net::RemoteTCPendpoint* rmt = static_cast< const net::RemoteTCPendpoint* >( m_remoteEP );
 		LOG_TRACE << "Peer set to " << rmt->toString() << ", connected at " << rmt->connectionTime();
 		break;
 	}
@@ -150,50 +150,50 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 	case NEW:	{
 		m_state = HELLO_SENT;
 		if ( ! m_globalCtx.banner().empty() )
-			outMsg_ = m_globalCtx.banner() + "\nOK\n";
+			m_outMsg = m_globalCtx.banner() + "\nOK\n";
 		else
-			outMsg_ = "OK\n";
-		return net::NetworkOperation( net::SendString( outMsg_ ));
+			m_outMsg = "OK\n";
+		return net::NetworkOperation( net::SendString( m_outMsg ));
 	}
 
 	case HELLO_SENT:	{
 		m_state = READ_INPUT;
-		return net::NetworkOperation( net::ReadData( readBuf_, ReadBufSize, idleTimeout_ ));
+		return net::NetworkOperation( net::ReadData( m_readBuf, ReadBufSize, idleTimeout_ ));
 	}
 
 	case READ_INPUT:
-		dataStart_ = readBuf_;
+		m_dataStart = m_readBuf;
 		// Yes, it continues with OUTPUT_MSG, sneaky, sneaky, sneaky :P
 
 	case OUTPUT_MSG:
-		if ( !strncmp( "quit", dataStart_, 4 ))	{
+		if ( !strncmp( "quit", m_dataStart, 4 ))	{
 			m_state = TERMINATE;
 			return net::NetworkOperation( net::SendString( "Bye\n" ));
 		}
 		else	{
-			char *s = dataStart_;
-			for ( std::size_t i = 0; i < dataSize_; i++ )	{
+			char *s = m_dataStart;
+			for ( std::size_t i = 0; i < m_dataSize; i++ )	{
 				if ( *s == '\n' )	{
 					s++;
-					outMsg_ = std::string( dataStart_, s - dataStart_ );
-					dataSize_ -= s - dataStart_;
-					dataStart_ = s;
+					m_outMsg = std::string( m_dataStart, s - m_dataStart );
+					m_dataSize -= s - m_dataStart;
+					m_dataStart = s;
 					m_state = OUTPUT_MSG;
-					return net::NetworkOperation( net::SendString( outMsg_ ));
+					return net::NetworkOperation( net::SendString( m_outMsg ));
 				}
 				s++;
 			}
 			// If we got here, no \n was found, we need to read more
 			// or close the connection if the buffer is full
-			if ( dataSize_ >= ReadBufSize )	{
+			if ( m_dataSize >= ReadBufSize )	{
 				m_state = TERMINATE;
 				return net::NetworkOperation( net::SendString( "Line too long. Bye.\n" ));
 			}
 			else {
-				memmove( readBuf_, dataStart_, dataSize_ );
+				memmove( m_readBuf, m_dataStart, m_dataSize );
 				m_state = READ_INPUT;
-				return net::NetworkOperation( net::ReadData( readBuf_ + dataSize_,
-									     ReadBufSize - dataSize_,
+				return net::NetworkOperation( net::ReadData( m_readBuf + m_dataSize,
+									     ReadBufSize - m_dataSize,
 									     idleTimeout_ ));
 			}
 		}
@@ -227,7 +227,7 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 void wolframeConnection::networkInput( const void*, std::size_t bytesTransferred )
 {
 	LOG_DATA << "network Input: Read " << bytesTransferred << " bytes";
-	dataSize_ += bytesTransferred;
+	m_dataSize += bytesTransferred;
 }
 
 void wolframeConnection::timeoutOccured()

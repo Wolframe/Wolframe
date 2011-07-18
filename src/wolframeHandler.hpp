@@ -82,7 +82,7 @@ public:
 	const net::NetworkOperation nextOperation();
 
 private:
-	///\enum State
+	///\enum States
 	///\brief Enumeration of processor states
 	enum FSMstate	{
 		NEW,				///<
@@ -97,10 +97,15 @@ private:
 
 	///\brief Returns the state as string for logging etc.
 	///\param [in] state state to get as string
-	static const char* stateName( FSMstate state );
+	static const char* stateName( FSMstate state )
+	{
+		const char* names[] = { "NEW", "HELLO SENT", "READ INPUT", "OUTPUT MESSAGE",
+					"TIMEOUT", "SIGNALLED", "TERMINATE", "FINISHED" };
+		return names[ state ];
+	}
 
-	///\enum Command
-	///\brief Enumeration of processor commands in the protocol after handshaking
+	///\enum Commands
+	///\brief Enumeration of commands in the protocol at first FSM level
 	enum Command	{
 		EMPTY,				///< empty line (to not get an error for no command)
 		CAPABILITIES,			///< get the protocol capabilities
@@ -109,36 +114,38 @@ private:
 	};
 
 	///\brief Returns the command name as string for instantiating the protocol command parser
-	///\param [in] cmd the command to get as string
-	static const char* commandName( Command cmd );
-
+	static const char* commandName( Command cmd )
+	{
+		const char* names[] = { "-- EMPTY --", "CAPABILITIES", "HELP", "QUIT" };
+		return names[ cmd ];
+	}
 
 	/// Back link to global context
 	const WolframeHandler&		m_globalCtx;
-	///*************
+///*************
 	db::Database*			m_db;
 	AAAA::Authenticator*		m_authentication;
-	//		AAAA::Authorizer*		m_authorization;
-	//		AAAA::Auditor*			m_audit;
-	//		AAAA::Accountant*		m_accounting;
-	///*************
+//	AAAA::Authorizer*		m_authorization;
+//	AAAA::Auditor*			m_audit;
+//	AAAA::Accountant*		m_accounting;
+///*************
 	proc::ProcessorChannel*		m_proc;
 
 	/// Connection endpoints
 	const net::LocalEndpoint*	m_localEP;
 	const net::RemoteEndpoint*	m_remoteEP;
 
-	static const std::size_t ReadBufSize = 8192;
 	/// The state of the processor FSM
-	FSMstate		m_state;
+	FSMstate			m_state;
 	/// Read buffer
-	char		readBuf_[ ReadBufSize ];
-	char*		dataStart_;
-	std::size_t	dataSize_;
+	static const std::size_t ReadBufSize = 8192;
+	char				m_readBuf[ ReadBufSize ];
+	char*				m_dataStart;
+	std::size_t			m_dataSize;
 	/// Output buffer
-	std::string	outMsg_;
+	std::string			m_outMsg;
 	/// Idle timeout value
-	unsigned	idleTimeout_;
+	unsigned			idleTimeout_;
 };
 
 /// The server handler container
