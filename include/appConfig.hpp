@@ -63,18 +63,18 @@ typedef bool (*ParseFunc_t)( ConfigurationBase&, const boost::property_tree::ptr
 
 /// application configuration structure
 struct ApplicationConfiguration	{
-	std::string				configFile;
+	std::string			configFile;
 	// from command line
-	bool					foreground;
+	bool				foreground;
 
 	// daemon / service configuration
-	ServiceConfiguration			*serviceConf;
+	ServiceConfiguration		*serviceConf;
 	// network server configuration
-	_Wolframe::net::Configuration		*serverConf;
+	net::Configuration		*serverConf;
 	// logger configuration
-	_Wolframe::log::LoggerConfiguration	*loggerConf;
+	log::LoggerConfiguration	*loggerConf;
 
-	_Wolframe::HandlerConfiguration		*handlerConf;
+	HandlerConfiguration		*handlerConf;
 
 public:
 	enum ConfigFileType	{

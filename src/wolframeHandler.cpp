@@ -56,29 +56,29 @@ wolframeConnection::wolframeConnection( const WolframeHandler& context,
 {
 	m_localEP = &local;
 	m_remoteEP = NULL;
-	_Wolframe::net::ConnectionEndpoint::ConnectionType type = m_localEP->type();
+	net::ConnectionEndpoint::ConnectionType type = m_localEP->type();
 
 	switch ( type )	{
-	case _Wolframe::net::ConnectionEndpoint::TCP_CONNECTION:	{
-		const _Wolframe::net::LocalTCPendpoint* lcl = static_cast<const _Wolframe::net::LocalTCPendpoint*>( m_localEP );
+	case net::ConnectionEndpoint::TCP_CONNECTION:	{
+		const net::LocalTCPendpoint* lcl = static_cast< const net::LocalTCPendpoint* >( m_localEP );
 		LOG_TRACE << "Created connection handler for " << lcl->toString();
 		break;
 	}
 #ifdef WITH_SSL
-	case _Wolframe::net::ConnectionEndpoint::SSL_CONNECTION:	{
-		const _Wolframe::net::LocalSSLendpoint* lcl = static_cast<const _Wolframe::net::LocalSSLendpoint*>( m_localEP );
+	case net::ConnectionEndpoint::SSL_CONNECTION:	{
+		const net::LocalSSLendpoint* lcl = static_cast< const net::LocalSSLendpoint* >( m_localEP );
 		LOG_TRACE << "Created connection handler (SSL) for " << lcl->toString();
 		break;
 	}
 #else
-	case _Wolframe::net::ConnectionEndpoint::SSL_CONNECTION:
+	case net::ConnectionEndpoint::SSL_CONNECTION:
 #endif // WITH_SSL
 	default:
 		LOG_FATAL << "Impossible local connection type !";
 		abort();
 	}
 
-	state_ = NEW;
+	m_state = NEW;
 	dataStart_ = NULL;
 	dataSize_ = 0;
 	idleTimeout_ = 30;
@@ -104,17 +104,17 @@ wolframeConnection::~wolframeConnection()
 void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
 {
 	m_remoteEP = &remote;
-	_Wolframe::net::ConnectionEndpoint::ConnectionType type = m_remoteEP->type();
+	net::ConnectionEndpoint::ConnectionType type = m_remoteEP->type();
 
 	switch ( type )	{
-	case _Wolframe::net::ConnectionEndpoint::TCP_CONNECTION:	{
-		const _Wolframe::net::RemoteTCPendpoint* rmt = static_cast<const _Wolframe::net::RemoteTCPendpoint*>( m_remoteEP );
+	case net::ConnectionEndpoint::TCP_CONNECTION:	{
+		const net::RemoteTCPendpoint* rmt = static_cast<const net::RemoteTCPendpoint*>( m_remoteEP );
 		LOG_TRACE << "Peer set to " << rmt->toString() << ", connected at " << rmt->connectionTime();
 		break;
 	}
 #ifdef WITH_SSL
-	case _Wolframe::net::ConnectionEndpoint::SSL_CONNECTION:	{
-		const _Wolframe::net::RemoteSSLendpoint* rmt = static_cast<const _Wolframe::net::RemoteSSLendpoint*>( m_remoteEP );
+	case net::ConnectionEndpoint::SSL_CONNECTION:	{
+		const net::RemoteSSLendpoint* rmt = static_cast<const net::RemoteSSLendpoint*>( m_remoteEP );
 		LOG_TRACE << "Peer set to " << rmt->toString() << ", connected at " << boost::posix_time::from_time_t( rmt->connectionTime());
 		if ( rmt->SSLcertInfo() )	{
 			LOG_TRACE << "Peer SSL certificate serial number " << rmt->SSLcertInfo()->serialNumber()
@@ -127,7 +127,7 @@ void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
 		break;
 	}
 #else
-	case _Wolframe::net::ConnectionEndpoint::SSL_CONNECTION:
+	case net::ConnectionEndpoint::SSL_CONNECTION:
 #endif // WITH_SSL
 	default:
 		LOG_FATAL << "Impossible remote connection type !";
@@ -146,9 +146,9 @@ void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
 /// Handle a request and produce a reply.
 const net::NetworkOperation wolframeConnection::nextOperation()
 {
-	switch( state_ )	{
+	switch( m_state )	{
 	case NEW:	{
-		state_ = HELLO_SENT;
+		m_state = HELLO_SENT;
 		if ( ! m_globalCtx.banner().empty() )
 			outMsg_ = m_globalCtx.banner() + "\nOK\n";
 		else
@@ -157,7 +157,7 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 	}
 
 	case HELLO_SENT:	{
-		state_ = READ_INPUT;
+		m_state = READ_INPUT;
 		return net::NetworkOperation( net::ReadData( readBuf_, ReadBufSize, idleTimeout_ ));
 	}
 
@@ -167,7 +167,7 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 
 	case OUTPUT_MSG:
 		if ( !strncmp( "quit", dataStart_, 4 ))	{
-			state_ = TERMINATE;
+			m_state = TERMINATE;
 			return net::NetworkOperation( net::SendString( "Bye\n" ));
 		}
 		else	{
@@ -178,7 +178,7 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 					outMsg_ = std::string( dataStart_, s - dataStart_ );
 					dataSize_ -= s - dataStart_;
 					dataStart_ = s;
-					state_ = OUTPUT_MSG;
+					m_state = OUTPUT_MSG;
 					return net::NetworkOperation( net::SendString( outMsg_ ));
 				}
 				s++;
@@ -186,12 +186,12 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 			// If we got here, no \n was found, we need to read more
 			// or close the connection if the buffer is full
 			if ( dataSize_ >= ReadBufSize )	{
-				state_ = TERMINATE;
+				m_state = TERMINATE;
 				return net::NetworkOperation( net::SendString( "Line too long. Bye.\n" ));
 			}
 			else {
 				memmove( readBuf_, dataStart_, dataSize_ );
-				state_ = READ_INPUT;
+				m_state = READ_INPUT;
 				return net::NetworkOperation( net::ReadData( readBuf_ + dataSize_,
 									     ReadBufSize - dataSize_,
 									     idleTimeout_ ));
@@ -199,17 +199,17 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 		}
 
 	case TIMEOUT:	{
-		state_ = TERMINATE;
+		m_state = TERMINATE;
 		return net::NetworkOperation( net::SendString( "Timeout. :P\n" ));
 	}
 
 	case SIGNALLED:	{
-		state_ = TERMINATE;
+		m_state = TERMINATE;
 		return net::NetworkOperation( net::SendString( "Server is shutting down. :P\n" ));
 	}
 
 	case TERMINATE:	{
-		state_ = FINISHED;
+		m_state = FINISHED;
 		return net::NetworkOperation( net::CloseConnection() );
 	}
 
@@ -232,13 +232,13 @@ void wolframeConnection::networkInput( const void*, std::size_t bytesTransferred
 
 void wolframeConnection::timeoutOccured()
 {
-	state_ = TIMEOUT;
+	m_state = TIMEOUT;
 	LOG_TRACE << "Processor received timeout";
 }
 
 void wolframeConnection::signalOccured()
 {
-	state_ = SIGNALLED;
+	m_state = SIGNALLED;
 	LOG_TRACE << "Processor received signal";
 }
 
@@ -261,7 +261,7 @@ void wolframeConnection::errorOccured( NetworkSignal signal )
 		LOG_TRACE << "Processor received an UNKNOWN error from the framework";
 		break;
 	}
-	state_ = TERMINATE;
+	m_state = TERMINATE;
 }
 
 

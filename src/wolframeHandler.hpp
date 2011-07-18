@@ -43,93 +43,114 @@
 #include "WolframeProcGroup.hpp"
 
 namespace _Wolframe {
-	/// The global server container
-	class WolframeHandler
-	{
-	public:
-		WolframeHandler( const HandlerConfiguration* conf );
-		~WolframeHandler();
+/// The global server container
+class WolframeHandler
+{
+public:
+	WolframeHandler( const HandlerConfiguration* conf );
+	~WolframeHandler();
 
-		const std::string& banner() const		{ return m_banner; }
-		const db::DatabaseProvider& db() const		{ return m_db; }
-		const AAAA::AAAAprovider& aaaa() const		{ return m_aaaa; }
-		const proc::ProcessorGroup& procGroup() const	{ return m_procGroup; }
-	private:
-		const std::string		m_banner;
-		db::DatabaseProvider		m_db;
-		AAAA::AAAAprovider		m_aaaa;
-		proc::ProcessorGroup		m_procGroup;
+	const std::string& banner() const		{ return m_banner; }
+	const db::DatabaseProvider& db() const		{ return m_db; }
+	const AAAA::AAAAprovider& aaaa() const		{ return m_aaaa; }
+	const proc::ProcessorGroup& procGroup() const	{ return m_procGroup; }
+private:
+	const std::string		m_banner;
+	db::DatabaseProvider		m_db;
+	AAAA::AAAAprovider		m_aaaa;
+	proc::ProcessorGroup		m_procGroup;
+};
+
+
+/// The connection handler
+class wolframeConnection : public net::ConnectionHandler
+{
+public:
+	wolframeConnection( const WolframeHandler& context, const net::LocalEndpoint& local );
+	~wolframeConnection();
+
+	void setPeer( const net::RemoteEndpoint& remote );
+
+	/// Parse / get the incoming data.
+	void networkInput( const void *begin, std::size_t bytesTransferred );
+
+	void timeoutOccured();
+	void signalOccured();
+	void errorOccured( NetworkSignal );
+
+	/// Handle a request and produce a reply.
+	const net::NetworkOperation nextOperation();
+
+private:
+	///\enum State
+	///\brief Enumeration of processor states
+	enum FSMstate	{
+		NEW,				///<
+		HELLO_SENT,			///<
+		READ_INPUT,			///<
+		OUTPUT_MSG,			///<
+		TIMEOUT,			///<
+		SIGNALLED,			///<
+		TERMINATE,			///<
+		FINISHED			///<
 	};
 
+	///\brief Returns the state as string for logging etc.
+	///\param [in] state state to get as string
+	static const char* stateName( FSMstate state );
 
-	/// The connection handler
-	class wolframeConnection : public net::ConnectionHandler
-	{
-	public:
-		wolframeConnection( const WolframeHandler& context, const net::LocalEndpoint& local );
-		~wolframeConnection();
-
-		void setPeer( const net::RemoteEndpoint& remote );
-
-		/// Parse / get the incoming data.
-		void networkInput( const void *begin, std::size_t bytesTransferred );
-
-		void timeoutOccured();
-		void signalOccured();
-		void errorOccured( NetworkSignal );
-
-		/// Handle a request and produce a reply.
-		const net::NetworkOperation nextOperation();
-
-	private:
-		enum State	{
-			NEW,
-			HELLO_SENT,
-			READ_INPUT,
-			OUTPUT_MSG,
-			TIMEOUT,
-			SIGNALLED,
-			TERMINATE,
-			FINISHED
-		};
-		/// Back link to global context
-		const WolframeHandler&		m_globalCtx;
-///*************
-		db::Database*			m_db;
-		AAAA::Authenticator*		m_authentication;
-//		AAAA::Authorizer*		m_authorization;
-//		AAAA::Auditor*			m_audit;
-//		AAAA::Accountant*		m_accounting;
-///*************
-		proc::ProcessorChannel*		m_proc;
-
-		/// Connection endpoints
-		const net::LocalEndpoint*	m_localEP;
-		const net::RemoteEndpoint*	m_remoteEP;
-
-		static const std::size_t ReadBufSize = 8192;
-		/// The state of the processor FSM
-		State		state_;
-		/// Read buffer
-		char		readBuf_[ ReadBufSize ];
-		char*		dataStart_;
-		std::size_t	dataSize_;
-		/// Output buffer
-		std::string	outMsg_;
-		/// Idle timeout value
-		unsigned	idleTimeout_;
+	///\enum Command
+	///\brief Enumeration of processor commands in the protocol after handshaking
+	enum Command	{
+		EMPTY,				///< empty line (to not get an error for no command)
+		CAPABILITIES,			///< get the protocol capabilities
+		HELP,				///< print a help text to the client
+		QUIT				///< BYE and terminate
 	};
 
-	/// The server handler container
-	class ServerHandler::ServerHandlerImpl
-	{
-	public:
-		ServerHandlerImpl( const HandlerConfiguration* conf );
-		~ServerHandlerImpl();
-		net::ConnectionHandler* newConnection( const net::LocalEndpoint& local );
-	private:
-		WolframeHandler	m_globalContext;
-	};
+	///\brief Returns the command name as string for instantiating the protocol command parser
+	///\param [in] cmd the command to get as string
+	static const char* commandName( Command cmd );
+
+
+	/// Back link to global context
+	const WolframeHandler&		m_globalCtx;
+	///*************
+	db::Database*			m_db;
+	AAAA::Authenticator*		m_authentication;
+	//		AAAA::Authorizer*		m_authorization;
+	//		AAAA::Auditor*			m_audit;
+	//		AAAA::Accountant*		m_accounting;
+	///*************
+	proc::ProcessorChannel*		m_proc;
+
+	/// Connection endpoints
+	const net::LocalEndpoint*	m_localEP;
+	const net::RemoteEndpoint*	m_remoteEP;
+
+	static const std::size_t ReadBufSize = 8192;
+	/// The state of the processor FSM
+	FSMstate		m_state;
+	/// Read buffer
+	char		readBuf_[ ReadBufSize ];
+	char*		dataStart_;
+	std::size_t	dataSize_;
+	/// Output buffer
+	std::string	outMsg_;
+	/// Idle timeout value
+	unsigned	idleTimeout_;
+};
+
+/// The server handler container
+class ServerHandler::ServerHandlerImpl
+{
+public:
+	ServerHandlerImpl( const HandlerConfiguration* conf );
+	~ServerHandlerImpl();
+	net::ConnectionHandler* newConnection( const net::LocalEndpoint& local );
+private:
+	WolframeHandler	m_globalContext;
+};
 
 } // namespace _Wolframe
 

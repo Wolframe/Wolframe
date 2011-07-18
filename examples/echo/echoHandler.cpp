@@ -15,22 +15,22 @@ namespace _Wolframe {
 
 echoConnection::echoConnection( const net::LocalEndpoint& local, unsigned short timeout )
 {
-	_Wolframe::net::ConnectionEndpoint::ConnectionType type = local.type();
+	net::ConnectionEndpoint::ConnectionType type = local.type();
 
 	switch ( type )	{
-	case _Wolframe::net::ConnectionEndpoint::TCP_CONNECTION:	{
-		const _Wolframe::net::LocalTCPendpoint& lcl = static_cast<const _Wolframe::net::LocalTCPendpoint&>( local );
+	case net::ConnectionEndpoint::TCP_CONNECTION:	{
+		const net::LocalTCPendpoint& lcl = static_cast<const net::LocalTCPendpoint&>( local );
 		LOG_TRACE << "Created connection handler for " << lcl.toString();
 		break;
 	}
 #ifdef WITH_SSL
-	case _Wolframe::net::ConnectionEndpoint::SSL_CONNECTION:	{
-		const _Wolframe::net::LocalSSLendpoint& lcl = static_cast<const _Wolframe::net::LocalSSLendpoint&>( local );
+	case net::ConnectionEndpoint::SSL_CONNECTION:	{
+		const net::LocalSSLendpoint& lcl = static_cast<const net::LocalSSLendpoint&>( local );
 		LOG_TRACE << "Created connection handler (SSL) for " << lcl.toString();
 		break;
 	}
 #else
-	case _Wolframe::net::ConnectionEndpoint::SSL_CONNECTION:
+	case net::ConnectionEndpoint::SSL_CONNECTION:
 #endif // WITH_SSL
 	default:
 		LOG_FATAL << "Impossible local connection type !";
@@ -53,17 +53,17 @@ echoConnection::~echoConnection()
 
 void echoConnection::setPeer( const net::RemoteEndpoint& remote )
 {
-	_Wolframe::net::ConnectionEndpoint::ConnectionType type = remote.type();
+	net::ConnectionEndpoint::ConnectionType type = remote.type();
 
 	switch ( type )	{
-	case _Wolframe::net::ConnectionEndpoint::TCP_CONNECTION:	{
-		const _Wolframe::net::RemoteTCPendpoint& rmt = static_cast<const _Wolframe::net::RemoteTCPendpoint&>( remote );
+	case net::ConnectionEndpoint::TCP_CONNECTION:	{
+		const net::RemoteTCPendpoint& rmt = static_cast<const net::RemoteTCPendpoint&>( remote );
 		LOG_TRACE << "Peer set to " << rmt.toString() << ", connected at " << rmt.connectionTime();
 		break;
 	}
 #ifdef WITH_SSL
-	case _Wolframe::net::ConnectionEndpoint::SSL_CONNECTION:	{
-		const _Wolframe::net::RemoteSSLendpoint& rmt = static_cast<const _Wolframe::net::RemoteSSLendpoint&>( remote );
+	case net::ConnectionEndpoint::SSL_CONNECTION:	{
+		const net::RemoteSSLendpoint& rmt = static_cast<const net::RemoteSSLendpoint&>( remote );
 		LOG_TRACE << "Peer set to " << rmt.toString() << ", connected at " << boost::posix_time::from_time_t( rmt.connectionTime());
 		if ( rmt.SSLcertInfo() )	{
 			LOG_TRACE << "Peer SSL certificate serial number " << rmt.SSLcertInfo()->serialNumber()
@@ -76,7 +76,7 @@ void echoConnection::setPeer( const net::RemoteEndpoint& remote )
 		break;
 	}
 #else
-	case _Wolframe::net::ConnectionEndpoint::SSL_CONNECTION:
+	case net::ConnectionEndpoint::SSL_CONNECTION:
 #endif // WITH_SSL
 	default:
 		LOG_FATAL << "Impossible remote connection type !";
