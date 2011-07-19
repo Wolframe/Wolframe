@@ -328,7 +328,7 @@ void read_from_stdin( WolfClient *c )
 
 int main( int argc, char *argv[] )
 {
-        boost::program_options::options_description options;
+	boost::program_options::options_description options;
 	boost::program_options::positional_options_description pd;
 
 	options.add_options( )
@@ -376,13 +376,16 @@ int main( int argc, char *argv[] )
 
 #ifdef WITH_SSL
 	boost::asio::ssl::context ctx( io_service, boost::asio::ssl::context::sslv23 );
+	std::string clientKeyFile;
+	std::string clientCertFile;
+	std::string CACertFile;
 	if( map.count( "ssl" ) ) {
 		ctx.set_options( boost::asio::ssl::context::default_workarounds
 			| boost::asio::ssl::context::no_sslv2 );
 		ctx.set_verify_mode( boost::asio::ssl::context::verify_peer
 			| boost::asio::ssl::context::verify_fail_if_no_peer_cert );
 		if( map.count( "CA-cert-file" ) ) {
-			std::string CACertFile = map["CA-cert-file"].as< std::string >( );
+			CACertFile = map["CA-cert-file"].as< std::string >( );
 			ctx.load_verify_file( CACertFile );
 		} else {
 			std::cerr << "ERROR: you must provide a CA certificate chain, otherwise no secure communication is possible!" << std::endl;
@@ -390,7 +393,7 @@ int main( int argc, char *argv[] )
 		}
 
 		if( map.count( "client-cert-file" ) ) {
-			std::string clientCertFile = map["client-cert-file"].as< std::string >( );
+			clientCertFile = map["client-cert-file"].as< std::string >( );
 			boost::system::error_code ec;
 			ctx.use_certificate_file( clientCertFile, boost::asio::ssl::context::pem, ec );
 			if( ec ) {
@@ -400,7 +403,7 @@ int main( int argc, char *argv[] )
 		}
 
 		if( map.count( "client-cert-key" ) ) {
-			std::string clientKeyFile = map["client-cert-key"].as< std::string >( );
+			clientKeyFile = map["client-cert-key"].as< std::string >( );
 			boost::system::error_code ec;
 			ctx.use_private_key_file( clientKeyFile, boost::asio::ssl::context::pem, ec );
 			if( ec ) {
