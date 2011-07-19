@@ -91,6 +91,10 @@ class SSLWolfClient : public WolfClient
 
 		void write( const char *s )
 		{
+			m_output_buffer.append( s );
+			m_output_buffer.append( "\n" );
+
+			start_write( );
 		}
 
 	private:
@@ -143,6 +147,14 @@ class SSLWolfClient : public WolfClient
 			}
 
 			m_deadline_timer.async_wait( boost::bind( &SSLWolfClient::check_deadline, this ) );
+		}
+
+		void start_write( )
+		{
+			boost::asio::write( m_socket, boost::asio::buffer( m_output_buffer,
+				m_output_buffer.size( ) ) );
+
+			m_output_buffer.clear( );
 		}
 
 		void start_read( )
@@ -363,7 +375,7 @@ int main( int argc, char *argv[] )
 		ctx.set_options( boost::asio::ssl::context::default_workarounds
 			| boost::asio::ssl::context::no_sslv2 );
 		ctx.set_verify_mode( boost::asio::ssl::context::verify_peer );
-//		ctx.load_verify_file( "ca.pem" );
+		ctx.load_verify_file( "CA.cert.pem" );
 	}
 #endif // WITH_SSL
 
