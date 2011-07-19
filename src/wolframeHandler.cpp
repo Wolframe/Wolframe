@@ -112,8 +112,10 @@ void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
 		LOG_TRACE << "Peer set to " << rmt->toString() << ", connected at " << rmt->connectionTime();
 		break;
 	}
+
+	case net::ConnectionEndpoint::SSL_CONNECTION:
 #ifdef WITH_SSL
-	case net::ConnectionEndpoint::SSL_CONNECTION:	{
+	{
 		const net::RemoteSSLendpoint* rmt = static_cast<const net::RemoteSSLendpoint*>( m_remoteEP );
 		LOG_TRACE << "Peer set to " << rmt->toString() << ", connected at " << boost::posix_time::from_time_t( rmt->connectionTime());
 		if ( rmt->SSLcertInfo() )	{
@@ -126,17 +128,16 @@ void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
 		}
 		break;
 	}
-#else
-	case net::ConnectionEndpoint::SSL_CONNECTION:
 #endif // WITH_SSL
+
 	default:
 		LOG_FATAL << "Impossible remote connection type !";
 		abort();
 	}
 
-	// Check here if the connection is allowed
+// Check here if the connection is allowed
 
-	// The AAAA stuf should also depend on peer properties
+// The AAAA stuf should also depend on peer properties
 //	m_authentication = m_globalCtx.aaaa().authenticationChannel();
 //	m_authorization = m_globalCtx.aaaa().authorizationChannel();
 //	m_audit = m_globalCtx.aaaa().auditChannel();
@@ -217,13 +218,14 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 		LOG_DEBUG << "Processor in FINISHED state";
 		break;
 
-	} /* switch( state_ ) */
+	} /* switch( m_state ) */
+
+	LOG_ALERT << "Connection FSM out of states";
 	return net::NetworkOperation( net::CloseConnection() );
 }
 
 
-/// Parse incoming data. The return value indicates how much of the
-/// input has been consumed.
+/// Parse incoming data..
 void wolframeConnection::networkInput( const void*, std::size_t bytesTransferred )
 {
 	LOG_DATA << "network Input: Read " << bytesTransferred << " bytes";
@@ -254,7 +256,7 @@ void wolframeConnection::errorOccured( NetworkSignal signal )
 		break;
 
 	case OPERATION_CANCELLED:
-		LOG_TRACE << "Processor received OPERATION_CANCELED (should have been requested by us)";
+		LOG_TRACE << "Processor received OPERATION CANCELED (should have been requested by us)";
 		break;
 
 	case UNKNOWN_ERROR:
@@ -287,7 +289,7 @@ WolframeHandler::WolframeHandler( const HandlerConfiguration* conf )
 
 WolframeHandler::~WolframeHandler()
 {
-	LOG_TRACE << "Global context destroyed";
+	LOG_TRACE << "Global Wolframe handler / context destroyed";
 }
 
 
@@ -298,7 +300,7 @@ net::ConnectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const n
 }
 
 ServerHandler::ServerHandlerImpl::ServerHandlerImpl( const HandlerConfiguration* conf )
-	: m_globalContext( conf )	{}
+	: m_globalContext( conf )			{}
 
 ServerHandler::ServerHandlerImpl::~ServerHandlerImpl()	{}
 
