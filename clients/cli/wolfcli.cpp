@@ -87,6 +87,8 @@ class SSLWolfClient : public WolfClient
 
 		void stop( )
 		{
+			// TODO: send outstanding network data!
+			m_io_service.stop( );
 		}
 
 		void write( const char *s )
@@ -332,10 +334,13 @@ int main( int argc, char *argv[] )
 	options.add_options( )
 		( "version,v", "print version" )
 		( "help,h", "print help message" )
-		( "connect-timeout", "in seconds, how long to wait for connect" )
-		( "read-timeout", "in seconds, terminate after inactivity" )
+		( "connect-timeout", boost::program_options::value<int>( ), "in seconds, how long to wait for connect" )
+		( "read-timeout", boost::program_options::value<int>( ), "in seconds, terminate after inactivity" )
 #ifdef WITH_SSL
 		( "ssl,S", "use SSL encryption" )
+		( "CA-cert-file", boost::program_options::value<std::string>( ), "certificate file containing the CA" )
+		( "client-cert-file", boost::program_options::value<std::string>( ), "client certificate to present to the server" )
+		( "client-cert-key", boost::program_options::value<std::string>( ), "client key file" )
 #endif
 		( "host", "the host to connect to" )
 		( "port", "the port to connect to" )
@@ -374,8 +379,35 @@ int main( int argc, char *argv[] )
 	if( map.count( "ssl" ) ) {
 		ctx.set_options( boost::asio::ssl::context::default_workarounds
 			| boost::asio::ssl::context::no_sslv2 );
-		ctx.set_verify_mode( boost::asio::ssl::context::verify_peer );
-		ctx.load_verify_file( "CA.cert.pem" );
+		ctx.set_verify_mode( boost::asio::ssl::context::verify_peer
+			| boost::asio::ssl::context::verify_fail_if_no_peer_cert );
+		if( map.count( "CA-cert-file" ) ) {
+			std::string CACertFile = map["CA-cert-file"].as< std::string >( );
+			ctx.load_verify_file( CACertFile );
+		} else {
+			std::cerr << "ERROR: you must provide a CA certificate chain, otherwise no secure communication is possible!" << std::endl;
+			return 1;
+		}
+
+		if( map.count( "client-cert-file" ) ) {
+			std::string clientCertFile = map["client-cert-file"].as< std::string >( );
+			boost::system::error_code ec;
+			ctx.use_certificate_file( clientCertFile, boost::asio::ssl::context::pem, ec );
+			if( ec ) {
+				std::cerr << "Client certificate illegal or in wrong format (expecting PEM): " << ec.message( ) << " (" << ec.value( ) << ")" << std::endl;
+				return 1;
+			}
+		}
+
+		if( map.count( "client-cert-key" ) ) {
+			std::string clientKeyFile = map["client-cert-key"].as< std::string >( );
+			boost::system::error_code ec;
+			ctx.use_private_key_file( clientKeyFile, boost::asio::ssl::context::pem, ec );
+			if( ec ) {
+				std::cerr << "Client key illegal or in wrong format (expecting PEM): " << ec.message( ) << " (" << ec.value( ) << ")" << std::endl;
+				return 1;
+			}
+		}
 	}
 #endif // WITH_SSL
 
