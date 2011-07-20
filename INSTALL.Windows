@@ -32,7 +32,12 @@ If you insist to compile Boost from scratch, do the following
 in a Visual Studio C++ command line:
 
 bootstrap
-.\bjam
+.\bjam --threading=multi --link=shared --runtime-link=shared --variant=debug 
+	--with-thread --with-filesystem --with-system --with-program_options
+	--with-date_time --with-regex
+	architecture=x86 address-model=64 toolset=msvc
+
+with variant, architecture, address-mode and toolset fitting your needs.
 
 set BOOST_DIR to C:\<myhome>\boost-1_44_0
 

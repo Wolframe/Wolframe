@@ -48,7 +48,7 @@ Compile and install boost
 -------------------------
 
 ./bootstrap.sh --prefix=/usr/local/boost-1.46.1 \
-	--with-libraries=thread,filesystem,system,program_options,date_time
+	--with-libraries=thread,filesystem,system,program_options,date_time,regex
 ./bjam install
 
 configure Wolframe in ~/config.mk and

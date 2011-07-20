@@ -317,11 +317,14 @@ void read_from_stdin( WolfClient *c )
 	do {
 		std::cin.getline( line, 2048, '\n' );
 		if( !std::cin.eof( ) ) {
+			std::cout << "WRITE" << std::endl;
 			c->write( line );
 		}
 	} while( !std::cin.eof( ) );
 
-	c->stop( );
+	std::cout << "STOP" << std::endl;
+	if( c ) c->stop( );
+	std::cout << "END" << std::endl;
 }
 
 }
@@ -434,7 +437,8 @@ int main( int argc, char *argv[] )
 	// no sense to wait for stdin thread to wait here, we have a broken connection!
 	// we can't set interruptions points either! So it's either this or a POSIX pipe
 	// or WaitForObject on the stdin handle (using or writing asio extensions)
-
-	delete c;
+	
+	// race here! we are leaking for now..
+	//delete c;
 }
 
