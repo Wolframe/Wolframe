@@ -38,6 +38,7 @@ local_distclean:
 local_test:
 	@-echo @echo off > test.bat
 	@-echo copy "$(LIBXML2_DIR)\bin\libxml2.dll" . >> test.bat
+	@-echo copy "$(LIBXML2_DIR)\lib\libxml2.dll" . >> test.bat
 	@-echo copy "$(ICONV_DIR)\bin\iconv.dll" . >> test.bat
 	@-echo copy "$(ZLIB_DIR)\bin\zlib1.dll" . >> test.bat
 	@-echo testlibxml1 test.xml >> test.bat
