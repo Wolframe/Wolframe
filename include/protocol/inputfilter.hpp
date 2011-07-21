@@ -112,8 +112,8 @@ struct InputFilter
 	}
 
 	///\brief Constructor
-	///\param [in] gn GetNext function pointer
 	InputFilter() :m_ptr(0),m_pos(0),m_size(0),m_gotEoD(false),m_state(Open),m_errorCode(0),m_genbufsize(DefaultBufferSize){}
+
 	///\brief destructor
 	virtual ~InputFilter(){}
 
@@ -131,7 +131,7 @@ struct InputFilter
 	///\brief Set input filter generator state with error code
 	///\param [in] s new state
 	///\param [in] e (optional) error code to set
-	void setState( State s, int e=0)		{m_state=s;m_errorCode=e;}	
+	void setState( State s, int e=0)		{m_state=s;m_errorCode=e;}
 	///\brief Set the size of the buffer used for the generated elements
 	///\param [in] bufsize size of the buffer in bytes
 	void setGenBufferSize( size_type bufsize)	{m_genbufsize = bufsize;}

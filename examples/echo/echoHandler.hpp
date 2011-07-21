@@ -10,7 +10,7 @@
 
 namespace _Wolframe {
 	/// The connection handler
-	class echoConnection : public net::connectionHandler
+	class echoConnection : public net::ConnectionHandler
 	{
 	public:
 		echoConnection( const net::LocalEndpoint& local, unsigned short timeout );
@@ -64,7 +64,7 @@ namespace _Wolframe {
 		{
 			timeout = conf->echoConfig->timeout;
 		}
-		net::connectionHandler* newConnection( const net::LocalEndpoint& local );
+		net::ConnectionHandler* newConnection( const net::LocalEndpoint& local );
 
 	private:
 		short unsigned timeout;

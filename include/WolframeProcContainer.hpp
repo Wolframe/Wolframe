@@ -42,17 +42,6 @@
 
 namespace _Wolframe {
 
-class WolframeProcConfig : public config::ConfigurationBase
-{
-public:
-	WolframeProcConfig( const char* name, const char* logParent, const char* logName )
-		: ConfigurationBase( name, logParent, logName )	{}
-	virtual ~WolframeProcConfig()				{}
-
-	virtual const char* typeName() const = 0;
-};
-
-
 class WolframeProcContainer
 {
 public:

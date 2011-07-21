@@ -396,7 +396,7 @@ ServerHandler::ServerHandlerImpl::ServerHandlerImpl( const HandlerConfiguration 
 	config_.knownLuaModules = config->luaConfig->knownLuaModules;
 }
 
-net::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const net::LocalEndpoint& local )
+net::ConnectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const net::LocalEndpoint& local )
 {
 	return new luaConnection( local, config_ );
 }
@@ -405,7 +405,7 @@ ServerHandler::ServerHandler( const HandlerConfiguration *config ) : impl_( new 
 
 ServerHandler::~ServerHandler()	{ delete impl_; }
 
-net::connectionHandler* ServerHandler::newConnection( const net::LocalEndpoint& local )
+net::ConnectionHandler* ServerHandler::newConnection( const net::LocalEndpoint& local )
 {
 	return impl_->newConnection( local );
 }

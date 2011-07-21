@@ -79,7 +79,7 @@ public:
 	///\param [in,out] src input iterator
 	///\param [in] end iterator marking end of input block
 	template <typename IteratorType>
-	static bool consumeEOLN( IteratorType& src, IteratorType& end)
+	static bool consumeEOL( IteratorType& src, IteratorType& end)
 	{
 		if (src == end) return false;
 		if (*src == '\r') src++;
@@ -93,7 +93,7 @@ public:
 	///\tparam IteratorType iterator type used as input for parsing
 	///\param [in] src input iterator
 	template <typename IteratorType>
-	static bool isEOLN( IteratorType& src)
+	static bool isEOL( IteratorType& src)
 	{
 		return (*src == '\r' || *src == '\n');
 	}
@@ -134,7 +134,7 @@ struct CmdMap :public std::vector<std::string>
 	};
 
 	///\brief retrieve a defined commands index from the map
-	///\param val value to retrieve
+	///\param value value to retrieve
 	///\return the index of the command or -1 if not found or not determined enough
 	int operator []( const char* value) const
 	{
@@ -158,10 +158,10 @@ struct CmdMap :public std::vector<std::string>
 	}
 
 	///\brief insert a command into the map.
-	///\param val value to insert
-	void insert( const value_type& val)
+	///\param value value to insert
+	void insert( const value_type& value)
 	{
-		push_back( boost::algorithm::to_upper_copy( val));
+		push_back( boost::algorithm::to_upper_copy( value));
 	}
 };
 
@@ -272,7 +272,7 @@ public:
 		buf.clear();
 		return rt;
 	}
-  
+
 private:
 	CmdMapType m_cmdmap;						///< commands of the parser
 };

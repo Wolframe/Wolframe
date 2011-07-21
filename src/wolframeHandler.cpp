@@ -50,37 +50,37 @@
 
 namespace _Wolframe	{
 
-wolframeConnection::wolframeConnection( const wolframeHandler& context,
+wolframeConnection::wolframeConnection( const WolframeHandler& context,
 					const net::LocalEndpoint& local )
 	: m_globalCtx( context )
 {
 	m_localEP = &local;
 	m_remoteEP = NULL;
-	_Wolframe::net::ConnectionEndpoint::ConnectionType type = m_localEP->type();
+	net::ConnectionEndpoint::ConnectionType type = m_localEP->type();
 
 	switch ( type )	{
-	case _Wolframe::net::ConnectionEndpoint::TCP_CONNECTION:	{
-		const _Wolframe::net::LocalTCPendpoint* lcl = static_cast<const _Wolframe::net::LocalTCPendpoint*>( m_localEP );
+	case net::ConnectionEndpoint::TCP_CONNECTION:	{
+		const net::LocalTCPendpoint* lcl = static_cast< const net::LocalTCPendpoint* >( m_localEP );
 		LOG_TRACE << "Created connection handler for " << lcl->toString();
 		break;
 	}
 #ifdef WITH_SSL
-	case _Wolframe::net::ConnectionEndpoint::SSL_CONNECTION:	{
-		const _Wolframe::net::LocalSSLendpoint* lcl = static_cast<const _Wolframe::net::LocalSSLendpoint*>( m_localEP );
+	case net::ConnectionEndpoint::SSL_CONNECTION:	{
+		const net::LocalSSLendpoint* lcl = static_cast< const net::LocalSSLendpoint* >( m_localEP );
 		LOG_TRACE << "Created connection handler (SSL) for " << lcl->toString();
 		break;
 	}
 #else
-	case _Wolframe::net::ConnectionEndpoint::SSL_CONNECTION:
+	case net::ConnectionEndpoint::SSL_CONNECTION:
 #endif // WITH_SSL
 	default:
 		LOG_FATAL << "Impossible local connection type !";
 		abort();
 	}
 
-	state_ = NEW;
-	dataStart_ = NULL;
-	dataSize_ = 0;
+	m_state = NEW;
+	m_dataStart = NULL;
+	m_dataSize = 0;
 	idleTimeout_ = 30;
 
 	// Get the database connection from the begining
@@ -104,17 +104,19 @@ wolframeConnection::~wolframeConnection()
 void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
 {
 	m_remoteEP = &remote;
-	_Wolframe::net::ConnectionEndpoint::ConnectionType type = m_remoteEP->type();
+	net::ConnectionEndpoint::ConnectionType type = m_remoteEP->type();
 
 	switch ( type )	{
-	case _Wolframe::net::ConnectionEndpoint::TCP_CONNECTION:	{
-		const _Wolframe::net::RemoteTCPendpoint* rmt = static_cast<const _Wolframe::net::RemoteTCPendpoint*>( m_remoteEP );
+	case net::ConnectionEndpoint::TCP_CONNECTION:	{
+		const net::RemoteTCPendpoint* rmt = static_cast< const net::RemoteTCPendpoint* >( m_remoteEP );
 		LOG_TRACE << "Peer set to " << rmt->toString() << ", connected at " << rmt->connectionTime();
 		break;
 	}
+
+	case net::ConnectionEndpoint::SSL_CONNECTION:
 #ifdef WITH_SSL
-	case _Wolframe::net::ConnectionEndpoint::SSL_CONNECTION:	{
-		const _Wolframe::net::RemoteSSLendpoint* rmt = static_cast<const _Wolframe::net::RemoteSSLendpoint*>( m_remoteEP );
+	{
+		const net::RemoteSSLendpoint* rmt = static_cast<const net::RemoteSSLendpoint*>( m_remoteEP );
 		LOG_TRACE << "Peer set to " << rmt->toString() << ", connected at " << boost::posix_time::from_time_t( rmt->connectionTime());
 		if ( rmt->SSLcertInfo() )	{
 			LOG_TRACE << "Peer SSL certificate serial number " << rmt->SSLcertInfo()->serialNumber()
@@ -126,17 +128,16 @@ void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
 		}
 		break;
 	}
-#else
-	case _Wolframe::net::ConnectionEndpoint::SSL_CONNECTION:
 #endif // WITH_SSL
+
 	default:
 		LOG_FATAL << "Impossible remote connection type !";
 		abort();
 	}
 
-	// Check here if the connection is allowed
+// Check here if the connection is allowed
 
-	// The AAAA stuf should also depend on peer properties
+// The AAAA stuf should also depend on peer properties
 //	m_authentication = m_globalCtx.aaaa().authenticationChannel();
 //	m_authorization = m_globalCtx.aaaa().authorizationChannel();
 //	m_audit = m_globalCtx.aaaa().auditChannel();
@@ -146,70 +147,70 @@ void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
 /// Handle a request and produce a reply.
 const net::NetworkOperation wolframeConnection::nextOperation()
 {
-	switch( state_ )	{
+	switch( m_state )	{
 	case NEW:	{
-		state_ = HELLO_SENT;
+		m_state = HELLO_SENT;
 		if ( ! m_globalCtx.banner().empty() )
-			outMsg_ = m_globalCtx.banner() + "\nOK\n";
+			m_outMsg = m_globalCtx.banner() + "\nOK\n";
 		else
-			outMsg_ = "OK\n";
-		return net::NetworkOperation( net::SendString( outMsg_ ));
+			m_outMsg = "OK\n";
+		return net::NetworkOperation( net::SendString( m_outMsg ));
 	}
 
 	case HELLO_SENT:	{
-		state_ = READ_INPUT;
-		return net::NetworkOperation( net::ReadData( readBuf_, ReadBufSize, idleTimeout_ ));
+		m_state = READ_INPUT;
+		return net::NetworkOperation( net::ReadData( m_readBuf, ReadBufSize, idleTimeout_ ));
 	}
 
 	case READ_INPUT:
-		dataStart_ = readBuf_;
+		m_dataStart = m_readBuf;
 		// Yes, it continues with OUTPUT_MSG, sneaky, sneaky, sneaky :P
 
 	case OUTPUT_MSG:
-		if ( !strncmp( "quit", dataStart_, 4 ))	{
-			state_ = TERMINATE;
+		if ( !strncmp( "quit", m_dataStart, 4 ))	{
+			m_state = TERMINATE;
 			return net::NetworkOperation( net::SendString( "Bye\n" ));
 		}
 		else	{
-			char *s = dataStart_;
-			for ( std::size_t i = 0; i < dataSize_; i++ )	{
+			char *s = m_dataStart;
+			for ( std::size_t i = 0; i < m_dataSize; i++ )	{
 				if ( *s == '\n' )	{
 					s++;
-					outMsg_ = std::string( dataStart_, s - dataStart_ );
-					dataSize_ -= s - dataStart_;
-					dataStart_ = s;
-					state_ = OUTPUT_MSG;
-					return net::NetworkOperation( net::SendString( outMsg_ ));
+					m_outMsg = std::string( m_dataStart, s - m_dataStart );
+					m_dataSize -= s - m_dataStart;
+					m_dataStart = s;
+					m_state = OUTPUT_MSG;
+					return net::NetworkOperation( net::SendString( m_outMsg ));
 				}
 				s++;
 			}
 			// If we got here, no \n was found, we need to read more
 			// or close the connection if the buffer is full
-			if ( dataSize_ >= ReadBufSize )	{
-				state_ = TERMINATE;
+			if ( m_dataSize >= ReadBufSize )	{
+				m_state = TERMINATE;
 				return net::NetworkOperation( net::SendString( "Line too long. Bye.\n" ));
 			}
 			else {
-				memmove( readBuf_, dataStart_, dataSize_ );
-				state_ = READ_INPUT;
-				return net::NetworkOperation( net::ReadData( readBuf_ + dataSize_,
-									     ReadBufSize - dataSize_,
+				memmove( m_readBuf, m_dataStart, m_dataSize );
+				m_state = READ_INPUT;
+				return net::NetworkOperation( net::ReadData( m_readBuf + m_dataSize,
+									     ReadBufSize - m_dataSize,
 									     idleTimeout_ ));
 			}
 		}
 
 	case TIMEOUT:	{
-		state_ = TERMINATE;
+		m_state = TERMINATE;
 		return net::NetworkOperation( net::SendString( "Timeout. :P\n" ));
 	}
 
 	case SIGNALLED:	{
-		state_ = TERMINATE;
+		m_state = TERMINATE;
 		return net::NetworkOperation( net::SendString( "Server is shutting down. :P\n" ));
 	}
 
 	case TERMINATE:	{
-		state_ = FINISHED;
+		m_state = FINISHED;
 		return net::NetworkOperation( net::CloseConnection() );
 	}
 
@@ -217,28 +218,29 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 		LOG_DEBUG << "Processor in FINISHED state";
 		break;
 
-	} /* switch( state_ ) */
+	} /* switch( m_state ) */
+
+	LOG_ALERT << "Connection FSM out of states";
 	return net::NetworkOperation( net::CloseConnection() );
 }
 
 
-/// Parse incoming data. The return value indicates how much of the
-/// input has been consumed.
+/// Parse incoming data..
 void wolframeConnection::networkInput( const void*, std::size_t bytesTransferred )
 {
 	LOG_DATA << "network Input: Read " << bytesTransferred << " bytes";
-	dataSize_ += bytesTransferred;
+	m_dataSize += bytesTransferred;
 }
 
 void wolframeConnection::timeoutOccured()
 {
-	state_ = TIMEOUT;
+	m_state = TIMEOUT;
 	LOG_TRACE << "Processor received timeout";
 }
 
 void wolframeConnection::signalOccured()
 {
-	state_ = SIGNALLED;
+	m_state = SIGNALLED;
 	LOG_TRACE << "Processor received signal";
 }
 
@@ -254,19 +256,19 @@ void wolframeConnection::errorOccured( NetworkSignal signal )
 		break;
 
 	case OPERATION_CANCELLED:
-		LOG_TRACE << "Processor received OPERATION_CANCELED (should have been requested by us)";
+		LOG_TRACE << "Processor received OPERATION CANCELED (should have been requested by us)";
 		break;
 
 	case UNKNOWN_ERROR:
 		LOG_TRACE << "Processor received an UNKNOWN error from the framework";
 		break;
 	}
-	state_ = TERMINATE;
+	m_state = TERMINATE;
 }
 
 
 /// The server handler global context
-wolframeHandler::wolframeHandler( const HandlerConfiguration* conf )
+WolframeHandler::WolframeHandler( const HandlerConfiguration* conf )
 	: m_banner( conf->banner->toString() ),
 	  m_db( *(conf->database)),
 	  m_aaaa( *(conf->aaaa)),
@@ -285,20 +287,20 @@ wolframeHandler::wolframeHandler( const HandlerConfiguration* conf )
 	LOG_TRACE << "Processor group database reference resolved";
 }
 
-wolframeHandler::~wolframeHandler()
+WolframeHandler::~WolframeHandler()
 {
-	LOG_TRACE << "Global context destroyed";
+	LOG_TRACE << "Global Wolframe handler / context destroyed";
 }
 
 
 /// ServerHandler PIMPL
-net::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const net::LocalEndpoint& local )
+net::ConnectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const net::LocalEndpoint& local )
 {
-	return new wolframeConnection( globalContext_, local );
+	return new wolframeConnection( m_globalContext, local );
 }
 
 ServerHandler::ServerHandlerImpl::ServerHandlerImpl( const HandlerConfiguration* conf )
-	: globalContext_( conf )	{}
+	: m_globalContext( conf )			{}
 
 ServerHandler::ServerHandlerImpl::~ServerHandlerImpl()	{}
 
@@ -308,7 +310,7 @@ ServerHandler::ServerHandler( const HandlerConfiguration* conf )
 
 ServerHandler::~ServerHandler()	{ delete impl_; }
 
-net::connectionHandler* ServerHandler::newConnection( const net::LocalEndpoint& local )
+net::ConnectionHandler* ServerHandler::newConnection( const net::LocalEndpoint& local )
 {
 	return impl_->newConnection( local );
 }

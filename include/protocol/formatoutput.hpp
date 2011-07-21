@@ -74,7 +74,6 @@ struct FormatOutput :public OutputBlock
 	};
 
 	///\brief Constructor
-	///\param [in] op print function pointer
 	FormatOutput()
 		:OutputBlock(0,0),m_errorCode(0),m_state(Open){}
 

@@ -237,7 +237,7 @@ struct Connection::Private
 						input.setPos( 0);
 						return net::ReadData( input.ptr(), input.size());
 					}
-					if (!ProtocolParser::consumeEOLN( itr, eoM))
+					if (!ProtocolParser::consumeEOL( itr, eoM))
 					{
 						if (itr == eoM)
 						{
@@ -324,7 +324,7 @@ struct Connection::Private
 						input.setPos( 0);
 						return net::ReadData( input.ptr(), input.size());
 					}
-					if (!ProtocolParser::isEOLN( itr))
+					if (!ProtocolParser::isEOL( itr))
 					{
 						state = Init;
 						return WriteLine( "BAD too many arguments");
@@ -371,7 +371,7 @@ struct Connection::Private
 
 				case HandleError:
 				{
-					if (!ProtocolParser::skipLine( itr, eoM) || !ProtocolParser::consumeEOLN( itr, eoM))
+					if (!ProtocolParser::skipLine( itr, eoM) || !ProtocolParser::consumeEOL( itr, eoM))
 					{
 						input.setPos( 0);
 						return net::ReadData( input.ptr(), input.size());
@@ -435,7 +435,7 @@ const Connection::Operation Connection::nextOperation()
 }
 
 /// ServerHandler PIMPL
-net::connectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const net::LocalEndpoint& local )
+net::ConnectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const net::LocalEndpoint& local )
 {
 		return new pecho::Connection( local );
 }
@@ -445,7 +445,7 @@ ServerHandler::ServerHandler( const HandlerConfiguration* ) : impl_( new ServerH
 
 ServerHandler::~ServerHandler()  { delete impl_; }
 
-net::connectionHandler* ServerHandler::newConnection( const net::LocalEndpoint& local )
+net::ConnectionHandler* ServerHandler::newConnection( const net::LocalEndpoint& local )
 {
 		return impl_->newConnection( local );
 }

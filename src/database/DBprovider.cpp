@@ -47,9 +47,9 @@
 using namespace _Wolframe;
 
 static const size_t noDBmodules = 2;
-static module::ModuleContainerDescription< db::DatabaseContainer, db::DatabaseConfig >
-dbModules[ noDBmodules ] = { module::ModuleContainerDescription< db::DatabaseContainer, db::DatabaseConfig >( "PostgreSQL", &db::PostgreSQLcontainer::create ),
-			     module::ModuleContainerDescription< db::DatabaseContainer, db::DatabaseConfig >( "SQLite", &db::SQLiteContainer::create ) };
+static module::ModuleContainerDescription< db::DatabaseContainer, config::ContainerConfiguration >
+dbModules[ noDBmodules ] = { module::ModuleContainerDescription< db::DatabaseContainer, config::ContainerConfiguration >( "PostgreSQL", &db::PostgreSQLcontainer::create ),
+			     module::ModuleContainerDescription< db::DatabaseContainer, config::ContainerConfiguration >( "SQLite", &db::SQLiteContainer::create ) };
 /****  End impersonating the module loader  **************************************************/
 
 namespace _Wolframe	{
@@ -57,7 +57,7 @@ namespace db	{
 
 DatabaseProvider::DatabaseProvider( const DBproviderConfig& conf )
 {
-	for ( std::list<DatabaseConfig*>::const_iterator it = conf.m_dbConfig.begin();
+	for ( std::list< config::ContainerConfiguration* >::const_iterator it = conf.m_dbConfig.begin();
 							it != conf.m_dbConfig.end(); it++ )	{
 		const char* dbType = (*it)->typeName();
 		size_t i;

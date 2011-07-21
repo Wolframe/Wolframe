@@ -32,7 +32,12 @@ If you insist to compile Boost from scratch, do the following
 in a Visual Studio C++ command line:
 
 bootstrap
-.\bjam
+.\bjam --threading=multi --link=shared --runtime-link=shared --variant=debug 
+	--with-thread --with-filesystem --with-system --with-program_options
+	--with-date_time --with-regex
+	architecture=x86 address-model=64 toolset=msvc
+
+with variant, architecture, address-mode and toolset fitting your needs.
 
 set BOOST_DIR to C:\<myhome>\boost-1_44_0
 
@@ -136,4 +141,15 @@ ICONV_DIR and ZLIB_DIR.
 
 Make sure, all DLLs are executable otherwise you get an Application Load Error 0x22.
 
-For 64-bit you have to compile your own libraries.
+For 64-bit you have to compile your own libraries
+
+Get sources from: ftp://xmlsoft.org/libxml2/
+
+libxml2-2.7.8
+cd win32
+cscript configure.js compiler=msvc prefix="C:\cygwin\home\Andreas\libxml2-2.7.8.win64" zlib=no iconv=no
+# if necessary, add qwuotes in config.msvc, PREFIX="C:\Program Files\libxml2-2.7.8.win64"
+nmake /nologo /f Makefile.msvc all
+nmake /nologo /f Makefile.msvc install
+
+Adapt LIBXML2_DIR in 'makefiles\nmake\config.mk'.

@@ -42,13 +42,13 @@
 
 namespace _Wolframe {
 
-class EchoProcConfig : public module::ModuleConfiguration< EchoProcConfig, WolframeProcConfig >
+class EchoProcConfig : public module::ModuleConfiguration< EchoProcConfig >
 {
 	friend class EchoProcContainer;
 	friend class config::ConfigurationParser;
 public:
 	EchoProcConfig( const char* cfgName, const char* logParent, const char* logName )
-		: module::ModuleConfiguration< EchoProcConfig, WolframeProcConfig >( cfgName, logParent, logName ) {}
+		: module::ModuleConfiguration< EchoProcConfig >( cfgName, logParent, logName ) {}
 
 	const char* typeName() const			{ return "EchoProcessor"; }
 
@@ -62,7 +62,7 @@ private:
 
 
 class EchoProcContainer : public module::ModuleContainer< EchoProcContainer, EchoProcConfig,
-		WolframeProcContainer, WolframeProcConfig >
+		WolframeProcContainer >
 {
 public:
 	EchoProcContainer( const EchoProcConfig& conf );

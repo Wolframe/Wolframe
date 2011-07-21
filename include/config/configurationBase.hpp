@@ -112,10 +112,11 @@ private:
 class ContainerConfiguration : public ConfigurationBase
 {
 public:
-	/// constructor
-	ContainerConfiguration( const char* cfgName, const char* logParent, const char* logName )
-		: ConfigurationBase( cfgName, logParent, logName )	{}
-	virtual ~ContainerConfiguration()				{}
+	/// Class constructor.
+	ContainerConfiguration( const char* name, const char* logParent, const char* logName )
+		: ConfigurationBase( name, logParent, logName )	{}
+
+	virtual ~ContainerConfiguration()			{}
 
 	virtual const char* typeName() const = 0;
 };

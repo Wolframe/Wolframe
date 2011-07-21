@@ -38,27 +38,11 @@
 #define _DATABASE_CONTAINER_HPP_INCLUDED
 
 #include "config/configurationBase.hpp"
-#include "moduleInterface.hpp"
 #include "database.hpp"
+#include "moduleInterface.hpp"
 
 namespace _Wolframe {
 namespace db {
-
-class DatabaseConfig : public config::ConfigurationBase
-{
-public:
-	DatabaseConfig( const char* name, const char* logParent, const char* logName )
-		: ConfigurationBase( name, logParent, logName )	{}
-	virtual ~DatabaseConfig()			{}
-
-	void ID( const std::string& id )		{ m_ID = id; }
-	const std::string& ID() const			{ return m_ID; }
-
-	virtual const char* typeName() const = 0;
-private:
-	std::string		m_ID;
-};
-
 
 class DatabaseContainer
 {

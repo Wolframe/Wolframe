@@ -43,7 +43,7 @@ namespace _Wolframe {
 namespace pecho {
 
    /// The connection handler
-   class Connection : public net::connectionHandler
+   class Connection : public net::ConnectionHandler
    {
    public:
       typedef net::NetworkOperation Operation;
@@ -74,7 +74,7 @@ namespace pecho {
    class ServerHandler::ServerHandlerImpl
    {
    public:
-      net::connectionHandler* newConnection( const net::LocalEndpoint& local);
+      net::ConnectionHandler* newConnection( const net::LocalEndpoint& local);
    };
 
 } // namespace _Wolframe

@@ -44,11 +44,11 @@ namespace config {
 ApplicationConfiguration::ApplicationConfiguration()
 {
 	// daemon / service configuration
-	serviceConf = new _Wolframe::config::ServiceConfiguration();
+	serviceConf = new config::ServiceConfiguration();
 	// network server
-	serverConf = new _Wolframe::net::Configuration();
+	serverConf = new net::Configuration();
 	// logging
-	loggerConf = new _Wolframe::log::LoggerConfiguration();
+	loggerConf = new log::LoggerConfiguration();
 
 	handlerConf = new _Wolframe::HandlerConfiguration();
 

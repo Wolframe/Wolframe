@@ -48,7 +48,7 @@ namespace db {
 
 //***  SQLite configuration functions  **************************************
 SQLiteConfig::SQLiteConfig( const char* name, const char* logParent, const char* logName )
-	: module::ModuleConfiguration< SQLiteConfig, DatabaseConfig >( name, logParent, logName )
+	: module::ModuleConfiguration< SQLiteConfig >( name, logParent, logName )
 {
 	flag = false;
 }
@@ -58,8 +58,8 @@ void SQLiteConfig::print( std::ostream& os, size_t indent ) const
 	std::string indStr( indent, ' ' );
 
 	os << indStr << sectionName() << ":" << std::endl;
-	if ( ! ID().empty() )
-		os << indStr << "   ID: " << ID() << std::endl;
+	if ( ! m_ID.empty() )
+		os << indStr << "   ID: " << m_ID << std::endl;
 	os << indStr << "   Filename: " << filename << std::endl;
 	os << indStr << "   Flags: " << (flag ? "True Flag" : "False Flag") << std::endl;
 }
@@ -162,9 +162,9 @@ bool SQLiteDatabase::doTransaction( DatabaseRequest &request, DatabaseAnswer &an
 
 //***  SQLite database container  *******************************************
 SQLiteContainer::SQLiteContainer( const SQLiteConfig& conf )
-	: m_db( conf.ID(), conf.filename, /* Aba: temporary */ 10, conf.flag )
+	: m_db( conf.m_ID, conf.filename, /* Aba: temporary */ 10, conf.flag )
 {
-	LOG_NOTICE << "SQLite database container for '" << conf.ID() << "' created";
+	LOG_NOTICE << "SQLite database container for '" << conf.m_ID << "' created";
 }
 
 SQLiteContainer::~SQLiteContainer( )

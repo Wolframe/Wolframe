@@ -89,7 +89,8 @@ PGSQL_DIR = C:\Program Files\PostgreSQL\9.0
 # libxml2
 #########
 
-LIBXML2_DIR = D:\Program Files\libxml2-2.7.8.win32
+#LIBXML2_DIR = D:\Program Files\libxml2-2.7.8.win32
+LIBXML2_DIR = C:\cygwin\home\Andreas\libxml2-2.7.8.win64
 ICONV_DIR = D:\Program Files\iconv-1.9.2.win32
 ZLIB_DIR = D:\Program Files\zlib-1.2.5
 

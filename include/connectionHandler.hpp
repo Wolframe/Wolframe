@@ -50,9 +50,9 @@ namespace net {
 
 /// Base class for a network operation. It should never be accessed directly by
 /// the user code
-class	NetworkOperation
+class NetworkOperation
 {
-	template< typename T > friend class connectionBase;
+	template< typename T > friend class ConnectionBase;
 
 protected:
 	enum Operation	{
@@ -114,16 +114,16 @@ public:
 
 
 /// The common handler for the connection status.
-class connectionHandler
+class ConnectionHandler
 {
-	template< typename socketType > friend class connectionBase;
+	template< typename socketType > friend class ConnectionBase;
 protected:
-	connectionHandler()		{}
-	virtual ~connectionHandler()	{}
+	ConnectionHandler()		{}
+	virtual ~ConnectionHandler()	{}
 
 private:
-	connectionHandler( const connectionHandler& );
-	connectionHandler& operator = ( const connectionHandler& );
+	ConnectionHandler( const ConnectionHandler& );
+	ConnectionHandler& operator = ( const ConnectionHandler& );
 
 public:
 	enum NetworkSignal	{
@@ -167,7 +167,7 @@ public:
 	~ServerHandler();
 
 	/// Create a new connection handler and return a pointer to it
-	net::connectionHandler* newConnection( const net::LocalEndpoint& local );
+	net::ConnectionHandler* newConnection( const net::LocalEndpoint& local );
 
 private:
 	ServerHandler( const ServerHandler& );
