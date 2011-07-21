@@ -55,6 +55,21 @@ struct CharFilter :FilterBase<IOCharset, AppCharset>
 	///\brief input filter for single characters
 	struct InputFilter :public protocol::InputFilter
 	{
+		///\brief Constructor
+		InputFilter() {}
+
+		///\brief Copy constructor
+		///\param [in] o format output to copy
+		InputFilter( const InputFilter& o)
+			:m_itr(o.m_itr) {}
+
+		///\brief self copy
+		///\return copy of this
+		virtual InputFilter* copy() const
+		{
+			return new InputFilter( *this);
+		}
+
 		enum ErrorCodes
 		{
 			Ok,
@@ -109,6 +124,19 @@ struct CharFilter :FilterBase<IOCharset, AppCharset>
 		///\brief Constructor
 		FormatOutput()
 			:m_bufstate(EscBufferType::SRC){}
+
+		///\brief Copy constructor
+		///\param [in] o format output to copy
+		FormatOutput( const FormatOutput& o)
+			:m_bufstate(o.m_bufstate)
+		{}
+
+		///\brief self copy
+		///\return copy of this
+		virtual FormatOutput* copy() const
+		{
+			return new FormatOutput( *this);
+		}
 
 		///\brief Implementation of protocol::InputFilter::print(ElementType,const void*,size_type)
 		///\param [in] type type of the element to print

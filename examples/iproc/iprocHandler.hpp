@@ -43,7 +43,6 @@
 #include "langbind/appObjects.hpp"
 #include "langbind/luaConfig.hpp"
 #include "langbind/luaAppProcessor.hpp"
-#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace iproc {
@@ -86,9 +85,6 @@ private:
 	typedef protocol::Buffer<256> LineBuffer;				///< buffer for one line of input/output
 	typedef protocol::CmdParser<LineBuffer> ProtocolParser;			///< parser for the protocol
 	typedef protocol::CArgBuffer<LineBuffer> ArgBuffer;			///< buffer type for the command arguments
-
-	typedef boost::shared_ptr<protocol::InputFilter> InputFilterR;		///< reference to protocol input instance
-	typedef boost::shared_ptr<protocol::FormatOutput> FormatOutputR;	///< reference to format output instance
 
 	///\enum State
 	///\brief Enumeration of processor states
@@ -140,8 +136,8 @@ private:
 	InputIterator m_end;			///< iterator pointing to end of message buffer
 
 	app::System m_system;			///< interface to system functions like database and loaded resources
-	InputFilterR m_inputfilter;		///< network input interface for the interpreter
-	FormatOutputR m_formatoutput;		///< network output interface for the interpreter
+	protocol::InputFilterR m_inputfilter;	///< network input interface for the interpreter
+	protocol::FormatOutputR m_formatoutput;	///< network output interface for the interpreter
 	lua::AppProcessor m_processor;		///< the interpreter state
 	const char* m_functionName;		///< name of the method to execute
 	bool m_functionHasIO;			///< true if the method to execute does content data processing (input/output)

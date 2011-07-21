@@ -44,12 +44,35 @@ struct BufferingInputFilter :public protocol::InputFilter
 		ErrOutputBufferTooSmall
 	};
 
+	///\brief Constructor
 	BufferingFilter()
-		:m_hasAll(false),m_content(0){}
+		:m_content(0){}
 
+	///\brief Destructor
 	~BufferingFilter()
 	{
 		if (m_content) delete m_content;
+	}
+
+	///\brief Copy constructor
+	///\param [in] o format output to copy
+	BufferingFilter( const BufferingFilter& o)
+		:m_buffer(o.m_buffer),m_content(0)
+	{
+		if (o.m_content)
+		{
+			protocol::InputFilter::protocolInput( (void*)&m_buffer.at(0), m_buffer.size(), true);
+			m_content = new Container( ptr(), size());
+			m_itr = m_content->begin() + (o.m_itr - o.m_content->begin());
+			m_end = m_content->end();
+		}
+	}
+
+	///\brief self copy
+	///\return copy of this
+	virtual BufferingFilter* copy() const
+	{
+		return new BufferingFilter( *this);
 	}
 
 	virtual void protocolInput( void* data, size_type datasize, bool eoD)

@@ -73,10 +73,10 @@ public:
 		return (functionName != 0);
 	}
 
-	///\brief Get command implemenation (see app::AppProcessorBase::setIO(boost::shared_ptr<protocol::InputFilter>, boost::shared_ptr<protocol::FormatOutput>)
+	///\brief Get command implemenation (see app::AppProcessorBase::setIO( const InputFilterR&, const FormatOutputR&)
 	///\param[in] in input filter reference
 	///\param[in] out format output reference
-	virtual void setIO( boost::shared_ptr<protocol::InputFilter> in, boost::shared_ptr<protocol::FormatOutput> out)
+	virtual void setIO( const protocol::InputFilterR& in, const protocol::FormatOutputR& out)
 	{
 		m_input.m_inputfilter = in;
 		m_output.m_formatoutput = out;

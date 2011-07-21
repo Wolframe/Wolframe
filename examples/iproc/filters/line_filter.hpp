@@ -63,6 +63,19 @@ struct LineFilter :FilterBase<IOCharset, AppCharset>
 		FormatOutput( const char* eoln="\r\n")
 			:m_eoln(eoln),m_bufstate(EscBufferType::SRC){}
 
+		///\brief Copy constructor
+		///\param [in] o format output to copy
+		FormatOutput( const FormatOutput& o)
+			:m_eoln(o.m_eoln),m_bufstate(o.m_bufstate)
+		{}
+
+		///\brief self copy
+		///\return copy of this
+		virtual FormatOutput* copy() const
+		{
+			return new FormatOutput( *this);
+		}
+
 		///\brief Implementation of protocol::InputFilter::print(ElementType,const void*,size_type)
 		///\param [in] type type of the element to print
 		///\param [in] element pointer to the element to print
@@ -92,6 +105,21 @@ struct LineFilter :FilterBase<IOCharset, AppCharset>
 	///\class InputFilter
 	struct InputFilter :public protocol::InputFilter
 	{
+		///\brief Constructor
+		InputFilter() {}
+
+		///\brief Copy constructor
+		///\param [in] o format output to copy
+		InputFilter( const InputFilter& o)
+			:m_itr(o.m_itr) {}
+
+		///\brief self copy
+		///\return copy of this
+		virtual InputFilter* copy() const
+		{
+			return new InputFilter( *this);
+		}
+
 		///\enum ErrorCodes
 		///\brief Enumeration of error codes
 		enum ErrorCodes

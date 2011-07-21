@@ -35,6 +35,7 @@ Project Wolframe.
 ///\brief Input interface for the application processor
 
 #include <cstddef>
+#include "countedReference.hpp"
 
 namespace _Wolframe {
 namespace protocol {
@@ -64,6 +65,10 @@ struct InputFilter
 		Value,		///< content or attribute value
 		CloseTag	///< close current hierarchy level
 	};
+
+	///\brief self copy
+	///\return copy of this
+	virtual InputFilter* copy() const=0;
 
 	///\brief Get next element call as methof call
 	///\param [out] type element type parsed
@@ -143,6 +148,10 @@ private:
 	int m_errorCode;	///< error code
 	size_type m_genbufsize;	///< element buffer size (the buffer itself is managed by the client of this class)
 };
+
+///\typedef InputFilterR
+///\brief Shared input filter reference
+typedef CountedReference<InputFilter> InputFilterR;
 
 }}//namespace
 #endif

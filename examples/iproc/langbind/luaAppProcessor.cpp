@@ -38,6 +38,7 @@ Project Wolframe.
 #include <stdexcept>
 #include <cstddef>
 #include <boost/lexical_cast.hpp>
+
 extern "C"
 {
 #include "lua.h"
@@ -211,6 +212,7 @@ struct LuaObject :public ObjectType
 
 static int function_inputFilter( lua_State* ls)
 {
+
 	for (;;)
 	{
 		const char* item[2];
@@ -338,12 +340,13 @@ static int function_input_as( lua_State* ls)
 		const char* tn = lua_typename( ls, lua_type( ls, 2));
 		luaL_error( ls, "filter type value expected as first argument of input:as instead of %s", tn?tn:"UNKNOWN");
 	}
-	boost::shared_ptr<protocol::InputFilter> inputfilter( filter->m_inputfilter);
+	protocol::InputFilter* ff = filter->m_inputfilter->copy();
 	if (input->m_inputfilter.get())
 	{
-		*inputfilter = *input->m_inputfilter;
+		*ff = *input->m_inputfilter;
 	}
-	input->m_inputfilter = inputfilter;
+	input->m_inputfilter.reset( ff);
+
 	return 0;
 }
 
@@ -360,12 +363,12 @@ static int function_output_as( lua_State* ls)
 		const char* tn = lua_typename( ls, lua_type( ls, 2));
 		luaL_error( ls, "filter type value expected as first argument of output:as instead of %s", tn?tn:"UNKNOWN");
 	}
-	boost::shared_ptr<protocol::FormatOutput> filteroutput( filter->m_formatoutput);
+	protocol::FormatOutput* ff = filter->m_formatoutput->copy();
 	if (output->m_formatoutput.get())
 	{
-		*filteroutput = *output->m_formatoutput;
+		*ff = *output->m_formatoutput;
 	}
-	output->m_formatoutput = filteroutput;
+	output->m_formatoutput.reset( ff);
 	return 0;
 }
 

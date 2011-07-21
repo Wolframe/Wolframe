@@ -37,7 +37,6 @@ Project Wolframe.
 #define _Wolframe_LANGBIND_HPP_INCLUDED
 #include "protocol/formatoutput.hpp"
 #include "protocol/inputfilter.hpp"
-#include <boost/shared_ptr.hpp>
 #include <stack>
 #include <string>
 
@@ -73,7 +72,7 @@ struct Output
 	ItemType print( const char* e1, unsigned int e1size, const char* e2, unsigned int e2size);
 
 public:
-	boost::shared_ptr<protocol::FormatOutput> m_formatoutput;	///< format output reference
+	protocol::FormatOutputR m_formatoutput;	///< format output reference
 
 private:
 	unsigned int m_state;						///< current state for outputs with more than one elements
@@ -109,7 +108,7 @@ struct System
 ///\brief input as seen from the application processor program
 struct Input
 {
-	boost::shared_ptr<protocol::InputFilter> m_inputfilter;		///< input is defined by the associated input filter
+	protocol::InputFilterR m_inputfilter;	///< input is defined by the associated input filter
 
 	///\brief Constructor
 	Input(){}
@@ -124,8 +123,8 @@ struct Input
 ///\brief input/output filter as seen from the application processor program
 struct Filter
 {
-	boost::shared_ptr<protocol::FormatOutput> m_formatoutput;		///< format output
-	boost::shared_ptr<protocol::InputFilter> m_inputfilter;			///< input filter
+	protocol::FormatOutputR m_formatoutput;		///< format output
+	protocol::InputFilterR m_inputfilter;		///< input filter
 
 	///\brief Constructor
 	///\param[in] system reference to system function call interface
@@ -160,7 +159,7 @@ public:
 
 	///\brief Constructor
 	///\param[in] ig input filter reference from input
-	InputFilterClosure( const boost::shared_ptr<protocol::InputFilter>& ig)		
+	InputFilterClosure( const protocol::InputFilterR& ig)
 		:m_inputfilter(ig)
 		,m_type(protocol::InputFilter::Value)
 		,m_value(0)
@@ -188,7 +187,7 @@ public:
 	ItemType fetch( const char*& e1, unsigned int& e1size, const char*& e2, unsigned int& e2size);
 
 private:
-	boost::shared_ptr<protocol::InputFilter> m_inputfilter;	///< rerefence to input with filter
+	protocol::InputFilterR m_inputfilter;			///< rerefence to input with filter
 	protocol::InputFilter::ElementType m_type;		///< current state (last value type parsed)
 	char* m_value;						///< pointer to local copy of value in m_buf
 	char* m_buf;						///< pointer to buffer for local copies of returned values

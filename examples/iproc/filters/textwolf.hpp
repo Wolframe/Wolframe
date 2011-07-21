@@ -1347,10 +1347,10 @@ public:
 	{
 		unsigned char ch;
 		tokstate.id = TokState::ParsingEntity;
-		ch = src.ascii();
+		ch = m_src.ascii();
 		if (ch == '#')
 		{
-			src.skip();
+			m_src.skip();
 			return parseNumericEntity();
 		}
 		else
@@ -1365,11 +1365,11 @@ public:
 	{
 		unsigned char ch;
 		tokstate.id = TokState::ParsingNumericEntity;
-		ch = src.ascii();
+		ch = m_src.ascii();
 		if (ch == 'x')
 		{
 			tokstate.base = 16;
-			src.skip();
+			m_src.skip();
 			return parseNumericBaseEntity();
 		}
 		else
@@ -1388,7 +1388,7 @@ public:
 
 		while (tokstate.pos < sizeof(tokstate.buf))
 		{
-			tokstate.buf[tokstate.pos++] = ch = src.ascii();
+			tokstate.buf[tokstate.pos++] = ch = m_src.ascii();
 			if (ch == ';')
 			{
 				if (tokstate.value > 0xFFFFFFFF)
@@ -1398,7 +1398,7 @@ public:
 				}
 				push( (UChar)tokstate.value);
 				tokstate.init( TokState::ParsingToken);
-				src.skip();
+				m_src.skip();
 				return true;
 			}
 			else
@@ -1410,7 +1410,7 @@ public:
 					return true;
 				}
 				tokstate.value = tokstate.value * tokstate.base + chval;
-				src.skip();
+				m_src.skip();
 			}
 		}
 		fallbackEntity();
@@ -1423,20 +1423,20 @@ public:
 	{
 		unsigned char ch;
 		tokstate.id = TokState::ParsingNamedEntity;
-		ch = src.ascii();
-		while (tokstate.pos < sizeof(tokstate.buf)-1 && ch != ';' && src.control() == Any)
+		ch = m_src.ascii();
+		while (tokstate.pos < sizeof(tokstate.buf)-1 && ch != ';' && m_src.control() == Any)
 		{
 			tokstate.buf[ tokstate.pos] = ch;
-			src.skip();
+			m_src.skip();
 			tokstate.pos++;
-			ch = src.ascii();
+			ch = m_src.ascii();
 		}
 		if (ch == ';')
 		{
 			tokstate.buf[ tokstate.pos] = '\0';
 			if (!pushEntity( tokstate.buf)) return false;
 			tokstate.init( TokState::ParsingToken);
-			src.skip();
+			m_src.skip();
 			return true;
 		}
 		else
@@ -1492,14 +1492,14 @@ public:
 		for (;;)
 		{
 			ControlCharacter ch;
-			while (isTok[ (unsigned char)(ch=src.control())])
+			while (isTok[ (unsigned char)(ch=m_src.control())])
 			{
-				push( src.chr());
-				src.skip();
+				push( m_src.chr());
+				m_src.skip();
 			}
 			if (ch == Amp)
 			{
-				src.skip();
+				m_src.skip();
 				if (!parseEntity()) break;
 				tokstate.init( TokState::ParsingToken);
 				continue;
@@ -1555,11 +1555,11 @@ public:
 		for (;;)
 		{
 			ControlCharacter ch;
-			while (isTok[ (unsigned char)(ch=src.control())] || ch == Amp)
+			while (isTok[ (unsigned char)(ch=m_src.control())] || ch == Amp)
 			{
-				src.skip();
+				m_src.skip();
 			}
-			if (src.control() != Any) return true;
+			if (m_src.control() != Any) return true;
 		}
 	}
 
@@ -1570,10 +1570,10 @@ public:
 	{
 		bool rt = true;
 		tokstate.id = TokState::ParsingKey;
-		for (; str[tokstate.pos] != '\0'; src.skip(),tokstate.pos++)
+		for (; str[tokstate.pos] != '\0'; m_src.skip(),tokstate.pos++)
 		{
-			if (src.ascii() == str[ tokstate.pos]) continue;
-			ControlCharacter ch = src.control();
+			if (m_src.ascii() == str[ tokstate.pos]) continue;
+			ControlCharacter ch = m_src.control();
 			if (ch == EndOfText)
 			{
 				error = ErrUnexpectedEndOfText;
@@ -1684,7 +1684,7 @@ public:
 private:
 	STMState state;			///< current state of the XML scanner
 	Error error;			///< last error code
-	InputReader src;		///< source input iterator
+	InputReader m_src;		///< source input iterator
 	const EntityMap* m_entityMap;	///< map with entities defined by the caller
 	OutputBuffer* m_outputBuf;	///< buffer to use for output
 
@@ -1694,16 +1694,16 @@ public:
 	///\param [in] p_outputBuf buffer to use for output
 	///\param [in] p_entityMap read only map of named entities defined by the user
 	XMLScanner( InputIterator& p_src, OutputBuffer& p_outputBuf, const EntityMap& p_entityMap)
-			:state(START),error(Ok),src(p_src),m_entityMap(&p_entityMap),m_outputBuf(&p_outputBuf)
+			:state(START),error(Ok),m_src(p_src),m_entityMap(&p_entityMap),m_outputBuf(&p_outputBuf)
 	{}
 	XMLScanner( InputIterator& p_src, OutputBuffer& p_outputBuf)
-			:state(START),error(Ok),src(p_src),m_entityMap(0),m_outputBuf(&p_outputBuf)
+			:state(START),error(Ok),m_src(p_src),m_entityMap(0),m_outputBuf(&p_outputBuf)
 	{}
 
 	///\brief Copy constructor
 	///\param [in] o scanner to copy
 	XMLScanner( XMLScanner& o)
-			:state(o.state),error(o.error),src(o.src),m_entityMap(o.m_entityMap),m_outputBuf(o.m_outputBuf)
+			:state(o.state),error(o.error),m_src(o.m_src),m_entityMap(o.m_entityMap),m_outputBuf(o.m_outputBuf)
 	{}
 
 	///\brief Redefine the buffer to use for output
@@ -1711,6 +1711,13 @@ public:
 	void setOutputBuffer( OutputBuffer& p_outputBuf)
 	{
 		m_outputBuf = &p_outputBuf;
+	}
+
+	///\brief Initialize a new source iterator while keeping the state
+	///\param [in] itr source iterator
+	void setSource( const InputIterator& itr)
+	{
+		m_src.setSource( itr);
 	}
 
 	///\brief Get the current parsed XML element string, if it was not masked out, see nextItem(unsigned short)
@@ -1785,12 +1792,12 @@ public:
 					if (rt == Exit) return rt;
 				}
 			}
-			ControlCharacter ch = src.control();
+			ControlCharacter ch = m_src.control();
 
 			if (sd->next[ ch] != -1)
 			{
 				state = (STMState)sd->next[ ch];
-				src.skip();
+				m_src.skip();
 			}
 			else if (sd->fallbackState != -1)
 			{
@@ -2928,20 +2935,20 @@ private:
 public:
 	///\brief Constructor
 	///\param[in] p_atm read only ML path select automaton reference
-	///\param[in] src source input iterator to process
+	///\param[in] p_src source input iterator to process
 	///\param[in] obuf reference to buffer to use for the output elements (STL back insertion sequence interface)
 	///\param[in] entityMap read only map of named entities to expand
-	XMLPathSelect( const ThisXMLPathSelectAutomaton* p_atm, InputIterator& src, OutputBuffer& obuf, const EntityMap& entityMap)
-		:scan(src,obuf,entityMap),atm(p_atm),scopestk(p_atm->maxScopeStackSize),follows(p_atm->maxFollows),triggers(p_atm->maxTriggers),tokens(p_atm->maxTokens)
+	XMLPathSelect( const ThisXMLPathSelectAutomaton* p_atm, InputIterator& p_src, OutputBuffer& obuf, const EntityMap& entityMap)
+		:scan(p_src,obuf,entityMap),atm(p_atm),scopestk(p_atm->maxScopeStackSize),follows(p_atm->maxFollows),triggers(p_atm->maxTriggers),tokens(p_atm->maxTokens)
 	{
 		if (atm->states.size() > 0) expand(0);
 	}
 	///\brief Constructor
 	///\param[in] p_atm read only ML path select automaton reference
-	///\param[in] src source input iterator to process
+	///\param[in] p_src source input iterator to process
 	///\param[in] obuf reference to buffer to use for the output elements (STL back insertion sequence interface)
-	XMLPathSelect( const ThisXMLPathSelectAutomaton* p_atm, InputIterator& src, OutputBuffer& obuf)
-		:scan(src,obuf),atm(p_atm),scopestk(p_atm->maxScopeStackSize),follows(p_atm->maxFollows),triggers(p_atm->maxTriggers),tokens(p_atm->maxTokens)
+	XMLPathSelect( const ThisXMLPathSelectAutomaton* p_atm, InputIterator& p_src, OutputBuffer& obuf)
+		:scan(p_src,obuf),atm(p_atm),scopestk(p_atm->maxScopeStackSize),follows(p_atm->maxFollows),triggers(p_atm->maxTriggers),tokens(p_atm->maxTokens)
 	{
 		if (atm->states.size() > 0) expand(0);
 	}

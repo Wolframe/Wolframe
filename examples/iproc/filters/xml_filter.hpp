@@ -38,7 +38,7 @@ Project Wolframe.
 #include "protocol/formatoutput.hpp"
 #include "filters/filterBase.hpp"
 #include <cstring>
-#include <iostream>
+#include <cstring>
 #include "textwolf.hpp"
 
 namespace _Wolframe {
@@ -98,6 +98,25 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 			,m_tagstkpos(0)
 			,m_xmlstate(Tag)
 			,m_bufstate(EscBufferType::SRC){}
+
+		///\brief Copy constructor
+		///\param [in] o format output to copy
+		FormatOutput( const FormatOutput& o)
+			:m_tagstk( new char[o.m_tagstksize])
+			,m_tagstksize(o.m_tagstksize)
+			,m_tagstkpos(o.m_tagstkpos)
+			,m_xmlstate(o.m_xmlstate)
+			,m_bufstate(o.m_bufstate)
+		{
+			std::memcpy( m_tagstk, o.m_tagstk, m_tagstkpos);
+		}
+
+		///\brief self copy
+		///\return copy of this
+		virtual FormatOutput* copy() const
+		{
+			return new FormatOutput( *this);
+		}
 
 		///\brief Implementation of protocol::InputFilter::print(ElementType,const void*,size_type)
 		///\param [in] type type of the element to print
@@ -266,6 +285,7 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 				++ts;
 			}
 		}
+
 		///\brief print attribute value string
 		///\param [in] src pointer to attribute value string to print
 		///\param [in] srcsize size of src in bytes
@@ -325,12 +345,13 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 			if (m_tagstkpos >= m_tagstksize) throw std::logic_error( "element stack is corrupt");
 		}
 	private:
-		char* m_tagstk;				///< tag stack buffer
-		size_type m_tagstksize;			///< size of tag stack buffer in bytes
-		size_type m_tagstkpos;			///< used size of tag stack buffer in bytes
-		XMLState m_xmlstate;			///< current state of output
+		char* m_tagstk;					///< tag stack buffer
+		size_type m_tagstksize;				///< size of tag stack buffer in bytes
+		size_type m_tagstkpos;				///< used size of tag stack buffer in bytes
+		XMLState m_xmlstate;				///< current state of output
 		typename EscBufferType::State m_bufstate;	///< state of escaping the output
 	};
+
 
 	///\class InputFilter
 	///\brief input filter for XML
@@ -351,7 +372,8 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		typedef textwolf::XMLScanner<SrcIterator,IOCharset,AppCharset,BufferType> XMLScanner;
 
 		///\brief Constructor
-		InputFilter() :m_outputbuf(0,0),m_scanner(0)
+		InputFilter()
+			:m_outputbuf(0,0),m_scanner(0)
 		{
 			m_src = SrcIterator(this);
 			m_scanner = new XMLScanner( m_src, m_outputbuf);
@@ -363,6 +385,24 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		virtual ~InputFilter()
 		{
 			delete m_scanner;
+		}
+
+		///\brief Copy constructor
+		///\param [in] o format output to copy
+		InputFilter( const InputFilter& o)
+			:m_outputbuf(o.m_outputbuf),m_src(o.m_src),m_scanner(0)
+		{
+			m_scanner = new XMLScanner( *o.m_scanner);
+			m_scanner->setSource( m_src);
+			m_scanner->setOutputBuffer( m_outputbuf);			m_itr = m_scanner->begin(false);
+			m_end = m_scanner->end();
+		}
+
+		///\brief self copy
+		///\return copy of this
+		virtual InputFilter* copy() const
+		{
+			return new InputFilter( *this);
 		}
 
 		struct ElementTypeMap :public textwolf::CharMap<int,-1,textwolf::XMLScannerBase::NofElementTypes>

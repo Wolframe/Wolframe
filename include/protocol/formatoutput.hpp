@@ -35,6 +35,7 @@ Project Wolframe.
 ///\brief Output interfaces for the application processor
 
 #include <cstddef>
+#include "countedReference.hpp"
 #include "protocol/ioblocks.hpp"
 
 namespace _Wolframe {
@@ -46,7 +47,7 @@ namespace protocol {
 /// The intention of this class is to get a thin binding of the scripting language
 /// in the application layer to the network output.
 ///
-	struct FormatOutput :public OutputBlock
+struct FormatOutput :public OutputBlock
 {
 	///\enum State
 	///\brief State of the output used in the application processor iterating loop to decide wheter to yield execution or not.
@@ -78,6 +79,10 @@ namespace protocol {
 		:OutputBlock(0,0),m_errorCode(0),m_state(Open){}
 
 	virtual ~FormatOutput(){}
+
+	///\brief self copy
+	///\return copy of this
+	virtual FormatOutput* copy() const=0;
 
 	///\brief Assignement of the data members
 	///\param [in] o format output to assign the data members of
@@ -142,6 +147,10 @@ private:
 	int m_errorCode;	///< error code
 	State m_state;		///< state
 };
+
+///\typedef FormatOutputR
+///\brief Shared format output reference
+typedef CountedReference<FormatOutput> FormatOutputR;
 
 }}//namespace
 #endif
