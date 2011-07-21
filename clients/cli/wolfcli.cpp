@@ -317,14 +317,11 @@ void read_from_stdin( WolfClient *c )
 	do {
 		std::cin.getline( line, 2048, '\n' );
 		if( !std::cin.eof( ) ) {
-			std::cout << "WRITE" << std::endl;
 			c->write( line );
 		}
 	} while( !std::cin.eof( ) );
 
-	std::cout << "STOP" << std::endl;
 	if( c ) c->stop( );
-	std::cout << "END" << std::endl;
 }
 
 }
