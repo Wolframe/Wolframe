@@ -132,22 +132,30 @@ Adapt PGSQL_DIR in 'makefiles\nmake\config.mk'.
 LibXML2
 -------
 
-32-bit Windows ports are available at http://www.zlatkovic.com/libxml.en.html.
-
-Adapt LIBXML2_DIR in 'makefiles\nmake\config.mk'.
-
-Note that 'libxml2' depends on 'libiconv' and 'zlib'! Also adapt
-ICONV_DIR and ZLIB_DIR.
-
-Make sure, all DLLs are executable otherwise you get an Application Load Error 0x22.
-
-For 64-bit you have to compile your own libraries
+Best is to compile your own libraries
 
 Get sources from: ftp://xmlsoft.org/libxml2/
 
+You have to fix the Makefile.msvc:
+
+There are some + where they don't belong:
+
++!if "$(WITH_ICU)" == "1"
++LIBS = $(LIBS) icu.lib
++!endif
+
+When there are spaces in the installation prefix, fix it manually in 'config.msvc'
+before installing the library:
+
+BINPREFIX="$(PREFIX)\bin"
+INCPREFIX="$(PREFIX)\include"
+LIBPREFIX="$(PREFIX)\lib"
+SOPREFIX="$(PREFIX)\lib"
+
 libxml2-2.7.8
 cd win32
-cscript configure.js compiler=msvc prefix="C:\cygwin\home\Andreas\libxml2-2.7.8.win64" zlib=no iconv=no
+cscript configure.js compiler=msvc prefix="D:\Program Files\libxml2-2.7.8.win32" zlib=no iconv=no
+#cscript configure.js compiler=msvc prefix="C:\cygwin\home\Andreas\libxml2-2.7.8.win64" zlib=no iconv=no
 # if necessary, add qwuotes in config.msvc, PREFIX="C:\Program Files\libxml2-2.7.8.win64"
 nmake /nologo /f Makefile.msvc all
 nmake /nologo /f Makefile.msvc install
