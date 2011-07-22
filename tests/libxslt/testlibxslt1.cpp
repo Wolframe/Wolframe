@@ -18,6 +18,7 @@ int main( int argc, char *argv[] )
 	xmlDocPtr res = xsltApplyStylesheet( script, doc, params );
 	xsltSaveResultToFile( stdout, res, script );
 
+	xmlFreeDoc( res );
 	xmlFreeDoc( doc );
 	xsltFreeStylesheet( script );
 
