@@ -65,3 +65,4 @@ docs/WolfBook.pdf
 docs/doxygen/
 clients/wt/wtclient
 src/primary.db
+tests/libxslt/testlibxslt1

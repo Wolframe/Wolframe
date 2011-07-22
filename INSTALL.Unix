@@ -25,6 +25,7 @@ Prerequisites
   - doxygen: for documentation for programmers
   - dia: to convert images to svg
 - optionally (WITH_LIBXML2)
+- optionally (WITH_LIBXSLT), needs LIBXML2 too
 
 Configuration of the build
 --------------------------
@@ -160,7 +161,8 @@ Ubuntu 10.04.1 LTS
 
 Optional packages: libqt4-dev,
                    libpam-dev (1.1.1), libsasl2-dev (2.1.23),
-                   libsqlite3-dev (3.6.22), libpq-dev (8.4.7), libxml2-dev (2.7.6)
+                   libsqlite3-dev (3.6.22), libpq-dev (8.4.7),
+                   libxml2-dev (2.7.6)
 
 libboost-dev is 1.40, too old, missing asio features and property_tree, build
 you own boost. gcc on Debian complains a lot about boost header files..
@@ -180,7 +182,8 @@ Ubuntu 10.10 Server
 
 Optional packages: libssl-dev, libqt4-dev (4.7.0),
                    libpam-dev (1.1.1), libsasl2-dev (2.1.23),
-                   libsqlite3-dev (3.7.2), libpq-dev (8.4.7), libxml2-dev (2.7.7)
+                   libsqlite3-dev (3.7.2), libpq-dev (8.4.7),
+                   libxml2-dev (2.7.7)
 
 libboost-dev is 1.42, only missing some new filesystem stuff, but you'll have to
 compile your own one.
@@ -200,7 +203,8 @@ Ubuntu 11.04
 
 Optional packages: libssl-dev (0.9.8o), libqt4-dev (4.7.2),
                    libpam-dev (1.1.2), libsasl2-dev (2.1.23),
-                   libsqlite3-dev (3.7.4), libpq-dev (8.4.8)
+                   libsqlite3-dev (3.7.4), libpq-dev (8.4.8),
+                   libxml2-dev (2.7.8), libxslt1-dev (1.1.26)
 
 libboost-dev is 1.42, only missing some new filesystem stuff, but you'll have to
 compile your own one.
@@ -302,7 +306,8 @@ Archlinux
 
 Required packages: boost and boost-libs
 Optional packages: openssl, qt, pam, libsasl,
-                   sqlite3, postgresql-libs, libxml2
+                   sqlite3, postgresql-libs,
+                   libxml2, libxslt
 
 For building the documentation you need 'xsltproc', 'docbook-xsl' and 'doxygen'.
 'fop' (together with 'java-batik', 'java-commons-io', 'java-avalon-framework',

@@ -141,6 +141,13 @@ ifeq ($(WITH_LIBXML2),1)
 	@echo "LIBXML2_LIB_DIRS: $(LIBXML2_LIB_DIRS)"
 	@echo "LIBXML2_LIBS: $(LIBXML2_LIBS)"
 endif
+ifeq ($(WITH_LIBXSLT),1)
+	@echo
+	@echo "LIBXSLT_DIR: $(LIBXSLT_DIR)"
+	@echo "LIBXSLT_INCLUDE_DIRS: $(LIBXSLT_INCLUDE_DIRS)"
+	@echo "LIBXSLT_LIB_DIRS: $(LIBXSLT_LIB_DIRS)"
+	@echo "LIBXSLT_LIBS: $(LIBXSLT_LIBS)"
+endif
 
 .PHONY: init-po
 init-po:

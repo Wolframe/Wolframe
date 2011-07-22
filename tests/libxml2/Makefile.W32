@@ -41,5 +41,5 @@ local_test:
 	@-echo copy "$(LIBXML2_DIR)\lib\libxml2.dll" . >> test.bat
 	@-echo copy "$(ICONV_DIR)\bin\iconv.dll" . >> test.bat
 	@-echo copy "$(ZLIB_DIR)\bin\zlib1.dll" . >> test.bat
-	@-echo testlibxml1 test.xml >> test.bat
+	@-echo testlibxml1 test1.xml >> test.bat
 	@-test.bat
