@@ -29,6 +29,7 @@ WITH_SQLITE3 ?= 0
 WITH_LOCAL_SQLITE3 ?= 0
 WITH_PGSQL ?= 0
 WITH_LIBXML2 ?= 0
+WITH_LIBXSLT ?= 0
 WITH_QT ?= 0
 WITH_EXAMPLES ?= 1
 
@@ -1068,10 +1069,30 @@ endif
 
 endif
 
+# libxslt
+#########
+
+ifeq ($(WITH_LIBXSLT),1)
+
+ifeq "$(PLATFORM)" "LINUX"
+
+ifeq "$(LINUX_DIST)" "arch"
+LIBXSLT_DIR ?= /usr
+LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
+LIBXSLT_INCLUDE_DIRS = -I$(LIBXSLT_INCLUDE_DIR)
+LIBXSLT_LIB_DIR ?= $(LIBXSLT_DIR)/lib
+LIBXSLT_LIB_DIRS = -L$(LIBXSLT_LIB_DIR)
+LIBXSLT_LIBS ?= -lxslt
+endif
+
+endif
+
+endif
+
 # libxml2
 #########
 
-ifeq ($(WITH_PGSQL),1)
+ifeq ($(WITH_LIBXML2),1)
 
 ifeq "$(PLATFORM)" "LINUX"
 
