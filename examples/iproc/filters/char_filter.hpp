@@ -56,12 +56,13 @@ struct CharFilter :FilterBase<IOCharset, AppCharset>
 	struct InputFilter :public protocol::InputFilter
 	{
 		///\brief Constructor
-		InputFilter() {}
+		InputFilter() :protocol::InputFilter(8) {}
 
 		///\brief Copy constructor
 		///\param [in] o format output to copy
 		InputFilter( const InputFilter& o)
-			:m_itr(o.m_itr) {}
+			:protocol::InputFilter( o)
+			,m_itr(o.m_itr) {}
 
 		///\brief self copy
 		///\return copy of this

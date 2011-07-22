@@ -92,14 +92,17 @@ struct System
 
 	///\brief Create a new input filter function
 	///\param[in] name name of the filter or the default filter if not specified
-	///\param[in] buffersize size of buffer in bytes to use
+	///\param[in] buffersize size of buffer in bytes to use for the generated elements
 	protocol::InputFilter* createInputFilter( const char* name, unsigned int buffersize=0) const;
+
 	///\brief Create a new input filter function from the default
 	protocol::InputFilter* createDefaultInputFilter() const;
+
 	///\brief Create a new format output filter function
 	///\param[in] name name of the filter or the default filter if not specified
-	///\param[in] buffersize size of buffer in bytes to use
+	///\param[in] buffersize size of buffer in bytes to use for the tag hierarchy context
 	protocol::FormatOutput* createFormatOutput( const char* name, unsigned int buffersize=0) const;
+
 	///\brief Create a new format output filter function from the default
 	protocol::FormatOutput* createDefaultFormatOutput() const;
 };
@@ -129,9 +132,11 @@ struct Filter
 	///\brief Constructor
 	///\param[in] system reference to system function call interface
 	///\param[in] name name of the filter as defined in the system
-	Filter( System* system, const char* name, unsigned int buffersize=0)
-		:m_formatoutput(system->createFormatOutput(name,buffersize))
-		,m_inputfilter(system->createInputFilter(name)){}
+	///\param[in] ib size of buffer used for input
+	///\param[in] ob size of buffer used for output
+	Filter( System* system, const char* name, unsigned int ib, unsigned int ob)
+		:m_formatoutput(system->createFormatOutput(name,ob))
+		,m_inputfilter(system->createInputFilter(name,ib)){}
 
 	///\brief Copy constructor
 	///\param[in] o copied item

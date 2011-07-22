@@ -321,7 +321,7 @@ static int function_filter( lua_State* ls)
 	const char* name = lua_tostring( ls, 1);
 	app::System* system = LuaObject<System>::getGlobal( ls, "_Wolframe");
 
-	Filter ft( system, name, buffersize);
+	Filter ft( system, name, buffersize, buffersize);
 	LuaObject<Filter>::push_luastack( ls, ft);
 	return 1;
 }

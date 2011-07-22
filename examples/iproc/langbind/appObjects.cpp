@@ -155,7 +155,7 @@ protocol::InputFilter* System::createDefaultInputFilter() const
 	return new filter::CharFilter<textwolf::charset::IsoLatin1>::InputFilter();
 }
 
-protocol::InputFilter* System::createInputFilter( const char* name, unsigned int ) const
+protocol::InputFilter* System::createInputFilter( const char* name, unsigned int bufsize) const
 {
 	char nm[32];
 	if (!getName( nm, sizeof(nm), name))
@@ -182,27 +182,27 @@ protocol::InputFilter* System::createInputFilter( const char* name, unsigned int
 	{
 		return new filter::LineFilter<textwolf::charset::IsoLatin1>::InputFilter();
 	}
-	if (boost::algorithm::iequals( nm, "line:utf8")) return new filter::LineFilter<textwolf::charset::UTF8>::InputFilter();
-	if (boost::algorithm::iequals( nm, "line:utf16")) return new filter::LineFilter<textwolf::charset::UTF8>::InputFilter();
-	if (boost::algorithm::iequals( nm, "line:UCS2LE")) return new filter::LineFilter<textwolf::charset::UCS2LE>::InputFilter();
-	if (boost::algorithm::iequals( nm, "line:UCS2BE")) return new filter::LineFilter<textwolf::charset::UCS2BE>::InputFilter();
-	if (boost::algorithm::iequals( nm, "line:UCS2")) return new filter::LineFilter<textwolf::charset::UCS2BE>::InputFilter();
-	if (boost::algorithm::iequals( nm, "line:UCS4LE")) return new filter::LineFilter<textwolf::charset::UCS4LE>::InputFilter();
-	if (boost::algorithm::iequals( nm, "line:UCS4BE")) return new filter::LineFilter<textwolf::charset::UCS4BE>::InputFilter();
-	if (boost::algorithm::iequals( nm, "line:UCS4")) return new filter::LineFilter<textwolf::charset::UCS4BE>::InputFilter();
+	if (boost::algorithm::iequals( nm, "line:utf8")) return new filter::LineFilter<textwolf::charset::UTF8>::InputFilter( bufsize);
+	if (boost::algorithm::iequals( nm, "line:utf16")) return new filter::LineFilter<textwolf::charset::UTF8>::InputFilter( bufsize);
+	if (boost::algorithm::iequals( nm, "line:UCS2LE")) return new filter::LineFilter<textwolf::charset::UCS2LE>::InputFilter( bufsize);
+	if (boost::algorithm::iequals( nm, "line:UCS2BE")) return new filter::LineFilter<textwolf::charset::UCS2BE>::InputFilter( bufsize);
+	if (boost::algorithm::iequals( nm, "line:UCS2")) return new filter::LineFilter<textwolf::charset::UCS2BE>::InputFilter( bufsize);
+	if (boost::algorithm::iequals( nm, "line:UCS4LE")) return new filter::LineFilter<textwolf::charset::UCS4LE>::InputFilter( bufsize);
+	if (boost::algorithm::iequals( nm, "line:UCS4BE")) return new filter::LineFilter<textwolf::charset::UCS4BE>::InputFilter( bufsize);
+	if (boost::algorithm::iequals( nm, "line:UCS4")) return new filter::LineFilter<textwolf::charset::UCS4BE>::InputFilter( bufsize);
 
 	if (boost::algorithm::iequals( nm, "xml:isolatin1") || boost::algorithm::iequals( nm, "xml:iso88591"))
 	{
-		return new filter::XmlFilter<textwolf::charset::IsoLatin1>::InputFilter();
+		return new filter::XmlFilter<textwolf::charset::IsoLatin1>::InputFilter( bufsize);
 	}
-	if (boost::algorithm::iequals( nm, "xml:utf8")) return new filter::XmlFilter<textwolf::charset::UTF8>::InputFilter();
-	if (boost::algorithm::iequals( nm, "xml:utf16")) return new filter::XmlFilter<textwolf::charset::UTF8>::InputFilter();
-	if (boost::algorithm::iequals( nm, "xml:UCS2LE")) return new filter::XmlFilter<textwolf::charset::UCS2LE>::InputFilter();
-	if (boost::algorithm::iequals( nm, "xml:UCS2BE")) return new filter::XmlFilter<textwolf::charset::UCS2BE>::InputFilter();
-	if (boost::algorithm::iequals( nm, "xml:UCS2")) return new filter::XmlFilter<textwolf::charset::UCS2BE>::InputFilter();
-	if (boost::algorithm::iequals( nm, "xml:UCS4LE")) return new filter::XmlFilter<textwolf::charset::UCS4LE>::InputFilter();
-	if (boost::algorithm::iequals( nm, "xml:UCS4BE")) return new filter::XmlFilter<textwolf::charset::UCS4BE>::InputFilter();
-	if (boost::algorithm::iequals( nm, "xml:UCS4")) return new filter::XmlFilter<textwolf::charset::UCS4BE>::InputFilter();
+	if (boost::algorithm::iequals( nm, "xml:utf8")) return new filter::XmlFilter<textwolf::charset::UTF8>::InputFilter( bufsize);
+	if (boost::algorithm::iequals( nm, "xml:utf16")) return new filter::XmlFilter<textwolf::charset::UTF8>::InputFilter( bufsize);
+	if (boost::algorithm::iequals( nm, "xml:UCS2LE")) return new filter::XmlFilter<textwolf::charset::UCS2LE>::InputFilter( bufsize);
+	if (boost::algorithm::iequals( nm, "xml:UCS2BE")) return new filter::XmlFilter<textwolf::charset::UCS2BE>::InputFilter( bufsize);
+	if (boost::algorithm::iequals( nm, "xml:UCS2")) return new filter::XmlFilter<textwolf::charset::UCS2BE>::InputFilter( bufsize);
+	if (boost::algorithm::iequals( nm, "xml:UCS4LE")) return new filter::XmlFilter<textwolf::charset::UCS4LE>::InputFilter( bufsize);
+	if (boost::algorithm::iequals( nm, "xml:UCS4BE")) return new filter::XmlFilter<textwolf::charset::UCS4BE>::InputFilter( bufsize);
+	if (boost::algorithm::iequals( nm, "xml:UCS4")) return new filter::XmlFilter<textwolf::charset::UCS4BE>::InputFilter( bufsize);
 	if (boost::algorithm::iequals( nm, "xml:Header")) return new filter::XmlHeaderFilter::InputFilter();
 
 	LOG_ERROR << "unknown filter '" << name << "'";

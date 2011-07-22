@@ -372,8 +372,10 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		typedef textwolf::XMLScanner<SrcIterator,IOCharset,AppCharset,BufferType> XMLScanner;
 
 		///\brief Constructor
-		InputFilter()
-			:m_outputbuf(0,0),m_scanner(0)
+		InputFilter( size_type genbufsize=0)
+			:protocol::InputFilter( genbufsize)
+			,m_outputbuf(0,0)
+			,m_scanner(0)
 		{
 			m_src = SrcIterator(this);
 			m_scanner = new XMLScanner( m_src, m_outputbuf);
@@ -390,7 +392,10 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		///\brief Copy constructor
 		///\param [in] o format output to copy
 		InputFilter( const InputFilter& o)
-			:m_outputbuf(o.m_outputbuf),m_src(o.m_src),m_scanner(0)
+			:protocol::InputFilter( o)
+			,m_outputbuf(o.m_outputbuf)
+			,m_src(o.m_src)
+			,m_scanner(0)
 		{
 			m_scanner = new XMLScanner( *o.m_scanner);
 			m_scanner->setSource( m_src);

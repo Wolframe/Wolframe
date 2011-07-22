@@ -66,7 +66,7 @@ struct LineFilter :FilterBase<IOCharset, AppCharset>
 		///\brief Copy constructor
 		///\param [in] o format output to copy
 		FormatOutput( const FormatOutput& o)
-			:m_eoln(o.m_eoln),m_bufstate(o.m_bufstate)
+			:m_eolMarker(o.m_eolMarker),m_bufstate(o.m_bufstate)
 		{}
 
 		///\brief self copy
@@ -106,12 +106,14 @@ struct LineFilter :FilterBase<IOCharset, AppCharset>
 	struct InputFilter :public protocol::InputFilter
 	{
 		///\brief Constructor
-		InputFilter() {}
+		InputFilter( size_type genbufsize=0)
+			:protocol::InputFilter( genbufsize) {}
 
 		///\brief Copy constructor
 		///\param [in] o format output to copy
 		InputFilter( const InputFilter& o)
-			:m_itr(o.m_itr) {}
+			:protocol::InputFilter( o)
+			,m_itr(o.m_itr) {}
 
 		///\brief self copy
 		///\return copy of this

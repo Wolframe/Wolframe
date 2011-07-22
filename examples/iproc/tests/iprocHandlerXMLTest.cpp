@@ -60,13 +60,14 @@ struct TestDescription
 	const char* name;
 	const char* scriptfile;
 	const char* datafile;
+	unsigned int elementBuffersize;
 };
 
 static const TestDescription testDescriptions[] =
 {
-	{"echo_xml_IsoLatin1",	"test_echo_xml.lua",	"test_IsoLatin1.xml"},
-	{"echo_char_IsoLatin1",	"test_echo_char.lua",	"test_IsoLatin1.xml"},
-	{0,0,0}
+	{"echo_xml_IsoLatin1",	"test_echo_xml.lua",	"test_IsoLatin1.xml", 16},
+	{"echo_char_IsoLatin1",	"test_echo_char.lua",	"test_IsoLatin1.xml", 1},
+	{0,0,0,0}
 };
 
 struct TestConfiguration :public lua::Configuration
@@ -155,7 +156,7 @@ TEST_F( XMLTestFixture, tests)
 			{
 				std::string prt_output;
 
-				TestConfiguration config( testDescriptions[ti].scriptfile, BufferSize[ib], BufferSize[ob]);
+				TestConfiguration config( testDescriptions[ti].scriptfile, BufferSize[ib], BufferSize[ob]+testDescriptions[ti].elementBuffersize);
 				connection = new iproc::Connection( ep, &config);
 
 				char* in_start = const_cast<char*>(prt_input.c_str());

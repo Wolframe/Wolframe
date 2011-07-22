@@ -108,11 +108,19 @@ struct InputFilter
 		m_gotEoD = o.m_gotEoD;
 		m_state = o.m_state;
 		m_errorCode = o.m_errorCode;
+		m_genbufsize = o.m_genbufsize;
 		return *this;
 	}
 
 	///\brief Constructor
-	InputFilter() :m_ptr(0),m_pos(0),m_size(0),m_gotEoD(false),m_state(Open),m_errorCode(0),m_genbufsize(DefaultBufferSize){}
+	InputFilter( size_type genbufsize=0)
+		:m_ptr(0)
+		,m_pos(0)
+		,m_size(0)
+		,m_gotEoD(false)
+		,m_state(Open)
+		,m_errorCode(0)
+		,m_genbufsize(genbufsize?genbufsize:(size_type)DefaultBufferSize){}
 
 	///\brief destructor
 	virtual ~InputFilter(){}
@@ -132,9 +140,6 @@ struct InputFilter
 	///\param [in] s new state
 	///\param [in] e (optional) error code to set
 	void setState( State s, int e=0)		{m_state=s;m_errorCode=e;}
-	///\brief Set the size of the buffer used for the generated elements
-	///\param [in] bufsize size of the buffer in bytes
-	void setGenBufferSize( size_type bufsize)	{m_genbufsize = bufsize;}
 	///\brief Get the size of the buffer used for the generated elements
 	///\return bufsize size of the buffer in bytes
 	size_type getGenBufferSize() const		{return m_genbufsize;}
