@@ -127,14 +127,13 @@ struct LineFilter :FilterBase<IOCharset, AppCharset>
 		enum ErrorCodes
 		{
 			Ok,
-			ErrBufferTooSmall,
-			ErrBrokenInput
+			ErrBufferTooSmall
 		};
 
 		///\brief Implementation of protocol::InputFilter::getNext( ElementType*, void*, size_type, size_type*)
 		virtual bool getNext( ElementType* type, void* buffer, size_type buffersize, size_type* bufferpos)
 		{
-			BufferType buf( (char*)buffer + *bufferpos, buffersize - *bufferpos);
+			BufferType buf( (char*)buffer, buffersize, *bufferpos);
 			setState( Open);
 			*type = Value;
 			m_itr.setSource( SrcIterator( this));
@@ -146,7 +145,7 @@ struct LineFilter :FilterBase<IOCharset, AppCharset>
 					if (ch == '\r') continue;
 					if (ch == '\n')
 					{
-						*bufferpos += buf.size();
+						*bufferpos = buf.size();
 						++m_itr;
 						return true;
 					}
@@ -164,14 +163,8 @@ struct LineFilter :FilterBase<IOCharset, AppCharset>
 			}
 			catch (SrcIterator::EoM)
 			{
-				if (!gotEoD())
-				{
-					setState( EndOfMessage);
-				}
-				else
-				{
-					setState( Error, ErrBrokenInput);
-				}
+				setState( EndOfMessage);
+				*bufferpos = buf.size();
 			}
 			return false;
 		}

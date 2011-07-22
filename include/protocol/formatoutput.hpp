@@ -73,6 +73,12 @@ struct FormatOutput :public OutputBlock
 		CloseTag	///< Close current hierarchy level
 	};
 
+	static const char* elementTypeName( ElementType i)
+	{
+		static const char* ar[] = {"OpenTag","Attribute","Value","CloseTag"};
+		return ar[(int)i];
+	}
+
 	///\brief Constructor
 	FormatOutput()
 		:OutputBlock(0,0),m_errorCode(0),m_state(Open){}
@@ -133,7 +139,11 @@ struct FormatOutput :public OutputBlock
 	///\brief Set format output state with error code
 	///\param [in] s new state
 	///\param [in] e (optional) error code to set
-	void setState( State s, int e=0)		{m_state=s;m_errorCode=e;}
+	void setState( State s, int e=0)
+	{
+		m_state = s;
+		m_errorCode = e;
+	}
 
 	///\brief Return the current state
 	///\return the current state

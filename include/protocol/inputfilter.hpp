@@ -66,6 +66,12 @@ struct InputFilter
 		CloseTag	///< close current hierarchy level
 	};
 
+	static const char* elementTypeName( ElementType i)
+	{
+		static const char* ar[] = {"OpenTag","Attribute","Value","CloseTag"};
+		return ar[(int)i];
+	}
+
 	///\brief self copy
 	///\return copy of this
 	virtual InputFilter* copy() const=0;
@@ -108,7 +114,6 @@ struct InputFilter
 		m_gotEoD = o.m_gotEoD;
 		m_state = o.m_state;
 		m_errorCode = o.m_errorCode;
-		m_genbufsize = o.m_genbufsize;
 		return *this;
 	}
 

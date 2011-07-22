@@ -39,12 +39,34 @@ Project Wolframe.
 namespace _Wolframe {
 namespace filter {
 
-struct StrIterator
+///\class StrIterator
+///\brief input iterator on a constant string returning null characters after EOF 
+class StrIterator
 {
 public:
-	StrIterator( const char* src, unsigned int size) :m_src(src),m_size(size),m_pos(0){}
-	char operator* () {return (m_pos < m_size)?m_src[m_pos]:0;}
-	StrIterator& operator++() {m_pos++; return *this;}
+	///\brief Constructor
+	///\param [in] src string to iterate on
+	///\param [in] size number of char in the string to iterate on
+	StrIterator( const char* src, unsigned int size)
+		:m_src(src)
+		,m_size(size)
+		,m_pos(0){}
+
+	///\brief Element access
+	///\return current character  
+	char operator* ()
+	{
+		return (m_pos < m_size)?m_src[m_pos]:0;
+	}
+
+	///\brief Preincrement
+	StrIterator& operator++()
+	{
+		m_pos++;
+		return *this;
+	}
+
+	///\brief Return current char position
 	unsigned int pos() const {return m_pos;}
 
 private:
@@ -53,15 +75,15 @@ private:
 	unsigned int m_pos;
 };
 
+
 ///\class SrcIterator
 ///\brief Input iterator as source for the XML scanner (throws EndOfMessageException on EoM)
-struct SrcIterator
+class SrcIterator
 {
+public:
 	///\class EoM
 	///\brief End of message exception
 	struct EoM{};
-
-	protocol::InputFilter* m_gen;		///< input for the iterator (from network message)
 
 	///\brief Empty constructor
 	SrcIterator()
@@ -79,7 +101,11 @@ struct SrcIterator
 	///\brief access operator (required by textwolf for an input iterator)
 	char operator*()
 	{
-		if (!m_gen->size()) throw EoM();
+		if (!m_gen->size())
+		{
+			if (m_gen->gotEoD()) return 0;
+			throw EoM();
+		}
 		return *(char*)m_gen->ptr();
 	}
 
@@ -89,6 +115,8 @@ struct SrcIterator
 		m_gen->skip(1);
 		return *this;
 	}
+private:
+	protocol::InputFilter* m_gen;		///< input for the iterator (from network message)
 };
 
 ///\class FilterBase

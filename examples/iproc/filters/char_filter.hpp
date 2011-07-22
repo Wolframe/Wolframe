@@ -74,14 +74,13 @@ struct CharFilter :FilterBase<IOCharset, AppCharset>
 		enum ErrorCodes
 		{
 			Ok,
-			ErrBufferTooSmall,
-			ErrBrokenInput
+			ErrBufferTooSmall
 		};
 
 		///\brief implement interface member protocol::InputFilter::getNext( ElementType*,void*,size_type,size_type*)
 		virtual bool getNext( ElementType* type, void* buffer, size_type buffersize, size_type* bufferpos)
 		{
-			BufferType buf( (char*)buffer + *bufferpos, buffersize - *bufferpos);
+			BufferType buf( (char*)buffer, buffersize, *bufferpos);
 			setState( Open);
 			*type = Value;
 			m_itr.setSource( SrcIterator( this));
@@ -97,20 +96,14 @@ struct CharFilter :FilterBase<IOCharset, AppCharset>
 						setState( Error, ErrBufferTooSmall);
 						return false;
 					}
-					*bufferpos += buf.size();
+					*bufferpos = buf.size();
 					return true;
 				}
 			}
 			catch (SrcIterator::EoM)
 			{
-				if (!gotEoD())
-				{
-					setState( EndOfMessage);
-				}
-				else
-				{
-					setState( Open);
-				}
+				setState( EndOfMessage);
+				*bufferpos = buf.size();
 			}
 			return false;
 		}

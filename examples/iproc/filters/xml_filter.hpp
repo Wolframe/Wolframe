@@ -38,7 +38,6 @@ Project Wolframe.
 #include "protocol/formatoutput.hpp"
 #include "filters/filterBase.hpp"
 #include <cstring>
-#include <cstring>
 #include "textwolf.hpp"
 
 namespace _Wolframe {
@@ -364,7 +363,6 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		{
 			Ok,			///< no error
 			ErrBufferTooSmall,	///< output buffer is too small to hold the element
-			ErrBrokenInputStream,	///< unexpected EoD
 			ErrXML,			///< error in input XML
 			ErrUnexpectedState	///< something unexpected happened,
 		};
@@ -375,9 +373,9 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		InputFilter( size_type genbufsize=0)
 			:protocol::InputFilter( genbufsize)
 			,m_outputbuf(0,0)
+			,m_src(SrcIterator(this))
 			,m_scanner(0)
 		{
-			m_src = SrcIterator(this);
 			m_scanner = new XMLScanner( m_src, m_outputbuf);
 			m_itr = m_scanner->begin(false);
 			m_end = m_scanner->end();
@@ -394,12 +392,13 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		InputFilter( const InputFilter& o)
 			:protocol::InputFilter( o)
 			,m_outputbuf(o.m_outputbuf)
-			,m_src(o.m_src)
+			,m_src(SrcIterator(this))
 			,m_scanner(0)
 		{
 			m_scanner = new XMLScanner( *o.m_scanner);
 			m_scanner->setSource( m_src);
-			m_scanner->setOutputBuffer( m_outputbuf);			m_itr = m_scanner->begin(false);
+			m_scanner->setOutputBuffer( m_outputbuf);
+			m_itr = m_scanner->begin(false);
 			m_end = m_scanner->end();
 		}
 
@@ -434,7 +433,7 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		virtual bool getNext( ElementType* type, void* buffer, size_type buffersize, size_type* bufferpos)
 		{
 			static const ElementTypeMap tmap;
-			BufferType buf( (char*)buffer + *bufferpos, buffersize - *bufferpos);
+			BufferType buf( (char*)buffer, buffersize, *bufferpos);
 			m_scanner->setOutputBuffer( buf);
 			try
 			{
@@ -445,7 +444,8 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 					setState( protocol::InputFilter::Error, ErrBufferTooSmall);
 					return false;
 				}
-				*bufferpos += buf.size();
+				*bufferpos = buf.size();
+
 				int st = tmap[ m_itr->type()];
 				if (st == -1)
 				{
@@ -460,16 +460,9 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 			}
 			catch (SrcIterator::EoM)
 			{
-				if (gotEoD())
-				{
-					setState( Error, ErrBrokenInputStream);
-					return false;
-				}
-				else
-				{
-					setState( EndOfMessage);
-					return false;
-				}
+				setState( EndOfMessage);
+				*bufferpos = buf.size();
+				return false;
 			};
 			setState( Error, ErrUnexpectedState);
 			return false;
@@ -519,7 +512,7 @@ struct XmlHeaderInputFilter :public XmlFilter<textwolf::charset::IsoLatin1,textw
 	virtual bool getNext( ElementType* type, void* buffer, size_type buffersize, size_type* bufferpos)
 	{
 		static const ElementTypeMap tmap;
-		BufferType buf( (char*)buffer + *bufferpos, buffersize - *bufferpos);
+		BufferType buf( (char*)buffer, buffersize, *bufferpos);
 		m_scanner->setOutputBuffer( buf);
 		try
 		{
@@ -530,7 +523,7 @@ struct XmlHeaderInputFilter :public XmlFilter<textwolf::charset::IsoLatin1,textw
 				setState( protocol::InputFilter::Error, ErrBufferTooSmall);
 				return false;
 			}
-			*bufferpos += buf.size();
+			*bufferpos = buf.size();
 			int st = tmap[ m_itr->type()];
 			if (st == -1)
 			{

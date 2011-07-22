@@ -247,9 +247,10 @@ static const char* get_printop( lua_State* ls, int index, std::size_t& size)
 {
 	const char* rt = 0;
 	if (lua_isnil( ls, index) || (lua_isboolean( ls, index) && !lua_toboolean( ls, index))) {}
-	else if ((rt=lua_tolstring( ls, 2, &size)) == 0)
+	else if ((rt=lua_tolstring( ls, index, &size)) == 0)
 	{
-		luaL_error( ls, "invalid type of argument %d (convertable to string or nil or false expected)", index);
+		const char* tn = lua_typename( ls, lua_type( ls, index));
+		luaL_error( ls, "invalid type (%s) of argument %d (convertable to string or nil or false expected)", tn?tn:"unknown", index-1);
 	}
 	return rt;
 }

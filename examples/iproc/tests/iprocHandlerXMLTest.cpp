@@ -65,7 +65,7 @@ struct TestDescription
 
 static const TestDescription testDescriptions[] =
 {
-	{"echo_xml_IsoLatin1",	"test_echo_xml.lua",	"test_IsoLatin1.xml", 16},
+	{"echo_xml_IsoLatin1",	"test_echo_xml.lua",	"test_IsoLatin1.xml", 24},
 	{"echo_char_IsoLatin1",	"test_echo_char.lua",	"test_IsoLatin1.xml", 1},
 	{0,0,0,0}
 };

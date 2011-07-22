@@ -158,8 +158,8 @@ public:
 		:m_pos(0),m_size(n),m_ar(0),m_allocated(true) {m_ar=new char[n];}
 
 	///\brief Constructor
-	StaticBuffer( char* p, unsigned int n)
-		:m_pos(0),m_size(n),m_ar(p),m_allocated(false),m_overflow(false) {}
+	StaticBuffer( char* p, unsigned int n, unsigned int i=0)
+		:m_pos(i),m_size(n),m_ar(p),m_allocated(false),m_overflow(false) {}
 
 	///\brief Destructor
 	~StaticBuffer()
@@ -185,7 +185,7 @@ public:
 	///\param [in] c fill character if n bigger than the current fill size
 	void resize( size_type n, char c=0)
 	{
-		if (m_pos<n)
+		if (m_pos>n)
 		{
 			m_pos=n;
 		}
@@ -1211,6 +1211,7 @@ private:
 		enum Id
 		{
 			Start,				///< start state (no parsing action performed at the moment)
+			ParsingDone,			///< scanner war interrupted after parsing something when accessing the follow character
 			ParsingKey,			///< scanner was interrupted when parsing a key
 			ParsingEntity,			///< scanner was interrupted when parsing an XML character entity
 			ParsingNumericEntity,		///< scanner was interrupted when parsing an XML numeric character entity
@@ -1252,14 +1253,6 @@ public:
 	void push( UChar ch)
 	{
 		OutputCharSet::print( ch, *m_outputBuf);
-	}
-
-	///\brief Print a null character to the output token buffer without expanding its size
-	void printnull()
-	{
-		typename OutputBuffer::size_type n = m_outputBuf->size();
-		OutputCharSet::print( 0, *m_outputBuf);
-		m_outputBuf->resize(n);
 	}
 
 	///\brief Map a hexadecimal digit to its value
@@ -1319,6 +1312,7 @@ public:
 		switch (tokstate.id)
 		{
 			case TokState::Start:
+			case TokState::ParsingDone:
 			case TokState::ParsingKey:
 			case TokState::ParsingToken:
 				break;
@@ -1459,6 +1453,7 @@ public:
 		switch (tokstate.id)
 		{
 			case TokState::Start:
+			case TokState::ParsingDone:
 			case TokState::ParsingKey:
 			case TokState::ParsingToken:
 				error = ErrInternal;
@@ -1506,7 +1501,7 @@ public:
 			}
 			else
 			{
-				tokstate.init();
+				tokstate.init( TokState::ParsingDone);
 				return true;
 			}
 		}
@@ -1585,7 +1580,7 @@ public:
 			rt = false;
 			break;
 		}
-		tokstate.init();
+		tokstate.init( TokState::ParsingDone);
 		return rt;
 	}
 
@@ -1760,14 +1755,15 @@ public:
 		static const char* stringDefs[ NofSTMActions] = {0,0,0,0,0,"xml","CDATA",0};
 
 		ElementType rt = None;
-		if (tokstate.id == TokState::Start)
+		if (tokstate.id <= TokState::ParsingDone)
 		{
+			//... if (tokstate.id == TokState::Start || tokstate.id == TokState::ParsingDone)
 			m_outputBuf->clear();
 		}
 		do
 		{
 			ScannerStatemachine::Element* sd = getState();
-			if (sd->action.op != -1)
+			if (sd->action.op != -1 && tokstate.id != TokState::ParsingDone)
 			{
 				if (tokenDefs[sd->action.op])
 				{
@@ -1779,7 +1775,6 @@ public:
 					{
 						if (!skipToken( *tokenDefs[ sd->action.op])) return ErrorOccurred;
 					}
-					printnull();
 					rt = (ElementType)sd->action.arg;
 				}
 				else if (stringDefs[sd->action.op])
@@ -1793,6 +1788,7 @@ public:
 				}
 			}
 			ControlCharacter ch = m_src.control();
+			tokstate.id = TokState::Start;
 
 			if (sd->next[ ch] != -1)
 			{
@@ -1805,19 +1801,16 @@ public:
 			}
 			else if (sd->missError != -1)
 			{
-				printnull();
 				error = (Error)sd->missError;
 				return ErrorOccurred;
 			}
 			else if (ch == EndOfText)
 			{
-				printnull();
 				error = ErrUnexpectedEndOfText;
 				return ErrorOccurred;
 			}
 			else
 			{
-				printnull();
 				error = ErrInternal;
 				return ErrorOccurred;
 			}

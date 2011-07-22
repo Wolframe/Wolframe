@@ -101,8 +101,8 @@ InputFilterClosure::ItemType InputFilterClosure::fetch( const char*& tag, unsign
 				{
 					val = m_buf;
 					valsize = m_bufpos;
-					init();
 				}
+				init();
 				return Data;
 
 			 case protocol::InputFilter::Attribute:
