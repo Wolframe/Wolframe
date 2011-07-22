@@ -45,9 +45,9 @@ TEST_CPP_BINS = \
 local_all:
 
 local_clean:
+	@-rm -rf *.RES
 
 local_distclean:
-	@-rm -rf *.RES
 
 local_test:
 	@./testlibxslt1 test1.xslt test1.xml > test1.RES
