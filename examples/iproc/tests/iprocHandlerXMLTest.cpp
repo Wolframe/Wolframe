@@ -108,6 +108,13 @@ static std::string getDataFile( const char* name, const char* type, const char* 
 	return rt.string();
 }
 
+static void createDataDir( const char* type)
+{
+	boost::filesystem::path pt = boost::filesystem::current_path();
+	pt /= type;
+	boost::filesystem::create_directory( pt);
+}
+
 static bool readFile( const char* fn, std::string& out)
 {
 	char buf;
@@ -187,6 +194,7 @@ TEST_F( XMLTestFixture, tests)
 
 int main( int argc, char **argv )
 {
+	createDataDir( "result");
 	::testing::InitGoogleTest( &argc, argv );
 	return RUN_ALL_TESTS();
 }

@@ -43,6 +43,25 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace app;
 
+static InputFilterClosure::ItemType fetchFailureResult( const protocol::InputFilter& ff)
+{
+	switch (ff.state())
+	{
+		case protocol::InputFilter::EndOfMessage:
+			return InputFilterClosure::DoYield;
+
+		case protocol::InputFilter::Error:
+			LOG_ERROR << "error in iterator (" << ff.getError() << ")";
+			return InputFilterClosure::Error;
+
+		case protocol::InputFilter::Open:
+			LOG_DATA << "end of input";
+			return InputFilterClosure::EndOfData;
+	}
+	LOG_ERROR << "illegal state in iterator";
+	return InputFilterClosure::Error;
+}
+
 InputFilterClosure::ItemType InputFilterClosure::fetch( const char*& tag, unsigned int& tagsize, const char*& val, unsigned int& valsize)
 {
 	if (!m_inputfilter.get() || m_bufsize==0)
@@ -51,32 +70,29 @@ InputFilterClosure::ItemType InputFilterClosure::fetch( const char*& tag, unsign
 	}
 	if (m_value)
 	{
-		tag = m_buf;
-		tagsize = m_bufpos;
+		if (!m_inputfilter->getNext( &m_type, m_buf, m_bufsize-1, &m_bufpos))
+		{
+			return fetchFailureResult( *m_inputfilter); 
+		}
+		else if (m_type == protocol::InputFilter::Value)
+		{
+			tag = m_buf;
+			tagsize = m_value-m_buf;
+			val = m_value;
+			valsize = m_bufpos-tagsize;
+			init();
+			return Data;
+		}
+		else
+		{
+			LOG_DATA << "error in XML: attribute value expected";
+			init();
+			return Error;
+		}
 	}
-	else
-	{
-		tag = 0;
-		tagsize = 0;
-	}
-	val = 0;
-	valsize = 0;
-
 	if (!m_inputfilter->getNext( &m_type, m_buf, m_bufsize-1, &m_bufpos))
 	{
-		switch (m_inputfilter->state())
-		{
-			case protocol::InputFilter::EndOfMessage:
-				return DoYield;
-
-			case protocol::InputFilter::Error:
-				LOG_ERROR << "error in iterator (" << m_inputfilter->getError() << ")";
-				return Error;
-
-			case protocol::InputFilter::Open:
-				LOG_DATA << "end of input";
-				return EndOfData;
-		}
+		return fetchFailureResult( *m_inputfilter); 
 	}
 	else
 	{
@@ -84,41 +100,30 @@ InputFilterClosure::ItemType InputFilterClosure::fetch( const char*& tag, unsign
 		{
 			case protocol::InputFilter::OpenTag:
 				m_taglevel += 1;
-				m_buf[ m_bufpos] = 0;
 				tag = m_buf;
 				tagsize = m_bufpos;
+				val = 0;
+				valsize = 0;
 				init();
 				return Data;
 
 			case protocol::InputFilter::Value:
-				m_buf[ m_bufpos] = 0;
-				if (m_value)
-				{
-					val = m_value;
-					valsize = m_bufpos -valsize -1;
-				}
-				else
-				{
-					val = m_buf;
-					valsize = m_bufpos;
-				}
+				tag = 0;
+				tagsize = 0;
+				val = m_buf;
+				valsize = m_bufpos;
 				init();
 				return Data;
 
 			 case protocol::InputFilter::Attribute:
-				m_buf[ m_bufpos++] = 0;
-				if (m_value)
-				{
-					init();
-					LOG_DATA << "illegal state in iterator";
-					return Error;
-				}
-				else
-				{
-					m_value = m_buf+m_bufpos;
-					return fetch( tag, tagsize, val, valsize);
-				}
+				m_value = m_buf+m_bufpos;
+				return fetch( tag, tagsize, val, valsize);
+
 			 case protocol::InputFilter::CloseTag:
+				tag = 0;
+				tagsize = 0;
+				val = 0;
+				valsize = 0;
 				init();
 				if (m_taglevel == 0)
 				{

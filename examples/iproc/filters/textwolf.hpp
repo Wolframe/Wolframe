@@ -1755,11 +1755,6 @@ public:
 		static const char* stringDefs[ NofSTMActions] = {0,0,0,0,0,"xml","CDATA",0};
 
 		ElementType rt = None;
-		if (tokstate.id <= TokState::ParsingDone)
-		{
-			//... if (tokstate.id == TokState::Start || tokstate.id == TokState::ParsingDone)
-			m_outputBuf->clear();
-		}
 		do
 		{
 			ScannerStatemachine::Element* sd = getState();

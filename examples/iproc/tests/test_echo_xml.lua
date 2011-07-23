@@ -7,7 +7,7 @@ function run( )
 
 	for c,t in input:get() do
 		if t == 'encoding' then
-			f = filter( "XML:" + c)
+			f = filter( "XML:" .. c)
 		end
 		output:print( c,t)
 	end

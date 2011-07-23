@@ -234,8 +234,24 @@ static int function_inputFilter( lua_State* ls)
 				return 0;
 
 			case InputFilterClosure::Data:
-				if (item[0]) lua_pushstring( ls, item[0]); else lua_pushboolean( ls, 0);
-				if (item[1]) lua_pushstring( ls, item[1]); else lua_pushboolean( ls, 0);
+				if (item[0])
+				{
+					lua_pushlstring( ls, item[0], (std::size_t)itemsize[0]);
+					lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one		
+				}
+				else
+				{
+					lua_pushboolean( ls, 0);
+				}
+				if (item[1])
+				{
+					lua_pushlstring( ls, item[1], (std::size_t)itemsize[1]);
+					lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one		
+				}
+				else
+				{
+					lua_pushboolean( ls, 0);
+				}
 				return 2;
 		}
 		luaL_error( ls, "illegal state produced by input filter");
