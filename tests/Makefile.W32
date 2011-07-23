@@ -13,6 +13,13 @@ SUBDIRS = \
 	$(SUBDIRS) libxml2
 !ENDIF
 
+!IFDEF WITH_LIBXSLT
+!IFDEF WITH_LIBXML2
+SUBDIRS = \
+	$(SUBDIRS) libxslt
+!ENDIF
+!ENDIF
+
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
 INCLUDE_CPPFLAGS = \

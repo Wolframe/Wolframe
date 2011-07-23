@@ -102,3 +102,11 @@
 #LIBXML2_LIB_DIR = $(LIBXML2_DIR)/lib
 #LIBXML2_LIBS = -lxml2
 
+# libxslt
+#########
+
+#LIBXSLT_DIR = /usr/local
+#LIBXSLT_INCLUDE_DIR = $(LIBXSLT_DIR)/include
+#LIBXSLT_LIB_DIR = $(LIBXSLT_DIR)/lib
+#LIBXSLT_LIBS = -lxslt
+

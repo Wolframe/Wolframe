@@ -9,8 +9,6 @@ INCLUDE_CPPFLAGS = \
 
 # libxml2
 
-ifeq ($(WITH_LIBXML2),1)
-
 INCLUDE_DIRS += \
 	$(LIBXML2_INCLUDE_DIRS)
 
@@ -20,11 +18,7 @@ INCLUDE_LDFLAGS += \
 INCLUDE_LIBS += \
 	$(LIBXML2_LIBS)
 
-endif
-
 # libxslt
-
-ifeq ($(WITH_LIBXSLT),1)
 
 INCLUDE_DIRS += \
 	$(LIBXSLT_INCLUDE_DIRS)
@@ -34,8 +28,6 @@ INCLUDE_LDFLAGS += \
 
 INCLUDE_LIBS += \
 	$(LIBXSLT_LIBS)
-
-endif
 
 TEST_CPP_BINS = \
 	testlibxslt1$(EXE)

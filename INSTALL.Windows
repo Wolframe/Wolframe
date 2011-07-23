@@ -161,3 +161,22 @@ nmake /nologo /f Makefile.msvc all
 nmake /nologo /f Makefile.msvc install
 
 Adapt LIBXML2_DIR in 'makefiles\nmake\config.mk'.
+
+LibXSLT
+-------
+
+Best is to compile your own libraries
+
+Get sources from: ftp://xmlsoft.org/libxslt/
+
+libxslt-1.1.24
+cd win32
+cscript configure.js compiler=msvc prefix="D:\Program Files\libxslt-1.1.24.win32" zlib=no iconv=no
+	include="D:\Program Files\libxml2-2.7.8.win32\include"
+# if necessary, add qwuotes in config.msvc, PREFIX="C:\Program Files\libxml2-2.7.8.win64" and
+# INCLUDE="xxx"
+# copy libxml2.lib to 'bin.msvc'
+nmake /nologo /f Makefile.msvc all
+nmake /nologo /f Makefile.msvc install
+
+Adapt LIBXSLT_DIR in 'makefiles\nmake\config.mk'.

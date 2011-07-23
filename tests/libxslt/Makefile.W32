@@ -9,23 +9,25 @@ INCLUDE_CPPFLAGS = \
 
 INCLUDE_DIRS = \
 	/I. /I"$(LIBXML2_DIR)\include" \
-	/I"$(LIBXML2_DIR)\include\libxml"
+	/I"$(LIBXML2_DIR)\include\libxml" \
+	/I"$(LIBXSLT_DIR)\include"
 
 # Note: libraries are picked automatically on Windows!
 INCLUDE_LDFLAGS = \
 	$(SDK_LDFLAGS) $(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
-	"$(LIBXML2_DIR)\lib\libxml2.lib"
+	"$(LIBXML2_DIR)\lib\libxml2.lib" \
+	"$(LIBXSLT_DIR)\lib\libxslt.lib"
 
 TEST_CPP_BINS = \
-	testlibxml1.exe
+	testlibxslt1.exe
 
 all: $(OBJS) $(CPP_BINS)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-testlibxml1.exe: testlibxml1.obj
+testlibxslt1.exe: testlibxslt1.obj
 
 local_all:
 
@@ -37,5 +39,6 @@ local_distclean:
 local_test:
 	@-echo @echo off > test.bat
 	@-echo copy "$(LIBXML2_DIR)\lib\libxml2.dll" . >> test.bat
-	@-echo testlibxml1 test1.xml >> test.bat
+	@-echo copy "$(LIBXSLT_DIR)\lib\libxslt.dll" . >> test.bat
+	@-echo testlibxslt1 test1.xslt test1.xml >> test.bat
 	@-test.bat
