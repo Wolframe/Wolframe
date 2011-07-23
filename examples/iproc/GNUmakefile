@@ -84,9 +84,8 @@ local_distclean:
 local_install:
 
 local_test: $(TEST_BINS)
+	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./iprocHandlerXMLTest$(EXE)
 	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./iprocHandlerTest$(EXE)
-
-#pf:disabled	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./iprocHandlerXMLTest$(EXE)
 
 run: $(CPP_BINS)
 	@echo "Running the Wolframe iproc example..."

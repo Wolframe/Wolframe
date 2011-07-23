@@ -59,14 +59,13 @@ struct LineFilter :FilterBase<IOCharset, AppCharset>
 	struct FormatOutput :public protocol::FormatOutput
 	{
 		///\brief Constructor
-		///\param [in] EOL end-of-line marker
-		FormatOutput( const char* EOL="\r\n")
-			:m_eolMarker(EOL),m_bufstate(EscBufferType::SRC){}
+		FormatOutput()
+			:m_bufstate(EscBufferType::SRC){}
 
 		///\brief Copy constructor
 		///\param [in] o format output to copy
 		FormatOutput( const FormatOutput& o)
-			:m_eolMarker(o.m_eolMarker),m_bufstate(o.m_bufstate)
+			:m_bufstate(o.m_bufstate)
 		{}
 
 		///\brief self copy
@@ -86,7 +85,7 @@ struct LineFilter :FilterBase<IOCharset, AppCharset>
 			{
 				EscBufferType buf( rest(), restsize(), m_bufstate);
 				ThisFilterBase::printToBuffer( (const char*)element, elementsize, buf);
-				ThisFilterBase::printToBuffer( (const char*)element, elementsize, buf);
+				ThisFilterBase::printToBuffer( protocol::EndOfLineMarker::value(), protocol::EndOfLineMarker::size(), buf);
 				if (buf.overflow())
 				{
 					setState( EndOfBuffer);
@@ -98,7 +97,6 @@ struct LineFilter :FilterBase<IOCharset, AppCharset>
 			return true;
 		}
 	private:
-		const char* m_eolMarker;			///< end of line marker
 		typename EscBufferType::State m_bufstate;	///< state of escaping the output
 	};
 

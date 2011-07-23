@@ -279,6 +279,10 @@ static int function_output_print( lua_State* ls)
 		std::size_t itemsize[2] = {0,0};
 
 		Output* output = LuaObject<Output>::getSelf( ls, "output", "print");
+		if (lua_gettop( ls) == 1)
+		{
+			return 0;
+		}
 		if (lua_gettop( ls) == 2)
 		{
 			item[1] = get_printop( ls, 2, itemsize[1]);
@@ -293,6 +297,30 @@ static int function_output_print( lua_State* ls)
 			return luaL_error( ls, "too many arguments in call of format output print");
 		}
 		switch (output->print( item[1]/*tag*/, itemsize[1], item[0]/*val*/, itemsize[0]))
+		{
+			case Output::DoYield:
+				lua_yield( ls, 0);
+				continue;
+
+			case Output::Error:
+				luaL_error( ls, "error in format output print");
+				return 0;
+
+			case Output::Data:
+				return 0;
+		}
+		luaL_error( ls, "illegal state produced by format output print");
+		return 0;
+	}
+}
+
+static int function_output_println( lua_State* ls)
+{
+	function_output_print( ls);
+	for (;;)
+	{
+		Output* output = LuaObject<Output>::getSelf( ls, "output", "println");
+		switch (output->print( 0/*tag*/, 0, protocol::EndOfLineMarker::value()/*val*/, protocol::EndOfLineMarker::size()))
 		{
 			case Output::DoYield:
 				lua_yield( ls, 0);
@@ -357,10 +385,14 @@ static int function_input_as( lua_State* ls)
 		const char* tn = lua_typename( ls, lua_type( ls, 2));
 		luaL_error( ls, "filter type value expected as first argument of input:as instead of %s", tn?tn:"UNKNOWN");
 	}
-	protocol::InputFilter* ff = filter->m_inputfilter->copy();
-	if (input->m_inputfilter.get())
+	protocol::InputFilter* ff = 0;
+	if (filter->m_inputfilter.get())
 	{
-		*ff = *input->m_inputfilter;
+		ff = filter->m_inputfilter->copy();
+		if (input->m_inputfilter.get())
+		{
+			*ff = *input->m_inputfilter;
+		}
 	}
 	input->m_inputfilter.reset( ff);
 
@@ -380,10 +412,14 @@ static int function_output_as( lua_State* ls)
 		const char* tn = lua_typename( ls, lua_type( ls, 2));
 		luaL_error( ls, "filter type value expected as first argument of output:as instead of %s", tn?tn:"UNKNOWN");
 	}
-	protocol::FormatOutput* ff = filter->m_formatoutput->copy();
-	if (output->m_formatoutput.get())
+	protocol::FormatOutput* ff = 0;
+	if (filter->m_formatoutput.get())
 	{
-		*ff = *output->m_formatoutput;
+		ff = filter->m_formatoutput->copy();
+		if (output->m_formatoutput.get())
+		{
+			*ff = *output->m_formatoutput;
+		}
 	}
 	output->m_formatoutput.reset( ff);
 	return 0;
@@ -419,10 +455,11 @@ static const luaL_Reg input_methodtable[ 3] =
 	{0,0}
 };
 
-static const luaL_Reg output_methodtable[ 3] =
+static const luaL_Reg output_methodtable[ 4] =
 {
 	{"as",&function_output_as},
 	{"print",&function_output_print},
+	{"println",&function_output_println},
 	{0,0}
 };
 

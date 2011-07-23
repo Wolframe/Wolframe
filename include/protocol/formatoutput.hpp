@@ -41,6 +41,12 @@ Project Wolframe.
 namespace _Wolframe {
 namespace protocol {
 
+struct EndOfLineMarker
+{
+	static const char* value() {return "\r\n";}
+	static unsigned int size() {return 2;}
+};
+
 ///\class FormatOutput
 ///\brief Provides an interface for the application processor for its hierarchically structured output like XML.
 ///

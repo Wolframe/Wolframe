@@ -65,7 +65,7 @@ struct TestDescription
 
 static const TestDescription testDescriptions[] =
 {
-	{"echo_xml_IsoLatin1",	"test_echo_xml.lua",	"test_IsoLatin1.xml", 24},
+	{"echo_xml_IsoLatin1",	"test_echo_xml.lua",	"test_IsoLatin1.xml", 32},
 	{"echo_char_IsoLatin1",	"test_echo_char.lua",	"test_IsoLatin1.xml", 1},
 	{0,0,0,0}
 };
@@ -171,13 +171,13 @@ TEST_F( XMLTestFixture, tests)
 				EXPECT_EQ( 0, test::runTestIO( in_start, in_end, prt_output, *connection));
 #define _Wolframe_LOWLEVEL_DEBUG
 #ifdef _Wolframe_LOWLEVEL_DEBUG
-				// write output to file to check the result in case of an error
-				writeFile( ofnam.c_str(), prt_output);
-
 				unsigned int ii=0,nn=prt_output.size();
 				for (;ii<nn && prt_output[ii]==prt_expect[ii]; ii++);
 				if (ii != nn)
 				{
+					// write output to file to check the result in case of an error
+					writeFile( ofnam.c_str(), prt_output);
+
 					printf( "TEST %s SIZE R=%lu,E=%lu,DIFF AT %u='%d %d %d %d|%d %d %d %d'\n",
 						testDescriptions[ti].name,
 						(unsigned long)prt_output.size(), (unsigned long)prt_expect.size(), ii,

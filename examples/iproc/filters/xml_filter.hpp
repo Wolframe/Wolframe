@@ -65,7 +65,7 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 	struct FormatOutput :public protocol::FormatOutput
 	{
 		enum {
-			TagBufferSize=1024	///< default size of buffer use for storing tag hierarchy of output
+			TagBufferSize=1024		///< default size of buffer use for storing tag hierarchy of output
 		};
 
 		///\enum ErrorCodes
@@ -96,6 +96,7 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 			,m_tagstksize(bufsize?bufsize:(unsigned int)TagBufferSize)
 			,m_tagstkpos(0)
 			,m_xmlstate(Tag)
+			,m_pendingOpenTag(false)
 			,m_bufstate(EscBufferType::SRC){}
 
 		///\brief Copy constructor
@@ -105,6 +106,7 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 			,m_tagstksize(o.m_tagstksize)
 			,m_tagstkpos(o.m_tagstkpos)
 			,m_xmlstate(o.m_xmlstate)
+			,m_pendingOpenTag(o.m_pendingOpenTag)
 			,m_bufstate(o.m_bufstate)
 		{
 			std::memcpy( m_tagstk, o.m_tagstk, m_tagstkpos);
@@ -131,6 +133,10 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 			switch (type)
 			{
 				case protocol::FormatOutput::OpenTag:
+					if (m_pendingOpenTag == true)
+					{
+						ThisFilterBase::printToBuffer( '>', buf);
+					}
 					ThisFilterBase::printToBuffer( '<', buf);
 					ThisFilterBase::printToBuffer( (const char*)element, elementsize, buf);
 
@@ -145,12 +151,14 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 						return false;
 					}
 					m_xmlstate = ((const char*)(element))[0]=='?'?Header:Tag;
+					m_pendingOpenTag = true;
 					incPos( buf.size());
 					setState( Open);
 					m_bufstate = buf.state();
 					return true;
 
 				case protocol::FormatOutput::Attribute:
+					ThisFilterBase::printToBuffer( ' ', buf);
 					ThisFilterBase::printToBuffer( (const char*)element, elementsize, buf);
 					ThisFilterBase::printToBuffer( '=', buf);
 
@@ -188,14 +196,21 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 					}
 					else
 					{
-						if (m_xmlstate == Content) IOCharset::print( ' ', buf);
-
+						if (m_pendingOpenTag == true)
+						{
+							ThisFilterBase::printToBuffer( '>', buf);
+						}
+						else
+						{
+							ThisFilterBase::printToBuffer( ' ', buf);
+						}
 						printToBufferContent( (const char*)element, elementsize, buf);
 						if (buf.overflow())
 						{
 							setState( EndOfBuffer);
 							return false;
 						}
+						m_pendingOpenTag = false;
 						m_xmlstate = Content;
 					}
 					incPos( buf.size());
@@ -211,11 +226,10 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 					}
 					if (m_xmlstate == Header)
 					{
-						printToBufferAttributeValue( (const char*)element, elementsize, buf);
 						ThisFilterBase::printToBuffer( '?', buf);
 						ThisFilterBase::printToBuffer( '>', buf);
 					}
-					else if (m_xmlstate == Tag)
+					else if (m_pendingOpenTag == true)
 					{
 						ThisFilterBase::printToBuffer( '/', buf);
 						ThisFilterBase::printToBuffer( '>', buf);
@@ -224,10 +238,16 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 					{
 						ThisFilterBase::printToBuffer( '<', buf);
 						ThisFilterBase::printToBuffer( '/', buf);
-						printToBufferAttributeValue( (const char*)element, elementsize, buf);
+						ThisFilterBase::printToBuffer( (const char*)cltag, cltagsize, buf);
 						ThisFilterBase::printToBuffer( '>', buf);
 					}
+					if (buf.overflow())
+					{
+						setState( EndOfBuffer);
+						return false;
+					}
 					m_xmlstate = Content;
+					m_pendingOpenTag = false;
 					popTag();
 					incPos( buf.size());
 					setState( Open);
@@ -321,7 +341,8 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 			size_type align = getAlign( elementsize);
 			if (align + elementsize + sizeof(size_type) >= m_tagstksize-m_tagstkpos) return false;
 			std::memcpy( m_tagstk + m_tagstkpos, element, elementsize);
-			m_tagstkpos += elementsize + align + sizeof( size_type);
+			size_type ofs = elementsize + align + sizeof( size_type);
+			m_tagstkpos += ofs;
 			*(size_type*)(m_tagstk+m_tagstkpos-sizeof( size_type)) = elementsize;
 			return true;
 		}
@@ -331,8 +352,9 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 			if (m_tagstkpos < sizeof( size_type)) return false;
 			elementsize = *(size_type*)(m_tagstk+m_tagstkpos-sizeof( size_type));
 			size_type align = getAlign( elementsize);
-			if (align + elementsize + sizeof(size_type) > m_tagstkpos) return false;
-			element = m_tagstk + m_tagstkpos - elementsize + align + sizeof( size_type);
+			size_type ofs = elementsize + align + sizeof( size_type);
+			if (ofs > m_tagstkpos) return false;
+			element = m_tagstk + m_tagstkpos - ofs;
 			return true;
 		}
 
@@ -340,14 +362,16 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		{
 			size_type elementsize = *(size_type*)(m_tagstk+m_tagstkpos-sizeof( size_type));
 			size_type align = getAlign( elementsize);
-			m_tagstkpos -= elementsize + align + sizeof( size_type);
-			if (m_tagstkpos >= m_tagstksize) throw std::logic_error( "element stack is corrupt");
+			size_type ofs = elementsize + align + sizeof( size_type);
+			if (m_tagstkpos < ofs) throw std::logic_error( "tag stack for output is corrupt");
+			m_tagstkpos -= ofs;
 		}
 	private:
 		char* m_tagstk;					///< tag stack buffer
 		size_type m_tagstksize;				///< size of tag stack buffer in bytes
 		size_type m_tagstkpos;				///< used size of tag stack buffer in bytes
 		XMLState m_xmlstate;				///< current state of output
+		int m_pendingOpenTag;				///< true if last open tag instruction has not been ended yet
 		typename EscBufferType::State m_bufstate;	///< state of escaping the output
 	};
 
@@ -416,6 +440,7 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 				(*this)
 				(textwolf::XMLScannerBase::None,-1)
 				(textwolf::XMLScannerBase::ErrorOccurred,-1)
+				(textwolf::XMLScannerBase::HeaderStart,(int)OpenTag)
 				(textwolf::XMLScannerBase::HeaderAttribName,(int)Attribute)
 				(textwolf::XMLScannerBase::HeaderAttribValue,(int)Value)
 				(textwolf::XMLScannerBase::HeaderEnd,(int)CloseTag)
@@ -490,6 +515,7 @@ struct XmlHeaderInputFilter :public XmlFilter<textwolf::charset::IsoLatin1,textw
 			(*this)
 			(textwolf::XMLScannerBase::None,-1)
 			(textwolf::XMLScannerBase::ErrorOccurred,-1)
+			(textwolf::XMLScannerBase::HeaderStart,(int)OpenTag)		
 			(textwolf::XMLScannerBase::HeaderAttribName,(int)Attribute)
 			(textwolf::XMLScannerBase::HeaderAttribValue,(int)Value)
 			(textwolf::XMLScannerBase::HeaderEnd,(int)CloseTag)

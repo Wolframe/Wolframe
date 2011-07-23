@@ -990,6 +990,7 @@ public:
 	{
 		None,					///< empty (NULL)
 		ErrorOccurred,				///< XML scanning error error reported
+		HeaderStart,				///< open XML header tag
 		HeaderAttribName,			///< tag attribute name in the XML header
 		HeaderAttribValue,			///< tag attribute value in the XML header
 		HeaderEnd,				///< end of XML header event (after parsing '?&gt;')
@@ -1011,7 +1012,7 @@ public:
 	///\return XML element type as string
 	static const char* getElementTypeName( ElementType ee)
 	{
-		static const char* names[ NofElementTypes] = {0,"ErrorOccurred","HeaderAttribName","HeaderAttribValue","HeaderEnd","TagAttribName","TagAttribValue","OpenTag","CloseTag","CloseTagIm","Content","Exit"};
+		static const char* names[ NofElementTypes] = {0,"ErrorOccurred","HeaderStart","HeaderAttribName","HeaderAttribValue","HeaderEnd","TagAttribName","TagAttribValue","OpenTag","CloseTag","CloseTagIm","Content","Exit"};
 		return names[ (unsigned int)ee];
 	}
 
@@ -1100,7 +1101,7 @@ public:
 		Statemachine()
 		{
 			(*this)
-			[ START    ](EndOfLine)(Cntrl)(Space)(Lt,STARTTAG).miss(ErrExpectedOpenTag)
+			[ START    ](EndOfText,EXIT)(EndOfLine)(Cntrl)(Space)(Lt,STARTTAG).miss(ErrExpectedOpenTag)
 			[ STARTTAG ](EndOfLine)(Cntrl)(Space)(Questm,XTAG )(Exclam,ENTITYSL).fallback(OPENTAG)
 			[ XTAG     ].action(ExpectIdentifierXML)(EndOfLine,Cntrl,Space,XTAGAISK)(Questm,XTAGEND).miss(ErrExpectedXMLTag)
 			[ XTAGEND  ].action(Return,HeaderEnd)(Gt,CONTENT)(EndOfLine)(Cntrl)(Space).miss(ErrExpectedTagEnd)
@@ -1755,34 +1756,57 @@ public:
 		static const char* stringDefs[ NofSTMActions] = {0,0,0,0,0,"xml","CDATA",0};
 
 		ElementType rt = None;
+		ControlCharacter ch;
 		do
 		{
 			ScannerStatemachine::Element* sd = getState();
-			if (sd->action.op != -1 && tokstate.id != TokState::ParsingDone)
+			if (sd->action.op != -1)
 			{
 				if (tokenDefs[sd->action.op])
 				{
-					if ((mask&(1<<sd->action.arg)) != 0)
+					if (tokstate.id != TokState::ParsingDone)
 					{
-						if (!parseToken( *tokenDefs[ sd->action.op])) return ErrorOccurred;
-					}
-					else
-					{
-						if (!skipToken( *tokenDefs[ sd->action.op])) return ErrorOccurred;
+						if ((mask&(1<<sd->action.arg)) != 0)
+						{
+							if (!parseToken( *tokenDefs[ sd->action.op])) return ErrorOccurred;
+						}
+						else
+						{
+							if (!skipToken( *tokenDefs[ sd->action.op])) return ErrorOccurred;
+						}
 					}
 					rt = (ElementType)sd->action.arg;
 				}
 				else if (stringDefs[sd->action.op])
 				{
-					if (!expectStr( stringDefs[sd->action.op])) return ErrorOccurred;
+					if (tokstate.id != TokState::ParsingDone)
+					{
+						if (!expectStr( stringDefs[sd->action.op])) return ErrorOccurred;
+						if (sd->action.op == ExpectIdentifierXML)
+						{
+							//... special treatement for xml header for not
+							//    enforcing the model too much just for this case
+							push( '?'); push( 'x'); push( 'm'); push( 'l');
+							rt = HeaderStart;
+						}
+					}
+					else if (sd->action.op == ExpectIdentifierXML)
+					{
+						//... special treatement for xml header for not  
+						//    enforcing the model too much just for this case
+						rt = HeaderStart;
+					}
 				}
 				else
 				{
 					rt = (ElementType)sd->action.arg;
-					if (rt == Exit) return rt;
+					if (rt == Exit)
+					{
+						return rt;
+					}
 				}
 			}
-			ControlCharacter ch = m_src.control();
+			ch = m_src.control();
 			tokstate.id = TokState::Start;
 
 			if (sd->next[ ch] != -1)
@@ -2058,6 +2082,7 @@ public:
 			{
 				case Tag:
 					this->match( XMLScannerBase::OpenTag);
+					this->match( XMLScannerBase::HeaderStart);
 					break;
 				case Attribute:
 					this->match( XMLScannerBase::TagAttribName);
