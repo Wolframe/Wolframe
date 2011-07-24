@@ -199,7 +199,8 @@ run: $(CPP_BINS)
 !ENDIF
 !IFDEF WITH_PGSQL
 	@-echo copy "$(PGSQL_DIR)\lib\libpq.dll" . >> test.bat
-	@-echo copy "$(PGSQL_DIR)\bin\libintl.dll" . >> test.bat
+	@-echo copy "$(PGSQL_DIR)\bin\libintl*.dll" . >> test.bat
+	@-echo copy "$(PGSQL_DIR)\bin\libiconv*.dll" . >> test.bat
 !ENDIF
 	@-echo echo Running the Wolframe server... >> test.bat
 	@-echo wolframed.exe -c wolframe.xml -d DATA >> test.bat
