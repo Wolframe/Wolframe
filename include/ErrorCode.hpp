@@ -31,15 +31,15 @@
 
 ************************************************************************/
 //
-// ErrorCodes.hpp
+// Error codes
 //
 
-#ifndef _ERRORCODES_HPP_INCLUDED
-#define _ERRORCODES_HPP_INCLUDED
+#ifndef _ERROR_CODES_HPP_INCLUDED
+#define _ERROR_CODES_HPP_INCLUDED
 
 namespace _Wolframe	{
 
-class ErrorCodes	{
+class ErrorCode	{
 public:
 	enum	{
 		OK = 0,
@@ -63,4 +63,4 @@ public:
 
 } // namespace _Wolframe
 
-#endif // _ERRORCODES_HPP_INCLUDED
+#endif // _ERROR_CODES_HPP_INCLUDED

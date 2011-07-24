@@ -30,6 +30,10 @@ makefiles/nmake/top.mk
 .Attic/CRAM.h
 .Attic/date.hpp
 .Attic/ErrorCode.hpp
+.Attic/loadModule/cross.cpp
+.Attic/loadModule/GNUmakefile
+.Attic/loadModule/Makefile.W32
+.Attic/loadModule/moduleBase.hpp
 .Attic/mtproc/implementation_c.c
 .Attic/mtproc/implementation_c.h
 .Attic/mtproc/methodtable_c.h
@@ -49,6 +53,9 @@ clients/Android/AndroidManifest.xml
 clients/Android/build.xml
 clients/Android/res/layout/main.xml
 clients/Android/res/values/strings.xml
+clients/cli/GNUmakefile
+clients/cli/Makefile.W32
+clients/cli/wolfcli.cpp
 clients/GNUmakefile
 clients/Makefile.W32
 clients/qt/AbstractFormLoader.cpp
@@ -73,6 +80,7 @@ clients/qt/WolframeClient.cpp
 clients/qt/WolframeClient.hpp
 clients/wt/etc/wt_config.xml
 clients/wt/GNUmakefile
+clients/wt/WolfMainView.cpp
 clients/wt/WolfMainView.hpp
 clients/wt/wtclient.cpp
 clients/wt/wtclient.xml
@@ -213,11 +221,12 @@ include/config/traits.hpp
 include/config/valueParser.hpp
 include/connectionEndpoint.hpp
 include/connectionHandler.hpp
+include/countedReference.hpp
 include/database/databaseContainer.hpp
 include/database/database.hpp
 include/database/databaseOperation.hpp
 include/database/databaseReference.hpp
-include/ErrorCodes.hpp
+include/ErrorCode.hpp
 include/GNUmakefile
 include/logger.hpp
 include/logger/logBackend.hpp
@@ -426,8 +435,12 @@ tests/expect/wolframe.conf
 tests/GNUmakefile
 tests/libxml2/GNUmakefile
 tests/libxml2/Makefile.W32
+tests/libxml2/test1.xml
 tests/libxml2/testlibxml1.cpp
-tests/libxml2/test.xml
+tests/libxslt/GNUmakefile
+tests/libxslt/Makefile.W32
+tests/libxslt/test1.xml
+tests/libxslt/testlibxslt1.cpp
 tests/logTest.cpp
 tests/Makefile.W32
 tests/poolTest.cpp
@@ -443,7 +456,3 @@ windows/wolframe.xml
 XML/configuration.rng
 XML/database.rng
 XML/logging.rng
-.Attic/loadModule/Makefile.W32
-.Attic/loadModule/GNUmakefile
-.Attic/loadModule/cross.cpp
-.Attic/loadModule/moduleBase.hpp

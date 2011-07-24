@@ -47,7 +47,7 @@
 #include "appConfig.hpp"
 #include "standardConfigs.hpp"
 #include "server.hpp"
-#include "ErrorCodes.hpp"
+#include "ErrorCode.hpp"
 #include "logger.hpp"
 #include "appSingleton.hpp"
 

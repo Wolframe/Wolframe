@@ -47,43 +47,42 @@
 #include <string>
 
 namespace _Wolframe {
-	namespace log {
+namespace log {
 
-	class LogBackend : public Singleton< LogBackend >
-	{
-	public:
-		LogBackend( );
+class LogBackend : public Singleton< LogBackend >
+{
+public:
+	LogBackend( );
 
-		~LogBackend( );
+	~LogBackend( );
 
-		void setConsoleLevel( const LogLevel::Level level );
-		
-		void setLogfileLevel( const LogLevel::Level level );
+	void setConsoleLevel( const LogLevel::Level level );
 
-		void setLogfileName( const std::string filename );
+	void setLogfileLevel( const LogLevel::Level level );
 
-		void setSyslogLevel( const LogLevel::Level level );
+	void setLogfileName( const std::string filename );
 
-		void setSyslogFacility( const SyslogFacility::Facility facility );
+	void setSyslogLevel( const LogLevel::Level level );
 
-		void setSyslogIdent( const std::string ident );
+	void setSyslogFacility( const SyslogFacility::Facility facility );
+
+	void setSyslogIdent( const std::string ident );
 
 #if defined( _WIN32 )
-		void setEventlogLevel( const LogLevel::Level level );
+	void setEventlogLevel( const LogLevel::Level level );
 
-		void setEventlogLog( const std::string log );
+	void setEventlogLog( const std::string log );
 
-		void setEventlogSource( const std::string source );
+	void setEventlogSource( const std::string source );
 #endif // defined( _WIN32 )
 
-		void log( const LogComponent component, const LogLevel::Level level, const std::string& msg );
+	void log( const LogComponent component, const LogLevel::Level level, const std::string& msg );
 
-	private:
-		class LogBackendImpl;
-		LogBackendImpl	*impl_;
-	};
+private:
+	class LogBackendImpl;
+	LogBackendImpl	*impl_;
+};
 
-	} // namespace log
-} // namespace _Wolframe
+}} // namespace _Wolframe::log
 
 #endif // _LOG_BACKEND_HPP_INCLUDED

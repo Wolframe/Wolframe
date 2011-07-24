@@ -39,7 +39,7 @@
 #include "logBackendImpl.hpp"
 
 namespace _Wolframe {
-	namespace log {
+namespace log {
 
 LogBackend::LogBackendImpl::LogBackendImpl( )
 {
@@ -126,14 +126,14 @@ void LogBackend::setSyslogFacility( const SyslogFacility::Facility facility )	{ 
 void LogBackend::setSyslogIdent( const std::string ident )	{ impl_->setSyslogIdent( ident );}
 
 #if defined( _WIN32 )
-void LogBackend::setEventlogLevel( const LogLevel::Level level )	{ impl_->setEventlogLevel( level );}
+void LogBackend::setEventlogLevel( const LogLevel::Level level ){ impl_->setEventlogLevel( level );}
 
 void LogBackend::setEventlogLog( const std::string log )	{ impl_->setEventlogLog( log ); }
 
 void LogBackend::setEventlogSource( const std::string source )	{ impl_->setEventlogSource( source ); }
 #endif // defined( _WIN32 )
 
-void LogBackend::log( const LogComponent component, const LogLevel::Level level, const std::string& msg )	{ impl_->log( component, level, msg ); }
+void LogBackend::log( const LogComponent component, const LogLevel::Level level, const std::string& msg )
+								{ impl_->log( component, level, msg ); }
 
-	} // namespace log
-} // namespace _Wolframe
+}} // namespace _Wolframe::log

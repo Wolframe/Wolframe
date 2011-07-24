@@ -325,7 +325,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\ErrorCodes.hpp"
+				RelativePath=".\include\ErrorCode.hpp"
 				>
 			</File>
 			<File
