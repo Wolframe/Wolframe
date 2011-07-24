@@ -393,7 +393,7 @@ int _Wolframe_winMain( int argc, char* argv[] )
 			LOG_ERROR << cmdLineCfg.errMsg();
 			cmdLineCfg.usage( std::cerr );
 			std::cerr << std::endl;
-			return _Wolframe::ErrorCodes::FAILURE;
+			return _Wolframe::ErrorCode::FAILURE;
 		}
 // command line has been parsed successfully
 // if cmdLineCfg.errMsg() is not empty than we have a warning
@@ -404,12 +404,12 @@ int _Wolframe_winMain( int argc, char* argv[] )
 		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::PRINT_VERSION )	{
 			std::cout << _Wolframe::applicationName() << " version "
 				  << appSingleton.version().toString() << std::endl << std::endl;
-			return _Wolframe::ErrorCodes::OK;
+			return _Wolframe::ErrorCode::OK;
 		}
 		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::PRINT_HELP )	{
 			cmdLineCfg.usage( std::cout );
 			std::cout << std::endl;
-			return _Wolframe::ErrorCodes::OK;
+			return _Wolframe::ErrorCode::OK;
 		}
 
 // decide what configuration file to use
@@ -417,12 +417,12 @@ int _Wolframe_winMain( int argc, char* argv[] )
 			configFile = cmdLineCfg.cfgFile.c_str();
 		if ( configFile == NULL )	{	// there is no configuration file
 			LOG_FATAL << "no configuration file found !";
-			return _Wolframe::ErrorCodes::FAILURE;
+			return _Wolframe::ErrorCode::FAILURE;
 		}
 
 		_Wolframe::config::ApplicationConfiguration config;
 		if ( !config.parse( configFile, cmdLineCfg.cfgType ))	// there was an error parsing the configuration file
-			return _Wolframe::ErrorCodes::FAILURE;
+			return _Wolframe::ErrorCode::FAILURE;
 
 // configuration file has been parsed successfully
 // build the final configuration
@@ -432,36 +432,36 @@ int _Wolframe_winMain( int argc, char* argv[] )
 		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::CHECK_CONFIG )	{
 			if ( config.check() )	{
 				std::cout << "Configuration OK" << std::endl << std::endl;
-				return _Wolframe::ErrorCodes::OK;
+				return _Wolframe::ErrorCode::OK;
 			}
 			else	{
-				return _Wolframe::ErrorCodes::OK;
+				return _Wolframe::ErrorCode::OK;
 			}
 		}
 
 		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::PRINT_CONFIG )	{
 			config.print( std::cout );
 			std::cout << std::endl;
-			return _Wolframe::ErrorCodes::OK;
+			return _Wolframe::ErrorCode::OK;
 		}
 
 		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::TEST_CONFIG )	{
 			std::cout << "Not implemented yet" << std::endl << std::endl;
-			return _Wolframe::ErrorCodes::OK;
+			return _Wolframe::ErrorCode::OK;
 		}
 
 		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::INSTALL_SERVICE ) {
-			if( !registerEventlog( config ) ) return _Wolframe::ErrorCodes::FAILURE;
-			if( !installAsService( config ) ) return _Wolframe::ErrorCodes::FAILURE;
+			if( !registerEventlog( config ) ) return _Wolframe::ErrorCode::FAILURE;
+			if( !installAsService( config ) ) return _Wolframe::ErrorCode::FAILURE;
 			LOG_INFO << "Installed as Windows service '" << config.serviceConf->serviceName.c_str( ) << "'";
-			return _Wolframe::ErrorCodes::OK;
+			return _Wolframe::ErrorCode::OK;
 		}
 
 		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::REMOVE_SERVICE ) {
-			if( !removeAsService( config ) ) return _Wolframe::ErrorCodes::FAILURE;
+			if( !removeAsService( config ) ) return _Wolframe::ErrorCode::FAILURE;
 			(void)deregisterEventlog( config );
 			LOG_INFO << "Removed as Windows service '" << config.serviceConf->serviceName.c_str( ) << "'";
-			return _Wolframe::ErrorCodes::OK;
+			return _Wolframe::ErrorCode::OK;
 		}
 
 		if( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::RUN_SERVICE ) {
@@ -480,11 +480,11 @@ int _Wolframe_winMain( int argc, char* argv[] )
 				} else {
 					// TODO: mmh? what are we doing here? No longer here
 					LOG_FATAL << "Unable to dispatch service control dispatcher: " << _Wolframe::log::LogError::LogWinerror;
-					return _Wolframe::ErrorCodes::FAILURE;
+					return _Wolframe::ErrorCode::FAILURE;
 				}
 			} else {
 				// here we get if the service has been stopped, so we terminate here
-				return _Wolframe::ErrorCodes::OK;
+				return _Wolframe::ErrorCode::OK;
 			}
 		}
 
@@ -506,11 +506,11 @@ int _Wolframe_winMain( int argc, char* argv[] )
 	}
 	catch (std::exception& e)	{
 		LOG_ERROR << "Got exception: " << e.what( );
-		return _Wolframe::ErrorCodes::FAILURE;
+		return _Wolframe::ErrorCode::FAILURE;
 	}
 	LOG_NOTICE << "Server stopped";
 
-	return _Wolframe::ErrorCodes::OK;
+	return _Wolframe::ErrorCode::OK;
 }
 
 #endif // defined(_WIN32)
