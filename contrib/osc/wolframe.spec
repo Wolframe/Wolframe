@@ -2,17 +2,23 @@
 ###
 
 %define rhel 0
+%define rhel4 0
+%define rhel5 0
+%define rhel6 0
 %if 0%{?rhel_version} >= 400 && 0%{?rhel_version} <= 499
 %define dist rhel4
 %define rhel 1
+%define rhel4 1
 %endif
 %if 0%{?rhel_version} >= 500 && 0%{?rhel_version} <= 599
 %define dist rhel5
 %define rhel 1
+%define rhel5 1
 %endif
 %if 0%{?rhel_version} >= 600 && 0%{?rhel_version} <= 699
 %define dist rhel6
 %define rhel 1
+%define rhel6 1
 %endif
 
 %define centos 0
@@ -101,8 +107,8 @@
 %if %{with_sqlite}
 %if %{rhel}
 %if %{rhel4}
-%endif
 %define build_sqlite 1
+%endif
 %endif
 %endif
 
