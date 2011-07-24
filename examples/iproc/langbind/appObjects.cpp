@@ -33,6 +33,7 @@ Project Wolframe.
 /// \file appObjects.cpp
 /// \brief interface implementation for application processor scripting language to system objects
 ///
+
 #include "appObjects.hpp"
 #include "logger.hpp"
 #include "protocol/inputfilter.hpp"

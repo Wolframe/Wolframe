@@ -73,7 +73,8 @@ local_test:
 !ENDIF
 !IFDEF WITH_PGSQL
 	@-echo copy "$(PGSQL_DIR)\lib\libpq.dll" . >> test.bat
-	@-echo copy "$(PGSQL_DIR)\bin\libintl.dll" . >> test.bat
+	@-echo copy "$(PGSQL_DIR)\bin\libintl*.dll" . >> test.bat
+	@-echo copy "$(PGSQL_DIR)\bin\libiconv*.dll" . >> test.bat
 !ENDIF
 	@-echo dbTest >> test.bat
 	@-test.bat
