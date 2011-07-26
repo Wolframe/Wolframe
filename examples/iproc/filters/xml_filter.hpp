@@ -40,12 +40,6 @@ Project Wolframe.
 #include <cstring>
 #include "textwolf.hpp"
 
-// Aba: Got a lot of them in initializer lists below, because they pass 'this'
-// pointers around (C4355 warnings)
-#ifdef _MSC_VER
-#pragma warning(disable:4355)
-#endif
-
 namespace _Wolframe {
 namespace filter {
 
@@ -408,9 +402,9 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		InputFilter( size_type genbufsize=0)
 			:protocol::InputFilter( genbufsize)
 			,m_outputbuf(0,0)
-			,m_src(SrcIterator(this))
 			,m_scanner(0)
 		{
+			m_src.setInput( this);
 			m_scanner = new XMLScanner( m_src, m_outputbuf);
 			m_itr = m_scanner->begin(false);
 			m_end = m_scanner->end();
@@ -427,9 +421,10 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		InputFilter( const InputFilter& o)
 			:protocol::InputFilter( o)
 			,m_outputbuf(o.m_outputbuf)
-			,m_src(SrcIterator(this))
+			,m_src( o.m_src)
 			,m_scanner(0)
 		{
+			m_src.setInput( this);
 			m_scanner = new XMLScanner( *o.m_scanner);
 			m_scanner->setSource( m_src);
 			m_scanner->setOutputBuffer( m_outputbuf);

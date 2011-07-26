@@ -115,6 +115,11 @@ public:
 		m_gen->skip(1);
 		return *this;
 	}
+
+	void setInput( protocol::InputFilter* ig)
+	{
+		m_gen = ig;
+	}
 private:
 	protocol::InputFilter* m_gen;		///< input for the iterator (from network message)
 };
