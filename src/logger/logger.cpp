@@ -39,7 +39,7 @@
 #include "logger.hpp"
 
 namespace _Wolframe {
-	namespace log {
+namespace log {
 
 Logger::Logger( LogBackend& backend ) :	logBk_( backend )
 {
@@ -57,5 +57,4 @@ Logger& Logger::Get( LogLevel::Level level )
 	return *this;
 }
 
-	} // namespace log
-} // namespace _Wolframe
+}} // namespace _Wolframe::log

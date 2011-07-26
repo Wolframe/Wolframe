@@ -40,6 +40,12 @@ Project Wolframe.
 #include <cstring>
 #include "textwolf.hpp"
 
+// Aba: Got a lot of them in initializer lists below, because they pass 'this'
+// pointers around (C4355 warnings)
+#ifdef _MSC_VER
+#pragma warning(disable:4355)
+#endif
+
 namespace _Wolframe {
 namespace filter {
 

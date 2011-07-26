@@ -40,42 +40,41 @@
 #define _LOG_ERROR_HPP_INCLUDED
 
 namespace _Wolframe {
-	namespace log {
+namespace log {
 
-	class LogError {
-	public:
-		/// Internal enum representing possible error conversion
-		/// methods
-		enum Error {
-			LOGERROR_UNDEF,		///< undefined
-			LOGERROR_STRERROR,	///< Posix strerror_r
-			LOGERROR_WINERROR	///< Windows GetLastError/FormatMessage
-		};
-
-	private:
-		enum Error _error;
-
-	public:
-		bool operator==( const LogError& e ) const {
-			return _error == e._error;
-		}
-
-		enum Error error( ) const {
-			return _error;
-		}
-
-		LogError( const enum Error& e = LOGERROR_UNDEF ) : _error( e ) { }
-
-		/// output stream marker for logging the strerror of the last
-		/// POSIX system call in human readable format
-		static const LogError LogStrerror;
-
-		/// output stream marker for logging the Windows error of the last
-		/// Windows API call in human readable format
-		static const LogError LogWinerror;
+class LogError {
+public:
+	/// Internal enum representing possible error conversion
+	/// methods
+	enum Error {
+		LOGERROR_UNDEF,		///< undefined
+		LOGERROR_STRERROR,	///< Posix strerror_r
+		LOGERROR_WINERROR	///< Windows GetLastError/FormatMessage
 	};
-	
-	} // namespace log
-} // namespace _Wolframe
+
+private:
+	enum Error _error;
+
+public:
+	bool operator==( const LogError& e ) const {
+		return _error == e._error;
+	}
+
+	enum Error error( ) const {
+		return _error;
+	}
+
+	LogError( const enum Error& e = LOGERROR_UNDEF ) : _error( e ) { }
+
+	/// output stream marker for logging the strerror of the last
+	/// POSIX system call in human readable format
+	static const LogError LogStrerror;
+
+	/// output stream marker for logging the Windows error of the last
+	/// Windows API call in human readable format
+	static const LogError LogWinerror;
+};
+
+}} // namespace _Wolframe::log
 
 #endif // _LOG_ERROR_HPP_INCLUDED

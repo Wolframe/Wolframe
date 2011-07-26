@@ -2,22 +2,33 @@
 ###
 
 %define rhel 0
+%define rhel4 0
+%define rhel5 0
+%define rhel6 0
 %if 0%{?rhel_version} >= 400 && 0%{?rhel_version} <= 499
 %define dist rhel4
 %define rhel 1
+%define rhel4 1
 %endif
 %if 0%{?rhel_version} >= 500 && 0%{?rhel_version} <= 599
 %define dist rhel5
 %define rhel 1
+%define rhel5 1
 %endif
 %if 0%{?rhel_version} >= 600 && 0%{?rhel_version} <= 699
 %define dist rhel6
 %define rhel 1
+%define rhel6 1
 %endif
 
 %define centos 0
 %if 0%{?centos_version} >= 500 && 0%{?centos_version} <= 599
 %define dist centos5
+%define centos 1
+%endif
+
+%if 0%{?centos_version} >= 600 && 0%{?centos_version} <= 699
+%define dist centos6
 %define centos 1
 %endif
 
@@ -88,6 +99,17 @@
 %define build_boost 1
 %define boost_version 1.46.1
 %define boost_underscore_version 1_46_1
+%endif
+
+# build local sqlite3 for distibutions with no or too old version
+
+%define build_sqlite 0   
+%if %{with_sqlite}
+%if %{rhel}
+%if %{rhel4}
+%define build_sqlite 1
+%endif
+%endif
 %endif
 
 # init script to start the daemon
@@ -166,9 +188,11 @@ Requires: openssl >= 0.9.7
 %endif
 %if %{with_sqlite}
 %if %{rhel} || %{centos} || %{fedora}
-%if %{rhel4}
-BuildRequires: sqlite-devel
-Requires: sqlite
+%if %{rhel}
+%if %{rhel5} || %{rhel6}
+BuildRequires: sqlite-devel >= 3.0
+Requires: sqlite >= 3.0
+%endif
 %else
 BuildRequires: sqlite-devel >= 3.0
 Requires: sqlite >= 3.0
@@ -267,16 +291,23 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make help \
 	BOOST_DIR=/tmp/boost-%{boost_version} \
 	%{boost_library_tag} \
 %endif
+%if %{build_sqlite}
+	WITH_LOCAL_SQLITE3=%{build_sqlite} \
+%endif
 	WITH_SSL=%{with_ssl} WITH_SQLITE3=%{with_sqlite} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
 	WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=/etc
+
 LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make config \
 %if %{build_boost}
 	BOOST_DIR=/tmp/boost-%{boost_version} \
 	%{boost_library_tag} \
+%endif
+%if %{build_sqlite}
+	WITH_LOCAL_SQLITE3=%{build_sqlite} \
 %endif
 	WITH_SSL=%{with_ssl} WITH_SQLITE3=%{with_sqlite} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
@@ -289,6 +320,9 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make all \
 %if %{build_boost}
 	BOOST_DIR=/tmp/boost-%{boost_version} \
 	%{boost_library_tag} \
+%endif
+%if %{build_sqlite}
+	WITH_LOCAL_SQLITE3=%{build_sqlite} \
 %endif
 	WITH_SSL=%{with_ssl} WITH_SQLITE3=%{with_sqlite} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
@@ -308,6 +342,9 @@ make DESTDIR=$RPM_BUILD_ROOT install \
 %if %{build_boost}
 	BOOST_DIR=/tmp/boost-%{boost_version} \
 	%{boost_library_tag} \
+%endif
+%if %{build_sqlite}
+	WITH_LOCAL_SQLITE3=%{build_sqlite} \
 %endif
 	WITH_SSL=%{with_ssl} WITH_SQLITE3=%{with_sqlite} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \

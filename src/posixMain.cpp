@@ -47,7 +47,7 @@
 #include "appConfig.hpp"
 #include "standardConfigs.hpp"
 #include "server.hpp"
-#include "ErrorCodes.hpp"
+#include "ErrorCode.hpp"
 #include "logger.hpp"
 #include "appSingleton.hpp"
 
@@ -86,11 +86,11 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 	else	{
 		if ( bindtextdomain( "Wolframe", "../po" ) == NULL )	{
 			LOG_FATAL << "Not enough memory to bind textdomain";
-			return _Wolframe::ErrorCodes::FAILURE;
+			return _Wolframe::ErrorCode::FAILURE;
 		}
 		if ( textdomain( "Wolframe" ) == NULL )	{
 			LOG_FATAL << "Not enough memory to set textdomain";
-			return _Wolframe::ErrorCodes::FAILURE;
+			return _Wolframe::ErrorCode::FAILURE;
 		}
 	}
 // end of i18n global stuff
@@ -107,7 +107,7 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 			std::cerr << std::endl;
 			cmdLineCfg.usage( std::cerr );
 			std::cerr << std::endl;
-			return _Wolframe::ErrorCodes::FAILURE;
+			return _Wolframe::ErrorCode::FAILURE;
 		}
 // command line has been parsed successfully
 // if cmdLineCfg.errMsg() is not empty than we have a warning
@@ -118,14 +118,14 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::PRINT_VERSION )	{
 			std::cout << std::endl << _Wolframe::applicationName() << gettext( " version " )
 				  << appSingleton.version().toString() << std::endl << std::endl;
-			return _Wolframe::ErrorCodes::OK;
+			return _Wolframe::ErrorCode::OK;
 		}
 		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::PRINT_HELP )	{
 			std::cout << std::endl << _Wolframe::applicationName() << gettext( " version " )
 				  << appSingleton.version().toString() << std::endl;
 			cmdLineCfg.usage( std::cout );
 			std::cout << std::endl;
-			return _Wolframe::ErrorCodes::OK;
+			return _Wolframe::ErrorCode::OK;
 		}
 
 // decide what configuration file to use
@@ -137,7 +137,7 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 											      _Wolframe::config::defaultLocalConfig() );
 		if ( configFile == NULL )	{	// there is no configuration file
 			LOG_FATAL << gettext ( "no configuration file found !" );
-			return _Wolframe::ErrorCodes::FAILURE;
+			return _Wolframe::ErrorCode::FAILURE;
 		}
 
 		_Wolframe::config::ApplicationConfiguration conf;
@@ -145,7 +145,7 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 		if ( !conf.parse( configFile, cmdLineCfg.cfgType ))	{
 			// there was an error parsing the configuration file
 			LOG_FATAL << "Error parsing the configuration file";
-			return _Wolframe::ErrorCodes::FAILURE;
+			return _Wolframe::ErrorCode::FAILURE;
 		}
 
 // configuration file has been parsed successfully
@@ -161,10 +161,10 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 				  << appSingleton.version().toString() << std::endl;
 			if ( conf.check() )	{
 				std::cout << "Configuration OK" << std::endl << std::endl;
-				return _Wolframe::ErrorCodes::OK;
+				return _Wolframe::ErrorCode::OK;
 			}
 			else	{
-				return _Wolframe::ErrorCodes::FAILURE;
+				return _Wolframe::ErrorCode::FAILURE;
 			}
 		}
 
@@ -173,19 +173,19 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 				  << appSingleton.version().toString() << std::endl;
 			conf.print( std::cout );
 			std::cout << std::endl;
-			return _Wolframe::ErrorCodes::OK;
+			return _Wolframe::ErrorCode::OK;
 		}
 
 		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::TEST_CONFIG )	{
 			std::cout << "Not implemented yet" << std::endl << std::endl;
-			return _Wolframe::ErrorCodes::OK;
+			return _Wolframe::ErrorCode::OK;
 		}
 
 		// Check the configuration before starting the service
 		if ( !conf.check() )	{
 			std::cout << std::endl << "Daemon not started because of a configuration ERROR"
 				  << std::endl << std::endl;
-			return _Wolframe::ErrorCodes::FAILURE;
+			return _Wolframe::ErrorCode::FAILURE;
 		}
 
 		// Daemon stuff
@@ -196,14 +196,14 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 				boost::interprocess::file_lock lock( conf.serviceConf->pidFile.c_str( ) );
 				if( lock.try_lock( ) ) {
 					LOG_ERROR << "Pidfile is locked, another daemon running?";
-					return _Wolframe::ErrorCodes::FAILURE;
+					return _Wolframe::ErrorCode::FAILURE;
 				}
 			}
 
 			// daemonize, lose process group, terminal output, etc.
 			if( daemon( 0, 0 ) ) {
 				LOG_CRITICAL << "Daemonizing server failed: " << _Wolframe::log::LogError::LogStrerror;
-				return _Wolframe::ErrorCodes::FAILURE;
+				return _Wolframe::ErrorCode::FAILURE;
 			}
 
 			// now here we lost constrol over the console, we should
@@ -220,30 +220,30 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 			passwdent = getpwnam( conf.serviceConf->user.c_str( ) );
 			if( passwdent == NULL ) {
 				LOG_CRITICAL << "Illegal user '" << conf.serviceConf->user << "': " << _Wolframe::log::LogError::LogStrerror;
-				return _Wolframe::ErrorCodes::FAILURE;
+				return _Wolframe::ErrorCode::FAILURE;
 			}
 
 			groupent = getgrnam( conf.serviceConf->group.c_str( ) );
 			if( groupent == NULL ) {
 				LOG_CRITICAL << "Illegal group '" << conf.serviceConf->group << "': " << _Wolframe::log::LogError::LogStrerror;
-				return _Wolframe::ErrorCodes::FAILURE;
+				return _Wolframe::ErrorCode::FAILURE;
 			}
 
 			if( setgid( groupent->gr_gid ) < 0 ) {
 				LOG_CRITICAL << "setgid for group '" << conf.serviceConf->group << "' failed: " << _Wolframe::log::LogError::LogStrerror;
-				return _Wolframe::ErrorCodes::FAILURE;
+				return _Wolframe::ErrorCode::FAILURE;
 			}
 
 			if( setuid( passwdent->pw_uid ) < 0 ) {
 				LOG_CRITICAL << "setgid for user '" << conf.serviceConf->user << "' failed: " << _Wolframe::log::LogError::LogStrerror;
-				return _Wolframe::ErrorCodes::FAILURE;
+				return _Wolframe::ErrorCode::FAILURE;
 			}
 
 			// create a pid file and lock id
 			std::ofstream pidFile( conf.serviceConf->pidFile.c_str( ), std::ios_base::trunc );
 			if( !pidFile.good( ) ) {
 				LOG_CRITICAL << "Unable to create PID file '" << conf.serviceConf->pidFile << "'!";
-				return _Wolframe::ErrorCodes::FAILURE;
+				return _Wolframe::ErrorCode::FAILURE;
 			}
 			pidFile << getpid( ) << std::endl;
 			pidFile.close( );
@@ -294,10 +294,10 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 	catch (std::exception& e)	{
 		// Aba: how to delete the pid file here?
 		LOG_ERROR << "posixMain: exception: " << e.what() << "\n";
-		return _Wolframe::ErrorCodes::FAILURE;
+		return _Wolframe::ErrorCode::FAILURE;
 	}
 
-	return _Wolframe::ErrorCodes::OK;
+	return _Wolframe::ErrorCode::OK;
 }
 
 #endif // !defined(_WIN32)

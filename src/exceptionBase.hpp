@@ -31,19 +31,18 @@
 
 ************************************************************************/
 //
-// application exception class
+// application exception base class
 //
 
-#ifndef _APP_EXCEPTION_HPP_INCLUDED
-#define _APP_EXCEPTION_HPP_INCLUDED
-
+#ifndef _EXCEPTION_BASE_HPP_INCLUDED
+#define _EXCEPTION_BASE_HPP_INCLUDED
 
 #include <string>
 #include <exception>
 
 #include "ErrorCode.hpp"
 
-namespace _Wolframe	{
+namespace _Wolframe {
 
 class appException : public std::exception
 {
@@ -51,17 +50,17 @@ public:
 	appException( ErrorCode::Error error, ErrorSeverity::Severity severity, const char* Format, ... );
 	~appException() throw ()	{}
 
-	ErrorCode::Error error()			{ return error_; }
-	ErrorSeverity::Severity severity( void )	{ return severity_; }
-	const char* what() const throw()		{ return what_.c_str(); }
+	ErrorCode::Error error()			{ return m_error; }
+	ErrorSeverity::Severity severity( void )	{ return m_severity; }
+	const char* what() const throw()		{ return m_what.c_str(); }
 private:
-	ErrorCode::Error	error_;
-	ErrorSeverity::Severity	severity_;
-	std::string		what_;
+	ErrorCode::Error	m_error;
+	ErrorSeverity::Severity	m_severity;
+	std::string		m_what;
 };
 
 template <typename C> inline std::basic_ostream<C>& operator<< ( std::basic_ostream<C>& o,
-								appException const& e )
+								 appException const& e )
 {
 	return o << e.what();
 }
@@ -71,7 +70,7 @@ class systemException : public std::exception
 {
 public:
 	systemException( ErrorCode::Error error, ErrorSeverity::Severity severity,
-		ErrorModule::Module module = ErrorModule::UNKNOWN, const char* msg = NULL );
+			 ErrorModule::Module module = ErrorModule::UNKNOWN, const char* msg = NULL );
 	~systemException() throw ()	{}
 
 	ErrorCode::Error error()			{ return error_; }
@@ -87,11 +86,11 @@ private:
 };
 
 template <typename C> inline std::basic_ostream<C>& operator<< ( std::basic_ostream<C>& o,
-								systemException const& e )
+								 systemException const& e )
 {
 	return o << e.what();
 }
 
 } // namespace _Wolframe
 
-#endif // _APP_EXCEPTION_HPP_INCLUDED
+#endif // _EXCEPTION_BASE_HPP_INCLUDED
