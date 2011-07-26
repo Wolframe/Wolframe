@@ -285,7 +285,7 @@ static int function_output_print( lua_State* ls)
 		}
 		if (lua_gettop( ls) == 2)
 		{
-			item[1] = get_printop( ls, 2, itemsize[1]);
+			item[0] = get_printop( ls, 2, itemsize[0]);
 		}
 		else if (lua_gettop( ls) == 3)
 		{

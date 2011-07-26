@@ -75,7 +75,8 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 			Ok,				///< no error
 			ErrTagStackExceedsLimit,	///< tack stack overflow
 			ErrTagHierarchy,		///< tack hierarchy error
-			ErrIllegalState			///< illegal state (should not happen)
+			ErrIllegalOperation,		///< illegal operation in this state
+			ErrIllegalState			///< illegal state (should not happen)			
 		};
 
 		///\enum XMLState
@@ -158,6 +159,10 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 					return true;
 
 				case protocol::FormatOutput::Attribute:
+					if (!m_pendingOpenTag)
+					{
+						setState( Error, ErrIllegalOperation);
+					}
 					ThisFilterBase::printToBuffer( ' ', buf);
 					ThisFilterBase::printToBuffer( (const char*)element, elementsize, buf);
 					ThisFilterBase::printToBuffer( '=', buf);
@@ -462,6 +467,7 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 			m_scanner->setOutputBuffer( buf);
 			try
 			{
+/*[-]*/std::cout << "///////////////////////////" << std::endl;		
 				setState( Open);
 				++m_itr;
 				if (buf.overflow())
@@ -530,9 +536,23 @@ struct XmlHeaderInputFilter :public XmlFilter<textwolf::charset::IsoLatin1,textw
 	};
 
 	///\brief Constructor
-	XmlHeaderInputFilter() {}
+	XmlHeaderInputFilter()
+		:m_endOfHeader(false){}
+
+	///\brief Copy constructor
+	XmlHeaderInputFilter( const XmlHeaderInputFilter& o)
+		:InputFilter( o)
+		,m_endOfHeader( o.m_endOfHeader){}
+
 	///\brief Destructor
 	virtual ~XmlHeaderInputFilter(){}
+
+	///\brief self copy
+	///\return copy of this
+	virtual InputFilter* copy() const
+	{
+		return new XmlHeaderInputFilter( *this);
+	}
 
 	///\brief Implementation of protocol::InputFilter::getNext( ElementType*, void*, size_type, size_type*)
 	virtual bool getNext( ElementType* type, void* buffer, size_type buffersize, size_type* bufferpos)
@@ -542,7 +562,13 @@ struct XmlHeaderInputFilter :public XmlFilter<textwolf::charset::IsoLatin1,textw
 		m_scanner->setOutputBuffer( buf);
 		try
 		{
+/*[-]*/std::cout << "-----------------------------" << std::endl;		
 			setState( Open);
+			if (m_endOfHeader)
+			{
+				*type = CloseTag;
+				return true;
+			}
 			++m_itr;
 			if (buf.overflow())
 			{
@@ -559,6 +585,10 @@ struct XmlHeaderInputFilter :public XmlFilter<textwolf::charset::IsoLatin1,textw
 			else
 			{
 				*type = (ElementType)st;
+				if (*type == CloseTag)
+				{
+					m_endOfHeader = true;
+				}
 				return true;
 			}
 		}
@@ -576,6 +606,8 @@ struct XmlHeaderInputFilter :public XmlFilter<textwolf::charset::IsoLatin1,textw
 		};
 		return false;
 	}
+private:
+	bool m_endOfHeader;	
 };
 
 ///\class XmlHeaderFilter 
