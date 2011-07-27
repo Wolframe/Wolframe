@@ -118,7 +118,7 @@ void connection::start()
 	if ( m_connList.isFull() )	{
 		LOG_TRACE << "Refusing connection from " << identifier() << ". Too many connections.";
 		boost::system::error_code ignored_ec;
-		socket().write_some( boost::asio::buffer( REFUSE_MSG ));
+		socket().write_some( boost::asio::buffer( REFUSE_MSG, strlen( REFUSE_MSG ) ));
 		socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
 	}
 	else	{
@@ -176,7 +176,7 @@ void SSLconnection::handleHandshake( const boost::system::error_code& e )
 		if ( m_connList.isFull() )	{
 			LOG_TRACE << "Refusing connection from " << identifier() << ". Too many connections.";
 			boost::system::error_code ignored_ec;
-			socket().write_some( boost::asio::buffer( REFUSE_MSG ));
+			socket().write_some( boost::asio::buffer( REFUSE_MSG, strlen( REFUSE_MSG ) ));
 			socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
 		}
 		else	{
