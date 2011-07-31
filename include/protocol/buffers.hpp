@@ -86,7 +86,7 @@ public:
 	const char* c_str()			{m_buf[m_pos]=0; return m_buf;}
 	///\brief cast operator for direct access
 	///\return the C-string
-	operator const char*()			{return c_str();};
+	operator const char*()			{return c_str();}
 };
 
 
@@ -212,7 +212,7 @@ public:
 				m_content->push_back(ch);
 				break;
 		}
-	};
+	}
 
 	///\brief Number of tokens parsed
 	///\return the number of tokens in the array parsed

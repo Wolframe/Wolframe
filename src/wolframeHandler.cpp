@@ -78,11 +78,13 @@ wolframeConnection::wolframeConnection( const WolframeHandler& context,
 		abort();
 	}
 
-	m_state = NEW;
+	m_state = NEW_CONNECTION;
 	m_dataStart = NULL;
 	m_dataSize = 0;
 	idleTimeout_ = 30;
 
+	// Initialize various channel processors to start-up values
+	m_authentication = NULL;
 	// Get the database connection from the begining
 	// as it might be necessary for further checks
 //	m_db = m_globalCtx.db().channel();
@@ -91,11 +93,8 @@ wolframeConnection::wolframeConnection( const WolframeHandler& context,
 
 wolframeConnection::~wolframeConnection()
 {
-//	if ( m_db )		m_db->close();
-//	if ( m_authentication )	m_authentication->close();
-//	if ( m_authorization )	m_authorization->close();
-//	if ( m_audit )		m_audit->close();
-//	if ( m_accounting )	m_accounting->close();
+	if ( m_authentication )	m_authentication->close();
+	if ( m_db )		m_db->close();
 
 	LOG_TRACE << "Connection handler destroyed";
 }
@@ -148,8 +147,8 @@ void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
 const net::NetworkOperation wolframeConnection::nextOperation()
 {
 	switch( m_state )	{
-	case NEW:	{
-		m_state = HELLO_SENT;
+	case NEW_CONNECTION:	{
+		m_state = SEND_HELLO;
 		if ( ! m_globalCtx.banner().empty() )
 			m_outMsg = m_globalCtx.banner() + "\nOK\n";
 		else
@@ -157,7 +156,7 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 		return net::NetworkOperation( net::SendString( m_outMsg ));
 	}
 
-	case HELLO_SENT:	{
+	case SEND_HELLO:	{
 		m_state = READ_INPUT;
 		return net::NetworkOperation( net::ReadData( m_readBuf, ReadBufSize, idleTimeout_ ));
 	}

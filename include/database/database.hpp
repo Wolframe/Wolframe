@@ -96,6 +96,10 @@ public:
 
 	/* we should also decide how we handle db encoding
 	virtual const char* encoding() const = 0; */
+
+	/// Close the database connetion
+	/// This exists for no good reason (mostly to make code look uniform)
+	virtual void close()	{}
 };
 
 }} // namespace _Wolframe::db

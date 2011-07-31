@@ -126,7 +126,7 @@ private:
 ///\class InputBlock
 ///\brief Input memory block of the protocol for network input with iterators for the processing of the data
 ///
-class InputBlock  :public MemBlock
+class InputBlock :public MemBlock
 {
 public:
 	///
