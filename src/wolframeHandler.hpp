@@ -132,15 +132,12 @@ private:
 ///*************
 	proc::ProcessorChannel*		m_proc;
 
-	/// Connection endpoints
-	const net::LocalEndpoint*	m_localEP;
-	const net::RemoteEndpoint*	m_remoteEP;
+	const net::LocalEndpoint*	m_localEP;		///< local endpoint
+	const net::RemoteEndpoint*	m_remoteEP;		///< remote endpoint
 
-	/// The state of the processor FSM
-	FSMstate			m_state;
-	/// Read buffer
-	static const std::size_t ReadBufSize = 16384;
-	char				m_readBuf[ ReadBufSize ];
+	FSMstate			m_state;		///< top processor FSM state
+
+	protocol::InputBlock		m_readBuf;		///< network read buffer
 	char*				m_dataStart;
 	std::size_t			m_dataSize;
 	/// Output buffer
@@ -163,9 +160,6 @@ private:
 
 //	InputIterator m_itr;			///< iterator to scan protocol input
 //	InputIterator m_end;			///< iterator pointing to end of message buffer
-
-	/// Idle timeout value
-	unsigned			idleTimeout_;
 };
 
 /// The server handler container

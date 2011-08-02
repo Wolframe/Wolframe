@@ -126,9 +126,6 @@ const net::NetworkOperation Connection::nextOperation()
 
 			case EnterCommand:
 			{
-//				m_functionName = 0;
-//				m_functionHasIO = false;
-
 				//the empty command is for an empty line for not bothering the client with obscure error messages.
 				//the next state should read one character for sure otherwise it may result in an endless loop
 				static const ProtocolParser parser(&commandName);

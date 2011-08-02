@@ -52,7 +52,8 @@ namespace _Wolframe	{
 
 wolframeConnection::wolframeConnection( const WolframeHandler& context,
 					const net::LocalEndpoint& local )
-	: m_globalCtx( context )
+	: m_globalCtx( context ),
+	  m_readBuf( 16536 )
 {
 	m_localEP = &local;
 	m_remoteEP = NULL;
@@ -81,7 +82,6 @@ wolframeConnection::wolframeConnection( const WolframeHandler& context,
 	m_state = NEW_CONNECTION;
 	m_dataStart = NULL;
 	m_dataSize = 0;
-	idleTimeout_ = 30;
 
 	// Initialize various channel processors to start-up values
 	m_authentication = NULL;
@@ -158,11 +158,11 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 
 	case SEND_HELLO:	{
 		m_state = READ_INPUT;
-		return net::NetworkOperation( net::ReadData( m_readBuf, ReadBufSize, idleTimeout_ ));
+		return net::NetworkOperation( net::ReadData( m_readBuf.ptr(), m_readBuf.size(), 30 ));
 	}
 
 	case READ_INPUT:
-		m_dataStart = m_readBuf;
+		m_dataStart = m_readBuf.charptr();
 		// Yes, it continues with OUTPUT_MSG, sneaky, sneaky, sneaky :P
 
 	case OUTPUT_MSG:
@@ -185,16 +185,16 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 			}
 			// If we got here, no \n was found, we need to read more
 			// or close the connection if the buffer is full
-			if ( m_dataSize >= ReadBufSize )	{
+			if ( m_dataSize >= m_readBuf.size() )	{
 				m_state = TERMINATE;
 				return net::NetworkOperation( net::SendString( "Line too long. Bye.\n" ));
 			}
 			else {
-				memmove( m_readBuf, m_dataStart, m_dataSize );
+				memmove( m_readBuf.ptr(), m_dataStart, m_dataSize );
 				m_state = READ_INPUT;
-				return net::NetworkOperation( net::ReadData( m_readBuf + m_dataSize,
-									     ReadBufSize - m_dataSize,
-									     idleTimeout_ ));
+				return net::NetworkOperation( net::ReadData( m_readBuf.ptr() + m_dataSize,
+									     m_readBuf.size() - m_dataSize,
+									     30 ));
 			}
 		}
 
