@@ -210,9 +210,21 @@ struct LuaObject :public ObjectType
 	}
 };
 
+static void pushItem( lua_State* ls, const char* item, unsigned int itemsize)
+{
+	if (item)
+	{
+		lua_pushlstring( ls, item, (std::size_t)itemsize);
+		lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
+	}
+	else
+	{
+		lua_pushboolean( ls, 0);
+	}
+}
+
 static int function_inputFilter( lua_State* ls)
 {
-
 	for (;;)
 	{
 		const char* item[2];
@@ -234,24 +246,8 @@ static int function_inputFilter( lua_State* ls)
 				return 0;
 
 			case InputFilterClosure::Data:
-				if (item[0])
-				{
-					lua_pushlstring( ls, item[0], (std::size_t)itemsize[0]);
-					lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one		
-				}
-				else
-				{
-					lua_pushboolean( ls, 0);
-				}
-				if (item[1])
-				{
-					lua_pushlstring( ls, item[1], (std::size_t)itemsize[1]);
-					lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one		
-				}
-				else
-				{
-					lua_pushboolean( ls, 0);
-				}
+				pushItem( ls, item[0], itemsize[0]);
+				pushItem( ls, item[1], itemsize[1]);
 				return 2;
 		}
 		luaL_error( ls, "illegal state produced by input filter");
@@ -303,7 +299,7 @@ static int function_output_print( lua_State* ls)
 				continue;
 
 			case Output::Error:
-				luaL_error( ls, "error in format output print");
+				luaL_error( ls, "error in format output print (%d)", output->m_formatoutput->getError());
 				return 0;
 
 			case Output::Data:
@@ -327,13 +323,13 @@ static int function_output_println( lua_State* ls)
 				continue;
 
 			case Output::Error:
-				luaL_error( ls, "error in format output print");
+				luaL_error( ls, "error in format output println (%d)", output->m_formatoutput->getError());
 				return 0;
 
 			case Output::Data:
 				return 0;
 		}
-		luaL_error( ls, "illegal state produced by format output print");
+		luaL_error( ls, "illegal state produced by format output println");
 		return 0;
 	}
 }

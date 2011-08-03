@@ -468,7 +468,6 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 			m_scanner->setOutputBuffer( buf);
 			try
 			{
-/*[-]*/std::cout << "///////////////////////////" << std::endl;		
 				setState( Open);
 				++m_itr;
 				if (buf.overflow())
@@ -563,7 +562,6 @@ struct XmlHeaderInputFilter :public XmlFilter<textwolf::charset::IsoLatin1,textw
 		m_scanner->setOutputBuffer( buf);
 		try
 		{
-/*[-]*/std::cout << "-----------------------------" << std::endl;		
 			setState( Open);
 			if (m_endOfHeader)
 			{
@@ -595,6 +593,7 @@ struct XmlHeaderInputFilter :public XmlFilter<textwolf::charset::IsoLatin1,textw
 		}
 		catch (SrcIterator::EoM)
 		{
+			*bufferpos = buf.size();
 			if (!gotEoD())
 			{
 				setState( EndOfMessage);
