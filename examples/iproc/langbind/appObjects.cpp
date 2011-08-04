@@ -288,7 +288,7 @@ Output::ItemType Output::print( const char* tag, unsigned int tagsize, const cha
 				int err = m_formatoutput->getError();
 				if (err)
 				{
-					LOG_ERROR << "error in format output (" << err << ")";
+					LOG_ERROR << "error in format output attribute (" << err << ")";
 					return Error;
 				}
 				return DoYield;
@@ -300,7 +300,7 @@ Output::ItemType Output::print( const char* tag, unsigned int tagsize, const cha
 					int err = m_formatoutput->getError();
 					if (err)
 					{
-						LOG_ERROR << "error in format output (" << err << ")";
+						LOG_ERROR << "error in format output open tag (" << err << ")";
 						return Error;
 					}
 					return DoYield;
@@ -315,7 +315,7 @@ Output::ItemType Output::print( const char* tag, unsigned int tagsize, const cha
 				int err = m_formatoutput->getError();
 				if (err)
 				{
-					LOG_ERROR << "error in format output (" << err << ")";
+					LOG_ERROR << "error in format output value (" << err << ")";
 					return Error;
 				}
 				return DoYield;
@@ -329,7 +329,7 @@ Output::ItemType Output::print( const char* tag, unsigned int tagsize, const cha
 				int err = m_formatoutput->getError();
 				if (err)
 				{
-					LOG_ERROR << "error in format output (" << err << ")";
+					LOG_ERROR << "error in format output close tag (" << err << ")";
 					return Error;
 				}
 				return DoYield;
