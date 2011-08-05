@@ -130,7 +130,8 @@ Fedora 14
 Required pacakges: boost-devel (1.44)
 Optional packages: openssl-devel, qt4-devel,
                    pam-devel (1.1.1), cyrus-sasl-devel (2.1.23),
-                   sqlite-devel (3.6.23), postgresql-devel (8.4.7)
+                   sqlite-devel (3.6.23), postgresql-devel (8.4.7),
+                   libxml2-devel (2.7.7), libxslt-devel (1.1.26)
 
 Boost is 1.44, but depending on the patch level boost filestystem exists only in
 version 2, not in version 3. Build your own one if you get linking problems around
