@@ -9,13 +9,17 @@ function run( )
 		if t == 'encoding' then
 			f = filter( "XML:" .. c)
 		end
-		output:print( c,t)
+		output:print( c, t)
 	end
 
 	-- parsing and echoing the content
 	input:as( f)
 	output:as( f)
 	for c,t in input:get() do
-		output:print( c,t)
+		if not c then
+			output:println( c, t)
+		else
+			output:print( c, t)
+		end
 	end
 end

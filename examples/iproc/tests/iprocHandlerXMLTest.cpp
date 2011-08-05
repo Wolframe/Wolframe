@@ -57,18 +57,51 @@ using namespace iproc;
 
 struct TestDescription
 {
-	const char* name;
-	const char* scriptfile;
-	const char* datafile;
-	unsigned int elementBuffersize;
+	const char* name;		//< determines the name of the result and of the expected result file
+	const char* scriptfile;		//< script to execute
+	const char* datafile;		//< input to feed
+	unsigned int elementBuffersize;	//< additional buffer for the output to hold at least one result element
 };
 
 static const TestDescription testDescriptions[] =
 {
-	{"echo_xml_IsoLatin1",	"test_echo_xml.lua",	"test_IsoLatin1.xml", 32},
-	{"echo_char_IsoLatin1",	"test_echo_char.lua",	"test_IsoLatin1.xml", 1},
+//	{
+//		"echo_xml_utf16_to_utf8",
+//		"test_echo_xml_utf8",
+//		"test_UTF16.xml", 64
+//	},
+	{
+		"echo_xml_IsoLatin1_to_utf16",
+		"test_echo_xml_utf16",
+		"test_IsoLatin1.xml", 64
+	},
+	{
+		"echo_xml_IsoLatin1_to_utf8",
+		"test_echo_xml_utf8",
+		"test_IsoLatin1.xml", 32
+	},
+	{
+		"echo_xml_IsoLatin1",
+		"test_echo_xml",
+		"test_IsoLatin1.xml", 32
+	},
+	{
+		"echo_char_IsoLatin1",
+		"test_echo_char",
+		"test_IsoLatin1.xml", 1
+	},
 	{0,0,0,0}
 };
+
+static std::string getDataFile( const char* name, const char* type, const char* ext=0)
+{
+	boost::filesystem::path rt = boost::filesystem::current_path();
+	std::string datafile( name);
+	datafile.append( ext?ext:"");
+	rt /= type;
+	rt /= datafile;
+	return rt.string();
+}
 
 struct TestConfiguration :public lua::Configuration
 {
@@ -79,7 +112,8 @@ struct TestConfiguration :public lua::Configuration
 		:lua::Configuration( "iproc", "test-iproc")
 	{
 		boost::property_tree::ptree pt;
-		pt.put("main", scriptname);
+		std::string scriptpath( getDataFile( scriptname, "scripts", ".lua"));
+		pt.put("main", scriptpath);
 		pt.put("input_buffer", boost::lexical_cast<std::string>( bufferSizeInput));
 		pt.put("output_buffer", boost::lexical_cast<std::string>( bufferSizeOutput));
 		setCanonicalPathes( ".");
@@ -97,16 +131,6 @@ protected:
 	virtual void SetUp() {}
 	virtual void TearDown() {}
 };
-
-static std::string getDataFile( const char* name, const char* type, const char* ext=0)
-{
-	boost::filesystem::path rt = boost::filesystem::current_path();
-	std::string datafile( name);
-	datafile.append( ext?ext:"");
-	rt /= type;
-	rt /= datafile;
-	return rt.string();
-}
 
 static void createDataDir( const char* type)
 {
@@ -140,8 +164,8 @@ TEST_F( XMLTestFixture, tests)
 	unsigned int ti;
 	for (ti=0; testDescriptions[ti].scriptfile; ti++)
 	{
-		enum {NofBufferSizes=8};
-		static int BufferSize[ NofBufferSizes] = {2,3,4,5,6,7,8,127};
+		enum {NofBufferSizes=5};
+		static int BufferSize[ NofBufferSizes] = {2,3,5,7,127};
 
 		std::string prt_input;
 		std::string ifnam = getDataFile( testDescriptions[ti].datafile, "data");
@@ -155,7 +179,7 @@ TEST_F( XMLTestFixture, tests)
 		iproc::Connection* connection = 0;
 
 		std::string ofnam = getDataFile( testDescriptions[ti].name, "result", ".txt");
-		std::cerr << "write output to file '" << ofnam << "'" << std::endl;
+		std::cerr << "in case of error the output is written to '" << ofnam << "'" << std::endl;
 
 		for (unsigned int ib=0; ib<NofBufferSizes; ib++)
 		{
@@ -183,7 +207,8 @@ TEST_F( XMLTestFixture, tests)
 						(unsigned long)prt_output.size(), (unsigned long)prt_expect.size(), ii,
 						prt_output[ii-2],prt_output[ii-1],prt_output[ii-0],prt_output[ii+1],
 						prt_expect[ii-2],prt_expect[ii-1],prt_expect[ii-0],prt_expect[ii+1]);
-					boost::this_thread::sleep( boost::posix_time::seconds( 10 ));
+
+					boost::this_thread::sleep( boost::posix_time::seconds( 5 ));
 				}
 #endif
 				ASSERT_EQ( prt_expect, prt_output);

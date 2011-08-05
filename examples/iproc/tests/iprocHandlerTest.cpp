@@ -41,6 +41,8 @@
 #include "config/configurationParser.hpp"
 #include "testHandlerTemplates.hpp"
 #include <gtest/gtest.h>
+#define BOOST_FILESYSTEM_VERSION 3
+#include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/thread/thread.hpp>
 
@@ -55,8 +57,12 @@ struct TestConfiguration :public lua::Configuration
 	TestConfiguration( int bufferSizeInput, int bufferSizeOutput)
 		:lua::Configuration( "iproc", "test-iproc")
 	{
+		boost::filesystem::path scriptpath = boost::filesystem::current_path();
+		scriptpath /= "scripts";
+		scriptpath /= "test_echo_char.lua";
+
 		boost::property_tree::ptree pt;
-		pt.put("main", "test_echo_char.lua");
+		pt.put("main", scriptpath.string());
 		pt.put("input_buffer", boost::lexical_cast<std::string>( bufferSizeInput));
 		pt.put("output_buffer", boost::lexical_cast<std::string>( bufferSizeOutput));
 		setCanonicalPathes( ".");

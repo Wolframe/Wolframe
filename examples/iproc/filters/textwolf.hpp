@@ -276,6 +276,31 @@ public:
 ///
 namespace charset {
 
+struct Encoder
+{
+	static bool encode( UChar chr, char* bufptr, unsigned int bufsize)
+	{
+		static const char* HEX = "0123456789abcdef";
+		StaticBuffer buf( bufptr, bufsize);
+		char bb[ 32];
+		unsigned int ii=0;
+		while (chr > 0)
+		{
+			bb[ii++] = HEX[ chr & 0xf];
+			chr /= 16;
+		}
+		buf.push_back( '&');
+		buf.push_back( '#');
+		buf.push_back( 'x');
+		while (ii)
+		{
+			buf.push_back( bb[ --ii]);
+		}
+		buf.push_back( '\0');
+		return !buf.overflow();
+	}
+};
+
 ///\class IsoLatin1
 ///\brief Character set IsoLatin-1
 struct IsoLatin1
@@ -299,7 +324,13 @@ struct IsoLatin1
 	static void print( UChar chr, Buffer_& buf)
 	{
 		char chr_ = (char)(unsigned char)chr;
-		if (chr > 255) chr_ = -1;
+		if (chr > 255)
+		{
+			char tb[ 32];
+			char* cc = tb;
+			Encoder::encode( chr, tb, sizeof(tb));
+			while (*cc) buf.push_back( *cc++);
+		}
 		buf.push_back( chr_);
 	}
 };
@@ -357,8 +388,15 @@ struct UCS2
 	{
 		if (chr>MaxChar)
 		{
-			buf.push_back( -1);
-			buf.push_back( -1);
+			char tb[ 32];
+			char* cc = tb;
+			Encoder::encode( chr, tb, sizeof(tb));
+			while (*cc)
+			{
+				buf.push_back( (UChar)*cc >> Print1shift);
+				buf.push_back( (UChar)*cc >> Print2shift);
+				++cc;
+			}
 		}
 		else
 		{
@@ -565,9 +603,14 @@ private:
 	};
 
 public:
-	static unsigned int asize()							{return 2;}
+	static unsigned int asize()				{return 2;}
 	static unsigned int size( const char* buf)		{return ((buf[ MSB]&0xD8) == 0xD8)?4:2;}
-	static char achar( const char* buf)					{return (buf[MSB])?(char)-1:buf[LSB];}
+	static char achar( const char* buf)
+	{
+		char rt = (buf[MSB])?(char)-1:buf[LSB];
+//[-]std::cout << "MSB[" << (int)MSB << "]=" << (int)buf[MSB] << " LSB[" << (int)LSB << "]=" << (int)buf[LSB] << " rt=" << (int)rt << std::endl; 
+		return rt;
+	}
 
 	///\brief parses a unicode character from its serialization in a buffer
 	///\param [in] buf buffer to parse the character from
@@ -617,8 +660,15 @@ public:
 		}
 		else
 		{
-			buf.push_back( (char)(unsigned char)(0xFF));
-			buf.push_back( (char)(unsigned char)(0xFF));
+			char tb[ 32];
+			char* cc = tb;
+			Encoder::encode( ch, tb, sizeof(tb));
+			while (*cc)
+			{
+				buf.push_back( (char)(unsigned char)(((UChar)*cc >> Print1shift) & 0xFF));
+				buf.push_back( (char)(unsigned char)(((UChar)*cc >> Print2shift) & 0xFF));
+				++cc;
+			}
 		}
 	}
 };
@@ -704,7 +754,7 @@ public:
 			(33,127,Any)
 			(128,255,Undef)
 			('\t',Space)
-			('\r',EndOfLine)
+			('\r',Space)
 			('\n',EndOfLine)
 			(' ',Space)
 			('&',Amp)
@@ -862,10 +912,11 @@ public:
 			int arg;		///< action argument
 		};
 		Action action;			///< action executed after entering this state
+		char nofnext;			///< number of follow states defined
 		char next[ NofControlCharacter];///< follow state fired by an event (control character type parsed)
 
 		///\brief Constructor
-		Element() :fallbackState(-1),missError(-1)
+		Element() :fallbackState(-1),missError(-1),nofnext(0)
 		{
 			action.op = -1;
 			action.arg = 0;
@@ -904,6 +955,7 @@ private:
 		{
 			if (tab[ size-1].next[ inputchr] == -1) tab[ size-1].next[ inputchr] = (unsigned char)nextState;
 		}
+		tab[ size-1].nofnext = NofControlCharacter;
 	}
 
 	///\brief Define a transition for inputchr in the last state defined
@@ -917,6 +969,7 @@ private:
 		if (tab[ size-1].next[ inputchr] != -1)  throw exception( InvalidParam);
 		if (size == 0)  throw exception( InvalidState);
 		tab[ size-1].next[ inputchr] = (unsigned char)nextState;
+		tab[ size-1].nofnext += 1;
 	}
 
 	///\brief Define a self directing transition for inputchr in the last state defined (the state remains the same for this input)
@@ -1033,7 +1086,8 @@ public:
 		ErrExpectedTagAttribute,		///< expected tag attribute
 		ErrExpectedCDATATag,			///< expected CDATA tag definition
 		ErrInternal,				///< internal error (textwolf implementation error)
-		ErrUnexpectedEndOfInput			///< unexpected end of input stream
+		ErrUnexpectedEndOfInput,		///< unexpected end of input stream
+		ErrExpectedEndOfLine			///< expected mandatory end of line (after XML header)
 	};
 
 	///\brief Get the error code as string
@@ -1041,13 +1095,13 @@ public:
 	///\return the error code as string
 	static const char* getErrorString( Error ee)
 	{
-		enum {NofErrors=14};
+		enum {NofErrors=15};
 		static const char* sError[NofErrors]
 			= {0,"ExpectedOpenTag", "ExpectedXMLTag","UnexpectedEndOfText",
 				"OutputBufferTooSmall","SyntaxToken","StringNotTerminated",
 				"UndefinedCharacterEntity","ExpectedTagEnd",
 				"ExpectedEqual", "ExpectedTagAttribute","ExpectedCDATATag","Internal",
-				"UnexpectedEndOfInput"
+				"UnexpectedEndOfInput", "ExpectedEndOfLine"
 		};
 		return sError[(unsigned int)ee];
 	}
@@ -1056,8 +1110,8 @@ public:
 	///\brief Enumeration of states of the XML scanner state machine
 	enum STMState
 	{
-		START, STARTTAG, XTAG, XTAGEND, XTAGAISK, XTAGANAM, XTAGAESK, XTAGAVSK, XTAGAVID, XTAGAVSQ, XTAGAVDQ, XTAGAVQE, CONTENT,
-		TOKEN, XMLTAG, OPENTAG, CLOSETAG, TAGCLSK, TAGAISK, TAGANAM, TAGAESK, TAGAVSK, TAGAVID, TAGAVSQ, TAGAVDQ, TAGAVQE,
+		START, STARTTAG, XTAG, XTAGEND, XTAGEOLN, XTAGDONE, XTAGAISK, XTAGANAM, XTAGAESK, XTAGAVSK, XTAGAVID, XTAGAVSQ, XTAGAVDQ, XTAGAVQE,
+		CONTENT, TOKEN, XMLTAG, OPENTAG, CLOSETAG, TAGCLSK, TAGAISK, TAGANAM, TAGAESK, TAGAVSK, TAGAVID, TAGAVSQ, TAGAVDQ, TAGAVQE,
 		TAGCLIM, ENTITYSL, ENTITY, CDATA, CDATA1, CDATA2, CDATA3, EXIT
 	};
 
@@ -1066,11 +1120,11 @@ public:
 	///\return the state as string
 	static const char* getStateString( STMState s)
 	{
-		enum Constant {NofStates=34};
+		enum Constant {NofStates=36};
 		static const char* sState[NofStates]
 		= {
-			"START", "STARTTAG", "XTAG", "XTAGEND", "XTAGAISK", "XTAGANAM", "XTAGAESK", "XTAGAVSK", "XTAGAVID", "XTAGAVSQ", "XTAGAVDQ", "XTAGAVQE", "CONTENT",
-			"TOKEN", "XMLTAG", "OPENTAG", "CLOSETAG", "TAGCLSK", "TAGAISK", "TAGANAM", "TAGAESK", "TAGAVSK", "TAGAVID", "TAGAVSQ", "TAGAVDQ", "TAGAVQE",
+			"START", "STARTTAG", "XTAG", "XTAGEND", "XTAGEOLN", "XTAGDONE", "XTAGAISK", "XTAGANAM", "XTAGAESK", "XTAGAVSK", "XTAGAVID", "XTAGAVSQ", "XTAGAVDQ", "XTAGAVQE",
+			"CONTENT", "TOKEN", "XMLTAG", "OPENTAG", "CLOSETAG", "TAGCLSK", "TAGAISK", "TAGANAM", "TAGAESK", "TAGAVSK", "TAGAVID", "TAGAVSQ", "TAGAVDQ", "TAGAVQE",
 			"TAGCLIM", "ENTITYSL", "ENTITY", "CDATA", "CDATA1", "CDATA2", "CDATA3", "EXIT"
 		};
 		return sState[(unsigned int)s];
@@ -1104,7 +1158,9 @@ public:
 			[ START    ](EndOfText,EXIT)(EndOfLine)(Cntrl)(Space)(Lt,STARTTAG).miss(ErrExpectedOpenTag)
 			[ STARTTAG ](EndOfLine)(Cntrl)(Space)(Questm,XTAG )(Exclam,ENTITYSL).fallback(OPENTAG)
 			[ XTAG     ].action(ExpectIdentifierXML)(EndOfLine,Cntrl,Space,XTAGAISK)(Questm,XTAGEND).miss(ErrExpectedXMLTag)
-			[ XTAGEND  ].action(Return,HeaderEnd)(Gt,CONTENT)(EndOfLine)(Cntrl)(Space).miss(ErrExpectedTagEnd)
+			[ XTAGEND  ](Gt,XTAGEOLN)(EndOfLine)(Cntrl)(Space).miss(ErrExpectedTagEnd)
+			[ XTAGEOLN ](EndOfLine,XTAGDONE)(Cntrl)(Space).miss(ErrExpectedEndOfLine)
+			[ XTAGDONE ].action(Return,HeaderEnd).fallback(CONTENT)
 			[ XTAGAISK ](EndOfLine)(Cntrl)(Space)(Questm,XTAGEND).fallback(XTAGANAM)
 			[ XTAGANAM ].action(ReturnIdentifier,HeaderAttribName)(EndOfLine,Cntrl,Space,XTAGAESK)(Equal,XTAGAVSK).miss(ErrExpectedEqual)
 			[ XTAGAESK ](EndOfLine)(Cntrl)(Space)(Equal,XTAGAVSK).miss(ErrExpectedEqual)
@@ -1729,6 +1785,7 @@ public:
 	ScannerStatemachine::Element* getState()
 	{
 		static Statemachine STM;
+//[-]std::cout << "state " << XMLScannerBase::getStateString( state) << std::endl; 
 		return STM.get( state);
 	}
 
@@ -1800,26 +1857,35 @@ public:
 				else
 				{
 					rt = (ElementType)sd->action.arg;
-					if (rt == Exit)
+				}
+				if (sd->nofnext == 0)
+				{
+					if (sd->fallbackState != -1)
 					{
-						return rt;
+//[-]std::cout << "fallback " << sd->fallbackState << std::endl;
+						state = (STMState)sd->fallbackState;
 					}
+					return rt;
 				}
 			}
 			ch = m_src.control();
+//[-]std::cout << "char " << ControlCharacterM::name( ch) << " (" << (int)ch << ")" << std::endl; 			
 			tokstate.id = TokState::Start;
 
 			if (sd->next[ ch] != -1)
 			{
 				state = (STMState)sd->next[ ch];
+//[-]std::cout << "next state " << XMLScannerBase::getStateString( state) << std::endl; 
 				m_src.skip();
 			}
 			else if (sd->fallbackState != -1)
 			{
+//[-]std::cout << "fallback " << sd->fallbackState << std::endl; 
 				state = (STMState)sd->fallbackState;
 			}
 			else if (sd->missError != -1)
 			{
+//[-]std::cout << "miss " << sd->missError << std::endl; 
 				error = (Error)sd->missError;
 				return ErrorOccurred;
 			}

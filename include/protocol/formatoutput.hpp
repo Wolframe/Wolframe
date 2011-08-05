@@ -130,16 +130,12 @@ struct FormatOutput :public OutputBlock
 	///\return the current cursor position (where to print the next element to)
 	void* cur() const			{return (void*)(charptr()+pos());}
 
-	///\brief Prints an end of line marker to output
-	///\return true if success, false else
-	virtual bool printEOL()=0;
-
 	///\brief Print the next element to the buffer
 	///\param [in] type type of element to print
 	///\param [in] element content of element to print
 	///\param [in] elementsize size of element to print in bytes
 	///\return true, on success, false, if failed
-	virtual bool print( ElementType type, const void* element, size_type elementsize)=0;
+	virtual bool print( ElementType type, const void* element, size_type elementsize, bool newLine=false)=0;
 
 	///\brief Get error code in case of error state
 	///\return the error code

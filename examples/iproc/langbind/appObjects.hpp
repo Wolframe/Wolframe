@@ -68,8 +68,9 @@ struct Output
 	///\param[in] e1size first element size
 	///\param[in] e2 second element
 	///\param[in] e2size second element size
+	///\param[in] newline true, if the printed item should start on a new line (for splitting lines to serve line buffering clients)
 	///\return state returned
-	ItemType print( const char* e1, unsigned int e1size, const char* e2, unsigned int e2size);
+	ItemType print( const char* e1, unsigned int e1size, const char* e2, unsigned int e2size, bool newline);
 
 public:
 	protocol::FormatOutputR m_formatoutput;	///< format output reference
