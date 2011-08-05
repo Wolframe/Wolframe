@@ -124,7 +124,6 @@ private:
 	/// Back link to global context
 	const WolframeHandler&		m_globalCtx;
 ///*************
-	db::Database*			m_db;
 	AAAA::Authenticator*		m_authentication;
 //	AAAA::Authorizer*		m_authorization;
 //	AAAA::Auditor*			m_audit;

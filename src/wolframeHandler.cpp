@@ -85,16 +85,15 @@ wolframeConnection::wolframeConnection( const WolframeHandler& context,
 
 	// Initialize various channel processors to start-up values
 	m_authentication = NULL;
-	// Get the database connection from the begining
-	// as it might be necessary for further checks
-//	m_db = m_globalCtx.db().channel();
 }
 
 
 wolframeConnection::~wolframeConnection()
 {
-	if ( m_authentication )	m_authentication->close();
-	if ( m_db )		m_db->close();
+	if ( m_authentication )	{
+		m_authentication->close();
+		m_authentication = NULL;
+	}
 
 	LOG_TRACE << "Connection handler destroyed";
 }
