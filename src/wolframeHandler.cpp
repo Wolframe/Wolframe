@@ -94,7 +94,8 @@ wolframeConnection::wolframeConnection( const WolframeHandler& context,
 wolframeConnection::~wolframeConnection()
 {
 	if ( m_authentication )	m_authentication->close();
-	if ( m_db )		m_db->close();
+// Aba: avoid segfault temporarily
+//	if ( m_db )		m_db->close();
 
 	LOG_TRACE << "Connection handler destroyed";
 }

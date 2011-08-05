@@ -1258,6 +1258,17 @@ endif
 
 endif
 
+ifeq "$(PLATFORM)" "FREEBSD"
+ifeq "$(OS_MAJOR_VERSION)" "8"
+LIBXSLT_DIR ?= /usr/local
+LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
+LIBXSLT_INCLUDE_DIRS = -I$(LIBXSLT_INCLUDE_DIR)
+LIBXSLT_LIB_DIR ?= $(LIBXSLT_DIR)/lib
+LIBXSLT_LIB_DIRS = -L$(LIBXSLT_LIB_DIR)
+LIBXSLT_LIBS ?= -lxslt
+endif
+endif
+
 endif
 
 
