@@ -281,7 +281,8 @@ SLES 11 SP1
 -----------
 
 Optional packages: libqt4-devel (4.6.2), pam-devel (1.0.4), cyrus-sasl-devel (2.1.22),
-                   sqlite3-devel (3.6.4), postgresql-devel (8.3.9)
+                   sqlite3-devel (3.6.4), postgresql-devel (8.3.9), libxml2-devel (2.7.6),
+                   libxslt (1.1.24)
 
 boost is 1.36, compile your own one.
 
