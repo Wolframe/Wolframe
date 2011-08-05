@@ -65,15 +65,15 @@ struct TestDescription
 
 static const TestDescription testDescriptions[] =
 {
-//	{
-//		"echo_xml_utf16_to_utf8",
-//		"test_echo_xml_utf8",
-//		"test_UTF16.xml", 64
-//	},
 	{
 		"echo_xml_IsoLatin1_to_utf16",
 		"test_echo_xml_utf16",
 		"test_IsoLatin1.xml", 64
+	},
+	{
+		"echo_xml_utf16_to_utf8",
+		"test_echo_xml_utf8",
+		"test_UTF16.xml", 64
 	},
 	{
 		"echo_xml_IsoLatin1_to_utf8",

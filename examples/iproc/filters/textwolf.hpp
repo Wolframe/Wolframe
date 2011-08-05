@@ -170,7 +170,17 @@ public:
 
 	///\brief Append one character
 	///\param[in] ch the character to append
-	void push_back( char ch)		{if (m_pos<m_size) m_ar[m_pos++]=ch; else m_overflow=true;}
+	void push_back( char ch)
+	{
+		if (m_pos < m_size)
+		{
+			m_ar[m_pos++] = ch;
+		}
+		else
+		{
+			m_overflow = true;
+		}
+	}
 
 	///\brief Return the number of characters in the buffer
 	///\return the number of characters (bytes)
@@ -608,7 +618,6 @@ public:
 	static char achar( const char* buf)
 	{
 		char rt = (buf[MSB])?(char)-1:buf[LSB];
-//[-]std::cout << "MSB[" << (int)MSB << "]=" << (int)buf[MSB] << " LSB[" << (int)LSB << "]=" << (int)buf[LSB] << " rt=" << (int)rt << std::endl; 
 		return rt;
 	}
 
@@ -1785,7 +1794,6 @@ public:
 	ScannerStatemachine::Element* getState()
 	{
 		static Statemachine STM;
-//[-]std::cout << "state " << XMLScannerBase::getStateString( state) << std::endl; 
 		return STM.get( state);
 	}
 
@@ -1862,30 +1870,25 @@ public:
 				{
 					if (sd->fallbackState != -1)
 					{
-//[-]std::cout << "fallback " << sd->fallbackState << std::endl;
 						state = (STMState)sd->fallbackState;
 					}
 					return rt;
 				}
 			}
 			ch = m_src.control();
-//[-]std::cout << "char " << ControlCharacterM::name( ch) << " (" << (int)ch << ")" << std::endl; 			
 			tokstate.id = TokState::Start;
 
 			if (sd->next[ ch] != -1)
 			{
 				state = (STMState)sd->next[ ch];
-//[-]std::cout << "next state " << XMLScannerBase::getStateString( state) << std::endl; 
 				m_src.skip();
 			}
 			else if (sd->fallbackState != -1)
 			{
-//[-]std::cout << "fallback " << sd->fallbackState << std::endl; 
 				state = (STMState)sd->fallbackState;
 			}
 			else if (sd->missError != -1)
 			{
-//[-]std::cout << "miss " << sd->missError << std::endl; 
 				error = (Error)sd->missError;
 				return ErrorOccurred;
 			}

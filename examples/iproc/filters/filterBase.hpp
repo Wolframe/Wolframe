@@ -106,7 +106,6 @@ public:
 			if (m_gen->gotEoD()) return 0;
 			throw EoM();
 		}
-//[-]std::cout << "read " << (int)*(char*)m_gen->ptr() << std::endl;
 
 		return *(char*)m_gen->ptr();
 	}
@@ -114,7 +113,6 @@ public:
 	///\brief prefix increment operator (required by textwolf for an input iterator)
 	SrcIterator& operator++()
 	{
-//[-]std::cout << "skip" << std::endl;
 		m_gen->skip(1);
 		return *this;
 	}
