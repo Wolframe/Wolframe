@@ -106,12 +106,15 @@ public:
 			if (m_gen->gotEoD()) return 0;
 			throw EoM();
 		}
+//[-]std::cout << "read " << (int)*(char*)m_gen->ptr() << std::endl;
+
 		return *(char*)m_gen->ptr();
 	}
 
 	///\brief prefix increment operator (required by textwolf for an input iterator)
 	SrcIterator& operator++()
 	{
+//[-]std::cout << "skip" << std::endl;
 		m_gen->skip(1);
 		return *this;
 	}
@@ -135,6 +138,7 @@ struct FilterBase
 	typedef std::size_t size_type;
 	typedef protocol::EscapingBuffer<textwolf::StaticBuffer> BufferType;
 
+	///\brief Prints a character string to an STL back insertion sequence buffer in the IO character set encoding
 	///\param [in] src pointer to string to print
 	///\param [in] srcsize size of src in bytes
 	///\param [in,out] buf buffer to print to
@@ -151,7 +155,17 @@ struct FilterBase
 		}
 	}
 
-	///\brief prints a character to an STL back insertion sequence buffer in the IO character set encoding
+	///\brief Prints an end of line marker (EOL) to an STL back insertion sequence buffer in the IO character set encoding
+	///\param [in] ch character to print
+	///\param [in,out] buf buffer to print to
+	static void printToBufferEOL( BufferType& buf)
+	{
+		static const char* str =  protocol::EndOfLineMarker::value();
+		static unsigned int len = protocol::EndOfLineMarker::size();
+		printToBuffer( str, len, buf);
+	}
+
+	///\brief Prints a character to an STL back insertion sequence buffer in the IO character set encoding
 	///\param [in] ch character to print
 	///\param [in,out] buf buffer to print to
 	static void printToBuffer( char ch, BufferType& buf)

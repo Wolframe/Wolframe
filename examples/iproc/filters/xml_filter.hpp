@@ -120,30 +120,13 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 			return new FormatOutput( *this);
 		}
 
-		///\brief Implementation of protocol::FormatOutput::printEOL()
-		///\return true if success, false else
-		virtual bool printEOL()
-		{
-			EscBufferType buf( rest(), restsize(), m_bufstate);
-
-			const char* e =  protocol::EndOfLineMarker::value();
-			unsigned int s = protocol::EndOfLineMarker::size();
-			ThisFilterBase::printToBuffer( e, s, buf);
-			if (buf.overflow())
-			{
-				setState( EndOfBuffer);
-				return false;
-			}
-			incPos( buf.size());
-			m_bufstate = buf.state();
-			return true;
-		}
- 
 		///\brief Implementation of protocol::FormatOutput::print(ElementType,const void*,size_type)
 		///\param [in] type type of the element to print
 		///\param [in] element pointer to the element to print
 		///\param [in] elementsize size of the element to print in bytes
-		virtual bool print( ElementType type, const void* element, size_type elementsize)
+		///\param [in] newline true, if the printed item should start on a new line
+		///\return true, if success, false else
+		virtual bool print( ElementType type, const void* element, size_type elementsize, bool newline)
 		{
 			EscBufferType buf( rest(), restsize(), m_bufstate);
 
@@ -156,6 +139,10 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 					if (m_pendingOpenTag == true)
 					{
 						ThisFilterBase::printToBuffer( '>', buf);
+					}
+					if (newline)
+					{
+						ThisFilterBase::printToBufferEOL( buf);
 					}
 					ThisFilterBase::printToBuffer( '<', buf);
 					ThisFilterBase::printToBuffer( (const char*)element, elementsize, buf);
@@ -181,8 +168,16 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 					if (!m_pendingOpenTag)
 					{
 						setState( Error, ErrIllegalOperation);
+						return false;
 					}
-					ThisFilterBase::printToBuffer( ' ', buf);
+					if (newline)
+					{
+						ThisFilterBase::printToBufferEOL( buf);
+					}
+					else
+					{
+						ThisFilterBase::printToBuffer( ' ', buf);
+					}
 					ThisFilterBase::printToBuffer( (const char*)element, elementsize, buf);
 					ThisFilterBase::printToBuffer( '=', buf);
 
@@ -223,6 +218,14 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 						if (m_pendingOpenTag == true)
 						{
 							ThisFilterBase::printToBuffer( '>', buf);
+							if (newline)
+							{
+								ThisFilterBase::printToBufferEOL( buf);
+							}
+						}
+						else if (newline)
+						{
+							ThisFilterBase::printToBufferEOL( buf);
 						}
 						else
 						{
@@ -252,6 +255,7 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 					{
 						ThisFilterBase::printToBuffer( '?', buf);
 						ThisFilterBase::printToBuffer( '>', buf);
+						ThisFilterBase::printToBufferEOL( buf);
 					}
 					else if (m_pendingOpenTag == true)
 					{
@@ -260,6 +264,10 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 					}
 					else
 					{
+						if (newline)
+						{
+							ThisFilterBase::printToBufferEOL( buf);
+						}
 						ThisFilterBase::printToBuffer( '<', buf);
 						ThisFilterBase::printToBuffer( '/', buf);
 						ThisFilterBase::printToBuffer( (const char*)cltag, cltagsize, buf);
@@ -294,7 +302,7 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 			{
 				unsigned int ii = 0;
 				const char* tt = estr[ cc-echr];
-				while (cc[ii]) IOCharset::print( tt[ii++], buf);
+				while (tt[ii]) IOCharset::print( tt[ii++], buf);
 			}
 			else
 			{

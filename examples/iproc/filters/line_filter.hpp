@@ -75,36 +75,24 @@ struct LineFilter :FilterBase<IOCharset, AppCharset>
 			return new FormatOutput( *this);
 		}
 
-		///\brief Implementation of protocol::FormatOutput::printEOL()
-		///\return true if success, false else
-		virtual bool printEOL()
-		{
-			EscBufferType buf( rest(), restsize(), m_bufstate);
-
-			const char* e =  protocol::EndOfLineMarker::value();
-			unsigned int s = protocol::EndOfLineMarker::size();
-			ThisFilterBase::printToBuffer( e, s, buf);
-			if (buf.overflow())
-			{
-				setState( EndOfBuffer);
-				return false;
-			}
-			incPos( buf.size());
-			m_bufstate = buf.state();
-			return true;
-		}
-
 		///\brief Implementation of protocol::FormatOutput::print(ElementType,const void*,size_type)
 		///\param [in] type type of the element to print
 		///\param [in] element pointer to the element to print
 		///\param [in] elementsize size of the element to print in bytes
-		virtual bool print( ElementType type, const void* element, size_type elementsize)
+		///\param [in] newline true, if the printed item should start after an extra empty line
+		///\return true, if success, false else
+		///\remark the last parameter (newline) is not needed for line break on this filter. It is automatically done. With newline an extra empty line is printed
+		virtual bool print( ElementType type, const void* element, size_type elementsize, bool newline)
 		{
 			if (type == Value)
 			{
 				EscBufferType buf( rest(), restsize(), m_bufstate);
+				if (newline)
+				{
+					ThisFilterBase::printToBufferEOL( buf);
+				}
 				ThisFilterBase::printToBuffer( (const char*)element, elementsize, buf);
-				ThisFilterBase::printToBuffer( protocol::EndOfLineMarker::value(), protocol::EndOfLineMarker::size(), buf);
+				ThisFilterBase::printToBufferEOL( buf);
 				if (buf.overflow())
 				{
 					setState( EndOfBuffer);

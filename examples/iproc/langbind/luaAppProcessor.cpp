@@ -267,7 +267,7 @@ static const char* get_printop( lua_State* ls, int index, std::size_t& size)
 	return rt;
 }
 
-static int function_output_print( lua_State* ls)
+static int output_print( lua_State* ls, bool newline)
 {
 	for (;;)
 	{
@@ -292,7 +292,7 @@ static int function_output_print( lua_State* ls)
 		{
 			return luaL_error( ls, "too many arguments in call of format output print");
 		}
-		switch (output->print( item[1]/*tag*/, itemsize[1], item[0]/*val*/, itemsize[0]))
+		switch (output->print( item[1]/*tag*/, itemsize[1], item[0]/*val*/, itemsize[0], newline))
 		{
 			case Output::DoYield:
 				lua_yield( ls, 0);
@@ -310,28 +310,14 @@ static int function_output_print( lua_State* ls)
 	}
 }
 
+static int function_output_print( lua_State* ls)
+{
+	return output_print( ls, false);
+}
+
 static int function_output_println( lua_State* ls)
 {
-	function_output_print( ls);
-	for (;;)
-	{
-		Output* output = LuaObject<Output>::getSelf( ls, "output", "println");
-		switch (output->print( 0/*tag*/, 0, protocol::EndOfLineMarker::value()/*val*/, protocol::EndOfLineMarker::size()))
-		{
-			case Output::DoYield:
-				lua_yield( ls, 0);
-				continue;
-
-			case Output::Error:
-				luaL_error( ls, "error in format output println (%d)", output->m_formatoutput->getError());
-				return 0;
-
-			case Output::Data:
-				return 0;
-		}
-		luaL_error( ls, "illegal state produced by format output println");
-		return 0;
-	}
+	return output_print( ls, true);
 }
 
 static int function_filter( lua_State* ls)
@@ -515,6 +501,11 @@ AppProcessor::~AppProcessor()
 
 static AppProcessor::CallResult getYieldState( protocol::InputFilter* in, protocol::FormatOutput* fo, const char* methodName)
 {
+	if (!fo)
+	{
+		LOG_ERROR << "no output specified";
+		return AppProcessor::Error;
+	}
 	if (fo->getError())
 	{
 		LOG_ERROR << "error " << fo->getError() << ") in format output when calling '" << methodName << "'";
