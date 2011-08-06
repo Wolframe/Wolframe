@@ -191,7 +191,9 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 			else {
 				memmove( m_readBuf.ptr(), m_dataStart, m_dataSize );
 				m_state = READ_INPUT;
-				return net::NetworkOperation( net::ReadData( m_readBuf.ptr() + m_dataSize,
+				// Aba: Windows: wolframeHandler.cpp(194) : error C2036: 'void *' : unknown size,
+				// fixed temporarily with an ugly cast. Please check.
+				return net::NetworkOperation( net::ReadData( (char *)m_readBuf.ptr() + m_dataSize,
 									     m_readBuf.size() - m_dataSize,
 									     30 ));
 			}

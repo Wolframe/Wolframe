@@ -403,7 +403,10 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		size_type m_tagstksize;				///< size of tag stack buffer in bytes
 		size_type m_tagstkpos;				///< used size of tag stack buffer in bytes
 		XMLState m_xmlstate;				///< current state of output
-		int m_pendingOpenTag;				///< true if last open tag instruction has not been ended yet
+		// Aba: was an int before, gives tons of error messages like:
+		// warning C4805: '==' : unsafe mix of type 'int' and type 'bool' in operation,
+		// I think bool is the right choice here..
+		bool m_pendingOpenTag;				///< true if last open tag instruction has not been ended yet
 		typename EscBufferType::State m_bufstate;	///< state of escaping the output
 	};
 
