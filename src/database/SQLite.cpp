@@ -88,8 +88,8 @@ void SQLiteConfig::setCanonicalPathes( const std::string& refPath )
 
 
 //***  SQLite database functions  *******************************************
-SQLiteDatabase::SQLiteDatabase(  const std::string& id,
-				 const std::string& filename, unsigned short connections, bool flag )
+SQLiteDatabase::SQLiteDatabase( const std::string& id,
+				const std::string& filename, unsigned short connections, bool flag )
 	: m_ID( id ), m_filename( filename ), m_flag( flag )
 {
 	for( int i = 0; i < connections; i++ ) {
@@ -100,7 +100,7 @@ SQLiteDatabase::SQLiteDatabase(  const std::string& id,
 		}
 
 		m_connections.push_back( handle );
-		m_connPool.add( &handle );
+		m_connPool.add( handle );
 	}
 
 	LOG_NOTICE << "SQLite database '" << m_ID << "' created with "
@@ -110,52 +110,52 @@ SQLiteDatabase::SQLiteDatabase(  const std::string& id,
 SQLiteDatabase::~SQLiteDatabase( )
 {
 	while( m_connPool.available( ) > 0 ) {
-		sqlite3 **handle = m_connPool.get( );
-		sqlite3_close( *handle );
+		sqlite3 *handle = m_connPool.get( );
+		sqlite3_close( handle );
 	}
 
 	LOG_DEBUG << "SQLite database '" << m_ID << "' destroyed with "
-		   << "filename '" << m_filename << "'";
+		  << "filename '" << m_filename << "'";
 }
 
 bool SQLiteDatabase::doTransaction( DatabaseRequest &request, DatabaseAnswer &answer,
-			    unsigned short timeout, unsigned short retries )
+				    unsigned short timeout, unsigned short retries )
 {
-/*
+	/*
 // check if user is in the sqlite table
 #if SQLITE_VERSION_NUMBER >= 3005000
-			rc = sqlite3_prepare_v2( m_db, sql.c_str( ), -1, &stmt, &tail );
+   rc = sqlite3_prepare_v2( m_db, sql.c_str( ), -1, &stmt, &tail );
 #else
-			rc = sqlite3_prepare( m_db, sql.c_str( ), -1, &stmt, &tail );
+   rc = sqlite3_prepare( m_db, sql.c_str( ), -1, &stmt, &tail );
 #endif
-			if( rc != SQLITE_OK ) {
-				std::ostringstream oss;
-				oss << "Unable to prepare SQL statement '" << sql << ": " << sqlite3_errmsg( m_db );
-				throw std::runtime_error( oss.str( ) );
-			}
+   if( rc != SQLITE_OK ) {
+    std::ostringstream oss;
+    oss << "Unable to prepare SQL statement '" << sql << ": " << sqlite3_errmsg( m_db );
+    throw std::runtime_error( oss.str( ) );
+   }
 
-			rc = sqlite3_bind_text( stmt, 1, m_login.c_str( ), m_login.length( ), SQLITE_STATIC );
-			if( rc != SQLITE_OK ) {
-				std::ostringstream oss;
-				oss << "Unable to bind parameter login in '" << sql << ": " << sqlite3_errmsg( m_db );
-				throw std::runtime_error( oss.str( ) );
-			}
+   rc = sqlite3_bind_text( stmt, 1, m_login.c_str( ), m_login.length( ), SQLITE_STATIC );
+   if( rc != SQLITE_OK ) {
+    std::ostringstream oss;
+    oss << "Unable to bind parameter login in '" << sql << ": " << sqlite3_errmsg( m_db );
+    throw std::runtime_error( oss.str( ) );
+   }
 
-			rc = sqlite3_step( stmt );
-			if( rc == SQLITE_DONE ) {
-				m_state = _Wolframe_DB_SQLITE3_STATE_NEED_LOGIN;
-				goto FAIL;
-			} else if( rc == SQLITE_ROW ) {
-				pass = (const char *)sqlite3_column_text( stmt, 0 );
-			}
+   rc = sqlite3_step( stmt );
+   if( rc == SQLITE_DONE ) {
+    m_state = _Wolframe_DB_SQLITE3_STATE_NEED_LOGIN;
+    goto FAIL;
+   } else if( rc == SQLITE_ROW ) {
+    pass = (const char *)sqlite3_column_text( stmt, 0 );
+   }
 
 // user found, but password doesn't match
-			if( strcmp( pass, m_pass.c_str( ) ) != 0 ) {
-				m_state = _Wolframe_DB_SQLITE3_STATE_NEED_LOGIN;
-				goto FAIL;
-			}
+   if( strcmp( pass, m_pass.c_str( ) ) != 0 ) {
+    m_state = _Wolframe_DB_SQLITE3_STATE_NEED_LOGIN;
+    goto FAIL;
+   }
 
-			sqlite3_finalize( stmt );
+   sqlite3_finalize( stmt );
 */
 	return true;
 }
