@@ -112,12 +112,12 @@ protected:
 	int					noThreads;
 	std::vector< boost::thread* >		threads;
 	std::vector< testObject* >		tstObjs;
-	_Wolframe::ObjectPool< testObject >	objPool;
+	_Wolframe::ObjectPool< testObject* >	objPool;
 	unsigned				poolSize;
 	unsigned long				times;
 
 public:
-	static void testThread( _Wolframe::ObjectPool< testObject > *pool, unsigned count )
+	static void testThread( _Wolframe::ObjectPool< testObject* > *pool, unsigned count )
 	{
 		for ( std::size_t i = 0; i < count; )	{
 			testObject *tstObj = pool->get();
@@ -129,7 +129,7 @@ public:
 		}
 	}
 
-	static void sleepTestThread( _Wolframe::ObjectPool< testObject > *pool, unsigned count )
+	static void sleepTestThread( _Wolframe::ObjectPool< testObject* > *pool, unsigned count )
 	{
 		for ( std::size_t i = 0; i < count; )	{
 			testObject *tstObj = pool->get();

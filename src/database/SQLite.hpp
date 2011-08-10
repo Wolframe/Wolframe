@@ -84,7 +84,7 @@ private:
 	const std::string	m_filename;
 	bool			m_flag;
 	std::list< sqlite3* >	m_connections;		//< list of DB connections
-	ObjectPool< sqlite3 >	m_connPool;		//< pool of connections
+	ObjectPool< sqlite3* >	m_connPool;		//< pool of connections
 };
 
 

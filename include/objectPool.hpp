@@ -59,11 +59,11 @@ public:
 
 	std::size_t available()		{ return m_availList.size(); }
 
-	objectType* get()	{
+	objectType get()	{
 		while( true )	{
 			boost::unique_lock<boost::mutex> lock( m_mutex );
 			if ( !m_availList.empty())	{
-				objectType* obj = m_availList.back();
+				objectType obj = m_availList.back();
 				m_availList.pop_back();
 				lock.unlock();
 				return obj;
@@ -85,7 +85,7 @@ public:
 		return NULL;
 	}
 
-	void add ( objectType* obj )	{
+	void add ( objectType obj )	{
 		boost::lock_guard<boost::mutex> lock( m_mutex );
 		m_availList.push_back( obj );
 		m_cond.notify_one();
@@ -94,7 +94,7 @@ public:
 	unsigned timeout()		{ return m_timeout; }
 	void timeout( unsigned to )	{ m_timeout = to; }
 private:
-	std::vector< objectType* >	m_availList;	///< list (vector really) of available objects
+	std::vector< objectType >	m_availList;	///< list (vector really) of available objects
 	boost::mutex			m_mutex;	///< condition variable associated mutex
 	boost::condition_variable	m_cond;		///< the condition variable
 	unsigned			m_timeout;	///< acquire timeout
