@@ -1,6 +1,7 @@
 MBa:
 
 - SSL must require certificate from peer if verify is on
+- * in network interface definition should add BOTH ipv4 and ipv6 IPs
 
 
 ABa:

@@ -43,30 +43,38 @@ namespace _Wolframe {
 namespace db {
 
 enum TransactionType	{
-	AUTHENTICATION,
-	AUTHORIZATION,
-	CLIENT_CONFIG,
-	OPERATION
+        AUTHENTICATION,
+        AUTHORIZATION,
+        CLIENT_CONFIG,
+        OPERATION
 };
+
+
+enum DatabaseOperation	{
+        INSERT,
+        DELETE,
+        UPDATE
+};
+
 
 /// base class for database request
 class DatabaseRequest
 {
 public:
-	virtual ~DatabaseRequest()			{}
-	virtual TransactionType type() const = 0;
+        virtual ~DatabaseRequest()			{}
+        virtual TransactionType type() const = 0;
 };
 
 /// base class for database answer
 class DatabaseAnswer
 {
 public:
-	enum AnswerType	{
-		USER_PASSWORD
-	};
+        enum AnswerType	{
+                USER_PASSWORD
+        };
 
-	virtual ~DatabaseAnswer()			{}
-	virtual TransactionType type() const = 0;
+        virtual ~DatabaseAnswer()			{}
+        virtual TransactionType type() const = 0;
 };
 
 
@@ -76,30 +84,30 @@ public:
 class Database
 {
 public:
-	virtual ~Database()				{}
+        virtual ~Database()				{}
 
-	/// Database identification.
-	/// All databases must have an identifier as they are referenced using this identifier.
-	/// The identifier must be unique (of course).
-	virtual const std::string& ID() const = 0;
+        /// Database identification.
+        /// All databases must have an identifier as they are referenced using this identifier.
+        /// The identifier must be unique (of course).
+        virtual const std::string& ID() const = 0;
 
-	/// Database type (module type).
-	/// All database implementations need a type (name).
-	/// Type names should be unique.
-	virtual const char* typeName() const = 0;
+        /// Database type (module type).
+        /// All database implementations need a type (name).
+        /// Type names should be unique.
+        virtual const char* typeName() const = 0;
 
-	/// Perform a database transaction.
-	virtual bool doTransaction( DatabaseRequest& request, DatabaseAnswer& answer,
-				    unsigned short timeout, unsigned short retries ) = 0;
-	/* NOTE */
-	/* There should be a connection to the auditing system somewhere */
+        /// Perform a database transaction.
+        virtual bool doTransaction( DatabaseRequest& request, DatabaseAnswer& answer,
+                                    unsigned short timeout, unsigned short retries ) = 0;
+        /* NOTE */
+        /* There should be a connection to the auditing system somewhere */
 
-	/* we should also decide how we handle db encoding
-	virtual const char* encoding() const = 0; */
+        /* we should also decide how we handle db encoding
+        virtual const char* encoding() const = 0; */
 
-	/// Close the database connetion
-	/// This exists for no good reason (mostly to make code look uniform)
-	virtual void close()	{}
+        /// Close the database connetion
+        /// This exists for no good reason (mostly to make code look uniform)
+        virtual void close()	{}
 };
 
 }} // namespace _Wolframe::db
