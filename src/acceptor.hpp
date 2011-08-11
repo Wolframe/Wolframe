@@ -55,7 +55,7 @@ namespace net {
 /// acceptor class of the Wolframe network server.
 class acceptor: private boost::noncopyable
 {
-/// public interface
+	/// public interface
 public:
 	/// Constructor
 	explicit acceptor( boost::asio::io_service& IOservice,
@@ -69,7 +69,7 @@ public:
 	/// Stop the acceptor. Outstanding asynchronous operations will be completed.
 	void stop();
 
-/// private functions of the server
+	/// private functions of the server
 private:
 	/// Handle completion of an asynchronous accept operation.
 	void handleAccept( const boost::system::error_code& e );
@@ -77,16 +77,16 @@ private:
 	/// Handle a request to stop the server.
 	void handleStop();
 
-/// object variables
-	boost::asio::io_service&		IOservice_;	// The io_service used to perform asynchronous operations.
-	boost::asio::io_service::strand		strand_;	// Strand to ensure the acceptor's handlers are not called concurrently.
-	boost::asio::ip::tcp::acceptor		acceptor_;	// Acceptor(s) used to listen for incoming connections.
-	connection_ptr				newConnection_;	// The next connection to be accepted.
-	SocketConnectionList<connection_ptr>	connList_;	// List of active connections
+	/// object variables
+	boost::asio::io_service&		m_IOservice;	// The io_service used to perform asynchronous operations.
+	boost::asio::io_service::strand		m_strand;	// Strand to ensure the acceptor's handlers are not called concurrently.
+	boost::asio::ip::tcp::acceptor		m_acceptor;	// Acceptor(s) used to listen for incoming connections.
+	connection_ptr				m_newConnection;// The next connection to be accepted.
+	SocketConnectionList<connection_ptr>	m_connList;	// List of active connections
 
-	std::string				identifier_;
+	std::string				m_identifier;
 
-	_Wolframe::ServerHandler&			srvHandler_;	// The handler for all incoming requests.
+	_Wolframe::ServerHandler&		m_srvHandler;	// The handler for all incoming requests.
 };
 
 
@@ -95,7 +95,7 @@ private:
 /// SSL acceptor class of the Wolframe network server.
 class SSLacceptor: private boost::noncopyable
 {
-/// public interface
+	/// public interface
 public:
 	/// Construct the acceptor
 	explicit SSLacceptor( boost::asio::io_service& IOservice,
@@ -114,7 +114,7 @@ public:
 	/// Get a password from the console (i.e. SSL key password)
 	std::string getPassword();
 
-/// private functions of the server
+	/// private functions of the server
 private:
 	/// Handle completion of an asynchronous accept operation.
 	void handleAccept( const boost::system::error_code& e );
@@ -122,17 +122,17 @@ private:
 	/// Handle a request to stop the server.
 	void handleStop();
 
-/// object variables
-	boost::asio::io_service&		IOservice_;	// The io_service used to perform asynchronous operations.
-	boost::asio::io_service::strand		strand_;	// Strand to ensure the acceptor's handlers are not called concurrently.
-	boost::asio::ip::tcp::acceptor		acceptor_;	// Acceptor(s) used to listen for incoming connections.
-	boost::asio::ssl::context		SSLcontext_;	/// SSL acceptor server context
-	SSLconnection_ptr			newConnection_;	// The next connection to be accepted.
-	SocketConnectionList<SSLconnection_ptr>	connList_;	// List of active connections
+	/// object variables
+	boost::asio::io_service&		m_IOservice;	// The io_service used to perform asynchronous operations.
+	boost::asio::io_service::strand		m_strand;	// Strand to ensure the acceptor's handlers are not called concurrently.
+	boost::asio::ip::tcp::acceptor		m_acceptor;	// Acceptor(s) used to listen for incoming connections.
+	boost::asio::ssl::context		m_SSLcontext;	// SSL acceptor server context
+	SSLconnection_ptr			m_newConnection;// The next connection to be accepted.
+	SocketConnectionList<SSLconnection_ptr>	m_connList;	// List of active connections
 
-	std::string				identifier_;
+	std::string				m_identifier;
 
-	_Wolframe::ServerHandler&			srvHandler_;	// The handler for all incoming requests.
+	_Wolframe::ServerHandler&		m_srvHandler;	// The handler for all incoming requests.
 };
 
 #endif // WITH_SSL

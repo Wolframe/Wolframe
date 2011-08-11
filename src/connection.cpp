@@ -198,7 +198,7 @@ void SSLconnection::handleHandshake( const boost::system::error_code& e )
 	}
 	else	{
 		LOG_DEBUG << e.message() << ", SSL handshake, peer " << identifier();
-//		delete this;
+		//		delete this;
 		boost::system::error_code ignored_ec;
 		socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
 	}

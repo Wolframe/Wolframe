@@ -142,7 +142,7 @@ protected:
 									      boost::asio::placeholders::error,
 									      boost::asio::placeholders::bytes_transferred )));
 		}
-		break;
+			break;
 
 		case NetworkOperation::WRITE:	{
 			LOG_TRACE << "Next operation: WRITE " << netOp.size() << " bytes to " << identifier();
@@ -162,7 +162,7 @@ protected:
 									      this->shared_from_this(),
 									      boost::asio::placeholders::error )));
 		}
-		break;
+			break;
 
 		case NetworkOperation::CLOSE:	{
 			LOG_TRACE << "Next operation: CLOSE connection to " << identifier();
@@ -175,7 +175,7 @@ protected:
 			}
 			unregister();
 		}
-		break;
+			break;
 		}
 	}
 

@@ -52,54 +52,54 @@ acceptor::acceptor( boost::asio::io_service& IOservice,
 		    const std::string& host, unsigned short port, unsigned maxConnections,
 		    GlobalConnectionList& globalList,
 		    _Wolframe::ServerHandler& srvHandler ) :
-	IOservice_( IOservice ),
-	strand_( IOservice_ ),
-	acceptor_( IOservice_ ),
-	connList_ ( maxConnections, globalList ),
-	srvHandler_( srvHandler )
+	m_IOservice( IOservice ),
+	m_strand( m_IOservice ),
+	m_acceptor( m_IOservice ),
+	m_connList ( maxConnections, globalList ),
+	m_srvHandler( srvHandler )
 {
 	// Open the acceptor(s) with the option to reuse the address (i.e. SO_REUSEADDR).
-	boost::asio::ip::tcp::resolver resolver( IOservice_ );
+	boost::asio::ip::tcp::resolver resolver( m_IOservice );
 	boost::asio::ip::tcp::resolver::query query( host, "" );
 	boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve( query );
 	endpoint.port( port );
 
-	ConnectionHandler *handler = srvHandler_.newConnection( LocalTCPendpoint( host, port ));
-	newConnection_ = connection_ptr( new connection( IOservice_, connList_, handler ));
+	ConnectionHandler *handler = m_srvHandler.newConnection( LocalTCPendpoint( host, port ));
+	m_newConnection = connection_ptr( new connection( m_IOservice, m_connList, handler ));
 
-	acceptor_.open( endpoint.protocol() );
-	acceptor_.set_option( boost::asio::ip::tcp::acceptor::reuse_address( true ));
-	acceptor_.bind( endpoint );
-	acceptor_.listen();
-	acceptor_.async_accept( newConnection_->socket(),
-				strand_.wrap( boost::bind( &acceptor::handleAccept,
-							   this,
-							   boost::asio::placeholders::error )));
-	identifier_ = acceptor_.local_endpoint().address().to_string()
-		      + ":" + boost::lexical_cast<std::string>( acceptor_.local_endpoint().port() );
-	LOG_INFO << "Accepting connections on " << identifier_;
+	m_acceptor.open( endpoint.protocol() );
+	m_acceptor.set_option( boost::asio::ip::tcp::acceptor::reuse_address( true ));
+	m_acceptor.bind( endpoint );
+	m_acceptor.listen();
+	m_acceptor.async_accept( m_newConnection->socket(),
+				 m_strand.wrap( boost::bind( &acceptor::handleAccept,
+							     this,
+							     boost::asio::placeholders::error )));
+	m_identifier = m_acceptor.local_endpoint().address().to_string()
+			+ ":" + boost::lexical_cast<std::string>( m_acceptor.local_endpoint().port() );
+	LOG_INFO << "Accepting connections on " << m_identifier;
 }
 
 /// acceptor destructor
 acceptor::~acceptor()
 {
-	LOG_TRACE << "Acceptor destructor called for " << identifier_;
+	LOG_TRACE << "Acceptor destructor called for " << m_identifier;
 }
 
 void acceptor::handleAccept( const boost::system::error_code& e )
 {
 	if ( !e )	{
-		LOG_DEBUG << "Received new connection on " << identifier_;
-		newConnection_->start();
+		LOG_DEBUG << "Received new connection on " << m_identifier;
+		m_newConnection->start();
 
-		ConnectionHandler *handler = srvHandler_.newConnection( LocalTCPendpoint( acceptor_.local_endpoint().address().to_string(),
-											  acceptor_.local_endpoint().port() ));
-		newConnection_.reset( new connection( IOservice_, connList_, handler ));
-		acceptor_.async_accept( newConnection_->socket(),
-					strand_.wrap( boost::bind( &acceptor::handleAccept,
-								   this,
-								   boost::asio::placeholders::error )));
-		LOG_DATA << "Acceptor on " << identifier_ << " ready for new connection";
+		ConnectionHandler *handler = m_srvHandler.newConnection( LocalTCPendpoint( m_acceptor.local_endpoint().address().to_string(),
+											   m_acceptor.local_endpoint().port() ));
+		m_newConnection.reset( new connection( m_IOservice, m_connList, handler ));
+		m_acceptor.async_accept( m_newConnection->socket(),
+					 m_strand.wrap( boost::bind( &acceptor::handleAccept,
+								     this,
+								     boost::asio::placeholders::error )));
+		LOG_DATA << "Acceptor on " << m_identifier << " ready for new connection";
 	}
 }
 
@@ -107,8 +107,8 @@ void acceptor::handleAccept( const boost::system::error_code& e )
 // from any thread.
 void acceptor::stop()
 {
-	LOG_TRACE << "Acceptor for " << identifier_ << " received a shutdown request";
-	IOservice_.post( strand_.wrap( boost::bind( &acceptor::handleStop, this )));
+	LOG_TRACE << "Acceptor for " << m_identifier << " received a shutdown request";
+	m_IOservice.post( m_strand.wrap( boost::bind( &acceptor::handleStop, this )));
 }
 
 // The server is stopped by closing the acceptor.
@@ -116,12 +116,12 @@ void acceptor::stop()
 // all calls to io_service::run() will return.
 void acceptor::handleStop()
 {
-	acceptor_.close();
-	LOG_DEBUG << "Closed acceptor for " << identifier_;
+	m_acceptor.close();
+	LOG_DEBUG << "Closed acceptor for " << m_identifier;
 	// at this point no more connections are accepted
 	// Signal the list of processors to terminate
 	connection_ptr conn;
-	while (( conn = connList_.pop()) != NULL )
+	while (( conn = m_connList.pop()) != NULL )
 		conn->signal();
 }
 
@@ -134,25 +134,25 @@ SSLacceptor::SSLacceptor( boost::asio::io_service& IOservice,
 			  const std::string& host, unsigned short port, unsigned maxConnections,
 			  GlobalConnectionList& globalList,
 			  _Wolframe::ServerHandler& srvHandler) :
-	IOservice_( IOservice ),
-	strand_( IOservice_ ),
-	acceptor_( IOservice_ ),
-	SSLcontext_( IOservice_, boost::asio::ssl::context::sslv23 ),
-	connList_ ( maxConnections, globalList ),
-	srvHandler_( srvHandler )
+	m_IOservice( IOservice ),
+	m_strand( m_IOservice ),
+	m_acceptor( m_IOservice ),
+	m_SSLcontext( m_IOservice, boost::asio::ssl::context::sslv23 ),
+	m_connList ( maxConnections, globalList ),
+	m_srvHandler( srvHandler )
 {
 	boost::system::error_code	ec;
 
-	SSLcontext_.set_options( boost::asio::ssl::context::default_workarounds
-			    | boost::asio::ssl::context::no_sslv2
-			    | boost::asio::ssl::context::single_dh_use
-			    );
-	SSLcontext_.set_password_callback( boost::bind( &SSLacceptor::getPassword, this ));
+	m_SSLcontext.set_options( boost::asio::ssl::context::default_workarounds
+				  | boost::asio::ssl::context::no_sslv2
+				  | boost::asio::ssl::context::single_dh_use
+				  );
+	m_SSLcontext.set_password_callback( boost::bind( &SSLacceptor::getPassword, this ));
 	if ( certFile.empty() )	{
 		LOG_FATAL << "Empty SSL certificate filename";
 		exit( 1 );
 	}
-	else if ( SSLcontext_.use_certificate_chain_file( certFile, ec ) != 0 )	{
+	else if ( m_SSLcontext.use_certificate_chain_file( certFile, ec ) != 0 )	{
 		LOG_FATAL << ec.message() << " loading SSL certificate file: " << certFile;
 		exit( 1 );
 	}
@@ -161,20 +161,20 @@ SSLacceptor::SSLacceptor( boost::asio::io_service& IOservice,
 		LOG_FATAL << "SSL key filename is required";
 		exit( 1 );
 	}
-	else if ( SSLcontext_.use_private_key_file( keyFile, boost::asio::ssl::context::pem, ec ) != 0 )	{
+	else if ( m_SSLcontext.use_private_key_file( keyFile, boost::asio::ssl::context::pem, ec ) != 0 )	{
 		LOG_FATAL << ec.message() << " loading SSL key file: " << keyFile;
 		exit( 1 );
 	}
-//		SSLcontext_->use_tmp_dh_file( "dh4096.pem" );
+	//		SSLcontext_->use_tmp_dh_file( "dh4096.pem" );
 
 	if ( ! CAchainFile.empty() )	{
-		if ( SSLcontext_.load_verify_file( CAchainFile, ec ) != 0 )	{
+		if ( m_SSLcontext.load_verify_file( CAchainFile, ec ) != 0 )	{
 			LOG_FATAL << ec.message() << " loading SSL CA chain file: " << CAchainFile;
 			exit( 1 );
 		}
 	}
 	if ( ! CAdirectory.empty() )	{
-		if ( SSLcontext_.add_verify_path( CAdirectory, ec ) != 0 )	{
+		if ( m_SSLcontext.add_verify_path( CAdirectory, ec ) != 0 )	{
 			LOG_FATAL << ec.message() << " setting CA directory: " << CAdirectory;
 			exit( 1 );
 		}
@@ -185,58 +185,58 @@ SSLacceptor::SSLacceptor( boost::asio::io_service& IOservice,
 			LOG_FATAL << "Either a CA directory or a CA chain file is required";
 			exit( 1 );
 		}
-		SSLcontext_.set_verify_mode( boost::asio::ssl::context::verify_peer |
-					     boost::asio::ssl::context::verify_fail_if_no_peer_cert );
+		m_SSLcontext.set_verify_mode( boost::asio::ssl::context::verify_peer |
+					      boost::asio::ssl::context::verify_fail_if_no_peer_cert );
 		LOG_DEBUG << "SSL client certificate verification set to VERIFY";
 	}
 	else	{
-//		SSLcontext_.set_verify_mode( boost::asio::ssl::context::verify_none );
-		SSLcontext_.set_verify_mode( boost::asio::ssl::context::verify_peer );
+		//		SSLcontext_.set_verify_mode( boost::asio::ssl::context::verify_none );
+		m_SSLcontext.set_verify_mode( boost::asio::ssl::context::verify_peer );
 		LOG_DEBUG << "SSL client certificate verification set to NONE";
 	}
 
 	// Open the acceptor(s) with the option to reuse the address (i.e. SO_REUSEADDR).
-	boost::asio::ip::tcp::resolver resolver( IOservice_ );
+	boost::asio::ip::tcp::resolver resolver( m_IOservice );
 	boost::asio::ip::tcp::resolver::query query( host, "" );
 	boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve( query );
 	endpoint.port( port );
 
-	ConnectionHandler *handler = srvHandler_.newConnection( LocalSSLendpoint( host, port ));
-	newConnection_ = SSLconnection_ptr( new SSLconnection( IOservice_, SSLcontext_, connList_, handler ));
+	ConnectionHandler *handler = m_srvHandler.newConnection( LocalSSLendpoint( host, port ));
+	m_newConnection = SSLconnection_ptr( new SSLconnection( m_IOservice, m_SSLcontext, m_connList, handler ));
 
-	acceptor_.open( endpoint.protocol() );
-	acceptor_.set_option( boost::asio::ip::tcp::acceptor::reuse_address( true ));
-	acceptor_.bind( endpoint );
-	acceptor_.listen();
-	acceptor_.async_accept( newConnection_->socket().lowest_layer(),
-				strand_.wrap( boost::bind( &SSLacceptor::handleAccept,
-							   this,
-							   boost::asio::placeholders::error )));
-	identifier_ = acceptor_.local_endpoint().address().to_string()
-		      + ":" + boost::lexical_cast<std::string>( acceptor_.local_endpoint().port() ) + " (SSL)";
-	LOG_INFO << "Accepting connections on " << identifier_;
+	m_acceptor.open( endpoint.protocol() );
+	m_acceptor.set_option( boost::asio::ip::tcp::acceptor::reuse_address( true ));
+	m_acceptor.bind( endpoint );
+	m_acceptor.listen();
+	m_acceptor.async_accept( m_newConnection->socket().lowest_layer(),
+				 m_strand.wrap( boost::bind( &SSLacceptor::handleAccept,
+							     this,
+							     boost::asio::placeholders::error )));
+	m_identifier = m_acceptor.local_endpoint().address().to_string()
+			+ ":" + boost::lexical_cast<std::string>( m_acceptor.local_endpoint().port() ) + " (SSL)";
+	LOG_INFO << "Accepting connections on " << m_identifier;
 }
 
 /// acceptor destructor (SSL acceptor)
 SSLacceptor::~SSLacceptor()
 {
-	LOG_TRACE << "Acceptor destructor called for " << identifier_;
+	LOG_TRACE << "Acceptor destructor called for " << m_identifier;
 }
 
 void SSLacceptor::handleAccept( const boost::system::error_code& e )
 {
 	if ( !e )	{
-		LOG_DEBUG << "Received new connection on " << identifier_;
-		newConnection_->start();
+		LOG_DEBUG << "Received new connection on " << m_identifier;
+		m_newConnection->start();
 
-		ConnectionHandler *handler = srvHandler_.newConnection( LocalSSLendpoint( acceptor_.local_endpoint().address().to_string(),
-											     acceptor_.local_endpoint().port() ));
-		newConnection_.reset( new SSLconnection( IOservice_, SSLcontext_, connList_, handler ));
-		acceptor_.async_accept( newConnection_->socket().lowest_layer(),
-					strand_.wrap( boost::bind( &SSLacceptor::handleAccept,
-								   this,
-								   boost::asio::placeholders::error )));
-		LOG_DATA << "Acceptor on " << identifier_ << " ready for new connection";
+		ConnectionHandler *handler = m_srvHandler.newConnection( LocalSSLendpoint( m_acceptor.local_endpoint().address().to_string(),
+											   m_acceptor.local_endpoint().port() ));
+		m_newConnection.reset( new SSLconnection( m_IOservice, m_SSLcontext, m_connList, handler ));
+		m_acceptor.async_accept( m_newConnection->socket().lowest_layer(),
+					 m_strand.wrap( boost::bind( &SSLacceptor::handleAccept,
+								     this,
+								     boost::asio::placeholders::error )));
+		LOG_DATA << "Acceptor on " << m_identifier << " ready for new connection";
 	}
 }
 
@@ -247,18 +247,18 @@ std::string SSLacceptor::getPassword()
 
 void SSLacceptor::stop()
 {
-	LOG_TRACE << "Acceptor for " << identifier_ << " received a shutdown request";
-	IOservice_.post( strand_.wrap( boost::bind( &SSLacceptor::handleStop, this )));
+	LOG_TRACE << "Acceptor for " << m_identifier << " received a shutdown request";
+	m_IOservice.post( m_strand.wrap( boost::bind( &SSLacceptor::handleStop, this )));
 }
 
 void SSLacceptor::handleStop()
 {
-	acceptor_.close();
-	LOG_DEBUG << "Closed acceptor for " << identifier_;
+	m_acceptor.close();
+	LOG_DEBUG << "Closed acceptor for " << m_identifier;
 	// at this point no more connections are accepted
 	// Signal the list of processors to terminate
 	SSLconnection_ptr conn;
-	while (( conn = connList_.pop()) != NULL )
+	while (( conn = m_connList.pop()) != NULL )
 		conn->signal();
 }
 
