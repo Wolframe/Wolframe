@@ -67,25 +67,32 @@ acceptor::acceptor( boost::asio::io_service& IOservice,
 		endpoint = *resolver.resolve( query );
 	}
 	catch ( std::exception& e )	{
-		LOG_FATAL << "Unable to resolve host '" << host << "': " << e.what();
+		LOG_FATAL << "Unable to resolve host '" << host << "' : " << e.what();
 		exit( ErrorCode::FAILURE );
 	}
-
 	endpoint.port( port );
 
 	ConnectionHandler *handler = m_srvHandler.newConnection( LocalTCPendpoint( host, port ));
 	m_newConnection = connection_ptr( new connection( m_IOservice, m_connList, handler ));
 
-	m_acceptor.open( endpoint.protocol() );
-	m_acceptor.set_option( boost::asio::ip::tcp::acceptor::reuse_address( true ));
-	m_acceptor.bind( endpoint );
-	m_acceptor.listen();
+	try	{
+		m_acceptor.open( endpoint.protocol() );
+		m_acceptor.set_option( boost::asio::ip::tcp::acceptor::reuse_address( true ));
+		m_acceptor.bind( endpoint );
+		m_acceptor.listen();
+	}
+	catch ( std::exception& e )	{
+		LOG_FATAL << "Unable to listen on " << host << ":" << port << " : " << e.what();
+		exit( ErrorCode::FAILURE );
+	}
+
+	m_identifier = m_acceptor.local_endpoint().address().to_string()
+			+ ":" + boost::lexical_cast<std::string>( m_acceptor.local_endpoint().port() );
+
 	m_acceptor.async_accept( m_newConnection->socket(),
 				 m_strand.wrap( boost::bind( &acceptor::handleAccept,
 							     this,
 							     boost::asio::placeholders::error )));
-	m_identifier = m_acceptor.local_endpoint().address().to_string()
-			+ ":" + boost::lexical_cast<std::string>( m_acceptor.local_endpoint().port() );
 	LOG_INFO << "Accepting connections on " << m_identifier;
 }
 
