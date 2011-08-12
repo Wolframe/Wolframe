@@ -67,7 +67,7 @@ acceptor::acceptor( boost::asio::io_service& IOservice,
 		endpoint = *resolver.resolve( query );
 	}
 	catch ( std::exception& e )	{
-		LOG_FATAL << "Unable to resolve host '" << host << "' : " << e.what();
+		LOG_FATAL << "Unable to resolve host '" << host << "' (" << e.what() << ")";
 		exit( ErrorCode::FAILURE );
 	}
 	endpoint.port( port );
@@ -82,7 +82,7 @@ acceptor::acceptor( boost::asio::io_service& IOservice,
 		m_acceptor.listen();
 	}
 	catch ( std::exception& e )	{
-		LOG_FATAL << "Unable to listen on " << host << ":" << port << " : " << e.what();
+		LOG_FATAL << "Unable to listen on " << endpoint << " (" << e.what() << ")";
 		exit( ErrorCode::FAILURE );
 	}
 
