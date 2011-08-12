@@ -36,6 +36,7 @@
 
 #include "acceptor.hpp"
 #include "connection.hpp"
+#include "ErrorCode.hpp"
 #include "logger.hpp"
 #include "getPassword.hpp"
 
@@ -59,9 +60,17 @@ acceptor::acceptor( boost::asio::io_service& IOservice,
 	m_srvHandler( srvHandler )
 {
 	// Open the acceptor(s) with the option to reuse the address (i.e. SO_REUSEADDR).
-	boost::asio::ip::tcp::resolver resolver( m_IOservice );
-	boost::asio::ip::tcp::resolver::query query( host, "" );
-	boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve( query );
+	boost::asio::ip::tcp::endpoint endpoint;
+	try	{
+		boost::asio::ip::tcp::resolver resolver( m_IOservice );
+		boost::asio::ip::tcp::resolver::query query( host, "" );
+		endpoint = *resolver.resolve( query );
+	}
+	catch ( std::exception& e )	{
+		LOG_FATAL << "Unable to resolve host '" << host << "': " << e.what();
+		exit( ErrorCode::FAILURE );
+	}
+
 	endpoint.port( port );
 
 	ConnectionHandler *handler = m_srvHandler.newConnection( LocalTCPendpoint( host, port ));
