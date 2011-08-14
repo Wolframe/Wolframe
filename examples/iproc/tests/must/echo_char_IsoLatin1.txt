@@ -507,8 +507,6 @@ OK expecting command
 </AVAILABILITY>
 </PLANT>
 </CATALOG>
-
-
 .
 OK
 BYE

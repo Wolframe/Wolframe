@@ -70,20 +70,34 @@ private:
 public:
 	///\brief Constructor
 	Buffer()				:m_pos(0){}
+
 	///\brief Clear the buffer content
 	void clear()				{m_pos=0;}
+
 	///\brief Append one character
 	///\param[in] ch the character to append
 	void push_back( char ch)		{if (m_pos<Size) m_buf[m_pos++]=ch;}
+
 	///\brief Append a 0-terminated string
 	///\param[in] cc the string to append
 	void append( const char* cc)		{unsigned int ii=0; while(m_pos<Size && cc[ii]) m_buf[m_pos++]=cc[ii++];}
+
 	///\brief Return the number of characters in the buffer
 	///\return the number of characters (bytes)
 	size_type size() const			{return m_pos;}
+
+	///\brief Return the buffer content as pointer to string without 0 termination
+	///\return the pointer to buffer start
+	const char* ptr() const			{return m_buf;}
+
+	///\brief Return the buffer content as pointer to string without 0 termination
+	///\return the pointer to buffer start
+	char* ptr()				{return m_buf;}
+
 	///\brief Return the buffer content as 0-terminated string
 	///\return the C-string
 	const char* c_str()			{m_buf[m_pos]=0; return m_buf;}
+
 	///\brief cast operator for direct access
 	///\return the C-string
 	operator const char*()			{return c_str();}

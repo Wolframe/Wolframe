@@ -145,7 +145,12 @@ private:
 	///\brief Helper function to send a line message with CRLF termination as C string
 	///\param [in] str head of the line to write
 	///\param [in] arg optional argument string of the line to write
-	net::NetworkOperation WriteLine( const char* str, const char* arg=0);
+	///\return network operation
+	const net::NetworkOperation WriteLine( const char* str, const char* arg=0);
+
+	///\brief Get the next read data operation
+	///\return network operation
+	const net::NetworkOperation readDataOp();
 
 	///\brief Passes the command data from protocol buffer to the processor
 	void passInput();

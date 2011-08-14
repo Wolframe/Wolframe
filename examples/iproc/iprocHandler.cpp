@@ -40,7 +40,7 @@
 using namespace _Wolframe;
 using namespace _Wolframe::iproc;
 
-net::NetworkOperation Connection::WriteLine( const char* str, const char* arg)
+const net::NetworkOperation Connection::WriteLine( const char* str, const char* arg)
 {
 	unsigned int ii;
 	m_buffer.clear();
@@ -67,10 +67,10 @@ void Connection::passInput()
 	m_itr = (eoD < m_end) ? eoD:m_end;
 }
 
-void Connection::networkInput( const void*, std::size_t nofBytes)
+void Connection::networkInput( const void* dt, std::size_t nofBytes)
 {
 	LOG_DATA << "ConnectionHandler got network input in state " << stateName(m_state);
-	m_input.setPos( nofBytes);
+	m_input.setPos( nofBytes + ((const char*)dt - m_input.charptr()));
 	m_itr = m_input.begin();
 
 	if (m_state == Processing || m_state == DiscardInput)
@@ -105,6 +105,19 @@ void Connection::errorOccured( NetworkSignal )
 {
 	LOG_TRACE << "Got termination signal (error occurred)";
 	m_state = Terminate;
+}
+
+const net::NetworkOperation Connection::readDataOp()
+{
+	void* pp;
+	std::size_t ppsize;
+
+	if (!m_input.getNetworkMessageRead( pp, ppsize))
+	{
+		LOG_ERROR << "buffer too small to buffer end of data marker in input";
+		return net::CloseConnection();
+	}
+	return net::ReadData( pp, ppsize);
 }
 
 const net::NetworkOperation Connection::nextOperation()
@@ -144,8 +157,7 @@ const net::NetworkOperation Connection::nextOperation()
 					{
 						if (m_itr == m_end)
 						{
-							m_input.setPos( 0);
-							return net::ReadData( m_input.ptr(), m_input.size());
+							return readDataOp();
 						}
 						else
 						{
@@ -162,8 +174,7 @@ const net::NetworkOperation Connection::nextOperation()
 				{
 					if (m_itr == m_end)
 					{
-						m_input.setPos( 0);
-						return net::ReadData( m_input.ptr(), m_input.size());
+						return readDataOp();
 					}
 					else
 					{
@@ -188,8 +199,7 @@ const net::NetworkOperation Connection::nextOperation()
 						}
 						else if (m_itr == m_end)
 						{
-							m_input.setPos( 0);
-							return net::ReadData( m_input.ptr(), m_input.size());
+							return readDataOp();
 						}
 						else
 						{
@@ -252,8 +262,7 @@ const net::NetworkOperation Connection::nextOperation()
 				switch (m_processor.call( argc, argv))
 				{
 					case lua::AppProcessor::YieldRead:
-						m_input.setPos( 0);
-						return net::ReadData( m_input.ptr(), m_input.size());
+						return readDataOp();
 
 					case lua::AppProcessor::YieldWrite:
 					{
@@ -268,7 +277,7 @@ const net::NetworkOperation Connection::nextOperation()
 						{
 							LOG_ERROR << "buffer too small for one output element";
 							m_state = DiscardInput;
-							return WriteLine( "\r\n.\r\nERR");
+							return WriteLine( "\r\n.\r\nERR protocol misconfiguration");
 						}
 						m_formatoutput->init( m_output.ptr(), m_output.size());
 						return net::SendData( content, contentsize);
@@ -336,8 +345,7 @@ const net::NetworkOperation Connection::nextOperation()
 				}
 				else
 				{
-					m_input.setPos( 0);
-					return net::ReadData( m_input.ptr(), m_input.size());
+					return readDataOp();
 				}
 			}
 
@@ -345,8 +353,7 @@ const net::NetworkOperation Connection::nextOperation()
 			{
 				if (!ProtocolParser::skipLine( m_itr, m_end) || !ProtocolParser::consumeEOL( m_itr, m_end))
 				{
-					m_input.setPos( 0);
-					return net::ReadData( m_input.ptr(), m_input.size());
+					return readDataOp();
 				}
 				m_state = Init;
 				continue;

@@ -86,67 +86,129 @@ int InputBlock::getEoDpos( size_type offset)
 
 	std::size_t bufsize = pos()-offset;
 	char* buf = charptr()+offset;
-	std::size_t bufpos=0;
+	std::size_t bufpos = 0;
+	std::size_t srcendpos = bufsize;
 
 	while (bufpos<bufsize)
 	{
-		if (m_eodState == EoD::SRC)
+		switch (m_eodState)
 		{
-			char* cc = (char*)std::memchr( buf+bufpos, '\n', bufsize-bufpos);
-			if (cc)
+			case EoD::SRC:
 			{
-				bufpos = cc - buf + 1;
-				m_eodState = EoD::LF;
+				char* cc = buf+bufpos;
+				std::size_t ii=0, nn=bufsize-bufpos;
+
+				for (;ii<nn; ii++)
+				{
+					if (cc[ii] == '\r')
+					{
+						srcendpos = bufpos + ii;
+						bufpos = srcendpos + 1;
+						m_eodState = EoD::CR;
+						break;
+					}
+					else if (cc[ii] == '\n')
+					{
+						srcendpos = bufpos + ii;
+						bufpos = srcendpos + 1;
+						m_eodState = EoD::CR_LF;
+						break;
+					}
+				}
+				if (ii == nn)
+				{
+					bufpos = bufsize;
+				}
+				break;
 			}
-			else
-			{
-				bufpos = bufsize;
-			}
+
+			case EoD::CR:
+				if (buf[bufpos] == '\n')
+				{
+					m_eodState = EoD::CR_LF;
+					++bufpos;
+				}
+				else
+				{
+					m_eodState = EoD::SRC;
+				}
+				break;
+
+			case EoD::CR_LF:
+				if (buf[bufpos] == '.')
+				{
+					m_eodState = EoD::CR_LF_DOT;
+					std::memmove( buf+bufpos, buf+bufpos+1, bufsize-bufpos-1);
+					bufsize -= 1;
+					setPos( bufsize + offset);
+				}
+				else
+				{
+					m_eodState = EoD::SRC;
+				}
+				break;
+
+			case EoD::CR_LF_DOT:
+				if (buf[bufpos] == '\r')
+				{
+					m_eodState = EoD::CR_LF_DOT_CR;
+					++bufpos;
+				}
+				else if (buf[bufpos] == '\n')
+				{
+					m_eodState = EoD::CR_LF_DOT_CR_LF;
+					++bufpos;
+				}
+				else
+				{
+					m_eodState = EoD::SRC;
+				}
+				break;
+
+			case EoD::CR_LF_DOT_CR:
+				if (buf[bufpos] == '\n')
+				{
+					++bufpos;
+				}
+				m_eodState = EoD::CR_LF_DOT_CR_LF;
+				return srcendpos;
+
+			case EoD::CR_LF_DOT_CR_LF:
+				return srcendpos;
 		}
-		else if (m_eodState == EoD::LF)
+	}
+	m_eodcharbuf.clear();
+	if (m_eodState != EoD::SRC)
+	{
+		if (m_eodState == EoD::CR_LF_DOT)
 		{
-			if (buf[bufpos] == '.')
+			unsigned int bb = srcendpos;
+			for (; bb<bufsize; bb++)
 			{
-				m_eodState = EoD::LF_DOT;
-				std::memmove( buf+bufpos, buf+bufpos+1, bufsize-bufpos-1);
-				bufsize -= 1;
-				setPos( bufsize + offset);
+				m_eodcharbuf.push_back( buf[ bb]);
 			}
-			else
-			{
-				++bufpos;
-				m_eodState = EoD::SRC;
-			}
+			m_eodcharbuf.push_back( '.');
 		}
-		else if (m_eodState == EoD::LF_DOT)
+		else if (m_eodState == EoD::CR_LF_DOT_CR)
 		{
-			if (buf[bufpos] == '\r')
+			unsigned int bb = srcendpos;
+			for (; (bb+1)<bufsize; bb++)
 			{
-				m_eodState = EoD::LF_DOT_CR;
+				m_eodcharbuf.push_back( buf[ bb]);
 			}
-			else if (buf[bufpos] == '\n')
-			{
-				m_eodState = EoD::LF_DOT_CR_LF;
-			}
-			else
-			{
-				m_eodState = EoD::SRC;
-			}
-			++bufpos;
-		}
-		else if (m_eodState == EoD::LF_DOT_CR)
-		{
-			if (buf[bufpos] == '\n')
-			{
-				++bufpos;
-			}
-			m_eodState = EoD::LF_DOT_CR_LF;
-			return bufpos;
+			m_eodcharbuf.push_back( '.');
+			m_eodcharbuf.push_back( '\r');
 		}
 		else
 		{
-			return bufpos;
+			unsigned int bb = srcendpos;
+			for (; bb<bufsize; bb++)
+			{
+				m_eodcharbuf.push_back( buf[ bb]);
+			}
 		}
+		m_eodState = EoD::SRC;
+		setPos( srcendpos + offset);
 	}
 	return -1;
 }

@@ -57,10 +57,15 @@ using namespace iproc;
 
 struct TestDescription
 {
-	const char* name;		//< determines the name of the result and of the expected result file
-	const char* scriptfile;		//< script to execute
-	const char* datafile;		//< input to feed
-	unsigned int elementBuffersize;	//< additional buffer for the output to hold at least one result element
+	const char* name;		///< determines the name of the result and of the expected result file
+	const char* scriptfile;		///< script to execute
+	const char* datafile;		///< input to feed
+	unsigned int elementBuffersize;	///< additional buffer for the output to hold at least one result element
+};
+
+enum
+{
+	EoDBufferSize = 4		///< size of buffer needed for end of data marker
 };
 
 static const TestDescription testDescriptions[] =
@@ -187,7 +192,10 @@ TEST_F( XMLTestFixture, tests)
 			{
 				std::string prt_output;
 
-				TestConfiguration config( testDescriptions[ti].scriptfile, BufferSize[ib], BufferSize[ob]+testDescriptions[ti].elementBuffersize);
+				TestConfiguration config(
+						testDescriptions[ti].scriptfile,
+						BufferSize[ib]+EoDBufferSize,
+						BufferSize[ob]+testDescriptions[ti].elementBuffersize);
 				connection = new iproc::Connection( ep, &config);
 
 				char* in_start = const_cast<char*>(prt_input.c_str());

@@ -35,7 +35,9 @@ Project Wolframe.
 ///\brief Network message blocks as seen from the protocol with the input iterator classes and print functions
 
 #include "iterators.hpp"
+#include "buffers.hpp"
 #include <stdexcept>
+#include <cstring>
 
 namespace _Wolframe {
 namespace protocol {
@@ -80,11 +82,13 @@ public:
 
 	///\brief Constant void pointer to start of buffer
 	void* ptr()						{return m_ptr;}
+
 	///\brief Constant void pointer to start of buffer
 	const void* ptr() const					{return m_ptr;}
 
 	///\brief Constant char pointer to start of buffer
 	char* charptr()						{return (char*)m_ptr;}
+
 	///\brief Constant char pointer to start of buffer
 	const char* charptr() const				{return (const char*)m_ptr;}
 
@@ -109,6 +113,7 @@ public:
 	///\brief random access operator on const
 	///\param [in] idx index of element to access
 	char operator[]( size_type idx) const			{if (idx>=m_pos) throw ArrayBoundReadError(); return charptr()[idx];}
+
 	///\brief random access operator on reference type
 	///\param [in] idx index of element to access
 	char& operator[]( size_type idx)			{if (idx>=m_pos) throw ArrayBoundReadError(); return charptr()[idx];}
@@ -147,43 +152,53 @@ public:
 		enum State
 		{
 			SRC,			///< parsing content
-			LF,			///< detected an LineFeed in state SRC, belonging either to a CRLF or a LF sequence
-			LF_DOT,			///< detected a '.' (dot) in state LF
-			LF_DOT_CR,		///< detected a CarriageReturn CR in state LF_DOT. Here we assume that end of data is reached
-			LF_DOT_CR_LF		///< detected a LineFeed LF in state LF_DOT or LF_DOT_CR. Here we assume at last that end of data is reached
+			CR,			///< detected an CarriageReturn in state SRC, belonging either to a CRLF or a LF sequence
+			CR_LF,			///< detected an LineFeed in state SRC or CR, belonging either to a CRLF or a LF sequence
+			CR_LF_DOT,		///< detected a '.' (dot) in state CR_LF
+			CR_LF_DOT_CR,		///< detected a CarriageReturn CR in state CR_LF_DOT. Here we assume that end of data is reached
+			CR_LF_DOT_CR_LF		///< detected a LineFeed LF in state CR_LF_DOT or CR_LF_DOT_CR. Here we assume at last that end of data is reached
 		};
 	};
 
 	///\brief Constructor
 	InputBlock()						:m_eodState(EoD::SRC){}
+
 	///\brief Constructor
 	///\param [in] p_size size of the memory block in bytes to allocate
 	InputBlock( size_type p_size)				:MemBlock(p_size),m_eodState(EoD::SRC){}
+
 	///\brief Constructor
 	///\param [in] p_ptr pointer to the memory block to use
 	///\param [in] p_size size of the memory block in bytes
 	InputBlock( void* p_ptr, size_type p_size)		:MemBlock(p_ptr,p_size),m_eodState(EoD::SRC){}
+
 	///\brief Copy constructor
 	///\param [in] o InputBlock to copy
 	InputBlock( const InputBlock& o)			:MemBlock(o),m_eodState(o.m_eodState){}
 
 	///\brief Random access const iterator
 	typedef array::iterator_t<const InputBlock,size_type,char,char,const char*> const_iterator;
+
 	///\brief Random access iterator
 	typedef array::iterator_t<InputBlock,size_type,char,char&,char*> iterator;
 
 	///\brief Get the starting const iterator
 	const_iterator begin() const				{const_iterator rt(this); return rt;}
+
 	///\brief Get the starting iterator
 	iterator begin()					{iterator rt(this); return rt;}
+
 	///\brief Random access to a const iterator
 	///\param [in] pos_ position from where to get the iterator
 	const_iterator at( size_type pos_) const		{const_iterator rt(this); return rt+pos_;}
+
 	///\brief Random access to an iterator
 	///\param [in] pos_ position from where to get the iterator
 	iterator at( size_type pos_)				{iterator rt(this); return rt+pos_;}
+
 	///\brief Get the end of block const iterator
 	const_iterator end() const				{return const_iterator(this)+pos();}
+
 	///\brief Get the end of block iterator
 	iterator end()						{return iterator(this)+pos();}
 
@@ -199,13 +214,32 @@ public:
 	void resetEoD()						{m_eodState=EoD::SRC;}
 
 	///\brief Return true if end of data was recognized with the last call of getEoD(iterator)
-	bool gotEoD() const					{return m_eodState>=EoD::LF_DOT_CR_LF;}
+	bool gotEoD() const					{return m_eodState>=EoD::CR_LF_DOT_CR_LF;}
+
+	///\brief Get the network message pointer and size for network input considering the EoD state
+	///\param[out] pp pointer to buffer
+	///\param[out] ppsize size of buffer in bytes
+	///\return false, if the buffer is too small to recognize EoD properly
+	bool getNetworkMessageRead( void*& pp, std::size_t& ppsize)
+	{
+		if (size() <= m_eodcharbuf.size()) return false;
+		std::memcpy( ptr(), m_eodcharbuf.ptr(), m_eodcharbuf.size());
+		setPos( m_eodcharbuf.size());
+		pp = charptr() + m_eodcharbuf.size();
+		ppsize = size() - m_eodcharbuf.size();
+		m_eodcharbuf.clear();
+		return true;
+	}
 
 private:
 	///\brief Implementation of the end of data recognition and linefeed,dot escaping state machine
 	int getEoDpos( size_type offset);
+
 	///\brief State of end of data recognition
 	EoD::State m_eodState;
+
+	///\brief Buffer for unprocessed EoD characters
+	Buffer<8> m_eodcharbuf;
 };
 
 

@@ -139,9 +139,9 @@ struct Connection::Private
 		}
 	}
 
-	void networkInput( const void*, std::size_t nofBytes)
+	void networkInput( const void* dt, std::size_t nofBytes)
 	{
-		input.setPos( nofBytes);
+		input.setPos( nofBytes + ((const char*)dt - input.charptr()));
 		itr = input.begin();
 		if (state == Processing || state == StartProcessing)
 		{
@@ -166,6 +166,19 @@ struct Connection::Private
 		eoD = eoM = input.end();
 	}
 	~Private()  {}
+
+	const net::NetworkOperation readDataOp()
+	{
+		void* pp;
+		std::size_t ppsize;
+
+		if (!input.getNetworkMessageRead( pp, ppsize))
+		{
+			LOG_ERROR << "buffer too small to buffer end of data marker in input";
+			return net::CloseConnection();
+		}
+		return net::ReadData( pp, ppsize);
+	}
 
 	//statemachine of the processor
 	const Operation nextOperation()
@@ -218,8 +231,7 @@ struct Connection::Private
 						{
 							if (itr == eoM)
 							{
-								input.setPos( 0);
-								return net::ReadData( input.ptr(), input.size());
+								return readDataOp();
 							}
 							else
 							{
@@ -234,15 +246,13 @@ struct Connection::Private
 				{
 					if (!ProtocolParser::skipSpaces( itr, eoM))
 					{
-						input.setPos( 0);
-						return net::ReadData( input.ptr(), input.size());
+						return readDataOp();
 					}
 					if (!ProtocolParser::consumeEOL( itr, eoM))
 					{
 						if (itr == eoM)
 						{
-							input.setPos( 0);
-							return net::ReadData( input.ptr(), input.size());
+							return readDataOp();
 						}
 						else
 						{
@@ -272,8 +282,7 @@ struct Connection::Private
 
 					if (!ProtocolParser::skipSpaces( itr, eoM))
 					{
-						input.setPos( 0);
-						return net::ReadData( input.ptr(), input.size());
+						return readDataOp();
 					}
 
 					switch (parser.getCommand( itr, eoM, buffer))
@@ -301,8 +310,7 @@ struct Connection::Private
 						{
 							if (itr == eoM)
 							{
-								input.setPos( 0);
-								return net::ReadData( input.ptr(), input.size());
+								return readDataOp();
 							}
 							else
 							{
@@ -321,8 +329,7 @@ struct Connection::Private
 					input.resetEoD();
 					if (!ProtocolParser::skipSpaces( itr, eoM))
 					{
-						input.setPos( 0);
-						return net::ReadData( input.ptr(), input.size());
+						return readDataOp();;
 					}
 					if (!ProtocolParser::isEOL( itr))
 					{
@@ -352,8 +359,7 @@ struct Connection::Private
 					EchoState echoState = echoInput();
 					if (echoState == EoM)
 					{
-						input.setPos( 0);
-						return net::ReadData( input.ptr(), input.size());
+						return readDataOp();
 					}
 					if (echoState == EoD)
 					{
@@ -363,18 +369,17 @@ struct Connection::Private
 					{
 						state = ProcessingAfterWrite;
 					}
-					void* content = output.ptr();
-					std::size_t size = output.pos();
-					if (size == 0) continue;
-					return net::SendData( content, size);
+					void* pp = output.ptr();
+					std::size_t ppsize = output.pos();
+					if (ppsize == 0) continue;
+					return net::SendData( pp, ppsize);
 				}
 
 				case HandleError:
 				{
 					if (!ProtocolParser::skipLine( itr, eoM) || !ProtocolParser::consumeEOL( itr, eoM))
 					{
-						input.setPos( 0);
-						return net::ReadData( input.ptr(), input.size());
+						return readDataOp();
 					}
 					state = Init;
 					continue;

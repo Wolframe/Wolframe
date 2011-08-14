@@ -506,7 +506,7 @@ OK expecting command
 <AVAILABILITY>022299
 </AVAILABILITY>
 </PLANT>
-</CATALOG> ഊഊ
+</CATALOG>
 .
 OK
 BYE

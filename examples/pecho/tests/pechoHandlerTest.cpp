@@ -40,6 +40,7 @@
 #include "testHandlerTemplates.hpp"
 #include <gtest/gtest.h>
 #include <stdlib.h>
+#include <boost/thread/thread.hpp>
 
 using namespace _Wolframe;
 
@@ -143,6 +144,11 @@ public:
 	std::string expected;
 	net::LocalTCPendpoint ep;
 	pecho::Connection* connection;
+	enum
+	{
+		EoDBufferSize=4,
+		EscBufferSize=1
+	};
 
 protected:
 	pechoHandlerFixture() :ep( "127.0.0.1", 12345),connection(0) {}
@@ -150,7 +156,7 @@ protected:
 	virtual void SetUp()
 	{
 		TestDescription test;
-		connection = new pecho::Connection( ep, test.inputBufferSize, test.outputBufferSize);
+		connection = new pecho::Connection( ep, test.inputBufferSize+EoDBufferSize, test.outputBufferSize+EscBufferSize);
 
 		input.clear();
 		expected.clear();
@@ -161,8 +167,8 @@ protected:
 		input.append( test.content);
 		expected.append( escape( test.content));
 
-		input.append( ".\r\n");
-		expected.append( "\r\nOK expecting command\r\n");
+		input.append( "\r\n.\r\n");
+		expected.append( "OK expecting command\r\n");
 		input.append( "quit\r\n");
 		expected.append( "BYE\r\n");
 	}
@@ -236,10 +242,14 @@ TYPED_TEST( pechoHandlerFixture, ExpectedResult )
 #ifdef _Wolframe_LOWLEVEL_DEBUG
 		unsigned int ii=0,nn=output.size();
 		for (;ii<nn && output[ii]==this->expected[ii]; ii++);
-		if (ii != nn) printf( "SIZE R=%lu,E=%lu,DIFF AT %u='%d %d %d %d|%d %d %d %d'\n",
+		if (ii != nn)
+		{
+			printf( "SIZE R=%lu,E=%lu,DIFF AT %u='%d %d %d %d|%d %d %d %d'\n",
 				(unsigned long)output.size(), (unsigned long)this->expected.size(), ii, output[ii-2],output[ii-1],output[ii-0],output[ii+1],this->expected[ii-2],this->expected[ii-1],this->expected[ii-0],this->expected[ii+1]);
+			boost::this_thread::sleep( boost::posix_time::seconds( 5 ));
+		}
 #endif
-	EXPECT_EQ( output, this->expected);
+	EXPECT_EQ( this->expected, output);
 }
 
 int main( int argc, char **argv )

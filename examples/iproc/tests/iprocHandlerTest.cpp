@@ -174,13 +174,20 @@ public:
 	net::LocalTCPendpoint ep;
 	iproc::Connection* m_connection;
 	TestConfiguration config;
+	enum
+	{
+		EoDBufferSize=4,
+		EscBufferSize=1
+	};
 protected:
 	iprocHandlerFixture() :ep( "127.0.0.1", 12345),m_connection(0) {}
 
 	virtual void SetUp()
 	{
 		TestDescription test;
-		config = TestConfiguration( test.inputBufferSize, test.outputBufferSize);
+		config = TestConfiguration(
+				test.inputBufferSize + EoDBufferSize,
+				test.outputBufferSize + EscBufferSize);
 		m_connection = new iproc::Connection( ep, &config);
 
 		m_input.clear();
@@ -192,7 +199,7 @@ protected:
 		m_expected.append( escape( test.content));
 
 		m_input.append( ".\r\n");
-		m_expected.append( "\r\n\r\n.\r\nOK\r\n");
+		m_expected.append( ".\r\nOK\r\n");
 		m_input.append( "quit\r\n");
 		m_expected.append( "BYE\r\n");
 	}
@@ -274,7 +281,7 @@ TYPED_TEST( iprocHandlerFixture, ExpectedResult )
 			(unsigned long)output.size(), (unsigned long)this->m_expected.size(), ii,
 			output[ii-2],output[ii-1],output[ii-0],output[ii+1],
 			this->m_expected[ii-2],this->m_expected[ii-1],this->m_expected[ii-0],this->m_expected[ii+1]);
-		boost::this_thread::sleep( boost::posix_time::seconds( 10 ));
+		boost::this_thread::sleep( boost::posix_time::seconds( 5 ));
 	}
 #endif
 #ifndef _WIN32
