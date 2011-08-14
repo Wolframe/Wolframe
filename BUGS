@@ -1,10 +1,3 @@
 openSuse 11.4:
 counterTest: /usr/include/boost/thread/pthread/mutex.hpp:47:
 boost::mutex::~mutex(): Assertion `!pthread_mutex_destroy(&m)' failed.
-
-all platforms:
-protocol \r\n of the EOD "\r\n.\r\n" is passed as content to the 
-processor. This creates problems (funny characters at the end of data
-for wide character set inputs. The problem is not easy to solve but 
-will be fixed sooner as possible. :-)
-
