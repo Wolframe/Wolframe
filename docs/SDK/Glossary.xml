@@ -39,16 +39,18 @@
 		</glossdef>
 	</glossentry>
 
-	<glossentry><glossterm>Connection Handler</glossterm>
+	<glossentry><glossterm>Application Processor System Call</glossterm>
 		<glossdef>
-			<para>Interface for the networking to one client/server connection during its whole lifetime.</para>
+			<para>Call of a database or another interface provided by the framework and configured by
+				the user. The application procesor program builds an object describing the
+				transaction or task and passes is to the system with a system call. As result
+				an object is returned as result of the call.</para>
 		</glossdef>
 	</glossentry>
 
-	<glossentry><glossterm>Closure</glossterm>
+	<glossentry><glossterm>Connection Handler</glossterm>
 		<glossdef>
-			<para></para>
-			<glossseealso><ulink url="http://en.wikipedia.org/wiki/Closure_%28computer_science%29">wikipedia</ulink></glossseealso>
+			<para>Interface for the networking to one client/server connection during its whole lifetime.</para>
 		</glossdef>
 	</glossentry>
 
@@ -73,17 +75,22 @@
 		</glossdef>
 	</glossentry>
 
-	<glossentry><glossterm>Generator</glossterm>
-		<glossdef>
-			<para>Generators are defined for the application processor to implement
-				iterators on network input or system call results.</para>
-			<glossseealso><ulink url="http://en.wikipedia.org/wiki/Generator_%28computer_science%29">wikipedia</ulink></glossseealso>
-		</glossdef>
-	</glossentry>
-
 	<glossentry><glossterm>Network Input</glossterm>
 		<glossdef>
 			<para>Data passed from the networking framework to the connection handler for processing.</para>
+		</glossdef>
+	</glossentry>
+
+	<glossentry><glossterm>Network Output</glossterm>
+		<glossdef>
+			<para>Data passed back to the networking framework from the connection handler as output of processing.</para>
+		</glossdef>
+	</glossentry>
+
+	<glossentry><glossterm>Filter</glossterm>
+		<glossdef>
+			<para>Filters are data structures attached to network input and output to read and write input in a well defined format.
+			</para>
 		</glossdef>
 	</glossentry>
 
@@ -104,6 +111,6 @@
 			<glossseealso><ulink url="http://en.wikipedia.org/wiki/Coroutine">wikipedia yield in coroutine</ulink></glossseealso>
 		</glossdef>
 	</glossentry>
-
 </glossdiv>
 </glossary>
+
