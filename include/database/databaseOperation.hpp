@@ -42,6 +42,13 @@
 namespace _Wolframe {
 namespace db {
 
+enum DatabaseOperation	{
+	INSERT,
+	DELETE,
+	UPDATE,
+	SELECT
+};
+
 /***********************************************************************/
 
 namespace request {
