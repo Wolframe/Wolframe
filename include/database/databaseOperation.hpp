@@ -42,12 +42,43 @@
 namespace _Wolframe {
 namespace db {
 
-enum DatabaseOperation	{
-	INSERT,
-	DELETE,
-	UPDATE,
-	SELECT
+class DatabaseOperation	{
+public:
+	enum Operation	{
+		INSERT,
+		DELETE,
+		UPDATE,
+		SELECT
+	};
+
+	virtual ~DatabaseOperation()			{}
+	virtual Operation operation() const = 0;
 };
+
+class DBinsert : public DatabaseOperation
+{
+public:
+	virtual Operation operation()		{ return INSERT; }
+};
+
+class DBdelete : public DatabaseOperation
+{
+public:
+	virtual Operation operation()		{ return DELETE; }
+};
+
+class DBupdate : public DatabaseOperation
+{
+public:
+	virtual Operation operation()		{ return UPDATE; }
+};
+
+class DBselect : public DatabaseOperation
+{
+public:
+	virtual Operation operation()		{ return SELECT; }
+};
+
 
 /***********************************************************************/
 
@@ -59,16 +90,44 @@ struct UserPassword : public DatabaseRequest
 	virtual TransactionType type() const	{ return AUTHENTICATION; }
 };
 
+
+/// get the client configuration
+struct ClientConfiguration : public DatabaseRequest
+{
+	virtual TransactionType type() const	{ return CLIENT_CONFIG; }
+};
+
+
+/// transaction request
+struct Transaction : public DatabaseRequest
+{
+	virtual TransactionType type() const	{ return TRANSACTION; }
+};
+
 } // namespace request
 
 /***********************************************************************/
 
 namespace answer {
 
-/// base class for database answer
+/// get password string / digest answer
 struct UserPassword : public DatabaseAnswer
 {
 	virtual TransactionType type() const	{ return AUTHENTICATION; }
+};
+
+
+/// client configuration answer
+struct ClientConfiguration : public DatabaseAnswer
+{
+	virtual TransactionType type() const	{ return CLIENT_CONFIG; }
+};
+
+
+/// transaction answer
+struct Transaction : public DatabaseAnswer
+{
+	virtual TransactionType type() const	{ return TRANSACTION; }
 };
 
 } // namespace answer
