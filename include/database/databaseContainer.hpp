@@ -39,7 +39,6 @@
 
 #include "config/configurationBase.hpp"
 #include "database.hpp"
-#include "moduleInterface.hpp"
 
 namespace _Wolframe {
 namespace db {

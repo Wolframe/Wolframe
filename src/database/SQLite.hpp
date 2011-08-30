@@ -39,6 +39,7 @@
 
 #include "database/database.hpp"
 #include "database/databaseContainer.hpp"
+#include "moduleInterface.hpp"
 
 #include <list>
 #include "objectPool.hpp"

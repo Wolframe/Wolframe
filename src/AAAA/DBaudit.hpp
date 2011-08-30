@@ -36,6 +36,7 @@
 
 #include "AAAA/auditContainer.hpp"
 #include "database/databaseReference.hpp"
+#include "moduleInterface.hpp"
 
 #ifndef _DB_AUDIT_HPP_INCLUDED
 #define _DB_AUDIT_HPP_INCLUDED

@@ -31,51 +31,25 @@
 
 ************************************************************************/
 //
-// file audit
+// container template
 //
 
-#ifndef _FILE_AUDIT_HPP_INCLUDED
-#define _FILE_AUDIT_HPP_INCLUDED
+#ifndef _CONTAINER_HPP_INCLUDED
+#define _CONTAINER_HPP_INCLUDED
 
 #include <string>
 
-#include "AAAA/auditContainer.hpp"
-#include "moduleInterface.hpp"
+namespace _Wolframe	{
 
-namespace _Wolframe {
-namespace AAAA {
-
-class FileAuditConfig : public module::ModuleConfiguration< FileAuditConfig >
-{
-	friend class FileAuditContainer;
-	friend class config::ConfigurationParser;
+template < class ObjectInterface >
+class Container	{
 public:
-	FileAuditConfig( const char* cfgName, const char* logParent, const char* logName )
-		: module::ModuleConfiguration< FileAuditConfig >( cfgName, logParent, logName ) {}
+	virtual ~Container()				{}
 
-	const char* typeName() const			{ return "FileAudit"; }
-
-	/// methods
-	bool check() const;
-	void print( std::ostream& os, size_t indent ) const;
-	void setCanonicalPathes( const std::string& referencePath );
-private:
-	std::string	m_file;
+	virtual const std::string& ID() const = 0;
+	virtual const ObjectInterface& object() = 0;
 };
 
+} // namespace _Wolframe
 
-class FileAuditContainer : public module::ModuleContainer< FileAuditContainer, FileAuditConfig,
-		AuditContainer >
-{
-public:
-	FileAuditContainer( const FileAuditConfig& conf );
-	~FileAuditContainer()				{}
-
-	const char* typeName() const			{ return "FileAudit"; }
-private:
-	std::string	m_file;
-};
-
-}} // namespace _Wolframe::AAAA
-
-#endif // _FILE_AUDIT_HPP_INCLUDED
+#endif // _CONTAINER_HPP_INCLUDED

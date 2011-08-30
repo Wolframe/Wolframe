@@ -39,6 +39,7 @@
 
 #include <string>
 #include "AAAA/authenticationContainer.hpp"
+#include "moduleInterface.hpp"
 
 namespace _Wolframe {
 namespace AAAA {

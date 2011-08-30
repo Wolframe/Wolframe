@@ -39,6 +39,7 @@
 
 #include "AAAA/authenticationContainer.hpp"
 #include "database/databaseReference.hpp"
+#include "moduleInterface.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
