@@ -87,7 +87,7 @@ const Database* DatabaseProvider::database( const std::string& id ) const
 {
 	for ( std::list< DatabaseContainer* >::const_iterator it = m_db.begin();
 							it != m_db.end(); it++ )	{
-		if ( (*it)->ID() == id )
+		if ( (*it)->database().ID() == id )
 			return &(*it)->database();
 	}
 	return NULL;

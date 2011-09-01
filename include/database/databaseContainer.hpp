@@ -48,7 +48,6 @@ class DatabaseContainer
 public:
 	virtual ~DatabaseContainer()			{}
 
-	virtual const std::string& ID() const = 0;
 	virtual const Database& database() = 0;
 };
 
