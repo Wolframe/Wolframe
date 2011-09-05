@@ -39,12 +39,12 @@
 
 #include "config/configurationBase.hpp"
 #include "AAAA/authentication.hpp"
-#include "AAAA/authenticationContainer.hpp"
 #include "AAAA/audit.hpp"
-#include "AAAA/auditContainer.hpp"
+#include "container.hpp"
 #include "moduleInterface.hpp"
 
 #include "database/database.hpp"
+#include "../database/DBprovider.hpp"
 
 #include <string>
 #include <list>
@@ -76,14 +76,14 @@ class AuthenticationGroup
 {
 public:
 	AuthenticationGroup( const std::list< config::ContainerConfiguration* >& confs,
-			     module::ModuleContainerDescription<AuthenticationContainer, config::ContainerConfiguration>* description,
+			     module::ModuleContainerDescription<Container < Authenticator >, config::ContainerConfiguration>* description,
 			     size_t descrSize );
 	~AuthenticationGroup();
 	bool resolveDB( db::DatabaseProvider& db );
 
 	Authenticator* authenticator()		{ return NULL; }
 private:
-	std::list<AuthenticationContainer*>	m_authenticators;
+	std::list< Container < Authenticator >* > m_authenticators;
 };
 
 
@@ -91,14 +91,14 @@ class AuditGroup
 {
 public:
 	AuditGroup( const std::list< config::ContainerConfiguration* >& confs,
-		    module::ModuleContainerDescription< AuditContainer, config::ContainerConfiguration >* description,
+		    module::ModuleContainerDescription< Container< Auditor >, config::ContainerConfiguration >* description,
 		    size_t descrSize );
 	~AuditGroup();
 	bool resolveDB( db::DatabaseProvider& db );
 
 	Auditor* auditor()			{ return NULL; }
 private:
-	std::list<AuditContainer*>		m_auditors;
+	std::list< Container< Auditor >* >	m_auditors;
 };
 
 

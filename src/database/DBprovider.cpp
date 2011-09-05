@@ -47,9 +47,9 @@
 using namespace _Wolframe;
 
 static const size_t noDBmodules = 2;
-static module::ModuleContainerDescription< db::DatabaseContainer, config::ContainerConfiguration >
-dbModules[ noDBmodules ] = { module::ModuleContainerDescription< db::DatabaseContainer, config::ContainerConfiguration >( "PostgreSQL", &db::PostgreSQLcontainer::create ),
-			     module::ModuleContainerDescription< db::DatabaseContainer, config::ContainerConfiguration >( "SQLite", &db::SQLiteContainer::create ) };
+static module::ModuleContainerDescription< Container< db::Database >, config::ContainerConfiguration >
+dbModules[ noDBmodules ] = { module::ModuleContainerDescription< Container< db::Database >, config::ContainerConfiguration >( "PostgreSQL", &db::PostgreSQLcontainer::create ),
+			     module::ModuleContainerDescription< Container< db::Database >, config::ContainerConfiguration >( "SQLite", &db::SQLiteContainer::create ) };
 /****  End impersonating the module loader  **************************************************/
 
 namespace _Wolframe	{
@@ -63,7 +63,7 @@ DatabaseProvider::DatabaseProvider( const DBproviderConfig& conf )
 		size_t i;
 		for ( i = 0; i < noDBmodules; i++ )	{
 			if ( boost::algorithm::iequals( dbModules[i].name, dbType ))	{
-				DatabaseContainer* container = dbModules[i].createFunc( **it );
+				Container< db::Database >* container = dbModules[i].createFunc( **it );
 				m_db.push_back( container );
 				break;
 			}
@@ -77,7 +77,7 @@ DatabaseProvider::DatabaseProvider( const DBproviderConfig& conf )
 
 DatabaseProvider::~DatabaseProvider()
 {
-	for ( std::list< DatabaseContainer* >::const_iterator it = m_db.begin();
+	for ( std::list< Container< db::Database >* >::const_iterator it = m_db.begin();
 							it != m_db.end(); it++ )
 		delete *it;
 }
@@ -85,10 +85,10 @@ DatabaseProvider::~DatabaseProvider()
 
 const Database* DatabaseProvider::database( const std::string& id ) const
 {
-	for ( std::list< DatabaseContainer* >::const_iterator it = m_db.begin();
+	for ( std::list< Container< db::Database >* >::const_iterator it = m_db.begin();
 							it != m_db.end(); it++ )	{
-		if ( (*it)->database().ID() == id )
-			return &(*it)->database();
+		if ( (*it)->object().ID() == id )
+			return &(*it)->object();
 	}
 	return NULL;
 }

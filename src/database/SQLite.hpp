@@ -38,7 +38,7 @@
 #define _SQLITE_HPP_INCLUDED
 
 #include "database/database.hpp"
-#include "database/databaseContainer.hpp"
+#include "container.hpp"
 #include "moduleInterface.hpp"
 
 #include <list>
@@ -90,7 +90,7 @@ private:
 
 
 class SQLiteContainer : public module::ModuleContainer< SQLiteContainer, SQLiteConfig,
-		DatabaseContainer >
+		db::Database >
 {
 public:
 	SQLiteContainer( const SQLiteConfig& conf );
@@ -98,7 +98,7 @@ public:
 
 	const std::string& ID() const			{ return m_db.ID(); }
 	virtual const char* typeName() const		{ return m_db.typeName(); }
-	virtual const Database& database()		{ return m_db; }
+	virtual Database& object()			{ return m_db; }
 private:
 	SQLiteDatabase	m_db;
 };

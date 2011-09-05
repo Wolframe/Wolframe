@@ -37,7 +37,7 @@
 #ifndef _DATABASE_REFERENCE_HPP_INCLUDED
 #define _DATABASE_REFERENCE_HPP_INCLUDED
 
-#include "databaseContainer.hpp"
+#include "config/configurationBase.hpp"
 
 namespace _Wolframe {
 namespace db {

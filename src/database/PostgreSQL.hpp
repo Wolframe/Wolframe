@@ -38,7 +38,7 @@
 #define _POSTGRESQL_HPP_INCLUDED
 
 #include "database/database.hpp"
-#include "database/databaseContainer.hpp"
+#include "container.hpp"
 #include "moduleInterface.hpp"
 
 #include <list>
@@ -98,7 +98,7 @@ private:
 
 
 class PostgreSQLcontainer : public module::ModuleContainer< PostgreSQLcontainer, PostgreSQLconfig,
-		DatabaseContainer >
+		db::Database >
 {
 public:
 	PostgreSQLcontainer( const PostgreSQLconfig& conf );
@@ -106,7 +106,7 @@ public:
 
 	virtual const std::string& ID() const		{ return m_db.ID(); }
 	virtual const char* typeName() const		{ return m_db.typeName(); }
-	virtual const Database& database()		{ return m_db; }
+	virtual Database& object()			{ return m_db; }
 private:
 	PostgreSQLdatabase	m_db;
 };

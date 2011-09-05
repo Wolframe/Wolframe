@@ -38,11 +38,21 @@
 #define _TEXT_FILE_AUTHENTICATION_HPP_INCLUDED
 
 #include <string>
-#include "AAAA/authenticationContainer.hpp"
+#include "AAAA/authentication.hpp"
 #include "moduleInterface.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
+
+class TextFileAuthenticator : public Authenticator
+{
+public:
+	virtual Step::AuthStep nextStep( )	{ return Step::_Wolframe_AUTH_STEP_SUCCESS; }
+	virtual std::string token( )		{ return "token"; }
+	virtual std::string sendData( )		{ return "sendData"; }
+	virtual void receiveData( const std::string )	{}
+	virtual std::string getError( )		{ return "getError"; }
+};
 
 class TextFileAuthConfig :  public module::ModuleConfiguration< TextFileAuthConfig >
 {
@@ -64,15 +74,17 @@ private:
 
 
 class TxtFileAuthContainer : public module::ModuleContainer< TxtFileAuthContainer, TextFileAuthConfig,
-		AuthenticationContainer >
+		Authenticator >
 {
 public:
 	TxtFileAuthContainer( const TextFileAuthConfig& conf );
 	~TxtFileAuthContainer()					{}
 
 	virtual const char* typeName() const			{ return "TextFileAuth"; }
+	virtual Authenticator& object()			{ return m_auth; }
 private:
-	std::string	m_file;
+	std::string		m_file;
+	TextFileAuthenticator	m_auth;
 };
 
 }} // namespace _Wolframe::AAAA

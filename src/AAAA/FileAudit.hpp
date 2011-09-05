@@ -39,11 +39,15 @@
 
 #include <string>
 
-#include "AAAA/auditContainer.hpp"
+#include "AAAA/audit.hpp"
 #include "moduleInterface.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
+
+class FileAuditor : public Auditor
+{
+};
 
 class FileAuditConfig : public module::ModuleConfiguration< FileAuditConfig >
 {
@@ -65,15 +69,17 @@ private:
 
 
 class FileAuditContainer : public module::ModuleContainer< FileAuditContainer, FileAuditConfig,
-		AuditContainer >
+		Auditor >
 {
 public:
 	FileAuditContainer( const FileAuditConfig& conf );
 	~FileAuditContainer()				{}
 
+	virtual Auditor& object()			{ return m_audit; }
 	const char* typeName() const			{ return "FileAudit"; }
 private:
 	std::string	m_file;
+	FileAuditor	m_audit;
 };
 
 }} // namespace _Wolframe::AAAA

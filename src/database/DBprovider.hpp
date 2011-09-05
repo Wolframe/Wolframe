@@ -40,7 +40,7 @@
 #include <list>
 #include "config/configurationBase.hpp"
 #include "database/database.hpp"
-#include "database/databaseContainer.hpp"
+#include "container.hpp"
 
 namespace _Wolframe {
 namespace db {
@@ -73,7 +73,7 @@ public:
 
 	const Database* database( const std::string& ID ) const;
 private:
-	std::list< DatabaseContainer* >	m_db;
+	std::list< Container< Database >* >	m_db;
 };
 
 }} // namespace _Wolframe::db

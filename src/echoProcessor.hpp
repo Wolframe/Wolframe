@@ -37,10 +37,17 @@
 #ifndef _ECHO_PROCESSOR_HPP_INCLUDED
 #define _ECHO_PROCESSOR_HPP_INCLUDED
 
-#include "WolframeProcContainer.hpp"
+#include "WolframeProcessor.hpp"
+#include "container.hpp"
 #include "moduleInterface.hpp"
 
 namespace _Wolframe {
+
+class EchoProcessor : public proc::Processor
+{
+	virtual const char* typeName() const	{ return "EchoProcessor"; }
+};
+
 
 class EchoProcConfig : public module::ModuleConfiguration< EchoProcConfig >
 {
@@ -62,15 +69,16 @@ private:
 
 
 class EchoProcContainer : public module::ModuleContainer< EchoProcContainer, EchoProcConfig,
-		WolframeProcContainer >
+		proc::Processor >
 {
 public:
 	EchoProcContainer( const EchoProcConfig& conf );
 	~EchoProcContainer()				{}
 
 	virtual const char* typeName() const		{ return "EchoProcessor"; }
-//	virtual const WolframeProcessor& processor()	{ return NULL; }
-
+	virtual proc::Processor& object()		{ return proc; }
+private:
+	EchoProcessor	proc;
 };
 
 } // namespace _Wolframe

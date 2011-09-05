@@ -40,6 +40,8 @@
 
 #include <string>
 
+#include "../src/database/DBprovider.hpp"
+
 namespace _Wolframe {
 namespace AAAA {
 
@@ -60,6 +62,8 @@ public:
 class Authenticator {
 public:
 	virtual ~Authenticator( ) { }
+
+	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ )	{ return true; }
 
 	// get next step in authentication
 	virtual Step::AuthStep nextStep( ) = 0;

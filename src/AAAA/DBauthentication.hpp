@@ -37,12 +37,22 @@
 #ifndef _DB_AUTHENTICATION_HPP_INCLUDED
 #define _DB_AUTHENTICATION_HPP_INCLUDED
 
-#include "AAAA/authenticationContainer.hpp"
 #include "database/databaseReference.hpp"
+#include "AAAA/authentication.hpp"
 #include "moduleInterface.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
+
+class DBauthenticator : public Authenticator
+{
+public:
+	virtual Step::AuthStep nextStep( )	{ return Step::_Wolframe_AUTH_STEP_SUCCESS; }
+	virtual std::string token( )		{ return "token"; }
+	virtual std::string sendData( )		{ return "sendData"; }
+	virtual void receiveData( const std::string )	{}
+	virtual std::string getError( )		{ return "getError"; }
+};
 
 class DatabaseAuthConfig : public module::ModuleConfiguration< DatabaseAuthConfig >
 {
@@ -71,18 +81,20 @@ private:
 
 
 class DBauthContainer : public module::ModuleContainer< DBauthContainer, DatabaseAuthConfig,
-		AuthenticationContainer >
+		Authenticator >
 {
 public:
 	DBauthContainer( const DatabaseAuthConfig& conf );
 	~DBauthContainer();
 
 	virtual const char* typeName() const	{ return "DatabaseAuth"; }
+	virtual Authenticator& object()		{ return m_auth; }
 
 	bool resolveDB( const db::DatabaseProvider& db );
 private:
 	std::string		m_dbLabel;
 	const db::Database*	m_db;
+	DBauthenticator		m_auth;
 };
 
 }} // namespace _Wolframe::AAAA

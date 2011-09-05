@@ -61,8 +61,8 @@ procConfigs[ noProcModules ] = { module::ModuleConfigurationDescription< config:
 				 EchoProcConfig::create,
 				 &config::ConfigurationParser::parseBase< EchoProcConfig > ) };
 
-static module::ModuleContainerDescription< WolframeProcContainer, config::ContainerConfiguration >
-procModules[ noProcModules ] = { module::ModuleContainerDescription< WolframeProcContainer, config::ContainerConfiguration >( "EchoProcessor", &EchoProcContainer::create ) };
+static module::ModuleContainerDescription< Container< proc::Processor >, config::ContainerConfiguration >
+procModules[ noProcModules ] = { module::ModuleContainerDescription< Container< proc::Processor >, config::ContainerConfiguration >( "EchoProcessor", &EchoProcContainer::create ) };
 /****  End impersonating the module loader  **************************************************/
 
 namespace _Wolframe {
@@ -169,7 +169,7 @@ ProcessorGroup::ProcessorGroup( const ProcessorGroupConfig& conf )
 		size_t i;
 		for ( i = 0; i < noProcModules; i++ )	{
 			if ( boost::algorithm::iequals( procModules[i].name, procType ))	{
-				WolframeProcContainer* container = procModules[i].createFunc( **it );
+				Container< Processor >* container = procModules[i].createFunc( **it );
 				m_proc.push_back( container );
 				break;
 			}
@@ -183,7 +183,7 @@ ProcessorGroup::ProcessorGroup( const ProcessorGroupConfig& conf )
 
 ProcessorGroup::~ProcessorGroup()
 {
-	for ( std::list< WolframeProcContainer* >::const_iterator it = m_proc.begin();
+	for ( std::list< Container< Processor >* >::const_iterator it = m_proc.begin();
 							it != m_proc.end(); it++ )
 		delete *it;
 }

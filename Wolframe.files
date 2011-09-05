@@ -220,9 +220,7 @@ gtest/Makefile.W32
 gtest/README
 gtest/src/gtest-internal-inl.h
 header.txt
-include/AAAA/auditContainer.hpp
 include/AAAA/audit.hpp
-include/AAAA/authenticationContainer.hpp
 include/AAAA/authentication.hpp
 include/appConfig.hpp
 include/appProcessor.hpp
@@ -240,7 +238,6 @@ include/config/valueParser.hpp
 include/connectionEndpoint.hpp
 include/connectionHandler.hpp
 include/countedReference.hpp
-include/database/databaseContainer.hpp
 include/database/database.hpp
 include/database/databaseOperation.hpp
 include/database/databaseReference.hpp
@@ -272,7 +269,6 @@ include/SSLcertificateInfo.hpp
 include/standardConfigs.hpp
 include/user.hpp
 include/version.hpp
-include/WolframeProcContainer.hpp
 include/WolframeProcessor.hpp
 INSTALL.Unix
 INSTALL.Windows

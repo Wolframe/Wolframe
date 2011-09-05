@@ -34,7 +34,7 @@
 // database audit
 //
 
-#include "AAAA/auditContainer.hpp"
+#include "AAAA/audit.hpp"
 #include "database/databaseReference.hpp"
 #include "moduleInterface.hpp"
 
@@ -43,6 +43,10 @@
 
 namespace _Wolframe {
 namespace AAAA {
+
+class DBauditor : public Auditor
+{
+};
 
 class DBauditConfig : public module::ModuleConfiguration< DBauditConfig >
 {
@@ -70,7 +74,7 @@ private:
 
 
 class DBauditContainer : public module::ModuleContainer< DBauditContainer, DBauditConfig,
-		AuditContainer >
+		Auditor >
 {
 public:
 	DBauditContainer( const DBauditConfig& conf );
@@ -79,9 +83,11 @@ public:
 	const char* typeName() const				{ return "DatabaseAudit"; }
 
 	bool resolveDB( const db::DatabaseProvider& db );
+	virtual Auditor& object()				{ return m_audit; }
 private:
 	std::string		m_dbLabel;
 	const db::Database*	m_db;
+	DBauditor		m_audit;
 };
 
 }} // namespace _Wolframe::AAAA

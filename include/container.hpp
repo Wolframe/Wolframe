@@ -41,13 +41,13 @@
 
 namespace _Wolframe	{
 
-template < class ObjectInterface >
+template < class Object >
 class Container	{
 public:
 	virtual ~Container()				{}
 
-	virtual const std::string& ID() const = 0;
-	virtual const ObjectInterface& object() = 0;
+//	virtual const std::string& ID() const = 0;
+	virtual Object& object() = 0;
 };
 
 } // namespace _Wolframe

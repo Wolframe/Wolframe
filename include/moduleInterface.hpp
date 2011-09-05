@@ -40,6 +40,7 @@
 #include <string>
 #include <boost/property_tree/ptree.hpp>
 #include "config/configurationBase.hpp"
+#include "container.hpp"
 
 namespace _Wolframe {
 namespace module {
@@ -99,13 +100,13 @@ public:
 
 
 template < class T, class Tconf, class Tbase >
-class ModuleContainer : public Tbase
+class ModuleContainer : public Container< Tbase >
 {
 public:
 	virtual ~ModuleContainer()			{}
 	virtual const char* typeName() const = 0;
 
-	static Tbase* create( const config::ContainerConfiguration& conf )	{
+	static Container< Tbase >* create( const config::ContainerConfiguration& conf )	{
 		return new T( dynamic_cast< const Tconf& >( conf ));
 	}
 };

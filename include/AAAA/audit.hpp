@@ -38,6 +38,8 @@
 #ifndef _AUDIT_HPP_INCLUDED
 #define _AUDIT_HPP_INCLUDED
 
+#include "../src/database/DBprovider.hpp"
+
 namespace _Wolframe {
 namespace AAAA {
 
@@ -45,6 +47,8 @@ namespace AAAA {
 class Auditor {
 public:
 	virtual ~Auditor( ) { }
+
+	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ )	{ return true; }
 
 	// close the auditor
 	virtual void close( ) { }

@@ -39,7 +39,8 @@
 
 #include "config/configurationBase.hpp"
 #include "moduleInterface.hpp"
-#include "WolframeProcContainer.hpp"
+#include "WolframeProcessor.hpp"
+#include "container.hpp"
 #include "database/database.hpp"
 #include "database/DBprovider.hpp"
 
@@ -80,7 +81,7 @@ public:
 private:
 	std::string				m_dbLabel;
 	const db::Database*			m_db;
-	std::list<WolframeProcContainer*>	m_proc;
+	std::list<Container< Processor >*>	m_proc;
 };
 
 }} // namespace _Wolframe::proc
