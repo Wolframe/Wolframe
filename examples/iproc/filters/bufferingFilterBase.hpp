@@ -32,61 +32,65 @@ Project Wolframe.
 ///\file bufferingFilterBase.hpp
 ///\brief Base class definitions for filters that process the content as a whole
 
+#ifndef _Wolframe_BUFFERING_FILTERBASE_HPP_INCLUDED
+#define _Wolframe_BUFFERING_FILTERBASE_HPP_INCLUDED
+#include "protocol/inputfilter.hpp"
+#include "countedReference.hpp"
+#include <string>
+
 namespace _Wolframe {
 namespace filter {
 
-template <class Container, class BufferType=std::string>
+template <class Content, class BufferType=std::string>
 struct BufferingInputFilter :public protocol::InputFilter
 {
 	enum ErrorCodes
 	{
 		Ok,
+		ErrOpenDoc,
+		ErrNoContent,
 		ErrOutputBufferTooSmall
 	};
 
 	///\brief Constructor
-	BufferingFilter()
-		:m_content(0){}
+	BufferingInputFilter(){}
 
 	///\brief Destructor
-	~BufferingFilter()
-	{
-		if (m_content) delete m_content;
-	}
+	~BufferingInputFilter(){}
 
 	///\brief Copy constructor
 	///\param [in] o format output to copy
-	BufferingFilter( const BufferingFilter& o)
-		:m_buffer(o.m_buffer),m_content(0)
-	{
-		if (o.m_content)
-		{
-			protocol::InputFilter::protocolInput( (void*)&m_buffer.at(0), m_buffer.size(), true);
-			m_content = new Container( ptr(), size());
-			m_itr = m_content->begin() + (o.m_itr - o.m_content->begin());
-			m_end = m_content->end();
-		}
-	}
+	BufferingInputFilter( const BufferingInputFilter& o)
+		:protocol::InputFilter(o),m_buffer(o.m_buffer),m_content(o.m_content){}
 
 	///\brief self copy
 	///\return copy of this
-	virtual BufferingFilter* copy() const
+	virtual BufferingInputFilter* copy() const
 	{
-		return new BufferingFilter( *this);
+		return new BufferingInputFilter( *this);
 	}
 
 	virtual void protocolInput( void* data, size_type datasize, bool eoD)
-	{
+	{		
 		for (unsigned int ii=0; ii<datasize; ii++)
 		{
-			buffer.push_back( ((unsigned char*)data)[ii]);
+			m_buffer.push_back( ((unsigned char*)data)[ii]);
 		}
 		if (eoD)
 		{
 			protocol::InputFilter::protocolInput( (void*)&m_buffer.at(0), m_buffer.size(), true);
-			m_content = new Container( ptr(), size());
-			m_itr = m_content->begin();
-			m_end = m_content->end();
+			Content* dc = new (std::nothrow) Content();
+			if (!dc)
+			{
+				setState( Error, ErrOpenDoc);
+			}
+			if (!dc->open( ptr(), size()))
+			{
+				setState( Error, ErrOpenDoc);
+				delete dc;
+				dc = 0;
+			}
+			m_content.reset( dc);
 		}
 	}
 
@@ -98,20 +102,21 @@ struct BufferingInputFilter :public protocol::InputFilter
 			return false;
 		}
 		setState( Open);
-		if (buffersize - *bufferpos < m_itr->size())
+		if (!m_content.get())
+		{
+			setState( Error, ErrNoContent);
+			return false;
+		}
+		if (!m_content.get()->getNext( type, buffer, buffersize, bufferpos))
 		{
 			setState( Error, ErrOutputBufferTooSmall);
 			return false;
 		}
-		memcpy( buffer, &m_itr->at(0), m_itr->size());
-		*bufferpos += m_itr->size();
-		++m_itr;
+		return true;
 	}
 private:
 	BufferType m_buffer;			///< STL back insertion sequence for buffering the input
-	Container* m_content;			///< Container that provides an iterator on the input
-	typename Container::iterator m_itr;	///< iterator
-	typename Container::iterator m_end;	///< end of input mark iterator
+	CountedReference<Content> m_content;	///< Content that provides an iterator on the input
 };
 
 }}//namespace

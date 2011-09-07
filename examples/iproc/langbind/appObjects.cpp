@@ -208,7 +208,9 @@ protocol::InputFilter* System::createInputFilter( const char* name, unsigned int
 	if (boost::algorithm::iequals( nm, "xml:UCS4BE")) return new filter::XmlFilter<textwolf::charset::UCS4BE>::InputFilter( bufsize);
 	if (boost::algorithm::iequals( nm, "xml:UCS4")) return new filter::XmlFilter<textwolf::charset::UCS4BE>::InputFilter( bufsize);
 	if (boost::algorithm::iequals( nm, "xml:Header")) return new filter::XmlHeaderFilter::InputFilter();
-
+#ifdef WITH_LIBXML2
+	if (boost::algorithm::iequals( nm, "xml:libxml")) return new filter::libxml2::InputFilter();
+#endif
 	LOG_ERROR << "unknown filter '" << name << "'";
 	return 0;
 }

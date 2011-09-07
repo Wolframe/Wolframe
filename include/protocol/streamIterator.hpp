@@ -29,18 +29,38 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filters.hpp
-///\brief Top-level include file for the input/output filter implementations
+///\file streamIterator.hpp
+///\brief Helper for defining stream iterators that are non comparable except for the check of EOF (end iterator)
 
-#ifndef _Wolframe_FILTERS_HPP_INCLUDED
-#define _Wolframe_FILTERS_HPP_INCLUDED
+#ifndef _Wolframe_STREAM_ITERATOR_HPP_INCLUDED
+#define _Wolframe_STREAM_ITERATOR_HPP_INCLUDED
 
-#include "filters/char_filter.hpp"
-#include "filters/line_filter.hpp"
-#include "filters/xml_filter.hpp"
-#ifdef WITH_LIBXML2
-#include "filters/libxml2_filter.hpp"
+namespace _Wolframe {
+
+///\class StreamIteratorType
+template <bool isEnd>
+class StreamIteratorBase
+{
+public:
+	bool operator == (const StreamIteratorBase& it) const {return m_isEnd == it.m_isEnd;}
+	bool operator != (const StreamIteratorBase& it) const {return m_isEnd != it.m_isEnd;}
+
+protected:
+	StreamIteratorBase()
+		:m_isEnd(isEnd){}
+
+	void done()
+	{
+		m_isEnd = true;
+	}
+
+private:
+	bool m_isEnd;
+};
+
+typedef StreamIteratorBase<true>  EndStreamIterator;
+typedef StreamIteratorBase<false> StreamIterator;
+
+}//namepspace
 #endif
-
-#endif //_Wolframe_PROTOCOL_HPP_INCLUDED
 

@@ -31,312 +31,154 @@ Project Wolframe.
 ************************************************************************/
 ///\file libxml2_filter.hpp
 ///\brief Filter using the libxml2 library for input and output
+
+#ifndef _Wolframe_LIBXML2_FILTER_HPP_INCLUDED
+#define _Wolframe_LIBXML2_FILTER_HPP_INCLUDED
+
 #include "bufferingFilterBase.hpp"
+#include "protocol/streamIterator.hpp"
 #include <cstddef>
 #include <vector>
 #include <string>
+#include <libxml/parser.h>
 #include <libxml/tree.h>
-#include <libxml++/libxml++.h>
-#include <libxml++/parsers/textreader.h>
 
 namespace _Wolframe {
 namespace filter {
-namespace libxml2pp {
-
-class Container
-{
-public:
-	///\brief Enumeration of states of the libxml2 parser
-	enum State
-	{
-		Init,		///< started
-		Tag,		///< reading tag
-		Attribute,	///< reading attribute name
-		AttributeValue,	///< reading attribute value
-		EndOfData	///< reached end of data
-	};
-
-	struct Element
-	{
-		std::string& value() const			{return m_value;}
-		protocol::InputFilter::ElementType type() const {return m_type;}
-	private:
-		friend class Container;
-	};
-
-	Container( void* src, std::size_t srcsize)
-		:m_reader( src, srcsize),m_state(Init),m_type(protocol::InputFilter::Value),m_depth(0){}
-
-	void skip()
-	{
-		m_element.m_value.clear();
-		for (;;)
-		{
-			while (m_depth > m_reader.get_depth())
-			{
-				m_element.m_type = protocol::InputFilter::CloseTag;
-				return;
-			}
-
-			switch (m_state)
-			{
-				case Init:
-					if (m_reader.read())
-					{
-						m_state = Tag;
-						m_element.m_value.append( m_reader.get_name());
-						m_element.m_type = protocol::InputFilter::OpenTag;
-						return;
-					}
-					else
-					{
-						m_element.m_type = protocol::InputFilter::CloseTag;
-						m_state = EndOfData;
-						return;
-					}
-
-				case Tag:
-					if (m_reader.has_attributes())
-					{
-						m_reader.move_to_first_attribute();
-						m_element.m_value.append( m_reader.get_name());
-						m_element.m_type = protocol::InputFilter::Attribute;
-						m_state = AttributeValue;
-						return;
-					}
-					else if (reader.has_value())
-					{
-						m_element.m_value.append( m_reader.reader.get_value());
-						m_element.m_type = protocol::InputFilter::Value;
-						m_state = Init;
-						return;
-					}
-					else
-					{
-						m_state = Init;
-						continue;
-					}
-
-				case Attribute:
-					if (reader.move_to_next_attribute())
-					{
-						m_element.m_value.append( m_reader.get_name());
-						m_element.m_type = protocol::InputFilter::Attribute;
-						m_state = AttributeValue;
-						return;
-					}
-					else if (reader.has_value())
-					{
-						m_element.m_value.append( m_reader.reader.get_value());
-						m_element.m_type = protocol::InputFilter::Value;
-						m_state = Init;
-						return;
-					}
-
-				case AttributeValue:
-					m_element.m_value.append( m_reader.reader.get_value());
-					m_element.m_type = protocol::InputFilter::Value;
-					m_state = Attribute;
-					return;
-
-				case EndOfData:
-					m_element.m_type = protocol::InputFilter::CloseTag;
-					return;
-
-			}
-		}
-	}
-
-
-	class iterator
-	{
-		iterator( Container* c) 	:m_container(c){}
-		iterator()			:m_container(0){}
-
-		iterator& operator++()
-		{
-			skip();
-			return *this;
-		}
-
-		const Element& operator*() const
-		{
-			return m_container->m_element;
-		}
-
-		const Element* operator->() const
-		{
-			return &m_container->m_element;
-		}
-	private:
-		Container* m_container;
-	};
-private:
-	xmlpp::TextReader m_reader;
-	State m_state;
-	Element m_element;
-	protocol::InputFilter::ElementType m_type;
-	int m_depth;
-};
-}//namespace
-
-typedef BufferingInputFilter<libxml2pp::Container,std::string> Libxml2ppInputFilter;
-
-
-
-
 namespace libxml2 {
 
-class Container
+class Content
 {
 public:
-	///\brief Enumeration of states of the libxml2 parser
-	enum State
-	{
-		Init,		///< started
-		Tag,		///< reading tag
-		Attribute,	///< reading attribute name
-		AttributeValue,	///< reading attribute value
-		EndOfData	///< reached end of data
-	};
+	Content() :m_doc(0),m_node(0),m_value(0),m_prop(0),m_propvalues(0){}
 
-	struct Element
+	bool open( const void* content, std::size_t size)
 	{
-		std::string& value() const			{return m_value;}
-		protocol::InputFilter::ElementType type() const {return m_type;}
-	private:
-		friend class Container;
-	};
+		if (m_doc) xmlFreeDoc( m_doc);
+		m_nodestk.clear();
 
-	Container( void* src, std::size_t srcsize)
-		:m_doc(0),m_state(Init),m_type(protocol::InputFilter::Value),m_depth(0)
-	{
-		m_doc = xmlReadMemory( buffer, size, 0/*URL*/, 0/*encoding*/, 0/*options*/); 
-		if (m_doc != 0)
-		{
-			if (doc->children)
-			{
-				nodestk.push_back( doc->children);
-			}
-		}
+		int options = XML_PARSE_NOENT | XML_PARSE_DTDLOAD | XML_PARSE_DTDVALID;
+		m_doc = xmlReadMemory( (const char*)content, size, "noname.xml", NULL, options);
+		if (!m_doc) return false;
+
+		m_node = xmlDocGetRootElement( m_doc);
+		return true;
 	}
 
-	void skip()
+	~Content()
 	{
-		m_element.m_value.clear();
-		for (;;)
-		{
-			while (m_depth > m_reader.get_depth())
-			{
-				m_element.m_type = protocol::InputFilter::CloseTag;
-				return;
-			}
-
-			switch (m_state)
-			{
-				case Init:
-					if (m_reader.read())
-					{
-						m_state = Tag;
-						m_element.m_value.append( m_reader.get_name());
-						m_element.m_type = protocol::InputFilter::OpenTag;
-						return;
-					}
-					else
-					{
-						m_element.m_type = protocol::InputFilter::CloseTag;
-						m_state = EndOfData;
-						return;
-					}
-
-				case Tag:
-					if (m_reader.has_attributes())
-					{
-						m_reader.move_to_first_attribute();
-						m_element.m_value.append( m_reader.get_name());
-						m_element.m_type = protocol::InputFilter::Attribute;
-						m_state = AttributeValue;
-						return;
-					}
-					else if (reader.has_value())
-					{
-						m_element.m_value.append( m_reader.reader.get_value());
-						m_element.m_type = protocol::InputFilter::Value;
-						m_state = Init;
-						return;
-					}
-					else
-					{
-						m_state = Init;
-						continue;
-					}
-
-				case Attribute:
-					if (reader.move_to_next_attribute())
-					{
-						m_element.m_value.append( m_reader.get_name());
-						m_element.m_type = protocol::InputFilter::Attribute;
-						m_state = AttributeValue;
-						return;
-					}
-					else if (reader.has_value())
-					{
-						m_element.m_value.append( m_reader.reader.get_value());
-						m_element.m_type = protocol::InputFilter::Value;
-						m_state = Init;
-						return;
-					}
-
-				case AttributeValue:
-					m_element.m_value.append( m_reader.reader.get_value());
-					m_element.m_type = protocol::InputFilter::Value;
-					m_state = Attribute;
-					return;
-
-				case EndOfData:
-					m_element.m_type = protocol::InputFilter::CloseTag;
-					return;
-
-			}
-		}
+		if (m_doc) xmlFreeDoc( m_doc);
 	}
 
-
-	class iterator
+	bool getNext( protocol::InputFilter::ElementType* type, void* buffer, std::size_t buffersize, std::size_t* bufferpos)
 	{
-		iterator( Container* c) 	:m_container(c){}
-		iterator()			:m_container(0){}
-
-		iterator& operator++()
+		bool rt;
+	AGAIN:
+		if (!m_doc)
 		{
-			skip();
-			return *this;
+			rt = false;
 		}
-
-		const Element& operator*() const
+		else if (m_value)
 		{
-			return m_container->m_element;
+			*type = protocol::InputFilter::Value;
+			rt = getElement( buffer, buffersize, bufferpos, m_value);
+			if (rt) m_value = 0;
 		}
-
-		const Element* operator->() const
+		else if (m_prop && m_propvalues)
 		{
-			return &m_container->m_element;
+			*type = protocol::InputFilter::Attribute;
+			rt = getElement( buffer, buffersize, bufferpos, m_prop->name);
+			m_value = m_propvalues->content;
+			m_propvalues = m_propvalues->next;
+			if (!m_propvalues)
+			{
+				m_prop = m_prop->next;
+				if (m_prop) m_propvalues = m_prop->children;
+			}
 		}
-	private:
-		Container* m_container;
-	};
+		else if (!m_node)
+		{
+			if (m_nodestk.empty())
+			{
+				xmlFreeDoc( m_doc);
+				m_doc = 0;
+				return false;
+			}
+			m_node = m_nodestk.back();
+			m_nodestk.pop_back();
+			*type = protocol::InputFilter::CloseTag;
+			rt = true;
+		}
+		else switch (m_node->type)
+		{
+			case XML_HTML_DOCUMENT_NODE:
+			case XML_DOCB_DOCUMENT_NODE:
+			case XML_DOCUMENT_NODE:
+			case XML_ELEMENT_NODE:
+				*type = protocol::InputFilter::OpenTag;
+				m_prop = m_node->properties;
+				if (m_prop) m_propvalues = m_prop->children;
+				m_nodestk.push_back( m_node->next);
+				rt = getElement( buffer, buffersize, bufferpos, m_node->name);
+				m_node = m_node->children;
+				break;
+
+			case XML_ATTRIBUTE_NODE:
+				*type = protocol::InputFilter::Attribute;
+				rt = getElement( buffer, buffersize, bufferpos, m_node->name);
+				m_value = m_node->content;
+				break;
+
+			case XML_TEXT_NODE:
+				*type = protocol::InputFilter::Value;
+				rt = getElement( buffer, buffersize, bufferpos, m_node->content);
+				break;
+
+			case XML_CDATA_SECTION_NODE:
+			case XML_ENTITY_REF_NODE:
+			case XML_ENTITY_NODE:
+			case XML_PI_NODE:
+			case XML_COMMENT_NODE:
+			case XML_DOCUMENT_TYPE_NODE:
+			case XML_DOCUMENT_FRAG_NODE:
+			case XML_NOTATION_NODE:
+			case XML_DTD_NODE:
+			case XML_ELEMENT_DECL:
+			case XML_ATTRIBUTE_DECL:
+			case XML_ENTITY_DECL:
+			case XML_NAMESPACE_DECL:
+			case XML_XINCLUDE_START:
+			case XML_XINCLUDE_END:
+			default:
+				goto AGAIN;
+		}
+		return rt;
+	}
+
+private:
+	bool getElement( void* buffer, std::size_t buffersize, std::size_t* bufferpos, const xmlChar* str)
+	{
+		if (!str) return true;
+
+		std::size_t elemenlen = xmlStrlen( str) * sizeof(*str);
+		if (buffersize - *bufferpos < elemenlen) return false;
+
+		std::memcpy( (char*)buffer + *bufferpos, str, elemenlen);
+		return true;
+	}
+
 private:
 	xmlDocPtr m_doc;
-	State m_state;
-	Element m_element;
-	protocol::InputFilter::ElementType m_type;
-	std::vector<xmlNodePtr> m_nodestk;
+	xmlNode* m_node;
+	xmlChar* m_value;
+	xmlAttr* m_prop;
+	xmlNode* m_propvalues;
+	std::vector<xmlNode*> m_nodestk;
 };
-}//namespace
 
-typedef BufferingInputFilter<libxml2::Container,std::string> Libxml2InputFilter;
+typedef BufferingInputFilter<Content,std::string> InputFilter;
 
 
-}}//namespace
+}}}//namespace
 #endif
 

@@ -647,7 +647,7 @@ public:
 	}
 	///\brief prints a unicode character to a buffer
 	///\tparam Buffer_ STL back insertion sequence
-	///\param [in] chr character to print
+	///\param [in] ch character to print
 	///\param [out] buf buffer to print to
 	template <class Buffer_>
 	static void print( UChar ch, Buffer_& buf)
@@ -1994,10 +1994,11 @@ public:
 		}
 		///\brief Constructor
 		///\param [in] p_input XML scanner to use for iteration
-		iterator( ThisXMLScanner& p_input, bool doSkipFirst=true)
+		///\param [in] doSkipToFirst true, if the iterator should skip to the first character of the input (default behaviour of STL conform iterators but maybe not exception save)
+		iterator( ThisXMLScanner& p_input, bool doSkipToFirst=true)
 				:input( &p_input)
 		{
-			if (doSkipFirst)
+			if (doSkipToFirst)
 			{
 				element.m_type = input->nextItem();
 				element.m_content = input->getItem();
@@ -2042,9 +2043,10 @@ public:
 
 	///\brief Get begin iterator
 	///\return iterator
-	iterator begin( bool doSkipFirst=true)
+	///\param [in] doSkipToFirst true, if the iterator should skip to the first character of the input (default behaviour of STL conform iterators but maybe not exception save)
+	iterator begin( bool doSkipToFirst=true)
 	{
-		return iterator( *this, doSkipFirst);
+		return iterator( *this, doSkipToFirst);
 	}
 	///\brief Get the pointer to the end of content
 	///\return iterator
@@ -3175,6 +3177,7 @@ public:
 
 		///\brief Constructor by values
 		///\param [in] p_input XML path selection stream to iterate through
+		///\param [in] skipToFirst true, if the iterator should skip to the first character of the input (default behaviour of STL conform iterators but maybe not exception save)
 		iterator( ThisXMLPathSelect& p_input, bool skipToFirst=true)
 				:input( &p_input)
 		{
@@ -3247,4 +3250,3 @@ public:
 
 } //namespace textwolf
 #endif
-  
