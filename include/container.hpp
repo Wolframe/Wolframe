@@ -46,7 +46,6 @@ class Container	{
 public:
 	virtual ~Container()				{}
 
-//	virtual const std::string& ID() const = 0;
 	virtual Object& object() = 0;
 };
 
