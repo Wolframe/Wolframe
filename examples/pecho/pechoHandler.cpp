@@ -446,13 +446,13 @@ net::ConnectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const n
 }
 
 
-ServerHandler::ServerHandler( const HandlerConfiguration* ) : impl_( new ServerHandlerImpl ) {}
+ServerHandler::ServerHandler( const HandlerConfiguration* ) : m_impl( new ServerHandlerImpl ) {}
 
-ServerHandler::~ServerHandler()  { delete impl_; }
+ServerHandler::~ServerHandler()  { delete m_impl; }
 
 net::ConnectionHandler* ServerHandler::newConnection( const net::LocalEndpoint& local )
 {
-		return impl_->newConnection( local );
+		return m_impl->newConnection( local );
 }
 
 

@@ -486,3 +486,4 @@ XML/database.rng
 XML/logging.rng
 XML/README
 include/container.hpp
+include/database/databaseProvider.hpp

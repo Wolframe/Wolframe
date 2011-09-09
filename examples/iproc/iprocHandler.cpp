@@ -400,16 +400,16 @@ net::ConnectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const n
 }
 
 ServerHandler::ServerHandler( const HandlerConfiguration* cfg )
-	:impl_( new ServerHandlerImpl( cfg) ) {}
+	:m_impl( new ServerHandlerImpl( cfg) ) {}
 
 ServerHandler::~ServerHandler()
 {
-	delete impl_;
+	delete m_impl;
 }
 
 net::ConnectionHandler* ServerHandler::newConnection( const net::LocalEndpoint& local )
 {
-	return impl_->newConnection( local );
+	return m_impl->newConnection( local );
 }
 
 

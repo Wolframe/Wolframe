@@ -67,9 +67,8 @@ public:
 };
 
 
-/// Base class for database(s).
-///
-/// All databases should derive from this class.
+/// Base class for database interface
+/// All databases should provide this interface
 class Database
 {
 public:
@@ -82,7 +81,7 @@ public:
 
 	/// Database type (module type).
 	/// All database implementations need a type (name).
-	/// Type names should be unique.
+	/// Type names must be unique.
 	virtual const char* typeName() const = 0;
 
 	/// Perform a database transaction.

@@ -155,7 +155,7 @@ public:
 
 } // namespace net
 
-/// The server main
+/// The server main handler
 /// All it should do is to provide connection handlers
 
 struct	HandlerConfiguration;
@@ -170,11 +170,8 @@ public:
 	net::ConnectionHandler* newConnection( const net::LocalEndpoint& local );
 
 private:
-	ServerHandler( const ServerHandler& );
-	ServerHandler& operator = ( const ServerHandler& );
-
 	class ServerHandlerImpl;
-	ServerHandlerImpl *impl_;
+	ServerHandlerImpl *m_impl;
 };
 
 } // namespace _Wolframe
