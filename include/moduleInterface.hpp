@@ -34,8 +34,8 @@
 ///\file moduleInterface.hpp
 //
 
-#ifndef _MODULE_CONFIGURATION_HPP_INCLUDED
-#define _MODULE_CONFIGURATION_HPP_INCLUDED
+#ifndef _MODULE_INTERFACE_HPP_INCLUDED
+#define _MODULE_INTERFACE_HPP_INCLUDED
 
 #include <string>
 #include <boost/property_tree/ptree.hpp>
@@ -133,7 +133,6 @@ extern "C" {
 	LoadableModuleDescription* modDesc();
 }
 
-
 }} // namespace _Wolframe::module
 
-#endif // _MODULE_CONFIGURATION_HPP_INCLUDED
+#endif // _MODULE_INTERFACE_HPP_INCLUDED
