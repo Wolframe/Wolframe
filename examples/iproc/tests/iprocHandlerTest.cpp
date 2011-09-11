@@ -193,13 +193,13 @@ protected:
 		m_input.clear();
 		m_expected.clear();
 		m_input.append( "run\r\n");
-		m_expected.append( "OK expecting command\r\n\r\n");
+		m_expected.append( "OK expecting command\r\n");
 
 		m_input.append( escape( test.content));
 		m_expected.append( escape( test.content));
 
-		m_input.append( ".\r\n");
-		m_expected.append( ".\r\nOK\r\n");
+		m_input.append( "\r\n.\r\n");
+		m_expected.append( "\r\n.\r\nOK\r\n");
 		m_input.append( "quit\r\n");
 		m_expected.append( "BYE\r\n");
 	}
@@ -211,9 +211,9 @@ protected:
 };
 
 typedef ::testing::Types<
+	Empty<1,1>,
 	OneLine<1,1>,
 	OneLine<200,200>,
-	Empty<1,1>,
 	OneEmptyLine<1,1>,
 	OneOneCharLine<1,1>,
 	Random<1,2,2000>,

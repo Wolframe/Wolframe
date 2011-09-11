@@ -57,14 +57,12 @@ template <unsigned int SIZE=128>
 class Buffer
 {
 private:
-	typedef std::size_t size_type;		///< size type of this buffer vector
-
 	///\brief Some buffer constants
 	enum
 	{
 		Size=SIZE			///< maximume size of the buffer in bytes as enum definition
 	};
-	size_type m_pos;			///< current cursor position of the buffer (number of added characters)
+	std::size_t m_pos;			///< current cursor position of the buffer (number of added characters)
 	char m_buf[ Size+1];			///< buffer content
 
 public:
@@ -84,7 +82,7 @@ public:
 
 	///\brief Return the number of characters in the buffer
 	///\return the number of characters (bytes)
-	size_type size() const			{return m_pos;}
+	std::size_t size() const		{return m_pos;}
 
 	///\brief Return the buffer content as pointer to string without 0 termination
 	///\return the pointer to buffer start

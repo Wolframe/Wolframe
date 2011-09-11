@@ -182,6 +182,24 @@ const net::NetworkOperation Connection::nextOperation()
 						return WriteLine( "BAD arguments");
 					}
 				}
+				m_state = ParseArgsEOL;
+				continue;
+			}
+
+			case ParseArgsEOL:
+			{
+				if (!ProtocolParser::consumeEOL( m_itr, m_end))
+				{
+					if (m_itr == m_end)
+					{
+						return readDataOp();
+					}
+					else
+					{
+						m_state = ProtocolError;
+						return WriteLine( "BAD command");
+					}
+				}
 				switch (m_cmdidx)
 				{
 					case empty:
@@ -190,21 +208,12 @@ const net::NetworkOperation Connection::nextOperation()
 							m_state = ProtocolError;
 							return WriteLine( "BAD command");
 						}
-						else if (ProtocolParser::consumeEOL( m_itr, m_end))
+						else
 						{
 							m_buffer.clear();
 							m_argBuffer.clear();
 							m_state = EnterCommand;
 							continue;
-						}
-						else if (m_itr == m_end)
-						{
-							return readDataOp();
-						}
-						else
-						{
-							m_state = ProtocolError;
-							return WriteLine( "BAD command");
 						}
 					case capa:
 						if (m_argBuffer.argc())

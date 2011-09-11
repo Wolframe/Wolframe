@@ -37,6 +37,7 @@ Project Wolframe.
 #include "protocol/inputfilter.hpp"
 #include "countedReference.hpp"
 #include <string>
+#include <cstddef>
 
 namespace _Wolframe {
 namespace filter {
@@ -48,6 +49,7 @@ struct BufferingInputFilter :public protocol::InputFilter
 	{
 		Ok,
 		ErrOpenDoc,
+		ErrOutOfMem,
 		ErrNoContent,
 		ErrOutputBufferTooSmall
 	};
@@ -70,35 +72,10 @@ struct BufferingInputFilter :public protocol::InputFilter
 		return new BufferingInputFilter( *this);
 	}
 
-	virtual void protocolInput( void* data, size_type datasize, bool eoD)
-	{		
-		for (unsigned int ii=0; ii<datasize; ii++)
-		{
-			m_buffer.push_back( ((unsigned char*)data)[ii]);
-		}
-		if (eoD)
-		{
-			protocol::InputFilter::protocolInput( (void*)&m_buffer.at(0), m_buffer.size(), true);
-			Content* dc = new (std::nothrow) Content();
-			if (!dc)
-			{
-				setState( Error, ErrOpenDoc);
-			}
-			if (!dc->open( ptr(), size()))
-			{
-				setState( Error, ErrOpenDoc);
-				delete dc;
-				dc = 0;
-			}
-			m_content.reset( dc);
-		}
-	}
-
-	virtual bool getNext( ElementType* type, void* buffer, size_type buffersize, size_type* bufferpos)
+	virtual bool getNext( ElementType* type, void* buffer, std::size_t buffersize, std::size_t* bufferpos)
 	{
-		if (!gotEoD())
+		if (!bufferInput())
 		{
-			setState( EndOfMessage);
 			return false;
 		}
 		setState( Open);
@@ -113,6 +90,49 @@ struct BufferingInputFilter :public protocol::InputFilter
 			return false;
 		}
 		return true;
+	}
+private:
+	bool bufferInput()
+	{
+		bool rt = true;
+		char* data = (char*)ptr();
+		std::size_t datasize = size();
+
+		try
+		{
+			for (unsigned int ii=0; ii<datasize; ii++)
+			{
+				m_buffer.push_back( data[ ii]);
+			}
+		}
+		catch (std::bad_alloc)
+		{
+			setState( Error, ErrOutOfMem);
+			return false;
+		}
+		if (gotEoD())
+		{
+			protocol::InputFilter::protocolInput( (void*)&m_buffer.at(0), m_buffer.size(), true);
+			Content* dc = new (std::nothrow) Content();
+			if (!dc)
+			{
+				setState( Error, ErrOpenDoc);
+			}
+			if (!dc->open( ptr(), size()))
+			{
+				setState( Error, ErrOpenDoc);
+				delete dc;
+				dc = 0;
+				rt = false;
+			}
+			m_content.reset( dc);
+		}
+		else
+		{
+			setState( EndOfMessage);
+			rt = false;
+		}
+		return rt;
 	}
 private:
 	BufferType m_buffer;			///< STL back insertion sequence for buffering the input

@@ -35,6 +35,7 @@ Project Wolframe.
 #ifndef _Wolframe_FILTER_BASE_HPP_INCLUDED
 #define _Wolframe_FILTER_BASE_HPP_INCLUDED
 #include "textwolf.hpp"
+#include <cstddef>
 
 namespace _Wolframe {
 namespace filter {
@@ -133,14 +134,13 @@ private:
 template <class IOCharset, class AppCharset>
 struct FilterBase
 {
-	typedef std::size_t size_type;
 	typedef protocol::EscapingBuffer<textwolf::StaticBuffer> BufferType;
 
 	///\brief Prints a character string to an STL back insertion sequence buffer in the IO character set encoding
 	///\param [in] src pointer to string to print
 	///\param [in] srcsize size of src in bytes
 	///\param [in,out] buf buffer to print to
-	static void printToBuffer( const char* src, size_type srcsize, BufferType& buf)
+	static void printToBuffer( const char* src, std::size_t srcsize, BufferType& buf)
 	{
 		StrIterator itr( src, srcsize);
 		textwolf::TextScanner<StrIterator,AppCharset> ts( itr);

@@ -112,7 +112,7 @@ struct FormatOutput :public OutputBlock
 	///\param [in] datasize allocation size of data in bytes
 	///
 	/// Initializes the structure without touching the output function itself
-	void init( void* data, size_type datasize)
+	void init( void* data, std::size_t datasize)
 	{
 		set( data, datasize);
 		m_errorCode = 0;
@@ -135,7 +135,7 @@ struct FormatOutput :public OutputBlock
 	///\param [in] element content of element to print
 	///\param [in] elementsize size of element to print in bytes
 	///\return true, on success, false, if failed
-	virtual bool print( ElementType type, const void* element, size_type elementsize, bool newLine=false)=0;
+	virtual bool print( ElementType type, const void* element, std::size_t elementsize, bool newLine=false)=0;
 
 	///\brief Get error code in case of error state
 	///\return the error code

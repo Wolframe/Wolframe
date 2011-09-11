@@ -57,7 +57,7 @@ public:
 		if (m_doc) xmlFreeDoc( m_doc);
 		m_nodestk.clear();
 
-		int options = XML_PARSE_NOENT | XML_PARSE_DTDLOAD | XML_PARSE_DTDVALID;
+		int options = XML_PARSE_NOENT | XML_PARSE_DTDLOAD;
 		m_doc = xmlReadMemory( (const char*)content, size, "noname.xml", NULL, options);
 		if (!m_doc) return false;
 
@@ -176,8 +176,10 @@ private:
 	std::vector<xmlNode*> m_nodestk;
 };
 
-typedef BufferingInputFilter<Content,std::string> InputFilter;
-
+struct InputFilter :public BufferingInputFilter<Content>
+{
+	InputFilter(){}
+};
 
 }}}//namespace
 #endif

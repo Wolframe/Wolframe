@@ -38,6 +38,7 @@ Project Wolframe.
 #include "protocol/formatoutput.hpp"
 #include "filters/filterBase.hpp"
 #include <cstring>
+#include <cstddef>
 
 namespace _Wolframe {
 namespace filter {
@@ -51,7 +52,6 @@ struct LineFilter :FilterBase<IOCharset, AppCharset>
 {
 	typedef FilterBase<IOCharset, AppCharset> ThisFilterBase;
 	typedef typename protocol::FormatOutput::ElementType ElementType;
-	typedef typename protocol::FormatOutput::size_type size_type;
 	typedef textwolf::StaticBuffer BufferType;
 	typedef protocol::EscapingBuffer<textwolf::StaticBuffer> EscBufferType;
 
@@ -75,14 +75,14 @@ struct LineFilter :FilterBase<IOCharset, AppCharset>
 			return new FormatOutput( *this);
 		}
 
-		///\brief Implementation of protocol::FormatOutput::print(ElementType,const void*,size_type)
+		///\brief Implementation of protocol::FormatOutput::print(ElementType,const void*,std::size_t)
 		///\param [in] type type of the element to print
 		///\param [in] element pointer to the element to print
 		///\param [in] elementsize size of the element to print in bytes
 		///\param [in] newline true, if the printed item should start after an extra empty line
 		///\return true, if success, false else
 		///\remark the last parameter (newline) is not needed for line break on this filter. It is automatically done. With newline an extra empty line is printed
-		virtual bool print( ElementType type, const void* element, size_type elementsize, bool newline)
+		virtual bool print( ElementType type, const void* element, std::size_t elementsize, bool newline)
 		{
 			if (type == Value)
 			{
@@ -111,7 +111,7 @@ struct LineFilter :FilterBase<IOCharset, AppCharset>
 	struct InputFilter :public protocol::InputFilter
 	{
 		///\brief Constructor
-		InputFilter( size_type genbufsize=0)
+		InputFilter( std::size_t genbufsize=0)
 			:protocol::InputFilter( genbufsize) {}
 
 		///\brief Copy constructor
@@ -135,8 +135,8 @@ struct LineFilter :FilterBase<IOCharset, AppCharset>
 			ErrBufferTooSmall
 		};
 
-		///\brief Implementation of protocol::InputFilter::getNext( ElementType*, void*, size_type, size_type*)
-		virtual bool getNext( ElementType* type, void* buffer, size_type buffersize, size_type* bufferpos)
+		///\brief Implementation of protocol::InputFilter::getNext( ElementType*, void*, std::size_t, std::size_t*)
+		virtual bool getNext( ElementType* type, void* buffer, std::size_t buffersize, std::size_t* bufferpos)
 		{
 			BufferType buf( (char*)buffer, buffersize, *bufferpos);
 			setState( Open);

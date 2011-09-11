@@ -38,6 +38,7 @@ Project Wolframe.
 #include "buffers.hpp"
 #include <stdexcept>
 #include <cstring>
+#include <cstddef>
 
 namespace _Wolframe {
 namespace protocol {
@@ -51,16 +52,15 @@ class MemBlock
 public:
 	//element typedefs
 	typedef char value_type;		///< basic STL vector typedefs
-	typedef std::size_t size_type;		///< basic STL vector typedefs
 
 	///\brief Constructor
 	MemBlock();
 	///\brief Constructor
 	///\param [in] p_size size of the memory block to allocate
-	MemBlock( size_type p_size);
+	MemBlock( std::size_t p_size);
 	///\param [in] p_ptr pointer to the memory block (not allocated on your own)
 	///\param [in] p_size size of the memory block p_ptr
-	MemBlock( void* p_ptr, size_type p_size);
+	MemBlock( void* p_ptr, std::size_t p_size);
 	///\brief Copy constructor
 	///\param [in] o MemBlock to copy
 	MemBlock( const MemBlock& o);
@@ -73,12 +73,12 @@ public:
 
 	///\brief Set the current cursor byte position
 	///\param [in] p_pos new cursor position in bytes from the memory block start
-	void setPos( size_type p_pos=0)				{m_pos = p_pos;}
+	void setPos( std::size_t p_pos=0)				{m_pos = p_pos;}
 
 	///\brief Set the buffer to be used by this class (as non allocated by this class)
 	///\param [in] p_ptr new buffer to use
 	///\param [in] p_size size of buffer to use
-	void set( void* p_ptr, size_type p_size);
+	void set( void* p_ptr, std::size_t p_size);
 
 	///\brief Constant void pointer to start of buffer
 	void* ptr()						{return m_ptr;}
@@ -93,18 +93,18 @@ public:
 	const char* charptr() const				{return (const char*)m_ptr;}
 
 	///\brief Allocation size of the buffer in bytes
-	size_type size() const					{return m_size;}
+	std::size_t size() const					{return m_size;}
 
 	///\brief Get the size of the buffer left
 	///\return the size of the buffer left
-	size_type restsize() const				{return (m_pos<m_size)?(m_size-m_pos):0;}
+	std::size_t restsize() const				{return (m_pos<m_size)?(m_size-m_pos):0;}
 
 	///\brief Current byte position of the cursor (input or output)
-	size_type pos() const					{return m_pos;}
+	std::size_t pos() const					{return m_pos;}
 
 	///\brief Shift current cursor poition by some bytes
 	///\param [in] n number of bytes to shift
-	void incr( size_type n)					{if ((m_pos+n)>=m_size) m_pos=m_size; else m_pos+=n;}
+	void incr( std::size_t n)					{if ((m_pos+n)>=m_size) m_pos=m_size; else m_pos+=n;}
 
 	///\exception ArrayBoundReadError
 	///\brief Protocol memory block access violation exception
@@ -112,11 +112,11 @@ public:
 
 	///\brief random access operator on const
 	///\param [in] idx index of element to access
-	char operator[]( size_type idx) const			{if (idx>=m_pos) throw ArrayBoundReadError(); return charptr()[idx];}
+	char operator[]( std::size_t idx) const			{if (idx>=m_pos) throw ArrayBoundReadError(); return charptr()[idx];}
 
 	///\brief random access operator on reference type
 	///\param [in] idx index of element to access
-	char& operator[]( size_type idx)			{if (idx>=m_pos) throw ArrayBoundReadError(); return charptr()[idx];}
+	char& operator[]( std::size_t idx)			{if (idx>=m_pos) throw ArrayBoundReadError(); return charptr()[idx];}
 
 private:
 	void* m_ptr;		///< pointer to buffer
@@ -165,22 +165,22 @@ public:
 
 	///\brief Constructor
 	///\param [in] p_size size of the memory block in bytes to allocate
-	InputBlock( size_type p_size)				:MemBlock(p_size),m_eodState(EoD::SRC){}
+	InputBlock( std::size_t p_size)				:MemBlock(p_size),m_eodState(EoD::SRC){}
 
 	///\brief Constructor
 	///\param [in] p_ptr pointer to the memory block to use
 	///\param [in] p_size size of the memory block in bytes
-	InputBlock( void* p_ptr, size_type p_size)		:MemBlock(p_ptr,p_size),m_eodState(EoD::SRC){}
+	InputBlock( void* p_ptr, std::size_t p_size)		:MemBlock(p_ptr,p_size),m_eodState(EoD::SRC){}
 
 	///\brief Copy constructor
 	///\param [in] o InputBlock to copy
 	InputBlock( const InputBlock& o)			:MemBlock(o),m_eodState(o.m_eodState){}
 
 	///\brief Random access const iterator
-	typedef array::iterator_t<const InputBlock,size_type,char,char,const char*> const_iterator;
+	typedef array::iterator_t<const InputBlock,std::size_t,char,char,const char*> const_iterator;
 
 	///\brief Random access iterator
-	typedef array::iterator_t<InputBlock,size_type,char,char&,char*> iterator;
+	typedef array::iterator_t<InputBlock,std::size_t,char,char&,char*> iterator;
 
 	///\brief Get the starting const iterator
 	const_iterator begin() const				{const_iterator rt(this); return rt;}
@@ -190,11 +190,11 @@ public:
 
 	///\brief Random access to a const iterator
 	///\param [in] pos_ position from where to get the iterator
-	const_iterator at( size_type pos_) const		{const_iterator rt(this); return rt+pos_;}
+	const_iterator at( std::size_t pos_) const		{const_iterator rt(this); return rt+pos_;}
 
 	///\brief Random access to an iterator
 	///\param [in] pos_ position from where to get the iterator
-	iterator at( size_type pos_)				{iterator rt(this); return rt+pos_;}
+	iterator at( std::size_t pos_)				{iterator rt(this); return rt+pos_;}
 
 	///\brief Get the end of block const iterator
 	const_iterator end() const				{return const_iterator(this)+pos();}
@@ -233,7 +233,7 @@ public:
 
 private:
 	///\brief Implementation of the end of data recognition and linefeed,dot escaping state machine
-	int getEoDpos( size_type offset);
+	int getEoDpos( std::size_t offset);
 
 	///\brief State of end of data recognition
 	EoD::State m_eodState;
@@ -255,11 +255,11 @@ class OutputBlock :public MemBlock
 public:
 	///\brief Constructor
 	///\param [in] p_size size of the memory block in bytes to allocate
-	OutputBlock( size_type p_size)				:MemBlock(p_size) {}
+	OutputBlock( std::size_t p_size)				:MemBlock(p_size) {}
 	///\brief Constructor
 	///\param [in] p_ptr pointer to the memory block to use
 	///\param [in] p_size size of the memory block in bytes
-	OutputBlock( void* p_ptr, size_type p_size)		:MemBlock(p_ptr,p_size) {}
+	OutputBlock( void* p_ptr, std::size_t p_size)		:MemBlock(p_ptr,p_size) {}
 	///\brief Copy constructor
 	///\param [in] o OutputBlock to copy
 	OutputBlock( const OutputBlock& o)			:MemBlock(o) {}
@@ -282,7 +282,7 @@ public:
 
 	///\brief Skip the output buffer cursor by some bytes
 	///\param [in] nn the number of bytes to skip
-	bool incPos( size_type nn)
+	bool incPos( std::size_t nn)
 	{
 		if (pos()+nn > size()) return false;
 		setPos( pos() + nn);
@@ -295,7 +295,7 @@ public:
 	char* rest()						{return charptr() + pos();}
 
 	///\brief Returns the size of the rest of the output buffer (how many characters can be written)
-	size_type restsize() const				{return size()-pos();}
+	std::size_t restsize() const				{return size()-pos();}
 
 	///\brief Release a written memory block (reset cursor position)
 	void release()						{setPos(0);}
@@ -320,7 +320,7 @@ public:
 	///\brief Constructor
 	///\param [in] p_ptr pointer to the memory block to use
 	///\param [in] p_size size of the memory block in bytes
-	EscapingBuffer( char* p_ptr, typename BufferType::size_type p_size, State p_state)
+	EscapingBuffer( char* p_ptr, std::size_t p_size, State p_state)
 		:BufferType(p_ptr,p_size),m_state(p_state) {}
 
 	///\brief get the current state of escaping LF DOT

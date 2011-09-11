@@ -93,6 +93,7 @@ private:
 		Init,				///< start state, called first time in this session
 		EnterCommand,			///< parse command
 		ParseArgs,			///< parse command arguments
+		ParseArgsEOL,			///< parse end of line after command arguments
 		Processing,			///< running a command
 		ProtocolError,			///< a protocol error (bad command etc) appeared and the rest of the line has to be discarded
 		DiscardInput,			///< reading and discarding data until end of data has been seen
@@ -103,7 +104,7 @@ private:
 	///\param [in] i state to get as string
 	static const char* stateName( State i)
 	{
-		static const char* ar[] = {"Init","EnterCommand","ParseArgs","Processing","ProtocolError","DiscardInput","FlushOutput","Terminate"};
+		static const char* ar[] = {"Init","EnterCommand","ParseArgs","ParseArgsEOL","Processing","ProtocolError","DiscardInput","FlushOutput","Terminate"};
 		return ar[i];
 	}
 	///\enum State
