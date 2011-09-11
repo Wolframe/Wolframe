@@ -67,16 +67,16 @@ public:
 	void setCanonicalPathes( const std::string& referencePath );
 private:
 	bool						m_allowAnonymous;
-	std::list< config::ContainerConfiguration* >	m_authConfig;
-	std::list< config::ContainerConfiguration* >	m_auditConfig;
+	std::list< config::TypedConfiguration* >	m_authConfig;
+	std::list< config::TypedConfiguration* >	m_auditConfig;
 };
 
 
 class AuthenticationGroup
 {
 public:
-	AuthenticationGroup( const std::list< config::ContainerConfiguration* >& confs,
-			     module::ModuleContainerDescription<Container < Authenticator >, config::ContainerConfiguration>* description,
+	AuthenticationGroup( const std::list< config::TypedConfiguration* >& confs,
+			     module::ModuleContainerDescription<Container < Authenticator >, config::TypedConfiguration>* description,
 			     size_t descrSize );
 	~AuthenticationGroup();
 	bool resolveDB( db::DatabaseProvider& db );
@@ -90,8 +90,8 @@ private:
 class AuditGroup
 {
 public:
-	AuditGroup( const std::list< config::ContainerConfiguration* >& confs,
-		    module::ModuleContainerDescription< Container< Auditor >, config::ContainerConfiguration >* description,
+	AuditGroup( const std::list< config::TypedConfiguration* >& confs,
+		    module::ModuleContainerDescription< Container< Auditor >, config::TypedConfiguration >* description,
 		    size_t descrSize );
 	~AuditGroup();
 	bool resolveDB( db::DatabaseProvider& db );

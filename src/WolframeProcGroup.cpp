@@ -56,13 +56,13 @@
 using namespace _Wolframe;
 
 static const size_t noProcModules = 1;
-static module::ModuleConfigurationDescription< config::ContainerConfiguration >
-procConfigs[ noProcModules ] = { module::ModuleConfigurationDescription< config::ContainerConfiguration >( "echoProcessor", "Echo Processor", "echoProcessor",
+static module::ModuleConfigurationDescription< config::TypedConfiguration >
+procConfigs[ noProcModules ] = { module::ModuleConfigurationDescription< config::TypedConfiguration >( "echoProcessor", "Echo Processor", "echoProcessor",
 				 EchoProcConfig::create,
 				 &config::ConfigurationParser::parseBase< EchoProcConfig > ) };
 
-static module::ModuleContainerDescription< Container< proc::Processor >, config::ContainerConfiguration >
-procModules[ noProcModules ] = { module::ModuleContainerDescription< Container< proc::Processor >, config::ContainerConfiguration >( "EchoProcessor", &EchoProcContainer::create ) };
+static module::ModuleContainerDescription< Container< proc::Processor >, config::TypedConfiguration >
+procModules[ noProcModules ] = { module::ModuleContainerDescription< Container< proc::Processor >, config::TypedConfiguration >( "EchoProcessor", &EchoProcContainer::create ) };
 /****  End impersonating the module loader  **************************************************/
 
 namespace _Wolframe {
@@ -85,7 +85,7 @@ bool ConfigurationParser::parse( proc::ProcessorGroupConfig& cfg,
 			size_t i;
 			for ( i = 0; i < noProcModules; i++ )	{
 				if ( boost::algorithm::iequals( procConfigs[i].typeName, L1it->first ))	{
-					config::ContainerConfiguration* conf = procConfigs[i].createFunc( procConfigs[i].sectionTitle,
+					config::TypedConfiguration* conf = procConfigs[i].createFunc( procConfigs[i].sectionTitle,
 											      cfg.logPrefix().c_str(),
 											      procConfigs[i].sectionName );
 					if ( procConfigs[i].parseFunc( *conf, L1it->second, L1it->first ))
@@ -113,7 +113,7 @@ namespace proc {
 
 ProcessorGroupConfig::~ProcessorGroupConfig()
 {
-	for ( std::list< config::ContainerConfiguration* >::const_iterator it = m_procConfig.begin();
+	for ( std::list< config::TypedConfiguration* >::const_iterator it = m_procConfig.begin();
 								it != m_procConfig.end(); it++ )
 		delete *it;
 }
@@ -123,7 +123,7 @@ void ProcessorGroupConfig::print( std::ostream& os, size_t /* indent */ ) const
 	os << sectionName() << std::endl;
 	os << "   Database: " << (m_dbLabel.empty() ? "(none)" : m_dbLabel) << std::endl;
 	if ( m_procConfig.size() > 0 )	{
-		for ( std::list< config::ContainerConfiguration* >::const_iterator it = m_procConfig.begin();
+		for ( std::list< config::TypedConfiguration* >::const_iterator it = m_procConfig.begin();
 								it != m_procConfig.end(); it++ )	{
 			(*it)->print( os, 3 );
 		}
@@ -141,7 +141,7 @@ bool ProcessorGroupConfig::check() const
 //		LOG_ERROR << logPrefix() << "referenced database ID cannot be empty";
 //		correct = false;
 //	}
-	for ( std::list< config::ContainerConfiguration* >::const_iterator it = m_procConfig.begin();
+	for ( std::list< config::TypedConfiguration* >::const_iterator it = m_procConfig.begin();
 								it != m_procConfig.end(); it++ )	{
 		if ( !(*it)->check() )
 			correct = false;
@@ -151,7 +151,7 @@ bool ProcessorGroupConfig::check() const
 
 void ProcessorGroupConfig::setCanonicalPathes( const std::string& refPath )
 {
-	for ( std::list< config::ContainerConfiguration* >::const_iterator it = m_procConfig.begin();
+	for ( std::list< config::TypedConfiguration* >::const_iterator it = m_procConfig.begin();
 								it != m_procConfig.end(); it++ )	{
 		(*it)->setCanonicalPathes( refPath );
 	}
@@ -163,7 +163,7 @@ ProcessorGroup::ProcessorGroup( const ProcessorGroupConfig& conf )
 	m_db = NULL;
 	if ( !conf.m_dbLabel.empty())
 		m_dbLabel = conf.m_dbLabel;
-	for ( std::list< config::ContainerConfiguration* >::const_iterator it = conf.m_procConfig.begin();
+	for ( std::list< config::TypedConfiguration* >::const_iterator it = conf.m_procConfig.begin();
 								it != conf.m_procConfig.end(); it++ )	{
 		const char* procType = (*it)->typeName();
 		size_t i;

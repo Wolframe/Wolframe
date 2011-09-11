@@ -60,7 +60,7 @@ public:
 	void print( std::ostream& os, size_t indent ) const;
 	virtual void setCanonicalPathes( const std::string& referencePath );
 private:
-	std::list< config::ContainerConfiguration* >	m_dbConfig;
+	std::list< config::TypedConfiguration* >	m_dbConfig;
 };
 
 ///
