@@ -52,6 +52,11 @@ class Content
 public:
 	Content() :m_doc(0),m_node(0),m_value(0),m_prop(0),m_propvalues(0){}
 
+	bool end() const
+	{
+		return (m_doc == 0);
+	}
+
 	bool open( const void* content, std::size_t size)
 	{
 		if (m_doc) xmlFreeDoc( m_doc);
@@ -70,9 +75,9 @@ public:
 		if (m_doc) xmlFreeDoc( m_doc);
 	}
 
-	bool getNext( protocol::InputFilter::ElementType* type, void* buffer, std::size_t buffersize, std::size_t* bufferpos)
+	bool fetch( protocol::InputFilter::ElementType* type, void* buffer, std::size_t buffersize, std::size_t* bufferpos)
 	{
-		bool rt;
+		bool rt = true;
 	AGAIN:
 		if (!m_doc)
 		{
@@ -102,12 +107,15 @@ public:
 			{
 				xmlFreeDoc( m_doc);
 				m_doc = 0;
-				return false;
+				rt = false;
 			}
-			m_node = m_nodestk.back();
-			m_nodestk.pop_back();
-			*type = protocol::InputFilter::CloseTag;
-			rt = true;
+			else
+			{
+				m_node = m_nodestk.back();
+				m_nodestk.pop_back();
+				*type = protocol::InputFilter::CloseTag;
+				rt = true;
+			}
 		}
 		else switch (m_node->type)
 		{
@@ -127,11 +135,13 @@ public:
 				*type = protocol::InputFilter::Attribute;
 				rt = getElement( buffer, buffersize, bufferpos, m_node->name);
 				m_value = m_node->content;
+				m_node = m_node->next;
 				break;
 
 			case XML_TEXT_NODE:
 				*type = protocol::InputFilter::Value;
 				rt = getElement( buffer, buffersize, bufferpos, m_node->content);
+				m_node = m_node->next;
 				break;
 
 			case XML_CDATA_SECTION_NODE:
@@ -161,9 +171,12 @@ private:
 		if (!str) return true;
 
 		std::size_t elemenlen = xmlStrlen( str) * sizeof(*str);
-		if (buffersize - *bufferpos < elemenlen) return false;
-
+		if (buffersize - *bufferpos < elemenlen)
+		{
+			return false;
+		}
 		std::memcpy( (char*)buffer + *bufferpos, str, elemenlen);
+		*bufferpos += elemenlen;
 		return true;
 	}
 

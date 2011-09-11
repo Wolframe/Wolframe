@@ -55,7 +55,7 @@ struct BufferingInputFilter :public protocol::InputFilter
 	};
 
 	///\brief Constructor
-	BufferingInputFilter(){}
+	BufferingInputFilter() :m_inputConsumed(false){}
 
 	///\brief Destructor
 	~BufferingInputFilter(){}
@@ -63,7 +63,7 @@ struct BufferingInputFilter :public protocol::InputFilter
 	///\brief Copy constructor
 	///\param [in] o format output to copy
 	BufferingInputFilter( const BufferingInputFilter& o)
-		:protocol::InputFilter(o),m_buffer(o.m_buffer),m_content(o.m_content){}
+		:protocol::InputFilter(o),m_inputConsumed(o.m_inputConsumed),m_buffer(o.m_buffer),m_content(o.m_content){}
 
 	///\brief self copy
 	///\return copy of this
@@ -74,19 +74,23 @@ struct BufferingInputFilter :public protocol::InputFilter
 
 	virtual bool getNext( ElementType* type, void* buffer, std::size_t buffersize, std::size_t* bufferpos)
 	{
-		if (!bufferInput())
+		if (!m_inputConsumed && !bufferInput())
 		{
 			return false;
 		}
 		setState( Open);
-		if (!m_content.get())
+		Content* dc = m_content.get();
+		if (!dc)
 		{
 			setState( Error, ErrNoContent);
 			return false;
 		}
-		if (!m_content.get()->getNext( type, buffer, buffersize, bufferpos))
+		if (!dc->fetch( type, buffer, buffersize, bufferpos))
 		{
-			setState( Error, ErrOutputBufferTooSmall);
+			if (!dc->end())
+			{
+				setState( Error, ErrOutputBufferTooSmall);
+			}
 			return false;
 		}
 		return true;
@@ -112,6 +116,7 @@ private:
 		}
 		if (gotEoD())
 		{
+			m_inputConsumed = true;
 			protocol::InputFilter::protocolInput( (void*)&m_buffer.at(0), m_buffer.size(), true);
 			Content* dc = new (std::nothrow) Content();
 			if (!dc)
@@ -135,6 +140,7 @@ private:
 		return rt;
 	}
 private:
+	bool m_inputConsumed;			///< true, if we have consumed the whole input
 	BufferType m_buffer;			///< STL back insertion sequence for buffering the input
 	CountedReference<Content> m_content;	///< Content that provides an iterator on the input
 };
