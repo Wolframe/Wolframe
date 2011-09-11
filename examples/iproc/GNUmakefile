@@ -35,6 +35,22 @@ INCLUDE_LIBS += \
 	$(TOPDIR)/lua/src/liblua.a
 endif
 
+# libxml2
+
+ifeq ($(WITH_LIBXML2),1)
+INCLUDE_CPPFLAGS += \
+	-DWITH_LIBXML2
+
+INCLUDE_DIRS += \
+	$(LIBXML2_INCLUDE_DIRS)
+
+INCLUDE_LDFLAGS += \
+	$(LIBXML2_LIB_DIRS)
+
+INCLUDE_LIBS += \
+	$(LIBXML2_LIBS)
+endif
+
 # openssl
 
 ifeq ($(WITH_SSL),1)

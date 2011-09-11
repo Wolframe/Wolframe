@@ -38,13 +38,13 @@ namespace _Wolframe {
 namespace protocol {
 
 MemBlock::MemBlock()							:m_ptr(0),m_size(0),m_pos(0),m_allocated(false) {}
-MemBlock::MemBlock( size_type p_size)					:m_ptr(0),m_size(p_size),m_pos(0),m_allocated(false)
+MemBlock::MemBlock( std::size_t p_size)					:m_ptr(0),m_size(p_size),m_pos(0),m_allocated(false)
 {
 	m_ptr = new unsigned char[ m_size];
 	m_allocated = true;
 }
 
-MemBlock::MemBlock( void* p_ptr, size_type p_size)			:m_ptr(p_ptr),m_size(p_size),m_pos(0),m_allocated(false){}
+MemBlock::MemBlock( void* p_ptr, std::size_t p_size)			:m_ptr(p_ptr),m_size(p_size),m_pos(0),m_allocated(false){}
 MemBlock::MemBlock( const MemBlock& o)					:m_ptr(0),m_size(0),m_pos(0),m_allocated(false) {*this = o;}
 
 MemBlock::~MemBlock()
@@ -52,7 +52,7 @@ MemBlock::~MemBlock()
 	if (m_allocated) delete [] (unsigned char*)m_ptr;
 }
 
-void MemBlock::set( void* p_ptr, size_type p_size)
+void MemBlock::set( void* p_ptr, std::size_t p_size)
 {
 	if (m_allocated) delete [] (unsigned char*)m_ptr;
 	m_size = p_size;
@@ -80,7 +80,7 @@ MemBlock& MemBlock::operator=( const MemBlock& o)
 	return *this;
 }
 
-int InputBlock::getEoDpos( size_type offset)
+int InputBlock::getEoDpos( std::size_t offset)
 {
 	if (pos()<=offset) return -1;
 
@@ -182,7 +182,7 @@ int InputBlock::getEoDpos( size_type offset)
 	{
 		if (m_eodState == EoD::CR_LF_DOT)
 		{
-			unsigned int bb = srcendpos;
+			std::size_t bb = srcendpos;
 			for (; bb<bufsize; bb++)
 			{
 				m_eodcharbuf.push_back( buf[ bb]);
@@ -191,7 +191,7 @@ int InputBlock::getEoDpos( size_type offset)
 		}
 		else if (m_eodState == EoD::CR_LF_DOT_CR)
 		{
-			unsigned int bb = srcendpos;
+			std::size_t bb = srcendpos;
 			for (; (bb+1)<bufsize; bb++)
 			{
 				m_eodcharbuf.push_back( buf[ bb]);
@@ -201,7 +201,7 @@ int InputBlock::getEoDpos( size_type offset)
 		}
 		else
 		{
-			unsigned int bb = srcendpos;
+			std::size_t bb = srcendpos;
 			for (; bb<bufsize; bb++)
 			{
 				m_eodcharbuf.push_back( buf[ bb]);

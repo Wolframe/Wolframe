@@ -372,6 +372,10 @@ void luaConnection::errorOccured( NetworkSignal signal )
 	case UNKNOWN_ERROR:
 		signal_s = "UNKNOWN_ERROR";
 		break;
+
+	default:
+		signal_s = "UNKNOWN_ERROR";
+		break;
 	}
 
 	LOG_TRACE << "Got error '" << signal_s << "'";

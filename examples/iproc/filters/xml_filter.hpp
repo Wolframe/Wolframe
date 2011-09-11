@@ -38,6 +38,7 @@ Project Wolframe.
 #include "protocol/formatoutput.hpp"
 #include "filters/filterBase.hpp"
 #include <cstring>
+#include <cstddef>
 #include "textwolf.hpp"
 
 namespace _Wolframe {
@@ -56,7 +57,6 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 	friend struct XmlHeaderFilter;
 	typedef FilterBase<IOCharset, AppCharset> ThisFilterBase;
 	typedef typename protocol::FormatOutput::ElementType ElementType;
-	typedef typename protocol::FormatOutput::size_type size_type;
 	typedef protocol::EscapingBuffer<textwolf::StaticBuffer> EscBufferType;
 	typedef textwolf::StaticBuffer BufferType;
 
@@ -120,18 +120,18 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 			return new FormatOutput( *this);
 		}
 
-		///\brief Implementation of protocol::FormatOutput::print(ElementType,const void*,size_type)
+		///\brief Implementation of protocol::FormatOutput::print(ElementType,const void*,std::size_t)
 		///\param [in] type type of the element to print
 		///\param [in] element pointer to the element to print
 		///\param [in] elementsize size of the element to print in bytes
 		///\param [in] newline true, if the printed item should start on a new line
 		///\return true, if success, false else
-		virtual bool print( ElementType type, const void* element, size_type elementsize, bool newline)
+		virtual bool print( ElementType type, const void* element, std::size_t elementsize, bool newline)
 		{
 			EscBufferType buf( rest(), restsize(), m_bufstate);
 
 			const void* cltag;
-			size_type cltagsize;
+			std::size_t cltagsize;
 
 			switch (type)
 			{
@@ -317,7 +317,7 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		///\param [in] nof_echr number of elements in echr and estr
 		///\param [in] echr ASCII characters to substitute
 		///\param [in] estr ASCII strings to substitute with (array parallel to echr)
-		static void printToBufferSubstChr( const char* src, size_type srcsize, EscBufferType& buf, unsigned int nof_echr, const char* echr, const char** estr)
+		static void printToBufferSubstChr( const char* src, std::size_t srcsize, EscBufferType& buf, unsigned int nof_echr, const char* echr, const char** estr)
 		{
 			StrIterator itr( src, srcsize);
 			textwolf::TextScanner<StrIterator,AppCharset> ts( itr);
@@ -341,7 +341,7 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		///\param [in] src pointer to attribute value string to print
 		///\param [in] srcsize size of src in bytes
 		///\param [in,out] buf buffer to print to
-		static void printToBufferAttributeValue( const char* src, size_type srcsize, EscBufferType& buf)
+		static void printToBufferAttributeValue( const char* src, std::size_t srcsize, EscBufferType& buf)
 		{
 			enum {nof_echr = 12};
 			static const char* estr[nof_echr] = {"&lt;", "&gt;", "&apos;", "&quot;", "&amp;", "&#0;", "&#8;", "&#9;", "&#10;", "&#13;", "&nbsp;"};
@@ -355,7 +355,7 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		///\param [in] src pointer to content string to print
 		///\param [in] srcsize size of src in bytes
 		///\param [in,out] buf buffer to print to
-		static void printToBufferContent( const char* src, size_type srcsize, EscBufferType& buf)
+		static void printToBufferContent( const char* src, std::size_t srcsize, EscBufferType& buf)
 		{
 			enum {nof_echr = 10};
 			static const char* estr[nof_echr] = {"&lt;", "&gt;", "&amp;", "&#0;", "&#8;", "&#9;", "&#10;", "&#13;", "&nbsp;"};
@@ -363,28 +363,28 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 			printToBufferSubstChr( src, srcsize, buf, nof_echr, echr, estr);
 		}
 
-		static size_type getAlign( size_type n)
+		static std::size_t getAlign( std::size_t n)
 		{
-			return (sizeof(size_type) - (n & (sizeof(size_type)-1))) & (sizeof(size_type)-1);
+			return (sizeof(std::size_t) - (n & (sizeof(std::size_t)-1))) & (sizeof(std::size_t)-1);
 		}
 
-		bool pushTag( const void* element, size_type elementsize)
+		bool pushTag( const void* element, std::size_t elementsize)
 		{
-			size_type align = getAlign( elementsize);
-			if (align + elementsize + sizeof(size_type) >= m_tagstksize-m_tagstkpos) return false;
+			std::size_t align = getAlign( elementsize);
+			if (align + elementsize + sizeof(std::size_t) >= m_tagstksize-m_tagstkpos) return false;
 			std::memcpy( m_tagstk + m_tagstkpos, element, elementsize);
-			size_type ofs = elementsize + align + sizeof( size_type);
+			std::size_t ofs = elementsize + align + sizeof( std::size_t);
 			m_tagstkpos += ofs;
-			*(size_type*)(m_tagstk+m_tagstkpos-sizeof( size_type)) = elementsize;
+			*(std::size_t*)(m_tagstk+m_tagstkpos-sizeof( std::size_t)) = elementsize;
 			return true;
 		}
 
-		bool topTag( const void*& element, size_type& elementsize)
+		bool topTag( const void*& element, std::size_t& elementsize)
 		{
-			if (m_tagstkpos < sizeof( size_type)) return false;
-			elementsize = *(size_type*)(m_tagstk+m_tagstkpos-sizeof( size_type));
-			size_type align = getAlign( elementsize);
-			size_type ofs = elementsize + align + sizeof( size_type);
+			if (m_tagstkpos < sizeof( std::size_t)) return false;
+			elementsize = *(std::size_t*)(m_tagstk+m_tagstkpos-sizeof( std::size_t));
+			std::size_t align = getAlign( elementsize);
+			std::size_t ofs = elementsize + align + sizeof( std::size_t);
 			if (ofs > m_tagstkpos) return false;
 			element = m_tagstk + m_tagstkpos - ofs;
 			return true;
@@ -392,16 +392,16 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 
 		void popTag()
 		{
-			size_type elementsize = *(size_type*)(m_tagstk+m_tagstkpos-sizeof( size_type));
-			size_type align = getAlign( elementsize);
-			size_type ofs = elementsize + align + sizeof( size_type);
+			std::size_t elementsize = *(std::size_t*)(m_tagstk+m_tagstkpos-sizeof( std::size_t));
+			std::size_t align = getAlign( elementsize);
+			std::size_t ofs = elementsize + align + sizeof( std::size_t);
 			if (m_tagstkpos < ofs) throw std::logic_error( "tag stack for output is corrupt");
 			m_tagstkpos -= ofs;
 		}
 	private:
 		char* m_tagstk;					///< tag stack buffer
-		size_type m_tagstksize;				///< size of tag stack buffer in bytes
-		size_type m_tagstkpos;				///< used size of tag stack buffer in bytes
+		std::size_t m_tagstksize;				///< size of tag stack buffer in bytes
+		std::size_t m_tagstkpos;				///< used size of tag stack buffer in bytes
 		XMLState m_xmlstate;				///< current state of output
 		// Aba: was an int before, gives tons of error messages like:
 		// warning C4805: '==' : unsafe mix of type 'int' and type 'bool' in operation,
@@ -429,7 +429,7 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		typedef textwolf::XMLScanner<SrcIterator,IOCharset,AppCharset,BufferType> XMLScanner;
 
 		///\brief Constructor
-		InputFilter( size_type genbufsize=0)
+		InputFilter( std::size_t genbufsize=0)
 			:protocol::InputFilter( genbufsize)
 			,m_outputbuf(0,0)
 			,m_scanner(0)
@@ -490,8 +490,8 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 			}
 		};
 
-		///\brief Implementation of protocol::InputFilter::getNext( ElementType*, void*, size_type, size_type*)
-		virtual bool getNext( ElementType* type, void* buffer, size_type buffersize, size_type* bufferpos)
+		///\brief Implementation of protocol::InputFilter::getNext( ElementType*, void*, std::size_t, std::size_t*)
+		virtual bool getNext( ElementType* type, void* buffer, std::size_t buffersize, std::size_t* bufferpos)
 		{
 			static const ElementTypeMap tmap;
 			BufferType buf( (char*)buffer, buffersize, *bufferpos);
@@ -584,8 +584,8 @@ struct XmlHeaderInputFilter :public XmlFilter<textwolf::charset::IsoLatin1,textw
 		return new XmlHeaderInputFilter( *this);
 	}
 
-	///\brief Implementation of protocol::InputFilter::getNext( ElementType*, void*, size_type, size_type*)
-	virtual bool getNext( ElementType* type, void* buffer, size_type buffersize, size_type* bufferpos)
+	///\brief Implementation of protocol::InputFilter::getNext( ElementType*, void*, std::size_t, std::size_t*)
+	virtual bool getNext( ElementType* type, void* buffer, std::size_t buffersize, std::size_t* bufferpos)
 	{
 		static const ElementTypeMap tmap;
 		BufferType buf( (char*)buffer, buffersize, *bufferpos);

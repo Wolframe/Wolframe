@@ -38,6 +38,7 @@ Project Wolframe.
 #include "protocol/formatoutput.hpp"
 #include "filters/filterBase.hpp"
 #include <cstring>
+#include <cstddef>
 
 namespace _Wolframe {
 namespace filter {
@@ -47,7 +48,6 @@ struct CharFilter :FilterBase<IOCharset, AppCharset>
 {
 	typedef FilterBase<IOCharset, AppCharset> ThisFilterBase;
 	typedef typename protocol::FormatOutput::ElementType ElementType;
-	typedef typename protocol::FormatOutput::size_type size_type;
 	typedef textwolf::StaticBuffer BufferType;
 	typedef protocol::EscapingBuffer<textwolf::StaticBuffer> EscBufferType;
 
@@ -77,8 +77,8 @@ struct CharFilter :FilterBase<IOCharset, AppCharset>
 			ErrBufferTooSmall
 		};
 
-		///\brief implement interface member protocol::InputFilter::getNext( ElementType*,void*,size_type,size_type*)
-		virtual bool getNext( ElementType* type, void* buffer, size_type buffersize, size_type* bufferpos)
+		///\brief implement interface member protocol::InputFilter::getNext( ElementType*,void*,std::size_t,std::size_t*)
+		virtual bool getNext( ElementType* type, void* buffer, std::size_t buffersize, std::size_t* bufferpos)
 		{
 			BufferType buf( (char*)buffer, buffersize, *bufferpos);
 			setState( Open);
@@ -132,13 +132,13 @@ struct CharFilter :FilterBase<IOCharset, AppCharset>
 			return new FormatOutput( *this);
 		}
 
-		///\brief Implementation of protocol::FormatOutput::print(ElementType,const void*,size_type)
+		///\brief Implementation of protocol::FormatOutput::print(ElementType,const void*,std::size_t)
 		///\param [in] type type of the element to print
 		///\param [in] element pointer to the element to print
 		///\param [in] elementsize size of the element to print in bytes
 		///\param [in] newline true, if the printed item should start on a new line
 		///\return true, if success, false else
-		virtual bool print( ElementType type, const void* element, size_type elementsize, bool newline)
+		virtual bool print( ElementType type, const void* element, std::size_t elementsize, bool newline)
 		{
 			if (type == Value)
 			{

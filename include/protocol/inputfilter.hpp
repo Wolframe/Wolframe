@@ -46,8 +46,6 @@ struct InputFilter
 {
 	enum {DefaultBufferSize=1024};
 
-	typedef std::size_t size_type;
-
 	///\enum State
 	///\brief State of the input filter used in the application processor iterating loop to decide wheter to yield execution or not.
 	enum State
@@ -83,7 +81,7 @@ struct InputFilter
 	///\param [in,out] bufferpos before parsed element in and bufferpos after parsed element out
 	///\return true, if success, false, if not.
 	///\remark Check the generator state when false is returned
-	virtual bool getNext( ElementType* type, void* buffer, size_type buffersize, size_type* bufferpos)=0;
+	virtual bool getNext( ElementType* type, void* buffer, std::size_t buffersize, std::size_t* bufferpos)=0;
 
 	///\brief Return the current state
 	///\return the current state
@@ -96,7 +94,7 @@ struct InputFilter
 	///\param [in] data pointer to memory block passed as input
 	///\param [in] datasize of memory block passed as input
 	///\param [in] eoD true, if end of data has been detected
-	void protocolInput( void* data, size_type datasize, bool eoD)
+	void protocolInput( void* data, std::size_t datasize, bool eoD)
 	{
 		m_gotEoD = eoD;
 		m_ptr = data;
@@ -118,14 +116,14 @@ struct InputFilter
 	}
 
 	///\brief Constructor
-	InputFilter( size_type genbufsize=0)
+	InputFilter( std::size_t genbufsize=0)
 		:m_ptr(0)
 		,m_pos(0)
 		,m_size(0)
 		,m_gotEoD(false)
 		,m_state(Open)
 		,m_errorCode(0)
-		,m_genbufsize(genbufsize?genbufsize:(size_type)DefaultBufferSize){}
+		,m_genbufsize(genbufsize?genbufsize:(std::size_t)DefaultBufferSize){}
 
 	///\brief destructor
 	virtual ~InputFilter(){}
@@ -137,26 +135,26 @@ struct InputFilter
 	///\brief Get data at current iterator cursor position
 	void* ptr() const				{return(void*)((char*)m_ptr+m_pos);}
 	///\brief Get rest of data from the current iterator cursor position
-	size_type size() const				{return (m_pos<m_size)?(m_size-m_pos):0;}
+	std::size_t size() const			{return (m_pos<m_size)?(m_size-m_pos):0;}
 	///\brief Skip forward current iterator cursor position
 	///\param [in] n number of bytes to skip
-	void skip( size_type n)				{if ((m_pos+n)>=m_size) m_pos=m_size; else m_pos+=n;}
+	void skip( std::size_t n)			{if ((m_pos+n)>=m_size) m_pos=m_size; else m_pos+=n;}
 	///\brief Set input filter generator state with error code
 	///\param [in] s new state
 	///\param [in] e (optional) error code to set
 	void setState( State s, int e=0)		{m_state=s;m_errorCode=e;}
 	///\brief Get the size of the buffer used for the generated elements
 	///\return bufsize size of the buffer in bytes
-	size_type getGenBufferSize() const		{return m_genbufsize;}
+	std::size_t getGenBufferSize() const		{return m_genbufsize;}
 
 private:
-	void* m_ptr;		///< pointer to network input buffer
-	size_type m_pos;	///< current iterator cursor position
-	size_type m_size;	///< size of network input buffer
-	bool m_gotEoD;		///< got end of data flag
-	State m_state;		///< state
-	int m_errorCode;	///< error code
-	size_type m_genbufsize;	///< element buffer size (the buffer itself is managed by the client of this class)
+	void* m_ptr;			///< pointer to network input buffer
+	std::size_t m_pos;		///< current iterator cursor position
+	std::size_t m_size;		///< size of network input buffer
+	bool m_gotEoD;			///< got end of data flag
+	State m_state;			///< state
+	int m_errorCode;		///< error code
+	std::size_t m_genbufsize;	///< element buffer size (the buffer itself is managed by the client of this class)
 };
 
 ///\typedef InputFilterR
