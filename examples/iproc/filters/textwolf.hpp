@@ -49,6 +49,7 @@ namespace textwolf {
 	///\typedef UChar
 	///\brief Unicode character type
 	typedef boost::uint32_t UChar;
+	typedef boost::uint64_t EChar;
 }//namespace
 #else
 #ifdef _MSC_VER
@@ -58,6 +59,7 @@ namespace textwolf {
 	///\typedef UChar
 	///\brief Unicode character type
 	typedef DWORD32 UChar;
+	typedef DWORD62 UChar;
 }//namespace
 #else
 #include <stdint.h>
@@ -65,6 +67,7 @@ namespace textwolf {
 	///\typedef UChar
 	///\brief Unicode character type
 	typedef uint32_t UChar;
+	typedef uint64_t EChar;
 }//namespace
 #endif
 #endif
@@ -1286,7 +1289,7 @@ private:
 		Id id;					///< the scanner token parser state
 		unsigned int pos;			///< entity buffer position (buf)
 		unsigned int base;			///< numeric entity base (10 for decimal/16 for hexadecimal)
-		unsigned long long value;		///< parsed entity value
+		EChar value;				///< parsed entity value
 		char buf[ 16];				///< parsed entity buffer
 		UChar curchr_saved;			///< save current character parsed for the case we cannot print it (output buffer too small)
 
@@ -1340,7 +1343,7 @@ public:
 	///\return the value of the entity parsed
 	static UChar parseStaticNumericEntityValue( InputReader& ir)
 	{
-		signed long long value = 0;
+		EChar value = 0;
 		unsigned char ch = ir.ascii();
 		unsigned int base;
 		if (ch != '#') return 0;
