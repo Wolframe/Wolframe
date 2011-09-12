@@ -47,23 +47,23 @@
 using namespace _Wolframe;
 
 static const size_t noDBmodules = 2;
-static module::ModuleContainerDescription< Container< db::Database >, config::TypedConfiguration >
-dbModules[ noDBmodules ] = { module::ModuleContainerDescription< Container< db::Database >, config::TypedConfiguration >( "PostgreSQL", &db::PostgreSQLcontainer::create ),
-			     module::ModuleContainerDescription< Container< db::Database >, config::TypedConfiguration >( "SQLite", &db::SQLiteContainer::create ) };
+static module::ModuleContainerDescription< Container< db::DatabaseUnit >, config::TypedConfiguration >
+dbModules[ noDBmodules ] = { module::ModuleContainerDescription< Container< db::DatabaseUnit >, config::TypedConfiguration >( "PostgreSQL", &db::PostgreSQLcontainer::create ),
+			     module::ModuleContainerDescription< Container< db::DatabaseUnit >, config::TypedConfiguration >( "SQLite", &db::SQLiteContainer::create ) };
 /****  End impersonating the module loader  **************************************************/
 
 namespace _Wolframe	{
 namespace db	{
 
-DatabaseProvider::DatabaseProvider( const DBproviderConfig& conf )
+DatabaseProvider_Implementation::DatabaseProvider_Implementation( const DBproviderConfig* conf )
 {
-	for ( std::list< config::TypedConfiguration* >::const_iterator it = conf.m_dbConfig.begin();
-							it != conf.m_dbConfig.end(); it++ )	{
+	for ( std::list< config::TypedConfiguration* >::const_iterator it = conf->m_dbConfig.begin();
+							it != conf->m_dbConfig.end(); it++ )	{
 		const char* dbType = (*it)->typeName();
 		size_t i;
 		for ( i = 0; i < noDBmodules; i++ )	{
 			if ( boost::algorithm::iequals( dbModules[i].name, dbType ))	{
-				Container< db::Database >* container = dbModules[i].createFunc( **it );
+				Container< db::DatabaseUnit >* container = dbModules[i].createFunc( **it );
 				m_db.push_back( container );
 				break;
 			}
@@ -75,17 +75,17 @@ DatabaseProvider::DatabaseProvider( const DBproviderConfig& conf )
 	}
 }
 
-DatabaseProvider::~DatabaseProvider()
+DatabaseProvider_Implementation::~DatabaseProvider_Implementation()
 {
-	for ( std::list< Container< db::Database >* >::const_iterator it = m_db.begin();
+	for ( std::list< Container< db::DatabaseUnit >* >::const_iterator it = m_db.begin();
 							it != m_db.end(); it++ )
 		delete *it;
 }
 
 
-const Database* DatabaseProvider::database( const std::string& id ) const
+const Database* DatabaseProvider_Implementation::database( const std::string& id ) const
 {
-	for ( std::list< Container< db::Database >* >::const_iterator it = m_db.begin();
+	for ( std::list< Container< db::DatabaseUnit >* >::const_iterator it = m_db.begin();
 							it != m_db.end(); it++ )	{
 		if ( (*it)->object().ID() == id )
 			return &(*it)->object();

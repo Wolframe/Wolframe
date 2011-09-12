@@ -40,18 +40,21 @@
 namespace _Wolframe {
 namespace db {
 
+/// Opaque definition for DBproviderConfig
+class DBproviderConfig;
+
 /// Database provider
 class DatabaseProvider : private boost::noncopyable
 {
 public:
-	DatabaseProvider();
+	DatabaseProvider( const DBproviderConfig* conf );
 	~DatabaseProvider();
 
 	const Database* database( const std::string& ID ) const;
 
 private:
-	class DatabaseProviderImpl;
-	DatabaseProviderImpl *m_impl;
+	class DatabaseProvider_Implementation;
+	DatabaseProvider_Implementation *m_impl;
 };
 
 }} // namespace _Wolframe::db

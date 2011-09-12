@@ -74,7 +74,7 @@ private:
 };
 
 
-class PostgreSQLdatabase : public Database
+class PostgreSQLdatabase : public DatabaseUnit
 {
 public:
 	PostgreSQLdatabase( const std::string& id,
@@ -98,7 +98,7 @@ private:
 
 
 class PostgreSQLcontainer : public module::ModuleContainer< PostgreSQLcontainer, PostgreSQLconfig,
-		db::Database >
+		db::DatabaseUnit >
 {
 public:
 	PostgreSQLcontainer( const PostgreSQLconfig& conf );
@@ -106,7 +106,7 @@ public:
 
 	virtual const std::string& ID() const		{ return m_db.ID(); }
 	virtual const char* typeName() const		{ return m_db.typeName(); }
-	virtual Database& object()			{ return m_db; }
+	virtual DatabaseUnit& object()			{ return m_db; }
 private:
 	PostgreSQLdatabase	m_db;
 };

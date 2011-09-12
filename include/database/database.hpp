@@ -98,6 +98,18 @@ public:
 	virtual void close()	{}
 };
 
+
+/// Database Unit
+/// This is the base class for database unit implementations
+class DatabaseUnit
+{
+public:
+	DatabaseUnit();
+	~DatabaseUnit();
+
+	virtual const Database* database( const std::string& ID ) = 0;
+};
+
 }} // namespace _Wolframe::db
 
 #endif // _DATABASE_HPP_INCLUDED

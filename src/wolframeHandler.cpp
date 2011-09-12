@@ -270,7 +270,7 @@ void wolframeConnection::errorOccured( NetworkSignal signal )
 /// The server handler global context
 WolframeHandler::WolframeHandler( const HandlerConfiguration* conf )
 	: m_banner( conf->banner->toString() ),
-	  m_db( *(conf->database)),
+	  m_db( conf->database ),
 	  m_aaaa( *(conf->aaaa)),
 	  m_procGroup( *(conf->proc))
 {

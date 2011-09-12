@@ -31,15 +31,15 @@
 
 ************************************************************************/
 //
-// DBprovider.hpp
+// DBproviderImplementation.hpp
 //
 
-#ifndef _DATABASE_PROVIDER_HPP_INCLUDED
-#define _DATABASE_PROVIDER_HPP_INCLUDED
+#ifndef _DB_PROVIDER_IMPLEMENTATION_HPP_INCLUDED
+#define _DB_PROVIDER_IMPLEMENTATION_HPP_INCLUDED
 
 #include <list>
 #include "config/configurationBase.hpp"
-#include "database/database.hpp"
+#include "database/databaseProvider.hpp"
 #include "container.hpp"
 
 namespace _Wolframe {
@@ -48,7 +48,7 @@ namespace db {
 /// database configuration
 class DBproviderConfig : public config::ConfigurationBase
 {
-	friend class DatabaseProvider;
+	friend class DatabaseProvider_Implementation;
 	friend class config::ConfigurationParser;
 public:
 	/// constructor & destructor
@@ -65,17 +65,17 @@ private:
 
 ///
 ///
-class DatabaseProvider
+class DatabaseProvider_Implementation
 {
 public:
-	DatabaseProvider( const DBproviderConfig& conf );
-	~DatabaseProvider();
+	DatabaseProvider_Implementation( const DBproviderConfig* conf );
+	~DatabaseProvider_Implementation();
 
-	const Database* database( const std::string& ID ) const;
+	const Database* database( const std::string& ID );
 private:
-	std::list< Container< Database >* >	m_db;
+	std::list< Container< DatabaseUnit >* >	m_db;
 };
 
 }} // namespace _Wolframe::db
 
-#endif // _DATABASE_PROVIDER_HPP_INCLUDED
+#endif // _DB_PROVIDER_IMPLEMENTATION_HPP_INCLUDED
