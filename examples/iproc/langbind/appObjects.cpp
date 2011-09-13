@@ -137,7 +137,7 @@ InputFilterClosure::ItemType InputFilterClosure::fetch( const char*& tag, unsign
 				}
 		}
 	}
-	LOG_DATA << "illegal state in iterator";
+	LOG_ERROR << "illegal state in iterator";
 	return Error;
 }
 

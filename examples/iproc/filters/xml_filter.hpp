@@ -495,7 +495,7 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		virtual bool getNext( ElementType* type, void* buffer, std::size_t buffersize, std::size_t* bufferpos)
 		{
 			static const ElementTypeMap tmap;
-			BufferType buf( (char*)buffer, buffersize, *bufferpos);
+			BufferType buf( (char*)buffer + *bufferpos, buffersize - *bufferpos);
 			m_scanner->setOutputBuffer( buf);
 			try
 			{
@@ -506,7 +506,7 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 					setState( protocol::InputFilter::Error, ErrBufferTooSmall);
 					return false;
 				}
-				*bufferpos = buf.size();
+				*bufferpos += buf.size();
 
 				int st = tmap[ m_itr->type()];
 				if (st == -1)
@@ -523,7 +523,7 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 			catch (SrcIterator::EoM)
 			{
 				setState( EndOfMessage);
-				*bufferpos = buf.size();
+				*bufferpos += buf.size();
 				return false;
 			};
 			setState( Error, ErrUnexpectedState);
@@ -589,7 +589,7 @@ struct XmlHeaderInputFilter :public XmlFilter<textwolf::charset::IsoLatin1,textw
 	virtual bool getNext( ElementType* type, void* buffer, std::size_t buffersize, std::size_t* bufferpos)
 	{
 		static const ElementTypeMap tmap;
-		BufferType buf( (char*)buffer, buffersize, *bufferpos);
+		BufferType buf( (char*)buffer+*bufferpos, buffersize-*bufferpos, 0);
 		m_scanner->setOutputBuffer( buf);
 		try
 		{
@@ -605,7 +605,7 @@ struct XmlHeaderInputFilter :public XmlFilter<textwolf::charset::IsoLatin1,textw
 				setState( protocol::InputFilter::Error, ErrBufferTooSmall);
 				return false;
 			}
-			*bufferpos = buf.size();
+			*bufferpos += buf.size();
 			int st = tmap[ m_itr->type()];
 			if (st == -1)
 			{
@@ -624,7 +624,7 @@ struct XmlHeaderInputFilter :public XmlFilter<textwolf::charset::IsoLatin1,textw
 		}
 		catch (SrcIterator::EoM)
 		{
-			*bufferpos = buf.size();
+			*bufferpos += buf.size();
 			if (!gotEoD())
 			{
 				setState( EndOfMessage);
