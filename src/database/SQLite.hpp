@@ -69,7 +69,7 @@ private:
 };
 
 
-class SQLiteDatabase : public Database
+class SQLiteDatabase : public DatabaseUnit
 {
 public:
 	SQLiteDatabase( const std::string& id,
@@ -90,7 +90,7 @@ private:
 
 
 class SQLiteContainer : public module::ModuleContainer< SQLiteContainer, SQLiteConfig,
-		db::Database >
+		db::DatabaseUnit >
 {
 public:
 	SQLiteContainer( const SQLiteConfig& conf );
@@ -98,7 +98,7 @@ public:
 
 	const std::string& ID() const			{ return m_db.ID(); }
 	virtual const char* typeName() const		{ return m_db.typeName(); }
-	virtual Database& object()			{ return m_db; }
+	virtual DatabaseUnit& object()			{ return m_db; }
 private:
 	SQLiteDatabase	m_db;
 };

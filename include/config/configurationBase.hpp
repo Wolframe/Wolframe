@@ -106,17 +106,16 @@ private:
 };
 
 
-///
-///
-///
-class ContainerConfiguration : public ConfigurationBase
+/// A typed configuration is a normal configuration that provides
+/// also a typeName function.
+class TypedConfiguration : public ConfigurationBase
 {
 public:
 	/// Class constructor.
-	ContainerConfiguration( const char* name, const char* logParent, const char* logName )
+	TypedConfiguration( const char* name, const char* logParent, const char* logName )
 		: ConfigurationBase( name, logParent, logName )	{}
 
-	virtual ~ContainerConfiguration()			{}
+	virtual ~TypedConfiguration()			{}
 
 	virtual const char* typeName() const = 0;
 };

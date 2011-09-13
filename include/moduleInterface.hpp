@@ -34,8 +34,8 @@
 ///\file moduleInterface.hpp
 //
 
-#ifndef _MODULE_CONFIGURATION_HPP_INCLUDED
-#define _MODULE_CONFIGURATION_HPP_INCLUDED
+#ifndef _MODULE_INTERFACE_HPP_INCLUDED
+#define _MODULE_INTERFACE_HPP_INCLUDED
 
 #include <string>
 #include <boost/property_tree/ptree.hpp>
@@ -54,7 +54,7 @@ enum ModuleType	{
 
 
 template< class T >
-class ModuleConfiguration : public config::ContainerConfiguration
+class ModuleConfiguration : public config::TypedConfiguration
 {
 public:
 	/// Class constructor.
@@ -66,13 +66,13 @@ public:
 	///			the logParent parameter will form the whole logging
 	///			prefix for of the section.
 	ModuleConfiguration( const char* name, const char* logParent, const char* logName )
-		: config::ContainerConfiguration( name, logParent, logName )	{}
+		: config::TypedConfiguration( name, logParent, logName )	{}
 
 	virtual ~ModuleConfiguration()			{}
 
 	virtual const char* typeName() const = 0;
 
-	static config::ContainerConfiguration* create( const char* name, const char* logParent, const char* logName )	{
+	static config::TypedConfiguration* create( const char* name, const char* logParent, const char* logName )	{
 		return new T( name, logParent, logName );
 	}
 };
@@ -106,7 +106,7 @@ public:
 	virtual ~ModuleContainer()			{}
 	virtual const char* typeName() const = 0;
 
-	static Container< Tbase >* create( const config::ContainerConfiguration& conf )	{
+	static Container< Tbase >* create( const config::TypedConfiguration& conf )	{
 		return new T( dynamic_cast< const Tconf& >( conf ));
 	}
 };
@@ -133,7 +133,6 @@ extern "C" {
 	LoadableModuleDescription* modDesc();
 }
 
-
 }} // namespace _Wolframe::module
 
-#endif // _MODULE_CONFIGURATION_HPP_INCLUDED
+#endif // _MODULE_INTERFACE_HPP_INCLUDED

@@ -270,7 +270,7 @@ void wolframeConnection::errorOccured( NetworkSignal signal )
 /// The server handler global context
 WolframeHandler::WolframeHandler( const HandlerConfiguration* conf )
 	: m_banner( conf->banner->toString() ),
-	  m_db( *(conf->database)),
+	  m_db( conf->database ),
 	  m_aaaa( *(conf->aaaa)),
 	  m_procGroup( *(conf->proc))
 {
@@ -306,13 +306,13 @@ ServerHandler::ServerHandlerImpl::~ServerHandlerImpl()	{}
 
 /// Outside face of the PIMPL
 ServerHandler::ServerHandler( const HandlerConfiguration* conf )
-	: impl_( new ServerHandlerImpl( conf ) )	{}
+	: m_impl( new ServerHandlerImpl( conf ) )	{}
 
-ServerHandler::~ServerHandler()	{ delete impl_; }
+ServerHandler::~ServerHandler()	{ delete m_impl; }
 
 net::ConnectionHandler* ServerHandler::newConnection( const net::LocalEndpoint& local )
 {
-	return impl_->newConnection( local );
+	return m_impl->newConnection( local );
 }
 
 } // namespace _Wolframe

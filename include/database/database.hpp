@@ -67,9 +67,8 @@ public:
 };
 
 
-/// Base class for database(s).
-///
-/// All databases should derive from this class.
+/// Base class for database interface
+/// All databases should provide this interface
 class Database
 {
 public:
@@ -82,7 +81,7 @@ public:
 
 	/// Database type (module type).
 	/// All database implementations need a type (name).
-	/// Type names should be unique.
+	/// Type names must be unique.
 	virtual const char* typeName() const = 0;
 
 	/// Perform a database transaction.
@@ -97,6 +96,18 @@ public:
 	/// Close the database connetion
 	/// This exists for no good reason (mostly to make code look uniform)
 	virtual void close()	{}
+};
+
+
+/// Database Unit
+/// This is the base class for database unit implementations
+class DatabaseUnit
+{
+public:
+	DatabaseUnit();
+	~DatabaseUnit();
+
+	virtual const Database* database( const std::string& ID ) = 0;
 };
 
 }} // namespace _Wolframe::db

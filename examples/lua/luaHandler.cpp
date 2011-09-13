@@ -405,13 +405,13 @@ net::ConnectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const n
 	return new luaConnection( local, config_ );
 }
 
-ServerHandler::ServerHandler( const HandlerConfiguration *config ) : impl_( new ServerHandlerImpl( config ) )	{}
+ServerHandler::ServerHandler( const HandlerConfiguration *config ) : m_impl( new ServerHandlerImpl( config ) )	{}
 
-ServerHandler::~ServerHandler()	{ delete impl_; }
+ServerHandler::~ServerHandler()	{ delete m_impl; }
 
 net::ConnectionHandler* ServerHandler::newConnection( const net::LocalEndpoint& local )
 {
-	return impl_->newConnection( local );
+	return m_impl->newConnection( local );
 }
 
 } // namespace _Wolframe
