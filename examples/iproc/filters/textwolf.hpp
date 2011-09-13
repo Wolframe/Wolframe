@@ -1144,8 +1144,8 @@ public:
 	///\brief Enumeration of actions in the XML scanner state machine
 	enum STMAction
 	{
-		Return, ReturnToken, ReturnIdentifier, ReturnSQString, ReturnDQString, ExpectIdentifierXML, ExpectIdentifierCDATA, ReturnEOF,
-		NofSTMActions = 8
+		Return, ReturnWord, ReturnContent, ReturnIdentifier, ReturnSQString, ReturnDQString, ExpectIdentifierXML, ExpectIdentifierCDATA, ReturnEOF,
+		NofSTMActions = 9
 	};
 
 	///\brief Get the scanner state machine action as string
@@ -1153,7 +1153,7 @@ public:
 	///\return the action as string
 	static const char* getActionString( STMAction a)
 	{
-		static const char* name[ NofSTMActions] = {"Return", "ReturnToken", "ReturnIdentifier", "ReturnSQString", "ReturnDQString", "ExpectIdentifierXML", "ExpectIdentifierCDATA", "ReturnEOF"};
+		static const char* name[ NofSTMActions] = {"Return", "ReturnWord", "ReturnContent", "ReturnIdentifier", "ReturnSQString", "ReturnDQString", "ExpectIdentifierXML", "ExpectIdentifierCDATA", "ReturnEOF"};
 		return name[ (unsigned int)a];
 	};
 
@@ -1162,7 +1162,7 @@ public:
 	struct Statemachine :public ScannerStatemachine
 	{
 		///\brief Constructor (defines the state machine completely)
-		Statemachine()
+		Statemachine( bool doTokenize)
 		{
 			(*this)
 			[ START    ](EndOfText,EXIT)(EndOfLine)(Cntrl)(Space)(Lt,STARTTAG).miss(ErrExpectedOpenTag)
@@ -1178,9 +1178,20 @@ public:
 			[ XTAGAVID ].action(ReturnIdentifier,HeaderAttribValue)(EndOfLine,Cntrl,Space,XTAGAISK)(Questm,XTAGEND).miss(ErrExpectedTagAttribute)
 			[ XTAGAVSQ ].action(ReturnSQString,HeaderAttribValue)(Sq,XTAGAVQE).miss(ErrStringNotTerminated)
 			[ XTAGAVDQ ].action(ReturnDQString,HeaderAttribValue)(Dq,XTAGAVQE).miss(ErrStringNotTerminated)
-			[ XTAGAVQE ](EndOfLine,Cntrl,Space,XTAGAISK)(Questm,XTAGEND).miss(ErrExpectedTagAttribute)
-			[ CONTENT  ](EndOfText,EXIT)(EndOfLine)(Cntrl)(Space)(Lt,XMLTAG).fallback(TOKEN)
-			[ TOKEN    ].action(ReturnToken,Content)(EndOfText,EXIT)(EndOfLine,Cntrl,Space,CONTENT)(Lt,XMLTAG).fallback(CONTENT)
+			[ XTAGAVQE ](EndOfLine,Cntrl,Space,XTAGAISK)(Questm,XTAGEND).miss(ErrExpectedTagAttribute);
+			if (doTokenize)
+			{
+				(*this)
+				[ CONTENT  ](EndOfText,EXIT)(EndOfLine)(Cntrl)(Space)(Lt,XMLTAG).fallback(TOKEN)
+				[ TOKEN    ].action(ReturnWord,Content)(EndOfText,EXIT)(EndOfLine,Cntrl,Space,CONTENT)(Lt,XMLTAG).fallback(CONTENT);
+			}
+			else
+			{
+				(*this)
+				[ CONTENT  ](EndOfText,EXIT)(Lt,XMLTAG).fallback(TOKEN)
+				[ TOKEN    ].action(ReturnContent,Content)(EndOfText,EXIT)(EndOfLine,Cntrl,Space,CONTENT)(Lt,XMLTAG).fallback(CONTENT);
+			}
+			(*this)
 			[ XMLTAG   ](EndOfLine)(Cntrl)(Space)(Questm,XTAG)(Slash,CLOSETAG).fallback(OPENTAG)
 			[ OPENTAG  ].action(ReturnIdentifier,OpenTag)(EndOfLine,Cntrl,Space,TAGAISK)(Slash,TAGCLIM)(Gt,CONTENT).miss(ErrExpectedTagAttribute)
 			[ CLOSETAG ].action(ReturnIdentifier,CloseTag)(EndOfLine,Cntrl,Space,TAGCLSK)(Gt,CONTENT).miss(ErrExpectedTagEnd)
@@ -1218,13 +1229,23 @@ public:
 		}
 	};
 
+	///\class IsWordCharMap
+	///\brief Defines the set of content word characters (tokenization switched on)
+	struct IsWordCharMap :public IsTokenCharMap
+	{
+		IsWordCharMap()
+		{
+			(*this)(Undef,true)(Equal,true)(Gt,true)(Slash,true)(Exclam,true)(Questm,true)(Sq,true)(Dq,true)(Osb,true)(Csb,true)(Any,true);
+		}
+	};
+
 	///\class IsContentCharMap
 	///\brief Defines the set of content token characters
 	struct IsContentCharMap :public IsTokenCharMap
 	{
 		IsContentCharMap()
 		{
-			(*this)(Undef,true)(Equal,true)(Gt,true)(Slash,true)(Exclam,true)(Questm,true)(Sq,true)(Dq,true)(Osb,true)(Csb,true)(Any,true);
+			(*this)(Cntrl,true)(Space,true)(EndOfLine,true)(Undef,true)(Equal,true)(Gt,true)(Slash,true)(Exclam,true)(Questm,true)(Sq,true)(Dq,true)(Osb,true)(Csb,true)(Any,true);
 		}
 	};
 
@@ -1287,6 +1308,13 @@ private:
 			ParsingToken			///< scanner was interrupted when parsing a token (not in entity cotext)
 		};
 		Id id;					///< the scanner token parser state
+
+		enum EolnState				///< end of line state to fulfill the W3C requirements for end of line mapping (see http://www.w3.org/TR/xml/: 2.11 End-of-Line Handling)
+		{
+			SRC,CR
+		};
+		EolnState eolnState;			///< the scanner end of line state
+
 		unsigned int pos;			///< entity buffer position (buf)
 		unsigned int base;			///< numeric entity base (10 for decimal/16 for hexadecimal)
 		EChar value;				///< parsed entity value
@@ -1294,11 +1322,14 @@ private:
 		UChar curchr_saved;			///< save current character parsed for the case we cannot print it (output buffer too small)
 
 		///\brief Constructor
-		TokState()				:id(Start),pos(0),base(0),value(0),curchr_saved(0) {}
+		TokState()				:id(Start),eolnState(SRC),pos(0),base(0),value(0),curchr_saved(0) {}
 
 		///\brief Reset this state variables (after succesful exit with a new token parsed)
 		///\param [in] id_ the new entity parse state
-		void init(Id id_=Start)			{id=id_;pos=0;base=0;value=0;curchr_saved=0;}
+		void init(Id id_=Start, EolnState eolnState_=SRC)
+		{
+			id=id_;eolnState=eolnState_;pos=0;base=0;value=0;curchr_saved=0;
+		}
 	};
 	TokState tokstate;								///< the entity parsing state of this XML scanner
 
@@ -1541,6 +1572,7 @@ public:
 		if (tokstate.id == TokState::Start)
 		{
 			tokstate.id = TokState::ParsingToken;
+			m_outputBuf->clear();
 		}
 		else if (tokstate.id != TokState::ParsingToken)
 		{
@@ -1555,7 +1587,35 @@ public:
 			ControlCharacter ch;
 			while (isTok[ (unsigned char)(ch=m_src.control())])
 			{
-				push( m_src.chr());
+				UChar chr = m_src.chr();
+				if (chr <= 0xD)
+				{
+					//handling W3C requirements for end of line translation in XML:
+					char aa = m_src.ascii();
+					if (aa == '\r')
+					{
+						push( (unsigned char)'\n');
+						tokstate.eolnState = TokState::CR;
+					}
+					else if (aa == '\n')
+					{
+						if (tokstate.eolnState != TokState::CR)
+						{
+							push( (unsigned char)'\n');
+						}
+						tokstate.eolnState = TokState::SRC;
+					}
+					else
+					{
+						push( chr);
+						tokstate.eolnState = TokState::SRC;
+					}
+				}
+				else
+				{
+					push( chr);
+					tokstate.eolnState = TokState::SRC;
+				}
 				m_src.skip();
 			}
 			if (ch == Amp)
@@ -1584,6 +1644,7 @@ public:
 	template <class OutputBufferType>
 	static bool parseStaticToken( const IsTokenCharMap& isTok, InputReader ir, OutputBufferType& buf)
 	{
+		buf.clear();
 		for (;;)
 		{
 			ControlCharacter ch;
@@ -1744,6 +1805,7 @@ public:
 
 private:
 	STMState state;			///< current state of the XML scanner
+	bool m_doTokenize;		///< true, if we do tokenize the input, false if we get the content according the W3C default (see http://www.w3.org/TR/xml: 2.10 White Space Handling)
 	Error error;			///< last error code
 	InputReader m_src;		///< source input iterator
 	const EntityMap* m_entityMap;	///< map with entities defined by the caller
@@ -1755,16 +1817,16 @@ public:
 	///\param [in] p_outputBuf buffer to use for output
 	///\param [in] p_entityMap read only map of named entities defined by the user
 	XMLScanner( InputIterator& p_src, OutputBuffer& p_outputBuf, const EntityMap& p_entityMap)
-			:state(START),error(Ok),m_src(p_src),m_entityMap(&p_entityMap),m_outputBuf(&p_outputBuf)
+			:state(START),m_doTokenize(false),error(Ok),m_src(p_src),m_entityMap(&p_entityMap),m_outputBuf(&p_outputBuf)
 	{}
 	XMLScanner( InputIterator& p_src, OutputBuffer& p_outputBuf)
-			:state(START),error(Ok),m_src(p_src),m_entityMap(0),m_outputBuf(&p_outputBuf)
+			:state(START),m_doTokenize(false),error(Ok),m_src(p_src),m_entityMap(0),m_outputBuf(&p_outputBuf)
 	{}
 
 	///\brief Copy constructor
 	///\param [in] o scanner to copy
 	XMLScanner( XMLScanner& o)
-			:state(o.state),error(o.error),m_src(o.m_src),m_entityMap(o.m_entityMap),m_outputBuf(o.m_outputBuf)
+			:state(o.state),m_doTokenize(o.m_doTokenize),error(o.error),m_src(o.m_src),m_entityMap(o.m_entityMap),m_outputBuf(o.m_outputBuf)
 	{}
 
 	///\brief Redefine the buffer to use for output
@@ -1793,8 +1855,17 @@ public:
 	///\return pointer to the state variables
 	ScannerStatemachine::Element* getState()
 	{
-		static Statemachine STM;
-		return STM.get( state);
+		static Statemachine STMtok(true);
+		static Statemachine STMW3C(false);
+		static Statemachine* stm[2] = {&STMW3C,&STMtok};
+		return stm[ m_doTokenize]->get( state);
+	}
+
+	///\brief Set the tokenization behaviour
+	///\param [out] v the tokenization behaviour flag
+	void doTokenize( bool v)
+	{
+		m_doTokenize = v;
 	}
 
 	///\brief Get the last error
@@ -1813,12 +1884,13 @@ public:
 	///\return the type of the XML element
 	ElementType nextItem( unsigned short mask=0xFFFF)
 	{
+		static const IsWordCharMap wordC;
 		static const IsContentCharMap contentC;
 		static const IsTagCharMap tagC;
 		static const IsSQStringCharMap sqC;
 		static const IsDQStringCharMap dqC;
-		static const IsTokenCharMap* tokenDefs[ NofSTMActions] = {0,&contentC,&tagC,&sqC,&dqC,0,0,0};
-		static const char* stringDefs[ NofSTMActions] = {0,0,0,0,0,"xml","CDATA",0};
+		static const IsTokenCharMap* tokenDefs[ NofSTMActions] = {0,&wordC,&contentC,&tagC,&sqC,&dqC,0,0,0};
+		static const char* stringDefs[ NofSTMActions] = {0,0,0,0,0,0,"xml","CDATA",0};
 
 		ElementType rt = None;
 		ControlCharacter ch;
@@ -3047,6 +3119,13 @@ public:
 	void setOutputBuffer( OutputBuffer& p_outputBuf)
 	{
 		scan.setOutputBuffer( p_outputBuf);
+	}
+
+	///\brief Set the tokenization behaviour
+	///\param [out] v the tokenization behaviour flag
+	void doTokenize( bool v)
+	{
+		scan.doTokenize(v);
 	}
 
 	///\class End
