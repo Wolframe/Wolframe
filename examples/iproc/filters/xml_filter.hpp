@@ -436,6 +436,7 @@ struct XmlFilter :public FilterBase<IOCharset,AppCharset>
 		{
 			m_src.setInput( this);
 			m_scanner = new XMLScanner( m_src, m_outputbuf);
+			m_scanner->doTokenize(true);
 			m_itr = m_scanner->begin(false);
 			m_end = m_scanner->end();
 		}
