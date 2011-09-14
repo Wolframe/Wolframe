@@ -1120,9 +1120,9 @@ public:
 	///\brief Enumeration of states of the XML scanner state machine
 	enum STMState
 	{
-		START, STARTTAG, XTAG, XTAGEND, XTAGEOLN, XTAGDONE, XTAGAISK, XTAGANAM, XTAGAESK, XTAGAVSK, XTAGAVID, XTAGAVSQ, XTAGAVDQ, XTAGAVQE,
+		START, STARTTAG, XTAG, PITAG, PITAGEND, XTAGEND, XTAGEOLN, XTAGDONE, XTAGAISK, XTAGANAM, XTAGAESK, XTAGAVSK, XTAGAVID, XTAGAVSQ, XTAGAVDQ, XTAGAVQE,
 		CONTENT, TOKEN, XMLTAG, OPENTAG, CLOSETAG, TAGCLSK, TAGAISK, TAGANAM, TAGAESK, TAGAVSK, TAGAVID, TAGAVSQ, TAGAVDQ, TAGAVQE,
-		TAGCLIM, ENTITYSL, ENTITY, CDATA, CDATA1, CDATA2, CDATA3, EXIT
+		TAGCLIM, ENTITYSL, ENTITY, ENTITYLC, CDATA, CDATA1, CDATA2, CDATA3, EXIT
 	};
 
 	///\brief Get the scanner state machine state as string
@@ -1130,12 +1130,17 @@ public:
 	///\return the state as string
 	static const char* getStateString( STMState s)
 	{
-		enum Constant {NofStates=36};
+		enum Constant {NofStates=39};
 		static const char* sState[NofStates]
 		= {
-			"START", "STARTTAG", "XTAG", "XTAGEND", "XTAGEOLN", "XTAGDONE", "XTAGAISK", "XTAGANAM", "XTAGAESK", "XTAGAVSK", "XTAGAVID", "XTAGAVSQ", "XTAGAVDQ", "XTAGAVQE",
-			"CONTENT", "TOKEN", "XMLTAG", "OPENTAG", "CLOSETAG", "TAGCLSK", "TAGAISK", "TAGANAM", "TAGAESK", "TAGAVSK", "TAGAVID", "TAGAVSQ", "TAGAVDQ", "TAGAVQE",
-			"TAGCLIM", "ENTITYSL", "ENTITY", "CDATA", "CDATA1", "CDATA2", "CDATA3", "EXIT"
+			"START", "STARTTAG", "XTAG", "PITAG", "PITAGEND",
+			"XTAGEND", "XTAGEOLN", "XTAGDONE", "XTAGAISK", "XTAGANAM",
+			"XTAGAESK", "XTAGAVSK", "XTAGAVID", "XTAGAVSQ", "XTAGAVDQ",
+			"XTAGAVQE", "CONTENT", "TOKEN", "XMLTAG", "OPENTAG",
+			"CLOSETAG", "TAGCLSK", "TAGAISK", "TAGANAM", "TAGAESK",
+			"TAGAVSK", "TAGAVID", "TAGAVSQ", "TAGAVDQ", "TAGAVQE",
+			"TAGCLIM", "ENTITYSL", "ENTITY", "ENTITYLC", "CDATA",
+			"CDATA1", "CDATA2", "CDATA3", "EXIT"
 		};
 		return sState[(unsigned int)s];
 	}
@@ -1168,6 +1173,8 @@ public:
 			[ START    ](EndOfText,EXIT)(EndOfLine)(Cntrl)(Space)(Lt,STARTTAG).miss(ErrExpectedOpenTag)
 			[ STARTTAG ](EndOfLine)(Cntrl)(Space)(Questm,XTAG )(Exclam,ENTITYSL).fallback(OPENTAG)
 			[ XTAG     ].action(ExpectIdentifierXML)(EndOfLine,Cntrl,Space,XTAGAISK)(Questm,XTAGEND).miss(ErrExpectedXMLTag)
+			[ PITAG    ](Questm,PITAGEND).other(PITAG)
+			[ PITAGEND ](Gt,CONTENT).miss(ErrExpectedTagEnd)
 			[ XTAGEND  ](Gt,XTAGEOLN)(EndOfLine)(Cntrl)(Space).miss(ErrExpectedTagEnd)
 			[ XTAGEOLN ](EndOfLine,XTAGDONE)(Cntrl)(Space).miss(ErrExpectedEndOfLine)
 			[ XTAGDONE ].action(Return,HeaderEnd).fallback(CONTENT)
@@ -1192,7 +1199,7 @@ public:
 				[ TOKEN    ].action(ReturnContent,Content)(EndOfText,EXIT)(EndOfLine,Cntrl,Space,CONTENT)(Lt,XMLTAG).fallback(CONTENT);
 			}
 			(*this)
-			[ XMLTAG   ](EndOfLine)(Cntrl)(Space)(Questm,XTAG)(Slash,CLOSETAG).fallback(OPENTAG)
+			[ XMLTAG   ](EndOfLine)(Cntrl)(Space)(Questm,PITAG)(Slash,CLOSETAG).fallback(OPENTAG)
 			[ OPENTAG  ].action(ReturnIdentifier,OpenTag)(EndOfLine,Cntrl,Space,TAGAISK)(Slash,TAGCLIM)(Gt,CONTENT).miss(ErrExpectedTagAttribute)
 			[ CLOSETAG ].action(ReturnIdentifier,CloseTag)(EndOfLine,Cntrl,Space,TAGCLSK)(Gt,CONTENT).miss(ErrExpectedTagEnd)
 			[ TAGCLSK  ](EndOfLine)(Cntrl)(Space)(Gt,CONTENT).miss(ErrExpectedTagEnd)
@@ -1206,7 +1213,8 @@ public:
 			[ TAGAVQE  ](EndOfLine,Cntrl,Space,TAGAISK)(Slash,TAGCLIM)(Gt,CONTENT).miss(ErrExpectedTagAttribute)
 			[ TAGCLIM  ].action(Return,CloseTagIm)(EndOfLine)(Cntrl)(Space)(Gt,CONTENT).miss(ErrExpectedTagEnd)
 			[ ENTITYSL ](Osb,CDATA).fallback(ENTITY)
-			[ ENTITY   ](Exclam,TAGCLSK).other( ENTITY)
+			[ ENTITY   ](Gt,CONTENT)(Osb,ENTITYLC).other( ENTITY)
+			[ ENTITYLC ](Csb,ENTITY).other( ENTITYLC)
 			[ CDATA    ].action(ExpectIdentifierCDATA)(Osb,CDATA1).miss(ErrExpectedCDATATag)
 			[ CDATA1   ](Csb,CDATA2).other(CDATA1)
 			[ CDATA2   ](Csb,CDATA3).other(CDATA1)
@@ -3330,3 +3338,4 @@ public:
 
 } //namespace textwolf
 #endif
+
