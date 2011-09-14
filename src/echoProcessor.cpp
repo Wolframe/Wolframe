@@ -94,6 +94,7 @@ void EchoProcConfig::setCanonicalPathes( const std::string& /*refPath*/ )
 
 
 EchoProcContainer::EchoProcContainer( const EchoProcConfig& /*conf*/ )
+	: m_proc()
 {
 	LOG_NOTICE << "Echo processor container created";
 }

@@ -118,8 +118,8 @@ SQLiteDatabase::~SQLiteDatabase( )
 		  << "filename '" << m_filename << "'";
 }
 
-bool SQLiteDatabase::doTransaction( DatabaseRequest &request, DatabaseAnswer &answer,
-				    unsigned short timeout, unsigned short retries )
+bool SQLiteDatabase::doTransaction( DatabaseRequest& /*request*/, DatabaseAnswer& /*answer*/,
+				    unsigned short /*timeout*/, unsigned short /*retries*/ )
 {
 	/*
 // check if user is in the sqlite table
@@ -160,14 +160,14 @@ bool SQLiteDatabase::doTransaction( DatabaseRequest &request, DatabaseAnswer &an
 	return true;
 }
 
-//***  SQLite database container  *******************************************
-SQLiteContainer::SQLiteContainer( const SQLiteConfig& conf )
+//***  SQLite database unit  ************************************************
+SQLiteUnit::SQLiteUnit( const SQLiteConfig& conf )
 	: m_db( conf.m_ID, conf.filename, /* Aba: temporary */ 10, conf.flag )
 {
 	LOG_NOTICE << "SQLite database container for '" << conf.m_ID << "' created";
 }
 
-SQLiteContainer::~SQLiteContainer( )
+SQLiteUnit::~SQLiteUnit( )
 {
 }
 

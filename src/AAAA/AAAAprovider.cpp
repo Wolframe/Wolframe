@@ -66,7 +66,7 @@ AAAAprovider::AAAAprovider( const AAAAconfiguration& conf )
 	: m_authenticator( conf.m_authConfig, authModules, noAuthModules ),
 	  m_auditor( conf.m_auditConfig, auditModules, noAuditModules )	{}
 
-bool AAAAprovider::resolveDB( db::DatabaseProvider& db )
+bool AAAAprovider::resolveDB( const db::DatabaseProvider& db )
 {
 	if ( !m_authenticator.resolveDB( db ))
 		return false;
@@ -106,7 +106,7 @@ AuthenticationGroup::~AuthenticationGroup()
 		delete *it;
 }
 
-bool AuthenticationGroup::resolveDB( db::DatabaseProvider& db )
+bool AuthenticationGroup::resolveDB( const db::DatabaseProvider& db )
 {
 	for ( std::list< Container< Authenticator >* >::iterator it = m_authenticators.begin();
 								it != m_authenticators.end(); it++ )
@@ -146,7 +146,7 @@ AuditGroup::~AuditGroup()
 		delete *it;
 }
 
-bool AuditGroup::resolveDB( db::DatabaseProvider& db )
+bool AuditGroup::resolveDB( const db::DatabaseProvider& db )
 {
 	for ( std::list< Container< AAAA::Auditor >* >::const_iterator it = m_auditors.begin();
 								it != m_auditors.end(); it++ )

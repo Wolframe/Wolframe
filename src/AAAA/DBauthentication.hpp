@@ -87,8 +87,8 @@ public:
 	DBauthContainer( const DatabaseAuthConfig& conf );
 	~DBauthContainer();
 
-	virtual const char* typeName() const	{ return "DatabaseAuth"; }
-	virtual Authenticator& object()		{ return m_auth; }
+	virtual const char* typeName() const		{ return "DatabaseAuth"; }
+	virtual const Authenticator& object() const	{ return m_auth; }
 
 	bool resolveDB( const db::DatabaseProvider& db );
 private:

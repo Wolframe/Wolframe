@@ -104,10 +104,9 @@ public:
 class DatabaseUnit
 {
 public:
-	DatabaseUnit();
-	~DatabaseUnit();
+	virtual ~DatabaseUnit()			{}
 
-	virtual const Database* database( const std::string& ID ) = 0;
+	virtual const Database& database() const = 0;
 };
 
 }} // namespace _Wolframe::db

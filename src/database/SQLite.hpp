@@ -52,7 +52,7 @@ namespace db {
 class SQLiteConfig : public module::ModuleConfiguration< SQLiteConfig >
 {
 	friend class config::ConfigurationParser;
-	friend class SQLiteContainer;
+	friend class SQLiteUnit;
 public:
 	const char* typeName() const			{ return "SQLite"; }
 
@@ -69,7 +69,7 @@ private:
 };
 
 
-class SQLiteDatabase : public DatabaseUnit
+class SQLiteDatabase : public Database
 {
 public:
 	SQLiteDatabase( const std::string& id,
@@ -89,18 +89,30 @@ private:
 };
 
 
+class SQLiteUnit : public DatabaseUnit
+{
+public:
+	SQLiteUnit( const SQLiteConfig& conf );
+	~SQLiteUnit();
+
+	virtual const Database& database() const	{ return m_db; }
+private:
+	const SQLiteDatabase	m_db;
+};
+
+
 class SQLiteContainer : public module::ModuleContainer< SQLiteContainer, SQLiteConfig,
 		db::DatabaseUnit >
 {
 public:
-	SQLiteContainer( const SQLiteConfig& conf );
-	~SQLiteContainer();
+	SQLiteContainer( const SQLiteConfig& conf ) : m_unit( conf )	{}
+	~SQLiteContainer()				{}
 
-	const std::string& ID() const			{ return m_db.ID(); }
-	virtual const char* typeName() const		{ return m_db.typeName(); }
-	virtual DatabaseUnit& object()			{ return m_db; }
+	const std::string& ID() const			{ return m_unit.database().ID(); }
+	virtual const char* typeName() const		{ return m_unit.database().typeName(); }
+	virtual const DatabaseUnit& object() const	{ return m_unit; }
 private:
-	SQLiteDatabase	m_db;
+	const SQLiteUnit	m_unit;
 };
 
 }} // _Wolframe::db

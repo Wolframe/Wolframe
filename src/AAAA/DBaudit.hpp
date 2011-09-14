@@ -80,10 +80,10 @@ public:
 	DBauditContainer( const DBauditConfig& conf );
 	~DBauditContainer();
 
-	const char* typeName() const				{ return "DatabaseAudit"; }
+	const char* typeName() const			{ return "DatabaseAudit"; }
 
 	bool resolveDB( const db::DatabaseProvider& db );
-	virtual Auditor& object()				{ return m_audit; }
+	virtual const Auditor& object() const		{ return m_audit; }
 private:
 	std::string		m_dbLabel;
 	const db::Database*	m_db;

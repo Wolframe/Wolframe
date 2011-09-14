@@ -48,7 +48,8 @@ namespace db {
 /// database configuration
 class DBproviderConfig : public config::ConfigurationBase
 {
-	friend class DatabaseProvider_Implementation;
+	friend class DatabaseProvider;
+//	friend class DatabaseProvider::DatabaseProvider_Impl;
 	friend class config::ConfigurationParser;
 public:
 	/// constructor & destructor
@@ -63,15 +64,15 @@ private:
 	std::list< config::TypedConfiguration* >	m_dbConfig;
 };
 
-///
-///
-class DatabaseProvider_Implementation
+
+/// DatabaseProvider PIMPL implementation
+class DatabaseProvider::DatabaseProvider_Impl
 {
 public:
-	DatabaseProvider_Implementation( const DBproviderConfig* conf );
-	~DatabaseProvider_Implementation();
+	DatabaseProvider_Impl( const DBproviderConfig* conf );
+	~DatabaseProvider_Impl();
 
-	const Database* database( const std::string& ID );
+	const Database* database( const std::string& ID ) const;
 private:
 	std::list< Container< DatabaseUnit >* >	m_db;
 };

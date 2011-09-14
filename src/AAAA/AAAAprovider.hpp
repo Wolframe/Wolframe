@@ -44,7 +44,7 @@
 #include "moduleInterface.hpp"
 
 #include "database/database.hpp"
-#include "../database/DBprovider.hpp"
+#include "database/databaseProvider.hpp"
 
 #include <string>
 #include <list>
@@ -79,7 +79,7 @@ public:
 			     module::ModuleContainerDescription<Container < Authenticator >, config::TypedConfiguration>* description,
 			     size_t descrSize );
 	~AuthenticationGroup();
-	bool resolveDB( db::DatabaseProvider& db );
+	bool resolveDB( const db::DatabaseProvider& db );
 
 	Authenticator* authenticator()		{ return NULL; }
 private:
@@ -94,7 +94,7 @@ public:
 		    module::ModuleContainerDescription< Container< Auditor >, config::TypedConfiguration >* description,
 		    size_t descrSize );
 	~AuditGroup();
-	bool resolveDB( db::DatabaseProvider& db );
+	bool resolveDB( const db::DatabaseProvider& db );
 
 	Auditor* auditor()			{ return NULL; }
 private:
@@ -107,7 +107,7 @@ class AAAAprovider
 public:
 	AAAAprovider( const AAAAconfiguration& conf );
 	~AAAAprovider()				{}
-	bool resolveDB( db::DatabaseProvider& db );
+	bool resolveDB( const db::DatabaseProvider& db );
 
 	Authenticator* authenticator()		{ return m_authenticator.authenticator(); }
 	Auditor* auditor()			{ return m_auditor.auditor(); }

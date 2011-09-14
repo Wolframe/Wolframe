@@ -48,7 +48,7 @@ class Auditor {
 public:
 	virtual ~Auditor( ) { }
 
-	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ )	{ return true; }
+	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ ) const	{ return true; }
 
 	// close the auditor
 	virtual void close( ) { }

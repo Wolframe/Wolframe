@@ -63,7 +63,7 @@ class Authenticator {
 public:
 	virtual ~Authenticator( ) { }
 
-	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ )	{ return true; }
+	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ ) const	{ return true; }
 
 	// get next step in authentication
 	virtual Step::AuthStep nextStep( ) = 0;

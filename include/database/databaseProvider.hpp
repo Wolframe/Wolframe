@@ -53,8 +53,8 @@ public:
 	const Database* database( const std::string& ID ) const;
 
 private:
-	class DatabaseProvider_Implementation;
-	DatabaseProvider_Implementation *m_impl;
+	class DatabaseProvider_Impl;
+	DatabaseProvider_Impl *m_impl;
 };
 
 }} // namespace _Wolframe::db

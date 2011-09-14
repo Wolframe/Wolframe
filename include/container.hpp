@@ -46,7 +46,7 @@ class Container	{
 public:
 	virtual ~Container()				{}
 
-	virtual Object& object() = 0;
+	virtual const Object& object() const = 0;
 };
 
 } // namespace _Wolframe

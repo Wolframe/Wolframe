@@ -52,7 +52,7 @@ namespace db {
 class PostgreSQLconfig : public module::ModuleConfiguration< PostgreSQLconfig >
 {
 	friend class config::ConfigurationParser;
-	friend class PostgreSQLcontainer;
+	friend class PostgreSQLunit;
 public:
 	const char* typeName() const			{ return "PostgreSQL"; }
 
@@ -74,7 +74,7 @@ private:
 };
 
 
-class PostgreSQLdatabase : public DatabaseUnit
+class PostgreSQLdatabase : public Database
 {
 public:
 	PostgreSQLdatabase( const std::string& id,
@@ -97,18 +97,30 @@ private:
 };
 
 
+class PostgreSQLunit : public DatabaseUnit
+{
+public:
+	PostgreSQLunit( const PostgreSQLconfig& conf );
+	~PostgreSQLunit();
+
+	virtual const Database& database() const	{ return m_db; }
+private:
+	const PostgreSQLdatabase	m_db;
+};
+
+
 class PostgreSQLcontainer : public module::ModuleContainer< PostgreSQLcontainer, PostgreSQLconfig,
 		db::DatabaseUnit >
 {
 public:
-	PostgreSQLcontainer( const PostgreSQLconfig& conf );
-	~PostgreSQLcontainer();
+	PostgreSQLcontainer( const PostgreSQLconfig& conf ) : m_unit( conf )	{}
+	~PostgreSQLcontainer()				{}
 
-	virtual const std::string& ID() const		{ return m_db.ID(); }
-	virtual const char* typeName() const		{ return m_db.typeName(); }
-	virtual DatabaseUnit& object()			{ return m_db; }
+	virtual const std::string& ID() const		{ return m_unit.database().ID(); }
+	virtual const char* typeName() const		{ return m_unit.database().typeName(); }
+	virtual const DatabaseUnit& object() const	{ return m_unit; }
 private:
-	PostgreSQLdatabase	m_db;
+	const PostgreSQLunit		m_unit;
 };
 
 }} // _Wolframe::db

@@ -75,7 +75,7 @@ public:
 	FileAuditContainer( const FileAuditConfig& conf );
 	~FileAuditContainer()				{}
 
-	virtual Auditor& object()			{ return m_audit; }
+	virtual const Auditor& object() const		{ return m_audit; }
 	const char* typeName() const			{ return "FileAudit"; }
 private:
 	std::string	m_file;

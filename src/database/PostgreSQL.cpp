@@ -47,58 +47,58 @@ namespace db {
 
 //***  PostgreSQL configuration functions  **********************************
 PostgreSQLconfig::PostgreSQLconfig( const char* cfgName, const char* logParent, const char* logName )
-        : module::ModuleConfiguration< PostgreSQLconfig >( cfgName, logParent, logName )
+	: module::ModuleConfiguration< PostgreSQLconfig >( cfgName, logParent, logName )
 {
-        port = 0;
-        connections = 0;
-        acquireTimeout = 0;
+	port = 0;
+	connections = 0;
+	acquireTimeout = 0;
 }
 
 void PostgreSQLconfig::print( std::ostream& os, size_t indent ) const
 {
-        std::string indStr( indent, ' ' );
+	std::string indStr( indent, ' ' );
 
-        os << indStr << sectionName() << ":" << std::endl;
-        if ( ! m_ID.empty() )
-                os << indStr << "   ID: " << m_ID << std::endl;
-        if ( host.empty())
-                os << indStr << "   Database host: local unix domain socket" << std::endl;
-        else
-                os << indStr << "   Database host: " << host << ":" << port << std::endl;
-        os << indStr << "   Database name: " << (dbName.empty() ? "(not specified - server user default)" : dbName) << std::endl;
-        os << indStr << "   Database user: " << (user.empty() ? "(not specified - same as server user)" : user)
-           << ", password: " << (password.empty() ? "(not specified - no password used)" : password) << std::endl;
-        if ( connectTimeout == 0 )
-                os << indStr << "   Connect timeout: 0 (wait indefinitely)" << std::endl;
-        else
-                os << indStr << "   Connect timeout: " << connectTimeout << "s" << std::endl;
-        os << indStr << "   Database connections: " << connections << std::endl;
-        if ( connectTimeout == 0 )
-                os << indStr << "   Acquire database connection timeout: 0 (wait indefinitely)" << std::endl;
-        else
-                os << indStr << "   Acquire database connection timeout: " << acquireTimeout << "s" << std::endl;
+	os << indStr << sectionName() << ":" << std::endl;
+	if ( ! m_ID.empty() )
+		os << indStr << "   ID: " << m_ID << std::endl;
+	if ( host.empty())
+		os << indStr << "   Database host: local unix domain socket" << std::endl;
+	else
+		os << indStr << "   Database host: " << host << ":" << port << std::endl;
+	os << indStr << "   Database name: " << (dbName.empty() ? "(not specified - server user default)" : dbName) << std::endl;
+	os << indStr << "   Database user: " << (user.empty() ? "(not specified - same as server user)" : user)
+	   << ", password: " << (password.empty() ? "(not specified - no password used)" : password) << std::endl;
+	if ( connectTimeout == 0 )
+		os << indStr << "   Connect timeout: 0 (wait indefinitely)" << std::endl;
+	else
+		os << indStr << "   Connect timeout: " << connectTimeout << "s" << std::endl;
+	os << indStr << "   Database connections: " << connections << std::endl;
+	if ( connectTimeout == 0 )
+		os << indStr << "   Acquire database connection timeout: 0 (wait indefinitely)" << std::endl;
+	else
+		os << indStr << "   Acquire database connection timeout: " << acquireTimeout << "s" << std::endl;
 }
 
 bool PostgreSQLconfig::check() const
 {
-        if ( connections == 0 )	{
-                LOG_ERROR << logPrefix() << "number of database connections cannot be 0";
-                return false;
-        }
-        return true;
+	if ( connections == 0 )	{
+		LOG_ERROR << logPrefix() << "number of database connections cannot be 0";
+		return false;
+	}
+	return true;
 }
 
 
-//***  PostgreSQL database container  ***************************************
-PostgreSQLcontainer::PostgreSQLcontainer( const PostgreSQLconfig& conf )
-        : m_db( conf.m_ID, conf.host, conf.port, conf.dbName,
-                  conf.user, conf.password, conf.connectTimeout,
-                  conf.connections, conf.acquireTimeout )
+//***  PostgreSQL database unit  ********************************************
+PostgreSQLunit::PostgreSQLunit( const PostgreSQLconfig& conf )
+	: m_db( conf.m_ID, conf.host, conf.port, conf.dbName,
+		conf.user, conf.password, conf.connectTimeout,
+		conf.connections, conf.acquireTimeout )
 {
-        LOG_NOTICE << "PostgreSQL database container for '" << conf.m_ID << "' created";
+	LOG_NOTICE << "PostgreSQL database unit for '" << conf.m_ID << "' created";
 }
 
-PostgreSQLcontainer::~PostgreSQLcontainer()
+PostgreSQLunit::~PostgreSQLunit()
 {
 }
 
@@ -106,164 +106,164 @@ PostgreSQLcontainer::~PostgreSQLcontainer()
 //***  PostgreSQL database functions  ***************************************
 static std::string escConnElement( std::string element )
 {
-        std::string esc;
-        for ( std::string::const_iterator it = element.begin(); it != element.end(); it++ )	{
-                if ( *it == '\'' )
-                        esc += "\\'";
-                else if ( *it == '\\' )
-                        esc += "\\\\";
-                else
-                        esc += *it;
-        }
-        return esc;
+	std::string esc;
+	for ( std::string::const_iterator it = element.begin(); it != element.end(); it++ )	{
+		if ( *it == '\'' )
+			esc += "\\'";
+		else if ( *it == '\\' )
+			esc += "\\\\";
+		else
+			esc += *it;
+	}
+	return esc;
 }
 
 static std::string buildConnStr( const std::string& host, unsigned short port, const std::string& dbName,
-                                 const std::string& user, const std::string& password,
-                                 unsigned short connectTimeout )
+				 const std::string& user, const std::string& password,
+				 unsigned short connectTimeout )
 {
-        std::stringstream ss;
+	std::stringstream ss;
 
-        if ( ! host.empty())
-                ss << "host = '" << host << "'";
-        if ( port != 0 )	{
-                if ( ! ss.str().empty())
-                        ss << " ";
-                ss << "port = " << port;
-        }
-        if ( ! dbName.empty())	{
-                if ( ! ss.str().empty())
-                        ss << " ";
-                ss << "dbname = '" << escConnElement( dbName ) << "'";
-        }
-        if ( ! user.empty())	{
-                if ( ! ss.str().empty())
-                        ss << " ";
-                ss << "user = '" << escConnElement( user ) << "'";
-                if ( ! password.empty())	{
-                        if ( ! ss.str().empty())
-                                ss << " ";
-                        ss << "password = '" << escConnElement( password ) << "'";
-                }
-        }
-        if ( connectTimeout != 0 )	{
-                if ( ! ss.str().empty())
-                        ss << " ";
-                ss << "connect_timeout = " << connectTimeout;
-        }
-        return ss.str();
+	if ( ! host.empty())
+		ss << "host = '" << host << "'";
+	if ( port != 0 )	{
+		if ( ! ss.str().empty())
+			ss << " ";
+		ss << "port = " << port;
+	}
+	if ( ! dbName.empty())	{
+		if ( ! ss.str().empty())
+			ss << " ";
+		ss << "dbname = '" << escConnElement( dbName ) << "'";
+	}
+	if ( ! user.empty())	{
+		if ( ! ss.str().empty())
+			ss << " ";
+		ss << "user = '" << escConnElement( user ) << "'";
+		if ( ! password.empty())	{
+			if ( ! ss.str().empty())
+				ss << " ";
+			ss << "password = '" << escConnElement( password ) << "'";
+		}
+	}
+	if ( connectTimeout != 0 )	{
+		if ( ! ss.str().empty())
+			ss << " ";
+		ss << "connect_timeout = " << connectTimeout;
+	}
+	return ss.str();
 }
 
 // This function also needs a lot of work
 PostgreSQLdatabase::PostgreSQLdatabase( const std::string& id,
-                                        const std::string& host, unsigned short port,
-                                        const std::string& dbName,
-                                        const std::string& user, const std::string& password,
-                                        unsigned short connectTimeout,
-                                        size_t connections, unsigned short acquireTimeout )
-        : m_ID( id ), m_noConnections( 0 ), m_connPool( acquireTimeout )
+					const std::string& host, unsigned short port,
+					const std::string& dbName,
+					const std::string& user, const std::string& password,
+					unsigned short connectTimeout,
+					size_t connections, unsigned short acquireTimeout )
+	: m_ID( id ), m_noConnections( 0 ), m_connPool( acquireTimeout )
 {
-        m_connStr = buildConnStr( host, port,  dbName, user, password, connectTimeout );
-        LOG_DATA << "PostgreSQL database '" << m_ID << "' connection string <" << m_connStr << ">";
+	m_connStr = buildConnStr( host, port,  dbName, user, password, connectTimeout );
+	LOG_DATA << "PostgreSQL database '" << m_ID << "' connection string <" << m_connStr << ">";
 
-        for ( size_t i = 0; i < connections; i++ )	{
-                PGconn* conn = PQconnectdb( m_connStr.c_str() );
-                if ( conn == NULL )
-                        LOG_ALERT << "PostgreSQL PQconnectdb returned NULL";
-                else	{
-                        ConnStatusType stat = PQstatus( conn );
-                        switch( stat )	{
-                        case CONNECTION_OK:
-                                LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
-                                          << i << " connected OK. Message: " << PQerrorMessage( conn );
-                                break;
-                        case CONNECTION_BAD:
-                                LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
-                                          << i << " connection BAD. Message: " << PQerrorMessage( conn );
-                                break;
-                        case CONNECTION_STARTED:
-                                LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
-                                          << i << " connection STARTED. Message: " << PQerrorMessage( conn );
-                                break;
-                        case CONNECTION_MADE:
-                                LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
-                                          << i << " connection MADE. Message: " << PQerrorMessage( conn );
-                                break;
-                        case CONNECTION_AWAITING_RESPONSE:
-                                LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
-                                          << i << " connection AWAITING RESPONSE. Message: " << PQerrorMessage( conn );
-                                break;
-                        case CONNECTION_AUTH_OK:
-                                LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
-                                          << i << " connection AUTH OK. Message: " << PQerrorMessage( conn );
-                                break;
-                        case CONNECTION_SSL_STARTUP:
-                                LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
-                                          << i << " connection SSL start. Message: " << PQerrorMessage( conn );
-                                break;
-                        case CONNECTION_SETENV:
-                                LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
-                                          << i << " connection SETENV. Message: " << PQerrorMessage( conn );
-                                break;
-                        case CONNECTION_NEEDED:
-                                LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
-                                          << i << " connection NEEDED. Message: " << PQerrorMessage( conn );
-                                break;
-                        }
-                        m_connPool.add( conn );
-                        m_noConnections++;
-                }
-        }
-        LOG_TRACE << "PostgreSQL database '" << m_ID << "' created with a pool of " << m_noConnections << " connections";
+	for ( size_t i = 0; i < connections; i++ )	{
+		PGconn* conn = PQconnectdb( m_connStr.c_str() );
+		if ( conn == NULL )
+			LOG_ALERT << "PostgreSQL PQconnectdb returned NULL";
+		else	{
+			ConnStatusType stat = PQstatus( conn );
+			switch( stat )	{
+			case CONNECTION_OK:
+				LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
+					  << i << " connected OK. Message: " << PQerrorMessage( conn );
+				break;
+			case CONNECTION_BAD:
+				LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
+					  << i << " connection BAD. Message: " << PQerrorMessage( conn );
+				break;
+			case CONNECTION_STARTED:
+				LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
+					  << i << " connection STARTED. Message: " << PQerrorMessage( conn );
+				break;
+			case CONNECTION_MADE:
+				LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
+					  << i << " connection MADE. Message: " << PQerrorMessage( conn );
+				break;
+			case CONNECTION_AWAITING_RESPONSE:
+				LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
+					  << i << " connection AWAITING RESPONSE. Message: " << PQerrorMessage( conn );
+				break;
+			case CONNECTION_AUTH_OK:
+				LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
+					  << i << " connection AUTH OK. Message: " << PQerrorMessage( conn );
+				break;
+			case CONNECTION_SSL_STARTUP:
+				LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
+					  << i << " connection SSL start. Message: " << PQerrorMessage( conn );
+				break;
+			case CONNECTION_SETENV:
+				LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
+					  << i << " connection SETENV. Message: " << PQerrorMessage( conn );
+				break;
+			case CONNECTION_NEEDED:
+				LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
+					  << i << " connection NEEDED. Message: " << PQerrorMessage( conn );
+				break;
+			}
+			m_connPool.add( conn );
+			m_noConnections++;
+		}
+	}
+	LOG_TRACE << "PostgreSQL database '" << m_ID << "' created with a pool of " << m_noConnections << " connections";
 }
 
 
 // This function needs a lot of work and thinking...
 PostgreSQLdatabase::~PostgreSQLdatabase()
 {
-        size_t connections = 0;
-        m_connPool.timeout( 3 );
+	size_t connections = 0;
+	m_connPool.timeout( 3 );
 
-        while ( m_connPool.available() )	{
-                PGconn* conn = m_connPool.get();
-                if ( conn == NULL )	{
-                        LOG_ALERT << "PostgreSQL database '" << m_ID << "' destructor: NULL connection from pool";
-                        throw std::logic_error( "PostgreSQL database destructor: NULL connection from pool" );
-                }
-                PGTransactionStatusType stat = PQtransactionStatus( conn );
-                switch( stat )	{
-                case PQTRANS_IDLE:
-                        LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " idle";
-                        PQfinish( conn );
-                        m_noConnections--, connections++;
-                        break;
-                case PQTRANS_ACTIVE:
-                        LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " active";
-                        PQfinish( conn );
-                        m_noConnections--, connections++;
-                        break;
-                case PQTRANS_INTRANS:
-                        LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " in transaction";
-                        PQfinish( conn );
-                        m_noConnections--, connections++;
-                        break;
-                case PQTRANS_INERROR:
-                        LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " in transaction error";
-                        PQfinish( conn );
-                        m_noConnections--, connections++;
-                        break;
-                case PQTRANS_UNKNOWN:
-                        LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " status unknown";
-                        PQfinish( conn );
-                        m_noConnections--, connections++;
-                        break;
-                }
-        }
-        if ( m_noConnections != 0 )	{
-                LOG_ALERT << "PostgreSQL database '" << m_ID << "' destructor: not all connections destroyed";
-                throw std::logic_error( "PostgreSQL database destructor: not all connections destroyed" );
-        }
-        LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: " << connections << " connections destroyed";
+	while ( m_connPool.available() )	{
+		PGconn* conn = m_connPool.get();
+		if ( conn == NULL )	{
+			LOG_ALERT << "PostgreSQL database '" << m_ID << "' destructor: NULL connection from pool";
+			throw std::logic_error( "PostgreSQL database destructor: NULL connection from pool" );
+		}
+		PGTransactionStatusType stat = PQtransactionStatus( conn );
+		switch( stat )	{
+		case PQTRANS_IDLE:
+			LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " idle";
+			PQfinish( conn );
+			m_noConnections--, connections++;
+			break;
+		case PQTRANS_ACTIVE:
+			LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " active";
+			PQfinish( conn );
+			m_noConnections--, connections++;
+			break;
+		case PQTRANS_INTRANS:
+			LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " in transaction";
+			PQfinish( conn );
+			m_noConnections--, connections++;
+			break;
+		case PQTRANS_INERROR:
+			LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " in transaction error";
+			PQfinish( conn );
+			m_noConnections--, connections++;
+			break;
+		case PQTRANS_UNKNOWN:
+			LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " status unknown";
+			PQfinish( conn );
+			m_noConnections--, connections++;
+			break;
+		}
+	}
+	if ( m_noConnections != 0 )	{
+		LOG_ALERT << "PostgreSQL database '" << m_ID << "' destructor: not all connections destroyed";
+		throw std::logic_error( "PostgreSQL database destructor: not all connections destroyed" );
+	}
+	LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: " << connections << " connections destroyed";
 }
 
 }} // _Wolframe::db
