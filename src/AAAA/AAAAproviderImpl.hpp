@@ -31,20 +31,20 @@
 
 ************************************************************************/
 //
-// AAAA provider
+// AAAA provider implementation
 //
 
-#ifndef _AAAA_PROVIDER_HPP_INCLUDED
-#define _AAAA_PROVIDER_HPP_INCLUDED
+#ifndef _AAAA_PROVIDER_IMPLEMENTATION_HPP_INCLUDED
+#define _AAAA_PROVIDER_IMPLEMENTATION_HPP_INCLUDED
 
+#include "AAAA/AAAAprovider.hpp"
 #include "config/configurationBase.hpp"
 #include "AAAA/authentication.hpp"
 #include "AAAA/audit.hpp"
 #include "container.hpp"
 #include "moduleInterface.hpp"
 
-#include "database/database.hpp"
-#include "database/databaseProvider.hpp"
+#include "database/DBprovider.hpp"
 
 #include <string>
 #include <list>
@@ -102,11 +102,11 @@ private:
 };
 
 
-class AAAAprovider
+class AAAAprovider::AAAAprovider_Impl
 {
 public:
-	AAAAprovider( const AAAAconfiguration& conf );
-	~AAAAprovider()				{}
+	AAAAprovider_Impl( const AAAAconfiguration* conf );
+	~AAAAprovider_Impl()				{}
 	bool resolveDB( const db::DatabaseProvider& db );
 
 	Authenticator* authenticator()		{ return m_authenticator.authenticator(); }
@@ -118,4 +118,4 @@ private:
 
 }} // namespace _Wolframe::AAAA
 
-#endif // _AAAA_PROVIDER_HPP_INCLUDED
+#endif // _AAAA_PROVIDER_IMPLEMENTATION_HPP_INCLUDED

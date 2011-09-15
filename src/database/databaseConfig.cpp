@@ -34,7 +34,7 @@
 // database configuration functions
 //
 
-#include "DBprovider.hpp"
+#include "DBproviderImpl.hpp"
 
 #include "config/valueParser.hpp"
 #include "config/configurationParser.hpp"

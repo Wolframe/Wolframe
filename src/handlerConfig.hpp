@@ -39,8 +39,8 @@
 
 #include "standardConfigs.hpp"
 #include "moduleLoaderConfig.hpp"
-#include "database/DBprovider.hpp"
-#include "AAAA/AAAAprovider.hpp"
+#include "database/DBproviderImpl.hpp"
+#include "AAAA/AAAAproviderImpl.hpp"
 #include "WolframeProcGroup.hpp"
 
 namespace _Wolframe {

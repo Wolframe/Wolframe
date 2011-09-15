@@ -36,7 +36,7 @@
 
 #include <stdexcept>
 
-#include "AAAAprovider.hpp"
+#include "AAAAproviderImpl.hpp"
 #include "logger.hpp"
 #include "boost/algorithm/string.hpp"
 
@@ -62,11 +62,37 @@ auditModules[ noAuditModules ] = { module::ModuleContainerDescription< Container
 namespace _Wolframe {
 namespace AAAA {
 
-AAAAprovider::AAAAprovider( const AAAAconfiguration& conf )
-	: m_authenticator( conf.m_authConfig, authModules, noAuthModules ),
-	  m_auditor( conf.m_auditConfig, auditModules, noAuditModules )	{}
+/// AAAAprovider PIMPL
+AAAAprovider::AAAAprovider( const AAAAconfiguration* conf ) :
+	m_impl( new AAAAprovider_Impl( conf ))	{}
+
+AAAAprovider::~AAAAprovider()
+{
+	delete m_impl;
+}
 
 bool AAAAprovider::resolveDB( const db::DatabaseProvider& db )
+{
+	return m_impl->resolveDB( db );
+}
+
+Authenticator* AAAAprovider::authenticator()
+{
+	return m_impl->authenticator();
+}
+
+Auditor* AAAAprovider::auditor()
+{
+	return m_impl->auditor();
+}
+
+
+/// AAAAprovider PIMPL implementation
+AAAAprovider::AAAAprovider_Impl::AAAAprovider_Impl( const AAAAconfiguration* conf )
+	: m_authenticator( conf->m_authConfig, authModules, noAuthModules ),
+	  m_auditor( conf->m_auditConfig, auditModules, noAuditModules )	{}
+
+bool AAAAprovider::AAAAprovider_Impl::resolveDB( const db::DatabaseProvider& db )
 {
 	if ( !m_authenticator.resolveDB( db ))
 		return false;

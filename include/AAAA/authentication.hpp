@@ -40,7 +40,7 @@
 
 #include <string>
 
-#include "../src/database/DBprovider.hpp"
+#include "database/DBprovider.hpp"
 
 namespace _Wolframe {
 namespace AAAA {

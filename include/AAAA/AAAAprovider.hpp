@@ -31,52 +31,36 @@
 
 ************************************************************************/
 //
-// DBproviderImplementation.hpp
+// AAAA provider interface
 //
 
-#ifndef _DB_PROVIDER_IMPLEMENTATION_HPP_INCLUDED
-#define _DB_PROVIDER_IMPLEMENTATION_HPP_INCLUDED
+#ifndef _AAAA_PROVIDER_HPP_INCLUDED
+#define _AAAA_PROVIDER_HPP_INCLUDED
 
-#include <list>
-#include "config/configurationBase.hpp"
-#include "database/databaseProvider.hpp"
-#include "container.hpp"
+#include "authentication.hpp"
+#include "audit.hpp"
+#include <boost/noncopyable.hpp>
 
 namespace _Wolframe {
-namespace db {
+namespace AAAA {
 
-/// database configuration
-class DBproviderConfig : public config::ConfigurationBase
-{
-	friend class DatabaseProvider;
-//	friend class DatabaseProvider::DatabaseProvider_Impl;
-	friend class config::ConfigurationParser;
-public:
-	/// constructor & destructor
-	DBproviderConfig() : ConfigurationBase( "Database(s)", NULL, "Database configuration" )	{}
-	~DBproviderConfig();
+class AAAAconfiguration;
 
-	/// methods
-	bool check() const;
-	void print( std::ostream& os, size_t indent ) const;
-	virtual void setCanonicalPathes( const std::string& referencePath );
-private:
-	std::list< config::TypedConfiguration* >	m_dbConfig;
-};
-
-
-/// DatabaseProvider PIMPL implementation
-class DatabaseProvider::DatabaseProvider_Impl
+class AAAAprovider
 {
 public:
-	DatabaseProvider_Impl( const DBproviderConfig* conf );
-	~DatabaseProvider_Impl();
+	AAAAprovider( const AAAAconfiguration* conf );
+	~AAAAprovider();
 
-	const Database* database( const std::string& ID ) const;
+	bool resolveDB( const db::DatabaseProvider& db );
+
+	Authenticator* authenticator();
+	Auditor* auditor();
 private:
-	std::list< Container< DatabaseUnit >* >	m_db;
+	class AAAAprovider_Impl;
+	AAAAprovider_Impl*	m_impl;
 };
 
-}} // namespace _Wolframe::db
+}} // namespace _Wolframe::AAAA
 
-#endif // _DB_PROVIDER_IMPLEMENTATION_HPP_INCLUDED
+#endif // _AAAA_PROVIDER_HPP_INCLUDED

@@ -30,30 +30,53 @@
  Project Wolframe.
 
 ************************************************************************/
-///
-/// \file audit.hpp
-/// \brief top-level header file for AAAA audit
-///
+//
+// DBproviderImplementation.hpp
+//
 
-#ifndef _AUDIT_HPP_INCLUDED
-#define _AUDIT_HPP_INCLUDED
+#ifndef _DB_PROVIDER_IMPLEMENTATION_HPP_INCLUDED
+#define _DB_PROVIDER_IMPLEMENTATION_HPP_INCLUDED
 
+#include <list>
+#include "config/configurationBase.hpp"
 #include "database/DBprovider.hpp"
+#include "container.hpp"
 
 namespace _Wolframe {
-namespace AAAA {
+namespace db {
 
-// virtual base for all audit methods
-class Auditor {
+/// database configuration
+class DBproviderConfig : public config::ConfigurationBase
+{
+	friend class DatabaseProvider;
+//	friend class DatabaseProvider::DatabaseProvider_Impl;
+	friend class config::ConfigurationParser;
 public:
-	virtual ~Auditor( ) { }
+	/// constructor & destructor
+	DBproviderConfig() : ConfigurationBase( "Database(s)", NULL, "Database configuration" )	{}
+	~DBproviderConfig();
 
-	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ ) const	{ return true; }
-
-	// close the auditor
-	virtual void close( ) { }
+	/// methods
+	bool check() const;
+	void print( std::ostream& os, size_t indent ) const;
+	virtual void setCanonicalPathes( const std::string& referencePath );
+private:
+	std::list< config::TypedConfiguration* >	m_dbConfig;
 };
 
-}} // namespace _Wolframe::AAAA
 
-#endif // _AUDIT_HPP_INCLUDED
+/// DatabaseProvider PIMPL implementation
+class DatabaseProvider::DatabaseProvider_Impl
+{
+public:
+	DatabaseProvider_Impl( const DBproviderConfig* conf );
+	~DatabaseProvider_Impl();
+
+	const Database* database( const std::string& ID ) const;
+private:
+	std::list< Container< DatabaseUnit >* >	m_db;
+};
+
+}} // namespace _Wolframe::db
+
+#endif // _DB_PROVIDER_IMPLEMENTATION_HPP_INCLUDED

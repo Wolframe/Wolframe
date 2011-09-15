@@ -26,6 +26,8 @@ makefiles/nmake/top.mk
 .Attic/byte2hex.c
 .Attic/byte2hex.cpp
 .Attic/byte2hex.h
+.Attic/cli/StdinDataIO.cpp
+.Attic/cli/StdinDataIO.h
 .Attic/CRAM.c
 .Attic/CRAM.h
 .Attic/date.hpp
@@ -75,11 +77,6 @@ clients/qt/HistoryLineEdit.hpp
 clients/qt/MainWindow.cpp
 clients/qt/MainWindow.hpp
 clients/qt/Makefile.W32
-clients/qt/moc_AbstractFormLoader.cpp
-clients/qt/moc_DebugTerminal.cpp
-clients/qt/moc_HistoryLineEdit.cpp
-clients/qt/moc_MainWindow.cpp
-clients/qt/moc_WolframeClient.cpp
 clients/qt/qtclient.cpp
 clients/qt/README
 clients/qt/TODOS
@@ -220,6 +217,7 @@ gtest/Makefile.W32
 gtest/README
 gtest/src/gtest-internal-inl.h
 header.txt
+include/AAAA/AAAAprovider.hpp
 include/AAAA/audit.hpp
 include/AAAA/authentication.hpp
 include/appConfig.hpp
@@ -237,10 +235,12 @@ include/config/traits.hpp
 include/config/valueParser.hpp
 include/connectionEndpoint.hpp
 include/connectionHandler.hpp
+include/container.hpp
 include/countedReference.hpp
 include/database/database.hpp
 include/database/databaseOperation.hpp
 include/database/databaseReference.hpp
+include/database/DBprovider.hpp
 include/ErrorCode.hpp
 include/GNUmakefile
 include/logger.hpp
@@ -259,6 +259,7 @@ include/protocol/inputfilter.hpp
 include/protocol/ioblocks.hpp
 include/protocol/iterators.hpp
 include/protocol/parser.hpp
+include/protocol/streamIterator.hpp
 include/README
 include/serialize/appProcessorSystemCall.hpp
 include/serialize/descriptionBase.hpp
@@ -351,7 +352,7 @@ sqlite3/sqlite3.c
 sqlite3/sqlite3.h
 src/AAAA/AAAAproviderConfig.cpp
 src/AAAA/AAAAprovider.cpp
-src/AAAA/AAAAprovider.hpp
+src/AAAA/AAAAproviderImpl.hpp
 src/AAAA/authentication_db_sqlite3.cpp
 src/AAAA/authentication_db_sqlite3.hpp
 src/AAAA/authentication_pam.cpp
@@ -386,7 +387,7 @@ src/connection.cpp
 src/connection.hpp
 src/database/databaseConfig.cpp
 src/database/DBprovider.cpp
-src/database/DBprovider.hpp
+src/database/DBproviderImpl.hpp
 src/database/DBreferenceConfig.cpp
 src/database/DBreference.cpp
 src/database/PostgreSQLconfig.cpp
@@ -485,5 +486,3 @@ XML/configuration.rng
 XML/database.rng
 XML/logging.rng
 XML/README
-include/container.hpp
-include/database/databaseProvider.hpp
