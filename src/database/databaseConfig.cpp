@@ -60,14 +60,34 @@
 
 using namespace _Wolframe;
 
-static const size_t noDBconfigs = 2;
+#ifdef WITH_PGSQL
+	#ifdef WITH_SQLITE3
+		static const size_t noDBconfigs = 2;
+	#else
+		static const size_t noDBconfigs = 1;
+	#endif
+#else
+	#ifdef WITH_SQLITE3
+		static const size_t noDBconfigs = 1;
+	#else
+		static const size_t noDBconfigs = 0;
+	#endif
+#endif
+
+
 static module::ModuleConfigurationDescription< config::TypedConfiguration >
-dbConfig[ noDBconfigs ] = { module::ModuleConfigurationDescription< config::TypedConfiguration >( "PostgreSQL", "PostgreSQL database", "PostgreSQL",
-			    &db::PostgreSQLconfig::create,
-			    &config::ConfigurationParser::parseBase<db::PostgreSQLconfig> ),
-			    module::ModuleConfigurationDescription< config::TypedConfiguration >( "SQLite", "SQLite database", "SQLite",
-			    &db::SQLiteConfig::create,
-			    &config::ConfigurationParser::parseBase<db::SQLiteConfig> ) };
+dbConfig[ noDBconfigs ] = {
+#ifdef WITH_PGSQL
+	module::ModuleConfigurationDescription< config::TypedConfiguration >( "PostgreSQL", "PostgreSQL database", "PostgreSQL",
+	&db::PostgreSQLconfig::create,
+	&config::ConfigurationParser::parseBase<db::PostgreSQLconfig> ),
+#endif
+#ifdef WITH_SQLITE3
+	module::ModuleConfigurationDescription< config::TypedConfiguration >( "SQLite", "SQLite database", "SQLite",
+	&db::SQLiteConfig::create,
+	&config::ConfigurationParser::parseBase<db::SQLiteConfig> )
+#endif
+};
 /****  End impersonating the module loader  **************************************************/
 
 namespace _Wolframe {

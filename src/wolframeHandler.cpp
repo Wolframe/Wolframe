@@ -45,6 +45,7 @@
 
 #include <string>
 #include <cstring>
+#include <stdexcept>
 
 #include "boost/date_time/posix_time/posix_time.hpp"		// to print time_t structures
 
@@ -277,12 +278,12 @@ WolframeHandler::WolframeHandler( const HandlerConfiguration* conf )
 	LOG_TRACE << "Global context: banner: <" << m_banner << ">";
 	if ( ! m_aaaa.resolveDB( m_db ) )	{
 		LOG_FATAL << "Cannot resolve database references for AAAA services";
-		exit( 1 );
+		throw( std::invalid_argument( "WolframeHandler AAAA: unresolved database reference" ));
 	}
 	LOG_TRACE << "AAAA database references resolved";
 	if ( ! m_procGroup.resolveDB( m_db ) )	{
 		LOG_FATAL << "Cannot resolve database reference for processor group";
-		exit( 1 );
+		throw( std::invalid_argument( "WolframeHandler processor: unresolved database reference" ));
 	}
 	LOG_TRACE << "Processor group database reference resolved";
 }
