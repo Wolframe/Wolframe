@@ -34,7 +34,8 @@
 // Wolframe processor group
 //
 
-#include "WolframeProcGroup.hpp"
+#include "processor/procProvider.hpp"
+#include "procProviderImpl.hpp"
 
 #include "config/valueParser.hpp"
 #include "config/configurationParser.hpp"

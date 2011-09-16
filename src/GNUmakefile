@@ -189,7 +189,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	serverConfig.o \
 	server.o \
 	moduleLoaderConfig.o \
-	WolframeProcGroup.o \
+	processor/procProvider.o \
 	echoProcessor.o \
 	$(DB_OBJS) \
 	$(AAAA_OBJS)

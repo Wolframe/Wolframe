@@ -31,57 +31,35 @@
 
 ************************************************************************/
 //
-// echo processor
+//
 //
 
-#ifndef _ECHO_PROCESSOR_HPP_INCLUDED
-#define _ECHO_PROCESSOR_HPP_INCLUDED
+#ifndef _PROCESSOR_PROVIDER_HPP_INCLUDED
+#define _PROCESSOR_PROVIDER_HPP_INCLUDED
 
-#include "processor/processor.hpp"
-#include "container.hpp"
-#include "moduleInterface.hpp"
+#include "processor.hpp"
+#include <boost/noncopyable.hpp>
 
 namespace _Wolframe {
+namespace proc {
 
-class EchoProcessor : public proc::Processor
+/// Opaque definition for ProcProviderConfig
+class ProcProviderConfig;
+
+/// Processor provider
+class ProcessorProvider : private boost::noncopyable
 {
 public:
-	virtual const char* typeName() const	{ return "EchoProcessor"; }
-};
+	ProcessorProvider( const ProcProviderConfig* conf );
+	~ProcessorProvider();
 
+	const Processor* processor() const;
 
-class EchoProcConfig : public module::ModuleConfiguration< EchoProcConfig >
-{
-	friend class EchoProcContainer;
-	friend class config::ConfigurationParser;
-public:
-	EchoProcConfig( const char* cfgName, const char* logParent, const char* logName )
-		: module::ModuleConfiguration< EchoProcConfig >( cfgName, logParent, logName ) {}
-
-	const char* typeName() const			{ return "EchoProcessor"; }
-
-	/// methods
-	bool check() const;
-	void print( std::ostream& os, size_t indent ) const;
-	void setCanonicalPathes( const std::string& referencePath );
 private:
-	unsigned short	m_timeout;
+	class ProcessorProvider_Impl;
+	ProcessorProvider_Impl *m_impl;
 };
 
+}} // namespace _Wolframe::proc
 
-class EchoProcContainer : public module::ModuleContainer< EchoProcContainer, EchoProcConfig,
-		proc::Processor >
-{
-public:
-	EchoProcContainer( const EchoProcConfig& conf );
-	~EchoProcContainer()				{}
-
-	virtual const char* typeName() const		{ return "EchoProcessor"; }
-	virtual const proc::Processor& object() const	{ return m_proc; }
-private:
-	const EchoProcessor	m_proc;
-};
-
-} // namespace _Wolframe
-
-#endif // _ECHO_PROCESSOR_HPP_INCLUDED
+#endif // _PROCESSOR_PROVIDER_HPP_INCLUDED

@@ -273,7 +273,7 @@ WolframeHandler::WolframeHandler( const HandlerConfiguration* conf )
 	: m_banner( conf->banner->toString() ),
 	  m_db( conf->database ),
 	  m_aaaa( conf->aaaa ),
-	  m_procGroup( *(conf->proc))
+	  m_proc( conf->proc )
 {
 	LOG_TRACE << "Global context: banner: <" << m_banner << ">";
 	if ( ! m_aaaa.resolveDB( m_db ) )	{
@@ -281,7 +281,7 @@ WolframeHandler::WolframeHandler( const HandlerConfiguration* conf )
 		throw( std::invalid_argument( "WolframeHandler AAAA: unresolved database reference" ));
 	}
 	LOG_TRACE << "AAAA database references resolved";
-	if ( ! m_procGroup.resolveDB( m_db ) )	{
+	if ( ! m_proc.resolveDB( m_db ) )	{
 		LOG_FATAL << "Cannot resolve database reference for processor group";
 		throw( std::invalid_argument( "WolframeHandler processor: unresolved database reference" ));
 	}

@@ -77,6 +77,11 @@ clients/qt/HistoryLineEdit.hpp
 clients/qt/MainWindow.cpp
 clients/qt/MainWindow.hpp
 clients/qt/Makefile.W32
+clients/qt/moc_AbstractFormLoader.cpp
+clients/qt/moc_DebugTerminal.cpp
+clients/qt/moc_HistoryLineEdit.cpp
+clients/qt/moc_MainWindow.cpp
+clients/qt/moc_WolframeClient.cpp
 clients/qt/qtclient.cpp
 clients/qt/README
 clients/qt/TODOS
@@ -252,6 +257,8 @@ include/logger/logSyslogFacility.hpp
 include/miscUtils.hpp
 include/moduleInterface.hpp
 include/objectPool.hpp
+include/processor/processor.hpp
+include/processor/procProvider.hpp
 include/protocol/buffers.hpp
 include/protocol/formatoutput.hpp
 include/protocol.hpp
@@ -270,7 +277,6 @@ include/SSLcertificateInfo.hpp
 include/standardConfigs.hpp
 include/user.hpp
 include/version.hpp
-include/WolframeProcessor.hpp
 INSTALL.Unix
 INSTALL.Windows
 lua/etc/all.c
@@ -425,6 +431,8 @@ src/Makefile.W32
 src/moduleLoaderConfig.cpp
 src/moduleLoaderConfig.hpp
 src/posixMain.cpp
+src/processor/procProvider.cpp
+src/processor/procProviderImpl.hpp
 src/protocol_ioblocks.cpp
 src/resolvePath.cpp
 src/serverConfig.cpp
@@ -440,8 +448,6 @@ src/wolframe.conf
 src/wolframed.cpp
 src/wolframeHandler.cpp
 src/wolframeHandler.hpp
-src/WolframeProcGroup.cpp
-src/WolframeProcGroup.hpp
 src/wolframe.xml
 tests/AAAA/authTest.cpp
 tests/AAAA/GNUmakefile

@@ -41,7 +41,7 @@
 #include "protocol.hpp"
 #include "database/database.hpp"
 #include "AAAA/AAAAprovider.hpp"
-#include "WolframeProcGroup.hpp"
+#include "processor/procProvider.hpp"
 
 namespace _Wolframe {
 /// The global server container
@@ -54,12 +54,12 @@ public:
 	const std::string& banner() const		{ return m_banner; }
 	const db::DatabaseProvider& db() const		{ return m_db; }
 	const AAAA::AAAAprovider& aaaa() const		{ return m_aaaa; }
-	const proc::ProcessorGroup& procGroup() const	{ return m_procGroup; }
+	const proc::ProcessorProvider& proc() const	{ return m_proc; }
 private:
 	const std::string		m_banner;
 	db::DatabaseProvider		m_db;
 	AAAA::AAAAprovider		m_aaaa;
-	proc::ProcessorGroup		m_procGroup;
+	proc::ProcessorProvider		m_proc;
 };
 
 

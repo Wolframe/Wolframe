@@ -31,35 +31,59 @@
 
 ************************************************************************/
 //
-// Wolframe processor base class
+// Wolframe processor group
 //
 
-#ifndef _WOLFRAME_PROCESSOR_HPP_INCLUDED
-#define _WOLFRAME_PROCESSOR_HPP_INCLUDED
+#ifndef _WOLFRAME_PROCESSOR_GROUP_HPP_INCLUDED
+#define _WOLFRAME_PROCESSOR_GROUP_HPP_INCLUDED
+
+#include "config/configurationBase.hpp"
+#include "moduleInterface.hpp"
+#include "procProviderImpl.hpp"
+#include "container.hpp"
+#include "database/database.hpp"
+#include "database/DBprovider.hpp"
+
+#include <list>
 
 namespace _Wolframe {
 namespace proc {
 
-
-/// base class for Wolframe processors channels
-class ProcessorChannel
+class ProcessorGroupConfig : public config::ConfigurationBase
 {
+	friend class ProcessorGroup;
+	friend class config::ConfigurationParser;
 public:
-	virtual ~ProcessorChannel()		{}
+	/// constructor & destructor
+	ProcessorGroupConfig()
+		: ConfigurationBase( "Processor(s)", NULL, "Processor configuration" )	{}
+	~ProcessorGroupConfig();
 
-	virtual void close() const = 0;
+	/// methods
+	bool check() const;
+	void print( std::ostream& os, size_t indent ) const;
+	virtual void setCanonicalPathes( const std::string& referencePath );
+private:
+	std::string					m_dbLabel;
+	std::list< config::TypedConfiguration* >	m_procConfig;
 };
 
 
-/// base class for Wolframe processors
-class Processor
+class ProcessorGroup
 {
 public:
-	virtual ~Processor()			{}
+	ProcessorGroup( const ProcessorGroupConfig& conf );
+	~ProcessorGroup();
 
-	virtual const char* typeName() const = 0;
+	bool resolveDB( db::DatabaseProvider& db );
+
+	const ProcessorChannel* procChannel() const;
+private:
+	std::string				m_dbLabel;
+	const db::Database*			m_db;
+	std::list<Container< Processor >*>	m_proc;
 };
 
 }} // namespace _Wolframe::proc
 
-#endif // _WOLFRAME_PROCESSOR_HPP_INCLUDED
+#endif // _WOLFRAME_PROCESSOR_GROUP_HPP_INCLUDED
