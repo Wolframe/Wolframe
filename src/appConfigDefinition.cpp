@@ -61,16 +61,16 @@ ApplicationConfiguration::ApplicationConfiguration()
 	addConfig( "service", serviceConf, &ConfigurationParser::parseBase<config::ServiceConfiguration> );
 	addConfig( "daemon", serviceConf, &ConfigurationParser::parseBase<config::ServiceConfiguration> );
 
-	addConfig( "LoadModules", handlerConf->modules, &ConfigurationParser::parseBase<config::ModuleLoaderConfiguration> );
+	addConfig( "LoadModules", handlerConf->modulesCfg, &ConfigurationParser::parseBase<config::ModuleLoaderConfiguration> );
 
-	addConfig( "ServerTokens", handlerConf->banner, &ConfigurationParser::parseBase<config::ServiceBanner> );
-	addConfig( "ServerSignature", handlerConf->banner, &ConfigurationParser::parseBase<config::ServiceBanner> );
+	addConfig( "ServerTokens", handlerConf->bannerCfg, &ConfigurationParser::parseBase<config::ServiceBanner> );
+	addConfig( "ServerSignature", handlerConf->bannerCfg, &ConfigurationParser::parseBase<config::ServiceBanner> );
 
 	addConfig( "listen", serverConf, &ConfigurationParser::parseBase<net::Configuration> );
 	addConfig( "logging", loggerConf, &ConfigurationParser::parseBase<log::LoggerConfiguration> );
-	addConfig( "database", handlerConf->database, &ConfigurationParser::parseBase<db::DBproviderConfig> );
-	addConfig( "aaaa", handlerConf->aaaa, &ConfigurationParser::parseBase<AAAA::AAAAconfiguration> );
-	addConfig( "Processor", handlerConf->proc, &ConfigurationParser::parseBase<proc::ProcessorGroupConfig> );
+	addConfig( "database", handlerConf->databaseCfg, &ConfigurationParser::parseBase<db::DBproviderConfig> );
+	addConfig( "aaaa", handlerConf->aaaaCfg, &ConfigurationParser::parseBase<AAAA::AAAAconfiguration> );
+	addConfig( "Processor", handlerConf->procCfg, &ConfigurationParser::parseBase<proc::ProcProviderConfig> );
 
 }
 

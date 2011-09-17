@@ -39,7 +39,7 @@
 
 #include "config/configurationBase.hpp"
 #include "moduleInterface.hpp"
-#include "procProviderImpl.hpp"
+#include "processor/procProvider.hpp"
 #include "container.hpp"
 #include "database/database.hpp"
 #include "database/DBprovider.hpp"
@@ -49,15 +49,15 @@
 namespace _Wolframe {
 namespace proc {
 
-class ProcessorGroupConfig : public config::ConfigurationBase
+class ProcProviderConfig : public config::ConfigurationBase
 {
-	friend class ProcessorGroup;
+	friend class ProcessorProvider;
 	friend class config::ConfigurationParser;
 public:
 	/// constructor & destructor
-	ProcessorGroupConfig()
+	ProcProviderConfig()
 		: ConfigurationBase( "Processor(s)", NULL, "Processor configuration" )	{}
-	~ProcessorGroupConfig();
+	~ProcProviderConfig();
 
 	/// methods
 	bool check() const;
@@ -69,19 +69,19 @@ private:
 };
 
 
-class ProcessorGroup
+class ProcessorProvider::ProcessorProvider_Impl
 {
 public:
-	ProcessorGroup( const ProcessorGroupConfig& conf );
-	~ProcessorGroup();
+	ProcessorProvider_Impl( const ProcProviderConfig* conf );
+	~ProcessorProvider_Impl();
 
-	bool resolveDB( db::DatabaseProvider& db );
+	bool resolveDB( const db::DatabaseProvider& db );
 
-	const ProcessorChannel* procChannel() const;
+	Processor* processor();
 private:
-	std::string				m_dbLabel;
-	const db::Database*			m_db;
-	std::list<Container< Processor >*>	m_proc;
+	std::string					m_dbLabel;
+	const db::Database*				m_db;
+	std::list< Container< ProcessorUnit >* >	m_proc;
 };
 
 }} // namespace _Wolframe::proc

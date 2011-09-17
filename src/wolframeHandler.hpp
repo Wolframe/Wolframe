@@ -129,7 +129,7 @@ private:
 //	AAAA::Auditor*			m_audit;
 //	AAAA::Accountant*		m_accounting;
 ///*************
-	proc::ProcessorChannel*		m_proc;
+	proc::Processor*		m_proc;
 
 	const net::LocalEndpoint*	m_localEP;		///< local endpoint
 	const net::RemoteEndpoint*	m_remoteEP;		///< remote endpoint

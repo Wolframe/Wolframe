@@ -99,5 +99,10 @@ EchoProcContainer::EchoProcContainer( const EchoProcConfig& /*conf*/ )
 	LOG_NOTICE << "Echo processor container created";
 }
 
+EchoProcessorUnit::EchoProcessorUnit()
+{
+	LOG_NOTICE << "Echo processor unit created";
+}
+
 } // namespace _Wolframe
 

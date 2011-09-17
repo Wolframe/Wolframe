@@ -62,15 +62,15 @@ procConfigs[ noProcModules ] = { module::ModuleConfigurationDescription< config:
 				 EchoProcConfig::create,
 				 &config::ConfigurationParser::parseBase< EchoProcConfig > ) };
 
-static module::ModuleContainerDescription< Container< proc::Processor >, config::TypedConfiguration >
-procModules[ noProcModules ] = { module::ModuleContainerDescription< Container< proc::Processor >, config::TypedConfiguration >( "EchoProcessor", &EchoProcContainer::create ) };
+static module::ModuleContainerDescription< Container< proc::ProcessorUnit >, config::TypedConfiguration >
+procModules[ noProcModules ] = { module::ModuleContainerDescription< Container< proc::ProcessorUnit >, config::TypedConfiguration >( "EchoProcessor", &EchoProcContainer::create ) };
 /****  End impersonating the module loader  **************************************************/
 
 namespace _Wolframe {
 namespace config {
 
 template<>
-bool ConfigurationParser::parse( proc::ProcessorGroupConfig& cfg,
+bool ConfigurationParser::parse( proc::ProcProviderConfig& cfg,
 				 const boost::property_tree::ptree& pt, const std::string& /*node*/ )
 {
 	using namespace _Wolframe::config;
@@ -112,14 +112,14 @@ bool ConfigurationParser::parse( proc::ProcessorGroupConfig& cfg,
 //***  Processor Group Configuration  ************************************
 namespace proc {
 
-ProcessorGroupConfig::~ProcessorGroupConfig()
+ProcProviderConfig::~ProcProviderConfig()
 {
 	for ( std::list< config::TypedConfiguration* >::const_iterator it = m_procConfig.begin();
 								it != m_procConfig.end(); it++ )
 		delete *it;
 }
 
-void ProcessorGroupConfig::print( std::ostream& os, size_t /* indent */ ) const
+void ProcProviderConfig::print( std::ostream& os, size_t /* indent */ ) const
 {
 	os << sectionName() << std::endl;
 	os << "   Database: " << (m_dbLabel.empty() ? "(none)" : m_dbLabel) << std::endl;
@@ -135,7 +135,7 @@ void ProcessorGroupConfig::print( std::ostream& os, size_t /* indent */ ) const
 
 
 /// Check if the database configuration makes sense
-bool ProcessorGroupConfig::check() const
+bool ProcProviderConfig::check() const
 {
 	bool correct = true;
 //	if ( m_dbLabel.empty() )	{
@@ -150,7 +150,7 @@ bool ProcessorGroupConfig::check() const
 	return correct;
 }
 
-void ProcessorGroupConfig::setCanonicalPathes( const std::string& refPath )
+void ProcProviderConfig::setCanonicalPathes( const std::string& refPath )
 {
 	for ( std::list< config::TypedConfiguration* >::const_iterator it = m_procConfig.begin();
 								it != m_procConfig.end(); it++ )	{
@@ -158,19 +158,40 @@ void ProcessorGroupConfig::setCanonicalPathes( const std::string& refPath )
 	}
 }
 
-//**** Processor Group **************************************************
-ProcessorGroup::ProcessorGroup( const ProcessorGroupConfig& conf )
+
+//**** Processor Provider PIMPL *********************************************
+ProcessorProvider::ProcessorProvider( const ProcProviderConfig* conf ) :
+	m_impl( new ProcessorProvider_Impl( conf ))	{}
+
+ProcessorProvider::~ProcessorProvider()
+{
+	delete m_impl;
+}
+
+bool ProcessorProvider::resolveDB( const db::DatabaseProvider& db )
+{
+	return m_impl->resolveDB( db );
+}
+
+Processor* ProcessorProvider::processor()
+{
+	return m_impl->processor();
+}
+
+
+//**** Processor Provider PIMPL Implementation ******************************
+ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcProviderConfig* conf )
 {
 	m_db = NULL;
-	if ( !conf.m_dbLabel.empty())
-		m_dbLabel = conf.m_dbLabel;
-	for ( std::list< config::TypedConfiguration* >::const_iterator it = conf.m_procConfig.begin();
-								it != conf.m_procConfig.end(); it++ )	{
+	if ( !conf->m_dbLabel.empty())
+		m_dbLabel = conf->m_dbLabel;
+	for ( std::list< config::TypedConfiguration* >::const_iterator it = conf->m_procConfig.begin();
+								it != conf->m_procConfig.end(); it++ )	{
 		const char* procType = (*it)->typeName();
 		size_t i;
 		for ( i = 0; i < noProcModules; i++ )	{
 			if ( boost::algorithm::iequals( procModules[i].name, procType ))	{
-				Container< Processor >* container = procModules[i].createFunc( **it );
+				Container< ProcessorUnit >* container = procModules[i].createFunc( **it );
 				m_proc.push_back( container );
 				break;
 			}
@@ -182,14 +203,14 @@ ProcessorGroup::ProcessorGroup( const ProcessorGroupConfig& conf )
 	}
 }
 
-ProcessorGroup::~ProcessorGroup()
+ProcessorProvider::ProcessorProvider_Impl::~ProcessorProvider_Impl()
 {
-	for ( std::list< Container< Processor >* >::const_iterator it = m_proc.begin();
+	for ( std::list< Container< ProcessorUnit >* >::const_iterator it = m_proc.begin();
 							it != m_proc.end(); it++ )
 		delete *it;
 }
 
-bool ProcessorGroup::resolveDB( db::DatabaseProvider& db )
+bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabaseProvider& db )
 {
 	if ( m_db == NULL && ! m_dbLabel.empty() )	{
 		m_db = db.database( m_dbLabel );
@@ -203,6 +224,15 @@ bool ProcessorGroup::resolveDB( db::DatabaseProvider& db )
 		}
 	}
 	return true;
+}
+
+Processor* ProcessorProvider::ProcessorProvider_Impl::processor()
+{
+	std::list< Container< ProcessorUnit >* >::const_iterator it = m_proc.begin();
+	if ( it != m_proc.end() )
+		return (*it)->object().processor();
+	else
+		return NULL;
 }
 
 } // namespace proc

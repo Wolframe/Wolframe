@@ -41,7 +41,7 @@
 #include "moduleLoaderConfig.hpp"
 #include "database/DBproviderImpl.hpp"
 #include "AAAA/AAAAproviderImpl.hpp"
-#include "WolframeProcGroup.hpp"
+#include "processor/procProviderImpl.hpp"
 
 namespace _Wolframe {
 
@@ -49,29 +49,29 @@ namespace _Wolframe {
 	struct HandlerConfiguration
 	{
 	public:
-		db::DBproviderConfig		*database;
-		config::ModuleLoaderConfiguration *modules;
-		config::ServiceBanner		*banner;
-		AAAA::AAAAconfiguration		*aaaa;
-		proc::ProcessorGroupConfig	*proc;
+		db::DBproviderConfig		*databaseCfg;
+		config::ModuleLoaderConfiguration *modulesCfg;
+		config::ServiceBanner		*bannerCfg;
+		AAAA::AAAAconfiguration		*aaaaCfg;
+		proc::ProcProviderConfig	*procCfg;
 
 		/// constructor
 		HandlerConfiguration()
 		{
-			banner = new config::ServiceBanner();
-			modules = new config::ModuleLoaderConfiguration();
-			database = new db::DBproviderConfig();
-			aaaa = new AAAA::AAAAconfiguration();
-			proc = new proc::ProcessorGroupConfig();
+			bannerCfg = new config::ServiceBanner();
+			modulesCfg = new config::ModuleLoaderConfiguration();
+			databaseCfg = new db::DBproviderConfig();
+			aaaaCfg = new AAAA::AAAAconfiguration();
+			procCfg = new proc::ProcProviderConfig();
 		}
 
 		~HandlerConfiguration()
 		{
-			if ( banner ) delete banner;
-			if ( modules ) delete modules;
-			if ( database ) delete database;
-			if ( aaaa ) delete aaaa;
-			if ( proc ) delete proc;
+			if ( bannerCfg ) delete bannerCfg;
+			if ( modulesCfg ) delete modulesCfg;
+			if ( databaseCfg ) delete databaseCfg;
+			if ( aaaaCfg ) delete aaaaCfg;
+			if ( procCfg ) delete procCfg;
 		}
 	};
 

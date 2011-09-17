@@ -31,7 +31,7 @@
 
 ************************************************************************/
 //
-//
+// Processor Provider
 //
 
 #ifndef _PROCESSOR_PROVIDER_HPP_INCLUDED
@@ -39,6 +39,7 @@
 
 #include "processor.hpp"
 #include <boost/noncopyable.hpp>
+#include "database/DBprovider.hpp"
 
 namespace _Wolframe {
 namespace proc {
@@ -53,7 +54,9 @@ public:
 	ProcessorProvider( const ProcProviderConfig* conf );
 	~ProcessorProvider();
 
-	const Processor* processor() const;
+	bool resolveDB( const db::DatabaseProvider& db );
+
+	Processor* processor();
 
 private:
 	class ProcessorProvider_Impl;

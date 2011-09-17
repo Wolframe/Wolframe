@@ -77,11 +77,6 @@ clients/qt/HistoryLineEdit.hpp
 clients/qt/MainWindow.cpp
 clients/qt/MainWindow.hpp
 clients/qt/Makefile.W32
-clients/qt/moc_AbstractFormLoader.cpp
-clients/qt/moc_DebugTerminal.cpp
-clients/qt/moc_HistoryLineEdit.cpp
-clients/qt/moc_MainWindow.cpp
-clients/qt/moc_WolframeClient.cpp
 clients/qt/qtclient.cpp
 clients/qt/README
 clients/qt/TODOS
@@ -402,8 +397,6 @@ src/database/PostgreSQL.hpp
 src/database/SQLiteConfig.cpp
 src/database/SQLite.cpp
 src/database/SQLite.hpp
-src/echoProcessor.cpp
-src/echoProcessor.hpp
 src/exceptionBase.hpp
 src/getPassword.cpp
 src/getPassword.hpp
@@ -431,6 +424,8 @@ src/Makefile.W32
 src/moduleLoaderConfig.cpp
 src/moduleLoaderConfig.hpp
 src/posixMain.cpp
+src/processor/echoProcessor.cpp
+src/processor/echoProcessor.hpp
 src/processor/procProvider.cpp
 src/processor/procProviderImpl.hpp
 src/protocol_ioblocks.cpp

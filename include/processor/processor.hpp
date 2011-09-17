@@ -47,7 +47,18 @@ class Processor
 public:
 	virtual ~Processor()			{}
 
-	virtual void close() const = 0;
+	virtual void close() = 0;
+};
+
+/// Processor Unit
+/// This is the base class for processor unit implementations
+class ProcessorUnit
+{
+public:
+	virtual ~ProcessorUnit()		{}
+
+	// temporary
+	virtual Processor* processor() const = 0;
 };
 
 }} // namespace _Wolframe::proc

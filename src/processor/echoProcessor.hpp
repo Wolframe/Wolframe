@@ -46,7 +46,19 @@ namespace _Wolframe {
 class EchoProcessor : public proc::Processor
 {
 public:
-	virtual const char* typeName() const	{ return "EchoProcessor"; }
+	~EchoProcessor()			{}
+	const char* typeName() const		{ return "EchoProcessor"; }
+	void close()				{}
+};
+
+
+class EchoProcessorUnit : public proc::ProcessorUnit
+{
+public:
+	EchoProcessorUnit();
+	~EchoProcessorUnit()			{}
+	const char* typeName() const		{ return "EchoProcessor"; }
+	proc::Processor* processor() const	{ return new EchoProcessor; }
 };
 
 
@@ -70,16 +82,16 @@ private:
 
 
 class EchoProcContainer : public module::ModuleContainer< EchoProcContainer, EchoProcConfig,
-		proc::Processor >
+		proc::ProcessorUnit >
 {
 public:
 	EchoProcContainer( const EchoProcConfig& conf );
-	~EchoProcContainer()				{}
+	~EchoProcContainer()					{}
 
-	virtual const char* typeName() const		{ return "EchoProcessor"; }
-	virtual const proc::Processor& object() const	{ return m_proc; }
+	virtual const char* typeName() const			{ return "EchoProcessor"; }
+	virtual const proc::ProcessorUnit& object() const	{ return m_proc; }
 private:
-	const EchoProcessor	m_proc;
+	const EchoProcessorUnit	m_proc;
 };
 
 } // namespace _Wolframe
