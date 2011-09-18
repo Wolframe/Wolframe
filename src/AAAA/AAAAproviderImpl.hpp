@@ -76,14 +76,14 @@ class AuthenticationGroup
 {
 public:
 	AuthenticationGroup( const std::list< config::TypedConfiguration* >& confs,
-			     module::ModuleContainerDescription<Container < Authenticator >, config::TypedConfiguration>* description,
+			     module::ModuleContainerDescription<Container < AuthenticationUnit >, config::TypedConfiguration>* description,
 			     size_t descrSize );
 	~AuthenticationGroup();
 	bool resolveDB( const db::DatabaseProvider& db );
 
 	Authenticator* authenticator()		{ return NULL; }
 private:
-	std::list< Container < Authenticator >* > m_authenticators;
+	std::list< Container < AuthenticationUnit >* > m_authenticators;
 };
 
 
@@ -91,14 +91,14 @@ class AuditGroup
 {
 public:
 	AuditGroup( const std::list< config::TypedConfiguration* >& confs,
-		    module::ModuleContainerDescription< Container< Auditor >, config::TypedConfiguration >* description,
+		    module::ModuleContainerDescription< Container< AuditUnit >, config::TypedConfiguration >* description,
 		    size_t descrSize );
 	~AuditGroup();
 	bool resolveDB( const db::DatabaseProvider& db );
 
 	Auditor* auditor()			{ return NULL; }
 private:
-	std::list< Container< Auditor >* >	m_auditors;
+	std::list< Container< AuditUnit >* >	m_auditors;
 };
 
 

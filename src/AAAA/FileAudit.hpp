@@ -45,7 +45,7 @@
 namespace _Wolframe {
 namespace AAAA {
 
-class FileAuditor : public Auditor
+class FileAuditor : public AuditUnit
 {
 };
 
@@ -69,13 +69,13 @@ private:
 
 
 class FileAuditContainer : public module::ModuleContainer< FileAuditContainer, FileAuditConfig,
-		Auditor >
+		AuditUnit >
 {
 public:
 	FileAuditContainer( const FileAuditConfig& conf );
 	~FileAuditContainer()				{}
 
-	virtual const Auditor& object() const		{ return m_audit; }
+	virtual const AuditUnit& object() const		{ return m_audit; }
 	const char* typeName() const			{ return "FileAudit"; }
 private:
 	std::string	m_file;

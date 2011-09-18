@@ -44,14 +44,8 @@
 namespace _Wolframe {
 namespace AAAA {
 
-class TextFileAuthenticator : public Authenticator
+class TextFileAuthenticator : public AuthenticationUnit
 {
-public:
-	virtual Step::AuthStep nextStep( )	{ return Step::_Wolframe_AUTH_STEP_SUCCESS; }
-	virtual std::string token( )		{ return "token"; }
-	virtual std::string sendData( )		{ return "sendData"; }
-	virtual void receiveData( const std::string )	{}
-	virtual std::string getError( )		{ return "getError"; }
 };
 
 class TextFileAuthConfig :  public module::ModuleConfiguration< TextFileAuthConfig >
@@ -74,14 +68,14 @@ private:
 
 
 class TxtFileAuthContainer : public module::ModuleContainer< TxtFileAuthContainer, TextFileAuthConfig,
-		Authenticator >
+		AuthenticationUnit >
 {
 public:
 	TxtFileAuthContainer( const TextFileAuthConfig& conf );
-	~TxtFileAuthContainer()				{}
+	~TxtFileAuthContainer()					{}
 
-	virtual const char* typeName() const		{ return "TextFileAuth"; }
-	virtual const Authenticator& object() const	{ return m_auth; }
+	virtual const char* typeName() const			{ return "TextFileAuth"; }
+	virtual const AuthenticationUnit& object() const	{ return m_auth; }
 private:
 	std::string		m_file;
 	TextFileAuthenticator	m_auth;

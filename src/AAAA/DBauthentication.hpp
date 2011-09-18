@@ -44,14 +44,8 @@
 namespace _Wolframe {
 namespace AAAA {
 
-class DBauthenticator : public Authenticator
+class DBauthenticator : public AuthenticationUnit
 {
-public:
-	virtual Step::AuthStep nextStep( )	{ return Step::_Wolframe_AUTH_STEP_SUCCESS; }
-	virtual std::string token( )		{ return "token"; }
-	virtual std::string sendData( )		{ return "sendData"; }
-	virtual void receiveData( const std::string )	{}
-	virtual std::string getError( )		{ return "getError"; }
 };
 
 class DatabaseAuthConfig : public module::ModuleConfiguration< DatabaseAuthConfig >
@@ -81,14 +75,14 @@ private:
 
 
 class DBauthContainer : public module::ModuleContainer< DBauthContainer, DatabaseAuthConfig,
-		Authenticator >
+		AuthenticationUnit >
 {
 public:
 	DBauthContainer( const DatabaseAuthConfig& conf );
 	~DBauthContainer();
 
-	virtual const char* typeName() const		{ return "DatabaseAuth"; }
-	virtual const Authenticator& object() const	{ return m_auth; }
+	virtual const char* typeName() const			{ return "DatabaseAuth"; }
+	virtual const AuthenticationUnit& object() const	{ return m_auth; }
 
 	bool resolveDB( const db::DatabaseProvider& db );
 private:

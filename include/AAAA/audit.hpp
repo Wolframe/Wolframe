@@ -46,12 +46,21 @@ namespace AAAA {
 // virtual base for all audit methods
 class Auditor {
 public:
-	virtual ~Auditor( ) { }
-
-	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ ) const	{ return true; }
+	virtual ~Auditor( ) {}
 
 	// close the auditor
-	virtual void close( ) { }
+	virtual void close( ) {}
+};
+
+
+/// Audit Unit
+/// This is the base class for audit unit implementations
+class AuditUnit
+{
+public:
+	virtual ~AuditUnit()					{}
+
+	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ ) const	{ return true; }
 };
 
 }} // namespace _Wolframe::AAAA

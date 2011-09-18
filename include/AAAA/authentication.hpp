@@ -63,8 +63,6 @@ class Authenticator {
 public:
 	virtual ~Authenticator( ) { }
 
-	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ ) const	{ return true; }
-
 	// get next step in authentication
 	virtual Step::AuthStep nextStep( ) = 0;
 
@@ -95,6 +93,17 @@ public:
 	// close the authenticator and destroy all
 	// sensible data
 	virtual void close( ) { }
+};
+
+
+/// Authentication Unit
+/// This is the base class for authentication unit implementations
+class AuthenticationUnit
+{
+public:
+	virtual ~AuthenticationUnit()				{}
+
+	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ ) const	{ return true; }
 };
 
 }} // namespace _Wolframe::AAAA
