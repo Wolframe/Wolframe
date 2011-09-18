@@ -37,7 +37,7 @@ Project Wolframe.
 
 #include "filters/char_filter.hpp"
 #include "filters/line_filter.hpp"
-#include "filters/xml_filter.hpp"
+#include "filters/textwolf_filter.hpp"
 #ifdef WITH_LIBXML2
 #include "filters/libxml2_filter.hpp"
 #endif
