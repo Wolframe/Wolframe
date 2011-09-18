@@ -68,6 +68,10 @@ OBJS = \
 	appConfigDefinition.o \
 	iprocHandler.o \
 	langbind/appObjects.o \
+	filters/textwolf_filter.o \
+	filters/textwolf_filterBase.o \
+	filters/char_filter.o \
+	filters/line_filter.o \
 	$(TOPDIR)/src/posixMain.o
 
 ifeq ($(WITH_LUA),1)
@@ -75,6 +79,11 @@ OBJS += \
 	langbind/luaDebug.o \
 	langbind/luaConfig.o \
 	langbind/luaAppProcessor.o
+endif
+
+ifeq ($(WITH_LIBXML2),1)
+OBJS += \
+	filters/libxml2_filter.o
 endif
 
 TEST_BINS =

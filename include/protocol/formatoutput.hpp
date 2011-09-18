@@ -95,6 +95,11 @@ struct FormatOutput :public OutputBlock
 	///\return copy of this
 	virtual FormatOutput* copy() const=0;
 
+	///\brief create the follow format output for processing
+	///\return the follow format output
+	///\remark this mechanism is used for chaining filters in case processing has to be changed
+	virtual FormatOutput* createFollow() {return 0;}
+
 	///\brief Assignement of the data members
 	///\param [in] o format output to assign the data members of
 	///\remark the output function specified with the constructor is not overwritten
@@ -135,7 +140,7 @@ struct FormatOutput :public OutputBlock
 	///\param [in] element content of element to print
 	///\param [in] elementsize size of element to print in bytes
 	///\return true, on success, false, if failed
-	virtual bool print( ElementType type, const void* element, std::size_t elementsize, bool newLine=false)=0;
+	virtual bool print( ElementType type, const void* element, std::size_t elementsize)=0;
 
 	///\brief Get error code in case of error state
 	///\return the error code

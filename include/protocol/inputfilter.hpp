@@ -44,8 +44,6 @@ namespace protocol {
 ///\brief Input filter generator data with iterator function for the application processor to iterate on network input content elements
 struct InputFilter
 {
-	enum {DefaultBufferSize=1024};
-
 	///\enum State
 	///\brief State of the input filter used in the application processor iterating loop to decide wheter to yield execution or not.
 	enum State
@@ -73,6 +71,11 @@ struct InputFilter
 	///\brief self copy
 	///\return copy of this
 	virtual InputFilter* copy() const=0;
+
+	///\brief create the follow filter for processing
+	///\return the follow filter
+	///\remark this mechanism is used for chaining filters in case processing has to be changed
+	virtual InputFilter* createFollow() {return 0;}
 
 	///\brief Get next element call as methof call
 	///\param [out] type element type parsed
@@ -116,14 +119,14 @@ struct InputFilter
 	}
 
 	///\brief Constructor
-	InputFilter( std::size_t genbufsize=0)
+	InputFilter( std::size_t genbufsize)
 		:m_ptr(0)
 		,m_pos(0)
 		,m_size(0)
 		,m_gotEoD(false)
 		,m_state(Open)
 		,m_errorCode(0)
-		,m_genbufsize(genbufsize?genbufsize:(std::size_t)DefaultBufferSize){}
+		,m_genbufsize(genbufsize){}
 
 	///\brief destructor
 	virtual ~InputFilter(){}

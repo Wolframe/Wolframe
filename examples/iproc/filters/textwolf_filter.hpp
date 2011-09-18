@@ -29,18 +29,42 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filters.hpp
-///\brief Top-level include file for the input/output filter implementations
+///\file textwolf_filter.hpp
+///\brief Filter reading/writing xml with the textwolf xml library
 
-#ifndef _Wolframe_FILTERS_HPP_INCLUDED
-#define _Wolframe_FILTERS_HPP_INCLUDED
+#ifndef _Wolframe_TEXTWOLF_FILTER_XML_HPP_INCLUDED
+#define _Wolframe_TEXTWOLF_FILTER_XML_HPP_INCLUDED
+#include "protocol/inputfilter.hpp"
+#include "protocol/formatoutput.hpp"
+#include <string>
+#include <cstddef>
 
-#include "filters/char_filter.hpp"
-#include "filters/line_filter.hpp"
-#include "filters/textwolf_filter.hpp"
-#ifdef WITH_LIBXML2
-#include "filters/libxml2_filter.hpp"
+namespace _Wolframe {
+namespace filter {
+
+///\class TextwolfXmlFilter
+class TextwolfXmlFilter
+{
+public:
+	TextwolfXmlFilter( std::size_t elementbufsize, std::size_t tagbufsize);
+
+	///\remark creates only a format output of the filter, because input should be determined always by the XML header
+	TextwolfXmlFilter( std::size_t elementbufsize, std::size_t tagbufsize, const char* encoding);
+
+	protocol::InputFilterR inputFilter() const	{return m_inputFilter;}
+	protocol::FormatOutputR formatOutput() const	{return m_formatOutput;}
+
+private:
+	protocol::InputFilterR m_inputFilter;
+	protocol::FormatOutputR m_formatOutput;
+};
+
+
+}}//namespace
 #endif
 
-#endif //_Wolframe_PROTOCOL_HPP_INCLUDED
+
+
+
+
 

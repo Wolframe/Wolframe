@@ -36,128 +36,20 @@ Project Wolframe.
 #define _Wolframe_FILTER_CHAR_HPP_INCLUDED
 #include "protocol/inputfilter.hpp"
 #include "protocol/formatoutput.hpp"
-#include "filters/filterBase.hpp"
-#include <cstring>
-#include <cstddef>
 
 namespace _Wolframe {
 namespace filter {
 
-template <class IOCharset, class AppCharset=textwolf::charset::UTF8>
-struct CharFilter :FilterBase<IOCharset, AppCharset>
+struct CharFilter
 {
-	typedef FilterBase<IOCharset, AppCharset> ThisFilterBase;
-	typedef typename protocol::FormatOutput::ElementType ElementType;
-	typedef textwolf::StaticBuffer BufferType;
-	typedef protocol::EscapingBuffer<textwolf::StaticBuffer> EscBufferType;
+public:
+	CharFilter( const char* encoding);
 
-	///\class InputFilter
-	///\brief input filter for single characters
-	struct InputFilter :public protocol::InputFilter
-	{
-		///\brief Constructor
-		InputFilter() :protocol::InputFilter(8) {}
-
-		///\brief Copy constructor
-		///\param [in] o format output to copy
-		InputFilter( const InputFilter& o)
-			:protocol::InputFilter( o)
-			,m_itr(o.m_itr) {}
-
-		///\brief self copy
-		///\return copy of this
-		virtual InputFilter* copy() const
-		{
-			return new InputFilter( *this);
-		}
-
-		enum ErrorCodes
-		{
-			Ok,
-			ErrBufferTooSmall
-		};
-
-		///\brief implement interface member protocol::InputFilter::getNext( ElementType*,void*,std::size_t,std::size_t*)
-		virtual bool getNext( ElementType* type, void* buffer, std::size_t buffersize, std::size_t* bufferpos)
-		{
-			BufferType buf( (char*)buffer, buffersize, *bufferpos);
-			setState( Open);
-			*type = Value;
-			m_itr.setSource( SrcIterator( this));
-			try
-			{
-				textwolf::UChar ch;
-				if ((ch = *m_itr) != 0)
-				{
-					++m_itr;
-					AppCharset::print( ch, buf);
-					if (buf.overflow())
-					{
-						setState( Error, ErrBufferTooSmall);
-						return false;
-					}
-					*bufferpos = buf.size();
-					return true;
-				}
-			}
-			catch (SrcIterator::EoM)
-			{
-				setState( EndOfMessage);
-				*bufferpos = buf.size();
-			}
-			return false;
-		}
-	private:
-		textwolf::TextScanner<SrcIterator,AppCharset> m_itr;
-	};
-
-	///\class FormatOutput
-	///\brief format output filter for single characters
-	struct FormatOutput :public protocol::FormatOutput
-	{
-		///\brief Constructor
-		FormatOutput()
-			:m_bufstate(EscBufferType::SRC){}
-
-		///\brief Copy constructor
-		///\param [in] o format output to copy
-		FormatOutput( const FormatOutput& o)
-			:m_bufstate(o.m_bufstate)
-		{}
-
-		///\brief self copy
-		///\return copy of this
-		virtual FormatOutput* copy() const
-		{
-			return new FormatOutput( *this);
-		}
-
-		///\brief Implementation of protocol::FormatOutput::print(ElementType,const void*,std::size_t)
-		///\param [in] type type of the element to print
-		///\param [in] element pointer to the element to print
-		///\param [in] elementsize size of the element to print in bytes
-		///\param [in] newline true, if the printed item should start on a new line
-		///\return true, if success, false else
-		virtual bool print( ElementType type, const void* element, std::size_t elementsize, bool newline)
-		{
-			if (type == Value)
-			{
-				EscBufferType buf( rest(), restsize(), m_bufstate);
-				if (newline) ThisFilterBase::printToBufferEOL( buf);
-				ThisFilterBase::printToBuffer( (const char*)element, elementsize, buf);
-				if (buf.overflow())
-				{
-					setState( EndOfBuffer);
-					return false;
-				}
-				incPos( buf.size());
-				m_bufstate = buf.state();
-			}
-			return true;
-		}
-	private:
-		typename EscBufferType::State m_bufstate;	///< state of escaping the output
-	};
+	protocol::InputFilterR inputFilter() const	{return m_inputFilter;}
+	protocol::FormatOutputR formatOutput() const	{return m_formatOutput;}
+private:
+	protocol::InputFilterR m_inputFilter;
+	protocol::FormatOutputR m_formatOutput;
 };
 
 }}//namespace

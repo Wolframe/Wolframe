@@ -68,44 +68,14 @@ struct Output
 	///\param[in] e1size first element size
 	///\param[in] e2 second element
 	///\param[in] e2size second element size
-	///\param[in] newline true, if the printed item should start on a new line (for splitting lines to serve line buffering clients)
 	///\return state returned
-	ItemType print( const char* e1, unsigned int e1size, const char* e2, unsigned int e2size, bool newline);
+	ItemType print( const char* e1, unsigned int e1size, const char* e2, unsigned int e2size);
 
 public:
 	protocol::FormatOutputR m_formatoutput;	///< format output reference
 
 private:
 	unsigned int m_state;						///< current state for outputs with more than one elements
-};
-
-///\class System
-///\brief System function call interface as seen from the application processor program
-struct System
-{
-	///\brief Constructor
-	System(){}
-	///\brief Copy constructor
-	///\param[in] o copied item
-	System( const System&){}
-	///\brief Destructor
-	~System(){}
-
-	///\brief Create a new input filter function
-	///\param[in] name name of the filter or the default filter if not specified
-	///\param[in] buffersize size of buffer in bytes to use for the generated elements
-	protocol::InputFilter* createInputFilter( const char* name, unsigned int buffersize=0) const;
-
-	///\brief Create a new input filter function from the default
-	protocol::InputFilter* createDefaultInputFilter() const;
-
-	///\brief Create a new format output filter function
-	///\param[in] name name of the filter or the default filter if not specified
-	///\param[in] buffersize size of buffer in bytes to use for the tag hierarchy context
-	protocol::FormatOutput* createFormatOutput( const char* name, unsigned int buffersize=0) const;
-
-	///\brief Create a new format output filter function from the default
-	protocol::FormatOutput* createDefaultFormatOutput() const;
 };
 
 ///\class Input
@@ -135,9 +105,7 @@ struct Filter
 	///\param[in] name name of the filter as defined in the system
 	///\param[in] ib size of buffer used for input
 	///\param[in] ob size of buffer used for output
-	Filter( System* system, const char* name, unsigned int ib, unsigned int ob)
-		:m_formatoutput(system->createFormatOutput(name,ob))
-		,m_inputfilter(system->createInputFilter(name,ib)){}
+	Filter( const char* name, unsigned int ib, unsigned int ob);
 
 	///\brief Copy constructor
 	///\param[in] o copied item

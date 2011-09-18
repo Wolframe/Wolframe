@@ -71,7 +71,7 @@ MemBlock& MemBlock::operator=( const MemBlock& o)
 	if (o.m_allocated)
 	{
 		m_ptr = new unsigned char[ m_size];
-		std::memcpy( m_ptr, o.m_ptr, m_size);
+		std::memcpy( m_ptr, o.m_ptr, m_pos);
 	}
 	else
 	{

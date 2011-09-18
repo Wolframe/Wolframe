@@ -54,7 +54,6 @@ using namespace app;
 
 namespace luaname
 {
-	static const char* System = "wolframe.System";
 	static const char* Input = "wolframe.Input";
 	static const char* Output = "wolframe.Output";
 	static const char* Filter = "wolframe.Filter";
@@ -80,7 +79,6 @@ template <> const char* metaTableName<Input>()			{return luaname::Input;}
 template <> const char* metaTableName<Output>()			{return luaname::Output;}
 template <> const char* metaTableName<Filter>()			{return luaname::Filter;}
 template <> const char* metaTableName<InputFilterClosure>()	{return luaname::InputFilterClosure;}
-template <> const char* metaTableName<System>()			{return luaname::System;}
 }//anonymous namespace
 
 static const luaL_Reg empty_methodtable[ 1] =
@@ -267,7 +265,7 @@ static const char* get_printop( lua_State* ls, int index, std::size_t& size)
 	return rt;
 }
 
-static int output_print( lua_State* ls, bool newline)
+static int function_output_print( lua_State* ls)
 {
 	for (;;)
 	{
@@ -292,7 +290,7 @@ static int output_print( lua_State* ls, bool newline)
 		{
 			return luaL_error( ls, "too many arguments in call of format output print");
 		}
-		switch (output->print( item[1]/*tag*/, itemsize[1], item[0]/*val*/, itemsize[0], newline))
+		switch (output->print( item[1]/*tag*/, itemsize[1], item[0]/*val*/, itemsize[0]))
 		{
 			case Output::DoYield:
 				lua_yield( ls, 0);
@@ -308,16 +306,6 @@ static int output_print( lua_State* ls, bool newline)
 		luaL_error( ls, "illegal state produced by format output print");
 		return 0;
 	}
-}
-
-static int function_output_print( lua_State* ls)
-{
-	return output_print( ls, false);
-}
-
-static int function_output_println( lua_State* ls)
-{
-	return output_print( ls, true);
 }
 
 static int function_filter( lua_State* ls)
@@ -346,9 +334,8 @@ static int function_filter( lua_State* ls)
 		return luaL_error( ls, "invalid type of argument (string expected)");
 	}
 	const char* name = lua_tostring( ls, 1);
-	app::System* system = LuaObject<System>::getGlobal( ls, "_Wolframe");
 
-	Filter ft( system, name, buffersize, buffersize);
+	Filter ft( name, buffersize, buffersize);
 	LuaObject<Filter>::push_luastack( ls, ft);
 	return 1;
 }
@@ -376,6 +363,10 @@ static int function_input_as( lua_State* ls)
 			*ff = *input->m_inputfilter;
 		}
 	}
+	else
+	{
+		luaL_error( ls, "input:as called with a filter with undefined input");
+	}
 	input->m_inputfilter.reset( ff);
 
 	return 0;
@@ -402,6 +393,10 @@ static int function_output_as( lua_State* ls)
 		{
 			*ff = *output->m_formatoutput;
 		}
+	}
+	else
+	{
+		luaL_error( ls, "output:as called with a filter with undefined output");
 	}
 	output->m_formatoutput.reset( ff);
 	return 0;
@@ -441,12 +436,6 @@ static const luaL_Reg output_methodtable[ 4] =
 {
 	{"as",&function_output_as},
 	{"print",&function_output_print},
-	{"println",&function_output_println},
-	{0,0}
-};
-
-static const luaL_Reg system_methodtable[ 1] =
-{
 	{0,0}
 };
 
@@ -482,13 +471,12 @@ struct AppProcessor::State
 	}
 };
 
-AppProcessor::AppProcessor( const app::System& system, const lua::Configuration* config)
-		:m_config(config),m_system(system)
+AppProcessor::AppProcessor( const lua::Configuration* config)
+		:m_config(config)
 {
 	m_state = new State( *config);
 	LuaObject<Input>::createGlobal( m_state->ls, "input", m_input, input_methodtable);
 	LuaObject<Output>::createGlobal( m_state->ls, "output", m_output, output_methodtable);
-	LuaObject<System>::createGlobal( m_state->ls, "_Wolframe", m_system, system_methodtable);
 	LuaObject<Filter>::create( m_state->ls);
 	LuaObject<InputFilterClosure>::create( m_state->ls);
 	create_global_functions( m_state->ls);

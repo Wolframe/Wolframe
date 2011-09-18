@@ -55,7 +55,8 @@ struct BufferingInputFilter :public protocol::InputFilter
 	};
 
 	///\brief Constructor
-	BufferingInputFilter() :m_inputConsumed(false){}
+	BufferingInputFilter( Content* cref, std::size_t bufsize)
+		:protocol::InputFilter(bufsize),m_inputConsumed(false),m_content(cref){}
 
 	///\brief Destructor
 	~BufferingInputFilter(){}
@@ -118,19 +119,16 @@ private:
 		{
 			m_inputConsumed = true;
 			protocol::InputFilter::protocolInput( (void*)&m_buffer.at(0), m_buffer.size(), true);
-			Content* dc = new (std::nothrow) Content();
-			if (!dc)
+
+			if (!m_content->open( ptr(), size()))
 			{
 				setState( Error, ErrOpenDoc);
-			}
-			if (!dc->open( ptr(), size()))
-			{
-				setState( Error, ErrOpenDoc);
-				delete dc;
-				dc = 0;
 				rt = false;
 			}
-			m_content.reset( dc);
+			else
+			{
+				setState( Open);
+			}
 		}
 		else
 		{

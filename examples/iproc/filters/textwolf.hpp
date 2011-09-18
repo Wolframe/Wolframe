@@ -42,6 +42,7 @@
 #include <exception>
 #include <limits>
 #include <cstddef>
+#include <cstring>
 
 #ifdef BOOST_VERSION
 #include <boost/cstdint.hpp>
@@ -183,9 +184,23 @@ public:
 		}
 	}
 
+	///\brief Append an array of characters
+	///\param[in] cc the characters to append
+	///\param[in] ccsize the number of characters to append
+	void append( const char* cc, std::size_t ccsize)
+	{
+		if (m_pos+ccsize > m_size)
+		{
+			m_overflow = true;
+			ccsize = m_size - m_pos;
+		}
+		std::memcpy( m_ar+m_pos, cc, ccsize);
+		m_pos += ccsize;
+	}
+
 	///\brief Return the number of characters in the buffer
 	///\return the number of characters (bytes)
-	std::size_t size() const			{return m_pos;}
+	std::size_t size() const		{return m_pos;}
 
 	///\brief Return the buffer content as 0-terminated string
 	///\return the C-string
@@ -1334,6 +1349,7 @@ private:
 
 		///\brief Reset this state variables (after succesful exit with a new token parsed)
 		///\param [in] id_ the new entity parse state
+		///\param [in] eolnState_ the end of line mapping state
 		void init(Id id_=Start, EolnState eolnState_=SRC)
 		{
 			id=id_;eolnState=eolnState_;pos=0;base=0;value=0;curchr_saved=0;

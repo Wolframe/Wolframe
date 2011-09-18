@@ -93,7 +93,7 @@ public:
 	const char* charptr() const				{return (const char*)m_ptr;}
 
 	///\brief Allocation size of the buffer in bytes
-	std::size_t size() const					{return m_size;}
+	std::size_t size() const				{return m_size;}
 
 	///\brief Get the size of the buffer left
 	///\return the size of the buffer left
@@ -104,7 +104,7 @@ public:
 
 	///\brief Shift current cursor poition by some bytes
 	///\param [in] n number of bytes to shift
-	void incr( std::size_t n)					{if ((m_pos+n)>=m_size) m_pos=m_size; else m_pos+=n;}
+	void incr( std::size_t n)				{if ((m_pos+n)>=m_size) m_pos=m_size; else m_pos+=n;}
 
 	///\exception ArrayBoundReadError
 	///\brief Protocol memory block access violation exception
@@ -175,6 +175,8 @@ public:
 	///\brief Copy constructor
 	///\param [in] o InputBlock to copy
 	InputBlock( const InputBlock& o)			:MemBlock(o),m_eodState(o.m_eodState){}
+
+	InputBlock& operator=( const InputBlock& o)		{MemBlock::operator=(o); m_eodState=o.m_eodState; return *this;}
 
 	///\brief Random access const iterator
 	typedef array::iterator_t<const InputBlock,std::size_t,char,char,const char*> const_iterator;
@@ -255,7 +257,7 @@ class OutputBlock :public MemBlock
 public:
 	///\brief Constructor
 	///\param [in] p_size size of the memory block in bytes to allocate
-	OutputBlock( std::size_t p_size)				:MemBlock(p_size) {}
+	OutputBlock( std::size_t p_size=0)			:MemBlock(p_size) {}
 	///\brief Constructor
 	///\param [in] p_ptr pointer to the memory block to use
 	///\param [in] p_size size of the memory block in bytes
@@ -263,6 +265,7 @@ public:
 	///\brief Copy constructor
 	///\param [in] o OutputBlock to copy
 	OutputBlock( const OutputBlock& o)			:MemBlock(o) {}
+	OutputBlock& operator=( const OutputBlock& o)		{MemBlock::operator=(o); return *this;}
 
 	///\brief Return true if the buffer is empty
 	bool empty() const
@@ -277,6 +280,16 @@ public:
 		if (pos() == size()) return false;
 		charptr()[ pos()] = ch;
 		setPos( pos() + 1);
+		return true;
+	}
+
+	///\brief Print one character to the output
+	///\param [in] ch the character to print
+	bool print( const void* p, std::size_t n)
+	{
+		if (n >= restsize()) return false;
+		std::memmove( charptr()+pos(), p, n);
+		setPos( pos() + n);
 		return true;
 	}
 
