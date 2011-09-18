@@ -1,17 +1,10 @@
-output_encoding = "UTF-8"
-
 function run( )
-	inpf = filter( "xml:libxml2")
-	outf = filter( "XML:" .. output_encoding)
+	f = filter( "xml:libxml2")
 
-	input:as( inpf)
-	output:as( filter( "XML:UTF8"))
+	input:as( f)
+	output:as( f)
 
 	for c,t in input:get() do
-		if not c then
-			output:println( c, t)
-		else
-			output:print( c, t)
-		end
+		output:print( c, t)
 	end
 end

@@ -136,7 +136,6 @@ private:
 	InputIterator m_itr;			///< iterator to scan protocol input
 	InputIterator m_end;			///< iterator pointing to end of message buffer
 
-	app::System m_system;			///< interface to system functions like database and loaded resources
 	protocol::InputFilterR m_inputfilter;	///< network input interface for the interpreter
 	protocol::FormatOutputR m_formatoutput;	///< network output interface for the interpreter
 	lua::AppProcessor m_processor;		///< the interpreter state

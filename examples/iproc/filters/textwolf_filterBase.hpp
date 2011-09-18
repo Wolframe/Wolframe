@@ -29,12 +29,14 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filterBase.hpp
-///\brief Base class for stream processing filters
+///\file textwolf_filterBase.hpp
+///\brief Base functions and classes for filters based on textwolf
 
-#ifndef _Wolframe_FILTER_BASE_HPP_INCLUDED
-#define _Wolframe_FILTER_BASE_HPP_INCLUDED
+#ifndef _Wolframe_TEXTWOLF_FILTER_BASE_HPP_INCLUDED
+#define _Wolframe_TEXTWOLF_FILTER_BASE_HPP_INCLUDED
 #include "textwolf.hpp"
+#include "protocol/inputfilter.hpp"
+#include "protocol/formatoutput.hpp"
 #include <cstddef>
 
 namespace _Wolframe {
@@ -170,6 +172,17 @@ struct FilterBase
 	{
 		IOCharset::print( (textwolf::UChar)(unsigned char)ch, buf);
 	}
+};
+
+struct TextwolfEncoding
+{
+	enum Id
+	{
+		Unknown, IsoLatin, UTF8, UTF16, UTF16BE, UTF16LE, UCS2BE, UCS2LE, UCS4BE, UCS4LE
+	};
+
+	static const char* getName( Id e);
+	static Id getId( const char* name);
 };
 
 }}//namespace

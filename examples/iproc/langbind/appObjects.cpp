@@ -73,6 +73,16 @@ InputFilterClosure::ItemType InputFilterClosure::fetch( const char*& tag, unsign
 	{
 		if (!m_inputfilter->getNext( &m_type, m_buf, m_bufsize-1, &m_bufpos))
 		{
+			if (m_inputfilter->state() == protocol::InputFilter::Open)
+			{
+				// at end of data check if there is a follow filter (transformed filter) to continue with:
+				protocol::InputFilter* follow = m_inputfilter->createFollow();
+				if (follow)
+				{
+					m_inputfilter.reset( follow);
+					return fetch( tag, tagsize, val, valsize);
+				}
+			}
 			return fetchFailureResult( *m_inputfilter); 
 		}
 		else if (m_type == protocol::InputFilter::Value)
@@ -141,147 +151,58 @@ InputFilterClosure::ItemType InputFilterClosure::fetch( const char*& tag, unsign
 	return Error;
 }
 
-static std::size_t getName( char* buf, std::size_t bufsize, const char* name)
+static bool startsWith( const char* str, const char* prefix)
 {
-	std::size_t ii,kk;
-	if (!bufsize) return 0;
-	bufsize -= 1;
-	for (kk=0,ii=0; ii<bufsize && name[kk]; kk++)
+	std::string nm( str, strlen(prefix));
+	return boost::algorithm::iequals( nm, prefix);
+}
+
+static bool equalIdent( const char* str, const char* prefix)
+{
+	return boost::algorithm::iequals( str, prefix);
+}
+
+Filter::Filter( const char* name, unsigned int ib, unsigned int ob)
+{
+	if (startsWith( name, "char:"))
 	{
-		if (name[kk] == '-') continue;
-		if (name[kk] == ' ') continue;
-		buf[ii++] = name[kk];
+		filter::CharFilter flt( name+5);
+		m_inputfilter = flt.inputFilter();
+		m_formatoutput = flt.formatOutput();
 	}
-	buf[ii] = 0;
-	return ii;
-}
-
-protocol::InputFilter* System::createDefaultInputFilter() const
-{
-	return new filter::CharFilter<textwolf::charset::IsoLatin1>::InputFilter();
-}
-
-static bool equalIdent( const char* a1, const char* a2)
-{
-	return boost::algorithm::iequals( a1, a2);
-}
-
-protocol::InputFilter* System::createInputFilter( const char* name, unsigned int bufsize) const
-{
-	protocol::InputFilter* rt = 0;
-	char nm[32];
-	if (!getName( nm, sizeof(nm), name))
+	else if (startsWith( name, "line:"))
 	{
-		LOG_ERROR << "unknown filter '" << name << "'";
-		return 0;
+		filter::LineFilter flt( name+5, ib?ib:2048);
+		m_inputfilter = flt.inputFilter();
+		m_formatoutput = flt.formatOutput();
 	}
-	if (equalIdent( nm, "char:isolatin1")) rt = (protocol::InputFilter*) new filter::CharFilter<textwolf::charset::IsoLatin1>::InputFilter();
-	else if (equalIdent( nm, "char:iso88591")) rt = (protocol::InputFilter*) new filter::CharFilter<textwolf::charset::IsoLatin1>::InputFilter();
-	else if (equalIdent( nm, "char:UTF8")) rt = (protocol::InputFilter*) new filter::CharFilter<textwolf::charset::UTF8>::InputFilter();
-	else if (equalIdent( nm, "char:UTF16")) rt = (protocol::InputFilter*) new filter::CharFilter<textwolf::charset::UTF16BE>::InputFilter();
-	else if (equalIdent( nm, "char:UTF16LE")) rt = (protocol::InputFilter*) new filter::CharFilter<textwolf::charset::UTF16LE>::InputFilter();
-	else if (equalIdent( nm, "char:UTF16BE")) rt = (protocol::InputFilter*) new filter::CharFilter<textwolf::charset::UTF16BE>::InputFilter();
-	else if (equalIdent( nm, "char:UCS2LE")) rt = (protocol::InputFilter*) new filter::CharFilter<textwolf::charset::UCS2LE>::InputFilter();
-	else if (equalIdent( nm, "char:UCS2BE")) rt = (protocol::InputFilter*) new filter::CharFilter<textwolf::charset::UCS2BE>::InputFilter();
-	else if (equalIdent( nm, "char:UCS2")) rt = (protocol::InputFilter*) new filter::CharFilter<textwolf::charset::UCS2BE>::InputFilter();
-	else if (equalIdent( nm, "char:UCS4LE")) rt = (protocol::InputFilter*) new filter::CharFilter<textwolf::charset::UCS4LE>::InputFilter();
-	else if (equalIdent( nm, "char:UCS4BE")) rt = (protocol::InputFilter*) new filter::CharFilter<textwolf::charset::UCS4BE>::InputFilter();
-	else if (equalIdent( nm, "char:UCS4")) rt = (protocol::InputFilter*) new filter::CharFilter<textwolf::charset::UCS4BE>::InputFilter();
-
-	else if (equalIdent( nm, "line:isolatin1")) rt = (protocol::InputFilter*) new filter::LineFilter<textwolf::charset::IsoLatin1>::InputFilter();
-	else if (equalIdent( nm, "line:iso88591")) rt = (protocol::InputFilter*) new filter::LineFilter<textwolf::charset::IsoLatin1>::InputFilter();
-	else if (equalIdent( nm, "line:UTF8")) rt = (protocol::InputFilter*) new filter::LineFilter<textwolf::charset::UTF8>::InputFilter( bufsize);
-	else if (equalIdent( nm, "line:UTF16")) rt = (protocol::InputFilter*) new filter::LineFilter<textwolf::charset::UTF16BE>::InputFilter( bufsize);
-	else if (equalIdent( nm, "line:UTF16LE")) rt = (protocol::InputFilter*) new filter::LineFilter<textwolf::charset::UTF16LE>::InputFilter( bufsize);
-	else if (equalIdent( nm, "line:UTF16BE")) rt = (protocol::InputFilter*) new filter::LineFilter<textwolf::charset::UTF16BE>::InputFilter( bufsize);
-	else if (equalIdent( nm, "line:UCS2LE")) rt = (protocol::InputFilter*) new filter::LineFilter<textwolf::charset::UCS2LE>::InputFilter( bufsize);
-	else if (equalIdent( nm, "line:UCS2BE")) rt = (protocol::InputFilter*) new filter::LineFilter<textwolf::charset::UCS2BE>::InputFilter( bufsize);
-	else if (equalIdent( nm, "line:UCS2")) rt = (protocol::InputFilter*) new filter::LineFilter<textwolf::charset::UCS2BE>::InputFilter( bufsize);
-	else if (equalIdent( nm, "line:UCS4LE")) rt = (protocol::InputFilter*) new filter::LineFilter<textwolf::charset::UCS4LE>::InputFilter( bufsize);
-	else if (equalIdent( nm, "line:UCS4BE")) rt = (protocol::InputFilter*) new filter::LineFilter<textwolf::charset::UCS4BE>::InputFilter( bufsize);
-	else if (equalIdent( nm, "line:UCS4")) rt = (protocol::InputFilter*) new filter::LineFilter<textwolf::charset::UCS4BE>::InputFilter( bufsize);
-
-	else if (equalIdent( nm, "xml:isolatin1")) rt = (protocol::InputFilter*) new filter::XmlFilter<textwolf::charset::IsoLatin1>::InputFilter( bufsize);
-	else if (equalIdent( nm, "xml:iso88591")) rt = (protocol::InputFilter*) new filter::XmlFilter<textwolf::charset::IsoLatin1>::InputFilter( bufsize);
-	else if (equalIdent( nm, "xml:UTF8"))	rt = (protocol::InputFilter*) new filter::XmlFilter<textwolf::charset::UTF8>::InputFilter( bufsize);
-	else if (equalIdent( nm, "xml:UTF16")) rt = (protocol::InputFilter*) new filter::XmlFilter<textwolf::charset::UTF16BE>::InputFilter( bufsize);
-	else if (equalIdent( nm, "xml:UTF16LE")) rt = (protocol::InputFilter*) new filter::XmlFilter<textwolf::charset::UTF16LE>::InputFilter( bufsize);
-	else if (equalIdent( nm, "xml:UTF16BE")) rt = (protocol::InputFilter*) new filter::XmlFilter<textwolf::charset::UTF16BE>::InputFilter( bufsize);
-	else if (equalIdent( nm, "xml:UCS2LE")) rt = (protocol::InputFilter*) new filter::XmlFilter<textwolf::charset::UCS2LE>::InputFilter( bufsize);
-	else if (equalIdent( nm, "xml:UCS2BE")) rt = (protocol::InputFilter*) new filter::XmlFilter<textwolf::charset::UCS2BE>::InputFilter( bufsize);
-	else if (equalIdent( nm, "xml:UCS2")) rt = (protocol::InputFilter*) new filter::XmlFilter<textwolf::charset::UCS2BE>::InputFilter( bufsize);
-	else if (equalIdent( nm, "xml:UCS4LE")) rt = (protocol::InputFilter*) new filter::XmlFilter<textwolf::charset::UCS4LE>::InputFilter( bufsize);
-	else if (equalIdent( nm, "xml:UCS4BE")) rt = (protocol::InputFilter*) new filter::XmlFilter<textwolf::charset::UCS4BE>::InputFilter( bufsize);
-	else if (equalIdent( nm, "xml:UCS4")) rt = (protocol::InputFilter*) new filter::XmlFilter<textwolf::charset::UCS4BE>::InputFilter( bufsize);
-	else if (equalIdent( nm, "xml:Header")) rt = (protocol::InputFilter*) new filter::XmlHeaderFilter::InputFilter();
+	else if (equalIdent( name, "xml:textwolf"))
+	{
+		filter::TextwolfXmlFilter tw( ib?ib:4096, ob?ob:1024);
+		m_inputfilter = tw.inputFilter();
+		m_formatoutput = tw.formatOutput();
+	}
+	else if (startsWith( name, "xml:textwolf:"))
+	{
+		filter::TextwolfXmlFilter tw( ib?ib:4096, ob?ob:1024, name+strlen("xml:textwolf:"));
+		m_inputfilter = tw.inputFilter();
+		m_formatoutput = tw.formatOutput();
+	}
 #ifdef WITH_LIBXML2
-	else if (equalIdent( nm, "xml:libxml2")) rt = (protocol::InputFilter*) new filter::libxml2::InputFilter();
+	else if (equalIdent( name, "xml:libxml2"))
+	{
+		filter::Libxml2Filter tw( ib?ib:4096);
+		m_inputfilter = tw.inputFilter();
+		m_formatoutput = tw.formatOutput();
+	}
 #endif
-	if (!rt)
+	else
 	{
 		LOG_ERROR << "unknown filter '" << name << "'";
 	}
-	return rt;
 }
 
-protocol::FormatOutput* System::createDefaultFormatOutput() const
-{
-	return new filter::CharFilter<textwolf::charset::IsoLatin1>::FormatOutput();
-}
-
-protocol::FormatOutput* System::createFormatOutput( const char* name, unsigned int buffersize) const
-{
-	protocol::FormatOutput* rt = 0;
-	char nm[32];
-	if (!getName( nm, sizeof(nm), name))
-	{
-		LOG_ERROR << "unknown filter '" << name << "'";
-		return 0;
-	}
-	if (equalIdent( nm, "char:isolatin1")) rt = (protocol::FormatOutput*) new filter::CharFilter<textwolf::charset::IsoLatin1>::FormatOutput();
-	else if (equalIdent( nm, "char:iso88591")) rt = (protocol::FormatOutput*) new filter::CharFilter<textwolf::charset::IsoLatin1>::FormatOutput();
-	else if (equalIdent( nm, "char:UTF8")) rt = (protocol::FormatOutput*) new filter::CharFilter<textwolf::charset::UTF8>::FormatOutput();
-	else if (equalIdent( nm, "char:UTF16")) rt = (protocol::FormatOutput*) new filter::CharFilter<textwolf::charset::UTF16BE>::FormatOutput();
-	else if (equalIdent( nm, "char:UTF16LE")) rt = (protocol::FormatOutput*) new filter::CharFilter<textwolf::charset::UTF16LE>::FormatOutput();
-	else if (equalIdent( nm, "char:UTF16BE")) rt = (protocol::FormatOutput*) new filter::CharFilter<textwolf::charset::UTF16BE>::FormatOutput();
-	else if (equalIdent( nm, "char:UCS2LE")) rt = (protocol::FormatOutput*) new filter::CharFilter<textwolf::charset::UCS2LE>::FormatOutput();
-	else if (equalIdent( nm, "char:UCS2BE")) rt = (protocol::FormatOutput*) new filter::CharFilter<textwolf::charset::UCS2BE>::FormatOutput();
-	else if (equalIdent( nm, "char:UCS4LE")) rt = (protocol::FormatOutput*) new filter::CharFilter<textwolf::charset::UCS4LE>::FormatOutput();
-	else if (equalIdent( nm, "char:UCS4BE")) rt = (protocol::FormatOutput*) new filter::CharFilter<textwolf::charset::UCS4BE>::FormatOutput();
-
-	else if (equalIdent( nm, "line:isolatin1")) rt = (protocol::FormatOutput*) new filter::LineFilter<textwolf::charset::IsoLatin1>::FormatOutput();
-	else if (equalIdent( nm, "line:iso88591")) rt = (protocol::FormatOutput*) new filter::LineFilter<textwolf::charset::IsoLatin1>::FormatOutput();
-	else if (equalIdent( nm, "line:UTF8")) rt = (protocol::FormatOutput*) new filter::LineFilter<textwolf::charset::UTF8>::FormatOutput();
-	else if (equalIdent( nm, "line:UTF16")) rt = (protocol::FormatOutput*) new filter::LineFilter<textwolf::charset::UTF16BE>::FormatOutput();
-	else if (equalIdent( nm, "line:UTF16LE")) rt = (protocol::FormatOutput*) new filter::LineFilter<textwolf::charset::UTF16LE>::FormatOutput();
-	else if (equalIdent( nm, "line:UTF16BE")) rt = (protocol::FormatOutput*) new filter::LineFilter<textwolf::charset::UTF16BE>::FormatOutput();
-	else if (equalIdent( nm, "line:UCS2LE")) rt = (protocol::FormatOutput*) new filter::LineFilter<textwolf::charset::UCS2LE>::FormatOutput();
-	else if (equalIdent( nm, "line:UCS2BE")) rt = (protocol::FormatOutput*) new filter::LineFilter<textwolf::charset::UCS2BE>::FormatOutput();
-	else if (equalIdent( nm, "line:UCS4LE")) rt = (protocol::FormatOutput*) new filter::LineFilter<textwolf::charset::UCS4LE>::FormatOutput();
-	else if (equalIdent( nm, "line:UCS4BE")) rt = (protocol::FormatOutput*) new filter::LineFilter<textwolf::charset::UCS4BE>::FormatOutput();
-
-	else if (equalIdent( nm, "xml:isolatin1")) rt = (protocol::FormatOutput*) new filter::XmlFilter<textwolf::charset::IsoLatin1>::FormatOutput( buffersize);
-	else if (equalIdent( nm, "xml:iso88591")) rt = (protocol::FormatOutput*) new filter::XmlFilter<textwolf::charset::IsoLatin1>::FormatOutput( buffersize);
-	else if (equalIdent( nm, "xml:UTF8")) rt = (protocol::FormatOutput*) new filter::XmlFilter<textwolf::charset::UTF8>::FormatOutput( buffersize);
-	else if (equalIdent( nm, "xml:UTF16")) rt = (protocol::FormatOutput*) new filter::XmlFilter<textwolf::charset::UTF16BE>::FormatOutput( buffersize);
-	else if (equalIdent( nm, "xml:UTF16LE")) rt = (protocol::FormatOutput*) new filter::XmlFilter<textwolf::charset::UTF16LE>::FormatOutput( buffersize);
-	else if (equalIdent( nm, "xml:UTF16BE")) rt = (protocol::FormatOutput*) new filter::XmlFilter<textwolf::charset::UTF16BE>::FormatOutput( buffersize);
-	else if (equalIdent( nm, "xml:UCS2LE")) rt = (protocol::FormatOutput*) new filter::XmlFilter<textwolf::charset::UCS2LE>::FormatOutput( buffersize);
-	else if (equalIdent( nm, "xml:UCS2BE")) rt = (protocol::FormatOutput*) new filter::XmlFilter<textwolf::charset::UCS2BE>::FormatOutput( buffersize);
-	else if (equalIdent( nm, "xml:UCS4LE")) rt = (protocol::FormatOutput*) new filter::XmlFilter<textwolf::charset::UCS4LE>::FormatOutput( buffersize);
-	else if (equalIdent( nm, "xml:UCS4BE")) rt = (protocol::FormatOutput*) new filter::XmlFilter<textwolf::charset::UCS4BE>::FormatOutput( buffersize);
-	else if (equalIdent( nm, "xml:Header")) rt = (protocol::FormatOutput*) new filter::XmlHeaderFilter::FormatOutput( buffersize);
-#ifdef WITH_LIBXML2
-	else if (equalIdent( nm, "xml:libxml2")) rt = (protocol::FormatOutput*) new filter::XmlFilter<textwolf::charset::UTF8>::FormatOutput( buffersize);
-#endif
-	if (!rt)
-	{
-		LOG_ERROR << "unknown filter '" << name << "'";
-	}
-	return rt;
-}
-
-Output::ItemType Output::print( const char* tag, unsigned int tagsize, const char* val, unsigned int valsize, bool newline)
+Output::ItemType Output::print( const char* tag, unsigned int tagsize, const char* val, unsigned int valsize)
 {
 	if (!m_formatoutput.get())
 	{
@@ -297,7 +218,7 @@ Output::ItemType Output::print( const char* tag, unsigned int tagsize, const cha
 				switch (m_state)
 				{
 					case 0:
-						if (!m_formatoutput->print( protocol::FormatOutput::Attribute, tag, tagsize, newline)) break;
+						if (!m_formatoutput->print( protocol::FormatOutput::Attribute, tag, tagsize)) break;
 						m_state ++;
 					case 1:
 						if (!m_formatoutput->print( protocol::FormatOutput::Value, val, valsize)) break;
@@ -309,20 +230,41 @@ Output::ItemType Output::print( const char* tag, unsigned int tagsize, const cha
 				int err = m_formatoutput->getError();
 				if (err)
 				{
-					LOG_ERROR << "error in format output attribute (" << err << ")";
+					LOG_ERROR << "error in format output (" << err << ")";
 					return Error;
+				}
+				else
+				{
+					// in case of return false and no error check if there is a follow format ouptut filter to continue with:
+					protocol::FormatOutput* follow = m_formatoutput->createFollow();
+					if (follow)
+					{
+						m_formatoutput.reset( follow);
+						return print( tag, tagsize, val, valsize);
+					}
+
 				}
 				return DoYield;
 			}
 			else
 			{
-				if (!m_formatoutput->print( protocol::FormatOutput::OpenTag, tag, tagsize, newline))
+				if (!m_formatoutput->print( protocol::FormatOutput::OpenTag, tag, tagsize))
 				{
 					int err = m_formatoutput->getError();
 					if (err)
 					{
 						LOG_ERROR << "error in format output open tag (" << err << ")";
 						return Error;
+					}
+					else
+					{
+						// in case of return false and no error check if there is a follow format ouptut filter to continue with:
+						protocol::FormatOutput* follow = m_formatoutput->createFollow();
+						if (follow)
+						{
+							m_formatoutput.reset( follow);
+							return print( tag, tagsize, val, valsize);
+						}
 					}
 					return DoYield;
 				}
@@ -331,7 +273,7 @@ Output::ItemType Output::print( const char* tag, unsigned int tagsize, const cha
 		}
 		else if (val)
 		{
-			if (!m_formatoutput->print( protocol::FormatOutput::Value, val, valsize, newline))
+			if (!m_formatoutput->print( protocol::FormatOutput::Value, val, valsize))
 			{
 				int err = m_formatoutput->getError();
 				if (err)
@@ -339,19 +281,39 @@ Output::ItemType Output::print( const char* tag, unsigned int tagsize, const cha
 					LOG_ERROR << "error in format output value (" << err << ")";
 					return Error;
 				}
+				else
+				{
+					// in case of return false and no error check if there is a follow format ouptut filter to continue with:
+					protocol::FormatOutput* follow = m_formatoutput->createFollow();
+					if (follow)
+					{
+						m_formatoutput.reset( follow);
+						return print( tag, tagsize, val, valsize);
+					}
+				}
 				return DoYield;
 			}
 			return Data;
 		}
 		else
 		{
-			if (!m_formatoutput->print( protocol::FormatOutput::CloseTag, 0, 0, newline))
+			if (!m_formatoutput->print( protocol::FormatOutput::CloseTag, 0, 0))
 			{
 				int err = m_formatoutput->getError();
 				if (err)
 				{
 					LOG_ERROR << "error in format output close tag (" << err << ")";
 					return Error;
+				}
+				else
+				{
+					// in case of return false and no error check if there is a follow format ouptut filter to continue with:
+					protocol::FormatOutput* follow = m_formatoutput->createFollow();
+					if (follow)
+					{
+						m_formatoutput.reset( follow);
+						return print( tag, tagsize, val, valsize);
+					}
 				}
 				return DoYield;
 			}

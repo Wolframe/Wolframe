@@ -29,29 +29,42 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file libxml2_filter.hpp
-///\brief Filter using the libxml2 library for input and output
+///\file textwolf_filter.hpp
+///\brief Filter reading/writing xml with the textwolf xml library
 
-#ifndef _Wolframe_LIBXML2_FILTER_HPP_INCLUDED
-#define _Wolframe_LIBXML2_FILTER_HPP_INCLUDED
+#ifndef _Wolframe_TEXTWOLF_FILTER_XML_HPP_INCLUDED
+#define _Wolframe_TEXTWOLF_FILTER_XML_HPP_INCLUDED
 #include "protocol/inputfilter.hpp"
 #include "protocol/formatoutput.hpp"
+#include <string>
+#include <cstddef>
 
 namespace _Wolframe {
 namespace filter {
 
-class Libxml2Filter
+///\class TextwolfXmlFilter
+class TextwolfXmlFilter
 {
 public:
-	Libxml2Filter( std::size_t bufsize);
+	TextwolfXmlFilter( std::size_t elementbufsize, std::size_t tagbufsize);
+
+	///\remark creates only a format output of the filter, because input should be determined always by the XML header
+	TextwolfXmlFilter( std::size_t elementbufsize, std::size_t tagbufsize, const char* encoding);
 
 	protocol::InputFilterR inputFilter() const	{return m_inputFilter;}
 	protocol::FormatOutputR formatOutput() const	{return m_formatOutput;}
+
 private:
 	protocol::InputFilterR m_inputFilter;
 	protocol::FormatOutputR m_formatOutput;
 };
 
+
 }}//namespace
 #endif
+
+
+
+
+
 

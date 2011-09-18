@@ -53,11 +53,8 @@ public:
 	struct State;
 
 	///\brief Constructor
-	///\param[in] system system call interface
 	///\param[in] config read only reference to the configuration of this application processor
-	///\param[in] input input of this application processor instance
-	///\param[in] output output of this application processor instance
-	AppProcessor( const app::System& system, const lua::Configuration* config);
+	AppProcessor( const lua::Configuration* config);
 	///\brief Destructor
 	~AppProcessor();
 
@@ -92,7 +89,6 @@ private:
 	const lua::Configuration* m_config;	///< reference to configuration
 	app::Input m_input;			///< input
 	app::Output m_output;			///< output
-	app::System m_system;			///< system call interface
 	State* m_state;				///< application procesor instance state
 };
 

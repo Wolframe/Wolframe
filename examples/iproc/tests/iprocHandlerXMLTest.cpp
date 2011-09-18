@@ -75,31 +75,31 @@ static const TestDescription testDescriptions[] =
 		"test_echo_xml_libxml2",
 		"test_UTF8.xml", 48
 	},
-	{
-		"echo_xml_IsoLatin1_to_utf16",
-		"test_echo_xml_utf16",
-		"test_IsoLatin1.xml", 64
-	},
-	{
-		"echo_xml_utf16_to_utf8",
-		"test_echo_xml_utf8",
-		"test_UTF16.xml", 64
-	},
-	{
-		"echo_xml_IsoLatin1_to_utf8",
-		"test_echo_xml_utf8",
-		"test_IsoLatin1.xml", 32
-	},
-	{
-		"echo_xml_IsoLatin1",
-		"test_echo_xml",
-		"test_IsoLatin1.xml", 32
-	},
-	{
-		"echo_char_IsoLatin1",
-		"test_echo_char",
-		"test_IsoLatin1.xml", 1
-	},
+//[-]	{
+//[-]		"echo_xml_IsoLatin1_to_utf16",
+//[-]		"test_echo_xml_utf16",
+//[-]		"test_IsoLatin1.xml", 64
+//[-]	},
+//[-]	{
+//[-]		"echo_xml_utf16_to_utf8",
+//[-]		"test_echo_xml_utf8",
+//[-]		"test_UTF16.xml", 64
+//[-]	},
+//[-]	{
+//[-]		"echo_xml_IsoLatin1_to_utf8",
+//[-]		"test_echo_xml_utf8",
+//[-]		"test_IsoLatin1.xml", 32
+//[-]	},
+//[-]	{
+//[-]		"echo_xml_IsoLatin1",
+//[-]		"test_echo_xml",
+//[-]		"test_IsoLatin1.xml", 32
+//[-]	},
+//[-]	{
+//[-]		"echo_char_IsoLatin1",
+//[-]		"test_echo_char",
+//[-]		"test_IsoLatin1.xml", 1
+//[-]	},
 	{0,0,0,0}
 };
 

@@ -35,6 +35,7 @@
 ///
 
 #include "iprocHandler.hpp"
+#include "filters/char_filter.hpp"
 #include "logger.hpp"
 
 using namespace _Wolframe;
@@ -247,8 +248,9 @@ const net::NetworkOperation Connection::nextOperation()
 						}
 						if (m_functionHasIO)
 						{
-							m_inputfilter.reset( m_system.createDefaultInputFilter());
-							m_formatoutput.reset( m_system.createDefaultFormatOutput());
+							filter::CharFilter flt( "UTF-8");
+							m_inputfilter = flt.inputFilter();
+							m_formatoutput = flt.formatOutput();
 							passInput();
 							m_formatoutput->init( m_output.ptr(), m_output.size());
 							m_processor.setIO( m_inputfilter, m_formatoutput);
@@ -384,7 +386,7 @@ Connection::Connection( const net::LocalEndpoint& local, const lua::Configuratio
 	,m_argBuffer(&m_buffer)
 	,m_input(config->input_bufsize())
 	,m_output(config->output_bufsize())
-	,m_processor(m_system, config)
+	,m_processor(config)
 	,m_functionName(0)
 	,m_functionHasIO(false)
 {

@@ -51,6 +51,10 @@ OBJS = \
 	appConfigDefinition.obj \
 	iprocHandler.obj \
 	langbind\appObjects.obj \
+	filters\textwolf_filter.obj \
+	filters\textwolf_filterBase.obj \
+	filters\char_filter.obj \
+	filters\line_filter.obj \
 	$(TOPDIR)\src\winMain.obj
 
 !IFDEF WITH_LUA
