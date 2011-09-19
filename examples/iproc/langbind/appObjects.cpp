@@ -103,7 +103,17 @@ InputFilterClosure::ItemType InputFilterClosure::fetch( const char*& tag, unsign
 	}
 	if (!m_inputfilter->getNext( &m_type, m_buf, m_bufsize-1, &m_bufpos))
 	{
-		return fetchFailureResult( *m_inputfilter); 
+		if (m_inputfilter->state() == protocol::InputFilter::Open)
+		{
+			// at end of data check if there is a follow filter (transformed filter) to continue with:
+			protocol::InputFilter* follow = m_inputfilter->createFollow();
+			if (follow)
+			{
+				m_inputfilter.reset( follow);
+				return fetch( tag, tagsize, val, valsize);
+			}
+		}
+		return fetchFailureResult( *m_inputfilter);
 	}
 	else
 	{
@@ -233,7 +243,7 @@ Output::ItemType Output::print( const char* tag, unsigned int tagsize, const cha
 					LOG_ERROR << "error in format output (" << err << ")";
 					return Error;
 				}
-				else
+				else if (m_formatoutput->state() != protocol::FormatOutput::EndOfBuffer)
 				{
 					// in case of return false and no error check if there is a follow format ouptut filter to continue with:
 					protocol::FormatOutput* follow = m_formatoutput->createFollow();
@@ -256,7 +266,7 @@ Output::ItemType Output::print( const char* tag, unsigned int tagsize, const cha
 						LOG_ERROR << "error in format output open tag (" << err << ")";
 						return Error;
 					}
-					else
+					else  if (m_formatoutput->state() != protocol::FormatOutput::EndOfBuffer)
 					{
 						// in case of return false and no error check if there is a follow format ouptut filter to continue with:
 						protocol::FormatOutput* follow = m_formatoutput->createFollow();
@@ -281,7 +291,7 @@ Output::ItemType Output::print( const char* tag, unsigned int tagsize, const cha
 					LOG_ERROR << "error in format output value (" << err << ")";
 					return Error;
 				}
-				else
+				else if (m_formatoutput->state() != protocol::FormatOutput::EndOfBuffer)
 				{
 					// in case of return false and no error check if there is a follow format ouptut filter to continue with:
 					protocol::FormatOutput* follow = m_formatoutput->createFollow();
@@ -305,7 +315,7 @@ Output::ItemType Output::print( const char* tag, unsigned int tagsize, const cha
 					LOG_ERROR << "error in format output close tag (" << err << ")";
 					return Error;
 				}
-				else
+				else if (m_formatoutput->state() != protocol::FormatOutput::EndOfBuffer)
 				{
 					// in case of return false and no error check if there is a follow format ouptut filter to continue with:
 					protocol::FormatOutput* follow = m_formatoutput->createFollow();

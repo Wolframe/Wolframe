@@ -316,9 +316,9 @@ private:
 	///\param [in,out] buf buffer to print to
 	static void printToBufferContent( const char* src, std::size_t srcsize, protocol::EscapingBuffer<textwolf::StaticBuffer>& buf)
 	{
-		enum {nof_echr = 10};
-		static const char* estr[nof_echr] = {"&lt;", "&gt;", "&amp;", "&#0;", "&#8;", "&#9;", "&#10;", "&#13;", "&nbsp;"};
-		static const char echr[nof_echr+1] = "<>&\0\b\t\n\r ";
+		enum {nof_echr = 6};
+		static const char* estr[nof_echr] = {"&lt;", "&gt;", "&amp;", "&#0;", "&#8;", "\r\n"};
+		static const char echr[nof_echr+1] = "<>&\0\b\n";
 		printToBufferSubstChr( src, srcsize, buf, nof_echr, echr, estr);
 	}
 
@@ -447,7 +447,6 @@ struct InputFilterImpl :public protocol::InputFilter, public FilterBase<IOCharse
 	{
 		m_src.setInput( this);
 		m_scanner = new XMLScanner( m_src, m_outputbuf);
-		m_scanner->doTokenize(true);
 		m_itr = m_scanner->begin(false);
 		m_end = m_scanner->end();
 	}
@@ -518,7 +517,6 @@ struct InputFilterImpl :public protocol::InputFilter, public FilterBase<IOCharse
 				return false;
 			}
 			*bufferpos += buf.size();
-
 			int st = tmap[ m_itr->type()];
 			if (st == -1)
 			{
@@ -589,9 +587,9 @@ public:
 			{
 				TextwolfEncoding::Id enc;
 
-				m_header.append( cc, pp-cc);
+				m_header.append( cc, pp-cc+1);
 				m_headerParsed = true;
-				skip( pp-cc);
+				skip( pp-cc+1);
 
 				if (getEncoding( m_header, enc))
 				{
@@ -599,21 +597,23 @@ public:
 					if (enc == TextwolfEncoding::Unknown)
 					{
 						setState( Error, ErrEncoding);
-						return false;
+					}
+					else
+					{
+						setState( Open);
 					}
 				}
 				else
 				{
 					setState( Error, ErrXML);
-					return false;
 				}
 			}
 			else
 			{
 				m_header.append( cc, nn);
 				skip( nn);
+				setState( EndOfMessage);
 			}
-			setState( Open);
 			return false;
 		}
 	}
