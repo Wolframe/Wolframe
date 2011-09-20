@@ -35,7 +35,7 @@
 //
 
 #include "AAAA/audit.hpp"
-#include "database/databaseReference.hpp"
+#include "config/reference.hpp"
 #include "moduleInterface.hpp"
 
 #ifndef _DB_AUDIT_HPP_INCLUDED
@@ -69,7 +69,7 @@ public:
 
 	void setCanonicalPathes( const std::string& refPath )	{ m_dbConfig.setCanonicalPathes( refPath ); }
 private:
-	db::ReferenceConfig	m_dbConfig;
+	config::ReferenceConfig	m_dbConfig;
 };
 
 

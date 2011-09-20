@@ -31,31 +31,34 @@
 
 ************************************************************************/
 //
-// database reference configuration
+// reference.hpp
 //
 
-#include "database/databaseReference.hpp"
-#include "config/valueParser.hpp"
-#include "config/configurationParser.hpp"
+#ifndef _REFERENCE_CONFIG_HPP_INCLUDED
+#define _REFERENCE_CONFIG_HPP_INCLUDED
+
+#include "config/configurationBase.hpp"
 
 namespace _Wolframe {
 namespace config {
 
-/// Specialization of the ConfigurationParser::parse for the reference configuration
-template<>
-bool ConfigurationParser::parse( db::ReferenceConfig& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& node )
+/// reference (label) class
+/// note that this is a configuration class only
+class ReferenceConfig : public ConfigurationBase
 {
-	bool labelDefined = ( ! cfg.m_ref.empty() );
-	if ( !config::Parser::getValue( cfg.logPrefix().c_str(), node.c_str(),
-					pt.get_value<std::string>(), cfg.m_ref, &labelDefined ))
-		return false;
-	if ( cfg.m_ref.empty() )	{
-		LOG_ERROR << cfg.logPrefix() << "Database reference label is empty";
-		return false;
-	}
-	return true;
-}
+	friend class ConfigurationParser;
+public:
+	ReferenceConfig( const char* name, const char* logParent, const char* logName )
+		: ConfigurationBase( name, logParent, logName )	{}
+
+	bool check() const;
+	void print( std::ostream& os, size_t indent ) const;
+
+	const std::string& label() const		{ return m_ref; }
+private:
+	std::string	m_ref;
+};
 
 }} // namespace _Wolframe::config
 
+#endif // _REFERENCE_CONFIG_HPP_INCLUDED

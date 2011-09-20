@@ -124,6 +124,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	serviceConfig.obj \
 	serviceBanner.obj \
 	config_descriptionBase.obj \
+	referenceConfig.obj \
 	database\databaseConfig.obj \
 	appConfig.obj \
 	protocol_ioblocks.obj \
@@ -152,8 +153,6 @@ OBJS = \
 	appConfigDefinition.obj \
 	wolframeHandler.obj \
 	database\DBprovider.obj \
-	database\DBreference.obj \
-	database\DBreferenceConfig.obj \
 	winMain.obj
 # Aba: link trouble in dbTest!
 # also suggesting with_sqlite flags and DB_OBJS..

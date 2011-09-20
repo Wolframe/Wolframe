@@ -44,10 +44,8 @@ namespace AAAA {
 
 DBauthContainer::DBauthContainer( const DatabaseAuthConfig& conf )
 {
-	assert ( boost::algorithm::iequals( conf.m_dbConfig.typeName(), "DB reference" ));
-
 	m_db = NULL;
-	m_dbLabel = conf.m_dbConfig.dbName();
+	m_dbLabel = conf.m_dbConfig.label();
 	if ( m_dbLabel.empty() )
 		throw std::logic_error( "Empty database reference in DBauthContainer" );
 

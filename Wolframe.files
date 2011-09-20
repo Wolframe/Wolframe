@@ -77,6 +77,11 @@ clients/qt/HistoryLineEdit.hpp
 clients/qt/MainWindow.cpp
 clients/qt/MainWindow.hpp
 clients/qt/Makefile.W32
+clients/qt/moc_AbstractFormLoader.cpp
+clients/qt/moc_DebugTerminal.cpp
+clients/qt/moc_HistoryLineEdit.cpp
+clients/qt/moc_MainWindow.cpp
+clients/qt/moc_WolframeClient.cpp
 clients/qt/qtclient.cpp
 clients/qt/README
 clients/qt/TODOS
@@ -131,13 +136,18 @@ examples/GNUmakefile
 examples/iproc/appConfigDefinition.cpp
 examples/iproc/appProperties.cpp
 examples/iproc/filters/bufferingFilterBase.hpp
+examples/iproc/filters/char_filter.cpp
 examples/iproc/filters/char_filter.hpp
-examples/iproc/filters/filterBase.hpp
 examples/iproc/filters.hpp
+examples/iproc/filters/libxml2_filter.cpp
 examples/iproc/filters/libxml2_filter.hpp
+examples/iproc/filters/line_filter.cpp
 examples/iproc/filters/line_filter.hpp
+examples/iproc/filters/textwolf_filterBase.cpp
+examples/iproc/filters/textwolf_filterBase.hpp
+examples/iproc/filters/textwolf_filter.cpp
+examples/iproc/filters/textwolf_filter.hpp
 examples/iproc/filters/textwolf.hpp
-examples/iproc/filters/xml_filter.hpp
 examples/iproc/GNUmakefile
 examples/iproc/handlerConfig.hpp
 examples/iproc/iproc.conf
@@ -228,6 +238,7 @@ include/config/configurationBase.hpp
 include/config/configurationParser.hpp
 include/config/descriptionBase.hpp
 include/config/description.hpp
+include/config/reference.hpp
 include/config/structParser.hpp
 include/config/structPointer.hpp
 include/config/structPrinter.hpp
@@ -239,7 +250,6 @@ include/container.hpp
 include/countedReference.hpp
 include/database/database.hpp
 include/database/databaseOperation.hpp
-include/database/databaseReference.hpp
 include/database/DBprovider.hpp
 include/ErrorCode.hpp
 include/GNUmakefile
@@ -389,8 +399,6 @@ src/connection.hpp
 src/database/databaseConfig.cpp
 src/database/DBprovider.cpp
 src/database/DBproviderImpl.hpp
-src/database/DBreferenceConfig.cpp
-src/database/DBreference.cpp
 src/database/PostgreSQLconfig.cpp
 src/database/PostgreSQL.cpp
 src/database/PostgreSQL.hpp
@@ -429,6 +437,7 @@ src/processor/echoProcessor.hpp
 src/processor/procProvider.cpp
 src/processor/procProviderImpl.hpp
 src/protocol_ioblocks.cpp
+src/referenceConfig.cpp
 src/resolvePath.cpp
 src/serverConfig.cpp
 src/server.cpp

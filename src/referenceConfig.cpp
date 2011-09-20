@@ -31,26 +31,45 @@
 
 ************************************************************************/
 //
-// database reference configuration functions
+// reference configuration
 //
 
-#include "database/databaseReference.hpp"
-#include "logger.hpp"
+#include "config/valueParser.hpp"
+#include "config/configurationParser.hpp"
+#include "config/reference.hpp"
 
+#include "logger.hpp"
 #include <ostream>
 
 namespace _Wolframe {
-namespace db {
+namespace config {
 
-//***  Database reference functions  **************************************
-bool ReferenceConfig::check() const
+/// Specialization of the ConfigurationParser::parse for the reference configuration
+template<>
+bool ConfigurationParser::parse( ReferenceConfig& cfg,
+				 const boost::property_tree::ptree& pt, const std::string& node )
 {
-	if ( m_ref.empty() )	{
-		LOG_ERROR << "Database reference label is empty";
+	bool labelDefined = ( ! cfg.m_ref.empty() );
+	if ( !config::Parser::getValue( cfg.logPrefix().c_str(), node.c_str(),
+					pt.get_value<std::string>(), cfg.m_ref, &labelDefined ))
+		return false;
+	if ( cfg.m_ref.empty() )	{
+		LOG_ERROR << cfg.logPrefix() << "Reference is empty";
 		return false;
 	}
 	return true;
 }
+
+
+bool ReferenceConfig::check() const
+{
+	if ( m_ref.empty() )	{
+		LOG_ERROR << "Reference is empty";
+		return false;
+	}
+	return true;
+}
+
 
 void ReferenceConfig::print( std::ostream& os, size_t indent ) const
 {
@@ -58,4 +77,5 @@ void ReferenceConfig::print( std::ostream& os, size_t indent ) const
 	os << indStr << sectionName() << ": " << (m_ref.empty() ? "Undefined!" : m_ref) << std::endl;
 }
 
-}} // namespace _Wolframe::db
+}} // namespace _Wolframe::config
+

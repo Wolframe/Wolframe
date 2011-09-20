@@ -181,6 +181,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	database/databaseConfig.o \
 	appConfig.o \
 	config_descriptionBase.o \
+	referenceConfig.o \
 	protocol_ioblocks.o \
 	acceptor.o \
 	getPassword.o \
@@ -206,8 +207,6 @@ OBJS = \
 	appConfigDefinition.o \
 	wolframeHandler.o \
 	database/DBprovider.o \
-	database/DBreference.o \
-	database/DBreferenceConfig.o \
 	posixMain.o
 # Aba: link trouble in dbTest!
 # also suggesting with_sqlite flags and DB_OBJS..

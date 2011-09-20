@@ -37,8 +37,8 @@
 #ifndef _DB_AUTHENTICATION_HPP_INCLUDED
 #define _DB_AUTHENTICATION_HPP_INCLUDED
 
-#include "database/databaseReference.hpp"
 #include "AAAA/authentication.hpp"
+#include "config/reference.hpp"
 #include "moduleInterface.hpp"
 
 namespace _Wolframe {
@@ -70,7 +70,7 @@ public:
 
 	void setCanonicalPathes( const std::string& refPath )	{ m_dbConfig.setCanonicalPathes( refPath ); }
 private:
-	db::ReferenceConfig	m_dbConfig;
+	config::ReferenceConfig	m_dbConfig;
 };
 
 
