@@ -43,6 +43,19 @@
 namespace _Wolframe {
 namespace AAAA {
 
+class AuditMsg_Connect
+{
+};
+
+class AuditMsg_Login
+{
+};
+
+class AuditMsg_Transaction
+{
+};
+
+
 // virtual base for all audit methods
 class Auditor {
 public:
@@ -50,6 +63,10 @@ public:
 
 	// close the auditor
 	virtual void close( ) {}
+
+//	virtual bool log( AuditMsg_Connect & msg ) = 0;
+//	virtual bool log( AuditMsg_Login& msg ) = 0;
+//	virtual bool log( AuditMsg_Transaction& msg ) = 0;
 };
 
 
@@ -60,7 +77,12 @@ class AuditUnit
 public:
 	virtual ~AuditUnit()					{}
 
-	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ ) const	{ return true; }
+	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ ) const
+								{ return true; }
+
+//	virtual bool log( AuditMsg_Connect & msg ) = 0;
+//	virtual bool log( AuditMsg_Login& msg ) = 0;
+//	virtual bool log( AuditMsg_Transaction& msg ) = 0;
 };
 
 }} // namespace _Wolframe::AAAA
