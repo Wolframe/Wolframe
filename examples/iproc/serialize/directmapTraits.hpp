@@ -44,7 +44,6 @@ Project Wolframe.
 
 namespace _Wolframe {
 namespace serialize {
-namespace dm {
 
 struct struct_ {};				///< category tag for a structure with named elements
 struct vector_ :public nonstruct_{};		///< category tag for a std::vector of any type
@@ -110,5 +109,5 @@ typename boost::enable_if_c<
 	boost::is_same<bool,T>::value
 	,bool_>::type getCategory( const T&) { return bool_();}
 
-}}}// end namespace
+}}// end namespace
 #endif
