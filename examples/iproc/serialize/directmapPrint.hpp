@@ -127,7 +127,6 @@ void print_( const char* tag, void* obj, vector_&, protocol::FormatOutput& out, 
 
 namespace _Wolframe {
 namespace serialize {
-namespace dm {
 
 template <typename T>
 static void print( const char* tag, T* obj, protocol::FormatOutput& out, std::string& buf)
@@ -137,6 +136,6 @@ static void print( const char* tag, T* obj, protocol::FormatOutput& out, std::st
 	out.release();
 }
 
-}}}//namespace
+}}//namespace
 #endif
 
