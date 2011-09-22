@@ -41,8 +41,7 @@ Project Wolframe.
 
 namespace _Wolframe {
 namespace serialize {
-namespace dm {
 
-}}}//namespace
+}}//namespace
 #endif
 
