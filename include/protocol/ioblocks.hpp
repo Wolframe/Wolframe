@@ -73,7 +73,7 @@ public:
 
 	///\brief Set the current cursor byte position
 	///\param [in] p_pos new cursor position in bytes from the memory block start
-	void setPos( std::size_t p_pos=0)				{m_pos = p_pos;}
+	void setPos( std::size_t p_pos=0)			{m_pos = p_pos;}
 
 	///\brief Set the buffer to be used by this class (as non allocated by this class)
 	///\param [in] p_ptr new buffer to use
