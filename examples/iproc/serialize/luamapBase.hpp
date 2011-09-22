@@ -42,16 +42,6 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-class ProcessingContext
-{
-public:
-  const char* getLastError() const {return m_lasterror;}
-private:
-friend class DescriptionBase;
-	char m_lasterror[ 256];
-	std::string m_content;
-};
-
 class DescriptionBase
 {
 public:
