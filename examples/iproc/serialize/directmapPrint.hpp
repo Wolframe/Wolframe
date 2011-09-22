@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/directmapParse.hpp
+///\file serialize/directmapPrint.hpp
 ///\brief Defines the intrusive implementation of the printing part of serialization for the direct map
 
 #ifndef _Wolframe_DIRECTMAP_PRINT_HPP_INCLUDED
