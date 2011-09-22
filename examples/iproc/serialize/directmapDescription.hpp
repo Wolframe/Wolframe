@@ -68,7 +68,7 @@ struct Description :public DescriptionBase
     DescriptionBase::IsAtomic isAtomic_ = &_Wolframe::serialize::Description<Element>::isAtomic;
 
     std::size_t pp = (std::size_t)&(((Structure*)0)->*eptr);
-    Item e( pp, std::string(name), type, parse_, print_, matches_, find_);
+    Item e( pp, std::string(name), type, parse_, print_, isAtomic_);
     m_ar.push_back( e);
     return *this;
   }
