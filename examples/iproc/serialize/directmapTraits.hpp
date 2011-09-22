@@ -45,10 +45,10 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-struct struct_ {};				///< category tag for a structure with named elements
-struct vector_ :public nonstruct_{};		///< category tag for a std::vector of any type
-struct arithmetic_ :public atom_ {};		///< category tag for a type that is convertible from a string through boost::lexical_cast
-struct bool_ :public atom_ {};			///< category tag for a boolean type
+struct struct_ {};		///< category tag for a structure with named elements
+struct vector_ {};		///< category tag for a std::vector of any type
+struct arithmetic_ {};		///< category tag for a type that is convertible from a string through boost::lexical_cast
+struct bool_ {};		///< category tag for a boolean type
 
 ///\brief conditional template for detecting if a type is a class with a static/member method getDescription() returning a const pointer to a structure description as defined in config/descriptionBase.hpp
 /// see http://drdobbs.com/article/print?articleId=227500449&siteSectionName= "Checking Concept Without Concepts in C++"
