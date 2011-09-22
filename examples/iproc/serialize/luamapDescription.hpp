@@ -37,11 +37,43 @@ Project Wolframe.
 #include "serialize/luamapTraits.hpp"
 #include "serialize/luamapParse.hpp"
 #include "serialize/luamapPrint.hpp"
+#include <typeinfo>
+#include <exception>
 
 namespace _Wolframe {
 namespace serialize {
 
-}}//namespace
+///\brief Intrusive configuration description
+///\tparam Structure structure that is represented by this description
+template <class Structure>
+struct Description :public DescriptionBase
+{
+  ///\brief Operator to build the configuration structure element by element
+  ///\tparam Element element type
+  ///\param[in] name name of the element
+  ///\param[in] eptr pointer to member of the element
+  template <typename Element>
+  Description& operator()( const char* name, Element Structure::*eptr)
+  {
+    const char* type = 0;
+    try
+    {
+      type = typeid(Element).name();
+    }
+    catch (std::bad_typeid)
+    {}
+    DescriptionBase::Parse parse_ = &_Wolframe::serialize::Description<Element>::parse;
+    DescriptionBase::Print print_ = _Wolframe::serialize::Description<Element>::print;
+
+    std::size_t pp = (std::size_t)&(((Structure*)0)->*eptr);
+    Item e( pp, std::string(name), type, parse_, print_);
+    m_ar.push_back( e);
+    return *this;
+  }
+  Description(){}
+};
+
+}}// end namespace
 #endif
 
 
