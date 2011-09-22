@@ -29,3 +29,48 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
+///\file serialize/luamapBase.hpp
+///\brief Defines the non intrusive base class of serialization for the lua map
+
+#ifndef _Wolframe_LUAMAP_BASE_HPP_INCLUDED
+#define _Wolframe_LUAMAP_BASE_HPP_INCLUDED
+#include "protocol/inputfilter.hpp"
+#include "protocol/formatoutput.hpp"
+#include <cstddef>
+#include <map>
+
+namespace _Wolframe {
+namespace serialize {
+
+class ProcessingContext
+{
+public:
+  const char* getLastError() const {return m_lasterror;}
+private:
+friend class DescriptionBase;
+	char m_lasterror[ 256];
+	std::string m_content;
+};
+
+class DescriptionBase
+{
+public:
+	typedef void (*Parse)( const char* tag, void* obj, lua_State* ls);
+	typedef void (*Print)( const char* tag, void* obj, lua_State* ls);
+	
+	DescriptionBase( std::size_t ofs, IsAtomic ia, Parse pa, Print pr)
+		:m_ofs(ofs),m_parse(pa),m_print(pr){}
+	DescriptionBase( const DescriptionBase& o)
+		:m_ofs(o.m_ofs),m_elem(o.m_elem),m_parse(o.m_parse),m_print(o.m_print){}
+
+	bool parse( void* obj, lua_State* ls) const;
+	bool print( void* obj, lua_State* ls) const;
+public:
+	std::size_t m_ofs;
+	std::map<std::string,DescriptionBase> m_elem;
+	Parse m_parse;
+	Print m_print;
+};
+
+}}//namespace
+#endif
