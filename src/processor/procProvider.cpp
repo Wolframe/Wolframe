@@ -138,10 +138,10 @@ void ProcProviderConfig::print( std::ostream& os, size_t /* indent */ ) const
 bool ProcProviderConfig::check() const
 {
 	bool correct = true;
-//	if ( m_dbLabel.empty() )	{
-//		LOG_ERROR << logPrefix() << "referenced database ID cannot be empty";
-//		correct = false;
-//	}
+	if ( m_dbLabel.empty() )	{
+		LOG_ERROR << logPrefix() << "referenced database ID cannot be empty";
+		correct = false;
+	}
 	for ( std::list< config::TypedConfiguration* >::const_iterator it = m_procConfig.begin();
 								it != m_procConfig.end(); it++ )	{
 		if ( !(*it)->check() )
