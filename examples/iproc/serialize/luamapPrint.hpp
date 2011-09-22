@@ -41,38 +41,6 @@ Project Wolframe.
 
 namespace {
 
-struct luanumeric_{};
-struct luabool_{};
-struct luastring_{};
-struct luastruct_{};
-
-///\brief get category luanumeric_ for a type
-/// returns luanumeric_ if T fulfills the is_arithmetic condition or is a string
-template <typename T>
-typename boost::enable_if_c<
-(boost::is_arithmetic<T>::value && !boost::is_same<bool,T>::value)
-,luanumeric_>::type getLuaCategory( const T&) { return luanumeric_();}
-
-///\brief get category luabool_ for a type
-/// returns luabool_ if T is a bool
-template <typename T>
-typename boost::enable_if_c<
-boost::is_same<bool,T>::value
-,luabool_>::type getLuaCategory( const T&) { return luabool_();}
-
-///\brief get category luastring_ for a type
-/// returns luastring_ if T is a bool
-template <typename T>
-typename boost::enable_if_c<
-boost::is_same<std::string,T>::value
-,luastring_>::type getLuaCategory( const T&) { return luastring_();}
-
-template <typename T>
-typename boost::enable_if_c<
-(!boost::is_arithmetic<T>::value && !boost::is_same<bool,T>::value && !boost::is_same<std::string,T>::value)
-,luastruct_>::type getLuaCategory( const T&) { return luastruct_();}
-
-
 struct Context
 {
   char errormessage[256];
