@@ -33,7 +33,12 @@ Project Wolframe.
 ///\brief Defines the intrusive implementation of the parsing part of serialization for the direct map
 #ifndef _Wolframe_DIRECTMAP_PARSE_HPP_INCLUDED
 #define _Wolframe_DIRECTMAP_PARSE_HPP_INCLUDED
+#include "protocol/inputfilter.hpp"
 #include <stdexcept>
+#include <string>
+#include <cstdef>
+#include <cstring>
+#include <boost/algorithm/string/predicate.hpp>
 
 ///the intrusive part of the definitions is put into an anonymous namespace:
 namespace {
@@ -236,8 +241,7 @@ void parse_( const char* tag, void* obj, bool_&, protocol::InputFilter& flt)
 }//anonymous namespace
 
 namespace _Wolframe {
-namespace parse {
-namespace dm {
+namespace serialize {
 
 template <typename T>
 static void parse( const char* tag, T* obj, protocol::InputFilter& flt)
@@ -256,6 +260,6 @@ static void parse( const char* tag, T* obj, protocol::InputFilter& flt)
 	}
 }
 
-}}}//namespace
+}}//namespace
 #endif
 
