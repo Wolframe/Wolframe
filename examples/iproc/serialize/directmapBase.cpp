@@ -1,4 +1,4 @@
-ProcessingContext/************************************************************************
+/************************************************************************
 Copyright (C) 2011 Project Wolframe.
 All rights reserved.
 
@@ -36,7 +36,6 @@ Project Wolframe.
 
 using namespace _Wolframe;
 using namespace serialize;
-using namespace dm;
 
 bool DescriptionBase::parse( void* obj, protocol::InputFilter& in, ProcessingContext& ctx)
 {
