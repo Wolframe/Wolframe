@@ -29,3 +29,19 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
+///\file serialize/directmapDescription.hpp
+///\brief Defines the bricks for the SDK to describe the lua table serializatiom in a readable way.
+#ifndef _Wolframe_SERIALIZE_LUAMAP_DESCRIPTION_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_LUAMAP_DESCRIPTION_HPP_INCLUDED
+#include "serialize/luamapBase.hpp"
+#include "serialize/luamapTraits.hpp"
+#include "serialize/luamapParse.hpp"
+#include "serialize/luamapPrint.hpp"
+
+namespace _Wolframe {
+namespace serialize {
+
+}}//namespace
+#endif
+
+
