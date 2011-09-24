@@ -72,10 +72,12 @@ OBJS = \
 	filters/textwolf_filterBase.o \
 	filters/char_filter.o \
 	filters/line_filter.o \
+	serialize/directmapBase.o \
 	$(TOPDIR)/src/posixMain.o
 
 ifeq ($(WITH_LUA),1)
 OBJS += \
+	serialize/luamapBase.o \
 	langbind/luaDebug.o \
 	langbind/luaConfig.o \
 	langbind/luaAppProcessor.o
@@ -115,7 +117,4 @@ local_test: $(TEST_BINS)
 run: $(CPP_BINS)
 	@echo "Running the Wolframe iproc example..."
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./iprocd -c iproc.conf -f
-
-
-
 

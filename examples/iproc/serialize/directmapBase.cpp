@@ -37,19 +37,22 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace serialize;
 
-bool DescriptionBase::parse( void* obj, protocol::InputFilter& in, ProcessingContext& ctx)
+bool DescriptionBase::parse( void* obj, protocol::InputFilter& in, ProcessingContext& ctx) const
 {
 	protocol::InputFilter* inp = 0;
 	try
 	{
-		ctx.m_content.append( in.charptr(), in.pos());
+		ctx.m_content.append( (char*)in.ptr(), in.size());
+		in.skip( in.size());
+
 		if (!in.gotEoD())
 		{
-			setState( protocol::InputFilter::EndOfMessage);
+			in.setState( protocol::InputFilter::EndOfMessage);
 			return false;
 		}
+		in.setState( protocol::InputFilter::Open);
 		inp = in.copy();
-		inp->protocolInput( ctx.m_content.c_str(), ctx.m_content.size(), true);
+		inp->protocolInput( (void*)ctx.m_content.c_str(), ctx.m_content.size(), true);
 		m_parse( 0, obj, *inp);
 		ctx.m_content.clear();
 		delete inp;
@@ -71,7 +74,7 @@ bool DescriptionBase::parse( void* obj, protocol::InputFilter& in, ProcessingCon
 	return true;
 }
 
-bool DescriptionBase::print( void* obj, protocol::FormatOutput& out, ProcessingContext& ctx)
+bool DescriptionBase::print( void* obj, protocol::FormatOutput& out, ProcessingContext& ctx) const
 {
 	try
 	{

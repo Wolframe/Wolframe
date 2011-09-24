@@ -32,18 +32,5 @@ Project Wolframe.
 ///\file serialize/luamapBase.cpp
 ///\brief Implements the non intrusive base class of serialization for the lua map
 #include "luamapBase.hpp"
-#include <cstring>
 
-using namespace _Wolframe;
-using namespace serialize;
-
-bool DescriptionBase::parse( void* obj, lua_State* ls)
-{
-		return m_parse( 0, obj, *inp);
-}
-
-bool DescriptionBase::print( void* obj, lua_State* ls)
-{
-		return m_print( 0, obj, ls);
-}
 
