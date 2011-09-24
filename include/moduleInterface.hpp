@@ -77,20 +77,19 @@ public:
 	}
 };
 
-template< class configBase >
 struct ModuleConfigurationDescription
 {
 	const char* typeName;
 	const char* sectionTitle;
 	const char* sectionName;
-	configBase* (*createFunc)( const char* name, const char* logParent, const char* logName );
+	config::TypedConfiguration* (*createFunc)( const char* name, const char* logParent, const char* logName );
 	bool (*parseFunc)( config::ConfigurationBase&,
 			   const boost::property_tree::ptree&, const std::string& );
 public:
 	ModuleConfigurationDescription( const char* tn, const char* st, const char* sn,
-					configBase* (*cf)( const char* name,
-							   const char* logParent,
-							   const char* logName ),
+					config::TypedConfiguration* (*cf)( const char* name,
+									   const char* logParent,
+									   const char* logName ),
 					bool (*pf)( config::ConfigurationBase& configuration,
 						    const boost::property_tree::ptree& pt,
 						    const std::string& node ) )

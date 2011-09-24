@@ -75,17 +75,17 @@ using namespace _Wolframe;
 #endif
 
 
-static module::ModuleConfigurationDescription< config::TypedConfiguration >
+static module::ModuleConfigurationDescription
 dbConfig[ noDBconfigs ] = {
 #ifdef WITH_PGSQL
-	module::ModuleConfigurationDescription< config::TypedConfiguration >( "PostgreSQL", "PostgreSQL database", "PostgreSQL",
-	&db::PostgreSQLconfig::create,
-	&config::ConfigurationParser::parseBase<db::PostgreSQLconfig> ),
+	module::ModuleConfigurationDescription( "PostgreSQL", "PostgreSQL database", "PostgreSQL",
+						&db::PostgreSQLconfig::create,
+						&config::ConfigurationParser::parseBase<db::PostgreSQLconfig> ),
 #endif
 #ifdef WITH_SQLITE3
-	module::ModuleConfigurationDescription< config::TypedConfiguration >( "SQLite", "SQLite database", "SQLite",
-	&db::SQLiteConfig::create,
-	&config::ConfigurationParser::parseBase<db::SQLiteConfig> )
+	module::ModuleConfigurationDescription( "SQLite", "SQLite database", "SQLite",
+						&db::SQLiteConfig::create,
+						&config::ConfigurationParser::parseBase<db::SQLiteConfig> )
 #endif
 };
 /****  End impersonating the module loader  **************************************************/
