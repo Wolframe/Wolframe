@@ -54,7 +54,7 @@ class PostgreSQLconfig : public module::ModuleConfiguration< PostgreSQLconfig >
 	friend class config::ConfigurationParser;
 	friend class PostgreSQLunit;
 public:
-	const char* typeName() const			{ return "PostgreSQL"; }
+	const char* objectName() const			{ return "PostgreSQL"; }
 
 	PostgreSQLconfig( const char* name, const char* logParent, const char* logName );
 	~PostgreSQLconfig()				{}

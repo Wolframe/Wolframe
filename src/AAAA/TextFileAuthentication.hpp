@@ -56,7 +56,7 @@ public:
 	TextFileAuthConfig( const char* cfgName, const char* logParent, const char* logName )
 		: module::ModuleConfiguration< TextFileAuthConfig >( cfgName, logParent, logName ) {}
 
-	virtual const char* typeName() const			{ return "TextFileAuth"; }
+	virtual const char* objectName() const			{ return "TextFileAuth"; }
 
 	/// methods
 	bool check() const;

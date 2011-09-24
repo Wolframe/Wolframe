@@ -94,7 +94,7 @@ bool ConfigurationParser::parse( AAAA::AAAAconfiguration& cfg,
 					size_t i;
 					for ( i = 0; i < noAuthConfigs; i++ )	{
 						if ( boost::algorithm::iequals( authConfig[i].typeName, L2it->first ))	{
-							config::TypedConfiguration* conf = authConfig[i].createFunc( authConfig[i].sectionTitle,
+							config::ObjectConfiguration* conf = authConfig[i].createFunc( authConfig[i].sectionTitle,
 															 cfg.logPrefix().c_str(),
 															 authConfig[i].sectionName );
 							if ( authConfig[i].parseFunc( *conf, L2it->second, L2it->first ))
@@ -118,7 +118,7 @@ bool ConfigurationParser::parse( AAAA::AAAAconfiguration& cfg,
 				size_t i;
 				for ( i = 0; i < noAuditConfigs; i++ )	{
 					if ( boost::algorithm::iequals( auditConfig[i].typeName, L2it->first ))	{
-						config::TypedConfiguration* conf = auditConfig[i].createFunc( auditConfig[i].sectionTitle,
+						config::ObjectConfiguration* conf = auditConfig[i].createFunc( auditConfig[i].sectionTitle,
 														  cfg.logPrefix().c_str(),
 														  auditConfig[i].sectionName );
 						if ( auditConfig[i].parseFunc( *conf, L2it->second, L2it->first ))

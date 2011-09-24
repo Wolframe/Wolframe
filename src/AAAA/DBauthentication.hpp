@@ -57,7 +57,7 @@ public:
 		: module::ModuleConfiguration< DatabaseAuthConfig >( cfgName, logParent, logName ),
 		  m_dbConfig( "", logParent, "Database" )	{}
 
-	virtual const char* typeName() const			{ return "DatabaseAuth"; }
+	virtual const char* objectName() const			{ return "DatabaseAuth"; }
 
 	/// methods
 	bool check() const					{ return m_dbConfig.check(); }

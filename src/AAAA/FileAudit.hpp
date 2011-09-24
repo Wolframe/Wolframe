@@ -57,7 +57,7 @@ public:
 	FileAuditConfig( const char* cfgName, const char* logParent, const char* logName )
 		: module::ModuleConfiguration< FileAuditConfig >( cfgName, logParent, logName ) {}
 
-	const char* typeName() const			{ return "FileAudit"; }
+	const char* objectName() const			{ return "FileAudit"; }
 
 	/// methods
 	bool check() const;

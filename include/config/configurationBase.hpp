@@ -106,18 +106,18 @@ private:
 };
 
 
-/// A typed configuration is a normal configuration that provides
-/// also a typeName function.
-class TypedConfiguration : public ConfigurationBase
+/// An object configuration is a normal configuration that provides
+/// also an objectName function.
+class ObjectConfiguration : public ConfigurationBase
 {
 public:
 	/// Class constructor.
-	TypedConfiguration( const char* name, const char* logParent, const char* logName )
+	ObjectConfiguration( const char* name, const char* logParent, const char* logName )
 		: ConfigurationBase( name, logParent, logName )	{}
 
-	virtual ~TypedConfiguration()			{}
+	virtual ~ObjectConfiguration()			{}
 
-	virtual const char* typeName() const = 0;
+	virtual const char* objectName() const = 0;
 };
 
 }} // namespace _Wolframe::config

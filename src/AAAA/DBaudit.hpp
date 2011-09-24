@@ -57,7 +57,7 @@ public:
 		: module::ModuleConfiguration< DBauditConfig >( cfgName, logParent, logName ),
 		  m_dbConfig( "", logParent, "" )		{}
 
-	const char* typeName() const				{ return "DatabaseAudit"; }
+	const char* objectName() const				{ return "DatabaseAudit"; }
 
 	/// methods
 	bool check() const					{ return m_dbConfig.check(); }
