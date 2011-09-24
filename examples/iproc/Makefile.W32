@@ -71,10 +71,12 @@ CPP_BINS = \
 all: $(OBJS) $(CPP_BINS)
 
 TEST_CPP_BINS = \
-	tests/iprocHandlerTest.exe
+	tests\iprocHandlerTest.exe \
+	tests\iprocHandlerXMLTest.exe
 
 iprocd.exe: iprocd.obj $(TOPDIR)\src\wolframe.lib
 tests\iprocHandlerTest.exe: tests\iprocHandlerTest.obj $(TOPDIR)\src\wolframe.lib
+tests\iprocHandlerXMLTest.exe: tests\iprocHandlerXMLTest.obj $(TOPDIR)\src\wolframe.lib
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
@@ -94,6 +96,7 @@ local_test: $(TEST_CPP_BINS)
 	@-echo copy "$(LUA_DIR)\src\lua51.dll" . >> test.bat
 !ENDIF
 	@-echo cd tests >> test.bat
+	@-echo iprocHandlerXMLTest.exe >> test.bat
 	@-echo iprocHandlerTest.exe >> test.bat
 	@-test.bat
 
