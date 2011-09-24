@@ -60,7 +60,7 @@ namespace textwolf {
 	///\typedef UChar
 	///\brief Unicode character type
 	typedef DWORD32 UChar;
-	typedef DWORD62 UChar;
+	typedef DWORD64 EChar;
 }//namespace
 #else
 #include <stdint.h>

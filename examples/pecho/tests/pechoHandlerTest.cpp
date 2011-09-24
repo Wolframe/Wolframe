@@ -249,7 +249,11 @@ TYPED_TEST( pechoHandlerFixture, ExpectedResult )
 			boost::this_thread::sleep( boost::posix_time::seconds( 5 ));
 		}
 #endif
+#ifndef _WIN32
 	EXPECT_EQ( this->expected, output);
+#else
+	EXPECT_EQ( expected, output);
+#endif
 }
 
 int main( int argc, char **argv )
