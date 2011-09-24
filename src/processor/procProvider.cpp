@@ -57,13 +57,13 @@
 using namespace _Wolframe;
 
 static const size_t noProcModules = 1;
-static module::ModuleConfigurationDescription< config::TypedConfiguration >
-procConfigs[ noProcModules ] = { module::ModuleConfigurationDescription< config::TypedConfiguration >( "echoProcessor", "Echo Processor", "echoProcessor",
+static module::ModuleConfigurationDescription
+procConfigs[ noProcModules ] = { module::ModuleConfigurationDescription( "echoProcessor", "Echo Processor", "echoProcessor",
 				 EchoProcConfig::create,
 				 &config::ConfigurationParser::parseBase< EchoProcConfig > ) };
 
-static module::ModuleContainerDescription< Container< proc::ProcessorUnit >, config::TypedConfiguration >
-procModules[ noProcModules ] = { module::ModuleContainerDescription< Container< proc::ProcessorUnit >, config::TypedConfiguration >( "EchoProcessor", &EchoProcContainer::create ) };
+static module::ModuleContainerDescription< Container< proc::ProcessorUnit >, config::ObjectConfiguration >
+procModules[ noProcModules ] = { module::ModuleContainerDescription< Container< proc::ProcessorUnit >, config::ObjectConfiguration >( "EchoProcessor", &EchoProcContainer::create ) };
 /****  End impersonating the module loader  **************************************************/
 
 namespace _Wolframe {
@@ -86,7 +86,7 @@ bool ConfigurationParser::parse( proc::ProcProviderConfig& cfg,
 			size_t i;
 			for ( i = 0; i < noProcModules; i++ )	{
 				if ( boost::algorithm::iequals( procConfigs[i].typeName, L1it->first ))	{
-					config::TypedConfiguration* conf = procConfigs[i].createFunc( procConfigs[i].sectionTitle,
+					config::ObjectConfiguration* conf = procConfigs[i].createFunc( procConfigs[i].sectionTitle,
 											      cfg.logPrefix().c_str(),
 											      procConfigs[i].sectionName );
 					if ( procConfigs[i].parseFunc( *conf, L1it->second, L1it->first ))
@@ -114,7 +114,7 @@ namespace proc {
 
 ProcProviderConfig::~ProcProviderConfig()
 {
-	for ( std::list< config::TypedConfiguration* >::const_iterator it = m_procConfig.begin();
+	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_procConfig.begin();
 								it != m_procConfig.end(); it++ )
 		delete *it;
 }
@@ -124,7 +124,7 @@ void ProcProviderConfig::print( std::ostream& os, size_t /* indent */ ) const
 	os << sectionName() << std::endl;
 	os << "   Database: " << (m_dbLabel.empty() ? "(none)" : m_dbLabel) << std::endl;
 	if ( m_procConfig.size() > 0 )	{
-		for ( std::list< config::TypedConfiguration* >::const_iterator it = m_procConfig.begin();
+		for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_procConfig.begin();
 								it != m_procConfig.end(); it++ )	{
 			(*it)->print( os, 3 );
 		}
@@ -142,7 +142,7 @@ bool ProcProviderConfig::check() const
 		LOG_ERROR << logPrefix() << "referenced database ID cannot be empty";
 		correct = false;
 	}
-	for ( std::list< config::TypedConfiguration* >::const_iterator it = m_procConfig.begin();
+	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_procConfig.begin();
 								it != m_procConfig.end(); it++ )	{
 		if ( !(*it)->check() )
 			correct = false;
@@ -152,7 +152,7 @@ bool ProcProviderConfig::check() const
 
 void ProcProviderConfig::setCanonicalPathes( const std::string& refPath )
 {
-	for ( std::list< config::TypedConfiguration* >::const_iterator it = m_procConfig.begin();
+	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_procConfig.begin();
 								it != m_procConfig.end(); it++ )	{
 		(*it)->setCanonicalPathes( refPath );
 	}
@@ -185,9 +185,9 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 	m_db = NULL;
 	if ( !conf->m_dbLabel.empty())
 		m_dbLabel = conf->m_dbLabel;
-	for ( std::list< config::TypedConfiguration* >::const_iterator it = conf->m_procConfig.begin();
+	for ( std::list< config::ObjectConfiguration* >::const_iterator it = conf->m_procConfig.begin();
 								it != conf->m_procConfig.end(); it++ )	{
-		const char* procType = (*it)->typeName();
+		const char* procType = (*it)->objectName();
 		size_t i;
 		for ( i = 0; i < noProcModules; i++ )	{
 			if ( boost::algorithm::iequals( procModules[i].name, procType ))	{

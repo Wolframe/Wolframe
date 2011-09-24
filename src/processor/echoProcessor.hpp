@@ -70,7 +70,7 @@ public:
 	EchoProcConfig( const char* cfgName, const char* logParent, const char* logName )
 		: module::ModuleConfiguration< EchoProcConfig >( cfgName, logParent, logName ) {}
 
-	const char* typeName() const			{ return "EchoProcessor"; }
+	const char* objectName() const			{ return "EchoProcessor"; }
 
 	/// methods
 	bool check() const;

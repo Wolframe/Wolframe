@@ -54,7 +54,7 @@ class SQLiteConfig : public module::ModuleConfiguration< SQLiteConfig >
 	friend class config::ConfigurationParser;
 	friend class SQLiteUnit;
 public:
-	const char* typeName() const			{ return "SQLite"; }
+	const char* objectName() const			{ return "SQLite"; }
 
 	SQLiteConfig( const char* name, const char* logParent, const char* logName );
 	~SQLiteConfig()					{}

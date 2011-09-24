@@ -54,7 +54,7 @@ enum ModuleType	{
 
 
 template< class T >
-class ModuleConfiguration : public config::TypedConfiguration
+class ModuleConfiguration : public config::ObjectConfiguration
 {
 public:
 	/// Class constructor.
@@ -66,31 +66,30 @@ public:
 	///			the logParent parameter will form the whole logging
 	///			prefix for of the section.
 	ModuleConfiguration( const char* name, const char* logParent, const char* logName )
-		: config::TypedConfiguration( name, logParent, logName )	{}
+		: config::ObjectConfiguration( name, logParent, logName )	{}
 
 	virtual ~ModuleConfiguration()			{}
 
-	virtual const char* typeName() const = 0;
+	virtual const char* objectName() const = 0;
 
-	static config::TypedConfiguration* create( const char* name, const char* logParent, const char* logName )	{
+	static config::ObjectConfiguration* create( const char* name, const char* logParent, const char* logName )	{
 		return new T( name, logParent, logName );
 	}
 };
 
-template< class configBase >
 struct ModuleConfigurationDescription
 {
 	const char* typeName;
 	const char* sectionTitle;
 	const char* sectionName;
-	configBase* (*createFunc)( const char* name, const char* logParent, const char* logName );
+	config::ObjectConfiguration* (*createFunc)( const char* name, const char* logParent, const char* logName );
 	bool (*parseFunc)( config::ConfigurationBase&,
 			   const boost::property_tree::ptree&, const std::string& );
 public:
 	ModuleConfigurationDescription( const char* tn, const char* st, const char* sn,
-					configBase* (*cf)( const char* name,
-							   const char* logParent,
-							   const char* logName ),
+					config::ObjectConfiguration* (*cf)( const char* name,
+									   const char* logParent,
+									   const char* logName ),
 					bool (*pf)( config::ConfigurationBase& configuration,
 						    const boost::property_tree::ptree& pt,
 						    const std::string& node ) )
@@ -106,7 +105,7 @@ public:
 	virtual ~ModuleContainer()			{}
 	virtual const char* typeName() const = 0;
 
-	static Container< Tbase >* create( const config::TypedConfiguration& conf )	{
+	static Container< Tbase >* create( const config::ObjectConfiguration& conf )	{
 		return new T( dynamic_cast< const Tconf& >( conf ));
 	}
 };

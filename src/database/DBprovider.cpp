@@ -48,10 +48,10 @@ using namespace _Wolframe;
 
 static const size_t noDBmodules = 2;
 
-static module::ModuleContainerDescription< Container< db::DatabaseUnit >, config::TypedConfiguration >
+static module::ModuleContainerDescription< Container< db::DatabaseUnit >, config::ObjectConfiguration >
 dbModules[ noDBmodules ] = {
-	module::ModuleContainerDescription< Container< db::DatabaseUnit >, config::TypedConfiguration >( "PostgreSQL", &db::PostgreSQLcontainer::create ),
-	module::ModuleContainerDescription< Container< db::DatabaseUnit >, config::TypedConfiguration >( "SQLite", &db::SQLiteContainer::create )
+	module::ModuleContainerDescription< Container< db::DatabaseUnit >, config::ObjectConfiguration >( "PostgreSQL", &db::PostgreSQLcontainer::create ),
+	module::ModuleContainerDescription< Container< db::DatabaseUnit >, config::ObjectConfiguration >( "SQLite", &db::SQLiteContainer::create )
 };
 /****  End impersonating the module loader  **************************************************/
 
@@ -77,9 +77,9 @@ const Database* DatabaseProvider::database( const std::string& ID ) const
 
 DatabaseProvider::DatabaseProvider_Impl::DatabaseProvider_Impl( const DBproviderConfig* conf )
 {
-	for ( std::list< config::TypedConfiguration* >::const_iterator it = conf->m_dbConfig.begin();
+	for ( std::list< config::ObjectConfiguration* >::const_iterator it = conf->m_dbConfig.begin();
 							it != conf->m_dbConfig.end(); it++ )	{
-		const char* dbType = (*it)->typeName();
+		const char* dbType = (*it)->objectName();
 		size_t i;
 		for ( i = 0; i < noDBmodules; i++ )	{
 			if ( boost::algorithm::iequals( dbModules[i].name, dbType ))	{

@@ -49,14 +49,14 @@
 using namespace _Wolframe;
 
 static const size_t noAuthModules = 2;
-static module::ModuleContainerDescription< Container< AAAA::AuthenticationUnit >, config::TypedConfiguration >
-authModules[ noAuthModules ] = { module::ModuleContainerDescription< Container< AAAA::AuthenticationUnit >, config::TypedConfiguration >( "DatabaseAuth", &AAAA::DBauthContainer::create ),
-				 module::ModuleContainerDescription< Container< AAAA::AuthenticationUnit >, config::TypedConfiguration >( "TextFileAuth", &AAAA::TxtFileAuthContainer::create ) };
+static module::ModuleContainerDescription< Container< AAAA::AuthenticationUnit >, config::ObjectConfiguration >
+authModules[ noAuthModules ] = { module::ModuleContainerDescription< Container< AAAA::AuthenticationUnit >, config::ObjectConfiguration >( "DatabaseAuth", &AAAA::DBauthContainer::create ),
+				 module::ModuleContainerDescription< Container< AAAA::AuthenticationUnit >, config::ObjectConfiguration >( "TextFileAuth", &AAAA::TxtFileAuthContainer::create ) };
 
 static const size_t noAuditModules = 2;
-static module::ModuleContainerDescription< Container< AAAA::AuditUnit >, config::TypedConfiguration >
-auditModules[ noAuditModules ] = { module::ModuleContainerDescription< Container< AAAA::AuditUnit >, config::TypedConfiguration >( "DatabaseAudit", &AAAA::DBauditContainer::create ),
-				   module::ModuleContainerDescription< Container< AAAA::AuditUnit >, config::TypedConfiguration >( "FileAudit", &AAAA::FileAuditContainer::create ) };
+static module::ModuleContainerDescription< Container< AAAA::AuditUnit >, config::ObjectConfiguration >
+auditModules[ noAuditModules ] = { module::ModuleContainerDescription< Container< AAAA::AuditUnit >, config::ObjectConfiguration >( "DatabaseAudit", &AAAA::DBauditContainer::create ),
+				   module::ModuleContainerDescription< Container< AAAA::AuditUnit >, config::ObjectConfiguration >( "FileAudit", &AAAA::FileAuditContainer::create ) };
 /****  End impersonating the module loader  ***********************************************************/
 
 namespace _Wolframe {
@@ -103,13 +103,13 @@ bool AAAAprovider::AAAAprovider_Impl::resolveDB( const db::DatabaseProvider& db 
 
 
 /***********************************************************************************/
-AuthenticationGroup::AuthenticationGroup( const std::list< config::TypedConfiguration* >& confs,
-					  module::ModuleContainerDescription< Container< AuthenticationUnit >, config::TypedConfiguration >* description,
+AuthenticationGroup::AuthenticationGroup( const std::list< config::ObjectConfiguration* >& confs,
+					  module::ModuleContainerDescription< Container< AuthenticationUnit >, config::ObjectConfiguration >* description,
 					  size_t descrSize )
 {
-	for ( std::list<config::TypedConfiguration*>::const_iterator it = confs.begin();
+	for ( std::list<config::ObjectConfiguration*>::const_iterator it = confs.begin();
 							it != confs.end(); it++ )	{
-		const char* authType = (*it)->typeName();
+		const char* authType = (*it)->objectName();
 		size_t i;
 		for ( i = 0; i < descrSize; i++ )	{
 			if ( boost::algorithm::iequals( description[i].name, authType ))	{
@@ -143,13 +143,13 @@ bool AuthenticationGroup::resolveDB( const db::DatabaseProvider& db )
 
 
 /***********************************************************************************/
-AuditGroup::AuditGroup( const std::list< config::TypedConfiguration* >& confs,
-			module::ModuleContainerDescription< Container< AAAA::AuditUnit >, config::TypedConfiguration >* description,
+AuditGroup::AuditGroup( const std::list< config::ObjectConfiguration* >& confs,
+			module::ModuleContainerDescription< Container< AAAA::AuditUnit >, config::ObjectConfiguration >* description,
 			size_t descrSize )
 {
-	for ( std::list<config::TypedConfiguration*>::const_iterator it = confs.begin();
+	for ( std::list<config::ObjectConfiguration*>::const_iterator it = confs.begin();
 							it != confs.end(); it++ )	{
-		const char* auditType = (*it)->typeName();
+		const char* auditType = (*it)->objectName();
 		size_t i;
 		for ( i = 0; i < descrSize; i++ )	{
 			if ( boost::algorithm::iequals( description[i].name, auditType ))	{
@@ -190,11 +190,11 @@ AAAAconfiguration::AAAAconfiguration()
 /// destructor
 AAAAconfiguration::~AAAAconfiguration()
 {
-	for ( std::list< config::TypedConfiguration* >::const_iterator it = m_authConfig.begin();
+	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_authConfig.begin();
 								it != m_authConfig.end(); it++ )
 		delete *it;
 
-	for ( std::list< config::TypedConfiguration* >::const_iterator it =m_auditConfig.begin();
+	for ( std::list< config::ObjectConfiguration* >::const_iterator it =m_auditConfig.begin();
 								it != m_auditConfig.end(); it++ )
 		delete *it;
 }
@@ -206,12 +206,12 @@ void AAAAconfiguration::print( std::ostream& os, size_t /* indent */ ) const
 	os << sectionName() << std::endl;
 	os << "   Authentication" << std::endl;
 	os << "      Allow anonymous login: " << (m_allowAnonymous ? "yes" : "no") << std::endl;
-	for ( std::list< config::TypedConfiguration* >::const_iterator it = m_authConfig.begin();
+	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_authConfig.begin();
 								it != m_authConfig.end(); it++ )
 		(*it)->print( os, 6 );
 
 	os << "   Audit" << std::endl;
-	for ( std::list< config::TypedConfiguration* >::const_iterator it = m_auditConfig.begin();
+	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_auditConfig.begin();
 								it != m_auditConfig.end(); it++ )
 		(*it)->print( os, 6 );
 
@@ -222,13 +222,13 @@ bool AAAAconfiguration::check() const
 {
 	bool correct = true;
 
-	for ( std::list< config::TypedConfiguration* >::const_iterator it = m_authConfig.begin();
+	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_authConfig.begin();
 								it != m_authConfig.end(); it++ )	{
 		if ( !(*it)->check() )
 			correct = false;
 	}
 
-	for ( std::list< config::TypedConfiguration* >::const_iterator it = m_auditConfig.begin();
+	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_auditConfig.begin();
 								it != m_auditConfig.end(); it++ )	{
 		if ( !(*it)->check() )
 			correct = false;
@@ -239,11 +239,11 @@ bool AAAAconfiguration::check() const
 
 void AAAAconfiguration::setCanonicalPathes( const std::string& refPath )
 {
-	for ( std::list< config::TypedConfiguration* >::const_iterator it = m_authConfig.begin();
+	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_authConfig.begin();
 								it != m_authConfig.end(); it++ )
 		(*it)->setCanonicalPathes( refPath );
 
-	for ( std::list< config::TypedConfiguration* >::const_iterator it = m_auditConfig.begin();
+	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_auditConfig.begin();
 								it != m_auditConfig.end(); it++ )
 		(*it)->setCanonicalPathes( refPath );
 }

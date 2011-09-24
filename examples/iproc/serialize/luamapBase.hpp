@@ -41,6 +41,7 @@ extern "C"
 	#include "lauxlib.h"
 }
 #include <cstddef>
+#include <string>
 #include <map>
 
 namespace _Wolframe {
@@ -49,16 +50,16 @@ namespace serialize {
 class DescriptionBase
 {
 public:
-	typedef void (*Parse)( const char* tag, void* obj, lua_State* ls);
-	typedef void (*Print)( const char* tag, void* obj, lua_State* ls);
+	typedef bool (*Parse)( void* obj, lua_State* ls);
+	typedef bool (*Print)( void* obj, lua_State* ls);
 	
-	DescriptionBase( std::size_t ofs, IsAtomic ia, Parse pa, Print pr)
+	DescriptionBase( std::size_t ofs, Parse pa, Print pr)
 		:m_ofs(ofs),m_parse(pa),m_print(pr){}
 	DescriptionBase( const DescriptionBase& o)
 		:m_ofs(o.m_ofs),m_elem(o.m_elem),m_parse(o.m_parse),m_print(o.m_print){}
 
-	bool parse( void* obj, lua_State* ls) const;
-	bool print( void* obj, lua_State* ls) const;
+	bool parse( void* obj, lua_State* ls) const	{return m_parse(obj,ls);}
+	bool print( void* obj, lua_State* ls) const	{return m_print(obj,ls);}
 public:
 	std::size_t m_ofs;
 	std::map<std::string,DescriptionBase> m_elem;

@@ -51,20 +51,20 @@
 using namespace _Wolframe;
 
 static const size_t noAuthConfigs = 2;
-static module::ModuleConfigurationDescription< config::TypedConfiguration >
-authConfig[ noAuthConfigs ] = { module::ModuleConfigurationDescription< config::TypedConfiguration >( "file", "Authentication file", "file",
+static module::ModuleConfigurationDescription
+authConfig[ noAuthConfigs ] = { module::ModuleConfigurationDescription( "file", "Authentication file", "file",
 				&AAAA::TextFileAuthConfig::create,
 				&config::ConfigurationParser::parseBase<AAAA::TextFileAuthConfig> ),
-				module::ModuleConfigurationDescription< config::TypedConfiguration >( "database", "Authentication database", "database",
+				module::ModuleConfigurationDescription( "database", "Authentication database", "database",
 				&AAAA::DatabaseAuthConfig::create,
 				&config::ConfigurationParser::parseBase<AAAA::DatabaseAuthConfig> ) };
 
 static const size_t noAuditConfigs = 2;
-static module::ModuleConfigurationDescription< config::TypedConfiguration >
-auditConfig[ noAuditConfigs ] = { module::ModuleConfigurationDescription< config::TypedConfiguration >( "file", "Audit file", "file",
+static module::ModuleConfigurationDescription
+auditConfig[ noAuditConfigs ] = { module::ModuleConfigurationDescription( "file", "Audit file", "file",
 				  &AAAA::FileAuditConfig::create,
 				  &config::ConfigurationParser::parseBase<AAAA::FileAuditConfig> ),
-				  module::ModuleConfigurationDescription< config::TypedConfiguration >( "database", "Audit database", "database",
+				  module::ModuleConfigurationDescription( "database", "Audit database", "database",
 				  &AAAA::DBauditConfig::create,
 				  &config::ConfigurationParser::parseBase<AAAA::DBauditConfig> ) };
 /****  End impersonating the module loader  **************************************************/
@@ -94,7 +94,7 @@ bool ConfigurationParser::parse( AAAA::AAAAconfiguration& cfg,
 					size_t i;
 					for ( i = 0; i < noAuthConfigs; i++ )	{
 						if ( boost::algorithm::iequals( authConfig[i].typeName, L2it->first ))	{
-							config::TypedConfiguration* conf = authConfig[i].createFunc( authConfig[i].sectionTitle,
+							config::ObjectConfiguration* conf = authConfig[i].createFunc( authConfig[i].sectionTitle,
 															 cfg.logPrefix().c_str(),
 															 authConfig[i].sectionName );
 							if ( authConfig[i].parseFunc( *conf, L2it->second, L2it->first ))
@@ -118,7 +118,7 @@ bool ConfigurationParser::parse( AAAA::AAAAconfiguration& cfg,
 				size_t i;
 				for ( i = 0; i < noAuditConfigs; i++ )	{
 					if ( boost::algorithm::iequals( auditConfig[i].typeName, L2it->first ))	{
-						config::TypedConfiguration* conf = auditConfig[i].createFunc( auditConfig[i].sectionTitle,
+						config::ObjectConfiguration* conf = auditConfig[i].createFunc( auditConfig[i].sectionTitle,
 														  cfg.logPrefix().c_str(),
 														  auditConfig[i].sectionName );
 						if ( auditConfig[i].parseFunc( *conf, L2it->second, L2it->first ))
