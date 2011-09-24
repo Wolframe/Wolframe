@@ -57,7 +57,7 @@ class DescriptionBase
 public:
 	typedef void (*Parse)( const char* tag, void* obj, protocol::InputFilter& flt);
 	typedef void (*Print)( const char* tag, void* obj, protocol::FormatOutput& out, std::string& buf);
-	typedef bool (*isAtomic)();
+	typedef bool (*IsAtomic)();
 
 	DescriptionBase( std::size_t ofs, IsAtomic ia, Parse pa, Print pr)
 		:m_ofs(ofs),m_isAtomic(ia),m_parse(pa),m_print(pr){}
@@ -66,10 +66,11 @@ public:
 
 	bool parse( void* obj, protocol::InputFilter& in, ProcessingContext& ctx) const;
 	bool print( void* obj, protocol::FormatOutput& out, ProcessingContext& ctx) const;
+	bool isAtomic() const		{return m_isAtomic();}
 public:
 	std::size_t m_ofs;
 	std::map<std::string,DescriptionBase> m_elem;
-	isAtomic m_isAtomic;
+	IsAtomic m_isAtomic;
 	Parse m_parse;
 	Print m_print;
 };
