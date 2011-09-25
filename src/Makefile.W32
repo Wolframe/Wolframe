@@ -18,7 +18,8 @@ INCLUDE_DIRS = \
 # TODO: better probing and correct library path based on Arch and
 # platform SDK version
 INCLUDE_LDFLAGS = \
-	$(SDK_LDFLAGS) $(BOOST_LDFLAGS)
+	$(SDK_LDFLAGS) $(BOOST_LDFLAGS) \
+	boost_program_options-vc90-mt-gd-1_46.lib
 
 INCLUDE_LIBS = \
 	Advapi32.lib Ws2_32.lib \
