@@ -19,7 +19,7 @@ WITH_SQLITE3=1         build AAAA and DB connectors for Sqlite3
 WITH_PGSQL=1           build AAAA and DB connectors for PostgreSql
 WITH_LIBXML2=1         build code using libxml2
 WITH_LIBXSLT=1         build code using libxslt
-WITH_EXAMPLES=0        do not build and test the examples (default is on)
+WITH_EXAMPLES=1        build and test the examples
 
 Avaliable optional features during testing only:
 

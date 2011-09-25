@@ -2,7 +2,7 @@ TOPDIR = .
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
-SUBDIRS = gtest src tests clients docs
+SUBDIRS = src gtest tests clients docs
 
 ifeq ($(WITH_LUA),1)
 SUBDIRS := lua $(SUBDIRS)

@@ -134,6 +134,26 @@ as an add-on using the Stack Builder.
 
 Adapt PGSQL_DIR in 'makefiles\nmake\config.mk'.
 
+Compiling Postgresql
+--------------------
+
+This is required if you want for instance to build the debug
+version of the libpq library.
+
+You need at least ActivePerl installed.
+
+cd src\tools\msvc
+copy config_default.pl config.pl
+
+Adapt config.pl to your needs.
+
+You may have to touch preproc.c and preproc.h if build wants
+to start bison and you don't have bison installed.
+
+build DEBUG
+
+install C:\<somewhere>
+
 LibXML2
 -------
 
