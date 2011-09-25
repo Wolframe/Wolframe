@@ -12,7 +12,7 @@ INCLUDE_DIRS = \
 	/I"$(TOPDIR)/include" \
 	/I"$(TOPDIR)/src" \
 	/I"$(TOPDIR)/gtest/include" \
-	/I"$(BOOST_DIR)" \
+	/I"$(BOOST_INCLUDE_DIR)" \
 	/I"$(TOPDIR)\gtest\include"	
 
 # Note: libraries are picked automatically on Windows!

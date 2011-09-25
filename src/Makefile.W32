@@ -10,7 +10,7 @@ INCLUDE_CPPFLAGS = \
 INCLUDE_DIRS = \
 	/I. \
 	/I$(TOPDIR)\include \
-	/I"$(BOOST_DIR)" \
+	/I"$(BOOST_INCLUDE_DIR)" \
 	/I"$(PLATFORM_SDK_DIR)\Include" \
 	/I"$(TOPDIR)\sqlite3"
 
@@ -22,7 +22,7 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 	Advapi32.lib Ws2_32.lib
-
+	
 # openssl
 
 !IFDEF WITH_SSL

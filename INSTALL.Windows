@@ -20,10 +20,10 @@ Boost
 
 Get boost from http://boostpro.com or http://boost.teeks99.com
 
-Install for instance into C:\Program Files\Boost\Boost_1_44
+Install for instance into C:\Program Files\Boost\Boost_1_46
 
 configure 'makefile\nmake\config.mk' and 
-set BOOST_DIR to C:\Program Files\Boost\Boost_1_44
+set BOOST_DIR to C:\Program Files\Boost\Boost_1_46
 
 Compile and install boost
 -------------------------
@@ -32,14 +32,19 @@ If you insist to compile Boost from scratch, do the following
 in a Visual Studio C++ command line:
 
 bootstrap
-.\bjam --threading=multi --link=shared --runtime-link=shared --variant=debug 
-	--with-thread --with-filesystem --with-system --with-program_options 
-	--with-date_time --with-regex 
-	architecture=x86 address-model=64 toolset=msvc
+.\bjam --prefix=C:\<myplace>\boost_1_46_0
+	--with-thread --with-filesystem --with-system --with-program_options --with-date_time --with-regex 
+	architecture=x86 address-model=64 toolset=msvc 
+	install
 
 with variant, architecture, address-mode and toolset fitting your needs.
 
-set BOOST_DIR to C:\<myhome>\boost-1_44_0
+set BOOST_DIR to C:\<myhome>\boost-1_46_0
+
+These instructions are for boost 1.46, other versions may vary.
+
+Careful: Always check %LIB% and the 'setenv' environment of the SDK! You can
+end up in 64-bit code using 32-bit libraries otherwise. :-)
 
 Notes on special Boost versions
 -------------------------------

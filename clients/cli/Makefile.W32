@@ -9,7 +9,7 @@ INCLUDE_CPPFLAGS = \
 
 INCLUDE_DIRS = \
 	/I. \
-	/I"$(BOOST_DIR)"
+	/I"$(BOOST_INCLUDE_DIR)"
 
 # Note: libraries are picked automatically on Windows!
 INCLUDE_LDFLAGS = \

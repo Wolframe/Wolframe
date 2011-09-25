@@ -11,7 +11,7 @@ INCLUDE_DIRS = \
 	/I$(TOPDIR)\include /I. \
 	/I$(TOPDIR)\src \
 	/I$(TOPDIR)\sqlite3 \
-	/I"$(BOOST_DIR)" \
+	/I"$(BOOST_INCLUDE_DIR)" \
 	/I"$(PLATFORM_SDK_DIR)\Include"
 
 # Note: libraries are picked automatically on Windows!
@@ -49,6 +49,7 @@ local_clean:
 local_distclean:
 
 local_test:
+!IFDEF WITH_EXPECT
 	@-"$(EXPECT)" checkAuthTextFileUnknownUser
 	@-"$(EXPECT)" checkAuthTextFileWrongPass
 	@-"$(EXPECT)" checkAuthTextFileOk
@@ -56,4 +57,5 @@ local_test:
 	@-"$(EXPECT)" checkAuthDbSqlite3UnknownUser
 	@-"$(EXPECT)" checkAuthDbSqlite3WrongPass
 	@-"$(EXPECT)" checkAuthDbSqlite3Ok
+!ENDIF
 !ENDIF

@@ -4,7 +4,7 @@ TOPDIR = .
 
 SUBDIRS = gtest src tests examples clients
 
-!IFDEF WITH_SSL
+!IFDEF WITH_LUA
 SUBDIRS = lua $(SUBDIRS)
 !ENDIF
 

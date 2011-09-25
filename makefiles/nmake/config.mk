@@ -36,9 +36,12 @@ BOOST_VERSION = 1_46_1
 #BOOST_DIR = C:\Programme\boost\boost_$(BOOST_VERSION)
 #BOOST_DIR = C:\Program Files\boost\boost_$(BOOST_VERSION)
 #BOOST_DIR = D:\Programme\boost\boost_$(BOOST_VERSION)
-BOOST_DIR = C:\Cygwin\home\Andreas\boost_1_46_0
+BOOST_DIR = C:\Cygwin\home\Andreas\boost_1_46_0-win64
 #BOOST_DIR = D:\boost\boost_1_45_0
 #BOOST_DIR = D:\Program Files\boost\boost_$(BOOST_VERSION)
+
+# depends on the choosen boost layout
+BOOST_INCLUDE_DIR = $(BOOST_DIR)\Include\boost-1_46
 
 # visual studio version used for compiling
 
@@ -50,7 +53,7 @@ BOOST_VC_VER = vc90
 #BOOST_MT = -mt
 
 # preinstalled binaries
-#BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib"
+BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib"
 
 # self-compiled
 #BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\stage\lib"
@@ -58,7 +61,7 @@ BOOST_VC_VER = vc90
 
 # precompiled libraries from http://boost.teeks99.com
 #BOOST_LDFLAGS = /LIBPATH:$(BOOST_DIR)\lib32
-BOOST_LDFLAGS = /LIBPATH:$(BOOST_DIR)\lib64
+#BOOST_LDFLAGS = /LIBPATH:$(BOOST_DIR)\lib64
 
 # OpenSSL (http://www.slproweb.com/products/Win32OpenSSL.html)
 ##############################################################

@@ -28,7 +28,7 @@ INCLUDE_CPPFLAGS = \
 INCLUDE_DIRS = \
 	/I$(TOPDIR)\include /I. \
 	/I$(TOPDIR)\src \
-	/I"$(BOOST_DIR)" \
+	/I"$(BOOST_INCLUDE_DIR)" \
 	/I"$(PLATFORM_SDK_DIR)\Include" \
 	/I$(TOPDIR)\gtest\include
 
@@ -60,7 +60,6 @@ all: $(OBJS) $(CPP_BINS)
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 threadLeakTest.exe: threadLeakTest.obj $(TOPDIR)\src\wolframe.lib
-
 testNamedRetVal.exe: testNamedRetVal.obj
 versionTest.exe: versionTest.obj $(TOPDIR)\src\wolframe.lib
 counterTest.exe: counterTest.obj $(TOPDIR)\src\wolframe.lib
@@ -90,7 +89,7 @@ local_test:
 	@-echo resolvePathTest >> test.bat
 	@-echo singletonTest >> test.bat
 	@-echo protocolArgumentParsing >> test.bat
-	@echo
+	@-echo echo off >> test.bat
 	@-test.bat
 
 local_longtest:
