@@ -36,13 +36,11 @@ BOOST_VERSION = 1_46_1
 #BOOST_DIR = C:\Programme\boost\boost_$(BOOST_VERSION)
 #BOOST_DIR = C:\Program Files\boost\boost_$(BOOST_VERSION)
 #BOOST_DIR = D:\Programme\boost\boost_$(BOOST_VERSION)
-BOOST_DIR = C:\Cygwin\home\Andreas\boost_1_46_0-win64
-#BOOST_DIR = C:\Cygwin\home\Andreas\boost_1_46_0-win32
+BOOST_DIR = C:\Cygwin\home\Andreas\boost_1_46_0-debug
 #BOOST_DIR = D:\boost\boost_1_45_0
 #BOOST_DIR = D:\Program Files\boost\boost_$(BOOST_VERSION)
 
-# depends on the choosen boost layout (Windows is versioned
-# per default, and not system layout)
+# depends on the choosen boost layout
 BOOST_INCLUDE_DIR = $(BOOST_DIR)\Include\boost-1_46
 
 # visual studio version used for compiling
@@ -86,9 +84,8 @@ QT_DIR = C:\Qt\4.7.3
 # (http://www.postgresql.org/)
 ##############################
 
-#PGSQL_DIR = C:\Program Files\PostgreSQL\9.0
+PGSQL_DIR = C:\Program Files\PostgreSQL\9.0
 #PGSQL_DIR = D:\Program Files\PostgreSQL\9.0
-PGSQL_DIR = C:\Cygwin\home\Andreas\postgresql-9.0.4-win64-debug
 
 # libxml2
 #########

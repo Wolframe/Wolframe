@@ -21,8 +21,9 @@ INCLUDE_LDFLAGS = \
 	$(SDK_LDFLAGS) $(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
-	Advapi32.lib Ws2_32.lib
+	Advapi32.lib Ws2_32.lib \
 	
+		
 # openssl
 
 !IFDEF WITH_SSL
