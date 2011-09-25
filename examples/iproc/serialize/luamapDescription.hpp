@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/directmapDescription.hpp
+///\file serialize/luamapDescription.hpp
 ///\brief Defines the bricks for the SDK to describe the lua table serializatiom in a readable way.
 #ifndef _Wolframe_SERIALIZE_LUAMAP_DESCRIPTION_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_LUAMAP_DESCRIPTION_HPP_INCLUDED
@@ -43,37 +43,40 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
+///\class Description
 ///\brief Intrusive configuration description
 ///\tparam Structure structure that is represented by this description
 template <class Structure>
 struct Description :public DescriptionBase
 {
-  ///\brief Operator to build the configuration structure element by element
-  ///\tparam Element element type
-  ///\param[in] name name of the element
-  ///\param[in] eptr pointer to member of the element
-  template <typename Element>
-  Description& operator()( const char* name, Element Structure::*eptr)
-  {
-    const char* type = 0;
-    try
-    {
-      type = typeid(Element).name();
-    }
-    catch (std::bad_typeid)
-    {}
-    DescriptionBase::Parse parse_ = &_Wolframe::serialize::Description<Element>::parse;
-    DescriptionBase::Print print_ = _Wolframe::serialize::Description<Element>::print;
+	///\brief Operator to build the configuration structure element by element
+	///\tparam Element element type
+	///\param[in] name name of the element
+	///\param[in] eptr pointer to member of the element
+	template <typename Element>
+	Description& operator()( const char* name, Element Structure::*eptr)
+	{
+		const char* typ = 0;
+		try
+		{
+			typ = typeid(Element).name();
+		}
+		catch (std::bad_typeid)
+		{}
+		DescriptionBase::Parse parse_ = &_Wolframe::serialize::Description<Element>::parse;
+		DescriptionBase::Print print_ = _Wolframe::serialize::Description<Element>::print;
 
-    std::size_t pp = (std::size_t)&(((Structure*)0)->*eptr);
-    Item e( pp, std::string(name), type, parse_, print_);
-    m_ar.push_back( e);
-    return *this;
-  }
-  Description(){}
+		std::size_t pp = (std::size_t)&(((Structure*)0)->*eptr);
+		DescriptionBase e( typ, pp, parse_, print_);
+		if (m_elem.find( name) != m_elem.end())
+		{
+			LOG_ERROR << "duplicate definition of " << name << " in structure";
+		}
+		m_elem[ name] = e;
+		return *this;
+	}
+	Description(){}
 };
 
 }}// end namespace
 #endif
-
-

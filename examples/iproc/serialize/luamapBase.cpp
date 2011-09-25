@@ -31,6 +31,6 @@ Project Wolframe.
 ************************************************************************/
 ///\file serialize/luamapBase.cpp
 ///\brief Implements the non intrusive base class of serialization for the lua map
-#include "luamapBase.hpp"
+#include "serialize/luamapBase.hpp"
 
 

@@ -34,7 +34,7 @@ Project Wolframe.
 
 #ifndef _Wolframe_LUAMAP_PRINT_HPP_INCLUDED
 #define _Wolframe_LUAMAP_PRINT_HPP_INCLUDED
-#include "luamapTraits.hpp"
+#include "serialize/luamapTraits.hpp"
 
 #include <boost/utility/value_init.hpp> 
 #include <vector> 
@@ -129,13 +129,13 @@ bool print_( void* obj, struct_&, lua_State* ls, Context* ctx)
 	static const DescriptionBase* descr = T::description();
 	
 	lua_newtable( ls);
-	std::map<std::string,DescriptionBase>::const_iterator itr = descr->m_elem->begin();
+	DescriptionBase::Map::const_iterator itr = descr->m_elem->begin();
 	while (itr != descr->m_elem->end()(
 	{
 		lua_pushstring( ls, itr->first);
-		if (!itr->m_print( 0, (char*)obj+itr->m_ofs, ls, ctx))
+		if (!itr->second.m_print( 0, (char*)obj+itr->second.m_ofs, ls, ctx))
 		{
-			printError( itr->first, ctx);
+			printError( itr->first.c_str(), ctx);
 			return false;
 		}
 		lua_settable( ls, -2);

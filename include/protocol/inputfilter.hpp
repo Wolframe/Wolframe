@@ -75,7 +75,7 @@ struct InputFilter
 	///\brief create the follow filter for processing
 	///\return the follow filter
 	///\remark this mechanism is used for chaining filters in case processing has to be changed
-	virtual InputFilter* createFollow() {return 0;}
+	virtual InputFilter* createFollow() const {return 0;}
 
 	///\brief Get next element call as methof call
 	///\param [out] type element type parsed

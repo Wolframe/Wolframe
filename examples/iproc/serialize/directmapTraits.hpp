@@ -34,13 +34,15 @@ Project Wolframe.
 
 #ifndef _Wolframe_SERIALIZE_DIRECTMAP_TRAITS_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_DIRECTMAP_TRAITS_HPP_INCLUDED
+#include "serialize/directmapBase.hpp"
+#include "logger/logLevel.hpp"
 #include <boost/lexical_cast.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits.hpp>
 #include <boost/detail/select_type.hpp>
 #include <boost/type_traits/function_traits.hpp>
-#include "serialize/directmapBase.hpp"
-#include "logger/logLevel.hpp"
+#include <vector>
+#include <string>
 
 namespace _Wolframe {
 namespace serialize {
@@ -61,8 +63,8 @@ struct has_description_method_noprm
 	typedef char small_type;
 	struct large_type {small_type dummy[2];};
 
-	template<const DirectmapBase* (T::*)()> struct tester_member_signature;
-	template<const DirectmapBase* (*)()> struct tester_static_signature;
+	template<const DescriptionBase* (T::*)()> struct tester_member_signature;
+	template<const DescriptionBase* (*)()> struct tester_static_signature;
 
 	template<typename U>
 	static small_type has_matching_member(tester_member_signature<&U::getDescription>*);
@@ -86,28 +88,28 @@ struct has_description_method<T,true>:
 template <typename T>
 typename boost::enable_if_c<
 	boost::is_same< std::vector< typename T::value_type> ,T>::value && !boost::is_same<std::string,T>::value
-	,vector_>::type getCategory( const T&) { return vector_();}
+	,const vector_&>::type getCategory( const T&) { static vector_ rt; return rt;}
 
 ///\brief get category struct_ for a type
 /// returns struct_ if T has a method description with no params returning a const pointer to a config::DescriptionBase
 template <typename T>
 typename boost::enable_if_c<
 	has_description_method<T>::value
-	,struct_>::type getCategory( const T&) { return struct_();}
+	,const struct_&>::type getCategory( const T&) { static struct_ rt; return rt;}
 
 ///\brief get category arithmetic_ for a type
 /// returns arithmetic_ if T fulfills the is_arithmetic condition or is a string
 template <typename T>
 typename boost::enable_if_c<
 	(boost::is_arithmetic<T>::value && !boost::is_same<bool,T>::value) || boost::is_same<std::string,T>::value
-	,arithmetic_>::type getCategory( const T&) { return arithmetic_();}
+	,const arithmetic_&>::type getCategory( const T&) { static arithmetic_ rt; return rt;}
 
 ///\brief get category bool_ for a type
 /// returns bool_ if T is a bool
 template <typename T>
 typename boost::enable_if_c<
 	boost::is_same<bool,T>::value
-	,bool_>::type getCategory( const T&) { return bool_();}
+	,const bool_&>::type getCategory( const T&) { static bool_ rt; return rt;}
 
 }}// end namespace
 #endif

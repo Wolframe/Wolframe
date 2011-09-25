@@ -97,10 +97,13 @@ CPP_BINS = \
 
 TEST_BINS += \
 	tests/iprocHandlerTest$(EXE) \
-	tests/iprocHandlerXMLTest$(EXE)
+	tests/iprocHandlerXMLTest$(EXE) \
+	tests/directmapParser$(EXE)
 
 tests/iprocHandlerTest$(EXE): tests/iprocHandlerTest.o $(OBJS) $(TOPDIR)/src/libwolframe.a
 tests/iprocHandlerXMLTest$(EXE): tests/iprocHandlerXMLTest.o $(OBJS) $(TOPDIR)/src/libwolframe.a
+tests/luamapParser$(EXE): tests/luamapParser.o $(OBJS) $(TOPDIR)/src/libwolframe.a
+tests/directmapParser$(EXE): tests/directmapParser.o $(OBJS) $(TOPDIR)/src/libwolframe.a
 
 local_all: $(CPP_BINS)
 
@@ -111,6 +114,7 @@ local_distclean:
 local_install:
 
 local_test: $(TEST_BINS)
+	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./directmapParser$(EXE)
 	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./iprocHandlerXMLTest$(EXE)
 	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./iprocHandlerTest$(EXE)
 

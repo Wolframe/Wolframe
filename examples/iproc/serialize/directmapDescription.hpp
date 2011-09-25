@@ -38,41 +38,55 @@ Project Wolframe.
 #include "serialize/directmapTraits.hpp"
 #include "serialize/directmapParse.hpp"
 #include "serialize/directmapPrint.hpp"
+#include "logger.hpp"
 #include <typeinfo>
 #include <exception>
 
 namespace _Wolframe {
 namespace serialize {
 
+template <class Element>
+static const char* getTypename()
+{
+	const char* typ = 0;
+	try
+	{
+		typ = typeid(Element).name();
+	}
+	catch (std::bad_typeid)
+	{}
+	return typ;
+}
+
+///\class Description
 ///\brief Intrusive configuration description
 ///\tparam Structure structure that is represented by this description
 template <class Structure>
 struct Description :public DescriptionBase
 {
-  ///\brief Operator to build the configuration structure element by element
-  ///\tparam Element element type
-  ///\param[in] name name of the element
-  ///\param[in] eptr pointer to member of the element
-  template <typename Element>
-  Description& operator()( const char* name, Element Structure::*eptr)
-  {
-    const char* type = 0;
-    try
-    {
-      type = typeid(Element).name();
-    }
-    catch (std::bad_typeid)
-    {}
-    DescriptionBase::Parse parse_ = &_Wolframe::serialize::Description<Element>::parse;
-    DescriptionBase::Print print_ = _Wolframe::serialize::Description<Element>::print;
-    DescriptionBase::IsAtomic isAtomic_ = &_Wolframe::serialize::Description<Element>::isAtomic;
+	///\brief Operator to build the configuration structure element by element
+	///\tparam Element element type
+	///\param[in] name name of the element
+	///\param[in] eptr pointer to member of the element
+	template <typename Element>
+	Description& operator()( const char* name, Element Structure::*eptr)
+	{
+		DescriptionBase::Parse parse_ = &IntrusiveParser<Element>::parse;
+		DescriptionBase::Print print_ = &IntrusivePrinter<Element>::print;
+		DescriptionBase::IsAtomic isAtomic_ = &IntrusiveParser<Element>::isAtomic;
 
-    std::size_t pp = (std::size_t)&(((Structure*)0)->*eptr);
-    Item e( pp, std::string(name), type, parse_, print_, isAtomic_);
-    m_ar.push_back( e);
-    return *this;
-  }
-  Description(){}
+		std::size_t pp = (std::size_t)&(((Structure*)0)->*eptr);
+		DescriptionBase e( getTypename<Element>(), pp, sizeof(Element), isAtomic_, parse_, print_);
+		if (m_elem.find( name) != m_elem.end())
+		{
+			LOG_ERROR << "duplicate definition of " << name << " in structure";
+		}
+		m_elem[ name] = e;
+		return *this;
+	}
+
+	Description()
+		:DescriptionBase( getTypename<Structure>(), 0, sizeof(Structure), &IntrusiveParser<Structure>::isAtomic, &IntrusiveParser<Structure>::parse, &IntrusivePrinter<Structure>::print){}
 };
 
 }}// end namespace

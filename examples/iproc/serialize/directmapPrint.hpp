@@ -34,107 +34,115 @@ Project Wolframe.
 
 #ifndef _Wolframe_DIRECTMAP_PRINT_HPP_INCLUDED
 #define _Wolframe_DIRECTMAP_PRINT_HPP_INCLUDED
-#include "directmapTraits.hpp"
+#include "serialize/directmapTraits.hpp"
+#include "serialize/directmapBase.hpp"
 #include <stdexcept>
-
-
-///the intrusive part of the definitions is put into an anonymous namespace:
-namespace {
-
-template<typename N>
-static bool isAttributeCatg( N&)
-{
-	return true;
-}
-template<>
-static bool isAttributeCatg( struct_&)
-{
-	return false;
-}
-template<>
-static bool isAttributeCatg( vector_&)
-{
-	return false;
-}
-
-static void printElem( protocol::FormatOutput::ElementType tp, void* elem, std::size_t elemsize, protocol::FormatOutput& out, std::string& buf)
-{
-	if (!out->print( tp, elem, elemsize))
-	{
-		buf.append( out.charptr(), out.pos());
-		out.release();
-		if (!out->print( tp, elem, elemsize))
-		{
-			throw std::runtime_error( "buffer of format output too small to hold one element");
-		}
-	}
-}
-
-template <typename T>
-void print_( const char* tag, void* obj, struct_&, protocol::FormatOutput& out, std::string& buf)
-{
-	static const DescriptionBase* descr = T::description();
-	bool isContent = true;
-
-	if (tag) printElem( OpenTag, itr->first.c_str(), itr->first.size(), out, buf);
-
-	std::map<std::string,DescriptionBase>::const_iterator itr = descr->m_elem->begin();
-	for (;itr != descr->m_elem->end(); ++itr)
-	{
-		if (itr->isAtomic() && !isContent)
-		{
-			printElem( Attribute, itr->first.c_str(), itr->first.size(), out, buf);
-			itr->m_print( 0, (char*)obj+itr->m_ofs, out, buf);
-		}
-		else
-		{
-			isContent = true;
-			itr->print( itr->first.c_str(), (char*)obj+itr->m_ofs, out, buf);
-		}
-	}
-	if (tag) printElem( CloseTag, "", 0, out, buf);
-}
-
-template <typename T>
-void print_( const char* tag, void* obj, arithmetic_&, protocol::FormatOutput& out, std::string& buf)
-{
-	if (tag) printElem( OpenTag, itr->first.c_str(), itr->first.size(), out, buf);
-	std::string value( boost::lexical_cast<std::string>( *((T*)obj)));
-	printElem( Value, value.c_str(), value.size(), out, buf);
-	if (tag) printElem( CloseTag, "", 0, out, buf);
-}
-
-template <typename T>
-void print_( const char* tag, void* obj, bool_&, protocol::FormatOutput& out, std::string& buf)
-{
-	if (tag) printElem( OpenTag, itr->first.c_str(), itr->first.size(), out, buf);
-	printElem( Value, (*((T*)obj))?"t":"f", 1, out, buf);
-	if (tag) printElem( CloseTag, "", 0, out, buf);
-}
-
-template <typename T>
-void print_( const char* tag, void* obj, vector_&, protocol::FormatOutput& out, std::string& buf)
-{
-	for (T::const_iterator itr=((T*)obj)->begin(); itr!=((T*)obj)->end(); itr++)
-	{
-		if (tag) printElem( OpenTag, itr->first.c_str(), itr->first.size(), out, buf);
-		itr->print( 0, (char*)obj+itr->m_ofs, out, buf);
-		if (tag) printElem( CloseTag, "", 0, out, buf);
-	}
-}
-
-}//anonymous namespace
+#include <string>
+#include <vector>
+#include <map>
 
 namespace _Wolframe {
 namespace serialize {
 
-template <typename T>
-static void print( const char* tag, T* obj, protocol::FormatOutput& out, std::string& buf)
+static void printElem( protocol::FormatOutput::ElementType tp, const void* elem, std::size_t elemsize, protocol::FormatOutput*& out, std::string& buf)
 {
-	print_<T>( tag, (void*)obj, getCategory(val), out, buf);
-	buf.append( out.charptr(), out.pos());
-	out.release();
+	if (!out->print( tp, elem, elemsize))
+	{
+		buf.append( out->charptr(), out->pos());
+		out->release();
+		if (!out->print( tp, elem, elemsize))
+		{
+			protocol::FormatOutput* ff = out->createFollow();
+			if (ff)
+			{
+				delete out;
+				out = ff;
+			}
+			if (!out->print( tp, elem, elemsize))
+			{
+				throw std::runtime_error( "buffer of format output too small to hold one element");
+			}
+		}
+	}
 }
+
+template <typename T>
+static void printObject( const char* tag, const T& obj, protocol::FormatOutput*& out, std::string& buf);
+
+
+template <typename T>
+void print_( const char* tag, const void* obj, const struct_&, protocol::FormatOutput*& out, std::string& buf)
+{
+	static const DescriptionBase* descr = T::getDescription();
+	bool isContent = true;
+
+	if (tag) printElem( protocol::FormatOutput::OpenTag, tag, std::strlen(tag), out, buf);
+
+	DescriptionBase::Map::const_iterator itr = descr->m_elem.begin(),end = descr->m_elem.end();
+	for (;itr != end; ++itr)
+	{
+		if (itr->second.m_isAtomic() && !isContent)
+		{
+			printElem( protocol::FormatOutput::Attribute, itr->first.c_str(), itr->first.size(), out, buf);
+			itr->second.m_print( 0, (char*)obj+itr->second.m_ofs, out, buf);
+		}
+		else
+		{
+			isContent = true;
+			itr->second.m_print( itr->first.c_str(), (char*)obj+itr->second.m_ofs, out, buf);
+		}
+	}
+	if (tag) printElem( protocol::FormatOutput::CloseTag, "", 0, out, buf);
+}
+
+template <typename T>
+void print_( const char* tag, const void* obj, const arithmetic_&, protocol::FormatOutput*& out, std::string& buf)
+{
+	if (tag) printElem( protocol::FormatOutput::OpenTag, tag, std::strlen(tag), out, buf);
+	std::string value( boost::lexical_cast<std::string>( *((T*)obj)));
+	printElem( protocol::FormatOutput::Value, value.c_str(), value.size(), out, buf);
+	if (tag) printElem( protocol::FormatOutput::CloseTag, "", 0, out, buf);
+}
+
+template <typename T>
+void print_( const char* tag, const void* obj, const bool_&, protocol::FormatOutput*& out, std::string& buf)
+{
+	if (tag) printElem( protocol::FormatOutput::OpenTag, tag, std::strlen(tag), out, buf);
+	printElem( protocol::FormatOutput::Value, (*((T*)obj))?"t":"f", 1, out, buf);
+	if (tag) printElem( protocol::FormatOutput::CloseTag, "", 0, out, buf);
+}
+
+template <typename T>
+void print_( const char* tag, const void* obj, const vector_&, protocol::FormatOutput*& out, std::string& buf)
+{
+	if (!tag)
+	{
+		throw std::runtime_error( "non printable structure");
+	}
+	for (typename T::const_iterator itr=((T*)obj)->begin(); itr!=((T*)obj)->end(); itr++)
+	{
+		printElem( protocol::FormatOutput::OpenTag, tag, strlen(tag), out, buf);
+		printObject( 0, *itr, out, buf);
+		printElem( protocol::FormatOutput::CloseTag, "", 0, out, buf);
+	}
+}
+
+template <typename T>
+static void printObject( const char* tag, const T& obj, protocol::FormatOutput*& out, std::string& buf)
+{
+	print_<T>( tag, (void*)&obj, getCategory(obj), out, buf);
+}
+
+template <typename T>
+struct IntrusivePrinter
+{
+	static void print( const char* tag, const void* obj, protocol::FormatOutput*& out, std::string& buf)
+	{
+		print_<T>( tag, obj, getCategory(*(T*)obj), out, buf);
+		buf.append( out->charptr(), out->pos());
+		out->release();
+	}
+};
 
 }}//namespace
 #endif

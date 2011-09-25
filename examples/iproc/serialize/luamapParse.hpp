@@ -29,10 +29,11 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file parse/directmapParse.hpp
+///\file serialize/luamapParse.hpp
 ///\brief Defines the intrusive implementation of the parsing part of serialization for the lua map
 #ifndef _Wolframe_LUAMAP_PARSE_HPP_INCLUDED
 #define _Wolframe_LUAMAP_PARSE_HPP_INCLUDED
+#include "serialize/luamapBase.hpp"
 #include <stdexcept>
 #include <boost/utility/value_init.hpp> 
 
@@ -100,7 +101,7 @@ bool parse_( void* obj, struct_&, lua_State* ls, Context* ctx)
 	while (lua_next( ls, -2))
 	{
 		lua_pushvalue( ls, -2);
-		std::map<std::string,DescriptionBase>::const_iterator itr = descr->m_elem->find( lua_tostring( ls, -1));
+		DescriptionBase::Map::const_iterator itr = descr->m_elem->find( lua_tostring( ls, -1));
 		lua_pop( ls, 1);
 		if (itr != descr->m_elem->end()
 		{
@@ -161,7 +162,7 @@ bool parse_( void* obj, vector_&, lua_State* ls, Context* ctx)
 	lua_pushnil( ls);
 	while (lua_next( ls, -2))
 	{
-		std::map<std::string,DescriptionBase>::const_iterator itr = descr->m_elem->begin();
+		DescriptionBase::Map::const_iterator itr = descr->m_elem->begin();
 		while (itr != descr->m_elem->end()
 		{
 			T::value_type elem;

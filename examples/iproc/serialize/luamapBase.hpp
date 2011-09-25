@@ -53,16 +53,18 @@ public:
 	typedef bool (*Parse)( void* obj, lua_State* ls);
 	typedef bool (*Print)( void* obj, lua_State* ls);
 	
-	DescriptionBase( std::size_t ofs, Parse pa, Print pr)
-		:m_ofs(ofs),m_parse(pa),m_print(pr){}
+	DescriptionBase( const char* tn, std::size_t ofs, Parse pa, Print pr)
+		:m_typename(tn),m_ofs(ofs),m_parse(pa),m_print(pr){}
 	DescriptionBase( const DescriptionBase& o)
-		:m_ofs(o.m_ofs),m_elem(o.m_elem),m_parse(o.m_parse),m_print(o.m_print){}
+		:m_typename(o.m_typename),m_ofs(o.m_ofs),m_elem(o.m_elem),m_parse(o.m_parse),m_print(o.m_print){}
 
 	bool parse( void* obj, lua_State* ls) const	{return m_parse(obj,ls);}
 	bool print( void* obj, lua_State* ls) const	{return m_print(obj,ls);}
 public:
+	const char* m_typename;
 	std::size_t m_ofs;
-	std::map<std::string,DescriptionBase> m_elem;
+	typedef std::map<std::string,DescriptionBase> Map;
+	Map m_elem;
 	Parse m_parse;
 	Print m_print;
 };
