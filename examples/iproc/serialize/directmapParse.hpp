@@ -120,8 +120,7 @@ void parseObject_( const char* tag, void* obj, const struct_&, protocol::InputFi
 				case protocol::InputFilter::OpenTag:
 				{
 					++m_depth;
-					const std::string tt( buf, bufpos);
-					DescriptionBase::Map::const_iterator itr = descr->m_elem.find( tt);
+					DescriptionBase::Map::const_iterator itr = descr->find( buf);
 					if (itr == descr->m_elem.end())
 					{
 						throw ParseError( tag, "unknown element ", buf);
@@ -137,8 +136,7 @@ void parseObject_( const char* tag, void* obj, const struct_&, protocol::InputFi
 
 				case protocol::InputFilter::Attribute:
 				{
-					const std::string tt( buf, bufpos);
-					DescriptionBase::Map::const_iterator itr = descr->m_elem.find( tt);
+					DescriptionBase::Map::const_iterator itr = descr->find( buf);
 					if (itr == descr->m_elem.end())
 					{
 						throw ParseError( tag, "unknown element ", buf);

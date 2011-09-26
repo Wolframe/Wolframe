@@ -36,9 +36,10 @@ Project Wolframe.
 #define _Wolframe_DIRECTMAP_BASE_HPP_INCLUDED
 #include "protocol/inputfilter.hpp"
 #include "protocol/formatoutput.hpp"
+#include "logger.hpp"
 #include <cstddef>
 #include <string>
-#include <map>
+#include <vector>
 
 namespace _Wolframe {
 namespace serialize {
@@ -61,6 +62,7 @@ private:
 class DescriptionBase
 {
 public:
+	typedef std::vector<std::pair<const char*,DescriptionBase> > Map;
 	typedef void (*Parse)( const char* tag, void* obj, protocol::InputFilter& flt, ProcessingContext& ctx);
 	typedef void (*Print)( const char* tag, const void* obj, protocol::FormatOutput*& out, std::string& buf);
 	typedef bool (*IsAtomic)();
@@ -83,11 +85,25 @@ public:
 	{
 		return m_size;
 	}
+
+	Map::const_iterator find( const char* name) const
+	{
+		for (Map::const_iterator itr = m_elem.begin(); itr!=m_elem.end(); ++itr)
+		{
+			if (std::strcmp( itr->first, name) == 0) return itr;
+		}
+		return m_elem.end();
+	}
+
+	void define( const char* name, const DescriptionBase& dd)
+	{
+		m_elem.push_back( std::pair<const char*,DescriptionBase>(name,dd));
+	}
+
 public:
 	const char* m_typename;
 	std::size_t m_ofs;
 	std::size_t m_size;
-	typedef std::map<std::string,DescriptionBase> Map;
 	Map m_elem;
 	IsAtomic m_isAtomic;
 	Parse m_parse;
@@ -96,3 +112,4 @@ public:
 
 }}//namespace
 #endif
+

@@ -83,13 +83,13 @@ void print_( const char* tag, const void* obj, const struct_&, protocol::FormatO
 	{
 		if (itr->second.m_isAtomic() && !isContent)
 		{
-			printElem( protocol::FormatOutput::Attribute, itr->first.c_str(), itr->first.size(), out, buf);
+			printElem( protocol::FormatOutput::Attribute, itr->first, std::strlen(itr->first), out, buf);
 			itr->second.m_print( 0, (char*)obj+itr->second.m_ofs, out, buf);
 		}
 		else
 		{
 			isContent = true;
-			itr->second.m_print( itr->first.c_str(), (char*)obj+itr->second.m_ofs, out, buf);
+			itr->second.m_print( itr->first, (char*)obj+itr->second.m_ofs, out, buf);
 		}
 	}
 	if (tag) printElem( protocol::FormatOutput::CloseTag, "", 0, out, buf);

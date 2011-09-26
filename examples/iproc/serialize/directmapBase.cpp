@@ -56,7 +56,7 @@ bool DescriptionBase::parse( const char* name, void* obj, protocol::InputFilter&
 		char tagbuf[ 1024];
 		std::size_t tagpos = 0;
 		protocol::InputFilter::ElementType etyp;
-		while (!inp->getNext( &etyp, tagbuf, sizeof(tagbuf), &tagpos))
+		while (!inp->getNext( &etyp, tagbuf, sizeof(tagbuf)-1, &tagpos))
 		{
 			protocol::InputFilter* ff = inp->createFollow();
 			if (!ff)
@@ -69,11 +69,12 @@ bool DescriptionBase::parse( const char* name, void* obj, protocol::InputFilter&
 				inp = ff;
 			}
 		}
+		tagbuf[ tagpos] = 0;
 		if (etyp != protocol::InputFilter::OpenTag)
 		{
 			throw std::logic_error( "failed to parse xml root element");
 		}
-		if (std::strlen(name) != tagpos || std::memcmp( name, tagbuf, tagpos) != 0)
+		if (std::strcmp(name, tagbuf) != 0)
 		{
 			throw std::logic_error( "xml is of different type than expected");
 		}
