@@ -31,7 +31,7 @@
 COMMON_COMPILE_FLAGS = /MD /D_SCL_SECURE_NO_WARNINGS=1 /D_CRT_SECURE_NO_WARNINGS=1 /W2 /WX /nologo /O2 /EHsc /c $(INCLUDE_DIRS)
 
 # compilation flags and compilers (debug)
-#COMMON_COMPILE_FLAGS = /MDd /Zi /DBOOST_ALL_NO_LIB=1 /D_SCL_SECURE_NO_WARNINGS=1 /D_CRT_SECURE_NO_WARNINGS=1 /W2 /WX /nologo /O2 /EHsc /c $(INCLUDE_DIRS)
+#COMMON_COMPILE_FLAGS = /MDd /Zi /D_SCL_SECURE_NO_WARNINGS=1 /D_CRT_SECURE_NO_WARNINGS=1 /W2 /WX /nologo /O2 /EHsc /c $(INCLUDE_DIRS)
 
 COMPILE_FLAGS = $(COMMON_COMPILE_FLAGS)
 
@@ -46,10 +46,10 @@ MT = mt.exe
 RC = "$(PLATFORM_SDK_DIR)\Bin\rc.exe"
 
 # linking flags (release)
-LDFLAGS = /nologo /verbose:lib $(INCLUDE_LDFLAGS)
+LDFLAGS = /nologo $(INCLUDE_LDFLAGS)
 
 # linking flags (debug)
-#LDFLAGS = /nologo /debug $(INCLUDE_LDFLAGS)
+#LDFLAGS = /nologo /debug /verbose:lib $(INCLUDE_LDFLAGS)
 
 LIBS = $(INCLUDE_LIBS)
 LINK = link.exe
