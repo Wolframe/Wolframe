@@ -113,26 +113,26 @@ struct luastruct_{};
 template <typename T>
 typename boost::enable_if_c<
 	(boost::is_arithmetic<T>::value && !boost::is_same<bool,T>::value)
-	,luanumeric_>::type getLuaCategory( const T&) { return luanumeric_();}
+	,const luanumeric_>::type getLuaCategory( const T&) { return luanumeric_();}
 
 ///\brief get category luabool_ for a type
 /// returns luabool_ if T is a bool
 template <typename T>
 typename boost::enable_if_c<
 	boost::is_same<bool,T>::value
-	,luabool_>::type getLuaCategory( const T&) { return luabool_();}
+	,const luabool_>::type getLuaCategory( const T&) { return luabool_();}
 
 ///\brief get category luastring_ for a type
 /// returns luastring_ if T is a bool
 template <typename T>
 typename boost::enable_if_c<
 	boost::is_same<std::string,T>::value
-	,luastring_>::type getLuaCategory( const T&) { return luastring_();}
+	,const luastring_>::type getLuaCategory( const T&) { return luastring_();}
 
 template <typename T>
 typename boost::enable_if_c<
 	(!boost::is_arithmetic<T>::value && !boost::is_same<bool,T>::value && !boost::is_same<std::string,T>::value)
-	,luastruct_>::type getLuaCategory( const T&) { return luastruct_();}
+	,const luastruct_>::type getLuaCategory( const T&) { return luastruct_();}
 
 }}//namespace
 #endif

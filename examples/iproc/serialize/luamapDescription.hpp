@@ -67,15 +67,16 @@ struct Description :public DescriptionBase
 		DescriptionBase::Print print_ = _Wolframe::serialize::Description<Element>::print;
 
 		std::size_t pp = (std::size_t)&(((Structure*)0)->*eptr);
-		DescriptionBase e( typ, pp, parse_, print_);
-		if (m_elem.find( name) != m_elem.end())
+		DescriptionBase e( getTypename<Element>(), pp, sizeof(Element), parse_, print_);
+		if (find( name) != m_elem.end())
 		{
 			LOG_ERROR << "duplicate definition of " << name << " in structure";
 		}
-		m_elem[ name] = e;
+		define( name, e);
 		return *this;
 	}
-	Description(){}
+	Description()
+		:DescriptionBase( getTypename<Structure>(), 0, sizeof(Structure), &IntrusiveParser<Structure>::parse, &IntrusivePrinter<Structure>::print){}
 };
 
 }}// end namespace

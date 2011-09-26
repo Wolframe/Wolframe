@@ -88,7 +88,7 @@ struct Context
 }
 
 template <typename T>
-bool parse_( void* obj, struct_&, lua_State* ls, Context* ctx)
+bool parse_( void* obj, const struct_&, lua_State* ls, Context* ctx)
 {
 	static const DescriptionBase* descr = T::description();
 	
@@ -101,7 +101,7 @@ bool parse_( void* obj, struct_&, lua_State* ls, Context* ctx)
 	while (lua_next( ls, -2))
 	{
 		lua_pushvalue( ls, -2);
-		DescriptionBase::Map::const_iterator itr = descr->m_elem->find( lua_tostring( ls, -1));
+		DescriptionBase::Map::const_iterator itr = descr->find( lua_tostring( ls, -1));
 		lua_pop( ls, 1);
 		if (itr != descr->m_elem->end()
 		{
@@ -123,7 +123,7 @@ bool parse_( void* obj, struct_&, lua_State* ls, Context* ctx)
 }
 
 template <typename T>
-bool parse_( void* obj, arithmetic_&, lua_State* ls, Context* ctx)
+bool parse_( void* obj, const arithmetic_&, lua_State* ls, Context* ctx)
 {
 	bool rt = true;
 	try
@@ -150,7 +150,7 @@ bool parse_( void* obj, arithmetic_&, lua_State* ls, Context* ctx)
 }
 
 template <typename T>
-bool parse_( void* obj, vector_&, lua_State* ls, Context* ctx)
+bool parse_( void* obj, const vector_&, lua_State* ls, Context* ctx)
 {
 	static const DescriptionBase* descr = T::description();
 	
