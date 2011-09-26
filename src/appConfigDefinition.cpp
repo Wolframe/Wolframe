@@ -47,40 +47,40 @@ namespace config {
 ApplicationConfiguration::ApplicationConfiguration()
 {
 	// daemon / service configuration
-	serviceConf = new _Wolframe::config::ServiceConfiguration();
+	serviceCfg = new _Wolframe::config::ServiceConfiguration();
 	// network server
-	serverConf = new _Wolframe::net::Configuration();
+	serverCfg = new _Wolframe::net::Configuration();
 	// logging
-	loggerConf = new _Wolframe::log::LoggerConfiguration();
+	loggerCfg = new _Wolframe::log::LoggerConfiguration();
 
-	handlerConf = new _Wolframe::HandlerConfiguration();
+	handlerCfg = new _Wolframe::HandlerConfiguration();
 
 
 	// add both sections, the parse function will select the
 	// appropriate action
-	addConfig( "service", serviceConf, &ConfigurationParser::parseBase<config::ServiceConfiguration> );
-	addConfig( "daemon", serviceConf, &ConfigurationParser::parseBase<config::ServiceConfiguration> );
+	addConfig( "service", serviceCfg, &ConfigurationParser::parseBase<config::ServiceConfiguration> );
+	addConfig( "daemon", serviceCfg, &ConfigurationParser::parseBase<config::ServiceConfiguration> );
 
-	addConfig( "LoadModules", handlerConf->modulesCfg, &ConfigurationParser::parseBase<config::ModuleLoaderConfiguration> );
+	addConfig( "LoadModules", handlerCfg->modulesCfg, &ConfigurationParser::parseBase<config::ModuleLoaderConfiguration> );
 
-	addConfig( "ServerTokens", handlerConf->bannerCfg, &ConfigurationParser::parseBase<config::ServiceBanner> );
-	addConfig( "ServerSignature", handlerConf->bannerCfg, &ConfigurationParser::parseBase<config::ServiceBanner> );
+	addConfig( "ServerTokens", handlerCfg->bannerCfg, &ConfigurationParser::parseBase<config::ServiceBanner> );
+	addConfig( "ServerSignature", handlerCfg->bannerCfg, &ConfigurationParser::parseBase<config::ServiceBanner> );
 
-	addConfig( "listen", serverConf, &ConfigurationParser::parseBase<net::Configuration> );
-	addConfig( "logging", loggerConf, &ConfigurationParser::parseBase<log::LoggerConfiguration> );
-	addConfig( "database", handlerConf->databaseCfg, &ConfigurationParser::parseBase<db::DBproviderConfig> );
-	addConfig( "aaaa", handlerConf->aaaaCfg, &ConfigurationParser::parseBase<AAAA::AAAAconfiguration> );
-	addConfig( "Processor", handlerConf->procCfg, &ConfigurationParser::parseBase<proc::ProcProviderConfig> );
+	addConfig( "listen", serverCfg, &ConfigurationParser::parseBase<net::Configuration> );
+	addConfig( "logging", loggerCfg, &ConfigurationParser::parseBase<log::LoggerConfiguration> );
+	addConfig( "database", handlerCfg->databaseCfg, &ConfigurationParser::parseBase<db::DBproviderConfig> );
+	addConfig( "aaaa", handlerCfg->aaaaCfg, &ConfigurationParser::parseBase<AAAA::AAAAconfiguration> );
+	addConfig( "Processor", handlerCfg->procCfg, &ConfigurationParser::parseBase<proc::ProcProviderConfig> );
 
 }
 
 
 ApplicationConfiguration::~ApplicationConfiguration()
 {
-	if ( serviceConf )	delete serviceConf;
-	if ( serverConf )	delete serverConf;
-	if ( loggerConf )	delete loggerConf;
-	if ( handlerConf )	delete handlerConf;
+	if ( serviceCfg )	delete serviceCfg;
+	if ( serverCfg )	delete serverCfg;
+	if ( loggerCfg )	delete loggerCfg;
+	if ( handlerCfg )	delete handlerCfg;
 }
 
 }} // namespace _Wolframe::config

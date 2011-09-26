@@ -77,22 +77,22 @@ public:
 	}
 };
 
-struct ModuleConfigurationDescription
+struct ConfigurationDescription
 {
 	const char* typeName;
 	const char* sectionTitle;
 	const char* sectionName;
 	config::ObjectConfiguration* (*createFunc)( const char* name, const char* logParent, const char* logName );
 	bool (*parseFunc)( config::ConfigurationBase&,
-			   const boost::property_tree::ptree&, const std::string& );
+			   const boost::property_tree::ptree&, const std::string& node );
 public:
-	ModuleConfigurationDescription( const char* tn, const char* st, const char* sn,
-					config::ObjectConfiguration* (*cf)( const char* name,
-									   const char* logParent,
-									   const char* logName ),
-					bool (*pf)( config::ConfigurationBase& configuration,
-						    const boost::property_tree::ptree& pt,
-						    const std::string& node ) )
+	ConfigurationDescription( const char* tn, const char* st, const char* sn,
+				  config::ObjectConfiguration* (*cf)( const char* name,
+								      const char* logParent,
+								      const char* logName ),
+				  bool (*pf)( config::ConfigurationBase& configuration,
+					      const boost::property_tree::ptree& pt,
+					      const std::string& node ) )
 		: typeName( tn ), sectionTitle( st ), sectionName( sn ),
 		  createFunc( cf ), parseFunc( pf )	{}
 };

@@ -51,20 +51,20 @@
 using namespace _Wolframe;
 
 static const size_t noAuthConfigs = 2;
-static module::ModuleConfigurationDescription
-authConfig[ noAuthConfigs ] = { module::ModuleConfigurationDescription( "file", "Authentication file", "file",
+static module::ConfigurationDescription
+authConfig[ noAuthConfigs ] = { module::ConfigurationDescription( "file", "Authentication file", "file",
 				&AAAA::TextFileAuthConfig::create,
 				&config::ConfigurationParser::parseBase<AAAA::TextFileAuthConfig> ),
-				module::ModuleConfigurationDescription( "database", "Authentication database", "database",
+				module::ConfigurationDescription( "database", "Authentication database", "database",
 				&AAAA::DatabaseAuthConfig::create,
 				&config::ConfigurationParser::parseBase<AAAA::DatabaseAuthConfig> ) };
 
 static const size_t noAuditConfigs = 2;
-static module::ModuleConfigurationDescription
-auditConfig[ noAuditConfigs ] = { module::ModuleConfigurationDescription( "file", "Audit file", "file",
+static module::ConfigurationDescription
+auditConfig[ noAuditConfigs ] = { module::ConfigurationDescription( "file", "Audit file", "file",
 				  &AAAA::FileAuditConfig::create,
 				  &config::ConfigurationParser::parseBase<AAAA::FileAuditConfig> ),
-				  module::ModuleConfigurationDescription( "database", "Audit database", "database",
+				  module::ConfigurationDescription( "database", "Audit database", "database",
 				  &AAAA::DBauditConfig::create,
 				  &config::ConfigurationParser::parseBase<AAAA::DBauditConfig> ) };
 /****  End impersonating the module loader  **************************************************/

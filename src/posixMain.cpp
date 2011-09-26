@@ -153,7 +153,7 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 		conf.finalize( cmdLineCfg );
 
 // now here we know where to log to on stderr
-		_Wolframe::log::LogBackend::instance().setConsoleLevel( conf.loggerConf->stderrLogLevel );
+		_Wolframe::log::LogBackend::instance().setConsoleLevel( conf.loggerCfg->stderrLogLevel );
 
 // Check the configuration
 		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::CHECK_CONFIG )	{
@@ -192,8 +192,8 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 		if( !conf.foreground ) {
 			// Aba: maybe also in the foreground?
 			// try to lock the pidfile, bail out if not possible
-			if( boost::filesystem::exists( conf.serviceConf->pidFile ) ) {
-				boost::interprocess::file_lock lock( conf.serviceConf->pidFile.c_str( ) );
+			if( boost::filesystem::exists( conf.serviceCfg->pidFile ) ) {
+				boost::interprocess::file_lock lock( conf.serviceCfg->pidFile.c_str( ) );
 				if( lock.try_lock( ) ) {
 					LOG_ERROR << "Pidfile is locked, another daemon running?";
 					return _Wolframe::ErrorCode::FAILURE;
@@ -209,40 +209,40 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 			// now here we lost constrol over the console, we should
 			// create a temporary logger which at least tells what's
 			// going on in the syslog
-			_Wolframe::log::LogBackend::instance().setSyslogLevel( conf.loggerConf->syslogLogLevel );
-			_Wolframe::log::LogBackend::instance().setSyslogFacility( conf.loggerConf->syslogFacility );
-			_Wolframe::log::LogBackend::instance().setSyslogIdent( conf.loggerConf->syslogIdent );
+			_Wolframe::log::LogBackend::instance().setSyslogLevel( conf.loggerCfg->syslogLogLevel );
+			_Wolframe::log::LogBackend::instance().setSyslogFacility( conf.loggerCfg->syslogFacility );
+			_Wolframe::log::LogBackend::instance().setSyslogIdent( conf.loggerCfg->syslogIdent );
 
 			// if we are root we can drop privileges now
 			struct group *groupent;
 			struct passwd *passwdent;
 
-			passwdent = getpwnam( conf.serviceConf->user.c_str( ) );
+			passwdent = getpwnam( conf.serviceCfg->user.c_str( ) );
 			if( passwdent == NULL ) {
-				LOG_CRITICAL << "Illegal user '" << conf.serviceConf->user << "': " << _Wolframe::log::LogError::LogStrerror;
+				LOG_CRITICAL << "Illegal user '" << conf.serviceCfg->user << "': " << _Wolframe::log::LogError::LogStrerror;
 				return _Wolframe::ErrorCode::FAILURE;
 			}
 
-			groupent = getgrnam( conf.serviceConf->group.c_str( ) );
+			groupent = getgrnam( conf.serviceCfg->group.c_str( ) );
 			if( groupent == NULL ) {
-				LOG_CRITICAL << "Illegal group '" << conf.serviceConf->group << "': " << _Wolframe::log::LogError::LogStrerror;
+				LOG_CRITICAL << "Illegal group '" << conf.serviceCfg->group << "': " << _Wolframe::log::LogError::LogStrerror;
 				return _Wolframe::ErrorCode::FAILURE;
 			}
 
 			if( setgid( groupent->gr_gid ) < 0 ) {
-				LOG_CRITICAL << "setgid for group '" << conf.serviceConf->group << "' failed: " << _Wolframe::log::LogError::LogStrerror;
+				LOG_CRITICAL << "setgid for group '" << conf.serviceCfg->group << "' failed: " << _Wolframe::log::LogError::LogStrerror;
 				return _Wolframe::ErrorCode::FAILURE;
 			}
 
 			if( setuid( passwdent->pw_uid ) < 0 ) {
-				LOG_CRITICAL << "setgid for user '" << conf.serviceConf->user << "' failed: " << _Wolframe::log::LogError::LogStrerror;
+				LOG_CRITICAL << "setgid for user '" << conf.serviceCfg->user << "' failed: " << _Wolframe::log::LogError::LogStrerror;
 				return _Wolframe::ErrorCode::FAILURE;
 			}
 
 			// create a pid file and lock id
-			std::ofstream pidFile( conf.serviceConf->pidFile.c_str( ), std::ios_base::trunc );
+			std::ofstream pidFile( conf.serviceCfg->pidFile.c_str( ), std::ios_base::trunc );
 			if( !pidFile.good( ) ) {
-				LOG_CRITICAL << "Unable to create PID file '" << conf.serviceConf->pidFile << "'!";
+				LOG_CRITICAL << "Unable to create PID file '" << conf.serviceCfg->pidFile << "'!";
 				return _Wolframe::ErrorCode::FAILURE;
 			}
 			pidFile << getpid( ) << std::endl;
@@ -250,8 +250,8 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 
 			// Create the final logger based on the configuration
 			// file logger only here to get the right permissions
-			_Wolframe::log::LogBackend::instance().setLogfileLevel( conf.loggerConf->logFileLogLevel );
-			_Wolframe::log::LogBackend::instance().setLogfileName( conf.loggerConf->logFile );
+			_Wolframe::log::LogBackend::instance().setLogfileLevel( conf.loggerCfg->logFileLogLevel );
+			_Wolframe::log::LogBackend::instance().setLogfileName( conf.loggerCfg->logFile );
 		}
 
 		// Block all signals for background thread.
@@ -263,8 +263,8 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 		LOG_NOTICE << "Starting server";
 
 		// Run server in background thread(s).
-		_Wolframe::ServerHandler handler( conf.handlerConf );
-		_Wolframe::net::server s( conf.serverConf, handler );
+		_Wolframe::ServerHandler handler( conf.handlerCfg );
+		_Wolframe::net::server s( conf.serverCfg, handler );
 		boost::thread t( boost::bind( &_Wolframe::net::server::run, &s ));
 
 		// Restore previous signals.
@@ -288,7 +288,7 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 
 		// Daemon stuff
 		if( !conf.foreground ) {
-			(void)remove( conf.serviceConf->pidFile.c_str( ) );
+			(void)remove( conf.serviceCfg->pidFile.c_str( ) );
 		}
 	}
 	catch (std::exception& e)	{

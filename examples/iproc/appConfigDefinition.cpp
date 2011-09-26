@@ -44,31 +44,31 @@ namespace config {
 ApplicationConfiguration::ApplicationConfiguration()
 {
 	// daemon / service configuration
-	serviceConf = new config::ServiceConfiguration();
+	serviceCfg = new config::ServiceConfiguration();
 	// network server
-	serverConf = new net::Configuration();
+	serverCfg = new net::Configuration();
 	// logging
-	loggerConf = new log::LoggerConfiguration();
+	loggerCfg = new log::LoggerConfiguration();
 #if WITH_LUA
 	// application processor
-	handlerConf = new _Wolframe::HandlerConfiguration();
+	handlerCfg = new _Wolframe::HandlerConfiguration();
 #endif
 	// add sections, the parse function will select the
 	// appropriate action
-	addConfig( "service", serviceConf, &ConfigurationParser::parseBase<config::ServiceConfiguration> );
-	addConfig( "daemon", serviceConf, &ConfigurationParser::parseBase<config::ServiceConfiguration> );
+	addConfig( "service", serviceCfg, &ConfigurationParser::parseBase<config::ServiceConfiguration> );
+	addConfig( "daemon", serviceCfg, &ConfigurationParser::parseBase<config::ServiceConfiguration> );
 
-	addConfig( "listen", serverConf, &ConfigurationParser::parseBase<net::Configuration> );
-	addConfig( "logging", loggerConf, &ConfigurationParser::parseBase<log::LoggerConfiguration> );
-	addConfig( "application", handlerConf->m_appConfig, &ConfigurationParser::parseBase<iproc::lua::Configuration>);
+	addConfig( "listen", serverCfg, &ConfigurationParser::parseBase<net::Configuration> );
+	addConfig( "logging", loggerCfg, &ConfigurationParser::parseBase<log::LoggerConfiguration> );
+	addConfig( "application", handlerCfg->m_appConfig, &ConfigurationParser::parseBase<iproc::lua::Configuration>);
 }
 
 ApplicationConfiguration::~ApplicationConfiguration()
 {
-	if (serviceConf) delete serviceConf;
-	if (serverConf) delete serverConf;
-	if (loggerConf) delete loggerConf;
-	if (handlerConf) delete handlerConf;
+	if (serviceCfg) delete serviceCfg;
+	if (serverCfg) delete serverCfg;
+	if (loggerCfg) delete loggerCfg;
+	if (handlerCfg) delete handlerCfg;
 }
 
 }} // namespace _Wolframe::config

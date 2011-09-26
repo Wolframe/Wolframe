@@ -68,13 +68,13 @@ struct ApplicationConfiguration	{
 	bool				foreground;
 
 	// daemon / service configuration
-	ServiceConfiguration		*serviceConf;
+	ServiceConfiguration		*serviceCfg;
 	// network server configuration
-	net::Configuration		*serverConf;
+	net::Configuration		*serverCfg;
 	// logger configuration
-	log::LoggerConfiguration	*loggerConf;
+	log::LoggerConfiguration	*loggerCfg;
 
-	HandlerConfiguration		*handlerConf;
+	HandlerConfiguration		*handlerCfg;
 
 public:
 	enum ConfigFileType	{
