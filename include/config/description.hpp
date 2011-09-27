@@ -44,6 +44,7 @@ Project Wolframe.
 namespace _Wolframe {
 namespace config {
 
+///\class Description
 ///\brief Intrusive configuration description
 ///\tparam Structure structure that is represented by this description
 template <class Structure>

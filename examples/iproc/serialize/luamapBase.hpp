@@ -42,7 +42,9 @@ extern "C"
 }
 #include <cstddef>
 #include <string>
-#include <map>
+#include <cstring>
+#include <cstddef>
+#include <vector>
 
 namespace _Wolframe {
 namespace serialize {
@@ -50,19 +52,41 @@ namespace serialize {
 class DescriptionBase
 {
 public:
+	typedef std::vector<std::pair<const char*,DescriptionBase> > Map;
 	typedef bool (*Parse)( void* obj, lua_State* ls);
 	typedef bool (*Print)( void* obj, lua_State* ls);
 	
-	DescriptionBase( std::size_t ofs, Parse pa, Print pr)
-		:m_ofs(ofs),m_parse(pa),m_print(pr){}
+	DescriptionBase( const char* tn, std::size_t ofs, std::size_t sz, Parse pa, Print pr)
+		:m_typename(tn),m_ofs(ofs),m_size(sz),m_parse(pa),m_print(pr){}
 	DescriptionBase( const DescriptionBase& o)
-		:m_ofs(o.m_ofs),m_elem(o.m_elem),m_parse(o.m_parse),m_print(o.m_print){}
+		:m_typename(o.m_typename),m_ofs(o.m_ofs),m_size(o.m_size),m_elem(o.m_elem),m_parse(o.m_parse),m_print(o.m_print){}
 
 	bool parse( void* obj, lua_State* ls) const	{return m_parse(obj,ls);}
 	bool print( void* obj, lua_State* ls) const	{return m_print(obj,ls);}
+
+	std::size_t size() const
+	{
+		return m_size;
+	}
+
+	Map::const_iterator find( const char* name) const
+	{
+		for (Map::const_iterator itr = m_elem.begin(); itr!=m_elem.end(); ++itr)
+		{
+			if (std::strcmp( itr->first, name) == 0) return itr;
+		}
+		return m_elem.end();
+	}
+
+	void define( const char* name, const DescriptionBase& dd)
+	{
+		m_elem.push_back( std::pair<const char*,DescriptionBase>(name,dd));
+	}
 public:
+	const char* m_typename;
 	std::size_t m_ofs;
-	std::map<std::string,DescriptionBase> m_elem;
+	std::size_t m_size;
+	Map m_elem;
 	Parse m_parse;
 	Print m_print;
 };

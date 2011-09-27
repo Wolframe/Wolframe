@@ -34,6 +34,15 @@ Project Wolframe.
 
 #ifndef _Wolframe_SERIALIZE_LUAMAP_TRAITS_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_LUAMAP_TRAITS_HPP_INCLUDED
+#include "serialize/luamapBase.hpp"
+#include "logger/logLevel.hpp"
+#include <boost/lexical_cast.hpp>
+#include <boost/utility/enable_if.hpp>
+#include <boost/type_traits.hpp>
+#include <boost/detail/select_type.hpp>
+#include <boost/type_traits/function_traits.hpp>
+#include <vector>
+#include <string>
 
 namespace _Wolframe {
 namespace serialize {
@@ -78,21 +87,21 @@ struct has_description_method<T,true>:
 template <typename T>
 typename boost::enable_if_c<
 	boost::is_same< std::vector< typename T::value_type> ,T>::value && !boost::is_same<std::string,T>::value
-	,vector_>::type getCategory( const T&) { return vector_();}
+	,const vector_>::type getCategory( const T&) { return vector_();}
 
 ///\brief get category struct_ for a type
 /// returns struct_ if T has a method description with no params returning a const pointer to a config::DescriptionBase
 template <typename T>
 typename boost::enable_if_c<
 	has_description_method<T>::value
-	,struct_>::type getCategory( const T&) { return struct_();}
+	,const struct_>::type getCategory( const T&) { return struct_();}
 
 ///\brief get category arithmetic_ for a type
 /// returns arithmetic_ if T fulfills the is_arithmetic condition or is a string
 template <typename T>
 typename boost::enable_if_c<
 	(boost::is_arithmetic<T>::value || boost::is_same<std::string,T>::value
-	,arithmetic_>::type getCategory( const T&) { return arithmetic_();}
+	,const arithmetic_>::type getCategory( const T&) { return arithmetic_();}
 
 struct luanumeric_{};
 struct luabool_{};
@@ -104,26 +113,26 @@ struct luastruct_{};
 template <typename T>
 typename boost::enable_if_c<
 	(boost::is_arithmetic<T>::value && !boost::is_same<bool,T>::value)
-	,luanumeric_>::type getLuaCategory( const T&) { return luanumeric_();}
+	,const luanumeric_>::type getLuaCategory( const T&) { return luanumeric_();}
 
 ///\brief get category luabool_ for a type
 /// returns luabool_ if T is a bool
 template <typename T>
 typename boost::enable_if_c<
 	boost::is_same<bool,T>::value
-	,luabool_>::type getLuaCategory( const T&) { return luabool_();}
+	,const luabool_>::type getLuaCategory( const T&) { return luabool_();}
 
 ///\brief get category luastring_ for a type
 /// returns luastring_ if T is a bool
 template <typename T>
 typename boost::enable_if_c<
 	boost::is_same<std::string,T>::value
-	,luastring_>::type getLuaCategory( const T&) { return luastring_();}
+	,const luastring_>::type getLuaCategory( const T&) { return luastring_();}
 
 template <typename T>
 typename boost::enable_if_c<
 	(!boost::is_arithmetic<T>::value && !boost::is_same<bool,T>::value && !boost::is_same<std::string,T>::value)
-	,luastruct_>::type getLuaCategory( const T&) { return luastruct_();}
+	,const luastruct_>::type getLuaCategory( const T&) { return luastruct_();}
 
 }}//namespace
 #endif

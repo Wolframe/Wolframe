@@ -618,7 +618,7 @@ public:
 		}
 	}
 
-	virtual protocol::InputFilter* createFollow()
+	virtual protocol::InputFilter* createFollow() const
 	{
 		if (!m_headerParsed) return 0;
 		TextwolfEncoding::Id enc = m_encoding.get()?*m_encoding.get():TextwolfEncoding::Unknown;
@@ -626,8 +626,7 @@ public:
 		switch (enc)
 		{
 			case TextwolfEncoding::Unknown:
-				setState( Error, ErrEncoding);
-				return false;
+				return 0;
 			case TextwolfEncoding::IsoLatin:
 				rt = new InputFilterImpl<textwolf::charset::IsoLatin1>(m_bufsize);
 				break;

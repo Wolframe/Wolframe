@@ -34,7 +34,7 @@ Project Wolframe.
 
 #ifndef _Wolframe_LUAMAP_PRINT_HPP_INCLUDED
 #define _Wolframe_LUAMAP_PRINT_HPP_INCLUDED
-#include "luamapTraits.hpp"
+#include "serialize/luamapTraits.hpp"
 
 #include <boost/utility/value_init.hpp> 
 #include <vector> 
@@ -89,28 +89,28 @@ struct Context
 }
 
 template <typename T>
-bool pushAtom_( void* obj, luanumeric_&, lua_State* ls, Context* ctx)
+bool pushAtom_( void* obj, const luanumeric_&, lua_State* ls, Context* ctx)
 {
 	lua_pushnumber( ls, *((T*)obj));
 	return true;
 }
 
 template <typename T>
-bool pushAtom_( void* obj, luabool_&, lua_State* ls, Context* ctx)
+bool pushAtom_( void* obj, const luabool_&, lua_State* ls, Context* ctx)
 {
 	lua_pushboolean( ls, *((T*)obj));
 	return true;
 }
 
 template <typename T>
-bool pushAtom_( void* obj, luastring_&, lua_State* ls, Context* ctx)
+bool pushAtom_( void* obj, const luastring_&, lua_State* ls, Context* ctx)
 {
 	lua_pushstring( ls, ((T*)obj)->c_str());
 	return true;
 }
 
 template <typename T>
-bool pushAtom_( void* obj, luastruct_&, lua_State* ls, Context* ctx)
+bool pushAtom_( void* obj, const luastruct_&, lua_State* ls, Context* ctx)
 {
 	printError( 0, "atomic value expected");
 	return false;
@@ -124,18 +124,18 @@ bool push_( void* obj, lua_State* ls, Context* ctx)
 
 
 template <typename T>
-bool print_( void* obj, struct_&, lua_State* ls, Context* ctx)
+bool print_( void* obj, const struct_&, lua_State* ls, Context* ctx)
 {
 	static const DescriptionBase* descr = T::description();
 	
 	lua_newtable( ls);
-	std::map<std::string,DescriptionBase>::const_iterator itr = descr->m_elem->begin();
+	DescriptionBase::Map::const_iterator itr = descr->m_elem->begin();
 	while (itr != descr->m_elem->end()(
 	{
 		lua_pushstring( ls, itr->first);
-		if (!itr->m_print( 0, (char*)obj+itr->m_ofs, ls, ctx))
+		if (!itr->second.m_print( 0, (char*)obj+itr->second.m_ofs, ls, ctx))
 		{
-			printError( itr->first, ctx);
+			printError( itr->first.c_str(), ctx);
 			return false;
 		}
 		lua_settable( ls, -2);
@@ -145,13 +145,13 @@ bool print_( void* obj, struct_&, lua_State* ls, Context* ctx)
 }
 
 template <typename T>
-bool print_( void* obj, arithmetic_&, lua_State* ls, Context* ctx)
+bool print_( void* obj, const arithmetic_&, lua_State* ls, Context* ctx)
 {
 	return push_<T>( obj, ls, ctx);
 }
 
 template <typename T>
-bool print_( void* obj, vector_&, lua_State* ls, Context* ctx)
+bool print_( void* obj, const vector_&, lua_State* ls, Context* ctx)
 {
 	static const DescriptionBase* descr = T::description();
 	
