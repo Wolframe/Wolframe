@@ -38,11 +38,8 @@ function printTable( tab)
 end
 
 function run()
-	iof = filter( "xml:textwolf")
-	input:as( iof)
-	output:as( iof)
 	t = readTable( input.get())
-	t = tranform( t)
+	t = transform( t)
 	printTable( t)
 end
 

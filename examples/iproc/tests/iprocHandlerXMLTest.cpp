@@ -40,17 +40,15 @@
 #include "handlerConfig.hpp"
 #include "config/configurationParser.hpp"
 #include "testHandlerTemplates.hpp"
-#include <gtest/gtest.h>
+#include "testUtils.hpp"
 #include <iostream>
 #include <list>
 #include <fstream>
 #include <algorithm>
 #include <stdexcept>
 #include <stdio.h>
-#define BOOST_FILESYSTEM_VERSION 3
-#include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/thread/thread.hpp>
+#include <gtest/gtest.h>
 
 using namespace _Wolframe;
 using namespace iproc;
@@ -103,16 +101,6 @@ static const TestDescription testDescriptions[] =
 	{0,0,0,0}
 };
 
-static std::string getDataFile( const char* name, const char* type, const char* ext=0)
-{
-	boost::filesystem::path rt = boost::filesystem::current_path();
-	std::string datafile( name);
-	datafile.append( ext?ext:"");
-	rt /= type;
-	rt /= datafile;
-	return rt.string();
-}
-
 struct TestConfiguration :public lua::Configuration
 {
 	TestConfiguration()
@@ -122,7 +110,7 @@ struct TestConfiguration :public lua::Configuration
 		:lua::Configuration( "iproc", "test-iproc")
 	{
 		boost::property_tree::ptree pt;
-		std::string scriptpath( getDataFile( scriptname, "scripts", ".lua"));
+		std::string scriptpath( wtest::Data::getDataFile( scriptname, "scripts", ".lua"));
 		pt.put("main", scriptpath);
 		pt.put("input_buffer", boost::lexical_cast<std::string>( bufferSizeInput));
 		pt.put("output_buffer", boost::lexical_cast<std::string>( bufferSizeOutput));
@@ -142,33 +130,6 @@ protected:
 	virtual void TearDown() {}
 };
 
-static void createDataDir( const char* type)
-{
-	boost::filesystem::path pt = boost::filesystem::current_path();
-	pt /= type;
-	boost::filesystem::create_directory( pt);
-}
-
-static bool readFile( const char* fn, std::string& out)
-{
-	char buf;
-	std::fstream ff;
-	ff.open( fn, std::ios::in | std::ios::binary);
-	while (ff.read( &buf, sizeof(buf)))
-	{
-		out.push_back( buf);
-	}
-	bool rt = ((ff.rdstate() & std::ifstream::eofbit) != 0);
-	ff.close();
-	return rt;
-}
-
-static void writeFile( const char* fn, const std::string& content)
-{
-	std::fstream ff( fn, std::ios::out | std::ios::binary);
-	ff.write( content.c_str(), content.size());
-}
-
 TEST_F( XMLTestFixture, tests)
 {
 	unsigned int ti;
@@ -177,25 +138,15 @@ TEST_F( XMLTestFixture, tests)
 		enum {NofBufferSizes=5};
 		static int BufferSize[ NofBufferSizes] = {2,3,5,7,127};
 
-		std::string prt_input;
-		std::string ifnam = getDataFile( testDescriptions[ti].datafile, "data");
-		if (!readFile( ifnam.c_str(), prt_input)) throw std::runtime_error("could not read test input file");
-
-		std::string prt_expect;
-		std::string efnam = getDataFile( testDescriptions[ti].name, "must", ".txt");
-		readFile( efnam.c_str(), prt_expect);
-
 		net::LocalTCPendpoint  ep( "127.0.0.1", 12345);
 		iproc::Connection* connection = 0;
-
-		std::string ofnam = getDataFile( testDescriptions[ti].name, "result", ".txt");
-		std::cerr << "in case of error the output is written to '" << ofnam << "'" << std::endl;
+		wtest::Data data( testDescriptions[ti].name, testDescriptions[ti].datafile);
 
 		for (unsigned int ib=0; ib<NofBufferSizes; ib++)
 		{
 			for (unsigned int ob=0; ob<NofBufferSizes; ob++)
 			{
-				std::string prt_output;
+				std::string testoutput;
 
 				TestConfiguration config(
 						testDescriptions[ti].scriptfile,
@@ -203,28 +154,12 @@ TEST_F( XMLTestFixture, tests)
 						BufferSize[ob]+testDescriptions[ti].elementBuffersize);
 				connection = new iproc::Connection( ep, &config);
 
-				char* in_start = const_cast<char*>(prt_input.c_str());
-				char* in_end = const_cast<char*>(prt_input.c_str() + prt_input.size());
-				EXPECT_EQ( 0, test::runTestIO( in_start, in_end, prt_output, *connection));
-#define _Wolframe_LOWLEVEL_DEBUG
-#ifdef _Wolframe_LOWLEVEL_DEBUG
-				unsigned int ii=0,nn=prt_output.size();
-				for (;ii<nn && prt_output[ii]==prt_expect[ii]; ii++);
-				if (ii != nn)
-				{
-					// write output to file to check the result in case of an error
-					writeFile( ofnam.c_str(), prt_output);
+				char* in_start = const_cast<char*>(data.input.c_str());
+				char* in_end = const_cast<char*>(data.input.c_str() + data.input.size());
 
-					printf( "TEST %s SIZE R=%lu,E=%lu,DIFF AT %u='%d %d %d %d|%d %d %d %d'\n",
-						testDescriptions[ti].name,
-						(unsigned long)prt_output.size(), (unsigned long)prt_expect.size(), ii,
-						prt_output[ii-2],prt_output[ii-1],prt_output[ii-0],prt_output[ii+1],
-						prt_expect[ii-2],prt_expect[ii-1],prt_expect[ii-0],prt_expect[ii+1]);
-
-					boost::this_thread::sleep( boost::posix_time::seconds( 5 ));
-				}
-#endif
-				ASSERT_EQ( prt_expect, prt_output);
+				EXPECT_EQ( 0, test::runTestIO( in_start, in_end, testoutput, *connection));
+				data.check( testoutput);
+				ASSERT_EQ( data.expected, testoutput);
 			}
 		}
 	}
@@ -232,7 +167,7 @@ TEST_F( XMLTestFixture, tests)
 
 int main( int argc, char **argv )
 {
-	createDataDir( "result");
+	wtest::Data::createDataDir( "result");
 	::testing::InitGoogleTest( &argc, argv );
 	return RUN_ALL_TESTS();
 }

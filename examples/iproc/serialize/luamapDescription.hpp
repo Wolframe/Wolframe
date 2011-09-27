@@ -37,11 +37,25 @@ Project Wolframe.
 #include "serialize/luamapTraits.hpp"
 #include "serialize/luamapParse.hpp"
 #include "serialize/luamapPrint.hpp"
+#include "logger.hpp"
 #include <typeinfo>
 #include <exception>
 
 namespace _Wolframe {
 namespace serialize {
+
+template <class Element>
+static const char* getTypename()
+{
+	const char* typ = 0;
+	try
+	{
+		typ = typeid(Element).name();
+	}
+	catch (std::bad_typeid)
+	{}
+	return typ;
+}
 
 ///\class Description
 ///\brief Intrusive configuration description
@@ -63,8 +77,8 @@ struct Description :public DescriptionBase
 		}
 		catch (std::bad_typeid)
 		{}
-		DescriptionBase::Parse parse_ = &_Wolframe::serialize::Description<Element>::parse;
-		DescriptionBase::Print print_ = _Wolframe::serialize::Description<Element>::print;
+		DescriptionBase::Parse parse_ = &IntrusiveParser<Element>::parse;
+		DescriptionBase::Print print_ = &IntrusivePrinter<Element>::print;
 
 		std::size_t pp = (std::size_t)&(((Structure*)0)->*eptr);
 		DescriptionBase e( getTypename<Element>(), pp, sizeof(Element), parse_, print_);

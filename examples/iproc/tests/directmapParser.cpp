@@ -36,8 +36,7 @@ Project Wolframe.
 #include "serialize/directmapBase.hpp"
 #include "langbind/appObjects.hpp"
 #include "logger.hpp"
-#define BOOST_FILESYSTEM_VERSION 3
-#include <boost/filesystem.hpp>
+#include "tests/testUtils.hpp"
 #ifdef _WIN32
 #pragma warning(disable:4996)
 #pragma warning(disable:4127)
@@ -48,7 +47,6 @@ Project Wolframe.
 
 using namespace _Wolframe;
 using namespace serialize;
-
 
 struct Plant
 {
@@ -185,7 +183,7 @@ const DescriptionBase* Places::getDescription()
 }
 
 template <class Struct>
-static int run( const char* name, const char* input, std::string& output)
+static int run( const char* root, const std::string& input, std::string& output)
 {
 	app::Filter filter( "xml:textwolf", 1024, 1024);
 	protocol::InputFilter* in = filter.m_inputfilter.get();
@@ -205,110 +203,37 @@ static int run( const char* name, const char* input, std::string& output)
 	ProcessingContext ctx;
 	const DescriptionBase* ds = Struct::getDescription();
 
-	in->protocolInput( (void*)input, strlen(input), true);
-	if (!ds->parse( name, (void*)&object, *in, ctx))
+	in->protocolInput( (void*)input.c_str(), input.size(), true);
+	if (!ds->parse( root, (void*)&object, *in, ctx))
 	{
-		LOG_ERROR << "error in serialization of " << name << ctx.getLastError();
+		LOG_ERROR << "error in serialization of " << root << " " << ctx.getLastError();
 		return 3;
 	}
-	if (!ds->print( name, (const void*)&object, *out, ctx))
+	if (!ds->print( root, (const void*)&object, *out, ctx))
 	{
-		LOG_ERROR << "error in deserialization of " << name << ": " << ctx.getLastError();
+		LOG_ERROR << "error in deserialization of " << root << ": " << ctx.getLastError();
 		return 4;
 	}
 	output = ctx.content();
 	return 0;
 }
 
-typedef int (*runFunction)( const char* name, const char* input, std::string& output);
+typedef int (*runFunction)( const char* name, const std::string& input, std::string& output);
 
 struct TestDescription
 {
-	const char* name;
-	const char* input;
-	const char* output;
-	runFunction run;
+	const char* name;		///< determines the name of the result and of the expected result file
+	const char* roottag;		///< name of the root tag of the xml file
+	const char* datafile;		///< input to feed
+	runFunction run;		///< the function to execute
 };
 
 static const TestDescription testDescription[2] = {
 {
+	"directmap_PLACES",
 	"PLACES",
-
-	"<?xml version='1.0' encoding='Isolatin-1' standalone='yes'>\r\n"
-	"<PLACES>"
-	"<GARDEN>"
-	"<NAME>Botanischer Garten</NAME>"
-	"<ADDRESS>"
-	"<COUNTRY>41</COUNTRY>"
-	"<STREET>Zollikerstrasse</STREET>"
-	"<CITY>Zürich</CITY>"
-	"<PHONE><NUMBER>01234567</NUMBER><MOBILE>01234567</MOBILE></PHONE>"
-	"</ADDRESS>"
-	"<PLANT>"
-	"<COMMON>Bloodroot</COMMON>"
-	"<BOTANICAL>Sanguinaria canadensis</BOTANICAL>"
-	"<ZONE>4</ZONE>"
-	"<LIGHT>Mostly Shady</LIGHT>"
-	"<PRICE>$2.44</PRICE>"
-	"<AVAILABILITY>31599</AVAILABILITY>"
-	"</PLANT>"
-	"<PLANT>"
-	"<COMMON>Columbine</COMMON>"
-	"<BOTANICAL>Aquilegia canadensis</BOTANICAL>"
-	"<ZONE>3</ZONE>"
-	"<LIGHT>Mostly Shady</LIGHT>"
-	"<PRICE>$9.37</PRICE>"
-	"<AVAILABILITY>3069</AVAILABILITY>"
-	"</PLANT>"
-	"<PLANT>"
-	"<COMMON>Marsh Marigold</COMMON>"
-	"<BOTANICAL>Caltha palustris</BOTANICAL>"
-	"<ZONE>4</ZONE>"
-	"<LIGHT>Mostly Sunny</LIGHT>"
-	"<PRICE>$6.81</PRICE>"
-	"<AVAILABILITY>51799</AVAILABILITY>"
-	"</PLANT>"
-	"</GARDEN>"
-	"</PLACES>",
-
-	"<?xml version='1.0' encoding='Isolatin-1' standalone='yes'>\r\n"
-	"<PLACES>"
-	"<GARDEN>"
-	"<NAME>Botanischer Garten</NAME>"
-	"<ADDRESS>"
-	"<COUNTRY>41</COUNTRY>"
-	"<STREET>Zollikerstrasse</STREET>"
-	"<CITY>Zürich</CITY>"
-	"<PHONE><NUMBER>01234567</NUMBER><MOBILE>01234567</MOBILE></PHONE>"
-	"</ADDRESS>"
-	"<PLANT>"
-	"<COMMON>Bloodroot</COMMON>"
-	"<BOTANICAL>Sanguinaria canadensis</BOTANICAL>"
-	"<ZONE>4</ZONE>"
-	"<LIGHT>Mostly Shady</LIGHT>"
-	"<PRICE>$2.44</PRICE>"
-	"<AVAILABILITY>31599</AVAILABILITY>"
-	"</PLANT>"
-	"<PLANT>"
-	"<COMMON>Columbine</COMMON>"
-	"<BOTANICAL>Aquilegia canadensis</BOTANICAL>"
-	"<ZONE>3</ZONE>"
-	"<LIGHT>Mostly Shady</LIGHT>"
-	"<PRICE>$9.37</PRICE>"
-	"<AVAILABILITY>3069</AVAILABILITY>"
-	"</PLANT>"
-	"<PLANT>"
-	"<COMMON>Marsh Marigold</COMMON>"
-	"<BOTANICAL>Caltha palustris</BOTANICAL>"
-	"<ZONE>4</ZONE>"
-	"<LIGHT>Mostly Sunny</LIGHT>"
-	"<PRICE>$6.81</PRICE>"
-	"<AVAILABILITY>51799</AVAILABILITY>"
-	"</PLANT>"
-	"</GARDEN>"
-	"</PLACES>",
-
-	&run<Places>,
+	"test_directmap_places_IsoLatin1.xml",
+	&run<Places>
 },
 {0,0,0,0}
 };
@@ -325,31 +250,19 @@ protected:
 TEST_F( TestFixture, tests)
 {
 	unsigned int ti;
-	for (ti=0; testDescription[ti].input; ti++)
+	for (ti=0; testDescription[ti].name; ti++)
 	{
-		std::string result;
-		EXPECT_EQ( 0, testDescription[ti].run( testDescription[ti].name, testDescription[ti].input, result));
-#define _Wolframe_LOWLEVEL_DEBUG
-#ifdef _Wolframe_LOWLEVEL_DEBUG
-		unsigned int ii=0,nn=result.size();
-		for (;ii<nn && result[ii]==testDescription[ti].output[ii]; ii++);
-		if (ii != nn)
-		{
-			std::string diff( testDescription[ti].output+ii, 10);
-			std::string res( result.c_str()+ii, 10);
-			std::size_t pp = ii - (ii<10?ii:10);
-			std::string pred( result.c_str()+ii-pp, ii-pp);
-			printf( "TEST %s DIFF AFTER '%s' RESULT='%s' EXPECTED='%s'\n", testDescription[ti].name, pred.c_str(), res.c_str(), diff.c_str());
-
-			boost::this_thread::sleep( boost::posix_time::seconds( 5 ));
-		}
-#endif
-		ASSERT_EQ( testDescription[ti].output, result);
+		wtest::Data data( testDescription[ti].name, testDescription[ti].datafile);
+		std::string testoutput;
+		EXPECT_EQ( 0, testDescription[ti].run( testDescription[ti].roottag, data.input, testoutput));
+		data.check( testoutput);
+		ASSERT_EQ( data.expected, testoutput);
 	}
 }
 
 int main( int argc, char **argv )
 {
+	wtest::Data::createDataDir( "result");
 	::testing::InitGoogleTest( &argc, argv );
 	return RUN_ALL_TESTS();
 }

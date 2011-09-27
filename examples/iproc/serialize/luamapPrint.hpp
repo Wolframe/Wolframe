@@ -34,108 +34,65 @@ Project Wolframe.
 
 #ifndef _Wolframe_LUAMAP_PRINT_HPP_INCLUDED
 #define _Wolframe_LUAMAP_PRINT_HPP_INCLUDED
+#include "serialize/luamapError.hpp"
 #include "serialize/luamapTraits.hpp"
-
 #include <boost/utility/value_init.hpp> 
 #include <vector> 
 
-namespace {
-
-struct Context
-{
-  char errormessage[256];
-	char tag[256];
-	
-	Context()
-	{
-		errormessage[ 0] = 0;
-		tag[ 0] = 0;
-	}
-
-	void printError( const char* tt, const char* ee)
-	{
-		std::size_t nn = strlen(ee);
-		if (nn >= sizeof( errormessage)) nn = sizeof( errormessage)-1;
-		std::memcpy( errormessage, ee, nn);
-		errormessage[ nn] = 0;
-		if (tt)
-		{
-			nn = strlen(tt);
-			if (nn >= sizeof( tag)) nn = sizeof( tag)-1;
-			std::memcpy( tag, tt, nn);
-			tag[ nn] = 0;
-		}
-		else
-		{
-			tag[ 0] = 0;
-		}
-	}
-
-	void printError( const char* tt, Context* ctx)
-	{
-		if (!tt) return;
-		char buf[ sizeof(tag)];
-		std::size_t nn = std::strlen(tt);
-		if (tt >= sizeof( buf)) nn = sizeof( buf)-2;
-		std::memcpy( buf, tt, nn);
-		buf[ nn] = '/';
-		buf[ ++nn] = 0;
-		std::size_t mm = std::strlen(tag);
-		if (mm+nn >= sizeof( buf)) mm = sizeof( buf)-1-nn;
-		std::memcpy( buf+nn, tag, mm);
-		buf[ nn+mm] = 0;
-		std::memcpy( tag, buf, nn+mm+1);
-	}
-}
+namespace _Wolframe {
+namespace serialize {
 
 template <typename T>
-bool pushAtom_( void* obj, const luanumeric_&, lua_State* ls, Context* ctx)
+struct IntrusivePrinter;
+
+template <typename T>
+bool pushAtom_( const void* obj, const luanumeric_&, lua_State* ls, Context*)
 {
 	lua_pushnumber( ls, *((T*)obj));
 	return true;
 }
 
 template <typename T>
-bool pushAtom_( void* obj, const luabool_&, lua_State* ls, Context* ctx)
+bool pushAtom_( const void* obj, const luabool_&, lua_State* ls, Context*)
 {
 	lua_pushboolean( ls, *((T*)obj));
 	return true;
 }
 
 template <typename T>
-bool pushAtom_( void* obj, const luastring_&, lua_State* ls, Context* ctx)
+bool pushAtom_( const void* obj, const luastring_&, lua_State* ls, Context*)
 {
 	lua_pushstring( ls, ((T*)obj)->c_str());
 	return true;
 }
 
 template <typename T>
-bool pushAtom_( void* obj, const luastruct_&, lua_State* ls, Context* ctx)
+bool pushAtom_( const void* obj, const luastruct_&, lua_State* ls, Context* ctx)
 {
-	printError( 0, "atomic value expected");
+	ctx->setError( 0, "atomic value expected");
 	return false;
 }
 
 template <typename T>
-bool push_( void* obj, lua_State* ls, Context* ctx)
+bool push_( const void* obj, lua_State* ls, Context* ctx)
 {
-	return pushAtom_( obj, getLuaCategory(T()), ls, ctx);
+	return pushAtom_<T>( obj, getLuaCategory(T()), ls, ctx);
 }
 
 
 template <typename T>
-bool print_( void* obj, const struct_&, lua_State* ls, Context* ctx)
+bool printObject_( const void* obj, const struct_&, lua_State* ls, Context* ctx)
 {
-	static const DescriptionBase* descr = T::description();
+	static const DescriptionBase* descr = T::getDescription();
 	
 	lua_newtable( ls);
-	DescriptionBase::Map::const_iterator itr = descr->m_elem->begin();
-	while (itr != descr->m_elem->end()(
+	DescriptionBase::Map::const_iterator itr = descr->m_elem.begin();
+	while (itr != descr->m_elem.end())
 	{
 		lua_pushstring( ls, itr->first);
-		if (!itr->second.m_print( 0, (char*)obj+itr->second.m_ofs, ls, ctx))
+		if (!itr->second.m_print( (char*)obj+itr->second.m_ofs, ls, ctx))
 		{
-			printError( itr->first.c_str(), ctx);
+			ctx->setError( itr->first, ctx);
 			return false;
 		}
 		lua_settable( ls, -2);
@@ -145,26 +102,24 @@ bool print_( void* obj, const struct_&, lua_State* ls, Context* ctx)
 }
 
 template <typename T>
-bool print_( void* obj, const arithmetic_&, lua_State* ls, Context* ctx)
+bool printObject_( const void* obj, const arithmetic_&, lua_State* ls, Context* ctx)
 {
 	return push_<T>( obj, ls, ctx);
 }
 
 template <typename T>
-bool print_( void* obj, const vector_&, lua_State* ls, Context* ctx)
+bool printObject_( const void* obj, const vector_&, lua_State* ls, Context* ctx)
 {
-	static const DescriptionBase* descr = T::description();
-	
 	lua_newtable( ls);
 	std::size_t index = 0;
 
-	T::const_iterator itr = ((T*)obj)->begin();
-	while (itr != ((T*)obj)->end()(
+	typename T::const_iterator itr = ((T*)obj)->begin();
+	while (itr != ((T*)obj)->end())
 	{
 		lua_pushnumber( ls, ++index);
-		if (!itr->m_print( 0, &(*itr), ls, ctx))
+		if (!IntrusivePrinter<typename T::value_type>::print( (const void*)&(*itr), ls, ctx))
 		{
-			printError( 0, ctx);
+			ctx->setError( 0, ctx);
 			return false;
 		}
 		lua_settable( ls, -2);
@@ -173,21 +128,14 @@ bool print_( void* obj, const vector_&, lua_State* ls, Context* ctx)
 	return true;
 }
 
-}//anonymous namespace
-namespace _Wolframe {
-namespace serialize {
-
 template <typename T>
-static bool print( T* obj, lua_State* ls)
+struct IntrusivePrinter
 {
-	Context ctx;
-	if (!print_<T>( (void*)obj, getCategory(val), ls, &ctx))
+	static bool print( const void* obj, lua_State* ls, Context* ctx)
 	{
-		luaL_error( "error in table deserialization at '%s': %s", ctx.tag, ctx.errormessage);
-		return false;
+		return printObject_<T>( obj, getCategory(*(T*)obj), ls, ctx);
 	}
-	return true;
-}
+};
 
 }}//namespace
 #endif

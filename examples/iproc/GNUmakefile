@@ -98,6 +98,7 @@ CPP_BINS = \
 TEST_BINS += \
 	tests/iprocHandlerTest$(EXE) \
 	tests/iprocHandlerXMLTest$(EXE) \
+	tests/luamapParser$(EXE) \
 	tests/directmapParser$(EXE)
 
 tests/iprocHandlerTest$(EXE): tests/iprocHandlerTest.o $(OBJS) $(TOPDIR)/src/libwolframe.a

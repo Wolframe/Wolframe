@@ -29,28 +29,63 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/luamapBase.cpp
-///\brief Implements the non intrusive base class of serialization for the lua map
-#include "serialize/luamapBase.hpp"
+///\file serialize/luamapError.hpp
+///\brief Defines the error handling of the intrusive lua serialization/deserialization
 
-using namespace _Wolframe;
-using namespace serialize;
+#ifndef _Wolframe_LUAMAP_ERROR_HPP_INCLUDED
+#define _Wolframe_LUAMAP_ERROR_HPP_INCLUDED
+#include <cstring>
 
-void DescriptionBase::parse( void* obj, lua_State* ls) const
+namespace _Wolframe {
+namespace serialize {
+
+struct Context
 {
-	Context ctx;
-	if (!m_parse(obj,ls,&ctx))
-	{
-		luaL_error( ls, ctx.errormessage);
-	}
-}
+	char errormessage[256];
+	char tag[256];
 
-void DescriptionBase::print( const void* obj, lua_State* ls) const
-{
-	Context ctx;
-	if (!m_print(obj,ls,&ctx))
+	Context()
 	{
-		luaL_error( ls, ctx.errormessage);
+		errormessage[ 0] = 0;
+		tag[ 0] = 0;
 	}
-}
+
+	void setError( const char* tt, const char* ee)
+	{
+		std::size_t nn = strlen(ee);
+		if (nn >= sizeof( errormessage)) nn = sizeof( errormessage)-1;
+		std::memcpy( errormessage, ee, nn);
+		errormessage[ nn] = 0;
+		if (tt)
+		{
+			nn = strlen(tt);
+			if (nn >= sizeof( tag)) nn = sizeof( tag)-1;
+			std::memcpy( tag, tt, nn);
+			tag[ nn] = 0;
+		}
+		else
+		{
+			tag[ 0] = 0;
+		}
+	}
+
+	void setError( const char* tt, Context* ctx)
+	{
+		if (!tt) return;
+		char buf[ sizeof(tag)];
+		std::size_t nn = std::strlen(tt);
+		if (nn >= sizeof( buf)) nn = sizeof( buf)-2;
+		std::memcpy( buf, tt, nn);
+		buf[ nn] = '/';
+		buf[ ++nn] = 0;
+		std::size_t mm = std::strlen(ctx->tag);
+		if (mm+nn >= sizeof( buf)) mm = sizeof( buf)-1-nn;
+		std::memcpy( buf+nn, ctx->tag, mm);
+		buf[ nn+mm] = 0;
+		std::memcpy( tag, buf, nn+mm+1);
+	}
+};
+
+}}
+#endif
 

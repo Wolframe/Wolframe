@@ -604,3 +604,9 @@ AppProcessor::CallResult AppProcessor::call( unsigned int argc, const char** arg
 	return Ok;
 }
 
+lua_State* AppProcessor::getLuaState() const
+{
+	return m_state->ls;
+}
+
+

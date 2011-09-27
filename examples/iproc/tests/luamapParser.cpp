@@ -31,12 +31,22 @@ Project Wolframe.
 ************************************************************************/
 ///\file serialize/luamapParser.cpp
 ///\brief test for lua serialization parser
+
 #include "serialize/luamapDescription.hpp"
 #include "serialize/luamapBase.hpp"
+#include "langbind/luaConfig.hpp"
 #include "langbind/appObjects.hpp"
+#include "langbind/luaAppProcessor.hpp"
 #include "logger.hpp"
-#define BOOST_FILESYSTEM_VERSION 3
-#include <boost/filesystem.hpp>
+#include "config/configurationParser.hpp"
+#include "tests/testUtils.hpp"
+extern "C"
+{
+#include "lua.h"
+#include "lualib.h"
+#include "lauxlib.h"
+#include "lcoco.h"
+}
 #ifdef _WIN32
 #pragma warning(disable:4996)
 #pragma warning(disable:4127)
@@ -46,6 +56,7 @@ Project Wolframe.
 #include <boost/thread/thread.hpp>
 
 using namespace _Wolframe;
+using namespace iproc;
 using namespace serialize;
 
 struct Plant
@@ -182,13 +193,43 @@ const DescriptionBase* Places::getDescription()
 	return &rt;
 }
 
-template <class Struct>
-static int run( const char* name, const char* input, std::string& output)
+struct TestConfiguration :public lua::Configuration
 {
+	TestConfiguration()
+		:lua::Configuration( "iproc", "test-xml"){}
+	TestConfiguration( const TestConfiguration& o) :lua::Configuration(o){}
+	TestConfiguration( const std::string& scriptpath, int bufferSizeInput, int bufferSizeOutput)
+		:lua::Configuration( "iproc", "test-iproc")
+	{
+		boost::property_tree::ptree pt;
+		pt.put("main", scriptpath);
+		pt.put("input_buffer", boost::lexical_cast<std::string>( bufferSizeInput));
+		pt.put("output_buffer", boost::lexical_cast<std::string>( bufferSizeOutput));
+		setCanonicalPathes( ".");
+		if (!config::ConfigurationParser::parse<lua::Configuration>( *this, pt, "test"))
+			throw std::logic_error( "Bad Configuration");
+		setCanonicalPathes( ".");
+	}
+};
+
+template <class Struct>
+static int luaIntrusiveSerializationTest( lua_State* ls)
+{
+	Struct obj;
+	const DescriptionBase* ds = Struct::getDescription();
+	lua_pushvalue( ls, 1);
+	ds->parse( &obj, ls);
+	ds->print( &obj, ls);
+	return 1;
+}
+
+template <class Struct>
+static int run( const TestConfiguration& cfg, const std::string& input, std::string& output)
+{
+	char outputbuf[ 8192];
 	app::Filter filter( "xml:textwolf", 1024, 1024);
 	protocol::InputFilter* in = filter.m_inputfilter.get();
 	protocol::FormatOutput* out = filter.m_formatoutput.get();
-
 	if (!in)
 	{
 		LOG_ERROR << "error in serialization: no valid input filter defined";
@@ -199,115 +240,67 @@ static int run( const char* name, const char* input, std::string& output)
 		LOG_ERROR << "error in serialization: no valid format output defined";
 		return 2;
 	}
-	Struct object;
-	ProcessingContext ctx;
-	const DescriptionBase* ds = Struct::getDescription();
+	lua::AppProcessor processor( &cfg);
+	lua_State* ls = processor.getLuaState();
+	lua_pushcfunction( ls, &luaIntrusiveSerializationTest<Struct>);
+	lua_setglobal( ls, "transform");
 
-	in->protocolInput( (void*)input, strlen(input), true);
-	if (!ds->parse( name, (void*)&object, *in, ctx))
+	in->protocolInput( (void*)input.c_str(), input.size(), true);
+	processor.setIO( filter.m_inputfilter, filter.m_formatoutput);
+	for (;;)
 	{
-		LOG_ERROR << "error in serialization of " << name << ctx.getLastError();
-		return 3;
+		const char* cmd = "run";
+		switch (processor.call( 1, &cmd))
+		{
+			case lua::AppProcessor::YieldRead:
+				LOG_ERROR << "unexpected end of input";
+				return 1;
+
+			case lua::AppProcessor::YieldWrite:
+			{
+				void* content = filter.m_formatoutput->ptr();
+				unsigned int contentsize = filter.m_formatoutput->pos();
+				output.append( (char*)content, contentsize);
+				filter.m_formatoutput->release();
+				filter.m_formatoutput->init( outputbuf, sizeof(outputbuf));
+				break;
+			}
+
+			case lua::AppProcessor::Ok:
+			{
+				void* content = filter.m_formatoutput->ptr();
+				unsigned int contentsize = filter.m_formatoutput->pos();
+				output.append( (char*)content, contentsize);
+				filter.m_formatoutput->release();
+				return 0;
+			}
+
+			case lua::AppProcessor::Error:
+			{
+				LOG_ERROR << "error processing";
+				return 2;
+			}
+		}
 	}
-	if (!ds->print( name, (const void*)&object, *out, ctx))
-	{
-		LOG_ERROR << "error in deserialization of " << name << ": " << ctx.getLastError();
-		return 4;
-	}
-	output = ctx.content();
 	return 0;
 }
 
-typedef int (*runFunction)( const char* name, const char* input, std::string& output);
+typedef int (*runFunction)( const TestConfiguration& cfg, const std::string& input, std::string& output);
 
 struct TestDescription
 {
-	const char* name;
-	const char* input;
-	const char* output;
-	const char* scriptfile;
-	runFunction run;
+	const char* name;		///< determines the name of the result and of the expected result file
+	const char* datafile;		///< input to feed
+	const char* scriptname;		///< input to feed
+	runFunction run;		///< the function to execute
 };
 
 static const TestDescription testDescription[2] = {
 {
-	"PLACES",
-
-	"<?xml version='1.0' encoding='Isolatin-1' standalone='yes'>\r\n"
-	"<PLACES>"
-	"<GARDEN>"
-	"<NAME>Botanischer Garten</NAME>"
-	"<ADDRESS>"
-	"<COUNTRY>41</COUNTRY>"
-	"<STREET>Zollikerstrasse</STREET>"
-	"<CITY>Zürich</CITY>"
-	"<PHONE><NUMBER>01234567</NUMBER><MOBILE>01234567</MOBILE></PHONE>"
-	"</ADDRESS>"
-	"<PLANT>"
-	"<COMMON>Bloodroot</COMMON>"
-	"<BOTANICAL>Sanguinaria canadensis</BOTANICAL>"
-	"<ZONE>4</ZONE>"
-	"<LIGHT>Mostly Shady</LIGHT>"
-	"<PRICE>$2.44</PRICE>"
-	"<AVAILABILITY>31599</AVAILABILITY>"
-	"</PLANT>"
-	"<PLANT>"
-	"<COMMON>Columbine</COMMON>"
-	"<BOTANICAL>Aquilegia canadensis</BOTANICAL>"
-	"<ZONE>3</ZONE>"
-	"<LIGHT>Mostly Shady</LIGHT>"
-	"<PRICE>$9.37</PRICE>"
-	"<AVAILABILITY>3069</AVAILABILITY>"
-	"</PLANT>"
-	"<PLANT>"
-	"<COMMON>Marsh Marigold</COMMON>"
-	"<BOTANICAL>Caltha palustris</BOTANICAL>"
-	"<ZONE>4</ZONE>"
-	"<LIGHT>Mostly Sunny</LIGHT>"
-	"<PRICE>$6.81</PRICE>"
-	"<AVAILABILITY>51799</AVAILABILITY>"
-	"</PLANT>"
-	"</GARDEN>"
-	"</PLACES>",
-
-	"<?xml version='1.0' encoding='Isolatin-1' standalone='yes'>\r\n"
-	"<PLACES>"
-	"<GARDEN>"
-	"<NAME>Botanischer Garten</NAME>"
-	"<ADDRESS>"
-	"<COUNTRY>41</COUNTRY>"
-	"<STREET>Zollikerstrasse</STREET>"
-	"<CITY>Zürich</CITY>"
-	"<PHONE><NUMBER>01234567</NUMBER><MOBILE>01234567</MOBILE></PHONE>"
-	"</ADDRESS>"
-	"<PLANT>"
-	"<COMMON>Bloodroot</COMMON>"
-	"<BOTANICAL>Sanguinaria canadensis</BOTANICAL>"
-	"<ZONE>4</ZONE>"
-	"<LIGHT>Mostly Shady</LIGHT>"
-	"<PRICE>$2.44</PRICE>"
-	"<AVAILABILITY>31599</AVAILABILITY>"
-	"</PLANT>"
-	"<PLANT>"
-	"<COMMON>Columbine</COMMON>"
-	"<BOTANICAL>Aquilegia canadensis</BOTANICAL>"
-	"<ZONE>3</ZONE>"
-	"<LIGHT>Mostly Shady</LIGHT>"
-	"<PRICE>$9.37</PRICE>"
-	"<AVAILABILITY>3069</AVAILABILITY>"
-	"</PLANT>"
-	"<PLANT>"
-	"<COMMON>Marsh Marigold</COMMON>"
-	"<BOTANICAL>Caltha palustris</BOTANICAL>"
-	"<ZONE>4</ZONE>"
-	"<LIGHT>Mostly Sunny</LIGHT>"
-	"<PRICE>$6.81</PRICE>"
-	"<AVAILABILITY>51799</AVAILABILITY>"
-	"</PLANT>"
-	"</GARDEN>"
-	"</PLACES>",
-
-	&run<Places>,
+	"luamap_PLACES",
+	"test_luamap_places_IsoLatin1.xml",
+	"test_serialization",
+	&run<Places>
 },
 {0,0,0,0}
 };
@@ -324,31 +317,21 @@ protected:
 TEST_F( TestFixture, tests)
 {
 	unsigned int ti;
-	for (ti=0; testDescription[ti].input; ti++)
+	for (ti=0; testDescription[ti].name; ti++)
 	{
-		std::string result;
-		EXPECT_EQ( 0, testDescription[ti].run( testDescription[ti].name, testDescription[ti].input, result));
-#define _Wolframe_LOWLEVEL_DEBUG
-#ifdef _Wolframe_LOWLEVEL_DEBUG
-		unsigned int ii=0,nn=result.size();
-		for (;ii<nn && result[ii]==testDescription[ti].output[ii]; ii++);
-		if (ii != nn)
-		{
-			std::string diff( testDescription[ti].output+ii, 10);
-			std::string res( result.c_str()+ii, 10);
-			std::size_t pp = ii - (ii<10?ii:10);
-			std::string pred( result.c_str()+ii-pp, ii-pp);
-			printf( "TEST %s DIFF AFTER '%s' RESULT='%s' EXPECTED='%s'\n", testDescription[ti].name, pred.c_str(), res.c_str(), diff.c_str());
+		wtest::Data data( testDescription[ti].name, testDescription[ti].datafile);
+		std::string testoutput;
+		TestConfiguration cfg( wtest::Data::getDataFile( testDescription[ti].scriptname, "scripts", ".lua"), 1023, 1023);
 
-			boost::this_thread::sleep( boost::posix_time::seconds( 5 ));
-		}
-#endif
-		ASSERT_EQ( testDescription[ti].output, result);
+		EXPECT_EQ( 0, testDescription[ti].run( cfg, data.input, testoutput));
+		data.check( testoutput);
+		ASSERT_EQ( data.expected, testoutput);
 	}
 }
 
 int main( int argc, char **argv )
 {
+	wtest::Data::createDataDir( "result");
 	::testing::InitGoogleTest( &argc, argv );
 	return RUN_ALL_TESTS();
 }

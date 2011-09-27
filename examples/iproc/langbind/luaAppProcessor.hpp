@@ -38,6 +38,10 @@ Project Wolframe.
 #include "luaConfig.hpp"
 #include "appObjects.hpp"
 #include "appProcessor.hpp"
+extern "C"
+{
+#include "lua.h"
+}
 
 namespace _Wolframe {
 namespace iproc {
@@ -84,6 +88,10 @@ public:
 	///\param[in] argc array of arguments
 	///\return call state
 	virtual CallResult call( unsigned int argc, const char** argv);
+
+	///\brief Get the current lua state (not the thread!)
+	///\return the current lua state
+	lua_State* getLuaState() const;
 
 private:
 	const lua::Configuration* m_config;	///< reference to configuration

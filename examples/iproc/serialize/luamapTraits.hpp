@@ -62,8 +62,8 @@ struct has_description_method_noprm
 	typedef char small_type;
 	struct large_type {small_type dummy[2];};
 
-	template<const LuamapBase* (T::*)()> struct tester_member_signature;
-	template<const LuamapBase* (*)()> struct tester_static_signature;
+	template<const DescriptionBase* (T::*)()> struct tester_member_signature;
+	template<const DescriptionBase* (*)()> struct tester_static_signature;
 
 	template<typename U>
 	static small_type has_matching_member(tester_member_signature<&U::getDescription>*);
@@ -100,7 +100,7 @@ typename boost::enable_if_c<
 /// returns arithmetic_ if T fulfills the is_arithmetic condition or is a string
 template <typename T>
 typename boost::enable_if_c<
-	(boost::is_arithmetic<T>::value || boost::is_same<std::string,T>::value
+	(boost::is_arithmetic<T>::value || boost::is_same<std::string,T>::value)
 	,const arithmetic_>::type getCategory( const T&) { return arithmetic_();}
 
 struct luanumeric_{};

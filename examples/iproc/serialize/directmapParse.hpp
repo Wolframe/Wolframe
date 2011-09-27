@@ -146,9 +146,13 @@ void parseObject_( const char* tag, void* obj, const struct_&, protocol::InputFi
 					break;
 				}
 				case protocol::InputFilter::Value:
+				{
+					std::size_t ii;
+					for (ii=0; ii<bufpos; ii++) if (buf[ii]>32) break;
+					if (ii==bufpos) break;
 					ctx.endTagConsumed(false);
 					throw ParseError( tag, "structure expected");
-
+				}
 				case protocol::InputFilter::CloseTag:
 					if (m_depth == 0)
 					{
