@@ -64,6 +64,7 @@ tests\pechoHandlerTest$(EXE): tests\pechoHandlerTest.obj $(TOPDIR)\src\wolframe.
 local_all:
 
 local_clean:
+	@-erase tests\*.obj 2>NUL
 
 local_distclean:
 

@@ -85,6 +85,7 @@ tests\iprocHandlerXMLTest.exe: tests\iprocHandlerXMLTest.obj $(TOPDIR)\src\wolfr
 local_all:
 
 local_clean:
+	@-erase tests\*.obj 2>NUL
 
 local_distclean:
 

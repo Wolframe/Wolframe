@@ -136,8 +136,8 @@ LOCAL_STATIC_LIB_OBJS = \
 	serverConfig.obj \
 	server.obj \
 	moduleLoaderConfig.obj \
-	processor/procProvider.obj \
-	processor/echoProcessor.obj \
+	processor\procProvider.obj \
+	processor\echoProcessor.obj \
 	$(DB_OBJS) \
 	$(AAAA_OBJS)
 
