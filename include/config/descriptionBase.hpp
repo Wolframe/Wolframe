@@ -40,7 +40,7 @@ Project Wolframe.
 #include <cstddef>
 
 namespace _Wolframe {
-namespace serialize {
+namespace config {
 
 ///\brief A configuration structure description
 struct DescriptionBase

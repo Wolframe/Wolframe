@@ -52,7 +52,7 @@ bool DescriptionBase::parse( void* configStruct, const boost::property_tree::ptr
 			}
 			return true;
 		}
-		catch (const ParseError& e)
+		catch (const config::ParseError& e)
 		{
 			errmsg.clear();
 			errmsg.append( "parse error in configuration at element ");
