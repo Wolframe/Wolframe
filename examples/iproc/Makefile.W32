@@ -61,7 +61,7 @@ OBJS = \
 !IFDEF WITH_LUA
 OBJS = \
 	$(OBJS) \
-	serialize\luamapBase.o \
+	serialize\luamapBase.obj \
 	langbind\luaDebug.obj \
 	langbind\luaConfig.obj \
 	langbind\luaAppProcessor.obj

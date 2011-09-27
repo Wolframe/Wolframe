@@ -101,7 +101,7 @@ static bool registerEventlog( const _Wolframe::config::ApplicationConfiguration&
 
 // choose the key for the EventLog registry entry
 	_snprintf( key, 256, "SYSTEM\\CurrentControlSet\\Services\\EventLog\\%s\\%s",
-		config.loggerConf->eventlogLogName.c_str( ), config.loggerConf->eventlogSource.c_str( ) );
+		config.loggerCfg->eventlogLogName.c_str( ), config.loggerCfg->eventlogSource.c_str( ) );
 	LONG ret = RegCreateKeyEx( HKEY_LOCAL_MACHINE, key, 0, NULL, REG_OPTION_NON_VOLATILE,
 		KEY_SET_VALUE, NULL, &h, &disposition );
 	if( ret != ERROR_SUCCESS ) {
@@ -138,7 +138,7 @@ static bool deregisterEventlog( const _Wolframe::config::ApplicationConfiguratio
 
 // remove event log registry entry
 	_snprintf( key, 256, "SYSTEM\\CurrentControlSet\\Services\\EventLog\\%s\\%s",
-		config.loggerConf->eventlogLogName.c_str( ), config.loggerConf->eventlogSource.c_str( ) );
+		config.loggerCfg->eventlogLogName.c_str( ), config.loggerCfg->eventlogSource.c_str( ) );
 	res = RegDeleteKey( HKEY_LOCAL_MACHINE, key );
 	if( res != ERROR_SUCCESS ) {
 		LOG_CRITICAL << "RegDeleteKey with key '" << key << "' failed: " << _Wolframe::log::LogError::LogWinerror;
@@ -167,7 +167,7 @@ static bool installAsService( const _Wolframe::config::ApplicationConfiguration&
 
 // create the service
 	SC_HANDLE service = CreateService( scm,
-		config.serviceConf->serviceName.c_str( ), config.serviceConf->serviceDisplayName.c_str( ),
+		config.serviceCfg->serviceName.c_str( ), config.serviceCfg->serviceDisplayName.c_str( ),
 		SERVICE_ALL_ACCESS, SERVICE_WIN32_OWN_PROCESS,
 		SERVICE_DEMAND_START, SERVICE_ERROR_NORMAL,
 		os.str( ).c_str( ), NULL, NULL, NULL, NULL, NULL );
@@ -178,7 +178,7 @@ static bool installAsService( const _Wolframe::config::ApplicationConfiguration&
 
 // set description of the service
 	SERVICE_DESCRIPTION descr;
-	descr.lpDescription = (LPTSTR)config.serviceConf->serviceDescription.c_str( );
+	descr.lpDescription = (LPTSTR)config.serviceCfg->serviceDescription.c_str( );
 	(void)ChangeServiceConfig2( service, SERVICE_CONFIG_DESCRIPTION, &descr );
 
 // free handles
@@ -198,7 +198,7 @@ static bool removeAsService( const _Wolframe::config::ApplicationConfiguration& 
 	}
 
 // get service handle of the service to delete (identified by service name)
-	SC_HANDLE service = OpenService( scm, config.serviceConf->serviceName.c_str( ), SERVICE_ALL_ACCESS );
+	SC_HANDLE service = OpenService( scm, config.serviceCfg->serviceName.c_str( ), SERVICE_ALL_ACCESS );
 	if( service == NULL ) {
 		LOG_CRITICAL << "OpenService during service deregistration failed: " << _Wolframe::log::LogError::LogWinerror;
 		return false;
@@ -298,18 +298,18 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 		config.finalize( cmdLineCfg );
 
 // create the final logger based on the configuration
-		_Wolframe::log::LogBackend::instance().setConsoleLevel( config.loggerConf->stderrLogLevel );
-		_Wolframe::log::LogBackend::instance().setLogfileLevel( config.loggerConf->logFileLogLevel );
-		_Wolframe::log::LogBackend::instance().setLogfileName( config.loggerConf->logFile );
-		_Wolframe::log::LogBackend::instance().setSyslogLevel( config.loggerConf->syslogLogLevel );
-		_Wolframe::log::LogBackend::instance().setSyslogFacility( config.loggerConf->syslogFacility );
-		_Wolframe::log::LogBackend::instance().setSyslogIdent( config.loggerConf->syslogIdent );
-		_Wolframe::log::LogBackend::instance().setEventlogLevel( config.loggerConf->eventlogLogLevel );
-		_Wolframe::log::LogBackend::instance().setEventlogSource( config.loggerConf->eventlogSource );
-		_Wolframe::log::LogBackend::instance().setEventlogLog( config.loggerConf->eventlogLogName );
+		_Wolframe::log::LogBackend::instance().setConsoleLevel( config.loggerCfg->stderrLogLevel );
+		_Wolframe::log::LogBackend::instance().setLogfileLevel( config.loggerCfg->logFileLogLevel );
+		_Wolframe::log::LogBackend::instance().setLogfileName( config.loggerCfg->logFile );
+		_Wolframe::log::LogBackend::instance().setSyslogLevel( config.loggerCfg->syslogLogLevel );
+		_Wolframe::log::LogBackend::instance().setSyslogFacility( config.loggerCfg->syslogFacility );
+		_Wolframe::log::LogBackend::instance().setSyslogIdent( config.loggerCfg->syslogIdent );
+		_Wolframe::log::LogBackend::instance().setEventlogLevel( config.loggerCfg->eventlogLogLevel );
+		_Wolframe::log::LogBackend::instance().setEventlogSource( config.loggerCfg->eventlogSource );
+		_Wolframe::log::LogBackend::instance().setEventlogLog( config.loggerCfg->eventlogLogName );
 
 // register the event callback where we get called by Windows and the SCM
-		serviceStatusHandle = RegisterServiceCtrlHandler( config.serviceConf->serviceName.c_str( ), serviceCtrlFunction );
+		serviceStatusHandle = RegisterServiceCtrlHandler( config.serviceCfg->serviceName.c_str( ), serviceCtrlFunction );
 		if( serviceStatusHandle == 0 ) {
 			LOG_FATAL << "Unable to register service control handler function: " << _Wolframe::log::LogError::LogWinerror;
 			return;
@@ -329,8 +329,8 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 		LOG_NOTICE << "Starting service";
 
 // run server in background thread(s).
-		_Wolframe::ServerHandler handler( config.handlerConf );
-		_Wolframe::net::server s( config.serverConf, handler );
+		_Wolframe::ServerHandler handler( config.handlerCfg );
+		_Wolframe::net::server s( config.serverCfg, handler );
 		boost::thread t( boost::bind( &_Wolframe::net::server::run, &s ));
 
 // we are up and running now (hopefully), signal this to the SCM
@@ -453,21 +453,21 @@ int _Wolframe_winMain( int argc, char* argv[] )
 		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::INSTALL_SERVICE ) {
 			if( !registerEventlog( config ) ) return _Wolframe::ErrorCode::FAILURE;
 			if( !installAsService( config ) ) return _Wolframe::ErrorCode::FAILURE;
-			LOG_INFO << "Installed as Windows service '" << config.serviceConf->serviceName.c_str( ) << "'";
+			LOG_INFO << "Installed as Windows service '" << config.serviceCfg->serviceName.c_str( ) << "'";
 			return _Wolframe::ErrorCode::OK;
 		}
 
 		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::REMOVE_SERVICE ) {
 			if( !removeAsService( config ) ) return _Wolframe::ErrorCode::FAILURE;
 			(void)deregisterEventlog( config );
-			LOG_INFO << "Removed as Windows service '" << config.serviceConf->serviceName.c_str( ) << "'";
+			LOG_INFO << "Removed as Windows service '" << config.serviceCfg->serviceName.c_str( ) << "'";
 			return _Wolframe::ErrorCode::OK;
 		}
 
 		if( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::RUN_SERVICE ) {
 			// if started as service we dispatch the service thread now
 			SERVICE_TABLE_ENTRY dispatch_table[2] =
-				{ { const_cast<char *>( config.serviceConf->serviceName.c_str( ) ), service_main },
+				{ { const_cast<char *>( config.serviceCfg->serviceName.c_str( ) ), service_main },
 				{ NULL, NULL } };
 
 			// pass configuration to service main
@@ -490,12 +490,12 @@ int _Wolframe_winMain( int argc, char* argv[] )
 
 		// Create the final logger based on the configuration, this is the
 		// foreground mode in a console, so we start only the stderr logger
-		_Wolframe::log::LogBackend::instance().setConsoleLevel( config.loggerConf->stderrLogLevel );
+		_Wolframe::log::LogBackend::instance().setConsoleLevel( config.loggerCfg->stderrLogLevel );
 
 		LOG_NOTICE << "Starting server";
 
-		_Wolframe::ServerHandler handler( config.handlerConf );
-		_Wolframe::net::server s( config.serverConf, handler );
+		_Wolframe::ServerHandler handler( config.handlerCfg );
+		_Wolframe::net::server s( config.serverCfg, handler );
 
 		// Set console control handler to allow server to be stopped.
 		consoleCtrlFunction = boost::bind(&_Wolframe::net::server::stop, &s);

@@ -185,6 +185,7 @@ local_all: $(LOCAL_STATIC_LIB)
 local_clean:
 	@-erase MSG*.bin logger\wolframemsg.rc logger\wolframemsg.h logger\wolframemsg.res logger\wolframemsg.dll 2>NUL
 	@-erase $(LOCAL_STATIC_LIB) 2>NUL
+	@-erase $(OBJS) 2>NUL
 	@-erase test.bat 2>NUL
 
 local_distclean:
