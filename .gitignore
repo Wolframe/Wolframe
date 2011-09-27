@@ -49,6 +49,7 @@ examples/pecho/pechod
 examples/iproc/tests/iprocHandlerTest
 examples/iproc/tests/iprocHandlerXMLTest
 examples/pecho/tests/pechoHandlerTest
+examples/iproc/tests/directmapParser
 clients/qt/qtclient
 moc_*.cpp
 clients/qt/.history
