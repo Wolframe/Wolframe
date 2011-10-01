@@ -48,7 +48,8 @@ namespace config {
 
 template<>
 bool ConfigurationParser::parse( AAAA::FileAuditConfig& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& node )
+				 const boost::property_tree::ptree& pt, const std::string& node,
+				 const module::ModulesConfiguration* /*modules*/ )
 {
 	using namespace _Wolframe::config;
 	bool retVal = true;

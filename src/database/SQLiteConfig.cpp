@@ -49,7 +49,8 @@ namespace config {
 /// Specialization of the ConfigurationParser::parse for the SQLite configuration
 template<>
 bool ConfigurationParser::parse( db::SQLiteConfig& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& /*node*/ )
+				 const boost::property_tree::ptree& pt, const std::string& /*node*/,
+				 const module::ModulesConfiguration* /*modules*/ )
 {
 	using namespace _Wolframe::config;
 	bool retVal = true;

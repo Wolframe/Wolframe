@@ -49,13 +49,13 @@ class FileAuditor : public AuditUnit
 {
 };
 
-class FileAuditConfig : public module::ModuleConfiguration< FileAuditConfig >
+class FileAuditConfig : public config::ObjectConfiguration
 {
 	friend class FileAuditContainer;
 	friend class config::ConfigurationParser;
 public:
 	FileAuditConfig( const char* cfgName, const char* logParent, const char* logName )
-		: module::ModuleConfiguration< FileAuditConfig >( cfgName, logParent, logName ) {}
+		: config::ObjectConfiguration( cfgName, logParent, logName ) {}
 
 	const char* objectName() const			{ return "FileAudit"; }
 

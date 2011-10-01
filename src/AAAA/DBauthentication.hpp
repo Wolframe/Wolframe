@@ -48,13 +48,13 @@ class DBauthenticator : public AuthenticationUnit
 {
 };
 
-class DatabaseAuthConfig : public module::ModuleConfiguration< DatabaseAuthConfig >
+class DatabaseAuthConfig : public config::ObjectConfiguration
 {
 	friend class DBauthContainer;
 	friend class config::ConfigurationParser;
 public:
 	DatabaseAuthConfig( const char* cfgName, const char* logParent, const char* logName )
-		: module::ModuleConfiguration< DatabaseAuthConfig >( cfgName, logParent, logName ),
+		: config::ObjectConfiguration( cfgName, logParent, logName ),
 		  m_dbConfig( "", logParent, "Database" )	{}
 
 	virtual const char* objectName() const			{ return "DatabaseAuth"; }

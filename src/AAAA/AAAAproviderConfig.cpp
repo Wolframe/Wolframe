@@ -42,43 +42,17 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/algorithm/string.hpp>
 
-/****  Impersonating the module loader  ******************************************************/
-#include "TextFileAuthentication.hpp"
-#include "DBauthentication.hpp"
-#include "FileAudit.hpp"
-#include "DBaudit.hpp"
-
-using namespace _Wolframe;
-
-static const size_t noAuthConfigs = 2;
-static module::ConfigurationDescription
-authConfig[ noAuthConfigs ] = { module::ConfigurationDescription( "file", "Authentication file", "file",
-				&AAAA::TextFileAuthConfig::create,
-				&config::ConfigurationParser::parseBase<AAAA::TextFileAuthConfig> ),
-				module::ConfigurationDescription( "database", "Authentication database", "database",
-				&AAAA::DatabaseAuthConfig::create,
-				&config::ConfigurationParser::parseBase<AAAA::DatabaseAuthConfig> ) };
-
-static const size_t noAuditConfigs = 2;
-static module::ConfigurationDescription
-auditConfig[ noAuditConfigs ] = { module::ConfigurationDescription( "file", "Audit file", "file",
-				  &AAAA::FileAuditConfig::create,
-				  &config::ConfigurationParser::parseBase<AAAA::FileAuditConfig> ),
-				  module::ConfigurationDescription( "database", "Audit database", "database",
-				  &AAAA::DBauditConfig::create,
-				  &config::ConfigurationParser::parseBase<AAAA::DBauditConfig> ) };
-/****  End impersonating the module loader  **************************************************/
-
 namespace _Wolframe {
 namespace config {
 
 template<>
 bool ConfigurationParser::parse( AAAA::AAAAconfiguration& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& /*node*/ )
+				 const boost::property_tree::ptree& pt, const std::string& /*node*/,
+				 const module::ModulesConfiguration* modules )
 {
 	using namespace _Wolframe::config;
 	bool retVal = true;
-	bool allowAnonDefined = false;
+	bool allowDefined = false;
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "Authentication" ) ||
@@ -87,50 +61,53 @@ bool ConfigurationParser::parse( AAAA::AAAAconfiguration& cfg,
 									L2it != L1it->second.end(); L2it++ )	{
 				if ( boost::algorithm::iequals( "allowAnonymous", L2it->first ))	{
 					if ( ! Parser::getValue( cfg.logPrefix().c_str(), *L2it, cfg.m_allowAnonymous,
-								 Parser::BoolDomain(), &allowAnonDefined ))
+								 Parser::BoolDomain(), &allowDefined ))
 						retVal = false;
 				}
-				else {
-					size_t i;
-					for ( i = 0; i < noAuthConfigs; i++ )	{
-						if ( boost::algorithm::iequals( authConfig[i].typeName, L2it->first ))	{
-							config::ObjectConfiguration* conf = authConfig[i].createFunc( authConfig[i].sectionTitle,
-															 cfg.logPrefix().c_str(),
-															 authConfig[i].sectionName );
-							if ( authConfig[i].parseFunc( *conf, L2it->second, L2it->first ))
-								cfg.m_authConfig.push_back( conf );
-							else	{
-								delete conf;
-								retVal = false;
-							}
-							break;
+				else if ( modules )	{
+					module::ConfigDescriptionBase* cfgDesc = modules->get( L2it->first );
+					if ( cfgDesc )	{
+						config::ObjectConfiguration* conf = cfgDesc->create( cfg.logPrefix().c_str());
+						if ( cfgDesc->parseFunc( *conf, L2it->second, L2it->first, modules ))
+							cfg.m_authConfig.push_back( conf );
+						else	{
+							delete conf;
+							retVal = false;
 						}
 					}
-					if ( i >= noAuthConfigs )
+					else
 						LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
 							    << L2it->first << "'";
 				}
+				else
+					LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
+						    << L2it->first << "'";
 			}
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "Audit" ))	{
 			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
 									L2it != L1it->second.end(); L2it++ )	{
-				size_t i;
-				for ( i = 0; i < noAuditConfigs; i++ )	{
-					if ( boost::algorithm::iequals( auditConfig[i].typeName, L2it->first ))	{
-						config::ObjectConfiguration* conf = auditConfig[i].createFunc( auditConfig[i].sectionTitle,
-														  cfg.logPrefix().c_str(),
-														  auditConfig[i].sectionName );
-						if ( auditConfig[i].parseFunc( *conf, L2it->second, L2it->first ))
+				if ( boost::algorithm::iequals( "allowAnonymous", L2it->first ))	{
+					if ( ! Parser::getValue( cfg.logPrefix().c_str(), *L2it, cfg.m_allowAnonymous,
+								 Parser::BoolDomain(), &allowDefined ))
+						retVal = false;
+				}
+				else if ( modules )	{
+					module::ConfigDescriptionBase* cfgDesc = modules->get( L2it->first );
+					if ( cfgDesc )	{
+						config::ObjectConfiguration* conf = cfgDesc->create( cfg.logPrefix().c_str());
+						if ( cfgDesc->parseFunc( *conf, L2it->second, L2it->first, modules ))
 							cfg.m_auditConfig.push_back( conf );
 						else	{
 							delete conf;
 							retVal = false;
 						}
-						break;
 					}
+					else
+						LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
+							    << L2it->first << "'";
 				}
-				if ( i >= noAuditConfigs )
+				else
 					LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
 						    << L2it->first << "'";
 			}

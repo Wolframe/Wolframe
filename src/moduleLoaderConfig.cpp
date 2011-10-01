@@ -31,7 +31,7 @@
 
 ************************************************************************/
 //
-// daemon / service configuration
+// module loader configuration
 //
 
 #include "moduleLoaderConfig.hpp"
@@ -56,7 +56,8 @@ namespace config {
 /// Parse the configuration
 template<>
 bool ConfigurationParser::parse( ModuleLoaderConfiguration& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& )
+				 const boost::property_tree::ptree& pt, const std::string& /*node*/,
+				 const module::ModulesConfiguration* /*modules*/ )
 {
 	bool retVal = true;
 

@@ -34,6 +34,7 @@ endif
 OBJS = \
 	appProperties.o \
 	appConfigDefinition.o \
+	../../src/loadModules-dummy.o \
 	echoConfig.o \
 	echoHandler.o \
 	$(TOPDIR)/src/posixMain.o

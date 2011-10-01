@@ -62,13 +62,13 @@ public:
 };
 
 
-class EchoProcConfig : public module::ModuleConfiguration< EchoProcConfig >
+class EchoProcConfig : public config::ObjectConfiguration
 {
 	friend class EchoProcContainer;
 	friend class config::ConfigurationParser;
 public:
 	EchoProcConfig( const char* cfgName, const char* logParent, const char* logName )
-		: module::ModuleConfiguration< EchoProcConfig >( cfgName, logParent, logName ) {}
+		: config::ObjectConfiguration( cfgName, logParent, logName ) {}
 
 	const char* objectName() const			{ return "EchoProcessor"; }
 

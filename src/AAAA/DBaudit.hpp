@@ -48,16 +48,16 @@ class DBauditor : public AuditUnit
 {
 };
 
-class DBauditConfig : public module::ModuleConfiguration< DBauditConfig >
+class DBauditConfig : public config::ObjectConfiguration
 {
 	friend class DBauditContainer;
 	friend class config::ConfigurationParser;
 public:
 	DBauditConfig( const char* cfgName, const char* logParent, const char* logName )
-		: module::ModuleConfiguration< DBauditConfig >( cfgName, logParent, logName ),
+		: config::ObjectConfiguration( cfgName, logParent, logName ),
 		  m_dbConfig( "", logParent, "" )		{}
 
-	const char* objectName() const				{ return "DatabaseAudit"; }
+	virtual const char* objectName() const			{ return "DatabaseAudit"; }
 
 	/// methods
 	bool check() const					{ return m_dbConfig.check(); }

@@ -49,7 +49,8 @@ namespace config {
 
 template<>
 bool ConfigurationParser::parse( EchoProcConfig& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& /*node*/ )
+				 const boost::property_tree::ptree& pt, const std::string& /*node*/,
+				 const module::ModulesConfiguration* /*modules*/ )
 {
 	bool retVal = true;
 	bool isDefined = false;

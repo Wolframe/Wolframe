@@ -47,7 +47,8 @@ namespace config {
 /// Specialization of the ConfigurationParser::parse for the PostgreSQL configuration
 template<>
 bool ConfigurationParser::parse( db::PostgreSQLconfig& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& /*node*/ )
+				 const boost::property_tree::ptree& pt, const std::string& /*node*/,
+				 const module::ModulesConfiguration* /*modules*/ )
 {
 	using namespace _Wolframe::config;
 	bool retVal = true;

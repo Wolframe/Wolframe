@@ -57,13 +57,8 @@
 using namespace _Wolframe;
 
 static const size_t noProcModules = 1;
-static module::ConfigurationDescription
-procConfigs[ noProcModules ] = { module::ConfigurationDescription( "echoProcessor", "Echo Processor", "echoProcessor",
-				 EchoProcConfig::create,
-				 &config::ConfigurationParser::parseBase< EchoProcConfig > ) };
-
-static module::ModuleContainerDescription< Container< proc::ProcessorUnit >, config::ObjectConfiguration >
-procModules[ noProcModules ] = { module::ModuleContainerDescription< Container< proc::ProcessorUnit >, config::ObjectConfiguration >( "EchoProcessor", &EchoProcContainer::create ) };
+static module::ContainerDescription< Container< proc::ProcessorUnit >, config::ObjectConfiguration >
+procModules[ noProcModules ] = { module::ContainerDescription< Container< proc::ProcessorUnit >, config::ObjectConfiguration >( "EchoProcessor", &EchoProcContainer::create ) };
 /****  End impersonating the module loader  **************************************************/
 
 namespace _Wolframe {
@@ -71,7 +66,8 @@ namespace config {
 
 template<>
 bool ConfigurationParser::parse( proc::ProcProviderConfig& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& /*node*/ )
+				 const boost::property_tree::ptree& pt, const std::string& /*node*/,
+				 const module::ModulesConfiguration* modules )
 {
 	using namespace _Wolframe::config;
 	bool retVal = true;
@@ -83,22 +79,22 @@ bool ConfigurationParser::parse( proc::ProcProviderConfig& cfg,
 				retVal = false;
 		}
 		else	{
-			size_t i;
-			for ( i = 0; i < noProcModules; i++ )	{
-				if ( boost::algorithm::iequals( procConfigs[i].typeName, L1it->first ))	{
-					config::ObjectConfiguration* conf = procConfigs[i].createFunc( procConfigs[i].sectionTitle,
-											      cfg.logPrefix().c_str(),
-											      procConfigs[i].sectionName );
-					if ( procConfigs[i].parseFunc( *conf, L1it->second, L1it->first ))
+			if ( modules )	{
+				module::ConfigDescriptionBase* cfgDesc = modules->get( L1it->first );
+				if ( cfgDesc )	{
+					config::ObjectConfiguration* conf = cfgDesc->create( cfg.logPrefix().c_str());
+					if ( cfgDesc->parseFunc( *conf, L1it->second, L1it->first, modules ))
 						cfg.m_procConfig.push_back( conf );
 					else	{
 						delete conf;
 						retVal = false;
 					}
-					break;
 				}
+				else
+					LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
+						    << L1it->first << "'";
 			}
-			if ( i >= noProcModules )
+			else
 				LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
 					    << L1it->first << "'";
 		}

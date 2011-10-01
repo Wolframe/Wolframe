@@ -50,6 +50,7 @@
 #include "ErrorCode.hpp"
 #include "logger.hpp"
 #include "appSingleton.hpp"
+#include "moduleInterface.hpp"
 
 #include "connectionHandler.hpp"
 
@@ -140,7 +141,9 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 			return _Wolframe::ErrorCode::FAILURE;
 		}
 
-		_Wolframe::config::ApplicationConfiguration conf;
+		_Wolframe::module::ModulesConfiguration modules;
+		_Wolframe::module::LoadModules( modules );
+		_Wolframe::config::ApplicationConfiguration conf( &modules );
 
 		if ( !conf.parse( configFile, cmdLineCfg.cfgType ))	{
 			// there was an error parsing the configuration file

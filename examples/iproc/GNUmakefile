@@ -66,6 +66,7 @@ endif
 OBJS = \
 	appProperties.o \
 	appConfigDefinition.o \
+	../../src/loadModules-dummy.o \
 	iprocHandler.o \
 	langbind/appObjects.o \
 	filters/textwolf_filter.o \

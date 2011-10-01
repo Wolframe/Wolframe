@@ -38,6 +38,7 @@
 #define _MODULE_INTERFACE_HPP_INCLUDED
 
 #include <string>
+#include <list>
 #include <boost/property_tree/ptree.hpp>
 #include "config/configurationBase.hpp"
 #include "container.hpp"
@@ -52,49 +53,47 @@ enum ModuleType	{
 	PROCESSOR_MODULE
 };
 
-
-template< class T >
-class ModuleConfiguration : public config::ObjectConfiguration
+struct ConfigDescriptionBase
 {
-public:
-	/// Class constructor.
-	///\param[in]	name	the name that will be displayed for this
-	///			configuration section in messages (log, print ...)
-	///			It has no other processing purpose
-	///\param[in]	logParent the logging prefix of the parent.
-	///\param[in]	logName	the logging name of this section. Combined with
-	///			the logParent parameter will form the whole logging
-	///			prefix for of the section.
-	ModuleConfiguration( const char* name, const char* logParent, const char* logName )
-		: config::ObjectConfiguration( name, logParent, logName )	{}
-
-	virtual ~ModuleConfiguration()			{}
-
-	virtual const char* objectName() const = 0;
-
-	static config::ObjectConfiguration* create( const char* name, const char* logParent, const char* logName )	{
-		return new T( name, logParent, logName );
-	}
-};
-
-struct ConfigurationDescription
-{
-	const char* typeName;
 	const char* sectionTitle;
 	const char* sectionName;
-	config::ObjectConfiguration* (*createFunc)( const char* name, const char* logParent, const char* logName );
 	bool (*parseFunc)( config::ConfigurationBase&,
-			   const boost::property_tree::ptree&, const std::string& node );
+			   const boost::property_tree::ptree&, const std::string& node,
+			   const module::ModulesConfiguration* modules );
 public:
-	ConfigurationDescription( const char* tn, const char* st, const char* sn,
-				  config::ObjectConfiguration* (*cf)( const char* name,
-								      const char* logParent,
-								      const char* logName ),
+	ConfigDescriptionBase( const char* st, const char* sn,
+			       bool (*pf)( config::ConfigurationBase& configuration,
+					   const boost::property_tree::ptree& pt,
+					   const std::string& node,
+					   const module::ModulesConfiguration* modules ) )
+		: sectionTitle( st ), sectionName( sn ),
+		  parseFunc( pf )		{}
+
+	virtual ~ConfigDescriptionBase()	{}
+
+	virtual const char* objectName() const = 0;
+	virtual config::ObjectConfiguration* create( const char* logPrefix ) = 0;
+};
+
+template< class T >
+struct ConfigurationDescription : public ConfigDescriptionBase
+{
+public:
+	ConfigurationDescription( const char* on, const char* st, const char* sn,
 				  bool (*pf)( config::ConfigurationBase& configuration,
 					      const boost::property_tree::ptree& pt,
-					      const std::string& node ) )
-		: typeName( tn ), sectionTitle( st ), sectionName( sn ),
-		  createFunc( cf ), parseFunc( pf )	{}
+					      const std::string& node,
+					      const module::ModulesConfiguration* modules ) )
+		: ConfigDescriptionBase( st, sn, pf )	{ m_name = on; }
+
+	virtual ~ConfigurationDescription()	{}
+
+	virtual const char* objectName() const	{ return m_name; }
+
+	virtual config::ObjectConfiguration* create( const char* logPrefix )
+					{ return new T( sectionTitle, logPrefix, sectionName ); }
+private:
+	const char*	m_name;
 };
 
 
@@ -111,26 +110,35 @@ public:
 };
 
 template < class T, class Tconf >
-struct ModuleContainerDescription
+struct ContainerDescription
 {
 	const char* name;
 	T* ( *createFunc )( const Tconf& conf );
 public:
-	ModuleContainerDescription( const char* n, T* ( *f )( const Tconf& conf ) )
+	ContainerDescription( const char* n, T* ( *f )( const Tconf& conf ) )
 		: name( n ), createFunc( f )		{}
 };
 
 
 ///
-class LoadableModuleDescription
+class ModulesConfiguration
 {
+public:
+	ModulesConfiguration()	{}
+	~ModulesConfiguration()	{
+		for ( std::list< ConfigDescriptionBase* >::const_iterator it = m_modules.begin();
+									it != m_modules.end();
+									it++ )
+			delete *it;
+	}
 
+	bool add( ConfigDescriptionBase* description );
+	ConfigDescriptionBase* get( const std::string& name ) const;
+private:
+	std::list< ConfigDescriptionBase* >	m_modules;
 };
 
-
-extern "C" {
-	LoadableModuleDescription* modDesc();
-}
+bool LoadModules( ModulesConfiguration& modules );
 
 }} // namespace _Wolframe::module
 

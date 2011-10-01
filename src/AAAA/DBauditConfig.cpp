@@ -42,7 +42,8 @@ namespace config {
 
 template<>
 bool ConfigurationParser::parse( AAAA::DBauditConfig& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& node )
+				 const boost::property_tree::ptree& pt, const std::string& node,
+				 const module::ModulesConfiguration* /*modules*/ )
 {
 	return ConfigurationParser::parse( cfg.m_dbConfig, pt, node );
 }

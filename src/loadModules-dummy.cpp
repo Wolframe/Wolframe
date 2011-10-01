@@ -31,45 +31,12 @@
 
 ************************************************************************/
 //
+// This is a dummy module loader in order to satisfy all dependencies
 //
-//
 
-#include "logger.hpp"
-#include "config/valueParser.hpp"
-#include "config/configurationParser.hpp"
+#include "moduleInterface.hpp"
 
-#include "TextFileAuthentication.hpp"
-
-#include "boost/algorithm/string.hpp"
-#define BOOST_FILESYSTEM_VERSION 3
-#include <boost/filesystem.hpp>
-
-namespace _Wolframe {
-namespace config {
-
-template<>
-bool ConfigurationParser::parse( AAAA::TextFileAuthConfig& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& node,
-				 const module::ModulesConfiguration* /*modules*/ )
+bool _Wolframe::module::LoadModules( ModulesConfiguration& /*modules*/ )
 {
-	using namespace _Wolframe::config;
-	bool retVal = true;
-
-	if ( boost::algorithm::iequals( node, "file" ) || boost::algorithm::iequals( node, "filename" ))	{
-		bool isDefined = ( !cfg.m_file.empty() );
-		if ( !Parser::getValue( cfg.logPrefix().c_str(), node.c_str(),
-					pt.get_value<std::string>(), cfg.m_file, &isDefined ))
-			retVal = false;
-		else	{
-			if ( ! boost::filesystem::path( cfg.m_file ).is_absolute() )
-				LOG_WARNING << cfg.logPrefix() << "authentication file path is not absolute: "
-					    << cfg.m_file;
-		}
-	}
-	else	{
-		LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '" << node << "'";
-	}
-	return retVal;
+	return true;
 }
-
-}} // namespace _Wolframe::config

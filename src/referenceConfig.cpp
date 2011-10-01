@@ -47,7 +47,8 @@ namespace config {
 /// Specialization of the ConfigurationParser::parse for the reference configuration
 template<>
 bool ConfigurationParser::parse( ReferenceConfig& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& node )
+				 const boost::property_tree::ptree& pt, const std::string& node,
+				 const module::ModulesConfiguration* /*modules*/ )
 {
 	bool labelDefined = ( ! cfg.m_ref.empty() );
 	if ( !config::Parser::getValue( cfg.logPrefix().c_str(), node.c_str(),

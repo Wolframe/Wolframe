@@ -22,8 +22,7 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 	Advapi32.lib Ws2_32.lib \
-	
-		
+
 # openssl
 
 !IFDEF WITH_SSL
@@ -138,6 +137,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	moduleLoaderConfig.obj \
 	processor\procProvider.obj \
 	processor\echoProcessor.obj \
+	moduleImpersonation.obj \
 	$(DB_OBJS) \
 	$(AAAA_OBJS)
 
