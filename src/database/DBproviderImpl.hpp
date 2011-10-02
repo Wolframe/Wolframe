@@ -49,7 +49,6 @@ namespace db {
 class DBproviderConfig : public config::ConfigurationBase
 {
 	friend class DatabaseProvider;
-//	friend class DatabaseProvider::DatabaseProvider_Impl;
 	friend class config::ConfigurationParser;
 public:
 	/// constructor & destructor

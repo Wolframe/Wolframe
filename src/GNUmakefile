@@ -205,6 +205,7 @@ OBJS = \
 	$(LOCAL_STATIC_LIB_OBJS) \
 	appProperties.o \
 	appConfigDefinition.o \
+	moduleImpersonation.o \
 	wolframeHandler.o \
 	database/DBprovider.o \
 	posixMain.o

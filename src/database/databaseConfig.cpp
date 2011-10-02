@@ -38,6 +38,7 @@
 
 #include "config/valueParser.hpp"
 #include "config/configurationParser.hpp"
+#include "moduleInterface.hpp"
 #include "logger.hpp"
 
 #define BOOST_FILESYSTEM_VERSION 3
@@ -50,82 +51,36 @@
 #include <ostream>
 #include <string>
 #include <cassert>
-
-/****  Impersonating the module loader  ******************************************************/
-#ifdef WITH_PGSQL
-#include "PostgreSQL.hpp"
-#endif
-#ifdef WITH_SQLITE3
-#include "SQLite.hpp"
-#endif
-
-using namespace _Wolframe;
-
-#ifdef WITH_PGSQL
-	#ifdef WITH_SQLITE3
-		static const size_t noDBconfigs = 2;
-	#else
-		static const size_t noDBconfigs = 1;
-	#endif
-#else
-	#ifdef WITH_SQLITE3
-		static const size_t noDBconfigs = 1;
-	#else
-		static const size_t noDBconfigs = 0;
-	#endif
-#endif
-
-
-static module::ConfigurationDescription
-dbConfig[ noDBconfigs ] = {
-#ifdef WITH_PGSQL
-	module::ConfigurationDescription( "PostgreSQL", "PostgreSQL database", "PostgreSQL",
-						&db::PostgreSQLconfig::create,
-						&config::ConfigurationParser::parseBase<db::PostgreSQLconfig> ),
-#endif
-#ifdef WITH_SQLITE3
-	module::ConfigurationDescription( "SQLite", "SQLite database", "SQLite",
-						&db::SQLiteConfig::create,
-						&config::ConfigurationParser::parseBase<db::SQLiteConfig> )
-#endif
-};
-/****  End impersonating the module loader  **************************************************/
+#include <list>
 
 namespace _Wolframe {
 namespace config {
 
-//template<>
-//bool ConfigurationParser::parse( db::DBproviderConfig&,
-//				 const boost::property_tree::ptree&, const std::string& )
-//{
-//	assert( false );
-//	return false;
-//}
-
 template<>
 bool ConfigurationParser::parse( db::DBproviderConfig& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& /*node*/ )
+				 const boost::property_tree::ptree& pt, const std::string& /*node*/,
+				 const module::ModulesConfiguration* modules )
 {
 	using namespace _Wolframe::config;
 	bool retVal = true;
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
-		size_t i;
-		for ( i = 0; i < noDBconfigs; i++ )	{
-			if ( boost::algorithm::iequals( dbConfig[i].typeName, L1it->first ))	{
-				config::ObjectConfiguration* conf = dbConfig[i].createFunc( dbConfig[i].sectionTitle,
-											       cfg.logPrefix().c_str(),
-											       dbConfig[i].sectionName );
-				if ( dbConfig[i].parseFunc( *conf, L1it->second, L1it->first ))
+		if ( modules )	{
+			module::ConfigDescriptionBase* cfgDesc = modules->get( L1it->first );
+			if ( cfgDesc )	{
+				config::ObjectConfiguration* conf = cfgDesc->create( cfg.logPrefix().c_str());
+				if ( cfgDesc->parseFunc( *conf, L1it->second, L1it->first, modules ))
 					cfg.m_dbConfig.push_back( conf );
 				else	{
 					delete conf;
 					retVal = false;
 				}
-				break;
 			}
+			else
+				LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
+					    << L1it->first << "'";
 		}
-		if ( i >= noDBconfigs )
+		else
 			LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
 				    << L1it->first << "'";
 	}

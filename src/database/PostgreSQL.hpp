@@ -49,7 +49,7 @@ namespace _Wolframe {
 namespace db {
 
 /// PostgreSQL server connection configuration
-class PostgreSQLconfig : public module::ModuleConfiguration< PostgreSQLconfig >
+class PostgreSQLconfig : public config::ObjectConfiguration
 {
 	friend class config::ConfigurationParser;
 	friend class PostgreSQLunit;

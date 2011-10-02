@@ -48,13 +48,13 @@ class TextFileAuthenticator : public AuthenticationUnit
 {
 };
 
-class TextFileAuthConfig :  public module::ModuleConfiguration< TextFileAuthConfig >
+class TextFileAuthConfig :  public config::ObjectConfiguration
 {
 	friend class TxtFileAuthContainer;
 	friend class config::ConfigurationParser;
 public:
 	TextFileAuthConfig( const char* cfgName, const char* logParent, const char* logName )
-		: module::ModuleConfiguration< TextFileAuthConfig >( cfgName, logParent, logName ) {}
+		: config::ObjectConfiguration( cfgName, logParent, logName ) {}
 
 	virtual const char* objectName() const			{ return "TextFileAuth"; }
 

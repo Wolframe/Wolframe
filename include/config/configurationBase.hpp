@@ -36,11 +36,18 @@
 
 #include <string>
 #include <ostream>
+#include <list>
+
+// forward definition
+namespace _Wolframe {
+namespace module {
+class ModulesConfiguration;
+}} // namespace _Wolframe::module
 
 namespace _Wolframe {
 namespace config {
 
-// forward definition for friends :)
+// forward definitions
 class ConfigurationParser;
 
 /// Base class for the configuration structures
@@ -55,7 +62,9 @@ public:
 	///\param[in]	logName	the logging name of this section. Combined with
 	///			the logParent parameter will form the whole logging
 	///			prefix for of the section.
-	ConfigurationBase( const char* name, const char* logParent, const char* logName )
+	ConfigurationBase( const char* name, const char* logParent, const char* logName,
+			   module::ModulesConfiguration* modules = NULL )
+		: m_modules( modules )
 	{
 		m_sectionName = name ? name : "";
 		m_logPrefix = logParent ? logParent : "";
@@ -101,8 +110,9 @@ public:
 	virtual void print( std::ostream& os, size_t indent = 0 ) const = 0;
 
 private:
-	std::string	m_sectionName;
-	std::string	m_logPrefix;
+	std::string			m_sectionName;
+	std::string			m_logPrefix;
+	module::ModulesConfiguration*	m_modules;
 };
 
 

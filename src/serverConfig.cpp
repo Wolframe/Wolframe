@@ -58,7 +58,8 @@ static const unsigned short DEFAULT_NOF_THREADS = 4;
 /// Parse the configuration
 template<>
 bool ConfigurationParser::parse( net::Configuration& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& /*node*/ )
+				 const boost::property_tree::ptree& pt, const std::string& /*node*/,
+				 const module::ModulesConfiguration* /*modules*/ )
 {
 	bool retVal = true;
 

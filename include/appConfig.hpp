@@ -59,7 +59,8 @@ struct ServiceConfiguration;
 struct LoggerConfiguration;
 struct CmdLineConfig;		// forward declaration for the command line structure
 
-typedef bool (*ParseFunc_t)( ConfigurationBase&, const boost::property_tree::ptree&, const std::string& );
+typedef bool (*ParseFunc_t)( ConfigurationBase&, const boost::property_tree::ptree&,
+			     const std::string&, const module::ModulesConfiguration* );
 
 /// application configuration structure
 struct ApplicationConfiguration	{
@@ -83,7 +84,7 @@ public:
 		CONFIG_UNDEFINED
 	};
 
-	ApplicationConfiguration();
+	ApplicationConfiguration( const module::ModulesConfiguration* modules );
 	~ApplicationConfiguration();
 
 	bool parse( const char *filename, ConfigFileType type );
@@ -102,8 +103,10 @@ private:
 	std::vector< ConfigurationBase* >	m_conf;
 	std::vector< ParseFunc_t >		m_parse;
 	std::map< std::string, std::size_t >	m_section;
+	const module::ModulesConfiguration*	m_modules;
 
-	bool addConfig( const std::string& nodeName, ConfigurationBase* conf, ParseFunc_t parseFunc );
+	bool addConfig( const std::string& nodeName, ConfigurationBase* conf,
+			ParseFunc_t parseFunc );
 };
 
 } // namespace config

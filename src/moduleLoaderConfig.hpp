@@ -46,7 +46,7 @@ namespace _Wolframe {
 namespace config {
 
 /// module loader configuration
-class ModuleLoaderConfiguration : public _Wolframe::config::ConfigurationBase
+class ModuleLoaderConfiguration : public ConfigurationBase
 {
 	friend class ConfigurationParser;
 public:

@@ -44,7 +44,8 @@
 namespace _Wolframe {
 namespace config {
 
-ApplicationConfiguration::ApplicationConfiguration()
+ApplicationConfiguration::ApplicationConfiguration( const module::ModulesConfiguration* modules )
+	: m_modules( modules )
 {
 	// daemon / service configuration
 	serviceCfg = new _Wolframe::config::ServiceConfiguration();
@@ -54,7 +55,6 @@ ApplicationConfiguration::ApplicationConfiguration()
 	loggerCfg = new _Wolframe::log::LoggerConfiguration();
 
 	handlerCfg = new _Wolframe::HandlerConfiguration();
-
 
 	// add both sections, the parse function will select the
 	// appropriate action

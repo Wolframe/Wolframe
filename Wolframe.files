@@ -173,6 +173,7 @@ examples/iproc/serialize/directmapTraits.hpp
 examples/iproc/serialize/luamapBase.cpp
 examples/iproc/serialize/luamapBase.hpp
 examples/iproc/serialize/luamapDescription.hpp
+examples/iproc/serialize/luamapError.hpp
 examples/iproc/serialize/luamapParse.hpp
 examples/iproc/serialize/luamapPrint.hpp
 examples/iproc/serialize/luamapTraits.hpp
@@ -183,9 +184,12 @@ examples/iproc/tests/data/test_UCS4BE.xml
 examples/iproc/tests/data/test_UCS4LE.xml
 examples/iproc/tests/data/test_UTF16.xml
 examples/iproc/tests/data/test_UTF8.xml
+examples/iproc/tests/directmapParser.cpp
 examples/iproc/tests/iprocHandlerTest.cpp
 examples/iproc/tests/iprocHandlerXMLTest.cpp
+examples/iproc/tests/luamapParser.cpp
 examples/iproc/tests/testHandlerTemplates.hpp
+examples/iproc/tests/testUtils.hpp
 examples/lua/appConfigDefinition.cpp
 examples/lua/appProperties.cpp
 examples/lua/.Attic/luahelpers.c
@@ -422,6 +426,7 @@ src/getPassword.cpp
 src/getPassword.hpp
 src/GNUmakefile
 src/handlerConfig.hpp
+src/loadModules-dummy.cpp
 src/logger/logBackendConsole.cpp
 src/logger/logBackendConsole.hpp
 src/logger/logBackendEventlog.cpp
@@ -441,6 +446,7 @@ src/logger/logSyslogFacility.cpp
 src/logger/syslog_win32.c
 src/logger/syslog_win32.h
 src/Makefile.W32
+src/moduleImpersonation.cpp
 src/moduleLoaderConfig.cpp
 src/moduleLoaderConfig.hpp
 src/posixMain.cpp

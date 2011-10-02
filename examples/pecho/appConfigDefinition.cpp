@@ -41,7 +41,7 @@
 namespace _Wolframe {
 namespace config {
 
-ApplicationConfiguration::ApplicationConfiguration()
+ApplicationConfiguration::ApplicationConfiguration( const module::ModulesConfiguration* /*modules*/ )
 {
 	// daemon / service configuration
 	serviceCfg = new _Wolframe::config::ServiceConfiguration();

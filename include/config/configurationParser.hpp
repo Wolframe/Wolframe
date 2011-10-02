@@ -54,15 +54,28 @@ public:
 	///\param[in]	pt		property tree node
 	///\param[in]	node		the label of the node. It should be
 	///				the same (case insensitive) as it->first
+//	template<typename T>
+//	static bool parse( T& configuration,
+//			   const boost::property_tree::ptree& pt, const std::string& node );
+
 	template<typename T>
 	static bool parse( T& configuration,
-			   const boost::property_tree::ptree& pt, const std::string& node );
+			   const boost::property_tree::ptree& pt, const std::string& node,
+			   const module::ModulesConfiguration* modules = NULL );
+
+//	template<typename T>
+//	static bool parseBase( ConfigurationBase& configuration,
+//			       const boost::property_tree::ptree& pt, const std::string& node )
+//	{
+//		return parse( dynamic_cast<T&>( configuration ), pt, node );
+//	}
 
 	template<typename T>
 	static bool parseBase( ConfigurationBase& configuration,
-			       const boost::property_tree::ptree& pt, const std::string& node )
+			       const boost::property_tree::ptree& pt, const std::string& node,
+			       const module::ModulesConfiguration* modules = NULL )
 	{
-		return parse( dynamic_cast<T&>( configuration ), pt, node );
+		return parse( dynamic_cast<T&>( configuration ), pt, node, modules );
 	}
 };
 

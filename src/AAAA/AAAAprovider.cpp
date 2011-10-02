@@ -49,14 +49,14 @@
 using namespace _Wolframe;
 
 static const size_t noAuthModules = 2;
-static module::ModuleContainerDescription< Container< AAAA::AuthenticationUnit >, config::ObjectConfiguration >
-authModules[ noAuthModules ] = { module::ModuleContainerDescription< Container< AAAA::AuthenticationUnit >, config::ObjectConfiguration >( "DatabaseAuth", &AAAA::DBauthContainer::create ),
-				 module::ModuleContainerDescription< Container< AAAA::AuthenticationUnit >, config::ObjectConfiguration >( "TextFileAuth", &AAAA::TxtFileAuthContainer::create ) };
+static module::ContainerDescription< Container< AAAA::AuthenticationUnit >, config::ObjectConfiguration >
+authModules[ noAuthModules ] = { module::ContainerDescription< Container< AAAA::AuthenticationUnit >, config::ObjectConfiguration >( "DatabaseAuth", &AAAA::DBauthContainer::create ),
+				 module::ContainerDescription< Container< AAAA::AuthenticationUnit >, config::ObjectConfiguration >( "TextFileAuth", &AAAA::TxtFileAuthContainer::create ) };
 
 static const size_t noAuditModules = 2;
-static module::ModuleContainerDescription< Container< AAAA::AuditUnit >, config::ObjectConfiguration >
-auditModules[ noAuditModules ] = { module::ModuleContainerDescription< Container< AAAA::AuditUnit >, config::ObjectConfiguration >( "DatabaseAudit", &AAAA::DBauditContainer::create ),
-				   module::ModuleContainerDescription< Container< AAAA::AuditUnit >, config::ObjectConfiguration >( "FileAudit", &AAAA::FileAuditContainer::create ) };
+static module::ContainerDescription< Container< AAAA::AuditUnit >, config::ObjectConfiguration >
+auditModules[ noAuditModules ] = { module::ContainerDescription< Container< AAAA::AuditUnit >, config::ObjectConfiguration >( "DatabaseAudit", &AAAA::DBauditContainer::create ),
+				   module::ContainerDescription< Container< AAAA::AuditUnit >, config::ObjectConfiguration >( "FileAudit", &AAAA::FileAuditContainer::create ) };
 /****  End impersonating the module loader  ***********************************************************/
 
 namespace _Wolframe {
@@ -104,7 +104,7 @@ bool AAAAprovider::AAAAprovider_Impl::resolveDB( const db::DatabaseProvider& db 
 
 /***********************************************************************************/
 AuthenticationGroup::AuthenticationGroup( const std::list< config::ObjectConfiguration* >& confs,
-					  module::ModuleContainerDescription< Container< AuthenticationUnit >, config::ObjectConfiguration >* description,
+					  module::ContainerDescription< Container< AuthenticationUnit >, config::ObjectConfiguration >* description,
 					  size_t descrSize )
 {
 	for ( std::list<config::ObjectConfiguration*>::const_iterator it = confs.begin();
@@ -144,7 +144,7 @@ bool AuthenticationGroup::resolveDB( const db::DatabaseProvider& db )
 
 /***********************************************************************************/
 AuditGroup::AuditGroup( const std::list< config::ObjectConfiguration* >& confs,
-			module::ModuleContainerDescription< Container< AAAA::AuditUnit >, config::ObjectConfiguration >* description,
+			module::ContainerDescription< Container< AAAA::AuditUnit >, config::ObjectConfiguration >* description,
 			size_t descrSize )
 {
 	for ( std::list<config::ObjectConfiguration*>::const_iterator it = confs.begin();

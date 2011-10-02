@@ -180,7 +180,7 @@ bool ApplicationConfiguration::parse ( const char *filename, ConfigFileType type
 			std::map< std::string, std::size_t >::iterator confIt;
 			if (( confIt = m_section.find( it->first ) ) != m_section.end() )	{
 				if ( ! m_parse[confIt->second]( *(m_conf[confIt->second]),
-								  it->second, confIt->first ))
+								it->second, confIt->first, m_modules ))
 					retVal = false;
 			}
 			else	{
