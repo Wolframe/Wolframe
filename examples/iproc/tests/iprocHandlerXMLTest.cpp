@@ -103,20 +103,11 @@ static const TestDescription testDescriptions[] =
 
 struct TestConfiguration :public lua::Configuration
 {
-	TestConfiguration()
-		:lua::Configuration( "iproc", "test-xml"){}
-	TestConfiguration( const TestConfiguration& o) :lua::Configuration(o){}
 	TestConfiguration( const char* scriptname, int bufferSizeInput, int bufferSizeOutput)
-		:lua::Configuration( "iproc", "test-iproc")
+		:lua::Configuration( "iproc", "test-iproc", bufferSizeInput, bufferSizeOutput)
 	{
-		boost::property_tree::ptree pt;
 		std::string scriptpath( wtest::Data::getDataFile( scriptname, "scripts", ".lua"));
-		pt.put("main", scriptpath);
-		pt.put("input_buffer", boost::lexical_cast<std::string>( bufferSizeInput));
-		pt.put("output_buffer", boost::lexical_cast<std::string>( bufferSizeOutput));
-		setCanonicalPathes( ".");
-		if (!config::ConfigurationParser::parse<lua::Configuration>( *this, pt, "test"))
-			throw std::logic_error( "Bad Configuration");
+		defMain( scriptpath.c_str());
 		setCanonicalPathes( ".");
 	}
 };

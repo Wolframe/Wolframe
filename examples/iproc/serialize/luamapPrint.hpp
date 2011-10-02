@@ -34,7 +34,7 @@ Project Wolframe.
 
 #ifndef _Wolframe_LUAMAP_PRINT_HPP_INCLUDED
 #define _Wolframe_LUAMAP_PRINT_HPP_INCLUDED
-#include "serialize/luamapError.hpp"
+#include "serialize/mapContext.hpp"
 #include "serialize/luamapTraits.hpp"
 #include <boost/utility/value_init.hpp> 
 #include <vector> 
@@ -92,7 +92,7 @@ bool printObject_( const void* obj, const struct_&, lua_State* ls, Context* ctx)
 		lua_pushstring( ls, itr->first);
 		if (!itr->second.m_print( (char*)obj+itr->second.m_ofs, ls, ctx))
 		{
-			ctx->setError( itr->first, ctx);
+			ctx->setError( itr->first);
 			return false;
 		}
 		lua_settable( ls, -2);
@@ -119,7 +119,6 @@ bool printObject_( const void* obj, const vector_&, lua_State* ls, Context* ctx)
 		lua_pushnumber( ls, ++index);
 		if (!IntrusivePrinter<typename T::value_type>::print( (const void*)&(*itr), ls, ctx))
 		{
-			ctx->setError( 0, ctx);
 			return false;
 		}
 		lua_settable( ls, -2);

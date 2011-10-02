@@ -114,6 +114,29 @@ struct Filter
 		,m_inputfilter(o.m_inputfilter){}
 	///\brief Destructor
 	~Filter(){}
+
+	///\brief Get a member value of the filter
+	///\param [in] name case sensitive name of the variable
+	///\param [in] valbuf buffer for the value returned
+	///\param [in] valbufsize size of the valbuf buffer in bytes
+	///\return true on success, false, if the variable does not exist or the operation failed
+	bool getValue( const char* name, char* valbuf, std::size_t valbufsize)
+	{
+		if (m_inputfilter.get() && m_inputfilter->getValue( name, valbuf, valbufsize)) return true;
+		if (m_formatoutput.get() && m_formatoutput->getValue( name, valbuf, valbufsize)) return true;
+		return false;
+	}
+
+	///\brief Set a member value of the filter
+	///\param [in] name case sensitive name of the variable
+	///\param [in] value new value of the variable to set
+	///\return true on success, false, if the variable does not exist or the operation failed
+	bool setValue( const char* name, const char* value)
+	{
+		if (m_inputfilter.get() && m_inputfilter->setValue( name, value)) return true;
+		if (m_formatoutput.get() && m_formatoutput->setValue( name, value)) return true;
+		return false;
+	}
 };
 
 ///\class InputFilterClosure

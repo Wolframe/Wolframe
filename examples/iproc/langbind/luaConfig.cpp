@@ -64,29 +64,13 @@ bool ConfigurationParser::parse( _Wolframe::iproc::lua::Configuration& cfg,
 		if (boost::algorithm::iequals( it->first, "main"))
 		{
 			if ( !config::Parser::getValue( cfg.logPrefix().c_str(), *it, name, config::Parser::NonEmptyDomain<std::string>())) return false;
-			cfg.m_main = Configuration::Module( name, Configuration::Module::Script);
+			cfg.defMain( name.c_str());
 			cnt_main ++;
 		}
 		else if (boost::algorithm::iequals( it->first, "module"))
 		{
 			if ( !config::Parser::getValue( cfg.logPrefix().c_str(), *it, name, config::Parser::NonEmptyDomain<std::string>())) return false;
-			cfg.m_modules.push_back( Configuration::Module( name));
-		}
-		else if (boost::algorithm::iequals( it->first, "input_buffer"))
-		{
-			if (!config::Parser::getValue( cfg.logPrefix().c_str(), *it, cfg.m_input_bufsize, config::Parser::RangeDomain<unsigned int>(1,(1<<20)))) return false;
-		}
-		else if (boost::algorithm::iequals( it->first, "output_buffer"))
-		{
-			if (!config::Parser::getValue( cfg.logPrefix().c_str(), *it, cfg.m_output_bufsize, config::Parser::RangeDomain<unsigned int>(1,(1<<20)))) return false;
-		}
-		else if (boost::algorithm::iequals( it->first, "cstacksize"))
-		{
-			if (!config::Parser::getValue( cfg.logPrefix().c_str(), *it, cfg.m_cthread_stacksize, config::Parser::RangeDomain<unsigned int>(64,(1<<20)))) return false;
-		}
-		else if (boost::algorithm::iequals( it->first, " filter_buffer"))
-		{
-			if (!config::Parser::getValue( cfg.logPrefix().c_str(), *it, cfg. m_filter_bufsize, config::Parser::RangeDomain<unsigned int>(64,(1<<20)))) return false;
+			cfg.addModule( name.c_str());
 		}
 		else
 		{
@@ -103,8 +87,17 @@ bool ConfigurationParser::parse( _Wolframe::iproc::lua::Configuration& cfg,
 
 }} // namespace _Wolframe::config
 
-
 using namespace _Wolframe::iproc::lua;
+
+void Configuration::addModule( const char* name)
+{
+	m_modules.push_back( Configuration::Module( name));
+}
+
+void Configuration::defMain( const char* name)
+{
+	m_main = Configuration::Module( name, Configuration::Module::Script);
+}
 
 static Configuration::ModuleLoad getLuaModuleEntryFunc( const char* name)
 {

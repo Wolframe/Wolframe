@@ -33,7 +33,7 @@ Project Wolframe.
 ///\brief Defines the intrusive implementation of the parsing part of serialization for the lua map
 #ifndef _Wolframe_LUAMAP_PARSE_HPP_INCLUDED
 #define _Wolframe_LUAMAP_PARSE_HPP_INCLUDED
-#include "serialize/luamapError.hpp"
+#include "serialize/mapContext.hpp"
 #include "serialize/luamapBase.hpp"
 #include "serialize/luamapTraits.hpp"
 #include <stdexcept>
@@ -45,6 +45,14 @@ namespace serialize {
 template <typename T>
 struct IntrusiveParser;
 
+static void setLuaError( Context* ctx, lua_State* ls, int tagIndex, const char* msg, const char* param)
+{
+	lua_pushvalue( ls, tagIndex);
+	const char* tablename = lua_tostring( ls, -1);
+	ctx->setError( tablename, msg, param);
+	lua_pop( ls, 1);
+}
+
 template <typename T>
 static bool parseObject_( void* obj, const struct_&, lua_State* ls, Context* ctx)
 {
@@ -55,24 +63,29 @@ static bool parseObject_( void* obj, const struct_&, lua_State* ls, Context* ctx
 		ctx->setError( 0, "table expected for structure");
 		return false;
 	}
+
 	lua_pushnil( ls);
 	while (lua_next( ls, -2))
 	{
 		lua_pushvalue( ls, -2);
-		DescriptionBase::Map::const_iterator itr = descr->find( lua_tostring( ls, -2));
+		const char* key = lua_tostring( ls, -1);
+		if (!key)
+		{
+			setLuaError( ctx, ls, -5, "string expected as key for struct in table instead of ", lua_typename( ls, lua_type( ls, -1)));
+			return false;
+		}
+		DescriptionBase::Map::const_iterator itr = descr->find( key);
+
+		if (itr == descr->m_elem.end())
+		{
+			setLuaError( ctx, ls, -5, "element not defined ", key);
+			return false;
+		}
 		lua_pop( ls, 1);
 
-		if (itr != descr->m_elem.end())
+		if (!itr->second.m_parse( (char*)obj+itr->second.m_ofs, ls, ctx))
 		{
-			if (!itr->second.m_parse( (char*)obj+itr->second.m_ofs, ls, ctx))
-			{
-				ctx->setError( itr->first, ctx);
-				return false;
-			}
-		}
-		else
-		{
-			ctx->setError( itr->first, "element not defined");
+			ctx->setError( itr->first);
 			return false;
 		}
 		lua_pop( ls, 1);

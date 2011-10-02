@@ -73,6 +73,7 @@ OBJS = \
 	filters/char_filter.o \
 	filters/line_filter.o \
 	serialize/directmapBase.o \
+	serialize/directmapCompile.o \
 	$(TOPDIR)/src/posixMain.o
 
 ifeq ($(WITH_LUA),1)
@@ -96,6 +97,7 @@ CPP_BINS = \
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 TEST_BINS += \
+	tests/directmapCompiler$(EXE) \
 	tests/iprocHandlerTest$(EXE) \
 	tests/iprocHandlerXMLTest$(EXE) \
 	tests/luamapParser$(EXE) \
@@ -105,6 +107,7 @@ tests/iprocHandlerTest$(EXE): tests/iprocHandlerTest.o $(OBJS) $(TOPDIR)/src/lib
 tests/iprocHandlerXMLTest$(EXE): tests/iprocHandlerXMLTest.o $(OBJS) $(TOPDIR)/src/libwolframe.a
 tests/luamapParser$(EXE): tests/luamapParser.o $(OBJS) $(TOPDIR)/src/libwolframe.a
 tests/directmapParser$(EXE): tests/directmapParser.o $(OBJS) $(TOPDIR)/src/libwolframe.a
+tests/directmapCompiler$(EXE): tests/directmapCompiler.o $(OBJS) $(TOPDIR)/src/libwolframe.a
 
 local_all: $(CPP_BINS)
 
@@ -118,6 +121,9 @@ local_test: $(TEST_BINS)
 	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./directmapParser$(EXE)
 	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./iprocHandlerXMLTest$(EXE)
 	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./iprocHandlerTest$(EXE)
+
+# cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./luamapParser$(EXE)
+# cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./directmapCompiler$(EXE)
 
 run: $(CPP_BINS)
 	@echo "Running the Wolframe iproc example..."

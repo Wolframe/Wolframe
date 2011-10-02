@@ -30,8 +30,8 @@ Project Wolframe.
 
 ************************************************************************/
 ///
-/// \file appObjects.cpp
-/// \brief interface implementation for application processor scripting language to system objects
+///\file appObjects.cpp
+///\brief interface implementation for application processor scripting language to system objects
 ///
 
 #include "appObjects.hpp"
@@ -46,13 +46,15 @@ using namespace app;
 
 static InputFilterClosure::ItemType fetchFailureResult( const protocol::InputFilter& ff)
 {
+	const char* msg;
 	switch (ff.state())
 	{
 		case protocol::InputFilter::EndOfMessage:
 			return InputFilterClosure::DoYield;
 
 		case protocol::InputFilter::Error:
-			LOG_ERROR << "error in iterator (" << ff.getError() << ")";
+			msg = ff.getLastError();
+			LOG_ERROR << "error in iterator (" << ff.getError() << " " << (msg?msg:"") << ")";
 			return InputFilterClosure::Error;
 
 		case protocol::InputFilter::Open:
@@ -240,7 +242,8 @@ Output::ItemType Output::print( const char* tag, unsigned int tagsize, const cha
 				int err = m_formatoutput->getError();
 				if (err)
 				{
-					LOG_ERROR << "error in format output (" << err << ")";
+					const char* msg = m_formatoutput->getLastError();
+					LOG_ERROR << "error in format output (" << err << " " << (msg?msg:"") << ")";
 					return Error;
 				}
 				else if (m_formatoutput->state() != protocol::FormatOutput::EndOfBuffer)
@@ -263,7 +266,8 @@ Output::ItemType Output::print( const char* tag, unsigned int tagsize, const cha
 					int err = m_formatoutput->getError();
 					if (err)
 					{
-						LOG_ERROR << "error in format output open tag (" << err << ")";
+						const char* msg = m_formatoutput->getLastError();
+						LOG_ERROR << "error in format output open tag (" << err << " " << (msg?msg:"") << ")";
 						return Error;
 					}
 					else  if (m_formatoutput->state() != protocol::FormatOutput::EndOfBuffer)
@@ -288,7 +292,8 @@ Output::ItemType Output::print( const char* tag, unsigned int tagsize, const cha
 				int err = m_formatoutput->getError();
 				if (err)
 				{
-					LOG_ERROR << "error in format output value (" << err << ")";
+					const char* msg = m_formatoutput->getLastError();
+					LOG_ERROR << "error in format output value (" << err << " " << (msg?msg:"") << ")";
 					return Error;
 				}
 				else if (m_formatoutput->state() != protocol::FormatOutput::EndOfBuffer)
@@ -312,7 +317,8 @@ Output::ItemType Output::print( const char* tag, unsigned int tagsize, const cha
 				int err = m_formatoutput->getError();
 				if (err)
 				{
-					LOG_ERROR << "error in format output close tag (" << err << ")";
+					const char* msg = m_formatoutput->getLastError();
+					LOG_ERROR << "error in format output close tag (" << err << " " << (msg?msg:"") << ")";
 					return Error;
 				}
 				else if (m_formatoutput->state() != protocol::FormatOutput::EndOfBuffer)

@@ -29,12 +29,13 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/luamapError.hpp
-///\brief Defines the error handling of the intrusive lua serialization/deserialization
+///\file serialize/mapContext.hpp
+///\brief Defines the error handling of any intrusive serialization/deserialization
 
 #ifndef _Wolframe_LUAMAP_ERROR_HPP_INCLUDED
 #define _Wolframe_LUAMAP_ERROR_HPP_INCLUDED
 #include <cstring>
+#include <string>
 
 namespace _Wolframe {
 namespace serialize {
@@ -44,8 +45,10 @@ struct Context
 	enum {bufsize=4096,errbufsize=256};
 
 	Context()
-		:m_buf(new char[ bufsize+errbufsize])
+		:m_buf(new char[ bufsize+errbufsize+256])
+		,m_endTagConsumed(false)
 	{
+		m_buf[0] = 0;
 		m_lasterror = m_buf+bufsize;
 	}
 
@@ -54,16 +57,16 @@ struct Context
 		delete [] m_buf;
 	}
 
-	const char* getLastError() const	{return m_lasterror;}
-	char* buf() const			{return m_buf;}
-	const std::string content() const {return m_content;}
-	void endTagConsumed( bool v)	{m_endtagConsumed=v;}
-	bool endTagConsumed()		{return m_endtagConsumed;}
-	char* buf() const		{return m_buf;}
+	const char* getLastError() const		{return m_lasterror;}
+	char* buf() const				{return m_buf;}
+	const std::string content() const		{return m_content;}
+	void append( const char* c, std::size_t n)	{m_content.append( c,n);}
+	void endTagConsumed( bool v)			{m_endTagConsumed=v;}
+	bool endTagConsumed()				{return m_endTagConsumed;}
 
-	void setError( const char* tt, const char* msg)
+	void setError( const char* tt, const char* msg, const char* msgparam=0)
 	{
-		setMsg( tt, ':', msg);
+		setMsg( tt, ':', msg, msgparam);
 	}
 
 	void setError( const char* tt)
@@ -77,18 +80,21 @@ private:
 	char* m_lasterror;
 	char* m_buf;
 	std::string m_content;
-	bool m_endtagConsumed;
+	bool m_endTagConsumed;
 
-	void setMsg( const char* m1, char dd, const char* m2)
+	void setMsg( const char* m1, char dd, const char* m2, const char* m3=0)
 	{
 		std::size_t m1len = m1?std::strlen(m1):0;
 		std::size_t m2len = m2?std::strlen(m2):0;
-		if (m1len >= errbufsize) m1len = errbufsize-1;
+		std::size_t m3len = m3?std::strlen(m3):0;
+		if (m1len >= errbufsize-1) m1len = errbufsize-2;
 		if (m2len >= errbufsize-m1len) m2len = errbufsize-m1len-1;
+		if (m3len >= errbufsize-m1len-m2len) m3len = errbufsize-m1len-m2len;
 		std::memmove( m_lasterror, m1?m1:"", m1len);
 		m_lasterror[ m1len] = dd;
 		std::memmove( m_lasterror+m1len+1, m2?m2:"", m2len);
-		m_lasterror[ m1len+m2len+1] = '\0';
+		std::memmove( m_lasterror+m1len+m2len+1, m3?m3:"", m3len);
+		m_lasterror[ m1len+m2len+m3len+1] = '\0';
 	}
 };
 

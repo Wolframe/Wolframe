@@ -73,6 +73,14 @@ struct BufferingInputFilter :public protocol::InputFilter
 		return new BufferingInputFilter( *this);
 	}
 
+	///\brief Get the last error, if the filter got into an error state
+	///\return the last error as string or 0
+	virtual const char* getLastError() const
+	{
+		Content* dc = m_content.get();
+		return dc?dc->getLastError():0;
+	}
+
 	virtual bool getNext( ElementType* type, void* buffer, std::size_t buffersize, std::size_t* bufferpos)
 	{
 		if (!m_inputConsumed && !bufferInput())

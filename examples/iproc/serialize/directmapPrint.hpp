@@ -44,11 +44,11 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-static void printElem( protocol::FormatOutput::ElementType tp, const void* elem, std::size_t elemsize, protocol::FormatOutput*& out, std::string& buf)
+static bool printElem( protocol::FormatOutput::ElementType tp, const void* elem, std::size_t elemsize, protocol::FormatOutput*& out, Context& ctx)
 {
 	if (!out->print( tp, elem, elemsize))
 	{
-		buf.append( out->charptr(), out->pos());
+		ctx.append( out->charptr(), out->pos());
 		out->release();
 		if (!out->print( tp, elem, elemsize))
 		{
@@ -60,87 +60,95 @@ static void printElem( protocol::FormatOutput::ElementType tp, const void* elem,
 			}
 			if (!out->print( tp, elem, elemsize))
 			{
-				throw std::runtime_error( "buffer of format output too small to hold one element");
+				ctx.setError( "buffer of format output too small to hold one element");
+				return false;
 			}
 		}
 	}
+	return true;
 }
 
 template <typename T>
-static void printObject( const char* tag, const T& obj, protocol::FormatOutput*& out, std::string& buf);
+static bool printObject( const char* tag, const T& obj, protocol::FormatOutput*& out, Context& ctx);
 
 
 template <typename T>
-void print_( const char* tag, const void* obj, const struct_&, protocol::FormatOutput*& out, std::string& buf)
+bool print_( const char* tag, const void* obj, const struct_&, protocol::FormatOutput*& out, Context& ctx)
 {
 	static const DescriptionBase* descr = T::getDescription();
 	bool isContent = true;
 
-	if (tag) printElem( protocol::FormatOutput::OpenTag, tag, std::strlen(tag), out, buf);
+	if (tag && !printElem( protocol::FormatOutput::OpenTag, tag, std::strlen(tag), out, ctx)) return false;
 
 	DescriptionBase::Map::const_iterator itr = descr->m_elem.begin(),end = descr->m_elem.end();
 	for (;itr != end; ++itr)
 	{
 		if (itr->second.m_isAtomic() && !isContent)
 		{
-			printElem( protocol::FormatOutput::Attribute, itr->first, std::strlen(itr->first), out, buf);
-			itr->second.m_print( 0, (char*)obj+itr->second.m_ofs, out, buf);
+			if (!printElem( protocol::FormatOutput::Attribute, itr->first, std::strlen(itr->first), out, ctx)) return false;
+			if (!itr->second.m_print( 0, (char*)obj+itr->second.m_ofs, out, ctx)) return false;
 		}
 		else
 		{
 			isContent = true;
-			itr->second.m_print( itr->first, (char*)obj+itr->second.m_ofs, out, buf);
+			if (!itr->second.m_print( itr->first, (char*)obj+itr->second.m_ofs, out, ctx)) return false;
 		}
 	}
-	if (tag) printElem( protocol::FormatOutput::CloseTag, "", 0, out, buf);
+	if (tag && !printElem( protocol::FormatOutput::CloseTag, "", 0, out, ctx)) return false;
+	return true;
 }
 
 template <typename T>
-void print_( const char* tag, const void* obj, const arithmetic_&, protocol::FormatOutput*& out, std::string& buf)
+bool print_( const char* tag, const void* obj, const arithmetic_&, protocol::FormatOutput*& out, Context& ctx)
 {
-	if (tag) printElem( protocol::FormatOutput::OpenTag, tag, std::strlen(tag), out, buf);
+	if (tag && !printElem( protocol::FormatOutput::OpenTag, tag, std::strlen(tag), out, ctx)) return false;
 	std::string value( boost::lexical_cast<std::string>( *((T*)obj)));
-	printElem( protocol::FormatOutput::Value, value.c_str(), value.size(), out, buf);
-	if (tag) printElem( protocol::FormatOutput::CloseTag, "", 0, out, buf);
+	if (!printElem( protocol::FormatOutput::Value, value.c_str(), value.size(), out, ctx)) return false;
+	if (tag && !printElem( protocol::FormatOutput::CloseTag, "", 0, out, ctx)) return false;
+	return true;
 }
 
 template <typename T>
-void print_( const char* tag, const void* obj, const bool_&, protocol::FormatOutput*& out, std::string& buf)
+bool print_( const char* tag, const void* obj, const bool_&, protocol::FormatOutput*& out, Context& ctx)
 {
-	if (tag) printElem( protocol::FormatOutput::OpenTag, tag, std::strlen(tag), out, buf);
-	printElem( protocol::FormatOutput::Value, (*((T*)obj))?"t":"f", 1, out, buf);
-	if (tag) printElem( protocol::FormatOutput::CloseTag, "", 0, out, buf);
+	if (tag && !printElem( protocol::FormatOutput::OpenTag, tag, std::strlen(tag), out, ctx)) return false;
+	if (!printElem( protocol::FormatOutput::Value, (*((T*)obj))?"t":"f", 1, out, ctx)) return false;
+	if (tag && !printElem( protocol::FormatOutput::CloseTag, "", 0, out, ctx)) return false;
+	return true;
 }
 
 template <typename T>
-void print_( const char* tag, const void* obj, const vector_&, protocol::FormatOutput*& out, std::string& buf)
+bool print_( const char* tag, const void* obj, const vector_&, protocol::FormatOutput*& out, Context& ctx)
 {
 	if (!tag)
 	{
-		throw std::runtime_error( "non printable structure");
+		ctx.setError( 0, "non printable structure");
+		return false;
 	}
 	for (typename T::const_iterator itr=((T*)obj)->begin(); itr!=((T*)obj)->end(); itr++)
 	{
-		printElem( protocol::FormatOutput::OpenTag, tag, strlen(tag), out, buf);
-		printObject( 0, *itr, out, buf);
-		printElem( protocol::FormatOutput::CloseTag, "", 0, out, buf);
+		printElem( protocol::FormatOutput::OpenTag, tag, strlen(tag), out, ctx);
+		if (!printObject<typename T::value_type>( 0, *itr, out, ctx)) return false;
+		printElem( protocol::FormatOutput::CloseTag, "", 0, out, ctx);
 	}
+	return true;
 }
 
 template <typename T>
-static void printObject( const char* tag, const T& obj, protocol::FormatOutput*& out, std::string& buf)
+static bool printObject( const char* tag, const T& obj, protocol::FormatOutput*& out, Context& ctx)
 {
-	print_<T>( tag, (void*)&obj, getCategory(obj), out, buf);
+	return print_<T>( tag, (void*)&obj, getCategory(obj), out, ctx);
 }
 
 template <typename T>
 struct IntrusivePrinter
 {
-	static void print( const char* tag, const void* obj, protocol::FormatOutput*& out, std::string& buf)
+	static bool print( const char* tag, const void* obj, protocol::FormatOutput*& out, Context& ctx)
 	{
-		print_<T>( tag, obj, getCategory(*(T*)obj), out, buf);
-		buf.append( out->charptr(), out->pos());
+		if (!print_<T>( tag, obj, getCategory(*(T*)obj), out, ctx)) return false;
+		ctx.append( out->charptr(), out->pos());
 		out->release();
+		return true;
 	}
 };
 

@@ -133,7 +133,7 @@ struct FormatOutput :public OutputBlock
 
 	///\brief Get the current cursor position as pointer for the next print
 	///\return the current cursor position (where to print the next element to)
-	void* cur() const			{return (void*)(charptr()+pos());}
+	void* cur() const				{return (void*)(charptr()+pos());}
 
 	///\brief Print the next element to the buffer
 	///\param [in] type type of element to print
@@ -144,7 +144,24 @@ struct FormatOutput :public OutputBlock
 
 	///\brief Get error code in case of error state
 	///\return the error code
-	int getError() const			{return m_errorCode;}
+	int getError() const				{return m_errorCode;}
+
+	///\brief Get the last error, if the filter got into an error state
+	///\return the last error as string or 0
+	virtual const char* getLastError() const	{return m_errorCode?"unknown":0;}
+
+	///\brief Get a member value of the filter
+	///\param [in] name case sensitive name of the variable
+	///\param [in] valbuf buffer for the value returned
+	///\param [in] valbufsize size of the valbuf buffer in bytes
+	///\return true on success, false, if the variable does not exist or the operation failed
+	virtual bool getValue( const char* /*name*/, char* /*valbuf*/, std::size_t /*valbufsize*/)	{return false;}
+
+	///\brief Set a member value of the filter
+	///\param [in] name case sensitive name of the variable
+	///\param [in] value new value of the variable to set
+	///\return true on success, false, if the variable does not exist or the operation failed
+	virtual bool setValue( const char* /*name*/, const char* /*value*/) {return false;}
 
 	///\brief Set format output state with error code
 	///\param [in] s new state

@@ -6,10 +6,10 @@ function readTable( itr)
 		i=i+1
 		return i
 	end
-	for t,v in itr() do
+	for v,t in itr do
 		local val = v or readTable( itr);
 		if t then
-			if tab[t]
+			if tab[t] then
 				local e = tab[t]
 				if type(e) == "table" and tab[ #e] then
 					tab.insert( val)
@@ -38,8 +38,8 @@ function printTable( tab)
 end
 
 function run()
-	t = readTable( input.get())
-	t = transform( t)
+	t = readTable( input:get())
+--	t = transform( t)
 	printTable( t)
 end
 

@@ -34,7 +34,7 @@ Project Wolframe.
 
 #ifndef _Wolframe_LUAMAP_BASE_HPP_INCLUDED
 #define _Wolframe_LUAMAP_BASE_HPP_INCLUDED
-#include "luamapError.hpp"
+#include "mapContext.hpp"
 extern "C"
 {
 	#include "lua.h"

@@ -200,7 +200,7 @@ static int run( const char* root, const std::string& input, std::string& output)
 		return 2;
 	}
 	Struct object;
-	ProcessingContext ctx;
+	Context ctx;
 	const DescriptionBase* ds = Struct::getDescription();
 
 	in->protocolInput( (void*)input.c_str(), input.size(), true);

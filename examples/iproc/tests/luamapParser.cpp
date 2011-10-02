@@ -195,19 +195,11 @@ const DescriptionBase* Places::getDescription()
 
 struct TestConfiguration :public lua::Configuration
 {
-	TestConfiguration()
-		:lua::Configuration( "iproc", "test-xml"){}
-	TestConfiguration( const TestConfiguration& o) :lua::Configuration(o){}
-	TestConfiguration( const std::string& scriptpath, int bufferSizeInput, int bufferSizeOutput)
-		:lua::Configuration( "iproc", "test-iproc")
+	TestConfiguration( const char* scriptname, int bufferSizeInput, int bufferSizeOutput)
+		:lua::Configuration( "iproc", "test-iproc", bufferSizeInput, bufferSizeOutput)
 	{
-		boost::property_tree::ptree pt;
-		pt.put("main", scriptpath);
-		pt.put("input_buffer", boost::lexical_cast<std::string>( bufferSizeInput));
-		pt.put("output_buffer", boost::lexical_cast<std::string>( bufferSizeOutput));
-		setCanonicalPathes( ".");
-		if (!config::ConfigurationParser::parse<lua::Configuration>( *this, pt, "test"))
-			throw std::logic_error( "Bad Configuration");
+		std::string scriptpath( wtest::Data::getDataFile( scriptname, "scripts", ".lua"));
+		defMain( scriptpath.c_str());
 		setCanonicalPathes( ".");
 	}
 };
@@ -321,7 +313,7 @@ TEST_F( TestFixture, tests)
 	{
 		wtest::Data data( testDescription[ti].name, testDescription[ti].datafile);
 		std::string testoutput;
-		TestConfiguration cfg( wtest::Data::getDataFile( testDescription[ti].scriptname, "scripts", ".lua"), 1023, 1023);
+		TestConfiguration cfg( testDescription[ti].scriptname, 127, 127);
 
 		EXPECT_EQ( 0, testDescription[ti].run( cfg, data.input, testoutput));
 		data.check( testoutput);

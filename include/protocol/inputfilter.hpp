@@ -35,6 +35,9 @@ Project Wolframe.
 ///\brief Input interface for the application processor
 
 #include <cstddef>
+#include <cstring>
+#include <cstdio>
+#include <cstdlib>
 #include "countedReference.hpp"
 
 namespace _Wolframe {
@@ -133,6 +136,43 @@ struct InputFilter
 
 	///\brief Get error code in case of error state
 	int getError() const				{return m_errorCode;}
+
+	///\brief Get the last error, if the filter got into an error state
+	///\return the last error as string or 0
+	virtual const char* getLastError() const	{return m_errorCode?"unknown":0;}
+
+	///\brief Get a member value of the filter
+	///\param [in] name case sensitive name of the variable
+	///\param [in] valbuf buffer for the value returned
+	///\param [in] valbufsize size of the valbuf buffer in bytes
+	///\return true on success, false, if the variable does not exist or the operation failed
+	virtual bool getValue( const char* name, char* valbuf, std::size_t valbufsize)
+	{
+		if (std::strcmp( name, "buffersize") == 0)
+		{
+			if (valbufsize < 6*sizeof(m_genbufsize)) return false;
+			std::snprintf( valbuf, valbufsize, "%u", m_genbufsize);
+			return true;
+		}
+		return false;
+	}
+
+	///\brief Set a member value of the filter
+	///\param [in] name case sensitive name of the variable
+	///\param [in] value new value of the variable to set
+	///\return true on success, false, if the variable does not exist or the operation failed
+	virtual bool setValue( const char* name, const char* value)
+	{
+		if (std::strcmp( name, "buffersize") == 0)
+		{
+			int genbufsize = atoi( value);
+			if (genbufsize <= 0) return false;
+			m_genbufsize = genbufsize;
+			return true;
+		}
+		return false;
+	}
+
 	///\brief Get end of data flag passed to input filter. Tells if more network input has to be passed to the application processor
 	bool gotEoD() const				{return m_gotEoD;}
 	///\brief Get data at current iterator cursor position
@@ -157,7 +197,7 @@ private:
 	bool m_gotEoD;			///< got end of data flag
 	State m_state;			///< state
 	int m_errorCode;		///< error code
-	std::size_t m_genbufsize;	///< element buffer size (the buffer itself is managed by the client of this class)
+	std::size_t m_genbufsize;	///< element buffer size (the buffer itself is managed by the user of this class)
 };
 
 ///\typedef InputFilterR

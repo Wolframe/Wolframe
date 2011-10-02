@@ -39,10 +39,13 @@ using namespace serialize;
 void DescriptionBase::parse( void* obj, lua_State* ls) const
 {
 	Context ctx;
+	lua_pushnil( ls);
+	lua_pushvalue( ls, -2);
 	if (!m_parse(obj,ls,&ctx))
 	{
-		luaL_error( ls, ctx.errormessage);
+		luaL_error( ls, ctx.getLastError());
 	}
+	lua_pop( ls, 2);
 }
 
 void DescriptionBase::print( const void* obj, lua_State* ls) const
@@ -50,7 +53,7 @@ void DescriptionBase::print( const void* obj, lua_State* ls) const
 	Context ctx;
 	if (!m_print(obj,ls,&ctx))
 	{
-		luaL_error( ls, ctx.errormessage);
+		luaL_error( ls, ctx.getLastError());
 	}
 }
 

@@ -38,6 +38,9 @@ Project Wolframe.
 #include "textwolf.hpp"
 #include <string>
 #include <cstring>
+#include <cstddef>
+#include <cstdio>
+#include <cstdlib>
 #include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
@@ -52,6 +55,8 @@ namespace {
 template <class IOCharset, class AppCharset=textwolf::charset::UTF8>
 struct FormatOutputImpl :public protocol::FormatOutput, public FilterBase<IOCharset,AppCharset>
 {
+	typedef protocol::FormatOutput Parent;
+
 	///\enum ErrorCodes
 	///\brief Enumeration of error codes
 	enum ErrorCodes
@@ -67,6 +72,12 @@ struct FormatOutputImpl :public protocol::FormatOutput, public FilterBase<IOChar
 		TagBufferSize=1024		///< default size of buffer use for storing tag hierarchy of output
 	};
 
+	static const char* errorName( ErrorCodes e)
+	{
+		static const char* ar[] = {0,"ErrTagStackExceedsLimit","ErrTagHierarchy","ErrIllegalOperation","ErrIllegalState"};
+		return ar[ (int)e];
+	}
+
 	///\enum XMLState
 	///\brief Enumeration of XML printer states
 	enum XMLState
@@ -80,9 +91,9 @@ struct FormatOutputImpl :public protocol::FormatOutput, public FilterBase<IOChar
 
 	///\brief Constructor
 	///\param [in] bufsize (optional) size of internal buffer to use (for the tag hierarchy stack)
-	FormatOutputImpl( unsigned int bufsize=TagBufferSize)
-		:m_tagstk(new char[bufsize?bufsize:(unsigned int)TagBufferSize])
-		,m_tagstksize(bufsize?bufsize:(unsigned int)TagBufferSize)
+	FormatOutputImpl( std::size_t bufsize=TagBufferSize)
+		:m_tagstk(new char[bufsize?bufsize:(std::size_t)TagBufferSize])
+		,m_tagstksize(bufsize?bufsize:(std::size_t)TagBufferSize)
 		,m_tagstkpos(0)
 		,m_xmlstate(Tag)
 		,m_pendingOpenTag(false)
@@ -106,6 +117,48 @@ struct FormatOutputImpl :public protocol::FormatOutput, public FilterBase<IOChar
 	virtual protocol::FormatOutput* copy() const
 	{
 		return new FormatOutputImpl( *this);
+	}
+
+	///\brief Get the last error, if the filter got into an error state
+	///\return the last error as string or 0
+	virtual const char* getLastError() const		{return errorName( (ErrorCodes)getError());}
+
+	///\brief Get a member value of the filter
+	///\param [in] name case sensitive name of the variable
+	///\param [in] valbuf buffer for the value returned
+	///\param [in] valbufsize size of the valbuf buffer in bytes
+	///\return true on success, false, if the variable does not exist or the operation failed
+	virtual bool getValue( const char* name, char* valbuf, std::size_t valbufsize)
+	{
+		if (std::strcmp( name, "tagstacksize") == 0)
+		{
+			if (sizeof( m_tagstksize)*6 > valbufsize) return false;
+			std::snprintf( valbuf, valbufsize, "%u", m_tagstksize);
+			return true;
+		}
+		return Parent::getValue( name, valbuf, valbufsize);
+	}
+
+	///\brief Set a member value of the filter
+	///\param [in] name case sensitive name of the variable
+	///\param [in] value new value of the variable to set
+	///\return true on success, false, if the variable does not exist or the operation failed
+	virtual bool setValue( const char* name, const char* value)
+	{
+		int tagstksize;
+		if (std::strcmp( name, "tagstacksize") == 0)
+		{
+			tagstksize = atoi( value);
+			if (tagstksize <= (int)m_tagstkpos) return false;
+			char* tagstk = new (std::nothrow) char[ tagstksize];
+			if (!tagstk) return false;
+			std::memcpy( tagstk, m_tagstk, m_tagstkpos);
+			delete [] m_tagstk;
+			m_tagstk = tagstk;
+			m_tagstksize = tagstksize;
+			return true;
+		}
+		return Parent::setValue( name, value);
 	}
 
 	///\brief Implementation of protocol::FormatOutput::print(protocol::FormatOutput::ElementType,const void*,std::size_t)
@@ -362,9 +415,6 @@ private:
 	std::size_t m_tagstksize;							///< size of tag stack buffer in bytes
 	std::size_t m_tagstkpos;							///< used size of tag stack buffer in bytes
 	XMLState m_xmlstate;								///< current state of output
-	// Aba: was an int before, gives tons of error messages like:
-	// warning C4805: '==' : unsafe mix of type 'int' and type 'bool' in operation,
-	// I think bool is the right choice here..
 	bool m_pendingOpenTag;								///< true if last open tag instruction has not been ended yet
 	typename protocol::EscapingBuffer<textwolf::StaticBuffer>::State m_bufstate;	///< state of escaping the output
 };
@@ -437,6 +487,12 @@ struct InputFilterImpl :public protocol::InputFilter, public FilterBase<IOCharse
 		ErrUnexpectedState	///< something unexpected happened
 	};
 
+	static const char* errorName( ErrorCodes e)
+	{
+		static const char* ar[] = {0,"ErrBufferTooSmall","ErrXML","ErrUnexpectedState"};
+		return ar[ (int)e];
+	}
+
 	typedef textwolf::XMLScanner<SrcIterator,IOCharset,AppCharset,textwolf::StaticBuffer> XMLScanner;
 
 	///\brief Constructor
@@ -479,6 +535,10 @@ struct InputFilterImpl :public protocol::InputFilter, public FilterBase<IOCharse
 	{
 		return new InputFilterImpl( *this);
 	}
+
+	///\brief Get the last error, if the filter got into an error state
+	///\return the last error as string or 0
+	virtual const char* getLastError() const		{return errorName( (ErrorCodes)getError());}
 
 	struct ElementTypeMap :public textwolf::CharMap<int,-1,textwolf::XMLScannerBase::NofElementTypes>
 	{

@@ -85,6 +85,16 @@ struct InputFilterImpl :public protocol::InputFilter
 		ErrBufferTooSmall
 	};
 
+	static const char* errorName( ErrorCodes e)
+	{
+		static const char* ar[] = {0,"ErrBufferTooSmall"};
+		return ar[ (int)e];
+	}
+
+	///\brief Get the last error, if the filter got into an error state
+	///\return the last error as string or 0
+	virtual const char* getLastError() const	{return errorName((ErrorCodes)getError());}
+
 	///\brief Implementation of protocol::InputFilter::getNext( typename protocol::InputFilter::ElementType*, void*, std::size_t, std::size_t*)
 	virtual bool getNext( typename protocol::InputFilter::ElementType* type, void* buffer, std::size_t buffersize, std::size_t* bufferpos)
 	{

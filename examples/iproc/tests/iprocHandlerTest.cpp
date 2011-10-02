@@ -51,23 +51,14 @@ using namespace iproc;
 
 struct TestConfiguration :public lua::Configuration
 {
-	TestConfiguration()
-		:lua::Configuration( "iproc", "test-iproc"){}
-	TestConfiguration( const TestConfiguration& o) :lua::Configuration(o){}
 	TestConfiguration( int bufferSizeInput, int bufferSizeOutput)
-		:lua::Configuration( "iproc", "test-iproc")
+		:lua::Configuration( "iproc", "test-iproc", bufferSizeInput, bufferSizeOutput)
 	{
 		boost::filesystem::path scriptpath = boost::filesystem::current_path();
 		scriptpath /= "scripts";
 		scriptpath /= "test_echo_char.lua";
 
-		boost::property_tree::ptree pt;
-		pt.put("main", scriptpath.string());
-		pt.put("input_buffer", boost::lexical_cast<std::string>( bufferSizeInput));
-		pt.put("output_buffer", boost::lexical_cast<std::string>( bufferSizeOutput));
-		setCanonicalPathes( ".");
-		if (!config::ConfigurationParser::parse<lua::Configuration>( *this, pt, "test"))
-			throw std::logic_error( "Bad Configuration");
+		defMain( scriptpath.string().c_str());
 		setCanonicalPathes( ".");
 	}
 };
@@ -173,22 +164,22 @@ public:
 	std::string m_expected;
 	net::LocalTCPendpoint ep;
 	iproc::Connection* m_connection;
-	TestConfiguration config;
+	TestConfiguration m_config;
 	enum
 	{
 		EoDBufferSize=4,
 		EscBufferSize=1
 	};
 protected:
-	iprocHandlerFixture() :ep( "127.0.0.1", 12345),m_connection(0) {}
+	iprocHandlerFixture()
+		:ep( "127.0.0.1", 12345)
+		,m_connection(0)
+		,m_config( TestDescription().inputBufferSize + EoDBufferSize, TestDescription().outputBufferSize + EscBufferSize) {}
 
 	virtual void SetUp()
 	{
 		TestDescription test;
-		config = TestConfiguration(
-				test.inputBufferSize + EoDBufferSize,
-				test.outputBufferSize + EscBufferSize);
-		m_connection = new iproc::Connection( ep, &config);
+		m_connection = new iproc::Connection( ep, &m_config);
 
 		m_input.clear();
 		m_expected.clear();

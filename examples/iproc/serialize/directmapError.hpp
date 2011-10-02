@@ -29,24 +29,31 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/luamapError.hpp
-///\brief Defines the error handling of the intrusive lua serialization/deserialization
+///\file serialize/directmapBase.hpp
+///\brief Defines the non intrusive base class of serialization for the direct map
 
-#ifndef _Wolframe_LUAMAP_ERROR_HPP_INCLUDED
-#define _Wolframe_LUAMAP_ERROR_HPP_INCLUDED
-#include <cstring>
+#ifndef _Wolframe_DIRECTMAP_ERROR_HPP_INCLUDED
+#define _Wolframe_DIRECTMAP_ERROR_HPP_INCLUDED
+#include "protocol/inputfilter.hpp"
+#include "protocol/formatoutput.hpp"
+#include "logger.hpp"
+#include <cstddef>
+#include <string>
+#include <vector>
 
 namespace _Wolframe {
 namespace serialize {
 
-struct Context
+class Context
 {
+public:
 	enum {bufsize=4096,errbufsize=256};
 
 	Context()
-		:m_buf(new char[ bufsize+errbufsize])
+		:m_endtagConsumed(false)
+		,m_buf(new char[bufsize+errbufsize])
 	{
-		m_lasterror = m_buf+bufsize;
+		m_lasterror = m_buf+errbufsize;
 	}
 
 	~Context()
@@ -54,44 +61,19 @@ struct Context
 		delete [] m_buf;
 	}
 
-	const char* getLastError() const	{return m_lasterror;}
-	char* buf() const			{return m_buf;}
+	const char* getLastError() const {return m_lasterror;}
 	const std::string content() const {return m_content;}
 	void endTagConsumed( bool v)	{m_endtagConsumed=v;}
 	bool endTagConsumed()		{return m_endtagConsumed;}
 	char* buf() const		{return m_buf;}
-
-	void setError( const char* tt, const char* msg)
-	{
-		setMsg( tt, ':', msg);
-	}
-
-	void setError( const char* tt)
-	{
-		if (!tt) return;
-		setMsg( tt, '/', m_lasterror);
-	}
-
 private:
 	friend class DescriptionBase;
 	char* m_lasterror;
-	char* m_buf;
 	std::string m_content;
 	bool m_endtagConsumed;
-
-	void setMsg( const char* m1, char dd, const char* m2)
-	{
-		std::size_t m1len = m1?std::strlen(m1):0;
-		std::size_t m2len = m2?std::strlen(m2):0;
-		if (m1len >= errbufsize) m1len = errbufsize-1;
-		if (m2len >= errbufsize-m1len) m2len = errbufsize-m1len-1;
-		std::memmove( m_lasterror, m1?m1:"", m1len);
-		m_lasterror[ m1len] = dd;
-		std::memmove( m_lasterror+m1len+1, m2?m2:"", m2len);
-		m_lasterror[ m1len+m2len+1] = '\0';
-	}
+	char* m_buf;
 };
 
-}}
+}}//namespace
 #endif
 

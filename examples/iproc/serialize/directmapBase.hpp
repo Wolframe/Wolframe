@@ -36,6 +36,7 @@ Project Wolframe.
 #define _Wolframe_DIRECTMAP_BASE_HPP_INCLUDED
 #include "protocol/inputfilter.hpp"
 #include "protocol/formatoutput.hpp"
+#include "serialize/mapContext.hpp"
 #include "logger.hpp"
 #include <cstddef>
 #include <string>
@@ -44,27 +45,12 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-class ProcessingContext
-{
-public:
-	ProcessingContext() :m_endtagConsumed(false){}
-	const char* getLastError() const {return m_lasterror;}
-	const std::string content() const {return m_content;}
-	void endTagConsumed( bool v)	{m_endtagConsumed=v;}
-	bool endTagConsumed()		{return m_endtagConsumed;}
-private:
-	friend class DescriptionBase;
-	char m_lasterror[ 256];
-	std::string m_content;
-	bool m_endtagConsumed;
-};
-
 class DescriptionBase
 {
 public:
 	typedef std::vector<std::pair<const char*,DescriptionBase> > Map;
-	typedef void (*Parse)( const char* tag, void* obj, protocol::InputFilter& flt, ProcessingContext& ctx);
-	typedef void (*Print)( const char* tag, const void* obj, protocol::FormatOutput*& out, std::string& buf);
+	typedef bool (*Parse)( const char* tag, void* obj, protocol::InputFilter& flt, Context& ctx);
+	typedef bool (*Print)( const char* tag, const void* obj, protocol::FormatOutput*& out, Context& ctx);
 	typedef bool (*IsAtomic)();
 
 	DescriptionBase( const char* tn, std::size_t ofs, std::size_t sz, IsAtomic ia, Parse pa, Print pr)
@@ -74,8 +60,8 @@ public:
 	DescriptionBase()
 		:m_typename(0),m_ofs(0),m_size(0),m_isAtomic(0),m_parse(0),m_print(0){}
 
-	bool parse( const char* name, void* obj, protocol::InputFilter& in, ProcessingContext& ctx) const;
-	bool print( const char* name, const void* obj, protocol::FormatOutput& out, ProcessingContext& ctx) const;
+	bool parse( const char* name, void* obj, protocol::InputFilter& in, Context& ctx) const;
+	bool print( const char* name, const void* obj, protocol::FormatOutput& out, Context& ctx) const;
 
 	bool isAtomic() const
 	{

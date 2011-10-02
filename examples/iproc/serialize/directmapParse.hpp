@@ -50,34 +50,6 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-struct ParseError
-{
-	std::string m_location;
-	std::string m_message;
-
-	ParseError( const char* location, const std::string& message, const char* name=0)
-		:m_location(location?location:""),m_message(message)
-	{
-		if (name)
-		{
-			m_message.append( " '");
-			m_message.append( name);
-			m_message.append( "'");
-		}
-	}
-
-	ParseError( const char* location, const ParseError& prev)
-		:m_message(prev.m_message)
-	{
-		if (location)
-		{
-			m_location.append( location);
-			m_location.append( "/");
-		}
-		m_location.append( prev.m_location);
-	}
-};
-
 template <typename T>
 static void parseObject( const char* tag, T& obj, protocol::InputFilter& inp);
 
@@ -99,179 +71,194 @@ bool isAtomic_( const bool_&)
 }
 
 template <typename T>
-void parseObject_( const char* tag, void* obj, const struct_&, protocol::InputFilter& inp, ProcessingContext& ctx)
+bool parseObject_( const char* tag, void* obj, const struct_&, protocol::InputFilter& inp, Context& ctx)
 {
 	protocol::InputFilter::ElementType typ;
-	enum {bufsize=4096};
-	char buf[ bufsize];
-	std::size_t bufpos=0;
 	static const DescriptionBase* descr = T::getDescription();
 	unsigned int m_depth = 0;
+	std::size_t bufpos = 0;
 
-	if (tag) throw ParseError( tag, "atomic value expected for an attribute value");
-
-	try
+	if (tag)
 	{
-		while (inp.getNext( &typ, buf, bufsize-1, &bufpos))
+		ctx.setError( tag, "atomic value expected for an attribute value");
+		return false;
+	}
+	while (inp.getNext( &typ, ctx.buf(), Context::bufsize-1, &bufpos))
+	{
+		ctx.buf()[ bufpos] = 0;
+		switch (typ)
 		{
-			buf[ bufpos] = 0;
-			switch (typ)
+			case protocol::InputFilter::OpenTag:
 			{
-				case protocol::InputFilter::OpenTag:
+				++m_depth;
+				DescriptionBase::Map::const_iterator itr = descr->find( ctx.buf());
+				if (itr == descr->m_elem.end())
 				{
-					++m_depth;
-					DescriptionBase::Map::const_iterator itr = descr->find( buf);
-					if (itr == descr->m_elem.end())
-					{
-						throw ParseError( tag, "unknown element ", buf);
-					}
-					itr->second.m_parse( 0, (char*)obj+itr->second.m_ofs, inp, ctx);
-					if (ctx.endTagConsumed())
-					{
-						--m_depth;
-						ctx.endTagConsumed(false);
-					}
-					break;
+					ctx.setError( ctx.buf(), "unknown element");
+					ctx.setError( tag);
+					return false;
 				}
-
-				case protocol::InputFilter::Attribute:
+				if (!itr->second.m_parse( 0, (char*)obj+itr->second.m_ofs, inp, ctx)) return false;
+				if (ctx.endTagConsumed())
 				{
-					DescriptionBase::Map::const_iterator itr = descr->find( buf);
-					if (itr == descr->m_elem.end())
-					{
-						throw ParseError( tag, "unknown element ", buf);
-					}
-					itr->second.m_parse( buf, (char*)obj+itr->second.m_ofs, inp, ctx);
-					ctx.endTagConsumed(false);
-					break;
-				}
-				case protocol::InputFilter::Value:
-				{
-					std::size_t ii;
-					for (ii=0; ii<bufpos; ii++) if (buf[ii]>32) break;
-					if (ii==bufpos) break;
-					ctx.endTagConsumed(false);
-					throw ParseError( tag, "structure expected");
-				}
-				case protocol::InputFilter::CloseTag:
-					if (m_depth == 0)
-					{
-						ctx.endTagConsumed(true);
-						return;
-					}
 					--m_depth;
 					ctx.endTagConsumed(false);
+					return true;
+				}
+				break;
 			}
-			bufpos = 0;
+
+			case protocol::InputFilter::Attribute:
+			{
+				DescriptionBase::Map::const_iterator itr = descr->find( ctx.buf());
+				if (itr == descr->m_elem.end())
+				{
+					ctx.setError( ctx.buf(), "unknown element");
+					ctx.setError( tag);
+					return false;
+				}
+				if (!itr->second.m_parse( ctx.buf(), (char*)obj+itr->second.m_ofs, inp, ctx)) return false;
+				ctx.endTagConsumed(false);
+				break;
+			}
+			case protocol::InputFilter::Value:
+			{
+				std::size_t ii;
+				for (ii=0; ii<bufpos; ii++) if (ctx.buf()[ii]>32) break;
+				if (ii==bufpos) break;
+				ctx.endTagConsumed(false);
+				ctx.setError( tag, "structure expected");
+				return false;
+			}
+			case protocol::InputFilter::CloseTag:
+				if (m_depth == 0)
+				{
+					ctx.endTagConsumed(true);
+					return true;
+				}
+				--m_depth;
+				ctx.endTagConsumed(false);
 		}
+		bufpos = 0;
 	}
-	catch (const ParseError& e)
-	{
-		throw ParseError( tag, e);
-	}
-	catch (boost::bad_lexical_cast& e)
-	{
-		throw ParseError( tag, "value not in domain", e.what());
-	}
-	catch (std::bad_alloc& e)
-	{
-		throw ParseError( tag, "out of memory");
-	}
+	return true;
 }
 
 template <typename T>
-void parseObject_( const char* tag, void* obj, const bool_&, protocol::InputFilter& inp, ProcessingContext&)
+bool parseObject_( const char* tag, void* obj, const bool_&, protocol::InputFilter& inp, Context& ctx)
 {
 	protocol::InputFilter::ElementType typ;
-	enum {bufsize=4096};
-	char buf[ bufsize];
 	std::size_t bufpos=0;
 
-	if (inp.getNext( &typ, buf, bufsize-1, &bufpos))
+	if (inp.getNext( &typ, ctx.buf(), Context::bufsize-1, &bufpos))
 	{
-		buf[ bufpos] = 0;
+		ctx.buf()[ bufpos] = 0;
 		switch (typ)
 		{
 			case protocol::InputFilter::OpenTag:
 			case protocol::InputFilter::Attribute:
-				throw ParseError( tag, "atomic value expected instead of structure");
+				ctx.setError( tag, "atomic value expected instead of structure");
+				return false;
 
 			case protocol::InputFilter::Value:
 			{
-				if (boost::algorithm::iequals( buf, "yes")
-				||  boost::algorithm::iequals( buf, "y")
-				||  boost::algorithm::iequals( buf, "t")
-				||  boost::algorithm::iequals( buf, "true"))
+				if (boost::algorithm::iequals( ctx.buf(), "yes")
+				||  boost::algorithm::iequals( ctx.buf(), "y")
+				||  boost::algorithm::iequals( ctx.buf(), "t")
+				||  boost::algorithm::iequals( ctx.buf(), "true"))
 				{
 					*((T*)obj) = true;
 					break;
 				}
-				if (boost::algorithm::iequals( buf, "no")
-				||  boost::algorithm::iequals( buf, "n")
-				||  boost::algorithm::iequals( buf, "f")
-				||  boost::algorithm::iequals( buf, "false"))
+				if (boost::algorithm::iequals( ctx.buf(), "no")
+				||  boost::algorithm::iequals( ctx.buf(), "n")
+				||  boost::algorithm::iequals( ctx.buf(), "f")
+				||  boost::algorithm::iequals( ctx.buf(), "false"))
 				{
 					*((T*)obj) = false;
 					break;
 				}
-				throw ParseError( tag, "boolean value expected");
+				ctx.setError( tag, "boolean value expected");
+				return false;
 			}
 			case protocol::InputFilter::CloseTag:
-				throw ParseError( tag, "boolean value expected");
+				ctx.setError( tag, "boolean value expected");
+				return false;
 		}
+		return true;
 	}
 	else
 	{
-		throw ParseError( tag, "unexpected end of document");
+		ctx.setError( tag, "unexpected end of document");
+		return false;
 	}
 }
 
 template <typename T>
-void parseObject_( const char* tag, void* obj, const vector_&, protocol::InputFilter& inp, ProcessingContext& ctx)
+bool parseObject_( const char* tag, void* obj, const vector_&, protocol::InputFilter& inp, Context& ctx)
 {
 	typename T::value_type val;
-	parseObject( tag, val, inp, ctx);
+	if (!parseObject( tag, val, inp, ctx))
+	{
+		ctx.setError( tag);
+		return false;
+	}
 	((T*)obj)->push_back( val);
+	ctx.endTagConsumed(false);
+	return true;
 }
 
 template <typename T>
-static void parseObject_( const char* tag, void* obj, const arithmetic_&, protocol::InputFilter& inp, ProcessingContext& ctx)
+static bool parseObject_( const char* tag, void* obj, const arithmetic_&, protocol::InputFilter& inp, Context& ctx)
 {
 	protocol::InputFilter::ElementType typ;
-	enum {bufsize=4096};
-	char buf[ bufsize];
 	std::size_t bufpos=0;
 
-	if (inp.getNext( &typ, buf, bufsize-1, &bufpos))
+	if (inp.getNext( &typ, ctx.buf(), Context::bufsize-1, &bufpos))
 	{
-		buf[ bufpos] = 0;
-		switch (typ)
+		ctx.buf()[ bufpos] = 0;
+		try
 		{
-			case protocol::InputFilter::OpenTag:
-			case protocol::InputFilter::Attribute:
-				throw ParseError( tag, "arithmetic value or string expected");
-
-			case protocol::InputFilter::Value:
+			switch (typ)
 			{
-				*((T*)obj) = boost::lexical_cast<T>( buf);
-				break;
+				case protocol::InputFilter::OpenTag:
+				case protocol::InputFilter::Attribute:
+					ctx.setError( tag, "arithmetic value or string expected");
+					return false;
+
+				case protocol::InputFilter::Value:
+					*((T*)obj) = boost::lexical_cast<T>( ctx.buf());
+					break;
+
+				case protocol::InputFilter::CloseTag:
+					*((T*)obj) = boost::lexical_cast<T>( "");
+					ctx.endTagConsumed(true);
+					break;
 			}
-			case protocol::InputFilter::CloseTag:
-				*((T*)obj) = boost::lexical_cast<T>( "");
-				ctx.endTagConsumed(true);
-				break;
+		}
+		catch (boost::bad_lexical_cast& e)
+		{
+			ctx.setError( tag, e.what());
+			return false;
 		}
 	}
 	else
 	{
-		throw ParseError( tag, "unexpected end of document");
+		ctx.setError( tag, "unexpected end of document");
+		return false;
 	}
+	return true;
 }
 
 template <typename T>
-static void parseObject( const char* tag, T& obj, protocol::InputFilter& inp, ProcessingContext& ctx)
+static bool parseObject( const char* tag, T& obj, protocol::InputFilter& inp, Context& ctx)
 {
-	_Wolframe::serialize::parseObject_<T>( tag, (void*)&obj, getCategory(obj), inp, ctx);
+	if (!_Wolframe::serialize::parseObject_<T>( tag, (void*)&obj, getCategory(obj), inp, ctx))
+	{
+		ctx.setError( tag);
+		return false;
+	}
+	return true;
 }
 
 template <typename T>
@@ -283,20 +270,9 @@ struct IntrusiveParser
 		return isAtomic_( getCategory(*obj));
 	}
 
-	static void parse( const char* tag, void* obj, protocol::InputFilter& inp, ProcessingContext& ctx)
+	static bool parse( const char* tag, void* obj, protocol::InputFilter& inp, Context& ctx)
 	{
-		try
-		{
-			parseObject_<T>( tag, obj, getCategory(*(T*)obj), inp, ctx);
-		}
-		catch (ParseError& e)
-		{
-			std::string msg( "/");
-			msg.append( e.m_location);
-			msg.append( ": ");
-			msg.append( e.m_message);
-			throw std::runtime_error( msg.c_str());
-		}
+		return parseObject_<T>( tag, obj, getCategory(*(T*)obj), inp, ctx);
 	}
 };
 

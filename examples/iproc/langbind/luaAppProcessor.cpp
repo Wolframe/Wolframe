@@ -107,13 +107,12 @@ struct LuaObject :public ObjectType
 		luaL_openlib( ls, metaTableName<ObjectType>(), mt?mt:empty_methodtable, 0);
 		luaL_newmetatable( ls, metaTableName<ObjectType>());
 		luaL_openlib( ls, 0, getMetamethods(), 0);
-
-		lua_pushliteral( ls, "__index");
-		lua_pushvalue( ls, -3);		// dup methods table
-		lua_rawset( ls, -3);		// metatable.__index = methods
 		lua_pushliteral( ls, "__metatable");
 		lua_pushvalue( ls, -3);		// dup methods table
 		lua_rawset( ls, -3);		//hide metatable: metatable.__metatable = methods
+		lua_pushliteral( ls, "__index");
+		lua_pushvalue( ls, -3);		// dup methods table
+		lua_rawset( ls, -3);		//hide metatable: metatable.__index = methods
 		lua_pop( ls, 1);
 	}
 
@@ -208,6 +207,42 @@ struct LuaObject :public ObjectType
 	}
 };
 
+template <class Object>
+static int function__LuaObject__index( lua_State* ls)
+{
+	Object* obj = LuaObject<Object>::getSelf( ls, metaTableName<Object>(), "__index");
+	const char* key = lua_tostring( ls, 2);
+	if (!key) luaL_error( ls, "%s __index called with an invalid argument 2 (key)", metaTableName<Object>());
+
+	char val[128];
+	if (obj->getValue( key, val, sizeof(val)))
+	{
+		lua_pushstring( ls, val);
+		return 1;
+	}
+	else
+	{
+		luaL_error( ls, "%s __index called with unknown variable name", metaTableName<Object>());
+	}
+	return 0;
+}
+
+template <class Object>
+static int function__LuaObject__newindex( lua_State* ls)
+{
+	Object* obj = LuaObject<Object>::getSelf( ls, metaTableName<Object>(), "__newindex");
+	const char* key = lua_tostring( ls, 2);
+	if (!key) luaL_error( ls, "%s __newindex called with invalid argument 2 (key)", metaTableName<Object>());
+	const char* val = lua_tostring( ls, 3);
+	if (!val) luaL_error( ls, "%s __newindex called with invalid argument 3 (value)", metaTableName<Object>());
+
+	if (!obj->setValue( key, val))
+	{
+		luaL_error( ls, "%s __newindex called with unknown variable name", metaTableName<Object>());
+	}
+	return 0;
+}
+
 static void pushItem( lua_State* ls, const char* item, unsigned int itemsize)
 {
 	if (item)
@@ -269,6 +304,7 @@ static int function_output_print( lua_State* ls)
 {
 	for (;;)
 	{
+		const char* msg;
 		const char* item[2] = {0,0};
 		std::size_t itemsize[2] = {0,0};
 
@@ -297,7 +333,8 @@ static int function_output_print( lua_State* ls)
 				continue;
 
 			case Output::Error:
-				luaL_error( ls, "error in format output print (%d)", output->m_formatoutput->getError());
+				msg = output->m_formatoutput->getLastError();
+				luaL_error( ls, "error in format output print (%s)", msg?msg:"unknown");
 				return 0;
 
 			case Output::Data:
@@ -307,6 +344,13 @@ static int function_output_print( lua_State* ls)
 		return 0;
 	}
 }
+
+static const luaL_Reg filter_methodtable[ 3] =
+{
+	{"__index", &function__LuaObject__index<Filter>},
+	{"__newindex", &function__LuaObject__newindex<Filter>},
+	{0,0}
+};
 
 static int function_filter( lua_State* ls)
 {
@@ -477,7 +521,7 @@ AppProcessor::AppProcessor( const lua::Configuration* config)
 	m_state = new State( *config);
 	LuaObject<Input>::createGlobal( m_state->ls, "input", m_input, input_methodtable);
 	LuaObject<Output>::createGlobal( m_state->ls, "output", m_output, output_methodtable);
-	LuaObject<Filter>::create( m_state->ls);
+	LuaObject<Filter>::create( m_state->ls, filter_methodtable);
 	LuaObject<InputFilterClosure>::create( m_state->ls);
 	create_global_functions( m_state->ls);
 }
@@ -496,7 +540,8 @@ static AppProcessor::CallResult getYieldState( protocol::InputFilter* in, protoc
 	}
 	if (fo->getError())
 	{
-		LOG_ERROR << "error " << fo->getError() << ") in format output when calling '" << methodName << "'";
+		const char* msg = fo->getLastError();
+		LOG_ERROR << "error (" << (msg?msg:"unknown") << ") in format output when calling '" << methodName << "'";
 		return AppProcessor::Error;
 	}
 	protocol::InputFilter::State istate = in->state();
@@ -511,8 +556,8 @@ static AppProcessor::CallResult getYieldState( protocol::InputFilter* in, protoc
 
 		case protocol::InputFilter::Error:
 		{
-			int returnCode = in->getError();
-			LOG_ERROR << "error " << returnCode << ") in input filter when calling '" << methodName << "'";
+			const char* msg = in->getLastError();
+			LOG_ERROR << "error (" << (msg?msg:"unknown") << ") in input filter when calling '" << methodName << "'";
 			return AppProcessor::Error;
 		}
 	}

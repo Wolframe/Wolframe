@@ -43,6 +43,13 @@ public:
 		return (m_doc == 0);
 	}
 
+	///\brief Get the last error, if the filter got into an error state
+	///\return the last error as string or 0
+	const char* getLastError() const
+	{
+		return m_error.size()?m_error.c_str():0;
+	}
+
 	bool open( const void* content, std::size_t size)
 	{
 		if (m_doc) xmlFreeDoc( m_doc);
@@ -50,8 +57,12 @@ public:
 
 		int options = XML_PARSE_NOENT | XML_PARSE_DTDLOAD;
 		m_doc = xmlReadMemory( (const char*)content, size, "noname.xml", NULL, options);
-		if (!m_doc) return false;
-
+		if (!m_doc)
+		{
+			xmlError* err = xmlGetLastError();
+			if (err) m_error.append( err->message);
+			return false;
+		}
 		m_node = xmlDocGetRootElement( m_doc);
 		std::string enc;
 		const xmlChar* ec = m_doc->encoding;
@@ -181,6 +192,7 @@ private:
 	xmlNode* m_propvalues;
 	std::vector<xmlNode*> m_nodestk;
 	CountedReference<std::string> m_encoding;
+	std::string m_error;
 };
 
 struct InputFilterImpl :public BufferingInputFilter<Content>
@@ -209,6 +221,27 @@ public:
 		ErrLibXMLMultiRootElement,
 		ErrLibXMLText
 	};
+
+	static const char* errorName( Error e)
+	{
+		static const char* ar[] =
+					{0
+					,"illegal operation"
+					,"illegal state"
+					,"out of mem"
+					,"create writer failed"
+					,"create document failed",
+					"XML end element error",
+					"XML attribute error",
+					"XML start element error",
+					"XML multi root element",
+					"XML text error"};
+		return ar[ (int)e];
+	}
+
+	///\brief Get the last error, if the filter got into an error state
+	///\return the last error as string or 0
+	virtual const char* getLastError() const	{return errorName((Error)getError());}
 
 	class Document
 	{

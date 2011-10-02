@@ -37,9 +37,10 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace serialize;
 
-bool DescriptionBase::parse( const char* name, void* obj, protocol::InputFilter& in, ProcessingContext& ctx) const
+bool DescriptionBase::parse( const char* name, void* obj, protocol::InputFilter& in, Context& ctx) const
 {
 	protocol::InputFilter* inp = 0;
+	bool rt = true;
 	try
 	{
 		ctx.m_content.append( (char*)in.ptr(), in.size());
@@ -53,92 +54,83 @@ bool DescriptionBase::parse( const char* name, void* obj, protocol::InputFilter&
 		in.setState( protocol::InputFilter::Open);
 		inp = in.copy();
 		inp->protocolInput( (void*)ctx.m_content.c_str(), ctx.m_content.size(), true);
-		char tagbuf[ 1024];
-		std::size_t tagpos = 0;
+
+		std::size_t bufpos = 0;
 		protocol::InputFilter::ElementType etyp;
-		while (!inp->getNext( &etyp, tagbuf, sizeof(tagbuf)-1, &tagpos))
+
+		while (!inp->getNext( &etyp, ctx.buf(), ctx.bufsize-1, &bufpos))
 		{
 			protocol::InputFilter* ff = inp->createFollow();
 			if (!ff)
 			{
-				throw std::logic_error( "failed to parse xml header");
+				ctx.setError( 0, "failed to parse xml header");
 			}
 			else
 			{
 				delete inp;
 				inp = ff;
 			}
+			bufpos = 0;
 		}
-		tagbuf[ tagpos] = 0;
+		ctx.buf()[ bufpos] = 0;
 		if (etyp != protocol::InputFilter::OpenTag)
 		{
-			throw std::logic_error( "failed to parse xml root element");
+			ctx.setError( 0, "failed to parse xml root element");
+			rt = false;
 		}
-		if (std::strcmp(name, tagbuf) != 0)
+		else if (std::strcmp(name, ctx.buf()) != 0)
 		{
-			throw std::logic_error( "xml is of different type than expected");
+			ctx.setError( 0, "xml is of different type than expected");
+			rt = false;
 		}
-		if (m_parse)
+		else if (m_parse)
 		{
-			m_parse( 0, obj, *inp, ctx);
+			rt &= m_parse( 0, obj, *inp, ctx);
 		}
 		else
 		{
-			throw std::logic_error( "null parser called");
+			ctx.setError( 0, "null parser called");
+			rt = false;
 		}
-		if (!ctx.endTagConsumed())
+		if (rt && !ctx.endTagConsumed())
 		{
-			if (!inp->getNext( &etyp, tagbuf, sizeof(tagbuf), &tagpos) || etyp != protocol::InputFilter::CloseTag)
+			bufpos = 0;
+			if (!inp->getNext( &etyp, ctx.buf(), ctx.bufsize-1, &bufpos) || etyp != protocol::InputFilter::CloseTag)
 			{
-				throw std::logic_error( "xml not properly balanced or illegal");
+				ctx.setError( 0, "xml not properly balanced or illegal");
+				rt = false;
 			}
 		}
-		ctx.m_content.clear();
-		delete inp;
 	}
 	catch (std::exception& e)
 	{
-		const char* msg = e.what();
-		std::size_t msgsize = std::strlen( msg);
-		if (msgsize > sizeof( ctx.m_lasterror))
-		{
-			msgsize = sizeof( ctx.m_lasterror)-1;
-		}
-		std::memcpy( ctx.m_lasterror, msg, msgsize);
-		ctx.m_lasterror[ msgsize] = 0;
-		ctx.m_content.clear();
-		delete inp;
-		return false;
+		ctx.setError( 0, e.what());
+		rt = false;
 	}
-	return true;
+	ctx.m_content.clear();
+	if (inp) delete inp;
+	return rt;
 }
 
-bool DescriptionBase::print( const char* name, const void* obj, protocol::FormatOutput& out, ProcessingContext& ctx) const
+bool DescriptionBase::print( const char* name, const void* obj, protocol::FormatOutput& out, Context& ctx) const
 {
 	try
 	{
-		char outputbuffer[ 8192];
 		if (m_print)
 		{
 			protocol::FormatOutput* oo = out.copy();
-			oo->init( (void*)outputbuffer, sizeof(outputbuffer));
-			m_print( name, obj, oo, ctx.m_content);
+			oo->init( (void*)ctx.buf(), ctx.bufsize);
+			return m_print( name, obj, oo, ctx);
 		}
 		else
 		{
-			throw std::logic_error( "null printer called");
+			ctx.setError( 0, "null printer called");
+			return false;
 		}
 	}
 	catch (std::exception& e)
 	{
-		const char* msg = e.what();
-		std::size_t msgsize = std::strlen( msg);
-		if (msgsize > sizeof( ctx.m_lasterror))
-		{
-			msgsize = sizeof( ctx.m_lasterror)-1;
-		}
-		std::memcpy( ctx.m_lasterror, msg, msgsize);
-		ctx.m_lasterror[ msgsize] = 0;
+		ctx.setError( name, e.what());
 		return false;
 	}
 	return true;
