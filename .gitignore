@@ -50,6 +50,9 @@ examples/iproc/tests/iprocHandlerTest
 examples/iproc/tests/iprocHandlerXMLTest
 examples/pecho/tests/pechoHandlerTest
 examples/iproc/tests/directmapParser
+examples/iproc/tests/directmapCompiler
+examples/iproc/tests/luamapParser
+tests/expect/primary.db
 clients/qt/qtclient
 moc_*.cpp
 clients/qt/.history

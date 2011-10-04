@@ -117,7 +117,7 @@ local_distclean:
 sasl.db:
 	echo "xx" | $(SASL_DIR)/sbin/saslpasswd2 -f sasl.db -p test
 
-local_test: sasl.db
+local_test: sasl.db $(TEST_CPP_BINS)
 ifeq ($(WITH_EXPECT),1)
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) $(EXPECT) ./checkAuthTextFileUnknownUser
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) $(EXPECT) ./checkAuthTextFileWrongPass

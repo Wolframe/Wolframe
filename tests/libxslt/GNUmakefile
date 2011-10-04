@@ -41,7 +41,7 @@ local_clean:
 
 local_distclean:
 
-local_test:
+local_test: $(TEST_CPP_BINS)
 	@./testlibxslt1 test1.xslt test1.xml > test1.RES
 	@diff test1.RES test1.MUST
 	@echo
