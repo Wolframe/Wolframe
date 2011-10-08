@@ -46,32 +46,25 @@
 namespace _Wolframe {
 namespace module {
 
-enum ModuleType	{
-	DATABASE_MODULE,
-	AUTHENTICATION_MODULE,
-	AUDIT_MODULE,
-	PROCESSOR_MODULE
-};
-
 struct ConfigDescriptionBase
 {
-	const char* sectionTitle;
-	const char* sectionName;
+	const char* title;
+	const char* section;
+	const char* keyword;
 	bool (*parseFunc)( config::ConfigurationBase&,
 			   const boost::property_tree::ptree&, const std::string& node,
 			   const module::ModulesConfiguration* modules );
 public:
-	ConfigDescriptionBase( const char* st, const char* sn,
+	ConfigDescriptionBase( const char* Title, const char* Section, const char* Keyword,
 			       bool (*pf)( config::ConfigurationBase& configuration,
 					   const boost::property_tree::ptree& pt,
 					   const std::string& node,
 					   const module::ModulesConfiguration* modules ) )
-		: sectionTitle( st ), sectionName( sn ),
+		: title( Title ), section( Section), keyword( Keyword ),
 		  parseFunc( pf )		{}
 
 	virtual ~ConfigDescriptionBase()	{}
 
-	virtual const char* objectName() const = 0;
 	virtual config::ObjectConfiguration* create( const char* logPrefix ) = 0;
 };
 
@@ -79,21 +72,18 @@ template< class T >
 struct ConfigurationDescription : public ConfigDescriptionBase
 {
 public:
-	ConfigurationDescription( const char* on, const char* st, const char* sn,
+	ConfigurationDescription( const char* Title, const char* Section, const char* Keyword,
 				  bool (*pf)( config::ConfigurationBase& configuration,
 					      const boost::property_tree::ptree& pt,
 					      const std::string& node,
 					      const module::ModulesConfiguration* modules ) )
-		: ConfigDescriptionBase( st, sn, pf )	{ m_name = on; }
+		: ConfigDescriptionBase( Title, Section, Keyword, pf )
+	{}
 
 	virtual ~ConfigurationDescription()	{}
 
-	virtual const char* objectName() const	{ return m_name; }
-
 	virtual config::ObjectConfiguration* create( const char* logPrefix )
-					{ return new T( sectionTitle, logPrefix, sectionName ); }
-private:
-	const char*	m_name;
+					{ return new T( title, logPrefix, keyword ); }
 };
 
 
@@ -101,7 +91,7 @@ template < class T, class Tconf, class Tbase >
 class ModuleContainer : public Container< Tbase >
 {
 public:
-	virtual ~ModuleContainer()			{}
+	virtual ~ModuleContainer()		{}
 	virtual const char* typeName() const = 0;
 
 	static Container< Tbase >* create( const config::ObjectConfiguration& conf )	{
@@ -116,7 +106,7 @@ struct ContainerDescription
 	T* ( *createFunc )( const Tconf& conf );
 public:
 	ContainerDescription( const char* n, T* ( *f )( const Tconf& conf ) )
-		: name( n ), createFunc( f )		{}
+		: name( n ), createFunc( f )	{}
 };
 
 
@@ -133,7 +123,7 @@ public:
 	}
 
 	bool add( ConfigDescriptionBase* description );
-	ConfigDescriptionBase* get( const std::string& name ) const;
+	ConfigDescriptionBase* get( const std::string& section, const std::string& keyword ) const;
 private:
 	std::list< ConfigDescriptionBase* >	m_modules;
 };

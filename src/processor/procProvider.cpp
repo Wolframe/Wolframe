@@ -80,7 +80,7 @@ bool ConfigurationParser::parse( proc::ProcProviderConfig& cfg,
 		}
 		else	{
 			if ( modules )	{
-				module::ConfigDescriptionBase* cfgDesc = modules->get( L1it->first );
+				module::ConfigDescriptionBase* cfgDesc = modules->get( "processor", L1it->first );
 				if ( cfgDesc )	{
 					config::ObjectConfiguration* conf = cfgDesc->create( cfg.logPrefix().c_str());
 					if ( cfgDesc->parseFunc( *conf, L1it->second, L1it->first, modules ))

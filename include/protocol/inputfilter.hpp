@@ -151,7 +151,7 @@ struct InputFilter
 		if (std::strcmp( name, "buffersize") == 0)
 		{
 			if (valbufsize < 6*sizeof(m_genbufsize)) return false;
-			std::snprintf( valbuf, valbufsize, "%u", m_genbufsize);
+			std::snprintf( valbuf, valbufsize, "%lu", (unsigned long)m_genbufsize);
 			return true;
 		}
 		return false;
