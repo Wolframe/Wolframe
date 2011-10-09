@@ -142,14 +142,18 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 		}
 
 		_Wolframe::module::ModulesConfiguration modules;
-		_Wolframe::module::LoadModules( modules );
 		_Wolframe::config::ApplicationConfiguration conf( &modules );
 
-		if ( !conf.parse( configFile, cmdLineCfg.cfgType ))	{
-			// there was an error parsing the configuration file
-			LOG_FATAL << "Error parsing the configuration file";
+		_Wolframe::config::ApplicationConfiguration::ConfigFileType cfgType =
+				_Wolframe::config::ApplicationConfiguration::fileType( configFile, cmdLineCfg.cfgType );
+		if ( cfgType == _Wolframe::config::ApplicationConfiguration::CONFIG_UNDEFINED )
 			return _Wolframe::ErrorCode::FAILURE;
-		}
+		if ( !conf.parseModules( configFile, cfgType ))
+			return _Wolframe::ErrorCode::FAILURE;
+		if ( ! _Wolframe::module::LoadModules( modules ))
+			return _Wolframe::ErrorCode::FAILURE;
+		if ( !conf.parse( configFile, cfgType ))
+			return _Wolframe::ErrorCode::FAILURE;
 
 // configuration file has been parsed successfully
 // finalize the application configuration
@@ -296,7 +300,7 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 	}
 	catch (std::exception& e)	{
 		// Aba: how to delete the pid file here?
-		LOG_ERROR << "posixMain: exception: " << e.what() << "\n";
+		LOG_FATAL << "posixMain: exception: " << e.what() << "\n";
 		return _Wolframe::ErrorCode::FAILURE;
 	}
 
