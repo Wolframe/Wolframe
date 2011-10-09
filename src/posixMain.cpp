@@ -142,7 +142,7 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 		}
 
 		_Wolframe::module::ModulesConfiguration modules;
-		_Wolframe::config::ApplicationConfiguration conf( &modules );
+		_Wolframe::config::ApplicationConfiguration conf;
 
 		_Wolframe::config::ApplicationConfiguration::ConfigFileType cfgType =
 				_Wolframe::config::ApplicationConfiguration::fileType( configFile, cmdLineCfg.cfgType );
@@ -152,6 +152,7 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 			return _Wolframe::ErrorCode::FAILURE;
 		if ( ! _Wolframe::module::LoadModules( modules ))
 			return _Wolframe::ErrorCode::FAILURE;
+		conf.addModules( &modules );
 		if ( !conf.parse( configFile, cfgType ))
 			return _Wolframe::ErrorCode::FAILURE;
 

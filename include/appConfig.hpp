@@ -84,11 +84,14 @@ public:
 		CONFIG_UNDEFINED
 	};
 
-	ApplicationConfiguration( const module::ModulesConfiguration* modules );
+	ApplicationConfiguration();
 	~ApplicationConfiguration();
 
 	static ConfigFileType fileType( const char *filename, ConfigFileType type );
 	bool parseModules( const char *filename, ConfigFileType type );
+	void addModules( const module::ModulesConfiguration* modules )
+	{ m_modules = modules; }
+
 	bool parse( const char *filename, ConfigFileType type );
 	void finalize( const CmdLineConfig& cmdLine );
 
