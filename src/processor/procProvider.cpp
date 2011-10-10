@@ -57,8 +57,8 @@
 using namespace _Wolframe;
 
 static const size_t noProcModules = 1;
-static module::ContainerDescription< Container< proc::ProcessorUnit >, config::ObjectConfiguration >
-procModules[ noProcModules ] = { module::ContainerDescription< Container< proc::ProcessorUnit >, config::ObjectConfiguration >( "EchoProcessor", &EchoProcContainer::create ) };
+static module::ContainerDescription< Container< proc::ProcessorUnit > >
+procModules[ noProcModules ] = { module::ContainerDescription< Container< proc::ProcessorUnit > >( "EchoProcessor", &EchoProcContainer::create ) };
 /****  End impersonating the module loader  **************************************************/
 
 namespace _Wolframe {

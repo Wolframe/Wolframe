@@ -99,13 +99,13 @@ public:
 	}
 };
 
-template < class T, class Tconf >
+template < class T >
 struct ContainerDescription
 {
 	const char* name;
-	T* ( *createFunc )( const Tconf& conf );
+	T* ( *createFunc )( const config::ObjectConfiguration& conf );
 public:
-	ContainerDescription( const char* n, T* ( *f )( const Tconf& conf ) )
+	ContainerDescription( const char* n, T* ( *f )( const config::ObjectConfiguration& conf ) )
 		: name( n ), createFunc( f )	{}
 };
 
