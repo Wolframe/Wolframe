@@ -122,7 +122,7 @@ public:
 			delete *it;
 	}
 
-	bool add( ConfigDescriptionBase* description );
+	bool addConfiguration( ConfigDescriptionBase* description );
 	ConfigDescriptionBase* get( const std::string& section, const std::string& keyword ) const;
 private:
 	std::list< ConfigDescriptionBase* >	m_modules;

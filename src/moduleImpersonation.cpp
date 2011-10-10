@@ -41,7 +41,7 @@
 namespace _Wolframe {
 namespace module {
 
-bool ModulesConfiguration::add( ConfigDescriptionBase* description )
+bool ModulesConfiguration::addConfiguration( ConfigDescriptionBase* description )
 {
 	for ( std::list< ConfigDescriptionBase* >::const_iterator it = m_modules.begin();
 								it != m_modules.end(); it++ )	{
@@ -96,31 +96,31 @@ bool module::LoadModules( ModulesConfiguration& modules )
 	bool retVal = true;
 
 #ifdef WITH_PGSQL
-	modules.add( new module::ConfigurationDescription< db::PostgreSQLconfig >
-		     ( "PostgreSQL database", "database", "PostgreSQL",
-		       &config::ConfigurationParser::parseBase<db::PostgreSQLconfig> ) );
+	modules.addConfiguration( new module::ConfigurationDescription< db::PostgreSQLconfig >
+				  ( "PostgreSQL database", "database", "PostgreSQL",
+				    &config::ConfigurationParser::parseBase<db::PostgreSQLconfig> ) );
 #endif
 #ifdef WITH_SQLITE3
-	modules.add( new module::ConfigurationDescription< db::SQLiteConfig >
-		     ( "SQLite database", "database", "SQLite",
-		       &config::ConfigurationParser::parseBase<db::SQLiteConfig> ) );
+	modules.addConfiguration( new module::ConfigurationDescription< db::SQLiteConfig >
+				  ( "SQLite database", "database", "SQLite",
+				    &config::ConfigurationParser::parseBase<db::SQLiteConfig> ) );
 #endif
-	modules.add( new module::ConfigurationDescription< EchoProcConfig >
-		     ( "Echo Processor", "processor", "echoProcessor",
-		       &config::ConfigurationParser::parseBase< EchoProcConfig > ) );
+	modules.addConfiguration( new module::ConfigurationDescription< EchoProcConfig >
+				  ( "Echo Processor", "processor", "echoProcessor",
+				    &config::ConfigurationParser::parseBase< EchoProcConfig > ) );
 
-	modules.add( new module::ConfigurationDescription< AAAA::TextFileAuthConfig >
-		     ( "Authentication file", "Authentication", "file",
-		       &config::ConfigurationParser::parseBase<AAAA::TextFileAuthConfig> ) );
-	modules.add( new module::ConfigurationDescription< AAAA::DatabaseAuthConfig >
-		     ( "Authentication database", "Authentication", "database",
-		       &config::ConfigurationParser::parseBase<AAAA::DatabaseAuthConfig> ) );
-	modules.add( new module::ConfigurationDescription< AAAA::FileAuditConfig >
-		     ( "Audit file", "Audit", "file",
-		       &config::ConfigurationParser::parseBase<AAAA::FileAuditConfig> ) );
-	modules.add( new module::ConfigurationDescription< AAAA::DBauditConfig >
-		     ( "Audit database", "Audit", "database",
-		       &config::ConfigurationParser::parseBase<AAAA::DBauditConfig> ) );
+	modules.addConfiguration( new module::ConfigurationDescription< AAAA::TextFileAuthConfig >
+				  ( "Authentication file", "Authentication", "file",
+				    &config::ConfigurationParser::parseBase<AAAA::TextFileAuthConfig> ) );
+	modules.addConfiguration( new module::ConfigurationDescription< AAAA::DatabaseAuthConfig >
+				  ( "Authentication database", "Authentication", "database",
+				    &config::ConfigurationParser::parseBase<AAAA::DatabaseAuthConfig> ) );
+	modules.addConfiguration( new module::ConfigurationDescription< AAAA::FileAuditConfig >
+				  ( "Audit file", "Audit", "file",
+				    &config::ConfigurationParser::parseBase<AAAA::FileAuditConfig> ) );
+	modules.addConfiguration( new module::ConfigurationDescription< AAAA::DBauditConfig >
+				  ( "Audit database", "Audit", "database",
+				    &config::ConfigurationParser::parseBase<AAAA::DBauditConfig> ) );
 	return retVal;
 }
 
