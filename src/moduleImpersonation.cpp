@@ -41,10 +41,10 @@
 namespace _Wolframe {
 namespace module {
 
-bool ModulesConfiguration::addConfiguration( ConfigDescriptionBase* description )
+bool ModulesDirectory::addConfiguration( ConfigDescriptionBase* description )
 {
-	for ( std::list< ConfigDescriptionBase* >::const_iterator it = m_modules.begin();
-								it != m_modules.end(); it++ )	{
+	for ( std::list< ConfigDescriptionBase* >::const_iterator it = m_config.begin();
+								it != m_config.end(); it++ )	{
 		if ( boost::algorithm::iequals( (*it)->section, description->section ) &&
 				boost::algorithm::iequals( (*it)->keyword, description->keyword ))	{
 			LOG_ALERT << "A configuration module for section '" << description->section
@@ -52,17 +52,17 @@ bool ModulesConfiguration::addConfiguration( ConfigDescriptionBase* description 
 			return false;
 		}
 	}
-	m_modules.push_back( description );
+	m_config.push_back( description );
 	LOG_DEBUG << "Configuration for section '" << description->section
 		  << "' keyword '" << description->keyword << "' registered";
 	return true;
 }
 
-ConfigDescriptionBase* ModulesConfiguration::get( const std::string& section,
+ConfigDescriptionBase* ModulesDirectory::getConfig( const std::string& section,
 						  const std::string& keyword ) const
 {
-	for ( std::list< ConfigDescriptionBase* >::const_iterator it = m_modules.begin();
-								it != m_modules.end(); it++ )	{
+	for ( std::list< ConfigDescriptionBase* >::const_iterator it = m_config.begin();
+								it != m_config.end(); it++ )	{
 		if ( boost::algorithm::iequals( (*it)->keyword, keyword ) &&
 				boost::algorithm::iequals( (*it)->section, section ))
 			return *it;
@@ -91,7 +91,7 @@ ConfigDescriptionBase* ModulesConfiguration::get( const std::string& section,
 
 using namespace _Wolframe;
 
-bool module::LoadModules( ModulesConfiguration& modules )
+bool module::LoadModules( ModulesDirectory& modules )
 {
 	bool retVal = true;
 

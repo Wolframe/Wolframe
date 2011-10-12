@@ -53,7 +53,7 @@ namespace config {
 template<>
 bool ConfigurationParser::parse( _Wolframe::iproc::lua::Configuration& cfg,
 				 const boost::property_tree::ptree& parentNode, const std::string& /*node*/,
-				 const module::ModulesConfiguration* /*modules*/ )
+				 const module::ModulesDirectory* /*modules*/ )
 {
 	using namespace _Wolframe::iproc::lua;
 

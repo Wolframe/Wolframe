@@ -75,7 +75,7 @@ static ServiceBanner::SignatureTokens strToToken( std::string& str )
 template<>
 bool ConfigurationParser::parse( ServiceBanner& cfg,
 				 const boost::property_tree::ptree& pt, const std::string& node,
-				 const module::ModulesConfiguration* /*modules*/ )
+				 const module::ModulesDirectory* /*modules*/ )
 {
 
 	if ( boost::algorithm::iequals( node, "ServerTokens" ))	{

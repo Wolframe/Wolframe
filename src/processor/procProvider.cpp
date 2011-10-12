@@ -67,7 +67,7 @@ namespace config {
 template<>
 bool ConfigurationParser::parse( proc::ProcProviderConfig& cfg,
 				 const boost::property_tree::ptree& pt, const std::string& /*node*/,
-				 const module::ModulesConfiguration* modules )
+				 const module::ModulesDirectory* modules )
 {
 	using namespace _Wolframe::config;
 	bool retVal = true;
@@ -80,7 +80,7 @@ bool ConfigurationParser::parse( proc::ProcProviderConfig& cfg,
 		}
 		else	{
 			if ( modules )	{
-				module::ConfigDescriptionBase* cfgDesc = modules->get( "processor", L1it->first );
+				module::ConfigDescriptionBase* cfgDesc = modules->getConfig( "processor", L1it->first );
 				if ( cfgDesc )	{
 					config::ObjectConfiguration* conf = cfgDesc->create( cfg.logPrefix().c_str());
 					if ( cfgDesc->parseFunc( *conf, L1it->second, L1it->first, modules ))

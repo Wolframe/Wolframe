@@ -36,7 +36,7 @@
 
 #include "moduleInterface.hpp"
 
-bool _Wolframe::module::LoadModules( ModulesConfiguration& /*modules*/ )
+bool _Wolframe::module::LoadModules( ModulesDirectory& /*modules*/ )
 {
 	return true;
 }

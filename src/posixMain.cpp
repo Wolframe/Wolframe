@@ -141,7 +141,7 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 			return _Wolframe::ErrorCode::FAILURE;
 		}
 
-		_Wolframe::module::ModulesConfiguration modules;
+		_Wolframe::module::ModulesDirectory modules;
 		_Wolframe::config::ApplicationConfiguration conf;
 
 		_Wolframe::config::ApplicationConfiguration::ConfigFileType cfgType =

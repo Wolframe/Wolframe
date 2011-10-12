@@ -53,13 +53,13 @@ struct ConfigDescriptionBase
 	const char* keyword;
 	bool (*parseFunc)( config::ConfigurationBase&,
 			   const boost::property_tree::ptree&, const std::string& node,
-			   const module::ModulesConfiguration* modules );
+			   const module::ModulesDirectory* modules );
 public:
 	ConfigDescriptionBase( const char* Title, const char* Section, const char* Keyword,
 			       bool (*pf)( config::ConfigurationBase& configuration,
 					   const boost::property_tree::ptree& pt,
 					   const std::string& node,
-					   const module::ModulesConfiguration* modules ) )
+					   const module::ModulesDirectory* modules ) )
 		: title( Title ), section( Section), keyword( Keyword ),
 		  parseFunc( pf )		{}
 
@@ -76,7 +76,7 @@ public:
 				  bool (*pf)( config::ConfigurationBase& configuration,
 					      const boost::property_tree::ptree& pt,
 					      const std::string& node,
-					      const module::ModulesConfiguration* modules ) )
+					      const module::ModulesDirectory* modules ) )
 		: ConfigDescriptionBase( Title, Section, Keyword, pf )
 	{}
 
@@ -87,8 +87,13 @@ public:
 };
 
 
+class ModuleContainerBase
+{
+};
+
+
 template < class T, class Tconf, class Tbase >
-class ModuleContainer : public Container< Tbase >
+class ModuleContainer : public Container< Tbase >, public ModuleContainerBase
 {
 public:
 	virtual ~ModuleContainer()		{}
@@ -111,24 +116,32 @@ public:
 
 
 ///
-class ModulesConfiguration
+class ModulesDirectory
 {
 public:
-	ModulesConfiguration()	{}
-	~ModulesConfiguration()	{
-		for ( std::list< ConfigDescriptionBase* >::const_iterator it = m_modules.begin();
-									it != m_modules.end();
+	ModulesDirectory()	{}
+	~ModulesDirectory()	{
+		for ( std::list< ConfigDescriptionBase* >::const_iterator it = m_config.begin();
+									it != m_config.end();
+									it++ )
+			delete *it;
+		for ( std::list< ModuleContainerBase* >::const_iterator it = m_container.begin();
+									it != m_container.end();
 									it++ )
 			delete *it;
 	}
 
 	bool addConfiguration( ConfigDescriptionBase* description );
-	ConfigDescriptionBase* get( const std::string& section, const std::string& keyword ) const;
+	bool addContainer( ModuleContainerBase* description );
+
+	ConfigDescriptionBase* getConfig( const std::string& section, const std::string& keyword ) const;
+	ConfigDescriptionBase* getContainer( const std::string& section, const std::string& name ) const;
 private:
-	std::list< ConfigDescriptionBase* >	m_modules;
+	std::list< ConfigDescriptionBase* >	m_config;
+	std::list< ModuleContainerBase* >	m_container;
 };
 
-bool LoadModules( ModulesConfiguration& modules );
+bool LoadModules( ModulesDirectory& modules );
 
 }} // namespace _Wolframe::module
 
