@@ -133,7 +133,7 @@ struct FormatOutputImpl :public protocol::FormatOutput, public FilterBase<IOChar
 		if (std::strcmp( name, "tagstacksize") == 0)
 		{
 			if (sizeof( m_tagstksize)*6 > valbufsize) return false;
-			std::snprintf( valbuf, valbufsize, "%lu", (unsigned long)m_tagstksize);
+			snprintf( valbuf, valbufsize, "%lu", (unsigned long)m_tagstksize);
 			return true;
 		}
 		return Parent::getValue( name, valbuf, valbufsize);
