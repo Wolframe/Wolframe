@@ -30,9 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// iprocHandler class unit tests using google test framework (gTest)
-//
+///\file iprocHandlerXMLTest.cpp class unit tests using google test framework (gTest)
 
 #include "iprocHandler.hpp"
 #include "connectionHandler.hpp"
@@ -69,6 +67,11 @@ enum
 static const TestDescription testDescriptions[] =
 {
 	{
+		"echo_xml_IsoLatin1_to_utf16",
+		"test_echo_xml_utf16",
+		"test_IsoLatin1.xml", 96
+	},
+	{
 		"echo_xml_utf16_to_utf8",
 		"test_echo_xml_utf8",
 		"test_UTF16.xml", 64
@@ -77,11 +80,6 @@ static const TestDescription testDescriptions[] =
 		"echo_xml_utf8_with_libxml",
 		"test_echo_xml_libxml2",
 		"test_UTF8.xml", 48
-	},
-	{
-		"echo_xml_IsoLatin1_to_utf16",
-		"test_echo_xml_utf16",
-		"test_IsoLatin1.xml", 96
 	},
 	{
 		"echo_xml_IsoLatin1_to_utf8",

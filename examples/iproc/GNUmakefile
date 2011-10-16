@@ -119,12 +119,11 @@ local_distclean:
 local_install:
 
 local_test: $(TEST_BINS)
+	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./luamapParser$(EXE)
+	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./directmapCompiler$(EXE) data/directmap_compiler.frm
 	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./directmapParser$(EXE)
 	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./iprocHandlerXMLTest$(EXE)
 	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./iprocHandlerTest$(EXE)
-
-# cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./luamapParser$(EXE)
-# cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./directmapCompiler$(EXE)
 
 run: $(CPP_BINS)
 	@echo "Running the Wolframe iproc example..."

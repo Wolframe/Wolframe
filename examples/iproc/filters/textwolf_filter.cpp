@@ -206,6 +206,7 @@ struct FormatOutputImpl :public protocol::FormatOutput, public FilterBase<IOChar
 					setState( Error, ErrIllegalOperation);
 					return false;
 				}
+				FilterBase<IOCharset,AppCharset>::printToBuffer( ' ', buf);
 				FilterBase<IOCharset,AppCharset>::printToBuffer( (const char*)element, elementsize, buf);
 				FilterBase<IOCharset,AppCharset>::printToBuffer( '=', buf);
 
@@ -479,6 +480,8 @@ static bool getEncoding( const std::string& xmlHeader, TextwolfEncoding::Id &enc
 template <class IOCharset, class AppCharset=textwolf::charset::UTF8>
 struct InputFilterImpl :public protocol::InputFilter, public FilterBase<IOCharset,AppCharset>
 {
+	typedef protocol::InputFilter Parent;
+
 	enum ErrorCodes
 	{
 		Ok,			///< no error
@@ -496,10 +499,13 @@ struct InputFilterImpl :public protocol::InputFilter, public FilterBase<IOCharse
 	typedef textwolf::XMLScanner<SrcIterator,IOCharset,AppCharset,textwolf::StaticBuffer> XMLScanner;
 
 	///\brief Constructor
-	InputFilterImpl( std::size_t genbufsize)
+	InputFilterImpl( std::size_t genbufsize, bool withEmpty, bool doTokenize)
 		:protocol::InputFilter( genbufsize)
 		,m_outputbuf(0,0)
 		,m_scanner(0)
+		,m_withEmpty(withEmpty)
+		,m_doTokenize(doTokenize)
+		,m_bufstart(0)
 	{
 		m_src.setInput( this);
 		m_scanner = new XMLScanner( m_src, m_outputbuf);
@@ -520,6 +526,9 @@ struct InputFilterImpl :public protocol::InputFilter, public FilterBase<IOCharse
 		,m_outputbuf(o.m_outputbuf)
 		,m_src( o.m_src)
 		,m_scanner(0)
+		,m_withEmpty(o.m_withEmpty)
+		,m_doTokenize(o.m_doTokenize)
+		,m_bufstart(o.m_bufstart)
 	{
 		m_src.setInput( this);
 		m_scanner = new XMLScanner( *o.m_scanner);
@@ -527,6 +536,69 @@ struct InputFilterImpl :public protocol::InputFilter, public FilterBase<IOCharse
 		m_scanner->setOutputBuffer( m_outputbuf);
 		m_itr = m_scanner->begin(false);
 		m_end = m_scanner->end();
+	}
+
+	///\brief Get a member value of the filter
+	///\param [in] name case sensitive name of the variable
+	///\param [in] valbuf buffer for the value returned
+	///\param [in] valbufsize size of the valbuf buffer in bytes
+	///\return true on success, false, if the variable does not exist or the operation failed
+	virtual bool getValue( const char* name, char* valbuf, std::size_t valbufsize)
+	{
+		if (std::strcmp( name, "empty") == 0)
+		{
+			if (valbufsize > 6) return false;
+			std::strncpy( valbuf, m_withEmpty?"true":"false", valbufsize);
+			return true;
+		}
+		if (std::strcmp( name, "tokenize") == 0)
+		{
+			if (valbufsize > 6) return false;
+			std::strncpy( valbuf, m_doTokenize?"true":"false", valbufsize);
+			return true;
+		}
+		return Parent::getValue( name, valbuf, valbufsize);
+	}
+
+	///\brief Set a member value of the filter
+	///\param [in] name case sensitive name of the variable
+	///\param [in] value new value of the variable to set
+	///\return true on success, false, if the variable does not exist or the operation failed
+	virtual bool setValue( const char* name, const char* value)
+	{
+		if (std::strcmp( name, "empty") == 0)
+		{
+			if (std::strcmp( value, "true") == 0)
+			{
+				m_withEmpty = true;
+			}
+			else if (std::strcmp( value, "false") == 0)
+			{
+				m_withEmpty = false;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		if (std::strcmp( name, "tokenize") == 0)
+		{
+			if (std::strcmp( value, "true") == 0)
+			{
+				m_doTokenize = true;
+				if (m_scanner) m_scanner->doTokenize(true);
+			}
+			else if (std::strcmp( value, "false") == 0)
+			{
+				m_doTokenize = false;
+				if (m_scanner) m_scanner->doTokenize(false);
+			}
+			else
+			{
+				return false;
+			}
+		}
+		return Parent::setValue( name, value);
 	}
 
 	///\brief self copy
@@ -565,7 +637,11 @@ struct InputFilterImpl :public protocol::InputFilter, public FilterBase<IOCharse
 	virtual bool getNext( protocol::InputFilter::ElementType* type, void* buffer, std::size_t buffersize, std::size_t* bufferpos)
 	{
 		static const ElementTypeMap tmap;
-		textwolf::StaticBuffer buf( (char*)buffer + *bufferpos, buffersize - *bufferpos);
+		if (m_bufstart > *bufferpos)
+		{
+			m_bufstart = *bufferpos;
+		}
+		textwolf::StaticBuffer buf( (char*)buffer + m_bufstart, buffersize - m_bufstart, *bufferpos - m_bufstart);
 		m_scanner->setOutputBuffer( buf);
 		try
 		{
@@ -576,7 +652,6 @@ struct InputFilterImpl :public protocol::InputFilter, public FilterBase<IOCharse
 				setState( protocol::InputFilter::Error, ErrBufferTooSmall);
 				return false;
 			}
-			*bufferpos += buf.size();
 			int st = tmap[ m_itr->type()];
 			if (st == -1)
 			{
@@ -586,13 +661,26 @@ struct InputFilterImpl :public protocol::InputFilter, public FilterBase<IOCharse
 			else
 			{
 				*type = (protocol::InputFilter::ElementType)st;
+				if (!m_withEmpty && m_itr->type() == textwolf::XMLScannerBase::Content)
+				{
+					std::size_t ii=0,nn = buf.size();
+					const unsigned char* cc = (unsigned char*)buf.ptr();
+					for (;ii<nn && cc[ii] <= ' '; ++ii);
+					if (ii==nn)
+					{
+						*bufferpos = m_bufstart;
+						return getNext( type, buffer, buffersize, bufferpos);
+					}
+				}
+				*bufferpos = m_bufstart + buf.size();
+				m_bufstart = *bufferpos;
 				return true;
 			}
 		}
 		catch (SrcIterator::EoM)
 		{
 			setState( EndOfMessage);
-			*bufferpos += buf.size();
+			*bufferpos = m_bufstart + buf.size();
 			return false;
 		};
 		setState( Error, ErrUnexpectedState);
@@ -604,11 +692,16 @@ private:
 	XMLScanner* m_scanner;			///< XML scanner
 	typename XMLScanner::iterator m_itr;	///< input iterator created from scanned XML from source iterator
 	typename XMLScanner::iterator m_end;	///< end of data (EoD) pointer
+	bool m_withEmpty;			///< do not produce empty tokens (containing only spaces)
+	bool m_doTokenize;			///< do tokenize (whitespace sequences as delimiters)
+	std::size_t m_bufstart;			///< start of the currently fetched token
 };
 
 class InputFilter :public protocol::InputFilter
 {
 public:
+	typedef protocol::InputFilter Parent;
+
 	///\enum ErrorCodes
 	///\brief Enumeration of error codes
 	enum ErrorCodes
@@ -621,11 +714,78 @@ public:
 
 public:
 	InputFilter( const CountedReference<TextwolfEncoding::Id>& enc, std::size_t bufsize)
-		:protocol::InputFilter(bufsize),m_bufsize(bufsize),m_headerParsed(false),m_encoding(enc){}
+		:protocol::InputFilter(bufsize)
+		,m_bufsize(bufsize)
+		,m_headerParsed(false)
+		,m_encoding(enc)
+		,m_withEmpty(true)
+		,m_doTokenize(false)
+		{}
 	InputFilter( const InputFilter& o)
 		:protocol::InputFilter(o),m_bufsize(o.m_bufsize),m_headerParsed(o.m_headerParsed),m_header(o.m_header),m_encoding(o.m_encoding){}
 
 	virtual ~InputFilter(){}
+
+	///\brief Get a member value of the filter
+	///\param [in] name case sensitive name of the variable
+	///\param [in] valbuf buffer for the value returned
+	///\param [in] valbufsize size of the valbuf buffer in bytes
+	///\return true on success, false, if the variable does not exist or the operation failed
+	virtual bool getValue( const char* name, char* valbuf, std::size_t valbufsize)
+	{
+		if (std::strcmp( name, "empty") == 0)
+		{
+			if (valbufsize > 6) return false;
+			std::strncpy( valbuf, m_withEmpty?"true":"false", valbufsize);
+			return true;
+		}
+		if (std::strcmp( name, "tokenize") == 0)
+		{
+			if (valbufsize > 6) return false;
+			std::strncpy( valbuf, m_doTokenize?"true":"false", valbufsize);
+			return true;
+		}
+		return Parent::getValue( name, valbuf, valbufsize);
+	}
+
+	///\brief Set a member value of the filter
+	///\param [in] name case sensitive name of the variable
+	///\param [in] value new value of the variable to set
+	///\return true on success, false, if the variable does not exist or the operation failed
+	virtual bool setValue( const char* name, const char* value)
+	{
+		if (std::strcmp( name, "empty") == 0)
+		{
+			if (std::strcmp( value, "true") == 0)
+			{
+				m_withEmpty = true;
+			}
+			else if (std::strcmp( value, "false") == 0)
+			{
+				m_withEmpty = false;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		if (std::strcmp( name, "tokenize") == 0)
+		{
+			if (std::strcmp( value, "true") == 0)
+			{
+				m_doTokenize = true;
+			}
+			else if (std::strcmp( value, "false") == 0)
+			{
+				m_doTokenize = false;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		return Parent::setValue( name, value);
+	}
 
 	virtual protocol::InputFilter* copy() const
 	{
@@ -688,31 +848,31 @@ public:
 			case TextwolfEncoding::Unknown:
 				return 0;
 			case TextwolfEncoding::IsoLatin:
-				rt = new InputFilterImpl<textwolf::charset::IsoLatin1>(m_bufsize);
+				rt = new InputFilterImpl<textwolf::charset::IsoLatin1>(m_bufsize,m_withEmpty,m_doTokenize);
 				break;
 			case TextwolfEncoding::UTF8:
-				rt = new InputFilterImpl<textwolf::charset::UTF8>(m_bufsize);
+				rt = new InputFilterImpl<textwolf::charset::UTF8>(m_bufsize,m_withEmpty,m_doTokenize);
 				break;
 			case TextwolfEncoding::UTF16:
-				rt = new InputFilterImpl<textwolf::charset::UTF16BE>(m_bufsize);
+				rt = new InputFilterImpl<textwolf::charset::UTF16BE>(m_bufsize,m_withEmpty,m_doTokenize);
 				break;
 			case TextwolfEncoding::UTF16BE:
-				rt = new InputFilterImpl<textwolf::charset::UTF16BE>(m_bufsize);
+				rt = new InputFilterImpl<textwolf::charset::UTF16BE>(m_bufsize,m_withEmpty,m_doTokenize);
 				break;
 			case TextwolfEncoding::UTF16LE:
-				rt = new InputFilterImpl<textwolf::charset::UTF16LE>(m_bufsize);
+				rt = new InputFilterImpl<textwolf::charset::UTF16LE>(m_bufsize,m_withEmpty,m_doTokenize);
 				break;
 			case TextwolfEncoding::UCS2BE:
-				rt = new InputFilterImpl<textwolf::charset::UCS2BE>(m_bufsize);
+				rt = new InputFilterImpl<textwolf::charset::UCS2BE>(m_bufsize,m_withEmpty,m_doTokenize);
 				break;
 			case TextwolfEncoding::UCS2LE:
-				rt = new InputFilterImpl<textwolf::charset::UCS2LE>(m_bufsize);
+				rt = new InputFilterImpl<textwolf::charset::UCS2LE>(m_bufsize,m_withEmpty,m_doTokenize);
 				break;
 			case TextwolfEncoding::UCS4BE:
-				rt = new InputFilterImpl<textwolf::charset::UCS4BE>(m_bufsize);
+				rt = new InputFilterImpl<textwolf::charset::UCS4BE>(m_bufsize,m_withEmpty,m_doTokenize);
 				break;
 			case TextwolfEncoding::UCS4LE:
-				rt = new InputFilterImpl<textwolf::charset::UCS4LE>(m_bufsize);
+				rt = new InputFilterImpl<textwolf::charset::UCS4LE>(m_bufsize,m_withEmpty,m_doTokenize);
 				break;
 		}
 		if (rt)
@@ -727,6 +887,8 @@ private:
 	bool m_headerParsed;
 	std::string m_header;
 	CountedReference<TextwolfEncoding::Id> m_encoding;
+	bool m_withEmpty;
+	bool m_doTokenize;
 };
 
 class FormatOutput :public protocol::FormatOutput

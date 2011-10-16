@@ -254,6 +254,7 @@ static bool parseEndOfLine( Lexem& lexem, Source& src)
 	}
 	else if (*src == '\n')
 	{
+		++src;
 		lexem.m_type = Lexem::EndOfLine;
 		return true;
 	}

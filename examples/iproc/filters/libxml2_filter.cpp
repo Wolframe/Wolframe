@@ -36,7 +36,7 @@ static LibXml2Init libXml2Init;
 class Content
 {
 public:
-	Content( const CountedReference<std::string>& e) :m_doc(0),m_node(0),m_value(0),m_prop(0),m_propvalues(0),m_encoding(e){}
+	Content( const CountedReference<std::string>& e, bool withEmpty=true) :m_doc(0),m_node(0),m_value(0),m_prop(0),m_propvalues(0),m_encoding(e),m_withEmpty(withEmpty){}
 
 	bool end() const
 	{
@@ -82,7 +82,6 @@ public:
 	bool fetch( protocol::InputFilter::ElementType* type, void* buffer, std::size_t buffersize, std::size_t* bufferpos)
 	{
 		bool rt = true;
-	AGAIN:
 		if (!m_doc)
 		{
 			rt = false;
@@ -144,6 +143,16 @@ public:
 
 			case XML_TEXT_NODE:
 				*type = protocol::InputFilter::Value;
+				if (!m_withEmpty)
+				{
+					std::size_t ii=0;
+					while (m_node->content[ii] != 0 && m_node->content[ii]<=' ') ++ii;
+					if (m_node->content[ii] == 0)
+					{
+						m_node = m_node->next;
+						return fetch( type, buffer, buffersize, bufferpos);
+					}
+				}
 				rt = getElement( buffer, buffersize, bufferpos, m_node->content);
 				m_node = m_node->next;
 				break;
@@ -164,7 +173,7 @@ public:
 			case XML_XINCLUDE_START:
 			case XML_XINCLUDE_END:
 			default:
-				goto AGAIN;
+				return fetch( type, buffer, buffersize, bufferpos);
 		}
 		return rt;
 	}
@@ -185,6 +194,7 @@ private:
 	}
 
 private:
+	friend class InputFilterImpl;
 	xmlDocPtr m_doc;
 	xmlNode* m_node;
 	xmlChar* m_value;
@@ -193,14 +203,59 @@ private:
 	std::vector<xmlNode*> m_nodestk;
 	CountedReference<std::string> m_encoding;
 	std::string m_error;
+	bool m_withEmpty;
 };
 
 struct InputFilterImpl :public BufferingInputFilter<Content>
 {
+	typedef BufferingInputFilter<Content> Parent;
+
 	InputFilterImpl( const CountedReference<std::string>& e, std::size_t bufsize)
 		:BufferingInputFilter<Content>(new Content( e), bufsize){}
 
 	InputFilterImpl( const InputFilterImpl& o) :BufferingInputFilter<Content>(o){}
+
+	///\brief Get a member value of the filter
+	///\param [in] name case sensitive name of the variable
+	///\param [in] valbuf buffer for the value returned
+	///\param [in] valbufsize size of the valbuf buffer in bytes
+	///\return true on success, false, if the variable does not exist or the operation failed
+	virtual bool getValue( const char* name, char* valbuf, std::size_t valbufsize)
+	{
+		Content* dc = content();
+		if (std::strcmp( name, "empty") == 0)
+		{
+			if (valbufsize > 6) return false;
+			std::strncpy( valbuf, dc->m_withEmpty?"true":"false", valbufsize);
+			return true;
+		}
+		return Parent::getValue( name, valbuf, valbufsize);
+	}
+
+	///\brief Set a member value of the filter
+	///\param [in] name case sensitive name of the variable
+	///\param [in] value new value of the variable to set
+	///\return true on success, false, if the variable does not exist or the operation failed
+	virtual bool setValue( const char* name, const char* value)
+	{
+		Content* dc = content();
+		if (std::strcmp( name, "empty") == 0)
+		{
+			if (std::strcmp( value, "true") == 0)
+			{
+				dc->m_withEmpty = true;
+			}
+			else if (std::strcmp( value, "false") == 0)
+			{
+				dc->m_withEmpty = false;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		return Parent::setValue( name, value);
+	}
 };
 
 

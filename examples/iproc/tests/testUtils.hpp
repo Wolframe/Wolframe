@@ -68,7 +68,7 @@ struct Data
 	std::string resultf;
 	std::string expectedf;
 
-	void check( const std::string& result) const
+	bool check( const std::string& result) const
 	{
 		unsigned int ii=0,nn=result.size();
 		for (;ii<nn && result[ii]==expected[ii]; ii++);
@@ -84,15 +84,18 @@ struct Data
 			if (mm.size() == Diffsize) mm.append( "...");
 			if (oo.size() == Diffsize) oo.append( "...");
 
-			printf( "TEST %s SIZE R=%u,E=%u,DIFF AT %u='%d %d %d %d|%d %d %d %d' \"%s\" \"%s\"\n",
+			printf( "Input \"%s\" Expected \"%s\" Result \"%s\"\n", inputf.c_str(), expectedf.c_str(), resultf.c_str());
+			printf( "TEST %s SIZE R=%lu,E=%lu,DIFF AT %u='%d %d %d %d|%d %d %d %d' \"%s\" \"%s\"\n",
 				name.c_str(),
-				result.size(), expected.size(), ii,
+				(unsigned long)result.size(), (unsigned long)expected.size(), ii,
 				result[ii-2],result[ii-1],result[ii-0],result[ii+1],
 				expected[ii-2],expected[ii-1],expected[ii-0],expected[ii+1],
 				oo.c_str(), mm.c_str());
 
 			boost::this_thread::sleep( boost::posix_time::seconds( 5 ));
+			return false;
 		}
+		return true;
 	}
 
 	static std::string getDataFile( const char* name, const char* type, const char* ext=0)

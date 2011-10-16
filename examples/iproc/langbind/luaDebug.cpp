@@ -57,13 +57,10 @@ static void getDescription_( lua_State *ls, int index, std::string& rt, int dept
 			break;
 
 		case LUA_TSTRING: {
-			rt.append( "'");
 			rt.append( lua_tostring( ls, index));
-			rt.append( "'");
 			break;
 
 		case LUA_TNUMBER:
-			rt.append( "#");
 			rt.append( boost::lexical_cast<std::string>( lua_tonumber( ls, index)));
 			break;
 
@@ -80,9 +77,10 @@ static void getDescription_( lua_State *ls, int index, std::string& rt, int dept
 				while (lua_next( ls, -2) != 0)
 				{
 					getDescription_( ls, -2, rt, depth-1);
-					rt.append( "=");
+					bool istable = (lua_type( ls, -1) == LUA_TTABLE);
+					rt.append( istable?"=":"='");
 					getDescription_( ls, -1, rt, depth-1);
-					rt.append( " ");
+					rt.append( istable?" ":"' ");
 					lua_pop( ls, 1);
 				}
 				lua_pop( ls, 1);
@@ -107,7 +105,7 @@ using namespace lua;
 std::string _Wolframe::iproc::lua::getDescription( lua_State *ls, int index)
 {
 	std::string rt;
-	getDescription_( ls, index, rt, 2);
+	getDescription_( ls, index, rt, 8);
 	return rt;
 }
 
@@ -115,7 +113,7 @@ bool _Wolframe::iproc::lua::getDescription( lua_State *ls, int index, std::strin
 {
 	try
 	{
-		getDescription_( ls, index, ret, 2);
+		getDescription_( ls, index, ret, 8);
 		return true;
 	}
 	catch (std::bad_alloc) { }

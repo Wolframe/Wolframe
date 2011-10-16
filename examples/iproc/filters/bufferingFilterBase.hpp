@@ -104,6 +104,9 @@ struct BufferingInputFilter :public protocol::InputFilter
 		}
 		return true;
 	}
+
+	Content* content() const		{return m_content.get();}
+
 private:
 	bool bufferInput()
 	{
@@ -145,6 +148,7 @@ private:
 		}
 		return rt;
 	}
+
 private:
 	bool m_inputConsumed;			///< true, if we have consumed the whole input
 	BufferType m_buffer;			///< STL back insertion sequence for buffering the input

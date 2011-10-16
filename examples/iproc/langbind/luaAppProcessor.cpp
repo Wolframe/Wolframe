@@ -113,6 +113,9 @@ struct LuaObject :public ObjectType
 		lua_pushliteral( ls, "__index");
 		lua_pushvalue( ls, -3);		// dup methods table
 		lua_rawset( ls, -3);		//hide metatable: metatable.__index = methods
+		lua_pushliteral( ls, "__newindex");
+		lua_pushvalue( ls, -3);		// dup methods table
+		lua_rawset( ls, -3);		//hide metatable: metatable.__newindex = methods
 		lua_pop( ls, 1);
 	}
 
@@ -310,10 +313,8 @@ static int function_output_print( lua_State* ls)
 
 		Output* output = LuaObject<Output>::getSelf( ls, "output", "print");
 		if (lua_gettop( ls) == 1)
-		{
-			return 0;
-		}
-		if (lua_gettop( ls) == 2)
+		{}
+		else if (lua_gettop( ls) == 2)
 		{
 			item[0] = get_printop( ls, 2, itemsize[0]);
 		}

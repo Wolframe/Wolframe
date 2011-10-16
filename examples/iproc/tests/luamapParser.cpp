@@ -200,6 +200,8 @@ struct TestConfiguration :public lua::Configuration
 	{
 		std::string scriptpath( wtest::Data::getDataFile( scriptname, "scripts", ".lua"));
 		defMain( scriptpath.c_str());
+		addModule( "table");
+		addModule( "string");
 		setCanonicalPathes( ".");
 	}
 };
