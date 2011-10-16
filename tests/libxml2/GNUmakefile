@@ -33,7 +33,7 @@ local_clean:
 
 local_distclean:
 
-local_test:
+local_test: $(TEST_CPP_BINS)
 	@./testlibxml1 test1.xml
 	@echo
 	@echo

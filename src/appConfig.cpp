@@ -111,71 +111,149 @@ bool ApplicationConfiguration::addConfig( const std::string& nodeName, Configura
 }
 
 
-bool ApplicationConfiguration::parse ( const char *filename, ConfigFileType type )
+ApplicationConfiguration::ConfigFileType ApplicationConfiguration::fileType ( const char *filename, ConfigFileType type )
+{
+	std::string file = resolvePath( boost::filesystem::absolute( filename ).string() );
+	if ( !boost::filesystem::exists( file ))	{
+		LOG_FATAL << "Configuration file " << file << " does not exist.";
+		return CONFIG_UNDEFINED;
+	}
+
+	boost::property_tree::ptree	pt;
+	try	{
+		switch ( type )	{
+			case CONFIG_INFO:
+				LOG_TRACE << "Forced configuration file type: INFO";
+				return CONFIG_INFO;
+
+			case CONFIG_XML:
+				LOG_TRACE << "Forced configuration file type: XML";
+				return CONFIG_XML;
+
+			case CONFIG_UNDEFINED:	{
+				try	{
+					read_xml( file, pt, boost::property_tree::xml_parser::no_comments |
+						  boost::property_tree::xml_parser::trim_whitespace );
+					pt = pt.get_child( "configuration" );
+					if ( plausibleConfig( pt ) )	{
+						LOG_TRACE << "Guessed configuration file type: XML";
+						return CONFIG_XML;
+					}
+					else	{
+						LOG_FATAL << "Cannot guess configuration file type: " << file;
+						return CONFIG_UNDEFINED;
+					}
+				}
+				catch( boost::property_tree::xml_parser::xml_parser_error )	{
+					try	{
+						read_info( file, pt );
+						if ( plausibleConfig( pt ) )	{
+							LOG_TRACE << "Guessed configuration file type: INFO";
+							return CONFIG_INFO;
+						}
+						else	{
+							LOG_FATAL << "Cannot guess configuration file type or invalid XML: " << filename;
+							return CONFIG_UNDEFINED;
+						}
+					}
+					catch( boost::property_tree::info_parser::info_parser_error& )	{
+						LOG_FATAL << "Cannot guess configuration file type or invalid XML: " << filename;
+						return CONFIG_UNDEFINED;
+					}
+				}
+				catch( boost::property_tree::ptree_bad_path )	{
+					LOG_FATAL << "Invalid XML configuration file: " << file;
+					return CONFIG_UNDEFINED;
+				}
+				break;
+			}
+			default:
+				LOG_FATAL << "Invalid XML configuration file: " << file;
+		}
+		return CONFIG_UNDEFINED;
+	}
+	catch( std::exception& e )	{
+		LOG_ERROR << "Parsing configuration: " << e.what();
+		return CONFIG_UNDEFINED;
+	}
+}
+
+
+bool ApplicationConfiguration::parseModules ( const char *filename, ConfigFileType type )
 {
 	configFile = resolvePath( boost::filesystem::absolute( filename ).string() );
-	if ( !boost::filesystem::exists( configFile ))	{
-		LOG_FATAL << "Configuration file " << configFile << " does not exist.";
-		return false;
-	}
+	assert( boost::filesystem::exists( configFile ));
 
 	// Create an empty property tree object
 	boost::property_tree::ptree	pt;
 	try	{
 		switch ( type )	{
-		case CONFIG_INFO:
-			read_info( filename, pt );
-			m_forced = true;
-			m_type = CONFIG_INFO;
-			break;
-		case CONFIG_XML:
-			read_xml( filename, pt, boost::property_tree::xml_parser::no_comments |
-						boost::property_tree::xml_parser::trim_whitespace );
-			pt = pt.get_child( "configuration" );
-			m_forced = true;
-			m_type = CONFIG_XML;
-			break;
-		case CONFIG_UNDEFINED:	{
-			m_forced = false;
-			try	{
-				read_xml( filename, pt, boost::property_tree::xml_parser::no_comments |
-							boost::property_tree::xml_parser::trim_whitespace );
+			case CONFIG_INFO:
+				read_info( configFile, pt );
+				break;
+			case CONFIG_XML:
+				read_xml( configFile, pt, boost::property_tree::xml_parser::no_comments |
+					  boost::property_tree::xml_parser::trim_whitespace );
 				pt = pt.get_child( "configuration" );
-				if ( plausibleConfig( pt ) )
-					m_type = CONFIG_XML;
-				else	{
-					LOG_FATAL << "Cannot guess configuration file type: " << filename;
-					return false;
-				}
-			}
-			catch( boost::property_tree::xml_parser::xml_parser_error )	{
-				try	{
-					read_info( filename, pt );
-					if ( plausibleConfig( pt ) )
-						m_type = CONFIG_INFO;
-					else	{
-						LOG_FATAL << "Cannot guess configuration file type or invalid XML: " << filename;
-						return false;
-					}
-				}
-				catch( boost::property_tree::info_parser::info_parser_error& )	{
-					throw std::logic_error( "cannot guess configuration file type" );
-				}
-			}
-			catch( boost::property_tree::ptree_bad_path )	{
-				LOG_FATAL << "Invalid XML configuration file: " << filename;
-				return false;
-			}
-			break;
-		}
-		default:
-			throw std::domain_error( "unknown configuration file type forced" );
+				break;
+			case CONFIG_UNDEFINED:
+				throw std::logic_error( "undefined configuration file type" );
 		}
 
 		bool retVal = true;
 		for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
 			LOG_TRACE << "Configuration : parsing root element '" << it->first << "'";
 			if ( it->first == "<xmlcomment>" && m_type == CONFIG_XML )
+				continue;
+			if ( !boost::algorithm::iequals( it->first, "LoadModules" ))
+				continue;
+			std::map< std::string, std::size_t >::iterator confIt;
+			if (( confIt = m_section.find( it->first ) ) != m_section.end() )	{
+				if ( ! m_parse[confIt->second]( *(m_conf[confIt->second]),
+								it->second, confIt->first, m_modules ))
+					retVal = false;
+			}
+			else	{
+				LOG_WARNING << "configuration root: Unknown configuration option '"
+					    << it->first << "'";
+			}
+		}
+		LOG_TRACE << "Configuration : parsing modules list finished " << (retVal ? "OK" : "with errors");
+		return retVal;
+	}
+	catch( std::exception& e )	{
+		LOG_FATAL << "Parsing configuration: " << e.what();
+		return false;
+	}
+}
+
+bool ApplicationConfiguration::parse ( const char *filename, ConfigFileType type )
+{
+	configFile = resolvePath( boost::filesystem::absolute( filename ).string() );
+	assert( boost::filesystem::exists( configFile ));
+
+	// Create an empty property tree object
+	boost::property_tree::ptree	pt;
+	try	{
+		switch ( type )	{
+			case CONFIG_INFO:
+				read_info( configFile, pt );
+				break;
+			case CONFIG_XML:
+				read_xml( configFile, pt, boost::property_tree::xml_parser::no_comments |
+					  boost::property_tree::xml_parser::trim_whitespace );
+				pt = pt.get_child( "configuration" );
+				break;
+			case CONFIG_UNDEFINED:
+				throw std::logic_error( "undefined configuration file type" );
+		}
+
+		bool retVal = true;
+		for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
+			LOG_TRACE << "Configuration : parsing root element '" << it->first << "'";
+			if ( it->first == "<xmlcomment>" && m_type == CONFIG_XML )
+				continue;
+			if ( boost::algorithm::iequals( it->first, "LoadModules" ))
 				continue;
 			std::map< std::string, std::size_t >::iterator confIt;
 			if (( confIt = m_section.find( it->first ) ) != m_section.end() )	{
@@ -192,11 +270,10 @@ bool ApplicationConfiguration::parse ( const char *filename, ConfigFileType type
 		return retVal;
 	}
 	catch( std::exception& e )	{
-		LOG_ERROR << "Parsing configuration: " << e.what();
+		LOG_FATAL << "Parsing configuration: " << e.what();
 		return false;
 	}
 }
-
 
 void ApplicationConfiguration::finalize( const CmdLineConfig& cmdLine )
 {
@@ -225,8 +302,7 @@ void ApplicationConfiguration::print( std::ostream& os ) const
 {
 
 	os << "Configuration file: " << configFile << std::endl;
-	os << "Configuration file type: " << (m_type == CONFIG_INFO ? "info" : "xml")
-	   << (m_forced ? " (forced)" : " (detected)" ) << std::endl;
+	os << "Configuration file type: " << (m_type == CONFIG_INFO ? "info" : "xml") << std::endl;
 	// Unix daemon
 #if !defined(_WIN32)
 	os << "Run in foreground: " << (foreground ? "yes" : "no") << std::endl;

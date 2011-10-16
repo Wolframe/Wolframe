@@ -73,7 +73,7 @@ local_clean:
 
 local_distclean:
 
-local_test:
+local_test: $(TEST_CPP_BINS)
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./testNamedRetVal
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./logTest
@@ -94,7 +94,7 @@ local_test:
 	@echo
 	@echo
 
-local_longtest:
+local_longtest: poolTest
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./poolTest
 	@echo
 	@echo

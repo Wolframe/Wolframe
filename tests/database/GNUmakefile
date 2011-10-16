@@ -82,7 +82,7 @@ local_clean:
 
 local_distclean:
 
-local_test:
+local_test: $(TEST_CPP_BINS)
 	@-rm -f test.db
 	@sqlite3 test.db "create table test(a integer);"
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./dbTest

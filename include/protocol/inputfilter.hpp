@@ -38,7 +38,14 @@ Project Wolframe.
 #include <cstring>
 #include <cstdio>
 #include <cstdlib>
+
 #include "countedReference.hpp"
+
+#ifdef _WIN32
+#define snprintf _snprintf
+#else
+#define snprintf std::snprintf
+#endif
 
 namespace _Wolframe {
 namespace protocol {
@@ -151,7 +158,7 @@ struct InputFilter
 		if (std::strcmp( name, "buffersize") == 0)
 		{
 			if (valbufsize < 6*sizeof(m_genbufsize)) return false;
-			std::snprintf( valbuf, valbufsize, "%u", m_genbufsize);
+			snprintf( valbuf, valbufsize, "%lu", (unsigned long)m_genbufsize);
 			return true;
 		}
 		return false;

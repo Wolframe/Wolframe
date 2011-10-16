@@ -60,7 +60,7 @@ struct LoggerConfiguration;
 struct CmdLineConfig;		// forward declaration for the command line structure
 
 typedef bool (*ParseFunc_t)( ConfigurationBase&, const boost::property_tree::ptree&,
-			     const std::string&, const module::ModulesConfiguration* );
+			     const std::string&, const module::ModulesDirectory* );
 
 /// application configuration structure
 struct ApplicationConfiguration	{
@@ -84,8 +84,13 @@ public:
 		CONFIG_UNDEFINED
 	};
 
-	ApplicationConfiguration( const module::ModulesConfiguration* modules );
+	ApplicationConfiguration();
 	~ApplicationConfiguration();
+
+	static ConfigFileType fileType( const char *filename, ConfigFileType type );
+	bool parseModules( const char *filename, ConfigFileType type );
+	void addModules( const module::ModulesDirectory* modules )
+	{ m_modules = modules; }
 
 	bool parse( const char *filename, ConfigFileType type );
 	void finalize( const CmdLineConfig& cmdLine );
@@ -99,11 +104,10 @@ public:
 				       const char *localFile );
 private:
 	ConfigFileType				m_type;
-	bool					m_forced;
 	std::vector< ConfigurationBase* >	m_conf;
 	std::vector< ParseFunc_t >		m_parse;
 	std::map< std::string, std::size_t >	m_section;
-	const module::ModulesConfiguration*	m_modules;
+	const module::ModulesDirectory*	m_modules;
 
 	bool addConfig( const std::string& nodeName, ConfigurationBase* conf,
 			ParseFunc_t parseFunc );

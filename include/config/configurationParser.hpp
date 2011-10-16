@@ -61,7 +61,7 @@ public:
 	template<typename T>
 	static bool parse( T& configuration,
 			   const boost::property_tree::ptree& pt, const std::string& node,
-			   const module::ModulesConfiguration* modules = NULL );
+			   const module::ModulesDirectory* modules = NULL );
 
 //	template<typename T>
 //	static bool parseBase( ConfigurationBase& configuration,
@@ -73,7 +73,7 @@ public:
 	template<typename T>
 	static bool parseBase( ConfigurationBase& configuration,
 			       const boost::property_tree::ptree& pt, const std::string& node,
-			       const module::ModulesConfiguration* modules = NULL )
+			       const module::ModulesDirectory* modules = NULL )
 	{
 		return parse( dynamic_cast<T&>( configuration ), pt, node, modules );
 	}

@@ -41,26 +41,30 @@
 namespace _Wolframe {
 namespace module {
 
-bool ModulesConfiguration::add( ConfigDescriptionBase* description )
+bool ModulesDirectory::addConfiguration( ConfigDescriptionBase* description )
 {
-	for ( std::list< ConfigDescriptionBase* >::const_iterator it = m_modules.begin();
-								it != m_modules.end(); it++ )	{
-		if ( boost::algorithm::iequals( (*it)->objectName(), description->objectName() ))	{
-			LOG_ALERT << "A module for object '" << description->objectName()
-				  << "' already exists";
+	for ( std::list< ConfigDescriptionBase* >::const_iterator it = m_config.begin();
+								it != m_config.end(); it++ )	{
+		if ( boost::algorithm::iequals( (*it)->section, description->section ) &&
+				boost::algorithm::iequals( (*it)->keyword, description->keyword ))	{
+			LOG_ALERT << "A configuration module for section '" << description->section
+				  << "' keyword '" << description->keyword << "' already exists";
 			return false;
 		}
 	}
-	m_modules.push_back( description );
-	LOG_DEBUG << "Configuration for module '" << description->objectName() << "' registered";
+	m_config.push_back( description );
+	LOG_DEBUG << "Configuration for section '" << description->section
+		  << "' keyword '" << description->keyword << "' registered";
 	return true;
 }
 
-ConfigDescriptionBase* ModulesConfiguration::get( const std::string& name ) const
+ConfigDescriptionBase* ModulesDirectory::getConfig( const std::string& section,
+						  const std::string& keyword ) const
 {
-	for ( std::list< ConfigDescriptionBase* >::const_iterator it = m_modules.begin();
-								it != m_modules.end(); it++ )	{
-		if ( boost::algorithm::iequals( (*it)->objectName(), name ))
+	for ( std::list< ConfigDescriptionBase* >::const_iterator it = m_config.begin();
+								it != m_config.end(); it++ )	{
+		if ( boost::algorithm::iequals( (*it)->keyword, keyword ) &&
+				boost::algorithm::iequals( (*it)->section, section ))
 			return *it;
 	}
 	return NULL;
@@ -87,36 +91,36 @@ ConfigDescriptionBase* ModulesConfiguration::get( const std::string& name ) cons
 
 using namespace _Wolframe;
 
-bool module::LoadModules( ModulesConfiguration& modules )
+bool module::LoadModules( ModulesDirectory& modules )
 {
 	bool retVal = true;
 
 #ifdef WITH_PGSQL
-	modules.add( new module::ConfigurationDescription< db::PostgreSQLconfig >
-		     ( "PostgreSQL", "PostgreSQL database", "PostgreSQL",
-		       &config::ConfigurationParser::parseBase<db::PostgreSQLconfig> ) );
+	modules.addConfiguration( new module::ConfigurationDescription< db::PostgreSQLconfig >
+				  ( "PostgreSQL database", "database", "PostgreSQL",
+				    &config::ConfigurationParser::parseBase<db::PostgreSQLconfig> ) );
 #endif
 #ifdef WITH_SQLITE3
-	modules.add( new module::ConfigurationDescription< db::SQLiteConfig >
-		     ( "SQLite", "SQLite database", "SQLite",
-		       &config::ConfigurationParser::parseBase<db::SQLiteConfig> ) );
+	modules.addConfiguration( new module::ConfigurationDescription< db::SQLiteConfig >
+				  ( "SQLite database", "database", "SQLite",
+				    &config::ConfigurationParser::parseBase<db::SQLiteConfig> ) );
 #endif
-	modules.add( new module::ConfigurationDescription< EchoProcConfig >
-		     ( "echoProcessor", "Echo Processor", "echoProcessor",
-		       &config::ConfigurationParser::parseBase< EchoProcConfig > ) );
+	modules.addConfiguration( new module::ConfigurationDescription< EchoProcConfig >
+				  ( "Echo Processor", "processor", "echoProcessor",
+				    &config::ConfigurationParser::parseBase< EchoProcConfig > ) );
 
-	modules.add( new module::ConfigurationDescription< AAAA::TextFileAuthConfig >
-		     ( "TextFileAuth", "Authentication file", "file",
-		       &config::ConfigurationParser::parseBase<AAAA::TextFileAuthConfig> ) );
-	modules.add( new module::ConfigurationDescription< AAAA::DatabaseAuthConfig >
-		     ( "DatabaseAuth", "Authentication database", "database",
-		       &config::ConfigurationParser::parseBase<AAAA::DatabaseAuthConfig> ) );
-	modules.add( new module::ConfigurationDescription< AAAA::FileAuditConfig >
-		     ( "FileAudit", "Audit file", "file",
-		       &config::ConfigurationParser::parseBase<AAAA::FileAuditConfig> ) );
-	modules.add( new module::ConfigurationDescription< AAAA::DBauditConfig >
-		     ( "DatabaseAudit", "Audit database", "database",
-		       &config::ConfigurationParser::parseBase<AAAA::DBauditConfig> ) );
+	modules.addConfiguration( new module::ConfigurationDescription< AAAA::TextFileAuthConfig >
+				  ( "Authentication file", "Authentication", "file",
+				    &config::ConfigurationParser::parseBase<AAAA::TextFileAuthConfig> ) );
+	modules.addConfiguration( new module::ConfigurationDescription< AAAA::DatabaseAuthConfig >
+				  ( "Authentication database", "Authentication", "database",
+				    &config::ConfigurationParser::parseBase<AAAA::DatabaseAuthConfig> ) );
+	modules.addConfiguration( new module::ConfigurationDescription< AAAA::FileAuditConfig >
+				  ( "Audit file", "Audit", "file",
+				    &config::ConfigurationParser::parseBase<AAAA::FileAuditConfig> ) );
+	modules.addConfiguration( new module::ConfigurationDescription< AAAA::DBauditConfig >
+				  ( "Audit database", "Audit", "database",
+				    &config::ConfigurationParser::parseBase<AAAA::DBauditConfig> ) );
 	return retVal;
 }
 

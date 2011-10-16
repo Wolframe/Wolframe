@@ -59,14 +59,14 @@ namespace config {
 template<>
 bool ConfigurationParser::parse( db::DBproviderConfig& cfg,
 				 const boost::property_tree::ptree& pt, const std::string& /*node*/,
-				 const module::ModulesConfiguration* modules )
+				 const module::ModulesDirectory* modules )
 {
 	using namespace _Wolframe::config;
 	bool retVal = true;
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( modules )	{
-			module::ConfigDescriptionBase* cfgDesc = modules->get( L1it->first );
+			module::ConfigDescriptionBase* cfgDesc = modules->getConfig( "database", L1it->first );
 			if ( cfgDesc )	{
 				config::ObjectConfiguration* conf = cfgDesc->create( cfg.logPrefix().c_str());
 				if ( cfgDesc->parseFunc( *conf, L1it->second, L1it->first, modules ))

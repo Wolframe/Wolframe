@@ -41,7 +41,7 @@
 // forward definition
 namespace _Wolframe {
 namespace module {
-class ModulesConfiguration;
+class ModulesDirectory;
 }} // namespace _Wolframe::module
 
 namespace _Wolframe {
@@ -63,7 +63,7 @@ public:
 	///			the logParent parameter will form the whole logging
 	///			prefix for of the section.
 	ConfigurationBase( const char* name, const char* logParent, const char* logName,
-			   module::ModulesConfiguration* modules = NULL )
+			   module::ModulesDirectory* modules = NULL )
 		: m_modules( modules )
 	{
 		m_sectionName = name ? name : "";
@@ -112,7 +112,7 @@ public:
 private:
 	std::string			m_sectionName;
 	std::string			m_logPrefix;
-	module::ModulesConfiguration*	m_modules;
+	module::ModulesDirectory*	m_modules;
 };
 
 

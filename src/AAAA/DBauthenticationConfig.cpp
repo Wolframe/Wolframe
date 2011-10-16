@@ -43,7 +43,7 @@ namespace config {
 template<>
 bool ConfigurationParser::parse( AAAA::DatabaseAuthConfig& cfg,
 				 const boost::property_tree::ptree& pt, const std::string& node,
-				 const module::ModulesConfiguration* /*modules*/ )
+				 const module::ModulesDirectory* /*modules*/ )
 {
 	return ConfigurationParser::parse( cfg.m_dbConfig, pt, node );
 }

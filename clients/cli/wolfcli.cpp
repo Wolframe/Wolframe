@@ -72,7 +72,8 @@ class SSLWolfClient : public WolfClient
 				unsigned short connect_timeout,
 				unsigned short read_timeout )
 			: m_io_service( io_service ),
-			  m_socket( io_service, ctx ), m_deadline_timer( io_service ),
+			  m_socket( io_service, ctx ),
+			  m_deadline_timer( io_service ),
 			  m_connect_timeout( connect_timeout ),
 			  m_read_timeout( read_timeout )
 		{
@@ -206,7 +207,8 @@ class PlainWolfClient : public WolfClient
 					unsigned short connect_timeout,
 					unsigned short read_timeout )
 			: m_io_service( io_service ),
-			  m_socket( io_service ), m_deadline_timer( io_service ),
+			  m_socket( io_service ),
+			  m_deadline_timer( io_service ),
 			  m_connect_timeout( connect_timeout ),
 			  m_read_timeout( read_timeout )
 		{
@@ -373,6 +375,8 @@ int main( int argc, char *argv[] )
 
 	boost::asio::io_service io_service;
 	boost::asio::ip::tcp::resolver resolver( io_service );
+	boost::asio::ip::tcp::resolver::query query( boost::asio::ip::tcp::v4( ), host, port );
+	boost::asio::ip::tcp::resolver::iterator endpoint_iter = resolver.resolve( query );
 
 #ifdef WITH_SSL
 	boost::asio::ssl::context ctx( io_service, boost::asio::ssl::context::sslv23 );
@@ -425,7 +429,7 @@ int main( int argc, char *argv[] )
 	}
 #endif // WITH_SSL
 
-	c->start( resolver.resolve( boost::asio::ip::tcp::resolver::query( host, port ) ) );
+	c->start( endpoint_iter );
 
 	boost::thread netthread( boost::bind( &boost::asio::io_service::run, &io_service ) );
 	boost::thread stdinthread( read_from_stdin, c );
