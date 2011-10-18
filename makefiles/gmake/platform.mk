@@ -294,10 +294,22 @@ BOOST_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 BOOST_LIBRARY_TAG ?= NOT SUPPLIED ON THIS PLATFORM
 endif
 
-# Ubuntu 10.04 TLS, 10.10, Debian 5.0, Debian 6.0
+# Ubuntu 10.04 TLS ... 11.04, 11.10, Debian 5.0, Debian 6.0
 ifeq "$(LINUX_DIST)" "debian"
 
 ifeq "$(LINUX_REV)" "squeeze/sid"
+ifdef BOOST_DIR
+BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
+BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
+endif
+ifndef BOOST_DIR
+BOOST_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
+BOOST_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
+BOOST_LIBRARY_TAG ?= NOT SUPPLIED ON THIS PLATFORM
+endif
+endif
+
+ifeq "$(LINUX_REV)" "wheezy/sid"
 ifdef BOOST_DIR
 BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
 BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
@@ -536,10 +548,17 @@ endif
 
 endif
 
-# Ubuntu 10.04 TLS, 10.10, Debian 5.0, 6.0
+# Ubuntu 10.04 TLS ... 11.04, 11.10, Debian 5.0, 6.0
 ifeq "$(LINUX_DIST)" "debian"
 
 ifeq "$(LINUX_REV)" "squeeze/sid"
+QT_DIR ?= /usr
+QT_INCLUDE_DIR ?= $(QT_DIR)/include/qt4
+QT_LIB_DIR ?= $(QT_DIR)/lib
+QT_MOC ?= $(QT_DIR)/bin/moc
+endif
+
+ifeq "$(LINUX_REV)" "wheezy/sid"
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include/qt4
 QT_LIB_DIR ?= $(QT_DIR)/lib
@@ -614,9 +633,15 @@ PAM_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 PAM_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
 endif
 
-# Ubuntu 10.04 TLS, 10.10, Debian 5.0, Debian 6.0
+# Ubuntu 10.04 TLS ... 11.04, 11.10, Debian 5.0, Debian 6.0
 ifeq "$(LINUX_DIST)" "debian"
 ifeq "$(LINUX_REV)" "squeeze/sid"
+PAM_DIR ?= /usr
+PAM_INCLUDE_DIR ?= $(PAM_DIR)/include
+PAM_LIB_DIR ?= /lib
+PAM_LIBS ?= -lpam
+endif
+ifeq "$(LINUX_REV)" "wheezy/sid"
 PAM_DIR ?= /usr
 PAM_INCLUDE_DIR ?= $(PAM_DIR)/include
 PAM_LIB_DIR ?= /lib
@@ -728,9 +753,15 @@ SASL_LIB_DIR ?= $(SASL_DIR)/lib
 SASL_LIBS ?= -lsasl2
 endif
 
-# Ubuntu 10.04 TLS, 10.10, Debian 5.0, Debian 6.0
+# Ubuntu 10.04 TLS ... 11.04, 11.10, Debian 5.0, Debian 6.0
 ifeq "$(LINUX_DIST)" "debian"
 ifeq "$(LINUX_REV)" "squeeze/sid"
+SASL_DIR ?= /usr
+SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
+SASL_LIB_DIR ?= $(SASL_DIR)/lib
+SASL_LIBS ?= -lsasl2
+endif
+ifeq "$(LINUX_REV)" "wheezy/sid"
 SASL_DIR ?= /usr
 SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
 SASL_LIB_DIR ?= $(SASL_DIR)/lib
@@ -844,9 +875,15 @@ SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
 SQLITE3_LIBS ?= -lsqlite3
 endif
 
-# Ubuntu 10.04 TLS, 10.10, Debian 5.0, Debian 6.0
+# Ubuntu 10.04 TLS ... 11.04, 11.10, Debian 5.0, Debian 6.0
 ifeq "$(LINUX_DIST)" "debian"
 ifeq "$(LINUX_REV)" "squeeze/sid"
+SQLITE3_DIR ?= /usr
+SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
+SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
+SQLITE3_LIBS ?= -lsqlite3
+endif
+ifeq "$(LINUX_REV)" "wheezy/sid"
 SQLITE3_DIR ?= /usr
 SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
 SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
@@ -965,9 +1002,17 @@ PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
 PGSQL_LIBS ?= -lpq
 endif
 
-# Ubuntu 10.04 TLS, 10.10, Debian 5.0, Debian 6.0
+# Ubuntu 10.04 TLS ... 11.04, 11.10, Debian 5.0, Debian 6.0
 ifeq "$(LINUX_DIST)" "debian"
 ifeq "$(LINUX_REV)" "squeeze/sid"
+PGSQL_DIR ?= /usr
+PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include/postgresql
+PGSQL_INCLUDE_DIRS = -I$(PGSQL_INCLUDE_DIR)
+PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
+PGSQL_LIB_DIRS = -L$(PGSQL_LIB_DIR)
+PGSQL_LIBS ?= -lpq
+endif
+ifeq "$(LINUX_REV)" "wheezy/sid"
 PGSQL_DIR ?= /usr
 PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include/postgresql
 PGSQL_INCLUDE_DIRS = -I$(PGSQL_INCLUDE_DIR)
@@ -1092,7 +1137,7 @@ LIBXML2_LIB_DIRS = -L$(LIBXML2_LIB_DIR)
 LIBXML2_LIBS ?= -lxml2
 endif
 
-# Ubuntu 10.04 TLS, 10.10, Debian 5.0, Debian 6.0
+# Ubuntu 10.04 TLS ... 11.04, 11.10, Debian 5.0, Debian 6.0
 ifeq "$(LINUX_DIST)" "debian"
 LIBXML2_DIR ?= /usr
 LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
@@ -1101,6 +1146,14 @@ LIBXML2_LIB_DIR ?= $(LIBXML2_DIR)/lib
 LIBXML2_LIB_DIRS = -L$(LIBXML2_LIB_DIR)
 LIBXML2_LIBS ?= -lxml2
 ifeq "$(LINUX_REV)" "squeeze/sid"
+LIBXML2_DIR ?= /usr
+LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
+LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
+LIBXML2_LIB_DIR ?= $(LIBXML2_DIR)/lib
+LIBXML2_LIB_DIRS = -L$(LIBXML2_LIB_DIR)
+LIBXML2_LIBS ?= -lxml2
+endif
+ifeq "$(LINUX_REV)" "wheezy/sid"
 LIBXML2_DIR ?= /usr
 LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
 LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
@@ -1229,7 +1282,7 @@ LIBXSLT_LIB_DIRS = -L$(LIBXSLT_LIB_DIR)
 LIBXSLT_LIBS ?= -lxslt
 endif
 
-# Ubuntu 10.04 TLS, 10.10, Debian 5.0, Debian 6.0
+# Ubuntu 10.04 TLS ... 11.04, 11.10, Debian 5.0, Debian 6.0
 ifeq "$(LINUX_DIST)" "debian"
 LIBXSLT_DIR ?= /usr
 LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
@@ -1238,6 +1291,14 @@ LIBXSLT_LIB_DIR ?= $(LIBXSLT_DIR)/lib
 LIBXSLT_LIB_DIRS = -L$(LIBXSLT_LIB_DIR)
 LIBXSLT_LIBS ?= -lxslt
 ifeq "$(LINUX_REV)" "squeeze/sid"
+LIBXSLT_DIR ?= /usr
+LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
+LIBXSLT_INCLUDE_DIRS = -I$(LIBXSLT_INCLUDE_DIR)
+LIBXSLT_LIB_DIR ?= $(LIBXSLT_DIR)/lib
+LIBXSLT_LIB_DIRS = -L$(LIBXSLT_LIB_DIR)
+LIBXSLT_LIBS ?= -lxslt
+endif
+ifeq "$(LINUX_REV)" "wheezy/sid"
 LIBXSLT_DIR ?= /usr
 LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
 LIBXSLT_INCLUDE_DIRS = -I$(LIBXSLT_INCLUDE_DIR)
