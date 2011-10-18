@@ -43,7 +43,7 @@
 
 #include <list>
 #include "objectPool.hpp"
-#include "libpq-fe.h"
+#include "postgresql/libpq-fe.h"
 
 namespace _Wolframe {
 namespace db {

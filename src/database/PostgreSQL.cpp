@@ -37,7 +37,7 @@
 #include "logger.hpp"
 #include "PostgreSQL.hpp"
 #include "database/databaseOperation.hpp"
-#include "libpq-fe.h"
+#include "postgresql/libpq-fe.h"
 
 #include <string>
 #include <sstream>

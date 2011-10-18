@@ -223,14 +223,21 @@ XSLT_VERSION ?= $(shell pacman -Q | grep docbook-xsl | cut -f 2 -d ' ' | cut -f 
 XSLT_MAN_STYLESHEET ?= /usr/share/xml/docbook/xsl-stylesheets-$(XSLT_VERSION)/manpages/docbook.xsl
 endif
 
-# Ubuntu 10.04 TLS, 10.10, Debian 5.0, Debian 6.0
+# Ubuntu & debian
 ifeq "$(LINUX_DIST)" "debian"
+# Ubuntu 10.04 TLS ... 11.04
 ifeq "$(LINUX_REV)" "squeeze/sid"
 XSLT_MAN_STYLESHEET ?= /usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl
 endif
+# Ubuntu 11.10
+ifeq "$(LINUX_REV)" "wheezy/sid"
+XSLT_MAN_STYLESHEET ?= /usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl
+endif
+# Debian 5.0
 ifeq "$(LINUX_REV)" "5"
 XSLT_MAN_STYLESHEET ?= /usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl
 endif
+# Debian 6.0
 ifeq "$(LINUX_REV)" "6"
 XSLT_MAN_STYLESHEET ?= /usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl
 endif
