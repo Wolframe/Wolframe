@@ -9,7 +9,7 @@ source md5.tcl
 set timeout 5
 log_user 0
 
-puts -nonewline "Authentication SASL DIGEST-MD5 successfull - "
+puts -nonewline "Authentication SASL DIGEST-MD5 unknown user - "
 
 spawn ./authTest SASL
 
