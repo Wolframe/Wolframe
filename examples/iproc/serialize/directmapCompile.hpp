@@ -31,7 +31,7 @@ Project Wolframe.
 ************************************************************************/
 ///
 ///\file directmapCompile.hpp
-///\brief interface for a compiler of a self defined direct map language
+///\brief interface for a compiler of a self defined direct map DDL
 ///
 #ifndef _Wolframe_DIRECTMAP_COMPILE_HPP_INCLUDED
 #define _Wolframe_DIRECTMAP_COMPILE_HPP_INCLUDED
@@ -44,10 +44,12 @@ Project Wolframe.
 namespace _Wolframe {
 namespace directmap {
 
-struct SymbolTable
+class SymbolTable
 {
-	struct Element
+public:
+	class Element
 	{
+	public:
 		enum Type
 		{
 			float_,long_,ulong_,int_,uint_,short_,ushort_,char_,uchar_,string_,struct_
@@ -71,7 +73,13 @@ struct SymbolTable
 			}
 			return false;
 		}
-
+		Type type() const {return m_type;}
+		std::string name() const {return m_name;}
+		std::string defaultValue() const {return m_default;}
+		int ref() const {return m_ref;}
+		std::size_t size() const {return m_size;}
+		bool isArray() const {return m_isArray;}
+	public:
 		Type m_type;
 		std::string m_name;
 		std::string m_default;
@@ -102,22 +110,17 @@ struct SymbolTable
 		return &m_ar[ itr->second];
 	}
 
-	bool define( const std::string& name, const Struct& ee)
-	{
-		if (m_linkmap.find( name) != m_linkmap.end())
-		{
-			return false;
-		}
-		m_linkmap[ name] = m_ar.size();
-		m_ar.push_back( ee);
-		return true;
-	}
+	bool define( const std::string& name, const Struct& ee);
+
+	void error( const std::string& msg) {m_errors.push_back( msg);}
+	const std::vector<std::string>& errors() const {return m_errors;}
 
 	bool compile( const char* filename, std::string& error);
 
 private:
 	std::map<std::string,std::size_t> m_linkmap;
 	std::vector<Struct> m_ar;
+	std::vector<std::string> m_errors;
 };
 
 }}
