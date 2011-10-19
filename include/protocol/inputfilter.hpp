@@ -41,12 +41,6 @@ Project Wolframe.
 
 #include "countedReference.hpp"
 
-#ifdef _WIN32
-#define snprintf _snprintf
-#else
-#define snprintf std::snprintf
-#endif
-
 namespace _Wolframe {
 namespace protocol {
 
