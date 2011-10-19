@@ -239,6 +239,8 @@ For running non-gtest tests you need 'expect'.
 
 For running the Sasl AAAA tests you need 'sasl2-bin'.
 
+For running the Sqlite3 database tests you need 'sqlite3'.
+
 For checking the validity of various XML files you need 'libxml2-utils' (for xmllint).
 
 Debian 5.0
