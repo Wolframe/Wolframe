@@ -19,9 +19,9 @@ INCLUDE_LIBS = \
 	-lboost_program_options \
 	-lboost_filesystem \
 	-lboost_date_time \
-	$(LIBS_DL) \
 	$(TOPDIR)/src/libwolframe.a \
-	$(TOPDIR)/lua/src/liblua.a
+	$(TOPDIR)/lua/src/liblua.a \
+	$(LIBS_DL)
 
 # openssl
 
