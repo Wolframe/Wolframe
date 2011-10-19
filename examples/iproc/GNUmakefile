@@ -18,9 +18,9 @@ INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_program_options \
 	-lboost_filesystem \
-	$(LIBS_DL) \
 	$(TOPDIR)/gtest/gtest-all.o \
-	$(TOPDIR)/src/libwolframe.a
+	$(TOPDIR)/src/libwolframe.a \
+	$(LIBS_DL)
 
 # lua
 
@@ -32,7 +32,8 @@ INCLUDE_DIRS += \
 	-I$(TOPDIR)/lua/src
 
 INCLUDE_LIBS += \
-	$(TOPDIR)/lua/src/liblua.a
+	$(TOPDIR)/lua/src/liblua.a \
+	$(LIBS_DL)
 endif
 
 # libxml2

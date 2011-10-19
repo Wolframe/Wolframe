@@ -15,9 +15,9 @@ INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
+	$(TOPDIR)/src/libwolframe.a \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
-	-lboost_system \
-	$(TOPDIR)/src/libwolframe.a
+	-lboost_system
 
 # openssl
 
