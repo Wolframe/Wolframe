@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = database AAAA
+SUBDIRS =
 
 # all broken on windows due to working telnet
 #!IFDEF WITH_EXPECT
