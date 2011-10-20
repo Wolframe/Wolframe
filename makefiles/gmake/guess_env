@@ -15,6 +15,9 @@ case "$UNAME_SYSTEM.$UNAME_RELEASE" in
 			if test -f /etc/arch-release; then
 				LINUX_DIST='arch'
 				LINUX_REV='current'
+				if test "$OS_MAJOR_VERSION" = "3"; then
+					OS_MINOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 2 | cut -d - -f 1`
+				fi
 			elif test -f /etc/debian_version; then
 				LINUX_DIST='debian'
 				LINUX_REV=`cat /etc/debian_version | cut -d . -f 1`
@@ -76,7 +79,7 @@ esac
 case "$UNAME_MACHINE" in
 	i*86*)		ARCH=x86
 			;;
-	x86_64)		ARCH=x86_64
+	x86_64|amd64)	ARCH=x86_64
 			;;
 	sun4u)		ARCH=sun4u
 			;;
@@ -84,6 +87,7 @@ case "$UNAME_MACHINE" in
 	*)		ARCH=UNKNOWN
 			echo "Unknown architecture '$UNAME_MACHINE'"
 			exit 1
+			
 esac
 
 # get last line, old 'tail' syntax and POSIX syntax, both exist out there
@@ -147,7 +151,7 @@ fi
 # version of icc (Intel C compiler)
 
 if test $COMPILER = "icc"; then
-	ICC_VERSION=`$CC -dumpversion`
+	ICC_VERSION=`icc -dumpversion`
 	ICC_MAJOR_VERSION=`echo $ICC_VERSION | cut -d . -f 1`
 	ICC_MINOR_VERSION=`echo $ICC_VERSION | cut -d . -f 2`
 fi
