@@ -137,7 +137,7 @@ ifeq ($(WITH_SASL),1)
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) $(EXPECT) ./checkAuthSaslLoginWrongPass
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) $(EXPECT) ./checkAuthSaslLoginOk
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) $(EXPECT) ./checkAuthSaslDigestMd5UnknownUser
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) $(EXPECT) ./checkAuthSaslDigestMd5Ok
+#	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) $(EXPECT) ./checkAuthSaslDigestMd5Ok
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) $(EXPECT) ./checkAuthSaslCramMd5UnknownUser
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) $(EXPECT) ./checkAuthSaslCramMd5WrongPass
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) $(EXPECT) ./checkAuthSaslCramMd5Ok
