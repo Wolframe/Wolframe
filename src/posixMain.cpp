@@ -271,7 +271,7 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 		LOG_NOTICE << "Starting server";
 
 		// Run server in background thread(s).
-		_Wolframe::ServerHandler handler( conf.handlerCfg );
+		_Wolframe::ServerHandler handler( conf.handlerCfg, &modules );
 		_Wolframe::net::server s( conf.serverCfg, handler );
 		boost::thread t( boost::bind( &_Wolframe::net::server::run, &s ));
 

@@ -35,32 +35,19 @@
 //
 
 #include "DBproviderImpl.hpp"
+#include "moduleInterface.hpp"
 
 #include "logger.hpp"
 
 #include <boost/algorithm/string.hpp>
 
-/****  Impersonating the module loader  ******************************************************/
-#include "PostgreSQL.hpp"
-#include "SQLite.hpp"
-
-using namespace _Wolframe;
-
-static const size_t noDBmodules = 2;
-
-static module::ContainerDescription< Container< db::DatabaseUnit > >
-dbModules[ noDBmodules ] = {
-	module::ContainerDescription< Container< db::DatabaseUnit > >( "PostgreSQL", &db::PostgreSQLcontainer::create ),
-	module::ContainerDescription< Container< db::DatabaseUnit > >( "SQLite", &db::SQLiteContainer::create )
-};
-/****  End impersonating the module loader  **************************************************/
-
 namespace _Wolframe	{
 namespace db	{
 
 /// DatabaseProvider PIMPL
-DatabaseProvider::DatabaseProvider( const DBproviderConfig* conf ) :
-	m_impl( new DatabaseProvider_Impl( conf ))	{}
+DatabaseProvider::DatabaseProvider( const DBproviderConfig* conf,
+				    const module::ModulesDirectory* modules ) :
+	m_impl( new DatabaseProvider_Impl( conf, modules ))	{}
 
 DatabaseProvider::~DatabaseProvider()
 {
@@ -75,21 +62,18 @@ const Database* DatabaseProvider::database( const std::string& ID ) const
 
 /// DatabaseProvider PIMPL implementation
 
-DatabaseProvider::DatabaseProvider_Impl::DatabaseProvider_Impl( const DBproviderConfig* conf )
+DatabaseProvider::DatabaseProvider_Impl::DatabaseProvider_Impl( const DBproviderConfig* conf,
+								const module::ModulesDirectory* modules )
 {
 	for ( std::list< config::ObjectConfiguration* >::const_iterator it = conf->m_dbConfig.begin();
-							it != conf->m_dbConfig.end(); it++ )	{
-		const char* dbType = (*it)->objectName();
-		size_t i;
-		for ( i = 0; i < noDBmodules; i++ )	{
-			if ( boost::algorithm::iequals( dbModules[i].name, dbType ))	{
-				Container< db::DatabaseUnit >* container = dbModules[i].createFunc( **it );
-				m_db.push_back( container );
-				break;
-			}
+									it != conf->m_dbConfig.end(); it++ )	{
+		module::ModuleContainerBase* container = modules->getContainer((*it)->objectName());
+		if ( container )	{
+			Container< db::DatabaseUnit >* db = container->createFunc( **it );
+			m_db.push_back( db );
 		}
-		if ( i >= noDBmodules )	{
-			LOG_ALERT << "DatabaseProvider: unknown database type '" << dbType << "'";
+		else	{
+			LOG_ALERT << "DatabaseProvider: unknown database module '" << (*it)->objectName() << "'";
 			throw std::domain_error( "Unknown database type in DBprovider constructor. See log" );
 		}
 	}

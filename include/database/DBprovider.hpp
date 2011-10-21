@@ -38,16 +38,19 @@
 #include <boost/noncopyable.hpp>
 
 namespace _Wolframe {
-namespace db {
 
-/// Opaque definition for DBproviderConfig
-class DBproviderConfig;
+/// Opaque definitions for DBproviderConfig and ModulesDirectory
+namespace db { class DBproviderConfig; }
+namespace module { class ModulesDirectory; }
+
+namespace db {
 
 /// Database provider
 class DatabaseProvider : private boost::noncopyable
 {
 public:
-	DatabaseProvider( const DBproviderConfig* conf );
+	DatabaseProvider( const DBproviderConfig* conf,
+			  const module::ModulesDirectory* modules );
 	~DatabaseProvider();
 
 	const Database* database( const std::string& ID ) const;

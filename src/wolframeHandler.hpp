@@ -48,7 +48,8 @@ namespace _Wolframe {
 class WolframeHandler
 {
 public:
-	WolframeHandler( const HandlerConfiguration* conf );
+	WolframeHandler( const HandlerConfiguration* conf,
+			 const module::ModulesDirectory* modules );
 	~WolframeHandler();
 
 	const std::string& banner() const		{ return m_banner; }
@@ -165,7 +166,8 @@ private:
 class ServerHandler::ServerHandlerImpl
 {
 public:
-	ServerHandlerImpl( const HandlerConfiguration* conf );
+	ServerHandlerImpl( const HandlerConfiguration* conf,
+			   const module::ModulesDirectory* modules );
 	~ServerHandlerImpl();
 	net::ConnectionHandler* newConnection( const net::LocalEndpoint& local );
 private:

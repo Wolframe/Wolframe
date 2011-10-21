@@ -87,13 +87,16 @@ public:
 };
 
 
-class ModuleContainerBase
+struct ModuleContainerBase
 {
+	const char* name;
+public:
+	ModuleContainerBase( const char* identifier ) : name( identifier )	{}
 };
 
 
 template < class T, class Tconf, class Tbase >
-class ModuleContainer : public Container< Tbase >, public ModuleContainerBase
+class ModuleContainer : public Container< Tbase >
 {
 public:
 	virtual ~ModuleContainer()		{}
@@ -105,13 +108,12 @@ public:
 };
 
 template < class T >
-struct ContainerDescription
+struct ContainerDescription : public ModuleContainerBase
 {
-	const char* name;
 	T* ( *createFunc )( const config::ObjectConfiguration& conf );
 public:
 	ContainerDescription( const char* n, T* ( *f )( const config::ObjectConfiguration& conf ) )
-		: name( n ), createFunc( f )	{}
+		: ModuleContainerBase( n ), createFunc( f )	{}
 };
 
 
@@ -131,11 +133,11 @@ public:
 			delete *it;
 	}
 
-	bool addConfiguration( ConfigDescriptionBase* description );
-	bool addContainer( ModuleContainerBase* description );
+	bool addConfig( ConfigDescriptionBase* description );
+	bool addContainer( ModuleContainerBase* container );
 
 	ConfigDescriptionBase* getConfig( const std::string& section, const std::string& keyword ) const;
-	ConfigDescriptionBase* getContainer( const std::string& section, const std::string& name ) const;
+	ModuleContainerBase* getContainer( const std::string& name ) const;
 private:
 	std::list< ConfigDescriptionBase* >	m_config;
 	std::list< ModuleContainerBase* >	m_container;

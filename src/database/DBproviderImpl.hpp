@@ -68,7 +68,8 @@ private:
 class DatabaseProvider::DatabaseProvider_Impl
 {
 public:
-	DatabaseProvider_Impl( const DBproviderConfig* conf );
+	DatabaseProvider_Impl( const DBproviderConfig* conf,
+			       const module::ModulesDirectory* modules );
 	~DatabaseProvider_Impl();
 
 	const Database* database( const std::string& ID ) const;

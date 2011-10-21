@@ -159,11 +159,13 @@ public:
 /// All it should do is to provide connection handlers
 
 struct	HandlerConfiguration;
+namespace module { class ModulesDirectory; }
 
 class ServerHandler : private boost::noncopyable
 {
 public:
-	ServerHandler( const HandlerConfiguration* conf );
+	ServerHandler( const HandlerConfiguration* conf,
+		       const module::ModulesDirectory* modules );
 	~ServerHandler();
 
 	/// Create a new connection handler and return a pointer to it
