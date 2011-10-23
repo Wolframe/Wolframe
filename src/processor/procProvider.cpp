@@ -57,8 +57,8 @@
 using namespace _Wolframe;
 
 static const size_t noProcModules = 1;
-static module::ContainerDescription< Container< proc::ProcessorUnit > >
-procModules[ noProcModules ] = { module::ContainerDescription< Container< proc::ProcessorUnit > >( "EchoProcessor", &EchoProcContainer::create ) };
+static module::ContainerDescription< ObjectContainer< proc::ProcessorUnit > >
+procModules[ noProcModules ] = { module::ContainerDescription< ObjectContainer< proc::ProcessorUnit > >( "EchoProcessor", &EchoProcContainer::create ) };
 /****  End impersonating the module loader  **************************************************/
 
 namespace _Wolframe {
@@ -187,7 +187,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 		size_t i;
 		for ( i = 0; i < noProcModules; i++ )	{
 			if ( boost::algorithm::iequals( procModules[i].name, procType ))	{
-				Container< ProcessorUnit >* container = procModules[i].createFunc( **it );
+				ObjectContainer< ProcessorUnit >* container = procModules[i].createFunc( **it );
 				m_proc.push_back( container );
 				break;
 			}
@@ -201,7 +201,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 
 ProcessorProvider::ProcessorProvider_Impl::~ProcessorProvider_Impl()
 {
-	for ( std::list< Container< ProcessorUnit >* >::const_iterator it = m_proc.begin();
+	for ( std::list< ObjectContainer< ProcessorUnit >* >::const_iterator it = m_proc.begin();
 							it != m_proc.end(); it++ )
 		delete *it;
 }
@@ -224,7 +224,7 @@ bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabasePro
 
 Processor* ProcessorProvider::ProcessorProvider_Impl::processor()
 {
-	std::list< Container< ProcessorUnit >* >::const_iterator it = m_proc.begin();
+	std::list< ObjectContainer< ProcessorUnit >* >::const_iterator it = m_proc.begin();
 	if ( it != m_proc.end() )
 		return (*it)->object().processor();
 	else

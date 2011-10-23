@@ -48,10 +48,10 @@ using namespace _Wolframe;
 
 static const size_t noDBmodules = 2;
 
-static module::ContainerDescription< Container< db::DatabaseUnit > >
+static module::ContainerDescription< ObjectContainer< db::DatabaseUnit > >
 dbModules[ noDBmodules ] = {
-	module::ContainerDescription< Container< db::DatabaseUnit > >( "PostgreSQL", &db::PostgreSQLcontainer::create ),
-	module::ContainerDescription< Container< db::DatabaseUnit > >( "SQLite", &db::SQLiteContainer::create )
+	module::ContainerDescription< ObjectContainer< db::DatabaseUnit > >( "PostgreSQL", &db::PostgreSQLcontainer::create ),
+	module::ContainerDescription< ObjectContainer< db::DatabaseUnit > >( "SQLite", &db::SQLiteContainer::create )
 };
 /****  End impersonating the module loader  **************************************************/
 
@@ -83,7 +83,7 @@ DatabaseProvider::DatabaseProvider_Impl::DatabaseProvider_Impl( const DBprovider
 		size_t i;
 		for ( i = 0; i < noDBmodules; i++ )	{
 			if ( boost::algorithm::iequals( dbModules[i].name, dbType ))	{
-				Container< db::DatabaseUnit >* container = dbModules[i].createFunc( **it );
+				ObjectContainer< db::DatabaseUnit >* container = dbModules[i].createFunc( **it );
 				m_db.push_back( container );
 				break;
 			}
@@ -97,7 +97,7 @@ DatabaseProvider::DatabaseProvider_Impl::DatabaseProvider_Impl( const DBprovider
 
 DatabaseProvider::DatabaseProvider_Impl::~DatabaseProvider_Impl()
 {
-	for ( std::list< Container< db::DatabaseUnit >* >::const_iterator it = m_db.begin();
+	for ( std::list< ObjectContainer< db::DatabaseUnit >* >::const_iterator it = m_db.begin();
 							it != m_db.end(); it++ )
 		delete *it;
 }
@@ -105,7 +105,7 @@ DatabaseProvider::DatabaseProvider_Impl::~DatabaseProvider_Impl()
 
 const Database* DatabaseProvider::DatabaseProvider_Impl::database( const std::string& id ) const
 {
-	for ( std::list< Container< db::DatabaseUnit >* >::const_iterator it = m_db.begin();
+	for ( std::list< ObjectContainer< db::DatabaseUnit >* >::const_iterator it = m_db.begin();
 							it != m_db.end(); it++ )	{
 		if ( (*it)->object().database().ID() == id )
 			return &(*it)->object().database();

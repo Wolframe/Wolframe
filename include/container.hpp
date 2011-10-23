@@ -41,10 +41,15 @@
 
 namespace _Wolframe	{
 
+class Container
+{
+};
+
 template < class Object >
-class Container	{
+class ObjectContainer : public Container
+{
 public:
-	virtual ~Container()				{}
+	virtual ~ObjectContainer()				{}
 
 	virtual const Object& object() const = 0;
 };
