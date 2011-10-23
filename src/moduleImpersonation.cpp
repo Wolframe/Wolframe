@@ -125,14 +125,14 @@ bool module::LoadModules( ModulesDirectory& modules )
 	modules.addConfig( new module::ConfigurationDescription< db::PostgreSQLconfig >
 			   ( "PostgreSQL database", "database", "PostgreSQL",
 			     &config::ConfigurationParser::parseBase<db::PostgreSQLconfig> ) );
-	modules.addContainer( new module::ContainerDescription< Container< db::DatabaseUnit > >
+	modules.addContainer( new module::ContainerDescription< ObjectContainer< db::DatabaseUnit > >
 			      ( "PostgreSQL", &db::PostgreSQLcontainer::create ));
 #endif
 #ifdef WITH_SQLITE3
 	modules.addConfig( new module::ConfigurationDescription< db::SQLiteConfig >
 			   ( "SQLite database", "database", "SQLite",
 			     &config::ConfigurationParser::parseBase<db::SQLiteConfig> ) );
-	modules.addContainer( new module::ContainerDescription< Container< db::DatabaseUnit > >
+	modules.addContainer( new module::ContainerDescription< ObjectContainer< db::DatabaseUnit > >
 			      ( "SQLite", &db::SQLiteContainer::create ));
 #endif
 	modules.addConfig( new module::ConfigurationDescription< EchoProcConfig >

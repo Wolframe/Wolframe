@@ -43,15 +43,18 @@ namespace _Wolframe	{
 
 class Container
 {
+public:
+	virtual ~Container()		{}
+//	virtual void dispose() = 0;
 };
 
-template < class Object >
+template < class T >
 class ObjectContainer : public Container
 {
 public:
-	virtual ~ObjectContainer()				{}
-
-	virtual const Object& object() const = 0;
+	virtual ~ObjectContainer()	{}
+//	virtual void dispose() = 0;
+	virtual const T& object() const = 0;
 };
 
 } // namespace _Wolframe
