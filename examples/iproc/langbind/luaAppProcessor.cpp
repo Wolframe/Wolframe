@@ -102,39 +102,41 @@ struct LuaObject :public ObjectType
 		return 0;
 	}
 
-	static void create( lua_State* ls, const luaL_Reg* mt=0, lua_CFunction indexf=0, lua_CFunction newindexf=0)
+	static void create( lua_State* ls, lua_CFunction indexf, lua_CFunction newindexf)
+	{
+		luaL_openlib( ls, metaTableName<ObjectType>(), empty_methodtable, 0);
+		luaL_newmetatable( ls, metaTableName<ObjectType>());
+		luaL_openlib( ls, 0, getMetamethods(), 0);
+
+		lua_pushliteral( ls, "__metatable");
+		lua_pushvalue( ls, -3);			//dup methods table
+		lua_rawset( ls, -3);			//hide metatable: metatable.__metatable = methods
+		lua_pushliteral( ls, "__index");
+		lua_pushcfunction( ls, indexf);
+		lua_rawset( ls, -3);
+		lua_pushliteral( ls, "__newindex");
+		lua_pushcfunction( ls, newindexf);
+		lua_rawset( ls, -3);
+
+		lua_pop( ls, 1);
+	}
+
+	static void create( lua_State* ls, const luaL_Reg* mt=0)
 	{
 		luaL_openlib( ls, metaTableName<ObjectType>(), mt?mt:empty_methodtable, 0);
 		luaL_newmetatable( ls, metaTableName<ObjectType>());
 		luaL_openlib( ls, 0, getMetamethods(), 0);
+
 		lua_pushliteral( ls, "__metatable");
 		lua_pushvalue( ls, -3);			//dup methods table
 		lua_rawset( ls, -3);			//hide metatable: metatable.__metatable = methods
+		lua_pushliteral( ls, "__index");
+		lua_pushvalue( ls, -3);		//dup methods table
+		lua_rawset( ls, -3);
+		lua_pushliteral( ls, "__newindex");
+		lua_pushvalue( ls, -3);		//dup methods table
+		lua_rawset( ls, -3);
 
-		if (indexf)
-		{
-			lua_pushliteral( ls, "__index");
-			lua_pushcfunction( ls, indexf);
-			lua_rawset( ls, -3);
-		}
-		else
-		{
-			lua_pushliteral( ls, "__index");
-			lua_pushvalue( ls, -3);		//dup methods table
-			lua_rawset( ls, -3);
-		}
-		if (newindexf)
-		{
-			lua_pushliteral( ls, "__newindex");
-			lua_pushcfunction( ls, newindexf);
-			lua_rawset( ls, -3);
-		}
-		else
-		{
-			lua_pushliteral( ls, "__newindex");
-			lua_pushvalue( ls, -3);		//dup methods table
-			lua_rawset( ls, -3);
-		}
 		lua_pop( ls, 1);
 	}
 
@@ -549,7 +551,7 @@ AppProcessor::AppProcessor( const lua::Configuration* config)
 	m_state = new State( *config);
 	LuaObject<Input>::createGlobal( m_state->ls, "input", m_input, input_methodtable);
 	LuaObject<Output>::createGlobal( m_state->ls, "output", m_output, output_methodtable);
-	LuaObject<Filter>::create( m_state->ls, filter_methodtable, &function__LuaObject__index<Filter>, &function__LuaObject__newindex<Filter>);
+	LuaObject<Filter>::create( m_state->ls, &function__LuaObject__index<Filter>, &function__LuaObject__newindex<Filter>);
 	LuaObject<InputFilterClosure>::create( m_state->ls);
 	create_global_functions( m_state->ls);
 }
