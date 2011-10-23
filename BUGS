@@ -1,3 +1,8 @@
 openSuse 11.4:
 counterTest: /usr/include/boost/thread/pthread/mutex.hpp:47:
 boost::mutex::~mutex(): Assertion `!pthread_mutex_destroy(&m)' failed.
+
+All platforms:
+luaApprocessor.cpp: LuaObject::create called with non empty metatable and __index function will ignore metatable.
+PF: Have to find out how why
+

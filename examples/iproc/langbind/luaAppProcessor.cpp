@@ -102,20 +102,39 @@ struct LuaObject :public ObjectType
 		return 0;
 	}
 
-	static void create( lua_State* ls, const luaL_Reg* mt=0)
+	static void create( lua_State* ls, const luaL_Reg* mt=0, lua_CFunction indexf=0, lua_CFunction newindexf=0)
 	{
 		luaL_openlib( ls, metaTableName<ObjectType>(), mt?mt:empty_methodtable, 0);
 		luaL_newmetatable( ls, metaTableName<ObjectType>());
 		luaL_openlib( ls, 0, getMetamethods(), 0);
 		lua_pushliteral( ls, "__metatable");
-		lua_pushvalue( ls, -3);		// dup methods table
-		lua_rawset( ls, -3);		//hide metatable: metatable.__metatable = methods
-		lua_pushliteral( ls, "__index");
-		lua_pushvalue( ls, -3);		// dup methods table
-		lua_rawset( ls, -3);		//hide metatable: metatable.__index = methods
-		lua_pushliteral( ls, "__newindex");
-		lua_pushvalue( ls, -3);		// dup methods table
-		lua_rawset( ls, -3);		//hide metatable: metatable.__newindex = methods
+		lua_pushvalue( ls, -3);			//dup methods table
+		lua_rawset( ls, -3);			//hide metatable: metatable.__metatable = methods
+
+		if (indexf)
+		{
+			lua_pushliteral( ls, "__index");
+			lua_pushcfunction( ls, indexf);
+			lua_rawset( ls, -3);
+		}
+		else
+		{
+			lua_pushliteral( ls, "__index");
+			lua_pushvalue( ls, -3);		//dup methods table
+			lua_rawset( ls, -3);
+		}
+		if (newindexf)
+		{
+			lua_pushliteral( ls, "__newindex");
+			lua_pushcfunction( ls, newindexf);
+			lua_rawset( ls, -3);
+		}
+		else
+		{
+			lua_pushliteral( ls, "__newindex");
+			lua_pushvalue( ls, -3);		//dup methods table
+			lua_rawset( ls, -3);
+		}
 		lua_pop( ls, 1);
 	}
 
@@ -236,7 +255,17 @@ static int function__LuaObject__newindex( lua_State* ls)
 	Object* obj = LuaObject<Object>::getSelf( ls, metaTableName<Object>(), "__newindex");
 	const char* key = lua_tostring( ls, 2);
 	if (!key) luaL_error( ls, "%s __newindex called with invalid argument 2 (key)", metaTableName<Object>());
-	const char* val = lua_tostring( ls, 3);
+	const char* val;
+	int tp = lua_type( ls, 3);
+
+	if (tp == LUA_TBOOLEAN)
+	{
+		val = lua_toboolean( ls, 3)?"true":"false";
+	}
+	else
+	{
+		lua_tostring( ls, 3);
+	}
 	if (!val) luaL_error( ls, "%s __newindex called with invalid argument 3 (value)", metaTableName<Object>());
 
 	if (!obj->setValue( key, val))
@@ -348,8 +377,6 @@ static int function_output_print( lua_State* ls)
 
 static const luaL_Reg filter_methodtable[ 3] =
 {
-	{"__index", &function__LuaObject__index<Filter>},
-	{"__newindex", &function__LuaObject__newindex<Filter>},
 	{0,0}
 };
 
@@ -522,7 +549,7 @@ AppProcessor::AppProcessor( const lua::Configuration* config)
 	m_state = new State( *config);
 	LuaObject<Input>::createGlobal( m_state->ls, "input", m_input, input_methodtable);
 	LuaObject<Output>::createGlobal( m_state->ls, "output", m_output, output_methodtable);
-	LuaObject<Filter>::create( m_state->ls, filter_methodtable);
+	LuaObject<Filter>::create( m_state->ls, filter_methodtable, &function__LuaObject__index<Filter>, &function__LuaObject__newindex<Filter>);
 	LuaObject<InputFilterClosure>::create( m_state->ls);
 	create_global_functions( m_state->ls);
 }

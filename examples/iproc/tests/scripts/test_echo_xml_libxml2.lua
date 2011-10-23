@@ -1,5 +1,6 @@
 function run( )
 	f = filter( "xml:libxml2")
+	f.empty = false
 
 	input:as( f)
 	output:as( f)

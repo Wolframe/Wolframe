@@ -253,6 +253,7 @@ struct InputFilterImpl :public BufferingInputFilter<Content>
 			{
 				return false;
 			}
+			return true;
 		}
 		return Parent::setValue( name, value);
 	}
