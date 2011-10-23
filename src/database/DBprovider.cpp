@@ -69,7 +69,7 @@ DatabaseProvider::DatabaseProvider_Impl::DatabaseProvider_Impl( const DBprovider
 									it != conf->m_dbConfig.end(); it++ )	{
 		module::ModuleContainerBase* container = modules->getContainer((*it)->objectName());
 		if ( container )	{
-			Container< db::DatabaseUnit >* db = container->createFunc( **it );
+			ObjectContainer< db::DatabaseUnit >* db = container->createFunc( **it );
 			m_db.push_back( db );
 		}
 		else	{
@@ -81,7 +81,7 @@ DatabaseProvider::DatabaseProvider_Impl::DatabaseProvider_Impl( const DBprovider
 
 DatabaseProvider::DatabaseProvider_Impl::~DatabaseProvider_Impl()
 {
-	for ( std::list< Container< db::DatabaseUnit >* >::const_iterator it = m_db.begin();
+	for ( std::list< ObjectContainer< db::DatabaseUnit >* >::const_iterator it = m_db.begin();
 							it != m_db.end(); it++ )
 		delete *it;
 }
@@ -89,7 +89,7 @@ DatabaseProvider::DatabaseProvider_Impl::~DatabaseProvider_Impl()
 
 const Database* DatabaseProvider::DatabaseProvider_Impl::database( const std::string& id ) const
 {
-	for ( std::list< Container< db::DatabaseUnit >* >::const_iterator it = m_db.begin();
+	for ( std::list< ObjectContainer< db::DatabaseUnit >* >::const_iterator it = m_db.begin();
 							it != m_db.end(); it++ )	{
 		if ( (*it)->object().database().ID() == id )
 			return &(*it)->object().database();

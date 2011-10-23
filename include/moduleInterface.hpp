@@ -96,13 +96,13 @@ public:
 
 
 template < class T, class Tconf, class Tbase >
-class ModuleContainer : public Container< Tbase >
+class ModuleContainer : public ObjectContainer< Tbase >
 {
 public:
 	virtual ~ModuleContainer()		{}
 	virtual const char* typeName() const = 0;
 
-	static Container< Tbase >* create( const config::ObjectConfiguration& conf )	{
+	static ObjectContainer< Tbase >* create( const config::ObjectConfiguration& conf )	{
 		return new T( dynamic_cast< const Tconf& >( conf ));
 	}
 };

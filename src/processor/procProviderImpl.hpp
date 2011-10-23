@@ -81,7 +81,7 @@ public:
 private:
 	std::string					m_dbLabel;
 	const db::Database*				m_db;
-	std::list< Container< ProcessorUnit >* >	m_proc;
+	std::list< ObjectContainer< ProcessorUnit >* >	m_proc;
 };
 
 }} // namespace _Wolframe::proc
