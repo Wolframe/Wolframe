@@ -584,6 +584,7 @@ struct InputFilterImpl :public protocol::InputFilter, public FilterBase<IOCharse
 			{
 				return false;
 			}
+			return true;
 		}
 		if (std::strcmp( name, "tokenize") == 0)
 		{
@@ -601,6 +602,7 @@ struct InputFilterImpl :public protocol::InputFilter, public FilterBase<IOCharse
 			{
 				return false;
 			}
+			return true;
 		}
 		return Parent::setValue( name, value);
 	}
@@ -726,7 +728,7 @@ public:
 		,m_doTokenize(false)
 		{}
 	InputFilter( const InputFilter& o)
-		:protocol::InputFilter(o),m_bufsize(o.m_bufsize),m_headerParsed(o.m_headerParsed),m_header(o.m_header),m_encoding(o.m_encoding){}
+		:protocol::InputFilter(o),m_bufsize(o.m_bufsize),m_headerParsed(o.m_headerParsed),m_header(o.m_header),m_encoding(o.m_encoding),m_withEmpty(o.m_withEmpty),m_doTokenize(o.m_doTokenize){}
 
 	virtual ~InputFilter(){}
 
@@ -772,6 +774,7 @@ public:
 			{
 				return false;
 			}
+			return true;
 		}
 		if (std::strcmp( name, "tokenize") == 0)
 		{
@@ -787,6 +790,7 @@ public:
 			{
 				return false;
 			}
+			return true;
 		}
 		return Parent::setValue( name, value);
 	}
