@@ -1,6 +1,7 @@
 function run( )
 	-- parsing and echoing the header
 	f = filter( "XML:textwolf")
+	f.empty = false
 
 	-- parsing and echoing the content
 	input:as( f)

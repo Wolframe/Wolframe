@@ -1,3 +1,4 @@
 openSuse 11.4:
 counterTest: /usr/include/boost/thread/pthread/mutex.hpp:47:
 boost::mutex::~mutex(): Assertion `!pthread_mutex_destroy(&m)' failed.
+
