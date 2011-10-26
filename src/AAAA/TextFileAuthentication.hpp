@@ -67,14 +67,13 @@ private:
 };
 
 
-class TxtFileAuthContainer : public module::ModuleContainer< TxtFileAuthContainer, TextFileAuthConfig,
-		AuthenticationUnit >
+class TxtFileAuthContainer : public ObjectContainer< AuthenticationUnit >
 {
 public:
 	TxtFileAuthContainer( const TextFileAuthConfig& conf );
 	~TxtFileAuthContainer()					{}
 
-	virtual const char* typeName() const			{ return "TextFileAuth"; }
+	virtual const char* objectName() const			{ return "TextFileAuth"; }
 	virtual const AuthenticationUnit& object() const	{ return m_auth; }
 private:
 	std::string		m_file;

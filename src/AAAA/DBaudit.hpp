@@ -73,14 +73,13 @@ private:
 };
 
 
-class DBauditContainer : public module::ModuleContainer< DBauditContainer, DBauditConfig,
-		AuditUnit >
+class DBauditContainer : public ObjectContainer< AuditUnit >
 {
 public:
 	DBauditContainer( const DBauditConfig& conf );
 	~DBauditContainer();
 
-	const char* typeName() const			{ return "DatabaseAudit"; }
+	const char* objectName() const			{ return "DatabaseAudit"; }
 
 	bool resolveDB( const db::DatabaseProvider& db );
 	virtual const AuditUnit& object() const		{ return m_audit; }

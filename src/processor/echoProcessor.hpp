@@ -81,14 +81,13 @@ private:
 };
 
 
-class EchoProcContainer : public module::ModuleContainer< EchoProcContainer, EchoProcConfig,
-		proc::ProcessorUnit >
+class EchoProcContainer : public ObjectContainer< proc::ProcessorUnit >
 {
 public:
 	EchoProcContainer( const EchoProcConfig& conf );
 	~EchoProcContainer()					{}
 
-	virtual const char* typeName() const			{ return "EchoProcessor"; }
+	virtual const char* objectName() const			{ return "EchoProcessor"; }
 	virtual const proc::ProcessorUnit& object() const	{ return m_proc; }
 private:
 	const EchoProcessorUnit	m_proc;

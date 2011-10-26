@@ -68,15 +68,14 @@ private:
 };
 
 
-class FileAuditContainer : public module::ModuleContainer< FileAuditContainer, FileAuditConfig,
-		AuditUnit >
+class FileAuditContainer : public ObjectContainer< AuditUnit >
 {
 public:
 	FileAuditContainer( const FileAuditConfig& conf );
 	~FileAuditContainer()				{}
 
 	virtual const AuditUnit& object() const		{ return m_audit; }
-	const char* typeName() const			{ return "FileAudit"; }
+	const char* objectName() const			{ return "FileAudit"; }
 private:
 	std::string	m_file;
 	FileAuditor	m_audit;

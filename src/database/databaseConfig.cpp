@@ -66,7 +66,7 @@ bool ConfigurationParser::parse( db::DBproviderConfig& cfg,
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( modules )	{
-			module::ConfigDescriptionBase* cfgDesc = modules->getConfig( "database", L1it->first );
+			module::ModuleConfiguration* cfgDesc = modules->getConfig( "database", L1it->first );
 			if ( cfgDesc )	{
 				config::ObjectConfiguration* conf = cfgDesc->create( cfg.logPrefix().c_str());
 				if ( cfgDesc->parseFunc( *conf, L1it->second, L1it->first, modules ))

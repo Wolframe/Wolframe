@@ -49,14 +49,14 @@
 using namespace _Wolframe;
 
 static const size_t noAuthModules = 2;
-static module::ContainerDescription< ObjectContainer< AAAA::AuthenticationUnit > >
-authModules[ noAuthModules ] = { module::ContainerDescription< ObjectContainer< AAAA::AuthenticationUnit > >( "DatabaseAuth", &AAAA::DBauthContainer::create ),
-				 module::ContainerDescription< ObjectContainer< AAAA::AuthenticationUnit > >( "TextFileAuth", &AAAA::TxtFileAuthContainer::create ) };
+static module::ContainerDescription< ObjectContainer< AAAA::AuthenticationUnit >, config::ObjectConfiguration >
+authModules[ noAuthModules ] = { module::ContainerDescription< ObjectContainer< AAAA::AuthenticationUnit >, config::ObjectConfiguration >( "DatabaseAuth" ),
+				 module::ContainerDescription< ObjectContainer< AAAA::AuthenticationUnit >, config::ObjectConfiguration >( "TextFileAuth" ) };
 
 static const size_t noAuditModules = 2;
-static module::ContainerDescription< ObjectContainer< AAAA::AuditUnit > >
-auditModules[ noAuditModules ] = { module::ContainerDescription< ObjectContainer< AAAA::AuditUnit > >( "DatabaseAudit", &AAAA::DBauditContainer::create ),
-				   module::ContainerDescription< ObjectContainer< AAAA::AuditUnit > >( "FileAudit", &AAAA::FileAuditContainer::create ) };
+static module::ContainerDescription< ObjectContainer< AAAA::AuditUnit >, config::ObjectConfiguration >
+auditModules[ noAuditModules ] = { module::ContainerDescription< ObjectContainer< AAAA::AuditUnit >, config::ObjectConfiguration >( "DatabaseAudit" ),
+				   module::ContainerDescription< ObjectContainer< AAAA::AuditUnit >, config::ObjectConfiguration >( "FileAudit" ) };
 /****  End impersonating the module loader  ***********************************************************/
 
 namespace _Wolframe {
@@ -104,7 +104,7 @@ bool AAAAprovider::AAAAprovider_Impl::resolveDB( const db::DatabaseProvider& db 
 
 /***********************************************************************************/
 AuthenticationGroup::AuthenticationGroup( const std::list< config::ObjectConfiguration* >& confs,
-					  module::ContainerDescription< ObjectContainer< AuthenticationUnit > >* description,
+					  module::ContainerDescription< ObjectContainer< AuthenticationUnit >, config::ObjectConfiguration >* description,
 					  size_t descrSize )
 {
 	for ( std::list<config::ObjectConfiguration*>::const_iterator it = confs.begin();
@@ -113,7 +113,7 @@ AuthenticationGroup::AuthenticationGroup( const std::list< config::ObjectConfigu
 		size_t i;
 		for ( i = 0; i < descrSize; i++ )	{
 			if ( boost::algorithm::iequals( description[i].name, authType ))	{
-				ObjectContainer< AuthenticationUnit >* container = authModules[i].createFunc( **it );
+				ObjectContainer< AuthenticationUnit >* container = dynamic_cast< ObjectContainer< AuthenticationUnit >* >( authModules[i].create( **it ));
 				m_authenticators.push_back( container );
 				break;
 			}
@@ -144,7 +144,7 @@ bool AuthenticationGroup::resolveDB( const db::DatabaseProvider& db )
 
 /***********************************************************************************/
 AuditGroup::AuditGroup( const std::list< config::ObjectConfiguration* >& confs,
-			module::ContainerDescription< ObjectContainer< AAAA::AuditUnit > >* description,
+			module::ContainerDescription< ObjectContainer< AAAA::AuditUnit >, config::ObjectConfiguration >* description,
 			size_t descrSize )
 {
 	for ( std::list<config::ObjectConfiguration*>::const_iterator it = confs.begin();
@@ -153,7 +153,7 @@ AuditGroup::AuditGroup( const std::list< config::ObjectConfiguration* >& confs,
 		size_t i;
 		for ( i = 0; i < descrSize; i++ )	{
 			if ( boost::algorithm::iequals( description[i].name, auditType ))	{
-				ObjectContainer< AAAA::AuditUnit >* container = auditModules[i].createFunc( **it );
+				ObjectContainer< AAAA::AuditUnit >* container = dynamic_cast< ObjectContainer< AAAA::AuditUnit >* >( auditModules[i].create( **it ));
 				m_auditors.push_back( container );
 				break;
 			}

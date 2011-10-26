@@ -65,7 +65,7 @@ bool ConfigurationParser::parse( AAAA::AAAAconfiguration& cfg,
 						retVal = false;
 				}
 				else if ( modules )	{
-					module::ConfigDescriptionBase* cfgDesc = modules->getConfig( "Authentication", L2it->first );
+					module::ModuleConfiguration* cfgDesc = modules->getConfig( "Authentication", L2it->first );
 					if ( cfgDesc )	{
 						config::ObjectConfiguration* conf = cfgDesc->create( cfg.logPrefix().c_str());
 						if ( cfgDesc->parseFunc( *conf, L2it->second, L2it->first, modules ))
@@ -93,7 +93,7 @@ bool ConfigurationParser::parse( AAAA::AAAAconfiguration& cfg,
 						retVal = false;
 				}
 				else if ( modules )	{
-					module::ConfigDescriptionBase* cfgDesc = modules->getConfig( "Audit", L2it->first );
+					module::ModuleConfiguration* cfgDesc = modules->getConfig( "Audit", L2it->first );
 					if ( cfgDesc )	{
 						config::ObjectConfiguration* conf = cfgDesc->create( cfg.logPrefix().c_str());
 						if ( cfgDesc->parseFunc( *conf, L2it->second, L2it->first, modules ))
