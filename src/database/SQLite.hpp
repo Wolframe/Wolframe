@@ -101,15 +101,14 @@ private:
 };
 
 
-class SQLiteContainer : public module::ModuleContainer< SQLiteContainer, SQLiteConfig,
-		db::DatabaseUnit >
+class SQLiteContainer : public ObjectContainer< db::DatabaseUnit >
 {
 public:
 	SQLiteContainer( const SQLiteConfig& conf ) : m_unit( conf )	{}
 	~SQLiteContainer()				{}
 
 	const std::string& ID() const			{ return m_unit.database().ID(); }
-	virtual const char* typeName() const		{ return m_unit.database().typeName(); }
+	virtual const char* objectName() const		{ return m_unit.database().typeName(); }
 	virtual const DatabaseUnit& object() const	{ return m_unit; }
 private:
 	const SQLiteUnit	m_unit;

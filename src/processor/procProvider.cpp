@@ -57,8 +57,8 @@
 using namespace _Wolframe;
 
 static const size_t noProcModules = 1;
-static module::ContainerDescription< ObjectContainer< proc::ProcessorUnit > >
-procModules[ noProcModules ] = { module::ContainerDescription< ObjectContainer< proc::ProcessorUnit > >( "EchoProcessor", &EchoProcContainer::create ) };
+static module::ContainerDescription< EchoProcContainer, EchoProcConfig >
+procModules[ noProcModules ] = { module::ContainerDescription< EchoProcContainer, EchoProcConfig >( "EchoProcessor" ) };
 /****  End impersonating the module loader  **************************************************/
 
 namespace _Wolframe {
@@ -80,7 +80,7 @@ bool ConfigurationParser::parse( proc::ProcProviderConfig& cfg,
 		}
 		else	{
 			if ( modules )	{
-				module::ConfigDescriptionBase* cfgDesc = modules->getConfig( "processor", L1it->first );
+				module::ModuleConfiguration* cfgDesc = modules->getConfig( "processor", L1it->first );
 				if ( cfgDesc )	{
 					config::ObjectConfiguration* conf = cfgDesc->create( cfg.logPrefix().c_str());
 					if ( cfgDesc->parseFunc( *conf, L1it->second, L1it->first, modules ))
@@ -187,7 +187,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 		size_t i;
 		for ( i = 0; i < noProcModules; i++ )	{
 			if ( boost::algorithm::iequals( procModules[i].name, procType ))	{
-				ObjectContainer< ProcessorUnit >* container = procModules[i].createFunc( **it );
+				ObjectContainer< ProcessorUnit >* container = dynamic_cast< ObjectContainer< ProcessorUnit >* >( procModules[i].create( **it ));
 				m_proc.push_back( container );
 				break;
 			}

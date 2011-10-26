@@ -45,7 +45,7 @@ class Container
 {
 public:
 	virtual ~Container()		{}
-//	virtual void dispose() = 0;
+	virtual void dispose() = 0;
 };
 
 template < class T >
@@ -53,7 +53,7 @@ class ObjectContainer : public Container
 {
 public:
 	virtual ~ObjectContainer()	{}
-//	virtual void dispose() = 0;
+	virtual void dispose()		{ delete this; }
 	virtual const T& object() const = 0;
 };
 

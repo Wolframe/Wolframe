@@ -74,14 +74,13 @@ private:
 };
 
 
-class DBauthContainer : public module::ModuleContainer< DBauthContainer, DatabaseAuthConfig,
-		AuthenticationUnit >
+class DBauthContainer : public ObjectContainer< AuthenticationUnit >
 {
 public:
 	DBauthContainer( const DatabaseAuthConfig& conf );
 	~DBauthContainer();
 
-	virtual const char* typeName() const			{ return "DatabaseAuth"; }
+	virtual const char* objectName() const			{ return "DatabaseAuth"; }
 	virtual const AuthenticationUnit& object() const	{ return m_auth; }
 
 	bool resolveDB( const db::DatabaseProvider& db );

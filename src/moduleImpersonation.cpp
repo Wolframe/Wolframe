@@ -41,9 +41,9 @@
 namespace _Wolframe {
 namespace module {
 
-bool ModulesDirectory::addConfig( ConfigDescriptionBase* description )
+bool ModulesDirectory::addConfig( ModuleConfiguration* description )
 {
-	for ( std::list< ConfigDescriptionBase* >::const_iterator it = m_config.begin();
+	for ( std::list< ModuleConfiguration* >::const_iterator it = m_config.begin();
 								it != m_config.end(); it++ )	{
 		if ( boost::algorithm::iequals( (*it)->section, description->section ) &&
 				boost::algorithm::iequals( (*it)->keyword, description->keyword ))	{
@@ -58,10 +58,10 @@ bool ModulesDirectory::addConfig( ConfigDescriptionBase* description )
 	return true;
 }
 
-ConfigDescriptionBase* ModulesDirectory::getConfig( const std::string& section,
+ModuleConfiguration* ModulesDirectory::getConfig( const std::string& section,
 						  const std::string& keyword ) const
 {
-	for ( std::list< ConfigDescriptionBase* >::const_iterator it = m_config.begin();
+	for ( std::list< ModuleConfiguration* >::const_iterator it = m_config.begin();
 								it != m_config.end(); it++ )	{
 		if ( boost::algorithm::iequals( (*it)->keyword, keyword ) &&
 				boost::algorithm::iequals( (*it)->section, section ))
