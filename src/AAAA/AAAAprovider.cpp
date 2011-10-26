@@ -49,14 +49,14 @@
 using namespace _Wolframe;
 
 static const size_t noAuthModules = 2;
-static module::ContainerDescription< ObjectContainer< AAAA::AuthenticationUnit >, config::ObjectConfiguration >
-authModules[ noAuthModules ] = { module::ContainerDescription< ObjectContainer< AAAA::AuthenticationUnit >, config::ObjectConfiguration >( "DatabaseAuth" ),
-				 module::ContainerDescription< ObjectContainer< AAAA::AuthenticationUnit >, config::ObjectConfiguration >( "TextFileAuth" ) };
+static module::ModuleContainer
+authModules[ noAuthModules ] = { module::ContainerDescription< AAAA::DBauthContainer, AAAA::DatabaseAuthConfig >( "DatabaseAuth" ),
+				 module::ContainerDescription< AAAA::TxtFileAuthContainer, AAAA::TextFileAuthConfig >( "TextFileAuth" ) };
 
 static const size_t noAuditModules = 2;
 static module::ContainerDescription< ObjectContainer< AAAA::AuditUnit >, config::ObjectConfiguration >
-auditModules[ noAuditModules ] = { module::ContainerDescription< ObjectContainer< AAAA::AuditUnit >, config::ObjectConfiguration >( "DatabaseAudit" ),
-				   module::ContainerDescription< ObjectContainer< AAAA::AuditUnit >, config::ObjectConfiguration >( "FileAudit" ) };
+auditModules[ noAuditModules ] = { module::ContainerDescription< AAAA::DBauditContainer, AAAA::DBauditConfig >( "DatabaseAudit" ),
+				   module::ContainerDescription< AAAA::FileAuditContainer, AAAA::FileAuditConfig >( "FileAudit" ) };
 /****  End impersonating the module loader  ***********************************************************/
 
 namespace _Wolframe {
@@ -104,7 +104,7 @@ bool AAAAprovider::AAAAprovider_Impl::resolveDB( const db::DatabaseProvider& db 
 
 /***********************************************************************************/
 AuthenticationGroup::AuthenticationGroup( const std::list< config::ObjectConfiguration* >& confs,
-					  module::ContainerDescription< ObjectContainer< AuthenticationUnit >, config::ObjectConfiguration >* description,
+					  module::ModuleContainer* description,
 					  size_t descrSize )
 {
 	for ( std::list<config::ObjectConfiguration*>::const_iterator it = confs.begin();
@@ -144,7 +144,7 @@ bool AuthenticationGroup::resolveDB( const db::DatabaseProvider& db )
 
 /***********************************************************************************/
 AuditGroup::AuditGroup( const std::list< config::ObjectConfiguration* >& confs,
-			module::ContainerDescription< ObjectContainer< AAAA::AuditUnit >, config::ObjectConfiguration >* description,
+			module::ModuleContainer* description,
 			size_t descrSize )
 {
 	for ( std::list<config::ObjectConfiguration*>::const_iterator it = confs.begin();
