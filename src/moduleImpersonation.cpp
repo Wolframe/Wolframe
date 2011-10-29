@@ -35,7 +35,7 @@
 // It's just a hardcoded possible result of the module loader
 
 #include <boost/algorithm/string.hpp>
-#include "logger.hpp"
+#include "logger-v1.hpp"
 #include "moduleInterface.hpp"
 
 namespace _Wolframe {

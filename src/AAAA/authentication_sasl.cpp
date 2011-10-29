@@ -58,7 +58,7 @@
 
 #include "sasl/sasl.h"
 
-#include "logger.hpp"
+#include "logger-v1.hpp"
 
 namespace _Wolframe {
 namespace AAAA {

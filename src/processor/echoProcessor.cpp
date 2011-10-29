@@ -34,7 +34,7 @@
 // echo processor implementation
 //
 
-#include "logger.hpp"
+#include "logger-v1.hpp"
 #include "echoProcessor.hpp"
 
 #include "config/configurationParser.hpp"

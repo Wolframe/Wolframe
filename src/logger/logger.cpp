@@ -36,7 +36,7 @@
 /// \brief implementation of top-level logger functionality
 ///
 
-#include "logger.hpp"
+#include "logger-v1.hpp"
 
 namespace _Wolframe {
 namespace log {

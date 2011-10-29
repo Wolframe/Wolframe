@@ -34,7 +34,7 @@
 //
 //
 
-#include "logger.hpp"
+#include "logger-v1.hpp"
 #include "config/valueParser.hpp"
 #include "config/configurationParser.hpp"
 

@@ -47,7 +47,7 @@
 #include <cassert>
 
 #include "connectionHandler.hpp"
-#include "logger.hpp"
+#include "logger-v1.hpp"
 
 namespace _Wolframe {
 namespace net {

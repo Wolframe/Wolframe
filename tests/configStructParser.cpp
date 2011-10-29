@@ -41,7 +41,7 @@ Project Wolframe.
 #endif
 #include <iostream>
 #include <boost/property_tree/info_parser.hpp>
-#include "logger.hpp"
+#include "logger-v1.hpp"
 
 using namespace _Wolframe;
 using namespace config;

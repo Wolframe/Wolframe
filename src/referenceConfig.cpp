@@ -38,7 +38,7 @@
 #include "config/configurationParser.hpp"
 #include "config/reference.hpp"
 
-#include "logger.hpp"
+#include "logger-v1.hpp"
 #include <ostream>
 
 namespace _Wolframe {

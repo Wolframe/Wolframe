@@ -31,7 +31,7 @@
 
 ************************************************************************/
 #include "luaDebug.hpp"
-#include "logger.hpp"
+#include "logger-v1.hpp"
 #include <boost/lexical_cast.hpp>
 
 extern "C" {

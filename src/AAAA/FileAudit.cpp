@@ -35,7 +35,7 @@
 //
 #include <stdexcept>
 
-#include "logger.hpp"
+#include "logger-v1.hpp"
 #include "FileAudit.hpp"
 
 #define BOOST_FILESYSTEM_VERSION 3

@@ -37,7 +37,7 @@
 #include "appConfig.hpp"
 #include "commandLine.hpp"
 #include "standardConfigs.hpp"		// fuck-up - idiotic interaction with ...
-#include "logger.hpp"
+#include "logger-v1.hpp"
 
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>

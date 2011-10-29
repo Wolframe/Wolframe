@@ -37,7 +37,7 @@
 #include <string>
 #include <ostream>
 
-#include "logger.hpp"
+#include "logger-v1.hpp"
 #include "TextFileAuthentication.hpp"
 
 #define BOOST_FILESYSTEM_VERSION 3

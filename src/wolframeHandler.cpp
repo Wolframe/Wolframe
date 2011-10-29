@@ -35,7 +35,7 @@
 //
 
 #include "wolframeHandler.hpp"
-#include "logger.hpp"
+#include "logger-v1.hpp"
 #include "standardConfigs.hpp"
 #include "handlerConfig.hpp"
 

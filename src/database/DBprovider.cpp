@@ -36,7 +36,7 @@
 
 #include "DBproviderImpl.hpp"
 
-#include "logger.hpp"
+#include "logger-v1.hpp"
 
 #include <boost/algorithm/string.hpp>
 
