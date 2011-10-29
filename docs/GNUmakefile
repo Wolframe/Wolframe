@@ -23,18 +23,30 @@ XSLT_PDF = \
 	$(XSLTPROC) --nonet --xinclude \
 	output-pdf.xsl
 
+XSLT_EPUB = \
+	$(XSLTPROC) --nonet --xinclude \
+	--stringparam draft.mode yes \
+	output-epub.xsl
+
 local_all:
 
-doc: doc-man doc-doxygen doc-html doc-pdf
+doc: doc-man doc-doxygen doc-html doc-pdf doc-epub
 
 doc-man: wolframed.8 wolframe.conf.5
 
 doc-doxygen:
 	cd $(TOPDIR); doxygen docs/doxygen.conf
-	
+
 doc-html: WolfBook.html
 
 doc-pdf: WolfBook.pdf
+
+doc-epub: WolfBook.epub
+	echo "application/epub+zip" > mimetype
+	zip -0Xq  WolfBook.epub mimetype
+	zip -Xr9D WolfBook.epub META-INF OEBPS
+	rm -rf mimetype META-INF OEBPS
+
 
 %.pdf: %.fop
 	fop -fo $< -pdf $@
@@ -44,6 +56,9 @@ doc-pdf: WolfBook.pdf
 
 %.html: %.xml
 	$(XSLT_HTML) $< >$@
+
+%.epub: %.xml
+	$(XSLT_EPUB) $<
 
 wolframed.8: wolframed-man.xml
 	$(XSLT_MAN) $<

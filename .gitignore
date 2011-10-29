@@ -66,6 +66,7 @@ lua/src/lua
 lua/src/luac
 docs/WolfBook.html
 docs/WolfBook.pdf
+docs/WolfBook.epub
 docs/doxygen/
 clients/wt/wtclient
 src/primary.db
