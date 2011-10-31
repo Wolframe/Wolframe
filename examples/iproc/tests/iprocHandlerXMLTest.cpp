@@ -36,7 +36,6 @@
 #include "connectionHandler.hpp"
 #include "langbind/luaConfig.hpp"
 #include "handlerConfig.hpp"
-#include "config/configurationParser.hpp"
 #include "testHandlerTemplates.hpp"
 #include "testUtils.hpp"
 #include <iostream>

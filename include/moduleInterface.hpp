@@ -51,17 +51,9 @@ struct ConfigDescriptionBase
 	const char* title;
 	const char* section;
 	const char* keyword;
-	bool (*parseFunc)( config::ConfigurationBase&,
-			   const boost::property_tree::ptree&, const std::string& node,
-			   const module::ModulesDirectory* modules );
 public:
-	ConfigDescriptionBase( const char* Title, const char* Section, const char* Keyword,
-			       bool (*pf)( config::ConfigurationBase& configuration,
-					   const boost::property_tree::ptree& pt,
-					   const std::string& node,
-					   const module::ModulesDirectory* modules ) )
-		: title( Title ), section( Section), keyword( Keyword ),
-		  parseFunc( pf )		{}
+	ConfigDescriptionBase( const char* Title, const char* Section, const char* Keyword )
+		: title( Title ), section( Section), keyword( Keyword )	{}
 
 	virtual ~ConfigDescriptionBase()	{}
 
@@ -72,12 +64,8 @@ template< class T >
 struct ConfigurationDescription : public ConfigDescriptionBase
 {
 public:
-	ConfigurationDescription( const char* Title, const char* Section, const char* Keyword,
-				  bool (*pf)( config::ConfigurationBase& configuration,
-					      const boost::property_tree::ptree& pt,
-					      const std::string& node,
-					      const module::ModulesDirectory* modules ) )
-		: ConfigDescriptionBase( Title, Section, Keyword, pf )
+	ConfigurationDescription( const char* Title, const char* Section, const char* Keyword )
+		: ConfigDescriptionBase( Title, Section, Keyword )
 	{}
 
 	virtual ~ConfigurationDescription()	{}

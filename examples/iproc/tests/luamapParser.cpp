@@ -38,7 +38,6 @@ Project Wolframe.
 #include "langbind/appObjects.hpp"
 #include "langbind/luaAppProcessor.hpp"
 #include "logger-v1.hpp"
-#include "config/configurationParser.hpp"
 #include "tests/testUtils.hpp"
 extern "C"
 {

@@ -36,7 +36,7 @@
 
 #include "standardConfigs.hpp"
 #include "config/valueParser.hpp"
-#include "config/configurationParser.hpp"
+#include "config/ConfigurationTree.hpp"
 #include "miscUtils.hpp"
 #include "logger-v1.hpp"
 
@@ -51,14 +51,12 @@
 
 
 namespace _Wolframe {
-namespace config {
+namespace log {
 
 static const unsigned short DEFAULT_NOF_THREADS = 4;
 
 /// Parse the configuration
-template<>
-bool ConfigurationParser::parse( log::LoggerConfiguration& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& /*node*/,
+bool LoggerConfiguration::parse( const config::ConfigurationTree& pt, const std::string& /*node*/,
 				 const module::ModulesDirectory* /*modules*/ )
 {
 	bool retVal = true;
@@ -66,12 +64,12 @@ bool ConfigurationParser::parse( log::LoggerConfiguration& cfg,
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		// stderr logging
 		if ( boost::algorithm::iequals( L1it->first, "stderr" ))	{
-			if ( cfg.logToStderr )	{
-				LOG_ERROR << cfg.logPrefix() << "stderr channel already defined";
+			if ( logToStderr )	{
+				LOG_ERROR << logPrefix() << "stderr channel already defined";
 				return false;
 			}
-			cfg.logToStderr = true;
-			cfg.stderrLogLevel = log::LogLevel::LOGLEVEL_UNDEFINED;
+			logToStderr = true;
+			stderrLogLevel = log::LogLevel::LOGLEVEL_UNDEFINED;
 			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
 									L2it != L1it->second.end(); L2it++ )	{
 				if ( boost::algorithm::iequals( L2it->first, "level" ))	{
@@ -79,30 +77,30 @@ bool ConfigurationParser::parse( log::LoggerConfiguration& cfg,
 					boost::algorithm::trim( s );
 					log::LogLevel::Level lvl = log::LogLevel::strToLogLevel( s );
 					if ( lvl ==  log::LogLevel::LOGLEVEL_UNDEFINED )	{
-						LOG_ERROR << cfg.logPrefix() << "unknown log level: "
+						LOG_ERROR << logPrefix() << "unknown log level: "
 							  << L2it->second.get_value<std::string>();
 						return false;
 					}
-					if ( cfg.stderrLogLevel != log::LogLevel::LOGLEVEL_UNDEFINED )	{
-						LOG_ERROR << cfg.logPrefix() << "stderr log level already defined. Second value: "
+					if ( stderrLogLevel != log::LogLevel::LOGLEVEL_UNDEFINED )	{
+						LOG_ERROR << logPrefix() << "stderr log level already defined. Second value: "
 							  << L2it->second.get_value<std::string>();
 						return false;
 					}
-					cfg.stderrLogLevel = lvl;
+					stderrLogLevel = lvl;
 				}
 				else
-					LOG_WARNING << cfg.logPrefix() << "stderr: unknown configuration option: '"
+					LOG_WARNING << logPrefix() << "stderr: unknown configuration option: '"
 						    << L2it->first << "'";
 			}
 		}
 		// logfile
 		else if ( boost::algorithm::iequals( L1it->first, "logFile" ))	{
-			if ( cfg.logToFile )	{
-				LOG_ERROR << cfg.logPrefix() << "logfile channel already defined";
+			if ( logToFile )	{
+				LOG_ERROR << logPrefix() << "logfile channel already defined";
 				return false;
 			}
-			cfg.logToFile = true;
-			cfg.logFileLogLevel = log::LogLevel::LOGLEVEL_UNDEFINED;
+			logToFile = true;
+			logFileLogLevel = log::LogLevel::LOGLEVEL_UNDEFINED;
 			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
 			L2it != L1it->second.end(); L2it++ )	{
 				if ( boost::algorithm::iequals( L2it->first, "level" ))	{
@@ -110,40 +108,40 @@ bool ConfigurationParser::parse( log::LoggerConfiguration& cfg,
 					boost::algorithm::trim( s );
 					log::LogLevel::Level lvl = log::LogLevel::strToLogLevel( s );
 					if ( lvl == log::LogLevel::LOGLEVEL_UNDEFINED )	{
-						LOG_ERROR << cfg.logPrefix() << "logfile: unknown log level: "
+						LOG_ERROR << logPrefix() << "logfile: unknown log level: "
 							  << L2it->second.get_value<std::string>();
 						return false;
 					}
-					if ( cfg.logFileLogLevel != log::LogLevel::LOGLEVEL_UNDEFINED )	{
-						LOG_ERROR << cfg.logPrefix() << "logfile: log level already defined. Second value: "
+					if ( logFileLogLevel != log::LogLevel::LOGLEVEL_UNDEFINED )	{
+						LOG_ERROR << logPrefix() << "logfile: log level already defined. Second value: "
 							  << L2it->second.get_value<std::string>();
 						return false;
 					}
-					cfg.logFileLogLevel = lvl;
+					logFileLogLevel = lvl;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "filename" ))	{
-					bool isDefined = ( ! cfg.logFile.empty());
-					if ( ! config::Parser::getValue( cfg.logPrefix().c_str(), *L2it, cfg.logFile, &isDefined ))
+					bool isDefined = ( ! logFile.empty());
+					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, logFile, &isDefined ))
 						retVal = false;
 					else	{
-						if ( ! boost::filesystem::path( cfg.logFile ).is_absolute() )
-							LOG_WARNING << cfg.logPrefix() << "log file is not absolute: '"
-								    << cfg.logFile <<"'";
+						if ( ! boost::filesystem::path( logFile ).is_absolute() )
+							LOG_WARNING << logPrefix() << "log file is not absolute: '"
+								    << logFile <<"'";
 					}
 				}
 				else
-					LOG_WARNING << cfg.logPrefix() << "logfile: unknown configuration option: '"
+					LOG_WARNING << logPrefix() << "logfile: unknown configuration option: '"
 						    << L2it->first << "'";
 			}
 		}
 		// syslog
 		else if ( boost::algorithm::iequals( L1it->first, "syslog" ))	{
-			if ( cfg.logToSyslog )	{
-				LOG_ERROR << cfg.logPrefix() << "syslog channel already defined";
+			if ( logToSyslog )	{
+				LOG_ERROR << logPrefix() << "syslog channel already defined";
 				return false;
 			}
-			cfg.logToSyslog = true;
-			cfg.syslogLogLevel = log::LogLevel::LOGLEVEL_UNDEFINED;
+			logToSyslog = true;
+			syslogLogLevel = log::LogLevel::LOGLEVEL_UNDEFINED;
 			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
 			L2it != L1it->second.end(); L2it++ )	{
 				if ( boost::algorithm::iequals( L2it->first, "level" ))	{
@@ -151,57 +149,57 @@ bool ConfigurationParser::parse( log::LoggerConfiguration& cfg,
 					boost::algorithm::trim( s );
 					log::LogLevel::Level lvl = log::LogLevel::strToLogLevel( s );
 					if ( lvl == log::LogLevel::LOGLEVEL_UNDEFINED )	{
-						LOG_ERROR << cfg.logPrefix() << "syslog: unknown log level: "
+						LOG_ERROR << logPrefix() << "syslog: unknown log level: "
 							  << L2it->second.get_value<std::string>();
 						return false;
 					}
-					if ( cfg.syslogLogLevel != log::LogLevel::LOGLEVEL_UNDEFINED )	{
-						LOG_ERROR << cfg.logPrefix() << "syslog: log level already defined. Second value: "
+					if ( syslogLogLevel != log::LogLevel::LOGLEVEL_UNDEFINED )	{
+						LOG_ERROR << logPrefix() << "syslog: log level already defined. Second value: "
 							  << L2it->second.get_value<std::string>();
 						return false;
 					}
-					cfg.syslogLogLevel = lvl;
+					syslogLogLevel = lvl;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "facility" ))	{
 					std::string s = boost::algorithm::to_upper_copy( L2it->second.get_value<std::string>() );
 					boost::algorithm::trim( s );
 					log::SyslogFacility::Facility fclt = log::SyslogFacility::strToSyslogFacility( s );
 					if ( fclt == log::SyslogFacility::WOLFRAME_SYSLOG_FACILITY_UNDEFINED )	{
-						LOG_ERROR << cfg.logPrefix() << "syslog: unknown facility: "
+						LOG_ERROR << logPrefix() << "syslog: unknown facility: "
 							  << L2it->second.get_value<std::string>();
 						return false;
 					}
-					if ( cfg.syslogFacility != log::SyslogFacility::WOLFRAME_SYSLOG_FACILITY_UNDEFINED )	{
-						LOG_ERROR << cfg.logPrefix() << "syslog: facility already defined. Second value: "
+					if ( syslogFacility != log::SyslogFacility::WOLFRAME_SYSLOG_FACILITY_UNDEFINED )	{
+						LOG_ERROR << logPrefix() << "syslog: facility already defined. Second value: "
 							  << L2it->second.get_value<std::string>();
 						return false;
 					}
-					cfg.syslogFacility = fclt;
+					syslogFacility = fclt;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "ident" ))	{
-					bool isDefined = ( ! cfg.syslogIdent.empty());
-					if ( ! config::Parser::getValue( cfg.logPrefix().c_str(), *L2it, cfg.syslogIdent, &isDefined ))
+					bool isDefined = ( ! syslogIdent.empty());
+					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, syslogIdent, &isDefined ))
 						retVal = false;
 				}
 				else
-					LOG_WARNING << cfg.logPrefix() << "syslog: unknown configuration option: '"
+					LOG_WARNING << logPrefix() << "syslog: unknown configuration option: '"
 						    << L2it->first << "'";
 			}
 		}
 
 #if !defined( _WIN32 )
 		else if ( boost::algorithm::iequals( L1it->first, "eventlog" ))	{
-			LOG_WARNING << cfg.logPrefix() << "event log is defined only on Windows";
+			LOG_WARNING << logPrefix() << "event log is defined only on Windows";
 		}
 #else // if !defined( _WIN32 )
 		// event log
 		else if ( boost::algorithm::iequals( L1it->first, "eventlog" ))	{
-			if ( cfg.logToEventlog )	{
-				LOG_ERROR << cfg.logPrefix() << "eventlog channel already defined";
+			if ( logToEventlog )	{
+				LOG_ERROR << logPrefix() << "eventlog channel already defined";
 				return false;
 			}
-			cfg.logToEventlog = true;
-			cfg.eventlogLogLevel = log::LogLevel::LOGLEVEL_UNDEFINED;
+			logToEventlog = true;
+			eventlogLogLevel = log::LogLevel::LOGLEVEL_UNDEFINED;
 			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
 			L2it != L1it->second.end(); L2it++ )	{
 				if ( boost::algorithm::iequals( L2it->first, "level" ))	{
@@ -209,43 +207,41 @@ bool ConfigurationParser::parse( log::LoggerConfiguration& cfg,
 					boost::algorithm::trim( s );
 					log::LogLevel::Level lvl = log::LogLevel::strToLogLevel( s );
 					if ( lvl == log::LogLevel::LOGLEVEL_UNDEFINED )	{
-						LOG_ERROR << cfg.logPrefix() << "eventlog: unknown log level: "
+						LOG_ERROR << logPrefix() << "eventlog: unknown log level: "
 							  << L2it->second.get_value<std::string>();
 						return false;
 					}
-					if ( cfg.eventlogLogLevel != log::LogLevel::LOGLEVEL_UNDEFINED )	{
-						LOG_ERROR << cfg.logPrefix() << "eventlog: log level already defined. Second value: "
+					if ( eventlogLogLevel != log::LogLevel::LOGLEVEL_UNDEFINED )	{
+						LOG_ERROR << logPrefix() << "eventlog: log level already defined. Second value: "
 							  << L2it->second.get_value<std::string>();
 						return false;
 					}
-					cfg.eventlogLogLevel = lvl;
+					eventlogLogLevel = lvl;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "name" ))	{
-					bool isDefined = ( ! cfg.eventlogLogName.empty());
-					if ( ! config::Parser::getValue( cfg.logPrefix().c_str(), *L2it, cfg.eventlogLogName, &isDefined ))
+					bool isDefined = ( ! eventlogLogName.empty());
+					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, eventlogLogName, &isDefined ))
 						retVal = false;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "source" ))	{
-					bool isDefined = ( ! cfg.eventlogSource.empty());
-					if ( ! config::Parser::getValue( cfg.logPrefix().c_str(), *L2it, cfg.eventlogSource, &isDefined ))
+					bool isDefined = ( ! eventlogSource.empty());
+					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, eventlogSource, &isDefined ))
 						retVal = false;
 				}
 				else
-					LOG_WARNING << cfg.logPrefix() << "syslog: unknown configuration option: '"
+					LOG_WARNING << logPrefix() << "syslog: unknown configuration option: '"
 						    << L2it->first << "'";
 			}
 		}
 #endif	// defined( _WIN32 )
 		// unknown log method
 		else
-			LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
+			LOG_WARNING << logPrefix() << "unknown configuration option: '"
 				    << L1it->first << "'";
 	}
 	return retVal;
 }
 
-} // namespace config
-namespace log {
 
 LoggerConfiguration::LoggerConfiguration() : ConfigurationBase( "Logging", NULL, "Logging" )
 {

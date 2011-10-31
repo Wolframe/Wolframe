@@ -35,7 +35,7 @@
 //
 
 #include "handlerConfig.hpp"
-#include "config/configurationParser.hpp"
+#include "config/ConfigurationTree.hpp"
 #include "config/valueParser.hpp"
 #include "logger-v1.hpp"
 
@@ -54,33 +54,30 @@ extern "C" {
 }
 
 namespace _Wolframe {
-namespace config {
 
-template<>
-bool ConfigurationParser::parse( LuaConfiguration& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& /*node*/,
-				 const module::ModulesDirectory* /*modules*/ )
+bool LuaConfiguration::parse( const config::ConfigurationTree& pt, const std::string& /*node*/,
+			      const module::ModulesDirectory* /*modules*/ )
 {
 	bool retVal = true;
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin();
 							L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "script" ))	{
-			bool isDefined = ( !cfg.script.empty());
-			if ( !config::Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.script, &isDefined ))
+			bool isDefined = ( !script.empty());
+			if ( !config::Parser::getValue( logPrefix().c_str(), *L1it, script, &isDefined ))
 				retVal = false;
 			else	{
-				if ( ! boost::filesystem::path( cfg.script ).is_absolute() )
-					LOG_WARNING << cfg.logPrefix() << "script file path is not absolute: "
-						    << cfg.script;
+				if ( ! boost::filesystem::path( script ).is_absolute() )
+					LOG_WARNING << logPrefix() << "script file path is not absolute: "
+						    << script;
 			}
 		} else if ( boost::algorithm::iequals( L1it->first, "preload_lib" ))	{
 			std::string preload_lib;
-			if ( !config::Parser::getValue( cfg.logPrefix().c_str(), *L1it, preload_lib ))
+			if ( !config::Parser::getValue( logPrefix().c_str(), *L1it, preload_lib ))
 				retVal = false;
-			cfg.preload_libs.push_back( preload_lib );
+			preload_libs.push_back( preload_lib );
 		} else {
-			LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
+			LOG_WARNING << logPrefix() << "unknown configuration option: '"
 				    << L1it->first << "'";
 			return false;
 		}
@@ -88,8 +85,6 @@ bool ConfigurationParser::parse( LuaConfiguration& cfg,
 
 	return retVal;
 }
-
-} // namespace config
 
 
 LuaConfiguration::LuaConfiguration()
@@ -181,6 +176,5 @@ void LuaConfiguration::setCanonicalPathes( const std::string& refPath )
 			script = resolvePath( script );
 	}
 }
-
 
 } // namespace _Wolframe

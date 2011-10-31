@@ -37,7 +37,7 @@
 #include "DBproviderImpl.hpp"
 
 #include "config/valueParser.hpp"
-#include "config/configurationParser.hpp"
+#include "config/ConfigurationTree.hpp"
 #include "moduleInterface.hpp"
 #include "logger-v1.hpp"
 
@@ -54,12 +54,11 @@
 #include <list>
 
 namespace _Wolframe {
-namespace config {
+namespace db {
 
-template<>
-bool ConfigurationParser::parse( db::DBproviderConfig& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& /*node*/,
-				 const module::ModulesDirectory* modules )
+bool DBproviderConfig::parse( const config::ConfigurationTree& pt,
+			      const std::string& /*node*/,
+			      const module::ModulesDirectory* modules )
 {
 	using namespace _Wolframe::config;
 	bool retVal = true;
@@ -68,20 +67,20 @@ bool ConfigurationParser::parse( db::DBproviderConfig& cfg,
 		if ( modules )	{
 			module::ConfigDescriptionBase* cfgDesc = modules->getConfig( "database", L1it->first );
 			if ( cfgDesc )	{
-				config::ObjectConfiguration* conf = cfgDesc->create( cfg.logPrefix().c_str());
-				if ( cfgDesc->parseFunc( *conf, L1it->second, L1it->first, modules ))
-					cfg.m_dbConfig.push_back( conf );
+				config::ObjectConfiguration* conf = cfgDesc->create( logPrefix().c_str());
+				if ( conf->parse( L1it->second, L1it->first, modules ))
+					m_dbConfig.push_back( conf );
 				else	{
 					delete conf;
 					retVal = false;
 				}
 			}
 			else
-				LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
+				LOG_WARNING << logPrefix() << "unknown configuration option: '"
 					    << L1it->first << "'";
 		}
 		else
-			LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
+			LOG_WARNING << logPrefix() << "unknown configuration option: '"
 				    << L1it->first << "'";
 	}
 	return retVal;

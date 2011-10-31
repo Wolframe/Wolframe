@@ -34,6 +34,7 @@
 // appConfig.cpp
 //
 
+#include "config/ConfigurationTree.hpp"
 #include "appConfig.hpp"
 #include "commandLine.hpp"
 #include "standardConfigs.hpp"		// fuck-up - idiotic interaction with ...
@@ -83,8 +84,8 @@ const char* ApplicationConfiguration::chooseFile( const char *globalFile, const 
 }
 
 
-bool ApplicationConfiguration::addConfig( const std::string& nodeName, ConfigurationBase* conf,
-					  ParseFunc_t parseFunc )
+bool ApplicationConfiguration::addConfig( const std::string& nodeName,
+					  ConfigurationBase* conf )
 {
 	// check if the label already exists
 	if ( m_section.find( nodeName ) != m_section.end() )
@@ -103,7 +104,6 @@ bool ApplicationConfiguration::addConfig( const std::string& nodeName, Configura
 	if ( !found )	{
 		pos = m_conf.size();
 		m_conf.push_back( conf );
-		m_parse.push_back( parseFunc  );
 	}
 	m_section[ nodeName ] = pos;
 
@@ -209,8 +209,8 @@ bool ApplicationConfiguration::parseModules ( const char *filename, ConfigFileTy
 				continue;
 			std::map< std::string, std::size_t >::iterator confIt;
 			if (( confIt = m_section.find( it->first ) ) != m_section.end() )	{
-				if ( ! m_parse[confIt->second]( *(m_conf[confIt->second]),
-								it->second, confIt->first, m_modules ))
+				if ( ! (m_conf[confIt->second])->parse ( config::ConfigurationTree( it->second ),
+									  confIt->first, m_modules ))
 					retVal = false;
 			}
 			else	{
@@ -257,8 +257,8 @@ bool ApplicationConfiguration::parse ( const char *filename, ConfigFileType type
 				continue;
 			std::map< std::string, std::size_t >::iterator confIt;
 			if (( confIt = m_section.find( it->first ) ) != m_section.end() )	{
-				if ( ! m_parse[confIt->second]( *(m_conf[confIt->second]),
-								it->second, confIt->first, m_modules ))
+				if ( ! (m_conf[confIt->second])->parse( config::ConfigurationTree( it->second ),
+									confIt->first, m_modules ))
 					retVal = false;
 			}
 			else	{

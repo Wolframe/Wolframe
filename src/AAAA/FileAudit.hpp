@@ -52,7 +52,6 @@ class FileAuditor : public AuditUnit
 class FileAuditConfig : public config::ObjectConfiguration
 {
 	friend class FileAuditContainer;
-	friend class config::ConfigurationParser;
 public:
 	FileAuditConfig( const char* cfgName, const char* logParent, const char* logName )
 		: config::ObjectConfiguration( cfgName, logParent, logName ) {}
@@ -60,6 +59,8 @@ public:
 	const char* objectName() const			{ return "FileAudit"; }
 
 	/// methods
+	bool parse( const config::ConfigurationTree& pt, const std::string& node,
+		    const module::ModulesDirectory* modules );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 	void setCanonicalPathes( const std::string& referencePath );

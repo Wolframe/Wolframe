@@ -51,6 +51,8 @@ public:
 	ReferenceConfig( const char* name, const char* logParent, const char* logName )
 		: ConfigurationBase( name, logParent, logName )	{}
 
+	bool parse( const config::ConfigurationTree& pt, const std::string& node,
+		    const module::ModulesDirectory* modules );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 

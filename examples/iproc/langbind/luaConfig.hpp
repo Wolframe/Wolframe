@@ -61,7 +61,6 @@ struct ConfigurationStruct
 ///\brief configuration object of the lua application processor
 class Configuration :public config::ConfigurationBase
 {
-	friend class _Wolframe::config::ConfigurationParser;
 public:
 	///\brief module load function for a lua state
 	///\param ls lua state to initialize with the load of the module for this state object
@@ -90,6 +89,9 @@ public:
 	///\brief Define the main program
 	///\param[in] name program name
 	void defMain( const char* name);
+
+	bool parse( const config::ConfigurationTree& pt, const std::string& node,
+		    const module::ModulesDirectory* modules );
 
 	///\brief interface implementation of ConfigurationBase::setCanonicalPathes(const std::string&)
 	virtual void setCanonicalPathes( const std::string&);

@@ -38,7 +38,6 @@
 #include "connectionHandler.hpp"
 #include "langbind/luaConfig.hpp"
 #include "handlerConfig.hpp"
-#include "config/configurationParser.hpp"
 #include "testHandlerTemplates.hpp"
 #include <gtest/gtest.h>
 #define BOOST_FILESYSTEM_VERSION 3

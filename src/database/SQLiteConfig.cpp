@@ -36,7 +36,7 @@
 
 #include "SQLite.hpp"
 #include "config/valueParser.hpp"
-#include "config/configurationParser.hpp"
+#include "config/ConfigurationTree.hpp"
 
 #include <boost/algorithm/string.hpp>
 #define BOOST_FILESYSTEM_VERSION 3
@@ -44,47 +44,83 @@
 #include "miscUtils.hpp"
 
 namespace _Wolframe {
-namespace config {
+namespace db {
 
-/// Specialization of the ConfigurationParser::parse for the SQLite configuration
-template<>
-bool ConfigurationParser::parse( db::SQLiteConfig& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& /*node*/,
-				 const module::ModulesDirectory* /*modules*/ )
+bool SQLiteConfig::parse( const config::ConfigurationTree& pt, const std::string& /*node*/,
+			  const module::ModulesDirectory* /*modules*/ )
 {
 	using namespace _Wolframe::config;
 	bool retVal = true;
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "identifier" ))	{
-			bool isDefined = ( !cfg.m_ID.empty() );
+			bool isDefined = ( !m_ID.empty() );
 			std::string id;
-			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, id, &isDefined ))
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, id, &isDefined ))
 				retVal = false;
 			else
-				cfg.m_ID = id;
+				m_ID = id;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "file" ) ||
 			  boost::algorithm::iequals( L1it->first, "filename" ))	{
-			bool isDefined = ( !cfg.filename.empty() );
-			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.filename, &isDefined ))
+			bool isDefined = ( !filename.empty() );
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, filename, &isDefined ))
 				retVal = false;
 			else	{
-				if ( ! boost::filesystem::path( cfg.filename ).is_absolute() )
-					LOG_WARNING << cfg.logPrefix() << "database file path is not absolute: "
-						    << cfg.filename;
+				if ( ! boost::filesystem::path( filename ).is_absolute() )
+					LOG_WARNING << logPrefix() << "database file path is not absolute: "
+						    << filename;
 			}
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "flag" ))	{
-			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.flag, Parser::BoolDomain() ))
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, flag, Parser::BoolDomain() ))
 				retVal = false;
 		}
 		else	{
-			LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
+			LOG_WARNING << logPrefix() << "unknown configuration option: '"
 				    << L1it->first << "'";
 		}
 	}
 	return retVal;
 }
 
-}} // namespace _Wolframe::config
+SQLiteConfig::SQLiteConfig( const char* name, const char* logParent, const char* logName )
+	: config::ObjectConfiguration( name, logParent, logName )
+{
+	flag = false;
+}
+
+void SQLiteConfig::print( std::ostream& os, size_t indent ) const
+{
+	std::string indStr( indent, ' ' );
+
+	os << indStr << sectionName() << ":" << std::endl;
+	if ( ! m_ID.empty() )
+		os << indStr << "   ID: " << m_ID << std::endl;
+	os << indStr << "   Filename: " << filename << std::endl;
+	os << indStr << "   Flags: " << (flag ? "True Flag" : "False Flag") << std::endl;
+}
+
+bool SQLiteConfig::check() const
+{
+	if ( filename.empty() )	{
+		LOG_ERROR << logPrefix() << "SQLite database filename cannot be empty";
+		return false;
+	}
+	return true;
+}
+
+void SQLiteConfig::setCanonicalPathes( const std::string& refPath )
+{
+	using namespace boost::filesystem;
+
+	if ( ! filename.empty() )	{
+		if ( ! path( filename ).is_absolute() )
+			filename = resolvePath( absolute( filename,
+							  path( refPath ).branch_path()).string());
+		else
+			filename = resolvePath( filename );
+	}
+}
+
+}} // namespace _Wolframe::db

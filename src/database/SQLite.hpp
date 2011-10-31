@@ -51,7 +51,6 @@ namespace db {
 /// SQLite database configuration
 class SQLiteConfig : public config::ObjectConfiguration
 {
-	friend class config::ConfigurationParser;
 	friend class SQLiteUnit;
 public:
 	const char* objectName() const			{ return "SQLite"; }
@@ -59,9 +58,11 @@ public:
 	SQLiteConfig( const char* name, const char* logParent, const char* logName );
 	~SQLiteConfig()					{}
 
+	bool parse( const config::ConfigurationTree& pt, const std::string& node,
+		    const module::ModulesDirectory* modules );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
-	virtual void setCanonicalPathes( const std::string& referencePath );
+	void setCanonicalPathes( const std::string& referencePath );
 private:
 	std::string	m_ID;
 	std::string	filename;

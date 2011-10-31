@@ -130,8 +130,6 @@ DB_OBJS =
 
 AAAA_OBJS = \
 	AAAA/authentication_textfile.o \
-	AAAA/AAAAprovider.o \
-	AAAA/AAAAproviderConfig.o \
 	AAAA/DBauthentication.o \
 	AAAA/DBauthenticationConfig.o \
 	AAAA/TextFileAuthentication.o \
@@ -139,7 +137,9 @@ AAAA_OBJS = \
 	AAAA/DBaudit.o \
 	AAAA/DBauditConfig.o \
 	AAAA/FileAudit.o \
-	AAAA/FileAuditConfig.o
+	AAAA/FileAuditConfig.o \
+	AAAA/AAAAprovider.o \
+	AAAA/AAAAproviderConfig.o
 
 ifeq ($(WITH_PAM),1)
 AAAA_OBJS += \
@@ -167,8 +167,8 @@ endif
 
 ifeq ($(WITH_PGSQL),1)
 DB_OBJS += \
-	database/PostgreSQL.o \
-	database/PostgreSQLconfig.o
+	database/PostgreSQLconfig.o \
+	database/PostgreSQL.o
 endif
 
 LOCAL_STATIC_LIB_OBJS = \
@@ -202,9 +202,9 @@ LOCAL_STATIC_LIB_OBJS += \
 endif
 
 OBJS = \
-	$(LOCAL_STATIC_LIB_OBJS) \
 	appProperties.o \
 	appConfigDefinition.o \
+	$(LOCAL_STATIC_LIB_OBJS) \
 	moduleImpersonation.o \
 	wolframeHandler.o \
 	database/DBprovider.o \

@@ -37,7 +37,7 @@
 #include "logger-v1.hpp"
 #include "echoProcessor.hpp"
 
-#include "config/configurationParser.hpp"
+#include "config/ConfigurationTree.hpp"
 #include "config/valueParser.hpp"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/algorithm/string.hpp>
@@ -45,34 +45,30 @@
 #include <ostream>
 
 namespace _Wolframe {
-namespace config {
 
-template<>
-bool ConfigurationParser::parse( EchoProcConfig& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& /*node*/,
-				 const module::ModulesDirectory* /*modules*/ )
+bool EchoProcConfig::parse( const config::ConfigurationTree& pt, const std::string& /*node*/,
+			    const module::ModulesDirectory* /*modules*/ )
 {
 	bool retVal = true;
 	bool isDefined = false;
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "timeout" ))	{
-			if ( !config::Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.m_timeout ))
+			if ( !config::Parser::getValue( logPrefix().c_str(), *L1it, m_timeout ))
 				retVal = false;
 			isDefined = true;
 		}
 		else	{
-			LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
+			LOG_WARNING << logPrefix() << "unknown configuration option: '"
 				    << L1it->first << "'";
 		}
 	}
 	if ( ! isDefined )
-		cfg.m_timeout = 0;
+		m_timeout = 0;
 
 	return retVal;
 }
 
-} // namespace config
 
 bool EchoProcConfig::check() const
 {

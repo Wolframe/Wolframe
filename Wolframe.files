@@ -262,7 +262,7 @@ include/appProcessor.hpp
 include/appProperties.hpp
 include/atomicCounter.hpp
 include/config/configurationBase.hpp
-include/config/configurationParser.hpp
+include/config/ConfigurationTree.hpp
 include/config/descriptionBase.hpp
 include/config/description.hpp
 include/config/reference.hpp
@@ -530,3 +530,4 @@ XML/configuration.rng
 XML/database.rng
 XML/logging.rng
 XML/README
+src/configurationBase.cpp

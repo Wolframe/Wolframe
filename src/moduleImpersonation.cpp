@@ -74,7 +74,7 @@ ConfigDescriptionBase* ModulesDirectory::getConfig( const std::string& section,
 
 
 /****  Impersonating the module loader  ******************************************************/
-#include "config/configurationParser.hpp"
+#include "config/ConfigurationTree.hpp"
 #include "processor/echoProcessor.hpp"
 
 #include "AAAA/TextFileAuthentication.hpp"
@@ -97,30 +97,23 @@ bool module::LoadModules( ModulesDirectory& modules )
 
 #ifdef WITH_PGSQL
 	modules.addConfiguration( new module::ConfigurationDescription< db::PostgreSQLconfig >
-				  ( "PostgreSQL database", "database", "PostgreSQL",
-				    &config::ConfigurationParser::parseBase<db::PostgreSQLconfig> ) );
+				  ( "PostgreSQL database", "database", "PostgreSQL" ));
 #endif
 #ifdef WITH_SQLITE3
 	modules.addConfiguration( new module::ConfigurationDescription< db::SQLiteConfig >
-				  ( "SQLite database", "database", "SQLite",
-				    &config::ConfigurationParser::parseBase<db::SQLiteConfig> ) );
+				  ( "SQLite database", "database", "SQLite" ));
 #endif
 	modules.addConfiguration( new module::ConfigurationDescription< EchoProcConfig >
-				  ( "Echo Processor", "processor", "echoProcessor",
-				    &config::ConfigurationParser::parseBase< EchoProcConfig > ) );
+				  ( "Echo Processor", "processor", "echoProcessor" ));
 
 	modules.addConfiguration( new module::ConfigurationDescription< AAAA::TextFileAuthConfig >
-				  ( "Authentication file", "Authentication", "file",
-				    &config::ConfigurationParser::parseBase<AAAA::TextFileAuthConfig> ) );
+				  ( "Authentication file", "Authentication", "file" ));
 	modules.addConfiguration( new module::ConfigurationDescription< AAAA::DatabaseAuthConfig >
-				  ( "Authentication database", "Authentication", "database",
-				    &config::ConfigurationParser::parseBase<AAAA::DatabaseAuthConfig> ) );
+				  ( "Authentication database", "Authentication", "database" ));
 	modules.addConfiguration( new module::ConfigurationDescription< AAAA::FileAuditConfig >
-				  ( "Audit file", "Audit", "file",
-				    &config::ConfigurationParser::parseBase<AAAA::FileAuditConfig> ) );
+				  ( "Audit file", "Audit", "file" ));
 	modules.addConfiguration( new module::ConfigurationDescription< AAAA::DBauditConfig >
-				  ( "Audit database", "Audit", "database",
-				    &config::ConfigurationParser::parseBase<AAAA::DBauditConfig> ) );
+				  ( "Audit database", "Audit", "database" ));
 	return retVal;
 }
 

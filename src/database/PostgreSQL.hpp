@@ -51,7 +51,6 @@ namespace db {
 /// PostgreSQL server connection configuration
 class PostgreSQLconfig : public config::ObjectConfiguration
 {
-	friend class config::ConfigurationParser;
 	friend class PostgreSQLunit;
 public:
 	const char* objectName() const			{ return "PostgreSQL"; }
@@ -59,6 +58,8 @@ public:
 	PostgreSQLconfig( const char* name, const char* logParent, const char* logName );
 	~PostgreSQLconfig()				{}
 
+	bool parse( const config::ConfigurationTree& pt, const std::string& node,
+		    const module::ModulesDirectory* modules );
 	virtual bool check() const;
 	virtual void print( std::ostream& os, size_t indent ) const;
 private:

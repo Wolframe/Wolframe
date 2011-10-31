@@ -39,7 +39,6 @@
 #include "moduleLoaderConfig.hpp"
 #include "handlerConfig.hpp"
 #include "server.hpp"
-#include "config/configurationParser.hpp"
 
 namespace _Wolframe {
 namespace config {
@@ -58,19 +57,19 @@ ApplicationConfiguration::ApplicationConfiguration()
 
 	// add both sections, the parse function will select the
 	// appropriate action
-	addConfig( "service", serviceCfg, &ConfigurationParser::parseBase<config::ServiceConfiguration> );
-	addConfig( "daemon", serviceCfg, &ConfigurationParser::parseBase<config::ServiceConfiguration> );
+	addConfig( "service", serviceCfg );
+	addConfig( "daemon", serviceCfg );
 
-	addConfig( "LoadModules", handlerCfg->modulesCfg, &ConfigurationParser::parseBase<config::ModuleLoaderConfiguration> );
+	addConfig( "LoadModules", handlerCfg->modulesCfg );
 
-	addConfig( "ServerTokens", handlerCfg->bannerCfg, &ConfigurationParser::parseBase<config::ServiceBanner> );
-	addConfig( "ServerSignature", handlerCfg->bannerCfg, &ConfigurationParser::parseBase<config::ServiceBanner> );
+	addConfig( "ServerTokens", handlerCfg->bannerCfg );
+	addConfig( "ServerSignature", handlerCfg->bannerCfg );
 
-	addConfig( "listen", serverCfg, &ConfigurationParser::parseBase<net::Configuration> );
-	addConfig( "logging", loggerCfg, &ConfigurationParser::parseBase<log::LoggerConfiguration> );
-	addConfig( "database", handlerCfg->databaseCfg, &ConfigurationParser::parseBase<db::DBproviderConfig> );
-	addConfig( "aaaa", handlerCfg->aaaaCfg, &ConfigurationParser::parseBase<AAAA::AAAAconfiguration> );
-	addConfig( "Processor", handlerCfg->procCfg, &ConfigurationParser::parseBase<proc::ProcProviderConfig> );
+	addConfig( "listen", serverCfg );
+	addConfig( "logging", loggerCfg );
+	addConfig( "database", handlerCfg->databaseCfg );
+	addConfig( "aaaa", handlerCfg->aaaaCfg );
+	addConfig( "Processor", handlerCfg->procCfg );
 
 }
 

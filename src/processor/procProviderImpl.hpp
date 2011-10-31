@@ -52,7 +52,6 @@ namespace proc {
 class ProcProviderConfig : public config::ConfigurationBase
 {
 	friend class ProcessorProvider;
-	friend class config::ConfigurationParser;
 public:
 	/// constructor & destructor
 	ProcProviderConfig()
@@ -60,6 +59,8 @@ public:
 	~ProcProviderConfig();
 
 	/// methods
+	bool parse( const config::ConfigurationTree& pt, const std::string& node,
+		    const module::ModulesDirectory* modules );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 	virtual void setCanonicalPathes( const std::string& referencePath );
