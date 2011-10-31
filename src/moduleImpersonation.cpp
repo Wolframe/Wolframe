@@ -35,7 +35,7 @@
 // It's just a hardcoded possible result of the module loader
 
 #include <boost/algorithm/string.hpp>
-#include "logger.hpp"
+#include "logger-v1.hpp"
 #include "moduleInterface.hpp"
 
 namespace _Wolframe {
@@ -100,7 +100,7 @@ ModuleContainerBase* ModulesDirectory::getContainer( const std::string& name ) c
 
 
 /****  Impersonating the module loader  ******************************************************/
-#include "config/configurationParser.hpp"
+#include "config/ConfigurationTree.hpp"
 #include "processor/echoProcessor.hpp"
 
 #include "AAAA/TextFileAuthentication.hpp"
@@ -123,34 +123,27 @@ bool module::LoadModules( ModulesDirectory& modules )
 
 #ifdef WITH_PGSQL
 	modules.addConfig( new module::ConfigurationDescription< db::PostgreSQLconfig >
-			   ( "PostgreSQL database", "database", "PostgreSQL",
-			     &config::ConfigurationParser::parseBase<db::PostgreSQLconfig> ) );
+			   ( "PostgreSQL database", "database", "PostgreSQL" ));
 	modules.addContainer( new module::ContainerDescription< ObjectContainer< db::DatabaseUnit > >
 			      ( "PostgreSQL", &db::PostgreSQLcontainer::create ));
 #endif
 #ifdef WITH_SQLITE3
 	modules.addConfig( new module::ConfigurationDescription< db::SQLiteConfig >
-			   ( "SQLite database", "database", "SQLite",
-			     &config::ConfigurationParser::parseBase<db::SQLiteConfig> ) );
+			   ( "SQLite database", "database", "SQLite" ));
 	modules.addContainer( new module::ContainerDescription< ObjectContainer< db::DatabaseUnit > >
 			      ( "SQLite", &db::SQLiteContainer::create ));
 #endif
 	modules.addConfig( new module::ConfigurationDescription< EchoProcConfig >
-			   ( "Echo Processor", "processor", "echoProcessor",
-			     &config::ConfigurationParser::parseBase< EchoProcConfig > ) );
+			   ( "Echo Processor", "processor", "echoProcessor" ));
 
 	modules.addConfig( new module::ConfigurationDescription< AAAA::TextFileAuthConfig >
-			   ( "Authentication file", "Authentication", "file",
-			     &config::ConfigurationParser::parseBase<AAAA::TextFileAuthConfig> ) );
+			   ( "Authentication file", "Authentication", "file" ));
 	modules.addConfig( new module::ConfigurationDescription< AAAA::DatabaseAuthConfig >
-			   ( "Authentication database", "Authentication", "database",
-			     &config::ConfigurationParser::parseBase<AAAA::DatabaseAuthConfig> ) );
+			   ( "Authentication database", "Authentication", "database" ));
 	modules.addConfig( new module::ConfigurationDescription< AAAA::FileAuditConfig >
-			   ( "Audit file", "Audit", "file",
-			     &config::ConfigurationParser::parseBase<AAAA::FileAuditConfig> ) );
+			   ( "Audit file", "Audit", "file" ));
 	modules.addConfig( new module::ConfigurationDescription< AAAA::DBauditConfig >
-			   ( "Audit database", "Audit", "database",
-			     &config::ConfigurationParser::parseBase<AAAA::DBauditConfig> ) );
+			   ( "Audit database", "Audit", "database" ));
 	return retVal;
 }
 

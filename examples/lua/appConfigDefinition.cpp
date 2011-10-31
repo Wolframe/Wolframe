@@ -54,12 +54,12 @@ ApplicationConfiguration::ApplicationConfiguration()
 
 	// add sections, the parse function will select the
 	// appropriate action
-	addConfig( "service", serviceCfg, &ConfigurationParser::parseBase<config::ServiceConfiguration> );
-	addConfig( "daemon", serviceCfg, &ConfigurationParser::parseBase<config::ServiceConfiguration> );
+	addConfig( "service", serviceCfg );
+	addConfig( "daemon", serviceCfg );
 
-	addConfig( "listen", serverCfg, &ConfigurationParser::parseBase<net::Configuration> );
-	addConfig( "logging", loggerCfg, &ConfigurationParser::parseBase<log::LoggerConfiguration> );
-	addConfig( "lua", handlerCfg->luaConfig, &ConfigurationParser::parseBase<LuaConfiguration> );
+	addConfig( "listen", serverCfg );
+	addConfig( "logging", loggerCfg );
+	addConfig( "lua", handlerCfg->luaConfig );
 }
 
 ApplicationConfiguration::~ApplicationConfiguration()

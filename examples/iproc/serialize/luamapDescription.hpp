@@ -37,7 +37,7 @@ Project Wolframe.
 #include "serialize/luamapTraits.hpp"
 #include "serialize/luamapParse.hpp"
 #include "serialize/luamapPrint.hpp"
-#include "logger.hpp"
+#include "logger-v1.hpp"
 #include <typeinfo>
 #include <exception>
 

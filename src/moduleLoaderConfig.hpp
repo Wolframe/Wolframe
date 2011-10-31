@@ -55,6 +55,8 @@ public:
 	~ModuleLoaderConfiguration();
 
 	/// methods
+	bool parse( const config::ConfigurationTree& pt, const std::string& node,
+		    const module::ModulesDirectory* modules );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 	void setCanonicalPathes( const std::string& referencePath );

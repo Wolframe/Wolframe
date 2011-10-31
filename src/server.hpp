@@ -51,36 +51,6 @@
 namespace _Wolframe {
 namespace net	{
 
-///// network server configuration
-//class Configuration : public _Wolframe::config::ConfigurationBase
-//{
-//	friend class ConfigurationParser;
-//	friend class server;
-//public:
-//	unsigned short		threads;
-//	unsigned short		maxConnections;
-
-//	// listen on
-//	std::list<net::ServerTCPendpoint> address;
-//#ifdef WITH_SSL
-//	std::list<net::ServerSSLendpoint> SSLaddress;
-//#endif // WITH_SSL
-
-//	/// constructor
-//	Configuration();
-
-//	/// methods
-//	bool parse( const boost::property_tree::ptree& pt, const std::string& node );
-//	bool check() const;
-//	void print( std::ostream& os, size_t indent ) const;
-
-//	void setCanonicalPathes( const std::string& referencePath );
-
-//	//			Not implemented yet, inherited from base for the time being
-//	//			bool test() const;
-//};
-
-
 /// The top-level class of the Wolframe network server.
 class server: private boost::noncopyable
 {

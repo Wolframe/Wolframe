@@ -41,6 +41,8 @@ namespace _Wolframe {
 		LuaConfiguration();
 
 		/// methods
+		bool parse( const config::ConfigurationTree& pt, const std::string& node,
+			    const module::ModulesDirectory* modules );
 		void setCanonicalPathes( const std::string& refPath );
 		bool check() const;
 		void print( std::ostream& os, size_t indent ) const;

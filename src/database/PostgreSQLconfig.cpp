@@ -36,19 +36,17 @@
 
 #include "PostgreSQL.hpp"
 #include "config/valueParser.hpp"
-#include "config/configurationParser.hpp"
+#include "config/ConfigurationTree.hpp"
 
 static const unsigned short DEFAULT_POSTGRESQL_CONNECTIONS = 4;
 static const unsigned short DEFAULT_CONNECTION_TIMEOUT = 30;
 
 namespace _Wolframe {
-namespace config {
+namespace db {
 
-/// Specialization of the ConfigurationParser::parse for the PostgreSQL configuration
-template<>
-bool ConfigurationParser::parse( db::PostgreSQLconfig& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& /*node*/,
-				 const module::ModulesDirectory* /*modules*/ )
+
+bool PostgreSQLconfig::parse( const config::ConfigurationTree& pt, const std::string& /*node*/,
+			      const module::ModulesDirectory* /*modules*/ )
 {
 	using namespace _Wolframe::config;
 	bool retVal = true;
@@ -57,60 +55,60 @@ bool ConfigurationParser::parse( db::PostgreSQLconfig& cfg,
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "identifier" ))	{
-			bool isDefined = ( !cfg.m_ID.empty() );
+			bool isDefined = ( !m_ID.empty() );
 			std::string id;
-			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, id, &isDefined ))
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, id, &isDefined ))
 				retVal = false;
 			else
-				cfg.m_ID = id;
+				m_ID = id;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "host" ))	{
-			bool isDefined = ( !cfg.host.empty());
-			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.host, &isDefined ))
+			bool isDefined = ( !host.empty());
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, host, &isDefined ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "port" ))	{
-			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.port,
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, port,
 						Parser::RangeDomain<unsigned short>( 1 ), &portDefined ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "name" ))	{
-			bool isDefined = ( !cfg.dbName.empty());
-			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.dbName, &isDefined ))
+			bool isDefined = ( !dbName.empty());
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, dbName, &isDefined ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "user" ))	{
-			bool isDefined = ( !cfg.user.empty());
-			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.user, &isDefined ))
+			bool isDefined = ( !user.empty());
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, user, &isDefined ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "password" ))	{
-			bool isDefined = ( !cfg.password.empty());
-			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.password, &isDefined ))
+			bool isDefined = ( !password.empty());
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, password, &isDefined ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "connectionTimeout" ))	{
-			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.connectTimeout, &cTdefined ))
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, connectTimeout, &cTdefined ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "connections" ))	{
-			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.connections,
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, connections,
 						Parser::RangeDomain<unsigned short>( 1 ), &connDefined ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "acquireTimeout" ))	{
-			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.acquireTimeout, &aTdefined ))
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, acquireTimeout, &aTdefined ))
 				retVal = false;
 		}
 		else	{
-			LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
+			LOG_WARNING << logPrefix() << "unknown configuration option: '"
 				    << L1it->first << "'";
 		}
 	}
 	if ( ! connDefined == 0 )
-		cfg.connections = DEFAULT_POSTGRESQL_CONNECTIONS;
+		connections = DEFAULT_POSTGRESQL_CONNECTIONS;
 	if ( ! cTdefined )
-		cfg.connectTimeout = DEFAULT_CONNECTION_TIMEOUT;
+		connectTimeout = DEFAULT_CONNECTION_TIMEOUT;
 
 	return retVal;
 }

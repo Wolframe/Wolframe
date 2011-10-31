@@ -39,16 +39,15 @@
 #include <list>
 
 // forward definition
-namespace _Wolframe {
-namespace module {
-class ModulesDirectory;
+namespace _Wolframe { namespace module {
+	class ModulesDirectory;
 }} // namespace _Wolframe::module
 
 namespace _Wolframe {
 namespace config {
 
-// forward definitions
-class ConfigurationParser;
+// forward definition
+struct ConfigurationTree;
 
 /// Base class for the configuration structures
 class ConfigurationBase
@@ -62,9 +61,7 @@ public:
 	///\param[in]	logName	the logging name of this section. Combined with
 	///			the logParent parameter will form the whole logging
 	///			prefix for of the section.
-	ConfigurationBase( const char* name, const char* logParent, const char* logName,
-			   module::ModulesDirectory* modules = NULL )
-		: m_modules( modules )
+	ConfigurationBase( const char* name, const char* logParent, const char* logName )
 	{
 		m_sectionName = name ? name : "";
 		m_logPrefix = logParent ? logParent : "";
@@ -82,6 +79,13 @@ public:
 	/// The prefix for logging messages for this configuration section
 	///\return	a reference to the prefix set by the constructor
 	const std::string& logPrefix() const		{ return m_logPrefix; }
+
+	///\brief Parse the configuration section
+	///\param[in]	pt		property tree node
+	///\param[in]	node		the label of the node. It should be
+	///				the same (case insensitive) as it->first
+	virtual bool parse( const ConfigurationTree& cfgTree, const std::string& node,
+			    const module::ModulesDirectory* modules ) = 0;
 
 	/// Set the pathes in the configuration to absolute values
 	///\param[in]	refPath	use this path as reference when computing
@@ -112,7 +116,6 @@ public:
 private:
 	std::string			m_sectionName;
 	std::string			m_logPrefix;
-	module::ModulesDirectory*	m_modules;
 };
 
 
@@ -125,7 +128,7 @@ public:
 	ObjectConfiguration( const char* name, const char* logParent, const char* logName )
 		: ConfigurationBase( name, logParent, logName )	{}
 
-	virtual ~ObjectConfiguration()			{}
+	virtual ~ObjectConfiguration()				{}
 
 	virtual const char* objectName() const = 0;
 };

@@ -51,17 +51,9 @@ struct ModuleConfiguration
 	const char* title;
 	const char* section;
 	const char* keyword;
-	bool (*parseFunc)( config::ConfigurationBase&,
-			   const boost::property_tree::ptree&, const std::string& node,
-			   const module::ModulesDirectory* modules );
 public:
-	ModuleConfiguration( const char* Title, const char* Section, const char* Keyword,
-			     bool (*pf)( config::ConfigurationBase& configuration,
-					 const boost::property_tree::ptree& pt,
-					 const std::string& node,
-					 const module::ModulesDirectory* modules ) )
-		: title( Title ), section( Section), keyword( Keyword ),
-		  parseFunc( pf )		{}
+	ModuleConfiguration( const char* Title, const char* Section, const char* Keyword )
+		: title( Title ), section( Section), keyword( Keyword )	{}
 
 	virtual ~ModuleConfiguration()		{}
 
@@ -72,13 +64,8 @@ template< class T >
 struct ConfigurationDescription : public ModuleConfiguration
 {
 public:
-	ConfigurationDescription( const char* Title, const char* Section, const char* Keyword,
-				  bool (*pf)( config::ConfigurationBase& configuration,
-					      const boost::property_tree::ptree& pt,
-					      const std::string& node,
-					      const module::ModulesDirectory* modules ) )
-		: ModuleConfiguration( Title, Section, Keyword, pf )
-	{}
+	ConfigurationDescription( const char* Title, const char* Section, const char* Keyword )
+		: ModuleConfiguration( Title, Section, Keyword )	{}
 
 	virtual ~ConfigurationDescription()	{}
 

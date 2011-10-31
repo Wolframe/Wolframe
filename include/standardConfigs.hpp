@@ -66,6 +66,8 @@ public:
 	Configuration();
 
 	/// methods
+	bool parse( const config::ConfigurationTree& pt, const std::string& node,
+		    const module::ModulesDirectory* modules );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 
@@ -105,6 +107,8 @@ public:
 	LoggerConfiguration();
 
 	/// methods
+	bool parse( const config::ConfigurationTree& pt, const std::string& node,
+		    const module::ModulesDirectory* modules );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 
@@ -141,6 +145,8 @@ public:
 	ServiceConfiguration();
 
 	/// methods
+	bool parse( const config::ConfigurationTree& pt, const std::string& node,
+		    const module::ModulesDirectory* modules );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 
@@ -175,6 +181,8 @@ public:
 	/// methods
 	std::string toString() const;
 
+	bool parse( const config::ConfigurationTree& pt, const std::string& node,
+		    const module::ModulesDirectory* modules );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 

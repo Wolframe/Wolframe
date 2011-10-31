@@ -35,17 +35,15 @@
 //
 
 #include "DBauthentication.hpp"
-#include "config/configurationParser.hpp"
+#include "config/configurationBase.hpp"
 
 namespace _Wolframe {
-namespace config {
+namespace AAAA {
 
-template<>
-bool ConfigurationParser::parse( AAAA::DatabaseAuthConfig& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& node,
-				 const module::ModulesDirectory* /*modules*/ )
+bool DatabaseAuthConfig::parse( const config::ConfigurationTree& pt, const std::string& node,
+				const module::ModulesDirectory* modules )
 {
-	return ConfigurationParser::parse( cfg.m_dbConfig, pt, node );
+	return m_dbConfig.parse( pt, node, modules );
 }
 
 }} // namespace _Wolframe::config

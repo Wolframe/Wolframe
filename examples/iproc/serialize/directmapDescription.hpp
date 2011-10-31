@@ -38,7 +38,7 @@ Project Wolframe.
 #include "serialize/directmapTraits.hpp"
 #include "serialize/directmapParse.hpp"
 #include "serialize/directmapPrint.hpp"
-#include "logger.hpp"
+#include "logger-v1.hpp"
 #include <typeinfo>
 #include <exception>
 

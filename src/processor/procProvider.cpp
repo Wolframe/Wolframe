@@ -38,8 +38,8 @@
 #include "procProviderImpl.hpp"
 
 #include "config/valueParser.hpp"
-#include "config/configurationParser.hpp"
-#include "logger.hpp"
+#include "config/ConfigurationTree.hpp"
+#include "logger-v1.hpp"
 
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
@@ -62,40 +62,38 @@ procModules[ noProcModules ] = { module::ContainerDescription< EchoProcContainer
 /****  End impersonating the module loader  **************************************************/
 
 namespace _Wolframe {
-namespace config {
+namespace proc {
 
-template<>
-bool ConfigurationParser::parse( proc::ProcProviderConfig& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& /*node*/,
-				 const module::ModulesDirectory* modules )
+bool ProcProviderConfig::parse( const config::ConfigurationTree& pt, const std::string& /*node*/,
+				const module::ModulesDirectory* modules )
 {
 	using namespace _Wolframe::config;
 	bool retVal = true;
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( "database", L1it->first ))	{
-			bool isDefined = ( ! cfg.m_dbLabel.empty());
-			if ( ! Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.m_dbLabel, &isDefined ))
+			bool isDefined = ( ! m_dbLabel.empty());
+			if ( ! Parser::getValue( logPrefix().c_str(), *L1it, m_dbLabel, &isDefined ))
 				retVal = false;
 		}
 		else	{
 			if ( modules )	{
 				module::ModuleConfiguration* cfgDesc = modules->getConfig( "processor", L1it->first );
 				if ( cfgDesc )	{
-					config::ObjectConfiguration* conf = cfgDesc->create( cfg.logPrefix().c_str());
-					if ( cfgDesc->parseFunc( *conf, L1it->second, L1it->first, modules ))
-						cfg.m_procConfig.push_back( conf );
+					config::ObjectConfiguration* conf = cfgDesc->create( logPrefix().c_str());
+					if ( conf->parse( L1it->second, L1it->first, modules ))
+						m_procConfig.push_back( conf );
 					else	{
 						delete conf;
 						retVal = false;
 					}
 				}
 				else
-					LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
+					LOG_WARNING << logPrefix() << "unknown configuration option: '"
 						    << L1it->first << "'";
 			}
 			else
-				LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
+				LOG_WARNING << logPrefix() << "unknown configuration option: '"
 					    << L1it->first << "'";
 		}
 	}

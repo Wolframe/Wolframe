@@ -36,9 +36,9 @@
 
 #include "standardConfigs.hpp"
 #include "config/valueParser.hpp"
-#include "config/configurationParser.hpp"
+#include "config/ConfigurationTree.hpp"
 #include "appProperties.hpp"
-#include "logger.hpp"
+#include "logger-v1.hpp"
 
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
@@ -55,10 +55,8 @@ namespace config {
 
 
 /// Parse the configuration
-template<>
-bool ConfigurationParser::parse( ServiceConfiguration& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& node,
-				 const module::ModulesDirectory* /*modules*/ )
+bool ServiceConfiguration::parse( const ConfigurationTree& pt, const std::string& node,
+				  const module::ModulesDirectory* /*modules*/ )
 {
 	bool retVal = true;
 #if defined(_WIN32)
@@ -69,27 +67,27 @@ bool ConfigurationParser::parse( ServiceConfiguration& cfg,
 	if ( boost::algorithm::iequals( node, "daemon" ))	{
 		for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 			if ( boost::algorithm::iequals( L1it->first, "user" ))	{
-				bool isDefined = ( !cfg.user.empty());
-				if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.user, &isDefined ))
+				bool isDefined = ( !user.empty());
+				if ( !Parser::getValue( logPrefix().c_str(), *L1it, user, &isDefined ))
 					retVal = false;
 			}
 			else if ( boost::algorithm::iequals( L1it->first, "group" ))	{
-				bool isDefined = ( !cfg.group.empty());
-				if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.group, &isDefined ))
+				bool isDefined = ( !group.empty());
+				if ( !Parser::getValue( logPrefix().c_str(), *L1it, group, &isDefined ))
 					retVal = false;
 			}
 			else if ( boost::algorithm::iequals( L1it->first, "pidFile" ))	{
-				bool isDefined = ( !cfg.pidFile.empty());
-				if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.pidFile, &isDefined ))
+				bool isDefined = ( !pidFile.empty());
+				if ( !Parser::getValue( logPrefix().c_str(), *L1it, pidFile, &isDefined ))
 					retVal = false;
 				else	{
-					if ( ! boost::filesystem::path( cfg.pidFile ).is_absolute() )
-						LOG_WARNING << cfg.logPrefix() << "pid file path is not absolute: "
-							    << cfg.pidFile;
+					if ( ! boost::filesystem::path( pidFile ).is_absolute() )
+						LOG_WARNING << logPrefix() << "pid file path is not absolute: "
+							    << pidFile;
 				}
 			}
 			else	{
-				LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
+				LOG_WARNING << logPrefix() << "unknown configuration option: '"
 					    << L1it->first << "'";
 			}
 		}
@@ -103,35 +101,35 @@ bool ConfigurationParser::parse( ServiceConfiguration& cfg,
 	else if ( boost::algorithm::iequals( node, "service" ))	{
 		for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 			if ( boost::algorithm::iequals( L1it->first, "serviceName" ))	{
-				bool isDefined = ( !cfg.serviceName.empty());
-				if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.serviceName, &isDefined ))
+				bool isDefined = ( !serviceName.empty());
+				if ( !Parser::getValue( logPrefix().c_str(), *L1it, serviceName, &isDefined ))
 					retVal = false;
 			}
 			else if ( boost::algorithm::iequals( L1it->first, "displayName" ))	{
-				bool isDefined = ( !cfg.serviceDisplayName.empty());
-				if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.serviceDisplayName, &isDefined ))
+				bool isDefined = ( !serviceDisplayName.empty());
+				if ( !Parser::getValue( logPrefix().c_str(), *L1it, serviceDisplayName, &isDefined ))
 					retVal = false;
 			}
 			else if ( boost::algorithm::iequals( L1it->first, "description" ))	{
-				bool isDefined = ( !cfg.serviceDescription.empty());
-				if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.serviceDescription, &isDefined ))
+				bool isDefined = ( !serviceDescription.empty());
+				if ( !Parser::getValue( logPrefix().c_str(), *L1it, serviceDescription, &isDefined ))
 					retVal = false;
 			}
 			else	{
-				LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '"
+				LOG_WARNING << logPrefix() << "unknown configuration option: '"
 					    << L1it->first << "'";
 			}
 		}
-		if ( cfg.serviceName.empty() )
-			cfg.serviceName = defaultServiceName();
-		if ( cfg.serviceDisplayName.empty() )
-			cfg.serviceDisplayName = defaultServiceDisplayName();
-		if ( cfg.serviceDescription.empty() )
-			cfg.serviceDescription = defaultServiceDescription();
+		if ( serviceName.empty() )
+			serviceName = defaultServiceName();
+		if ( serviceDisplayName.empty() )
+			serviceDisplayName = defaultServiceDisplayName();
+		if ( serviceDescription.empty() )
+			serviceDescription = defaultServiceDescription();
 	}
 #endif
 	else	{
-		LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '" << node << "'";
+		LOG_WARNING << logPrefix() << "unknown configuration option: '" << node << "'";
 	}
 	return retVal;
 }

@@ -35,7 +35,7 @@ Project Wolframe.
 ///
 
 #include "appObjects.hpp"
-#include "logger.hpp"
+#include "logger-v1.hpp"
 #include "protocol/inputfilter.hpp"
 #include "protocol/formatoutput.hpp"
 #include <boost/algorithm/string.hpp>

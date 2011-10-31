@@ -36,7 +36,7 @@
 /// \brief implementation of the logger which logs to a simple logfile
 ///
 
-#include "logger.hpp"
+#include "logger-v1.hpp"
 #include "logger/logBackendFile.hpp"
 
 namespace _Wolframe {

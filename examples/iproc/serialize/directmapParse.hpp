@@ -36,7 +36,7 @@ Project Wolframe.
 #include "protocol/inputfilter.hpp"
 #include "serialize/directmapTraits.hpp"
 #include "serialize/directmapBase.hpp"
-#include "logger.hpp"
+#include "logger-v1.hpp"
 #include <stdexcept>
 #include <string>
 #include <cstddef>

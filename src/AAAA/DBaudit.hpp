@@ -51,7 +51,6 @@ class DBauditor : public AuditUnit
 class DBauditConfig : public config::ObjectConfiguration
 {
 	friend class DBauditContainer;
-	friend class config::ConfigurationParser;
 public:
 	DBauditConfig( const char* cfgName, const char* logParent, const char* logName )
 		: config::ObjectConfiguration( cfgName, logParent, logName ),
@@ -60,6 +59,8 @@ public:
 	virtual const char* objectName() const			{ return "DatabaseAudit"; }
 
 	/// methods
+	bool parse( const config::ConfigurationTree& pt, const std::string& node,
+		    const module::ModulesDirectory* modules );
 	bool check() const					{ return m_dbConfig.check(); }
 	void print( std::ostream& os, size_t indent ) const	{
 		std::string indStr( indent, ' ' );

@@ -31,54 +31,27 @@
 
 ************************************************************************/
 //
-// configuration parser base class
+// configuration tree for the configuration parser
 //
 ///\note	This file is separated from configurationBase.hpp
 ///		in order to keep boost/property_tree/ptree.hpp away
 ///		from the dependencies of the configuration structures
 
-#ifndef _CONFIG_PARSER_HPP_INCLUDED
-#define _CONFIG_PARSER_HPP_INCLUDED
+#ifndef _CONFIGURATION_TREE_HPP_INCLUDED
+#define _CONFIGURATION_TREE_HPP_INCLUDED
 
-#include <string>
 #include <boost/property_tree/ptree.hpp>
-#include "config/configurationBase.hpp"
 
 namespace _Wolframe {
 namespace config {
 
-class ConfigurationParser
+struct ConfigurationTree : public boost::property_tree::ptree
 {
 public:
-	///\brief Parse the configuration section
-	///\param[in]	pt		property tree node
-	///\param[in]	node		the label of the node. It should be
-	///				the same (case insensitive) as it->first
-//	template<typename T>
-//	static bool parse( T& configuration,
-//			   const boost::property_tree::ptree& pt, const std::string& node );
-
-	template<typename T>
-	static bool parse( T& configuration,
-			   const boost::property_tree::ptree& pt, const std::string& node,
-			   const module::ModulesDirectory* modules = NULL );
-
-//	template<typename T>
-//	static bool parseBase( ConfigurationBase& configuration,
-//			       const boost::property_tree::ptree& pt, const std::string& node )
-//	{
-//		return parse( dynamic_cast<T&>( configuration ), pt, node );
-//	}
-
-	template<typename T>
-	static bool parseBase( ConfigurationBase& configuration,
-			       const boost::property_tree::ptree& pt, const std::string& node,
-			       const module::ModulesDirectory* modules = NULL )
-	{
-		return parse( dynamic_cast<T&>( configuration ), pt, node, modules );
-	}
+	ConfigurationTree( const boost::property_tree::ptree& pt )
+		: boost::property_tree::ptree( pt )	{}
 };
 
 }} // namespace _Wolframe::config
 
-#endif // _CONFIG_PARSER_HPP_INCLUDED
+#endif // _CONFIGURATION_TREE_HPP_INCLUDED

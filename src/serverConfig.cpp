@@ -34,12 +34,12 @@
 // server configuration
 //
 
-//#include "standardConfigs.hpp"
+#include "standardConfigs.hpp"
 #include "server.hpp"
-#include "config/configurationParser.hpp"
+#include "config/ConfigurationTree.hpp"
 #include "config/valueParser.hpp"
 #include "appProperties.hpp"
-#include "logger.hpp"
+#include "logger-v1.hpp"
 
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
@@ -51,15 +51,13 @@
 #include <ostream>
 
 namespace _Wolframe {
-namespace config {
+namespace net {
 
 static const unsigned short DEFAULT_NOF_THREADS = 4;
 
 /// Parse the configuration
-template<>
-bool ConfigurationParser::parse( net::Configuration& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& /*node*/,
-				 const module::ModulesDirectory* /*modules*/ )
+bool Configuration::parse( const config::ConfigurationTree& pt, const std::string& /*node*/,
+			   const module::ModulesDirectory* /*modules*/ )
 {
 	bool retVal = true;
 
@@ -68,12 +66,12 @@ bool ConfigurationParser::parse( net::Configuration& cfg,
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "threads" ))	{
-			if ( ! Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.threads,
-						 Parser::RangeDomain<unsigned short>( 1 ), &threadsDefined ))
+			if ( ! config::Parser::getValue( logPrefix().c_str(), *L1it, threads,
+						 config::Parser::RangeDomain<unsigned short>( 1 ), &threadsDefined ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "maxConnections" ))	{
-			if ( ! Parser::getValue( cfg.logPrefix().c_str(), *L1it, cfg.maxConnections,
+			if ( ! config::Parser::getValue( logPrefix().c_str(), *L1it, maxConnections,
 						 &maxConnDefined ))
 				retVal = false;
 		}
@@ -90,7 +88,7 @@ bool ConfigurationParser::parse( net::Configuration& cfg,
 				if ( boost::algorithm::iequals( L2it->first, "host" ) ||
 						boost::algorithm::iequals( L2it->first, "address" ))	{
 					bool isDefined = ( ! host.empty());
-					if ( ! Parser::getValue( cfg.logPrefix().c_str(), *L2it, host, &isDefined ))
+					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, host, &isDefined ))
 						retVal = false;
 					else	{
 						if ( host == "*" )
@@ -98,29 +96,29 @@ bool ConfigurationParser::parse( net::Configuration& cfg,
 					}
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "port" ))	{
-					if ( !Parser::getValue( cfg.logPrefix().c_str(), *L2it, port,
-								Parser::RangeDomain<unsigned short>( 1 ),
+					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, port,
+								config::Parser::RangeDomain<unsigned short>( 1 ),
 								&portDefined ))
 						retVal = false;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "name" ))	{
 					bool isDefined = ( ! name.empty());
-					if ( ! Parser::getValue( cfg.logPrefix().c_str(), *L2it, name, &isDefined ))
+					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, name, &isDefined ))
 						retVal = false;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "maxConnections" ))	{
-					if ( !Parser::getValue( cfg.logPrefix().c_str(), *L2it, maxConn, &connDefined ))
+					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, maxConn, &connDefined ))
 						retVal = false;
 				}
 				else
-					LOG_WARNING << cfg.logPrefix() << "socket: unknown configuration option: '"
+					LOG_WARNING << logPrefix() << "socket: unknown configuration option: '"
 						    << L2it->first << "'";
 			}
 			if ( port == 0 )
 				port = net::defaultTCPport();
 
 			net::ServerTCPendpoint lep( host, port, name, maxConn );
-			cfg.address.push_back( lep );
+			address.push_back( lep );
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "SSLsocket" ))	{
 			std::string	host;
@@ -140,7 +138,7 @@ bool ConfigurationParser::parse( net::Configuration& cfg,
 				if ( boost::algorithm::iequals( L2it->first, "host" ) ||
 						boost::algorithm::iequals( L2it->first, "address" ))	{
 					bool isDefined = ( ! host.empty());
-					if ( ! Parser::getValue( cfg.logPrefix().c_str(), *L2it, host, &isDefined ))
+					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, host, &isDefined ))
 						retVal = false;
 					else	{
 						if ( host == "*" )
@@ -148,68 +146,68 @@ bool ConfigurationParser::parse( net::Configuration& cfg,
 					}
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "port" ))	{
-					if ( !Parser::getValue( cfg.logPrefix().c_str(), *L2it, port,
-								Parser::RangeDomain<unsigned short>( 1 ),
+					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, port,
+								config::Parser::RangeDomain<unsigned short>( 1 ),
 								&portDefined ))
 						retVal = false;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "name" ))	{
 					bool isDefined = ( ! name.empty());
-					if ( ! Parser::getValue( cfg.logPrefix().c_str(), *L2it, name, &isDefined ))
+					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, name, &isDefined ))
 						retVal = false;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "maxConnections" ))	{
-					if ( !Parser::getValue( cfg.logPrefix().c_str(), *L2it, maxConn, &connDefined ))
+					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, maxConn, &connDefined ))
 						retVal = false;
 				}
 
 				else if ( boost::algorithm::iequals( L2it->first, "certificate" ))	{
 					bool isDefined = ( ! certFile.empty());
-					if ( ! Parser::getValue( cfg.logPrefix().c_str(), *L2it, certFile, &isDefined ))
+					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, certFile, &isDefined ))
 						retVal = false;
 					else	{
 						if ( ! boost::filesystem::path( certFile ).is_absolute() )
-							LOG_WARNING << cfg.logPrefix() << "certificate file is not absolute: '"
+							LOG_WARNING << logPrefix() << "certificate file is not absolute: '"
 								    << certFile << "'";
 					}
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "key" ))	{
 					bool isDefined = ( ! keyFile.empty());
-					if ( ! Parser::getValue( cfg.logPrefix().c_str(), *L2it, keyFile, &isDefined ))
+					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, keyFile, &isDefined ))
 						retVal = false;
 					else	{
 						if ( ! boost::filesystem::path( keyFile ).is_absolute() )
-							LOG_WARNING << cfg.logPrefix() << "key file is not absolute: "
+							LOG_WARNING << logPrefix() << "key file is not absolute: "
 								    << keyFile << "'";
 					}
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "CAdirectory" ))	{
 					bool isDefined = ( ! CAdirectory.empty());
-					if ( ! Parser::getValue( cfg.logPrefix().c_str(), *L2it, CAdirectory, &isDefined ))
+					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, CAdirectory, &isDefined ))
 						retVal = false;
 					else	{
 						if ( ! boost::filesystem::path( CAdirectory ).is_absolute() )
-							LOG_WARNING << cfg.logPrefix() << "CA directory is not absolute: "
+							LOG_WARNING << logPrefix() << "CA directory is not absolute: "
 								    << CAdirectory << "'";
 					}
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "CAchainFile" ))	{
 					bool isDefined = ( ! CAchainFile.empty());
-					if ( ! Parser::getValue( cfg.logPrefix().c_str(), *L2it, CAchainFile, &isDefined ))
+					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, CAchainFile, &isDefined ))
 						retVal = false;
 					else	{
 						if ( ! boost::filesystem::path( CAchainFile ).is_absolute() )
-							LOG_WARNING << cfg.logPrefix() << "CA chain file is not absolute: "
+							LOG_WARNING << logPrefix() << "CA chain file is not absolute: "
 								    << CAchainFile << "'";
 					}
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "verify" ))	{
-					if ( ! Parser::getValue( cfg.logPrefix().c_str(), *L2it, verify,
-								 Parser::BoolDomain(), &verifyDefined ))
+					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, verify,
+								 config::Parser::BoolDomain(), &verifyDefined ))
 						return false;
 				}
 				else
-					LOG_WARNING << cfg.logPrefix() << "SSLsocket: unknown configuration option: '"
+					LOG_WARNING << logPrefix() << "SSLsocket: unknown configuration option: '"
 						    << L2it->first << "'";
 			}
 #ifdef WITH_SSL
@@ -219,21 +217,18 @@ bool ConfigurationParser::parse( net::Configuration& cfg,
 			net::ServerSSLendpoint lep( host, port, name, maxConn,
 						    certFile, keyFile,
 						    verify, CAdirectory, CAchainFile );
-			cfg.SSLaddress.push_back( lep );
+			SSLaddress.push_back( lep );
 #endif // WITH_SSL
 		}
 		else	{
-			LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '" << L1it->first << "'";
+			LOG_WARNING << logPrefix() << "unknown configuration option: '" << L1it->first << "'";
 		}
 	}
-	if ( cfg.threads == 0 )
-		cfg.threads = DEFAULT_NOF_THREADS;
+	if ( threads == 0 )
+		threads = DEFAULT_NOF_THREADS;
 	return retVal;
 }
 
-} // namespace config
-
-namespace net	{
 
 // Constructor
 Configuration::Configuration()

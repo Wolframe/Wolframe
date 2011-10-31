@@ -55,12 +55,12 @@ ApplicationConfiguration::ApplicationConfiguration()
 #endif
 	// add sections, the parse function will select the
 	// appropriate action
-	addConfig( "service", serviceCfg, &ConfigurationParser::parseBase<config::ServiceConfiguration> );
-	addConfig( "daemon", serviceCfg, &ConfigurationParser::parseBase<config::ServiceConfiguration> );
+	addConfig( "service", serviceCfg );
+	addConfig( "daemon", serviceCfg);
 
-	addConfig( "listen", serverCfg, &ConfigurationParser::parseBase<net::Configuration> );
-	addConfig( "logging", loggerCfg, &ConfigurationParser::parseBase<log::LoggerConfiguration> );
-	addConfig( "application", handlerCfg->m_appConfig, &ConfigurationParser::parseBase<iproc::lua::Configuration>);
+	addConfig( "listen", serverCfg );
+	addConfig( "logging", loggerCfg );
+	addConfig( "application", handlerCfg->m_appConfig );
 }
 
 ApplicationConfiguration::~ApplicationConfiguration()

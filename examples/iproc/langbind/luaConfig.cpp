@@ -37,7 +37,7 @@
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include <ostream>
-#include "config/configurationParser.hpp"
+#include "config/ConfigurationTree.hpp"
 #include "config/valueParser.hpp"
 #include "miscUtils.hpp"
 
@@ -47,13 +47,11 @@ extern "C" {
 	#include <lua.h>
 }
 
-namespace _Wolframe {
-namespace config {
+using namespace _Wolframe::iproc::lua;
 
-template<>
-bool ConfigurationParser::parse( _Wolframe::iproc::lua::Configuration& cfg,
-				 const boost::property_tree::ptree& parentNode, const std::string& /*node*/,
-				 const module::ModulesDirectory* /*modules*/ )
+bool Configuration::parse( const _Wolframe::config::ConfigurationTree& parentNode,
+			   const std::string& /*node*/,
+			   const module::ModulesDirectory* /*modules*/ )
 {
 	using namespace _Wolframe::iproc::lua;
 
@@ -64,31 +62,27 @@ bool ConfigurationParser::parse( _Wolframe::iproc::lua::Configuration& cfg,
 	{
 		if (boost::algorithm::iequals( it->first, "main"))
 		{
-			if ( !config::Parser::getValue( cfg.logPrefix().c_str(), *it, name, config::Parser::NonEmptyDomain<std::string>())) return false;
-			cfg.defMain( name.c_str());
+			if ( !config::Parser::getValue( logPrefix().c_str(), *it, name, config::Parser::NonEmptyDomain<std::string>())) return false;
+			defMain( name.c_str());
 			cnt_main ++;
 		}
 		else if (boost::algorithm::iequals( it->first, "module"))
 		{
-			if ( !config::Parser::getValue( cfg.logPrefix().c_str(), *it, name, config::Parser::NonEmptyDomain<std::string>())) return false;
-			cfg.addModule( name.c_str());
+			if ( !config::Parser::getValue( logPrefix().c_str(), *it, name, config::Parser::NonEmptyDomain<std::string>())) return false;
+			addModule( name.c_str());
 		}
 		else
 		{
-			LOG_WARNING << cfg.logPrefix() << "unknown configuration option: '" << it->first << "'";
+			LOG_WARNING << logPrefix() << "unknown configuration option: '" << it->first << "'";
 		}
 	}
 	if (cnt_main == 0)
 	{
-		LOG_ERROR << cfg.logPrefix() << "main script to execute is not defined (configuration option <module>";
+		LOG_ERROR << logPrefix() << "main script to execute is not defined (configuration option <module>";
 		return false;
 	}
 	return true;
 }
-
-}} // namespace _Wolframe::config
-
-using namespace _Wolframe::iproc::lua;
 
 void Configuration::addModule( const char* name)
 {

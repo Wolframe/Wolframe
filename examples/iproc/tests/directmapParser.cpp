@@ -35,7 +35,7 @@ Project Wolframe.
 #include "serialize/directmapDescription.hpp"
 #include "serialize/directmapBase.hpp"
 #include "langbind/appObjects.hpp"
-#include "logger.hpp"
+#include "logger-v1.hpp"
 #include "tests/testUtils.hpp"
 #ifdef _WIN32
 #pragma warning(disable:4996)

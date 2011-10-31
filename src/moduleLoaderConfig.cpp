@@ -36,8 +36,8 @@
 
 #include "moduleLoaderConfig.hpp"
 #include "config/valueParser.hpp"
-#include "config/configurationParser.hpp"
-#include "logger.hpp"
+#include "config/ConfigurationTree.hpp"
+#include "logger-v1.hpp"
 
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
@@ -54,27 +54,25 @@ namespace _Wolframe {
 namespace config {
 
 /// Parse the configuration
-template<>
-bool ConfigurationParser::parse( ModuleLoaderConfiguration& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& /*node*/,
-				 const module::ModulesDirectory* /*modules*/ )
+bool ModuleLoaderConfiguration::parse( const ConfigurationTree& pt, const std::string& /*node*/,
+				       const module::ModulesDirectory* /*modules*/ )
 {
 	bool retVal = true;
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "module" ))	{
 			std::string* modFile = new std::string;
-			if ( !Parser::getValue( cfg.logPrefix().c_str(), *L1it, *modFile ))	{
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, *modFile ))	{
 				retVal = false;
 				delete modFile;
 			}
 			else	{
 				if ( ! boost::filesystem::path( *modFile ).is_absolute() )
-					LOG_WARNING << cfg.logPrefix() << " file path is not absolute: "
+					LOG_WARNING << logPrefix() << " file path is not absolute: "
 						    << *modFile;
 				bool isDuplicate = false;
-				for ( std::list< std::string* >::const_iterator it = cfg.m_moduleFile.begin();
-										it != cfg.m_moduleFile.end(); it++ )	{
+				for ( std::list< std::string* >::const_iterator it = m_moduleFile.begin();
+										it != m_moduleFile.end(); it++ )	{
 					if ( boost::algorithm::iequals( **it, *modFile ))	{
 						LOG_ERROR << "duplicate module file: '" << *modFile << "'";
 						retVal = false;
@@ -83,11 +81,11 @@ bool ConfigurationParser::parse( ModuleLoaderConfiguration& cfg,
 					}
 				}
 				if ( ! isDuplicate )
-					cfg.m_moduleFile.push_back( modFile );
+					m_moduleFile.push_back( modFile );
 			}
 		}
 		else	{
-			LOG_WARNING << cfg.logPrefix() << " unknown configuration option: '"
+			LOG_WARNING << logPrefix() << " unknown configuration option: '"
 				    << L1it->first << "'";
 		}
 	}

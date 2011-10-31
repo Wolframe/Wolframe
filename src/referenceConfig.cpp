@@ -35,27 +35,25 @@
 //
 
 #include "config/valueParser.hpp"
-#include "config/configurationParser.hpp"
+#include "config/ConfigurationTree.hpp"
 #include "config/reference.hpp"
 
-#include "logger.hpp"
+#include "logger-v1.hpp"
 #include <ostream>
 
 namespace _Wolframe {
 namespace config {
 
 /// Specialization of the ConfigurationParser::parse for the reference configuration
-template<>
-bool ConfigurationParser::parse( ReferenceConfig& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& node,
-				 const module::ModulesDirectory* /*modules*/ )
+bool ReferenceConfig::parse( const ConfigurationTree& pt, const std::string& node,
+			     const module::ModulesDirectory* /*modules*/ )
 {
-	bool labelDefined = ( ! cfg.m_ref.empty() );
-	if ( !config::Parser::getValue( cfg.logPrefix().c_str(), node.c_str(),
-					pt.get_value<std::string>(), cfg.m_ref, &labelDefined ))
+	bool labelDefined = ( ! m_ref.empty() );
+	if ( !config::Parser::getValue( logPrefix().c_str(), node.c_str(),
+					pt.get_value<std::string>(), m_ref, &labelDefined ))
 		return false;
-	if ( cfg.m_ref.empty() )	{
-		LOG_ERROR << cfg.logPrefix() << "Reference is empty";
+	if ( m_ref.empty() )	{
+		LOG_ERROR << logPrefix() << "Reference is empty";
 		return false;
 	}
 	return true;

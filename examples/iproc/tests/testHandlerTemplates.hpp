@@ -36,7 +36,7 @@
 
 #ifndef _Wolframe_TEST_HANDLER_TEMPLATES_HPP_INCLUDED
 #define _Wolframe_TEST_HANDLER_TEMPLATES_HPP_INCLUDED
-#include "logger.hpp"
+#include "logger-v1.hpp"
 #include <cstring>
 #include <iostream>
 

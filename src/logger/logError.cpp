@@ -36,7 +36,7 @@
 /// \brief implementation of logging error
 ///
 
-#include "logger.hpp"
+#include "logger-v1.hpp"
 #include "logger/logError.hpp"
 #include "logger/logBackendImpl.hpp"
 

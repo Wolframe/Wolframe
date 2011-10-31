@@ -48,46 +48,45 @@
 #include <sstream>
 
 namespace _Wolframe {
-	namespace log {
+namespace log {
 
-	class Logger {
-	public:
-		/// create a logger and connect it to a backend, typically
-		/// not called directly
-		Logger( LogBackend& backend );
+class Logger {
+public:
+	/// create a logger and connect it to a backend, typically
+	/// not called directly
+	Logger( LogBackend& backend );
 
-		~Logger( );
+	~Logger( );
 
-		Logger& Get( LogLevel::Level level );
+	Logger& Get( LogLevel::Level level );
 
-		template<typename T> friend Logger& operator<<( Logger& logger, T thing );
-		friend Logger& operator<<( Logger& logger, LogComponent c );
-		friend Logger& operator<<( Logger& logger, LogError e );
-		
-	protected:
-		std::ostringstream os_;
+	template<typename T> friend Logger& operator<<( Logger& logger, T thing );
+	friend Logger& operator<<( Logger& logger, LogComponent c );
+	friend Logger& operator<<( Logger& logger, LogError e );
 
-	private:
-		LogBackend&	logBk_;
-		LogLevel::Level	msgLevel_;
-		LogComponent	component_;
+protected:
+	std::ostringstream os_;
 
-		Logger( );
-		Logger( const Logger& );
-		Logger& operator= ( const Logger& );
-	};
-	
-	/// template functions for logging, default is we search for the << operator
-	/// and log with this one..
-	template<typename T>
-	Logger& operator<<( Logger& logger, T t )
-	{
-		logger.os_ << t;
-		return logger;
-	}
-			
-	} // namespace log
-} // namespace _Wolframe
+private:
+	LogBackend&	logBk_;
+	LogLevel::Level	msgLevel_;
+	LogComponent	component_;
+
+	Logger( );
+	Logger( const Logger& );
+	Logger& operator= ( const Logger& );
+};
+
+/// template functions for logging, default is we search for the << operator
+/// and log with this one..
+template<typename T>
+Logger& operator<<( Logger& logger, T t )
+{
+	logger.os_ << t;
+	return logger;
+}
+
+}} // namespace _Wolframe::log
 
 // shortcut macros
 #define LOG_DATA	_Wolframe::log::Logger( _Wolframe::log::LogBackend::instance() ).Get( _Wolframe::log::LogLevel::LOGLEVEL_DATA )

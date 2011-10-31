@@ -36,7 +36,7 @@
 
 #include "standardConfigs.hpp"
 #include "config/valueParser.hpp"
-#include "logger.hpp"
+#include "logger-v1.hpp"
 #include "appSingleton.hpp"
 
 #include <string>
@@ -46,7 +46,7 @@
 
 //////// Just for temporary testing purposes ////////
 #include "config/configurationBase.hpp"
-#include "config/configurationParser.hpp"
+#include "config/ConfigurationTree.hpp"
 //////// Just for temporary testing purposes ////////
 
 namespace _Wolframe {
@@ -72,31 +72,29 @@ static ServiceBanner::SignatureTokens strToToken( std::string& str )
 
 
 /// Service signature parser
-template<>
-bool ConfigurationParser::parse( ServiceBanner& cfg,
-				 const boost::property_tree::ptree& pt, const std::string& node,
-				 const module::ModulesDirectory* /*modules*/ )
+bool ServiceBanner::parse( const ConfigurationTree& pt, const std::string& node,
+			   const module::ModulesDirectory* /*modules*/ )
 {
 
 	if ( boost::algorithm::iequals( node, "ServerTokens" ))	{
-		bool tokensDefined = ( cfg.m_tokens != ServiceBanner::UNDEFINED );
+		bool tokensDefined = ( m_tokens != ServiceBanner::UNDEFINED );
 		std::string	val;
-		if ( !Parser::getValue( cfg.logPrefix().c_str(), node.c_str(), pt.get_value<std::string>(),
+		if ( !Parser::getValue( logPrefix().c_str(), node.c_str(), pt.get_value<std::string>(),
 					val, &tokensDefined ))
 			return false;
-		cfg.m_tokens = strToToken( val );
-		if ( cfg.m_tokens == ServiceBanner::UNDEFINED )	{
-			LOG_ERROR << cfg.logPrefix() << "Unknown option '" << val << "' for " << node;
+		m_tokens = strToToken( val );
+		if ( m_tokens == ServiceBanner::UNDEFINED )	{
+			LOG_ERROR << logPrefix() << "Unknown option '" << val << "' for " << node;
 			return false;
 		}
 	}
 	else if ( boost::algorithm::iequals( node, "ServerSignature" ))	{
-		if ( !Parser::getValue( cfg.logPrefix().c_str(), node.c_str(), pt.get_value<std::string>(),
-				       cfg.m_serverName, Parser::BoolDomain(), &cfg.m_serverNameDefined ))
+		if ( !Parser::getValue( logPrefix().c_str(), node.c_str(), pt.get_value<std::string>(),
+				       m_serverName, Parser::BoolDomain(), &m_serverNameDefined ))
 			return false;
 	}
 	else	{
-		LOG_FATAL << cfg.logPrefix() << "called with unknown configuration option: '"
+		LOG_FATAL << logPrefix() << "called with unknown configuration option: '"
 			  << node << "'";
 		return false;
 	}

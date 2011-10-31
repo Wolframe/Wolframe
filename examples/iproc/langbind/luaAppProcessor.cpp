@@ -32,7 +32,7 @@ Project Wolframe.
 #include "luaAppProcessor.hpp"
 #include "luaDebug.hpp"
 #include "appObjects.hpp"
-#include "logger.hpp"
+#include "logger-v1.hpp"
 #include "protocol/formatoutput.hpp"
 #include "protocol/inputfilter.hpp"
 #include <stdexcept>

@@ -37,7 +37,7 @@ Project Wolframe.
 #include "protocol/inputfilter.hpp"
 #include "protocol/formatoutput.hpp"
 #include "serialize/mapContext.hpp"
-#include "logger.hpp"
+#include "logger-v1.hpp"
 #include <cstddef>
 #include <string>
 #include <vector>

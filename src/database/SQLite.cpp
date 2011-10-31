@@ -34,7 +34,7 @@
 // Wolframe SQLite client view implementation
 //
 
-#include "logger.hpp"
+#include "logger-v1.hpp"
 #include "SQLite.hpp"
 
 #define BOOST_FILESYSTEM_VERSION 3
@@ -46,48 +46,6 @@
 namespace _Wolframe {
 namespace db {
 
-//***  SQLite configuration functions  **************************************
-SQLiteConfig::SQLiteConfig( const char* name, const char* logParent, const char* logName )
-	: config::ObjectConfiguration( name, logParent, logName )
-{
-	flag = false;
-}
-
-void SQLiteConfig::print( std::ostream& os, size_t indent ) const
-{
-	std::string indStr( indent, ' ' );
-
-	os << indStr << sectionName() << ":" << std::endl;
-	if ( ! m_ID.empty() )
-		os << indStr << "   ID: " << m_ID << std::endl;
-	os << indStr << "   Filename: " << filename << std::endl;
-	os << indStr << "   Flags: " << (flag ? "True Flag" : "False Flag") << std::endl;
-}
-
-bool SQLiteConfig::check() const
-{
-	if ( filename.empty() )	{
-		LOG_ERROR << logPrefix() << "SQLite database filename cannot be empty";
-		return false;
-	}
-	return true;
-}
-
-void SQLiteConfig::setCanonicalPathes( const std::string& refPath )
-{
-	using namespace boost::filesystem;
-
-	if ( ! filename.empty() )	{
-		if ( ! path( filename ).is_absolute() )
-			filename = resolvePath( absolute( filename,
-							  path( refPath ).branch_path()).string());
-		else
-			filename = resolvePath( filename );
-	}
-}
-
-
-//***  SQLite database functions  *******************************************
 SQLiteDatabase::SQLiteDatabase( const std::string& id,
 				const std::string& filename, unsigned short connections, bool flag )
 	: m_ID( id ), m_filename( filename ), m_flag( flag )

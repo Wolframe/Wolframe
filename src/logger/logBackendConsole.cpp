@@ -37,7 +37,7 @@
 ///
 
 // TODO: why!!!? logLevel.hpp with << definition should be enough
-#include "logger.hpp"
+#include "logger-v1.hpp"
 #include "logger/logLevel.hpp"
 #include "logger/logBackendConsole.hpp"
 

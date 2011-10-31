@@ -51,7 +51,6 @@ class DBauthenticator : public AuthenticationUnit
 class DatabaseAuthConfig : public config::ObjectConfiguration
 {
 	friend class DBauthContainer;
-	friend class config::ConfigurationParser;
 public:
 	DatabaseAuthConfig( const char* cfgName, const char* logParent, const char* logName )
 		: config::ObjectConfiguration( cfgName, logParent, logName ),
@@ -60,6 +59,8 @@ public:
 	virtual const char* objectName() const			{ return "DatabaseAuth"; }
 
 	/// methods
+	bool parse( const config::ConfigurationTree& pt, const std::string& node,
+		    const module::ModulesDirectory* modules );
 	bool check() const					{ return m_dbConfig.check(); }
 
 	void print( std::ostream& os, size_t indent ) const	{

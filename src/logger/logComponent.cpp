@@ -36,7 +36,7 @@
 /// \brief implementation of logging components
 ///
 
-#include "logger.hpp"
+#include "logger-v1.hpp"
 
 #include <ostream>
 

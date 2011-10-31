@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "logger.hpp"
+#include "logger-v1.hpp"
 #include "database/database.hpp"
 
 // not happy here!
