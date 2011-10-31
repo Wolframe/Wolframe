@@ -405,7 +405,9 @@ net::ConnectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const n
 	return new luaConnection( local, config_ );
 }
 
-ServerHandler::ServerHandler( const HandlerConfiguration *config ) : m_impl( new ServerHandlerImpl( config ) )	{}
+ServerHandler::ServerHandler( const HandlerConfiguration *config,
+			      const module::ModulesDirectory* /*modules*/ )
+	: m_impl( new ServerHandlerImpl( config ) )	{}
 
 ServerHandler::~ServerHandler()	{ delete m_impl; }
 

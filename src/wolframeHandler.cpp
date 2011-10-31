@@ -273,8 +273,8 @@ WolframeHandler::WolframeHandler( const HandlerConfiguration* conf,
 				  const module::ModulesDirectory* modules )
 	: m_banner( conf->bannerCfg->toString() ),
 	  m_db( conf->databaseCfg, modules ),
-	  m_aaaa( conf->aaaaCfg ),
-	  m_proc( conf->procCfg )
+	  m_aaaa( conf->aaaaCfg, modules ),
+	  m_proc( conf->procCfg, modules )
 {
 	LOG_TRACE << "Global context: banner: <" << m_banner << ">";
 	if ( ! m_aaaa.resolveDB( m_db ) )	{

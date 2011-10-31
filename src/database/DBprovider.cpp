@@ -67,9 +67,10 @@ DatabaseProvider::DatabaseProvider_Impl::DatabaseProvider_Impl( const DBprovider
 {
 	for ( std::list< config::ObjectConfiguration* >::const_iterator it = conf->m_dbConfig.begin();
 									it != conf->m_dbConfig.end(); it++ )	{
-		module::ModuleContainerBase* container = modules->getContainer((*it)->objectName());
+		module::ModuleContainer* container = modules->getContainer((*it)->objectName());
 		if ( container )	{
-			ObjectContainer< db::DatabaseUnit >* db = container->createFunc( **it );
+			ObjectContainer< db::DatabaseUnit >* db =
+					dynamic_cast< ObjectContainer< db::DatabaseUnit >* >( container->create( **it ));
 			m_db.push_back( db );
 		}
 		else	{

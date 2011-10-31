@@ -36,7 +36,7 @@
 #ifndef MODULELOADER_H_INCLUDED
 #define MODULELOADER_H_INCLUDED
 extern "C" {
-	#include "Module.h"
+	#include "module.h"
 }
 namespace _Wolframe {
 namespace module {

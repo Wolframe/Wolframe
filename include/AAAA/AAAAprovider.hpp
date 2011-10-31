@@ -49,7 +49,8 @@ class AAAAconfiguration;
 class AAAAprovider
 {
 public:
-	AAAAprovider( const AAAAconfiguration* conf );
+	AAAAprovider( const AAAAconfiguration* conf,
+		      const module::ModulesDirectory* modules );
 	~AAAAprovider();
 
 	bool resolveDB( const db::DatabaseProvider& db );

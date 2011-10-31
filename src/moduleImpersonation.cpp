@@ -71,9 +71,9 @@ ModuleConfiguration* ModulesDirectory::getConfig( const std::string& section,
 }
 
 
-bool ModulesDirectory::addContainer( ModuleContainerBase* container )
+bool ModulesDirectory::addContainer( ModuleContainer* container )
 {
-	for ( std::list< ModuleContainerBase* >::const_iterator it = m_container.begin();
+	for ( std::list< ModuleContainer* >::const_iterator it = m_container.begin();
 								it != m_container.end(); it++ )	{
 		if ( boost::algorithm::iequals( (*it)->name, container->name ))	{
 			LOG_ALERT << "A module for named '" << container->name
@@ -86,9 +86,9 @@ bool ModulesDirectory::addContainer( ModuleContainerBase* container )
 	return true;
 }
 
-ModuleContainerBase* ModulesDirectory::getContainer( const std::string& name ) const
+ModuleContainer* ModulesDirectory::getContainer( const std::string& name ) const
 {
-	for ( std::list< ModuleContainerBase* >::const_iterator it = m_container.begin();
+	for ( std::list< ModuleContainer* >::const_iterator it = m_container.begin();
 								it != m_container.end(); it++ )	{
 		if ( boost::algorithm::iequals( (*it)->name, name ))
 			return *it;
@@ -124,14 +124,14 @@ bool module::LoadModules( ModulesDirectory& modules )
 #ifdef WITH_PGSQL
 	modules.addConfig( new module::ConfigurationDescription< db::PostgreSQLconfig >
 			   ( "PostgreSQL database", "database", "PostgreSQL" ));
-	modules.addContainer( new module::ContainerDescription< ObjectContainer< db::DatabaseUnit > >
-			      ( "PostgreSQL", &db::PostgreSQLcontainer::create ));
+	modules.addContainer( new module::ContainerDescription< db::PostgreSQLcontainer,
+						db::PostgreSQLconfig >( "PostgreSQL" ));
 #endif
 #ifdef WITH_SQLITE3
 	modules.addConfig( new module::ConfigurationDescription< db::SQLiteConfig >
 			   ( "SQLite database", "database", "SQLite" ));
-	modules.addContainer( new module::ContainerDescription< ObjectContainer< db::DatabaseUnit > >
-			      ( "SQLite", &db::SQLiteContainer::create ));
+	modules.addContainer( new module::ContainerDescription< db::SQLiteContainer,
+						db::SQLiteConfig >( "SQLite" ));
 #endif
 
 	modules.addConfig( new module::ConfigurationDescription< EchoProcConfig >

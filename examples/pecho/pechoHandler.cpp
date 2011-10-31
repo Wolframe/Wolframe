@@ -446,7 +446,9 @@ net::ConnectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const n
 }
 
 
-ServerHandler::ServerHandler( const HandlerConfiguration* ) : m_impl( new ServerHandlerImpl ) {}
+ServerHandler::ServerHandler( const HandlerConfiguration*,
+			      const module::ModulesDirectory* /*modules*/  )
+	: m_impl( new ServerHandlerImpl ) {}
 
 ServerHandler::~ServerHandler()  { delete m_impl; }
 

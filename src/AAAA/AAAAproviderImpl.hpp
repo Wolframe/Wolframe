@@ -77,8 +77,7 @@ class AuthenticationGroup
 {
 public:
 	AuthenticationGroup( const std::list< config::ObjectConfiguration* >& confs,
-			     module::ModuleContainer* description,
-			     size_t descrSize );
+			     const module::ModulesDirectory* modules );
 	~AuthenticationGroup();
 	bool resolveDB( const db::DatabaseProvider& db );
 
@@ -92,8 +91,7 @@ class AuditGroup
 {
 public:
 	AuditGroup( const std::list< config::ObjectConfiguration* >& confs,
-		    module::ModuleContainer* description,
-		    size_t descrSize );
+		    const module::ModulesDirectory* modules );
 	~AuditGroup();
 	bool resolveDB( const db::DatabaseProvider& db );
 
@@ -106,7 +104,8 @@ private:
 class AAAAprovider::AAAAprovider_Impl
 {
 public:
-	AAAAprovider_Impl( const AAAAconfiguration* conf );
+	AAAAprovider_Impl( const AAAAconfiguration* conf,
+			   const module::ModulesDirectory* modules );
 	~AAAAprovider_Impl()				{}
 	bool resolveDB( const db::DatabaseProvider& db );
 

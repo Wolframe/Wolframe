@@ -44,8 +44,9 @@ namespace _Wolframe {
 namespace AAAA {
 
 /// AAAAprovider PIMPL
-AAAAprovider::AAAAprovider( const AAAAconfiguration* conf ) :
-	m_impl( new AAAAprovider_Impl( conf ))	{}
+AAAAprovider::AAAAprovider( const AAAAconfiguration* conf,
+			    const module::ModulesDirectory* modules )
+	: m_impl( new AAAAprovider_Impl( conf, modules ))	{}
 
 AAAAprovider::~AAAAprovider()
 {
@@ -69,9 +70,10 @@ Auditor* AAAAprovider::auditor()
 
 
 /// AAAAprovider PIMPL implementation
-AAAAprovider::AAAAprovider_Impl::AAAAprovider_Impl( const AAAAconfiguration* conf )
-	: m_authenticator( conf->m_authConfig, authModules, noAuthModules ),
-	  m_auditor( conf->m_auditConfig, auditModules, noAuditModules )	{}
+AAAAprovider::AAAAprovider_Impl::AAAAprovider_Impl( const AAAAconfiguration* conf,
+						    const module::ModulesDirectory* modules )
+	: m_authenticator( conf->m_authConfig, modules ),
+	  m_auditor( conf->m_auditConfig, modules )	{}
 
 bool AAAAprovider::AAAAprovider_Impl::resolveDB( const db::DatabaseProvider& db )
 {
@@ -85,22 +87,18 @@ bool AAAAprovider::AAAAprovider_Impl::resolveDB( const db::DatabaseProvider& db 
 
 /***********************************************************************************/
 AuthenticationGroup::AuthenticationGroup( const std::list< config::ObjectConfiguration* >& confs,
-					  module::ModuleContainer* description,
-					  size_t descrSize )
+					  const module::ModulesDirectory* modules )
 {
 	for ( std::list<config::ObjectConfiguration*>::const_iterator it = confs.begin();
 							it != confs.end(); it++ )	{
-		const char* authType = (*it)->objectName();
-		size_t i;
-		for ( i = 0; i < descrSize; i++ )	{
-			if ( boost::algorithm::iequals( description[i].name, authType ))	{
-				ObjectContainer< AuthenticationUnit >* container = dynamic_cast< ObjectContainer< AuthenticationUnit >* >( authModules[i].create( **it ));
-				m_authenticators.push_back( container );
-				break;
-			}
+		module::ModuleContainer* container = modules->getContainer((*it)->objectName());
+		if ( container )	{
+			ObjectContainer< AuthenticationUnit >* auth =
+					dynamic_cast< ObjectContainer< AuthenticationUnit >* >( container->create( **it ));
+			m_authenticators.push_back( auth );
 		}
-		if ( i >= descrSize )	{
-			LOG_ALERT << "AuthenticationGroup: unknown authentication type '" << authType << "'";
+		else	{
+			LOG_ALERT << "AuthenticationGroup: unknown authentication type '" << (*it)->objectName() << "'";
 			throw std::domain_error( "Unknown authentication mechanism type in AAAAprovider constructor. See log" );
 		}
 	}
@@ -125,22 +123,18 @@ bool AuthenticationGroup::resolveDB( const db::DatabaseProvider& db )
 
 /***********************************************************************************/
 AuditGroup::AuditGroup( const std::list< config::ObjectConfiguration* >& confs,
-			module::ModuleContainer* description,
-			size_t descrSize )
+			const module::ModulesDirectory* modules )
 {
 	for ( std::list<config::ObjectConfiguration*>::const_iterator it = confs.begin();
-							it != confs.end(); it++ )	{
-		const char* auditType = (*it)->objectName();
-		size_t i;
-		for ( i = 0; i < descrSize; i++ )	{
-			if ( boost::algorithm::iequals( description[i].name, auditType ))	{
-				ObjectContainer< AAAA::AuditUnit >* container = dynamic_cast< ObjectContainer< AAAA::AuditUnit >* >( auditModules[i].create( **it ));
-				m_auditors.push_back( container );
-				break;
-			}
+								it != confs.end(); it++ )	{
+		module::ModuleContainer* container = modules->getContainer((*it)->objectName());
+		if ( container )	{
+			ObjectContainer< AuditUnit >* audit =
+					dynamic_cast< ObjectContainer< AuditUnit >* >( container->create( **it ));
+			m_auditors.push_back( audit );
 		}
-		if ( i >= descrSize )	{
-			LOG_ALERT << "AuditGroup: unknown audit type '" << auditType << "'";
+		else	{
+			LOG_ALERT << "AuditGroup: unknown audit type '" << (*it)->objectName() << "'";
 			throw std::domain_error( "Unknown auditing mechanism type in AAAAprovider constructor. See log" );
 		}
 	}
@@ -148,14 +142,14 @@ AuditGroup::AuditGroup( const std::list< config::ObjectConfiguration* >& confs,
 
 AuditGroup::~AuditGroup()
 {
-	for ( std::list< ObjectContainer< AAAA::AuditUnit >* >::const_iterator it = m_auditors.begin();
+	for ( std::list< ObjectContainer< AuditUnit >* >::const_iterator it = m_auditors.begin();
 								it != m_auditors.end(); it++ )
 		delete *it;
 }
 
 bool AuditGroup::resolveDB( const db::DatabaseProvider& db )
 {
-	for ( std::list< ObjectContainer< AAAA::AuditUnit >* >::const_iterator it = m_auditors.begin();
+	for ( std::list< ObjectContainer< AuditUnit >* >::const_iterator it = m_auditors.begin();
 								it != m_auditors.end(); it++ )
 		if ( ! (*it)->object().resolveDB( db ) )
 			return false;

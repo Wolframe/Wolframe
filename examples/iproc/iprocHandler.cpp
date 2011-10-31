@@ -410,8 +410,9 @@ net::ConnectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const n
 	return new iproc::Connection( local, m_config->m_appConfig);
 }
 
-ServerHandler::ServerHandler( const HandlerConfiguration* cfg )
-	:m_impl( new ServerHandlerImpl( cfg) ) {}
+ServerHandler::ServerHandler( const HandlerConfiguration* cfg,
+			      const module::ModulesDirectory* /*modules*/ )
+	: m_impl( new ServerHandlerImpl( cfg) ) {}
 
 ServerHandler::~ServerHandler()
 {

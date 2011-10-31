@@ -174,9 +174,10 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 
 	for ( std::list< config::ObjectConfiguration* >::const_iterator it = conf->m_procConfig.begin();
 									it != conf->m_procConfig.end(); it++ )	{
-		module::ModuleContainerBase* container = modules->getContainer((*it)->objectName());
+		module::ModuleContainer* container = modules->getContainer((*it)->objectName());
 		if ( container )	{
-			ObjectContainer< ProcessorUnit >* proc = container->createFunc( **it );
+			ObjectContainer< ProcessorUnit >* proc =
+					dynamic_cast< ObjectContainer< ProcessorUnit >* >( container->create( **it ));
 			m_proc.push_back( proc );
 		}
 		else	{
