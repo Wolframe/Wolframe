@@ -51,7 +51,8 @@ class ProcProviderConfig;
 class ProcessorProvider : private boost::noncopyable
 {
 public:
-	ProcessorProvider( const ProcProviderConfig* conf );
+	ProcessorProvider( const ProcProviderConfig* conf,
+			   const module::ModulesDirectory* modules );
 	~ProcessorProvider();
 
 	bool resolveDB( const db::DatabaseProvider& db );

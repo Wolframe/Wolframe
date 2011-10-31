@@ -40,25 +40,6 @@
 #include "logger-v1.hpp"
 #include "boost/algorithm/string.hpp"
 
-/****  Impersonating the module loader  ***************************************************************/
-#include "FileAudit.hpp"
-#include "DBaudit.hpp"
-#include "TextFileAuthentication.hpp"
-#include "DBauthentication.hpp"
-
-using namespace _Wolframe;
-
-static const size_t noAuthModules = 2;
-static module::ModuleContainer
-authModules[ noAuthModules ] = { module::ContainerDescription< AAAA::DBauthContainer, AAAA::DatabaseAuthConfig >( "DatabaseAuth" ),
-				 module::ContainerDescription< AAAA::TxtFileAuthContainer, AAAA::TextFileAuthConfig >( "TextFileAuth" ) };
-
-static const size_t noAuditModules = 2;
-static module::ContainerDescription< ObjectContainer< AAAA::AuditUnit >, config::ObjectConfiguration >
-auditModules[ noAuditModules ] = { module::ContainerDescription< AAAA::DBauditContainer, AAAA::DBauditConfig >( "DatabaseAudit" ),
-				   module::ContainerDescription< AAAA::FileAuditContainer, AAAA::FileAuditConfig >( "FileAudit" ) };
-/****  End impersonating the module loader  ***********************************************************/
-
 namespace _Wolframe {
 namespace AAAA {
 

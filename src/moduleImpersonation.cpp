@@ -133,17 +133,34 @@ bool module::LoadModules( ModulesDirectory& modules )
 	modules.addContainer( new module::ContainerDescription< ObjectContainer< db::DatabaseUnit > >
 			      ( "SQLite", &db::SQLiteContainer::create ));
 #endif
+
 	modules.addConfig( new module::ConfigurationDescription< EchoProcConfig >
 			   ( "Echo Processor", "processor", "echoProcessor" ));
+	modules.addContainer( new module::ContainerDescription< EchoProcContainer,
+						EchoProcConfig >( "EchoProcessor" ));
+
 
 	modules.addConfig( new module::ConfigurationDescription< AAAA::TextFileAuthConfig >
 			   ( "Authentication file", "Authentication", "file" ));
+	modules.addContainer( new module::ContainerDescription< AAAA::TxtFileAuthContainer,
+						AAAA::TextFileAuthConfig >( "TextFileAuth" ));
+
 	modules.addConfig( new module::ConfigurationDescription< AAAA::DatabaseAuthConfig >
 			   ( "Authentication database", "Authentication", "database" ));
+	modules.addContainer( new module::ContainerDescription< AAAA::DBauthContainer,
+						AAAA::DatabaseAuthConfig >( "DatabaseAuth" ));
+
+
 	modules.addConfig( new module::ConfigurationDescription< AAAA::FileAuditConfig >
 			   ( "Audit file", "Audit", "file" ));
+	modules.addContainer( new module::ContainerDescription< AAAA::FileAuditContainer,
+						AAAA::FileAuditConfig >( "FileAudit" ));
+
 	modules.addConfig( new module::ConfigurationDescription< AAAA::DBauditConfig >
 			   ( "Audit database", "Audit", "database" ));
+	modules.addContainer( new module::ContainerDescription< AAAA::DBauditContainer,
+						AAAA::DBauditConfig >( "DatabaseAudit" ));
+
 	return retVal;
 }
 

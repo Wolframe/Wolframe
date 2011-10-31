@@ -51,16 +51,6 @@
 #include <ostream>
 #include <string>
 
-/****  Impersonating the module loader  ******************************************************/
-#include "echoProcessor.hpp"
-
-using namespace _Wolframe;
-
-static const size_t noProcModules = 1;
-static module::ContainerDescription< EchoProcContainer, EchoProcConfig >
-procModules[ noProcModules ] = { module::ContainerDescription< EchoProcContainer, EchoProcConfig >( "EchoProcessor" ) };
-/****  End impersonating the module loader  **************************************************/
-
 namespace _Wolframe {
 namespace proc {
 
@@ -154,8 +144,9 @@ void ProcProviderConfig::setCanonicalPathes( const std::string& refPath )
 
 
 //**** Processor Provider PIMPL *********************************************
-ProcessorProvider::ProcessorProvider( const ProcProviderConfig* conf ) :
-	m_impl( new ProcessorProvider_Impl( conf ))	{}
+ProcessorProvider::ProcessorProvider( const ProcProviderConfig* conf,
+				      const module::ModulesDirectory* modules )
+	: m_impl( new ProcessorProvider_Impl( conf, modules ))	{}
 
 ProcessorProvider::~ProcessorProvider()
 {
@@ -174,28 +165,27 @@ Processor* ProcessorProvider::processor()
 
 
 //**** Processor Provider PIMPL Implementation ******************************
-ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcProviderConfig* conf )
+ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcProviderConfig* conf,
+								   const module::ModulesDirectory* modules )
 {
 	m_db = NULL;
 	if ( !conf->m_dbLabel.empty())
 		m_dbLabel = conf->m_dbLabel;
+
 	for ( std::list< config::ObjectConfiguration* >::const_iterator it = conf->m_procConfig.begin();
-								it != conf->m_procConfig.end(); it++ )	{
-		const char* procType = (*it)->objectName();
-		size_t i;
-		for ( i = 0; i < noProcModules; i++ )	{
-			if ( boost::algorithm::iequals( procModules[i].name, procType ))	{
-				ObjectContainer< ProcessorUnit >* container = dynamic_cast< ObjectContainer< ProcessorUnit >* >( procModules[i].create( **it ));
-				m_proc.push_back( container );
-				break;
-			}
+									it != conf->m_procConfig.end(); it++ )	{
+		module::ModuleContainerBase* container = modules->getContainer((*it)->objectName());
+		if ( container )	{
+			ObjectContainer< ProcessorUnit >* proc = container->createFunc( **it );
+			m_proc.push_back( proc );
 		}
-		if ( i >= noProcModules )	{
-			LOG_ALERT << "Wolframe Processor Group: unknown processor type '" << procType << "'";
+		else	{
+			LOG_ALERT << "Wolframe Processor Group: unknown processor type '" << (*it)->objectName() << "'";
 			throw std::domain_error( "Unknown processor type in Processor Group constructor. See log" );
 		}
 	}
 }
+
 
 ProcessorProvider::ProcessorProvider_Impl::~ProcessorProvider_Impl()
 {

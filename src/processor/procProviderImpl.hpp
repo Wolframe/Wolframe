@@ -73,7 +73,8 @@ private:
 class ProcessorProvider::ProcessorProvider_Impl
 {
 public:
-	ProcessorProvider_Impl( const ProcProviderConfig* conf );
+	ProcessorProvider_Impl( const ProcProviderConfig* conf,
+				const module::ModulesDirectory* modules);
 	~ProcessorProvider_Impl();
 
 	bool resolveDB( const db::DatabaseProvider& db );
