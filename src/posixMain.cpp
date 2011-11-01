@@ -225,26 +225,28 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 			struct group *groupent;
 			struct passwd *passwdent;
 
-			passwdent = getpwnam( conf.serviceCfg->user.c_str( ) );
-			if( passwdent == NULL ) {
-				LOG_CRITICAL << "Illegal user '" << conf.serviceCfg->user << "': " << _Wolframe::log::LogError::LogStrerror;
-				return _Wolframe::ErrorCode::FAILURE;
+			if ( !conf.serviceCfg->user.empty() )	{
+				passwdent = getpwnam( conf.serviceCfg->user.c_str( ) );
+				if( passwdent == NULL ) {
+					LOG_CRITICAL << "Illegal user '" << conf.serviceCfg->user << "': " << _Wolframe::log::LogError::LogStrerror;
+					return _Wolframe::ErrorCode::FAILURE;
+				}
+				if( setuid( passwdent->pw_uid ) < 0 ) {
+					LOG_CRITICAL << "setgid for user '" << conf.serviceCfg->user << "' failed: " << _Wolframe::log::LogError::LogStrerror;
+					return _Wolframe::ErrorCode::FAILURE;
+				}
 			}
 
-			groupent = getgrnam( conf.serviceCfg->group.c_str( ) );
-			if( groupent == NULL ) {
-				LOG_CRITICAL << "Illegal group '" << conf.serviceCfg->group << "': " << _Wolframe::log::LogError::LogStrerror;
-				return _Wolframe::ErrorCode::FAILURE;
-			}
-
-			if( setgid( groupent->gr_gid ) < 0 ) {
-				LOG_CRITICAL << "setgid for group '" << conf.serviceCfg->group << "' failed: " << _Wolframe::log::LogError::LogStrerror;
-				return _Wolframe::ErrorCode::FAILURE;
-			}
-
-			if( setuid( passwdent->pw_uid ) < 0 ) {
-				LOG_CRITICAL << "setgid for user '" << conf.serviceCfg->user << "' failed: " << _Wolframe::log::LogError::LogStrerror;
-				return _Wolframe::ErrorCode::FAILURE;
+			if ( !conf.serviceCfg->user.empty() )	{
+				groupent = getgrnam( conf.serviceCfg->group.c_str( ) );
+				if( groupent == NULL ) {
+					LOG_CRITICAL << "Illegal group '" << conf.serviceCfg->group << "': " << _Wolframe::log::LogError::LogStrerror;
+					return _Wolframe::ErrorCode::FAILURE;
+				}
+				if( setgid( groupent->gr_gid ) < 0 ) {
+					LOG_CRITICAL << "setgid for group '" << conf.serviceCfg->group << "' failed: " << _Wolframe::log::LogError::LogStrerror;
+					return _Wolframe::ErrorCode::FAILURE;
+				}
 			}
 
 			// create a pid file and lock id
