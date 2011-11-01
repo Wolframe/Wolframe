@@ -98,13 +98,15 @@ AAAA_OBJS = \
 	AAAA\DBaudit.obj \
 	AAAA\DBauditConfig.obj \
 	AAAA\FileAudit.obj \
-	AAAA\FileAuditConfig.obj
+	AAAA\FileAuditConfig.obj \
+	AAAA\AAAAmodules.obj
 
 !IFDEF WITH_SQLITE3
 DB_OBJS = $(DB_OBJS) \
 	database\SQLite.obj \
 	database\SQLiteConfig.obj \
-	$(TOPDIR)\sqlite3\sqlite3.obj
+	$(TOPDIR)\sqlite3\sqlite3.obj \
+	database\SQLiteModule.obj
 
 AAAA_OBJS = $(AAAA_OBJS) \
 	AAAA\authentication_db_sqlite3.obj \
@@ -113,7 +115,8 @@ AAAA_OBJS = $(AAAA_OBJS) \
 !IFDEF WITH_PGSQL
 DB_OBJS = $(DB_OBJS) \
 	database\PostgreSQL.obj \
-	database\PostgreSQLconfig.obj
+	database\PostgreSQLconfig.obj \
+	database\PostgreSQLmodule.obj
 !ENDIF
 
 LOCAL_STATIC_LIB_OBJS = \
@@ -137,6 +140,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	moduleLoaderConfig.obj \
 	processor\procProvider.obj \
 	processor\echoProcessor.obj \
+	processor\echoProcessorModule.obj \
 	moduleImpersonation.obj \
 	$(DB_OBJS) \
 	$(AAAA_OBJS)

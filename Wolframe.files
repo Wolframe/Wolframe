@@ -391,6 +391,7 @@ README
 sqlite3/README
 sqlite3/sqlite3.c
 sqlite3/sqlite3.h
+src/AAAA/AAAAmodules.cpp
 src/AAAA/AAAAproviderConfig.cpp
 src/AAAA/AAAAprovider.cpp
 src/AAAA/AAAAproviderImpl.hpp
@@ -432,9 +433,11 @@ src/database/DBproviderImpl.hpp
 src/database/PostgreSQLconfig.cpp
 src/database/PostgreSQL.cpp
 src/database/PostgreSQL.hpp
+src/database/PostgreSQLmodule.cpp
 src/database/SQLiteConfig.cpp
 src/database/SQLite.cpp
 src/database/SQLite.hpp
+src/database/SQLiteModule.cpp
 src/exceptionBase.hpp
 src/getPassword.cpp
 src/getPassword.hpp
@@ -468,6 +471,7 @@ src/moduleLoader_Windows.cpp
 src/posixMain.cpp
 src/processor/echoProcessor.cpp
 src/processor/echoProcessor.hpp
+src/processor/echoProcessorModule.cpp
 src/processor/procProvider.cpp
 src/processor/procProviderImpl.hpp
 src/protocol_ioblocks.cpp
@@ -530,4 +534,3 @@ XML/configuration.rng
 XML/database.rng
 XML/logging.rng
 XML/README
-src/configurationBase.cpp

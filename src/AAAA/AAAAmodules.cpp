@@ -31,68 +31,48 @@
 
 ************************************************************************/
 //
-// file audit
+// AAAA modules
 //
 
-#ifndef _FILE_AUDIT_HPP_INCLUDED
-#define _FILE_AUDIT_HPP_INCLUDED
-
-#include <string>
-
-#include "AAAA/audit.hpp"
-#include "moduleInterface.hpp"
-
-namespace _Wolframe {
-namespace AAAA {
-
-class FileAuditor : public AuditUnit
-{
-};
-
-class FileAuditConfig : public config::ObjectConfiguration
-{
-	friend class FileAuditContainer;
-public:
-	FileAuditConfig( const char* cfgName, const char* logParent, const char* logName )
-		: config::ObjectConfiguration( cfgName, logParent, logName ) {}
-
-	const char* objectName() const			{ return "FileAudit"; }
-
-	/// methods
-	bool parse( const config::ConfigurationTree& pt, const std::string& node,
-		    const module::ModulesDirectory* modules );
-	bool check() const;
-	void print( std::ostream& os, size_t indent ) const;
-	void setCanonicalPathes( const std::string& referencePath );
-private:
-	std::string	m_file;
-};
-
-
-class FileAuditContainer : public ObjectContainer< AuditUnit >
-{
-public:
-	FileAuditContainer( const FileAuditConfig& conf );
-	~FileAuditContainer()				{}
-
-	virtual const AuditUnit& object() const		{ return m_audit; }
-	const char* objectName() const			{ return "FileAudit"; }
-private:
-	std::string	m_file;
-	FileAuditor	m_audit;
-};
-
-}} // namespace _Wolframe::AAAA
-
-
-//*********** Module *********
+#include "AAAA/TextFileAuthentication.hpp"
+#include "AAAA/DBauthentication.hpp"
+#include "AAAA/FileAudit.hpp"
+#include "AAAA/DBaudit.hpp"
 #include "moduleInterface.hpp"
 
 namespace _Wolframe {
 namespace module {
 
-ModuleContainer* FileAuditModule();
+ModuleContainer* TextFileAuthModule()
+{
+	static module::ContainerDescription< AAAA::TxtFileAuthContainer,
+			AAAA::TextFileAuthConfig > mod( "Authentication file", "Authentication",
+							"file", "TextFileAuth" );
+	return &mod;
+}
 
-}} // _Wolframe::module
+ModuleContainer* DBauthModule()
+{
+	static module::ContainerDescription< AAAA::DBauthContainer,
+			AAAA::DatabaseAuthConfig > mod( "Authentication database", "Authentication",
+							"database", "DatabaseAuth" );
+	return &mod;
+}
 
-#endif // _FILE_AUDIT_HPP_INCLUDED
+ModuleContainer* FileAuditModule()
+{
+	static module::ContainerDescription< AAAA::FileAuditContainer,
+			AAAA::FileAuditConfig > mod( "Audit file", "Audit",
+						     "file", "FileAudit" );
+	return &mod;
+}
+
+ModuleContainer* DBauditModule()
+{
+	static module::ContainerDescription< AAAA::DBauditContainer,
+			AAAA::DBauditConfig > mod( "Audit database", "Audit",
+						   "database", "DatabaseAudit" );
+	return &mod;
+}
+
+}} // namespace _Wolframe::module

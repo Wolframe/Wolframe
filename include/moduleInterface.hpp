@@ -86,12 +86,7 @@ class ModulesDirectory
 {
 public:
 	ModulesDirectory()	{}
-	~ModulesDirectory()	{
-		for ( std::list< ModuleContainer* >::const_iterator it = m_container.begin();
-									it != m_container.end();
-									it++ )
-			delete *it;
-	}
+	~ModulesDirectory()	{}
 
 	bool addContainer( ModuleContainer* container );
 

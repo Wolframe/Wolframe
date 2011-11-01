@@ -90,7 +90,6 @@ ModuleContainer* ModulesDirectory::getContainer( const std::string& name ) const
 
 
 /****  Impersonating the module loader  ******************************************************/
-#include "config/ConfigurationTree.hpp"
 #include "processor/echoProcessor.hpp"
 
 #include "AAAA/TextFileAuthentication.hpp"
@@ -112,35 +111,18 @@ bool module::LoadModules( ModulesDirectory& modules )
 	bool retVal = true;
 
 #ifdef WITH_PGSQL
-	modules.addContainer( new module::ContainerDescription< db::PostgreSQLcontainer,
-						db::PostgreSQLconfig >( "PostgreSQL database", "database",
-									"PostgreSQL", "PostgreSQL" ));
+	modules.addContainer( PostgreSQLmodule() );
 #endif
 #ifdef WITH_SQLITE3
-	modules.addContainer( new module::ContainerDescription< db::SQLiteContainer,
-						db::SQLiteConfig >( "SQLite database", "database",
-								    "SQLite", "SQLite" ));
+	modules.addContainer( SQLiteModule() );
 #endif
+	modules.addContainer( echoProcessorModule() );
 
-	modules.addContainer( new module::ContainerDescription< EchoProcContainer,
-						EchoProcConfig >( "Echo Processor", "processor",
-								  "echoProcessor", "EchoProcessor" ));
+	modules.addContainer( TextFileAuthModule() );
+	modules.addContainer( DBauthModule() );
 
-	modules.addContainer( new module::ContainerDescription< AAAA::TxtFileAuthContainer,
-						AAAA::TextFileAuthConfig >( "Authentication file", "Authentication",
-									    "file", "TextFileAuth" ));
-
-	modules.addContainer( new module::ContainerDescription< AAAA::DBauthContainer,
-						AAAA::DatabaseAuthConfig >( "Authentication database", "Authentication",
-									    "database", "DatabaseAuth" ));
-
-	modules.addContainer( new module::ContainerDescription< AAAA::FileAuditContainer,
-						AAAA::FileAuditConfig >( "Audit file", "Audit",
-									 "file", "FileAudit" ));
-
-	modules.addContainer( new module::ContainerDescription< AAAA::DBauditContainer,
-						AAAA::DBauditConfig >( "Audit database", "Audit",
-								       "database", "DatabaseAudit" ));
+	modules.addContainer( FileAuditModule() );
+	modules.addContainer( DBauditModule() );
 
 	return retVal;
 }

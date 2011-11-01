@@ -92,4 +92,15 @@ private:
 
 }} // namespace _Wolframe::AAAA
 
+
+//*********** Module *********
+#include "moduleInterface.hpp"
+
+namespace _Wolframe {
+namespace module {
+
+ModuleContainer* DBauditModule();
+
+}} // _Wolframe::module
+
 #endif // _DB_AUDIT_HPP_INCLUDED

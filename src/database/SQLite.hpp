@@ -117,4 +117,15 @@ private:
 
 }} // _Wolframe::db
 
+
+//*********** Module *********
+#include "moduleInterface.hpp"
+
+namespace _Wolframe {
+namespace module {
+
+ModuleContainer* SQLiteModule();
+
+}} // _Wolframe::module
+
 #endif // _SQLITE_HPP_INCLUDED

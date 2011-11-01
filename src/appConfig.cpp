@@ -181,6 +181,7 @@ ApplicationConfiguration::ConfigFileType ApplicationConfiguration::fileType ( co
 
 bool ApplicationConfiguration::parseModules ( const char *filename, ConfigFileType type )
 {
+	m_type = type;
 	configFile = resolvePath( boost::filesystem::absolute( filename ).string() );
 	assert( boost::filesystem::exists( configFile ));
 

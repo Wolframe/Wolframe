@@ -39,11 +39,13 @@
 
 #include "database/database.hpp"
 #include "container.hpp"
-#include "moduleInterface.hpp"
+#include "config/configurationBase.hpp"
 
 #include <list>
 #include "objectPool.hpp"
 #include "libpq-fe.h"
+
+#include "moduleInterface.hpp"
 
 namespace _Wolframe {
 namespace db {
@@ -124,5 +126,16 @@ private:
 };
 
 }} // _Wolframe::db
+
+
+//*********** Module *********
+#include "moduleInterface.hpp"
+
+namespace _Wolframe {
+namespace module {
+
+ModuleContainer* PostgreSQLmodule();
+
+}} // _Wolframe::module
 
 #endif // _POSTGRESQL_HPP_INCLUDED

@@ -93,4 +93,15 @@ private:
 
 }} // namespace _Wolframe::AAAA
 
+
+//*********** Module *********
+#include "moduleInterface.hpp"
+
+namespace _Wolframe {
+namespace module {
+
+ModuleContainer* DBauthModule();
+
+}} // _Wolframe::module
+
 #endif // _DB_AUTHENTICATION_HPP_INCLUDED

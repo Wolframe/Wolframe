@@ -83,4 +83,15 @@ private:
 
 }} // namespace _Wolframe::AAAA
 
+
+//*********** Module *********
+#include "moduleInterface.hpp"
+
+namespace _Wolframe {
+namespace module {
+
+ModuleContainer* TextFileAuthModule();
+
+}} // _Wolframe::module
+
 #endif // _TEXT_FILE_AUTHENTICATION_HPP_INCLUDED

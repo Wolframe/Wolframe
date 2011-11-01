@@ -139,7 +139,8 @@ AAAA_OBJS = \
 	AAAA/FileAudit.o \
 	AAAA/FileAuditConfig.o \
 	AAAA/AAAAprovider.o \
-	AAAA/AAAAproviderConfig.o
+	AAAA/AAAAproviderConfig.o \
+	AAAA/AAAAmodules.o
 
 ifeq ($(WITH_PAM),1)
 AAAA_OBJS += \
@@ -154,7 +155,8 @@ endif
 ifeq ($(WITH_SQLITE3),1)
 DB_OBJS += \
 	database/SQLite.o \
-	database/SQLiteConfig.o
+	database/SQLiteConfig.o \
+	database/SQLiteModule.o
 
 ifeq ($(WITH_LOCAL_SQLITE3),1)
 DB_OBJS += \
@@ -168,7 +170,8 @@ endif
 ifeq ($(WITH_PGSQL),1)
 DB_OBJS += \
 	database/PostgreSQLconfig.o \
-	database/PostgreSQL.o
+	database/PostgreSQL.o \
+	database/PostgreSQLmodule.o
 endif
 
 LOCAL_STATIC_LIB_OBJS = \
@@ -192,6 +195,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	moduleLoaderConfig.o \
 	processor/procProvider.o \
 	processor/echoProcessor.o \
+	processor/echoProcessorModule.o \
 	$(DB_OBJS) \
 	$(AAAA_OBJS)
 

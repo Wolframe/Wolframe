@@ -96,4 +96,15 @@ private:
 
 } // namespace _Wolframe
 
+
+//*********** Module *********
+#include "moduleInterface.hpp"
+
+namespace _Wolframe {
+namespace module {
+
+ModuleContainer* echoProcessorModule();
+
+}} // _Wolframe::module
+
 #endif // _ECHO_PROCESSOR_HPP_INCLUDED
