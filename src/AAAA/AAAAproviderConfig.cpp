@@ -65,7 +65,7 @@ bool AAAAconfiguration::parse( const config::ConfigurationTree& pt, const std::s
 				else if ( modules )	{
 					module::ModuleConfiguration* cfgDesc = modules->getConfig( "Authentication", L2it->first );
 					if ( cfgDesc )	{
-						config::ObjectConfiguration* conf = cfgDesc->create( logPrefix().c_str());
+						config::ObjectConfiguration* conf = cfgDesc->configuration( logPrefix().c_str());
 						if ( conf->parse( L2it->second, L2it->first, modules ))
 							m_authConfig.push_back( conf );
 						else	{
@@ -93,7 +93,7 @@ bool AAAAconfiguration::parse( const config::ConfigurationTree& pt, const std::s
 				else if ( modules )	{
 					module::ModuleConfiguration* cfgDesc = modules->getConfig( "Audit", L2it->first );
 					if ( cfgDesc )	{
-						config::ObjectConfiguration* conf = cfgDesc->create( logPrefix().c_str());
+						config::ObjectConfiguration* conf = cfgDesc->configuration( logPrefix().c_str());
 						if ( conf->parse( L2it->second, L2it->first, modules ))
 							m_auditConfig.push_back( conf );
 						else	{

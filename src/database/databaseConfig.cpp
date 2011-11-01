@@ -67,7 +67,7 @@ bool DBproviderConfig::parse( const config::ConfigurationTree& pt,
 		if ( modules )	{
 			module::ModuleConfiguration* cfgDesc = modules->getConfig( "database", L1it->first );
 			if ( cfgDesc )	{
-				config::ObjectConfiguration* conf = cfgDesc->create( logPrefix().c_str());
+				config::ObjectConfiguration* conf = cfgDesc->configuration( logPrefix().c_str());
 				if ( conf->parse( L1it->second, L1it->first, modules ))
 					m_dbConfig.push_back( conf );
 				else	{

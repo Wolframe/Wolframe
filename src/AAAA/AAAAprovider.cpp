@@ -94,7 +94,7 @@ AuthenticationGroup::AuthenticationGroup( const std::list< config::ObjectConfigu
 		module::ModuleContainer* container = modules->getContainer((*it)->objectName());
 		if ( container )	{
 			ObjectContainer< AuthenticationUnit >* auth =
-					dynamic_cast< ObjectContainer< AuthenticationUnit >* >( container->create( **it ));
+					dynamic_cast< ObjectContainer< AuthenticationUnit >* >( container->container( **it ));
 			m_authenticators.push_back( auth );
 		}
 		else	{
@@ -130,7 +130,7 @@ AuditGroup::AuditGroup( const std::list< config::ObjectConfiguration* >& confs,
 		module::ModuleContainer* container = modules->getContainer((*it)->objectName());
 		if ( container )	{
 			ObjectContainer< AuditUnit >* audit =
-					dynamic_cast< ObjectContainer< AuditUnit >* >( container->create( **it ));
+					dynamic_cast< ObjectContainer< AuditUnit >* >( container->container( **it ));
 			m_auditors.push_back( audit );
 		}
 		else	{

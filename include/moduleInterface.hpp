@@ -57,7 +57,7 @@ public:
 
 	virtual ~ModuleConfiguration()		{}
 
-	virtual config::ObjectConfiguration* create( const char* logPrefix ) = 0;
+	virtual config::ObjectConfiguration* configuration( const char* logPrefix ) = 0;
 };
 
 template< class T >
@@ -69,7 +69,7 @@ public:
 
 	virtual ~ConfigurationDescription()	{}
 
-	virtual config::ObjectConfiguration* create( const char* logPrefix )
+	virtual config::ObjectConfiguration* configuration( const char* logPrefix )
 					{ return new T( title, logPrefix, keyword ); }
 };
 
@@ -82,7 +82,7 @@ public:
 
 	virtual ~ModuleContainer()		{}
 
-	virtual Container* create( const config::ObjectConfiguration& conf ) = 0;
+	virtual Container* container( const config::ObjectConfiguration& conf ) = 0;
 };
 
 template < class T, class Tconf >
@@ -93,7 +93,7 @@ public:
 		ModuleContainer( Name )		{}
 	virtual ~ContainerDescription()		{}
 
-	virtual Container* create( const config::ObjectConfiguration& conf )	{
+	virtual Container* container( const config::ObjectConfiguration& conf )	{
 		return new T( dynamic_cast< const Tconf& >( conf ));
 	}
 };

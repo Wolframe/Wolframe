@@ -51,7 +51,7 @@ DBauditContainer::DBauditContainer( const DBauditConfig& conf )
 	if ( m_dbLabel.empty() )
 		throw std::logic_error( "Empty database reference in DBauditContainer" );
 
-	LOG_NOTICE << "Database auditor with database reference '" << m_dbLabel << "'";
+	LOG_NOTICE << "Database auditor created with database reference '" << m_dbLabel << "'";
 }
 
 DBauditContainer::~DBauditContainer()

@@ -70,7 +70,7 @@ bool ProcProviderConfig::parse( const config::ConfigurationTree& pt, const std::
 			if ( modules )	{
 				module::ModuleConfiguration* cfgDesc = modules->getConfig( "processor", L1it->first );
 				if ( cfgDesc )	{
-					config::ObjectConfiguration* conf = cfgDesc->create( logPrefix().c_str());
+					config::ObjectConfiguration* conf = cfgDesc->configuration( logPrefix().c_str());
 					if ( conf->parse( L1it->second, L1it->first, modules ))
 						m_procConfig.push_back( conf );
 					else	{
@@ -177,7 +177,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 		module::ModuleContainer* container = modules->getContainer((*it)->objectName());
 		if ( container )	{
 			ObjectContainer< ProcessorUnit >* proc =
-					dynamic_cast< ObjectContainer< ProcessorUnit >* >( container->create( **it ));
+					dynamic_cast< ObjectContainer< ProcessorUnit >* >( container->container( **it ));
 			m_proc.push_back( proc );
 		}
 		else	{

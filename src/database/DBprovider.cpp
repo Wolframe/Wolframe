@@ -70,7 +70,7 @@ DatabaseProvider::DatabaseProvider_Impl::DatabaseProvider_Impl( const DBprovider
 		module::ModuleContainer* container = modules->getContainer((*it)->objectName());
 		if ( container )	{
 			ObjectContainer< db::DatabaseUnit >* db =
-					dynamic_cast< ObjectContainer< db::DatabaseUnit >* >( container->create( **it ));
+					dynamic_cast< ObjectContainer< db::DatabaseUnit >* >( container->container( **it ));
 			m_db.push_back( db );
 		}
 		else	{
