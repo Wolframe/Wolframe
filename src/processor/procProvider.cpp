@@ -68,9 +68,9 @@ bool ProcProviderConfig::parse( const config::ConfigurationTree& pt, const std::
 		}
 		else	{
 			if ( modules )	{
-				module::ModuleConfiguration* cfgDesc = modules->getConfig( "processor", L1it->first );
-				if ( cfgDesc )	{
-					config::ObjectConfiguration* conf = cfgDesc->configuration( logPrefix().c_str());
+				module::ModuleContainer* container = modules->getContainer( "processor", L1it->first );
+				if ( container )	{
+					config::ObjectConfiguration* conf = container->configuration( logPrefix().c_str());
 					if ( conf->parse( L1it->second, L1it->first, modules ))
 						m_procConfig.push_back( conf );
 					else	{

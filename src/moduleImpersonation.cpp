@@ -41,28 +41,34 @@
 namespace _Wolframe {
 namespace module {
 
-bool ModulesDirectory::addConfig( ModuleConfiguration* description )
+bool ModulesDirectory::addContainer( ModuleContainer* container )
 {
-	for ( std::list< ModuleConfiguration* >::const_iterator it = m_config.begin();
-								it != m_config.end(); it++ )	{
-		if ( boost::algorithm::iequals( (*it)->section, description->section ) &&
-				boost::algorithm::iequals( (*it)->keyword, description->keyword ))	{
-			LOG_ALERT << "A configuration module for section '" << description->section
-				  << "' keyword '" << description->keyword << "' already exists";
+	for ( std::list< ModuleContainer* >::const_iterator it = m_container.begin();
+							it != m_container.end(); it++ )	{
+		if ( boost::algorithm::iequals( (*it)->section, container->section ) &&
+				boost::algorithm::iequals( (*it)->keyword, container->keyword ))	{
+			LOG_ALERT << "A configuration module for section '" << container->section
+				  << "' keyword '" << container->keyword << "' already exists";
+			return false;
+		}
+		if ( boost::algorithm::iequals( (*it)->name, container->name ))	{
+			LOG_ALERT << "A module named '" << container->name
+				  << "' already exists";
 			return false;
 		}
 	}
-	m_config.push_back( description );
-	LOG_DEBUG << "Configuration for section '" << description->section
-		  << "' keyword '" << description->keyword << "' registered";
+	m_container.push_back( container );
+	LOG_DEBUG << "Container '" << container->name << "' registered for section '"
+		  << container->section << "' keyword '" << container->keyword << "'";
 	return true;
 }
 
-ModuleConfiguration* ModulesDirectory::getConfig( const std::string& section,
-						  const std::string& keyword ) const
+
+ModuleContainer* ModulesDirectory::getContainer( const std::string& section,
+						 const std::string& keyword ) const
 {
-	for ( std::list< ModuleConfiguration* >::const_iterator it = m_config.begin();
-								it != m_config.end(); it++ )	{
+	for ( std::list< ModuleContainer* >::const_iterator it = m_container.begin();
+							it != m_container.end(); it++ )	{
 		if ( boost::algorithm::iequals( (*it)->keyword, keyword ) &&
 				boost::algorithm::iequals( (*it)->section, section ))
 			return *it;
@@ -70,26 +76,10 @@ ModuleConfiguration* ModulesDirectory::getConfig( const std::string& section,
 	return NULL;
 }
 
-
-bool ModulesDirectory::addContainer( ModuleContainer* container )
-{
-	for ( std::list< ModuleContainer* >::const_iterator it = m_container.begin();
-								it != m_container.end(); it++ )	{
-		if ( boost::algorithm::iequals( (*it)->name, container->name ))	{
-			LOG_ALERT << "A module for named '" << container->name
-				  << "' already exists";
-			return false;
-		}
-	}
-	m_container.push_back( container );
-	LOG_DEBUG << "Container for module '" << container->name << "' registered";
-	return true;
-}
-
 ModuleContainer* ModulesDirectory::getContainer( const std::string& name ) const
 {
 	for ( std::list< ModuleContainer* >::const_iterator it = m_container.begin();
-								it != m_container.end(); it++ )	{
+							it != m_container.end(); it++ )	{
 		if ( boost::algorithm::iequals( (*it)->name, name ))
 			return *it;
 	}
@@ -122,44 +112,35 @@ bool module::LoadModules( ModulesDirectory& modules )
 	bool retVal = true;
 
 #ifdef WITH_PGSQL
-	modules.addConfig( new module::ConfigurationDescription< db::PostgreSQLconfig >
-			   ( "PostgreSQL database", "database", "PostgreSQL" ));
 	modules.addContainer( new module::ContainerDescription< db::PostgreSQLcontainer,
-						db::PostgreSQLconfig >( "PostgreSQL" ));
+						db::PostgreSQLconfig >( "PostgreSQL database", "database",
+									"PostgreSQL", "PostgreSQL" ));
 #endif
 #ifdef WITH_SQLITE3
-	modules.addConfig( new module::ConfigurationDescription< db::SQLiteConfig >
-			   ( "SQLite database", "database", "SQLite" ));
 	modules.addContainer( new module::ContainerDescription< db::SQLiteContainer,
-						db::SQLiteConfig >( "SQLite" ));
+						db::SQLiteConfig >( "SQLite database", "database",
+								    "SQLite", "SQLite" ));
 #endif
 
-	modules.addConfig( new module::ConfigurationDescription< EchoProcConfig >
-			   ( "Echo Processor", "processor", "echoProcessor" ));
 	modules.addContainer( new module::ContainerDescription< EchoProcContainer,
-						EchoProcConfig >( "EchoProcessor" ));
+						EchoProcConfig >( "Echo Processor", "processor",
+								  "echoProcessor", "EchoProcessor" ));
 
-
-	modules.addConfig( new module::ConfigurationDescription< AAAA::TextFileAuthConfig >
-			   ( "Authentication file", "Authentication", "file" ));
 	modules.addContainer( new module::ContainerDescription< AAAA::TxtFileAuthContainer,
-						AAAA::TextFileAuthConfig >( "TextFileAuth" ));
+						AAAA::TextFileAuthConfig >( "Authentication file", "Authentication",
+									    "file", "TextFileAuth" ));
 
-	modules.addConfig( new module::ConfigurationDescription< AAAA::DatabaseAuthConfig >
-			   ( "Authentication database", "Authentication", "database" ));
 	modules.addContainer( new module::ContainerDescription< AAAA::DBauthContainer,
-						AAAA::DatabaseAuthConfig >( "DatabaseAuth" ));
+						AAAA::DatabaseAuthConfig >( "Authentication database", "Authentication",
+									    "database", "DatabaseAuth" ));
 
-
-	modules.addConfig( new module::ConfigurationDescription< AAAA::FileAuditConfig >
-			   ( "Audit file", "Audit", "file" ));
 	modules.addContainer( new module::ContainerDescription< AAAA::FileAuditContainer,
-						AAAA::FileAuditConfig >( "FileAudit" ));
+						AAAA::FileAuditConfig >( "Audit file", "Audit",
+									 "file", "FileAudit" ));
 
-	modules.addConfig( new module::ConfigurationDescription< AAAA::DBauditConfig >
-			   ( "Audit database", "Audit", "database" ));
 	modules.addContainer( new module::ContainerDescription< AAAA::DBauditContainer,
-						AAAA::DBauditConfig >( "DatabaseAudit" ));
+						AAAA::DBauditConfig >( "Audit database", "Audit",
+								       "database", "DatabaseAudit" ));
 
 	return retVal;
 }

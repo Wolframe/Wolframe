@@ -46,42 +46,21 @@
 namespace _Wolframe {
 namespace module {
 
-struct ModuleConfiguration
+struct ModuleContainer
 {
 	const char* title;
 	const char* section;
 	const char* keyword;
-public:
-	ModuleConfiguration( const char* Title, const char* Section, const char* Keyword )
-		: title( Title ), section( Section), keyword( Keyword )	{}
-
-	virtual ~ModuleConfiguration()		{}
-
-	virtual config::ObjectConfiguration* configuration( const char* logPrefix ) = 0;
-};
-
-template< class T >
-struct ConfigurationDescription : public ModuleConfiguration
-{
-public:
-	ConfigurationDescription( const char* Title, const char* Section, const char* Keyword )
-		: ModuleConfiguration( Title, Section, Keyword )	{}
-
-	virtual ~ConfigurationDescription()	{}
-
-	virtual config::ObjectConfiguration* configuration( const char* logPrefix )
-					{ return new T( title, logPrefix, keyword ); }
-};
-
-
-struct ModuleContainer
-{
 	const char* name;
 public:
-	ModuleContainer( const char* Name ) : name( Name ){}
+	ModuleContainer( const char* Title, const char* Section, const char* Keyword,
+			 const char* Name )
+		: title( Title ), section( Section), keyword( Keyword ),
+		  name( Name ){}
 
 	virtual ~ModuleContainer()		{}
 
+	virtual config::ObjectConfiguration* configuration( const char* logPrefix ) = 0;
 	virtual Container* container( const config::ObjectConfiguration& conf ) = 0;
 };
 
@@ -89,11 +68,15 @@ template < class T, class Tconf >
 class ContainerDescription : public ModuleContainer
 {
 public:
-	ContainerDescription( const char* Name ) :
-		ModuleContainer( Name )		{}
+	ContainerDescription( const char* Title, const char* Section, const char* Keyword,
+			      const char* Name )
+		: ModuleContainer( Title, Section, Keyword, Name )	{}
 	virtual ~ContainerDescription()		{}
 
-	virtual Container* container( const config::ObjectConfiguration& conf )	{
+	virtual config::ObjectConfiguration* configuration( const char* logPrefix ){
+		return new Tconf( title, logPrefix, keyword );
+	}
+	virtual Container* container( const config::ObjectConfiguration& conf ){
 		return new T( dynamic_cast< const Tconf& >( conf ));
 	}
 };
@@ -104,23 +87,17 @@ class ModulesDirectory
 public:
 	ModulesDirectory()	{}
 	~ModulesDirectory()	{
-		for ( std::list< ModuleConfiguration* >::const_iterator it = m_config.begin();
-									it != m_config.end();
-									it++ )
-			delete *it;
 		for ( std::list< ModuleContainer* >::const_iterator it = m_container.begin();
 									it != m_container.end();
 									it++ )
 			delete *it;
 	}
 
-	bool addConfig( ModuleConfiguration* description );
 	bool addContainer( ModuleContainer* container );
 
-	ModuleConfiguration* getConfig( const std::string& section, const std::string& keyword ) const;
+	ModuleContainer* getContainer( const std::string& section, const std::string& keyword ) const;
 	ModuleContainer* getContainer( const std::string& name ) const;
 private:
-	std::list< ModuleConfiguration* >	m_config;
 	std::list< ModuleContainer* >		m_container;
 };
 

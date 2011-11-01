@@ -65,9 +65,9 @@ bool DBproviderConfig::parse( const config::ConfigurationTree& pt,
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( modules )	{
-			module::ModuleConfiguration* cfgDesc = modules->getConfig( "database", L1it->first );
-			if ( cfgDesc )	{
-				config::ObjectConfiguration* conf = cfgDesc->configuration( logPrefix().c_str());
+			module::ModuleContainer* container = modules->getContainer( "database", L1it->first );
+			if ( container )	{
+				config::ObjectConfiguration* conf = container->configuration( logPrefix().c_str());
 				if ( conf->parse( L1it->second, L1it->first, modules ))
 					m_dbConfig.push_back( conf );
 				else	{
