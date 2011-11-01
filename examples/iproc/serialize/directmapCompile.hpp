@@ -38,13 +38,15 @@ Project Wolframe.
 #include <string>
 #include <vector>
 #include <map>
+#include <stdexcept>
+#include <sstream>
 #include <cstddef>
 #include <cstring>
 
 namespace _Wolframe {
 namespace directmap {
 
-class SymbolTable
+class Definition
 {
 public:
 	class Element
@@ -52,7 +54,7 @@ public:
 	public:
 		enum Type
 		{
-			float_,long_,ulong_,int_,uint_,short_,ushort_,char_,uchar_,string_,struct_
+			string_,float_,long_,ulong_,int_,uint_,short_,ushort_,char_,uchar_,struct_
 		};
 		static const char* typeName( Type tp)
 		{
@@ -73,13 +75,36 @@ public:
 			}
 			return false;
 		}
-		Type type() const {return m_type;}
-		std::string name() const {return m_name;}
-		std::string defaultValue() const {return m_default;}
-		int ref() const {return m_ref;}
-		std::size_t size() const {return m_size;}
-		bool isArray() const {return m_isArray;}
-	public:
+		Type type() const				{return m_type;}
+		std::string name() const			{return m_name;}
+		std::string defaultValue() const		{return m_default;}
+		int ref() const					{return m_ref;}
+		std::size_t size() const			{return m_size;}
+		bool isArray() const				{return m_isArray;}
+
+		Element()
+			:m_type(string_),m_ref(-1),m_size(0),m_isArray(false){}
+
+		Element( const std::string& name_)
+			:m_type(string_),m_name(name_),m_ref(-1),m_size(0),m_isArray(false){}
+
+		Element( const std::string& type_, const std::string& name_)
+			:m_type(string_),m_name(name_),m_ref(-1),m_size(0),m_isArray(false)
+		{
+			initType( type_);
+		}
+		Element( const std::string& type_, const std::string& name_, const std::string& default_)
+			:m_type(string_),m_name(name_),m_default(default_),m_ref(-1),m_size(0),m_isArray(false)
+		{
+			initType( type_);
+		}
+		Element( const std::string& type_, const std::string& name_, const char&)
+			:m_type(string_),m_name(name_),m_ref(-1),m_size(0),m_isArray(true)
+		{
+			initType( type_);
+		}
+	private:
+		friend class Definition;
 		Type m_type;
 		std::string m_name;
 		std::string m_default;
@@ -87,15 +112,31 @@ public:
 		std::size_t m_size;
 		bool m_isArray;
 
-		Element() :m_ref(-1),m_size(0U),m_isArray(false){}
+		void initType( const std::string& type_)
+		{
+			unsigned int ii=0;
+			while (typeName( (Type)ii) && std::strcmp( typeName( (Type)ii), type_.c_str()) != 0) ii++;
+			if (!typeName( (Type)ii)) throw std::runtime_error( "illegal type ");
+			m_type = (Type)ii;
+		}
 	};
 
-	struct Struct
+	class Struct
 	{
+	public:
+		std::size_t size() const				{return m_size;}
+		const std::string& name() const				{return m_name;}
+		const std::vector<Element>& elements() const		{return m_elements;}
+
+		Struct() :m_size(0){}
+		Struct( const std::string& name_)						:m_name(name_),m_size(0){}
+		Struct( const std::string& name_, const std::vector<Element>& elements_)	:m_name(name_),m_elements(elements_),m_size(0){}
+
+	private:
+		friend class Definition;
 		std::string m_name;
 		std::vector<Element> m_elements;
 		std::size_t m_size;
-		Struct() :m_size(0){}
 	};
 
 	const std::vector<Struct> ar() const
@@ -110,9 +151,6 @@ public:
 		return &m_ar[ itr->second];
 	}
 
-	bool define( const std::string& name, const Struct& ee);
-
-	void error( const std::string& msg) {m_errors.push_back( msg);}
 	const std::vector<std::string>& errors() const {return m_errors;}
 
 	bool compile( const char* filename, std::string& error);
@@ -121,6 +159,8 @@ private:
 	std::map<std::string,std::size_t> m_linkmap;
 	std::vector<Struct> m_ar;
 	std::vector<std::string> m_errors;
+
+	std::size_t calcElementSize( std::size_t idx, std::size_t depht);
 };
 
 }}

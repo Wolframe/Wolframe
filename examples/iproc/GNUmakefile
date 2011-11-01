@@ -75,9 +75,9 @@ OBJS = \
 	filters/char_filter.o \
 	filters/line_filter.o \
 	serialize/directmapBase.o \
+	serialize/directmapCompile.o \
 	$(TOPDIR)/src/posixMain.o
 
-#PF: temporarily disabled: 	serialize/directmapCompile.o \
 
 ifeq ($(WITH_LUA),1)
 OBJS += \
@@ -103,9 +103,8 @@ TEST_BINS += \
 	tests/iprocHandlerTest$(EXE) \
 	tests/iprocHandlerXMLTest$(EXE) \
 	tests/luamapParser$(EXE) \
+	tests/directmapCompiler$(EXE) \
 	tests/directmapParser$(EXE)
-
-#PF: temporarily disabled: 	tests/directmapCompiler$(EXE) \
 
 
 tests/iprocHandlerTest$(EXE): tests/iprocHandlerTest.o $(OBJS) $(TOPDIR)/src/libwolframe.a

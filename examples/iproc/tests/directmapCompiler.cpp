@@ -11,9 +11,9 @@ int main( int argc, const char** argv)
 		std::cerr << "missing input file parameter" << std::endl;
 		return -1;
 	}
-	directmap::SymbolTable symtab;
+	directmap::Definition directmap;
 	std::string error;
-	if (!symtab.compile( argv[1], error))
+	if (!directmap.compile( argv[1], error))
 	{
 		std::cerr << error << std::endl;
 		return -2;
