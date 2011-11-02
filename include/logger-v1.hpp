@@ -55,6 +55,7 @@ public:
 	/// create a logger and connect it to a backend, typically
 	/// not called directly
 	Logger( LogBackend& backend );
+	Logger( LogBackend* backend );
 
 	~Logger( );
 

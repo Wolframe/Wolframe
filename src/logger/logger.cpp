@@ -45,6 +45,10 @@ Logger::Logger( LogBackend& backend ) :	logBk_( backend )
 {
 }
 
+Logger::Logger( LogBackend* backend ) :	logBk_( *backend )
+{
+}
+
 Logger::~Logger( )
 {
 	logBk_.log( component_, msgLevel_, os_.str( ) );
