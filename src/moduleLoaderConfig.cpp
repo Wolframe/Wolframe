@@ -127,7 +127,6 @@ bool ModuleLoaderConfiguration::check() const
 				retVal = false;
 			}
 	}
-
 	return retVal;
 }
 

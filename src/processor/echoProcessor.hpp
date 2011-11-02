@@ -103,7 +103,9 @@ private:
 namespace _Wolframe {
 namespace module {
 
-ModuleContainer* echoProcessorModule();
+extern "C" {
+	ModuleContainer* echoProcessorModule();
+}
 
 }} // _Wolframe::module
 

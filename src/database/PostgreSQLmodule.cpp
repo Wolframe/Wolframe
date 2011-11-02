@@ -40,12 +40,14 @@
 namespace _Wolframe {
 namespace module {
 
-ModuleContainer* PostgreSQLmodule()
+extern "C" {
+ModuleContainer* PostgreSQLmodule( void )
 {
 	static ContainerDescription< db::PostgreSQLcontainer,
 			db::PostgreSQLconfig > mod( "PostgreSQL database", "database",
 						    "PostgreSQL", "PostgreSQL" );
 	return &mod;
+}
 }
 
 }} // namespace _Wolframe::module

@@ -124,7 +124,9 @@ private:
 namespace _Wolframe {
 namespace module {
 
-ModuleContainer* SQLiteModule();
+extern "C" {
+	ModuleContainer* SQLiteModule();
+}
 
 }} // _Wolframe::module
 

@@ -133,8 +133,9 @@ private:
 
 namespace _Wolframe {
 namespace module {
-
-ModuleContainer* PostgreSQLmodule();
+extern "C" {
+	ModuleContainer* PostgreSQLmodule( void );
+}
 
 }} // _Wolframe::module
 

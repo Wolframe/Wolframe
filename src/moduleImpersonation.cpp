@@ -111,18 +111,18 @@ bool module::LoadModules( ModulesDirectory& modules )
 	bool retVal = true;
 
 #ifdef WITH_PGSQL
-	modules.addContainer( PostgreSQLmodule() );
+	modules.addContainer( reinterpret_cast<module::ModuleContainer*(*)()>( PostgreSQLmodule )() );
 #endif
 #ifdef WITH_SQLITE3
-	modules.addContainer( SQLiteModule() );
+	modules.addContainer( reinterpret_cast<module::ModuleContainer*(*)()>( SQLiteModule )() );
 #endif
-	modules.addContainer( echoProcessorModule() );
+	modules.addContainer( reinterpret_cast<module::ModuleContainer*(*)()>( echoProcessorModule )() );
 
-	modules.addContainer( TextFileAuthModule() );
-	modules.addContainer( DBauthModule() );
+	modules.addContainer( reinterpret_cast<module::ModuleContainer*(*)()>( TextFileAuthModule )() );
+	modules.addContainer( reinterpret_cast<module::ModuleContainer*(*)()>( DBauthModule )() );
 
-	modules.addContainer( FileAuditModule() );
-	modules.addContainer( DBauditModule() );
+	modules.addContainer( reinterpret_cast<module::ModuleContainer*(*)()>( FileAuditModule )() );
+	modules.addContainer( reinterpret_cast<module::ModuleContainer*(*)()>( DBauditModule )() );
 
 	return retVal;
 }

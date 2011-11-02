@@ -40,12 +40,14 @@
 namespace _Wolframe {
 namespace module {
 
+extern "C" {
 ModuleContainer* echoProcessorModule()
 {
 	static ContainerDescription< EchoProcContainer,
 			EchoProcConfig > mod( "Echo Processor", "processor",
 					      "echoProcessor", "EchoProcessor" );
 	return &mod;
+}
 }
 
 }} // namespace _Wolframe::module

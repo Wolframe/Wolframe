@@ -99,7 +99,9 @@ private:
 namespace _Wolframe {
 namespace module {
 
-ModuleContainer* DBauditModule();
+extern "C" {
+	ModuleContainer* DBauditModule();
+}
 
 }} // _Wolframe::module
 

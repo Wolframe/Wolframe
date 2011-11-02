@@ -40,12 +40,14 @@
 namespace _Wolframe {
 namespace module {
 
+extern "C" {
 ModuleContainer* SQLiteModule()
 {
 	static module::ContainerDescription< db::SQLiteContainer,
 			db::SQLiteConfig > mod( "SQLite database", "database",
 						"SQLite", "SQLite" );
 	return &mod;
+}
 }
 
 }} // namespace _Wolframe::module

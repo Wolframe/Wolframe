@@ -43,6 +43,8 @@
 namespace _Wolframe {
 namespace module {
 
+extern "C" {
+
 ModuleContainer* TextFileAuthModule()
 {
 	static module::ContainerDescription< AAAA::TxtFileAuthContainer,
@@ -74,5 +76,7 @@ ModuleContainer* DBauditModule()
 						   "database", "DatabaseAudit" );
 	return &mod;
 }
+
+} // extern "C"
 
 }} // namespace _Wolframe::module

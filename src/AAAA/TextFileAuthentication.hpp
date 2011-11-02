@@ -90,7 +90,9 @@ private:
 namespace _Wolframe {
 namespace module {
 
-ModuleContainer* TextFileAuthModule();
+extern "C" {
+	ModuleContainer* TextFileAuthModule();
+}
 
 }} // _Wolframe::module
 
