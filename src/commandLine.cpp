@@ -133,7 +133,7 @@ bool CmdLineConfig::parse( int argc, char* argv[] )
 			if ( command == DEFAULT )
 				command = TEST_CONFIG;
 			else	{
-				errMsg_ = "-t (--test-config) can not be specified together with -v|-h|-p|-t";
+				errMsg_ = "-T (--test-config) can not be specified together with -v|-h|-p|-t";
 				return false;
 			}
 		}
@@ -143,7 +143,7 @@ bool CmdLineConfig::parse( int argc, char* argv[] )
 			if ( command == DEFAULT )
 				command = INSTALL_SERVICE;
 			else	{
-				errMsg_ = "--install can not be specified together with -h|-p|-t|-T";
+				errMsg_ = "--install can not be specified together with -v|-h|-p|-t|-T";
 				return false;
 			}
 		}
@@ -152,7 +152,7 @@ bool CmdLineConfig::parse( int argc, char* argv[] )
 			if ( command == DEFAULT )
 				command = REMOVE_SERVICE;
 			else	{
-				errMsg_ = "--remove can not be specified together with -h|-p|-t|-T";
+				errMsg_ = "--remove can not be specified together with -v|-h|-p|-t|-T";
 				return false;
 			}
 		}
@@ -161,14 +161,28 @@ bool CmdLineConfig::parse( int argc, char* argv[] )
 			if ( command == DEFAULT )
 				command = RUN_SERVICE;
 			else	{
-				errMsg_ = "--service can not be specified together with -h|-p|-t|-T";
+				errMsg_ = "--service can not be specified together with -v|-h|-p|-t|-T";
+				return false;
 			}
 		}
 #endif
 
 #if !defined(_WIN32)
-		if ( clMap.count( "foreground" ))
+		if ( clMap.count( "foreground" ))	{
 			foreground = true;
+			switch( command )	{
+				case PRINT_HELP:
+				case PRINT_VERSION:
+				case CHECK_CONFIG:
+				case TEST_CONFIG:
+				case PRINT_CONFIG:
+					errMsg_ = "-f (--foreground) make no sense together with -v|-h|-p|-t|-T";
+					break;
+				case DEFAULT:
+					break;
+				default: throw std::logic_error( "'command' in command line parser has an unknwn value" );
+			}
+		}
 #endif
 		if ( clMap.count( "use-config-logging" ))
 			useLogConfig = true;

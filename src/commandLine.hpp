@@ -48,7 +48,6 @@ namespace config	{
 
 struct CmdLineConfig	{
 	enum Command_t	{
-		DEFAULT,
 		PRINT_HELP,
 		PRINT_VERSION,
 		CHECK_CONFIG,
@@ -59,7 +58,7 @@ struct CmdLineConfig	{
 		REMOVE_SERVICE,
 		RUN_SERVICE,
 #endif
-		UNKNOWN
+		DEFAULT
 	};
 
 	Command_t	command;
