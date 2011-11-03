@@ -111,6 +111,7 @@ bool module::LoadModules( ModulesDirectory& modules )
 	bool retVal = true;
 
 #ifdef WITH_PGSQL
+	setModuleLogger( &_Wolframe::log::LogBackend::instance() );
 	modules.addContainer( reinterpret_cast<module::ModuleContainer*(*)()>( PostgreSQLmodule )() );
 #endif
 #ifdef WITH_SQLITE3

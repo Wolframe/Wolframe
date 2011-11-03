@@ -36,6 +36,10 @@
 
 #include "PostgreSQL.hpp"
 #include "moduleInterface.hpp"
+#include "logger-v1.hpp"
+
+
+_Wolframe::log::LogBackend*	logBackendPtr;
 
 namespace _Wolframe {
 namespace module {
@@ -48,6 +52,11 @@ ModuleContainer* PostgreSQLmodule( void )
 						    "PostgreSQL", "PostgreSQL" );
 	return &mod;
 }
+
+void setModuleLogger( void* logger )
+{
+	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend* >( logger );
 }
+} // extern "C"
 
 }} // namespace _Wolframe::module

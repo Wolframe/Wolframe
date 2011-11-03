@@ -81,7 +81,7 @@ void PostgreSQLconfig::print( std::ostream& os, size_t indent ) const
 bool PostgreSQLconfig::check() const
 {
 	if ( connections == 0 )	{
-		LOG_ERROR << logPrefix() << "number of database connections cannot be 0";
+		MOD_LOG_ERROR << logPrefix() << "number of database connections cannot be 0";
 		return false;
 	}
 	return true;
@@ -94,7 +94,7 @@ PostgreSQLunit::PostgreSQLunit( const PostgreSQLconfig& conf )
 		conf.user, conf.password, conf.connectTimeout,
 		conf.connections, conf.acquireTimeout )
 {
-	LOG_NOTICE << "PostgreSQL database unit for '" << conf.m_ID << "' created";
+	MOD_LOG_NOTICE << "PostgreSQL database unit for '" << conf.m_ID << "' created";
 }
 
 PostgreSQLunit::~PostgreSQLunit()
@@ -163,57 +163,57 @@ PostgreSQLdatabase::PostgreSQLdatabase( const std::string& id,
 	: m_ID( id ), m_noConnections( 0 ), m_connPool( acquireTimeout )
 {
 	m_connStr = buildConnStr( host, port,  dbName, user, password, connectTimeout );
-	LOG_DATA << "PostgreSQL database '" << m_ID << "' connection string <" << m_connStr << ">";
+	MOD_LOG_DATA << "PostgreSQL database '" << m_ID << "' connection string <" << m_connStr << ">";
 
 	for ( size_t i = 0; i < connections; i++ )	{
 		PGconn* conn = PQconnectdb( m_connStr.c_str() );
 		if ( conn == NULL )
-			LOG_ALERT << "PostgreSQL PQconnectdb returned NULL";
+			MOD_LOG_ALERT << "PostgreSQL PQconnectdb returned NULL";
 		else	{
 			ConnStatusType stat = PQstatus( conn );
 			switch( stat )	{
-			case CONNECTION_OK:
-				LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
-					  << i << " connected OK. Message: " << PQerrorMessage( conn );
-				break;
-			case CONNECTION_BAD:
-				LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
-					  << i << " connection BAD. Message: " << PQerrorMessage( conn );
-				break;
-			case CONNECTION_STARTED:
-				LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
-					  << i << " connection STARTED. Message: " << PQerrorMessage( conn );
-				break;
-			case CONNECTION_MADE:
-				LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
-					  << i << " connection MADE. Message: " << PQerrorMessage( conn );
-				break;
-			case CONNECTION_AWAITING_RESPONSE:
-				LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
-					  << i << " connection AWAITING RESPONSE. Message: " << PQerrorMessage( conn );
-				break;
-			case CONNECTION_AUTH_OK:
-				LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
-					  << i << " connection AUTH OK. Message: " << PQerrorMessage( conn );
-				break;
-			case CONNECTION_SSL_STARTUP:
-				LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
-					  << i << " connection SSL start. Message: " << PQerrorMessage( conn );
-				break;
-			case CONNECTION_SETENV:
-				LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
-					  << i << " connection SETENV. Message: " << PQerrorMessage( conn );
-				break;
-			case CONNECTION_NEEDED:
-				LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
-					  << i << " connection NEEDED. Message: " << PQerrorMessage( conn );
-				break;
+				case CONNECTION_OK:
+					MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
+						      << i << " connected OK. Message: " << PQerrorMessage( conn );
+					break;
+				case CONNECTION_BAD:
+					MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
+						      << i << " connection BAD. Message: " << PQerrorMessage( conn );
+					break;
+				case CONNECTION_STARTED:
+					MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
+						      << i << " connection STARTED. Message: " << PQerrorMessage( conn );
+					break;
+				case CONNECTION_MADE:
+					MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
+						      << i << " connection MADE. Message: " << PQerrorMessage( conn );
+					break;
+				case CONNECTION_AWAITING_RESPONSE:
+					MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
+						      << i << " connection AWAITING RESPONSE. Message: " << PQerrorMessage( conn );
+					break;
+				case CONNECTION_AUTH_OK:
+					MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
+						      << i << " connection AUTH OK. Message: " << PQerrorMessage( conn );
+					break;
+				case CONNECTION_SSL_STARTUP:
+					MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
+						      << i << " connection SSL start. Message: " << PQerrorMessage( conn );
+					break;
+				case CONNECTION_SETENV:
+					MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
+						      << i << " connection SETENV. Message: " << PQerrorMessage( conn );
+					break;
+				case CONNECTION_NEEDED:
+					MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
+						      << i << " connection NEEDED. Message: " << PQerrorMessage( conn );
+					break;
 			}
 			m_connPool.add( conn );
 			m_noConnections++;
 		}
 	}
-	LOG_TRACE << "PostgreSQL database '" << m_ID << "' created with a pool of " << m_noConnections << " connections";
+	MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' created with a pool of " << m_noConnections << " connections";
 }
 
 
@@ -226,43 +226,43 @@ PostgreSQLdatabase::~PostgreSQLdatabase()
 	while ( m_connPool.available() )	{
 		PGconn* conn = m_connPool.get();
 		if ( conn == NULL )	{
-			LOG_ALERT << "PostgreSQL database '" << m_ID << "' destructor: NULL connection from pool";
+			MOD_LOG_ALERT << "PostgreSQL database '" << m_ID << "' destructor: NULL connection from pool";
 			throw std::logic_error( "PostgreSQL database destructor: NULL connection from pool" );
 		}
 		PGTransactionStatusType stat = PQtransactionStatus( conn );
 		switch( stat )	{
-		case PQTRANS_IDLE:
-			LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " idle";
-			PQfinish( conn );
-			m_noConnections--, connections++;
-			break;
-		case PQTRANS_ACTIVE:
-			LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " active";
-			PQfinish( conn );
-			m_noConnections--, connections++;
-			break;
-		case PQTRANS_INTRANS:
-			LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " in transaction";
-			PQfinish( conn );
-			m_noConnections--, connections++;
-			break;
-		case PQTRANS_INERROR:
-			LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " in transaction error";
-			PQfinish( conn );
-			m_noConnections--, connections++;
-			break;
-		case PQTRANS_UNKNOWN:
-			LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " status unknown";
-			PQfinish( conn );
-			m_noConnections--, connections++;
-			break;
+			case PQTRANS_IDLE:
+				MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " idle";
+				PQfinish( conn );
+				m_noConnections--, connections++;
+				break;
+			case PQTRANS_ACTIVE:
+				MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " active";
+				PQfinish( conn );
+				m_noConnections--, connections++;
+				break;
+			case PQTRANS_INTRANS:
+				MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " in transaction";
+				PQfinish( conn );
+				m_noConnections--, connections++;
+				break;
+			case PQTRANS_INERROR:
+				MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " in transaction error";
+				PQfinish( conn );
+				m_noConnections--, connections++;
+				break;
+			case PQTRANS_UNKNOWN:
+				MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " status unknown";
+				PQfinish( conn );
+				m_noConnections--, connections++;
+				break;
 		}
 	}
 	if ( m_noConnections != 0 )	{
-		LOG_ALERT << "PostgreSQL database '" << m_ID << "' destructor: not all connections destroyed";
+		MOD_LOG_ALERT << "PostgreSQL database '" << m_ID << "' destructor: not all connections destroyed";
 		throw std::logic_error( "PostgreSQL database destructor: not all connections destroyed" );
 	}
-	LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: " << connections << " connections destroyed";
+	MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: " << connections << " connections destroyed";
 }
 
 }} // _Wolframe::db

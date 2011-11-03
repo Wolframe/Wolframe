@@ -1,6 +1,6 @@
-TOPDIR = ..
+TOPDIR = ../../..
 
-SUBDIRS = modules
+SUBDIRS =
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
@@ -30,69 +30,6 @@ INCLUDE_LIBS += \
 
 endif
 
-# pam
-
-ifeq ($(WITH_PAM),1)
-
-INCLUDE_CPPFLAGS += \
-	-DWITH_PAM
-
-INCLUDE_DIRS += \
-	-I$(PAM_INCLUDE_DIR)
-
-INCLUDE_LDFLAGS += \
-	-L$(PAM_LIB_DIR)
-
-INCLUDE_LIBS += \
-	$(PAM_LIBS)
-
-endif
-
-# sasl
-
-ifeq ($(WITH_SASL),1)
-
-INCLUDE_CPPFLAGS += \
-	-DWITH_SASL
-
-INCLUDE_DIRS += \
-	-I$(SASL_INCLUDE_DIR)
-
-INCLUDE_LDFLAGS += \
-	-L$(SASL_LIB_DIR)
-
-INCLUDE_LIBS += \
-	$(SASL_LIBS)
-
-endif
-
-# sqlite3
-
-ifeq ($(WITH_SQLITE3),1)
-
-INCLUDE_CPPFLAGS += \
-	-DWITH_SQLITE3
-
-ifeq ($(WITH_LOCAL_SQLITE3),0)
-
-INCLUDE_DIRS += \
-	-I$(SQLITE3_INCLUDE_DIR)
-
-INCLUDE_LDFLAGS += \
-	-L$(SQLITE3_LIB_DIR)
-
-INCLUDE_LIBS += \
-	$(SQLITE3_LIBS)
-
-endif
-
-ifeq ($(WITH_LOCAL_SQLITE3),1)
-
-INCLUDE_DIRS += \
-	-I$(TOPDIR)/sqlite3
-endif
-
-endif
 
 # Postgresql
 
@@ -127,45 +64,6 @@ LOGGER_OBJS = \
 	logger/logger.o
 
 DB_OBJS =
-
-AAAA_OBJS = \
-	AAAA/authentication_textfile.o \
-	AAAA/DBauthentication.o \
-	AAAA/DBauthenticationConfig.o \
-	AAAA/TextFileAuthentication.o \
-	AAAA/TextAuthenticationConfig.o \
-	AAAA/DBaudit.o \
-	AAAA/DBauditConfig.o \
-	AAAA/FileAudit.o \
-	AAAA/FileAuditConfig.o \
-	AAAA/AAAAprovider.o \
-	AAAA/AAAAproviderConfig.o \
-	AAAA/AAAAmodules.o
-
-ifeq ($(WITH_PAM),1)
-AAAA_OBJS += \
-	AAAA/authentication_pam.o
-endif
-
-ifeq ($(WITH_SASL),1)
-AAAA_OBJS += \
-	AAAA/authentication_sasl.o
-endif
-
-ifeq ($(WITH_SQLITE3),1)
-DB_OBJS += \
-	database/SQLite.o \
-	database/SQLiteConfig.o \
-	database/SQLiteModule.o
-
-ifeq ($(WITH_LOCAL_SQLITE3),1)
-DB_OBJS += \
-	$(TOPDIR)/sqlite3/sqlite3.o
-endif
-
-AAAA_OBJS += \
-	AAAA/authentication_db_sqlite3.o
-endif
 
 ifeq ($(WITH_PGSQL),1)
 DB_OBJS += \
@@ -221,7 +119,7 @@ OBJS = \
 #	database/PostgreSQLconfig.o \
 
 CPP_BINS = \
-	wolframed$(EXE)
+#	postgresql$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

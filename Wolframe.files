@@ -468,6 +468,12 @@ src/moduleLoaderConfig.cpp
 src/moduleLoaderConfig.hpp
 src/moduleLoader_dlfcn.cpp
 src/moduleLoader_Windows.cpp
+src/modules/GNUmakefile
+src/modules/Makefile.W32
+src/modules/PostgreSQL/GNUmakefile
+src/modules/PostgreSQL/Makefile.W32
+src/modules/SQLite/GNUmakefile
+src/modules/SQLite/Makefile.W32
 src/posixMain.cpp
 src/processor/echoProcessor.cpp
 src/processor/echoProcessor.hpp

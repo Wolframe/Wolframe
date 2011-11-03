@@ -44,7 +44,6 @@ static const unsigned short DEFAULT_CONNECTION_TIMEOUT = 30;
 namespace _Wolframe {
 namespace db {
 
-
 bool PostgreSQLconfig::parse( const config::ConfigurationTree& pt, const std::string& /*node*/,
 			      const module::ModulesDirectory* /*modules*/ )
 {
@@ -101,8 +100,8 @@ bool PostgreSQLconfig::parse( const config::ConfigurationTree& pt, const std::st
 				retVal = false;
 		}
 		else	{
-			LOG_WARNING << logPrefix() << "unknown configuration option: '"
-				    << L1it->first << "'";
+			MOD_LOG_WARNING << logPrefix() << "unknown configuration option: '"
+					<< L1it->first << "'";
 		}
 	}
 	if ( ! connDefined == 0 )
