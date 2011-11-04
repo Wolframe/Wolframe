@@ -14,12 +14,12 @@ INCLUDE_LDFLAGS = \
 INCLUDE_LIBS = \
 	$(PGSQL_LIBS)
 
-DYNAMIC_LIB = libPostgreSQL.so
+DYNAMIC_LIB = mod_db_postgresql.so
 DYNAMIC_LIB_MAJOR = 0     
 DYNAMIC_LIB_MINOR = 0
 DYNAMIC_LIB_PATCH = 0 
 
-OBJS = \
+OBJS =
 
 #	database/PostgreSQLconfig.o
 #	database/PostgreSQL.o
