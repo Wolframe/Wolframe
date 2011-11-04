@@ -4,7 +4,7 @@ SUBDIRS =
 
 # Postgresql
 ifeq ($(WITH_PGSQL),1)
-#SUBDIRS += PostgreSQL
+SUBDIRS += PostgreSQL
 endif
 
 # sqlite3
