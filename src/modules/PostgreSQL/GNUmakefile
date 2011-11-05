@@ -22,9 +22,9 @@ DYNAMIC_LIB_MINOR = 0
 DYNAMIC_LIB_PATCH = 0
 
 OBJS = \
-	PostgreSQLconfig.sho++ \
-	PostgreSQL.sho++ \
-	PostgreSQLmodule.sho++
+	PostgreSQLconfig.o \
+	PostgreSQL.o \
+	PostgreSQLmodule.o
 
 # ??
 #CPP_BINS = \
