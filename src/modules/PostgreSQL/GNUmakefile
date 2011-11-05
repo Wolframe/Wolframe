@@ -21,7 +21,7 @@ DYNAMIC_LIB_MAJOR = 0
 DYNAMIC_LIB_MINOR = 0
 DYNAMIC_LIB_PATCH = 0
 
-OBJS = \
+CPP_OBJS = \
 	PostgreSQLconfig.o \
 	PostgreSQL.o \
 	PostgreSQLmodule.o
