@@ -77,11 +77,6 @@ clients/qt/HistoryLineEdit.hpp
 clients/qt/MainWindow.cpp
 clients/qt/MainWindow.hpp
 clients/qt/Makefile.W32
-clients/qt/moc_AbstractFormLoader.cpp
-clients/qt/moc_DebugTerminal.cpp
-clients/qt/moc_HistoryLineEdit.cpp
-clients/qt/moc_MainWindow.cpp
-clients/qt/moc_WolframeClient.cpp
 clients/qt/qtclient.cpp
 clients/qt/README
 clients/qt/TODOS
@@ -430,10 +425,6 @@ src/connection.hpp
 src/database/databaseConfig.cpp
 src/database/DBprovider.cpp
 src/database/DBproviderImpl.hpp
-src/database/PostgreSQLconfig.cpp
-src/database/PostgreSQL.cpp
-src/database/PostgreSQL.hpp
-src/database/PostgreSQLmodule.cpp
 src/database/SQLiteConfig.cpp
 src/database/SQLite.cpp
 src/database/SQLite.hpp
@@ -472,6 +463,10 @@ src/modules/GNUmakefile
 src/modules/Makefile.W32
 src/modules/PostgreSQL/GNUmakefile
 src/modules/PostgreSQL/Makefile.W32
+src/modules/PostgreSQL/PostgreSQLconfig.cpp
+src/modules/PostgreSQL/PostgreSQL.cpp
+src/modules/PostgreSQL/PostgreSQL.hpp
+src/modules/PostgreSQL/PostgreSQLmodule.cpp
 src/modules/SQLite/GNUmakefile
 src/modules/SQLite/Makefile.W32
 src/posixMain.cpp

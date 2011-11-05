@@ -5,25 +5,26 @@ SUBDIRS =
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
 INCLUDE_DIRS = \
-	-I. \
+	-I. -I$(TOPDIR)/include \
 	$(PGSQL_INCLUDE_DIRS)
 
 INCLUDE_LDFLAGS = \
-	-L$(PGSQL_LIB_DIR)
+	-L$(PGSQL_LIB_DIR) \
+	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
 	$(PGSQL_LIBS)
 
+
 DYNAMIC_LIB = mod_db_postgresql.so
-DYNAMIC_LIB_MAJOR = 0     
+DYNAMIC_LIB_MAJOR = 0
 DYNAMIC_LIB_MINOR = 0
-DYNAMIC_LIB_PATCH = 0 
+DYNAMIC_LIB_PATCH = 0
 
-OBJS =
-
-#	database/PostgreSQLconfig.o
-#	database/PostgreSQL.o
-#	database/PostgreSQLmodule.o
+OBJS = \
+	PostgreSQLconfig.sho++ \
+	PostgreSQL.sho++ \
+	PostgreSQLmodule.sho++
 
 # ??
 #CPP_BINS = \
@@ -42,3 +43,4 @@ local_install:
 	$(INSTALL) -m 0775 $(DYNAMIC_LIB) $(libdir)/modules
 
 local_test:
+

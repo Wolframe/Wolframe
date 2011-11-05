@@ -94,22 +94,6 @@ endif
 
 endif
 
-# Postgresql
-
-ifeq ($(WITH_PGSQL),1)
-
-INCLUDE_CPPFLAGS += \
-	-DWITH_PGSQL
-
-INCLUDE_DIRS += \
-	$(PGSQL_INCLUDE_DIRS)
-
-INCLUDE_LDFLAGS += \
-	-L$(PGSQL_LIB_DIR)
-
-INCLUDE_LIBS += \
-	$(PGSQL_LIBS)
-endif
 
 LOCAL_STATIC_LIB = \
 	libwolframe.a
@@ -165,13 +149,6 @@ endif
 
 AAAA_OBJS += \
 	AAAA/authentication_db_sqlite3.o
-endif
-
-ifeq ($(WITH_PGSQL),1)
-DB_OBJS += \
-	database/PostgreSQLconfig.o \
-	database/PostgreSQL.o \
-	database/PostgreSQLmodule.o
 endif
 
 LOCAL_STATIC_LIB_OBJS = \
