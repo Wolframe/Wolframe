@@ -1,6 +1,6 @@
 TOPDIR = ../..
 
-SUBDIRS =
+SUBDIRS = audit authentication processor
 
 # Postgresql
 ifeq ($(WITH_PGSQL),1)

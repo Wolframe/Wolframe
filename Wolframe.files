@@ -479,8 +479,8 @@ src/modules/SQLite/SQLite.cpp
 src/modules/SQLite/SQLite.hpp
 src/modules/SQLite/SQLiteModule.cpp
 src/posixMain.cpp
-src/processor/procProvider.cpp
-src/processor/procProviderImpl.hpp
+src/procProvider.cpp
+src/procProviderImpl.hpp
 src/protocol_ioblocks.cpp
 src/referenceConfig.cpp
 src/resolvePath.cpp

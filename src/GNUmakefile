@@ -85,18 +85,8 @@ LOGGER_OBJS = \
 DB_OBJS =
 
 AAAA_OBJS = \
-	AAAA/authentication_textfile.o \
-	AAAA/DBauthentication.o \
-	AAAA/DBauthenticationConfig.o \
-	AAAA/TextFileAuthentication.o \
-	AAAA/TextAuthenticationConfig.o \
-	AAAA/DBaudit.o \
-	AAAA/DBauditConfig.o \
-	AAAA/FileAudit.o \
-	AAAA/FileAuditConfig.o \
 	AAAA/AAAAprovider.o \
-	AAAA/AAAAproviderConfig.o \
-	AAAA/AAAAmodules.o
+	AAAA/AAAAproviderConfig.o
 
 ifeq ($(WITH_PAM),1)
 AAAA_OBJS += \
@@ -127,9 +117,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	connection.o \
 	serverConfig.o \
 	server.o \
-	processor/procProvider.o \
-	processor/echoProcessor.o \
-	processor/echoProcessorModule.o \
+	procProvider.o \
 	$(DB_OBJS) \
 	$(AAAA_OBJS)
 
