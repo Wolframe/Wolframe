@@ -51,7 +51,8 @@ class ModuleLoaderConfiguration : public ConfigurationBase
 	friend class ConfigurationParser;
 public:
 	/// constructor
-	ModuleLoaderConfiguration() : ConfigurationBase( "Module(s) to load", NULL, "Module loader" )	{}
+	ModuleLoaderConfiguration()
+		: ConfigurationBase( "Module(s) to load", NULL, "Module loader" ) {}
 	~ModuleLoaderConfiguration();
 
 	/// methods
@@ -61,7 +62,7 @@ public:
 	void print( std::ostream& os, size_t indent ) const;
 	void setCanonicalPathes( const std::string& referencePath );
 private:
-	std::list< std::string* >	m_moduleFile;
+	std::list< std::string >	m_modFiles;
 };
 
 }} // namespace _Wolframe::config

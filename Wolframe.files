@@ -33,6 +33,11 @@ makefiles/nmake/top.mk
 .Attic/date.hpp
 .Attic/ErrorCode.hpp
 .Attic/loadModule/cross.cpp
+.Attic/loadModule/fromPatrick/moduleLoader_dlfcn.cpp
+.Attic/loadModule/fromPatrick/moduleLoader_Windows.cpp
+.Attic/loadModule/fromPatrick/module/module.h
+.Attic/loadModule/fromPatrick/module/module.hpp
+.Attic/loadModule/fromPatrick/module/moduleLoader.hpp
 .Attic/loadModule/GNUmakefile
 .Attic/loadModule/Makefile.W32
 .Attic/loadModule/moduleBase.hpp
@@ -283,9 +288,6 @@ include/logger/logSyslogFacility.hpp
 include/logger-v1.hpp
 include/miscUtils.hpp
 include/moduleInterface.hpp
-include/module/module.h
-include/module/module.hpp
-include/module/moduleLoader.hpp
 include/objectPool.hpp
 include/processor/processor.hpp
 include/processor/procProvider.hpp
@@ -434,6 +436,7 @@ src/getPassword.cpp
 src/getPassword.hpp
 src/GNUmakefile
 src/handlerConfig.hpp
+src/loadModules.cpp
 src/loadModules-dummy.cpp
 src/logger/logBackendConsole.cpp
 src/logger/logBackendConsole.hpp
@@ -454,11 +457,9 @@ src/logger/logSyslogFacility.cpp
 src/logger/syslog_win32.c
 src/logger/syslog_win32.h
 src/Makefile.W32
-src/moduleImpersonation.cpp
+src/moduleDirectory.cpp
 src/moduleLoaderConfig.cpp
 src/moduleLoaderConfig.hpp
-src/moduleLoader_dlfcn.cpp
-src/moduleLoader_Windows.cpp
 src/modules/GNUmakefile
 src/modules/Makefile.W32
 src/modules/PostgreSQL/GNUmakefile

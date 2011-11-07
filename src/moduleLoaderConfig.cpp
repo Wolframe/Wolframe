@@ -61,27 +61,25 @@ bool ModuleLoaderConfiguration::parse( const ConfigurationTree& pt, const std::s
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "module" ))	{
-			std::string* modFile = new std::string;
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, *modFile ))	{
+			std::string modFile;
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, modFile ))	{
 				retVal = false;
-				delete modFile;
 			}
 			else	{
-				if ( ! boost::filesystem::path( *modFile ).is_absolute() )
+				if ( ! boost::filesystem::path( modFile ).is_absolute() )
 					LOG_WARNING << logPrefix() << " file path is not absolute: "
-						    << *modFile;
+						    << modFile;
 				bool isDuplicate = false;
-				for ( std::list< std::string* >::const_iterator it = m_moduleFile.begin();
-										it != m_moduleFile.end(); it++ )	{
-					if ( boost::algorithm::iequals( **it, *modFile ))	{
-						LOG_ERROR << "duplicate module file: '" << *modFile << "'";
+				for ( std::list< std::string >::const_iterator it = m_modFiles.begin();
+										it != m_modFiles.end(); it++ )	{
+					if ( boost::algorithm::iequals( *it, modFile ))	{
+						LOG_ERROR << "duplicate module file: '" << modFile << "'";
 						retVal = false;
 						isDuplicate = true;
-						delete modFile;
 					}
 				}
 				if ( ! isDuplicate )
-					m_moduleFile.push_back( modFile );
+					m_modFiles.push_back( modFile );
 			}
 		}
 		else	{
@@ -96,20 +94,17 @@ bool ModuleLoaderConfiguration::parse( const ConfigurationTree& pt, const std::s
 
 ModuleLoaderConfiguration::~ModuleLoaderConfiguration()
 {
-	for ( std::list< std::string* >::const_iterator it = m_moduleFile.begin();
-							it != m_moduleFile.end(); it++ )	{
-		assert( !(*it)->empty());
-		delete *it;
-	}
 }
 
 // Server configuration functions
 void ModuleLoaderConfiguration::print( std::ostream& os, size_t /* indent */ ) const
 {
-	os << sectionName() << std::endl;
-	for ( std::list< std::string* >::const_iterator it = m_moduleFile.begin();
-							it != m_moduleFile.end(); it++ )
-		os << "   " << **it << std::endl;
+	if ( ! m_modFiles.empty() )	{
+		os << sectionName() << std::endl;
+		for ( std::list< std::string >::const_iterator it = m_modFiles.begin();
+								it != m_modFiles.end(); it++ )
+			os << "   " << *it << std::endl;
+	}
 }
 
 
@@ -117,15 +112,20 @@ void ModuleLoaderConfiguration::print( std::ostream& os, size_t /* indent */ ) c
 bool ModuleLoaderConfiguration::check() const
 {
 	bool retVal = true;
-	for ( std::list< std::string* >::const_iterator it1 = m_moduleFile.begin();
-						      it1 != m_moduleFile.end(); it1++ )	{
-		std::list< std::string* >::const_iterator it2 = it1;
+	for ( std::list< std::string >::const_iterator it1 = m_modFiles.begin();
+						      it1 != m_modFiles.end(); it1++ )	{
+		std::list< std::string >::const_iterator it2 = it1;
 		it2++;
-		for ( ; it2 != m_moduleFile.end(); it2++ )
-			if ( boost::algorithm::iequals( **it1, **it2 ))	{
-				LOG_ERROR << "duplicate module file: '" << **it1 << "'";
+		for ( ; it2 != m_modFiles.end(); it2++ )	{
+			if ( boost::algorithm::iequals( *it1, *it2 ))	{
+				LOG_ERROR << "duplicate module file: '" << *it1 << "'";
 				retVal = false;
 			}
+		}
+		if ( it1->empty() )	{
+			LOG_ERROR << "empty module file name encountered";
+			retVal = false;
+		}
 	}
 	return retVal;
 }
@@ -134,14 +134,17 @@ void ModuleLoaderConfiguration::setCanonicalPathes( const std::string& refPath )
 {
 	using namespace boost::filesystem;
 
-	for ( std::list< std::string* >::const_iterator it = m_moduleFile.begin();
-							it != m_moduleFile.end(); it++ )	{
-		assert( ! (*it)->empty() );
-		if ( ! path( **it ).is_absolute() )
-			**it = resolvePath( absolute( **it,
-						      path( refPath ).branch_path()).string());
+	for ( std::list< std::string >::const_iterator it = m_modFiles.begin();
+							it != m_modFiles.end(); it++ )	{
+		assert( ! it->empty() );
+		if ( ! path( *it ).is_absolute() )	{
+//			(*it) = resolvePath( absolute( *it,
+//						       path( refPath ).branch_path()).string());
+			;
+		}
 		else
-			**it = resolvePath( **it );
+			;
+//			(*it) = resolvePath( *it );
 	}
 }
 

@@ -69,7 +69,7 @@ struct ApplicationConfiguration	{
 	net::Configuration		*serverCfg;
 	// logger configuration
 	log::LoggerConfiguration	*loggerCfg;
-
+	// the thing that does the job
 	HandlerConfiguration		*handlerCfg;
 
 public:
@@ -83,10 +83,12 @@ public:
 	~ApplicationConfiguration();
 
 	static ConfigFileType fileType( const char *filename, ConfigFileType type );
-	bool parseModules( const char *filename, ConfigFileType type );
-	void addModules( const module::ModulesDirectory* modules )
-						{ m_modules = modules; }
 
+	bool parseModules( const char *filename, ConfigFileType type );
+	std::list<std::string>& moduleList();
+
+	void addModules( const module::ModulesDirectory* modules )
+						{ m_modDir = modules; }
 	bool parse( const char *filename, ConfigFileType type );
 	void finalize( const CmdLineConfig& cmdLine );
 
@@ -101,7 +103,9 @@ private:
 	ConfigFileType				m_type;
 	std::vector< ConfigurationBase* >	m_conf;
 	std::map< std::string, std::size_t >	m_section;
-	const module::ModulesDirectory*	m_modules;
+	std::list<std::string>			m_modFiles;
+
+	const module::ModulesDirectory*		m_modDir;
 
 	bool addConfig( const std::string& nodeName, ConfigurationBase* conf );
 };

@@ -54,6 +54,7 @@
 #include <ostream>
 #include <stdexcept>
 
+const char* MODULE_SECTION = "LoadModules";
 
 namespace _Wolframe {
 namespace config {
@@ -203,20 +204,10 @@ bool ApplicationConfiguration::parseModules ( const char *filename, ConfigFileTy
 
 		bool retVal = true;
 		for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
-			LOG_TRACE << "Configuration : parsing root element '" << it->first << "'";
+			LOG_TRACE << "Parse list of modules : parsing root element '" << it->first << "'";
 			if ( it->first == "<xmlcomment>" && m_type == CONFIG_XML )
 				continue;
-			if ( !boost::algorithm::iequals( it->first, "LoadModules" ))
-				continue;
-			std::map< std::string, std::size_t >::iterator confIt;
-			if (( confIt = m_section.find( it->first ) ) != m_section.end() )	{
-				if ( ! (m_conf[confIt->second])->parse ( config::ConfigurationTree( it->second ),
-									  confIt->first, m_modules ))
-					retVal = false;
-			}
-			else	{
-				LOG_WARNING << "configuration root: Unknown configuration option '"
-					    << it->first << "'";
+			if ( boost::algorithm::iequals( it->first, MODULE_SECTION ))	{
 			}
 		}
 		LOG_TRACE << "Configuration : parsing modules list finished " << (retVal ? "OK" : "with errors");
@@ -254,12 +245,12 @@ bool ApplicationConfiguration::parse ( const char *filename, ConfigFileType type
 			LOG_TRACE << "Configuration : parsing root element '" << it->first << "'";
 			if ( it->first == "<xmlcomment>" && m_type == CONFIG_XML )
 				continue;
-			if ( boost::algorithm::iequals( it->first, "LoadModules" ))
+			if ( boost::algorithm::iequals( it->first, MODULE_SECTION ))
 				continue;
 			std::map< std::string, std::size_t >::iterator confIt;
 			if (( confIt = m_section.find( it->first ) ) != m_section.end() )	{
 				if ( ! (m_conf[confIt->second])->parse( config::ConfigurationTree( it->second ),
-									confIt->first, m_modules ))
+									confIt->first, m_modDir ))
 					retVal = false;
 			}
 			else	{

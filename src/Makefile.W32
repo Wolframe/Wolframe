@@ -112,13 +112,6 @@ AAAA_OBJS = $(AAAA_OBJS) \
 	AAAA\authentication_db_sqlite3.obj \
 !ENDIF
 
-!IFDEF WITH_PGSQL
-DB_OBJS = $(DB_OBJS) \
-	database\PostgreSQL.obj \
-	database\PostgreSQLconfig.obj \
-	database\PostgreSQLmodule.obj
-!ENDIF
-
 LOCAL_STATIC_LIB_OBJS = \
 	version.obj \
 	resolvePath.obj \
@@ -138,6 +131,8 @@ LOCAL_STATIC_LIB_OBJS = \
 	serverConfig.obj \
 	server.obj \
 	moduleLoaderConfig.obj \
+	moduleDirectory.obj \
+	loadModules.obj \
 	processor\procProvider.obj \
 	processor\echoProcessor.obj \
 	processor\echoProcessorModule.obj \

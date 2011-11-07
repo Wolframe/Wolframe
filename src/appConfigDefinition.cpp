@@ -44,7 +44,7 @@ namespace _Wolframe {
 namespace config {
 
 ApplicationConfiguration::ApplicationConfiguration()
-	: m_modules( NULL )
+	: m_modDir( NULL )
 {
 	// daemon / service configuration
 	serviceCfg = new _Wolframe::config::ServiceConfiguration();
@@ -59,8 +59,6 @@ ApplicationConfiguration::ApplicationConfiguration()
 	// appropriate action
 	addConfig( "service", serviceCfg );
 	addConfig( "daemon", serviceCfg );
-
-	addConfig( "LoadModules", handlerCfg->modulesCfg );
 
 	addConfig( "ServerTokens", handlerCfg->bannerCfg );
 	addConfig( "ServerSignature", handlerCfg->bannerCfg );

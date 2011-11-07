@@ -31,63 +31,11 @@
 
 ************************************************************************/
 //
-// This is doing just module loader impersonation
-// It's just a hardcoded possible result of the module loader
+// loadModules.cpp
+//
 
-#include <boost/algorithm/string.hpp>
 #include "logger-v1.hpp"
 #include "moduleInterface.hpp"
-
-namespace _Wolframe {
-namespace module {
-
-bool ModulesDirectory::addContainer( ModuleContainer* container )
-{
-	for ( std::list< ModuleContainer* >::const_iterator it = m_container.begin();
-							it != m_container.end(); it++ )	{
-		if ( boost::algorithm::iequals( (*it)->section, container->section ) &&
-				boost::algorithm::iequals( (*it)->keyword, container->keyword ))	{
-			LOG_ALERT << "A configuration module for section '" << container->section
-				  << "' keyword '" << container->keyword << "' already exists";
-			return false;
-		}
-		if ( boost::algorithm::iequals( (*it)->name, container->name ))	{
-			LOG_ALERT << "A module named '" << container->name
-				  << "' already exists";
-			return false;
-		}
-	}
-	m_container.push_back( container );
-	LOG_DEBUG << "Container '" << container->name << "' registered for section '"
-		  << container->section << "' keyword '" << container->keyword << "'";
-	return true;
-}
-
-
-ModuleContainer* ModulesDirectory::getContainer( const std::string& section,
-						 const std::string& keyword ) const
-{
-	for ( std::list< ModuleContainer* >::const_iterator it = m_container.begin();
-							it != m_container.end(); it++ )	{
-		if ( boost::algorithm::iequals( (*it)->keyword, keyword ) &&
-				boost::algorithm::iequals( (*it)->section, section ))
-			return *it;
-	}
-	return NULL;
-}
-
-ModuleContainer* ModulesDirectory::getContainer( const std::string& name ) const
-{
-	for ( std::list< ModuleContainer* >::const_iterator it = m_container.begin();
-							it != m_container.end(); it++ )	{
-		if ( boost::algorithm::iequals( (*it)->name, name ))
-			return *it;
-	}
-	return NULL;
-}
-
-}} // namespace _Wolframe::module
-
 
 /****  Impersonating the module loader  ******************************************************/
 #include "processor/echoProcessor.hpp"

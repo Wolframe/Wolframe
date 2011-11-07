@@ -50,7 +50,6 @@ namespace _Wolframe {
 	{
 	public:
 		db::DBproviderConfig		*databaseCfg;
-		config::ModuleLoaderConfiguration *modulesCfg;
 		config::ServiceBanner		*bannerCfg;
 		AAAA::AAAAconfiguration		*aaaaCfg;
 		proc::ProcProviderConfig	*procCfg;
@@ -59,7 +58,6 @@ namespace _Wolframe {
 		HandlerConfiguration()
 		{
 			bannerCfg = new config::ServiceBanner();
-			modulesCfg = new config::ModuleLoaderConfiguration();
 			databaseCfg = new db::DBproviderConfig();
 			aaaaCfg = new AAAA::AAAAconfiguration();
 			procCfg = new proc::ProcProviderConfig();
@@ -68,7 +66,6 @@ namespace _Wolframe {
 		~HandlerConfiguration()
 		{
 			if ( bannerCfg ) delete bannerCfg;
-			if ( modulesCfg ) delete modulesCfg;
 			if ( databaseCfg ) delete databaseCfg;
 			if ( aaaaCfg ) delete aaaaCfg;
 			if ( procCfg ) delete procCfg;
