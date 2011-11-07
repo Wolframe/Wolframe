@@ -1,16 +1,53 @@
+/************************************************************************
+Copyright (C) 2011 Project Wolframe.
+All rights reserved.
+
+This file is part of Project Wolframe.
+
+Commercial Usage
+Licensees holding valid Project Wolframe Commercial licenses may
+use this file in accordance with the Project Wolframe
+Commercial License Agreement provided with the Software or,
+alternatively, in accordance with the terms contained
+in a written agreement between the licensee and Project Wolframe.
+
+GNU General Public License Usage
+Alternatively, you can redistribute this file and/or modify it
+under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Wolframe is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Wolframe. If not, see <http://www.gnu.org/licenses/>.
+
+If you have questions regarding the use of this file, please contact
+Project Wolframe.
+
+************************************************************************/
+///
+///\file directmapCompile.cpp
+///\brief implementation a compiler of a self defined direct map DDL
+///
 #include "directmapCompile.hpp"
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <vector>
+#include <map>
+#include <cstring>
+#include <cstddef>
+#include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
-#define SPIRIT_VERSION 2050
-#include <boost/spirit/include/qi.hpp>
 
 using namespace _Wolframe;
 using namespace directmap;
-using namespace boost::spirit;
 
 static bool readFile( const char* fn, std::string& out)
 {
@@ -26,131 +63,499 @@ static bool readFile( const char* fn, std::string& out)
 	return rt;
 }
 
-///\remark The following example was inspired by the key value parser example of Hartmut Kaiser
-///\link http://boost-spirit.com/home/articles/qi-example/parsing-a-list-of-key-value-pairs-using-spirit-qi/
-template <typename Iterator>
-struct Grammar
-	: qi::grammar<Iterator, std::vector<Definition::Struct>()>
+struct Lexem
 {
-	Grammar() : Grammar::base_type(start)
+	enum Type
 	{
-		start =		record >> *(record);
-		record =	lit("form") >> recordname >> qi::eol >> elementlist >> qi::lit("end");
-		elementlist =	element >> *(element);
-		element =	type >> name >> -(defaultvalue || (qi::char_('[') >> ']')) >> qi::eol;
-		type =		qi::char_("a-zA-Z_") >> *qi::char_("a-zA-Z_0-9");
-		name =		qi::char_("a-zA-Z_") >> *qi::char_("a-zA-Z_0-9");
-		recordname =	qi::char_("a-zA-Z_") >> *qi::char_("a-zA-Z_0-9");
-		defaultvalue =	(qi::char_('\'') >> *(lexeme[ qi::char_ - qi::char_('\'')]) >> qi::char_('\''))
-		||		(qi::char_('\"') >> *(lexeme[ qi::char_ - qi::char_('\"')]) >> qi::char_('\"'))
-		||		(qi::char_("a-zA-Z_") >> *qi::char_("a-zA-Z_0-9"));
-	}
-	qi::rule< Iterator, std::vector< Definition::Struct>()> start;
-	qi::rule< Iterator, Definition::Struct()> record;
-	qi::rule< Iterator, std::vector< Definition::Element>()> elementlist;
-	qi::rule< Iterator, Definition::Element()> element;
-	qi::rule< Iterator, std::string()> type, name, recordname, defaultvalue;
+		Error,
+		EndOfLine,
+		OpenBracket,
+		CloseBracket,
+		Semicolon,
+		Dot,
+		Form,
+		Plus,
+		Minus,
+		End,
+		As,
+		Identifier,
+		String,
+		Int,
+		Uint,
+		Float,
+		EndOfFile
+	};
+	std::string value;
+	Type type;
 };
 
-std::size_t Definition::calcElementSize( std::size_t idx, std::size_t depht=0)
+struct Source
+{
+	std::string src;
+	char* itr;
+
+	Source( const std::string& src_)
+		:src(const_cast<char*>(src_.c_str())),itr(const_cast<char*>(src_.c_str()))
+	{
+		removeComments();
+	}
+
+	Source( const Source& o)
+		:src(o.src),itr(o.itr) {}
+
+	Source& operator++() {itr++; return *this;}
+	Source operator++(int) {Source rt(*this); itr++; return rt;}
+	char operator*() {return *itr;}
+
+	void removeComments()
+	{
+		std::size_t ii;
+		for (ii=0; ii<src.size(); ii++)
+		{
+			if (src[ii] == '#')
+			{
+				for (; ii<src.size() && src[ii] != '\n' && src[ii] != '\r'; ii++)
+				{
+					src[ii] = ' ';
+				}
+			}
+		}
+	}
+
+	unsigned int line() const
+	{
+		unsigned int ln=1;
+		std::size_t ii,nn=itr-src.c_str();
+		for (ii=0; ii<nn; ii++)
+		{
+			if (src[ii] == '\n' || (src[ii] == '\r' && src[ii+1] != '\n')) ln++;
+		}
+		return ln;
+	}
+
+	unsigned int pos() const
+	{
+		char* pp;
+		for (pp=const_cast<char*>(itr); pp!=const_cast<char*>(src.c_str()) && *pp != '\n' && *pp != '\r'; pp--);
+		return (itr-pp+1);
+	}
+};
+
+static bool setError( Lexem& lexem, const Source& src, const char* message)
+{
+		if (lexem.type == Lexem::Error) return false; ///we want only the first error
+		lexem.type = Lexem::Error;
+		lexem.value.clear();
+		lexem.value.append( "[");
+		lexem.value.append( boost::lexical_cast<std::string>( src.line()));
+		lexem.value.append( ", ");
+		lexem.value.append( boost::lexical_cast<std::string>( src.pos()));
+		lexem.value.append( "] ");
+		lexem.value.append( message);
+		return false;
+}
+
+static bool isOperator( Source& src)
+{
+	if (*src == '.' || *src == ';' || *src == '[' || *src == ']' || *src == '+' || *src == '-') return true;
+	return false;
+}
+
+static bool parseOperator( Lexem& lexem, Source& src)
+{
+	switch (*src)
+	{
+		case '[': ++src; lexem.type = Lexem::OpenBracket; return true;
+		case ']': ++src; lexem.type = Lexem::CloseBracket; return true;
+		case '.': ++src; lexem.type = Lexem::Dot; return true;
+		case ';': ++src; lexem.type = Lexem::Semicolon; return true;
+		case '+': ++src; lexem.type = Lexem::Plus; return true;
+		case '-': ++src; lexem.type = Lexem::Minus; return true;
+	}
+	return setError( lexem, src, "unknown operator");
+}
+
+static bool isDelimiter( Source& src)
+{
+	if (*src <= ' ' || isOperator(src)) return true;
+	return false;
+}
+
+static bool parseString( Lexem& lexem, Source& src)
+{
+	char eb = *src++;
+	while (*src != eb)
+	{
+		if (*src == '\r' || *src == '\n') return setError( lexem, src, "string not terminated");
+		if (*src < ' ') return setError( lexem, src, "string contains non ascii characters");
+		if (*src == '\\') src++;
+		if (*src == '\r' || *src == '\n') return setError( lexem, src, "string not terminated");
+		if (*src < ' ') return setError( lexem, src, "string contains non ascii characters");
+		lexem.value.push_back( *src);
+		++src;
+	}
+	++src;
+	return true;
+}
+
+static bool parseIdentifier( Lexem& lexem, Source& src)
+{
+	while (((*src|32) >= 'a' && (*src|32) <= 'z') || *src == '_' || (*src >= '0' && *src <= '9'))
+	{
+		lexem.value.push_back( *src);
+		++src;
+	}
+	if (!isDelimiter(src))
+	{
+		return setError( lexem, src, "invalid identifier");
+	}
+	if (std::strcmp( lexem.value.c_str(), "form") == 0)
+	{
+		lexem.type = Lexem::Form;
+	}
+	else if (std::strcmp( lexem.value.c_str(), "as") == 0)
+	{
+		lexem.type = Lexem::As;
+	}
+	else if (std::strcmp( lexem.value.c_str(), "end") == 0)
+	{
+		lexem.type = Lexem::End;
+	}
+	else
+	{
+		lexem.type = Lexem::Identifier;
+	}
+	return true;
+}
+
+static bool parseNumber( Lexem& lexem, Source& src)
+{
+	unsigned int length = 0;
+	if (*src == '-')
+	{
+		lexem.type = Lexem::Minus;
+		lexem.value.push_back( *src);
+		++src;
+	}
+	else if (*src == '+')
+	{
+		lexem.type = Lexem::Plus;
+		++src;
+	}
+	else
+	{
+		lexem.type = Lexem::Plus;
+	}
+	while (*src >= '0' && *src <= '9')
+	{
+		length++;
+		lexem.value.push_back( *src);
+		++src;
+	}
+	if (length > 0)
+	{
+		lexem.type = (lexem.type == Lexem::Minus)?Lexem::Int:Lexem::Uint;
+		if (*src == '.')
+		{
+			++src;
+			while (*src >= '0' && *src <= '9')
+			{
+				lexem.value.push_back( *src);
+				++src;
+			}
+			lexem.type = Lexem::Float;
+		}
+		if (!isDelimiter(src)) return setError( lexem, src, "invalid number");
+	}
+	return true;
+}
+
+static bool parseEndOfLine( Lexem& lexem, Source& src)
+{
+	if (*src == '\r')
+	{
+		++src;
+		if (*src == '\n')
+		{
+			++src;
+		}
+		lexem.type = Lexem::EndOfLine;
+		return true;
+	}
+	else if (*src == '\n')
+	{
+		++src;
+		lexem.type = Lexem::EndOfLine;
+		return true;
+	}
+	else
+	{
+		return setError( lexem, src, "invalid character at end of line");
+	}
+}
+
+static bool nextLexem( Lexem& lexem, Source& src)
+{
+	lexem.value.clear();
+	while (*src != 0 && *src <= ' ' && *src != '\r' && *src != '\n') src++;
+	if (*src == '\r' || *src == '\n') return parseEndOfLine( lexem, src);
+	if (((*src|32) >= 'a' && (*src|32) <= 'z') || *src == '_') return parseIdentifier( lexem, src);
+	if ((*src >= '0' && *src <= '9') || *src == '-' || *src == '+') return parseNumber( lexem, src);
+	if (*src == '\'' || *src == '"') return parseString( lexem, src);
+	if (isOperator( src)) return parseOperator( lexem, src);
+	if (*src == '\0') {lexem.type=Lexem::EndOfFile; return true;}
+	return setError( lexem, src, "illegal lexem");
+}
+
+static bool parseName( Source& src, Lexem& lexem, std::string& name)
+{
+	if (nextLexem( lexem, src))
+	{
+		if (lexem.type == Lexem::Identifier)
+		{
+			name = lexem.value;
+			return true;
+		}
+		return setError( lexem, src, "identifier expected");
+	}
+	return false;
+}
+
+static bool parseElement( Source& src, Lexem& lexem, PrimitiveDDLParser::Element& element)
+{
+	while (nextLexem( lexem, src) && lexem.type == Lexem::EndOfLine);
+
+	if (lexem.type == Lexem::End)
+	{
+		return false;
+	}
+	if (lexem.type == Lexem::Form)
+	{
+		element.type = PrimitiveDDLParser::Element::form_;
+	}
+	else if (lexem.type == Lexem::Identifier)
+	{
+		if (!PrimitiveDDLParser::Element::getType( lexem.value.c_str(), element.type))
+		{
+			return setError( lexem, src, "unknown element type name");
+		}
+	}
+	else
+	{
+		return setError( lexem, src, "element type name or 'ref' expected");
+	}
+	if (!parseName( src, lexem, element.name)) return false;
+
+	if (nextLexem( lexem, src))
+	{
+		if (lexem.type == Lexem::String || lexem.type == Lexem::Int || lexem.type == Lexem::Float || lexem.type == Lexem::Uint || lexem.type == Lexem::Identifier)
+		{
+			element.defaultValue = lexem.value;
+			if (element.defaultValue.size() == 0)
+			{
+				return setError( lexem, src, "empty default values are not allowed");
+			}
+			if (!nextLexem( lexem, src))
+			{
+				return setError( lexem, src, "unexpected end of file");
+			}
+			if (element.type == PrimitiveDDLParser::Element::form_)
+			{
+				return setError( lexem, src, "structure can't be defined with a default value");
+			}
+			else if (lexem.type == Lexem::OpenBracket)
+			{
+				return setError( lexem, src, "array can't be defined with a default value");
+			}
+			else if (lexem.type != Lexem::EndOfLine)
+			{
+				return setError( lexem, src, "end of line expected after default value");
+			}
+		}
+		else if (lexem.type == Lexem::OpenBracket)
+		{
+			if (!nextLexem( lexem, src) || lexem.type != Lexem::CloseBracket)
+			{
+				return setError( lexem, src, "] expected");
+			}
+			element.isArray = true;
+			if (!nextLexem( lexem, src) || lexem.type != Lexem::EndOfLine)
+			{
+				return setError( lexem, src, "end of line expected");
+			}
+		}
+		if (lexem.type == Lexem::EndOfLine)
+		{
+			return true;
+		}
+		return setError( lexem, src, "[ or end of line expected");
+	}
+	return setError( lexem, src, "unexpected end of file");
+}
+
+static bool parseHeader( Source& src, Lexem& lexem, std::string& name, std::string& rname)
+{
+	while (nextLexem( lexem, src) && lexem.type == Lexem::EndOfLine);
+
+	if (lexem.type == Lexem::EndOfFile)
+	{
+		return false;
+	}
+	if (lexem.type == Lexem::Form)
+	{
+		if (!parseName( src, lexem, name)) return false;
+
+		if (nextLexem( lexem, src))
+		{
+			if (lexem.type == Lexem::As)
+			{
+				if (!parseName( src, lexem, rname)) return false;
+				if (nextLexem( lexem, src))
+				{
+					if (lexem.type == Lexem::EndOfLine)
+					{
+						return true;
+					}
+					return setError( lexem, src, "end of line expected");
+				}
+			}
+			else if (lexem.type == Lexem::EndOfLine)
+			{
+				rname = name;
+				return true;
+			}
+			else
+			{
+				return setError( lexem, src, "end of line expected");
+			}
+		}
+	}
+	return setError( lexem, src, "'struct' expected");
+}
+
+static bool parseStruct( Source& src, Lexem& lexem, PrimitiveDDLParser& ds)
+{
+	PrimitiveDDLParser::Struct st;
+	std::string rname;
+
+	if (parseHeader( src, lexem, st.name, rname))
+	{
+		while (lexem.type != Lexem::End && lexem.type != Lexem::Error)
+		{
+			PrimitiveDDLParser::Element ee;
+			if (parseElement( src, lexem, ee))
+			{
+				st.elements.push_back( ee);
+			}
+		}
+
+		if (lexem.type != Lexem::Error)
+		{
+			if (!ds.define( rname, st))
+			{
+				setError( lexem, src, "duplicate struct definition");
+			}
+			return true;
+		}
+	}
+	if (lexem.type==Lexem::EndOfFile)
+	{
+		return true;
+	}
+	return setError( lexem, src, "structure definition expected");
+}
+
+static bool parseDefinition( Source& src, PrimitiveDDLParser& parser, Lexem& lexem)
+{
+	while (parseStruct( src, lexem, parser) && lexem.type != Lexem::EndOfFile);
+	return lexem.type!=Lexem::Error;
+}
+
+std::size_t PrimitiveDDLParser::calcElementSize( std::size_t idx, std::size_t depht)
 {
 	std::size_t rt = 0;
-	if (depht > m_ar.size()) return 0;
-	std::vector<Definition::Element>::iterator eitr = m_ar[ idx].m_elements.begin(), eend = m_ar[ idx].m_elements.end();
+	if (depht > ar.size()) return 0;
+	std::vector<Element>::iterator eitr = ar[ idx].elements.begin(), eend = ar[ idx].elements.end();
 	while (eitr != eend)
 	{
-		if (eitr->m_size == 0)
+		if (eitr->size == 0)
 		{
-			if (eitr->m_ref == -1) return 0;
-			eitr->m_size = calcElementSize( eitr->m_ref, depht+1);
-			if (eitr->m_size) return 0;
+			if (eitr->ref == -1) return 0;
+			eitr->size = calcElementSize( eitr->ref, depht+1);
+			if (eitr->size) return 0;
 		}
-		rt += eitr->m_size;
+		rt += eitr->size;
 		++eitr;
 	}
 	return rt;
 }
 
-bool Definition::compile( const char* filename, std::string& errors_)
+bool PrimitiveDDLParser::compile( const char* filename, std::string& error_)
 {
-	bool rt = false;
-	std::stringstream err;
-	std::string src;
-	if (!readFile( filename, src))
+	std::string srcstring;
+	if (!readFile( filename, srcstring))
 	{
-		err << filename << ": failed to read file" << std::endl;
-		rt = false;
+		std::stringstream err;
+		err << "failed to read input file " << filename << std::endl;
+		error_ = err.str();
+		return false;
 	}
-	else try
+	Source src( srcstring);
+	Lexem lexem;
+	std::stringstream err;
+	bool rt = true;
+
+	if (!parseDefinition( src, *this, lexem))
 	{
-		Grammar<std::string::iterator> p;
-		rt = qi::parse(src.begin(), src.end(), p, m_ar);
-		if (rt)
+		err << filename << ": " << lexem.value << std::endl;
+		error_ = err.str();
+		return false;
+	}
+	std::vector<Struct>::iterator itr = ar.begin(), end = ar.end();
+	std::size_t ii = 0;
+	while (itr != end)
+	{
+		if (linkmap.find( itr->name) != linkmap.end())
 		{
-			std::vector<Definition::Struct>::iterator itr = m_ar.begin(), end = m_ar.end();
-			std::size_t ii = 0;
-			while (itr != end)
+			err << filename << ": duplicate definition of struct '" << itr->name << "'" << std::endl;
+			rt = false;
+		}
+		linkmap[ itr->name] = ii;
+		++itr;
+		++ii;
+	}
+	itr = ar.begin(), end = ar.end();
+	while (itr != end)
+	{
+		std::vector<Element>::iterator eitr = itr->elements.begin(), eend = itr->elements.end();
+		while (eitr != eend)
+		{
+			if (eitr->type == Element::form_)
 			{
-				if (m_linkmap.find( itr->name()) != m_linkmap.end())
+				if (linkmap.find( eitr->name) == linkmap.end())
 				{
-					err << filename << ": duplicate definition of struct '" << itr->name() << "'" << std::endl;
+					err << filename << ": unresolved reference of struct '" << eitr->name << "'" << std::endl;
 					rt = false;
 				}
-				m_linkmap[ itr->name()] = ii;
-				++itr;
-				++ii;
-			}
-			itr = m_ar.begin(), end = m_ar.end();
-			while (itr != end)
-			{
-				std::vector<Definition::Element>::iterator eitr = itr->m_elements.begin(), eend = itr->m_elements.end();
-				while (eitr != eend)
+				else
 				{
-					if (eitr->type() == Element::string_)
-					{
-						if (m_linkmap.find( eitr->name()) == m_linkmap.end())
-						{
-							err << filename << ": unresolved reference of struct '" << eitr->name() << "'" << std::endl;
-							rt = false;
-						}
-						else
-						{
-							eitr->m_ref = m_linkmap[ itr->name()];
-						}
-					}
-					++eitr;
+					eitr->ref = linkmap[ itr->name];
 				}
-				++itr;
 			}
-			itr = m_ar.begin(), end = m_ar.end(), ii=0;
-			while (itr != end)
-			{
-				if (itr->m_size == 0)
-				{
-					itr->m_size = calcElementSize( ii);
-				}
-				++itr;
-				++ii;
-			}
+			++eitr;
 		}
-		else
+		++itr;
+	}
+	itr = ar.begin(), end = ar.end(), ii=0;
+	while (itr != end)
+	{
+		if (itr->size == 0)
 		{
-			err << filename << ": unspecified syntax error" << std::endl;
+			itr->size = calcElementSize( ii);
 		}
+		++itr;
+		++ii;
 	}
-	catch (std::exception& e)
-	{
-		err << filename << ": " << e.what() << std::endl;
-		rt = false;
-	}
-	std::vector<std::string>::const_iterator ei=m_errors.begin(),ee=m_errors.end();
-	while (ei != ee)
-	{
-		rt = false;
-		err << filename << ": " << *ei << std::endl;
-		++ei;
-	}
-	errors_ = err.str();
 	return rt;
 }
 
