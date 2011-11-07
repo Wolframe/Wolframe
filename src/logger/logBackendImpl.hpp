@@ -40,11 +40,11 @@
 #define _LOG_BACKEND_IMPL_HPP_INCLUDED
 
 #include "logger/logBackend.hpp"
-#include "logger/logBackendConsole.hpp"
-#include "logger/logBackendFile.hpp"
-#include "logger/logBackendSyslog.hpp"
+#include "logBackendConsole.hpp"
+#include "logBackendFile.hpp"
+#include "logBackendSyslog.hpp"
 #if defined( _WIN32 )
-#include "logger/logBackendEventlog.hpp"
+#include "logBackendEventlog.hpp"
 #endif // defined( _WIN32 )
 
 namespace _Wolframe {
@@ -58,9 +58,9 @@ namespace _Wolframe {
 		~LogBackendImpl( );
 
 		void setConsoleLevel( const LogLevel::Level level );
-		
+
 		void setLogfileLevel( const LogLevel::Level level );
-		
+
 		void setLogfileName( const std::string filename );
 
 		void setSyslogLevel( const LogLevel::Level level );

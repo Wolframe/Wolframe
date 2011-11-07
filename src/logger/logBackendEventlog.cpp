@@ -40,7 +40,7 @@
 #include <iostream>
 #include <sstream>
 
-#include "logger/logBackendEventlog.hpp"
+#include "logBackendEventlog.hpp"
 
 #include <tchar.h>
 #define WIN32_LEAN_AND_MEAN

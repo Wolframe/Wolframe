@@ -38,7 +38,7 @@
 
 #include "logger-v1.hpp"
 #include "logger/logError.hpp"
-#include "logger/logBackendImpl.hpp"
+#include "logBackendImpl.hpp"
 
 #include <stdexcept>
 #include <sstream>
@@ -88,7 +88,7 @@ Logger& operator<<( Logger& logger, LogError e )
 			LPVOID werrbuf;
 			DWORD wbuf_size;
 			DWORD wres;
-		
+
 			wres = FormatMessage(
 				FORMAT_MESSAGE_ALLOCATE_BUFFER |
 				FORMAT_MESSAGE_FROM_SYSTEM |
@@ -100,20 +100,20 @@ Logger& operator<<( Logger& logger, LogError e )
 				(LPTSTR)&werrbuf,	// use LocalAlloc for the message string
 				0,			// minimal allocation size
 				NULL );			// no arguments to the message
-					
+
 			if( wres == 0 ) {
 				StringCbCopy( errbuf, 512, _T( "No message available" ) );
 			}
 
 			StringCbCopy( errbuf, 512, (LPCTSTR)werrbuf );
-			
+
 			logger.os_ << errbuf;
 
 			logger.os_ << " (errcode: " << last_error << ")";
-			
+
 			return logger;
 		}
-	
+
 #endif // defined( _WIN32 )
 
 #if !defined( _WIN32 )
