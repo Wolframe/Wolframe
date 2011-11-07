@@ -440,12 +440,13 @@ src/logger/syslog_win32.c
 src/logger/syslog_win32.h
 src/Makefile.W32
 src/moduleDirectory.cpp
-src/modules/audit/database/AAAAmodules.cpp
 src/modules/audit/database/DBauditConfig.cpp
 src/modules/audit/database/DBaudit.cpp
 src/modules/audit/database/DBaudit.hpp
+src/modules/audit/database/DBauditModule.cpp
 src/modules/audit/database/GNUmakefile
 src/modules/audit/GNUmakefile
+src/modules/audit/textfile/AditTextFileModule.cpp
 src/modules/audit/textfile/FileAuditConfig.cpp
 src/modules/audit/textfile/FileAudit.cpp
 src/modules/audit/textfile/FileAudit.hpp
@@ -453,8 +454,10 @@ src/modules/audit/textfile/GNUmakefile
 src/modules/authentication/database/DBauthenticationConfig.cpp
 src/modules/authentication/database/DBauthentication.cpp
 src/modules/authentication/database/DBauthentication.hpp
+src/modules/authentication/database/DBauthModule.cpp
 src/modules/authentication/database/GNUmakefile
 src/modules/authentication/GNUmakefile
+src/modules/authentication/textfile/AuthTextFileModule.cpp
 src/modules/authentication/textfile/GNUmakefile
 src/modules/authentication/textfile/TextAuthenticationConfig.cpp
 src/modules/authentication/textfile/TextFileAuthentication.cpp

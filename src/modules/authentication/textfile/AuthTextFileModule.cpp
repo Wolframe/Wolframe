@@ -31,57 +31,52 @@
 
 ************************************************************************/
 //
-// file audit
+// AAAA modules
 //
 
-#ifndef _FILE_AUDIT_HPP_INCLUDED
-#define _FILE_AUDIT_HPP_INCLUDED
-
-#include <string>
-
-#include "AAAA/audit.hpp"
+#include "AAAA/TextFileAuthentication.hpp"
+#include "AAAA/DBauthentication.hpp"
+#include "AAAA/FileAudit.hpp"
+#include "AAAA/DBaudit.hpp"
 #include "moduleInterface.hpp"
 
 namespace _Wolframe {
-namespace AAAA {
+namespace module {
 
-class FileAuditor : public AuditUnit
+extern "C" {
+
+ModuleContainer* TextFileAuthModule()
 {
-};
+	static module::ContainerDescription< AAAA::TxtFileAuthContainer,
+			AAAA::TextFileAuthConfig > mod( "Authentication file", "Authentication",
+							"file", "TextFileAuth" );
+	return &mod;
+}
 
-class FileAuditConfig : public config::ObjectConfiguration
+ModuleContainer* DBauthModule()
 {
-	friend class FileAuditContainer;
-public:
-	FileAuditConfig( const char* cfgName, const char* logParent, const char* logName )
-		: config::ObjectConfiguration( cfgName, logParent, logName ) {}
+	static module::ContainerDescription< AAAA::DBauthContainer,
+			AAAA::DatabaseAuthConfig > mod( "Authentication database", "Authentication",
+							"database", "DatabaseAuth" );
+	return &mod;
+}
 
-	const char* objectName() const			{ return "FileAudit"; }
-
-	/// methods
-	bool parse( const config::ConfigurationTree& pt, const std::string& node,
-		    const module::ModulesDirectory* modules );
-	bool check() const;
-	void print( std::ostream& os, size_t indent ) const;
-	void setCanonicalPathes( const std::string& referencePath );
-private:
-	std::string	m_file;
-};
-
-
-class FileAuditContainer : public ObjectContainer< AuditUnit >
+ModuleContainer* FileAuditModule()
 {
-public:
-	FileAuditContainer( const FileAuditConfig& conf );
-	~FileAuditContainer()				{}
+	static module::ContainerDescription< AAAA::FileAuditContainer,
+			AAAA::FileAuditConfig > mod( "Audit file", "Audit",
+						     "file", "FileAudit" );
+	return &mod;
+}
 
-	virtual const AuditUnit& object() const		{ return m_audit; }
-	const char* objectName() const			{ return "FileAudit"; }
-private:
-	std::string	m_file;
-	FileAuditor	m_audit;
-};
+ModuleContainer* DBauditModule()
+{
+	static module::ContainerDescription< AAAA::DBauditContainer,
+			AAAA::DBauditConfig > mod( "Audit database", "Audit",
+						   "database", "DatabaseAudit" );
+	return &mod;
+}
 
-}} // namespace _Wolframe::AAAA
+} // extern "C"
 
-#endif // _FILE_AUDIT_HPP_INCLUDED
+}} // namespace _Wolframe::module
