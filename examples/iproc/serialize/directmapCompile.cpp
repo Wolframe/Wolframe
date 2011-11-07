@@ -89,70 +89,75 @@ struct Lexem
 	Type type;
 };
 
-struct Source
+
+static void removeComments( std::string& src)
 {
-	std::string src;
-	char* itr;
-
-	Source( const std::string& src_)
-		:src(const_cast<char*>(src_.c_str())),itr(const_cast<char*>(src_.c_str()))
+	std::size_t ii;
+	for (ii=0; ii<src.size(); ii++)
 	{
-		removeComments();
-	}
-
-	Source( const Source& o)
-		:src(o.src),itr(o.itr) {}
-
-	Source& operator++() {itr++; return *this;}
-	Source operator++(int) {Source rt(*this); itr++; return rt;}
-	char operator*() {return *itr;}
-
-	void removeComments()
-	{
-		std::size_t ii;
-		for (ii=0; ii<src.size(); ii++)
+		if (src[ii] == '#')
 		{
-			if (src[ii] == '#')
+			for (; ii<src.size() && src[ii] != '\n' && src[ii] != '\r'; ii++)
 			{
-				for (; ii<src.size() && src[ii] != '\n' && src[ii] != '\r'; ii++)
-				{
-					src[ii] = ' ';
-				}
+				src[ii] = ' ';
 			}
 		}
 	}
+}
 
-	unsigned int line() const
+static std::pair<std::size_t, std::size_t> getPos( const std::string::const_iterator& start, const std::string::const_iterator& at)
+{
+	std::pair<std::size_t, std::size_t> pos( 1,0);
+	std::string::const_iterator itr = start;
+	for (; itr!=at; itr++)
 	{
-		unsigned int ln=1;
-		std::size_t ii,nn=itr-src.c_str();
-		for (ii=0; ii<nn; ii++)
+		if (*itr == '\n')
 		{
-			if (src[ii] == '\n' || (src[ii] == '\r' && src[ii+1] != '\n')) ln++;
+			++pos.first;
+			pos.second = 1;
 		}
-		return ln;
+		else if (*itr == '\r' && *++itr != '\n')
+		{
+			++pos.first;
+			pos.second = 2;
+			if (itr == at) return pos;
+		}
+		else
+		{
+			++pos.second;
+		}
 	}
+	return pos;
+}
 
-	unsigned int pos() const
+struct Source
+{
+	std::string src;
+	std::string::const_iterator start;
+	std::string::const_iterator at;
+	Source& operator ++()	{++at; return *this;}
+	char operator*()	{return *at;}
+	Source( const std::string& src_) :src(src_)
 	{
-		char* pp;
-		for (pp=const_cast<char*>(itr); pp!=const_cast<char*>(src.c_str()) && *pp != '\n' && *pp != '\r'; pp--);
-		return (itr-pp+1);
+		removeComments( src);
+		start = src.begin();
+		at = src.begin();
 	}
 };
 
 static bool setError( Lexem& lexem, const Source& src, const char* message)
 {
-		if (lexem.type == Lexem::Error) return false; ///we want only the first error
-		lexem.type = Lexem::Error;
-		lexem.value.clear();
-		lexem.value.append( "[");
-		lexem.value.append( boost::lexical_cast<std::string>( src.line()));
-		lexem.value.append( ", ");
-		lexem.value.append( boost::lexical_cast<std::string>( src.pos()));
-		lexem.value.append( "] ");
-		lexem.value.append( message);
-		return false;
+	if (lexem.type == Lexem::Error) return false; ///we want only the first error
+	lexem.type = Lexem::Error;
+	std::pair<std::size_t, std::size_t> pos = getPos( src.start, src.at);
+	lexem.value.clear();
+	lexem.value.append( "[");
+	lexem.value.append( boost::lexical_cast<std::string>( pos.first));
+	lexem.value.append( ", ");
+	lexem.value.append( boost::lexical_cast<std::string>( pos.second));
+	lexem.value.append( "] ");
+	lexem.value.append( message);
+	return false;
 }
 
 static bool isOperator( Source& src)
@@ -183,12 +188,13 @@ static bool isDelimiter( Source& src)
 
 static bool parseString( Lexem& lexem, Source& src)
 {
-	char eb = *src++;
+	char eb = *src;
+	++src;
 	while (*src != eb)
 	{
 		if (*src == '\r' || *src == '\n') return setError( lexem, src, "string not terminated");
 		if (*src < ' ') return setError( lexem, src, "string contains non ascii characters");
-		if (*src == '\\') src++;
+		if (*src == '\\') ++src;
 		if (*src == '\r' || *src == '\n') return setError( lexem, src, "string not terminated");
 		if (*src < ' ') return setError( lexem, src, "string contains non ascii characters");
 		lexem.value.push_back( *src);
@@ -297,7 +303,7 @@ static bool parseEndOfLine( Lexem& lexem, Source& src)
 static bool nextLexem( Lexem& lexem, Source& src)
 {
 	lexem.value.clear();
-	while (*src != 0 && *src <= ' ' && *src != '\r' && *src != '\n') src++;
+	while (*src != 0 && *src <= ' ' && *src != '\r' && *src != '\n') ++src;
 	if (*src == '\r' || *src == '\n') return parseEndOfLine( lexem, src);
 	if (((*src|32) >= 'a' && (*src|32) <= 'z') || *src == '_') return parseIdentifier( lexem, src);
 	if ((*src >= '0' && *src <= '9') || *src == '-' || *src == '+') return parseNumber( lexem, src);
