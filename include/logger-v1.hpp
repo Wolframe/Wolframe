@@ -102,17 +102,29 @@ Logger& operator<<( Logger& logger, T t )
 #define LOG_ALERT	_Wolframe::log::Logger( _Wolframe::log::LogBackend::instance() ).Get( _Wolframe::log::LogLevel::LOGLEVEL_ALERT )
 #define LOG_FATAL	_Wolframe::log::Logger( _Wolframe::log::LogBackend::instance() ).Get( _Wolframe::log::LogLevel::LOGLEVEL_FATAL )
 
-extern _Wolframe::log::LogBackend*	logBackendPtr;
-#define MOD_LOG_DATA	_Wolframe::log::Logger( logBackendPtr ).Get( _Wolframe::log::LogLevel::LOGLEVEL_DATA )
-#define MOD_LOG_TRACE	_Wolframe::log::Logger( logBackendPtr ).Get( _Wolframe::log::LogLevel::LOGLEVEL_TRACE )
-#define MOD_LOG_DEBUG	_Wolframe::log::Logger( logBackendPtr ).Get( _Wolframe::log::LogLevel::LOGLEVEL_DEBUG )
-#define MOD_LOG_INFO	_Wolframe::log::Logger( logBackendPtr ).Get( _Wolframe::log::LogLevel::LOGLEVEL_INFO )
-#define MOD_LOG_NOTICE	_Wolframe::log::Logger( logBackendPtr ).Get( _Wolframe::log::LogLevel::LOGLEVEL_NOTICE )
-#define MOD_LOG_WARNING	_Wolframe::log::Logger( logBackendPtr ).Get( _Wolframe::log::LogLevel::LOGLEVEL_WARNING )
-#define MOD_LOG_ERROR	_Wolframe::log::Logger( logBackendPtr ).Get( _Wolframe::log::LogLevel::LOGLEVEL_ERROR )
-#define MOD_LOG_SEVERE	_Wolframe::log::Logger( logBackendPtr ).Get( _Wolframe::log::LogLevel::LOGLEVEL_SEVERE )
-#define MOD_LOG_CRITICAL _Wolframe::log::Logger( logBackendPtr ).Get( _Wolframe::log::LogLevel::LOGLEVEL_CRITICAL )
-#define MOD_LOG_ALERT	_Wolframe::log::Logger( logBackendPtr ).Get( _Wolframe::log::LogLevel::LOGLEVEL_ALERT )
-#define MOD_LOG_FATAL	_Wolframe::log::Logger( logBackendPtr ).Get( _Wolframe::log::LogLevel::LOGLEVEL_FATAL )
+#define MOD_LOG_DATA		std::cerr
+#define MOD_LOG_TRACE		std::cerr
+#define MOD_LOG_DEBUG		std::cerr
+#define MOD_LOG_INFO		std::cerr
+#define MOD_LOG_NOTICE		std::cerr
+#define MOD_LOG_WARNING		std::cerr
+#define MOD_LOG_ERROR		std::cerr
+#define MOD_LOG_SEVERE		std::cerr
+#define MOD_LOG_CRITICAL	std::cerr
+#define MOD_LOG_ALERT		std::cerr
+#define MOD_LOG_FATAL		std::cerr
+
+//extern _Wolframe::log::LogBackend*	logBackendPtr;
+//#define MOD_LOG_DATA	_Wolframe::log::Logger( logBackendPtr ).Get( _Wolframe::log::LogLevel::LOGLEVEL_DATA )
+//#define MOD_LOG_TRACE	_Wolframe::log::Logger( logBackendPtr ).Get( _Wolframe::log::LogLevel::LOGLEVEL_TRACE )
+//#define MOD_LOG_DEBUG	_Wolframe::log::Logger( logBackendPtr ).Get( _Wolframe::log::LogLevel::LOGLEVEL_DEBUG )
+//#define MOD_LOG_INFO	_Wolframe::log::Logger( logBackendPtr ).Get( _Wolframe::log::LogLevel::LOGLEVEL_INFO )
+//#define MOD_LOG_NOTICE	_Wolframe::log::Logger( logBackendPtr ).Get( _Wolframe::log::LogLevel::LOGLEVEL_NOTICE )
+//#define MOD_LOG_WARNING	_Wolframe::log::Logger( logBackendPtr ).Get( _Wolframe::log::LogLevel::LOGLEVEL_WARNING )
+//#define MOD_LOG_ERROR	_Wolframe::log::Logger( logBackendPtr ).Get( _Wolframe::log::LogLevel::LOGLEVEL_ERROR )
+//#define MOD_LOG_SEVERE	_Wolframe::log::Logger( logBackendPtr ).Get( _Wolframe::log::LogLevel::LOGLEVEL_SEVERE )
+//#define MOD_LOG_CRITICAL _Wolframe::log::Logger( logBackendPtr ).Get( _Wolframe::log::LogLevel::LOGLEVEL_CRITICAL )
+//#define MOD_LOG_ALERT	_Wolframe::log::Logger( logBackendPtr ).Get( _Wolframe::log::LogLevel::LOGLEVEL_ALERT )
+//#define MOD_LOG_FATAL	_Wolframe::log::Logger( logBackendPtr ).Get( _Wolframe::log::LogLevel::LOGLEVEL_FATAL )
 
 #endif // _LOGGER_HPP_INCLUDED

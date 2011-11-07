@@ -458,8 +458,6 @@ src/logger/syslog_win32.c
 src/logger/syslog_win32.h
 src/Makefile.W32
 src/moduleDirectory.cpp
-src/moduleLoaderConfig.cpp
-src/moduleLoaderConfig.hpp
 src/modules/GNUmakefile
 src/modules/Makefile.W32
 src/modules/PostgreSQL/GNUmakefile

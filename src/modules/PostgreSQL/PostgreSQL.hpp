@@ -127,17 +127,4 @@ private:
 
 }} // _Wolframe::db
 
-
-//*********** Module *********
-#include "moduleInterface.hpp"
-
-namespace _Wolframe {
-namespace module {
-extern "C" {
-	ModuleContainer* PostgreSQLmodule( void );
-	void setModuleLogger( void* logger );
-}
-
-}} // _Wolframe::module
-
 #endif // _POSTGRESQL_HPP_INCLUDED

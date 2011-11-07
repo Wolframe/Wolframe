@@ -130,7 +130,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	connection.obj \
 	serverConfig.obj \
 	server.obj \
-	moduleLoaderConfig.obj \
 	moduleDirectory.obj \
 	loadModules.obj \
 	processor\procProvider.obj \

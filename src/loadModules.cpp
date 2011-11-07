@@ -36,6 +36,7 @@
 
 #include "logger-v1.hpp"
 #include "moduleInterface.hpp"
+#include <dlfcn.h>
 
 /****  Impersonating the module loader  ******************************************************/
 #include "processor/echoProcessor.hpp"
@@ -54,24 +55,53 @@
 
 using namespace _Wolframe;
 
-bool module::LoadModules( ModulesDirectory& modules )
+typedef module::ModuleContainer* (*CreateFunction)();
+typedef void (*SetModuleLogger)( void* );
+
+bool module::LoadModules( ModulesDirectory& modDir, std::list< std::string >& modFiles )
 {
 	bool retVal = true;
 
-#ifdef WITH_PGSQL
-	setModuleLogger( &_Wolframe::log::LogBackend::instance() );
-	modules.addContainer( reinterpret_cast<module::ModuleContainer*(*)()>( PostgreSQLmodule )() );
-#endif
+	for ( std::list< std::string >::const_iterator it = modFiles.begin();
+							it != modFiles.end(); it++ )	{
+		void* hndl = dlopen( it->c_str(), RTLD_LAZY );
+		if ( !hndl )	{
+			LOG_ERROR << "Module loader: " << dlerror();
+			retVal = false;
+			break;
+		}
+
+		CreateFunction create = (CreateFunction)dlsym( hndl, "createModule" );
+		if ( !create )	{
+			LOG_ERROR << "Module loader creation entry point: " << dlerror();
+			retVal = false;
+			dlclose( hndl );
+			break;
+		}
+
+		SetModuleLogger setLogger = (SetModuleLogger)dlsym( hndl, "setModuleLogger" );
+		if ( !setLogger )	{
+			LOG_ERROR << "Module loader logging entry point: " << dlerror();
+			retVal = false;
+			dlclose( hndl );
+			break;
+		}
+		setLogger( &_Wolframe::log::LogBackend::instance() );
+		modDir.addContainer( create() );
+//		reinterpret_cast< void *( void* ) >( setLogger( &_Wolframe::log::LogBackend::instance() ));
+//		modDir.addContainer( reinterpret_cast< module::ModuleContainer*(*)() >( create )() );
+	}
+
 #ifdef WITH_SQLITE3
-	modules.addContainer( reinterpret_cast<module::ModuleContainer*(*)()>( SQLiteModule )() );
+	modDir.addContainer( reinterpret_cast<module::ModuleContainer*(*)()>( SQLiteModule )() );
 #endif
-	modules.addContainer( reinterpret_cast<module::ModuleContainer*(*)()>( echoProcessorModule )() );
+	modDir.addContainer( reinterpret_cast<module::ModuleContainer*(*)()>( echoProcessorModule )() );
 
-	modules.addContainer( reinterpret_cast<module::ModuleContainer*(*)()>( TextFileAuthModule )() );
-	modules.addContainer( reinterpret_cast<module::ModuleContainer*(*)()>( DBauthModule )() );
+	modDir.addContainer( reinterpret_cast<module::ModuleContainer*(*)()>( TextFileAuthModule )() );
+	modDir.addContainer( reinterpret_cast<module::ModuleContainer*(*)()>( DBauthModule )() );
 
-	modules.addContainer( reinterpret_cast<module::ModuleContainer*(*)()>( FileAuditModule )() );
-	modules.addContainer( reinterpret_cast<module::ModuleContainer*(*)()>( DBauditModule )() );
+	modDir.addContainer( reinterpret_cast<module::ModuleContainer*(*)()>( FileAuditModule )() );
+	modDir.addContainer( reinterpret_cast<module::ModuleContainer*(*)()>( DBauditModule )() );
 
 	return retVal;
 }

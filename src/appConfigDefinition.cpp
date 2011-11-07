@@ -36,7 +36,6 @@
 
 #include "appConfig.hpp"
 #include "standardConfigs.hpp"
-#include "moduleLoaderConfig.hpp"
 #include "handlerConfig.hpp"
 #include "server.hpp"
 

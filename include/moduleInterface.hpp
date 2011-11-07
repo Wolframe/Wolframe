@@ -96,7 +96,15 @@ private:
 	std::list< ModuleContainer* >		m_container;
 };
 
-bool LoadModules( ModulesDirectory& modules );
+
+bool LoadModules( ModulesDirectory& modDir, std::list< std::string >& modFiles );
+
+
+//*********** Module *********
+extern "C" {
+	ModuleContainer* createModule( void );
+	void setModuleLogger( void* logger );
+}
 
 }} // namespace _Wolframe::module
 

@@ -141,7 +141,7 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 			return _Wolframe::ErrorCode::FAILURE;
 		}
 
-		_Wolframe::module::ModulesDirectory modules;
+		_Wolframe::module::ModulesDirectory modDir;
 		_Wolframe::config::ApplicationConfiguration conf;
 
 		_Wolframe::config::ApplicationConfiguration::ConfigFileType cfgType =
@@ -150,9 +150,9 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 			return _Wolframe::ErrorCode::FAILURE;
 		if ( !conf.parseModules( configFile, cfgType ))
 			return _Wolframe::ErrorCode::FAILURE;
-		if ( ! _Wolframe::module::LoadModules( modules ))
+		if ( ! _Wolframe::module::LoadModules( modDir, conf.moduleList() ))
 			return _Wolframe::ErrorCode::FAILURE;
-		conf.addModules( &modules );
+		conf.addModules( &modDir );
 		if ( !conf.parse( configFile, cfgType ))
 			return _Wolframe::ErrorCode::FAILURE;
 
@@ -273,7 +273,7 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 		LOG_NOTICE << "Starting server";
 
 		// Run server in background thread(s).
-		_Wolframe::ServerHandler handler( conf.handlerCfg, &modules );
+		_Wolframe::ServerHandler handler( conf.handlerCfg, &modDir );
 		_Wolframe::net::server s( conf.serverCfg, handler );
 		boost::thread t( boost::bind( &_Wolframe::net::server::run, &s ));
 

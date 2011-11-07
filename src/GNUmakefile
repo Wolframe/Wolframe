@@ -169,7 +169,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	connection.o \
 	serverConfig.o \
 	server.o \
-	moduleLoaderConfig.o \
 	processor/procProvider.o \
 	processor/echoProcessor.o \
 	processor/echoProcessorModule.o \

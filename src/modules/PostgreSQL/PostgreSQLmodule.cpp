@@ -45,7 +45,7 @@ namespace _Wolframe {
 namespace module {
 
 extern "C" {
-ModuleContainer* PostgreSQLmodule( void )
+ModuleContainer* createModule( void )
 {
 	static ContainerDescription< db::PostgreSQLcontainer,
 			db::PostgreSQLconfig > mod( "PostgreSQL database", "database",

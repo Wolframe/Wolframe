@@ -85,7 +85,8 @@ public:
 	static ConfigFileType fileType( const char *filename, ConfigFileType type );
 
 	bool parseModules( const char *filename, ConfigFileType type );
-	std::list<std::string>& moduleList();
+	std::list<std::string>& moduleList()
+						{ return m_modFiles; }
 
 	void addModules( const module::ModulesDirectory* modules )
 						{ m_modDir = modules; }

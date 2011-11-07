@@ -35,6 +35,7 @@
 //
 
 #include "config/ConfigurationTree.hpp"
+#include "config/valueParser.hpp"
 #include "appConfig.hpp"
 #include "commandLine.hpp"
 #include "standardConfigs.hpp"		// fuck-up - idiotic interaction with ...
@@ -54,7 +55,10 @@
 #include <ostream>
 #include <stdexcept>
 
+using namespace boost::filesystem;
+
 const char* MODULE_SECTION = "LoadModules";
+const char* MODULE_SECTION_MSG = "Module list:";
 
 namespace _Wolframe {
 namespace config {
@@ -208,9 +212,49 @@ bool ApplicationConfiguration::parseModules ( const char *filename, ConfigFileTy
 			if ( it->first == "<xmlcomment>" && m_type == CONFIG_XML )
 				continue;
 			if ( boost::algorithm::iequals( it->first, MODULE_SECTION ))	{
+				for ( boost::property_tree::ptree::const_iterator L2it = it->second.begin();
+										L2it != it->second.end(); L2it++ )	{
+					if ( boost::algorithm::iequals( L2it->first, "module" ))	{
+						std::string modFile;
+						if ( !Parser::getValue( MODULE_SECTION_MSG, *L2it, modFile ))	{
+							retVal = false;
+						}
+						else	{
+							if ( ! boost::filesystem::path( modFile ).is_absolute() )
+								LOG_WARNING << MODULE_SECTION_MSG << " file path is not absolute: "
+									    << modFile;
+							bool isDuplicate = false;
+							for ( std::list< std::string >::const_iterator Vit = m_modFiles.begin();
+													Vit != m_modFiles.end(); Vit++ )	{
+								if ( boost::algorithm::iequals( *Vit, modFile ))	{
+									LOG_ERROR << "duplicate module file: '" << modFile << "'";
+									retVal = false;
+									isDuplicate = true;
+								}
+							}
+							if ( ! isDuplicate )
+								m_modFiles.push_back( modFile );
+						}
+					}
+					else	{
+						LOG_WARNING << MODULE_SECTION_MSG << " unknown configuration option: '"
+							    << L2it->first << "'";
+					}
+				}
 			}
 		}
 		LOG_TRACE << "Configuration : parsing modules list finished " << (retVal ? "OK" : "with errors");
+
+		// resolv relative pathes
+		for ( std::list< std::string >::iterator it = m_modFiles.begin();
+							it != m_modFiles.end(); it++ )	{
+			assert( ! it->empty() );
+			if ( ! path( *it ).is_absolute() )
+				(*it) = resolvePath( absolute( *it,
+							       path( configFile ).branch_path()).string());
+			else
+				(*it) = resolvePath( *it );
+		}
 		return retVal;
 	}
 	catch( std::exception& e )	{
@@ -245,6 +289,7 @@ bool ApplicationConfiguration::parse ( const char *filename, ConfigFileType type
 			LOG_TRACE << "Configuration : parsing root element '" << it->first << "'";
 			if ( it->first == "<xmlcomment>" && m_type == CONFIG_XML )
 				continue;
+			// skip modules to load
 			if ( boost::algorithm::iequals( it->first, MODULE_SECTION ))
 				continue;
 			std::map< std::string, std::size_t >::iterator confIt;
@@ -294,11 +339,19 @@ void ApplicationConfiguration::print( std::ostream& os ) const
 {
 
 	os << "Configuration file: " << configFile << std::endl;
-	os << "Configuration file type: " << (m_type == CONFIG_INFO ? "info" : "xml") << std::endl;
+	os << "Configuration file type: " << (m_type == CONFIG_INFO ? "info" : "XML") << std::endl;
 	// Unix daemon
 #if !defined(_WIN32)
 	os << "Run in foreground: " << (foreground ? "yes" : "no") << std::endl;
 #endif
+	// modules
+	if ( ! m_modFiles.empty() )	{
+		os << "Module files to load:" << std::endl;
+		for ( std::list< std::string >::const_iterator it = m_modFiles.begin();
+								it != m_modFiles.end(); it++ )
+			os << "   " << *it << std::endl;
+	}
+	// rest of the configuration
 	for ( std::size_t i = 0; i < m_conf.size(); i++ )	{
 		os << std::endl;
 		m_conf[ i ]->print( os, 0 );
@@ -308,10 +361,27 @@ void ApplicationConfiguration::print( std::ostream& os ) const
 /// Check if the application configuration makes sense
 bool ApplicationConfiguration::check() const
 {
+	bool retVal = true;
+	// check the list of modules
+	for ( std::list< std::string >::const_iterator it1 = m_modFiles.begin();
+						      it1 != m_modFiles.end(); it1++ )	{
+		std::list< std::string >::const_iterator it2 = it1;
+		it2++;
+		for ( ; it2 != m_modFiles.end(); it2++ )	{
+			if ( boost::algorithm::iequals( *it1, *it2 ))	{
+				LOG_ERROR << "duplicate module file: '" << *it1 << "'";
+				retVal = false;
+			}
+		}
+		if ( it1->empty() )
+			throw  std::logic_error( "empty module file name encountered" );
+	}
+
+	// check the rest of the configuration
 	for ( std::size_t i = 0; i < m_conf.size(); i++ )
 		if ( ! m_conf[ i ]->check())
 			return false;
-	return true;
+	return retVal;
 }
 
 }} // namespace _Wolframe::config
