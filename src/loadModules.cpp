@@ -38,15 +38,6 @@
 #include "moduleInterface.hpp"
 #include <dlfcn.h>
 
-/****  Impersonating the module loader  ******************************************************/
-#include "processor/echoProcessor.hpp"
-
-#include "AAAA/TextFileAuthentication.hpp"
-#include "AAAA/DBauthentication.hpp"
-#include "AAAA/FileAudit.hpp"
-#include "AAAA/DBaudit.hpp"
-
-
 using namespace _Wolframe;
 
 typedef module::ModuleContainer* (*CreateFunction)();
@@ -83,16 +74,6 @@ bool module::LoadModules( ModulesDirectory& modDir, std::list< std::string >& mo
 		setLogger( &_Wolframe::log::LogBackend::instance() );
 		modDir.addContainer( create() );
 	}
-
-	modDir.addContainer( reinterpret_cast<module::ModuleContainer*(*)()>( echoProcessorModule )() );
-
-	modDir.addContainer( reinterpret_cast<module::ModuleContainer*(*)()>( TextFileAuthModule )() );
-	modDir.addContainer( reinterpret_cast<module::ModuleContainer*(*)()>( DBauthModule )() );
-
-	modDir.addContainer( reinterpret_cast<module::ModuleContainer*(*)()>( FileAuditModule )() );
-	modDir.addContainer( reinterpret_cast<module::ModuleContainer*(*)()>( DBauditModule )() );
-
 	return retVal;
 }
 
-/****  End impersonating the module loader  **************************************************/

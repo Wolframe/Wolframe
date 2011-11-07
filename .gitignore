@@ -8,6 +8,8 @@ x64
 *.o
 *.d
 *.a
+*.sho
+*.sho++
 *.exe
 *.exe.manifest
 *.exp
