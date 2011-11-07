@@ -45,18 +45,18 @@ namespace _Wolframe {
 namespace module {
 
 extern "C" {
-ModuleContainer* createModule( void )
-{
-	static ContainerDescription< db::PostgreSQLcontainer,
-			db::PostgreSQLconfig > mod( "PostgreSQL database", "database",
-						    "PostgreSQL", "PostgreSQL" );
-	return &mod;
-}
+	ModuleContainer* createModule( void )
+	{
+		static ContainerDescription< db::PostgreSQLcontainer,
+				db::PostgreSQLconfig > mod( "PostgreSQL database", "database",
+							    "PostgreSQL", "PostgreSQL" );
+		return &mod;
+	}
 
-void setModuleLogger( void* logger )
-{
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend* >( logger );
-}
+	void setModuleLogger( void* logger )
+	{
+		logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend* >( logger );
+	}
 } // extern "C"
 
 }} // namespace _Wolframe::module

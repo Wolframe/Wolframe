@@ -66,34 +66,6 @@ INCLUDE_LIBS += \
 
 endif
 
-# sqlite3
-
-ifeq ($(WITH_SQLITE3),1)
-
-INCLUDE_CPPFLAGS += \
-	-DWITH_SQLITE3
-
-ifeq ($(WITH_LOCAL_SQLITE3),0)
-
-INCLUDE_DIRS += \
-	-I$(SQLITE3_INCLUDE_DIR)
-
-INCLUDE_LDFLAGS += \
-	-L$(SQLITE3_LIB_DIR)
-
-INCLUDE_LIBS += \
-	$(SQLITE3_LIBS)
-
-endif
-
-ifeq ($(WITH_LOCAL_SQLITE3),1)
-
-INCLUDE_DIRS += \
-	-I$(TOPDIR)/sqlite3
-endif
-
-endif
-
 
 LOCAL_STATIC_LIB = \
 	libwolframe.a
@@ -136,20 +108,6 @@ AAAA_OBJS += \
 	AAAA/authentication_sasl.o
 endif
 
-ifeq ($(WITH_SQLITE3),1)
-DB_OBJS += \
-	database/SQLite.o \
-	database/SQLiteConfig.o \
-	database/SQLiteModule.o
-
-ifeq ($(WITH_LOCAL_SQLITE3),1)
-DB_OBJS += \
-	$(TOPDIR)/sqlite3/sqlite3.o
-endif
-
-AAAA_OBJS += \
-	AAAA/authentication_db_sqlite3.o
-endif
 
 LOCAL_STATIC_LIB_OBJS = \
 	version.o \
@@ -190,12 +148,6 @@ OBJS = \
 	wolframeHandler.o \
 	database/DBprovider.o \
 	posixMain.o
-# Aba: link trouble in dbTest!
-# also suggesting with_sqlite flags and DB_OBJS..
-#	database/SQLite.o
-#	database/SQLiteConfig.o
-#	database/PostgreSQL.o \
-#	database/PostgreSQLconfig.o \
 
 CPP_BINS = \
 	wolframed$(EXE)

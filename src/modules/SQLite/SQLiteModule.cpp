@@ -36,18 +36,26 @@
 
 #include "SQLite.hpp"
 #include "moduleInterface.hpp"
+#include "logger-v1.hpp"
+
+_Wolframe::log::LogBackend*	logBackendPtr;
 
 namespace _Wolframe {
 namespace module {
 
 extern "C" {
-ModuleContainer* SQLiteModule()
-{
-	static module::ContainerDescription< db::SQLiteContainer,
-			db::SQLiteConfig > mod( "SQLite database", "database",
-						"SQLite", "SQLite" );
-	return &mod;
-}
-}
+	ModuleContainer* createModule( void )
+	{
+		static module::ContainerDescription< db::SQLiteContainer,
+				db::SQLiteConfig > mod( "SQLite database", "database",
+							"SQLite", "SQLite" );
+		return &mod;
+	}
+
+	void setModuleLogger( void* logger )
+	{
+		logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend* >( logger );
+	}
+} // extern "C"
 
 }} // namespace _Wolframe::module

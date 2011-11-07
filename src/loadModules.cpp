@@ -46,12 +46,6 @@
 #include "AAAA/FileAudit.hpp"
 #include "AAAA/DBaudit.hpp"
 
-#ifdef WITH_PGSQL
-#include "database/PostgreSQL.hpp"
-#endif
-#ifdef WITH_SQLITE3
-#include "database/SQLite.hpp"
-#endif
 
 using namespace _Wolframe;
 
@@ -88,13 +82,8 @@ bool module::LoadModules( ModulesDirectory& modDir, std::list< std::string >& mo
 		}
 		setLogger( &_Wolframe::log::LogBackend::instance() );
 		modDir.addContainer( create() );
-//		reinterpret_cast< void *( void* ) >( setLogger( &_Wolframe::log::LogBackend::instance() ));
-//		modDir.addContainer( reinterpret_cast< module::ModuleContainer*(*)() >( create )() );
 	}
 
-#ifdef WITH_SQLITE3
-	modDir.addContainer( reinterpret_cast<module::ModuleContainer*(*)()>( SQLiteModule )() );
-#endif
 	modDir.addContainer( reinterpret_cast<module::ModuleContainer*(*)()>( echoProcessorModule )() );
 
 	modDir.addContainer( reinterpret_cast<module::ModuleContainer*(*)()>( TextFileAuthModule )() );

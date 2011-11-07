@@ -33,15 +33,27 @@ INCLUDE_DIRS += \
 endif
 
 DYNAMIC_LIB = mod_db_sqlite3.so
-DYNAMIC_LIB_MAJOR = 0     
+DYNAMIC_LIB_MAJOR = 0
 DYNAMIC_LIB_MINOR = 0
-DYNAMIC_LIB_PATCH = 0 
+DYNAMIC_LIB_PATCH = 0
+
+CPP_OBJS = \
+	SQLite.o \
+	SQLiteConfig.o \
+	SQLiteModule.o \
+	../../resolvePath.o \
+	../../logger/logLevel.o \
+	../../logger/logSyslogFacility.o \
+	../../logger/logComponent.o \
+	../../logger/logError.o \
+	../../logger/logBackendConsole.o \
+	../../logger/logBackendFile.o \
+	../../logger/logBackendSyslog.o \
+	../../logger/logBackendImpl.o \
+	../../logger/loggerConfig.o \
+	../../logger/logger.o
 
 OBJS =
-
-#	database/SQLite.o \
-#	database/SQLiteConfig.o \
-#	database/SQLiteModule.o
 
 ifeq ($(WITH_LOCAL_SQLITE3),1)
 OBJS += \

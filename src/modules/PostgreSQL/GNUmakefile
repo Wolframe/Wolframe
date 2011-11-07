@@ -35,10 +35,6 @@ CPP_OBJS = \
 	../../logger/loggerConfig.o \
 	../../logger/logger.o
 
-# ??
-#CPP_BINS = \
-#	postgresql$(EXE)
-
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 local_all:
