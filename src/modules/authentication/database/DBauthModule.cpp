@@ -31,52 +31,31 @@
 
 ************************************************************************/
 //
-// AAAA modules
+// Database Authentification module
 //
 
-#include "AAAA/TextFileAuthentication.hpp"
-#include "AAAA/DBauthentication.hpp"
-#include "AAAA/FileAudit.hpp"
-#include "AAAA/DBaudit.hpp"
+#include "DBauth.hpp"
 #include "moduleInterface.hpp"
+#include "logger-v1.hpp"
+
+_Wolframe::log::LogBackend*	logBackendPtr;
 
 namespace _Wolframe {
 namespace module {
 
 extern "C" {
+	ModuleContainer* createModule( void )
+	{
+		static module::ContainerDescription< AAAA::DBauthContainer,
+				AAAA::DatabaseAuthConfig > mod( "Authentication database", "Authentication",
+								"database", "DatabaseAuth" );
+		return &mod;
+	}
 
-ModuleContainer* TextFileAuthModule()
-{
-	static module::ContainerDescription< AAAA::TxtFileAuthContainer,
-			AAAA::TextFileAuthConfig > mod( "Authentication file", "Authentication",
-							"file", "TextFileAuth" );
-	return &mod;
-}
-
-ModuleContainer* DBauthModule()
-{
-	static module::ContainerDescription< AAAA::DBauthContainer,
-			AAAA::DatabaseAuthConfig > mod( "Authentication database", "Authentication",
-							"database", "DatabaseAuth" );
-	return &mod;
-}
-
-ModuleContainer* FileAuditModule()
-{
-	static module::ContainerDescription< AAAA::FileAuditContainer,
-			AAAA::FileAuditConfig > mod( "Audit file", "Audit",
-						     "file", "FileAudit" );
-	return &mod;
-}
-
-ModuleContainer* DBauditModule()
-{
-	static module::ContainerDescription< AAAA::DBauditContainer,
-			AAAA::DBauditConfig > mod( "Audit database", "Audit",
-						   "database", "DatabaseAudit" );
-	return &mod;
-}
-
+	void setModuleLogger( void* logger )
+	{
+		logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend* >( logger );
+	}
 } // extern "C"
 
 }} // namespace _Wolframe::module

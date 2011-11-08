@@ -31,52 +31,47 @@
 
 ************************************************************************/
 //
-// AAAA modules
+//
 //
 
-#include "AAAA/TextFileAuthentication.hpp"
-#include "AAAA/DBauthentication.hpp"
-#include "AAAA/FileAudit.hpp"
-#include "AAAA/DBaudit.hpp"
-#include "moduleInterface.hpp"
+#include <stdexcept>
+#include <boost/algorithm/string.hpp>
+#include "logger-v1.hpp"
+#include "DBauth.hpp"
 
 namespace _Wolframe {
-namespace module {
+namespace AAAA {
 
-extern "C" {
-
-ModuleContainer* TextFileAuthModule()
+DBauthContainer::DBauthContainer( const DatabaseAuthConfig& conf )
 {
-	static module::ContainerDescription< AAAA::TxtFileAuthContainer,
-			AAAA::TextFileAuthConfig > mod( "Authentication file", "Authentication",
-							"file", "TextFileAuth" );
-	return &mod;
+	m_db = NULL;
+	m_dbLabel = conf.m_dbConfig.label();
+	if ( m_dbLabel.empty() )
+		throw std::logic_error( "Empty database reference in DBauthContainer" );
+
+	LOG_NOTICE << "Database authenticator with database reference '" << m_dbLabel << "'";
 }
 
-ModuleContainer* DBauthModule()
+DBauthContainer::~DBauthContainer()
 {
-	static module::ContainerDescription< AAAA::DBauthContainer,
-			AAAA::DatabaseAuthConfig > mod( "Authentication database", "Authentication",
-							"database", "DatabaseAuth" );
-	return &mod;
 }
 
-ModuleContainer* FileAuditModule()
+
+bool DBauthContainer::resolveDB( const db::DatabaseProvider& db )
 {
-	static module::ContainerDescription< AAAA::FileAuditContainer,
-			AAAA::FileAuditConfig > mod( "Audit file", "Audit",
-						     "file", "FileAudit" );
-	return &mod;
+	if ( m_db == NULL && ! m_dbLabel.empty() )	{
+		m_db = db.database( m_dbLabel );
+		if ( m_db )	{
+			LOG_NOTICE << "Database authenticator: database reference '" << m_dbLabel << "' resolved";
+			return true;
+		}
+		else	{
+			LOG_ERROR << "Database authenticator: database labeled '" << m_dbLabel << "' not found !";
+			return false;
+		}
+	}
+	return true;
 }
 
-ModuleContainer* DBauditModule()
-{
-	static module::ContainerDescription< AAAA::DBauditContainer,
-			AAAA::DBauditConfig > mod( "Audit database", "Audit",
-						   "database", "DatabaseAudit" );
-	return &mod;
-}
+}} // namespace _Wolframe::AAAA
 
-} // extern "C"
-
-}} // namespace _Wolframe::module

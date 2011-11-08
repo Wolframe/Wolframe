@@ -38,9 +38,9 @@
 #define _HANDLERCONFIG_HPP_INCLUDED
 
 #include "standardConfigs.hpp"
-#include "database/DBproviderImpl.hpp"
-#include "AAAA/AAAAproviderImpl.hpp"
-#include "processor/procProviderImpl.hpp"
+#include "database/DBprovider.hpp"
+#include "AAAA/AAAAprovider.hpp"
+#include "processor/procProvider.hpp"
 
 namespace _Wolframe {
 

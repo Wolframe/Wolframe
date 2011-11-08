@@ -34,40 +34,16 @@
 //
 //
 
-#include "logger-v1.hpp"
-#include "config/valueParser.hpp"
-#include "config/ConfigurationTree.hpp"
-
-#include "TextFileAuthentication.hpp"
-
-#include "boost/algorithm/string.hpp"
-#define BOOST_FILESYSTEM_VERSION 3
-#include <boost/filesystem.hpp>
+#include "DBauth.hpp"
+#include "config/configurationBase.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
 
-bool TextFileAuthConfig::parse( const config::ConfigurationTree& pt, const std::string& node,
-				const module::ModulesDirectory* /*modules*/ )
+bool DatabaseAuthConfig::parse( const config::ConfigurationTree& pt, const std::string& node,
+				const module::ModulesDirectory* modules )
 {
-	using namespace _Wolframe::config;
-	bool retVal = true;
-
-	if ( boost::algorithm::iequals( node, "file" ) || boost::algorithm::iequals( node, "filename" ))	{
-		bool isDefined = ( !m_file.empty() );
-		if ( !Parser::getValue( logPrefix().c_str(), node.c_str(),
-					pt.get_value<std::string>(), m_file, &isDefined ))
-			retVal = false;
-		else	{
-			if ( ! boost::filesystem::path( m_file ).is_absolute() )
-				LOG_WARNING << logPrefix() << "authentication file path is not absolute: "
-					    << m_file;
-		}
-	}
-	else	{
-		LOG_WARNING << logPrefix() << "unknown configuration option: '" << node << "'";
-	}
-	return retVal;
+	return m_dbConfig.parse( pt, node, modules );
 }
 
 }} // namespace _Wolframe::config

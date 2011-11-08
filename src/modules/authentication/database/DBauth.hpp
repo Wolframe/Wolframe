@@ -93,6 +93,4 @@ private:
 
 }} // namespace _Wolframe::AAAA
 
-}} // _Wolframe::module
-
 #endif // _DB_AUTHENTICATION_HPP_INCLUDED

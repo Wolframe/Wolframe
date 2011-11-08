@@ -31,47 +31,54 @@
 
 ************************************************************************/
 //
+// file audit implementation
 //
-//
-
 #include <stdexcept>
-#include <boost/algorithm/string.hpp>
+
 #include "logger-v1.hpp"
-#include "DBauthentication.hpp"
+#include "TextFileAudit.hpp"
+
+#define BOOST_FILESYSTEM_VERSION 3
+#include <boost/filesystem.hpp>
+#include "miscUtils.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
 
-DBauthContainer::DBauthContainer( const DatabaseAuthConfig& conf )
+/// Audit to file
+bool FileAuditConfig::check() const
 {
-	m_db = NULL;
-	m_dbLabel = conf.m_dbConfig.label();
-	if ( m_dbLabel.empty() )
-		throw std::logic_error( "Empty database reference in DBauthContainer" );
-
-	LOG_NOTICE << "Database authenticator with database reference '" << m_dbLabel << "'";
-}
-
-DBauthContainer::~DBauthContainer()
-{
-}
-
-
-bool DBauthContainer::resolveDB( const db::DatabaseProvider& db )
-{
-	if ( m_db == NULL && ! m_dbLabel.empty() )	{
-		m_db = db.database( m_dbLabel );
-		if ( m_db )	{
-			LOG_NOTICE << "Database authenticator: database reference '" << m_dbLabel << "' resolved";
-			return true;
-		}
-		else	{
-			LOG_ERROR << "Database authenticator: database labeled '" << m_dbLabel << "' not found !";
-			return false;
-		}
+	if ( m_file.empty() )	{
+		LOG_ERROR << logPrefix() << "Audit filename cannot be empty";
+		return false;
 	}
 	return true;
 }
 
-}} // namespace _Wolframe::AAAA
+void FileAuditConfig::print( std::ostream& os, size_t indent ) const
+{
+	std::string indStr( indent, ' ' );
+	os << indStr << sectionName() << ": " << m_file << std::endl;
+}
 
+void FileAuditConfig::setCanonicalPathes( const std::string& refPath )
+{
+	using namespace boost::filesystem;
+
+	if ( ! m_file.empty() )	{
+		if ( ! path( m_file ).is_absolute() )
+			m_file = resolvePath( absolute( m_file,
+							path( refPath ).branch_path()).string());
+		else
+			m_file = resolvePath( m_file );
+	}
+}
+
+
+FileAuditContainer::FileAuditContainer( const FileAuditConfig& conf )
+{
+	m_file = conf.m_file;
+	LOG_NOTICE << "File auditor created with file '" << m_file << "'";
+}
+
+}} // namespace _Wolframe::AAAA

@@ -31,56 +31,42 @@
 
 ************************************************************************/
 //
-// Processor Provider
+// file audit configuration
 //
 
-#ifndef _PROCESSOR_PROVIDER_HPP_INCLUDED
-#define _PROCESSOR_PROVIDER_HPP_INCLUDED
+#include "TextFileAudit.hpp"
+#include "config/ConfigurationTree.hpp"
+#include "config/valueParser.hpp"
 
-#include "processor.hpp"
-#include <boost/noncopyable.hpp>
-#include "database/DBprovider.hpp"
+#include <boost/algorithm/string.hpp>
+#define BOOST_FILESYSTEM_VERSION 3
+#include <boost/filesystem.hpp>
+#include "miscUtils.hpp"
 
 namespace _Wolframe {
-namespace proc {
+namespace AAAA {
 
-class ProcProviderConfig : public config::ConfigurationBase
+bool FileAuditConfig::parse( const config::ConfigurationTree& pt, const std::string& node,
+			     const module::ModulesDirectory* /*modules*/ )
 {
-	friend class ProcessorProvider;
-public:
-	/// constructor & destructor
-	ProcProviderConfig()
-		: ConfigurationBase( "Processor(s)", NULL, "Processor configuration" )	{}
-	~ProcProviderConfig();
+	using namespace _Wolframe::config;
+	bool retVal = true;
 
-	/// methods
-	bool parse( const config::ConfigurationTree& pt, const std::string& node,
-		    const module::ModulesDirectory* modules );
-	bool check() const;
-	void print( std::ostream& os, size_t indent ) const;
-	virtual void setCanonicalPathes( const std::string& referencePath );
-private:
-	std::string					m_dbLabel;
-	std::list< config::ObjectConfiguration* >	m_procConfig;
-};
+	if ( boost::algorithm::iequals( node, "file" ) || boost::algorithm::iequals( node, "filename" ))	{
+		bool isDefined = ( ! m_file.empty() );
+		if ( !Parser::getValue( logPrefix().c_str(), node.c_str(),
+					pt.get_value<std::string>(), m_file, &isDefined ))
+			retVal = false;
+		else	{
+			if ( ! boost::filesystem::path( m_file ).is_absolute() )
+				LOG_WARNING << logPrefix() << "audit file path is not absolute: "
+					    << m_file;
+		}
+	}
+	else	{
+		LOG_WARNING << logPrefix() << "unknown configuration option: '" << node << "'";
+	}
+	return retVal;
+}
 
-/// Processor provider
-class ProcessorProvider : private boost::noncopyable
-{
-public:
-	ProcessorProvider( const ProcProviderConfig* conf,
-			   const module::ModulesDirectory* modules );
-	~ProcessorProvider();
-
-	bool resolveDB( const db::DatabaseProvider& db );
-
-	Processor* processor();
-
-private:
-	class ProcessorProvider_Impl;
-	ProcessorProvider_Impl *m_impl;
-};
-
-}} // namespace _Wolframe::proc
-
-#endif // _PROCESSOR_PROVIDER_HPP_INCLUDED
+}} // namespace _Wolframe::config

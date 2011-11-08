@@ -31,57 +31,13 @@
 
 ************************************************************************/
 //
+// This is a dummy module loader in order to satisfy all dependencies
 //
-//
 
-#include <string>
-#include <ostream>
+#include "moduleInterface.hpp"
 
-#include "logger-v1.hpp"
-#include "TextFileAuthentication.hpp"
-
-#define BOOST_FILESYSTEM_VERSION 3
-#include <boost/filesystem.hpp>
-#include "miscUtils.hpp"
-
-namespace _Wolframe {
-namespace AAAA {
-
-/// Text file authentication
-bool TextFileAuthConfig::check() const
+bool _Wolframe::module::LoadModules( ModulesDirectory& /*modules*/,
+				     std::list< std::string >& /*modFiles*/)
 {
-	if ( m_file.empty() )	{
-		LOG_ERROR << logPrefix() << "Authentication filename cannot be empty";
-		return false;
-	}
 	return true;
 }
-
-void TextFileAuthConfig::print( std::ostream& os, size_t indent ) const
-{
-	std::string indStr( indent, ' ' );
-	os << indStr << sectionName() << ": " << m_file << std::endl;
-}
-
-void TextFileAuthConfig::setCanonicalPathes( const std::string& refPath )
-{
-	using namespace boost::filesystem;
-
-	if ( ! m_file.empty() )	{
-		if ( ! path( m_file ).is_absolute() )
-			m_file = resolvePath( absolute( m_file,
-							path( refPath ).branch_path()).string());
-		else
-			m_file = resolvePath( m_file );
-	}
-}
-
-
-TxtFileAuthContainer::TxtFileAuthContainer( const TextFileAuthConfig& conf )
-{
-	m_file = conf.m_file;
-	LOG_NOTICE << "File authenticator created with file '" << m_file << "'";
-}
-
-}} // namespace _Wolframe::AAAA
-

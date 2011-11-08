@@ -31,19 +31,31 @@
 
 ************************************************************************/
 //
-//
+// Text File Audit module
 //
 
-#include "DBauthentication.hpp"
-#include "config/configurationBase.hpp"
+#include "TextFileAudit.hpp"
+#include "moduleInterface.hpp"
+#include "logger-v1.hpp"
+
+_Wolframe::log::LogBackend*	logBackendPtr;
 
 namespace _Wolframe {
-namespace AAAA {
+namespace module {
 
-bool DatabaseAuthConfig::parse( const config::ConfigurationTree& pt, const std::string& node,
-				const module::ModulesDirectory* modules )
-{
-	return m_dbConfig.parse( pt, node, modules );
-}
+extern "C" {
+	ModuleContainer* createModule( void )
+	{
+		static module::ContainerDescription< AAAA::FileAuditContainer,
+				AAAA::FileAuditConfig > mod( "Audit file", "Audit",
+							     "file", "FileAudit" );
+		return &mod;
+	}
 
-}} // namespace _Wolframe::config
+	void setModuleLogger( void* logger )
+	{
+		logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend* >( logger );
+	}
+} // extern "C"
+
+}} // namespace _Wolframe::module

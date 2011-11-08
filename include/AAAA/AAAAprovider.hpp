@@ -39,14 +39,33 @@
 
 #include "authentication.hpp"
 #include "audit.hpp"
+#include "config/configurationBase.hpp"
 #include <boost/noncopyable.hpp>
 
 namespace _Wolframe {
 namespace AAAA {
 
-class AAAAconfiguration;
+class AAAAconfiguration : public config::ConfigurationBase
+{
+	friend class AAAAprovider;
+public:
+	/// x-structor
+	AAAAconfiguration();
+	~AAAAconfiguration();
 
-class AAAAprovider
+	/// methods
+	bool parse( const config::ConfigurationTree& pt, const std::string& node,
+		    const module::ModulesDirectory* modules );
+	bool check() const;
+	void print( std::ostream& os, size_t indent ) const;
+	void setCanonicalPathes( const std::string& referencePath );
+private:
+	bool						m_allowAnonymous;
+	std::list< config::ObjectConfiguration* >	m_authConfig;
+	std::list< config::ObjectConfiguration* >	m_auditConfig;
+};
+
+class AAAAprovider : public boost::noncopyable
 {
 public:
 	AAAAprovider( const AAAAconfiguration* conf,

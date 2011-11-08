@@ -31,23 +31,31 @@
 
 ************************************************************************/
 //
-// Processor module
+// Echo Processor module
 //
 
 #include "echoProcessor.hpp"
 #include "moduleInterface.hpp"
+#include "logger-v1.hpp"
+
+_Wolframe::log::LogBackend*	logBackendPtr;
 
 namespace _Wolframe {
 namespace module {
 
 extern "C" {
-ModuleContainer* echoProcessorModule()
-{
-	static ContainerDescription< EchoProcContainer,
-			EchoProcConfig > mod( "Echo Processor", "processor",
-					      "echoProcessor", "EchoProcessor" );
-	return &mod;
-}
-}
+	ModuleContainer* createModule( void )
+	{
+		static ContainerDescription< EchoProcContainer,
+				EchoProcConfig > mod( "Echo Processor", "processor",
+						      "echoProcessor", "EchoProcessor" );
+		return &mod;
+	}
+
+	void setModuleLogger( void* logger )
+	{
+		logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend* >( logger );
+	}
+} // extern "C"
 
 }} // namespace _Wolframe::module

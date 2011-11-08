@@ -31,54 +31,31 @@
 
 ************************************************************************/
 //
-// file audit implementation
+// Text File Authentication module
 //
-#include <stdexcept>
 
+#include "TextFileAuth.hpp"
+#include "moduleInterface.hpp"
 #include "logger-v1.hpp"
-#include "FileAudit.hpp"
 
-#define BOOST_FILESYSTEM_VERSION 3
-#include <boost/filesystem.hpp>
-#include "miscUtils.hpp"
+_Wolframe::log::LogBackend*	logBackendPtr;
 
 namespace _Wolframe {
-namespace AAAA {
+namespace module {
 
-/// Audit to file
-bool FileAuditConfig::check() const
-{
-	if ( m_file.empty() )	{
-		LOG_ERROR << logPrefix() << "Audit filename cannot be empty";
-		return false;
+extern "C" {
+	ModuleContainer* createModule( void )
+	{
+		static module::ContainerDescription< AAAA::TxtFileAuthContainer,
+				AAAA::TextFileAuthConfig > mod( "Authentication file", "Authentication",
+								"file", "TextFileAuth" );
+		return &mod;
 	}
-	return true;
-}
 
-void FileAuditConfig::print( std::ostream& os, size_t indent ) const
-{
-	std::string indStr( indent, ' ' );
-	os << indStr << sectionName() << ": " << m_file << std::endl;
-}
-
-void FileAuditConfig::setCanonicalPathes( const std::string& refPath )
-{
-	using namespace boost::filesystem;
-
-	if ( ! m_file.empty() )	{
-		if ( ! path( m_file ).is_absolute() )
-			m_file = resolvePath( absolute( m_file,
-							path( refPath ).branch_path()).string());
-		else
-			m_file = resolvePath( m_file );
+	void setModuleLogger( void* logger )
+	{
+		logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend* >( logger );
 	}
-}
+} // extern "C"
 
-
-FileAuditContainer::FileAuditContainer( const FileAuditConfig& conf )
-{
-	m_file = conf.m_file;
-	LOG_NOTICE << "File auditor created with file '" << m_file << "'";
-}
-
-}} // namespace _Wolframe::AAAA
+}} // namespace _Wolframe::module

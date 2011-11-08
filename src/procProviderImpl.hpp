@@ -37,8 +37,6 @@
 #ifndef _WOLFRAME_PROCESSOR_GROUP_HPP_INCLUDED
 #define _WOLFRAME_PROCESSOR_GROUP_HPP_INCLUDED
 
-#include "config/configurationBase.hpp"
-#include "moduleInterface.hpp"
 #include "processor/procProvider.hpp"
 #include "container.hpp"
 #include "database/database.hpp"
@@ -48,27 +46,6 @@
 
 namespace _Wolframe {
 namespace proc {
-
-class ProcProviderConfig : public config::ConfigurationBase
-{
-	friend class ProcessorProvider;
-public:
-	/// constructor & destructor
-	ProcProviderConfig()
-		: ConfigurationBase( "Processor(s)", NULL, "Processor configuration" )	{}
-	~ProcProviderConfig();
-
-	/// methods
-	bool parse( const config::ConfigurationTree& pt, const std::string& node,
-		    const module::ModulesDirectory* modules );
-	bool check() const;
-	void print( std::ostream& os, size_t indent ) const;
-	virtual void setCanonicalPathes( const std::string& referencePath );
-private:
-	std::string					m_dbLabel;
-	std::list< config::ObjectConfiguration* >	m_procConfig;
-};
-
 
 class ProcessorProvider::ProcessorProvider_Impl
 {

@@ -31,52 +31,43 @@
 
 ************************************************************************/
 //
-// AAAA modules
+//
 //
 
-#include "AAAA/TextFileAuthentication.hpp"
-#include "AAAA/DBauthentication.hpp"
-#include "AAAA/FileAudit.hpp"
-#include "AAAA/DBaudit.hpp"
-#include "moduleInterface.hpp"
+#include "logger-v1.hpp"
+#include "config/valueParser.hpp"
+#include "config/ConfigurationTree.hpp"
+
+#include "TextFileAuth.hpp"
+
+#include "boost/algorithm/string.hpp"
+#define BOOST_FILESYSTEM_VERSION 3
+#include <boost/filesystem.hpp>
 
 namespace _Wolframe {
-namespace module {
+namespace AAAA {
 
-extern "C" {
-
-ModuleContainer* TextFileAuthModule()
+bool TextFileAuthConfig::parse( const config::ConfigurationTree& pt, const std::string& node,
+				const module::ModulesDirectory* /*modules*/ )
 {
-	static module::ContainerDescription< AAAA::TxtFileAuthContainer,
-			AAAA::TextFileAuthConfig > mod( "Authentication file", "Authentication",
-							"file", "TextFileAuth" );
-	return &mod;
+	using namespace _Wolframe::config;
+	bool retVal = true;
+
+	if ( boost::algorithm::iequals( node, "file" ) || boost::algorithm::iequals( node, "filename" ))	{
+		bool isDefined = ( !m_file.empty() );
+		if ( !Parser::getValue( logPrefix().c_str(), node.c_str(),
+					pt.get_value<std::string>(), m_file, &isDefined ))
+			retVal = false;
+		else	{
+			if ( ! boost::filesystem::path( m_file ).is_absolute() )
+				LOG_WARNING << logPrefix() << "authentication file path is not absolute: "
+					    << m_file;
+		}
+	}
+	else	{
+		LOG_WARNING << logPrefix() << "unknown configuration option: '" << node << "'";
+	}
+	return retVal;
 }
 
-ModuleContainer* DBauthModule()
-{
-	static module::ContainerDescription< AAAA::DBauthContainer,
-			AAAA::DatabaseAuthConfig > mod( "Authentication database", "Authentication",
-							"database", "DatabaseAuth" );
-	return &mod;
-}
-
-ModuleContainer* FileAuditModule()
-{
-	static module::ContainerDescription< AAAA::FileAuditContainer,
-			AAAA::FileAuditConfig > mod( "Audit file", "Audit",
-						     "file", "FileAudit" );
-	return &mod;
-}
-
-ModuleContainer* DBauditModule()
-{
-	static module::ContainerDescription< AAAA::DBauditContainer,
-			AAAA::DBauditConfig > mod( "Audit database", "Audit",
-						   "database", "DatabaseAudit" );
-	return &mod;
-}
-
-} // extern "C"
-
-}} // namespace _Wolframe::module
+}} // namespace _Wolframe::config

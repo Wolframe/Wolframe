@@ -35,15 +35,34 @@
 #define _DATABASE_PROVIDER_HPP_INCLUDED
 
 #include "database.hpp"
+#include "config/configurationBase.hpp"
 #include <boost/noncopyable.hpp>
 
 namespace _Wolframe {
 
-/// Opaque definitions for DBproviderConfig and ModulesDirectory
-namespace db { class DBproviderConfig; }
+/// Opaque definitions for ModulesDirectory
 namespace module { class ModulesDirectory; }
 
 namespace db {
+
+/// database configuration
+class DBproviderConfig : public config::ConfigurationBase
+{
+	friend class DatabaseProvider;
+public:
+	/// constructor & destructor
+	DBproviderConfig() : ConfigurationBase( "Database(s)", NULL, "Database configuration" )	{}
+	~DBproviderConfig();
+
+	/// methods
+	bool parse( const config::ConfigurationTree& pt, const std::string& node,
+		    const module::ModulesDirectory* modules );
+	bool check() const;
+	void print( std::ostream& os, size_t indent ) const;
+	virtual void setCanonicalPathes( const std::string& referencePath );
+private:
+	std::list< config::ObjectConfiguration* >	m_dbConfig;
+};
 
 /// Database provider
 class DatabaseProvider : private boost::noncopyable

@@ -52,27 +52,6 @@
 namespace _Wolframe {
 namespace AAAA {
 
-class AAAAconfiguration : public config::ConfigurationBase
-{
-	friend class AAAAprovider;
-public:
-	/// x-structor
-	AAAAconfiguration();
-	~AAAAconfiguration();
-
-	/// methods
-	bool parse( const config::ConfigurationTree& pt, const std::string& node,
-		    const module::ModulesDirectory* modules );
-	bool check() const;
-	void print( std::ostream& os, size_t indent ) const;
-	void setCanonicalPathes( const std::string& referencePath );
-private:
-	bool						m_allowAnonymous;
-	std::list< config::ObjectConfiguration* >	m_authConfig;
-	std::list< config::ObjectConfiguration* >	m_auditConfig;
-};
-
-
 class AuthenticationGroup
 {
 public:
