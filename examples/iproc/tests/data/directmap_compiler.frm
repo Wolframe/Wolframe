@@ -1,4 +1,4 @@
-struct PLANT
+form PLANT
 	string COMMON []
 	string BOTANICAL
 	uint ZONE
@@ -7,24 +7,24 @@ struct PLANT
 	uint AVAILABILITY
 end
 
-struct PHONE
+form PHONE
 	string NUMBER
 	string MOBILE
 end
 
-struct ADDRESS
+form ADDRESS
 	int COUNTRY
 	string STREET
 	string CITY
-	ref PHONE
+	form PHONE
 end
 
-struct GARDEN
+form GARDEN
 	string NAME
-	ref ADDRESS
-	ref PLANT []
+	form ADDRESS
+	form PLANT []
 end
 
-struct PLACES
-	ref GARDEN
+form PLACES
+	form GARDEN
 end

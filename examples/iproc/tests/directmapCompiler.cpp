@@ -11,7 +11,7 @@ int main( int argc, const char** argv)
 		std::cerr << "missing input file parameter" << std::endl;
 		return -1;
 	}
-	directmap::Definition directmap;
+	directmap::PrimitiveDDLParser directmap;
 	std::string error;
 	if (!directmap.compile( argv[1], error))
 	{

@@ -16,7 +16,8 @@ INCLUDE_DIRS = \
 INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_program_options \
-	-lboost_filesystem
+	-lboost_filesystem \
+	$(LIBS_DL)
 
 # openssl
 
