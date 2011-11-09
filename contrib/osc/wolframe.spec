@@ -70,6 +70,7 @@
 %define with_pam	1
 %define with_sasl	1
 %define with_libxml2	1
+%define with_libxslt	1
 %define with_examples	1
 
 # Qt is far too old on some platforms, we also don't want to build a local
@@ -224,6 +225,10 @@ Requires: cyrus-sasl >= 2.1.22
 BuildRequires: libxml2-devel >= 2.6
 Requires: libxml2 >= 2.6
 %endif
+%if %{with_libxslt}
+BuildRequires: libxslt-devel >= 1.0
+Requires: libxslt-devel >= 1.0
+%endif
 BuildRequires: gcc-c++
 BuildRequires: doxygen
 
@@ -298,6 +303,7 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make help \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
+	WITH_LIBXSLT=%{with_libxslt} \
 	WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=/etc
 
@@ -313,6 +319,7 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make config \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
+	WITH_LIBXSLT=%{with_libxslt} \
 	WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=/etc
 LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make all \
@@ -328,6 +335,7 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make all \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
+	WITH_LIBXSLT=%{with_libxslt} \
 	WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=/etc
 cd docs; make doc-doxygen
@@ -350,6 +358,7 @@ make DESTDIR=$RPM_BUILD_ROOT install \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
+	WITH_LIBXSLT=%{with_libxslt} \
 	WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=$RPM_BUILD_ROOT/etc
 cd docs && make DESTDIR=$RPM_BUILD_ROOT install && cd ..
