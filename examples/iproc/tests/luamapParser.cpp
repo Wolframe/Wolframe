@@ -105,6 +105,12 @@ struct Places
 	static const DescriptionBase* getDescription();
 };
 
+struct Document
+{
+	Places places;
+	static const DescriptionBase* getDescription();
+};
+
 const DescriptionBase* Plant::getDescription()
 {
 	struct ThisDescription :public Description<Plant>
@@ -192,6 +198,21 @@ const DescriptionBase* Places::getDescription()
 	return &rt;
 }
 
+const DescriptionBase* Document::getDescription()
+{
+	struct ThisDescription :public Description<Document>
+	{
+		ThisDescription()
+		{
+			(*this)
+			("PLACES",		&Document::places)
+			;
+		}
+	};
+	static const ThisDescription rt;
+	return &rt;
+}
+
 struct TestConfiguration :public lua::Configuration
 {
 	TestConfiguration( const char* scriptname, int bufferSizeInput, int bufferSizeOutput)
@@ -206,7 +227,7 @@ struct TestConfiguration :public lua::Configuration
 };
 
 template <class Struct>
-static int luaIntrusiveSerializationTest( lua_State* ls)
+static int luaSerializationTest( lua_State* ls)
 {
 	Struct obj;
 	const DescriptionBase* ds = Struct::getDescription();
@@ -235,7 +256,7 @@ static int run( const TestConfiguration& cfg, const std::string& input, std::str
 	}
 	lua::AppProcessor processor( &cfg);
 	lua_State* ls = processor.getLuaState();
-	lua_pushcfunction( ls, &luaIntrusiveSerializationTest<Struct>);
+	lua_pushcfunction( ls, &luaSerializationTest<Struct>);
 	lua_setglobal( ls, "transform");
 
 	in->protocolInput( (void*)input.c_str(), input.size(), true);
@@ -293,7 +314,7 @@ static const TestDescription testDescription[2] = {
 	"luamap_PLACES",
 	"test_luamap_places_IsoLatin1.xml",
 	"test_serialization",
-	&run<Places>
+	&run<Document>
 },
 {0,0,0,0}
 };

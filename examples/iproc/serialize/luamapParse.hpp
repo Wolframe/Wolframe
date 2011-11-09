@@ -37,7 +37,8 @@ Project Wolframe.
 #include "serialize/luamapBase.hpp"
 #include "serialize/luamapTraits.hpp"
 #include <stdexcept>
-#include <boost/utility/value_init.hpp> 
+/*[-]*/#include <iostream>
+#include <boost/utility/value_init.hpp>
 
 namespace _Wolframe {
 namespace serialize {
@@ -56,6 +57,7 @@ static void setLuaError( Context* ctx, lua_State* ls, int tagIndex, const char* 
 template <typename T>
 static bool parseObject_( void* obj, const struct_&, lua_State* ls, Context* ctx)
 {
+/*[-]*/std::cout << "PARSE STRUCT" << std::endl;
 	static const DescriptionBase* descr = T::getDescription();
 	
 	if (!lua_istable( ls, -1))
@@ -74,16 +76,23 @@ static bool parseObject_( void* obj, const struct_&, lua_State* ls, Context* ctx
 			setLuaError( ctx, ls, -5, "string expected as key for struct in table instead of ", lua_typename( ls, lua_type( ls, -1)));
 			return false;
 		}
+/*[-]*/std::cout << "ELEMENT '" << key  << "'" << std::endl;
 		DescriptionBase::Map::const_iterator itr = descr->find( key);
 
-		if (itr == descr->m_elem.end())
+		if (itr == descr->end())
 		{
+/*[-]*/itr = descr->begin();
+/*[-]*/while (itr != descr->end())
+{
+/*[-]*/std::cout << "? '" << itr->first << "'" << std::endl;
+/*[-]*/++itr;
+}
 			setLuaError( ctx, ls, -5, "element not defined ", key);
 			return false;
 		}
 		lua_pop( ls, 1);
 
-		if (!itr->second.m_parse( (char*)obj+itr->second.m_ofs, ls, ctx))
+		if (!itr->second.parse()( (char*)obj+itr->second.ofs(), ls, ctx))
 		{
 			ctx->setError( itr->first);
 			return false;
@@ -97,6 +106,7 @@ static bool parseObject_( void* obj, const struct_&, lua_State* ls, Context* ctx
 template <typename T>
 static bool parseObject_( void* obj, const arithmetic_&, lua_State* ls, Context* ctx)
 {
+/*[-]*/std::cout << "PARSE ARITHMETIC" << std::endl;
 	bool rt = true;
 	try
 	{
@@ -124,6 +134,7 @@ static bool parseObject_( void* obj, const arithmetic_&, lua_State* ls, Context*
 template <typename T>
 static bool parseObject_( void* obj, const vector_&, lua_State* ls, Context* ctx)
 {
+/*[-]*/std::cout << "PARSE VECTOR" << std::endl;
 	if (!lua_istable( ls, -1))
 	{
 		ctx->setError( 0, "table expected for vector");
@@ -134,6 +145,8 @@ static bool parseObject_( void* obj, const vector_&, lua_State* ls, Context* ctx
 	{
 		if (!lua_isnumber( ls, -2))
 		{
+/*[-]*/std::cout << "TYPE " << lua_typename( ls, lua_type( ls, -2)) << std::endl;
+/*[-]*/std::cout << "VALUE " << lua_tostring( ls, -2) << std::endl;
 			ctx->setError( 0, "only number indices expected for vector");
 			return false;
 		}

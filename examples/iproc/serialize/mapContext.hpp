@@ -90,10 +90,10 @@ private:
 		if (m1len >= errbufsize-1) m1len = errbufsize-2;
 		if (m2len >= errbufsize-m1len) m2len = errbufsize-m1len-1;
 		if (m3len >= errbufsize-m1len-m2len) m3len = errbufsize-m1len-m2len;
+		std::memmove( m_lasterror+m1len+m2len+1, m3?m3:"", m3len);
+		std::memmove( m_lasterror+m1len+1, m2?m2:"", m2len);
 		std::memmove( m_lasterror, m1?m1:"", m1len);
 		m_lasterror[ m1len] = dd;
-		std::memmove( m_lasterror+m1len+1, m2?m2:"", m2len);
-		std::memmove( m_lasterror+m1len+m2len+1, m3?m3:"", m3len);
 		m_lasterror[ m1len+m2len+m3len+1] = '\0';
 	}
 };

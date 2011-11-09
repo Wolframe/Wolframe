@@ -75,7 +75,7 @@ bool parseObject_( const char* tag, void* obj, const struct_&, protocol::InputFi
 {
 	protocol::InputFilter::ElementType typ;
 	static const DescriptionBase* descr = T::getDescription();
-	unsigned int m_depth = 0;
+	unsigned int depth = 0;
 	std::size_t bufpos = 0;
 
 	if (tag)
@@ -90,18 +90,18 @@ bool parseObject_( const char* tag, void* obj, const struct_&, protocol::InputFi
 		{
 			case protocol::InputFilter::OpenTag:
 			{
-				++m_depth;
+				++depth;
 				DescriptionBase::Map::const_iterator itr = descr->find( ctx.buf());
-				if (itr == descr->m_elem.end())
+				if (itr == descr->end())
 				{
 					ctx.setError( ctx.buf(), "unknown element");
 					ctx.setError( tag);
 					return false;
 				}
-				if (!itr->second.m_parse( 0, (char*)obj+itr->second.m_ofs, inp, ctx)) return false;
+				if (!itr->second.parse()( 0, (char*)obj+itr->second.ofs(), inp, ctx)) return false;
 				if (ctx.endTagConsumed())
 				{
-					--m_depth;
+					--depth;
 					ctx.endTagConsumed(false);
 					return true;
 				}
@@ -111,13 +111,13 @@ bool parseObject_( const char* tag, void* obj, const struct_&, protocol::InputFi
 			case protocol::InputFilter::Attribute:
 			{
 				DescriptionBase::Map::const_iterator itr = descr->find( ctx.buf());
-				if (itr == descr->m_elem.end())
+				if (itr == descr->end())
 				{
 					ctx.setError( ctx.buf(), "unknown element");
 					ctx.setError( tag);
 					return false;
 				}
-				if (!itr->second.m_parse( ctx.buf(), (char*)obj+itr->second.m_ofs, inp, ctx)) return false;
+				if (!itr->second.parse()( ctx.buf(), (char*)obj+itr->second.ofs(), inp, ctx)) return false;
 				ctx.endTagConsumed(false);
 				break;
 			}
@@ -131,12 +131,12 @@ bool parseObject_( const char* tag, void* obj, const struct_&, protocol::InputFi
 				return false;
 			}
 			case protocol::InputFilter::CloseTag:
-				if (m_depth == 0)
+				if (depth == 0)
 				{
 					ctx.endTagConsumed(true);
 					return true;
 				}
-				--m_depth;
+				--depth;
 				ctx.endTagConsumed(false);
 		}
 		bufpos = 0;

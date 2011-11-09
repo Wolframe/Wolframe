@@ -51,9 +51,11 @@ public:
 	typedef bool (*Parse)( const char* tag, void* obj, protocol::InputFilter& flt, Context& ctx);
 	typedef bool (*Print)( const char* tag, const void* obj, protocol::FormatOutput*& out, Context& ctx);
 	typedef bool (*IsAtomic)();
+	Parse parse() const {return m_parse;}
+	Print print() const {return m_print;}
 
-	DescriptionBase( const char* tn, std::size_t ofs, std::size_t sz, IsAtomic ia, Parse pa, Print pr)
-		:m_typename(tn),m_ofs(ofs),m_size(sz),m_isAtomic(ia),m_parse(pa),m_print(pr){}
+	DescriptionBase( const char* tn, std::size_t os, std::size_t sz, IsAtomic ia, Parse pa, Print pr)
+		:m_typename(tn),m_ofs(os),m_size(sz),m_isAtomic(ia),m_parse(pa),m_print(pr){}
 	DescriptionBase( const DescriptionBase& o)
 		:m_typename(o.m_typename),m_ofs(o.m_ofs),m_size(o.m_size),m_elem(o.m_elem),m_isAtomic(o.m_isAtomic),m_parse(o.m_parse),m_print(o.m_print){}
 	DescriptionBase()
@@ -66,9 +68,15 @@ public:
 	{
 		return m_isAtomic();
 	}
+
 	std::size_t size() const
 	{
 		return m_size;
+	}
+
+	std::size_t ofs() const
+	{
+		return m_ofs;
 	}
 
 	Map::const_iterator find( const char* name) const
@@ -80,12 +88,15 @@ public:
 		return m_elem.end();
 	}
 
+	Map::const_iterator begin() const {return m_elem.begin();}
+	Map::const_iterator end() const {return m_elem.end();}
+
 	void define( const char* name, const DescriptionBase& dd)
 	{
 		m_elem.push_back( std::pair<const char*,DescriptionBase>(name,dd));
 	}
 
-public:
+private:
 	const char* m_typename;
 	std::size_t m_ofs;
 	std::size_t m_size;

@@ -82,7 +82,7 @@ struct Description :public DescriptionBase
 
 		std::size_t pp = (std::size_t)&(((Structure*)0)->*eptr);
 		DescriptionBase e( getTypename<Element>(), pp, sizeof(Element), parse_, print_);
-		if (find( name) != m_elem.end())
+		if (find( name) != end())
 		{
 			LOG_ERROR << "duplicate definition of " << name << " in structure";
 		}

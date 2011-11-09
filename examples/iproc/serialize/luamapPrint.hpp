@@ -86,11 +86,11 @@ bool printObject_( const void* obj, const struct_&, lua_State* ls, Context* ctx)
 	static const DescriptionBase* descr = T::getDescription();
 	
 	lua_newtable( ls);
-	DescriptionBase::Map::const_iterator itr = descr->m_elem.begin();
-	while (itr != descr->m_elem.end())
+	DescriptionBase::Map::const_iterator itr = descr->begin();
+	while (itr != descr->end())
 	{
 		lua_pushstring( ls, itr->first);
-		if (!itr->second.m_print( (char*)obj+itr->second.m_ofs, ls, ctx))
+		if (!itr->second.print()( (char*)obj+itr->second.ofs(), ls, ctx))
 		{
 			ctx->setError( itr->first);
 			return false;

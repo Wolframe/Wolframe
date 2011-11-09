@@ -56,9 +56,11 @@ public:
 	typedef std::vector<std::pair<const char*,DescriptionBase> > Map;
 	typedef bool (*Parse)( void* obj, lua_State* ls, Context* ctx);
 	typedef bool (*Print)( const void* obj, lua_State* ls, Context* ctx);
-	
-	DescriptionBase( const char* tn, std::size_t ofs, std::size_t sz, Parse pa, Print pr)
-		:m_typename(tn),m_ofs(ofs),m_size(sz),m_parse(pa),m_print(pr){}
+	Parse parse() const {return m_parse;}
+	Print print() const {return m_print;}
+
+	DescriptionBase( const char* tn, std::size_t os, std::size_t sz, Parse pa, Print pr)
+		:m_typename(tn),m_ofs(os),m_size(sz),m_parse(pa),m_print(pr){}
 	DescriptionBase( const DescriptionBase& o)
 		:m_typename(o.m_typename),m_ofs(o.m_ofs),m_size(o.m_size),m_elem(o.m_elem),m_parse(o.m_parse),m_print(o.m_print){}
 
@@ -70,6 +72,11 @@ public:
 		return m_size;
 	}
 
+	std::size_t ofs() const
+	{
+		return m_ofs;
+	}
+
 	Map::const_iterator find( const char* name) const
 	{
 		for (Map::const_iterator itr = m_elem.begin(); itr!=m_elem.end(); ++itr)
@@ -79,11 +86,14 @@ public:
 		return m_elem.end();
 	}
 
+	Map::const_iterator begin() const {return m_elem.begin();}
+	Map::const_iterator end() const {return m_elem.end();}
+
 	void define( const char* name, const DescriptionBase& dd)
 	{
 		m_elem.push_back( std::pair<const char*,DescriptionBase>(name,dd));
 	}
-public:
+private:
 	const char* m_typename;
 	std::size_t m_ofs;
 	std::size_t m_size;

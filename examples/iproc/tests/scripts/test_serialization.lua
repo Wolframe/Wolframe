@@ -80,7 +80,7 @@ function run()
 	output:as(f)
 
 	t = readTable( input:get())
-	-- t = transform( t)
+	t = transform( t )
 	printTable( t)
 end
 
