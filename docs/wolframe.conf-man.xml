@@ -2,64 +2,54 @@
 <!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
 	"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
 
+<!ENTITY firstname "Mihai">
+<!ENTITY surname   "Barbos">
+<!ENTITY username  "&firstname; &surname;">
+<!ENTITY email     "mihai.barbos@gmail.com">
+<!ENTITY year      "2010-2011">
+<!ENTITY section   "5">
+<!-- TITLE should be something like "User commands" or similar (see
+	http://www.tldp.org/HOWTO/Man-Page/q2.html). -->
+    <!ENTITY dhtitle     "Wolframe User Manual">
+    <!ENTITY dhucpackage "wolframe">
+    <!ENTITY dhpackage   "wolframe.conf">
+]>
+
 <!--
+************************************************************************
 
-`xsltproc -''-nonet \
-	  -''-param man.charmap.use.subset "0" \
-	  -''-param make.year.ranges "1" \
-	  -''-param make.single.year.ranges "1" \
-	  /usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl \
-	  manpage.xml'
+ Copyright (C) 2011 Project Wolframe.
+ All rights reserved.
 
-A manual page <package>.<section> will be generated. You may view the
-manual page with: nroff -man <package>.<section> | less'. A typical entry
-in a Makefile or Makefile.am is:
+ This file is part of Project Wolframe.
 
-DB2MAN = /usr/share/sgml/docbook/stylesheet/xsl/nwalsh/manpages/docbook.xsl
-XP     = xsltproc -''-nonet -''-param man.charmap.use.subset "0"
+ Commercial Usage
+    Licensees holding valid Project Wolframe Commercial licenses may
+    use this file in accordance with the Project Wolframe
+    Commercial License Agreement provided with the Software or,
+    alternatively, in accordance with the terms contained
+    in a written agreement between the licensee and Project Wolframe.
 
-manpage.1: manpage.xml
-	$(XP) $(DB2MAN) $<
+ GNU General Public License Usage
+    Alternatively, you can redistribute this file and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-The xsltproc binary is found in the xsltproc package. The XSL files are in
-docbook-xsl. A description of the parameters you can use can be found in the
-docbook-xsl-doc-* packages. Please remember that if you create the nroff
-version in one of the debian/rules file targets (such as build), you will need
-to include xsltproc and docbook-xsl in your Build-Depends control field.
-Alternatively use the xmlto command/package. That will also automatically
-pull in xsltproc and docbook-xsl.
+    Wolframe is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-Notes for using docbook2x: docbook2x-man does not automatically create the
-AUTHOR(S) and COPYRIGHT sections. In this case, please add them manually as
-<refsect1> ... </refsect1>.
+    You should have received a copy of the GNU General Public License
+    along with Wolframe.  If not, see <http://www.gnu.org/licenses/>.
 
-To disable the automatic creation of the AUTHOR(S) and COPYRIGHT sections
-read /usr/share/doc/docbook-xsl/doc/manpages/authors.html. This file can be
-found in the docbook-xsl-doc-html package.
+ If you have questions regarding the use of this file, please contact
+ Project Wolframe.
 
-Validation can be done using: `xmllint -''-noout -''-valid manpage.xml`
-
-General documentation about man-pages and man-page-formatting:
-man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
-
+************************************************************************
 -->
 
-  <!-- Fill in your name for FIRSTNAME and SURNAME. -->
-  <!ENTITY dhfirstname "FIRSTNAME">
-  <!ENTITY dhsurname   "SURNAME">
-  <!-- dhusername could also be set to "&dhfirstname; &dhsurname;". -->
-  <!ENTITY dhusername  "Mihai Barbos">
-  <!ENTITY dhemail     "mihai.barbos@gmail.com">
-  <!-- SECTION should be 1-8, maybe w/ subsection other parameters are
-       allowed: see man(7), man(1) and
-       http://www.tldp.org/HOWTO/Man-Page/q2.html. -->
-  <!ENTITY dhsection   "5">
-  <!-- TITLE should be something like "User commands" or similar (see
-       http://www.tldp.org/HOWTO/Man-Page/q2.html). -->
-  <!ENTITY dhtitle     "Wolframe User Manual">
-  <!ENTITY dhucpackage "wolframe">
-  <!ENTITY dhpackage   "wolframe.conf">
-]>
 
 <refentry>
   <refentryinfo>
@@ -67,17 +57,17 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
     <productname>&dhpackage;</productname>
     <authorgroup>
       <author>
-       <firstname>&dhfirstname;</firstname>
-	<surname>&dhsurname;</surname>
+       <firstname>&firstname;</firstname>
+	<surname>&surname;</surname>
 	<contrib>Wrote this manpage for the Debian system.</contrib>
 	<address>
-	  <email>&dhemail;</email>
+	  <email>&email;</email>
 	</address>
       </author>
     </authorgroup>
     <copyright>
-      <year>2007</year>
-      <holder>&dhusername;</holder>
+      <year>&year;</year>
+      <holder>&username;</holder>
     </copyright>
     <legalnotice>
       <para>This manual page was written for the Debian system
@@ -93,7 +83,7 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
   </refentryinfo>
   <refmeta>
     <refentrytitle>&dhucpackage;</refentrytitle>
-    <manvolnum>&dhsection;</manvolnum>
+    <manvolnum>&section;</manvolnum>
   </refmeta>
   <refnamediv>
     <refname>&dhpackage;</refname>
@@ -143,6 +133,177 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
       </group>
     </cmdsynopsis>
   </refsynopsisdiv>
+
+<!--
+;
+;Wolframe configuration file
+
+LoadModules	{						; modules to be loaded by the server
+	module modules/PostgreSQL/mod_db_postgresql.so.0.0.0
+	module modules/SQLite/mod_db_sqlite3.so.0.0.0
+
+	module modules/audit/database/mod_audit_database.so.0.0.0
+	module modules/audit/textfile/mod_audit_textfile.so.0.0.0
+	module modules/authentication/database/mod_auth_database.so.0.0.0
+	module modules/authentication/textfile/mod_auth_textfile.so.0.0.0
+
+	module modules/processor/echo/mod_proc_echo.so.0.0.0
+
+}
+
+ServerTokens		OS					; print the application name and
+								; version in the initial greeting
+								; allowed values are:
+								;   ProductOnly, Major, Minor,
+								;   Revision, OS, None
+ServerSignature		On					; print the name of the server as
+								; first element of the greeting
+
+; Unix daemon parameters. This section is not valid for windows
+daemon {
+;	user		nobody
+;	group		nobody
+	pidFile		/tmp/wolframed.pid
+}
+
+; Windows service parameters (for service registration). This section is not valid on non-Windows OSes
+service {
+	serviceName	wolframe
+	displayName	"Wolframe Daemon"
+	description	"a daemon for howling"
+}
+
+
+; Ports 7649-7671 and 7934-7966 are unassigned according to IANA (last updated 2010-03-11).
+; Let's use 7660 for unencrypted connections and 7960 for SSL connections.
+; Note that 7654 seems to be used by Winamp.
+listen	{
+	maxConnections	3					; Maximum number of simultaneous connections (clients).
+								; Default is the OS limit. This is the global (total) value.
+								; Set it to 0 to disable (to use the system limit)
+	threads		7					; Number of threads for serving client connections.
+								; Default 4
+	socket	{
+		address		*
+		port		7661
+		maxConnections	2				; Maximum number of simultaneous connections (clients)
+								; for this socket. Default is the OS limit.
+	}
+	socket	{
+		address		localhost
+;		address		::1
+		port		7662
+		name		"Interface 1"			; Interfaces can be named for AAA purposes
+	}
+
+	SSLsocket	{
+		address		0.0.0.0
+		port		7961
+		name		"Interface 1"			; Many interfaces can have the same name and
+								; they can be referred as one group in AAAA
+		; SSL parameters: required if SSLsocket is defined
+		certificate	../tests/SSL/wolframed.crt	; Server certificate file (PEM)
+		key		../tests/SSL/wolframed.key	; Server key file (PEM)
+		CAdirectory	../tests/SSL/CAdir		; Directory holding CA certificate files
+		CAchainFile	../tests/SSL/CAchain.pem	; SSL CA chain file
+		verify		ON				; Require and verify client certificate
+	}
+	SSLsocket	{
+		address		127.0.0.1
+		port		7962
+		name		"Interface 2"
+		maxConnections	2
+		certificate	../tests/SSL/wolframed.crt
+		key		../tests/SSL/wolframed.key
+		; CAdirectory	../tests/SSL/CAdir		; It's not necessary to define both
+		CAchainFile	../tests/SSL/CAchain.pem	; CAdirectory and CAchainFile.
+		verify		OFF
+	}
+}
+
+
+; Database configuration
+database	{
+	PostgreSQL	{					; PostgreSQL database.
+		identifier	pgdb				; Database identifier. Used by other definitions.
+		host		localhost			; Database host. Uses the unix socket if not defined.
+		port		5432				; Database port. Uses the default port if not defined.
+		name		wolframe			; Database name.
+		user		wolframe			; Database user.
+		password	blabla				; Password for the database user.
+		connectionTimeout 10				; connection timeout in seconds
+								; 0 to disable, default 30s
+		connections	5				; number of parallel connections to the database
+								; Default is 4
+		acquireTimeout	10				; maximum allowed time to acquire a database
+								; connection
+	}
+
+	SQLite	{
+		identifier	sqlitedb			; All databases defined independently must have
+								; an identifier
+;		file		/var/lib/wolframe/primary.db	; SQLite database file
+		file		primary.db
+	}
+}
+
+
+; Logging configuration
+logging	{
+	; log level for console (stderr) logging
+	stderr	{
+		level	INFO
+	}
+
+	; log level for file logging
+	logFile	{
+		filename	/tmp/wolframed.log
+		level		NOTICE
+	}
+
+	; syslog facility, identifier and log level
+	syslog	{
+		ident		wolframed
+		facility	LOCAL2
+		level		INFO
+	}
+
+	; eventlog source and log level. Valid only on Windows
+	eventlog	{
+		name		Wolframe
+		source		wolframed
+		level		INFO
+	}
+}
+
+; Authentication, authorization, accounting and auditing configuration
+aaaa	{
+	authentication	{
+		allowAnonymous	yes
+		database	pgdb
+;		database	sqlitedb
+	}
+
+	audit	{
+		file		../var/tmp/wolframe.audit
+		database	sqlitedb
+	}
+	; There are no configurations for authorization and accounting
+	; as authorization uses the authentication information and the
+	; server database and accounting should be derived from audit
+	; information
+}
+
+; The thing that does the real job ;)
+Processor	{
+	database		pgdb
+;	database		sqlitedb
+	EchoProcessor	{
+		timeout		10
+	}
+}
+
+-->
   <refsect1 id="description">
     <title>DESCRIPTION</title>
     <para>This manual page documents briefly the

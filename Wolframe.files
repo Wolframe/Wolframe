@@ -41,6 +41,7 @@ makefiles/nmake/top.mk
 .Attic/loadModule/GNUmakefile
 .Attic/loadModule/Makefile.W32
 .Attic/loadModule/moduleBase.hpp
+.Attic/manpage-example.xml
 .Attic/mtproc/implementation_c.c
 .Attic/mtproc/implementation_c.h
 .Attic/mtproc/methodtable_c.h
@@ -117,7 +118,6 @@ docs/doxygen.conf
 docs/GNUmakefile
 docs/images/GNUmakefile
 docs/LuaAppProcessor.xml
-docs/manpage-example.xml
 docs/SDK/Appendix.xml
 docs/SDK/Glossary.xml
 docs/SDK/Introduction.xml

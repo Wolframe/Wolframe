@@ -44,12 +44,9 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
 
 -->
 
-  <!-- Fill in your name for FIRSTNAME and SURNAME. -->
-  <!ENTITY dhfirstname "FIRSTNAME">
-  <!ENTITY dhsurname   "SURNAME">
-  <!-- dhusername could also be set to "&dhfirstname; &dhsurname;". -->
-  <!ENTITY dhusername  "Mihai Barbos">
-  <!ENTITY dhemail     "mihai.barbos@gmail.com">
+	<!ENTITY AUTHOR		"Wolframe Project Team">
+	<!ENTITY EMAIL		"contact@wolframe.org">
+	<!ENTITY YEAR		"2010 - 2011">
   <!-- SECTION should be 1-8, maybe w/ subsection other parameters are
        allowed: see man(7), man(1) and
        http://www.tldp.org/HOWTO/Man-Page/q2.html. -->
@@ -58,36 +55,68 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
        http://www.tldp.org/HOWTO/Man-Page/q2.html). -->
   <!ENTITY dhtitle     "Wolframe User Manual">
   <!ENTITY dhucpackage "Wolframe">
-  <!ENTITY dhpackage   "wolgrame">
+  <!ENTITY dhpackage   "wolframe">
 ]>
+
+<!--
+************************************************************************
+
+ Copyright (C) 2011 Project Wolframe.
+ All rights reserved.
+
+ This file is part of Project Wolframe.
+
+ Commercial Usage
+    Licensees holding valid Project Wolframe Commercial licenses may
+    use this file in accordance with the Project Wolframe
+    Commercial License Agreement provided with the Software or,
+    alternatively, in accordance with the terms contained
+    in a written agreement between the licensee and Project Wolframe.
+
+ GNU General Public License Usage
+    Alternatively, you can redistribute this file and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Wolframe is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Wolframe.  If not, see <http://www.gnu.org/licenses/>.
+
+ If you have questions regarding the use of this file, please contact
+ Project Wolframe.
+
+************************************************************************
+-->
 
 <refentry>
   <refentryinfo>
     <title>&dhtitle;</title>
     <productname>&dhpackage;</productname>
     <authorgroup>
-      <author>
+      <corpauthor>
        <firstname>&dhfirstname;</firstname>
         <surname>&dhsurname;</surname>
-        <contrib>Wrote this manpage for the Debian system.</contrib>
         <address>
-          <email>&dhemail;</email>
+          <email>&EMAIL;</email>
         </address>
-      </author>
+      </corpauthor>
     </authorgroup>
     <copyright>
-      <year>2007</year>
+      <year>&YEAR;</year>
       <holder>&dhusername;</holder>
     </copyright>
     <legalnotice>
-      <para>This manual page was written for the Debian system
-        (and may be used by others).</para>
       <para>Permission is granted to copy, distribute and/or modify this
         document under the terms of the GNU General Public License,
-        Version 2 or (at your option) any later version published by
+        Version 3 or (at your option) any later version published by
         the Free Software Foundation.</para>
       <para>On Debian systems, the complete text of the GNU General Public
-        License can be found in
+        License can be found at
         <filename>/usr/share/common-licenses/GPL</filename>.</para>
     </legalnotice>
   </refentryinfo>
