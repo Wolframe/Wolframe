@@ -51,7 +51,7 @@ DBauditContainer::DBauditContainer( const DBauditConfig& conf )
 	if ( m_dbLabel.empty() )
 		throw std::logic_error( "Empty database reference in DBauditContainer" );
 
-	LOG_NOTICE << "Database auditor created with database reference '" << m_dbLabel << "'";
+	MOD_LOG_NOTICE << "Database auditor created with database reference '" << m_dbLabel << "'";
 }
 
 DBauditContainer::~DBauditContainer()
@@ -63,11 +63,11 @@ bool DBauditContainer::resolveDB( const db::DatabaseProvider& db )
 	if ( m_db == NULL && ! m_dbLabel.empty() )	{
 		m_db = db.database( m_dbLabel );
 		if ( m_db )	{
-			LOG_NOTICE << "Database audit: database reference '" << m_dbLabel << "' resolved";
+			MOD_LOG_NOTICE << "Database audit: database reference '" << m_dbLabel << "' resolved";
 			return true;
 		}
 		else	{
-			LOG_ERROR << "Database audit: database labeled '" << m_dbLabel << "' not found !";
+			MOD_LOG_ERROR << "Database audit: database labeled '" << m_dbLabel << "' not found !";
 			return false;
 		}
 	}

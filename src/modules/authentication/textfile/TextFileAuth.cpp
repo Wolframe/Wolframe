@@ -51,7 +51,7 @@ namespace AAAA {
 bool TextFileAuthConfig::check() const
 {
 	if ( m_file.empty() )	{
-		LOG_ERROR << logPrefix() << "Authentication filename cannot be empty";
+		MOD_LOG_ERROR << logPrefix() << "Authentication filename cannot be empty";
 		return false;
 	}
 	return true;
@@ -80,7 +80,7 @@ void TextFileAuthConfig::setCanonicalPathes( const std::string& refPath )
 TxtFileAuthContainer::TxtFileAuthContainer( const TextFileAuthConfig& conf )
 {
 	m_file = conf.m_file;
-	LOG_NOTICE << "File authenticator created with file '" << m_file << "'";
+	MOD_LOG_NOTICE << "File authenticator created with file '" << m_file << "'";
 }
 
 }} // namespace _Wolframe::AAAA

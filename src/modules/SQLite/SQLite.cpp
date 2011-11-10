@@ -54,14 +54,14 @@ SQLiteDatabase::SQLiteDatabase( const std::string& id,
 		sqlite3 *handle;
 		int res = sqlite3_open( m_filename.c_str( ), &handle );
 		if( res != SQLITE_OK ) {
-			LOG_ERROR << "Unable to open Sqlite3 database '" << filename << ": " << sqlite3_errmsg( handle );
+			MOD_LOG_ERROR << "Unable to open Sqlite3 database '" << filename << ": " << sqlite3_errmsg( handle );
 		}
 
 		m_connections.push_back( handle );
 		m_connPool.add( handle );
 	}
 
-	LOG_NOTICE << "SQLite database '" << m_ID << "' created with "
+	MOD_LOG_NOTICE << "SQLite database '" << m_ID << "' created with "
 		   << "filename '" << m_filename << "'";
 }
 
@@ -72,7 +72,7 @@ SQLiteDatabase::~SQLiteDatabase( )
 		sqlite3_close( handle );
 	}
 
-	LOG_DEBUG << "SQLite database '" << m_ID << "' destroyed with "
+	MOD_LOG_DEBUG << "SQLite database '" << m_ID << "' destroyed with "
 		  << "filename '" << m_filename << "'";
 }
 
@@ -122,7 +122,7 @@ bool SQLiteDatabase::doTransaction( DatabaseRequest& /*request*/, DatabaseAnswer
 SQLiteUnit::SQLiteUnit( const SQLiteConfig& conf )
 	: m_db( conf.m_ID, conf.filename, /* Aba: temporary */ 10, conf.flag )
 {
-	LOG_NOTICE << "SQLite database container for '" << conf.m_ID << "' created";
+	MOD_LOG_NOTICE << "SQLite database container for '" << conf.m_ID << "' created";
 }
 
 SQLiteUnit::~SQLiteUnit( )

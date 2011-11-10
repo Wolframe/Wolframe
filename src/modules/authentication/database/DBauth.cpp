@@ -49,7 +49,7 @@ DBauthContainer::DBauthContainer( const DatabaseAuthConfig& conf )
 	if ( m_dbLabel.empty() )
 		throw std::logic_error( "Empty database reference in DBauthContainer" );
 
-	LOG_NOTICE << "Database authenticator with database reference '" << m_dbLabel << "'";
+	MOD_LOG_NOTICE << "Database authenticator with database reference '" << m_dbLabel << "'";
 }
 
 DBauthContainer::~DBauthContainer()
@@ -62,11 +62,11 @@ bool DBauthContainer::resolveDB( const db::DatabaseProvider& db )
 	if ( m_db == NULL && ! m_dbLabel.empty() )	{
 		m_db = db.database( m_dbLabel );
 		if ( m_db )	{
-			LOG_NOTICE << "Database authenticator: database reference '" << m_dbLabel << "' resolved";
+			MOD_LOG_NOTICE << "Database authenticator: database reference '" << m_dbLabel << "' resolved";
 			return true;
 		}
 		else	{
-			LOG_ERROR << "Database authenticator: database labeled '" << m_dbLabel << "' not found !";
+			MOD_LOG_ERROR << "Database authenticator: database labeled '" << m_dbLabel << "' not found !";
 			return false;
 		}
 	}

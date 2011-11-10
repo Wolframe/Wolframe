@@ -68,7 +68,7 @@ bool SQLiteConfig::parse( const config::ConfigurationTree& pt, const std::string
 				retVal = false;
 			else	{
 				if ( ! boost::filesystem::path( filename ).is_absolute() )
-					LOG_WARNING << logPrefix() << "database file path is not absolute: "
+					MOD_LOG_WARNING << logPrefix() << "database file path is not absolute: "
 						    << filename;
 			}
 		}
@@ -77,7 +77,7 @@ bool SQLiteConfig::parse( const config::ConfigurationTree& pt, const std::string
 				retVal = false;
 		}
 		else	{
-			LOG_WARNING << logPrefix() << "unknown configuration option: '"
+			MOD_LOG_WARNING << logPrefix() << "unknown configuration option: '"
 				    << L1it->first << "'";
 		}
 	}
@@ -104,7 +104,7 @@ void SQLiteConfig::print( std::ostream& os, size_t indent ) const
 bool SQLiteConfig::check() const
 {
 	if ( filename.empty() )	{
-		LOG_ERROR << logPrefix() << "SQLite database filename cannot be empty";
+		MOD_LOG_ERROR << logPrefix() << "SQLite database filename cannot be empty";
 		return false;
 	}
 	return true;

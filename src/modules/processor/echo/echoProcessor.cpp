@@ -59,7 +59,7 @@ bool EchoProcConfig::parse( const config::ConfigurationTree& pt, const std::stri
 			isDefined = true;
 		}
 		else	{
-			LOG_WARNING << logPrefix() << "unknown configuration option: '"
+			MOD_LOG_WARNING << logPrefix() << "unknown configuration option: '"
 				    << L1it->first << "'";
 		}
 	}
@@ -93,12 +93,12 @@ void EchoProcConfig::setCanonicalPathes( const std::string& /*refPath*/ )
 EchoProcContainer::EchoProcContainer( const EchoProcConfig& /*conf*/ )
 	: m_proc()
 {
-	LOG_NOTICE << "Echo processor container created";
+	MOD_LOG_NOTICE << "Echo processor container created";
 }
 
 EchoProcessorUnit::EchoProcessorUnit()
 {
-	LOG_NOTICE << "Echo processor unit created";
+	MOD_LOG_NOTICE << "Echo processor unit created";
 }
 
 } // namespace _Wolframe

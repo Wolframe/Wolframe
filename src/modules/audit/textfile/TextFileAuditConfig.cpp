@@ -59,12 +59,12 @@ bool FileAuditConfig::parse( const config::ConfigurationTree& pt, const std::str
 			retVal = false;
 		else	{
 			if ( ! boost::filesystem::path( m_file ).is_absolute() )
-				LOG_WARNING << logPrefix() << "audit file path is not absolute: "
+				MOD_LOG_WARNING << logPrefix() << "audit file path is not absolute: "
 					    << m_file;
 		}
 	}
 	else	{
-		LOG_WARNING << logPrefix() << "unknown configuration option: '" << node << "'";
+		MOD_LOG_WARNING << logPrefix() << "unknown configuration option: '" << node << "'";
 	}
 	return retVal;
 }

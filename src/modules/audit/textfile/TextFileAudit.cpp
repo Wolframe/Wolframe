@@ -49,7 +49,7 @@ namespace AAAA {
 bool FileAuditConfig::check() const
 {
 	if ( m_file.empty() )	{
-		LOG_ERROR << logPrefix() << "Audit filename cannot be empty";
+		MOD_LOG_ERROR << logPrefix() << "Audit filename cannot be empty";
 		return false;
 	}
 	return true;
@@ -78,7 +78,7 @@ void FileAuditConfig::setCanonicalPathes( const std::string& refPath )
 FileAuditContainer::FileAuditContainer( const FileAuditConfig& conf )
 {
 	m_file = conf.m_file;
-	LOG_NOTICE << "File auditor created with file '" << m_file << "'";
+	MOD_LOG_NOTICE << "File auditor created with file '" << m_file << "'";
 }
 
 }} // namespace _Wolframe::AAAA
