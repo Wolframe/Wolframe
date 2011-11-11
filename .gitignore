@@ -17,6 +17,7 @@ x64
 *.lib
 *.log
 *.so.*
+*.so
 makefiles/gmake/*.mk.vars
 test.bat
 *.bin
