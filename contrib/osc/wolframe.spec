@@ -454,6 +454,6 @@ fi
 %endif
 
 %changelog
-* Sun Aug 29 2010 Mihai Barbos <mihai.barbos@gmail.com> 0.1.0-0.1
+* Sun Aug 29 2011 Andreas Baumann <abaumann@yahoo.com> 0.0.1-0.1
 - preliminary release
 
