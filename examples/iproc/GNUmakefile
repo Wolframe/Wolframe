@@ -20,6 +20,7 @@ INCLUDE_LIBS = \
 	-lboost_filesystem \
 	$(TOPDIR)/gtest/gtest-all.o \
 	$(TOPDIR)/src/libwolframe.a \
+	$(TOPDIR)/src/libwolframe/libwolframe.a \
 	$(LIBS_DL)
 
 # lua

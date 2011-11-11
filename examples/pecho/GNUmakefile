@@ -20,6 +20,7 @@ INCLUDE_LIBS = \
 	-lboost_filesystem \
 	$(LIBS_DL) \
 	$(TOPDIR)/src/libwolframe.a \
+	$(TOPDIR)/src/libwolframe/libwolframe.a \
 	$(TOPDIR)/gtest/gtest-all.o
 
 # openssl

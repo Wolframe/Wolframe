@@ -10,28 +10,18 @@ INCLUDE_DIRS = \
 
 INCLUDE_CPPFLAGS =
 
-INCLUDE_LDFLAGS =
+INCLUDE_LDFLAGS = \
+	-L$(TOPDIR)/src/libwolframe
 
-INCLUDE_LIBS =
-
+INCLUDE_LIBS = \
+	-lwolframe
 
 DYNAMIC_MODULE = mod_audit_database.so
 
 CPP_OBJS = \
 	DBaudit.o \
 	DBauditConfig.o \
-	DBauditModule.o \
-	../../../referenceConfig.o \
-	../../../logger/logLevel.o \
-	../../../logger/logSyslogFacility.o \
-	../../../logger/logComponent.o \
-	../../../logger/logError.o \
-	../../../logger/logBackendConsole.o \
-	../../../logger/logBackendFile.o \
-	../../../logger/logBackendSyslog.o \
-	../../../logger/logBackendImpl.o \
-	../../../logger/loggerConfig.o \
-	../../../logger/logger.o
+	DBauditModule.o
 
 OBJS =
 

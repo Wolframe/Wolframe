@@ -16,6 +16,6 @@ local_distclean:
 
 local_test:
 ifeq ($(WITH_EXPECT),1)
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) $(EXPECT) ./testEcho
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) $(EXPECT) ./testPecho
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe $(EXPECT) ./testEcho
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe $(EXPECT) ./testPecho
 endif

@@ -1,5 +1,7 @@
 TOPDIR = ..
 
+PRESUBDIRS = libwolframe
+
 SUBDIRS = modules
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
@@ -7,13 +9,15 @@ SUBDIRS = modules
 INCLUDE_CPPFLAGS =
 
 INCLUDE_LDFLAGS = \
-	-L$(BOOST_LIB_DIR)
+	-L$(BOOST_LIB_DIR) \
+	-Llibwolframe
 
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LIBS = \
+	-lwolframe \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_program_options \
 	-lboost_filesystem \
@@ -71,18 +75,6 @@ endif
 LOCAL_STATIC_LIB = \
 	libwolframe.a
 
-LOGGER_OBJS = \
-	logger/logLevel.o \
-	logger/logSyslogFacility.o \
-	logger/logComponent.o \
-	logger/logError.o \
-	logger/logBackendConsole.o \
-	logger/logBackendFile.o \
-	logger/logBackendSyslog.o \
-	logger/logBackendImpl.o \
-	logger/loggerConfig.o \
-	logger/logger.o
-
 DB_OBJS =
 
 AAAA_OBJS = \
@@ -102,15 +94,12 @@ endif
 
 LOCAL_STATIC_LIB_OBJS = \
 	version.o \
-	resolvePath.o \
 	commandLine.o \
-	$(LOGGER_OBJS) \
 	serviceConfig.o \
 	serviceBanner.o \
 	database/databaseConfig.o \
 	appConfig.o \
 	config_descriptionBase.o \
-	referenceConfig.o \
 	protocol_ioblocks.o \
 	acceptor.o \
 	getPassword.o \
@@ -164,4 +153,4 @@ local_test:
 
 run: $(CPP_BINS)
 	@echo "Running the Wolframe server..."
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./wolframed -c wolframe.conf -f
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./wolframed -c wolframe.conf -f

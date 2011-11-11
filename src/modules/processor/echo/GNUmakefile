@@ -10,26 +10,17 @@ INCLUDE_DIRS = \
 
 INCLUDE_CPPFLAGS =
 
-INCLUDE_LDFLAGS =
+INCLUDE_LDFLAGS = \
+	-L$(TOPDIR)/src/libwolframe
 
-INCLUDE_LIBS =
-
+INCLUDE_LIBS = \
+	-lwolframe
 
 DYNAMIC_MODULE = mod_proc_echo.so
 
 CPP_OBJS = \
 	echoProcessor.o \
-	echoProcessorModule.o \
-	../../../logger/logLevel.o \
-	../../../logger/logSyslogFacility.o \
-	../../../logger/logComponent.o \
-	../../../logger/logError.o \
-	../../../logger/logBackendConsole.o \
-	../../../logger/logBackendFile.o \
-	../../../logger/logBackendSyslog.o \
-	../../../logger/logBackendImpl.o \
-	../../../logger/loggerConfig.o \
-	../../../logger/logger.o
+	echoProcessorModule.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

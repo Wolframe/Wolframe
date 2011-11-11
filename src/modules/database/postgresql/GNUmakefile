@@ -10,10 +10,12 @@ INCLUDE_DIRS = \
 	$(PGSQL_INCLUDE_DIRS)
 
 INCLUDE_LDFLAGS = \
+	-L$(TOPDIR)/src/libwolframe \
 	-L$(BOOST_LIB_DIR) \
 	-L$(PGSQL_LIB_DIR)
 
 INCLUDE_LIBS = \
+	-lwolframe \
 	$(PGSQL_LIBS)
 
 
@@ -22,17 +24,7 @@ DYNAMIC_MODULE = mod_db_postgresql.so
 CPP_OBJS = \
 	PostgreSQLconfig.o \
 	PostgreSQL.o \
-	PostgreSQLmodule.o \
-	../../../logger/logLevel.o \
-	../../../logger/logSyslogFacility.o \
-	../../../logger/logComponent.o \
-	../../../logger/logError.o \
-	../../../logger/logBackendConsole.o \
-	../../../logger/logBackendFile.o \
-	../../../logger/logBackendSyslog.o \
-	../../../logger/logBackendImpl.o \
-	../../../logger/loggerConfig.o \
-	../../../logger/logger.o
+	PostgreSQLmodule.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

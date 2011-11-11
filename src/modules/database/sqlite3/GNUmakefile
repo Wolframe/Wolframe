@@ -7,6 +7,7 @@ SUBDIRS =
 INCLUDE_CPPFLAGS =
 
 INCLUDE_LDFLAGS = \
+	-L$(TOPDIR)/src/libwolframe \
 	-L$(BOOST_LIB_DIR)
 
 INCLUDE_DIRS = \
@@ -14,6 +15,7 @@ INCLUDE_DIRS = \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LIBS = \
+	-lwolframe \
 	-lboost_filesystem
 
 ifeq ($(WITH_LOCAL_SQLITE3),0)
@@ -40,18 +42,7 @@ DYNAMIC_MODULE = mod_db_sqlite3.so
 CPP_OBJS = \
 	SQLite.o \
 	SQLiteConfig.o \
-	SQLiteModule.o \
-	../../../resolvePath.o \
-	../../../logger/logLevel.o \
-	../../../logger/logSyslogFacility.o \
-	../../../logger/logComponent.o \
-	../../../logger/logError.o \
-	../../../logger/logBackendConsole.o \
-	../../../logger/logBackendFile.o \
-	../../../logger/logBackendSyslog.o \
-	../../../logger/logBackendImpl.o \
-	../../../logger/loggerConfig.o \
-	../../../logger/logger.o
+	SQLiteModule.o
 
 OBJS =
 
