@@ -11,4 +11,3 @@ Build-Depends: debhelper (>= 4.1.16),
  libsqlite3-dev, libpq-dev, libxml2-dev, libxslt1-dev,
  xsltproc, docbook-xsl, doxygen, graphviz
 Files:
- 3174eb7d752207e1c9d9023ad666236c 3720970 wolframe_0.0.1.tar.gz
