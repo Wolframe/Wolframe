@@ -16,10 +16,7 @@ INCLUDE_LDFLAGS = \
 INCLUDE_LIBS = \
 	-lboost_filesystem
 
-DYNAMIC_LIB = mod_auth_textfile.so
-DYNAMIC_LIB_MAJOR = 0
-DYNAMIC_LIB_MINOR = 0
-DYNAMIC_LIB_PATCH = 0
+DYNAMIC_MODULE = mod_auth_textfile.so
 
 CPP_OBJS = \
 	TextFileAuthConfig.o \
@@ -46,8 +43,8 @@ local_clean:
 local_distclean:
 
 local_install:
-	$(INSTALL) -d -m 0755 $(libdir)/modules
-	$(INSTALL) -m 0775 $(DYNAMIC_LIB) $(libdir)/modules
+	$(INSTALL) -d -m 0755 $(libdir)/modules/authentication
+	$(INSTALL) -m 0775 $(DYNAMIC_MODULE) $(libdir)/modules/authentication
 
 local_test:
 

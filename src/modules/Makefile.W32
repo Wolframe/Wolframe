@@ -1,18 +1,6 @@
 TOPDIR = ..\..
 
-SUBDIRS =
-
-# PostgreSQL
-!IFDEF WITH_PGSQL
-SUBDIRS = \
-	$(SUBDIRS) PostgreSQL
-!ENDIF
-
-# sqlite3
-!IFDEF WITH_SQLITE3
-SUBDIRS = \
-	$(SUBDIRS) SQLite
-!ENDIF
+SUBDIRS = database
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 

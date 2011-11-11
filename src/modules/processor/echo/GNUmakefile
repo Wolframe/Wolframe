@@ -15,10 +15,7 @@ INCLUDE_LDFLAGS =
 INCLUDE_LIBS =
 
 
-DYNAMIC_LIB = mod_proc_echo.so
-DYNAMIC_LIB_MAJOR = 0
-DYNAMIC_LIB_MINOR = 0
-DYNAMIC_LIB_PATCH = 0
+DYNAMIC_MODULE = mod_proc_echo.so
 
 CPP_OBJS = \
 	echoProcessor.o \
@@ -43,8 +40,8 @@ local_clean:
 local_distclean:
 
 local_install:
-	$(INSTALL) -d -m 0755 $(libdir)/modules
-	$(INSTALL) -m 0775 $(DYNAMIC_LIB) $(libdir)/modules
+	$(INSTALL) -d -m 0755 $(libdir)/modules/processor
+	$(INSTALL) -m 0775 $(DYNAMIC_MODULE) $(libdir)/modules/processor
 
 local_test:
 

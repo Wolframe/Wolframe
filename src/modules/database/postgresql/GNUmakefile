@@ -1,4 +1,4 @@
-TOPDIR = ../../..
+TOPDIR = ../../../..
 
 SUBDIRS =
 
@@ -17,25 +17,22 @@ INCLUDE_LIBS = \
 	$(PGSQL_LIBS)
 
 
-DYNAMIC_LIB = mod_db_postgresql.so
-DYNAMIC_LIB_MAJOR = 0
-DYNAMIC_LIB_MINOR = 0
-DYNAMIC_LIB_PATCH = 0
+DYNAMIC_MODULE = mod_db_postgresql.so
 
 CPP_OBJS = \
 	PostgreSQLconfig.o \
 	PostgreSQL.o \
 	PostgreSQLmodule.o \
-	../../logger/logLevel.o \
-	../../logger/logSyslogFacility.o \
-	../../logger/logComponent.o \
-	../../logger/logError.o \
-	../../logger/logBackendConsole.o \
-	../../logger/logBackendFile.o \
-	../../logger/logBackendSyslog.o \
-	../../logger/logBackendImpl.o \
-	../../logger/loggerConfig.o \
-	../../logger/logger.o
+	../../../logger/logLevel.o \
+	../../../logger/logSyslogFacility.o \
+	../../../logger/logComponent.o \
+	../../../logger/logError.o \
+	../../../logger/logBackendConsole.o \
+	../../../logger/logBackendFile.o \
+	../../../logger/logBackendSyslog.o \
+	../../../logger/logBackendImpl.o \
+	../../../logger/loggerConfig.o \
+	../../../logger/logger.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
@@ -46,8 +43,8 @@ local_clean:
 local_distclean:
 
 local_install:
-	$(INSTALL) -d -m 0755 $(libdir)/modules
-	$(INSTALL) -m 0775 $(DYNAMIC_LIB) $(libdir)/modules
+	$(INSTALL) -d -m 0755 $(libdir)/modules/database
+	$(INSTALL) -m 0775 $(DYNAMIC_MODULE) $(libdir)/modules/database
 
 local_test:
 

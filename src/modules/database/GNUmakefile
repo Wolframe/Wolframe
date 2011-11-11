@@ -1,6 +1,16 @@
 TOPDIR = ../../..
 
-SUBDIRS = postgresql sqlite3
+SUBDIRS =
+
+# Postgresql
+ifeq ($(WITH_PGSQL),1)
+SUBDIRS += postgresql
+endif
+
+# sqlite3
+ifeq ($(WITH_SQLITE3),1)
+SUBDIRS += sqlite3
+endif
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

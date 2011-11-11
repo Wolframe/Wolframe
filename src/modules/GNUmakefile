@@ -1,16 +1,6 @@
 TOPDIR = ../..
 
-SUBDIRS = audit authentication processor
-
-# Postgresql
-ifeq ($(WITH_PGSQL),1)
-SUBDIRS += PostgreSQL
-endif
-
-# sqlite3
-ifeq ($(WITH_SQLITE3),1)
-SUBDIRS += SQLite
-endif
+SUBDIRS = database audit authentication processor
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

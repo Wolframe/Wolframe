@@ -15,10 +15,7 @@ INCLUDE_LDFLAGS =
 INCLUDE_LIBS =
 
 
-DYNAMIC_LIB = mod_audit_database.so
-DYNAMIC_LIB_MAJOR = 0
-DYNAMIC_LIB_MINOR = 0
-DYNAMIC_LIB_PATCH = 0
+DYNAMIC_MODULE = mod_audit_database.so
 
 CPP_OBJS = \
 	DBaudit.o \
@@ -47,7 +44,7 @@ local_clean:
 local_distclean:
 
 local_install:
-	$(INSTALL) -d -m 0755 $(libdir)/modules
-	$(INSTALL) -m 0775 $(DYNAMIC_LIB) $(libdir)/modules
+	$(INSTALL) -d -m 0755 $(libdir)/modules/audit
+	$(INSTALL) -m 0775 $(DYNAMIC_MODULE) $(libdir)/modules/audit
 
 local_test:
