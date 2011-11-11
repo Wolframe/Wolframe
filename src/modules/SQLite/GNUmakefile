@@ -6,12 +6,15 @@ SUBDIRS =
 
 INCLUDE_CPPFLAGS =
 
-INCLUDE_LDFLAGS =
+INCLUDE_LDFLAGS = \
+	-L$(BOOST_LIB_DIR)
 
 INCLUDE_DIRS = \
-	-I. -I$(TOPDIR)/include
+	-I. -I$(TOPDIR)/include \
+	-I$(BOOST_INCLUDE_DIR)
 
-INCLUDE_LIBS =
+INCLUDE_LIBS = \
+	-lboost_filesystem
 
 ifeq ($(WITH_LOCAL_SQLITE3),0)
 

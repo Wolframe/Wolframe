@@ -5,14 +5,16 @@ SUBDIRS =
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
 INCLUDE_DIRS = \
-	-I. -I$(TOPDIR)/include
+	-I. -I$(TOPDIR)/include \
+	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_CPPFLAGS =
 
-INCLUDE_LDFLAGS =
+INCLUDE_LDFLAGS = \
+	-L$(BOOST_LIB_DIR)
 
-INCLUDE_LIBS =
-
+INCLUDE_LIBS = \
+	-lboost_filesystem
 
 DYNAMIC_LIB = mod_auth_textfile.so
 DYNAMIC_LIB_MAJOR = 0
