@@ -23,8 +23,6 @@ CPP_OBJS = \
 	DBauditConfig.o \
 	DBauditModule.o
 
-OBJS =
-
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 local_all:

@@ -1,6 +1,6 @@
 TOPDIR = ..\..
 
-SUBDIRS = database
+SUBDIRS = database audit authentication processor
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 

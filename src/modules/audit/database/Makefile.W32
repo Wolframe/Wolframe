@@ -11,8 +11,7 @@ INCLUDE_DIRS = \
 	/I. \
 	/I$(TOPDIR)\include \
 	/I"$(BOOST_INCLUDE_DIR)" \
-	/I"$(PLATFORM_SDK_DIR)\Include" \
-	/I"$(TOPDIR)\sqlite3"
+	/I"$(PLATFORM_SDK_DIR)\Include"
 
 # Note: libraries are picked automatically on Windows!
 # TODO: better probing and correct library path based on Arch and
@@ -24,13 +23,12 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib
 
 CPP_OBJS = \
-	SQLite.obj \
-	SQLiteConfig.obj \
-	SQLiteModule.obj \
-	$(TOPDIR)\sqlite3\sqlite3.obj
+	DBaudit.obj \
+	DBauditConfig.obj \
+	DBauditModule.obj
 
 DYNAMIC_MODULE = \
-	mod_db_sqlite3.dll
+	mod_audit_database.dll
 
 all: $(DYNAMIC_MODULE)
 

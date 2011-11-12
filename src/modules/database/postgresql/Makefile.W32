@@ -1,6 +1,6 @@
-TOPDIR = ..
+TOPDIR = ..\..\..\..
 
-SUBDIRS = modules
+SUBDIRS =
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
@@ -12,7 +12,7 @@ INCLUDE_DIRS = \
 	/I$(TOPDIR)\include \
 	/I"$(BOOST_INCLUDE_DIR)" \
 	/I"$(PLATFORM_SDK_DIR)\Include" \
-	/I"$(TOPDIR)\sqlite3"
+	/I"$(PGSQL_DIR)\include"
 
 # Note: libraries are picked automatically on Windows!
 # TODO: better probing and correct library path based on Arch and
@@ -21,192 +21,28 @@ INCLUDE_LDFLAGS = \
 	$(SDK_LDFLAGS) $(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
-	Advapi32.lib Ws2_32.lib \
+	"$(PGSQL_DIR)\lib\libpq.lib" \
+	$(TOPDIR)\src\libwolframe\wolframe.lib
 
-# openssl
+CPP_OBJS = \
+	PostgreSQLconfig.obj \
+	PostgreSQL.obj \
+	PostgreSQLmodule.obj
 
-!IFDEF WITH_SSL
+DYNAMIC_MODULE = \
+	mod_db_postgresql.dll
 
-INCLUDE_DIRS = \
-	$(INCLUDE_DIRS)	/I"$(OPENSSL_DIR)\include"
-
-INCLUDE_CPPFLAGS = \
-	$(INCLUDE_CPPFLAGS) /DWITH_SSL
-
-INCLUDE_LDFLAGS = \
-	$(INCLUDE_LDFLAGS) /LIBPATH:"$(OPENSSL_DIR)\lib"
-
-INCLUDE_LIBS = \
-	$(INCLUDE_LIBS) $(OPENSSL_LIBS)
-
-!ENDIF
-
-# sqlite3
-
-!IFDEF WITH_SQLITE3
-
-INCLUDE_CPPFLAGS = \
-	$(INCLUDE_CPPFLAGS) /DWITH_SQLITE3
-
-INCLUDE_DIRS = \
-	$(INCLUDE_DIRS)	/I"$(TOPDIR)\sqlite3"
-
-!ENDIF
-
-# libpq
-
-!IFDEF WITH_PGSQL
-
-INCLUDE_CPPFLAGS = \
-	$(INCLUDE_CPPFLAGS) /DWITH_PGSQL
-
-INCLUDE_DIRS = \
-	$(INCLUDE_DIRS) /I"$(PGSQL_DIR)\include"
-
-INCLUDE_LIBS = \
-	$(INCLUDE_LIBS) "$(PGSQL_DIR)\lib\libpq.lib"
-
-!ENDIF
-
-LOCAL_STATIC_LIB = \
-	wolframe.lib
-
-LOGGER_OBJS = \
-	logger\logLevel.obj \
-	logger\logSyslogFacility.obj \
-	logger\logComponent.obj \
-	logger\logError.obj \
-	logger\logBackendConsole.obj \
-	logger\logBackendFile.obj \
-	logger\logBackendSyslog.obj \
-	logger\syslog_win32.obj \
-	logger\logBackendEventlog.obj \
-	logger\logBackendImpl.obj \
-	logger\loggerConfig.obj \
-	logger\logger.obj \
-
-DB_OBJS =
-
-AAAA_OBJS = \
-	AAAA\authentication_textfile.obj \
-	AAAA\AAAAprovider.obj \
-	AAAA\AAAAproviderConfig.obj \
-	AAAA\DBauthentication.obj \
-	AAAA\DBauthenticationConfig.obj \
-	AAAA\TextFileAuthentication.obj \
-	AAAA\TextAuthenticationConfig.obj \
-	AAAA\DBaudit.obj \
-	AAAA\DBauditConfig.obj \
-	AAAA\FileAudit.obj \
-	AAAA\FileAuditConfig.obj \
-	AAAA\AAAAmodules.obj
-
-!IFDEF WITH_SQLITE3
-DB_OBJS = $(DB_OBJS) \
-	database\SQLite.obj \
-	database\SQLiteConfig.obj \
-	$(TOPDIR)\sqlite3\sqlite3.obj \
-	database\SQLiteModule.obj
-
-AAAA_OBJS = $(AAAA_OBJS) \
-	AAAA\authentication_db_sqlite3.obj \
-!ENDIF
-
-!IFDEF WITH_PGSQL
-DB_OBJS = $(DB_OBJS) \
-	database\PostgreSQL.obj \
-	database\PostgreSQLconfig.obj \
-	database\PostgreSQLmodule.obj
-!ENDIF
-
-LOCAL_STATIC_LIB_OBJS = \
-	version.obj \
-	resolvePath.obj \
-	commandLine.obj \
-	$(LOGGER_OBJS) \
-	serviceConfig.obj \
-	serviceBanner.obj \
-	config_descriptionBase.obj \
-	referenceConfig.obj \
-	database\databaseConfig.obj \
-	appConfig.obj \
-	protocol_ioblocks.obj \
-	acceptor.obj \
-	getPassword.obj \
-	serverEndpoint.obj \
-	connection.obj \
-	serverConfig.obj \
-	server.obj \
-	moduleLoaderConfig.obj \
-	processor\procProvider.obj \
-	processor\echoProcessor.obj \
-	processor\echoProcessorModule.obj \
-	moduleImpersonation.obj \
-	$(DB_OBJS) \
-	$(AAAA_OBJS)
-
-#SSL
-
-!IFDEF WITH_SSL
-LOCAL_STATIC_LIB_OBJS = $(LOCAL_STATIC_LIB_OBJS) \
-	SSLcertificateInfo.obj
-!ENDIF
-
-OBJS = \
-	$(LOCAL_STATIC_LIB_OBJS) \
-	appProperties.obj \
-	appConfigDefinition.obj \
-	wolframeHandler.obj \
-	database\DBprovider.obj \
-	winMain.obj
-# Aba: link trouble in dbTest!
-# also suggesting with_sqlite flags and DB_OBJS..
-#	database\PostgreSQL.obj \
-#	database\PostgreSQLconfig.obj \
-#	database\SQLite.obj
-#	database\SQLiteConfig.obj
-
-CPP_BINS = \
-	wolframed.exe
-
-all: $(OBJS) $(CPP_BINS) logger\wolframemsg.dll
+all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-wolframed.exe: wolframed.obj logger\wolframemsg.res
+$(DYNAMIC_MODULE): $(CPP_OBJS)
+	$(LINK) /dll /nologo /out:$@ $(LDFLAGS) $(LIBS) $?
 
-logger\wolframemsg.dll: logger\wolframemsg.res
-	$(LINK) /dll /nologo /noentry /MACHINE:x86 /out:$@ $?
-logger\wolframemsg.res: logger\wolframemsg.rc
-logger\wolframemsg.rc: logger\wolframemsg.mc
-logger\logBackendEventlog.obj: logger\wolframemsg.rc
-
-$(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
-	$(LINK) /lib /nologo /out:$@ $(LDFLAGS) $(LIBS) $?
-
-local_all: $(LOCAL_STATIC_LIB)
+local_all:
 
 local_clean:
-	@-erase MSG*.bin logger\wolframemsg.rc logger\wolframemsg.h logger\wolframemsg.res logger\wolframemsg.dll 2>NUL
-	@-erase $(LOCAL_STATIC_LIB) 2>NUL
-	@-erase $(OBJS) 2>NUL
-	@-erase test.bat 2>NUL
 
 local_distclean:
 
 local_test:
-
-run: $(CPP_BINS)
-	@-echo @echo off > test.bat
-!IFDEF WITH_SSL
-	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat
-	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >> test.bat
-!ENDIF
-!IFDEF WITH_PGSQL
-	@-echo copy "$(PGSQL_DIR)\lib\libpq.dll" . >> test.bat
-	@-echo copy "$(PGSQL_DIR)\bin\libintl*.dll" . >> test.bat
-	@-echo copy "$(PGSQL_DIR)\bin\libiconv*.dll" . >> test.bat
-!ENDIF
-	@-echo echo Running the Wolframe server... >> test.bat
-	@-echo wolframed.exe -c wolframe.xml -d DATA >> test.bat
-	@-test.bat

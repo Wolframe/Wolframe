@@ -44,12 +44,8 @@ CPP_OBJS = \
 	SQLiteConfig.o \
 	SQLiteModule.o
 
-OBJS =
-
-ifeq ($(WITH_LOCAL_SQLITE3),1)
-OBJS += \
+OBJS = \
 	$(TOPDIR)/sqlite3/sqlite3.o
-endif
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
