@@ -75,8 +75,6 @@ endif
 LOCAL_STATIC_LIB = \
 	libwolframe.a
 
-DB_OBJS =
-
 AAAA_OBJS = \
 	AAAA/AAAAprovider.o \
 	AAAA/AAAAproviderConfig.o
@@ -108,7 +106,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	serverConfig.o \
 	server.o \
 	procProvider.o \
-	$(DB_OBJS) \
 	$(AAAA_OBJS)
 
 #SSL
@@ -117,7 +114,7 @@ LOCAL_STATIC_LIB_OBJS += \
 	SSLcertificateInfo.o
 endif
 
-OBJS = \
+CPP_OBJS = \
 	appProperties.o \
 	appConfigDefinition.o \
 	$(LOCAL_STATIC_LIB_OBJS) \

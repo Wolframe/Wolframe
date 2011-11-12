@@ -34,11 +34,11 @@ LOGGER_OBJS = \
 	logger/logBackendImpl.o \
 	logger/loggerConfig.o \
 	logger/logger.o \
-	resolvePath.o \
-	referenceConfig.o
 
 CPP_OBJS = \
-	$(LOGGER_OBJS)
+	$(LOGGER_OBJS) \
+	resolvePath.o \
+	referenceConfig.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

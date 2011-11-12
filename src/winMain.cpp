@@ -291,7 +291,7 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 		cmdLineCfg.command = _Wolframe::config::CmdLineConfig::RUN_SERVICE;
 		const char *configFile = serviceConfig.c_str( ); // configuration comes from main thread
 
-		_Wolframe::module::ModulesDirectory modules;
+		_Wolframe::module::ModulesDirectory modDir;
 		_Wolframe::config::ApplicationConfiguration conf;
 
 		_Wolframe::config::ApplicationConfiguration::ConfigFileType cfgType =
@@ -300,9 +300,9 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 			return;
 		if ( !conf.parseModules( configFile, cfgType ))
 			return;
-		if ( ! _Wolframe::module::LoadModules( modules ))
+		if ( ! _Wolframe::module::LoadModules( modDir, conf.moduleList() ))
 			return;
-		conf.addModules( &modules );
+		conf.addModules( &modDir );
 		if ( !conf.parse( configFile, cfgType ))
 			return;
 
@@ -342,7 +342,7 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 		LOG_NOTICE << "Starting service";
 
 // run server in background thread(s).
-		_Wolframe::ServerHandler handler( conf.handlerCfg );
+		_Wolframe::ServerHandler handler( conf.handlerCfg, &modDir );
 		_Wolframe::net::server s( conf.serverCfg, handler );
 		boost::thread t( boost::bind( &_Wolframe::net::server::run, &s ));
 
@@ -433,7 +433,7 @@ int _Wolframe_winMain( int argc, char* argv[] )
 			return _Wolframe::ErrorCode::FAILURE;
 		}
 
-		_Wolframe::module::ModulesDirectory modules;
+		_Wolframe::module::ModulesDirectory modDir;
 		_Wolframe::config::ApplicationConfiguration conf;
 
 		_Wolframe::config::ApplicationConfiguration::ConfigFileType cfgType =
@@ -442,9 +442,9 @@ int _Wolframe_winMain( int argc, char* argv[] )
 			return _Wolframe::ErrorCode::FAILURE;
 		if ( !conf.parseModules( configFile, cfgType ))
 			return _Wolframe::ErrorCode::FAILURE;
-		if ( ! _Wolframe::module::LoadModules( modules ))
+		if ( ! _Wolframe::module::LoadModules( modDir, conf.moduleList() ))
 			return _Wolframe::ErrorCode::FAILURE;
-		conf.addModules( &modules );
+		conf.addModules( &modDir );
 		if ( !conf.parse( configFile, cfgType ))
 			return _Wolframe::ErrorCode::FAILURE;
 
@@ -518,7 +518,7 @@ int _Wolframe_winMain( int argc, char* argv[] )
 
 		LOG_NOTICE << "Starting server";
 
-		_Wolframe::ServerHandler handler( conf.handlerCfg );
+		_Wolframe::ServerHandler handler( conf.handlerCfg, &modDir );
 		_Wolframe::net::server s( conf.serverCfg, handler );
 
 		// Set console control handler to allow server to be stopped.

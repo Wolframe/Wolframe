@@ -1,6 +1,6 @@
-TOPDIR = ..
+TOPDIR = ..\..
 
-SUBDIRS = modules
+SUBDIRS =
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
@@ -11,8 +11,7 @@ INCLUDE_DIRS = \
 	/I. \
 	/I$(TOPDIR)\include \
 	/I"$(BOOST_INCLUDE_DIR)" \
-	/I"$(PLATFORM_SDK_DIR)\Include" \
-	/I"$(TOPDIR)\sqlite3"
+	/I"$(PLATFORM_SDK_DIR)\Include"
 
 # Note: libraries are picked automatically on Windows!
 # TODO: better probing and correct library path based on Arch and
@@ -21,29 +20,11 @@ INCLUDE_LDFLAGS = \
 	$(SDK_LDFLAGS) $(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
-	Advapi32.lib Ws2_32.lib \
+	kernel32.lib advapi32.lib Ws2_32.lib
 
-# openssl
-
-!IFDEF WITH_SSL
-
-INCLUDE_DIRS = \
-	$(INCLUDE_DIRS)	/I"$(OPENSSL_DIR)\include"
-
-INCLUDE_CPPFLAGS = \
-	$(INCLUDE_CPPFLAGS) /DWITH_SSL
-
-INCLUDE_LDFLAGS = \
-	$(INCLUDE_LDFLAGS) /LIBPATH:"$(OPENSSL_DIR)\lib"
-
-INCLUDE_LIBS = \
-	$(INCLUDE_LIBS) $(OPENSSL_LIBS)
-
-!ENDIF
-
-
-LOCAL_STATIC_LIB = \
-	wolframe.lib
+LIBRARIES = \
+	wolframe.lib \
+	logger\wolframemsg.dll
 
 LOGGER_OBJS = \
 	logger\logLevel.obj \
@@ -57,73 +38,16 @@ LOGGER_OBJS = \
 	logger\logBackendEventlog.obj \
 	logger\logBackendImpl.obj \
 	logger\loggerConfig.obj \
-	logger\logger.obj \
+	logger\logger.obj
 
-DB_OBJS =
-
-AAAA_OBJS = \
-	AAAA\authentication_textfile.obj \
-	AAAA\AAAAprovider.obj \
-	AAAA\AAAAproviderConfig.obj \
-	AAAA\DBauthentication.obj \
-	AAAA\DBauthenticationConfig.obj \
-	AAAA\TextFileAuthentication.obj \
-	AAAA\TextAuthenticationConfig.obj \
-	AAAA\DBaudit.obj \
-	AAAA\DBauditConfig.obj \
-	AAAA\FileAudit.obj \
-	AAAA\FileAuditConfig.obj \
-	AAAA\AAAAmodules.obj
-
-LOCAL_STATIC_LIB_OBJS = \
-	version.obj \
-	resolvePath.obj \
-	commandLine.obj \
+CPP_OBJS = \
 	$(LOGGER_OBJS) \
-	serviceConfig.obj \
-	serviceBanner.obj \
-	config_descriptionBase.obj \
-	referenceConfig.obj \
-	database\databaseConfig.obj \
-	appConfig.obj \
-	protocol_ioblocks.obj \
-	acceptor.obj \
-	getPassword.obj \
-	serverEndpoint.obj \
-	connection.obj \
-	serverConfig.obj \
-	server.obj \
-	moduleDirectory.obj \
-	loadModules.obj \
-	processor\procProvider.obj \
-	processor\echoProcessor.obj \
-	processor\echoProcessorModule.obj \
-	$(DB_OBJS) \
-	$(AAAA_OBJS)
+	resolvePath.obj \
+	referenceConfig.obj
 
-#SSL
-
-!IFDEF WITH_SSL
-LOCAL_STATIC_LIB_OBJS = $(LOCAL_STATIC_LIB_OBJS) \
-	SSLcertificateInfo.obj
-!ENDIF
-
-OBJS = \
-	$(LOCAL_STATIC_LIB_OBJS) \
-	appProperties.obj \
-	appConfigDefinition.obj \
-	wolframeHandler.obj \
-	database\DBprovider.obj \
-	winMain.obj
-
-CPP_BINS = \
-	wolframed.exe
-
-all: $(OBJS) $(CPP_BINS) logger\wolframemsg.dll
+all: $(CPP_OBJS) $(LIBRARIES)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
-
-wolframed.exe: wolframed.obj logger\wolframemsg.res
 
 logger\wolframemsg.dll: logger\wolframemsg.res
 	$(LINK) /dll /nologo /noentry /MACHINE:x86 /out:$@ $?
@@ -131,32 +55,14 @@ logger\wolframemsg.res: logger\wolframemsg.rc
 logger\wolframemsg.rc: logger\wolframemsg.mc
 logger\logBackendEventlog.obj: logger\wolframemsg.rc
 
-$(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
+wolframe.lib: $(CPP_OBJS)
 	$(LINK) /lib /nologo /out:$@ $(LDFLAGS) $(LIBS) $?
 
-local_all: $(LOCAL_STATIC_LIB)
+local_all:
 
 local_clean:
 	@-erase MSG*.bin logger\wolframemsg.rc logger\wolframemsg.h logger\wolframemsg.res logger\wolframemsg.dll 2>NUL
-	@-erase $(LOCAL_STATIC_LIB) 2>NUL
-	@-erase $(OBJS) 2>NUL
-	@-erase test.bat 2>NUL
 
 local_distclean:
 
 local_test:
-
-run: $(CPP_BINS)
-	@-echo @echo off > test.bat
-!IFDEF WITH_SSL
-	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat
-	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >> test.bat
-!ENDIF
-!IFDEF WITH_PGSQL
-	@-echo copy "$(PGSQL_DIR)\lib\libpq.dll" . >> test.bat
-	@-echo copy "$(PGSQL_DIR)\bin\libintl*.dll" . >> test.bat
-	@-echo copy "$(PGSQL_DIR)\bin\libiconv*.dll" . >> test.bat
-!ENDIF
-	@-echo echo Running the Wolframe server... >> test.bat
-	@-echo wolframed.exe -c wolframe.xml -d DATA >> test.bat
-	@-test.bat
