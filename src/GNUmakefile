@@ -114,7 +114,7 @@ LOCAL_STATIC_LIB_OBJS += \
 	SSLcertificateInfo.o
 endif
 
-CPP_OBJS = \
+OBJS = \
 	appProperties.o \
 	appConfigDefinition.o \
 	$(LOCAL_STATIC_LIB_OBJS) \
