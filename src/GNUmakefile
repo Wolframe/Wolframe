@@ -79,17 +79,6 @@ AAAA_OBJS = \
 	AAAA/AAAAprovider.o \
 	AAAA/AAAAproviderConfig.o
 
-ifeq ($(WITH_PAM),1)
-AAAA_OBJS += \
-	AAAA/authentication_pam.o
-endif
-
-ifeq ($(WITH_SASL),1)
-AAAA_OBJS += \
-	AAAA/authentication_sasl.o
-endif
-
-
 LOCAL_STATIC_LIB_OBJS = \
 	version.o \
 	commandLine.o \
