@@ -51,7 +51,7 @@ TEST_BINS += \
 	tests/pechoHandlerTest$(EXE)
 
 tests/pechoHandlerTest$(EXE): tests/pechoHandlerTest.o $(OBJS) $(TOPDIR)/src/libwolframe.a
-	$(CCPP_LINK) -o $@ $(LDFLAGS) $(OBJS) $< $(LIBS)
+	$(CXX_LINK) -o $@ $(LDFLAGS) $(OBJS) $< $(LIBS)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

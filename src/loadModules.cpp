@@ -37,81 +37,88 @@
 #include "logger-v1.hpp"
 #include "moduleInterface.hpp"
 
-#ifndef _WIN32
-#include <dlfcn.h>
-#else
-#define WIN32_MEAN_AND_LEAN
-#include <windows.h>
-#endif
+#if !defined(_WIN32)	// POSIX module loader
 
-using namespace _Wolframe;
+	#include <dlfcn.h>
 
-typedef module::ModuleContainer* (*CreateFunction)();
-typedef void (*SetModuleLogger)( void* );
+	using namespace _Wolframe;
 
-bool module::LoadModules( ModulesDirectory& modDir, std::list< std::string >& modFiles )
-{
-	bool retVal = true;
+	typedef module::ModuleContainer* (*CreateFunction)();
+	typedef void (*SetModuleLogger)( void* );
 
-	for ( std::list< std::string >::const_iterator it = modFiles.begin();
-							it != modFiles.end(); it++ )	{
-#ifndef _WIN32
-		void* hndl = dlopen( it->c_str(), RTLD_LAZY );
-#else
-		HMODULE hndl = LoadLibrary( it->c_str( ) );
-#endif
-		if ( !hndl )	{
-#ifndef _WIN32
-			LOG_ERROR << "Module loader: " << dlerror();
-#else
-			LOG_ERROR << "Module loader error";
-#endif
-			retVal = false;
-			break;
+	bool module::LoadModules( ModulesDirectory& modDir, std::list< std::string >& modFiles )
+	{
+		bool retVal = true;
+
+		for ( std::list< std::string >::const_iterator it = modFiles.begin();
+								it != modFiles.end(); it++ )	{
+			void* hndl = dlopen( it->c_str(), RTLD_LAZY );
+			if ( !hndl )	{
+				LOG_ERROR << "Module loader: " << dlerror();
+				retVal = false;
+				break;
+			}
+			CreateFunction create = (CreateFunction)dlsym( hndl, "createModule" );
+			if ( !create )	{
+				LOG_ERROR << "Module loader creation entry point: " << dlerror();
+				retVal = false;
+				dlclose( hndl );
+				break;
+			}
+
+			SetModuleLogger setLogger = (SetModuleLogger)dlsym( hndl, "setModuleLogger" );
+			if ( !setLogger )	{
+				LOG_ERROR << "Module loader creation entry point: " << dlerror();
+				retVal = false;
+				dlclose( hndl );
+				break;
+			}
+			setLogger( &_Wolframe::log::LogBackend::instance() );
+			modDir.addContainer( create() );
 		}
-
-#ifndef _WIN32
-		CreateFunction create = (CreateFunction)dlsym( hndl, "createModule" );
-#else
-		CreateFunction create = (CreateFunction)GetProcAddress( hndl, "createModule" );
-#endif
-		if ( !create )	{
-#ifndef _WIN32
-			LOG_ERROR << "Module loader creation entry point: " << dlerror();
-#else
-			LOG_ERROR << "Module loader creation entry point error";
-#endif
-			retVal = false;
-#ifndef _WIN32
-			dlclose( hndl );
-#else
-			(void)FreeLibrary( hndl );
-#endif
-			break;
-		}
-
-#ifndef _WIN32
-		SetModuleLogger setLogger = (SetModuleLogger)dlsym( hndl, "setModuleLogger" );
-#else
-		SetModuleLogger setLogger = (SetModuleLogger)GetProcAddress( hndl, "setModuleLogger" );
-#endif
-		if ( !setLogger )	{
-#ifndef _WIN32
-			LOG_ERROR << "Module loader creation entry point: " << dlerror();
-#else
-			LOG_ERROR << "Module loader creation entry point error";
-#endif
-			retVal = false;
-#ifndef _WIN32
-			dlclose( hndl );
-#else
-			(void)FreeLibrary( hndl );
-#endif
-			break;
-		}
-		setLogger( &_Wolframe::log::LogBackend::instance() );
-		modDir.addContainer( create() );
+		return retVal;
 	}
-	return retVal;
-}
 
+#else		// Win32 module loader
+
+	#define WIN32_MEAN_AND_LEAN
+	#include <windows.h>
+
+	using namespace _Wolframe;
+
+	typedef module::ModuleContainer* (*CreateFunction)();
+	typedef void (*SetModuleLogger)( void* );
+
+	bool module::LoadModules( ModulesDirectory& modDir, std::list< std::string >& modFiles )
+	{
+		bool retVal = true;
+
+		for ( std::list< std::string >::const_iterator it = modFiles.begin();
+								it != modFiles.end(); it++ )	{
+			HMODULE hndl = LoadLibrary( it->c_str( ) );
+			if ( !hndl )	{
+				LOG_ERROR << "Module loader error";
+				retVal = false;
+				break;
+			}
+			CreateFunction create = (CreateFunction)GetProcAddress( hndl, "createModule" );
+			if ( !create )	{
+				LOG_ERROR << "Module loader creation entry point error";
+				retVal = false;
+				(void)FreeLibrary( hndl );
+				break;
+			}
+			SetModuleLogger setLogger = (SetModuleLogger)GetProcAddress( hndl, "setModuleLogger" );
+			if ( !setLogger )	{
+				LOG_ERROR << "Module loader creation entry point error";
+				retVal = false;
+				(void)FreeLibrary( hndl );
+				break;
+			}
+			setLogger( &_Wolframe::log::LogBackend::instance() );
+			modDir.addContainer( create() );
+		}
+		return retVal;
+	}
+
+#endif		// defined(_WIN32)
