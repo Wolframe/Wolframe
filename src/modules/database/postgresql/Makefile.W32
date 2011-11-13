@@ -24,13 +24,13 @@ INCLUDE_LIBS = \
 	"$(PGSQL_DIR)\lib\libpq.lib" \
 	$(TOPDIR)\src\libwolframe\wolframe.lib
 
+DYNAMIC_MODULE = \
+	mod_db_postgresql.dll
+
 CPP_OBJS = \
 	PostgreSQLconfig.obj \
 	PostgreSQL.obj \
 	PostgreSQLmodule.obj
-
-DYNAMIC_MODULE = \
-	mod_db_postgresql.dll
 
 all: $(DYNAMIC_MODULE)
 

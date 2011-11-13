@@ -33,7 +33,7 @@ LOGGER_OBJS = \
 	logger/logBackendSyslog.o \
 	logger/logBackendImpl.o \
 	logger/loggerConfig.o \
-	logger/logger.o \
+	logger/logger.o
 
 CPP_OBJS = \
 	$(LOGGER_OBJS) \

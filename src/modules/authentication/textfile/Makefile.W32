@@ -23,12 +23,12 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib
 
 DYNAMIC_MODULE = \
-	mod_audit_database.dll
+	mod_auth_textfile.dll
 
 CPP_OBJS = \
-	DBaudit.obj \
-	DBauditConfig.obj \
-	DBauditModule.obj
+	TextFileAuthConfig.obj \
+	TextFileAuth.obj \
+	TextFileAuthModule.obj
 
 all: $(DYNAMIC_MODULE)
 
