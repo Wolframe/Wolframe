@@ -39,7 +39,7 @@ endif
 OBJS = \
 	appProperties.o \
 	appConfigDefinition.o \
-	../../src/loadModules-dummy.o \
+	$(TOPDIR)/src/loadModules-dummy.o \
 	luaConfig.o \
 	luaHandler.o \
 	$(TOPDIR)/src/posixMain.o

@@ -68,7 +68,7 @@ endif
 OBJS = \
 	appProperties.o \
 	appConfigDefinition.o \
-	../../src/loadModules-dummy.o \
+	$(TOPDIR)/src/loadModules-dummy.o \
 	iprocHandler.o \
 	langbind/appObjects.o \
 	filters/textwolf_filter.o \
@@ -78,7 +78,6 @@ OBJS = \
 	serialize/directmapBase.o \
 	serialize/directmapCompile.o \
 	$(TOPDIR)/src/posixMain.o
-
 
 ifeq ($(WITH_LUA),1)
 OBJS += \
@@ -93,20 +92,17 @@ OBJS += \
 	filters/libxml2_filter.o
 endif
 
-TEST_BINS =
-
-CPP_BINS = \
-	iprocd$(EXE)
-
--include $(TOPDIR)/makefiles/gmake/sub.mk
-
-TEST_BINS += \
+TEST_BINS = \
 	tests/iprocHandlerTest$(EXE) \
 	tests/iprocHandlerXMLTest$(EXE) \
 	tests/luamapParser$(EXE) \
 	tests/directmapCompiler$(EXE) \
 	tests/directmapParser$(EXE)
 
+CPP_BINS = \
+	iprocd$(EXE)
+
+-include $(TOPDIR)/makefiles/gmake/sub.mk
 
 tests/iprocHandlerTest$(EXE): tests/iprocHandlerTest.o $(OBJS) $(TOPDIR)/src/libwolframe.a
 tests/iprocHandlerXMLTest$(EXE): tests/iprocHandlerXMLTest.o $(OBJS) $(TOPDIR)/src/libwolframe.a

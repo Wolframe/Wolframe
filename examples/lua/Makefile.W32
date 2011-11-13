@@ -42,6 +42,7 @@ INCLUDE_LIBS = \
 OBJS = \
 	appProperties.obj \
 	appConfigDefinition.obj \
+	$(TOPDIR)\src\loadModules-dummy.obj \
 	luaConfig.obj \
 	luaHandler.obj \
 	$(TOPDIR)\src\winMain.obj
@@ -51,7 +52,7 @@ CPP_BINS = \
 
 all: $(OBJS) $(CPP_BINS)
 
-luad.exe: luad.obj $(TOPDIR)\src\wolframe.lib
+luad.exe: luad.obj $(TOPDIR)\src\wolframe.lib $(TOPDIR)\src\libwolframe\wolframe.lib
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 

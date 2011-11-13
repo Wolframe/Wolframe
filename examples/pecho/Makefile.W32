@@ -43,6 +43,7 @@ INCLUDE_LIBS = \
 OBJS = \
 	appProperties.obj \
 	appConfigDefinition.obj \
+	$(TOPDIR)\src\loadModules-dummy.obj \
 	pechoConfig.obj \
 	pechoHandler.obj \
 	$(TOPDIR)\src\winMain.obj
