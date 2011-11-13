@@ -2,7 +2,7 @@
 # 'makedepend', 'gcc -MM' or similar mechanisms
 #
 # requires:
-# - compilers CC and CCPP
+# - compilers CC and CXX
 # - INCLUDEDIRS
 # - OBJS, CPP_OBJS and BIN_OBJS, CPP_BIN_OBJS
 # - TEST_BINS, TEST_BIN_OBJS, TEST_CPP_BINS, TEST_CPP_BIN_OBJS
@@ -16,12 +16,12 @@ ifeq "$(COMPILER)" "gcc"
 
 %.d : %.c
 	@echo Generating dependencies for $<
-	@$(CC) -DMAKE_DEPENDENCIES -MM -MT $(@:.d=.o) $(CFLAGS) $< | \
+	@$(CC) -DMAKE_DEPENDENCIES -MM -MT $(@:.d=.o) $(ALL_CFLAGS) $< | \
 		sed "s,\($*\.o\)[ :]*\(.*\),$@ : $$\(wildcard \2\)\&\&\&\1 : \2,g" | tr -s '&' "\n" > $@
 
 %.d : %.cpp
 	@echo Generating dependencies for $<
-	@$(CCPP) -DMAKE_DEPENDENCIES -MM -MT $(@:.d=.o) $(CCPPFLAGS) $< | \
+	@$(CXX) -DMAKE_DEPENDENCIES -MM -MT $(@:.d=.o) $(ALL_CXXFLAGS) $< | \
 		sed "s,\($*\.o\)[ :]*\(.*\),$@ : $$\(wildcard \2\)\&\&\&\1 : \2,g" | tr -s '&' "\n" > $@
 
 endif
@@ -38,12 +38,12 @@ ifeq "$(COMPILER)" "icc"
 
 %.d : %.c
 	@echo Generating dependencies for $<
-	@$(CC) -DMAKE_DEPENDENCIES -MM -MT  $(@:.d=.o) $(CFLAGS) $< | \
+	@$(CC) -DMAKE_DEPENDENCIES -MM -MT  $(@:.d=.o) $(ALL_CFLAGS) $< | \
 		sed "s,\($*\.o\)[ :]*\(.*\),$@ : $$\(wildcard \2\)\&\&\&\1 : \2,g" | tr -s '&' "\n" > $@
 
 %.d : %.cpp
 	@echo Generating dependencies for $<
-	@$(CCPP) -DMAKE_DEPENDENCIES -MM -MT  $(@:.d=.o) $(CCPPFLAGS) $< | \
+	@$(CXX) -DMAKE_DEPENDENCIES -MM -MT  $(@:.d=.o) $(ALL_CXXFLAGS) $< | \
 		sed "s,\($*\.o\)[ :]*\(.*\),$@ : $$\(wildcard \2\)\&\&\&\1 : \2,g" | tr -s '&' "\n" > $@
 
 endif
@@ -52,11 +52,11 @@ ifeq "$(COMPILER)" "spro"
 
 %.d : %.c
 	@echo Generating dependencies for $<
-	@$(CC) -DMAKE_DEPENDENCIES -xM1 $(CFLAGS) $< > $@
+	@$(CC) -DMAKE_DEPENDENCIES -xM1 $(ALL_CFLAGS) $< > $@
 
 %.d : %.cpp
 	@echo Generating dependencies for $<
-	@$(CCPP) -DMAKE_DEPENDENCIES -xM1 $(CCPPFLAGS) $< > $@
+	@$(CXX) -DMAKE_DEPENDENCIES -xM1 $(ALL_CXXFLAGS) $< > $@
 endif
 
 ifeq "$(COMPILER)" "pcc"
@@ -64,7 +64,7 @@ ifeq "$(COMPILER)" "pcc"
 # FIXME: platform in path of compiler include files, mmh, how to fix?
 %.d : %.c
 	@echo Generating dependencies for $<
-	@$(CC) -DMAKE_DEPENDENCIES $(CFLAGS) -M $< > $@
+	@$(CC) -DMAKE_DEPENDENCIES $(ALL_CFLAGS) -M $< > $@
 
 endif
 

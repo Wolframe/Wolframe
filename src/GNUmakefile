@@ -6,11 +6,11 @@ SUBDIRS = modules
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
-INCLUDE_CPPFLAGS =
+INCLUDE_CXXFLAGS =
 
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR) \
-	-Llibwolframe
+	-L$(TOPDIR)/src/libwolframe
 
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include \
@@ -27,50 +27,13 @@ INCLUDE_LIBS = \
 
 ifeq ($(WITH_SSL),1)
 
-INCLUDE_CPPFLAGS += \
+INCLUDE_CXXFLAGS += \
 	-DWITH_SSL
 
 INCLUDE_LIBS += \
 	$(OPENSSL_LIBS)
 
 endif
-
-# pam
-
-ifeq ($(WITH_PAM),1)
-
-INCLUDE_CPPFLAGS += \
-	-DWITH_PAM
-
-INCLUDE_DIRS += \
-	-I$(PAM_INCLUDE_DIR)
-
-INCLUDE_LDFLAGS += \
-	-L$(PAM_LIB_DIR)
-
-INCLUDE_LIBS += \
-	$(PAM_LIBS)
-
-endif
-
-# sasl
-
-ifeq ($(WITH_SASL),1)
-
-INCLUDE_CPPFLAGS += \
-	-DWITH_SASL
-
-INCLUDE_DIRS += \
-	-I$(SASL_INCLUDE_DIR)
-
-INCLUDE_LDFLAGS += \
-	-L$(SASL_LIB_DIR)
-
-INCLUDE_LIBS += \
-	$(SASL_LIBS)
-
-endif
-
 
 LOCAL_STATIC_LIB = \
 	libwolframe.a

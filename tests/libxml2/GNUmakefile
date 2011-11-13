@@ -4,7 +4,7 @@ SUBDIRS =
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
-INCLUDE_CPPFLAGS = \
+INCLUDE_CXXFLAGS = \
 	-I.
 
 # libxml2

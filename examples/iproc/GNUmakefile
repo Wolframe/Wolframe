@@ -4,7 +4,7 @@ SUBDIRS =
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
-INCLUDE_CPPFLAGS =
+INCLUDE_CXXFLAGS =
 
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include \
@@ -26,7 +26,7 @@ INCLUDE_LIBS = \
 # lua
 
 ifeq ($(WITH_LUA),1)
-INCLUDE_CPPFLAGS += \
+INCLUDE_CXXFLAGS += \
 	-DWITH_LUA
 
 INCLUDE_DIRS += \
@@ -40,7 +40,7 @@ endif
 # libxml2
 
 ifeq ($(WITH_LIBXML2),1)
-INCLUDE_CPPFLAGS += \
+INCLUDE_CXXFLAGS += \
 	-DWITH_LIBXML2
 
 INCLUDE_DIRS += \
@@ -57,7 +57,7 @@ endif
 
 ifeq ($(WITH_SSL),1)
 
-INCLUDE_CPPFLAGS += \
+INCLUDE_CXXFLAGS += \
 	-DWITH_SSL
 
 INCLUDE_LIBS += \

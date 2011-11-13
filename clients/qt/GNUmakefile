@@ -4,7 +4,7 @@ SUBDIRS =
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
-INCLUDE_CPPFLAGS =
+INCLUDE_CXXFLAGS =
 
 INCLUDE_DIRS = \
 	-I. \
@@ -28,7 +28,7 @@ MOC_FLAGS = \
 
 ifeq ($(WITH_SSL),1)
 
-INCLUDE_CPPFLAGS += \
+INCLUDE_CXXFLAGS += \
 	-DWITH_SSL
 
 INCLUDE_LIBS += \

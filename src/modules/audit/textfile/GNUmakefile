@@ -8,7 +8,7 @@ INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include \
 	-I$(BOOST_INCLUDE_DIR)
 
-INCLUDE_CPPFLAGS =
+INCLUDE_CXXFLAGS =
 
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe \

@@ -33,7 +33,7 @@ clean: clean_recursive clean_po local_clean
 ifneq "$(DYNAMIC_LIB)" ""
 	-@rm -rf $(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR).$(DYNAMIC_LIB_MINOR).$(DYNAMIC_LIB_PATCH) 2>/dev/null
 	-@rm -rf $(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR) 2>/dev/null
-	-@rm -rf $(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR) 2>/dev/null
+	-@rm -rf $(DYNAMIC_LIB) 2>/dev/null
 endif
 
 

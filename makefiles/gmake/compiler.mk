@@ -124,13 +124,13 @@ endif
 
 endif
 
-CCPP_COMPILE_FLAGS = \
+CXX_COMPILE_FLAGS = \
 	$(COMMON_COMPILE_FLAGS) \
 	-std=c++98
 
 # gcc 4.x
 ifeq "$(GCC_MAJOR_VERSION)" "4"
-CCPP_COMPILE_FLAGS += \
+CXX_COMPILE_FLAGS += \
 	-Wno-invalid-offsetof -funit-at-a-time
 endif
 
@@ -138,20 +138,20 @@ ifeq "$(GCC_MAJOR_VERSION)" "3"
 
 # gcc 3.4, not tested yet
 ifeq "$(GCC_MINOR_VERSION)" "4"
-CCPP_COMPILE_FLAGS += \
+CXX_COMPILE_FLAGS += \
 	-Wno-invalid-offsetof
 endif
 
 # gcc 3.3, testend on OpenBSD 4.2
 ifeq "$(GCC_MINOR_VERSION)" "3"
-#CCPP_COMPILE_FLAGS += \
+#CXX_COMPILE_FLAGS += \
 #	-Wdeclaration-after-statement
 endif
 
 endif
 
 #CC = gcc
-CCPP = g++
+CXX = g++
 
 endif
 
@@ -313,34 +313,34 @@ endif
 #endif
 #endif
 
-CFLAGS := $(CFLAGS) $(COMPILE_FLAGS) $(PLATFORM_COMPILE_FLAGS) $(INCLUDE_DIRS) $(INCLUDE_CFLAGS) $(PTHREADS_CFLAGS)
-CCPPFLAGS := $(CPPFLAGS) $(CCPP_COMPILE_FLAGS) $(PLATFORM_COMPILE_FLAGS) $(INCLUDE_DIRS) $(INCLUDE_CPPFLAGS) $(PTHREADS_CFLAGS)
+ALL_CFLAGS = $(CFLAGS) $(COMPILE_FLAGS) $(PLATFORM_COMPILE_FLAGS) $(INCLUDE_DIRS) $(INCLUDE_CFLAGS) $(PTHREADS_CFLAGS)
+ALL_CXXFLAGS = $(CXXFLAGS) $(CXX_COMPILE_FLAGS) $(PLATFORM_COMPILE_FLAGS) $(INCLUDE_DIRS) $(INCLUDE_CXXFLAGS) $(PTHREADS_CFLAGS)
+ALL_LDFLAGS = $(LDFLAGS) $(INCLUDE_LDFLAGS) $(PTHREADS_LDFLAGS) $(LDFLAGS_NET) $(LDFLAGS_LT)
 
-LDFLAGS := $(LDFLAGS) $(INCLUDE_LDFLAGS) $(PTHREADS_LDFLAGS) $(LDFLAGS_NET) $(LDFLAGS_LT)
 LIBS = $(INCLUDE_LIBS) $(PTHREADS_LIBS) $(LIBS_NET) $(LIBS_LT)
 LINK = $(CC)
-CCPP_LINK = $(CCPP)
+CXX_LINK = $(CXX)
 
 %.o : %.c
-	$(CC) -c -o $@ $(CFLAGS) $<
+	$(CC) -c -o $@ $(ALL_CFLAGS) $<
 
 %.o : %.cpp
-	$(CCPP) -c -o $@ $(CCPPFLAGS) $<
+	$(CXX) -c -o $@ $(ALL_CXXFLAGS) $<
 
 %$(EXE): %.o $(OBJS)
-	$(CCPP_LINK) -o $@ $(LDFLAGS) $(OBJS) $< $(LIBS)
+	$(CXX_LINK) -o $@ $(ALL_LDFLAGS) $(OBJS) $< $(LIBS)
 
 %.sho : %.c
-	$(CC) -c -o $@ $(SO_COMPILE_FLAGS) -DSHARED $(CFLAGS) $<
+	$(CC) -c -o $@ $(SO_COMPILE_FLAGS) -DSHARED $(ALL_CFLAGS) $<
 
 #%$(SO) : %.sho $(OBJS)
-#	$(LINK) -shared -o $@ $(LDFLAGS) $(LIBS) $(OBJS) $<
+#	$(LINK) -shared -o $@ $(ALL_LDFLAGS) $(LIBS) $(OBJS) $<
 
 %.sho++ : %.cpp
-	$(CCPP) -c -o $@ $(SO_COMPILE_FLAGS) -DSHARED $(CCPPFLAGS) $<
+	$(CXX) -c -o $@ $(SO_COMPILE_FLAGS) -DSHARED $(ALL_CXXFLAGS) $<
 
 #%$(SO) : %.sho++ $(OBJS) $(CPPOBJS)
-#	$(CCPP_LINK) -shared -o $@ $(LDFLAGS) $(LIBS) $(OBJS) $(CPPOBJS) $<
+#	$(CXX_LINK) -shared -o $@ $(ALL_LDFLAGS) $(LIBS) $(OBJS) $(CPPOBJS) $<
 
 BIN_OBJS = $(BINS:$(EXE)=.o)
 TEST_BIN_OBJS = $(TEST_BINS:$(EXE)=.o)

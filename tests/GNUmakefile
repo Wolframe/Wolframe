@@ -18,7 +18,7 @@ endif
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
-INCLUDE_CPPFLAGS = \
+INCLUDE_CXXFLAGS = \
 
 INCLUDE_DIRS = \
 	-I$(TOPDIR)/include -I. \

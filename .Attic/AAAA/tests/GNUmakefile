@@ -4,7 +4,7 @@ SUBDIRS =
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
-INCLUDE_CPPFLAGS =
+INCLUDE_CXXFLAGS =
 
 INCLUDE_DIRS = \
 	-I$(TOPDIR)/include -I. \
@@ -32,7 +32,7 @@ endif
 
 ifeq ($(WITH_PAM),1)
 
-INCLUDE_CPPFLAGS += \
+INCLUDE_CXXFLAGS += \
 	-DWITH_PAM
 
 INCLUDE_DIRS += \
@@ -50,7 +50,7 @@ endif
 
 ifeq ($(WITH_SASL),1)
 
-INCLUDE_CPPFLAGS += \
+INCLUDE_CXXFLAGS += \
 	-DWITH_SASL
 
 INCLUDE_DIRS += \
@@ -70,7 +70,7 @@ ifeq ($(WITH_SQLITE3),1)
 
 ifeq ($(WITH_LOCAL_SQLITE3),0)
 
-INCLUDE_CPPFLAGS += \
+INCLUDE_CXXFLAGS += \
 	-DWITH_SQLITE3
 
 INCLUDE_DIRS += \
@@ -86,7 +86,7 @@ endif
 
 ifeq ($(WITH_LOCAL_SQLITE3),1)
 
-INCLUDE_CPPFLAGS += \
+INCLUDE_CXXFLAGS += \
 	-DWITH_SQLITE3
 
 INCLUDE_DIRS += \
