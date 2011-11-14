@@ -37,6 +37,7 @@ GCC_MINOR_VERSION ?=	$(shell $(TOPDIR)/makefiles/gmake/guess_env --gcc-minor-ver
 # -Waggregate-return: is for K&R code and mostly useless nowadays
 # -Wno-long-long: some boost code header require 'long long'
 # -Winline: warns too often is early optimization anyway, not very useful
+# -Wundef: gcc warning is violating the standard, not using it
 
 # compilation flags and compilers
 COMMON_COMPILE_FLAGS = \
@@ -44,7 +45,6 @@ COMMON_COMPILE_FLAGS = \
 	-fstrict-aliasing \
 	-pedantic -Wall \
 	-Wno-long-long \
-	-Wundef \
 	-Wunused -Wno-import \
 	-Wformat -Wformat-y2k -Wformat-nonliteral -Wformat-security -Wformat-y2k \
 	-Wswitch-enum -Wunknown-pragmas -Wfloat-equal \
