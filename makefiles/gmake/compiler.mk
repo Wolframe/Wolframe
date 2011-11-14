@@ -38,6 +38,8 @@ GCC_MINOR_VERSION ?=	$(shell $(TOPDIR)/makefiles/gmake/guess_env --gcc-minor-ver
 # -Wno-long-long: some boost code header require 'long long'
 # -Winline: warns too often is early optimization anyway, not very useful
 # -Wundef: gcc warning is violating the standard, not using it
+# -Wvariadic-macros: set -Wno-variadic-macros; troubles gtest, which is happilly
+#  mixing C99 and C++98 features, let's hope c++0 sorts this out
 
 # compilation flags and compilers
 COMMON_COMPILE_FLAGS = \
@@ -59,7 +61,7 @@ COMMON_COMPILE_FLAGS += \
 	-Wfatal-errors -Wmissing-include-dirs \
 	-Wvolatile-register-var \
 	-Wextra -Winit-self \
-	-Wvariadic-macros
+	-Wno-variadic-macros
 # -Wconversion had to meanings before gcc 4.3 (warn about ABI changes when porting
 # old K&R code without function prototypes) and warn about conversions loosing
 # precision. So we enable only -Wconversion (not -Wtraditional-conversion) for gcc
