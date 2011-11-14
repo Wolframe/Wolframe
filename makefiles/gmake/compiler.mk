@@ -36,10 +36,7 @@ GCC_MINOR_VERSION ?=	$(shell $(TOPDIR)/makefiles/gmake/guess_env --gcc-minor-ver
 # everything implied by -Wall is not explicitly specified (gcc 4.2.3)
 # -Waggregate-return: is for K&R code and mostly useless nowadays
 # -Wno-long-long: some boost code header require 'long long'
-# -Wundef: is troubling gtest and is against the C/C++ standard anyway
-# -Wvariadic-macros: set -Wno-variadic-macros; troubles gtest, which is happilly
-# mixing C99 and C++98 features, let's hope c++0 sorts this out
-# -Winline
+# -Winline: warns too often is early optimization anyway, not very useful
 
 # compilation flags and compilers
 COMMON_COMPILE_FLAGS = \
@@ -47,6 +44,7 @@ COMMON_COMPILE_FLAGS = \
 	-fstrict-aliasing \
 	-pedantic -Wall \
 	-Wno-long-long \
+	-Wundef \
 	-Wunused -Wno-import \
 	-Wformat -Wformat-y2k -Wformat-nonliteral -Wformat-security -Wformat-y2k \
 	-Wswitch-enum -Wunknown-pragmas -Wfloat-equal \
@@ -61,7 +59,7 @@ COMMON_COMPILE_FLAGS += \
 	-Wfatal-errors -Wmissing-include-dirs \
 	-Wvolatile-register-var \
 	-Wextra -Winit-self \
-	-Wno-variadic-macros
+	-Wvariadic-macros
 # -Wconversion had to meanings before gcc 4.3 (warn about ABI changes when porting
 # old K&R code without function prototypes) and warn about conversions loosing
 # precision. So we enable only -Wconversion (not -Wtraditional-conversion) for gcc
@@ -157,19 +155,6 @@ endif
 
 # end of gcc section
 
-# start of tcc section
-
-# currently we don't need this, the tcc flags are fairly consistent
-#TCC_MAJOR_VERSION ?=	$(shell $(TOPDIR)/makefiles/gmake/guess_env --tcc-major-version $(CC) "$(CURDIR)" $(TOPDIR))
-#TCC_MINOR_VERSION ?=	$(shell $(TOPDIR)/makefiles/gmake/guess_env --tcc-minor-version $(CC) "$(CURDIR)" $(TOPDIR))
-
-ifeq "$(COMPILER)" "tcc"
-COMPILE_FLAGS = \
-	-Wall -Werror
-endif
-
-# end of tcc section
-
 # start of icc section
 
 # currently we don't need this, the icc flags are fairly consistent
@@ -201,70 +186,6 @@ COMPILE_FLAGS = \
 endif
 
 # end of spro section
-
-# start of pcc section
-
-# currently we don't need this, the pcc flags are fairly consistent
-#PCC_MAJOR_VERSION ?=	$(shell $(TOPDIR)/makefiles/gmake/guess_env --pcc-major-version $(CC) "$(CURDIR)" $(TOPDIR))
-#PCC_MINOR_VERSION ?=	$(shell $(TOPDIR)/makefiles/gmake/guess_env --pcc-minor-version $(CC) "$(CURDIR)" $(TOPDIR))
-
-ifeq "$(COMPILER)" "pcc"
-COMPILE_FLAGS = \
-	--fatal-warnings
-endif
-
-# end of pcc section
-
-# set flags for threading support using POSIX threads. This is completly different
-# between compiler/platforms
-ifeq "$(COMPILER)" "gcc"
-ifeq "$(PLATFORM)" "LINUX"
-PTHREADS_CFLAGS = -D_REENTRANT -pthread
-PTHREADS_LDFLAGS = -pthread
-PTHREADS_LIBS =
-endif
-ifeq "$(PLATFORM)" "SUNOS"
-PTHREADS_CFLAGS = -D_REENTRANT -pthreads
-PTHREADS_LDFLAGS = -pthreads
-PTHREADS_LIBS =
-endif
-ifeq "$(PLATFORM)" "FREEBSD"
-PTHREADS_CFLAGS = -D_REENTRANT -pthread
-PTHREADS_LDFLAGS = -pthread
-PTHREADS_LIBS =
-endif
-ifeq "$(PLATFORM)" "NETBSD"
-PTHREADS_CFLAGS = -D_REENTRANT -pthread
-PTHREADS_LDFLAGS = -pthread
-PTHREADS_LIBS =
-endif
-ifeq "$(PLATFORM)" "OPENBSD"
-PTHREADS_CFLAGS = -D_REENTRANT -pthread
-PTHREADS_LDFLAGS = -pthread
-PTHREADS_LIBS =
-endif
-ifeq "$(PLATFORM)" "CYGWIN"
-PTHREADS_CFLAGS =
-PTHREADS_LDFLAGS =
-PTHREADS_LIBS =
-endif
-endif
-
-ifeq "$(COMPILER)" "tcc"
-ifeq "$(PLATFORM)" "LINUX"
-PTHREADS_CFLAGS = -D_REENTRANT
-PTHREADS_LDFLAGS =
-PTHREADS_LIBS = -lpthread
-endif
-endif
-
-ifeq "$(COMPILER)" "pcc"
-ifeq "$(PLATFORM)" "LINUX"
-PTHREADS_CFLAGS = -D_REENTRANT -pthread
-PTHREADS_LDFLAGS = -pthread
-PTHREADS_LIBS =
-endif
-endif
 
 ifeq "$(COMPILER)" "icc"
 ifeq "$(PLATFORM)" "LINUX"
