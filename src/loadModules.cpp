@@ -41,6 +41,12 @@
 
 	#include <dlfcn.h>
 
+	template<typename T> T void_ptr_to_func_ptr_cast( void *symbol ) {
+		union { T f; void *s; } alias;
+		alias.s = symbol;
+		return alias.f;
+	}
+
 	using namespace _Wolframe;
 
 	typedef module::ModuleContainer* (*CreateFunction)();
@@ -58,7 +64,8 @@
 				retVal = false;
 				break;
 			}
-			CreateFunction create = (CreateFunction)dlsym( hndl, "createModule" );
+
+			CreateFunction create = void_ptr_to_func_ptr_cast<CreateFunction>( dlsym( hndl, "createModule" ) );
 			if ( !create )	{
 				LOG_ERROR << "Module loader creation entry point: " << dlerror();
 				retVal = false;
@@ -66,7 +73,7 @@
 				break;
 			}
 
-			SetModuleLogger setLogger = (SetModuleLogger)dlsym( hndl, "setModuleLogger" );
+			SetModuleLogger setLogger = void_ptr_to_func_ptr_cast<SetModuleLogger>( dlsym( hndl, "setModuleLogger" ) );
 			if ( !setLogger )	{
 				LOG_ERROR << "Module loader creation entry point: " << dlerror();
 				retVal = false;
