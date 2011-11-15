@@ -189,12 +189,48 @@ endif
 
 # end of spro section
 
+# set flags for threading support using POSIX threads. This is completly different
+# between compiler/platforms
+ifeq "$(COMPILER)" "gcc"
+ifeq "$(PLATFORM)" "LINUX"
+PTHREADS_CFLAGS = -D_REENTRANT -pthread
+PTHREADS_LDFLAGS = -pthread
+PTHREADS_LIBS =
+endif
+ifeq "$(PLATFORM)" "SUNOS"
+PTHREADS_CFLAGS = -D_REENTRANT -pthreads
+PTHREADS_LDFLAGS = -pthreads
+PTHREADS_LIBS = 
+endif
+ifeq "$(PLATFORM)" "FREEBSD"
+PTHREADS_CFLAGS = -D_REENTRANT -pthread
+PTHREADS_LDFLAGS = -pthread
+PTHREADS_LIBS =
+endif
+ifeq "$(PLATFORM)" "NETBSD"
+PTHREADS_CFLAGS = -D_REENTRANT -pthread
+PTHREADS_LDFLAGS = -pthread
+PTHREADS_LIBS =
+endif
+ifeq "$(PLATFORM)" "OPENBSD"
+PTHREADS_CFLAGS = -D_REENTRANT -pthread
+PTHREADS_LDFLAGS = -pthread
+PTHREADS_LIBS =
+endif
+ifeq "$(PLATFORM)" "CYGWIN"
+PTHREADS_CFLAGS =
+PTHREADS_LDFLAGS =
+PTHREADS_LIBS =
+endif
+
 ifeq "$(COMPILER)" "icc"
 ifeq "$(PLATFORM)" "LINUX"
 PTHREADS_CFLAGS = -D_REENTRANT -pthread
 PTHREADS_LDFLAGS = -pthread
 PTHREADS_LIBS =
 endif
+endif
+
 endif
 
 # set flags for position independend code (as required for shared libraries
