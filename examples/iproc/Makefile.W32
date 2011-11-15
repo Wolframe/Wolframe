@@ -46,6 +46,23 @@ INCLUDE_LIBS = \
 
 !ENDIF
 
+!IFDEF WITH_LIBXML2
+
+INCLUDE_CPPFLAGS = \
+	$(INCLUDE_CPPFLAGS) \
+	/DWITH_LIBXML2
+
+INCLUDE_DIRS = \
+	$(INCLUDE_DIRS) \
+	/I. /I"$(LIBXML2_DIR)\include" \
+	/I"$(LIBXML2_DIR)\include\libxml"
+
+INCLUDE_LIBS = \
+	$(INCLUDE_LIBS) \
+	"$(LIBXML2_DIR)\lib\libxml2.lib"
+	
+!ENDIF
+
 OBJS = \
 	appProperties.obj \
 	appConfigDefinition.obj \
@@ -125,6 +142,9 @@ run:
 !ENDIF
 !IFDEF WITH_LUA
 	@-echo copy "$(LUA_DIR)\src\lua51.dll" . >> test.bat
+!ENDIF
+!IFDEF WITH_LIBXML2
+	@-echo copy "$(LIBXML2_DIR)\lib\libxml2.dll" . >> test.bat
 !ENDIF
 	@-echo echo Running the Wolframe iproc example... >> test.bat
 	@-echo iprocd.exe -c iproc.conf >> test.bat

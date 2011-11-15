@@ -194,7 +194,7 @@ private:
 	}
 
 private:
-	friend class InputFilterImpl;
+	friend struct InputFilterImpl;
 	xmlDocPtr m_doc;
 	xmlNode* m_node;
 	xmlChar* m_value;

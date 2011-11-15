@@ -51,7 +51,7 @@ using namespace _Wolframe::iproc::lua;
 
 bool Configuration::parse( const _Wolframe::config::ConfigurationTree& parentNode,
 			   const std::string& /*node*/,
-			   const module::ModulesDirectory* /*modules*/ )
+			   const _Wolframe::module::ModulesDirectory* /*modules*/ )
 {
 	using namespace _Wolframe::iproc::lua;
 
