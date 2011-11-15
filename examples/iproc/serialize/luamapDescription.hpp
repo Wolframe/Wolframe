@@ -70,10 +70,11 @@ struct Description :public DescriptionBase
 	template <typename Element>
 	Description& operator()( const char* name, Element Structure::*eptr)
 	{
-		const char* typ = 0;
+		// :73:15: error: variable ‘typ’ set but not used [-Werror=unused-but-set-variable]
+		// removed 'typ', again not sure here..
 		try
 		{
-			typ = typeid(Element).name();
+			(void)typeid(Element).name();
 		}
 		catch (std::bad_typeid)
 		{}

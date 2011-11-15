@@ -266,7 +266,9 @@ static int function__LuaObject__newindex( lua_State* ls)
 	}
 	else
 	{
-		lua_tostring( ls, 3);
+		// Aba: not sure, what should be the fix here: langbind/luaAppProcessor.cpp:271:2: error: ‘val’ may be used uninitialized in this function [-Werror=uninitialized]
+		// added 'val =', seems to be the proper fix :-)
+		val = lua_tostring( ls, 3);
 	}
 	if (!val) luaL_error( ls, "%s __newindex called with invalid argument 3 (value)", metaTableName<Object>());
 
