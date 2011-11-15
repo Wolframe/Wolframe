@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = 
+SUBDIRS =
 
 ifeq ($(WITH_EXPECT),1)
 SUBDIRS += expect config
@@ -33,7 +33,8 @@ INCLUDE_LIBS = \
 	$(TOPDIR)/gtest/gtest-all.o \
 	$(TOPDIR)/src/libwolframe.a \
 	$(TOPDIR)/src/libwolframe/libwolframe.a \
-	-lboost_thread$(BOOST_LIBRARY_TAG) \
+	-lpthread \
+	-lboost_thread \
 	-lboost_filesystem -lboost_system \
 	-lboost_program_options
 
