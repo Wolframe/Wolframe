@@ -36,16 +36,11 @@
 
 #include "logger-v1.hpp"
 #include "moduleInterface.hpp"
+#include "loadModules.hpp"
 
 #if !defined(_WIN32)	// POSIX module loader
 
 	#include <dlfcn.h>
-
-	template<typename T> T void_ptr_to_func_ptr_cast( void *symbol ) {
-		union { T f; void *s; } alias;
-		alias.s = symbol;
-		return alias.f;
-	}
 
 	using namespace _Wolframe;
 
