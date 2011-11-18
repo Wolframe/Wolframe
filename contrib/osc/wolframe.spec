@@ -264,6 +264,7 @@ Group: Application/Business
 %description postgresql
 The Wolframe database module for Postgresql (libpq).
 
+Requires: %{name} >= %{version}-%{release}
 Requires: postgresql-libs >= 7.0
 %endif
 
@@ -275,6 +276,7 @@ Group: Application/Business
 %description sqlite3
 The Wolframe database module for Sqlite3.
 
+Requires: %{name} >= %{version}-%{release}
 %if %{rhel} || %{centos} || %{fedora}
 %if %{rhel}
 %if %{rhel5} || %{rhel6}
@@ -487,11 +489,13 @@ fi
 
 %if %{with_pgsql}
 %files postgresql
+%defattr( -, root, root )
 %dir %{_prefix}/lib/wolframe/modules/database/mod_db_postgresql.so
 %endif
 
 %if %{with_sqlite}
 %files sqlite3
+%defattr( -, root, root )
 %dir %{_prefix}/lib/wolframe/modules/database/mod_db_sqlite3.so
 %endif
 
