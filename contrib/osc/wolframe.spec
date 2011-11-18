@@ -465,15 +465,15 @@ fi
 %{_libdir}/wolframe/libboost_date_time.so.%{boost_version}
 %endif
 
-%dir %{_libdir}/wolframe/modules
-%dir %{_libdir}/wolframe/modules/database
-%dir %{_libdir}/wolframe/modules/audit
-%dir %{_libdir}/wolframe/modules/audit//mod_audit_textfile.so
-%dir %{_libdir}/wolframe/modules/audit//mod_audit_database.so
-%dir %{_libdir}/wolframe/modules/authentication
-%dir %{_libdir}/wolframe/modules/authentication/mod_auth_textfile.so
-%dir %{_libdir}/wolframe/modules/authentication/mod_auth_database.so
-%dir %{_libdir}/wolframe/modules/processor/mod_proc_echo.so
+%dir %{_prefix}/lib/wolframe/modules
+%dir %{_prefix}/lib/wolframe/modules/database
+%dir %{_prefix}/lib/wolframe/modules/audit
+%dir %{_prefix}/lib/wolframe/modules/audit//mod_audit_textfile.so
+%dir %{_prefix}/lib/wolframe/modules/audit//mod_audit_database.so
+%dir %{_prefix}/lib/wolframe/modules/authentication
+%dir %{_prefix}/lib/wolframe/modules/authentication/mod_auth_textfile.so
+%dir %{_prefix}/lib/wolframe/modules/authentication/mod_auth_database.so
+%dir %{_prefix}/lib/wolframe/modules/processor/mod_proc_echo.so
 
 
 #%dir %{_datadir}/wolframe
@@ -487,12 +487,12 @@ fi
 
 %if %{with_pgsql}
 %files postgresql
-%dir %{_libdir}/wolframe/modules/database/mod_db_postgresql.so
+%dir %{_prefix}/lib/wolframe/modules/database/mod_db_postgresql.so
 %endif
 
 %if %{with_sqlite}
 %files sqlite3
-%dir %{_libdir}/wolframe/modules/database/mod_db_sqlite3.so
+%dir %{_prefix}/lib/wolframe/modules/database/mod_db_sqlite3.so
 %endif
 
 %if %{with_qt}
