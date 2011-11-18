@@ -200,6 +200,41 @@ Requires: libxslt-devel >= 1.0
 BuildRequires: gcc-c++
 BuildRequires: doxygen
 
+# postgres database module
+%if %{with_pgsql}
+BuildRequires: postgresql-devel >= 7.0
+Requires: postgresql-libs >= 7.0
+%endif
+
+# build local sqlite3 for distibutions with no or too old version
+%define build_sqlite 0   
+%if %{with_sqlite}
+%if %{rhel}
+%if %{rhel4}
+%define build_sqlite 1
+%endif
+%endif
+%endif
+
+# sqlite database module
+%if %{with_sqlite}
+%if %{rhel} || %{centos} || %{fedora}
+%if %{rhel}
+%if %{rhel5} || %{rhel6}
+BuildRequires: sqlite-devel >= 3.0
+Requires: sqlite >= 3.0
+%endif
+%else
+BuildRequires: sqlite-devel >= 3.0
+Requires: sqlite >= 3.0
+%endif
+%endif
+%if %{suse} || %{sles}
+BuildRequires: sqlite3-devel >= 3.0
+Requires: sqlite3 >= 3.0
+%endif
+%endif
+
 # Check if 'Distribution' is really set by OBS (as mentioned in bacula)
 %if ! 0%{?opensuse_bs}
 Distribution: %{dist}
@@ -229,10 +264,7 @@ Group: Application/Business
 %description postgresql
 The Wolframe database module for Postgresql (libpq).
 
-%if %{with_pgsql}
-BuildRequires: postgresql-devel >= 7.0
 Requires: postgresql-libs >= 7.0
-%endif
 %endif
 
 %if %{with_sqlite}
@@ -243,31 +275,19 @@ Group: Application/Business
 %description sqlite3
 The Wolframe database module for Sqlite3.
 
-# build local sqlite3 for distibutions with no or too old version
-%define build_sqlite 0   
-%if %{with_sqlite}
-%if %{rhel}
-%if %{rhel4}
-%define build_sqlite 1
-%endif
-%endif
-%endif
-
 %if %{rhel} || %{centos} || %{fedora}
 %if %{rhel}
 %if %{rhel5} || %{rhel6}
-BuildRequires: sqlite-devel >= 3.0
 Requires: sqlite >= 3.0
 %endif
 %else
-BuildRequires: sqlite-devel >= 3.0
 Requires: sqlite >= 3.0
 %endif
 %endif
 %if %{suse} || %{sles}
-BuildRequires: sqlite3-devel >= 3.0
 Requires: sqlite3 >= 3.0
 %endif
+
 %endif
 
 %if %{with_qt}

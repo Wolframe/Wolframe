@@ -37,7 +37,8 @@ build-stamp:
 	# Add here commands to compile the package.
 	$(MAKE) help
 	$(MAKE) $(WOLFRAME_PARAMS) config
-	$(MAKE) LDFLAGS=-Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe $(WOLFRAME_PARAMS) all
+	$(MAKE) LDFLAGS=-Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe \
+		LDFLAGS=-Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH) $(WOLFRAME_PARAMS) all
 	cd docs; $(MAKE) $(WOLFRAME_PARAMS) doc-doxygen; cd ..
 
 	# --- end custom part for compiling
@@ -124,7 +125,7 @@ binary-arch: build install
 #	dh_makeshlibs
 	dh_installdeb
 #	dh_perl
-	LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:`pwd`/debian/$@/usr/lib dh_shlibdeps
+	dh_shlibdeps
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
