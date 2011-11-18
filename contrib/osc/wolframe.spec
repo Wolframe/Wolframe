@@ -226,6 +226,9 @@ multiple file html documentation and the pdf documentation.
 Summary: Wolframe Postgresql database module
 Group: Application/Business
 
+%description postgresql
+The Wolframe database module for Postgresql (libpq).
+
 %if %{with_pgsql}
 BuildRequires: postgresql-devel >= 7.0
 Requires: postgresql-libs >= 7.0
@@ -236,6 +239,9 @@ Requires: postgresql-libs >= 7.0
 %package sqlite3
 Summary: Wolframe Sqlite3 database module
 Group: Application/Business
+
+%description sqlite3
+The Wolframe database module for Sqlite3.
 
 # build local sqlite3 for distibutions with no or too old version
 %define build_sqlite 0   
