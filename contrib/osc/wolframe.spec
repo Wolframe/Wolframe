@@ -102,17 +102,6 @@
 %define boost_underscore_version 1_46_1
 %endif
 
-# build local sqlite3 for distibutions with no or too old version
-
-%define build_sqlite 0   
-%if %{with_sqlite}
-%if %{rhel}
-%if %{rhel4}
-%define build_sqlite 1
-%endif
-%endif
-%endif
-
 # init script to start the daemon
 
 %if %{rhel} || %{centos} || %{fedora}
@@ -187,27 +176,6 @@ Requires: libboost-system1_44_0 >= 1.44.0
 BuildRequires: openssl-devel >= 0.9.7
 Requires: openssl >= 0.9.7
 %endif
-%if %{with_sqlite}
-%if %{rhel} || %{centos} || %{fedora}
-%if %{rhel}
-%if %{rhel5} || %{rhel6}
-BuildRequires: sqlite-devel >= 3.0
-Requires: sqlite >= 3.0
-%endif
-%else
-BuildRequires: sqlite-devel >= 3.0
-Requires: sqlite >= 3.0
-%endif
-%endif
-%if %{suse} || %{sles}
-BuildRequires: sqlite3-devel >= 3.0
-Requires: sqlite3 >= 3.0
-%endif
-%endif
-%if %{with_pgsql}
-BuildRequires: postgresql-devel >= 7.0
-Requires: postgresql-libs >= 7.0
-%endif
 %if %{with_pam}
 BuildRequires: pam-devel >= 0.77
 Requires: pam >= 0.77
@@ -253,6 +221,48 @@ The Wolframe documentation.
 This package contains the one file html documentation,
 multiple file html documentation and the pdf documentation.
 
+%if %{with_pgsql}
+%package postgresql
+Summary: Wolframe Postgresql database module
+Group: Application/Business
+
+%if %{with_pgsql}
+BuildRequires: postgresql-devel >= 7.0
+Requires: postgresql-libs >= 7.0
+%endif
+%endif
+
+%if %{with_sqlite}
+%package sqlite3
+Summary: Wolframe Sqlite3 database module
+Group: Application/Business
+
+# build local sqlite3 for distibutions with no or too old version
+%define build_sqlite 0   
+%if %{with_sqlite}
+%if %{rhel}
+%if %{rhel4}
+%define build_sqlite 1
+%endif
+%endif
+%endif
+
+%if %{rhel} || %{centos} || %{fedora}
+%if %{rhel}
+%if %{rhel5} || %{rhel6}
+BuildRequires: sqlite-devel >= 3.0
+Requires: sqlite >= 3.0
+%endif
+%else
+BuildRequires: sqlite-devel >= 3.0
+Requires: sqlite >= 3.0
+%endif
+%endif
+%if %{suse} || %{sles}
+BuildRequires: sqlite3-devel >= 3.0
+Requires: sqlite3 >= 3.0
+%endif
+%endif
 
 %if %{with_qt}
 %package client
@@ -429,6 +439,17 @@ fi
 %{_libdir}/wolframe/libboost_date_time.so.%{boost_version}
 %endif
 
+%dir %{_libdir}/wolframe/modules
+%dir %{_libdir}/wolframe/modules/database
+%dir %{_libdir}/wolframe/modules/audit
+%dir %{_libdir}/wolframe/modules/audit//mod_audit_textfile.so
+%dir %{_libdir}/wolframe/modules/audit//mod_audit_database.so
+%dir %{_libdir}/wolframe/modules/authentication
+%dir %{_libdir}/wolframe/modules/authentication/mod_auth_textfile.so
+%dir %{_libdir}/wolframe/modules/authentication/mod_auth_database.so
+%dir %{_libdir}/wolframe/modules/processor/mod_proc_echo.so
+
+
 #%dir %{_datadir}/wolframe
 #%doc LICENSE
 
@@ -437,6 +458,16 @@ fi
 %defattr( -, root, root )
 %dir %{_datadir}/doc/wolframe
 %{_datadir}/doc/wolframe/html
+
+%if %{with_pgsql}
+%files postgresql
+%dir %{_libdir}/wolframe/modules/database/mod_db_postgresql.so
+%endif
+
+%if %{with_sqlite}
+%files sqlite3
+%dir %{_libdir}/wolframe/modules/database/mod_db_sqlite3.so
+%endif
 
 %if %{with_qt}
 %files client

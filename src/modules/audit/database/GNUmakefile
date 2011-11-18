@@ -32,7 +32,12 @@ local_clean:
 local_distclean:
 
 local_install:
-	$(INSTALL) -d -m 0755 $(libdir)/modules/audit
-	$(INSTALL) -m 0775 $(DYNAMIC_MODULE) $(libdir)/modules/audit
+	$(INSTALL) -d -m 0755 $(libdir)/wolframe/modules/audit
+	$(INSTALL) -m 0775 $(DYNAMIC_MODULE) $(libdir)/wolframe/modules/audit
+
+local_uninstall:
+	-rm "$(libdir)/wolframe/modules/audit/$(DYNAMIC_MODULE)
+	-rmdir $(libdir)/wolframe/modules/audit
+	-rmdir $(libdir)/wolframe/modules
 
 local_test:

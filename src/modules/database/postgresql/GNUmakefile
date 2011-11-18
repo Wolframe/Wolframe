@@ -34,8 +34,13 @@ local_clean:
 local_distclean:
 
 local_install:
-	$(INSTALL) -d -m 0755 $(libdir)/modules/database
-	$(INSTALL) -m 0775 $(DYNAMIC_MODULE) $(libdir)/modules/database
+	$(INSTALL) -d -m 0755 $(libdir)/wolframe/modules/database
+	$(INSTALL) -m 0775 $(DYNAMIC_MODULE) $(libdir)/wolframe/modules/database
+
+local_uninstall:
+	-rm "$(libdir)/wolframe/modules/database/$(DYNAMIC_MODULE)
+	-rmdir $(libdir)/wolframe/modules/database
+	-rmdir $(libdir)/wolframe/modules
 
 local_test:
 
