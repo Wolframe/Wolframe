@@ -475,6 +475,7 @@ fi
 %dir %{_prefix}/lib/wolframe/modules/authentication
 %dir %{_prefix}/lib/wolframe/modules/authentication/mod_auth_textfile.so
 %dir %{_prefix}/lib/wolframe/modules/authentication/mod_auth_database.so
+%dir %{_prefix}/lib/wolframe/modules/processor
 %dir %{_prefix}/lib/wolframe/modules/processor/mod_proc_echo.so
 
 
@@ -490,12 +491,18 @@ fi
 %if %{with_pgsql}
 %files postgresql
 %defattr( -, root, root )
+%dir %{_prefix}/lib/wolframe/
+%dir %{_prefix}/lib/wolframe/modules
+%dir %{_prefix}/lib/wolframe/modules/database
 %dir %{_prefix}/lib/wolframe/modules/database/mod_db_postgresql.so
 %endif
 
 %if %{with_sqlite}
 %files sqlite3
 %defattr( -, root, root )
+%dir %{_prefix}/lib/wolframe/
+%dir %{_prefix}/lib/wolframe/modules
+%dir %{_prefix}/lib/wolframe/modules/database
 %dir %{_prefix}/lib/wolframe/modules/database/mod_db_sqlite3.so
 %endif
 

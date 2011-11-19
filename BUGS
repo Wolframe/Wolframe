@@ -2,3 +2,15 @@ openSuse 11.4:
 counterTest: /usr/include/boost/thread/pthread/mutex.hpp:47:
 boost::mutex::~mutex(): Assertion `!pthread_mutex_destroy(&m)' failed.
 
+RHEL4:
+procProvider.cpp: In constructor `_Wolframe::proc::ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl(const _Wolframe::proc::ProcProviderConfig*, const _Wolframe::module::ModulesDirectory*)':
+../include/processor/procProvider.hpp:63: error: `std::string _Wolframe::proc::ProcProviderConfig::m_dbLabel' is private
+procProvider.cpp:173: error: within this context
+../include/processor/procProvider.hpp:63: error: `std::string _Wolframe::proc::ProcProviderConfig::m_dbLabel' is private
+procProvider.cpp:174: error: within this context
+../include/processor/procProvider.hpp:64: error: `std::list<_Wolframe::config::ObjectConfiguration*, std::allocator<_Wolframe::config::ObjectConfiguration*> > _Wolframe::proc::ProcProviderConfig::m_procConfig' is private
+procProvider.cpp:176: error: within this context
+../include/processor/procProvider.hpp:64: error: `std::list<_Wolframe::config::ObjectConfiguration*, std::allocator<_Wolframe::config::ObjectConfiguration*> > _Wolframe::proc::ProcProviderConfig::m_procConfig' is private
+procProvider.cpp:177: error: within this context
+make[1]: *** [procProvider.o] Error 1
+
