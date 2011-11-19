@@ -381,6 +381,19 @@ BOOST_LIBRARY_TAG ?=
 endif
 endif
 
+ifeq "$(LINUX_REV)" "12.2"
+ifdef BOOST_DIR
+BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
+BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
+endif
+ifndef BOOST_DIR
+BOOST_DIR ?= /usr
+BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
+BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
+BOOST_LIBRARY_TAG ?=
+endif
+endif
+
 endif
 
 # SUSE Linux Enterprise
@@ -624,6 +637,13 @@ QT_MOC ?= $(QT_DIR)/bin/moc
 endif
 
 ifeq "$(LINUX_REV)" "12.1"
+QT_DIR ?= /usr
+QT_INCLUDE_DIR ?= $(QT_DIR)/include
+QT_LIB_DIR ?= $(QT_DIR)/lib
+QT_MOC ?= $(QT_DIR)/bin/moc
+endif
+
+ifeq "$(LINUX_REV)" "12.2"
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
