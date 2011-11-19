@@ -159,6 +159,21 @@ For building the PDF wolfbook install 'fop'.
 
 When rebuilding the SVG images of the documentation you also need 'dia'.
 
+Fedora 16
+---------
+
+No problems with the supplied packages at all, everything builds out of the box:
+
+Required pacakges: boost-devel (1.47.0)
+Optional packages: openssl-devel (1.0.0e), qt4-devel (4.7.4),
+                   pam-devel (1.1.4), cyrus-sasl-devel (2.1.23),
+                   sqlite-devel (3.7.7), postgresql-devel (9.1.1)
+
+For building the documentation you need 'libxslt', 'docbook-style-xsl' and 'doxygen'.
+For building the PDF wolfbook install 'fop'.
+
+When rebuilding the SVG images of the documentation you also need 'dia'.
+
 Ubuntu 10.04.1 LTS
 ------------------
 
