@@ -144,6 +144,7 @@ BuildRequires: centos-release
 %endif
 %if %{fedora}
 BuildRequires: generic-release
+BuildRequires: fedora-release
 %endif
 %if %{suse}
 BuildRequires: openSUSE-release

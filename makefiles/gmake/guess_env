@@ -27,6 +27,9 @@ case "$UNAME_SYSTEM.$UNAME_RELEASE" in
 			elif test -f /etc/redhat-release; then
 				LINUX_DIST='redhat'
 				LINUX_REV=`cat /etc/redhat-release | sed s/.*release\ // | sed s/\ .*// | cut -f 1 -d .`
+			elif test -f /etc/fedora-release; then
+				LINUX_DIST='redhat'
+				LINUX_REV=`cat /etc/fedora-release | cut -f 3 -d ' '`
 			elif test -f /etc/SuSE-release; then
 				grep "SUSE Linux Enterprise Server" /etc/SuSE-release
 				if test $? = 0; then
