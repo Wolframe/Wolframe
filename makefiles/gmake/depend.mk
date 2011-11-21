@@ -26,28 +26,6 @@ ifeq "$(COMPILER)" "gcc"
 
 endif
 
-ifeq "$(COMPILER)" "tcc"
-
-%.d : %.c
-	@echo Generating dependencies for $<
-	@makedepend -DMAKE_DEPENDENCIES $(PLATFORM_COMPILE_FLAGS) $(INCLUDE_DIRS) -I/usr/lib/tcc/include -f - $< > $@
-
-endif
-
-ifeq "$(COMPILER)" "icc"
-
-%.d : %.c
-	@echo Generating dependencies for $<
-	@$(CC) -DMAKE_DEPENDENCIES -MM -MT  $(@:.d=.o) $(ALL_CFLAGS) $< | \
-		sed "s,\($*\.o\)[ :]*\(.*\),$@ : $$\(wildcard \2\)\&\&\&\1 : \2,g" | tr -s '&' "\n" > $@
-
-%.d : %.cpp
-	@echo Generating dependencies for $<
-	@$(CXX) -DMAKE_DEPENDENCIES -MM -MT  $(@:.d=.o) $(ALL_CXXFLAGS) $< | \
-		sed "s,\($*\.o\)[ :]*\(.*\),$@ : $$\(wildcard \2\)\&\&\&\1 : \2,g" | tr -s '&' "\n" > $@
-
-endif
-
 ifeq "$(COMPILER)" "spro"
 
 %.d : %.c
@@ -57,15 +35,6 @@ ifeq "$(COMPILER)" "spro"
 %.d : %.cpp
 	@echo Generating dependencies for $<
 	@$(CXX) -DMAKE_DEPENDENCIES -xM1 $(ALL_CXXFLAGS) $< > $@
-endif
-
-ifeq "$(COMPILER)" "pcc"
-
-# FIXME: platform in path of compiler include files, mmh, how to fix?
-%.d : %.c
-	@echo Generating dependencies for $<
-	@$(CC) -DMAKE_DEPENDENCIES $(ALL_CFLAGS) -M $< > $@
-
 endif
 
 ifneq ($(MAKECMDGOALS),clean)

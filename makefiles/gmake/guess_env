@@ -111,26 +111,16 @@ CC=`echo $CC | sed 's/distcc//g' | sed 's/ccache//g'`
 if test $? = 0; then
 	COMPILER='gcc'
 else
-	( $CC -v | grep tcc ) 2>/dev/null 1>/dev/null
+#	( $CC -V 2>&1 | grep l_cproc_p ) >/dev/null
+	( $CC -V 2>&1 | grep "Intel(R) C" | grep "Compiler" ) >/dev/null
 	if test $? = 0; then
-		COMPILER='tcc'
+		COMPILER='icc'
 	else
-#		( $CC -V 2>&1 | grep l_cproc_p ) >/dev/null
-		( $CC -V 2>&1 | grep "Intel(R) C" | grep "Compiler" ) >/dev/null
+		( $CC -xhelp=readme | head -n 1 | grep 'Sun Studio' ) >/dev/null
 		if test $? = 0; then
-			COMPILER='icc'
+			COMPILER='spro'
 		else
-			( $CC -xhelp=readme | head -n 1 | grep 'Sun Studio' ) >/dev/null
-			if test $? = 0; then
-				COMPILER='spro'
-			else
-				( $CC -v | head -n 1 | grep 'pcc' ) >/dev/null
-				if test $? = 0; then
-					COMPILER='pcc'
-				else
-					COMPILER='unknown'
-				fi
-			fi
+			COMPILER='unknown'
 		fi
 	fi
 fi
@@ -141,14 +131,6 @@ if test $COMPILER = "gcc"; then
 	GCC_VERSION=`gcc -dumpversion`
 	GCC_MAJOR_VERSION=`echo $GCC_VERSION | cut -d . -f 1`
 	GCC_MINOR_VERSION=`echo $GCC_VERSION | cut -d . -f 2`
-fi
-
-# version of tcc (Tiny C compiler)
-
-if test $COMPILER = "tcc"; then
-	TCC_VERSION=`tcc -v | cut -d ' ' -f 3`
-	TCC_MAJOR_VERSION=`echo $ICC_VERSION | cut -d . -f 1`
-	TCC_MINOR_VERSION=`echo $ICC_VERSION | cut -d . -f 2`
 fi
 
 # version of icc (Intel C compiler)
@@ -164,14 +146,6 @@ fi
 if test $COMPILER = "spro"; then
 	SPRO_VERSION=`$CC -xhelp=readme | head -n 1 | cut -d ' ' -f 3`
 	SPRO_MAJOR_VERSION=`echo $SPRO_VERSION | cut -d : -f 1`
-fi
-
-# version of pcc (Portable C Compiler)
-
-if test $COMPILER = "pcc"; then
-	PCC_VERSION=`$CC -v | head -n 1 | cut -d ' ' -f 2`
-	PCC_MAJOR_VERSION=`echo $PCC_VERSION | cut -d . -f 1`
-	PCC_MINOR_VERSION=`echo $PCC_VERSION | cut -d . -f 2`
 fi
 
 case "$1" in
@@ -196,12 +170,6 @@ case "$1" in
 	--gcc-minor-version)	echo $GCC_MINOR_VERSION
 				;;
 
-	--tcc-major-version)	echo $TCC_MAJOR_VERSION
-				;;
-
-	--tcc-minor-version)	echo $TCC_MINOR_VERSION
-				;;
-
 	--icc-major-version)	echo $ICC_MAJOR_VERSION
 				;;
 
@@ -211,11 +179,8 @@ case "$1" in
 	--spro-major-version)	echo $SPRO_MAJOR_VERSION
 				;;
 
-	--pcc-major-version)	echo $PCC_MAJOR_VERSION
-				;;
-
-	--pcc-minor-version)	echo $PCC_MINOR_VERSION
-				;;
+	*)			echo "unkown flag '$1' requested!"
+				exit 1
 esac
 
 MAKEFILE_DIR="$3/$4"
@@ -230,13 +195,9 @@ OS_MINOR_VERSION=$OS_MINOR_VERSION
 COMPILER=$COMPILER
 GCC_MAJOR_VERSION=$GCC_MAJOR_VERSION
 GCC_MINOR_VERSION=$GCC_MINOR_VERSION
-TCC_MAJOR_VERSION=$TCC_MAJOR_VERSION
-TCC_MINOR_VERSION=$TCC_MINOR_VERSION
 ICC_MAJOR_VERSION=$ICC_MAJOR_VERSION
 ICC_MINOR_VERSION=$ICC_MINOR_VERSION
 SPRO_MAJOR_VERSION=$SPRO_MAJOR_VERSION
-PCC_MAJOR_VERSION=$PCC_MAJOR_VERSION
-PCC_MINOR_VERSION=$PCC_MINOR_VERSION
 LINUX_DIST=$LINUX_DIST
 LINUX_REV=$LINUX_REV
 EOF
