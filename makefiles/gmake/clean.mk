@@ -6,7 +6,6 @@
 # - all artifacts to clean:
 #   - BINS, TEST_BINS, TEST_CPP_BINS, CPP_BINS
 #   - OBJS, CPP_OBJS, BIN_OBJS, TEST_BIN_OBJS, CPP_BIN_OBJS, TEST_CPP_BIN_OBJS
-#   - CMODULES, CPPMODULES
 #
 # provides:
 # - target: clean
@@ -28,8 +27,6 @@ clean: clean_recursive clean_po local_clean
 	-@rm -f $(OBJS) $(CPP_OBJS) $(BIN_OBJS) $(TEST_BIN_OBJS) $(CPP_BIN_OBJS) $(TEST_CPP_BIN_OBJS) 2>/dev/null
 	-@rm -f exec/* 2>/dev/null
 	-@rm -f *.core  2>/dev/null
-	-@rm -f $(CMODULES) $(CPPMODULES) 2>/dev/null
-	-@rm -f $(CMODULES:.o=.d) $(CPPMODULES:.o=.d) 2>/dev/null
 	-@rm -rf $(STATIC_LIB) 2>/dev/null
 	-@rm -f $(SH_OBJS) rm -f $(SHPP_OBJS) 2>/dev/null
 ifneq "$(DYNAMIC_LIB)" ""

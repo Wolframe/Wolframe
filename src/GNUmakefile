@@ -1,8 +1,9 @@
 TOPDIR = ..
 
-PRESUBDIRS = libwolframe
+SUBDIRS = libwolframe modules
 
-SUBDIRS = modules
+modules: libwolframe
+wolframed$(EXE): libwolframe
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
@@ -66,7 +67,7 @@ LOCAL_STATIC_LIB_OBJS += \
 	SSLcertificateInfo.o
 endif
 
-OBJS = \
+CPP_OBJS = \
 	appProperties.o \
 	appConfigDefinition.o \
 	$(LOCAL_STATIC_LIB_OBJS) \
