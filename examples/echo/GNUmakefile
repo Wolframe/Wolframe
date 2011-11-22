@@ -32,7 +32,7 @@ INCLUDE_LIBS += \
 
 endif
 
-OBJS = \
+CPP_OBJS = \
 	appProperties.o \
 	appConfigDefinition.o \
 	$(TOPDIR)/src/loadModules-dummy.o \
