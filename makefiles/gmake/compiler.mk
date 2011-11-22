@@ -286,8 +286,8 @@ CXX_LINK = $(CXX)
 %.o : %.cpp
 	$(CXX) -c -o $@ $(ALL_CXXFLAGS) $<
 
-%$(EXE): %.o $(OBJS)
-	$(CXX_LINK) -o $@ $(ALL_LDFLAGS) $(OBJS) $< $(LIBS)
+%$(EXE): %.o $(OBJS) $(CPP_OBJS)
+	$(CXX_LINK) -o $@ $(ALL_LDFLAGS) $(OBJS) $(CPP_OBJS) $< $(LIBS)
 
 %.sho : %.c
 	$(CC) -c -o $@ $(SO_COMPILE_FLAGS) -DSHARED $(ALL_CFLAGS) $<

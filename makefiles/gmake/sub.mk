@@ -11,18 +11,15 @@
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 -include $(TOPDIR)/makefiles/gmake/compiler.mk
 
-.PHONY: all $(SUBDIRS) local_all
-all: prereq $(OBJS) $(CPP_OBJS) $(BIN_OBJS) $(CPP_BIN_OBJS) $(BINS) $(CPP_BINS) $(CMODULES) $(CPPMODULES) $(STATIC_LIB) $(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR).$(DYNAMIC_LIB_MINOR).$(DYNAMIC_LIB_PATCH) $(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR) $(DYNAMIC_LIB) $(DYNAMIC_MODULE) local_all all_po
-	@test -z "$(SUBDIRS)" || ( set -e; for d in $(SUBDIRS)""; do \
-	  (set -e; $(MAKE) -C $$d all || exit 1); done)
+.PHONY: all subdirs $(SUBDIRS) local_all
+subdirs: $(SUBDIRS)
+all: subdirs $(BINS) $(CPP_BINS) $(STATIC_LIB) $(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR).$(DYNAMIC_LIB_MINOR).$(DYNAMIC_LIB_PATCH) $(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR) $(DYNAMIC_LIB) $(DYNAMIC_MODULE) local_all all_po
 
-.PHONY: prereq $(PRESUBDIRS)
-prereq:
-	@test -z "$(PRESUBDIRS)" || ( set -e; for d in $(PRESUBDIRS)""; do \
-          (set -e; $(MAKE) -C $$d all || exit 1); done)
+$(SUBDIRS):
+	$(MAKE) -C $@ all
 
 .PHONY: test local_test
-test: $(OBJS) $(TEST_OBJS) $(CPP_OBJS) $(BIN_OBJS) $(BINS) $(CPP_BINS) $(TEST_BIN_OBJS) $(TEST_BINS) $(TEST_CPP_BINS) $(CMODULES) $(CPPMODULES) $(STATIC_LIB) local_test
+test: all local_test
 	@test -z "$(SUBDIRS)" || ( set -e; for d in $(SUBDIRS)""; do \
 	  (set -e; $(MAKE) -C $$d test || exit 1); done)
 
