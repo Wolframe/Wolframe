@@ -298,8 +298,8 @@ CXX_LINK = $(CXX)
 %.sho++ : %.cpp
 	$(CXX) -c -o $@ $(SO_COMPILE_FLAGS) -DSHARED $(ALL_CXXFLAGS) $<
 
-#%$(SO) : %.sho++ $(OBJS) $(CPPOBJS)
-#	$(CXX_LINK) -shared -o $@ $(ALL_LDFLAGS) $(LIBS) $(OBJS) $(CPPOBJS) $<
+#%$(SO) : %.sho++ $(OBJS) $(CPP_OBJS)
+#	$(CXX_LINK) -shared -o $@ $(ALL_LDFLAGS) $(LIBS) $(OBJS) $(CPP_OBJS) $<
 
 BIN_OBJS = $(BINS:$(EXE)=.o)
 TEST_BIN_OBJS = $(TEST_BINS:$(EXE)=.o)

@@ -5,7 +5,7 @@
 # - local_clean, local_distclean targets in local GNUmakefile
 # - all artifacts to clean:
 #   - BINS, TEST_BINS, TEST_CPP_BINS, CPP_BINS
-#   - OBJS, CPPOBJS, BIN_OBJS, TEST_BIN_OBJS, CPP_BIN_OBJS, TEST_CPP_BIN_OBJS
+#   - OBJS, CPP_OBJS, BIN_OBJS, TEST_BIN_OBJS, CPP_BIN_OBJS, TEST_CPP_BIN_OBJS
 #   - CMODULES, CPPMODULES
 #
 # provides:
@@ -36,6 +36,9 @@ ifneq "$(DYNAMIC_LIB)" ""
 	-@rm -rf $(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR).$(DYNAMIC_LIB_MINOR).$(DYNAMIC_LIB_PATCH) 2>/dev/null
 	-@rm -rf $(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR) 2>/dev/null
 	-@rm -rf $(DYNAMIC_LIB) 2>/dev/null
+endif
+ifneq "$(DYNAMIC_MODULE)" ""
+	-@rm -rf $(DYNAMIC_MODULE) 2>/dev/null
 endif
 
 
