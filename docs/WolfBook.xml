@@ -52,6 +52,7 @@
 
 		&AppPreface;
 		&AppIntroduction;
+		&ThreeTierArchitecture;
 		&AppSSL;
 		&AppAppendix;
 		&AppGlossary;
