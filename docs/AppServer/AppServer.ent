@@ -3,6 +3,7 @@
 <!ENTITY AppPreface			SYSTEM "Preface.xml">
 
 <!ENTITY AppIntroduction		SYSTEM "Introduction.xml">
+<!ENTITY ThreeTierArch			SYSTEM "3-tier.xml">
 <!ENTITY AppSSL				SYSTEM "SSL.xml">
 
 <!ENTITY AppAppendix			SYSTEM "Appendix.xml">

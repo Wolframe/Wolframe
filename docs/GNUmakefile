@@ -42,6 +42,8 @@ doc-html: WolfBook.html
 doc-pdf: WolfBook.pdf
 
 doc-epub: WolfBook.epub
+	mkdir OEBPS/images
+	cp images/draft.png images/*.svg OEBPS/images
 	echo "application/epub+zip" > mimetype
 	zip -0Xq  WolfBook.epub mimetype
 	zip -Xr9D WolfBook.epub META-INF OEBPS
@@ -67,7 +69,7 @@ wolframe.conf.5: wolframe.conf-man.xml
 	$(XSLT_MAN) $<
 
 local_clean:
-	-rm -rf doxygen/* WolfBook.html WolfBook.fop WolfBook.pdf
+	-rm -rf doxygen/* WolfBook.html WolfBook.fop WolfBook.pdf WolfBook.epub
 
 local_distclean:
 
