@@ -2,9 +2,6 @@ TOPDIR = ..
 
 SUBDIRS = libwolframe modules
 
-modules: libwolframe
-wolframed$(EXE): libwolframe
-
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
 INCLUDE_CXXFLAGS =
@@ -74,6 +71,9 @@ CPP_BINS = \
 	wolframed$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
+
+modules: libwolframe
+wolframed$(EXE): libwolframe
 
 local_all: $(LOCAL_STATIC_LIB)
 

@@ -1,8 +1,6 @@
 TOPDIR = ..
 
-PRESUBDIRS = libwolframe
-
-SUBDIRS = modules
+SUBDIRS = libwolframe modules
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
@@ -46,17 +44,12 @@ INCLUDE_LIBS = \
 LOCAL_STATIC_LIB = \
 	wolframe.lib
 
-AAAA_OBJS = \
-	AAAA\AAAAprovider.obj \
-	AAAA\AAAAproviderConfig.obj
-
 LOCAL_STATIC_LIB_OBJS = \
 	version.obj \
 	commandLine.obj \
 	serviceConfig.obj \
 	serviceBanner.obj \
 	config_descriptionBase.obj \
-	database\databaseConfig.obj \
 	appConfig.obj \
 	protocol_ioblocks.obj \
 	acceptor.obj \
@@ -65,8 +58,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	connection.obj \
 	serverConfig.obj \
 	server.obj \
-	procProvider.obj \
-	$(AAAA_OBJS)
+	procProvider.obj
 
 #SSL
 
@@ -82,7 +74,6 @@ CPP_OBJS = \
 	moduleDirectory.obj \
 	loadModules.obj \
 	wolframeHandler.obj \
-	database\DBprovider.obj \
 	winMain.obj
 
 CPP_BINS = \
@@ -92,7 +83,8 @@ all: $(CPP_OBJS) $(CPP_BINS)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-wolframed.exe: wolframed.obj $(CPP_OBJS)
+wolframed.exe: wolframed.obj $(CPP_OBJS) libwolframe
+modules: libwolframe
 
 $(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
 	$(LINK) /lib /nologo /out:$@ $(LDFLAGS) $(LIBS) $?
