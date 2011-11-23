@@ -83,7 +83,7 @@ all: $(CPP_OBJS) $(CPP_BINS)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-wolframed.exe: wolframed.obj $(CPP_OBJS) libwolframe
+wolframed.exe: wolframed.obj $(CPP_OBJS)
 modules: libwolframe
 
 $(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
