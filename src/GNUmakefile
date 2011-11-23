@@ -39,16 +39,11 @@ endif
 LOCAL_STATIC_LIB = \
 	libwolframe.a
 
-AAAA_OBJS = \
-	AAAA/AAAAprovider.o \
-	AAAA/AAAAproviderConfig.o
-
 LOCAL_STATIC_LIB_OBJS = \
 	version.o \
 	commandLine.o \
 	serviceConfig.o \
 	serviceBanner.o \
-	database/databaseConfig.o \
 	appConfig.o \
 	config_descriptionBase.o \
 	protocol_ioblocks.o \
@@ -59,7 +54,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	serverConfig.o \
 	server.o \
 	procProvider.o \
-	$(AAAA_OBJS)
 
 #SSL
 ifeq ($(WITH_SSL),1)
@@ -74,7 +68,6 @@ CPP_OBJS = \
 	moduleDirectory.o \
 	loadModules.o \
 	wolframeHandler.o \
-	database/DBprovider.o \
 	posixMain.o
 
 CPP_BINS = \
