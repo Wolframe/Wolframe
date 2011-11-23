@@ -272,6 +272,8 @@ Group: Application/Business
 %description devel
 The libraries and header files used for development with Wolframe.
 
+Requires: %{name} >= %{version}-%{release}
+
 %if %{with_pgsql}
 %package postgresql
 Summary: Wolframe Postgresql database module
@@ -359,7 +361,7 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make help \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
 	WITH_EXAMPLES=%{with_examples} \
-	sysconfdir=/etc
+	sysconfdir=/etc libdir=%{_libdir}
 
 LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make config \
 %if %{build_boost}
@@ -375,7 +377,8 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make config \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
 	WITH_EXAMPLES=%{with_examples} \
-	sysconfdir=/etc
+	sysconfdir=/etc libdir=%{_libdir}
+
 LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make all \
 	%{?_smp_mflags} \
 %if %{build_boost}
@@ -391,7 +394,8 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make all \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
 	WITH_EXAMPLES=%{with_examples} \
-	sysconfdir=/etc
+	sysconfdir=/etc libdir=%{_libdir}
+
 cd docs; make doc-doxygen
 
 echo ======================= TESTING ==============================
@@ -414,7 +418,8 @@ make DESTDIR=$RPM_BUILD_ROOT install \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
 	WITH_EXAMPLES=%{with_examples} \
-	sysconfdir=$RPM_BUILD_ROOT/etc
+	sysconfdir=/etc libdir=%{_libdir}
+
 cd docs && make DESTDIR=$RPM_BUILD_ROOT install && cd ..
 
 %if %{build_boost}
@@ -487,16 +492,16 @@ fi
 %{_libdir}/libwolframe.so
 %{_libdir}/libwolframe.a
 
-%dir %{_prefix}/lib/wolframe/modules
-%dir %{_prefix}/lib/wolframe/modules/database
-%dir %{_prefix}/lib/wolframe/modules/audit
-%dir %{_prefix}/lib/wolframe/modules/audit//mod_audit_textfile.so
-%dir %{_prefix}/lib/wolframe/modules/audit//mod_audit_database.so
-%dir %{_prefix}/lib/wolframe/modules/authentication
-%dir %{_prefix}/lib/wolframe/modules/authentication/mod_auth_textfile.so
-%dir %{_prefix}/lib/wolframe/modules/authentication/mod_auth_database.so
-%dir %{_prefix}/lib/wolframe/modules/processor
-%dir %{_prefix}/lib/wolframe/modules/processor/mod_proc_echo.so
+%{_libdir}/wolframe/modules
+%{_libdir}/wolframe/modules/database
+%{_libdir}/wolframe/modules/audit
+%{_libdir}/wolframe/modules/audit//mod_audit_textfile.so
+%{_libdir}/wolframe/modules/audit//mod_audit_database.so
+%{_libdir}/wolframe/modules/authentication
+%{_libdir}/wolframe/modules/authentication/mod_auth_textfile.so
+%{_libdir}/wolframe/modules/authentication/mod_auth_database.so
+%{_libdir}/wolframe/modules/processor
+%{_libdir}/wolframe/modules/processor/mod_proc_echo.so
 
 
 #%dir %{_datadir}/wolframe
@@ -517,19 +522,19 @@ fi
 %if %{with_pgsql}
 %files postgresql
 %defattr( -, root, root )
-%dir %{_prefix}/lib/wolframe/
-%dir %{_prefix}/lib/wolframe/modules
-%dir %{_prefix}/lib/wolframe/modules/database
-%dir %{_prefix}/lib/wolframe/modules/database/mod_db_postgresql.so
+%{_libdir}/wolframe/
+%{_libdir}/wolframe/modules
+%{_libdir}/wolframe/modules/database
+%{_libdir}/wolframe/modules/database/mod_db_postgresql.so
 %endif
 
 %if %{with_sqlite}
 %files sqlite3
 %defattr( -, root, root )
-%dir %{_prefix}/lib/wolframe/
-%dir %{_prefix}/lib/wolframe/modules
-%dir %{_prefix}/lib/wolframe/modules/database
-%dir %{_prefix}/lib/wolframe/modules/database/mod_db_sqlite3.so
+%{_libdir}/wolframe/
+%{_libdir}/wolframe/modules
+%{_libdir}/wolframe/modules/database
+%{_libdir}/wolframe/modules/database/mod_db_sqlite3.so
 %endif
 
 %if %{with_qt}
