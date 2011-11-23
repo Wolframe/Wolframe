@@ -264,6 +264,14 @@ The Wolframe documentation.
 This package contains the one file html documentation,
 multiple file html documentation and the pdf documentation.
 
+
+%package devel
+Summary: Wolframe development files
+Group: Application/Business
+
+%description devel
+The libraries and header files used for development with Wolframe.
+
 %if %{with_pgsql}
 %package postgresql
 Summary: Wolframe Postgresql database module
@@ -475,6 +483,10 @@ fi
 %{_libdir}/wolframe/libboost_date_time.so.%{boost_version}
 %endif
 
+%dir %{_libdir}
+%{_libdir}/libwolframe.so
+%{_libdir}/libwolframe.a
+
 %dir %{_prefix}/lib/wolframe/modules
 %dir %{_prefix}/lib/wolframe/modules/database
 %dir %{_prefix}/lib/wolframe/modules/audit
@@ -495,6 +507,12 @@ fi
 %defattr( -, root, root )
 %dir %{_datadir}/doc/wolframe
 %{_datadir}/doc/wolframe/html
+
+%files devel
+%defattr( -, root, root )
+%dir %{_libdir}
+%{_libdir}/libwolframe.so.0
+%{_libdir}/libwolframe.so.0.0.0
 
 %if %{with_pgsql}
 %files postgresql
