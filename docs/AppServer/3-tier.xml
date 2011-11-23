@@ -23,6 +23,17 @@
 			</mediaobject>
 		</figure>
 
+		<figure>
+			<title>Overview</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="images/VisioTest.svg" format="SVG"
+						scalefit="1" width="100%" contentdepth="100%"/>
+				</imageobject>
+				<caption><para>3-tier architecture</para></caption>
+			</mediaobject>
+		</figure>
+
 		<para></para>
         </sect1>
 </chapter>
