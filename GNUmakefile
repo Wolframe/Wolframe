@@ -16,3 +16,8 @@ PACKAGE_NAME = wolframe
 PACKAGE_VERSION = 0.0.1
 
 -include $(TOPDIR)/makefiles/gmake/top.mk
+
+ifeq ($(WITH_EXAMPLES),1)
+examples: src
+tests: src
+endif
