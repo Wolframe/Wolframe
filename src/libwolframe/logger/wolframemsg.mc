@@ -57,7 +57,8 @@ SeverityNames = (
 ;// facility names
 FacilityNames = (
 	System		= 0x0FF
-	Application	= 0xFFF
+;//MBa newer version complain if Application is defined. We should investigate...
+;//	Application	= 0xFFF
 )
 
 ;// event messages from here, currently one to log a plain text field
