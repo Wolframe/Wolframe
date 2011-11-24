@@ -41,10 +41,10 @@ LOGGER_OBJS = \
 	logger\logger.obj
 
 PROVIDER_OBJS = \
-	AAAA\AAAAprovider.obj \
-	AAAA\AAAAproviderConfig.obj \
-	database\DBprovider.obj \
-	database\databaseConfig.obj
+	provider\AAAAprovider.obj \
+	provider\AAAAproviderConfig.obj \
+	provider\DBprovider.obj \
+	provider\databaseConfig.obj
 
 CPP_OBJS = \
 	$(LOGGER_OBJS) \
