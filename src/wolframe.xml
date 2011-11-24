@@ -33,6 +33,23 @@ Project Wolframe.
 
 <!-- Wolframe configuration file -->
 <configuration>
+
+	<!-- modules to be loaded by the server -->
+	<LoadModules>
+		<module>modules\database\postgresql\mod_db_postgresql.dll</module>
+	</LoadModules>
+<!--	module modules/database/sqlite3/mod_db_sqlite3.so
+
+	module modules/audit/database/mod_audit_database.so
+	module modules/audit/textfile/mod_audit_textfile.so
+	module modules/authentication/database/mod_auth_database.so
+	module modules/authentication/textfile/mod_auth_textfile.so
+
+	module modules/processor/echo/mod_proc_echo.so
+
+}
+-->
+
 	<ServerTokens>OS</ServerTokens>		<!--    Print the application name and version
 							in the initial greeting.
 							Allowed values are:
