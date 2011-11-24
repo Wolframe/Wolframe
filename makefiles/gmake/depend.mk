@@ -45,5 +45,9 @@ ifneq ($(MAKECMDGOALS),distclean)
 -include $(CPP_BIN_OBJS:.o=.d)
 -include $(TEST_BIN_OBJS:.o=.d)
 -include $(TEST_CPP_BIN_OBJS:.o=.d)
+
+.PHONY: depend
+depend: $(OBJS:.o=.d) $(CPP_OBJS:.o=.d) $(BIN_OBJS:.o=.d) $(CPP_BIN_OBJS:.o=.d) $(TEST_BIN_OBJS:.o=.d) $(TEST_CPP_BIN_OBJS:.o=.d)
+
 endif
 endif

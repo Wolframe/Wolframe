@@ -75,7 +75,7 @@ CPP_BINS = \
 modules: libwolframe
 wolframed$(EXE): libwolframe
 
-local_all: $(LOCAL_STATIC_LIB)
+local_all: $(LOCAL_STATIC_LIB) loadModules-dummy.o
 
 $(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
 	ar rcs $(LOCAL_STATIC_LIB) $(LOCAL_STATIC_LIB_OBJS)
