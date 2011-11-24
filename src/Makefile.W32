@@ -71,7 +71,6 @@ CPP_OBJS = \
 	appProperties.obj \
 	appConfigDefinition.obj \
 	$(LOCAL_STATIC_LIB_OBJS) \
-	moduleDirectory.obj \
 	loadModules.obj \
 	wolframeHandler.obj \
 	winMain.obj

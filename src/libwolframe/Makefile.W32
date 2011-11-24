@@ -40,18 +40,16 @@ LOGGER_OBJS = \
 	logger\loggerConfig.obj \
 	logger\logger.obj
 
-AAAA_OBJS = \
+PROVIDER_OBJS = \
 	AAAA\AAAAprovider.obj \
-	AAAA\AAAAproviderConfig.obj
-
-DATABASE_OBJS = \
+	AAAA\AAAAproviderConfig.obj \
 	database\DBprovider.obj \
 	database\databaseConfig.obj
 
 CPP_OBJS = \
 	$(LOGGER_OBJS) \
-	$(DATABASE_OBJS) \
-	$(AAAA_OBJS) \
+	$(PROVIDER_OBJS) \
+	moduleDirectory.obj \
 	resolvePath.obj \
 	referenceConfig.obj
 

@@ -62,7 +62,6 @@ CPP_OBJS = \
 	appProperties.o \
 	appConfigDefinition.o \
 	$(LOCAL_STATIC_LIB_OBJS) \
-	moduleDirectory.o \
 	loadModules.o \
 	wolframeHandler.o \
 	posixMain.o
