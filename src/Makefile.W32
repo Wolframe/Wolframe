@@ -76,7 +76,7 @@ CPP_OBJS = \
 	winMain.obj
 
 CPP_BINS = \
-	wolframed.exe
+	wolframed$(EXE)
 
 all: $(CPP_OBJS) $(CPP_BINS)
 
@@ -91,7 +91,6 @@ $(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
 local_all: $(LOCAL_STATIC_LIB)
 
 local_clean:
-	@-erase MSG*.bin logger\wolframemsg.rc logger\wolframemsg.h logger\wolframemsg.res logger\wolframemsg.dll 2>NUL
 	@-erase $(LOCAL_STATIC_LIB) 2>NUL
 	@-erase $(CPP_OBJS) 2>NUL
 	@-erase test.bat 2>NUL
