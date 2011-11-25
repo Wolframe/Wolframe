@@ -100,11 +100,18 @@ private:
 bool LoadModules( ModulesDirectory& modDir, std::list< std::string >& modFiles );
 
 
-//*********** Module *********
-extern "C" {
-	ModuleContainer* createModule( void );
-	void setModuleLogger( void* logger );
-}
+//*********** Module interface *********
+#if !defined(_WIN32)	// POSIX module loader
+	extern "C" {
+		ModuleContainer* createModule( void );
+		void setModuleLogger( void* logger );
+	}
+#else
+	extern "C" {
+		__declspec( dllexport ) ModuleContainer* createModule( void );
+		__declspec( dllexport ) void setModuleLogger( void* logger );
+	}
+#endif
 
 }} // namespace _Wolframe::module
 

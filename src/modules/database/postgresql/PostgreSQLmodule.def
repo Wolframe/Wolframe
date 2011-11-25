@@ -1,0 +1,6 @@
+LIBRARY mod_db_postgresql
+DESCRIPTION "Wolframe PostgreSQL database module"
+
+EXPORTS
+createModule    @1
+setModuleLogger @1

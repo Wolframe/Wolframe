@@ -70,7 +70,7 @@
 
 			SetModuleLogger setLogger = void_ptr_to_func_ptr_cast<SetModuleLogger>( dlsym( hndl, "setModuleLogger" ) );
 			if ( !setLogger )	{
-				LOG_ERROR << "Module loader creation entry point: " << dlerror();
+				LOG_ERROR << "Module loader logging entry point: " << dlerror();
 				retVal = false;
 				dlclose( hndl );
 				break;
@@ -86,7 +86,7 @@
 	#define WIN32_MEAN_AND_LEAN
 	#include <windows.h>
 	#include <string.h>
-	
+
 	using namespace _Wolframe;
 
 	typedef module::ModuleContainer* (*CreateFunction)();
@@ -99,7 +99,7 @@
 		DWORD last_error;
 
 		last_error = GetLastError( );
-	
+
 		res = FormatMessage(
 			FORMAT_MESSAGE_ALLOCATE_BUFFER |
 			FORMAT_MESSAGE_FROM_SYSTEM |
@@ -111,14 +111,14 @@
 			(LPTSTR)&errbuf,	/* buffer allocated internally with LocalAlloc */
 			0,			/* minimum allocation size */
 			NULL );			/* no arguments */
-		
+
 		if( res == 0 ) {
 			strncpy( buf, "No message available", buflen );
 		} else {
 			strncpy( buf, errbuf, buflen );
 			LocalFree( errbuf );
 		}
-	
+
 		return buf;
 	}
 
@@ -144,7 +144,7 @@
 			}
 			SetModuleLogger setLogger = (SetModuleLogger)GetProcAddress( hndl, "setModuleLogger" );
 			if ( !setLogger )	{
-				LOG_ERROR << "Module loader creation entry point error: " << getLastError( buf, 512 );
+				LOG_ERROR << "Module loader logging entry point error: " << getLastError( buf, 512 );
 				retVal = false;
 				(void)FreeLibrary( hndl );
 				break;
