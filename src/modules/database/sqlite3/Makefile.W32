@@ -38,6 +38,7 @@ $(DYNAMIC_MODULE): $(CPP_OBJS)
 local_all:
 
 local_clean:
+	@-erase $(TOPDIR)\sqlite3\*.obj 2>NUL
 
 local_distclean:
 

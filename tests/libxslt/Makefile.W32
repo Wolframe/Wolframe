@@ -32,7 +32,7 @@ testlibxslt1.exe: testlibxslt1.obj
 local_all:
 
 local_clean:
-	@-erase test.res 2>NUL
+	@-erase test.RES 2>NUL
 
 local_distclean:
 
