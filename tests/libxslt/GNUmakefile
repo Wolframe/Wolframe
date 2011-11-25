@@ -43,7 +43,7 @@ local_distclean:
 
 local_test: $(TEST_CPP_BINS)
 	@./testlibxslt1 test1.xslt test1.xml > test1.RES
-	@diff test1.RES test1.MUST
+	@comp /L test1.RES test1.MUST
 	@echo
 	@echo
 
