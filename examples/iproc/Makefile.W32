@@ -129,7 +129,10 @@ local_test: $(TEST_CPP_BINS)
 	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" tests >> test.bat
 !ENDIF
 !IFDEF WITH_LUA
-	@-echo copy "$(LUA_DIR)\src\lua51.dll" . >> test.bat
+	@-echo copy "$(LUA_DIR)\src\lua51.dll" tests >> test.bat
+!ENDIF
+!IFDEF WITH_LIBXML2
+	@-echo copy "$(LIBXML2_DIR)\lib\libxml2.dll" tests >> test.bat
 !ENDIF
 	@-echo cd tests >> test.bat
 	@-echo iprocHandlerXMLTest.exe >> test.bat
