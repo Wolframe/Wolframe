@@ -33,12 +33,12 @@ local_clean:
 local_distclean:
 
 local_install:
-	$(INSTALL) -d -m 0755 $(bindir)
-	$(INSTALL) -m 0755 $(CPP_BINS) $(bindir)
+	$(INSTALL) -d -m 0755 $(DESTDIR)$(bindir)
+	$(INSTALL) -m 0755 $(CPP_BINS) $(DESTDIR)$(bindir)
 
 local_uninstall:
-	-rm -f $(bindir)/wtclient$(EXE)
-	-rmdir $(bindir)
+	-rm -f $(DESTDIR)$(bindir)/wtclient$(EXE)
+	-rmdir $(DESTDIR)$(bindir)
 	
 FORMS = \
 	forms/form1.ui \

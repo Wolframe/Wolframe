@@ -74,17 +74,17 @@ all_po: $(MO_FILES)
 install_po:
 	@test -z "$(GETTEXT_LANGUAGES)" || \
 		for lang in $(GETTEXT_LANGUAGES)""; do ( \
-			echo "installing po/$$lang.mo to $(localedir)/$$lang/LC_MESSAGES.." && \
-			$(INSTALL) -d -m 755 $(localedir)/$$lang/LC_MESSAGES && \
-			$(INSTALL) -m 644 po/$$lang.mo $(localedir)/$$lang/LC_MESSAGES/$(CATALOG_NAME).mo || exit 1 \
+			echo "installing po/$$lang.mo to $(DESTDIR)$(localedir)/$$lang/LC_MESSAGES.." && \
+			$(INSTALL) -d -m 755 $(DESTDIR)$(localedir)/$$lang/LC_MESSAGES && \
+			$(INSTALL) -m 644 po/$$lang.mo $(DESTDIR)$(localedir)/$$lang/LC_MESSAGES/$(CATALOG_NAME).mo || exit 1 \
 		) done
 
 uninstall_po:
 	@test -z "$(GETTEXT_LANGUAGES)" || \
 		for lang in $(GETTEXT_LANGUAGES)""; do ( \
-			echo "uninstalling $(localedir)/$$lang/LC_MESSAGES.." && \
-			rm $(localedir)/$$lang/LC_MESSAGES/$(CATALOG_NAME).mo && \
-			rmdir $(localedir)/$$lang/LC_MESSAGES || exit 1 \
+			echo "uninstalling $(DESTDIR)$(localedir)/$$lang/LC_MESSAGES.." && \
+			rm $(DESTDIR)$(localedir)/$$lang/LC_MESSAGES/$(CATALOG_NAME).mo && \
+			rmdir $(DESTDIR)$(localedir)/$$lang/LC_MESSAGES || exit 1 \
 		) done
 
 else

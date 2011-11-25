@@ -31,13 +31,13 @@ local_clean:
 local_distclean:
 
 local_install:
-	$(INSTALL) -d -m 0755 $(libdir)/wolframe/modules/processor
-	$(INSTALL) -m 0775 $(DYNAMIC_MODULE) $(libdir)/wolframe/modules/processor
+	$(INSTALL) -d -m 0755 $(DESTDIR)$(libdir)/wolframe/modules/processor
+	$(INSTALL) -m 0775 $(DYNAMIC_MODULE) $(DESTDIR)$(libdir)/wolframe/modules/processor
 
 local_uninstall:
-	-rm "$(libdir)/wolframe/modules/processor/$(DYNAMIC_MODULE)
-	-rmdir $(libdir)/wolframe/modules/processor
-	-rmdir $(libdir)/wolframe/modules
+	-rm $(DESTDIR)$(libdir)/wolframe/modules/processor/$(DYNAMIC_MODULE)
+	-rmdir $(DESTDIR)$(libdir)/wolframe/modules/processor
+	-rmdir $(DESTDIR)$(libdir)/wolframe/modules
 
 local_test:
 

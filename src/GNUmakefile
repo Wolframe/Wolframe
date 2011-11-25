@@ -85,10 +85,10 @@ local_clean:
 local_distclean:
 
 local_install:
-	$(INSTALL) -d -m 0755 $(sbindir)
-	$(INSTALL) -m 0775 $(CPP_BINS) $(sbindir)
-	$(INSTALL) -d -m 0755 $(sysconfdir)/wolframe
-	$(INSTALL) -m 0755 wolframe.conf $(sysconfdir)/wolframe
+	$(INSTALL) -d -m 0755 $(DESTDIR)$(sbindir)
+	$(INSTALL) -m 0775 $(CPP_BINS) $(DESTDIR)$(sbindir)
+	$(INSTALL) -d -m 0755 $(DESTDIR)$(sysconfdir)/wolframe
+	$(INSTALL) -m 0755 wolframe.conf $(DESTDIR)$(sysconfdir)/wolframe
 
 local_test:
 

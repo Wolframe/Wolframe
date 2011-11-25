@@ -67,7 +67,7 @@ install: build
 
 	# main package
 	$(MAKE) install $(WOLFRAME_PARAMS) \
-		sysconfdir=/usr/src/packages/BUILD/debian/wolframe/etc \
+		sysconfdir=/etc \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe
 	cd clients; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \

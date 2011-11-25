@@ -13,7 +13,7 @@ DESTDIR=
 prefix=/usr
 
 # standard directories following FHS
-execdir=$(DESTDIR)$(prefix)
+execdir=$(prefix)
 bindir=$(execdir)/bin
 sbindir=$(execdir)/sbin
 libdir=$(execdir)/lib
@@ -29,20 +29,20 @@ install_recursive:
 	  (set -e; $(MAKE) -C $$d install || exit 1); done)
 
 install: install_recursive local_install install_po
-	@test -d "$(libdir)" || mkdir -p "$(libdir)"
+	@test -d "$(DESTDIR)$(libdir)" || mkdir -p "$(DESTDIR)$(libdir)"
 	@test -z "$(STATIC_LIB)" || ( \
-		$(INSTALL) -m 644 $(STATIC_LIB) $(libdir)/$(STATIC_LIB) )
+		$(INSTALL) -m 644 $(STATIC_LIB) $(DESTDIR)$(libdir)/$(STATIC_LIB) )
 	@test -z "$(DYNAMIC_LIB)" || ( \
 		$(INSTALL) -m 755 $(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR).$(DYNAMIC_LIB_MINOR).$(DYNAMIC_LIB_PATCH) \
-			$(libdir)/$(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR).$(DYNAMIC_LIB_MINOR).$(DYNAMIC_LIB_PATCH) )
+			$(DESTDIR)$(libdir)/$(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR).$(DYNAMIC_LIB_MINOR).$(DYNAMIC_LIB_PATCH) )
 	@test -z "$(DYNAMIC_LIB)" || ( \
-		rm -f "$(libdir)/$(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR)" && \
+		rm -f "$(DESTDIR)$(libdir)/$(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR)" && \
 		ln -s "$(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR).$(DYNAMIC_LIB_MINOR).$(DYNAMIC_LIB_PATCH)" \
-			"$(libdir)/$(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR)" )
+			"$(DESTDIR)$(libdir)/$(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR)" )
 	@test -z "$(DYNAMIC_LIB)" || ( \
-		rm -f "$(libdir)/$(DYNAMIC_LIB)" && \
+		rm -f "$(DESTDIR)$(libdir)/$(DYNAMIC_LIB)" && \
 		ln -s "$(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR).$(DYNAMIC_LIB_MINOR).$(DYNAMIC_LIB_PATCH)" \
-			"$(libdir)/$(DYNAMIC_LIB)" )
+			"$(DESTDIR)$(libdir)/$(DYNAMIC_LIB)" )
 
 .PHONY: uninstall_recursive uninstall local_uninstall
 
@@ -52,13 +52,13 @@ uninstall_recursive:
 
 uninstall: uninstall_recursive local_uninstall uninstall_po
 	test -z "$(DYNAMIC_LIB)" || ( \
-		test ! -f "$(libdir)/$(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR).$(DYNAMIC_LIB_MINOR).$(DYNAMIC_LIB_PATCH)" || \
-			rm "$(libdir)/$(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR).$(DYNAMIC_LIB_MINOR).$(DYNAMIC_LIB_PATCH)" )
+		test ! -f "$(DESTDIR)$(libdir)/$(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR).$(DYNAMIC_LIB_MINOR).$(DYNAMIC_LIB_PATCH)" || \
+			rm "$(DESTDIR)$(libdir)/$(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR).$(DYNAMIC_LIB_MINOR).$(DYNAMIC_LIB_PATCH)" )
 	test -z "$(DYNAMIC_LIB)" || ( \
-		test ! -h "$(libdir)/$(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR)" || \
-			rm "$(libdir)/$(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR)" )
+		test ! -h "$(DESTDIR)$(libdir)/$(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR)" || \
+			rm "$(DESTDIR)$(libdir)/$(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR)" )
 	test -z "$(DYNAMIC_LIB)" || ( \
-		test ! -h "$(libdir)/$(DYNAMIC_LIB)" || \
-			rm "$(libdir)/$(DYNAMIC_LIB)" )
+		test ! -h "$(DESTDIR)$(libdir)/$(DYNAMIC_LIB)" || \
+			rm "$(DESTDIR)$(libdir)/$(DYNAMIC_LIB)" )
 	test -z "$(STATIC_LIB)" || ( \
-		test ! -f "$(libdir)/$(STATIC_LIB)" || rm "$(libdir)/$(STATIC_LIB)" )
+		test ! -f "$(DESTDIR)$(libdir)/$(STATIC_LIB)" || rm "$(DESTDIR)$(libdir)/$(STATIC_LIB)" )
