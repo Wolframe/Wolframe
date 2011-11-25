@@ -97,8 +97,8 @@ run: $(CPP_BINS)
 	@-echo copy $(QT_DIR)\bin\QtGui4.dll . >> test.bat
 	@-echo copy $(QT_DIR)\bin\QtNetwork4.dll . >> test.bat
 !IFDEF WITH_SSL
-	@-echo copy $(OPENSSL_DIR)\bin\libeay32.dll . >> test.bat
-	@-echo copy $(OPENSSL_DIR)\bin\ssleay32.dll . >> test.bat
+	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat
+	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >> test.bat
 !ENDIF
 	@-echo echo Testing Qt client... >> test.bat
 	@-echo qtclient.exe >> test.bat
