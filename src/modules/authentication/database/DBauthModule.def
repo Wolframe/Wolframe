@@ -1,0 +1,6 @@
+LIBRARY mod_auth_database
+DESCRIPTION "Wolframe module"
+
+EXPORTS
+createModule    @1
+setModuleLogger @1

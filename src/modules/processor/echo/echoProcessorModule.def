@@ -1,0 +1,6 @@
+LIBRARY mod_proc_echo
+DESCRIPTION "Wolframe module"
+
+EXPORTS
+createModule    @1
+setModuleLogger @1
