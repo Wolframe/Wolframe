@@ -10,12 +10,14 @@
 
 .PHONY: dist dist-bz2 dist-gz dist-Z
 
+TMPDIR ?= /tmp
+
 dist:
 	-@rm -rf $(PACKAGE_NAME)-$(PACKAGE_VERSION)
-	-@rm -rf /tmp/$(PACKAGE_NAME)-$(PACKAGE_VERSION)
-	mkdir /tmp/$(PACKAGE_NAME)-$(PACKAGE_VERSION)
-	cp -r * /tmp/$(PACKAGE_NAME)-$(PACKAGE_VERSION)/.
-	-@cd /tmp/$(PACKAGE_NAME)-$(PACKAGE_VERSION) ; \
+	-@rm -rf $(TMPDIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION)
+	mkdir $(TMPDIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION)
+	cp -r * $(TMPDIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION)/.
+	-@cd $(TMPDIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION) ; \
 		$(MAKE) distclean ; \
 		rm -f makefiles/gmake/platform.mk.vars; \
 		find . -name .svn -exec rm -rf {} \; ; \
@@ -23,8 +25,8 @@ dist:
 		cd .. ; \
 		tar cvf $(PACKAGE_NAME)-$(PACKAGE_VERSION).tar \
 			$(PACKAGE_NAME)-$(PACKAGE_VERSION)
-	-@rm -rf /tmp/$(PACKAGE_NAME)-$(PACKAGE_VERSION)
-	@mv /tmp/$(PACKAGE_NAME)-$(PACKAGE_VERSION).tar .
+	-@rm -rf $(TMPDIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION)
+	@mv $(TMPDIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION).tar .
 
 dist-bz2: dist
 	-@rm -rf $(PACKAGE_NAME)-$(PACKAGE_VERSION).bz2
