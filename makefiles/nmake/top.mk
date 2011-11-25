@@ -11,7 +11,6 @@
 # - target 'test'
 # - target 'longtest'
 # - target 'doc'
-# - target 'dist'
 # - target 'help'
 
 all:
@@ -22,11 +21,6 @@ clean:
 
 distclean:
 	@if not "$(SUBDIRS)" == "" @for %%d IN ( $(SUBDIRS) ) do @cd %%d & $(MAKE) /nologo /f Makefile.w32 distclean & cd ..
-
-#.PHONY: install
-#install:
-#	@test -z "$(SUBDIRS)" || ( set -e; for d in $(SUBDIRS)""; do \
-#	  (set -e; $(MAKE) -C $$d install || exit 1); done)
 
 test: all
 	@if not "$(SUBDIRS)" == "" @for %%d IN ( $(SUBDIRS) ) do @cd %%d & $(MAKE) /nologo /f Makefile.w32 test & cd ..
@@ -39,5 +33,3 @@ doc:
 
 help:
 	@type makefiles\nmake\help.mk
-
-#-include $(TOPDIR)/makefiles/gmake/dist.mk

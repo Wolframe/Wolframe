@@ -1,14 +1,13 @@
 # sets compiler settings
 #
 # requires:
-# - INCLUDE_DIRS
-#
+# - INCLUDE_DIRS: directories searched for includes (/I)
+# - INCLUDE_CFLAGS: specific compilation flags (C)
+# - INCLUDE_CPPFLAGS: specific compilation flags (C++)
+# - INCLUDE_LDFLAGS: library flags like like link location (/L)
+# - INCLUDE_LIBS: additional libraries to link against (e.g. advapi32.dll)
 # provides:
-# - BIN_OBJS: the object files we need for the binaries which we build always
-# - CPP_BIN_OBJS: same for binaries which have C++ code in them
-# - TEST_BIN_OBJS: same as BIN_OBJS but for test binaries compiled only when
-#   testing
-# - TEST_CPP_BIN_OBJS: same for C++ tests
+# - generic implicit rules for compilation/linking
 #
 
 # TODO: which flags to enable?
@@ -24,11 +23,9 @@
 # /Wp64 breaks Qt and SSL
 # /Wall: enable all warnings (produces tons of warnings!)
 # /WX: treat warnings as errors
-# /D_SCL_SECURE_NO_WARNINGS=1: disable security CRT warnings in C library
-# /D_CRT_SECURE_NO_WARNINGS=1: dito
 
 # compilation flags and compilers (release)
-COMMON_COMPILE_FLAGS = /MD /D_SCL_SECURE_NO_WARNINGS=1 /D_CRT_SECURE_NO_WARNINGS=1 /W2 /WX /nologo /O2 /EHsc /c $(INCLUDE_DIRS)
+COMMON_COMPILE_FLAGS = /MD /W2 /WX /nologo /O2 /EHsc /c $(INCLUDE_DIRS)
 
 # compilation flags and compilers (debug)
 #COMMON_COMPILE_FLAGS = /MDd /Zi /D_SCL_SECURE_NO_WARNINGS=1 /D_CRT_SECURE_NO_WARNINGS=1 /W2 /WX /nologo /O2 /EHsc /c $(INCLUDE_DIRS)
@@ -41,9 +38,9 @@ CFLAGS = $(COMPILE_FLAGS) $(PLATFORM_COMPILE_FLAGS) $(INCLUDE_CFLAGS) $(DEBUGLEV
 CCPPFLAGS = $(CCPP_COMPILE_FLAGS) $(PLATFORM_COMPILE_FLAGS) $(INCLUDE_CPPFLAGS) $(DEBUGLEVELFLAGS)
 CC = cl.exe
 CCPP = cl.exe
-MC = "$(PLATFORM_SDK_DIR)\Bin\mc.exe"
+MC = mc.exe
 MT = mt.exe
-RC = "$(PLATFORM_SDK_DIR)\Bin\rc.exe"
+RC = rc.exe
 
 # linking flags (release)
 LDFLAGS = /nologo $(INCLUDE_LDFLAGS)
@@ -74,27 +71,7 @@ CCPP_LINK = link.exe
 	$(MT) -nologo -manifest $@.manifest -outputresource:$@;1
 
 .mc.rc:
-	$(MC) -h $(@D) -r $(@D) $<
+	"$(MC)" -h $(@D) -r $(@D) $<
 
 .rc.res:
 	$(RC) $<
-
-#%$(EXE): %.o $(OBJS) $(TEST_OBJS)
-#	$(LINK) -o $@ $(LDFLAGS) $(OBJS) $(TEST_OBJS) $< $(LIBS)
-
-#%.sho : %.c
-#	$(CC) -c -o $@ -fPIC -DSHARED $(CFLAGS) $<
-
-#%$(SO) : %.sho $(OBJS)
-#	$(LINK) -shared -o $@ $(LDFLAGS) $(LIBS) $(OBJS) $<
-
-#%.sho++ : %.cpp
-#	$(CCPP) -c -o $@ -fPIC -DSHARED $(CCPPFLAGS) $<
-
-#%$(SO) : %.sho++ $(OBJS) $(CPPOBJS)
-#	$(CCPP_LINK) -shared -o $@ $(LDFLAGS) $(LIBS) $(OBJS) $(CPPOBJS) $<
- 
-#BIN_OBJS = $(BINS:$(EXE)=.o) 
-#TEST_BIN_OBJS = $(TEST_BINS:$(EXE)=.o)
-#CPP_BIN_OBJS = $(CPP_BINS:$(EXE)=.o)
-#TEST_CPP_BIN_OBJS = $(TEST_CPP_BINS:$(EXE)=.o)

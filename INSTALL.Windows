@@ -3,6 +3,8 @@ Prerequisites
 
 - Visual C++ (cl, link and nmake), VC8 or later
 - Platform SDK 6.0a or later
+- mc.exe may be missing in your path, usually it is available
+  as part of the SDK, copy it into the path
 - boost 1.43.0 or later
 - optionally (WITH_SSL) openssl 0.9.8 or later
 - optionally (WITH_LUA) lua 5.1.4 with LuaCoco-1.1.6
