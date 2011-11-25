@@ -85,15 +85,47 @@
 
 	#define WIN32_MEAN_AND_LEAN
 	#include <windows.h>
-
+	#include <string.h>
+	
 	using namespace _Wolframe;
 
 	typedef module::ModuleContainer* (*CreateFunction)();
 	typedef void (*SetModuleLogger)( void* );
 
+	char *getLastError( char *buf, size_t buflen ) {
+		LPTSTR errbuf;
+		DWORD errbuf_len;
+		DWORD res;
+		DWORD last_error;
+
+		last_error = GetLastError( );
+	
+		res = FormatMessage(
+			FORMAT_MESSAGE_ALLOCATE_BUFFER |
+			FORMAT_MESSAGE_FROM_SYSTEM |
+			FORMAT_MESSAGE_IGNORE_INSERTS |
+			FORMAT_MESSAGE_MAX_WIDTH_MASK,
+			NULL,			/* message is from system */
+			last_error,		/* there is a message with that id */
+			0,			/* default language preference */
+			(LPTSTR)&errbuf,	/* buffer allocated internally with LocalAlloc */
+			0,			/* minimum allocation size */
+			NULL );			/* no arguments */
+		
+		if( res == 0 ) {
+			strncpy( buf, "No message available", buflen );
+		} else {
+			strncpy( buf, errbuf, buflen );
+			LocalFree( errbuf );
+		}
+	
+		return buf;
+	}
+
 	bool module::LoadModules( ModulesDirectory& modDir, std::list< std::string >& modFiles )
 	{
 		bool retVal = true;
+		char buf[512];
 
 		for ( std::list< std::string >::const_iterator it = modFiles.begin();
 								it != modFiles.end(); it++ )	{
@@ -105,7 +137,7 @@
 			}
 			CreateFunction create = (CreateFunction)GetProcAddress( hndl, "createModule" );
 			if ( !create )	{
-				LOG_ERROR << "Module loader creation entry point error";
+				LOG_ERROR << "Module loader creation entry point error: " << getLastError( buf, 512 );
 				retVal = false;
 				(void)FreeLibrary( hndl );
 				break;
