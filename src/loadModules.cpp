@@ -131,7 +131,7 @@
 								it != modFiles.end(); it++ )	{
 			HMODULE hndl = LoadLibrary( it->c_str( ) );
 			if ( !hndl )	{
-				LOG_ERROR << "Module loader error";
+				LOG_ERROR << "Module loader error: " << getLastError( buf, 512 );
 				retVal = false;
 				break;
 			}
@@ -144,7 +144,7 @@
 			}
 			SetModuleLogger setLogger = (SetModuleLogger)GetProcAddress( hndl, "setModuleLogger" );
 			if ( !setLogger )	{
-				LOG_ERROR << "Module loader creation entry point error";
+				LOG_ERROR << "Module loader creation entry point error: " << getLastError( buf, 512 );
 				retVal = false;
 				(void)FreeLibrary( hndl );
 				break;
