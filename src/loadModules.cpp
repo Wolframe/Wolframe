@@ -53,16 +53,19 @@
 
 		for ( std::list< std::string >::const_iterator it = modFiles.begin();
 								it != modFiles.end(); it++ )	{
+			LOG_TRACE << "Loading module '" << *it << "'";
 			void* hndl = dlopen( it->c_str(), RTLD_LAZY );
 			if ( !hndl )	{
-				LOG_ERROR << "Module loader: " << dlerror();
+				LOG_ERROR << "Module loader: " << dlerror()
+					  << ", (module '" << *it << "')";
 				retVal = false;
 				break;
 			}
 
 			CreateFunction create = void_ptr_to_func_ptr_cast<CreateFunction>( dlsym( hndl, "createModule" ) );
 			if ( !create )	{
-				LOG_ERROR << "Module loader creation entry point: " << dlerror();
+				LOG_ERROR << "Module creation entry point: " << dlerror()
+					  << ", (module '" << *it << "')";
 				retVal = false;
 				dlclose( hndl );
 				break;
@@ -70,7 +73,8 @@
 
 			SetModuleLogger setLogger = void_ptr_to_func_ptr_cast<SetModuleLogger>( dlsym( hndl, "setModuleLogger" ) );
 			if ( !setLogger )	{
-				LOG_ERROR << "Module loader logging entry point: " << dlerror();
+				LOG_ERROR << "Module logging entry point: " << dlerror()
+					  << ", (module '" << *it << "')";
 				retVal = false;
 				dlclose( hndl );
 				break;
@@ -129,22 +133,26 @@
 
 		for ( std::list< std::string >::const_iterator it = modFiles.begin();
 								it != modFiles.end(); it++ )	{
+			LOG_TRACE << "Loading module '" << *it << "'";
 			HMODULE hndl = LoadLibrary( it->c_str( ) );
 			if ( !hndl )	{
-				LOG_ERROR << "Module loader error: " << getLastError( buf, 512 );
+				LOG_ERROR << "Module loader: " << getLastError( buf, 512 )
+					  << ", (module '" << *it << "')";
 				retVal = false;
 				break;
 			}
 			CreateFunction create = (CreateFunction)GetProcAddress( hndl, "createModule" );
 			if ( !create )	{
-				LOG_ERROR << "Module loader creation entry point error: " << getLastError( buf, 512 );
+				LOG_ERROR << "Module creation entry point: " << getLastError( buf, 512 )
+					  << ", (module '" << *it << "')";
 				retVal = false;
 				(void)FreeLibrary( hndl );
 				break;
 			}
 			SetModuleLogger setLogger = (SetModuleLogger)GetProcAddress( hndl, "setModuleLogger" );
 			if ( !setLogger )	{
-				LOG_ERROR << "Module loader logging entry point error: " << getLastError( buf, 512 );
+				LOG_ERROR << "Module logging entry point: " << getLastError( buf, 512 )
+					  << ", (module '" << *it << "')";
 				retVal = false;
 				(void)FreeLibrary( hndl );
 				break;
