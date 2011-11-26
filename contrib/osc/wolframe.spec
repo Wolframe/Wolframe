@@ -537,12 +537,18 @@ fi
 %if %{with_pgsql}
 %files postgresql
 %defattr( -, root, root )
+%{_libdir}/wolframe
+%{_libdir}/wolframe/modules
+%{_libdir}/wolframe/modules/database
 %{_libdir}/wolframe/modules/database/mod_db_postgresql.so
 %endif
 
 %if %{with_sqlite}
 %files sqlite3
 %defattr( -, root, root )
+%{_libdir}/wolframe
+%{_libdir}/wolframe/modules
+%{_libdir}/wolframe/modules/database
 %{_libdir}/wolframe/modules/database/mod_db_sqlite3.so
 %endif
 
