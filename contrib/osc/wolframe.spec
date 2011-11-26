@@ -515,25 +515,34 @@ fi
 
 %files devel
 %defattr( -, root, root )
-%dir %{_libdir}
 %{_libdir}/libwolframe.so.0
 %{_libdir}/libwolframe.so.0.0.0
+%dir %{_includedir}/wolframe
+%{_includedir}/wolframe/*.hpp
+%dir %{_includedir}/wolframe/config/
+%{_includedir}/wolframe/config/*.hpp
+%dir %{_includedir}/wolframe/AAAA/
+%{_includedir}/wolframe/AAAA/*.hpp
+%dir %{_includedir}/wolframe/processor/
+%{_includedir}/wolframe/processor/*.hpp
+%dir %{_includedir}/wolframe/logger/
+%{_includedir}/wolframe/logger/*.hpp
+%dir %{_includedir}/wolframe/serialize/
+%{_includedir}/wolframe/serialize/*.hpp
+%dir %{_includedir}/wolframe/database/
+%{_includedir}/wolframe/database/*.hpp
+%dir %{_includedir}/wolframe/protocol/
+%{_includedir}/wolframe/protocol/*.hpp
 
 %if %{with_pgsql}
 %files postgresql
 %defattr( -, root, root )
-%{_libdir}/wolframe/
-%{_libdir}/wolframe/modules
-%{_libdir}/wolframe/modules/database
 %{_libdir}/wolframe/modules/database/mod_db_postgresql.so
 %endif
 
 %if %{with_sqlite}
 %files sqlite3
 %defattr( -, root, root )
-%{_libdir}/wolframe/
-%{_libdir}/wolframe/modules
-%{_libdir}/wolframe/modules/database
 %{_libdir}/wolframe/modules/database/mod_db_sqlite3.so
 %endif
 
