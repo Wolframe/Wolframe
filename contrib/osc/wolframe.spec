@@ -488,15 +488,14 @@ fi
 %{_libdir}/wolframe/libboost_date_time.so.%{boost_version}
 %endif
 
-%dir %{_libdir}
 %{_libdir}/libwolframe.so
 %{_libdir}/libwolframe.a
 
 %{_libdir}/wolframe/modules
 %{_libdir}/wolframe/modules/database
 %{_libdir}/wolframe/modules/audit
-%{_libdir}/wolframe/modules/audit//mod_audit_textfile.so
-%{_libdir}/wolframe/modules/audit//mod_audit_database.so
+%{_libdir}/wolframe/modules/audit/mod_audit_textfile.so
+%{_libdir}/wolframe/modules/audit/mod_audit_database.so
 %{_libdir}/wolframe/modules/authentication
 %{_libdir}/wolframe/modules/authentication/mod_auth_textfile.so
 %{_libdir}/wolframe/modules/authentication/mod_auth_database.so
