@@ -40,7 +40,7 @@ PROVIDER_OBJS = \
 	provider\AAAAprovider.obj \
 	provider\AAAAproviderConfig.obj \
 	provider\DBprovider.obj \
-	provider\databaseConfig.obj
+	provider\DBproviderConfig.obj
 
 CPP_OBJS = \
 	$(LOGGER_OBJS) \

@@ -31,7 +31,7 @@
 
 ************************************************************************/
 //
-// database configuration functions
+// database provider configuration functions
 //
 
 #include "DBproviderImpl.hpp"
@@ -86,11 +86,6 @@ bool DBproviderConfig::parse( const config::ConfigurationTree& pt,
 	return retVal;
 }
 
-} // namespace config
-
-namespace db {
-
-//***  Generic database functions  **************************************
 DBproviderConfig::~DBproviderConfig()
 {
 	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_dbConfig.begin();
