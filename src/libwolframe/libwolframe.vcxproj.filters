@@ -36,6 +36,9 @@
     <ClInclude Include="logger\logBackendSyslog.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="logger\syslog_win32.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="logger\logBackendConsole.cpp">
@@ -83,10 +86,13 @@
     <ClCompile Include="provider\AAAAproviderConfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="provider\databaseConfig.cpp">
+    <ClCompile Include="provider\DBprovider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="provider\DBprovider.cpp">
+    <ClCompile Include="provider\DBproviderConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="logger\syslog_win32.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
