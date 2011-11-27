@@ -73,7 +73,7 @@
 #if !defined( _WIN32 )
 #include <syslog.h>
 #else
-#include "logger/syslog_win32.h"
+#include "syslog_win32.h"
 #endif
 
 namespace _Wolframe {

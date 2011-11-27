@@ -65,7 +65,7 @@
  * - handle more options
  */
 
-#include "logger/syslog_win32.h"
+#include "syslog_win32.h"
 
 #include <Winsock2.h>
 #include <ws2tcpip.h>
@@ -256,8 +256,6 @@ void closelog( )
 
 void set_syslogd_destination( const char *hostname, const char *service )
 {
-	strncpy( syslog_hostname, hostname,
-		( strlen( hostname ) > 255 ) ? strlen( hostname ) : 255 );
-	strncpy( syslog_service, service,
-		( strlen( service ) > 255 ) ? strlen( service ) : 255 );
+	strncpy_s( syslog_hostname, 255, hostname, _TRUNCATE );
+	strncpy_s( syslog_service, 255, service, _TRUNCATE );
 }
