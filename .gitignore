@@ -1,5 +1,6 @@
 Wolframe.creator.user*
 Wolframe.suo
+Wolframe2008.suo
 Wolframe.sdf
 src/libwolframe/libwolframe.vcxproj.user
 src/modules/*/*/*.vcxproj.user
