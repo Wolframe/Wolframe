@@ -1,9 +1,8 @@
 Wolframe.creator.user*
 Wolframe.suo
-Wolframe.ncb
-Wolframe.vcproj.*
-Debug
-x64
+Wolframe.sdf
+src/libwolframe/libwolframe.vcxproj.user
+src/modules/*/*/*.vcxproj.user
 *~
 *.o
 *.d
