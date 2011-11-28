@@ -514,8 +514,9 @@ LUA_PLATFORM_LDFLAGS = -ldl
 endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
-LUA_PLATFORM_CFLAGS = -DLUA_USE_POSIX
+LUA_PLATFORM_CFLAGS = -DLUA_USE_LINUX
 LUA_PLATFORM_LDFLAGS =
+LUA_PLATFORM_LIBS = -Wl,-E -lreadline
 endif
 
 endif
@@ -652,6 +653,15 @@ endif
 
 endif
 
+endif
+
+ifeq "$(PLATFORM)" "FREEBSD"
+ifeq "$(OS_MAJOR_VERSION)" "8"
+QT_DIR ?= /usr/local/lib/qt4
+QT_INCLUDE_DIR ?= $(QT_DIR)/include
+QT_LIB_DIR ?= $(QT_DIR)/lib
+QT_MOC ?= $(QT_DIR)/bin/moc
+endif
 endif
 
 endif
