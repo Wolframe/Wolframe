@@ -37,7 +37,7 @@ Project Wolframe.
 #include "serialize/mapContext.hpp"
 #include "serialize/luamapTraits.hpp"
 #include <boost/utility/value_init.hpp> 
-#include <vector> 
+#include <vector>
 
 namespace _Wolframe {
 namespace serialize {
@@ -95,7 +95,7 @@ bool printObject_( const void* obj, const struct_&, lua_State* ls, Context* ctx)
 			ctx->setError( itr->first);
 			return false;
 		}
-		lua_settable( ls, -2);
+		lua_settable( ls, -3);
 		++itr;
 	}
 	return true;
@@ -116,12 +116,12 @@ bool printObject_( const void* obj, const vector_&, lua_State* ls, Context* ctx)
 	typename T::const_iterator itr = ((T*)obj)->begin();
 	while (itr != ((T*)obj)->end())
 	{
-		lua_pushnumber( ls, ++index);
+		lua_pushnumber( ls, (lua_Number)(++index));
 		if (!IntrusivePrinter<typename T::value_type>::print( (const void*)&(*itr), ls, ctx))
 		{
 			return false;
 		}
-		lua_settable( ls, -2);
+		lua_settable( ls, -3);
 		++itr;
 	}
 	return true;
@@ -136,83 +136,6 @@ struct IntrusivePrinter
 	}
 };
 
-/* Aba, Windows: This gives:
-
-	cl.exe /MD /D_SCL_SECURE_NO_WARNINGS=1 /D_CRT_SECURE_NO_WARNINGS=1 /W2 /WX /nologo /O2 /EHsc /c /I.  /I..\..\include  /I"C:\Cygwin\home\Andreas\boost_1_46_0-win64\Include\boost-1_46"  /I"C:\Program Files\Microsoft SDKs\Windows\v7.0\Include"  /I..\..\gtest\include /I..\..\lua\src  /I. /I"C:\cygwin\home\Andreas\libxml2-2.7.8.win64\include"  /I"C:\cygwin\home\Andreas\libxml2-2.7.8.win64\include\libxml" /EHsc  /D_WIN32_WINNT=0x504  /DWITH_LIBXML2  /Fotests\luamapParser.obj tests\luamapParser.cpp
-luamapParser.cpp
-.\serialize/luamapPrint.hpp(119) : error C2220: warning treated as error - no 'object' file generated
-        .\serialize/luamapPrint.hpp(135) : see reference to function template instantiation 'bool _Wolframe::serialize::printObject_<T>(const void *,const _Wolframe::serialize::vector_ &,lua_State *,_Wolframe::serialize::Context *)' being compiled
-        with
-        [
-            T=std::vector<testing::internal::string>
-        ]
-        .\serialize/luamapPrint.hpp(134) : while compiling class template member function 'bool _Wolframe::serialize::IntrusivePrinter<T>::print(const void *,lua_State *,_Wolframe::serialize::Context *)'
-        with
-        [
-            T=std::vector<testing::internal::string>
-        ]
-        .\serialize/luamapDescription.hpp(81) : see reference to class template instantiation '_Wolframe::serialize::IntrusivePrinter<T>' being compiled
-        with
-        [
-            T=std::vector<testing::internal::string>
-        ]
-        tests\luamapParser.cpp(121) : see reference to function template instantiation '_Wolframe::serialize::Description<Structure> &_Wolframe::serialize::Description<Structure>::operator ()<std::vector<_Ty>>(const char *,Element Plant::* )' being compiled
-        with
-        [
-            Structure=Plant,
-            _Ty=testing::internal::string,
-            Element=std::vector<testing::internal::string>
-        ]
-.\serialize/luamapPrint.hpp(119) : warning C4244: 'argument' : conversion from 'size_t' to 'lua_Number', possible loss of data
-.\serialize/luamapPrint.hpp(119) : warning C4244: 'argument' : conversion from 'size_t' to 'lua_Number', possible loss of data
-        .\serialize/luamapPrint.hpp(135) : see reference to function template instantiation 'bool _Wolframe::serialize::printObject_<T>(const void *,const _Wolframe::serialize::vector_ &,lua_State *,_Wolframe::serialize::Context *)' being compiled
-        with
-        [
-            T=std::vector<Plant>
-        ]
-        .\serialize/luamapPrint.hpp(134) : while compiling class template member function 'bool _Wolframe::serialize::IntrusivePrinter<T>::print(const void *,lua_State *,_Wolframe::serialize::Context *)'
-        with
-        [
-            T=std::vector<Plant>
-        ]
-        .\serialize/luamapDescription.hpp(81) : see reference to class template instantiation '_Wolframe::serialize::IntrusivePrinter<T>' being compiled
-        with
-        [
-            T=std::vector<Plant>
-        ]
-        tests\luamapParser.cpp(178) : see reference to function template instantiation '_Wolframe::serialize::Description<Structure> &_Wolframe::serialize::Description<Structure>::operator ()<std::vector<_Ty>>(const char *,Element Garden::* )' being compiled
-        with
-        [
-            Structure=Garden,
-            _Ty=Plant,
-            Element=std::vector<Plant>
-        ]
-.\serialize/luamapPrint.hpp(119) : warning C4244: 'argument' : conversion from 'size_t' to 'lua_Number', possible loss of data
-        .\serialize/luamapPrint.hpp(135) : see reference to function template instantiation 'bool _Wolframe::serialize::printObject_<T>(const void *,const _Wolframe::serialize::vector_ &,lua_State *,_Wolframe::serialize::Context *)' being compiled
-        with
-        [
-            T=std::vector<Garden>
-        ]
-        .\serialize/luamapPrint.hpp(134) : while compiling class template member function 'bool _Wolframe::serialize::IntrusivePrinter<T>::print(const void *,lua_State *,_Wolframe::serialize::Context *)'
-        with
-        [
-            T=std::vector<Garden>
-        ]
-        .\serialize/luamapDescription.hpp(81) : see reference to class template instantiation '_Wolframe::serialize::IntrusivePrinter<T>' being compiled
-        with
-        [
-            T=std::vector<Garden>
-        ]
-        tests\luamapParser.cpp(193) : see reference to function template instantiation '_Wolframe::serialize::Description<Structure> &_Wolframe::serialize::Description<Structure>::operator ()<std::vector<_Ty>>(const char *,Element Places::* )' being compiled
-        with
-        [
-            Structure=Places,
-            _Ty=Garden,
-            Element=std::vector<Garden>
-        ]
-
-*/
-		
 
 }}//namespace
 #endif

@@ -37,7 +37,6 @@ Project Wolframe.
 #include "serialize/luamapBase.hpp"
 #include "serialize/luamapTraits.hpp"
 #include <stdexcept>
-/*[-]*/#include <iostream>
 #include <boost/utility/value_init.hpp>
 
 namespace _Wolframe {
@@ -57,7 +56,6 @@ static void setLuaError( Context* ctx, lua_State* ls, int tagIndex, const char* 
 template <typename T>
 static bool parseObject_( void* obj, const struct_&, lua_State* ls, Context* ctx)
 {
-/*[-]*/std::cout << "PARSE STRUCT" << std::endl;
 	static const DescriptionBase* descr = T::getDescription();
 	
 	if (!lua_istable( ls, -1))
@@ -76,17 +74,10 @@ static bool parseObject_( void* obj, const struct_&, lua_State* ls, Context* ctx
 			setLuaError( ctx, ls, -5, "string expected as key for struct in table instead of ", lua_typename( ls, lua_type( ls, -1)));
 			return false;
 		}
-/*[-]*/std::cout << "ELEMENT '" << key  << "'" << std::endl;
 		DescriptionBase::Map::const_iterator itr = descr->find( key);
 
 		if (itr == descr->end())
 		{
-/*[-]*/itr = descr->begin();
-/*[-]*/while (itr != descr->end())
-{
-/*[-]*/std::cout << "? '" << itr->first << "'" << std::endl;
-/*[-]*/++itr;
-}
 			setLuaError( ctx, ls, -5, "element not defined ", key);
 			return false;
 		}
@@ -99,14 +90,12 @@ static bool parseObject_( void* obj, const struct_&, lua_State* ls, Context* ctx
 		}
 		lua_pop( ls, 1);
 	}
-	lua_pop( ls, 1);
 	return true;
 }
 
 template <typename T>
 static bool parseObject_( void* obj, const arithmetic_&, lua_State* ls, Context* ctx)
 {
-/*[-]*/std::cout << "PARSE ARITHMETIC" << std::endl;
 	bool rt = true;
 	try
 	{
@@ -132,41 +121,75 @@ static bool parseObject_( void* obj, const arithmetic_&, lua_State* ls, Context*
 }
 
 template <typename T>
+static bool parseVectorElement( void* vectorobj, lua_State* ls, Context* ctx)
+{
+	typename T::value_type val;
+	if (!IntrusiveParser<typename T::value_type>::parse( &val, ls, ctx))
+	{
+		return false;
+	}
+	try
+	{
+		((T*)vectorobj)->push_back( val);
+		return true;
+	}
+	catch (std::exception& e)
+	{
+		ctx->setError( 0, e.what());
+		return false;
+	}
+}
+
+template <typename T>
 static bool parseObject_( void* obj, const vector_&, lua_State* ls, Context* ctx)
 {
-/*[-]*/std::cout << "PARSE VECTOR" << std::endl;
+	std::size_t vecidx = 0;
 	if (!lua_istable( ls, -1))
 	{
-		ctx->setError( 0, "table expected for vector");
-		return false;
+		/// ... If the element parsed as a vector is not a table,
+		/// ... then we assume it to be the single atomic
+		/// ... element of the vector parsed. If this hypothesis
+		/// ... works, everything is fine. If not we have to give
+		/// ... up with an error.
+		if (!parseVectorElement<T>( obj, ls, ctx))
+		{
+			ctx->setError( 0, "single vector element does not match to element type");
+			return false;
+		}
+		return true;
 	}
 	lua_pushnil( ls);
 	while (lua_next( ls, -2))
 	{
-		if (!lua_isnumber( ls, -2))
+		if (lua_type( ls, -2) != LUA_TNUMBER)
 		{
-/*[-]*/std::cout << "TYPE " << lua_typename( ls, lua_type( ls, -2)) << std::endl;
-/*[-]*/std::cout << "VALUE " << lua_tostring( ls, -2) << std::endl;
-			ctx->setError( 0, "only number indices expected for vector");
-			return false;
+			if (vecidx == 0)
+			{
+				/// ... If the table parsed as a vector
+				/// ... has not a number index as first element,
+				/// ... then we assume it to be the single structure
+				/// ... element of the vector parsed. If this hypothesis
+				/// ... works, everything is fine. If not we have to give
+				/// ... up with an error.
+				lua_pushvalue( ls, -3);
+				if (!parseVectorElement<T>( obj, ls, ctx))
+				{
+					ctx->setError( 0, "single vector element does not match to element type");
+					return false;
+				}
+				lua_pop( ls, 3);
+				return true;
+			}
+			else
+			{
+				ctx->setError( 0, "only number indices expected for vector");
+				return false;
+			}
 		}
-		typename T::value_type val;
-		if (!IntrusiveParser<typename T::value_type>::parse( &val, ls, ctx))
-		{
-			return false;
-		}
-		try
-		{
-			((T*)obj)->push_back( val);
-		}
-		catch (std::exception& e)
-		{
-			ctx->setError( 0, e.what());
-			return false;
-		}
+		++vecidx;
+		if (!parseVectorElement<T>( obj, ls, ctx)) return false;
 		lua_pop( ls, 1);
 	}
-	lua_pop( ls, 1);
 	return true;
 }
 
