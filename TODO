@@ -30,9 +30,8 @@ ABa:
 - Logger:
   - get better interface in logger.hpp (inheriting basic::ostream
     instead of templating?)
-- *BSD
+- FreeBSD
   - OpenPAM instead of Linux-PAM
-  - Qt not tested so far
   - trouble with some expect tests, check!
 
 PF:

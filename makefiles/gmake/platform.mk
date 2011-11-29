@@ -658,10 +658,16 @@ endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
 ifeq "$(OS_MAJOR_VERSION)" "8"
-QT_DIR ?= /usr/local/lib/qt4
+ifdef QT_DIR
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
-QT_MOC ?= $(QT_DIR)/bin/moc
+endif
+ifndef QT_DIR
+QT_DIR ?= /usr/local/lib/qt4
+QT_INCLUDE_DIR ?= /usr/local/include/qt4
+QT_LIB_DIR ?= /usr/local/lib/qt4
+QT_MOC ?= /usr/local/bin/moc-qt4
+endif
 endif
 endif
 
