@@ -4,7 +4,8 @@ SUBDIRS = echo pecho
 
 !IFDEF WITH_LUA
 SUBDIRS = \
-	$(SUBDIRS) lua iproc
+	$(SUBDIRS) lua
+#pf:disabled temporarily: iproc
 !ENDIF
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk

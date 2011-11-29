@@ -29,13 +29,13 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/directmapPrint.hpp
-///\brief Defines the intrusive implementation of the printing part of serialization for the direct map
+///\file serialize/struct/filtermapPrint.hpp
+///\brief Defines the intrusive implementation of the printing part of serialization of filters
 
-#ifndef _Wolframe_DIRECTMAP_PRINT_HPP_INCLUDED
-#define _Wolframe_DIRECTMAP_PRINT_HPP_INCLUDED
-#include "serialize/directmapTraits.hpp"
-#include "serialize/directmapBase.hpp"
+#ifndef _Wolframe_SERLIALIZE_STRUCT_FILTERMAP_PRINT_HPP_INCLUDED
+#define _Wolframe_SERLIALIZE_STRUCT_FILTERMAP_PRINT_HPP_INCLUDED
+#include "serialize/struct/filtermapTraits.hpp"
+#include "serialize/struct/filtermapBase.hpp"
 #include <stdexcept>
 #include <string>
 #include <vector>

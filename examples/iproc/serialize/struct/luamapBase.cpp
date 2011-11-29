@@ -29,9 +29,9 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/luamapBase.cpp
+///\file serialize/struct/luamapBase.cpp
 ///\brief Implements the non intrusive base class of serialization for the lua map
-#include "serialize/luamapBase.hpp"
+#include "serialize/struct/luamapBase.hpp"
 
 using namespace _Wolframe;
 using namespace serialize;

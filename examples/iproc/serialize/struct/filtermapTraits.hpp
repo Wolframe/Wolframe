@@ -29,12 +29,12 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/directmapTraits.hpp
-///\brief defines the type traits for the intrusive part of serialization of the direct map
+///\file serialize/struct/filtermapTraits.hpp
+///\brief defines the type traits for the intrusive part of serialization/deserialization
 
-#ifndef _Wolframe_SERIALIZE_DIRECTMAP_TRAITS_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_DIRECTMAP_TRAITS_HPP_INCLUDED
-#include "serialize/directmapBase.hpp"
+#ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_TRAITS_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_TRAITS_HPP_INCLUDED
+#include "serialize/struct/filtermapBase.hpp"
 #include "logger/logLevel.hpp"
 #include <boost/lexical_cast.hpp>
 #include <boost/utility/enable_if.hpp>

@@ -75,13 +75,13 @@ OBJS = \
 	filters/textwolf_filterBase.o \
 	filters/char_filter.o \
 	filters/line_filter.o \
-	serialize/directmapBase.o \
-	serialize/directmapCompile.o \
+	serialize/struct/filtermapBase.o \
+	ddl/simpleFormCompile.o \
 	$(TOPDIR)/src/posixMain.o
 
 ifeq ($(WITH_LUA),1)
 OBJS += \
-	serialize/luamapBase.o \
+	serialize/struct/luamapBase.o \
 	langbind/luaDebug.o \
 	langbind/luaConfig.o \
 	langbind/luaAppProcessor.o
@@ -95,9 +95,9 @@ endif
 TEST_BINS = \
 	tests/iprocHandlerTest$(EXE) \
 	tests/iprocHandlerXMLTest$(EXE) \
-	tests/luamapParser$(EXE) \
-	tests/directmapCompiler$(EXE) \
-	tests/directmapParser$(EXE)
+	tests/simpleFormCompilerTest$(EXE) \
+	tests/structLuamapTest$(EXE) \
+	tests/structFiltermapTest$(EXE)
 
 CPP_BINS = \
 	iprocd$(EXE)
@@ -106,9 +106,9 @@ CPP_BINS = \
 
 tests/iprocHandlerTest$(EXE): tests/iprocHandlerTest.o $(OBJS) $(TOPDIR)/src/libwolframe.a
 tests/iprocHandlerXMLTest$(EXE): tests/iprocHandlerXMLTest.o $(OBJS) $(TOPDIR)/src/libwolframe.a
-tests/luamapParser$(EXE): tests/luamapParser.o $(OBJS) $(TOPDIR)/src/libwolframe.a
-tests/directmapParser$(EXE): tests/directmapParser.o $(OBJS) $(TOPDIR)/src/libwolframe.a
-tests/directmapCompiler$(EXE): tests/directmapCompiler.o $(OBJS) $(TOPDIR)/src/libwolframe.a
+tests/structLuamapTest$(EXE): tests/structLuamapTest.o $(OBJS) $(TOPDIR)/src/libwolframe.a
+tests/structFiltermapTest$(EXE): tests/structFiltermapTest.o $(OBJS) $(TOPDIR)/src/libwolframe.a
+tests/simpleFormCompilerTest$(EXE): tests/simpleFormCompilerTest.o $(OBJS) $(TOPDIR)/src/libwolframe.a
 
 local_all: $(CPP_BINS)
 
@@ -121,9 +121,9 @@ local_install:
 local_test: $(TEST_BINS)
 	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./iprocHandlerTest$(EXE)
 	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./iprocHandlerXMLTest$(EXE)
-	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./directmapCompiler$(EXE) data/directmap_compiler.frm
-	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./directmapParser$(EXE)
-	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./luamapParser$(EXE)
+	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./simpleFormCompilerTest$(EXE) data/directmap_compiler.frm
+	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./structFiltermapTest$(EXE)
+	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./structLuamapTest$(EXE)
 
 run: $(CPP_BINS)
 	@echo "Running the Wolframe iproc example..."

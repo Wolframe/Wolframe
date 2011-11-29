@@ -29,12 +29,12 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/luamapTraits.hpp
+///\file serialize/struct/luamapTraits.hpp
 ///\brief defines the type traits for the intrusive part of serialization of the lua map
 
-#ifndef _Wolframe_SERIALIZE_LUAMAP_TRAITS_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_LUAMAP_TRAITS_HPP_INCLUDED
-#include "serialize/luamapBase.hpp"
+#ifndef _Wolframe_SERIALIZE_STRUCT_LUAMAP_TRAITS_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_STRUCT_LUAMAP_TRAITS_HPP_INCLUDED
+#include "serialize/struct/luamapBase.hpp"
 #include "logger/logLevel.hpp"
 #include <boost/lexical_cast.hpp>
 #include <boost/utility/enable_if.hpp>

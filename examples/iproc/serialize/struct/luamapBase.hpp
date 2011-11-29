@@ -29,16 +29,22 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/directmapBase.hpp
-///\brief Defines the non intrusive base class of serialization for the direct map
+///\file serialize/struct/luamapBase.hpp
+///\brief Defines the non intrusive base class of serialization for the lua map
 
-#ifndef _Wolframe_DIRECTMAP_BASE_HPP_INCLUDED
-#define _Wolframe_DIRECTMAP_BASE_HPP_INCLUDED
-#include "protocol/inputfilter.hpp"
-#include "protocol/formatoutput.hpp"
-#include "serialize/mapContext.hpp"
+#ifndef _Wolframe_SERIALIZE_STRUCT_LUAMAP_BASE_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_STRUCT_LUAMAP_BASE_HPP_INCLUDED
+#include "mapContext.hpp"
+extern "C"
+{
+	#include "lua.h"
+	#include "lualib.h"
+	#include "lauxlib.h"
+}
 #include <cstddef>
 #include <string>
+#include <cstring>
+#include <cstddef>
 #include <vector>
 
 namespace _Wolframe {
@@ -48,26 +54,18 @@ class DescriptionBase
 {
 public:
 	typedef std::vector<std::pair<const char*,DescriptionBase> > Map;
-	typedef bool (*Parse)( const char* tag, void* obj, protocol::InputFilter& flt, Context& ctx);
-	typedef bool (*Print)( const char* tag, const void* obj, protocol::FormatOutput*& out, Context& ctx);
-	typedef bool (*IsAtomic)();
+	typedef bool (*Parse)( void* obj, lua_State* ls, Context* ctx);
+	typedef bool (*Print)( const void* obj, lua_State* ls, Context* ctx);
 	Parse parse() const {return m_parse;}
 	Print print() const {return m_print;}
 
-	DescriptionBase( const char* tn, std::size_t os, std::size_t sz, IsAtomic ia, Parse pa, Print pr)
-		:m_typename(tn),m_ofs(os),m_size(sz),m_isAtomic(ia),m_parse(pa),m_print(pr){}
+	DescriptionBase( const char* tn, std::size_t os, std::size_t sz, Parse pa, Print pr)
+		:m_typename(tn),m_ofs(os),m_size(sz),m_parse(pa),m_print(pr){}
 	DescriptionBase( const DescriptionBase& o)
-		:m_typename(o.m_typename),m_ofs(o.m_ofs),m_size(o.m_size),m_elem(o.m_elem),m_isAtomic(o.m_isAtomic),m_parse(o.m_parse),m_print(o.m_print){}
-	DescriptionBase()
-		:m_typename(0),m_ofs(0),m_size(0),m_isAtomic(0),m_parse(0),m_print(0){}
+		:m_typename(o.m_typename),m_ofs(o.m_ofs),m_size(o.m_size),m_elem(o.m_elem),m_parse(o.m_parse),m_print(o.m_print){}
 
-	bool parse( const char* name, void* obj, protocol::InputFilter& in, Context& ctx) const;
-	bool print( const char* name, const void* obj, protocol::FormatOutput& out, Context& ctx) const;
-
-	bool isAtomic() const
-	{
-		return m_isAtomic();
-	}
+	void parse( void* obj, lua_State* ls) const;
+	void print( const void* obj, lua_State* ls) const;
 
 	std::size_t size() const
 	{
@@ -95,17 +93,14 @@ public:
 	{
 		m_elem.push_back( std::pair<const char*,DescriptionBase>(name,dd));
 	}
-
 private:
 	const char* m_typename;
 	std::size_t m_ofs;
 	std::size_t m_size;
 	Map m_elem;
-	IsAtomic m_isAtomic;
 	Parse m_parse;
 	Print m_print;
 };
 
 }}//namespace
 #endif
-

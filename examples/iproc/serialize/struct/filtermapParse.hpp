@@ -29,13 +29,13 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/directmapParse.hpp
-///\brief Defines the intrusive implementation of the parsing part of serialization for the direct map
-#ifndef _Wolframe_DIRECTMAP_PARSE_HPP_INCLUDED
-#define _Wolframe_DIRECTMAP_PARSE_HPP_INCLUDED
+///\file serialize/struct/filtermapParse.hpp
+///\brief Defines the intrusive implementation of the parsing part of serialization/deserialization of filters
+#ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PARSE_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PARSE_HPP_INCLUDED
 #include "protocol/inputfilter.hpp"
-#include "serialize/directmapTraits.hpp"
-#include "serialize/directmapBase.hpp"
+#include "serialize/struct/filtermapTraits.hpp"
+#include "serialize/struct/filtermapBase.hpp"
 #include "logger-v1.hpp"
 #include <stdexcept>
 #include <string>
