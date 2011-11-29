@@ -450,7 +450,7 @@ src/libwolframe/moduleDirectory.cpp
 src/libwolframe/provider/AAAAproviderConfig.cpp
 src/libwolframe/provider/AAAAprovider.cpp
 src/libwolframe/provider/AAAAproviderImpl.hpp
-src/libwolframe/provider/databaseConfig.cpp
+src/libwolframe/provider/DBproviderConfig.cpp
 src/libwolframe/provider/DBprovider.cpp
 src/libwolframe/provider/DBproviderImpl.hpp
 src/libwolframe/referenceConfig.cpp
