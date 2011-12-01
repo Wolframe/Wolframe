@@ -35,8 +35,8 @@ BOOST_DIR = C:\Cygwin\home\Andreas\boost_1_46_0-win64
 #BOOST_DIR = D:\Program Files\boost\boost_$(BOOST_VERSION)
 
 # depends on the choosen boost layout
-#BOOST_INCLUDE_DIR = $(BOOST_DIR)\Include\boost-1_46
-BOOST_INCLUDE_DIR = $(BOOST_DIR)
+BOOST_INCLUDE_DIR = $(BOOST_DIR)\Include\boost-1_46
+#BOOST_INCLUDE_DIR = $(BOOST_DIR)
 
 # visual studio version used for compiling
 
