@@ -4,7 +4,7 @@ Build Instructions
 Prerequisites
 -------------
 
-- gcc c++ 3.4.6 or later (preferably 512 MB RAM or Swap)
+- gcc c++ 4.1.x or later (preferably 512 MB RAM or Swap)
 - GNU make
 - boost 1.43.0 or later
 - optionally (WITH_SSL) openssl 0.9.7 or later
@@ -12,11 +12,12 @@ Prerequisites
   (integrated in subdir 'lua')
 - for the optional Qt client
   - optionally (WITH_QT) Qt 4, 4.5.x or later
+- for database support
+  - optionally (WITH_SQLITE3)
+  - optionally (WITH_PGSQL)
 - for optional authentication mechanisms:
   - optionally (WITH_PAM)
   - optionally (WITH_SASL)
-  - optionally (WITH_SQLITE3)
-  - optionally (WITH_PGSQL)
 - optionally for testing:
   - optionally (WITH_EXPECT) expect and Tcl 8.4 or later
 - optionally (for building the documentation):
@@ -48,23 +49,23 @@ home directory as '~/config.mk'. Customize '~/config.mk' as needed.
 Compile and install boost
 -------------------------
 
-./bootstrap.sh --prefix=/usr/local/boost-1.46.1 \
+./bootstrap.sh --prefix=/usr/local/boost-1.48.0 \
 	--with-libraries=thread,filesystem,system,program_options,date_time,regex
 ./bjam install
 
 configure Wolframe in ~/config.mk and
-set BOOST_DIR to /usr/local/boost-1.46.1.
+set BOOST_DIR to /usr/local/boost-1.48.0.
 
 Compile and install openssl
 ---------------------------
 
 Unless you have a good reason, use the openssl library of
-your Linux system.
+your Linux distribution.
 
 Compile and install Qt
 ----------------------
 
-./configure --prefix /usr/local/qt-4.7.2 -openssl
+./configure --prefix /usr/local/qt-4.7.4 -openssl
 make
 cd src/3rdparty/webkit/JavaScriptCore/
 make
@@ -72,28 +73,10 @@ cd -
 make install
 
 confiugre Wolframe in ~/config.mk and
-set QT_DIR to /usr/local/qt-4.7.2
+set QT_DIR to /usr/local/qt-4.7.4
 
 A note on Linux Distributions
 =============================
-
-RHEL/Centos/SL 4
-----------------
-
-Optional packages: openssl-devel (0.9.7a), pam-devel (0.77), cyrus-sasl-devel (2.1.19),
-                   sqlite-devel (3.3.6), postgresql-devel (7.4.30), libxml2-devel (2.6.16)
-
-Boost is not available in a decent version (1.32), build your own one.
-
-Qt (3.3.3) is too old, compile your own one.
-
-For building the documentation you need 'libxslt', 'doxygen' and
-'docbook-style-xsl' (from epel).
-
-Make is a little bit old (3.80), so you'll see some errors while compiling,
-they should not matter for a clean build:
-
-../../makefiles/gmake/depend.mk:74: no file name for `-include'
 
 RHEL/Centos/SL 5
 ----------------
