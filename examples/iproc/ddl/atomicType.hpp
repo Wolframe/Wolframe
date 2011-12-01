@@ -36,6 +36,7 @@ Project Wolframe.
 #define _Wolframe_DDL_ATOMICTYPE_HPP_INCLUDED
 #include <string>
 #include <stdexcept>
+#include <cstddef>
 #include <boost/lexical_cast.hpp>
 
 namespace _Wolframe {
@@ -95,7 +96,7 @@ public:
 			}
 
 		}
-		catch ( const boost::bad_cast&)
+		catch ( const boost::bad_lexical_cast&)
 		{
 			return false;
 		}
@@ -108,7 +109,7 @@ public:
 		{
 			val = boost::lexical_cast<T>( m_value);
 		}
-		catch ( const boost::bad_cast&)
+		catch ( const boost::bad_lexical_cast&)
 		{
 			return false;
 		}
