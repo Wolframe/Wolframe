@@ -63,3 +63,13 @@ run: $(CPP_BINS)
 !ENDIF
 	@-echo wolfcli.exe 127.0.0.1 7661 >> test.bat
 	@-test.bat
+
+runssl: $(CPP_BINS)
+	@-echo @echo off > test.bat
+!IFDEF WITH_SSL
+	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat
+	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >> test.bat
+!ENDIF
+	@-echo wolfcli.exe -S --CA-cert-file=CA.cert.pem --client-cert-file=client.crt --client-cert-key=client.key 127.0.0.1 7961 >> test.bat
+	@-test.bat
+

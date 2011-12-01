@@ -46,3 +46,9 @@ local_test:
 ifeq ($(WITH_EXPECT),1)
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe $(EXPECT) ./testCli
 endif
+
+run:
+	@./wolfcli localhost 7661
+
+runssl:
+	@./wolfcli -S --CA-cert-file=CA.cert.pem --client-cert-file=client.crt --client-cert-key=client.key localhost 7961
