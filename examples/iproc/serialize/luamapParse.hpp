@@ -103,7 +103,7 @@ static bool parseObject_( void* obj, const arithmetic_&, lua_State* ls, Context*
 		{
 			case LUA_TNIL: *((T*)obj) = boost::value_initialized<T>(); break;
 			case LUA_TNUMBER: *((T*)obj) = boost::lexical_cast<T>(lua_tonumber(ls,-1)); break;
-			case LUA_TBOOLEAN: *((T*)obj) = boost::lexical_cast<T>(lua_toboolean(ls,-1)); break;
+			case LUA_TBOOLEAN: *((T*)obj) = boost::lexical_cast<T>((bool)lua_toboolean(ls,-1)); break;
 			case LUA_TSTRING: *((T*)obj) = boost::lexical_cast<T>(lua_tostring(ls,-1)); break;
 			case LUA_TTABLE: ctx->setError( 0, "arithmetic value expected instead of table"); rt = false; break;
 			case LUA_TFUNCTION: ctx->setError( 0, "arithmetic value expected instead of function"); rt = false; break;
