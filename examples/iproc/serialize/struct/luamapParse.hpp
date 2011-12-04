@@ -127,15 +127,15 @@ static bool parseObject_( void* obj, const string_&, lua_State* ls, Context* ctx
 template <typename T>
 typename boost::enable_if_c<boost::is_same<bool,T>::value,T>::type convertNumber( double n)
 {
-	if (n > std::numeric_limits::epsilon()) return false;
-	if (n < -std::numeric_limits::epsilon()) return false;
+	if (n > std::numeric_limits<T>::epsilon()) return false;
+	if (n < -std::numeric_limits<T>::epsilon()) return false;
 	return true;
 }
 
 template <typename T>
 typename boost::enable_if_c<boost::is_floating_point<T>::value,T>::type convertNumber( double n)
 {
-	if (n > (double)numeric_limits<T>::max() || n < (double)numeric_limits<T>::min())
+	if (n > (double)std::numeric_limits<T>::max() || n < (double)std::numeric_limits<T>::min())
 	{
 		throw std::out_of_range( "arithmetic value");
 	}
@@ -145,7 +145,7 @@ typename boost::enable_if_c<boost::is_floating_point<T>::value,T>::type convertN
 template <typename T>
 typename boost::enable_if_c<boost::is_integral<T>::value,T>::type convertNumber( double n)
 {
-	if (n > (double)std::numeric_limits<T>::max() || n < n > (double)std::numeric_limits<T>::min())
+	if (n > (double)std::numeric_limits<T>::max() || n < (double)std::numeric_limits<T>::min())
 	{
 		throw std::out_of_range( "arithmetic value");
 	}

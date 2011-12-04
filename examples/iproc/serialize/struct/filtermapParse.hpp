@@ -46,12 +46,11 @@ Project Wolframe.
 #include <boost/cast.hpp>
 #include <boost/lexical_cast.hpp>
 
-///the intrusive part of the definitions is put into an anonymous namespace:
 namespace _Wolframe {
 namespace serialize {
 
 template <typename T>
-static void parseObject( const char* tag, T& obj, protocol::InputFilter& inp);
+static void parseObject( const char* tag, T& obj, protocol::InputFilter& inp, bool);
 
 bool isAtomic_( const struct_&)
 {
@@ -71,13 +70,19 @@ bool isAtomic_( const bool_&)
 }
 
 template <typename T>
-bool parseObject_( const char* tag, void* obj, const struct_&, protocol::InputFilter& inp, Context& ctx)
+bool parseObject_( const char* tag, void* obj, const struct_&, protocol::InputFilter& inp, Context& ctx, bool isinit)
 {
 	protocol::InputFilter::ElementType typ;
 	static const DescriptionBase* descr = T::getDescription();
 	unsigned int depth = 0;
 	std::size_t bufpos = 0;
+	std::vector<bool> isinitar;
 
+	if (isinit)
+	{
+		ctx.setError( tag, "duplicate structure definition");
+		return false;
+	}
 	if (tag)
 	{
 		ctx.setError( tag, "atomic value expected for an attribute value");
@@ -98,7 +103,9 @@ bool parseObject_( const char* tag, void* obj, const struct_&, protocol::InputFi
 					ctx.setError( tag);
 					return false;
 				}
-				if (!itr->second.parse()( 0, (char*)obj+itr->second.ofs(), inp, ctx)) return false;
+
+				if (!itr->second.parse()( 0, (char*)obj+itr->second.ofs(), inp, ctx, isinitar[ itr - descr->begin()])) return false;
+				isinitar[ itr - descr->begin()] = true;
 				if (ctx.endTagConsumed())
 				{
 					--depth;
@@ -117,7 +124,9 @@ bool parseObject_( const char* tag, void* obj, const struct_&, protocol::InputFi
 					ctx.setError( tag);
 					return false;
 				}
-				if (!itr->second.parse()( ctx.buf(), (char*)obj+itr->second.ofs(), inp, ctx)) return false;
+				if (!itr->second.parse()( ctx.buf(), (char*)obj+itr->second.ofs(), inp, ctx, isinitar[ itr - descr->begin()])) return false;
+				isinitar[ itr - descr->begin()] = true;
+
 				ctx.endTagConsumed(false);
 				break;
 			}
@@ -145,11 +154,16 @@ bool parseObject_( const char* tag, void* obj, const struct_&, protocol::InputFi
 }
 
 template <typename T>
-bool parseObject_( const char* tag, void* obj, const bool_&, protocol::InputFilter& inp, Context& ctx)
+bool parseObject_( const char* tag, void* obj, const bool_&, protocol::InputFilter& inp, Context& ctx, bool isinit)
 {
 	protocol::InputFilter::ElementType typ;
 	std::size_t bufpos=0;
 
+	if (isinit)
+	{
+		ctx.setError( tag, "duplicate boolean definition");
+		return false;
+	}
 	if (inp.getNext( &typ, ctx.buf(), Context::bufsize-1, &bufpos))
 	{
 		ctx.buf()[ bufpos] = 0;
@@ -195,10 +209,10 @@ bool parseObject_( const char* tag, void* obj, const bool_&, protocol::InputFilt
 }
 
 template <typename T>
-bool parseObject_( const char* tag, void* obj, const vector_&, protocol::InputFilter& inp, Context& ctx)
+bool parseObject_( const char* tag, void* obj, const vector_&, protocol::InputFilter& inp, Context& ctx, bool)
 {
 	typename T::value_type val;
-	if (!parseObject( tag, val, inp, ctx))
+	if (!parseObject( tag, val, inp, ctx, false))
 	{
 		ctx.setError( tag);
 		return false;
@@ -209,11 +223,16 @@ bool parseObject_( const char* tag, void* obj, const vector_&, protocol::InputFi
 }
 
 template <typename T>
-static bool parseObject_( const char* tag, void* obj, const arithmetic_&, protocol::InputFilter& inp, Context& ctx)
+static bool parseObject_( const char* tag, void* obj, const arithmetic_&, protocol::InputFilter& inp, Context& ctx, bool isinit)
 {
 	protocol::InputFilter::ElementType typ;
 	std::size_t bufpos=0;
 
+	if (isinit)
+	{
+		ctx.setError( tag, "duplicate value definition");
+		return false;
+	}
 	if (inp.getNext( &typ, ctx.buf(), Context::bufsize-1, &bufpos))
 	{
 		ctx.buf()[ bufpos] = 0;
@@ -251,9 +270,9 @@ static bool parseObject_( const char* tag, void* obj, const arithmetic_&, protoc
 }
 
 template <typename T>
-static bool parseObject( const char* tag, T& obj, protocol::InputFilter& inp, Context& ctx)
+static bool parseObject( const char* tag, T& obj, protocol::InputFilter& inp, Context& ctx, bool isinit)
 {
-	if (!_Wolframe::serialize::parseObject_<T>( tag, (void*)&obj, getCategory(obj), inp, ctx))
+	if (!_Wolframe::serialize::parseObject_<T>( tag, (void*)&obj, getCategory(obj), inp, ctx, isinit))
 	{
 		ctx.setError( tag);
 		return false;
@@ -270,9 +289,9 @@ struct IntrusiveParser
 		return isAtomic_( getCategory(*obj));
 	}
 
-	static bool parse( const char* tag, void* obj, protocol::InputFilter& inp, Context& ctx)
+	static bool parse( const char* tag, void* obj, protocol::InputFilter& inp, Context& ctx, bool isinit)
 	{
-		return parseObject_<T>( tag, obj, getCategory(*(T*)obj), inp, ctx);
+		return parseObject_<T>( tag, obj, getCategory(*(T*)obj), inp, ctx, isinit);
 	}
 };
 
