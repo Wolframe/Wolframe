@@ -108,6 +108,12 @@ bool printObject_( const void* obj, const arithmetic_&, lua_State* ls, Context* 
 }
 
 template <typename T>
+bool printObject_( const void* obj, const string_&, lua_State* ls, Context* ctx)
+{
+	return push_<T>( obj, ls, ctx);
+}
+
+template <typename T>
 bool printObject_( const void* obj, const vector_&, lua_State* ls, Context* ctx)
 {
 	lua_newtable( ls);

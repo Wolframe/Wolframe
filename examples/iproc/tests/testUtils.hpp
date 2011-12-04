@@ -84,8 +84,8 @@ struct Data
 			if (mm.size() == Diffsize) mm.append( "...");
 			if (oo.size() == Diffsize) oo.append( "...");
 
-			printf( "Input \"%s\" Expected \"%s\" Result \"%s\"\n", inputf.c_str(), expectedf.c_str(), resultf.c_str());
-			printf( "TEST %s SIZE R=%lu,E=%lu,DIFF AT %u='%d %d %d %d|%d %d %d %d' \"%s\" \"%s\"\n",
+				printf( "Input \"%s\" Expected \"%s\" Result \"%s\"\n", inputf.c_str(), expectedf.c_str(), resultf.c_str());
+				printf( "TEST %s SIZE R=%lu,E=%lu,DIFF AT %u='%d %d %d %d|%d %d %d %d' \"%s\" \"%s\"\n",
 				name.c_str(),
 				(unsigned long)result.size(), (unsigned long)expected.size(), ii,
 				result[ii-2],result[ii-1],result[ii-0],result[ii+1],

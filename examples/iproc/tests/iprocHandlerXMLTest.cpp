@@ -75,11 +75,13 @@ static const TestDescription testDescriptions[] =
 		"test_echo_xml_utf8",
 		"test_UTF16.xml", 64
 	},
+#ifdef WITH_LIBXML2
 	{
 		"echo_xml_utf8_with_libxml",
 		"test_echo_xml_libxml2",
 		"test_UTF8.xml", 48
 	},
+#endif
 	{
 		"echo_xml_IsoLatin1_to_utf8",
 		"test_echo_xml_utf8",

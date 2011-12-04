@@ -100,7 +100,7 @@ all: $(OBJS) $(CPP_BINS)
 TEST_CPP_BINS = \
 	tests\iprocHandlerTest.exe \
 	tests\iprocHandlerXMLTest.exe \
-	tests\structLuamapParserTest.exe \
+	tests\structLuamapTest.exe \
 	tests\simpleFormCompilerTest.exe \
 	tests\structFiltermapTest.exe
 

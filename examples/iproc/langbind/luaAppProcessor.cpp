@@ -398,7 +398,7 @@ static int function_filter( lua_State* ls)
 		}
 		try
 		{
-			buffersize = boost::lexical_cast<unsigned int>( lua_tonumber( ls, 2));
+			buffersize = (unsigned int)( lua_tonumber( ls, 2));
 		}
 		catch (...)
 		{

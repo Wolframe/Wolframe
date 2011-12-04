@@ -38,6 +38,9 @@ Project Wolframe.
 #include "serialize/struct/luamapTraits.hpp"
 #include <stdexcept>
 #include <boost/utility/value_init.hpp>
+#include <boost/lexical_cast.hpp>
+#include <cmath>
+#include <limits>
 
 namespace _Wolframe {
 namespace serialize {
@@ -94,6 +97,62 @@ static bool parseObject_( void* obj, const struct_&, lua_State* ls, Context* ctx
 }
 
 template <typename T>
+static bool parseObject_( void* obj, const string_&, lua_State* ls, Context* ctx)
+{
+	bool rt = true;
+	try
+	{
+		switch (lua_type( ls, -1))
+		{
+			case LUA_TNIL: *((T*)obj) = boost::value_initialized<T>(); break;
+			case LUA_TNUMBER: *((T*)obj) = boost::lexical_cast<T>( lua_tonumber(ls,-1)); break;
+			case LUA_TBOOLEAN: *((T*)obj) = boost::lexical_cast<T>( (bool)lua_toboolean(ls,-1)); break;
+			case LUA_TSTRING: *((T*)obj) = boost::lexical_cast<T>( lua_tostring(ls,-1)); break;
+			case LUA_TTABLE: ctx->setError( 0, "arithmetic value expected instead of table"); rt = false; break;
+			case LUA_TFUNCTION: ctx->setError( 0, "arithmetic value expected instead of function"); rt = false; break;
+			case LUA_TUSERDATA: ctx->setError( 0, "arithmetic value expected instead of userdata"); rt = false; break;
+			case LUA_TTHREAD: ctx->setError( 0, "arithmetic value expected instead of thread"); rt = false; break;
+			case LUA_TLIGHTUSERDATA: ctx->setError( 0, "arithmetic value expected instead of lightuserdata"); rt = false; break;
+		}
+	}
+	catch (const std::exception& e)
+	{
+		ctx->setError( 0, e.what());
+		rt = false;
+	}
+	return rt;
+}
+
+
+template <typename T>
+typename boost::enable_if_c<boost::is_same<bool,T>::value,T>::type convertNumber( double n)
+{
+	if (n > std::numeric_limits::epsilon()) return false;
+	if (n < -std::numeric_limits::epsilon()) return false;
+	return true;
+}
+
+template <typename T>
+typename boost::enable_if_c<boost::is_floating_point<T>::value,T>::type convertNumber( double n)
+{
+	if (n > (double)numeric_limits<T>::max() || n < (double)numeric_limits<T>::min())
+	{
+		throw std::out_of_range( "arithmetic value");
+	}
+	return (T)n;
+}
+
+template <typename T>
+typename boost::enable_if_c<boost::is_integral<T>::value,T>::type convertNumber( double n)
+{
+	if (n > (double)std::numeric_limits<T>::max() || n < n > (double)std::numeric_limits<T>::min())
+	{
+		throw std::out_of_range( "arithmetic value");
+	}
+	return (T)n;
+}
+
+template <typename T>
 static bool parseObject_( void* obj, const arithmetic_&, lua_State* ls, Context* ctx)
 {
 	bool rt = true;
@@ -102,9 +161,9 @@ static bool parseObject_( void* obj, const arithmetic_&, lua_State* ls, Context*
 		switch (lua_type( ls, -1))
 		{
 			case LUA_TNIL: *((T*)obj) = boost::value_initialized<T>(); break;
-			case LUA_TNUMBER: *((T*)obj) = boost::lexical_cast<T>(lua_tonumber(ls,-1)); break;
-			case LUA_TBOOLEAN: *((T*)obj) = boost::lexical_cast<T>((bool)lua_toboolean(ls,-1)); break;
-			case LUA_TSTRING: *((T*)obj) = boost::lexical_cast<T>(lua_tostring(ls,-1)); break;
+			case LUA_TNUMBER: *((T*)obj) = convertNumber<T>( lua_tonumber( ls,-1)); break;
+			case LUA_TBOOLEAN: *((T*)obj) = convertNumber<T>( lua_tonumber( ls,-1)); break;
+			case LUA_TSTRING: *((T*)obj) = boost::lexical_cast<T>( lua_tostring( ls,-1)); break;
 			case LUA_TTABLE: ctx->setError( 0, "arithmetic value expected instead of table"); rt = false; break;
 			case LUA_TFUNCTION: ctx->setError( 0, "arithmetic value expected instead of function"); rt = false; break;
 			case LUA_TUSERDATA: ctx->setError( 0, "arithmetic value expected instead of userdata"); rt = false; break;

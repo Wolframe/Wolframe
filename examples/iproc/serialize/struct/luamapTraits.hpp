@@ -50,6 +50,7 @@ namespace serialize {
 struct struct_ {};  		///< category tag for a structure with named elements
 struct vector_ {};		///< category tag for a std::vector of any type
 struct arithmetic_ {};		///< category tag for a type that is convertible from/to a string through boost::lexical_cast
+struct string_ {};		///< category tag for a type that is convertible from/to a string through boost::lexical_cast
 
 ///\brief conditional template for detecting if a type is a class with a static/member method getDescription() returning a const pointer to a structure description as defined in config/descriptionBase.hpp
 /// see http://drdobbs.com/article/print?articleId=227500449&siteSectionName= "Checking Concept Without Concepts in C++"
@@ -97,11 +98,18 @@ typename boost::enable_if_c<
 	,const struct_>::type getCategory( const T&) { return struct_();}
 
 ///\brief get category arithmetic_ for a type
-/// returns arithmetic_ if T fulfills the is_arithmetic condition or is a string
+/// returns arithmetic_ if T fulfills the is_arithmetic condition
 template <typename T>
 typename boost::enable_if_c<
-	(boost::is_arithmetic<T>::value || boost::is_same<std::string,T>::value)
+	(boost::is_arithmetic<T>::value)
 	,const arithmetic_>::type getCategory( const T&) { return arithmetic_();}
+
+///\brief get category string_ for a type
+/// returns string_ if T is a std::string 
+template <typename T>
+typename boost::enable_if_c<
+	(boost::is_same<std::string,T>::value)
+	,const string_>::type getCategory( const T&) { return string_();}
 
 struct luanumeric_{};
 struct luabool_{};
