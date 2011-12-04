@@ -38,6 +38,7 @@ Project Wolframe.
 #include <cstring>
 #include <cstdio>
 #include <cstdlib>
+#include <boost/lexical_cast.hpp>
 
 #include "countedReference.hpp"
 
@@ -151,12 +152,9 @@ struct InputFilter
 	{
 		if (std::strcmp( name, "buffersize") == 0)
 		{
-			if (valbufsize < 6*sizeof(m_genbufsize)) return false;
-#ifdef _WIN32
-			_snprintf( valbuf, valbufsize, "%lu", (unsigned long)m_genbufsize);
-#else
-			snprintf( valbuf, valbufsize, "%lu", (unsigned long)m_genbufsize);
-#endif
+			std::string val( boost::lexical_cast<std::string>( m_genbufsize));
+			if (val.size() >= valbufsize) return false;
+			std::memcpy( valbuf, val.c_str(), val.size()+1);
 			return true;
 		}
 		return false;

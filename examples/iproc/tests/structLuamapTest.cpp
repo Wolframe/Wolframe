@@ -29,11 +29,11 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/luamapParser.cpp
-///\brief test for lua serialization parser
+///\file serialize/struct/structLuamapTest.cpp
+///\brief test for lua serialization/deserialization of lua tables
 
-#include "serialize/luamapDescription.hpp"
-#include "serialize/luamapBase.hpp"
+#include "serialize/struct/luamapDescription.hpp"
+#include "serialize/struct/luamapBase.hpp"
 #include "langbind/luaConfig.hpp"
 #include "langbind/appObjects.hpp"
 #include "langbind/luaAppProcessor.hpp"

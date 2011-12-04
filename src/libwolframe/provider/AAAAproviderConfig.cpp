@@ -51,6 +51,7 @@ bool AAAAconfiguration::parse( const config::ConfigurationTree& pt, const std::s
 	using namespace _Wolframe::config;
 	bool retVal = true;
 	bool allowDefined = false;
+	bool mandatoryDefined = false;
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "Authentication" ) ||
@@ -82,12 +83,35 @@ bool AAAAconfiguration::parse( const config::ConfigurationTree& pt, const std::s
 						    << L2it->first << "'";
 			}
 		}
+		else if ( boost::algorithm::iequals( L1it->first, "Authorization" ))	{
+			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
+									L2it != L1it->second.end(); L2it++ )	{
+				if ( modules )	{
+					module::ModuleContainer* container = modules->getContainer( "Authorization", L2it->first );
+					if ( container )	{
+						config::ObjectConfiguration* conf = container->configuration( logPrefix().c_str());
+						if ( conf->parse( L2it->second, L2it->first, modules ))
+							m_authzConfig.push_back( conf );
+						else	{
+							delete conf;
+							retVal = false;
+						}
+					}
+					else
+						LOG_WARNING << logPrefix() << "unknown configuration option: '"
+							    << L2it->first << "'";
+				}
+				else
+					LOG_WARNING << logPrefix() << "unknown configuration option: '"
+						    << L2it->first << "'";
+			}
+		}
 		else if ( boost::algorithm::iequals( L1it->first, "Audit" ))	{
 			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
 									L2it != L1it->second.end(); L2it++ )	{
-				if ( boost::algorithm::iequals( "allowAnonymous", L2it->first ))	{
-					if ( ! Parser::getValue( logPrefix().c_str(), *L2it, m_allowAnonymous,
-								 Parser::BoolDomain(), &allowDefined ))
+				if ( boost::algorithm::iequals( "mandatory", L2it->first ))	{
+					if ( ! Parser::getValue( logPrefix().c_str(), *L2it, m_mandatoryAudit,
+								 Parser::BoolDomain(), &mandatoryDefined ))
 						retVal = false;
 				}
 				else if ( modules )	{

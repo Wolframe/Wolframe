@@ -30,11 +30,11 @@ Project Wolframe.
 
 ************************************************************************/
 ///
-///\file directmapCompile.hpp
-///\brief interface for a compiler of a self defined direct map DDL
+///\file ddl/simpleformCompile.hpp
+///\brief interface for a compiler of a self defined DDL for forms
 ///
-#ifndef _Wolframe_DIRECTMAP_COMPILE_HPP_INCLUDED
-#define _Wolframe_DIRECTMAP_COMPILE_HPP_INCLUDED
+#ifndef _Wolframe_DDL_SIMPLEFORM_COMPILE_HPP_INCLUDED
+#define _Wolframe_DDL_SIMPLEFORM_COMPILE_HPP_INCLUDED
 #include <string>
 #include <vector>
 #include <map>
@@ -42,9 +42,10 @@ Project Wolframe.
 #include <cstring>
 
 namespace _Wolframe {
-namespace directmap {
+namespace ddl {
+namespace simpleform {
 
-struct PrimitiveDDLParser
+struct SimpleformDDLParser
 {
 	struct Element
 	{
@@ -120,5 +121,5 @@ private:
 	std::size_t calcElementSize( std::size_t idx, std::size_t depht=0);
 };
 
-}}
+}}}
 #endif

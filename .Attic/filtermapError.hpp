@@ -29,11 +29,11 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/directmapBase.hpp
+///\file serialize/struct/filtermapBase.hpp
 ///\brief Defines the non intrusive base class of serialization for the direct map
 
-#ifndef _Wolframe_DIRECTMAP_ERROR_HPP_INCLUDED
-#define _Wolframe_DIRECTMAP_ERROR_HPP_INCLUDED
+#ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_ERROR_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_ERROR_HPP_INCLUDED
 #include "protocol/inputfilter.hpp"
 #include "protocol/formatoutput.hpp"
 #include "logger.hpp"

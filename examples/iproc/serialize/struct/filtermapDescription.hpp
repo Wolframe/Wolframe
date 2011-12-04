@@ -29,14 +29,15 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/luamapDescription.hpp
-///\brief Defines the bricks for the SDK to describe the lua table serializatiom in a readable way.
-#ifndef _Wolframe_SERIALIZE_LUAMAP_DESCRIPTION_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_LUAMAP_DESCRIPTION_HPP_INCLUDED
-#include "serialize/luamapBase.hpp"
-#include "serialize/luamapTraits.hpp"
-#include "serialize/luamapParse.hpp"
-#include "serialize/luamapPrint.hpp"
+///\file serialize/struct/filtermapDescription.hpp
+///\brief Defines the bricks for the SDK to describe structures for mapping filters to forms in a readable way.
+///\remark This module uses intrusive building blocks to build the serialization/deserialization of the direct map objects.
+#ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_DESCRIPTION_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_DESCRIPTION_HPP_INCLUDED
+#include "serialize/struct/filtermapBase.hpp"
+#include "serialize/struct/filtermapTraits.hpp"
+#include "serialize/struct/filtermapParse.hpp"
+#include "serialize/struct/filtermapPrint.hpp"
 #include "logger-v1.hpp"
 #include <typeinfo>
 #include <exception>
@@ -70,19 +71,12 @@ struct Description :public DescriptionBase
 	template <typename Element>
 	Description& operator()( const char* name, Element Structure::*eptr)
 	{
-		// :73:15: error: variable ‘typ’ set but not used [-Werror=unused-but-set-variable]
-		// removed 'typ', again not sure here..
-		try
-		{
-			(void)typeid(Element).name();
-		}
-		catch (std::bad_typeid)
-		{}
 		DescriptionBase::Parse parse_ = &IntrusiveParser<Element>::parse;
 		DescriptionBase::Print print_ = &IntrusivePrinter<Element>::print;
+		DescriptionBase::IsAtomic isAtomic_ = &IntrusiveParser<Element>::isAtomic;
 
 		std::size_t pp = (std::size_t)&(((Structure*)0)->*eptr);
-		DescriptionBase e( getTypename<Element>(), pp, sizeof(Element), parse_, print_);
+		DescriptionBase e( getTypename<Element>(), pp, sizeof(Element), isAtomic_, parse_, print_);
 		if (find( name) != end())
 		{
 			LOG_ERROR << "duplicate definition of " << name << " in structure";
@@ -90,9 +84,11 @@ struct Description :public DescriptionBase
 		define( name, e);
 		return *this;
 	}
+
 	Description()
-		:DescriptionBase( getTypename<Structure>(), 0, sizeof(Structure), &IntrusiveParser<Structure>::parse, &IntrusivePrinter<Structure>::print){}
+		:DescriptionBase( getTypename<Structure>(), 0, sizeof(Structure), &IntrusiveParser<Structure>::isAtomic, &IntrusiveParser<Structure>::parse, &IntrusivePrinter<Structure>::print){}
 };
 
 }}// end namespace
 #endif
+

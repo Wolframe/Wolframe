@@ -29,9 +29,9 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/directmapBase.cpp
-///\brief Implements the non intrusive base class of serialization for the direct map
-#include "serialize/directmapBase.hpp"
+///\file serialize/struct/filtermapBase.cpp
+///\brief Implements the non intrusive base class of serialization/deserialization of filters
+#include "serialize/struct/filtermapBase.hpp"
 #include <cstring>
 
 using namespace _Wolframe;

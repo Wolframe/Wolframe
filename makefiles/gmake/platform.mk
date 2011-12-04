@@ -510,12 +510,14 @@ ifeq ($(WITH_LUA),1)
 
 ifeq "$(PLATFORM)" "LINUX"
 LUA_PLATFORM_CFLAGS = -DLUA_USE_LINUX
-LUA_PLATFORM_LDFLAGS = -ldl
+LUA_PLATFORM_LDFLAGS =
+LUA_PLATFORM_LIBS = -ldl
 endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
-LUA_PLATFORM_CFLAGS = -DLUA_USE_POSIX
+LUA_PLATFORM_CFLAGS = -DLUA_USE_LINUX
 LUA_PLATFORM_LDFLAGS =
+LUA_PLATFORM_LIBS =
 endif
 
 endif
@@ -652,6 +654,21 @@ endif
 
 endif
 
+endif
+
+ifeq "$(PLATFORM)" "FREEBSD"
+ifeq "$(OS_MAJOR_VERSION)" "8"
+ifdef QT_DIR
+QT_INCLUDE_DIR ?= $(QT_DIR)/include
+QT_LIB_DIR ?= $(QT_DIR)/lib
+endif
+ifndef QT_DIR
+QT_DIR ?= /usr/local/lib/qt4
+QT_INCLUDE_DIR ?= /usr/local/include/qt4
+QT_LIB_DIR ?= /usr/local/lib/qt4
+QT_MOC ?= /usr/local/bin/moc-qt4
+endif
+endif
 endif
 
 endif

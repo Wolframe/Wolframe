@@ -29,13 +29,13 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/luamapPrint.hpp
+///\file serialize/struct/luamapPrint.hpp
 ///\brief Defines the intrusive implementation of the printing part of serialization for the lua map
 
-#ifndef _Wolframe_LUAMAP_PRINT_HPP_INCLUDED
-#define _Wolframe_LUAMAP_PRINT_HPP_INCLUDED
-#include "serialize/mapContext.hpp"
-#include "serialize/luamapTraits.hpp"
+#ifndef _Wolframe_SERIALIZE_STRUCT_LUAMAP_PRINT_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_STRUCT_LUAMAP_PRINT_HPP_INCLUDED
+#include "serialize/struct/mapContext.hpp"
+#include "serialize/struct/luamapTraits.hpp"
 #include <boost/utility/value_init.hpp> 
 #include <vector>
 

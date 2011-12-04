@@ -1,4 +1,4 @@
-#include "serialize/directmapCompile.hpp"
+#include "ddl/simpleFormCompile.hpp"
 #include <iostream>
 #include <string>
 
@@ -11,9 +11,9 @@ int main( int argc, const char** argv)
 		std::cerr << "missing input file parameter" << std::endl;
 		return -1;
 	}
-	directmap::PrimitiveDDLParser directmap;
+	ddl::simpleform::SimpleformDDLParser mm;
 	std::string error;
-	if (!directmap.compile( argv[1], error))
+	if (!mm.compile( argv[1], error))
 	{
 		std::cerr << error << std::endl;
 		return -2;

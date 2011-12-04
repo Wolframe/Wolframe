@@ -29,11 +29,11 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-/// \file directmapParser.cpp
-/// \brief test for the directmap serialization
+/// \file serialize/struct/structFiltermapTest.cpp
+/// \brief test for the serialization/deserialization of filters
 
-#include "serialize/directmapDescription.hpp"
-#include "serialize/directmapBase.hpp"
+#include "serialize/struct/filtermapDescription.hpp"
+#include "serialize/struct/filtermapBase.hpp"
 #include "langbind/appObjects.hpp"
 #include "logger-v1.hpp"
 #include "tests/testUtils.hpp"

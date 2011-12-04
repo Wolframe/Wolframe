@@ -1,3 +1,0 @@
-for secure connection use:
-
-./wolfcli -S --CA-cert-file=CA.cert.pem --client-cert-file=client.crt --client-cert-key=client.key localhost 7961

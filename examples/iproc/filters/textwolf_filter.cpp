@@ -42,6 +42,7 @@ Project Wolframe.
 #include <cstdio>
 #include <cstdlib>
 #include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 
 using namespace _Wolframe;
 using namespace filter;
@@ -132,12 +133,9 @@ struct FormatOutputImpl :public protocol::FormatOutput, public FilterBase<IOChar
 	{
 		if (std::strcmp( name, "tagstacksize") == 0)
 		{
-			if (sizeof( m_tagstksize)*6 > valbufsize) return false;
-#ifdef _WIN32
-			_snprintf( valbuf, valbufsize, "%lu", (unsigned long)m_tagstksize);
-#else
-			snprintf( valbuf, valbufsize, "%lu", (unsigned long)m_tagstksize);
-#endif
+			std::string val( boost::lexical_cast<std::string>( m_tagstksize));
+			if (val.size() >= valbufsize) return false;
+			std::memcpy( valbuf, val.c_str(), val.size()+1);
 			return true;
 		}
 		return Parent::getValue( name, valbuf, valbufsize);

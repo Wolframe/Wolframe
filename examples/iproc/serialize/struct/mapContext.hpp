@@ -29,11 +29,11 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/mapContext.hpp
+///\file serialize/struct/mapContext.hpp
 ///\brief Defines the error handling of any intrusive serialization/deserialization
 
-#ifndef _Wolframe_LUAMAP_ERROR_HPP_INCLUDED
-#define _Wolframe_LUAMAP_ERROR_HPP_INCLUDED
+#ifndef _Wolframe_SERIALIZE_STRUCT_MAPCONTEXT_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_STRUCT_MAPCONTEXT_HPP_INCLUDED
 #include <cstring>
 #include <string>
 
