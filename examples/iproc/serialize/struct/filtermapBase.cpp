@@ -85,7 +85,7 @@ bool DescriptionBase::parse( const char* name, void* obj, protocol::InputFilter&
 		}
 		else if (m_parse)
 		{
-			rt &= m_parse( 0, obj, *inp, ctx);
+			rt &= m_parse( 0, obj, *inp, ctx, false);
 		}
 		else
 		{

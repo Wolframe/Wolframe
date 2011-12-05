@@ -76,7 +76,7 @@ bool parseObject_( const char* tag, void* obj, const struct_&, protocol::InputFi
 	static const DescriptionBase* descr = T::getDescription();
 	unsigned int depth = 0;
 	std::size_t bufpos = 0;
-	std::vector<bool> isinitar;
+	std::vector<bool> isinitar( descr->end() - descr->begin(), false);
 
 	if (isinit)
 	{
@@ -103,9 +103,9 @@ bool parseObject_( const char* tag, void* obj, const struct_&, protocol::InputFi
 					ctx.setError( tag);
 					return false;
 				}
-
-				if (!itr->second.parse()( 0, (char*)obj+itr->second.ofs(), inp, ctx, isinitar[ itr - descr->begin()])) return false;
-				isinitar[ itr - descr->begin()] = true;
+				std::size_t idx = itr - descr->begin();
+				if (!itr->second.parse()( 0, (char*)obj+itr->second.ofs(), inp, ctx, isinitar[ idx])) return false;
+				isinitar[ idx] = true;
 				if (ctx.endTagConsumed())
 				{
 					--depth;
@@ -124,8 +124,9 @@ bool parseObject_( const char* tag, void* obj, const struct_&, protocol::InputFi
 					ctx.setError( tag);
 					return false;
 				}
-				if (!itr->second.parse()( ctx.buf(), (char*)obj+itr->second.ofs(), inp, ctx, isinitar[ itr - descr->begin()])) return false;
-				isinitar[ itr - descr->begin()] = true;
+				std::size_t idx = itr - descr->begin();
+				if (!itr->second.parse()( ctx.buf(), (char*)obj+itr->second.ofs(), inp, ctx, isinitar[ idx])) return false;
+				isinitar[ idx] = true;
 
 				ctx.endTagConsumed(false);
 				break;

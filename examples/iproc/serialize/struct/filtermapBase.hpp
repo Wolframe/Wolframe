@@ -48,7 +48,7 @@ class DescriptionBase
 {
 public:
 	typedef std::vector<std::pair<const char*,DescriptionBase> > Map;
-	typedef bool (*Parse)( const char* tag, void* obj, protocol::InputFilter& flt, Context& ctx);
+	typedef bool (*Parse)( const char* tag, void* obj, protocol::InputFilter& flt, Context& ctx, bool isinit);
 	typedef bool (*Print)( const char* tag, const void* obj, protocol::FormatOutput*& out, Context& ctx);
 	typedef bool (*IsAtomic)();
 	Parse parse() const {return m_parse;}
