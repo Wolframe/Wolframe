@@ -141,7 +141,7 @@ local_test: $(TEST_CPP_BINS)
 	@-echo structLuamapTest.exe >> test.bat
 !ENDIF
 	@-echo structFiltermapTest.exe  >> test.bat
-	@-echo simpleFormCompilerTest.exe data\directmap_compiler.frm >> test.bat
+	@-echo simpleFormCompilerTest.exe >> test.bat
 	@-test.bat
 
 run:

@@ -123,7 +123,7 @@ local_install:
 local_test: $(TEST_BINS)
 	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./iprocHandlerTest$(EXE)
 	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./iprocHandlerXMLTest$(EXE)
-	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./simpleFormCompilerTest$(EXE) data/directmap_compiler.frm
+	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./simpleFormCompilerTest$(EXE)
 	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./structFiltermapTest$(EXE)
 	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./structLuamapTest$(EXE)
 
