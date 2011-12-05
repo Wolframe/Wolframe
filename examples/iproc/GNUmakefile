@@ -102,6 +102,8 @@ TEST_BINS = \
 CPP_BINS = \
 	iprocd$(EXE)
 
+iprocd$(EXE): $(TOPDIR)/src/loadModules-dummy.o $(TOPDIR)/src/posixMain.o $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
+
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 tests/iprocHandlerTest$(EXE): tests/iprocHandlerTest.o $(OBJS) $(TOPDIR)/src/libwolframe.a

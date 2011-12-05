@@ -47,6 +47,8 @@ OBJS = \
 CPP_BINS = \
 	luad$(EXE)
 
+luad$(EXE): $(TOPDIR)/src/loadModules-dummy.o $(TOPDIR)/src/posixMain.o $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
+
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 local_all:

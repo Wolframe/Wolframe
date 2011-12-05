@@ -43,6 +43,8 @@ CPP_OBJS = \
 CPP_BINS = \
 	echod$(EXE)
 
+echod$(EXE): $(TOPDIR)/src/posixMain.o $(TOPDIR)/src/loadModules-dummy.o $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
+
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 local_all: $(CPP_BINS)
