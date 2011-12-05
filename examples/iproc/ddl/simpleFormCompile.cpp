@@ -29,10 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///
-///\file simpleformCompile.cpp
+///\file ddl/simpleformCompile.cpp
 ///\brief implementation a compiler of a self defined direct map DDL
-///
 #include "ddl/simpleFormCompile.hpp"
 #include <string>
 #include <fstream>
@@ -43,26 +41,10 @@ Project Wolframe.
 #include <cstddef>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
-#define BOOST_FILESYSTEM_VERSION 3
-#include <boost/filesystem.hpp>
 
 using namespace _Wolframe;
 using namespace ddl;
 using namespace simpleform;
-
-static bool readFile( const char* fn, std::string& out)
-{
-	char buf;
-	std::fstream ff;
-	ff.open( fn, std::ios::in | std::ios::binary);
-	while (ff.read( &buf, sizeof(buf)))
-	{
-		out.push_back( buf);
-	}
-	bool rt = ((ff.rdstate() & std::ifstream::eofbit) != 0);
-	ff.close();
-	return rt;
-}
 
 struct Lexem
 {
@@ -497,16 +479,8 @@ std::size_t SimpleformDDLParser::calcElementSize( std::size_t idx, std::size_t d
 	return rt;
 }
 
-bool SimpleformDDLParser::compile( const char* filename, std::string& error_)
+bool SimpleformDDLParser::compile( const std::string& srcstring, std::string& error_)
 {
-	std::string srcstring;
-	if (!readFile( filename, srcstring))
-	{
-		std::stringstream err;
-		err << "failed to read input file " << filename << std::endl;
-		error_ = err.str();
-		return false;
-	}
 	Source src( srcstring);
 	Lexem lexem;
 	std::stringstream err;
@@ -514,7 +488,7 @@ bool SimpleformDDLParser::compile( const char* filename, std::string& error_)
 
 	if (!parseDefinition( src, *this, lexem))
 	{
-		err << filename << ": " << lexem.value << std::endl;
+		err << lexem.value << std::endl;
 		error_ = err.str();
 		return false;
 	}
@@ -524,7 +498,7 @@ bool SimpleformDDLParser::compile( const char* filename, std::string& error_)
 	{
 		if (linkmap.find( itr->name) != linkmap.end())
 		{
-			err << filename << ": duplicate definition of struct '" << itr->name << "'" << std::endl;
+			err << "duplicate definition of struct '" << itr->name << "'" << std::endl;
 			rt = false;
 		}
 		linkmap[ itr->name] = ii;
@@ -541,7 +515,7 @@ bool SimpleformDDLParser::compile( const char* filename, std::string& error_)
 			{
 				if (linkmap.find( eitr->name) == linkmap.end())
 				{
-					err << filename << ": unresolved reference of struct '" << eitr->name << "'" << std::endl;
+					err << "unresolved reference of struct '" << eitr->name << "'" << std::endl;
 					rt = false;
 				}
 				else

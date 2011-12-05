@@ -137,6 +137,11 @@ local_test: $(TEST_CPP_BINS)
 	@-echo cd tests >> test.bat
 	@-echo iprocHandlerXMLTest.exe >> test.bat
 	@-echo iprocHandlerTest.exe >> test.bat
+!IFDEF WITH_LUA
+	@-echo structLuamapTest.exe >> test.bat
+!ENDIF
+	@-echo structFiltermapTest.exe  >> test.bat
+	@-echo simpleFormCompilerTest.exe data\directmap_compiler.frm >> test.bat
 	@-test.bat
 
 run:

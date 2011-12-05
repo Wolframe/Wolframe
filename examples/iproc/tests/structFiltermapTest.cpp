@@ -238,16 +238,16 @@ static const TestDescription testDescription[2] = {
 {0,0,0,0}
 };
 
-class TestFixture : public ::testing::Test
+class StructFiltermapTest : public ::testing::Test
 {
 protected:
-	TestFixture() {}
-	virtual ~TestFixture() {}
+	StructFiltermapTest() {}
+	virtual ~StructFiltermapTest() {}
 	virtual void SetUp() {}
 	virtual void TearDown() {}
 };
 
-TEST_F( TestFixture, tests)
+TEST_F( StructFiltermapTest, tests)
 {
 	unsigned int ti;
 	for (ti=0; testDescription[ti].name; ti++)

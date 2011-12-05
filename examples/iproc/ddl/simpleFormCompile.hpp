@@ -29,10 +29,9 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///
 ///\file ddl/simpleformCompile.hpp
 ///\brief interface for a compiler of a self defined DDL for forms
-///
+
 #ifndef _Wolframe_DDL_SIMPLEFORM_COMPILE_HPP_INCLUDED
 #define _Wolframe_DDL_SIMPLEFORM_COMPILE_HPP_INCLUDED
 #include <string>
@@ -110,15 +109,15 @@ struct SimpleformDDLParser
 		return true;
 	}
 
-	bool compile( const char* filename, std::string& error);
-
-	std::map<std::string,std::size_t> linkmap;
-	std::vector<Struct> ar;
-	std::vector<std::string> errors;
+	bool compile( const std::string& srcstring, std::string& error);
 
 private:
 	void error( const std::string& msg) {errors.push_back( msg);}
 	std::size_t calcElementSize( std::size_t idx, std::size_t depht=0);
+
+	std::map<std::string,std::size_t> linkmap;
+	std::vector<Struct> ar;
+	std::vector<std::string> errors;
 };
 
 }}}

@@ -111,16 +111,16 @@ struct TestConfiguration :public lua::Configuration
 	}
 };
 
-class XMLTestFixture : public ::testing::Test
+class IProcHandlerXMLTest : public ::testing::Test
 {
 protected:
-	XMLTestFixture() {}
-	virtual ~XMLTestFixture() {}
+	IProcHandlerXMLTest() {}
+	virtual ~IProcHandlerXMLTest() {}
 	virtual void SetUp() {}
 	virtual void TearDown() {}
 };
 
-TEST_F( XMLTestFixture, tests)
+TEST_F( IProcHandlerXMLTest, tests)
 {
 	unsigned int ti;
 	for (ti=0; testDescriptions[ti].scriptfile; ti++)

@@ -156,7 +156,7 @@ static std::string escape( std::string& content)
 
 
 template <class TestDescription>
-class iprocHandlerFixture : public ::testing::Test
+class IProcHandlerTest : public ::testing::Test
 {
 public:
 	std::string m_input;
@@ -170,7 +170,7 @@ public:
 		EscBufferSize=1
 	};
 protected:
-	iprocHandlerFixture()
+	IProcHandlerTest()
 		:ep( "127.0.0.1", 12345)
 		,m_connection(0)
 		,m_config( TestDescription().inputBufferSize + EoDBufferSize, TestDescription().outputBufferSize + EscBufferSize) {}
@@ -253,9 +253,9 @@ typedef ::testing::Types<
 	Random<7,2,4000,32>
 > MyTypes;
 
-TYPED_TEST_CASE( iprocHandlerFixture, MyTypes);
+TYPED_TEST_CASE( IProcHandlerTest, MyTypes);
 
-TYPED_TEST( iprocHandlerFixture, ExpectedResult )
+TYPED_TEST( IProcHandlerTest, ExpectedResult )
 {
 	std::string output;
 	char* itr = const_cast<char*>( this->m_input.c_str());
