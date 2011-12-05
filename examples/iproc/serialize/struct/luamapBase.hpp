@@ -34,7 +34,7 @@ Project Wolframe.
 
 #ifndef _Wolframe_SERIALIZE_STRUCT_LUAMAP_BASE_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_LUAMAP_BASE_HPP_INCLUDED
-#include "mapContext.hpp"
+#include "serialize/mapContext.hpp"
 extern "C"
 {
 	#include "lua.h"

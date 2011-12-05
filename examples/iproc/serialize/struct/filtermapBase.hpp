@@ -36,7 +36,7 @@ Project Wolframe.
 #define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_BASE_HPP_INCLUDED
 #include "protocol/inputfilter.hpp"
 #include "protocol/formatoutput.hpp"
-#include "serialize/struct/mapContext.hpp"
+#include "serialize/mapContext.hpp"
 #include <cstddef>
 #include <string>
 #include <vector>

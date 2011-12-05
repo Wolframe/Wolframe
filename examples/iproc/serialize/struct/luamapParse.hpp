@@ -33,7 +33,7 @@ Project Wolframe.
 ///\brief Defines the intrusive implementation of the parsing part of serialization for the lua map
 #ifndef _Wolframe_SERIALIZE_STRUCT_LUAMAP_PARSE_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_LUAMAP_PARSE_HPP_INCLUDED
-#include "serialize/struct/mapContext.hpp"
+#include "serialize/mapContext.hpp"
 #include "serialize/struct/luamapBase.hpp"
 #include "serialize/struct/luamapTraits.hpp"
 #include <stdexcept>

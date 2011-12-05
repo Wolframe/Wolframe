@@ -34,7 +34,7 @@ Project Wolframe.
 
 #ifndef _Wolframe_SERIALIZE_STRUCT_LUAMAP_PRINT_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_LUAMAP_PRINT_HPP_INCLUDED
-#include "serialize/struct/mapContext.hpp"
+#include "serialize/mapContext.hpp"
 #include "serialize/struct/luamapTraits.hpp"
 #include <boost/utility/value_init.hpp> 
 #include <vector>

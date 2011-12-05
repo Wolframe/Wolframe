@@ -205,7 +205,7 @@ examples/iproc/serialize/struct/luamapError.hpp
 examples/iproc/serialize/struct/luamapParse.hpp
 examples/iproc/serialize/struct/luamapPrint.hpp
 examples/iproc/serialize/struct/luamapTraits.hpp
-examples/iproc/serialize/struct/mapContext.hpp
+examples/iproc/serialize/mapContext.hpp
 examples/iproc/tests/data/test_directmap_places_IsoLatin1.xml
 examples/iproc/tests/data/test_IsoLatin1.xml
 examples/iproc/tests/data/test_luamap_places_IsoLatin1.xml
