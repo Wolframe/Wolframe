@@ -124,6 +124,10 @@ bool parseObject_( const char* tag, void* obj, const struct_&, protocol::InputFi
 					ctx.setError( tag);
 					return false;
 				}
+				if ((std::size_t)(itr-descr->begin()) >= descr->nof_attributes())
+				{
+					ctx.setError( ctx.buf(), "content element expected");
+				}
 				std::size_t idx = itr - descr->begin();
 				if (!itr->second.parse()( ctx.buf(), (char*)obj+itr->second.ofs(), inp, ctx, isinitar[ idx])) return false;
 				isinitar[ idx] = true;

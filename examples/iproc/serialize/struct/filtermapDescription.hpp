@@ -85,6 +85,12 @@ struct Description :public DescriptionBase
 		return *this;
 	}
 
+	Description& operator--(int)
+	{
+		defineEndOfAttributes();
+		return *this;
+	}
+
 	Description()
 		:DescriptionBase( getTypename<Structure>(), 0, sizeof(Structure), &IntrusiveParser<Structure>::isAtomic, &IntrusiveParser<Structure>::parse, &IntrusivePrinter<Structure>::print){}
 };

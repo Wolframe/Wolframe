@@ -34,8 +34,9 @@ Project Wolframe.
 
 #ifndef _Wolframe_SERIALIZE_STRUCT_MAPCONTEXT_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_MAPCONTEXT_HPP_INCLUDED
-#include <cstring>
 #include <string>
+#include "protocol/inputfilter.hpp"
+#include "protocol/formatoutput.hpp"
 
 namespace _Wolframe {
 namespace serialize {
@@ -44,58 +45,28 @@ struct Context
 {
 	enum {bufsize=4096,errbufsize=256};
 
-	Context()
-		:m_buf(new char[ bufsize+errbufsize+256])
-		,m_endTagConsumed(false)
-	{
-		m_buf[0] = 0;
-		m_lasterror = m_buf+bufsize;
-	}
-
-	~Context()
-	{
-		delete [] m_buf;
-	}
+	Context();
+	~Context();
 
 	const char* getLastError() const		{return m_lasterror;}
 	char* buf() const				{return m_buf;}
-	const std::string content() const		{return m_content;}
+	const std::string& content() const		{return m_content;}
 	void append( const char* c, std::size_t n)	{m_content.append( c,n);}
+	void clear()					{m_content.clear();}
 	void endTagConsumed( bool v)			{m_endTagConsumed=v;}
 	bool endTagConsumed()				{return m_endTagConsumed;}
 
-	void setError( const char* tt, const char* msg, const char* msgparam=0)
-	{
-		setMsg( tt, ':', msg, msgparam);
-	}
-
-	void setError( const char* tt)
-	{
-		if (!tt) return;
-		setMsg( tt, '/', m_lasterror);
-	}
+	void setError( const char* tt, const char* msg, const char* msgparam=0);
+	void setError( const char* tt);
+	bool printElem( protocol::FormatOutput::ElementType tp, const void* elem, std::size_t elemsize, protocol::FormatOutput*& out);
 
 private:
-	friend class DescriptionBase;
 	char* m_lasterror;
 	char* m_buf;
 	std::string m_content;
 	bool m_endTagConsumed;
 
-	void setMsg( const char* m1, char dd, const char* m2, const char* m3=0)
-	{
-		std::size_t m1len = m1?std::strlen(m1):0;
-		std::size_t m2len = m2?std::strlen(m2):0;
-		std::size_t m3len = m3?std::strlen(m3):0;
-		if (m1len >= errbufsize-1) m1len = errbufsize-2;
-		if (m2len >= errbufsize-m1len) m2len = errbufsize-m1len-1;
-		if (m3len >= errbufsize-m1len-m2len) m3len = errbufsize-m1len-m2len;
-		std::memmove( m_lasterror+m1len+m2len+1, m3?m3:"", m3len);
-		std::memmove( m_lasterror+m1len+1, m2?m2:"", m2len);
-		std::memmove( m_lasterror, m1?m1:"", m1len);
-		m_lasterror[ m1len] = dd;
-		m_lasterror[ m1len+m2len+m3len+1] = '\0';
-	}
+	void setMsg( const char* m1, char dd, const char* m2, const char* m3=0);
 };
 
 }}

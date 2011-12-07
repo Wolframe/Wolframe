@@ -100,6 +100,7 @@ public:
 		{
 			return false;
 		}
+		return false;
 	}
 
 	template <typename T>
@@ -120,7 +121,7 @@ public:
 		return m_type;
 	}
 
-	std::string value() const
+	const std::string& value() const
 	{
 		return m_value;
 	}

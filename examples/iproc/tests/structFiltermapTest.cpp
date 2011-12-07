@@ -102,6 +102,7 @@ const DescriptionBase* Plant::getDescription()
 		ThisDescription()
 		{
 			(*this)
+			--
 			("COMMON",		&Plant::common)
 			("BOTANICAL",		&Plant::botanical)
 			("ZONE",		&Plant::zone)
@@ -123,6 +124,7 @@ const DescriptionBase* Phone::getDescription()
 		ThisDescription()
 		{
 			(*this)
+			--
 			("NUMBER",		&Phone::number)
 			("MOBILE",		&Phone::mobile)
 			;
@@ -139,6 +141,7 @@ const DescriptionBase* Address::getDescription()
 		ThisDescription()
 		{
 			(*this)
+			--
 			("COUNTRY",		&Address::country)
 			("STREET",		&Address::street)
 			("CITY",		&Address::city)

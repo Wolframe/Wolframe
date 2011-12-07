@@ -76,6 +76,8 @@ OBJS = \
 	filters/char_filter.o \
 	filters/line_filter.o \
 	serialize/struct/filtermapBase.o \
+	serialize/ddl/filtermapSerialize.o \
+	serialize/mapContext.o \
 	ddl/simpleFormCompile.o \
 	$(TOPDIR)/src/posixMain.o
 

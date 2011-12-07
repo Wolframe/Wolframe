@@ -40,6 +40,7 @@ Project Wolframe.
 #include <cstddef>
 #include <string>
 #include <vector>
+#include <limits>
 
 namespace _Wolframe {
 namespace serialize {
@@ -55,11 +56,11 @@ public:
 	Print print() const {return m_print;}
 
 	DescriptionBase( const char* tn, std::size_t os, std::size_t sz, IsAtomic ia, Parse pa, Print pr)
-		:m_typename(tn),m_ofs(os),m_size(sz),m_isAtomic(ia),m_parse(pa),m_print(pr){}
+		:m_typename(tn),m_ofs(os),m_size(sz),m_nof_attributes(std::numeric_limits<std::size_t>::max()),m_isAtomic(ia),m_parse(pa),m_print(pr){}
 	DescriptionBase( const DescriptionBase& o)
-		:m_typename(o.m_typename),m_ofs(o.m_ofs),m_size(o.m_size),m_elem(o.m_elem),m_isAtomic(o.m_isAtomic),m_parse(o.m_parse),m_print(o.m_print){}
+		:m_typename(o.m_typename),m_ofs(o.m_ofs),m_size(o.m_size),m_nof_attributes(o.m_nof_attributes),m_elem(o.m_elem),m_isAtomic(o.m_isAtomic),m_parse(o.m_parse),m_print(o.m_print){}
 	DescriptionBase()
-		:m_typename(0),m_ofs(0),m_size(0),m_isAtomic(0),m_parse(0),m_print(0){}
+		:m_typename(0),m_ofs(0),m_size(0),m_nof_attributes(std::numeric_limits<std::size_t>::max()),m_isAtomic(0),m_parse(0),m_print(0){}
 
 	bool parse( const char* name, void* obj, protocol::InputFilter& in, Context& ctx) const;
 	bool print( const char* name, const void* obj, protocol::FormatOutput& out, Context& ctx) const;
@@ -96,10 +97,20 @@ public:
 		m_elem.push_back( std::pair<const char*,DescriptionBase>(name,dd));
 	}
 
+	std::size_t nof_attributes() const
+	{
+		return m_nof_attributes;
+	}
+
+	void defineEndOfAttributes()
+	{
+		m_nof_attributes = m_elem.size();
+	}
 private:
 	const char* m_typename;
 	std::size_t m_ofs;
 	std::size_t m_size;
+	std::size_t m_nof_attributes;
 	Map m_elem;
 	IsAtomic m_isAtomic;
 	Parse m_parse;

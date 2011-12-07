@@ -35,7 +35,7 @@ Project Wolframe.
 #ifndef _Wolframe_DDL_STRUCTTYPE_HPP_INCLUDED
 #define _Wolframe_DDL_STRUCTTYPE_HPP_INCLUDED
 #include <string>
-#include <pair>
+#include <utility>
 #include <vector>
 #include <stdexcept>
 #include <cstddef>
@@ -59,7 +59,7 @@ public:
 		Struct
 	};
 
-	bool contentType() const
+	ContentType contentType() const
 	{
 		return m_contentType;
 	}
@@ -68,6 +68,16 @@ public:
 	{
 		REQUIRE(Struct);
 		for (Map::const_iterator itr = m_elem.begin(); itr!=m_elem.end(); ++itr)
+		{
+			if (std::strcmp( itr->first.c_str(), name) == 0) return itr;
+		}
+		return m_elem.end();
+	}
+
+	Map::iterator find( const char* name)
+	{
+		REQUIRE(Struct);
+		for (Map::iterator itr = m_elem.begin(); itr!=m_elem.end(); ++itr)
 		{
 			if (std::strcmp( itr->first.c_str(), name) == 0) return itr;
 		}
@@ -96,10 +106,18 @@ public:
 		return m_value;
 	}
 
-	void define( const char* name, const StructType& dd)
+	void defineContent( const char* name, const StructType& dd)
 	{
 		REQUIRE(Struct);
 		m_elem.push_back( Element( name, dd));
+	}
+
+	void defineAttribute( const char* name, const StructType& dd)
+	{
+		REQUIRE(Struct);
+		dd.REQUIRE(Atomic);
+		m_elem.insert( m_elem.begin()+m_nof_attributes, Element( name, dd));
+		m_nof_attributes += 1;
 	}
 
 	void defineAsVector( const StructType& prototype)
@@ -108,7 +126,7 @@ public:
 		if (m_contentType == Atomic) throw std::logic_error( "defined as atomic");
 		if (m_elem.size()) throw std::logic_error( "defined as structure");
 		m_contentType = Vector;
-		m_elem.push_back( Element( string(), prototype));
+		m_elem.push_back( Element( std::string(), prototype));
 	}
 
 	void push()
@@ -117,27 +135,32 @@ public:
 		m_elem.push_back( m_elem[0]);
 	}
 
-	StructType& top()
+	StructType& back()
 	{
 		REQUIRE(Vector);
-		return m_elem.top().second;
+		return m_elem.back().second;
 	}
 
-	const StructType& top() const
+	const StructType& back() const
 	{
 		REQUIRE(Vector);
-		return m_elem.top().second;
+		return m_elem.back().second;
+	}
+
+	std::size_t nof_attributes() const
+	{
+		return m_nof_attributes;
 	}
 
 	StructType()
-		:m_contentType( Struct) {}
+		:m_contentType( Struct),m_nof_attributes(0){}
 	StructType( const StructType& o)
-		:m_contentType(o.m_contentType),m_value(o.m_value),m_elem(o.m_elem){}
+		:m_contentType(o.m_contentType),m_value(o.m_value),m_elem(o.m_elem),m_nof_attributes(o.m_nof_attributes){}
 	StructType( const AtomicType& a)
-		:m_contentType( Atomic),m_value(a.value()){}
+		:m_contentType( Atomic),m_value(a),m_nof_attributes(0){}
 
 private:
-	void REQUIRE( ContentType t)
+	void REQUIRE( ContentType t) const
 	{
 		if (m_contentType != t)
 		{
@@ -153,6 +176,7 @@ private:
 	ContentType m_contentType;
 	AtomicType m_value;
 	Map m_elem;
+	std::size_t m_nof_attributes;
 };
 
 }}//namespace
