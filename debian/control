@@ -16,6 +16,18 @@ Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Wolframe Daemon
  <insert long description, indented with spaces>
 
+Package: wolframe-sqlite3
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Sqlite3 database bindings
+ <insert long description, indented with spaces>
+
+Package: wolframe-postgresql
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Postgresql database bindings
+ <insert long description, indented with spaces>
+
 Package: wolframe-client
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
