@@ -11,3 +11,6 @@ local_clean:
 local_distclean:
 
 local_test:
+
+local_uninstall:
+	@-rmdir $(DESTDIR)$(libdir)/wolframe

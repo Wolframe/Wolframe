@@ -51,14 +51,14 @@ uninstall_recursive:
 	  (set -e; $(MAKE) -C $$d uninstall || exit 1); done)
 
 uninstall: uninstall_recursive local_uninstall uninstall_po
-	test -z "$(DYNAMIC_LIB)" || ( \
+	@test -z "$(DYNAMIC_LIB)" || ( \
 		test ! -f "$(DESTDIR)$(libdir)/$(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR).$(DYNAMIC_LIB_MINOR).$(DYNAMIC_LIB_PATCH)" || \
 			rm "$(DESTDIR)$(libdir)/$(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR).$(DYNAMIC_LIB_MINOR).$(DYNAMIC_LIB_PATCH)" )
-	test -z "$(DYNAMIC_LIB)" || ( \
+	@test -z "$(DYNAMIC_LIB)" || ( \
 		test ! -h "$(DESTDIR)$(libdir)/$(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR)" || \
 			rm "$(DESTDIR)$(libdir)/$(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR)" )
-	test -z "$(DYNAMIC_LIB)" || ( \
+	@test -z "$(DYNAMIC_LIB)" || ( \
 		test ! -h "$(DESTDIR)$(libdir)/$(DYNAMIC_LIB)" || \
 			rm "$(DESTDIR)$(libdir)/$(DYNAMIC_LIB)" )
-	test -z "$(STATIC_LIB)" || ( \
+	@test -z "$(STATIC_LIB)" || ( \
 		test ! -f "$(DESTDIR)$(libdir)/$(STATIC_LIB)" || rm "$(DESTDIR)$(libdir)/$(STATIC_LIB)" )

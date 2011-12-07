@@ -86,9 +86,16 @@ local_distclean:
 
 local_install:
 	$(INSTALL) -d -m 0755 $(DESTDIR)$(sbindir)
-	$(INSTALL) -m 0775 $(CPP_BINS) $(DESTDIR)$(sbindir)
+	$(INSTALL) -m 0775 wolframed $(DESTDIR)$(sbindir)
 	$(INSTALL) -d -m 0755 $(DESTDIR)$(sysconfdir)/wolframe
 	$(INSTALL) -m 0755 wolframe.conf $(DESTDIR)$(sysconfdir)/wolframe
+
+local_uninstall:
+	@-rm -f $(DESTDIR)$(sbindir)/wolframed
+	@-rmdir $(DESTDIR)$(sbindir)
+	@-rm -f $(DESTDIR)$(sysconfdir)/wolframe/wolframe.conf
+	@-rmdir $(DESTDIR)$(sysconfdir)/wolframe
+	@-rmdir $(DESTDIR)$(sysconfdir)
 
 local_test:
 
