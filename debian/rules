@@ -69,9 +69,24 @@ install: build
 	$(MAKE) install $(WOLFRAME_PARAMS) \
 		sysconfdir=/etc \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe
+	# database modules depend on the database client library, each of them in its own package
+	cd src/modules/database; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
+		cd ../../..
+	# Qt client depends on X11/Qt, so it deserves it's own package
 	cd clients; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
 		cd ..
+
+	# module database sqlite3
+	cd src/modules/database/sqlite3; $(MAKE) install $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-sqlite3; \
+		cd ../../../..
+
+	# module database postgresql
+	cd src/modules/database/postgresql; $(MAKE) install $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-postgresql; \
+		cd ../../../..
 
 	# copy local versions of shared libraries of boost for platforms missing a decent
 	# version of boost
@@ -90,9 +105,9 @@ install: build
 		cd ..
 
 	# documentation package
-#	cd docs; $(MAKE) install $(WOLFRAME_PARAMS) \
-#		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-doc; \
-#		cd ..
+	cd docs; $(MAKE) install $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-doc; \
+		cd ..
 	
 	# --- end custom part for installing
 

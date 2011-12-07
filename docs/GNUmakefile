@@ -77,5 +77,11 @@ local_install:
 	$(INSTALL) -d -m 0755 $(DESTDIR)$(datadir)/doc/wolframe
 	cp -R doxygen/html/ $(DESTDIR)$(datadir)/doc/wolframe
 
+local_uninstall:
+	@-rm -rf $(DESTDIR)$(datadir)/doc/wolframe/html
+	@-rmdir $(DESTDIR)$(datadir)/doc/wolframe
+	@-rmdir $(DESTDIR)$(datadir)/doc
+	@-rmdir $(DESTDIR)$(datadir)
+
 local_test:
 	xmllint --noout --xinclude --postvalid --noent WolfBook.xml
