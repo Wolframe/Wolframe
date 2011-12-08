@@ -36,6 +36,7 @@ Project Wolframe.
 
 #include <cstddef>
 #include <string>
+#include <cstring>
 #include <boost/lexical_cast.hpp>
 
 #include "countedReference.hpp"
