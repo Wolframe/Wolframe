@@ -73,11 +73,14 @@ Auditor* AAAAprovider::auditor()
 AAAAprovider::AAAAprovider_Impl::AAAAprovider_Impl( const AAAAconfiguration* conf,
 						    const module::ModulesDirectory* modules )
 	: m_authenticator( conf->m_authConfig, modules ),
+	  m_authorizer( conf->m_authzConfig, modules ),
 	  m_auditor( conf->m_auditConfig, modules )	{}
 
 bool AAAAprovider::AAAAprovider_Impl::resolveDB( const db::DatabaseProvider& db )
 {
 	if ( !m_authenticator.resolveDB( db ))
+		return false;
+	if ( !m_authorizer.resolveDB( db ))
 		return false;
 	if ( !m_auditor.resolveDB( db ))
 		return false;
@@ -86,7 +89,7 @@ bool AAAAprovider::AAAAprovider_Impl::resolveDB( const db::DatabaseProvider& db 
 
 
 /***********************************************************************************/
-AuthenticationGroup::AuthenticationGroup( const std::list< config::ObjectConfiguration* >& confs,
+AuthenticationFactory::AuthenticationFactory( const std::list< config::ObjectConfiguration* >& confs,
 					  const module::ModulesDirectory* modules )
 {
 	for ( std::list<config::ObjectConfiguration*>::const_iterator it = confs.begin();
@@ -104,14 +107,14 @@ AuthenticationGroup::AuthenticationGroup( const std::list< config::ObjectConfigu
 	}
 }
 
-AuthenticationGroup::~AuthenticationGroup()
+AuthenticationFactory::~AuthenticationFactory()
 {
 	for ( std::list< ObjectContainer< AuthenticationUnit >* >::const_iterator it = m_authenticators.begin();
 								it != m_authenticators.end(); it++ )
 		delete *it;
 }
 
-bool AuthenticationGroup::resolveDB( const db::DatabaseProvider& db )
+bool AuthenticationFactory::resolveDB( const db::DatabaseProvider& db )
 {
 	for ( std::list< ObjectContainer< AuthenticationUnit >* >::const_iterator it = m_authenticators.begin();
 								it != m_authenticators.end(); it++ )
@@ -122,7 +125,43 @@ bool AuthenticationGroup::resolveDB( const db::DatabaseProvider& db )
 
 
 /***********************************************************************************/
-AuditGroup::AuditGroup( const std::list< config::ObjectConfiguration* >& confs,
+AuthorizationProvider::AuthorizationProvider( const std::list< config::ObjectConfiguration* >& confs,
+			const module::ModulesDirectory* modules )
+{
+	for ( std::list<config::ObjectConfiguration*>::const_iterator it = confs.begin();
+								it != confs.end(); it++ )	{
+		module::ModuleContainer* container = modules->getContainer((*it)->objectName());
+		if ( container )	{
+			ObjectContainer< AuthorizationUnit >* authz =
+					dynamic_cast< ObjectContainer< AuthorizationUnit >* >( container->container( **it ));
+			m_authorizers.push_back( authz );
+		}
+		else	{
+			LOG_ALERT << "AuthorizationProvider: unknown audit type '" << (*it)->objectName() << "'";
+			throw std::domain_error( "Unknown authorization mechanism type in AAAAprovider constructor. See log" );
+		}
+	}
+}
+
+AuthorizationProvider::~AuthorizationProvider()
+{
+	for ( std::list< ObjectContainer< AuthorizationUnit >* >::const_iterator it = m_authorizers.begin();
+								it != m_authorizers.end(); it++ )
+		delete *it;
+}
+
+bool AuthorizationProvider::resolveDB( const db::DatabaseProvider& db )
+{
+	for ( std::list< ObjectContainer< AuthorizationUnit >* >::const_iterator it = m_authorizers.begin();
+								it != m_authorizers.end(); it++ )
+		if ( ! (*it)->object().resolveDB( db ) )
+			return false;
+	return true;
+}
+
+
+/***********************************************************************************/
+AuditProvider::AuditProvider( const std::list< config::ObjectConfiguration* >& confs,
 			const module::ModulesDirectory* modules )
 {
 	for ( std::list<config::ObjectConfiguration*>::const_iterator it = confs.begin();
@@ -140,14 +179,14 @@ AuditGroup::AuditGroup( const std::list< config::ObjectConfiguration* >& confs,
 	}
 }
 
-AuditGroup::~AuditGroup()
+AuditProvider::~AuditProvider()
 {
 	for ( std::list< ObjectContainer< AuditUnit >* >::const_iterator it = m_auditors.begin();
 								it != m_auditors.end(); it++ )
 		delete *it;
 }
 
-bool AuditGroup::resolveDB( const db::DatabaseProvider& db )
+bool AuditProvider::resolveDB( const db::DatabaseProvider& db )
 {
 	for ( std::list< ObjectContainer< AuditUnit >* >::const_iterator it = m_auditors.begin();
 								it != m_auditors.end(); it++ )
@@ -169,6 +208,10 @@ AAAAconfiguration::~AAAAconfiguration()
 								it != m_authConfig.end(); it++ )
 		delete *it;
 
+	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_authzConfig.begin();
+								it != m_authzConfig.end(); it++ )
+		delete *it;
+
 	for ( std::list< config::ObjectConfiguration* >::const_iterator it =m_auditConfig.begin();
 								it != m_auditConfig.end(); it++ )
 		delete *it;
@@ -183,6 +226,11 @@ void AAAAconfiguration::print( std::ostream& os, size_t /* indent */ ) const
 	os << "      Allow anonymous login: " << (m_allowAnonymous ? "yes" : "no") << std::endl;
 	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_authConfig.begin();
 								it != m_authConfig.end(); it++ )
+		(*it)->print( os, 6 );
+
+	os << "   Authorization" << std::endl;
+	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_authzConfig.begin();
+								it != m_authzConfig.end(); it++ )
 		(*it)->print( os, 6 );
 
 	os << "   Audit" << std::endl;
@@ -204,6 +252,12 @@ bool AAAAconfiguration::check() const
 			correct = false;
 	}
 
+	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_authzConfig.begin();
+								it != m_authzConfig.end(); it++ )	{
+		if ( !(*it)->check() )
+			correct = false;
+	}
+
 	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_auditConfig.begin();
 								it != m_auditConfig.end(); it++ )	{
 		if ( !(*it)->check() )
@@ -218,6 +272,11 @@ void AAAAconfiguration::setCanonicalPathes( const std::string& refPath )
 	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_authConfig.begin();
 								it != m_authConfig.end(); it++ )
 		(*it)->setCanonicalPathes( refPath );
+
+	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_authzConfig.begin();
+								it != m_authzConfig.end(); it++ )
+		(*it)->setCanonicalPathes( refPath );
+
 
 	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_auditConfig.begin();
 								it != m_auditConfig.end(); it++ )

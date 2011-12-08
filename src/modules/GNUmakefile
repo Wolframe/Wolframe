@@ -1,6 +1,6 @@
 TOPDIR = ../..
 
-SUBDIRS = database audit authentication processor
+SUBDIRS = database audit authentication authorization processor
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

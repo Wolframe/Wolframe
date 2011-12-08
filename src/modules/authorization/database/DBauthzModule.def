@@ -1,0 +1,6 @@
+LIBRARY mod_authz_database
+DESCRIPTION "Wolframe authorization module"
+
+EXPORTS
+createModule    @1
+setModuleLogger @1

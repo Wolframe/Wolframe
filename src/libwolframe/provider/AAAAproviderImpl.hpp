@@ -40,6 +40,7 @@
 #include "AAAA/AAAAprovider.hpp"
 #include "config/configurationBase.hpp"
 #include "AAAA/authentication.hpp"
+#include "AAAA/authorization.hpp"
 #include "AAAA/audit.hpp"
 #include "container.hpp"
 #include "moduleInterface.hpp"
@@ -52,12 +53,12 @@
 namespace _Wolframe {
 namespace AAAA {
 
-class AuthenticationGroup
+class AuthenticationFactory
 {
 public:
-	AuthenticationGroup( const std::list< config::ObjectConfiguration* >& confs,
+	AuthenticationFactory( const std::list< config::ObjectConfiguration* >& confs,
 			     const module::ModulesDirectory* modules );
-	~AuthenticationGroup();
+	~AuthenticationFactory();
 	bool resolveDB( const db::DatabaseProvider& db );
 
 	Authenticator* authenticator()		{ return NULL; }
@@ -66,12 +67,26 @@ private:
 };
 
 
-class AuditGroup
+class AuthorizationProvider
 {
 public:
-	AuditGroup( const std::list< config::ObjectConfiguration* >& confs,
+	AuthorizationProvider( const std::list< config::ObjectConfiguration* >& confs,
 		    const module::ModulesDirectory* modules );
-	~AuditGroup();
+	~AuthorizationProvider();
+	bool resolveDB( const db::DatabaseProvider& db );
+
+	Authorizer* authorizer()		{ return NULL; }
+private:
+	std::list< ObjectContainer< AuthorizationUnit >* >	m_authorizers;
+};
+
+
+class AuditProvider
+{
+public:
+	AuditProvider( const std::list< config::ObjectConfiguration* >& confs,
+		    const module::ModulesDirectory* modules );
+	~AuditProvider();
 	bool resolveDB( const db::DatabaseProvider& db );
 
 	Auditor* auditor()			{ return NULL; }
@@ -89,10 +104,12 @@ public:
 	bool resolveDB( const db::DatabaseProvider& db );
 
 	Authenticator* authenticator()		{ return m_authenticator.authenticator(); }
+	Authorizer* authorizer()		{ return m_authorizer.authorizer(); }
 	Auditor* auditor()			{ return m_auditor.auditor(); }
 private:
-	AuthenticationGroup	m_authenticator;
-	AuditGroup		m_auditor;
+	AuthenticationFactory	m_authenticator;
+	AuthorizationProvider	m_authorizer;
+	AuditProvider		m_auditor;
 };
 
 }} // namespace _Wolframe::AAAA
