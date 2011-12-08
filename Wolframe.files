@@ -101,6 +101,11 @@ clients/qt/HistoryLineEdit.hpp
 clients/qt/MainWindow.cpp
 clients/qt/MainWindow.hpp
 clients/qt/Makefile.W32
+clients/qt/moc_AbstractFormLoader.cpp
+clients/qt/moc_DebugTerminal.cpp
+clients/qt/moc_HistoryLineEdit.cpp
+clients/qt/moc_MainWindow.cpp
+clients/qt/moc_WolframeClient.cpp
 clients/qt/qtclient.cpp
 clients/qt/README
 clients/qt/TODOS
@@ -191,8 +196,10 @@ examples/iproc/langbind/luaDebug.hpp
 examples/iproc/langbind/luaTransaction.cpp
 examples/iproc/langbind/luaTransaction.hpp
 examples/iproc/Makefile.W32
-examples/iproc/serialize/mapContext.hpp
+examples/iproc/serialize/ddl/filtermapSerialize.cpp
+examples/iproc/serialize/ddl/filtermapSerialize.hpp
 examples/iproc/serialize/mapContext.cpp
+examples/iproc/serialize/mapContext.hpp
 examples/iproc/serialize/struct/filtermapBase.cpp
 examples/iproc/serialize/struct/filtermapBase.hpp
 examples/iproc/serialize/struct/filtermapDescription.hpp
@@ -205,8 +212,6 @@ examples/iproc/serialize/struct/luamapDescription.hpp
 examples/iproc/serialize/struct/luamapParse.hpp
 examples/iproc/serialize/struct/luamapPrint.hpp
 examples/iproc/serialize/struct/luamapTraits.hpp
-examples/iproc/serialize/ddl/filtermapSerialize.cpp
-examples/iproc/serialize/ddl/filtermapSerialize.hpp
 examples/iproc/tests/data/test_directmap_places_IsoLatin1.xml
 examples/iproc/tests/data/test_IsoLatin1.xml
 examples/iproc/tests/data/test_luamap_places_IsoLatin1.xml
@@ -223,6 +228,7 @@ examples/iproc/tests/structFiltermapTest.cpp
 examples/iproc/tests/structLuamapTest.cpp
 examples/iproc/tests/testHandlerTemplates.hpp
 examples/iproc/tests/testUtils.hpp
+examples/iproc/TODO
 examples/lua/appConfigDefinition.cpp
 examples/lua/appProperties.cpp
 examples/lua/.Attic/luahelpers.c
