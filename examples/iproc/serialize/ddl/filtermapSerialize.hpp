@@ -29,46 +29,23 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/mapContext.hpp
-///\brief Defines the error handling of serialization/deserialization functions
+///\file serialize/struct/filtermapSerialize.hpp
+///\brief Defines the DDL structure serialization for filters
 
-#ifndef _Wolframe_SERIALIZE_STRUCT_MAPCONTEXT_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_STRUCT_MAPCONTEXT_HPP_INCLUDED
-#include <string>
+#ifndef _Wolframe_SERIALIZE_DDL_FILTERMAP_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_DDL_FILTERMAP_HPP_INCLUDED
 #include "protocol/inputfilter.hpp"
 #include "protocol/formatoutput.hpp"
+#include "serialize/mapContext.hpp"
+#include "ddl/structType.hpp"
+#include <cstddef>
 
 namespace _Wolframe {
 namespace serialize {
 
-struct Context
-{
-	enum {bufsize=4096,errbufsize=256};
+bool parse( ddl::StructType& st, protocol::InputFilter& flt, Context& ctx);
+bool print( const ddl::StructType& st, protocol::FormatOutput*& out, Context& ctx);
 
-	Context();
-	~Context();
-
-	const char* getLastError() const		{return m_lasterror;}
-	char* buf() const				{return m_buf;}
-	const std::string& content() const		{return m_content;}
-	void append( const char* c, std::size_t n)	{m_content.append( c,n);}
-	void clear()					{m_content.clear();}
-	void endTagConsumed( bool v)			{m_endTagConsumed=v;}
-	bool endTagConsumed()				{return m_endTagConsumed;}
-
-	void setError( const char* tt, const char* msg, const char* msgparam=0);
-	void setError( const char* tt);
-	bool printElem( protocol::FormatOutput::ElementType tp, const void* elem, std::size_t elemsize, protocol::FormatOutput*& out);
-
-private:
-	char* m_lasterror;
-	char* m_buf;
-	std::string m_content;
-	bool m_endTagConsumed;
-
-	void setMsg( const char* m1, char dd, const char* m2, const char* m3=0);
-};
-
-}}
+}}//namespace
 #endif
 

@@ -81,9 +81,9 @@ bool print_( const char* tag, const void* obj, const struct_&, protocol::FormatO
 	if (tag && !printElem( protocol::FormatOutput::OpenTag, tag, std::strlen(tag), out, ctx)) return false;
 
 	DescriptionBase::Map::const_iterator itr = descr->begin(),end = descr->end();
-	for (;itr != end; ++itr)
+	for (std::size_t idx=0; itr != end; ++itr,++idx)
 	{
-		if (itr->second.isAtomic() && !isContent)
+		if (itr->second.isAtomic() && !isContent && idx < descr->nof_attributes())
 		{
 			if (!printElem( protocol::FormatOutput::Attribute, itr->first, std::strlen(itr->first), out, ctx)) return false;
 			if (!itr->second.print()( 0, (char*)obj+itr->second.ofs(), out, ctx)) return false;

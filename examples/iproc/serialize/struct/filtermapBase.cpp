@@ -43,7 +43,7 @@ bool DescriptionBase::parse( const char* name, void* obj, protocol::InputFilter&
 	bool rt = true;
 	try
 	{
-		ctx.m_content.append( (char*)in.ptr(), in.size());
+		ctx.append( (char*)in.ptr(), in.size());
 		in.skip( in.size());
 
 		if (!in.gotEoD())
@@ -53,7 +53,7 @@ bool DescriptionBase::parse( const char* name, void* obj, protocol::InputFilter&
 		}
 		in.setState( protocol::InputFilter::Open);
 		inp = in.copy();
-		inp->protocolInput( (void*)ctx.m_content.c_str(), ctx.m_content.size(), true);
+		inp->protocolInput( (void*)ctx.content().c_str(), ctx.content().size(), true);
 
 		std::size_t bufpos = 0;
 		protocol::InputFilter::ElementType etyp;
@@ -107,7 +107,7 @@ bool DescriptionBase::parse( const char* name, void* obj, protocol::InputFilter&
 		ctx.setError( 0, e.what());
 		rt = false;
 	}
-	ctx.m_content.clear();
+	ctx.clear();
 	if (inp) delete inp;
 	return rt;
 }

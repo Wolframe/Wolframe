@@ -73,7 +73,9 @@ OBJS = \
 	filters\textwolf_filterBase.obj \
 	filters\char_filter.obj \
 	filters\line_filter.obj \
+	serialize\mapContext.obj \
 	serialize\struct\filtermapBase.obj \
+	serialize\ddl\filtermapSerialize.obj \
 	ddl\simpleFormCompile.obj \
 	$(TOPDIR)\src\winMain.obj
 

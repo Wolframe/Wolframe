@@ -126,32 +126,29 @@ struct FormatOutputImpl :public protocol::FormatOutput, public FilterBase<IOChar
 
 	///\brief Get a member value of the filter
 	///\param [in] name case sensitive name of the variable
-	///\param [in] valbuf buffer for the value returned
-	///\param [in] valbufsize size of the valbuf buffer in bytes
+	///\param [in] value the value returned
 	///\return true on success, false, if the variable does not exist or the operation failed
-	virtual bool getValue( const char* name, char* valbuf, std::size_t valbufsize)
+	virtual bool getValue( const char* name, std::string& value)
 	{
 		if (std::strcmp( name, "tagstacksize") == 0)
 		{
-			std::string val( boost::lexical_cast<std::string>( m_tagstksize));
-			if (val.size() >= valbufsize) return false;
-			std::memcpy( valbuf, val.c_str(), val.size()+1);
+			value = boost::lexical_cast<std::string>( m_tagstksize);
 			return true;
 		}
-		return Parent::getValue( name, valbuf, valbufsize);
+		return Parent::getValue( name, value);
 	}
 
 	///\brief Set a member value of the filter
 	///\param [in] name case sensitive name of the variable
 	///\param [in] value new value of the variable to set
 	///\return true on success, false, if the variable does not exist or the operation failed
-	virtual bool setValue( const char* name, const char* value)
+	virtual bool setValue( const char* name, const std::string& value)
 	{
-		int tagstksize;
+		std::size_t tagstksize;
 		if (std::strcmp( name, "tagstacksize") == 0)
 		{
-			tagstksize = atoi( value);
-			if (tagstksize <= (int)m_tagstkpos) return false;
+			tagstksize = boost::lexical_cast<std::size_t>( value);
+			if (tagstksize <= m_tagstkpos) return false;
 			char* tagstk = new (std::nothrow) char[ tagstksize];
 			if (!tagstk) return false;
 			std::memcpy( tagstk, m_tagstk, m_tagstkpos);
@@ -542,39 +539,36 @@ struct InputFilterImpl :public protocol::InputFilter, public FilterBase<IOCharse
 
 	///\brief Get a member value of the filter
 	///\param [in] name case sensitive name of the variable
-	///\param [in] valbuf buffer for the value returned
-	///\param [in] valbufsize size of the valbuf buffer in bytes
+	///\param [in] val the value returned
 	///\return true on success, false, if the variable does not exist or the operation failed
-	virtual bool getValue( const char* name, char* valbuf, std::size_t valbufsize)
+	virtual bool getValue( const char* name, std::string& val)
 	{
 		if (std::strcmp( name, "empty") == 0)
 		{
-			if (valbufsize > 6) return false;
-			std::strncpy( valbuf, m_withEmpty?"true":"false", valbufsize);
+			val = m_withEmpty?"true":"false";
 			return true;
 		}
 		if (std::strcmp( name, "tokenize") == 0)
 		{
-			if (valbufsize > 6) return false;
-			std::strncpy( valbuf, m_doTokenize?"true":"false", valbufsize);
+			val = m_doTokenize?"true":"false";
 			return true;
 		}
-		return Parent::getValue( name, valbuf, valbufsize);
+		return Parent::getValue( name, val);
 	}
 
 	///\brief Set a member value of the filter
 	///\param [in] name case sensitive name of the variable
 	///\param [in] value new value of the variable to set
 	///\return true on success, false, if the variable does not exist or the operation failed
-	virtual bool setValue( const char* name, const char* value)
+	virtual bool setValue( const char* name, const std::string& value)
 	{
 		if (std::strcmp( name, "empty") == 0)
 		{
-			if (std::strcmp( value, "true") == 0)
+			if (std::strcmp( value.c_str(), "true") == 0)
 			{
 				m_withEmpty = true;
 			}
-			else if (std::strcmp( value, "false") == 0)
+			else if (std::strcmp( value.c_str(), "false") == 0)
 			{
 				m_withEmpty = false;
 			}
@@ -586,12 +580,12 @@ struct InputFilterImpl :public protocol::InputFilter, public FilterBase<IOCharse
 		}
 		if (std::strcmp( name, "tokenize") == 0)
 		{
-			if (std::strcmp( value, "true") == 0)
+			if (std::strcmp( value.c_str(), "true") == 0)
 			{
 				m_doTokenize = true;
 				if (m_scanner) m_scanner->doTokenize(true);
 			}
-			else if (std::strcmp( value, "false") == 0)
+			else if (std::strcmp( value.c_str(), "false") == 0)
 			{
 				m_doTokenize = false;
 				if (m_scanner) m_scanner->doTokenize(false);
@@ -732,39 +726,36 @@ public:
 
 	///\brief Get a member value of the filter
 	///\param [in] name case sensitive name of the variable
-	///\param [in] valbuf buffer for the value returned
-	///\param [in] valbufsize size of the valbuf buffer in bytes
+	///\param [in] val the value returned
 	///\return true on success, false, if the variable does not exist or the operation failed
-	virtual bool getValue( const char* name, char* valbuf, std::size_t valbufsize)
+	virtual bool getValue( const char* name, std::string& val)
 	{
 		if (std::strcmp( name, "empty") == 0)
 		{
-			if (valbufsize > 6) return false;
-			std::strncpy( valbuf, m_withEmpty?"true":"false", valbufsize);
+			val = m_withEmpty?"true":"false";
 			return true;
 		}
 		if (std::strcmp( name, "tokenize") == 0)
 		{
-			if (valbufsize > 6) return false;
-			std::strncpy( valbuf, m_doTokenize?"true":"false", valbufsize);
+			val = m_doTokenize?"true":"false";
 			return true;
 		}
-		return Parent::getValue( name, valbuf, valbufsize);
+		return Parent::getValue( name, val);
 	}
 
 	///\brief Set a member value of the filter
 	///\param [in] name case sensitive name of the variable
 	///\param [in] value new value of the variable to set
 	///\return true on success, false, if the variable does not exist or the operation failed
-	virtual bool setValue( const char* name, const char* value)
+	virtual bool setValue( const char* name, const std::string& value)
 	{
 		if (std::strcmp( name, "empty") == 0)
 		{
-			if (std::strcmp( value, "true") == 0)
+			if (std::strcmp( value.c_str(), "true") == 0)
 			{
 				m_withEmpty = true;
 			}
-			else if (std::strcmp( value, "false") == 0)
+			else if (std::strcmp( value.c_str(), "false") == 0)
 			{
 				m_withEmpty = false;
 			}
@@ -776,11 +767,11 @@ public:
 		}
 		if (std::strcmp( name, "tokenize") == 0)
 		{
-			if (std::strcmp( value, "true") == 0)
+			if (std::strcmp( value.c_str(), "true") == 0)
 			{
 				m_doTokenize = true;
 			}
-			else if (std::strcmp( value, "false") == 0)
+			else if (std::strcmp( value.c_str(), "false") == 0)
 			{
 				m_doTokenize = false;
 			}

@@ -117,13 +117,12 @@ struct Filter
 
 	///\brief Get a member value of the filter
 	///\param [in] name case sensitive name of the variable
-	///\param [in] valbuf buffer for the value returned
-	///\param [in] valbufsize size of the valbuf buffer in bytes
+	///\param [in] val the value returned
 	///\return true on success, false, if the variable does not exist or the operation failed
-	bool getValue( const char* name, char* valbuf, std::size_t valbufsize)
+	bool getValue( const char* name, std::string& val)
 	{
-		if (m_inputfilter.get() && m_inputfilter->getValue( name, valbuf, valbufsize)) return true;
-		if (m_formatoutput.get() && m_formatoutput->getValue( name, valbuf, valbufsize)) return true;
+		if (m_inputfilter.get() && m_inputfilter->getValue( name, val)) return true;
+		if (m_formatoutput.get() && m_formatoutput->getValue( name, val)) return true;
 		return false;
 	}
 
@@ -131,7 +130,7 @@ struct Filter
 	///\param [in] name case sensitive name of the variable
 	///\param [in] value new value of the variable to set
 	///\return true on success, false, if the variable does not exist or the operation failed
-	bool setValue( const char* name, const char* value)
+	bool setValue( const char* name, const std::string& value)
 	{
 		if (m_inputfilter.get() && m_inputfilter->setValue( name, value)) return true;
 		if (m_formatoutput.get() && m_formatoutput->setValue( name, value)) return true;

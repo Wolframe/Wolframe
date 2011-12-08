@@ -217,35 +217,33 @@ struct InputFilterImpl :public BufferingInputFilter<Content>
 
 	///\brief Get a member value of the filter
 	///\param [in] name case sensitive name of the variable
-	///\param [in] valbuf buffer for the value returned
-	///\param [in] valbufsize size of the valbuf buffer in bytes
+	///\param [in] val the value returned
 	///\return true on success, false, if the variable does not exist or the operation failed
-	virtual bool getValue( const char* name, char* valbuf, std::size_t valbufsize)
+	virtual bool getValue( const char* name, std::string& val)
 	{
 		Content* dc = content();
 		if (std::strcmp( name, "empty") == 0)
 		{
-			if (valbufsize > 6) return false;
-			std::strncpy( valbuf, dc->m_withEmpty?"true":"false", valbufsize);
+			val = dc->m_withEmpty?"true":"false";
 			return true;
 		}
-		return Parent::getValue( name, valbuf, valbufsize);
+		return Parent::getValue( name, val);
 	}
 
 	///\brief Set a member value of the filter
 	///\param [in] name case sensitive name of the variable
 	///\param [in] value new value of the variable to set
 	///\return true on success, false, if the variable does not exist or the operation failed
-	virtual bool setValue( const char* name, const char* value)
+	virtual bool setValue( const char* name, const std::string& value)
 	{
 		Content* dc = content();
 		if (std::strcmp( name, "empty") == 0)
 		{
-			if (std::strcmp( value, "true") == 0)
+			if (std::strcmp( value.c_str(), "true") == 0)
 			{
 				dc->m_withEmpty = true;
 			}
-			else if (std::strcmp( value, "false") == 0)
+			else if (std::strcmp( value.c_str(), "false") == 0)
 			{
 				dc->m_withEmpty = false;
 			}

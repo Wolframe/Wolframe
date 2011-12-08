@@ -35,6 +35,7 @@ Project Wolframe.
 ///\brief Output interfaces for the application processor
 
 #include <cstddef>
+#include <string>
 #include "countedReference.hpp"
 #include "protocol/ioblocks.hpp"
 
@@ -142,26 +143,34 @@ struct FormatOutput :public OutputBlock
 	///\return true, on success, false, if failed
 	virtual bool print( ElementType type, const void* element, std::size_t elementsize)=0;
 
+	///\brief Print the next element to the buffer
+	///\param [in] type type of element to print
+	///\param [in] element content of element to print
+	///\return true, on success, false, if failed
+	bool print( ElementType type, const std::string& element)
+	{
+		return print( type, element.c_str(), element.size());
+	}
+
 	///\brief Get error code in case of error state
 	///\return the error code
-	int getError() const				{return m_errorCode;}
+	int getError() const								{return m_errorCode;}
 
 	///\brief Get the last error, if the filter got into an error state
 	///\return the last error as string or 0
-	virtual const char* getLastError() const	{return m_errorCode?"unknown":0;}
+	virtual const char* getLastError() const					{return m_errorCode?"unknown":0;}
 
 	///\brief Get a member value of the filter
 	///\param [in] name case sensitive name of the variable
-	///\param [in] valbuf buffer for the value returned
-	///\param [in] valbufsize size of the valbuf buffer in bytes
+	///\param [in] val buffer for the value returned
 	///\return true on success, false, if the variable does not exist or the operation failed
-	virtual bool getValue( const char* /*name*/, char* /*valbuf*/, std::size_t /*valbufsize*/)	{return false;}
+	virtual bool getValue( const char* /*name*/, std::string& /*val*/)		{return false;}
 
 	///\brief Set a member value of the filter
 	///\param [in] name case sensitive name of the variable
-	///\param [in] value new value of the variable to set
+	///\param [in] val new value of the variable to set
 	///\return true on success, false, if the variable does not exist or the operation failed
-	virtual bool setValue( const char* /*name*/, const char* /*value*/) {return false;}
+	virtual bool setValue( const char* /*name*/, const std::string& /*val*/)	{return false;}
 
 	///\brief Set format output state with error code
 	///\param [in] s new state

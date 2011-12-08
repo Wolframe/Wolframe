@@ -35,9 +35,7 @@ Project Wolframe.
 ///\brief Input interface for the application processor
 
 #include <cstddef>
-#include <cstring>
-#include <cstdio>
-#include <cstdlib>
+#include <string>
 #include <boost/lexical_cast.hpp>
 
 #include "countedReference.hpp"
@@ -145,16 +143,13 @@ struct InputFilter
 
 	///\brief Get a member value of the filter
 	///\param [in] name case sensitive name of the variable
-	///\param [in] valbuf buffer for the value returned
-	///\param [in] valbufsize size of the valbuf buffer in bytes
+	///\param [in] value buffer for the value returned
 	///\return true on success, false, if the variable does not exist or the operation failed
-	virtual bool getValue( const char* name, char* valbuf, std::size_t valbufsize)
+	virtual bool getValue( const char* name, std::string& value)
 	{
 		if (std::strcmp( name, "buffersize") == 0)
 		{
-			std::string val( boost::lexical_cast<std::string>( m_genbufsize));
-			if (val.size() >= valbufsize) return false;
-			std::memcpy( valbuf, val.c_str(), val.size()+1);
+			value = boost::lexical_cast<std::string>( m_genbufsize);
 			return true;
 		}
 		return false;
@@ -164,13 +159,11 @@ struct InputFilter
 	///\param [in] name case sensitive name of the variable
 	///\param [in] value new value of the variable to set
 	///\return true on success, false, if the variable does not exist or the operation failed
-	virtual bool setValue( const char* name, const char* value)
+	virtual bool setValue( const char* name, const std::string& value)
 	{
 		if (std::strcmp( name, "buffersize") == 0)
 		{
-			int genbufsize = atoi( value);
-			if (genbufsize <= 0) return false;
-			m_genbufsize = genbufsize;
+			m_genbufsize = boost::lexical_cast<std::size_t>( value);
 			return true;
 		}
 		return false;
