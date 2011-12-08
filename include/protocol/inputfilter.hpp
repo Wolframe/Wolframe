@@ -148,7 +148,7 @@ struct InputFilter
 	///\return true on success, false, if the variable does not exist or the operation failed
 	virtual bool getValue( const char* name, std::string& value)
 	{
-		if (std::strcmp( name, "buffersize") == 0)
+		if (strcmp( name, "buffersize") == 0)
 		{
 			value = boost::lexical_cast<std::string>( m_genbufsize);
 			return true;
