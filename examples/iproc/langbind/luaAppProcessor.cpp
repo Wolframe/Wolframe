@@ -238,10 +238,33 @@ static int function__LuaObject__index( lua_State* ls)
 	const char* key = lua_tostring( ls, 2);
 	if (!key) luaL_error( ls, "%s __index called with an invalid argument 2 (key)", metaTableName<Object>());
 
-	char val[128];
-	if (obj->getValue( key, val, sizeof(val)))
+	bool rt = false;
+	bool overfl = false;
+	char valbuf[ 128];
+	try
 	{
-		lua_pushstring( ls, val);
+		std::string val;
+		rt = obj->getValue( key, val);
+		std::size_t nn = (overfl=(val.size() >= sizeof( valbuf)))?127:val.size();
+		std::memcpy( valbuf, val.c_str(), nn);
+		valbuf[ nn] = 0;
+	}
+	catch (const std::bad_alloc&)
+	{
+		luaL_error( ls, "out of memory calling %s __index", metaTableName<Object>());
+	}
+	catch (const std::exception& e)
+	{
+		luaL_error( ls, "%s __index called with illegal value (%s)", metaTableName<Object>(), e.what());
+	}
+	if (rt)
+	{
+		if (overfl)
+		{
+			luaL_error( ls, "%s __index variable size exceeds maximum size (%u)", metaTableName<Object>(), sizeof(valbuf));
+		}
+
+		lua_pushstring( ls, valbuf);
 		return 1;
 	}
 	else
@@ -272,9 +295,20 @@ static int function__LuaObject__newindex( lua_State* ls)
 	}
 	if (!val) luaL_error( ls, "%s __newindex called with invalid argument 3 (value)", metaTableName<Object>());
 
-	if (!obj->setValue( key, val))
+	try
 	{
-		luaL_error( ls, "%s __newindex called with unknown variable name", metaTableName<Object>());
+		if (!obj->setValue( key, val))
+		{
+			luaL_error( ls, "%s __newindex called with unknown variable name", metaTableName<Object>());
+		}
+	}
+	catch (const std::bad_alloc&)
+	{
+		luaL_error( ls, "out of memory calling %s __newindex", metaTableName<Object>());
+	}
+	catch (const std::exception& e)
+	{
+		luaL_error( ls, "%s __newindex called with illegal value (%s)", metaTableName<Object>(), e.what());
 	}
 	return 0;
 }
