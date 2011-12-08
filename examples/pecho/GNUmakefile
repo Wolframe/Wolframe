@@ -53,7 +53,6 @@ TEST_BINS += \
 pechod$(EXE): $(TOPDIR)/src/loadModules-dummy.o $(TOPDIR)/src/posixMain.o $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
 
 tests/pechoHandlerTest$(EXE): tests/pechoHandlerTest.o $(OBJS) $(TOPDIR)/src/libwolframe.a
-	$(CXX_LINK) -o $@ $(LDFLAGS) $(OBJS) $< $(LIBS)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
