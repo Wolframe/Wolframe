@@ -48,11 +48,10 @@ namespace AAAA {
 // interface for all authorization mechanisms
 class Authorizer {
 public:
-	virtual ~Authorizer( ) { }
+	virtual ~Authorizer()		{}
 
-	// close the authorizer and destroy all
-	// sensible data
-	virtual void close( ) { }
+	// close the authorizer (not really)
+	virtual void close()		{}
 };
 
 
@@ -61,9 +60,10 @@ public:
 class AuthorizationUnit
 {
 public:
-	virtual ~AuthorizationUnit()				{}
+	virtual ~AuthorizationUnit()	{}
 
-	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ ) const	{ return true; }
+	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ ) const
+					{ return true; }
 };
 
 }} // namespace _Wolframe::AAAA

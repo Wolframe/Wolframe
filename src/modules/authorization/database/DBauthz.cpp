@@ -49,7 +49,7 @@ DBauthzContainer::DBauthzContainer( const DatabaseAuthzConfig& conf )
 	if ( m_dbLabel.empty() )
 		throw std::logic_error( "Empty database reference in DBauthzContainer" );
 
-	MOD_LOG_NOTICE << "Database authorizer with database reference '" << m_dbLabel << "'";
+	MOD_LOG_NOTICE << "Database authorizer created with database reference '" << m_dbLabel << "'";
 }
 
 DBauthzContainer::~DBauthzContainer()

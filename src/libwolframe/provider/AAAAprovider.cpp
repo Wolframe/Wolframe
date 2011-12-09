@@ -78,10 +78,13 @@ AAAAprovider::AAAAprovider_Impl::AAAAprovider_Impl( const AAAAconfiguration* con
 
 bool AAAAprovider::AAAAprovider_Impl::resolveDB( const db::DatabaseProvider& db )
 {
+	LOG_DATA << " --- Resolving authentication databases ---";
 	if ( !m_authenticator.resolveDB( db ))
 		return false;
+	LOG_DATA << " --- Resolving authorization databases ---";
 	if ( !m_authorizer.resolveDB( db ))
 		return false;
+	LOG_DATA << " --- Resolving audit databases ---";
 	if ( !m_auditor.resolveDB( db ))
 		return false;
 	return true;
@@ -99,6 +102,7 @@ AuthenticationFactory::AuthenticationFactory( const std::list< config::ObjectCon
 			ObjectContainer< AuthenticationUnit >* auth =
 					dynamic_cast< ObjectContainer< AuthenticationUnit >* >( container->container( **it ));
 			m_authenticators.push_back( auth );
+			LOG_TRACE << "Authentication Unit of type '" << auth->objectName() << "' registered";
 		}
 		else	{
 			LOG_ALERT << "AuthenticationGroup: unknown authentication type '" << (*it)->objectName() << "'";
@@ -116,6 +120,8 @@ AuthenticationFactory::~AuthenticationFactory()
 
 bool AuthenticationFactory::resolveDB( const db::DatabaseProvider& db )
 {
+	MOD_LOG_ERROR << " *** AuthenticationFactory::resolveDB ***";
+
 	for ( std::list< ObjectContainer< AuthenticationUnit >* >::const_iterator it = m_authenticators.begin();
 								it != m_authenticators.end(); it++ )
 		if ( ! (*it)->object().resolveDB( db ) )
@@ -135,6 +141,7 @@ AuthorizationProvider::AuthorizationProvider( const std::list< config::ObjectCon
 			ObjectContainer< AuthorizationUnit >* authz =
 					dynamic_cast< ObjectContainer< AuthorizationUnit >* >( container->container( **it ));
 			m_authorizers.push_back( authz );
+			LOG_TRACE << "Authorization Unit of type '" << authz->objectName() << "' registered";
 		}
 		else	{
 			LOG_ALERT << "AuthorizationProvider: unknown audit type '" << (*it)->objectName() << "'";
@@ -152,6 +159,8 @@ AuthorizationProvider::~AuthorizationProvider()
 
 bool AuthorizationProvider::resolveDB( const db::DatabaseProvider& db )
 {
+	MOD_LOG_ERROR << " *** AuthorizationProvider::resolveDB ***";
+
 	for ( std::list< ObjectContainer< AuthorizationUnit >* >::const_iterator it = m_authorizers.begin();
 								it != m_authorizers.end(); it++ )
 		if ( ! (*it)->object().resolveDB( db ) )
@@ -171,6 +180,7 @@ AuditProvider::AuditProvider( const std::list< config::ObjectConfiguration* >& c
 			ObjectContainer< AuditUnit >* audit =
 					dynamic_cast< ObjectContainer< AuditUnit >* >( container->container( **it ));
 			m_auditors.push_back( audit );
+			LOG_TRACE << "Audit Unit of type '" << audit->objectName() << "' registered";
 		}
 		else	{
 			LOG_ALERT << "AuditGroup: unknown audit type '" << (*it)->objectName() << "'";
@@ -188,6 +198,8 @@ AuditProvider::~AuditProvider()
 
 bool AuditProvider::resolveDB( const db::DatabaseProvider& db )
 {
+	MOD_LOG_ERROR << " *** AuditProvider::resolveDB ***";
+
 	for ( std::list< ObjectContainer< AuditUnit >* >::const_iterator it = m_auditors.begin();
 								it != m_auditors.end(); it++ )
 		if ( ! (*it)->object().resolveDB( db ) )

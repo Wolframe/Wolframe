@@ -46,6 +46,7 @@ class Container
 public:
 	virtual ~Container()		{}
 	virtual void dispose() = 0;
+	virtual const char* objectName() const = 0;
 };
 
 template < class T >

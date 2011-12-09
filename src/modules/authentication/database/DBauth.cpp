@@ -49,25 +49,19 @@ DBauthContainer::DBauthContainer( const DatabaseAuthConfig& conf )
 	if ( m_dbLabel.empty() )
 		throw std::logic_error( "Empty database reference in DBauthContainer" );
 
-	MOD_LOG_NOTICE << "Database authenticator with database reference '" << m_dbLabel << "'";
+	MOD_LOG_NOTICE << "Database authenticator created with database reference '" << m_dbLabel << "'";
 }
 
 DBauthContainer::~DBauthContainer()
 {
+	MOD_LOG_TRACE << " *** DBauthContainer::~DBauthContainer() ***";
 }
 
 
 bool DBauthContainer::resolveDB( const db::DatabaseProvider& db )
 {
+	MOD_LOG_ERROR << " *** DBauthContainer::resolveDB ***";
 	if ( m_db == NULL && ! m_dbLabel.empty() )	{
-		// Aba: DBauth.obj : error LNK2019: unresolved external symbol "public: class _Wolframe:
-		//:db::Database const * __thiscall _Wolframe::db::DatabaseProvider::database(class
-		//std::basic_string<char,struct std::char_traits<char>,class std::allocator<char>
-		//> const &)const " (?database@DatabaseProvider@db@_Wolframe@@QBEPBVDatabase@23@A
-		//BV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z) referenced in
-		//function "public: bool __thiscall _Wolframe::AAAA::DBauthContainer::resolveDB(c
-		//lass _Wolframe::db::DatabaseProvider const &)" (?resolveDB@DBauthContainer@AAAA@
-		//_Wolframe@@QAE_NABVDatabaseProvider@db@3@@Z)
 		m_db = db.database( m_dbLabel );
 		if ( m_db )	{
 			MOD_LOG_NOTICE << "Database authenticator: database reference '" << m_dbLabel << "' resolved";

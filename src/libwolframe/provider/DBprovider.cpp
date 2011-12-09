@@ -72,6 +72,7 @@ DatabaseProvider::DatabaseProvider_Impl::DatabaseProvider_Impl( const DBprovider
 			ObjectContainer< db::DatabaseUnit >* db =
 					dynamic_cast< ObjectContainer< db::DatabaseUnit >* >( container->container( **it ));
 			m_db.push_back( db );
+			LOG_TRACE << "Database Unit of type '" << db->objectName() << "' registered";
 		}
 		else	{
 			LOG_ALERT << "DatabaseProvider: unknown database module '" << (*it)->objectName() << "'";
