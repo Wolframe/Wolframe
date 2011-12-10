@@ -324,7 +324,13 @@ openssl and qt are there (select the correct "disk" sets while installing)
 Lua is missing, compile your own one.
 
 PAM doesn't exist on Slackware it may be build manually.
-Postgresql doesn't exist on Slackware, build your own one.
+Postgresql doesn't exist on Slackware, build your own one:
+
+./configure --prefix=/home/<myname>/postgresql-9.1.2
+make
+make install
+
+add PGSQL_DIR=~/postgresql-9.1.2 to Wolframe 'make'
 
 Archlinux
 ---------
