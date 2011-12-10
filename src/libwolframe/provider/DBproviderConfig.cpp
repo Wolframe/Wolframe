@@ -69,7 +69,7 @@ bool DBproviderConfig::parse( const config::ConfigurationTree& pt,
 			if ( container )	{
 				config::ObjectConfiguration* conf = container->configuration( logPrefix().c_str());
 				if ( conf->parse( L1it->second, L1it->first, modules ))
-					m_dbConfig.push_back( conf );
+					m_config.push_back( conf );
 				else	{
 					delete conf;
 					retVal = false;
@@ -88,17 +88,17 @@ bool DBproviderConfig::parse( const config::ConfigurationTree& pt,
 
 DBproviderConfig::~DBproviderConfig()
 {
-	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_dbConfig.begin();
-								it != m_dbConfig.end(); it++ )
+	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_config.begin();
+								it != m_config.end(); it++ )
 		delete *it;
 }
 
 void DBproviderConfig::print( std::ostream& os, size_t /* indent */ ) const
 {
 	os << sectionName() << std::endl;
-	if ( m_dbConfig.size() > 0 )	{
-		for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_dbConfig.begin();
-								it != m_dbConfig.end(); it++ )	{
+	if ( m_config.size() > 0 )	{
+		for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_config.begin();
+								it != m_config.end(); it++ )	{
 			(*it)->print( os, 3 );
 		}
 	}
@@ -111,8 +111,8 @@ void DBproviderConfig::print( std::ostream& os, size_t /* indent */ ) const
 bool DBproviderConfig::check() const
 {
 	bool correct = true;
-	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_dbConfig.begin();
-								it != m_dbConfig.end(); it++ )	{
+	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_config.begin();
+								it != m_config.end(); it++ )	{
 		if ( !(*it)->check() )
 			correct = false;
 	}
@@ -121,8 +121,8 @@ bool DBproviderConfig::check() const
 
 void DBproviderConfig::setCanonicalPathes( const std::string& refPath )
 {
-	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_dbConfig.begin();
-								it != m_dbConfig.end(); it++ )	{
+	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_config.begin();
+								it != m_config.end(); it++ )	{
 		(*it)->setCanonicalPathes( refPath );
 	}
 }

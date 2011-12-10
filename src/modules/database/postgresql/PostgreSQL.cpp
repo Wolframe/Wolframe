@@ -88,17 +88,19 @@ bool PostgreSQLconfig::check() const
 }
 
 
-//***  PostgreSQL database unit  ********************************************
-PostgreSQLunit::PostgreSQLunit( const PostgreSQLconfig& conf )
-	: m_db( conf.m_ID, conf.host, conf.port, conf.dbName,
-		conf.user, conf.password, conf.connectTimeout,
-		conf.connections, conf.acquireTimeout )
+//***  PostgreSQL database container  ***************************************
+PostgreSQLcontainer::PostgreSQLcontainer( const PostgreSQLconfig& conf )
 {
+	m_db = new PostgreSQLdatabase( conf.m_ID, conf.host, conf.port, conf.dbName,
+				       conf.user, conf.password, conf.connectTimeout,
+				       conf.connections, conf.acquireTimeout );
 	MOD_LOG_NOTICE << "PostgreSQL database unit for '" << conf.m_ID << "' created";
 }
 
-PostgreSQLunit::~PostgreSQLunit()
+PostgreSQLcontainer::~PostgreSQLcontainer()
 {
+	if ( m_db )
+		delete m_db;
 }
 
 

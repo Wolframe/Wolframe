@@ -53,7 +53,7 @@ namespace db {
 /// PostgreSQL server connection configuration
 class PostgreSQLconfig : public config::ObjectConfiguration
 {
-	friend class PostgreSQLunit;
+	friend class PostgreSQLcontainer;
 public:
 	const char* objectName() const			{ return "PostgreSQL"; }
 
@@ -77,7 +77,7 @@ private:
 };
 
 
-class PostgreSQLdatabase : public Database
+class PostgreSQLdatabase : public Database, public DatabaseUnit
 {
 public:
 	PostgreSQLdatabase( const std::string& id,
@@ -89,6 +89,8 @@ public:
 
 	virtual const std::string& ID() const		{ return m_ID; }
 	virtual const char* typeName() const		{ return "PostgreSQL"; }
+	virtual const Database& database() const	{ return *this; }
+
 	virtual bool doTransaction( DatabaseRequest&, DatabaseAnswer&,
 			    unsigned short, unsigned short ){ return true; }
 private:
@@ -100,29 +102,17 @@ private:
 };
 
 
-class PostgreSQLunit : public DatabaseUnit
-{
-public:
-	PostgreSQLunit( const PostgreSQLconfig& conf );
-	~PostgreSQLunit();
-
-	virtual const Database& database() const	{ return m_db; }
-private:
-	const PostgreSQLdatabase	m_db;
-};
-
-
 class PostgreSQLcontainer : public ObjectContainer< db::DatabaseUnit >
 {
 public:
-	PostgreSQLcontainer( const PostgreSQLconfig& conf ) : m_unit( conf )	{}
-	~PostgreSQLcontainer()				{}
+	PostgreSQLcontainer( const PostgreSQLconfig& conf );
+	~PostgreSQLcontainer();
 
-	virtual const std::string& ID() const		{ return m_unit.database().ID(); }
-	virtual const char* objectName() const		{ return m_unit.database().typeName(); }
-	virtual const DatabaseUnit& object() const	{ return m_unit; }
+	virtual const std::string& ID() const		{ return m_db->ID(); }
+	virtual const char* objectName() const		{ return m_db->typeName(); }
+	virtual const DatabaseUnit& object() const	{ return *m_db; }
 private:
-	const PostgreSQLunit		m_unit;
+	const PostgreSQLdatabase*	m_db;
 };
 
 }} // _Wolframe::db

@@ -61,7 +61,7 @@ public:
 	void print( std::ostream& os, size_t indent ) const;
 	virtual void setCanonicalPathes( const std::string& referencePath );
 private:
-	std::list< config::ObjectConfiguration* >	m_dbConfig;
+	std::list< config::ObjectConfiguration* >	m_config;
 };
 
 /// Database provider

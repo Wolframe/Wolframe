@@ -46,6 +46,7 @@
 
 namespace _Wolframe {
 
+//***  Processor configuration  *****************************************
 bool EchoProcConfig::parse( const config::ConfigurationTree& pt, const std::string& /*node*/,
 			    const module::ModulesDirectory* /*modules*/ )
 {
@@ -90,12 +91,21 @@ void EchoProcConfig::setCanonicalPathes( const std::string& /*refPath*/ )
 }
 
 
+//***  Processor unit container  ****************************************
 EchoProcContainer::EchoProcContainer( const EchoProcConfig& /*conf*/ )
-	: m_proc()
 {
+	m_proc = new EchoProcessorUnit();
 	MOD_LOG_NOTICE << "Echo processor container created";
 }
 
+EchoProcContainer::~EchoProcContainer()
+{
+	if ( m_proc )
+		delete m_proc;
+}
+
+
+//***  Processor unit  **************************************************
 EchoProcessorUnit::EchoProcessorUnit()
 {
 	MOD_LOG_NOTICE << "Echo processor unit created";

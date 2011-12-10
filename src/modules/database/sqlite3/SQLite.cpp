@@ -118,15 +118,17 @@ bool SQLiteDatabase::doTransaction( DatabaseRequest& /*request*/, DatabaseAnswer
 	return true;
 }
 
-//***  SQLite database unit  ************************************************
-SQLiteUnit::SQLiteUnit( const SQLiteConfig& conf )
-	: m_db( conf.m_ID, conf.filename, /* Aba: temporary */ 10, conf.flag )
+//***  SQLite database container  *******************************************
+SQLiteContainer::SQLiteContainer( const SQLiteConfig& conf )
 {
+	m_db = new SQLiteDatabase( conf.m_ID, conf.filename, /* Aba: temporary */ 10, conf.flag );
 	MOD_LOG_NOTICE << "SQLite database container for '" << conf.m_ID << "' created";
 }
 
-SQLiteUnit::~SQLiteUnit( )
+SQLiteContainer::~SQLiteContainer()
 {
+	if ( m_db )
+		delete m_db;
 }
 
 }} // _Wolframe::db

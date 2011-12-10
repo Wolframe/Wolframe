@@ -51,7 +51,7 @@ namespace db {
 /// SQLite database configuration
 class SQLiteConfig : public config::ObjectConfiguration
 {
-	friend class SQLiteUnit;
+	friend class SQLiteContainer;
 public:
 	const char* objectName() const			{ return "SQLite"; }
 
@@ -70,7 +70,7 @@ private:
 };
 
 
-class SQLiteDatabase : public Database
+class SQLiteDatabase : public Database, public DatabaseUnit
 {
 public:
 	SQLiteDatabase( const std::string& id,
@@ -79,6 +79,8 @@ public:
 
 	virtual const std::string& ID() const		{ return m_ID; }
 	virtual const char* typeName() const		{ return "SQLite"; }
+	virtual const Database& database() const	{ return *this; }
+
 	virtual bool doTransaction( DatabaseRequest&, DatabaseAnswer&,
 			    unsigned short, unsigned short );
 private:
@@ -90,29 +92,17 @@ private:
 };
 
 
-class SQLiteUnit : public DatabaseUnit
-{
-public:
-	SQLiteUnit( const SQLiteConfig& conf );
-	~SQLiteUnit();
-
-	virtual const Database& database() const	{ return m_db; }
-private:
-	const SQLiteDatabase	m_db;
-};
-
-
 class SQLiteContainer : public ObjectContainer< db::DatabaseUnit >
 {
 public:
-	SQLiteContainer( const SQLiteConfig& conf ) : m_unit( conf )	{}
-	~SQLiteContainer()				{}
+	SQLiteContainer( const SQLiteConfig& conf );
+	~SQLiteContainer();
 
-	const std::string& ID() const			{ return m_unit.database().ID(); }
-	virtual const char* objectName() const		{ return m_unit.database().typeName(); }
-	virtual const DatabaseUnit& object() const	{ return m_unit; }
+	const std::string& ID() const			{ return m_db->ID(); }
+	virtual const char* objectName() const		{ return m_db->typeName(); }
+	virtual const DatabaseUnit& object() const	{ return *m_db; }
 private:
-	const SQLiteUnit	m_unit;
+	const SQLiteDatabase*	m_db;
 };
 
 }} // _Wolframe::db

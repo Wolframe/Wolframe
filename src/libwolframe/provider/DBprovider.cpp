@@ -65,8 +65,8 @@ const Database* DatabaseProvider::database( const std::string& ID ) const
 DatabaseProvider::DatabaseProvider_Impl::DatabaseProvider_Impl( const DBproviderConfig* conf,
 								const module::ModulesDirectory* modules )
 {
-	for ( std::list< config::ObjectConfiguration* >::const_iterator it = conf->m_dbConfig.begin();
-									it != conf->m_dbConfig.end(); it++ )	{
+	for ( std::list< config::ObjectConfiguration* >::const_iterator it = conf->m_config.begin();
+									it != conf->m_config.end(); it++ )	{
 		module::ModuleContainer* container = modules->getContainer((*it)->objectName());
 		if ( container )	{
 			ObjectContainer< db::DatabaseUnit >* db =

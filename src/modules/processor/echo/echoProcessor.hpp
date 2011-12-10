@@ -69,7 +69,7 @@ public:
 	EchoProcConfig( const char* cfgName, const char* logParent, const char* logName )
 		: config::ObjectConfiguration( cfgName, logParent, logName ) {}
 
-	const char* objectName() const			{ return "EchoProcessor"; }
+	const char* objectName() const				{ return "EchoProcessor"; }
 
 	/// methods
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,
@@ -86,12 +86,12 @@ class EchoProcContainer : public ObjectContainer< proc::ProcessorUnit >
 {
 public:
 	EchoProcContainer( const EchoProcConfig& conf );
-	~EchoProcContainer()					{}
+	~EchoProcContainer();
 
-	virtual const char* objectName() const			{ return "EchoProcessor"; }
-	virtual const proc::ProcessorUnit& object() const	{ return m_proc; }
+	virtual const char* objectName() const			{ return m_proc->typeName(); }
+	virtual const proc::ProcessorUnit& object() const	{ return *m_proc; }
 private:
-	const EchoProcessorUnit	m_proc;
+	const EchoProcessorUnit*	m_proc;
 };
 
 } // namespace _Wolframe
