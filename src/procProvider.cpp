@@ -180,6 +180,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 			ObjectContainer< ProcessorUnit >* proc =
 					dynamic_cast< ObjectContainer< ProcessorUnit >* >( container->container( **it ));
 			m_proc.push_back( proc );
+			LOG_TRACE << "'" << proc->objectName() << "' processor unit registered";
 		}
 		else	{
 			LOG_ALERT << "Wolframe Processor Group: unknown processor type '" << (*it)->objectName() << "'";
