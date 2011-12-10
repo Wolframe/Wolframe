@@ -6,7 +6,7 @@ local_all:
 
 local_clean:
 
-INCLUDE_SUBDIRS = . config AAAA processor logger serialize database protocol
+INCLUDE_SUBDIRS = . config AAAA processor logger database protocol
 
 local_install:
 	for d in $(INCLUDE_SUBDIRS); do \
