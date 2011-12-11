@@ -526,8 +526,6 @@ fi
 %{_includedir}/wolframe/processor/*.hpp
 %dir %{_includedir}/wolframe/logger/
 %{_includedir}/wolframe/logger/*.hpp
-%dir %{_includedir}/wolframe/serialize/
-%{_includedir}/wolframe/serialize/*.hpp
 %dir %{_includedir}/wolframe/database/
 %{_includedir}/wolframe/database/*.hpp
 %dir %{_includedir}/wolframe/protocol/
