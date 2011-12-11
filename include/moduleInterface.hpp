@@ -92,8 +92,9 @@ public:
 
 	ModuleContainer* getContainer( const std::string& section, const std::string& keyword ) const;
 	ModuleContainer* getContainer( const std::string& name ) const;
+
 private:
-	std::list< ModuleContainer* >		m_container;
+	std::list< ModuleContainer* >	m_container;
 };
 
 

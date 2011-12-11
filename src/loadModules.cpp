@@ -47,6 +47,24 @@
 	typedef module::ModuleContainer* (*CreateFunction)();
 	typedef void (*SetModuleLogger)( void* );
 
+	class OpenDLlist
+	{
+	public:
+		~OpenDLlist()	{
+			while ( !m_handle.empty())	{
+				dlclose( m_handle.back());
+				m_handle.pop_back();
+			}
+		}
+
+		void addHandle( void* handle )	{ m_handle.push_back( handle); }
+	private:
+		std::list< void* >	m_handle;
+
+	};
+
+	static OpenDLlist	handleList;
+
 	bool module::LoadModules( ModulesDirectory& modDir, std::list< std::string >& modFiles )
 	{
 		bool retVal = true;
@@ -81,6 +99,7 @@
 			}
 			setLogger( &_Wolframe::log::LogBackend::instance() );
 			modDir.addContainer( create() );
+			handleList.addHandle( hndl );
 		}
 		return retVal;
 	}
@@ -95,6 +114,24 @@
 
 	typedef module::ModuleContainer* (*CreateFunction)();
 	typedef void (*SetModuleLogger)( void* );
+
+	class OpenDLlist
+	{
+	public:
+		~OpenDLlist()	{
+			while ( !m_handle.empty())	{
+				FreeLibrary( m_handle.back());
+				m_handle.pop_back();
+			}
+		}
+
+		void addHandle( void* handle )	{ m_handle.push_back( handle); }
+	private:
+		std::list< HMODULE >	m_handle;
+
+	};
+
+	static OpenDLlist	handleList;
 
 	char *getLastError( char *buf, size_t buflen ) {
 		LPTSTR errbuf;
@@ -159,6 +196,7 @@
 			}
 			setLogger( &_Wolframe::log::LogBackend::instance() );
 			modDir.addContainer( create() );
+			handleList.addHandle( hndl );
 		}
 		return retVal;
 	}
