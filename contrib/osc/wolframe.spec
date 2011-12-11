@@ -502,6 +502,10 @@ fi
 %{_libdir}/wolframe/modules/authentication/mod_auth_textfile.so
 %{_libdir}/wolframe/modules/authentication/mod_auth_database.so
 
+%dir %{_libdir}/wolframe/modules/authorization
+%dir %{_libdir}/wolframe/modules/authorization/database
+%{_libdir}/wolframe/modules/authorization/database/mod_authz_database.so
+
 %dir %{_libdir}/wolframe/modules/processor
 %{_libdir}/wolframe/modules/processor/mod_proc_echo.so
 
