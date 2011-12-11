@@ -101,11 +101,12 @@ AuthenticationFactory::AuthenticationFactory( const std::list< config::ObjectCon
 		if ( container )	{
 			ObjectContainer< AuthenticationUnit >* auth =
 					dynamic_cast< ObjectContainer< AuthenticationUnit >* >( container->container( **it ));
-			m_authenticators.push_back( auth );
+			m_authenticators.push_back( auth->object() );
 			LOG_TRACE << "'" << auth->objectName() << "' authentication unit registered";
+			auth->dispose();
 		}
 		else	{
-			LOG_ALERT << "AuthenticationGroup: unknown authentication type '" << (*it)->objectName() << "'";
+			LOG_ALERT << "AuthenticationFactory: unknown authentication type '" << (*it)->objectName() << "'";
 			throw std::domain_error( "Unknown authentication mechanism type in AAAAprovider constructor. See log" );
 		}
 	}
@@ -113,18 +114,16 @@ AuthenticationFactory::AuthenticationFactory( const std::list< config::ObjectCon
 
 AuthenticationFactory::~AuthenticationFactory()
 {
-	for ( std::list< ObjectContainer< AuthenticationUnit >* >::const_iterator it = m_authenticators.begin();
+	for ( std::list< AuthenticationUnit* >::const_iterator it = m_authenticators.begin();
 								it != m_authenticators.end(); it++ )
 		delete *it;
 }
 
 bool AuthenticationFactory::resolveDB( const db::DatabaseProvider& db )
 {
-	LOG_ERROR << " *** AuthenticationFactory::resolveDB ***";
-
-	for ( std::list< ObjectContainer< AuthenticationUnit >* >::const_iterator it = m_authenticators.begin();
+	for ( std::list< AuthenticationUnit* >::const_iterator it = m_authenticators.begin();
 								it != m_authenticators.end(); it++ )
-		if ( ! (*it)->object().resolveDB( db ) )
+		if ( ! (*it)->resolveDB( db ) )
 			return false;
 	return true;
 }
@@ -140,8 +139,9 @@ AuthorizationProvider::AuthorizationProvider( const std::list< config::ObjectCon
 		if ( container )	{
 			ObjectContainer< AuthorizationUnit >* authz =
 					dynamic_cast< ObjectContainer< AuthorizationUnit >* >( container->container( **it ));
-			m_authorizers.push_back( authz );
+			m_authorizers.push_back( authz->object() );
 			LOG_TRACE << "'" << authz->objectName() << "' authorization unit registered";
+			authz->dispose();
 		}
 		else	{
 			LOG_ALERT << "AuthorizationProvider: unknown audit type '" << (*it)->objectName() << "'";
@@ -152,18 +152,16 @@ AuthorizationProvider::AuthorizationProvider( const std::list< config::ObjectCon
 
 AuthorizationProvider::~AuthorizationProvider()
 {
-	for ( std::list< ObjectContainer< AuthorizationUnit >* >::const_iterator it = m_authorizers.begin();
+	for ( std::list< AuthorizationUnit* >::iterator it = m_authorizers.begin();
 								it != m_authorizers.end(); it++ )
 		delete *it;
 }
 
 bool AuthorizationProvider::resolveDB( const db::DatabaseProvider& db )
 {
-	LOG_ERROR << " *** AuthorizationProvider::resolveDB ***";
-
-	for ( std::list< ObjectContainer< AuthorizationUnit >* >::const_iterator it = m_authorizers.begin();
+	for ( std::list< AuthorizationUnit* >::iterator it = m_authorizers.begin();
 								it != m_authorizers.end(); it++ )
-		if ( ! (*it)->object().resolveDB( db ) )
+		if ( ! (*it)->resolveDB( db ) )
 			return false;
 	return true;
 }
@@ -179,11 +177,12 @@ AuditProvider::AuditProvider( const std::list< config::ObjectConfiguration* >& c
 		if ( container )	{
 			ObjectContainer< AuditUnit >* audit =
 					dynamic_cast< ObjectContainer< AuditUnit >* >( container->container( **it ));
-			m_auditors.push_back( audit );
+			m_auditors.push_back( audit->object() );
 			LOG_TRACE << "'" << audit->objectName() << "' audit unit registered";
+			audit->dispose();
 		}
 		else	{
-			LOG_ALERT << "AuditGroup: unknown audit type '" << (*it)->objectName() << "'";
+			LOG_ALERT << "AuditProvider: unknown audit type '" << (*it)->objectName() << "'";
 			throw std::domain_error( "Unknown auditing mechanism type in AAAAprovider constructor. See log" );
 		}
 	}
@@ -191,18 +190,16 @@ AuditProvider::AuditProvider( const std::list< config::ObjectConfiguration* >& c
 
 AuditProvider::~AuditProvider()
 {
-	for ( std::list< ObjectContainer< AuditUnit >* >::const_iterator it = m_auditors.begin();
-								it != m_auditors.end(); it++ )
+	for ( std::list< AuditUnit* >::iterator it = m_auditors.begin();
+						it != m_auditors.end(); it++ )
 		delete *it;
 }
 
 bool AuditProvider::resolveDB( const db::DatabaseProvider& db )
 {
-	LOG_ERROR << " *** AuditProvider::resolveDB ***";
-
-	for ( std::list< ObjectContainer< AuditUnit >* >::const_iterator it = m_auditors.begin();
-								it != m_auditors.end(); it++ )
-		if ( ! (*it)->object().resolveDB( db ) )
+	for ( std::list< AuditUnit* >::iterator it = m_auditors.begin();
+						it != m_auditors.end(); it++ )
+		if ( ! (*it)->resolveDB( db ) )
 			return false;
 	return true;
 }

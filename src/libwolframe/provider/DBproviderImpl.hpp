@@ -55,7 +55,7 @@ public:
 
 	const Database* database( const std::string& ID ) const;
 private:
-	std::list< ObjectContainer< DatabaseUnit >* >	m_db;
+	std::list< DatabaseUnit* >	m_db;
 };
 
 }} // namespace _Wolframe::db

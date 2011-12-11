@@ -55,7 +55,7 @@ class ObjectContainer : public Container
 public:
 	virtual ~ObjectContainer()	{}
 	virtual void dispose()		{ delete this; }
-	virtual const T& object() const = 0;
+	virtual T* object() const = 0;
 };
 
 } // namespace _Wolframe

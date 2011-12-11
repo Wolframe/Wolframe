@@ -44,10 +44,6 @@
 namespace _Wolframe {
 namespace AAAA {
 
-class DBauthenticator : public AuthenticationUnit
-{
-};
-
 class DatabaseAuthConfig : public config::ObjectConfiguration
 {
 	friend class DBauthContainer;
@@ -75,20 +71,31 @@ private:
 };
 
 
-class DBauthContainer : public ObjectContainer< AuthenticationUnit >
+class DBauthenticator : public AuthenticationUnit
 {
 public:
-	DBauthContainer( const DatabaseAuthConfig& conf );
-	~DBauthContainer();
-
+	DBauthenticator( const std::string& dbLabel );
+	~DBauthenticator();
 	virtual const char* objectName() const			{ return "DatabaseAuth"; }
-	virtual const AuthenticationUnit& object() const	{ return m_auth; }
 
 	bool resolveDB( const db::DatabaseProvider& db );
 private:
 	std::string		m_dbLabel;
 	const db::Database*	m_db;
-	DBauthenticator		m_auth;
+};
+
+
+class DBauthContainer : public ObjectContainer< AuthenticationUnit >
+{
+public:
+	DBauthContainer( const DatabaseAuthConfig& conf );
+	~DBauthContainer()					{}
+
+	virtual const char* objectName() const			{ return m_auth->objectName(); }
+	virtual AuthenticationUnit* object() const		{ return m_auth; }
+
+private:
+	DBauthenticator*	m_auth;
 };
 
 }} // namespace _Wolframe::AAAA

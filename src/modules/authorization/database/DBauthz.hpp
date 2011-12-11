@@ -44,10 +44,7 @@
 namespace _Wolframe {
 namespace AAAA {
 
-class DBauthorizer : public AuthorizationUnit
-{
-};
-
+//***  Database authorizer configuration  *******************************
 class DatabaseAuthzConfig : public config::ObjectConfiguration
 {
 	friend class DBauthzContainer;
@@ -56,7 +53,7 @@ public:
 		: config::ObjectConfiguration( cfgName, logParent, logName ),
 		  m_dbConfig( "", logParent, "Database" )	{}
 
-	virtual const char* objectName() const			{ return "DatabaseAuthz"; }
+	virtual const char* objectName() const			{ return "DatabaseAuthorization"; }
 
 	/// methods
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,
@@ -75,20 +72,31 @@ private:
 };
 
 
+//***  Database authorizer  *********************************************
+class DBauthorizer : public AuthorizationUnit
+{
+public:
+	DBauthorizer( const std::string& dbLabel );
+	~DBauthorizer();
+	virtual const char* typeName() const		{ return "DatabaseAuthorization"; }
+
+	virtual bool resolveDB( const db::DatabaseProvider& db );
+private:
+	const std::string	m_dbLabel;
+	const db::Database*	m_db;
+};
+
+//***  Database authorizer container  ***********************************
 class DBauthzContainer : public ObjectContainer< AuthorizationUnit >
 {
 public:
 	DBauthzContainer( const DatabaseAuthzConfig& conf );
-	~DBauthzContainer();
+	~DBauthzContainer()				{}
 
-	virtual const char* objectName() const		{ return "DatabaseAuthz"; }
-	virtual const AuthorizationUnit& object() const	{ return m_authz; }
-
-	bool resolveDB( const db::DatabaseProvider& db );
+	virtual const char* objectName() const		{ return m_authz->typeName(); }
+	virtual AuthorizationUnit* object() const	{ return m_authz; }
 private:
-	std::string		m_dbLabel;
-	const db::Database*	m_db;
-	DBauthorizer		m_authz;
+	 DBauthorizer*		m_authz;
 };
 
 }} // namespace _Wolframe::AAAA

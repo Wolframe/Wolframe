@@ -98,12 +98,6 @@ EchoProcContainer::EchoProcContainer( const EchoProcConfig& /*conf*/ )
 	MOD_LOG_NOTICE << "Echo processor container created";
 }
 
-EchoProcContainer::~EchoProcContainer()
-{
-	if ( m_proc )
-		delete m_proc;
-}
-
 
 //***  Processor unit  **************************************************
 EchoProcessorUnit::EchoProcessorUnit()

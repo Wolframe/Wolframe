@@ -46,9 +46,9 @@ namespace _Wolframe {
 class EchoProcessor : public proc::Processor
 {
 public:
-	~EchoProcessor()			{}
-	const char* typeName() const		{ return "EchoProcessor"; }
-	void close()				{}
+	~EchoProcessor()				{}
+	const char* typeName() const			{ return "EchoProcessor"; }
+	void close()					{}
 };
 
 
@@ -56,9 +56,9 @@ class EchoProcessorUnit : public proc::ProcessorUnit
 {
 public:
 	EchoProcessorUnit();
-	~EchoProcessorUnit()			{}
-	const char* typeName() const		{ return "EchoProcessor"; }
-	proc::Processor* processor() const	{ return new EchoProcessor; }
+	~EchoProcessorUnit()				{}
+	const char* typeName() const			{ return "EchoProcessor"; }
+	proc::Processor* processor() const		{ return new EchoProcessor; }
 };
 
 
@@ -69,7 +69,7 @@ public:
 	EchoProcConfig( const char* cfgName, const char* logParent, const char* logName )
 		: config::ObjectConfiguration( cfgName, logParent, logName ) {}
 
-	const char* objectName() const				{ return "EchoProcessor"; }
+	const char* objectName() const			{ return "EchoProcessor"; }
 
 	/// methods
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,
@@ -86,12 +86,12 @@ class EchoProcContainer : public ObjectContainer< proc::ProcessorUnit >
 {
 public:
 	EchoProcContainer( const EchoProcConfig& conf );
-	~EchoProcContainer();
+	~EchoProcContainer()				{}
 
-	virtual const char* objectName() const			{ return m_proc->typeName(); }
-	virtual const proc::ProcessorUnit& object() const	{ return *m_proc; }
+	virtual const char* objectName() const		{ return m_proc->typeName(); }
+	virtual proc::ProcessorUnit* object() const	{ return m_proc; }
 private:
-	const EchoProcessorUnit*	m_proc;
+	EchoProcessorUnit*	m_proc;
 };
 
 } // namespace _Wolframe

@@ -59,10 +59,10 @@ class AuditMsg_Transaction
 // virtual base for all audit methods
 class Auditor {
 public:
-	virtual ~Auditor( ) {}
+	virtual ~Auditor( )				{}
 
 	// close the auditor
-	virtual void close( ) {}
+	virtual void close( )				{}
 
 //	virtual bool log( AuditMsg_Connect & msg ) = 0;
 //	virtual bool log( AuditMsg_Login& msg ) = 0;
@@ -75,10 +75,10 @@ public:
 class AuditUnit
 {
 public:
-	virtual ~AuditUnit()					{}
+	virtual ~AuditUnit()				{}
 
-	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ ) const
-								{ return true; }
+	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ )
+							{ return true; }
 
 //	virtual bool log( AuditMsg_Connect & msg ) = 0;
 //	virtual bool log( AuditMsg_Login& msg ) = 0;

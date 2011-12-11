@@ -96,13 +96,13 @@ class SQLiteContainer : public ObjectContainer< db::DatabaseUnit >
 {
 public:
 	SQLiteContainer( const SQLiteConfig& conf );
-	~SQLiteContainer();
+	~SQLiteContainer()				{}
 
 	const std::string& ID() const			{ return m_db->ID(); }
 	virtual const char* objectName() const		{ return m_db->typeName(); }
-	virtual const DatabaseUnit& object() const	{ return *m_db; }
+	virtual DatabaseUnit* object() const		{ return m_db; }
 private:
-	const SQLiteDatabase*	m_db;
+	SQLiteDatabase*		m_db;
 };
 
 }} // _Wolframe::db

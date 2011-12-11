@@ -103,7 +103,8 @@ class AuthenticationUnit
 public:
 	virtual ~AuthenticationUnit()				{}
 
-	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ ) const	{ return true; }
+	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ )
+								{ return true; }
 };
 
 }} // namespace _Wolframe::AAAA

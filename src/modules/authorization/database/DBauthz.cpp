@@ -42,27 +42,28 @@
 namespace _Wolframe {
 namespace AAAA {
 
-DBauthzContainer::DBauthzContainer( const DatabaseAuthzConfig& conf )
+//***  Database authorizer  *********************************************
+DBauthorizer::DBauthorizer( const std::string& dbLabel )
+	: m_dbLabel( dbLabel )
 {
 	m_db = NULL;
-	m_dbLabel = conf.m_dbConfig.label();
 	if ( m_dbLabel.empty() )
-		throw std::logic_error( "Empty database reference in DBauthzContainer" );
+		throw std::logic_error( "Empty database reference in DBauthorizer" );
 
-	MOD_LOG_NOTICE << "Database authorizer created with database reference '" << m_dbLabel << "'";
+	MOD_LOG_TRACE << "Database authorizer created with database reference '" << m_dbLabel << "'";
 }
 
-DBauthzContainer::~DBauthzContainer()
+DBauthorizer::~DBauthorizer()
 {
 }
 
 
-bool DBauthzContainer::resolveDB( const db::DatabaseProvider& db )
+bool DBauthorizer::resolveDB( const db::DatabaseProvider& db )
 {
 	if ( m_db == NULL && ! m_dbLabel.empty() )	{
 		m_db = db.database( m_dbLabel );
 		if ( m_db )	{
-			MOD_LOG_NOTICE << "Database authorizer: database reference '" << m_dbLabel << "' resolved";
+			MOD_LOG_TRACE << "Database authorizer: database reference '" << m_dbLabel << "' resolved";
 			return true;
 		}
 		else	{
@@ -71,6 +72,14 @@ bool DBauthzContainer::resolveDB( const db::DatabaseProvider& db )
 		}
 	}
 	return true;
+}
+
+
+//***  Database authorizer container  ***********************************
+DBauthzContainer::DBauthzContainer( const DatabaseAuthzConfig& conf )
+{
+	m_authz = new DBauthorizer( conf.m_dbConfig.label() );
+	MOD_LOG_TRACE << "Database authorizer container created";
 }
 
 }} // namespace _Wolframe::AAAA

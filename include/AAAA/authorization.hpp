@@ -62,7 +62,9 @@ class AuthorizationUnit
 public:
 	virtual ~AuthorizationUnit()	{}
 
-	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ ) const
+	virtual const char* typeName() const = 0;
+
+	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ )
 					{ return true; }
 };
 

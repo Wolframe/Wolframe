@@ -46,7 +46,7 @@ namespace module {
 extern "C" {
 	ModuleContainer* createModule( void )
 	{
-		static module::ContainerDescription< AAAA::TxtFileAuthContainer,
+		static module::ContainerDescription< AAAA::TextFileAuthContainer,
 				AAAA::TextFileAuthConfig > mod( "Authentication file", "Authentication",
 								"file", "TextFileAuth" );
 		return &mod;

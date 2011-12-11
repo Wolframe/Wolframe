@@ -106,13 +106,13 @@ class PostgreSQLcontainer : public ObjectContainer< db::DatabaseUnit >
 {
 public:
 	PostgreSQLcontainer( const PostgreSQLconfig& conf );
-	~PostgreSQLcontainer();
+	~PostgreSQLcontainer()				{}
 
 	virtual const std::string& ID() const		{ return m_db->ID(); }
 	virtual const char* objectName() const		{ return m_db->typeName(); }
-	virtual const DatabaseUnit& object() const	{ return *m_db; }
+	virtual DatabaseUnit* object() const		{ return m_db; }
 private:
-	const PostgreSQLdatabase*	m_db;
+	PostgreSQLdatabase*	m_db;
 };
 
 }} // _Wolframe::db

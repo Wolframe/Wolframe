@@ -58,9 +58,9 @@ public:
 
 	Processor* processor();
 private:
-	std::string					m_dbLabel;
-	const db::Database*				m_db;
-	std::list< ObjectContainer< ProcessorUnit >* >	m_proc;
+	std::string			m_dbLabel;
+	const db::Database*		m_db;
+	std::list< ProcessorUnit* >	m_proc;
 };
 
 }} // namespace _Wolframe::proc

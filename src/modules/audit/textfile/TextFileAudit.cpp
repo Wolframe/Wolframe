@@ -46,7 +46,7 @@ namespace _Wolframe {
 namespace AAAA {
 
 /// Audit to file
-bool FileAuditConfig::check() const
+bool TextFileAuditConfig::check() const
 {
 	if ( m_file.empty() )	{
 		MOD_LOG_ERROR << logPrefix() << "Audit filename cannot be empty";
@@ -55,13 +55,13 @@ bool FileAuditConfig::check() const
 	return true;
 }
 
-void FileAuditConfig::print( std::ostream& os, size_t indent ) const
+void TextFileAuditConfig::print( std::ostream& os, size_t indent ) const
 {
 	std::string indStr( indent, ' ' );
 	os << indStr << sectionName() << ": " << m_file << std::endl;
 }
 
-void FileAuditConfig::setCanonicalPathes( const std::string& refPath )
+void TextFileAuditConfig::setCanonicalPathes( const std::string& refPath )
 {
 	using namespace boost::filesystem;
 
@@ -75,10 +75,21 @@ void FileAuditConfig::setCanonicalPathes( const std::string& refPath )
 }
 
 
-FileAuditContainer::FileAuditContainer( const FileAuditConfig& conf )
+TextFileAuditor::TextFileAuditor( const std::string& filename )
+	: m_file( filename )
 {
-	m_file = conf.m_file;
-	MOD_LOG_NOTICE << "File auditor created with file '" << m_file << "'";
+	MOD_LOG_NOTICE << "Text file auditor created with file '" << m_file << "'";
+}
+
+TextFileAuditor::~TextFileAuditor()
+{
+}
+
+
+TextFileAuditContainer::TextFileAuditContainer( const TextFileAuditConfig& conf )
+{
+	m_audit = new TextFileAuditor( conf.m_file );
+	MOD_LOG_NOTICE << "Text file auditor container created";
 }
 
 }} // namespace _Wolframe::AAAA

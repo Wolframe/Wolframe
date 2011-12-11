@@ -79,11 +79,6 @@ public:
 	/// The identifier must be unique (of course).
 	virtual const std::string& ID() const = 0;
 
-	/// Database type (module type).
-	/// All database implementations need a type (name).
-	/// Type names must be unique.
-	virtual const char* typeName() const = 0;
-
 	/// Perform a database transaction.
 	virtual bool doTransaction( DatabaseRequest& request, DatabaseAnswer& answer,
 				    unsigned short timeout, unsigned short retries ) = 0;
@@ -105,6 +100,11 @@ class DatabaseUnit
 {
 public:
 	virtual ~DatabaseUnit()			{}
+
+	/// Database type (module type).
+	/// All database implementations need a type (name).
+	/// Type names must be unique.
+	virtual const char* typeName() const = 0;
 
 	virtual const Database& database() const = 0;
 };

@@ -46,7 +46,7 @@
 namespace _Wolframe {
 namespace AAAA {
 
-bool FileAuditConfig::parse( const config::ConfigurationTree& pt, const std::string& node,
+bool TextFileAuditConfig::parse( const config::ConfigurationTree& pt, const std::string& node,
 			     const module::ModulesDirectory* /*modules*/ )
 {
 	using namespace _Wolframe::config;

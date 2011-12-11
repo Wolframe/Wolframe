@@ -44,24 +44,20 @@
 namespace _Wolframe {
 namespace AAAA {
 
-class DBauditor : public AuditUnit
-{
-};
-
 class DBauditConfig : public config::ObjectConfiguration
 {
 	friend class DBauditContainer;
 public:
 	DBauditConfig( const char* cfgName, const char* logParent, const char* logName )
 		: config::ObjectConfiguration( cfgName, logParent, logName ),
-		  m_dbConfig( "", logParent, "" )		{}
+		  m_dbConfig( "", logParent, "" )	{}
 
-	virtual const char* objectName() const			{ return "DatabaseAudit"; }
+	virtual const char* objectName() const		{ return "DatabaseAudit"; }
 
 	/// methods
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,
 		    const module::ModulesDirectory* modules );
-	bool check() const					{ return m_dbConfig.check(); }
+	bool check() const				{ return m_dbConfig.check(); }
 	void print( std::ostream& os, size_t indent ) const	{
 		std::string indStr( indent, ' ' );
 		os << indStr << sectionName();
@@ -74,20 +70,30 @@ private:
 };
 
 
+class DBauditor : public AuditUnit
+{
+public:
+	DBauditor( const std::string& dbLabel );
+	~DBauditor();
+	virtual const char* typeName() const		{ return "DatabaseAudit"; }
+
+	virtual bool resolveDB( const db::DatabaseProvider& db );
+private:
+	std::string		m_dbLabel;
+	const db::Database*	m_db;
+};
+
+
 class DBauditContainer : public ObjectContainer< AuditUnit >
 {
 public:
 	DBauditContainer( const DBauditConfig& conf );
-	~DBauditContainer();
+	~DBauditContainer()				{}
 
-	const char* objectName() const			{ return "DatabaseAudit"; }
-
-	bool resolveDB( const db::DatabaseProvider& db );
-	virtual const AuditUnit& object() const		{ return m_audit; }
+	const char* objectName() const			{ return m_audit->typeName(); }
+	virtual AuditUnit* object() const		{ return m_audit; }
 private:
-	std::string		m_dbLabel;
-	const db::Database*	m_db;
-	DBauditor		m_audit;
+	DBauditor*		m_audit;
 };
 
 }} // namespace _Wolframe::AAAA

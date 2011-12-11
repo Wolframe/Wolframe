@@ -42,29 +42,27 @@
 namespace _Wolframe {
 namespace AAAA {
 
-DBauthContainer::DBauthContainer( const DatabaseAuthConfig& conf )
+DBauthenticator::DBauthenticator( const std::string& dbLabel )
+	: m_dbLabel( dbLabel )
 {
 	m_db = NULL;
-	m_dbLabel = conf.m_dbConfig.label();
 	if ( m_dbLabel.empty() )
 		throw std::logic_error( "Empty database reference in DBauthContainer" );
 
-	MOD_LOG_NOTICE << "Database authenticator created with database reference '" << m_dbLabel << "'";
+	MOD_LOG_TRACE << "Database authenticator created with database reference '" << m_dbLabel << "'";
 }
 
-DBauthContainer::~DBauthContainer()
+DBauthenticator::~DBauthenticator()
 {
-	MOD_LOG_TRACE << " *** DBauthContainer::~DBauthContainer() ***";
 }
 
 
-bool DBauthContainer::resolveDB( const db::DatabaseProvider& db )
+bool DBauthenticator::resolveDB( const db::DatabaseProvider& db )
 {
-	MOD_LOG_ERROR << " *** DBauthContainer::resolveDB ***";
 	if ( m_db == NULL && ! m_dbLabel.empty() )	{
 		m_db = db.database( m_dbLabel );
 		if ( m_db )	{
-			MOD_LOG_NOTICE << "Database authenticator: database reference '" << m_dbLabel << "' resolved";
+			MOD_LOG_TRACE << "Database authenticator: database reference '" << m_dbLabel << "' resolved";
 			return true;
 		}
 		else	{
@@ -73,6 +71,13 @@ bool DBauthContainer::resolveDB( const db::DatabaseProvider& db )
 		}
 	}
 	return true;
+}
+
+
+DBauthContainer::DBauthContainer( const DatabaseAuthConfig& conf )
+{
+	m_auth = new DBauthenticator( conf.m_dbConfig.label() );
+	MOD_LOG_TRACE << "Database authenticator container created";
 }
 
 }} // namespace _Wolframe::AAAA

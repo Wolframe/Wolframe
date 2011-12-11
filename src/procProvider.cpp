@@ -179,8 +179,9 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 		if ( container )	{
 			ObjectContainer< ProcessorUnit >* proc =
 					dynamic_cast< ObjectContainer< ProcessorUnit >* >( container->container( **it ));
-			m_proc.push_back( proc );
+			m_proc.push_back( proc->object() );
 			LOG_TRACE << "'" << proc->objectName() << "' processor unit registered";
+			proc->dispose();
 		}
 		else	{
 			LOG_ALERT << "Wolframe Processor Group: unknown processor type '" << (*it)->objectName() << "'";
@@ -192,7 +193,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 
 ProcessorProvider::ProcessorProvider_Impl::~ProcessorProvider_Impl()
 {
-	for ( std::list< ObjectContainer< ProcessorUnit >* >::const_iterator it = m_proc.begin();
+	for ( std::list< ProcessorUnit* >::iterator it = m_proc.begin();
 							it != m_proc.end(); it++ )
 		delete *it;
 }
@@ -215,12 +216,11 @@ bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabasePro
 
 Processor* ProcessorProvider::ProcessorProvider_Impl::processor()
 {
-	std::list< ObjectContainer< ProcessorUnit >* >::const_iterator it = m_proc.begin();
+	std::list< ProcessorUnit* >::const_iterator it = m_proc.begin();
 	if ( it != m_proc.end() )
-		return (*it)->object().processor();
+		return (*it)->processor();
 	else
 		return NULL;
 }
 
-} // namespace proc
-} // namespace _Wolframe
+}} // namespace _Wolframe::proc

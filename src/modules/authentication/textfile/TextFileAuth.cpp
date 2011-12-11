@@ -77,10 +77,21 @@ void TextFileAuthConfig::setCanonicalPathes( const std::string& refPath )
 }
 
 
-TxtFileAuthContainer::TxtFileAuthContainer( const TextFileAuthConfig& conf )
+TextFileAuthenticator::TextFileAuthenticator( const std::string& filename )
+	: m_file( filename )
 {
-	m_file = conf.m_file;
-	MOD_LOG_NOTICE << "File authenticator created with file '" << m_file << "'";
+	MOD_LOG_NOTICE << "Text file authenticator created with file '" << m_file << "'";
+}
+
+TextFileAuthenticator::~TextFileAuthenticator()
+{
+}
+
+
+TextFileAuthContainer::TextFileAuthContainer( const TextFileAuthConfig& conf )
+{
+	m_auth = new TextFileAuthenticator( conf.m_file );
+	MOD_LOG_NOTICE << "Text file authenticator container created";
 }
 
 }} // namespace _Wolframe::AAAA

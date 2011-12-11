@@ -44,18 +44,14 @@
 namespace _Wolframe {
 namespace AAAA {
 
-class TextFileAuthenticator : public AuthenticationUnit
-{
-};
-
 class TextFileAuthConfig :  public config::ObjectConfiguration
 {
-	friend class TxtFileAuthContainer;
+	friend class TextFileAuthContainer;
 public:
 	TextFileAuthConfig( const char* cfgName, const char* logParent, const char* logName )
 		: config::ObjectConfiguration( cfgName, logParent, logName ) {}
 
-	virtual const char* objectName() const			{ return "TextFileAuth"; }
+	virtual const char* objectName() const		{ return "TextFileAuth"; }
 
 	/// methods
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,
@@ -68,17 +64,28 @@ private:
 };
 
 
-class TxtFileAuthContainer : public ObjectContainer< AuthenticationUnit >
+class TextFileAuthenticator : public AuthenticationUnit
 {
 public:
-	TxtFileAuthContainer( const TextFileAuthConfig& conf );
-	~TxtFileAuthContainer()					{}
+	TextFileAuthenticator( const std::string& filename );
+	~TextFileAuthenticator();
+	virtual const char* typeName() const		{ return "TextFileAuth"; }
 
-	virtual const char* objectName() const			{ return "TextFileAuth"; }
-	virtual const AuthenticationUnit& object() const	{ return m_auth; }
 private:
 	std::string		m_file;
-	TextFileAuthenticator	m_auth;
+};
+
+
+class TextFileAuthContainer : public ObjectContainer< AuthenticationUnit >
+{
+public:
+	TextFileAuthContainer( const TextFileAuthConfig& conf );
+	~TextFileAuthContainer()			{}
+
+	virtual const char* objectName() const		{ return m_auth->typeName(); }
+	virtual AuthenticationUnit* object() const	{ return m_auth; }
+private:
+	TextFileAuthenticator*	m_auth;
 };
 
 }} // namespace _Wolframe::AAAA

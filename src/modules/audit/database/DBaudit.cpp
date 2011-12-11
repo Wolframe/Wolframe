@@ -43,10 +43,10 @@
 namespace _Wolframe {
 namespace AAAA {
 
-DBauditContainer::DBauditContainer( const DBauditConfig& conf )
+DBauditor::DBauditor( const std::string& dbLabel )
+	: m_dbLabel( dbLabel )
 {
 	m_db = NULL;
-	m_dbLabel = conf.m_dbConfig.label();
 
 	if ( m_dbLabel.empty() )
 		throw std::logic_error( "Empty database reference in DBauditContainer" );
@@ -54,16 +54,16 @@ DBauditContainer::DBauditContainer( const DBauditConfig& conf )
 	MOD_LOG_NOTICE << "Database auditor created with database reference '" << m_dbLabel << "'";
 }
 
-DBauditContainer::~DBauditContainer()
+DBauditor::~DBauditor()
 {
 }
 
-bool DBauditContainer::resolveDB( const db::DatabaseProvider& db )
+bool DBauditor::resolveDB( const db::DatabaseProvider& db )
 {
 	if ( m_db == NULL && ! m_dbLabel.empty() )	{
 		m_db = db.database( m_dbLabel );
 		if ( m_db )	{
-			MOD_LOG_NOTICE << "Database audit: database reference '" << m_dbLabel << "' resolved";
+			MOD_LOG_TRACE << "Database audit: database reference '" << m_dbLabel << "' resolved";
 			return true;
 		}
 		else	{
@@ -72,6 +72,13 @@ bool DBauditContainer::resolveDB( const db::DatabaseProvider& db )
 		}
 	}
 	return true;
+}
+
+
+DBauditContainer::DBauditContainer( const DBauditConfig& conf )
+{
+	m_audit = new DBauditor( conf.m_dbConfig.label());
+	MOD_LOG_TRACE << "Database auditor container created";
 }
 
 }} // namespace _Wolframe::AAAA

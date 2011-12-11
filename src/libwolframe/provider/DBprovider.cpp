@@ -71,8 +71,9 @@ DatabaseProvider::DatabaseProvider_Impl::DatabaseProvider_Impl( const DBprovider
 		if ( container )	{
 			ObjectContainer< db::DatabaseUnit >* db =
 					dynamic_cast< ObjectContainer< db::DatabaseUnit >* >( container->container( **it ));
-			m_db.push_back( db );
+			m_db.push_back( db->object() );
 			LOG_TRACE << "'" << db->objectName() << "' database unit registered";
+			db->dispose();
 		}
 		else	{
 			LOG_ALERT << "DatabaseProvider: unknown database module '" << (*it)->objectName() << "'";
@@ -83,18 +84,17 @@ DatabaseProvider::DatabaseProvider_Impl::DatabaseProvider_Impl( const DBprovider
 
 DatabaseProvider::DatabaseProvider_Impl::~DatabaseProvider_Impl()
 {
-	for ( std::list< ObjectContainer< db::DatabaseUnit >* >::const_iterator it = m_db.begin();
+	for ( std::list< db::DatabaseUnit* >::iterator it = m_db.begin();
 							it != m_db.end(); it++ )
 		delete *it;
 }
 
-
 const Database* DatabaseProvider::DatabaseProvider_Impl::database( const std::string& id ) const
 {
-	for ( std::list< ObjectContainer< db::DatabaseUnit >* >::const_iterator it = m_db.begin();
+	for ( std::list<db::DatabaseUnit* >::const_iterator it = m_db.begin();
 							it != m_db.end(); it++ )	{
-		if ( (*it)->object().database().ID() == id )
-			return &(*it)->object().database();
+		if ( (*it)->database().ID() == id )
+			return &(*it)->database();
 	}
 	return NULL;
 }

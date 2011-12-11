@@ -45,15 +45,11 @@
 namespace _Wolframe {
 namespace AAAA {
 
-class FileAuditor : public AuditUnit
+class TextFileAuditConfig : public config::ObjectConfiguration
 {
-};
-
-class FileAuditConfig : public config::ObjectConfiguration
-{
-	friend class FileAuditContainer;
+	friend class TextFileAuditContainer;
 public:
-	FileAuditConfig( const char* cfgName, const char* logParent, const char* logName )
+	TextFileAuditConfig( const char* cfgName, const char* logParent, const char* logName )
 		: config::ObjectConfiguration( cfgName, logParent, logName ) {}
 
 	const char* objectName() const			{ return "FileAudit"; }
@@ -69,17 +65,28 @@ private:
 };
 
 
-class FileAuditContainer : public ObjectContainer< AuditUnit >
+class TextFileAuditor : public AuditUnit
 {
 public:
-	FileAuditContainer( const FileAuditConfig& conf );
-	~FileAuditContainer()				{}
+	TextFileAuditor( const std::string& filename );
+	~TextFileAuditor();
+	virtual const char* typeName() const		{ return "FileAudit"; }
 
-	virtual const AuditUnit& object() const		{ return m_audit; }
-	const char* objectName() const			{ return "FileAudit"; }
 private:
 	std::string	m_file;
-	FileAuditor	m_audit;
+};
+
+
+class TextFileAuditContainer : public ObjectContainer< AuditUnit >
+{
+public:
+	TextFileAuditContainer( const TextFileAuditConfig& conf );
+	~TextFileAuditContainer()			{}
+
+	const char* objectName() const			{ return m_audit->typeName(); }
+	virtual AuditUnit* object() const		{ return m_audit; }
+private:
+	TextFileAuditor*	m_audit;
 };
 
 }} // namespace _Wolframe::AAAA

@@ -46,8 +46,8 @@ namespace module {
 extern "C" {
 	ModuleContainer* createModule( void )
 	{
-		static module::ContainerDescription< AAAA::FileAuditContainer,
-				AAAA::FileAuditConfig > mod( "Audit file", "Audit",
+		static module::ContainerDescription< AAAA::TextFileAuditContainer,
+				AAAA::TextFileAuditConfig > mod( "Audit file", "Audit",
 							     "file", "FileAudit" );
 		return &mod;
 	}

@@ -63,7 +63,7 @@ public:
 
 	Authenticator* authenticator()		{ return NULL; }
 private:
-	std::list< ObjectContainer < AuthenticationUnit >* > m_authenticators;
+	std::list< AuthenticationUnit* > m_authenticators;
 };
 
 
@@ -77,7 +77,7 @@ public:
 
 	Authorizer* authorizer()		{ return NULL; }
 private:
-	std::list< ObjectContainer< AuthorizationUnit >* >	m_authorizers;
+	std::list< AuthorizationUnit* >	m_authorizers;
 };
 
 
@@ -91,7 +91,7 @@ public:
 
 	Auditor* auditor()			{ return NULL; }
 private:
-	std::list< ObjectContainer< AuditUnit >* >	m_auditors;
+	std::list< AuditUnit* >	m_auditors;
 };
 
 

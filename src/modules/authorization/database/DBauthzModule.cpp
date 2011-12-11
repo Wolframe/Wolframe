@@ -48,7 +48,7 @@ extern "C" {
 	{
 		static module::ContainerDescription< AAAA::DBauthzContainer,
 				AAAA::DatabaseAuthzConfig > mod( "Authorization database", "authorization",
-								 "database", "DatabaseAuthz" );
+								 "database", "DatabaseAuthorization" );
 		return &mod;
 	}
 
