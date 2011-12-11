@@ -12,5 +12,9 @@ local_distclean:
 
 local_test:
 
+local_install:
+	$(INSTALL) -d -m 0755 $(DESTDIR)$(libdir)/wolframe/modules
+	$(INSTALL) -d -m 0775 $(DYNAMIC_MODULE) $(DESTDIR)$(libdir)/wolframe/modules
+
 local_uninstall:
-	@-rmdir $(DESTDIR)$(libdir)/wolframe
+	@-rmdir $(DESTDIR)$(libdir)/wolframe/modules

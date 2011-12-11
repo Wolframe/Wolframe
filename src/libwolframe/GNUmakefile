@@ -2,6 +2,8 @@ TOPDIR = ../..
 
 SUBDIRS =
 
+PACKAGE_NAME = wolframe
+
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
 INCLUDE_CXXFLAGS =

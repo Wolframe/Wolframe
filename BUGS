@@ -2,7 +2,7 @@ openSuse 11.4:
 counterTest: /usr/include/boost/thread/pthread/mutex.hpp:47:
 boost::mutex::~mutex(): Assertion `!pthread_mutex_destroy(&m)' failed.
 
-RHEL4:
+gcc 3 breaks (RHEL4, Solaris, OpenIndiana):
 procProvider.cpp: In constructor `_Wolframe::proc::ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl(const _Wolframe::proc::ProcProviderConfig*, const _Wolframe::module::ModulesDirectory*)':
 ../include/processor/procProvider.hpp:63: error: `std::string _Wolframe::proc::ProcProviderConfig::m_dbLabel' is private
 procProvider.cpp:173: error: within this context
@@ -17,3 +17,10 @@ make[1]: *** [procProvider.o] Error 1
 Windows:
 wolframed.exe.manifest : general error c1010070: Failed to load and parse the manifest. The system cannot find the file specified.
 advapi32.lib(ADVAPI32.dll) : warning LNK4006: __NULL_IMPORT_DESCRIPTOR already defined in kernel32.lib(KERNEL32.dll); second definition ignored
+
+Archlinux:
+xsltproc --nonet --xinclude --stringparam draft.mode yes output-epub.xsl WolfBook.xml
+warning: failed to load external entity "http://docbook.sourceforge.net/release/xsl/current/epub/docbook.xsl"
+compilation error: file output-epub.xsl line 6 element import
+xsl:import : unable to load http://docbook.sourceforge.net/release/xsl/current/epub/docbook.xsl
+make: *** [WolfBook.epub] Error 5

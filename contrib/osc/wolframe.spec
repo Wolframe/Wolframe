@@ -488,26 +488,21 @@ fi
 %{_libdir}/wolframe/libboost_date_time.so.%{boost_version}
 %endif
 
-%{_libdir}/libwolframe.so
-%{_libdir}/libwolframe.a
+%dir %{_libdir}/wolframe
+%{_libdir}/wolframe/libwolframe.so
+%{_libdir}/wolframe/libwolframe.a
 
 %dir %{_libdir}/wolframe/modules
-%dir %{_libdir}/wolframe/modules/database
 
-%dir %{_libdir}/wolframe/modules/audit
-%{_libdir}/wolframe/modules/audit/mod_audit_textfile.so
-%{_libdir}/wolframe/modules/audit/mod_audit_database.so
+%{_libdir}/wolframe/modules/mod_audit_textfile.so
+%{_libdir}/wolframe/modules/mod_audit_database.so
 
-%dir %{_libdir}/wolframe/modules/authentication
-%{_libdir}/wolframe/modules/authentication/mod_auth_textfile.so
-%{_libdir}/wolframe/modules/authentication/mod_auth_database.so
+%{_libdir}/wolframe/modules/mod_auth_textfile.so
+%{_libdir}/wolframe/modules/mod_auth_database.so
 
-%dir %{_libdir}/wolframe/modules/authorization
-%dir %{_libdir}/wolframe/modules/authorization/database
-%{_libdir}/wolframe/modules/authorization/database/mod_authz_database.so
+%{_libdir}/wolframe/modules/mod_authz_database.so
 
-%dir %{_libdir}/wolframe/modules/processor
-%{_libdir}/wolframe/modules/processor/mod_proc_echo.so
+%{_libdir}/wolframe/modules/mod_proc_echo.so
 
 
 #%dir %{_datadir}/wolframe
@@ -521,8 +516,9 @@ fi
 
 %files devel
 %defattr( -, root, root )
-%{_libdir}/libwolframe.so.0
-%{_libdir}/libwolframe.so.0.0.0
+%dir %{_libdir}/wolframe
+%{_libdir}/wolframe/libwolframe.so.0
+%{_libdir}/wolframe/libwolframe.so.0.0.0
 %dir %{_includedir}/wolframe
 %{_includedir}/wolframe/*.hpp
 %dir %{_includedir}/wolframe/config/
@@ -543,8 +539,7 @@ fi
 %defattr( -, root, root )
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
-%dir %{_libdir}/wolframe/modules/database
-%{_libdir}/wolframe/modules/database/mod_db_postgresql.so
+%{_libdir}/wolframe/modules/mod_db_postgresql.so
 %endif
 
 %if %{with_sqlite}
@@ -552,8 +547,7 @@ fi
 %defattr( -, root, root )
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
-%dir %{_libdir}/wolframe/modules/database
-%{_libdir}/wolframe/modules/database/mod_db_sqlite3.so
+%{_libdir}/wolframe/modules/mod_db_sqlite3.so
 %endif
 
 %if %{with_qt}
