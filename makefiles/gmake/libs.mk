@@ -32,6 +32,7 @@ endif
 ifeq "$(COMPILER)" "spro"
 SONAME_FLAGS=-h $(SONAME)
 endif
+endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
 SONAME_FLAGS=-Wl,-x,-soname,$(SONAME)
@@ -47,8 +48,6 @@ endif
 
 ifeq "$(PLATFORM)" "CYGWIN"
 SONAME_FLAGS=-Wl,-soname,$(SONAME)
-endif
-
 endif
 
 # no soname and versioning for loadable modules, just dynamic linking
