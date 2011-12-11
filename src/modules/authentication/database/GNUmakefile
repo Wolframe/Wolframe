@@ -32,12 +32,11 @@ local_clean:
 local_distclean:
 
 local_install:
-	$(INSTALL) -d -m 0755 $(DESTDIR)$(libdir)/wolframe/modules/authentication
-	$(INSTALL) -m 0775 $(DYNAMIC_MODULE) $(DESTDIR)$(libdir)/wolframe/modules/authentication
+	$(INSTALL) -d -m 0755 $(DESTDIR)$(libdir)/wolframe/modules
+	$(INSTALL) -m 0775 $(DYNAMIC_MODULE) $(DESTDIR)$(libdir)/wolframe/modules
 
 local_uninstall:
-	-rm $(DESTDIR)$(libdir)/wolframe/modules/authentication/$(DYNAMIC_MODULE)
-	-rmdir $(DESTDIR)$(libdir)/wolframe/modules/authentication
+	-rm $(DESTDIR)$(libdir)/wolframe/modules/$(DYNAMIC_MODULE)
 	-rmdir $(DESTDIR)$(libdir)/wolframe/modules
 
 local_test:
