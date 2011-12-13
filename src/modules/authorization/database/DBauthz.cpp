@@ -50,7 +50,7 @@ DBauthorizer::DBauthorizer( const std::string& dbLabel )
 	if ( m_dbLabel.empty() )
 		throw std::logic_error( "Empty database reference in DBauthorizer" );
 
-	MOD_LOG_TRACE << "Database authorizer created with database reference '" << m_dbLabel << "'";
+	MOD_LOG_DEBUG << "Database authorizer created with database reference '" << m_dbLabel << "'";
 }
 
 DBauthorizer::~DBauthorizer()

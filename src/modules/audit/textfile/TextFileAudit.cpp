@@ -78,7 +78,7 @@ void TextFileAuditConfig::setCanonicalPathes( const std::string& refPath )
 TextFileAuditor::TextFileAuditor( const std::string& filename )
 	: m_file( filename )
 {
-	MOD_LOG_NOTICE << "Text file auditor created with file '" << m_file << "'";
+	MOD_LOG_DEBUG << "Text file auditor created with file '" << m_file << "'";
 }
 
 TextFileAuditor::~TextFileAuditor()
@@ -89,7 +89,7 @@ TextFileAuditor::~TextFileAuditor()
 TextFileAuditContainer::TextFileAuditContainer( const TextFileAuditConfig& conf )
 {
 	m_audit = new TextFileAuditor( conf.m_file );
-	MOD_LOG_NOTICE << "Text file auditor container created";
+	MOD_LOG_TRACE << "Text file auditor container created";
 }
 
 }} // namespace _Wolframe::AAAA

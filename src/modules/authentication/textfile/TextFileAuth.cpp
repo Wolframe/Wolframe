@@ -80,7 +80,7 @@ void TextFileAuthConfig::setCanonicalPathes( const std::string& refPath )
 TextFileAuthenticator::TextFileAuthenticator( const std::string& filename )
 	: m_file( filename )
 {
-	MOD_LOG_NOTICE << "Text file authenticator created with file '" << m_file << "'";
+	MOD_LOG_DEBUG << "Text file authenticator created with file '" << m_file << "'";
 }
 
 TextFileAuthenticator::~TextFileAuthenticator()

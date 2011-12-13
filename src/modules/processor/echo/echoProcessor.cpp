@@ -95,14 +95,14 @@ void EchoProcConfig::setCanonicalPathes( const std::string& /*refPath*/ )
 EchoProcContainer::EchoProcContainer( const EchoProcConfig& /*conf*/ )
 {
 	m_proc = new EchoProcessorUnit();
-	MOD_LOG_NOTICE << "Echo processor container created";
+	MOD_LOG_TRACE << "Echo processor container created";
 }
 
 
 //***  Processor unit  **************************************************
 EchoProcessorUnit::EchoProcessorUnit()
 {
-	MOD_LOG_NOTICE << "Echo processor unit created";
+	MOD_LOG_DEBUG << "Echo processor unit created";
 }
 
 } // namespace _Wolframe

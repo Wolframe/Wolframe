@@ -49,7 +49,7 @@ DBauthenticator::DBauthenticator( const std::string& dbLabel )
 	if ( m_dbLabel.empty() )
 		throw std::logic_error( "Empty database reference in DBauthContainer" );
 
-	MOD_LOG_TRACE << "Database authenticator created with database reference '" << m_dbLabel << "'";
+	MOD_LOG_DEBUG << "Database authenticator created with database reference '" << m_dbLabel << "'";
 }
 
 DBauthenticator::~DBauthenticator()

@@ -97,7 +97,6 @@ private:
 	const std::string	m_ID;			//< database ID
 	std::string		m_connStr;		//< connection string
 	size_t			m_noConnections;	//< number of connections
-	std::list< PGconn* >	m_connections;		//< list of DB connections
 	ObjectPool< PGconn* >	m_connPool;		//< pool of connections
 };
 

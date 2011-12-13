@@ -111,9 +111,13 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 			return _Wolframe::ErrorCode::FAILURE;
 		}
 // command line has been parsed successfully
+// reset log level to the command line one, if specified
+		if ( cmdLineCfg.debugLevel != _Wolframe::log::LogLevel::LOGLEVEL_UNDEFINED )
+			_Wolframe::log::LogBackend::instance().setConsoleLevel( cmdLineCfg.debugLevel );
+
 // if cmdLineCfg.errMsg() is not empty than we have a warning
 		if ( !cmdLineCfg.errMsg().empty() )	// there was a warning parsing the command line
-			LOG_ERROR << cmdLineCfg.errMsg();
+			LOG_WARNING << cmdLineCfg.errMsg();
 
 // if we have to print the version or the help do it and exit
 		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::PRINT_VERSION )	{

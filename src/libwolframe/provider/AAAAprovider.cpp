@@ -78,15 +78,16 @@ AAAAprovider::AAAAprovider_Impl::AAAAprovider_Impl( const AAAAconfiguration* con
 
 bool AAAAprovider::AAAAprovider_Impl::resolveDB( const db::DatabaseProvider& db )
 {
-	LOG_DATA << " --- Resolving authentication databases ---";
+	LOG_DATA << "Resolving authentication databases";
 	if ( !m_authenticator.resolveDB( db ))
 		return false;
-	LOG_DATA << " --- Resolving authorization databases ---";
+	LOG_DATA << "Resolving authorization databases";
 	if ( !m_authorizer.resolveDB( db ))
 		return false;
-	LOG_DATA << " --- Resolving audit databases ---";
+	LOG_DATA << "Resolving audit databases";
 	if ( !m_auditor.resolveDB( db ))
 		return false;
+	LOG_DEBUG << "AAAA database references resolved";
 	return true;
 }
 

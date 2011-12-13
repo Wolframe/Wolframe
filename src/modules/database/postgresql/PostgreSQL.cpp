@@ -149,6 +149,7 @@ static std::string buildConnStr( const std::string& host, unsigned short port, c
 	return ss.str();
 }
 
+
 // This function also needs a lot of work
 PostgreSQLdatabase::PostgreSQLdatabase( const std::string& id,
 					const std::string& host, unsigned short port,
@@ -228,28 +229,28 @@ PostgreSQLdatabase::~PostgreSQLdatabase()
 		PGTransactionStatusType stat = PQtransactionStatus( conn );
 		switch( stat )	{
 			case PQTRANS_IDLE:
-				MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " idle";
 				PQfinish( conn );
+				MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " idle";
 				m_noConnections--, connections++;
 				break;
 			case PQTRANS_ACTIVE:
-				MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " active";
 				PQfinish( conn );
+				MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " active";
 				m_noConnections--, connections++;
 				break;
 			case PQTRANS_INTRANS:
-				MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " in transaction";
 				PQfinish( conn );
+				MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " in transaction";
 				m_noConnections--, connections++;
 				break;
 			case PQTRANS_INERROR:
-				MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " in transaction error";
 				PQfinish( conn );
+				MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " in transaction error";
 				m_noConnections--, connections++;
 				break;
 			case PQTRANS_UNKNOWN:
-				MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " status unknown";
 				PQfinish( conn );
+				MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " status unknown";
 				m_noConnections--, connections++;
 				break;
 		}

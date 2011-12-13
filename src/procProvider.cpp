@@ -203,7 +203,7 @@ bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabasePro
 	if ( m_db == NULL && ! m_dbLabel.empty() )	{
 		m_db = db.database( m_dbLabel );
 		if ( m_db )	{
-			LOG_NOTICE << "Processor database: database reference '" << m_dbLabel << "' resolved";
+			LOG_DEBUG << "Processor database: database reference '" << m_dbLabel << "' resolved";
 			return true;
 		}
 		else	{

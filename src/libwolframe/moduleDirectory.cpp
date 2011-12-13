@@ -58,7 +58,7 @@ bool ModulesDirectory::addContainer( ModuleContainer* container )
 		}
 	}
 	m_container.push_back( container );
-	LOG_DEBUG << "Container '" << container->name << "' registered for section '"
+	LOG_DEBUG << "Module '" << container->name << "' registered for section '"
 		  << container->section << "' keyword '" << container->keyword << "'";
 	return true;
 }
