@@ -61,7 +61,7 @@ SQLiteDatabase::SQLiteDatabase( const std::string& id,
 		m_connPool.add( handle );
 	}
 
-	MOD_LOG_NOTICE << "SQLite database '" << m_ID << "' created with "
+	MOD_LOG_DEBUG << "SQLite database '" << m_ID << "' created with "
 		   << "filename '" << m_filename << "'";
 }
 
@@ -72,8 +72,7 @@ SQLiteDatabase::~SQLiteDatabase( )
 		sqlite3_close( handle );
 	}
 
-	MOD_LOG_DEBUG << "SQLite database '" << m_ID << "' destroyed with "
-		  << "filename '" << m_filename << "'";
+	MOD_LOG_TRACE << "SQLite database '" << m_ID << "' destroyed";
 }
 
 bool SQLiteDatabase::doTransaction( DatabaseRequest& /*request*/, DatabaseAnswer& /*answer*/,

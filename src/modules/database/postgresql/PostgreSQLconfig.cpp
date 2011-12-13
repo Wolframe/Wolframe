@@ -92,7 +92,7 @@ bool PostgreSQLconfig::parse( const config::ConfigurationTree& pt, const std::st
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "connections" ))	{
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, connections,
-						Parser::RangeDomain<unsigned short>( 1 ), &connDefined ))
+						Parser::RangeDomain<unsigned short>( 0 ), &connDefined ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "acquireTimeout" ))	{
@@ -104,7 +104,7 @@ bool PostgreSQLconfig::parse( const config::ConfigurationTree& pt, const std::st
 					<< L1it->first << "'";
 		}
 	}
-	if ( ! connDefined == 0 )
+	if ( ! connDefined )
 		connections = DEFAULT_POSTGRESQL_CONNECTIONS;
 	if ( ! cTdefined )
 		connectTimeout = DEFAULT_CONNECTION_TIMEOUT;

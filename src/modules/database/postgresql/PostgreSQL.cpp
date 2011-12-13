@@ -209,7 +209,7 @@ PostgreSQLdatabase::PostgreSQLdatabase( const std::string& id,
 			m_noConnections++;
 		}
 	}
-	MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' created with a pool of " << m_noConnections << " connections";
+	MOD_LOG_DEBUG << "PostgreSQL database '" << m_ID << "' created with a pool of " << m_noConnections << " connections";
 }
 
 
