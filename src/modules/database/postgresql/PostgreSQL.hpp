@@ -37,13 +37,14 @@
 #ifndef _POSTGRESQL_HPP_INCLUDED
 #define _POSTGRESQL_HPP_INCLUDED
 
+#include <libpq-fe.h>
+#include <list>
+
 #include "database/database.hpp"
 #include "container.hpp"
 #include "config/configurationBase.hpp"
 
-#include <list>
 #include "objectPool.hpp"
-#include "libpq-fe.h"
 
 #include "moduleInterface.hpp"
 
