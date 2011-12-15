@@ -47,13 +47,14 @@
 	typedef module::ModuleContainer* (*CreateFunction)();
 	typedef void (*SetModuleLogger)( void* );
 
-	class OpenDLlist
+	class LocalGarbageCollector
 	{
 	public:
-		~OpenDLlist()	{
+		~LocalGarbageCollector()	{
 			while ( !m_handle.empty())	{
 				dlclose( m_handle.back());
 				m_handle.pop_back();
+				LOG_ALERT << "DLL handle closed.";
 			}
 		}
 
@@ -63,7 +64,7 @@
 
 	};
 
-	static OpenDLlist	handleList;
+	static LocalGarbageCollector	handleList;
 
 	bool module::LoadModules( ModulesDirectory& modDir, std::list< std::string >& modFiles )
 	{
@@ -115,10 +116,10 @@
 	typedef module::ModuleContainer* (*CreateFunction)();
 	typedef void (*SetModuleLogger)( void* );
 
-	class OpenDLlist
+	class LocalGarbageCollector
 	{
 	public:
-		~OpenDLlist()	{
+		~LocalGarbageCollector()	{
 			while ( !m_handle.empty())	{
 				FreeLibrary( m_handle.back());
 				m_handle.pop_back();
@@ -131,7 +132,7 @@
 
 	};
 
-	static OpenDLlist	handleList;
+	static LocalGarbageCollector	handleList;
 
 	char *getLastError( char *buf, size_t buflen ) {
 		LPTSTR errbuf;
