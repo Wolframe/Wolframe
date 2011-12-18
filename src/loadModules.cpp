@@ -126,7 +126,7 @@
 			}
 		}
 
-		void addHandle( void* handle )	{ m_handle.push_back( handle); }
+		void addHandle( HMODULE handle )	{ m_handle.push_back( handle); }
 	private:
 		std::list< HMODULE >	m_handle;
 
