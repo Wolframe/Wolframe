@@ -37,7 +37,7 @@ Project Wolframe.
 #define _Wolframe_LUATYPES_HPP_INCLUDED
 #include "luaConfig.hpp"
 #include "appObjects.hpp"
-#include "appProcessor.hpp"
+#include "ioFilterCommandHandler.hpp"
 extern "C"
 {
 #include "lua.h"
@@ -49,7 +49,7 @@ namespace lua {
 
 ///\class AppProcessor
 ///\brief application processor instance for processing calls as Lua script
-class AppProcessor :public app::AppProcessorBase
+class AppProcessor :public protocol::IOFilterCommandHandler
 {
 public:
 	///\class State
@@ -58,45 +58,28 @@ public:
 
 	///\brief Constructor
 	///\param[in] config read only reference to the configuration of this application processor
-	AppProcessor( const lua::Configuration* config);
+	AppProcessor( const lua::CommandConfig* config);
 	///\brief Destructor
 	~AppProcessor();
 
-	///\brief Get command implemenation (see app::AppProcessorBase::getCommand(const char*,const char*&,bool&)const)
-	///\param[in] protocolCmd protocol command
-	///\param[out] functionName associated Lua script function name
-	///\param[out] hasIO true if associated Lua script function is processing content from network I/O
-	///\return true, if the command is defined in configuration
-	virtual bool getCommand( const char* protocolCmd, const char*& functionName, bool& hasIO) const
-	{
-		functionName = m_config->scriptFunctionName( protocolCmd);
-		hasIO = m_config->scriptFunctionHasIO( protocolCmd);
-		return (functionName != 0);
-	}
-
-	///\brief Get command implemenation (see app::AppProcessorBase::setIO( const InputFilterR&, const FormatOutputR&)
-	///\param[in] in input filter reference
-	///\param[in] out format output reference
-	virtual void setIO( const protocol::InputFilterR& in, const protocol::FormatOutputR& out)
-	{
-		m_input.m_inputfilter = in;
-		m_output.m_formatoutput = out;
-	}
-
-	///\brief Execute the Lua script (see app::AppProcessorBase::call(unsigned int, const char**,bool))
+	///\brief Execute the Lua script
 	///\param[in] argc number of arguments
 	///\param[in] argc array of arguments
 	///\return call state
-	virtual CallResult call( unsigned int argc, const char** argv);
+	virtual CallResult call();
 
 	///\brief Get the current lua state (not the thread!)
 	///\return the current lua state
 	lua_State* getLuaState() const;
 
 private:
-	const lua::Configuration* m_config;	///< reference to configuration
-	app::Input m_input;			///< input
-	app::Output m_output;			///< output
+	const lua::CommandConfig* m_config;	///< reference to configuration
+	struct Globals
+	{
+		app::Input m_input;
+		app::Output m_output;
+	};
+	Globals m_globals;
 	State* m_state;				///< application procesor instance state
 };
 

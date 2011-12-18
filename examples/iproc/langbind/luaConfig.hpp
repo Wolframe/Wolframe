@@ -36,6 +36,7 @@
 #define _iproc_LUA_CONFIG_HPP_INCLUDED
 #include "standardConfigs.hpp"
 #include "config/descriptionBase.hpp"
+#include "protocol/commandHandler.hpp"
 #include <string>
 #include <vector>
 
@@ -47,54 +48,28 @@ namespace _Wolframe {
 namespace iproc {
 namespace lua {
 
-#if 0//[+]
-struct ConfigurationStruct
-{
-	std::string m_main;				///< main module
-	std::list<std::string> m_modules;		///< list of module names without the main
-
-	static const config::DescriptionBase* ConfigurationStruct::description();
-};
-#endif
 
 ///\class Configuration
 ///\brief configuration object of the lua application processor
-class Configuration :public config::ConfigurationBase
+class CommandConfig :public protocol::CommandConfig
 {
 public:
 	///\brief module load function for a lua state
 	///\param ls lua state to initialize with the load of the module for this state object
 	typedef int (*ModuleLoad)( lua_State *ls);
 
-	///\brief constructor
-	///\param[in] name configuration name
-	///\param[in] prefix configuration prefix
-	///\param[in] ib network input buffer size
-	///\param[in] ob network output buffer size
-	///\param[in] cs C stack size for a thread
-	Configuration( const char* name, const char* prefix, std::size_t ib=1024, std::size_t ob=1024, std::size_t cs=2048)
-
-		:ConfigurationBase(name, 0, prefix)
-		,m_input_bufsize(ib)
-		,m_output_bufsize(ob)
-		,m_cthread_stacksize(cs){}
-
 	///\brief default constructor
-	Configuration() :ConfigurationBase( "Lua", 0, "lua"){}
-
-	///\brief Add a module
-	///\param[in] name module name
-	void addModule( const char* name);
-
-	///\brief Define the main program
-	///\param[in] name program name
-	void defMain( const char* name);
-
-	bool parse( const config::ConfigurationTree& pt, const std::string& node,
-		    const module::ModulesDirectory* modules );
-
-	///\brief interface implementation of ConfigurationBase::setCanonicalPathes(const std::string&)
-	virtual void setCanonicalPathes( const std::string&);
+	CommandConfig( const std::string& main_, const std::string& mainmodule_, const std::vector<std::string>& modules_=std::vector<std::string>())
+		:m_main(main_)
+		,m_mainmodule( mainmodule_, Module::Script)
+		,m_cthread_stacksize(2048)
+	{
+		std::vector<std::string>::const_iterator itr=modules_.begin(),end=modules_.end();
+		for (;itr!=end; ++itr)
+		{
+			m_modules.push_back( Module( *itr));
+		}
+	}
 
 	///\brief interface implementation of ConfigurationBase::test() const
 	virtual bool test() const;
@@ -136,12 +111,6 @@ public:
 		///\param module to copy
 		Module( const Module& o)					:m_type(o.m_type),m_name(o.m_name),m_path(o.m_path),m_load(o.m_load){}
 
-		///\brief Canonical module file path decomposition based on the application reference path
-		/// Initialize the absolute path of this module by combining the application reference path with the module file name.
-		/// remove all path parts from the name. After this call the module name is the plain name abd path the full path of the module.
-		///\param[in] refPath the application reference path
-		void setCanonicalPath( const std::string& refPath);
-
 		///\brief Determines the type of the module
 		void setType();
 
@@ -172,32 +141,20 @@ public:
 		std::string m_path;			///< full path of the module
 		ModuleLoad m_load;			///< function to load the module into the interpreter context
 	};
+	///\brief return the main function
+	const std::string& main() const			{return m_main;}
 	///\brief return the main module
-	const Module& main() const			{return m_main;}
+	const Module& mainmodule() const		{return m_mainmodule;}
 	///\brief return the list of modules without the main
-	const std::list<Module>& modules() const	{return m_modules;}
+	const std::vector<Module>& modules() const	{return m_modules;}
 
-	///\brief return size of the buffer used for input network messages in bytes
-	std::size_t input_bufsize() const		{return m_input_bufsize;}
-	///\brief return size of the buffer used for output network messages in bytes
-	std::size_t output_bufsize() const		{return m_output_bufsize;}
 	///\brief return stack size in bytes of lua c thread executing command
 	std::size_t cthread_stacksize() const		{return m_cthread_stacksize;}
 
-	///\brief Return the name of the function to execute for a command
-	///\param[in] protocolcmd command from the protocol
-	///\return script function name to execute
-	const char* scriptFunctionName( const char* cmd) const		{return cmd;}
-
-	///\brief Tell wheter the command has IO (protocol command content) or not
-	///\param[in] protocolcmd command from the protocol
-	///\return true, if the command has IO, false, if not
-	bool scriptFunctionHasIO( const char*) const			{return true;}
 private:
-	Module m_main;					///< main module
-	std::list<Module> m_modules;			///< list of modules without the main
-	std::size_t m_input_bufsize;			///< size of input network message buffers in bytes
-	std::size_t m_output_bufsize;			///< size of output network message buffers in bytes
+	std::string m_main;				///< main function
+	Module m_mainmodule;				///< main module
+	std::vector<Module> m_modules;			///< list of modules without the main
 	std::size_t m_cthread_stacksize;		///< stack size in bytes of lua c thread executing command
 };
 

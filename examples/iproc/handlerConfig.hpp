@@ -38,18 +38,18 @@
 #define _HANDLERCONFIG_HPP_INCLUDED
 
 #include "standardConfigs.hpp"
-#include "langbind/luaConfig.hpp"
+#include "iprocHandlerConfig.hpp"
 
 namespace _Wolframe {
 
 struct HandlerConfiguration
 {
 public:
-	iproc::lua::Configuration *m_appConfig;
+	iproc::Configuration *m_appConfig;
 
 	HandlerConfiguration()
 	{
-		m_appConfig = new iproc::lua::Configuration( "lua iproc", "iproc");
+		m_appConfig = new iproc::Configuration();
 	}
 
 	virtual ~HandlerConfiguration( ) {

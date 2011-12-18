@@ -34,6 +34,7 @@ Project Wolframe.
 
 #include "serialize/struct/luamapDescription.hpp"
 #include "serialize/struct/luamapBase.hpp"
+#include "iprocHandlerConfig.hpp"
 #include "langbind/luaConfig.hpp"
 #include "langbind/appObjects.hpp"
 #include "langbind/luaAppProcessor.hpp"
@@ -213,17 +214,10 @@ const DescriptionBase* Document::getDescription()
 	return &rt;
 }
 
-struct TestConfiguration :public lua::Configuration
+class TestConfiguration :public lua::CommandConfig
 {
-	TestConfiguration( const char* scriptname, int bufferSizeInput, int bufferSizeOutput)
-		:lua::Configuration( "iproc", "test-iproc", bufferSizeInput, bufferSizeOutput)
-	{
-		std::string scriptpath( wtest::Data::getDataFile( scriptname, "scripts", ".lua"));
-		defMain( scriptpath.c_str());
-		addModule( "table");
-		addModule( "string");
-		setCanonicalPathes( ".");
-	}
+public:
+	TestConfiguration ( const std::string& scriptpath) :lua::CommandConfig( "run",  scriptpath){}
 };
 
 template <class Struct>
@@ -260,11 +254,11 @@ static int run( const TestConfiguration& cfg, const std::string& input, std::str
 	lua_setglobal( ls, "transform");
 
 	in->protocolInput( (void*)input.c_str(), input.size(), true);
-	processor.setIO( filter.m_inputfilter, filter.m_formatoutput);
+	processor.setFilter( filter.m_inputfilter);
+	processor.setFilter( filter.m_formatoutput);
 	for (;;)
 	{
-		const char* cmd = "run";
-		switch (processor.call( 1, &cmd))
+		switch (processor.call())
 		{
 			case lua::AppProcessor::YieldRead:
 				LOG_ERROR << "unexpected end of input";
@@ -335,7 +329,7 @@ TEST_F( StructLuamapTest, tests)
 	{
 		wtest::Data data( testDescription[ti].name, testDescription[ti].datafile);
 		std::string testoutput;
-		TestConfiguration cfg( testDescription[ti].scriptname, 127, 127);
+		TestConfiguration cfg( testDescription[ti].scriptname);
 
 		EXPECT_EQ( 0, testDescription[ti].run( cfg, data.input, testoutput));
 		data.check( testoutput);

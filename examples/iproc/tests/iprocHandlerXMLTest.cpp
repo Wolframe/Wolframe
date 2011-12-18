@@ -100,14 +100,18 @@ static const TestDescription testDescriptions[] =
 	{0,0,0,0}
 };
 
-struct TestConfiguration :public lua::Configuration
+class TestConfiguration :public Configuration
 {
-	TestConfiguration( const char* scriptname, int bufferSizeInput, int bufferSizeOutput)
-		:lua::Configuration( "iproc", "test-iproc", bufferSizeInput, bufferSizeOutput)
+public:
+	TestConfiguration ( const std::string& scriptpath, std::size_t ib, std::size_t ob)
 	{
-		std::string scriptpath( wtest::Data::getDataFile( scriptname, "scripts", ".lua"));
-		defMain( scriptpath.c_str());
-		setCanonicalPathes( ".");
+		m_data.input_bufsize = ib;
+		m_data.output_bufsize = ob;
+		ScriptConfigStruct sc;
+		sc.name = "run";
+		sc.main = "run";
+		sc.path = scriptpath;
+		if (!defineScript( sc)) throw std::logic_error( "cannot define test configuration");
 	}
 };
 

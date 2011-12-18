@@ -103,6 +103,20 @@ const void* findElement_( const char* type, const char* name, const T* value, co
 	return rt;
 }
 
+///\brief findElement_ for atom_
+template <typename T>
+const void* findElement_( const char*, const char*, const T*, const traits::atom_&)
+{
+	return 0;
+}
+
+///\brief findElement_ for foreign_
+template <typename T>
+const void* findElement_( const char*, const char*, const T*, const traits::foreign_&)
+{
+	return 0;
+}
+
 ///\brief findElement_ for vector_
 template <typename T>
 const void* findElement_( const char* type, const char* name, const T* value, const traits::vector_&)
@@ -135,20 +149,6 @@ const void* findElement_( const char* type, const char* name, const T* value, co
 		}
 	}
 	return rt;
-}
-
-///\brief findElement_ for atom_
-template <typename T>
-const void* findElement_( const char*, const char*, const T*, const traits::atom_&)
-{
-	return 0;
-}
-
-///\brief findElement_ for foreign_
-template <typename T>
-const void* findElement_( const char*, const char*, const T*, const traits::foreign_&)
-{
-	return 0;
 }
 
 template <typename Element>

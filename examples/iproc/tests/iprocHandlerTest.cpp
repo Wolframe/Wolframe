@@ -48,17 +48,18 @@
 using namespace _Wolframe;
 using namespace iproc;
 
-struct TestConfiguration :public lua::Configuration
+class TestConfiguration :public Configuration
 {
-	TestConfiguration( int bufferSizeInput, int bufferSizeOutput)
-		:lua::Configuration( "iproc", "test-iproc", bufferSizeInput, bufferSizeOutput)
+public:
+	TestConfiguration ( const std::string& scriptpath, std::size_t ib, std::size_t ob)
 	{
-		boost::filesystem::path scriptpath = boost::filesystem::current_path();
-		scriptpath /= "scripts";
-		scriptpath /= "test_echo_char.lua";
-
-		defMain( scriptpath.string().c_str());
-		setCanonicalPathes( ".");
+		m_data.input_bufsize = ib;
+		m_data.output_bufsize = ob;
+		ScriptConfigStruct sc;
+		sc.name = "run";
+		sc.main = "run";
+		sc.path = scriptpath;
+		if (!defineScript( sc)) throw std::logic_error( "cannot define test configuration");
 	}
 };
 
@@ -173,7 +174,11 @@ protected:
 	IProcHandlerTest()
 		:ep( "127.0.0.1", 12345)
 		,m_connection(0)
-		,m_config( TestDescription().inputBufferSize + EoDBufferSize, TestDescription().outputBufferSize + EscBufferSize) {}
+		,m_config(
+			(boost::filesystem::current_path() / "scripts"/ "test_echo_char.lua").string(),
+			TestDescription().inputBufferSize + EoDBufferSize,
+			TestDescription().outputBufferSize + EscBufferSize)
+		{}
 
 	virtual void SetUp()
 	{

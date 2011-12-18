@@ -31,7 +31,7 @@
 
 ************************************************************************/
 ///
-/// \file iprocHandler.cpp
+///\file iprocHandler.cpp
 ///
 
 #include "iprocHandler.hpp"
@@ -60,12 +60,31 @@ const net::NetworkOperation Connection::WriteLine( const char* str, const char* 
 	return net::SendData( msg, msgsize);
 }
 
-void Connection::passInput()
+const net::NetworkOperation Connection::WriteLine( const char* str, int code)
 {
-	Input::iterator eoD = m_input.getEoD( m_itr);
-	m_inputfilter->protocolInput( m_itr.ptr(), eoD-m_itr, m_input.gotEoD());
-	m_end = m_input.end();
-	m_itr = (eoD < m_end) ? eoD:m_end;
+	bool sg;
+	char arg[128];
+	unsigned int ii=sizeof(arg)-1;
+	arg[ii] = 0;
+	if (code < 0)
+	{
+		sg = true;
+		code = -code;
+	}
+	if (code == 0)
+	{
+		arg[--ii] = '0';
+	}
+	while (code > 0)
+	{
+		arg[--ii] = code%10 + '0';
+		code = code / 10;
+	}
+	if (sg)
+	{
+		arg[--ii] = '-';
+	}
+	return WriteLine( str, arg+ii);
 }
 
 void Connection::networkInput( const void* dt, std::size_t nofBytes)
@@ -74,15 +93,9 @@ void Connection::networkInput( const void* dt, std::size_t nofBytes)
 	m_input.setPos( nofBytes + ((const char*)dt - m_input.charptr()));
 	m_itr = m_input.begin();
 
-	if (m_state == Processing || m_state == DiscardInput)
+	if (m_cmdhandler.get())
 	{
-		Input::iterator eoD = m_input.getEoD( m_itr);
-		if (m_state == Processing)
-		{
-			m_inputfilter->protocolInput( m_itr.ptr(), eoD-m_itr, m_input.gotEoD());
-		}
-		m_end = m_input.end();
-		m_itr = (eoD < m_end)? eoD:m_end;
+		m_cmdhandler.get()->putInput( m_input.ptr(), m_input.pos());
 	}
 	else
 	{
@@ -113,10 +126,14 @@ const net::NetworkOperation Connection::readDataOp()
 	void* pp;
 	std::size_t ppsize;
 
-	if (!m_input.getNetworkMessageRead( pp, ppsize))
+	if (m_cmdhandler.get())
+	{
+		m_cmdhandler.get()->getInputBlock( pp, ppsize);
+	}
+	else if (!m_input.getNetworkMessageRead( pp, ppsize))
 	{
 		LOG_ERROR << "buffer too small to buffer end of data marker in input";
-		return net::CloseConnection();
+		throw std::logic_error( "buffer too small");
 	}
 	return net::ReadData( pp, ppsize);
 }
@@ -142,13 +159,11 @@ const net::NetworkOperation Connection::nextOperation()
 			{
 				//the empty command is for an empty line for not bothering the client with obscure error messages.
 				//the next state should read one character for sure otherwise it may result in an endless loop
-				static const ProtocolParser parser(&commandName);
-				m_cmdidx = (Command)parser.getCommand( m_itr, m_end, m_buffer);
+				m_cmdidx = m_parser.getCommand( m_itr, m_end, m_buffer);
 				switch (m_cmdidx)
 				{
 					case empty:
 					case capa:
-					case run:
 					case quit:
 					{
 						m_state = ParseArgs;
@@ -224,7 +239,7 @@ const net::NetworkOperation Connection::nextOperation()
 						}
 						else
 						{
-							return WriteLine( "OK capa run quit");
+							return WriteLine( "OK capa quit", m_config->getCommandDescriptions().c_str());
 							m_state = EnterCommand;
 							continue;
 						}
@@ -239,124 +254,50 @@ const net::NetworkOperation Connection::nextOperation()
 							m_state = Terminate;
 							return WriteLine( "BYE");
 						}
-					case run:
-						if (!m_processor.getCommand( "run", m_functionName, m_functionHasIO))
-						{
-							LOG_ERROR << "Command for 'run' not defined in configuration";
-							m_state = ProtocolError;
-							return WriteLine( "BAD command not defined");
-						}
-						if (m_functionHasIO)
-						{
-							filter::CharFilter flt( "UTF-8");
-							m_inputfilter = flt.inputFilter();
-							m_formatoutput = flt.formatOutput();
-							passInput();
-							m_formatoutput->init( m_output.ptr(), m_output.size());
-							m_processor.setIO( m_inputfilter, m_formatoutput);
-						}
-						else
-						{
-							m_inputfilter.reset();
-							m_formatoutput.reset();
-						}
-						m_state = Processing;
+					default:
+						m_cmdhandler = m_cmds[ m_cmdidx - NofCommands].create( m_input, m_output, m_argBuffer.argc(), m_argBuffer.argv());
+						m_state = m_cmdhandler.get()?Processing:Init;
 						continue;
 				}
 			}
 
 			case Processing:
 			{
-				const char** argv = m_argBuffer.argv( m_functionName);
-				unsigned int argc = m_argBuffer.argc( m_functionName);
+				const void* content;
+				std::size_t contentsize;
 
-				switch (m_processor.call( argc, argv))
+				m_cmdhandler.get()->run();
+
+				switch (m_cmdhandler.get()->nextOperation())
 				{
-					case lua::AppProcessor::YieldRead:
+					case protocol::CommandHandler::READ:
 						return readDataOp();
-
-					case lua::AppProcessor::YieldWrite:
-					{
-						void* content = m_formatoutput->ptr();
-						unsigned int contentsize = m_formatoutput->pos();
-						if (!m_functionHasIO)
-						{
-							LOG_WARNING << "output of function '" << m_functionName << "' that has no IO configured is ignored";
-							contentsize = 0;
-						}
-						else if (contentsize == 0)
-						{
-							LOG_ERROR << "buffer too small for one output element";
-							m_state = DiscardInput;
-							return WriteLine( "\r\n.\r\nERR protocol misconfiguration");
-						}
-						m_formatoutput->init( m_output.ptr(), m_output.size());
+					break;
+					case protocol::CommandHandler::WRITE:
+						m_cmdhandler.get()->getOutput( content, contentsize);
 						return net::SendData( content, contentsize);
-					}
-
-					case lua::AppProcessor::Ok:
-					{
-						if (m_functionHasIO)
+					break;
+					case protocol::CommandHandler::CLOSED:
+						m_cmdhandler.get()->getOutput( content, contentsize);
+						if (contentsize)
 						{
-							m_state = FlushOutput;
-							void* content = m_formatoutput->ptr();
-							unsigned int contentsize = m_formatoutput->pos();
-
-							m_formatoutput->init( m_output.ptr(), m_output.size());
-							if (contentsize)
+							return net::SendData( content, contentsize);
+						}
+						else
+						{
+							int err = m_cmdhandler.get()->statusCode();
+							m_cmdhandler.reset(0);
+							m_state = Init;
+							if (err != 0)
 							{
-								if (!m_functionHasIO)
-								{
-									LOG_WARNING << "output of function '" << m_functionName << "' that has no IO configured is ignored";
-									contentsize = 0;
-								}
-								else
-								{
-									m_formatoutput->init( m_output.ptr(), m_output.size());
-									return net::SendData( content, contentsize);
-								}
+								return WriteLine( "ERR", err);
 							}
-							continue;
+							else
+							{
+								return WriteLine( "OK");
+							}
 						}
-						else
-						{
-							m_state = Init;
-							return WriteLine( "\r\nOK");
-						}
-					}
-
-					case lua::AppProcessor::Error:
-					{
-						if (m_functionHasIO)
-						{
-							m_state = DiscardInput;
-							return WriteLine( "\r\n.\r\nERR");
-						}
-						else
-						{
-							m_state = Init;
-							return WriteLine( "\r\nERR");
-						}
-					}
-				}
-			}
-
-			case FlushOutput:
-			{
-				m_state = DiscardInput;
-				return WriteLine( "\r\n.\r\nOK");
-			}
-
-			case DiscardInput:
-			{
-				if (m_input.gotEoD())
-				{
-					m_state = EnterCommand;
-					continue;
-				}
-				else
-				{
-					return readDataOp();
+					break;
 				}
 			}
 
@@ -380,18 +321,37 @@ const net::NetworkOperation Connection::nextOperation()
 	return net::CloseConnection();
 }
 
+bool Connection::loadCommands()
+{
+	try
+	{
+		m_parser = ProtocolParser( &commandName);
+		std::vector< protocol::CommandBase >::const_iterator itr=m_cmds.begin(), end=m_cmds.end();
+		for (; itr!=end; ++itr)
+		{
+			m_parser.add( itr->protocolCmdName());
+		}
+		return true;
+	}
+	catch (std::exception& e)
+	{
+		LOG_ERROR << "Cannot initialize protocol context " << e.what();
+		return false;
+	}
+}
 
-Connection::Connection( const net::LocalEndpoint& local, const lua::Configuration* config)
+Connection::Connection( const net::LocalEndpoint& local, const Configuration* config)
 	:m_state(Init)
 	,m_argBuffer(&m_buffer)
 	,m_input(config->input_bufsize())
 	,m_output(config->output_bufsize())
-	,m_processor(config)
-	,m_functionName(0)
-	,m_functionHasIO(false)
+	,m_config(config)
+	,m_cmdidx( -1)
+	,m_cmds( config->getCommands())
 {
 	m_itr = m_input.begin();
 	m_end = m_input.end();
+	loadCommands();
 	LOG_TRACE << "Created connection handler for " << local.toString();
 }
 

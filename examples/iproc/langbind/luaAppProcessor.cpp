@@ -569,7 +569,7 @@ struct AppProcessor::State
 	int threadref;
 	lua_State* env;
 
-	State( const lua::Configuration& config) :ls(0),thread(0),threadref(0),env(0)
+	State( const lua::CommandConfig& config) :ls(0),thread(0),threadref(0),env(0)
 	{
 		env = ls = luaL_newstate();
 		if (!ls) throw std::bad_alloc();
@@ -581,12 +581,14 @@ struct AppProcessor::State
 	}
 };
 
-AppProcessor::AppProcessor( const lua::Configuration* config)
+AppProcessor::AppProcessor( const lua::CommandConfig* config)
 		:m_config(config)
 {
 	m_state = new State( *config);
-	LuaObject<Input>::createGlobal( m_state->ls, "input", m_input, input_methodtable);
-	LuaObject<Output>::createGlobal( m_state->ls, "output", m_output, output_methodtable);
+	m_globals.m_input.m_inputfilter = m_inputfilter;
+	m_globals.m_output.m_formatoutput = m_formatoutput;
+	LuaObject<Input>::createGlobal( m_state->ls, "input", m_globals.m_input, input_methodtable);
+	LuaObject<Output>::createGlobal( m_state->ls, "output", m_globals.m_output, output_methodtable);
 	LuaObject<Filter>::create( m_state->ls, &function__LuaObject__index<Filter>, &function__LuaObject__newindex<Filter>);
 	LuaObject<InputFilterClosure>::create( m_state->ls);
 	create_global_functions( m_state->ls);
@@ -631,13 +633,8 @@ static AppProcessor::CallResult getYieldState( protocol::InputFilter* in, protoc
 	return AppProcessor::Error;
 }
 
-AppProcessor::CallResult AppProcessor::call( unsigned int argc, const char** argv)
+AppProcessor::CallResult AppProcessor::call()
 {
-	if (argc == 0)
-	{
-		LOG_ERROR << "lua interpreter called with no arguments (first argument funtion name missing)";
-		return Error;
-	}
 	int rt = 0;
 
 	if (!m_state->thread)
@@ -659,27 +656,30 @@ AppProcessor::CallResult AppProcessor::call( unsigned int argc, const char** arg
 		lua_setfenv( m_state->ls, -2);
 		lua_pop( m_state->ls, 1);
 
-		if (m_input.m_inputfilter.get())
+		if (m_inputfilter.get())
 		{
-			if (!LuaObject<Input>::setGlobal( m_state->ls, "input", m_input))
+			m_globals.m_input.m_inputfilter = m_inputfilter;
+			if (!LuaObject<Input>::setGlobal( m_state->ls, "input", m_globals.m_input))
 			{
 				LOG_ERROR << "Failed to initialize input. It possibly has been redefined as a value of different type";
 			}
 		}
-		if (m_output.m_formatoutput.get())
+		if (m_formatoutput.get())
 		{
-			if (!LuaObject<Output>::setGlobal( m_state->ls, "output", m_output))
+			m_globals.m_output.m_formatoutput = m_formatoutput;
+			if (!LuaObject<Output>::setGlobal( m_state->ls, "output", m_globals.m_output))
 			{
 				LOG_ERROR << "Failed to initialize output. It possibly has been redefined as a value of different type";
 			}
 		}
 		// call the function (for the first time)
-		lua_getglobal( m_state->thread, argv[0]);
-		for (unsigned int ii=1; ii<argc; ii++)
+		lua_getglobal( m_state->thread, m_config->main().c_str());
+		std::vector<std::string>::const_iterator itr=m_argBuffer.begin(),end=m_argBuffer.end();
+		for (;itr != end; ++itr)
 		{
-			if (argv[ii]) lua_pushstring( m_state->thread, argv[ii]); else lua_pushnil( m_state->thread);
+			lua_pushlstring( m_state->thread, itr->c_str(), itr->size());
 		}
-		rt = lua_resume( m_state->thread, argc-1);
+		rt = lua_resume( m_state->thread, m_argBuffer.size());
 	}
 	else
 	{
@@ -688,9 +688,9 @@ AppProcessor::CallResult AppProcessor::call( unsigned int argc, const char** arg
 	}
 	if (rt == LUA_YIELD)
 	{
-		if (m_input.m_inputfilter.get())
+		if (m_globals.m_input.m_inputfilter.get())
 		{
-			return getYieldState( m_input.m_inputfilter.get(), m_output.m_formatoutput.get(), argv[0]);
+			return getYieldState( m_globals.m_input.m_inputfilter.get(), m_globals.m_output.m_formatoutput.get(), m_config->main().c_str());
 		}
 		else
 		{
@@ -700,7 +700,7 @@ AppProcessor::CallResult AppProcessor::call( unsigned int argc, const char** arg
 	else if (rt != 0)
 	{
 		const char* msg = lua_tostring( m_state->thread, -1);
-		LOG_ERROR << "error calling '" << argv[0] << "':" << msg;
+		LOG_ERROR << "error calling '" << m_config->main().c_str() << "':" << msg;
 		luaL_unref( m_state->ls, LUA_REGISTRYINDEX, m_state->threadref);
 		m_state->threadref = 0;
 		m_state->thread = 0;

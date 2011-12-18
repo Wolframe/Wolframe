@@ -187,8 +187,12 @@ examples/iproc/iproc.conf
 examples/iproc/iprocd.cpp
 examples/iproc/iprocHandler.cpp
 examples/iproc/iprocHandler.hpp
+examples/iproc/iprocHandlerConfig.cpp
+examples/iproc/iprocHandlerConfig.hpp
 examples/iproc/langbind/appObjects.cpp
 examples/iproc/langbind/appObjects.hpp
+examples/iproc/langbind/ioFilterCommandHandler.hpp
+examples/iproc/langbind/ioFilterCommandHandler.cpp
 examples/iproc/langbind/directmapTransaction.cpp
 examples/iproc/langbind/directmapTransaction.hpp
 examples/iproc/langbind/luaAppProcessor.cpp
@@ -291,7 +295,6 @@ include/AAAA/audit.hpp
 include/AAAA/authentication.hpp
 include/AAAA/authorization.hpp
 include/appConfig.hpp
-include/appProcessor.hpp
 include/appProperties.hpp
 include/atomicCounter.hpp
 include/config/configurationBase.hpp
@@ -331,7 +334,7 @@ include/protocol/inputfilter.hpp
 include/protocol/ioblocks.hpp
 include/protocol/iterators.hpp
 include/protocol/parser.hpp
-include/protocol/streamIterator.hpp
+include/protocol/commandHandler.hpp
 include/README
 include/serverEndpoint.hpp
 include/singleton.hpp
@@ -539,6 +542,7 @@ src/posixMain.cpp
 src/procProvider.cpp
 src/procProviderImpl.hpp
 src/protocol_ioblocks.cpp
+src/protocol_commandHandler.cpp
 src/serverConfig.cpp
 src/server.cpp
 src/serverEndpoint.cpp

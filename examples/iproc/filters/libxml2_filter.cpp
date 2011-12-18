@@ -4,7 +4,6 @@
 #include "libxml2_filter.hpp"
 #include "bufferingFilterBase.hpp"
 #include "textwolf.hpp"
-#include "protocol/streamIterator.hpp"
 #include <cstddef>
 #include <cstring>
 #include <vector>

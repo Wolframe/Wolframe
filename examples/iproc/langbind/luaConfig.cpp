@@ -47,54 +47,10 @@ extern "C" {
 	#include <lua.h>
 }
 
+using namespace _Wolframe;
 using namespace _Wolframe::iproc::lua;
 
-bool Configuration::parse( const _Wolframe::config::ConfigurationTree& parentNode,
-			   const std::string& /*node*/,
-			   const _Wolframe::module::ModulesDirectory* /*modules*/ )
-{
-	using namespace _Wolframe::iproc::lua;
-
-	std::string name;
-	unsigned int cnt_main = 0;
-
-	for ( boost::property_tree::ptree::const_iterator it = parentNode.begin(); it != parentNode.end(); it++)
-	{
-		if (boost::algorithm::iequals( it->first, "main"))
-		{
-			if ( !config::Parser::getValue( logPrefix().c_str(), *it, name, config::Parser::NonEmptyDomain<std::string>())) return false;
-			defMain( name.c_str());
-			cnt_main ++;
-		}
-		else if (boost::algorithm::iequals( it->first, "module"))
-		{
-			if ( !config::Parser::getValue( logPrefix().c_str(), *it, name, config::Parser::NonEmptyDomain<std::string>())) return false;
-			addModule( name.c_str());
-		}
-		else
-		{
-			LOG_WARNING << logPrefix() << "unknown configuration option: '" << it->first << "'";
-		}
-	}
-	if (cnt_main == 0)
-	{
-		LOG_ERROR << logPrefix() << "main script to execute is not defined (configuration option <module>";
-		return false;
-	}
-	return true;
-}
-
-void Configuration::addModule( const char* name)
-{
-	m_modules.push_back( Configuration::Module( name));
-}
-
-void Configuration::defMain( const char* name)
-{
-	m_main = Configuration::Module( name, Configuration::Module::Script);
-}
-
-static Configuration::ModuleLoad getLuaModuleEntryFunc( const char* name)
+static CommandConfig::ModuleLoad getLuaModuleEntryFunc( const char* name)
 {
 	if (strcmp(name,LUA_TABLIBNAME) == 0) return luaopen_table;
 	if (strcmp(name,LUA_IOLIBNAME) == 0) return luaopen_io;
@@ -106,9 +62,9 @@ static Configuration::ModuleLoad getLuaModuleEntryFunc( const char* name)
 	return 0;
 }
 
-void Configuration::Module::setType()
+void CommandConfig::Module::setType()
 {
-	if (m_type == Configuration::Module::Undefined)
+	if (m_type == CommandConfig::Module::Undefined)
 	{
 		m_load = getLuaModuleEntryFunc( m_name.c_str());
 		if (m_load)
@@ -119,32 +75,6 @@ void Configuration::Module::setType()
 		{
 			m_type = Script;
 		}
-	}
-}
-
-void Configuration::Module::setCanonicalPath( const std::string& refPath)
-{
-	if (m_type == Script)
-	{
-		boost::filesystem::path pt(m_name);
-		if (pt.is_absolute())
-		{
-			m_path = resolvePath(m_name);
-		}
-		else
-		{
-			m_path = resolvePath( boost::filesystem::absolute( m_name, boost::filesystem::path( refPath).branch_path()).string());
-		}
-		m_name = pt.leaf().string();
-	}
-}
-
-void Configuration::setCanonicalPathes( const std::string& refPath)
-{
-	m_main.setCanonicalPath( refPath);
-	for (std::list<Module>::iterator it = m_modules.begin(); it != m_modules.end(); it++)
-	{
-		it->setCanonicalPath( refPath);
 	}
 }
 
@@ -183,7 +113,7 @@ static int function_printlog( lua_State *ls)
 	return 0;
 }
 
-bool Configuration::Module::load( lua_State* ls) const
+bool CommandConfig::Module::load( lua_State* ls) const
 {
 	if (m_type == PreloadLib && m_load)
 	{
@@ -227,7 +157,7 @@ bool Configuration::Module::load( lua_State* ls) const
 	return true;
 }
 
-bool Configuration::Module::check() const
+bool CommandConfig::Module::check() const
 {
 	switch (m_type)
 	{
@@ -247,43 +177,43 @@ bool Configuration::Module::check() const
 	return true;
 }
 
-bool Configuration::load( lua_State *ls) const
+bool CommandConfig::load( lua_State *ls) const
 {
 	luaopen_base( ls);
-	for (std::list<Module>::const_iterator it = m_modules.begin(); it != m_modules.end(); it++)
+	for (std::vector<Module>::const_iterator it = m_modules.begin(); it != m_modules.end(); it++)
 	{
 		if (it->type() == Module::PreloadLib)
 		{
 			if (!it->load( ls)) return false;
 		}
 	}
-	for (std::list<Module>::const_iterator it = m_modules.begin(); it != m_modules.end(); it++)
+	for (std::vector<Module>::const_iterator it = m_modules.begin(); it != m_modules.end(); it++)
 	{
 		if (it->type() != Module::PreloadLib)
 		{
 			if (!it->load( ls)) return false;
 		}
 	}
-	if (!m_main.load( ls)) return false;
+	if (!m_mainmodule.load( ls)) return false;
 	return true;
 }
 
-bool Configuration::check() const
+bool CommandConfig::check() const
 {
 	bool rt = true;
-	for (std::list<Module>::const_iterator it = m_modules.begin(); it != m_modules.end(); it++)
+	for (std::vector<Module>::const_iterator it = m_modules.begin(); it != m_modules.end(); it++)
 	{
 		rt &= it->check();
 	}
 	return rt;
 }
 
-bool Configuration::test() const
+bool CommandConfig::test() const
 {
 	lua_State *ls = luaL_newstate();
 	if (!ls)
 	{
-		LOG_ERROR << "failed to create lua state in configuration check";
+		LOG_ERROR << "failed to create lua state in configuration test";
 		return false;
 	}
 	bool rt = load( ls);
@@ -291,15 +221,16 @@ bool Configuration::test() const
 	return rt;
 }
 
-void Configuration::print( std::ostream& os, size_t /*indent*/) const
+void CommandConfig::print( std::ostream& os, size_t /*indent*/) const
 {
-	os << "Configuration of " << logPrefix() << ":" << std::endl;
-	os << "   Main Script: " << m_main.name() << " (" << m_main.path() << ")" << std::endl;
+	os << "Configuration of Lua Script Processor" << ":" << std::endl;
+	os << "   Main Script: " << m_mainmodule.name() << " (" << m_mainmodule.path() << ")" << std::endl;
+	os << "   Main Function: " << m_main << std::endl;
 
 	if( !m_modules.empty())
 	{
 		os << "   Modules: ";
-		for (std::list<Module>::const_iterator it = m_modules.begin(); it != m_modules.end(); it++)
+		for (std::vector<Module>::const_iterator it = m_modules.begin(); it != m_modules.end(); it++)
 		{
 			os << "      " << Module::typeName(it->type()) << " " << it->name();
 			if (it->type() == Module::Script)

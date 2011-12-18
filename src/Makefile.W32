@@ -48,6 +48,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	config_descriptionBase.obj \
 	appConfig.obj \
 	protocol_ioblocks.obj \
+	protocol_commandHandler.obj \
 	acceptor.obj \
 	getPassword.obj \
 	serverEndpoint.obj \

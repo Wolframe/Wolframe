@@ -70,7 +70,9 @@ OBJS = \
 	appConfigDefinition.o \
 	$(TOPDIR)/src/loadModules-dummy.o \
 	iprocHandler.o \
+	iprocHandlerConfig.o \
 	langbind/appObjects.o \
+	langbind/ioFilterCommandHandler.o \
 	filters/textwolf_filter.o \
 	filters/textwolf_filterBase.o \
 	filters/char_filter.o \

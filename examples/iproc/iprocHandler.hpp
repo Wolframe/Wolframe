@@ -39,10 +39,8 @@
 #define _Wolframe_iproc_HANDLER_HPP_INCLUDED
 #include "connectionHandler.hpp"
 #include "handlerConfig.hpp"
+#include "protocol/commandHandler.hpp"
 #include "protocol.hpp"
-#include "langbind/appObjects.hpp"
-#include "langbind/luaConfig.hpp"
-#include "langbind/luaAppProcessor.hpp"
 
 namespace _Wolframe {
 namespace iproc {
@@ -52,7 +50,7 @@ class Connection : public net::ConnectionHandler
 {
 public:
 	///\brief Constructor
-	Connection( const net::LocalEndpoint& local, const lua::Configuration* config);
+	Connection( const net::LocalEndpoint& local, const Configuration* config);
 
 	///\brief Destructor
 	virtual ~Connection();
@@ -78,10 +76,6 @@ public:
 	virtual void errorOccured( NetworkSignal);
 
 private:
-	typedef protocol::InputBlock Input;					///< input buffer type
-	typedef protocol::OutputBlock Output;					///< output buffer type
-	typedef protocol::InputBlock::iterator InputIterator;			///< iterator type for protocol commands
-
 	typedef protocol::Buffer<256> LineBuffer;				///< buffer for one line of input/output
 	typedef protocol::CmdParser<LineBuffer> ProtocolParser;			///< parser for the protocol
 	typedef protocol::CArgBuffer<LineBuffer> ArgBuffer;			///< buffer type for the command arguments
@@ -96,8 +90,6 @@ private:
 		ParseArgsEOL,			///< parse end of line after command arguments
 		Processing,			///< running a command
 		ProtocolError,			///< a protocol error (bad command etc) appeared and the rest of the line has to be discarded
-		DiscardInput,			///< reading and discarding data until end of data has been seen
-		FlushOutput,			///< state for sending end of data after flushing the output buffers after a call
 		Terminate			///< terminate application processor session (close for network)
 	};
 	///\brief Returns the state as string for logging etc.
@@ -113,9 +105,11 @@ private:
 	{
 		empty,				///< empty line (to not get an error for no command)
 		capa,				///< get the protocol capabilities
-		run,				///< call a lua script
 		quit				///< BYE and terminate
+
 	};
+	enum {NofCommands=3};
+
 	///\brief Returns the command name as string for instantiating the protocol command parser
 	///\param [in] c the command to get as string
 	static const char* commandName( Command c)
@@ -124,23 +118,25 @@ private:
 		return ar[c];
 	}
 
-	State m_state;				///< state of the processor (protocol main statemachine)
+	State m_state;					///< state of the processor (protocol main statemachine)
 
-	LineBuffer m_buffer;			///< context (sub state) for partly parsed input lines
-	ArgBuffer m_argBuffer;			///< buffer for the arguments
-	Command m_cmdidx;			///< command parsed
+	LineBuffer m_buffer;				///< context (sub state) for partly parsed input lines
+	ArgBuffer m_argBuffer;				///< buffer for the arguments
 
-	Input m_input;				///< buffer for network read messages
-	Output m_output;			///< buffer for network write messages
+	protocol::InputBlock m_input;			///< buffer for network read messages
+	protocol::OutputBlock m_output;			///< buffer for network write messages
 
-	InputIterator m_itr;			///< iterator to scan protocol input
-	InputIterator m_end;			///< iterator pointing to end of message buffer
+	protocol::InputBlock::iterator m_itr;		///< iterator to scan protocol input
+	protocol::InputBlock::iterator m_end;		///< iterator pointing to end of message buffer
 
-	protocol::InputFilterR m_inputfilter;	///< network input interface for the interpreter
-	protocol::FormatOutputR m_formatoutput;	///< network output interface for the interpreter
-	lua::AppProcessor m_processor;		///< the interpreter state
-	const char* m_functionName;		///< name of the method to execute
-	bool m_functionHasIO;			///< true if the method to execute does content data processing (input/output)
+	const Configuration* m_config;			///< configuration
+	ProtocolParser m_parser;			///< context dependent command parser definition
+	int m_cmdidx;					///< command parsed
+	std::vector<protocol::CommandBase> m_cmds;	///< list of commands available
+	protocol::CommandHandlerR m_cmdhandler;		///< currently executed command
+
+	///\brief tries to load the list of currently available commands
+	bool loadCommands();
 
 	///\brief Helper function to send a line message with CRLF termination as C string
 	///\param [in] str head of the line to write
@@ -148,12 +144,15 @@ private:
 	///\return network operation
 	const net::NetworkOperation WriteLine( const char* str, const char* arg=0);
 
+	///\brief Helper function to send a line message with CRLF termination as C string
+	///\param [in] str head of the line to write
+	///\param [in] arg integer argument of the line to write
+	///\return network operation
+	const net::NetworkOperation WriteLine( const char* str, int code);
+
 	///\brief Get the next read data operation
 	///\return network operation
 	const net::NetworkOperation readDataOp();
-
-	///\brief Passes the command data from protocol buffer to the processor
-	void passInput();
 };
 } // namespace iproc
 
