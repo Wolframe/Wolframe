@@ -102,6 +102,23 @@ bool LoadModules( ModulesDirectory& modDir, std::list< std::string >& modFiles )
 
 
 //*********** Module interface *********
+struct ModuleEntry
+{
+	unsigned short ifaceVersion;
+	unsigned short moduleType;
+	const char* name;
+	ModuleContainer* (*create)();
+	void (*setLogger)(void*);
+public:
+	ModuleEntry( unsigned short iVer, unsigned short mType, const char* modName,
+		     ModuleContainer* (*createFunc)(),
+		     void (*setLoggerFunc)(void*))
+		: ifaceVersion( iVer ), moduleType( mType ), name( modName ),
+		  create( createFunc ), setLogger( setLoggerFunc )
+	{}
+
+};
+
 #if !defined(_WIN32)	// POSIX module loader
 	extern "C" {
 		ModuleContainer* createModule( void );
