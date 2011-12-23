@@ -48,7 +48,7 @@ COMMON_COMPILE_FLAGS = \
 	-pedantic -Wall \
 	-Wno-long-long \
 	-Wunused -Wno-import \
-	-Wformat -Wformat-y2k -Wformat-nonliteral -Wformat-security -Wformat-y2k \
+	-Wformat -Wformat-y2k -Wformat-nonliteral -Wformat-security \
 	-Wswitch-enum -Wunknown-pragmas -Wfloat-equal \
 	-Wshadow -Wpointer-arith \
 	-Wcast-qual -Wcast-align \
