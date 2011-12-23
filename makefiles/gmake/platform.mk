@@ -46,21 +46,21 @@ endif
 # set library path on Intel/AMD
 ifeq "$(ARCH)" "x86"
 ifeq "$(LINUX_DIST)" "arch"
-LIBDIR=/usr/lib32
+LIBDIR=lib32
 else
-LIBDIR=/usr/lib
+LIBDIR=lib
 endif
 else
-LIBDIR=/usr/lib
+LIBDIR=lib
 endif
 ifeq "$(ARCH)" "x86_64"
 ifeq "$(LINUX_DIST)" "arch"
-LIBDIR=/usr/lib
+LIBDIR=lib
 else
-LIBDIR=/usr/lib64
+LIBDIR=lib64
 endif
 else
-LIBDIR=/usr/lib
+LIBDIR=lib
 endif
 
 # platform specific flags
