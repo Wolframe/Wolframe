@@ -16,7 +16,7 @@ sleep 2
 
 set timeout 3
 if { [catch {
-	spawn ./wolfcli localhost 7661
+	spawn ./wolfcli 127.0.0.1 7661
 
 	expect 	{
 		timeout	{ return "--> oops. timeout occured waiting for server banner\n" }

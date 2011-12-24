@@ -384,9 +384,15 @@ int main( int argc, char *argv[] )
 	char *port = argv[argc-1];
 
 	boost::asio::io_service io_service;
-	boost::asio::ip::tcp::resolver resolver( io_service );
-	boost::asio::ip::tcp::resolver::query query( boost::asio::ip::tcp::v4( ), host, port );
-	boost::asio::ip::tcp::resolver::iterator endpoint_iter = resolver.resolve( query );
+	boost::asio::ip::tcp::resolver::iterator endpoint_iter;
+	try {
+		boost::asio::ip::tcp::resolver resolver( io_service );
+		boost::asio::ip::tcp::resolver::query query( host, port );
+		endpoint_iter = resolver.resolve( query );
+	} catch( std::exception &e ) {
+		std::cerr <<"Unable to resolve host '" << host << "' (" << e.what() << ")" << std::endl;
+		return 1;
+	}
 
 #ifdef WITH_SSL
 	boost::asio::ssl::context ctx( io_service, boost::asio::ssl::context::sslv23 );
@@ -451,5 +457,7 @@ int main( int argc, char *argv[] )
 	
 	// race here! we are leaking for now..
 	//delete c;
+
+	return 0;
 }
 
