@@ -215,10 +215,10 @@ const DescriptionBase* Document::getDescription()
 	return &rt;
 }
 
-class TestConfiguration :public LuaCommandConfig
+class IProcTestConfiguration :public LuaCommandConfig
 {
 public:
-	TestConfiguration ( const std::string& scriptpath) :LuaCommandConfig( "run",  scriptpath){}
+	IProcTestConfiguration ( const std::string& scriptpath) :LuaCommandConfig( "run",  scriptpath){}
 };
 
 template <class Struct>
@@ -233,7 +233,7 @@ static int luaSerializationTest( lua_State* ls)
 }
 
 template <class Struct>
-static int run( const TestConfiguration& cfg, const std::string& input, std::string& output)
+static int run( const IProcTestConfiguration& cfg, const std::string& input, std::string& output)
 {
 	char outputbuf[ 8192];
 	langbind::Filter filter( "xml:textwolf", 1024, 1024);
@@ -295,7 +295,7 @@ static int run( const TestConfiguration& cfg, const std::string& input, std::str
 	return 0;
 }
 
-typedef int (*runFunction)( const TestConfiguration& cfg, const std::string& input, std::string& output);
+typedef int (*runFunction)( const IProcTestConfiguration& cfg, const std::string& input, std::string& output);
 
 struct TestDescription
 {
@@ -331,7 +331,7 @@ TEST_F( StructLuamapTest, tests)
 	{
 		wtest::Data data( testDescription[ti].name, testDescription[ti].datafile);
 		std::string testoutput;
-		TestConfiguration cfg( testDescription[ti].scriptname);
+		IProcTestConfiguration cfg( testDescription[ti].scriptname);
 
 		EXPECT_EQ( 0, testDescription[ti].run( cfg, data.input, testoutput));
 		data.check( testoutput);

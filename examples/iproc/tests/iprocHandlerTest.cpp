@@ -49,10 +49,10 @@ using namespace _Wolframe;
 using namespace _Wolframe::iproc;
 using namespace _Wolframe::langbind;
 
-class TestConfiguration :public Configuration
+class IProcTestConfiguration :public Configuration
 {
 public:
-	TestConfiguration ( const std::string& scriptpath, std::size_t ib, std::size_t ob)
+	IProcTestConfiguration ( const std::string& scriptpath, std::size_t ib, std::size_t ob)
 	{
 		m_data.input_bufsize = ib;
 		m_data.output_bufsize = ob;
@@ -165,7 +165,7 @@ public:
 	std::string m_expected;
 	net::LocalTCPendpoint ep;
 	iproc::Connection* m_connection;
-	TestConfiguration m_config;
+	IProcTestConfiguration m_config;
 	enum
 	{
 		EoDBufferSize=4,

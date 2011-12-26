@@ -51,7 +51,6 @@
 
 using namespace _Wolframe;
 using namespace _Wolframe::iproc;
-using namespace _Wolframe::langbind;
 
 const config::DescriptionBase* ScriptConfigStruct::description()
 {

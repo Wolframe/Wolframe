@@ -101,10 +101,10 @@ static const TestDescription testDescriptions[] =
 	{0,0,0,0}
 };
 
-class TestConfiguration :public Configuration
+class IProcTestConfiguration :public Configuration
 {
 public:
-	TestConfiguration ( const std::string& scriptpath, std::size_t ib, std::size_t ob)
+	IProcTestConfiguration ( const std::string& scriptpath, std::size_t ib, std::size_t ob)
 	{
 		m_data.input_bufsize = ib;
 		m_data.output_bufsize = ob;
@@ -143,7 +143,7 @@ TEST_F( IProcHandlerXMLTest, tests)
 			{
 				std::string testoutput;
 
-				TestConfiguration config(
+				IProcTestConfiguration config(
 						testDescriptions[ti].scriptfile,
 						BufferSize[ib]+EoDBufferSize,
 						BufferSize[ob]+testDescriptions[ti].elementBuffersize);
