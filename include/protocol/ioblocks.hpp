@@ -60,7 +60,7 @@ public:
 	MemBlock( std::size_t p_size);
 	///\param [in] p_ptr pointer to the memory block (not allocated on your own)
 	///\param [in] p_size size of the memory block p_ptr
-	MemBlock( void* p_ptr, std::size_t p_size);
+	MemBlock( void* p_ptr, std::size_t p_size, std::size_t p_pos=0);
 	///\brief Copy constructor
 	///\param [in] o MemBlock to copy
 	MemBlock( const MemBlock& o);
@@ -168,9 +168,10 @@ public:
 	InputBlock( std::size_t p_size)				:MemBlock(p_size),m_eodState(EoD::SRC){}
 
 	///\brief Constructor
-	///\param [in] p_ptr pointer to the memory block to use
-	///\param [in] p_size size of the memory block in bytes
-	InputBlock( void* p_ptr, std::size_t p_size)		:MemBlock(p_ptr,p_size),m_eodState(EoD::SRC){}
+	///\param [in] p pointer to the memory block to use
+	///\param [in] n allocation size of the memory block in bytes
+	///\param [in] i fill size of the block in bytes
+	InputBlock( void* p, std::size_t n, std::size_t i)	:MemBlock(p,n,i),m_eodState(EoD::SRC){}
 
 	///\brief Copy constructor
 	///\param [in] o InputBlock to copy
@@ -259,9 +260,10 @@ public:
 	///\param [in] p_size size of the memory block in bytes to allocate
 	OutputBlock( std::size_t p_size=0)			:MemBlock(p_size) {}
 	///\brief Constructor
-	///\param [in] p_ptr pointer to the memory block to use
-	///\param [in] p_size size of the memory block in bytes
-	OutputBlock( void* p_ptr, std::size_t p_size)		:MemBlock(p_ptr,p_size) {}
+	///\param [in] p pointer to the memory block to use
+	///\param [in] n size of the memory block in bytes
+	///\param [in] i fill size of the block in bytes
+	OutputBlock( void* p, std::size_t n, std::size_t i=0)	:MemBlock(p,n,i) {}
 	///\brief Copy constructor
 	///\param [in] o OutputBlock to copy
 	OutputBlock( const OutputBlock& o)			:MemBlock(o) {}

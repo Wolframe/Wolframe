@@ -532,9 +532,13 @@ public:
 	}
 public:
 	FormatOutputImpl( const CountedReference<std::string>& enc)
-		:m_encoding(enc),m_document(0){}
+		:m_encoding(enc)
+		,m_document(0){}
+
 	FormatOutputImpl( const FormatOutputImpl& o)
-		:m_encoding(o.m_encoding),m_document(o.m_document){}
+		:protocol::FormatOutput(o)
+		,m_encoding(o.m_encoding)
+		,m_document(o.m_document){}
 
 	virtual ~FormatOutputImpl(){}
 

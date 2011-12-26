@@ -46,11 +46,12 @@
 #if WITH_LUA
 #include "langbind/appObjects.hpp"
 #include "langbind/luaConfig.hpp"
-#include "langbind/luaAppProcessor.hpp"
+#include "langbind/luaCommandHandler.hpp"
 #endif
 
 using namespace _Wolframe;
 using namespace _Wolframe::iproc;
+using namespace _Wolframe::langbind;
 
 const config::DescriptionBase* ScriptConfigStruct::description()
 {
@@ -92,7 +93,7 @@ Configuration::Configuration()
 
 static bool isLuaScript( const std::string& path)
 {
-	return (path.size()>4 && boost::algorithm::iequals( path.c_str()+path.size(), ".lua"));
+	return (path.size()>4 && boost::algorithm::iequals( path.c_str()+path.size()-4, ".lua"));
 }
 
 bool Configuration::defineScript( const ScriptConfigStruct& sc)
@@ -100,10 +101,12 @@ bool Configuration::defineScript( const ScriptConfigStruct& sc)
 #if WITH_LUA
 	if (isLuaScript( sc.path))
 	{
-		lua::CommandConfig* cfg;
-		m_configs.push_back( cfg=new lua::CommandConfig( sc.main, sc.path, sc.module));
-		protocol::Command< lua::AppProcessor, lua::CommandConfig> cmd( sc.name.c_str(), cfg);
+		LuaCommandConfig* cfg;
+		m_configs.push_back( cfg=new LuaCommandConfig( sc.main, sc.path, sc.module));
+		protocol::CommandBase* cmd = new protocol::Command< LuaCommandHandler, LuaCommandConfig>( sc.name.c_str(), cfg);
 		m_cmds.push_back( cmd);
+		m_capa.push_back( ' ');
+		m_capa.append( sc.name);
 	}
 	else
 #endif
@@ -140,22 +143,22 @@ bool Configuration::parse( const config::ConfigurationTree& pt, const std::strin
 
 bool Configuration::test() const
 {
-	std::vector<protocol::CommandBase>::const_iterator itr=m_cmds.begin(),end=m_cmds.end();
+	std::vector< CountedReference<protocol::CommandBase> >::const_iterator itr=m_cmds.begin(),end=m_cmds.end();
 	for (;itr!=end; ++itr)
 	{
-		if (!itr->config()->test()) return false;
+		if (!itr->get()->config()->test()) return false;
 	}
 	return true;
 }
 
 bool Configuration::check() const
 {
-	std::vector<protocol::CommandBase>::const_iterator itr=m_cmds.begin(),end=m_cmds.end();
+	std::vector<CountedReference< protocol::CommandBase> >::const_iterator itr=m_cmds.begin(),end=m_cmds.end();
 	for (;itr!=end; ++itr)
 	{
-		if (itr->config())
+		if (itr->get()->config())
 		{
-			if (!itr->config()->check()) return false;
+			if (!itr->get()->config()->check()) return false;
 		}
 	}
 	return true;
@@ -163,12 +166,12 @@ bool Configuration::check() const
 
 void Configuration::print( std::ostream& o, size_t i) const
 {
-	std::vector<protocol::CommandBase>::const_iterator itr=m_cmds.begin(),end=m_cmds.end();
+	std::vector<CountedReference< protocol::CommandBase> >::const_iterator itr=m_cmds.begin(),end=m_cmds.end();
 	for (;itr!=end; ++itr)
 	{
-		if (itr->config())
+		if (itr->get()->config())
 		{
-			itr->config()->print( o, i);
+			itr->get()->config()->print( o, i);
 		}
 	}
 }
@@ -190,17 +193,13 @@ void Configuration::setCanonicalPathes( const std::string& refPath)
 	}
 }
 
-const std::vector<protocol::CommandBase> Configuration::getCommands( const char* ) const
+const std::vector<CountedReference< protocol::CommandBase> >& Configuration::getCommands( const char* ) const
 {
 	return m_cmds;
 }
 
 const std::string Configuration::getCommandDescriptions( const char* ) const
 {
-	std::string rt;
-#if WITH_LUA
-	rt.append( " run");
-#endif
-	return rt;
+	return m_capa;
 }
 

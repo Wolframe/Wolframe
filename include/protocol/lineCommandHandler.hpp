@@ -30,33 +30,25 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file langbind/ioFilterCommandHandler.hpp
-#ifndef _Wolframe_IOFILTER_COMMAND_HANDLER_HPP_INCLUDED
-#define _Wolframe_IOFILTER_COMMAND_HANDLER_HPP_INCLUDED
-#include "protocol.hpp"
-#include "protocol/ioblocks.hpp"
+///\file protocol/commandHandler.hpp
+///\brief interface to a generic command handler for a networkHandler command with delegation of network I/O until the command context is left
+#ifndef _Wolframe_PROTOCOL_LINE_COMMAND_HANDLER_HPP_INCLUDED
+#define _Wolframe_PROTOCOL_LINE_COMMAND_HANDLER_HPP_INCLUDED
 #include "protocol/commandHandler.hpp"
+#include "protocol.hpp"
 #include "connectionHandler.hpp"
+#include "countedReference.hpp"
+#include <vector>
+#include <string>
 
 namespace _Wolframe {
 namespace protocol {
 
-class IOFilterCommandHandler :public CommandHandler
+class LineCommandHandler :public CommandHandler
 {
 public:
-	typedef CommandHandler Parent;
+	LineCommandHandler();
 
-	IOFilterCommandHandler();
-
-	void setFilter( const protocol::InputFilterR& in)
-	{
-		m_inputfilter = in;
-	}
-
-	void setFilter( const protocol::FormatOutputR& out)
-	{
-		m_formatoutput = out;
-	}
 	///\brief See Parent::setInputBuffer(void*,std::size_t,std::size_t,std::size_t)
 	virtual void setInputBuffer( void* buf, std::size_t allocsize, std::size_t size, std::size_t itrpos);
 
@@ -64,9 +56,9 @@ public:
 	virtual void setOutputBuffer( void* buf, std::size_t size, std::size_t pos);
 
 	///\brief See Parent::nextOperation()
-	virtual Operation nextOperation();
+	virtual Operation nextOperation()=0;
 
-	///\brief See Parent::putInput(const void*,std::size_t);
+	///\brief See Parent::putInput(const void*,std::size_t)
 	virtual void putInput( const void *begin, std::size_t bytesTransferred);
 
 	///\brief See Parent::getInputBlock(void*&,std::size_t&)
@@ -78,72 +70,22 @@ public:
 	///\brief See Parent::getDataLeft(const void*&,std::size_t&)
 	virtual void getDataLeft( const void*& begin, std::size_t& nofBytes);
 
-	///\enum CallResult
-	///\brief Enumeration of call states of this application processor instance
-	enum CallResult
-	{
-		Ok,		///< successful termination of call
-		Error,		///< termination of call with error (not completed)
-		YieldRead,	///< call interrupted with request for more network input
-		YieldWrite	///< call interrupted with request for sending data from the write buffer that is full
-	};
-	///\param[out] errorCode error code in case of error
-	///\return CallResult status of the filter input for the state machine of this command handler
-	virtual CallResult call( int& errorCode)=0;
+	///\brief Get the error code of command execution to be returned to the client
+	int statusCode() const				{return m_statusCode;}
 
-	virtual void run()
-	{
-		int errorCode = 0;
-		CallResult cr = call( errorCode);
-		switch (cr)
-		{
-			case Ok:
-				if (m_state == Processing)
-				{
-					m_state = DiscardInput;
-				}
-				break;
+	virtual void run()=0;
 
-			case Error:
-				if (m_state == Processing || m_state == FlushingOutput)
-				{
-					m_state = DiscardInput;
-				}
-				m_statusCode = errorCode;
-				break;
-
-			case YieldRead:
-				break;
-
-			case YieldWrite:
-				{
-					if (m_state == Processing)
-					{
-						m_state = FlushingOutput;
-					}
-				}
-				break;
-		}
-	}
 private:
-	enum State
-	{
-		Processing,
-		FlushingOutput,
-		DiscardInput,
-		Terminated
-	};
-	State m_state;				///< processing state machine state
-	const void* m_writedata;		///< bytes to write next (WRITE)
-	std::size_t m_writedatasize;		///< number of bytes to write next (WRITE)
+	void terminate( int cd);
+	void flushOutput();
 
-	InputBlock m_input;			///< input buffer
-	InputBlock::iterator m_eoD;		///< input end of data marker
+	InputBlock m_input;				///< buffer for network read messages
+	OutputBlock m_output;				///< buffer for network write messages
 
-protected:
-	InputFilterR m_inputfilter;		///< network input interface for the interpreter
-	FormatOutputR m_formatoutput;		///< network output interface for the interpreter
+	InputBlock::iterator m_itr;			///< iterator to scan protocol input
+	InputBlock::iterator m_end;			///< iterator pointing to end of message buffer
 };
+
 }}
 #endif
 

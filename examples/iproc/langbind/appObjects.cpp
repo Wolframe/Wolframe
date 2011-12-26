@@ -42,7 +42,7 @@ Project Wolframe.
 #include "filters.hpp"
 
 using namespace _Wolframe;
-using namespace app;
+using namespace langbind;
 
 static InputFilterClosure::ItemType fetchFailureResult( const protocol::InputFilter& ff)
 {

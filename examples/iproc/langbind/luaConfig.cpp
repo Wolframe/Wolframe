@@ -48,9 +48,9 @@ extern "C" {
 }
 
 using namespace _Wolframe;
-using namespace _Wolframe::iproc::lua;
+using namespace _Wolframe::langbind;
 
-static CommandConfig::ModuleLoad getLuaModuleEntryFunc( const char* name)
+static LuaCommandConfig::ModuleLoad getLuaModuleEntryFunc( const char* name)
 {
 	if (strcmp(name,LUA_TABLIBNAME) == 0) return luaopen_table;
 	if (strcmp(name,LUA_IOLIBNAME) == 0) return luaopen_io;
@@ -62,9 +62,9 @@ static CommandConfig::ModuleLoad getLuaModuleEntryFunc( const char* name)
 	return 0;
 }
 
-void CommandConfig::Module::setType()
+void LuaCommandConfig::Module::setType()
 {
-	if (m_type == CommandConfig::Module::Undefined)
+	if (m_type == LuaCommandConfig::Module::Undefined)
 	{
 		m_load = getLuaModuleEntryFunc( m_name.c_str());
 		if (m_load)
@@ -113,7 +113,7 @@ static int function_printlog( lua_State *ls)
 	return 0;
 }
 
-bool CommandConfig::Module::load( lua_State* ls) const
+bool LuaCommandConfig::Module::load( lua_State* ls) const
 {
 	if (m_type == PreloadLib && m_load)
 	{
@@ -157,7 +157,7 @@ bool CommandConfig::Module::load( lua_State* ls) const
 	return true;
 }
 
-bool CommandConfig::Module::check() const
+bool LuaCommandConfig::Module::check() const
 {
 	switch (m_type)
 	{
@@ -177,7 +177,7 @@ bool CommandConfig::Module::check() const
 	return true;
 }
 
-bool CommandConfig::load( lua_State *ls) const
+bool LuaCommandConfig::load( lua_State *ls) const
 {
 	luaopen_base( ls);
 	for (std::vector<Module>::const_iterator it = m_modules.begin(); it != m_modules.end(); it++)
@@ -198,7 +198,7 @@ bool CommandConfig::load( lua_State *ls) const
 	return true;
 }
 
-bool CommandConfig::check() const
+bool LuaCommandConfig::check() const
 {
 	bool rt = true;
 	for (std::vector<Module>::const_iterator it = m_modules.begin(); it != m_modules.end(); it++)
@@ -208,7 +208,7 @@ bool CommandConfig::check() const
 	return rt;
 }
 
-bool CommandConfig::test() const
+bool LuaCommandConfig::test() const
 {
 	lua_State *ls = luaL_newstate();
 	if (!ls)
@@ -221,7 +221,7 @@ bool CommandConfig::test() const
 	return rt;
 }
 
-void CommandConfig::print( std::ostream& os, size_t /*indent*/) const
+void LuaCommandConfig::print( std::ostream& os, size_t /*indent*/) const
 {
 	os << "Configuration of Lua Script Processor" << ":" << std::endl;
 	os << "   Main Script: " << m_mainmodule.name() << " (" << m_mainmodule.path() << ")" << std::endl;

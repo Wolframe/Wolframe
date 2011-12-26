@@ -101,25 +101,23 @@ struct InputFilter
 	///\param [in] data pointer to memory block passed as input
 	///\param [in] datasize of memory block passed as input
 	///\param [in] eoD true, if end of data has been detected
-	void protocolInput( void* data, std::size_t datasize, bool eoD)
+	void protocolInput( void* data, std::size_t datasize, bool eoD, std::size_t pos_=0)
 	{
 		m_gotEoD = eoD;
 		m_ptr = data;
 		m_size = datasize;
-		m_pos = 0;
+		m_pos = pos_;
 	}
 
-	///\brief Assignement copy
-	///\param [in] o InputFilter to copy
-	InputFilter& operator = (const InputFilter& o)
+	///\brief Assignement of the content processed only
+	///\param [in] o InputFilter to copy the content processed from
+	void assignContent(const InputFilter& o)
 	{
 		m_ptr = o.m_ptr;
 		m_pos = o.m_pos;
 		m_size = o.m_size;
 		m_gotEoD = o.m_gotEoD;
 		m_state = o.m_state;
-		m_errorCode = o.m_errorCode;
-		return *this;
 	}
 
 	///\brief Constructor
@@ -131,6 +129,16 @@ struct InputFilter
 		,m_state(Open)
 		,m_errorCode(0)
 		,m_genbufsize(genbufsize){}
+
+	///\brief Copy constructor
+	InputFilter( const InputFilter& o)
+		:m_ptr(o.m_ptr)
+		,m_pos(o.m_pos)
+		,m_size(o.m_size)
+		,m_gotEoD(o.m_gotEoD)
+		,m_state(o.m_state)
+		,m_errorCode(o.m_errorCode)
+		,m_genbufsize(o.m_genbufsize){}
 
 	///\brief destructor
 	virtual ~InputFilter(){}
@@ -187,6 +195,9 @@ struct InputFilter
 	///\return bufsize size of the buffer in bytes
 	std::size_t getGenBufferSize() const		{return m_genbufsize;}
 
+	///\brief Get the current iterator position
+	///\return the current iterator position as byte offset
+	std::size_t pos() const				{return m_pos;}
 private:
 	void* m_ptr;			///< pointer to network input buffer
 	std::size_t m_pos;		///< current iterator cursor position

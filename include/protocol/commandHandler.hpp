@@ -34,11 +34,11 @@
 ///\brief interface to a generic command handler for a networkHandler command with delegation of network I/O until the command context is left
 #ifndef _Wolframe_PROTOCOL_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_PROTOCOL_COMMAND_HANDLER_HPP_INCLUDED
-#include "protocol.hpp"
 #include "connectionHandler.hpp"
 #include "countedReference.hpp"
 #include <vector>
 #include <string>
+#include <stdexcept>
 
 namespace _Wolframe {
 namespace protocol {
@@ -54,69 +54,60 @@ public:
 		CLOSED
 	};
 
-	CommandHandler();
+	CommandHandler()
+		:m_statusCode(0){}
 
 	///\brief Pass the parameters for processing
 	///\param [in] argc number of arguments of the protocol command
 	///\param [in] argv arguments of the protocol command
 	void passParameters( int argc, const char** argv);
 
-	///\brief Pass the IO for processing
-	///\param [in] input network input interface
-	///\param [in] output network output interface
-	virtual void passIO( const InputBlock& input, const OutputBlock& output);
+	///\brief Define the input buffer for processing the command
+	///\param [in] buf buffer for the data to process
+	///\param [in] allocsize allocation size of the buffer for the data to process in bytes
+	///\param [in] size size of the data filled in the in bytes
+	///\param [in] itrpos cursor position in the buffer defining byte position of the start of the the data to process
+	virtual void setInputBuffer( void* buf, std::size_t allocsize, std::size_t size, std::size_t itrpos)=0;
+
+	///\brief Define the input buffer for processing the command
+	///\param [in] buf buffer for the data to process
+	///\param [in] size size of the buffer for the data to process in bytes
+	///\param [in] pos cursor position in the buffer defining byte position of the start of the the data to process
+	virtual void setOutputBuffer( void* buf, std::size_t size, std::size_t pos)=0;
 
 	///\brief Get the next operation to do for the connection handler
-	Operation nextOperation();
+	///\return the next operation for the connection handler
+	virtual Operation nextOperation()=0;
 
 	///\brief Passes the network input to the command handler (READ operation)
 	///\param [in] begin start of the network input block.
 	///\param [in] bytesTransferred number of bytes passed in the input block
-	virtual void putInput( const void *begin, std::size_t bytesTransferred);
+	virtual void putInput( const void *begin, std::size_t bytesTransferred)=0;
 
 	///\brief Get the input block request (READ operation)
 	///\param [out] begin start of the network input buffer
 	///\param [out] maxBlockSize maximum size of data in bytes to pass with the subsequent putInput(const void*,std::size_t) call
-	virtual void getInputBlock( void*& begin, std::size_t& maxBlockSize);
+	virtual void getInputBlock( void*& begin, std::size_t& maxBlockSize)=0;
 
 	///\brief Get the next output chunk from the command handler (WRITE operation)
 	///\param [out] begin start of the output chunk
 	///\param [out] bytesToTransfer size of the output chunk to send in bytes
-	virtual void getOutput( const void*& begin, std::size_t& bytesToTransfer);
+	virtual void getOutput( const void*& begin, std::size_t& bytesToTransfer)=0;
 
 	///\brief Get the data left unprocessed after close. The data belongs to the caller to process.
 	///\param [out] begin returned start of the data chunk
 	///\param [out] nofBytes size of the returned data chunk in bytes
-	virtual void getDataLeft( const void*& begin, std::size_t& nofBytes);
+	virtual void getDataLeft( const void*& begin, std::size_t& nofBytes)=0;
 
 	///\brief Get the error code of command execution to be returned to the client
 	int statusCode() const				{return m_statusCode;}
 
+	///\brief Run one iteration of processing until the next interation with the connection handler has to be done
 	virtual void run()=0;
-
-	void terminate( int cd);
-	void flushOutput();
 
 protected:
 	std::vector< std::string > m_argBuffer;		///< buffer type for the command arguments
-	InputBlock m_input;				///< buffer for network read messages
-	OutputBlock m_output;				///< buffer for network write messages
-
-	InputBlock::iterator m_itr;			///< iterator to scan protocol input
-	InputBlock::iterator m_end;			///< iterator pointing to end of message buffer
-	InputBlock::iterator m_eoD;			///< iterator pointing to end of data marker in the buffer
-
 	int m_statusCode;				///< error code of operation for the client
-	bool m_gotEoD;					///< true, if we got end of data to process
-
-	enum State
-	{
-		Processing,
-		FlushingOutput,
-		DiscardInput,
-		Terminated
-	};
-	State m_state;					///< processing state maschine state
 };
 
 
@@ -142,7 +133,7 @@ struct CommandConfig
 class CommandBase
 {
 public:
-	CommandBase( const char* nam, const CommandConfig* cfg)
+	CommandBase( const std::string& nam, const CommandConfig* cfg)
 		:m_protocolCmdName(nam),m_config(cfg){}
 	CommandBase( const CommandBase& o)
 		:m_protocolCmdName(o.m_protocolCmdName),m_config(o.m_config){}
@@ -152,10 +143,10 @@ public:
 
 	const char* protocolCmdName() const
 	{
-		return m_protocolCmdName;
+		return m_protocolCmdName.c_str();
 	}
 
-	virtual CommandHandlerR create( const InputBlock& /*input*/, const OutputBlock& /*output*/, int /*argc*/, const char** /*argv*/) const
+	virtual CommandHandlerR create( int /*argc*/, const char** /*argv*/) const
 	{
 		return CommandHandlerR(0);
 	}
@@ -166,7 +157,7 @@ public:
 	}
 
 protected:
-	const char* m_protocolCmdName;
+	std::string m_protocolCmdName;
 	const CommandConfig* m_config;
 };
 
@@ -184,11 +175,10 @@ struct Command :public CommandBase
 	}
 	virtual ~Command(){}
 
-	virtual CommandHandlerR create( const InputBlock& input, const OutputBlock& output, int argc, const char** argv) const
+	virtual CommandHandlerR create( int argc, const char** argv) const
 	{
 		CommandHandlerClass* rt = new CommandHandlerClass( dynamic_cast<const CommandConfigClass*>(m_config));
 		rt->passParameters( argc, argv);
-		rt->passIO( input, output);
 		return CommandHandlerR( rt);
 	}
 };

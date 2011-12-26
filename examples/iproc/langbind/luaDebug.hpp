@@ -41,12 +41,11 @@ extern "C" {
 }
 
 namespace _Wolframe {
-namespace iproc {
-namespace lua {
+namespace langbind {
 
 std::string getDescription( lua_State *ls, int index);
 bool getDescription( lua_State *ls, int index, std::string& ret);
 
-}}}//namespace
+}}//namespace
 #endif
 

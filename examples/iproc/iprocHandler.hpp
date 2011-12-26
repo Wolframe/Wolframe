@@ -114,26 +114,26 @@ private:
 	///\param [in] c the command to get as string
 	static const char* commandName( Command c)
 	{
-		const char* ar[] = {"", "capa", "run", "quit", 0};
+		const char* ar[] = {"", "capa", "quit", 0};
 		return ar[c];
 	}
 
-	State m_state;					///< state of the processor (protocol main statemachine)
+	State m_state;							///< state of the processor (protocol main statemachine)
 
-	LineBuffer m_buffer;				///< context (sub state) for partly parsed input lines
-	ArgBuffer m_argBuffer;				///< buffer for the arguments
+	LineBuffer m_buffer;						///< context (sub state) for partly parsed input lines
+	ArgBuffer m_argBuffer;						///< buffer for the arguments
 
-	protocol::InputBlock m_input;			///< buffer for network read messages
-	protocol::OutputBlock m_output;			///< buffer for network write messages
+	protocol::InputBlock m_input;					///< buffer for network read messages
+	protocol::OutputBlock m_output;					///< buffer for network write messages
 
-	protocol::InputBlock::iterator m_itr;		///< iterator to scan protocol input
-	protocol::InputBlock::iterator m_end;		///< iterator pointing to end of message buffer
+	protocol::InputBlock::iterator m_itr;				///< iterator to scan protocol input
+	protocol::InputBlock::iterator m_end;				///< iterator pointing to end of message buffer
 
-	const Configuration* m_config;			///< configuration
-	ProtocolParser m_parser;			///< context dependent command parser definition
-	int m_cmdidx;					///< command parsed
-	std::vector<protocol::CommandBase> m_cmds;	///< list of commands available
-	protocol::CommandHandlerR m_cmdhandler;		///< currently executed command
+	const Configuration* m_config;					///< configuration
+	ProtocolParser m_parser;					///< context dependent command parser definition
+	int m_cmdidx;							///< command parsed
+	std::vector< CountedReference<protocol::CommandBase> > m_cmds;	///< list of commands available
+	protocol::CommandHandlerR m_cmdhandler;				///< currently executed command
 
 	///\brief tries to load the list of currently available commands
 	bool loadCommands();

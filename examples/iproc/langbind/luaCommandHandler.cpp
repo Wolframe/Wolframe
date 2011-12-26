@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-#include "luaAppProcessor.hpp"
+#include "luaCommandHandler.hpp"
 #include "luaDebug.hpp"
 #include "appObjects.hpp"
 #include "logger-v1.hpp"
@@ -38,6 +38,7 @@ Project Wolframe.
 #include <stdexcept>
 #include <cstddef>
 #include <boost/lexical_cast.hpp>
+/*[-]*/#include <iostream>
 
 extern "C"
 {
@@ -48,9 +49,7 @@ extern "C"
 }
 
 using namespace _Wolframe;
-using namespace iproc;
-using namespace lua;
-using namespace app;
+using namespace langbind;
 
 namespace luaname
 {
@@ -280,7 +279,7 @@ static int function__LuaObject__newindex( lua_State* ls)
 	Object* obj = LuaObject<Object>::getSelf( ls, metaTableName<Object>(), "__newindex");
 	const char* key = lua_tostring( ls, 2);
 	if (!key) luaL_error( ls, "%s __newindex called with invalid argument 2 (key)", metaTableName<Object>());
-	const char* val;
+	const char* val = 0;
 	int tp = lua_type( ls, 3);
 
 	if (tp == LUA_TBOOLEAN)
@@ -289,8 +288,6 @@ static int function__LuaObject__newindex( lua_State* ls)
 	}
 	else
 	{
-		// Aba: not sure, what should be the fix here: langbind/luaAppProcessor.cpp:271:2: error: ‘val’ may be used uninitialized in this function [-Werror=uninitialized]
-		// added 'val =', seems to be the proper fix :-)
 		val = lua_tostring( ls, 3);
 	}
 	if (!val) luaL_error( ls, "%s __newindex called with invalid argument 3 (value)", metaTableName<Object>());
@@ -470,7 +467,7 @@ static int function_input_as( lua_State* ls)
 		ff = filter->m_inputfilter->copy();
 		if (input->m_inputfilter.get())
 		{
-			*ff = *input->m_inputfilter;
+			ff->assignContent( *input->m_inputfilter);
 		}
 	}
 	else
@@ -501,7 +498,7 @@ static int function_output_as( lua_State* ls)
 		ff = filter->m_formatoutput->copy();
 		if (output->m_formatoutput.get())
 		{
-			*ff = *output->m_formatoutput;
+			ff->assignContent( *output->m_formatoutput);
 		}
 	}
 	else
@@ -562,129 +559,134 @@ static void create_global_functions( lua_State* ls)
 	lua_settable( ls, LUA_GLOBALSINDEX);
 }
 
-struct AppProcessor::State
+struct LuaCommandHandler::Context
 {
 	lua_State* ls;
 	lua_State* thread;
 	int threadref;
 	lua_State* env;
 
-	State( const lua::CommandConfig& config) :ls(0),thread(0),threadref(0),env(0)
+	Context( const LuaCommandConfig& config) :ls(0),thread(0),threadref(0),env(0)
 	{
 		env = ls = luaL_newstate();
 		if (!ls) throw std::bad_alloc();
 		if (!config.load( ls)) throw std::runtime_error( "cannot load application processor from configuration");
 	}
-	~State()
+	~Context()
 	{
 		if (ls) lua_close( ls);
 	}
 };
 
-AppProcessor::AppProcessor( const lua::CommandConfig* config)
+LuaCommandHandler::LuaCommandHandler( const LuaCommandConfig* config)
 		:m_config(config)
 {
-	m_state = new State( *config);
+	m_context = new Context( *config);
 	m_globals.m_input.m_inputfilter = m_inputfilter;
 	m_globals.m_output.m_formatoutput = m_formatoutput;
-	LuaObject<Input>::createGlobal( m_state->ls, "input", m_globals.m_input, input_methodtable);
-	LuaObject<Output>::createGlobal( m_state->ls, "output", m_globals.m_output, output_methodtable);
-	LuaObject<Filter>::create( m_state->ls, &function__LuaObject__index<Filter>, &function__LuaObject__newindex<Filter>);
-	LuaObject<InputFilterClosure>::create( m_state->ls);
-	create_global_functions( m_state->ls);
+	LuaObject<Input>::createGlobal( m_context->ls, "input", m_globals.m_input, input_methodtable);
+	LuaObject<Output>::createGlobal( m_context->ls, "output", m_globals.m_output, output_methodtable);
+	LuaObject<Filter>::create( m_context->ls, &function__LuaObject__index<Filter>, &function__LuaObject__newindex<Filter>);
+	LuaObject<InputFilterClosure>::create( m_context->ls);
+	create_global_functions( m_context->ls);
 }
 
-AppProcessor::~AppProcessor()
+LuaCommandHandler::~LuaCommandHandler()
 {
-	delete m_state;
+	delete m_context;
 }
 
-static AppProcessor::CallResult getYieldState( protocol::InputFilter* in, protocol::FormatOutput* fo, const char* methodName)
+static LuaCommandHandler::CallResult getYieldState( protocol::InputFilter* in, protocol::FormatOutput* fo, const char* methodName)
 {
 	if (!fo)
 	{
 		LOG_ERROR << "no output specified";
-		return AppProcessor::Error;
+		return LuaCommandHandler::Error;
 	}
 	if (fo->getError())
 	{
 		const char* msg = fo->getLastError();
 		LOG_ERROR << "error (" << (msg?msg:"unknown") << ") in format output when calling '" << methodName << "'";
-		return AppProcessor::Error;
+		return LuaCommandHandler::Error;
 	}
 	protocol::InputFilter::State istate = in->state();
 
 	switch (istate)
 	{
 		case protocol::InputFilter::Open:
-			return AppProcessor::YieldWrite;
+			return LuaCommandHandler::YieldWrite;
 
 		case protocol::InputFilter::EndOfMessage:
-			return AppProcessor::YieldRead;
+			return LuaCommandHandler::YieldRead;
 
 		case protocol::InputFilter::Error:
 		{
 			const char* msg = in->getLastError();
 			LOG_ERROR << "error (" << (msg?msg:"unknown") << ") in input filter when calling '" << methodName << "'";
-			return AppProcessor::Error;
+			return LuaCommandHandler::Error;
 		}
 	}
 	LOG_ERROR << "illegal state of input filter when calling '" << methodName << "'";
-	return AppProcessor::Error;
+	return LuaCommandHandler::Error;
 }
 
-AppProcessor::CallResult AppProcessor::call()
+LuaCommandHandler::CallResult LuaCommandHandler::call( int& errorCode)
 {
 	int rt = 0;
+	errorCode = 0;
 
-	if (!m_state->thread)
+	if (!m_context->thread)
 	{
 		// create thread for the call execution
-		m_state->thread = lua_newcthread( m_state->ls, m_config->cthread_stacksize());
+		m_context->thread = lua_newcthread( m_context->ls, m_config->cthread_stacksize());
 
 		// prevent garbage collecting of thread (http://permalink.gmane.org/gmane.comp.lang.lua.general/22680)
-		lua_pushvalue( m_state->ls, -1);
-		m_state->threadref = luaL_ref( m_state->ls, LUA_REGISTRYINDEX);
+		lua_pushvalue( m_context->ls, -1);
+		m_context->threadref = luaL_ref( m_context->ls, LUA_REGISTRYINDEX);
 
 		// (http://medek.wordpress.com/page/2/)
 		// create a local environment with a link to global environment via the '__index' metamethod
-		lua_newtable( m_state->ls);
-		lua_pushvalue( m_state->ls, -1);
-		lua_setmetatable( m_state->ls, -2); //Set itself as metatable
-		lua_pushvalue( m_state->ls, LUA_GLOBALSINDEX);
-		lua_setfield( m_state->ls, -2, "__index");
-		lua_setfenv( m_state->ls, -2);
-		lua_pop( m_state->ls, 1);
+		lua_newtable( m_context->ls);
+		lua_pushvalue( m_context->ls, -1);
+		lua_setmetatable( m_context->ls, -2); //Set itself as metatable
+		lua_pushvalue( m_context->ls, LUA_GLOBALSINDEX);
+		lua_setfield( m_context->ls, -2, "__index");
+		lua_setfenv( m_context->ls, -2);
+		lua_pop( m_context->ls, 1);
 
 		if (m_inputfilter.get())
 		{
 			m_globals.m_input.m_inputfilter = m_inputfilter;
-			if (!LuaObject<Input>::setGlobal( m_state->ls, "input", m_globals.m_input))
+			if (!LuaObject<Input>::setGlobal( m_context->ls, "input", m_globals.m_input))
 			{
 				LOG_ERROR << "Failed to initialize input. It possibly has been redefined as a value of different type";
+				errorCode = 101;
+				return Error;
 			}
 		}
 		if (m_formatoutput.get())
 		{
 			m_globals.m_output.m_formatoutput = m_formatoutput;
-			if (!LuaObject<Output>::setGlobal( m_state->ls, "output", m_globals.m_output))
+			if (!LuaObject<Output>::setGlobal( m_context->ls, "output", m_globals.m_output))
 			{
 				LOG_ERROR << "Failed to initialize output. It possibly has been redefined as a value of different type";
+				errorCode = 102;
+				return Error;
 			}
 		}
 		// call the function (for the first time)
-		lua_getglobal( m_state->thread, m_config->main().c_str());
+		lua_getglobal( m_context->thread, m_config->main().c_str());
 		std::vector<std::string>::const_iterator itr=m_argBuffer.begin(),end=m_argBuffer.end();
 		for (;itr != end; ++itr)
 		{
-			lua_pushlstring( m_state->thread, itr->c_str(), itr->size());
+			lua_pushlstring( m_context->thread, itr->c_str(), itr->size());
 		}
-		rt = lua_resume( m_state->thread, m_argBuffer.size());
+		rt = lua_resume( m_context->thread, m_argBuffer.size());
 	}
 	else
 	{
 		// call the function (subsequently until termination)
-		rt = lua_resume( m_state->thread, 0);
+		rt = lua_resume( m_context->thread, 0);
 	}
 	if (rt == LUA_YIELD)
 	{
@@ -699,25 +701,26 @@ AppProcessor::CallResult AppProcessor::call()
 	}
 	else if (rt != 0)
 	{
-		const char* msg = lua_tostring( m_state->thread, -1);
+		const char* msg = lua_tostring( m_context->thread, -1);
 		LOG_ERROR << "error calling '" << m_config->main().c_str() << "':" << msg;
-		luaL_unref( m_state->ls, LUA_REGISTRYINDEX, m_state->threadref);
-		m_state->threadref = 0;
-		m_state->thread = 0;
+		luaL_unref( m_context->ls, LUA_REGISTRYINDEX, m_context->threadref);
+		m_context->threadref = 0;
+		m_context->thread = 0;
+		errorCode = 1;
 		return Error;
 	}
 	else
 	{
-		luaL_unref( m_state->ls, LUA_REGISTRYINDEX, m_state->threadref);
-		m_state->threadref = 0;
-		m_state->thread = 0;
+		luaL_unref( m_context->ls, LUA_REGISTRYINDEX, m_context->threadref);
+		m_context->threadref = 0;
+		m_context->thread = 0;
 	}
 	return Ok;
 }
 
-lua_State* AppProcessor::getLuaState() const
+lua_State* LuaCommandHandler::getLuaState() const
 {
-	return m_state->ls;
+	return m_context->ls;
 }
 
 

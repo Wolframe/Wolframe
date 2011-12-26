@@ -44,7 +44,7 @@ MemBlock::MemBlock( std::size_t p_size)					:m_ptr(0),m_size(p_size),m_pos(0),m_
 	m_allocated = true;
 }
 
-MemBlock::MemBlock( void* p_ptr, std::size_t p_size)			:m_ptr(p_ptr),m_size(p_size),m_pos(0),m_allocated(false){}
+MemBlock::MemBlock( void* p_ptr, std::size_t p_size, std::size_t p_pos)	:m_ptr(p_ptr),m_size(p_size),m_pos(p_pos),m_allocated(false){}
 MemBlock::MemBlock( const MemBlock& o)					:m_ptr(0),m_size(0),m_pos(0),m_allocated(false) {*this = o;}
 
 MemBlock::~MemBlock()

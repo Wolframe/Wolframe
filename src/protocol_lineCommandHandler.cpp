@@ -30,19 +30,58 @@
  Project Wolframe.
 
 ************************************************************************/
-#include "protocol/commandHandler.hpp"
+#include "protocol/lineCommandHandler.hpp"
+#include "protocol/ioblocks.hpp"
 #include "logger-v1.hpp"
 /*[-]*/#include <iostream>
 
 using namespace _Wolframe;
 using namespace _Wolframe::protocol;
 
-void CommandHandler::passParameters( int argc, const char** argv)
+LineCommandHandler::LineCommandHandler()
 {
-	for (int ii=0; ii<argc; ii++)
+	m_itr = m_input.begin();
+	m_end = m_input.end();
+}
+
+void LineCommandHandler::setInputBuffer( void* buf, std::size_t allocsize, std::size_t size, std::size_t itrpos)
+{
+	m_input = protocol::InputBlock( (char*)buf, allocsize, size);
+	m_itr = m_input.at(itrpos);
+	m_end = m_input.end();
+}
+
+void LineCommandHandler::setOutputBuffer( void* buf, std::size_t size, std::size_t pos)
+{
+	m_output = protocol::OutputBlock( buf, size, pos);
+}
+
+void LineCommandHandler::putInput( const void *begin, std::size_t bytesTransferred)
+{
+	m_input.setPos( bytesTransferred + ((const char*)begin - m_input.charptr()));
+	m_itr = m_input.begin();
+	m_end = m_input.end();
+}
+
+void LineCommandHandler::getInputBlock( void*& begin, std::size_t& maxBlockSize)
+{
+	if (!m_input.getNetworkMessageRead( begin, maxBlockSize))
 	{
-		m_argBuffer.push_back( argv[ ii]);
+		throw std::logic_error( "buffer too small");
 	}
+}
+
+void LineCommandHandler::getOutput( const void*& begin, std::size_t& bytesToTransfer)
+{
+	begin = m_output.ptr();
+	bytesToTransfer = m_output.pos();
+	m_output.setPos(0);
+}
+
+void LineCommandHandler::getDataLeft( const void*& begin, std::size_t& nofBytes)
+{
+	begin = (char*)(m_input.charptr() + (m_itr - m_input.begin()));
+	nofBytes = m_end - m_itr;
 }
 
 

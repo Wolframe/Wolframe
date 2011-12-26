@@ -87,7 +87,7 @@ OBJS = \
 	serialize\struct\luamapBase.obj \
 	langbind\luaDebug.obj \
 	langbind\luaConfig.obj \
-	langbind\luaAppProcessor.obj
+	langbind\luaCommandHandler.obj
 !ENDIF
 
 !IFDEF WITH_LIBXML2

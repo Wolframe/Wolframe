@@ -89,6 +89,10 @@ struct FormatOutput :public OutputBlock
 	///\brief Constructor
 	FormatOutput()
 		:OutputBlock(0,0),m_errorCode(0),m_state(Open){}
+	FormatOutput( void* p, std::size_t n, std::size_t i=0)
+		:OutputBlock(p,n,i),m_errorCode(0),m_state(Open){}
+	FormatOutput( const FormatOutput& o)
+		:OutputBlock(o),m_errorCode(o.m_errorCode),m_state(o.m_state){}
 
 	virtual ~FormatOutput(){}
 
@@ -101,16 +105,13 @@ struct FormatOutput :public OutputBlock
 	///\remark this mechanism is used for chaining filters in case processing has to be changed
 	virtual FormatOutput* createFollow() {return 0;}
 
-	///\brief Assignement of the data members
+	///\brief Assignement of the content processed only
 	///\param [in] o format output to assign the data members of
-	///\remark the output function specified with the constructor is not overwritten
-	FormatOutput& operator = (const FormatOutput& o)
+	void assignContent( const FormatOutput& o)
 	{
 		set( const_cast<void*>(o.ptr()), o.size());
 		setPos( o.pos());
-		m_errorCode = o.m_errorCode;
 		m_state = o.m_state;
-		return *this;
 	}
 
 	///\brief Defines the buffer to use for output.

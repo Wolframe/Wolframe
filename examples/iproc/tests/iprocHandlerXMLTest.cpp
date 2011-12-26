@@ -48,7 +48,8 @@
 #include <gtest/gtest.h>
 
 using namespace _Wolframe;
-using namespace iproc;
+using namespace _Wolframe::iproc;
+using namespace _Wolframe::langbind;
 
 struct TestDescription
 {

@@ -41,7 +41,7 @@ Project Wolframe.
 #include <string>
 
 namespace _Wolframe {
-namespace app {
+namespace langbind {
 
 ///\class Output
 ///\brief Output as seen from the application processor program

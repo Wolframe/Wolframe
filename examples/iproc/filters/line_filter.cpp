@@ -20,7 +20,8 @@ struct FormatOutputImpl :public protocol::FormatOutput
 	///\brief Copy constructor
 	///\param [in] o format output to copy
 	FormatOutputImpl( const FormatOutputImpl& o)
-		:m_bufstate(o.m_bufstate)
+		:protocol::FormatOutput(o)
+		,m_bufstate(o.m_bufstate)
 	{}
 
 	///\brief self copy

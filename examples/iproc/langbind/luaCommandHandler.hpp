@@ -30,11 +30,11 @@ Project Wolframe.
 
 ************************************************************************/
 ///
-///\file luaAppProcessor.hpp
-///\brief interface to the lua application processor
+///\file luaCommandHandler.hpp
+///\brief interface to the lua command handler
 ///
-#ifndef _Wolframe_LUATYPES_HPP_INCLUDED
-#define _Wolframe_LUATYPES_HPP_INCLUDED
+#ifndef _Wolframe_LUACOMMANDHANDLER_HPP_INCLUDED
+#define _Wolframe_LUACOMMANDHANDLER_HPP_INCLUDED
 #include "luaConfig.hpp"
 #include "appObjects.hpp"
 #include "ioFilterCommandHandler.hpp"
@@ -44,45 +44,43 @@ extern "C"
 }
 
 namespace _Wolframe {
-namespace iproc {
-namespace lua {
+namespace langbind {
 
-///\class AppProcessor
-///\brief application processor instance for processing calls as Lua script
-class AppProcessor :public protocol::IOFilterCommandHandler
+///\class LuaCommandHandler
+///\brief command handler instance for processing a call as Lua script
+class LuaCommandHandler :public protocol::IOFilterCommandHandler
 {
 public:
-	///\class State
-	///\brief State of the application processor instance
-	struct State;
+	///\class Context
+	///\brief Execution context of the command handler
+	struct Context;
 
 	///\brief Constructor
 	///\param[in] config read only reference to the configuration of this application processor
-	AppProcessor( const lua::CommandConfig* config);
+	LuaCommandHandler( const langbind::LuaCommandConfig* config);
 	///\brief Destructor
-	~AppProcessor();
+	~LuaCommandHandler();
 
 	///\brief Execute the Lua script
-	///\param[in] argc number of arguments
-	///\param[in] argc array of arguments
-	///\return call state
-	virtual CallResult call();
+	///\param[out] errorCode error code in case of error
+	///\return CallResult status of the filter input for the state machine of this command handler
+	virtual CallResult call( int& errorCode);
 
 	///\brief Get the current lua state (not the thread!)
 	///\return the current lua state
 	lua_State* getLuaState() const;
 
 private:
-	const lua::CommandConfig* m_config;	///< reference to configuration
+	const LuaCommandConfig* m_config;	///< reference to configuration
 	struct Globals
 	{
-		app::Input m_input;
-		app::Output m_output;
+		langbind::Input m_input;
+		langbind::Output m_output;
 	};
 	Globals m_globals;
-	State* m_state;				///< application procesor instance state
+	Context* m_context;			///< execution context of the command handler
 };
 
-}}}//namespace
+}}//namespace
 #endif
 

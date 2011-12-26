@@ -98,18 +98,14 @@ static void getDescription_( lua_State *ls, int index, std::string& rt, int dept
 	}
 }
 
-using namespace _Wolframe;
-using namespace iproc;
-using namespace lua;
-
-std::string _Wolframe::iproc::lua::getDescription( lua_State *ls, int index)
+std::string _Wolframe::langbind::getDescription( lua_State *ls, int index)
 {
 	std::string rt;
 	getDescription_( ls, index, rt, 8);
 	return rt;
 }
 
-bool _Wolframe::iproc::lua::getDescription( lua_State *ls, int index, std::string& ret)
+bool _Wolframe::langbind::getDescription( lua_State *ls, int index, std::string& ret)
 {
 	try
 	{

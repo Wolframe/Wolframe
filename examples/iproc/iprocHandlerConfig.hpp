@@ -76,7 +76,7 @@ public:
 	bool parse( const config::ConfigurationTree& pt, const std::string& node, const module::ModulesDirectory* modules );
 
 	///\brief return all currently available commands
-	const std::vector<protocol::CommandBase> getCommands( const char* privileges=0) const;
+	const std::vector< CountedReference<protocol::CommandBase> >& getCommands( const char* privileges=0) const;
 
 	///\brief return all currently available commands as description for the 'capa' command in the protocol
 	const std::string getCommandDescriptions( const char* privileges=0) const;
@@ -103,7 +103,8 @@ protected:
 	friend class TestConfiguration;
 	ConfigurationStruct m_data;
 private:
-	std::vector<protocol::CommandBase> m_cmds;
+	std::string m_capa;
+	std::vector< CountedReference<protocol::CommandBase> > m_cmds;
 	std::vector< CountedReference<protocol::CommandConfig> > m_configs;
 };
 }}//namespace

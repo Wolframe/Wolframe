@@ -71,6 +71,7 @@ private:
 	std::size_t	size_;
 };
 
+
 template <class Connection>
 int runTestIO( char* in, char* end, std::string& out, Connection& connection)
 {

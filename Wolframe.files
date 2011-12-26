@@ -196,8 +196,8 @@ examples/iproc/langbind/directmapTransaction.cpp
 examples/iproc/langbind/directmapTransaction.hpp
 examples/iproc/langbind/ioFilterCommandHandler.cpp
 examples/iproc/langbind/ioFilterCommandHandler.hpp
-examples/iproc/langbind/luaAppProcessor.cpp
-examples/iproc/langbind/luaAppProcessor.hpp
+examples/iproc/langbind/luaCommandHandler.cpp
+examples/iproc/langbind/luaCommandHandler.hpp
 examples/iproc/langbind/luaConfig.cpp
 examples/iproc/langbind/luaConfig.hpp
 examples/iproc/langbind/luaDebug.cpp
@@ -331,6 +331,7 @@ include/processor/processor.hpp
 include/processor/procProvider.hpp
 include/protocol/buffers.hpp
 include/protocol/commandHandler.hpp
+include/protocol/lineCommandHandler.hpp
 include/protocol/formatoutput.hpp
 include/protocol.hpp
 include/protocol/inputfilter.hpp
@@ -544,6 +545,7 @@ src/posixMain.cpp
 src/procProvider.cpp
 src/procProviderImpl.hpp
 src/protocol_commandHandler.cpp
+src/protocol_lineCommandHandler.cpp
 src/protocol_ioblocks.cpp
 src/serverConfig.cpp
 src/server.cpp

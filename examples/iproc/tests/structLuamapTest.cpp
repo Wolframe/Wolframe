@@ -37,7 +37,7 @@ Project Wolframe.
 #include "iprocHandlerConfig.hpp"
 #include "langbind/luaConfig.hpp"
 #include "langbind/appObjects.hpp"
-#include "langbind/luaAppProcessor.hpp"
+#include "langbind/luaCommandHandler.hpp"
 #include "logger-v1.hpp"
 #include "tests/testUtils.hpp"
 extern "C"
@@ -56,8 +56,9 @@ extern "C"
 #include <boost/thread/thread.hpp>
 
 using namespace _Wolframe;
-using namespace iproc;
-using namespace serialize;
+using namespace _Wolframe::iproc;
+using namespace _Wolframe::langbind;
+using namespace _Wolframe::serialize;
 
 struct Plant
 {
@@ -214,10 +215,10 @@ const DescriptionBase* Document::getDescription()
 	return &rt;
 }
 
-class TestConfiguration :public lua::CommandConfig
+class TestConfiguration :public LuaCommandConfig
 {
 public:
-	TestConfiguration ( const std::string& scriptpath) :lua::CommandConfig( "run",  scriptpath){}
+	TestConfiguration ( const std::string& scriptpath) :LuaCommandConfig( "run",  scriptpath){}
 };
 
 template <class Struct>
@@ -235,7 +236,7 @@ template <class Struct>
 static int run( const TestConfiguration& cfg, const std::string& input, std::string& output)
 {
 	char outputbuf[ 8192];
-	app::Filter filter( "xml:textwolf", 1024, 1024);
+	langbind::Filter filter( "xml:textwolf", 1024, 1024);
 	protocol::InputFilter* in = filter.m_inputfilter.get();
 	protocol::FormatOutput* out = filter.m_formatoutput.get();
 	if (!in)
@@ -248,7 +249,7 @@ static int run( const TestConfiguration& cfg, const std::string& input, std::str
 		LOG_ERROR << "error in serialization: no valid format output defined";
 		return 2;
 	}
-	lua::AppProcessor processor( &cfg);
+	LuaCommandHandler processor( &cfg);
 	lua_State* ls = processor.getLuaState();
 	lua_pushcfunction( ls, &luaSerializationTest<Struct>);
 	lua_setglobal( ls, "transform");
@@ -258,13 +259,14 @@ static int run( const TestConfiguration& cfg, const std::string& input, std::str
 	processor.setFilter( filter.m_formatoutput);
 	for (;;)
 	{
-		switch (processor.call())
+		int errorCode = 0;
+		switch (processor.call( errorCode))
 		{
-			case lua::AppProcessor::YieldRead:
+			case LuaCommandHandler::YieldRead:
 				LOG_ERROR << "unexpected end of input";
 				return 1;
 
-			case lua::AppProcessor::YieldWrite:
+			case LuaCommandHandler::YieldWrite:
 			{
 				void* content = filter.m_formatoutput->ptr();
 				unsigned int contentsize = filter.m_formatoutput->pos();
@@ -274,7 +276,7 @@ static int run( const TestConfiguration& cfg, const std::string& input, std::str
 				break;
 			}
 
-			case lua::AppProcessor::Ok:
+			case LuaCommandHandler::Ok:
 			{
 				void* content = filter.m_formatoutput->ptr();
 				unsigned int contentsize = filter.m_formatoutput->pos();
@@ -283,9 +285,9 @@ static int run( const TestConfiguration& cfg, const std::string& input, std::str
 				return 0;
 			}
 
-			case lua::AppProcessor::Error:
+			case LuaCommandHandler::Error:
 			{
-				LOG_ERROR << "error processing";
+				LOG_ERROR << "error processing " << errorCode;
 				return 2;
 			}
 		}

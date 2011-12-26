@@ -103,7 +103,8 @@ struct FormatOutputImpl :public protocol::FormatOutput, public FilterBase<IOChar
 	///\brief Copy constructor
 	///\param [in] o format output to copy
 	FormatOutputImpl( const FormatOutputImpl& o)
-		:m_tagstk( new char[o.m_tagstksize])
+		:protocol::FormatOutput(o)
+		,m_tagstk( new char[o.m_tagstksize])
 		,m_tagstksize(o.m_tagstksize)
 		,m_tagstkpos(o.m_tagstkpos)
 		,m_xmlstate(o.m_xmlstate)
@@ -720,7 +721,13 @@ public:
 		,m_doTokenize(false)
 		{}
 	InputFilter( const InputFilter& o)
-		:protocol::InputFilter(o),m_bufsize(o.m_bufsize),m_headerParsed(o.m_headerParsed),m_header(o.m_header),m_encoding(o.m_encoding),m_withEmpty(o.m_withEmpty),m_doTokenize(o.m_doTokenize){}
+		:protocol::InputFilter(o)
+		,m_bufsize(o.m_bufsize)
+		,m_headerParsed(o.m_headerParsed)
+		,m_header(o.m_header)
+		,m_encoding(o.m_encoding)
+		,m_withEmpty(o.m_withEmpty)
+		,m_doTokenize(o.m_doTokenize){}
 
 	virtual ~InputFilter(){}
 
@@ -902,9 +909,19 @@ public:
 
 public:
 	FormatOutput( const CountedReference<TextwolfEncoding::Id>& enc, std::size_t tagbufsize)
-		:m_tagbuffersize(tagbufsize),m_headerPrinted(false),m_headerPos(0),m_header(0),m_encoding(enc){}
+		:m_tagbuffersize(tagbufsize)
+		,m_headerPrinted(false)
+		,m_headerPos(0)
+		,m_header(0)
+		,m_encoding(enc){}
+
 	FormatOutput( const FormatOutput& o)
-		:m_tagbuffersize(o.m_tagbuffersize),m_headerPrinted(o.m_headerPrinted),m_headerPos(o.m_headerPos),m_header(o.m_header),m_encoding(o.m_encoding){}
+		:protocol::FormatOutput(o)
+		,m_tagbuffersize(o.m_tagbuffersize)
+		,m_headerPrinted(o.m_headerPrinted)
+		,m_headerPos(o.m_headerPos)
+		,m_header(o.m_header)
+		,m_encoding(o.m_encoding){}
 
 	virtual ~FormatOutput(){}
 

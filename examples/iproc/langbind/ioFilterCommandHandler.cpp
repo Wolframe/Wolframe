@@ -39,54 +39,159 @@
 using namespace _Wolframe;
 using namespace _Wolframe::protocol;
 
-
 IOFilterCommandHandler::IOFilterCommandHandler()
+	:m_state(Processing)
+	,m_writedata(0)
+	,m_writedatasize(0)
+
 {
 	filter::CharFilter flt( "UTF-8");
 	m_inputfilter = flt.inputFilter();
 	m_formatoutput = flt.formatOutput();
 }
 
-void IOFilterCommandHandler::passIO( const InputBlock& input, const OutputBlock& output)
+void IOFilterCommandHandler::setInputBuffer( void* buf, std::size_t allocsize, std::size_t size, std::size_t itrpos)
 {
-	Parent::passIO( input, output);
-	m_eoD = m_input.getEoD( m_input.begin());
-	m_gotEoD = m_input.gotEoD();
-	m_inputfilter.get()->protocolInput( m_input.ptr(), m_eoD-m_input.begin(), m_gotEoD);
-	m_formatoutput->init( m_output.ptr(), m_output.size());
+	m_input = protocol::InputBlock( (char*)buf, allocsize, size);
+	protocol::InputBlock::iterator start = m_input.at( itrpos);
+	m_eoD = m_input.getEoD( start);
+	InputFilter* flt = m_inputfilter.get();
+	if (flt)
+	{
+		flt->protocolInput( m_input.charptr()+itrpos, m_eoD-start, m_input.gotEoD());
+	}
+}
+
+void IOFilterCommandHandler::setOutputBuffer( void* buf, std::size_t size, std::size_t pos)
+{
+	if (m_formatoutput.get()) m_formatoutput->init( (char*)buf+pos, size-pos);
+}
+
+enum
+{
+	ErrFormatOutputDeleted=-1,
+	ErrInputFilterDeleted=-2
+};
+
+CommandHandler::Operation IOFilterCommandHandler::nextOperation()
+{
+	FormatOutput* flt;
+	switch (m_state)
+	{
+		case Terminated:
+			return CLOSED;
+
+		case FlushingOutput:
+			m_state = Processing;
+			if (!(flt = m_formatoutput.get()))
+			{
+				LOG_ERROR << "Output filter deleted";
+				m_statusCode = ErrFormatOutputDeleted;
+				m_state = DiscardInput;
+				return READ;
+			}
+			m_writedata = flt->ptr();
+			m_writedatasize = flt->pos();
+			flt->setPos(0);
+			return WRITE;
+
+		case DiscardInput:
+			flt = m_formatoutput.get();
+			if (flt)
+			{
+				m_writedatasize=flt->pos();
+				if (m_writedatasize)
+				{
+					m_writedata = flt->ptr();
+					flt->setPos(0);
+					return WRITE;
+				}
+			}
+			if (m_input.gotEoD())
+			{
+				m_formatoutput.reset(0);
+				m_writedata = "\r\n.\r\n";
+				m_writedatasize = std::strlen("\r\n.\r\n");
+				m_state = Terminated;
+				return WRITE;
+			}
+			return READ;
+
+		case Processing:
+			if (!m_inputfilter.get())
+			{
+				LOG_ERROR << "Input filter deleted";
+				m_statusCode = ErrInputFilterDeleted;
+				m_state = DiscardInput;
+				return READ;
+			}
+			if (m_inputfilter->size() == 0)
+			{
+				if (m_input.gotEoD())
+				{
+					if (m_formatoutput.get() && m_formatoutput->size())
+					{
+						m_writedata = m_formatoutput->ptr();
+						m_writedatasize = m_formatoutput->size();
+						return WRITE;
+					}
+					m_state = Terminated;
+					m_writedata = "\r\n.\r\n";
+					m_writedatasize = std::strlen("\r\n.\r\n");
+					return WRITE;
+				}
+				return READ;
+			}
+			else if (m_formatoutput.get())
+			{
+				if (m_formatoutput->size())
+				{
+					m_writedata = m_formatoutput->ptr();
+					m_writedatasize = m_formatoutput->size();
+					return WRITE;
+				}
+				m_writedata = "";
+				m_writedatasize = 0;
+				return WRITE;
+			}
+			else
+			{
+				LOG_ERROR << "Output filter deleted";
+				m_statusCode = ErrFormatOutputDeleted;
+				m_state = DiscardInput;
+				return READ;
+			}
+	}
+	LOG_ERROR << "illegal state";
+	return CLOSED;
 }
 
 void IOFilterCommandHandler::putInput( const void *begin, std::size_t bytesTransferred)
 {
-	Parent::putInput( begin, bytesTransferred);
+	m_input.setPos( bytesTransferred + ((const char*)begin - m_input.charptr()));
 	m_eoD = m_input.getEoD( m_input.begin());
-	m_gotEoD = m_input.gotEoD();
-	m_inputfilter.get()->protocolInput( m_input.ptr(), m_eoD-m_input.begin(), m_gotEoD);
+	m_inputfilter.get()->protocolInput( m_input.ptr(), m_eoD-m_input.begin(), m_input.gotEoD(), 0);
+}
+
+void IOFilterCommandHandler::getInputBlock( void*& begin, std::size_t& maxBlockSize)
+{
+	if (!m_input.getNetworkMessageRead( begin, maxBlockSize))
+	{
+		throw std::logic_error( "buffer too small");
+	}
 }
 
 void IOFilterCommandHandler::getOutput( const void*& begin, std::size_t& bytesToTransfer)
 {
-	protocol::FormatOutput* flt = m_formatoutput.get();
-	if (flt)
-	{
-		begin = flt->ptr();
-		bytesToTransfer = flt->pos();
-		m_output.setPos(0);
-		flt->setPos(0);
-		if (m_state == FlushingOutput)
-		{
-			m_state = Processing;
-		}
-	}
-	else
-	{
-		begin = flt->ptr();
-		bytesToTransfer = 0;
-		m_output.setPos(0);
-		if (m_state == FlushingOutput)
-		{
-			m_state = Processing;
-		}
-	}
+	begin = m_writedata;
+	bytesToTransfer = m_writedatasize;
 }
+
+void IOFilterCommandHandler::getDataLeft( const void*& begin, std::size_t& nofBytes)
+{
+	std::size_t pos = m_eoD - m_input.begin();
+	begin = (const void*)(m_input.charptr() + pos);
+	nofBytes = m_input.pos() - pos;
+}
+
 

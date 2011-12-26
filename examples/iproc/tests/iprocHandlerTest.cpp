@@ -46,7 +46,8 @@
 #include <boost/thread/thread.hpp>
 
 using namespace _Wolframe;
-using namespace iproc;
+using namespace _Wolframe::iproc;
+using namespace _Wolframe::langbind;
 
 class TestConfiguration :public Configuration
 {
@@ -206,9 +207,9 @@ protected:
 };
 
 typedef ::testing::Types<
+	OneLine<200,200>,
 	Empty<1,1>,
 	OneLine<1,1>,
-	OneLine<200,200>,
 	OneEmptyLine<1,1>,
 	OneOneCharLine<1,1>,
 	Random<1,2,2000>,

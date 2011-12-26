@@ -45,13 +45,12 @@ extern "C" {
 }
 
 namespace _Wolframe {
-namespace iproc {
-namespace lua {
+namespace langbind {
 
 
 ///\class Configuration
-///\brief configuration object of the lua application processor
-class CommandConfig :public protocol::CommandConfig
+///\brief configuration object of a lua command processor
+class LuaCommandConfig :public protocol::CommandConfig
 {
 public:
 	///\brief module load function for a lua state
@@ -59,7 +58,7 @@ public:
 	typedef int (*ModuleLoad)( lua_State *ls);
 
 	///\brief default constructor
-	CommandConfig( const std::string& main_, const std::string& mainmodule_, const std::vector<std::string>& modules_=std::vector<std::string>())
+	LuaCommandConfig( const std::string& main_, const std::string& mainmodule_, const std::vector<std::string>& modules_=std::vector<std::string>())
 		:m_main(main_)
 		,m_mainmodule( mainmodule_, Module::Script)
 		,m_cthread_stacksize(2048)
@@ -158,6 +157,6 @@ private:
 	std::size_t m_cthread_stacksize;		///< stack size in bytes of lua c thread executing command
 };
 
-}}}//namespace
+}}//namespace
 #endif
 

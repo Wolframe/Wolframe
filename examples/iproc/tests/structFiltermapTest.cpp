@@ -188,7 +188,7 @@ const DescriptionBase* Places::getDescription()
 template <class Struct>
 static int run( const char* root, const std::string& input, std::string& output)
 {
-	app::Filter filter( "xml:textwolf", 1024, 1024);
+	langbind::Filter filter( "xml:textwolf", 1024, 1024);
 	protocol::InputFilter* in = filter.m_inputfilter.get();
 	protocol::FormatOutput* out = filter.m_formatoutput.get();
 
