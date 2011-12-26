@@ -31,8 +31,8 @@
 
 ************************************************************************/
 ///
-/// \file authorization.hpp
-/// \brief top-level header file for authorization interface
+/// \file authentication.hpp
+/// \brief top-level header file for authentication interface
 ///
 
 #ifndef _AUTHENTICATION_HPP_INCLUDED
@@ -45,7 +45,7 @@
 namespace _Wolframe {
 namespace AAAA {
 
-// interface for all authorization mechanisms
+// interface for all authentication mechanisms
 class Authenticator {
 public:
 	virtual ~Authenticator()		{}
@@ -56,7 +56,7 @@ public:
 
 
 /// AuthenticationUnit Unit
-/// This is the base class for authorization unit implementations
+/// This is the base class for authentication unit implementations
 class AuthenticationUnit
 {
 public:
