@@ -1,10 +1,10 @@
 TOPDIR = ..
 
-SUBDIRS = echo pecho
+SUBDIRS = echo pecho iproc
 
 !IFDEF WITH_LUA
 SUBDIRS = \
-	$(SUBDIRS) lua iproc
+	$(SUBDIRS) lua
 !ENDIF
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk

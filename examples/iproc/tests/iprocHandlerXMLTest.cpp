@@ -34,7 +34,6 @@
 
 #include "iprocHandler.hpp"
 #include "connectionHandler.hpp"
-#include "langbind/luaConfig.hpp"
 #include "handlerConfig.hpp"
 #include "testHandlerTemplates.hpp"
 #include "testUtils.hpp"
@@ -49,13 +48,12 @@
 
 using namespace _Wolframe;
 using namespace _Wolframe::iproc;
-using namespace _Wolframe::langbind;
 
 struct TestDescription
 {
-	const char* name;		///< determines the name of the result and of the expected result file
-	const char* scriptfile;		///< script to execute
-	const char* datafile;		///< input to feed
+	const char* name;				///< determines the name of the result and of the expected result file
+	const char* scriptfile;			///< script to execute
+	const char* datafile;			///< input to feed
 	unsigned int elementBuffersize;	///< additional buffer for the output to hold at least one result element
 };
 
