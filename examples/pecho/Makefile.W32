@@ -52,13 +52,13 @@ CPP_BINS = \
 	pechod.exe
 
 TEST_CPP_BINS = \
-	tests\pechoHandlerTest$(EXE)
+	tests\pechoHandlerTest.exe
 
 all: $(OBJS) $(CPP_BINS)
 
 pechod.exe: pechod.obj $(TOPDIR)\src\wolframe.lib
 # Aba: doesn't work this way, I must investigate, obj gets build, exe not!
-tests\pechoHandlerTest$(EXE): tests\pechoHandlerTest.obj $(TOPDIR)\src\wolframe.lib
+tests\pechoHandlerTest.exe: tests\pechoHandlerTest.obj $(TOPDIR)\src\wolframe.lib
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
@@ -66,14 +66,20 @@ local_all:
 
 local_clean:
 	@-erase tests\*.obj 2>NUL
+	@-erase tests\*.dll 2>NUL
+	@-erase tests\*.exe 2>NUL
 
 local_distclean:
 
-local_test:
-# Aba: doesn't work this way, I must investigate, obj gets build, exe not!
-#	@-echo tests\pechoHandlerTest > test.bat
-#	@echo
-#	@-test.bat
+local_test: $(TEST_CPP_BINS)
+	@-echo @echo off > test.bat
+!IFDEF WITH_SSL
+	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" tests >> test.bat
+	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" tests >> test.bat
+!ENDIF
+	@-echo tests\pechoHandlerTest.exe >> test.bat
+	@echo
+	@-test.bat
 
 run: $(CPP_BINS)
 	@-echo @echo off > test.bat

@@ -26,6 +26,12 @@ INCLUDE_LIBS = \
 
 !IFDEF WITH_SSL
 
+INCLUDE_DIRS = \
+	$(INCLUDE_DIRS)	/I"$(OPENSSL_DIR)\include"
+
+INCLUDE_CPPFLAGS = \
+	$(INCLUDE_CPPFLAGS) /DWITH_SSL
+
 INCLUDE_LDFLAGS = \
 	$(INCLUDE_LDFLAGS) /LIBPATH:"$(OPENSSL_DIR)\lib"
 
@@ -38,6 +44,9 @@ INCLUDE_LIBS = \
 
 !IFDEF WITH_LUA
 
+INCLUDE_CPPFLAGS = \
+	$(INCLUDE_CPPFLAGS) /DWITH_LUA
+ 
 INCLUDE_DIRS = \
 	$(INCLUDE_DIRS) /I$(TOPDIR)\lua\src
 
@@ -49,17 +58,13 @@ INCLUDE_LIBS = \
 !IFDEF WITH_LIBXML2
 
 INCLUDE_CPPFLAGS = \
-	$(INCLUDE_CPPFLAGS) \
-	/DWITH_LIBXML2
+	$(INCLUDE_CPPFLAGS) /DWITH_LIBXML2
 
 INCLUDE_DIRS = \
-	$(INCLUDE_DIRS) \
-	/I. /I"$(LIBXML2_DIR)\include" \
-	/I"$(LIBXML2_DIR)\include\libxml"
+	$(INCLUDE_DIRS) /I. /I"$(LIBXML2_DIR)\include" /I"$(LIBXML2_DIR)\include\libxml"
 
 INCLUDE_LIBS = \
-	$(INCLUDE_LIBS) \
-	"$(LIBXML2_DIR)\lib\libxml2.lib"
+	$(INCLUDE_LIBS) "$(LIBXML2_DIR)\lib\libxml2.lib"
 	
 !ENDIF
 
@@ -139,13 +144,7 @@ local_test: $(TEST_CPP_BINS)
 	@-echo copy "$(LIBXML2_DIR)\lib\libxml2.dll" tests >> test.bat
 !ENDIF
 	@-echo cd tests >> test.bat
-	@-echo iprocHandlerXMLTest.exe >> test.bat
 	@-echo iprocHandlerTest.exe >> test.bat
-!IFDEF WITH_LUA
-	@-echo structLuamapTest.exe >> test.bat
-!ENDIF
-	@-echo structFiltermapTest.exe  >> test.bat
-	@-echo simpleFormCompilerTest.exe >> test.bat
 	@-test.bat
 
 run:

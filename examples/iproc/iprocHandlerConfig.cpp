@@ -110,7 +110,7 @@ bool Configuration::defineScript( const ScriptConfigStruct& sc)
 	else
 #endif
 	{
-		LOG_ERROR << "Unknown type of script loaded";
+		LOG_ERROR << "Unknown type of script loaded: " << sc.path;
 		return false;
 	}
 	return true;
