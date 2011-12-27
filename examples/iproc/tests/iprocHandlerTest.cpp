@@ -36,7 +36,6 @@
 
 #include "iprocHandler.hpp"
 #include "connectionHandler.hpp"
-#include "langbind/luaConfig.hpp"
 #include "handlerConfig.hpp"
 #include "testHandlerTemplates.hpp"
 #include <gtest/gtest.h>
@@ -47,7 +46,6 @@
 
 using namespace _Wolframe;
 using namespace _Wolframe::iproc;
-using namespace _Wolframe::langbind;
 
 class IProcTestConfiguration :public Configuration
 {

@@ -109,16 +109,21 @@ all: $(OBJS) $(CPP_BINS)
 TEST_CPP_BINS = \
 	tests\iprocHandlerTest.exe \
 	tests\iprocHandlerXMLTest.exe \
-	tests\structLuamapTest.exe \
 	tests\simpleFormCompilerTest.exe \
 	tests\structFiltermapTest.exe
+
+!IFDEF WITH_LUA
+TEST_CPP_BINS = \
+	$(TEST_CPP_BINS) \
+	tests\structLuamapTest.exe	
+!ENDIF
 
 iprocd.exe: iprocd.obj $(TOPDIR)\src\wolframe.lib
 tests\iprocHandlerTest.exe: tests\iprocHandlerTest.obj $(TOPDIR)\src\wolframe.lib
 tests\iprocHandlerXMLTest.exe: tests\iprocHandlerXMLTest.obj $(TOPDIR)\src\wolframe.lib
-tests\structLuamapTest.exe: tests\structLuamapTest.obj $(TOPDIR)\src\wolframe.lib
 tests\simpleFormCompilerTest.exe: tests\simpleFormCompilerTest.obj $(TOPDIR)\src\wolframe.lib
 tests\structFiltermapTest.exe: tests\structFiltermapTest.obj $(TOPDIR)\src\wolframe.lib
+tests\structLuamapTest.exe: tests\structLuamapTest.obj $(TOPDIR)\src\wolframe.lib
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
@@ -144,7 +149,9 @@ local_test: $(TEST_CPP_BINS)
 	@-echo copy "$(LIBXML2_DIR)\lib\libxml2.dll" tests >> test.bat
 !ENDIF
 	@-echo cd tests >> test.bat
+!IFDEF WITH_LUA
 	@-echo iprocHandlerTest.exe >> test.bat
+!ENDIF
 	@-test.bat
 
 run:
