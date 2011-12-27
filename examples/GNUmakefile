@@ -1,9 +1,9 @@
 TOPDIR = ..
 
-SUBDIRS = echo pecho
+SUBDIRS = echo pecho iproc
 
 ifeq ($(WITH_LUA),1)
-SUBDIRS += lua iproc
+SUBDIRS += lua 
 endif
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

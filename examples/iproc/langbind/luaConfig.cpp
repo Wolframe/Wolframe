@@ -117,7 +117,14 @@ bool LuaCommandConfig::Module::load( lua_State* ls) const
 {
 	if (m_type == PreloadLib && m_load)
 	{
-		m_load(ls);
+		if (m_load == luaopen_table)
+		{
+			LOG_INFO << "Defined module " << LUA_TABLIBNAME << " in configuration that is loaded by default";
+		}
+		else
+		{
+			m_load(ls);
+		}
 	}
 	else if (m_type == UserLib)
 	{
@@ -180,6 +187,8 @@ bool LuaCommandConfig::Module::check() const
 bool LuaCommandConfig::load( lua_State *ls) const
 {
 	luaopen_base( ls);
+	luaopen_table( ls);
+
 	for (std::vector<Module>::const_iterator it = m_modules.begin(); it != m_modules.end(); it++)
 	{
 		if (it->type() == Module::PreloadLib)

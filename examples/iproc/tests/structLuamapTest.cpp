@@ -309,7 +309,7 @@ static const TestDescription testDescription[2] = {
 {
 	"luamap_PLACES",
 	"test_luamap_places_IsoLatin1.xml",
-	"test_serialization",
+	"test_serialization.lua",
 	&run<Document>
 },
 {0,0,0,0}
@@ -331,8 +331,7 @@ TEST_F( StructLuamapTest, tests)
 	{
 		wtest::Data data( testDescription[ti].name, testDescription[ti].datafile);
 		std::string testoutput;
-		IProcTestConfiguration cfg( testDescription[ti].scriptname);
-
+		IProcTestConfiguration cfg( (boost::filesystem::current_path() / "scripts"/ testDescription[ti].scriptname).string());
 		EXPECT_EQ( 0, testDescription[ti].run( cfg, data.input, testoutput));
 		data.check( testoutput);
 		ASSERT_EQ( data.expected, testoutput);
