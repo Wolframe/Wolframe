@@ -57,7 +57,6 @@ TEST_CPP_BINS = \
 all: $(OBJS) $(CPP_BINS)
 
 pechod.exe: pechod.obj $(TOPDIR)\src\wolframe.lib
-# Aba: doesn't work this way, I must investigate, obj gets build, exe not!
 tests\pechoHandlerTest.exe: tests\pechoHandlerTest.obj $(TOPDIR)\src\wolframe.lib
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
