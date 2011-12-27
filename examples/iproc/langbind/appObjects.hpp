@@ -33,8 +33,8 @@ Project Wolframe.
 ///\file appObjects.hpp
 ///\brief interface for application processor scripting language to system objects
 ///
-#ifndef _Wolframe_LANGBIND_HPP_INCLUDED
-#define _Wolframe_LANGBIND_HPP_INCLUDED
+#ifndef _Wolframe_langbind_APPOBJECTS_HPP_INCLUDED
+#define _Wolframe_langbind_APPOBJECTS_HPP_INCLUDED
 #include "protocol/formatoutput.hpp"
 #include "protocol/inputfilter.hpp"
 #include <stack>

@@ -33,8 +33,8 @@ Project Wolframe.
 ///\file luaCommandHandler.hpp
 ///\brief interface to the lua command handler
 ///
-#ifndef _Wolframe_LUACOMMANDHANDLER_HPP_INCLUDED
-#define _Wolframe_LUACOMMANDHANDLER_HPP_INCLUDED
+#ifndef _Wolframe_langbind_LUA_COMMAND_HANDLER_HPP_INCLUDED
+#define _Wolframe_langbind_LUA_COMMAND_HANDLER_HPP_INCLUDED
 #include "luaConfig.hpp"
 #include "appObjects.hpp"
 #include "ioFilterCommandHandler.hpp"

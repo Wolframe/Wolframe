@@ -100,9 +100,9 @@ bool Configuration::defineScript( const ScriptConfigStruct& sc)
 #if WITH_LUA
 	if (isLuaScript( sc.path))
 	{
-		LuaCommandConfig* cfg;
-		m_configs.push_back( cfg=new LuaCommandConfig( sc.main, sc.path, sc.module));
-		protocol::CommandBase* cmd = new protocol::Command< LuaCommandHandler, LuaCommandConfig>( sc.name.c_str(), cfg);
+		langbind::LuaCommandConfig* cfg;
+		m_configs.push_back( cfg=new langbind::LuaCommandConfig( sc.main, sc.path, sc.module));
+		protocol::CommandBase* cmd = new protocol::Command< langbind::LuaCommandHandler, langbind::LuaCommandConfig>( sc.name.c_str(), cfg);
 		m_cmds.push_back( cmd);
 		m_capa.push_back( ' ');
 		m_capa.append( sc.name);

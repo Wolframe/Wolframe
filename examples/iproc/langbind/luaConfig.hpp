@@ -32,8 +32,8 @@
 ************************************************************************/
 ///\file luaConfig.hpp
 ///\brief Configuration of the lua application processor
-#ifndef _iproc_LUA_CONFIG_HPP_INCLUDED
-#define _iproc_LUA_CONFIG_HPP_INCLUDED
+#ifndef _langbind_LUA_CONFIG_HPP_INCLUDED
+#define _langbind_LUA_CONFIG_HPP_INCLUDED
 #include "standardConfigs.hpp"
 #include "config/descriptionBase.hpp"
 #include "protocol/commandHandler.hpp"
