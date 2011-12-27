@@ -63,6 +63,9 @@ else
 LIBDIR=lib
 endif
 
+# default location of system libraries per architecture
+SYSTEM_LIBDIR=/usr/$(LIBDIR)
+
 # platform specific flags
 #########################
 
@@ -553,25 +556,25 @@ ifeq "$(LINUX_DIST)" "redhat"
 
 # Fedora 14 puts Qt in a subdir in /usr/lib
 ifeq "$(LINUX_REV)" "14"
-QT_DIR ?= $(LIBDIR)/qt4
+QT_DIR ?= $(SYSTEM_LIBDIR)/qt4
 QT_INCLUDE_DIR ?= /usr/include
-QT_LIB_DIR ?= $(LIBDIR)
+QT_LIB_DIR ?= $(SYSTEM_LIBDIR)
 QT_MOC ?= $(QT_DIR)/bin/moc
 endif
 
 # Fedora 15 puts Qt in a subdir in /usr/lib
 ifeq "$(LINUX_REV)" "15"
-QT_DIR ?= $(LIBDIR)/qt4
+QT_DIR ?= $(SYSTEM_LIBDIR)/qt4
 QT_INCLUDE_DIR ?= /usr/include
-QT_LIB_DIR ?= $(LIBDIR)
+QT_LIB_DIR ?= $(SYSTEM_LIBDIR)
 QT_MOC ?= $(QT_DIR)/bin/moc
 endif
 
 # Fedora 16 puts Qt in a subdir in /usr/lib
 ifeq "$(LINUX_REV)" "16"
-QT_DIR ?= $(LIBDIR)/qt4
+QT_DIR ?= $(SYSTEM_LIBDIR)/qt4
 QT_INCLUDE_DIR ?= /usr/include
-QT_LIB_DIR ?= $(LIBDIR)
+QT_LIB_DIR ?= $(SYSTEM_LIBDIR)
 QT_MOC ?= $(QT_DIR)/bin/moc
 endif
 
