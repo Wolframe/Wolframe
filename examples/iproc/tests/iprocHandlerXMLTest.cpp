@@ -66,34 +66,34 @@ static const TestDescription testDescriptions[] =
 {
 	{
 		"echo_xml_IsoLatin1_to_utf16",
-		"test_echo_xml_utf16",
+		"test_echo_xml_utf16.lua",
 		"test_IsoLatin1.xml", 96
 	},
 	{
 		"echo_xml_utf16_to_utf8",
-		"test_echo_xml_utf8",
+		"test_echo_xml_utf8.lua",
 		"test_UTF16.xml", 64
 	},
 #ifdef WITH_LIBXML2
 	{
 		"echo_xml_utf8_with_libxml",
-		"test_echo_xml_libxml2",
+		"test_echo_xml_libxml2.lua",
 		"test_UTF8.xml", 48
 	},
 #endif
 	{
 		"echo_xml_IsoLatin1_to_utf8",
-		"test_echo_xml_utf8",
+		"test_echo_xml_utf8.lua",
 		"test_IsoLatin1.xml", 32
 	},
 	{
 		"echo_xml_IsoLatin1",
-		"test_echo_xml",
+		"test_echo_xml.lua",
 		"test_IsoLatin1.xml", 32
 	},
 	{
 		"echo_char_IsoLatin1",
-		"test_echo_char",
+		"test_echo_char.lua",
 		"test_IsoLatin1.xml", 1
 	},
 	{0,0,0,0}
@@ -142,7 +142,7 @@ TEST_F( IProcHandlerXMLTest, tests)
 				std::string testoutput;
 
 				IProcTestConfiguration config(
-						testDescriptions[ti].scriptfile,
+						(boost::filesystem::current_path() / "scripts"/ testDescriptions[ti].scriptfile).string(),
 						BufferSize[ib]+EoDBufferSize,
 						BufferSize[ob]+testDescriptions[ti].elementBuffersize);
 				connection = new iproc::Connection( ep, &config);

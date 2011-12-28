@@ -73,8 +73,6 @@ public:
 	///\brief Get the error code of command execution to be returned to the client
 	int statusCode() const				{return m_statusCode;}
 
-	virtual void run()=0;
-
 private:
 	void terminate( int cd);
 	void flushOutput();

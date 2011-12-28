@@ -262,11 +262,7 @@ static int run( const IProcTestConfiguration& cfg, const std::string& input, std
 		int errorCode = 0;
 		switch (processor.call( errorCode))
 		{
-			case LuaCommandHandler::YieldRead:
-				LOG_ERROR << "unexpected end of input";
-				return 1;
-
-			case LuaCommandHandler::YieldWrite:
+			case LuaCommandHandler::Yield:
 			{
 				void* content = filter.m_formatoutput->ptr();
 				unsigned int contentsize = filter.m_formatoutput->pos();
