@@ -149,8 +149,12 @@ local_test: $(TEST_CPP_BINS)
 	@-echo copy "$(LIBXML2_DIR)\lib\libxml2.dll" tests >> test.bat
 !ENDIF
 	@-echo cd tests >> test.bat
+	@-echo simpleFormCompilerTest.exe >> test.bat
+	@-echo structFiltermapTest.exe >> test.bat
 !IFDEF WITH_LUA
 	@-echo iprocHandlerTest.exe >> test.bat
+	@-echo iprocHandlerXMLTest.exe >> test.bat
+	@-echo structLuamapTest.exe >> test.bat
 !ENDIF
 	@-test.bat
 
