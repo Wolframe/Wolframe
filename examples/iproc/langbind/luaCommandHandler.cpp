@@ -38,7 +38,6 @@ Project Wolframe.
 #include <stdexcept>
 #include <cstddef>
 #include <boost/lexical_cast.hpp>
-/*[-]*/#include <iostream>
 
 extern "C"
 {
@@ -596,40 +595,6 @@ LuaCommandHandler::~LuaCommandHandler()
 	delete m_context;
 }
 
-static LuaCommandHandler::CallResult getYieldState( protocol::InputFilter* in, protocol::FormatOutput* fo, const char* methodName)
-{
-	if (!fo)
-	{
-		LOG_ERROR << "no output specified";
-		return LuaCommandHandler::Error;
-	}
-	if (fo->getError())
-	{
-		const char* msg = fo->getLastError();
-		LOG_ERROR << "error (" << (msg?msg:"unknown") << ") in format output when calling '" << methodName << "'";
-		return LuaCommandHandler::Error;
-	}
-	protocol::InputFilter::State istate = in->state();
-
-	switch (istate)
-	{
-		case protocol::InputFilter::Open:
-			return LuaCommandHandler::YieldWrite;
-
-		case protocol::InputFilter::EndOfMessage:
-			return LuaCommandHandler::YieldRead;
-
-		case protocol::InputFilter::Error:
-		{
-			const char* msg = in->getLastError();
-			LOG_ERROR << "error (" << (msg?msg:"unknown") << ") in input filter when calling '" << methodName << "'";
-			return LuaCommandHandler::Error;
-		}
-	}
-	LOG_ERROR << "illegal state of input filter when calling '" << methodName << "'";
-	return LuaCommandHandler::Error;
-}
-
 LuaCommandHandler::CallResult LuaCommandHandler::call( int& errorCode)
 {
 	int rt = 0;
@@ -690,14 +655,7 @@ LuaCommandHandler::CallResult LuaCommandHandler::call( int& errorCode)
 	}
 	if (rt == LUA_YIELD)
 	{
-		if (m_globals.m_input.m_inputfilter.get())
-		{
-			return getYieldState( m_globals.m_input.m_inputfilter.get(), m_globals.m_output.m_formatoutput.get(), m_config->main().c_str());
-		}
-		else
-		{
-			return YieldWrite;
-		}
+		return Yield;
 	}
 	else if (rt != 0)
 	{

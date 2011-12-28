@@ -977,7 +977,11 @@ public:
 
 	virtual bool print( ElementType, const void*, std::size_t)
 	{
-		if (m_headerPrinted) return false;
+		if (m_headerPrinted)
+		{
+			setState( Open);
+			return false;
+		}
 		if (!m_header)
 		{
 			TextwolfEncoding::Id enc = m_encoding.get()?*m_encoding.get():TextwolfEncoding::UTF8;

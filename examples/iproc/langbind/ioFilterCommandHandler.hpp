@@ -84,47 +84,18 @@ public:
 	{
 		Ok,		///< successful termination of call
 		Error,		///< termination of call with error (not completed)
-		YieldRead,	///< call interrupted with request for more network input
-		YieldWrite	///< call interrupted with request for sending data from the write buffer that is full
+		Yield		///< call interrupted with request for a network operation
 	};
+	static const char* callResultName( CallResult cr)
+	{
+		static const char* ar[] = {"Ok","Error","Yield"};
+		return ar[ (int)cr];
+	}
+
 	///\param[out] errorCode error code in case of error
 	///\return CallResult status of the filter input for the state machine of this command handler
 	virtual CallResult call( int& errorCode)=0;
 
-	virtual void run()
-	{
-		int errorCode = 0;
-		CallResult cr = call( errorCode);
-		switch (cr)
-		{
-			case Ok:
-				if (m_state == Processing)
-				{
-					m_state = DiscardInput;
-				}
-				break;
-
-			case Error:
-				if (m_state == Processing || m_state == FlushingOutput)
-				{
-					m_state = DiscardInput;
-				}
-				m_statusCode = errorCode;
-				break;
-
-			case YieldRead:
-				break;
-
-			case YieldWrite:
-				{
-					if (m_state == Processing)
-					{
-						m_state = FlushingOutput;
-					}
-				}
-				break;
-		}
-	}
 private:
 	enum State
 	{
@@ -133,6 +104,12 @@ private:
 		DiscardInput,
 		Terminated
 	};
+	static const char* stateName( State st)
+	{
+		static const char* ar[] = {"Processing","FlushingOutput","DiscardInput","Terminated"};
+		return ar[ (int)st];
+	}
+
 	State m_state;				///< processing state machine state
 	const void* m_writedata;		///< bytes to write next (WRITE)
 	std::size_t m_writedatasize;		///< number of bytes to write next (WRITE)

@@ -102,9 +102,6 @@ public:
 	///\brief Get the error code of command execution to be returned to the client
 	int statusCode() const				{return m_statusCode;}
 
-	///\brief Run one iteration of processing until the next interation with the connection handler has to be done
-	virtual void run()=0;
-
 protected:
 	std::vector< std::string > m_argBuffer;		///< buffer type for the command arguments
 	int m_statusCode;				///< error code of operation for the client

@@ -45,7 +45,7 @@
 
 #if WITH_LUA
 #include "langbind/appObjects.hpp"
-#include "langbind/luaConfig.hpp"
+#include "langbind/luaCommandConfig.hpp"
 #include "langbind/luaCommandHandler.hpp"
 #endif
 

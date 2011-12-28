@@ -185,7 +185,6 @@ struct Connection::Private
 	{
 		for (;;)
 		{
-			LOG_DATA << "\nState: " << stateName(state) << "(" << modeName(mode) << ")";
 			switch( state)
 			{
 				case Init:

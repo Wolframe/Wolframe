@@ -30,10 +30,10 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file luaConfig.hpp
-///\brief Configuration of the lua application processor
-#ifndef _langbind_LUA_CONFIG_HPP_INCLUDED
-#define _langbind_LUA_CONFIG_HPP_INCLUDED
+///\file luaCommandConfig.hpp
+///\brief Configuration of a command as call to a lua script
+#ifndef _langbind_LUA_COMMAND_CONFIG_HPP_INCLUDED
+#define _langbind_LUA_COMMAND_CONFIG_HPP_INCLUDED
 #include "standardConfigs.hpp"
 #include "config/descriptionBase.hpp"
 #include "protocol/commandHandler.hpp"
@@ -49,7 +49,7 @@ namespace langbind {
 
 
 ///\class Configuration
-///\brief configuration object of a lua command processor
+///\brief configuration object of a command as call to a lua script
 class LuaCommandConfig :public protocol::CommandConfig
 {
 public:

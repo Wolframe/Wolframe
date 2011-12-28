@@ -70,13 +70,17 @@ void IOFilterCommandHandler::setOutputBuffer( void* buf, std::size_t size, std::
 enum
 {
 	ErrFormatOutputDeleted=-1,
-	ErrInputFilterDeleted=-2
+	ErrInputFilterDeleted=-2,
+	ErrFormatOutput=-3,
+	ErrInputFilter=-4,
+	ErrUnknown=-5
 };
 
 CommandHandler::Operation IOFilterCommandHandler::nextOperation()
 {
 	FormatOutput* flt;
-	switch (m_state)
+
+	for (;;) switch (m_state)
 	{
 		case Terminated:
 			return CLOSED;
@@ -85,7 +89,7 @@ CommandHandler::Operation IOFilterCommandHandler::nextOperation()
 			m_state = Processing;
 			if (!(flt = m_formatoutput.get()))
 			{
-				LOG_ERROR << "Output filter deleted";
+				LOG_ERROR << "Output filter undefined";
 				m_statusCode = ErrFormatOutputDeleted;
 				m_state = DiscardInput;
 				return READ;
@@ -118,53 +122,75 @@ CommandHandler::Operation IOFilterCommandHandler::nextOperation()
 			return READ;
 
 		case Processing:
-			if (!m_inputfilter.get())
+			switch (call( m_statusCode))
 			{
-				LOG_ERROR << "Input filter deleted";
-				m_statusCode = ErrInputFilterDeleted;
-				m_state = DiscardInput;
-				return READ;
-			}
-			if (m_inputfilter->size() == 0)
-			{
-				if (m_input.gotEoD())
-				{
-					if (m_formatoutput.get() && m_formatoutput->size())
+				case Ok:
+					m_state = DiscardInput;
+					continue;
+
+				case Error:
+					m_state = DiscardInput;
+					if (m_statusCode == 0)
 					{
-						m_writedata = m_formatoutput->ptr();
-						m_writedatasize = m_formatoutput->size();
+						m_statusCode = ErrUnknown;
+					}
+					continue;
+
+				case Yield:
+					if (m_inputfilter.get())
+					{
+						switch (m_inputfilter->state())
+						{
+							case InputFilter::Open:
+								m_state = FlushingOutput;
+								continue;
+
+							case InputFilter::EndOfMessage:
+								return READ;
+
+							case InputFilter::Error:
+								m_statusCode = ErrInputFilter;
+								m_state = DiscardInput;
+								return READ;
+						}
+					}
+					else if (m_formatoutput.get())
+					{
+						switch (m_formatoutput->state())
+						{
+							case FormatOutput::Open:
+								m_state = FlushingOutput;
+								continue;
+
+							case FormatOutput::EndOfBuffer:
+								m_writedata = m_formatoutput->ptr();
+								m_writedatasize = m_formatoutput->size();
+								if (m_writedatasize > 0)
+								{
+									m_formatoutput->setState( FormatOutput::Open);
+									return WRITE;
+								}
+								/* no break here !*/
+
+							case FormatOutput::Error:
+								m_statusCode = ErrFormatOutput;
+								m_state = DiscardInput;
+								return READ;
+						}
+					}
+					else
+					{
+						m_writedata = "";
+						m_writedatasize = 0;
 						return WRITE;
 					}
-					m_state = Terminated;
-					m_writedata = "\r\n.\r\n";
-					m_writedatasize = std::strlen("\r\n.\r\n");
-					return WRITE;
-				}
-				return READ;
-			}
-			else if (m_formatoutput.get())
-			{
-				if (m_formatoutput->size())
-				{
-					m_writedata = m_formatoutput->ptr();
-					m_writedatasize = m_formatoutput->size();
-					return WRITE;
-				}
-				m_writedata = "";
-				m_writedatasize = 0;
-				return WRITE;
-			}
-			else
-			{
-				LOG_ERROR << "Output filter deleted";
-				m_statusCode = ErrFormatOutputDeleted;
-				m_state = DiscardInput;
-				return READ;
 			}
 	}
 	LOG_ERROR << "illegal state";
 	return CLOSED;
 }
+
+
 
 void IOFilterCommandHandler::putInput( const void *begin, std::size_t bytesTransferred)
 {

@@ -87,7 +87,7 @@ ifeq ($(WITH_LUA),1)
 OBJS += \
 	serialize/struct/luamapBase.o \
 	langbind/luaDebug.o \
-	langbind/luaConfig.o \
+	langbind/luaCommandConfig.o \
 	langbind/luaCommandHandler.o
 endif
 
@@ -129,14 +129,13 @@ local_distclean:
 local_install:
 
 local_test: $(TEST_BINS)
+	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./simpleFormCompilerTest$(EXE)
+	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./structFiltermapTest$(EXE)
 ifeq ($(WITH_LUA),1)
 	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./iprocHandlerTest$(EXE)
+	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./iprocHandlerXMLTest$(EXE)
 	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./structLuamapTest$(EXE)
 endif
-
-#pf:temporary disabled:	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./iprocHandlerXMLTest$(EXE)
-#pf:temporary disabled:	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./simpleFormCompilerTest$(EXE)
-#pf:temporary disabled:	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./structFiltermapTest$(EXE)
 
 run: $(CPP_BINS)
 	@echo "Running the Wolframe iproc example..."

@@ -38,7 +38,6 @@
 #include "filters/char_filter.hpp"
 #include "logger-v1.hpp"
 #include <stdexcept>
-/*[-]*/#include <iostream>
 
 using namespace _Wolframe;
 using namespace _Wolframe::iproc;
@@ -141,8 +140,6 @@ const net::NetworkOperation Connection::nextOperation()
 {
 	for (;;)
 	{
-		LOG_DATA << "ConnectionHandler State: " << stateName(m_state);
-
 		switch( m_state)
 		{
 			case Init:
@@ -259,17 +256,25 @@ const net::NetworkOperation Connection::nextOperation()
 							return WriteLine( "BYE");
 						}
 					default:
-						m_cmdhandler = m_cmds[ m_cmdidx - NofCommands]->create( m_argBuffer.argc(), m_argBuffer.argv());
-						if (m_cmdhandler.get())
+						try
 						{
-							m_state = Processing;
-							m_cmdhandler->setInputBuffer( m_input.ptr(), m_input.size(), m_input.pos(), m_itr-m_input.begin());
-							m_cmdhandler->setOutputBuffer( m_output.ptr(), m_output.size(), m_output.pos());
+							m_cmdhandler = m_cmds[ m_cmdidx - NofCommands]->create( m_argBuffer.argc(), m_argBuffer.argv());
+							if (m_cmdhandler.get())
+							{
+								m_state = Processing;
+								m_cmdhandler->setInputBuffer( m_input.ptr(), m_input.size(), m_input.pos(), m_itr-m_input.begin());
+								m_cmdhandler->setOutputBuffer( m_output.ptr(), m_output.size(), m_output.pos());
+							}
+							else
+							{
+								m_state = ProtocolError;
+								return WriteLine( "BAD command not implemented");
+							}
 						}
-						else
+						catch (std::exception& e)
 						{
-							m_state = ProtocolError;
-							return WriteLine( "BAD command not implemented");
+							LOG_ERROR << "Command handler creation thrown exception: " << e.what();
+							return net::CloseConnection();
 						}
 						continue;
 				}
@@ -284,41 +289,40 @@ const net::NetworkOperation Connection::nextOperation()
 
 				try
 				{
-					m_cmdhandler->run();
+					switch (m_cmdhandler->nextOperation())
+					{
+						case protocol::CommandHandler::READ:
+							return readDataOp();
+						break;
+						case protocol::CommandHandler::WRITE:
+							m_cmdhandler->getOutput( content, contentsize);
+							return net::SendData( content, contentsize);
+						break;
+						case protocol::CommandHandler::CLOSED:
+							m_cmdhandler->getDataLeft( content, contentsize);
+							pos = (const char*)content - m_input.charptr();
+							m_input.setPos( pos + contentsize);
+							m_itr = m_input.at( pos);
+							m_end = m_input.end();
+
+							err = m_cmdhandler.get()->statusCode();
+							m_cmdhandler.reset(0);
+							m_state = EnterCommand;
+							if (err != 0)
+							{
+								return WriteLine( "ERR", err);
+							}
+							else
+							{
+								return WriteLine( "OK");
+							}
+						break;
+					}
 				}
 				catch (std::exception& e)
 				{
 					LOG_ERROR << "Command execution thrown exception: " << e.what();
 					return net::CloseConnection();
-				}
-				switch (m_cmdhandler->nextOperation())
-				{
-					case protocol::CommandHandler::READ:
-						return readDataOp();
-					break;
-					case protocol::CommandHandler::WRITE:
-						m_cmdhandler->getOutput( content, contentsize);
-						return net::SendData( content, contentsize);
-					break;
-					case protocol::CommandHandler::CLOSED:
-						m_cmdhandler->getDataLeft( content, contentsize);
-						pos = (const char*)content - m_input.charptr();
-						m_input.setPos( pos + contentsize);
-						m_itr = m_input.at( pos);
-						m_end = m_input.end();
-
-						err = m_cmdhandler.get()->statusCode();
-						m_cmdhandler.reset(0);
-						m_state = EnterCommand;
-						if (err != 0)
-						{
-							return WriteLine( "ERR", err);
-						}
-						else
-						{
-							return WriteLine( "OK");
-						}
-					break;
 				}
 			}
 
