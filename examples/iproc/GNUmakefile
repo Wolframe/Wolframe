@@ -87,7 +87,7 @@ ifeq ($(WITH_LUA),1)
 OBJS += \
 	serialize/struct/luamapBase.o \
 	langbind/luaDebug.o \
-	langbind/luaConfig.o \
+	langbind/luaCommandConfig.o \
 	langbind/luaCommandHandler.o
 endif
 

@@ -91,7 +91,7 @@ OBJS = \
 	$(OBJS) \
 	serialize\struct\luamapBase.obj \
 	langbind\luaDebug.obj \
-	langbind\luaConfig.obj \
+	langbind\luaCommandConfig.obj \
 	langbind\luaCommandHandler.obj
 !ENDIF
 

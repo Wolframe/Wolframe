@@ -35,7 +35,7 @@ Project Wolframe.
 ///
 #ifndef _Wolframe_langbind_LUA_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_langbind_LUA_COMMAND_HANDLER_HPP_INCLUDED
-#include "luaConfig.hpp"
+#include "luaCommandConfig.hpp"
 #include "appObjects.hpp"
 #include "ioFilterCommandHandler.hpp"
 extern "C"

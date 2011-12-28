@@ -198,8 +198,8 @@ examples/iproc/langbind/ioFilterCommandHandler.cpp
 examples/iproc/langbind/ioFilterCommandHandler.hpp
 examples/iproc/langbind/luaCommandHandler.cpp
 examples/iproc/langbind/luaCommandHandler.hpp
-examples/iproc/langbind/luaConfig.cpp
-examples/iproc/langbind/luaConfig.hpp
+examples/iproc/langbind/luaCommandConfig.cpp
+examples/iproc/langbind/luaCommandConfig.hpp
 examples/iproc/langbind/luaDebug.cpp
 examples/iproc/langbind/luaDebug.hpp
 examples/iproc/langbind/luaTransaction.cpp
