@@ -43,7 +43,7 @@ _Wolframe::log::LogBackend*	logBackendPtr;
 namespace _Wolframe {
 namespace module {
 
-ModuleContainer* createModule( void )
+static ModuleContainer* createModule( void )
 {
 	static module::ContainerDescription< AAAA::DBauditContainer,
 			AAAA::DBauditConfig > mod( "Audit database", "Audit",
@@ -51,13 +51,14 @@ ModuleContainer* createModule( void )
 	return &mod;
 }
 
-void setModuleLogger( void* logger )
+static void setModuleLogger( void* logger )
 {
 	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend* >( logger );
 }
 
 extern "C" {
-	ModuleEntryPoint entryPoint( 0, 0, "Database Audit", createModule, setModuleLogger );
+	ModuleEntryPoint entryPoint( 0, CONTAINER_MODULE, "Database Audit",
+				     createModule, setModuleLogger );
 }
 
 }} // namespace _Wolframe::module
