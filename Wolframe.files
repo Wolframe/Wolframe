@@ -28,6 +28,7 @@ makefiles/nmake/top.mk
 .Attic/AAAA/authentication_sasl.hpp
 .Attic/AAAA/authentication_textfile.cpp
 .Attic/AAAA/authentication_textfile.hpp
+.Attic/AAAA/include/authentication.hpp
 .Attic/AAAA/tests/authTest.cpp
 .Attic/AAAA/tests/GNUmakefile
 .Attic/AAAA/tests/Makefile.W32
@@ -112,11 +113,6 @@ clients/qt/HistoryLineEdit.hpp
 clients/qt/MainWindow.cpp
 clients/qt/MainWindow.hpp
 clients/qt/Makefile.W32
-clients/qt/moc_AbstractFormLoader.cpp
-clients/qt/moc_DebugTerminal.cpp
-clients/qt/moc_HistoryLineEdit.cpp
-clients/qt/moc_MainWindow.cpp
-clients/qt/moc_WolframeClient.cpp
 clients/qt/qtclient.cpp
 clients/qt/README
 clients/qt/TODOS
@@ -331,12 +327,12 @@ include/processor/processor.hpp
 include/processor/procProvider.hpp
 include/protocol/buffers.hpp
 include/protocol/commandHandler.hpp
-include/protocol/lineCommandHandler.hpp
 include/protocol/formatoutput.hpp
 include/protocol.hpp
 include/protocol/inputfilter.hpp
 include/protocol/ioblocks.hpp
 include/protocol/iterators.hpp
+include/protocol/lineCommandHandler.hpp
 include/protocol/parser.hpp
 include/README
 include/serverEndpoint.hpp
@@ -472,7 +468,6 @@ src/libwolframe/referenceConfig.cpp
 src/libwolframe/resolvePath.cpp
 src/loadModules.cpp
 src/loadModules-dummy.cpp
-src/loadModules.hpp
 src/Makefile.W32
 src/modules/audit/database/DBauditConfig.cpp
 src/modules/audit/database/DBaudit.cpp
@@ -545,8 +540,8 @@ src/posixMain.cpp
 src/procProvider.cpp
 src/procProviderImpl.hpp
 src/protocol_commandHandler.cpp
-src/protocol_lineCommandHandler.cpp
 src/protocol_ioblocks.cpp
+src/protocol_lineCommandHandler.cpp
 src/serverConfig.cpp
 src/server.cpp
 src/serverEndpoint.cpp

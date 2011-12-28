@@ -43,19 +43,21 @@ _Wolframe::log::LogBackend*	logBackendPtr;
 namespace _Wolframe {
 namespace module {
 
-extern "C" {
-	ModuleContainer* createModule( void )
-	{
-		static module::ContainerDescription< AAAA::TextFileAuditContainer,
-				AAAA::TextFileAuditConfig > mod( "Audit file", "Audit",
-							     "file", "FileAudit" );
-		return &mod;
-	}
+ModuleContainer* createModule( void )
+{
+	static module::ContainerDescription< AAAA::TextFileAuditContainer,
+			AAAA::TextFileAuditConfig > mod( "Audit file", "Audit",
+						     "file", "FileAudit" );
+	return &mod;
+}
 
-	void setModuleLogger( void* logger )
-	{
-		logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend* >( logger );
-	}
-} // extern "C"
+void setModuleLogger( void* logger )
+{
+	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend* >( logger );
+}
+
+extern "C" {
+	ModuleEntryPoint entryPoint( 0, 0, "Text File Audit", createModule, setModuleLogger );
+}
 
 }} // namespace _Wolframe::module

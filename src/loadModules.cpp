@@ -36,7 +36,6 @@
 
 #include "logger-v1.hpp"
 #include "moduleInterface.hpp"
-#include "loadModules.hpp"
 
 #if !defined(_WIN32)	// POSIX module loader
 
@@ -54,11 +53,10 @@
 			while ( !m_handle.empty())	{
 				dlclose( m_handle.back());
 				m_handle.pop_back();
-				LOG_ALERT << "DLL handle closed.";
 			}
 		}
 
-		void addHandle( void* handle )	{ m_handle.push_back( handle); }
+		void addHandle( void* handle )	{ m_handle.push_back( handle ); }
 	private:
 		std::list< void* >	m_handle;
 
@@ -81,26 +79,19 @@
 				break;
 			}
 
-			CreateFunction create = void_ptr_to_func_ptr_cast<CreateFunction>( dlsym( hndl, "createModule" ) );
-			if ( !create )	{
-				LOG_ERROR << "Module creation entry point: " << dlerror()
+			ModuleEntryPoint* entry = (ModuleEntryPoint*)dlsym( hndl, "entryPoint" );
+			if ( !entry )	{
+				LOG_ERROR << "Module entry point not found: " << dlerror()
 					  << ", (module '" << *it << "')";
 				retVal = false;
 				dlclose( hndl );
 				break;
 			}
 
-			SetModuleLogger setLogger = void_ptr_to_func_ptr_cast<SetModuleLogger>( dlsym( hndl, "setModuleLogger" ) );
-			if ( !setLogger )	{
-				LOG_ERROR << "Module logging entry point: " << dlerror()
-					  << ", (module '" << *it << "')";
-				retVal = false;
-				dlclose( hndl );
-				break;
-			}
-			setLogger( &_Wolframe::log::LogBackend::instance() );
-			modDir.addContainer( create() );
+			entry->setLogger( &_Wolframe::log::LogBackend::instance() );
+			modDir.addContainer( entry->create() );
 			handleList.addHandle( hndl );
+			LOG_DEBUG << "Module '" << entry->name << "' loaded";
 		}
 		return retVal;
 	}
@@ -126,7 +117,7 @@
 			}
 		}
 
-		void addHandle( HMODULE handle )	{ m_handle.push_back( handle); }
+		void addHandle( HMODULE handle )	{ m_handle.push_back( handle ); }
 	private:
 		std::list< HMODULE >	m_handle;
 

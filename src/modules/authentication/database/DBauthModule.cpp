@@ -43,19 +43,21 @@ _Wolframe::log::LogBackend*	logBackendPtr;
 namespace _Wolframe {
 namespace module {
 
-extern "C" {
-	ModuleContainer* createModule( void )
-	{
-		static module::ContainerDescription< AAAA::DBauthContainer,
-				AAAA::DatabaseAuthConfig > mod( "Authentication database", "Authentication",
-								"database", "DatabaseAuth" );
-		return &mod;
-	}
+ModuleContainer* createModule( void )
+{
+	static module::ContainerDescription< AAAA::DBauthContainer,
+			AAAA::DatabaseAuthConfig > mod( "Authentication database", "Authentication",
+							"database", "DatabaseAuth" );
+	return &mod;
+}
 
-	void setModuleLogger( void* logger )
-	{
-		logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend* >( logger );
-	}
-} // extern "C"
+void setModuleLogger( void* logger )
+{
+	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend* >( logger );
+}
+
+extern "C" {
+	ModuleEntryPoint entryPoint( 0, 0, "Database Authentification", createModule, setModuleLogger );
+}
 
 }} // namespace _Wolframe::module

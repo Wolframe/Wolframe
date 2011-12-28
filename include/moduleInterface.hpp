@@ -102,7 +102,7 @@ bool LoadModules( ModulesDirectory& modDir, std::list< std::string >& modFiles )
 
 
 //*********** Module interface *********
-struct ModuleEntry
+struct ModuleEntryPoint
 {
 	unsigned short ifaceVersion;
 	unsigned short moduleType;
@@ -110,9 +110,9 @@ struct ModuleEntry
 	ModuleContainer* (*create)();
 	void (*setLogger)(void*);
 public:
-	ModuleEntry( unsigned short iVer, unsigned short mType, const char* modName,
-		     ModuleContainer* (*createFunc)(),
-		     void (*setLoggerFunc)(void*))
+	ModuleEntryPoint( unsigned short iVer, unsigned short mType, const char* modName,
+			  ModuleContainer* (*createFunc)(),
+			  void (*setLoggerFunc)(void*))
 		: ifaceVersion( iVer ), moduleType( mType ), name( modName ),
 		  create( createFunc ), setLogger( setLoggerFunc )
 	{}

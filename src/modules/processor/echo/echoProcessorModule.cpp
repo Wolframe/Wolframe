@@ -43,19 +43,21 @@ _Wolframe::log::LogBackend*	logBackendPtr;
 namespace _Wolframe {
 namespace module {
 
-extern "C" {
-	ModuleContainer* createModule( void )
-	{
-		static ContainerDescription< EchoProcContainer,
-				EchoProcConfig > mod( "Echo Processor", "processor",
-						      "echoProcessor", "EchoProcessor" );
-		return &mod;
-	}
+ModuleContainer* createModule( void )
+{
+	static ContainerDescription< EchoProcContainer,
+			EchoProcConfig > mod( "Echo Processor", "processor",
+					      "echoProcessor", "EchoProcessor" );
+	return &mod;
+}
 
-	void setModuleLogger( void* logger )
-	{
-		logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend* >( logger );
-	}
-} // extern "C"
+void setModuleLogger( void* logger )
+{
+	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend* >( logger );
+}
+
+extern "C" {
+	ModuleEntryPoint entryPoint( 0, 0, "Echo Processor", createModule, setModuleLogger );
+}
 
 }} // namespace _Wolframe::module

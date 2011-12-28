@@ -43,19 +43,21 @@ _Wolframe::log::LogBackend*	logBackendPtr;
 namespace _Wolframe {
 namespace module {
 
-extern "C" {
-	ModuleContainer* createModule( void )
-	{
-		static module::ContainerDescription< db::SQLiteContainer,
-				db::SQLiteConfig > mod( "SQLite database", "database",
-							"SQLite", "SQLite" );
-		return &mod;
-	}
+ModuleContainer* createModule( void )
+{
+	static module::ContainerDescription< db::SQLiteContainer,
+			db::SQLiteConfig > mod( "SQLite database", "database",
+						"SQLite", "SQLite" );
+	return &mod;
+}
 
-	void setModuleLogger( void* logger )
-	{
-		logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend* >( logger );
-	}
-} // extern "C"
+void setModuleLogger( void* logger )
+{
+	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend* >( logger );
+}
+
+extern "C" {
+	ModuleEntryPoint entryPoint( 0, 0, "SQLite Database", createModule, setModuleLogger );
+}
 
 }} // namespace _Wolframe::module
