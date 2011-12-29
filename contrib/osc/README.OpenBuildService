@@ -27,3 +27,5 @@ osc build xUbuntu_11.04 i586 wolframe.dsc
 abort, use getlocal.pl on the .osc/_buildinfo* file, copy it back
 prepare the /var/tmp/osbuild-packagecache package cache (from CDs,
 mirrors, etc., Xubuntu version loads them directly from the mirrors))
+
+# set use_keyring=0 in the general secion of ~/.oscrc !!

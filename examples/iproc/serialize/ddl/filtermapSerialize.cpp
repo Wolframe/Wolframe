@@ -201,15 +201,15 @@ static bool parseObject( const char* tag, ddl::StructType& st, protocol::InputFi
 	return rt;
 }
 
-bool printObject( const char* tag, const ddl::StructType& st, protocol::FormatOutput*& out, Context& ctx)
+bool printObject( const char* tag, const ddl::StructType& st, protocol::OutputFilter*& out, Context& ctx)
 {
 	switch (st.contentType())
 	{
 		case ddl::StructType::Atomic:
 		{
-			if (tag && !ctx.printElem( protocol::FormatOutput::OpenTag, tag, std::strlen(tag), out)) return false;
-			if (!ctx.printElem( protocol::FormatOutput::Value, st.value().value().c_str(), st.value().value().size(), out)) return false;
-			if (tag && !ctx.printElem( protocol::FormatOutput::CloseTag, "", 0, out)) return false;
+			if (tag && !ctx.printElem( protocol::OutputFilter::OpenTag, tag, std::strlen(tag), out)) return false;
+			if (!ctx.printElem( protocol::OutputFilter::Value, st.value().value().c_str(), st.value().value().size(), out)) return false;
+			if (tag && !ctx.printElem( protocol::OutputFilter::CloseTag, "", 0, out)) return false;
 		}
 		case ddl::StructType::Vector:
 		{
@@ -222,15 +222,15 @@ bool printObject( const char* tag, const ddl::StructType& st, protocol::FormatOu
 		case ddl::StructType::Struct:
 		{
 			bool isContent = false;
-			if (tag && !ctx.printElem( protocol::FormatOutput::OpenTag, tag, std::strlen(tag), out)) return false;
+			if (tag && !ctx.printElem( protocol::OutputFilter::OpenTag, tag, std::strlen(tag), out)) return false;
 
 			ddl::StructType::Map::const_iterator itr=st.begin(), end=st.end();
 			for (std::size_t idx=0; itr != end; ++itr,++idx)
 			{
 				if (!isContent && itr->second.contentType() == ddl::StructType::Atomic && idx >= st.nof_attributes())
 				{
-					if (!ctx.printElem( protocol::FormatOutput::Attribute, itr->first.c_str(), itr->first.size(), out)) return false;
-					if (!ctx.printElem( protocol::FormatOutput::Value, itr->second.value().value().c_str(), itr->second.value().value().size(), out)) return false;
+					if (!ctx.printElem( protocol::OutputFilter::Attribute, itr->first.c_str(), itr->first.size(), out)) return false;
+					if (!ctx.printElem( protocol::OutputFilter::Value, itr->second.value().value().c_str(), itr->second.value().value().size(), out)) return false;
 				}
 				else
 				{
@@ -238,7 +238,7 @@ bool printObject( const char* tag, const ddl::StructType& st, protocol::FormatOu
 					if (!printObject( itr->first.c_str(), itr->second, out, ctx)) return false;
 				}
 			}
-			if (tag && !ctx.printElem( protocol::FormatOutput::CloseTag, "", 0, out)) return false;
+			if (tag && !ctx.printElem( protocol::OutputFilter::CloseTag, "", 0, out)) return false;
 		}
 	}
 	return true;
@@ -250,7 +250,7 @@ bool _Wolframe::serialize::parse( ddl::StructType& st, protocol::InputFilter& fl
 	return parseObject( 0, st, flt, ctx, false);
 }
 
-bool _Wolframe::serialize::print( const ddl::StructType& st, protocol::FormatOutput*& out, Context& ctx)
+bool _Wolframe::serialize::print( const ddl::StructType& st, protocol::OutputFilter*& out, Context& ctx)
 {
 	return printObject( 0, st, out, ctx);
 }

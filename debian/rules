@@ -137,14 +137,14 @@ binary-arch: build install
 #	dh_installinfo
 #	dh_undocumented
 	dh_installchangelogs
-	dh_link
+#	dh_link
 	dh_strip
 	dh_compress
 	dh_fixperms
 	dh_makeshlibs
 	dh_installdeb
 #	dh_perl
-	dh_shlibdeps -Llibwolframe -l/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe
+	dh_shlibdeps -Llibwolframe -ldebian/wolframe/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb

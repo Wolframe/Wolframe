@@ -34,7 +34,7 @@ Project Wolframe.
 #include "textwolf_filter.hpp"
 #include "filters/textwolf_filterBase.hpp"
 #include "protocol/inputfilter.hpp"
-#include "protocol/formatoutput.hpp"
+#include "protocol/outputfilter.hpp"
 #include "textwolf.hpp"
 #include <string>
 #include <cstring>
@@ -49,14 +49,14 @@ using namespace filter;
 
 namespace {
 
-///\class FormatOutputImpl
-///\brief format output filter for XML using textwolf
+///\class OutputFilterImpl
+///\brief output filter filter for XML using textwolf
 ///\tparam IOCharset character set encoding of input and output
 ///\tparam AppCharset character set encoding of the application processor
 template <class IOCharset, class AppCharset=textwolf::charset::UTF8>
-struct FormatOutputImpl :public protocol::FormatOutput, public FilterBase<IOCharset,AppCharset>
+struct OutputFilterImpl :public protocol::OutputFilter, public FilterBase<IOCharset,AppCharset>
 {
-	typedef protocol::FormatOutput Parent;
+	typedef protocol::OutputFilter Parent;
 
 	///\enum ErrorCodes
 	///\brief Enumeration of error codes
@@ -92,7 +92,7 @@ struct FormatOutputImpl :public protocol::FormatOutput, public FilterBase<IOChar
 
 	///\brief Constructor
 	///\param [in] bufsize (optional) size of internal buffer to use (for the tag hierarchy stack)
-	FormatOutputImpl( std::size_t bufsize=TagBufferSize)
+	OutputFilterImpl( std::size_t bufsize=TagBufferSize)
 		:m_tagstk(new char[bufsize?bufsize:(std::size_t)TagBufferSize])
 		,m_tagstksize(bufsize?bufsize:(std::size_t)TagBufferSize)
 		,m_tagstkpos(0)
@@ -101,9 +101,9 @@ struct FormatOutputImpl :public protocol::FormatOutput, public FilterBase<IOChar
 		,m_bufstate(protocol::EscapingBuffer<textwolf::StaticBuffer>::SRC){}
 
 	///\brief Copy constructor
-	///\param [in] o format output to copy
-	FormatOutputImpl( const FormatOutputImpl& o)
-		:protocol::FormatOutput(o)
+	///\param [in] o output filter to copy
+	OutputFilterImpl( const OutputFilterImpl& o)
+		:protocol::OutputFilter(o)
 		,m_tagstk( new char[o.m_tagstksize])
 		,m_tagstksize(o.m_tagstksize)
 		,m_tagstkpos(o.m_tagstkpos)
@@ -116,9 +116,9 @@ struct FormatOutputImpl :public protocol::FormatOutput, public FilterBase<IOChar
 
 	///\brief self copy
 	///\return copy of this
-	virtual protocol::FormatOutput* copy() const
+	virtual protocol::OutputFilter* copy() const
 	{
-		return new FormatOutputImpl( *this);
+		return new OutputFilterImpl( *this);
 	}
 
 	///\brief Get the last error, if the filter got into an error state
@@ -161,12 +161,12 @@ struct FormatOutputImpl :public protocol::FormatOutput, public FilterBase<IOChar
 		return Parent::setValue( name, value);
 	}
 
-	///\brief Implementation of protocol::FormatOutput::print(protocol::FormatOutput::ElementType,const void*,std::size_t)
+	///\brief Implementation of protocol::OutputFilter::print(protocol::OutputFilter::ElementType,const void*,std::size_t)
 	///\param [in] type type of the element to print
 	///\param [in] element pointer to the element to print
 	///\param [in] elementsize size of the element to print in bytes
 	///\return true, if success, false else
-	virtual bool print( protocol::FormatOutput::ElementType type, const void* element, std::size_t elementsize)
+	virtual bool print( protocol::OutputFilter::ElementType type, const void* element, std::size_t elementsize)
 	{
 		protocol::EscapingBuffer<textwolf::StaticBuffer> buf( rest(), restsize(), m_bufstate);
 
@@ -175,7 +175,7 @@ struct FormatOutputImpl :public protocol::FormatOutput, public FilterBase<IOChar
 
 		switch (type)
 		{
-			case protocol::FormatOutput::OpenTag:
+			case protocol::OutputFilter::OpenTag:
 				if (m_pendingOpenTag == true)
 				{
 					FilterBase<IOCharset,AppCharset>::printToBuffer( '>', buf);
@@ -200,7 +200,7 @@ struct FormatOutputImpl :public protocol::FormatOutput, public FilterBase<IOChar
 				m_bufstate = buf.state();
 				return true;
 
-			case protocol::FormatOutput::Attribute:
+			case protocol::OutputFilter::Attribute:
 				if (!m_pendingOpenTag)
 				{
 					setState( Error, ErrIllegalOperation);
@@ -221,7 +221,7 @@ struct FormatOutputImpl :public protocol::FormatOutput, public FilterBase<IOChar
 				m_bufstate = buf.state();
 				return true;
 
-			case protocol::FormatOutput::Value:
+			case protocol::OutputFilter::Value:
 				if (m_xmlstate == Attribute)
 				{
 					printToBufferAttributeValue( (const char*)element, elementsize, buf);
@@ -262,7 +262,7 @@ struct FormatOutputImpl :public protocol::FormatOutput, public FilterBase<IOChar
 				m_bufstate = buf.state();
 				return true;
 
-			case protocol::FormatOutput::CloseTag:
+			case protocol::OutputFilter::CloseTag:
 				if (!topTag( cltag, cltagsize) || !cltagsize)
 				{
 					setState( Error, ErrTagHierarchy);
@@ -520,7 +520,7 @@ struct InputFilterImpl :public protocol::InputFilter, public FilterBase<IOCharse
 	}
 
 	///\brief Copy constructor
-	///\param [in] o format output to copy
+	///\param [in] o output filter to copy
 	InputFilterImpl( const InputFilterImpl& o)
 		:protocol::InputFilter( o)
 		,m_outputbuf(o.m_outputbuf)
@@ -632,7 +632,7 @@ struct InputFilterImpl :public protocol::InputFilter, public FilterBase<IOCharse
 		}
 	};
 
-	///\brief Implementation of protocol::InputFilter::getNext( protocol::FormatOutput::ElementType*, void*, std::size_t, std::size_t*)
+	///\brief Implementation of protocol::InputFilter::getNext( protocol::OutputFilter::ElementType*, void*, std::size_t, std::size_t*)
 	virtual bool getNext( protocol::InputFilter::ElementType* type, void* buffer, std::size_t buffersize, std::size_t* bufferpos)
 	{
 		static const ElementTypeMap tmap;
@@ -895,7 +895,7 @@ private:
 	bool m_doTokenize;
 };
 
-class FormatOutput :public protocol::FormatOutput
+class OutputFilter :public protocol::OutputFilter
 {
 public:
 	///\enum ErrorCodes
@@ -904,68 +904,68 @@ public:
 	{
 		Ok,			///< no error
 		ErrEncoding,		///< tack stack overflow
-		ErrCreateFilter		///< could not format output
+		ErrCreateFilter		///< could not output filter
 	};
 
 public:
-	FormatOutput( const CountedReference<TextwolfEncoding::Id>& enc, std::size_t tagbufsize)
+	OutputFilter( const CountedReference<TextwolfEncoding::Id>& enc, std::size_t tagbufsize)
 		:m_tagbuffersize(tagbufsize)
 		,m_headerPrinted(false)
 		,m_headerPos(0)
 		,m_header(0)
 		,m_encoding(enc){}
 
-	FormatOutput( const FormatOutput& o)
-		:protocol::FormatOutput(o)
+	OutputFilter( const OutputFilter& o)
+		:protocol::OutputFilter(o)
 		,m_tagbuffersize(o.m_tagbuffersize)
 		,m_headerPrinted(o.m_headerPrinted)
 		,m_headerPos(o.m_headerPos)
 		,m_header(o.m_header)
 		,m_encoding(o.m_encoding){}
 
-	virtual ~FormatOutput(){}
+	virtual ~OutputFilter(){}
 
-	virtual FormatOutput* copy() const
+	virtual OutputFilter* copy() const
 	{
-		return new FormatOutput( *this);
+		return new OutputFilter( *this);
 	}
 
-	virtual protocol::FormatOutput* createFollow()
+	virtual protocol::OutputFilter* createFollow()
 	{
 		if (!m_headerPrinted) return 0;
 		TextwolfEncoding::Id enc = m_encoding.get()?*m_encoding.get():TextwolfEncoding::UTF8;
-		protocol::FormatOutput* rt = 0;
+		protocol::OutputFilter* rt = 0;
 		switch (enc)
 		{
 			case TextwolfEncoding::Unknown:
 				setState( Error, ErrEncoding);
 				return false;
 			case TextwolfEncoding::IsoLatin:
-				rt = new FormatOutputImpl<textwolf::charset::IsoLatin1>( m_tagbuffersize);
+				rt = new OutputFilterImpl<textwolf::charset::IsoLatin1>( m_tagbuffersize);
 				break;
 			case TextwolfEncoding::UTF8:
-				rt = new FormatOutputImpl<textwolf::charset::UTF8>( m_tagbuffersize);
+				rt = new OutputFilterImpl<textwolf::charset::UTF8>( m_tagbuffersize);
 				break;
 			case TextwolfEncoding::UTF16:
-				rt = new FormatOutputImpl<textwolf::charset::UTF16BE>( m_tagbuffersize);
+				rt = new OutputFilterImpl<textwolf::charset::UTF16BE>( m_tagbuffersize);
 				break;
 			case TextwolfEncoding::UTF16BE:
-				rt = new FormatOutputImpl<textwolf::charset::UTF16BE>( m_tagbuffersize);
+				rt = new OutputFilterImpl<textwolf::charset::UTF16BE>( m_tagbuffersize);
 				break;
 			case TextwolfEncoding::UTF16LE:
-				rt = new FormatOutputImpl<textwolf::charset::UTF16LE>( m_tagbuffersize);
+				rt = new OutputFilterImpl<textwolf::charset::UTF16LE>( m_tagbuffersize);
 				break;
 			case TextwolfEncoding::UCS2BE:
-				rt = new FormatOutputImpl<textwolf::charset::UCS2BE>( m_tagbuffersize);
+				rt = new OutputFilterImpl<textwolf::charset::UCS2BE>( m_tagbuffersize);
 				break;
 			case TextwolfEncoding::UCS2LE:
-				rt = new FormatOutputImpl<textwolf::charset::UCS2LE>( m_tagbuffersize);
+				rt = new OutputFilterImpl<textwolf::charset::UCS2LE>( m_tagbuffersize);
 				break;
 			case TextwolfEncoding::UCS4BE:
-				rt = new FormatOutputImpl<textwolf::charset::UCS4BE>( m_tagbuffersize);
+				rt = new OutputFilterImpl<textwolf::charset::UCS4BE>( m_tagbuffersize);
 				break;
 			case TextwolfEncoding::UCS4LE:
-				rt = new FormatOutputImpl<textwolf::charset::UCS4LE>( m_tagbuffersize);
+				rt = new OutputFilterImpl<textwolf::charset::UCS4LE>( m_tagbuffersize);
 				break;
 		}
 		if (rt)
@@ -1044,7 +1044,7 @@ TextwolfXmlFilter::TextwolfXmlFilter( std::size_t elementbufsize, std::size_t ta
 {
 	CountedReference<TextwolfEncoding::Id> enc;
 	m_inputFilter.reset( new InputFilter( enc, elementbufsize));
-	m_formatOutput.reset( new FormatOutput( enc, tagbufsize));
+	m_outputFilter.reset( new OutputFilter( enc, tagbufsize));
 }
 
 TextwolfXmlFilter::TextwolfXmlFilter( std::size_t, std::size_t tagbufsize, const char* encoding)
@@ -1052,6 +1052,6 @@ TextwolfXmlFilter::TextwolfXmlFilter( std::size_t, std::size_t tagbufsize, const
 	TextwolfEncoding::Id ei = TextwolfEncoding::getId( encoding);
 	CountedReference<TextwolfEncoding::Id> enc( new TextwolfEncoding::Id( ei));
 	m_inputFilter.reset( 0);
-	m_formatOutput.reset( new FormatOutput( enc, tagbufsize));
+	m_outputFilter.reset( new OutputFilter( enc, tagbufsize));
 }
 

@@ -31,13 +31,13 @@ Project Wolframe.
 ************************************************************************/
 ///
 ///\file appObjects.cpp
-///\brief interface implementation for application processor scripting language to system objects
+///\brief implementation of scripting language objects
 ///
 
 #include "appObjects.hpp"
 #include "logger-v1.hpp"
 #include "protocol/inputfilter.hpp"
-#include "protocol/formatoutput.hpp"
+#include "protocol/outputfilter.hpp"
 #include <boost/algorithm/string.hpp>
 #include "filters.hpp"
 
@@ -180,32 +180,32 @@ Filter::Filter( const char* name, unsigned int ib, unsigned int ob)
 	{
 		filter::CharFilter flt( name+5);
 		m_inputfilter = flt.inputFilter();
-		m_formatoutput = flt.formatOutput();
+		m_outputfilter = flt.outputFilter();
 	}
 	else if (startsWith( name, "line:"))
 	{
 		filter::LineFilter flt( name+5, ib?ib:2048);
 		m_inputfilter = flt.inputFilter();
-		m_formatoutput = flt.formatOutput();
+		m_outputfilter = flt.outputFilter();
 	}
 	else if (equalIdent( name, "xml:textwolf"))
 	{
 		filter::TextwolfXmlFilter tw( ib?ib:4096, ob?ob:1024);
 		m_inputfilter = tw.inputFilter();
-		m_formatoutput = tw.formatOutput();
+		m_outputfilter = tw.outputFilter();
 	}
 	else if (startsWith( name, "xml:textwolf:"))
 	{
 		filter::TextwolfXmlFilter tw( ib?ib:4096, ob?ob:1024, name+strlen("xml:textwolf:"));
 		m_inputfilter = tw.inputFilter();
-		m_formatoutput = tw.formatOutput();
+		m_outputfilter = tw.outputFilter();
 	}
 #ifdef WITH_LIBXML2
 	else if (equalIdent( name, "xml:libxml2"))
 	{
 		filter::Libxml2Filter tw( ib?ib:4096);
 		m_inputfilter = tw.inputFilter();
-		m_formatoutput = tw.formatOutput();
+		m_outputfilter = tw.outputFilter();
 	}
 #endif
 	else
@@ -216,7 +216,7 @@ Filter::Filter( const char* name, unsigned int ib, unsigned int ob)
 
 Output::ItemType Output::print( const char* tag, unsigned int tagsize, const char* val, unsigned int valsize)
 {
-	if (!m_formatoutput.get())
+	if (!m_outputfilter.get())
 	{
 		LOG_ERROR << "no output sink defined (output ignored)";
 		return Error;
@@ -230,29 +230,29 @@ Output::ItemType Output::print( const char* tag, unsigned int tagsize, const cha
 				switch (m_state)
 				{
 					case 0:
-						if (!m_formatoutput->print( protocol::FormatOutput::Attribute, tag, tagsize)) break;
+						if (!m_outputfilter->print( protocol::OutputFilter::Attribute, tag, tagsize)) break;
 						m_state ++;
 					case 1:
-						if (!m_formatoutput->print( protocol::FormatOutput::Value, val, valsize)) break;
+						if (!m_outputfilter->print( protocol::OutputFilter::Value, val, valsize)) break;
 						m_state ++;
 					case 2:
 						m_state = 0;
 						return Data;
 				}
-				int err = m_formatoutput->getError();
+				int err = m_outputfilter->getError();
 				if (err)
 				{
-					const char* msg = m_formatoutput->getLastError();
-					LOG_ERROR << "error in format output (" << err << " " << (msg?msg:"") << ")";
+					const char* msg = m_outputfilter->getLastError();
+					LOG_ERROR << "error in output filter (" << err << " " << (msg?msg:"") << ")";
 					return Error;
 				}
-				else if (m_formatoutput->state() != protocol::FormatOutput::EndOfBuffer)
+				else if (m_outputfilter->state() != protocol::OutputFilter::EndOfBuffer)
 				{
 					// in case of return false and no error check if there is a follow format ouptut filter to continue with:
-					protocol::FormatOutput* follow = m_formatoutput->createFollow();
+					protocol::OutputFilter* follow = m_outputfilter->createFollow();
 					if (follow)
 					{
-						m_formatoutput.reset( follow);
+						m_outputfilter.reset( follow);
 						return print( tag, tagsize, val, valsize);
 					}
 
@@ -261,22 +261,22 @@ Output::ItemType Output::print( const char* tag, unsigned int tagsize, const cha
 			}
 			else
 			{
-				if (!m_formatoutput->print( protocol::FormatOutput::OpenTag, tag, tagsize))
+				if (!m_outputfilter->print( protocol::OutputFilter::OpenTag, tag, tagsize))
 				{
-					int err = m_formatoutput->getError();
+					int err = m_outputfilter->getError();
 					if (err)
 					{
-						const char* msg = m_formatoutput->getLastError();
-						LOG_ERROR << "error in format output open tag (" << err << " " << (msg?msg:"") << ")";
+						const char* msg = m_outputfilter->getLastError();
+						LOG_ERROR << "error in output filter open tag (" << err << " " << (msg?msg:"") << ")";
 						return Error;
 					}
-					else  if (m_formatoutput->state() != protocol::FormatOutput::EndOfBuffer)
+					else  if (m_outputfilter->state() != protocol::OutputFilter::EndOfBuffer)
 					{
 						// in case of return false and no error check if there is a follow format ouptut filter to continue with:
-						protocol::FormatOutput* follow = m_formatoutput->createFollow();
+						protocol::OutputFilter* follow = m_outputfilter->createFollow();
 						if (follow)
 						{
-							m_formatoutput.reset( follow);
+							m_outputfilter.reset( follow);
 							return print( tag, tagsize, val, valsize);
 						}
 					}
@@ -287,22 +287,22 @@ Output::ItemType Output::print( const char* tag, unsigned int tagsize, const cha
 		}
 		else if (val)
 		{
-			if (!m_formatoutput->print( protocol::FormatOutput::Value, val, valsize))
+			if (!m_outputfilter->print( protocol::OutputFilter::Value, val, valsize))
 			{
-				int err = m_formatoutput->getError();
+				int err = m_outputfilter->getError();
 				if (err)
 				{
-					const char* msg = m_formatoutput->getLastError();
-					LOG_ERROR << "error in format output value (" << err << " " << (msg?msg:"") << ")";
+					const char* msg = m_outputfilter->getLastError();
+					LOG_ERROR << "error in output filter value (" << err << " " << (msg?msg:"") << ")";
 					return Error;
 				}
-				else if (m_formatoutput->state() != protocol::FormatOutput::EndOfBuffer)
+				else if (m_outputfilter->state() != protocol::OutputFilter::EndOfBuffer)
 				{
 					// in case of return false and no error check if there is a follow format ouptut filter to continue with:
-					protocol::FormatOutput* follow = m_formatoutput->createFollow();
+					protocol::OutputFilter* follow = m_outputfilter->createFollow();
 					if (follow)
 					{
-						m_formatoutput.reset( follow);
+						m_outputfilter.reset( follow);
 						return print( tag, tagsize, val, valsize);
 					}
 				}
@@ -312,22 +312,22 @@ Output::ItemType Output::print( const char* tag, unsigned int tagsize, const cha
 		}
 		else
 		{
-			if (!m_formatoutput->print( protocol::FormatOutput::CloseTag, 0, 0))
+			if (!m_outputfilter->print( protocol::OutputFilter::CloseTag, 0, 0))
 			{
-				int err = m_formatoutput->getError();
+				int err = m_outputfilter->getError();
 				if (err)
 				{
-					const char* msg = m_formatoutput->getLastError();
-					LOG_ERROR << "error in format output close tag (" << err << " " << (msg?msg:"") << ")";
+					const char* msg = m_outputfilter->getLastError();
+					LOG_ERROR << "error in output filter close tag (" << err << " " << (msg?msg:"") << ")";
 					return Error;
 				}
-				else if (m_formatoutput->state() != protocol::FormatOutput::EndOfBuffer)
+				else if (m_outputfilter->state() != protocol::OutputFilter::EndOfBuffer)
 				{
 					// in case of return false and no error check if there is a follow format ouptut filter to continue with:
-					protocol::FormatOutput* follow = m_formatoutput->createFollow();
+					protocol::OutputFilter* follow = m_outputfilter->createFollow();
 					if (follow)
 					{
-						m_formatoutput.reset( follow);
+						m_outputfilter.reset( follow);
 						return print( tag, tagsize, val, valsize);
 					}
 				}
@@ -338,7 +338,7 @@ Output::ItemType Output::print( const char* tag, unsigned int tagsize, const cha
 	}
 	catch (std::bad_alloc)
 	{
-		LOG_ERROR << "out of memory in format output";
+		LOG_ERROR << "out of memory in output filter";
 		return Error;
 	}
 }

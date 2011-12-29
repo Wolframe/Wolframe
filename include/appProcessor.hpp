@@ -68,8 +68,8 @@ public:
 
 	///\brief Define input and output interface of the application processor
 	///\param[in] in input filter reference
-	///\param[in] out format output reference
-	virtual void setIO( const protocol::InputFilterR& in, const protocol::FormatOutputR& out)=0;
+	///\param[in] out output filter reference
+	virtual void setIO( const protocol::InputFilterR& in, const protocol::OutputFilterR& out)=0;
 
 	///\brief Function call of an application processor script function
 	///\param[in] argc number of arguments inclusing the script function name as first argument

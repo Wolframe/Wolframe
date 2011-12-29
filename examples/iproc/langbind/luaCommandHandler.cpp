@@ -33,7 +33,7 @@ Project Wolframe.
 #include "luaDebug.hpp"
 #include "appObjects.hpp"
 #include "logger-v1.hpp"
-#include "protocol/formatoutput.hpp"
+#include "protocol/outputfilter.hpp"
 #include "protocol/inputfilter.hpp"
 #include <stdexcept>
 #include <cstddef>
@@ -388,7 +388,7 @@ static int function_output_print( lua_State* ls)
 		}
 		else
 		{
-			return luaL_error( ls, "too many arguments in call of format output print");
+			return luaL_error( ls, "too many arguments in call of output filter print");
 		}
 		switch (output->print( item[1]/*tag*/, itemsize[1], item[0]/*val*/, itemsize[0]))
 		{
@@ -397,14 +397,14 @@ static int function_output_print( lua_State* ls)
 				continue;
 
 			case Output::Error:
-				msg = output->m_formatoutput->getLastError();
-				luaL_error( ls, "error in format output print (%s)", msg?msg:"unknown");
+				msg = output->m_outputfilter->getLastError();
+				luaL_error( ls, "error in output filter print (%s)", msg?msg:"unknown");
 				return 0;
 
 			case Output::Data:
 				return 0;
 		}
-		luaL_error( ls, "illegal state produced by format output print");
+		luaL_error( ls, "illegal state produced by output filter print");
 		return 0;
 	}
 }
@@ -491,20 +491,20 @@ static int function_output_as( lua_State* ls)
 		const char* tn = lua_typename( ls, lua_type( ls, 2));
 		luaL_error( ls, "filter type value expected as first argument of output:as instead of %s", tn?tn:"UNKNOWN");
 	}
-	protocol::FormatOutput* ff = 0;
-	if (filter->m_formatoutput.get())
+	protocol::OutputFilter* ff = 0;
+	if (filter->m_outputfilter.get())
 	{
-		ff = filter->m_formatoutput->copy();
-		if (output->m_formatoutput.get())
+		ff = filter->m_outputfilter->copy();
+		if (output->m_outputfilter.get())
 		{
-			ff->assignContent( *output->m_formatoutput);
+			ff->assignContent( *output->m_outputfilter);
 		}
 	}
 	else
 	{
 		luaL_error( ls, "output:as called with a filter with undefined output");
 	}
-	output->m_formatoutput.reset( ff);
+	output->m_outputfilter.reset( ff);
 	return 0;
 }
 
@@ -582,7 +582,7 @@ LuaCommandHandler::LuaCommandHandler( const LuaCommandConfig* config)
 {
 	m_context = new Context( *config);
 	m_globals.m_input.m_inputfilter = m_inputfilter;
-	m_globals.m_output.m_formatoutput = m_formatoutput;
+	m_globals.m_output.m_outputfilter = m_outputfilter;
 	LuaObject<Input>::createGlobal( m_context->ls, "input", m_globals.m_input, input_methodtable);
 	LuaObject<Output>::createGlobal( m_context->ls, "output", m_globals.m_output, output_methodtable);
 	LuaObject<Filter>::create( m_context->ls, &function__LuaObject__index<Filter>, &function__LuaObject__newindex<Filter>);
@@ -629,9 +629,9 @@ LuaCommandHandler::CallResult LuaCommandHandler::call( int& errorCode)
 				return Error;
 			}
 		}
-		if (m_formatoutput.get())
+		if (m_outputfilter.get())
 		{
-			m_globals.m_output.m_formatoutput = m_formatoutput;
+			m_globals.m_output.m_outputfilter = m_outputfilter;
 			if (!LuaObject<Output>::setGlobal( m_context->ls, "output", m_globals.m_output))
 			{
 				LOG_ERROR << "Failed to initialize output. It possibly has been redefined as a value of different type";

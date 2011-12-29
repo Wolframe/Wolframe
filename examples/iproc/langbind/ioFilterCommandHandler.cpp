@@ -47,7 +47,7 @@ IOFilterCommandHandler::IOFilterCommandHandler()
 {
 	filter::CharFilter flt( "UTF-8");
 	m_inputfilter = flt.inputFilter();
-	m_formatoutput = flt.formatOutput();
+	m_outputfilter = flt.outputFilter();
 }
 
 void IOFilterCommandHandler::setInputBuffer( void* buf, std::size_t allocsize, std::size_t size, std::size_t itrpos)
@@ -64,21 +64,21 @@ void IOFilterCommandHandler::setInputBuffer( void* buf, std::size_t allocsize, s
 
 void IOFilterCommandHandler::setOutputBuffer( void* buf, std::size_t size, std::size_t pos)
 {
-	if (m_formatoutput.get()) m_formatoutput->init( (char*)buf+pos, size-pos);
+	if (m_outputfilter.get()) m_outputfilter->init( (char*)buf+pos, size-pos);
 }
 
 enum
 {
-	ErrFormatOutputDeleted=-1,
+	ErrOutputFilterDeleted=-1,
 	ErrInputFilterDeleted=-2,
-	ErrFormatOutput=-3,
+	ErrOutputFilter=-3,
 	ErrInputFilter=-4,
 	ErrUnknown=-5
 };
 
 CommandHandler::Operation IOFilterCommandHandler::nextOperation()
 {
-	FormatOutput* flt;
+	OutputFilter* flt;
 
 	for (;;) switch (m_state)
 	{
@@ -87,10 +87,10 @@ CommandHandler::Operation IOFilterCommandHandler::nextOperation()
 
 		case FlushingOutput:
 			m_state = Processing;
-			if (!(flt = m_formatoutput.get()))
+			if (!(flt = m_outputfilter.get()))
 			{
 				LOG_ERROR << "Output filter undefined";
-				m_statusCode = ErrFormatOutputDeleted;
+				m_statusCode = ErrOutputFilterDeleted;
 				m_state = DiscardInput;
 				return READ;
 			}
@@ -100,7 +100,7 @@ CommandHandler::Operation IOFilterCommandHandler::nextOperation()
 			return WRITE;
 
 		case DiscardInput:
-			flt = m_formatoutput.get();
+			flt = m_outputfilter.get();
 			if (flt)
 			{
 				m_writedatasize=flt->pos();
@@ -113,7 +113,7 @@ CommandHandler::Operation IOFilterCommandHandler::nextOperation()
 			}
 			if (m_input.gotEoD())
 			{
-				m_formatoutput.reset(0);
+				m_outputfilter.reset(0);
 				m_writedata = "\r\n.\r\n";
 				m_writedatasize = std::strlen("\r\n.\r\n");
 				m_state = Terminated;
@@ -154,26 +154,26 @@ CommandHandler::Operation IOFilterCommandHandler::nextOperation()
 								return READ;
 						}
 					}
-					else if (m_formatoutput.get())
+					else if (m_outputfilter.get())
 					{
-						switch (m_formatoutput->state())
+						switch (m_outputfilter->state())
 						{
-							case FormatOutput::Open:
+							case OutputFilter::Open:
 								m_state = FlushingOutput;
 								continue;
 
-							case FormatOutput::EndOfBuffer:
-								m_writedata = m_formatoutput->ptr();
-								m_writedatasize = m_formatoutput->size();
+							case OutputFilter::EndOfBuffer:
+								m_writedata = m_outputfilter->ptr();
+								m_writedatasize = m_outputfilter->size();
 								if (m_writedatasize > 0)
 								{
-									m_formatoutput->setState( FormatOutput::Open);
+									m_outputfilter->setState( OutputFilter::Open);
 									return WRITE;
 								}
 								/* no break here !*/
 
-							case FormatOutput::Error:
-								m_statusCode = ErrFormatOutput;
+							case OutputFilter::Error:
+								m_statusCode = ErrOutputFilter;
 								m_state = DiscardInput;
 								return READ;
 						}

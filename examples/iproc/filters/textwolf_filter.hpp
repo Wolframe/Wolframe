@@ -35,7 +35,7 @@ Project Wolframe.
 #ifndef _Wolframe_TEXTWOLF_FILTER_XML_HPP_INCLUDED
 #define _Wolframe_TEXTWOLF_FILTER_XML_HPP_INCLUDED
 #include "protocol/inputfilter.hpp"
-#include "protocol/formatoutput.hpp"
+#include "protocol/outputfilter.hpp"
 #include <string>
 #include <cstddef>
 
@@ -48,15 +48,15 @@ class TextwolfXmlFilter
 public:
 	TextwolfXmlFilter( std::size_t elementbufsize, std::size_t tagbufsize);
 
-	///\remark creates only a format output of the filter, because input should be determined always by the XML header
+	///\remark creates only a output filter of the filter, because input should be determined always by the XML header
 	TextwolfXmlFilter( std::size_t elementbufsize, std::size_t tagbufsize, const char* encoding);
 
 	protocol::InputFilterR inputFilter() const	{return m_inputFilter;}
-	protocol::FormatOutputR formatOutput() const	{return m_formatOutput;}
+	protocol::OutputFilterR outputFilter() const	{return m_outputFilter;}
 
 private:
 	protocol::InputFilterR m_inputFilter;
-	protocol::FormatOutputR m_formatOutput;
+	protocol::OutputFilterR m_outputFilter;
 };
 
 

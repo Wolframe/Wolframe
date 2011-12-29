@@ -53,9 +53,9 @@ public:
 		m_inputfilter = in;
 	}
 
-	void setFilter( const protocol::FormatOutputR& out)
+	void setFilter( const protocol::OutputFilterR& out)
 	{
-		m_formatoutput = out;
+		m_outputfilter = out;
 	}
 	///\brief See Parent::setInputBuffer(void*,std::size_t,std::size_t,std::size_t)
 	virtual void setInputBuffer( void* buf, std::size_t allocsize, std::size_t size, std::size_t itrpos);
@@ -119,7 +119,7 @@ private:
 
 protected:
 	InputFilterR m_inputfilter;		///< network input interface for the interpreter
-	FormatOutputR m_formatoutput;		///< network output interface for the interpreter
+	OutputFilterR m_outputfilter;		///< network output interface for the interpreter
 };
 }}
 #endif

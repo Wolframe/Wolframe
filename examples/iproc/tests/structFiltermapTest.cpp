@@ -190,7 +190,7 @@ static int run( const char* root, const std::string& input, std::string& output)
 {
 	langbind::Filter filter( "xml:textwolf", 1024, 1024);
 	protocol::InputFilter* in = filter.m_inputfilter.get();
-	protocol::FormatOutput* out = filter.m_formatoutput.get();
+	protocol::OutputFilter* out = filter.m_outputfilter.get();
 
 	if (!in)
 	{
@@ -199,7 +199,7 @@ static int run( const char* root, const std::string& input, std::string& output)
 	}
 	if (!out)
 	{
-		LOG_ERROR << "error in serialization: no valid format output defined";
+		LOG_ERROR << "error in serialization: no valid output filter defined";
 		return 2;
 	}
 	Struct object;

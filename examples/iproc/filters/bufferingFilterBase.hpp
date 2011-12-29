@@ -62,7 +62,7 @@ struct BufferingInputFilter :public protocol::InputFilter
 	~BufferingInputFilter(){}
 
 	///\brief Copy constructor
-	///\param [in] o format output to copy
+	///\param [in] o output filter to copy
 	BufferingInputFilter( const BufferingInputFilter& o)
 		:protocol::InputFilter(o),m_inputConsumed(o.m_inputConsumed),m_buffer(o.m_buffer),m_content(o.m_content){}
 
