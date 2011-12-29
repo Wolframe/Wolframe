@@ -224,7 +224,7 @@ Ubuntu 11.10
 ------------
 
 Optional packages: libssl-dev (1.0.0e), libqt4-dev (4.7.4),
-                   libpam-dev (1.1.3), libsasl2-dev (2.1.24),
+                   libpam0g-dev (1.1.3), libsasl2-dev (2.1.24),
                    libsqlite3-dev (3.7.7), libpq-dev (9.1.1),
                    libxml2-dev (2.7.8), libxslt1-dev (1.1.26)
                    libboost-dev (1.46), libboost-program-options1.46-dev,
