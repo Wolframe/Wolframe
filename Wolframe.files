@@ -332,7 +332,7 @@ include/processor/procProvider.hpp
 include/protocol/buffers.hpp
 include/protocol/commandHandler.hpp
 include/protocol/lineCommandHandler.hpp
-include/protocol/formatoutput.hpp
+include/protocol/outputfilter.hpp
 include/protocol.hpp
 include/protocol/inputfilter.hpp
 include/protocol/ioblocks.hpp

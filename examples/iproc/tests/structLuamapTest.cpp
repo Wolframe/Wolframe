@@ -238,7 +238,7 @@ static int run( const IProcTestConfiguration& cfg, const std::string& input, std
 	char outputbuf[ 8192];
 	langbind::Filter filter( "xml:textwolf", 1024, 1024);
 	protocol::InputFilter* in = filter.m_inputfilter.get();
-	protocol::FormatOutput* out = filter.m_formatoutput.get();
+	protocol::OutputFilter* out = filter.m_outputfilter.get();
 	if (!in)
 	{
 		LOG_ERROR << "error in serialization: no valid input filter defined";
@@ -246,7 +246,7 @@ static int run( const IProcTestConfiguration& cfg, const std::string& input, std
 	}
 	if (!out)
 	{
-		LOG_ERROR << "error in serialization: no valid format output defined";
+		LOG_ERROR << "error in serialization: no valid output filter defined";
 		return 2;
 	}
 	LuaCommandHandler processor( &cfg);
@@ -256,7 +256,7 @@ static int run( const IProcTestConfiguration& cfg, const std::string& input, std
 
 	in->protocolInput( (void*)input.c_str(), input.size(), true);
 	processor.setFilter( filter.m_inputfilter);
-	processor.setFilter( filter.m_formatoutput);
+	processor.setFilter( filter.m_outputfilter);
 	for (;;)
 	{
 		int errorCode = 0;
@@ -264,20 +264,20 @@ static int run( const IProcTestConfiguration& cfg, const std::string& input, std
 		{
 			case LuaCommandHandler::Yield:
 			{
-				void* content = filter.m_formatoutput->ptr();
-				unsigned int contentsize = filter.m_formatoutput->pos();
+				void* content = filter.m_outputfilter->ptr();
+				unsigned int contentsize = filter.m_outputfilter->pos();
 				output.append( (char*)content, contentsize);
-				filter.m_formatoutput->release();
-				filter.m_formatoutput->init( outputbuf, sizeof(outputbuf));
+				filter.m_outputfilter->release();
+				filter.m_outputfilter->init( outputbuf, sizeof(outputbuf));
 				break;
 			}
 
 			case LuaCommandHandler::Ok:
 			{
-				void* content = filter.m_formatoutput->ptr();
-				unsigned int contentsize = filter.m_formatoutput->pos();
+				void* content = filter.m_outputfilter->ptr();
+				unsigned int contentsize = filter.m_outputfilter->pos();
 				output.append( (char*)content, contentsize);
-				filter.m_formatoutput->release();
+				filter.m_outputfilter->release();
 				return 0;
 			}
 

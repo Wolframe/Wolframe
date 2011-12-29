@@ -257,7 +257,7 @@ struct InputFilterImpl :public BufferingInputFilter<Content>
 };
 
 
-class FormatOutputImpl :public protocol::FormatOutput
+class OutputFilterImpl :public protocol::OutputFilter
 {
 public:
 	enum Error
@@ -340,7 +340,7 @@ public:
 			bool rt = true;
 			switch (type)
 			{
-				case protocol::FormatOutput::OpenTag:
+				case protocol::OutputFilter::OpenTag:
 					m_attribname.clear();
 					if (m_taglevel == 0)
 					{
@@ -362,7 +362,7 @@ public:
 					m_taglevel += 1;
 					break;
 
-				case protocol::FormatOutput::Attribute:
+				case protocol::OutputFilter::Attribute:
 					if (m_attribname.size())
 					{
 						m_error = ErrIllegalOperation;
@@ -372,7 +372,7 @@ public:
 					m_attribname.append( (const char*)element, elementsize);
 					break;
 
-				case protocol::FormatOutput::Value:
+				case protocol::OutputFilter::Value:
 					if (m_attribname.empty())
 					{
 						if (0>xmlTextWriterWriteString( m_writer, getElement( element, elementsize)))
@@ -392,7 +392,7 @@ public:
 					}
 					break;
 
-				case protocol::FormatOutput::CloseTag:
+				case protocol::OutputFilter::CloseTag:
 					if (0>xmlTextWriterEndElement( m_writer))
 					{
 						m_error = ErrLibXMLEndElement;
@@ -480,18 +480,18 @@ public:
 			incPos( nn);
 			if (dc->m_contentitr == dc->m_contentend)
 			{
-				setState( protocol::FormatOutput::Open);
+				setState( protocol::OutputFilter::Open);
 				rt = true;
 			}
 			else
 			{
-				setState( protocol::FormatOutput::EndOfBuffer);
+				setState( protocol::OutputFilter::EndOfBuffer);
 				rt = false;
 			}
 		}
 		else
 		{
-			setState( protocol::FormatOutput::Open);
+			setState( protocol::OutputFilter::Open);
 		}
 		return rt;
 	}
@@ -519,34 +519,34 @@ public:
 			}
 			else
 			{
-				setState( protocol::FormatOutput::Open);
+				setState( protocol::OutputFilter::Open);
 				rt = true;
 			}
 		}
 		else
 		{
-			setState( protocol::FormatOutput::Error, dc->m_error);
+			setState( protocol::OutputFilter::Error, dc->m_error);
 			rt = false;
 		}
 		return rt;
 	}
 public:
-	FormatOutputImpl( const CountedReference<std::string>& enc)
+	OutputFilterImpl( const CountedReference<std::string>& enc)
 		:m_encoding(enc)
 		,m_document(0){}
 
-	FormatOutputImpl( const FormatOutputImpl& o)
-		:protocol::FormatOutput(o)
+	OutputFilterImpl( const OutputFilterImpl& o)
+		:protocol::OutputFilter(o)
 		,m_encoding(o.m_encoding)
 		,m_document(o.m_document){}
 
-	virtual ~FormatOutputImpl(){}
+	virtual ~OutputFilterImpl(){}
 
 	///\brief self copy
 	///\return copy of this
-	virtual FormatOutputImpl* copy() const
+	virtual OutputFilterImpl* copy() const
 	{
-		return new FormatOutputImpl( *this);
+		return new OutputFilterImpl( *this);
 	}
 
 private:
@@ -561,6 +561,6 @@ Libxml2Filter::Libxml2Filter( std::size_t bufsize)
 {
 	CountedReference<std::string> enc;
 	m_inputFilter.reset( new InputFilterImpl( enc, bufsize));
-	m_formatOutput.reset( new FormatOutputImpl( enc));
+	m_outputFilter.reset( new OutputFilterImpl( enc));
 }
 

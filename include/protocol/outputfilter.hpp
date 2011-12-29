@@ -29,9 +29,9 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-#ifndef _Wolframe_PROTOCOL_FORMATOUTPUT_INTERFACE_HPP_INCLUDED
-#define _Wolframe_PROTOCOL_FORMATOUTPUT_INTERFACE_HPP_INCLUDED
-///\file protocol/formatoutput.hpp
+#ifndef _Wolframe_PROTOCOL_OUTPUTFILTER_INTERFACE_HPP_INCLUDED
+#define _Wolframe_PROTOCOL_OUTPUTFILTER_INTERFACE_HPP_INCLUDED
+///\file protocol/outputfilter.hpp
 ///\brief Output interfaces for the application processor
 
 #include <cstddef>
@@ -48,13 +48,13 @@ struct EndOfLineMarker
 	static unsigned int size() {return 2;}
 };
 
-///\class FormatOutput
+///\class OutputFilter
 ///\brief Provides an interface for the application processor for its hierarchically structured output like XML.
 ///
 /// The intention of this class is to get a thin binding of the scripting language
 /// in the application layer to the network output.
 ///
-struct FormatOutput :public OutputBlock
+struct OutputFilter :public OutputBlock
 {
 	///\enum State
 	///\brief State of the output used in the application processor iterating loop to decide wheter to yield execution or not.
@@ -87,27 +87,27 @@ struct FormatOutput :public OutputBlock
 	}
 
 	///\brief Constructor
-	FormatOutput()
+	OutputFilter()
 		:OutputBlock(0,0),m_errorCode(0),m_state(Open){}
-	FormatOutput( void* p, std::size_t n, std::size_t i=0)
+	OutputFilter( void* p, std::size_t n, std::size_t i=0)
 		:OutputBlock(p,n,i),m_errorCode(0),m_state(Open){}
-	FormatOutput( const FormatOutput& o)
+	OutputFilter( const OutputFilter& o)
 		:OutputBlock(o),m_errorCode(o.m_errorCode),m_state(o.m_state){}
 
-	virtual ~FormatOutput(){}
+	virtual ~OutputFilter(){}
 
 	///\brief self copy
 	///\return copy of this
-	virtual FormatOutput* copy() const=0;
+	virtual OutputFilter* copy() const=0;
 
-	///\brief create the follow format output for processing
-	///\return the follow format output
+	///\brief create the follow output filter for processing
+	///\return the follow output filter
 	///\remark this mechanism is used for chaining filters in case processing has to be changed
-	virtual FormatOutput* createFollow() {return 0;}
+	virtual OutputFilter* createFollow() {return 0;}
 
 	///\brief Assignement of the content processed only
-	///\param [in] o format output to assign the data members of
-	void assignContent( const FormatOutput& o)
+	///\param [in] o output filter to assign the data members of
+	void assignContent( const OutputFilter& o)
 	{
 		set( const_cast<void*>(o.ptr()), o.size());
 		setPos( o.pos());
@@ -173,7 +173,7 @@ struct FormatOutput :public OutputBlock
 	///\return true on success, false, if the variable does not exist or the operation failed
 	virtual bool setValue( const char* /*name*/, const std::string& /*val*/)	{return false;}
 
-	///\brief Set format output state with error code
+	///\brief Set output filter state with error code
 	///\param [in] s new state
 	///\param [in] e (optional) error code to set
 	void setState( State s, int e=0)
@@ -194,9 +194,9 @@ private:
 	State m_state;		///< state
 };
 
-///\typedef FormatOutputR
-///\brief Shared format output reference
-typedef CountedReference<FormatOutput> FormatOutputR;
+///\typedef OutputFilterR
+///\brief Shared output filter reference
+typedef CountedReference<OutputFilter> OutputFilterR;
 
 }}//namespace
 #endif

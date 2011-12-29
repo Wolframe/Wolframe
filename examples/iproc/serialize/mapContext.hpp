@@ -36,7 +36,7 @@ Project Wolframe.
 #define _Wolframe_SERIALIZE_STRUCT_MAPCONTEXT_HPP_INCLUDED
 #include <string>
 #include "protocol/inputfilter.hpp"
-#include "protocol/formatoutput.hpp"
+#include "protocol/outputfilter.hpp"
 
 namespace _Wolframe {
 namespace serialize {
@@ -58,7 +58,7 @@ struct Context
 
 	void setError( const char* tt, const char* msg, const char* msgparam=0);
 	void setError( const char* tt);
-	bool printElem( protocol::FormatOutput::ElementType tp, const void* elem, std::size_t elemsize, protocol::FormatOutput*& out);
+	bool printElem( protocol::OutputFilter::ElementType tp, const void* elem, std::size_t elemsize, protocol::OutputFilter*& out);
 
 private:
 	char* m_lasterror;

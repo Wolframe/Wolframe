@@ -39,7 +39,7 @@ Project Wolframe.
 #include "protocol/buffers.hpp"
 #include "protocol/ioblocks.hpp"
 #include "protocol/inputfilter.hpp"
-#include "protocol/formatoutput.hpp"
+#include "protocol/outputfilter.hpp"
 
 #endif //_Wolframe_PROTOCOL_HPP_INCLUDED
 

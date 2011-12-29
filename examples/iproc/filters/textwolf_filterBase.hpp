@@ -36,7 +36,7 @@ Project Wolframe.
 #define _Wolframe_TEXTWOLF_FILTER_BASE_HPP_INCLUDED
 #include "textwolf.hpp"
 #include "protocol/inputfilter.hpp"
-#include "protocol/formatoutput.hpp"
+#include "protocol/outputfilter.hpp"
 #include <cstddef>
 
 namespace _Wolframe {
