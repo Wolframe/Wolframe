@@ -157,6 +157,12 @@ struct CmdMap :public std::vector<std::string>
 		return (cnt==1) ? rt:-1;
 	}
 
+	///\brief See operator[](const char*)
+	int operator []( const std::string& value) const
+	{
+		return operator[]( value.c_str());
+	}
+
 	///\brief insert a command into the map.
 	///\param value value to insert
 	void insert( const value_type& value)

@@ -44,10 +44,10 @@
 namespace _Wolframe {
 namespace protocol {
 
-class LineCommandHandler :public CommandHandler
+class LineCommandHandlerBase :public CommandHandler
 {
 public:
-	LineCommandHandler();
+	LineCommandHandlerBase();
 
 	///\brief See Parent::setInputBuffer(void*,std::size_t,std::size_t,std::size_t)
 	virtual void setInputBuffer( void* buf, std::size_t allocsize, std::size_t size, std::size_t itrpos);
@@ -74,15 +74,72 @@ public:
 	int statusCode() const				{return m_statusCode;}
 
 private:
-	void terminate( int cd);
-	void flushOutput();
-
+	friend class LineCommandHandler;
 	InputBlock m_input;				///< buffer for network read messages
 	OutputBlock m_output;				///< buffer for network write messages
 
 	InputBlock::iterator m_itr;			///< iterator to scan protocol input
 	InputBlock::iterator m_end;			///< iterator pointing to end of message buffer
 };
+
+
+class LineCommandHandlerSTM
+{
+protected:
+	friend class LineCommandHandler;
+	struct State
+	{
+		typedef int (*RunCommand)( void* data, int argc, const char** argv, OutputBlock& m_output);
+
+		protocol::CmdParser<std::string> m_parser;
+		std::vector<RunCommand> m_cmds;
+		RunCommand m_runUnknown;
+
+		State()
+		{
+			m_parser.add("");
+		}
+		void defineCommand( const char* name_, RunCommand run_)
+		{
+			m_parser.add( name_);
+			m_cmds.push_back( run_);
+		}
+	};
+	const std::vector<State> m_statear;
+};
+
+
+class LineCommandHandler :public LineCommandHandlerBase
+{
+public:
+	///\enum CommandState
+	///\brief Enumeration of command processing states
+	enum CommandState
+	{
+		EnterCommand,			///< parse command
+		ParseArgs,			///< parse command arguments
+		ParseArgsEOL,			///< parse end of line after command arguments
+		ProtocolError,			///< a protocol error (bad command etc) appeared and the rest of the line has to be discarded
+		Terminate			///< exit and return the protocol context to the caller (CLOSED)
+	};
+
+	LineCommandHandler( const LineCommandHandlerSTM* stm_)
+		:m_stm(stm_),m_argBuffer(&m_buffer),m_cmdstateidx(EnterCommand),m_stateidx(0),m_cmdidx(-1)
+	{
+		if (!stm_ || stm_->m_statear.size() == 0) throw std::logic_error("undefined or empty statemachine in LineCommandHandler");
+	}
+
+	virtual Operation nextOperation();
+
+private:
+	const LineCommandHandlerSTM* m_stm;			///< protocol sub state machine reference
+	protocol::CArgBuffer< std::string > m_argBuffer;	///< buffer type for the command arguments
+	std::string m_buffer;					///< line buffer
+	CommandState m_cmdstateidx;				///< current state of command execution
+	std::size_t m_stateidx;					///< current state in the STM
+	int m_cmdidx;						///< index of the command to execute starting with 0 (-1 = undefined command)
+};
+
 
 }}
 #endif

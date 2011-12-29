@@ -133,7 +133,7 @@ private:
 	ProtocolParser m_parser;					///< context dependent command parser definition
 	int m_cmdidx;							///< command parsed
 	std::vector< CountedReference<protocol::CommandBase> > m_cmds;	///< list of commands available
-	protocol::CommandHandlerR m_cmdhandler;				///< currently executed command
+	CountedReference<protocol::CommandHandler> m_cmdhandler;	///< currently executed command
 
 	///\brief tries to load the list of currently available commands
 	bool loadCommands();
