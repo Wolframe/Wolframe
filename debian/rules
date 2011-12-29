@@ -137,7 +137,7 @@ binary-arch: build install
 #	dh_installinfo
 #	dh_undocumented
 	dh_installchangelogs
-	dh_link
+#	dh_link
 	dh_strip
 	dh_compress
 	dh_fixperms
