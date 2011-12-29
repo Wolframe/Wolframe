@@ -35,7 +35,7 @@ Project Wolframe.
 ///
 #ifndef _Wolframe_langbind_APPOBJECTS_HPP_INCLUDED
 #define _Wolframe_langbind_APPOBJECTS_HPP_INCLUDED
-#include "protocol/formatoutput.hpp"
+#include "protocol/outputfilter.hpp"
 #include "protocol/inputfilter.hpp"
 #include <stack>
 #include <string>
@@ -44,7 +44,7 @@ namespace _Wolframe {
 namespace langbind {
 
 ///\class Output
-///\brief Output as seen from the application processor program
+///\brief Output as seen from scripting language
 struct Output
 {
 	///\enum ItemType
@@ -59,7 +59,7 @@ struct Output
 	Output() :m_state(0){}
 	///\brief Copy constructor
 	///\param[in] o copied item
-	Output( const Output& o) :m_formatoutput(o.m_formatoutput),m_state(0){}
+	Output( const Output& o) :m_outputfilter(o.m_outputfilter),m_state(0){}
 	///\brief Destructor
 	~Output(){}
 
@@ -72,7 +72,7 @@ struct Output
 	ItemType print( const char* e1, unsigned int e1size, const char* e2, unsigned int e2size);
 
 public:
-	protocol::FormatOutputR m_formatoutput;	///< format output reference
+	protocol::OutputFilterR m_outputfilter;	///< output filter reference
 
 private:
 	unsigned int m_state;						///< current state for outputs with more than one elements
@@ -97,7 +97,7 @@ struct Input
 ///\brief input/output filter as seen from the application processor program
 struct Filter
 {
-	protocol::FormatOutputR m_formatoutput;		///< format output
+	protocol::OutputFilterR m_outputfilter;		///< output filter
 	protocol::InputFilterR m_inputfilter;		///< input filter
 
 	///\brief Constructor
@@ -110,7 +110,7 @@ struct Filter
 	///\brief Copy constructor
 	///\param[in] o copied item
 	Filter( const Filter& o)
-		:m_formatoutput(o.m_formatoutput)
+		:m_outputfilter(o.m_outputfilter)
 		,m_inputfilter(o.m_inputfilter){}
 	///\brief Destructor
 	~Filter(){}
@@ -122,7 +122,7 @@ struct Filter
 	bool getValue( const char* name, std::string& val)
 	{
 		if (m_inputfilter.get() && m_inputfilter->getValue( name, val)) return true;
-		if (m_formatoutput.get() && m_formatoutput->getValue( name, val)) return true;
+		if (m_outputfilter.get() && m_outputfilter->getValue( name, val)) return true;
 		return false;
 	}
 
@@ -133,7 +133,7 @@ struct Filter
 	bool setValue( const char* name, const std::string& value)
 	{
 		if (m_inputfilter.get() && m_inputfilter->setValue( name, value)) return true;
-		if (m_formatoutput.get() && m_formatoutput->setValue( name, value)) return true;
+		if (m_outputfilter.get() && m_outputfilter->setValue( name, value)) return true;
 		return false;
 	}
 };

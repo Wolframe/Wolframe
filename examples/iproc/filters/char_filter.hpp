@@ -35,7 +35,7 @@ Project Wolframe.
 #ifndef _Wolframe_FILTER_CHAR_HPP_INCLUDED
 #define _Wolframe_FILTER_CHAR_HPP_INCLUDED
 #include "protocol/inputfilter.hpp"
-#include "protocol/formatoutput.hpp"
+#include "protocol/outputfilter.hpp"
 
 namespace _Wolframe {
 namespace filter {
@@ -46,10 +46,10 @@ public:
 	CharFilter( const char* encoding);
 
 	protocol::InputFilterR inputFilter() const	{return m_inputFilter;}
-	protocol::FormatOutputR formatOutput() const	{return m_formatOutput;}
+	protocol::OutputFilterR outputFilter() const	{return m_outputFilter;}
 private:
 	protocol::InputFilterR m_inputFilter;
-	protocol::FormatOutputR m_formatOutput;
+	protocol::OutputFilterR m_outputFilter;
 };
 
 }}//namespace

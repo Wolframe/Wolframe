@@ -54,7 +54,7 @@ struct InputFilterImpl :public protocol::InputFilter
 	InputFilterImpl() :protocol::InputFilter(8) {}
 
 	///\brief Copy constructor
-	///\param [in] o format output to copy
+	///\param [in] o output filter to copy
 	InputFilterImpl( const InputFilterImpl& o)
 		:protocol::InputFilter( o)
 		,m_itr(o.m_itr) {}
@@ -116,37 +116,37 @@ private:
 	textwolf::TextScanner<SrcIterator,AppCharset> m_itr;
 };
 
-///\class FormatOutput
-///\brief format output filter for single characters
+///\class OutputFilter
+///\brief output filter filter for single characters
 template <class IOCharset, class AppCharset=textwolf::charset::UTF8>
-struct FormatOutputImpl :public protocol::FormatOutput
+struct OutputFilterImpl :public protocol::OutputFilter
 {
 	typedef protocol::EscapingBuffer<textwolf::StaticBuffer> EscapingBuffer;
 
 	///\brief Constructor
-	FormatOutputImpl()
+	OutputFilterImpl()
 		:m_bufstate(EscapingBuffer::SRC){}
 
 	///\brief Copy constructor
-	///\param [in] o format output to copy
-	FormatOutputImpl( const FormatOutputImpl& o)
-		:protocol::FormatOutput(o)
+	///\param [in] o output filter to copy
+	OutputFilterImpl( const OutputFilterImpl& o)
+		:protocol::OutputFilter(o)
 		,m_bufstate(o.m_bufstate)
 	{}
 
 	///\brief self copy
 	///\return copy of this
-	virtual protocol::FormatOutput* copy() const
+	virtual protocol::OutputFilter* copy() const
 	{
-		return new FormatOutputImpl( *this);
+		return new OutputFilterImpl( *this);
 	}
 
-	///\brief Implementation of protocol::FormatOutput::print(typename protocol::FormatOutput::ElementType,const void*,std::size_t)
+	///\brief Implementation of protocol::OutputFilter::print(typename protocol::OutputFilter::ElementType,const void*,std::size_t)
 	///\param [in] type type of the element to print
 	///\param [in] element pointer to the element to print
 	///\param [in] elementsize size of the element to print in bytes
 	///\return true, if success, false else
-	virtual bool print( typename protocol::FormatOutput::ElementType type, const void* element, std::size_t elementsize)
+	virtual bool print( typename protocol::OutputFilter::ElementType type, const void* element, std::size_t elementsize)
 	{
 		if (type == Value)
 		{
@@ -177,39 +177,39 @@ CharFilter::CharFilter( const char *encoding)
 			break;
 		case TextwolfEncoding::IsoLatin:
 			m_inputFilter.reset( new InputFilterImpl<textwolf::charset::IsoLatin1>());
-			m_formatOutput.reset( new FormatOutputImpl<textwolf::charset::IsoLatin1>());
+			m_outputFilter.reset( new OutputFilterImpl<textwolf::charset::IsoLatin1>());
 			break;
 		case TextwolfEncoding::UTF8:
 			m_inputFilter.reset( new InputFilterImpl<textwolf::charset::UTF8>());
-			m_formatOutput.reset( new FormatOutputImpl<textwolf::charset::UTF8>());
+			m_outputFilter.reset( new OutputFilterImpl<textwolf::charset::UTF8>());
 			break;
 		case TextwolfEncoding::UTF16:
 			m_inputFilter.reset( new InputFilterImpl<textwolf::charset::UTF16BE>());
-			m_formatOutput.reset( new FormatOutputImpl<textwolf::charset::UTF16BE>());
+			m_outputFilter.reset( new OutputFilterImpl<textwolf::charset::UTF16BE>());
 			break;
 		case TextwolfEncoding::UTF16BE:
 			m_inputFilter.reset( new InputFilterImpl<textwolf::charset::UTF16BE>());
-			m_formatOutput.reset( new FormatOutputImpl<textwolf::charset::UTF16BE>());
+			m_outputFilter.reset( new OutputFilterImpl<textwolf::charset::UTF16BE>());
 			break;
 		case TextwolfEncoding::UTF16LE:
 			m_inputFilter.reset( new InputFilterImpl<textwolf::charset::UTF16LE>());
-			m_formatOutput.reset( new FormatOutputImpl<textwolf::charset::UTF16LE>());
+			m_outputFilter.reset( new OutputFilterImpl<textwolf::charset::UTF16LE>());
 			break;
 		case TextwolfEncoding::UCS2BE:
 			m_inputFilter.reset( new InputFilterImpl<textwolf::charset::UCS2BE>());
-			m_formatOutput.reset( new FormatOutputImpl<textwolf::charset::UCS2BE>());
+			m_outputFilter.reset( new OutputFilterImpl<textwolf::charset::UCS2BE>());
 			break;
 		case TextwolfEncoding::UCS2LE:
 			m_inputFilter.reset( new InputFilterImpl<textwolf::charset::UCS2LE>());
-			m_formatOutput.reset( new FormatOutputImpl<textwolf::charset::UCS2LE>());
+			m_outputFilter.reset( new OutputFilterImpl<textwolf::charset::UCS2LE>());
 			break;
 		case TextwolfEncoding::UCS4BE:
 			m_inputFilter.reset( new InputFilterImpl<textwolf::charset::UCS4BE>());
-			m_formatOutput.reset( new FormatOutputImpl<textwolf::charset::UCS4BE>());
+			m_outputFilter.reset( new OutputFilterImpl<textwolf::charset::UCS4BE>());
 			break;
 		case TextwolfEncoding::UCS4LE:
 			m_inputFilter.reset( new InputFilterImpl<textwolf::charset::UCS4LE>());
-			m_formatOutput.reset( new FormatOutputImpl<textwolf::charset::UCS4LE>());
+			m_outputFilter.reset( new OutputFilterImpl<textwolf::charset::UCS4LE>());
 			break;
 	}
 }

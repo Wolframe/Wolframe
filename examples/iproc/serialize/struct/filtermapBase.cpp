@@ -112,13 +112,13 @@ bool DescriptionBase::parse( const char* name, void* obj, protocol::InputFilter&
 	return rt;
 }
 
-bool DescriptionBase::print( const char* name, const void* obj, protocol::FormatOutput& out, Context& ctx) const
+bool DescriptionBase::print( const char* name, const void* obj, protocol::OutputFilter& out, Context& ctx) const
 {
 	try
 	{
 		if (m_print)
 		{
-			protocol::FormatOutput* oo = out.copy();
+			protocol::OutputFilter* oo = out.copy();
 			oo->init( (void*)ctx.buf(), ctx.bufsize);
 			return m_print( name, obj, oo, ctx);
 		}

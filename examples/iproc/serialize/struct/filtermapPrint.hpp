@@ -44,7 +44,7 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-static bool printElem( protocol::FormatOutput::ElementType tp, const void* elem, std::size_t elemsize, protocol::FormatOutput*& out, Context& ctx)
+static bool printElem( protocol::OutputFilter::ElementType tp, const void* elem, std::size_t elemsize, protocol::OutputFilter*& out, Context& ctx)
 {
 	if (!out->print( tp, elem, elemsize))
 	{
@@ -52,7 +52,7 @@ static bool printElem( protocol::FormatOutput::ElementType tp, const void* elem,
 		out->release();
 		if (!out->print( tp, elem, elemsize))
 		{
-			protocol::FormatOutput* ff = out->createFollow();
+			protocol::OutputFilter* ff = out->createFollow();
 			if (ff)
 			{
 				delete out;
@@ -60,7 +60,7 @@ static bool printElem( protocol::FormatOutput::ElementType tp, const void* elem,
 			}
 			if (!out->print( tp, elem, elemsize))
 			{
-				ctx.setError( "buffer of format output too small to hold one element");
+				ctx.setError( "buffer of output filter too small to hold one element");
 				return false;
 			}
 		}
@@ -69,23 +69,23 @@ static bool printElem( protocol::FormatOutput::ElementType tp, const void* elem,
 }
 
 template <typename T>
-static bool printObject( const char* tag, const T& obj, protocol::FormatOutput*& out, Context& ctx);
+static bool printObject( const char* tag, const T& obj, protocol::OutputFilter*& out, Context& ctx);
 
 
 template <typename T>
-bool print_( const char* tag, const void* obj, const struct_&, protocol::FormatOutput*& out, Context& ctx)
+bool print_( const char* tag, const void* obj, const struct_&, protocol::OutputFilter*& out, Context& ctx)
 {
 	static const DescriptionBase* descr = T::getDescription();
 	bool isContent = true;
 
-	if (tag && !printElem( protocol::FormatOutput::OpenTag, tag, std::strlen(tag), out, ctx)) return false;
+	if (tag && !printElem( protocol::OutputFilter::OpenTag, tag, std::strlen(tag), out, ctx)) return false;
 
 	DescriptionBase::Map::const_iterator itr = descr->begin(),end = descr->end();
 	for (std::size_t idx=0; itr != end; ++itr,++idx)
 	{
 		if (itr->second.isAtomic() && !isContent && idx < descr->nof_attributes())
 		{
-			if (!printElem( protocol::FormatOutput::Attribute, itr->first, std::strlen(itr->first), out, ctx)) return false;
+			if (!printElem( protocol::OutputFilter::Attribute, itr->first, std::strlen(itr->first), out, ctx)) return false;
 			if (!itr->second.print()( 0, (char*)obj+itr->second.ofs(), out, ctx)) return false;
 		}
 		else
@@ -94,31 +94,31 @@ bool print_( const char* tag, const void* obj, const struct_&, protocol::FormatO
 			if (!itr->second.print()( itr->first, (char*)obj+itr->second.ofs(), out, ctx)) return false;
 		}
 	}
-	if (tag && !printElem( protocol::FormatOutput::CloseTag, "", 0, out, ctx)) return false;
+	if (tag && !printElem( protocol::OutputFilter::CloseTag, "", 0, out, ctx)) return false;
 	return true;
 }
 
 template <typename T>
-bool print_( const char* tag, const void* obj, const arithmetic_&, protocol::FormatOutput*& out, Context& ctx)
+bool print_( const char* tag, const void* obj, const arithmetic_&, protocol::OutputFilter*& out, Context& ctx)
 {
-	if (tag && !printElem( protocol::FormatOutput::OpenTag, tag, std::strlen(tag), out, ctx)) return false;
+	if (tag && !printElem( protocol::OutputFilter::OpenTag, tag, std::strlen(tag), out, ctx)) return false;
 	std::string value( boost::lexical_cast<std::string>( *((T*)obj)));
-	if (!printElem( protocol::FormatOutput::Value, value.c_str(), value.size(), out, ctx)) return false;
-	if (tag && !printElem( protocol::FormatOutput::CloseTag, "", 0, out, ctx)) return false;
+	if (!printElem( protocol::OutputFilter::Value, value.c_str(), value.size(), out, ctx)) return false;
+	if (tag && !printElem( protocol::OutputFilter::CloseTag, "", 0, out, ctx)) return false;
 	return true;
 }
 
 template <typename T>
-bool print_( const char* tag, const void* obj, const bool_&, protocol::FormatOutput*& out, Context& ctx)
+bool print_( const char* tag, const void* obj, const bool_&, protocol::OutputFilter*& out, Context& ctx)
 {
-	if (tag && !printElem( protocol::FormatOutput::OpenTag, tag, std::strlen(tag), out, ctx)) return false;
-	if (!printElem( protocol::FormatOutput::Value, (*((T*)obj))?"t":"f", 1, out, ctx)) return false;
-	if (tag && !printElem( protocol::FormatOutput::CloseTag, "", 0, out, ctx)) return false;
+	if (tag && !printElem( protocol::OutputFilter::OpenTag, tag, std::strlen(tag), out, ctx)) return false;
+	if (!printElem( protocol::OutputFilter::Value, (*((T*)obj))?"t":"f", 1, out, ctx)) return false;
+	if (tag && !printElem( protocol::OutputFilter::CloseTag, "", 0, out, ctx)) return false;
 	return true;
 }
 
 template <typename T>
-bool print_( const char* tag, const void* obj, const vector_&, protocol::FormatOutput*& out, Context& ctx)
+bool print_( const char* tag, const void* obj, const vector_&, protocol::OutputFilter*& out, Context& ctx)
 {
 	if (!tag)
 	{
@@ -127,15 +127,15 @@ bool print_( const char* tag, const void* obj, const vector_&, protocol::FormatO
 	}
 	for (typename T::const_iterator itr=((T*)obj)->begin(); itr!=((T*)obj)->end(); itr++)
 	{
-		printElem( protocol::FormatOutput::OpenTag, tag, strlen(tag), out, ctx);
+		printElem( protocol::OutputFilter::OpenTag, tag, strlen(tag), out, ctx);
 		if (!printObject<typename T::value_type>( 0, *itr, out, ctx)) return false;
-		printElem( protocol::FormatOutput::CloseTag, "", 0, out, ctx);
+		printElem( protocol::OutputFilter::CloseTag, "", 0, out, ctx);
 	}
 	return true;
 }
 
 template <typename T>
-static bool printObject( const char* tag, const T& obj, protocol::FormatOutput*& out, Context& ctx)
+static bool printObject( const char* tag, const T& obj, protocol::OutputFilter*& out, Context& ctx)
 {
 	return print_<T>( tag, (void*)&obj, getCategory(obj), out, ctx);
 }
@@ -143,7 +143,7 @@ static bool printObject( const char* tag, const T& obj, protocol::FormatOutput*&
 template <typename T>
 struct IntrusivePrinter
 {
-	static bool print( const char* tag, const void* obj, protocol::FormatOutput*& out, Context& ctx)
+	static bool print( const char* tag, const void* obj, protocol::OutputFilter*& out, Context& ctx)
 	{
 		if (!print_<T>( tag, obj, getCategory(*(T*)obj), out, ctx)) return false;
 		ctx.append( out->charptr(), out->pos());

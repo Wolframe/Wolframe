@@ -35,7 +35,7 @@ Project Wolframe.
 #ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_ERROR_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_ERROR_HPP_INCLUDED
 #include "protocol/inputfilter.hpp"
-#include "protocol/formatoutput.hpp"
+#include "protocol/outputfilter.hpp"
 #include "logger.hpp"
 #include <cstddef>
 #include <string>

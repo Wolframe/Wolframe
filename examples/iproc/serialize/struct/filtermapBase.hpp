@@ -35,7 +35,7 @@ Project Wolframe.
 #ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_BASE_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_BASE_HPP_INCLUDED
 #include "protocol/inputfilter.hpp"
-#include "protocol/formatoutput.hpp"
+#include "protocol/outputfilter.hpp"
 #include "serialize/mapContext.hpp"
 #include <cstddef>
 #include <string>
@@ -50,7 +50,7 @@ class DescriptionBase
 public:
 	typedef std::vector<std::pair<const char*,DescriptionBase> > Map;
 	typedef bool (*Parse)( const char* tag, void* obj, protocol::InputFilter& flt, Context& ctx, bool isinit);
-	typedef bool (*Print)( const char* tag, const void* obj, protocol::FormatOutput*& out, Context& ctx);
+	typedef bool (*Print)( const char* tag, const void* obj, protocol::OutputFilter*& out, Context& ctx);
 	typedef bool (*IsAtomic)();
 	Parse parse() const {return m_parse;}
 	Print print() const {return m_print;}
@@ -63,7 +63,7 @@ public:
 		:m_typename(0),m_ofs(0),m_size(0),m_nof_attributes(std::numeric_limits<std::size_t>::max()),m_isAtomic(0),m_parse(0),m_print(0){}
 
 	bool parse( const char* name, void* obj, protocol::InputFilter& in, Context& ctx) const;
-	bool print( const char* name, const void* obj, protocol::FormatOutput& out, Context& ctx) const;
+	bool print( const char* name, const void* obj, protocol::OutputFilter& out, Context& ctx) const;
 
 	bool isAtomic() const
 	{

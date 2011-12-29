@@ -77,7 +77,7 @@ void Context::setMsg( const char* m1, char dd, const char* m2, const char* m3)
 	m_lasterror[ m1len+m2len+m3len+1] = '\0';
 }
 
-bool Context::printElem( protocol::FormatOutput::ElementType tp, const void* elem, std::size_t elemsize, protocol::FormatOutput*& out)
+bool Context::printElem( protocol::OutputFilter::ElementType tp, const void* elem, std::size_t elemsize, protocol::OutputFilter*& out)
 {
 	if (!out->print( tp, elem, elemsize))
 	{
@@ -85,7 +85,7 @@ bool Context::printElem( protocol::FormatOutput::ElementType tp, const void* ele
 		out->release();
 		if (!out->print( tp, elem, elemsize))
 		{
-			protocol::FormatOutput* ff = out->createFollow();
+			protocol::OutputFilter* ff = out->createFollow();
 			if (ff)
 			{
 				delete out;
@@ -93,7 +93,7 @@ bool Context::printElem( protocol::FormatOutput::ElementType tp, const void* ele
 			}
 			if (!out->print( tp, elem, elemsize))
 			{
-				setError( "buffer of format output too small to hold one element");
+				setError( "buffer of output filter too small to hold one element");
 				return false;
 			}
 		}
