@@ -36,6 +36,35 @@ INCLUDE_LIBS = \
 
 !ENDIF
 
+# Lua
+!IFDEF WITH_LUA
+
+INCLUDE_CPPFLAGS = \
+	$(INCLUDE_CPPFLAGS) /DWITH_LUA
+ 
+INCLUDE_DIRS = \
+	$(INCLUDE_DIRS) /I$(TOPDIR)\lua\src
+
+INCLUDE_LIBS = \
+	$(INCLUDE_LIBS) $(TOPDIR)\lua\src\lua.lib
+
+!ENDIF
+
+# libxml2
+!IFDEF WITH_LIBXML2
+
+INCLUDE_CPPFLAGS = \
+	$(INCLUDE_CPPFLAGS) /DWITH_LIBXML2
+
+INCLUDE_DIRS = \
+	$(INCLUDE_DIRS) /I. /I"$(LIBXML2_DIR)\include" /I"$(LIBXML2_DIR)\include\libxml"
+
+INCLUDE_LIBS = \
+	$(INCLUDE_LIBS) "$(LIBXML2_DIR)\lib\libxml2.lib"
+	
+!ENDIF
+
+
 
 LOCAL_STATIC_LIB = \
 	wolframe.lib
@@ -67,21 +96,21 @@ LOCAL_STATIC_LIB_OBJS = \
 	server.obj \
 	procProvider.obj
 
-#LUA
+#Lua
 !IFDEF WITH_LUA
 LOCAL_STATIC_LIB_OBJS = \
 	$(LOCAL_STATIC_LIB_OBJS) \
-	serialize\struct\luamapBase.obj \
-	langbind\luaDebug.obj \
-	langbind\luaCommandConfig.obj \
-	langbind\luaCommandHandler.obj
+	serialize_struct_luamapBase.obj \
+	langbind_luaDebug.obj \
+	langbind_luaCommandConfig.obj \
+	langbind_luaCommandHandler.obj
 !ENDIF
 
-#LIBXML2
+# libxml2
 !IFDEF WITH_LIBXML2
 LOCAL_STATIC_LIB_OBJS = \
 	$(LOCAL_STATIC_LIB_OBJS) \
-	filters\libxml2_filter.obj
+	filter_libxml2_filter.obj
 !ENDIF
 
 #SSL
