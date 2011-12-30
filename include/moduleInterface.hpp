@@ -125,11 +125,9 @@ public:
 };
 
 #if !defined(_WIN32)	// POSIX module loader
+	#define	_Wolframe_MODULE_ENTRY_POINT	extern "C"
 #else
-	extern "C" {
-		__declspec( dllexport ) ModuleContainer* createModule( void );
-		__declspec( dllexport ) void setModuleLogger( void* logger );
-	}
+	#define	_Wolframe_MODULE_ENTRY_POINT	extern "C" __declspec( dllexport )
 #endif
 
 }} // namespace _Wolframe::module

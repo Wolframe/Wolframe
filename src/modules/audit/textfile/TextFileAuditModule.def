@@ -2,5 +2,4 @@ LIBRARY mod_audit_textfile
 DESCRIPTION "Wolframe module"
 
 EXPORTS
-createModule    @1
-setModuleLogger @1
+entryPoint	@1
