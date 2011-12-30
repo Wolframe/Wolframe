@@ -108,9 +108,6 @@ protected:
 };
 
 
-typedef CountedReference<CommandHandler> CommandHandlerR;
-
-
 struct CommandConfig
 {
 	CommandConfig(){}
@@ -143,9 +140,9 @@ public:
 		return m_protocolCmdName.c_str();
 	}
 
-	virtual CommandHandlerR create( int /*argc*/, const char** /*argv*/) const
+	virtual CountedReference<CommandHandler> create( int /*argc*/, const char** /*argv*/) const
 	{
-		return CommandHandlerR(0);
+		return CountedReference<CommandHandler>(0);
 	}
 
 	const CommandConfig* config() const
@@ -172,11 +169,11 @@ struct Command :public CommandBase
 	}
 	virtual ~Command(){}
 
-	virtual CommandHandlerR create( int argc, const char** argv) const
+	virtual CountedReference<CommandHandler> create( int argc, const char** argv) const
 	{
 		CommandHandlerClass* rt = new CommandHandlerClass( dynamic_cast<const CommandConfigClass*>(m_config));
 		rt->passParameters( argc, argv);
-		return CommandHandlerR( rt);
+		return CountedReference<CommandHandler>( rt);
 	}
 };
 
