@@ -42,6 +42,8 @@ Project Wolframe.
 /// to the application processors.
 ///
 #include <cstddef>
+#include <stdexcept>
+#include <cstring>
 #include <boost/cstdint.hpp>
 
 namespace _Wolframe {
@@ -50,39 +52,42 @@ namespace protocol {
 ///
 ///\class Buffer
 ///\brief Constant size single byte (ASCII) character buffer that implements a subset of the std::string interface
-///  The buffer implements the STL back insertion sequence interface required by the protocol parser.
-///\tparam SIZE maximum number of character bytes buffered (without terminating 0 byte that is counted extra)
+///\remark The buffer implements the STL back insertion sequence interface required by the protocol parser.
 ///
-template <unsigned int SIZE=128>
 class Buffer
 {
 private:
-	///\brief Some buffer constants
-	enum
-	{
-		Size=SIZE			///< maximume size of the buffer in bytes as enum definition
-	};
 	std::size_t m_pos;			///< current cursor position of the buffer (number of added characters)
-	char m_buf[ Size+1];			///< buffer content
+	std::size_t m_size;			///< current cursor position of the buffer (number of added characters)
+	char* m_buf;				///< buffer content
+	bool m_allocated;
 
 public:
 	///\brief Constructor
-	Buffer()				:m_pos(0){}
+	Buffer( std::size_t n)			:m_pos(0),m_size(n),m_buf(new char[n]),m_allocated(true) {}
+	///\brief Constructor
+	Buffer( char* b, std::size_t n)		:m_pos(0),m_size(n),m_buf(b),m_allocated(false) {}
+	~Buffer()				{if (m_allocated) delete m_buf;}
 
+	Buffer& operator=( const Buffer& o)	{if (m_size < o.m_pos) throw std::logic_error("assignement not possible"); std::memmove( m_buf, o.m_buf, m_pos=o.m_pos); return *this;}
 	///\brief Clear the buffer content
 	void clear()				{m_pos=0;}
 
 	///\brief Append one character
 	///\param[in] ch the character to append
-	void push_back( char ch)		{if (m_pos<Size) m_buf[m_pos++]=ch;}
+	void push_back( char ch)		{if (m_pos<m_size) m_buf[m_pos++]=ch;}
 
 	///\brief Append a 0-terminated string
 	///\param[in] cc the string to append
-	void append( const char* cc)		{unsigned int ii=0; while(m_pos<Size && cc[ii]) m_buf[m_pos++]=cc[ii++];}
+	void append( const char* cc)		{unsigned int ii=0; while(m_pos<m_size && cc[ii]) m_buf[m_pos++]=cc[ii++];}
 
 	///\brief Return the number of characters in the buffer
 	///\return the number of characters (bytes)
 	std::size_t size() const		{return m_pos;}
+	std::size_t size()			{return m_pos;}
+
+	///\brief Change the fill size of the buffer to a smaller size
+	void resize( std::size_t n)		{if (n > m_pos) throw std::logic_error("resize to bigger size not possible"); m_pos=n;}
 
 	///\brief Return the buffer content as pointer to string without 0 termination
 	///\return the pointer to buffer start
@@ -99,6 +104,10 @@ public:
 	///\brief cast operator for direct access
 	///\return the C-string
 	operator const char*()			{return c_str();}
+
+	///\brief check, if the buffer had an overflow, no space left
+	///\return true, if yes
+	bool overflow() const			{return m_pos==m_size;}
 };
 
 

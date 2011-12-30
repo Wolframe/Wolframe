@@ -1,9 +1,8 @@
 #ifndef WITH_LIBXML2
 #error Compiling a libxml2 module without libxml2 support enabled
 #endif
-#include "libxml2_filter.hpp"
-#include "bufferingFilterBase.hpp"
-#include "textwolf.hpp"
+#include "filter/libxml2_filter.hpp"
+#include "filter/bufferingFilterBase.hpp"
 #include <cstddef>
 #include <cstring>
 #include <vector>
@@ -306,7 +305,7 @@ public:
 			,m_writerbuf(0)
 			,m_writer(0)
 			,m_valuebuf(0)
-			,m_bufstate(protocol::EscapingBuffer<textwolf::StaticBuffer>::SRC)
+			,m_bufstate(protocol::EscapingBuffer<protocol::Buffer>::SRC)
 
 		{
 			m_writerbuf = xmlBufferCreate();
@@ -439,19 +438,15 @@ public:
 
 		std::size_t printNextChunk( void* out, std::size_t outsize)
 		{
-			protocol::EscapingBuffer<textwolf::StaticBuffer> buf( (char*)out, outsize, m_bufstate);
-			while (m_contentitr != m_contentend)
+			protocol::Buffer buf( (char*)out, outsize);
+			protocol::EscapingBuffer<protocol::Buffer> ebuf( &buf, m_bufstate);
+
+			while (m_contentitr != m_contentend && buf.size()+1 < outsize)
 			{
-				std::size_t bufmark = buf.size();
-				buf.push_back( *m_contentitr);
-				if (buf.overflow())
-				{
-					buf.resize( bufmark);
-					break;
-				}
+				ebuf.push_back( *m_contentitr);
 				++m_contentitr;
 			}
-			m_bufstate = buf.state();
+			m_bufstate = ebuf.state();
 			return buf.size();
 		}
 
@@ -467,7 +462,7 @@ public:
 		std::string m_content;
 		std::string::const_iterator m_contentitr;
 		std::string::const_iterator m_contentend;
-		protocol::EscapingBuffer<textwolf::StaticBuffer>::State m_bufstate;
+		protocol::EscapingBuffer<protocol::Buffer>::State m_bufstate;
 	};
 
 	bool flushBuffer( Document* dc)

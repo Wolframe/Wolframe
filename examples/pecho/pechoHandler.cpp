@@ -47,8 +47,7 @@ struct Connection::Private
 	typedef protocol::InputBlock::iterator InputIterator;		//< iterator type for protocol commands
 
 	//* typedefs for input output buffers
-	typedef protocol::Buffer<128> LineBuffer;			//< buffer for one line of input/output
-	typedef protocol::CmdParser<LineBuffer> ProtocolParser;		//< parser for the protocol
+	typedef protocol::CmdParser<protocol::Buffer> ProtocolParser;	//< parser for the protocol
 
 	//* typedefs for state variables and buffers
 	//list of processor states
@@ -82,7 +81,7 @@ struct Connection::Private
 	State state;			//< state of the processor
 	Mode mode;			//< selected function to process the content
 	//2. buffers and context
-	LineBuffer buffer;		//< context (sub state) for partly parsed input lines
+	protocol::Buffer buffer;	//< context (sub state) for partly parsed input lines
 	Input input;			//< buffer for network read messages
 	Output output;			//< buffer for network write messages
 	//3. Iterators
@@ -160,7 +159,7 @@ struct Connection::Private
 	}
 
 	//* interface
-	Private( unsigned int inputBufferSize, unsigned int outputBufferSize)		:state(Init),mode(Ident),input(inputBufferSize),output(outputBufferSize)
+	Private( unsigned int inputBufferSize, unsigned int outputBufferSize)		:state(Init),mode(Ident),buffer(128),input(inputBufferSize),output(outputBufferSize)
 	{
 		itr = input.begin();
 		eoD = eoM = input.end();

@@ -38,7 +38,6 @@ INCLUDE_LIBS += \
 endif
 
 # libxml2
-
 ifeq ($(WITH_LIBXML2),1)
 INCLUDE_CXXFLAGS += \
 	-DWITH_LIBXML2
@@ -71,30 +70,8 @@ OBJS = \
 	$(TOPDIR)/src/loadModules-dummy.o \
 	iprocHandler.o \
 	iprocHandlerConfig.o \
-	langbind/appObjects.o \
-	langbind/ioFilterCommandHandler.o \
-	filters/textwolf_filter.o \
-	filters/textwolf_filterBase.o \
-	filters/char_filter.o \
-	filters/line_filter.o \
-	serialize/struct/filtermapBase.o \
-	serialize/ddl/filtermapSerialize.o \
-	serialize/mapContext.o \
 	ddl/simpleFormCompile.o \
 	$(TOPDIR)/src/posixMain.o
-
-ifeq ($(WITH_LUA),1)
-OBJS += \
-	serialize/struct/luamapBase.o \
-	langbind/luaDebug.o \
-	langbind/luaCommandConfig.o \
-	langbind/luaCommandHandler.o
-endif
-
-ifeq ($(WITH_LIBXML2),1)
-OBJS += \
-	filters/libxml2_filter.o
-endif
 
 TEST_BINS = \
 	tests/iprocHandlerTest$(EXE) \

@@ -76,9 +76,8 @@ public:
 	virtual void errorOccured( NetworkSignal);
 
 private:
-	typedef protocol::Buffer<256> LineBuffer;				///< buffer for one line of input/output
-	typedef protocol::CmdParser<LineBuffer> ProtocolParser;			///< parser for the protocol
-	typedef protocol::CArgBuffer<LineBuffer> ArgBuffer;			///< buffer type for the command arguments
+	typedef protocol::CmdParser<protocol::Buffer> ProtocolParser;	///< parser for the protocol
+	typedef protocol::CArgBuffer<protocol::Buffer> ArgBuffer;	///< buffer type for the command arguments
 
 	///\enum State
 	///\brief Enumeration of processor states
@@ -120,7 +119,7 @@ private:
 
 	State m_state;							///< state of the processor (protocol main statemachine)
 
-	LineBuffer m_buffer;						///< context (sub state) for partly parsed input lines
+	protocol::Buffer m_buffer;					///< context (sub state) for partly parsed input lines
 	ArgBuffer m_argBuffer;						///< buffer for the arguments
 
 	protocol::InputBlock m_input;					///< buffer for network read messages

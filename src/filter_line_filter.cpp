@@ -1,6 +1,6 @@
-#include "line_filter.hpp"
-#include "textwolf.hpp"
-#include "filters/textwolf_filterBase.hpp"
+#include "filter/line_filter.hpp"
+#include "filter/textwolf.hpp"
+#include "filter/textwolf_filterBase.hpp"
 #include <cstring>
 #include <cstddef>
 
@@ -40,15 +40,16 @@ struct OutputFilterImpl :public protocol::OutputFilter
 	{
 		if (type == Value)
 		{
-			protocol::EscapingBuffer<textwolf::StaticBuffer> buf( rest(), restsize(), m_bufstate);
+			textwolf::StaticBuffer basebuf( rest(), restsize());
+			protocol::EscapingBuffer<textwolf::StaticBuffer> buf( &basebuf, m_bufstate);
 			FilterBase<IOCharset,AppCharset>::printToBuffer( (const char*)element, elementsize, buf);
 			FilterBase<IOCharset,AppCharset>::printToBufferEOL( buf);
-			if (buf.overflow())
+			if (basebuf.overflow())
 			{
 				setState( EndOfBuffer);
 				return false;
 			}
-			incPos( buf.size());
+			incPos( basebuf.size());
 			m_bufstate = buf.state();
 		}
 		return true;

@@ -22,7 +22,6 @@ INCLUDE_LIBS = \
 	$(LIBS_DL)
 
 # openssl
-
 ifeq ($(WITH_SSL),1)
 
 INCLUDE_CXXFLAGS += \
@@ -30,8 +29,36 @@ INCLUDE_CXXFLAGS += \
 
 INCLUDE_LIBS += \
 	$(OPENSSL_LIBS)
-
 endif
+
+# lua
+ifeq ($(WITH_LUA),1)
+INCLUDE_CXXFLAGS += \
+	-DWITH_LUA
+
+INCLUDE_DIRS += \
+	-I$(TOPDIR)/lua/src
+
+INCLUDE_LIBS += \
+	$(TOPDIR)/lua/src/liblua.a \
+	$(LIBS_DL)
+endif
+
+# libxml2
+ifeq ($(WITH_LIBXML2),1)
+INCLUDE_CXXFLAGS += \
+	-DWITH_LIBXML2
+
+INCLUDE_DIRS += \
+	$(LIBXML2_INCLUDE_DIRS)
+
+INCLUDE_LDFLAGS += \
+	$(LIBXML2_LIB_DIRS)
+
+INCLUDE_LIBS += \
+	$(LIBXML2_LIBS)
+endif
+
 
 LOCAL_STATIC_LIB = \
 	libwolframe.a
@@ -46,6 +73,15 @@ LOCAL_STATIC_LIB_OBJS = \
 	protocol_ioblocks.o \
 	protocol_commandHandler.o \
 	protocol_lineCommandHandler.o \
+	langbind_appObjects.o \
+	langbind_ioFilterCommandHandler.o \
+	filter_textwolf_filter.o \
+	filter_textwolf_filterBase.o \
+	filter_char_filter.o \
+	filter_line_filter.o \
+	serialize_struct_filtermapBase.o \
+	serialize_ddl_filtermapSerialize.o \
+	serialize_mapContext.o \
 	acceptor.o \
 	getPassword.o \
 	serverEndpoint.o \
@@ -53,6 +89,21 @@ LOCAL_STATIC_LIB_OBJS = \
 	serverConfig.o \
 	server.o \
 	procProvider.o \
+
+#LUA
+ifeq ($(WITH_LUA),1)
+LOCAL_STATIC_LIB_OBJS += \
+	serialize_struct_luamapBase.o \
+	langbind_luaDebug.o \
+	langbind_luaCommandConfig.o \
+	langbind_luaCommandHandler.o
+endif
+
+#LIBXML2
+ifeq ($(WITH_LIBXML2),1)
+LOCAL_STATIC_LIB_OBJS += \
+	filter_libxml2_filter.o
+endif
 
 #SSL
 ifeq ($(WITH_SSL),1)

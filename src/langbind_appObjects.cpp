@@ -29,17 +29,20 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///
 ///\file appObjects.cpp
 ///\brief implementation of scripting language objects
-///
 
-#include "appObjects.hpp"
+#include "langbind/appObjects.hpp"
 #include "logger-v1.hpp"
 #include "protocol/inputfilter.hpp"
 #include "protocol/outputfilter.hpp"
 #include <boost/algorithm/string.hpp>
-#include "filters.hpp"
+#include "filter/char_filter.hpp"
+#include "filter/line_filter.hpp"
+#if WITH_LIBXML2
+#include "filter/libxml2_filter.hpp"
+#endif
+#include "filter/textwolf_filter.hpp"
 
 using namespace _Wolframe;
 using namespace langbind;
