@@ -92,7 +92,7 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 		{
 			case EnterCommand:
 			{
-				const LineCommandHandlerSTM::State& st = m_stm->m_statear.at( m_stateidx);
+				const LineCommandHandlerSTM::State& st = (*m_stm)[ m_stateidx];
 				m_cmdidx = st.m_parser.getCommand( m_itr, m_end, m_buffer)-1;
 				if (m_cmdidx < (int)st.m_cmds.size())
 				{
@@ -119,7 +119,7 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 					}
 					else
 					{
-						const LineCommandHandlerSTM::State& st = m_stm->m_statear.at( m_stateidx);
+						const LineCommandHandlerSTM::State& st = (*m_stm)[ m_stateidx];
 						m_cmdstateidx = ProtocolError;
 						m_stateidx = st.m_runUnknown( this, m_argBuffer.argc(), m_argBuffer.argv(), m_output);
 					}
@@ -138,7 +138,7 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 					}
 					else
 					{
-						const LineCommandHandlerSTM::State& st = m_stm->m_statear.at( m_stateidx);
+						const LineCommandHandlerSTM::State& st = (*m_stm)[ m_stateidx];
 						m_cmdstateidx = ProtocolError;
 						try
 						{
@@ -156,7 +156,7 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 				{
 					if (m_argBuffer.argc())
 					{
-						const LineCommandHandlerSTM::State& st = m_stm->m_statear.at( m_stateidx);
+						const LineCommandHandlerSTM::State& st = (*m_stm)[ m_stateidx];
 						m_cmdstateidx = ProtocolError;
 						try
 						{
@@ -180,7 +180,7 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 				}
 				else
 				{
-					const LineCommandHandlerSTM::State& st = m_stm->m_statear.at( m_stateidx);
+					const LineCommandHandlerSTM::State& st = (*m_stm)[ m_stateidx];
 					try
 					{
 						m_stateidx = st.m_cmds[ m_cmdidx-1]( this, m_argBuffer.argc(), m_argBuffer.argv(), m_output);
