@@ -85,12 +85,12 @@ private:
 
 class LineCommandHandlerSTM
 {
-protected:
+public:
+	typedef int (*RunCommand)( void* data, int argc, const char** argv, OutputBlock& m_output);
+private:
 	friend class LineCommandHandler;
 	struct State
 	{
-		typedef int (*RunCommand)( void* data, int argc, const char** argv, OutputBlock& m_output);
-
 		protocol::CmdParser<std::string> m_parser;
 		std::vector<RunCommand> m_cmds;
 		RunCommand m_runUnknown;
@@ -105,7 +105,26 @@ protected:
 			m_cmds.push_back( run_);
 		}
 	};
-	const std::vector<State> m_statear;
+	std::vector<State> m_statear;
+
+public:
+	template <typename StateEnum>
+	void newState( StateEnum se)
+	{
+		if ((std::size_t)se != m_statear.size()) throw std::logic_error( "state index defined not matching to enum given as state index");
+		State st;
+		m_statear.push_back( st);
+	}
+
+	void defineCommand( const char* name_, RunCommand run_)
+	{
+		m_statear.back().defineCommand( name_, run_);
+	}
+
+	const State& operator[]( std::size_t idx) const
+	{
+		return m_statear.at( idx);
+	}
 };
 
 
@@ -140,6 +159,33 @@ private:
 	int m_cmdidx;						///< index of the command to execute starting with 0 (-1 = undefined command)
 };
 
+
+template <class HandlerObj, typename StateEnum>
+class LineCommandHandlerSTMTemplate :private LineCommandHandlerSTM
+{
+private:
+	typedef int (HandlerObj::*RunCommandMethod)( int argc, const char** argv, OutputBlock& m_output);
+
+	template <RunCommandMethod Method>
+	static int runCommandFunction( void* data, int argc, const char** argv, OutputBlock& m_output)
+	{
+		return (((HandlerObj*)data).*Method)( argc, argv, m_output);
+	}
+public:
+
+	LineCommandHandlerSTMTemplate& operator[]( StateEnum se)
+	{
+		newState( se);
+		return *this;
+	}
+
+	template <RunCommandMethod Method>
+	LineCommandHandlerSTMTemplate&  operator()( const char* name_)
+	{
+		defineCommand( name_, &runCommandFunction<Method>);
+		return *this;
+	}
+};
 
 }}
 #endif

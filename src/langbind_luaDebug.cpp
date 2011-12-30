@@ -30,7 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-#include "luaDebug.hpp"
+#include "langbind/luaDebug.hpp"
 #include "logger-v1.hpp"
 #include <boost/lexical_cast.hpp>
 

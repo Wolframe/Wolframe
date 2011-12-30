@@ -50,6 +50,15 @@ LOCAL_STATIC_LIB_OBJS = \
 	protocol_ioblocks.obj \
 	protocol_commandHandler.obj \
 	protocol_lineCommandHandler.obj \
+	langbind_appObjects.obj \
+	langbind_ioFilterCommandHandler.obj \
+	filter_textwolf_filter.obj \
+	filter_textwolf_filterBase.obj \
+	filter_char_filter.obj \
+	filter_line_filter.obj \
+	serialize_mapContext.obj \
+	serialize_struct_filtermapBase.obj \
+	serialize_ddl_filtermapSerialize.obj \
 	acceptor.obj \
 	getPassword.obj \
 	serverEndpoint.obj \
@@ -58,8 +67,24 @@ LOCAL_STATIC_LIB_OBJS = \
 	server.obj \
 	procProvider.obj
 
-#SSL
+#LUA
+!IFDEF WITH_LUA
+LOCAL_STATIC_LIB_OBJS = \
+	$(LOCAL_STATIC_LIB_OBJS) \
+	serialize\struct\luamapBase.obj \
+	langbind\luaDebug.obj \
+	langbind\luaCommandConfig.obj \
+	langbind\luaCommandHandler.obj
+!ENDIF
 
+#LIBXML2
+!IFDEF WITH_LIBXML2
+LOCAL_STATIC_LIB_OBJS = \
+	$(LOCAL_STATIC_LIB_OBJS) \
+	filters\libxml2_filter.obj
+!ENDIF
+
+#SSL
 !IFDEF WITH_SSL
 LOCAL_STATIC_LIB_OBJS = $(LOCAL_STATIC_LIB_OBJS) \
 	SSLcertificateInfo.obj

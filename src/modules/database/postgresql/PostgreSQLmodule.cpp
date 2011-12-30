@@ -44,19 +44,22 @@ _Wolframe::log::LogBackend*	logBackendPtr;
 namespace _Wolframe {
 namespace module {
 
-extern "C" {
-	ModuleContainer* createModule( void )
-	{
-		static ContainerDescription< db::PostgreSQLcontainer,
-				db::PostgreSQLconfig > mod( "PostgreSQL database", "database",
-							    "PostgreSQL", "PostgreSQL" );
-		return &mod;
-	}
+static ModuleContainer* createModule( void )
+{
+	static ContainerDescription< db::PostgreSQLcontainer,
+			db::PostgreSQLconfig > mod( "PostgreSQL database", "database",
+						    "PostgreSQL", "PostgreSQL" );
+	return &mod;
+}
 
-	void setModuleLogger( void* logger )
-	{
-		logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend* >( logger );
-	}
-} // extern "C"
+static void setModuleLogger( void* logger )
+{
+	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend* >( logger );
+}
+
+
+_Wolframe_MODULE_ENTRY_POINT ModuleEntryPoint entryPoint( 0, CONTAINER_MODULE,
+							  "PostgreSQL Database",
+							  createModule, setModuleLogger );
 
 }} // namespace _Wolframe::module

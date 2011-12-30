@@ -31,7 +31,7 @@ Project Wolframe.
 ************************************************************************/
 ///\file textwolf_filterBase.cpp
 ///\brief Implementations of base functions and classes for filters based on textwolf
-#include "textwolf_filterBase.hpp"
+#include "filter/textwolf_filterBase.hpp"
 #include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;

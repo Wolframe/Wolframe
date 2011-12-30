@@ -31,11 +31,11 @@ Project Wolframe.
 ************************************************************************/
 ///\file textwolf_filter.cpp
 ///\brief Filter implementation reading/writing xml with the textwolf xml library
-#include "textwolf_filter.hpp"
-#include "filters/textwolf_filterBase.hpp"
+#include "filter/textwolf_filter.hpp"
+#include "filter/textwolf_filterBase.hpp"
+#include "filter/textwolf.hpp"
 #include "protocol/inputfilter.hpp"
 #include "protocol/outputfilter.hpp"
-#include "textwolf.hpp"
 #include <string>
 #include <cstring>
 #include <cstddef>
@@ -168,7 +168,8 @@ struct OutputFilterImpl :public protocol::OutputFilter, public FilterBase<IOChar
 	///\return true, if success, false else
 	virtual bool print( protocol::OutputFilter::ElementType type, const void* element, std::size_t elementsize)
 	{
-		protocol::EscapingBuffer<textwolf::StaticBuffer> buf( rest(), restsize(), m_bufstate);
+		textwolf::StaticBuffer basebuf( (char*)rest(), restsize());
+		protocol::EscapingBuffer<textwolf::StaticBuffer> buf( &basebuf, m_bufstate);
 
 		const void* cltag;
 		std::size_t cltagsize;
@@ -183,7 +184,7 @@ struct OutputFilterImpl :public protocol::OutputFilter, public FilterBase<IOChar
 				FilterBase<IOCharset,AppCharset>::printToBuffer( '<', buf);
 				FilterBase<IOCharset,AppCharset>::printToBuffer( (const char*)element, elementsize, buf);
 
-				if (buf.overflow())
+				if (basebuf.overflow())
 				{
 					setState( EndOfBuffer);
 					return false;
@@ -195,7 +196,7 @@ struct OutputFilterImpl :public protocol::OutputFilter, public FilterBase<IOChar
 				}
 				m_xmlstate = ((const char*)(element))[0]=='?'?Header:Tag;
 				m_pendingOpenTag = true;
-				incPos( buf.size());
+				incPos( basebuf.size());
 				setState( Open);
 				m_bufstate = buf.state();
 				return true;
@@ -210,13 +211,13 @@ struct OutputFilterImpl :public protocol::OutputFilter, public FilterBase<IOChar
 				FilterBase<IOCharset,AppCharset>::printToBuffer( (const char*)element, elementsize, buf);
 				FilterBase<IOCharset,AppCharset>::printToBuffer( '=', buf);
 
-				if (buf.overflow())
+				if (basebuf.overflow())
 				{
 					setState( EndOfBuffer);
 					return false;
 				}
 				m_xmlstate = (m_xmlstate==Header)?HeaderAttribute:Attribute;
-				incPos( buf.size());
+				incPos( basebuf.size());
 				setState( Open);
 				m_bufstate = buf.state();
 				return true;
@@ -225,7 +226,7 @@ struct OutputFilterImpl :public protocol::OutputFilter, public FilterBase<IOChar
 				if (m_xmlstate == Attribute)
 				{
 					printToBufferAttributeValue( (const char*)element, elementsize, buf);
-					if (buf.overflow())
+					if (basebuf.overflow())
 					{
 						setState( EndOfBuffer);
 						return false;
@@ -235,7 +236,7 @@ struct OutputFilterImpl :public protocol::OutputFilter, public FilterBase<IOChar
 				else if (m_xmlstate == HeaderAttribute)
 				{
 					printToBufferAttributeValue( (const char*)element, elementsize, buf);
-					if (buf.overflow())
+					if (basebuf.overflow())
 					{
 						setState( EndOfBuffer);
 						return false;
@@ -249,7 +250,7 @@ struct OutputFilterImpl :public protocol::OutputFilter, public FilterBase<IOChar
 						FilterBase<IOCharset,AppCharset>::printToBuffer( '>', buf);
 					}
 					printToBufferContent( (const char*)element, elementsize, buf);
-					if (buf.overflow())
+					if (basebuf.overflow())
 					{
 						setState( EndOfBuffer);
 						return false;
@@ -257,7 +258,7 @@ struct OutputFilterImpl :public protocol::OutputFilter, public FilterBase<IOChar
 					m_pendingOpenTag = false;
 					m_xmlstate = Content;
 				}
-				incPos( buf.size());
+				incPos( basebuf.size());
 				setState( Open);
 				m_bufstate = buf.state();
 				return true;
@@ -286,7 +287,7 @@ struct OutputFilterImpl :public protocol::OutputFilter, public FilterBase<IOChar
 					FilterBase<IOCharset,AppCharset>::printToBuffer( (const char*)cltag, cltagsize, buf);
 					FilterBase<IOCharset,AppCharset>::printToBuffer( '>', buf);
 				}
-				if (buf.overflow())
+				if (basebuf.overflow())
 				{
 					setState( EndOfBuffer);
 					return false;
@@ -294,7 +295,7 @@ struct OutputFilterImpl :public protocol::OutputFilter, public FilterBase<IOChar
 				m_xmlstate = Content;
 				m_pendingOpenTag = false;
 				popTag();
-				incPos( buf.size());
+				incPos( basebuf.size());
 				setState( Open);
 				m_bufstate = buf.state();
 				return true;

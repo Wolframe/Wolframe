@@ -35,7 +35,6 @@
 ///
 
 #include "iprocHandler.hpp"
-#include "filters/char_filter.hpp"
 #include "logger-v1.hpp"
 #include <stdexcept>
 
@@ -367,6 +366,7 @@ bool Connection::loadCommands()
 
 Connection::Connection( const net::LocalEndpoint& local, const Configuration* config)
 	:m_state(Init)
+	,m_buffer(256)
 	,m_argBuffer(&m_buffer)
 	,m_input(config->input_bufsize())
 	,m_output(config->output_bufsize())

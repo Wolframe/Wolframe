@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-#include "luaCommandConfig.hpp"
-#include "luaDebug.hpp"
+#include "langbind/luaCommandConfig.hpp"
+#include "langbind/luaDebug.hpp"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/algorithm/string.hpp>
 #define BOOST_FILESYSTEM_VERSION 3

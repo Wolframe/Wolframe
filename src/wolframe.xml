@@ -53,12 +53,13 @@ Project Wolframe.
 	<ServerSignature>Off</ServerSignature>	<!--	Print the name of the server as first element
 							of the greeting -->
 
-	<!--	Unix daemon parameters. This section is not valid for windows -->
+	<!--	Unix daemon parameters. This section is not valid for windows
 	<daemon>
 		<user>nobody</user>
 		<group>nobody</group>
 		<pidFile>/tmp/wolframed.pid</pidFile>
 	</daemon>
+	-->
 
 	<!--	Windows service parameters (for service registration).
 		This section is not valid on non-Windows OSes -->

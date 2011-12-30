@@ -36,105 +36,24 @@
 
 #include "logger-v1.hpp"
 #include "moduleInterface.hpp"
-#include "loadModules.hpp"
 
 #if !defined(_WIN32)	// POSIX module loader
 
 	#include <dlfcn.h>
 
-	using namespace _Wolframe;
-
-	typedef module::ModuleContainer* (*CreateFunction)();
-	typedef void (*SetModuleLogger)( void* );
-
-	class LocalGarbageCollector
-	{
-	public:
-		~LocalGarbageCollector()	{
-			while ( !m_handle.empty())	{
-				dlclose( m_handle.back());
-				m_handle.pop_back();
-				LOG_ALERT << "DLL handle closed.";
-			}
-		}
-
-		void addHandle( void* handle )	{ m_handle.push_back( handle); }
-	private:
-		std::list< void* >	m_handle;
-
-	};
-
-	static LocalGarbageCollector	handleList;
-
-	bool module::LoadModules( ModulesDirectory& modDir, std::list< std::string >& modFiles )
-	{
-		bool retVal = true;
-
-		for ( std::list< std::string >::const_iterator it = modFiles.begin();
-								it != modFiles.end(); it++ )	{
-			LOG_TRACE << "Loading module '" << *it << "'";
-			void* hndl = dlopen( it->c_str(), RTLD_LAZY );
-			if ( !hndl )	{
-				LOG_ERROR << "Module loader: " << dlerror()
-					  << ", (module '" << *it << "')";
-				retVal = false;
-				break;
-			}
-
-			CreateFunction create = void_ptr_to_func_ptr_cast<CreateFunction>( dlsym( hndl, "createModule" ) );
-			if ( !create )	{
-				LOG_ERROR << "Module creation entry point: " << dlerror()
-					  << ", (module '" << *it << "')";
-				retVal = false;
-				dlclose( hndl );
-				break;
-			}
-
-			SetModuleLogger setLogger = void_ptr_to_func_ptr_cast<SetModuleLogger>( dlsym( hndl, "setModuleLogger" ) );
-			if ( !setLogger )	{
-				LOG_ERROR << "Module logging entry point: " << dlerror()
-					  << ", (module '" << *it << "')";
-				retVal = false;
-				dlclose( hndl );
-				break;
-			}
-			setLogger( &_Wolframe::log::LogBackend::instance() );
-			modDir.addContainer( create() );
-			handleList.addHandle( hndl );
-		}
-		return retVal;
-	}
-
+	typedef	void*	_Wolframe_MODULE_HANDLE;
+	#define	_Wolframe_DLL_CLOSE(x)	dlclose( x )
 #else		// Win32 module loader
 
 	#define WIN32_MEAN_AND_LEAN
 	#include <windows.h>
 	#include <string.h>
 
-	using namespace _Wolframe;
+	typedef	HMODULE	_Wolframe_MODULE_HANDLE;
+	#define	_Wolframe_DLL_CLOSE(x)	(void)FreeLibrary( x )
 
-	typedef module::ModuleContainer* (*CreateFunction)();
-	typedef void (*SetModuleLogger)( void* );
-
-	class LocalGarbageCollector
+	char *getLastError( char *buf, size_t buflen )
 	{
-	public:
-		~LocalGarbageCollector()	{
-			while ( !m_handle.empty())	{
-				FreeLibrary( m_handle.back());
-				m_handle.pop_back();
-			}
-		}
-
-		void addHandle( HMODULE handle )	{ m_handle.push_back( handle); }
-	private:
-		std::list< HMODULE >	m_handle;
-
-	};
-
-	static LocalGarbageCollector	handleList;
-
-	char *getLastError( char *buf, size_t buflen ) {
 		LPTSTR errbuf;
 		DWORD errbuf_len;
 		DWORD res;
@@ -164,42 +83,78 @@
 		return buf;
 	}
 
-	bool module::LoadModules( ModulesDirectory& modDir, std::list< std::string >& modFiles )
-	{
-		bool retVal = true;
-		char buf[512];
+#endif		// defined(_WIN32)
 
-		for ( std::list< std::string >::const_iterator it = modFiles.begin();
-								it != modFiles.end(); it++ )	{
-			LOG_TRACE << "Loading module '" << *it << "'";
-			HMODULE hndl = LoadLibrary( it->c_str( ) );
-			if ( !hndl )	{
-				LOG_ERROR << "Module loader: " << getLastError( buf, 512 )
-					  << ", (module '" << *it << "')";
-				retVal = false;
-				break;
-			}
-			CreateFunction create = (CreateFunction)GetProcAddress( hndl, "createModule" );
-			if ( !create )	{
-				LOG_ERROR << "Module creation entry point: " << getLastError( buf, 512 )
-					  << ", (module '" << *it << "')";
-				retVal = false;
-				(void)FreeLibrary( hndl );
-				break;
-			}
-			SetModuleLogger setLogger = (SetModuleLogger)GetProcAddress( hndl, "setModuleLogger" );
-			if ( !setLogger )	{
-				LOG_ERROR << "Module logging entry point: " << getLastError( buf, 512 )
-					  << ", (module '" << *it << "')";
-				retVal = false;
-				(void)FreeLibrary( hndl );
-				break;
-			}
-			setLogger( &_Wolframe::log::LogBackend::instance() );
-			modDir.addContainer( create() );
-			handleList.addHandle( hndl );
+using namespace _Wolframe;
+
+class LocalGarbageCollector
+{
+public:
+	~LocalGarbageCollector()	{
+		while ( !m_handle.empty())	{
+			_Wolframe_DLL_CLOSE( m_handle.back());
+			m_handle.pop_back();
 		}
-		return retVal;
 	}
 
-#endif		// defined(_WIN32)
+	void addHandle( _Wolframe_MODULE_HANDLE handle )	{ m_handle.push_back( handle ); }
+private:
+	std::list< _Wolframe_MODULE_HANDLE >	m_handle;
+
+};
+
+static LocalGarbageCollector	handleList;
+
+
+bool module::LoadModules( ModulesDirectory& modDir, std::list< std::string >& modFiles )
+{
+	bool retVal = true;
+
+	for ( std::list< std::string >::const_iterator it = modFiles.begin();
+	      it != modFiles.end(); it++ )	{
+		LOG_TRACE << "Loading module '" << *it << "'";
+#if !defined(_WIN32)	// POSIX module loader
+		void* hndl = dlopen( it->c_str(), RTLD_LAZY );
+		if ( !hndl )	{
+			LOG_ERROR << "Module loader: " << dlerror()
+				  << ", (module '" << *it << "')";
+			retVal = false;
+			break;
+		}
+
+		ModuleEntryPoint* entry = (ModuleEntryPoint*)dlsym( hndl, "entryPoint" );
+		if ( !entry )	{
+			LOG_ERROR << "Module entry point not found: " << dlerror()
+				  << ", (module '" << *it << "')";
+			retVal = false;
+			dlclose( hndl );
+			break;
+		}
+#else
+		HMODULE hndl = LoadLibrary( it->c_str( ) );
+		if ( !hndl )	{
+			char buf[512];
+			LOG_ERROR << "Module loader: " << getLastError( buf, 512 )
+				  << ", (module '" << *it << "')";
+			retVal = false;
+			break;
+		}
+		ModuleEntryPoint* entry = (ModuleEntryPoint*)GetProcAddress( hndl, "entryPoint" );
+		if ( !entry )	{
+			char buf[512];
+			LOG_ERROR << "Module entry point not found: " << getLastError( buf, 512 )
+				  << ", (module '" << *it << "')";
+			retVal = false;
+			(void)FreeLibrary( hndl );
+			break;
+		}
+#endif
+		entry->setLogger( &_Wolframe::log::LogBackend::instance() );
+		modDir.addContainer( entry->create() );
+		handleList.addHandle( hndl );
+		LOG_DEBUG << "Module '" << entry->name << "' loaded";
+	}
+	return retVal;
+}
+
+

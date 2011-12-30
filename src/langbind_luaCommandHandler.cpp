@@ -29,9 +29,9 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-#include "luaCommandHandler.hpp"
-#include "luaDebug.hpp"
-#include "appObjects.hpp"
+#include "langbind/luaCommandHandler.hpp"
+#include "langbind/luaDebug.hpp"
+#include "langbind/appObjects.hpp"
 #include "logger-v1.hpp"
 #include "protocol/outputfilter.hpp"
 #include "protocol/inputfilter.hpp"

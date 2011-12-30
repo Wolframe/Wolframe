@@ -161,23 +161,23 @@ public:
 	};
 
 	///\brief Constructor
-	InputBlock()						:m_eodState(EoD::SRC){}
+	InputBlock()						:m_eodState(EoD::SRC),m_eodcharbuf(m_eodcharbufc,sizeof(m_eodcharbuf)){}
 
 	///\brief Constructor
 	///\param [in] p_size size of the memory block in bytes to allocate
-	InputBlock( std::size_t p_size)				:MemBlock(p_size),m_eodState(EoD::SRC){}
+	InputBlock( std::size_t p_size)				:MemBlock(p_size),m_eodState(EoD::SRC),m_eodcharbuf(m_eodcharbufc,sizeof(m_eodcharbuf)){}
 
 	///\brief Constructor
 	///\param [in] p pointer to the memory block to use
 	///\param [in] n allocation size of the memory block in bytes
 	///\param [in] i fill size of the block in bytes
-	InputBlock( void* p, std::size_t n, std::size_t i)	:MemBlock(p,n,i),m_eodState(EoD::SRC){}
+	InputBlock( void* p, std::size_t n, std::size_t i)	:MemBlock(p,n,i),m_eodState(EoD::SRC),m_eodcharbuf(m_eodcharbufc,sizeof(m_eodcharbuf)){}
 
 	///\brief Copy constructor
 	///\param [in] o InputBlock to copy
-	InputBlock( const InputBlock& o)			:MemBlock(o),m_eodState(o.m_eodState){}
+	InputBlock( const InputBlock& o)			:MemBlock(o),m_eodState(o.m_eodState),m_eodcharbuf(m_eodcharbufc,sizeof(m_eodcharbuf)) {m_eodcharbuf=o.m_eodcharbuf;}
 
-	InputBlock& operator=( const InputBlock& o)		{MemBlock::operator=(o); m_eodState=o.m_eodState; return *this;}
+	InputBlock& operator=( const InputBlock& o)		{MemBlock::operator=(o); m_eodState=o.m_eodState; m_eodcharbuf=o.m_eodcharbuf; return *this;}
 
 	///\brief Random access const iterator
 	typedef array::iterator_t<const InputBlock,std::size_t,char,char,const char*> const_iterator;
@@ -242,7 +242,8 @@ private:
 	EoD::State m_eodState;
 
 	///\brief Buffer for unprocessed EoD characters
-	Buffer<8> m_eodcharbuf;
+	Buffer m_eodcharbuf;
+	char m_eodcharbufc[8];
 };
 
 
@@ -320,7 +321,7 @@ public:
 ///\brief Back insertion sequence for content data where LF '.' sequences have to be escaped for the prococol
 ///\tparam Inherited back insertion sequence base
 template <class BufferType>
-class EscapingBuffer :public BufferType
+class EscapingBuffer
 {
 public:
 	///\enum State
@@ -335,8 +336,8 @@ public:
 	///\brief Constructor
 	///\param [in] p_ptr pointer to the memory block to use
 	///\param [in] p_size size of the memory block in bytes
-	EscapingBuffer( char* p_ptr, std::size_t p_size, State p_state)
-		:BufferType(p_ptr,p_size),m_state(p_state) {}
+	EscapingBuffer( BufferType* b, State p_state)
+		:m_buf(b),m_state(p_state) {}
 
 	///\brief get the current state of escaping LF DOT
 	State state() const
@@ -347,7 +348,7 @@ public:
 	///\brief redirect to BufferType::push_back(char) with escaping of LF DOT as LF DOT DOT
 	void push_back( char ch)
 	{
-		BufferType::push_back( ch);
+		m_buf->push_back( ch);
 		if (ch == '\n')
 		{
 			m_state = LF;
@@ -357,7 +358,7 @@ public:
 			if (m_state == LF)
 			{
 				m_state = LF_DOT;
-				BufferType::push_back( ch);
+				m_buf->push_back( ch);
 
 			}
 			m_state = SRC;
@@ -368,6 +369,7 @@ public:
 		}
 	}
 private:
+	BufferType* m_buf;	///< the buffer to use
 	State m_state;		///< the current state of escaping LF DOT as LF DOT DOT
 };
 

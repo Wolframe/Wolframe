@@ -2,5 +2,5 @@ LIBRARY mod_db_sqlite3
 DESCRIPTION "Wolframe SQLite database module"
 
 EXPORTS
-createModule    @1
-setModuleLogger @1
+entryPoint	@1
+

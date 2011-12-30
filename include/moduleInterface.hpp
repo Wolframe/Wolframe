@@ -102,33 +102,32 @@ bool LoadModules( ModulesDirectory& modDir, std::list< std::string >& modFiles )
 
 
 //*********** Module interface *********
-struct ModuleEntry
+
+enum ModuleType	{
+	CONTAINER_MODULE = 1
+};
+
+struct ModuleEntryPoint
 {
 	unsigned short ifaceVersion;
-	unsigned short moduleType;
+	ModuleType moduleType;
 	const char* name;
 	ModuleContainer* (*create)();
 	void (*setLogger)(void*);
 public:
-	ModuleEntry( unsigned short iVer, unsigned short mType, const char* modName,
-		     ModuleContainer* (*createFunc)(),
-		     void (*setLoggerFunc)(void*))
-		: ifaceVersion( iVer ), moduleType( mType ), name( modName ),
+	ModuleEntryPoint( unsigned short iVer, ModuleType modType, const char* modName,
+			  ModuleContainer* (*createFunc)(),
+			  void (*setLoggerFunc)(void*))
+		: ifaceVersion( iVer ), moduleType( modType ), name( modName ),
 		  create( createFunc ), setLogger( setLoggerFunc )
 	{}
 
 };
 
 #if !defined(_WIN32)	// POSIX module loader
-	extern "C" {
-		ModuleContainer* createModule( void );
-		void setModuleLogger( void* logger );
-	}
+	#define	_Wolframe_MODULE_ENTRY_POINT	extern "C"
 #else
-	extern "C" {
-		__declspec( dllexport ) ModuleContainer* createModule( void );
-		__declspec( dllexport ) void setModuleLogger( void* logger );
-	}
+	#define	_Wolframe_MODULE_ENTRY_POINT	extern "C" __declspec( dllexport )
 #endif
 
 }} // namespace _Wolframe::module
