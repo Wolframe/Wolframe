@@ -74,8 +74,8 @@ LOCAL_STATIC_LIB_OBJS = \
 	commandLine.obj \
 	serviceConfig.obj \
 	serviceBanner.obj \
-	config_descriptionBase.obj \
 	appConfig.obj \
+	config_descriptionBase.obj \
 	protocol_ioblocks.obj \
 	protocol_commandHandler.obj \
 	protocol_lineCommandHandler.obj \
@@ -85,9 +85,9 @@ LOCAL_STATIC_LIB_OBJS = \
 	filter_textwolf_filterBase.obj \
 	filter_char_filter.obj \
 	filter_line_filter.obj \
-	serialize_mapContext.obj \
 	serialize_struct_filtermapBase.obj \
 	serialize_ddl_filtermapSerialize.obj \
+	serialize_mapContext.obj \
 	acceptor.obj \
 	getPassword.obj \
 	serverEndpoint.obj \
@@ -134,13 +134,13 @@ all: $(CPP_OBJS) $(CPP_BINS)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-wolframed.exe: wolframed.obj $(CPP_OBJS)
 modules: libwolframe
+wolframed.exe: wolframed.obj $(CPP_OBJS)
 
 $(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
 	$(LINK) /lib /nologo /out:$@ $(LDFLAGS) $(LIBS) $?
 
-local_all: $(LOCAL_STATIC_LIB)
+local_all: $(LOCAL_STATIC_LIB) loadModules-dummy.obj
 
 local_clean:
 	@-erase $(LOCAL_STATIC_LIB) 2>NUL
@@ -156,6 +156,9 @@ run: $(CPP_BINS)
 !IFDEF WITH_SSL
 	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat
 	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >> test.bat
+!ENDIF
+!IFDEF WITH_LIBXML2
+	@-echo copy "$(LIBXML2_DIR)\lib\libxml2.dll" . >> test.bat
 !ENDIF
 !IFDEF WITH_PGSQL
 	@-echo copy "$(PGSQL_DIR)\lib\libpq.dll" . >> test.bat

@@ -92,7 +92,7 @@ TEST_CPP_BINS = \
 !IFDEF WITH_LUA
 TEST_CPP_BINS = \
 	$(TEST_CPP_BINS) \
-	tests\structLuamapTest.exe	
+	tests\structLuamapTest.exe
 !ENDIF
 
 iprocd.exe: iprocd.obj $(TOPDIR)\src\wolframe.lib
