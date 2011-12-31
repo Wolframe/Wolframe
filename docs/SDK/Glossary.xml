@@ -22,93 +22,115 @@
 
 <glossdiv><title>Our glossary</title>
 
-	<glossentry><glossterm>Application Processor</glossterm>
-		<glossdef>
-			<para>The module that executes the scripts of the user application called by the
-				connection handler. An application processor is assigned to exactly one connection
-				handler during its lifetime.</para>
-		</glossdef>
-	</glossentry>
-
-	<glossentry><glossterm>Application Processor Program</glossterm>
-		<glossdef>
-			<para>Program or script executed by the application processor.
-				The program or script works with input, output and system calls
-				as only interface to the system. System exceptions, signals and events
-				are handled in the background through yield execution.</para>
-		</glossdef>
-	</glossentry>
-
-	<glossentry><glossterm>Application Processor System Call</glossterm>
-		<glossdef>
-			<para>Call of a database or another interface provided by the framework and configured by
-				the user. The application procesor program builds an object describing the
-				transaction or task and passes is to the system with a system call. As result
-				an object is returned as result of the call.</para>
-		</glossdef>
-	</glossentry>
-
 	<glossentry><glossterm>Connection Handler</glossterm>
 		<glossdef>
-			<para>Interface for the networking to one client/server connection during its whole lifetime.</para>
+			<para>Interface for the networking to one client/server connection during its whole lifetime.
+			</para>
 		</glossdef>
 	</glossentry>
-
-	<glossentry id="EoD" ><glossterm>End Of Data</glossterm>
-		<abbrev>EoD</abbrev>
+	<glossentry><glossterm>Command Handler</glossterm>
 		<glossdef>
-			<para>Marks the end of the content to be processed by the application processor.
-				End of data is marked with CR LF '.' CR LF or LF '.' LF.
-				For passing lines with a dot '.' at the start of a content line,
-				the client has to escape an LF '.' in the content with LF '.' '.'.</para>
-			<glossseealso otherterm="EoM">EoM</glossseealso>
+			<para>Interface for delegating processing in a hierarchical way. A command handler is created by a connection handler or another command handler. The creator creates a command handler to execute a command. During this command execution the input/output of the connection is entirely handled by the command handler. After command execution the control gets back to the creator of the command handler. Command Handlers are used to build the communication protocol processing as hierarchical state machine.
+			</para>
 		</glossdef>
 	</glossentry>
-
-	<glossentry id="EoM"><glossterm>End Of Message</glossterm>
-		<abbrev>EoM</abbrev>
-		<glossdef>
-			<para>Marks the end of a network input message.
-				End of message is handled by the application processor generator function
-				without showing up to the application processor program (yield execution).</para>
-			<glossseealso otherterm="EoD">EoD</glossseealso>
-		</glossdef>
-	</glossentry>
-
 	<glossentry><glossterm>Network Input</glossterm>
 		<glossdef>
-			<para>Data passed from the networking framework to the connection handler for processing.</para>
+			<para>Data passed from the networking framework to the connection handler through its channel for processing.
+			</para>
 		</glossdef>
 	</glossentry>
-
 	<glossentry><glossterm>Network Output</glossterm>
 		<glossdef>
-			<para>Data passed back to the networking framework from the connection handler as output of processing.</para>
+			<para>Data passed back  through the channel to the networking framework from the connection handler as output of processing.
+			</para>
 		</glossdef>
 	</glossentry>
-
+	<glossentry><glossterm>Transaction</glossterm>
+		<glossdef>
+			<para>A transaction is a call of a database or another function involving resources. A transaction either fails completely or succeeds a whole and is object of auditing seen as part of the transaction. It has an object as input and returns an object or an error as result. Transaction functions are loaded by the system at startup and have a unique name.
+			</para>
+		</glossdef>
+	</glossentry>
+	<glossentry><glossterm>Program</glossterm>
+		<glossdef>
+			<para>A program is executed by a command handler. It works with data input, data output and transaction execution as only interfaces to the system. Exceptions, signals and events are handled by the processor in the background without showing up the the program. A program in this context is sequential.
+			</para>
+		</glossdef>
+	</glossentry>
+	<glossentry><glossterm>Lua</glossterm>
+		<glossdef>
+			<para>Lua (www.lua.org) is a scripting language. It is used in Wolframe as one language for writing programs. It distinguishes itself by being lightweight. It has to be lightweight because the language context has to be recreated with every start of a clients command execution for security reasons.
+			</para>
+		</glossdef>
+	</glossentry>
 	<glossentry><glossterm>Filter</glossterm>
 		<glossdef>
-			<para>Filters are data structures attached to network input and output to read and write input in a well defined format.
+			<para>Filters are attached to network input and output to read and write input in a well defined format. Filters let you process input and print output in an iterative way. Filters are loaded by the system at startup and have a unique name.
+			</para>
+		</glossdef>
+	</glossentry>
+	<glossentry><glossterm>Form</glossterm>
+		<glossdef>
+			<para>A form is a hierarchical description of typed data. Forms are used to create objects from a data structure representation in the program and to map them back. In Lua for example forms are used to create transaction input from Lua tables and to map the transaction output back to its representation as lua table. Forms are loaded by the system at startup and have a unique name.
+			</para>
+		</glossdef>
+	</glossentry>
+	<glossentry><glossterm>Direct Map</glossterm>
+		<glossdef>
+			<para>A direct map is a program described by a form for the input, a form for the output, and a transaction function. The input of a direct map transaction function is the object deserialization of the input xml defined by the input form. The result of the transaction function is returned as xml serialization of the transaction result defined by the output form. It is called direct map because no scripting is involved in this case.
 			</para>
 		</glossdef>
 	</glossentry>
 
-	<glossentry><glossterm>Application Reference Path</glossterm>
+	<glossentry><glossterm>Channel</glossterm>
 		<glossdef>
-			<para>The application server defines this file path where all relative paths
-			defined in the configuration refer to.</para>
+			<para>The flow for a single connection. Not all objects have channels (e.g. databases).
+			</para>
 		</glossdef>
 	</glossentry>
-
+	<glossentry><glossterm>Group</glossterm>
+		<glossdef>
+			<para>A set of objects of the same type seen as one single object for the objects that use it.
+			</para>
+		</glossdef>
+	</glossentry>
+	<glossentry><glossterm>Unit</glossterm>
+		<glossdef>
+			<para>An element of a group. A group is a set of units.
+			</para>
+		</glossdef>
+	</glossentry>
+	<glossentry><glossterm>Provider</glossterm>
+		<glossdef>
+			<para>An entity providing objects of a kind. Some providers are factories, but not all of them (e.g. the database provider)
+			</para>
+		</glossdef>
+	</glossentry>
+	<glossentry id="EoD"><glossterm>End Of Data (EoD)</glossterm>
+		<abbrev>EoD</abbrev>
+		<glossdef>
+			<para>Marks the end of the data to be processed by a processor. End of data is marked with CR LF dot ('.') CR LF or LF dot LF. For passing lines with a dot ('.') at the start of a content line, the client has to escape an LF dot in the content with LF dot dot.
+			</para>
+		</glossdef>
+	</glossentry>
+	<glossentry id="EoM"><glossterm>End Of Message</glossterm>
+		<abbrev>EoM</abbrev>
+		<glossdef>
+			<para>Marks the end of a network input message. End of message is handled by the processor without showing up to the processor program (yield execution).
+			</para>
+		</glossdef>
+	</glossentry>
+	<glossentry><glossterm>Application Reference Path</glossterm>
+		<glossdef>
+			<para>The application server defines this file path where all relative paths defined in the configuration refer to.
+			</para>
+		</glossdef>
+	</glossentry>
 	<glossentry><glossterm>Yield execution</glossterm>
 		<glossdef>
-			<para>The application processor yields execution and gives control
-				back to the connection handler, when it cannot continue execution.
-				The connection handler has to resume with an action returned
-				to the networking framework, that fetches the resources needed by
-				the application processor to continue.</para>
-			<glossseealso><ulink url="http://en.wikipedia.org/wiki/Coroutine">wikipedia yield in coroutine</ulink></glossseealso>
+			<para>The processor yields execution and gives control back to the connection handler, when it cannot continue execution. The connection handler has to resume with an action returned to the networking framework, that fetches the resources needed by the processor to continue. (see also [http://en.wikipedia.org/wiki/Coroutine wikipedia yield in coroutine]). Lua is able to yield execution.
+			</para>
 		</glossdef>
 	</glossentry>
 </glossdiv>
