@@ -52,6 +52,11 @@
 	typedef	HMODULE	_Wolframe_MODULE_HANDLE;
 	#define	_Wolframe_DLL_CLOSE(x)	(void)FreeLibrary( x )
 
+	#ifdef LOCAL_ERROR_BUFFER_SIZE
+		#error "LOCAL_ERROR_BUFFER_SIZE previously defined"
+	#else
+		#define	LOCAL_ERROR_BUFFER_SIZE	512
+	#endif
 	char *getLastError( char *buf, size_t buflen )
 	{
 		LPTSTR errbuf;
@@ -133,16 +138,16 @@ bool module::LoadModules( ModulesDirectory& modDir, std::list< std::string >& mo
 #else
 		HMODULE hndl = LoadLibrary( it->c_str( ) );
 		if ( !hndl )	{
-			char buf[512];
-			LOG_ERROR << "Module loader: " << getLastError( buf, 512 )
+			char buf[LOCAL_ERROR_BUFFER_SIZE];
+			LOG_ERROR << "Module loader: " << getLastError( buf, LOCAL_ERROR_BUFFER_SIZE )
 				  << ", (module '" << *it << "')";
 			retVal = false;
 			break;
 		}
 		ModuleEntryPoint* entry = (ModuleEntryPoint*)GetProcAddress( hndl, "entryPoint" );
 		if ( !entry )	{
-			char buf[512];
-			LOG_ERROR << "Module entry point not found: " << getLastError( buf, 512 )
+			char buf[LOCAL_ERROR_BUFFER_SIZE];
+			LOG_ERROR << "Module entry point not found: " << getLastError( buf, LOCAL_ERROR_BUFFER_SIZE )
 				  << ", (module '" << *it << "')";
 			retVal = false;
 			(void)FreeLibrary( hndl );

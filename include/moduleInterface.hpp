@@ -109,6 +109,11 @@ enum ModuleType	{
 
 struct ModuleEntryPoint
 {
+	enum	SignSize	{
+		MODULE_SIGN_SIZE = 16
+	};
+
+	char signature[MODULE_SIGN_SIZE];
 	unsigned short ifaceVersion;
 	ModuleType moduleType;
 	const char* name;
@@ -120,7 +125,9 @@ public:
 			  void (*setLoggerFunc)(void*))
 		: ifaceVersion( iVer ), moduleType( modType ), name( modName ),
 		  create( createFunc ), setLogger( setLoggerFunc )
-	{}
+	{
+		std::strncpy ( signature, "Wolframe Module", MODULE_SIGN_SIZE );
+	}
 
 };
 
