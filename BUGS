@@ -1,4 +1,6 @@
-openSuse 11.4:
+openSuse 11.4
+-------------
+
 counterTest: /usr/include/boost/thread/pthread/mutex.hpp:47:
 boost::mutex::~mutex(): Assertion `!pthread_mutex_destroy(&m)' failed.
 
@@ -14,18 +16,26 @@ procProvider.cpp:176: error: within this context
 procProvider.cpp:177: error: within this context
 make[1]: *** [procProvider.o] Error 1
 
-Windows:
+Windows
+-------
+
 wolframed.exe.manifest : general error c1010070: Failed to load and parse the manifest. The system cannot find the file specified.
 advapi32.lib(ADVAPI32.dll) : warning LNK4006: __NULL_IMPORT_DESCRIPTOR already defined in kernel32.lib(KERNEL32.dll); second definition ignored
 
-Archlinux:
+Archlinux
+---------
+
+Ebook templates are missing in Arch docboox xslt package, must be fixed
+upstream:
+
 xsltproc --nonet --xinclude --stringparam draft.mode yes output-epub.xsl WolfBook.xml
 warning: failed to load external entity "http://docbook.sourceforge.net/release/xsl/current/epub/docbook.xsl"
 compilation error: file output-epub.xsl line 6 element import
 xsl:import : unable to load http://docbook.sourceforge.net/release/xsl/current/epub/docbook.xsl
 make: *** [WolfBook.epub] Error 5
 
-FreeBSD 8.2:
+FreeBSD 8.2
+-----------
 
 Segmentation fault when starting wolframed:
 
@@ -45,3 +55,29 @@ Loaded symbols for /libexec/ld-elf.so.1
     at wolframeHandler.cpp:313
 #4  0x080e560a in _Wolframe_posixMain (argc=4, argv=0xbfbfe848) at posixMain.cpp:276
 #5  0x080e9b82 in main (argc=Cannot access memory at address 0x0) at wolframed.cpp:55
+
+Building the Qt client segfaults:
+
+/usr/local/bin/moc-qt4 -I. -I/usr/local/include/qt4
+-I/usr/local/include/qt4/QtCore -I/usr/local/include/qt4/QtNetwork
+-I/usr/local/include/qt4/QtGui -I/usr/local/include/qt4/QtUiTools -DWITH_SSL
+MainWindow.hpp -o moc_MainWindow.cpp
+Generating dependencies for moc_MainWindow.cpp
+g++ -c -o qtclient.o  -O0 -g -pipe -fstrict-aliasing -pedantic -Wall
+-Wno-long-long -Wunused -Wno-import -Wformat -Wformat-y2k
+-Wformat-nonliteral -Wformat-security -Wswitch-enum -Wunknown-pragmas
+-Wfloat-equal -Wshadow -Wpointer-arith -Wcast-qual -Wcast-align
+-Wwrite-strings -Wmissing-noreturn -Wno-multichar -Wparentheses
+-Wredundant-decls -Wdisabled-optimization -Wfatal-errors
+-Wmissing-include-dirs -Wvolatile-register-var -Wextra -Winit-self
+-Wno-variadic-macros -std=c++98 -Wno-invalid-offsetof -funit-at-a-time
+-DFREEBSD -DOS_MAJOR_VERSION=8 -DOS_MINOR_VERSION=2 -I/usr/local/include
+-DENABLE_NLS=1 -DLOCALEDIR=\"/usr/share/locale\"  -I.
+-I/usr/local/include/qt4 -I/usr/local/include/qt4/QtCore
+-I/usr/local/include/qt4/QtNetwork -I/usr/local/include/qt4/QtGui
+-I/usr/local/include/qt4/QtUiTools  -DWITH_SSL -D_REENTRANT -pthread
+qtclient.cpp
+cc1plus: internal compiler error: Segmentation fault: 11
+Please submit a full bug report,
+with preprocessed source if appropriate.
+See <URL:http://gcc.gnu.org/bugs.html> for instructions.
