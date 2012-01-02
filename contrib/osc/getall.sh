@@ -16,6 +16,8 @@ for r in `cat repo.cache | tr -s ' ' '@'`; do
 	osc buildlog $repo $arch > buildlog-$repo-$arch.log	
 	
 	mv *.log packages/$repo/$arch
-	mv *.rpm packages/$repo/$arch
-	mv *.deb packages/$repo/$arch
+	mv binaries/*.log packages/$repo/$arch
+	mv binaries/*.rpm packages/$repo/$arch
+	mv binaries/*.deb packages/$repo/$arch
+	rmdir binaries
 done
