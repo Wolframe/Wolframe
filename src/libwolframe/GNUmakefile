@@ -16,6 +16,7 @@ INCLUDE_DIRS = \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LIBS = \
+	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_filesystem
 
 STATIC_LIB = libwolframe.a
