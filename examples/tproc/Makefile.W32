@@ -85,11 +85,6 @@ all: $(OBJS) $(CPP_BINS)
 TEST_CPP_BINS = \
 	tests\tprocHandlerTest.exe
 
-!IFDEF WITH_LUA
-TEST_CPP_BINS = \
-	$(TEST_CPP_BINS) \
-	tests\structLuamapTest.exe
-!ENDIF
 
 tprocd.exe: tprocd.obj $(TOPDIR)\src\wolframe.lib
 tests\tprocHandlerTest.exe: tests\tprocHandlerTest.obj $(TOPDIR)\src\wolframe.lib
