@@ -42,9 +42,9 @@ INCLUDE_LIBS = \
 
 TEST_CPP_BINS = \
 	threadLeakTest.exe \
-	testMethodMemberPointerTemplate.exe \
 	testNamedRetVal.exe \
 	versionTest.exe \
+	testMethodMemberPointerTemplate.exe \
 	counterTest.exe \
 	resolvePathTest.exe \
 	singletonTest.exe \
@@ -62,6 +62,7 @@ all: $(OBJS) $(CPP_BINS)
 
 threadLeakTest.exe: threadLeakTest.obj $(TOPDIR)\src\wolframe.lib
 testNamedRetVal.exe: testNamedRetVal.obj
+testMethodMemberPointerTemplate.exe: testMethodMemberPointerTemplate.obj
 versionTest.exe: versionTest.obj $(TOPDIR)\src\wolframe.lib
 counterTest.exe: counterTest.obj $(TOPDIR)\src\wolframe.lib
 resolvePathTest.exe: resolvePathTest.obj $(TOPDIR)\src\wolframe.lib
