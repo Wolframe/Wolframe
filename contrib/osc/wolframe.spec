@@ -489,8 +489,8 @@ fi
 %endif
 
 %dir %{_libdir}/wolframe
-%{_libdir}/wolframe/libwolframe.so
-%{_libdir}/wolframe/libwolframe.a
+%{_libdir}/wolframe/libwolframe.so.0.0.0
+%{_libdir}/wolframe/libwolframe.so.0
 
 %dir %{_libdir}/wolframe/modules
 
@@ -517,8 +517,8 @@ fi
 %files devel
 %defattr( -, root, root )
 %dir %{_libdir}/wolframe
-%{_libdir}/wolframe/libwolframe.so.0
-%{_libdir}/wolframe/libwolframe.so.0.0.0
+%{_libdir}/wolframe/libwolframe.so
+%{_libdir}/wolframe/libwolframe.a
 %dir %{_includedir}/wolframe
 %{_includedir}/wolframe/*.hpp
 %dir %{_includedir}/wolframe/config/
