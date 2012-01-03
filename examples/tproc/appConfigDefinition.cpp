@@ -31,31 +31,43 @@
 
 ************************************************************************/
 //
-// application properties - implementation
+// appConfigDefinition.cpp
 //
 
-#include "appProperties.hpp"
+#include "appConfig.hpp"
+#include "standardConfigs.hpp"
+#include "handlerConfig.hpp"
 
-namespace _Wolframe	{
-	static const unsigned short APP_MAJOR_VERSION = 0;
-	static const unsigned short APP_MINOR_VERSION = 0;
-	static const unsigned short APP_REVISION = 5;
+namespace _Wolframe {
+namespace config {
 
-	const char*	applicationName()			{ return "iproc"; }
-	const Version	applicationVersion()			{ return Version( APP_MAJOR_VERSION, APP_MINOR_VERSION ,APP_REVISION); }
+ApplicationConfiguration::ApplicationConfiguration()
+{
+	// daemon / service configuration
+	serviceCfg = new config::ServiceConfiguration();
+	// network server
+	serverCfg = new net::Configuration();
+	// logging
+	loggerCfg = new log::LoggerConfiguration();
+	// command handler
+	handlerCfg = new _Wolframe::HandlerConfiguration();
+	// add sections, the parse function will select the
+	// appropriate action
+	addConfig( "service", serviceCfg );
+	addConfig( "daemon", serviceCfg);
 
-	const char*	config::defaultMainConfig()		{ return "/etc/iproc.conf"; }
-	const char*	config::defaultUserConfig()		{ return "~/iproc.conf"; }
-	const char*	config::defaultLocalConfig()		{ return "./iproc.conf"; }
+	addConfig( "listen", serverCfg );
+	addConfig( "logging", loggerCfg );
+	addConfig( "application", handlerCfg->m_appConfig );
+}
 
-	unsigned short	net::defaultTCPport()			{ return 7660; }
-	unsigned short	net::defaultSSLport()			{ return 7960; }
+ApplicationConfiguration::~ApplicationConfiguration()
+{
+	if (serviceCfg) delete serviceCfg;
+	if (serverCfg) delete serverCfg;
+	if (loggerCfg) delete loggerCfg;
+	if (handlerCfg) delete handlerCfg;
+}
 
-	const char*	config::defaultServiceName()		{ return "iproc"; }
-#if defined( _WIN32 )
-	const char*	config::defaultServiceDisplayName()	{ return "Wolframe iproc Daemon"; }
-	const char*	config::defaultServiceDescription()	{ return "a daemon for iprocing"; }
-#endif // defined( _WIN32 )
-
-} // namespace _Wolframe
+}} // namespace _Wolframe::config
 

@@ -1,7 +1,4 @@
 - write a test for filter and luamap and ddl serialization/deserialization
 - uniform interface for form compilers: source in form description out, errors logged
 - configure form sources in iproc processor configuration
-- change filter interface to std::string
-- start split processor protocol
-- define simple configuration for mapping protocol commands to script/form + function + has I/O
 

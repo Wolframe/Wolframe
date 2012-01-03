@@ -31,31 +31,31 @@
 
 ************************************************************************/
 //
-// application properties - implementation
+// handlerConfig.hpp
 //
 
-#include "appProperties.hpp"
+#ifndef _HANDLERCONFIG_HPP_INCLUDED
+#define _HANDLERCONFIG_HPP_INCLUDED
 
-namespace _Wolframe	{
-	static const unsigned short APP_MAJOR_VERSION = 0;
-	static const unsigned short APP_MINOR_VERSION = 0;
-	static const unsigned short APP_REVISION = 5;
+#include "standardConfigs.hpp"
+#include "tprocHandlerConfig.hpp"
 
-	const char*	applicationName()			{ return "iproc"; }
-	const Version	applicationVersion()			{ return Version( APP_MAJOR_VERSION, APP_MINOR_VERSION ,APP_REVISION); }
+namespace _Wolframe {
 
-	const char*	config::defaultMainConfig()		{ return "/etc/iproc.conf"; }
-	const char*	config::defaultUserConfig()		{ return "~/iproc.conf"; }
-	const char*	config::defaultLocalConfig()		{ return "./iproc.conf"; }
+struct HandlerConfiguration
+{
+public:
+	tproc::Configuration *m_appConfig;
 
-	unsigned short	net::defaultTCPport()			{ return 7660; }
-	unsigned short	net::defaultSSLport()			{ return 7960; }
+	HandlerConfiguration()
+	{
+		m_appConfig = new tproc::Configuration();
+	}
 
-	const char*	config::defaultServiceName()		{ return "iproc"; }
-#if defined( _WIN32 )
-	const char*	config::defaultServiceDisplayName()	{ return "Wolframe iproc Daemon"; }
-	const char*	config::defaultServiceDescription()	{ return "a daemon for iprocing"; }
-#endif // defined( _WIN32 )
+	virtual ~HandlerConfiguration( ) {
+		if (m_appConfig) delete m_appConfig;
+	}
+};
 
-} // namespace _Wolframe
-
+}//namespace _Wolframe
+#endif

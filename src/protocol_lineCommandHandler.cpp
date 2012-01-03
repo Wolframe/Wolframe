@@ -33,37 +33,38 @@
 #include "protocol/lineCommandHandler.hpp"
 #include "protocol/ioblocks.hpp"
 #include "logger-v1.hpp"
-/*[-]*/#include <iostream>
 
 using namespace _Wolframe;
 using namespace _Wolframe::protocol;
 
-LineCommandHandlerBase::LineCommandHandlerBase()
+LineCommandHandler::LineCommandHandler( const LineCommandHandlerSTM* stm_)
+	:m_stm(stm_),m_argBuffer(&m_buffer),m_cmdstateidx(Init),m_stateidx(0),m_cmdidx(-1)
 {
 	m_itr = m_input.begin();
 	m_end = m_input.end();
 }
 
-void LineCommandHandlerBase::setInputBuffer( void* buf, std::size_t allocsize, std::size_t size, std::size_t itrpos)
+void LineCommandHandler::setInputBuffer( void* buf, std::size_t allocsize, std::size_t size, std::size_t itrpos)
 {
 	m_input = protocol::InputBlock( (char*)buf, allocsize, size);
 	m_itr = m_input.at(itrpos);
 	m_end = m_input.end();
 }
 
-void LineCommandHandlerBase::setOutputBuffer( void* buf, std::size_t size, std::size_t pos)
+void LineCommandHandler::setOutputBuffer( void* buf, std::size_t size, std::size_t pos)
 {
+	if (size < 16) throw std::logic_error("output buffer smaller than 16 bytes");
 	m_output = protocol::OutputBlock( buf, size, pos);
 }
 
-void LineCommandHandlerBase::putInput( const void *begin, std::size_t bytesTransferred)
+void LineCommandHandler::putInput( const void *begin, std::size_t bytesTransferred)
 {
 	m_input.setPos( bytesTransferred + ((const char*)begin - m_input.charptr()));
 	m_itr = m_input.begin();
 	m_end = m_input.end();
 }
 
-void LineCommandHandlerBase::getInputBlock( void*& begin, std::size_t& maxBlockSize)
+void LineCommandHandler::getInputBlock( void*& begin, std::size_t& maxBlockSize)
 {
 	if (!m_input.getNetworkMessageRead( begin, maxBlockSize))
 	{
@@ -71,14 +72,14 @@ void LineCommandHandlerBase::getInputBlock( void*& begin, std::size_t& maxBlockS
 	}
 }
 
-void LineCommandHandlerBase::getOutput( const void*& begin, std::size_t& bytesToTransfer)
+void LineCommandHandler::getOutput( const void*& begin, std::size_t& bytesToTransfer)
 {
 	begin = m_output.ptr();
 	bytesToTransfer = m_output.pos();
 	m_output.setPos(0);
 }
 
-void LineCommandHandlerBase::getDataLeft( const void*& begin, std::size_t& nofBytes)
+void LineCommandHandler::getDataLeft( const void*& begin, std::size_t& nofBytes)
 {
 	begin = (char*)(m_input.charptr() + (m_itr - m_input.begin()));
 	nofBytes = m_end - m_itr;
@@ -90,9 +91,15 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 	{
 		switch( m_cmdstateidx)
 		{
+			case Init:
+				m_argBuffer.clear();
+				if (m_output.pos()) return WRITE;
+				m_cmdstateidx = EnterCommand;
+				/* no break here !*/
+
 			case EnterCommand:
 			{
-				const LineCommandHandlerSTM::State& st = (*m_stm)[ m_stateidx];
+				const LineCommandHandlerSTM::State& st = (*m_stm).get( m_stateidx);
 				m_cmdidx = st.m_parser.getCommand( m_itr, m_end, m_buffer)-1;
 				if (m_cmdidx < (int)st.m_cmds.size())
 				{
@@ -105,7 +112,9 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 				}
 				else
 				{
+					m_output.print( "BAD command\r\n", 5);
 					m_cmdstateidx = ProtocolError;
+					return WRITE;
 				}
 			}
 
@@ -119,9 +128,9 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 					}
 					else
 					{
-						const LineCommandHandlerSTM::State& st = (*m_stm)[ m_stateidx];
+						m_output.print( "BAD argument\r\n", 5);
 						m_cmdstateidx = ProtocolError;
-						m_stateidx = st.m_runUnknown( this, m_argBuffer.argc(), m_argBuffer.argv(), m_output);
+						return WRITE;
 					}
 				}
 				m_cmdstateidx = ParseArgsEOL;
@@ -138,52 +147,45 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 					}
 					else
 					{
-						const LineCommandHandlerSTM::State& st = (*m_stm)[ m_stateidx];
+						m_output.print( "BAD line\r\n", 5);
 						m_cmdstateidx = ProtocolError;
-						try
-						{
-							m_stateidx = st.m_runUnknown( this, m_argBuffer.argc(), m_argBuffer.argv(), m_output);
-						}
-						catch (std::exception& e)
-						{
-							LOG_ERROR << "command execution thrown exception: " << e.what();
-							m_cmdstateidx = Terminate;
-							return CLOSED;
-						}
+						return WRITE;
 					}
 				}
 				if (m_cmdidx < 0)
 				{
+					m_output.print( "BAD command\r\n", 5);
+					m_cmdstateidx = ProtocolError;
+					return WRITE;
+
 					if (m_argBuffer.argc())
 					{
-						const LineCommandHandlerSTM::State& st = (*m_stm)[ m_stateidx];
+						m_output.print( "BAD command\r\n", 5);
 						m_cmdstateidx = ProtocolError;
-						try
-						{
-							m_stateidx = st.m_runUnknown( this, m_argBuffer.argc(), m_argBuffer.argv(), m_output);
-						}
-						catch (std::exception& e)
-						{
-							LOG_ERROR << "command execution thrown exception: " << e.what();
-							m_cmdstateidx = Terminate;
-							return CLOSED;
-						}
-						continue;
+						return WRITE;
 					}
 					else
 					{
-						m_buffer.clear();
-						m_argBuffer.clear();
-						m_cmdstateidx = EnterCommand;
+						m_cmdstateidx = Init;
 						continue;
 					}
 				}
 				else
 				{
-					const LineCommandHandlerSTM::State& st = (*m_stm)[ m_stateidx];
+					std::ostringstream out;
 					try
 					{
-						m_stateidx = st.m_cmds[ m_cmdidx-1]( this, m_argBuffer.argc(), m_argBuffer.argv(), m_output);
+						int rt = m_stm->runCommand( m_stateidx, (std::size_t)m_cmdidx, this, m_argBuffer.argc(), m_argBuffer.argv(), out);
+						if (rt < 0)
+						{
+							m_cmdstateidx = Terminate;
+							if (!m_output.print( out.str().c_str(), out.str().size()))
+							{
+								LOG_ERROR << "internal: output buffer to small (" << out.str().size() << ")";
+								return CLOSED;
+							}
+							return WRITE;
+						}
 					}
 					catch (std::exception& e)
 					{
@@ -191,16 +193,7 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 						m_cmdstateidx = Terminate;
 						return CLOSED;
 					}
-					if (m_stateidx >= m_stm->m_statear.size())
-					{
-						LOG_ERROR << "illegal state returned by method of statemachine";
-						m_cmdstateidx = Terminate;
-						return CLOSED;
-					}
-					else
-					{
-						return WRITE;
-					}
+					return (out.str().size())?WRITE:READ;
 				}
 			}
 
@@ -223,6 +216,5 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 		}//switch(..)
 	}//for(;;)
 }
-
 
 

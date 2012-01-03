@@ -31,31 +31,38 @@
 
 ************************************************************************/
 //
-// application properties - implementation
+// tprocHandler class unit tests using google test framework (gTest)
 //
 
-#include "appProperties.hpp"
+#include "tprocHandler.hpp"
+#include "connectionHandler.hpp"
+#include "handlerConfig.hpp"
+#include <gtest/gtest.h>
+#define BOOST_FILESYSTEM_VERSION 3
+#include <boost/filesystem.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/thread/thread.hpp>
 
-namespace _Wolframe	{
-	static const unsigned short APP_MAJOR_VERSION = 0;
-	static const unsigned short APP_MINOR_VERSION = 0;
-	static const unsigned short APP_REVISION = 5;
+using namespace _Wolframe;
+using namespace _Wolframe::tproc;
 
-	const char*	applicationName()			{ return "iproc"; }
-	const Version	applicationVersion()			{ return Version( APP_MAJOR_VERSION, APP_MINOR_VERSION ,APP_REVISION); }
+class TProcTestConfiguration :public Configuration
+{
+public:
+	TProcTestConfiguration ()
+	{
+	}
+};
 
-	const char*	config::defaultMainConfig()		{ return "/etc/iproc.conf"; }
-	const char*	config::defaultUserConfig()		{ return "~/iproc.conf"; }
-	const char*	config::defaultLocalConfig()		{ return "./iproc.conf"; }
+struct TestDescription
+{
+	std::string content;
+};
 
-	unsigned short	net::defaultTCPport()			{ return 7660; }
-	unsigned short	net::defaultSSLport()			{ return 7960; }
-
-	const char*	config::defaultServiceName()		{ return "iproc"; }
-#if defined( _WIN32 )
-	const char*	config::defaultServiceDisplayName()	{ return "Wolframe iproc Daemon"; }
-	const char*	config::defaultServiceDescription()	{ return "a daemon for iprocing"; }
-#endif // defined( _WIN32 )
-
-} // namespace _Wolframe
+int main( int argc, char **argv )
+{
+	::testing::InitGoogleTest( &argc, argv );
+	_Wolframe::log::LogBackend::instance().setConsoleLevel( _Wolframe::log::LogLevel::LOGLEVEL_INFO );
+	return RUN_ALL_TESTS();
+}
 

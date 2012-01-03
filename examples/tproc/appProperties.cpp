@@ -41,20 +41,20 @@ namespace _Wolframe	{
 	static const unsigned short APP_MINOR_VERSION = 0;
 	static const unsigned short APP_REVISION = 5;
 
-	const char*	applicationName()			{ return "iproc"; }
+	const char*	applicationName()			{ return "tproc"; }
 	const Version	applicationVersion()			{ return Version( APP_MAJOR_VERSION, APP_MINOR_VERSION ,APP_REVISION); }
 
-	const char*	config::defaultMainConfig()		{ return "/etc/iproc.conf"; }
-	const char*	config::defaultUserConfig()		{ return "~/iproc.conf"; }
-	const char*	config::defaultLocalConfig()		{ return "./iproc.conf"; }
+	const char*	config::defaultMainConfig()		{ return "/etc/tproc.conf"; }
+	const char*	config::defaultUserConfig()		{ return "~/tproc.conf"; }
+	const char*	config::defaultLocalConfig()		{ return "./tproc.conf"; }
 
 	unsigned short	net::defaultTCPport()			{ return 7660; }
 	unsigned short	net::defaultSSLport()			{ return 7960; }
 
-	const char*	config::defaultServiceName()		{ return "iproc"; }
+	const char*	config::defaultServiceName()		{ return "tproc"; }
 #if defined( _WIN32 )
-	const char*	config::defaultServiceDisplayName()	{ return "Wolframe iproc Daemon"; }
-	const char*	config::defaultServiceDescription()	{ return "a daemon for iprocing"; }
+	const char*	config::defaultServiceDisplayName()	{ return "Wolframe tproc Daemon"; }
+	const char*	config::defaultServiceDescription()	{ return "a daemon for tprocing"; }
 #endif // defined( _WIN32 )
 
 } // namespace _Wolframe

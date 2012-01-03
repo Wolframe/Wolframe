@@ -89,7 +89,6 @@ const net::NetworkOperation Connection::WriteLine( const char* str, int code)
 
 void Connection::networkInput( const void* dt, std::size_t nofBytes)
 {
-	LOG_DATA << "ConnectionHandler got network input in state " << stateName(m_state);
 	m_input.setPos( nofBytes + ((const char*)dt - m_input.charptr()));
 	m_itr = m_input.begin();
 	m_end = m_input.end();
@@ -102,19 +101,19 @@ void Connection::networkInput( const void* dt, std::size_t nofBytes)
 
 void Connection::timeoutOccured()
 {
-	LOG_TRACE << "Got termination signal (timeout occurred)";
+	LOG_TRACE << "Got timeout";
 	m_state = Terminate;
 }
 
 void Connection::signalOccured()
 {
-	LOG_TRACE << "Got termination signal (signal occurred)";
+	LOG_TRACE << "Got signal";
 	m_state = Terminate;
 }
 
 void Connection::errorOccured( NetworkSignal )
 {
-	LOG_TRACE << "Got termination signal (error occurred)";
+	LOG_TRACE << "Got error";
 	m_state = Terminate;
 }
 
