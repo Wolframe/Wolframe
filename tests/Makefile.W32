@@ -42,6 +42,7 @@ INCLUDE_LIBS = \
 
 TEST_CPP_BINS = \
 	threadLeakTest.exe \
+	testMethodMemberPointerTemplate.exe \
 	testNamedRetVal.exe \
 	versionTest.exe \
 	counterTest.exe \
