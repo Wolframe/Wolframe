@@ -179,7 +179,7 @@ void AAAAconfiguration::print( std::ostream& os, size_t /* indent */ ) const
 		(*it)->print( os, 6 );
 
 	os << "   Audit" << std::endl;
-	os << "      Audit is mandatory: " << (m_allowAnonymous ? "yes" : "no") << std::endl;
+	os << "      Audit is mandatory: " << (m_mandatoryAudit ? "yes" : "no") << std::endl;
 	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_auditConfig.begin();
 								it != m_auditConfig.end(); it++ )
 		(*it)->print( os, 6 );
