@@ -44,7 +44,8 @@
 #include "processor/procProvider.hpp"
 
 namespace _Wolframe {
-/// The global server container
+
+/// The global server handler structure (global context)
 class WolframeHandler
 {
 public:
@@ -126,8 +127,8 @@ private:
 	const WolframeHandler&		m_globalCtx;
 ///*************
 	AAAA::Authenticator*		m_authentication;
-//	AAAA::Authorizer*		m_authorization;
-//	AAAA::Auditor*			m_audit;
+	AAAA::Authorizer*		m_authorization;
+	AAAA::Auditor*			m_audit;
 //	AAAA::Accountant*		m_accounting;
 ///*************
 	proc::Processor*		m_proc;

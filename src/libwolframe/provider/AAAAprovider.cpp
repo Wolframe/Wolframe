@@ -63,6 +63,11 @@ Authenticator* AAAAprovider::authenticator()
 	return m_impl->authenticator();
 }
 
+Authorizer* AAAAprovider::authorizer()
+{
+	return m_impl->authorizer();
+}
+
 Auditor* AAAAprovider::auditor()
 {
 	return m_impl->auditor();
@@ -205,93 +210,4 @@ bool AuditProvider::resolveDB( const db::DatabaseProvider& db )
 	return true;
 }
 
-
-/***********************************************************************************/
-AAAAconfiguration::AAAAconfiguration()
-	: config::ConfigurationBase( "AAAA", NULL, "AAAA configuration"  ),
-	  m_allowAnonymous( false )	{}
-
-/// destructor
-AAAAconfiguration::~AAAAconfiguration()
-{
-	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_authConfig.begin();
-								it != m_authConfig.end(); it++ )
-		delete *it;
-
-	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_authzConfig.begin();
-								it != m_authzConfig.end(); it++ )
-		delete *it;
-
-	for ( std::list< config::ObjectConfiguration* >::const_iterator it =m_auditConfig.begin();
-								it != m_auditConfig.end(); it++ )
-		delete *it;
-}
-
-
-/// methods
-void AAAAconfiguration::print( std::ostream& os, size_t /* indent */ ) const
-{
-	os << sectionName() << std::endl;
-	os << "   Authentication" << std::endl;
-	os << "      Allow anonymous login: " << (m_allowAnonymous ? "yes" : "no") << std::endl;
-	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_authConfig.begin();
-								it != m_authConfig.end(); it++ )
-		(*it)->print( os, 6 );
-
-	os << "   Authorization" << std::endl;
-	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_authzConfig.begin();
-								it != m_authzConfig.end(); it++ )
-		(*it)->print( os, 6 );
-
-	os << "   Audit" << std::endl;
-	os << "      Audit is mandatory: " << (m_allowAnonymous ? "yes" : "no") << std::endl;
-	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_auditConfig.begin();
-								it != m_auditConfig.end(); it++ )
-		(*it)->print( os, 6 );
-
-}
-
-/// Check if the database configuration makes sense
-bool AAAAconfiguration::check() const
-{
-	bool correct = true;
-
-	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_authConfig.begin();
-								it != m_authConfig.end(); it++ )	{
-		if ( !(*it)->check() )
-			correct = false;
-	}
-
-	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_authzConfig.begin();
-								it != m_authzConfig.end(); it++ )	{
-		if ( !(*it)->check() )
-			correct = false;
-	}
-
-	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_auditConfig.begin();
-								it != m_auditConfig.end(); it++ )	{
-		if ( !(*it)->check() )
-			correct = false;
-	}
-
-	return correct;
-}
-
-void AAAAconfiguration::setCanonicalPathes( const std::string& refPath )
-{
-	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_authConfig.begin();
-								it != m_authConfig.end(); it++ )
-		(*it)->setCanonicalPathes( refPath );
-
-	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_authzConfig.begin();
-								it != m_authzConfig.end(); it++ )
-		(*it)->setCanonicalPathes( refPath );
-
-
-	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_auditConfig.begin();
-								it != m_auditConfig.end(); it++ )
-		(*it)->setCanonicalPathes( refPath );
-}
-
 }} // namespace _Wolframe::AAAA
-

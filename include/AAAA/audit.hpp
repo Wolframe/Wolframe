@@ -51,6 +51,10 @@ class AuditMsg_Login
 {
 };
 
+class AuditMsg_Logout
+{
+};
+
 class AuditMsg_Transaction
 {
 };
@@ -66,6 +70,7 @@ public:
 
 //	virtual bool log( AuditMsg_Connect & msg ) = 0;
 //	virtual bool log( AuditMsg_Login& msg ) = 0;
+//	virtual bool log( AuditMsg_Logout& msg ) = 0;
 //	virtual bool log( AuditMsg_Transaction& msg ) = 0;
 };
 

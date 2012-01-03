@@ -38,6 +38,7 @@
 #define _AAAA_PROVIDER_HPP_INCLUDED
 
 #include "authentication.hpp"
+#include "authorization.hpp"
 #include "audit.hpp"
 #include "config/configurationBase.hpp"
 #include <boost/noncopyable.hpp>
@@ -77,6 +78,7 @@ public:
 	bool resolveDB( const db::DatabaseProvider& db );
 
 	Authenticator* authenticator();
+	Authorizer* authorizer();
 	Auditor* auditor();
 private:
 	class AAAAprovider_Impl;

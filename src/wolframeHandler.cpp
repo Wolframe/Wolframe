@@ -86,6 +86,8 @@ wolframeConnection::wolframeConnection( const WolframeHandler& context,
 
 	// Initialize various channel processors to start-up values
 	m_authentication = NULL;
+	m_audit = NULL;
+	m_proc = NULL;
 }
 
 
@@ -94,6 +96,10 @@ wolframeConnection::~wolframeConnection()
 	if ( m_authentication )	{
 		m_authentication->close();
 		m_authentication = NULL;
+	}
+	if ( m_audit )	{
+		m_audit->close();
+		m_audit = NULL;
 	}
 
 	LOG_TRACE << "Connection handler destroyed";
