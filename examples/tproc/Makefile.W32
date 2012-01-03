@@ -1,0 +1,127 @@
+TOPDIR = ..\..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_CPPFLAGS = \
+	/D_WIN32_WINNT=0x504
+
+INCLUDE_DIRS = \
+	/I. \
+	/I$(TOPDIR)\include \
+	/I"$(BOOST_INCLUDE_DIR)" \
+	/I"$(PLATFORM_SDK_DIR)\Include" \
+	/I$(TOPDIR)\gtest\include
+
+# Note: libraries are picked automatically on Windows!
+INCLUDE_LDFLAGS = \
+	$(SDK_LDFLAGS) $(BOOST_LDFLAGS)
+
+INCLUDE_LIBS = \
+	Advapi32.lib \
+	$(TOPDIR)\gtest\gtest-all.obj
+
+# openssl
+
+!IFDEF WITH_SSL
+
+INCLUDE_DIRS = \
+	$(INCLUDE_DIRS)	/I"$(OPENSSL_DIR)\include"
+
+INCLUDE_CPPFLAGS = \
+	$(INCLUDE_CPPFLAGS) /DWITH_SSL
+
+INCLUDE_LDFLAGS = \
+	$(INCLUDE_LDFLAGS) /LIBPATH:"$(OPENSSL_DIR)\lib"
+
+INCLUDE_LIBS = \
+	$(INCLUDE_LIBS) $(OPENSSL_LIBS)
+
+!ENDIF
+
+# Lua
+
+!IFDEF WITH_LUA
+
+INCLUDE_CPPFLAGS = \
+	$(INCLUDE_CPPFLAGS) /DWITH_LUA
+ 
+INCLUDE_DIRS = \
+	$(INCLUDE_DIRS) /I$(TOPDIR)\lua\src
+
+INCLUDE_LIBS = \
+	$(INCLUDE_LIBS) $(TOPDIR)\lua\src\lua.lib
+
+!ENDIF
+
+!IFDEF WITH_LIBXML2
+
+INCLUDE_CPPFLAGS = \
+	$(INCLUDE_CPPFLAGS) /DWITH_LIBXML2
+
+INCLUDE_DIRS = \
+	$(INCLUDE_DIRS) /I. /I"$(LIBXML2_DIR)\include" /I"$(LIBXML2_DIR)\include\libxml"
+
+INCLUDE_LIBS = \
+	$(INCLUDE_LIBS) "$(LIBXML2_DIR)\lib\libxml2.lib"
+	
+!ENDIF
+
+OBJS = \
+	appProperties.obj \
+	appConfigDefinition.obj \
+	$(TOPDIR)\src\loadModules-dummy.obj \
+	tprocHandler.obj \
+	tprocHandlerConfig.obj \
+	$(TOPDIR)\src\winMain.obj
+
+
+CPP_BINS = \
+	tprocd.exe
+
+all: $(OBJS) $(CPP_BINS)
+
+TEST_CPP_BINS = \
+	tests\tprocHandlerTest.exe
+
+!IFDEF WITH_LUA
+TEST_CPP_BINS = \
+	$(TEST_CPP_BINS) \
+	tests\structLuamapTest.exe
+!ENDIF
+
+tprocd.exe: tprocd.obj $(TOPDIR)\src\wolframe.lib
+tests\tprocHandlerTest.exe: tests\tprocHandlerTest.obj $(TOPDIR)\src\wolframe.lib
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+local_all:
+
+local_clean:
+	@-erase tests\*.obj 2>NUL
+	@-erase tests\*.dll 2>NUL
+	@-erase tests\*.exe 2>NUL
+
+local_distclean:
+
+local_test: $(TEST_CPP_BINS)
+	@-echo @echo off > test.bat
+!IFDEF WITH_SSL
+	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" tests >> test.bat
+	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" tests >> test.bat
+!ENDIF
+	@-echo cd tests >> test.bat
+	@-echo tprocHandlerTest.exe >> test.bat
+	@-test.bat
+
+run:
+	@-echo @echo off > test.bat
+!IFDEF WITH_SSL
+	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat
+	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >> test.bat
+!ENDIF
+	@-echo echo Running the Wolframe tproc example... >> test.bat
+	@-echo tprocd.exe -c tproc.conf >> test.bat
+	@-test.bat
+

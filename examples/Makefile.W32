@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = echo pecho iproc
+SUBDIRS = echo pecho iproc tproc
 
 !IFDEF WITH_LUA
 SUBDIRS = \

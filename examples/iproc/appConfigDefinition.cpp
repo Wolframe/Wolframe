@@ -49,10 +49,9 @@ ApplicationConfiguration::ApplicationConfiguration()
 	serverCfg = new net::Configuration();
 	// logging
 	loggerCfg = new log::LoggerConfiguration();
-#if WITH_LUA
 	// application processor
 	handlerCfg = new _Wolframe::HandlerConfiguration();
-#endif
+
 	// add sections, the parse function will select the
 	// appropriate action
 	addConfig( "service", serviceCfg );

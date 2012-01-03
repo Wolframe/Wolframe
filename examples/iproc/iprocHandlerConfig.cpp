@@ -30,7 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file iprocHandlerCmd.cpp
+///\file iprocHandlerConfig.cpp
 ///\brief Implementation of the commands of the iproc connection handler
 #include "countedReference.hpp"
 #include "iprocHandlerConfig.hpp"

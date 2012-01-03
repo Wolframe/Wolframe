@@ -1,0 +1,270 @@
+/************************************************************************
+
+ Copyright (C) 2011 Project Wolframe.
+ All rights reserved.
+
+ This file is part of Project Wolframe.
+
+ Commercial Usage
+    Licensees holding valid Project Wolframe Commercial licenses may
+    use this file in accordance with the Project Wolframe
+    Commercial License Agreement provided with the Software or,
+    alternatively, in accordance with the terms contained
+    in a written agreement between the licensee and Project Wolframe.
+
+ GNU General Public License Usage
+    Alternatively, you can redistribute this file and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Wolframe is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Wolframe.  If not, see <http://www.gnu.org/licenses/>.
+
+ If you have questions regarding the use of this file, please contact
+ Project Wolframe.
+
+************************************************************************/
+///
+///\file tprocHandler.cpp
+///
+
+#include "tprocHandler.hpp"
+#include "logger-v1.hpp"
+#include <stdexcept>
+
+using namespace _Wolframe;
+using namespace _Wolframe::tproc;
+
+enum State
+{
+	State1,
+	State2,
+	State3
+};
+
+struct STM :public protocol::LineCommandHandlerSTMTemplate<CommandHandler>
+{
+	STM()
+	{
+		(*this)
+			[State1]
+				.cmd< &CommandHandler::doCmd1A >( "CMD1A")
+				.cmd< &CommandHandler::doCmd1B >( "CMD1B")
+				.cmd< &CommandHandler::doCmd1C >( "CMD1B")
+			[State2]
+				.cmd< &CommandHandler::doCmd2A >( "CMD2A")
+				.cmd< &CommandHandler::doCmd2B >( "CMD2B")
+			[State3]
+				.cmd< &CommandHandler::doCmd3A >( "CMD3A")
+		;
+	}
+};
+static STM stm;
+
+
+int CommandHandler::doCmd1A( int argc, const char** argv, std::ostream& out)
+{
+	out << "you called doCmd1A with ";
+	if (argc == 0)
+	{
+		out << "no arguments" << std::endl;;
+		return State1;
+	}
+	else
+	{
+		for (int ii=0; ii<argc; ii++)
+		{
+			out << " '" << argv[ii] << "'";
+		}
+		out << " as arguments" << std::endl;;
+		return State2;
+	}
+}
+
+int CommandHandler::doCmd1B( int argc, const char** argv, std::ostream& out)
+{
+	out << "you called doCmd1B with ";
+	if (argc == 0)
+	{
+		out << "no arguments" << std::endl;;
+		return State1;
+	}
+	else
+	{
+		for (int ii=0; ii<argc; ii++)
+		{
+			out << " '" << argv[ii] << "'";
+		}
+		out << " as arguments" << std::endl;;
+		return State2;
+	}
+}
+
+int CommandHandler::doCmd1C( int argc, const char** argv, std::ostream& out)
+{
+	out << "you called doCmd1C with ";
+	if (argc == 0)
+	{
+		out << "no arguments" << std::endl;;
+		return State1;
+	}
+	else
+	{
+		for (int ii=0; ii<argc; ii++)
+		{
+			out << " '" << argv[ii] << "'";
+		}
+		out << " as arguments" << std::endl;;
+		return State2;
+	}
+}
+
+int CommandHandler::doCmd2A( int argc, const char** argv, std::ostream& out)
+{
+	out << "you called doCmd2A with ";
+	if (argc == 0)
+	{
+		out << "no arguments" << std::endl;;
+		return State2;
+	}
+	else
+	{
+		for (int ii=0; ii<argc; ii++)
+		{
+			out << " '" << argv[ii] << "'";
+		}
+		out << " as arguments" << std::endl;;
+		return State3;
+	}
+}
+
+int CommandHandler::doCmd2B( int argc, const char** argv, std::ostream& out)
+{
+	out << "you called doCmd2B with ";
+	if (argc == 0)
+	{
+		out << "no arguments" << std::endl;;
+		return State2;
+	}
+	else
+	{
+		for (int ii=0; ii<argc; ii++)
+		{
+			out << " '" << argv[ii] << "'";
+		}
+		out << " as arguments" << std::endl;;
+		return State3;
+	}
+}
+
+int CommandHandler::doCmd3A( int argc, const char** argv, std::ostream& out)
+{
+	out << "you called doCmd3A with ";
+	if (argc == 0)
+	{
+		out << "no arguments" << std::endl;;
+		return State3;
+	}
+	else
+	{
+		for (int ii=0; ii<argc; ii++)
+		{
+			out << " '" << argv[ii] << "'";
+		}
+		out << " as arguments" << std::endl;;
+		return -1;
+	}
+}
+
+void Connection::networkInput( const void* dt, std::size_t nofBytes)
+{
+	m_cmdhandler.putInput( dt, nofBytes);
+}
+
+void Connection::timeoutOccured()
+{
+	LOG_TRACE << "Got timeout";
+	m_terminated = true;
+}
+
+void Connection::signalOccured()
+{
+	LOG_TRACE << "Got signal";
+	m_terminated = true;
+}
+
+void Connection::errorOccured( NetworkSignal )
+{
+	LOG_TRACE << "Got error";
+	m_terminated = true;
+}
+
+const net::NetworkOperation Connection::nextOperation()
+{
+	void* inpp;
+	std::size_t inppsize;
+	const void* outpp;
+	std::size_t outppsize;
+	if (m_terminated)
+	{
+		return net::CloseConnection();
+	}
+	switch(m_cmdhandler.nextOperation())
+	{
+		case protocol::CommandHandler::READ:
+			m_cmdhandler.getInputBlock( inpp, inppsize);
+			return net::ReadData( inpp, inppsize);
+
+		case protocol::CommandHandler::WRITE:
+			m_cmdhandler.getOutput( outpp, outppsize);
+			return net::SendData( outpp, outppsize);
+
+		case protocol::CommandHandler::CLOSED:
+			return net::CloseConnection();
+	}
+	return net::CloseConnection();
+}
+
+Connection::Connection( const net::LocalEndpoint& local, const Configuration* config)
+	:m_cmdhandler( static_cast<protocol::LineCommandHandlerSTM*>(&stm))
+	,m_terminated(false)
+{
+	LOG_TRACE << "Created connection handler for " << local.toString();
+}
+
+Connection::~Connection()
+{
+	LOG_TRACE << "Connection handler destroyed";
+}
+
+void Connection::setPeer( const net::RemoteEndpoint& remote)
+{
+	LOG_TRACE << "Peer set to " << remote.toString();
+}
+
+net::ConnectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const net::LocalEndpoint& local )
+{
+	return new tproc::Connection( local, m_config->m_appConfig);
+}
+
+ServerHandler::ServerHandler( const HandlerConfiguration* cfg,
+			      const module::ModulesDirectory* /*modules*/ )
+	: m_impl( new ServerHandlerImpl( cfg) ) {}
+
+ServerHandler::~ServerHandler()
+{
+	delete m_impl;
+}
+
+net::ConnectionHandler* ServerHandler::newConnection( const net::LocalEndpoint& local )
+{
+	return m_impl->newConnection( local );
+}
+
+

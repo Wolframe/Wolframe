@@ -1,0 +1,71 @@
+TOPDIR = ../..
+
+SUBDIRS =
+
+-include $(TOPDIR)/makefiles/gmake/platform.mk
+
+INCLUDE_CXXFLAGS =
+
+INCLUDE_DIRS = \
+	-I. -I$(TOPDIR)/include \
+	-I$(BOOST_INCLUDE_DIR) \
+	-I$(TOPDIR)/gtest/include
+
+INCLUDE_LDFLAGS = \
+	-L$(BOOST_LIB_DIR)
+
+INCLUDE_LIBS = \
+	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
+	-lboost_program_options \
+	-lboost_filesystem \
+	$(TOPDIR)/gtest/gtest-all.o \
+	$(TOPDIR)/src/libwolframe.a \
+	$(TOPDIR)/src/libwolframe/libwolframe.a \
+	$(LIBS_DL)
+
+# openssl
+ifeq ($(WITH_SSL),1)
+
+INCLUDE_CXXFLAGS += \
+	-DWITH_SSL
+
+INCLUDE_LIBS += \
+	$(OPENSSL_LIBS)
+
+endif
+
+OBJS = \
+	appProperties.o \
+	appConfigDefinition.o \
+	$(TOPDIR)/src/loadModules-dummy.o \
+	tprocHandler.o \
+	tprocHandlerConfig.o \
+	$(TOPDIR)/src/posixMain.o
+
+TEST_BINS = \
+	tests/tprocHandlerTest$(EXE)
+
+CPP_BINS = \
+	tprocd$(EXE)
+
+tprocd$(EXE): $(TOPDIR)/src/loadModules-dummy.o $(TOPDIR)/src/posixMain.o $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
+
+-include $(TOPDIR)/makefiles/gmake/sub.mk
+
+tests/tprocHandlerTest$(EXE): tests/tprocHandlerTest.o $(OBJS) $(TOPDIR)/src/libwolframe.a
+
+local_all: $(CPP_BINS)
+
+local_clean:
+
+local_distclean:
+
+local_install:
+
+local_test: $(TEST_BINS)
+	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./tprocHandlerTest$(EXE)
+
+run: $(CPP_BINS)
+	@echo "Running the Wolframe tproc example..."
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./tprocd -c tproc.conf -f
+

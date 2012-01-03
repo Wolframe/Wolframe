@@ -35,19 +35,73 @@
 #ifndef _Wolframe_PROTOCOL_LINE_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_PROTOCOL_LINE_COMMAND_HANDLER_HPP_INCLUDED
 #include "protocol/commandHandler.hpp"
-#include "protocol.hpp"
+#include "protocol/ioblocks.hpp"
+#include "protocol/parser.hpp"
 #include "connectionHandler.hpp"
 #include "countedReference.hpp"
+#include "logger-v1.hpp"
 #include <vector>
 #include <string>
+#include <iostream>
 
 namespace _Wolframe {
 namespace protocol {
 
-class LineCommandHandlerBase :public CommandHandler
+///\brief State machine definition of a LineCommandHandler
+class LineCommandHandlerSTM
 {
 public:
-	LineCommandHandlerBase();
+	///\return -1 for terminate or a valid state in the state machine definition
+	typedef int (*RunCommand)( void* obj, int argc, const char** argv, std::ostream& out);
+	struct State
+	{
+		protocol::CmdParser<std::string> m_parser;
+		std::vector<RunCommand> m_cmds;
+
+		State()
+		{
+			m_parser.add("");
+		}
+		void defineCommand( const char* name_, RunCommand run_)
+		{
+			m_parser.add( name_);
+			m_cmds.push_back( run_);
+		}
+	};
+
+	int runCommand( std::size_t stateidx, std::size_t cmdidx, void* obj, int argc, const char** argv, std::ostream& out) const
+	{
+		const State& st = get( stateidx);
+		if (cmdidx >= st.m_cmds.size()) throw std::logic_error( "illegal command reference");
+		return st.m_cmds.at(cmdidx)( obj, argc, argv, out);
+	}
+
+	void defineState( std::size_t se)
+	{
+		if (se != m_statear.size()) throw std::logic_error( "state index defined not matching to enum given as state index");
+		State st;
+		m_statear.push_back( st);
+	}
+
+	void defineCommand( const char* name_, RunCommand run_)
+	{
+		m_statear.back().defineCommand( name_, run_);
+	}
+
+	const State& get( std::size_t idx) const
+	{
+		if (idx >= m_statear.size()) throw std::logic_error( "illegal state");
+		return m_statear.at( idx);
+	}
+private:
+	std::vector<State> m_statear;
+};
+
+
+class LineCommandHandler :public CommandHandler
+{
+public:
+	LineCommandHandler( const LineCommandHandlerSTM* stm_);
 
 	///\brief See Parent::setInputBuffer(void*,std::size_t,std::size_t,std::size_t)
 	virtual void setInputBuffer( void* buf, std::size_t allocsize, std::size_t size, std::size_t itrpos);
@@ -56,7 +110,7 @@ public:
 	virtual void setOutputBuffer( void* buf, std::size_t size, std::size_t pos);
 
 	///\brief See Parent::nextOperation()
-	virtual Operation nextOperation()=0;
+	virtual Operation nextOperation();
 
 	///\brief See Parent::putInput(const void*,std::size_t)
 	virtual void putInput( const void *begin, std::size_t bytesTransferred);
@@ -74,84 +128,32 @@ public:
 	int statusCode() const				{return m_statusCode;}
 
 private:
-	friend class LineCommandHandler;
-	InputBlock m_input;				///< buffer for network read messages
-	OutputBlock m_output;				///< buffer for network write messages
+	InputBlock m_input;					///< buffer for network read messages
+	OutputBlock m_output;					///< buffer for network write messages
 
-	InputBlock::iterator m_itr;			///< iterator to scan protocol input
-	InputBlock::iterator m_end;			///< iterator pointing to end of message buffer
-};
+	InputBlock::iterator m_itr;				///< iterator to scan protocol input
+	InputBlock::iterator m_end;				///< iterator pointing to end of message buffer
 
-
-class LineCommandHandlerSTM
-{
-public:
-	typedef int (*RunCommand)( void* data, int argc, const char** argv, OutputBlock& m_output);
-private:
-	friend class LineCommandHandler;
-	struct State
-	{
-		protocol::CmdParser<std::string> m_parser;
-		std::vector<RunCommand> m_cmds;
-		RunCommand m_runUnknown;
-
-		State()
-		{
-			m_parser.add("");
-		}
-		void defineCommand( const char* name_, RunCommand run_)
-		{
-			m_parser.add( name_);
-			m_cmds.push_back( run_);
-		}
-	};
-	std::vector<State> m_statear;
-
-public:
-	template <typename StateEnum>
-	void newState( StateEnum se)
-	{
-		if ((std::size_t)se != m_statear.size()) throw std::logic_error( "state index defined not matching to enum given as state index");
-		State st;
-		m_statear.push_back( st);
-	}
-
-	void defineCommand( const char* name_, RunCommand run_)
-	{
-		m_statear.back().defineCommand( name_, run_);
-	}
-
-	const State& operator[]( std::size_t idx) const
-	{
-		return m_statear.at( idx);
-	}
-};
-
-
-class LineCommandHandler :public LineCommandHandlerBase
-{
-public:
-	///\enum CommandState
-	///\brief Enumeration of command processing states
+	///\enum State
+	///\brief Enumeration of processor states
 	enum CommandState
 	{
-		EnterCommand,			///< parse command
-		ParseArgs,			///< parse command arguments
-		ParseArgsEOL,			///< parse end of line after command arguments
-		ProtocolError,			///< a protocol error (bad command etc) appeared and the rest of the line has to be discarded
-		Terminate			///< exit and return the protocol context to the caller (CLOSED)
+		Init,						///< start state, called first time in this session
+		EnterCommand,					///< parse command
+		ParseArgs,					///< parse command arguments
+		ParseArgsEOL,					///< parse end of line after command arguments
+		ProtocolError,					///< a protocol error (bad command etc) appeared and the rest of the line has to be discarded
+		Terminate					///< terminate application processor session (close for network)
 	};
-
-	LineCommandHandler( const LineCommandHandlerSTM* stm_)
-		:m_stm(stm_),m_argBuffer(&m_buffer),m_cmdstateidx(EnterCommand),m_stateidx(0),m_cmdidx(-1)
+	///\brief Returns the state as string for logging etc.
+	///\param [in] i state to get as string
+	static const char* stateName( CommandState i)
 	{
-		if (!stm_ || stm_->m_statear.size() == 0) throw std::logic_error("undefined or empty statemachine in LineCommandHandler");
+		static const char* ar[] = {"Init","EnterCommand","ParseArgs","ParseArgsEOL","Processing","ProtocolError","DiscardInput","FlushOutput","Terminate"};
+		return ar[i];
 	}
 
-	virtual Operation nextOperation();
-
-private:
-	const LineCommandHandlerSTM* m_stm;			///< protocol sub state machine reference
+	const LineCommandHandlerSTM* m_stm;			///< command level protocol state machine
 	protocol::CArgBuffer< std::string > m_argBuffer;	///< buffer type for the command arguments
 	std::string m_buffer;					///< line buffer
 	CommandState m_cmdstateidx;				///< current state of command execution
@@ -160,29 +162,32 @@ private:
 };
 
 
-template <class HandlerObj, typename StateEnum>
-class LineCommandHandlerSTMTemplate :private LineCommandHandlerSTM
+///\brief defines a static function calling a member function with fixed signature
+///\warning do not declare virtual method calls like this. It is not portable (GCC only) !
+///\TODO make a static assert here for refusing virtual methods here
+template <class T, int (T::*Method)( int argc, const char** argv, std::ostream& out)>
+struct LineCommandHandlerWrapper
 {
-private:
-	typedef int (HandlerObj::*RunCommandMethod)( int argc, const char** argv, OutputBlock& m_output);
-
-	template <RunCommandMethod Method>
-	static int runCommandFunction( void* data, int argc, const char** argv, OutputBlock& m_output)
+	static int function( void* this_, int argc, const char** argv, std::ostream& out)
 	{
-		return (((HandlerObj*)data).*Method)( argc, argv, m_output);
+		return (((T*)this_)->*Method)( argc, argv, out);
 	}
-public:
+};
 
-	LineCommandHandlerSTMTemplate& operator[]( StateEnum se)
+
+template <class LineCommandHandlerImpl>
+struct LineCommandHandlerSTMTemplate :public LineCommandHandlerSTM
+{
+	LineCommandHandlerSTMTemplate& operator[]( std::size_t se)
 	{
-		newState( se);
+		defineState( se);
 		return *this;
 	}
 
-	template <RunCommandMethod Method>
-	LineCommandHandlerSTMTemplate&  operator()( const char* name_)
+	template <int (LineCommandHandlerImpl::*Method)(int,const char**,std::ostream&)>
+	LineCommandHandlerSTMTemplate& cmd( const char* cmdname_)
 	{
-		defineCommand( name_, &runCommandFunction<Method>);
+		defineCommand( cmdname_, &LineCommandHandlerWrapper<LineCommandHandlerImpl,Method>::function);
 		return *this;
 	}
 };
