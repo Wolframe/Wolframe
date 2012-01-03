@@ -9,5 +9,5 @@ Build-Depends: debhelper (>= 4.1.16),
  libboost-program-options1.46-dev, libboost-filesystem1.46-dev,
  libssl-dev, libqt4-dev, libpam-dev, libsasl2-dev,
  libsqlite3-dev, libpq-dev, libxml2-dev, libxslt1-dev,
- xsltproc, docbook-xsl, doxygen, graphviz
+ xsltproc, docbook-xsl, doxygen, graphviz, lsb-release
 Files:
