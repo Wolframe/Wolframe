@@ -11,37 +11,55 @@ case "$UNAME_SYSTEM.$UNAME_RELEASE" in
 	Linux*)		PLATFORM=LINUX
 			OS_MAJOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 1`
 			OS_MINOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 2`
-
-			if test -f /etc/arch-release; then
-				LINUX_DIST='arch'
-				LINUX_REV='current'
-				if test "$OS_MAJOR_VERSION" = "3"; then
-					OS_MINOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 2 | cut -d - -f 1`
-				fi
-			elif test -f /etc/debian_version; then
-				LINUX_DIST='debian'
-				LINUX_REV=`cat /etc/debian_version | cut -d . -f 1`
-			elif test -f /etc/slackware-version; then
-				LINUX_DIST='slackware'
-				LINUX_REV=`cat /etc/slackware-version | cut -d ' ' -f 2 | cut -d . -f 1`
-			elif test -f /etc/redhat-release; then
-				LINUX_DIST='redhat'
-				LINUX_REV=`cat /etc/redhat-release | sed s/.*release\ // | sed s/\ .*// | cut -f 1 -d .`
-			elif test -f /etc/fedora-release; then
-				LINUX_DIST='redhat'
-				LINUX_REV=`cat /etc/fedora-release | cut -f 3 -d ' '`
-			elif test -f /etc/SuSE-release; then
-				grep "SUSE Linux Enterprise Server" /etc/SuSE-release
-				if test $? = 0; then
-					LINUX_DIST='sles'
-					LINUX_REV=`grep VERSION /etc/SuSE-release | cut -f 3 -d ' '`
-				else
-					LINUX_DIST='suse'
-					LINUX_REV=`grep VERSION /etc/SuSE-release | cut -f 3 -d ' '`
-				fi
+			
+			# LSB-system? Check for lsb-release
+			if test -x /usr/bin/lsb_release; then
+				dist=`/usr/bin/lsb_release -i | cut -f 2`
+				rev=`/usr/bin/lsb_release -r | cut -f 2`
+				case "$dist" in
+					Ubuntu)
+						LINUX_DIST='ubuntu'
+						LINUX_REV=$rev
+						;;
+					*)
+						LINUX_DIST='unknown'
+						LINUX_REV='unknown'
+						;;
+				esac
 			else
-				LINUX_DIST='unknown'
-				LINUX_REV='unknown'
+				# try the older way with release files in /etc
+				
+				if test -f /etc/arch-release; then
+					LINUX_DIST='arch'
+					LINUX_REV='current'
+					if test "$OS_MAJOR_VERSION" = "3"; then
+						OS_MINOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 2 | cut -d - -f 1`
+					fi
+				elif test -f /etc/debian_version; then
+					LINUX_DIST='debian'
+					LINUX_REV=`cat /etc/debian_version | cut -d . -f 1`
+				elif test -f /etc/slackware-version; then
+					LINUX_DIST='slackware'
+					LINUX_REV=`cat /etc/slackware-version | cut -d ' ' -f 2 | cut -d . -f 1`
+				elif test -f /etc/redhat-release; then
+					LINUX_DIST='redhat'
+					LINUX_REV=`cat /etc/redhat-release | sed s/.*release\ // | sed s/\ .*// | cut -f 1 -d .`
+				elif test -f /etc/fedora-release; then
+					LINUX_DIST='redhat'
+					LINUX_REV=`cat /etc/fedora-release | cut -f 3 -d ' '`
+				elif test -f /etc/SuSE-release; then
+					grep "SUSE Linux Enterprise Server" /etc/SuSE-release
+					if test $? = 0; then
+						LINUX_DIST='sles'
+						LINUX_REV=`grep VERSION /etc/SuSE-release | cut -f 3 -d ' '`
+					else
+						LINUX_DIST='suse'
+						LINUX_REV=`grep VERSION /etc/SuSE-release | cut -f 3 -d ' '`
+					fi
+				else
+					LINUX_DIST='unknown'
+					LINUX_REV='unknown'
+				fi
 			fi
 			;;
 

@@ -7,6 +7,7 @@ src/libwolframe/libwolframe.vcxproj.user
 src/libwolframe/libwolframe.vcproj.*
 src/modules/*/*/*.vcxproj.user
 src/modules/*/*/*.vcproj.*
+wolframemsg.h
 *~
 *.o
 *.d
@@ -15,6 +16,8 @@ src/modules/*/*/*.vcproj.*
 *.sho++
 *.exe
 *.exe.manifest
+*.dll
+*.dll.manifest
 *.exp
 *.obj
 *.lib
@@ -82,3 +85,4 @@ docs/doxygen/
 clients/wt/wtclient
 src/primary.db
 tests/libxslt/testlibxslt1
+tests/testMethodMemberPointerTemplate

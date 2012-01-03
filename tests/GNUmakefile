@@ -50,6 +50,7 @@ TEST_OBJS =
 
 TEST_CPP_BINS = \
 	threadLeakTest$(EXE) \
+	testMethodMemberPointerTemplate$(EXE) \
 	testNamedRetVal$(EXE) \
 	versionTest$(EXE) \
 	counterTest$(EXE) \
@@ -75,6 +76,8 @@ local_clean:
 local_distclean:
 
 local_test: $(TEST_CPP_BINS)
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./testMethodMemberPointerTemplate
+	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./testNamedRetVal
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./logTest
