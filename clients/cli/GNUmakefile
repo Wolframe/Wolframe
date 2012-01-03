@@ -15,7 +15,7 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
-	-lboost_program_options -lboost_system -lboost_thread$(BOOST_LIBRARY_TAG)
+	-lboost_program_options -lboost_system
 
 # openssl
 
