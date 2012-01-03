@@ -58,8 +58,7 @@ static void setModuleLogger( void* logger )
 }
 
 
-_Wolframe_MODULE_ENTRY_POINT ModuleEntryPoint entryPoint( 0, CONTAINER_MODULE,
-							  "PostgreSQL Database",
-							  createModule, setModuleLogger );
+ModuleEntryPoint entryPoint( 0, CONTAINER_MODULE, "PostgreSQL Database",
+			     createModule, setModuleLogger );
 
 }} // namespace _Wolframe::module

@@ -57,8 +57,7 @@ static void setModuleLogger( void* logger )
 }
 
 
-_Wolframe_MODULE_ENTRY_POINT ModuleEntryPoint entryPoint( 0, CONTAINER_MODULE,
-							  "Database authorization",
-							  createModule, setModuleLogger );
+ModuleEntryPoint entryPoint( 0, CONTAINER_MODULE, "Database authorization",
+			     createModule, setModuleLogger );
 
 }} // namespace _Wolframe::module

@@ -56,9 +56,8 @@ static void setModuleLogger( void* logger )
 	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend* >( logger );
 }
 
-_Wolframe_MODULE_ENTRY_POINT ModuleEntryPoint entryPoint( 0, CONTAINER_MODULE,
-							  "SQLite Database",
-							  createModule, setModuleLogger );
 
+ModuleEntryPoint entryPoint( 0, CONTAINER_MODULE, "SQLite Database",
+			     createModule, setModuleLogger );
 
 }} // namespace _Wolframe::module

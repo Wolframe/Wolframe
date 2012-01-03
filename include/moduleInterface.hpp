@@ -132,9 +132,9 @@ public:
 };
 
 #if !defined(_WIN32)	// POSIX module loader
-	#define	_Wolframe_MODULE_ENTRY_POINT	extern "C"
+	extern "C" ModuleEntryPoint	entryPoint;
 #else
-	#define	_Wolframe_MODULE_ENTRY_POINT	extern "C" __declspec( dllexport )
+	extern "C" __declspec( dllexport ) ModuleEntryPoint entryPoint;
 #endif
 
 }} // namespace _Wolframe::module

@@ -57,8 +57,7 @@ static void setModuleLogger( void* logger )
 }
 
 
-_Wolframe_MODULE_ENTRY_POINT ModuleEntryPoint entryPoint( 0, CONTAINER_MODULE,
-							  "Echo Processor",
-							  createModule, setModuleLogger );
+ModuleEntryPoint entryPoint( 0, CONTAINER_MODULE, "Echo Processor",
+			     createModule, setModuleLogger );
 
 }} // namespace _Wolframe::module
