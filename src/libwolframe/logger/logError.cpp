@@ -92,7 +92,7 @@ Logger& operator<<( Logger& logger, LogError e )
 			DWORD last_error = GetLastError( );
 			TCHAR errbuf[512];
 			LPVOID werrbuf;
-			DWORD wbuf_size;
+			//DWORD wbuf_size;
 			DWORD wres;
 
 			wres = FormatMessage(

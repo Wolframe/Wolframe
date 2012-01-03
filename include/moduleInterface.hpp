@@ -126,7 +126,7 @@ public:
 		: ifaceVersion( iVer ), moduleType( modType ), name( modName ),
 		  create( createFunc ), setLogger( setLoggerFunc )
 	{
-		std::strncpy ( signature, "Wolframe Module", MODULE_SIGN_SIZE );
+		std::memcpy ( signature, "Wolframe Module", MODULE_SIGN_SIZE );
 	}
 
 };

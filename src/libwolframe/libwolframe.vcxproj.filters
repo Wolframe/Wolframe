@@ -95,10 +95,11 @@
     <ClCompile Include="logger\syslog_win32.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="logger\logBackendSyslog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="logger\wolframemsg.mc">
-      <Filter>Resource Files</Filter>
-    </None>
+    <CustomBuild Include="logger\wolframemsg.mc" />
   </ItemGroup>
 </Project>
