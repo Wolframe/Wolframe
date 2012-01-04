@@ -211,7 +211,6 @@ BuildRequires: doxygen
 # postgres database module
 %if %{with_pgsql}
 BuildRequires: postgresql-devel >= 7.0
-Requires: postgresql-libs >= 7.0
 %endif
 
 # build local sqlite3 for distibutions with no or too old version
@@ -230,16 +229,13 @@ Requires: postgresql-libs >= 7.0
 %if %{rhel}
 %if %{rhel5} || %{rhel6}
 BuildRequires: sqlite-devel >= 3.0
-Requires: sqlite >= 3.0
 %endif
 %else
 BuildRequires: sqlite-devel >= 3.0
-Requires: sqlite >= 3.0
 %endif
 %endif
 %if %{suse} || %{sles}
 BuildRequires: sqlite3-devel >= 3.0
-Requires: sqlite3 >= 3.0
 %endif
 %endif
 
