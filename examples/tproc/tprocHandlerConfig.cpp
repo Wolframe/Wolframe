@@ -94,6 +94,7 @@ bool Configuration::parse( const config::ConfigurationTree& pt, const std::strin
 		LOG_ERROR << "Error parsing configuration: " << e.what();
 		return false;
 	}
+	return true;
 }
 
 bool Configuration::test() const
