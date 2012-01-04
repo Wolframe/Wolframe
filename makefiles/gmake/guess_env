@@ -21,6 +21,12 @@ case "$UNAME_SYSTEM.$UNAME_RELEASE" in
 						LINUX_DIST='ubuntu'
 						LINUX_REV=$rev
 						;;
+					
+					Debian)
+						LINUX_DIST='debian'
+						LINUX_REV=`echo $rev | cut -f 1 -d.`
+						;;
+						
 					*)
 						LINUX_DIST='unknown'
 						LINUX_REV='unknown'
