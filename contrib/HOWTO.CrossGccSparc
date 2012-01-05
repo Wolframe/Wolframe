@@ -1,0 +1,60 @@
+# Step 1: Get a SPARC gcc cross compiler running on Linux
+# http://www.cis.upenn.edu/~milom/cross-compile.html
+
+# On Host:
+export TARGET=sparc-sun-solaris2.10
+export PREFIX=/opt/gcc-sparc-sun-solaris2.10-4.6.2
+export SYSROOT=$PREFIX/sysroot
+export PATH=$PATH:$PREFIX/bin
+
+mkdir $PREFIX $SYSROOT
+
+# On Sun:
+tar zcvf /export/home/sol10_sysroot.tgz /usr/include/ /lib /usr/lib
+
+# On HOST:
+cd $SYSROOT
+tar zxvf sol10_sysroot.tgz
+
+# On Host:
+wget 'http://gcc.cybermirror.org/releases/gcc-4.6.2/gcc-4.6.2.tar.bz2'
+wget 'http://ftp.gnu.org/gnu/binutils/binutils-2.22.tar.bz2'
+
+mkdir /home/build
+cd /home/build
+tar xvf binutils-2.22.tar.bz2
+mkdir build-binutils
+cd build-binutils
+make all
+make install
+
+tar xvf gcc-4.6.2.tar.bz2
+mkdir build-gcc
+cd build-gcc
+../gcc-4.6.2/configure --target=$TARGET --with-gnu-as --with-gnu-ld --prefix=$PREFIX \
+	--with-sysroot=$SYSROOT --disable-libgcj --enable-languages=c,c++ -v
+make all
+make install
+
+# Step 2: Cross compile boost
+# http://goodliffe.blogspot.com/2008/05/cross-compiling-boost.html
+tar jxvf boost_1_48_0.tar.bz2
+
+# patch boost
+# https://svn.boost.org/trac/boost/attachment/ticket/6158/cstdint_patch.diff
+cp cstdint.hpp boost_1_48_0/boost/cstdint.hpp
+
+cd boost_1_48_0
+./bootstrap.sh --prefix=/usr/local/boost-1.48.0 \
+        --with-libraries=thread,filesystem,system,program_options,date_time,regex
+
+# edit: tools/build/v2/user-config.jam, add
+# using gcc : 4.6.2 : /opt/gcc-sparc-sun-solaris2.10-4.6.2/bin/sparc-sun-solaris2.10-g++ ;
+./b2 --prefix=/usr/local/boost-1.48.0 -d2 -a install
+mkdir $SYSROOT/usr/local
+cp -av /usr/local/boost-1.48.0/ $SYSROOT/usr/local
+
+# Step 3: Build Wolframe (cross)
+BOOST_DIR=/opt/gcc-sparc-sun-solaris2.10-4.6.2/sysroot/usr/local/boost-1.48.0 \
+	make CC=sparc-sun-solaris2.10-gcc CXX=sparc-sun-solaris2.10-g++ 
+
