@@ -56,16 +56,9 @@ examples/echo/echod
 examples/lua/luad
 examples/mtproc/mtprocd
 examples/pecho/pechod
-examples/iproc/tests/iprocHandlerTest
-examples/iproc/tests/iprocHandlerXMLTest
 examples/pecho/tests/pechoHandlerTest
-examples/iproc/tests/directmapParser
-examples/iproc/tests/directmapCompiler
-examples/iproc/tests/luamapParser
-examples/iproc/tests/result/
-examples/iproc/tests/simpleFormCompilerTest
-examples/iproc/tests/structFiltermapTest
-examples/iproc/tests/structLuamapTest
+examples/iproc/iprocd
+examples/tproc/tprocd
 tests/expect/primary.db
 clients/qt/qtclient
 moc_*.cpp
@@ -75,7 +68,6 @@ clients/Android/Wolframe.keystore
 clients/cli/wolfcli
 tests/db/sdsqliteTest
 tests/db/sqlite3ppTest
-examples/iproc/iprocd
 lua/src/lua
 lua/src/luac
 docs/WolfBook.html
