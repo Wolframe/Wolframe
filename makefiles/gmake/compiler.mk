@@ -175,16 +175,26 @@ endif
 # start of spro section
 
 # -xc99=all: full C99 compliance for the code (syntax and library functions)
-# -Xc: full ISO compliance, no K&R stuf
 # -mt: enable mutlithreading (-D_REENTRANT for header files, -lthread for ld)
 # -errwarn=%all: convert all warnings to errors
-# -v: do more restrictive syntax checking
 
 ifeq "$(COMPILER)" "spro"
+
+CC=CC
+CXX=CC
+
 STD99_COMPILE_FLAGS = \
 	-xc99=all
+
+COMMON_COMPILE_FLAGS = \
+	-errwarn=%all -mt
+
 COMPILE_FLAGS = \
-	$(STD99_COMPILE_FLAGS) -Xc -errwarn=%all -mt -v
+	$(STD99_COMPILE_FLAGS) $(COMMON_COMPILE_FLAGS)
+
+CXX_COMPILE_FLAGS = \
+	$(COMMON_COMPILE_FLAGS)
+
 endif
 
 # end of spro section

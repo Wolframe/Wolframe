@@ -522,6 +522,17 @@ BOOST_LIBRARY_TAG ?=
 endif
 endif
 
+ifeq "$(PLATFORM)" "SUNOS"
+ifeq "$(OS_MAJOR_VERSION)" "5"
+ifeq "$(OS_MINOR_VERSION)" "10"
+BOOST_DIR ?= NOT SUPPLIED ON THIS PLATFORM
+BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
+BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
+BOOST_LIBRARY_TAG ?=
+endif
+endif
+endif
+
 # OpenSSL
 #########
 
@@ -531,6 +542,15 @@ ifeq "$(PLATFORM)" "LINUX"
 
 OPENSSL_LIBS ?= -lssl -lcrypto
 
+endif
+
+ifeq "$(PLATFORM)" "SUNOS"
+ifeq "$(OS_MAJOR_VERSION)" "5"
+ifeq "$(OS_MINOR_VERSION)" "10"
+OPENSSL_DIR = /usr/local/ssl
+OPENSSL_LIBS ?= -lssl -lcrypto
+endif
+endif
 endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
@@ -550,6 +570,11 @@ ifeq "$(PLATFORM)" "LINUX"
 LUA_PLATFORM_CFLAGS = -DLUA_USE_LINUX
 LUA_PLATFORM_LDFLAGS =
 LUA_PLATFORM_LIBS = -ldl
+endif
+
+ifeq "$(PLATFORM)" "SUNOS"
+LUA_PLATFORM_CFLAGS = -DLUA_USE_POSIX -DLUA_USE_DLOPEN
+LUA_PLATFORM_LDFLAGS = -ldl
 endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
@@ -1183,6 +1208,17 @@ endif
 
 endif
 
+ifeq "$(PLATFORM)" "SUNOS"
+ifeq "$(OS_MAJOR_VERSION)" "5"
+ifeq "$(OS_MINOR_VERSION)" "10"
+SQLITE3_DIR ?= /usr/local
+SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
+SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
+SQLITE3_LIBS ?= -lsqlite3
+endif
+endif
+endif
+
 ifeq "$(PLATFORM)" "FREEBSD"
 ifeq "$(OS_MAJOR_VERSION)" "8"
 SQLITE3_DIR ?= /usr/local
@@ -1369,6 +1405,19 @@ PGSQL_LIB_DIRS = -L$(PGSQL_LIB_DIR)
 PGSQL_LIBS ?= -lpq
 endif
 
+endif
+
+ifeq "$(PLATFORM)" "SUNOS"
+ifeq "$(OS_MAJOR_VERSION)" "5"
+ifeq "$(OS_MINOR_VERSION)" "10"
+PGSQL_DIR ?= /usr/local/pgsql
+PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include
+PGSQL_INCLUDE_DIRS = -I$(PGSQL_INCLUDE_DIR)
+PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
+PGSQL_LIB_DIRS = -L$(PGSQL_LIB_DIR)
+PGSQL_LIBS ?= -lpq
+endif
+endif
 endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
@@ -1559,6 +1608,19 @@ endif
 
 endif
 
+ifeq "$(PLATFORM)" "SUNOS"
+ifeq "$(OS_MAJOR_VERSION)" "5"
+ifeq "$(OS_MINOR_VERSION)" "10"
+LIBXML2_DIR ?= /usr/local
+LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
+LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
+LIBXML2_LIB_DIR ?= $(LIBXML2_DIR)/lib
+LIBXML2_LIB_DIRS = -L$(LIBXML2_LIB_DIR)
+LIBXML2_LIBS ?= -lxml2
+endif
+endif
+endif
+
 ifeq "$(PLATFORM)" "FREEBSD"
 ifeq "$(OS_MAJOR_VERSION)" "8"
 LIBXML2_DIR ?= /usr/local
@@ -1745,6 +1807,19 @@ LIBXSLT_INCLUDE_DIRS = -I$(LIBXSLT_INCLUDE_DIR)
 LIBXSLT_LIB_DIR ?= $(LIBXSLT_DIR)/lib
 LIBXSLT_LIB_DIRS = -L$(LIBXSLT_LIB_DIR)
 LIBXSLT_LIBS ?= -lxslt
+endif
+
+ifeq "$(PLATFORM)" "SUNOS"
+ifeq "$(OS_MAJOR_VERSION)" "5"
+ifeq "$(OS_MINOR_VERSION)" "10"
+LIBXSLT_DIR ?= /usr/local
+LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
+LIBXSLT_INCLUDE_DIRS = -I$(LIBXSLT_INCLUDE_DIR)
+LIBXSLT_LIB_DIR ?= $(LIBXSLT_DIR)/lib
+LIBXSLT_LIB_DIRS = -L$(LIBXSLT_LIB_DIR)
+LIBXSLT_LIBS ?= -lxslt
+endif
+endif
 endif
 
 ifeq "$(PLATFORM)" "FREEBSD"

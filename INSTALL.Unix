@@ -359,3 +359,61 @@ Optional packages: qt4-gui (4.7.1), cyrus-sasl (2.1.23)
 You need 'gmake' (3.81_4).
 
 So far no PAM support.
+
+Solaris 10 (Sun Forte toolchain)
+--------------------------------
+
+You need the Sun Forte Compiler (e.g. SunStudio 12.1).
+You need GNU tar to unpack boost-1.48.0.tar.gz.
+
+Set your path so that boost build can find the compiler:
+
+export PATH=/opt/sunstudio12.1/bin:/usr/ccs/bin:${PATH}
+
+Build boost with the sun toolset:
+
+./bootstrap.sh --prefix=/usr/local/boost-1.48.0 \
+	--with-toolset=sun \
+	--with-libraries=thread,filesystem,system,program_options,date_time,regex
+
+Problems:
+
+Boost tarfile can't be unpacked
+
+/usr/local/bin/tar: Archive value 4294967295 is out of gid_t range -2147483648..2147483647
+
+Those messages can be ignored.
+
+Some @LongLinks may appear, though using a GNU tar.
+
+TODO from here:
+
+ BOOST_DIR=/usr/local/boost-1.48.0 make CC=cc CXX=CC WITH_SSL=1 WITH_EXPECT=1 WITH_QT=1 WITH_PAM=1 WITH_SASL=1      WITH_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 WITH_LIBXSLT=1
+
+Solaris 10 (GCC toolchain)
+--------------------------
+
+CAREFUL: NOT WORKING!! COMPILER TOO OLD..
+
+You neeed 'gmake' (3.81) and 'gcc' (3.4.6). Be careful with the PATH
+settings so that 'make' is the GNU make and not the native one
+'/usr/ccs/bin/make'. Best ist to install Sunfreeware in '/usr/local'
+and set the pathes before building as follows:
+
+PATH=/usr/local/bin:/usr/local/ssl/bin:/usr/ccs/bin:/usr/bin:/bin:/usr/local/bin:/opt/bin:/usr/local/sbin:/usr/sbin:/sbin:/opt/sbin
+LD_LIBRARY_PATH=/usr/local/lib:/usr/local/ssl/lib:/usr/local/apr/lib
+export PATH
+export LD_LIBRARY_PATH
+
+Boost has to be compiled from scratch.
+
+Get packages from sunfreeware.com (as long it still exists):
+
+Optional packages: sqlite (SMCsqlite, 3.7.2), postgresql (SMCpgsql, 9.1.0)
+
+#qt4-gui (4.7.1), openpam, cyrus-sasl (2.1.23)
+#                 libxml2 (2.7.8)
+
+problems you may have:
+
+visibility attribute not supported in this configuration; ignored
