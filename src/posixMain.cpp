@@ -74,6 +74,39 @@
 #include <boost/interprocess/sync/file_lock.hpp>
 #include <boost/filesystem.hpp>
 
+// Solaris has no BSD daemon function, provide our own
+#ifdef SUNOS
+int daemon( int nochdir, int noclose )
+{
+	switch( fork( ) ) {
+		case -1:
+			// fork error
+			return -1;
+		
+		case 0:
+			// terminate parent without closing file descriptors
+			_exit( 0 );
+	}
+	
+	// new process group
+	if( setsid( ) == -1 ) return -1;
+
+	// optionally change to root dir (avoid unmount problems)
+	if( !nochdir ) chdir( "/" );
+	
+	// assign /dev/null to stdin, stdout and stderr
+	if( !noclose ) {
+		int fd = open( "/dev/null", O_RDWR, 0 );
+		if( fd != -1 ) {
+			(void)dup2( fd, STDIN_FILENO );	
+			(void)dup2( fd, STDOUT_FILENO );	
+			(void)dup2( fd, STDERR_FILENO );
+		}
+	}
+	
+	return 0;
+}		
+#endif	
 
 int _Wolframe_posixMain( int argc, char* argv[] )
 {

@@ -56,5 +56,19 @@ cp -av /usr/local/boost-1.48.0/ $SYSROOT/usr/local
 
 # Step 3: Build Wolframe (cross)
 BOOST_DIR=/opt/gcc-sparc-sun-solaris2.10-4.6.2/sysroot/usr/local/boost-1.48.0 \
-	make CC=sparc-sun-solaris2.10-gcc CXX=sparc-sun-solaris2.10-g++ 
+	make CC=sparc-sun-solaris2.10-gcc CXX=sparc-sun-solaris2.10-g++ config
 
+# change makefiles/gmake/platform.mk.vars manually
+ARCH=sun4u
+PLATFORM=SUNOS
+OS_MAJOR_VERSION=5
+OS_MINOR_VERSION=10
+COMPILER=gcc
+GCC_MAJOR_VERSION=4
+GCC_MINOR_VERSION=6
+ICC_MAJOR_VERSION=
+ICC_MINOR_VERSION=
+SPRO_MAJOR_VERSION=
+
+BOOST_DIR=/opt/gcc-sparc-sun-solaris2.10-4.6.2/sysroot/usr/local/boost-1.48.0 \
+	make CC=sparc-sun-solaris2.10-gcc CXX=sparc-sun-solaris2.10-g++ all install
