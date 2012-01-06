@@ -34,7 +34,9 @@ ABa:
   - OpenPAM instead of Linux-PAM
   - trouble with some expect tests, check!
 - Solaris
-  - get a build running
+  - make build fit for cross-compilation
+  - fix BSD daemon function (getgid fails with EPERM)
+  - make a lot more tests
 
 PF:
 
