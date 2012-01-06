@@ -40,9 +40,14 @@ make install
 # http://goodliffe.blogspot.com/2008/05/cross-compiling-boost.html
 tar jxvf boost_1_48_0.tar.bz2
 
-# patch boost
+# Step 2a: patch boost
 # https://svn.boost.org/trac/boost/attachment/ticket/6158/cstdint_patch.diff
 cp cstdint.hpp boost_1_48_0/boost/cstdint.hpp
+# evtl. https://forums.oracle.com/forums/thread.jspa?threadID=1997320
+# #define BOOST_SP_USE_PTHREADS in boost/config/user.hpp
+# avoids using funny gcc constructs instead of POSIX thread functions
+
+export PATH=/opt/gcc-sparc-sun-solaris2.10-4.6.2/bin:$PATH
 
 cd boost_1_48_0
 ./bootstrap.sh --prefix=/usr/local/boost-1.48.0 \
@@ -56,6 +61,7 @@ cp -av /usr/local/boost-1.48.0/ $SYSROOT/usr/local
 
 # Step 3: Build Wolframe (cross)
 BOOST_DIR=/opt/gcc-sparc-sun-solaris2.10-4.6.2/sysroot/usr/local/boost-1.48.0 \
+	WITH_SQLITE3=1 WITH_LOCAL_SQLITE3=1 \
 	make CC=sparc-sun-solaris2.10-gcc CXX=sparc-sun-solaris2.10-g++ config
 
 # change makefiles/gmake/platform.mk.vars manually
@@ -71,4 +77,5 @@ ICC_MINOR_VERSION=
 SPRO_MAJOR_VERSION=
 
 BOOST_DIR=/opt/gcc-sparc-sun-solaris2.10-4.6.2/sysroot/usr/local/boost-1.48.0 \
+	WITH_SQLITE3=1 WITH_LOCAL_SQLITE3=1 \
 	make CC=sparc-sun-solaris2.10-gcc CXX=sparc-sun-solaris2.10-g++ all install
