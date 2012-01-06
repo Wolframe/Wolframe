@@ -25,6 +25,7 @@ cd /home/build
 tar xvf binutils-2.22.tar.bz2
 mkdir build-binutils
 cd build-binutils
+../binutils-2.22/configure --target=$TARGET --prefix=$PREFIX -with-sysroot=$SYSROOT -v
 make all
 make install
 
@@ -50,17 +51,17 @@ cp cstdint.hpp boost_1_48_0/boost/cstdint.hpp
 export PATH=/opt/gcc-sparc-sun-solaris2.10-4.6.2/bin:$PATH
 
 cd boost_1_48_0
-./bootstrap.sh --prefix=/usr/local/boost-1.48.0 \
+./bootstrap.sh --prefix=/opt/boost-1.48.0 \
         --with-libraries=thread,filesystem,system,program_options,date_time,regex
 
 # edit: tools/build/v2/user-config.jam, add
 # using gcc : 4.6.2 : /opt/gcc-sparc-sun-solaris2.10-4.6.2/bin/sparc-sun-solaris2.10-g++ ;
-./b2 --prefix=/usr/local/boost-1.48.0 -d2 -a install
+./b2 --prefix=/opt/boost-1.48.0 -d2 -a install
 mkdir $SYSROOT/usr/local
-cp -av /usr/local/boost-1.48.0/ $SYSROOT/usr/local
+cp -av /opt/boost-1.48.0/ $SYSROOT/usr/local
 
 # Step 3: Build Wolframe (cross)
-BOOST_DIR=/opt/gcc-sparc-sun-solaris2.10-4.6.2/sysroot/usr/local/boost-1.48.0 \
+BOOST_DIR=/opt/gcc-sparc-sun-solaris2.10-4.6.2/sysroot/opt/boost-1.48.0 \
 	WITH_SQLITE3=1 WITH_LOCAL_SQLITE3=1 \
 	make CC=sparc-sun-solaris2.10-gcc CXX=sparc-sun-solaris2.10-g++ config
 
@@ -76,6 +77,6 @@ ICC_MAJOR_VERSION=
 ICC_MINOR_VERSION=
 SPRO_MAJOR_VERSION=
 
-BOOST_DIR=/opt/gcc-sparc-sun-solaris2.10-4.6.2/sysroot/usr/local/boost-1.48.0 \
+BOOST_DIR=/opt/gcc-sparc-sun-solaris2.10-4.6.2/sysroot/opt/boost-1.48.0 \
 	WITH_SQLITE3=1 WITH_LOCAL_SQLITE3=1 \
 	make CC=sparc-sun-solaris2.10-gcc CXX=sparc-sun-solaris2.10-g++ all install
