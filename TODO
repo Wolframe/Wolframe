@@ -9,22 +9,22 @@ ABa:
 - wolfcli
   - netcat with authentication and SSL
 - authentication
-  - LDAP
-  - AD/Windows Kerberos
-  - SASL
+  - redo interface (now in Attic)
+  - then plugins for
+    - LDAP
+    - AD/Windows Kerberos
+    - SASL
 - makefiles
-  - merge po stuff from WolfBones with the funny script in po :-)
   - warning LNK4006: __NULL_IMPORT_DESCRIPTOR in src (because we
     link the library and the executable twice with library dependencies,
     we should link only the resulting binary, this is exactly the
     opposite of shared libraries on Unix)
 - Windows:
   - have boost debug libraries
-    - check why iprocd aborts
   - username, password for service credentials
   - clean up native Win32 string mess in service code
   - log when service gets installed and uninstalled
-  - do some packaging with Wix
+  - do some packaging with WIX
     - have merge modules for all optional parts (should be do
       merge modules for OpenSSL? legal?)
 - Logger:
@@ -33,6 +33,8 @@ ABa:
 - FreeBSD
   - OpenPAM instead of Linux-PAM
   - trouble with some expect tests, check!
+- Solaris
+  - get a build running
 
 PF:
 
