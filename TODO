@@ -15,6 +15,9 @@ ABa:
     - AD/Windows Kerberos
     - SASL
 - makefiles
+  - wolframed is build over and over again. mix of real and phony
+    target because of parallel builds and dependencies. don't know
+    how to solve it
   - warning LNK4006: __NULL_IMPORT_DESCRIPTOR in src (because we
     link the library and the executable twice with library dependencies,
     we should link only the resulting binary, this is exactly the

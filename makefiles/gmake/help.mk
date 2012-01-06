@@ -28,10 +28,15 @@ WITH_LOCAL_SQLITE3=1   force building of local amalgataion version of Sqlite3
 WITH_PGSQL=1           build AAAA and DB connectors for PostgreSql
 WITH_LIBXML2=1         build code using libxml2
 WITH_LIBXSLT=1         build code using libxslt
+
+Some more obscure options:
+
 WITH_EXAMPLES=0        do not build and test the examples (default is on)
+ENABLE_NLS=0           Don't build gettext NLS support (default is on)
 
 Avaliable optional features during testing only:
 
+RUN_TESTS=0            don't automatially run tests (default is run them)
 WITH_EXPECT=1          use Expect/Tcl for system testing
 
 Example:

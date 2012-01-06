@@ -61,22 +61,17 @@ mkdir $SYSROOT/usr/local
 cp -av /opt/boost-1.48.0/ $SYSROOT/usr/local
 
 # Step 3: Build Wolframe (cross)
-BOOST_DIR=/opt/gcc-sparc-sun-solaris2.10-4.6.2/sysroot/opt/boost-1.48.0 \
-	WITH_SQLITE3=1 WITH_LOCAL_SQLITE3=1 \
-	make CC=sparc-sun-solaris2.10-gcc CXX=sparc-sun-solaris2.10-g++ config
+#
+# Provide the architecture flags yourself (ARCH and friends), don't let the
+# system probe them automatically (as the build host is Linux and not Solaris).
+# Provide pathes to cross-compiled versions of all libraries (at least boost).
+# Pass the cross-compilers as arguments.
+# Also switch of execution of any test ruring 'make test'
 
-# change makefiles/gmake/platform.mk.vars manually
-ARCH=sun4u
-PLATFORM=SUNOS
-OS_MAJOR_VERSION=5
-OS_MINOR_VERSION=10
-COMPILER=gcc
-GCC_MAJOR_VERSION=4
-GCC_MINOR_VERSION=6
-ICC_MAJOR_VERSION=
-ICC_MINOR_VERSION=
-SPRO_MAJOR_VERSION=
-
-BOOST_DIR=/opt/gcc-sparc-sun-solaris2.10-4.6.2/sysroot/opt/boost-1.48.0 \
+ARCH=sun4u PLATFORM=SUNOS OS_MAJOR_VERSION=5 OS_MINOR_VERSION=10 INSTALL=install \
+	BOOST_DIR=/opt/boost-1.48.0 \
 	WITH_SQLITE3=1 WITH_LOCAL_SQLITE3=1 \
-	make CC=sparc-sun-solaris2.10-gcc CXX=sparc-sun-solaris2.10-g++ all install
+	RUN_TESTS=0 \
+        make config all test install \
+		CC=sparc-sun-solaris2.10-gcc CXX=sparc-sun-solaris2.10-g++ \
+		DESTDIR=/tmp prefix=/opt/wolframe-0.0.1

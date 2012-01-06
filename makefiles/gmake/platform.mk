@@ -32,6 +32,8 @@ WITH_LIBXML2 ?= 0
 WITH_LIBXSLT ?= 0
 WITH_QT ?= 0
 WITH_EXAMPLES ?= 1
+ENABLE_NLS ?= 1
+DONT_RUN_TESTS ?= 0
 
 # variables guessed by 'guess_env'
 PLATFORM ?=		$(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_env --platform "$(CC)" "$(CURDIR)" $(TOPDIR))
@@ -92,11 +94,13 @@ SO = .so
 
 # name if the installation program
 # (TODO: use the MIT or openradio install-sh script instead?)
-INSTALL = $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_env --install)
+INSTALL ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_env --install)
+ifndef INSTALL
 ifeq "$(PLATFORM)" "SUNOS"
 INSTALL = /usr/ucb/install
 else
 INSTALL = install
+endif
 endif
 
 # dynamic linker
@@ -113,9 +117,6 @@ endif
 
 # i18n, gettext/libintl
 #######################
-
-# enable or disable internationalization code
-ENABLE_NLS = 1
 
 ifeq "$(ENABLE_NLS)" "1"
 

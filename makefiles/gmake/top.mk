@@ -154,6 +154,20 @@ ifeq ($(WITH_LIBXSLT),1)
 	@echo "LIBXSLT_LIB_DIRS: $(LIBXSLT_LIB_DIRS)"
 	@echo "LIBXSLT_LIBS: $(LIBXSLT_LIBS)"
 endif
+	@echo "ENABLE_NLS: '$(ENABLE_NLS)'"
+	@echo "WITH_SQLITE3: '$(WITH_SQLITE3)'"
+	@echo
+	@echo "Additional build options:"
+	@echo
+ifeq ($(ENABLE_NLS),0)
+	@echo "NLS support is disabled"
+else
+	@echo "NLS support is enabled"
+endif
+ifeq ($(RUN_TESTS),0)
+	@echo "Will not execute any tests"
+endif
+	@echo
 
 .PHONY: init-po
 init-po:

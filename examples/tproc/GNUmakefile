@@ -63,7 +63,9 @@ local_distclean:
 local_install:
 
 local_test: $(TEST_BINS)
+ifeq ($(RUN_TESTS),1)
 	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./tprocHandlerTest$(EXE)
+endif
 
 run: $(CPP_BINS)
 	@echo "Running the Wolframe tproc example..."

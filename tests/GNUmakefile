@@ -75,6 +75,7 @@ local_clean:
 local_distclean:
 
 local_test: $(TEST_CPP_BINS)
+ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./testMethodMemberPointerTemplate
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./testNamedRetVal
@@ -96,8 +97,11 @@ local_test: $(TEST_CPP_BINS)
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./configStructParser $(TOPDIR)/src/wolframe.conf
 	@echo
 	@echo
+endif
 
 local_longtest: poolTest
+ifeq ($(RUN_TESTS),0)
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./poolTest
 	@echo
 	@echo
+endif
