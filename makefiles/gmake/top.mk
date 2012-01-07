@@ -154,8 +154,6 @@ ifeq ($(WITH_LIBXSLT),1)
 	@echo "LIBXSLT_LIB_DIRS: $(LIBXSLT_LIB_DIRS)"
 	@echo "LIBXSLT_LIBS: $(LIBXSLT_LIBS)"
 endif
-	@echo "ENABLE_NLS: '$(ENABLE_NLS)'"
-	@echo "WITH_SQLITE3: '$(WITH_SQLITE3)'"
 	@echo
 	@echo "Additional build options:"
 	@echo

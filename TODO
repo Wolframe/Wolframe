@@ -37,8 +37,7 @@ ABa:
   - OpenPAM instead of Linux-PAM
   - trouble with some expect tests, check!
 - Solaris
-  - make build fit for cross-compilation
-  - make a lot more tests
+  - native build and test (not only cross-compiled)
 
 PF:
 
