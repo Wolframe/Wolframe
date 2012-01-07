@@ -94,8 +94,8 @@ SO = .so
 
 # name if the installation program
 # (TODO: use the MIT or openradio install-sh script instead?)
-INSTALL ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_env --install)
 ifndef INSTALL
+INSTALL = $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_env --install)
 ifeq "$(PLATFORM)" "SUNOS"
 INSTALL = /usr/ucb/install
 else
