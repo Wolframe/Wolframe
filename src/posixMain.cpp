@@ -84,6 +84,10 @@ int daemon( int nochdir, int noclose )
 			return -1;
 		
 		case 0:
+			// the new daemon
+			break;
+		
+		default:
 			// terminate parent without closing file descriptors
 			_exit( 0 );
 	}
@@ -263,25 +267,25 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 			struct passwd *passwdent;
 
 			if ( !conf.serviceCfg->user.empty() )	{
-				passwdent = getpwnam( conf.serviceCfg->user.c_str( ) );
-				if( passwdent == NULL ) {
-					LOG_CRITICAL << "Illegal user '" << conf.serviceCfg->user << "': " << _Wolframe::log::LogError::LogStrerror;
-					return _Wolframe::ErrorCode::FAILURE;
-				}
-				if( setuid( passwdent->pw_uid ) < 0 ) {
-					LOG_CRITICAL << "setgid for user '" << conf.serviceCfg->user << "' failed: " << _Wolframe::log::LogError::LogStrerror;
-					return _Wolframe::ErrorCode::FAILURE;
-				}
-			}
-
-			if ( !conf.serviceCfg->user.empty() )	{
 				groupent = getgrnam( conf.serviceCfg->group.c_str( ) );
 				if( groupent == NULL ) {
 					LOG_CRITICAL << "Illegal group '" << conf.serviceCfg->group << "': " << _Wolframe::log::LogError::LogStrerror;
 					return _Wolframe::ErrorCode::FAILURE;
 				}
+				LOG_TRACE << "changing group to " << conf.serviceCfg->group << "(" << groupent->gr_gid << ")";
 				if( setgid( groupent->gr_gid ) < 0 ) {
 					LOG_CRITICAL << "setgid for group '" << conf.serviceCfg->group << "' failed: " << _Wolframe::log::LogError::LogStrerror;
+					return _Wolframe::ErrorCode::FAILURE;
+				}
+
+				passwdent = getpwnam( conf.serviceCfg->user.c_str( ) );
+				if( passwdent == NULL ) {
+					LOG_CRITICAL << "Illegal user '" << conf.serviceCfg->user << "': " << _Wolframe::log::LogError::LogStrerror;
+					return _Wolframe::ErrorCode::FAILURE;
+				}
+				LOG_TRACE << "Changing user to " << conf.serviceCfg->user << "(" << passwdent->pw_uid << ")";
+				if( setuid( passwdent->pw_uid ) < 0 ) {
+					LOG_CRITICAL << "setuid for user '" << conf.serviceCfg->user << "' failed: " << _Wolframe::log::LogError::LogStrerror;
 					return _Wolframe::ErrorCode::FAILURE;
 				}
 			}
