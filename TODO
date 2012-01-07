@@ -38,7 +38,6 @@ ABa:
   - trouble with some expect tests, check!
 - Solaris
   - make build fit for cross-compilation
-  - fix BSD daemon function (getgid fails with EPERM)
   - make a lot more tests
 
 PF:
