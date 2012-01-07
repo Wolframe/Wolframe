@@ -33,7 +33,7 @@ WITH_LIBXSLT ?= 0
 WITH_QT ?= 0
 WITH_EXAMPLES ?= 1
 ENABLE_NLS ?= 1
-DONT_RUN_TESTS ?= 0
+RUN_TESTS ?= 1
 
 # variables guessed by 'guess_env'
 PLATFORM ?=		$(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_env --platform "$(CC)" "$(CURDIR)" $(TOPDIR))
