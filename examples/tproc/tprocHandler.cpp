@@ -70,10 +70,10 @@ static STM stm;
 
 int CommandHandler::doCmd1A( int argc, const char** argv, std::ostream& out)
 {
-	out << "you called doCmd1A with ";
+	out << "OK CMD1A";
 	if (argc == 0)
 	{
-		out << "no arguments" << std::endl;;
+		out << " ?" << endl();
 		return State1;
 	}
 	else
@@ -82,17 +82,17 @@ int CommandHandler::doCmd1A( int argc, const char** argv, std::ostream& out)
 		{
 			out << " '" << argv[ii] << "'";
 		}
-		out << " as arguments" << std::endl;;
+		out << endl();
 		return State2;
 	}
 }
 
 int CommandHandler::doCmd1B( int argc, const char** argv, std::ostream& out)
 {
-	out << "you called doCmd1B with ";
+	out << "OK CMD1B";
 	if (argc == 0)
 	{
-		out << "no arguments" << std::endl;;
+		out << " ?" << endl();
 		return State1;
 	}
 	else
@@ -101,17 +101,17 @@ int CommandHandler::doCmd1B( int argc, const char** argv, std::ostream& out)
 		{
 			out << " '" << argv[ii] << "'";
 		}
-		out << " as arguments" << std::endl;;
+		out << endl();
 		return State2;
 	}
 }
 
 int CommandHandler::doCmd1C( int argc, const char** argv, std::ostream& out)
 {
-	out << "you called doCmd1C with ";
+	out << "OK CMD1C";
 	if (argc == 0)
 	{
-		out << "no arguments" << std::endl;;
+		out << " ?" << endl();
 		return State1;
 	}
 	else
@@ -120,17 +120,17 @@ int CommandHandler::doCmd1C( int argc, const char** argv, std::ostream& out)
 		{
 			out << " '" << argv[ii] << "'";
 		}
-		out << " as arguments" << std::endl;;
+		out << endl();
 		return State2;
 	}
 }
 
 int CommandHandler::doCmd2A( int argc, const char** argv, std::ostream& out)
 {
-	out << "you called doCmd2A with ";
+	out << "OK CMD2A";
 	if (argc == 0)
 	{
-		out << "no arguments" << std::endl;;
+		out << " ?" << endl();
 		return State2;
 	}
 	else
@@ -139,17 +139,17 @@ int CommandHandler::doCmd2A( int argc, const char** argv, std::ostream& out)
 		{
 			out << " '" << argv[ii] << "'";
 		}
-		out << " as arguments" << std::endl;;
+		out << endl();
 		return State3;
 	}
 }
 
 int CommandHandler::doCmd2B( int argc, const char** argv, std::ostream& out)
 {
-	out << "you called doCmd2B with ";
+	out << "OK CMD2B";
 	if (argc == 0)
 	{
-		out << "no arguments" << std::endl;;
+		out << " ?" << endl();
 		return State2;
 	}
 	else
@@ -158,17 +158,17 @@ int CommandHandler::doCmd2B( int argc, const char** argv, std::ostream& out)
 		{
 			out << " '" << argv[ii] << "'";
 		}
-		out << " as arguments" << std::endl;;
+		out << endl();
 		return State3;
 	}
 }
 
 int CommandHandler::doCmd3A( int argc, const char** argv, std::ostream& out)
 {
-	out << "you called doCmd3A with ";
+	out << "OK CMD3A";
 	if (argc == 0)
 	{
-		out << "no arguments" << std::endl;;
+		out << " ?" << endl();
 		return State3;
 	}
 	else
@@ -177,7 +177,7 @@ int CommandHandler::doCmd3A( int argc, const char** argv, std::ostream& out)
 		{
 			out << " '" << argv[ii] << "'";
 		}
-		out << " as arguments" << std::endl;;
+		out << endl();
 		return -1;
 	}
 }
@@ -232,9 +232,14 @@ const net::NetworkOperation Connection::nextOperation()
 }
 
 Connection::Connection( const net::LocalEndpoint& local, const Configuration* config)
-	:m_cmdhandler( static_cast<protocol::LineCommandHandlerSTM*>(&stm))
+	:m_config(config)
+	,m_cmdhandler( static_cast<protocol::LineCommandHandlerSTM*>(&stm))
+	,m_input(config->input_bufsize())
+	,m_output(config->output_bufsize())
 	,m_terminated(false)
 {
+	m_cmdhandler.setInputBuffer( m_input.ptr(), m_input.size());
+	m_cmdhandler.setOutputBuffer( m_output.ptr(), m_output.size());
 	LOG_TRACE << "Created connection handler for " << local.toString();
 }
 

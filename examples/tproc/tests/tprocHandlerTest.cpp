@@ -37,27 +37,99 @@
 #include "tprocHandler.hpp"
 #include "connectionHandler.hpp"
 #include "handlerConfig.hpp"
+#include "testHandlerTemplates.hpp"
 #include <gtest/gtest.h>
-#define BOOST_FILESYSTEM_VERSION 3
-#include <boost/filesystem.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/thread/thread.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::tproc;
 
-class TProcTestConfiguration :public Configuration
+class TestConfiguration :public Configuration
 {
 public:
-	TProcTestConfiguration ()
+	TestConfiguration( const TestConfiguration& o)
+		:Configuration(o){}
+
+	TestConfiguration( std::size_t ib, std::size_t ob)
 	{
+		m_data.input_bufsize = ib;
+		m_data.output_bufsize = ob;
 	}
 };
 
 struct TestDescription
 {
-	std::string content;
+	std::size_t inputBufferSize;
+	std::size_t outputBufferSize;
+	const char* input;
+	const char* expected;
 };
+static TestDescription testDescription[] =
+{
+	{128,128,"CMD1A\r\nCMD1A 'hi arg'\r\nCMD2A 'huga'\r\nCMD3A 1\r\n", "OK CMD1A ?\r\nOK CMD1A 'hi arg'\r\nOK CMD2A 'huga'\r\nOK CMD3A '1'\r\n"},
+	{0,0,0,0}
+};
+
+class TProcHandlerTest : public ::testing::Test
+{
+protected:
+	TProcHandlerTest() {}
+	virtual ~TProcHandlerTest() {}
+	virtual void SetUp() {}
+	virtual void TearDown() {}
+};
+
+class TProcHandlerTestInstance
+{
+public:
+	net::LocalTCPendpoint ep;
+	tproc::Connection* m_connection;
+	TestConfiguration m_config;
+	std::string m_input;
+	std::string m_output;
+	std::string m_expected;
+	enum
+	{
+		EoDBufferSize=4,
+		MinOutBufferSize=16
+	};
+public:
+	TProcHandlerTestInstance( const TestDescription& descr)
+		:ep( "127.0.0.1", 12345)
+		,m_connection(0)
+		,m_config( descr.inputBufferSize + EoDBufferSize, descr.outputBufferSize + MinOutBufferSize)
+		,m_input( descr.input)
+		,m_expected( descr.expected)
+		{
+			m_connection = new tproc::Connection( ep, &m_config);
+		}
+
+	~TProcHandlerTestInstance()
+	{
+		delete m_connection;
+	}
+
+	const std::string& input() const {return m_input;}
+	const std::string& output() const {return m_output;}
+	const std::string& expected() const {return m_expected;}
+
+	int run()
+	{
+		char* itr = const_cast<char*>( m_input.c_str());
+		m_output.clear();
+		return test::runTestIO( itr, itr+m_input.size(), m_output, *m_connection);
+	}
+};
+
+TEST_F( TProcHandlerTest, tests)
+{
+	unsigned int ti;
+	for (ti=0; testDescription[ti].input; ti++)
+	{
+		TProcHandlerTestInstance test( testDescription[ti]);
+		EXPECT_EQ( 0, test.run());
+		EXPECT_EQ( test.expected(), test.output());
+	}
+}
 
 int main( int argc, char **argv )
 {

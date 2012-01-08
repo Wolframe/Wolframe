@@ -60,7 +60,7 @@ public:
 
 		State()
 		{
-			m_parser.add("");
+			m_parser.add(""); ///... the empty line as command is added implicitely to every state as command with index 0 and handled as such in the STM
 		}
 		void defineCommand( const char* name_, RunCommand run_)
 		{
@@ -101,13 +101,14 @@ private:
 class LineCommandHandler :public CommandHandler
 {
 public:
-	LineCommandHandler( const LineCommandHandlerSTM* stm_);
+	///\brief constructor
+	explicit LineCommandHandler( const LineCommandHandlerSTM* stm_);
 
 	///\brief See Parent::setInputBuffer(void*,std::size_t,std::size_t,std::size_t)
-	virtual void setInputBuffer( void* buf, std::size_t allocsize, std::size_t size, std::size_t itrpos);
+	virtual void setInputBuffer( void* buf, std::size_t allocsize, std::size_t size=0, std::size_t itrpos=0);
 
 	///\brief See Parent::setOutputBuffer(void*,std::size_t,std::size_t)
-	virtual void setOutputBuffer( void* buf, std::size_t size, std::size_t pos);
+	virtual void setOutputBuffer( void* buf, std::size_t size, std::size_t pos=0);
 
 	///\brief See Parent::nextOperation()
 	virtual Operation nextOperation();
@@ -127,6 +128,8 @@ public:
 	///\brief Get the error code of command execution to be returned to the client
 	int statusCode() const				{return m_statusCode;}
 
+	static const char* endl()			{return "\r\n";}
+
 private:
 	InputBlock m_input;					///< buffer for network read messages
 	OutputBlock m_output;					///< buffer for network write messages
@@ -143,13 +146,14 @@ private:
 		ParseArgs,					///< parse command arguments
 		ParseArgsEOL,					///< parse end of line after command arguments
 		ProtocolError,					///< a protocol error (bad command etc) appeared and the rest of the line has to be discarded
+		ProcessOutput,					///< prints the command output to the output buffer
 		Terminate					///< terminate application processor session (close for network)
 	};
 	///\brief Returns the state as string for logging etc.
 	///\param [in] i state to get as string
 	static const char* stateName( CommandState i)
 	{
-		static const char* ar[] = {"Init","EnterCommand","ParseArgs","ParseArgsEOL","Processing","ProtocolError","DiscardInput","FlushOutput","Terminate"};
+		static const char* ar[] = {"Init","EnterCommand","ParseArgs","ParseArgsEOL","ProtocolError","ProcessOutput","Terminate"};
 		return ar[i];
 	}
 
@@ -159,6 +163,9 @@ private:
 	CommandState m_cmdstateidx;				///< current state of command execution
 	std::size_t m_stateidx;					///< current state in the STM
 	int m_cmdidx;						///< index of the command to execute starting with 0 (-1 = undefined command)
+	int m_resultstate;					///< result state of the last command
+	std::string m_resultstr;				///< content the command output stream after command execution
+	std::size_t m_resultitr;				///< iterator on m_result to send the output via network output
 };
 
 

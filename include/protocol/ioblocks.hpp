@@ -286,13 +286,25 @@ public:
 		return true;
 	}
 
-	///\brief Print one character to the output
-	///\param [in] ch the character to print
+	///\brief Print a block to the output
+	///\param [in] p pointer to the block to print
+	///\param [in] n size of the block to print in bytes
 	bool print( const void* p, std::size_t n)
 	{
 		if (n >= restsize()) return false;
 		std::memmove( charptr()+pos(), p, n);
 		setPos( pos() + n);
+		return true;
+	}
+
+	///\brief Print a C-string to the output
+	///\param [in] pp pointer to the null terminated string to print
+	bool print( const char* pp)
+	{
+		std::size_t nn = std::strlen(pp);
+		if (nn >= restsize()) return false;
+		std::memmove( charptr()+pos(), pp, nn);
+		setPos( pos() + nn);
 		return true;
 	}
 

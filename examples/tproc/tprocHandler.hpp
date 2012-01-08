@@ -90,8 +90,11 @@ public:
 	virtual void errorOccured( NetworkSignal);
 
 private:
-	CommandHandler m_cmdhandler;
-	bool m_terminated;
+	const Configuration* m_config;		///< configuration reference
+	CommandHandler m_cmdhandler;		///< top level instance executing commands
+	protocol::InputBlock m_input;		///< buffer for network read messages
+	protocol::OutputBlock m_output;		///< buffer for network write messages
+	bool m_terminated;			///< true, if a termination signal came from the network
 };
 } // namespace tproc
 

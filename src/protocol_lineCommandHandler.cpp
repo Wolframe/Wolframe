@@ -68,7 +68,7 @@ void LineCommandHandler::getInputBlock( void*& begin, std::size_t& maxBlockSize)
 {
 	if (!m_input.getNetworkMessageRead( begin, maxBlockSize))
 	{
-		throw std::logic_error( "buffer too small");
+		throw std::logic_error( "buffer too small for input");
 	}
 }
 
@@ -95,26 +95,34 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 				m_argBuffer.clear();
 				if (m_output.pos()) return WRITE;
 				m_cmdstateidx = EnterCommand;
-				/* no break here !*/
+				m_cmdidx = -1;
+				m_resultstate = -1;
+				m_resultstr.clear();
+				m_resultitr = 0;
+				continue;
 
 			case EnterCommand:
 			{
 				const LineCommandHandlerSTM::State& st = (*m_stm).get( m_stateidx);
-				m_cmdidx = st.m_parser.getCommand( m_itr, m_end, m_buffer)-1;
-				if (m_cmdidx < (int)st.m_cmds.size())
+				int ci = st.m_parser.getCommand( m_itr, m_end, m_buffer);
+				if (ci == -1)
 				{
-					m_cmdstateidx = ParseArgs;
-					continue;
-				}
-				else if (m_itr == m_end)
-				{
-					return READ;
+					if (m_itr == m_end)
+					{
+						return READ;
+					}
+					else
+					{
+						m_output.print( "BAD command\r\n");
+						m_cmdstateidx = ProtocolError;
+						return WRITE;
+					}
 				}
 				else
 				{
-					m_output.print( "BAD command\r\n", 5);
-					m_cmdstateidx = ProtocolError;
-					return WRITE;
+					m_cmdidx = ci;
+					m_cmdstateidx = ParseArgs;
+					continue;
 				}
 			}
 
@@ -128,13 +136,16 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 					}
 					else
 					{
-						m_output.print( "BAD argument\r\n", 5);
+						m_output.print( m_cmdidx?"BAD arguments\r\n":"BAD line\r\n");
 						m_cmdstateidx = ProtocolError;
 						return WRITE;
 					}
 				}
-				m_cmdstateidx = ParseArgsEOL;
-				continue;
+				else
+				{
+					m_cmdstateidx = ParseArgsEOL;
+					continue;
+				}
 			}
 
 			case ParseArgsEOL:
@@ -147,54 +158,71 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 					}
 					else
 					{
-						m_output.print( "BAD line\r\n", 5);
+						m_output.print( "BAD line\r\n");
 						m_cmdstateidx = ProtocolError;
 						return WRITE;
 					}
 				}
-				if (m_cmdidx < 0)
+				else if (m_cmdidx == 0)
 				{
-					m_output.print( "BAD command\r\n", 5);
-					m_cmdstateidx = ProtocolError;
-					return WRITE;
-
-					if (m_argBuffer.argc())
+					if (m_argBuffer.argc() > 0)
 					{
-						m_output.print( "BAD command\r\n", 5);
+						///...line beginning with space
+						m_output.print( "BAD line\r\n");
 						m_cmdstateidx = ProtocolError;
 						return WRITE;
 					}
 					else
 					{
+						///...empty line
+						m_cmdstateidx = EnterCommand;
+						continue;
+					}
+				}
+				try
+				{
+					std::ostringstream out;
+					m_resultstate = m_stm->runCommand( m_stateidx, (std::size_t)m_cmdidx-1, this, m_argBuffer.argc(), m_argBuffer.argv(), out);
+					m_cmdstateidx = ProcessOutput;
+					m_resultstr = out.str();
+					m_resultitr = 0;
+					return (m_resultstr.size())?WRITE:READ;
+				}
+				catch (std::exception& e)
+				{
+					LOG_ERROR << "command execution thrown exception: " << e.what();
+					m_cmdstateidx = Terminate;
+					return CLOSED;
+				}
+			}
+
+			case ProcessOutput:
+			{
+				std::size_t rr = m_output.restsize();
+				if (m_resultitr == m_resultstr.size())
+				{
+					if (m_resultstate < 0)
+					{
+						m_cmdstateidx = Terminate;
+						return CLOSED;
+					}
+					else
+					{
+						m_stateidx = (std::size_t)m_resultstate;
 						m_cmdstateidx = Init;
 						continue;
 					}
 				}
-				else
+				if (rr > m_resultstr.size() - m_resultitr)
 				{
-					std::ostringstream out;
-					try
-					{
-						int rt = m_stm->runCommand( m_stateidx, (std::size_t)m_cmdidx, this, m_argBuffer.argc(), m_argBuffer.argv(), out);
-						if (rt < 0)
-						{
-							m_cmdstateidx = Terminate;
-							if (!m_output.print( out.str().c_str(), out.str().size()))
-							{
-								LOG_ERROR << "internal: output buffer to small (" << out.str().size() << ")";
-								return CLOSED;
-							}
-							return WRITE;
-						}
-					}
-					catch (std::exception& e)
-					{
-						LOG_ERROR << "command execution thrown exception: " << e.what();
-						m_cmdstateidx = Terminate;
-						return CLOSED;
-					}
-					return (out.str().size())?WRITE:READ;
+					rr = m_resultstr.size() - m_resultitr;
 				}
+				if (!m_output.print( m_resultstr.c_str()+m_resultitr, rr))
+				{
+					throw std::logic_error( "protocol error");
+				}
+				m_resultitr += rr;
+				return WRITE;
 			}
 
 			case ProtocolError:

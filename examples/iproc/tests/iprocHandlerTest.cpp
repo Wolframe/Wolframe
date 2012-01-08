@@ -278,11 +278,7 @@ TYPED_TEST( IProcHandlerTest, ExpectedResult )
 		boost::this_thread::sleep( boost::posix_time::seconds( 5 ));
 	}
 #endif
-#ifndef _WIN32
 	EXPECT_EQ( this->m_expected, output);
-#else
-	EXPECT_EQ( m_expected, output);
-#endif
 }
 
 int main( int argc, char **argv )

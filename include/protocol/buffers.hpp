@@ -144,6 +144,12 @@ private:
 		DQContent,				///< parsing a sub token starting with a double quote
 		DQContentEsc				///< escape encountered in State::DQContent state
 	};
+	static const char* stateName( State st)
+	{
+		static const char* ar[] = {"EndToken","Empty","Content","ContentEsc","SQContent","SQContentEsc","DQContent","DQContentEsc",0};
+		return ar[(int)st];
+	}
+
 	unsigned int m_pos;				///< cursor position in the parsed token vector
 	unsigned int m_buf[ Size];			///< the parsed token vector buffer
 	const char* m_sbuf[ Size];			///< the parsed token vector as array of 0-terminated strings
@@ -159,7 +165,7 @@ public:
 	CArgBuffer( Buffer* c)				:m_pos(0),m_state(Empty),m_content(c) {m_buf[0]=0;m_sbuf[0]=0;}
 
 	///\brief Clear the buffer content
-	void clear()					{m_pos=0;m_buf[0]=0;m_sbuf[0]=0;m_content->clear();}
+	void clear()					{m_pos=0;m_buf[0]=0;m_sbuf[0]=0;m_state=Empty;m_content->clear();}
 
 	///\brief Add the next character of the parsed content
 	///\param[in] ch character to process next
@@ -196,7 +202,7 @@ public:
 					case '\"': m_state = DQContent; break;
 					case '\\': m_state = ContentEsc; break;
 					case ' ':  m_content->push_back(0); m_state = Empty; break;
-					default:	m_content->push_back(ch); break;
+					default: m_content->push_back(ch); break;
 				}
 				break;
 
@@ -210,7 +216,7 @@ public:
 				{
 					case '\'': m_state = EndToken; break;
 					case '\\': m_state = SQContentEsc; break;
-					default:	m_content->push_back(ch); break;
+					default: m_content->push_back(ch); break;
 				}
 				break;
 
@@ -224,7 +230,7 @@ public:
 				{
 					case '\"': m_state = EndToken; break;
 					case '\\': m_state = DQContentEsc; break;
-					default:   m_content->push_back(ch); break;
+					default: m_content->push_back(ch); break;
 				}
 				break;
 

@@ -56,6 +56,8 @@ struct ScriptConfigStruct
 
 struct ConfigurationStruct
 {
+	ConfigurationStruct( const ConfigurationStruct& o)
+		:script(o.script),input_bufsize(o.input_bufsize),output_bufsize(o.output_bufsize){}
 	ConfigurationStruct()
 		:input_bufsize(1024),output_bufsize(1024){}
 
@@ -100,7 +102,6 @@ public:
 
 protected:
 	bool defineScript( const ScriptConfigStruct& sc);
-	friend class TestConfiguration;
 	ConfigurationStruct m_data;
 private:
 	std::string m_capa;

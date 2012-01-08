@@ -47,7 +47,7 @@ namespace tproc {
 
 struct CommandConfigStruct
 {
-	std::string name;
+	std::string name;		///< name of the command
 
 	static const config::DescriptionBase* description();
 };
@@ -55,6 +55,13 @@ struct CommandConfigStruct
 struct ConfigurationStruct
 {
 	std::vector<CommandConfigStruct> command;
+	std::size_t input_bufsize;			///< size of input network message buffers in bytes (should only be configured for testing)
+	std::size_t output_bufsize;			///< size of output network message buffers in bytes (should only be configured for testing)
+
+	ConfigurationStruct( const ConfigurationStruct& o)
+		:command(o.command),input_bufsize(o.input_bufsize),output_bufsize(o.output_bufsize){}
+	ConfigurationStruct()
+		:input_bufsize(1024),output_bufsize(1024){}
 
 	static const config::DescriptionBase* description();
 };
@@ -80,6 +87,12 @@ public:
 
 	///\brief interface implementation of ConfigurationBase::setCanonicalPathes(const std::string&)
 	virtual void setCanonicalPathes( const std::string&);
+
+	///\brief return size of the buffer used for input network messages in bytes
+	std::size_t input_bufsize() const		{return m_data.input_bufsize;}
+	///\brief return size of the buffer used for output network messages in bytes
+	std::size_t output_bufsize() const		{return m_data.output_bufsize;}
+
 protected:
 	ConfigurationStruct m_data;
 };

@@ -32,7 +32,6 @@
 ************************************************************************/
 #include "protocol/commandHandler.hpp"
 #include "logger-v1.hpp"
-/*[-]*/#include <iostream>
 
 using namespace _Wolframe;
 using namespace _Wolframe::protocol;
