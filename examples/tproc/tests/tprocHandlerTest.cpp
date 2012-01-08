@@ -47,7 +47,8 @@ class TestConfiguration :public Configuration
 {
 public:
 	TestConfiguration( const TestConfiguration& o)
-		:Configuration(o){}
+		:Configuration(o)
+	{}
 
 	TestConfiguration( std::size_t ib, std::size_t ob)
 	{
@@ -58,15 +59,13 @@ public:
 
 struct TestDescription
 {
-	std::size_t inputBufferSize;
-	std::size_t outputBufferSize;
 	const char* input;
 	const char* expected;
 };
 static TestDescription testDescription[] =
 {
-	{128,128,"CMD1A\r\nCMD1A 'hi arg'\r\nCMD2A 'huga'\r\nCMD3A 1\r\n", "OK CMD1A ?\r\nOK CMD1A 'hi arg'\r\nOK CMD2A 'huga'\r\nOK CMD3A '1'\r\n"},
-	{0,0,0,0}
+	{"CMD1A\r\nCMD1A 'hi arg'\r\nCMD2A 'huga'\r\nCMD3A 1\r\n", "OK CMD1A ?\r\nOK CMD1A 'hi arg'\r\nOK CMD2A 'huga'\r\nOK CMD3A '1'\r\n"},
+	{0,0}
 };
 
 class TProcHandlerTest : public ::testing::Test
@@ -80,25 +79,30 @@ protected:
 
 class TProcHandlerTestInstance
 {
-public:
+private:
 	net::LocalTCPendpoint ep;
 	tproc::Connection* m_connection;
 	TestConfiguration m_config;
 	std::string m_input;
 	std::string m_output;
 	std::string m_expected;
+	std::size_t m_inputBufferSize;
+	std::size_t m_outputBufferSize;
+
 	enum
 	{
 		EoDBufferSize=4,
 		MinOutBufferSize=16
 	};
 public:
-	TProcHandlerTestInstance( const TestDescription& descr)
+	TProcHandlerTestInstance( const TestDescription& descr, std::size_t ib, std::size_t ob)
 		:ep( "127.0.0.1", 12345)
 		,m_connection(0)
-		,m_config( descr.inputBufferSize + EoDBufferSize, descr.outputBufferSize + MinOutBufferSize)
+		,m_config( ib + EoDBufferSize, ob + MinOutBufferSize)
 		,m_input( descr.input)
 		,m_expected( descr.expected)
+		,m_inputBufferSize(ib)
+		,m_outputBufferSize(ob)
 		{
 			m_connection = new tproc::Connection( ep, &m_config);
 		}
@@ -123,11 +127,21 @@ public:
 TEST_F( TProcHandlerTest, tests)
 {
 	unsigned int ti;
+	enum {NOF_IB=8,NOF_OB=3};
+	std::size_t ib[ NOF_IB] = {1,2,3,5,11,13,23,127};
+	std::size_t ob[ NOF_OB] = {1,2,3};
+
 	for (ti=0; testDescription[ti].input; ti++)
 	{
-		TProcHandlerTestInstance test( testDescription[ti]);
-		EXPECT_EQ( 0, test.run());
-		EXPECT_EQ( test.expected(), test.output());
+		for (int ii=0; ii<NOF_IB; ii++)
+		{
+			for (int oo=0; oo<NOF_OB; oo++)
+			{
+				TProcHandlerTestInstance test( testDescription[ti], ib[ii], ob[oo]);
+				EXPECT_EQ( 0, test.run());
+				EXPECT_EQ( test.expected(), test.output());
+			}
+		}
 	}
 }
 

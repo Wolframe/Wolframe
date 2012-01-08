@@ -291,7 +291,7 @@ public:
 	///\param [in] n size of the block to print in bytes
 	bool print( const void* p, std::size_t n)
 	{
-		if (n >= restsize()) return false;
+		if (n > restsize()) return false;
 		std::memmove( charptr()+pos(), p, n);
 		setPos( pos() + n);
 		return true;
@@ -302,7 +302,7 @@ public:
 	bool print( const char* pp)
 	{
 		std::size_t nn = std::strlen(pp);
-		if (nn >= restsize()) return false;
+		if (nn > restsize()) return false;
 		std::memmove( charptr()+pos(), pp, nn);
 		setPos( pos() + nn);
 		return true;
