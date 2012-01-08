@@ -100,6 +100,7 @@ tests/simpleFormCompilerTest$(EXE): tests/simpleFormCompilerTest.o $(OBJS) $(TOP
 local_all: $(CPP_BINS)
 
 local_clean:
+	rm -Rf tests/result
 
 local_distclean:
 
