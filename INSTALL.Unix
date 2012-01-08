@@ -46,6 +46,9 @@ or you can build and configure your own version of the package.
 In this case copy 'makefiles/gmake/config.mk.template' to your
 home directory as '~/config.mk'. Customize '~/config.mk' as needed.
 
+Alternatively you can of course pass all the options as variables 
+directory to the invocation of make.
+
 Compile and install boost
 -------------------------
 
@@ -75,8 +78,8 @@ make install
 confiugre Wolframe in ~/config.mk and
 set QT_DIR to /usr/local/qt-4.7.4
 
-A note on Linux Distributions
-=============================
+Build instructions for Linux Distributions
+------------------------------------------
 
 RHEL/Centos/SL 5
 ----------------
@@ -349,6 +352,9 @@ CLASSPATH="$CLASSPATH:/usr/share/java/batik/xml-apis-ext.jar"
 
 When rebuilding the SVG images of the documentation you also need 'dia'.
 
+Instructions for other Unixes
+-----------------------------
+
 FreeBSD 8.2
 -----------
 
@@ -360,8 +366,89 @@ You need 'gmake' (3.81_4).
 
 So far no PAM support.
 
+Broken and non-working instructions for other Unixes
+----------------------------------------------------
+
+Solaris 10
+----------
+
+So far only gross compilation with a modern gcc 4.6.2 was successfull. But
+this causes other problems for all optional packages which now have to
+be cross-compiled (or taken from the sysroot).
+
+The only option I see is building a native gcc 4.6.x toolchain and bootstrap
+all packages on our own.
+
+Solaris 10 (SFW gcc toolchain)
+------------------------------
+
+CAREFUL: NOT WORKING!! COMPILER TOO OLD..
+         visibility problems in XXXprovider.cpp
+         lots of C++ compatibility issues, gcc 3.4.3 is
+
+You need 'gcc' and 'gmake' from the companion CD (packages
+'SUNWgcc' 3.4.6 and 'SUNWgmake' 3.80).
+
+Make sure the build environment is always set as follows:
+
+PATH=/usr/sfw/bin:/usr/ccs/bin:/usr/bin:/bin:/usr/sfw/sbin:/usr/sbin:/sbin
+export PATH
+
+Boost has to be compiled from scratch.
+
+First apply the following patch to 'boost/cstdint.ppp':
+
+...
+namespace boost
+{
+
+#if defined(sun) || defined(__sun) 
+  typedef signed char int8_t;
+#else
+  using ::int8_t;             
+#endif  
+..
+
+Build and install normally:
+
+./bootstrap.sh --prefix=/usr/local/boost-1.48.0 \
+	--with-libraries=thread,filesystem,system,program_options,date_time,regex
+./b2 -d2 install
+
+LibXML2 and LibXSLT are there per default (packages 'SMClxml' and 'SMClxslt') and
+are installed in '/usr'.
+
+Install optional packages from the companion CD:
+
+
+Specify pathes for all third party software you want to include in the build
+
+SQLITE3_DIR=/usr/sfw PGSQL_DIR=/usr/sfw LIBXML2_DIR=/usr/ LIBXSLT_DIR=/usr \
+OPENSSL_DIR=/usr/sfw BOOST_DIR=/usr/local/boost-1.48.0 \
+	gmake \
+	WITH_SSL=1 WITH_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 WITH_LIBXSLT=1 \
+	CC=gcc CXX=g++
+
+Problems you may encounter during the build:
+
+* In Lua:
+
+  "visibility attribute not supported in this configuration; ignored"
+
+  This can be ignored
+
+* gmake 3.80 has problems with the dependency include snippets, so the
+  dependencies may not be respected. A complete build should work though:
+
+  "../makefiles/gmake/depend.mk:42: no file name for `-include'"
+
+
 Solaris 10 (Sun Forte toolchain)
 --------------------------------
+
+CAREFUL: NOT WORKING!! COMPILER TOO BUGGY..
+         Also boost is not really well tested on Solaris with Forte,
+         furthermore many tests fail (especially asio!)
 
 You need the Sun Forte Compiler (e.g. SunStudio 12.1).
 You need GNU tar to unpack boost-1.48.0.tar.gz.
@@ -388,12 +475,14 @@ Some @LongLinks may appear, though using a GNU tar.
 
 TODO from here:
 
- BOOST_DIR=/usr/local/boost-1.48.0 make CC=cc CXX=CC WITH_SSL=1 WITH_EXPECT=1 WITH_QT=1 WITH_PAM=1 WITH_SASL=1      WITH_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 WITH_LIBXSLT=1
+BOOST_DIR=/usr/local/boost-1.48.0 make CC=cc CXX=CC WITH_SSL=1 WITH_EXPECT=1 WITH_QT=1 WITH_PAM=1 WITH_SASL=1      WITH_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 WITH_LIBXSLT=1
 
-Solaris 10 (GCC toolchain)
---------------------------
+Solaris 10 (Sunfreeware GCC toolchain)
+--------------------------------------
 
 CAREFUL: NOT WORKING!! COMPILER TOO OLD..
+         visibility problems in XXXprovider.cpp
+         lots of C++ compatibility issues, gcc 3.4.3 is
 
 You neeed 'gmake' (3.81) and 'gcc' (3.4.6). Be careful with the PATH
 settings so that 'make' is the GNU make and not the native one

@@ -548,7 +548,7 @@ endif
 ifeq "$(PLATFORM)" "SUNOS"
 ifeq "$(OS_MAJOR_VERSION)" "5"
 ifeq "$(OS_MINOR_VERSION)" "10"
-OPENSSL_DIR = /usr/local/ssl
+OPENSSL_DIR ?= /usr/local/ssl
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 endif
