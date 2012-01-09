@@ -366,6 +366,63 @@ You need 'gmake' (3.81_4).
 
 So far no PAM support.
 
+Solaris 10
+----------
+
+Solaris 10 with CSW toolchain
+-----------------------------
+
+http://www.opencsw.org
+
+pkgadd -d http://get.opencsw.org/now
+
+pkgutil --install CSWgcc4core CSWgcc4g++ CSWgmake
+
+Boost is too old (CSWboostdevel is 1.33), build your own.
+
+Make sure the build environment is always set as follows:
+
+PATH=/opt/csw/bin:/usr/ccs/bin:/usr/bin:/bin:/usr/csw/sbin:/usr/sbin:/sbin
+export PATH
+
+Boost has to be compiled from scratch.
+
+First apply the following patch to 'boost/cstdint.ppp':
+
+...
+namespace boost
+{
+
+#if defined(sun) || defined(__sun) 
+  typedef signed char int8_t;
+#else
+  using ::int8_t;             
+#endif  
+..
+
+Patch the correct architecture (V8 is not really supported, but V8
+is also very old) in 'tools/build/v2/user-config.jam':
+
+using gcc : 4.6.2 : g++ : <compileflags>-mcpu=v9 ; 
+
+Build and install normally:
+
+./bootstrap.sh --prefix=/opt/csw/boost-1.48.0 \
+	--with-libraries=thread,filesystem,system,program_options,date_time,regex
+./b2 -d2 install
+
+Optional packages to install from CSW:
+
+CSWsqlite3 (you can also use the supplied version with WITH_LOCAL_SQLITE3=1, which may
+be the better idea from a deployment point of view)
+
+ENABLE_NLS=0 OPENSSL_DIR=/usr PGSQL_DIR=/usr LIBXML2_DIR=/usr LIBXSLT_DIR=/usr \
+BOOST_DIR=/opt/csw/boost-1.48.0 \
+	gmake \
+	WITH_SSL=1 WITH_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 WITH_LIBXSLT=1 \
+	WITH_LOCAL_SQLITE3=1 \
+	 CC=gcc CXX=g++
+
 Broken and non-working instructions for other Unixes
 ----------------------------------------------------
 
