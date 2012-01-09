@@ -5,7 +5,7 @@ Prerequisites
 -------------
 
 - gcc c++ 4.1.x or later (preferably 512 MB RAM or Swap)
-- GNU make
+- GNU make (preferably 3.82 or newer)
 - boost 1.43.0 or later
 - optionally (WITH_SSL) openssl 0.9.7 or later
 - optionally (WITH_LUA) lua 5.1.4 with LuaCoco-1.1.6
@@ -13,7 +13,8 @@ Prerequisites
 - for the optional Qt client
   - optionally (WITH_QT) Qt 4, 4.5.x or later
 - for database support
-  - optionally (WITH_SQLITE3)
+  - optionally (WITH_SQLITE3), WITH_LOCAL_SQLITE3=1 uses the
+    supplied amalgamation
   - optionally (WITH_PGSQL)
 - for optional authentication mechanisms:
   - optionally (WITH_PAM)
@@ -414,15 +415,19 @@ Build and install normally:
 Optional packages to install from CSW:
   openssl_devel (0.9.8r)
   CSWpostgresql (8.3.1)
-  CSWsqlite3 (3.7.8) (or use internally supplied version with WITH_LOCAL_SQLITE1=1)
   CSWexpect (5.41.1)
+  SUNWlxml
+  SUNWlxsl
+
+CSWsqlite3 misses the header files, so use internally supplied version with WITH_LOCAL_SQLITE1=1
 
 Build Wolframe:
 
-OPENSSL_DIR=/usr SQLITE3_DIR=/opt/csw PGSQL_DIR=/opt/csw/postgresql LIBXML2_DIR=/usr \
-LIBXSLT_DIR=/usr LIBLT_DIR=/opt/csw BOOST_DIR=/opt/csw/boost-1.48.0 \
+OPENSSL_DIR=/opt/csw PGSQL_DIR=/opt/csw/postgresql LIBXML2_DIR=/usr \
+	LIBXSLT_DIR=/usr LIBLT_DIR=/usr BOOST_DIR=/opt/csw/boost-1.48.0 \
+	WITH_EXPECT=1 WITH_SSL=1 WITH_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 \
+	WITH_LIBXSLT=1 WITH_LOCAL_SQLITE3=1 \
 	gmake \
-	WITH_EXPECT=1 WITH_SSL=1 WITH_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 WITH_LIBXSLT=1 \
 		CC=gcc CXX=g++ CFLAGS=-mcpu=v9 CXXFLAGS=-mcpu=v9
 
 Broken and non-working instructions for other Unixes

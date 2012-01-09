@@ -37,7 +37,7 @@ ABa:
   - OpenPAM instead of Linux-PAM
   - trouble with some expect tests, check!
 - Solaris
-  - native build and test (not only cross-compiled)
+  - redo pam, sasl
 
 PF:
 
