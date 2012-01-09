@@ -154,4 +154,4 @@ local_test:
 
 run: $(CPP_BINS)
 	@echo "Running the Wolframe server..."
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./wolframed -c wolframe.conf -f
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(PGSQL_DIR)/lib:$(TOPDIR)/src/libwolframe ./wolframed -c wolframe.conf -f

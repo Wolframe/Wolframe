@@ -378,14 +378,14 @@ pkgadd -d http://get.opencsw.org/now
 
 pkgutil --install CSWgcc4core CSWgcc4g++ CSWgmake
 
-Boost is too old (CSWboostdevel is 1.33), build your own.
 
 Make sure the build environment is always set as follows:
 
 PATH=/opt/csw/bin:/usr/ccs/bin:/usr/bin:/bin:/usr/csw/sbin:/usr/sbin:/sbin
 export PATH
 
-Boost has to be compiled from scratch.
+Boost is too old (CSWboostdevel is 1.33)
+and has to be compiled from scratch, use the lastest version (1.48.0).
 
 First apply the following patch to 'boost/cstdint.ppp':
 
@@ -412,16 +412,18 @@ Build and install normally:
 ./b2 -d2 install
 
 Optional packages to install from CSW:
+  openssl_devel (0.9.8r)
+  CSWpostgresql (8.3.1)
+  CSWsqlite3 (3.7.8) (or use internally supplied version with WITH_LOCAL_SQLITE1=1)
+  CSWexpect (5.41.1)
 
-CSWsqlite3 (you can also use the supplied version with WITH_LOCAL_SQLITE3=1, which may
-be the better idea from a deployment point of view)
+Build Wolframe:
 
-ENABLE_NLS=0 OPENSSL_DIR=/usr PGSQL_DIR=/usr LIBXML2_DIR=/usr LIBXSLT_DIR=/usr \
-BOOST_DIR=/opt/csw/boost-1.48.0 \
+OPENSSL_DIR=/usr SQLITE3_DIR=/opt/csw PGSQL_DIR=/opt/csw/postgresql LIBXML2_DIR=/usr \
+LIBXSLT_DIR=/usr LIBLT_DIR=/opt/csw BOOST_DIR=/opt/csw/boost-1.48.0 \
 	gmake \
-	WITH_SSL=1 WITH_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 WITH_LIBXSLT=1 \
-	WITH_LOCAL_SQLITE3=1 \
-	 CC=gcc CXX=g++
+	WITH_EXPECT=1 WITH_SSL=1 WITH_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 WITH_LIBXSLT=1 \
+		CC=gcc CXX=g++ CFLAGS=-mcpu=v9 CXXFLAGS=-mcpu=v9
 
 Broken and non-working instructions for other Unixes
 ----------------------------------------------------
