@@ -1852,4 +1852,8 @@ ifeq "$(PLATFORM)" "FREEBSD"
 EXPECT = /usr/local/bin/expect
 endif
 
+ifeq "$(PLATFORM)" "SUNOS"
+EXPECT = expect
+endif
+
 endif
