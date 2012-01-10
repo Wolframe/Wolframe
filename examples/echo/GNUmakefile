@@ -43,7 +43,7 @@ CPP_OBJS = \
 CPP_BINS = \
 	echod$(EXE)
 
-echod$(EXE): $(TOPDIR)/src/posixMain.o $(TOPDIR)/src/loadModules-dummy.o $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
+echod$(EXE): $(TOPDIR)/src/loadModules-dummy.o $(TOPDIR)/src/posixMain.o $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
@@ -56,8 +56,10 @@ local_distclean:
 local_install:
 
 local_test:
+ifeq ($(RUN_TESTS),1)
 ifeq ($(WITH_EXPECT),1)
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) $(EXPECT) ./testEcho
+endif
 endif
 
 run: $(CPP_BINS)

@@ -423,6 +423,7 @@ CSWsqlite3 misses the header files, so use internally supplied version with WITH
 
 Build Wolframe:
 
+LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
 OPENSSL_DIR=/opt/csw PGSQL_DIR=/opt/csw/postgresql LIBXML2_DIR=/usr \
 	LIBXSLT_DIR=/usr LIBLT_DIR=/usr BOOST_DIR=/opt/csw/boost-1.48.0 \
 	WITH_EXPECT=1 WITH_SSL=1 WITH_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 \
