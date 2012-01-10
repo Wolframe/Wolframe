@@ -8,13 +8,11 @@ namespace _Wolframe	{
 	static const unsigned short APP_MAJOR_VERSION = 0;
 	static const unsigned short APP_MINOR_VERSION = 0;
 	static const unsigned short APP_REVISION = 5;
-	static const unsigned short APP_BUILD = 0;
 
 	const char*	applicationName()			{ return "Wolframe-ECHO"; }
 	const Version	applicationVersion()			{ return Version( APP_MAJOR_VERSION,
 										  APP_MINOR_VERSION
 										  ,APP_REVISION
-//										  ,APP_BUILD
 									  ); }
 
 	const char*	config::defaultMainConfig()		{ return "/etc/echo.conf"; }

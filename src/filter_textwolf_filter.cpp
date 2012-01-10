@@ -389,14 +389,16 @@ private:
 		std::memcpy( m_tagstk + m_tagstkpos, element, elementsize);
 		std::size_t ofs = elementsize + align + sizeof( std::size_t);
 		m_tagstkpos += ofs;
-		*(std::size_t*)(m_tagstk+m_tagstkpos-sizeof( std::size_t)) = elementsize;
+		void* tt = m_tagstk+m_tagstkpos-sizeof( std::size_t);
+		*(std::size_t*)(tt) = elementsize;
 		return true;
 	}
 
 	bool topTag( const void*& element, std::size_t& elementsize)
 	{
 		if (m_tagstkpos < sizeof( std::size_t)) return false;
-		elementsize = *(std::size_t*)(m_tagstk+m_tagstkpos-sizeof( std::size_t));
+		void* tt = m_tagstk+m_tagstkpos-sizeof( std::size_t);
+		elementsize = *(std::size_t*)(tt);
 		std::size_t align = getAlign( elementsize);
 		std::size_t ofs = elementsize + align + sizeof( std::size_t);
 		if (ofs > m_tagstkpos) return false;
@@ -406,7 +408,8 @@ private:
 
 	void popTag()
 	{
-		std::size_t elementsize = *(std::size_t*)(m_tagstk+m_tagstkpos-sizeof( std::size_t));
+		void* tt = m_tagstk+m_tagstkpos-sizeof( std::size_t);
+		std::size_t elementsize = *(std::size_t*)(tt);
 		std::size_t align = getAlign( elementsize);
 		std::size_t ofs = elementsize + align + sizeof( std::size_t);
 		if (m_tagstkpos < ofs) throw std::logic_error( "tag stack for output is corrupt");

@@ -50,7 +50,7 @@ struct ElementParser
 {
 	static void parse( const char* name, void* st, std::size_t ofs, const boost::property_tree::ptree& pt)
 	{
-		parseElement( name, *reinterpret_cast<Element*>((char*)st + ofs), pt);
+		parseElement( name, *reinterpret_cast<Element*>((void*)((char*)st + ofs)), pt);
 	}
 };
 

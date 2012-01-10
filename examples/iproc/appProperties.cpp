@@ -37,9 +37,7 @@
 #include "appProperties.hpp"
 
 namespace _Wolframe	{
-	static const unsigned short APP_MAJOR_VERSION = 0;
-	static const unsigned short APP_MINOR_VERSION = 0;
-	static const unsigned short APP_REVISION = 5;
+	enum {APP_MAJOR_VERSION = 0, APP_MINOR_VERSION = 0, APP_REVISION = 5};
 
 	const char*	applicationName()			{ return "iproc"; }
 	const Version	applicationVersion()			{ return Version( APP_MAJOR_VERSION, APP_MINOR_VERSION ,APP_REVISION); }

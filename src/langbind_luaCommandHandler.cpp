@@ -58,17 +58,6 @@ namespace luaname
 	static const char* InputFilterClosure = "wolframe.InputFilterClosure";
 }
 
-static void* toudata_udkey( lua_State* ls, int index, const char* id)
-{
-	lua_getmetatable( ls,index);
-	const void* p1 = lua_topointer( ls,-1);
-	luaL_getmetatable( ls,id);
-	const void* p2 = lua_topointer( ls,-1);
-
-	lua_pop( ls,2);
-	return p1 == p2 ? lua_touserdata( ls, index) : NULL;
-}
-
 namespace
 {
 template <class ObjectType>
@@ -195,7 +184,7 @@ struct LuaObject :public ObjectType
 	static bool setGlobal( lua_State* ls, const char* name, const ObjectType& instance)
 	{
 		lua_getglobal( ls, name);
-		LuaObject* obj = (LuaObject*) toudata_udkey( ls, -1, metaTableName<ObjectType>());
+		LuaObject* obj = (LuaObject*) luaL_checkudata( ls, -1, metaTableName<ObjectType>());
 		if (!obj) return false;
 		*obj = instance;
 		return true;
@@ -204,7 +193,7 @@ struct LuaObject :public ObjectType
 	static ObjectType* getGlobal( lua_State* ls, const char* name)
 	{
 		lua_getglobal( ls, name);
-		LuaObject* obj = (LuaObject*) toudata_udkey( ls, -1, metaTableName<ObjectType>());
+		LuaObject* obj = (LuaObject*) luaL_checkudata( ls, -1, metaTableName<ObjectType>());
 		if (!obj)
 		{
 			luaL_error( ls, "reserved global variable '%s' has been changed", name);
@@ -215,7 +204,7 @@ struct LuaObject :public ObjectType
 	static LuaObject* getSelf( lua_State* ls, const char* name, const char* method)
 	{
 		LuaObject* self;
-		if (lua_gettop( ls) == 0 || (self=(LuaObject*) toudata_udkey( ls, 1, metaTableName<ObjectType>())) == 0)
+		if (lua_gettop( ls) == 0 || (self=(LuaObject*)luaL_checkudata( ls, 1, metaTableName<ObjectType>())) == 0)
 		{
 			luaL_error( ls, "'%s' needs self parameter (%s:%s() instead of %s.%s())", name, name, method, name, method);
 		}
@@ -224,7 +213,7 @@ struct LuaObject :public ObjectType
 
 	static LuaObject* get( lua_State* ls, int index)
 	{
-		LuaObject* rt = (LuaObject*) toudata_udkey( ls, index, metaTableName<ObjectType>());
+		LuaObject* rt = (LuaObject*) luaL_checkudata( ls, index, metaTableName<ObjectType>());
 		return rt;
 	}
 };
