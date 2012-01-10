@@ -5,7 +5,7 @@
 
 package require Expect
 
-set config ../../src/wolframe.conf
+set config wolframe.conf
 
 set timeout 3
 set serverpid [spawn ../../src/wolframed -c $config -f]
