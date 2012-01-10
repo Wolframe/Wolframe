@@ -290,6 +290,7 @@ include/database/databaseOperation.hpp
 include/database/DBprovider.hpp
 include/ddl/atomicType.hpp
 include/ddl/structType.hpp
+include/ddl/parserInterface.hpp
 include/ErrorCode.hpp
 include/filter/bufferingFilterBase.hpp
 include/filter/char_filter.hpp

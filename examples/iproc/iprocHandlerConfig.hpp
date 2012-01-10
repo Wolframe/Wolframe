@@ -54,6 +54,24 @@ struct ScriptConfigStruct
 	static const config::DescriptionBase* description();
 };
 
+struct FormConfigStruct
+{
+	std::string name;
+	std::string path;
+	std::string main;
+
+	static const config::DescriptionBase* description();
+};
+
+struct DirectMapConfigStruct
+{
+	FormConfigStruct input;
+	FormConfigStruct output;
+	std::string function;
+
+	static const config::DescriptionBase* description();
+};
+
 struct ConfigurationStruct
 {
 	ConfigurationStruct( const ConfigurationStruct& o)
@@ -61,7 +79,8 @@ struct ConfigurationStruct
 	ConfigurationStruct()
 		:input_bufsize(1024),output_bufsize(1024){}
 
-	std::vector<ScriptConfigStruct> script;
+	std::vector<ScriptConfigStruct> script;		///< script definitions
+	std::vector<DirectMapConfigStruct> directmap;	///< direct map definitions
 	std::size_t input_bufsize;			///< size of input network message buffers in bytes (should only be configured for testing)
 	std::size_t output_bufsize;			///< size of output network message buffers in bytes (should only be configured for testing)
 
@@ -102,6 +121,8 @@ public:
 
 protected:
 	bool defineScript( const ScriptConfigStruct& sc);
+	bool defineDirectMap( const DirectMapConfigStruct& dm);
+
 	ConfigurationStruct m_data;
 private:
 	std::string m_capa;

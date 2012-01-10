@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file ddl/atomicType.hpp
+///\file ddl/structType.hpp
 ///\brief Defines an an intrusive structure type as basic mapping type for DDLs
 
 #ifndef _Wolframe_DDL_STRUCTTYPE_HPP_INCLUDED

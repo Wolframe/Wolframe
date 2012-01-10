@@ -39,13 +39,17 @@ Project Wolframe.
 #include <map>
 #include <cstddef>
 #include <cstring>
+#include "ddl/structType.hpp"
+#include "ddl/parserInterface.hpp"
 
 namespace _Wolframe {
 namespace ddl {
-namespace simpleform {
 
-struct SimpleformDDLParser
+class SimpleformParser :public ParserInterface
 {
+public:
+	virtual bool compile( const std::string& srcstring, StructType& result, std::string& error);
+
 	struct Element
 	{
 	public:
@@ -109,8 +113,6 @@ struct SimpleformDDLParser
 		return true;
 	}
 
-	bool compile( const std::string& srcstring, std::string& error);
-
 private:
 	void error( const std::string& msg) {errors.push_back( msg);}
 	std::size_t calcElementSize( std::size_t idx, std::size_t depht=0);
@@ -120,5 +122,5 @@ private:
 	std::vector<std::string> errors;
 };
 
-}}}
+}}
 #endif

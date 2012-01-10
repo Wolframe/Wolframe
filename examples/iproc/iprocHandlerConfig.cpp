@@ -70,6 +70,40 @@ const config::DescriptionBase* ScriptConfigStruct::description()
 	return &rt;
 }
 
+const config::DescriptionBase* FormConfigStruct::description()
+{
+	struct ThisDescription :public config::Description<FormConfigStruct>
+	{
+		ThisDescription()
+		{
+			(*this)
+			( "name",	&FormConfigStruct::name)
+			( "path",	&FormConfigStruct::path)
+			( "main",	&FormConfigStruct::main)
+			;
+		}
+	};
+	static const ThisDescription rt;
+	return &rt;
+}
+
+const config::DescriptionBase* DirectMapConfigStruct::description()
+{
+	struct ThisDescription :public config::Description<DirectMapConfigStruct>
+	{
+		ThisDescription()
+		{
+			(*this)
+			( "input",	&DirectMapConfigStruct::input)
+			( "output",	&DirectMapConfigStruct::output)
+			( "function",	&DirectMapConfigStruct::function)
+			;
+		}
+	};
+	static const ThisDescription rt;
+	return &rt;
+}
+
 const config::DescriptionBase* ConfigurationStruct::description()
 {
 	struct ThisDescription :public config::Description<ConfigurationStruct>
@@ -77,6 +111,7 @@ const config::DescriptionBase* ConfigurationStruct::description()
 		ThisDescription()
 		{
 			(*this)
+			( "directmap",	&ConfigurationStruct::directmap)
 			( "script",	&ConfigurationStruct::script)
 			( "inputbuf",	&ConfigurationStruct::input_bufsize)
 			( "outputbuf",	&ConfigurationStruct::output_bufsize)
@@ -93,6 +128,11 @@ Configuration::Configuration()
 static bool isLuaScript( const std::string& path)
 {
 	return (path.size()>4 && boost::algorithm::iequals( path.c_str()+path.size()-4, ".lua"));
+}
+
+static bool isSimpleForm( const std::string& path)
+{
+	return (path.size()>4 && boost::algorithm::iequals( path.c_str()+path.size()-4, ".frm"));
 }
 
 bool Configuration::defineScript( const ScriptConfigStruct& sc)
@@ -116,6 +156,27 @@ bool Configuration::defineScript( const ScriptConfigStruct& sc)
 	return true;
 }
 
+bool Configuration::defineDirectMap( const DirectMapConfigStruct& dm)
+{
+	if (isSimpleForm( dm.input.path))
+	{
+	}
+	else
+	{
+		LOG_ERROR << "Unknown type of DDL source loaded for input: " << dm.input.path;
+		return false;
+	}
+	if (isSimpleForm( dm.output.path))
+	{
+	}
+	else
+	{
+		LOG_ERROR << "Unknown type of DDL source loaded for output: " << dm.output.path;
+		return false;
+	}
+	return true;
+}
+
 bool Configuration::parse( const config::ConfigurationTree& pt, const std::string&, const module::ModulesDirectory*)
 {
 	try
@@ -126,10 +187,18 @@ bool Configuration::parse( const config::ConfigurationTree& pt, const std::strin
 			LOG_ERROR << "Error in configuration: " << errmsg;
 			return false;
 		}
-		std::vector<ScriptConfigStruct>::const_iterator itr=m_data.script.begin(),end=m_data.script.end();
-		for (;itr != end; ++itr)
 		{
-			if (!defineScript( *itr)) return false;
+			std::vector<ScriptConfigStruct>::const_iterator itr=m_data.script.begin(),end=m_data.script.end();
+			for (;itr != end; ++itr)
+			{
+				if (!defineScript( *itr)) return false;
+			}
+		}{
+			std::vector<DirectMapConfigStruct>::const_iterator itr=m_data.directmap.begin(),end=m_data.directmap.end();
+			for (;itr != end; ++itr)
+			{
+				if (!defineDirectMap( *itr)) return false;
+			}
 		}
 		return true;
 	}

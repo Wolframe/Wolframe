@@ -29,62 +29,24 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-/// \file tests/simpleFormCompilerTest.cpp
-#include "tests/testUtils.hpp"
-#include "ddl/simpleFormCompile.hpp"
-#ifdef _WIN32
-#pragma warning(disable:4996)
-#pragma warning(disable:4127)
+///\file ddl/parserInterface.hpp
+///\brief Defines the interface for different type of data definition languages used for forms
+
+#ifndef _Wolframe_DDL_PARSER_INTERFACE_HPP_INCLUDED
+#define _Wolframe_DDL_PARSER_INTERFACE_HPP_INCLUDED
+#include "ddl/atomicType.hpp"
+#include "ddl/structType.hpp"
+#include <string>
+
+namespace _Wolframe {
+namespace ddl {
+
+///\class ParserInterface
+///\brief Interface for DDL compilers
+struct ParserInterface
+{
+	virtual bool compile( const std::string& srcstring, StructType& result, std::string& error)=0;
+};
+
+}}//namespace
 #endif
-#include <iostream>
-#include <gtest/gtest.h>
-#include <boost/thread/thread.hpp>
-
-using namespace _Wolframe;
-
-struct TestDescription
-{
-	const char* srcfile;
-};
-
-static const TestDescription testDescription[2] = {
-{
-	"directmap_compiler"
-},
-{0}
-};
-
-class SimpleFormCompilerTest : public ::testing::Test
-{
-protected:
-	SimpleFormCompilerTest() {}
-	virtual ~SimpleFormCompilerTest() {}
-	virtual void SetUp() {}
-	virtual void TearDown() {}
-};
-
-TEST_F( SimpleFormCompilerTest, tests)
-{
-	unsigned int ti;
-	for (ti=0; testDescription[ti].srcfile; ti++)
-	{
-		std::string srcfile = wtest::Data::getDataFile( testDescription[ti].srcfile, "data", ".frm");
-		std::string srcstring;
-		if (!wtest::Data::readFile( srcfile.c_str(), srcstring)) throw std::runtime_error("could not read test input file");
-
-		ddl::SimpleformParser mm;
-		ddl::StructType sr;
-		std::string error;
-		EXPECT_EQ( true, mm.compile( srcstring, sr, error));
-		ASSERT_EQ( "", error);
-	}
-}
-
-int main( int argc, char **argv )
-{
-	wtest::Data::createDataDir( "result");
-	::testing::InitGoogleTest( &argc, argv );
-	return RUN_ALL_TESTS();
-}
-
-

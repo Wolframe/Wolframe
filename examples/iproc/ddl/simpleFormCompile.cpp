@@ -44,7 +44,6 @@ Project Wolframe.
 
 using namespace _Wolframe;
 using namespace ddl;
-using namespace simpleform;
 
 struct Lexem
 {
@@ -310,7 +309,7 @@ static bool parseName( Source& src, Lexem& lexem, std::string& name)
 	return false;
 }
 
-static bool parseElement( Source& src, Lexem& lexem, SimpleformDDLParser::Element& element)
+static bool parseElement( Source& src, Lexem& lexem, SimpleformParser::Element& element)
 {
 	while (nextLexem( lexem, src) && lexem.type == Lexem::EndOfLine);
 
@@ -320,11 +319,11 @@ static bool parseElement( Source& src, Lexem& lexem, SimpleformDDLParser::Elemen
 	}
 	if (lexem.type == Lexem::Form)
 	{
-		element.type = SimpleformDDLParser::Element::form_;
+		element.type = SimpleformParser::Element::form_;
 	}
 	else if (lexem.type == Lexem::Identifier)
 	{
-		if (!SimpleformDDLParser::Element::getType( lexem.value.c_str(), element.type))
+		if (!SimpleformParser::Element::getType( lexem.value.c_str(), element.type))
 		{
 			return setError( lexem, src, "unknown element type name");
 		}
@@ -348,7 +347,7 @@ static bool parseElement( Source& src, Lexem& lexem, SimpleformDDLParser::Elemen
 			{
 				return setError( lexem, src, "unexpected end of file");
 			}
-			if (element.type == SimpleformDDLParser::Element::form_)
+			if (element.type == SimpleformParser::Element::form_)
 			{
 				return setError( lexem, src, "structure can't be defined with a default value");
 			}
@@ -422,16 +421,16 @@ static bool parseHeader( Source& src, Lexem& lexem, std::string& name, std::stri
 	return setError( lexem, src, "'struct' expected");
 }
 
-static bool parseStruct( Source& src, Lexem& lexem, SimpleformDDLParser& ds)
+static bool parseStruct( Source& src, Lexem& lexem, SimpleformParser& ds)
 {
-	SimpleformDDLParser::Struct st;
+	SimpleformParser::Struct st;
 	std::string rname;
 
 	if (parseHeader( src, lexem, st.name, rname))
 	{
 		while (lexem.type != Lexem::End && lexem.type != Lexem::Error)
 		{
-			SimpleformDDLParser::Element ee;
+			SimpleformParser::Element ee;
 			if (parseElement( src, lexem, ee))
 			{
 				st.elements.push_back( ee);
@@ -454,13 +453,13 @@ static bool parseStruct( Source& src, Lexem& lexem, SimpleformDDLParser& ds)
 	return setError( lexem, src, "structure definition expected");
 }
 
-static bool parseDefinition( Source& src, SimpleformDDLParser& parser, Lexem& lexem)
+static bool parseDefinition( Source& src, SimpleformParser& parser, Lexem& lexem)
 {
 	while (parseStruct( src, lexem, parser) && lexem.type != Lexem::EndOfFile);
 	return lexem.type!=Lexem::Error;
 }
 
-std::size_t SimpleformDDLParser::calcElementSize( std::size_t idx, std::size_t depht)
+std::size_t SimpleformParser::calcElementSize( std::size_t idx, std::size_t depht)
 {
 	std::size_t rt = 0;
 	if (depht > ar.size()) return 0;
@@ -479,7 +478,7 @@ std::size_t SimpleformDDLParser::calcElementSize( std::size_t idx, std::size_t d
 	return rt;
 }
 
-bool SimpleformDDLParser::compile( const std::string& srcstring, std::string& error_)
+bool SimpleformParser::compile( const std::string& srcstring, StructType&, std::string& error_)
 {
 	Source src( srcstring);
 	Lexem lexem;
