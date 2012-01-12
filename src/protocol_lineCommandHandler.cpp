@@ -134,6 +134,9 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 				m_resultitr = 0;
 				if (m_delegateHandler)
 				{
+					m_delegateHandler->setInputBuffer( m_input.ptr(), m_input.size(), m_input.pos(), m_itr-m_input.begin());
+					m_delegateHandler->setOutputBuffer( m_output.ptr(), m_output.size(), m_output.pos());
+					m_delegateHandler->putInput( m_input.charptr() + (m_itr-m_input.begin()), m_end-m_itr);
 					m_cmdstateidx = ProcessingDelegation;
 					continue;
 				}
