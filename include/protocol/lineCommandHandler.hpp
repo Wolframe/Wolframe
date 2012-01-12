@@ -98,6 +98,7 @@ private:
 };
 
 
+
 class LineCommandHandler :public CommandHandler
 {
 public:
@@ -130,6 +131,17 @@ public:
 
 	static const char* endl()			{return "\r\n";}
 
+protected:
+	typedef int (*DelegateHandlerEnd)( void*, CommandHandler*, std::ostream&);
+
+	///\brief Delegate the processing to 'ch' until its termination. Call the processing termination function for informing the caller
+	void delegateProcessingFunction( CommandHandler* ch, DelegateHandlerEnd end)
+	{
+		if (m_delegateHandler) throw std::logic_error( "duplicate deletation of protocol processing");
+		m_delegateHandler = ch;
+		m_delegateHandlerEnd = end;
+	}
+
 private:
 	InputBlock m_input;					///< buffer for network read messages
 	OutputBlock m_output;					///< buffer for network write messages
@@ -142,6 +154,7 @@ private:
 	enum CommandState
 	{
 		Init,						///< start state, called first time in this session
+		ProcessingDelegation,				///< the command execution has been delegated to another command handler
 		EnterCommand,					///< parse command
 		ParseArgs,					///< parse command arguments
 		ParseArgsEOL,					///< parse end of line after command arguments
@@ -153,10 +166,12 @@ private:
 	///\param [in] i state to get as string
 	static const char* stateName( CommandState i)
 	{
-		static const char* ar[] = {"Init","EnterCommand","ParseArgs","ParseArgsEOL","ProtocolError","ProcessOutput","Terminate"};
+		static const char* ar[] = {"Init","ProcessingDelegation","EnterCommand","ParseArgs","ParseArgsEOL","ProtocolError","ProcessOutput","Terminate"};
 		return ar[i];
 	}
 
+	CommandHandler* m_delegateHandler;			///< command handler that processes the I/O delegated from this command handler until it return a CLOSE and gets destroyed again
+	DelegateHandlerEnd m_delegateHandlerEnd;		///< function type called after termination of m_delegateHandler
 	const LineCommandHandlerSTM* m_stm;			///< command level protocol state machine
 	protocol::CArgBuffer< std::string > m_argBuffer;	///< buffer type for the command arguments
 	std::string m_buffer;					///< line buffer
@@ -166,6 +181,33 @@ private:
 	int m_resultstate;					///< result state of the last command
 	std::string m_resultstr;				///< content the command output stream after command execution
 	std::size_t m_resultitr;				///< iterator on m_result to send the output via network output
+};
+
+
+///\brief defines a static function calling a member function with fixed signature
+///\warning do not declare virtual method calls like this. It is not portable (GCC only) !
+///\TODO make a static assert here for refusing virtual methods here
+template <class T, int (T::*TerminateDelegationMethod)( CommandHandler* ch)>
+struct LineCommandHandlerTerminateDelegationWrapper
+{
+	static int function( void* this_, CommandHandler* ch, std::ostream& out)
+	{
+		return (((T*)this_)->*TerminateDelegationMethod)( ch, out);
+	}
+};
+
+///\brief defines some template based extensions to line command handler
+///\usage derive LineCommandHandlerImpl from LineCommandHandlerTemplate<LineCommandHandlerImpl>
+template <class LineCommandHandlerImpl>
+class LineCommandHandlerTemplate :public LineCommandHandler
+{
+	///\brief Delegate the processing to 'ch' until its termination. Call the processing termination function for informing the caller
+	template <int (LineCommandHandlerImpl::*EndDelegateProcessingMethod)( CommandHandler*, std::ostream&)>
+	void delegateProcessing( CommandHandler* ch)
+	{
+		if (m_delegateHandler) throw std::logic_error( "duplicate deletation of protocol processing");
+		delegateProcessingFunction( ch, &LineCommandHandlerTerminateDelegationWrapper<LineCommandHandlerImpl,EndDelegateProcessingMethod>::function);
+	}
 };
 
 

@@ -49,24 +49,43 @@ void LineCommandHandler::setInputBuffer( void* buf, std::size_t allocsize, std::
 	m_input = protocol::InputBlock( (char*)buf, allocsize, size);
 	m_itr = m_input.at(itrpos);
 	m_end = m_input.end();
+	if (m_delegateHandler)
+	{
+		m_delegateHandler->setInputBuffer( buf, allocsize, size, itrpos);
+	}
 }
 
 void LineCommandHandler::setOutputBuffer( void* buf, std::size_t size, std::size_t pos)
 {
 	if (size < 16) throw std::logic_error("output buffer smaller than 16 bytes");
 	m_output = protocol::OutputBlock( buf, size, pos);
+	if (m_delegateHandler)
+	{
+		m_delegateHandler->setOutputBuffer( buf, size, pos);
+	}
 }
 
 void LineCommandHandler::putInput( const void *begin, std::size_t bytesTransferred)
 {
-	m_input.setPos( bytesTransferred + ((const char*)begin - m_input.charptr()));
-	m_itr = m_input.begin();
-	m_end = m_input.end();
+	if (m_delegateHandler)
+	{
+		m_delegateHandler->putInput( begin, bytesTransferred);
+	}
+	else
+	{
+		m_input.setPos( bytesTransferred + ((const char*)begin - m_input.charptr()));
+		m_itr = m_input.begin() + ((const char*)begin - m_input.charptr());
+		m_end = m_input.end();
+	}
 }
 
 void LineCommandHandler::getInputBlock( void*& begin, std::size_t& maxBlockSize)
 {
-	if (!m_input.getNetworkMessageRead( begin, maxBlockSize))
+	if (m_delegateHandler)
+	{
+		m_delegateHandler->getInputBlock( begin, maxBlockSize);
+	}
+	else if (!m_input.getNetworkMessageRead( begin, maxBlockSize))
 	{
 		throw std::logic_error( "buffer too small for input");
 	}
@@ -74,15 +93,29 @@ void LineCommandHandler::getInputBlock( void*& begin, std::size_t& maxBlockSize)
 
 void LineCommandHandler::getOutput( const void*& begin, std::size_t& bytesToTransfer)
 {
-	begin = m_output.ptr();
-	bytesToTransfer = m_output.pos();
-	m_output.setPos(0);
+	if (m_delegateHandler)
+	{
+		m_delegateHandler->getOutput( begin, bytesToTransfer);
+	}
+	else
+	{
+		begin = m_output.ptr();
+		bytesToTransfer = m_output.pos();
+		m_output.setPos(0);
+	}
 }
 
 void LineCommandHandler::getDataLeft( const void*& begin, std::size_t& nofBytes)
 {
-	begin = (char*)(m_input.charptr() + (m_itr - m_input.begin()));
-	nofBytes = m_end - m_itr;
+	if (m_delegateHandler)
+	{
+		m_delegateHandler->getDataLeft( begin, nofBytes);
+	}
+	else
+	{
+		begin = (char*)(m_input.charptr() + (m_itr - m_input.begin()));
+		nofBytes = m_end - m_itr;
+	}
 }
 
 CommandHandler::Operation LineCommandHandler::nextOperation()
@@ -99,7 +132,59 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 				m_resultstate = -1;
 				m_resultstr.clear();
 				m_resultitr = 0;
+				if (m_delegateHandler)
+				{
+					m_cmdstateidx = ProcessingDelegation;
+					continue;
+				}
 				continue;
+
+			case ProcessingDelegation:
+				if (m_delegateHandler)
+				{
+					CommandHandler::Operation delegateRes = m_delegateHandler->nextOperation();
+					if (delegateRes == CLOSED)
+					{
+						try
+						{
+							const void* r_begin;
+							std::size_t r_nofBytes;
+							std::ostringstream out;
+							m_resultstate = (*m_delegateHandlerEnd)( (void*)this, m_delegateHandler, out);
+							m_cmdstateidx = ProcessOutput;
+							m_resultstr = out.str();
+							m_resultitr = 0;
+							m_delegateHandler->getDataLeft( r_begin, r_nofBytes);
+							m_delegateHandler = 0;
+							m_delegateHandlerEnd = 0;
+							putInput( r_begin, r_nofBytes);
+							if (m_resultstr.size() > 0)
+							{
+								return WRITE;
+							}
+							else
+							{
+								continue;
+							}
+						}
+						catch (std::exception& e)
+						{
+							LOG_ERROR << "command delegation termination method thrown exception: " << e.what();
+							m_cmdstateidx = Terminate;
+							return CLOSED;
+						}
+					}
+					else
+					{
+						return delegateRes;
+					}
+				}
+				else
+				{
+					LOG_ERROR << "protocol error";
+					m_cmdstateidx = Terminate;
+					return CLOSED;
+				}
 
 			case EnterCommand:
 			{
