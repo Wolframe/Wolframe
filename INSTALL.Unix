@@ -1,5 +1,5 @@
-Build Instructions
-==================
+Build Instructions for Unixes
+=============================
 
 Table of Contents
 -----------------
@@ -30,7 +30,7 @@ Table of Contents
   Instructions for other Unixes
     FreeBSD 8.2
     Solaris 10
-      Solaris 10 with CSW toolchain
+      Solaris 10 (CSW toolchain)
   Broken and non-working instructions for other Unixes
     Solaris 10 (SFW gcc toolchain)
     Solaris 10 (Sun Forte toolchain)
@@ -408,8 +408,8 @@ So far no PAM support.
 Solaris 10
 ----------
 
-Solaris 10 with CSW toolchain
------------------------------
+Solaris 10 (CSW toolchain)
+--------------------------
 
 http://www.opencsw.org
 
