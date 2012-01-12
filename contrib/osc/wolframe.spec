@@ -1,3 +1,7 @@
+# Wolframe RPM spec file
+#
+# Copyright (C) 2011 Project Wolframe
+
 # set distribution based on some OpenSuse and distribution macros
 ###
 
@@ -125,7 +129,7 @@
 Summary: Small and medium enterprise resource planning (Wolframe)
 Name: wolframe
 Version: 0.0.1
-Release: 0.1
+Release: 0.2
 License: Wolframe License
 Group: Application/Business
 %if %{build_boost}
@@ -554,14 +558,12 @@ fi
 %dir %{_bindir}
 %endif
 %{_bindir}/qtclient
-#%dir %{_libdir}/wolframe
-#%{_libdir}/wolframe/libQtCore.so.4
-#%{_libdir}/wolframe/libQtGui.so.4
-#%{_libdir}/wolframe/libQtNetwork.so.4
-#%{_libdir}/wolframe/libQtXml.so.4
 %endif
 
 %changelog
-* Sun Aug 29 2011 Andreas Baumann <abaumann@yahoo.com> 0.0.1-0.1
-- preliminary release
+* Sun Aug 29 2011 Andreas Baumann <abaumann@yahoo.com> 0.0.1-0.2
+- more splitting into sub-packages for modules
+- builds on OpenSuse Build Service (osc)
 
+* Sun Aug 29 2010 Mihai Barbos <mihai.barbos@gmail.com> 0.0.1-0.1
+- preliminary release
