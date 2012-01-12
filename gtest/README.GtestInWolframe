@@ -1,0 +1,11 @@
+This is a down-stripped version of the Google test framework,
+version 1.6.0.
+
+To get the original go to http://code.google.com/p/googletest.
+
+Local Changes to the Code:
+
+ * include/gtest/gtest.h: disable -Wsign-compare for GNU gcc
+
+ * autoconf/automake build system has been removed in favour of
+   the Wolframe makefiles
