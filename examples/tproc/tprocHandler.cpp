@@ -74,7 +74,7 @@ int CommandHandler::doCmd1A( int argc, const char** argv, std::ostream& out)
 	if (argc == 0)
 	{
 		out << " ?" << endl();
-		return State1;
+		return (int)stateidx();
 	}
 	else
 	{
@@ -93,7 +93,7 @@ int CommandHandler::doCmd1B( int argc, const char** argv, std::ostream& out)
 	if (argc == 0)
 	{
 		out << " ?" << endl();
-		return State1;
+		return (int)stateidx();
 	}
 	else
 	{
@@ -112,7 +112,7 @@ int CommandHandler::doCmd1C( int argc, const char** argv, std::ostream& out)
 	if (argc == 0)
 	{
 		out << " ?" << endl();
-		return State1;
+		return (int)stateidx();
 	}
 	else
 	{
@@ -131,7 +131,7 @@ int CommandHandler::doCmd2A( int argc, const char** argv, std::ostream& out)
 	if (argc == 0)
 	{
 		out << " ?" << endl();
-		return State2;
+		return (int)stateidx();
 	}
 	else
 	{
@@ -150,7 +150,7 @@ int CommandHandler::doCmd2B( int argc, const char** argv, std::ostream& out)
 	if (argc == 0)
 	{
 		out << " ?" << endl();
-		return State2;
+		return (int)stateidx();
 	}
 	else
 	{
@@ -169,7 +169,7 @@ int CommandHandler::doCmd3A( int argc, const char** argv, std::ostream& out)
 	if (argc == 0)
 	{
 		out << " ?" << endl();
-		return State3;
+		return (int)stateidx();
 	}
 	else
 	{

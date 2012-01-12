@@ -128,6 +128,8 @@ public:
 
 	///\brief Get the error code of command execution to be returned to the client
 	int statusCode() const				{return m_statusCode;}
+	///\brief Get the current state (toplevel)
+	std::size_t stateidx() const			{return m_stateidx;}
 
 	static const char* endl()			{return "\r\n";}
 
