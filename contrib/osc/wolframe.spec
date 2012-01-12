@@ -3,7 +3,10 @@
 # Copyright (C) 2011 Project Wolframe
 
 # set distribution based on some OpenSuse and distribution macros
+# this is only relevant when building on https://build.opensuse.org
 ###
+
+%if 0%{?opensuse_bs}
 
 %define rhel 0
 %define rhel4 0
@@ -72,6 +75,8 @@
 %define sles 1
 %endif
 
+%endif
+
 # define what to build
 ###
 
@@ -92,7 +97,6 @@
 %if %{rhel} || %{centos}
 %define with_qt		0
 %endif
-
 %if %{fedora} || %{suse} || %{sles}
 %define with_qt		1
 %endif

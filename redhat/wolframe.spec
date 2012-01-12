@@ -2,9 +2,83 @@
 #
 # Copyright (C) 2011 Project Wolframe
 
-%define boost_version	1.46.1
-%define qt_version	4.7.2
+# set distribution based on some OpenSuse and distribution macros
+# this is only relevant when building on https://build.opensuse.org
+###
 
+%if 0%{?opensuse_bs}
+
+%define rhel 0
+%define rhel4 0
+%define rhel5 0
+%define rhel6 0
+%if 0%{?rhel_version} >= 400 && 0%{?rhel_version} <= 499
+%define dist rhel4
+%define rhel 1
+%define rhel4 1
+%endif
+%if 0%{?rhel_version} >= 500 && 0%{?rhel_version} <= 599
+%define dist rhel5
+%define rhel 1
+%define rhel5 1
+%endif
+%if 0%{?rhel_version} >= 600 && 0%{?rhel_version} <= 699
+%define dist rhel6
+%define rhel 1
+%define rhel6 1
+%endif
+
+%define centos 0
+%if 0%{?centos_version} >= 500 && 0%{?centos_version} <= 599
+%define dist centos5
+%define centos 1
+%endif
+
+%if 0%{?centos_version} >= 600 && 0%{?centos_version} <= 699
+%define dist centos6
+%define centos 1
+%endif
+
+%define fedora 0
+%define fc14 0
+%if 0%{?fedora_version} == 14
+%define dist fc14
+%define fc14 1
+%define fedora 1
+%endif
+%define fc15 0  
+%if 0%{?fedora_version} == 15
+%define dist fc15
+%define fc15 1
+%define fedora 1
+%endif
+%define fc16 0  
+%if 0%{?fedora_version} == 16
+%define dist fc16
+%define fc16 1   
+%define fedora 1
+%endif
+
+%define suse 0
+%if 0%{?suse_version} == 1140
+%define dist osu114
+%define suse 1
+%endif
+%if 0%{?suse_version} > 1140
+%define dist osu121
+%define suse 1
+%endif
+
+%define sles 0
+%if 0%{?sles_version} == 11
+%define dist sle11
+%define sles 1
+%endif
+
+%endif
+
+# define what to build
+###
 
 %define with_ssl	1
 %define with_sqlite	1
@@ -12,9 +86,28 @@
 %define with_lua	1
 %define with_pam	1
 %define with_sasl	1
-%define with_qt		1
+%define with_libxml2	1
+%define with_libxslt	1
 %define with_examples	1
- 
+
+# Qt is far too old on some platforms, we also don't want to build a local
+# version here
+
+%define with_qt		1
+%if %{rhel} || %{centos}
+%define with_qt		0
+%endif
+%if %{fedora} || %{suse} || %{sles}
+%define with_qt		1
+%endif
+
+# Boost has sometimes a different layout in the shared libraries, don't
+# know why
+
+%define boost_library_tag %{nil}
+%if %{fedora}
+%define boost_library_tag BOOST_LIBRARY_TAG=
+%endif
 
 # build local boost for distributions which have a too old version
 
@@ -52,28 +145,52 @@ Source: %{name}_%{version}.tar.gz
 
 URL: http://www.wolframe.net/
 
-%define boost_version  1.46.1
-
 BuildRoot: %{_tmppath}/%{name}-root
+
+# Build dependencies
+###
+
+# our makefile mechanism depends on the Linux release file in '/etc' which
+# is provided by many different packages
+%if %{rhel}
 BuildRequires: redhat-release
-#BuildRequires: boost-devel >= 1.43
-#Requires: boost >= 1.43
-#Requires: boost-thread >= 1.43
-#Requires: boost-date-time >= 1.43
-#Requires: boost-filesystem >= 1.43
-#Requires: boost-program-options >= 1.43
-#Requires: boost-system >= 1.43
+%endif
+%if %{centos}
+BuildRequires: centos-release
+%endif
+%if %{fedora}
+BuildRequires: generic-release
+%endif
+%if %{suse}
+BuildRequires: openSUSE-release
+%endif
+%if %{sles}
+BuildRequires: sles-release
+BuildRequires: pwdutils >= 3.2
+%endif
+
+%if !%{build_boost}
+BuildRequires: boost-devel
+%if %{rhel} || %{centos} || %{fedora}
+Requires: boost >= 1.43
+Requires: boost-thread >= 1.43
+Requires: boost-date-time >= 1.43
+Requires: boost-filesystem >= 1.43
+Requires: boost-program-options >= 1.43
+Requires: boost-system >= 1.43
+%endif
+%if %{suse}
+Requires: libboost-thread1_44_0 >= 1.44.0
+Requires: libboost-date-time1_44_0 >= 1.44.0
+Requires: libboost-filesystem1_44_0 >= 1.44.0
+Requires: libboost-program-options1_44_0 >= 1.44.0
+Requires: libboost-system1_44_0 >= 1.44.0
+%endif
+%endif
+
 %if %{with_ssl}
-BuildRequires: openssl-devel >= 0.9.8
-Requires: openssl >= 0.9.8
-%endif
-%if %{with_sqlite}
-BuildRequires: sqlite-devel >= 3.0
-Requires: sqlite >= 3.0
-%endif
-%if %{with_pgsql}
-BuildRequires: postgresql-devel >= 8.1
-Requires: postgresql-libs >= 8.1
+BuildRequires: openssl-devel >= 0.9.7
+Requires: openssl >= 0.9.7
 %endif
 %if %{with_pam}
 BuildRequires: pam-devel >= 0.77
@@ -202,8 +319,14 @@ Requires: sqlite3 >= 3.0
 Summary: Wolframe client
 Group: Application/Business
 
+%if %{rhel} || %{centos} || %{fedora}
 BuildRequires: qt4-devel >= 4.5
 Requires: qt4 >= 4.5
+%endif
+%if %{suse} || %{sles}
+BuildRequires: libqt4-devel >= 4.5
+Requires: libqt4 >= 4.5
+%endif
 
 %description client
 Qt client for the Wolframe server.
@@ -233,29 +356,50 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make help \
 	BOOST_DIR=/tmp/boost-%{boost_version} \
 	%{boost_library_tag} \
 %endif
+%if %{build_sqlite}
+	WITH_LOCAL_SQLITE3=%{build_sqlite} \
+%endif
 	WITH_SSL=%{with_ssl} WITH_SQLITE3=%{with_sqlite} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
-	WITH_QT=%{with_qt} \
+	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
+	WITH_LIBXSLT=%{with_libxslt} \
 	WITH_EXAMPLES=%{with_examples} \
-	sysconfdir=/etc
+	sysconfdir=/etc libdir=%{_libdir}
+
 LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make config \
-	BOOST_DIR=/tmp/boost-1.46.1 \
+%if %{build_boost}
+	BOOST_DIR=/tmp/boost-%{boost_version} \
+	%{boost_library_tag} \
+%endif
+%if %{build_sqlite}
+	WITH_LOCAL_SQLITE3=%{build_sqlite} \
+%endif
 	WITH_SSL=%{with_ssl} WITH_SQLITE3=%{with_sqlite} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
-	WITH_QT=%{with_qt} \
+	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
+	WITH_LIBXSLT=%{with_libxslt} \
 	WITH_EXAMPLES=%{with_examples} \
-	sysconfdir=/etc
+	sysconfdir=/etc libdir=%{_libdir}
+
 LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make all \
 	%{?_smp_mflags} \
-	BOOST_DIR=/tmp/boost-1.46.1 \
+%if %{build_boost}
+	BOOST_DIR=/tmp/boost-%{boost_version} \
+	%{boost_library_tag} \
+%endif
+%if %{build_sqlite}
+	WITH_LOCAL_SQLITE3=%{build_sqlite} \
+%endif
 	WITH_SSL=%{with_ssl} WITH_SQLITE3=%{with_sqlite} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
-	WITH_QT=%{with_qt} \
+	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
+	WITH_LIBXSLT=%{with_libxslt} \
 	WITH_EXAMPLES=%{with_examples} \
-	sysconfdir=/etc
+	sysconfdir=/etc libdir=%{_libdir}
+
 cd docs; make doc-doxygen
 
 echo ======================= TESTING ==============================
@@ -265,13 +409,21 @@ echo ===================== END OF TESTING =========================
 
 %install
 make DESTDIR=$RPM_BUILD_ROOT install \
-	BOOST_DIR=/tmp/boost-1.46.1 \
+%if %{build_boost}
+	BOOST_DIR=/tmp/boost-%{boost_version} \
+	%{boost_library_tag} \
+%endif
+%if %{build_sqlite}
+	WITH_LOCAL_SQLITE3=%{build_sqlite} \
+%endif
 	WITH_SSL=%{with_ssl} WITH_SQLITE3=%{with_sqlite} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
-	WITH_QT=%{with_qt} \
+	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
+	WITH_LIBXSLT=%{with_libxslt} \
 	WITH_EXAMPLES=%{with_examples} \
-	sysconfdir=$RPM_BUILD_ROOT/etc
+	sysconfdir=/etc libdir=%{_libdir}
+
 cd docs && make DESTDIR=$RPM_BUILD_ROOT install && cd ..
 
 %if %{build_boost}
