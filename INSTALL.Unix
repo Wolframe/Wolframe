@@ -1,6 +1,41 @@
 Build Instructions
 ==================
 
+Table of Contents
+-----------------
+
+  Prerequisites
+  Configuration of the build
+  Manually build the prerequisites
+    Compile and install boost
+    Compile and install openssl
+    Compile and install Qt
+  Build instructions for Linux Distributions
+    RHEL/Centos/SL 5
+    RHEL/Centos/SL 6
+    Fedora 14
+    Fedora 15 
+    Fedora 16
+    Ubuntu 10.04.1 LTS
+    Ubuntu 10.10 Server
+    Ubuntu 11.04
+    Ubuntu 11.10
+    Debian 5.0
+    Debian 6.0
+    OpenSuSE 11.3
+    OpenSuSE 11.4
+    SLES 11 SP1
+    Slackware 13.1
+    Archlinux
+  Instructions for other Unixes
+    FreeBSD 8.2
+    Solaris 10
+      Solaris 10 with CSW toolchain
+  Broken and non-working instructions for other Unixes
+    Solaris 10 (SFW gcc toolchain)
+    Solaris 10 (Sun Forte toolchain)
+    Solaris 10 (Sunfreeware GCC toolchain)
+
 Prerequisites
 -------------
 
@@ -49,6 +84,9 @@ home directory as '~/config.mk'. Customize '~/config.mk' as needed.
 
 Alternatively you can of course pass all the options as variables 
 directory to the invocation of make.
+
+Manually build the prerequisites
+--------------------------------
 
 Compile and install boost
 -------------------------
@@ -434,15 +472,7 @@ OPENSSL_DIR=/opt/csw PGSQL_DIR=/opt/csw/postgresql LIBXML2_DIR=/usr \
 Broken and non-working instructions for other Unixes
 ----------------------------------------------------
 
-Solaris 10
-----------
-
-So far only gross compilation with a modern gcc 4.6.2 was successfull. But
-this causes other problems for all optional packages which now have to
-be cross-compiled (or taken from the sysroot).
-
-The only option I see is building a native gcc 4.6.x toolchain and bootstrap
-all packages on our own.
+Those are other unsuccessful builds on Solaris 10.
 
 Solaris 10 (SFW gcc toolchain)
 ------------------------------

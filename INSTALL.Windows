@@ -1,3 +1,24 @@
+Build Instructions for Windows
+==============================
+
+Table of Contents
+-----------------
+
+  Prerequisites
+    Boost
+      Compile and install boost
+      Notes on special Boost versions
+      Boost 1.44
+    OpenSSL
+       Compile and install openssl
+    Install Tcl and Expect
+    Compile and install Qt
+    Postgresql C client library
+      Compiling Postgresql
+      Notes for Postgreslql 9.0.4
+    LibXML2
+    LibXSLT
+
 Prerequisites
 -------------
 
@@ -15,6 +36,7 @@ Prerequisites
   - optionally (WITH_PGSQL)
 - optionally (WITH_EXPECT) Expect and Tcl 8.4 or later
 - optionally (WITH_LIBXML2)
+- optionally (WITH_LIBXSLT)
 - optionally for packaging: Wix 3.5 or later
 
 Boost
@@ -57,6 +79,9 @@ Boost 1.44
 Boost 1.44 needs an essential patch, see:
 https://svn.boost.org/trac/boost/ticket/4487
 
+OpenSSL
+-------
+
 Compile and install openssl
 ---------------------------
 
@@ -91,6 +116,9 @@ Telnet is not enable by default, enable it in "Control Panel",
 "Windows Features" or call:
 
 pkgmgr /iu:"TelnetClient"
+
+Qt
+--
 
 Compile and install Qt
 ----------------------
