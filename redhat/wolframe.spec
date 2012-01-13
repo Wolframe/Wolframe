@@ -211,7 +211,7 @@ Requires: libxml2 >= 2.6
 %endif
 %if %{with_libxslt}
 BuildRequires: libxslt-devel >= 1.0
-Requires: libxslt-devel >= 1.0
+Requires: libxslt >= 1.0
 %endif
 BuildRequires: gcc-c++
 BuildRequires: doxygen
