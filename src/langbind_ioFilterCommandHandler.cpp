@@ -50,6 +50,9 @@ IOFilterCommandHandler::IOFilterCommandHandler()
 	m_outputfilter = flt.outputFilter();
 }
 
+IOFilterCommandHandler::~IOFilterCommandHandler()
+{}
+
 void IOFilterCommandHandler::setInputBuffer( void* buf, std::size_t allocsize, std::size_t size, std::size_t itrpos)
 {
 	m_input = protocol::InputBlock( (char*)buf, allocsize, size);

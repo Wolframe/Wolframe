@@ -54,8 +54,11 @@ public:
 		CLOSED
 	};
 
+	///\brief Constructor
 	CommandHandler()
 		:m_statusCode(0){}
+	///\brief Destructor
+	virtual ~CommandHandler(){}
 
 	///\brief Pass the parameters for processing
 	///\param [in] argc number of arguments of the protocol command

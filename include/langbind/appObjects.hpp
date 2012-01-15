@@ -167,6 +167,25 @@ public:
 		m_buf = new char[ m_bufsize];
 	}
 
+	InputFilterClosure( const InputFilterClosure& o)
+		:m_inputfilter(o.m_inputfilter)
+		,m_type(o.m_type)
+		,m_value(o.m_value)
+		,m_buf(0)
+		,m_bufsize(o.m_bufsize)
+		,m_bufpos(o.m_bufpos)
+		,m_taglevel(o.m_taglevel)
+	{
+		m_buf = new char[ m_bufsize];
+		std::memcpy( m_buf, o.m_buf, m_bufpos);
+	}
+
+	///\brief Destructor
+	~InputFilterClosure()
+	{
+		delete [] m_buf;
+	}
+
 	///\brief Internal buffer reset
 	void init()
 	{

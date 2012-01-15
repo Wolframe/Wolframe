@@ -168,7 +168,10 @@ InputFilterClosure::ItemType InputFilterClosure::fetch( const char*& tag, unsign
 
 static bool startsWith( const char* str, const char* prefix)
 {
-	std::string nm( str, strlen(prefix));
+	std::size_t str_len = std::strlen( str);
+	std::size_t prefix_len = std::strlen( prefix);
+	if (str_len < prefix_len) return false;
+	const std::string nm( str, prefix_len);
 	return boost::algorithm::iequals( nm, prefix);
 }
 

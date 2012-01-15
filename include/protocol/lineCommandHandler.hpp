@@ -102,8 +102,10 @@ private:
 class LineCommandHandler :public CommandHandler
 {
 public:
-	///\brief constructor
+	///\brief Constructor
 	explicit LineCommandHandler( const LineCommandHandlerSTM* stm_);
+	///\brief Destructor
+	virtual ~LineCommandHandler();
 
 	///\brief See Parent::setInputBuffer(void*,std::size_t,std::size_t,std::size_t)
 	virtual void setInputBuffer( void* buf, std::size_t allocsize, std::size_t size=0, std::size_t itrpos=0);

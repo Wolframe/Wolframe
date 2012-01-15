@@ -67,7 +67,7 @@ public:
 	Buffer( std::size_t n)			:m_pos(0),m_size(n),m_buf(new char[n]),m_allocated(true) {}
 	///\brief Constructor
 	Buffer( char* b, std::size_t n)		:m_pos(0),m_size(n),m_buf(b),m_allocated(false) {}
-	~Buffer()				{if (m_allocated) delete m_buf;}
+	~Buffer()				{if (m_allocated) delete [] m_buf;}
 
 	Buffer& operator=( const Buffer& o)	{if (m_size < o.m_pos) throw std::logic_error("assignement not possible"); std::memmove( m_buf, o.m_buf, m_pos=o.m_pos); return *this;}
 	///\brief Clear the buffer content

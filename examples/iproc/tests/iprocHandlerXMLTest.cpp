@@ -132,7 +132,6 @@ TEST_F( IProcHandlerXMLTest, tests)
 		static int BufferSize[ NofBufferSizes] = {2,3,5,7,127};
 
 		net::LocalTCPendpoint  ep( "127.0.0.1", 12345);
-		iproc::Connection* connection = 0;
 		wtest::Data data( testDescriptions[ti].name, testDescriptions[ti].datafile);
 
 		for (unsigned int ib=0; ib<NofBufferSizes; ib++)
@@ -145,12 +144,12 @@ TEST_F( IProcHandlerXMLTest, tests)
 						(boost::filesystem::current_path() / "scripts"/ testDescriptions[ti].scriptfile).string(),
 						BufferSize[ib]+EoDBufferSize,
 						BufferSize[ob]+testDescriptions[ti].elementBuffersize);
-				connection = new iproc::Connection( ep, &config);
+				iproc::Connection connection( ep, &config);
 
 				char* in_start = const_cast<char*>(data.input.c_str());
 				char* in_end = const_cast<char*>(data.input.c_str() + data.input.size());
 
-				EXPECT_EQ( 0, test::runTestIO( in_start, in_end, testoutput, *connection));
+				EXPECT_EQ( 0, test::runTestIO( in_start, in_end, testoutput, connection));
 				data.check( testoutput);
 				ASSERT_EQ( data.expected, testoutput);
 			}

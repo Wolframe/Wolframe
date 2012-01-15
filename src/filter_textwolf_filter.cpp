@@ -114,6 +114,11 @@ struct OutputFilterImpl :public protocol::OutputFilter, public FilterBase<IOChar
 		std::memcpy( m_tagstk, o.m_tagstk, m_tagstkpos);
 	}
 
+	virtual ~OutputFilterImpl()
+	{
+		delete [] m_tagstk;
+	}
+
 	///\brief self copy
 	///\return copy of this
 	virtual protocol::OutputFilter* copy() const

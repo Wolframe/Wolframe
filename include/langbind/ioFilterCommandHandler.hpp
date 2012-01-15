@@ -41,12 +41,17 @@
 namespace _Wolframe {
 namespace protocol {
 
+///\class IOFilterCommandHandler
+///\brief Command handler processing filter input/output
 class IOFilterCommandHandler :public CommandHandler
 {
 public:
 	typedef CommandHandler Parent;
 
+	///\brief Constructor
 	IOFilterCommandHandler();
+	///\brief Destructor
+	virtual ~IOFilterCommandHandler();
 
 	void setFilter( const protocol::InputFilterR& in)
 	{

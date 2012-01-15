@@ -114,25 +114,28 @@ bool DescriptionBase::parse( const char* name, void* obj, protocol::InputFilter&
 
 bool DescriptionBase::print( const char* name, const void* obj, protocol::OutputFilter& out, Context& ctx) const
 {
+	protocol::OutputFilter* oo = 0;
+	bool rt = true;
 	try
 	{
 		if (m_print)
 		{
-			protocol::OutputFilter* oo = out.copy();
+			oo = out.copy();
 			oo->init( (void*)ctx.buf(), ctx.bufsize);
-			return m_print( name, obj, oo, ctx);
+			rt = m_print( name, obj, oo, ctx);
 		}
 		else
 		{
 			ctx.setError( 0, "null printer called");
-			return false;
+			rt = false;
 		}
 	}
 	catch (std::exception& e)
 	{
 		ctx.setError( name, e.what());
-		return false;
+		rt = false;
 	}
-	return true;
+	if (oo) delete oo;
+	return rt;
 }
 

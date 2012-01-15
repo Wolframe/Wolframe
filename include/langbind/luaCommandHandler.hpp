@@ -59,7 +59,7 @@ public:
 	///\param[in] config read only reference to the configuration of this application processor
 	LuaCommandHandler( const langbind::LuaCommandConfig* config);
 	///\brief Destructor
-	~LuaCommandHandler();
+	virtual ~LuaCommandHandler();
 
 	///\brief Execute the Lua script
 	///\param[out] errorCode error code in case of error
