@@ -215,6 +215,7 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 				{
 					m_cmdidx = ci;
 					m_cmdstateidx = ParseArgs;
+					m_buffer.clear();
 					continue;
 				}
 			}

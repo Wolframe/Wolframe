@@ -144,8 +144,6 @@ bool Configuration::defineScript( const ScriptConfigStruct& sc)
 		m_configs.push_back( cfg=new langbind::LuaCommandConfig( sc.main, sc.path, sc.module));
 		protocol::CommandBase* cmd = new protocol::Command< langbind::LuaCommandHandler, langbind::LuaCommandConfig>( sc.name.c_str(), cfg);
 		m_cmds.push_back( cmd);
-		m_capa.push_back( ' ');
-		m_capa.append( sc.name);
 	}
 	else
 #endif
@@ -265,9 +263,3 @@ const std::vector<CountedReference< protocol::CommandBase> >& Configuration::get
 {
 	return m_cmds;
 }
-
-const std::string Configuration::getCommandDescriptions( const char* ) const
-{
-	return m_capa;
-}
-

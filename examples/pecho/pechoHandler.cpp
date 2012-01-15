@@ -212,11 +212,13 @@ struct Connection::Private
 						}
 						case capa:
 						{
+							buffer.clear();
 							state = EnterCommand;
 							return WriteLine( "OK capa echo[tolower|toupper] quit");
 						}
 						case echo:
 						{
+							buffer.clear();
 							state = EnterMode;
 							continue;
 						}

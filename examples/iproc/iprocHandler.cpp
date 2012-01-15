@@ -185,7 +185,8 @@ const net::NetworkOperation Connection::nextOperation()
 
 			case ParseArgs:
 			{
-				if (!ProtocolParser::getLine( m_itr, m_end, m_argBuffer))
+				m_buffer.clear();
+				if (!protocol::CmdParser<protocol::Buffer>::getLine( m_itr, m_end, m_argBuffer))
 				{
 					if (m_itr == m_end)
 					{
@@ -203,7 +204,7 @@ const net::NetworkOperation Connection::nextOperation()
 
 			case ParseArgsEOL:
 			{
-				if (!ProtocolParser::consumeEOL( m_itr, m_end))
+				if (!protocol::CmdParser<protocol::Buffer>::consumeEOL( m_itr, m_end))
 				{
 					if (m_itr == m_end)
 					{
@@ -238,7 +239,7 @@ const net::NetworkOperation Connection::nextOperation()
 						}
 						else
 						{
-							return WriteLine( "OK capa quit", m_config->getCommandDescriptions().c_str());
+							return WriteLine( "OK capa quit", m_parser.capabilities().c_str());
 							m_state = EnterCommand;
 							continue;
 						}
@@ -326,7 +327,8 @@ const net::NetworkOperation Connection::nextOperation()
 
 			case ProtocolError:
 			{
-				if (!ProtocolParser::skipLine( m_itr, m_end) || !ProtocolParser::consumeEOL( m_itr, m_end))
+				if (!protocol::CmdParser<protocol::Buffer>::skipLine( m_itr, m_end)
+				||  !protocol::CmdParser<protocol::Buffer>::consumeEOL( m_itr, m_end))
 				{
 					return readDataOp();
 				}
@@ -348,7 +350,7 @@ bool Connection::loadCommands()
 {
 	try
 	{
-		m_parser = ProtocolParser( &commandName);
+		m_parser = protocol::CmdParser<protocol::Buffer>( &commandName);
 		std::vector< CountedReference< protocol::CommandBase> >::const_iterator itr=m_cmds.begin(), end=m_cmds.end();
 		for (; itr!=end; ++itr)
 		{

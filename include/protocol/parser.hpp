@@ -275,10 +275,20 @@ public:
 		}
 		if (src == end) return -1;
 		int rt = m_cmdmap[ buf];
-		buf.clear();
 		return rt;
 	}
 
+	const std::string capabilities() const
+	{
+		std::string rt;
+		CmdMap::const_iterator itr=m_cmdmap.begin(), end=m_cmdmap.end();
+		for (; itr != end; ++itr)
+		{
+			rt.append( *itr);
+			rt.push_back( ' ');
+		}
+		return rt;
+	}
 private:
 	CmdMapType m_cmdmap;						///< commands of the parser
 };

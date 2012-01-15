@@ -99,9 +99,6 @@ public:
 	///\brief return all currently available commands
 	const std::vector< CountedReference<protocol::CommandBase> >& getCommands( const char* privileges=0) const;
 
-	///\brief return all currently available commands as description for the 'capa' command in the protocol
-	const std::string getCommandDescriptions( const char* privileges=0) const;
-
 	///\brief interface implementation of ConfigurationBase::test() const
 	virtual bool test() const;
 
@@ -125,7 +122,6 @@ protected:
 
 	ConfigurationStruct m_data;
 private:
-	std::string m_capa;
 	std::vector< CountedReference<protocol::CommandBase> > m_cmds;
 	std::vector< CountedReference<protocol::CommandConfig> > m_configs;
 };

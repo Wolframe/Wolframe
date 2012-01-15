@@ -76,9 +76,6 @@ public:
 	virtual void errorOccured( NetworkSignal);
 
 private:
-	typedef protocol::CmdParser<protocol::Buffer> ProtocolParser;	///< parser for the protocol
-	typedef protocol::CArgBuffer<protocol::Buffer> ArgBuffer;	///< buffer type for the command arguments
-
 	///\enum State
 	///\brief Enumeration of processor states
 	enum State
@@ -95,7 +92,7 @@ private:
 	///\param [in] i state to get as string
 	static const char* stateName( State i)
 	{
-		static const char* ar[] = {"Init","EnterCommand","ParseArgs","ParseArgsEOL","Processing","ProtocolError","DiscardInput","FlushOutput","Terminate"};
+		static const char* ar[] = {"Init","EnterCommand","ParseArgs","ParseArgsEOL","Processing","ProtocolError","Terminate"};
 		return ar[i];
 	}
 	///\enum State
@@ -120,7 +117,7 @@ private:
 	State m_state;							///< state of the processor (protocol main statemachine)
 
 	protocol::Buffer m_buffer;					///< context (sub state) for partly parsed input lines
-	ArgBuffer m_argBuffer;						///< buffer for the arguments
+	protocol::CArgBuffer<protocol::Buffer> m_argBuffer;		///< buffer for the arguments
 
 	protocol::InputBlock m_input;					///< buffer for network read messages
 	protocol::OutputBlock m_output;					///< buffer for network write messages
@@ -129,7 +126,7 @@ private:
 	protocol::InputBlock::iterator m_end;				///< iterator pointing to end of message buffer
 
 	const Configuration* m_config;					///< configuration
-	ProtocolParser m_parser;					///< context dependent command parser definition
+	protocol::CmdParser<protocol::Buffer> m_parser;			///< context dependent command parser definition
 	int m_cmdidx;							///< command parsed
 	std::vector< CountedReference<protocol::CommandBase> > m_cmds;	///< list of commands available
 	CountedReference<protocol::CommandHandler> m_cmdhandler;	///< currently executed command
