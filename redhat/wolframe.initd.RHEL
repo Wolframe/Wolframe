@@ -47,7 +47,7 @@ stop()
 {
 	echo -n $"Stopping $prog: "
 	if [ -n "`pidof $WOLFRAMED`" ] ; then
-	    killproc -p $WOLFRAMED
+	    killproc -p $PIDFILE $WOLFRAMED
 	else
 	    failure $"Stopping $prog"
 	fi
