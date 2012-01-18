@@ -38,16 +38,18 @@
 #ifndef _Wolframe_tproc_HANDLER_HPP_INCLUDED
 #define _Wolframe_tproc_HANDLER_HPP_INCLUDED
 #include "connectionHandler.hpp"
+#include "protocol/lineCommandHandler.hpp"
 #include "handlerConfig.hpp"
 #include "protocol.hpp"
 
 namespace _Wolframe {
 namespace tproc {
 
-struct CommandHandler :public protocol::LineCommandHandler
+class CommandHandler :public protocol::LineCommandHandlerTemplate<CommandHandler>
 {
-	CommandHandler( const protocol::LineCommandHandlerSTM* stm)
-		:protocol::LineCommandHandler( stm){}
+public:
+	CommandHandler( const protocol::LineCommandHandlerSTM* stm, const Configuration* cfg)
+		:protocol::LineCommandHandlerTemplate<CommandHandler>( stm),m_config(cfg){}
 
 	//methods called by the protocol and implemented here
 	int doCmd1A( int argc, const char** argv, std::ostream& out);
@@ -56,6 +58,11 @@ struct CommandHandler :public protocol::LineCommandHandler
 	int doCmd2A( int argc, const char** argv, std::ostream& out);
 	int doCmd2B( int argc, const char** argv, std::ostream& out);
 	int doCmd3A( int argc, const char** argv, std::ostream& out);
+	int endRun( protocol::CommandHandler* ch, std::ostream& out);
+	int doRun( int argc, const char** argv, std::ostream& out);
+	int doCmdQUIT( int argc, const char** argv, std::ostream& out);
+private:
+	const Configuration* m_config;		///< configuration reference
 };
 
 
@@ -90,11 +97,11 @@ public:
 	virtual void errorOccured( NetworkSignal);
 
 private:
-	const Configuration* m_config;		///< configuration reference
-	CommandHandler m_cmdhandler;		///< top level instance executing commands
-	protocol::InputBlock m_input;		///< buffer for network read messages
-	protocol::OutputBlock m_output;		///< buffer for network write messages
-	bool m_terminated;			///< true, if a termination signal came from the network
+	const Configuration* m_config;			///< configuration reference
+	CommandHandler m_cmdhandler;			///< top level instance executing commands
+	protocol::InputBlock m_input;			///< buffer for network read messages
+	protocol::OutputBlock m_output;			///< buffer for network write messages
+	bool m_terminated;				///< true, if a termination signal came from the network
 };
 } // namespace tproc
 

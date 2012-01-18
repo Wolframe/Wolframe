@@ -32,7 +32,6 @@
 ************************************************************************/
 ///\file iprocHandlerConfig.hpp
 ///\brief iproc handler configuration
-
 #ifndef _Wolframe_IPROC_HANDLER_CONFIGURATION_HPP_INCLUDED
 #define _Wolframe_IPROC_HANDLER_CONFIGURATION_HPP_INCLUDED
 #include <vector>

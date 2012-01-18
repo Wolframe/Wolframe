@@ -64,8 +64,8 @@ struct TestDescription
 };
 static TestDescription testDescription[] =
 {
-	{"CMD1A\r\nCMD1A 'hi arg'\r\nCMD2A 'huga'\r\nCMD3A 1\r\n", "OK CMD1A ?\r\nOK CMD1A 'hi arg'\r\nOK CMD2A 'huga'\r\nOK CMD3A '1'\r\n"},
-	{"CMD1B\r\nCMD1A \"hi\" \"\\\"arg\\\"\"\r\nCMD2B 'h' '' 'u' ''\r\nCMD3A 123\r\n", "OK CMD1B ?\r\nOK CMD1A 'hi' '\"arg\"'\r\nOK CMD2B 'h' '' 'u' ''\r\nOK CMD3A '123'\r\n"},
+	{"CMD1A\r\nCMD1A 'hi arg'\r\nCMD2A 'huga'\r\nCMD3A 1\r\nQUIT\r\n", "OK CMD1A ?\r\nOK CMD1A 'hi arg'\r\nOK CMD2A 'huga'\r\nOK CMD3A '1'\r\nOK enter cmd\r\nBYE\r\n"},
+	{"CMD1B\r\nCMD1A \"hi\" \"\\\"arg\\\"\"\r\nCMD2B 'h' '' 'u' ''\r\nCMD3A 123\r\nQUIT\r\n", "OK CMD1B ?\r\nOK CMD1A 'hi' '\"arg\"'\r\nOK CMD2B 'h' '' 'u' ''\r\nOK CMD3A '123'\r\nOK enter cmd\r\nBYE\r\n"},
 	{0,0}
 };
 

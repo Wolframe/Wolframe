@@ -125,10 +125,12 @@ const config::DescriptionBase* ConfigurationStruct::description()
 Configuration::Configuration()
 	:ConfigurationBase( "Iproc", 0, "iproc") {}
 
+#if WITH_LUA
 static bool isLuaScript( const std::string& path)
 {
 	return (path.size()>4 && boost::algorithm::iequals( path.c_str()+path.size()-4, ".lua"));
 }
+#endif
 
 static bool isSimpleForm( const std::string& path)
 {

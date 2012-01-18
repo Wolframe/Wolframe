@@ -40,6 +40,7 @@ OBJS = \
 	$(TOPDIR)/src/loadModules-dummy.o \
 	tprocHandler.o \
 	tprocHandlerConfig.o \
+	execCommandHandler.o \
 	$(TOPDIR)/src/posixMain.o
 
 TEST_BINS = \

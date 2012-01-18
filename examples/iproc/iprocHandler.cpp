@@ -111,7 +111,7 @@ void Connection::signalOccured()
 	m_state = Terminate;
 }
 
-void Connection::errorOccured( NetworkSignal )
+void Connection::errorOccured( NetworkSignal)
 {
 	LOG_TRACE << "Got error";
 	m_state = Terminate;
@@ -391,23 +391,23 @@ void Connection::setPeer( const net::RemoteEndpoint& remote)
 	LOG_TRACE << "Peer set to " << remote.toString();
 }
 
-net::ConnectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const net::LocalEndpoint& local )
+net::ConnectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const net::LocalEndpoint& local)
 {
 	return new iproc::Connection( local, m_config->m_appConfig);
 }
 
 ServerHandler::ServerHandler( const HandlerConfiguration* cfg,
-			      const module::ModulesDirectory* /*modules*/ )
-	: m_impl( new ServerHandlerImpl( cfg) ) {}
+			      const module::ModulesDirectory* /*modules*/)
+	: m_impl( new ServerHandlerImpl( cfg)) {}
 
 ServerHandler::~ServerHandler()
 {
 	delete m_impl;
 }
 
-net::ConnectionHandler* ServerHandler::newConnection( const net::LocalEndpoint& local )
+net::ConnectionHandler* ServerHandler::newConnection( const net::LocalEndpoint& local)
 {
-	return m_impl->newConnection( local );
+	return m_impl->newConnection( local);
 }
 
 

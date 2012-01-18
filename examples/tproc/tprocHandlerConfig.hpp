@@ -1,4 +1,4 @@
-/************************************************************************
+ /************************************************************************
 
  Copyright (C) 2011 Project Wolframe.
  All rights reserved.
@@ -32,36 +32,56 @@
 ************************************************************************/
 ///\file tprocHandlerConfig.hpp
 ///\brief tproc handler configuration
-
 #ifndef _Wolframe_TPROC_HANDLER_CONFIGURATION_HPP_INCLUDED
 #define _Wolframe_TPROC_HANDLER_CONFIGURATION_HPP_INCLUDED
 #include <vector>
 #include <string>
 #include "protocol/commandHandler.hpp"
-#include "protocol/lineCommandHandler.hpp"
 #include "config/descriptionBase.hpp"
 #include "standardConfigs.hpp"
 
 namespace _Wolframe {
 namespace tproc {
 
-struct CommandConfigStruct
+struct ScriptConfigStruct
 {
-	std::string name;		///< name of the command
+	std::string name;
+	std::string path;
+	std::string main;
+	std::vector<std::string> module;
+
+	static const config::DescriptionBase* description();
+};
+
+struct FormConfigStruct
+{
+	std::string name;
+	std::string path;
+	std::string main;
+
+	static const config::DescriptionBase* description();
+};
+
+struct DirectMapConfigStruct
+{
+	FormConfigStruct input;
+	FormConfigStruct output;
+	std::string function;
 
 	static const config::DescriptionBase* description();
 };
 
 struct ConfigurationStruct
 {
-	std::vector<CommandConfigStruct> command;
-	std::size_t input_bufsize;			///< size of input network message buffers in bytes (should only be configured for testing)
-	std::size_t output_bufsize;			///< size of output network message buffers in bytes (should only be configured for testing)
-
 	ConfigurationStruct( const ConfigurationStruct& o)
-		:command(o.command),input_bufsize(o.input_bufsize),output_bufsize(o.output_bufsize){}
+		:script(o.script),input_bufsize(o.input_bufsize),output_bufsize(o.output_bufsize){}
 	ConfigurationStruct()
 		:input_bufsize(1024),output_bufsize(1024){}
+
+	std::vector<ScriptConfigStruct> script;		///< script definitions
+	std::vector<DirectMapConfigStruct> directmap;	///< direct map definitions
+	std::size_t input_bufsize;			///< size of input network message buffers in bytes (should only be configured for testing)
+	std::size_t output_bufsize;			///< size of output network message buffers in bytes (should only be configured for testing)
 
 	static const config::DescriptionBase* description();
 };
@@ -71,10 +91,12 @@ class Configuration :public config::ConfigurationBase
 {
 public:
 	Configuration();
-	Configuration( const Configuration& o)	:config::ConfigurationBase(o),m_data(o.m_data){}
+	Configuration( const Configuration& o)	:config::ConfigurationBase(o),m_data(o.m_data),m_cmds(o.m_cmds),m_configs(o.m_configs){}
 
-	///\brief parse the configuration and initialize this configuration structure
-	bool parse( const config::ConfigurationTree& pt, const std::string& node, const module::ModulesDirectory* modules);
+	bool parse( const config::ConfigurationTree& pt, const std::string& node, const module::ModulesDirectory* modules );
+
+	///\brief return all currently available commands
+	const std::vector< CountedReference<protocol::CommandBase> >& getCommands( const char* privileges=0) const;
 
 	///\brief interface implementation of ConfigurationBase::test() const
 	virtual bool test() const;
@@ -94,7 +116,13 @@ public:
 	std::size_t output_bufsize() const		{return m_data.output_bufsize;}
 
 protected:
+	bool defineScript( const ScriptConfigStruct& sc);
+	bool defineDirectMap( const DirectMapConfigStruct& dm);
+
 	ConfigurationStruct m_data;
+private:
+	std::vector< CountedReference<protocol::CommandBase> > m_cmds;
+	std::vector< CountedReference<protocol::CommandConfig> > m_configs;
 };
 }}//namespace
 #endif

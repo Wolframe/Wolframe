@@ -54,7 +54,7 @@ void LineCommandHandler::setInputBuffer( void* buf, std::size_t allocsize, std::
 	m_input = protocol::InputBlock( (char*)buf, allocsize, size);
 	m_itr = m_input.at(itrpos);
 	m_end = m_input.end();
-	if (m_delegateHandler)
+	if (m_delegateHandler && m_cmdstateidx == ProcessingDelegation)
 	{
 		m_delegateHandler->setInputBuffer( buf, allocsize, size, itrpos);
 	}
@@ -64,7 +64,7 @@ void LineCommandHandler::setOutputBuffer( void* buf, std::size_t size, std::size
 {
 	if (size < 16) throw std::logic_error("output buffer smaller than 16 bytes");
 	m_output = protocol::OutputBlock( buf, size, pos);
-	if (m_delegateHandler)
+	if (m_delegateHandler && m_cmdstateidx == ProcessingDelegation)
 	{
 		m_delegateHandler->setOutputBuffer( buf, size, pos);
 	}
@@ -72,7 +72,7 @@ void LineCommandHandler::setOutputBuffer( void* buf, std::size_t size, std::size
 
 void LineCommandHandler::putInput( const void *begin, std::size_t bytesTransferred)
 {
-	if (m_delegateHandler)
+	if (m_delegateHandler && m_cmdstateidx == ProcessingDelegation)
 	{
 		m_delegateHandler->putInput( begin, bytesTransferred);
 	}
@@ -86,7 +86,7 @@ void LineCommandHandler::putInput( const void *begin, std::size_t bytesTransferr
 
 void LineCommandHandler::getInputBlock( void*& begin, std::size_t& maxBlockSize)
 {
-	if (m_delegateHandler)
+	if (m_delegateHandler && m_cmdstateidx == ProcessingDelegation)
 	{
 		m_delegateHandler->getInputBlock( begin, maxBlockSize);
 	}
@@ -98,7 +98,7 @@ void LineCommandHandler::getInputBlock( void*& begin, std::size_t& maxBlockSize)
 
 void LineCommandHandler::getOutput( const void*& begin, std::size_t& bytesToTransfer)
 {
-	if (m_delegateHandler)
+	if (m_delegateHandler && m_cmdstateidx == ProcessingDelegation)
 	{
 		m_delegateHandler->getOutput( begin, bytesToTransfer);
 	}
@@ -112,7 +112,7 @@ void LineCommandHandler::getOutput( const void*& begin, std::size_t& bytesToTran
 
 void LineCommandHandler::getDataLeft( const void*& begin, std::size_t& nofBytes)
 {
-	if (m_delegateHandler)
+	if (m_delegateHandler && m_cmdstateidx == ProcessingDelegation)
 	{
 		m_delegateHandler->getDataLeft( begin, nofBytes);
 	}
@@ -121,6 +121,17 @@ void LineCommandHandler::getDataLeft( const void*& begin, std::size_t& nofBytes)
 		begin = (char*)(m_input.charptr() + (m_itr - m_input.begin()));
 		nofBytes = m_end - m_itr;
 	}
+}
+
+int LineCommandHandler::runCommand( const char* cmd_, int argc_, const char** argv_, std::ostream& out_)
+{
+	char* begin=const_cast<char*>(cmd_);
+	char* end=begin+strlen(cmd_)+1;
+	std::string cmdbuf;
+	int cmdidx = m_stm->get( m_stateidx).m_parser.getCommand( begin, end, cmdbuf);
+	if (cmdidx == 0) throw std::logic_error( "protocol error: redirected to empty command");
+	if (cmdidx < 0) throw std::logic_error( "protocol error: redirected to unknown command");
+	return m_stm->runCommand( m_stateidx, (std::size_t)cmdidx-1, this, argc_, argv_, out_);
 }
 
 CommandHandler::Operation LineCommandHandler::nextOperation()
@@ -143,7 +154,6 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 					m_delegateHandler->setOutputBuffer( m_output.ptr(), m_output.size(), m_output.pos());
 					m_delegateHandler->putInput( m_input.charptr() + (m_itr-m_input.begin()), m_end-m_itr);
 					m_cmdstateidx = ProcessingDelegation;
-					continue;
 				}
 				continue;
 
@@ -155,16 +165,18 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 					{
 						try
 						{
+							std::ostringstream out;
 							const void* r_begin;
 							std::size_t r_nofBytes;
-							std::ostringstream out;
+							m_delegateHandler->getDataLeft( r_begin, r_nofBytes);
+
 							m_resultstate = (*m_delegateHandlerEnd)( (void*)this, m_delegateHandler, out);
 							m_cmdstateidx = ProcessOutput;
 							m_resultstr = out.str();
 							m_resultitr = 0;
-							m_delegateHandler->getDataLeft( r_begin, r_nofBytes);
 							m_delegateHandler = 0;
 							m_delegateHandlerEnd = 0;
+
 							putInput( r_begin, r_nofBytes);
 							if (m_resultstr.size() > 0)
 							{
@@ -208,6 +220,7 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 					{
 						m_output.print( "BAD command\r\n");
 						m_cmdstateidx = ProtocolError;
+						m_buffer.clear();
 						return WRITE;
 					}
 				}

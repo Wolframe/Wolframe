@@ -125,8 +125,11 @@ public:
 ///\class CmdMap
 ///\brief implements a map for set of protocol commands
 ///\remark implementation as vector because the set of commands is expected to be small.
-struct CmdMap :public std::vector<std::string>
+struct CmdMap
 {
+	CmdMap(){}
+	CmdMap( const CmdMap& o) :m_ar(o.m_ar){}
+
 	///\brief predicate for case insensitive comparison in boost::algorithm::starts_with
 	struct ToUpperPredicate
 	{
@@ -142,15 +145,15 @@ struct CmdMap :public std::vector<std::string>
 		unsigned int cnt = 0;
 		unsigned int valuesize = strlen(value);
 
-		for (const_iterator itr = begin(); itr != end(); itr++)
+		for (std::vector<std::string>::const_iterator itr = m_ar.begin(); itr != m_ar.end(); itr++)
 		{
 			if (boost::algorithm::starts_with( *itr, value, ToUpperPredicate()))
 			{
 				if (valuesize == itr->size())
 				{
-					return itr-begin(); ///< exact match is always returned
+					return itr-m_ar.begin(); ///< exact match is always returned
 				}
-				if (!cnt) rt = itr-begin();
+				if (!cnt) rt = itr-m_ar.begin();
 				cnt++;
 			}
 		}
@@ -165,10 +168,28 @@ struct CmdMap :public std::vector<std::string>
 
 	///\brief insert a command into the map.
 	///\param value value to insert
-	void insert( const value_type& value)
+	void insert( const std::string& value)
 	{
-		push_back( boost::algorithm::to_upper_copy( value));
+		m_ar.push_back( boost::algorithm::to_upper_copy( value));
 	}
+
+	const std::string& get( std::size_t idx) const
+	{
+		return m_ar[ idx];
+	}
+
+	std::size_t size() const
+	{
+		return m_ar.size();
+	}
+
+	typedef std::vector<std::string>::const_iterator const_iterator;
+	const_iterator begin() const				{return m_ar.begin();}
+	const_iterator end() const				{return m_ar.end();}
+
+	const std::vector<std::string>& cmds() const		{return m_ar;}
+private:
+	std::vector<std::string> m_ar;
 };
 
 ///\class CmdParser
@@ -182,58 +203,57 @@ class CmdParser :public Parser
 {
 public:
 	///\brief Constructor
-	///
 	CmdParser() {}
 
 	///\brief Destructor
-	///
 	~CmdParser() {}
 
 	///\brief Copy constructor
 	///\param [in] o CmdParser to copy
-	///
 	CmdParser( const CmdParser& o)  :m_cmdmap(o.m_cmdmap) {}
 
-	///
 	///\brief Reset parser command definitions
-	///
 	void init()
 	{
 		m_cmdmap = CmdMapType();
 	}
 
-	///
 	///\brief Add a command to the protocol parser (case insensitive)
 	///\param [in] cmd command to define
-	///
 	void add( const char* cmd)
 	{
 		m_cmdmap.insert( cmd);
 	}
 
-	///
+	///\brief Add a command to the protocol parser (case insensitive)
+	///\param [in] cmd command to define
+	void add( const std::string& cmd)
+	{
+		m_cmdmap.insert( cmd);
+	}
+
+	std::size_t size() const
+	{
+		return m_cmdmap.size();
+	}
+
 	///\brief Assignement copy
 	///\param [in] o CmdParser to copy
-	///
 	CmdParser& operator=( const CmdParser& o)
 	{
 		m_cmdmap = o.m_cmdmap;
 		return *this;
 	}
 
-	///
 	///\brief Constructor
 	///\param [in] cmd null-terminated array of commands to define
-	///
 	CmdParser( const char** cmd)
 	{
 		for (unsigned int ii=0; cmd[ii]; ii++) add(cmd[ii]);
 	}
-	///
 	///\brief Constructor
 	///\tparam ENUM enumeration type for the command
 	///\param [in] getCmdName function mapping the enums to their names
-	///
 	template <typename ENUM>
 	CmdParser( const char* (*getCmdName)(ENUM c))
 	{
@@ -244,18 +264,15 @@ public:
 		}
 	}
 
-	///
 	///\brief Defines a command. The index of the command is counted from 0 with one increment per add.
 	///\param [in] cmd command to define
 	///\remarks synonym for add(const char*)
-	///
 	CmdParser& operator[]( const char* cmd)
 	{
 		add( cmd);
 		return *this;
 	}
 
-	///
 	///\brief Parse the next command.
 	///\tparam IteratorType iterator type used as input for parsing
 	///\param [in,out] src input iterator
@@ -263,7 +280,6 @@ public:
 	///\param [in,out] buf the command buffer implementing the STL back insertion sequence interface
 	///\return the index of the command in the order of definition counted from 0 for the first command or return -1, if the command could not be recognized
 	///\remark At the end of buffer -1 is returned also. If \c src equals \c end after call and -1 was returned then the method has to be called again with new data.
-	///
 	template <typename IteratorType>
 	int getCommand( IteratorType& src, IteratorType& end, CmdBufferType& buf) const
 	{
@@ -289,8 +305,16 @@ public:
 		}
 		return rt;
 	}
+
+	const char* getcmd( std::size_t idx) const
+	{
+		return m_cmdmap.get( idx).c_str();
+	}
+
+	const std::vector<std::string>& cmds() const		{return m_cmdmap.cmds();}
+
 private:
-	CmdMapType m_cmdmap;						///< commands of the parser
+	CmdMapType m_cmdmap;					///< commands of the parser
 };
 
 } // namespace protocol

@@ -212,5 +212,21 @@ int InputBlock::getEoDpos( std::size_t offset)
 	}
 	return -1;
 }
+
+bool OutputBlock::printNumber( unsigned int num)
+{
+	char nn[64];
+	unsigned int ii= sizeof(nn);
+	const char digits[] = "0123456789";
+
+	if (num == 0) nn[--ii] = '0';
+	while (num > 0)
+	{
+		nn[ --ii] = digits[num%10];
+		num /= 10;
+	}
+	return print( nn+ii, sizeof(nn)-ii);
+}
+
 }}//namespace
 

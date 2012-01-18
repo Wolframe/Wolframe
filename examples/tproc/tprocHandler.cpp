@@ -35,6 +35,7 @@
 ///
 
 #include "tprocHandler.hpp"
+#include "execCommandHandler.hpp"
 #include "logger-v1.hpp"
 #include <stdexcept>
 
@@ -62,6 +63,7 @@ struct STM :public protocol::LineCommandHandlerSTMTemplate<CommandHandler>
 				.cmd< &CommandHandler::doCmd2B >( "CMD2B")
 			[State3]
 				.cmd< &CommandHandler::doCmd3A >( "CMD3A")
+				.cmd< &CommandHandler::doCmdQUIT >( "QUIT")
 		;
 	}
 };
@@ -163,6 +165,34 @@ int CommandHandler::doCmd2B( int argc, const char** argv, std::ostream& out)
 	}
 }
 
+int CommandHandler::endRun( protocol::CommandHandler* ch, std::ostream& out)
+{
+	ExecCommandHandler* chnd = dynamic_cast<ExecCommandHandler*>( ch);
+	int argc;
+	const char** argv;
+	const char* lastcmd = chnd->getCommand( argc, argv);
+	int err = ch->statusCode();
+
+	if (lastcmd)
+	{
+		try
+		{
+			return runCommand( lastcmd, argc, argv, out);
+		}
+		catch (const std::exception& e)
+		{
+			LOG_ERROR << "exception in command execution: " << e.what();
+			err = -11;
+		}
+	}
+	if (err)
+	{
+		m_statusCode = err;
+	}
+	delete ch;
+	return stateidx();
+}
+
 int CommandHandler::doCmd3A( int argc, const char** argv, std::ostream& out)
 {
 	out << "OK CMD3A";
@@ -178,6 +208,29 @@ int CommandHandler::doCmd3A( int argc, const char** argv, std::ostream& out)
 			out << " '" << argv[ii] << "'";
 		}
 		out << endl();
+		try
+		{
+			CommandHandler* ch = (CommandHandler*)new ExecCommandHandler( cmds(), m_config->getCommands());
+			delegateProcessing<&CommandHandler::endRun>( ch);
+		}
+		catch (const std::exception& e)
+		{
+			LOG_ERROR << "exception in command execution: " << e.what();
+		}
+		return stateidx();
+	}
+}
+
+int CommandHandler::doCmdQUIT( int argc, const char**, std::ostream& out)
+{
+	if (argc != 0)
+	{
+		out << "BAD arguments" << endl();
+		return stateidx();
+	}
+	else
+	{
+		out << "BYE" << endl();
 		return -1;
 	}
 }
@@ -199,7 +252,7 @@ void Connection::signalOccured()
 	m_terminated = true;
 }
 
-void Connection::errorOccured( NetworkSignal )
+void Connection::errorOccured( NetworkSignal)
 {
 	LOG_TRACE << "Got error";
 	m_terminated = true;
@@ -233,7 +286,7 @@ const net::NetworkOperation Connection::nextOperation()
 
 Connection::Connection( const net::LocalEndpoint& local, const Configuration* config)
 	:m_config(config)
-	,m_cmdhandler( static_cast<protocol::LineCommandHandlerSTM*>(&stm))
+	,m_cmdhandler( &stm, config)
 	,m_input(config->input_bufsize())
 	,m_output(config->output_bufsize())
 	,m_terminated(false)
@@ -253,23 +306,23 @@ void Connection::setPeer( const net::RemoteEndpoint& remote)
 	LOG_TRACE << "Peer set to " << remote.toString();
 }
 
-net::ConnectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const net::LocalEndpoint& local )
+net::ConnectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const net::LocalEndpoint& local)
 {
 	return new tproc::Connection( local, m_config->m_appConfig);
 }
 
 ServerHandler::ServerHandler( const HandlerConfiguration* cfg,
-			      const module::ModulesDirectory* /*modules*/ )
-	: m_impl( new ServerHandlerImpl( cfg) ) {}
+			      const module::ModulesDirectory* /*modules*/)
+	: m_impl( new ServerHandlerImpl( cfg)) {}
 
 ServerHandler::~ServerHandler()
 {
 	delete m_impl;
 }
 
-net::ConnectionHandler* ServerHandler::newConnection( const net::LocalEndpoint& local )
+net::ConnectionHandler* ServerHandler::newConnection( const net::LocalEndpoint& local)
 {
-	return m_impl->newConnection( local );
+	return m_impl->newConnection( local);
 }
 
 

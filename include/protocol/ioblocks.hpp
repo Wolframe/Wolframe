@@ -161,21 +161,21 @@ public:
 	};
 
 	///\brief Constructor
-	InputBlock()						:m_eodState(EoD::SRC),m_eodcharbuf(m_eodcharbufc,sizeof(m_eodcharbuf)){}
+	InputBlock()						:m_eodState(EoD::SRC),m_eodcharbuf(m_eodcharbufc,sizeof(m_eodcharbufc)){}
 
 	///\brief Constructor
 	///\param [in] p_size size of the memory block in bytes to allocate
-	InputBlock( std::size_t p_size)				:MemBlock(p_size),m_eodState(EoD::SRC),m_eodcharbuf(m_eodcharbufc,sizeof(m_eodcharbuf)){}
+	InputBlock( std::size_t p_size)				:MemBlock(p_size),m_eodState(EoD::SRC),m_eodcharbuf(m_eodcharbufc,sizeof(m_eodcharbufc)){}
 
 	///\brief Constructor
 	///\param [in] p pointer to the memory block to use
 	///\param [in] n allocation size of the memory block in bytes
 	///\param [in] i fill size of the block in bytes
-	InputBlock( void* p, std::size_t n, std::size_t i)	:MemBlock(p,n,i),m_eodState(EoD::SRC),m_eodcharbuf(m_eodcharbufc,sizeof(m_eodcharbuf)){}
+	InputBlock( void* p, std::size_t n, std::size_t i)	:MemBlock(p,n,i),m_eodState(EoD::SRC),m_eodcharbuf(m_eodcharbufc,sizeof(m_eodcharbufc)){}
 
 	///\brief Copy constructor
 	///\param [in] o InputBlock to copy
-	InputBlock( const InputBlock& o)			:MemBlock(o),m_eodState(o.m_eodState),m_eodcharbuf(m_eodcharbufc,sizeof(m_eodcharbuf)) {m_eodcharbuf=o.m_eodcharbuf;}
+	InputBlock( const InputBlock& o)			:MemBlock(o),m_eodState(o.m_eodState),m_eodcharbuf(m_eodcharbufc,sizeof(m_eodcharbufc)) {m_eodcharbuf=o.m_eodcharbuf;}
 
 	InputBlock& operator=( const InputBlock& o)		{MemBlock::operator=(o); m_eodState=o.m_eodState; m_eodcharbuf=o.m_eodcharbuf; return *this;}
 
@@ -285,6 +285,10 @@ public:
 		setPos( pos() + 1);
 		return true;
 	}
+
+	///\brief Print one number as string to the output
+	///\param [in] ch the number to print
+	bool printNumber( unsigned int num);
 
 	///\brief Print a block to the output
 	///\param [in] p pointer to the block to print

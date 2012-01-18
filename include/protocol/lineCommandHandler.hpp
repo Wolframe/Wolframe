@@ -98,7 +98,6 @@ private:
 };
 
 
-
 class LineCommandHandler :public CommandHandler
 {
 public:
@@ -133,6 +132,7 @@ public:
 	///\brief Get the current state (toplevel)
 	std::size_t stateidx() const			{return m_stateidx;}
 
+	const std::vector<std::string>& cmds() const	{return m_stm->get( m_stateidx).m_parser.cmds();}
 	static const char* endl()			{return "\r\n";}
 
 protected:
@@ -145,6 +145,13 @@ protected:
 		m_delegateHandler = ch;
 		m_delegateHandlerEnd = end;
 	}
+
+	///\brief Redirect to another command of the state machine.
+	///\remark The command cmd_ must exist, though it may fail
+	///\param[in] cmd_ command of the current state to execute
+	///\param[in] argc_ number of arguments to pass to the command
+	///\param[in] argc_ the arguments to pass to the command
+	int runCommand( const char* cmd_, int argc_, const char** argv_, std::ostream& out);
 
 private:
 	InputBlock m_input;					///< buffer for network read messages
@@ -173,7 +180,6 @@ private:
 		static const char* ar[] = {"Init","ProcessingDelegation","EnterCommand","ParseArgs","ParseArgsEOL","ProtocolError","ProcessOutput","Terminate"};
 		return ar[i];
 	}
-
 	CommandHandler* m_delegateHandler;			///< command handler that processes the I/O delegated from this command handler until it return a CLOSE and gets destroyed again
 	DelegateHandlerEnd m_delegateHandlerEnd;		///< function type called after termination of m_delegateHandler
 	const LineCommandHandlerSTM* m_stm;			///< command level protocol state machine
@@ -191,7 +197,7 @@ private:
 ///\brief defines a static function calling a member function with fixed signature
 ///\warning do not declare virtual method calls like this. It is not portable (GCC only) !
 ///\TODO make a static assert here for refusing virtual methods here
-template <class T, int (T::*TerminateDelegationMethod)( CommandHandler* ch)>
+template <class T, int (T::*TerminateDelegationMethod)( CommandHandler*, std::ostream&)>
 struct LineCommandHandlerTerminateDelegationWrapper
 {
 	static int function( void* this_, CommandHandler* ch, std::ostream& out)
@@ -203,13 +209,19 @@ struct LineCommandHandlerTerminateDelegationWrapper
 ///\brief defines some template based extensions to line command handler
 ///\usage derive LineCommandHandlerImpl from LineCommandHandlerTemplate<LineCommandHandlerImpl>
 template <class LineCommandHandlerImpl>
-class LineCommandHandlerTemplate :public LineCommandHandler
+struct LineCommandHandlerTemplate :public LineCommandHandler
 {
+	///\brief Constructor
+	explicit LineCommandHandlerTemplate( const LineCommandHandlerSTM* stm_)
+		:LineCommandHandler( stm_){}
+
+	///\brief Destructor
+	virtual ~LineCommandHandlerTemplate(){}
+
 	///\brief Delegate the processing to 'ch' until its termination. Call the processing termination function for informing the caller
 	template <int (LineCommandHandlerImpl::*EndDelegateProcessingMethod)( CommandHandler*, std::ostream&)>
 	void delegateProcessing( CommandHandler* ch)
 	{
-		if (m_delegateHandler) throw std::logic_error( "duplicate deletation of protocol processing");
 		delegateProcessingFunction( ch, &LineCommandHandlerTerminateDelegationWrapper<LineCommandHandlerImpl,EndDelegateProcessingMethod>::function);
 	}
 };
