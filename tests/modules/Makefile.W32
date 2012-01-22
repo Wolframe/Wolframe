@@ -1,0 +1,48 @@
+TOPDIR = ..\..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_CPPFLAGS = \
+	/D_WIN32_WINNT=0x504
+
+INCLUDE_DIRS = \
+	/I$(TOPDIR)\include /I. \
+	/I$(TOPDIR)\src \
+	/I"$(BOOST_INCLUDE_DIR)" \
+	/I"$(PLATFORM_SDK_DIR)\Include" \
+	/I$(TOPDIR)\gtest\include
+
+# Note: libraries are picked automatically on Windows!
+INCLUDE_LDFLAGS = \
+	$(SDK_LDFLAGS) $(BOOST_LDFLAGS)
+
+INCLUDE_LIBS = \
+	Advapi32.lib Ws2_32.lib \
+	$(TOPDIR)\gtest\gtest-all.obj
+
+TEST_CPP_BINS = \
+	moduleTest.exe
+
+OBJS = \
+
+all: $(OBJS) $(CPP_BINS)
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+moduleTest.exe: moduleTest.obj $(TOPDIR)\src\wolframe.lib
+
+local_all:
+
+local_clean:
+	@-erase test.bat 2>NUL
+
+local_distclean:
+
+local_test:
+	@-echo @echo off > test.bat
+	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
+	@-echo moduleTest >> test.bat
+	@-echo echo off >> test.bat
+	@-test.bat

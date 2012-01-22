@@ -52,6 +52,7 @@ tests/configStructParser
 tests/database/dbTest
 tests/database/test.db
 tests/libxml2/testlibxml1
+tests/modules/moduleTest
 examples/echo/echod
 examples/lua/luad
 examples/mtproc/mtprocd
