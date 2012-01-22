@@ -1,6 +1,6 @@
 TOPDIR = ../..
 
-SUBDIRS =
+SUBDIRS = tests
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
@@ -39,7 +39,6 @@ local_distclean:
 
 local_test: $(TEST_CPP_BINS)
 ifeq ($(RUN_TESTS),1)
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./moduleTest
-	@echo
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./moduleTest
 	@echo
 endif

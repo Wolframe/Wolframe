@@ -36,48 +36,61 @@
 
 #include "moduleInterface.hpp"
 #include "logger-v1.hpp"
-#include "mod_test.hpp"
-
-_Wolframe::log::LogBackend*	logBackendPtr;
+#include "database/DBprovider.hpp"
 
 namespace _Wolframe {
 namespace module {
 namespace test {
 
-bool TestModuleConfig::parse( const config::ConfigurationTree& pt, const std::string& node,
-    const module::ModulesDirectory* modules )
+class TestModuleConfig :  public config::ObjectConfiguration
 {
-}
+	friend class TestModuleContainer;
 
-bool TestModuleConfig::check( ) const
+public:
+	TestModuleConfig( const char* cfgName, const char* logParent, const char* logName )
+		: config::ObjectConfiguration( cfgName, logParent, logName ) {}
+	virtual ~TestModuleConfig( ) {}
+
+	virtual const char* objectName() const		{ return "TestModule"; }
+
+	/// methods
+	bool parse( const config::ConfigurationTree& pt, const std::string& node,
+		    const module::ModulesDirectory* modules );
+	
+	bool check() const;
+	void print( std::ostream& os, size_t indent ) const;
+	void setCanonicalPathes( const std::string& referencePath );
+private:
+	std::string m_a_param;
+};
+
+class TestUnit
 {
-	return true;
-}
+	virtual ~TestUnit( ) { }
+	
+	virtual bool resolveDB( const db::DatabaseProvider& /* db */ )
+	{
+		return true;
+	}
+};
 
-void TestModuleConfig::print( std::ostream& os, size_t indent ) const
+class TestModuleContainer : public ObjectContainer< TestUnit >
 {
-	std::string indStr( indent, ' ' );
-	os << indStr << sectionName() << ": no config " << std::endl;
-}
+public:
+	TestModuleContainer( const TestModuleConfig& conf ) {
+		MOD_LOG_NOTICE << "Test module container created";
+	}
+	
+	~TestModuleContainer()			{}
 
-void TestModuleConfig::setCanonicalPathes( const std::string& refPath )
-{
-}
+	virtual const char* objectName() const	{ return "TestUnit"; }
+	virtual TestUnit* object() const	{ return m_test; }
 
-static ModuleContainer* createModule( void )
-{
-	static module::ContainerDescription< test::TestModuleContainer,
-		test::TestModuleConfig > mod( "Test Module", "Test", "test", "TestModule" );
-	return &mod;
-}
+private:
+	TestUnit *m_test;	
+};
 
-static void setModuleLogger( void* logger )
-{
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend* >( logger );
-}
+extern "C" ModuleEntryPoint entryPoint;
 
 
-ModuleEntryPoint entryPoint( 0, CONTAINER_MODULE, "Test Module",
-			     createModule, setModuleLogger );
-
-}}} // namespace _Wolframe::module:test
+}}} // namespace _Wolframe::module::test
