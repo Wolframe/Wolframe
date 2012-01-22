@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS =
+SUBDIRS = modules
 
 ifeq ($(WITH_EXPECT),1)
 SUBDIRS += expect config
@@ -76,32 +76,32 @@ local_distclean:
 
 local_test: $(TEST_CPP_BINS)
 ifeq ($(RUN_TESTS),1)
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./testMethodMemberPointerTemplate
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./testMethodMemberPointerTemplate
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./testNamedRetVal
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./testNamedRetVal
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./logTest
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./logTest
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./versionTest
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./versionTest
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./counterTest
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./counterTest
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./resolvePathTest
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./resolvePathTest
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./singletonTest
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./singletonTest
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./protocolArgumentParsing
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./protocolArgumentParsing
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./configValueParser
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./configValueParser
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./configStructParser $(TOPDIR)/src/wolframe.conf
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./configStructParser $(TOPDIR)/src/wolframe.conf
 	@echo
 	@echo
 endif
 
 local_longtest: poolTest
 ifeq ($(RUN_TESTS),0)
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(GTEST_LIB_DIR) ./poolTest
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./poolTest
 	@echo
 	@echo
 endif

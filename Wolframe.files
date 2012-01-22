@@ -133,8 +133,7 @@ clients/qt/WolframeClient.hpp
 clients/README
 contrib/osc/boost/debian/README.Debian
 contrib/osc/boost/debian/README.source
-contrib/osc/README.OpenBuildService
-contrib/osc/TODO
+contrib/osc/README
 contrib/README
 debian/README.source
 docs/AppServer/3-tier.xml
@@ -229,6 +228,8 @@ examples/pecho/tests/pechoHandlerTest.cpp
 examples/pecho/tests/testHandlerTemplates.hpp
 examples/tproc/appConfigDefinition.cpp
 examples/tproc/appProperties.cpp
+examples/tproc/execCommandHandler.cpp
+examples/tproc/execCommandHandler.hpp
 examples/tproc/GNUmakefile
 examples/tproc/handlerConfig.hpp
 examples/tproc/Makefile.W32
@@ -265,6 +266,7 @@ gtest/include/gtest/internal/gtest-tuple.h
 gtest/include/gtest/internal/gtest-type-util.h
 gtest/Makefile.W32
 gtest/README
+gtest/README.GtestInWolframe
 gtest/src/gtest-internal-inl.h
 header.txt
 include/AAAA/AAAAprovider.hpp
@@ -597,6 +599,9 @@ tests/libxslt/test1.xml
 tests/libxslt/testlibxslt1.cpp
 tests/logTest.cpp
 tests/Makefile.W32
+tests/modules/GNUmakefile
+tests/modules/Makefile.W32
+tests/modules/moduleTest.cpp
 tests/poolTest.cpp
 tests/protocolArgumentParsing.cpp
 tests/resolvePathTest.cpp

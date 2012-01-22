@@ -99,13 +99,6 @@ ifeq ($(WITH_QT),1)
 	@echo "QT_LIB_DIR: $(QT_LIB_DIR)"
 	@echo "QT_MOC: $(QT_MOC)"
 endif
-ifeq ($(WITH_GTEST),1)
-	@echo
-	@echo "GTEST_DIR: $(GTEST_DIR)"
-	@echo "GTEST_INCLUDE_DIR: $(GTEST_INCLUDE_DIR)"
-	@echo "GTEST_LIB_DIR: $(GTEST_LIB_DIR)"
-	@echo "GTEST_LIBS: $(GTEST_LIBS)"
-endif
 ifeq ($(WITH_PAM),1)
 	@echo
 	@echo "PAM_DIR: $(PAM_DIR)"
