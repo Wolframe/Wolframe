@@ -37,9 +37,9 @@ LOGGER_OBJS = \
 	logger\logger.obj
 
 PROVIDER_OBJS = \
-	provider\AAAAprovider.obj \
+	provider\AAAAproviderImpl.obj \
 	provider\AAAAproviderConfig.obj \
-	provider\DBprovider.obj \
+	provider\DBproviderImpl.obj \
 	provider\DBproviderConfig.obj
 
 CPP_OBJS = \

@@ -49,10 +49,10 @@ class TestModuleConfig :  public config::ObjectConfiguration
 public:
 	TestModuleConfig( const char* cfgName, const char* logParent, const char* logName )
 		: config::ObjectConfiguration( cfgName, logParent, logName )
-	{			
+	{
 		MOD_LOG_NOTICE << "Test module config created";
 	}
-	
+
 	virtual ~TestModuleConfig( ) {}
 
 	virtual const char* objectName() const		{ return "TestUnit"; }
@@ -60,7 +60,7 @@ public:
 	/// methods
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,
 		    const module::ModulesDirectory* modules );
-	
+
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 	void setCanonicalPathes( const std::string& referencePath );
@@ -71,7 +71,7 @@ private:
 class TestUnit
 {
 	virtual ~TestUnit( ) { }
-	
+
 	virtual bool resolveDB( const db::DatabaseProvider& /* db */ )
 	{
 		return true;
@@ -84,17 +84,17 @@ public:
 class TestModuleContainer : public ObjectContainer< TestUnit >
 {
 public:
-	TestModuleContainer( const TestModuleConfig& conf ) {
+	TestModuleContainer( const TestModuleConfig& /*conf*/ ) {
 		MOD_LOG_NOTICE << "Test module container created";
 	}
-	
+
 	~TestModuleContainer()			{}
 
 	virtual const char* objectName() const	{ return "TestUnit"; }
 	virtual TestUnit* object() const	{ return m_test; }
 
 private:
-	TestUnit *m_test;	
+	TestUnit *m_test;
 };
 
 extern "C" ModuleEntryPoint entryPoint;

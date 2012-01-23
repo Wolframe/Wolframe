@@ -120,11 +120,6 @@ clients/qt/HistoryLineEdit.hpp
 clients/qt/MainWindow.cpp
 clients/qt/MainWindow.hpp
 clients/qt/Makefile.W32
-clients/qt/moc_AbstractFormLoader.cpp
-clients/qt/moc_DebugTerminal.cpp
-clients/qt/moc_HistoryLineEdit.cpp
-clients/qt/moc_MainWindow.cpp
-clients/qt/moc_WolframeClient.cpp
 clients/qt/qtclient.cpp
 clients/qt/README
 clients/qt/TODOS
@@ -478,10 +473,11 @@ src/libwolframe/logger/syslog_win32.h
 src/libwolframe/Makefile.W32
 src/libwolframe/moduleDirectory.cpp
 src/libwolframe/provider/AAAAproviderConfig.cpp
-src/libwolframe/provider/AAAAprovider.cpp
+src/libwolframe/provider/AAAAproviderImpl.cpp
 src/libwolframe/provider/AAAAproviderImpl.hpp
+src/libwolframe/provider/Authorization.cpp
 src/libwolframe/provider/DBproviderConfig.cpp
-src/libwolframe/provider/DBprovider.cpp
+src/libwolframe/provider/DBproviderImpl.cpp
 src/libwolframe/provider/DBproviderImpl.hpp
 src/libwolframe/referenceConfig.cpp
 src/libwolframe/resolvePath.cpp
