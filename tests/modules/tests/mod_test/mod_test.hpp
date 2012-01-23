@@ -41,61 +41,6 @@ namespace _Wolframe {
 namespace module {
 namespace test {
 
-class TestModuleConfig :  public config::ObjectConfiguration
-{
-	friend class TestModuleContainer;
-
-public:
-	TestModuleConfig( const char* cfgName, const char* logParent, const char* logName )
-		: config::ObjectConfiguration( cfgName, logParent, logName )
-	{
-		MOD_LOG_NOTICE << "Test module config created";
-	}
-
-	virtual ~TestModuleConfig( ) {}
-
-	virtual const char* objectName() const		{ return "TestUnit"; }
-
-	/// methods
-	bool parse( const config::ConfigurationTree& pt, const std::string& node,
-		    const module::ModulesDirectory* modules );
-
-	bool check() const;
-	void print( std::ostream& os, size_t indent ) const;
-	void setCanonicalPathes( const std::string& referencePath );
-private:
-	std::string m_a_param;
-};
-
-class TestUnit
-{
-	virtual ~TestUnit( ) { }
-
-	virtual bool resolveDB( const db::DatabaseProvider& /* db */ )
-	{
-		return true;
-	}
-
-public:
-	const std::string hello( ) { return "hello"; }
-};
-
-class TestModuleContainer : public ObjectContainer< TestUnit >
-{
-public:
-	TestModuleContainer( const TestModuleConfig& /*conf*/ ) {
-		MOD_LOG_NOTICE << "Test module container created";
-	}
-
-	~TestModuleContainer()			{}
-
-	virtual const char* objectName() const	{ return "TestUnit"; }
-	virtual TestUnit* object() const	{ return m_test; }
-
-private:
-	TestUnit *m_test;
-};
-
 extern "C" ModuleEntryPoint entryPoint;
 
 }}} // namespace _Wolframe::module::test

@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = modules
+SUBDIRS = 
 
 ifeq ($(WITH_EXPECT),1)
 SUBDIRS += expect config
