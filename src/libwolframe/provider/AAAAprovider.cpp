@@ -63,7 +63,7 @@ Authenticator* AAAAprovider::authenticator()
 	return m_impl->authenticator();
 }
 
-Authorizer* AAAAprovider::authorizer()
+Authorizer* AAAAprovider::authorizer() const
 {
 	return m_impl->authorizer();
 }

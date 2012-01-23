@@ -75,7 +75,7 @@ public:
 	~AuthorizationProvider();
 	bool resolveDB( const db::DatabaseProvider& db );
 
-	Authorizer* authorizer()		{ return NULL; }
+	Authorizer* authorizer() const		{ return NULL; }
 private:
 	std::list< AuthorizationUnit* >	m_authorizers;
 };

@@ -602,6 +602,12 @@ tests/Makefile.W32
 tests/modules/GNUmakefile
 tests/modules/Makefile.W32
 tests/modules/moduleTest.cpp
+tests/modules/tests/GNUmakefile
+tests/modules/tests/Makefile.W32
+tests/modules/tests/mod_test/GNUmakefile
+tests/modules/tests/mod_test/Makefile.W32
+tests/modules/tests/mod_test/mod_test.cpp
+tests/modules/tests/mod_test/mod_test.hpp
 tests/poolTest.cpp
 tests/protocolArgumentParsing.cpp
 tests/resolvePathTest.cpp

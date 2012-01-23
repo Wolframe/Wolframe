@@ -40,6 +40,7 @@
 
 #include <string>
 
+#include "connectionEndpoint.hpp"
 #include "database/DBprovider.hpp"
 
 namespace _Wolframe {
@@ -52,6 +53,13 @@ public:
 
 	// close the authorizer (not really)
 	virtual void close()		{}
+
+	// authorization requests
+	bool connectAllowed( const net::LocalEndpoint& /*local*/, const net::RemoteEndpoint& /*remote*/,
+			     std::string& /*msg*/ )
+	{
+		return true;
+	}
 };
 
 

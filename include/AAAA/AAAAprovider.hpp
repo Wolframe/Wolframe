@@ -78,7 +78,7 @@ public:
 	bool resolveDB( const db::DatabaseProvider& db );
 
 	Authenticator* authenticator();
-	Authorizer* authorizer();
+	Authorizer* authorizer() const;
 	Auditor* auditor();
 private:
 	class AAAAprovider_Impl;

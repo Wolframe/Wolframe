@@ -93,6 +93,10 @@ wolframeConnection::wolframeConnection( const WolframeHandler& context,
 
 wolframeConnection::~wolframeConnection()
 {
+	if ( m_authorization )	{
+		m_authorization->close();
+		m_authorization = NULL;
+	}
 	if ( m_authentication )	{
 		m_authentication->close();
 		m_authentication = NULL;
@@ -140,13 +144,26 @@ void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
 		abort();
 	}
 
-// Check here if the connection is allowed
+// Check if the connection is allowed
+	if (( m_authorization = m_globalCtx.aaaa().authorizer()))	{
+		std::string msg;
+		if ( m_authorization->connectAllowed( *m_localEP, *m_remoteEP, msg ))	{
+			LOG_DEBUG << "Connection from " << m_remoteEP->endpoint()
+				  << " to " << m_localEP->endpoint() << " authorized";
 
-// The AAAA stuf should also depend on peer properties
-//	m_authentication = m_globalCtx.aaaa().authenticationChannel();
-//	m_authorization = m_globalCtx.aaaa().authorizationChannel();
-//	m_audit = m_globalCtx.aaaa().auditChannel();
-//	m_accounting = m_globalCtx.aaaa().accountingChannel();
+		}
+		else	{
+			LOG_ERROR << "Connection from " << m_remoteEP->endpoint()
+				  << " to " << m_localEP->endpoint() << " not authorized: "
+				  << msg;
+			// close the connection
+			m_state = TERMINATE;
+		}
+	}
+	else	{
+		LOG_WARNING << "Authorization not available";
+//		abort();
+	}
 }
 
 /// Handle a request and produce a reply.
