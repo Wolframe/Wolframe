@@ -55,11 +55,8 @@ public:
 	virtual void close()		{}
 
 	// authorization requests
-	bool connectAllowed( const net::LocalEndpoint& /*local*/, const net::RemoteEndpoint& /*remote*/,
-			     std::string& /*msg*/ )
-	{
-		return true;
-	}
+	virtual bool connectAllowed( const net::LocalEndpoint& local, const net::RemoteEndpoint& remote,
+				     std::string& msg ) = 0;
 };
 
 

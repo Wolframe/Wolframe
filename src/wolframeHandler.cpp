@@ -148,13 +148,13 @@ void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
 	if (( m_authorization = m_globalCtx.aaaa().authorizer()))	{
 		std::string msg;
 		if ( m_authorization->connectAllowed( *m_localEP, *m_remoteEP, msg ))	{
-			LOG_DEBUG << "Connection from " << m_remoteEP->endpoint()
-				  << " to " << m_localEP->endpoint() << " authorized";
+			LOG_DEBUG << "Connection from " << m_remoteEP->toString()
+				  << " to " << m_localEP->toString() << " authorized";
 
 		}
 		else	{
-			LOG_ERROR << "Connection from " << m_remoteEP->endpoint()
-				  << " to " << m_localEP->endpoint() << " not authorized: "
+			LOG_ERROR << "Connection from " << m_remoteEP->toString()
+				  << " to " << m_localEP->toString() << " not authorized: "
 				  << msg;
 			// close the connection
 			m_state = TERMINATE;

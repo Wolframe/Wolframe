@@ -53,6 +53,7 @@
 namespace _Wolframe {
 namespace AAAA {
 
+// Standard authentication class and authentication provider
 class AuthenticationFactory
 {
 public:
@@ -67,6 +68,20 @@ private:
 };
 
 
+// Standard authorization class and authorization provider
+class StandardAuthorizer : public Authorizer
+{
+public:
+	StandardAuthorizer( const std::list< AuthorizationUnit* >& units );
+	~StandardAuthorizer();
+	void close();
+
+	bool connectAllowed( const net::LocalEndpoint& local, const net::RemoteEndpoint& remote,
+			     std::string& msg );
+private:
+	const std::list< AuthorizationUnit* >&	m_authorizeUnits;
+};
+
 class AuthorizationProvider
 {
 public:
@@ -75,12 +90,14 @@ public:
 	~AuthorizationProvider();
 	bool resolveDB( const db::DatabaseProvider& db );
 
-	Authorizer* authorizer() const		{ return NULL; }
+	Authorizer* authorizer() const		{ return m_authorizer; }
 private:
-	std::list< AuthorizationUnit* >	m_authorizers;
+	std::list< AuthorizationUnit* >	m_authorizeUnits;
+	StandardAuthorizer*		m_authorizer;
 };
 
 
+// Standard audit class and audit provider
 class AuditProvider
 {
 public:
@@ -95,6 +112,7 @@ private:
 };
 
 
+// AAAA provider PIMPL class
 class AAAAprovider::AAAAprovider_Impl
 {
 public:

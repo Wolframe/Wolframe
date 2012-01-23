@@ -39,9 +39,10 @@ LOGGER_OBJS = \
 	logger/logger.o
 
 PROVIDER_OBJS = \
-	provider/AAAAprovider.o \
+	provider/Authorization.o \
+	provider/AAAAproviderImpl.o \
 	provider/AAAAproviderConfig.o \
-	provider/DBprovider.o \
+	provider/DBproviderImpl.o \
 	provider/DBproviderConfig.o
 
 CPP_OBJS = \

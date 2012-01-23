@@ -136,44 +136,6 @@ bool AuthenticationFactory::resolveDB( const db::DatabaseProvider& db )
 
 
 /***********************************************************************************/
-AuthorizationProvider::AuthorizationProvider( const std::list< config::ObjectConfiguration* >& confs,
-			const module::ModulesDirectory* modules )
-{
-	for ( std::list<config::ObjectConfiguration*>::const_iterator it = confs.begin();
-								it != confs.end(); it++ )	{
-		module::ModuleContainer* container = modules->getContainer((*it)->objectName());
-		if ( container )	{
-			ObjectContainer< AuthorizationUnit >* authz =
-					dynamic_cast< ObjectContainer< AuthorizationUnit >* >( container->container( **it ));
-			m_authorizers.push_back( authz->object() );
-			LOG_TRACE << "'" << authz->objectName() << "' authorization unit registered";
-			authz->dispose();
-		}
-		else	{
-			LOG_ALERT << "AuthorizationProvider: unknown audit type '" << (*it)->objectName() << "'";
-			throw std::domain_error( "Unknown authorization mechanism type in AAAAprovider constructor. See log" );
-		}
-	}
-}
-
-AuthorizationProvider::~AuthorizationProvider()
-{
-	for ( std::list< AuthorizationUnit* >::iterator it = m_authorizers.begin();
-								it != m_authorizers.end(); it++ )
-		delete *it;
-}
-
-bool AuthorizationProvider::resolveDB( const db::DatabaseProvider& db )
-{
-	for ( std::list< AuthorizationUnit* >::iterator it = m_authorizers.begin();
-								it != m_authorizers.end(); it++ )
-		if ( ! (*it)->resolveDB( db ) )
-			return false;
-	return true;
-}
-
-
-/***********************************************************************************/
 AuditProvider::AuditProvider( const std::list< config::ObjectConfiguration* >& confs,
 			const module::ModulesDirectory* modules )
 {
