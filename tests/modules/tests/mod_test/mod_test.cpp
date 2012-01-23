@@ -47,6 +47,7 @@ namespace test {
 bool TestModuleConfig::parse( const config::ConfigurationTree& pt, const std::string& node,
     const module::ModulesDirectory* modules )
 {
+	return true;
 }
 
 bool TestModuleConfig::check( ) const
@@ -67,7 +68,7 @@ void TestModuleConfig::setCanonicalPathes( const std::string& refPath )
 static ModuleContainer* createModule( void )
 {
 	static module::ContainerDescription< test::TestModuleContainer,
-		test::TestModuleConfig > mod( "Test Module", "Test", "test", "TestModule" );
+		test::TestModuleConfig > mod( "Test Module", "Test", "test", "TestObject" );
 	return &mod;
 }
 

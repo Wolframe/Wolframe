@@ -48,10 +48,14 @@ class TestModuleConfig :  public config::ObjectConfiguration
 
 public:
 	TestModuleConfig( const char* cfgName, const char* logParent, const char* logName )
-		: config::ObjectConfiguration( cfgName, logParent, logName ) {}
+		: config::ObjectConfiguration( cfgName, logParent, logName )
+	{			
+		MOD_LOG_NOTICE << "Test module config created";
+	}
+	
 	virtual ~TestModuleConfig( ) {}
 
-	virtual const char* objectName() const		{ return "TestModule"; }
+	virtual const char* objectName() const		{ return "TestUnit"; }
 
 	/// methods
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,
@@ -72,6 +76,9 @@ class TestUnit
 	{
 		return true;
 	}
+
+public:
+	const std::string hello( ) { return "hello"; }
 };
 
 class TestModuleContainer : public ObjectContainer< TestUnit >

@@ -6,11 +6,15 @@
 #include "moduleInterface.hpp"
 #include <gtest/gtest.h>
 
+// TODO: share a common header file
+#include "tests/mod_test/mod_test.hpp"
+
 #include <string>
 #include <list>
 
 using namespace _Wolframe::module;
 using namespace _Wolframe::log;
+using namespace _Wolframe;
 using namespace std;
 
 // The fixture for testing class _Wolframe::module
@@ -37,10 +41,20 @@ TEST_F( ModuleFixture, LoadingModuleFromDir )
 #else
 	modFiles.push_back( ".\\tests\\mod_test\\mod_test.dll" );
 #endif
-	
 	bool res = LoadModules( modDir, modFiles );
-	ASSERT_EQ( res, true );
+	ASSERT_TRUE( res );
+	
+	ModuleContainer* container = modDir.getContainer( "TestObject" );
+	ASSERT_TRUE( container != NULL );
+	
+	config::ObjectConfiguration* configuration = container->configuration( "TestObject" );
+	ASSERT_TRUE( configuration != NULL );
 
+	test::TestModuleContainer* obj = dynamic_cast<test::TestModuleContainer *>( container->container( *configuration ) );
+	test::TestUnit* unit = obj->object( );
+	
+	string s = unit->hello( );
+	ASSERT_EQ( s, "hello" );
 }
 
 int main( int argc, char **argv )
