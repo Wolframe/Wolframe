@@ -16,7 +16,8 @@ INCLUDE_LDFLAGS = \
 INCLUDE_LIBS = \
 	-lwolframe
 
-DYNAMIC_MODULE = mod_test.so
+DYNAMIC_MODULE = \
+	mod_test.so
 
 CPP_OBJS = \
 	mod_test.o

@@ -31,16 +31,60 @@
 
 ************************************************************************/
 //
-// a test module
+// common part which has to be known to Wolframe and the loadable module
 //
 
-#include "logger-v1.hpp"
-#include "common.hpp"
+#include "moduleInterface.hpp"
+#include "database/DBprovider.hpp"
 
 namespace _Wolframe {
 namespace module {
 namespace test {
 
-extern "C" ModuleEntryPoint entryPoint;
+class TestModuleConfig :  public config::ObjectConfiguration
+{
+	friend class TestModuleContainer;
+
+public:
+	TestModuleConfig( const char* cfgName, const char* logParent, const char* logName );
+	
+	virtual ~TestModuleConfig( ) {}
+
+	virtual const char* objectName() const		{ return "TestUnit"; }
+
+	/// methods
+	bool parse( const config::ConfigurationTree& pt, const std::string& node,
+		    const module::ModulesDirectory* modules );
+	
+	bool check() const;
+	void print( std::ostream& os, size_t indent ) const;
+	void setCanonicalPathes( const std::string& referencePath );
+private:
+	std::string m_a_param;
+};
+
+class TestUnit
+{
+	virtual ~TestUnit( ) { }
+	
+	virtual bool resolveDB( const db::DatabaseProvider& /* db */ );
+
+public:
+	const std::string hello( );
+};
+
+class TestModuleContainer : public ObjectContainer< TestUnit >
+{
+public:
+	TestModuleContainer( const TestModuleConfig& conf );
+	
+	~TestModuleContainer()			{}
+
+	virtual const char* objectName() const	{ return "TestUnit"; }
+	virtual TestUnit* object() const	{ return m_test; }
+
+private:
+	TestUnit *m_test;	
+};
 
 }}} // namespace _Wolframe::module::test

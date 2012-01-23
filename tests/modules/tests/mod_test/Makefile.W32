@@ -19,11 +19,10 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib
 
 DYNAMIC_MODULE = \
-	mod_proc_echo.dll
+	mod_test.dll
 
 CPP_OBJS = \
-	echoProcessor.obj \
-	echoProcessorModule.obj
+	mod_test.obj
 
 all: $(DYNAMIC_MODULE)
 

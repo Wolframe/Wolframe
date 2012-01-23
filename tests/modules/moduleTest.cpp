@@ -6,8 +6,7 @@
 #include "moduleInterface.hpp"
 #include <gtest/gtest.h>
 
-// TODO: share a common header file
-#include "tests/mod_test/mod_test.hpp"
+#include "tests/mod_test/common.hpp"
 
 #include <string>
 #include <list>

@@ -20,6 +20,7 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 	Advapi32.lib Ws2_32.lib \
+	$(TOPDIR)/src/loadModules.obj \
 	$(TOPDIR)\gtest\gtest-all.obj
 
 TEST_CPP_BINS = \

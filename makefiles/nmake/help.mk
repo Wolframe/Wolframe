@@ -1,14 +1,14 @@
 
 Available targets:
 
-make [all]	       create all artifacts
-make test	       create test binaries and execute tests and execute
+nmake [all]	       create all artifacts
+nmake test	       create test binaries and execute tests and execute
                        fast tests
-make longtest          execute all tests, including long lasting ones
-make doc               build the documentation
-make clean             clean up build artifacts
-make distclean         clean up all generated artifacts
-make help              show this very help page
+nmake longtest          execute all tests, including long lasting ones
+nmake doc               build the documentation
+nmake clean             clean up build artifacts
+nmake distclean         clean up all generated artifacts
+nmake help              show this very help page
 
 Available optional features:
 
