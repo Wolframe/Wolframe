@@ -76,6 +76,10 @@ TestModuleContainer::TestModuleContainer( const TestModuleConfig& conf )
 	MOD_LOG_NOTICE << "Test module container created";
 }
 
+TestUnitBase::~TestUnitBase( )
+{
+}
+
 const std::string TestUnit::hello( )
 {
 	return "hello";

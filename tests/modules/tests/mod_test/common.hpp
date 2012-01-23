@@ -50,7 +50,7 @@ public:
 	
 	virtual ~TestModuleConfig( ) {}
 
-	virtual const char* objectName() const		{ return "TestUnit"; }
+	virtual const char* objectName() const		{ return "TestUnitBase"; }
 
 	/// methods
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,
@@ -63,30 +63,32 @@ private:
 	std::string m_a_param;
 };
 
-class TestUnit
+// must be an abstract base class for usage in the code loading
+// and using objects of the derived class!
+class TestUnitBase
 {
-	virtual ~TestUnit( ) { }
-	
-	virtual bool resolveDB( const db::DatabaseProvider& /* db */ );
-
 public:
+	// may not be private and must be virtual, can be empty as
+	// we define an interface here only
+	virtual ~TestUnitBase( );
+
 	// must be virtual, otherwise moduleTest tries to link a hello
 	// function in which can't exist there!
-	virtual const std::string hello( );
+	virtual const std::string hello( ) = 0;
 };
 
-class TestModuleContainer : public ObjectContainer< TestUnit >
+class TestModuleContainer : public ObjectContainer< TestUnitBase >
 {
 public:
 	TestModuleContainer( const TestModuleConfig& conf );
 	
 	~TestModuleContainer()			{}
 
-	virtual const char* objectName() const	{ return "TestUnit"; }
-	virtual TestUnit* object() const	{ return m_test; }
+	virtual const char* objectName() const	{ return "TestUnitBase"; }
+	virtual TestUnitBase* object() const	{ return m_test; }
 
 private:
-	TestUnit *m_test;	
+	TestUnitBase *m_test;	
 };
 
 }}} // namespace _Wolframe::module::test

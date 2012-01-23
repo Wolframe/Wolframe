@@ -50,7 +50,7 @@ TEST_F( ModuleFixture, LoadingModuleFromDir )
 	ASSERT_TRUE( configuration != NULL );
 
 	test::TestModuleContainer* obj = dynamic_cast<test::TestModuleContainer *>( container->container( *configuration ) );
-	test::TestUnit* unit = obj->object( );
+	test::TestUnitBase* unit = obj->object( );
 
 	string s = unit->hello( );
 	ASSERT_EQ( s, "hello" );

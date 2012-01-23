@@ -43,4 +43,15 @@ namespace test {
 
 extern "C" ModuleEntryPoint entryPoint;
 
+// the implementation of a plugin full-filling the TestUnit interface
+class TestUnit : public TestUnitBase
+{
+	virtual bool resolveDB( const db::DatabaseProvider& /* db */ );
+
+public:
+	virtual ~TestUnit( ) { };
+
+	virtual const std::string hello( );
+};
+
 }}} // namespace _Wolframe::module::test
