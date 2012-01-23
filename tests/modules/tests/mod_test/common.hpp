@@ -70,7 +70,9 @@ class TestUnit
 	virtual bool resolveDB( const db::DatabaseProvider& /* db */ );
 
 public:
-	const std::string hello( );
+	// must be virtual, otherwise moduleTest tries to link a hello
+	// function in which can't exist there!
+	virtual const std::string hello( );
 };
 
 class TestModuleContainer : public ObjectContainer< TestUnit >
