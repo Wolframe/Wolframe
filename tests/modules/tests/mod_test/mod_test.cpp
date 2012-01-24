@@ -47,7 +47,7 @@ namespace test {
 TestModuleConfig::TestModuleConfig( const char* cfgName, const char* logParent, const char* logName )
 	: config::ObjectConfiguration( cfgName, logParent, logName )
 {			
-	MOD_LOG_NOTICE << "Test module config created";
+	MOD_LOG_DEBUG << "Test module config created";
 }
 
 bool TestModuleConfig::parse( const config::ConfigurationTree& pt, const std::string& node,
@@ -74,11 +74,17 @@ void TestModuleConfig::setCanonicalPathes( const std::string& refPath )
 TestModuleContainer::TestModuleContainer( const TestModuleConfig& /* conf */ )
 {
 	m_test = new TestUnit( /* conf */ );	
-	MOD_LOG_NOTICE << "Test module container created";
+	MOD_LOG_DEBUG << "Test module container created";
 }
 
 TestUnit::TestUnit( )
 {
+	MOD_LOG_DEBUG << "TestUnit object created";
+}
+
+TestUnit::~TestUnit( )
+{
+	MOD_LOG_DEBUG << "TestUnit object destroyed";
 }
 
 const std::string TestUnit::hello( )

@@ -52,7 +52,7 @@ public:
 	// test unit has no configuration, so have an empty constructor
 	TestUnit( );
 	
-	virtual ~TestUnit( ) { };
+	virtual ~TestUnit( );
 
 	virtual const std::string hello( );
 };

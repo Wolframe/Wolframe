@@ -50,7 +50,7 @@ public:
 	
 	virtual ~TestModuleConfig( ) {}
 
-	virtual const char* objectName() const		{ return "TestUnitBase"; }
+	virtual const char* objectName() const		{ return "TestUnit"; }
 
 	/// methods
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,
@@ -84,7 +84,7 @@ public:
 	
 	~TestModuleContainer()			{}
 
-	virtual const char* objectName() const	{ return "TestUnitBase"; }
+	virtual const char* objectName() const	{ return "TestUnit"; }
 	virtual TestUnitBase* object() const	{ return m_test; }
 
 private:
