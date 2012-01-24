@@ -120,6 +120,11 @@ clients/qt/HistoryLineEdit.hpp
 clients/qt/MainWindow.cpp
 clients/qt/MainWindow.hpp
 clients/qt/Makefile.W32
+clients/qt/moc_AbstractFormLoader.cpp
+clients/qt/moc_DebugTerminal.cpp
+clients/qt/moc_HistoryLineEdit.cpp
+clients/qt/moc_MainWindow.cpp
+clients/qt/moc_WolframeClient.cpp
 clients/qt/qtclient.cpp
 clients/qt/README
 clients/qt/TODOS
@@ -600,6 +605,7 @@ tests/modules/Makefile.W32
 tests/modules/moduleTest.cpp
 tests/modules/tests/GNUmakefile
 tests/modules/tests/Makefile.W32
+tests/modules/tests/mod_test/common.hpp
 tests/modules/tests/mod_test/GNUmakefile
 tests/modules/tests/mod_test/Makefile.W32
 tests/modules/tests/mod_test/mod_test.cpp

@@ -187,12 +187,10 @@ void SSLconnection::handleHandshake( const boost::system::error_code& e )
 			if ( peerCert )	{
 				certInfo = new SSLcertificateInfo( peerCert );
 			}
+			m_connList.push( boost::static_pointer_cast< SSLconnection >( shared_from_this()) );
 			m_connHandler->setPeer( RemoteSSLendpoint( m_SSLsocket.lowest_layer().remote_endpoint().address().to_string(),
 								   m_SSLsocket.lowest_layer().remote_endpoint().port(),
 								   certInfo ));
-
-			m_connList.push( boost::static_pointer_cast< SSLconnection >( shared_from_this()) );
-
 			nextOperation();
 		}
 	}
