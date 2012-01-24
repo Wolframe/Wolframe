@@ -56,36 +56,42 @@ wolframeConnection::wolframeConnection( const WolframeHandler& context,
 	: m_globalCtx( context ),
 	  m_readBuf( 16536 )
 {
-	m_localEP = &local;
 	m_remoteEP = NULL;
-	net::ConnectionEndpoint::ConnectionType type = m_localEP->type();
+	net::ConnectionEndpoint::ConnectionType type = local.type();
 
 	switch ( type )	{
-	case net::ConnectionEndpoint::TCP_CONNECTION:	{
-		const net::LocalTCPendpoint* lcl = static_cast< const net::LocalTCPendpoint* >( m_localEP );
-		LOG_TRACE << "Created connection handler for " << lcl->toString();
-		break;
-	}
+		case net::ConnectionEndpoint::UDP:
+			LOG_FATAL << "UDP local connection type not implemented";
+			abort();
+
+		case net::ConnectionEndpoint::TCP:	{
+			const net::LocalTCPendpoint& lcl = dynamic_cast< const net::LocalTCPendpoint& >( local );
+			m_localEP = new net::LocalTCPendpoint( lcl );
+			LOG_TRACE << "Created connection handler for " << m_localEP->toString();
+			break;
+		}
 #ifdef WITH_SSL
-	case net::ConnectionEndpoint::SSL_CONNECTION:	{
-		const net::LocalSSLendpoint* lcl = static_cast< const net::LocalSSLendpoint* >( m_localEP );
-		LOG_TRACE << "Created connection handler (SSL) for " << lcl->toString();
-		break;
-	}
+		case net::ConnectionEndpoint::SSL:	{
+			const net::LocalSSLendpoint& lcl = dynamic_cast< const net::LocalSSLendpoint& >( local );
+			m_localEP = new net::LocalSSLendpoint( lcl );
+			LOG_TRACE << "Created connection handler (SSL) for " << m_localEP->toString();
+			break;
+		}
 #else
-	case net::ConnectionEndpoint::SSL_CONNECTION:
+		case net::ConnectionEndpoint::SSL:
 #endif // WITH_SSL
-	default:
-		LOG_FATAL << "Impossible local connection type !";
-		abort();
+		default:
+			LOG_FATAL << "Impossible local connection type !";
+			abort();
 	}
 
+	// Initialize channel data to start-up values
 	m_state = NEW_CONNECTION;
 	m_dataStart = NULL;
 	m_dataSize = 0;
 
-	// Initialize various channel processors to start-up values
 	m_authentication = NULL;
+	m_authorization = NULL;
 	m_audit = NULL;
 	m_proc = NULL;
 }
@@ -93,6 +99,10 @@ wolframeConnection::wolframeConnection( const WolframeHandler& context,
 
 wolframeConnection::~wolframeConnection()
 {
+	if ( m_localEP )
+		delete m_localEP;
+	if ( m_remoteEP )
+		delete m_remoteEP;
 	if ( m_authorization )	{
 		m_authorization->close();
 		m_authorization = NULL;
@@ -112,39 +122,43 @@ wolframeConnection::~wolframeConnection()
 
 void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
 {
-	m_remoteEP = &remote;
-	net::ConnectionEndpoint::ConnectionType type = m_remoteEP->type();
+	net::ConnectionEndpoint::ConnectionType type = remote.type();
 
 	switch ( type )	{
-	case net::ConnectionEndpoint::TCP_CONNECTION:	{
-		const net::RemoteTCPendpoint* rmt = static_cast< const net::RemoteTCPendpoint* >( m_remoteEP );
-		LOG_TRACE << "Peer set to " << rmt->toString() << ", connected at " << rmt->connectionTime();
-		break;
-	}
+		case net::ConnectionEndpoint::UDP:
+			LOG_FATAL << "UDP local connection type not implemented";
+			abort();
 
-	case net::ConnectionEndpoint::SSL_CONNECTION:
-#ifdef WITH_SSL
-	{
-		const net::RemoteSSLendpoint* rmt = static_cast<const net::RemoteSSLendpoint*>( m_remoteEP );
-		LOG_TRACE << "Peer set to " << rmt->toString() << ", connected at " << boost::posix_time::from_time_t( rmt->connectionTime());
-		if ( rmt->SSLcertInfo() )	{
-			LOG_TRACE << "Peer SSL certificate serial number " << rmt->SSLcertInfo()->serialNumber()
-				  << ", issued by: " << rmt->SSLcertInfo()->issuer();
-			LOG_TRACE << "Peer SSL certificate valid from " << boost::posix_time::from_time_t( rmt->SSLcertInfo()->notBefore())
-				  << " to " <<  boost::posix_time::from_time_t( rmt->SSLcertInfo()->notAfter());
-			LOG_TRACE << "Peer SSL certificate subject: " << rmt->SSLcertInfo()->subject();
-			LOG_TRACE << "Peer SSL certificate Common Name: " << rmt->SSLcertInfo()->commonName();
+		case net::ConnectionEndpoint::TCP:	{
+			const net::RemoteTCPendpoint& rmt = dynamic_cast< const net::RemoteTCPendpoint& >( remote );
+			m_remoteEP = new net::RemoteTCPendpoint( rmt );
+			LOG_TRACE << "Peer set to " << m_remoteEP->toString() << ", connected at " << m_remoteEP->connectionTime();
+			break;
 		}
-		break;
-	}
+
+		case net::ConnectionEndpoint::SSL:
+#ifdef WITH_SSL
+		{
+			const net::RemoteSSLendpoint& rmt = dynamic_cast<const net::RemoteSSLendpoint&>( remote );
+			m_remoteEP = new net::RemoteSSLendpoint( rmt );
+			LOG_TRACE << "Peer set to " << m_remoteEP->toString() << ", connected at " << boost::posix_time::from_time_t( m_remoteEP->connectionTime());
+			if ( rmt.SSLcertInfo() )	{
+				LOG_TRACE << "Peer SSL certificate serial number " << rmt.SSLcertInfo()->serialNumber()
+					  << ", issued by: " << rmt.SSLcertInfo()->issuer();
+				LOG_TRACE << "Peer SSL certificate valid from " << boost::posix_time::from_time_t( rmt.SSLcertInfo()->notBefore())
+					  << " to " <<  boost::posix_time::from_time_t( rmt.SSLcertInfo()->notAfter());
+				LOG_TRACE << "Peer SSL certificate subject: " << rmt.SSLcertInfo()->subject();
+				LOG_TRACE << "Peer SSL certificate Common Name: " << rmt.SSLcertInfo()->commonName();
+			}
+			break;
+		}
 #endif // WITH_SSL
-
-	default:
-		LOG_FATAL << "Impossible remote connection type !";
-		abort();
+		default:
+			LOG_FATAL << "Impossible remote connection type !";
+			abort();
 	}
 
-// Check if the connection is allowed
+	// Check if the connection is allowed
 	if (( m_authorization = m_globalCtx.aaaa().authorizer()))	{
 		std::string msg;
 		if ( m_authorization->connectAllowed( *m_localEP, *m_remoteEP, msg ))	{
@@ -162,7 +176,7 @@ void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
 	}
 	else	{
 		LOG_WARNING << "Authorization not available";
-//		abort();
+		//		abort();
 	}
 }
 

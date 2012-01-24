@@ -18,25 +18,28 @@ echoConnection::echoConnection( const net::LocalEndpoint& local, unsigned short 
 	net::ConnectionEndpoint::ConnectionType type = local.type();
 
 	switch ( type )	{
-	case net::ConnectionEndpoint::TCP_CONNECTION:	{
-		const net::LocalTCPendpoint& lcl = static_cast<const net::LocalTCPendpoint&>( local );
-		LOG_TRACE << "Created connection handler for " << lcl.toString();
-		break;
-	}
-#ifdef WITH_SSL
-	case net::ConnectionEndpoint::SSL_CONNECTION:	{
-		const net::LocalSSLendpoint& lcl = static_cast<const net::LocalSSLendpoint&>( local );
-		LOG_TRACE << "Created connection handler (SSL) for " << lcl.toString();
-		break;
-	}
-#else
-	case net::ConnectionEndpoint::SSL_CONNECTION:
-#endif // WITH_SSL
-	default:
-		LOG_FATAL << "Impossible local connection type !";
-		abort();
-	}
+		case net::ConnectionEndpoint::UDP:
+			LOG_FATAL << "UDP local connection type not implemented";
+			abort();
 
+		case net::ConnectionEndpoint::TCP:	{
+			const net::LocalTCPendpoint& lcl = static_cast<const net::LocalTCPendpoint&>( local );
+			LOG_TRACE << "Created connection handler for " << lcl.toString();
+			break;
+		}
+#ifdef WITH_SSL
+		case net::ConnectionEndpoint::SSL:	{
+			const net::LocalSSLendpoint& lcl = static_cast<const net::LocalSSLendpoint&>( local );
+			LOG_TRACE << "Created connection handler (SSL) for " << lcl.toString();
+			break;
+		}
+#else
+		case net::ConnectionEndpoint::SSL:
+#endif // WITH_SSL
+		default:
+			LOG_FATAL << "Impossible local connection type !";
+			abort();
+	}
 
 	state_ = NEW;
 	dataStart_ = NULL;
@@ -56,31 +59,35 @@ void echoConnection::setPeer( const net::RemoteEndpoint& remote )
 	net::ConnectionEndpoint::ConnectionType type = remote.type();
 
 	switch ( type )	{
-	case net::ConnectionEndpoint::TCP_CONNECTION:	{
-		const net::RemoteTCPendpoint& rmt = static_cast<const net::RemoteTCPendpoint&>( remote );
-		LOG_TRACE << "Peer set to " << rmt.toString() << ", connected at " << rmt.connectionTime();
-		break;
-	}
-#ifdef WITH_SSL
-	case net::ConnectionEndpoint::SSL_CONNECTION:	{
-		const net::RemoteSSLendpoint& rmt = static_cast<const net::RemoteSSLendpoint&>( remote );
-		LOG_TRACE << "Peer set to " << rmt.toString() << ", connected at " << boost::posix_time::from_time_t( rmt.connectionTime());
-		if ( rmt.SSLcertInfo() )	{
-			LOG_TRACE << "Peer SSL certificate serial number " << rmt.SSLcertInfo()->serialNumber()
-				  << ", issued by: " << rmt.SSLcertInfo()->issuer();
-			LOG_TRACE << "Peer SSL certificate valid from " << boost::posix_time::from_time_t( rmt.SSLcertInfo()->notBefore())
-				  << " to " <<  boost::posix_time::from_time_t( rmt.SSLcertInfo()->notAfter());
-			LOG_TRACE << "Peer SSL certificate subject: " << rmt.SSLcertInfo()->subject();
-			LOG_TRACE << "Peer SSL certificate Common Name: " << rmt.SSLcertInfo()->commonName();
+		case net::ConnectionEndpoint::UDP:
+			LOG_FATAL << "UDP local connection type not implemented";
+			abort();
+
+		case net::ConnectionEndpoint::TCP:	{
+			const net::RemoteTCPendpoint& rmt = static_cast<const net::RemoteTCPendpoint&>( remote );
+			LOG_TRACE << "Peer set to " << rmt.toString() << ", connected at " << rmt.connectionTime();
+			break;
 		}
-		break;
-	}
+#ifdef WITH_SSL
+		case net::ConnectionEndpoint::SSL:	{
+			const net::RemoteSSLendpoint& rmt = static_cast<const net::RemoteSSLendpoint&>( remote );
+			LOG_TRACE << "Peer set to " << rmt.toString() << ", connected at " << boost::posix_time::from_time_t( rmt.connectionTime());
+			if ( rmt.SSLcertInfo() )	{
+				LOG_TRACE << "Peer SSL certificate serial number " << rmt.SSLcertInfo()->serialNumber()
+					  << ", issued by: " << rmt.SSLcertInfo()->issuer();
+				LOG_TRACE << "Peer SSL certificate valid from " << boost::posix_time::from_time_t( rmt.SSLcertInfo()->notBefore())
+					  << " to " <<  boost::posix_time::from_time_t( rmt.SSLcertInfo()->notAfter());
+				LOG_TRACE << "Peer SSL certificate subject: " << rmt.SSLcertInfo()->subject();
+				LOG_TRACE << "Peer SSL certificate Common Name: " << rmt.SSLcertInfo()->commonName();
+			}
+			break;
+		}
 #else
-	case net::ConnectionEndpoint::SSL_CONNECTION:
+		case net::ConnectionEndpoint::SSL:
 #endif // WITH_SSL
-	default:
-		LOG_FATAL << "Impossible remote connection type !";
-		abort();
+		default:
+			LOG_FATAL << "Impossible remote connection type !";
+			abort();
 	}
 }
 

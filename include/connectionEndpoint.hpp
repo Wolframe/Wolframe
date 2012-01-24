@@ -49,8 +49,9 @@ class ConnectionEndpoint
 {
 public:
 	enum ConnectionType	{
-		TCP_CONNECTION,
-		SSL_CONNECTION
+		UDP,
+		TCP,
+		SSL
 	};
 
 	enum EndPoint	{
@@ -105,7 +106,7 @@ public:
 	LocalTCPendpoint( const std::string& Host, unsigned short Port )
 		: LocalEndpoint( Host, Port )		{}
 
-	ConnectionType type() const			{ return TCP_CONNECTION; }
+	ConnectionType type() const			{ return TCP; }
 };
 
 #ifdef WITH_SSL
@@ -116,7 +117,7 @@ public:
 	LocalSSLendpoint( const std::string& Host, unsigned short Port )
 		: LocalEndpoint( Host, Port )		{}
 
-	ConnectionType type() const			{ return SSL_CONNECTION; }
+	ConnectionType type() const			{ return SSL; }
 };
 #endif // WITH_SSL
 
@@ -148,7 +149,7 @@ public:
 	RemoteTCPendpoint( const std::string& Host, unsigned short Port )
 		: RemoteEndpoint( Host, Port )		{}
 
-	ConnectionType type() const			{ return TCP_CONNECTION; }
+	ConnectionType type() const			{ return TCP; }
 };
 
 #ifdef WITH_SSL
@@ -166,7 +167,7 @@ public:
 			   const SSLcertificateInfo *SSLinfo )
 		: RemoteEndpoint( Host, Port ), m_SSLinfo( SSLinfo )	{}
 
-	ConnectionType type() const			{ return SSL_CONNECTION; }
+	ConnectionType type() const			{ return SSL; }
 
 	/// SSL certificate information
 	const SSLcertificateInfo* SSLcertInfo() const	{ return m_SSLinfo; }

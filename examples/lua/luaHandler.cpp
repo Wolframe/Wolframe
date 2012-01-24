@@ -184,7 +184,7 @@ luaConnection::luaConnection( const net::LocalEndpoint& local, const luaConfig c
 	: config( config_ )
 {
 	LOG_TRACE	<< "Created connection handler "
-			<< ( ( local.type( ) == _Wolframe::net::ConnectionEndpoint::SSL_CONNECTION ) ? "(SSL) " : "" )
+			<< ( ( local.type( ) == _Wolframe::net::ConnectionEndpoint::SSL ) ? "(SSL) " : "" )
 			<< "for " << local.toString( );
 
 	createVM( );
@@ -204,7 +204,7 @@ void luaConnection::setPeer( const net::RemoteEndpoint& remote )
 
 
 #ifdef WITH_SSL
-	if( remote.type( ) == _Wolframe::net::ConnectionEndpoint::SSL_CONNECTION ) {
+	if( remote.type( ) == _Wolframe::net::ConnectionEndpoint::SSL ) {
 		const _Wolframe::net::RemoteSSLendpoint& rmt = static_cast<const _Wolframe::net::RemoteSSLendpoint&>( remote );
 		if ( rmt.SSLcertInfo( ) ) {
 			LOG_TRACE << "Peer SSL certificate serial number " << rmt.SSLcertInfo()->serialNumber()
@@ -226,7 +226,7 @@ void luaConnection::setPeer( const net::RemoteEndpoint& remote )
 
 #ifdef WITH_SSL
 	_Wolframe::net::ConnectionEndpoint::ConnectionType type = remote.type( );
-	if( type == _Wolframe::net::ConnectionEndpoint::SSL_CONNECTION ) {
+	if( type == _Wolframe::net::ConnectionEndpoint::SSL ) {
 		const _Wolframe::net::RemoteSSLendpoint& rmt = static_cast<const _Wolframe::net::RemoteSSLendpoint&>( remote );
 		if ( rmt.SSLcertInfo( ) ) {
 			lua_newtable( l );
