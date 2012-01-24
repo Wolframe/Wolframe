@@ -37,8 +37,19 @@
 #include "tprocHandler.hpp"
 #include "connectionHandler.hpp"
 #include "handlerConfig.hpp"
+#include "moduleInterface.hpp"
+#include "config/ConfigurationTree.hpp"
 #include "testHandlerTemplates.hpp"
+#define BOOST_FILESYSTEM_VERSION 3
+#include <boost/filesystem.hpp>
+#include <boost/property_tree/info_parser.hpp>
+#include <boost/algorithm/string.hpp>
 #include <gtest/gtest.h>
+#include <map>
+#include <string>
+#include <vector>
+#include <fstream>
+#include <iostream>
 
 using namespace _Wolframe;
 using namespace _Wolframe::tproc;
@@ -50,24 +61,159 @@ public:
 		:Configuration(o)
 	{}
 
-	TestConfiguration( std::size_t ib, std::size_t ob)
+	TestConfiguration( std::size_t ib, std::size_t ob, const std::string& config)
 	{
 		m_data.input_bufsize = ib;
 		m_data.output_bufsize = ob;
+
+		std::istringstream cfgreader( config);
+		boost::property_tree::ptree pt;
+		boost::property_tree::read_info( cfgreader, pt);
+
+		module::ModulesDirectory modules;
+		if (!parse( config::ConfigurationTree(pt), std::string("tproc"), &modules)) throw std::runtime_error( "error in configuration");
+		setCanonicalPathes( (boost::filesystem::current_path() / "temp").string());
 	}
 };
 
 struct TestDescription
 {
-	const char* input;
-	const char* expected;
+	std::string input;
+	std::string expected;
+	std::string config;
 };
-static TestDescription testDescription[] =
+
+static void readFile( const boost::filesystem::path& pt, std::vector<std::string>& hdr, std::vector<std::string>& out)
 {
-	{"CMD1A\r\nCMD1A 'hi arg'\r\nCMD2A 'huga'\r\nCMD3A 1\r\nQUIT\r\n", "OK CMD1A ?\r\nOK CMD1A 'hi arg'\r\nOK CMD2A 'huga'\r\nOK CMD3A '1'\r\nOK enter cmd\r\nBYE\r\n"},
-	{"CMD1B\r\nCMD1A \"hi\" \"\\\"arg\\\"\"\r\nCMD2B 'h' '' 'u' ''\r\nCMD3A 123\r\nQUIT\r\n", "OK CMD1B ?\r\nOK CMD1A 'hi' '\"arg\"'\r\nOK CMD2B 'h' '' 'u' ''\r\nOK CMD3A '123'\r\nOK enter cmd\r\nBYE\r\n"},
-	{0,0}
-};
+	std::string element;
+	char chb;
+	std::fstream infh;
+	infh.exceptions( std::ifstream::failbit | std::ifstream::badbit);
+	infh.open( pt.string().c_str(), std::ios::in | std::ios::binary);
+	std::string splitstr;
+	std::string::const_iterator splititr;
+	enum
+	{
+		PARSE_HDR,
+		PARSE_OUT
+	}
+	type = PARSE_HDR;
+
+	while (infh.read( &chb, sizeof(chb)))
+	{
+		if (chb == '\r' || chb == '\n') break;
+		splitstr.push_back( chb);
+	}
+	splititr = splitstr.begin();
+	if (splititr == splitstr.end())
+	{
+		throw std::runtime_error( "illegal test definition file. no split tag defined at file start");
+	}
+	while (infh.read( &chb, sizeof(chb)))
+	{
+		if (chb != '\r' && chb != '\n') break;
+	}
+	do
+	{
+		if (chb != *splititr) break;
+		++splititr;
+	}
+	while (splititr != splitstr.end() && infh.read( &chb, sizeof(chb)));
+
+	if (splititr != splitstr.end())
+	{
+		throw std::runtime_error( "illegal test definition file. header expected after split tag definition");
+	}
+	splititr = splitstr.begin();
+
+	while (infh.read( &chb, sizeof(chb)))
+	{
+		if (type == PARSE_HDR)
+		{
+			if (chb == '\n')
+			{
+				std::string tag( std::string( element.c_str(), element.size()));
+				boost::trim( tag);
+				if (boost::iequals( tag, "end"))
+				{
+					infh.close();
+					return;
+				}
+				else
+				{
+					hdr.push_back( tag);
+					element.clear();
+					type = PARSE_OUT;
+				}
+			}
+			else
+			{
+				element.push_back( chb);
+			}
+		}
+		else if (type == PARSE_OUT)
+		{
+			element.push_back( chb);
+			if (chb == *splititr)
+			{
+				++splititr;
+				if (splititr == splitstr.end())
+				{
+					out.push_back( std::string( element.c_str(), element.size() - splitstr.size()));
+					element.clear();
+					type = PARSE_HDR;
+				}
+			}
+			else
+			{
+				splititr = splitstr.begin();
+			}
+		}
+	}
+	throw std::runtime_error( "no end tag at end of file");
+}
+
+static void writeFile( const boost::filesystem::path& pt, const std::string& content)
+{
+	std::fstream ff( pt.string().c_str(), std::ios::out | std::ios::binary);
+	ff.exceptions( std::ifstream::failbit | std::ifstream::badbit);
+	ff.write( content.c_str(), content.size());
+}
+
+static const TestDescription getTestDescription( const boost::filesystem::path& pt)
+{
+	TestDescription rt;
+	std::vector<std::string> header;
+	std::vector<std::string> content;
+	readFile( pt, header, content);
+
+	std::vector<std::string>::const_iterator hi=header.begin();
+	std::vector<std::string>::const_iterator itr=content.begin(),end=content.end();
+
+	for (;itr != end; ++itr,++hi)
+	{
+		if (boost::iequals( *hi, "input"))
+		{
+			rt.input.append( *itr);
+		}
+		else if (boost::iequals( *hi, "output"))
+		{
+			rt.expected.append( *itr);
+		}
+		else if (boost::iequals( *hi, "config"))
+		{
+			rt.config.append( *itr);
+		}
+		else if (boost::starts_with( *hi, "file:"))
+		{
+			std::string filename( hi->c_str()+sizeof("file:"));
+			boost::trim( filename);
+			boost::filesystem::path fn( boost::filesystem::current_path() / "temp" / filename);
+			writeFile( fn, *itr);
+		}
+	}
+	return rt;
+}
 
 class TProcHandlerTest : public ::testing::Test
 {
@@ -99,14 +245,14 @@ public:
 	TProcHandlerTestInstance( const TestDescription& descr, std::size_t ib, std::size_t ob)
 		:ep( "127.0.0.1", 12345)
 		,m_connection(0)
-		,m_config( ib + EoDBufferSize, ob + MinOutBufferSize)
+		,m_config( ib + EoDBufferSize, ob + MinOutBufferSize, descr.config)
 		,m_input( descr.input)
 		,m_expected( descr.expected)
 		,m_inputBufferSize(ib)
 		,m_outputBufferSize(ob)
-		{
-			m_connection = new tproc::Connection( ep, &m_config);
-		}
+	{
+		m_connection = new tproc::Connection( ep, &m_config);
+	}
 
 	~TProcHandlerTestInstance()
 	{
@@ -127,21 +273,35 @@ public:
 
 TEST_F( TProcHandlerTest, tests)
 {
-	unsigned int ti;
 	enum {NOF_IB=8,NOF_OB=3};
 	std::size_t ib[ NOF_IB] = {1,2,3,5,11,13,23,127};
 	std::size_t ob[ NOF_OB] = {1,2,3};
 
-	for (ti=0; testDescription[ti].input; ti++)
+	boost::filesystem::recursive_directory_iterator itr( boost::filesystem::current_path() / "data"), end;
+
+	for (; itr != end; ++itr)
 	{
-		for (int ii=0; ii<NOF_IB; ii++)
+		if (boost::iequals( boost::filesystem::extension( *itr), ".txt"))
 		{
-			for (int oo=0; oo<NOF_OB; oo++)
+			std::cerr << "Processing file '" << *itr << "'" << std::endl;
+
+			boost::filesystem::remove_all( boost::filesystem::current_path() / "temp" );
+			boost::filesystem::create_directory( boost::filesystem::current_path() / "temp");
+
+			TestDescription td = getTestDescription( *itr);
+			for (int ii=0; ii<NOF_IB; ii++)
 			{
-				TProcHandlerTestInstance test( testDescription[ti], ib[ii], ob[oo]);
-				EXPECT_EQ( 0, test.run());
-				EXPECT_EQ( test.expected(), test.output());
+				for (int oo=0; oo<NOF_OB; oo++)
+				{
+					TProcHandlerTestInstance test( td, ib[ii], ob[oo]);
+					EXPECT_EQ( 0, test.run());
+					EXPECT_EQ( test.expected(), test.output());
+				}
 			}
+		}
+		else
+		{
+			std::cerr << "Ignoring file '" << *itr << "'" << std::endl;
 		}
 	}
 }

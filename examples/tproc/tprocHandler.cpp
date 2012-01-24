@@ -171,26 +171,23 @@ int CommandHandler::endRun( protocol::CommandHandler* ch, std::ostream& out)
 	int argc;
 	const char** argv;
 	const char* lastcmd = chnd->getCommand( argc, argv);
-	int err = ch->statusCode();
+	m_statusCode = ch->statusCode();
+	int rt = stateidx();
 
 	if (lastcmd)
 	{
 		try
 		{
-			return runCommand( lastcmd, argc, argv, out);
+			rt = runCommand( lastcmd, argc, argv, out);
 		}
 		catch (const std::exception& e)
 		{
 			LOG_ERROR << "exception in command execution: " << e.what();
-			err = -11;
+			m_statusCode = -1;
 		}
 	}
-	if (err)
-	{
-		m_statusCode = err;
-	}
 	delete ch;
-	return stateidx();
+	return rt;
 }
 
 int CommandHandler::doCmd3A( int argc, const char** argv, std::ostream& out)

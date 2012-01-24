@@ -51,15 +51,15 @@ using namespace _Wolframe::iproc;
 
 struct TestDescription
 {
-	const char* name;				///< determines the name of the result and of the expected result file
+	const char* name;			///< determines the name of the result and of the expected result file
 	const char* scriptfile;			///< script to execute
 	const char* datafile;			///< input to feed
-	unsigned int elementBuffersize;	///< additional buffer for the output to hold at least one result element
+	unsigned int elementBuffersize;		///< additional buffer for the output to hold at least one result element
 };
 
 enum
 {
-	EoDBufferSize = 4		///< size of buffer needed for end of data marker
+	EoDBufferSize = 4			///< size of buffer needed for end of data marker
 };
 
 static const TestDescription testDescriptions[] =

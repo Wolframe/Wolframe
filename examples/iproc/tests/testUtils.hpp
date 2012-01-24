@@ -36,7 +36,7 @@
 ///\brief Some common code of tests (not in an own object file because of test program build issues)
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
-#include <boost/thread/thread.hpp>
+#include <boost/thread.hpp>
 #include <string>
 #include <fstream>
 #include <iostream>
