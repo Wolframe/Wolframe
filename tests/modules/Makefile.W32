@@ -1,6 +1,6 @@
 TOPDIR = ..\..
 
-SUBDIRS =
+SUBDIRS = tests
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
@@ -26,9 +26,7 @@ INCLUDE_LIBS = \
 TEST_CPP_BINS = \
 	moduleTest.exe
 
-OBJS = \
-
-all: $(OBJS) $(CPP_BINS)
+OBJS =
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
@@ -41,7 +39,7 @@ local_clean:
 
 local_distclean:
 
-local_test:
+local_test: tests\mod_test
 	@-echo @echo off > test.bat
 	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
 	@-echo moduleTest >> test.bat

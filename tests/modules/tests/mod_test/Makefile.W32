@@ -24,8 +24,6 @@ DYNAMIC_MODULE = \
 CPP_OBJS = \
 	mod_test.obj
 
-all: $(DYNAMIC_MODULE)
-
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 $(DYNAMIC_MODULE): $(CPP_OBJS)
@@ -37,4 +35,4 @@ local_clean:
 
 local_distclean:
 
-local_test:
+local_test: $(DYNAMIC_MODULE)

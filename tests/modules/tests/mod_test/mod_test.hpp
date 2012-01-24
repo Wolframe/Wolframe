@@ -41,7 +41,13 @@ namespace _Wolframe {
 namespace module {
 namespace test {
 
-extern "C" ModuleEntryPoint entryPoint;
+#ifdef _WIN32
+#define DLLEXPORT __declspec( dllexport )
+#else
+#define DLLEXPORT
+#endif
+
+extern "C" DLLEXPORT ModuleEntryPoint entryPoint;
 
 // the implementation of a plugin full-filling the TestUnit interface
 class TestUnit : public TestUnitBase

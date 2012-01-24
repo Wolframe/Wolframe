@@ -1,5 +1,0 @@
-LIBRARY mod_test
-DESCRIPTION "Test module"
-
-EXPORTS
-entryPoint	@1
