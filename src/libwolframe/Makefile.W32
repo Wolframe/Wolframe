@@ -37,6 +37,7 @@ LOGGER_OBJS = \
 	logger\logger.obj
 
 PROVIDER_OBJS = \
+	provider\Authorization.obj \
 	provider\AAAAproviderImpl.obj \
 	provider\AAAAproviderConfig.obj \
 	provider\DBproviderImpl.obj \
