@@ -70,7 +70,7 @@ class TestUnitBase
 public:
 	// may not be private and must be virtual, can be empty as
 	// we define an interface here only
-	virtual ~TestUnitBase( );
+	virtual ~TestUnitBase( ) { };
 
 	// must be virtual, otherwise moduleTest tries to link a hello
 	// function in which can't exist there!

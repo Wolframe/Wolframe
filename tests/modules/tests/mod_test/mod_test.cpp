@@ -71,12 +71,13 @@ void TestModuleConfig::setCanonicalPathes( const std::string& refPath )
 {
 }
 
-TestModuleContainer::TestModuleContainer( const TestModuleConfig& conf )
+TestModuleContainer::TestModuleContainer( const TestModuleConfig& /* conf */ )
 {
+	m_test = new TestUnit( /* conf */ );	
 	MOD_LOG_NOTICE << "Test module container created";
 }
 
-TestUnitBase::~TestUnitBase( )
+TestUnit::TestUnit( )
 {
 }
 

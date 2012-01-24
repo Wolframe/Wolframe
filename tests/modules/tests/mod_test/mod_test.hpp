@@ -49,6 +49,9 @@ class TestUnit : public TestUnitBase
 	virtual bool resolveDB( const db::DatabaseProvider& /* db */ );
 
 public:
+	// test unit has no configuration, so have an empty constructor
+	TestUnit( );
+	
 	virtual ~TestUnit( ) { };
 
 	virtual const std::string hello( );
