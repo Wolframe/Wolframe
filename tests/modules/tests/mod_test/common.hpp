@@ -74,6 +74,8 @@ public:
 
 	// must be virtual, otherwise moduleTest tries to link a hello
 	// function in which can't exist there!
+	// must be abstract too, otherwise we get a dlopen error with 
+	// 'typeinfo for _Wolframe::module::test::TestUnitBase' missing
 	virtual const std::string hello( ) = 0;
 };
 
