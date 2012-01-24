@@ -54,6 +54,8 @@ TEST_F( ModuleFixture, LoadingModuleFromDir )
 
 	string s = unit->hello( );
 	ASSERT_EQ( s, "hello" );
+	
+	delete unit;
 }
 
 int main( int argc, char **argv )
