@@ -92,6 +92,7 @@ public:
 
 	const char* objectName() const			{ return m_audit->typeName(); }
 	virtual AuditUnit* object() const		{ return m_audit; }
+	void dispose()					{ m_audit = NULL; delete this; }
 private:
 	DBauditor*		m_audit;
 };

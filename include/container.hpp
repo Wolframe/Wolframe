@@ -54,7 +54,7 @@ class ObjectContainer : public Container
 {
 public:
 	virtual ~ObjectContainer()	{}
-	virtual void dispose()		{ delete this; }
+	virtual void dispose() = 0;
 	virtual T* object() const = 0;
 };
 

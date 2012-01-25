@@ -97,7 +97,7 @@ bool TestUnit::resolveDB( const db::DatabaseProvider& /* db */ )
 	return true;
 }
 
-static ModuleContainer* createModule( void )
+static ContainerBuilder* createModule( void )
 {
 	static module::ContainerDescription< test::TestModuleContainer,
 		test::TestModuleConfig > mod( "Test Module", "Test", "test", "TestObject" );

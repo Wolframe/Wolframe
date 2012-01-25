@@ -95,6 +95,7 @@ public:
 
 	virtual const char* objectName() const		{ return m_authz->typeName(); }
 	virtual AuthorizationUnit* object() const	{ return m_authz; }
+	void dispose()					{ m_authz = NULL; delete this; }
 private:
 	 DBauthorizer*		m_authz;
 };

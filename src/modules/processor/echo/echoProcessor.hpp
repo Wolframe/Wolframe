@@ -90,6 +90,7 @@ public:
 
 	virtual const char* objectName() const		{ return m_proc->typeName(); }
 	virtual proc::ProcessorUnit* object() const	{ return m_proc; }
+	void dispose()					{ m_proc = NULL; delete this; }
 private:
 	EchoProcessorUnit*	m_proc;
 };

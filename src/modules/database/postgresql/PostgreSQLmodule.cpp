@@ -44,7 +44,7 @@ _Wolframe::log::LogBackend*	logBackendPtr;
 namespace _Wolframe {
 namespace module {
 
-static ModuleContainer* createModule( void )
+static ContainerBuilder* createModule( void )
 {
 	static ContainerDescription< db::PostgreSQLcontainer,
 			db::PostgreSQLconfig > mod( "PostgreSQL database", "database",

@@ -43,7 +43,7 @@ _Wolframe::log::LogBackend*	logBackendPtr;
 namespace _Wolframe {
 namespace module {
 
-static ModuleContainer* createModule( void )
+static ContainerBuilder* createModule( void )
 {
 	static module::ContainerDescription< AAAA::DBauthContainer,
 			AAAA::DatabaseAuthConfig > mod( "Authentication database", "Authentication",

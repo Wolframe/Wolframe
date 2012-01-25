@@ -101,6 +101,7 @@ public:
 	const std::string& ID() const			{ return m_db->ID(); }
 	virtual const char* objectName() const		{ return m_db->typeName(); }
 	virtual DatabaseUnit* object() const		{ return m_db; }
+	void dispose()					{ m_db = NULL; delete this; }
 private:
 	SQLiteDatabase*		m_db;
 };

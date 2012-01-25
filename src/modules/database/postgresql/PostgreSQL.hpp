@@ -106,11 +106,12 @@ class PostgreSQLcontainer : public ObjectContainer< db::DatabaseUnit >
 {
 public:
 	PostgreSQLcontainer( const PostgreSQLconfig& conf );
-	~PostgreSQLcontainer()				{}
+	~PostgreSQLcontainer()				{ if ( m_db ) delete m_db; }
 
 	virtual const std::string& ID() const		{ return m_db->ID(); }
 	virtual const char* objectName() const		{ return m_db->typeName(); }
 	virtual DatabaseUnit* object() const		{ return m_db; }
+	void dispose()					{ m_db = NULL; delete this; }
 private:
 	PostgreSQLdatabase*	m_db;
 };

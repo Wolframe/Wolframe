@@ -103,10 +103,10 @@ AuthenticationFactory::AuthenticationFactory( const std::list< config::ObjectCon
 {
 	for ( std::list<config::ObjectConfiguration*>::const_iterator it = confs.begin();
 							it != confs.end(); it++ )	{
-		module::ModuleContainer* container = modules->getContainer((*it)->objectName());
-		if ( container )	{
+		module::ContainerBuilder* builder = modules->getContainer((*it)->objectName());
+		if ( builder )	{
 			ObjectContainer< AuthenticationUnit >* auth =
-					dynamic_cast< ObjectContainer< AuthenticationUnit >* >( container->container( **it ));
+					dynamic_cast< ObjectContainer< AuthenticationUnit >* >( builder->container( **it ));
 			m_authenticators.push_back( auth->object() );
 			LOG_TRACE << "'" << auth->objectName() << "' authentication unit registered";
 			auth->dispose();
@@ -141,10 +141,10 @@ AuditProvider::AuditProvider( const std::list< config::ObjectConfiguration* >& c
 {
 	for ( std::list<config::ObjectConfiguration*>::const_iterator it = confs.begin();
 								it != confs.end(); it++ )	{
-		module::ModuleContainer* container = modules->getContainer((*it)->objectName());
-		if ( container )	{
+		module::ContainerBuilder* builder = modules->getContainer((*it)->objectName());
+		if ( builder )	{
 			ObjectContainer< AuditUnit >* audit =
-					dynamic_cast< ObjectContainer< AuditUnit >* >( container->container( **it ));
+					dynamic_cast< ObjectContainer< AuditUnit >* >( builder->container( **it ));
 			m_auditors.push_back( audit->object() );
 			LOG_TRACE << "'" << audit->objectName() << "' audit unit registered";
 			audit->dispose();

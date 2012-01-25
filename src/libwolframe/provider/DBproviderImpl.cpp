@@ -67,10 +67,10 @@ DatabaseProvider::DatabaseProvider_Impl::DatabaseProvider_Impl( const DBprovider
 {
 	for ( std::list< config::ObjectConfiguration* >::const_iterator it = conf->m_config.begin();
 									it != conf->m_config.end(); it++ )	{
-		module::ModuleContainer* container = modules->getContainer((*it)->objectName());
-		if ( container )	{
+		module::ContainerBuilder* builder = modules->getContainer((*it)->objectName());
+		if ( builder )	{
 			ObjectContainer< db::DatabaseUnit >* db =
-					dynamic_cast< ObjectContainer< db::DatabaseUnit >* >( container->container( **it ));
+					dynamic_cast< ObjectContainer< db::DatabaseUnit >* >( builder->container( **it ));
 			m_db.push_back( db->object() );
 			LOG_TRACE << "'" << db->objectName() << "' database unit registered";
 			db->dispose();

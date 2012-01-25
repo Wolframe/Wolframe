@@ -43,7 +43,7 @@ TEST_F( ModuleFixture, LoadingModuleFromDir )
 	bool res = LoadModules( modDir, modFiles );
 	ASSERT_TRUE( res );
 	
-	ModuleContainer* container = modDir.getContainer( "TestObject" );
+	ContainerBuilder* container = modDir.getContainer( "TestObject" );
 	ASSERT_TRUE( container != NULL );
 	
 	config::ObjectConfiguration* configuration = container->configuration( "TestObject" );

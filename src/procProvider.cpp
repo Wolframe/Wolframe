@@ -69,9 +69,9 @@ bool ProcProviderConfig::parse( const config::ConfigurationTree& pt, const std::
 		}
 		else	{
 			if ( modules )	{
-				module::ModuleContainer* container = modules->getContainer( "processor", L1it->first );
-				if ( container )	{
-					config::ObjectConfiguration* conf = container->configuration( logPrefix().c_str());
+				module::ContainerBuilder* builder = modules->getContainer( "processor", L1it->first );
+				if ( builder )	{
+					config::ObjectConfiguration* conf = builder->configuration( logPrefix().c_str());
 					if ( conf->parse( L1it->second, L1it->first, modules ))
 						m_procConfig.push_back( conf );
 					else	{
@@ -175,10 +175,10 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 
 	for ( std::list< config::ObjectConfiguration* >::const_iterator it = conf->m_procConfig.begin();
 									it != conf->m_procConfig.end(); it++ )	{
-		module::ModuleContainer* container = modules->getContainer((*it)->objectName());
-		if ( container )	{
+		module::ContainerBuilder* builder = modules->getContainer((*it)->objectName());
+		if ( builder )	{
 			ObjectContainer< ProcessorUnit >* proc =
-					dynamic_cast< ObjectContainer< ProcessorUnit >* >( container->container( **it ));
+					dynamic_cast< ObjectContainer< ProcessorUnit >* >( builder->container( **it ));
 			m_proc.push_back( proc->object() );
 			LOG_TRACE << "'" << proc->objectName() << "' processor unit registered";
 			proc->dispose();

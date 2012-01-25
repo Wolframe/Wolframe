@@ -41,9 +41,9 @@
 namespace _Wolframe {
 namespace module {
 
-bool ModulesDirectory::addContainer( ModuleContainer* container )
+bool ModulesDirectory::addContainer( ContainerBuilder* container )
 {
-	for ( std::list< ModuleContainer* >::const_iterator it = m_container.begin();
+	for ( std::list< ContainerBuilder* >::const_iterator it = m_container.begin();
 							it != m_container.end(); it++ )	{
 		if ( boost::algorithm::iequals( (*it)->section, container->section ) &&
 				boost::algorithm::iequals( (*it)->keyword, container->keyword ))	{
@@ -64,10 +64,10 @@ bool ModulesDirectory::addContainer( ModuleContainer* container )
 }
 
 
-ModuleContainer* ModulesDirectory::getContainer( const std::string& section,
+ContainerBuilder* ModulesDirectory::getContainer( const std::string& section,
 						 const std::string& keyword ) const
 {
-	for ( std::list< ModuleContainer* >::const_iterator it = m_container.begin();
+	for ( std::list< ContainerBuilder* >::const_iterator it = m_container.begin();
 							it != m_container.end(); it++ )	{
 		if ( boost::algorithm::iequals( (*it)->keyword, keyword ) &&
 				boost::algorithm::iequals( (*it)->section, section ))
@@ -76,9 +76,9 @@ ModuleContainer* ModulesDirectory::getContainer( const std::string& section,
 	return NULL;
 }
 
-ModuleContainer* ModulesDirectory::getContainer( const std::string& name ) const
+ContainerBuilder* ModulesDirectory::getContainer( const std::string& name ) const
 {
-	for ( std::list< ModuleContainer* >::const_iterator it = m_container.begin();
+	for ( std::list< ContainerBuilder* >::const_iterator it = m_container.begin();
 							it != m_container.end(); it++ )	{
 		if ( boost::algorithm::iequals( (*it)->name, name ))
 			return *it;

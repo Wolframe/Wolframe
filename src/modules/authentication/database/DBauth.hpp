@@ -93,7 +93,7 @@ public:
 
 	virtual const char* objectName() const			{ return m_auth->objectName(); }
 	virtual AuthenticationUnit* object() const		{ return m_auth; }
-
+	void dispose()					{ m_auth = NULL; delete this; }
 private:
 	DBauthenticator*	m_auth;
 };

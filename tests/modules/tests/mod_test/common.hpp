@@ -47,7 +47,7 @@ class TestModuleConfig :  public config::ObjectConfiguration
 
 public:
 	TestModuleConfig( const char* cfgName, const char* logParent, const char* logName );
-	
+
 	virtual ~TestModuleConfig( ) {}
 
 	virtual const char* objectName() const		{ return "TestUnit"; }
@@ -55,7 +55,7 @@ public:
 	/// methods
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,
 		    const module::ModulesDirectory* modules );
-	
+
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 	void setCanonicalPathes( const std::string& referencePath );
@@ -70,11 +70,11 @@ class TestUnitBase
 public:
 	// may not be private and must be virtual, can be empty as
 	// we define an interface here only
-	virtual ~TestUnitBase( ) { };
+	virtual ~TestUnitBase( ) { }
 
 	// must be virtual, otherwise moduleTest tries to link a hello
 	// function in which can't exist there!
-	// must be abstract too, otherwise we get a dlopen error with 
+	// must be abstract too, otherwise we get a dlopen error with
 	// 'typeinfo for _Wolframe::module::test::TestUnitBase' missing
 	virtual const std::string hello( ) = 0;
 };
@@ -83,14 +83,14 @@ class TestModuleContainer : public ObjectContainer< TestUnitBase >
 {
 public:
 	TestModuleContainer( const TestModuleConfig& conf );
-	
+
 	~TestModuleContainer()			{}
 
 	virtual const char* objectName() const	{ return "TestUnit"; }
 	virtual TestUnitBase* object() const	{ return m_test; }
-
+	void dispose()				{ m_test = NULL; delete this; }
 private:
-	TestUnitBase *m_test;	
+	TestUnitBase *m_test;
 };
 
 }}} // namespace _Wolframe::module::test

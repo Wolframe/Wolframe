@@ -46,31 +46,31 @@
 namespace _Wolframe {
 namespace module {
 
-struct ModuleContainer
+struct ContainerBuilder
 {
 	const char* title;
 	const char* section;
 	const char* keyword;
 	const char* name;
 public:
-	ModuleContainer( const char* Title, const char* Section, const char* Keyword,
+	ContainerBuilder( const char* Title, const char* Section, const char* Keyword,
 			 const char* Name )
 		: title( Title ), section( Section), keyword( Keyword ),
 		  name( Name ){}
 
-	virtual ~ModuleContainer()		{}
+	virtual ~ContainerBuilder()		{}
 
 	virtual config::ObjectConfiguration* configuration( const char* logPrefix ) = 0;
 	virtual Container* container( const config::ObjectConfiguration& conf ) = 0;
 };
 
 template < class T, class Tconf >
-class ContainerDescription : public ModuleContainer
+class ContainerDescription : public ContainerBuilder
 {
 public:
 	ContainerDescription( const char* Title, const char* Section, const char* Keyword,
 			      const char* Name )
-		: ModuleContainer( Title, Section, Keyword, Name )	{}
+		: ContainerBuilder( Title, Section, Keyword, Name )	{}
 	virtual ~ContainerDescription()		{}
 
 	virtual config::ObjectConfiguration* configuration( const char* logPrefix ){
@@ -88,13 +88,13 @@ public:
 	ModulesDirectory()	{}
 	~ModulesDirectory()	{}
 
-	bool addContainer( ModuleContainer* container );
+	bool addContainer( ContainerBuilder* container );
 
-	ModuleContainer* getContainer( const std::string& section, const std::string& keyword ) const;
-	ModuleContainer* getContainer( const std::string& name ) const;
+	ContainerBuilder* getContainer( const std::string& section, const std::string& keyword ) const;
+	ContainerBuilder* getContainer( const std::string& name ) const;
 
 private:
-	std::list< ModuleContainer* >	m_container;
+	std::list< ContainerBuilder* >	m_container;
 };
 
 
@@ -117,11 +117,11 @@ struct ModuleEntryPoint
 	unsigned short ifaceVersion;
 	ModuleType moduleType;
 	const char* name;
-	ModuleContainer* (*create)();
+	ContainerBuilder* (*create)();
 	void (*setLogger)(void*);
 public:
 	ModuleEntryPoint( unsigned short iVer, ModuleType modType, const char* modName,
-			  ModuleContainer* (*createFunc)(),
+			  ContainerBuilder* (*createFunc)(),
 			  void (*setLoggerFunc)(void*))
 		: ifaceVersion( iVer ), moduleType( modType ), name( modName ),
 		  create( createFunc ), setLogger( setLoggerFunc )

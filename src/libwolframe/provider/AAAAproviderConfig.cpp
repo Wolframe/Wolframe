@@ -86,9 +86,9 @@ bool AAAAconfiguration::parse( const config::ConfigurationTree& pt, const std::s
 						retVal = false;
 				}
 				else if ( modules )	{
-					module::ModuleContainer* container = modules->getContainer( "Authentication", L2it->first );
-					if ( container )	{
-						config::ObjectConfiguration* conf = container->configuration( logPrefix().c_str());
+					module::ContainerBuilder* builder = modules->getContainer( "Authentication", L2it->first );
+					if ( builder )	{
+						config::ObjectConfiguration* conf = builder->configuration( logPrefix().c_str());
 						if ( conf->parse( L2it->second, L2it->first, modules ))
 							m_authConfig.push_back( conf );
 						else	{
@@ -109,9 +109,9 @@ bool AAAAconfiguration::parse( const config::ConfigurationTree& pt, const std::s
 			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
 									L2it != L1it->second.end(); L2it++ )	{
 				if ( modules )	{
-					module::ModuleContainer* container = modules->getContainer( "Authorization", L2it->first );
-					if ( container )	{
-						config::ObjectConfiguration* conf = container->configuration( logPrefix().c_str());
+					module::ContainerBuilder* builder = modules->getContainer( "Authorization", L2it->first );
+					if ( builder )	{
+						config::ObjectConfiguration* conf = builder->configuration( logPrefix().c_str());
 						if ( conf->parse( L2it->second, L2it->first, modules ))
 							m_authzConfig.push_back( conf );
 						else	{
@@ -137,9 +137,9 @@ bool AAAAconfiguration::parse( const config::ConfigurationTree& pt, const std::s
 						retVal = false;
 				}
 				else if ( modules )	{
-					module::ModuleContainer* container = modules->getContainer( "Audit", L2it->first );
-					if ( container )	{
-						config::ObjectConfiguration* conf = container->configuration( logPrefix().c_str());
+					module::ContainerBuilder* builder = modules->getContainer( "Audit", L2it->first );
+					if ( builder )	{
+						config::ObjectConfiguration* conf = builder->configuration( logPrefix().c_str());
 						if ( conf->parse( L2it->second, L2it->first, modules ))
 							m_auditConfig.push_back( conf );
 						else	{
