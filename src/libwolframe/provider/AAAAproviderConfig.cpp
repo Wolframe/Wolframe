@@ -48,7 +48,7 @@ namespace AAAA {
 /// constructor
 AAAAconfiguration::AAAAconfiguration()
 	: config::ConfigurationBase( "AAAA", NULL, "AAAA configuration"  ),
-	  m_allowAnonymous( false )	{}
+	  m_allowAnonymous( false ), m_authzDefault( false )	{}
 
 /// destructor
 AAAAconfiguration::~AAAAconfiguration()
@@ -73,6 +73,7 @@ bool AAAAconfiguration::parse( const config::ConfigurationTree& pt, const std::s
 	using namespace _Wolframe::config;
 	bool retVal = true;
 	bool allowDefined = false;
+	bool authzDfltDefined = false;
 	bool mandatoryDefined = false;
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
@@ -108,6 +109,11 @@ bool AAAAconfiguration::parse( const config::ConfigurationTree& pt, const std::s
 		else if ( boost::algorithm::iequals( L1it->first, "Authorization" ))	{
 			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
 									L2it != L1it->second.end(); L2it++ )	{
+				if ( boost::algorithm::iequals( "default", L2it->first ))	{
+					if ( ! Parser::getValue( logPrefix().c_str(), *L2it, m_authzDefault,
+								 Parser::BoolDomain(), &authzDfltDefined ))
+						retVal = false;
+				}
 				if ( modules )	{
 					module::ContainerBuilder* builder = modules->getContainer( "Authorization", L2it->first );
 					if ( builder )	{
@@ -174,6 +180,7 @@ void AAAAconfiguration::print( std::ostream& os, size_t /* indent */ ) const
 		(*it)->print( os, 6 );
 
 	os << "   Authorization" << std::endl;
+	os << "      Default: " << (m_authzDefault ? "allow" : "deny") << std::endl;
 	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_authzConfig.begin();
 								it != m_authzConfig.end(); it++ )
 		(*it)->print( os, 6 );

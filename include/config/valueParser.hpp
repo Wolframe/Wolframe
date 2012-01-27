@@ -232,13 +232,13 @@ public:
 	struct BoolDomain :public EnumDomain
 	{
 	private:
-		enum {NofBooleanEnum=8};
+		enum {NofBooleanEnum=10};
 
 		///\brief returns the accepted string representations of a boolean
 		///\return enumeration of valid boolean values
 		static const char** booleanEnum()
 		{
-			static const char* ar[ NofBooleanEnum ] = {"false", "true", "0", "1", "off", "on", "no", "yes"};
+			static const char* ar[ NofBooleanEnum ] = {"false", "true", "0", "1", "off", "on", "no", "yes", "deny", "allow"};
 			return ar;
 		}
 		///\brief Returns the boolean value of an accepted token

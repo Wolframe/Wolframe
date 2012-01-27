@@ -65,12 +65,24 @@ public:
 class AuthorizationUnit
 {
 public:
+	enum Result	{
+		DENIED,
+		ALLOWED,
+		IGNORED,
+		ERROR
+	};
+
 	virtual ~AuthorizationUnit()	{}
 
 	virtual const char* typeName() const = 0;
 
 	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ )
 					{ return true; }
+
+	virtual const char* name() const = 0;
+
+	virtual Result connectAllowed( const net::LocalEndpoint& local,
+				       const net::RemoteEndpoint& remote ) = 0;
 };
 
 }} // namespace _Wolframe::AAAA

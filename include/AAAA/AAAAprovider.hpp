@@ -63,6 +63,7 @@ public:
 private:
 	bool						m_allowAnonymous;
 	std::list< config::ObjectConfiguration* >	m_authConfig;
+	bool						m_authzDefault;
 	std::list< config::ObjectConfiguration* >	m_authzConfig;
 	bool						m_mandatoryAudit;
 	std::list< config::ObjectConfiguration* >	m_auditConfig;

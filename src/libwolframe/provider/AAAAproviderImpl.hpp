@@ -68,11 +68,11 @@ private:
 };
 
 
-// Standard authorization class and authorization provider
+// Standard authorization classes and authorization provider
 class StandardAuthorizer : public Authorizer
 {
 public:
-	StandardAuthorizer( const std::list< AuthorizationUnit* >& units );
+	StandardAuthorizer( const std::list< AuthorizationUnit* >& units, bool dflt );
 	~StandardAuthorizer();
 	void close();
 
@@ -80,13 +80,15 @@ public:
 			     std::string& msg );
 private:
 	const std::list< AuthorizationUnit* >&	m_authorizeUnits;
+	bool m_default;
 };
 
 class AuthorizationProvider
 {
 public:
 	AuthorizationProvider( const std::list< config::ObjectConfiguration* >& confs,
-		    const module::ModulesDirectory* modules );
+			       bool authzDefault,
+			       const module::ModulesDirectory* modules );
 	~AuthorizationProvider();
 	bool resolveDB( const db::DatabaseProvider& db );
 

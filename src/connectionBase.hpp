@@ -68,7 +68,6 @@ public:
 		assert( handler != NULL );
 		m_connHandler = handler;
 		m_readBuffer = NULL;
-		LOG_TRACE << "New connection base created";
 	}
 
 	~ConnectionBase()

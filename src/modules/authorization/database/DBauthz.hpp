@@ -68,6 +68,7 @@ public:
 
 	void setCanonicalPathes( const std::string& refPath )	{ m_dbConfig.setCanonicalPathes( refPath ); }
 private:
+	std::string		m_name;
 	config::ReferenceConfig	m_dbConfig;
 };
 
@@ -76,12 +77,17 @@ private:
 class DBauthorizer : public AuthorizationUnit
 {
 public:
-	DBauthorizer( const std::string& dbLabel );
+	DBauthorizer( const std::string& name, const std::string& dbLabel );
 	~DBauthorizer();
-	virtual const char* typeName() const		{ return "DatabaseAuthorization"; }
+	const char* typeName() const		{ return "DatabaseAuthorization"; }
+	const char* name() const		{ return m_name.c_str(); }
 
-	virtual bool resolveDB( const db::DatabaseProvider& db );
+	bool resolveDB( const db::DatabaseProvider& db );
+
+	AuthorizationUnit::Result connectAllowed( const net::LocalEndpoint& /*local*/,
+						  const net::RemoteEndpoint& remote );
 private:
+	const std::string	m_name;
 	const std::string	m_dbLabel;
 	const db::Database*	m_db;
 };

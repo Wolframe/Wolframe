@@ -78,7 +78,7 @@ Auditor* AAAAprovider::auditor()
 AAAAprovider::AAAAprovider_Impl::AAAAprovider_Impl( const AAAAconfiguration* conf,
 						    const module::ModulesDirectory* modules )
 	: m_authenticator( conf->m_authConfig, modules ),
-	  m_authorizer( conf->m_authzConfig, modules ),
+	  m_authorizer( conf->m_authzConfig, conf->m_authzDefault, modules ),
 	  m_auditor( conf->m_auditConfig, modules )	{}
 
 bool AAAAprovider::AAAAprovider_Impl::resolveDB( const db::DatabaseProvider& db )

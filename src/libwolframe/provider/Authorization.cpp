@@ -44,7 +44,8 @@ namespace _Wolframe {
 namespace AAAA {
 
 AuthorizationProvider::AuthorizationProvider( const std::list< config::ObjectConfiguration* >& confs,
-			const module::ModulesDirectory* modules )
+					      bool authzDefault,
+					      const module::ModulesDirectory* modules )
 {
 	for ( std::list<config::ObjectConfiguration*>::const_iterator it = confs.begin();
 								it != confs.end(); it++ )	{
@@ -57,11 +58,11 @@ AuthorizationProvider::AuthorizationProvider( const std::list< config::ObjectCon
 			authz->dispose();
 		}
 		else	{
-			LOG_ALERT << "AuthorizationProvider: unknown audit type '" << (*it)->objectName() << "'";
+			LOG_ALERT << "AuthorizationProvider: unknown authorization type '" << (*it)->objectName() << "'";
 			throw std::domain_error( "Unknown authorization mechanism type in AAAAprovider constructor. See log" );
 		}
 	}
-	m_authorizer = new StandardAuthorizer( m_authorizeUnits );
+	m_authorizer = new StandardAuthorizer( m_authorizeUnits, authzDefault );
 }
 
 AuthorizationProvider::~AuthorizationProvider()
@@ -83,8 +84,9 @@ bool AuthorizationProvider::resolveDB( const db::DatabaseProvider& db )
 }
 
 
-StandardAuthorizer::StandardAuthorizer( const std::list< AuthorizationUnit* >& units )
-	: m_authorizeUnits( units )
+StandardAuthorizer::StandardAuthorizer( const std::list< AuthorizationUnit* >& units,
+					bool dflt )
+	: m_authorizeUnits( units ), m_default( dflt)
 {
 }
 
@@ -97,14 +99,33 @@ void StandardAuthorizer::close()
 }
 
 // authorization requests
-bool StandardAuthorizer::connectAllowed( const net::LocalEndpoint& /*local*/,
+bool StandardAuthorizer::connectAllowed( const net::LocalEndpoint& local,
 					 const net::RemoteEndpoint& remote,
-					 std::string& /*msg*/ )
+					 std::string& msg )
 {
-	// that's just for testing - allow localhost only
-	if ( remote.host() == "127.0.0.1" )
-		return true;
-	return false;
+	if ( m_authorizeUnits.empty() )
+		return m_default;
+	bool retVal = true;
+
+	for ( std::list< AuthorizationUnit* >::const_iterator au = m_authorizeUnits.begin();
+							au != m_authorizeUnits.end(); au++ )	{
+		AuthorizationUnit::Result res = (*au)->connectAllowed( local, remote );
+		switch( res )	{
+			case AuthorizationUnit::ALLOWED:
+				break;
+			case AuthorizationUnit::DENIED:
+				msg = "Access denied";
+				retVal = false;
+				break;
+			case AuthorizationUnit::IGNORED:
+				break;
+			case AuthorizationUnit::ERROR:
+				msg = "Error in authorization unit ";
+				msg += (*au)->name();
+				return false;
+		}
+	}
+	return retVal;
 }
 
 }} // namespace _Wolframe::AAAA
