@@ -194,16 +194,9 @@ Requires: openssl >= 0.9.7
 %endif
 %if %{with_pam}
 BuildRequires: pam-devel >= 0.77
-Requires: pam >= 0.77
 %endif
 %if %{with_sasl}
 BuildRequires: cyrus-sasl-devel >= 2.1.19
-%if %{rhel} || %{centos} || %{fedora}
-Requires: cyrus-sasl-lib >= 2.1.19
-%endif
-%if %{suse} || %{sles}
-Requires: cyrus-sasl >= 2.1.22
-%endif
 %endif
 %if %{with_libxml2}
 BuildRequires: libxml2-devel >= 2.6
@@ -310,6 +303,36 @@ Requires: sqlite >= 3.0
 %endif
 %if %{suse} || %{sles}
 Requires: sqlite3 >= 3.0
+%endif
+
+%endif
+
+%if %{with_pam}
+%package pam
+Summary: Wolframe PAM authentication module
+Group: Application/Business
+
+%description pam
+The Wolframe authentication module for PAM.
+
+Requires: %{name} >= %{version}-%{release}
+Requires: pam >= 0.77
+%endif
+
+%if %{with_sasl}
+%package sasl
+Summary: Wolframe SASL authentication module
+Group: Application/Business
+
+%description pam
+The Wolframe authentication module using Cyrus SASL.
+
+Requires: %{name} >= %{version}-%{release}
+%if %{rhel} || %{centos} || %{fedora}
+Requires: cyrus-sasl-lib >= 2.1.19
+%endif
+%if %{suse} || %{sles}
+Requires: cyrus-sasl >= 2.1.22
 %endif
 
 %endif
@@ -552,6 +575,22 @@ fi
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
 %{_libdir}/wolframe/modules/mod_db_sqlite3.so
+%endif
+
+%if %{with_pam}
+%files pam
+%defattr( -, root, root )
+%dir %{_libdir}/wolframe
+%dir %{_libdir}/wolframe/modules
+%{_libdir}/wolframe/modules/mod_auth_pam.so
+%endif
+
+%if %{with_sasl}
+%files sasl
+%defattr( -, root, root )
+%dir %{_libdir}/wolframe
+%dir %{_libdir}/wolframe/modules
+%{_libdir}/wolframe/modules/mod_auth_sasl.so
 %endif
 
 %if %{with_qt}

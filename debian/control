@@ -28,6 +28,18 @@ Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Postgresql database bindings
  <insert long description, indented with spaces>
 
+Package: wolframe-pam
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: PAM authentication bindings
+ <insert long description, indented with spaces>
+
+Package: wolframe-sasl
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: SASL authentication bindings
+ <insert long description, indented with spaces>
+
 Package: wolframe-client
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}

@@ -69,10 +69,20 @@ install: build
 	$(MAKE) install $(WOLFRAME_PARAMS) \
 		sysconfdir=/etc \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe
+
 	# database modules depend on the database client library, each of them in its own package
 	cd src/modules/database; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
 		cd ../../..
+
+	# authentication modules depend on strange libraries, each of the in its own package
+	cd src/modules/authentication/pam; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
+		cd ../../../..
+	cd src/modules/authentication/sasl; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
+		cd ../../../..
+
 	# Qt client depends on X11/Qt, so it deserves it's own package
 	cd clients; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
@@ -91,6 +101,20 @@ install: build
 		cd ../../../..
 	mkdir /usr/src/packages/BUILD/debian/wolframe-postgresql/DEBIAN
 	cp debian/shlibs /usr/src/packages/BUILD/debian/wolframe-postgresql/DEBIAN
+
+	# authentication module for PAM
+	cd src/modules/authentication/pam; $(MAKE) install $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-pam; \
+		cd ../../../..
+	mkdir /usr/src/packages/BUILD/debian/wolframe-pam/DEBIAN
+	cp debian/shlibs /usr/src/packages/BUILD/debian/wolframe-pam/DEBIAN
+
+	# authentication module for Sasl
+	cd src/modules/authentication/sasl; $(MAKE) install $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-sasl; \
+		cd ../../../..
+	mkdir /usr/src/packages/BUILD/debian/wolframe-sasl/DEBIAN
+	cp debian/shlibs /usr/src/packages/BUILD/debian/wolframe-sasl/DEBIAN
 
 	# copy local versions of shared libraries of boost for platforms missing a decent
 	# version of boost
