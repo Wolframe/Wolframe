@@ -324,7 +324,7 @@ Requires: pam >= 0.77
 Summary: Wolframe SASL authentication module
 Group: Application/Business
 
-%description pam
+%description sasl
 The Wolframe authentication module using Cyrus SASL.
 
 Requires: %{name} >= %{version}-%{release}
