@@ -902,6 +902,17 @@ endif
 
 endif
 
+ifeq "$(PLATFORM)" "SUNOS"
+ifeq "$(OS_MAJOR_VERSION)" "5"
+ifeq "$(OS_MINOR_VERSION)" "10"
+PAM_DIR ?= /usr
+PAM_INCLUDE_DIR ?= $(PAM_DIR)/include
+PAM_LIB_DIR ?= $(PAM_DIR)/lib
+PAM_LIBS ?= -lpam
+endif
+endif
+endif
+
 ifeq "$(PLATFORM)" "FREEBSD"
 ifeq "$(OS_MAJOR_VERSION)" "8"
 PAM_DIR ?= NOT SUPPLIED ON THIS PLATFORM
@@ -1054,6 +1065,17 @@ SASL_LIB_DIR ?= $(SASL_DIR)/lib
 SASL_LIBS ?= -lsasl2
 endif
 
+endif
+
+ifeq "$(PLATFORM)" "SUNOS"
+ifeq "$(OS_MAJOR_VERSION)" "5"
+ifeq "$(OS_MINOR_VERSION)" "10"
+SASL_DIR ?= /opt/csw
+SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
+SASL_LIB_DIR ?= $(SASL_DIR)/lib
+SASL_LIBS ?= -lsasl2
+endif
+endif
 endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
@@ -1213,7 +1235,7 @@ endif
 ifeq "$(PLATFORM)" "SUNOS"
 ifeq "$(OS_MAJOR_VERSION)" "5"
 ifeq "$(OS_MINOR_VERSION)" "10"
-SQLITE3_DIR ?= /usr/local
+SQLITE3_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
 SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
 SQLITE3_LIBS ?= -lsqlite3

@@ -151,7 +151,7 @@ local_distclean:
 
 local_test:
 
-run: $(CPP_BINS)
+run:
 	@-echo @echo off > test.bat
 !IFDEF WITH_SSL
 	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat

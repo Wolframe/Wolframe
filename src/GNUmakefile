@@ -152,14 +152,14 @@ local_uninstall:
 
 local_test:
 
-run: $(CPP_BINS)
+run:
 	@echo "Running the Wolframe server..."
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./wolframed -c wolframe.conf -f
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(PGSQL_LIB_DIR):$(TOPDIR)/src/libwolframe ./wolframed -c wolframe.conf -f
 
-check: $(CPP_BINS)
+check:
 	@echo "Running the Wolframe server..."
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./wolframed -c wolframe.conf -t
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(PGSQL_LIB_DIR):$(TOPDIR)/src/libwolframe ./wolframed -c wolframe.conf -t
 
-print: $(CPP_BINS)
+print:
 	@echo "Running the Wolframe server..."
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./wolframed -c wolframe.conf -p
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(PGSQL_LIB_DIR):$(TOPDIR)/src/libwolframe ./wolframed -c wolframe.conf -p
