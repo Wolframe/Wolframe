@@ -456,8 +456,11 @@ Optional packages to install from CSW:
   CSWexpect (5.41.1)
   SUNWlxml
   SUNWlxsl
+  CSWsasl-dev and CSWsasl (2.1.25.REV-2012.01.20)
 
 CSWsqlite3 misses the header files, so use internally supplied version with WITH_LOCAL_SQLITE1=1
+
+PAM is available natively, just add WITH_PATH=1
 
 Build Wolframe:
 
@@ -465,7 +468,8 @@ LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
 OPENSSL_DIR=/opt/csw PGSQL_DIR=/opt/csw/postgresql LIBXML2_DIR=/usr \
 	LIBXSLT_DIR=/usr LIBLT_DIR=/usr BOOST_DIR=/opt/csw/boost-1.48.0 \
 	WITH_EXPECT=1 WITH_SSL=1 WITH_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 \
-	WITH_LIBXSLT=1 WITH_LOCAL_SQLITE3=1 \
+	WITH_LIBXSLT=1 WITH_LOCAL_SQLITE3=1 WITH_LOCAL_SQLITE1=1 \
+	WITH_PAM=1 WITH_SASL=1 \
 	gmake \
 		CC=gcc CXX=g++ CFLAGS=-mcpu=v9 CXXFLAGS=-mcpu=v9
 

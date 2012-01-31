@@ -37,9 +37,12 @@
 #ifndef _SASL_AUTHENTICATION_HPP_INCLUDED
 #define _SASL_AUTHENTICATION_HPP_INCLUDED
 
-#include <string>
 #include "AAAA/authentication.hpp"
 #include "moduleInterface.hpp"
+
+#include <string>
+
+#include "sasl/sasl.h"
 
 namespace _Wolframe {
 namespace AAAA {
