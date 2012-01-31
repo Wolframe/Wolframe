@@ -47,7 +47,7 @@ static ContainerBuilder* createModule( void )
 {
 	static module::ContainerDescription< AAAA::SaslAuthContainer,
 			AAAA::SaslAuthConfig > mod( "Authentication file", "Authentication",
-							"file", "SaslAuth" );
+							"SASL", "SaslAuth" );
 	return &mod;
 }
 

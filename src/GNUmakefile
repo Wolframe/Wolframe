@@ -155,3 +155,11 @@ local_test:
 run: $(CPP_BINS)
 	@echo "Running the Wolframe server..."
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./wolframed -c wolframe.conf -f
+
+check: $(CPP_BINS)
+	@echo "Running the Wolframe server..."
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./wolframed -c wolframe.conf -t
+
+print: $(CPP_BINS)
+	@echo "Running the Wolframe server..."
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./wolframed -c wolframe.conf -p
