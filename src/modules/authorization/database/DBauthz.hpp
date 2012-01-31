@@ -38,7 +38,6 @@
 #define _DB_AUTHORIZATION_HPP_INCLUDED
 
 #include "AAAA/authorization.hpp"
-#include "config/reference.hpp"
 #include "moduleInterface.hpp"
 
 namespace _Wolframe {
@@ -50,26 +49,19 @@ class DatabaseAuthzConfig : public config::ObjectConfiguration
 	friend class DBauthzContainer;
 public:
 	DatabaseAuthzConfig( const char* cfgName, const char* logParent, const char* logName )
-		: config::ObjectConfiguration( cfgName, logParent, logName ),
-		  m_dbConfig( "", logParent, "Database" )	{}
+		: config::ObjectConfiguration( cfgName, logParent, logName )	{}
 
-	virtual const char* objectName() const			{ return "DatabaseAuthorization"; }
+	virtual const char* objectName() const		{ return "DatabaseAuthorization"; }
 
 	/// methods
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,
 		    const module::ModulesDirectory* modules );
-	bool check() const					{ return m_dbConfig.check(); }
+	bool check() const;
 
-	void print( std::ostream& os, size_t indent ) const	{
-		std::string indStr( indent, ' ' );
-		os << indStr << sectionName();
-		m_dbConfig.print( os, 0 );
-	}
-
-	void setCanonicalPathes( const std::string& refPath )	{ m_dbConfig.setCanonicalPathes( refPath ); }
+	void print( std::ostream& os, size_t indent ) const;
 private:
-	std::string		m_name;
-	config::ReferenceConfig	m_dbConfig;
+	std::string	m_name;
+	std::string	m_dbConfig;
 };
 
 
@@ -77,7 +69,7 @@ private:
 class DBauthorizer : public AuthorizationUnit
 {
 public:
-	DBauthorizer( const std::string& name, const std::string& dbLabel );
+	DBauthorizer( const std::string& Name, const std::string& DbLabel );
 	~DBauthorizer();
 	const char* typeName() const		{ return "DatabaseAuthorization"; }
 	const char* name() const		{ return m_name.c_str(); }

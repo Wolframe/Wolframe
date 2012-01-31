@@ -51,7 +51,7 @@ bool PAMAuthConfig::parse( const config::ConfigurationTree& pt, const std::strin
 	using namespace _Wolframe::config;
 	bool retVal = true;
 
-	if ( boost::algorithm::iequals( node, "service" ))	{
+	if ( boost::algorithm::iequals( node, "PAM" ))	{
 		bool isDefined = ( !m_service.empty() );
 		if ( !Parser::getValue( logPrefix().c_str(), node.c_str(),
 					pt.get_value<std::string>(), m_service, &isDefined ))

@@ -514,6 +514,16 @@ src/modules/authentication/database/GNUmakefile
 src/modules/authentication/database/Makefile.W32
 src/modules/authentication/GNUmakefile
 src/modules/authentication/Makefile.W32
+src/modules/authentication/pam/GNUmakefile
+src/modules/authentication/pam/PAMAuthConfig.cpp
+src/modules/authentication/pam/PAMAuth.cpp
+src/modules/authentication/pam/PAMAuth.hpp
+src/modules/authentication/pam/PAMAuthModule.cpp
+src/modules/authentication/sasl/GNUmakefile
+src/modules/authentication/sasl/SaslAuthConfig.cpp
+src/modules/authentication/sasl/SaslAuth.cpp
+src/modules/authentication/sasl/SaslAuth.hpp
+src/modules/authentication/sasl/SaslAuthModule.cpp
 src/modules/authentication/textfile/GNUmakefile
 src/modules/authentication/textfile/Makefile.W32
 src/modules/authentication/textfile/TextFileAuthConfig.cpp

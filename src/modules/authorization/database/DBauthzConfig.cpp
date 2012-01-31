@@ -35,15 +35,53 @@
 //
 
 #include "DBauthz.hpp"
-#include "config/configurationBase.hpp"
+#include "config/valueParser.hpp"
+#include "config/ConfigurationTree.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
 
-bool DatabaseAuthzConfig::parse( const config::ConfigurationTree& pt, const std::string& node,
-				 const module::ModulesDirectory* modules )
+using namespace config;
+
+bool DatabaseAuthzConfig::parse( const config::ConfigurationTree& pt, const std::string& /*node*/,
+				 const module::ModulesDirectory* /*modules*/ )
 {
-	return m_dbConfig.parse( pt, node, modules );
+	using namespace config;
+
+	bool retVal = true;
+
+	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
+		if ( boost::algorithm::iequals( L1it->first, "name" ))	{
+			bool isDefined = ( !m_name.empty() );
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_name, &isDefined ))
+				retVal = false;
+		}
+		else if ( boost::algorithm::iequals( L1it->first, "database" ))	{
+			bool isDefined = ( !m_dbConfig.empty() );
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_dbConfig, &isDefined ))
+				retVal = false;
+		}
+		else	{
+			MOD_LOG_WARNING << logPrefix() << "unknown configuration option: '"
+					<< L1it->first << "'";
+		}
+	}
+	return retVal;
+}
+
+
+bool DatabaseAuthzConfig::check() const
+{
+	return !m_dbConfig.empty();
+}
+
+
+void DatabaseAuthzConfig::print( std::ostream& os, size_t indent ) const
+{
+	std::string indStr( indent, ' ' );
+	os << indStr << sectionName() << std::endl;
+	os << indStr << "   Identifier: " << m_name << std::endl;
+	os << indStr << "   Database: " << m_dbConfig << std::endl;
 }
 
 }} // namespace _Wolframe::config

@@ -43,8 +43,8 @@ namespace _Wolframe {
 namespace AAAA {
 
 //***  Database authorizer  *********************************************
-DBauthorizer::DBauthorizer( const std::string& name, const std::string& dbLabel )
-	: m_name( name ), m_dbLabel( dbLabel )
+DBauthorizer::DBauthorizer( const std::string& Name, const std::string& DbLabel )
+	: m_name( Name ), m_dbLabel( DbLabel )
 {
 	m_db = NULL;
 	if ( m_dbLabel.empty() )
@@ -87,7 +87,7 @@ AuthorizationUnit::Result DBauthorizer::connectAllowed( const net::LocalEndpoint
 //***  Database authorizer container  ***********************************
 DBauthzContainer::DBauthzContainer( const DatabaseAuthzConfig& conf )
 {
-	m_authz = new DBauthorizer( conf.m_name, conf.m_dbConfig.label() );
+	m_authz = new DBauthorizer( conf.m_name, conf.m_dbConfig );
 	MOD_LOG_TRACE << "Database authorizer container created";
 }
 

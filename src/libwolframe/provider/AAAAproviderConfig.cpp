@@ -114,7 +114,7 @@ bool AAAAconfiguration::parse( const config::ConfigurationTree& pt, const std::s
 								 Parser::BoolDomain(), &authzDfltDefined ))
 						retVal = false;
 				}
-				if ( modules )	{
+				else if ( modules )	{
 					module::ContainerBuilder* builder = modules->getContainer( "Authorization", L2it->first );
 					if ( builder )	{
 						config::ObjectConfiguration* conf = builder->configuration( logPrefix().c_str());
