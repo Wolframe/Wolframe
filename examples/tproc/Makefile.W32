@@ -98,7 +98,7 @@ local_clean:
 	@-erase tests\*.obj 2>NUL
 	@-erase tests\*.dll 2>NUL
 	@-erase tests\*.exe 2>NUL
-	@-erase tests\temp 2>NUL
+	@-erase /q tests\temp 2>NUL
 
 local_distclean:
 
