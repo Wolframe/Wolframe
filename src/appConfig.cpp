@@ -92,8 +92,10 @@ const char* ApplicationConfiguration::chooseFile( const char *globalFile, const 
 bool ApplicationConfiguration::addConfig( const std::string& nodeName,
 					  ConfigurationBase* conf )
 {
+	std::string nodeNameLC = nodeName;
+	boost::algorithm::to_lower( nodeNameLC );
 	// check if the label already exists
-	if ( m_section.find( nodeName ) != m_section.end() )
+	if ( m_section.find( nodeNameLC ) != m_section.end() )
 		return false;
 
 	// find the appropriate index in the configurations vector
@@ -110,7 +112,7 @@ bool ApplicationConfiguration::addConfig( const std::string& nodeName,
 		pos = m_conf.size();
 		m_conf.push_back( conf );
 	}
-	m_section[ nodeName ] = pos;
+	m_section[ nodeNameLC ] = pos;
 
 	return true;
 }
@@ -293,7 +295,9 @@ bool ApplicationConfiguration::parse ( const char *filename, ConfigFileType type
 			if ( boost::algorithm::iequals( it->first, MODULE_SECTION ))
 				continue;
 			std::map< std::string, std::size_t >::iterator confIt;
-			if (( confIt = m_section.find( it->first ) ) != m_section.end() )	{
+			std::string nodeNameLC = it->first;
+			boost::algorithm::to_lower( nodeNameLC );
+			if (( confIt = m_section.find( nodeNameLC ) ) != m_section.end() )	{
 				if ( ! (m_conf[confIt->second])->parse( config::ConfigurationTree( it->second ),
 									confIt->first, m_modDir ))
 					retVal = false;
