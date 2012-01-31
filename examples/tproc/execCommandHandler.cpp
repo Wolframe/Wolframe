@@ -225,11 +225,17 @@ protocol::CommandHandler::Operation ExecCommandHandler::nextOperation()
 						continue;
 					}
 				}
+				else if (m_cmdidx == (int)m_parser.size())
+				{
+					m_state = ProtocolError;
+					m_output.print( "BAD unknown\r\n");
+					return WRITE;
+				}
 				else
 				{
 					try
 					{
-						m_cmdhandler = m_cmds[ m_cmdidx - m_nofParentCmds - 1]->create( m_argBuffer.argc(), m_argBuffer.argv());
+						m_cmdhandler = m_cmds[ m_cmdidx - m_nofParentCmds - 2]->create( m_argBuffer.argc(), m_argBuffer.argv());
 						if (m_cmdhandler.get())
 						{
 							m_state = Processing;

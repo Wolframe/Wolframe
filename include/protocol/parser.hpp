@@ -122,83 +122,13 @@ public:
 	}
 };
 
-///\class CmdMap
-///\brief implements a map for set of protocol commands
-///\remark implementation as vector because the set of commands is expected to be small.
-struct CmdMap
-{
-	CmdMap(){}
-	CmdMap( const CmdMap& o) :m_ar(o.m_ar){}
-
-	///\brief predicate for case insensitive comparison in boost::algorithm::starts_with
-	struct ToUpperPredicate
-	{
-		bool operator()( const char& ch1, const char& ch2) const {return ch1==toupper(ch2);}
-	};
-
-	///\brief retrieve a defined commands index from the map
-	///\param value value to retrieve
-	///\return the index of the command or -1 if not found or not determined enough
-	int operator []( const char* value) const
-	{
-		int rt = -1;
-		unsigned int cnt = 0;
-		unsigned int valuesize = strlen(value);
-
-		for (std::vector<std::string>::const_iterator itr = m_ar.begin(); itr != m_ar.end(); itr++)
-		{
-			if (boost::algorithm::starts_with( *itr, value, ToUpperPredicate()))
-			{
-				if (valuesize == itr->size())
-				{
-					return itr-m_ar.begin(); ///< exact match is always returned
-				}
-				if (!cnt) rt = itr-m_ar.begin();
-				cnt++;
-			}
-		}
-		return (cnt==1) ? rt:-1;
-	}
-
-	///\brief See operator[](const char*)
-	int operator []( const std::string& value) const
-	{
-		return operator[]( value.c_str());
-	}
-
-	///\brief insert a command into the map.
-	///\param value value to insert
-	void insert( const std::string& value)
-	{
-		m_ar.push_back( boost::algorithm::to_upper_copy( value));
-	}
-
-	const std::string& get( std::size_t idx) const
-	{
-		return m_ar[ idx];
-	}
-
-	std::size_t size() const
-	{
-		return m_ar.size();
-	}
-
-	typedef std::vector<std::string>::const_iterator const_iterator;
-	const_iterator begin() const				{return m_ar.begin();}
-	const_iterator end() const				{return m_ar.end();}
-
-	const std::vector<std::string>& cmds() const		{return m_ar;}
-private:
-	std::vector<std::string> m_ar;
-};
-
 ///\class CmdParser
 ///\exception Bad
 ///\brief Parser for ascii protocol commands
 ///\tparam CmdBufferType buffer type to use, implementing the STL back insertion sequence interface
 ///\tparam CmdMapType map for the commands defined, implementing the STL back insertion sequence interface for adding and a get(value_type) method for matching
 ///
-template <typename CmdBufferType, class CmdMapType=CmdMap>
+template <typename CmdBufferType>
 class CmdParser :public Parser
 {
 public:
@@ -215,21 +145,21 @@ public:
 	///\brief Reset parser command definitions
 	void init()
 	{
-		m_cmdmap = CmdMapType();
+		m_cmdmap.clear();
 	}
 
 	///\brief Add a command to the protocol parser (case insensitive)
 	///\param [in] cmd command to define
 	void add( const char* cmd)
 	{
-		m_cmdmap.insert( cmd);
+		m_cmdmap.push_back( cmd);
 	}
 
 	///\brief Add a command to the protocol parser (case insensitive)
 	///\param [in] cmd command to define
 	void add( const std::string& cmd)
 	{
-		m_cmdmap.insert( cmd);
+		m_cmdmap.push_back( cmd);
 	}
 
 	std::size_t size() const
@@ -290,14 +220,29 @@ public:
 			buf.push_back( ch);
 		}
 		if (src == end) return -1;
-		int rt = m_cmdmap[ buf];
-		return rt;
+
+		int rt = -1;
+		unsigned int cnt = 0;
+
+		for (std::vector<std::string>::const_iterator itr = m_cmdmap.begin(); itr != m_cmdmap.end(); itr++)
+		{
+			if (boost::algorithm::starts_with( *itr, buf.c_str()))
+			{
+				if (buf.size() == itr->size())
+				{
+					return itr-m_cmdmap.begin(); ///< exact match is always returned
+				}
+				if (!cnt) rt = itr-m_cmdmap.begin();
+				cnt++;
+			}
+		}
+		return (cnt==1) ? rt:-1;
 	}
 
 	const std::string capabilities() const
 	{
 		std::string rt;
-		CmdMap::const_iterator itr=m_cmdmap.begin(), end=m_cmdmap.end();
+		std::vector<std::string>::const_iterator itr=m_cmdmap.begin(), end=m_cmdmap.end();
 		for (; itr != end; ++itr)
 		{
 			rt.append( *itr);
@@ -308,13 +253,13 @@ public:
 
 	const char* getcmd( std::size_t idx) const
 	{
-		return m_cmdmap.get( idx).c_str();
+		return m_cmdmap.at( idx).c_str();
 	}
 
-	const std::vector<std::string>& cmds() const		{return m_cmdmap.cmds();}
+	const std::vector<std::string>& cmds() const		{return m_cmdmap;}
 
 private:
-	CmdMapType m_cmdmap;					///< commands of the parser
+	std::vector<std::string> m_cmdmap;					///< commands of the parser
 };
 
 } // namespace protocol

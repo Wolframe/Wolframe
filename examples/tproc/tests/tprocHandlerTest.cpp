@@ -81,9 +81,46 @@ struct TestDescription
 	std::string input;
 	std::string expected;
 	std::string config;
+	std::string requires;
 };
 
-static void readFile( const boost::filesystem::path& pt, std::vector<std::string>& hdr, std::vector<std::string>& out)
+static const char* check_flag( const std::string& flag)
+{
+	if (boost::iequals( flag, "DISABLED")) return "DISABLED ";
+#if !(WITH_LUA)
+	if (boost::iequals( flag, "LUA")) return "WITH_LUA=1 ";
+#endif
+#if !(WITH_SSL)
+	if (boost::iequals( flag, "SSL")) return "WITH_SSL=1 ";
+#endif
+#if !(WITH_QT)
+	if (boost::iequals( flag, "QT")) return "WITH_QT=1 ";
+#endif
+#if !(WITH_PAM)
+	if (boost::iequals( flag, "PAM")) return "WITH_PAM=1 ";
+#endif
+#if !(WITH_SASL)
+	if (boost::iequals( flag, "SASL")) return "WITH_SASL=1 ";
+#endif
+#if !(WITH_SQLITE3)
+	if (boost::iequals( flag, "SQLITE3")) return "WITH_SQLITE3=1 ";
+#endif
+#if !(WITH_LOCAL_SQLITE3)
+	if (boost::iequals( flag, "LOCAL_SQLITE3")) return "WITH_LOCAL_SQLITE3=1 ";
+#endif
+#if !(WITH_PGSQL)
+	if (boost::iequals( flag, "PGSQL")) return "WITH_PGSQL=1 ";
+#endif
+#if !(WITH_LIBXML2)
+	if (boost::iequals( flag, "LIBXML2")) return "WITH_LIBXML2=1 ";
+#endif
+#if !(WITH_LIBXSLT)
+	if (boost::iequals( flag, "LIBXSLT")) return "WITH_LIBXSLT=1 ";
+#endif
+	return "";
+}
+
+static void readFile( const boost::filesystem::path& pt, std::vector<std::string>& hdr, std::vector<std::string>& out, std::string& requires)
 {
 	std::string element;
 	char chb;
@@ -95,7 +132,8 @@ static void readFile( const boost::filesystem::path& pt, std::vector<std::string
 	enum
 	{
 		PARSE_HDR,
-		PARSE_OUT
+		PARSE_OUT,
+		PARSE_NOT
 	}
 	type = PARSE_HDR;
 
@@ -139,6 +177,15 @@ static void readFile( const boost::filesystem::path& pt, std::vector<std::string
 					infh.close();
 					return;
 				}
+				else if (boost::starts_with( tag, "requires:"))
+				{
+					std::size_t nn = std::strlen("requires:");
+					std::string flagname( std::string( tag.c_str()+nn, tag.size()-nn));
+					boost::trim( flagname);
+					requires.append( check_flag( flagname));
+					type = PARSE_NOT;
+					splititr = splitstr.begin();
+				}
 				else
 				{
 					hdr.push_back( tag);
@@ -162,7 +209,29 @@ static void readFile( const boost::filesystem::path& pt, std::vector<std::string
 					out.push_back( std::string( element.c_str(), element.size() - splitstr.size()));
 					element.clear();
 					type = PARSE_HDR;
+					splititr = splitstr.begin();
 				}
+			}
+			else
+			{
+				splititr = splitstr.begin();
+			}
+		}
+		else if (type == PARSE_NOT)
+		{
+			if (chb == *splititr)
+			{
+				++splititr;
+				if (splititr == splitstr.end())
+				{
+					element.clear();
+					type = PARSE_HDR;
+					splititr = splitstr.begin();
+				}
+			}
+			else if (chb > ' ' || chb < 0)
+			{
+				throw std::runtime_error( "illegal test definition file. tag definition expected");
 			}
 			else
 			{
@@ -185,7 +254,7 @@ static const TestDescription getTestDescription( const boost::filesystem::path& 
 	TestDescription rt;
 	std::vector<std::string> header;
 	std::vector<std::string> content;
-	readFile( pt, header, content);
+	readFile( pt, header, content, rt.requires);
 
 	std::vector<std::string>::const_iterator hi=header.begin();
 	std::vector<std::string>::const_iterator itr=content.begin(),end=content.end();
@@ -281,14 +350,18 @@ TEST_F( TProcHandlerTest, tests)
 
 	for (; itr != end; ++itr)
 	{
-		if (boost::iequals( boost::filesystem::extension( *itr), ".txt"))
+		if (boost::iequals( boost::filesystem::extension( *itr), ".tst"))
 		{
-			std::cerr << "Processing file '" << *itr << "'" << std::endl;
-
 			boost::filesystem::remove_all( boost::filesystem::current_path() / "temp" );
 			boost::filesystem::create_directory( boost::filesystem::current_path() / "temp");
 
 			TestDescription td = getTestDescription( *itr);
+			if (td.requires.size())
+			{
+				std::cerr << "skipping test '" << *itr << "' ( is " << td.requires << ")" << std::endl;
+				continue;
+			}
+			std::cerr << "processing test '" << *itr << "'" << std::endl;
 			for (int ii=0; ii<NOF_IB; ii++)
 			{
 				for (int oo=0; oo<NOF_OB; oo++)
@@ -299,9 +372,9 @@ TEST_F( TProcHandlerTest, tests)
 				}
 			}
 		}
-		else
+		else if (!boost::filesystem::is_directory( *itr))
 		{
-			std::cerr << "Ignoring file '" << *itr << "'" << std::endl;
+			std::cerr << "ignoring file '" << *itr << "'" << std::endl;
 		}
 	}
 }
