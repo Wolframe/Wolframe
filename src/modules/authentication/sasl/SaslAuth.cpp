@@ -60,7 +60,8 @@ bool SaslAuthConfig::check() const
 void SaslAuthConfig::print( std::ostream& os, size_t indent ) const
 {
 	std::string indStr( indent, ' ' );
-	os << indStr << sectionName() << ": " << m_file << std::endl;
+	os << indStr << sectionName() << std::endl;
+	os << indStr << "   SASL file: " << m_file << std::endl;
 }
 
 void SaslAuthConfig::setCanonicalPathes( const std::string& refPath )
@@ -80,7 +81,7 @@ void SaslAuthConfig::setCanonicalPathes( const std::string& refPath )
 SaslAuthenticator::SaslAuthenticator( const std::string& filename )
 	: m_file( filename )
 {
-	MOD_LOG_DEBUG << "Text file authenticator created with file '" << m_file << "'";
+	MOD_LOG_DEBUG << "SASL authenticator created with file '" << m_file << "'";
 }
 
 SaslAuthenticator::~SaslAuthenticator()
@@ -91,7 +92,7 @@ SaslAuthenticator::~SaslAuthenticator()
 SaslAuthContainer::SaslAuthContainer( const SaslAuthConfig& conf )
 {
 	m_auth = new SaslAuthenticator( conf.m_file );
-	MOD_LOG_NOTICE << "Text file authenticator container created";
+	MOD_LOG_NOTICE << "SASL authenticator container created";
 }
 
 }} // namespace _Wolframe::AAAA

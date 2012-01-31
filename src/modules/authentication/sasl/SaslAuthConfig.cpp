@@ -41,31 +41,26 @@
 #include "SaslAuth.hpp"
 
 #include "boost/algorithm/string.hpp"
-#define BOOST_FILESYSTEM_VERSION 3
-#include <boost/filesystem.hpp>
 
 namespace _Wolframe {
 namespace AAAA {
 
-bool SaslAuthConfig::parse( const config::ConfigurationTree& pt, const std::string& node,
+bool SaslAuthConfig::parse( const config::ConfigurationTree& pt, const std::string& /*node*/,
 				const module::ModulesDirectory* /*modules*/ )
 {
 	using namespace _Wolframe::config;
 	bool retVal = true;
 
-	if ( boost::algorithm::iequals( node, "file" ) || boost::algorithm::iequals( node, "filename" ))	{
-		bool isDefined = ( !m_file.empty() );
-		if ( !Parser::getValue( logPrefix().c_str(), node.c_str(),
-					pt.get_value<std::string>(), m_file, &isDefined ))
-			retVal = false;
-		else	{
-			if ( ! boost::filesystem::path( m_file ).is_absolute() )
-				MOD_LOG_WARNING << logPrefix() << "authentication file path is not absolute: "
-					    << m_file;
+	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
+		if ( boost::algorithm::iequals( L1it->first, "file" ))	{
+			bool isDefined = ( !m_file.empty() );
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_file, &isDefined ))
+				retVal = false;
 		}
-	}
-	else	{
-		MOD_LOG_WARNING << logPrefix() << "unknown configuration option: '" << node << "'";
+		else	{
+			MOD_LOG_WARNING << logPrefix() << "unknown configuration option: '"
+					<< L1it->first << "'";
+		}
 	}
 	return retVal;
 }

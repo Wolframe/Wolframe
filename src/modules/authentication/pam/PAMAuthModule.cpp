@@ -46,7 +46,7 @@ namespace module {
 static ContainerBuilder* createModule( void )
 {
 	static module::ContainerDescription< AAAA::PAMAuthContainer,
-			AAAA::PAMAuthConfig > mod( "Authentication PAM", "Authentication",
+			AAAA::PAMAuthConfig > mod( "PAM authentication", "Authentication",
 							"PAM", "PAMAuth" );
 	return &mod;
 }
@@ -57,7 +57,7 @@ static void setModuleLogger( void* logger )
 }
 
 
-ModuleEntryPoint entryPoint( 0, CONTAINER_MODULE, "PAM Authentication",
+ModuleEntryPoint entryPoint( 0, CONTAINER_MODULE, "PAM authentication",
 			     createModule, setModuleLogger );
 
 }} // namespace _Wolframe::module

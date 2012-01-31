@@ -46,7 +46,7 @@ namespace module {
 static ContainerBuilder* createModule( void )
 {
 	static module::ContainerDescription< AAAA::SaslAuthContainer,
-			AAAA::SaslAuthConfig > mod( "Authentication file", "Authentication",
+			AAAA::SaslAuthConfig > mod( "SASL authentication", "Authentication",
 							"SASL", "SaslAuth" );
 	return &mod;
 }
@@ -57,7 +57,7 @@ static void setModuleLogger( void* logger )
 }
 
 
-ModuleEntryPoint entryPoint( 0, CONTAINER_MODULE, "Text File Authentication",
+ModuleEntryPoint entryPoint( 0, CONTAINER_MODULE, "SASL authentication",
 			     createModule, setModuleLogger );
 
 }} // namespace _Wolframe::module

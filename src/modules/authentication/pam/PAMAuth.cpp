@@ -56,7 +56,8 @@ bool PAMAuthConfig::check() const
 void PAMAuthConfig::print( std::ostream& os, size_t indent ) const
 {
 	std::string indStr( indent, ' ' );
-	os << indStr << sectionName() << ": " << m_service << std::endl;
+	os << indStr << sectionName() << std::endl;
+	os << indStr << "   PAM service: " << m_service << std::endl;
 }
 
 
