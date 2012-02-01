@@ -103,18 +103,19 @@ bool StandardAuthorizer::connectAllowed( const net::LocalEndpoint& local,
 					 const net::RemoteEndpoint& remote,
 					 std::string& msg )
 {
-	if ( m_authorizeUnits.empty() )
-		return m_default;
 	bool retVal = true;
+	bool ignored = true;
 
 	for ( std::list< AuthorizationUnit* >::const_iterator au = m_authorizeUnits.begin();
 							au != m_authorizeUnits.end(); au++ )	{
 		AuthorizationUnit::Result res = (*au)->connectAllowed( local, remote );
 		switch( res )	{
 			case AuthorizationUnit::ALLOWED:
+				ignored = false;
 				break;
 			case AuthorizationUnit::DENIED:
 				msg = "Access denied";
+				ignored = false;
 				retVal = false;
 				break;
 			case AuthorizationUnit::IGNORED:
@@ -125,7 +126,10 @@ bool StandardAuthorizer::connectAllowed( const net::LocalEndpoint& local,
 				return false;
 		}
 	}
-	return retVal;
+	if ( ignored )
+		return m_default;
+	else
+		return retVal;
 }
 
 }} // namespace _Wolframe::AAAA
