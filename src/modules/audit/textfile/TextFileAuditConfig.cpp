@@ -59,7 +59,7 @@ bool TextFileAuditConfig::parse( const config::ConfigurationTree& pt, const std:
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_required, Parser::BoolDomain(), &reqDefined ))
 				retVal = false;
 		}
-		else if ( boost::algorithm::iequals( L1it->first, "database" ))	{
+		else if ( boost::algorithm::iequals( L1it->first, "file" ))	{
 			bool isDefined = ( !m_file.empty() );
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_file, &isDefined ))
 				retVal = false;
