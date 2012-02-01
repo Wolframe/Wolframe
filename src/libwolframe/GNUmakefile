@@ -39,7 +39,9 @@ LOGGER_OBJS = \
 	logger/logger.o
 
 PROVIDER_OBJS = \
+	provider/Authentication.o \
 	provider/Authorization.o \
+	provider/Audit.o \
 	provider/AAAAproviderImpl.o \
 	provider/AAAAproviderConfig.o \
 	provider/DBproviderImpl.o \

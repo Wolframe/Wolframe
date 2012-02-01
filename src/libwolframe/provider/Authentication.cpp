@@ -31,7 +31,7 @@
 
 ************************************************************************/
 //
-// AAAA provider implementation
+// Authentication factory implementation
 //
 
 #include <stdexcept>
@@ -43,56 +43,39 @@
 namespace _Wolframe {
 namespace AAAA {
 
-/// AAAAprovider PIMPL
-AAAAprovider::AAAAprovider( const AAAAconfiguration* conf,
-			    const module::ModulesDirectory* modules )
-	: m_impl( new AAAAprovider_Impl( conf, modules ))	{}
-
-AAAAprovider::~AAAAprovider()
+AuthenticationFactory::AuthenticationFactory( const std::list< config::ObjectConfiguration* >& confs,
+					  const module::ModulesDirectory* modules )
 {
-	delete m_impl;
+	for ( std::list<config::ObjectConfiguration*>::const_iterator it = confs.begin();
+							it != confs.end(); it++ )	{
+		module::ContainerBuilder* builder = modules->getContainer((*it)->objectName());
+		if ( builder )	{
+			ObjectContainer< AuthenticationUnit >* auth =
+					dynamic_cast< ObjectContainer< AuthenticationUnit >* >( builder->container( **it ));
+			m_authenticators.push_back( auth->object() );
+			LOG_TRACE << "'" << auth->objectName() << "' authentication unit registered";
+			auth->dispose();
+		}
+		else	{
+			LOG_ALERT << "AuthenticationFactory: unknown authentication type '" << (*it)->objectName() << "'";
+			throw std::domain_error( "Unknown authentication mechanism type in AAAAprovider constructor. See log" );
+		}
+	}
 }
 
-bool AAAAprovider::resolveDB( const db::DatabaseProvider& db )
+AuthenticationFactory::~AuthenticationFactory()
 {
-	return m_impl->resolveDB( db );
+	for ( std::list< AuthenticationUnit* >::const_iterator it = m_authenticators.begin();
+								it != m_authenticators.end(); it++ )
+		delete *it;
 }
 
-Authenticator* AAAAprovider::authenticator()
+bool AuthenticationFactory::resolveDB( const db::DatabaseProvider& db )
 {
-	return m_impl->authenticator();
-}
-
-Authorizer* AAAAprovider::authorizer() const
-{
-	return m_impl->authorizer();
-}
-
-Auditor* AAAAprovider::auditor()
-{
-	return m_impl->auditor();
-}
-
-
-/// AAAAprovider PIMPL implementation
-AAAAprovider::AAAAprovider_Impl::AAAAprovider_Impl( const AAAAconfiguration* conf,
-						    const module::ModulesDirectory* modules )
-	: m_authenticator( conf->m_authConfig, modules ),
-	  m_authorizer( conf->m_authzConfig, conf->m_authzDefault, modules ),
-	  m_auditor( conf->m_auditConfig, modules )	{}
-
-bool AAAAprovider::AAAAprovider_Impl::resolveDB( const db::DatabaseProvider& db )
-{
-	LOG_DATA << "Resolving authentication databases";
-	if ( !m_authenticator.resolveDB( db ))
-		return false;
-	LOG_DATA << "Resolving authorization databases";
-	if ( !m_authorizer.resolveDB( db ))
-		return false;
-	LOG_DATA << "Resolving audit databases";
-	if ( !m_auditor.resolveDB( db ))
-		return false;
-	LOG_DEBUG << "AAAA database references resolved";
+	for ( std::list< AuthenticationUnit* >::const_iterator it = m_authenticators.begin();
+								it != m_authenticators.end(); it++ )
+		if ( ! (*it)->resolveDB( db ) )
+			return false;
 	return true;
 }
 

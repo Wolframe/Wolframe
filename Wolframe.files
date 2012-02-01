@@ -480,6 +480,8 @@ src/libwolframe/moduleDirectory.cpp
 src/libwolframe/provider/AAAAproviderConfig.cpp
 src/libwolframe/provider/AAAAproviderImpl.cpp
 src/libwolframe/provider/AAAAproviderImpl.hpp
+src/libwolframe/provider/Audit.cpp
+src/libwolframe/provider/Authentication.cpp
 src/libwolframe/provider/Authorization.cpp
 src/libwolframe/provider/DBproviderConfig.cpp
 src/libwolframe/provider/DBproviderImpl.cpp
