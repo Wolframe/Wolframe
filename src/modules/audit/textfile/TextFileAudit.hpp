@@ -61,6 +61,7 @@ public:
 	void print( std::ostream& os, size_t indent ) const;
 	void setCanonicalPathes( const std::string& referencePath );
 private:
+	bool		m_required;
 	std::string	m_file;
 };
 
@@ -72,7 +73,9 @@ public:
 	~TextFileAuditor();
 	virtual const char* typeName() const		{ return "FileAudit"; }
 
+	bool required()					{ return m_required; }
 private:
+	bool		m_required;
 	std::string	m_file;
 };
 

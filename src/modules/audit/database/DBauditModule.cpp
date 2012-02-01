@@ -46,7 +46,7 @@ namespace module {
 static ContainerBuilder* createModule( void )
 {
 	static module::ContainerDescription< AAAA::DBauditContainer,
-			AAAA::DBauditConfig > mod( "Audit database", "Audit",
+			AAAA::DBauditConfig > mod( "Audit - database", "audit",
 						   "database", "DatabaseAudit" );
 	return &mod;
 }

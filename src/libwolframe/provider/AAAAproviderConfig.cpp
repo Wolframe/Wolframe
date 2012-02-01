@@ -48,7 +48,8 @@ namespace AAAA {
 /// constructor
 AAAAconfiguration::AAAAconfiguration()
 	: config::ConfigurationBase( "AAAA", NULL, "AAAA configuration"  ),
-	  m_allowAnonymous( false ), m_authzDefault( false )	{}
+	  m_allowAnonymous( false ), m_authzDefault( false ), m_mandatoryAudit( true )
+{}
 
 /// destructor
 AAAAconfiguration::~AAAAconfiguration()

@@ -46,8 +46,8 @@ namespace module {
 static ContainerBuilder* createModule( void )
 {
 	static module::ContainerDescription< AAAA::TextFileAuditContainer,
-			AAAA::TextFileAuditConfig > mod( "Audit file", "Audit",
-						     "file", "FileAudit" );
+			AAAA::TextFileAuditConfig > mod( "Audit - text file", "audit",
+						     "TextFile", "FileAudit" );
 	return &mod;
 }
 

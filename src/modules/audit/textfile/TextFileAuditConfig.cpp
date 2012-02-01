@@ -46,27 +46,60 @@
 namespace _Wolframe {
 namespace AAAA {
 
-bool TextFileAuditConfig::parse( const config::ConfigurationTree& pt, const std::string& node,
+bool TextFileAuditConfig::parse( const config::ConfigurationTree& pt, const std::string& /*node*/,
 			     const module::ModulesDirectory* /*modules*/ )
 {
-	using namespace _Wolframe::config;
-	bool retVal = true;
+	using namespace config;
 
-	if ( boost::algorithm::iequals( node, "file" ) || boost::algorithm::iequals( node, "filename" ))	{
-		bool isDefined = ( ! m_file.empty() );
-		if ( !Parser::getValue( logPrefix().c_str(), node.c_str(),
-					pt.get_value<std::string>(), m_file, &isDefined ))
-			retVal = false;
+	bool retVal = true;
+	bool reqDefined = false;
+
+	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
+		if ( boost::algorithm::iequals( L1it->first, "required" ))	{
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_required, Parser::BoolDomain(), &reqDefined ))
+				retVal = false;
+		}
+		else if ( boost::algorithm::iequals( L1it->first, "database" ))	{
+			bool isDefined = ( !m_file.empty() );
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_file, &isDefined ))
+				retVal = false;
+		}
 		else	{
-			if ( ! boost::filesystem::path( m_file ).is_absolute() )
-				MOD_LOG_WARNING << logPrefix() << "audit file path is not absolute: "
-					    << m_file;
+			MOD_LOG_WARNING << logPrefix() << "unknown configuration option: '"
+					<< L1it->first << "'";
 		}
 	}
-	else	{
-		MOD_LOG_WARNING << logPrefix() << "unknown configuration option: '" << node << "'";
-	}
 	return retVal;
+}
+
+bool TextFileAuditConfig::check() const
+{
+	if ( m_file.empty() )	{
+		MOD_LOG_ERROR << logPrefix() << "Audit filename cannot be empty";
+		return false;
+	}
+	return true;
+}
+
+void TextFileAuditConfig::print( std::ostream& os, size_t indent ) const
+{
+	std::string indStr( indent, ' ' );
+	os << indStr << sectionName() << std::endl;
+	os << indStr << "   Required: " << (m_required ? "yes" : "no") << std::endl;
+	os << indStr << "   File: " << m_file << std::endl;
+}
+
+void TextFileAuditConfig::setCanonicalPathes( const std::string& refPath )
+{
+	using namespace boost::filesystem;
+
+	if ( ! m_file.empty() )	{
+		if ( ! path( m_file ).is_absolute() )
+			m_file = resolvePath( absolute( m_file,
+							path( refPath ).branch_path()).string());
+		else
+			m_file = resolvePath( m_file );
+	}
 }
 
 }} // namespace _Wolframe::config

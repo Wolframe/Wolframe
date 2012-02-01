@@ -77,7 +77,7 @@ bool DBauditor::resolveDB( const db::DatabaseProvider& db )
 
 DBauditContainer::DBauditContainer( const DBauditConfig& conf )
 {
-	m_audit = new DBauditor( conf.m_dbConfig.label());
+	m_audit = new DBauditor( conf.m_dbConfig );
 	MOD_LOG_TRACE << "Database auditor container created";
 }
 

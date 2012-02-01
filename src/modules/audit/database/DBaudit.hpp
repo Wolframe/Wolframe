@@ -49,24 +49,19 @@ class DBauditConfig : public config::ObjectConfiguration
 	friend class DBauditContainer;
 public:
 	DBauditConfig( const char* cfgName, const char* logParent, const char* logName )
-		: config::ObjectConfiguration( cfgName, logParent, logName ),
-		  m_dbConfig( "", logParent, "" )	{}
+		: config::ObjectConfiguration( cfgName, logParent, logName )
+	{ m_required = true; }
 
 	virtual const char* objectName() const		{ return "DatabaseAudit"; }
 
 	/// methods
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,
 		    const module::ModulesDirectory* modules );
-	bool check() const				{ return m_dbConfig.check(); }
-	void print( std::ostream& os, size_t indent ) const	{
-		std::string indStr( indent, ' ' );
-		os << indStr << sectionName();
-		m_dbConfig.print( os, 0 );
-	}
-
-	void setCanonicalPathes( const std::string& refPath )	{ m_dbConfig.setCanonicalPathes( refPath ); }
+	bool check() const;
+	void print( std::ostream& os, size_t indent ) const;
 private:
-	config::ReferenceConfig	m_dbConfig;
+	bool			m_required;
+	std::string		m_dbConfig;
 };
 
 
@@ -78,7 +73,10 @@ public:
 	virtual const char* typeName() const		{ return "DatabaseAudit"; }
 
 	virtual bool resolveDB( const db::DatabaseProvider& db );
+
+	bool required()					{ return m_required; }
 private:
+	bool			m_required;
 	std::string		m_dbLabel;
 	const db::Database*	m_db;
 };

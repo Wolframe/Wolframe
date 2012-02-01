@@ -35,15 +35,53 @@
 //
 
 #include "DBaudit.hpp"
+#include "config/valueParser.hpp"
 #include "config/ConfigurationTree.hpp"
+
 namespace _Wolframe {
 namespace AAAA {
 
-bool DBauditConfig::parse( const config::ConfigurationTree& pt, const std::string& node,
-			   const module::ModulesDirectory* modules )
+bool DBauditConfig::parse( const config::ConfigurationTree& pt, const std::string& /*node*/,
+			   const module::ModulesDirectory* /*modules*/ )
 {
-	return m_dbConfig.parse( pt, node, modules );
+	using namespace config;
+
+	bool retVal = true;
+	bool reqDefined = false;
+
+	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
+		if ( boost::algorithm::iequals( L1it->first, "required" ))	{
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_required, Parser::BoolDomain(), &reqDefined ))
+				retVal = false;
+		}
+		else if ( boost::algorithm::iequals( L1it->first, "database" ))	{
+			bool isDefined = ( !m_dbConfig.empty() );
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_dbConfig, &isDefined ))
+				retVal = false;
+		}
+		else	{
+			MOD_LOG_WARNING << logPrefix() << "unknown configuration option: '"
+					<< L1it->first << "'";
+		}
+	}
+	return retVal;
 }
 
-}} // namespace _Wolframe::config
+
+bool DBauditConfig::check() const
+{
+	return !m_dbConfig.empty();
+}
+
+
+void DBauditConfig::print( std::ostream& os, size_t indent ) const
+{
+	std::string indStr( indent, ' ' );
+	os << indStr << sectionName() << std::endl;
+	os << indStr << "   Required: " << (m_required ? "yes" : "no") << std::endl;
+	os << indStr << "   Database: " << m_dbConfig << std::endl;
+}
+
+}} // namespace _Wolframe::AAAA
+
 

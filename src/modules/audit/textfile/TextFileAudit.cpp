@@ -46,35 +46,6 @@ namespace _Wolframe {
 namespace AAAA {
 
 /// Audit to file
-bool TextFileAuditConfig::check() const
-{
-	if ( m_file.empty() )	{
-		MOD_LOG_ERROR << logPrefix() << "Audit filename cannot be empty";
-		return false;
-	}
-	return true;
-}
-
-void TextFileAuditConfig::print( std::ostream& os, size_t indent ) const
-{
-	std::string indStr( indent, ' ' );
-	os << indStr << sectionName() << ": " << m_file << std::endl;
-}
-
-void TextFileAuditConfig::setCanonicalPathes( const std::string& refPath )
-{
-	using namespace boost::filesystem;
-
-	if ( ! m_file.empty() )	{
-		if ( ! path( m_file ).is_absolute() )
-			m_file = resolvePath( absolute( m_file,
-							path( refPath ).branch_path()).string());
-		else
-			m_file = resolvePath( m_file );
-	}
-}
-
-
 TextFileAuditor::TextFileAuditor( const std::string& filename )
 	: m_file( filename )
 {
