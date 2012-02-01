@@ -15,4 +15,4 @@ local_clean:
 local_distclean:
 
 local_test:
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./checkConfig.sh $(EXPECT)
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(PGSQL_LIB_DIR):$(TOPDIR)/src/libwolframe ./checkConfig.sh $(EXPECT)
