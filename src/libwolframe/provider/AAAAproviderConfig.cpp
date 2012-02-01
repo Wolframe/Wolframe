@@ -79,17 +79,18 @@ bool AAAAconfiguration::parse( const config::ConfigurationTree& pt, const std::s
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "Authentication" ) ||
 				boost::algorithm::iequals( L1it->first, "Auth" ))	{
+			std::string logStr = logPrefix() + "authentication: ";
 			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
 									L2it != L1it->second.end(); L2it++ )	{
 				if ( boost::algorithm::iequals( "allowAnonymous", L2it->first ))	{
-					if ( ! Parser::getValue( logPrefix().c_str(), *L2it, m_allowAnonymous,
+					if ( ! Parser::getValue( logStr.c_str(), *L2it, m_allowAnonymous,
 								 Parser::BoolDomain(), &allowDefined ))
 						retVal = false;
 				}
 				else if ( modules )	{
 					module::ContainerBuilder* builder = modules->getContainer( "Authentication", L2it->first );
 					if ( builder )	{
-						config::ObjectConfiguration* conf = builder->configuration( logPrefix().c_str());
+						config::ObjectConfiguration* conf = builder->configuration( logStr.c_str());
 						if ( conf->parse( L2it->second, L2it->first, modules ))
 							m_authConfig.push_back( conf );
 						else	{
@@ -98,26 +99,27 @@ bool AAAAconfiguration::parse( const config::ConfigurationTree& pt, const std::s
 						}
 					}
 					else
-						LOG_WARNING << logPrefix() << "unknown configuration option: '"
+						LOG_WARNING << logStr << "authentication: unknown configuration option: '"
 							    << L2it->first << "'";
 				}
 				else
-					LOG_WARNING << logPrefix() << "unknown configuration option: '"
+					LOG_WARNING << logStr << "authentication: unknown configuration option: '"
 						    << L2it->first << "'";
 			}
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "Authorization" ))	{
+			std::string logStr = logPrefix() + "authorization: ";
 			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
 									L2it != L1it->second.end(); L2it++ )	{
 				if ( boost::algorithm::iequals( "default", L2it->first ))	{
-					if ( ! Parser::getValue( logPrefix().c_str(), *L2it, m_authzDefault,
+					if ( ! Parser::getValue( logStr.c_str(), *L2it, m_authzDefault,
 								 Parser::BoolDomain(), &authzDfltDefined ))
 						retVal = false;
 				}
 				else if ( modules )	{
 					module::ContainerBuilder* builder = modules->getContainer( "Authorization", L2it->first );
 					if ( builder )	{
-						config::ObjectConfiguration* conf = builder->configuration( logPrefix().c_str());
+						config::ObjectConfiguration* conf = builder->configuration( logStr.c_str());
 						if ( conf->parse( L2it->second, L2it->first, modules ))
 							m_authzConfig.push_back( conf );
 						else	{
@@ -126,26 +128,27 @@ bool AAAAconfiguration::parse( const config::ConfigurationTree& pt, const std::s
 						}
 					}
 					else
-						LOG_WARNING << logPrefix() << "unknown configuration option: '"
+						LOG_WARNING << logStr << "unknown configuration option: '"
 							    << L2it->first << "'";
 				}
 				else
-					LOG_WARNING << logPrefix() << "unknown configuration option: '"
+					LOG_WARNING << logStr << "unknown configuration option: '"
 						    << L2it->first << "'";
 			}
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "Audit" ))	{
+			std::string logStr = logPrefix() + "audit: ";
 			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
 									L2it != L1it->second.end(); L2it++ )	{
 				if ( boost::algorithm::iequals( "mandatory", L2it->first ))	{
-					if ( ! Parser::getValue( logPrefix().c_str(), *L2it, m_mandatoryAudit,
+					if ( ! Parser::getValue( logStr.c_str(), *L2it, m_mandatoryAudit,
 								 Parser::BoolDomain(), &mandatoryDefined ))
 						retVal = false;
 				}
 				else if ( modules )	{
 					module::ContainerBuilder* builder = modules->getContainer( "Audit", L2it->first );
 					if ( builder )	{
-						config::ObjectConfiguration* conf = builder->configuration( logPrefix().c_str());
+						config::ObjectConfiguration* conf = builder->configuration( logStr.c_str());
 						if ( conf->parse( L2it->second, L2it->first, modules ))
 							m_auditConfig.push_back( conf );
 						else	{
@@ -154,11 +157,11 @@ bool AAAAconfiguration::parse( const config::ConfigurationTree& pt, const std::s
 						}
 					}
 					else
-						LOG_WARNING << logPrefix() << "unknown configuration option: '"
+						LOG_WARNING << logStr << "unknown configuration option: '"
 							    << L2it->first << "'";
 				}
 				else
-					LOG_WARNING << logPrefix() << "unknown configuration option: '"
+					LOG_WARNING << logStr << "unknown configuration option: '"
 						    << L2it->first << "'";
 			}
 		}
