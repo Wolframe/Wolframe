@@ -87,6 +87,7 @@ AuthorizationUnit::Result DBauthorizer::allowed( const AAAAObject& authzObject )
 		case AAAAObject::TRANSACTION:
 			return IGNORED;
 	}
+	return ERROR;
 }
 
 AuthorizationUnit::Result DBauthorizer::connectionAllowed( const net::LocalEndpoint& /*local*/,
