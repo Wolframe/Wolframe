@@ -64,7 +64,7 @@ TextFileAuditor::~TextFileAuditor()
 {
 }
 
-bool audit( const AAAAObject& auditObject )
+bool TextFileAuditor::audit( const AAAAObject& auditObject )
 {
 	switch( auditObject.type())	{
 		case AAAAObject::CONNECTION:
@@ -73,6 +73,7 @@ bool audit( const AAAAObject& auditObject )
 		case AAAAObject::TRANSACTION:
 			return true;
 	}
+	return false;
 }
 
 }} // namespace _Wolframe::AAAA
