@@ -48,10 +48,11 @@ namespace AAAA {
 // interface for all authentication mechanisms
 class Authenticator {
 public:
-	virtual ~Authenticator()		{}
+	virtual ~Authenticator( ) { }
 
-	// close the authorizer (not really)
-	virtual void close()		{}
+	// close the authenticator and destroy all
+	// sensible data
+	virtual void close( ) { }
 };
 
 

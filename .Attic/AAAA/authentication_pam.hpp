@@ -43,38 +43,15 @@
 
 #include <string>
 
-#include <security/pam_appl.h>
-
 namespace _Wolframe {
 namespace AAAA {
 
-
-typedef struct {
-	std::string login;
-	bool has_pass;
-	std::string pass;
-	std::string errmsg;
-	pam_handle_t *h;
-} pam_appdata;
-
 class PAMAuthenticator : public Authenticator {
 	private:
-		std::string m_service;
 
-		// states of the authenticator state machine
-		enum {
-			_Wolframe_PAM_STATE_NEED_LOGIN,
-			_Wolframe_PAM_STATE_HAS_LOGIN,
-			_Wolframe_PAM_STATE_NEED_PASS,
-			_Wolframe_PAM_STATE_HAS_PASS,
-			_Wolframe_PAM_STATE_ERROR
-		} m_state;
-
-		pam_appdata m_appdata;
 		std::string m_token;
 		std::string m_data;
 		std::string m_error;
-		struct pam_conv m_conv;
 
 	public:
 		PAMAuthenticator( const std::string _service );

@@ -1,6 +1,6 @@
 TOPDIR = ..\..
 
-SUBDIRS = tests
+SUBDIRS =
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
@@ -20,17 +20,16 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 	Advapi32.lib Ws2_32.lib \
-	$(TOPDIR)\src\loadModules.obj \
 	$(TOPDIR)\gtest\gtest-all.obj
 
 TEST_CPP_BINS = \
-	moduleTest.exe
+	authenticationTest.exe
 
 OBJS =
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-moduleTest.exe: moduleTest.obj $(TOPDIR)\src\wolframe.lib
+authenticationTest.exe: authenticationTest.obj $(TOPDIR)\src\wolframe.lib
 
 local_all:
 
@@ -39,9 +38,9 @@ local_clean:
 
 local_distclean:
 
-local_test: tests\mod_test
+local_test:
 	@-echo @echo off > test.bat
 	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
-	@-echo moduleTest >> test.bat
+	@-echo authenticationTest >> test.bat
 	@-echo echo off >> test.bat
 	@-test.bat

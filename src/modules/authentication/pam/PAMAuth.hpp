@@ -41,6 +41,8 @@
 #include "AAAA/authentication.hpp"
 #include "moduleInterface.hpp"
 
+#include <security/pam_appl.h>
+
 namespace _Wolframe {
 namespace AAAA {
 
@@ -62,6 +64,15 @@ private:
 	std::string	m_service;
 };
 
+// the structure with data we have to pass to the
+// PAM callback function (a transport wagon)
+typedef struct {
+	std::string login;
+	bool has_pass;
+	std::string pass;
+	std::string errmsg;
+	pam_handle_t *h;
+} pam_appdata;
 
 class PAMAuthenticator : public AuthenticationUnit
 {
@@ -71,7 +82,23 @@ public:
 	virtual const char* typeName() const		{ return "PAMAuth"; }
 
 private:
+	// name of the PAM service
 	std::string		m_service;
+	
+	// PAM internal data structure
+	struct pam_conv		m_conv;
+	
+	// our void * for PAM data
+	pam_appdata		m_appdata;
+	
+	// states of the authenticator state machine
+	enum {
+		_Wolframe_PAM_STATE_NEED_LOGIN,
+		_Wolframe_PAM_STATE_HAS_LOGIN,
+		_Wolframe_PAM_STATE_NEED_PASS,
+		_Wolframe_PAM_STATE_HAS_PASS,
+		_Wolframe_PAM_STATE_ERROR
+	} m_state;
 };
 
 

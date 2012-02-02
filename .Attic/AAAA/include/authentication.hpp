@@ -61,8 +61,6 @@ public:
 // virtual base for all authentication methods
 class Authenticator {
 public:
-	virtual ~Authenticator( ) { }
-
 	// get next step in authentication
 	virtual Step::AuthStep nextStep( ) = 0;
 
@@ -90,21 +88,6 @@ public:
 	// not sent to the client)
 	virtual std::string getError( ) = 0;
 
-	// close the authenticator and destroy all
-	// sensible data
-	virtual void close( ) { }
-};
-
-
-/// Authentication Unit
-/// This is the base class for authentication unit implementations
-class AuthenticationUnit
-{
-public:
-	virtual ~AuthenticationUnit()				{}
-
-	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ )
-								{ return true; }
 };
 
 }} // namespace _Wolframe::AAAA

@@ -28,23 +28,6 @@ INCLUDE_LIBS += \
 
 endif
 
-# pam
-
-ifeq ($(WITH_PAM),1)
-
-INCLUDE_CXXFLAGS += \
-	-DWITH_PAM
-
-INCLUDE_DIRS += \
-	-I$(PAM_INCLUDE_DIR)
-
-INCLUDE_LDFLAGS += \
-	-L$(PAM_LIB_DIR)
-
-INCLUDE_LIBS += \
-	$(PAM_LIBS)
-
-endif
 
 # sasl
 
