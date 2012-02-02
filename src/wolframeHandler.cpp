@@ -165,8 +165,8 @@ void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
 				  << " to " << m_localEP->toString() << " authorized";
 		}
 		else	{
-			LOG_ERROR << "Connection from " << m_remoteEP->toString()
-				  << " to " << m_localEP->toString() << " not authorized: ";
+			LOG_DEBUG << "Connection from " << m_remoteEP->toString()
+				  << " to " << m_localEP->toString() << " not authorized";
 			// close the connection
 			m_state = FORBIDDEN;
 		}
