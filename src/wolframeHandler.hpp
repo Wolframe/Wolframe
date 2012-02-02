@@ -94,6 +94,7 @@ private:
 		OUTPUT_MSG,			///<
 		TIMEOUT,			///<
 		SIGNALLED,			///<
+		FORBIDDEN,			///<
 		TERMINATE,			///<
 		FINISHED			///<
 	};
@@ -143,24 +144,6 @@ private:
 	std::size_t			m_dataSize;
 	/// Output buffer
 	std::string			m_outMsg;
-
-//	typedef protocol::InputBlock Input;					///< input buffer type
-//	typedef protocol::OutputBlock Output;					///< output buffer type
-//	typedef protocol::InputBlock::iterator InputIterator;			///< iterator type for protocol commands
-
-//	typedef protocol::Buffer<256> LineBuffer;				///< buffer for one line of input/output
-//	typedef protocol::CmdParser<LineBuffer> ProtocolParser;			///< parser for the protocol
-//	typedef protocol::CArgBuffer<LineBuffer> ArgBuffer;			///< buffer type for the command arguments
-
-//	LineBuffer m_buffer;			///< context (sub state) for partly parsed input lines
-//	ArgBuffer m_argBuffer;			///< buffer for the arguments
-//	Command m_cmdidx;			///< command parsed
-
-//	Input m_input;				///< buffer for network read messages
-//	Output m_output;			///< buffer for network write messages
-
-//	InputIterator m_itr;			///< iterator to scan protocol input
-//	InputIterator m_end;			///< iterator pointing to end of message buffer
 };
 
 /// The server handler container

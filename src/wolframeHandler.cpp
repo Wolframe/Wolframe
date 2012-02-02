@@ -168,7 +168,7 @@ void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
 			LOG_ERROR << "Connection from " << m_remoteEP->toString()
 				  << " to " << m_localEP->toString() << " not authorized: ";
 			// close the connection
-			m_state = TERMINATE;
+			m_state = FORBIDDEN;
 		}
 	}
 	else	{
@@ -242,6 +242,11 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 	case SIGNALLED:	{
 		m_state = TERMINATE;
 		return net::NetworkOperation( net::SendString( "Server is shutting down. :P\n" ));
+	}
+
+	case FORBIDDEN:	{
+		m_state = TERMINATE;
+		return net::NetworkOperation( net::SendString( "Access denied.\n" ));
 	}
 
 	case TERMINATE:	{

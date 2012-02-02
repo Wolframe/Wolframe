@@ -269,6 +269,7 @@ gtest/README
 gtest/README.GtestInWolframe
 gtest/src/gtest-internal-inl.h
 header.txt
+include/AAAA/AAAAobjects.hpp
 include/AAAA/AAAAprovider.hpp
 include/AAAA/audit.hpp
 include/AAAA/authentication.hpp
@@ -639,4 +640,3 @@ XML/configuration.rng
 XML/database.rng
 XML/logging.rng
 XML/README
-include/AAAA/AAAAobjects.hpp
