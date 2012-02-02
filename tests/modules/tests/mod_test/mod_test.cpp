@@ -73,26 +73,26 @@ void TestModuleConfig::setCanonicalPathes( const std::string& refPath )
 
 TestModuleContainer::TestModuleContainer( const TestModuleConfig& /* conf */ )
 {
-	m_test = new TestUnit( /* conf */ );	
+	m_test = new TestUnitImpl( /* conf */ );	
 	MOD_LOG_DEBUG << "Test module container created";
 }
 
-TestUnit::TestUnit( )
+TestUnitImpl::TestUnitImpl( )
 {
 	MOD_LOG_DEBUG << "TestUnit object created";
 }
 
-TestUnit::~TestUnit( )
+TestUnitImpl::~TestUnitImpl( )
 {
 	MOD_LOG_DEBUG << "TestUnit object destroyed";
 }
 
-const std::string TestUnit::hello( )
+const std::string TestUnitImpl::hello( )
 {
 	return "hello";
 }
 
-bool TestUnit::resolveDB( const db::DatabaseProvider& /* db */ )
+bool TestUnitImpl::resolveDB( const db::DatabaseProvider& /* db */ )
 {
 	return true;
 }

@@ -65,21 +65,21 @@ private:
 
 // must be an abstract base class for usage in the code loading
 // and using objects of the derived class!
-class TestUnitBase
+class TestUnit
 {
 public:
 	// may not be private and must be virtual, can be empty as
 	// we define an interface here only
-	virtual ~TestUnitBase( ) { }
+	virtual ~TestUnit( ) { }
 
 	// must be virtual, otherwise moduleTest tries to link a hello
 	// function in which can't exist there!
 	// must be abstract too, otherwise we get a dlopen error with
-	// 'typeinfo for _Wolframe::module::test::TestUnitBase' missing
+	// 'typeinfo for _Wolframe::module::test::TestUnit' missing
 	virtual const std::string hello( ) = 0;
 };
 
-class TestModuleContainer : public ObjectContainer< TestUnitBase >
+class TestModuleContainer : public ObjectContainer< TestUnit >
 {
 public:
 	TestModuleContainer( const TestModuleConfig& conf );
@@ -87,10 +87,10 @@ public:
 	~TestModuleContainer()			{}
 
 	virtual const char* objectName() const	{ return "TestUnit"; }
-	virtual TestUnitBase* object() const	{ return m_test; }
+	virtual TestUnit* object() const	{ return m_test; }
 	void dispose()				{ m_test = NULL; delete this; }
 private:
-	TestUnitBase *m_test;
+	TestUnit *m_test;
 };
 
 }}} // namespace _Wolframe::module::test
