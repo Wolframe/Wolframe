@@ -40,6 +40,7 @@
 
 #include <string>
 
+#include "AAAAobjects.hpp"
 #include "connectionEndpoint.hpp"
 #include "database/DBprovider.hpp"
 
@@ -55,8 +56,7 @@ public:
 	virtual void close()		{}
 
 	// authorization requests
-	virtual bool connectAllowed( const net::LocalEndpoint& local, const net::RemoteEndpoint& remote,
-				     std::string& msg ) = 0;
+	virtual bool allowed( const AAAAObject& ) = 0;
 };
 
 
@@ -81,8 +81,7 @@ public:
 
 	virtual const char* name() const = 0;
 
-	virtual Result connectAllowed( const net::LocalEndpoint& local,
-				       const net::RemoteEndpoint& remote ) = 0;
+	virtual Result allowed( const AAAAObject& ) = 0;
 };
 
 }} // namespace _Wolframe::AAAA

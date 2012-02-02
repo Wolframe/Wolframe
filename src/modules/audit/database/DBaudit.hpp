@@ -52,7 +52,7 @@ public:
 		: config::ObjectConfiguration( cfgName, logParent, logName )
 	{ m_required = true; }
 
-	virtual const char* objectName() const		{ return "DatabaseAudit"; }
+	const char* objectName() const		{ return "DatabaseAudit"; }
 
 	/// methods
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,
@@ -70,11 +70,13 @@ class DBauditor : public AuditUnit
 public:
 	DBauditor( const std::string& dbLabel );
 	~DBauditor();
-	virtual const char* typeName() const		{ return "DatabaseAudit"; }
+	const char* typeName() const		{ return "DatabaseAudit"; }
 
-	virtual bool resolveDB( const db::DatabaseProvider& db );
+	bool resolveDB( const db::DatabaseProvider& db );
 
-	bool required()					{ return m_required; }
+	bool required()				{ return m_required; }
+
+	bool audit( const AAAAObject& auditObject );
 private:
 	bool			m_required;
 	std::string		m_dbLabel;
@@ -88,9 +90,9 @@ public:
 	DBauditContainer( const DBauditConfig& conf );
 	~DBauditContainer()				{}
 
-	const char* objectName() const			{ return m_audit->typeName(); }
-	virtual AuditUnit* object() const		{ return m_audit; }
-	void dispose()					{ m_audit = NULL; delete this; }
+	const char* objectName() const		{ return m_audit->typeName(); }
+	AuditUnit* object() const		{ return m_audit; }
+	void dispose()				{ m_audit = NULL; delete this; }
 private:
 	DBauditor*		m_audit;
 };

@@ -38,29 +38,13 @@
 #ifndef _AUDIT_HPP_INCLUDED
 #define _AUDIT_HPP_INCLUDED
 
+#include "AAAA/AAAAobjects.hpp"
 #include "database/DBprovider.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
 
-class AuditMsg_Connect
-{
-};
-
-class AuditMsg_Login
-{
-};
-
-class AuditMsg_Logout
-{
-};
-
-class AuditMsg_Transaction
-{
-};
-
-
-// virtual base for all audit methods
+// virtual base (interface) for auditor classes
 class Auditor {
 public:
 	virtual ~Auditor()				{}
@@ -68,10 +52,7 @@ public:
 	// close the auditor
 	virtual void close()				{}
 
-//	virtual bool log( AuditMsg_Connect & msg ) = 0;
-//	virtual bool log( AuditMsg_Login& msg ) = 0;
-//	virtual bool log( AuditMsg_Logout& msg ) = 0;
-//	virtual bool log( AuditMsg_Transaction& msg ) = 0;
+	virtual bool audit( const AAAAObject& auditObject ) = 0;
 };
 
 
@@ -85,6 +66,8 @@ public:
 	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ )
 							{ return true; }
 	virtual bool required() = 0;
+
+	virtual bool audit( const AAAAObject& auditObject ) = 0;
 
 //	virtual bool log( AuditMsg_Connect & msg ) = 0;
 //	virtual bool log( AuditMsg_Login& msg ) = 0;

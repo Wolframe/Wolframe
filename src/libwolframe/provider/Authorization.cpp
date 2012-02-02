@@ -84,9 +84,10 @@ bool AuthorizationProvider::resolveDB( const db::DatabaseProvider& db )
 }
 
 
+//********************************************************************************
 StandardAuthorizer::StandardAuthorizer( const std::list< AuthorizationUnit* >& units,
 					bool dflt )
-	: m_authorizeUnits( units ), m_default( dflt)
+	: m_authorizeUnits( units ), m_default( dflt )
 {
 }
 
@@ -99,30 +100,25 @@ void StandardAuthorizer::close()
 }
 
 // authorization requests
-bool StandardAuthorizer::connectAllowed( const net::LocalEndpoint& local,
-					 const net::RemoteEndpoint& remote,
-					 std::string& msg )
+bool StandardAuthorizer::allowed( const AAAAObject& authzObject )
 {
 	bool retVal = true;
 	bool ignored = true;
 
 	for ( std::list< AuthorizationUnit* >::const_iterator au = m_authorizeUnits.begin();
 							au != m_authorizeUnits.end(); au++ )	{
-		AuthorizationUnit::Result res = (*au)->connectAllowed( local, remote );
+		AuthorizationUnit::Result res = (*au)->allowed( authzObject );
 		switch( res )	{
 			case AuthorizationUnit::ALLOWED:
 				ignored = false;
 				break;
 			case AuthorizationUnit::DENIED:
-				msg = "Access denied";
 				ignored = false;
 				retVal = false;
 				break;
 			case AuthorizationUnit::IGNORED:
 				break;
 			case AuthorizationUnit::ERROR:
-				msg = "Error in authorization unit ";
-				msg += (*au)->name();
 				return false;
 		}
 	}

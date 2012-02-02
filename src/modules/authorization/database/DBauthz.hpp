@@ -76,12 +76,14 @@ public:
 
 	bool resolveDB( const db::DatabaseProvider& db );
 
-	AuthorizationUnit::Result connectAllowed( const net::LocalEndpoint& /*local*/,
-						  const net::RemoteEndpoint& remote );
+	AuthorizationUnit::Result allowed( const AAAAObject& );
 private:
 	const std::string	m_name;
 	const std::string	m_dbLabel;
 	const db::Database*	m_db;
+
+	AuthorizationUnit::Result connectionAllowed( const net::LocalEndpoint& /*local*/,
+						     const net::RemoteEndpoint& remote );
 };
 
 //***  Database authorizer container  ***********************************

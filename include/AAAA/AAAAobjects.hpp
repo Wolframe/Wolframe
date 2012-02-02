@@ -30,68 +30,44 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// database audit implementation
-//
+///
+/// \file AAAAobjects.hpp
+/// \brief header file for the objects used for AAAA operations
+///
 
-#include <stdexcept>
-#include <boost/algorithm/string.hpp>
+#include "connectionEndpoint.hpp"
 
-#include "logger-v1.hpp"
-#include "DBaudit.hpp"
+#ifndef _AAAA_OBJECTS_HPP_INCLUDED
+#define _AAAA_OBJECTS_HPP_INCLUDED
 
 namespace _Wolframe {
 namespace AAAA {
 
-//****  DBauditor Container  ************************************************
-DBauditContainer::DBauditContainer( const DBauditConfig& conf )
+struct AAAAObject
 {
-	m_audit = new DBauditor( conf.m_dbConfig );
-	MOD_LOG_TRACE << "Database auditor container created";
-}
+	enum ObjectType	{
+		CONNECTION,
+		LOGIN,
+		LOGOUT,
+		TRANSACTION
+	};
+
+	virtual ObjectType type() const = 0;
+};
 
 
-//****  DBauditor  **********************************************************
-DBauditor::DBauditor( const std::string& dbLabel )
-	: m_dbLabel( dbLabel )
+struct AAAAObj_Connect : public AAAAObject
 {
-	m_db = NULL;
+	const net::LocalEndpoint&	local;
+	const net::RemoteEndpoint&	remote;
 
-	if ( m_dbLabel.empty() )
-		throw std::logic_error( "Empty database reference in DBauditContainer" );
+	AAAAObj_Connect( const net::LocalEndpoint& lcl,
+			 const net::RemoteEndpoint& rmt)
+		: local( lcl ), remote( rmt )	{}
 
-	MOD_LOG_DEBUG << "Database auditor created with database reference '" << m_dbLabel << "'";
-}
-
-DBauditor::~DBauditor()
-{
-}
-
-bool DBauditor::resolveDB( const db::DatabaseProvider& db )
-{
-	if ( m_db == NULL && ! m_dbLabel.empty() )	{
-		m_db = db.database( m_dbLabel );
-		if ( m_db )	{
-			MOD_LOG_TRACE << "Database audit: database reference '" << m_dbLabel << "' resolved";
-			return true;
-		}
-		else	{
-			MOD_LOG_ERROR << "Database audit: database labeled '" << m_dbLabel << "' not found !";
-			return false;
-		}
-	}
-	return true;
-}
-
-bool audit( const AAAAObject& auditObject )
-{
-	switch( auditObject.type())	{
-		case AAAAObject::CONNECTION:
-		case AAAAObject::LOGIN:
-		case AAAAObject::LOGOUT:
-		case AAAAObject::TRANSACTION:
-			return true;
-	}
-}
+	AAAAObject::ObjectType type() const	{ return CONNECTION; }
+};
 
 }} // namespace _Wolframe::AAAA
+
+#endif // _AAAA_OBJECTS_HPP_INCLUDED

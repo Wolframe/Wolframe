@@ -54,6 +54,15 @@ namespace _Wolframe {
 namespace AAAA {
 
 // Standard authentication class and authentication provider
+class StandardAuthenticator : public Authenticator
+{
+public:
+	StandardAuthenticator();
+	~StandardAuthenticator();
+	void close();
+private:
+};
+
 class AuthenticationFactory
 {
 public:
@@ -62,7 +71,7 @@ public:
 	~AuthenticationFactory();
 	bool resolveDB( const db::DatabaseProvider& db );
 
-	Authenticator* authenticator()		{ return NULL; }
+	Authenticator* authenticator();
 private:
 	std::list< AuthenticationUnit* > m_authenticators;
 };
@@ -76,8 +85,7 @@ public:
 	~StandardAuthorizer();
 	void close();
 
-	bool connectAllowed( const net::LocalEndpoint& local, const net::RemoteEndpoint& remote,
-			     std::string& msg );
+	bool allowed( const AAAAObject& authzObject );
 private:
 	const std::list< AuthorizationUnit* >&	m_authorizeUnits;
 	bool m_default;
@@ -100,6 +108,19 @@ private:
 
 
 // Standard audit class and audit provider
+class StandardAudit : public Auditor
+{
+public:
+	StandardAudit( const std::list< AuditUnit* >& units, bool mandatory );
+	~StandardAudit();
+	void close();
+
+	bool audit( const AAAAObject& );
+private:
+	const std::list< AuditUnit* >&	m_auditUnits;
+	bool				m_mandatory;
+};
+
 class AuditProvider
 {
 public:
@@ -108,9 +129,10 @@ public:
 	~AuditProvider();
 	bool resolveDB( const db::DatabaseProvider& db );
 
-	Auditor* auditor()			{ return NULL; }
+	Auditor* auditor()			{ return m_auditor; }
 private:
-	std::list< AuditUnit* >	m_auditors;
+	std::list< AuditUnit* >		m_auditors;
+	StandardAudit*			m_auditor;
 };
 
 

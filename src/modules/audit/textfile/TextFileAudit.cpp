@@ -45,7 +45,15 @@
 namespace _Wolframe {
 namespace AAAA {
 
-/// Audit to file
+//****  Text File Audit Container   *****************************************
+TextFileAuditContainer::TextFileAuditContainer( const TextFileAuditConfig& conf )
+{
+	m_audit = new TextFileAuditor( conf.m_file );
+	MOD_LOG_TRACE << "Text file auditor container created";
+}
+
+
+//****  Text File Audit   ***************************************************
 TextFileAuditor::TextFileAuditor( const std::string& filename )
 	: m_file( filename )
 {
@@ -56,11 +64,15 @@ TextFileAuditor::~TextFileAuditor()
 {
 }
 
-
-TextFileAuditContainer::TextFileAuditContainer( const TextFileAuditConfig& conf )
+bool audit( const AAAAObject& auditObject )
 {
-	m_audit = new TextFileAuditor( conf.m_file );
-	MOD_LOG_TRACE << "Text file auditor container created";
+	switch( auditObject.type())	{
+		case AAAAObject::CONNECTION:
+		case AAAAObject::LOGIN:
+		case AAAAObject::LOGOUT:
+		case AAAAObject::TRANSACTION:
+			return true;
+	}
 }
 
 }} // namespace _Wolframe::AAAA

@@ -74,8 +74,23 @@ bool DBauthorizer::resolveDB( const db::DatabaseProvider& db )
 	return true;
 }
 
-AuthorizationUnit::Result DBauthorizer::connectAllowed( const net::LocalEndpoint& /*local*/,
-							const net::RemoteEndpoint& remote )
+
+AuthorizationUnit::Result DBauthorizer::allowed( const AAAAObject& authzObject )
+{
+	switch ( authzObject.type() )	{
+		case AAAAObject::CONNECTION:	{
+			const AAAAObj_Connect& obj = dynamic_cast<const AAAAObj_Connect&>( authzObject );
+			return connectionAllowed( obj.local, obj.remote);
+		}
+		case AAAAObject::LOGIN:
+		case AAAAObject::LOGOUT:
+		case AAAAObject::TRANSACTION:
+			return IGNORED;
+	}
+}
+
+AuthorizationUnit::Result DBauthorizer::connectionAllowed( const net::LocalEndpoint& /*local*/,
+							   const net::RemoteEndpoint& remote )
 {
 	// that's just for testing - allow localhost only
 	if ( remote.host() == "127.0.0.1" )

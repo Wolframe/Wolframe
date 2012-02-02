@@ -71,9 +71,10 @@ class TextFileAuditor : public AuditUnit
 public:
 	TextFileAuditor( const std::string& filename );
 	~TextFileAuditor();
-	virtual const char* typeName() const		{ return "FileAudit"; }
+	const char* typeName() const		{ return "FileAudit"; }
 
-	bool required()					{ return m_required; }
+	bool required()				{ return m_required; }
+	bool audit( const AAAAObject& auditObject );
 private:
 	bool		m_required;
 	std::string	m_file;
@@ -84,11 +85,11 @@ class TextFileAuditContainer : public ObjectContainer< AuditUnit >
 {
 public:
 	TextFileAuditContainer( const TextFileAuditConfig& conf );
-	~TextFileAuditContainer()			{}
+	~TextFileAuditContainer()		{}
 
-	const char* objectName() const			{ return m_audit->typeName(); }
-	virtual AuditUnit* object() const		{ return m_audit; }
-	void dispose()					{ m_audit = NULL; delete this; }
+	const char* objectName() const		{ return m_audit->typeName(); }
+	AuditUnit* object() const		{ return m_audit; }
+	void dispose()				{ m_audit = NULL; delete this; }
 private:
 	TextFileAuditor*	m_audit;
 };

@@ -79,4 +79,26 @@ bool AuthenticationFactory::resolveDB( const db::DatabaseProvider& db )
 	return true;
 }
 
+
+Authenticator* AuthenticationFactory::authenticator()
+{
+	return new StandardAuthenticator();
+}
+
+
+//*********************************************************************************
+// Standard authenticator
+StandardAuthenticator::StandardAuthenticator()
+{
+}
+
+StandardAuthenticator::~StandardAuthenticator()
+{
+}
+
+void StandardAuthenticator::close()
+{
+	delete this;
+}
+
 }} // namespace _Wolframe::AAAA

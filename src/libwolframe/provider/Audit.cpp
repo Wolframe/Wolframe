@@ -79,4 +79,40 @@ bool AuditProvider::resolveDB( const db::DatabaseProvider& db )
 	return true;
 }
 
+
+//********************************************************************************
+StandardAudit::StandardAudit( const std::list< AuditUnit* >& units, bool mandatory )
+	: m_auditUnits( units ), m_mandatory( mandatory )
+{
+}
+
+StandardAudit::~StandardAudit()
+{
+}
+
+void StandardAudit::close()
+{
+}
+
+// audit request
+bool StandardAudit::audit( const AAAAObject& auditObject )
+{
+	bool hasSucceded = false;
+
+	for ( std::list< AuditUnit* >::const_iterator au = m_auditUnits.begin();
+						au != m_auditUnits.end(); au++ )	{
+		bool res = (*au)->audit( auditObject );
+		if ( res )
+			hasSucceded = true;
+		else	{
+			if ((*au)->required() )
+				return false;
+		}
+	}
+
+	if ( m_mandatory && ! hasSucceded )
+		return false;
+	return true;
+}
+
 }} // namespace _Wolframe::AAAA
