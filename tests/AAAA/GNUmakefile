@@ -23,7 +23,7 @@ INCLUDE_LIBS = \
 	-lboost_filesystem -lboost_system \
 	$(LIBS_DL)
 
-OBJS =
+CPP_OBJS =
 
 # openssl
 
@@ -51,7 +51,7 @@ INCLUDE_LDFLAGS += \
 INCLUDE_LIBS += \
 	$(PAM_LIBS)
 
-OBJS += \
+CPP_OBJS += \
 	$(TOPDIR)/src/modules/authentication/pam/PAMAuth.o
 
 endif
@@ -60,6 +60,8 @@ TEST_CPP_BINS = \
 	authenticationTest$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
+
+authenticationTest$(EXE): $(CPP_OBJS)
 
 local_all:
 

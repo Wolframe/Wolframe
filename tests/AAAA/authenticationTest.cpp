@@ -15,7 +15,7 @@ using namespace _Wolframe;
 using namespace std;
 
 // Aba: tempoarary hack to make the logger in the PAMAuthenticator work
-// (some mixup here with logging in a module of a class which would actualy
+// (some mixup here with logging in a module of a class which would actually
 // be standalone)
 _Wolframe::log::LogBackend*	logBackendPtr;
 
