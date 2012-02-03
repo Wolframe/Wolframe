@@ -51,7 +51,7 @@ namespace AAAA {
 bool SaslAuthConfig::check() const
 {
 	if ( m_service.empty() )	{
-		MOD_LOG_ERROR << logPrefix() << "Assuming default SAS service 'wolframe'";
+		MOD_LOG_ERROR << logPrefix() << "a SASL service must be configured";
 		return false;
 	}
 	return true;
