@@ -63,9 +63,6 @@ class SaslAuthenticator : public Authenticator {
 		sasl_callback_t m_callbacks[3];
 		sasl_conn_t *m_connection;
 
-		std::string m_appName;
-		std::string m_service;
-		std::string m_confpath;
 		std::string m_mech;
 		std::string m_client_data;
 		
@@ -74,7 +71,6 @@ class SaslAuthenticator : public Authenticator {
 		std::string m_token;
 
 	public:
-		SaslAuthenticator( const std::string appName, const std::string service, const std::string confpath );
 		virtual ~SaslAuthenticator( );
 		virtual Step::AuthStep nextStep( );
 		virtual std::string sendData( );

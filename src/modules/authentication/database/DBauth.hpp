@@ -77,6 +77,7 @@ public:
 	DBauthenticator( const std::string& dbLabel );
 	~DBauthenticator();
 	virtual const char* objectName() const			{ return "DatabaseAuth"; }
+	virtual const char* typeName() const		{ return "DBAuth"; }
 
 	bool resolveDB( const db::DatabaseProvider& db );
 private:

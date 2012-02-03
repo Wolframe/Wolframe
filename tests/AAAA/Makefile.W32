@@ -12,7 +12,9 @@ INCLUDE_DIRS = \
 	/I$(TOPDIR)\src \
 	/I"$(BOOST_INCLUDE_DIR)" \
 	/I"$(PLATFORM_SDK_DIR)\Include" \
-	/I$(TOPDIR)\gtest\include
+	/I$(TOPDIR)\gtest\include \
+	/I$(TOPDIR)\src\modules\authentication\textfile \
+	/I$(TOPDIR)\src\modules\authentication\database
 
 # Note: libraries are picked automatically on Windows!
 INCLUDE_LDFLAGS = \
@@ -22,10 +24,12 @@ INCLUDE_LIBS = \
 	Advapi32.lib Ws2_32.lib \
 	$(TOPDIR)\gtest\gtest-all.obj
 
+CPP_OBJS = \
+	$(TOPDIR)\src\modules\authentication\textfile\TextFileAuth.obj \
+	$(TOPDIR)\src\modules\authentication\database\DBauth.obj
+
 TEST_CPP_BINS = \
 	authenticationTest.exe
-
-OBJS =
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 

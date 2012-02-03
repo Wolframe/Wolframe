@@ -5,9 +5,14 @@
 #include "logger-v1.hpp"
 #include <gtest/gtest.h>
 
+#include "TextFileAuth.hpp"
+#include "DBauth.hpp"
 #ifdef WITH_PAM
 #include "PAMAuth.hpp"
 #endif // WITH_PATH
+#ifdef WITH_SASL
+#include "SaslAuth.hpp"
+#endif // WITH_SASL
 
 using namespace _Wolframe::AAAA;
 using namespace _Wolframe::log;
@@ -37,15 +42,35 @@ class AuthenticationFixture : public ::testing::Test
 		}
 };
 
+TEST_F( AuthenticationFixture, TextFileAuthenticator )
+{
+	TextFileAuthenticator authenticator( "users" );
+	ASSERT_STREQ( authenticator.typeName( ), "TextFileAuth" );
+}
+
+TEST_F( AuthenticationFixture, DatabaseAuthenticator )
+{
+	DBauthenticator authenticator( "sqlitedb" );
+	ASSERT_STREQ( authenticator.typeName( ), "DBAuth" );
+}
+
 // Aba: avoiding module loader here on purpose, so we include the things to
 // test with conditional compilation
 #ifdef WITH_PAM
-TEST_F( AuthenticationFixture, PamAuthenticatorIdentity )
+TEST_F( AuthenticationFixture, PamAuthenticator )
 {
 	PAMAuthenticator authenticator( "wolframe" );
 	ASSERT_STREQ( authenticator.typeName( ), "PAMAuth" );
 }
 #endif // WITH_PATH
+
+#ifdef WITH_SASL
+TEST_F( AuthenticationFixture, SaslAuthenticator )
+{
+	SaslAuthenticator authenticator( "wolframe", "sasl.conf" );
+	ASSERT_STREQ( authenticator.typeName( ), "SaslAuth" );
+}
+#endif // WITH_SASL
 
 int main( int argc, char **argv )
 {

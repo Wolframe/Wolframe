@@ -54,7 +54,6 @@ class PAMAuthenticator : public Authenticator {
 		std::string m_error;
 
 	public:
-		PAMAuthenticator( const std::string _service );
 		virtual Step::AuthStep nextStep( );
 		virtual std::string sendData( );
 		virtual std::string token( );

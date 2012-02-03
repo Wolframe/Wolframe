@@ -50,8 +50,8 @@ namespace AAAA {
 /// Text file authentication
 bool SaslAuthConfig::check() const
 {
-	if ( m_file.empty() )	{
-		MOD_LOG_ERROR << logPrefix() << "Authentication filename cannot be empty";
+	if ( m_service.empty() )	{
+		MOD_LOG_ERROR << logPrefix() << "Assuming default SAS service 'wolframe'";
 		return false;
 	}
 	return true;
@@ -61,27 +61,33 @@ void SaslAuthConfig::print( std::ostream& os, size_t indent ) const
 {
 	std::string indStr( indent, ' ' );
 	os << indStr << sectionName() << std::endl;
-	os << indStr << "   SASL file: " << m_file << std::endl;
+	os << indStr << "   SASL service: " << m_service << std::endl;
+	if( !m_confPath.empty( ) ) {
+		os << indStr << "   SASL local configuration: " << m_confPath << std::endl;
+	}
 }
 
 void SaslAuthConfig::setCanonicalPathes( const std::string& refPath )
 {
 	using namespace boost::filesystem;
 
-	if ( ! m_file.empty() )	{
-		if ( ! path( m_file ).is_absolute() )
-			m_file = resolvePath( absolute( m_file,
+	if ( ! m_confPath.empty() )	{
+		if ( ! path( m_confPath ).is_absolute() )
+			m_confPath = resolvePath( absolute( m_confPath,
 							path( refPath ).branch_path()).string());
 		else
-			m_file = resolvePath( m_file );
+			m_confPath = resolvePath( m_confPath );
 	}
 }
 
-
-SaslAuthenticator::SaslAuthenticator( const std::string& filename )
-	: m_file( filename )
+SaslAuthenticator::SaslAuthenticator( const std::string& service,
+		   const std::string& confPath )
+	: m_service( service ), m_confPath( confPath )
 {
-	MOD_LOG_DEBUG << "SASL authenticator created with file '" << m_file << "'";
+	MOD_LOG_DEBUG << "SASL authenticator created for service '" << m_service << "'";
+	if( !m_confPath.empty( ) ) {
+		MOD_LOG_DEBUG << "     and with SASL configuration '" << confPath << "'";
+	}
 }
 
 SaslAuthenticator::~SaslAuthenticator()
@@ -91,7 +97,7 @@ SaslAuthenticator::~SaslAuthenticator()
 
 SaslAuthContainer::SaslAuthContainer( const SaslAuthConfig& conf )
 {
-	m_auth = new SaslAuthenticator( conf.m_file );
+	m_auth = new SaslAuthenticator( conf.m_service, conf.m_confPath );
 	MOD_LOG_NOTICE << "SASL authenticator container created";
 }
 
