@@ -5,6 +5,9 @@
 #include "logger-v1.hpp"
 #include <gtest/gtest.h>
 
+// Aba: avoiding module loader here on purpose, so we include the things to
+// test with conditional compilation
+
 #include "TextFileAuth.hpp"
 #include "DBauth.hpp"
 #ifdef WITH_PAM
@@ -44,7 +47,7 @@ class AuthenticationFixture : public ::testing::Test
 
 TEST_F( AuthenticationFixture, TextFileAuthenticator )
 {
-	TextFileAuthenticator authenticator( "users" );
+	TextFileAuthenticator authenticator( "passwd" );
 	ASSERT_STREQ( authenticator.typeName( ), "TextFileAuth" );
 }
 
@@ -54,8 +57,6 @@ TEST_F( AuthenticationFixture, DatabaseAuthenticator )
 	ASSERT_STREQ( authenticator.typeName( ), "DBAuth" );
 }
 
-// Aba: avoiding module loader here on purpose, so we include the things to
-// test with conditional compilation
 #ifdef WITH_PAM
 TEST_F( AuthenticationFixture, PamAuthenticator )
 {
