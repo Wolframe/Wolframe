@@ -39,7 +39,9 @@ local_clean:
 
 local_distclean:
 
-local_test: tests\mod_test
+# cd tests...: Temporary hotfix to avoid running the module test before having built the modules
+local_test:
+	@cd tests & $(MAKE) /nologo /f Makefile.w32 test & cd ..
 	@-echo @echo off > test.bat
 	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
 	@-echo moduleTest >> test.bat
