@@ -108,7 +108,7 @@ public:
 		Module( const std::string& name_, Type type_=Undefined)		:m_type(type_),m_name(name_),m_load(0) {if (type_==Undefined) setType();}
 		///\brief Copy constructor
 		///\param module to copy
-		Module( const Module& o)					:m_type(o.m_type),m_name(o.m_name),m_path(o.m_path),m_load(o.m_load){}
+		Module( const Module& o)					:m_type(o.m_type),m_name(o.m_name),m_load(o.m_load){}
 
 		///\brief Determines the type of the module
 		void setType();
@@ -116,10 +116,6 @@ public:
 		///\brief Return the name of the module
 		///\return the plain name of the module
 		const std::string& name() const		{return m_name;}
-
-		///\brief Return the full path of the module
-		///\return the full path of the module
-		const std::string& path() const		{return m_path;}
 
 		///\brief Return the type of the module
 		///\return the type of the module
@@ -137,7 +133,6 @@ public:
 	private:
 		Type m_type;				///< type of the module
 		std::string m_name;			///< name of the module
-		std::string m_path;			///< full path of the module
 		ModuleLoad m_load;			///< function to load the module into the interpreter context
 	};
 	///\brief return the main function

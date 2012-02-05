@@ -169,13 +169,14 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 							const void* r_begin;
 							std::size_t r_nofBytes;
 							m_delegateHandler->getDataLeft( r_begin, r_nofBytes);
-
-							m_resultstate = (*m_delegateHandlerEnd)( (void*)this, m_delegateHandler, out);
-							m_cmdstateidx = ProcessOutput;
-							m_resultstr = out.str();
-							m_resultitr = 0;
+							CommandHandler* l_delegateHandler = m_delegateHandler;
+							DelegateHandlerEnd l_delegateHandlerEnd = m_delegateHandlerEnd;
 							m_delegateHandler = 0;
 							m_delegateHandlerEnd = 0;
+							m_cmdstateidx = ProcessOutput;
+							m_resultstate = (*l_delegateHandlerEnd)( (void*)this, l_delegateHandler, out);
+							m_resultstr = out.str();
+							m_resultitr = 0;
 
 							putInput( r_begin, r_nofBytes);
 							if (m_resultstr.size() > 0)

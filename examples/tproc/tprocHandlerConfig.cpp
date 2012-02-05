@@ -187,19 +187,6 @@ bool Configuration::parse( const config::ConfigurationTree& pt, const std::strin
 			LOG_ERROR << "Error in configuration: " << errmsg;
 			return false;
 		}
-		{
-			std::vector<ScriptConfigStruct>::const_iterator itr=m_data.script.begin(),end=m_data.script.end();
-			for (;itr != end; ++itr)
-			{
-				if (!defineScript( *itr)) return false;
-			}
-		}{
-			std::vector<DirectMapConfigStruct>::const_iterator itr=m_data.directmap.begin(),end=m_data.directmap.end();
-			for (;itr != end; ++itr)
-			{
-				if (!defineDirectMap( *itr)) return false;
-			}
-		}
 		return true;
 	}
 	catch (std::exception& e)
@@ -246,17 +233,59 @@ void Configuration::print( std::ostream& o, size_t i) const
 
 void Configuration::setCanonicalPathes( const std::string& refPath)
 {
-	std::vector<ScriptConfigStruct>::iterator itr=m_data.script.begin(),end=m_data.script.end();
-	for (;itr != end; ++itr)
 	{
-		boost::filesystem::path pt(itr->path);
-		if (pt.is_absolute())
+		std::vector<ScriptConfigStruct>::iterator itr=m_data.script.begin(),end=m_data.script.end();
+		for (;itr != end; ++itr)
 		{
-			itr->path = pt.string();
+			boost::filesystem::path pt(itr->path);
+			if (pt.is_absolute())
+			{
+				itr->path = pt.string();
+			}
+			else
+			{
+				itr->path = boost::filesystem::absolute( pt, boost::filesystem::path( refPath).branch_path()).string();
+			}
 		}
-		else
+	}{
+		std::vector<DirectMapConfigStruct>::iterator itr=m_data.directmap.begin(),end=m_data.directmap.end();
+		for (;itr != end; ++itr)
 		{
-			itr->path = boost::filesystem::absolute( pt, boost::filesystem::path( refPath).branch_path()).string();
+			boost::filesystem::path pt( itr->input.path);
+			if (pt.is_absolute())
+			{
+				itr->input.path = pt.string();
+			}
+			else
+			{
+				itr->input.path = boost::filesystem::absolute( pt, boost::filesystem::path( refPath).branch_path()).string();
+			}
+		}
+	}{
+		std::vector<DirectMapConfigStruct>::iterator itr=m_data.directmap.begin(),end=m_data.directmap.end();
+		for (;itr != end; ++itr)
+		{
+			boost::filesystem::path pt( itr->output.path);
+			if (pt.is_absolute())
+			{
+				itr->output.path = pt.string();
+			}
+			else
+			{
+				itr->output.path = boost::filesystem::absolute( pt, boost::filesystem::path( refPath).branch_path()).string();
+			}
+		}
+	}{
+		std::vector<ScriptConfigStruct>::iterator itr=m_data.script.begin(),end=m_data.script.end();
+		for (;itr != end; ++itr)
+		{
+			if (!defineScript( *itr)) throw std::runtime_error( "direct map load error");
+		}
+	}{
+		std::vector<DirectMapConfigStruct>::iterator itr=m_data.directmap.begin(),end=m_data.directmap.end();
+		for (;itr != end; ++itr)
+		{
+			if (!defineDirectMap( *itr)) throw std::runtime_error( "direct map load error");
 		}
 	}
 }
@@ -265,4 +294,5 @@ const std::vector<CountedReference< protocol::CommandBase> >& Configuration::get
 {
 	return m_cmds;
 }
+
 

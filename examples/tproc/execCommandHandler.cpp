@@ -66,19 +66,34 @@ void ExecCommandHandler::setInputBuffer( void* buf, std::size_t allocsize, std::
 	m_input = protocol::InputBlock( (char*)buf, allocsize, size);
 	m_itr = m_input.at(itrpos);
 	m_end = m_input.end();
+	if (m_cmdhandler.get())
+	{
+		m_cmdhandler->setInputBuffer( buf, allocsize, size, itrpos);
+	}
 }
 
 void ExecCommandHandler::setOutputBuffer( void* buf, std::size_t size, std::size_t pos)
 {
 	if (size < 16) throw std::logic_error("output buffer smaller than 16 bytes");
 	m_output = protocol::OutputBlock( buf, size, pos);
+	if (m_cmdhandler.get())
+	{
+		m_cmdhandler->setOutputBuffer( buf, size, pos);
+	}
 }
 
 void ExecCommandHandler::putInput( const void *begin, std::size_t bytesTransferred)
 {
-	m_input.setPos( bytesTransferred + ((const char*)begin - m_input.charptr()));
-	m_itr = m_input.begin() + ((const char*)begin - m_input.charptr());
-	m_end = m_input.end();
+	if (m_cmdhandler.get())
+	{
+		m_cmdhandler->putInput( begin, bytesTransferred);
+	}
+	else
+	{
+		m_input.setPos( bytesTransferred + ((const char*)begin - m_input.charptr()));
+		m_itr = m_input.begin() + ((const char*)begin - m_input.charptr());
+		m_end = m_input.end();
+	}
 }
 
 void ExecCommandHandler::getInputBlock( void*& begin, std::size_t& maxBlockSize)
@@ -91,15 +106,30 @@ void ExecCommandHandler::getInputBlock( void*& begin, std::size_t& maxBlockSize)
 
 void ExecCommandHandler::getOutput( const void*& begin, std::size_t& bytesToTransfer)
 {
-	begin = m_output.ptr();
-	bytesToTransfer = m_output.pos();
-	m_output.setPos(0);
+	if (m_cmdhandler.get())
+	{
+		if (m_output.pos()) throw std::logic_error( "illegal state in exec command handler protocol");
+		m_cmdhandler->getOutput( begin, bytesToTransfer);
+	}
+	else
+	{
+		begin = m_output.ptr();
+		bytesToTransfer = m_output.pos();
+		m_output.setPos(0);
+	}
 }
 
 void ExecCommandHandler::getDataLeft( const void*& begin, std::size_t& nofBytes)
 {
-	begin = (char*)(m_input.charptr() + (m_itr - m_input.begin()));
-	nofBytes = m_end - m_itr;
+	if (m_cmdhandler.get())
+	{
+		m_cmdhandler->getDataLeft( begin, nofBytes);
+	}
+	else
+	{
+		begin = (char*)(m_input.charptr() + (m_itr - m_input.begin()));
+		nofBytes = m_end - m_itr;
+	}
 }
 
 const char* ExecCommandHandler::getCommand( int& argc, const char**& argv)
@@ -274,7 +304,6 @@ protocol::CommandHandler::Operation ExecCommandHandler::nextOperation()
 							return READ;
 						break;
 						case WRITE:
-							m_cmdhandler->getOutput( content, contentsize);
 							return WRITE;
 						break;
 						case CLOSED:

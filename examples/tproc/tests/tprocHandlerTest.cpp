@@ -72,7 +72,7 @@ public:
 
 		module::ModulesDirectory modules;
 		if (!parse( config::ConfigurationTree(pt), std::string("tproc"), &modules)) throw std::runtime_error( "error in configuration");
-		setCanonicalPathes( (boost::filesystem::current_path() / "temp").string());
+		setCanonicalPathes( (boost::filesystem::current_path() / "temp" / "example.txt").string());
 	}
 };
 
@@ -82,6 +82,11 @@ struct TestDescription
 	std::string expected;
 	std::string config;
 	std::string requires;
+
+	TestDescription(){}
+	TestDescription( const TestDescription& o)
+		:input(o.input),expected(o.expected),config(o.config),requires(o.requires)
+	{}
 };
 
 static const char* check_flag( const std::string& flag)
@@ -275,7 +280,7 @@ static const TestDescription getTestDescription( const boost::filesystem::path& 
 		}
 		else if (boost::starts_with( *hi, "file:"))
 		{
-			std::string filename( hi->c_str()+sizeof("file:"));
+			std::string filename( hi->c_str()+std::strlen("file:"));
 			boost::trim( filename);
 			boost::filesystem::path fn( boost::filesystem::current_path() / "temp" / filename);
 			writeFile( fn, *itr);
@@ -342,9 +347,9 @@ public:
 
 TEST_F( TProcHandlerTest, tests)
 {
-	enum {NOF_IB=8,NOF_OB=3};
-	std::size_t ib[ NOF_IB] = {1,2,3,5,11,13,23,127};
-	std::size_t ob[ NOF_OB] = {1,2,3};
+	enum {NOF_IB=1,NOF_OB=1};
+	std::size_t ib[ NOF_IB] = {127};
+	std::size_t ob[ NOF_OB] = {1};
 
 	boost::filesystem::recursive_directory_iterator itr( boost::filesystem::current_path() / "data"), end;
 
@@ -355,7 +360,7 @@ TEST_F( TProcHandlerTest, tests)
 			boost::filesystem::remove_all( boost::filesystem::current_path() / "temp" );
 			boost::filesystem::create_directory( boost::filesystem::current_path() / "temp");
 
-			TestDescription td = getTestDescription( *itr);
+			const TestDescription td = getTestDescription( *itr);
 			if (td.requires.size())
 			{
 				std::cerr << "skipping test '" << *itr << "' ( is " << td.requires << ")" << std::endl;

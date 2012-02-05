@@ -141,7 +141,7 @@ protected:
 	///\brief Delegate the processing to 'ch' until its termination. Call the processing termination function for informing the caller
 	void delegateProcessingFunction( CommandHandler* ch, DelegateHandlerEnd end)
 	{
-		if (m_delegateHandler) throw std::logic_error( "duplicate deletation of protocol processing");
+		if (m_delegateHandler) throw std::logic_error( "duplicate delegation of protocol processing");
 		m_delegateHandler = ch;
 		m_delegateHandlerEnd = end;
 	}
@@ -175,7 +175,7 @@ private:
 	};
 	///\brief Returns the state as string for logging etc.
 	///\param [in] i state to get as string
-	static const char* stateName( CommandState i)
+	static const char* commandStateName( CommandState i)
 	{
 		static const char* ar[] = {"Init","ProcessingDelegation","EnterCommand","ParseArgs","ParseArgsEOL","ProtocolError","ProcessOutput","Terminate"};
 		return ar[i];

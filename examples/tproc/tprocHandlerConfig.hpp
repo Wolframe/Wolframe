@@ -73,11 +73,6 @@ struct DirectMapConfigStruct
 
 struct ConfigurationStruct
 {
-	ConfigurationStruct( const ConfigurationStruct& o)
-		:script(o.script),input_bufsize(o.input_bufsize),output_bufsize(o.output_bufsize){}
-	ConfigurationStruct()
-		:input_bufsize(1024),output_bufsize(1024){}
-
 	std::vector<ScriptConfigStruct> script;		///< script definitions
 	std::vector<DirectMapConfigStruct> directmap;	///< direct map definitions
 	std::size_t input_bufsize;			///< size of input network message buffers in bytes (should only be configured for testing)

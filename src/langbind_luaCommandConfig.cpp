@@ -138,7 +138,7 @@ bool LuaCommandConfig::Module::load( lua_State* ls) const
 	}
 	else if (m_type == Script)
 	{
-		if (luaL_loadfile( ls, m_path.empty()?m_name.c_str():m_path.c_str()))
+		if (luaL_loadfile( ls, m_name.c_str()))
 		{
 			LOG_ERROR << "Failed to load script '" << m_name << "':" << lua_tostring( ls, -1);
 			lua_pop( ls, 1);
@@ -172,9 +172,9 @@ bool LuaCommandConfig::Module::check() const
 		case UserLib:
 			break;
 		case Script:
-			if (!boost::filesystem::exists( m_path))
+			if (!boost::filesystem::exists( m_name))
 			{
-				LOG_ERROR << "Script " << m_name << " ( " << m_path << ") does not exist";
+				LOG_ERROR << "Script " << m_name << "does not exist";
 				return false;
 			}
 			break;
@@ -233,7 +233,7 @@ bool LuaCommandConfig::test() const
 void LuaCommandConfig::print( std::ostream& os, size_t /*indent*/) const
 {
 	os << "Configuration of Lua Script Processor" << ":" << std::endl;
-	os << "   Main Script: " << m_mainmodule.name() << " (" << m_mainmodule.path() << ")" << std::endl;
+	os << "   Main Script: " << m_mainmodule.name() << " (" << m_mainmodule.name() << ")" << std::endl;
 	os << "   Main Function: " << m_main << std::endl;
 
 	if( !m_modules.empty())
@@ -241,12 +241,7 @@ void LuaCommandConfig::print( std::ostream& os, size_t /*indent*/) const
 		os << "   Modules: ";
 		for (std::vector<Module>::const_iterator it = m_modules.begin(); it != m_modules.end(); it++)
 		{
-			os << "      " << Module::typeName(it->type()) << " " << it->name();
-			if (it->type() == Module::Script)
-			{
-				os << " (" << it->path() << ")";
-			}
-			os << std::endl;
+			os << "      " << Module::typeName(it->type()) << " " << it->name() << std::endl;
 		}
 		os << std::endl;
 	}
