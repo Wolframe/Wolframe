@@ -151,7 +151,7 @@ local_distclean:
 
 local_test:
 
-run:
+run_prereq:
 	@-echo @echo off > test.bat
 !IFDEF WITH_SSL
 	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat
@@ -165,6 +165,16 @@ run:
 	@-echo copy "$(PGSQL_DIR)\bin\libintl*.dll" . >> test.bat
 	@-echo copy "$(PGSQL_DIR)\bin\libiconv*.dll" . >> test.bat
 !ENDIF
+
+run: run_prereq
 	@-echo echo Running the Wolframe server... >> test.bat
-	@-echo wolframed.exe -c wolframe.xml -d DATA >> test.bat
+	@-echo wolframed.exe -c wolframe.xml >> test.bat
+	@-test.bat
+
+check: run_prereq
+	@-echo wolframed.exe -c wolframe.xml -t >> test.bat
+	@-test.bat
+
+print: run_prereq
+	@-echo wolframed.exe -c wolframe.xml -p >> test.bat
 	@-test.bat
