@@ -23,15 +23,20 @@ CPP_BINS = \
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-#WIX_DIR = C:\Programme\Windows Installer XML v3.5
-#WIX_DIR = C:\Program Files (x86)\Windows Installer XML v3.5
-WIX_DIR = C:\Program Files\Windows Installer XML v3.5
+WIX_DIR = C:\Program Files (x86)\Windows Installer XML v3.5
+# @home PIII
+#WIX_DIR = C:\Program Files\Windows Installer XML v3.5
+
+# TODO: probe and automatize this!
+#ARCH = x86
+ARCH = x64
+
 CANDLE = "$(WIX_DIR)\bin\candle.exe"
 LIGHT = "$(WIX_DIR)\bin\light.exe"
 SMOKE = "$(WIX_DIR)\bin\smoke.exe"
 
 local_all: $(CPP_BINS)
-	$(CANDLE) /nologo -ext WixUIExtension -ext WixUtilExtension -ext WixFirewallExtension wolframe.wxs
+	$(CANDLE) /nologo -arch $(ARCH) -ext WixUIExtension -ext WixUtilExtension -ext WixFirewallExtension wolframe.wxs
 	$(LIGHT) /nologo -ext WixUIExtension -ext WixUtilExtension -ext WixFirewallExtension wolframe.wixobj
 
 #uuidgen.exe: uuidgen.obj
