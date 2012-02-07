@@ -27,6 +27,10 @@ WIX_DIR = C:\Program Files (x86)\Windows Installer XML v3.5
 # @home PIII
 #WIX_DIR = C:\Program Files\Windows Installer XML v3.5
 
+VDREDIST_MERGE_MODULE = C:\Program Files\Common Files\Merge Modules\Microsoft_VC90_CRT_x86.msm
+VDREDIST_MERGE_MODULE = C:\Program Files (x86)\Common Files\Merge Modules\Microsoft_VC90_CRT_x86.msm
+VDREDIST_MERGE_MODULE = C:\Program Files (x86)\Common Files\Merge Modules\Microsoft_VC90_CRT_x86.msm
+
 # TODO: probe and automatize this!
 #ARCH = x86
 ARCH = x64
@@ -36,7 +40,7 @@ LIGHT = "$(WIX_DIR)\bin\light.exe"
 SMOKE = "$(WIX_DIR)\bin\smoke.exe"
 
 local_all: $(CPP_BINS)
-	$(CANDLE) /nologo -arch $(ARCH) -ext WixUIExtension -ext WixUtilExtension -ext WixFirewallExtension wolframe.wxs
+	$(CANDLE) /nologo -arch $(ARCH) -dVCRedist.Location="$(VDREDIST_MERGE_MODULE)" -ext WixUIExtension -ext WixUtilExtension -ext WixFirewallExtension wolframe.wxs
 	$(LIGHT) /nologo -ext WixUIExtension -ext WixUtilExtension -ext WixFirewallExtension wolframe.wixobj
 
 #uuidgen.exe: uuidgen.obj
