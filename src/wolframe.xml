@@ -121,24 +121,26 @@ Project Wolframe.
 
 	<!--	Database configuration -->
 	<database>
-		<type>SQLite</type>
-		<server>
-			<filename>localhost.db</filename>
-			<flag>On</flag>
-		</server>
-<!--		<type>PostgreSQL</type>
-		<server>
+<!--
+		<PostgreSQL>
+			<identifier>pgdb</identifier>
 			<host>localhost</host>
 			<port>5432</port>
 			<name>wolframe</name>
 			<user>wolframe</user>
 			<password>blabla</password>
+			<connectionTimeout>10</connectionTimeout>
 			<connections>5</connections>
 			<acquireTimeout>10</acquireTimeout>
-		</server>
--->
+		</PostgreSQL>
+-->		
+		<SQLite>
+			<identifier>sqlitedb</identifier>
+			<filename>primary.db</filename>
+<!--			<filename>/var/lib/wolframe/primary.db</filename> -->
+		</SQLite>
 	</database>
-
+	
 	<!--	Logging parameters -->
 	<logging>
 		<!--	log level for console (stderr) logging -->
@@ -148,7 +150,7 @@ Project Wolframe.
 
 		<!--	log level for file logging -->
 		<logFile>
-			<filename>/tmp/wolframed.log</filename>
+			<filename>C:\TEMP\wolframed.log</filename>
 			<level>NOTICE</level>
 		</logFile>
 
@@ -166,4 +168,59 @@ Project Wolframe.
 			<level>INFO</level>
 		</eventlog>
 	</logging>
+	
+	<!-- Authentication, authorization, auditing and accounting configuration -->
+	<AAAA>
+
+		<authentication>
+			<allowAnonymous>yes</allowAnonymous>
+			<!-- <database>pgdb</database> -->
+			<database>sqlitedb</database>
+			<file>wolframe.auth</file>
+		</authentication>
+		
+		<Authorization>
+			<default>deny</default> <!-- what to do when there is no authorization information -->
+
+<!--
+			<database>
+				<name>"PostgreSQL database authorization"</name>
+				<database>pgdb</database>
+			</database>
+
+			<database>
+				<name>"SQLite database authorization"</name>
+				<database>sqlitedb</database>
+			</database>
+-->
+		</Authorization>
+
+		<Audit>
+			<!-- Audit is mandatory ? If set to yes operations will fail if audit fails -->
+			<mandatory>yes</mandatory>
+			
+			<TextFile>
+				<required>yes</required>
+				<file>wolframe.audit</file>
+			</TextFile>
+			
+			<Database>
+				<required>no</required>
+				<database>sqlitedb</database>
+			</Database>
+		</Audit>
+	<!-- There is no configuration for accounting as it
+	     should be derived from audit information -->
+	</AAAA>
+	
 </configuration>
+
+<!-- The thing that does the real job ;) -->
+<Processor>
+<!--	<database>pgdb</database> -->
+	<database>sqlitedb</database>
+	<EchoProcessor>
+		<timeout>10</timeout>
+	</EchoProcessor>
+</Processor>
+	
