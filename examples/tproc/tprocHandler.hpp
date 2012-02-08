@@ -52,6 +52,7 @@ public:
 		:protocol::LineCommandHandlerTemplate<CommandHandler>( stm),m_config(cfg){}
 
 	//methods called by the protocol and implemented here
+	int doHello( int argc, const char** argv, std::ostream& out);
 	int doCmd1A( int argc, const char** argv, std::ostream& out);
 	int doCmd1B( int argc, const char** argv, std::ostream& out);
 	int doCmd1C( int argc, const char** argv, std::ostream& out);

@@ -55,9 +55,11 @@ struct STM :public protocol::LineCommandHandlerSTMTemplate<CommandHandler>
 	{
 		(*this)
 			[State1]
+				.cmd< &CommandHandler::doHello >( "HELLO")
 				.cmd< &CommandHandler::doCmd1A >( "CMD1A")
 				.cmd< &CommandHandler::doCmd1B >( "CMD1B")
 				.cmd< &CommandHandler::doCmd1C >( "CMD1B")
+				.cmd< &CommandHandler::doCmdQUIT >( "QUIT")
 			[State2]
 				.cmd< &CommandHandler::doCmd2A >( "CMD2A")
 				.cmd< &CommandHandler::doCmd2B >( "CMD2B")
@@ -230,6 +232,25 @@ int CommandHandler::doCmdQUIT( int argc, const char**, std::ostream& out)
 		out << "BYE" << endl();
 		return -1;
 	}
+}
+
+int CommandHandler::doHello( int argc, const char**, std::ostream& out)
+{
+	if (argc != 0)
+	{
+		out << "BAD arguments" << endl();
+		return stateidx();
+	}
+	try
+	{
+		CommandHandler* ch = (CommandHandler*)new ExecCommandHandler( cmds(), m_config->getCommands());
+			delegateProcessing<&CommandHandler::endRun>( ch);
+	}
+	catch (const std::exception& e)
+	{
+		LOG_ERROR << "exception in command execution: " << e.what();
+	}
+	return stateidx();
 }
 
 void Connection::networkInput( const void* dt, std::size_t nofBytes)
