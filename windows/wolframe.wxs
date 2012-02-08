@@ -138,7 +138,7 @@
 
 		<Feature Id="Complete" Title="Complete" Description="The complete package."
 		         Display="expand" Level="1" ConfigurableDirectory="INSTALLDIR">
-			<Feature Id="MainProgram" Title="Wolframe Service" Description="The basic Wolframe server." Level="1" AllowAdvertise="no" Absent="disallow">
+			<Feature Id="MainProgram" Title="Wolframe Service" Description="The basic Wolframe server." Level="1" AllowAdvertise="no" Absent="disallow" InstallDefault="local">
 				<ComponentRef Id="License"/>
 				<ComponentRef Id="ServiceBinary"/>
 				<?ifdef var.with_ssl?>				
@@ -156,41 +156,41 @@
 				<MergeRef Id="VCRedist"/>
 			</Feature>
 			
-			<Feature Id="DatabaseModules" Title="Database Modules" Description="Connectors to databases" Level="2">
+			<Feature Id="DatabaseModules" Title="Database Modules" Description="Connectors to databases" Level="3">
 				<?ifdef with_pgsql?>
-				<Feature Id="PostgresqlDB" Title="PostgreSQL database driver" Description="Access PostgreSQL database." Level="3">
+				<Feature Id="PostgresqlDB" Title="PostgreSQL database driver" Description="Access PostgreSQL database." Level="1000">
 					<ComponentRef Id="ModDbPostgresql"/>
 					<ComponentRef Id="PostgresqlDlls"/>
 				</Feature>
 				<?endif?>
 
 				<?ifdef with_sqlite3?>
-				<Feature Id="Sqlite3DB" Title="SQlite3 database driver" Description="Access local Sqlite3 database files." Level="3">
+				<Feature Id="Sqlite3DB" Title="SQlite3 database driver" Description="Access local Sqlite3 database files." Level="3" InstallDefault="local" TypicalDefault="install">
 					<ComponentRef Id="ModDbSqlite3"/>
 				</Feature>				
 				<?endif?>
 			</Feature>
 			
-			<Feature Id="AuditModules" Title="Modules for Auditing" Description="Audit modules" Level="2">
-				<Feature Id="AuditDatabase" Title="Audit via database" Description="Audit via a database module." Level="3">
+			<Feature Id="AuditModules" Title="Modules for Auditing" Description="Audit modules" Level="3">
+				<Feature Id="AuditDatabase" Title="Audit via database" Description="Audit via a database module." Level="3" TypicalDefault="install">
 					<ComponentRef Id="ModAuditDatabase"/>
 				</Feature>
-				<Feature Id="AuditTextfile" Title="Audit via textfile" Description="Audit via a local text file." Level="3">
+				<Feature Id="AuditTextfile" Title="Audit via textfile" Description="Audit via a local text file." Level="3" InstallDefault="local" TypicalDefault="install">
 					<ComponentRef Id="ModAuditTextfile"/>
 				</Feature>
 			</Feature>
 			
-			<Feature Id="AuthModules" Title="Authentication Modules" Description="Authentication modules" Level="2">
-				<Feature Id="AuthDatabase" Title="Authenticate via database" Description="Use a database module for authentication." Level="3">
+			<Feature Id="AuthModules" Title="Authentication Modules" Description="Authentication modules" Level="3">
+				<Feature Id="AuthDatabase" Title="Authenticate via database" Description="Use a database module for authentication." Level="3" InstallDefault="local" TypicalDefault="install">
 					<ComponentRef Id="ModAuthDatabase"/>
 				</Feature>
-				<Feature Id="AuthTextfile" Title="Authenticate via textfile" Description="Use a local textfile for authentication." Level="3">
+				<Feature Id="AuthTextfile" Title="Authenticate via textfile" Description="Use a local textfile for authentication." Level="3" InstallDefault="local" TypicalDefault="install">
 					<ComponentRef Id="ModAuthTextfile"/>
 				</Feature>
 			</Feature>
 			
-			<Feature Id="ProcModules" Title="Processor Modules" Description="Modules with processors doing the actual work." Level="2">
-				<Feature Id="ProcEcho" Title="Echo processor" Description="A demo processor echoing all input." Level="3">
+			<Feature Id="ProcModules" Title="Processor Modules" Description="Modules with processors doing the actual work." Level="3">
+				<Feature Id="ProcEcho" Title="Echo processor" Description="A demo processor echoing all input." Level="1000">
 					<ComponentRef Id="ModProcEcho"/>
 				</Feature>
 			</Feature>
