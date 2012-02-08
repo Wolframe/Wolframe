@@ -66,9 +66,7 @@
 			     - http://social.msdn.microsoft.com/Forums/en-US/vcgeneral/thread/867cf808-bf1f-4f4a-bde1-cd75d92d73ad
 			     - http://stackoverflow.com/questions/59635/app-does-not-run-with-vs-2008-sp1-dlls-previous-version-works-with-rtm-versions
 			  -->
-<!--			<Merge Id="VCRedist" Language="0" SourceFile="C:\Program Files\Common Files\Merge Modules\Microsoft_VC90_CRT_x86.msm" DiskId="1"/> -->
-			<Merge Id="VCRedist" Language="0" SourceFile="C:\Program Files (x86)\Common Files\Merge Modules\Microsoft_VC90_CRT_x86.msm" DiskId="1"/>
-<!--			<Merge Id="VCRedist" Language="0" SourceFile="C:\Program Files (x86)\Common Files\Merge Modules\Microsoft_VC90_CRT_x86.msm" DiskId="1"/>-->	
+			<Merge Id="VCRedist" Language="0" SourceFile="$(var.VCRedist.Location)" DiskId="1"/>
 		</Directory>
 
 		<DirectoryRef Id="ApplicationProgramsFolder">
@@ -116,8 +114,7 @@
 		</Feature>
 		
 		<WixVariable Id="WixUILicenseRtf" Value="license.rtf"/>
-<!-- TODO: find better image here
-		<WixVariable Id="WixUIDialogBmp" Value="wolframe.bmp"/>-->
+		<WixVariable Id="WixUIDialogBmp" Value="Wolf.bmp"/>
 		<Property Id="WIXUI_EXITDIALOGOPTIONALTEXT" Value="Check out http://www.wolframe.net for additional information."/>
 
 		<UIRef Id="WixUI_Mondo"/>
