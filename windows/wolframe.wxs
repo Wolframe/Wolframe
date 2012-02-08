@@ -26,28 +26,75 @@
 				<Directory Id="WolframeGroup" Name="Wolframe Group">
 					<Directory Id="INSTALLDIR" Name="Wolframe">
 						<Component Id="License" Guid="{6999FF89-95FC-4E6B-867B-7AC19839284E}">
-							<File Id="license" Name="license.rtf" DiskId="1" Source="license.rtf"/>
+							<File Id="license.rtf" Name="license.rtf" DiskId="1" Source="license.rtf"/>
 						</Component>
 						<Directory Id="BinDir" Name="bin">
 							<Component Id="ServiceBinary" Guid="{112265CD-F35C-49B5-A4A1-F685B32BC208}">
-								<File Id="wolframed" Name="wolframed.exe" DiskId="1" Source="..\src\wolframed.exe"/>
+								<File Id="wolframed.exe" Name="wolframed.exe" DiskId="1" Source="..\src\wolframed.exe"/>
 								<firewall:FirewallException Id="Protocol" Name="Wolframe Protocol" Port="7661" Protocol="tcp" Scope="any"/>
 								<firewall:FirewallException Id="SSLProtocol" Name="Wolframe Protocol (SSL)" Port="7961" Protocol="tcp" Scope="any"/>
 							</Component>
-
+						
+							<?ifdef var.with_ssl?>				
 							<Component Id="OpenSSL" Guid="{606BA861-BBE5-49C0-A037-6A4F4B2DD496}"> 
-								<File Id="ssleay32" Name="ssleay32.dll" DiskId="1" Source="..\src\ssleay32.dll"/> 
-								<File Id="libeay32" Name="libeay32.dll" DiskId="1" Source="..\src\libeay32.dll"/> 
-							</Component> 
-
-							<Component Id="LibXML2" Guid="{B2788BB1-0226-4365-AB12-C24F21B37134}">
-								<File Id="libxml2" Name="libxml2.dll" DiskId="1" Source="..\src\libxml2.dll"/>
+								<File Id="ssleay32.dll" Name="ssleay32.dll" DiskId="1" Source="..\src\ssleay32.dll"/> 
+								<File Id="libeay32.dll" Name="libeay32.dll" DiskId="1" Source="..\src\libeay32.dll"/> 
 							</Component>
+							<?endif?>
 
+							<?ifdef var.with_libxml?>
+							<Component Id="LibXML2" Guid="{B2788BB1-0226-4365-AB12-C24F21B37134}">
+								<File Id="libxml2.dll" Name="libxml2.dll" DiskId="1" Source="..\src\libxml2.dll"/>
+							</Component>
+							<?endif?>
+
+							<?ifdef with_pgsql?>
+							<Component Id="PostgresqlDlls" Guid="{3BD6483F-70B2-44D3-9C65-26787635A44B}">
+								<File Id="libpq.dll" Name="libpq.dll" DiskId="1" Source="..\src\libpq.dll"/>
+								<File Id="libiconv.dll" Name="libiconv.dll" DiskId="1" Source="..\src\libiconv.dll"/>
+								<File Id="libintl.dll" Name="libintl.dll" DiskId="1" Source="..\src\libintl.dll"/>
+							</Component>
+							<?endif?>
+						</Directory>
+
+						<Directory Id="ConfigDir" Name="config">
 							<Component Id="WolframeConfigXml" Guid="{2ECC2B4F-9198-4498-8BD2-00446C16F239}">
 								<File Id="wolframe.xml" Name="wolframe.xml" DiskId="1" Source="wolframe.xml"/>
 							</Component>
-														
+						</Directory>
+
+						<Directory Id="ModulesDir" Name="modules">
+							<?ifdef with_pgsql?>
+							<Component Id="ModDbPostgresql" Guid="{F1A6E235-2394-466A-AB1E-A1CD6C396339}">
+								<File Id="mod_db_postgresql.dll" Name="mod_db_postgresql.dll" DiskId="1" Source="..\src\modules\database\postgresql\mod_db_postgresql.dll"/>
+							</Component>
+							<?endif?>
+
+							<?ifdef with_sqlite3?>
+							<Component Id="ModDbSqlite3" Guid="{71270C73-F3B4-4956-8DBC-D80301BB3417}">
+								<File Id="mod_db_sqlite3.dll" Name="mod_db_sqlite3.dll" DiskId="1" Source="..\src\modules\database\sqlite3\mod_db_sqlite3.dll"/>
+							</Component>
+							<?endif?>
+
+							<Component Id="ModAuditDatabase" Guid="{8EBEC554-6E24-435A-82E1-EE7B1DADE59D}">
+								<File Id="mod_audit_database.dll" Name="mod_audit_database.dll" DiskId="1" Source="..\src\modules\audit\database\mod_audit_database.dll"/>
+							</Component>
+							
+							<Component Id="ModAuditTextfile" Guid="{A2A224B8-E564-4F45-B600-A3FC6142544F}">
+								<File Id="mod_audit_textfile.dll" Name="mod_audit_textfile.dll" DiskId="1" Source="..\src\modules\audit\textfile\mod_audit_textfile.dll"/>
+							</Component>
+
+							<Component Id="ModAuthDatabase" Guid="{5C91782A-8751-40ED-9E3C-3818405614B8}">
+								<File Id="mod_auth_database.dll" Name="mod_auth_database.dll" DiskId="1" Source="..\src\modules\authentication\database\mod_auth_database.dll"/>
+							</Component>
+
+							<Component Id="ModAuthTextfile" Guid="{C3062ADD-6827-4ABE-915F-F1DA1D8EAF47}">
+								<File Id="mod_auth_textfile.dll" Name="mod_auth_textfile.dll" DiskId="1" Source="..\src\modules\authentication\textfile\mod_auth_textfile.dll"/>
+							</Component>
+
+							<Component Id="ModProcEcho" Guid="{A2B8DBB1-1059-4596-A6E1-7DC31214F305}">
+								<File Id="mod_proc_echo.dll" Name="mod_proc_echo.dll" DiskId="1" Source="..\src\modules\processor\echo\mod_proc_echo.dll"/>
+							</Component>							
 						</Directory>
 					</Directory>
 				</Directory>
@@ -91,11 +138,15 @@
 
 		<Feature Id="Complete" Title="Complete" Description="The complete package."
 		         Display="expand" Level="1" ConfigurableDirectory="INSTALLDIR">
-			<Feature Id="MainProgram" Title="Program" Description="The main executable." Level="1">
+			<Feature Id="MainProgram" Title="Wolframe Service" Description="The basic Wolframe server." Level="1" AllowAdvertise="no" Absent="disallow" InstallDefault="local">
 				<ComponentRef Id="License"/>
 				<ComponentRef Id="ServiceBinary"/>
+				<?ifdef var.with_ssl?>				
 				<ComponentRef Id="OpenSSL"/>
+				<?endif?>
+				<?ifdef var.with_libxml?>
 				<ComponentRef Id="LibXML2"/>
+				<?endif?>
 				<ComponentRef Id="WolframeConfigXml"/>
 				<ComponentRef Id="ApplicationShortcut"/>
 			</Feature>
@@ -105,10 +156,58 @@
 				<MergeRef Id="VCRedist"/>
 			</Feature>
 			
-			<Feature Id="Documentation" Title="Manual" Description="The Wolfbones usage manual." Level="1000">
+			<Feature Id="DatabaseModules" Title="Database Modules" Description="Connectors to databases" Level="3">
+				<?ifdef with_pgsql?>
+				<Feature Id="PostgresqlDB" Title="PostgreSQL database driver" Description="Access PostgreSQL database." Level="1000">
+					<ComponentRef Id="ModDbPostgresql"/>
+					<ComponentRef Id="PostgresqlDlls"/>
+				</Feature>
+				<?endif?>
+
+				<?ifdef with_sqlite3?>
+				<Feature Id="Sqlite3DB" Title="SQlite3 database driver" Description="Access local Sqlite3 database files." Level="3" InstallDefault="local" TypicalDefault="install">
+					<ComponentRef Id="ModDbSqlite3"/>
+				</Feature>				
+				<?endif?>
+			</Feature>
+			
+			<Feature Id="AuditModules" Title="Modules for Auditing" Description="Audit modules" Level="3">
+				<Feature Id="AuditDatabase" Title="Audit via database" Description="Audit via a database module." Level="3" TypicalDefault="install">
+					<ComponentRef Id="ModAuditDatabase"/>
+				</Feature>
+				<Feature Id="AuditTextfile" Title="Audit via textfile" Description="Audit via a local text file." Level="3" InstallDefault="local" TypicalDefault="install">
+					<ComponentRef Id="ModAuditTextfile"/>
+				</Feature>
+			</Feature>
+			
+			<Feature Id="AuthModules" Title="Authentication Modules" Description="Authentication modules" Level="3">
+				<Feature Id="AuthDatabase" Title="Authenticate via database" Description="Use a database module for authentication." Level="3" InstallDefault="local" TypicalDefault="install">
+					<ComponentRef Id="ModAuthDatabase"/>
+				</Feature>
+				<Feature Id="AuthTextfile" Title="Authenticate via textfile" Description="Use a local textfile for authentication." Level="3" InstallDefault="local" TypicalDefault="install">
+					<ComponentRef Id="ModAuthTextfile"/>
+				</Feature>
+			</Feature>
+			
+			<Feature Id="ProcModules" Title="Processor Modules" Description="Modules with processors doing the actual work." Level="3">
+				<Feature Id="ProcEcho" Title="Echo processor" Description="A demo processor echoing all input." Level="1000">
+					<ComponentRef Id="ModProcEcho"/>
+				</Feature>
 			</Feature>
 
-			<Feature Id="SDK" Title="SDK" Description="The programming SDK." Level="1000">
+			<Feature Id="Clients" Title="Clients" Description="Client programmes talking to Wolframe." Level="2">
+				<Feature Id="QtClient" Title="Qt Client" Description="A Qt client to access the Wolframe server." Level="3">
+				</Feature>
+				<Feature Id="Cli" Title="Command Line Interface" Description="A simple command line interpreter to access the Wolframe server." Level="3">
+				</Feature>
+			</Feature>
+			
+			<Feature Id="Documentation" Title="Documentation" Description="The Wolfbones documentation." Level="2">
+				<Feature Id="UserManual" Title="User Manual" Description="The Wolfbones usage manual." Level="3">
+				</Feature>
+			</Feature>
+
+			<Feature Id="SDK" Title="SDK" Description="The programming SDK." Level="2">
 			</Feature>
 
 		</Feature>

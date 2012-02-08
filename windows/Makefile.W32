@@ -35,13 +35,39 @@ VDREDIST_MERGE_MODULE = C:\Program Files (x86)\Common Files\Merge Modules\Micros
 #ARCH = x86
 ARCH = x64
 
+WIX_FLAGS = \
+	-dVCRedist.Location="$(VDREDIST_MERGE_MODULE)"
+
+!IFDEF WITH_SSL
+WIX_FLAGS = $(WIX_FLAGS) \
+	-dwith_ssl=1
+!ENDIF
+
+!IFDEF WITH_PGSQL
+WIX_FLAGS = $(WIX_FLAGS) \
+	-dwith_pgsql=1
+!ENDIF
+
+!IFDEF WITH_SQLITE3
+WIX_FLAGS = $(WIX_FLAGS) \
+	-dwith_sqlite3=1
+!ENDIF
+
+!IFDEF WITH_LIBXML2
+WIX_FLAGS = $(WIX_FLAGS) \
+	-dwith_libxml2=1
+!ENDIF
+
+WIX_EXTENSIONS = \
+	-ext WixUIExtension -ext WixUtilExtension -ext WixFirewallExtension
+	
 CANDLE = "$(WIX_DIR)\bin\candle.exe"
 LIGHT = "$(WIX_DIR)\bin\light.exe"
 SMOKE = "$(WIX_DIR)\bin\smoke.exe"
 
 local_all: $(CPP_BINS)
-	$(CANDLE) /nologo -arch $(ARCH) -dVCRedist.Location="$(VDREDIST_MERGE_MODULE)" -ext WixUIExtension -ext WixUtilExtension -ext WixFirewallExtension wolframe.wxs
-	$(LIGHT) /nologo -ext WixUIExtension -ext WixUtilExtension -ext WixFirewallExtension wolframe.wixobj
+	$(CANDLE) /nologo -arch $(ARCH) $(WIX_FLAGS) $(WIX_EXTENSIONS) wolframe.wxs
+	$(LIGHT) /nologo $(WIX_FLAGS) $(WIX_EXTENSIONS) wolframe.wixobj
 
 #uuidgen.exe: uuidgen.obj
 	
