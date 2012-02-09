@@ -60,8 +60,14 @@ void PAMAuthConfig::print( std::ostream& os, size_t indent ) const
 	os << indStr << "   PAM service: " << m_service << std::endl;
 }
 
+// Solaris defines the pam client callback function slightly different
+#ifdef SUNOS
+static int pam_conv_func(	int nmsg, struct pam_message **msg,
+				struct pam_response **reply, void *appdata_ptr );
+#else
 static int pam_conv_func(	int nmsg, const struct pam_message **msg,
 				struct pam_response **reply, void *appdata_ptr );
+#endif
 
 static const char *msg_style_to_str( int msg_style )
 {
@@ -91,8 +97,13 @@ static void null_and_free( int nmsg, struct pam_response *pr )
 	free( pr );
 }
 
+#ifdef SUNOS
+static int pam_conv_func(	int nmsg, struct pam_message **msg,
+				struct pam_response **reply, void *appdata_ptr )
+#else
 static int pam_conv_func(	int nmsg, const struct pam_message **msg,
 				struct pam_response **reply, void *appdata_ptr )
+#endif
 {
 	int i;
 	const struct pam_message *m = *msg;
@@ -141,7 +152,12 @@ static int pam_conv_func(	int nmsg, const struct pam_message **msg,
 			case PAM_PROMPT_ECHO_OFF:
 // thank you very much, come again (but with a password)
 				if( !appdata->has_pass )
+// Solaris has no PAM_CONV_AGAIN, returning an error instead
+#ifdef SUNOS
+					return PAM_CONV_ERR;
+#else
 					return PAM_CONV_AGAIN;
+#endif
 
 				r->resp = strdup( appdata->pass.c_str( ) );
 				if( r->resp == NULL ) {
@@ -153,7 +169,12 @@ static int pam_conv_func(	int nmsg, const struct pam_message **msg,
 // Check against the PAM_USER_PROMPT to be sure we have a login request.
 // Always recheck because the library could change the prompt any time
 			case PAM_PROMPT_ECHO_ON:
+// Solaris hat different API in pam_get_item
+#ifdef SUNOS
+				rc = pam_get_item( appdata->h, PAM_USER_PROMPT, (void **)&login_prompt_union.v );
+#else				
 				rc = pam_get_item( appdata->h, PAM_USER_PROMPT, &login_prompt_union.v );
+#endif
 				if( rc != PAM_SUCCESS ) {
 					std::ostringstream ss;
 
