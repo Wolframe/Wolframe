@@ -27,8 +27,8 @@ WIX_DIR = C:\Program Files (x86)\Windows Installer XML v3.5
 # @home PIII
 #WIX_DIR = C:\Program Files\Windows Installer XML v3.5
 
-VDREDIST_MERGE_MODULE = C:\Program Files\Common Files\Merge Modules\Microsoft_VC90_CRT_x86.msm
-VDREDIST_MERGE_MODULE = C:\Program Files (x86)\Common Files\Merge Modules\Microsoft_VC90_CRT_x86.msm
+#VDREDIST_MERGE_MODULE = C:\Program Files\Common Files\Merge Modules\Microsoft_VC90_CRT_x86.msm
+#VDREDIST_MERGE_MODULE = C:\Program Files (x86)\Common Files\Merge Modules\Microsoft_VC90_CRT_x86.msm
 VDREDIST_MERGE_MODULE = C:\Program Files (x86)\Common Files\Merge Modules\Microsoft_VC90_CRT_x86.msm
 
 !IF ( "$(CPU)" == "i386" )
