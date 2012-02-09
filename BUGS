@@ -56,6 +56,9 @@ Loaded symbols for /libexec/ld-elf.so.1
 #4  0x080e560a in _Wolframe_posixMain (argc=4, argv=0xbfbfe848) at posixMain.cpp:276
 #5  0x080e9b82 in main (argc=Cannot access memory at address 0x0) at wolframed.cpp:55
 
+Same bug appears in tests/modules/moduleTest. The object received from the container
+is empty!
+
 Building the Qt client segfaults:
 
 /usr/local/bin/moc-qt4 -I. -I/usr/local/include/qt4
