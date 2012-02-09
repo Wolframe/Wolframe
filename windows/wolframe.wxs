@@ -42,7 +42,7 @@
 							</Component>
 							<?endif?>
 
-							<?ifdef var.with_libxml?>
+							<?ifdef var.with_libxml2?>
 							<Component Id="LibXML2" Guid="{B2788BB1-0226-4365-AB12-C24F21B37134}">
 								<File Id="libxml2.dll" Name="libxml2.dll" DiskId="1" Source="..\src\libxml2.dll"/>
 							</Component>
@@ -144,7 +144,7 @@
 				<?ifdef var.with_ssl?>				
 				<ComponentRef Id="OpenSSL"/>
 				<?endif?>
-				<?ifdef var.with_libxml?>
+				<?ifdef var.with_libxml2?>
 				<ComponentRef Id="LibXML2"/>
 				<?endif?>
 				<ComponentRef Id="WolframeConfigXml"/>
