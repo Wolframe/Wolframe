@@ -154,6 +154,18 @@ bool module::LoadModules( ModulesDirectory& modDir, std::list< std::string >& mo
 			break;
 		}
 #endif
+		if( !entry->name ) {
+			LOG_ERROR << "Module entry point has no name, something is wrong in module '" << *it << "')";
+			retVal = false;
+#if !defined(_WIN32)
+			dlclose( hndl );
+#else
+			(void)FreeLibrary( hndl );
+#endif
+
+			break;
+		}
+
 		entry->setLogger( &_Wolframe::log::LogBackend::instance() );
 		modDir.addContainer( entry->create() );
 		handleList.addHandle( hndl );

@@ -37,28 +37,6 @@ make: *** [WolfBook.epub] Error 5
 FreeBSD 8.2
 -----------
 
-Segmentation fault when starting wolframed:
-
-Loaded symbols for /libexec/ld-elf.so.1
-#0  ProcessorProvider_Impl (this=0x287481e0, conf=0x28709660, modules=0xbfbfe778)
-    at procProvider.cpp:182
-182				m_proc.push_back( proc->object() );
-[New Thread 28701140 (LWP 100139)]
-(gdb) bt
-#0  ProcessorProvider_Impl (this=0x287481e0, conf=0x28709660, modules=0xbfbfe778)
-    at procProvider.cpp:182
-#1  0x080d4280 in ProcessorProvider (this=0x28715cec, conf=0x28709660, modules=0xbfbfe778)
-    at procProvider.cpp:150
-#2  0x080d6e29 in WolframeHandler (this=0x28715ce0, conf=0x28715bc0, modules=0xbfbfe778)
-    at wolframeHandler.cpp:277
-#3  0x080d73c0 in ServerHandler (this=0xbfbfe784, conf=0x28715bc0, modules=0xbfbfe778)
-    at wolframeHandler.cpp:313
-#4  0x080e560a in _Wolframe_posixMain (argc=4, argv=0xbfbfe848) at posixMain.cpp:276
-#5  0x080e9b82 in main (argc=Cannot access memory at address 0x0) at wolframed.cpp:55
-
-Same bug appears in tests/modules/moduleTest. The object received from the container
-is empty!
-
 Building the Qt client segfaults:
 
 /usr/local/bin/moc-qt4 -I. -I/usr/local/include/qt4

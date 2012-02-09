@@ -141,9 +141,11 @@ LDFLAGS_LT = -L$(LIBLT_DIR)/lib
 LIBS_LT = -lintl
 endif
 
+# Note for dlopen to work (at least on FreeBSD) with rtti information we have to export all symbols
+# in the binary and in the modules (see http://stackoverflow.com/questions/2351786/dynamic-cast-fails-when-used-with-dlopen-dlsym)
 ifeq "$(PLATFORM)" "FREEBSD"
 INCLUDE_FLAGS_LT = -I/usr/local/include
-LDFLAGS_LT = -L/usr/local/lib
+LDFLAGS_LT = -L/usr/local/lib -Wl,-E
 LIBS_LT = -lintl
 endif
 
