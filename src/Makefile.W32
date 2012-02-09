@@ -154,30 +154,29 @@ local_distclean:
 
 local_test:
 
-run_prereq:
-	@-echo @echo off > test.bat
+copy_prereq:
 !IFDEF WITH_SSL
-	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat
-	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >> test.bat
+	@-copy "$(OPENSSL_DIR)\bin\libeay32.dll" .
+	@-copy "$(OPENSSL_DIR)\bin\ssleay32.dll" .
 !ENDIF
 !IFDEF WITH_LIBXML2
-	@-echo copy "$(LIBXML2_DIR)\lib\libxml2.dll" . >> test.bat
+	@-copy "$(LIBXML2_DIR)\lib\libxml2.dll" .
 !ENDIF
 !IFDEF WITH_PGSQL
-	@-echo copy "$(PGSQL_DIR)\lib\libpq.dll" . >> test.bat
-	@-echo copy "$(PGSQL_DIR)\bin\libintl*.dll" . >> test.bat
-	@-echo copy "$(PGSQL_DIR)\bin\libiconv*.dll" . >> test.bat
+	@-copy "$(PGSQL_DIR)\lib\libpq.dll" .
+	@-copy "$(PGSQL_DIR)\bin\libintl*.dll" .
+	@-copy "$(PGSQL_DIR)\bin\libiconv*.dll" .
 !ENDIF
 
-run: run_prereq
-	@-echo echo Running the Wolframe server... >> test.bat
+run: copy_prereq
+	@-echo echo Running the Wolframe server... > test.bat
 	@-echo wolframed.exe -c wolframe.xml >> test.bat
 	@-test.bat
 
-check: run_prereq
-	@-echo wolframed.exe -c wolframe.xml -t >> test.bat
+check: copy_prereq
+	@-echo wolframed.exe -c wolframe.xml -t > test.bat
 	@-test.bat
 
-print: run_prereq
-	@-echo wolframed.exe -c wolframe.xml -p >> test.bat
+print: copy_prereq
+	@-echo wolframed.exe -c wolframe.xml -p > test.bat
 	@-test.bat
