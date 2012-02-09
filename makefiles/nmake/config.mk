@@ -30,7 +30,7 @@ BOOST_VERSION = 1_46_0
 #BOOST_DIR = C:\Programme\boost\boost_$(BOOST_VERSION)
 #BOOST_DIR = C:\Program Files\boost\boost_$(BOOST_VERSION)
 #BOOST_DIR = D:\Programme\boost\boost_$(BOOST_VERSION)
-BOOST_DIR = C:\Cygwin\home\Andreas\boost_1_46_0-win32
+BOOST_DIR = C:\Cygwin\home\Andreas\boost_1_46_0-win64
 #BOOST_DIR = D:\boost\boost_1_45_0
 #BOOST_DIR = D:\Program Files\boost\boost_$(BOOST_VERSION)
 
@@ -62,7 +62,7 @@ BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib"
 ##############################################################
 
 #OPENSSL_DIR = C:\Programme\OpenSSL-1.0.0a
-OPENSSL_DIR = C:\Program Files (x86)\OpenSSL
+OPENSSL_DIR = C:\Program Files\OpenSSL
 #OPENSSL_DIR = D:\Programme\OpenSSL
 #OPENSSL_DIR = D:\OpenSSL\Win32
 #OPENSSL_DIR = D:\Program Files\OpenSSL-1.0.0d
@@ -86,7 +86,7 @@ PGSQL_DIR = C:\Program Files\PostgreSQL\9.0
 # libxml2
 #########
 
-LIBXML2_DIR = C:\cygwin\home\Andreas\libxml2-2.7.8.win32
+LIBXML2_DIR = C:\cygwin\home\Andreas\libxml2-2.7.8.win64
 #LIBXML2_DIR = D:\Program Files\libxml2-2.7.8.win32
 
 # libxslt

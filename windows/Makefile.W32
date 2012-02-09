@@ -31,9 +31,13 @@ VDREDIST_MERGE_MODULE = C:\Program Files\Common Files\Merge Modules\Microsoft_VC
 VDREDIST_MERGE_MODULE = C:\Program Files (x86)\Common Files\Merge Modules\Microsoft_VC90_CRT_x86.msm
 VDREDIST_MERGE_MODULE = C:\Program Files (x86)\Common Files\Merge Modules\Microsoft_VC90_CRT_x86.msm
 
-# TODO: probe and automatize this!
-ARCH = x86
-#ARCH = x64
+!IF ( "$(CPU)" == "i386" )
+WIX_ARCH = x86
+!ENDIF CPU == i386
+
+!IF ( "$(CPU)" == "AMD64" )
+WIX_ARCH = x64
+!ENDIF CPU == AMD64
 
 WIX_FLAGS = \
 	-dVCRedist.Location="$(VDREDIST_MERGE_MODULE)"
@@ -66,11 +70,9 @@ LIGHT = "$(WIX_DIR)\bin\light.exe"
 SMOKE = "$(WIX_DIR)\bin\smoke.exe"
 
 local_all: $(CPP_BINS)
-	$(CANDLE) /nologo -arch $(ARCH) $(WIX_FLAGS) $(WIX_EXTENSIONS) wolframe.wxs
+	$(CANDLE) /nologo -arch $(WIX_ARCH) $(WIX_FLAGS) $(WIX_EXTENSIONS) wolframe.wxs
 	$(LIGHT) /nologo $(WIX_FLAGS) $(WIX_EXTENSIONS) wolframe.wixobj
 
-#uuidgen.exe: uuidgen.obj
-	
 local_clean:
 	@-erase wolframe.wixobj wolframe.wixpdb wolframe.msi 2>NUL
 
