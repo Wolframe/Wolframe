@@ -212,8 +212,6 @@ Project Wolframe.
 	<!-- There is no configuration for accounting as it
 	     should be derived from audit information -->
 	</AAAA>
-	
-</configuration>
 
 <!-- The thing that does the real job ;) -->
 <Processor>
@@ -224,3 +222,5 @@ Project Wolframe.
 		<timeout>10</timeout>
 	</EchoProcessor>
 </Processor>
+	
+</configuration>
