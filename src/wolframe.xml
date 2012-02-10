@@ -1,4 +1,6 @@
-<!-----------------------------------------------------------------------
+<?xml version="1.0"?>
+
+<!--
 
 Copyright (C) 2011 Project Wolframe.
 All rights reserved.
@@ -29,7 +31,7 @@ GNU General Public License Usage
 If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
------------------------------------------------------------------------->
+-->
 
 <!-- Wolframe configuration file -->
 <configuration>

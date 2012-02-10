@@ -1,4 +1,6 @@
-<!-----------------------------------------------------------------------
+<?xml version="1.0"?>
+
+<!--
 
 Copyright (C) 2011 Project Wolframe.
 All rights reserved.
@@ -29,7 +31,7 @@ GNU General Public License Usage
 If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
------------------------------------------------------------------------->
+-->
 
 <!-- Wolframe configuration file -->
 <configuration>
@@ -42,8 +44,6 @@ Project Wolframe.
 		<module>modules\mod_audit_textfile.dll</module>
 		<module>modules\mod_auth_database.dll</module>
 		<module>modules\mod_auth_textfile.dll</module>
-
-		<module>modules\mod_proc_echo.dll</module>
 	</LoadModules>
 
 	<ServerTokens>OS</ServerTokens>		<!--    Print the application name and version
@@ -224,4 +224,3 @@ Project Wolframe.
 		<timeout>10</timeout>
 	</EchoProcessor>
 </Processor>
-	

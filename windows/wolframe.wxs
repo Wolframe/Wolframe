@@ -1,8 +1,44 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+
+Copyright (C) 2011 Project Wolframe.
+All rights reserved.
+
+This file is part of Project Wolframe.
+
+Commercial Usage
+   Licensees holding valid Project Wolframe Commercial licenses may
+   use this file in accordance with the Project Wolframe
+   Commercial License Agreement provided with the Software or,
+   alternatively, in accordance with the terms contained
+   in a written agreement between the licensee and Project Wolframe.
+
+GNU General Public License Usage
+   Alternatively, you can redistribute this file and/or modify it
+   under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   Wolframe is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with Wolframe.  If not, see <http://www.gnu.org/licenses/>.
+
+If you have questions regarding the use of this file, please contact
+Project Wolframe.
+
+-->
+
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
      xmlns:firewall="http://schemas.microsoft.com/wix/FirewallExtension">
-     
+
+	<?define ProductVersion = "0.0.1"?>
+	
 	<?if $(sys.BUILDARCH) = "x64" ?>
 		<?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
 		<?define ProductName = "Wolframe (64-bit)"?>
@@ -11,7 +47,7 @@
 		<?define ProductName = "Wolframe (32-bit)"?>
 	<?endif?>
 	
-	<Product Name="$(var.ProductName)" Version="0.0.1" Manufacturer="Wolframe Team"
+	<Product Name="$(var.ProductName)" Version="$(var.ProductVersion)" Manufacturer="Wolframe Team"
 	         Language="1033" Codepage="1252"
 	         Id="{09E1E9CC-6AE6-4207-B7FE-F47CFDB2861F}" 
 	         UpgradeCode="{64361569-C468-42DE-95A1-901DDDE84D13}" >
@@ -94,6 +130,9 @@
 
 							<Component Id="ModProcEcho" Guid="{A2B8DBB1-1059-4596-A6E1-7DC31214F305}">
 								<File Id="mod_proc_echo.dll" Name="mod_proc_echo.dll" DiskId="1" Source="..\src\modules\processor\echo\mod_proc_echo.dll"/>
+								<util:XmlFile Id="AppendConfigModProcEcho" Action="createElement" ElementPath="/configuration/LoadModules"
+								              Name="module" Value="modules\processor\echo\mod_proc_echo.dll"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							</Component>							
 						</Directory>
 					</Directory>
@@ -135,8 +174,7 @@
 			</Component>
 		</DirectoryRef>
 
-
-		<Feature Id="Complete" Title="Complete" Description="The complete package."
+		<Feature Id="Complete" Title="Wolframe" Description="$(var.ProductName)"
 		         Display="expand" Level="1" ConfigurableDirectory="INSTALLDIR">
 			<Feature Id="MainProgram" Title="Wolframe Service" Description="The basic Wolframe server." Level="1" AllowAdvertise="no" Absent="disallow" InstallDefault="local">
 				<ComponentRef Id="License"/>
@@ -190,24 +228,24 @@
 			</Feature>
 			
 			<Feature Id="ProcModules" Title="Processor Modules" Description="Modules with processors doing the actual work." Level="3">
-				<Feature Id="ProcEcho" Title="Echo processor" Description="A demo processor echoing all input." Level="1000">
+				<Feature Id="ProcEcho" Title="Echo processor" Description="A demo processor echoing all input." Level="3" InstallDefault="local" TypicalDefault="install">
 					<ComponentRef Id="ModProcEcho"/>
 				</Feature>
 			</Feature>
 
-			<Feature Id="Clients" Title="Clients" Description="Client programmes talking to Wolframe." Level="2">
-				<Feature Id="QtClient" Title="Qt Client" Description="A Qt client to access the Wolframe server." Level="3">
+			<Feature Id="Clients" Title="Clients" Description="Client programmes talking to Wolframe." Level="3"  InstallDefault="local">
+				<Feature Id="QtClient" Title="Qt Client" Description="A Qt client to access the Wolframe server." Level="1000">
 				</Feature>
 				<Feature Id="Cli" Title="Command Line Interface" Description="A simple command line interpreter to access the Wolframe server." Level="3">
 				</Feature>
 			</Feature>
 			
-			<Feature Id="Documentation" Title="Documentation" Description="The Wolfbones documentation." Level="2">
+			<Feature Id="Documentation" Title="Documentation" Description="The Wolfbones documentation." Level="3">
 				<Feature Id="UserManual" Title="User Manual" Description="The Wolfbones usage manual." Level="3">
 				</Feature>
 			</Feature>
 
-			<Feature Id="SDK" Title="SDK" Description="The programming SDK." Level="2">
+			<Feature Id="SDK" Title="SDK" Description="The programming SDK." Level="1000">
 			</Feature>
 
 		</Feature>
@@ -215,6 +253,13 @@
 		<WixVariable Id="WixUILicenseRtf" Value="license.rtf"/>
 		<WixVariable Id="WixUIDialogBmp" Value="Wolf.bmp"/>
 		<Property Id="WIXUI_EXITDIALOGOPTIONALTEXT" Value="Check out http://www.wolframe.net for additional information."/>
+
+		<Property Id="ARPPRODUCTICON" Value="Wolframe.ico"/>
+		
+		<Property Id="APPHELPLINK">http://www.wolframe.net</Property>
+		<Icon Id="Wolframe.ico" SourceFile="Wolframe.ico"/>
+
+		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR"/>
 
 		<UIRef Id="WixUI_Mondo"/>
 		<UIRef Id="WixUI_ErrorProgressText"/>
