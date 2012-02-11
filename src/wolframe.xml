@@ -214,16 +214,16 @@ Project Wolframe.
 	<!-- There is no configuration for accounting as it
 	     should be derived from audit information -->
 	</AAAA>
+
+	<!-- The thing that does the real job ;) -->
+	<Processor>
+	<!--	<database>pgdb</database> -->
+	<!-- getting "ERROR: Processor configuration: referenced database ID cannot be empty", no clue why? -->
+		<database>sqlitedb</database>
+		<EchoProcessor>
+			<timeout>10</timeout>
+		</EchoProcessor>
+	</Processor>
 	
 </configuration>
-
-<!-- The thing that does the real job ;) -->
-<Processor>
-<!--	<database>pgdb</database> -->
-<!-- getting "ERROR: Processor configuration: referenced database ID cannot be empty", no clue why? -->
-	<database>sqlitedb</database>
-	<EchoProcessor>
-		<timeout>10</timeout>
-	</EchoProcessor>
-</Processor>
 	
