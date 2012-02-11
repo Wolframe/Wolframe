@@ -14,7 +14,7 @@ local_all: $(OBJS)
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 gtest-all.obj: src\gtest-all.cc
-	$(CCPP) $(CCPPFLAGS) /Fo$@ $?
+	$(CXX) $(CXXFLAGS) /Fo$@ $?
 
 local_all:
 

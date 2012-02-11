@@ -218,7 +218,6 @@ Project Wolframe.
 	<!-- The thing that does the real job ;) -->
 	<Processor>
 	<!--	<database>pgdb</database> -->
-	<!-- getting "ERROR: Processor configuration: referenced database ID cannot be empty", no clue why? -->
 		<database>sqlitedb</database>
 		<EchoProcessor>
 			<timeout>10</timeout>

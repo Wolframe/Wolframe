@@ -3,7 +3,7 @@
 # requires:
 # - INCLUDE_DIRS: directories searched for includes (/I)
 # - INCLUDE_CFLAGS: specific compilation flags (C)
-# - INCLUDE_CPPFLAGS: specific compilation flags (C++)
+# - INCLUDE_CXXFLAGS: specific compilation flags (C++)
 # - INCLUDE_LDFLAGS: library flags like like link location (/L)
 # - INCLUDE_LIBS: additional libraries to link against (e.g. advapi32.dll)
 # provides:
@@ -32,12 +32,12 @@ COMMON_COMPILE_FLAGS = /MD /W2 /nologo /O2 /EHsc /c $(INCLUDE_DIRS)
 
 COMPILE_FLAGS = $(COMMON_COMPILE_FLAGS)
 
-CCPP_COMPILE_FLAGS = $(COMMON_COMPILE_FLAGS) /EHsc
+CXX_COMPILE_FLAGS = $(COMMON_COMPILE_FLAGS) /EHsc
 
 CFLAGS = $(COMPILE_FLAGS) $(PLATFORM_COMPILE_FLAGS) $(INCLUDE_CFLAGS) $(DEBUGLEVELFLAGS)
-CCPPFLAGS = $(CCPP_COMPILE_FLAGS) $(PLATFORM_COMPILE_FLAGS) $(INCLUDE_CPPFLAGS) $(DEBUGLEVELFLAGS)
+CXXFLAGS = $(CXX_COMPILE_FLAGS) $(PLATFORM_COMPILE_FLAGS) $(INCLUDE_CXXFLAGS) $(DEBUGLEVELFLAGS)
 CC = cl.exe
-CCPP = cl.exe
+CXX = cl.exe
 MC = mc.exe
 MT = mt.exe
 RC = rc.exe
@@ -50,7 +50,7 @@ LDFLAGS = /nologo $(INCLUDE_LDFLAGS)
 
 LIBS = $(INCLUDE_LIBS)
 LINK = link.exe
-CCPP_LINK = link.exe
+CXX_LINK = link.exe
 
 .SUFFIXES: .c .cpp .obj .exe .mc .rc .res
 
@@ -58,16 +58,16 @@ CCPP_LINK = link.exe
 	$(CC) $(CFLAGS) /Fo$@ $<
 
 .cpp.obj:
-	$(CCPP) $(CCPPFLAGS) /Fo$@ $<
+	$(CXX) $(CXXFLAGS) /Fo$@ $<
 
 .c.dllobj:
 	$(CC) $(CFLAGS) /D "BUILD_SHARED" /Fo$@ $<
 
 .cpp.dllobj:
-	$(CCPP) $(CCPPFLAGS) /D "BUILD_SHARED" /Fo$@ $<
+	$(CXX) $(CXXFLAGS) /D "BUILD_SHARED" /Fo$@ $<
 
 .obj.exe:
-	$(CCPP_LINK) $(LDFLAGS) $(LIBS) /out:$@ $(OBJS) $**
+	$(CXX_LINK) $(LDFLAGS) $(LIBS) /out:$@ $(OBJS) $**
 	$(MT) -nologo -manifest $@.manifest -outputresource:$@;1
 
 .mc.rc:
