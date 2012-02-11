@@ -38,12 +38,6 @@ Project Wolframe.
 
 	<!-- modules to be loaded by the server -->
 	<LoadModules>
-<!--		<module>modules\mod_db_postgresql.dll</module> -->
-		<module>modules\mod_db_sqlite3.dll</module>
-		<module>modules\mod_audit_database.dll</module>
-		<module>modules\mod_audit_textfile.dll</module>
-		<module>modules\mod_auth_database.dll</module>
-		<module>modules\mod_auth_textfile.dll</module>
 	</LoadModules>
 
 	<ServerTokens>OS</ServerTokens>		<!--    Print the application name and version

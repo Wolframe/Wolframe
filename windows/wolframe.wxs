@@ -103,35 +103,53 @@ Project Wolframe.
 							<?ifdef with_pgsql?>
 							<Component Id="ModDbPostgresql" Guid="{F1A6E235-2394-466A-AB1E-A1CD6C396339}">
 								<File Id="mod_db_postgresql.dll" Name="mod_db_postgresql.dll" DiskId="1" Source="..\src\modules\database\postgresql\mod_db_postgresql.dll"/>
+								<util:XmlFile Id="AppendConfigModDbPostgresql" Action="createElement" ElementPath="/configuration/LoadModules"
+								              Name="module" Value="[INSTALLDIR]modules\mod_db_postgresql.dll"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							</Component>
 							<?endif?>
 
 							<?ifdef with_sqlite3?>
 							<Component Id="ModDbSqlite3" Guid="{71270C73-F3B4-4956-8DBC-D80301BB3417}">
 								<File Id="mod_db_sqlite3.dll" Name="mod_db_sqlite3.dll" DiskId="1" Source="..\src\modules\database\sqlite3\mod_db_sqlite3.dll"/>
+								<util:XmlFile Id="AppendConfigModDbSqlite3" Action="createElement" ElementPath="/configuration/LoadModules"
+								              Name="module" Value="[INSTALLDIR]modules\mod_db_sqlite3.dll"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							</Component>
 							<?endif?>
 
 							<Component Id="ModAuditDatabase" Guid="{8EBEC554-6E24-435A-82E1-EE7B1DADE59D}">
 								<File Id="mod_audit_database.dll" Name="mod_audit_database.dll" DiskId="1" Source="..\src\modules\audit\database\mod_audit_database.dll"/>
+								<util:XmlFile Id="AppendConfigModAuditDatabase" Action="createElement" ElementPath="/configuration/LoadModules"
+								              Name="module" Value="[INSTALLDIR]modules\mod_audit_database.dll"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							</Component>
 							
 							<Component Id="ModAuditTextfile" Guid="{A2A224B8-E564-4F45-B600-A3FC6142544F}">
 								<File Id="mod_audit_textfile.dll" Name="mod_audit_textfile.dll" DiskId="1" Source="..\src\modules\audit\textfile\mod_audit_textfile.dll"/>
+								<util:XmlFile Id="AppendConfigModAuditTextfile" Action="createElement" ElementPath="/configuration/LoadModules"
+								              Name="module" Value="[INSTALLDIR]modules\mod_audit_textfile.dll"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							</Component>
 
 							<Component Id="ModAuthDatabase" Guid="{5C91782A-8751-40ED-9E3C-3818405614B8}">
 								<File Id="mod_auth_database.dll" Name="mod_auth_database.dll" DiskId="1" Source="..\src\modules\authentication\database\mod_auth_database.dll"/>
+								<util:XmlFile Id="AppendConfigModAuthDatabase" Action="createElement" ElementPath="/configuration/LoadModules"
+								              Name="module" Value="[INSTALLDIR]modules\mod_auth_database.dll"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							</Component>
 
 							<Component Id="ModAuthTextfile" Guid="{C3062ADD-6827-4ABE-915F-F1DA1D8EAF47}">
 								<File Id="mod_auth_textfile.dll" Name="mod_auth_textfile.dll" DiskId="1" Source="..\src\modules\authentication\textfile\mod_auth_textfile.dll"/>
+								<util:XmlFile Id="AppendConfigModAuthTextfile" Action="createElement" ElementPath="/configuration/LoadModules"
+								              Name="module" Value="[INSTALLDIR]modules\mod_auth_textfile.dll"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							</Component>
 
 							<Component Id="ModProcEcho" Guid="{A2B8DBB1-1059-4596-A6E1-7DC31214F305}">
 								<File Id="mod_proc_echo.dll" Name="mod_proc_echo.dll" DiskId="1" Source="..\src\modules\processor\echo\mod_proc_echo.dll"/>
 								<util:XmlFile Id="AppendConfigModProcEcho" Action="createElement" ElementPath="/configuration/LoadModules"
-								              Name="module" Value="modules\processor\echo\mod_proc_echo.dll"
+								              Name="module" Value="[INSTALLDIR]modules\mod_proc_echo.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							</Component>							
 						</Directory>
