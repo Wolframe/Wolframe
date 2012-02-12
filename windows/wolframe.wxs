@@ -69,8 +69,11 @@ Project Wolframe.
 								<File Id="wolframed.exe" Name="wolframed.exe" DiskId="1" Source="..\src\wolframed.exe"/>
 								<firewall:FirewallException Id="Protocol" Name="Wolframe Protocol" Port="7661" Protocol="tcp" Scope="any"/>
 								<firewall:FirewallException Id="SSLProtocol" Name="Wolframe Protocol (SSL)" Port="7961" Protocol="tcp" Scope="any"/>
+								<util:XmlFile Id="UpdateLogfileLocation" Action="setValue" ElementPath="/configuration/logging/logFile/filename"
+								              Value="[INSTALLDIR]logs\wolframed.log"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							</Component>
-						
+							
 							<?ifdef var.with_ssl?>				
 							<Component Id="OpenSSL" Guid="{606BA861-BBE5-49C0-A037-6A4F4B2DD496}"> 
 								<File Id="ssleay32.dll" Name="ssleay32.dll" DiskId="1" Source="..\src\ssleay32.dll"/> 
@@ -115,6 +118,9 @@ Project Wolframe.
 								<util:XmlFile Id="AppendConfigModDbSqlite3" Action="createElement" ElementPath="/configuration/LoadModules"
 								              Name="module" Value="[INSTALLDIR]modules\mod_db_sqlite3.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+								<util:XmlFile Id="UpdateSqlite3DbLocation" Action="setValue" ElementPath="/configuration/database/SQLite/filename"
+								              Value="[INSTALLDIR]data\primary.db"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>			
 							</Component>
 							<?endif?>
 
@@ -130,6 +136,9 @@ Project Wolframe.
 								<util:XmlFile Id="AppendConfigModAuditTextfile" Action="createElement" ElementPath="/configuration/LoadModules"
 								              Name="module" Value="[INSTALLDIR]modules\mod_audit_textfile.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+								<util:XmlFile Id="UpdateAuditTextfileLocation" Action="setValue" ElementPath="/configuration/AAAA/Audit/TextFile/file"
+								              Value="[INSTALLDIR]data\audit.txt"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							</Component>
 
 							<Component Id="ModAuthDatabase" Guid="{5C91782A-8751-40ED-9E3C-3818405614B8}">
@@ -144,6 +153,9 @@ Project Wolframe.
 								<util:XmlFile Id="AppendConfigModAuthTextfile" Action="createElement" ElementPath="/configuration/LoadModules"
 								              Name="module" Value="[INSTALLDIR]modules\mod_auth_textfile.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+								<util:XmlFile Id="UpdateAuthTextfileLocation" Action="setValue" ElementPath="/configuration/AAAA/authentication/file"
+								              Value="[INSTALLDIR]data\auth.txt"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							</Component>
 
 							<Component Id="ModProcEcho" Guid="{A2B8DBB1-1059-4596-A6E1-7DC31214F305}">
@@ -153,6 +165,19 @@ Project Wolframe.
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							</Component>							
 						</Directory>
+						
+						<Directory Id="LogDir" Name="logs">
+							<Component Id="EmptyLogDir" Guid="{A9695D48-197D-49A0-A1B8-A8A50D18C693}">
+								<CreateFolder/>
+							</Component>
+						</Directory>
+
+						<Directory Id="DataDir" Name="data">
+							<Component Id="EmptyDataDir" Guid="{48BB041A-BDA9-4B6C-87F9-94CB264F3032}">
+								<CreateFolder/>
+							</Component>
+						</Directory>
+													
 					</Directory>
 				</Directory>
 			</Directory>
@@ -205,6 +230,8 @@ Project Wolframe.
 				<?endif?>
 				<ComponentRef Id="WolframeConfigXml"/>
 				<ComponentRef Id="ApplicationShortcut"/>
+				<ComponentRef Id="EmptyLogDir"/>
+				<ComponentRef Id="EmptyDataDir"/>
 			</Feature>
 
 			<Feature Id="VCRedist" Title="Visual C++ 9.0 Runtime" Level="1"
