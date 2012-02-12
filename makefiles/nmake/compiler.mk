@@ -25,10 +25,10 @@
 # /WX: treat warnings as errors
 
 # compilation flags and compilers (release)
-#COMMON_COMPILE_FLAGS = /MD /W2 /nologo /O2 /EHsc /c $(INCLUDE_DIRS)
+COMMON_COMPILE_FLAGS = /MD /W2 /nologo /O2 /EHsc /c $(INCLUDE_DIRS)
 
 # compilation flags and compilers (debug)
-COMMON_COMPILE_FLAGS = /MDd /Zi /W2 /WX /nologo /O2 /EHsc /c $(INCLUDE_DIRS)
+#COMMON_COMPILE_FLAGS = /MDd /Zi /W2 /WX /nologo /O2 /EHsc /c $(INCLUDE_DIRS)
 
 COMPILE_FLAGS = $(COMMON_COMPILE_FLAGS)
 
