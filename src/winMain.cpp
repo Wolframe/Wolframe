@@ -284,8 +284,13 @@ void WINAPI serviceCtrlFunction( DWORD control )
 // for passing the location of the configuration
 static std::string serviceConfig;
 
+#include <intrin.h>
+
 static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 	try {
+		_Wolframe::log::LogBackend::instance().setWinDebugLevel( _Wolframe::log::LogLevel::LOGLEVEL_DATA );
+		LOG_DEBUG << "Starting up service";
+		
 // read configuration (from the location passed in the command line arguments of the main, not the service_main)
 		_Wolframe::config::CmdLineConfig cmdLineCfg; // empty for a service with --service
 		cmdLineCfg.command = _Wolframe::config::CmdLineConfig::RUN_SERVICE;

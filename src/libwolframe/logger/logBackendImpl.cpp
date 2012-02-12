@@ -96,6 +96,12 @@ void LogBackend::LogBackendImpl::setEventlogSource( const std::string source )
 {
 	eventlogLogger_.setSource( source );
 }
+
+void LogBackend::LogBackendImpl::setWinDebugLevel( const LogLevel::Level level )
+{
+	windebugLogger_.setLevel( level );
+}
+
 #endif // defined( _WIN32 )
 
 inline void LogBackend::LogBackendImpl::log( const LogComponent component, const LogLevel::Level level, const std::string& msg )
@@ -104,6 +110,7 @@ inline void LogBackend::LogBackendImpl::log( const LogComponent component, const
 	logfileLogger_.log( component, level, msg );
 	syslogLogger_.log( component, level, msg );
 #if defined( _WIN32 )
+	windebugLogger_.log( component, level, msg );
 	eventlogLogger_.log( component, level, msg );
 #endif // defined( _WIN32 )
 }
@@ -131,6 +138,9 @@ void LogBackend::setEventlogLevel( const LogLevel::Level level ){ impl_->setEven
 void LogBackend::setEventlogLog( const std::string log )	{ impl_->setEventlogLog( log ); }
 
 void LogBackend::setEventlogSource( const std::string source )	{ impl_->setEventlogSource( source ); }
+
+void LogBackend::setWinDebugLevel( const LogLevel::Level level ) { impl_->setWinDebugLevel( level ); }
+
 #endif // defined( _WIN32 )
 
 void LogBackend::log( const LogComponent component, const LogLevel::Level level, const std::string& msg )

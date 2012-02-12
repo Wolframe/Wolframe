@@ -36,6 +36,7 @@ class LoggingFixture : public ::testing::Test
 #if defined( _WIN32_ )
 			logBack.setSyslogHost( "localhost" );
 			logBack.setSyslogPort( 514 );
+			logBack.setWinDebugLevel( LogLevel::LOGLEVEL_DATA );
 			logBack.setEventlogLevel( LogLevel::LOGLEVEL_DATA );
 			logBack.setEventlogSource( "logTest" );
 			logBack.setEventlogLog( "Application" );

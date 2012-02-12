@@ -32,59 +32,53 @@
 ************************************************************************/
 
 ///
-/// \file logBackend.hpp
-/// \brief Interface for the logging backend
+/// \file logBackendWinDebug.cpp
+/// \brief implementation of the Windows debugging log backend
 ///
 
-#ifndef _LOG_BACKEND_HPP_INCLUDED
-#define _LOG_BACKEND_HPP_INCLUDED
-
-#include "singleton.hpp"
+// TODO: why!!!? logLevel.hpp with << definition should be enough
+#include "logger-v1.hpp"
 #include "logger/logLevel.hpp"
-#include "logger/logSyslogFacility.hpp"
-#include "logger/logComponent.hpp"
+#include "logBackendWinDebug.hpp"
 
-#include <string>
+#include <sstream>
+
+#define WIN32_MEAN_AND_LEAN
+#include <windows.h>
 
 namespace _Wolframe {
-namespace log {
+	namespace log {
 
-class LogBackend : public Singleton< LogBackend >
+WinDebugLogBackend::WinDebugLogBackend( )
 {
-public:
-	LogBackend( );
+	// default is not to log to the Windows debug log, this should be
+	// set manually, if needed (in debug code mainly)
+	logLevel_ = LogLevel::LOGLEVEL_UNDEFINED;
+}
 
-	~LogBackend( );
+WinDebugLogBackend::~WinDebugLogBackend( )
+{
+	// nothing to do here
+}
 
-	void setConsoleLevel( const LogLevel::Level level );
+void WinDebugLogBackend::setLevel( const LogLevel::Level level )
+{
+	logLevel_ = level;
+}
 
-	void setLogfileLevel( const LogLevel::Level level );
+void WinDebugLogBackend::log( const LogComponent /* component */, const LogLevel::Level level, const std::string& msg )
+{
+	if ( level >= logLevel_ ) {
+		std::ostringstream oss;
+		oss << level << ": " << msg << "\r";
+		OutputDebugString( oss.str( ).c_str( ) );
+	}
+}
 
-	void setLogfileName( const std::string filename );
+void WinDebugLogBackend::reopen( )
+{
+	// nothing to do here
+}
 
-	void setSyslogLevel( const LogLevel::Level level );
-
-	void setSyslogFacility( const SyslogFacility::Facility facility );
-
-	void setSyslogIdent( const std::string ident );
-
-#if defined( _WIN32 )
-	void setEventlogLevel( const LogLevel::Level level );
-
-	void setEventlogLog( const std::string log );
-
-	void setEventlogSource( const std::string source );
-
-	void setWinDebugLevel( const LogLevel::Level level );
-#endif // defined( _WIN32 )
-
-	void log( const LogComponent component, const LogLevel::Level level, const std::string& msg );
-
-private:
-	class LogBackendImpl;
-	LogBackendImpl	*impl_;
-};
-
-}} // namespace _Wolframe::log
-
-#endif // _LOG_BACKEND_HPP_INCLUDED
+	} // namespace log
+} // namespace _Wolframe

@@ -32,67 +32,37 @@
 ************************************************************************/
 
 ///
-/// \file logBackendImpl.hpp
-/// \brief header file for the logging backend implementation
+/// \file logBackendWinDebug.hpp
+/// \brief header file for the windows debug backend
 ///
 
-#ifndef _LOG_BACKEND_IMPL_HPP_INCLUDED
-#define _LOG_BACKEND_IMPL_HPP_INCLUDED
+#ifndef _LOG_BACKEND_WINDEBUG_HPP_INCLUDED
+#define _LOG_BACKEND_WINDEBUG_HPP_INCLUDED
 
-#include "logger/logBackend.hpp"
-#include "logBackendConsole.hpp"
-#include "logBackendFile.hpp"
-#include "logBackendSyslog.hpp"
-#if defined( _WIN32 )
-#include "logBackendEventlog.hpp"
-#include "logBackendWinDebug.hpp"
-#endif // defined( _WIN32 )
+#include "logger/logLevel.hpp"
+#include "logger/logComponent.hpp"
 
 namespace _Wolframe {
 	namespace log {
 
-	class LogBackend::LogBackendImpl
+	class WinDebugLogBackend
 	{
 	public:
-		LogBackendImpl( );
+		WinDebugLogBackend( );
 
-		~LogBackendImpl( );
+		~WinDebugLogBackend( );
 
-		void setConsoleLevel( const LogLevel::Level level );
-
-		void setLogfileLevel( const LogLevel::Level level );
-
-		void setLogfileName( const std::string filename );
-
-		void setSyslogLevel( const LogLevel::Level level );
-
-		void setSyslogFacility( const SyslogFacility::Facility facility );
-
-		void setSyslogIdent( const std::string ident );
-
-#if defined( _WIN32 )
-		void setEventlogLevel( const LogLevel::Level level );
-
-		void setEventlogLog( const std::string log );
-
-		void setEventlogSource( const std::string source );
-		
-		void setWinDebugLevel( const LogLevel::Level level );
-#endif // defined( _WIN32 )
+		void setLevel( const LogLevel::Level level );
 
 		void log( const LogComponent component, const LogLevel::Level level, const std::string& msg );
 
+		void reopen( );
+		
 	private:
-		ConsoleLogBackend consoleLogger_;
-		LogfileBackend logfileLogger_;
-		SyslogBackend syslogLogger_;
-#ifdef _WIN32
-		WinDebugLogBackend windebugLogger_;
-		EventlogBackend eventlogLogger_;
-#endif // _WIN32
+		LogLevel::Level	logLevel_;
 	};
 
 	} // namespace log
 } // namespace _Wolframe
 
-#endif // _LOG_BACKEND_IMPL_HPP_INCLUDED
+#endif // _LOG_BACKEND_WINDEBUG_HPP_INCLUDED

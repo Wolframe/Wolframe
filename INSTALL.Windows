@@ -224,6 +224,8 @@ nmake /nologo /f Makefile.msvc install
 
 Adapt LIBXML2_DIR in 'makefiles\nmake\config.mk'.
 
+For the debug version add debug=yes and cruntime=/MDd to the confiugure.js call.
+
 LibXSLT
 -------
 
