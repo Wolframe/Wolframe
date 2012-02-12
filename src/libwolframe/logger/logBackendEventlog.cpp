@@ -236,7 +236,6 @@ void EventlogBackend::calculateSid( )
 			LOG_CRITICAL	<< _Wolframe::log::LogComponent::LogLogging
 					<< "Unable to make a copy of the current SID (CopySid): "
 					<< LogError::LogWinerror;
-			free( tokenSid );
 			free( tokenUser );
 			CloseHandle( tokenProcess );
 			return;
@@ -244,7 +243,6 @@ void EventlogBackend::calculateSid( )
 	} else {
 		LOG_CRITICAL	<< _Wolframe::log::LogComponent::LogLogging
 				<< "Unable to get memory to store copy of user token (malloc)";
-		free( tokenSid );
 		free( tokenUser );
 		CloseHandle( tokenProcess );
 		return;
@@ -252,7 +250,6 @@ void EventlogBackend::calculateSid( )
 
 // the process handle is a pseudo handle which doesn't need closing,
 // all others have to be freed
-	free( tokenSid );
 	free( tokenUser );
 	CloseHandle( tokenProcess );
 }

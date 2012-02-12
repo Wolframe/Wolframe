@@ -288,8 +288,9 @@ static std::string serviceConfig;
 
 static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 	try {
+		// TODO: enable this with a trigger, so we can have remote and local debugging
+		// in running services, a nice feature..
 		_Wolframe::log::LogBackend::instance().setWinDebugLevel( _Wolframe::log::LogLevel::LOGLEVEL_DATA );
-		LOG_DEBUG << "Starting up service";
 		
 // read configuration (from the location passed in the command line arguments of the main, not the service_main)
 		_Wolframe::config::CmdLineConfig cmdLineCfg; // empty for a service with --service
