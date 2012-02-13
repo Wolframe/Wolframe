@@ -66,12 +66,46 @@ Project Wolframe.
 						</Component>
 						<Directory Id="BinDir" Name="bin">
 							<Component Id="ServiceBinary" Guid="{112265CD-F35C-49B5-A4A1-F685B32BC208}">
+								<File Id="wolframemsg.dll" Name="wolframemsg.dll" DiskId="1" Source="..\src\libwolframe\logger\wolframemsg.dll"/>
+								
+								<!-- must be last in list of files as ServiceInstall acts on the last file seen! -->
 								<File Id="wolframed.exe" Name="wolframed.exe" DiskId="1" Source="..\src\wolframed.exe"/>
+
+								<!-- add firewall rules for plain and SSL -->
 								<firewall:FirewallException Id="Protocol" Name="Wolframe Protocol" Port="7661" Protocol="tcp" Scope="any"/>
 								<firewall:FirewallException Id="SSLProtocol" Name="Wolframe Protocol (SSL)" Port="7961" Protocol="tcp" Scope="any"/>
+
+								<!-- set location of the logfile -->
 								<util:XmlFile Id="UpdateLogfileLocation" Action="setValue" ElementPath="/configuration/logging/logFile/filename"
 								              Value="[INSTALLDIR]logs\wolframed.log"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+								
+								<!-- install service (TODO, couple names with config) -->
+								<ServiceInstall Id="ServiceInstallation" Type="ownProcess" Vital="yes"
+								                Name="wolframe" DisplayName="Wolframe Daemon"
+										Description="Wolframe Dameon" Start="demand"
+										Account="LocalSystem" ErrorControl="normal"
+										Interactive="no">
+								</ServiceInstall>
+								<ServiceControl Id="ServiceControl" Name="wolframe" Remove="uninstall"
+								                Stop="both" Wait="yes"/>
+
+								<!-- TODO: writes funny stuff, doesn't work! -->
+								<RegistryKey Root="HKLM" Key="SYSTEM\CurrentControlSet\Services\wolframe">
+									<RegistryValue Id="ImagePath" Type="expandable" Name="ImagePath" 
+									               Value="&quot;[INSTALLDIR]bin\wolframed.exe&quot; --service -c &quot;[INSTALLDIR]config\wolframe.xml&quot;"/>
+								</RegistryKey>
+								
+								<!-- register event logger source (TODO, couple with config) -->
+								<RegistryKey Root="HKLM" Key="SYSTEM\CurrentControlSet\Services\EventLog\Application\Wolframe">
+									<RegistryValue Id="EventMessageFile" Type="expandable" Name="EventMessageFile" 
+									               Value="[INSTALLDIR]bin\wolframemsg.dll"/>
+									<RegistryValue Id="CategoryMessageFile" Type="expandable" Name="CategoryMessageFile" 
+									               Value="[INSTALLDIR]bin\wolframemsg.dll"/>
+									<RegistryValue Id="TypesSupported" Type="integer" Name="TypesSupported"
+									               Value="7"/> <!-- EVENTLOG_ERROR_TYPE | EVENTLOG_WARNING_TYPE | EVENTLOG_INFORMATION_TYPE -->
+									<RegistryValue Id="CategoryCount" Type="integer" Name="CategoryCount" Value="5"/>
+								</RegistryKey>
 							</Component>
 							
 							<?ifdef var.with_ssl?>				

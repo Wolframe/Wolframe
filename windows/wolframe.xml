@@ -125,8 +125,8 @@ Project Wolframe.
 
 		<!--	eventlog source and log level. Valid only on Windows -->
 		<eventlog>
-			<name>Wolframe</name>
-			<source>wolframed</source>
+			<name>Application</name>
+			<source>Wolframe</source>
 			<level>INFO</level>
 		</eventlog>
 	</logging>
