@@ -46,7 +46,9 @@ namespace prgOpts = boost::program_options;
 namespace _Wolframe {
 namespace config {
 
-static const log::LogLevel::Level DEFAULT_DEBUG_LEVEL = log::LogLevel::LOGLEVEL_INFO;
+// Aba: if we set the default level INFO, we can't react later in the code..
+// The console logger has a default level, which is overwritten by the config
+static const log::LogLevel::Level DEFAULT_DEBUG_LEVEL = log::LogLevel::LOGLEVEL_UNDEFINED;
 
 CmdLineConfig::CmdLineConfig()
 {

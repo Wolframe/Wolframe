@@ -113,7 +113,7 @@
 	<logging>
 		<!--	log level for console (stderr) logging -->
 		<stderr>
-			<level>INFO</level>
+			<level>FATAL</level>
 		</stderr>
 
 		<!--	log level for file logging -->

@@ -414,12 +414,14 @@ int _Wolframe_winMain( int argc, char* argv[] )
 		}
 // command line has been parsed successfully
 // reset log level to the command line one, if specified
-		if ( cmdLineCfg.debugLevel != _Wolframe::log::LogLevel::LOGLEVEL_UNDEFINED )
+		if ( cmdLineCfg.debugLevel != _Wolframe::log::LogLevel::LOGLEVEL_UNDEFINED ) {
 			_Wolframe::log::LogBackend::instance().setConsoleLevel( cmdLineCfg.debugLevel );
 // if in a service the -d flag can be specified in the 'ImagePath' of the service description in order
 // to debug lowlevel via 'OutputDebugString'
-		winDbgLevel = cmdLineCfg.debugLevel;
-		
+			winDbgLevel = cmdLineCfg.debugLevel;
+		} else {
+			winDbgLevel = _Wolframe::log::LogLevel::LOGLEVEL_UNDEFINED;
+		}
 // if cmdLineCfg.errMsg() is not empty than we have a warning
 		if ( !cmdLineCfg.errMsg().empty() )	// there was a warning parsing the command line
 			LOG_WARNING << cmdLineCfg.errMsg();
