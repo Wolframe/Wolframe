@@ -106,8 +106,8 @@ public:
 	///\brief Destructor
 	virtual ~LineCommandHandler();
 
-	///\brief See Parent::setInputBuffer(void*,std::size_t,std::size_t,std::size_t)
-	virtual void setInputBuffer( void* buf, std::size_t allocsize, std::size_t size=0, std::size_t itrpos=0);
+	///\brief See Parent::setInputBuffer(void*,std::size_t)
+	virtual void setInputBuffer( void* buf, std::size_t allocsize);
 
 	///\brief See Parent::setOutputBuffer(void*,std::size_t,std::size_t)
 	virtual void setOutputBuffer( void* buf, std::size_t size, std::size_t pos=0);

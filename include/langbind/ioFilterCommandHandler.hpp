@@ -63,7 +63,7 @@ public:
 		m_outputfilter = out;
 	}
 	///\brief See Parent::setInputBuffer(void*,std::size_t,std::size_t,std::size_t)
-	virtual void setInputBuffer( void* buf, std::size_t allocsize, std::size_t size, std::size_t itrpos);
+	virtual void setInputBuffer( void* buf, std::size_t allocsize);
 
 	///\brief See Parent::setOutputBuffer(void*,std::size_t,std::size_t)
 	virtual void setOutputBuffer( void* buf, std::size_t size, std::size_t pos);
@@ -121,7 +121,7 @@ private:
 
 	InputBlock m_input;			///< input buffer
 	InputBlock::iterator m_eoD;		///< input end of data marker
-
+	std::size_t m_itrpos;			///< read start position in buffer for the command handler
 protected:
 	InputFilterR m_inputfilter;		///< network input interface for the interpreter
 	OutputFilterR m_outputfilter;		///< network output interface for the interpreter

@@ -4,14 +4,8 @@
 --input
 HELLO
 RUN
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<employee>
-<firstname>Sara</firstname>
-<surname>Sample</surname>
-<phone>0123456789</phone>
-<email>sara.sample@gmail.com</email>
-<jobtitle>engineer</jobtitle>
-</employee>
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<employee><firstname>Sara</firstname><surname>Sample</surname><phone>0123456789</phone><email>sara.sample@gmail.com</email><jobtitle>engineer</jobtitle></employee>
 
 .
 QUIT
@@ -35,14 +29,8 @@ script {
 }
 --output
 OK enter cmd
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<employee>
-<firstname>Sara</firstname>
-<surname>Sample</surname>
-<phone>0123456789</phone>
-<email>sara.sample@gmail.com</email>
-<jobtitle>engineer</jobtitle>
-</employee>
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<employee><firstname>Sara</firstname><surname>Sample</surname><phone>0123456789</phone><email>sara.sample@gmail.com</email><jobtitle>engineer</jobtitle></employee>
 
 .
 OK

@@ -171,7 +171,7 @@ public:
 	///\param [in] p pointer to the memory block to use
 	///\param [in] n allocation size of the memory block in bytes
 	///\param [in] i fill size of the block in bytes
-	InputBlock( void* p, std::size_t n, std::size_t i)	:MemBlock(p,n,i),m_eodState(EoD::SRC),m_eodcharbuf(m_eodcharbufc,sizeof(m_eodcharbufc)){}
+	InputBlock( void* p, std::size_t n, std::size_t i=0)	:MemBlock(p,n,i),m_eodState(EoD::SRC),m_eodcharbuf(m_eodcharbufc,sizeof(m_eodcharbufc)){}
 
 	///\brief Copy constructor
 	///\param [in] o InputBlock to copy

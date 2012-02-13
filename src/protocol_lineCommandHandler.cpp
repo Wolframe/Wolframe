@@ -49,14 +49,13 @@ LineCommandHandler::~LineCommandHandler()
 	if (m_delegateHandler) delete m_delegateHandler;
 }
 
-void LineCommandHandler::setInputBuffer( void* buf, std::size_t allocsize, std::size_t size, std::size_t itrpos)
+void LineCommandHandler::setInputBuffer( void* buf, std::size_t allocsize)
 {
-	m_input = protocol::InputBlock( (char*)buf, allocsize, size);
-	m_itr = m_input.at(itrpos);
-	m_end = m_input.end();
+	m_input = protocol::InputBlock( (char*)buf, allocsize);
+	m_itr = m_end = m_input.begin();
 	if (m_delegateHandler && m_cmdstateidx == ProcessingDelegation)
 	{
-		m_delegateHandler->setInputBuffer( buf, allocsize, size, itrpos);
+		m_delegateHandler->setInputBuffer( buf, allocsize);
 	}
 }
 
@@ -150,9 +149,9 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 				m_resultitr = 0;
 				if (m_delegateHandler)
 				{
-					m_delegateHandler->setInputBuffer( m_input.ptr(), m_input.size(), m_input.pos(), m_itr-m_input.begin());
-					m_delegateHandler->setOutputBuffer( m_output.ptr(), m_output.size(), m_output.pos());
+					m_delegateHandler->setInputBuffer( m_input.ptr(), m_input.size());
 					m_delegateHandler->putInput( m_input.charptr() + (m_itr-m_input.begin()), m_end-m_itr);
+					m_delegateHandler->setOutputBuffer( m_output.ptr(), m_output.size(), m_output.pos());
 					m_cmdstateidx = ProcessingDelegation;
 				}
 				continue;
@@ -229,7 +228,7 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 				{
 					m_cmdidx = ci;
 					m_cmdstateidx = ParseArgs;
-					m_buffer.clear();
+					m_argBuffer.clear();
 					continue;
 				}
 			}
@@ -294,7 +293,7 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 					m_cmdstateidx = ProcessOutput;
 					m_resultstr = out.str();
 					m_resultitr = 0;
-					return (m_resultstr.size())?WRITE:READ;
+					continue;
 				}
 				catch (std::exception& e)
 				{

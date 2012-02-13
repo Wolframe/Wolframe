@@ -67,9 +67,7 @@ public:
 	///\brief Define the input buffer for processing the command
 	///\param [in] buf buffer for the data to process
 	///\param [in] allocsize allocation size of the buffer for the data to process in bytes
-	///\param [in] size size of the data filled in the in bytes
-	///\param [in] itrpos cursor position in the buffer defining byte position of the start of the the data to process
-	virtual void setInputBuffer( void* buf, std::size_t allocsize, std::size_t size, std::size_t itrpos)=0;
+	virtual void setInputBuffer( void* buf, std::size_t allocsize)=0;
 
 	///\brief Define the input buffer for processing the command
 	///\param [in] buf buffer for the data to process

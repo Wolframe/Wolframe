@@ -1,7 +1,7 @@
 #!/bin/sh
 
-for ff in `find data -type f`
+for ff in `find data -type f`; do
 	echo Expanding template $ff
-	do $ff 
+	./$ff 
 done
 

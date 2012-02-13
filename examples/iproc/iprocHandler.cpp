@@ -95,7 +95,7 @@ void Connection::networkInput( const void* dt, std::size_t nofBytes)
 
 	if (m_cmdhandler.get())
 	{
-		m_cmdhandler.get()->putInput( m_input.ptr(), m_input.pos());
+		m_cmdhandler.get()->putInput( dt, nofBytes);
 	}
 }
 
@@ -261,7 +261,8 @@ const net::NetworkOperation Connection::nextOperation()
 							if (m_cmdhandler.get())
 							{
 								m_state = Processing;
-								m_cmdhandler->setInputBuffer( m_input.ptr(), m_input.size(), m_input.pos(), m_itr-m_input.begin());
+								m_cmdhandler->setInputBuffer( m_input.ptr(), m_input.size());
+								m_cmdhandler->putInput( m_itr.ptr(), m_end-m_itr);
 								m_cmdhandler->setOutputBuffer( m_output.ptr(), m_output.size(), m_output.pos());
 							}
 							else

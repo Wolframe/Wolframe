@@ -61,15 +61,9 @@ ExecCommandHandler::ExecCommandHandler( const std::vector<std::string>& rcmds_, 
 ExecCommandHandler::~ExecCommandHandler()
 {}
 
-void ExecCommandHandler::setInputBuffer( void* buf, std::size_t allocsize, std::size_t size, std::size_t itrpos)
+void ExecCommandHandler::setInputBuffer( void* buf, std::size_t allocsize)
 {
-	m_input = protocol::InputBlock( (char*)buf, allocsize, size);
-	m_itr = m_input.at(itrpos);
-	m_end = m_input.end();
-	if (m_cmdhandler.get())
-	{
-		m_cmdhandler->setInputBuffer( buf, allocsize, size, itrpos);
-	}
+	m_input = protocol::InputBlock( (char*)buf, allocsize);
 }
 
 void ExecCommandHandler::setOutputBuffer( void* buf, std::size_t size, std::size_t pos)
@@ -98,7 +92,11 @@ void ExecCommandHandler::putInput( const void *begin, std::size_t bytesTransferr
 
 void ExecCommandHandler::getInputBlock( void*& begin, std::size_t& maxBlockSize)
 {
-	if (!m_input.getNetworkMessageRead( begin, maxBlockSize))
+	if (m_cmdhandler.get())
+	{
+		m_cmdhandler->getInputBlock( begin, maxBlockSize);
+	}
+	else if (!m_input.getNetworkMessageRead( begin, maxBlockSize))
 	{
 		throw std::logic_error( "buffer too small for input");
 	}
@@ -186,7 +184,7 @@ protocol::CommandHandler::Operation ExecCommandHandler::nextOperation()
 				}
 				else
 				{
-					m_buffer.clear();
+					m_argBuffer.clear();
 					m_state = ParseArgs;
 					continue;
 				}
@@ -194,7 +192,6 @@ protocol::CommandHandler::Operation ExecCommandHandler::nextOperation()
 
 			case ParseArgs:
 			{
-				m_buffer.clear();
 				if (!protocol::CmdParser<protocol::Buffer>::getLine( m_itr, m_end, m_argBuffer))
 				{
 					if (m_itr == m_end)
@@ -229,7 +226,7 @@ protocol::CommandHandler::Operation ExecCommandHandler::nextOperation()
 				}
 				if (m_cmdidx < m_nofParentCmds)
 				{
-					m_state = Init;
+					m_state = Terminate;
 					return CLOSED;
 				}
 				else if (m_cmdidx == m_nofParentCmds)
@@ -269,8 +266,9 @@ protocol::CommandHandler::Operation ExecCommandHandler::nextOperation()
 						if (m_cmdhandler.get())
 						{
 							m_state = Processing;
-							m_cmdhandler->setInputBuffer( m_input.ptr(), m_input.size(), m_input.pos(), m_itr-m_input.begin());
+							m_cmdhandler->setInputBuffer( m_input.ptr(), m_input.size());
 							m_cmdhandler->setOutputBuffer( m_output.ptr(), m_output.size(), m_output.pos());
+							m_cmdhandler->putInput( m_input.charptr() + (m_itr-m_input.begin()), m_end-m_itr);
 						}
 						else
 						{

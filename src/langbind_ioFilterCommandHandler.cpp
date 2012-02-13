@@ -43,7 +43,7 @@ IOFilterCommandHandler::IOFilterCommandHandler()
 	:m_state(Processing)
 	,m_writedata(0)
 	,m_writedatasize(0)
-
+	,m_itrpos(0)
 {
 	filter::CharFilter flt( "UTF-8");
 	m_inputfilter = flt.inputFilter();
@@ -53,16 +53,9 @@ IOFilterCommandHandler::IOFilterCommandHandler()
 IOFilterCommandHandler::~IOFilterCommandHandler()
 {}
 
-void IOFilterCommandHandler::setInputBuffer( void* buf, std::size_t allocsize, std::size_t size, std::size_t itrpos)
+void IOFilterCommandHandler::setInputBuffer( void* buf, std::size_t allocsize)
 {
-	m_input = protocol::InputBlock( (char*)buf, allocsize, size);
-	protocol::InputBlock::iterator start = m_input.at( itrpos);
-	m_eoD = m_input.getEoD( start);
-	InputFilter* flt = m_inputfilter.get();
-	if (flt)
-	{
-		flt->protocolInput( m_input.charptr()+itrpos, m_eoD-start, m_input.gotEoD());
-	}
+	m_input = protocol::InputBlock( (char*)buf, allocsize);
 }
 
 void IOFilterCommandHandler::setOutputBuffer( void* buf, std::size_t size, std::size_t pos)
@@ -194,12 +187,22 @@ CommandHandler::Operation IOFilterCommandHandler::nextOperation()
 }
 
 
-
 void IOFilterCommandHandler::putInput( const void *begin, std::size_t bytesTransferred)
 {
-	m_input.setPos( bytesTransferred + ((const char*)begin - m_input.charptr()));
-	m_eoD = m_input.getEoD( m_input.begin());
-	m_inputfilter.get()->protocolInput( m_input.ptr(), m_eoD-m_input.begin(), m_input.gotEoD(), 0);
+	std::size_t startidx = (const char*)begin - m_input.charptr();
+	m_input.setPos( bytesTransferred + startidx);
+	if (m_itrpos != 0)
+	{
+		if (startidx != m_itrpos) throw std::logic_error( "unexpected buffer start for input to cmd handler");
+		startidx = 0; //... start of buffer is end last message (part of eoD marker)
+	}
+	protocol::InputBlock::iterator start = m_input.at( startidx);
+	m_eoD = m_input.getEoD( start);
+	InputFilter* flt = m_inputfilter.get();
+	if (flt)
+	{
+		flt->protocolInput( start.ptr(), m_eoD-start, m_input.gotEoD());
+	}
 }
 
 void IOFilterCommandHandler::getInputBlock( void*& begin, std::size_t& maxBlockSize)
@@ -208,6 +211,7 @@ void IOFilterCommandHandler::getInputBlock( void*& begin, std::size_t& maxBlockS
 	{
 		throw std::logic_error( "buffer too small");
 	}
+	m_itrpos = ((const char*)begin - m_input.charptr());
 }
 
 void IOFilterCommandHandler::getOutput( const void*& begin, std::size_t& bytesToTransfer)

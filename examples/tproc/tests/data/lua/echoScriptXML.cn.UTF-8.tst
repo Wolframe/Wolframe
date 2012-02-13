@@ -4,14 +4,8 @@
 --input
 HELLO
 RUN
-<?xml version="1.0" encoding="UTF-8"?>
-<employee>
-<firstname>æ</firstname>
-<surname>å§</surname>
-<phone>021436587</phone>
-<email>yao.ming@gmail.com</email>
-<jobtitle>sportsman</jobtitle>
-</employee>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<employee><firstname>æ</firstname><surname>å§</surname><phone>021436587</phone><email>yao.ming@gmail.com</email><jobtitle>sportsman</jobtitle></employee>
 
 .
 QUIT
@@ -35,14 +29,8 @@ script {
 }
 --output
 OK enter cmd
-<?xml version="1.0" encoding="UTF-8"?>
-<employee>
-<firstname>æ</firstname>
-<surname>å§</surname>
-<phone>021436587</phone>
-<email>yao.ming@gmail.com</email>
-<jobtitle>sportsman</jobtitle>
-</employee>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<employee><firstname>æ</firstname><surname>å§</surname><phone>021436587</phone><email>yao.ming@gmail.com</email><jobtitle>sportsman</jobtitle></employee>
 
 .
 OK
