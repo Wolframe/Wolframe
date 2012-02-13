@@ -57,8 +57,9 @@ SeverityNames = (
 ;// facility names
 FacilityNames = (
 	System		= 0x0FF
-;//MBa newer version complain if Application is defined. We should investigate...
-;//	Application	= 0xFFF
+	;// Aba: though there is a warning, application level messages MUST be
+	;// marked like this, otherwise nothing works!
+	Application	= 0xFFF
 )
 
 ;// event messages from here, currently one to log a plain text field

@@ -39,7 +39,7 @@ class LoggingFixture : public ::testing::Test
 //			logBack.setSyslogPort( 514 );
 			logBack.setWinDebugLevel( LogLevel::LOGLEVEL_DATA );
 			logBack.setEventlogLevel( LogLevel::LOGLEVEL_DATA );
-			logBack.setEventlogSource( "logTest" );
+			logBack.setEventlogSource( "wolframe" );
 			logBack.setEventlogLog( "Application" );
 #endif // defined( _WIN32 )
 		}

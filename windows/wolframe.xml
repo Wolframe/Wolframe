@@ -113,7 +113,7 @@ Project Wolframe.
 		<!--	log level for file logging -->
 		<logFile>
 			<filename>#inserted by installer#</filename>
-			<level>NOTICE</level>
+			<level>INFO</level>
 		</logFile>
 
 		<!--	syslog facility, identifier and log level -->

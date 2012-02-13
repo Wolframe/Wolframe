@@ -154,7 +154,7 @@ static WORD logComponentToCategoryId( const LogComponent c )
 
 void EventlogBackend::log( const LogComponent component, const LogLevel::Level level, const std::string& msg )
 {
-	if ( level >= logLevel_ ) {
+	if ( level >= logLevel_ && eventSource_ ) {
 		LPCSTR msg_arr[1];
 		msg_arr[0] = (LPSTR)msg.c_str( );
 		BOOL res = ReportEvent(
@@ -189,7 +189,7 @@ void EventlogBackend::reopen( )
 		LOG_WARNING 	<< "Could not register event source '" << source_ << "'"
 				<< LogError::LogWinerror;
 	else
-		LOG_NOTICE	<< "Registered new eventlog source '" << source_ << "' of log '"
+		LOG_DEBUG	<< "Registered new eventlog source '" << source_ << "' of log '"
 				<< log_ << "'";
 }
 

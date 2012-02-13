@@ -153,7 +153,7 @@ Project Wolframe.
 		<!--	log level for file logging -->
 		<logFile>
 			<filename>C:\TEMP\wolframed.log</filename>
-			<level>NOTICE</level>
+			<level>INFO</level>
 		</logFile>
 
 		<!--	syslog facility, identifier and log level -->
@@ -165,8 +165,8 @@ Project Wolframe.
 
 		<!--	eventlog source and log level. Valid only on Windows -->
 		<eventlog>
-			<name>Wolframe</name>
-			<source>wolframed</source>
+			<name>Application</name>
+			<source>Wolframe</source>
 			<level>INFO</level>
 		</eventlog>
 	</logging>
