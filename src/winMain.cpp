@@ -283,14 +283,12 @@ void WINAPI serviceCtrlFunction( DWORD control )
 
 // for passing the location of the configuration
 static std::string serviceConfig;
-
-#include <intrin.h>
+static _Wolframe::log::LogLevel::Level winDbgLevel;
 
 static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 	try {
-		// TODO: enable this with a trigger, so we can have remote and local debugging
-		// in running services, a nice feature..
-		//_Wolframe::log::LogBackend::instance().setWinDebugLevel( _Wolframe::log::LogLevel::LOGLEVEL_DATA );
+// set an emergency logger (debug view), is set in 'ImagePath' in the registry of the service description
+		_Wolframe::log::LogBackend::instance().setWinDebugLevel( winDbgLevel );
 		
 // read configuration (from the location passed in the command line arguments of the main, not the service_main)
 		_Wolframe::config::CmdLineConfig cmdLineCfg; // empty for a service with --service
@@ -324,8 +322,8 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 		_Wolframe::log::LogBackend::instance().setSyslogFacility( conf.loggerCfg->syslogFacility );
 		_Wolframe::log::LogBackend::instance().setSyslogIdent( conf.loggerCfg->syslogIdent );
 		_Wolframe::log::LogBackend::instance().setEventlogLevel( conf.loggerCfg->eventlogLogLevel );
-		_Wolframe::log::LogBackend::instance().setEventlogSource( conf.loggerCfg->eventlogSource );
 		_Wolframe::log::LogBackend::instance().setEventlogLog( conf.loggerCfg->eventlogLogName );
+		_Wolframe::log::LogBackend::instance().setEventlogSource( conf.loggerCfg->eventlogSource );
 
 // register the event callback where we get called by Windows and the SCM
 		serviceStatusHandle = RegisterServiceCtrlHandler( conf.serviceCfg->serviceName.c_str( ), serviceCtrlFunction );
@@ -418,6 +416,10 @@ int _Wolframe_winMain( int argc, char* argv[] )
 // reset log level to the command line one, if specified
 		if ( cmdLineCfg.debugLevel != _Wolframe::log::LogLevel::LOGLEVEL_UNDEFINED )
 			_Wolframe::log::LogBackend::instance().setConsoleLevel( cmdLineCfg.debugLevel );
+// if in a service the -d flag can be specified in the 'ImagePath' of the service description in order
+// to debug lowlevel via 'OutputDebugString'
+		winDbgLevel = cmdLineCfg.debugLevel;
+		
 // if cmdLineCfg.errMsg() is not empty than we have a warning
 		if ( !cmdLineCfg.errMsg().empty() )	// there was a warning parsing the command line
 			LOG_WARNING << cmdLineCfg.errMsg();

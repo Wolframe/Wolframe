@@ -45,7 +45,6 @@
 #include <tchar.h>
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <strsafe.h>
 
 #include "wolframemsg.h"
 
@@ -60,8 +59,11 @@ EventlogBackend::EventlogBackend( )
 	// the one category we have at the moment in the resource
 	// was '1 | 0x0FFF0000' before, why?!
 	log_ = "Application";
-	source_ = "<undefined>";
+	source_ = "Wolframe";
 	eventSource_ = RegisterEventSource( NULL, source_.c_str( ) );
+	if( !eventSource_ )
+		LOG_WARNING 	<< "Could not register a minimalistic event source to Application/Wolframe: "
+				<< LogError::LogWinerror;
 	sid_ = NULL;
 }
 
@@ -86,7 +88,6 @@ void EventlogBackend::setLevel( const LogLevel::Level level )
 void EventlogBackend::setLog( const std::string log )
 {
 	log_ = log;
-	reopen( );
 }
 
 void EventlogBackend::setSource( const std::string source )
@@ -147,7 +148,7 @@ static WORD logComponentToCategoryId( const LogComponent c )
 		case LogComponent::LOGCOMPONENT_NETWORK:	return WOLFRAME_CATEGORY_NETWORK;
 		case LogComponent::LOGCOMPONENT_AUTH:		return WOLFRAME_CATEGORY_AUTH;
 		case LogComponent::LOGCOMPONENT_LUA:		return WOLFRAME_CATEGORY_LUA;
-		default:									return WOLFRAME_CATEGORY_NONE;
+		default:					return WOLFRAME_CATEGORY_NONE;
 	};
 }
 
@@ -175,7 +176,6 @@ void EventlogBackend::log( const LogComponent component, const LogLevel::Level l
 }
 
 void EventlogBackend::reopen( )
-
 {
 // deferring calculation of SID for logging, avoid reentrance trouble in
 // the constructor
@@ -185,6 +185,12 @@ void EventlogBackend::reopen( )
 	if( eventSource_ )
 		(void)DeregisterEventSource( eventSource_ );
 	eventSource_ = RegisterEventSource( NULL, source_.c_str( ) );
+	if( !eventSource_ )
+		LOG_WARNING 	<< "Could not register event source '" << source_ << "'"
+				<< LogError::LogWinerror;
+	else
+		LOG_NOTICE	<< "Registered new eventlog source '" << source_ << "' of log '"
+				<< log_ << "'";
 }
 
 void EventlogBackend::calculateSid( )
