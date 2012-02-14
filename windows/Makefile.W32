@@ -67,13 +67,17 @@ WIX_EXTENSIONS = \
 CANDLE = "$(WIX_DIR)\bin\candle.exe"
 LIGHT = "$(WIX_DIR)\bin\light.exe"
 SMOKE = "$(WIX_DIR)\bin\smoke.exe"
+SETUPBLD = "$(WIX_DIR)\bin\setupbld.exe"
 
 local_all: $(CPP_BINS)
 	$(CANDLE) /nologo -arch $(WIX_ARCH) $(WIX_FLAGS) $(WIX_EXTENSIONS) wolframe.wxs
 	$(LIGHT) /nologo $(WIX_FLAGS) $(WIX_EXTENSIONS) wolframe.wixobj
 
+setup.exe: wolframe.msi
+	$(SETUPBLD) -out setup.exe -ms wolframe.msi -setup "$(WIX_DIR)\bin\setup.exe"
+
 local_clean:
-	@-erase wolframe.wixobj wolframe.wixpdb wolframe.msi 2>NUL
+	@-erase wolframe.wixobj wolframe.wixpdb wolframe.msi setup.exe 2>NUL
 
 local_distclean:
 
