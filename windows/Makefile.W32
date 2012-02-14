@@ -18,8 +18,7 @@ INCLUDE_LDFLAGS = \
 INCLUDE_LIBS = \
 	Ole32.lib
 
-CPP_BINS = \
-	uuidgen.exe
+CPP_BINS =
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
@@ -80,5 +79,12 @@ local_distclean:
 
 local_test: wolframe.msi
 	$(SMOKE) wolframe.msi
-	
+
+test_install:
+	-del install.log
+	-msiexec /lieva install.log /i Wolframe.msi
+
+test_uninstall:
+	-del uninstall.log
+	-msiexec /lieva uninstall.log /x {09E1E9CC-6AE6-4207-B7FE-F47CFDB2861F}
 	

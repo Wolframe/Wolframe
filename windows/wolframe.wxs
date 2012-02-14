@@ -65,10 +65,11 @@ Project Wolframe.
 							<File Id="license.rtf" Name="license.rtf" DiskId="1" Source="license.rtf"/>
 						</Component>
 						<Directory Id="BinDir" Name="bin">
+							<Component Id="EventLogDlls" Guid="{b9855bb2-d7ea-46d7-8873-96e1612212c3}">
+								<File Id="wolframemsg.dll" Name="wolframemsg.dll" DiskId="1" Source="..\src\libwolframe\logger\wolframemsg.dll"/>								
+							</Component>
+							
 							<Component Id="ServiceBinary" Guid="{112265CD-F35C-49B5-A4A1-F685B32BC208}">
-								<File Id="wolframemsg.dll" Name="wolframemsg.dll" DiskId="1" Source="..\src\libwolframe\logger\wolframemsg.dll"/>
-								
-								<!-- must be last in list of files as ServiceInstall acts on the last file seen! -->
 								<File Id="wolframed.exe" Name="wolframed.exe" DiskId="1" Source="..\src\wolframed.exe"/>
 
 								<!-- add firewall rules for plain and SSL -->
@@ -79,8 +80,7 @@ Project Wolframe.
 								<util:XmlFile Id="UpdateLogfileLocation" Action="setValue" ElementPath="/configuration/logging/logFile/filename"
 								              Value="[INSTALLDIR]logs\wolframed.log"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
-								
-								<!-- install service (TODO, couple names with config) -->
+									      								<!-- install service (TODO, couple names with config) -->
 								<ServiceInstall Id="ServiceInstallation" Type="ownProcess" Vital="yes"
 								                Name="wolframe" DisplayName="Wolframe Daemon"
 										Description="Wolframe Dameon" Start="demand"
@@ -89,13 +89,9 @@ Project Wolframe.
 								</ServiceInstall>
 								<ServiceControl Id="ServiceControl" Name="wolframe" Remove="uninstall"
 								                Stop="both" Wait="yes"/>
+							</Component>
 
-								<!-- TODO: writes funny stuff, doesn't work! -->
-								<RegistryKey Root="HKLM" Key="SYSTEM\CurrentControlSet\Services\wolframe">
-									<RegistryValue Id="ImagePath" Type="expandable" Name="ImagePath" 
-									               Value="&quot;[INSTALLDIR]bin\wolframed.exe&quot; --service -c &quot;[INSTALLDIR]config\wolframe.xml&quot;"/>
-								</RegistryKey>
-								
+							<Component Id="EventLogRegistryEntries" Guid="{f0a03f1a-155c-46b8-88bf-0ea608222b92}">
 								<!-- register event logger source (TODO, couple with config) -->
 								<RegistryKey Root="HKLM" Key="SYSTEM\CurrentControlSet\Services\EventLog\Application\Wolframe">
 									<RegistryValue Id="EventMessageFile" Type="expandable" Name="EventMessageFile" 
@@ -106,6 +102,13 @@ Project Wolframe.
 									               Value="7"/> <!-- EVENTLOG_ERROR_TYPE | EVENTLOG_WARNING_TYPE | EVENTLOG_INFORMATION_TYPE -->
 									<RegistryValue Id="CategoryCount" Type="integer" Name="CategoryCount" Value="5"/>
 								</RegistryKey>
+							</Component>
+									      
+							<Component Id="ServiceRegistryEntries" Guid="{0e5bde38-207e-4caf-893c-0b8d83ab42e8}">
+								<RegistryKey Root="HKLM" Key="SYSTEM\CurrentControlSet\Services\wolframe">
+									<RegistryValue Id="ImagePath" Type="expandable" Name="ImagePath" 
+									               Value="&quot;[INSTALLDIR]bin\wolframed.exe&quot; --service -c &quot;[INSTALLDIR]config\wolframe.xml&quot;"/>
+								</RegistryKey>								
 							</Component>
 							
 							<?ifdef var.with_ssl?>				
@@ -256,6 +259,9 @@ Project Wolframe.
 			<Feature Id="MainProgram" Title="Wolframe Service" Description="The basic Wolframe server." Level="1" AllowAdvertise="no" Absent="disallow" InstallDefault="local">
 				<ComponentRef Id="License"/>
 				<ComponentRef Id="ServiceBinary"/>
+				<ComponentRef Id="ServiceRegistryEntries"/>
+				<ComponentRef Id="EventLogDlls"/>
+				<ComponentRef Id="EventLogRegistryEntries"/>
 				<?ifdef var.with_ssl?>				
 				<ComponentRef Id="OpenSSL"/>
 				<?endif?>
@@ -342,6 +348,12 @@ Project Wolframe.
 
 		<UIRef Id="WixUI_Mondo"/>
 		<UIRef Id="WixUI_ErrorProgressText"/>
+		
+		<!-- make sure ImagePath is patched after installation of service -->
+		<InstallExecuteSequence>
+			<!-- TODO: is 5801 a global constant number? -->
+			<WriteRegistryValues Sequence="5801"/>
+		</InstallExecuteSequence>
 
 	</Product>
 </Wix>
