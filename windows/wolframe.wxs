@@ -206,12 +206,14 @@ Project Wolframe.
 						<Directory Id="LogDir" Name="logs">
 							<Component Id="EmptyLogDir" Guid="{A9695D48-197D-49A0-A1B8-A8A50D18C693}">
 								<CreateFolder/>
+								<RemoveFile Id="LogFiles" On="uninstall" Name="*.log"/>
 							</Component>
 						</Directory>
 
 						<Directory Id="DataDir" Name="data">
 							<Component Id="EmptyDataDir" Guid="{48BB041A-BDA9-4B6C-87F9-94CB264F3032}">
 								<CreateFolder/>
+								<RemoveFile Id="SqliteDataFiles" On="uninstall" Name="primary.db"/>
 							</Component>
 						</Directory>
 													
