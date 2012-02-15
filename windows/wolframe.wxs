@@ -225,15 +225,6 @@ Project Wolframe.
 				<Directory Id="ApplicationProgramsFolder" Name="Wolframe"/>
 			</Directory>
 
-			<!-- merge module for the C++ runtime, careful: check manifests of
-			     all EXE and DLLs, especially thrid-party ones like OpenSSL,
-			     Qt, etc.!
-			     - http://wix.sourceforge.net/manual-wix3/install_vcredist.htm
-			     - http://blogs.msdn.com/b/astebner/archive/2007/02/13/building-an-msi-using-wix-v3-0-that-includes-the-vc-8-0-runtime-merge-modules.aspx
-			     - http://msdn.microsoft.com/en-us/library/ms235290(v=vs.80).aspx
-			     - http://social.msdn.microsoft.com/Forums/en-US/vcgeneral/thread/867cf808-bf1f-4f4a-bde1-cd75d92d73ad
-			     - http://stackoverflow.com/questions/59635/app-does-not-run-with-vs-2008-sp1-dlls-previous-version-works-with-rtm-versions
-			  -->
 			<Merge Id="VCRedist" Language="0" SourceFile="$(var.VCRedist.Location)" DiskId="1"/>
 		</Directory>
 
