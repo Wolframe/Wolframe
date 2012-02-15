@@ -341,7 +341,7 @@ Project Wolframe.
 		<Icon Id="Wolframe.ico" SourceFile="Wolframe.ico"/>
 		<Property Id="ARPPRODUCTICON" Value="Wolframe.ico"/>
 		
-		<UIRef Id="WixUI_Mondo"/>
+		<UIRef Id="WixUI_Wolframe"/>
 		<UIRef Id="WixUI_ErrorProgressText"/>
 				
 		<!-- make sure ImagePath is patched after installation of service -->
