@@ -228,8 +228,9 @@ Project Wolframe.
 			<Directory Id="ProgramMenuFolder">
 				<Directory Id="ApplicationProgramsFolder" Name="Wolframe"/>
 			</Directory>
-
+<!--
 			<Merge Id="VCRedist" Language="0" SourceFile="$(var.VCRedist.Location)" DiskId="1"/>
+			-->
 		</Directory>
 
 		<DirectoryRef Id="ApplicationProgramsFolder">
@@ -269,12 +270,12 @@ Project Wolframe.
 				<ComponentRef Id="EmptyLogDir"/>
 				<ComponentRef Id="EmptyDataDir"/>
 			</Feature>
-
+<!--
 			<Feature Id="VCRedist" Title="Visual C++ 9.0 Runtime" Level="1"
 			         AllowAdvertise="no" Display="hidden">
 				<MergeRef Id="VCRedist"/>
 			</Feature>
-			
+-->			
 			<Feature Id="DatabaseModules" Title="Database Modules" Description="Connectors to databases" Level="3">
 				<?ifdef with_pgsql?>
 				<Feature Id="PostgresqlDB" Title="PostgreSQL database driver" Description="Access PostgreSQL database." Level="1000">
@@ -332,13 +333,14 @@ Project Wolframe.
 		</Feature>
 								
 		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR"/>
+		<Property Id="DATABASE">Sqlite3</Property>
 
 		<WixVariable Id="WixUILicenseRtf" Value="license.rtf"/>
-		<WixVariable Id="WixUIDialogBmp" Value="Wolf.bmp"/>
+		<WixVariable Id="WixUIDialogBmp" Value="bitmaps/Wolf.bmp"/>
 		<Property Id="WIXUI_EXITDIALOGOPTIONALTEXT" Value="Check out http://www.wolframe.net for additional information."/>
 
 		<Property Id="APPHELPLINK">http://www.wolframe.net</Property>
-		<Icon Id="Wolframe.ico" SourceFile="Wolframe.ico"/>
+		<Icon Id="Wolframe.ico" SourceFile="bitmaps/Wolframe.ico"/>
 		<Property Id="ARPPRODUCTICON" Value="Wolframe.ico"/>
 		
 		<UIRef Id="WixUI_Wolframe"/>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+
+Copyright (C) 2011 Project Wolframe.
+All rights reserved.
+
+This file is part of Project Wolframe.
+
+Commercial Usage
+   Licensees holding valid Project Wolframe Commercial licenses may
+   use this file in accordance with the Project Wolframe
+   Commercial License Agreement provided with the Software or,
+   alternatively, in accordance with the terms contained
+   in a written agreement between the licensee and Project Wolframe.
+
+GNU General Public License Usage
+   Alternatively, you can redistribute this file and/or modify it
+   under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   Wolframe is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with Wolframe.  If not, see <http://www.gnu.org/licenses/>.
+
+If you have questions regarding the use of this file, please contact
+Project Wolframe.
+
+-->
+
+<WixLocalization Culture="en-us" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+	<String Id="DatabaseSelect_Title" Overridable="yes">[ProductName] Select database</String>
+	<String Id="DatabaseSelectDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
+	<String Id="DatabaseSelectDlgInstruction" Overridable="yes">Choose the primary database which will be used to store your data.</String>
+	<String Id="DatabaseSelectDlgDescription" Overridable="yes">You have selected more than one database connector.</String>
+	<String Id="DatabaseSelectDlgTitle" Overridable="yes">{\WixUI_Font_Bold}Select Primary Database Binding</String>
+	<String Id="DatabaseSelectDlgRadio1" Overridable="yes">SQlite3 (integrated)</String>
+	<String Id="DatabaseSelectDlgRadio2" Overridable="yes">Postgresql</String>
+</WixLocalization>

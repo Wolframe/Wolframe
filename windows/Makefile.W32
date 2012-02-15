@@ -77,8 +77,12 @@ SETUPBLD = "$(WIX_DIR)\bin\setupbld.exe"
 
 WIX_OBJS = \
 	wolframe.wixobj \
-	WixUI_Wolframe.wixobj
+	WixUI_Wolframe.wixobj \
+	dialogs\DatabaseSelect.wixobj
 
+WIX_LOCALES = \
+	-cultures:en-us -loc "i18n\en_us-wolframe.wxl"
+	
 .SUFFIXES: .wxs .wixobj
 
 .wxs.wixobj:
@@ -86,11 +90,8 @@ WIX_OBJS = \
 
 local_all: wolframe.msi
 
-#wolframe.wixobj: wolframe.wxs
-#WixUI_Wolframe.wixobj: WixUI_Wolframe.wxs
-
 wolframe.msi: $(WIX_OBJS)
-	$(LIGHT) /nologo -o $@ $(WIX_FLAGS) $(WIX_EXTENSIONS) $**
+	$(LIGHT) /nologo -o $@ $(WIX_FLAGS) $(WIX_EXTENSIONS) $(WIX_LOCALES) $**
 
 setup.exe: wolframe.msi
 	$(SETUPBLD) -out setup.exe -ms wolframe.msi -setup "$(WIX_DIR)\bin\setup.exe"
