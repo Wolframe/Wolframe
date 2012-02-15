@@ -37,20 +37,23 @@ Project Wolframe.
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
      xmlns:firewall="http://schemas.microsoft.com/wix/FirewallExtension">
 
-	<?define ProductVersion = "0.0.1"?>
+	<?define ProductVersion = "0.0.1" ?>
+	<?define ProductCode = "{09E1E9CC-6AE6-4207-B7FE-F47CFDB2861F}" ?>
+	<?define ProductUpgradeCode = "{64361569-C468-42DE-95A1-901DDDE84D13}" ?>
 	
 	<?if $(sys.BUILDARCH) = "x64" ?>
 		<?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
-		<?define ProductName = "Wolframe (64-bit)"?>
+		<?define ProductName = "Wolframe (64-bit)" ?>
 	<?elseif $(sys.BUILDARCH) = "x86" ?>
-		<?define PlatformProgramFilesFolder = "ProgramFilesFolder"?>
-		<?define ProductName = "Wolframe (32-bit)"?>
+		<?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
+		<?define ProductName = "Wolframe (32-bit)" ?>
 	<?endif?>
 	
 	<Product Name="$(var.ProductName)" Version="$(var.ProductVersion)" Manufacturer="Wolframe Team"
 	         Language="1033" Codepage="1252"
-	         Id="{09E1E9CC-6AE6-4207-B7FE-F47CFDB2861F}" 
-	         UpgradeCode="{64361569-C468-42DE-95A1-901DDDE84D13}" >
+	         Id="$(var.ProductCode)" 
+	         UpgradeCode="$(var.ProductUpgradeCode)" >
+		 
 		<Package Description="Wolframe Windows Installer Package"
 		         Comments="The Wolframe framework"
 		         Manufacturer="Wolframe Team" InstallerVersion="300" Compressed="yes"/>
@@ -103,7 +106,8 @@ Project Wolframe.
 									<RegistryValue Id="CategoryCount" Type="integer" Name="CategoryCount" Value="5"/>
 								</RegistryKey>
 							</Component>
-									      
+		
+							<!-- add the service parameters to the ImagePath service registry entry -->
 							<Component Id="ServiceRegistryEntries" Guid="{0e5bde38-207e-4caf-893c-0b8d83ab42e8}">
 								<RegistryKey Root="HKLM" Key="SYSTEM\CurrentControlSet\Services\wolframe">
 									<RegistryValue Id="ImagePath" Type="expandable" Name="ImagePath" 
@@ -234,12 +238,11 @@ Project Wolframe.
 				                       Name="Wolframe Home Page"
 				                       Target="http://www.wolframe.net/"/>
 
-				<!-- Product code must be in sync with product code of the WXS! -->
 				<Shortcut Id="UninstallProduct"             
 				          Name="Uninstall Wolframe"
 				          Description="Uninstalls Wolframe"
 				          Target="[System64Folder]msiexec.exe"
-				          Arguments="/x {09E1E9CC-6AE6-4207-B7FE-F47CFDB2861F}"/>
+				          Arguments="/x $(var.ProductCode)"/>
 
 				<RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
 				<RegistryValue Root="HKCU" Key="Software\WolframeGroup\Wolframe"
@@ -327,20 +330,31 @@ Project Wolframe.
 			</Feature>
 
 		</Feature>
-		
+								
+		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR"/>
+
 		<WixVariable Id="WixUILicenseRtf" Value="license.rtf"/>
 		<WixVariable Id="WixUIDialogBmp" Value="Wolf.bmp"/>
 		<Property Id="WIXUI_EXITDIALOGOPTIONALTEXT" Value="Check out http://www.wolframe.net for additional information."/>
 
-		<Property Id="ARPPRODUCTICON" Value="Wolframe.ico"/>
-		
 		<Property Id="APPHELPLINK">http://www.wolframe.net</Property>
 		<Icon Id="Wolframe.ico" SourceFile="Wolframe.ico"/>
-
-		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR"/>
-
+		<Property Id="ARPPRODUCTICON" Value="Wolframe.ico"/>
+		
 		<UIRef Id="WixUI_Mondo"/>
 		<UIRef Id="WixUI_ErrorProgressText"/>
+		
+		<UI>
+			<Dialog Id="DatabaseSelectDialog" Width="370" Height="270" Title="[ProductName] Select Databse Type" NoMinimize="yes">
+				<Control Id="Ok" Type="PushButton" X="304" Y="243" Width="56" Height="17" Default="yes" Text="Ok">
+					<Publish Event="EndDialog" Value="Return"/>
+				</Control>
+			</Dialog>
+	
+			<InstallUISequence>
+				<Show Dialog="DatabaseSelectDialog" Before="ProgressDlg"/>
+			</InstallUISequence>
+		</UI>
 		
 		<!-- make sure ImagePath is patched after installation of service -->
 		<InstallExecuteSequence>
