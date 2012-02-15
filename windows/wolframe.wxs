@@ -343,19 +343,7 @@ Project Wolframe.
 		
 		<UIRef Id="WixUI_Mondo"/>
 		<UIRef Id="WixUI_ErrorProgressText"/>
-		
-		<UI>
-			<Dialog Id="DatabaseSelectDialog" Width="370" Height="270" Title="[ProductName] Select Databse Type" NoMinimize="yes">
-				<Control Id="Ok" Type="PushButton" X="304" Y="243" Width="56" Height="17" Default="yes" Text="Ok">
-					<Publish Event="EndDialog" Value="Return"/>
-				</Control>
-			</Dialog>
-	
-			<InstallUISequence>
-				<Show Dialog="DatabaseSelectDialog" Before="ProgressDlg"/>
-			</InstallUISequence>
-		</UI>
-		
+				
 		<!-- make sure ImagePath is patched after installation of service -->
 		<InstallExecuteSequence>
 			<!-- TODO: is 5801 a global constant number? -->
