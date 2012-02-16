@@ -82,7 +82,7 @@ Project Wolframe.
 	</listen>
 
 
-	<!--	Database configuration -->
+	<!--	Database configuration, get added here by the installer -->
 	<database>
 <!--
 		<PostgreSQL>
@@ -97,10 +97,6 @@ Project Wolframe.
 			<acquireTimeout>10</acquireTimeout>
 		</PostgreSQL>
 -->		
-		<SQLite>
-			<identifier>sqlitedb</identifier>
-			<filename>#inserted by installer#</filename>
-		</SQLite>
 	</database>
 	
 	<!--	Logging parameters -->

@@ -159,9 +159,18 @@ Project Wolframe.
 								<util:XmlFile Id="AppendConfigModDbSqlite3" Action="createElement" ElementPath="/configuration/LoadModules"
 								              Name="module" Value="[INSTALLDIR]modules\mod_db_sqlite3.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+								<util:XmlFile Id="AppendDBconfigSqlite3SQlite" Action="createElement" ElementPath="/configuration/database"
+								              Name="SQLite"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+								<util:XmlFile Id="AppendDBconfigSqlite3Itentifier" Action="createElement" ElementPath="/configuration/database/SQLite"
+								              Name="identifier" Value="sqlitedb"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="2"/>
+								<util:XmlFile Id="AppendDBconfigSqlite3Filename" Action="createElement" ElementPath="/configuration/database/SQLite"
+								              Name="filename" Value="#inserted by installer#"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="3"/>
 								<util:XmlFile Id="UpdateSqlite3DbLocation" Action="setValue" ElementPath="/configuration/database/SQLite/filename"
 								              Value="[INSTALLDIR]data\primary.db"
-									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>			
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="4"/>
 							</Component>
 							<?endif?>
 
