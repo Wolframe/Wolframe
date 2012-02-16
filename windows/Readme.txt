@@ -50,3 +50,13 @@ Prepare the build
      WITH_SQLITE3=1 WITH_PGSQL=1 WITH_LIBXML2=1 ^
      WITH_LIBXSLT=1 WITH_EXAMPLES=1 ^
      setup.exe
+
+More Links
+----------
+
+http://blogs.technet.com/b/alexshev/archive/2009/05/27/from-msi-to-wix-part-25-installable-items-updating-xml-files-using-xmlfile.aspx
+http://wix.sourceforge.net/manual-wix2/wix_xsd_xmlfile.htm
+https://github.com/apache/subversion/blob/57b9abdac726d701db7b2f89609bfb8e6397b3ef/packages/windows-WiX/BuildSubversion/Setup.wxs
+http://weblogs.asp.net/lorenh/archive/2005/10/13/427398.aspx
+http://www.slideshare.net/alekdavis/beginners-guide-to-windows
+http://wix.tramontana.co.hu/tutorial/user-interface-revisited

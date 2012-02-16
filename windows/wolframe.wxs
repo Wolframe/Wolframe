@@ -170,6 +170,9 @@ Project Wolframe.
 								<util:XmlFile Id="AppendConfigModAuditDatabase" Action="createElement" ElementPath="/configuration/LoadModules"
 								              Name="module" Value="[INSTALLDIR]modules\mod_audit_database.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+								<util:XmlFile Id="UpdateConfigModAuditDatabaseReference" Action="setValue" ElementPath="/configuration/AAAA/Audit/Database/database"
+								              Value="[WOLFRAME_DATABASE]"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							</Component>
 							
 							<Component Id="ModAuditTextfile" Guid="{A2A224B8-E564-4F45-B600-A3FC6142544F}">
@@ -186,6 +189,9 @@ Project Wolframe.
 								<File Id="mod_auth_database.dll" Name="mod_auth_database.dll" DiskId="1" Source="..\src\modules\authentication\database\mod_auth_database.dll"/>
 								<util:XmlFile Id="AppendConfigModAuthDatabase" Action="createElement" ElementPath="/configuration/LoadModules"
 								              Name="module" Value="[INSTALLDIR]modules\mod_auth_database.dll"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+								<util:XmlFile Id="UpdateConfigModAuthDatabaseReference" Action="setValue" ElementPath="/configuration/AAAA/authentication/database"
+								              Value="[WOLFRAME_DATABASE]"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							</Component>
 
@@ -204,7 +210,10 @@ Project Wolframe.
 								<util:XmlFile Id="AppendConfigModProcEcho" Action="createElement" ElementPath="/configuration/LoadModules"
 								              Name="module" Value="[INSTALLDIR]modules\mod_proc_echo.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
-							</Component>							
+								<util:XmlFile Id="UpdateEchoDatabase" Action="setValue" ElementPath="/configuration/Processor/database"
+								              Value="[WOLFRAME_DATABASE]"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+							      </Component>							
 						</Directory>
 						
 						<Directory Id="LogDir" Name="logs">
@@ -333,7 +342,7 @@ Project Wolframe.
 		</Feature>
 								
 		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR"/>
-		<Property Id="DATABASE">Sqlite3</Property>
+		<Property Id="WOLFRAME_DATABASE">sqlitedb</Property>
 
 		<WixVariable Id="WixUILicenseRtf" Value="license.rtf"/>
 		<WixVariable Id="WixUIDialogBmp" Value="bitmaps/Wolf.bmp"/>

@@ -137,7 +137,7 @@ Project Wolframe.
 		<authentication>
 			<allowAnonymous>yes</allowAnonymous>
 			<!-- <database>pgdb</database> -->
-			<database>sqlitedb</database>
+			<database>#inserted by installer#</database>
 			<file>#inserted by installer#</file>
 		</authentication>
 		
@@ -168,7 +168,7 @@ Project Wolframe.
 			
 			<Database>
 				<required>no</required>
-				<database>sqlitedb</database>
+				<database>#inserted by installer#</database>
 			</Database>
 		</Audit>
 	<!-- There is no configuration for accounting as it
@@ -177,8 +177,7 @@ Project Wolframe.
 
 	<!-- The thing that does the real job ;) -->
 	<Processor>
-	<!--	<database>pgdb</database> -->
-		<database>sqlitedb</database>
+		<database>#inserted by installer#</database>
 		<EchoProcessor>
 			<timeout>10</timeout>
 		</EchoProcessor>
