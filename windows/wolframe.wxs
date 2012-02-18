@@ -131,8 +131,13 @@ Project Wolframe.
 							<?ifdef with_pgsql?>
 							<Component Id="PostgresqlDlls" Guid="{3BD6483F-70B2-44D3-9C65-26787635A44B}">
 								<File Id="libpq.dll" Name="libpq.dll" DiskId="1" Source="..\src\libpq.dll"/>
-								<File Id="libiconv.dll" Name="libiconv.dll" DiskId="1" Source="..\src\libiconv.dll"/>
-								<File Id="libintl.dll" Name="libintl.dll" DiskId="1" Source="..\src\libintl.dll"/>
+								<?ifdef pgdll_without_major_versions?>
+									<File Id="libiconv.dll" Name="libiconv.dll" DiskId="1" Source="..\src\libiconv.dll"/>
+									<File Id="libintl.dll" Name="libintl.dll" DiskId="1" Source="..\src\libintl.dll"/>
+								<?else?>
+									<File Id="libiconv.dll" Name="libiconv-2.dll" DiskId="1" Source="..\src\libiconv-2.dll"/>
+									<File Id="libintl.dll" Name="libintl-8.dll" DiskId="1" Source="..\src\libintl-8.dll"/>								
+								<?endif?>
 							</Component>
 							<?endif?>
 						</Directory>
