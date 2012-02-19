@@ -377,8 +377,8 @@ private:
 	static void printToBufferContent( const char* src, std::size_t srcsize, protocol::EscapingBuffer<textwolf::StaticBuffer>& buf)
 	{
 		enum {nof_echr = 6};
-		static const char* estr[nof_echr] = {"&lt;", "&gt;", "&amp;", "&#0;", "&#8;", "\r\n"};
-		static const char echr[nof_echr+1] = "<>&\0\b\n";
+		static const char* estr[nof_echr] = {"&lt;", "&gt;", "&amp;", "&#0;", "&#8;"};
+		static const char echr[nof_echr+1] = "<>&\0\b";
 		printToBufferSubstChr( src, srcsize, buf, nof_echr, echr, estr);
 	}
 
@@ -1000,31 +1000,31 @@ public:
 					setState( Error, ErrEncoding);
 					return false;
 				case TextwolfEncoding::IsoLatin:
-					m_header = "<?xml version='1.0' encoding='Isolatin-1' standalone='yes'>\r\n";
+					m_header = "<?xml version=\"1.0\" encoding=\"Isolatin-1\" standalone=\"yes\"?>\n";
 					break;
 				case TextwolfEncoding::UTF8:
-					m_header = "<?xml version='1.0' encoding='UTF-8' standalone='yes'>\r\n";
+					m_header = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n";
 					break;
 				case TextwolfEncoding::UTF16:
-					m_header = "<?xml version='1.0' encoding='UTF-16' standalone='yes'>\r\n";
+					m_header = "<?xml version=\"1.0\" encoding=\"UTF-16\" standalone=\"yes\"?>\n";
 					break;
 				case TextwolfEncoding::UTF16BE:
-					m_header = "<?xml version='1.0' encoding='UTF-16 BE' standalone='yes'>\r\n";
+					m_header = "<?xml version=\"1.0\" encoding=\"UTF-16BE\" standalone=\"yes\"?>\n";
 					break;
 				case TextwolfEncoding::UTF16LE:
-					m_header = "<?xml version='1.0' encoding='UTF-16 LE' standalone='yes'>\r\n";
+					m_header = "<?xml version=\"1.0\" encoding=\"UTF-16LE\" standalone=\"yes\"?>\n";
 					break;
 				case TextwolfEncoding::UCS2BE:
-					m_header = "<?xml version='1.0' encoding='UCS-2 BE' standalone='yes'>\r\n";
+					m_header = "<?xml version=\"1.0\" encoding=\"UCS-2BE\" standalone=\"yes\"?>\n";
 					break;
 				case TextwolfEncoding::UCS2LE:
-					m_header = "<?xml version='1.0' encoding='UCS-2 LE' standalone='yes'>\r\n";
+					m_header = "<?xml version=\"1.0\" encoding=\"UCS-2LE\" standalone=\"yes\"?>\n";
 					break;
 				case TextwolfEncoding::UCS4BE:
-					m_header = "<?xml version='1.0' encoding='UCS-4 BE' standalone='yes'>\r\n";
+					m_header = "<?xml version=\"1.0\" encoding=\"UCS-4BE\" standalone=\"yes\"?>\n";
 					break;
 				case TextwolfEncoding::UCS4LE:
-					m_header = "<?xml version='1.0' encoding='UCS-4 LE' standalone='yes'>\r\n";
+					m_header = "<?xml version=\"1.0\" encoding=\"UCS-4LE\" standalone=\"yes\"?>\n";
 					break;
 			}
 			m_headerPos = 0;

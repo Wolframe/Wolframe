@@ -65,6 +65,11 @@ enum
 static const TestDescription testDescriptions[] =
 {
 	{
+		"echo_xml_UCS4",
+		"test_echo_xml.lua",
+		"test_UCS4BE.xml", 128
+	},
+	{
 		"echo_xml_IsoLatin1_to_utf16",
 		"test_echo_xml_utf16.lua",
 		"test_IsoLatin1.xml", 96

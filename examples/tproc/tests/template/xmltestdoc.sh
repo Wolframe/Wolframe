@@ -3,7 +3,7 @@
 encoding=$1
 type=$2
 
-echo '<?xml version="1.0" encoding='"\"$encoding\" standalone=\"yes\""'?>'
+echo "<?xml version=\"1.0\" encoding=\"$encoding\" standalone=\"yes\"?>"
 doc=""
 
 xmlElement()
@@ -79,9 +79,10 @@ _assignement)
 	;;
 esac
 
-if [ `echo $encoding | grep -c '[LB]E$'` = 0 ]; then
+if [ `echo $encoding | grep -c '[26]BE$'` = 0 ]; then
 	echo "$doc" | recode XML-standalone..$encoding
 else
 	echo "$doc" | recode XML-standalone..$encoding | cut -b3-
 	# ... remove BOM with cut:
 fi
+

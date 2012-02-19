@@ -81,6 +81,11 @@ public:
 	///\param[in] cc the string to append
 	void append( const char* cc)		{unsigned int ii=0; while(m_pos<m_size && cc[ii]) m_buf[m_pos++]=cc[ii++];}
 
+	///\brief Append a string
+	///\param[in] cc the string to append
+	///\param[in] nn the size of the string to append
+	void append( const char* cc, unsigned int nn)	{unsigned int ii=0; while(m_pos<m_size && ii<nn) m_buf[m_pos++]=cc[ii++];}
+
 	///\brief Return the number of characters in the buffer
 	///\return the number of characters (bytes)
 	std::size_t size() const		{return m_pos;}

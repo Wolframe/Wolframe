@@ -83,7 +83,8 @@ struct Data
 			for (unsigned int kk=0; kk<mm.size(); kk++) if (mm[kk] < ' ' || (unsigned char)mm[kk] > 128) mm[kk] = '_';
 			if (mm.size() == Diffsize) mm.append( "...");
 			if (oo.size() == Diffsize) oo.append( "...");
-
+			if (oo.size() >= Diffsize && mm.size() >= Diffsize)
+			{
 				printf( "Input \"%s\" Expected \"%s\" Result \"%s\"\n", inputf.c_str(), expectedf.c_str(), resultf.c_str());
 				printf( "TEST %s SIZE R=%lu,E=%lu,DIFF AT %u='%d %d %d %d|%d %d %d %d' \"%s\" \"%s\"\n",
 				name.c_str(),
@@ -91,7 +92,7 @@ struct Data
 				result[ii-2],result[ii-1],result[ii-0],result[ii+1],
 				expected[ii-2],expected[ii-1],expected[ii-0],expected[ii+1],
 				oo.c_str(), mm.c_str());
-
+			}
 			boost::this_thread::sleep( boost::posix_time::seconds( 5 ));
 			return false;
 		}

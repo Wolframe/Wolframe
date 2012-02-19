@@ -35,6 +35,7 @@
 #include "langbind/ioFilterCommandHandler.hpp"
 #include "logger-v1.hpp"
 #include "filter/char_filter.hpp"
+/*[-]*/#include <iostream>
 
 using namespace _Wolframe;
 using namespace _Wolframe::protocol;
@@ -138,8 +139,7 @@ CommandHandler::Operation IOFilterCommandHandler::nextOperation()
 						switch (m_inputfilter->state())
 						{
 							case InputFilter::Open:
-								m_state = FlushingOutput;
-								continue;
+								break;
 
 							case InputFilter::EndOfMessage:
 								return READ;
@@ -150,7 +150,7 @@ CommandHandler::Operation IOFilterCommandHandler::nextOperation()
 								return READ;
 						}
 					}
-					else if (m_outputfilter.get())
+					if (m_outputfilter.get())
 					{
 						switch (m_outputfilter->state())
 						{
@@ -159,12 +159,10 @@ CommandHandler::Operation IOFilterCommandHandler::nextOperation()
 								continue;
 
 							case OutputFilter::EndOfBuffer:
-								m_writedata = m_outputfilter->ptr();
-								m_writedatasize = m_outputfilter->size();
-								if (m_writedatasize > 0)
+								if (m_outputfilter->pos() > 0)
 								{
-									m_outputfilter->setState( OutputFilter::Open);
-									return WRITE;
+									m_state = FlushingOutput;
+									continue;
 								}
 								/* no break here !*/
 
@@ -176,9 +174,9 @@ CommandHandler::Operation IOFilterCommandHandler::nextOperation()
 					}
 					else
 					{
-						m_writedata = "";
-						m_writedatasize = 0;
-						return WRITE;
+						m_statusCode = ErrInputFilter;
+						m_state = DiscardInput;
+						return READ;
 					}
 			}
 	}

@@ -1,6 +1,5 @@
 --
 --requires:LUA
---requires:DISABLED
 --input
 HELLO
 RUN
@@ -34,7 +33,6 @@ OK enter cmd
 
 .
 OK
-OK enter cmd
 BYE
 --end
 

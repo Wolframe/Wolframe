@@ -53,7 +53,7 @@ public:
 		if (m_doc) xmlFreeDoc( m_doc);
 		m_nodestk.clear();
 
-		int options = XML_PARSE_NOENT | XML_PARSE_DTDLOAD;
+		int options = XML_PARSE_NOENT | XML_PARSE_COMPACT | XML_PARSE_NONET | XML_PARSE_NODICT;
 		m_doc = xmlReadMemory( (const char*)content, size, "noname.xml", NULL, options);
 		if (!m_doc)
 		{
