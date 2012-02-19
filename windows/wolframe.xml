@@ -84,19 +84,6 @@ Project Wolframe.
 
 	<!--	Database configuration, get added here by the installer -->
 	<database>
-<!--
-		<PostgreSQL>
-			<identifier>pgdb</identifier>
-			<host>localhost</host>
-			<port>5432</port>
-			<name>wolframe</name>
-			<user>wolframe</user>
-			<password>blabla</password>
-			<connectionTimeout>10</connectionTimeout>
-			<connections>5</connections>
-			<acquireTimeout>10</acquireTimeout>
-		</PostgreSQL>
--->		
 	</database>
 	
 	<!--	Logging parameters -->

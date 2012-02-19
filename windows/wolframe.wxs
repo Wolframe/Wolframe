@@ -149,15 +149,6 @@ Project Wolframe.
 						</Directory>
 
 						<Directory Id="ModulesDir" Name="modules">
-							<?ifdef with_pgsql?>
-							<Component Id="ModDbPostgresql" Guid="{F1A6E235-2394-466A-AB1E-A1CD6C396339}">
-								<File Id="mod_db_postgresql.dll" Name="mod_db_postgresql.dll" DiskId="1" Source="..\src\modules\database\postgresql\mod_db_postgresql.dll"/>
-								<util:XmlFile Id="AppendConfigModDbPostgresql" Action="createElement" ElementPath="/configuration/LoadModules"
-								              Name="module" Value="[INSTALLDIR]modules\mod_db_postgresql.dll"
-									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
-							</Component>
-							<?endif?>
-
 							<?ifdef with_sqlite3?>
 							<Component Id="ModDbSqlite3" Guid="{71270C73-F3B4-4956-8DBC-D80301BB3417}">
 								<File Id="mod_db_sqlite3.dll" Name="mod_db_sqlite3.dll" DiskId="1" Source="..\src\modules\database\sqlite3\mod_db_sqlite3.dll"/>
@@ -167,7 +158,7 @@ Project Wolframe.
 								<util:XmlFile Id="AppendDBconfigSqlite3SQlite" Action="createElement" ElementPath="/configuration/database"
 								              Name="SQLite"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
-								<util:XmlFile Id="AppendDBconfigSqlite3Itentifier" Action="createElement" ElementPath="/configuration/database/SQLite"
+								<util:XmlFile Id="AppendDBconfigSqlite3Identifier" Action="createElement" ElementPath="/configuration/database/SQLite"
 								              Name="identifier" Value="sqlitedb"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="2"/>
 								<util:XmlFile Id="AppendDBconfigSqlite3Filename" Action="createElement" ElementPath="/configuration/database/SQLite"
@@ -179,13 +170,52 @@ Project Wolframe.
 							</Component>
 							<?endif?>
 
+							<?ifdef with_pgsql?>
+							<Component Id="ModDbPostgresql" Guid="{F1A6E235-2394-466A-AB1E-A1CD6C396339}">
+								<File Id="mod_db_postgresql.dll" Name="mod_db_postgresql.dll" DiskId="1" Source="..\src\modules\database\postgresql\mod_db_postgresql.dll"/>
+								<util:XmlFile Id="AppendConfigModDbPostgresql" Action="createElement" ElementPath="/configuration/LoadModules"
+								              Name="module" Value="[INSTALLDIR]modules\mod_db_postgresql.dll"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+								<util:XmlFile Id="AppendDBconfigPostgresqlPostgresql" Action="createElement" ElementPath="/configuration/database"
+								              Name="PostgreSQL"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+								<util:XmlFile Id="AppendDBconfigPostgresqlIdentifier" Action="createElement" ElementPath="/configuration/database/PostgreSQL"
+								              Name="identifier" Value="pgdb"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="2"/>
+								<util:XmlFile Id="AppendDBconfigPostgresqlHost" Action="createElement" ElementPath="/configuration/database/PostgreSQL"
+								              Name="host" Value="[WOLFRAME_DATABASE_HOST]"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="3"/>
+								<util:XmlFile Id="AppendDBconfigPostgresqlPort" Action="createElement" ElementPath="/configuration/database/PostgreSQL"
+								              Name="port" Value="[WOLFRAME_DATABASE_PORT]"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="4"/>
+								<util:XmlFile Id="AppendDBconfigPostgresqlName" Action="createElement" ElementPath="/configuration/database/PostgreSQL"
+								              Name="name" Value="[WOLFRAME_DATABASE_NAME]"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="5"/>
+								<util:XmlFile Id="AppendDBconfigPostgresqlUser" Action="createElement" ElementPath="/configuration/database/PostgreSQL"
+								              Name="user" Value="[WOLFRAME_DATABASE_USER]"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="6"/>
+								<util:XmlFile Id="AppendDBconfigPostgresqlPassword" Action="createElement" ElementPath="/configuration/database/PostgreSQL"
+								              Name="name" Value="[WOLFRAME_DATABASE_PASSWORD]"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="7"/>
+								<util:XmlFile Id="AppendDBconfigPostgresqlConnectionTimeout" Action="createElement" ElementPath="/configuration/database/PostgreSQL"
+								              Name="connectionTimeout" Value="10"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="8"/>
+								<util:XmlFile Id="AppendDBconfigPostgresqConnections" Action="createElement" ElementPath="/configuration/database/PostgreSQL"
+								              Name="connections" Value="5"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="9"/>
+								<util:XmlFile Id="AppendDBconfigPostgresqlAcquireTimeout" Action="createElement" ElementPath="/configuration/database/PostgreSQL"
+								              Name="acquireTimeout" Value="10"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="10"/>
+							</Component>
+							<?endif?>
+							
 							<Component Id="ModAuditDatabase" Guid="{8EBEC554-6E24-435A-82E1-EE7B1DADE59D}">
 								<File Id="mod_audit_database.dll" Name="mod_audit_database.dll" DiskId="1" Source="..\src\modules\audit\database\mod_audit_database.dll"/>
 								<util:XmlFile Id="AppendConfigModAuditDatabase" Action="createElement" ElementPath="/configuration/LoadModules"
 								              Name="module" Value="[INSTALLDIR]modules\mod_audit_database.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 								<util:XmlFile Id="UpdateConfigModAuditDatabaseReference" Action="setValue" ElementPath="/configuration/AAAA/Audit/Database/database"
-								              Value="[WOLFRAME_DATABASE]"
+								              Value="[WOLFRAME_DATABASE_TYPE]"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							</Component>
 							
@@ -205,7 +235,7 @@ Project Wolframe.
 								              Name="module" Value="[INSTALLDIR]modules\mod_auth_database.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 								<util:XmlFile Id="UpdateConfigModAuthDatabaseReference" Action="setValue" ElementPath="/configuration/AAAA/authentication/database"
-								              Value="[WOLFRAME_DATABASE]"
+								              Value="[WOLFRAME_DATABASE_TYPE]"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							</Component>
 
@@ -225,7 +255,7 @@ Project Wolframe.
 								              Name="module" Value="[INSTALLDIR]modules\mod_proc_echo.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 								<util:XmlFile Id="UpdateEchoDatabase" Action="setValue" ElementPath="/configuration/Processor/database"
-								              Value="[WOLFRAME_DATABASE]"
+								              Value="[WOLFRAME_DATABASE_TYPE]"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							      </Component>							
 						</Directory>
@@ -300,17 +330,17 @@ Project Wolframe.
 			</Feature>
 -->			
 			<Feature Id="DatabaseModules" Title="Database Modules" Description="Connectors to databases" Level="3">
+				<?ifdef with_sqlite3?>
+				<Feature Id="Sqlite3DB" Title="SQlite3 database driver" Description="Access local Sqlite3 database files." Level="3" InstallDefault="local" TypicalDefault="install">
+					<ComponentRef Id="ModDbSqlite3"/>
+				</Feature>				
+				<?endif?>
+				
 				<?ifdef with_pgsql?>
 				<Feature Id="PostgresqlDB" Title="PostgreSQL database driver" Description="Access PostgreSQL database." Level="1000">
 					<ComponentRef Id="ModDbPostgresql"/>
 					<ComponentRef Id="PostgresqlDlls"/>
 				</Feature>
-				<?endif?>
-
-				<?ifdef with_sqlite3?>
-				<Feature Id="Sqlite3DB" Title="SQlite3 database driver" Description="Access local Sqlite3 database files." Level="3" InstallDefault="local" TypicalDefault="install">
-					<ComponentRef Id="ModDbSqlite3"/>
-				</Feature>				
 				<?endif?>
 			</Feature>
 			
@@ -356,7 +386,12 @@ Project Wolframe.
 		</Feature>
 								
 		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR"/>
-		<Property Id="WOLFRAME_DATABASE">sqlitedb</Property>
+		<Property Id="WOLFRAME_DATABASE_TYPE" Secure="yes">sqlitedb</Property>
+		<Property Id="WOLFRAME_DATABASE_HOST" Secure="yes">localhost</Property>
+		<Property Id="WOLFRAME_DATABASE_PORT" Secure="yes">5432</Property>
+		<Property Id="WOLFRAME_DATABASE_DATABASE" Secure="yes"></Property>
+		<Property Id="WOLFRAME_DATABASE_USER" Secure="yes"></Property>
+		<Property Id="WOLFRAME_DATABASE_PASSWORD" Secure="yes"></Property>
 
 		<WixVariable Id="WixUILicenseRtf" Value="license.rtf"/>
 		<WixVariable Id="WixUIDialogBmp" Value="bitmaps/Wolf.bmp"/>

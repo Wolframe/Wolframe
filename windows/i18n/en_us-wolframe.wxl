@@ -34,6 +34,7 @@ Project Wolframe.
 -->
 
 <WixLocalization Culture="en-us" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+	<!-- DatabaseSelectDlg -->
 	<String Id="DatabaseSelect_Title" Overridable="yes">[ProductName] Select database</String>
 	<String Id="DatabaseSelectDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
 	<String Id="DatabaseSelectDlgInstruction" Overridable="yes">Choose the primary database which will be used to store your data.</String>
@@ -41,4 +42,11 @@ Project Wolframe.
 	<String Id="DatabaseSelectDlgTitle" Overridable="yes">{\WixUI_Font_Bold}Select Primary Database Binding</String>
 	<String Id="DatabaseSelectDlgRadio1" Overridable="yes">SQlite3 (integrated)</String>
 	<String Id="DatabaseSelectDlgRadio2" Overridable="yes">Postgresql</String>
+	
+	<!-- PostgresqlParametersDlg -->
+	<String Id="PostgresqlParameters_Title" Overridable="yes">[ProductName] Postgresql Connection Parameters</String>
+	<String Id="PostgresqlParametersDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
+	<String Id="PostgresqlParametersDlgDescription" Overridable="yes">You have choosen Postgresql as the primary source for your data.</String>
+	<String Id="PostgresqlParametersDlgInstruction" Overridable="yes">Configure the Postgresql database connection parameters.</String>
+	<String Id="DPostgresqlParametersDlgTitle" Overridable="yes">{\WixUI_Font_Bold}Postgresql Connection Parameters</String>
 </WixLocalization>

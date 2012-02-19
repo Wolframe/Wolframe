@@ -22,9 +22,9 @@ CPP_BINS =
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 # @office
-WIX_DIR = C:\Program Files (x86)\Windows Installer XML v3.5
+#WIX_DIR = C:\Program Files (x86)\Windows Installer XML v3.5
 # @home PIII
-#WIX_DIR = C:\Program Files\Windows Installer XML v3.5
+WIX_DIR = C:\Program Files\Windows Installer XML v3.5
 
 !IF ( "$(CPU)" == "" )
 !IF ( "$(PROCESSOR_ARCHITECTURE)" == "x86" )
@@ -41,11 +41,11 @@ CPU=AMD64
 !ENDIF CPU == ""
 
 !IF ( "$(CPU)" == "i386" )
-VDREDIST_MERGE_MODULE = C:\Program Files (x86)\Common Files\Merge Modules\Microsoft_VC90_CRT_x86.msm
-#VDREDIST_MERGE_MODULE = C:\Program Files\Common Files\Merge Modules\Microsoft_VC90_CRT_x86.msm
-!ELSEIF ( "$(CPU)" == "AMD64" )
 #VDREDIST_MERGE_MODULE = C:\Program Files (x86)\Common Files\Merge Modules\Microsoft_VC90_CRT_x86.msm
-VDREDIST_MERGE_MODULE = C:\Program Files\Common Files\Merge Modules\Microsoft_VC90_CRT_x64.msm
+VDREDIST_MERGE_MODULE = C:\Program Files\Common Files\Merge Modules\Microsoft_VC90_CRT_x86.msm
+!ELSEIF ( "$(CPU)" == "AMD64" )
+VDREDIST_MERGE_MODULE = C:\Program Files (x86)\Common Files\Merge Modules\Microsoft_VC90_CRT_x86.msm
+#VDREDIST_MERGE_MODULE = C:\Program Files\Common Files\Merge Modules\Microsoft_VC90_CRT_x64.msm
 !ELSE
 !ERROR Unknown CPU architecture found in CPU variable: $(CPU)
 !ENDIF CPU == i386
@@ -81,8 +81,8 @@ WIX_FLAGS = $(WIX_FLAGS) \
 
 # TODO: must be probed, as well as the major versions of libintl and libiconv
 # (or should it be rather in platform.mk?)
-WIX_FLAGS = $(WIX_FLAGS) \
-	-dpgdll_without_major_versions=1
+#WIX_FLAGS = $(WIX_FLAGS) \
+#	-dpgdll_without_major_versions=1
 
 WIX_EXTENSIONS = \
 	-ext WixUIExtension -ext WixUtilExtension -ext WixFirewallExtension
@@ -95,7 +95,8 @@ SETUPBLD = "$(WIX_DIR)\bin\setupbld.exe"
 WIX_OBJS = \
 	wolframe.wixobj \
 	WixUI_Wolframe.wixobj \
-	dialogs\DatabaseSelect.wixobj
+	dialogs\DatabaseSelect.wixobj \
+	dialogs\PostgresqlParametersDlg.wixobj
 
 WIX_LOCALES = \
 	-cultures:en-us -loc "i18n\en_us-wolframe.wxl"
