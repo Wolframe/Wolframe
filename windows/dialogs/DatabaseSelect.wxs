@@ -35,12 +35,12 @@ Project Wolframe.
 	<Fragment>
 		<UI>
 			<Dialog Id="DatabaseSelectDlg" Width="370" Height="270" Title="!(loc.DatabaseSelect_Title)">
-				<Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
-				<Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Text="!(loc.WixUINext)" />
+				<Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Text="!(loc.WixUINext)" Default="yes" TabSkip="no"/>
+				<Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)"/>
 				<Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
 					<Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
 				</Control>
-				<Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="!(loc.DatabaseSelectDlgBannerBitmap)" />
+				<Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" Text="!(loc.DatabaseSelectDlgBannerBitmap)" />
 				<Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="2" />
 				<Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="2" />
 				<Control Id="Description" Type="Text" X="20" Y="21" Width="280" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.DatabaseSelectDlgDescription)" />
