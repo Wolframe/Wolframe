@@ -22,9 +22,9 @@ CPP_BINS =
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 # @office
-#WIX_DIR = C:\Program Files (x86)\Windows Installer XML v3.5
+WIX_DIR = C:\Program Files (x86)\Windows Installer XML v3.5
 # @home PIII
-WIX_DIR = C:\Program Files\Windows Installer XML v3.5
+#WIX_DIR = C:\Program Files\Windows Installer XML v3.5
 
 !IF ( "$(CPU)" == "" )
 !IF ( "$(PROCESSOR_ARCHITECTURE)" == "x86" )
@@ -81,8 +81,8 @@ WIX_FLAGS = $(WIX_FLAGS) \
 
 # TODO: must be probed, as well as the major versions of libintl and libiconv
 # (or should it be rather in platform.mk?)
-#WIX_FLAGS = $(WIX_FLAGS) \
-#	-dpgdll_without_major_versions=1
+WIX_FLAGS = $(WIX_FLAGS) \
+	-dpgdll_without_major_versions=1
 
 WIX_EXTENSIONS = \
 	-ext WixUIExtension -ext WixUtilExtension -ext WixFirewallExtension
