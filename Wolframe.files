@@ -14,7 +14,9 @@ makefiles/gmake/top.mk
 makefiles/nmake/clean.mk
 makefiles/nmake/compiler.mk
 makefiles/nmake/config_aba_home_piii.mk
-makefiles/nmake/config_aba_office_w7.mk
+makefiles/nmake/config_aba_office_w7_32bit.mk
+makefiles/nmake/config_aba_office_w7_64bit_debug.mk
+makefiles/nmake/config_aba_office_w7_64bit.mk
 makefiles/nmake/config.mk
 makefiles/nmake/help.mk
 makefiles/nmake/platform.mk
@@ -32,7 +34,6 @@ makefiles/nmake/top.mk
 .Attic/AAAA/tests/authTest.cpp
 .Attic/AAAA/tests/GNUmakefile
 .Attic/AAAA/tests/Makefile.W32
-.Attic/AAAA/tests/test.conf
 .Attic/appException.cpp
 .Attic/appException.hpp
 .Attic/base64.cpp
@@ -320,6 +321,7 @@ include/logger/logSyslogFacility.hpp
 include/logger-v1.hpp
 include/miscUtils.hpp
 include/moduleInterface.hpp
+include/object.hpp
 include/objectPool.hpp
 include/processor/processor.hpp
 include/processor/procProvider.hpp
@@ -468,6 +470,8 @@ src/libwolframe/logger/logBackendImpl.cpp
 src/libwolframe/logger/logBackendImpl.hpp
 src/libwolframe/logger/logBackendSyslog.cpp
 src/libwolframe/logger/logBackendSyslog.hpp
+src/libwolframe/logger/logBackendWinDebug.cpp
+src/libwolframe/logger/logBackendWinDebug.hpp
 src/libwolframe/logger/logComponent.cpp
 src/libwolframe/logger/logError.cpp
 src/libwolframe/logger/loggerConfig.cpp
@@ -592,7 +596,12 @@ src/wolframe.conf
 src/wolframed.cpp
 src/wolframeHandler.cpp
 src/wolframeHandler.hpp
+src/wolframe-minimal.xml
 src/wolframe.xml
+tests/AAAA/authenticationTest.cpp
+tests/AAAA/GNUmakefile
+tests/AAAA/Makefile.W32
+tests/AAAA/sasl.conf
 tests/config/GNUmakefile
 tests/configStructParser.cpp
 tests/configValueParser.cpp
@@ -634,7 +643,6 @@ tests/threadLeakTest.cpp
 tests/versionTest.cpp
 TODO
 windows/Makefile.W32
-windows/uuidgen.c
 windows/wolframe.xml
 XML/configuration.rng
 XML/database.rng

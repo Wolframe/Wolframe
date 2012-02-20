@@ -42,21 +42,38 @@
 #include <boost/property_tree/ptree.hpp>
 #include "config/configurationBase.hpp"
 #include "container.hpp"
+#include "object.hpp"
 
 namespace _Wolframe {
 namespace module {
 
-struct ContainerBuilder
+class ObjectBuilder
 {
-	const char* title;
-	const char* section;
-	const char* keyword;
-	const char* name;
+	friend class ModulesDirectory;
+protected:
+	const char* m_name;
 public:
-	ContainerBuilder( const char* Title, const char* Section, const char* Keyword,
-			 const char* Name )
-		: title( Title ), section( Section), keyword( Keyword ),
-		  name( Name ){}
+	ObjectBuilder( const char* name )
+		: m_name( name )		{}
+
+	virtual ~ObjectBuilder()		{}
+
+	virtual Object* object() = 0;
+};
+
+class ContainerBuilder
+{
+	friend class ModulesDirectory;
+protected:
+	const char* m_title;
+	const char* m_section;
+	const char* m_keyword;
+	const char* m_name;
+public:
+	ContainerBuilder( const char* title, const char* section, const char* keyword,
+			 const char* name )
+		: m_title( title ), m_section( section), m_keyword( keyword ),
+		  m_name( name ){}
 
 	virtual ~ContainerBuilder()		{}
 
@@ -68,13 +85,13 @@ template < class T, class Tconf >
 class ContainerDescription : public ContainerBuilder
 {
 public:
-	ContainerDescription( const char* Title, const char* Section, const char* Keyword,
-			      const char* Name )
-		: ContainerBuilder( Title, Section, Keyword, Name )	{}
+	ContainerDescription( const char* title, const char* section, const char* keyword,
+			      const char* name )
+		: ContainerBuilder( title, section, keyword, name )	{}
 	virtual ~ContainerDescription()		{}
 
 	virtual config::ObjectConfiguration* configuration( const char* logPrefix ){
-		return new Tconf( title, logPrefix, keyword );
+		return new Tconf( m_title, logPrefix, m_keyword );
 	}
 	virtual Container* container( const config::ObjectConfiguration& conf ){
 		return new T( dynamic_cast< const Tconf& >( conf ));
@@ -89,12 +106,14 @@ public:
 	~ModulesDirectory()	{}
 
 	bool addContainer( ContainerBuilder* container );
+	bool addObject( ObjectBuilder* object );
 
 	ContainerBuilder* getContainer( const std::string& section, const std::string& keyword ) const;
 	ContainerBuilder* getContainer( const std::string& name ) const;
 
 private:
 	std::list< ContainerBuilder* >	m_container;
+	std::list< ObjectBuilder* >	m_object;
 };
 
 

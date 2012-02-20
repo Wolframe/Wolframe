@@ -45,32 +45,46 @@ bool ModulesDirectory::addContainer( ContainerBuilder* container )
 {
 	for ( std::list< ContainerBuilder* >::const_iterator it = m_container.begin();
 							it != m_container.end(); it++ )	{
-		if ( boost::algorithm::iequals( (*it)->section, container->section ) &&
-				boost::algorithm::iequals( (*it)->keyword, container->keyword ))	{
-			LOG_ALERT << "A configuration module for section '" << container->section
-				  << "' keyword '" << container->keyword << "' already exists";
+		if ( boost::algorithm::iequals( (*it)->m_section, container->m_section ) &&
+				boost::algorithm::iequals( (*it)->m_keyword, container->m_keyword ))	{
+			LOG_ALERT << "A configuration module for section '" << container->m_section
+				  << "' keyword '" << container->m_keyword << "' already exists";
 			return false;
 		}
-		if ( boost::algorithm::iequals( (*it)->name, container->name ))	{
-			LOG_ALERT << "A module named '" << container->name
+		if ( boost::algorithm::iequals( (*it)->m_name, container->m_name ))	{
+			LOG_ALERT << "A module container named '" << container->m_name
 				  << "' already exists";
 			return false;
 		}
 	}
 	m_container.push_back( container );
-	LOG_DEBUG << "Module '" << container->name << "' registered for section '"
-		  << container->section << "' keyword '" << container->keyword << "'";
+	LOG_DEBUG << "Module '" << container->m_name << "' registered for section '"
+		  << container->m_section << "' keyword '" << container->m_keyword << "'";
 	return true;
 }
 
+bool ModulesDirectory::addObject( ObjectBuilder* object )
+{
+	for ( std::list< ObjectBuilder* >::const_iterator it = m_object.begin();
+							it != m_object.end(); it++ )	{
+		if ( boost::algorithm::iequals( (*it)->m_name, object->m_name ))	{
+			LOG_ALERT << "A module object named '" << object->m_name
+				  << "' already exists";
+			return false;
+		}
+	}
+	m_object.push_back( object );
+	LOG_DEBUG << "Module object '" << object->m_name << "' registered";
+	return true;
+}
 
 ContainerBuilder* ModulesDirectory::getContainer( const std::string& section,
 						 const std::string& keyword ) const
 {
 	for ( std::list< ContainerBuilder* >::const_iterator it = m_container.begin();
 							it != m_container.end(); it++ )	{
-		if ( boost::algorithm::iequals( (*it)->keyword, keyword ) &&
-				boost::algorithm::iequals( (*it)->section, section ))
+		if ( boost::algorithm::iequals( (*it)->m_keyword, keyword ) &&
+				boost::algorithm::iequals( (*it)->m_section, section ))
 			return *it;
 	}
 	return NULL;
@@ -80,7 +94,7 @@ ContainerBuilder* ModulesDirectory::getContainer( const std::string& name ) cons
 {
 	for ( std::list< ContainerBuilder* >::const_iterator it = m_container.begin();
 							it != m_container.end(); it++ )	{
-		if ( boost::algorithm::iequals( (*it)->name, name ))
+		if ( boost::algorithm::iequals( (*it)->m_name, name ))
 			return *it;
 	}
 	return NULL;
