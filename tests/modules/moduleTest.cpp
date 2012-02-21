@@ -7,6 +7,7 @@
 #include <gtest/gtest.h>
 
 #include "tests/mod_test/common.hpp"
+#include "tests/mod_test_containers/common.hpp"
 
 #include <string>
 #include <list>
@@ -56,6 +57,47 @@ TEST_F( ModuleFixture, LoadingModuleFromDir )
 	ASSERT_EQ( s, "hello" );
 	
 	delete unit;
+}
+
+TEST_F( ModuleFixture, LoadingModuleWithMultipleContainers )
+{
+	ModulesDirectory modDir;
+	list<string> modFiles;
+
+#ifndef _WIN32
+	modFiles.push_back( "./tests/mod_test_containers/mod_test_containers.so" );
+#else
+	modFiles.push_back( ".\\tests\\mod_test_containers\\mod_test_containers.dll" );
+#endif
+	bool res = LoadModules( modDir, modFiles );
+	ASSERT_TRUE( res );
+
+	ContainerBuilder* container1 = modDir.getContainer( "TestObject1" );
+	ASSERT_TRUE( container1 != NULL );
+
+	ContainerBuilder* container2 = modDir.getContainer( "TestObject2" );
+	ASSERT_TRUE( container2 != NULL );
+
+	config::ObjectConfiguration* configuration1 = container1->configuration( "TestObject1" );
+	ASSERT_TRUE( configuration1 != NULL );
+
+	config::ObjectConfiguration* configuration2 = container2->configuration( "TestObject2" );
+	ASSERT_TRUE( configuration2 != NULL );
+
+	test_containers::TestModuleContainer1* obj1 = dynamic_cast<test_containers::TestModuleContainer1 *>( container1->container( *configuration1 ) );
+	test_containers::TestUnit1* unit1 = obj1->object( );
+
+	test_containers::TestModuleContainer2* obj2 = dynamic_cast<test_containers::TestModuleContainer2 *>( container2->container( *configuration2 ) );
+	test_containers::TestUnit2* unit2 = obj2->object( );
+
+	string s1 = unit1->hello( );
+	ASSERT_EQ( s1, "hello" );
+
+	string s2 = unit2->hullo( );
+	ASSERT_EQ( s2, "hullo" );
+
+	delete unit1;	
+	delete unit2;
 }
 
 int main( int argc, char **argv )

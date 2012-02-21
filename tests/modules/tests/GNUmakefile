@@ -1,6 +1,6 @@
 TOPDIR = ../../..
 
-SUBDIRS = mod_test
+SUBDIRS = mod_test mod_test_containers
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
