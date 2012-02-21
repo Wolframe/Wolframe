@@ -122,9 +122,13 @@ bool LoadModules( ModulesDirectory& modDir, std::list< std::string >& modFiles )
 
 //*********** Module interface *********
 
-enum ModuleType	{
-	CONTAINER_MODULE = 1
+enum ModuleObjectType	{
+	MODULE_CONTAINER = 1,
+	MODULE_OBJECT = 2
 };
+
+typedef ContainerBuilder* (*createContainerFunc)();
+typedef ObjectBuilder* (*createObjectFunc)();
 
 struct ModuleEntryPoint
 {
@@ -134,18 +138,26 @@ struct ModuleEntryPoint
 
 	char signature[MODULE_SIGN_SIZE];
 	unsigned short ifaceVersion;
-	ModuleType moduleType;
 	const char* name;
-	ContainerBuilder* (*create)();
 	void (*setLogger)(void*);
+	unsigned short		containers;
+	createContainerFunc	*createContainer;
+	unsigned short		objects;
+	createObjectFunc	*createObject;
 public:
-	ModuleEntryPoint( unsigned short iVer, ModuleType modType, const char* modName,
-			  ContainerBuilder* (*createFunc)(),
-			  void (*setLoggerFunc)(void*))
-		: ifaceVersion( iVer ), moduleType( modType ), name( modName ),
-		  create( createFunc ), setLogger( setLoggerFunc )
+	ModuleEntryPoint( unsigned short iVer, const char* modName,
+			  void (*setLoggerFunc)(void*),
+			  unsigned short nrContainers, createContainerFunc* containerFunc,
+			  unsigned short nrObjects, createObjectFunc* objectFunc
+			  )
+		: ifaceVersion( iVer ), name( modName ),
+		  setLogger( setLoggerFunc ),
+		  containers( nrContainers ), createContainer( containerFunc ),
+		  objects( nrObjects ), createObject( objectFunc )
 	{
 		std::memcpy ( signature, "Wolframe Module", MODULE_SIGN_SIZE );
+		if ( createContainer == NULL ) containers = 0;
+		if ( createObject == NULL ) objects = 0;
 	}
 
 };

@@ -57,7 +57,13 @@ static void setModuleLogger( void* logger )
 }
 
 
-ModuleEntryPoint entryPoint( 0, CONTAINER_MODULE, "Database Authentification",
-			     createModule, setModuleLogger );
+static const unsigned short nrContainers = 1;
+static ContainerBuilder* (*containers[ nrContainers ])() = {
+	createModule
+};
+
+ModuleEntryPoint entryPoint( 0, "Database authentification", setModuleLogger,
+			     nrContainers, containers,
+			     0, NULL );
 
 }} // namespace _Wolframe::module

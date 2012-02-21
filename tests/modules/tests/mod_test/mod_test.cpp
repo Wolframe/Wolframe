@@ -46,7 +46,7 @@ namespace test {
 
 TestModuleConfig::TestModuleConfig( const char* cfgName, const char* logParent, const char* logName )
 	: config::ObjectConfiguration( cfgName, logParent, logName )
-{			
+{
 	MOD_LOG_DEBUG << "Test module config created";
 }
 
@@ -73,7 +73,7 @@ void TestModuleConfig::setCanonicalPathes( const std::string& refPath )
 
 TestModuleContainer::TestModuleContainer( const TestModuleConfig& /* conf */ )
 {
-	m_test = new TestUnitImpl( /* conf */ );	
+	m_test = new TestUnitImpl( /* conf */ );
 	MOD_LOG_DEBUG << "Test module container created";
 }
 
@@ -109,7 +109,14 @@ static void setModuleLogger( void* logger )
 	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend* >( logger );
 }
 
-ModuleEntryPoint entryPoint( 0, CONTAINER_MODULE, "Test Module",
-			     createModule, setModuleLogger );
+
+static const unsigned short nrContainers = 1;
+static ContainerBuilder* (*containers[ nrContainers ])() = {
+	createModule
+};
+
+ModuleEntryPoint entryPoint( 0, "Test Module", setModuleLogger,
+			     nrContainers, containers,
+			     0, NULL );
 
 }}} // namespace _Wolframe::module:test

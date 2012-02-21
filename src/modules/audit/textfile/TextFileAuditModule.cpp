@@ -57,7 +57,13 @@ static void setModuleLogger( void* logger )
 }
 
 
-ModuleEntryPoint entryPoint( 0, CONTAINER_MODULE, "Text File Audit",
-			     createModule, setModuleLogger );
+static const unsigned short nrContainers = 1;
+static ContainerBuilder* (*containers[ nrContainers ])() = {
+	createModule
+};
+
+ModuleEntryPoint entryPoint( 0, "Text file audit", setModuleLogger,
+			     nrContainers, containers,
+			     0, NULL );
 
 }} // namespace _Wolframe::module

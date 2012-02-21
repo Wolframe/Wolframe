@@ -43,7 +43,7 @@ _Wolframe::log::LogBackend*	logBackendPtr;
 namespace _Wolframe {
 namespace module {
 
-static ContainerBuilder* createModule( void )
+static ContainerBuilder* createSQLiteModule( void )
 {
 	static module::ContainerDescription< db::SQLiteContainer,
 			db::SQLiteConfig > mod( "SQLite database", "database",
@@ -57,7 +57,13 @@ static void setModuleLogger( void* logger )
 }
 
 
-ModuleEntryPoint entryPoint( 0, CONTAINER_MODULE, "SQLite Database",
-			     createModule, setModuleLogger );
+static const unsigned short nrContainers = 1;
+static ContainerBuilder* (*containers[ nrContainers ])() = {
+	createSQLiteModule
+};
+
+ModuleEntryPoint entryPoint( 0, "SQLite database", setModuleLogger,
+			     nrContainers, containers,
+			     0, NULL );
 
 }} // namespace _Wolframe::module

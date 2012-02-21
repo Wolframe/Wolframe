@@ -155,14 +155,19 @@ bool module::LoadModules( ModulesDirectory& modDir, std::list< std::string >& mo
 		}
 #endif
 		if( !entry->name ) {
-			LOG_ERROR << "Module entry point has no name, something is wrong in module '" << *it << "')";
+			LOG_ERROR << "Module entry point has no name, something is here '" << *it << "')";
 			retVal = false;
 			_Wolframe_DLL_CLOSE( hndl );
 			break;
 		}
 
 		entry->setLogger( &_Wolframe::log::LogBackend::instance() );
-		modDir.addContainer( entry->create() );
+		for ( unsigned short i = 0; i < entry->containers; i++ )	{
+			modDir.addContainer( entry->createContainer[ i ]() );
+		}
+		for ( unsigned short i = 0; i < entry->objects; i++ )	{
+			modDir.addObject( entry->createObject[ i ]() );
+		}
 		handleList.addHandle( hndl );
 		LOG_DEBUG << "Module '" << entry->name << "' loaded";
 	}
