@@ -22,7 +22,7 @@ DYNAMIC_MODULE = \
 	mod_test_containers.dll
 
 CPP_OBJS = \
-	mod_test_containers.obj
+	mod_test.obj
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
