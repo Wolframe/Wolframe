@@ -17,6 +17,8 @@ makefiles/nmake/config_aba_home_piii.mk
 makefiles/nmake/config_aba_office_w7_32bit.mk
 makefiles/nmake/config_aba_office_w7_64bit_debug.mk
 makefiles/nmake/config_aba_office_w7_64bit.mk
+makefiles/nmake/config_mba_32bit.mk
+makefiles/nmake/config_mba_64bit.mk
 makefiles/nmake/config.mk
 makefiles/nmake/help.mk
 makefiles/nmake/platform.mk
@@ -95,7 +97,6 @@ makefiles/nmake/top.mk
 .Attic/wt/wtclient.xml
 .Attic/xmlselect/xmlIterator.cpp
 .Attic/xmlselect/xmlIterator.hpp
-BUGS
 clients/Android/AndroidManifest.xml
 clients/Android/build.xml
 clients/Android/README.txt
@@ -121,11 +122,6 @@ clients/qt/HistoryLineEdit.hpp
 clients/qt/MainWindow.cpp
 clients/qt/MainWindow.hpp
 clients/qt/Makefile.W32
-clients/qt/moc_AbstractFormLoader.cpp
-clients/qt/moc_DebugTerminal.cpp
-clients/qt/moc_HistoryLineEdit.cpp
-clients/qt/moc_MainWindow.cpp
-clients/qt/moc_WolframeClient.cpp
 clients/qt/qtclient.cpp
 clients/qt/README
 clients/qt/TODOS
@@ -156,7 +152,6 @@ docs/SDK/Preface.xml
 docs/SDK/README
 docs/SDK/SDK.ent
 docs/SDK/TutorialConfiguration.xml
-docs/TODO
 docs/TutorialProgramLua.xml
 docs/WolfBook.xml
 docs/wolframe.conf-man.xml
@@ -628,6 +623,11 @@ tests/modules/moduleTest.cpp
 tests/modules/tests/GNUmakefile
 tests/modules/tests/Makefile.W32
 tests/modules/tests/mod_test/common.hpp
+tests/modules/tests/mod_test_containers/common.hpp
+tests/modules/tests/mod_test_containers/GNUmakefile
+tests/modules/tests/mod_test_containers/Makefile.W32
+tests/modules/tests/mod_test_containers/mod_test.cpp
+tests/modules/tests/mod_test_containers/mod_test.hpp
 tests/modules/tests/mod_test/GNUmakefile
 tests/modules/tests/mod_test/Makefile.W32
 tests/modules/tests/mod_test/mod_test.cpp

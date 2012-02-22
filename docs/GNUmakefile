@@ -30,18 +30,20 @@ XSLT_EPUB = \
 
 local_all:
 
-doc: doc-man doc-doxygen doc-html doc-pdf doc-epub
+doc: doc-doxygen doc-html doc-html-chunked doc-pdf
 
-doc-man: wolframed.8 wolframe.conf.5
+man: wolframed.8 wolframe.conf.5
 
 doc-doxygen:
 	cd $(TOPDIR); doxygen docs/doxygen.conf
 
 doc-html: WolfBook.html
 
+doc-html-chunked: html/index.html
+
 doc-pdf: WolfBook.pdf
 
-doc-epub: WolfBook.epub
+epub: WolfBook.epub
 	mkdir OEBPS/images
 	cp images/draft.png images/*.svg OEBPS/images
 	echo "application/epub+zip" > mimetype
@@ -57,7 +59,12 @@ doc-epub: WolfBook.epub
 	$(XSLT_PDF) $< > $@
 
 %.html: %.xml
-	$(XSLT_HTML) $< >$@
+	$(XSLT_HTML) $< > $@
+
+html/index.html: WolfBook.xml
+	$(XSLTPROC) --nonet --xinclude \
+	--stringparam draft.mode yes \
+	-o $@ output-html-chunked.xsl WolfBook.xml
 
 %.epub: %.xml
 	$(XSLT_EPUB) $<
@@ -70,6 +77,7 @@ wolframe.conf.5: wolframe.conf-man.xml
 
 local_clean:
 	-rm -rf doxygen/* WolfBook.html WolfBook.fop WolfBook.pdf WolfBook.epub
+	-rm -rf html/*
 
 local_distclean:
 
