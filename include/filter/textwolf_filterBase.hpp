@@ -136,12 +136,11 @@ private:
 template <class IOCharset, class AppCharset>
 struct FilterBase
 {
-	typedef protocol::EscapingBuffer<textwolf::StaticBuffer> BufferType;
-
 	///\brief Prints a character string to an STL back insertion sequence buffer in the IO character set encoding
 	///\param [in] src pointer to string to print
 	///\param [in] srcsize size of src in bytes
 	///\param [in,out] buf buffer to print to
+	template <class BufferType>
 	static void printToBuffer( const char* src, std::size_t srcsize, BufferType& buf)
 	{
 		StrIterator itr( src, srcsize);
@@ -158,6 +157,7 @@ struct FilterBase
 	///\brief Prints an end of line marker (EOL) to an STL back insertion sequence buffer in the IO character set encoding
 	///\param [in] ch character to print
 	///\param [in,out] buf buffer to print to
+	template <class BufferType>
 	static void printToBufferEOL( BufferType& buf)
 	{
 		static const char* str =  protocol::EndOfLineMarker::value();
@@ -168,6 +168,7 @@ struct FilterBase
 	///\brief Prints a character to an STL back insertion sequence buffer in the IO character set encoding
 	///\param [in] ch character to print
 	///\param [in,out] buf buffer to print to
+	template <class BufferType>
 	static void printToBuffer( char ch, BufferType& buf)
 	{
 		IOCharset::print( (textwolf::UChar)(unsigned char)ch, buf);

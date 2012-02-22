@@ -2,9 +2,7 @@
 
 encoding=$1
 type=$2
-
-echo "<?xml version=\"1.0\" encoding=\"$encoding\" standalone=\"yes\"?>"
-doc=""
+hdr="<?xml version=\"1.0\" encoding=\"$encoding\" standalone=\"yes\"?>"
 
 xmlElement()
 {
@@ -18,7 +16,6 @@ xmlCloseTag()
 {
 	doc="$doc</$1>"
 }
-
 
 case _"$type" in
 _employee)
@@ -79,10 +76,5 @@ _assignement)
 	;;
 esac
 
-if [ `echo $encoding | grep -c '[26]BE$'` = 0 ]; then
-	echo "$doc" | recode XML-standalone..$encoding
-else
-	echo "$doc" | recode XML-standalone..$encoding | cut -b3-
-	# ... remove BOM with cut:
-fi
-
+echo "$hdr" | recode XML-standalone..$encoding
+echo "$doc" | recode XML-standalone..$encoding

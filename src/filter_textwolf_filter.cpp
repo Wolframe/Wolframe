@@ -815,14 +815,27 @@ public:
 		{
 			const char* cc = (char*)ptr();
 			std::size_t nn = size();
-			const char* pp = (const char*)std::memchr( cc, '\n', nn);
-			if (pp)
+			std::size_t ii = 0;
+			for (;ii < nn; ++ii)
+			{
+				if (cc[ii] == '\n') break;
+				if (cc[ii] != '\0')
+				{
+					if (cc[ii] < 0 || m_header.size() > 128)
+					{
+						setState( Error, ErrXML);
+						return false;
+					}
+					m_header.push_back( cc[ii]);
+				}
+			}
+			if (cc[ii] == '\n')
 			{
 				TextwolfEncoding::Id enc;
 
-				m_header.append( cc, pp-cc+1);
+				m_header.push_back( '\n');
 				m_headerParsed = true;
-				skip( pp-cc+1);
+				skip( ii+1);
 
 				if (getEncoding( m_header, enc))
 				{
@@ -843,7 +856,6 @@ public:
 			}
 			else
 			{
-				m_header.append( cc, nn);
 				skip( nn);
 				setState( EndOfMessage);
 			}
@@ -921,7 +933,6 @@ public:
 		:m_tagbuffersize(tagbufsize)
 		,m_headerPrinted(false)
 		,m_headerPos(0)
-		,m_header(0)
 		,m_encoding(enc){}
 
 	OutputFilter( const OutputFilter& o)
@@ -941,6 +952,7 @@ public:
 
 	virtual protocol::OutputFilter* createFollow()
 	{
+		namespace tc = textwolf::charset;
 		if (!m_headerPrinted) return 0;
 		TextwolfEncoding::Id enc = m_encoding.get()?*m_encoding.get():TextwolfEncoding::UTF8;
 		protocol::OutputFilter* rt = 0;
@@ -950,31 +962,31 @@ public:
 				setState( Error, ErrEncoding);
 				return false;
 			case TextwolfEncoding::IsoLatin:
-				rt = new OutputFilterImpl<textwolf::charset::IsoLatin1>( m_tagbuffersize);
+				rt = new OutputFilterImpl<tc::IsoLatin1>( m_tagbuffersize);
 				break;
 			case TextwolfEncoding::UTF8:
-				rt = new OutputFilterImpl<textwolf::charset::UTF8>( m_tagbuffersize);
+				rt = new OutputFilterImpl<tc::UTF8>( m_tagbuffersize);
 				break;
 			case TextwolfEncoding::UTF16:
-				rt = new OutputFilterImpl<textwolf::charset::UTF16BE>( m_tagbuffersize);
+				rt = new OutputFilterImpl<tc::UTF16BE>( m_tagbuffersize);
 				break;
 			case TextwolfEncoding::UTF16BE:
-				rt = new OutputFilterImpl<textwolf::charset::UTF16BE>( m_tagbuffersize);
+				rt = new OutputFilterImpl<tc::UTF16BE>( m_tagbuffersize);
 				break;
 			case TextwolfEncoding::UTF16LE:
-				rt = new OutputFilterImpl<textwolf::charset::UTF16LE>( m_tagbuffersize);
+				rt = new OutputFilterImpl<tc::UTF16LE>( m_tagbuffersize);
 				break;
 			case TextwolfEncoding::UCS2BE:
-				rt = new OutputFilterImpl<textwolf::charset::UCS2BE>( m_tagbuffersize);
+				rt = new OutputFilterImpl<tc::UCS2BE>( m_tagbuffersize);
 				break;
 			case TextwolfEncoding::UCS2LE:
-				rt = new OutputFilterImpl<textwolf::charset::UCS2LE>( m_tagbuffersize);
+				rt = new OutputFilterImpl<tc::UCS2LE>( m_tagbuffersize);
 				break;
 			case TextwolfEncoding::UCS4BE:
-				rt = new OutputFilterImpl<textwolf::charset::UCS4BE>( m_tagbuffersize);
+				rt = new OutputFilterImpl<tc::UCS4BE>( m_tagbuffersize);
 				break;
 			case TextwolfEncoding::UCS4LE:
-				rt = new OutputFilterImpl<textwolf::charset::UCS4LE>( m_tagbuffersize);
+				rt = new OutputFilterImpl<tc::UCS4LE>( m_tagbuffersize);
 				break;
 		}
 		if (rt)
@@ -991,50 +1003,86 @@ public:
 			setState( Open);
 			return false;
 		}
-		if (!m_header)
+		if (m_header.size() == 0)
 		{
 			TextwolfEncoding::Id enc = m_encoding.get()?*m_encoding.get():TextwolfEncoding::UTF8;
+			namespace tc = textwolf::charset;
+
 			switch (enc)
 			{
 				case TextwolfEncoding::Unknown:
+				{
 					setState( Error, ErrEncoding);
 					return false;
+				}
 				case TextwolfEncoding::IsoLatin:
+				{
 					m_header = "<?xml version=\"1.0\" encoding=\"Isolatin-1\" standalone=\"yes\"?>\n";
 					break;
+				}
 				case TextwolfEncoding::UTF8:
+				{
 					m_header = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n";
 					break;
+				}
 				case TextwolfEncoding::UTF16:
-					m_header = "<?xml version=\"1.0\" encoding=\"UTF-16\" standalone=\"yes\"?>\n";
+				{
+					typedef FilterBase<tc::UTF16<>,tc::IsoLatin1> FLT;
+					const char* elem = "<?xml version=\"1.0\" encoding=\"UTF-16\" standalone=\"yes\"?>\n";
+					FLT::printToBuffer( (const char*)elem, std::strlen(elem), m_header);
 					break;
+				}
 				case TextwolfEncoding::UTF16BE:
-					m_header = "<?xml version=\"1.0\" encoding=\"UTF-16BE\" standalone=\"yes\"?>\n";
+				{
+					typedef FilterBase<tc::UTF16<tc::ByteOrder::BE>,tc::IsoLatin1> FLT;
+					const char* elem = "<?xml version=\"1.0\" encoding=\"UTF-16BE\" standalone=\"yes\"?>\n";
+					FLT::printToBuffer( (const char*)elem, std::strlen(elem), m_header);
 					break;
+				}
 				case TextwolfEncoding::UTF16LE:
-					m_header = "<?xml version=\"1.0\" encoding=\"UTF-16LE\" standalone=\"yes\"?>\n";
+				{
+					typedef FilterBase<tc::UTF16<tc::ByteOrder::LE>,tc::IsoLatin1> FLT;
+					const char* elem = "<?xml version=\"1.0\" encoding=\"UTF-16LE\" standalone=\"yes\"?>\n";
+					FLT::printToBuffer( (const char*)elem, std::strlen(elem), m_header);
 					break;
+				}
 				case TextwolfEncoding::UCS2BE:
-					m_header = "<?xml version=\"1.0\" encoding=\"UCS-2BE\" standalone=\"yes\"?>\n";
+				{
+					typedef FilterBase<tc::UCS2<tc::ByteOrder::BE>,tc::IsoLatin1> FLT;
+					const char* elem = "<?xml version=\"1.0\" encoding=\"UCS-2BE\" standalone=\"yes\"?>\n";
+					FLT::printToBuffer( (const char*)elem, std::strlen(elem), m_header);
 					break;
+				}
 				case TextwolfEncoding::UCS2LE:
-					m_header = "<?xml version=\"1.0\" encoding=\"UCS-2LE\" standalone=\"yes\"?>\n";
+				{
+					typedef FilterBase<tc::UCS2<tc::ByteOrder::LE>,tc::IsoLatin1> FLT;
+					const char* elem = "<?xml version=\"1.0\" encoding=\"UCS-2LE\" standalone=\"yes\"?>\n";
+					FLT::printToBuffer( (const char*)elem, std::strlen(elem), m_header);
 					break;
+				}
 				case TextwolfEncoding::UCS4BE:
-					m_header = "<?xml version=\"1.0\" encoding=\"UCS-4BE\" standalone=\"yes\"?>\n";
+				{
+					typedef FilterBase<tc::UCS4<tc::ByteOrder::BE>,tc::IsoLatin1> FLT;
+					const char* elem = "<?xml version=\"1.0\" encoding=\"UCS-4BE\" standalone=\"yes\"?>\n";
+					FLT::printToBuffer( (const char*)elem, std::strlen(elem), m_header);
 					break;
+				}
 				case TextwolfEncoding::UCS4LE:
-					m_header = "<?xml version=\"1.0\" encoding=\"UCS-4LE\" standalone=\"yes\"?>\n";
+				{
+					typedef FilterBase<tc::UCS4<tc::ByteOrder::LE>,tc::IsoLatin1> FLT;
+					const char* elem = "<?xml version=\"1.0\" encoding=\"UCS-4LE\" standalone=\"yes\"?>\n";
+					FLT::printToBuffer( (const char*)elem, std::strlen(elem), m_header);
 					break;
+				}
 			}
 			m_headerPos = 0;
 		}
-		std::size_t nn = std::strlen( m_header+m_headerPos);
+		std::size_t nn = m_header.size() - m_headerPos;
 		if (nn > restsize()) nn = restsize();
-		memcpy( rest(), m_header+m_headerPos, nn);
+		memcpy( rest(), m_header.c_str()+m_headerPos, nn);
 		incPos( nn);
 		m_headerPos += nn;
-		m_headerPrinted = (m_header[m_headerPos] == 0);
+		m_headerPrinted = (m_headerPos == m_header.size());
 		setState( EndOfBuffer);
 		return false;
 	}
@@ -1043,7 +1091,7 @@ private:
 	std::size_t m_tagbuffersize;
 	bool m_headerPrinted;
 	std::size_t m_headerPos;
-	const char* m_header;
+	std::string m_header;
 	CountedReference<TextwolfEncoding::Id> m_encoding;
 };
 

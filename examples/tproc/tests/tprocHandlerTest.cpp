@@ -254,6 +254,68 @@ static void writeFile( const boost::filesystem::path& pt, const std::string& con
 	ff.write( content.c_str(), content.size());
 }
 
+static void appendContent( std::string& to, const std::string& from)
+{
+	enum {FE,FF,SRC} state = SRC;
+	std::string::const_iterator itr = from.begin(),end = from.end();
+	for (;itr != end; ++itr)
+	{
+		if (*itr == (char)0xFF)
+		{
+			if (state == FE)
+			{
+				state = SRC;
+			}
+			else if (state == FF)
+			{
+				to.push_back( *itr);
+				state = FF;
+			}
+			else
+			{
+				state = FF;
+			}
+		}
+		else if (*itr == (char)0xFE)
+		{
+			if (state == FF)
+			{
+				state = SRC;
+			}
+			else if (state == FE)
+			{
+				to.push_back( *itr);
+				state = FE;
+			}
+			else
+			{
+				state = FE;
+			}
+		}
+		else
+		{
+			if (state == FF)
+			{
+				to.push_back( (char)0xFF);
+			}
+			else if (state == FE)
+			{
+				to.push_back( (char)0xFE);
+			}
+			to.push_back( *itr);
+			state = SRC;
+		}
+	}
+	if (state == FF)
+	{
+		to.push_back( (char)0xFF);
+	}
+	else if (state == FE)
+	{
+		to.push_back( (char)0xFE);
+	}
+}
+
 static const TestDescription getTestDescription( const boost::filesystem::path& pt)
 {
 	TestDescription rt;
@@ -268,11 +330,11 @@ static const TestDescription getTestDescription( const boost::filesystem::path& 
 	{
 		if (boost::iequals( *hi, "input"))
 		{
-			rt.input.append( *itr);
+			appendContent( rt.input, *itr);
 		}
 		else if (boost::iequals( *hi, "output"))
 		{
-			rt.expected.append( *itr);
+			appendContent( rt.expected, *itr);
 		}
 		else if (boost::iequals( *hi, "config"))
 		{

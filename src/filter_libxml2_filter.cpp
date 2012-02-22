@@ -11,6 +11,7 @@
 #include <libxml/tree.h>
 #include <libxml/encoding.h>
 #include <libxml/xmlwriter.h>
+#include <libxml/xmlsave.h>
 
 using namespace _Wolframe;
 using namespace filter;
