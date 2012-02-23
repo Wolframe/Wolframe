@@ -108,6 +108,7 @@ local_test: $(TEST_CPP_BINS)
 	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" tests >> test.bat
 	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" tests >> test.bat
 !ENDIF
+	@-echo copy "$(LIBXML2_DIR)\lib\libxml2.dll" tests >> test.bat
 	@-echo cd tests >> test.bat
 	@-echo tprocHandlerTest.exe >> test.bat
 	@-test.bat
@@ -118,6 +119,7 @@ run:
 	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat
 	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >> test.bat
 !ENDIF
+	@-echo copy "$(LIBXML2_DIR)\lib\libxml2.dll" . >> test.bat
 	@-echo echo Running the Wolframe tproc example... >> test.bat
 	@-echo tprocd.exe -c tproc.conf >> test.bat
 	@-test.bat
