@@ -240,12 +240,22 @@ bool OutputBlock::printNumber( unsigned int num)
 	char nn[64];
 	unsigned int ii= sizeof(nn);
 	const char digits[] = "0123456789";
+	char sg = '\0';
 
 	if (num == 0) nn[--ii] = '0';
+	if ((int)num < 0)
+	{
+		num = (unsigned int)(-(int)num);
+		sg = '-';
+	}
 	while (num > 0)
 	{
 		nn[ --ii] = digits[num%10];
 		num /= 10;
+	}
+	if (sg)
+	{
+		nn[ --ii] = sg;
 	}
 	return print( nn+ii, sizeof(nn)-ii);
 }

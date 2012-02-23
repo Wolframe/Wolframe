@@ -377,11 +377,29 @@ private:
 		EoDBufferSize=4,
 		MinOutBufferSize=16
 	};
+
+	static unsigned int buffersizeFactor( const std::string& inp)
+	{
+		unsigned ii=0,nn=inp.size();
+		std::string::const_iterator itr=inp.begin(),end=inp.end();
+		for (;itr != end; ++itr)
+		{
+			if (*itr)
+			{
+				++ii;
+			}
+		}
+		if (*itr <= nn/4) return 5;
+		if (*itr <= nn/3) return 4;
+		if (*itr <= nn/2) return 3;
+		return 1;
+	}
+
 public:
 	TProcHandlerTestInstance( const TestDescription& descr, std::size_t ib, std::size_t ob)
 		:ep( "127.0.0.1", 12345)
 		,m_connection(0)
-		,m_config( ib + EoDBufferSize, ob + MinOutBufferSize, descr.config)
+		,m_config( ib + EoDBufferSize, buffersizeFactor( descr.input) * (ob + MinOutBufferSize), descr.config)
 		,m_input( descr.input)
 		,m_expected( descr.expected)
 		,m_inputBufferSize(ib)
@@ -433,7 +451,7 @@ TEST_F( TProcHandlerTest, tests)
 			{
 				for (int oo=0; oo<NOF_OB; oo++)
 				{
-					TProcHandlerTestInstance test( td, ib[ii], ob[oo]);
+					TProcHandlerTestInstance test( td, ib[ii], ob[ii]);
 					EXPECT_EQ( 0, test.run());
 					EXPECT_EQ( test.expected(), test.output());
 				}
