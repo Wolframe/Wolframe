@@ -881,7 +881,7 @@ public:
 							m_headerParseLeft = 1;
 							continue;
 						}
-						else if (enc == TextwolfEncoding::UCS2LE)
+						else if (enc == TextwolfEncoding::UCS4LE)
 						{
 							m_headerParseLeft = 3;
 							continue;

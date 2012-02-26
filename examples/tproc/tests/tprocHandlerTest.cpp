@@ -366,7 +366,7 @@ public:
 
 TEST_F( TProcHandlerTest, tests)
 {
-	enum {NOF_IB=6,NOF_OB=4};
+	enum {NOF_IB=1,NOF_OB=1};
 	std::size_t ib[] = {127,1,2,3,5,7};
 	std::size_t ob[] = {127,1,2,5};
 
