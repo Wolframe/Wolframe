@@ -518,6 +518,7 @@ struct InputFilterImpl :public protocol::InputFilter, public FilterBase<IOCharse
 	{
 		m_src.setInput( this);
 		m_scanner = new XMLScanner( m_src, m_outputbuf);
+		m_scanner->doTokenize(m_doTokenize);
 		m_itr = m_scanner->begin(false);
 		m_end = m_scanner->end();
 	}
@@ -543,6 +544,7 @@ struct InputFilterImpl :public protocol::InputFilter, public FilterBase<IOCharse
 		m_scanner = new XMLScanner( *o.m_scanner);
 		m_scanner->setSource( m_src);
 		m_scanner->setOutputBuffer( m_outputbuf);
+		m_scanner->doTokenize(m_doTokenize);
 		m_itr = m_scanner->begin(false);
 		m_end = m_scanner->end();
 	}

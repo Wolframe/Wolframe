@@ -6,7 +6,6 @@ echo "Expanding test file $output"
 recode lat1..ibmpc >> $output <<!TEST
 --
 --requires:LUA
---requires:LIBXML2
 --input
 HELLO
 RUN
@@ -18,13 +17,16 @@ recode lat1..ibmpc >> $output <<!TEST
 QUIT
 --file:echo.lua
 function run( )
-	f = filter( "xml:libxml2")
+	f = filter( "xml:textwolf")
 	f.empty = false
-
+	f.tokenize = true
 	input:as( f)
 	output:as( f)
 
 	for c,t in input:get() do
+		if c and not t then
+			output:print( ' ') 
+		end 
 		output:print( c, t)
 	end
 end
@@ -37,7 +39,7 @@ script {
 --output
 OK enter cmd
 !TEST
-cat ../data/bible.xml | ../cleanInput BOM >> $output
+cat ../data/bible.xml | ../cleanInput BOM EOLN >> $output
 recode lat1..ibmpc >> $output <<!TEST
 
 .
