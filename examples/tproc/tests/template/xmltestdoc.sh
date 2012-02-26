@@ -76,5 +76,5 @@ _assignement)
 	;;
 esac
 
-echo "$hdr" | recode XML-standalone..$encoding
+echo "$hdr" | recode XML-standalone..$encoding  
 echo "$doc" | recode XML-standalone..$encoding

@@ -27,7 +27,7 @@ recode lat1..ibmpc >> $output <<!TEST
 HELLO
 RUN
 !TEST
-./xmltestdoc.sh $cset $testdoc >> $output
+./xmltestdoc.sh $cset $testdoc | ../cleanInput BOM >> $output
 recode lat1..ibmpc >> $output <<!TEST
 
 .
@@ -53,7 +53,7 @@ script {
 --output
 OK enter cmd
 !TEST
-./xmltestdoc.sh $cset $testdoc >> $output
+./xmltestdoc.sh $cset $testdoc | ../cleanInput BOM >> $output
 recode lat1..ibmpc >> $output <<!TEST
 
 .

@@ -254,67 +254,6 @@ static void writeFile( const boost::filesystem::path& pt, const std::string& con
 	ff.write( content.c_str(), content.size());
 }
 
-static void appendContent( std::string& to, const std::string& from)
-{
-	enum {FE,FF,SRC} state = SRC;
-	std::string::const_iterator itr = from.begin(),end = from.end();
-	for (;itr != end; ++itr)
-	{
-		if (*itr == (char)0xFF)
-		{
-			if (state == FE)
-			{
-				state = SRC;
-			}
-			else if (state == FF)
-			{
-				to.push_back( *itr);
-				state = FF;
-			}
-			else
-			{
-				state = FF;
-			}
-		}
-		else if (*itr == (char)0xFE)
-		{
-			if (state == FF)
-			{
-				state = SRC;
-			}
-			else if (state == FE)
-			{
-				to.push_back( *itr);
-				state = FE;
-			}
-			else
-			{
-				state = FE;
-			}
-		}
-		else
-		{
-			if (state == FF)
-			{
-				to.push_back( (char)0xFF);
-			}
-			else if (state == FE)
-			{
-				to.push_back( (char)0xFE);
-			}
-			to.push_back( *itr);
-			state = SRC;
-		}
-	}
-	if (state == FF)
-	{
-		to.push_back( (char)0xFF);
-	}
-	else if (state == FE)
-	{
-		to.push_back( (char)0xFE);
-	}
-}
 
 static const TestDescription getTestDescription( const boost::filesystem::path& pt)
 {
@@ -330,11 +269,11 @@ static const TestDescription getTestDescription( const boost::filesystem::path& 
 	{
 		if (boost::iequals( *hi, "input"))
 		{
-			appendContent( rt.input, *itr);
+			rt.input.append( *itr);
 		}
 		else if (boost::iequals( *hi, "output"))
 		{
-			appendContent( rt.expected, *itr);
+			rt.expected.append( *itr);
 		}
 		else if (boost::iequals( *hi, "config"))
 		{
@@ -375,7 +314,7 @@ private:
 	enum
 	{
 		EoDBufferSize=4,
-		MinOutBufferSize=16
+		MinOutBufferSize=24
 	};
 
 	static unsigned int buffersizeFactor( const std::string& inp)
@@ -452,7 +391,10 @@ TEST_F( TProcHandlerTest, tests)
 				for (int oo=0; oo<NOF_OB; oo++)
 				{
 					TProcHandlerTestInstance test( td, ib[ii], ob[ii]);
-					EXPECT_EQ( 0, test.run());
+					int trt = test.run();
+					if (trt != 0) sleep( 1);
+					EXPECT_EQ( 0, trt);
+					if (test.expected() != test.output()) sleep( 1);
 					EXPECT_EQ( test.expected(), test.output());
 				}
 			}

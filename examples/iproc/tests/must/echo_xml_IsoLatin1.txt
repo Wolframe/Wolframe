@@ -1,5 +1,5 @@
 OK expecting command
-<?xml version="1.0" encoding="Isolatin-1" standalone="yes"?>
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
 <CATALOG><PLANT><COMMON>Bloodroot
 </COMMON><BOTANICAL>Sanguinaria canadensis
 </BOTANICAL><ZONE>4
