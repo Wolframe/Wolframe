@@ -12,6 +12,9 @@ INCLUDE_DIRS = \
 INCLUDE_LDFLAGS = \
 	/LIBPATH:"$(WIX_DIR)\SDK\lib"
 
+# TODO: Httpapi.lib is only for the http-extension, drops out later,
+# library names of WIX libs depend on the version of visual studio
+# and the architecture of the machine
 INCLUDE_LIBS = \
 	dutil_2008_x64.lib wcautil_2008_x64.lib \
 	msi.lib \
@@ -20,6 +23,7 @@ INCLUDE_LIBS = \
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
+# TODO: change
 ROOT_NAMESPACE = Microsoft.Tools.WixContrib.Extensions
 
 WIX_OBJS = \
@@ -48,13 +52,13 @@ WixContribExecCA.dll: $(EXEC_OBJS)
 
 # TODO: oiginal uses wixproj and -b to locate subproject? -bf embedds, no -b means current dir
 WixContrib.wixlib: $(WIX_OBJS) WixContribSchedCA.dll WixContribExecCA.dll
-	$(LIT) /nologo -o $@ $(WIX_OBJS)
+	$(LIT) /nologo -bf -o $@ $(WIX_OBJS)
 
 WixContribExtension.dll: WixContrib.wixlib tables.xml wixcontrib.xsd AssemblyInfo.cs CompilerExtension.cs WixContribExtension.cs
 	csc /nologo \
 		/target:library /out:$@ \
 		/resource:tables.xml,$(ROOT_NAMESPACE).Data.tables.xml \
-		/resource:wixcontrib.xsd \
+		/resource:wixcontrib.xsd,$(ROOT_NAMESPACE).Xsd.wixcontrib.xsd \
 		/resource:WixContrib.wixlib,$(ROOT_NAMESPACE).Data.wixcontrib.wixlib \
 		/reference:"$(WIX_DIR)\bin\wix.dll" \
 		AssemblyInfo.cs CompilerExtension.cs WixContribExtension.cs

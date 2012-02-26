@@ -11,13 +11,16 @@ INCLUDE_DIRS = \
 	/I. \
 	/I"$(PLATFORM_SDK_DIR)\Include"
 
-# Note: libraries are picked automatically on Windows!
-INCLUDE_LDFLAGS = \
-	$(SDK_LDFLAGS)
+INCLUDE_LDFLAGS =
 
 INCLUDE_LIBS =
 
 CPP_BINS =
+
+all: dependencies
+
+dependencies:
+	cd extxmlprop & $(MAKE) /nologo /f Makefile.W32 all
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
@@ -80,13 +83,15 @@ WIX_FLAGS = $(WIX_FLAGS) \
 	-dpgdll_without_major_versions=1
 
 WIX_EXTENSIONS = \
-	-ext WixUIExtension -ext WixUtilExtension -ext WixFirewallExtension
+	-ext WixUIExtension -ext WixUtilExtension -ext WixFirewallExtension \
+	-ext extxmlprop\WixContribExtension.dll
 	
 WIX_OBJS = \
 	wolframe.wixobj \
 	WixUI_Wolframe.wixobj \
 	dialogs\DatabaseSelect.wixobj \
-	dialogs\PostgresqlParametersDlg.wixobj
+	dialogs\PostgresqlParametersDlg.wixobj \
+	extxmlprop\WixContrib.wixlib
 
 WIX_LOCALES = \
 	-cultures:en-us -loc "i18n\en_us-wolframe.wxl"

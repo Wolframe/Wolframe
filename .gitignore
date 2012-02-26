@@ -89,3 +89,5 @@ examples/tproc/tests/tprocHandlerTest
 examples/tproc/tests/temp/
 *.wixlib
 *.wixobj
+*.wixpdb
+*.msi
