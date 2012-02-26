@@ -71,7 +71,6 @@ OBJS = \
 	$(TOPDIR)/src/posixMain.o
 
 TEST_BINS = \
-	tests/cleanInput$(EXE) \
 	tests/tprocHandlerTest$(EXE)
 
 CPP_BINS = \
