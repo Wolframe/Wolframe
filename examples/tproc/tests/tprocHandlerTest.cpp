@@ -45,6 +45,7 @@
 #include <boost/property_tree/info_parser.hpp>
 #include <boost/algorithm/string.hpp>
 #include <gtest/gtest.h>
+#include <boost/thread/thread.hpp>
 #include <map>
 #include <string>
 #include <vector>
@@ -392,9 +393,9 @@ TEST_F( TProcHandlerTest, tests)
 				{
 					TProcHandlerTestInstance test( td, ib[ii], ob[ii]);
 					int trt = test.run();
-					if (trt != 0) sleep( 1);
+					if (trt != 0) boost::this_thread::sleep( boost::posix_time::seconds( 1 ) );
 					EXPECT_EQ( 0, trt);
-					if (test.expected() != test.output()) sleep( 1);
+					if (test.expected() != test.output()) boost::this_thread::sleep( boost::posix_time::seconds( 1 ) );
 					EXPECT_EQ( test.expected(), test.output());
 				}
 			}
