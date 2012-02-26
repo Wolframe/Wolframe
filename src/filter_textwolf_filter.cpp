@@ -725,6 +725,7 @@ public:
 		:protocol::InputFilter(bufsize)
 		,m_bufsize(bufsize)
 		,m_headerParsed(false)
+		,m_headerParseLeft(0)
 		,m_encoding(enc)
 		,m_withEmpty(true)
 		,m_doTokenize(false)
@@ -733,6 +734,7 @@ public:
 		:protocol::InputFilter(o)
 		,m_bufsize(o.m_bufsize)
 		,m_headerParsed(o.m_headerParsed)
+		,m_headerParseLeft(o.m_headerParseLeft)
 		,m_header(o.m_header)
 		,m_encoding(o.m_encoding)
 		,m_withEmpty(o.m_withEmpty)
@@ -807,8 +809,34 @@ public:
 
 	virtual bool getNext( ElementType*, void*, std::size_t, std::size_t*)
 	{
+		for (;;)
 		if (m_headerParsed)
 		{
+			return false;
+		}
+		else if (m_headerParseLeft)
+		{
+			const char* cc = (char*)ptr();
+			std::size_t nn = size();
+			std::size_t ii = 0;
+			for (;ii < nn && m_headerParseLeft>0; ++ii,--m_headerParseLeft)
+			{
+				if (cc[ii] != '\0')
+				{
+					setState( Error, ErrXML);
+					return false;
+				}
+			}
+			skip( ii);
+			if (m_headerParseLeft)
+			{
+				setState( EndOfMessage);
+			}
+			else
+			{
+				m_headerParsed = true;
+				setState( Open);
+			}
 			return false;
 		}
 		else
@@ -829,12 +857,11 @@ public:
 					m_header.push_back( cc[ii]);
 				}
 			}
-			if (cc[ii] == '\n')
+			if (ii < nn)
 			{
 				TextwolfEncoding::Id enc;
 
 				m_header.push_back( '\n');
-				m_headerParsed = true;
 				skip( ii+1);
 
 				if (getEncoding( m_header, enc))
@@ -847,12 +874,29 @@ public:
 					else
 					{
 						setState( Open);
+
+						if (enc == TextwolfEncoding::UTF16LE
+						|| enc == TextwolfEncoding::UCS2LE)
+						{
+							m_headerParseLeft = 1;
+							continue;
+						}
+						else if (enc == TextwolfEncoding::UCS2LE)
+						{
+							m_headerParseLeft = 3;
+							continue;
+						}
+						else
+						{
+							m_headerParseLeft = 0;
+						}
 					}
 				}
 				else
 				{
 					setState( Error, ErrXML);
 				}
+				m_headerParsed = true;
 			}
 			else
 			{
@@ -910,6 +954,7 @@ public:
 private:
 	std::size_t m_bufsize;
 	bool m_headerParsed;
+	char m_headerParseLeft;
 	std::string m_header;
 	CountedReference<TextwolfEncoding::Id> m_encoding;
 	bool m_withEmpty;
@@ -1017,7 +1062,7 @@ public:
 				}
 				case TextwolfEncoding::IsoLatin:
 				{
-					m_header = "<?xml version=\"1.0\" encoding=\"Isolatin-1\" standalone=\"yes\"?>\n";
+					m_header = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" standalone=\"yes\"?>\n";
 					break;
 				}
 				case TextwolfEncoding::UTF8:

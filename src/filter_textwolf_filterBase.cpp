@@ -58,7 +58,7 @@ static bool equalIdent( const std::string& a1, const char* a2)
 
 const char* TextwolfEncoding::getName( TextwolfEncoding::Id e)
 {
-	static const char* ar[] = {"","IsoLatin", "UTF8", "UTF16", "UTF16BE", "UTF16LE", "UCS2BE", "UCS2LE", "UCS4BE", "UCS4LE"};
+	static const char* ar[] = {"","ISO-8859-1", "UTF8", "UTF16", "UTF16BE", "UTF16LE", "UCS2BE", "UCS2LE", "UCS4BE", "UCS4LE"};
 	return ar[ (int)e];
 }
 

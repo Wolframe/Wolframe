@@ -27,14 +27,14 @@ recode lat1..ibmpc >> $output <<!TEST
 HELLO
 RUN
 !TEST
-./xmltestdoc.sh $cset $testdoc | ../cleanInput BOM >> $output
+./xmltestdoc.sh $cset $testdoc | ../cleanInput BOM EOLN >> $output
 recode lat1..ibmpc >> $output <<!TEST
 
 .
 QUIT
 --file:echo.lua
 function run( )
-	f = filter( "xml:libxml2")
+	f = filter( "xml:textwolf")
 	f.empty = false
 
 	input:as( f)
@@ -53,7 +53,7 @@ script {
 --output
 OK enter cmd
 !TEST
-./xmltestdoc.sh $cset $testdoc | ../cleanInput BOM >> $output
+./xmltestdoc.sh $cset $testdoc NOEOL | ../cleanInput BOM EOLN >> $output
 recode lat1..ibmpc >> $output <<!TEST
 
 .
