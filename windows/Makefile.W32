@@ -90,8 +90,7 @@ WIX_OBJS = \
 	wolframe.wixobj \
 	WixUI_Wolframe.wixobj \
 	dialogs\DatabaseSelect.wixobj \
-	dialogs\PostgresqlParametersDlg.wixobj \
-	extxmlprop\WixContrib.wixlib
+	dialogs\PostgresqlParametersDlg.wixobj
 
 WIX_LOCALES = \
 	-cultures:en-us -loc "i18n\en_us-wolframe.wxl"
