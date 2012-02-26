@@ -1,0 +1,119 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+          xmlns:xse="http://schemas.microsoft.com/wix/2005/XmlSchemaExtension"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+    targetNamespace="http://wixtoolset.org/wixcontrib/2008"
+              xmlns="http://wixtoolset.org/wixcontrib/2008">
+    <xs:annotation>
+        <xs:documentation>
+            Copyright (c) Microsoft Corporation.  All rights reserved.
+
+            Schema for describing Windows Installer Toolset Contrib Extensions.
+        </xs:documentation>
+    </xs:annotation>
+
+    <xs:import namespace="http://www.w3.org/1999/xhtml" />
+
+    <xs:element name="HttpServerReservation">
+        <xs:annotation>
+            <xs:documentation>
+                Reserves a URL with a provided SDDL string with the HTTP Server API.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attribute name="Id" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>
+                        Primary key used to identify this particular entry.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="Url" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>
+                        URL to reserve.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="Sddl" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>
+                        SDDL to apply to the URL reservation.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="RemoveFolderEx">
+        <xs:annotation>
+            <xs:appinfo>
+                <xse:msiRef table="RemoveFile" href="http://msdn.microsoft.com/library/aa371201.aspx"/>
+            </xs:appinfo>
+            <xs:documentation>
+                Remove a folder and all contained files and folders if the parent component is selected for installation or removal.
+                By default, the root folder is the directory of the parent component.  This can be overridden by specifying the Directory
+                attribute with a value corresponding to the Id of the directory, or by specifying the Property attribute with a value
+                corresponding to a property that will have a value that resolves to the full path of the folder.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attribute name="Id" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Primary key used to identify this particular entry. If this is not specified it will be defaulted to
+                    "Remove" plus the value from the Directory or Property attribute.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="Directory" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>
+                        Overrides the directory of the parent component with a specific Directory.  This Directory must exist in the
+                        installer database at creation time.  This attribute cannot be specified in conjunction with the Property attribute.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="Property" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>
+                        Overrides the directory of the parent component with the value of the specified property.  The property
+                        should have a value that resolves to the full path of the source directory.  The property does not have
+                        to exist in the installer database at creation time; it could be created at installation time by a custom
+                        action, on the command line, etc.  This attribute cannot be specified in conjunction with the Directory attribute.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="On" use="required">
+                <xs:annotation>
+                    <xs:documentation>
+                        This value determines the time at which the folder may be removed.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:NMTOKEN">
+                        <xs:enumeration value="install">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Removes the folder only when the parent component is being installed (msiInstallStateLocal or msiInstallStateSource).
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="uninstall">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Removes the folder only when the parent component is being removed (msiInstallStateAbsent).
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="both">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Removes the folder when the parent component is being installed or removed.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

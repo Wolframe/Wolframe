@@ -101,3 +101,13 @@ LIBXSLT_DIR = C:\cygwin\home\Andreas\libxslt-1.1.26.win64
 TCL_DIR = C:\Program Files (x86)\Tcl8.5.9
 #TCL_DIR = D:\Program Files\Tcl8.5.9
 EXPECT = $(TCL_DIR)\bin\tclsh.exe
+
+# Windows Installer (WIX)
+# used for deployment only!
+#########################
+
+# @office
+WIX_DIR = C:\Program Files (x86)\Windows Installer XML v3.5
+# @home PIII
+#WIX_DIR = C:\Program Files\Windows Installer XML v3.5
+

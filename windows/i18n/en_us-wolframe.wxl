@@ -48,5 +48,10 @@ Project Wolframe.
 	<String Id="PostgresqlParametersDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
 	<String Id="PostgresqlParametersDlgDescription" Overridable="yes">You have choosen Postgresql as the primary source for your data.</String>
 	<String Id="PostgresqlParametersDlgInstruction" Overridable="yes">Configure the Postgresql database connection parameters.</String>
-	<String Id="DPostgresqlParametersDlgTitle" Overridable="yes">{\WixUI_Font_Bold}Postgresql Connection Parameters</String>
+	<String Id="PostgresqlParametersDlgTitle" Overridable="yes">{\WixUI_Font_Bold}Postgresql Connection Parameters</String>
+	<String Id="PostgresqlParametersDlgHostLabel" Overridable="yes">Host</String>
+	<String Id="PostgresqlParametersDlgPortLabel" Overridable="yes">Port</String>
+	<String Id="PostgresqlParametersDlgDatabaseLabel" Overridable="yes">Database</String>
+	<String Id="PostgresqlParametersDlgDatabaseUserLabel" Overridable="yes">Database User</String>
+	<String Id="PostgresqlParametersDlgDatabasePasswordLabel" Overridable="yes">Password</String>
 </WixLocalization>

@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<tableDefinitions xmlns="http://schemas.microsoft.com/wix/2006/tables">
+    <tableDefinition name="HttpServerUrl" createSymbols="yes">
+        <columnDefinition name="HttpServerUrl" type="string" length="72" primaryKey="yes" modularize="column"
+                category="identifier" description="Identifier for the HTTP Server URL in the package."/>
+        <columnDefinition name="Component_" type="string" length="72" modularize="column"
+                keyTable="Component" keyColumn="1" category="identifier" description="Foreign key into the Component table used to determine install state"/>
+        <columnDefinition name="Url" type="string" length="0" modularize="property"
+                category="formatted" description="HTTP Server URL."/>
+        <columnDefinition name="Sddl" type="string" length="0" nullable="yes" modularize="property"
+                category="formatted" description="SDDL ACL to apply to URL."/>
+    </tableDefinition>
+    <tableDefinition name="RemoveFoldersEx" createSymbols="yes">
+        <columnDefinition name="RemoveFoldersEx" type="string" length="72" primaryKey="yes" modularize="column"
+                category="identifier" description="Identifier for the RemoveFoldersEx row in the package."/>
+        <columnDefinition name="Component_" type="string" length="72" modularize="column"
+                keyTable="Component" keyColumn="1" category="identifier" description="Foreign key into the Component table used to determine install state"/>
+        <columnDefinition name="DirProperty" type="string" length="72" modularize="property"
+                category="identifier" description="Name of Property that contains the root of the directory tree to remove."/>
+        <columnDefinition name="InstallMode" type="number" length="2"
+                minValue="1" maxValue="3" description="1 == Remove only when the associated component is being installed (msiInstallStateLocal or msiInstallStateSource), 2 == Remove only when the associated component is being removed (msiInstallStateAbsent), 3 = Remove in either of the above cases."/>
+    </tableDefinition>
+</tableDefinitions>

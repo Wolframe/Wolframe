@@ -60,3 +60,6 @@ https://github.com/apache/subversion/blob/57b9abdac726d701db7b2f89609bfb8e6397b3
 http://weblogs.asp.net/lorenh/archive/2005/10/13/427398.aspx
 http://www.slideshare.net/alekdavis/beginners-guide-to-windows
 http://wix.tramontana.co.hu/tutorial/user-interface-revisited
+http://robmensching.com/blog/posts/2010/5/2/The-WiX-toolsets-Remember-Property-pattern
+http://stackoverflow.com/questions/3449770/how-do-i-read-app-config-values-and-set-properties-in-wix
+http://blogs.technet.com/b/alexshev/

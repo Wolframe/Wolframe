@@ -1,0 +1,5 @@
+LIBRARY "WixContribExecCA"
+
+EXPORTS
+    WriteHttpServerUrls     PRIVATE
+    RemoveHttpServerUrls    PRIVATE

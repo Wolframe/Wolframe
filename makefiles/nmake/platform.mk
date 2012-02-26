@@ -26,3 +26,12 @@ OPENSSL_LIBS = libeay32.lib ssleay32.lib
 !IFDEF WITH_EXPECT
 EXPECT = $(TCL_DIR)\bin\tclsh.exe
 !ENDIF
+
+# WIX Microsoft Installer (for deployment)
+##########################################
+
+CANDLE = "$(WIX_DIR)\bin\candle.exe"
+LIGHT = "$(WIX_DIR)\bin\light.exe"
+LIT = "$(WIX_DIR)\bin\lit.exe"
+SMOKE = "$(WIX_DIR)\bin\smoke.exe"
+SETUPBLD = "$(WIX_DIR)\bin\setupbld.exe"

@@ -46,15 +46,15 @@ Project Wolframe.
                 <Control Id="Description" Type="Text" X="20" Y="21" Width="280" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.PostgresqlParametersDlgDescription)" />
                 <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.PostgresqlParameters_Title)" />
                 <Control Id="Instruction" Type="Text" Height="15" Width="280" X="20" Y="53" Text="!(loc.PostgresqlParametersDlgInstruction)" />
-                <Control Type="Text" Id="PgHostLabel" Width="50" Height="17" X="19" Y="79" Text="Host:" />
+                <Control Type="Text" Id="PgHostLabel" Width="50" Height="17" X="19" Y="79" Text="!(loc.PostgresqlParametersDlgHostLabel):" />
                 <Control Type="Edit" Id="PgHost" Width="96" Height="15" X="124" Y="75" Property="WOLFRAME_DATABASE_HOST" />
-                <Control Type="Text" Id="PgPortLabel" Width="50" Height="17" X="19" Y="98" Text="Port:" />
+                <Control Type="Text" Id="PgPortLabel" Width="50" Height="17" X="19" Y="98" Text="!(loc.PostgresqlParametersDlgPortLabel):" />
                 <Control Type="Edit" Id="PgPort" Width="50" Height="15" X="124" Y="94" Property="WOLFRAME_DATABASE_PORT" />
-                <Control Type="Text" Id="PgDatabaseLabel" Width="50" Height="17" X="19" Y="116" Text="Database:" />
+                <Control Type="Text" Id="PgDatabaseLabel" Width="50" Height="17" X="19" Y="116" Text="!(loc.PostgresqlParametersDlgDatabaseLabel):" />
                 <Control Type="Edit" Id="PgDatabase" Width="50" Height="15" X="124" Y="116" Property="WOLFRAME_DATABASE_DATABASE"/>
-                <Control Type="Text" Id="PgUserLabel" Width="98" Height="17" X="19" Y="142" Text="Database User:" />
+                <Control Type="Text" Id="PgUserLabel" Width="98" Height="17" X="19" Y="142" Text="!(loc.PostgresqlParametersDlgDatabaseUserLabel):" />
                 <Control Type="Edit" Id="PgUser" Width="50" Height="15" X="124" Y="139" Property="WOLFRAME_DATABASE_USER" />
-                <Control Type="Text" Id="PgPasswordLabel" Width="93" Height="17" X="19" Y="165" Text="Password:" />
+                <Control Type="Text" Id="PgPasswordLabel" Width="93" Height="17" X="19" Y="165" Text="!(loc.PostgresqlParametersDlgDatabasePasswordLabel):" />
                 <Control Type="Edit" Id="PgPassword" Width="50" Height="15" X="124" Y="161" Property="WOLFRAME_DATABASE_PASSWORD" Password="yes" />
             </Dialog>
         </UI>

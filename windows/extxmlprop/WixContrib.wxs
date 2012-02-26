@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment Id="RemoveFoldersEx">
+        <CustomAction Id="RemoveFoldersEx" BinaryKey="WcSchedCA.dll" DllEntry="RemoveFoldersEx" Execute="immediate" Return="ignore" />
+        <InstallExecuteSequence>
+            <Custom Action="RemoveFoldersEx" After="CostFinalize" />
+        </InstallExecuteSequence>
+    </Fragment>
+
+    <Fragment Id="HttpServerUrl">
+        <CustomAction Id="InstallHttpServerUrls" BinaryKey="WcSchedCA.dll" DllEntry="InstallHttpServerUrls" Execute="immediate" Return="check" />
+        <CustomAction Id="UninstallHttpServerUrls" BinaryKey="WcSchedCA.dll" DllEntry="UninstallHttpServerUrls" Execute="immediate" Return="check" />
+
+        <CustomAction Id="WriteHttpServerUrls" BinaryKey="WcExecCA.dll" DllEntry="WriteHttpServerUrls" Execute="deferred" Return="check" Impersonate="no" SuppressModularization="yes" />
+        <CustomAction Id="RollbackWriteHttpServerUrls" BinaryKey="WcExecCA.dll" DllEntry="RemoveHttpServerUrls" Execute="rollback" Return="ignore" Impersonate="no" SuppressModularization="yes" />
+        <CustomAction Id="RemoveHttpServerUrls" BinaryKey="WcExecCA.dll" DllEntry="RemoveHttpServerUrls" Execute="deferred" Return="ignore" Impersonate="no" SuppressModularization="yes" />
+        <CustomAction Id="RollbackRemoveHttpServerUrls" BinaryKey="WcExecCA.dll" DllEntry="WriteHttpServerUrls" Execute="rollback" Return="ignore" Impersonate="no" SuppressModularization="yes" />
+
+        <InstallExecuteSequence>
+            <Custom Action="InstallHttpServerUrls" After="InstallFiles" />
+            <Custom Action="UninstallHttpServerUrls" Before="RemoveFiles" />
+        </InstallExecuteSequence>
+    </Fragment>
+
+    <Fragment Id="WixContribCustomActions">
+        <Binary Id="WcSchedCA.dll" SourceFile="WixContribSchedCA.dll" />
+        <Binary Id="WcExecCA.dll" SourceFile="WixContribExecCA.dll" />
+    </Fragment>
+</Wix>

@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS =
+SUBDIRS = extxmlprop
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
@@ -20,11 +20,6 @@ INCLUDE_LIBS =
 CPP_BINS =
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
-
-# @office
-WIX_DIR = C:\Program Files (x86)\Windows Installer XML v3.5
-# @home PIII
-#WIX_DIR = C:\Program Files\Windows Installer XML v3.5
 
 !IF ( "$(CPU)" == "" )
 !IF ( "$(PROCESSOR_ARCHITECTURE)" == "x86" )
@@ -87,11 +82,6 @@ WIX_FLAGS = $(WIX_FLAGS) \
 WIX_EXTENSIONS = \
 	-ext WixUIExtension -ext WixUtilExtension -ext WixFirewallExtension
 	
-CANDLE = "$(WIX_DIR)\bin\candle.exe"
-LIGHT = "$(WIX_DIR)\bin\light.exe"
-SMOKE = "$(WIX_DIR)\bin\smoke.exe"
-SETUPBLD = "$(WIX_DIR)\bin\setupbld.exe"
-
 WIX_OBJS = \
 	wolframe.wixobj \
 	WixUI_Wolframe.wixobj \
@@ -115,7 +105,7 @@ setup.exe: wolframe.msi
 	$(SETUPBLD) -out setup.exe -ms wolframe.msi -setup "$(WIX_DIR)\bin\setup.exe"
 
 local_clean:
-	@-erase *.wixobj wolframe.wixpdb wolframe.msi setup.exe 2>NUL
+	@-erase *.wixobj dialogs\*.wixobj wolframe.wixpdb wolframe.msi setup.exe 2>NUL
 
 local_distclean:
 

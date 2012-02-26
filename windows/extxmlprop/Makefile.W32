@@ -1,0 +1,73 @@
+TOPDIR = ..\..
+
+SUBDIRS =
+
+INCLUDE_CXXFLAGS = \
+	/D_WIN32_WINNT=0x504
+
+INCLUDE_DIRS = \
+	/I. \
+	/I"$(WIX_DIR)\SDK\inc"
+
+INCLUDE_LDFLAGS = \
+	/LIBPATH:"$(WIX_DIR)\SDK\lib"
+
+INCLUDE_LIBS = \
+	dutil_2008_x64.lib wcautil_2008_x64.lib \
+	msi.lib \
+	kernel32.lib advapi32.lib version.lib user32.lib \
+	Httpapi.lib
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+ROOT_NAMESPACE = Microsoft.Tools.WixContrib.Extensions
+
+WIX_OBJS = \
+	WixContrib.wixobj
+
+.SUFFIXES: .wxs .wixobj
+
+.wxs.wixobj:
+	$(CANDLE) /nologo -o $@ $<
+
+SCHEDULE_OBJS = \
+	HttpServerUrlsSched.obj \
+	RemoveFoldersExSched.obj \
+	WixContribSched.obj
+
+WixContribSchedCA.dll: $(SCHEDULE_OBJS)
+	$(CXX_LINK) $(LDFLAGS) $(LIBS) /dll /nologo /out:$@ $?
+
+EXEC_OBJS = \
+	HttpServerUrlsExec.obj \
+	RemoveFoldersExExec.obj \
+	WixContribExec.obj
+
+WixContribExecCA.dll: $(EXEC_OBJS)
+	$(CXX_LINK) $(LDFLAGS) $(LIBS) /dll /nologo /out:$@ $?
+
+# TODO: oiginal uses wixproj and -b to locate subproject? -bf embedds, no -b means current dir
+WixContrib.wixlib: $(WIX_OBJS) WixContribSchedCA.dll WixContribExecCA.dll
+	$(LIT) /nologo -o $@ $(WIX_OBJS)
+
+WixContribExtension.dll: WixContrib.wixlib tables.xml wixcontrib.xsd AssemblyInfo.cs CompilerExtension.cs WixContribExtension.cs
+	csc /nologo \
+		/target:library /out:$@ \
+		/resource:tables.xml,$(ROOT_NAMESPACE).Data.tables.xml \
+		/resource:wixcontrib.xsd \
+		/resource:WixContrib.wixlib,$(ROOT_NAMESPACE).Data.wixcontrib.wixlib \
+		/reference:"$(WIX_DIR)\bin\wix.dll" \
+		AssemblyInfo.cs CompilerExtension.cs WixContribExtension.cs
+
+local_all: WixContribExtension.dll
+	
+local_clean:
+	@-erase *.wixobj *.wixlib 2>NUL
+
+local_distclean:
+
+local_test:
+
+test_install:
+
+test_uninstall:

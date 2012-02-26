@@ -1,0 +1,6 @@
+LIBRARY "WixContribSchedCA"
+
+EXPORTS
+    RemoveFoldersEx             PRIVATE
+    InstallHttpServerUrls       PRIVATE
+    UninstallHttpServerUrls     PRIVATE
