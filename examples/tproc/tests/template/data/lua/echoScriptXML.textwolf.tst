@@ -9,7 +9,8 @@ for example in\
 	"UTF-16BE=cn=employee &#x59DA &#x660E 021436587 yao.ming@gmail.com sportsman"\
 	"UCS-2BE=cn=employee  &#x59DA &#x660E 021436587 yao.ming@gmail.com sportsman"\
 	"UCS-2LE=cn=employee  &#x59DA &#x660E 021436587 yao.ming@gmail.com sportsman"\
-	"UCS-4BE=cn=employee  &#x59DA &#x660E 021436587 yao.ming@gmail.com sportsman"
+	"UCS-4BE=cn=employee  &#x59DA &#x660E 021436587 yao.ming@gmail.com sportsman"\
+	"UCS-4LE=cn=employee  &#x59DA &#x660E 021436587 yao.ming@gmail.com sportsman"
 do
 # yao ming UTF-8: &#xE6&#x98&#x8E &#xE5&#xA7&#x98
 cset=`echo $example | cut -f1 -d=`
