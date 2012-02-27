@@ -1,5 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <tableDefinitions xmlns="http://schemas.microsoft.com/wix/2006/tables">
+    <tableDefinition name="XmlSearch" createSymbols="yes">
+        <columnDefinition name="XmlSearch" type="string" length="72" primaryKey="yes" modularize="column"
+                category="identifier" description="Identifier for the XmlSearch in the package."/>
+        <columnDefinition name="File" type="string" length="0" modularize="property"
+                category="formatted" description="The XML file to read from."/>
+        <columnDefinition name="Path" type="string" length="0" modularize="property"
+                category="formatted" description="XPath in the package."/>
+    </tableDefinition>
     <tableDefinition name="HttpServerUrl" createSymbols="yes">
         <columnDefinition name="HttpServerUrl" type="string" length="72" primaryKey="yes" modularize="column"
                 category="identifier" description="Identifier for the HTTP Server URL in the package."/>

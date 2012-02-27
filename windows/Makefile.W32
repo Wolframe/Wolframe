@@ -4,19 +4,6 @@ SUBDIRS = extxmlprop
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
-INCLUDE_CXXFLAGS = \
-	/D_WIN32_WINNT=0x500
-
-INCLUDE_DIRS = \
-	/I. \
-	/I"$(PLATFORM_SDK_DIR)\Include"
-
-INCLUDE_LDFLAGS =
-
-INCLUDE_LIBS =
-
-CPP_BINS =
-
 all: dependencies
 
 dependencies:
@@ -109,7 +96,7 @@ setup.exe: wolframe.msi
 	$(SETUPBLD) -out setup.exe -ms wolframe.msi -setup "$(WIX_DIR)\bin\setup.exe"
 
 local_clean:
-	@-erase *.wixobj dialogs\*.wixobj wolframe.wixpdb wolframe.msi setup.exe 2>NUL
+	@-erase *.wixobj dialogs\*.wixobj wolframe.wixpdb wolframe.msi setup.exe *.log 2>NUL
 
 local_distclean:
 
@@ -123,4 +110,3 @@ test_install:
 test_uninstall:
 	-del uninstall.log
 	-msiexec /lieva uninstall.log /x {09E1E9CC-6AE6-4207-B7FE-F47CFDB2861F}
-	
