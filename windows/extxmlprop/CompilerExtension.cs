@@ -37,10 +37,24 @@
         /// <param name="parentElement">Parent element of element to process.</param>
         /// <param name="element">Element to process.</param>
         /// <param name="contextValues">Extra information about the context in which this element is being parsed.</param>
-        public override void ParseElement(SourceLineNumberCollection sourceLineNumbers, XmlElement parentElement, XmlElement element, params string[] contextValues)
-        {
-            switch (parentElement.LocalName)
-            {
+	public override void ParseElement(SourceLineNumberCollection sourceLineNumbers, XmlElement parentElement, XmlElement element, params string[] contextValues)
+	{
+		switch( parentElement.LocalName ) {
+			case "Property":
+//				string propertyId = contextValues[0];
+				string propertyId = "bla";
+		    
+				switch( element.LocalName ) {
+					case "XmlSearch":
+						this.ParseXmlSearchElement( element, propertyId );
+						break;
+						
+					default:
+						this.Core.UnexpectedElement(parentElement, element);
+						break;
+				}
+				break;
+		    
                 case "Component":
                     string componentId = contextValues[0];
                     string directoryId = contextValues[1];
@@ -64,6 +78,62 @@
             }
         }
 
+	/// <summary>
+	/// Parses a XmlSearch element.
+	/// </summary>
+	/// <param name="node">Element to parse.</param>
+	/// <param name="componentId">Identifier of a property node.</param>
+	private void ParseXmlSearchElement(XmlNode node, string propertyId)
+	{
+		SourceLineNumberCollection sourceLineNumbers = Preprocessor.GetSourceLineNumbers( node );
+		string id = null;
+		string file = null;
+		string path = null;
+		foreach( XmlAttribute attrib in node.Attributes ) {
+			if( attrib.NamespaceURI.Length == 0 || attrib.NamespaceURI == this.schema.TargetNamespace ) {
+				switch( attrib.LocalName ) {
+					case "Id":
+						id = this.Core.GetAttributeIdentifierValue( sourceLineNumbers, attrib );
+						break;
+						
+					case "File":
+						file = this.Core.GetAttributeValue( sourceLineNumbers, attrib );
+						break;
+						
+					case "Path":
+						path = this.Core.GetAttributeValue( sourceLineNumbers, attrib );
+						break;
+						
+					default:
+						this.Core.UnexpectedAttribute( sourceLineNumbers, attrib );
+						break;
+				}
+			} else {
+				this.Core.UnsupportedExtensionAttribute(sourceLineNumbers, attrib);
+			}
+		}
+
+		if( id == null ) {
+			this.Core.OnMessage(WixErrors.ExpectedAttribute( sourceLineNumbers, node.Name, "Id" ) );
+		}
+		
+		if( file == null ) {
+			this.Core.OnMessage(WixErrors.ExpectedAttribute( sourceLineNumbers, node.Name, "File" ) );
+		}
+
+		if( path == null ) {
+			this.Core.OnMessage(WixErrors.ExpectedAttribute( sourceLineNumbers, node.Name, "Path" ) );
+		}
+		
+		if( !this.Core.EncounteredError ) {
+			Row row = this.Core.CreateRow( sourceLineNumbers, "XmlSearch" );
+			row[0] = id;
+			row[1] = file;
+			row[2] = path;
+			this.Core.CreateWixSimpleReferenceRow( sourceLineNumbers, "CustomAction", "XmlSearch" );
+		}
+	}
+	
         /// <summary>
         /// Parses a RemoveFolderEx element.
         /// </summary>

@@ -35,7 +35,8 @@ Project Wolframe.
 
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
-     xmlns:firewall="http://schemas.microsoft.com/wix/FirewallExtension">
+     xmlns:firewall="http://schemas.microsoft.com/wix/FirewallExtension"
+	 xmlns:contrib="http://wixtoolset.org/wixcontrib/2008">
 
 	<?define ProductVersion = "0.0.1" ?>
 	<?define ProductCode = "{09E1E9CC-6AE6-4207-B7FE-F47CFDB2861F}" ?>
@@ -195,7 +196,7 @@ Project Wolframe.
 								              Name="user" Value="[WOLFRAME_DATABASE_USER]"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="6"/>
 								<util:XmlFile Id="AppendDBconfigPostgresqlPassword" Action="createElement" ElementPath="/configuration/database/PostgreSQL"
-								              Name="name" Value="[WOLFRAME_DATABASE_PASSWORD]"
+								              Name="password" Value="[WOLFRAME_DATABASE_PASSWORD]"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="7"/>
 								<util:XmlFile Id="AppendDBconfigPostgresqlConnectionTimeout" Action="createElement" ElementPath="/configuration/database/PostgreSQL"
 								              Name="connectionTimeout" Value="10"
@@ -391,7 +392,9 @@ Project Wolframe.
 		<Property Id="WOLFRAME_DATABASE_PORT" Secure="yes">5432</Property>
 		<Property Id="WOLFRAME_DATABASE_DATABASE" Secure="yes"></Property>
 		<Property Id="WOLFRAME_DATABASE_USER" Secure="yes"></Property>
-		<Property Id="WOLFRAME_DATABASE_PASSWORD" Secure="yes"></Property>
+		<Property Id="WOLFRAME_DATABASE_PASSWORD" Secure="yes">
+			<contrib:XmlSearch Id="XmlDatabasePassword" File="[#wolframe.xml]" Path="/configuration/database/PostgreSQL/password"/>
+		</Property>
 
 		<WixVariable Id="WixUILicenseRtf" Value="license.rtf"/>
 		<WixVariable Id="WixUIDialogBmp" Value="bitmaps/Wolf.bmp"/>

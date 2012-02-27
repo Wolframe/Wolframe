@@ -55,7 +55,7 @@ WixContrib.wixlib: $(WIX_OBJS) WixContribSchedCA.dll WixContribExecCA.dll
 	$(LIT) /nologo -bf -o $@ $(WIX_OBJS)
 
 WixContribExtension.dll: WixContrib.wixlib tables.xml wixcontrib.xsd AssemblyInfo.cs CompilerExtension.cs WixContribExtension.cs
-	csc /nologo \
+	csc /nologo /debug \
 		/target:library /out:$@ \
 		/resource:tables.xml,$(ROOT_NAMESPACE).Data.tables.xml \
 		/resource:wixcontrib.xsd,$(ROOT_NAMESPACE).Xsd.wixcontrib.xsd \
