@@ -23,6 +23,7 @@ echo "Expanding test file $output"
 recode lat1..ibmpc >> $output <<!TEST
 --
 --requires:LUA
+--requires:LIBXML2
 --input
 HELLO
 RUN

@@ -391,7 +391,7 @@ TEST_F( TProcHandlerTest, tests)
 			{
 				for (int oo=0; oo<NOF_OB; oo++)
 				{
-					TProcHandlerTestInstance test( td, ib[ii], ob[ii]);
+					TProcHandlerTestInstance test( td, ib[ii], ob[oo]);
 					int trt = test.run();
 					if (trt != 0) boost::this_thread::sleep( boost::posix_time::seconds( 1 ) );
 					EXPECT_EQ( 0, trt);
