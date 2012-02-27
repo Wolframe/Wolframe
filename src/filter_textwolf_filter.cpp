@@ -93,17 +93,20 @@ struct OutputFilterImpl :public protocol::OutputFilter, public FilterBase<IOChar
 	///\brief Constructor
 	///\param [in] bufsize (optional) size of internal buffer to use (for the tag hierarchy stack)
 	OutputFilterImpl( std::size_t bufsize=TagBufferSize)
-		:m_tagstk(new char[bufsize?bufsize:(std::size_t)TagBufferSize])
+		:m_elemitr(0)
+		,m_tagstk(new char[bufsize?bufsize:(std::size_t)TagBufferSize])
 		,m_tagstksize(bufsize?bufsize:(std::size_t)TagBufferSize)
 		,m_tagstkpos(0)
 		,m_xmlstate(Tag)
 		,m_pendingOpenTag(false)
-		,m_bufstate(protocol::EscapingBuffer<textwolf::StaticBuffer>::SRC){}
+		,m_bufstate(protocol::EscapingBuffer<std::string>::SRC){}
 
 	///\brief Copy constructor
 	///\param [in] o output filter to copy
 	OutputFilterImpl( const OutputFilterImpl& o)
 		:protocol::OutputFilter(o)
+		,m_element(o.m_element)
+		,m_elemitr(o.m_elemitr)
 		,m_tagstk( new char[o.m_tagstksize])
 		,m_tagstksize(o.m_tagstksize)
 		,m_tagstkpos(o.m_tagstkpos)
@@ -166,6 +169,26 @@ struct OutputFilterImpl :public protocol::OutputFilter, public FilterBase<IOChar
 		return Parent::setValue( name, value);
 	}
 
+	bool emptybuf()
+	{
+		std::size_t nn = m_element.size() - m_elemitr;
+		if (nn > restsize())
+		{
+			nn = restsize();
+		}
+		std::memcpy( rest(), m_element.c_str() + m_elemitr, nn);
+		m_elemitr += nn;
+		incPos( nn);
+
+		if (m_elemitr == m_element.size())
+		{
+			m_element.clear();
+			m_elemitr = 0;
+			return true;
+		}
+		return false;
+	}
+
 	///\brief Implementation of protocol::OutputFilter::print(protocol::OutputFilter::ElementType,const void*,std::size_t)
 	///\param [in] type type of the element to print
 	///\param [in] element pointer to the element to print
@@ -173,8 +196,19 @@ struct OutputFilterImpl :public protocol::OutputFilter, public FilterBase<IOChar
 	///\return true, if success, false else
 	virtual bool print( protocol::OutputFilter::ElementType type, const void* element, std::size_t elementsize)
 	{
-		textwolf::StaticBuffer basebuf( (char*)rest(), restsize());
-		protocol::EscapingBuffer<textwolf::StaticBuffer> buf( &basebuf, m_bufstate);
+		setState( Open);
+		if (m_elemitr < m_element.size())
+		{
+			/// there is something to print left from last time
+			if (!emptybuf())
+			{
+				setState( EndOfBuffer);
+				return false;
+			}
+			/// we finished the printing left
+			return true;
+		}
+		protocol::EscapingBuffer<std::string> buf( &m_element, m_bufstate);
 
 		const void* cltag;
 		std::size_t cltagsize;
@@ -189,11 +223,6 @@ struct OutputFilterImpl :public protocol::OutputFilter, public FilterBase<IOChar
 				FilterBase<IOCharset,AppCharset>::printToBuffer( '<', buf);
 				FilterBase<IOCharset,AppCharset>::printToBuffer( (const char*)element, elementsize, buf);
 
-				if (basebuf.overflow())
-				{
-					setState( EndOfBuffer);
-					return false;
-				}
 				if (!pushTag( element, elementsize))
 				{
 					setState( Error, ErrTagStackExceedsLimit);
@@ -201,9 +230,13 @@ struct OutputFilterImpl :public protocol::OutputFilter, public FilterBase<IOChar
 				}
 				m_xmlstate = ((const char*)(element))[0]=='?'?Header:Tag;
 				m_pendingOpenTag = true;
-				incPos( basebuf.size());
-				setState( Open);
 				m_bufstate = buf.state();
+
+				if (!emptybuf())
+				{
+					setState( EndOfBuffer);
+					return false;
+				}
 				return true;
 
 			case protocol::OutputFilter::Attribute:
@@ -216,36 +249,25 @@ struct OutputFilterImpl :public protocol::OutputFilter, public FilterBase<IOChar
 				FilterBase<IOCharset,AppCharset>::printToBuffer( (const char*)element, elementsize, buf);
 				FilterBase<IOCharset,AppCharset>::printToBuffer( '=', buf);
 
-				if (basebuf.overflow())
+				m_xmlstate = (m_xmlstate==Header)?HeaderAttribute:Attribute;
+				m_bufstate = buf.state();
+
+				if (!emptybuf())
 				{
 					setState( EndOfBuffer);
 					return false;
 				}
-				m_xmlstate = (m_xmlstate==Header)?HeaderAttribute:Attribute;
-				incPos( basebuf.size());
-				setState( Open);
-				m_bufstate = buf.state();
 				return true;
 
 			case protocol::OutputFilter::Value:
 				if (m_xmlstate == Attribute)
 				{
 					printToBufferAttributeValue( (const char*)element, elementsize, buf);
-					if (basebuf.overflow())
-					{
-						setState( EndOfBuffer);
-						return false;
-					}
 					m_xmlstate = Tag;
 				}
 				else if (m_xmlstate == HeaderAttribute)
 				{
 					printToBufferAttributeValue( (const char*)element, elementsize, buf);
-					if (basebuf.overflow())
-					{
-						setState( EndOfBuffer);
-						return false;
-					}
 					m_xmlstate = Header;
 				}
 				else
@@ -255,17 +277,16 @@ struct OutputFilterImpl :public protocol::OutputFilter, public FilterBase<IOChar
 						FilterBase<IOCharset,AppCharset>::printToBuffer( '>', buf);
 					}
 					printToBufferContent( (const char*)element, elementsize, buf);
-					if (basebuf.overflow())
-					{
-						setState( EndOfBuffer);
-						return false;
-					}
 					m_pendingOpenTag = false;
 					m_xmlstate = Content;
 				}
-				incPos( basebuf.size());
-				setState( Open);
 				m_bufstate = buf.state();
+
+				if (!emptybuf())
+				{
+					setState( EndOfBuffer);
+					return false;
+				}
 				return true;
 
 			case protocol::OutputFilter::CloseTag:
@@ -292,17 +313,16 @@ struct OutputFilterImpl :public protocol::OutputFilter, public FilterBase<IOChar
 					FilterBase<IOCharset,AppCharset>::printToBuffer( (const char*)cltag, cltagsize, buf);
 					FilterBase<IOCharset,AppCharset>::printToBuffer( '>', buf);
 				}
-				if (basebuf.overflow())
+				m_xmlstate = Content;
+				m_pendingOpenTag = false;
+				popTag();
+				m_bufstate = buf.state();
+
+				if (!emptybuf())
 				{
 					setState( EndOfBuffer);
 					return false;
 				}
-				m_xmlstate = Content;
-				m_pendingOpenTag = false;
-				popTag();
-				incPos( basebuf.size());
-				setState( Open);
-				m_bufstate = buf.state();
 				return true;
 		}
 		setState( Error, ErrIllegalState);
@@ -314,7 +334,7 @@ private:
 	///\param [in] nof_echr number of elements in echr and estr
 	///\param [in] echr ASCII characters to substitute
 	///\param [in] estr ASCII strings to substitute with (array parallel to echr)
-	static void printEsc( char ch, protocol::EscapingBuffer<textwolf::StaticBuffer>& buf, unsigned int nof_echr, const char* echr, const char** estr)
+	static void printEsc( char ch, protocol::EscapingBuffer<std::string>& buf, unsigned int nof_echr, const char* echr, const char** estr)
 	{
 		const char* cc = (const char*)memchr( echr, ch, nof_echr);
 		if (cc)
@@ -336,7 +356,7 @@ private:
 	///\param [in] nof_echr number of elements in echr and estr
 	///\param [in] echr ASCII characters to substitute
 	///\param [in] estr ASCII strings to substitute with (array parallel to echr)
-	static void printToBufferSubstChr( const char* src, std::size_t srcsize, protocol::EscapingBuffer<textwolf::StaticBuffer>& buf, unsigned int nof_echr, const char* echr, const char** estr)
+	static void printToBufferSubstChr( const char* src, std::size_t srcsize, protocol::EscapingBuffer<std::string>& buf, unsigned int nof_echr, const char* echr, const char** estr)
 	{
 		StrIterator itr( src, srcsize);
 		textwolf::TextScanner<StrIterator,AppCharset> ts( itr);
@@ -360,7 +380,7 @@ private:
 	///\param [in] src pointer to attribute value string to print
 	///\param [in] srcsize size of src in bytes
 	///\param [in,out] buf buffer to print to
-	static void printToBufferAttributeValue( const char* src, std::size_t srcsize, protocol::EscapingBuffer<textwolf::StaticBuffer>& buf)
+	static void printToBufferAttributeValue( const char* src, std::size_t srcsize, protocol::EscapingBuffer<std::string>& buf)
 	{
 		enum {nof_echr = 12};
 		static const char* estr[nof_echr] = {"&lt;", "&gt;", "&apos;", "&quot;", "&amp;", "&#0;", "&#8;", "&#9;", "&#10;", "&#13;", "&nbsp;"};
@@ -374,7 +394,7 @@ private:
 	///\param [in] src pointer to content string to print
 	///\param [in] srcsize size of src in bytes
 	///\param [in,out] buf buffer to print to
-	static void printToBufferContent( const char* src, std::size_t srcsize, protocol::EscapingBuffer<textwolf::StaticBuffer>& buf)
+	static void printToBufferContent( const char* src, std::size_t srcsize, protocol::EscapingBuffer<std::string>& buf)
 	{
 		enum {nof_echr = 6};
 		static const char* estr[nof_echr] = {"&lt;", "&gt;", "&amp;", "&#0;", "&#8;"};
@@ -421,12 +441,14 @@ private:
 		m_tagstkpos -= ofs;
 	}
 private:
+	std::string m_element;								///< buffer for the currently printed element
+	std::size_t m_elemitr;								///< iterator to pass it to output
 	char* m_tagstk;									///< tag stack buffer
 	std::size_t m_tagstksize;							///< size of tag stack buffer in bytes
 	std::size_t m_tagstkpos;							///< used size of tag stack buffer in bytes
 	XMLState m_xmlstate;								///< current state of output
 	bool m_pendingOpenTag;								///< true if last open tag instruction has not been ended yet
-	typename protocol::EscapingBuffer<textwolf::StaticBuffer>::State m_bufstate;	///< state of escaping the output
+	typename protocol::EscapingBuffer<std::string>::State m_bufstate;		///< state of escaping the output
 };
 
 

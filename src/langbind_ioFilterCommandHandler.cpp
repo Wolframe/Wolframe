@@ -35,7 +35,6 @@
 #include "langbind/ioFilterCommandHandler.hpp"
 #include "logger-v1.hpp"
 #include "filter/char_filter.hpp"
-/*[-]*/#include <iostream>
 
 using namespace _Wolframe;
 using namespace _Wolframe::protocol;

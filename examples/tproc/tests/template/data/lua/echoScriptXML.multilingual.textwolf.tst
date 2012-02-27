@@ -19,14 +19,10 @@ QUIT
 function run( )
 	f = filter( "xml:textwolf")
 	f.empty = false
-	f.tokenize = true
 	input:as( f)
 	output:as( f)
 
 	for c,t in input:get() do
-		if c and not t then
-			output:print( ' ') 
-		end 
 		output:print( c, t)
 	end
 end

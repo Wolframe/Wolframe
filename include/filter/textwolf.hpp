@@ -630,7 +630,7 @@ private:
 
 public:
 	static unsigned int asize()				{return 2;}
-	static unsigned int size( const char* buf)		{return ((buf[ MSB]&0xD8) == 0xD8)?4:2;}
+	static unsigned int size( const char* buf)		{return ((unsigned char)(buf[ MSB]-0xD8) > 0x03)?2:4;}
 	static char achar( const char* buf)
 	{
 		char rt = (buf[MSB])?(char)-1:buf[LSB];
@@ -642,24 +642,19 @@ public:
 	///\return the value of the unicode character
 	static UChar value( const char* buf)
 	{
-		unsigned short hi = (unsigned char)buf[ MSB];
-		hi = (hi << 8) + (unsigned char)buf[ LSB];
-		if ((hi & 0xD800) == 0xD800)
+		UChar rt = (unsigned char)buf[ MSB];
+		if ((rt - 0xD8) > 0x03)
 		{
-			unsigned short lo = (unsigned char)buf[ 2+MSB];
-			lo = (lo << 8) + (unsigned char)buf[ 2+LSB];
-			if ((lo & 0xDC00) != 0xDC00) return 0xFFFF;
-			hi ^= 0xD800;
-			lo ^= 0xDC00;
-			UChar rt = hi;
-			return (rt << 10) + lo;
-		}
-		else
-		{
-			UChar rt = (unsigned char)buf[ MSB];
+			// 1 teilig
 			return (rt << 8) + (unsigned char)buf[ LSB];
 		}
-		return 0xFFFF;
+		rt = (rt << 8) + (unsigned char)buf[ LSB];
+		rt -= 0xD800;
+		rt *= 0x400;
+		unsigned short lo = (unsigned char)buf[ 2+MSB];
+		if ((lo - 0xD8) > 0x03) return 0xFFFF;
+		lo = (lo << 8) + (unsigned char)buf[ 2+LSB];
+		return rt + lo - 0xDC00 + 0x010000;
 	}
 	///\brief prints a unicode character to a buffer
 	///\tparam Buffer_ STL back insertion sequence
@@ -676,8 +671,8 @@ public:
 		else if (ch <= 0x10FFFF)
 		{
 			ch -= 0x10000;
-			unsigned short hi = (ch >> 10) + 0xD800;
-			unsigned short lo = (1 & ((1 << 10) -1)) + 0xDC00;
+			unsigned short hi = (ch / 0x400) + 0xD800;
+			unsigned short lo = (ch % 0x400) + 0xDC00;
 			buf.push_back( (char)(unsigned char)((hi >> Print1shift) & 0xFF));
 			buf.push_back( (char)(unsigned char)((hi >> Print2shift) & 0xFF));
 			buf.push_back( (char)(unsigned char)((lo >> Print1shift) & 0xFF));
