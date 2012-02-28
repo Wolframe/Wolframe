@@ -304,6 +304,10 @@ namespace charset {
 
 struct Encoder
 {
+	///\brief Write the character 'chr' in encoded form  as nul-terminated string to a buffer
+	///\param[in] chr unicode character to encode
+	///\param[out] bufptr buffer to write to
+	///\param[in] bufsize allocation size of buffer pointer by 'bufptr'
 	static bool encode( UChar chr, char* bufptr, std::size_t bufsize)
 	{
 		static const char* HEX = "0123456789abcdef";
@@ -434,7 +438,7 @@ struct ByteOrder
 
 ///\class UCS2
 ///\brief Character set UCS-2 (little/big endian)
-///\tparam encoding ByteOrder::LE or ByteOrder::BE
+///\tparam encoding charset::ByteOrder::LE or charset::ByteOrder::BE
 ///\remark UCS-2 encoding is defined to be big-endian only. Although the similar designations UCS-2BE and UCS-2LE 
 ///  imitate the UTF-16 labels, they do not represent official encoding schemes. (http://en.wikipedia.org/wiki/UTF-16/UCS-2)
 ///  therefore we take encoding=ByteOrder::BE as default.
