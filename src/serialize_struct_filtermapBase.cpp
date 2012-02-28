@@ -64,6 +64,8 @@ bool DescriptionBase::parse( const char* name, void* obj, protocol::InputFilter&
 			if (!ff)
 			{
 				ctx.setError( 0, "failed to parse xml header");
+				delete inp;
+				return false;
 			}
 			else
 			{
@@ -76,12 +78,14 @@ bool DescriptionBase::parse( const char* name, void* obj, protocol::InputFilter&
 		if (etyp != protocol::InputFilter::OpenTag)
 		{
 			ctx.setError( 0, "failed to parse xml root element");
-			rt = false;
+			delete inp;
+			return false;
 		}
 		else if (std::strcmp(name, ctx.buf()) != 0)
 		{
 			ctx.setError( 0, "xml is of different type than expected");
-			rt = false;
+			delete inp;
+			return false;
 		}
 		else if (m_parse)
 		{
@@ -90,7 +94,8 @@ bool DescriptionBase::parse( const char* name, void* obj, protocol::InputFilter&
 		else
 		{
 			ctx.setError( 0, "null parser called");
-			rt = false;
+			delete inp;
+			return false;
 		}
 		if (rt && !ctx.endTagConsumed())
 		{
@@ -98,14 +103,16 @@ bool DescriptionBase::parse( const char* name, void* obj, protocol::InputFilter&
 			if (!inp->getNext( &etyp, ctx.buf(), ctx.bufsize-1, &bufpos) || etyp != protocol::InputFilter::CloseTag)
 			{
 				ctx.setError( 0, "xml not properly balanced or illegal");
-				rt = false;
+				delete inp;
+				return false;
 			}
 		}
 	}
 	catch (std::exception& e)
 	{
 		ctx.setError( 0, e.what());
-		rt = false;
+		delete inp;
+		return false;
 	}
 	ctx.clear();
 	if (inp) delete inp;
