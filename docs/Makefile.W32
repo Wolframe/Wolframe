@@ -1,0 +1,23 @@
+TOPDIR = ..
+
+SUBDIRS = libwolframe modules
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\doc.mk
+
+local_all:
+
+doc: doc-doxygen
+
+doc-doxygen:
+	@cd $(TOPDIR) & "$(DOXYGEN)" docs\doxygen.conf
+	@-"$(HHC_LOCATION)" doxygen\html\index.hhp
+
+doxygen\html\index.chm: doxygen\html\index.hhp
+	@-"$(HHC_LOCATION)" $@
+
+local_clean:
+	@-erase /S /Q doxygen\* >NUL 2>NUL
+
+local_distclean:
+
+local_test:
