@@ -149,6 +149,12 @@ Project Wolframe.
 							</Component>
 						</Directory>
 
+						<Directory Id="DocumentationDir" Name="doc">
+							<Component Id="APIDocumentationCHM" Guid="{2a73f5b4-c257-4696-8847-bd503727fa51}">
+								<File Id="wolframeAPI.chm" Name="wolframeAPI.chm" DiskId="1" Source="..\docs\doxygen\html\index.chm"/>
+							</Component>
+						</Directory>						
+						
 						<Directory Id="ModulesDir" Name="modules">
 							<?ifdef with_sqlite3?>
 							<Component Id="ModDbSqlite3" Guid="{71270C73-F3B4-4956-8DBC-D80301BB3417}">
@@ -292,7 +298,12 @@ Project Wolframe.
 				<util:InternetShortcut Id="WolframeHomePage"
 				                       Name="Wolframe Home Page"
 				                       Target="http://www.wolframe.net/"/>
-
+				
+				<Shortcut Id="APIDocumentation"
+					  Name="API Documentation"
+					  Description="Show API HTML Documentation"
+					  Target="[INSTALLDIR]doc\wolframeAPI.chm"/>
+					  
 				<Shortcut Id="UninstallProduct"             
 				          Name="Uninstall Wolframe"
 				          Description="Uninstalls Wolframe"
@@ -376,8 +387,11 @@ Project Wolframe.
 				</Feature>
 			</Feature>
 			
-			<Feature Id="Documentation" Title="Documentation" Description="The Wolfbones documentation." Level="3">
-				<Feature Id="UserManual" Title="User Manual" Description="The Wolfbones usage manual." Level="3">
+			<Feature Id="Documentation" Title="Documentation" Description="The Wolframe documentation." Level="3">
+				<Feature Id="UserManual" Title="User Manual" Description="The Wolframe usage manual." Level="3">
+				</Feature>
+				<Feature Id="APIDocumentation" Title="API Documentation" Description="The Wolframe API Doxygen documentation." Level="3">
+					<ComponentRef Id="APIDocumentationCHM"/>
 				</Feature>
 			</Feature>
 

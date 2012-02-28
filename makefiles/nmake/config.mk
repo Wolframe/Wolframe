@@ -111,3 +111,13 @@ WIX_DIR = C:\Program Files (x86)\Windows Installer XML v3.5
 # @home PIII
 #WIX_DIR = C:\Program Files\Windows Installer XML v3.5
 
+# Doxygen binary to generate API documentation (for docu and deployment)
+########################################################################
+
+DOXYGEN = C:\Program Files\Doxygen\doxygen.exe
+
+# Microsoft HTML Help Workshop (for documentation building and deployment)
+##########################################################################
+
+HHC_LOCATION = C:\Program Files (x86)\HTML Help Workshop\hhc.exe
+
