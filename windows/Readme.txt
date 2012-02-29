@@ -1,10 +1,10 @@
-Build Instructions
-==================
+Windows WIX Packaging Instructions
+==================================
 
 Requirements
 ------------
 
-* Wix 3.5
+* Wix 3.5 (which requires .NET 2.0)
 
 Prepare the build
 -----------------
@@ -27,7 +27,7 @@ Prepare the build
 
 * Set the location of the WIX toolkit in 'Makefile.W32' in variable 'WIX_DIR'.
 
-* Copy prerequisites in src, e. g.
+* Copy prerequisites in 'src' subdir, e. g.
 
   cd src
   nmake /nologo /f Makefile.W32 ^
@@ -35,6 +35,11 @@ Prepare the build
      WITH_SQLITE3=1 WITH_PGSQL=1 WITH_LIBXML2=1 ^
      WITH_LIBXSLT=1 WITH_EXAMPLES=1 ^
      copy_prereq
+
+* Build documentation in 'docs' subdir:
+
+  cd docs
+  nmake /nologo /f Makefile.W32 doc
 
 * Build 'wolframe.msi' in the local 'windows' directory
 
@@ -50,16 +55,3 @@ Prepare the build
      WITH_SQLITE3=1 WITH_PGSQL=1 WITH_LIBXML2=1 ^
      WITH_LIBXSLT=1 WITH_EXAMPLES=1 ^
      setup.exe
-
-More Links
-----------
-
-http://blogs.technet.com/b/alexshev/archive/2009/05/27/from-msi-to-wix-part-25-installable-items-updating-xml-files-using-xmlfile.aspx
-http://wix.sourceforge.net/manual-wix2/wix_xsd_xmlfile.htm
-https://github.com/apache/subversion/blob/57b9abdac726d701db7b2f89609bfb8e6397b3ef/packages/windows-WiX/BuildSubversion/Setup.wxs
-http://weblogs.asp.net/lorenh/archive/2005/10/13/427398.aspx
-http://www.slideshare.net/alekdavis/beginners-guide-to-windows
-http://wix.tramontana.co.hu/tutorial/user-interface-revisited
-http://robmensching.com/blog/posts/2010/5/2/The-WiX-toolsets-Remember-Property-pattern
-http://stackoverflow.com/questions/3449770/how-do-i-read-app-config-values-and-set-properties-in-wix
-http://blogs.technet.com/b/alexshev/

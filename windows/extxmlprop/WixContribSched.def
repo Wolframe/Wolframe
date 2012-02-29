@@ -1,6 +1,7 @@
 LIBRARY "WixContribSchedCA"
 
 EXPORTS
+    SetPropertyFromXml          PRIVATE
     RemoveFoldersEx             PRIVATE
     InstallHttpServerUrls       PRIVATE
     UninstallHttpServerUrls     PRIVATE

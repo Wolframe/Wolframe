@@ -37,7 +37,8 @@ WIX_OBJS = \
 SCHEDULE_OBJS = \
 	HttpServerUrlsSched.obj \
 	RemoveFoldersExSched.obj \
-	WixContribSched.obj
+	WixContribSched.obj \
+	SetPropertyFromXmlSched.obj
 
 WixContribSchedCA.dll: $(SCHEDULE_OBJS)
 	$(CXX_LINK) $(LDFLAGS) $(LIBS) /dll /nologo /out:$@ $?
@@ -45,7 +46,8 @@ WixContribSchedCA.dll: $(SCHEDULE_OBJS)
 EXEC_OBJS = \
 	HttpServerUrlsExec.obj \
 	RemoveFoldersExExec.obj \
-	WixContribExec.obj
+	WixContribExec.obj \
+	SetPropertyFromXmlExec.obj
 
 WixContribExecCA.dll: $(EXEC_OBJS)
 	$(CXX_LINK) $(LDFLAGS) $(LIBS) /dll /nologo /out:$@ $?

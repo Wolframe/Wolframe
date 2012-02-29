@@ -41,12 +41,9 @@
 	{
 		switch( parentElement.LocalName ) {
 			case "Property":
-//				string propertyId = contextValues[0];
-				string propertyId = "bla";
-		    
 				switch( element.LocalName ) {
-					case "XmlSearch":
-						this.ParseXmlSearchElement( element, propertyId );
+					case "SetPropertyFromXml":
+						this.ParseSetPropertyFromXml( element );
 						break;
 						
 					default:
@@ -82,18 +79,24 @@
 	/// Parses a XmlSearch element.
 	/// </summary>
 	/// <param name="node">Element to parse.</param>
-	/// <param name="componentId">Identifier of a property node.</param>
-	private void ParseXmlSearchElement(XmlNode node, string propertyId)
+	private void ParseSetPropertyFromXml(XmlNode node)
 	{
 		SourceLineNumberCollection sourceLineNumbers = Preprocessor.GetSourceLineNumbers( node );
 		string id = null;
+		string name = null;
 		string file = null;
 		string path = null;
+		string value = null;
+		
 		foreach( XmlAttribute attrib in node.Attributes ) {
 			if( attrib.NamespaceURI.Length == 0 || attrib.NamespaceURI == this.schema.TargetNamespace ) {
 				switch( attrib.LocalName ) {
 					case "Id":
 						id = this.Core.GetAttributeIdentifierValue( sourceLineNumbers, attrib );
+						break;
+						
+					case "Name":
+						name = this.Core.GetAttributeValue( sourceLineNumbers, attrib );
 						break;
 						
 					case "File":
@@ -102,6 +105,10 @@
 						
 					case "Path":
 						path = this.Core.GetAttributeValue( sourceLineNumbers, attrib );
+						break;
+
+					case "Value":
+						value = this.Core.GetAttributeValue( sourceLineNumbers, attrib );
 						break;
 						
 					default:
@@ -117,20 +124,31 @@
 			this.Core.OnMessage(WixErrors.ExpectedAttribute( sourceLineNumbers, node.Name, "Id" ) );
 		}
 		
+		if( name == null ) {
+			this.Core.OnMessage(WixErrors.ExpectedAttribute( sourceLineNumbers, node.Name, "Name" ) );
+		}
+
 		if( file == null ) {
 			this.Core.OnMessage(WixErrors.ExpectedAttribute( sourceLineNumbers, node.Name, "File" ) );
 		}
-
+		
 		if( path == null ) {
 			this.Core.OnMessage(WixErrors.ExpectedAttribute( sourceLineNumbers, node.Name, "Path" ) );
 		}
+
+		if( value == null ) {
+			// set default value to empty (marker, empty itself leads to IDT import table error)
+			value = "#EMPTY#";
+		}
 		
 		if( !this.Core.EncounteredError ) {
-			Row row = this.Core.CreateRow( sourceLineNumbers, "XmlSearch" );
+			Row row = this.Core.CreateRow( sourceLineNumbers, "SetPropertyFromXml" );
 			row[0] = id;
-			row[1] = file;
-			row[2] = path;
-			this.Core.CreateWixSimpleReferenceRow( sourceLineNumbers, "CustomAction", "XmlSearch" );
+			row[1] = name;
+			row[2] = file;
+			row[3] = path;
+			row[4] = value;
+			this.Core.CreateWixSimpleReferenceRow( sourceLineNumbers, "CustomAction", "SetPropertyFromXml" );
 		}
 	}
 	

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-    <Fragment Id="XmlSearch">
-        <CustomAction Id="XmlSearch" BinaryKey="WcSchedCA.dll" DllEntry="XmlSearch" Execute="immediate" Return="ignore" />
+    <Fragment Id="SetPropertyFromXml">
+        <CustomAction Id="SetPropertyFromXml" BinaryKey="WcSchedCA.dll" DllEntry="SetPropertyFromXml" Execute="immediate" Return="check" />
         <InstallExecuteSequence>
-            <Custom Action="XmlSearch" After="CostFinalize" />
+            <Custom Action="SetPropertyFromXml" Before="LaunchConditions" />
         </InstallExecuteSequence>
     </Fragment>
     

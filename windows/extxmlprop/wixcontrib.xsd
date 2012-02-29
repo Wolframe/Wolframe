@@ -14,10 +14,11 @@
 
     <xs:import namespace="http://www.w3.org/1999/xhtml" />
 
-    <xs:element name="XmlSearch">
+    <xs:element name="SetPropertyFromXml">
         <xs:annotation>
             <xs:documentation>
-	        Searches a XML file for a XPath expression and returns the value.
+	        Sets a property value to the value found in a XML file.
+		If nothing is found, the value of the property is set to 'Value'.
             </xs:documentation>
         </xs:annotation>
         <xs:complexType>
@@ -25,6 +26,13 @@
                 <xs:annotation>
                     <xs:documentation>
                         Primary key used to identify this particular entry.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="Name" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>
+                        The name of the property to set.
                     </xs:documentation>
                 </xs:annotation>
             </xs:attribute>
@@ -39,6 +47,13 @@
                 <xs:annotation>
                     <xs:documentation>
                         An XPath expression selecting a value.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="Value" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>
+                        The default value to set if no entry could be found. If ommitted it is an empty string.
                     </xs:documentation>
                 </xs:annotation>
             </xs:attribute>

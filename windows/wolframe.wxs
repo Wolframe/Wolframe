@@ -401,15 +401,25 @@ Project Wolframe.
 		</Feature>
 								
 		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR"/>
-		<Property Id="WOLFRAME_DATABASE_TYPE" Secure="yes">sqlitedb</Property>
-		<Property Id="WOLFRAME_DATABASE_HOST" Secure="yes">localhost</Property>
-		<Property Id="WOLFRAME_DATABASE_PORT" Secure="yes">5432</Property>
-		<Property Id="WOLFRAME_DATABASE_DATABASE" Secure="yes"></Property>
-		<Property Id="WOLFRAME_DATABASE_USER" Secure="yes"></Property>
-		<Property Id="WOLFRAME_DATABASE_PASSWORD" Secure="yes">
-			<contrib:XmlSearch Id="XmlDatabasePassword" File="[#wolframe.xml]" Path="/configuration/database/PostgreSQL/password"/>
+		<Property Id="WOLFRAME_DATABASE_TYPE" Secure="yes">
+		   sqlitedb
 		</Property>
-
+		<Property Id="WOLFRAME_DATABASE_HOST" Secure="yes">
+			<contrib:SetPropertyFromXml Id="XmlDatabaseHost" Name="WOLFRAME_DATABASE_HOST" File="[#wolframe.xml]" Path="/configuration/database/PostgreSQL/host" Value="localhost"/>
+		</Property>
+		<Property Id="WOLFRAME_DATABASE_PORT" Secure="yes">
+			<contrib:SetPropertyFromXml Id="XmlDatabasePort" Name="WOLFRAME_DATABASE_PORT" File="[#wolframe.xml]" Path="/configuration/database/PostgreSQL/port" Value="5432"/>
+		</Property>
+		<Property Id="WOLFRAME_DATABASE_DATABASE" Secure="yes">
+			<contrib:SetPropertyFromXml Id="XmlDatabaseName" Name="WOLFRAME_DATABASE_DATABASE" File="[#wolframe.xml]" Path="/configuration/database/PostgreSQL/name"/>
+		</Property>
+		<Property Id="WOLFRAME_DATABASE_USER" Secure="yes">
+			<contrib:SetPropertyFromXml Id="XmlDatabaseUser" Name="WOLFRAME_DATABASE_USER" File="[#wolframe.xml]" Path="/configuration/database/PostgreSQL/user"/>
+		</Property>
+		<Property Id="WOLFRAME_DATABASE_PASSWORD" Secure="yes">
+			<contrib:SetPropertyFromXml Id="XmlDatabasePassword" Name="WOLFRAME_DATABASE_PASSWORD" File="[#wolframe.xml]" Path="/configuration/database/PostgreSQL/password"/>
+		</Property>
+		
 		<WixVariable Id="WixUILicenseRtf" Value="license.rtf"/>
 		<WixVariable Id="WixUIDialogBmp" Value="bitmaps/Wolf.bmp"/>
 		<Property Id="WIXUI_EXITDIALOGOPTIONALTEXT" Value="Check out http://www.wolframe.net for additional information."/>
