@@ -311,8 +311,10 @@ Project Wolframe.
 				          Arguments="/x $(var.ProductCode)"/>
 
 				<RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
-				<RegistryValue Root="HKCU" Key="Software\WolframeGroup\Wolframe"
+				<RegistryValue Root="HKCU" Key="SOFTWARE\WolframeGroup\Wolframe"
 				               Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+				<RegistryValue Root="HKCU" Key="SOFTWARE\WolframeGroup\Wolframe\Configuration"
+				               Name="DatabaseType" Type="string" Value="[WOLFRAME_DATABASE_TYPE]"/>
 			</Component>
 		</DirectoryRef>
 
@@ -402,6 +404,9 @@ Project Wolframe.
 								
 		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR"/>
 		<Property Id="WOLFRAME_DATABASE_TYPE" Secure="yes">
+			<RegistrySearch Id="WolframeDatabaseType" Root="HKCU"
+			                Key="SOFTWARE\WolframeGroup\Wolframe\Configuration"
+					Name="DatabaseType" Type="raw"/>
 		   sqlitedb
 		</Property>
 		<Property Id="WOLFRAME_DATABASE_HOST" Secure="yes">

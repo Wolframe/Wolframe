@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <Fragment Id="SetPropertyFromXml">
-        <CustomAction Id="SetPropertyFromXml" BinaryKey="WcSchedCA.dll" DllEntry="SetPropertyFromXml" Execute="immediate" Return="check" />
+        <CustomAction Id="SetPropertyFromXml" BinaryKey="WcSchedCA.dll" DllEntry="SetPropertyFromXml" Execute="immediate" Return="ignore" />
         <InstallExecuteSequence>
             <Custom Action="SetPropertyFromXml" Before="LaunchConditions" />
         </InstallExecuteSequence>
