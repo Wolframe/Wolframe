@@ -420,13 +420,18 @@ pkgutil --install CSWgcc4core CSWgcc4g++ CSWgmake
 
 Make sure the build environment is always set as follows:
 
-PATH=/opt/csw/bin:/usr/ccs/bin:/usr/bin:/bin:/usr/csw/sbin:/usr/sbin:/sbin
+PATH=/opt/csw/bin:/usr/ccs/bin:/usr/bin:/bin:/opt/csw/sbin:/usr/sbin:/sbin
 export PATH
 
 Boost is too old (CSWboostdevel is 1.33)
 and has to be compiled from scratch, use the lastest version (1.48.0).
 
-First apply the following patch to 'boost/cstdint.ppp':
+Do not use boost 1.49.0, it has a missing function fchmodat, see
+http://lists.boost.org/boost-build/2012/02/25680.php
+causing building of libboost_filesystem to fail!
+
+First apply the following patch to 'boost/cstdint.ppp' for boost
+(https://svn.boost.org/trac/boost/ticket/6158):
 
 ...
 namespace boost
@@ -451,12 +456,13 @@ Build and install normally:
 ./b2 -d2 install
 
 Optional packages to install from CSW:
-  openssl_devel (0.9.8r)
+  libssl_dev (0.9.8t)
   CSWpostgresql (8.3.1)
   CSWexpect (5.41.1)
+  CSWsasl-dev and CSWsasl (2.1.25.REV-2012.01.20)
+Optional packages from Sun installation disk:
   SUNWlxml
   SUNWlxsl
-  CSWsasl-dev and CSWsasl (2.1.25.REV-2012.01.20)
 
 CSWsqlite3 misses the header files, so use internally supplied version with WITH_LOCAL_SQLITE1=1
 
