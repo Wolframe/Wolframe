@@ -4,7 +4,7 @@
 # Do not execute this unless you know what you do. Executing this script might invalidate the
 # test collection. 
 
-for ff in `find data -type f`; do
+for ff in `find data -type f -name "*.tst"`; do
 	echo Expanding template $ff
 	./$ff 
 done

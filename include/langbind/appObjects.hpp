@@ -103,9 +103,7 @@ struct Filter
 	///\brief Constructor
 	///\param[in] system reference to system function call interface
 	///\param[in] name name of the filter as defined in the system
-	///\param[in] ib size of buffer used for input
-	///\param[in] ob size of buffer used for output
-	Filter( const char* name, unsigned int ib, unsigned int ob);
+	Filter( const char* name);
 
 	///\brief Copy constructor
 	///\param[in] o copied item

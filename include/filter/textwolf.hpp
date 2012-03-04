@@ -834,7 +834,7 @@ public:
 			rt -= 0xD800;
 			rt *= 0x400;
 			unsigned short lo = (unsigned char)buf[ 2+MSB];
-			if ((lo - 0xD8) > 0x03) return 0xFFFF;
+			if ((lo - 0xDC) > 0x03) return 0xFFFF;
 			lo = (lo << 8) + (unsigned char)buf[ 2+LSB];
 			return rt + lo - 0xDC00 + 0x010000;
 		}

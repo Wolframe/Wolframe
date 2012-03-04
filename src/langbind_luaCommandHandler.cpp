@@ -156,6 +156,7 @@ struct LuaObject :public ObjectType
 	/// ABa: got a C4291 warning here again, not sure about the whole construct here..
 	/// an indicator could be that started the 'iprocd.exe' results in an error when
 	/// opening the processor!
+	/// PF: Overloading new and delete as defined in the C++ standard
 	void operator delete (void *, lua_State*, const char*) {}
 
 	template <class Orig>
@@ -408,29 +409,14 @@ static int function_filter( lua_State* ls)
 	unsigned int nn = lua_gettop( ls);
 	unsigned int buffersize = 0;
 	if (nn == 0) return luaL_error( ls, "too few arguments for filter");
-	if (nn > 2) return luaL_error( ls, "too many arguments for filter");
-	if (nn == 2)
-	{
-		if (lua_type( ls, 2) != LUA_TNUMBER)
-		{
-			return luaL_error( ls, "invalid 2nd argument for filter (number expected)");
-		}
-		try
-		{
-			buffersize = (unsigned int)( lua_tonumber( ls, 2));
-		}
-		catch (...)
-		{
-			return luaL_error( ls, "invalid 2nd argument for filter (positive non fraction number expected)");
-		}
-	}
+	if (nn > 1) return luaL_error( ls, "too many arguments for filter");
 	if (!lua_isstring( ls, 1))
 	{
 		return luaL_error( ls, "invalid type of argument (string expected)");
 	}
 	const char* name = lua_tostring( ls, 1);
 
-	Filter ft( name, buffersize, buffersize);
+	Filter ft( name);
 	LuaObject<Filter>::push_luastack( ls, ft);
 	return 1;
 }

@@ -1,5 +1,7 @@
 #!/bin/sh
-output="../`echo $0 | sed 's/template//' | sed 's/.tst$//'`.tst"
+for cset in 'UTF-8' 'UTF-16LE' 'UTF-16BE' 'UCS-2LE' 'UCS-2BE' 'UCS-4LE' 'UCS-4BE'
+do
+output="../`echo $0 | sed 's/template//' | sed 's/.tst$//'`.$cset.tst"
 rm -f $output
 echo "Expanding test file $output"
 
@@ -10,7 +12,7 @@ recode lat1..ibmpc >> $output <<!TEST
 HELLO
 RUN
 !TEST
-cat ../data/bible.xml | ../cleanInput BOM EOLN >> $output
+cat data/multilingual.UTF-8.xml | sed "s/UTF-8/$cset/" | recode UTF-8..$cset | ../cleanInput BOM EOLN >> $output
 recode lat1..ibmpc >> $output <<!TEST
 
 .
@@ -35,7 +37,7 @@ script {
 --output
 OK enter cmd
 !TEST
-cat ../data/bible.xml | ../cleanInput BOM EOLN >> $output
+cat data/multilingual.UTF-8.xml | sed "s/UTF-8/$cset/" | recode UTF-8..$cset | ../cleanInput BOM EOLN >> $output
 recode lat1..ibmpc >> $output <<!TEST
 
 .
@@ -44,3 +46,4 @@ BYE
 --end
 
 !TEST
+done

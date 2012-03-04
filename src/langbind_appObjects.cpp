@@ -180,8 +180,9 @@ static bool equalIdent( const char* str, const char* prefix)
 	return boost::algorithm::iequals( str, prefix);
 }
 
-Filter::Filter( const char* name, unsigned int ib, unsigned int ob)
+Filter::Filter( const char* name)
 {
+	enum {DEFAULT_LINE_SIZE=2048,DEFAULT_INPUT_SIZE=4096,DEFAULT_OUTPUT_SIZE=4096};
 	if (startsWith( name, "char:"))
 	{
 		filter::CharFilter flt( name+5);
@@ -190,26 +191,26 @@ Filter::Filter( const char* name, unsigned int ib, unsigned int ob)
 	}
 	else if (startsWith( name, "line:"))
 	{
-		filter::LineFilter flt( name+5, ib?ib:2048);
+		filter::LineFilter flt( name+5, DEFAULT_LINE_SIZE);
 		m_inputfilter = flt.inputFilter();
 		m_outputfilter = flt.outputFilter();
 	}
 	else if (equalIdent( name, "xml:textwolf"))
 	{
-		filter::TextwolfXmlFilter tw( ib?ib:4096, ob?ob:1024);
+		filter::TextwolfXmlFilter tw( DEFAULT_INPUT_SIZE, DEFAULT_OUTPUT_SIZE);
 		m_inputfilter = tw.inputFilter();
 		m_outputfilter = tw.outputFilter();
 	}
 	else if (startsWith( name, "xml:textwolf:"))
 	{
-		filter::TextwolfXmlFilter tw( ib?ib:4096, ob?ob:1024, name+strlen("xml:textwolf:"));
+		filter::TextwolfXmlFilter tw( DEFAULT_INPUT_SIZE, DEFAULT_OUTPUT_SIZE, name+strlen("xml:textwolf:"));
 		m_inputfilter = tw.inputFilter();
 		m_outputfilter = tw.outputFilter();
 	}
 #ifdef WITH_LIBXML2
 	else if (equalIdent( name, "xml:libxml2"))
 	{
-		filter::Libxml2Filter tw( ib?ib:4096);
+		filter::Libxml2Filter tw( DEFAULT_INPUT_SIZE);
 		m_inputfilter = tw.inputFilter();
 		m_outputfilter = tw.outputFilter();
 	}

@@ -383,11 +383,11 @@ private:
 	static void printToBufferAttributeValue( const char* src, std::size_t srcsize, protocol::EscapingBuffer<std::string>& buf)
 	{
 		enum {nof_echr = 12};
-		static const char* estr[nof_echr] = {"&lt;", "&gt;", "&apos;", "&quot;", "&amp;", "&#0;", "&#8;", "&#9;", "&#10;", "&#13;", "&nbsp;"};
-		static const char echr[nof_echr+1] = "<>'\"&\0\b\t\n\r ";
-		IOCharset::print( '\'', buf);
+		static const char* estr[nof_echr] = {"&lt;", "&gt;", "&apos;", "&quot;", "&amp;", "&#0;", "&#8;", "&#9;", "&#10;", "&#13;"};
+		static const char echr[nof_echr+1] = "<>'\"&\0\b\t\n\r";
+		IOCharset::print( '"', buf);
 		printToBufferSubstChr( src, srcsize, buf, nof_echr, echr, estr);
-		IOCharset::print( '\'', buf);
+		IOCharset::print( '"', buf);
 	}
 
 	///\brief print content value string
