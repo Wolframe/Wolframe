@@ -46,6 +46,85 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace ddl;
 
+static void removeComments( std::string& src)
+{
+	std::size_t ii;
+	for (ii=0; ii<src.size(); ii++)
+	{
+		if (src[ii] == '#')
+		{
+			for (; ii<src.size() && src[ii] != '\n' && src[ii] != '\r'; ii++)
+			{
+				src[ii] = ' ';
+			}
+		}
+	}
+}
+
+namespace
+{
+struct Element
+{
+public:
+	enum Type
+	{
+		float_,long_,ulong_,int_,uint_,short_,ushort_,char_,uchar_,string_,form_
+	};
+
+	static const char* typeName( Type tp)
+	{
+		static const char* ar[] = {"float","long","ulong","int","uint","short","ushort","char","uchar","string","form",0};
+		return ar[ (int)tp];
+	}
+
+	static bool getType( const char* name, Type& tp)
+	{
+		const char* rt;
+		unsigned int ii;
+		for (ii=0,rt=typeName((Type)(ii)); rt!=0; ii++,rt=typeName((Type)(ii)))
+		{
+			if (std::strcmp( rt, name) == 0)
+			{
+				tp = (Type)ii;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	Type type;
+	std::string name;
+	std::string defaultValue;
+	int ref;
+	std::size_t size;
+	bool isArray;
+
+	Element() :ref(-1),size(0U),isArray(false){}
+};
+
+struct Struct
+{
+	std::string name;
+	std::vector<Element> elements;
+	std::size_t size;
+	Struct() :size(0){}
+};
+
+struct Source
+{
+	std::string src;
+	std::string::const_iterator start;
+	std::string::const_iterator at;
+	Source& operator ++()	{++at; return *this;}
+	char operator*()	{return *at;}
+	Source( const std::string& src_) :src(src_)
+	{
+		removeComments( src);
+		start = src.begin();
+		at = src.begin();
+	}
+};
+
 struct Lexem
 {
 	enum Type
@@ -72,21 +151,57 @@ struct Lexem
 	Type type;
 };
 
-
-static void removeComments( std::string& src)
+class SimpleFormCompilerImpl
 {
-	std::size_t ii;
-	for (ii=0; ii<src.size(); ii++)
+public:
+
+	explicit SimpleFormCompilerImpl( const std::string& srcstring)
+		:src( srcstring){}
+
+	bool compile( StructType& result, std::string& error);
+
+
+	const Struct* get( const std::string& name) const
 	{
-		if (src[ii] == '#')
-		{
-			for (; ii<src.size() && src[ii] != '\n' && src[ii] != '\r'; ii++)
-			{
-				src[ii] = ' ';
-			}
-		}
+		std::map<std::string,std::size_t>::const_iterator itr = linkmap.find( name), end = linkmap.end();
+		if (itr == end) return 0;
+		return &ar[ itr->second];
 	}
-}
+
+	bool define( const std::string& name, const Struct& ee)
+	{
+		std::map<std::string,std::size_t>::const_iterator itr = linkmap.find( name);
+		if (itr == linkmap.end()) return false;
+		linkmap[ name] = ar.size();
+		ar.push_back( ee);
+		return true;
+	}
+
+	bool parseDefinition( Lexem& lexem);
+	bool parseStruct( Lexem& lexem);
+	bool parseHeader( Lexem& lexem, std::string& name, std::string& rname);
+	bool nextLexem( Lexem& lexem);
+	bool parseName( Lexem& lexem, std::string& name);
+	bool parseElement( Lexem& lexem, Element& element);
+	bool parseEndOfLine( Lexem& lexem);
+	bool parseNumber( Lexem& lexem);
+	bool parseIdentifier( Lexem& lexem);
+	bool parseString( Lexem& lexem);
+	bool isDelimiter();
+	bool parseOperator( Lexem& lexem);
+	bool isOperator();
+	bool setError( Lexem& lexem, const char* message);
+
+private:
+	void error( const std::string& msg) {errors.push_back( msg);}
+	std::size_t calcElementSize( std::size_t idx, std::size_t depht=0);
+
+	std::map<std::string,std::size_t> linkmap;
+	std::vector<Struct> ar;
+	std::vector<std::string> errors;
+	Source src;
+};
+
 
 static std::pair<std::size_t, std::size_t> getPos( const std::string::const_iterator& start, const std::string::const_iterator& at)
 {
@@ -113,22 +228,7 @@ static std::pair<std::size_t, std::size_t> getPos( const std::string::const_iter
 	return pos;
 }
 
-struct Source
-{
-	std::string src;
-	std::string::const_iterator start;
-	std::string::const_iterator at;
-	Source& operator ++()	{++at; return *this;}
-	char operator*()	{return *at;}
-	Source( const std::string& src_) :src(src_)
-	{
-		removeComments( src);
-		start = src.begin();
-		at = src.begin();
-	}
-};
-
-static bool setError( Lexem& lexem, const Source& src, const char* message)
+bool SimpleFormCompilerImpl::setError( Lexem& lexem, const char* message)
 {
 	if (lexem.type == Lexem::Error) return false; ///we want only the first error
 	lexem.type = Lexem::Error;
@@ -143,13 +243,13 @@ static bool setError( Lexem& lexem, const Source& src, const char* message)
 	return false;
 }
 
-static bool isOperator( Source& src)
+bool SimpleFormCompilerImpl::isOperator()
 {
 	if (*src == '.' || *src == ';' || *src == '[' || *src == ']' || *src == '+' || *src == '-') return true;
 	return false;
 }
 
-static bool parseOperator( Lexem& lexem, Source& src)
+bool SimpleFormCompilerImpl::parseOperator( Lexem& lexem)
 {
 	switch (*src)
 	{
@@ -160,26 +260,26 @@ static bool parseOperator( Lexem& lexem, Source& src)
 		case '+': ++src; lexem.type = Lexem::Plus; return true;
 		case '-': ++src; lexem.type = Lexem::Minus; return true;
 	}
-	return setError( lexem, src, "unknown operator");
+	return setError( lexem, "unknown operator");
 }
 
-static bool isDelimiter( Source& src)
+bool SimpleFormCompilerImpl::isDelimiter()
 {
-	if (*src <= ' ' || isOperator(src)) return true;
+	if (*src <= ' ' || isOperator()) return true;
 	return false;
 }
 
-static bool parseString( Lexem& lexem, Source& src)
+bool SimpleFormCompilerImpl::parseString( Lexem& lexem)
 {
 	char eb = *src;
 	++src;
 	while (*src != eb)
 	{
-		if (*src == '\r' || *src == '\n') return setError( lexem, src, "string not terminated");
-		if (*src < ' ') return setError( lexem, src, "string contains non ascii characters");
+		if (*src == '\r' || *src == '\n') return setError( lexem, "string not terminated");
+		if (*src < ' ') return setError( lexem, "string contains non ascii characters");
 		if (*src == '\\') ++src;
-		if (*src == '\r' || *src == '\n') return setError( lexem, src, "string not terminated");
-		if (*src < ' ') return setError( lexem, src, "string contains non ascii characters");
+		if (*src == '\r' || *src == '\n') return setError( lexem, "string not terminated");
+		if (*src < ' ') return setError( lexem, "string contains non ascii characters");
 		lexem.value.push_back( *src);
 		++src;
 	}
@@ -187,16 +287,16 @@ static bool parseString( Lexem& lexem, Source& src)
 	return true;
 }
 
-static bool parseIdentifier( Lexem& lexem, Source& src)
+bool SimpleFormCompilerImpl::parseIdentifier( Lexem& lexem)
 {
 	while (((*src|32) >= 'a' && (*src|32) <= 'z') || *src == '_' || (*src >= '0' && *src <= '9'))
 	{
 		lexem.value.push_back( *src);
 		++src;
 	}
-	if (!isDelimiter(src))
+	if (!isDelimiter())
 	{
-		return setError( lexem, src, "invalid identifier");
+		return setError( lexem, "invalid identifier");
 	}
 	if (std::strcmp( lexem.value.c_str(), "form") == 0)
 	{
@@ -217,7 +317,7 @@ static bool parseIdentifier( Lexem& lexem, Source& src)
 	return true;
 }
 
-static bool parseNumber( Lexem& lexem, Source& src)
+bool SimpleFormCompilerImpl::parseNumber( Lexem& lexem)
 {
 	unsigned int length = 0;
 	if (*src == '-')
@@ -254,12 +354,12 @@ static bool parseNumber( Lexem& lexem, Source& src)
 			}
 			lexem.type = Lexem::Float;
 		}
-		if (!isDelimiter(src)) return setError( lexem, src, "invalid number");
+		if (!isDelimiter()) return setError( lexem, "invalid number");
 	}
 	return true;
 }
 
-static bool parseEndOfLine( Lexem& lexem, Source& src)
+bool SimpleFormCompilerImpl::parseEndOfLine( Lexem& lexem)
 {
 	if (*src == '\r')
 	{
@@ -279,40 +379,40 @@ static bool parseEndOfLine( Lexem& lexem, Source& src)
 	}
 	else
 	{
-		return setError( lexem, src, "invalid character at end of line");
+		return setError( lexem, "invalid character at end of line");
 	}
 }
 
-static bool nextLexem( Lexem& lexem, Source& src)
+bool SimpleFormCompilerImpl::nextLexem( Lexem& lexem)
 {
 	lexem.value.clear();
 	while (*src != 0 && *src <= ' ' && *src != '\r' && *src != '\n') ++src;
-	if (*src == '\r' || *src == '\n') return parseEndOfLine( lexem, src);
-	if (((*src|32) >= 'a' && (*src|32) <= 'z') || *src == '_') return parseIdentifier( lexem, src);
-	if ((*src >= '0' && *src <= '9') || *src == '-' || *src == '+') return parseNumber( lexem, src);
-	if (*src == '\'' || *src == '"') return parseString( lexem, src);
-	if (isOperator( src)) return parseOperator( lexem, src);
+	if (*src == '\r' || *src == '\n') return parseEndOfLine( lexem);
+	if (((*src|32) >= 'a' && (*src|32) <= 'z') || *src == '_') return parseIdentifier( lexem);
+	if ((*src >= '0' && *src <= '9') || *src == '-' || *src == '+') return parseNumber( lexem);
+	if (*src == '\'' || *src == '"') return parseString( lexem);
+	if (isOperator()) return parseOperator( lexem);
 	if (*src == '\0') {lexem.type=Lexem::EndOfFile; return true;}
-	return setError( lexem, src, "illegal lexem");
+	return setError( lexem, "illegal lexem");
 }
 
-static bool parseName( Source& src, Lexem& lexem, std::string& name)
+bool SimpleFormCompilerImpl::parseName( Lexem& lexem, std::string& name)
 {
-	if (nextLexem( lexem, src))
+	if (nextLexem( lexem))
 	{
 		if (lexem.type == Lexem::Identifier)
 		{
 			name = lexem.value;
 			return true;
 		}
-		return setError( lexem, src, "identifier expected");
+		return setError( lexem, "identifier expected");
 	}
 	return false;
 }
 
-static bool parseElement( Source& src, Lexem& lexem, SimpleFormCompiler::Element& element)
+bool SimpleFormCompilerImpl::parseElement( Lexem& lexem, Element& element)
 {
-	while (nextLexem( lexem, src) && lexem.type == Lexem::EndOfLine);
+	while (nextLexem( lexem) && lexem.type == Lexem::EndOfLine);
 
 	if (lexem.type == Lexem::End)
 	{
@@ -320,71 +420,71 @@ static bool parseElement( Source& src, Lexem& lexem, SimpleFormCompiler::Element
 	}
 	if (lexem.type == Lexem::Form)
 	{
-		element.type = SimpleFormCompiler::Element::form_;
+		element.type = Element::form_;
 	}
 	else if (lexem.type == Lexem::Identifier)
 	{
-		if (!SimpleFormCompiler::Element::getType( lexem.value.c_str(), element.type))
+		if (!Element::getType( lexem.value.c_str(), element.type))
 		{
-			return setError( lexem, src, "unknown element type name");
+			return setError( lexem, "unknown element type name");
 		}
 	}
 	else
 	{
-		return setError( lexem, src, "element type name or 'ref' expected");
+		return setError( lexem, "element type name or 'ref' expected");
 	}
-	if (!parseName( src, lexem, element.name)) return false;
+	if (!parseName( lexem, element.name)) return false;
 
-	if (nextLexem( lexem, src))
+	if (nextLexem( lexem))
 	{
 		if (lexem.type == Lexem::String || lexem.type == Lexem::Int || lexem.type == Lexem::Float || lexem.type == Lexem::Uint || lexem.type == Lexem::Identifier)
 		{
 			element.defaultValue = lexem.value;
 			if (element.defaultValue.size() == 0)
 			{
-				return setError( lexem, src, "empty default values are not allowed");
+				return setError( lexem, "empty default values are not allowed");
 			}
-			if (!nextLexem( lexem, src))
+			if (!nextLexem( lexem))
 			{
-				return setError( lexem, src, "unexpected end of file");
+				return setError( lexem, "unexpected end of file");
 			}
-			if (element.type == SimpleFormCompiler::Element::form_)
+			if (element.type == Element::form_)
 			{
-				return setError( lexem, src, "structure can't be defined with a default value");
+				return setError( lexem, "structure can't be defined with a default value");
 			}
 			else if (lexem.type == Lexem::OpenBracket)
 			{
-				return setError( lexem, src, "array can't be defined with a default value");
+				return setError( lexem, "array can't be defined with a default value");
 			}
 			else if (lexem.type != Lexem::EndOfLine)
 			{
-				return setError( lexem, src, "end of line expected after default value");
+				return setError( lexem, "end of line expected after default value");
 			}
 		}
 		else if (lexem.type == Lexem::OpenBracket)
 		{
-			if (!nextLexem( lexem, src) || lexem.type != Lexem::CloseBracket)
+			if (!nextLexem( lexem) || lexem.type != Lexem::CloseBracket)
 			{
-				return setError( lexem, src, "] expected");
+				return setError( lexem, "] expected");
 			}
 			element.isArray = true;
-			if (!nextLexem( lexem, src) || lexem.type != Lexem::EndOfLine)
+			if (!nextLexem( lexem) || lexem.type != Lexem::EndOfLine)
 			{
-				return setError( lexem, src, "end of line expected");
+				return setError( lexem, "end of line expected");
 			}
 		}
 		if (lexem.type == Lexem::EndOfLine)
 		{
 			return true;
 		}
-		return setError( lexem, src, "[ or end of line expected");
+		return setError( lexem, "[ or end of line expected");
 	}
-	return setError( lexem, src, "unexpected end of file");
+	return setError( lexem, "unexpected end of file");
 }
 
-static bool parseHeader( Source& src, Lexem& lexem, std::string& name, std::string& rname)
+bool SimpleFormCompilerImpl::parseHeader( Lexem& lexem, std::string& name, std::string& rname)
 {
-	while (nextLexem( lexem, src) && lexem.type == Lexem::EndOfLine);
+	while (nextLexem( lexem) && lexem.type == Lexem::EndOfLine);
 
 	if (lexem.type == Lexem::EndOfFile)
 	{
@@ -392,20 +492,20 @@ static bool parseHeader( Source& src, Lexem& lexem, std::string& name, std::stri
 	}
 	if (lexem.type == Lexem::Form)
 	{
-		if (!parseName( src, lexem, name)) return false;
+		if (!parseName( lexem, name)) return false;
 
-		if (nextLexem( lexem, src))
+		if (nextLexem( lexem))
 		{
 			if (lexem.type == Lexem::As)
 			{
-				if (!parseName( src, lexem, rname)) return false;
-				if (nextLexem( lexem, src))
+				if (!parseName( lexem, rname)) return false;
+				if (nextLexem( lexem))
 				{
 					if (lexem.type == Lexem::EndOfLine)
 					{
 						return true;
 					}
-					return setError( lexem, src, "end of line expected");
+					return setError( lexem, "end of line expected");
 				}
 			}
 			else if (lexem.type == Lexem::EndOfLine)
@@ -415,24 +515,24 @@ static bool parseHeader( Source& src, Lexem& lexem, std::string& name, std::stri
 			}
 			else
 			{
-				return setError( lexem, src, "end of line expected");
+				return setError( lexem, "end of line expected");
 			}
 		}
 	}
-	return setError( lexem, src, "'struct' expected");
+	return setError( lexem, "'struct' expected");
 }
 
-static bool parseStruct( Source& src, Lexem& lexem, SimpleFormCompiler& ds)
+bool SimpleFormCompilerImpl::parseStruct( Lexem& lexem)
 {
-	SimpleFormCompiler::Struct st;
+	Struct st;
 	std::string rname;
 
-	if (parseHeader( src, lexem, st.name, rname))
+	if (parseHeader( lexem, st.name, rname))
 	{
 		while (lexem.type != Lexem::End && lexem.type != Lexem::Error)
 		{
-			SimpleFormCompiler::Element ee;
-			if (parseElement( src, lexem, ee))
+			Element ee;
+			if (parseElement( lexem, ee))
 			{
 				st.elements.push_back( ee);
 			}
@@ -440,9 +540,9 @@ static bool parseStruct( Source& src, Lexem& lexem, SimpleFormCompiler& ds)
 
 		if (lexem.type != Lexem::Error)
 		{
-			if (!ds.define( rname, st))
+			if (!define( rname, st))
 			{
-				setError( lexem, src, "duplicate struct definition");
+				setError( lexem, "duplicate struct definition");
 			}
 			return true;
 		}
@@ -451,16 +551,16 @@ static bool parseStruct( Source& src, Lexem& lexem, SimpleFormCompiler& ds)
 	{
 		return true;
 	}
-	return setError( lexem, src, "structure definition expected");
+	return setError( lexem, "structure definition expected");
 }
 
-static bool parseDefinition( Source& src, SimpleFormCompiler& parser, Lexem& lexem)
+bool SimpleFormCompilerImpl::parseDefinition( Lexem& lexem)
 {
-	while (parseStruct( src, lexem, parser) && lexem.type != Lexem::EndOfFile);
+	while (parseStruct( lexem) && lexem.type != Lexem::EndOfFile);
 	return lexem.type!=Lexem::Error;
 }
 
-std::size_t SimpleFormCompiler::calcElementSize( std::size_t idx, std::size_t depht)
+std::size_t SimpleFormCompilerImpl::calcElementSize( std::size_t idx, std::size_t depht)
 {
 	std::size_t rt = 0;
 	if (depht > ar.size()) return 0;
@@ -479,14 +579,13 @@ std::size_t SimpleFormCompiler::calcElementSize( std::size_t idx, std::size_t de
 	return rt;
 }
 
-bool SimpleFormCompiler::compile( const std::string& srcstring, StructType&, std::string& error_)
+bool SimpleFormCompilerImpl::compile( StructType& result_, std::string& error_)
 {
-	Source src( srcstring);
 	Lexem lexem;
 	std::stringstream err;
 	bool rt = true;
 
-	if (!parseDefinition( src, *this, lexem))
+	if (!parseDefinition( lexem))
 	{
 		err << lexem.value << std::endl;
 		error_ = err.str();
@@ -538,5 +637,13 @@ bool SimpleFormCompiler::compile( const std::string& srcstring, StructType&, std
 		++ii;
 	}
 	return rt;
+}
+
+}///anonymous namespace
+
+bool SimpleFormCompiler::compile( const std::string& srcstring, StructType& result_, std::string& error_)
+{
+	SimpleFormCompilerImpl impl( srcstring);
+	return impl.compile( result_, error_);
 }
 

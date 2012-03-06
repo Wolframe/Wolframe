@@ -45,6 +45,10 @@ namespace ddl {
 ///\brief Interface for DDL compilers
 struct CompilerInterface
 {
+	///\brief Compile a source from a string
+	///\param[in] srcstring source as string
+	///\param[out] result compilation result
+	///\param[out] error error message in case of failure
 	virtual bool compile( const std::string& srcstring, StructType& result, std::string& error)=0;
 };
 

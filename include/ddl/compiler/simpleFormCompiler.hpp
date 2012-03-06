@@ -48,82 +48,8 @@ namespace ddl {
 class SimpleFormCompiler :public CompilerInterface
 {
 public:
-	///\brief Compile a source from a string
-	///\param[in] srcstring source as string
-	///\param[out] result compilation result
-	///\param[out] error error message in case of failure
+	///\brief Compile a source from a string. See CompilerInterface::compile( const std::string&,StructType&,std::string&)
 	virtual bool compile( const std::string& srcstring, StructType& result, std::string& error);
-
-	struct Element
-	{
-	public:
-		enum Type
-		{
-			float_,long_,ulong_,int_,uint_,short_,ushort_,char_,uchar_,string_,form_
-		};
-
-		static const char* typeName( Type tp)
-		{
-			static const char* ar[] = {"float","long","ulong","int","uint","short","ushort","char","uchar","string","form",0};
-			return ar[ (int)tp];
-		}
-
-		static bool getType( const char* name, Type& tp)
-		{
-			const char* rt;
-			unsigned int ii;
-			for (ii=0,rt=typeName((Type)(ii)); rt!=0; ii++,rt=typeName((Type)(ii)))
-			{
-				if (std::strcmp( rt, name) == 0)
-				{
-					tp = (Type)ii;
-					return true;
-				}
-			}
-			return false;
-		}
-
-		Type type;
-		std::string name;
-		std::string defaultValue;
-		int ref;
-		std::size_t size;
-		bool isArray;
-
-		Element() :ref(-1),size(0U),isArray(false){}
-	};
-
-	struct Struct
-	{
-		std::string name;
-		std::vector<Element> elements;
-		std::size_t size;
-		Struct() :size(0){}
-	};
-
-	const Struct* get( const std::string& name) const
-	{
-		std::map<std::string,std::size_t>::const_iterator itr = linkmap.find( name), end = linkmap.end();
-		if (itr == end) return 0;
-		return &ar[ itr->second];
-	}
-
-	bool define( const std::string& name, const Struct& ee)
-	{
-		std::map<std::string,std::size_t>::const_iterator itr = linkmap.find( name);
-		if (itr == linkmap.end()) return false;
-		linkmap[ name] = ar.size();
-		ar.push_back( ee);
-		return true;
-	}
-
-private:
-	void error( const std::string& msg) {errors.push_back( msg);}
-	std::size_t calcElementSize( std::size_t idx, std::size_t depht=0);
-
-	std::map<std::string,std::size_t> linkmap;
-	std::vector<Struct> ar;
-	std::vector<std::string> errors;
 };
 
 }}
