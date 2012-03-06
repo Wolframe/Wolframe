@@ -88,6 +88,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	serialize_struct_filtermapBase.obj \
 	serialize_ddl_filtermapSerialize.obj \
 	serialize_mapContext.obj \
+	ddl_compiler_simpleFormCompiler.obj \
 	acceptor.obj \
 	getPassword.obj \
 	serverEndpoint.obj \

@@ -74,7 +74,6 @@ OBJS = \
 	$(TOPDIR)\src\loadModules-dummy.obj \
 	iprocHandler.obj \
 	iprocHandlerConfig.obj \
-	ddl\simpleFormCompile.obj \
 	$(TOPDIR)\src\winMain.obj
 
 

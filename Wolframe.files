@@ -169,8 +169,6 @@ examples/echo/Makefile.W32
 examples/GNUmakefile
 examples/iproc/appConfigDefinition.cpp
 examples/iproc/appProperties.cpp
-examples/iproc/ddl/simpleFormCompile.cpp
-examples/iproc/ddl/simpleFormCompile.hpp
 examples/iproc/GNUmakefile
 examples/iproc/handlerConfig.hpp
 examples/iproc/iproc.conf
@@ -292,8 +290,9 @@ include/database/database.hpp
 include/database/databaseOperation.hpp
 include/database/DBprovider.hpp
 include/ddl/atomicType.hpp
-include/ddl/parserInterface.hpp
 include/ddl/structType.hpp
+include/ddl/compilerInterface.hpp
+include/ddl/compiler/simpleFormCompiler.hpp
 include/ErrorCode.hpp
 include/filter/bufferingFilterBase.hpp
 include/filter/char_filter.hpp
@@ -439,6 +438,7 @@ src/config_descriptionBase.cpp
 src/connectionBase.hpp
 src/connection.cpp
 src/connection.hpp
+src/ddl_compiler_simpleFormCompiler.cpp
 src/exceptionBase.hpp
 src/filter_char_filter.cpp
 src/filter_libxml2_filter.cpp

@@ -29,11 +29,11 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file ddl/parserInterface.hpp
+///\file ddl/compilerInterface.hpp
 ///\brief Defines the interface for different type of data definition languages used for forms
 
-#ifndef _Wolframe_DDL_PARSER_INTERFACE_HPP_INCLUDED
-#define _Wolframe_DDL_PARSER_INTERFACE_HPP_INCLUDED
+#ifndef _Wolframe_DDL_COMPILER_INTERFACE_HPP_INCLUDED
+#define _Wolframe_DDL_COMPILER_INTERFACE_HPP_INCLUDED
 #include "ddl/atomicType.hpp"
 #include "ddl/structType.hpp"
 #include <string>
@@ -41,9 +41,9 @@ Project Wolframe.
 namespace _Wolframe {
 namespace ddl {
 
-///\class ParserInterface
+///\class CompilerInterface
 ///\brief Interface for DDL compilers
-struct ParserInterface
+struct CompilerInterface
 {
 	virtual bool compile( const std::string& srcstring, StructType& result, std::string& error)=0;
 };

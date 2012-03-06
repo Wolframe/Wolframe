@@ -31,7 +31,7 @@ Project Wolframe.
 ************************************************************************/
 /// \file tests/simpleFormCompilerTest.cpp
 #include "tests/testUtils.hpp"
-#include "ddl/simpleFormCompile.hpp"
+#include "ddl/compiler/simpleFormCompiler.hpp"
 #ifdef _WIN32
 #pragma warning(disable:4996)
 #pragma warning(disable:4127)
@@ -71,8 +71,7 @@ TEST_F( SimpleFormCompilerTest, tests)
 		std::string srcfile = wtest::Data::getDataFile( testDescription[ti].srcfile, "data", ".frm");
 		std::string srcstring;
 		if (!wtest::Data::readFile( srcfile.c_str(), srcstring)) throw std::runtime_error("could not read test input file");
-
-		ddl::SimpleformParser mm;
+		ddl::SimpleFormCompiler mm;
 		ddl::StructType sr;
 		std::string error;
 		EXPECT_EQ( true, mm.compile( srcstring, sr, error));

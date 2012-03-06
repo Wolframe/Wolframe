@@ -70,7 +70,6 @@ OBJS = \
 	$(TOPDIR)/src/loadModules-dummy.o \
 	iprocHandler.o \
 	iprocHandlerConfig.o \
-	ddl/simpleFormCompile.o \
 	$(TOPDIR)/src/posixMain.o
 
 TEST_BINS = \

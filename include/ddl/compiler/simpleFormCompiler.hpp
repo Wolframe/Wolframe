@@ -32,22 +32,26 @@ Project Wolframe.
 ///\file ddl/simpleformCompile.hpp
 ///\brief interface for a compiler of a self defined DDL for forms
 
-#ifndef _Wolframe_DDL_SIMPLEFORM_COMPILE_HPP_INCLUDED
-#define _Wolframe_DDL_SIMPLEFORM_COMPILE_HPP_INCLUDED
+#ifndef _Wolframe_DDL_SIMPLEFORM_COMPILER_HPP_INCLUDED
+#define _Wolframe_DDL_SIMPLEFORM_COMPILER_HPP_INCLUDED
 #include <string>
 #include <vector>
 #include <map>
 #include <cstddef>
 #include <cstring>
 #include "ddl/structType.hpp"
-#include "ddl/parserInterface.hpp"
+#include "ddl/compilerInterface.hpp"
 
 namespace _Wolframe {
 namespace ddl {
 
-class SimpleformParser :public ParserInterface
+class SimpleFormCompiler :public CompilerInterface
 {
 public:
+	///\brief Compile a source from a string
+	///\param[in] srcstring source as string
+	///\param[out] result compilation result
+	///\param[out] error error message in case of failure
 	virtual bool compile( const std::string& srcstring, StructType& result, std::string& error);
 
 	struct Element

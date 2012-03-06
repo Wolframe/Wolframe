@@ -29,9 +29,10 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file ddl/simpleformCompile.cpp
-///\brief implementation a compiler of a self defined direct map DDL
-#include "ddl/simpleFormCompile.hpp"
+///\file ddl_compiler_SimpleFormCompiler.cpp
+///\brief implementation of a compiler for a self defined form DDL called 'simple form DDL'
+
+#include "ddl/compiler/simpleFormCompiler.hpp"
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -309,7 +310,7 @@ static bool parseName( Source& src, Lexem& lexem, std::string& name)
 	return false;
 }
 
-static bool parseElement( Source& src, Lexem& lexem, SimpleformParser::Element& element)
+static bool parseElement( Source& src, Lexem& lexem, SimpleFormCompiler::Element& element)
 {
 	while (nextLexem( lexem, src) && lexem.type == Lexem::EndOfLine);
 
@@ -319,11 +320,11 @@ static bool parseElement( Source& src, Lexem& lexem, SimpleformParser::Element& 
 	}
 	if (lexem.type == Lexem::Form)
 	{
-		element.type = SimpleformParser::Element::form_;
+		element.type = SimpleFormCompiler::Element::form_;
 	}
 	else if (lexem.type == Lexem::Identifier)
 	{
-		if (!SimpleformParser::Element::getType( lexem.value.c_str(), element.type))
+		if (!SimpleFormCompiler::Element::getType( lexem.value.c_str(), element.type))
 		{
 			return setError( lexem, src, "unknown element type name");
 		}
@@ -347,7 +348,7 @@ static bool parseElement( Source& src, Lexem& lexem, SimpleformParser::Element& 
 			{
 				return setError( lexem, src, "unexpected end of file");
 			}
-			if (element.type == SimpleformParser::Element::form_)
+			if (element.type == SimpleFormCompiler::Element::form_)
 			{
 				return setError( lexem, src, "structure can't be defined with a default value");
 			}
@@ -421,16 +422,16 @@ static bool parseHeader( Source& src, Lexem& lexem, std::string& name, std::stri
 	return setError( lexem, src, "'struct' expected");
 }
 
-static bool parseStruct( Source& src, Lexem& lexem, SimpleformParser& ds)
+static bool parseStruct( Source& src, Lexem& lexem, SimpleFormCompiler& ds)
 {
-	SimpleformParser::Struct st;
+	SimpleFormCompiler::Struct st;
 	std::string rname;
 
 	if (parseHeader( src, lexem, st.name, rname))
 	{
 		while (lexem.type != Lexem::End && lexem.type != Lexem::Error)
 		{
-			SimpleformParser::Element ee;
+			SimpleFormCompiler::Element ee;
 			if (parseElement( src, lexem, ee))
 			{
 				st.elements.push_back( ee);
@@ -453,13 +454,13 @@ static bool parseStruct( Source& src, Lexem& lexem, SimpleformParser& ds)
 	return setError( lexem, src, "structure definition expected");
 }
 
-static bool parseDefinition( Source& src, SimpleformParser& parser, Lexem& lexem)
+static bool parseDefinition( Source& src, SimpleFormCompiler& parser, Lexem& lexem)
 {
 	while (parseStruct( src, lexem, parser) && lexem.type != Lexem::EndOfFile);
 	return lexem.type!=Lexem::Error;
 }
 
-std::size_t SimpleformParser::calcElementSize( std::size_t idx, std::size_t depht)
+std::size_t SimpleFormCompiler::calcElementSize( std::size_t idx, std::size_t depht)
 {
 	std::size_t rt = 0;
 	if (depht > ar.size()) return 0;
@@ -478,7 +479,7 @@ std::size_t SimpleformParser::calcElementSize( std::size_t idx, std::size_t deph
 	return rt;
 }
 
-bool SimpleformParser::compile( const std::string& srcstring, StructType&, std::string& error_)
+bool SimpleFormCompiler::compile( const std::string& srcstring, StructType&, std::string& error_)
 {
 	Source src( srcstring);
 	Lexem lexem;
