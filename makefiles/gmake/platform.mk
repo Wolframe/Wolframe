@@ -524,6 +524,12 @@ BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
 BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
 BOOST_LIBRARY_TAG ?=
 endif
+ifeq "$(OS_MAJOR_VERSION)" "9"
+BOOST_DIR ?= /usr/local
+BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
+BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
+BOOST_LIBRARY_TAG ?=
+endif
 endif
 
 ifeq "$(PLATFORM)" "SUNOS"
@@ -559,6 +565,9 @@ endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
 ifeq "$(OS_MAJOR_VERSION)" "8"
+OPENSSL_LIBS ?= -lssl -lcrypto
+endif
+ifeq "$(OS_MAJOR_VERSION)" "9"
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 endif
@@ -757,6 +766,18 @@ QT_LIB_DIR ?= /usr/local/lib/qt4
 QT_MOC ?= /usr/local/bin/moc-qt4
 endif
 endif
+ifeq "$(OS_MAJOR_VERSION)" "9"
+ifdef QT_DIR
+QT_INCLUDE_DIR ?= $(QT_DIR)/include
+QT_LIB_DIR ?= $(QT_DIR)/lib
+endif
+ifndef QT_DIR
+QT_DIR ?= /usr/local/lib/qt4
+QT_INCLUDE_DIR ?= /usr/local/include/qt4
+QT_LIB_DIR ?= /usr/local/lib/qt4
+QT_MOC ?= /usr/local/bin/moc-qt4
+endif
+endif
 endif
 
 endif
@@ -917,6 +938,12 @@ endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
 ifeq "$(OS_MAJOR_VERSION)" "8"
+PAM_DIR ?= NOT SUPPLIED ON THIS PLATFORM
+PAM_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
+PAM_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
+PAM_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
+endif
+ifeq "$(OS_MAJOR_VERSION)" "9"
 PAM_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 PAM_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 PAM_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
@@ -1087,6 +1114,12 @@ SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
 SASL_LIB_DIR ?= $(SASL_DIR)/lib
 SASL_LIBS ?= -lsasl2
 endif
+ifeq "$(OS_MAJOR_VERSION)" "9"
+SASL_DIR ?= /usr/local
+SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
+SASL_LIB_DIR ?= $(SASL_DIR)/lib
+SASL_LIBS ?= -lsasl2
+endif
 endif
 
 endif
@@ -1247,6 +1280,12 @@ endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
 ifeq "$(OS_MAJOR_VERSION)" "8"
+SQLITE3_DIR ?= /usr/local
+SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
+SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
+SQLITE3_LIBS ?= -lsqlite3
+endif
+ifeq "$(OS_MAJOR_VERSION)" "9"
 SQLITE3_DIR ?= /usr/local
 SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
 SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
@@ -1455,6 +1494,14 @@ PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
 PGSQL_LIB_DIRS = -L$(PGSQL_LIB_DIR)
 PGSQL_LIBS ?= -lpq
 endif
+ifeq "$(OS_MAJOR_VERSION)" "9"
+PGSQL_DIR ?= /usr/local
+PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include
+PGSQL_INCLUDE_DIRS = -I$(PGSQL_INCLUDE_DIR)
+PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
+PGSQL_LIB_DIRS = -L$(PGSQL_LIB_DIR)
+PGSQL_LIBS ?= -lpq
+endif
 endif
 
 endif
@@ -1656,6 +1703,14 @@ LIBXML2_LIB_DIR ?= $(LIBXML2_DIR)/lib
 LIBXML2_LIB_DIRS = -L$(LIBXML2_LIB_DIR)
 LIBXML2_LIBS ?= -lxml2
 endif
+ifeq "$(OS_MAJOR_VERSION)" "9"
+LIBXML2_DIR ?= /usr/local
+LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
+LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
+LIBXML2_LIB_DIR ?= $(LIBXML2_DIR)/lib
+LIBXML2_LIB_DIRS = -L$(LIBXML2_LIB_DIR)
+LIBXML2_LIBS ?= -lxml2
+endif
 endif
 
 endif
@@ -1850,6 +1905,14 @@ endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
 ifeq "$(OS_MAJOR_VERSION)" "8"
+LIBXSLT_DIR ?= /usr/local
+LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
+LIBXSLT_INCLUDE_DIRS = -I$(LIBXSLT_INCLUDE_DIR)
+LIBXSLT_LIB_DIR ?= $(LIBXSLT_DIR)/lib
+LIBXSLT_LIB_DIRS = -L$(LIBXSLT_LIB_DIR)
+LIBXSLT_LIBS ?= -lxslt
+endif
+ifeq "$(OS_MAJOR_VERSION)" "9"
 LIBXSLT_DIR ?= /usr/local
 LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
 LIBXSLT_INCLUDE_DIRS = -I$(LIBXSLT_INCLUDE_DIR)

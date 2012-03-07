@@ -29,6 +29,7 @@ Table of Contents
     Archlinux
   Instructions for other Unixes
     FreeBSD 8.2
+    FreeBSD 9.0
     Solaris 10
       Solaris 10 (CSW toolchain)
   Broken and non-working instructions for other Unixes
@@ -402,6 +403,18 @@ Optional packages: qt4-gui (4.7.1), cyrus-sasl (2.1.23)
                    sqlite3 (3.7.4), postgresql (9.0.3), libxml2 (2.7.8)
 
 You need 'gmake' (3.81_4).
+
+So far no PAM support.
+
+FreeBSD 9.0
+-----------
+
+Required packages: boost-libs (1.45.0)
+Optional packages: qt4-gui (4.7.4), qt4-moc (4.7.4), cyrus-sasl (2.1.25_1)
+                   sqlite34 (3.4.2), postgresql (9.1.2), libxml2 (2.7.8_1),
+                   libxslt (1.1.26_3)
+
+You need 'gmake' (3.82).
 
 So far no PAM support.
 
