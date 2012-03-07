@@ -438,6 +438,7 @@ src/config_descriptionBase.cpp
 src/connectionBase.hpp
 src/connection.cpp
 src/connection.hpp
+src/ddl_compilerInterface.cpp
 src/ddl_compiler_simpleFormCompiler.cpp
 src/exceptionBase.hpp
 src/filter_char_filter.cpp

@@ -29,34 +29,42 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file ddl/compilerInterface.hpp
-///\brief Defines the interface for different type of data definition languages used for forms
-
-#ifndef _Wolframe_DDL_COMPILER_INTERFACE_HPP_INCLUDED
-#define _Wolframe_DDL_COMPILER_INTERFACE_HPP_INCLUDED
-#include "ddl/atomicType.hpp"
-#include "ddl/structType.hpp"
+///\file ddl_compilerInterface.cpp
+///\brief implementation of common methods of DDL compilers
+#include "ddl/compilerInterface.hpp"
+#define BOOST_FILESYSTEM_VERSION 3
+#include <sstream>
 #include <string>
+#include <boost/filesystem.hpp>
+#include <boost/filesystem/fstream.hpp>
+#include <boost/filesystem/exception.hpp>
 
-namespace _Wolframe {
-namespace ddl {
+using namespace _Wolframe;
+using namespace ddl;
 
-///\class CompilerInterface
-///\brief Interface for DDL compilers
-struct CompilerInterface
+bool CompilerInterface::compileFile( const std::string& filename, StructType& result, std::string& error)
 {
-	///\brief Compile a source from a string
-	///\param[in] srcstring source as string
-	///\param[out] result compilation result
-	///\param[out] error error message in case of failure
-	virtual bool compile( const std::string& srcstring, StructType& result, std::string& error)=0;
+	try
+	{
+		std::ifstream inFile( filename.c_str());
+		std::ostringstream src;
+		while (inFile)
+		{
+			std::string ln;
+			std::getline( inFile, ln);
+			if (!inFile.eof()) src << ln << "\n";
+		}
+		return compile( src.str(), result, error);
+	}
+	catch (const std::ios_base::failure& e)
+	{
+		error.append( "Error reading DDL source file '");
+		error.append( filename);
+		error.append( "' (");
+		error.append( e.what());
+		error.append( ")");
+		return false;
+	}
+	return true;
+}
 
-	///\brief Compile a source from a file
-	///\param[in] filename path of the file as string
-	///\param[out] result compilation result
-	///\param[out] error error message in case of failure
-	bool compileFile( const std::string& filename, StructType& result, std::string& error);
-};
-
-}}//namespace
-#endif
