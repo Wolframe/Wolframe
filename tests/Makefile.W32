@@ -8,6 +8,12 @@ SUBDIRS = modules AAAA
 #	$(SUBDIRS) expect
 #!ENDIF
 
+# XMLLite
+!IFDEF WITH_XMLLITE
+SUBDIRS = \
+	$(SUBDIRS) xmllite
+!ENDIF
+
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
 INCLUDE_CXXFLAGS = \
