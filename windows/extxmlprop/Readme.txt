@@ -34,3 +34,5 @@ References for Developers
   http://stackoverflow.com/questions/3449770/how-do-i-read-app-config-values-and-set-properties-in-wix
   http://blogs.technet.com/b/alexshev/
   http://netinverse.com/devblogs/wix/read-configuration-parameters-from-xml-file/355/
+  http://stackoverflow.com/questions/8531852/saving-a-wix-checkbox-value-that-defaults-to-checked-to-the-registry
+  http://www.mail-archive.com/wix-users@lists.sourceforge.net/msg32524.html
