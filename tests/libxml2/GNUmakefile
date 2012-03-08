@@ -23,7 +23,7 @@ INCLUDE_LIBS += \
 endif
 
 TEST_CPP_BINS = \
-	testlibxml1$(EXE)
+	testlibxml2$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
@@ -34,7 +34,7 @@ local_clean:
 local_distclean:
 
 local_test: $(TEST_CPP_BINS)
-	@./testlibxml1 test1.xml
+	@./testlibxml test.xml
 	@echo
 	@echo
 
