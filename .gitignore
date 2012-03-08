@@ -1,3 +1,5 @@
+makefiles/gmake/platform.mk.vars
+makefiles/gmake/platform.vars
 Wolframe.creator.user*
 Wolframe.suo
 Wolframe.sdf

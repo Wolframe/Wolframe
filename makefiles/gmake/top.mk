@@ -29,12 +29,14 @@ clean:
 	@test -z "$(SUBDIRS)" || ( set -e; for d in $(SUBDIRS)""; do \
 	  (set -e; $(MAKE) -C $$d clean || exit 1); done)
 	@-rm $(TOPDIR)/makefiles/gmake/platform.mk.vars
+	@-rm $(TOPDIR)/makefiles/gmake/platform.vars
 
 .PHONY: distclean
 distclean:
 	@test -z "$(SUBDIRS)" || ( set -e; for d in $(SUBDIRS)""; do \
 	  (set -e; $(MAKE) -C $$d distclean || exit 1); done)
 	@-rm $(TOPDIR)/makefiles/gmake/platform.mk.vars
+	@-rm $(TOPDIR)/makefiles/gmake/platform.vars
 
 .PHONY: install
 install:

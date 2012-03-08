@@ -1,175 +1,218 @@
 #!/bin/sh
 
-# operating system and major, minor version, more should not be necessary
+# bail out fast if we already have a cache file, otherwise building is far too slow!
 
-UNAME_SYSTEM=`(uname -s) 2>/dev/null`
-UNAME_RELEASE=`(uname -r) 2>/dev/null`
-UNAME_VERSION=`(uname -v) 2>/dev/null`
-UNAME_MACHINE=`(uname -m) 2>/dev/null`
+MAKEFILE_DIR="$3/$4"
+if test -f "${MAKEFILE_DIR}/makefiles/gmake/platform.vars"; then
+	. "${MAKEFILE_DIR}/makefiles/gmake/platform.vars"
+else
 
-case "$UNAME_SYSTEM.$UNAME_RELEASE" in
-	Linux*)		PLATFORM=LINUX
-			OS_MAJOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 1`
-			OS_MINOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 2`
-			
-			# LSB-system? Check for lsb-release
-			if test -x /usr/bin/lsb_release; then
-				dist=`/usr/bin/lsb_release -i | cut -f 2`
-				rev=`/usr/bin/lsb_release -r | cut -f 2`
-				case "$dist" in
-					Ubuntu)
-						LINUX_DIST='ubuntu'
-						LINUX_REV=$rev
-						;;
-					
-					Debian)
-						LINUX_DIST='debian'
-						LINUX_REV=`echo $rev | cut -f 1 -d.`
-						;;
+	# operating system and major, minor version, more should not be necessary
+
+	UNAME_SYSTEM=`(uname -s) 2>/dev/null`
+	UNAME_RELEASE=`(uname -r) 2>/dev/null`
+	UNAME_VERSION=`(uname -v) 2>/dev/null`
+	UNAME_MACHINE=`(uname -m) 2>/dev/null`
+
+	case "$UNAME_SYSTEM.$UNAME_RELEASE" in
+		Linux*)		PLATFORM=LINUX
+				OS_MAJOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 1`
+				OS_MINOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 2`
+				
+				# LSB-system? Check for lsb-release
+				if test -x /usr/bin/lsb_release; then
+					dist=`/usr/bin/lsb_release -i | cut -f 2`
+					rev=`/usr/bin/lsb_release -r | cut -f 2`
+					case "$dist" in
+						Ubuntu)
+							LINUX_DIST='ubuntu'
+							LINUX_REV=$rev
+							;;
 						
-					*)
+						Debian)
+							LINUX_DIST='debian'
+							LINUX_REV=`echo $rev | cut -f 1 -d.`
+							;;
+							
+						*)
+							LINUX_DIST='unknown'
+							LINUX_REV='unknown'
+							;;
+					esac
+				else
+					# try the older way with release files in /etc
+					
+					if test -f /etc/arch-release; then
+						LINUX_DIST='arch'
+						LINUX_REV='current'
+						if test "$OS_MAJOR_VERSION" = "3"; then
+							OS_MINOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 2 | cut -d - -f 1`
+						fi
+					elif test -f /etc/debian_version; then
+						LINUX_DIST='debian'
+						LINUX_REV=`cat /etc/debian_version | cut -d . -f 1`
+					elif test -f /etc/slackware-version; then
+						LINUX_DIST='slackware'
+						LINUX_REV=`cat /etc/slackware-version | cut -d ' ' -f 2 | cut -d . -f 1`
+					elif test -f /etc/redhat-release; then
+						LINUX_DIST='redhat'
+						LINUX_REV=`cat /etc/redhat-release | sed s/.*release\ // | sed s/\ .*// | cut -f 1 -d .`
+					elif test -f /etc/fedora-release; then
+						LINUX_DIST='redhat'
+						LINUX_REV=`cat /etc/fedora-release | cut -f 3 -d ' '`
+					elif test -f /etc/SuSE-release; then
+						grep "SUSE Linux Enterprise Server" /etc/SuSE-release
+						if test $? = 0; then
+							LINUX_DIST='sles'
+							LINUX_REV=`grep VERSION /etc/SuSE-release | cut -f 3 -d ' '`
+						else
+							LINUX_DIST='suse'
+							LINUX_REV=`grep VERSION /etc/SuSE-release | cut -f 3 -d ' '`
+						fi
+					else
 						LINUX_DIST='unknown'
 						LINUX_REV='unknown'
-						;;
-				esac
-			else
-				# try the older way with release files in /etc
-				
-				if test -f /etc/arch-release; then
-					LINUX_DIST='arch'
-					LINUX_REV='current'
-					if test "$OS_MAJOR_VERSION" = "3"; then
-						OS_MINOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 2 | cut -d - -f 1`
 					fi
-				elif test -f /etc/debian_version; then
-					LINUX_DIST='debian'
-					LINUX_REV=`cat /etc/debian_version | cut -d . -f 1`
-				elif test -f /etc/slackware-version; then
-					LINUX_DIST='slackware'
-					LINUX_REV=`cat /etc/slackware-version | cut -d ' ' -f 2 | cut -d . -f 1`
-				elif test -f /etc/redhat-release; then
-					LINUX_DIST='redhat'
-					LINUX_REV=`cat /etc/redhat-release | sed s/.*release\ // | sed s/\ .*// | cut -f 1 -d .`
-				elif test -f /etc/fedora-release; then
-					LINUX_DIST='redhat'
-					LINUX_REV=`cat /etc/fedora-release | cut -f 3 -d ' '`
-				elif test -f /etc/SuSE-release; then
-					grep "SUSE Linux Enterprise Server" /etc/SuSE-release
-					if test $? = 0; then
-						LINUX_DIST='sles'
-						LINUX_REV=`grep VERSION /etc/SuSE-release | cut -f 3 -d ' '`
-					else
-						LINUX_DIST='suse'
-						LINUX_REV=`grep VERSION /etc/SuSE-release | cut -f 3 -d ' '`
-					fi
-				else
-					LINUX_DIST='unknown'
-					LINUX_REV='unknown'
 				fi
-			fi
-			;;
+				;;
 
-	FreeBSD*)	PLATFORM=FREEBSD
-			OS_MAJOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 1`
-			OS_MINOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 2 | cut -d - -f 1`
-			;;
-			
-	OpenBSD*)	PLATFORM=OPENBSD
-			OS_MAJOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 1`
-			OS_MINOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 2 | cut -d - -f 1`
-			;;
+		FreeBSD*)	PLATFORM=FREEBSD
+				OS_MAJOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 1`
+				OS_MINOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 2 | cut -d - -f 1`
+				;;
+				
+		OpenBSD*)	PLATFORM=OPENBSD
+				OS_MAJOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 1`
+				OS_MINOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 2 | cut -d - -f 1`
+				;;
 
-	NetBSD*)	PLATFORM=NETBSD
-			OS_MAJOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 1`
-			OS_MINOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 2 | cut -d - -f 1`
-			;;
+		NetBSD*)	PLATFORM=NETBSD
+				OS_MAJOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 1`
+				OS_MINOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 2 | cut -d - -f 1`
+				;;
 
-	SunOS*)		PLATFORM=SUNOS
-			OS_MAJOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 1`
-			OS_MINOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 2`
-			;;
+		SunOS*)		PLATFORM=SUNOS
+				OS_MAJOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 1`
+				OS_MINOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 2`
+				;;
 
-	CYGWIN_NT*)	PLATFORM=CYGWIN
-			_tmp=`echo $UNAME_SYSTEM | cut -d - -f 2`
-			OS_MAJOR_VERSION=`echo $_tmp | cut -d . -f 1`
-			OS_MINOR_VERSION=`echo $_tmp | cut -d . -f 2`
-			;;
+		CYGWIN_NT*)	PLATFORM=CYGWIN
+				_tmp=`echo $UNAME_SYSTEM | cut -d - -f 2`
+				OS_MAJOR_VERSION=`echo $_tmp | cut -d . -f 1`
+				OS_MINOR_VERSION=`echo $_tmp | cut -d . -f 2`
+				;;
 
-	*)
-			PLATFORM=UNKNOWN
-			echo "Unknown platform '$UNAME_SYSTEM $UNAME_RELEASE'"
-			exit 1
-esac
+		*)
+				PLATFORM=UNKNOWN
+				echo "Unknown platform '$UNAME_SYSTEM $UNAME_RELEASE'"
+				exit 1
+	esac
 
-# the architecture
+	# the architecture
 
-case "$UNAME_MACHINE" in
-	i*86*)		ARCH=x86
-			;;
-	x86_64|amd64)	ARCH=x86_64
-			;;
-	sun4u)		ARCH=sun4u
-			;;
+	case "$UNAME_MACHINE" in
+		i*86*)		ARCH=x86
+				;;
+		x86_64|amd64)	ARCH=x86_64
+				;;
+		sun4u)		ARCH=sun4u
+				;;
 
-	*)		ARCH=UNKNOWN
-			echo "Unknown architecture '$UNAME_MACHINE'"
-			exit 1
-			
-esac
+		*)		ARCH=UNKNOWN
+				echo "Unknown architecture '$UNAME_MACHINE'"
+				exit 1
+				
+	esac
 
-# get last line, old 'tail' syntax and POSIX syntax, both exist out there
-if test "x${PLATFORM}" = "xSUNOS"; then
-	TAIL1='tail -1'
-else
-	TAIL1='tail -n 1'
-fi
-
-# the compiler and version
-
-# do we have ccache or distcc in CC, then check the compiler, not the wrapper
-CC=$2
-CC=`echo $CC | sed 's/distcc//g' | sed 's/ccache//g'`
-
-# what compiler do we have (we can't relly on it's name as it may be a cc link to the binary!)
-(( $CC -v 2>&1 | $TAIL1 ) | grep -i GCC ) 2>/dev/null 1>/dev/null
-if test $? = 0; then
-	COMPILER='gcc'
-else
-#	( $CC -V 2>&1 | grep l_cproc_p ) >/dev/null
-	( $CC -V 2>&1 | grep "Intel(R) C" | grep "Compiler" ) >/dev/null
-	if test $? = 0; then
-		COMPILER='icc'
+	# get last line, old 'tail' syntax and POSIX syntax, both exist out there
+	if test "x${PLATFORM}" = "xSUNOS"; then
+		TAIL1='tail -1'
 	else
-		( $CC -xhelp=readme | head -n 1 | grep 'Sun Studio' ) >/dev/null
+		TAIL1='tail -n 1'
+	fi
+
+	# the compiler and version
+
+	# do we have ccache or distcc in CC, then check the compiler, not the wrapper
+	CC=$2
+	CC=`echo $CC | sed 's/distcc//g' | sed 's/ccache//g'`
+
+	# what compiler do we have (we can't relly on it's name as it may be a cc link to the binary!)
+	(( $CC -v 2>&1 | $TAIL1 ) | grep -i GCC ) 2>/dev/null 1>/dev/null
+	if test $? = 0; then
+		COMPILER='gcc'
+	else
+	#	( $CC -V 2>&1 | grep l_cproc_p ) >/dev/null
+		( $CC -V 2>&1 | grep "Intel(R) C" | grep "Compiler" ) >/dev/null
 		if test $? = 0; then
-			COMPILER='spro'
+			COMPILER='icc'
 		else
-			COMPILER='unknown'
+			( $CC -xhelp=readme | head -n 1 | grep 'Sun Studio' ) >/dev/null
+			if test $? = 0; then
+				COMPILER='spro'
+			else
+				COMPILER='unknown'
+			fi
 		fi
 	fi
-fi
 
-# version of gcc (GNU C compiler)
+	# version of gcc (GNU C compiler)
 
-if test $COMPILER = "gcc"; then
-	GCC_VERSION=`gcc -dumpversion`
-	GCC_MAJOR_VERSION=`echo $GCC_VERSION | cut -d . -f 1`
-	GCC_MINOR_VERSION=`echo $GCC_VERSION | cut -d . -f 2`
-fi
+	if test $COMPILER = "gcc"; then
+		GCC_VERSION=`gcc -dumpversion`
+		GCC_MAJOR_VERSION=`echo $GCC_VERSION | cut -d . -f 1`
+		GCC_MINOR_VERSION=`echo $GCC_VERSION | cut -d . -f 2`
+	fi
 
-# version of icc (Intel C compiler)
+	# version of icc (Intel C compiler)
 
-if test $COMPILER = "icc"; then
-	ICC_VERSION=`icc -dumpversion`
-	ICC_MAJOR_VERSION=`echo $ICC_VERSION | cut -d . -f 1`
-	ICC_MINOR_VERSION=`echo $ICC_VERSION | cut -d . -f 2`
-fi
+	if test $COMPILER = "icc"; then
+		ICC_VERSION=`icc -dumpversion`
+		ICC_MAJOR_VERSION=`echo $ICC_VERSION | cut -d . -f 1`
+		ICC_MINOR_VERSION=`echo $ICC_VERSION | cut -d . -f 2`
+	fi
 
-# version of spro (Sun Pro compiler, Sun Studio)
+	# version of spro (Sun Pro compiler, Sun Studio)
 
-if test $COMPILER = "spro"; then
-	SPRO_VERSION=`$CC -xhelp=readme | head -n 1 | cut -d ' ' -f 3`
-	SPRO_MAJOR_VERSION=`echo $SPRO_VERSION | cut -d : -f 1`
+	if test $COMPILER = "spro"; then
+		SPRO_VERSION=`$CC -xhelp=readme | head -n 1 | cut -d ' ' -f 3`
+		SPRO_MAJOR_VERSION=`echo $SPRO_VERSION | cut -d : -f 1`
+	fi
+
+	# generate the makefile snippet with conditional variables
+	# (conditional, so that users can overwrite them for instance
+	# for cross-compilation)
+	cat >"${MAKEFILE_DIR}/makefiles/gmake/platform.mk.vars" <<EOF
+ARCH?=$ARCH
+PLATFORM?=$PLATFORM
+OS_MAJOR_VERSION?=$OS_MAJOR_VERSION
+OS_MINOR_VERSION?=$OS_MINOR_VERSION
+COMPILER?=$COMPILER
+GCC_MAJOR_VERSION?=$GCC_MAJOR_VERSION
+GCC_MINOR_VERSION?=$GCC_MINOR_VERSION
+ICC_MAJOR_VERSION?=$ICC_MAJOR_VERSION
+ICC_MINOR_VERSION?=$ICC_MINOR_VERSION
+SPRO_MAJOR_VERSION?=$SPRO_MAJOR_VERSION
+LINUX_DIST?=$LINUX_DIST
+LINUX_REV?=$LINUX_REV
+EOF
+
+	# write the cache file (to protect against constant recomputations!)
+	cat >"${MAKEFILE_DIR}/makefiles/gmake/platform.vars" <<EOF
+ARCH=$ARCH
+PLATFORM=$PLATFORM
+OS_MAJOR_VERSION=$OS_MAJOR_VERSION
+OS_MINOR_VERSION=$OS_MINOR_VERSION
+COMPILER=$COMPILER
+GCC_MAJOR_VERSION=$GCC_MAJOR_VERSION
+GCC_MINOR_VERSION=$GCC_MINOR_VERSION
+ICC_MAJOR_VERSION=$ICC_MAJOR_VERSION
+ICC_MINOR_VERSION=$ICC_MINOR_VERSION
+SPRO_MAJOR_VERSION=$SPRO_MAJOR_VERSION
+LINUX_DIST=$LINUX_DIST
+LINUX_REV=$LINUX_REV
+EOF
+
 fi
 
 case "$1" in
@@ -206,24 +249,4 @@ case "$1" in
 	*)			echo "unkown flag '$1' requested!"
 				exit 1
 esac
-
-MAKEFILE_DIR="$3/$4"
-
-# regenerate the cache file, otherwise building is far too slow!
-if test ! -f "${MAKEFILE_DIR}/makefiles/gmake/platform.mk.vars"; then
-	cat >"${MAKEFILE_DIR}/makefiles/gmake/platform.mk.vars" <<EOF
-ARCH?=$ARCH
-PLATFORM?=$PLATFORM
-OS_MAJOR_VERSION?=$OS_MAJOR_VERSION
-OS_MINOR_VERSION?=$OS_MINOR_VERSION
-COMPILER?=$COMPILER
-GCC_MAJOR_VERSION?=$GCC_MAJOR_VERSION
-GCC_MINOR_VERSION?=$GCC_MINOR_VERSION
-ICC_MAJOR_VERSION?=$ICC_MAJOR_VERSION
-ICC_MINOR_VERSION?=$ICC_MINOR_VERSION
-SPRO_MAJOR_VERSION?=$SPRO_MAJOR_VERSION
-LINUX_DIST?=$LINUX_DIST
-LINUX_REV?=$LINUX_REV
-EOF
-fi
 
