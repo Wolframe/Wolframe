@@ -64,6 +64,11 @@ WIX_FLAGS = $(WIX_FLAGS) \
 	-dwith_msxml=1
 !ENDIF
 
+!IFDEF WITH_XMLLITE
+WIX_FLAGS = $(WIX_FLAGS) \
+	-dwith_xmllite=1
+!ENDIF
+
 # TODO: must be probed, as well as the major versions of libintl and libiconv
 # (or should it be rather in platform.mk?)
 WIX_FLAGS = $(WIX_FLAGS) \
