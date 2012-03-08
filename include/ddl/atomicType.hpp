@@ -42,7 +42,8 @@ Project Wolframe.
 namespace _Wolframe {
 namespace ddl {
 
-///\class AtomicType for DDL language binding
+///\class AtomicType
+///\brief atomic type for DDL language binding
 class AtomicType
 {
 public:
@@ -51,26 +52,15 @@ public:
 		double_,float_,long_,ulong_,int_,uint_,short_,ushort_,char_,uchar_,string_
 	};
 
+	///\brief Get the name of a type
 	static const char* typeName( Type tp)
 	{
 		static const char* ar[] = {"double","float","long","ulong","int","uint","short","ushort","char","uchar","string",0};
 		return ar[ (int)tp];
 	}
-
-	static bool getType( const char* name, Type& tp)
-	{
-		const char* rt;
-		unsigned int ii;
-		for (ii=0,rt=typeName((Type)(ii)); rt!=0; ii++,rt=typeName((Type)(ii)))
-		{
-			if (std::strcmp( rt, name) == 0)
-			{
-				tp = (Type)ii;
-				return true;
-			}
-		}
-		return false;
-	}
+	///\brief Get the id of a type by name, if exists
+	///\return true, if the type exists
+	static bool getType( const char* name, Type& tp);
 
 	AtomicType( Type t=string_)		:m_type(t){}
 	AtomicType( const AtomicType& o)	:m_type(o.m_type),m_value(o.m_value){}

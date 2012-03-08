@@ -207,7 +207,7 @@ struct LuaObject :public ObjectType
 		LuaObject* self;
 		if (lua_gettop( ls) == 0 || (self=(LuaObject*)luaL_checkudata( ls, 1, metaTableName<ObjectType>())) == 0)
 		{
-			luaL_error( ls, "'%s' needs self parameter (%s:%s() instead of %s.%s())", name, name, method, name, method);
+			luaL_error( ls, "'%s' (metatable '%s') needs self parameter (%s:%s() instead of %s.%s())", name, metaTableName<ObjectType>(), name, method, name, method);
 		}
 		return self;
 	}
@@ -314,13 +314,12 @@ static void pushItem( lua_State* ls, const char* item, unsigned int itemsize)
 
 static int function_inputFilter( lua_State* ls)
 {
+	const char* item[2];
+	unsigned int itemsize[2];
+	InputFilterClosure* closure = (InputFilterClosure*)lua_touserdata( ls, lua_upvalueindex( 1));
+
 	for (;;)
 	{
-		const char* item[2];
-		unsigned int itemsize[2];
-
-		InputFilterClosure* closure = (InputFilterClosure*)lua_touserdata( ls, lua_upvalueindex( 1));
-
 		switch (closure->fetch( item[1]/*tag*/, itemsize[1], item[0]/*val*/, itemsize[0]))
 		{
 			case InputFilterClosure::DoYield:
@@ -358,28 +357,29 @@ static const char* get_printop( lua_State* ls, int index, std::size_t& size)
 
 static int function_output_print( lua_State* ls)
 {
+	const char* msg;
+	const char* item[2] = {0,0};
+	std::size_t itemsize[2] = {0,0};
+
+	Output* output = LuaObject<Output>::getSelf( ls, "output", "print");
+	if (lua_gettop( ls) == 1)
+	{}
+	else if (lua_gettop( ls) == 2)
+	{
+		item[0] = get_printop( ls, 2, itemsize[0]);
+	}
+	else if (lua_gettop( ls) == 3)
+	{
+		item[0] = get_printop( ls, 2, itemsize[0]);
+		item[1] = get_printop( ls, 3, itemsize[1]);
+	}
+	else
+	{
+		return luaL_error( ls, "too many arguments in call of output filter print");
+	}
+
 	for (;;)
 	{
-		const char* msg;
-		const char* item[2] = {0,0};
-		std::size_t itemsize[2] = {0,0};
-
-		Output* output = LuaObject<Output>::getSelf( ls, "output", "print");
-		if (lua_gettop( ls) == 1)
-		{}
-		else if (lua_gettop( ls) == 2)
-		{
-			item[0] = get_printop( ls, 2, itemsize[0]);
-		}
-		else if (lua_gettop( ls) == 3)
-		{
-			item[0] = get_printop( ls, 2, itemsize[0]);
-			item[1] = get_printop( ls, 3, itemsize[1]);
-		}
-		else
-		{
-			return luaL_error( ls, "too many arguments in call of output filter print");
-		}
 		switch (output->print( item[1]/*tag*/, itemsize[1], item[0]/*val*/, itemsize[0]))
 		{
 			case Output::DoYield:
@@ -407,7 +407,6 @@ static const luaL_Reg filter_methodtable[ 3] =
 static int function_filter( lua_State* ls)
 {
 	unsigned int nn = lua_gettop( ls);
-	unsigned int buffersize = 0;
 	if (nn == 0) return luaL_error( ls, "too few arguments for filter");
 	if (nn > 1) return luaL_error( ls, "too many arguments for filter");
 	if (!lua_isstring( ls, 1))

@@ -82,6 +82,8 @@ LOCAL_STATIC_LIB_OBJS = \
 	serialize_struct_filtermapBase.o \
 	serialize_ddl_filtermapSerialize.o \
 	serialize_mapContext.o \
+	ddl_atomicType.o \
+	ddl_structType.o \
 	ddl_compilerInterface.o \
 	ddl_compiler_simpleFormCompiler.o \
 	acceptor.o \

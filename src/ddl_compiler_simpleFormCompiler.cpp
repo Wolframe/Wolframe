@@ -68,12 +68,12 @@ struct Element
 public:
 	enum Type
 	{
-		float_,long_,ulong_,int_,uint_,short_,ushort_,char_,uchar_,string_,form_
+		double_,float_,long_,ulong_,int_,uint_,short_,ushort_,char_,uchar_,string_,form_
 	};
 
 	static const char* typeName( Type tp)
 	{
-		static const char* ar[] = {"float","long","ulong","int","uint","short","ushort","char","uchar","string","form",0};
+		static const char* ar[] = {"double","float","long","ulong","int","uint","short","ushort","char","uchar","string","form",0};
 		return ar[ (int)tp];
 	}
 
@@ -98,8 +98,9 @@ public:
 	int ref;
 	std::size_t size;
 	bool isArray;
+	bool isAttribute;
 
-	Element() :ref(-1),size(0U),isArray(false){}
+	Element() :ref(-1),size(0U),isArray(false),isAttribute(false){}
 };
 
 struct Struct
@@ -107,7 +108,9 @@ struct Struct
 	std::string name;
 	std::vector<Element> elements;
 	std::size_t size;
-	Struct() :size(0){}
+	bool isPublic;
+
+	Struct() :size(0),isPublic(false){}
 };
 
 struct Source
@@ -131,11 +134,13 @@ struct Lexem
 	{
 		Error,
 		EndOfLine,
+		At,
 		OpenBracket,
 		CloseBracket,
 		Semicolon,
 		Dot,
 		Form,
+		Public,
 		Plus,
 		Minus,
 		End,
@@ -179,7 +184,7 @@ public:
 
 	bool parseDefinition( Lexem& lexem);
 	bool parseStruct( Lexem& lexem);
-	bool parseHeader( Lexem& lexem, std::string& name, std::string& rname);
+	bool parseHeader( Lexem& lexem, std::string& name, std::string& rname, bool& isPublic);
 	bool nextLexem( Lexem& lexem);
 	bool parseName( Lexem& lexem, std::string& name);
 	bool parseElement( Lexem& lexem, Element& element);
@@ -191,11 +196,11 @@ public:
 	bool parseOperator( Lexem& lexem);
 	bool isOperator();
 	bool setError( Lexem& lexem, const char* message);
+	void getStruct( std::size_t idx, StructType& st);
 
 private:
 	void error( const std::string& msg) {errors.push_back( msg);}
 	std::size_t calcElementSize( std::size_t idx, std::size_t depht=0);
-
 	std::map<std::string,std::size_t> linkmap;
 	std::vector<Struct> ar;
 	std::vector<std::string> errors;
@@ -245,7 +250,7 @@ bool SimpleFormCompilerImpl::setError( Lexem& lexem, const char* message)
 
 bool SimpleFormCompilerImpl::isOperator()
 {
-	if (*src == '.' || *src == ';' || *src == '[' || *src == ']' || *src == '+' || *src == '-') return true;
+	if (*src == '@' || *src == '.' || *src == ';' || *src == '[' || *src == ']' || *src == '+' || *src == '-') return true;
 	return false;
 }
 
@@ -253,6 +258,7 @@ bool SimpleFormCompilerImpl::parseOperator( Lexem& lexem)
 {
 	switch (*src)
 	{
+		case '@': ++src; lexem.type = Lexem::At; return true;
 		case '[': ++src; lexem.type = Lexem::OpenBracket; return true;
 		case ']': ++src; lexem.type = Lexem::CloseBracket; return true;
 		case '.': ++src; lexem.type = Lexem::Dot; return true;
@@ -301,6 +307,10 @@ bool SimpleFormCompilerImpl::parseIdentifier( Lexem& lexem)
 	if (std::strcmp( lexem.value.c_str(), "form") == 0)
 	{
 		lexem.type = Lexem::Form;
+	}
+	else if (std::strcmp( lexem.value.c_str(), "public") == 0)
+	{
+		lexem.type = Lexem::Public;
 	}
 	else if (std::strcmp( lexem.value.c_str(), "as") == 0)
 	{
@@ -418,9 +428,18 @@ bool SimpleFormCompilerImpl::parseElement( Lexem& lexem, Element& element)
 	{
 		return false;
 	}
+	if (lexem.type == Lexem::At)
+	{
+		element.isAttribute = true;
+		while (nextLexem( lexem) && lexem.type == Lexem::EndOfLine);
+	}
 	if (lexem.type == Lexem::Form)
 	{
 		element.type = Element::form_;
+		if (element.isAttribute)
+		{
+			return setError( lexem, "form references cannot be attributes");
+		}
 	}
 	else if (lexem.type == Lexem::Identifier)
 	{
@@ -431,7 +450,7 @@ bool SimpleFormCompilerImpl::parseElement( Lexem& lexem, Element& element)
 	}
 	else
 	{
-		return setError( lexem, "element type name or 'ref' expected");
+		return setError( lexem, "element type name or 'form' expected");
 	}
 	if (!parseName( lexem, element.name)) return false;
 
@@ -482,13 +501,18 @@ bool SimpleFormCompilerImpl::parseElement( Lexem& lexem, Element& element)
 	return setError( lexem, "unexpected end of file");
 }
 
-bool SimpleFormCompilerImpl::parseHeader( Lexem& lexem, std::string& name, std::string& rname)
+bool SimpleFormCompilerImpl::parseHeader( Lexem& lexem, std::string& name, std::string& rname, bool& isPublic)
 {
 	while (nextLexem( lexem) && lexem.type == Lexem::EndOfLine);
 
 	if (lexem.type == Lexem::EndOfFile)
 	{
 		return false;
+	}
+	if (lexem.type == Lexem::Public)
+	{
+		isPublic = true;
+		while (nextLexem( lexem) && lexem.type == Lexem::EndOfLine);
 	}
 	if (lexem.type == Lexem::Form)
 	{
@@ -519,7 +543,7 @@ bool SimpleFormCompilerImpl::parseHeader( Lexem& lexem, std::string& name, std::
 			}
 		}
 	}
-	return setError( lexem, "'struct' expected");
+	return setError( lexem, "'form' expected");
 }
 
 bool SimpleFormCompilerImpl::parseStruct( Lexem& lexem)
@@ -527,7 +551,7 @@ bool SimpleFormCompilerImpl::parseStruct( Lexem& lexem)
 	Struct st;
 	std::string rname;
 
-	if (parseHeader( lexem, st.name, rname))
+	if (parseHeader( lexem, st.name, rname, st.isPublic))
 	{
 		while (lexem.type != Lexem::End && lexem.type != Lexem::Error)
 		{
@@ -537,7 +561,6 @@ bool SimpleFormCompilerImpl::parseStruct( Lexem& lexem)
 				st.elements.push_back( ee);
 			}
 		}
-
 		if (lexem.type != Lexem::Error)
 		{
 			if (!define( rname, st))
@@ -577,6 +600,59 @@ std::size_t SimpleFormCompilerImpl::calcElementSize( std::size_t idx, std::size_
 		++eitr;
 	}
 	return rt;
+}
+
+void SimpleFormCompilerImpl::getStruct( std::size_t idx, StructType& st)
+{
+	std::vector<Element>::iterator eitr = ar[ idx].elements.begin(), eend = ar[ idx].elements.end();
+	while (eitr != eend)
+	{
+		StructType elem;
+		if (eitr->ref)
+		{
+			getStruct( eitr->ref, elem);
+		}
+		else
+		{
+			AtomicType::Type atype = AtomicType::string_;
+			switch (eitr->type)
+			{
+				case Element::double_: atype = AtomicType::double_; break;
+				case Element::float_: atype = AtomicType::float_; break;
+				case Element::long_: atype = AtomicType::long_; break;
+				case Element::ulong_: atype = AtomicType::ulong_; break;
+				case Element::int_: atype = AtomicType::int_; break;
+				case Element::uint_: atype = AtomicType::uint_; break;
+				case Element::short_: atype = AtomicType::short_; break;
+				case Element::ushort_: atype = AtomicType::ushort_; break;
+				case Element::char_: atype = AtomicType::char_; break;
+				case Element::uchar_: atype = AtomicType::uchar_; break;
+				case Element::string_: atype = AtomicType::string_; break;
+				case Element::form_: throw std::logic_error( "illegal atomic element form");
+			}
+			AtomicType atm( atype);
+			if (eitr->defaultValue.size())
+			{
+				atm.set( eitr->defaultValue);
+			}
+			elem = atm;
+		}
+		if (eitr->isArray)
+		{
+			StructType vec;
+			vec.defineAsVector( elem);
+			elem = vec;
+		}
+		if (eitr->isAttribute)
+		{
+			st.defineAttribute( eitr->name, elem);
+		}
+		else
+		{
+			st.defineContent( eitr->name, elem);
+		}
+		++eitr;
+	}
 }
 
 bool SimpleFormCompilerImpl::compile( StructType& result_, std::string& error_)
@@ -632,6 +708,23 @@ bool SimpleFormCompilerImpl::compile( StructType& result_, std::string& error_)
 		if (itr->size == 0)
 		{
 			itr->size = calcElementSize( ii);
+			if (itr->size == 0)
+			{
+				err << "circular references in DDL definition (" << itr->name << ")" << std::endl;
+				rt = false;
+			}
+		}
+		++itr;
+		++ii;
+	}
+	itr = ar.begin(), end = ar.end(), ii=0;
+	while (itr != end)
+	{
+		if (itr->isPublic == 0)
+		{
+			StructType st;
+			getStruct( ii, st);
+			result_ = st;
 		}
 		++itr;
 		++ii;

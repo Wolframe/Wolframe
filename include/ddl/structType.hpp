@@ -45,7 +45,8 @@ Project Wolframe.
 namespace _Wolframe {
 namespace ddl {
 
-///\class AtomicType for DDL language binding
+///\class StructType
+///\brief generic type for DDL language binding
 class StructType
 {
 public:
@@ -54,102 +55,14 @@ public:
 
 	enum ContentType
 	{
-		Atomic,
-		Vector,
-		Struct
+		Atomic,		//< atomic type
+		Vector,		//< vector of StructType elements (that are Atomic or Struct)
+		Struct		//< structure type
 	};
 
 	ContentType contentType() const
 	{
 		return m_contentType;
-	}
-
-	Map::const_iterator find( const char* name) const
-	{
-		REQUIRE(Struct);
-		for (Map::const_iterator itr = m_elem.begin(); itr!=m_elem.end(); ++itr)
-		{
-			if (std::strcmp( itr->first.c_str(), name) == 0) return itr;
-		}
-		return m_elem.end();
-	}
-
-	Map::iterator find( const char* name)
-	{
-		REQUIRE(Struct);
-		for (Map::iterator itr = m_elem.begin(); itr!=m_elem.end(); ++itr)
-		{
-			if (std::strcmp( itr->first.c_str(), name) == 0) return itr;
-		}
-		return m_elem.end();
-	}
-
-	Map::const_iterator begin() const
-	{
-		return (m_contentType == Vector)?(m_elem.begin()+1):m_elem.begin();
-	}
-
-	Map::const_iterator end() const
-	{
-		return m_elem.end();
-	}
-
-	AtomicType& value()
-	{
-		REQUIRE(Atomic);
-		return m_value;
-	}
-
-	const AtomicType& value() const
-	{
-		REQUIRE(Atomic);
-		return m_value;
-	}
-
-	void defineContent( const char* name, const StructType& dd)
-	{
-		REQUIRE(Struct);
-		m_elem.push_back( Element( name, dd));
-	}
-
-	void defineAttribute( const char* name, const StructType& dd)
-	{
-		REQUIRE(Struct);
-		dd.REQUIRE(Atomic);
-		m_elem.insert( m_elem.begin()+m_nof_attributes, Element( name, dd));
-		m_nof_attributes += 1;
-	}
-
-	void defineAsVector( const StructType& prototype)
-	{
-		if (m_contentType == Vector) throw std::logic_error( "prototype of vector defined");
-		if (m_contentType == Atomic) throw std::logic_error( "defined as atomic");
-		if (m_elem.size()) throw std::logic_error( "defined as structure");
-		m_contentType = Vector;
-		m_elem.push_back( Element( std::string(), prototype));
-	}
-
-	void push()
-	{
-		REQUIRE(Vector);
-		m_elem.push_back( m_elem[0]);
-	}
-
-	StructType& back()
-	{
-		REQUIRE(Vector);
-		return m_elem.back().second;
-	}
-
-	const StructType& back() const
-	{
-		REQUIRE(Vector);
-		return m_elem.back().second;
-	}
-
-	std::size_t nof_attributes() const
-	{
-		return m_nof_attributes;
 	}
 
 	StructType()
@@ -159,19 +72,39 @@ public:
 	StructType( const AtomicType& a)
 		:m_contentType( Atomic),m_value(a),m_nof_attributes(0){}
 
+	StructType& operator= ( const StructType& o);
+
+
+	Map::const_iterator find( const char* name) const;
+
+	Map::iterator find( const char* name);
+
+	Map::const_iterator begin() const;
+
+	Map::const_iterator end() const;
+
+	AtomicType& value();
+
+	const AtomicType& value() const;
+
+	void defineContent( const char* name, const StructType& dd);
+	void defineContent( const std::string& name, const StructType& dd);
+
+	void defineAttribute( const char* name, const StructType& dd);
+	void defineAttribute( const std::string& name, const StructType& dd);
+
+	void defineAsVector( const StructType& prototype);
+
+	void push();
+
+	StructType& back();
+
+	const StructType& back() const;
+
+	std::size_t nof_attributes() const;
+
 private:
-	void REQUIRE( ContentType t) const
-	{
-		if (m_contentType != t)
-		{
-			switch(m_contentType)
-			{
-				case Vector: throw std::logic_error( "not defined as vector");
-				case Struct: throw std::logic_error( "not defined as structure");
-				case Atomic: throw std::logic_error( "not defined as atomic");
-			}
-		}
-	}
+	void REQUIRE( ContentType t) const;
 
 	ContentType m_contentType;
 	AtomicType m_value;
