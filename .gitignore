@@ -52,7 +52,7 @@ tests/commandCmpTest
 tests/configStructParser
 tests/database/dbTest
 tests/database/test.db
-tests/libxml2/testlibxml1
+tests/libxml2/testlibxml2
 tests/modules/moduleTest
 tests/AAAA/authenticationTest
 examples/echo/echod
