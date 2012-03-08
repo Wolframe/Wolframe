@@ -17,7 +17,8 @@ WITH_LUA=1             build code depending on Lua
 WITH_QT=1              build code depending on Qt
 WITH_SQLITE3=1         build AAAA and DB connectors for Sqlite3
 WITH_PGSQL=1           build AAAA and DB connectors for PostgreSql
-WITH_MSXML=1           build with Microsoft XML Core Services
+WITH_MSXML=1           build with Microsoft XML Core Services support
+WITH_XMLLITE=1         build with Microsoft XmlLite library support
 WITH_EXAMPLES=1        build and test the examples
 
 Avaliable optional features during testing only:
@@ -27,4 +28,4 @@ WITH_EXPECT=1          use Expect/Tcl for system testing
 Example:
 nmake /nologo /f Makefile.W32 WITH_SSL=1 WITH_EXPECT=1 WITH_LUA=1
                               WITH_QT=1 WITH_SQLITE3=1 WITH_PGSQL=1
-			      WITH_EXAMPLES=1
+			      WITH_MSXML=1 WITH_XMLLITE=1 WITH_EXAMPLES=1

@@ -33,6 +33,9 @@ Prerequisites
 - for database support
   - optionally (WITH_SQLITE3)
   - optionally (WITH_PGSQL)
+- for native XML support
+  - optionally (WITH_MSXML): MSXML 6.0 or later
+  - optionally (WITH_XMLLITE): XmlLite SDK
 - optionally (WITH_EXPECT) Expect and Tcl 8.4 or later
 - optionally for packaging:
   - Wix 3.5 or later (which needs .NET 2.0 during packaging)
