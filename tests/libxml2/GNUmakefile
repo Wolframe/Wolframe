@@ -34,7 +34,7 @@ local_clean:
 local_distclean:
 
 local_test: $(TEST_CPP_BINS)
-	@./testlibxml test.xml
+	@./testlibxml2 test.xml
 	@echo
 	@echo
 
