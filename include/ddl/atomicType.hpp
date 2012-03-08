@@ -37,6 +37,7 @@ Project Wolframe.
 #include <string>
 #include <stdexcept>
 #include <cstddef>
+#include <cstring>
 #include <boost/lexical_cast.hpp>
 
 namespace _Wolframe {
