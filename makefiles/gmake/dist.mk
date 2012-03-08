@@ -20,6 +20,7 @@ dist:
 	-@cd $(TMPDIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION) ; \
 		$(MAKE) distclean ; \
 		rm -f makefiles/gmake/platform.mk.vars; \
+		rm -f makefiles/gmake/platform.vars; \
 		find . -name .svn -exec rm -rf {} \; ; \
 		find . -name .git -exec rm -rf {} \; ; \
 		cd .. ; \

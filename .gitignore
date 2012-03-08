@@ -1,3 +1,5 @@
+makefiles/gmake/platform.mk.vars
+makefiles/gmake/platform.vars
 Wolframe.creator.user*
 Wolframe.suo
 Wolframe.sdf
@@ -52,7 +54,7 @@ tests/commandCmpTest
 tests/configStructParser
 tests/database/dbTest
 tests/database/test.db
-tests/libxml2/testlibxml1
+tests/libxml2/testlibxml2
 tests/modules/moduleTest
 tests/AAAA/authenticationTest
 examples/echo/echod

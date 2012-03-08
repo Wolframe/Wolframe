@@ -55,16 +55,31 @@ INCLUDE_LIBS = \
 
 !ENDIF
 
-!IFDEF WITH_LIBXML2
+# MS XML
+!IFDEF WITH_MSXML
 
 INCLUDE_CXXFLAGS = \
-	$(INCLUDE_CXXFLAGS) /DWITH_LIBXML2
+	$(INCLUDE_CXXFLAGS) /DWITH_MSXML
 
 INCLUDE_DIRS = \
-	$(INCLUDE_DIRS) /I. /I"$(LIBXML2_DIR)\include" /I"$(LIBXML2_DIR)\include\libxml"
+	$(INCLUDE_DIRS)
 
 INCLUDE_LIBS = \
-	$(INCLUDE_LIBS) "$(LIBXML2_DIR)\lib\libxml2.lib"
+	$(INCLUDE_LIBS)
+	
+!ENDIF
+
+# XmlLite
+!IFDEF WITH_XMLLITE
+
+INCLUDE_CXXFLAGS = \
+	$(INCLUDE_CXXFLAGS) /DWITH_XMLLITE
+
+INCLUDE_DIRS = \
+	$(INCLUDE_DIRS)
+
+INCLUDE_LIBS = \
+	$(INCLUDE_LIBS)
 	
 !ENDIF
 
@@ -122,9 +137,6 @@ local_test: $(TEST_CPP_BINS)
 !IFDEF WITH_LUA
 	@-echo copy "$(LUA_DIR)\src\lua51.dll" tests >> test.bat
 !ENDIF
-!IFDEF WITH_LIBXML2
-	@-echo copy "$(LIBXML2_DIR)\lib\libxml2.dll" tests >> test.bat
-!ENDIF
 	@-echo cd tests >> test.bat
 	@-echo simpleFormCompilerTest.exe >> test.bat
 	@-echo structFiltermapTest.exe >> test.bat
@@ -143,9 +155,6 @@ run:
 !ENDIF
 !IFDEF WITH_LUA
 	@-echo copy "$(LUA_DIR)\src\lua51.dll" . >> test.bat
-!ENDIF
-!IFDEF WITH_LIBXML2
-	@-echo copy "$(LIBXML2_DIR)\lib\libxml2.dll" . >> test.bat
 !ENDIF
 	@-echo echo Running the Wolframe iproc example... >> test.bat
 	@-echo iprocd.exe -c iproc.conf >> test.bat
