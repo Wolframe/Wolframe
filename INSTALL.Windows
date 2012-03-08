@@ -16,8 +16,6 @@ Table of Contents
     Postgresql C client library
       Compiling Postgresql
       Notes for Postgreslql 9.0.4
-    LibXML2
-    LibXSLT
   Documentation
 
 Prerequisites
@@ -36,8 +34,6 @@ Prerequisites
   - optionally (WITH_SQLITE3)
   - optionally (WITH_PGSQL)
 - optionally (WITH_EXPECT) Expect and Tcl 8.4 or later
-- optionally (WITH_LIBXML2)
-- optionally (WITH_LIBXSLT)
 - optionally for packaging:
   - Wix 3.5 or later (which needs .NET 2.0 during packaging)
 - optionally to build documentation:
@@ -195,62 +191,6 @@ Notes for Postgreslql 9.0.4
 If your disable OpenSSL (for instance for debugging), you have
 to touch sslinfo.sql in contrib/sslinfo Dito for uuid-ossp.sql,
 pgxml.sql.in.
-
-LibXML2
--------
-
-Best is to compile your own libraries
-
-Get sources from: ftp://xmlsoft.org/libxml2/
-
-You have to fix the Makefile.msvc:
-
-There are some + where they don't belong:
-
-+!if "$(WITH_ICU)" == "1"
-+LIBS = $(LIBS) icu.lib
-+!endif
-
-When there are spaces in the installation prefix, fix it manually in 'config.msvc'
-before installing the library:
-
-BINPREFIX="$(PREFIX)\bin"
-INCPREFIX="$(PREFIX)\include"
-LIBPREFIX="$(PREFIX)\lib"
-SOPREFIX="$(PREFIX)\lib"
-
-libxml2-2.7.8
-cd win32
-cscript configure.js compiler=msvc prefix="D:\Program Files\libxml2-2.7.8.win32" zlib=no iconv=no
-#cscript configure.js compiler=msvc prefix="C:\cygwin\home\Andreas\libxml2-2.7.8.win64" zlib=no iconv=no
-# if necessary, add qwuotes in config.msvc, PREFIX="C:\Program Files\libxml2-2.7.8.win64"
-nmake /nologo /f Makefile.msvc all
-nmake /nologo /f Makefile.msvc install
-
-Adapt LIBXML2_DIR in 'makefiles\nmake\config.mk'.
-
-For the debug version add debug=yes and cruntime=/MDd to the confiugure.js call.
-
-LibXSLT
--------
-
-Best is to compile your own libraries
-
-Get sources from: ftp://xmlsoft.org/libxslt/
-
-libxslt-1.1.26
-cd win32
-cscript configure.js compiler=msvc prefix="D:\Program Files\libxslt-1.1.26.win32" zlib=no iconv=no
-	include="D:\Program Files\libxml2-2.7.8.win32\include"
-#cscript configure.js compiler=msvc prefix="C:\cygwin\home\Andreas\libxslt-1.1.26.win64" zlib=no iconv=no
-#	include="C:\cygwin\home\Andreas\libxml2-2.7.8.win64\include"
-# if necessary, add qwuotes in config.msvc, PREFIX="C:\Program Files\libxml2-2.7.8.win64" and
-# INCLUDE="xxx"
-# copy libxml2.lib to 'win32\bin.msvc'
-nmake /nologo /f Makefile.msvc all
-nmake /nologo /f Makefile.msvc install
-
-Adapt LIBXSLT_DIR in 'makefiles\nmake\config.mk'.
 
 Documentation
 -------------

@@ -8,18 +8,6 @@ SUBDIRS = modules AAAA
 #	$(SUBDIRS) expect
 #!ENDIF
 
-!IFDEF WITH_LIBXML2
-SUBDIRS = \
-	$(SUBDIRS) libxml2
-!ENDIF
-
-!IFDEF WITH_LIBXSLT
-!IFDEF WITH_LIBXML2
-SUBDIRS = \
-	$(SUBDIRS) libxslt
-!ENDIF
-!ENDIF
-
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
 INCLUDE_CXXFLAGS = \
@@ -87,7 +75,6 @@ local_test:
 	@-echo logTest >> test.bat
 	@-echo versionTest >> test.bat
 	@-echo counterTest >> test.bat
-# Aba: broken on windows: gives wrong path canonization results
 	@-echo resolvePathTest >> test.bat
 	@-echo singletonTest >> test.bat
 	@-echo protocolArgumentParsing >> test.bat
@@ -98,5 +85,5 @@ local_longtest:
 	@-echo @echo off > test.bat
 	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
 	@-echo poolTest >> test.bat
-	@echo
+	@-echo
 	@-test.bat

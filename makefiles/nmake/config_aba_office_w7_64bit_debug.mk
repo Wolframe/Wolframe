@@ -10,8 +10,6 @@
 # - OPENSSL_DIR: location of the OpenSSL library (WITH_SSL=1 only)
 # - QT_DIR: location of Qt (WITH_QT=1 only)
 # - PGSQL_DIR: location of Postgres libpq and header files (WITH_PGSQL=1 only)
-# - LIBXML2_DIR: location of libxml2 (WITH_LIBXML2=1 only)
-# - LIBXSLT_DIR: location of libxslt (WITH_LIBXSLT=1 only)
 # - TCL_DIR: location of the Active Tcl installation (for testing only)
 # - EXPECT: location of the expect interpreter (for testing only)
 
@@ -82,19 +80,6 @@ QT_DIR = C:\Qt\4.7.3
 PGSQL_DIR = C:\Program Files\PostgreSQL\9.0
 #PGSQL_DIR = D:\Program Files\PostgreSQL\9.0
 #PGSQL_DIR = C:\cygwin\home\Andreas\postgresql-9.0.4-win64-debug
-
-# libxml2
-#########
-
-LIBXML2_DIR = C:\cygwin\home\Andreas\libxml2-2.7.8.win64-dbg
-#LIBXML2_DIR = C:\cygwin\home\Andreas\libxml2-2.7.8.win64
-#LIBXML2_DIR = D:\Program Files\libxml2-2.7.8.win32
-
-# libxslt
-#########
-
-LIBXSLT_DIR = C:\cygwin\home\Andreas\libxslt-1.1.26.win64
-#LIBXSLT_DIR = D:\Program Files\libxslt-1.1.24.win32
 
 # Tcl 8.5 and Expect
 ####################

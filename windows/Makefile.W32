@@ -59,9 +59,9 @@ WIX_FLAGS = $(WIX_FLAGS) \
 	-dwith_sqlite3=1
 !ENDIF
 
-!IFDEF WITH_LIBXML2
+!IFDEF WITH_MSXML
 WIX_FLAGS = $(WIX_FLAGS) \
-	-dwith_libxml2=1
+	-dwith_msxml=1
 !ENDIF
 
 # TODO: must be probed, as well as the major versions of libintl and libiconv

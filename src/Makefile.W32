@@ -50,17 +50,17 @@ INCLUDE_LIBS = \
 
 !ENDIF
 
-# libxml2
-!IFDEF WITH_LIBXML2
+# MS XML
+!IFDEF WITH_MSXML
 
 INCLUDE_CXXFLAGS = \
-	$(INCLUDE_CXXFLAGS) /DWITH_LIBXML2
+	$(INCLUDE_CXXFLAGS) /DWITH_MSXML
 
 INCLUDE_DIRS = \
-	$(INCLUDE_DIRS) /I. /I"$(LIBXML2_DIR)\include" /I"$(LIBXML2_DIR)\include\libxml"
+	$(INCLUDE_DIRS)
 
 INCLUDE_LIBS = \
-	$(INCLUDE_LIBS) "$(LIBXML2_DIR)\lib\libxml2.lib"
+	$(INCLUDE_LIBS)
 	
 !ENDIF
 
@@ -108,11 +108,11 @@ LOCAL_STATIC_LIB_OBJS = \
 	langbind_luaCommandHandler.obj
 !ENDIF
 
-# libxml2
-!IFDEF WITH_LIBXML2
+# MS XML
+!IFDEF WITH_MSXML
 LOCAL_STATIC_LIB_OBJS = \
 	$(LOCAL_STATIC_LIB_OBJS) \
-	filter_libxml2_filter.obj
+	filter_msxml_filter.obj
 !ENDIF
 
 #SSL
@@ -160,9 +160,6 @@ copy_prereq:
 !IFDEF WITH_SSL
 	@-copy "$(OPENSSL_DIR)\bin\libeay32.dll" .
 	@-copy "$(OPENSSL_DIR)\bin\ssleay32.dll" .
-!ENDIF
-!IFDEF WITH_LIBXML2
-	@-copy "$(LIBXML2_DIR)\lib\libxml2.dll" .
 !ENDIF
 !IFDEF WITH_PGSQL
 	@-copy "$(PGSQL_DIR)\lib\libpq.dll" .
