@@ -45,7 +45,6 @@ extern "C"
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
-#include "lcoco.h"
 }
 #ifdef _WIN32
 #pragma warning(disable:4996)
