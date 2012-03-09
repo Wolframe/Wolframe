@@ -98,6 +98,10 @@ void luaConnection::createVM( )
 		throw new std::runtime_error( "Can't initialize LUA processor" );
 	}
 
+// 5.1 -> 5.2 transition, for now we simply open all standard libraries and
+// remove the selection of loadable modules in lua.conf (better it is ignored)
+	luaL_openlibs( l );
+
 	// Open lua libraries based on configuration, see
 	// http://stackoverflow.com/questions/966162/best-way-to-omit-lua-standard-libraries
 	for( std::list<std::string>::const_iterator it = config.preload_libs.begin( ); it != config.preload_libs.end( ); it++ ) {
