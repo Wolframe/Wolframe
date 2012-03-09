@@ -14,8 +14,10 @@ LOCAL_STATIC_LIB_OBJS = \
 	lapi.o \
 	lauxlib.o \
 	lbaselib.o \
-	lcoco.o \
+	lbitlib.o \
 	lcode.o \
+	lcorolib.o \
+	lctype.o \
 	ldblib.o \
 	ldebug.o \
 	ldo.o \
@@ -40,8 +42,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	ltm.o \
 	lundump.o \
 	lvm.o \
-	lzio.o \
-	print.o
+	lzio.o
 
 LOCAL_STATIC_LIB = \
 	liblua.a

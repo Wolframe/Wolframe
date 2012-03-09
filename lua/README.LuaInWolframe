@@ -1,6 +1,4 @@
-Lua 5.1.4 with LuaCoco 1.1.6 patch integrated
-
-Don't use the lua from the system, it won't work!
+Lua 5.2 Vanilla, unpatched
 
 Makefile has been renamed to 'Makefile.orig'.
 

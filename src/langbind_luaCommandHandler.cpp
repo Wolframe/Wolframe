@@ -41,10 +41,11 @@ Project Wolframe.
 
 extern "C"
 {
+// 5.1 -> 5.2, this is really bad, new module concept
+#define LUA_COMPAT_MODULE
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
-#include "lcoco.h"
 }
 
 using namespace _Wolframe;
@@ -521,15 +522,20 @@ static const luaL_Reg output_methodtable[ 4] =
 
 static void create_global_functions( lua_State* ls)
 {
+// 5.1 -> 5.2
 	//yield( )
-	lua_pushliteral( ls, "yield");
+//	lua_pushliteral( ls, "yield");
+//	lua_pushcfunction( ls, &function_yield);
+//	lua_settable( ls, LUA_GLOBALSINDEX);
 	lua_pushcfunction( ls, &function_yield);
-	lua_settable( ls, LUA_GLOBALSINDEX);
+	lua_setglobal( ls, "yield");
 
 	//filter( )
-	lua_pushliteral( ls, "filter");
+//	lua_pushliteral( ls, "filter");
+//	lua_pushcfunction( ls, &function_filter);
+//	lua_settable( ls, LUA_GLOBALSINDEX);
 	lua_pushcfunction( ls, &function_filter);
-	lua_settable( ls, LUA_GLOBALSINDEX);
+	lua_setglobal( ls, "filter");
 }
 
 struct LuaCommandHandler::Context
@@ -577,7 +583,9 @@ LuaCommandHandler::CallResult LuaCommandHandler::call( int& errorCode)
 	if (!m_context->thread)
 	{
 		// create thread for the call execution
-		m_context->thread = lua_newcthread( m_context->ls, m_config->cthread_stacksize());
+// 5.1+Coco -> 5.2
+//		m_context->thread = lua_newcthread( m_context->ls, m_config->cthread_stacksize());
+		m_context->thread = lua_newthread( m_context->ls);
 
 		// prevent garbage collecting of thread (http://permalink.gmane.org/gmane.comp.lang.lua.general/22680)
 		lua_pushvalue( m_context->ls, -1);
@@ -588,9 +596,13 @@ LuaCommandHandler::CallResult LuaCommandHandler::call( int& errorCode)
 		lua_newtable( m_context->ls);
 		lua_pushvalue( m_context->ls, -1);
 		lua_setmetatable( m_context->ls, -2); //Set itself as metatable
-		lua_pushvalue( m_context->ls, LUA_GLOBALSINDEX);
+// 5.1 -> 5.2 http://lua-list.2524044.n2.nabble.com/Lua-5-2-amp-SWIG-compatibility-problem-td7135702.html
+//		lua_pushvalue( m_context->ls, LUA_GLOBALSINDEX);
+		lua_getglobal( m_context->ls, "_G");
 		lua_setfield( m_context->ls, -2, "__index");
-		lua_setfenv( m_context->ls, -2);
+// 5.1 -> 5.2
+//		lua_setfenv( m_context->ls, -2);
+		lua_setuservalue( m_context->ls, -2);
 		lua_pop( m_context->ls, 1);
 
 		if (m_inputfilter.get())
@@ -620,12 +632,14 @@ LuaCommandHandler::CallResult LuaCommandHandler::call( int& errorCode)
 		{
 			lua_pushlstring( m_context->thread, itr->c_str(), itr->size());
 		}
-		rt = lua_resume( m_context->thread, m_argBuffer.size());
+// 5.1 -> 5.2
+		rt = lua_resume( m_context->thread, NULL, m_argBuffer.size());
 	}
 	else
 	{
 		// call the function (subsequently until termination)
-		rt = lua_resume( m_context->thread, 0);
+// 5.1 -> 5.2
+		rt = lua_resume( m_context->thread, NULL, 0);
 	}
 	if (rt == LUA_YIELD)
 	{

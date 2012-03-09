@@ -135,8 +135,10 @@ void luaConnection::createVM( )
 	}
 
 	// execute the main entry point of the script, we could initialize things there in LUA
-	lua_pushstring( l, "init" );
-	lua_gettable( l, LUA_GLOBALSINDEX );
+// 5.1 -> 5.2
+//	lua_pushstring( l, "init" );
+//	lua_gettable( l, LUA_GLOBALSINDEX );
+	lua_getglobal( l, "init" );
 	res = lua_pcall( l, 0, 0, 0 );
 	if( res != 0 ) {
 		LOG_FATAL << "Unable to call 'init' function: " << lua_tostring( l, -1 );
@@ -153,8 +155,10 @@ void luaConnection::destroyVM( )
 
 	// give LUA code a chance to clean up resources or something
 	// usually hardly necessary, as the garbage collector should take care of it
-	lua_pushstring( l, "destroy" );
-	lua_gettable( l, LUA_GLOBALSINDEX );
+// 5.1 -> 5.2
+//	lua_pushstring( l, "destroy" );
+//	lua_gettable( l, LUA_GLOBALSINDEX );
+	lua_getglobal( l, "destroy" );
 	int res = lua_pcall( l, 0, 0, 0 );
 	if( res != 0 ) {
 		LOG_FATAL << "Unable to call 'destroy' function: " << lua_tostring( l, -1 );
@@ -219,8 +223,10 @@ void luaConnection::setPeer( const net::RemoteEndpoint& remote )
 	}
 #endif // WITH_SSL
 
-	lua_pushstring( l, "new_connection" );
-	lua_gettable( l, LUA_GLOBALSINDEX );
+// 5.1 -> 5.2
+//	lua_pushstring( l, "new_connection" );
+//	lua_gettable( l, LUA_GLOBALSINDEX );
+	lua_getglobal( l, "new_connection" );
 	lua_pushstring( l, remote.host( ).c_str( ) );
 	lua_pushinteger( l, remote.port( ) );
 
@@ -276,8 +282,10 @@ void luaConnection::setPeer( const net::RemoteEndpoint& remote )
 /// Handle a request and produce a reply.
 const net::NetworkOperation luaConnection::nextOperation()
 {
-	lua_pushstring( l, "next_operation" );
-	lua_gettable( l, LUA_GLOBALSINDEX );
+// 5.1 -> 5.2
+//	lua_pushstring( l, "next_operation" );
+//	lua_gettable( l, LUA_GLOBALSINDEX );
+	lua_getglobal( l, "next_operation" );
 	int res = lua_pcall( l, 0, 2, 0 );
 	if( res != 0 ) {
 		LOG_FATAL << "Unable to call 'next_operation' function: " << lua_tostring( l, -1 );
@@ -314,8 +322,10 @@ void luaConnection::networkInput( const void *begin, std::size_t bytesTransferre
 {
 	LOG_DATA << "network Input: Read " << bytesTransferred << " bytes";
 
-	lua_pushstring( l, "network_input" );
-	lua_gettable( l, LUA_GLOBALSINDEX );
+// 5.1 -> 5.2
+//	lua_pushstring( l, "network_input" );
+//	lua_gettable( l, LUA_GLOBALSINDEX );
+	lua_getglobal( l, "network_input" );
 	lua_pushlstring( l, (const char *)begin, bytesTransferred );
 	int res = lua_pcall( l, 1, 0, 0 );
 	if( res != 0 ) {
@@ -328,8 +338,10 @@ void luaConnection::timeoutOccured()
 {
 	LOG_TRACE << "Processor received timeout";
 
-	lua_pushstring( l, "timeout_occured" );
-	lua_gettable( l, LUA_GLOBALSINDEX );
+// 5.1 -> 5.2
+//	lua_pushstring( l, "timeout_occured" );
+//	lua_gettable( l, LUA_GLOBALSINDEX );
+	lua_getglobal( l, "timeout_occured" );
 	int res = lua_pcall( l, 0, 0, 0 );
 	if( res != 0 ) {
 		LOG_FATAL << "Unable to call 'timeout_occured' function: " << lua_tostring( l, -1 );
@@ -342,8 +354,10 @@ void luaConnection::signalOccured()
 {
 	LOG_TRACE << "Processor received signal";
 
-	lua_pushstring( l, "signal_occured" );
-	lua_gettable( l, LUA_GLOBALSINDEX );
+// 5.1 -> 5.2
+//	lua_pushstring( l, "signal_occured" );
+//	lua_gettable( l, LUA_GLOBALSINDEX );
+	lua_getglobal( l, "signal_occured" );
 	int res = lua_pcall( l, 0, 0, 0 );
 	if( res != 0 ) {
 		LOG_FATAL << "Unable to call 'signal_occured' function: " << lua_tostring( l, -1 );
@@ -380,8 +394,10 @@ void luaConnection::errorOccured( NetworkSignal signal )
 
 	LOG_TRACE << "Got error '" << signal_s << "'";
 
-	lua_pushstring( l, "error_occured" );
-	lua_gettable( l, LUA_GLOBALSINDEX );
+// 5.1 -> 5.2
+//	lua_pushstring( l, "error_occured" );
+//	lua_gettable( l, LUA_GLOBALSINDEX );
+	lua_getglobal( l, "error_occured" );
 	lua_pushstring( l, signal_s );
 	int res = lua_pcall( l, 1, 0, 0 );
 	if( res != 0 ) {

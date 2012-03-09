@@ -145,9 +145,12 @@ bool LuaCommandConfig::Module::load( lua_State* ls) const
 			return false;
 		}
 		// register logging function already here because then it can be used in the script initilization part
-		lua_pushstring( ls, "printlog");
+// 5.1 -> 5.2
+//		lua_pushstring( ls, "printlog");
+//		lua_pushcfunction( ls, &function_printlog);
+//		lua_settable( ls, LUA_GLOBALSINDEX);
 		lua_pushcfunction( ls, &function_printlog);
-		lua_settable( ls, LUA_GLOBALSINDEX);
+		lua_setglobal( ls, "printlog");
 
 		// call main, we may have to initialize LUA modules there
 		if (lua_pcall( ls, 0, LUA_MULTRET, 0) != 0)
