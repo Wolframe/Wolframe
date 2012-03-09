@@ -98,25 +98,29 @@ void luaConnection::createVM( )
 		throw new std::runtime_error( "Can't initialize LUA processor" );
 	}
 
-// 5.1 -> 5.2 transition, for now we simply open all standard libraries and
-// remove the selection of loadable modules in lua.conf (better it is ignored)
-	luaL_openlibs( l );
+	// Open lua libraries based on configuration (from linit.c)
 
-	// Open lua libraries based on configuration, see
-	// http://stackoverflow.com/questions/966162/best-way-to-omit-lua-standard-libraries
+	// call open functions from 'loadedlibs' and set results to global table
 	for( std::list<std::string>::const_iterator it = config.preload_libs.begin( ); it != config.preload_libs.end( ); it++ ) {
 		std::map<std::string, LuaModuleDefinition>::const_iterator it2 = config.knownLuaModules.find( *it );
 		if( it2 != config.knownLuaModules.end( ) ) {
 			LOG_TRACE << "LUA initializing library '" << *it << "'";
-			lua_pushcfunction( l, it2->second.moduleInit );
-			lua_pushstring( l, it2->second.moduleName.c_str( ) );
-			lua_call( l, 1, 0 );
+			luaL_requiref( l, it2->second.moduleName.c_str( ), it2->second.moduleInit, 1 );
+			lua_pop( l, 1 ); // remove lib
 		} else {
 			// we should not get here! the configuration checked should croak before
 			LOG_FATAL << "Can't load unknown LUA library '" << *it << "'!";
 			throw new std::runtime_error( "Can't initialize LUA processor" );
 		}
 	}
+	// add open functions from 'preloadedlibs' into 'package.preload' table
+	luaL_getsubtable( l, LUA_REGISTRYINDEX, "_PRELOAD" );
+	for( std::list<std::string>::const_iterator it = config.preload_libs.begin( ); it != config.preload_libs.end( ); it++ ) {
+		std::map<std::string, LuaModuleDefinition>::const_iterator it2 = config.knownLuaModules.find( *it );
+		lua_pushcfunction( l, it2->second.moduleInit );
+		lua_setfield( l, -2, it2->second.moduleName.c_str( ) );
+	}
+	lua_pop( l, 1 ); // remove _PRELOAD table
 
 	// script location, also configurable
 	int res = luaL_loadfile( l, config.script.c_str( ) );
