@@ -69,7 +69,8 @@ OPENSSL_DIR = C:\Program Files (x86)\OpenSSL
 # take the VC2008 version SDK Opensource, not the MinGW one
 ############################################################
 
-QT_DIR = C:\Qt\4.7.3
+# TODO: must build a 32-bit version first
+#QT_DIR = C:\Qt\4.7.3
 #QT_DIR = /home/user/qt
 #QT_DIR = D:\Qt\4.7.2
 
@@ -77,9 +78,13 @@ QT_DIR = C:\Qt\4.7.3
 # (http://www.postgresql.org/)
 ##############################
 
-PGSQL_DIR = C:\Program Files\PostgreSQL\9.0
+PGSQL_DIR = C:\Program Files (x86)\PostgreSQL\9.0
+#PGSQL_DIR = C:\Program Files\PostgreSQL\9.0
 #PGSQL_DIR = D:\Program Files\PostgreSQL\9.0
-#PGSQL_DIR = C:\cygwin\home\Andreas\postgresql-9.0.4-win64-debug
+#PGSQL_DIR = C:\cygwin\home\Andreas\postgresql-9.0.4-win32-debug
+
+# enable depending on libintl.dll and libiconv.dll (deployment only)
+#PGDLL_WITHOUT_MAJOR_VERSION = 1
 
 # Tcl 8.5 and Expect
 ####################
@@ -96,6 +101,9 @@ EXPECT = $(TCL_DIR)\bin\tclsh.exe
 WIX_DIR = C:\Program Files (x86)\Windows Installer XML v3.5
 # @home PIII
 #WIX_DIR = C:\Program Files\Windows Installer XML v3.5
+
+WIX_LIBS = dutil_2008.lib wcautil_2008.lib
+#WIX_LIBS = dutil_2008_x64.lib wcautil_2008_x64.lib
 
 # Doxygen binary to generate API documentation (for docu and deployment)
 ########################################################################

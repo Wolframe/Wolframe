@@ -81,6 +81,9 @@ PGSQL_DIR = C:\Program Files\PostgreSQL\9.0
 #PGSQL_DIR = D:\Program Files\PostgreSQL\9.0
 #PGSQL_DIR = C:\cygwin\home\Andreas\postgresql-9.0.4-win64-debug
 
+# enable depending on libintl.dll and libiconv.dll (deployment only)
+PGDLL_WITHOUT_MAJOR_VERSION = 1
+
 # Tcl 8.5 and Expect
 ####################
 
@@ -96,6 +99,9 @@ EXPECT = $(TCL_DIR)\bin\tclsh.exe
 WIX_DIR = C:\Program Files (x86)\Windows Installer XML v3.5
 # @home PIII
 #WIX_DIR = C:\Program Files\Windows Installer XML v3.5
+
+#WIX_LIBS = dutil_2008.lib wcautil_2008.lib
+WIX_LIBS = dutil_2008_x64.lib wcautil_2008_x64.lib
 
 # Doxygen binary to generate API documentation (for docu and deployment)
 ########################################################################

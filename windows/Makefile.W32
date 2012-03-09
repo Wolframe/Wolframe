@@ -67,10 +67,11 @@ WIX_FLAGS = $(WIX_FLAGS) \
 	-dwith_xmllite=1
 !ENDIF
 
-# TODO: must be probed, as well as the major versions of libintl and libiconv
-# (or should it be rather in platform.mk?)
+# The name of libintl and libiconv are not always the same
+!IFDEF PGDLL_WITHOUT_MAJOR_VERSION
 WIX_FLAGS = $(WIX_FLAGS) \
 	-dpgdll_without_major_versions=1
+!ENDIF
 
 WIX_EXTENSIONS = \
 	-ext WixUIExtension -ext WixUtilExtension -ext WixFirewallExtension \

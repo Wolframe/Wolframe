@@ -13,10 +13,8 @@ INCLUDE_LDFLAGS = \
 	/LIBPATH:"$(WIX_DIR)\SDK\lib"
 
 # TODO: Httpapi.lib is only for the http-extension, drops out later,
-# library names of WIX libs depend on the version of visual studio
-# and the architecture of the machine
 INCLUDE_LIBS = \
-	dutil_2008_x64.lib wcautil_2008_x64.lib \
+	$(WIX_LIBS) \
 	msi.lib \
 	kernel32.lib advapi32.lib version.lib user32.lib \
 	Httpapi.lib

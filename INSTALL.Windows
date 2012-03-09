@@ -195,6 +195,15 @@ If your disable OpenSSL (for instance for debugging), you have
 to touch sslinfo.sql in contrib/sslinfo Dito for uuid-ossp.sql,
 pgxml.sql.in.
 
+Notes for 32-bit dependencies
+-----------------------------
+
+You can get gettext/libintl and other libraries from 
+
+http://gnuwin32.sourceforge.net/packages.html
+
+as packages.
+
 Documentation
 -------------
 
