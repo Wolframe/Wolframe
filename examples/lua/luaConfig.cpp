@@ -91,30 +91,46 @@ LuaConfiguration::LuaConfiguration()
 	: ConfigurationBase( "Lua Example Server", NULL, "Lua Example configuration " )
 {
 	LuaModuleDefinition x;
-	x.moduleName = "";
+
+	x.moduleName = "_G";
 	x.moduleInit = luaopen_base;
 	knownLuaModules["base"] = x;
-	x.moduleName = LUA_TABLIBNAME;
-	x.moduleInit = luaopen_table;
-	knownLuaModules[LUA_TABLIBNAME] = x;
-	x.moduleName = LUA_IOLIBNAME;
-	x.moduleInit = luaopen_io;
-	knownLuaModules[LUA_IOLIBNAME] = x;
-	x.moduleName = LUA_OSLIBNAME;
-	x.moduleInit = luaopen_os;
-	knownLuaModules[LUA_OSLIBNAME] = x;
-	x.moduleName = LUA_STRLIBNAME;
-	x.moduleInit = luaopen_string;
-	knownLuaModules[LUA_STRLIBNAME] = x;
-	x.moduleName = LUA_MATHLIBNAME;
-	x.moduleInit = luaopen_math;
-	knownLuaModules[LUA_MATHLIBNAME] = x;
-	x.moduleName = LUA_DBLIBNAME;
-	x.moduleInit = luaopen_debug;
-	knownLuaModules[LUA_DBLIBNAME] = x;
+
 	x.moduleName = LUA_LOADLIBNAME;
 	x.moduleInit = luaopen_package;
 	knownLuaModules[LUA_LOADLIBNAME] = x;
+
+	x.moduleName = LUA_COLIBNAME;
+	x.moduleInit = luaopen_coroutine;
+	knownLuaModules[LUA_COLIBNAME] = x;
+
+	x.moduleName = LUA_TABLIBNAME;
+	x.moduleInit = luaopen_table;
+	knownLuaModules[LUA_TABLIBNAME] = x;
+
+	x.moduleName = LUA_IOLIBNAME;
+	x.moduleInit = luaopen_io;
+	knownLuaModules[LUA_IOLIBNAME] = x;
+
+	x.moduleName = LUA_OSLIBNAME;
+	x.moduleInit = luaopen_os;
+	knownLuaModules[LUA_OSLIBNAME] = x;
+
+	x.moduleName = LUA_STRLIBNAME;
+	x.moduleInit = luaopen_string;
+	knownLuaModules[LUA_STRLIBNAME] = x;
+
+	x.moduleName = LUA_BITLIBNAME;
+	x.moduleInit = luaopen_bit32;
+	knownLuaModules[LUA_BITLIBNAME] = x;
+
+	x.moduleName = LUA_MATHLIBNAME;
+	x.moduleInit = luaopen_math;
+	knownLuaModules[LUA_MATHLIBNAME] = x;
+
+	x.moduleName = LUA_DBLIBNAME;
+	x.moduleInit = luaopen_debug;
+	knownLuaModules[LUA_DBLIBNAME] = x;
 }
 
 void LuaConfiguration::print( std::ostream& os, size_t /* indent */ ) const
