@@ -6,7 +6,8 @@
 # this is only relevant when building on https://build.opensuse.org
 ###
 
-%if 0%{?opensuse_bs}
+#neested ifs are not supported?
+#%if 0%{?opensuse_bs}
 
 %define rhel 0
 %define rhel4 0
@@ -75,7 +76,7 @@
 %define sles 1
 %endif
 
-%endif
+#%endif
 
 # define what to build
 ###
