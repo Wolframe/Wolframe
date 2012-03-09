@@ -47,6 +47,7 @@ namespace
 			//CHK_HR(pXMLErr->get_reason(&bstrErr));
 			//printf("Failed to load DOM from stocks.xml. %S\n", bstrErr);		}
 			std::cerr << "Error opening XML file" << std::endl;
+			//SAFE_RELEASE(pXMLErr);
 			VariantClear( &varFileName );
 			xmlDom->Release( );
 			return false;
@@ -57,6 +58,7 @@ namespace
 		//puts( OLE2A( xml ) );
 		
 		// cleanup
+		SysFreeString( xml );
 		VariantClear( &varFileName );
 		xmlDom->Release( );
 		
