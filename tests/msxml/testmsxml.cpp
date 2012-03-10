@@ -43,11 +43,12 @@ namespace
 		VARIANT_BOOL res = xmlDom->load( varFileName );
 		if( res != VARIANT_TRUE ) {
 			// Failed to load xml, get last parsing error
-			//xmlDom->get_parseError(&pXMLErr));
-			//CHK_HR(pXMLErr->get_reason(&bstrErr));
-			//printf("Failed to load DOM from stocks.xml. %S\n", bstrErr);		}
-			std::cerr << "Error opening XML file" << std::endl;
-			//SAFE_RELEASE(pXMLErr);
+			MSXML2::IXMLDOMParseError *xmlErr = NULL;			
+			BSTR err = NULL;
+			xmlDom->get_parseError( &xmlErr );
+			xmlErr->get_reason( &err );
+			std::cerr << "Error opening XML file: " << OLE2A( err ) << std::endl;
+			SysFreeString( err );
 			VariantClear( &varFileName );
 			xmlDom->Release( );
 			return false;
