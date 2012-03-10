@@ -61,7 +61,6 @@ public:
 	LuaCommandConfig( const std::string& main_, const std::string& mainmodule_, const std::vector<std::string>& modules_=std::vector<std::string>())
 		:m_main(main_)
 		,m_mainmodule( mainmodule_, Module::Script)
-		,m_cthread_stacksize(2048)
 	{
 		std::vector<std::string>::const_iterator itr=modules_.begin(),end=modules_.end();
 		for (;itr!=end; ++itr)
@@ -95,8 +94,7 @@ public:
 		{
 			Undefined,	///< unknown (cannot be loaded)
 			Script,		///< lua script with helper functions
-			PreloadLib,	///< one of the lua preload core library
-			UserLib		///< a user defined library
+			UserLib		///< a library
 		};
 		///\brief returns the module type 't' as descriptive string for an error or status message
 		static const char* typeName( Type t)	{const char* ar[3] = {"undefined", "script", "preloaded library"}; return ar[t];}
@@ -142,14 +140,10 @@ public:
 	///\brief return the list of modules without the main
 	const std::vector<Module>& modules() const	{return m_modules;}
 
-	///\brief return stack size in bytes of lua c thread executing command
-	std::size_t cthread_stacksize() const		{return m_cthread_stacksize;}
-
 private:
 	std::string m_main;				///< main function
 	Module m_mainmodule;				///< main module
 	std::vector<Module> m_modules;			///< list of modules without the main
-	std::size_t m_cthread_stacksize;		///< stack size in bytes of lua c thread executing command
 };
 
 }}//namespace

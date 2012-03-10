@@ -50,31 +50,12 @@ extern "C" {
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
-static LuaCommandConfig::ModuleLoad getLuaModuleEntryFunc( const char* name)
-{
-	if (strcmp(name,LUA_TABLIBNAME) == 0) return luaopen_table;
-	if (strcmp(name,LUA_IOLIBNAME) == 0) return luaopen_io;
-	if (strcmp(name,LUA_OSLIBNAME) == 0) return luaopen_os;
-	if (strcmp(name,LUA_STRLIBNAME) == 0) return luaopen_string;
-	if (strcmp(name,LUA_MATHLIBNAME) == 0) return luaopen_math;
-	if (strcmp(name,LUA_DBLIBNAME) == 0) return luaopen_debug;
-	if (strcmp(name,LUA_LOADLIBNAME) == 0) return luaopen_package;
-	return 0;
-}
-
 void LuaCommandConfig::Module::setType()
 {
 	if (m_type == LuaCommandConfig::Module::Undefined)
 	{
-		m_load = getLuaModuleEntryFunc( m_name.c_str());
-		if (m_load)
-		{
-			m_type = PreloadLib;
-		}
-		else
-		{
-			m_type = Script;
-		}
+		///TODO: Implement user defined modules
+		m_type = Script;
 	}
 }
 
@@ -115,18 +96,7 @@ static int function_printlog( lua_State *ls)
 
 bool LuaCommandConfig::Module::load( lua_State* ls) const
 {
-	if (m_type == PreloadLib && m_load)
-	{
-		if (m_load == luaopen_table)
-		{
-			LOG_INFO << "Defined module " << LUA_TABLIBNAME << " in configuration that is loaded by default";
-		}
-		else
-		{
-			m_load(ls);
-		}
-	}
-	else if (m_type == UserLib)
+	if (m_type == UserLib)
 	{
 		lua_pushcfunction( ls, m_load);
 		lua_pushstring( ls, m_name.c_str());
@@ -145,10 +115,6 @@ bool LuaCommandConfig::Module::load( lua_State* ls) const
 			return false;
 		}
 		// register logging function already here because then it can be used in the script initilization part
-// 5.1 -> 5.2
-//		lua_pushstring( ls, "printlog");
-//		lua_pushcfunction( ls, &function_printlog);
-//		lua_settable( ls, LUA_GLOBALSINDEX);
 		lua_pushcfunction( ls, &function_printlog);
 		lua_setglobal( ls, "printlog");
 
@@ -171,8 +137,12 @@ bool LuaCommandConfig::Module::check() const
 {
 	switch (m_type)
 	{
-		case PreloadLib:
 		case UserLib:
+			if (!boost::filesystem::exists( m_name))
+			{
+				LOG_ERROR << "Library " << m_name << "does not exist";
+				return false;
+			}
 			break;
 		case Script:
 			if (!boost::filesystem::exists( m_name))
@@ -189,19 +159,18 @@ bool LuaCommandConfig::Module::check() const
 
 bool LuaCommandConfig::load( lua_State *ls) const
 {
-	luaopen_base( ls);
-	luaopen_table( ls);
+	luaL_openlibs( ls);
 
 	for (std::vector<Module>::const_iterator it = m_modules.begin(); it != m_modules.end(); it++)
 	{
-		if (it->type() == Module::PreloadLib)
+		if (it->type() == Module::UserLib)
 		{
 			if (!it->load( ls)) return false;
 		}
 	}
 	for (std::vector<Module>::const_iterator it = m_modules.begin(); it != m_modules.end(); it++)
 	{
-		if (it->type() != Module::PreloadLib)
+		if (it->type() == Module::Script)
 		{
 			if (!it->load( ls)) return false;
 		}

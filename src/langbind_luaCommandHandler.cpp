@@ -41,8 +41,6 @@ Project Wolframe.
 
 extern "C"
 {
-// 5.1 -> 5.2, this is really bad, new module concept
-#define LUA_COMPAT_MODULE
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
@@ -90,48 +88,38 @@ struct LuaObject :public ObjectType
 		return 0;
 	}
 
-	static void create( lua_State* ls, lua_CFunction indexf, lua_CFunction newindexf)
+	static void createMetatable( lua_State* ls, lua_CFunction indexf, lua_CFunction newindexf, const luaL_Reg* mt)
 	{
-		luaL_openlib( ls, metaTableName<ObjectType>(), empty_methodtable, 0);
 		luaL_newmetatable( ls, metaTableName<ObjectType>());
-		luaL_openlib( ls, 0, getMetamethods(), 0);
-
-		lua_pushliteral( ls, "__metatable");
-		lua_pushvalue( ls, -3);			//dup methods table
-		lua_rawset( ls, -3);			//hide metatable: metatable.__metatable = methods
 		lua_pushliteral( ls, "__index");
-		lua_pushcfunction( ls, indexf);
+		if (indexf)
+		{
+			lua_pushcfunction( ls, indexf);
+		}
+		else
+		{
+			lua_pushvalue( ls, -2);
+		}
 		lua_rawset( ls, -3);
+
 		lua_pushliteral( ls, "__newindex");
-		lua_pushcfunction( ls, newindexf);
+		if (newindexf)
+		{
+			lua_pushcfunction( ls, newindexf);
+		}
+		else
+		{
+			lua_pushvalue( ls, -2);
+		}
+		lua_rawset( ls, -3);
+
+		if (mt) luaL_setfuncs( ls, mt, 0);
+
+		lua_pushliteral( ls, "__gc");
+		lua_pushcfunction( ls, destroy);
 		lua_rawset( ls, -3);
 
 		lua_pop( ls, 1);
-	}
-
-	static void create( lua_State* ls, const luaL_Reg* mt=0)
-	{
-		luaL_openlib( ls, metaTableName<ObjectType>(), mt?mt:empty_methodtable, 0);
-		luaL_newmetatable( ls, metaTableName<ObjectType>());
-		luaL_openlib( ls, 0, getMetamethods(), 0);
-
-		lua_pushliteral( ls, "__metatable");
-		lua_pushvalue( ls, -3);			//dup methods table
-		lua_rawset( ls, -3);			//hide metatable: metatable.__metatable = methods
-		lua_pushliteral( ls, "__index");
-		lua_pushvalue( ls, -3);		//dup methods table
-		lua_rawset( ls, -3);
-		lua_pushliteral( ls, "__newindex");
-		lua_pushvalue( ls, -3);		//dup methods table
-		lua_rawset( ls, -3);
-
-		lua_pop( ls, 1);
-	}
-
-	static const luaL_Reg* getMetamethods()
-	{
-		static luaL_Reg ar[2] = {{"__gc", destroy},{0,0}};
-		return ar;
 	}
 
 	void* operator new (std::size_t num_bytes, lua_State* ls) throw (std::bad_alloc)
@@ -176,7 +164,7 @@ struct LuaObject :public ObjectType
 
 	static void createGlobal( lua_State* ls, const char* name, const ObjectType& instance, const luaL_Reg* mt=0)
 	{
-		create( ls, mt);
+		createMetatable( ls, 0, 0, mt);
 		new (ls) LuaObject( instance);
 		luaL_getmetatable( ls, metaTableName<ObjectType>());
 		lua_setmetatable( ls, -2);
@@ -319,29 +307,25 @@ static int function_inputFilter( lua_State* ls)
 	unsigned int itemsize[2];
 	InputFilterClosure* closure = (InputFilterClosure*)lua_touserdata( ls, lua_upvalueindex( 1));
 
-	for (;;)
+	switch (closure->fetch( item[1]/*tag*/, itemsize[1], item[0]/*val*/, itemsize[0]))
 	{
-		switch (closure->fetch( item[1]/*tag*/, itemsize[1], item[0]/*val*/, itemsize[0]))
-		{
-			case InputFilterClosure::DoYield:
-				lua_yield( ls, 0);
-				continue;
+		case InputFilterClosure::DoYield:
+			lua_yieldk( ls, 0, 1, function_inputFilter);
 
-			case InputFilterClosure::EndOfData:
-				return 0;
+		case InputFilterClosure::EndOfData:
+			return 0;
 
-			case InputFilterClosure::Error:
-				luaL_error( ls, "error in iterator");
-				return 0;
+		case InputFilterClosure::Error:
+			luaL_error( ls, "error in iterator");
+			return 0;
 
-			case InputFilterClosure::Data:
-				pushItem( ls, item[0], itemsize[0]);
-				pushItem( ls, item[1], itemsize[1]);
-				return 2;
-		}
-		luaL_error( ls, "illegal state produced by input filter");
-		return 0;
+		case InputFilterClosure::Data:
+			pushItem( ls, item[0], itemsize[0]);
+			pushItem( ls, item[1], itemsize[1]);
+			return 2;
 	}
+	luaL_error( ls, "illegal state produced by input filter");
+	return 0;
 }
 
 static const char* get_printop( lua_State* ls, int index, std::size_t& size)
@@ -379,25 +363,21 @@ static int function_output_print( lua_State* ls)
 		return luaL_error( ls, "too many arguments in call of output filter print");
 	}
 
-	for (;;)
+	switch (output->print( item[1]/*tag*/, itemsize[1], item[0]/*val*/, itemsize[0]))
 	{
-		switch (output->print( item[1]/*tag*/, itemsize[1], item[0]/*val*/, itemsize[0]))
-		{
-			case Output::DoYield:
-				lua_yield( ls, 0);
-				continue;
+		case Output::DoYield:
+			lua_yieldk( ls, 0, 1, function_output_print);
 
-			case Output::Error:
-				msg = output->m_outputfilter->getLastError();
-				luaL_error( ls, "error in output filter print (%s)", msg?msg:"unknown");
-				return 0;
+		case Output::Error:
+			msg = output->m_outputfilter->getLastError();
+			luaL_error( ls, "error in output filter print (%s)", msg?msg:"unknown");
+			return 0;
 
-			case Output::Data:
-				return 0;
-		}
-		luaL_error( ls, "illegal state produced by output filter print");
-		return 0;
+		case Output::Data:
+			return 0;
 	}
+	luaL_error( ls, "illegal state produced by output filter print");
+	return 0;
 }
 
 static const luaL_Reg filter_methodtable[ 3] =
@@ -503,7 +483,7 @@ static int function_yield( lua_State* ls)
 {
 	int ii,nn=lua_gettop( ls);
 	for (ii=0; ii<nn; ii++) lua_pushvalue( ls, ii);
-	return lua_yield( ls, ii);
+	return lua_yieldk( ls, ii, 1, function_yield);
 }
 
 static const luaL_Reg input_methodtable[ 3] =
@@ -522,18 +502,8 @@ static const luaL_Reg output_methodtable[ 4] =
 
 static void create_global_functions( lua_State* ls)
 {
-// 5.1 -> 5.2
-	//yield( )
-//	lua_pushliteral( ls, "yield");
-//	lua_pushcfunction( ls, &function_yield);
-//	lua_settable( ls, LUA_GLOBALSINDEX);
 	lua_pushcfunction( ls, &function_yield);
 	lua_setglobal( ls, "yield");
-
-	//filter( )
-//	lua_pushliteral( ls, "filter");
-//	lua_pushcfunction( ls, &function_filter);
-//	lua_settable( ls, LUA_GLOBALSINDEX);
 	lua_pushcfunction( ls, &function_filter);
 	lua_setglobal( ls, "filter");
 }
@@ -565,8 +535,8 @@ LuaCommandHandler::LuaCommandHandler( const LuaCommandConfig* config)
 	m_globals.m_output.m_outputfilter = m_outputfilter;
 	LuaObject<Input>::createGlobal( m_context->ls, "input", m_globals.m_input, input_methodtable);
 	LuaObject<Output>::createGlobal( m_context->ls, "output", m_globals.m_output, output_methodtable);
-	LuaObject<Filter>::create( m_context->ls, &function__LuaObject__index<Filter>, &function__LuaObject__newindex<Filter>);
-	LuaObject<InputFilterClosure>::create( m_context->ls);
+	LuaObject<Filter>::createMetatable( m_context->ls, &function__LuaObject__index<Filter>, &function__LuaObject__newindex<Filter>, 0);
+	LuaObject<InputFilterClosure>::createMetatable( m_context->ls, 0, 0, 0);
 	create_global_functions( m_context->ls);
 }
 
@@ -583,27 +553,11 @@ LuaCommandHandler::CallResult LuaCommandHandler::call( int& errorCode)
 	if (!m_context->thread)
 	{
 		// create thread for the call execution
-// 5.1+Coco -> 5.2
-//		m_context->thread = lua_newcthread( m_context->ls, m_config->cthread_stacksize());
 		m_context->thread = lua_newthread( m_context->ls);
 
 		// prevent garbage collecting of thread (http://permalink.gmane.org/gmane.comp.lang.lua.general/22680)
 		lua_pushvalue( m_context->ls, -1);
 		m_context->threadref = luaL_ref( m_context->ls, LUA_REGISTRYINDEX);
-
-		// (http://medek.wordpress.com/page/2/)
-		// create a local environment with a link to global environment via the '__index' metamethod
-		lua_newtable( m_context->ls);
-		lua_pushvalue( m_context->ls, -1);
-		lua_setmetatable( m_context->ls, -2); //Set itself as metatable
-// 5.1 -> 5.2 http://lua-list.2524044.n2.nabble.com/Lua-5-2-amp-SWIG-compatibility-problem-td7135702.html
-//		lua_pushvalue( m_context->ls, LUA_GLOBALSINDEX);
-		lua_getglobal( m_context->ls, "_G");
-		lua_setfield( m_context->ls, -2, "__index");
-// 5.1 -> 5.2
-//		lua_setfenv( m_context->ls, -2);
-		lua_setuservalue( m_context->ls, -2);
-		lua_pop( m_context->ls, 1);
 
 		if (m_inputfilter.get())
 		{
@@ -632,13 +586,11 @@ LuaCommandHandler::CallResult LuaCommandHandler::call( int& errorCode)
 		{
 			lua_pushlstring( m_context->thread, itr->c_str(), itr->size());
 		}
-// 5.1 -> 5.2
 		rt = lua_resume( m_context->thread, NULL, m_argBuffer.size());
 	}
 	else
 	{
 		// call the function (subsequently until termination)
-// 5.1 -> 5.2
 		rt = lua_resume( m_context->thread, NULL, 0);
 	}
 	if (rt == LUA_YIELD)
