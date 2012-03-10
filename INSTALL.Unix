@@ -44,7 +44,7 @@ Prerequisites
 - GNU make (preferably 3.82 or newer)
 - boost 1.43.0 or later
 - optionally (WITH_SSL) openssl 0.9.7 or later
-- optionally (WITH_LUA) lua 5.1.4 with LuaCoco-1.1.6
+- optionally (WITH_LUA) lua 5.2
   (integrated in subdir 'lua')
 - for the optional Qt client
   - optionally (WITH_QT) Qt 4, 4.5.x or later
@@ -365,7 +365,6 @@ boost is 1.42, only missing some new filesystem stuff, but you'll have to
 compile your own one.
 
 openssl and qt are there (select the correct "disk" sets while installing)
-Lua is missing, compile your own one.
 
 PAM doesn't exist on Slackware it may be build manually.
 Postgresql doesn't exist on Slackware, build your own one:

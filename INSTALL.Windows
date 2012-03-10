@@ -27,7 +27,7 @@ Prerequisites
   as part of the SDK, copy it into the path
 - boost 1.43.0 or later
 - optionally (WITH_SSL) openssl 0.9.8 or later
-- optionally (WITH_LUA) lua 5.1.4 with LuaCoco-1.1.6
+- optionally (WITH_LUA) lua 5.2
   (integrated in subdir 'lua')
 - optionally (WITH_QT) Qt 4, 4.5.x or later
 - for database support
