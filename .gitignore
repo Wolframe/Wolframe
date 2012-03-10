@@ -94,3 +94,5 @@ examples/tproc/tests/temp/
 *.wixobj
 *.wixpdb
 *.msi
+*.tlh
+*.tli

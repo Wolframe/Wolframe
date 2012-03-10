@@ -8,11 +8,18 @@ SUBDIRS = modules AAAA
 #	$(SUBDIRS) expect
 #!ENDIF
 
+# MSXML
+!IFDEF WITH_MSXML
+SUBDIRS = \
+	$(SUBDIRS) msxml
+!ENDIF
+
 # XMLLite
 !IFDEF WITH_XMLLITE
 SUBDIRS = \
 	$(SUBDIRS) xmllite
 !ENDIF
+
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 

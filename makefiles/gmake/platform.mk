@@ -115,6 +115,16 @@ else
 LIBS_DL =
 endif
 
+# Note for dlopen to work (at least on FreeBSD) with rtti information we have to export all symbols
+# in the binary and in the modules (see http://stackoverflow.com/questions/2351786/dynamic-cast-fails-when-used-with-dlopen-dlsym)
+LDFLAGS_DL =
+ifeq "$(PLATFORM)" "LINUX"
+LDFLAGS_DL = -Wl,-E
+endif
+ifeq "$(PLATFORM)" "FREEBSD"
+LDFLAGS_DL = -Wl,-E
+endif
+
 # i18n, gettext/libintl
 #######################
 
@@ -141,11 +151,9 @@ LDFLAGS_LT = -L$(LIBLT_DIR)/lib
 LIBS_LT = -lintl
 endif
 
-# Note for dlopen to work (at least on FreeBSD) with rtti information we have to export all symbols
-# in the binary and in the modules (see http://stackoverflow.com/questions/2351786/dynamic-cast-fails-when-used-with-dlopen-dlsym)
 ifeq "$(PLATFORM)" "FREEBSD"
 INCLUDE_FLAGS_LT = -I/usr/local/include
-LDFLAGS_LT = -L/usr/local/lib -Wl,-E
+LDFLAGS_LT = -L/usr/local/lib
 LIBS_LT = -lintl
 endif
 
@@ -232,6 +240,10 @@ endif
 
 # Ubuntu
 ifeq "$(LINUX_DIST)" "ubuntu"
+
+ifeq "$(LINUX_REV)" "12.04"
+XSLT_MAN_STYLESHEET ?= /usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl
+endif
 
 ifeq "$(LINUX_REV)" "11.10"
 XSLT_MAN_STYLESHEET ?= /usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl
@@ -326,6 +338,13 @@ endif
 
 # Ubuntu
 ifeq "$(LINUX_DIST)" "ubuntu"
+
+ifeq "$(LINUX_REV)" "12.04"
+BOOST_DIR ?= /usr
+BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
+BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
+BOOST_LIBRARY_TAG ?=
+endif
 
 ifeq "$(LINUX_REV)" "11.10"
 BOOST_DIR ?= /usr
@@ -667,6 +686,13 @@ endif
 
 ifeq "$(LINUX_DIST)" "ubuntu"
 
+ifeq "$(LINUX_REV)" "12.04"
+QT_DIR ?= /usr
+QT_INCLUDE_DIR ?= $(QT_DIR)/include/qt4
+QT_LIB_DIR ?= $(QT_DIR)/lib
+QT_MOC ?= $(QT_DIR)/bin/moc
+endif
+
 ifeq "$(LINUX_REV)" "11.10"
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include/qt4
@@ -806,6 +832,13 @@ endif
 # Ubuntu
 
 ifeq "$(LINUX_DIST)" "ubuntu"
+
+ifeq "$(LINUX_REV)" "12.04"
+PAM_DIR ?= /usr
+PAM_INCLUDE_DIR ?= $(PAM_DIR)/include
+PAM_LIB_DIR ?= /lib
+PAM_LIBS ?= -lpam
+endif
 
 ifeq "$(LINUX_REV)" "11.10"
 PAM_DIR ?= /usr
@@ -977,6 +1010,13 @@ endif
 # Ubuntu
 
 ifeq "$(LINUX_DIST)" "ubuntu"
+
+ifeq "$(LINUX_REV)" "12.04"
+SASL_DIR ?= /usr
+SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
+SASL_LIB_DIR ?= $(SASL_DIR)/lib
+SASL_LIBS ?= -lsasl2
+endif
 
 ifeq "$(LINUX_REV)" "11.10"
 SASL_DIR ?= /usr
@@ -1150,6 +1190,13 @@ endif
 # Ubuntu
 
 ifeq "$(LINUX_DIST)" "ubuntu"
+
+ifeq "$(LINUX_REV)" "12.04"
+SQLITE3_DIR ?= /usr
+SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
+SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
+SQLITE3_LIBS ?= -lsqlite3
+endif
 
 ifeq "$(LINUX_REV)" "11.10"
 SQLITE3_DIR ?= /usr
@@ -1333,6 +1380,15 @@ endif
 
 # Ubuntu
 ifeq "$(LINUX_DIST)" "ubuntu"
+
+ifeq "$(LINUX_REV)" "12.04"
+PGSQL_DIR ?= /usr
+PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include/postgresql
+PGSQL_INCLUDE_DIRS = -I$(PGSQL_INCLUDE_DIR)
+PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
+PGSQL_LIB_DIRS = -L$(PGSQL_LIB_DIR)
+PGSQL_LIBS ?= -lpq
+endif
 
 ifeq "$(LINUX_REV)" "11.10"
 PGSQL_DIR ?= /usr
@@ -1534,6 +1590,15 @@ endif
 # Ubuntu
 
 ifeq "$(LINUX_DIST)" "ubuntu"
+
+ifeq "$(LINUX_REV)" "12.04"
+LIBXML2_DIR ?= /usr
+LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
+LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
+LIBXML2_LIB_DIR ?= $(LIBXML2_DIR)/lib
+LIBXML2_LIB_DIRS = -L$(LIBXML2_LIB_DIR)
+LIBXML2_LIBS ?= -lxml2
+endif
 
 ifeq "$(LINUX_REV)" "11.10"
 LIBXML2_DIR ?= /usr
@@ -1743,6 +1808,15 @@ endif
 # Ubuntu
 
 ifeq "$(LINUX_DIST)" "ubuntu"
+
+ifeq "$(LINUX_REV)" "12.04"
+LIBXSLT_DIR ?= /usr
+LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
+LIBXSLT_INCLUDE_DIRS = -I$(LIBXSLT_INCLUDE_DIR)
+LIBXSLT_LIB_DIR ?= $(LIBXSLT_DIR)/lib
+LIBXSLT_LIB_DIRS = -L$(LIBXSLT_LIB_DIR)
+LIBXSLT_LIBS ?= -lxslt
+endif
 
 ifeq "$(LINUX_REV)" "11.10"
 LIBXSLT_DIR ?= /usr

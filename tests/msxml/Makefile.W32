@@ -1,0 +1,40 @@
+TOPDIR = ..\..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_CXXFLAGS = \
+	/D_WIN32_WINNT=0x504
+
+INCLUDE_DIRS = \
+	/I. \
+	/I"$(PLATFORM_SDK_DIR)\Include"
+
+# Note: libraries are picked automatically on Windows!
+INCLUDE_LDFLAGS = \
+	$(SDK_LDFLAGS)
+
+INCLUDE_LIBS = \
+	ole32.lib
+
+TEST_CPP_BINS = \
+	testmsxml.exe
+
+all: $(OBJS) $(CPP_BINS)
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+testmsxml.exe: testmsxml.obj
+
+local_all:
+
+local_clean:
+	@-erase test.bat 2>NUL
+
+local_distclean:
+
+local_test:
+	@-echo @echo off > test.bat
+	@-echo testmsxml test.xml >> test.bat
+	@-test.bat
