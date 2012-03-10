@@ -51,6 +51,7 @@
 #include <vector>
 #include <fstream>
 #include <iostream>
+#include <algorithm>
 
 using namespace _Wolframe;
 using namespace _Wolframe::tproc;
@@ -126,13 +127,13 @@ static const char* check_flag( const std::string& flag)
 	return "";
 }
 
-static void readFile( const boost::filesystem::path& pt, std::vector<std::string>& hdr, std::vector<std::string>& out, std::string& requires)
+static void readFile( const std::string& pt, std::vector<std::string>& hdr, std::vector<std::string>& out, std::string& requires)
 {
 	std::string element;
 	char chb;
 	std::fstream infh;
 	infh.exceptions( std::ifstream::failbit | std::ifstream::badbit);
-	infh.open( pt.string().c_str(), std::ios::in | std::ios::binary);
+	infh.open( pt.c_str(), std::ios::in | std::ios::binary);
 	std::string splitstr;
 	std::string::const_iterator splititr;
 	enum
@@ -248,15 +249,15 @@ static void readFile( const boost::filesystem::path& pt, std::vector<std::string
 	throw std::runtime_error( "no end tag at end of file");
 }
 
-static void writeFile( const boost::filesystem::path& pt, const std::string& content)
+static void writeFile( const std::string& pt, const std::string& content)
 {
-	std::fstream ff( pt.string().c_str(), std::ios::out | std::ios::binary);
+	std::fstream ff( pt.c_str(), std::ios::out | std::ios::binary);
 	ff.exceptions( std::ifstream::failbit | std::ifstream::badbit);
 	ff.write( content.c_str(), content.size());
 }
 
 
-static const TestDescription getTestDescription( const boost::filesystem::path& pt)
+static const TestDescription getTestDescription( const std::string& pt)
 {
 	TestDescription rt;
 	std::vector<std::string> header;
@@ -285,7 +286,7 @@ static const TestDescription getTestDescription( const boost::filesystem::path& 
 			std::string filename( hi->c_str()+std::strlen("file:"));
 			boost::trim( filename);
 			boost::filesystem::path fn( boost::filesystem::current_path() / "temp" / filename);
-			writeFile( fn, *itr);
+			writeFile( fn.string(), *itr);
 		}
 	}
 	return rt;
@@ -370,39 +371,46 @@ TEST_F( TProcHandlerTest, tests)
 	enum {NOF_IB=6,NOF_OB=4};
 	std::size_t ib[] = {127,1,2,3,5,7};
 	std::size_t ob[] = {127,1,2,5};
+	std::vector<std::string> tests;
 
-	boost::filesystem::recursive_directory_iterator itr( boost::filesystem::current_path() / "data"), end;
+	boost::filesystem::recursive_directory_iterator ditr( boost::filesystem::current_path() / "data"), dend;
+	for (; ditr != dend; ++ditr)
+	{
+		if (boost::iequals( boost::filesystem::extension( *ditr), ".tst"))
+		{
+			tests.push_back( ditr->path().string());
+		}
+		else if (!boost::filesystem::is_directory( *ditr))
+		{
+			std::cerr << "ignoring file '" << *ditr << "'" << std::endl;
+		}
+	}
+	std::sort( tests.begin(), tests.end());
 
+	std::vector<std::string>::const_iterator itr=tests.begin(),end=tests.end();
 	for (; itr != end; ++itr)
 	{
-		if (boost::iequals( boost::filesystem::extension( *itr), ".tst"))
-		{
-			boost::filesystem::remove_all( boost::filesystem::current_path() / "temp" );
-			boost::filesystem::create_directory( boost::filesystem::current_path() / "temp");
+		boost::filesystem::remove_all( boost::filesystem::current_path() / "temp" );
+		boost::filesystem::create_directory( boost::filesystem::current_path() / "temp");
 
-			const TestDescription td = getTestDescription( *itr);
-			if (td.requires.size())
-			{
-				std::cerr << "skipping test '" << *itr << "' ( is " << td.requires << ")" << std::endl;
-				continue;
-			}
-			std::cerr << "processing test '" << *itr << "'" << std::endl;
-			for (int ii=0; ii<NOF_IB; ii++)
-			{
-				for (int oo=0; oo<NOF_OB; oo++)
-				{
-					TProcHandlerTestInstance test( td, ib[ii], ob[oo]);
-					int trt = test.run();
-					if (trt != 0) boost::this_thread::sleep( boost::posix_time::seconds( 1 ) );
-					EXPECT_EQ( 0, trt);
-					if (test.expected() != test.output()) boost::this_thread::sleep( boost::posix_time::seconds( 1 ) );
-					EXPECT_EQ( test.expected(), test.output());
-				}
-			}
-		}
-		else if (!boost::filesystem::is_directory( *itr))
+		const TestDescription td = getTestDescription( *itr);
+		if (td.requires.size())
 		{
-			std::cerr << "ignoring file '" << *itr << "'" << std::endl;
+			std::cerr << "skipping test '" << *itr << "' ( is " << td.requires << ")" << std::endl;
+			continue;
+		}
+		std::cerr << "processing test '" << *itr << "'" << std::endl;
+		for (int ii=0; ii<NOF_IB; ii++)
+		{
+			for (int oo=0; oo<NOF_OB; oo++)
+			{
+				TProcHandlerTestInstance test( td, ib[ii], ob[oo]);
+				int trt = test.run();
+				if (trt != 0) boost::this_thread::sleep( boost::posix_time::seconds( 1 ) );
+				EXPECT_EQ( 0, trt);
+				if (test.expected() != test.output()) boost::this_thread::sleep( boost::posix_time::seconds( 1 ) );
+				EXPECT_EQ( test.expected(), test.output());
+			}
 		}
 	}
 }
