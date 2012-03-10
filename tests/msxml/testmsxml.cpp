@@ -8,6 +8,24 @@
 
 namespace
 {
+	bool CreateAndInitDom( MSXML2::IXMLDOMDocument **xmlDom )
+	{
+		HRESULT h;
+		
+		h = CoCreateInstance( __uuidof( MSXML2::DOMDocument60 ), NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS( xmlDom ) );
+		if( FAILED( h ) ) {
+			std::cerr << "Error creating and initializing DOM, error is " << h << std::endl;
+			return false;
+		}
+	
+		// these methods should not fail so don't inspect result
+		(*xmlDom)->put_async( VARIANT_FALSE );  
+		(*xmlDom)->put_validateOnParse( VARIANT_FALSE );
+		(*xmlDom)->put_resolveExternals( VARIANT_FALSE );
+		
+		return true;
+	}
+
 	bool LoadXmlFile( MSXML2::IXMLDOMDocument *xmlDom, LPCSTR filename )
 	{
 		HRESULT h;
@@ -47,16 +65,9 @@ namespace
 		HRESULT h;
 		MSXML2::IXMLDOMDocument *xmlDom = NULL;
     
-		h = CoCreateInstance( __uuidof( MSXML2::DOMDocument60 ), NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS( &xmlDom ) );
-		if( FAILED( h ) ) {
-			std::cerr << "Error creating and initializing DOM, error is " << h << std::endl;
+		if( !CreateAndInitDom( &xmlDom ) ) {
 			return false;
 		}
-		
-		// these methods should not fail so don't inspect result
-		xmlDom->put_async( VARIANT_FALSE );  
-		xmlDom->put_validateOnParse( VARIANT_FALSE );
-		xmlDom->put_resolveExternals( VARIANT_FALSE );
 
 		// load XML file
 		if( !LoadXmlFile( xmlDom, filename ) ) {
