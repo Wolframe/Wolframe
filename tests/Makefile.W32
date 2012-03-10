@@ -11,7 +11,7 @@ SUBDIRS = modules AAAA
 # MSXML
 !IFDEF WITH_MSXML
 SUBDIRS = \
-	$(SUBDIRS) msxml
+	$(SUBDIRS) msxml msxslt
 !ENDIF
 
 # XMLLite

@@ -8,6 +8,24 @@
 
 namespace
 {
+	bool CreateAndInitDom( MSXML2::IXMLDOMDocument **xmlDom )
+	{
+		HRESULT h;
+		
+		h = CoCreateInstance( __uuidof( MSXML2::DOMDocument60 ), NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS( xmlDom ) );
+		if( FAILED( h ) ) {
+			std::cerr << "Error creating and initializing DOM, error is " << h << std::endl;
+			return false;
+		}
+	
+		// these methods should not fail so don't inspect result
+		(*xmlDom)->put_async( VARIANT_FALSE );  
+		(*xmlDom)->put_validateOnParse( VARIANT_FALSE );
+		(*xmlDom)->put_resolveExternals( VARIANT_FALSE );
+		
+		return true;
+	}
+
 	bool LoadXmlFile( MSXML2::IXMLDOMDocument *xmlDom, LPCSTR filename )
 	{
 		HRESULT h;
@@ -38,38 +56,49 @@ namespace
 			VariantClear( &varFileName );
 			return false;
 		}
+
+		VariantClear( &varFileName );
 		
 		return true;
 	}
 
-	bool example1Func( const _TCHAR *filename )
+	bool example1Func( const _TCHAR *xsltFilename, const _TCHAR *xmlFilename )
 	{
 		HRESULT h;
 		MSXML2::IXMLDOMDocument *xmlDom = NULL;
-    
-		h = CoCreateInstance( __uuidof( MSXML2::DOMDocument60 ), NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS( &xmlDom ) );
-		if( FAILED( h ) ) {
-			std::cerr << "Error creating and initializing DOM, error is " << h << std::endl;
-			return false;
-		}
-		
-		// these methods should not fail so don't inspect result
-		xmlDom->put_async( VARIANT_FALSE );  
-		xmlDom->put_validateOnParse( VARIANT_FALSE );
-		xmlDom->put_resolveExternals( VARIANT_FALSE );
+		MSXML2::IXMLDOMDocument *xsltDoc = NULL;
 
-		// load XML file
-		if( !LoadXmlFile( xmlDom, filename ) ) {
-			xmlDom->Release( );
+		if( !CreateAndInitDom( &xmlDom ) ) {
 			return false;
 		}
 				
-		BSTR xml = NULL;
-		xmlDom->get_xml( &xml );
-		//puts( OLE2A( xml ) );
+		// load XML file
+		if( !LoadXmlFile( xmlDom, xmlFilename ) ) {
+			xmlDom->Release( );
+			return false;
+		}
+
+		if( !CreateAndInitDom( &xsltDoc ) ) {
+			xmlDom->Release( );
+			return false;
+		}
+		
+		// load XSLT filename
+		if( !LoadXmlFile( xsltDoc, xsltFilename ) ) {
+			xmlDom->Release( );
+			return false;
+		}
+
+		USES_CONVERSION;
+		
+		BSTR html = NULL;
+		html = xmlDom->transformNode( xsltDoc );
+		
+		//puts( OLE2A( html ) );
 		
 		// cleanup
-		SysFreeString( xml );
+		SysFreeString( html );
+		xsltDoc->Release( );
 		xmlDom->Release( );
 		
 		return true;
@@ -78,7 +107,7 @@ namespace
 
 int _tmain( int argc, _TCHAR* argv[] )
 {
-	if( argc != 2 ) {
+	if( argc != 3 ) {
 		return 1;
 	}
 
@@ -88,12 +117,12 @@ int _tmain( int argc, _TCHAR* argv[] )
 		return 1;
 	}
 		
-	bool res = example1Func( argv[1] );
+	bool res = example1Func( argv[1], argv[2] );
 
 	if( res ) {
-		std::cout << "msxml test OK" << std::endl;
+		std::cout << "msxslt test OK" << std::endl;
 	} else {
-		std::cout << "msxml test ERROR" << std::endl;
+		std::cout << "msxslt test ERROR" << std::endl;
 	}
 
         CoUninitialize( );
