@@ -515,7 +515,7 @@ struct LuaCommandHandler::Context
 	int threadref;
 	lua_State* env;
 
-	Context( const LuaCommandConfig& config) :ls(0),thread(0),threadref(0),env(0)
+	Context( const LuaCommandEnvironment& config) :ls(0),thread(0),threadref(0),env(0)
 	{
 		env = ls = luaL_newstate();
 		if (!ls) throw std::bad_alloc();
@@ -527,10 +527,10 @@ struct LuaCommandHandler::Context
 	}
 };
 
-LuaCommandHandler::LuaCommandHandler( const LuaCommandConfig* config)
-		:m_config(config)
+LuaCommandHandler::LuaCommandHandler( const LuaCommandEnvironment* env)
+		:m_env(env)
 {
-	m_context = new Context( *config);
+	m_context = new Context( *env);
 	m_globals.m_input.m_inputfilter = m_inputfilter;
 	m_globals.m_output.m_outputfilter = m_outputfilter;
 	LuaObject<Input>::createGlobal( m_context->ls, "input", m_globals.m_input, input_methodtable);
@@ -580,7 +580,7 @@ LuaCommandHandler::CallResult LuaCommandHandler::call( const char*& errorCode)
 			}
 		}
 		// call the function (for the first time)
-		lua_getglobal( m_context->thread, m_config->main().c_str());
+		lua_getglobal( m_context->thread, m_env->main().c_str());
 		std::vector<std::string>::const_iterator itr=m_argBuffer.begin(),end=m_argBuffer.end();
 		for (;itr != end; ++itr)
 		{
@@ -600,7 +600,7 @@ LuaCommandHandler::CallResult LuaCommandHandler::call( const char*& errorCode)
 	else if (rt != 0)
 	{
 		const char* msg = lua_tostring( m_context->thread, -1);
-		LOG_ERROR << "error calling '" << m_config->main().c_str() << "':" << msg;
+		LOG_ERROR << "error calling '" << m_env->main().c_str() << "':" << msg;
 		luaL_unref( m_context->ls, LUA_REGISTRYINDEX, m_context->threadref);
 		m_context->threadref = 0;
 		m_context->thread = 0;

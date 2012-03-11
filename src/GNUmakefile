@@ -99,7 +99,7 @@ ifeq ($(WITH_LUA),1)
 LOCAL_STATIC_LIB_OBJS += \
 	serialize_struct_luamapBase.o \
 	langbind_luaDebug.o \
-	langbind_luaCommandConfig.o \
+	langbind_luaCommandEnvironment.o \
 	langbind_luaCommandHandler.o
 endif
 

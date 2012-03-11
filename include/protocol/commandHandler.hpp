@@ -108,10 +108,10 @@ protected:
 };
 
 
-struct CommandConfig
+struct CommandEnvironment
 {
-	CommandConfig(){}
-	virtual ~CommandConfig(){}
+	CommandEnvironment(){}
+	virtual ~CommandEnvironment(){}
 
 	///\brief interface implementation of ConfigurationBase::test() const
 	virtual bool test() const=0;
@@ -127,12 +127,12 @@ struct CommandConfig
 class CommandBase
 {
 public:
-	CommandBase( const std::string& nam, const CommandConfig* cfg)
-		:m_protocolCmdName(nam),m_config(cfg){}
+	CommandBase( const std::string& nam, const CommandEnvironment* env_)
+		:m_protocolCmdName(nam),m_env(env_){}
 	CommandBase( const CommandBase& o)
-		:m_protocolCmdName(o.m_protocolCmdName),m_config(o.m_config){}
+		:m_protocolCmdName(o.m_protocolCmdName),m_env(o.m_env){}
 	CommandBase()
-		:m_protocolCmdName(0),m_config(0){}
+		:m_protocolCmdName(0),m_env(0){}
 	virtual ~CommandBase() {}
 
 	const char* protocolCmdName() const
@@ -145,24 +145,24 @@ public:
 		return CountedReference<CommandHandler>(0);
 	}
 
-	const CommandConfig* config() const
+	const CommandEnvironment* env() const
 	{
-		return m_config;
+		return m_env;
 	}
 
 protected:
 	std::string m_protocolCmdName;
-	const CommandConfig* m_config;
+	const CommandEnvironment* m_env;
 };
 
 
-template <class CommandHandlerClass, class CommandConfigClass>
+template <class CommandHandlerClass, class CommandEnvironmentClass>
 struct Command :public CommandBase
 {
-	Command( const char* nam, const CommandConfigClass* cfg)
-		:CommandBase(nam, dynamic_cast<const CommandConfig*>(cfg))
+	Command( const char* nam, const CommandEnvironmentClass* env_)
+		:CommandBase(nam, dynamic_cast<const CommandEnvironment*>(env_))
 	{
-		if (!dynamic_cast<const CommandConfigClass*>(m_config))
+		if (!dynamic_cast<const CommandEnvironmentClass*>(m_env))
 		{
 			throw std::logic_error( "Base class mismatch or RTTI support is switched off");
 		}
@@ -171,7 +171,7 @@ struct Command :public CommandBase
 
 	virtual CountedReference<CommandHandler> create( int argc, const char** argv) const
 	{
-		CommandHandlerClass* rt = new CommandHandlerClass( dynamic_cast<const CommandConfigClass*>(m_config));
+		CommandHandlerClass* rt = new CommandHandlerClass( dynamic_cast<const CommandEnvironmentClass*>(m_env));
 		rt->passParameters( argc, argv);
 		return CountedReference<CommandHandler>( rt);
 	}

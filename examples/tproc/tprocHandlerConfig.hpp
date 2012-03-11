@@ -73,10 +73,10 @@ struct DirectMapConfigStruct
 
 struct ConfigurationStruct
 {
-	std::vector<ScriptConfigStruct> script;		///< script definitions
-	std::vector<DirectMapConfigStruct> directmap;	///< direct map definitions
-	std::size_t input_bufsize;			///< size of input network message buffers in bytes (should only be configured for testing)
-	std::size_t output_bufsize;			///< size of output network message buffers in bytes (should only be configured for testing)
+	std::vector<ScriptConfigStruct> script;		//< script definitions
+	std::vector<DirectMapConfigStruct> directmap;	//< direct map definitions
+	std::size_t input_bufsize;			//< size of input network message buffers in bytes (should only be configured for testing)
+	std::size_t output_bufsize;			//< size of output network message buffers in bytes (should only be configured for testing)
 
 	static const config::DescriptionBase* description();
 };
@@ -86,7 +86,7 @@ class Configuration :public config::ConfigurationBase
 {
 public:
 	Configuration();
-	Configuration( const Configuration& o)	:config::ConfigurationBase(o),m_data(o.m_data),m_cmds(o.m_cmds),m_configs(o.m_configs){}
+	Configuration( const Configuration& o)	:config::ConfigurationBase(o),m_data(o.m_data),m_cmds(o.m_cmds),m_envs(o.m_envs){}
 
 	bool parse( const config::ConfigurationTree& pt, const std::string& node, const module::ModulesDirectory* modules );
 
@@ -116,8 +116,8 @@ protected:
 
 	ConfigurationStruct m_data;
 private:
-	std::vector< CountedReference<protocol::CommandBase> > m_cmds;
-	std::vector< CountedReference<protocol::CommandConfig> > m_configs;
+	std::vector< CountedReference<protocol::CommandBase> > m_cmds;		//< factories for the command handlers
+	std::vector< CountedReference<protocol::CommandEnvironment> > m_envs;	//< static environments of the command handlers
 };
 }}//namespace
 #endif
