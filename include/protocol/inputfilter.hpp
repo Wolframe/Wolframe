@@ -121,7 +121,7 @@ struct InputFilter
 	}
 
 	///\brief Constructor
-	InputFilter( std::size_t genbufsize)
+	explicit InputFilter( std::size_t genbufsize)
 		:m_ptr(0)
 		,m_pos(0)
 		,m_size(0)
@@ -143,7 +143,7 @@ struct InputFilter
 		setState( o.m_state, o.m_errorbuf);
 	}
 
-	///\brief destructor
+	///\brief Destructor
 	virtual ~InputFilter(){}
 
 	///\brief Get a member value of the filter

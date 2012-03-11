@@ -29,10 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///
 ///\file directmapCommandHandler.hpp
 ///\brief interface to the directmap command handler
-///
 #ifndef _Wolframe_langbind_DIRECTMAP_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_langbind_DIRECTMAP_COMMAND_HANDLER_HPP_INCLUDED
 #include "directmapCommandEnvironment.hpp"

@@ -29,10 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///
 ///\file luaCommandHandler.hpp
 ///\brief interface to the lua command handler
-///
 #ifndef _Wolframe_langbind_LUA_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_langbind_LUA_COMMAND_HANDLER_HPP_INCLUDED
 #include "luaCommandEnvironment.hpp"
