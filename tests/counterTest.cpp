@@ -76,15 +76,15 @@ public:
 
 // Tests the AtomicCounter constructors and members
 TEST_F( CounterFixture, Assignment )	{
-	ASSERT_EQ( ulCounter0.val(), ulVal0 );
-	ASSERT_EQ( iCounter0.val(), iVal0 );
+	ASSERT_EQ( ulCounter0.value(), ulVal0 );
+	ASSERT_EQ( iCounter0.value(), iVal0 );
 }
 
 
 // Tests the AtomicCounter operators
 TEST_F( CounterFixture, Increment )	{
-	ASSERT_EQ( ulCounter0.val(), ulVal0 );
-	ASSERT_EQ( iCounter0.val(), iVal0 );
+	ASSERT_EQ( ulCounter0.value(), ulVal0 );
+	ASSERT_EQ( iCounter0.value(), iVal0 );
 
 	for ( int i = 0; i < noThreads; i++ )   {
 		boost::thread* thread = new boost::thread( &CounterFixture::incrementThread, times );
@@ -95,23 +95,23 @@ TEST_F( CounterFixture, Increment )	{
 		delete threads[i];
 	}
 
-	ASSERT_EQ( ulCounter0.val(), ulVal0 + noThreads * times );
-	ASSERT_EQ( iCounter0.val(), iVal0 + noThreads * times );
+	ASSERT_EQ( ulCounter0.value(), ulVal0 + noThreads * times );
+	ASSERT_EQ( iCounter0.value(), (int)( iVal0 + noThreads * times ));
 
 	ulCounter0 -= noThreads * times;
 	iCounter0 -= noThreads * times;
-	ASSERT_EQ( ulCounter0.val(), ulVal0 );
-	ASSERT_EQ( iCounter0.val(), iVal0 );
+	ASSERT_EQ( ulCounter0.value(), ulVal0 );
+	ASSERT_EQ( iCounter0.value(), iVal0 );
 }
 
 TEST_F( CounterFixture, Decrement )	{
-	ASSERT_EQ( ulCounter0.val(), ulVal0 );
-	ASSERT_EQ( iCounter0.val(), iVal0 );
+	ASSERT_EQ( ulCounter0.value(), ulVal0 );
+	ASSERT_EQ( iCounter0.value(), iVal0 );
 
 	ulCounter0 += noThreads * times;
 	iCounter0 += noThreads * times;
-	ASSERT_EQ( ulCounter0.val(), ulVal0 + noThreads * times );
-	ASSERT_EQ( iCounter0.val(), iVal0 + noThreads * times );
+	ASSERT_EQ( ulCounter0.value(), ulVal0 + noThreads * times );
+	ASSERT_EQ( iCounter0.value(), (int)( iVal0 + noThreads * times ));
 
 	for ( int i = 0; i < noThreads; i++ )   {
 		boost::thread* thread = new boost::thread( &CounterFixture::decrementThread, times );
@@ -122,8 +122,46 @@ TEST_F( CounterFixture, Decrement )	{
 		delete threads[i];
 	}
 
-	ASSERT_EQ( ulCounter0.val(), ulVal0 );
-	ASSERT_EQ( iCounter0.val(), iVal0 );
+	ASSERT_EQ( ulCounter0.value(), ulVal0 );
+	ASSERT_EQ( iCounter0.value(), iVal0 );
+}
+
+TEST_F( CounterFixture, Prefix )	{
+	ASSERT_EQ( ulCounter0.value(), ulVal0 );
+	ASSERT_EQ( iCounter0.value(), iVal0 );
+
+	unsigned long a = ++ulCounter0;
+	int b = ++iCounter0;
+	ASSERT_EQ( ulCounter0.value(), ulVal0 + 1 );
+	ASSERT_EQ( a, ulVal0 + 1 );
+	ASSERT_EQ( iCounter0.value(), iVal0 + 1 );
+	ASSERT_EQ( b, iVal0 + 1 );
+
+	a = --ulCounter0;
+	b = --iCounter0;
+	ASSERT_EQ( ulCounter0.value(), ulVal0 );
+	ASSERT_EQ( a, ulVal0 );
+	ASSERT_EQ( iCounter0.value(), iVal0 );
+	ASSERT_EQ( b, iVal0 );
+}
+
+TEST_F( CounterFixture, Postfix )	{
+	ASSERT_EQ( ulCounter0.value(), ulVal0 );
+	ASSERT_EQ( iCounter0.value(), iVal0 );
+
+	unsigned long a = ulCounter0++;
+	int b = iCounter0++;
+	ASSERT_EQ( ulCounter0.value(), ulVal0 + 1 );
+	ASSERT_EQ( a, ulVal0 );
+	ASSERT_EQ( iCounter0.value(), iVal0 + 1 );
+	ASSERT_EQ( b, iVal0 );
+
+	a = ulCounter0--;
+	b = iCounter0--;
+	ASSERT_EQ( ulCounter0.value(), ulVal0 );
+	ASSERT_EQ( a, ulVal0 + 1 );
+	ASSERT_EQ( iCounter0.value(), iVal0 );
+	ASSERT_EQ( b, iVal0 + 1 );
 }
 
 

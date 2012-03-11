@@ -40,79 +40,124 @@
 
 namespace _Wolframe	{
 
-template <typename T>
-class AtomicCounter	{
+/// Simple thread safe counter class template
+///
+/// The implementation should be based on atomic primitives
+/// specific to the platform where possible
+template < typename T > class AtomicCounter	{
 public:
-	AtomicCounter()		{
-		m_mtx.lock(); m_val = 0; m_mtx.unlock();
-	}
-	AtomicCounter( const T value )	{
-		m_mtx.lock(); m_val = value; m_mtx.unlock();
+	/// Create an atomic counter and initialize it to 0
+	inline AtomicCounter()	{
+		boost::lock_guard<boost::mutex>	lock( m_mtx );
+		m_val = 0;
 	}
 
+	/// Create an atomic counter and initialize it to value
+	inline explicit AtomicCounter( const T initialValue )	{
+		boost::lock_guard<boost::mutex>	lock( m_mtx );
+		m_val = initialValue;
+	}
+
+	/// Copy constructor
+	inline AtomicCounter( const AtomicCounter<T>& counter )	{
+		boost::lock_guard<boost::mutex>	lock( m_mtx );
+		m_val = counter.m_val;
+	}
+
+
+	/// Print counter value
 	friend std::ostream& operator<< ( std::ostream& out, const AtomicCounter<T>& x )	{
 		out << x.m_val;
 		return out;
 	}
 
-	const T val()	{
+
+	/// Assign value to the counter
+	inline AtomicCounter<T>& operator = ( const T newValue )	{
+		boost::lock_guard<boost::mutex>	lock( m_mtx );
+		m_val = newValue;
+		return *this;
+	}
+
+	/// Assign counter value to the counter
+	inline AtomicCounter<T>& operator = ( const AtomicCounter<T>& counter )	{
+		boost::lock_guard<boost::mutex>	lock( m_mtx );
+		m_val = value.m_val;
+		return *this;
+	}
+
+
+	/// Counter value operator
+	inline operator T () const	{ return m_val; }
+
+	/// Counter value function
+	inline T value() const		{ return m_val; }
+
+
+	/// Prefix increment operator
+	inline T operator ++ ()	{
 		T	ret;
-		m_mtx.lock(); ret = m_val; m_mtx.unlock();
+		{
+			boost::lock_guard<boost::mutex>	lock( m_mtx );
+			ret = ++m_val;
+		}
 		return ret;
 	}
 
-	void set( const T value )	{
-		m_mtx.lock(); m_val = value; m_mtx.unlock();
-	}
-
-	void reset()	{
-		m_mtx.lock(); m_val = 0; m_mtx.unlock();
-	}
-
-	bool operator== ( const T& rhs )	{
-		m_mtx.lock(); T ret = m_val; m_mtx.unlock();
-		return( ret == rhs );
-	}
-
-	bool operator!= ( const T& rhs )	{
-		m_mtx.lock(); T ret = m_val; m_mtx.unlock();
-		return( ret != rhs );
-	}
-
-	T operator= ( const T rhs )	{
-		m_mtx.lock(); m_val = rhs; T ret = m_val; m_mtx.unlock();
+	/// Postfix increment operator
+	inline T operator ++ ( int )	{
+		T	ret;
+		{
+			boost::lock_guard<boost::mutex>	lock( m_mtx );
+			ret = m_val++;
+		}
 		return ret;
 	}
 
-	T operator++ ()	{
-		m_mtx.lock(); m_val++; T ret = m_val; m_mtx.unlock();
+
+	/// Prefix decrement operator
+	inline T operator -- ()	{
+		T	ret;
+		{
+			boost::lock_guard<boost::mutex>	lock( m_mtx );
+			ret = --m_val;
+		}
 		return ret;
 	}
 
-	T operator+= ( const T rhs )	{
-		m_mtx.lock(); m_val += rhs; T ret = m_val; m_mtx.unlock();
+	/// Postfix decrement operator
+	inline T operator -- ( int )	{
+		T	ret;
+		{
+			boost::lock_guard<boost::mutex>	lock( m_mtx );
+			ret = m_val--;
+		}
 		return ret;
 	}
 
-	T operator-= ( const T rhs )	{
-		m_mtx.lock(); m_val -= rhs; T ret = m_val; m_mtx.unlock();
+	inline T operator += ( const T difference )	{
+		T	ret;
+		{
+			boost::lock_guard<boost::mutex>	lock( m_mtx );
+			m_val += difference;
+			ret = m_val;
+		}
 		return ret;
 	}
 
-	T operator-- ()	{
-		m_mtx.lock(); m_val--; T ret = m_val; m_mtx.unlock();
+	inline T operator -= ( const T difference )	{
+		T	ret;
+		{
+			boost::lock_guard<boost::mutex>	lock( m_mtx );
+			m_val -= difference;
+			ret = m_val;
+		}
 		return ret;
 	}
-
-	///
-	bool operator> ( const T rhs )	{ return m_val > rhs; }
-	bool operator>= ( const T rhs )	{ return m_val >= rhs; }
-	bool operator< ( const T rhs )	{ return m_val < rhs; }
-	bool operator<= ( const T rhs )	{ return m_val <= rhs; }
 
 private:
-	T		m_val;
-	boost::mutex	m_mtx;
+	volatile T		m_val;
+	mutable boost::mutex	m_mtx;
 };
 
 } // namespace _Wolframe
