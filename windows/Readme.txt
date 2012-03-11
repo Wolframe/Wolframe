@@ -1,6 +1,10 @@
 Windows WIX Packaging Instructions
 ==================================
 
+    Requirements
+    Prepare the build
+    Some useful links for the packager
+    
 Requirements
 ------------
 
@@ -55,3 +59,10 @@ Prepare the build
      WITH_SQLITE3=1 WITH_PGSQL=1 WITH_MSXML=1 ^
      WITH_XMLLITE=1 WITH_EXAMPLES=1 ^
      setup.exe
+
+Some useful links for the packager
+----------------------------------
+
+* merge modules and prerequisites:
+  - http://cticoder.wordpress.com/2009/10/24/simulating-vs-nets-msi-installurl-property-with-wix/
+  

@@ -123,10 +123,6 @@ Project Wolframe.
 							</Component>
 							<?endif?>
 							
-							<?ifdef var.with_msxml?>
-							<!-- TODO: MSXML6.msi in bootstrapper -->
-							<?endif?>
-
 							<?ifdef with_pgsql?>
 							<Component Id="PostgresqlDlls" Guid="{3BD6483F-70B2-44D3-9C65-26787635A44B}">
 								<File Id="libpq.dll" Name="libpq.dll" DiskId="1" Source="..\src\libpq.dll"/>
@@ -411,7 +407,17 @@ Project Wolframe.
 				<![CDATA[Installed OR XMLLITE_VERSION]]>
 			</Condition>
 		<?endif?>
-		
+
+		<!-- no more merge modules for MSXML6, let the user download one -->
+		<?ifdef var.with_msxml?>
+			<Property Id="MSXML6_INSTALLED">
+				<RegistrySearch Id="MSXML6Search" Root="HKCR" Key="Msxml2.DOMDocument.6.0" Type="raw"/>
+			</Property>
+			<Condition Message="No MSXML6 has been installed. Install package first.">
+				<![CDATA[Installed OR MSXML6_INSTALLED]]>
+			</Condition>
+		<?endif?>
+				
 		<Property Id="WOLFRAME_DATABASE_TYPE" Secure="yes">
 			<RegistrySearch Id="WolframeDatabaseType" Root="HKCU"
 			                Key="SOFTWARE\WolframeGroup\Wolframe\Configuration"
