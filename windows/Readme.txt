@@ -26,9 +26,6 @@ Prepare the build
     - http://stackoverflow.com/questions/59635/app-does-not-run-with-vs-2008-sp1-dlls-previous-version-works-with-rtm-versions
     - http://stackoverflow.com/questions/59635/app-does-not-run-with-vs-2008-sp1-dlls-previous-version-works-with-rtm-versions
 
-* Set the location of the correct VC merge modules in 'makefiles\nmake\config.mk' in
-  VDREDIST_MERGE_MODULE_i386 and VDREDIST_MERGE_MODULE_AMD64
-
 * Set the location of the WIX toolkit in 'makefiles\nmake\config.mk' in variable 'WIX_DIR'.
 
 * Copy prerequisites in 'src' subdir, e. g.

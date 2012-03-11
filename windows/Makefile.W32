@@ -11,9 +11,6 @@ dependencies:
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-WIX_FLAGS = \
-	-dVCRedist.Location="$(VDREDIST_MERGE_MODULE)"
-
 !IFDEF WITH_SSL
 WIX_FLAGS = $(WIX_FLAGS) \
 	-dwith_ssl=1
