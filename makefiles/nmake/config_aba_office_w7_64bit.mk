@@ -103,6 +103,14 @@ WIX_DIR = C:\Program Files (x86)\Windows Installer XML v3.5
 #WIX_LIBS = dutil_2008.lib wcautil_2008.lib
 WIX_LIBS = dutil_2008_x64.lib wcautil_2008_x64.lib
 
+# architecture of resulting msi
+#WIX_ARCH = x86
+WIX_ARCH = x64
+
+# merge modules for the C/C++ runtime
+#VDREDIST_MERGE_MODULE = C:\Program Files (x86)\Common Files\Merge Modules\Microsoft_VC90_CRT_x86.msm
+VDREDIST_MERGE_MODULE = C:\Program Files (x86)\Common Files\Merge Modules\Microsoft_VC90_CRT_x86_x64.msm
+
 # Doxygen binary to generate API documentation (for docu and deployment)
 ########################################################################
 

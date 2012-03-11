@@ -11,34 +11,6 @@ dependencies:
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-!IF ( "$(CPU)" == "" )
-!IF ( "$(PROCESSOR_ARCHITECTURE)" == "x86" )
-CPU=i386
-!ELSEIF ( "$(PROCESSOR_ARCHITECTURE)" == "AMD64" )
-CPU=AMD64
-!ELSE
-!IF PROCESSOR_ARCHITEW6432 == AMD64
-CPU=AMD64
-!ELSE
-!ERROR Unknown CPU architecture found in PROCESSOR_ARCHITECTURE variable: $(PROCESSOR_ARCHITECTURE)
-!ENDIF PROCESSOR_ARCHITEW6432 == AMD64
-!ENDIF PROCESSOR_ARCHITECTURE == x86
-!ENDIF CPU == ""
-
-!IF ( "$(CPU)" == "i386" )
-VDREDIST_MERGE_MODULE = C:\Program Files (x86)\Common Files\Merge Modules\Microsoft_VC90_CRT_x86.msm
-!ELSEIF ( "$(CPU)" == "AMD64" )
-VDREDIST_MERGE_MODULE = C:\Program Files (x86)\Common Files\Merge Modules\Microsoft_VC90_CRT_x86_x64.msm
-!ELSE
-!ERROR Unknown CPU architecture found in CPU variable: $(CPU)
-!ENDIF CPU == i386
-
-!IF ( "$(CPU)" == "i386" )
-WIX_ARCH = x86
-!ELSEIF ( "$(CPU)" == "AMD64" )
-WIX_ARCH = x64
-!ENDIF CPU == AMD64
-
 WIX_FLAGS = \
 	-dVCRedist.Location="$(VDREDIST_MERGE_MODULE)"
 

@@ -122,9 +122,9 @@ Project Wolframe.
 								<File Id="libeay32.dll" Name="libeay32.dll" DiskId="1" Source="..\src\libeay32.dll"/> 
 							</Component>
 							<?endif?>
-
+							
 							<?ifdef var.with_msxml?>
-							<!-- TODO: merge module for MSXML -->
+							<!-- TODO: MSXML6.msi in bootstrapper -->
 							<?endif?>
 
 							<?ifdef with_pgsql?>
@@ -286,9 +286,8 @@ Project Wolframe.
 			<Directory Id="ProgramMenuFolder">
 				<Directory Id="ApplicationProgramsFolder" Name="Wolframe"/>
 			</Directory>
-<!--
+
 			<Merge Id="VCRedist" Language="0" SourceFile="$(var.VCRedist.Location)" DiskId="1"/>
-			-->
 		</Directory>
 
 		<DirectoryRef Id="ApplicationProgramsFolder">
@@ -335,12 +334,12 @@ Project Wolframe.
 				<ComponentRef Id="EmptyLogDir"/>
 				<ComponentRef Id="EmptyDataDir"/>
 			</Feature>
-<!--
+			
 			<Feature Id="VCRedist" Title="Visual C++ 9.0 Runtime" Level="1"
 			         AllowAdvertise="no" Display="hidden">
 				<MergeRef Id="VCRedist"/>
 			</Feature>
--->			
+
 			<Feature Id="DatabaseModules" Title="Database Modules" Description="Connectors to databases" Level="3">
 				<?ifdef with_sqlite3?>
 				<Feature Id="Sqlite3DB" Title="SQlite3 database driver" Description="Access local Sqlite3 database files." Level="3" InstallDefault="local" TypicalDefault="install">
@@ -399,8 +398,20 @@ Project Wolframe.
 			</Feature>
 
 		</Feature>
-								
+		
 		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR"/>
+		
+		<?ifdef var.with_xmllite?>
+			<Property Id="XMLLITE_VERSION">
+				<DirectorySearch Id="SystemFolderDriverVersion" Path="[SystemFolder]">
+					<FileSearch Name="xmllite.dll" MinVersion="1.0"/>
+				</DirectorySearch>
+			</Property>
+			<Condition Message="The installed version of xmllite.dll is not high enough to support this installer (minimal required version is 1.0.1018.0).">
+				<![CDATA[Installed OR XMLLITE_VERSION]]>
+			</Condition>
+		<?endif?>
+		
 		<Property Id="WOLFRAME_DATABASE_TYPE" Secure="yes">
 			<RegistrySearch Id="WolframeDatabaseType" Root="HKCU"
 			                Key="SOFTWARE\WolframeGroup\Wolframe\Configuration"

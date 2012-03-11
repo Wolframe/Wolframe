@@ -23,7 +23,7 @@ Prepare the build
     - http://stackoverflow.com/questions/59635/app-does-not-run-with-vs-2008-sp1-dlls-previous-version-works-with-rtm-versions
 
 * Set the location of the correct VC merge modules in 'makefiles\nmake\config.mk' in
-  VDREDIST_MERGE_MODULE
+  VDREDIST_MERGE_MODULE_i386 and VDREDIST_MERGE_MODULE_AMD64
 
 * Set the location of the WIX toolkit in 'makefiles\nmake\config.mk' in variable 'WIX_DIR'.
 
@@ -33,7 +33,7 @@ Prepare the build
   nmake /nologo /f Makefile.W32 ^
      WITH_SSL=1 WITH_EXPECT=1 WITH_LUA=1 WITH_QT=1 ^
      WITH_SQLITE3=1 WITH_PGSQL=1 WITH_MSXML=1 ^
-     WITH_EXAMPLES=1 ^
+     WITH_XMLLITE=1 WITH_EXAMPLES=1 ^
      copy_prereq
 
 * Build documentation in 'docs' subdir:
@@ -46,12 +46,12 @@ Prepare the build
   nmake /nologo /f Makefile.W32 ^
      WITH_SSL=1 WITH_EXPECT=1 WITH_LUA=1 WITH_QT=1 ^
      WITH_SQLITE3=1 WITH_PGSQL=1 WITH_MSXML=1 ^
-     WITH_EXAMPLES=1
+     WITH_XMLLITE=1 WITH_EXAMPLES=1
 
 * a standalone setup.exe can be build with
 
   nmake /nologo /f Makefile.W32 ^
      WITH_SSL=1 WITH_EXPECT=1 WITH_LUA=1 WITH_QT=1 ^
      WITH_SQLITE3=1 WITH_PGSQL=1 WITH_MSXML=1 ^
-     WITH_EXAMPLES=1 ^
+     WITH_XMLLITE=1 WITH_EXAMPLES=1 ^
      setup.exe
