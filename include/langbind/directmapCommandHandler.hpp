@@ -30,25 +30,21 @@ Project Wolframe.
 
 ************************************************************************/
 ///
-///\file luaCommandHandler.hpp
-///\brief interface to the lua command handler
+///\file directmapCommandHandler.hpp
+///\brief interface to the directmap command handler
 ///
-#ifndef _Wolframe_langbind_LUA_COMMAND_HANDLER_HPP_INCLUDED
-#define _Wolframe_langbind_LUA_COMMAND_HANDLER_HPP_INCLUDED
-#include "luaCommandEnvironment.hpp"
+#ifndef _Wolframe_langbind_DIRECTMAP_COMMAND_HANDLER_HPP_INCLUDED
+#define _Wolframe_langbind_DIRECTMAP_COMMAND_HANDLER_HPP_INCLUDED
+#include "directmapCommandEnvironment.hpp"
 #include "appObjects.hpp"
 #include "ioFilterCommandHandler.hpp"
-extern "C"
-{
-#include "lua.h"
-}
 
 namespace _Wolframe {
 namespace langbind {
 
-///\class LuaCommandHandler
-///\brief command handler instance for processing a call as Lua script
-class LuaCommandHandler :public protocol::IOFilterCommandHandler
+///\class DirectmapCommandHandler
+///\brief command handler instance for processing a call as Directmap (mapping with forms and a transaction function)
+class DirectmapCommandHandler :public protocol::IOFilterCommandHandler
 {
 public:
 	///\class Context
@@ -57,28 +53,19 @@ public:
 
 	///\brief Constructor
 	///\param[in] config read only reference to the configuration of this application processor
-	explicit LuaCommandHandler( const LuaCommandEnvironment* env);
-	///\brief Destructor
-	virtual ~LuaCommandHandler();
+	explicit DirectmapCommandHandler( const DirectmapCommandEnvironment* e);
 
-	///\brief Execute the Lua script
+	///\brief Destructor
+	virtual ~DirectmapCommandHandler();
+
+	///\brief Execute the Directmap
 	///\param[out] err error code in case of error
 	///\return CallResult status (See protocol::IOFilterCommandHandler::CallResult)
 	virtual CallResult call( const char*& err);
 
-	///\brief Get the current lua state (not the thread!)
-	///\return the current lua state
-	lua_State* getLuaState() const;
-
 private:
-	const LuaCommandEnvironment* m_env;	///< reference to static environment
-	struct Globals
-	{
-		Input m_input;
-		Output m_output;
-	};
-	Globals m_globals;
-	Context* m_context;			///< execution context of the command handler
+	const DirectmapCommandEnvironment* m_env;	///< reference to static environment
+	Context* m_context;				///< execution context of the command handler
 };
 
 }}//namespace

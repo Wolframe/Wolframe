@@ -45,17 +45,25 @@ namespace ddl {
 ///\brief Interface for DDL compilers
 struct CompilerInterface
 {
+	explicit CompilerInterface( const std::string& n) :m_ddlname(n) {};
+
 	///\brief Compile a source from a string
 	///\param[in] srcstring source as string
 	///\param[out] result compilation result (a map represented as StructType::Struct of exported structures representing the forms)
 	///\param[out] error error message in case of failure
-	virtual bool compile( const std::string& srcstring, StructType& result, std::string& error)=0;
+	virtual bool compile( const std::string& srcstring, StructType& result, std::string& error) const=0;
 
 	///\brief Compile a source from a file
 	///\param[in] filename path of the file as string
 	///\param[out] result compilation result (a map represented as StructType::Struct of exported structures representing the forms)
 	///\param[out] error error message in case of failure
-	bool compileFile( const std::string& filename, StructType& result, std::string& error);
+	bool compileFile( const std::string& filename, StructType& result, std::string& error) const;
+
+	///\brief Get the name of the ddl this compiler is for
+	const std::string& ddlname() const		{return m_ddlname;}
+
+private:
+	std::string m_ddlname;
 };
 
 }}//namespace

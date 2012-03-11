@@ -515,11 +515,11 @@ struct LuaCommandHandler::Context
 	int threadref;
 	lua_State* env;
 
-	Context( const LuaCommandEnvironment& config) :ls(0),thread(0),threadref(0),env(0)
+	Context( const LuaCommandEnvironment& cenv) :ls(0),thread(0),threadref(0),env(0)
 	{
 		env = ls = luaL_newstate();
 		if (!ls) throw std::bad_alloc();
-		if (!config.load( ls)) throw std::runtime_error( "cannot load application processor from configuration");
+		if (!cenv.load( ls)) throw std::runtime_error( "cannot load lua command handler with this environment");
 	}
 	~Context()
 	{
@@ -528,7 +528,7 @@ struct LuaCommandHandler::Context
 };
 
 LuaCommandHandler::LuaCommandHandler( const LuaCommandEnvironment* env)
-		:m_env(env)
+		:m_env(env),m_context(0)
 {
 	m_context = new Context( *env);
 	m_globals.m_input.m_inputfilter = m_inputfilter;

@@ -59,6 +59,11 @@ StructType::Map::const_iterator StructType::find( const char* name) const
 	return m_elem.end();
 }
 
+StructType::Map::const_iterator StructType::find( const std::string& name) const
+{
+	return find( name.c_str());
+}
+
 StructType::Map::iterator StructType::find( const char* name)
 {
 	REQUIRE(Struct);
@@ -67,6 +72,11 @@ StructType::Map::iterator StructType::find( const char* name)
 		if (std::strcmp( itr->first.c_str(), name) == 0) return itr;
 	}
 	return m_elem.end();
+}
+
+StructType::Map::iterator StructType::find( const std::string& name)
+{
+	return find( name.c_str());
 }
 
 StructType::Map::const_iterator StructType::begin() const
@@ -156,5 +166,68 @@ StructType& StructType::operator= ( const StructType& o)
 	m_elem = o.m_elem;
 	m_nof_attributes = o.m_nof_attributes;
 	return *this;
+}
+
+
+static void printIndent( std::ostream& out, size_t indent)
+{
+	while (indent--) out << "\t";
+}
+
+void StructType::print( std::ostream& out, size_t indent) const
+{
+	switch (m_contentType)
+	{
+		case Atomic:
+		{
+			m_value.print( out, indent);
+			break;
+		}
+		case Vector:
+		{
+			StructType::Map::const_iterator ii = begin(),ee=end();
+			int idx = 0;
+			while (ii != ee)
+			{
+				if (ii->second.m_contentType == Atomic)
+				{
+					printIndent( out, indent);
+					out << "[" << (idx++) << "] ";
+					ii->second.value().print( out);
+				}
+				else
+				{
+					printIndent( out, indent);
+					out << "[" << (idx++) << "] {";
+					ii->second.print( out, indent+1);
+					printIndent( out, indent);
+					out << "}";
+				}
+			}
+			break;
+		}
+		case Struct:
+		{
+			StructType::Map::const_iterator ii = begin(),ee=end();
+			while (ii != ee)
+			{
+				if (ii->second.m_contentType == Atomic)
+				{
+					printIndent( out, indent);
+					out << ii->first << "= ";
+					ii->second.value().print( out);
+				}
+				else
+				{
+					printIndent( out, indent);
+					out << ii->first << " {";
+					ii->second.print( out, indent+1);
+					printIndent( out, indent);
+					out << "}";
+				}
+			}
+			break;
+		}
+	}
 }
 

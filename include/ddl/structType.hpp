@@ -93,7 +93,17 @@ public:
 	///\brief Find an element of this as a structure
 	///\remark [precondition] this must be of type (ContentType) Struct
 	///\param[in] name name of the element to find
+	Map::const_iterator find( const std::string& name) const;
+
+	///\brief Find an element of this as a structure
+	///\remark [precondition] this must be of type (ContentType) Struct
+	///\param[in] name name of the element to find
 	Map::iterator find( const char* name);
+
+	///\brief Find an element of this as a structure
+	///\remark [precondition] this must be of type (ContentType) Struct
+	///\param[in] name name of the element to find
+	Map::iterator find( const std::string& name);
 
 	///\brief Get the begin marker iterator on the elements of this
 	///\remark [precondition] this must not be of type (ContentType) Atomic
@@ -163,6 +173,11 @@ public:
 	///\remark returns 0 this is not of type (ContentType) Struct
 	///\return the number of attributes or 0
 	std::size_t nof_attributes() const;
+
+	///\brief Print content to out
+	///\param[out] out output stream to print to
+	///\param[in] indent indentiation for items to print
+	void print( std::ostream& out, size_t indent=0) const;
 
 private:
 	///\brief Assert a type precondition of this. (throws an logic_error exception on failure)

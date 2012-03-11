@@ -32,14 +32,11 @@
 ************************************************************************/
 #include "langbind/luaCommandEnvironment.hpp"
 #include "langbind/luaDebug.hpp"
-#include <boost/property_tree/ptree.hpp>
+#include "logger-v1.hpp"
 #include <boost/algorithm/string.hpp>
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include <ostream>
-#include "config/ConfigurationTree.hpp"
-#include "config/valueParser.hpp"
-#include "miscUtils.hpp"
 
 extern "C" {
 	#include <lualib.h>

@@ -38,6 +38,7 @@
 #include <string>
 #include "protocol/commandHandler.hpp"
 #include "config/descriptionBase.hpp"
+#include "ddl/compilerInterface.hpp"
 #include "standardConfigs.hpp"
 
 namespace _Wolframe {
@@ -55,15 +56,16 @@ struct ScriptConfigStruct
 
 struct FormConfigStruct
 {
-	std::string name;
 	std::string path;
-	std::string main;
+	std::string name;
 
 	static const config::DescriptionBase* description();
 };
 
 struct DirectMapConfigStruct
 {
+	std::string name;
+	std::string ddlname;
 	FormConfigStruct input;
 	FormConfigStruct output;
 	std::string function;
@@ -86,7 +88,7 @@ class Configuration :public config::ConfigurationBase
 {
 public:
 	Configuration();
-	Configuration( const Configuration& o)	:config::ConfigurationBase(o),m_data(o.m_data),m_cmds(o.m_cmds),m_envs(o.m_envs){}
+	Configuration( const Configuration& o)	:config::ConfigurationBase(o),m_data(o.m_data),m_cmds(o.m_cmds),m_envs(o.m_envs),m_compilers(o.m_compilers){}
 
 	bool parse( const config::ConfigurationTree& pt, const std::string& node, const module::ModulesDirectory* modules );
 
@@ -118,6 +120,7 @@ protected:
 private:
 	std::vector< CountedReference<protocol::CommandBase> > m_cmds;		//< factories for the command handlers
 	std::vector< CountedReference<protocol::CommandEnvironment> > m_envs;	//< static environments of the command handlers
+	std::vector< CountedReference<ddl::CompilerInterface> > m_compilers;	//< compilers for translating DDL definitions
 };
 }}//namespace
 #endif

@@ -53,11 +53,11 @@ namespace langbind {
 class LuaCommandEnvironment :public protocol::CommandEnvironment
 {
 public:
-	///\brief module load function for a lua state
-	///\param ls lua state to initialize with the load of the module for this state object
+	///\brief Module load function for a lua state
+	///\param[in] ls lua state to initialize with the load of the module for this state object
 	typedef int (*ModuleLoad)( lua_State *ls);
 
-	///\brief default constructor
+	///\brief Constructor
 	LuaCommandEnvironment( const std::string& main_, const std::string& mainmodule_, const std::vector<std::string>& modules_=std::vector<std::string>())
 		:m_main(main_)
 		,m_mainmodule( mainmodule_, Module::Script)
@@ -69,54 +69,56 @@ public:
 		}
 	}
 
-	///\brief interface implementation of ConfigurationBase::test() const
+	///\brief Interface implementation of ConfigurationBase::test() const
 	virtual bool test() const;
 
-	///\brief interface implementation of ConfigurationBase::check() const
+	///\brief Interface implementation of ConfigurationBase::check() const
 	virtual bool check() const;
 
-	///\brief interface implementation of ConfigurationBase::print(std::ostream& os, size_t indent) const
+	///\brief Interface implementation of ConfigurationBase::print(std::ostream& os, size_t indent) const
 	virtual void print( std::ostream&, size_t indent=0) const;
 
-	///\brief loads the configuration settings for a lua virtual machine state
+	///\brief Loads the configuration settings for a lua virtual machine state
 	///\param[in,out] ls lua state to initialize
 	///\return true if success, else false
 	bool load( lua_State* ls) const;
 
 	///\class Module
-	///\brief loadable module description
+	///\brief Loadable module description
 	class Module
 	{
 	public:
 		///\enum Type
-		///\brief type of the module
+		///\brief Type of the module
 		enum Type
 		{
 			Undefined,	///< unknown (cannot be loaded)
 			Script,		///< lua script with helper functions
 			UserLib		///< a library
 		};
-		///\brief returns the module type 't' as descriptive string for an error or status message
+		///\brief Get the module type 't' as descriptive string for an error or status message
+		///\return the module type
 		static const char* typeName( Type t)	{const char* ar[3] = {"undefined", "script", "preloaded library"}; return ar[t];}
 
-		///\brief Default constructor
+		///\brief Constructor
 		Module()							:m_type(Undefined),m_load(0){}
 		///\brief Constructor
-		///\param module name
+		///\param[in] name_ module name
+		///\param[in] type_ type of the module
 		Module( const std::string& name_, Type type_=Undefined)		:m_type(type_),m_name(name_),m_load(0) {if (type_==Undefined) setType();}
 		///\brief Copy constructor
-		///\param module to copy
+		///\param[in] module to copy
 		Module( const Module& o)					:m_type(o.m_type),m_name(o.m_name),m_load(o.m_load){}
 
 		///\brief Determines the type of the module
 		void setType();
 
-		///\brief Return the name of the module
+		///\brief Get the name of the module
 		///\return the plain name of the module
 		const std::string& name() const		{return m_name;}
 
-		///\brief Return the type of the module
-		///\return the type of the module
+		///\brief Get the type of the module
+		///\return type of the module
 		const Type& type() const		{return m_type;}
 
 		///\brief Loads the configuration settings for a lua virtual machine state
@@ -133,11 +135,14 @@ public:
 		std::string m_name;			//< name of the module
 		ModuleLoad m_load;			//< function to load the module into the interpreter context
 	};
-	///\brief return the main function
+	///\brief Get the main function
+	///\return main function
 	const std::string& main() const			{return m_main;}
-	///\brief return the main module
+	///\brief Get the main module
+	///\return main module
 	const Module& mainmodule() const		{return m_mainmodule;}
-	///\brief return the list of modules without the main
+	///\brief Get the list of modules without the main
+	///\return list of modules without the main
 	const std::vector<Module>& modules() const	{return m_modules;}
 
 private:

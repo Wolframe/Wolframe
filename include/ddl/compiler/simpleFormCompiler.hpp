@@ -48,8 +48,10 @@ namespace ddl {
 class SimpleFormCompiler :public CompilerInterface
 {
 public:
+	SimpleFormCompiler() :CompilerInterface( "simpleform") {}
+
 	///\brief Compile a source from a string. See CompilerInterface::compile( const std::string&,StructType&,std::string&)
-	virtual bool compile( const std::string& srcstring, StructType& result, std::string& error);
+	virtual bool compile( const std::string& srcstring, StructType& result, std::string& error) const;
 };
 
 }}

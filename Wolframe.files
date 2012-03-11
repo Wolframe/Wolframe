@@ -460,6 +460,8 @@ src/langbind_appObjects.cpp
 src/langbind_ioFilterCommandHandler.cpp
 src/langbind_luaCommandEnvironment.cpp
 src/langbind_luaCommandHandler.cpp
+src/langbind_directmapCommandEnvironment.cpp
+src/langbind_directmapCommandHandler.cpp
 src/langbind_luaDebug.cpp
 src/libwolframe/GNUmakefile
 src/libwolframe/logger/logBackendConsole.cpp

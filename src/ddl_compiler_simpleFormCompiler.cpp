@@ -734,7 +734,7 @@ bool SimpleFormCompilerImpl::compile( StructType& result_, std::string& error_)
 
 }///anonymous namespace
 
-bool SimpleFormCompiler::compile( const std::string& srcstring, StructType& result_, std::string& error_)
+bool SimpleFormCompiler::compile( const std::string& srcstring, StructType& result_, std::string& error_) const
 {
 	SimpleFormCompilerImpl impl( srcstring);
 	return impl.compile( result_, error_);
