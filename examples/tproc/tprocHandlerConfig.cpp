@@ -160,6 +160,7 @@ bool Configuration::defineDirectMap( const DirectMapConfigStruct& dm)
 {
 	if (isSimpleForm( dm.input.path))
 	{
+
 	}
 	else
 	{

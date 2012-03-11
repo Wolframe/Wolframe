@@ -117,7 +117,7 @@ struct InputFilter
 		m_pos = o.m_pos;
 		m_size = o.m_size;
 		m_gotEoD = o.m_gotEoD;
-		m_state = o.m_state;
+		setState( o.m_state, o.m_errorbuf);
 	}
 
 	///\brief Constructor
@@ -126,9 +126,11 @@ struct InputFilter
 		,m_pos(0)
 		,m_size(0)
 		,m_gotEoD(false)
+		,m_genbufsize(genbufsize)
 		,m_state(Open)
-		,m_errorCode(0)
-		,m_genbufsize(genbufsize){}
+	{
+		m_errorbuf[0] = 0;
+	}
 
 	///\brief Copy constructor
 	InputFilter( const InputFilter& o)
@@ -136,19 +138,13 @@ struct InputFilter
 		,m_pos(o.m_pos)
 		,m_size(o.m_size)
 		,m_gotEoD(o.m_gotEoD)
-		,m_state(o.m_state)
-		,m_errorCode(o.m_errorCode)
-		,m_genbufsize(o.m_genbufsize){}
+		,m_genbufsize(o.m_genbufsize)
+	{
+		setState( o.m_state, o.m_errorbuf);
+	}
 
 	///\brief destructor
 	virtual ~InputFilter(){}
-
-	///\brief Get error code in case of error state
-	int getError() const				{return m_errorCode;}
-
-	///\brief Get the last error, if the filter got into an error state
-	///\return the last error as string or 0
-	virtual const char* getLastError() const	{return m_errorCode?"unknown":0;}
 
 	///\brief Get a member value of the filter
 	///\param [in] name case sensitive name of the variable
@@ -178,6 +174,9 @@ struct InputFilter
 		return false;
 	}
 
+	///\brief Get the las error in case of error state
+	///\return the error string or 0
+	const char* getError() const			{return (m_state==Error)?m_errorbuf:0;}
 	///\brief Get end of data flag passed to input filter. Tells if more network input has to be passed to the application processor
 	bool gotEoD() const				{return m_gotEoD;}
 	///\brief Get data at current iterator cursor position
@@ -187,25 +186,41 @@ struct InputFilter
 	///\brief Skip forward current iterator cursor position
 	///\param [in] n number of bytes to skip
 	void skip( std::size_t n)			{if ((m_pos+n)>=m_size) m_pos=m_size; else m_pos+=n;}
-	///\brief Set input filter generator state with error code
-	///\param [in] s new state
-	///\param [in] e (optional) error code to set
-	void setState( State s, int e=0)		{m_state=s;m_errorCode=e;}
 	///\brief Get the size of the buffer used for the generated elements
 	///\return bufsize size of the buffer in bytes
 	std::size_t getGenBufferSize() const		{return m_genbufsize;}
+
+	///\brief Set input filter state with error message
+	///\param [in] s new state
+	///\param [in] msg (optional) error to set
+	void setState( State s, const char* msg=0)
+	{
+		m_state = s;
+		if (msg)
+		{
+			std::size_t msglen = std::strlen( msg);
+			if (msglen >= ErrorBufSize) msglen = (std::size_t)ErrorBufSize-1;
+			std::memcpy( m_errorbuf, msg, msglen);
+			m_errorbuf[ msglen] = 0;
+		}
+		else
+		{
+			m_errorbuf[ 0] = 0;
+		}
+	}
 
 	///\brief Get the current iterator position
 	///\return the current iterator position as byte offset
 	std::size_t pos() const				{return m_pos;}
 private:
-	void* m_ptr;			///< pointer to network input buffer
-	std::size_t m_pos;		///< current iterator cursor position
-	std::size_t m_size;		///< size of network input buffer
-	bool m_gotEoD;			///< got end of data flag
-	State m_state;			///< state
-	int m_errorCode;		///< error code
-	std::size_t m_genbufsize;	///< element buffer size (the buffer itself is managed by the user of this class)
+	void* m_ptr;			//< pointer to network input buffer
+	std::size_t m_pos;		//< current iterator cursor position
+	std::size_t m_size;		//< size of network input buffer
+	bool m_gotEoD;			//< got end of data flag
+	std::size_t m_genbufsize;	//< element buffer size (the buffer itself is managed by the user of this class)
+	State m_state;			//< state
+	enum {ErrorBufSize=128};
+	char m_errorbuf[ ErrorBufSize];	//< error string
 };
 
 ///\typedef InputFilterR

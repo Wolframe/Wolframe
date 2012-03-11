@@ -30,7 +30,7 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file ddl/atomicType.hpp
-///\brief Defines an an intrusive atomic type as basic mapping type for DDLs
+///\brief Defines a non intrusive atomic type for the DDLs used for forms
 
 #ifndef _Wolframe_DDL_ATOMICTYPE_HPP_INCLUDED
 #define _Wolframe_DDL_ATOMICTYPE_HPP_INCLUDED
@@ -48,12 +48,14 @@ namespace ddl {
 class AtomicType
 {
 public:
+	///\enum Type
+	///\brief What AtomicType can be
 	enum Type
 	{
 		double_,float_,long_,ulong_,int_,uint_,short_,ushort_,char_,uchar_,string_
 	};
 
-	///\brief Get the name of a type
+	///\brief Get the name of a type as string
 	static const char* typeName( Type tp)
 	{
 		static const char* ar[] = {"double","float","long","ulong","int","uint","short","ushort","char","uchar","string",0};
@@ -63,9 +65,16 @@ public:
 	///\return true, if the type exists
 	static bool getType( const char* name, Type& tp);
 
+	///\brief Constructor
 	AtomicType( Type t=string_)		:m_type(t){}
+	///\brief Copy constructor
+	///\param[in] o element to copy
 	AtomicType( const AtomicType& o)	:m_type(o.m_type),m_value(o.m_value){}
 
+	///\brief Setter method
+	///\tparam T Type of element to assign
+	///\param[in] element to assign
+	///\return true on success, false if the type check fails or on overflow
 	template <typename T>
 	bool set( const T& val)
 	{
@@ -94,6 +103,10 @@ public:
 		return false;
 	}
 
+	///\brief Getter method
+	///\tparam T Type of element to get
+	///\param[out] element retrieved
+	///\return true on success, false if the type check fails or on overflow
 	template <typename T>
 	bool get( T& val)
 	{
@@ -107,20 +120,28 @@ public:
 		}
 	}
 
+	///\brief Get the type of this
+	///\return the type of this
 	Type type() const
 	{
 		return m_type;
 	}
 
+	///\brief Get the value of this as string
+	///\return the value of this as string
 	const std::string& value() const
 	{
 		return m_value;
 	}
 
 private:
-	Type m_type;
-	std::string m_value;
+	Type m_type;						//< type of this
+	std::string m_value;					//< value of this
 
+	///\brief Internally used assingement over another type as intermediate.
+	///\tparam M type serving as intermediate of the assignement (used for type checking)
+	///\tparam S type of the element to assign to this. (source type of the assingement)
+	///\param[in] element to assign to this
 	template <typename M, typename S>
 	void assign( const S& src)
 	{

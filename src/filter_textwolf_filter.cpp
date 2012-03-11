@@ -58,26 +58,9 @@ struct OutputFilterImpl :public protocol::OutputFilter, public FilterBase<IOChar
 {
 	typedef protocol::OutputFilter Parent;
 
-	///\enum ErrorCodes
-	///\brief Enumeration of error codes
-	enum ErrorCodes
-	{
-		Ok,				///< no error
-		ErrTagStackExceedsLimit,	///< tack stack overflow
-		ErrTagHierarchy,		///< tack hierarchy error
-		ErrIllegalOperation,		///< illegal operation in this state
-		ErrIllegalState			///< illegal state (should not happen)
-	};
-
 	enum {
 		TagBufferSize=1024		///< default size of buffer use for storing tag hierarchy of output
 	};
-
-	static const char* errorName( ErrorCodes e)
-	{
-		static const char* ar[] = {0,"ErrTagStackExceedsLimit","ErrTagHierarchy","ErrIllegalOperation","ErrIllegalState"};
-		return ar[ (int)e];
-	}
 
 	///\enum XMLState
 	///\brief Enumeration of XML printer states
@@ -128,10 +111,6 @@ struct OutputFilterImpl :public protocol::OutputFilter, public FilterBase<IOChar
 	{
 		return new OutputFilterImpl( *this);
 	}
-
-	///\brief Get the last error, if the filter got into an error state
-	///\return the last error as string or 0
-	virtual const char* getLastError() const		{return errorName( (ErrorCodes)getError());}
 
 	///\brief Get a member value of the filter
 	///\param [in] name case sensitive name of the variable
@@ -225,7 +204,7 @@ struct OutputFilterImpl :public protocol::OutputFilter, public FilterBase<IOChar
 
 				if (!pushTag( element, elementsize))
 				{
-					setState( Error, ErrTagStackExceedsLimit);
+					setState( Error, "textwolf: tag stack exceeds limit");
 					return false;
 				}
 				m_xmlstate = ((const char*)(element))[0]=='?'?Header:Tag;
@@ -242,7 +221,7 @@ struct OutputFilterImpl :public protocol::OutputFilter, public FilterBase<IOChar
 			case protocol::OutputFilter::Attribute:
 				if (!m_pendingOpenTag)
 				{
-					setState( Error, ErrIllegalOperation);
+					setState( Error, "textwolf: illegal operation");
 					return false;
 				}
 				FilterBase<IOCharset,AppCharset>::printToBuffer( ' ', buf);
@@ -292,7 +271,7 @@ struct OutputFilterImpl :public protocol::OutputFilter, public FilterBase<IOChar
 			case protocol::OutputFilter::CloseTag:
 				if (!topTag( cltag, cltagsize) || !cltagsize)
 				{
-					setState( Error, ErrTagHierarchy);
+					setState( Error, "textwolf: tags not balanced");
 					return false;
 				}
 				if (m_xmlstate == Header)
@@ -325,7 +304,7 @@ struct OutputFilterImpl :public protocol::OutputFilter, public FilterBase<IOChar
 				}
 				return true;
 		}
-		setState( Error, ErrIllegalState);
+		setState( Error, "textwolf: illegal state");
 		return false;
 	}
 private:
@@ -512,21 +491,6 @@ template <class IOCharset, class AppCharset=textwolf::charset::UTF8>
 struct InputFilterImpl :public protocol::InputFilter, public FilterBase<IOCharset,AppCharset>
 {
 	typedef protocol::InputFilter Parent;
-
-	enum ErrorCodes
-	{
-		Ok,			///< no error
-		ErrBufferTooSmall,	///< output buffer is too small to hold the element
-		ErrXML,			///< error in input XML
-		ErrUnexpectedState	///< something unexpected happened
-	};
-
-	static const char* errorName( ErrorCodes e)
-	{
-		static const char* ar[] = {0,"ErrBufferTooSmall","ErrXML","ErrUnexpectedState"};
-		return ar[ (int)e];
-	}
-
 	typedef textwolf::XMLScanner<SrcIterator,IOCharset,AppCharset,textwolf::StaticBuffer> XMLScanner;
 
 	///\brief Constructor
@@ -640,10 +604,6 @@ struct InputFilterImpl :public protocol::InputFilter, public FilterBase<IOCharse
 		return new InputFilterImpl( *this);
 	}
 
-	///\brief Get the last error, if the filter got into an error state
-	///\return the last error as string or 0
-	virtual const char* getLastError() const		{return errorName( (ErrorCodes)getError());}
-
 	struct ElementTypeMap :public textwolf::CharMap<int,-1,textwolf::XMLScannerBase::NofElementTypes>
 	{
 		ElementTypeMap()
@@ -681,13 +641,13 @@ struct InputFilterImpl :public protocol::InputFilter, public FilterBase<IOCharse
 			++m_itr;
 			if (buf.overflow())
 			{
-				setState( protocol::InputFilter::Error, ErrBufferTooSmall);
+				setState( protocol::InputFilter::Error, "textwolf: input filter buffer too small for one element");
 				return false;
 			}
 			int st = tmap[ m_itr->type()];
 			if (st == -1)
 			{
-				setState( Error, ErrXML);
+				setState( Error, "textwolf: syntax error in XML");
 				return false;
 			}
 			else
@@ -715,7 +675,7 @@ struct InputFilterImpl :public protocol::InputFilter, public FilterBase<IOCharse
 			*bufferpos = m_bufstart + buf.size();
 			return false;
 		};
-		setState( Error, ErrUnexpectedState);
+		setState( Error, "textwolf: unexpected state");
 		return false;
 	}
 private:
@@ -847,7 +807,7 @@ public:
 			{
 				if (cc[ii] != '\0')
 				{
-					setState( Error, ErrXML);
+					setState( Error, "textwolf: syntax error in XML");
 					return false;
 				}
 			}
@@ -875,7 +835,7 @@ public:
 				{
 					if (cc[ii] < 0 || m_header.size() > 128)
 					{
-						setState( Error, ErrXML);
+						setState( Error, "textwolf: syntax error in XML");
 						return false;
 					}
 					m_header.push_back( cc[ii]);
@@ -893,7 +853,7 @@ public:
 					m_encoding.reset( new TextwolfEncoding::Id( enc));
 					if (enc == TextwolfEncoding::Unknown)
 					{
-						setState( Error, ErrEncoding);
+						setState( Error, "textwolf: cannot handle this encoding");
 					}
 					else
 					{
@@ -918,7 +878,7 @@ public:
 				}
 				else
 				{
-					setState( Error, ErrXML);
+					setState( Error, "textwolf: syntax error in XML");
 				}
 				m_headerParsed = true;
 			}
@@ -1028,7 +988,7 @@ public:
 		switch (enc)
 		{
 			case TextwolfEncoding::Unknown:
-				setState( Error, ErrEncoding);
+				setState( Error, "textwolf: cannot handle this encoding");
 				return false;
 			case TextwolfEncoding::IsoLatin:
 				rt = new OutputFilterImpl<tc::IsoLatin1>( m_tagbuffersize);
@@ -1081,7 +1041,7 @@ public:
 			{
 				case TextwolfEncoding::Unknown:
 				{
-					setState( Error, ErrEncoding);
+					setState( Error, "textwolf: cannot handle this encoding");
 					return false;
 				}
 				case TextwolfEncoding::IsoLatin:

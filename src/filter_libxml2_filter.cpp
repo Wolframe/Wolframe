@@ -44,7 +44,7 @@ public:
 
 	///\brief Get the last error, if the filter got into an error state
 	///\return the last error as string or 0
-	const char* getLastError() const
+	const char* getError() const
 	{
 		return m_error.size()?m_error.c_str():0;
 	}
@@ -292,10 +292,6 @@ public:
 		return ar[ (int)e];
 	}
 
-	///\brief Get the last error, if the filter got into an error state
-	///\return the last error as string or 0
-	virtual const char* getLastError() const	{return errorName((Error)getError());}
-
 	class Document
 	{
 	public:
@@ -521,7 +517,7 @@ public:
 		}
 		else
 		{
-			setState( protocol::OutputFilter::Error, dc->m_error);
+			setState( protocol::OutputFilter::Error, OutputFilterImpl::errorName( dc->m_error));
 			rt = false;
 		}
 		return rt;

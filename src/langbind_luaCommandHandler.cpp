@@ -369,7 +369,7 @@ static int function_output_print( lua_State* ls)
 			lua_yieldk( ls, 0, 1, function_output_print);
 
 		case Output::Error:
-			msg = output->m_outputfilter->getLastError();
+			msg = output->m_outputfilter->getError();
 			luaL_error( ls, "error in output filter print (%s)", msg?msg:"unknown");
 			return 0;
 

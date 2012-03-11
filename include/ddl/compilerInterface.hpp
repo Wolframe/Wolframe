@@ -47,13 +47,13 @@ struct CompilerInterface
 {
 	///\brief Compile a source from a string
 	///\param[in] srcstring source as string
-	///\param[out] result compilation result
+	///\param[out] result compilation result (a map represented as StructType::Struct of exported structures representing the forms)
 	///\param[out] error error message in case of failure
 	virtual bool compile( const std::string& srcstring, StructType& result, std::string& error)=0;
 
 	///\brief Compile a source from a file
 	///\param[in] filename path of the file as string
-	///\param[out] result compilation result
+	///\param[out] result compilation result (a map represented as StructType::Struct of exported structures representing the forms)
 	///\param[out] error error message in case of failure
 	bool compileFile( const std::string& filename, StructType& result, std::string& error);
 };

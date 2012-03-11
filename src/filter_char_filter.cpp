@@ -66,22 +66,6 @@ struct InputFilterImpl :public protocol::InputFilter
 		return new InputFilterImpl( *this);
 	}
 
-	enum ErrorCodes
-	{
-		Ok,
-		ErrBufferTooSmall
-	};
-
-	static const char* errorName( ErrorCodes e)
-	{
-		static const char* ar[] = {0,"ErrBufferTooSmall"};
-		return ar[ (int)e];
-	}
-
-	///\brief Get the last error, if the filter got into an error state
-	///\return the last error as string or 0
-	virtual const char* getLastError() const	{return errorName((ErrorCodes)getError());}
-
 	///\brief implement interface member protocol::InputFilter::getNext( typename protocol::InputFilter::ElementType*,void*,std::size_t,std::size_t*)
 	virtual bool getNext( typename protocol::InputFilter::ElementType* type, void* buffer, std::size_t buffersize, std::size_t* bufferpos)
 	{
@@ -98,7 +82,7 @@ struct InputFilterImpl :public protocol::InputFilter
 				AppCharset::print( ch, buf);
 				if (buf.overflow())
 				{
-					setState( Error, ErrBufferTooSmall);
+					setState( Error, "textwolf: buffer too small to hold one character");
 					return false;
 				}
 				*bufferpos = buf.size();

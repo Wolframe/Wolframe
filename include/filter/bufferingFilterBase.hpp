@@ -73,14 +73,6 @@ struct BufferingInputFilter :public protocol::InputFilter
 		return new BufferingInputFilter( *this);
 	}
 
-	///\brief Get the last error, if the filter got into an error state
-	///\return the last error as string or 0
-	virtual const char* getLastError() const
-	{
-		Content* dc = m_content.get();
-		return dc?dc->getLastError():0;
-	}
-
 	virtual bool getNext( ElementType* type, void* buffer, std::size_t buffersize, std::size_t* bufferpos)
 	{
 		if (!m_inputConsumed && !bufferInput())
@@ -91,14 +83,15 @@ struct BufferingInputFilter :public protocol::InputFilter
 		Content* dc = m_content.get();
 		if (!dc)
 		{
-			setState( Error, ErrNoContent);
+			setState( Error, "buffering filter: No content");
 			return false;
 		}
 		if (!dc->fetch( type, buffer, buffersize, bufferpos))
 		{
 			if (!dc->end())
 			{
-				setState( Error, ErrOutputBufferTooSmall);
+				const char* err = dc->getError();
+				setState( Error, err?err:"buffering filter: element buffer too small to hold one element");
 			}
 			return false;
 		}
@@ -123,7 +116,7 @@ private:
 		}
 		catch (std::bad_alloc)
 		{
-			setState( Error, ErrOutOfMem);
+			setState( Error, "buffering filter: out of memory");
 			return false;
 		}
 		if (gotEoD())
@@ -133,7 +126,7 @@ private:
 
 			if (!m_content->open( ptr(), size()))
 			{
-				setState( Error, ErrOpenDoc);
+				setState( Error, "buffering filter: cannot open document");
 				rt = false;
 			}
 			else

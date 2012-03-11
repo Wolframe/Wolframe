@@ -724,7 +724,7 @@ bool SimpleFormCompilerImpl::compile( StructType& result_, std::string& error_)
 		{
 			StructType st;
 			getStruct( ii, st);
-			result_ = st;
+			result_.defineContent( itr->name, st);
 		}
 		++itr;
 		++ii;

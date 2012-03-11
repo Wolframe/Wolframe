@@ -56,8 +56,8 @@ static InputFilterClosure::ItemType fetchFailureResult( const protocol::InputFil
 			return InputFilterClosure::DoYield;
 
 		case protocol::InputFilter::Error:
-			msg = ff.getLastError();
-			LOG_ERROR << "error in iterator (" << ff.getError() << " " << (msg?msg:"") << ")";
+			msg = ff.getError();
+			LOG_ERROR << "error in input filter (" << (msg?msg:"unknown") << ")";
 			return InputFilterClosure::Error;
 
 		case protocol::InputFilter::Open:
@@ -246,11 +246,10 @@ Output::ItemType Output::print( const char* tag, unsigned int tagsize, const cha
 						m_state = 0;
 						return Data;
 				}
-				int err = m_outputfilter->getError();
+				const char* err = m_outputfilter->getError();
 				if (err)
 				{
-					const char* msg = m_outputfilter->getLastError();
-					LOG_ERROR << "error in output filter (" << err << " " << (msg?msg:"") << ")";
+					LOG_ERROR << "error in output filter (" << err << ")";
 					return Error;
 				}
 				else if (m_outputfilter->state() != protocol::OutputFilter::EndOfBuffer)
@@ -270,11 +269,10 @@ Output::ItemType Output::print( const char* tag, unsigned int tagsize, const cha
 			{
 				if (!m_outputfilter->print( protocol::OutputFilter::OpenTag, tag, tagsize))
 				{
-					int err = m_outputfilter->getError();
+					const char* err = m_outputfilter->getError();
 					if (err)
 					{
-						const char* msg = m_outputfilter->getLastError();
-						LOG_ERROR << "error in output filter open tag (" << err << " " << (msg?msg:"") << ")";
+						LOG_ERROR << "error in output filter open tag (" << err << ")";
 						return Error;
 					}
 					else  if (m_outputfilter->state() != protocol::OutputFilter::EndOfBuffer)
@@ -296,11 +294,10 @@ Output::ItemType Output::print( const char* tag, unsigned int tagsize, const cha
 		{
 			if (!m_outputfilter->print( protocol::OutputFilter::Value, val, valsize))
 			{
-				int err = m_outputfilter->getError();
+				const char* err = m_outputfilter->getError();
 				if (err)
 				{
-					const char* msg = m_outputfilter->getLastError();
-					LOG_ERROR << "error in output filter value (" << err << " " << (msg?msg:"") << ")";
+					LOG_ERROR << "error in output filter value (" << err << ")";
 					return Error;
 				}
 				else if (m_outputfilter->state() != protocol::OutputFilter::EndOfBuffer)
@@ -321,11 +318,10 @@ Output::ItemType Output::print( const char* tag, unsigned int tagsize, const cha
 		{
 			if (!m_outputfilter->print( protocol::OutputFilter::CloseTag, 0, 0))
 			{
-				int err = m_outputfilter->getError();
+				const char* err = m_outputfilter->getError();
 				if (err)
 				{
-					const char* msg = m_outputfilter->getLastError();
-					LOG_ERROR << "error in output filter close tag (" << err << " " << (msg?msg:"") << ")";
+					LOG_ERROR << "error in output filter close tag (" << err << ")";
 					return Error;
 				}
 				else if (m_outputfilter->state() != protocol::OutputFilter::EndOfBuffer)

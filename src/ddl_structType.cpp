@@ -71,11 +71,13 @@ StructType::Map::iterator StructType::find( const char* name)
 
 StructType::Map::const_iterator StructType::begin() const
 {
+	if (m_contentType == Atomic) throw std::logic_error( "defined as atomic");
 	return (m_contentType == Vector)?(m_elem.begin()+1):m_elem.begin();
 }
 
 StructType::Map::const_iterator StructType::end() const
 {
+	if (m_contentType == Atomic) throw std::logic_error( "defined as atomic");
 	return m_elem.end();
 }
 

@@ -88,11 +88,20 @@ struct OutputFilter :public OutputBlock
 
 	///\brief Constructor
 	OutputFilter()
-		:OutputBlock(0,0),m_errorCode(0),m_state(Open){}
+		:OutputBlock(0,0),m_state(Open)
+	{
+		m_errorbuf[0] = 0;
+	}
 	OutputFilter( void* p, std::size_t n, std::size_t i=0)
-		:OutputBlock(p,n,i),m_errorCode(0),m_state(Open){}
+		:OutputBlock(p,n,i),m_state(Open)
+	{
+		m_errorbuf[0] = 0;
+	}
 	OutputFilter( const OutputFilter& o)
-		:OutputBlock(o),m_errorCode(o.m_errorCode),m_state(o.m_state){}
+		:OutputBlock(o)
+	{
+		setState( o.m_state, o.m_errorbuf);
+	}
 
 	virtual ~OutputFilter(){}
 
@@ -111,23 +120,21 @@ struct OutputFilter :public OutputBlock
 	{
 		set( const_cast<void*>(o.ptr()), o.size());
 		setPos( o.pos());
-		m_state = o.m_state;
+		setState( o.m_state, o.m_errorbuf);
 	}
 
 	///\brief Defines the buffer to use for output.
 	///\param [in] data pointer to buffer to use
 	///\param [in] datasize allocation size of data in bytes
-	///
-	/// Initializes the structure without touching the output function itself
+	///\remark Initializes the structure without touching the output function itself
 	void init( void* data, std::size_t datasize)
 	{
 		set( data, datasize);
-		m_errorCode = 0;
-		m_state = Open;
+		setState( Open);
 	}
 
 	///\brief Empty initialization to force a yield execution
-	/// The forced yield execution signals the connectionHandler that it should define an output buffer for the application processor for printing.
+	///\remark The forced yield execution signals the connectionHandler that it should define an output buffer for the application processor for printing.
 	void init()
 	{
 		init( 0, 0);
@@ -153,13 +160,9 @@ struct OutputFilter :public OutputBlock
 		return print( type, element.c_str(), element.size());
 	}
 
-	///\brief Get error code in case of error state
-	///\return the error code
-	int getError() const								{return m_errorCode;}
-
-	///\brief Get the last error, if the filter got into an error state
-	///\return the last error as string or 0
-	virtual const char* getLastError() const					{return m_errorCode?"unknown":0;}
+	///\brief Get the las error in case of error state
+	///\return the error string or 0
+	const char* getError() const							{return (m_state==Error)?m_errorbuf:0;}
 
 	///\brief Get a member value of the filter
 	///\param [in] name case sensitive name of the variable
@@ -173,13 +176,23 @@ struct OutputFilter :public OutputBlock
 	///\return true on success, false, if the variable does not exist or the operation failed
 	virtual bool setValue( const char* /*name*/, const std::string& /*val*/)	{return false;}
 
-	///\brief Set output filter state with error code
+	///\brief Set output filter state with error message
 	///\param [in] s new state
-	///\param [in] e (optional) error code to set
-	void setState( State s, int e=0)
+	///\param [in] msg (optional) error to set
+	void setState( State s, const char* msg=0)
 	{
 		m_state = s;
-		m_errorCode = e;
+		if (msg)
+		{
+			std::size_t msglen = std::strlen( msg);
+			if (msglen >= ErrorBufSize) msglen = (std::size_t)ErrorBufSize-1;
+			std::memcpy( m_errorbuf, msg, msglen);
+			m_errorbuf[ msglen] = 0;
+		}
+		else
+		{
+			m_errorbuf[ 0] = 0;
+		}
 	}
 
 	///\brief Return the current state
@@ -190,8 +203,9 @@ struct OutputFilter :public OutputBlock
 	}
 
 private:
-	int m_errorCode;	///< error code
-	State m_state;		///< state
+	enum {ErrorBufSize=128};
+	char m_errorbuf[ ErrorBufSize];	//< error string
+	State m_state;			//< state
 };
 
 ///\typedef OutputFilterR

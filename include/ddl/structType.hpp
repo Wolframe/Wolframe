@@ -30,7 +30,7 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file ddl/structType.hpp
-///\brief Defines an an intrusive structure type as basic mapping type for DDLs
+///\brief Defines a non intrusive structure type for values in the DDLs used for forms
 
 #ifndef _Wolframe_DDL_STRUCTTYPE_HPP_INCLUDED
 #define _Wolframe_DDL_STRUCTTYPE_HPP_INCLUDED
@@ -53,6 +53,8 @@ public:
 	typedef std::pair< std::string,StructType> Element;
 	typedef std::vector< Element> Map;
 
+	///\enum ContentType
+	///\brief What StructType can be
 	enum ContentType
 	{
 		Atomic,		//< atomic type
@@ -60,50 +62,111 @@ public:
 		Struct		//< structure type
 	};
 
+	///\brief Get the content type of this
+	///\return the content type of this
 	ContentType contentType() const
 	{
 		return m_contentType;
 	}
 
+	///\brief Constructor
 	StructType()
 		:m_contentType( Struct),m_nof_attributes(0){}
+	///\brief Copy constructor
+	///\param[in] o element to copy
 	StructType( const StructType& o)
 		:m_contentType(o.m_contentType),m_value(o.m_value),m_elem(o.m_elem),m_nof_attributes(o.m_nof_attributes){}
+	///\brief Copy constructor
+	///\param[in] a element to copy
 	StructType( const AtomicType& a)
 		:m_contentType( Atomic),m_value(a),m_nof_attributes(0){}
 
+	///\brief Assignement operator
+	///\param[in] o element to copy
 	StructType& operator= ( const StructType& o);
 
-
+	///\brief Find an element of this as a structure
+	///\remark [precondition] this must be of type (ContentType) Struct
+	///\param[in] name name of the element to find
 	Map::const_iterator find( const char* name) const;
 
+	///\brief Find an element of this as a structure
+	///\remark [precondition] this must be of type (ContentType) Struct
+	///\param[in] name name of the element to find
 	Map::iterator find( const char* name);
 
+	///\brief Get the begin marker iterator on the elements of this
+	///\remark [precondition] this must not be of type (ContentType) Atomic
+	///\return the begin iterator
 	Map::const_iterator begin() const;
 
+	///\brief Get the end marker iterator on the elements of this
+	///\remark [precondition] this must not be of type (ContentType) Atomic
+	///\return the end iterator
 	Map::const_iterator end() const;
 
+	///\brief Get the value of this as an atomic type
+	///\remark [precondition] this must be of type (ContentType) Atomic
+	///\return the value of this
 	AtomicType& value();
 
+	///\brief Get the value of this as an atomic type
+	///\remark [precondition] this must be of type (ContentType) Atomic
+	///\return the value of this
 	const AtomicType& value() const;
 
-	void defineContent( const char* name, const StructType& dd);
-	void defineContent( const std::string& name, const StructType& dd);
+	///\brief Define a content element of a structure
+	///\remark [precondition] this must be of type (ContentType) Struct
+	///\param[in] name name of the element defined
+	///\param[in] val value of the element defined as member of this
+	void defineContent( const char* name, const StructType& val);
 
-	void defineAttribute( const char* name, const StructType& dd);
-	void defineAttribute( const std::string& name, const StructType& dd);
+	///\brief Define a content element of a structure
+	///\remark [precondition] this must be of type (ContentType) Struct
+	///\param[in] name name of the element defined
+	///\param[in] val value of the element defined as member of this
+	void defineContent( const std::string& name, const StructType& val);
 
+	///\brief Define an attribute of a structure
+	///\remark [precondition] this must be of type (ContentType) Struct
+	///\remark [precondition] val must be of type atomic
+	///\param[in] name name of the attribute defined
+	///\param[in] val value of the attribute defined as member of this
+	void defineAttribute( const char* name, const StructType& val);
+
+	///\brief Define an attribute of a structure
+	///\remark [precondition] this must be of type (ContentType) Struct
+	///\remark [precondition] val must be of type atomic
+	///\param[in] name name of the attribute defined
+	///\param[in] val value of the attribute defined as member of this
+	void defineAttribute( const std::string& name, const StructType& val);
+
+	///\brief Define this to be a vector of elements (ContentType Vector) of type defined by prototype
+	///\remark [precondition] this must not be of type (ContentType) Vector yet.
+	///\remark [precondition] prototype must not be of type (ContentType) Vector
+	///\param[in] prototype prototype of an empty vector element (new elements are created as copies of prototype)
 	void defineAsVector( const StructType& prototype);
 
+	///\brief Add a new element (copy of prototype) to this as a vector of elements (ContentType Vector)
+	///\remark [precondition] this must be of type (ContentType) Vector
 	void push();
 
+	///\brief Access the topmost element of a vector of elements (ContentType Vector)
+	///\remark [precondition] this must be of type (ContentType) Vector
 	StructType& back();
 
+	///\brief Access the topmost element of a vector of elements (ContentType Vector)
+	///\remark [precondition] this must be of type (ContentType) Vector
 	const StructType& back() const;
 
+	///\brief Get the number of attributes of a struct
+	///\remark returns 0 this is not of type (ContentType) Struct
+	///\return the number of attributes or 0
 	std::size_t nof_attributes() const;
 
 private:
+	///\brief Assert a type precondition of this. (throws an logic_error exception on failure)
+	///\remark Used for checking the preconditions mentioned as remark [precondition]
 	void REQUIRE( ContentType t) const;
 
 	ContentType m_contentType;
