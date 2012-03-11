@@ -65,4 +65,9 @@ Some useful links for the packager
 
 * merge modules and prerequisites:
   - http://cticoder.wordpress.com/2009/10/24/simulating-vs-nets-msi-installurl-property-with-wix/
-  
+* bootstrapper, dotNetInstaller:
+  - http://msdn.microsoft.com/en-us/library/ms229223.aspx
+  - http://stackoverflow.com/questions/1971407/how-to-silent-run-an-installer-of-another-programpostgresql-during-the-install
+  - http://msdn.microsoft.com/en-us/library/aa730839%28VS.80%29.aspx
+  - http://lostechies.com/gabrielschenker/2010/05/19/creating-a-bootstrapper-with-dotnetinstaller/
+  - http://windows-installer-xml-wix-toolset.687559.n2.nabble.com/How-to-install-prerequisites-based-upon-feature-selection-td5631730.html
