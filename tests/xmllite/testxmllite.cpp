@@ -1,13 +1,15 @@
 // modified example, original from the Windows SDK Code Samples
 
+#include <tchar.h>
 #include <atlbase.h>
+#include <AtlConv.h>
 #include "xmllite.h"
 #include <strsafe.h>
 #include <iostream>
 
 namespace
 {
-	bool example1Func( const char *filename )
+	bool example1Func( const _TCHAR *filename )
 	{
 		HRESULT h;
 		CComPtr<IStream> fileStream;
@@ -15,7 +17,9 @@ namespace
 		XmlNodeType nodeType;
 		const WCHAR *value;
 		
-		h = SHCreateStreamOnFile( filename, STGM_READ, &fileStream );
+		USES_CONVERSION;
+		
+		h = SHCreateStreamOnFileEx( A2CW( filename ), STGM_READ, OPEN_EXISTING, false, NULL, &fileStream );
 		if( FAILED( h ) ) {
 			std::cerr << "Error creating file reader, error is " << h << std::endl;
 			return false;
@@ -62,7 +66,7 @@ namespace
 	}
 }
 
-int main( int argc, char** argv )
+int _tmain( int argc, _TCHAR* argv[] )
 {
 	if( argc != 2 ) {
 		return 1;

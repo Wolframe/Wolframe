@@ -7,7 +7,11 @@
 #include <cstring>
 #include <vector>
 #include <string>
-//#include <whateverXmlLite...>
+#include <atlbase.h>
+#include "xmllite.h"
+#include <strsafe.h>
+// see: http://msdn.microsoft.com/en-us/magazine/cc163436.aspx
+// TODO: make it streamable
 
 using namespace _Wolframe;
 using namespace filter;
@@ -43,8 +47,12 @@ public:
 		return m_error.size()?m_error.c_str():0;
 	}
 
-	bool open( const void* content, std::size_t size)
+	bool open( const void* content, std::size_t size )
 	{
+		HRESULT h;
+
+		h = CreateStreamOnHGlobal( 0, TRUE, &m_s );
+		
 		return false;
 	}
 
@@ -63,6 +71,7 @@ private:
 	friend struct InputFilterImpl;
 	CountedReference<std::string> m_encoding;
 	std::string m_error;
+	CComPtr<IStream> m_s;
 };
 
 }//end anonymous namespace

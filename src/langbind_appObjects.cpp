@@ -39,10 +39,16 @@ Project Wolframe.
 #include <boost/algorithm/string.hpp>
 #include "filter/char_filter.hpp"
 #include "filter/line_filter.hpp"
-#if WITH_LIBXML2
+#ifdef WITH_LIBXML2
 #include "filter/libxml2_filter.hpp"
 #endif
 #include "filter/textwolf_filter.hpp"
+#ifdef WITH_XMLLITE
+#include "filter/xmllite_filter.hpp"
+#endif
+#if WITH_MSXML
+#include "filter/msxml_filter.hpp"
+#endif
 
 using namespace _Wolframe;
 using namespace langbind;
@@ -211,6 +217,22 @@ Filter::Filter( const char* name)
 	else if (equalIdent( name, "xml:libxml2"))
 	{
 		filter::Libxml2Filter tw( DEFAULT_INPUT_SIZE);
+		m_inputfilter = tw.inputFilter();
+		m_outputfilter = tw.outputFilter();
+	}
+#endif
+#ifdef WITH_XMLLITE
+	else if (equalIdent( name, "xml:xmllite"))
+	{
+		filter::XmlLiteFilter tw( DEFAULT_INPUT_SIZE);
+		m_inputfilter = tw.inputFilter();
+		m_outputfilter = tw.outputFilter();
+	}
+#endif
+#ifdef WITH_MSXML
+	else if (equalIdent( name, "xml:msxml"))
+	{
+		filter::MSXMLFilter tw( DEFAULT_INPUT_SIZE);
 		m_inputfilter = tw.inputFilter();
 		m_outputfilter = tw.outputFilter();
 	}
