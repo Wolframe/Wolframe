@@ -35,6 +35,9 @@
 #include "countedReference.hpp"
 #include "tprocHandlerConfig.hpp"
 #include "langbind/ioFilterCommandHandler.hpp"
+#include "langbind/directmapCommandEnvironment.hpp"
+#include "langbind/directmapCommandHandler.hpp"
+#include "ddl/compiler/simpleFormCompiler.hpp"
 #include "protocol/commandHandler.hpp"
 #include "config/description.hpp"
 #include <string>
@@ -77,9 +80,8 @@ const config::DescriptionBase* FormConfigStruct::description()
 		ThisDescription()
 		{
 			(*this)
-			( "name",	&FormConfigStruct::name)
 			( "path",	&FormConfigStruct::path)
-			( "main",	&FormConfigStruct::main)
+			( "name",	&FormConfigStruct::name)
 			;
 		}
 	};
@@ -94,6 +96,8 @@ const config::DescriptionBase* DirectMapConfigStruct::description()
 		ThisDescription()
 		{
 			(*this)
+			( "name",	&DirectMapConfigStruct::name)
+			( "ddlname",	&DirectMapConfigStruct::ddlname)
 			( "input",	&DirectMapConfigStruct::input)
 			( "output",	&DirectMapConfigStruct::output)
 			( "function",	&DirectMapConfigStruct::function)
@@ -122,8 +126,12 @@ const config::DescriptionBase* ConfigurationStruct::description()
 	return &rt;
 }
 
+
 Configuration::Configuration()
-	:ConfigurationBase( "tproc", 0, "tproc") {}
+	:ConfigurationBase( "tproc", 0, "tproc")
+{
+	m_compilers.push_back( new ddl::SimpleFormCompiler());
+}
 
 #if WITH_LUA
 static bool isLuaScript( const std::string& path)
@@ -132,19 +140,14 @@ static bool isLuaScript( const std::string& path)
 }
 #endif
 
-static bool isSimpleForm( const std::string& path)
-{
-	return (path.size()>4 && boost::algorithm::iequals( path.c_str()+path.size()-4, ".frm"));
-}
-
 bool Configuration::defineScript( const ScriptConfigStruct& sc)
 {
 #if WITH_LUA
 	if (isLuaScript( sc.path))
 	{
-		langbind::LuaCommandEnvironment* cfg;
-		m_envs.push_back( cfg=new langbind::LuaCommandEnvironment( sc.main, sc.path, sc.module));
-		protocol::CommandBase* cmd = new protocol::Command< langbind::LuaCommandHandler, langbind::LuaCommandEnvironment>( sc.name.c_str(), cfg);
+		langbind::LuaCommandEnvironment* env;
+		m_envs.push_back( env=new langbind::LuaCommandEnvironment( sc.main, sc.path, sc.module));
+		protocol::CommandBase* cmd = new protocol::Command< langbind::LuaCommandHandler, langbind::LuaCommandEnvironment>( sc.name.c_str(), env);
 		m_cmds.push_back( cmd);
 	}
 	else
@@ -158,24 +161,21 @@ bool Configuration::defineScript( const ScriptConfigStruct& sc)
 
 bool Configuration::defineDirectMap( const DirectMapConfigStruct& dm)
 {
-	if (isSimpleForm( dm.input.path))
+	std::vector<CountedReference<ddl::CompilerInterface> >::const_iterator itr=m_compilers.begin(),end=m_compilers.end();
+	for (; itr != end; ++itr)
 	{
-
+		ddl::CompilerInterface* ddlc = itr->get();
+		if (ddlc && boost::algorithm::iequals( dm.ddlname, ddlc->ddlname()))
+		{
+			langbind::DirectmapCommandEnvironment* env;
+			m_envs.push_back( env=new langbind::DirectmapCommandEnvironment( ddlc, dm.input.path, dm.input.name, dm.output.path, dm.output.name));
+			protocol::CommandBase* cmd = new protocol::Command< langbind::DirectmapCommandHandler, langbind::DirectmapCommandEnvironment>( dm.name.c_str(), env);
+			m_cmds.push_back( cmd);
+			return true;
+		}
 	}
-	else
-	{
-		LOG_ERROR << "Unknown type of DDL source loaded for input: " << dm.input.path;
-		return false;
-	}
-	if (isSimpleForm( dm.output.path))
-	{
-	}
-	else
-	{
-		LOG_ERROR << "Unknown type of DDL source loaded for output: " << dm.output.path;
-		return false;
-	}
-	return true;
+	LOG_ERROR << "Unknown type of DDL: '" << dm.ddlname << "'";
+	return false;
 }
 
 bool Configuration::parse( const config::ConfigurationTree& pt, const std::string&, const module::ModulesDirectory*)

@@ -75,6 +75,8 @@ LOCAL_STATIC_LIB_OBJS = \
 	protocol_lineCommandHandler.o \
 	langbind_appObjects.o \
 	langbind_ioFilterCommandHandler.o \
+	langbind_directmapCommandEnvironment.o \
+	langbind_directmapCommandHandler.o \
 	filter_textwolf_filter.o \
 	filter_textwolf_filterBase.o \
 	filter_char_filter.o \

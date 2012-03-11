@@ -51,3 +51,8 @@ bool AtomicType::getType( const char* name, Type& tp)
 	return false;
 }
 
+void AtomicType::print( std::ostream& out, size_t indent) const
+{
+	while (indent--) out << "\t";
+	out << typeName( m_type) << " '" << m_value << "'" << std::endl;
+}

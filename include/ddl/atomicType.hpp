@@ -134,6 +134,11 @@ public:
 		return m_value;
 	}
 
+	///\brief Print content to out
+	///\param[out] out output stream to print to
+	///\param[in] indent indentiation for items to print
+	void print( std::ostream& out, size_t indent=0) const;
+
 private:
 	Type m_type;						//< type of this
 	std::string m_value;					//< value of this

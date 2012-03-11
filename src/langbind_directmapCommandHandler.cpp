@@ -29,42 +29,31 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file ddl_compilerInterface.cpp
-///\brief implementation of common methods of DDL compilers
-#include "ddl/compilerInterface.hpp"
-#define BOOST_FILESYSTEM_VERSION 3
-#include <sstream>
-#include <string>
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/fstream.hpp>
-#include <boost/filesystem/exception.hpp>
+#include "langbind/directmapCommandHandler.hpp"
+#include "langbind/appObjects.hpp"
+#include "logger-v1.hpp"
+#include "protocol/outputfilter.hpp"
+#include "protocol/inputfilter.hpp"
+#include <stdexcept>
+#include <cstddef>
+#include <boost/lexical_cast.hpp>
 
 using namespace _Wolframe;
-using namespace ddl;
+using namespace langbind;
 
-bool CompilerInterface::compileFile( const std::string& filename, StructType& result, std::string& error) const
+struct DirectmapCommandHandler::Context
 {
-	try
-	{
-		std::ifstream inFile( filename.c_str());
-		std::ostringstream src;
-		while (inFile)
-		{
-			std::string ln;
-			std::getline( inFile, ln);
-			if (!inFile.eof()) src << ln << "\n";
-		}
-		return compile( src.str(), result, error);
-	}
-	catch (const std::ios_base::failure& e)
-	{
-		error.append( "Error reading DDL source file '");
-		error.append( filename);
-		error.append( "' (");
-		error.append( e.what());
-		error.append( ")");
-		return false;
-	}
-	return true;
+};
+
+DirectmapCommandHandler::DirectmapCommandHandler( const DirectmapCommandEnvironment* e)
+	:m_env(e),m_context(0){}
+
+DirectmapCommandHandler::~DirectmapCommandHandler() {}
+
+protocol::IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& err)
+{
+	err = "NOT IMPLEMENTED";
+	return protocol::IOFilterCommandHandler::Error;
 }
+
 
