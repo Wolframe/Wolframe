@@ -97,9 +97,11 @@ local_clean:
 local_distclean:
 
 sasl.db:
+ifeq ($(WITH_SASL),1)
 	echo "xx" | $(SASL_DIR)/sbin/saslpasswd2 -f sasl.db -p test
 ifeq "$(PLATFORM)" "FREEBSD"
 	mv sasl.db.db sasl.db
+endif
 endif
 
 local_test: sasl.db $(TEST_CPP_BINS)
