@@ -30,10 +30,10 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file luaCommandConfig.hpp
-///\brief Configuration of a command as call to a lua script
-#ifndef _langbind_LUA_COMMAND_CONFIG_HPP_INCLUDED
-#define _langbind_LUA_COMMAND_CONFIG_HPP_INCLUDED
+///\file luaCommandEnvironment.hpp
+///\brief Static environment of a command as call to a lua script
+#ifndef _langbind_LUA_COMMAND_ENVIRONMENT_HPP_INCLUDED
+#define _langbind_LUA_COMMAND_ENVIRONMENT_HPP_INCLUDED
 #include "standardConfigs.hpp"
 #include "config/descriptionBase.hpp"
 #include "protocol/commandHandler.hpp"
@@ -50,7 +50,7 @@ namespace langbind {
 
 ///\class Configuration
 ///\brief configuration object of a command as call to a lua script
-class LuaCommandConfig :public protocol::CommandConfig
+class LuaCommandEnvironment :public protocol::CommandEnvironment
 {
 public:
 	///\brief module load function for a lua state
@@ -58,7 +58,7 @@ public:
 	typedef int (*ModuleLoad)( lua_State *ls);
 
 	///\brief default constructor
-	LuaCommandConfig( const std::string& main_, const std::string& mainmodule_, const std::vector<std::string>& modules_=std::vector<std::string>())
+	LuaCommandEnvironment( const std::string& main_, const std::string& mainmodule_, const std::vector<std::string>& modules_=std::vector<std::string>())
 		:m_main(main_)
 		,m_mainmodule( mainmodule_, Module::Script)
 	{
@@ -129,9 +129,9 @@ public:
 		virtual bool check() const;
 
 	private:
-		Type m_type;				///< type of the module
-		std::string m_name;			///< name of the module
-		ModuleLoad m_load;			///< function to load the module into the interpreter context
+		Type m_type;				//< type of the module
+		std::string m_name;			//< name of the module
+		ModuleLoad m_load;			//< function to load the module into the interpreter context
 	};
 	///\brief return the main function
 	const std::string& main() const			{return m_main;}
@@ -141,9 +141,9 @@ public:
 	const std::vector<Module>& modules() const	{return m_modules;}
 
 private:
-	std::string m_main;				///< main function
-	Module m_mainmodule;				///< main module
-	std::vector<Module> m_modules;			///< list of modules without the main
+	std::string m_main;				//< main function
+	Module m_mainmodule;				//< main module
+	std::vector<Module> m_modules;			//< list of modules without the main
 };
 
 }}//namespace

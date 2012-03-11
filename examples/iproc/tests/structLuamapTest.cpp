@@ -35,7 +35,7 @@ Project Wolframe.
 #include "serialize/struct/luamapDescription.hpp"
 #include "serialize/struct/luamapBase.hpp"
 #include "iprocHandlerConfig.hpp"
-#include "langbind/luaCommandConfig.hpp"
+#include "langbind/luaCommandEnvironment.hpp"
 #include "langbind/appObjects.hpp"
 #include "langbind/luaCommandHandler.hpp"
 #include "logger-v1.hpp"
@@ -214,10 +214,10 @@ const DescriptionBase* Document::getDescription()
 	return &rt;
 }
 
-class IProcTestConfiguration :public LuaCommandConfig
+class IProcTestConfiguration :public LuaCommandEnvironment
 {
 public:
-	IProcTestConfiguration ( const std::string& scriptpath) :LuaCommandConfig( "run",  scriptpath){}
+	IProcTestConfiguration ( const std::string& scriptpath) :LuaCommandEnvironment( "run",  scriptpath){}
 };
 
 template <class Struct>

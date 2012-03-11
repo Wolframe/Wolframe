@@ -45,7 +45,7 @@
 
 #if WITH_LUA
 #include "langbind/appObjects.hpp"
-#include "langbind/luaCommandConfig.hpp"
+#include "langbind/luaCommandEnvironment.hpp"
 #include "langbind/luaCommandHandler.hpp"
 #endif
 
@@ -142,9 +142,9 @@ bool Configuration::defineScript( const ScriptConfigStruct& sc)
 #if WITH_LUA
 	if (isLuaScript( sc.path))
 	{
-		langbind::LuaCommandConfig* cfg;
-		m_configs.push_back( cfg=new langbind::LuaCommandConfig( sc.main, sc.path, sc.module));
-		protocol::CommandBase* cmd = new protocol::Command< langbind::LuaCommandHandler, langbind::LuaCommandConfig>( sc.name.c_str(), cfg);
+		langbind::LuaCommandEnvironment* cfg;
+		m_envs.push_back( cfg=new langbind::LuaCommandEnvironment( sc.main, sc.path, sc.module));
+		protocol::CommandBase* cmd = new protocol::Command< langbind::LuaCommandHandler, langbind::LuaCommandEnvironment>( sc.name.c_str(), cfg);
 		m_cmds.push_back( cmd);
 	}
 	else
@@ -202,7 +202,7 @@ bool Configuration::test() const
 	std::vector< CountedReference<protocol::CommandBase> >::const_iterator itr=m_cmds.begin(),end=m_cmds.end();
 	for (;itr!=end; ++itr)
 	{
-		if (!itr->get()->config()->test()) return false;
+		if (!itr->get()->env()->test()) return false;
 	}
 	return true;
 }
@@ -212,9 +212,9 @@ bool Configuration::check() const
 	std::vector<CountedReference< protocol::CommandBase> >::const_iterator itr=m_cmds.begin(),end=m_cmds.end();
 	for (;itr!=end; ++itr)
 	{
-		if (itr->get()->config())
+		if (itr->get()->env())
 		{
-			if (!itr->get()->config()->check()) return false;
+			if (!itr->get()->env()->check()) return false;
 		}
 	}
 	return true;
@@ -225,9 +225,9 @@ void Configuration::print( std::ostream& o, size_t i) const
 	std::vector<CountedReference< protocol::CommandBase> >::const_iterator itr=m_cmds.begin(),end=m_cmds.end();
 	for (;itr!=end; ++itr)
 	{
-		if (itr->get()->config())
+		if (itr->get()->env())
 		{
-			itr->get()->config()->print( o, i);
+			itr->get()->env()->print( o, i);
 		}
 	}
 }

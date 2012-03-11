@@ -310,7 +310,7 @@ include/filter/xmllite_filter.hpp
 include/GNUmakefile
 include/langbind/appObjects.hpp
 include/langbind/ioFilterCommandHandler.hpp
-include/langbind/luaCommandConfig.hpp
+include/langbind/luaCommandEnvironment.hpp
 include/langbind/luaCommandHandler.hpp
 include/langbind/luaDebug.hpp
 include/logger/logBackend.hpp
@@ -458,7 +458,7 @@ src/GNUmakefile
 src/handlerConfig.hpp
 src/langbind_appObjects.cpp
 src/langbind_ioFilterCommandHandler.cpp
-src/langbind_luaCommandConfig.cpp
+src/langbind_luaCommandEnvironment.cpp
 src/langbind_luaCommandHandler.cpp
 src/langbind_luaDebug.cpp
 src/libwolframe/GNUmakefile

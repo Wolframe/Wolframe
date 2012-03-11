@@ -35,7 +35,7 @@ Project Wolframe.
 ///
 #ifndef _Wolframe_langbind_LUA_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_langbind_LUA_COMMAND_HANDLER_HPP_INCLUDED
-#include "luaCommandConfig.hpp"
+#include "luaCommandEnvironment.hpp"
 #include "appObjects.hpp"
 #include "ioFilterCommandHandler.hpp"
 extern "C"
@@ -57,7 +57,7 @@ public:
 
 	///\brief Constructor
 	///\param[in] config read only reference to the configuration of this application processor
-	LuaCommandHandler( const langbind::LuaCommandConfig* config);
+	LuaCommandHandler( const langbind::LuaCommandEnvironment* config);
 	///\brief Destructor
 	virtual ~LuaCommandHandler();
 
@@ -71,7 +71,7 @@ public:
 	lua_State* getLuaState() const;
 
 private:
-	const LuaCommandConfig* m_config;	///< reference to configuration
+	const LuaCommandEnvironment* m_env;	///< reference to static environment
 	struct Globals
 	{
 		langbind::Input m_input;

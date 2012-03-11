@@ -30,7 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-#include "langbind/luaCommandConfig.hpp"
+#include "langbind/luaCommandEnvironment.hpp"
 #include "langbind/luaDebug.hpp"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/algorithm/string.hpp>
@@ -50,9 +50,9 @@ extern "C" {
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
-void LuaCommandConfig::Module::setType()
+void LuaCommandEnvironment::Module::setType()
 {
-	if (m_type == LuaCommandConfig::Module::Undefined)
+	if (m_type == LuaCommandEnvironment::Module::Undefined)
 	{
 		///TODO: Implement user defined modules
 		m_type = Script;
@@ -94,7 +94,7 @@ static int function_printlog( lua_State *ls)
 	return 0;
 }
 
-bool LuaCommandConfig::Module::load( lua_State* ls) const
+bool LuaCommandEnvironment::Module::load( lua_State* ls) const
 {
 	if (m_type == UserLib)
 	{
@@ -133,7 +133,7 @@ bool LuaCommandConfig::Module::load( lua_State* ls) const
 	return true;
 }
 
-bool LuaCommandConfig::Module::check() const
+bool LuaCommandEnvironment::Module::check() const
 {
 	switch (m_type)
 	{
@@ -157,7 +157,7 @@ bool LuaCommandConfig::Module::check() const
 	return true;
 }
 
-bool LuaCommandConfig::load( lua_State *ls) const
+bool LuaCommandEnvironment::load( lua_State *ls) const
 {
 	luaL_openlibs( ls);
 
@@ -179,7 +179,7 @@ bool LuaCommandConfig::load( lua_State *ls) const
 	return true;
 }
 
-bool LuaCommandConfig::check() const
+bool LuaCommandEnvironment::check() const
 {
 	bool rt = true;
 	for (std::vector<Module>::const_iterator it = m_modules.begin(); it != m_modules.end(); it++)
@@ -189,7 +189,7 @@ bool LuaCommandConfig::check() const
 	return rt;
 }
 
-bool LuaCommandConfig::test() const
+bool LuaCommandEnvironment::test() const
 {
 	lua_State *ls = luaL_newstate();
 	if (!ls)
@@ -202,7 +202,7 @@ bool LuaCommandConfig::test() const
 	return rt;
 }
 
-void LuaCommandConfig::print( std::ostream& os, size_t /*indent*/) const
+void LuaCommandEnvironment::print( std::ostream& os, size_t /*indent*/) const
 {
 	os << "Configuration of Lua Script Processor" << ":" << std::endl;
 	os << "   Main Script: " << m_mainmodule.name() << " (" << m_mainmodule.name() << ")" << std::endl;
