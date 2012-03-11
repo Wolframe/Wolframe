@@ -258,7 +258,7 @@ static int run( const IProcTestConfiguration& cfg, const std::string& input, std
 	processor.setFilter( filter.m_outputfilter);
 	for (;;)
 	{
-		int errorCode = 0;
+		const char* errorCode = 0;
 		switch (processor.call( errorCode))
 		{
 			case LuaCommandHandler::Yield:
@@ -282,7 +282,7 @@ static int run( const IProcTestConfiguration& cfg, const std::string& input, std
 
 			case LuaCommandHandler::Error:
 			{
-				LOG_ERROR << "error processing " << errorCode;
+				LOG_ERROR << "error processing " << (errorCode?errorCode:"unknown");
 				return 2;
 			}
 		}

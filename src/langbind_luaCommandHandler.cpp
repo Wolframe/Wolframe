@@ -545,7 +545,7 @@ LuaCommandHandler::~LuaCommandHandler()
 	delete m_context;
 }
 
-LuaCommandHandler::CallResult LuaCommandHandler::call( int& errorCode)
+LuaCommandHandler::CallResult LuaCommandHandler::call( const char*& errorCode)
 {
 	int rt = 0;
 	errorCode = 0;
@@ -565,7 +565,7 @@ LuaCommandHandler::CallResult LuaCommandHandler::call( int& errorCode)
 			if (!LuaObject<Input>::setGlobal( m_context->ls, "input", m_globals.m_input))
 			{
 				LOG_ERROR << "Failed to initialize input. It possibly has been redefined as a value of different type";
-				errorCode = 101;
+				errorCode = "init input";
 				return Error;
 			}
 		}
@@ -575,7 +575,7 @@ LuaCommandHandler::CallResult LuaCommandHandler::call( int& errorCode)
 			if (!LuaObject<Output>::setGlobal( m_context->ls, "output", m_globals.m_output))
 			{
 				LOG_ERROR << "Failed to initialize output. It possibly has been redefined as a value of different type";
-				errorCode = 102;
+				errorCode = "init output";
 				return Error;
 			}
 		}
@@ -604,7 +604,7 @@ LuaCommandHandler::CallResult LuaCommandHandler::call( int& errorCode)
 		luaL_unref( m_context->ls, LUA_REGISTRYINDEX, m_context->threadref);
 		m_context->threadref = 0;
 		m_context->thread = 0;
-		errorCode = 1;
+		errorCode = "call of lua procedure failed";
 		return Error;
 	}
 	else

@@ -65,16 +65,15 @@ void IOFilterCommandHandler::setOutputBuffer( void* buf, std::size_t size, std::
 
 enum
 {
-	ErrOutputFilterDeleted=-1,
-	ErrInputFilterDeleted=-2,
-	ErrOutputFilter=-3,
-	ErrInputFilter=-4,
-	ErrUnknown=-5
+	ErrInternal=-1,
+	ErrProcessing=-2,
+	ErrResources=-3
 };
 
 CommandHandler::Operation IOFilterCommandHandler::nextOperation()
 {
 	OutputFilter* flt;
+	const char* errmsg = 0;
 
 	for (;;) switch (m_state)
 	{
@@ -86,7 +85,7 @@ CommandHandler::Operation IOFilterCommandHandler::nextOperation()
 			if (!(flt = m_outputfilter.get()))
 			{
 				LOG_ERROR << "Output filter undefined";
-				m_statusCode = ErrOutputFilterDeleted;
+				m_statusCode = ErrInternal;
 				m_state = DiscardInput;
 				return READ;
 			}
@@ -118,7 +117,7 @@ CommandHandler::Operation IOFilterCommandHandler::nextOperation()
 			return READ;
 
 		case Processing:
-			switch (call( m_statusCode))
+			switch (call( errmsg))
 			{
 				case Ok:
 					m_state = DiscardInput;
@@ -126,9 +125,10 @@ CommandHandler::Operation IOFilterCommandHandler::nextOperation()
 
 				case Error:
 					m_state = DiscardInput;
-					if (m_statusCode == 0)
+					if (errmsg)
 					{
-						m_statusCode = ErrUnknown;
+						LOG_ERROR << "Error calling procedure: " << (errmsg?errmsg:"unknown");
+						m_statusCode = ErrProcessing;
 					}
 					continue;
 
@@ -144,7 +144,9 @@ CommandHandler::Operation IOFilterCommandHandler::nextOperation()
 								return READ;
 
 							case InputFilter::Error:
-								m_statusCode = ErrInputFilter;
+								errmsg = m_inputfilter->getError();
+								LOG_ERROR << "Error in input filter: " << (errmsg?errmsg:"unknown");
+								m_statusCode = ErrProcessing;
 								m_state = DiscardInput;
 								return READ;
 						}
@@ -166,17 +168,17 @@ CommandHandler::Operation IOFilterCommandHandler::nextOperation()
 								/* no break here !*/
 
 							case OutputFilter::Error:
-								m_statusCode = ErrOutputFilter;
+								errmsg = m_outputfilter->getError();
+								LOG_ERROR << "Error in output filter: " << (errmsg?errmsg:"unknown");
+								m_statusCode = ErrProcessing;
 								m_state = DiscardInput;
 								return READ;
 						}
 					}
-					else
-					{
-						m_statusCode = ErrInputFilter;
-						m_state = DiscardInput;
-						return READ;
-					}
+					LOG_ERROR << "Illegal state (missing filter)";
+					m_statusCode = ErrInternal;
+					m_state = DiscardInput;
+					return READ;
 			}
 	}
 	LOG_ERROR << "illegal state";

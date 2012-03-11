@@ -64,7 +64,7 @@ public:
 	///\brief Execute the Lua script
 	///\param[out] errorCode error code in case of error
 	///\return CallResult status of the filter input for the state machine of this command handler
-	virtual CallResult call( int& errorCode);
+	virtual CallResult call( const char*& err);
 
 	///\brief Get the current lua state (not the thread!)
 	///\return the current lua state

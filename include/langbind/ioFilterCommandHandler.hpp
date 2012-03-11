@@ -97,9 +97,9 @@ public:
 		return ar[ (int)cr];
 	}
 
-	///\param[out] errorCode error code in case of error
+	///\param[out] err error code in case of error
 	///\return CallResult status of the filter input for the state machine of this command handler
-	virtual CallResult call( int& errorCode)=0;
+	virtual CallResult call( const char*& err)=0;
 
 private:
 	enum State
