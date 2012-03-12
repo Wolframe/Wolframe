@@ -27,17 +27,11 @@ ABa:
   - username, password for service credentials
   - clean up native Win32 string mess in service code
   - log when service gets installed and uninstalled
-  - do some packaging with WIX
-    - have merge modules for all optional parts (should be do
-      merge modules for OpenSSL? legal?)
 - Logger:
   - get better interface in logger.hpp (inheriting basic::ostream
-    instead of templating?)
+    instead of templating? or boost streams or boost:log)
 - FreeBSD
   - OpenPAM instead of Linux-PAM
-  - trouble with some expect tests, check!
-- Solaris
-  - redo pam, sasl
 - packaging
   - OSC
     - Debian release (squeeze/sid) into deb package name
