@@ -62,7 +62,7 @@ const config::DescriptionBase* ScriptConfigStruct::description()
 		ThisDescription()
 		{
 			(*this)
-			( "name",	&ScriptConfigStruct::name)
+			( "name",	&ScriptConfigStruct::cmdname)
 			( "path",	&ScriptConfigStruct::path)
 			( "main",	&ScriptConfigStruct::main)
 			( "module",	&ScriptConfigStruct::module)
@@ -96,7 +96,7 @@ const config::DescriptionBase* DirectMapConfigStruct::description()
 		ThisDescription()
 		{
 			(*this)
-			( "name",	&DirectMapConfigStruct::name)
+			( "cmdname",	&DirectMapConfigStruct::cmdname)
 			( "ddlname",	&DirectMapConfigStruct::ddlname)
 			( "input",	&DirectMapConfigStruct::input)
 			( "output",	&DirectMapConfigStruct::output)
@@ -147,7 +147,7 @@ bool Configuration::defineScript( const ScriptConfigStruct& sc)
 	{
 		langbind::LuaCommandEnvironment* env;
 		m_envs.push_back( env=new langbind::LuaCommandEnvironment( sc.main, sc.path, sc.module));
-		protocol::CommandBase* cmd = new protocol::Command< langbind::LuaCommandHandler, langbind::LuaCommandEnvironment>( sc.name.c_str(), env);
+		protocol::CommandBase* cmd = new protocol::Command< langbind::LuaCommandHandler, langbind::LuaCommandEnvironment>( sc.cmdname.c_str(), env);
 		m_cmds.push_back( cmd);
 	}
 	else
@@ -169,7 +169,7 @@ bool Configuration::defineDirectMap( const DirectMapConfigStruct& dm)
 		{
 			langbind::DirectmapCommandEnvironment* env;
 			m_envs.push_back( env=new langbind::DirectmapCommandEnvironment( ddlc, dm.input.path, dm.input.name, dm.output.path, dm.output.name));
-			protocol::CommandBase* cmd = new protocol::Command< langbind::DirectmapCommandHandler, langbind::DirectmapCommandEnvironment>( dm.name.c_str(), env);
+			protocol::CommandBase* cmd = new protocol::Command< langbind::DirectmapCommandHandler, langbind::DirectmapCommandEnvironment>( dm.cmdname.c_str(), env);
 			m_cmds.push_back( cmd);
 			return true;
 		}

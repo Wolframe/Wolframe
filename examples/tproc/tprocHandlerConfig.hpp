@@ -46,30 +46,33 @@ namespace tproc {
 
 struct ScriptConfigStruct
 {
-	std::string name;
-	std::string path;
-	std::string main;
-	std::vector<std::string> module;
+	std::string cmdname;				//< name of the command in the protocol
+	std::string path;				//< path of the script to execute
+	std::string main;				//< path of the function in the script to execute
+	std::vector<std::string> module;		//< list of additional modules to load
 
+	///\brief Get the configuration structure description
 	static const config::DescriptionBase* description();
 };
 
 struct FormConfigStruct
 {
-	std::string path;
-	std::string name;
+	std::string path;				//< path of the DDL source of the form
+	std::string name;				//< name of the form in the source
 
+	///\brief Get the configuration structure description
 	static const config::DescriptionBase* description();
 };
 
 struct DirectMapConfigStruct
 {
-	std::string name;
-	std::string ddlname;
-	FormConfigStruct input;
-	FormConfigStruct output;
-	std::string function;
+	std::string cmdname;				//< name of the command in the protocol
+	std::string ddlname;				//< name of the DDL (selects the compiler to translate the source)
+	FormConfigStruct input;				//< input form definition
+	FormConfigStruct output;			//< output form definition
+	std::string function;				//< name of the transaction function to execute
 
+	///\brief Get the configuration structure description
 	static const config::DescriptionBase* description();
 };
 
@@ -80,16 +83,19 @@ struct ConfigurationStruct
 	std::size_t input_bufsize;			//< size of input network message buffers in bytes (should only be configured for testing)
 	std::size_t output_bufsize;			//< size of output network message buffers in bytes (should only be configured for testing)
 
+	///\brief Get the configuration structure description
 	static const config::DescriptionBase* description();
 };
 
-
+///\class Configuration
+///\brief Configuration structure
 class Configuration :public config::ConfigurationBase
 {
 public:
 	Configuration();
 	Configuration( const Configuration& o)	:config::ConfigurationBase(o),m_data(o.m_data),m_cmds(o.m_cmds),m_envs(o.m_envs),m_compilers(o.m_compilers){}
 
+	///\brief interface implementation of ConfigurationBase::parse( const config::ConfigurationTree&, const std::string&, const module::ModulesDirectory*)
 	bool parse( const config::ConfigurationTree& pt, const std::string& node, const module::ModulesDirectory* modules );
 
 	///\brief return all currently available commands
