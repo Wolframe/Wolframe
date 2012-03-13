@@ -336,9 +336,11 @@ private:
 				++ii;
 			}
 		}
+		/* Aba: dereference *itr == end ?! Can't work IMHO, crashes on Windows
 		if (*itr <= nn/4) return 5;
 		if (*itr <= nn/3) return 4;
 		if (*itr <= nn/2) return 3;
+		*/
 		return 1;
 	}
 
