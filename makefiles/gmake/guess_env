@@ -34,6 +34,11 @@ else
 							LINUX_REV=`echo $rev | cut -f 1 -d.`
 							;;
 							
+						SUSE*LINUX)
+							LINUX_DIST='suse'
+							LINUX_REV=`echo $rev | tr -s ' ' '\t' | cut -f 2 -d ' '`
+							;;
+							
 						*)
 							LINUX_DIST='unknown'
 							LINUX_REV='unknown'
