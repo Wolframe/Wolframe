@@ -36,8 +36,8 @@ namespace
 		VARIANT varFileName;
 		VariantInit( &varFileName );
 		BSTR bstr = SysAllocString( A2OLE( filename ) );
-		if( FAILED( bstr ) ) {
-			std::cerr << "Error allocating variant string for filename, error is " << h << std::endl;
+		if( bstr == NULL ) {
+			std::cerr << "Error allocating variant string for filename, out of memory" << std::endl;
 			return false;
 		}
 		V_VT( &varFileName ) = VT_BSTR;

@@ -21,6 +21,7 @@ wolframemsg.h
 *.dll
 *.dll.manifest
 *.pdb
+*.ilk
 *.exp
 *.obj
 *.lib
