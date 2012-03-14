@@ -25,10 +25,14 @@
 # /WX: treat warnings as errors
 
 # compilation flags and compilers (release)
+!IFNDEF DEBUG
 COMMON_COMPILE_FLAGS = /MD /W2 /nologo /O2 /EHsc /c $(INCLUDE_DIRS)
+!ENDIF
 
 # compilation flags and compilers (debug)
-#COMMON_COMPILE_FLAGS = /MDd /Zi /W2 /WX /nologo /O2 /EHsc /c $(INCLUDE_DIRS)
+!IFDEF DEBUG
+COMMON_COMPILE_FLAGS = /MDd /Zi /W2 /WX /nologo /O2 /EHsc /c $(INCLUDE_DIRS)
+!ENDIF
 
 COMPILE_FLAGS = $(COMMON_COMPILE_FLAGS)
 
@@ -43,10 +47,14 @@ MT = mt.exe
 RC = rc.exe
 
 # linking flags (release)
+!IFNDEF DEBUG
 LDFLAGS = /nologo $(INCLUDE_LDFLAGS)
+!ENDIF
 
 # linking flags (debug)
-#LDFLAGS = /nologo /debug /verbose:lib $(INCLUDE_LDFLAGS)
+!IFDEF DEBUG
+LDFLAGS = /nologo /debug $(INCLUDE_LDFLAGS)
+!ENDIF
 
 LIBS = $(INCLUDE_LIBS)
 LINK = link.exe

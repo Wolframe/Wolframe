@@ -23,6 +23,7 @@ WITH_EXAMPLES=1        build and test the examples
 
 Avaliable optional features during testing only:
 
+DEBUG=1                build using debug compiler and linker flags
 WITH_EXPECT=1          use Expect/Tcl for system testing
 
 Example:
