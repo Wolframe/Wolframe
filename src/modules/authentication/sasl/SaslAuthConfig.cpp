@@ -43,6 +43,7 @@
 #include "boost/algorithm/string.hpp"
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
+#include "miscUtils.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
@@ -64,7 +65,7 @@ bool SaslAuthConfig::parse( const config::ConfigurationTree& pt, const std::stri
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_confPath, &isDefined )) {
 				retVal = false;
 			} else {
-				if ( ! boost::filesystem::path( m_confPath ).is_absolute() )
+				if ( ! boost::filesystem::path( m_confPath ).IS_ABSOLUTE() )
 					MOD_LOG_WARNING << logPrefix() << "SASL configuration file path is not absolute: "
 						<< m_confPath;
 			}

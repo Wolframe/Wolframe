@@ -45,6 +45,7 @@
 #include <boost/algorithm/string.hpp>
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
+#include "miscUtils.hpp"
 
 #if WITH_LUA
 #include "langbind/appObjects.hpp"
@@ -239,13 +240,13 @@ void Configuration::setCanonicalPathes( const std::string& refPath)
 		for (;itr != end; ++itr)
 		{
 			boost::filesystem::path pt(itr->path);
-			if (pt.is_absolute())
+			if (pt.IS_ABSOLUTE())
 			{
 				itr->path = pt.string();
 			}
 			else
 			{
-				itr->path = boost::filesystem::absolute( pt, boost::filesystem::path( refPath).branch_path()).string();
+				itr->path = boost::filesystem::ABSOLUTE( pt, boost::filesystem::path( refPath).branch_path()).string();
 			}
 		}
 	}{
@@ -253,13 +254,13 @@ void Configuration::setCanonicalPathes( const std::string& refPath)
 		for (;itr != end; ++itr)
 		{
 			boost::filesystem::path pt( itr->input.path);
-			if (pt.is_absolute())
+			if (pt.IS_ABSOLUTE())
 			{
 				itr->input.path = pt.string();
 			}
 			else
 			{
-				itr->input.path = boost::filesystem::absolute( pt, boost::filesystem::path( refPath).branch_path()).string();
+				itr->input.path = boost::filesystem::ABSOLUTE( pt, boost::filesystem::path( refPath).branch_path()).string();
 			}
 		}
 	}{
@@ -267,13 +268,13 @@ void Configuration::setCanonicalPathes( const std::string& refPath)
 		for (;itr != end; ++itr)
 		{
 			boost::filesystem::path pt( itr->output.path);
-			if (pt.is_absolute())
+			if (pt.IS_ABSOLUTE())
 			{
 				itr->output.path = pt.string();
 			}
 			else
 			{
-				itr->output.path = boost::filesystem::absolute( pt, boost::filesystem::path( refPath).branch_path()).string();
+				itr->output.path = boost::filesystem::ABSOLUTE( pt, boost::filesystem::path( refPath).branch_path()).string();
 			}
 		}
 	}{
