@@ -89,6 +89,8 @@ ifeq ($(RUN_TESTS),1)
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./resolvePathTest
 	@echo
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./testBoostPath
+	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./singletonTest
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./protocolArgumentParsing
