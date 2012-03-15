@@ -438,10 +438,6 @@ supported by Wolframe.
 For some optional packages you need the OpenBSD ports tree and
 you have to build the packages on your own.
 
-Currently change manually some boost::filesystem::path functions:
-is_absolute -> is_complete
-absolute -> complete
-
 For testing you need 'expect-5.44.1.15p0-no_tk'.
 
 Solaris 10
