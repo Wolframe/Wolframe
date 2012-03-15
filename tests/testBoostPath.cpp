@@ -9,7 +9,11 @@ TEST( BoostPathFixture, testAbsolute )
 	std::string filename = "test.conf";
 
 #ifdef _WIN32
+#if BOOST_VERSION < 104300
 	std::string completeFilename = boost::filesystem::complete( filename, "C:\\DIR\\SOMEwhere" ).string( );
+#else
+	std::string completeFilename = boost::filesystem::absolute( filename, "C:\\DIR\\SOMEwhere" ).string( );
+#endif
 	ASSERT_EQ( completeFilename, "C:\\DIR\\SOMEwhere\\test.conf" );
 #else
 #if BOOST_VERSION < 104300
