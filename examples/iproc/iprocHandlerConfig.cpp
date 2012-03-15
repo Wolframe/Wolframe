@@ -42,6 +42,7 @@
 #include <boost/algorithm/string.hpp>
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
+#include "miscUtils.hpp"
 
 #if WITH_LUA
 #include "langbind/appObjects.hpp"
@@ -250,13 +251,13 @@ void Configuration::setCanonicalPathes( const std::string& refPath)
 	for (;itr != end; ++itr)
 	{
 		boost::filesystem::path pt(itr->path);
-		if (pt.is_absolute())
+		if (pt.IS_ABSOLUTE())
 		{
 			itr->path = pt.string();
 		}
 		else
 		{
-			itr->path = boost::filesystem::absolute( pt, boost::filesystem::path( refPath).branch_path()).string();
+			itr->path = boost::filesystem::COMPLETE( pt, boost::filesystem::path( refPath).branch_path()).string();
 		}
 	}
 }

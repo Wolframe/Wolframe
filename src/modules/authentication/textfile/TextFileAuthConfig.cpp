@@ -43,6 +43,7 @@
 #include "boost/algorithm/string.hpp"
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
+#include "miscUtils.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
@@ -59,7 +60,7 @@ bool TextFileAuthConfig::parse( const config::ConfigurationTree& pt, const std::
 					pt.get_value<std::string>(), m_file, &isDefined ))
 			retVal = false;
 		else	{
-			if ( ! boost::filesystem::path( m_file ).is_absolute() )
+			if ( ! boost::filesystem::path( m_file ).IS_ABSOLUTE() )
 				MOD_LOG_WARNING << logPrefix() << "authentication file path is not absolute: "
 					    << m_file;
 		}

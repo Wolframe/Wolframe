@@ -35,6 +35,7 @@ Project Wolframe.
 #include "config/description.hpp"
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
+#include "miscUtils.hpp"
 #ifdef _WIN32
 #pragma warning(disable:4996)
 #pragma warning(disable:4127)
@@ -423,7 +424,7 @@ int main( int argc, const char** argv)
 	}
 	std::string filename( argv[1]);
 
-	std::string configfile = boost::filesystem::absolute( filename).string();
+	std::string configfile = boost::filesystem::ABSOLUTE( filename).string();
 	if ( !boost::filesystem::exists( configfile))	{
 		std::cerr << "Configuration file " << configfile << " does not exist." << std::endl;
 		return false;
