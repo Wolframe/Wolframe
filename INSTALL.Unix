@@ -30,6 +30,7 @@ Table of Contents
   Instructions for other Unixes
     FreeBSD 8.2
     FreeBSD 9.0
+    OpenBSD 5.0
     Solaris 10
       Solaris 10 (CSW toolchain)
   Broken and non-working instructions for other Unixes
@@ -417,6 +418,31 @@ Optional packages: qt4-gui (4.7.4), qt4-moc (4.7.4), cyrus-sasl (2.1.25_1)
 You need 'gmake' (3.82).
 
 So far no PAM support.
+
+OpenBSD 5.0
+-----------
+
+Required packages: boost (1.42.0p7)
+Optional package:  cyrus-sasl2 (from ports tree, 2.1.23p7),
+                   qt4 (qt4-4.7.3p0),
+                   sqlite3 (3.7.5), postgresql-client (9.0.4),
+                   libxml (2.7.8p2), libxslt (1.1.26p2)
+
+You need 'gmake' (3.82).
+
+For NLS support you need 'libintl' and 'gettext'.
+
+OpenBSD has no PAM, but BSD Authentication, which is currently not
+supported by Wolframe.
+
+For some optional packages you need the OpenBSD ports tree and
+you have to build the packages on your own.
+
+Currently change manually some boost::filesystem::path functions:
+is_absolute -> is_complete
+absolute -> complete
+
+For testing you need 'expect-5.44.1.15p0-no_tk'.
 
 Solaris 10
 ----------

@@ -68,6 +68,12 @@ local_test:$(TEST_BINS)
 ifeq ($(RUN_TESTS),1)
 	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./pechoHandlerTest$(EXE)
 ifeq ($(WITH_EXPECT),1)
+ifneq "$(PLATFORM)" "OPENBSD"
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) $(EXPECT) tests/testPEcho
 endif
 endif
+endif
+
+run: $(CPP_BINS)
+	@echo "Running the Wolframe server..."
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./pechod -c pecho.conf -f

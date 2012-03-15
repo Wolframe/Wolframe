@@ -16,7 +16,8 @@ INCLUDE_DIRS = \
 
 INCLUDE_LDFLAGS = \
 	-L$(QT_DIR)/lib \
-	-L$(QT_LIB_DIR)
+	-L$(QT_LIB_DIR) \
+	$(QT_LDFLAGS)
 
 INCLUDE_LIBS = \
 	-lQtCore -lQtGui -lQtUiTools -lQtNetwork -lQtXml

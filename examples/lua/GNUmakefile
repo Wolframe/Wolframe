@@ -60,10 +60,14 @@ local_distclean:
 local_install:
 
 local_test:
+ifeq ($(RUN_TESTS),1)
 ifeq ($(WITH_EXPECT),1)
+ifneq "$(PLATFORM)" "OPENBSD"
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) $(EXPECT) ./testLua
+endif
+endif
 endif
 
 run: $(CPP_BINS)
 	@echo "Running the Wolframe server..."
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./luad -c lua.conf -f -dDATA
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./luad -c lua.conf -f
