@@ -46,6 +46,8 @@ LINUX_REV ?=		$(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_env --linux-rev "
 endif
 
 # set library path on Intel/AMD
+
+ifeq "$(PLATFORM)" "LINUX"
 ifeq "$(ARCH)" "x86"
 ifeq "$(LINUX_DIST)" "arch"
 LIBDIR=lib32
@@ -64,6 +66,21 @@ endif
 else
 LIBDIR=lib
 endif
+endif
+
+ifeq "$(PLATFORM)" "FREEBSD"
+LIBDIR=lib
+endif
+
+ifeq "$(PLATFORM)" "OPENBSD"
+LIBDIR=lib
+endif
+
+# Sparc or Intel, always 'lib'
+ifeq "$(PLATFORM)" "SUNOS"
+LIBDIR=lib
+endif
+
 
 # default location of system libraries per architecture
 SYSTEM_LIBDIR=/usr/$(LIBDIR)
@@ -122,6 +139,9 @@ ifeq "$(PLATFORM)" "LINUX"
 LDFLAGS_DL = -Wl,-E
 endif
 ifeq "$(PLATFORM)" "FREEBSD"
+LDFLAGS_DL = -Wl,-E
+endif
+ifeq "$(PLATFORM)" "OPENBSD"
 LDFLAGS_DL = -Wl,-E
 endif
 
@@ -551,6 +571,15 @@ BOOST_LIBRARY_TAG ?=
 endif
 endif
 
+ifeq "$(PLATFORM)" "OPENBSD"
+ifeq "$(OS_MAJOR_VERSION)" "5"
+BOOST_DIR ?= /usr/local
+BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
+BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
+BOOST_LIBRARY_TAG ?= -mt
+endif
+endif
+
 ifeq "$(PLATFORM)" "SUNOS"
 ifeq "$(OS_MAJOR_VERSION)" "5"
 ifeq "$(OS_MINOR_VERSION)" "10"
@@ -591,6 +620,12 @@ OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 endif
 
+ifeq "$(PLATFORM)" "OPENBSD"
+ifeq "$(OS_MAJOR_VERSION)" "5"
+OPENSSL_LIBS ?= -lssl -lcrypto
+endif
+endif
+
 endif
 
 # Lua 5.2
@@ -615,6 +650,12 @@ LUA_PLATFORM_LDFLAGS =
 LUA_PLATFORM_LIBS =
 endif
 
+ifeq "$(PLATFORM)" "OPENBSD"
+LUA_PLATFORM_CFLAGS = -DLUA_USE_POSIX -DLUA_USE_DLOPEN
+LUA_PLATFORM_LDFLAGS =
+LUA_PLATFORM_LIBS =
+endif
+
 endif
 
 # Qt 4 (http://qt.nokia.com/products/)
@@ -629,6 +670,7 @@ QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
 QT_MOC ?= $(QT_DIR)/bin/moc
+QT_LDFLAGS =
 endif
 
 ifeq "$(LINUX_DIST)" "slackware"
@@ -636,6 +678,7 @@ QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
 QT_MOC ?= $(QT_DIR)/bin/moc
+QT_LDFLAGS =
 endif
 
 ifeq "$(LINUX_DIST)" "redhat"
@@ -646,6 +689,7 @@ QT_DIR ?= $(SYSTEM_LIBDIR)/qt4
 QT_INCLUDE_DIR ?= /usr/include
 QT_LIB_DIR ?= $(SYSTEM_LIBDIR)
 QT_MOC ?= $(QT_DIR)/bin/moc
+QT_LDFLAGS =
 endif
 
 # Fedora 15 puts Qt in a subdir in /usr/lib
@@ -654,6 +698,7 @@ QT_DIR ?= $(SYSTEM_LIBDIR)/qt4
 QT_INCLUDE_DIR ?= /usr/include
 QT_LIB_DIR ?= $(SYSTEM_LIBDIR)
 QT_MOC ?= $(QT_DIR)/bin/moc
+QT_LDFLAGS =
 endif
 
 # Fedora 16 puts Qt in a subdir in /usr/lib
@@ -662,6 +707,7 @@ QT_DIR ?= $(SYSTEM_LIBDIR)/qt4
 QT_INCLUDE_DIR ?= /usr/include
 QT_LIB_DIR ?= $(SYSTEM_LIBDIR)
 QT_MOC ?= $(QT_DIR)/bin/moc
+QT_LDFLAGS =
 endif
 
 # RHEL 5
@@ -670,6 +716,7 @@ QT_DIR ?= /usr/lib/qt4
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
 QT_MOC ?= $(QT_DIR)/bin/moc
+QT_LDFLAGS =
 endif
 
 # RHEL 6
@@ -678,6 +725,7 @@ QT_DIR ?= /usr/lib/qt4
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
 QT_MOC ?= $(QT_DIR)/bin/moc
+QT_LDFLAGS =
 endif
 
 endif
@@ -691,6 +739,7 @@ QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include/qt4
 QT_LIB_DIR ?= $(QT_DIR)/lib
 QT_MOC ?= $(QT_DIR)/bin/moc
+QT_LDFLAGS =
 endif
 
 ifeq "$(LINUX_REV)" "11.10"
@@ -698,6 +747,7 @@ QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include/qt4
 QT_LIB_DIR ?= $(QT_DIR)/lib
 QT_MOC ?= $(QT_DIR)/bin/moc
+QT_LDFLAGS =
 endif
 
 ifeq "$(LINUX_REV)" "11.04"
@@ -705,6 +755,7 @@ QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include/qt4
 QT_LIB_DIR ?= $(QT_DIR)/lib
 QT_MOC ?= $(QT_DIR)/bin/moc
+QT_LDFLAGS =
 endif
 
 ifeq "$(LINUX_REV)" "10.10"
@@ -712,6 +763,7 @@ QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include/qt4
 QT_LIB_DIR ?= $(QT_DIR)/lib
 QT_MOC ?= $(QT_DIR)/bin/moc
+QT_LDFLAGS =
 endif
 
 ifeq "$(LINUX_REV)" "10.04"
@@ -719,6 +771,7 @@ QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include/qt4
 QT_LIB_DIR ?= $(QT_DIR)/lib
 QT_MOC ?= $(QT_DIR)/bin/moc
+QT_LDFLAGS =
 endif
 
 endif
@@ -732,6 +785,7 @@ QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include/qt4
 QT_LIB_DIR ?= $(QT_DIR)/lib
 QT_MOC ?= $(QT_DIR)/bin/moc
+QT_LDFLAGS =
 endif
 
 ifeq "$(LINUX_REV)" "6"
@@ -739,6 +793,7 @@ QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include/qt4
 QT_LIB_DIR ?= $(QT_DIR)/lib
 QT_MOC ?= $(QT_DIR)/bin/moc
+QT_LDFLAGS =
 endif
 
 endif
@@ -749,6 +804,7 @@ QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
 QT_MOC ?= $(QT_DIR)/bin/moc
+QT_LDFLAGS =
 endif
 endif
 
@@ -759,6 +815,7 @@ QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
 QT_MOC ?= $(QT_DIR)/bin/moc
+QT_LDFLAGS =
 endif
 
 ifeq "$(LINUX_REV)" "12.1"
@@ -766,6 +823,7 @@ QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
 QT_MOC ?= $(QT_DIR)/bin/moc
+QT_LDFLAGS =
 endif
 
 ifeq "$(LINUX_REV)" "12.2"
@@ -773,6 +831,7 @@ QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
 QT_MOC ?= $(QT_DIR)/bin/moc
+QT_LDFLAGS =
 endif
 
 endif
@@ -784,24 +843,45 @@ ifeq "$(OS_MAJOR_VERSION)" "8"
 ifdef QT_DIR
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
+QT_LDFLAGS =
 endif
 ifndef QT_DIR
 QT_DIR ?= /usr/local/lib/qt4
 QT_INCLUDE_DIR ?= /usr/local/include/qt4
 QT_LIB_DIR ?= /usr/local/lib/qt4
 QT_MOC ?= /usr/local/bin/moc-qt4
+QT_LDFLAGS =
 endif
 endif
 ifeq "$(OS_MAJOR_VERSION)" "9"
 ifdef QT_DIR
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
+QT_LDFLAGS =
 endif
 ifndef QT_DIR
 QT_DIR ?= /usr/local/lib/qt4
 QT_INCLUDE_DIR ?= /usr/local/include/qt4
 QT_LIB_DIR ?= /usr/local/lib/qt4
 QT_MOC ?= /usr/local/bin/moc-qt4
+QT_LDFLAGS =
+endif
+endif
+endif
+
+ifeq "$(PLATFORM)" "OPENBSD"
+ifeq "$(OS_MAJOR_VERSION)" "5"
+ifdef QT_DIR
+QT_INCLUDE_DIR ?= $(QT_DIR)/include
+QT_LIB_DIR ?= $(QT_DIR)/lib
+QT_LDFLAGS = -L/usr/X11R6/lib
+endif
+ifndef QT_DIR
+QT_DIR ?= /usr/local/lib/qt4
+QT_INCLUDE_DIR ?= /usr/local/include/X11/qt4
+QT_LIB_DIR ?= /usr/local/lib/qt4
+QT_MOC ?= /usr/local/bin/moc4
+QT_LDFLAGS = -L/usr/X11R6/lib
 endif
 endif
 endif
@@ -977,6 +1057,15 @@ PAM_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 PAM_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
 endif
 ifeq "$(OS_MAJOR_VERSION)" "9"
+PAM_DIR ?= NOT SUPPLIED ON THIS PLATFORM
+PAM_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
+PAM_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
+PAM_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
+endif
+endif
+
+ifeq "$(PLATFORM)" "OPENBSD"
+ifeq "$(OS_MAJOR_VERSION)" "5"
 PAM_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 PAM_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 PAM_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
@@ -1162,6 +1251,15 @@ SASL_LIBS ?= -lsasl2
 endif
 endif
 
+ifeq "$(PLATFORM)" "OPENBSD"
+ifeq "$(OS_MAJOR_VERSION)" "5"
+SASL_DIR ?= /usr/local
+SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
+SASL_LIB_DIR ?= $(SASL_DIR)/lib
+SASL_LIBS ?= -lsasl2
+endif
+endif
+
 endif
 
 # Sqlite3
@@ -1333,6 +1431,15 @@ SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
 SQLITE3_LIBS ?= -lsqlite3
 endif
 ifeq "$(OS_MAJOR_VERSION)" "9"
+SQLITE3_DIR ?= /usr/local
+SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
+SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
+SQLITE3_LIBS ?= -lsqlite3
+endif
+endif
+
+ifeq "$(PLATFORM)" "OPENBSD"
+ifeq "$(OS_MAJOR_VERSION)" "5"
 SQLITE3_DIR ?= /usr/local
 SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
 SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
@@ -1560,6 +1667,17 @@ PGSQL_LIBS ?= -lpq
 endif
 endif
 
+ifeq "$(PLATFORM)" "OPENBSD"
+ifeq "$(OS_MAJOR_VERSION)" "5"
+PGSQL_DIR ?= /usr/local
+PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include/postgresql
+PGSQL_INCLUDE_DIRS = -I$(PGSQL_INCLUDE_DIR)
+PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
+PGSQL_LIB_DIRS = -L$(PGSQL_LIB_DIR)
+PGSQL_LIBS ?= -lpq
+endif
+endif
+
 endif
 
 # libxml2
@@ -1769,6 +1887,17 @@ LIBXML2_LIB_DIRS = -L$(LIBXML2_LIB_DIR)
 LIBXML2_LIBS ?= -lxml2
 endif
 ifeq "$(OS_MAJOR_VERSION)" "9"
+LIBXML2_DIR ?= /usr/local
+LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
+LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
+LIBXML2_LIB_DIR ?= $(LIBXML2_DIR)/lib
+LIBXML2_LIB_DIRS = -L$(LIBXML2_LIB_DIR)
+LIBXML2_LIBS ?= -lxml2
+endif
+endif
+
+ifeq "$(PLATFORM)" "OPENBSD"
+ifeq "$(OS_MAJOR_VERSION)" "5"
 LIBXML2_DIR ?= /usr/local
 LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
 LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
@@ -1996,6 +2125,17 @@ LIBXSLT_LIBS ?= -lxslt
 endif
 endif
 
+ifeq "$(PLATFORM)" "OPENBSD"
+ifeq "$(OS_MAJOR_VERSION)" "5"
+LIBXSLT_DIR ?= /usr/local
+LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
+LIBXSLT_INCLUDE_DIRS = -I$(LIBXSLT_INCLUDE_DIR)
+LIBXSLT_LIB_DIR ?= $(LIBXSLT_DIR)/lib
+LIBXSLT_LIB_DIRS = -L$(LIBXSLT_LIB_DIR)
+LIBXSLT_LIBS ?= -lxslt
+endif
+endif
+
 endif
 
 
@@ -2010,6 +2150,10 @@ EXPECT = /usr/bin/expect
 endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
+EXPECT = /usr/local/bin/expect
+endif
+
+ifeq "$(PLATFORM)" "OPENBSD"
 EXPECT = /usr/local/bin/expect
 endif
 

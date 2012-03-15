@@ -58,6 +58,7 @@ tests/database/test.db
 tests/libxml2/testlibxml2
 tests/modules/moduleTest
 tests/AAAA/authenticationTest
+tests/testBoostPath
 examples/echo/echod
 examples/lua/luad
 examples/mtproc/mtprocd
