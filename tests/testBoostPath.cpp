@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-//#define BOOST_FILESYSTEM_VERSION 3
-//#include <boost/version.hpp>
+#define BOOST_FILESYSTEM_VERSION 3
+#include <boost/version.hpp>
 #include <boost/filesystem.hpp>
 
 TEST( BoostPathFixture, testAbsolute )
