@@ -257,7 +257,7 @@ void Configuration::setCanonicalPathes( const std::string& refPath)
 		}
 		else
 		{
-			itr->path = boost::filesystem::COMPLETE( pt, boost::filesystem::path( refPath).branch_path()).string();
+			itr->path = boost::filesystem::ABSOLUTE( pt, boost::filesystem::path( refPath).branch_path()).string();
 		}
 	}
 }
