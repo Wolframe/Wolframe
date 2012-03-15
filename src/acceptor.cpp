@@ -63,7 +63,8 @@ acceptor::acceptor( boost::asio::io_service& IOservice,
 	boost::asio::ip::tcp::endpoint endpoint;
 	try	{
 		boost::asio::ip::tcp::resolver resolver( m_IOservice );
-		boost::asio::ip::tcp::resolver::query query( host, "" );
+		// Aba: empty service fails on boost 1.42 with "Service not found"
+		boost::asio::ip::tcp::resolver::query query( host, "7661" );
 		endpoint = *resolver.resolve( query );
 	}
 	catch ( std::exception& e )	{
@@ -213,7 +214,8 @@ SSLacceptor::SSLacceptor( boost::asio::io_service& IOservice,
 
 	// Open the acceptor(s) with the option to reuse the address (i.e. SO_REUSEADDR).
 	boost::asio::ip::tcp::resolver resolver( m_IOservice );
-	boost::asio::ip::tcp::resolver::query query( host, "" );
+	// Aba: empty service fails on boost 1.42 with "Service not found"
+	boost::asio::ip::tcp::resolver::query query( host, "7661" );
 	boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve( query );
 	endpoint.port( port );
 
