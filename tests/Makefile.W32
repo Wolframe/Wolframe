@@ -91,6 +91,7 @@ local_test:
 	@-echo versionTest >> test.bat
 	@-echo counterTest >> test.bat
 	@-echo resolvePathTest >> test.bat
+	@-echo testBoostPath >> test.bat
 	@-echo singletonTest >> test.bat
 	@-echo protocolArgumentParsing >> test.bat
 	@-echo echo off >> test.bat
