@@ -54,6 +54,7 @@ TEST_CPP_BINS = \
 	versionTest$(EXE) \
 	counterTest$(EXE) \
 	resolvePathTest$(EXE) \
+	testBoostPath$(EXE) \
 	singletonTest$(EXE) \
 	poolTest$(EXE) \
 	logTest$(EXE) \
