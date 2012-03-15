@@ -186,7 +186,7 @@ void LuaConfiguration::setCanonicalPathes( const std::string& refPath )
 	using namespace boost::filesystem;
 	if ( ! script.empty() )	{
 		if ( ! path( script ).IS_ABSOLUTE() )
-			script = resolvePath( absolute( script,
+			script = resolvePath( ABSOLUTE( script,
 							path( refPath ).branch_path()).string());
 		else
 			script = resolvePath( script );
