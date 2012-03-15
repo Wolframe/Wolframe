@@ -1,20 +1,12 @@
 #include <gtest/gtest.h>
 
-#define BOOST_FILESYSTEM_VERSION 3
-#include <boost/version.hpp>
+//#define BOOST_FILESYSTEM_VERSION 3
+//#include <boost/version.hpp>
 #include <boost/filesystem.hpp>
 
 TEST( BoostPathFixture, testAbsolute )
 {
-	std::string filename( "test.conf" );
-	std::string filename2( "test.conf" );
-
-#if BOOST_VERSION < 104300
-	std::string configfile = boost::filesystem::complete( filename ).string( );
-	std::string configfile2 = boost::filesystem::absolute( filename2 ).string( );
-
-	ASSERT_EQ( configfile, configfile2 );
-#endif
+	std::string filename = "test.conf";
 
 #ifdef _WIN32
 	std::string completeFilename = boost::filesystem::complete( filename, "C:\\DIR\\SOMEwhere" ).string( );
