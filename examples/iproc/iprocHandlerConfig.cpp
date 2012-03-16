@@ -251,13 +251,13 @@ void Configuration::setCanonicalPathes( const std::string& refPath)
 	for (;itr != end; ++itr)
 	{
 		boost::filesystem::path pt(itr->path);
-		if (pt.IS_ABSOLUTE())
+		if (pt.is_absolute())
 		{
 			itr->path = pt.string();
 		}
 		else
 		{
-			itr->path = boost::filesystem::ABSOLUTE( pt, boost::filesystem::path( refPath).branch_path()).string();
+			itr->path = boost::filesystem::absolute( pt, boost::filesystem::path( refPath).branch_path()).string();
 		}
 	}
 }

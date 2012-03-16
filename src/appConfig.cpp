@@ -120,7 +120,7 @@ bool ApplicationConfiguration::addConfig( const std::string& nodeName,
 
 ApplicationConfiguration::ConfigFileType ApplicationConfiguration::fileType ( const char *filename, ConfigFileType type )
 {
-	std::string file = resolvePath( boost::filesystem::ABSOLUTE( filename ).string() );
+	std::string file = resolvePath( boost::filesystem::absolute( filename ).string() );
 	if ( !boost::filesystem::exists( file ))	{
 		LOG_FATAL << "Configuration file " << file << " does not exist.";
 		return CONFIG_UNDEFINED;
@@ -189,7 +189,7 @@ ApplicationConfiguration::ConfigFileType ApplicationConfiguration::fileType ( co
 bool ApplicationConfiguration::parseModules ( const char *filename, ConfigFileType type )
 {
 	m_type = type;
-	configFile = resolvePath( boost::filesystem::ABSOLUTE( filename ).string() );
+	configFile = resolvePath( boost::filesystem::absolute( filename ).string() );
 	assert( boost::filesystem::exists( configFile ));
 
 	// Create an empty property tree object
@@ -222,7 +222,7 @@ bool ApplicationConfiguration::parseModules ( const char *filename, ConfigFileTy
 							retVal = false;
 						}
 						else	{
-							if ( ! boost::filesystem::path( modFile ).IS_ABSOLUTE() )
+							if ( ! boost::filesystem::path( modFile ).is_absolute() )
 								LOG_WARNING << MODULE_SECTION_MSG << " file path is not absolute: "
 									    << modFile;
 							bool isDuplicate = false;
@@ -251,8 +251,8 @@ bool ApplicationConfiguration::parseModules ( const char *filename, ConfigFileTy
 		for ( std::list< std::string >::iterator it = m_modFiles.begin();
 							it != m_modFiles.end(); it++ )	{
 			assert( ! it->empty() );
-			if ( ! path( *it ).IS_ABSOLUTE() )
-				(*it) = resolvePath( ABSOLUTE( *it,
+			if ( ! path( *it ).is_absolute() )
+				(*it) = resolvePath( absolute( *it,
 							       path( configFile ).branch_path()).string());
 			else
 				(*it) = resolvePath( *it );
@@ -267,7 +267,7 @@ bool ApplicationConfiguration::parseModules ( const char *filename, ConfigFileTy
 
 bool ApplicationConfiguration::parse ( const char *filename, ConfigFileType type )
 {
-	configFile = resolvePath( boost::filesystem::ABSOLUTE( filename ).string() );
+	configFile = resolvePath( boost::filesystem::absolute( filename ).string() );
 	assert( boost::filesystem::exists( configFile ));
 
 	// Create an empty property tree object

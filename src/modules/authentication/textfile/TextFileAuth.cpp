@@ -68,8 +68,8 @@ void TextFileAuthConfig::setCanonicalPathes( const std::string& refPath )
 	using namespace boost::filesystem;
 
 	if ( ! m_file.empty() )	{
-		if ( ! path( m_file ).IS_ABSOLUTE() )
-			m_file = resolvePath( ABSOLUTE( m_file,
+		if ( ! path( m_file ).is_absolute() )
+			m_file = resolvePath( absolute( m_file,
 							path( refPath ).branch_path()).string());
 		else
 			m_file = resolvePath( m_file );

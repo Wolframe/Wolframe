@@ -167,7 +167,7 @@ bool Configuration::parse( const config::ConfigurationTree& pt, const std::strin
 					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, certFile, &isDefined ))
 						retVal = false;
 					else	{
-						if ( ! boost::filesystem::path( certFile ).IS_ABSOLUTE() )
+						if ( ! boost::filesystem::path( certFile ).is_absolute() )
 							LOG_WARNING << logPrefix() << "certificate file is not absolute: '"
 								    << certFile << "'";
 					}
@@ -177,7 +177,7 @@ bool Configuration::parse( const config::ConfigurationTree& pt, const std::strin
 					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, keyFile, &isDefined ))
 						retVal = false;
 					else	{
-						if ( ! boost::filesystem::path( keyFile ).IS_ABSOLUTE() )
+						if ( ! boost::filesystem::path( keyFile ).is_absolute() )
 							LOG_WARNING << logPrefix() << "key file is not absolute: "
 								    << keyFile << "'";
 					}
@@ -187,7 +187,7 @@ bool Configuration::parse( const config::ConfigurationTree& pt, const std::strin
 					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, CAdirectory, &isDefined ))
 						retVal = false;
 					else	{
-						if ( ! boost::filesystem::path( CAdirectory ).IS_ABSOLUTE() )
+						if ( ! boost::filesystem::path( CAdirectory ).is_absolute() )
 							LOG_WARNING << logPrefix() << "CA directory is not absolute: "
 								    << CAdirectory << "'";
 					}
@@ -197,7 +197,7 @@ bool Configuration::parse( const config::ConfigurationTree& pt, const std::strin
 					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, CAchainFile, &isDefined ))
 						retVal = false;
 					else	{
-						if ( ! boost::filesystem::path( CAchainFile ).IS_ABSOLUTE() )
+						if ( ! boost::filesystem::path( CAchainFile ).is_absolute() )
 							LOG_WARNING << logPrefix() << "CA chain file is not absolute: "
 								    << CAchainFile << "'";
 					}

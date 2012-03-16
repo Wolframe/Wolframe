@@ -65,7 +65,7 @@ bool SaslAuthConfig::parse( const config::ConfigurationTree& pt, const std::stri
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_confPath, &isDefined )) {
 				retVal = false;
 			} else {
-				if ( ! boost::filesystem::path( m_confPath ).IS_ABSOLUTE() )
+				if ( ! boost::filesystem::path( m_confPath ).is_absolute() )
 					MOD_LOG_WARNING << logPrefix() << "SASL configuration file path is not absolute: "
 						<< m_confPath;
 			}

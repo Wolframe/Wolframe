@@ -81,7 +81,7 @@ bool ServiceConfiguration::parse( const ConfigurationTree& pt, const std::string
 				if ( !Parser::getValue( logPrefix().c_str(), *L1it, pidFile, &isDefined ))
 					retVal = false;
 				else	{
-					if ( ! boost::filesystem::path( pidFile ).IS_ABSOLUTE() )
+					if ( ! boost::filesystem::path( pidFile ).is_absolute() )
 						LOG_WARNING << logPrefix() << "pid file path is not absolute: "
 							    << pidFile;
 				}
@@ -174,8 +174,8 @@ void ServiceConfiguration::setCanonicalPathes( const std::string& refPath )
 	using namespace boost::filesystem;
 
 	if ( ! pidFile.empty() )	{
-		if ( ! path( pidFile ).IS_ABSOLUTE() )
-			pidFile = resolvePath( ABSOLUTE( pidFile,
+		if ( ! path( pidFile ).is_absolute() )
+			pidFile = resolvePath( absolute( pidFile,
 							 path( refPath ).branch_path()).string());
 		else
 			pidFile = resolvePath( pidFile );

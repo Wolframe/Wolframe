@@ -50,29 +50,29 @@ namespace _Wolframe	{
 void ServerSSLendpoint::setAbsolutePath( const std::string& refPath )
 {
 	if ( ! cert_.empty() )	{
-		if ( ! boost::filesystem::path( cert_ ).IS_ABSOLUTE() )
-			cert_ = resolvePath( boost::filesystem::ABSOLUTE( cert_,
+		if ( ! boost::filesystem::path( cert_ ).is_absolute() )
+			cert_ = resolvePath( boost::filesystem::absolute( cert_,
 							boost::filesystem::path( refPath ).branch_path()).string());
 		else
 			cert_ = resolvePath( cert_ );
 	}
 	if ( ! key_.empty() )	{
-		if ( ! boost::filesystem::path( key_ ).IS_ABSOLUTE() )
-			key_ = resolvePath( boost::filesystem::ABSOLUTE( key_,
+		if ( ! boost::filesystem::path( key_ ).is_absolute() )
+			key_ = resolvePath( boost::filesystem::absolute( key_,
 							boost::filesystem::path( refPath ).branch_path()).string());
 		else
 			key_ = resolvePath( key_ );
 	}
 	if ( ! CAdir_.empty() )	{
-		if ( ! boost::filesystem::path( CAdir_ ).IS_ABSOLUTE() )
-			CAdir_ = resolvePath( boost::filesystem::ABSOLUTE( CAdir_,
+		if ( ! boost::filesystem::path( CAdir_ ).is_absolute() )
+			CAdir_ = resolvePath( boost::filesystem::absolute( CAdir_,
 							boost::filesystem::path( refPath ).branch_path()).string());
 		else
 			CAdir_ = resolvePath( CAdir_ );
 	}
 	if ( ! CAchain_.empty() )	{
-		if ( ! boost::filesystem::path( CAchain_ ).IS_ABSOLUTE() )
-			CAchain_ = resolvePath( boost::filesystem::ABSOLUTE( CAchain_,
+		if ( ! boost::filesystem::path( CAchain_ ).is_absolute() )
+			CAchain_ = resolvePath( boost::filesystem::absolute( CAchain_,
 							boost::filesystem::path( refPath ).branch_path()).string());
 		else
 			CAchain_ = resolvePath( CAchain_);

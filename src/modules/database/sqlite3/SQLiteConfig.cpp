@@ -67,7 +67,7 @@ bool SQLiteConfig::parse( const config::ConfigurationTree& pt, const std::string
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, filename, &isDefined ))
 				retVal = false;
 			else	{
-				if ( ! boost::filesystem::path( filename ).IS_ABSOLUTE() )
+				if ( ! boost::filesystem::path( filename ).is_absolute() )
 					MOD_LOG_WARNING << logPrefix() << "database file path is not absolute: "
 						    << filename;
 			}
@@ -115,8 +115,8 @@ void SQLiteConfig::setCanonicalPathes( const std::string& refPath )
 	using namespace boost::filesystem;
 
 	if ( ! filename.empty() )	{
-		if ( ! path( filename ).IS_ABSOLUTE() )
-			filename = resolvePath( ABSOLUTE( filename,
+		if ( ! path( filename ).is_absolute() )
+			filename = resolvePath( absolute( filename,
 							  path( refPath ).branch_path()).string());
 		else
 			filename = resolvePath( filename );

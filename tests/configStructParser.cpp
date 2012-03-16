@@ -424,7 +424,7 @@ int main( int argc, const char** argv)
 	}
 	std::string filename( argv[1]);
 
-	std::string configfile = boost::filesystem::ABSOLUTE( filename).string();
+	std::string configfile = boost::filesystem::absolute( filename).string();
 	if ( !boost::filesystem::exists( configfile))	{
 		std::cerr << "Configuration file " << configfile << " does not exist." << std::endl;
 		return false;
