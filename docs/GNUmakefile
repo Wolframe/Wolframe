@@ -91,5 +91,5 @@ local_uninstall:
 	@-rmdir $(DESTDIR)$(datadir)/doc
 	@-rmdir $(DESTDIR)$(datadir)
 
-local_test:
+check:
 	xmllint --noout --xinclude --postvalid --noent WolfBook.xml

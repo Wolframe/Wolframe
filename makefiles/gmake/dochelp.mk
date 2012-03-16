@@ -9,5 +9,5 @@ make doc-html-chunked       build chunked HTML version of the manual
 make doc-pdf                build PDF version of the manual
 make epub                   build EPUB version of the manual
 
-make test                   test the validity of the documenation source and tools
+make check                  test the validity of the documenation source and tools
 
