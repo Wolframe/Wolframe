@@ -9,7 +9,7 @@ using namespace filter;
 
 namespace {
 
-static bool getElementType( typename protocol::InputFilter::ElementType& et, char ch)
+static bool getElementType( protocol::InputFilter::ElementType& et, char ch)
 {
 	switch (ch)
 	{
@@ -21,7 +21,7 @@ static bool getElementType( typename protocol::InputFilter::ElementType& et, cha
 	return false;
 }
 
-static char getElementTag( typename protocol::OutputFilter::ElementType tp)
+static char getElementTag( protocol::OutputFilter::ElementType tp)
 {
 	switch (tp)
 	{
