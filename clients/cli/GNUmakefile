@@ -44,7 +44,9 @@ local_distclean:
 
 local_test:
 ifeq ($(WITH_EXPECT),1)
+ifneq "$(PLATFORM)" "NETBSD"
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe $(EXPECT) ./testCli
+endif
 endif
 
 run:

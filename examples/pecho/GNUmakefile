@@ -69,7 +69,9 @@ ifeq ($(RUN_TESTS),1)
 	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./pechoHandlerTest$(EXE)
 ifeq ($(WITH_EXPECT),1)
 ifneq "$(PLATFORM)" "OPENBSD"
+ifneq "$(PLATFORM)" "NETBSD"
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) $(EXPECT) tests/testPEcho
+endif
 endif
 endif
 endif

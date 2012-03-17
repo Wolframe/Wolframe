@@ -103,4 +103,4 @@ local_test:
 
 run: $(CPP_BINS)
 	@echo "Testing Qt client.."
-	@./qtclient
+	@LD_LIBRARY_PATH=$(QT_LIB_DIR) ./qtclient

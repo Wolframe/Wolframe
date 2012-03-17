@@ -34,7 +34,7 @@ local_clean:
 local_distclean:
 
 local_test: $(TEST_CPP_BINS)
-	@./testlibxml2 test.xml
+	@LD_LIBRARY_PATH=$(LIBXML2_LIB_DIR) ./testlibxml2 test.xml
 	@echo
 	@echo
 

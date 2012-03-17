@@ -105,6 +105,9 @@ endif
 ifeq "$(PLATFORM)" "OPENBSD"
 	mv sasl.db.db sasl.db
 endif
+ifeq "$(PLATFORM)" "NETBSD"
+	mv sasl.db.db sasl.db
+endif
 endif
 
 local_test: sasl.db $(TEST_CPP_BINS)

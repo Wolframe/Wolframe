@@ -93,7 +93,9 @@ local_install:
 
 local_test: $(TEST_BINS)
 ifeq ($(RUN_TESTS),1)
+ifneq "$(PLATFORM)" "NETBSD"
 	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./tprocHandlerTest$(EXE)
+endif
 endif
 
 run: $(CPP_BINS)

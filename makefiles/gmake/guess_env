@@ -93,7 +93,7 @@ else
 
 		NetBSD*)	PLATFORM=NETBSD
 				OS_MAJOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 1`
-				OS_MINOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 2 | cut -d - -f 1`
+				OS_MINOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 2`
 				;;
 
 		SunOS*)		PLATFORM=SUNOS

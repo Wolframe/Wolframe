@@ -59,7 +59,9 @@ local_test:
 ifeq ($(RUN_TESTS),1)
 ifeq ($(WITH_EXPECT),1)
 ifneq "$(PLATFORM)" "OPENBSD"
+ifneq "$(PLATFORM)" "NETBSD"
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) $(EXPECT) ./testEcho
+endif
 endif
 endif
 endif

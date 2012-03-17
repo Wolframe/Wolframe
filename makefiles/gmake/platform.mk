@@ -76,6 +76,10 @@ ifeq "$(PLATFORM)" "OPENBSD"
 LIBDIR=lib
 endif
 
+ifeq "$(PLATFORM)" "NETBSD"
+LIBDIR=lib
+endif
+
 # Sparc or Intel, always 'lib'
 ifeq "$(PLATFORM)" "SUNOS"
 LIBDIR=lib
@@ -144,6 +148,9 @@ endif
 ifeq "$(PLATFORM)" "OPENBSD"
 LDFLAGS_DL = -Wl,-E
 endif
+ifeq "$(PLATFORM)" "NETBSD"
+LDFLAGS_DL = -Wl,-E
+endif
 
 # i18n, gettext/libintl
 #######################
@@ -183,13 +190,13 @@ LDFLAGS_LT = -L/usr/local/lib
 LIBS_LT = -lintl -liconv
 endif
 
-ifeq "$(PLATFORM)" "CYGWIN"
+ifeq "$(PLATFORM)" "NETBSD"
 INCLUDE_FLAGS_LT =
 LDFLAGS_LT =
 LIBS_LT = -lintl
 endif
 
-ifeq "$(PLATFORM)" "NETBSD"
+ifeq "$(PLATFORM)" "CYGWIN"
 INCLUDE_FLAGS_LT =
 LDFLAGS_LT =
 LIBS_LT = -lintl
@@ -580,6 +587,15 @@ BOOST_LIBRARY_TAG ?= -mt
 endif
 endif
 
+ifeq "$(PLATFORM)" "NETBSD"
+ifeq "$(OS_MAJOR_VERSION)" "5"
+BOOST_DIR ?= /usr/pkg
+BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
+BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
+BOOST_LIBRARY_TAG ?=
+endif
+endif
+
 ifeq "$(PLATFORM)" "SUNOS"
 ifeq "$(OS_MAJOR_VERSION)" "5"
 ifeq "$(OS_MINOR_VERSION)" "10"
@@ -626,6 +642,12 @@ OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 endif
 
+ifeq "$(PLATFORM)" "NETBSD"
+ifeq "$(OS_MAJOR_VERSION)" "5"
+OPENSSL_LIBS ?= -lssl -lcrypto
+endif
+endif
+
 endif
 
 # Lua 5.2
@@ -651,6 +673,12 @@ LUA_PLATFORM_LIBS =
 endif
 
 ifeq "$(PLATFORM)" "OPENBSD"
+LUA_PLATFORM_CFLAGS = -DLUA_USE_POSIX -DLUA_USE_DLOPEN
+LUA_PLATFORM_LDFLAGS =
+LUA_PLATFORM_LIBS =
+endif
+
+ifeq "$(PLATFORM)" "NETBSD"
 LUA_PLATFORM_CFLAGS = -DLUA_USE_POSIX -DLUA_USE_DLOPEN
 LUA_PLATFORM_LDFLAGS =
 LUA_PLATFORM_LIBS =
@@ -886,6 +914,23 @@ endif
 endif
 endif
 
+ifeq "$(PLATFORM)" "NETBSD"
+ifeq "$(OS_MAJOR_VERSION)" "5"
+ifdef QT_DIR
+QT_INCLUDE_DIR ?= $(QT_DIR)/include
+QT_LIB_DIR ?= $(QT_DIR)/lib
+QT_LDFLAGS =
+endif
+ifndef QT_DIR
+QT_DIR ?= /usr/pkg/qt4
+QT_INCLUDE_DIR ?= /usr/pkg/qt4/include
+QT_LIB_DIR ?= /usr/pkg/qt4/lib
+QT_MOC ?= /usr/pkg/qt4/bin/moc
+QT_LDFLAGS =
+endif
+endif
+endif
+
 endif
 
 # PAM 1.1.3
@@ -1070,6 +1115,15 @@ PAM_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 PAM_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 PAM_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 PAM_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
+endif
+endif
+
+ifeq "$(PLATFORM)" "NETBSD"
+ifeq "$(OS_MAJOR_VERSION)" "5"
+PAM_DIR ?= /usr
+PAM_INCLUDE_DIR ?= $(PAM_DIR)/include
+PAM_LIB_DIR ?= $(PAM_DIR)/lib
+PAM_LIBS ?= -lpam
 endif
 endif
 
@@ -1260,6 +1314,15 @@ SASL_LIBS ?= -lsasl2
 endif
 endif
 
+ifeq "$(PLATFORM)" "NETBSD"
+ifeq "$(OS_MAJOR_VERSION)" "5"
+SASL_DIR ?= /usr/pkg
+SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
+SASL_LIB_DIR ?= $(SASL_DIR)/lib
+SASL_LIBS ?= -lsasl2
+endif
+endif
+
 endif
 
 # Sqlite3
@@ -1441,6 +1504,15 @@ endif
 ifeq "$(PLATFORM)" "OPENBSD"
 ifeq "$(OS_MAJOR_VERSION)" "5"
 SQLITE3_DIR ?= /usr/local
+SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
+SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
+SQLITE3_LIBS ?= -lsqlite3
+endif
+endif
+
+ifeq "$(PLATFORM)" "NETBSD"
+ifeq "$(OS_MAJOR_VERSION)" "5"
+SQLITE3_DIR ?= /usr/pkg
 SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
 SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
 SQLITE3_LIBS ?= -lsqlite3
@@ -1678,6 +1750,17 @@ PGSQL_LIBS ?= -lpq
 endif
 endif
 
+ifeq "$(PLATFORM)" "NETBSD"
+ifeq "$(OS_MAJOR_VERSION)" "5"
+PGSQL_DIR ?= /usr/pkg
+PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include/postgresql
+PGSQL_INCLUDE_DIRS = -I$(PGSQL_INCLUDE_DIR)
+PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
+PGSQL_LIB_DIRS = -L$(PGSQL_LIB_DIR)
+PGSQL_LIBS ?= -lpq
+endif
+endif
+
 endif
 
 # libxml2
@@ -1899,6 +1982,17 @@ endif
 ifeq "$(PLATFORM)" "OPENBSD"
 ifeq "$(OS_MAJOR_VERSION)" "5"
 LIBXML2_DIR ?= /usr/local
+LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
+LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
+LIBXML2_LIB_DIR ?= $(LIBXML2_DIR)/lib
+LIBXML2_LIB_DIRS = -L$(LIBXML2_LIB_DIR)
+LIBXML2_LIBS ?= -lxml2
+endif
+endif
+
+ifeq "$(PLATFORM)" "NETBSD"
+ifeq "$(OS_MAJOR_VERSION)" "5"
+LIBXML2_DIR ?= /usr/pkg
 LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
 LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
 LIBXML2_LIB_DIR ?= $(LIBXML2_DIR)/lib
@@ -2136,6 +2230,17 @@ LIBXSLT_LIBS ?= -lxslt
 endif
 endif
 
+ifeq "$(PLATFORM)" "NETBSD"
+ifeq "$(OS_MAJOR_VERSION)" "5"
+LIBXSLT_DIR ?= /usr/pkg
+LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
+LIBXSLT_INCLUDE_DIRS = -I$(LIBXSLT_INCLUDE_DIR)
+LIBXSLT_LIB_DIR ?= $(LIBXSLT_DIR)/lib
+LIBXSLT_LIB_DIRS = -L$(LIBXSLT_LIB_DIR)
+LIBXSLT_LIBS ?= -lxslt
+endif
+endif
+
 endif
 
 
@@ -2155,6 +2260,10 @@ endif
 
 ifeq "$(PLATFORM)" "OPENBSD"
 EXPECT = /usr/local/bin/expect
+endif
+
+ifeq "$(PLATFORM)" "NETBSD"
+EXPECT = /usr/pkg/bin/expect
 endif
 
 ifeq "$(PLATFORM)" "SUNOS"

@@ -31,6 +31,7 @@ Table of Contents
     FreeBSD 8.2
     FreeBSD 9.0
     OpenBSD 5.0
+    NetBSD 5.1
     Solaris 10
       Solaris 10 (CSW toolchain)
   Broken and non-working instructions for other Unixes
@@ -86,6 +87,9 @@ home directory as '~/config.mk'. Customize '~/config.mk' as needed.
 
 Alternatively you can of course pass all the options as variables 
 directory to the invocation of make.
+
+Versions of packages just indicate the ones I tested last, this
+doesn't mean other versions won't work.
 
 Manually build the prerequisites
 --------------------------------
@@ -424,7 +428,7 @@ OpenBSD 5.0
 -----------
 
 Required packages: boost (1.42.0p7)
-Optional package:  cyrus-sasl2 (from ports tree, 2.1.23p7),
+Optional packages: cyrus-sasl2 (from ports tree, 2.1.23p7),
                    qt4 (qt4-4.7.3p0),
                    sqlite3 (3.7.5), postgresql-client (9.0.4),
                    libxml (2.7.8p2), libxslt (1.1.26p2)
@@ -436,10 +440,29 @@ For NLS support you need 'libintl' and 'gettext'.
 OpenBSD has no PAM, but BSD Authentication, which is currently not
 supported by Wolframe.
 
+OpenBSD contains SSL libraries per default no packages needed.
+
 For some optional packages you need the OpenBSD ports tree and
 you have to build the packages on your own.
 
 For testing you need 'expect-5.44.1.15p0-no_tk'.
+
+NetBSD 5.1
+----------
+
+(Packages are all from pkgsrc)
+
+Required packages: boost-headers (1.47.0), boost-libs (1.47.0)
+Optional packages: cyrus-sasl (2.1.25), qt4 (4.7.4),
+                   sqlite3 (3.7.9), postgresql91-client (9.1.2),
+                   libxml2 (2.7.8nb8), libxslt (1.1.26nb1)
+
+You need 'gmake' (3.82db3).
+
+NetBSD contains SSL libraries per default no packages needed.
+Also PAM modules.
+
+For testing you need 'tcl-expect' (5.43.0nb1).
 
 Solaris 10
 ----------
