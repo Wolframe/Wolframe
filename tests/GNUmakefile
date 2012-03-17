@@ -76,7 +76,7 @@ TEST_CPP_BINS = \
 	protocolArgumentParsing$(EXE) \
 	configValueParser$(EXE) \
 	configStructParser$(EXE) \
-	filter$(EXE) \
+	filter$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
