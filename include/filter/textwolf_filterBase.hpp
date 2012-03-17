@@ -104,12 +104,11 @@ public:
 	///\brief access operator (required by textwolf for an input iterator)
 	char operator*()
 	{
-		if (!m_gen->size())
+		if (!m_gen->hasLeft())
 		{
 			if (m_gen->gotEoD()) return 0;
 			throw EoM();
 		}
-
 		return *(char*)m_gen->ptr();
 	}
 

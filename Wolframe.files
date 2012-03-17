@@ -615,6 +615,7 @@ tests/counterTest.cpp
 tests/expect/GNUmakefile
 tests/expect/Makefile.W32
 tests/expect/wolframe.conf
+tests/filter.cpp
 tests/GNUmakefile
 tests/libxml2/GNUmakefile
 tests/libxml2/testlibxml2.cpp

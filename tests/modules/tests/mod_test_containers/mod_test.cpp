@@ -50,8 +50,8 @@ TestModuleConfig::TestModuleConfig( const char* cfgName, const char* logParent, 
 	MOD_LOG_DEBUG << "Test module config created";
 }
 
-bool TestModuleConfig::parse( const config::ConfigurationTree& pt, const std::string& node,
-    const module::ModulesDirectory* modules )
+bool TestModuleConfig::parse( const config::ConfigurationTree& /*pt*/, const std::string& /*node*/,
+    const module::ModulesDirectory* /*modules*/ )
 {
 	return true;
 }
@@ -67,7 +67,7 @@ void TestModuleConfig::print( std::ostream& os, size_t indent ) const
 	os << indStr << sectionName() << ": no config " << std::endl;
 }
 
-void TestModuleConfig::setCanonicalPathes( const std::string& refPath )
+void TestModuleConfig::setCanonicalPathes( const std::string& /*refPath*/ )
 {
 }
 

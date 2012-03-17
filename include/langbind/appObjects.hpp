@@ -29,10 +29,9 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///
 ///\file appObjects.hpp
 ///\brief interface for application processor scripting language to system objects
-///
+
 #ifndef _Wolframe_langbind_APPOBJECTS_HPP_INCLUDED
 #define _Wolframe_langbind_APPOBJECTS_HPP_INCLUDED
 #include "protocol/outputfilter.hpp"
@@ -101,15 +100,23 @@ struct Filter
 	protocol::InputFilterR m_inputfilter;		///< input filter
 
 	///\brief Constructor
-	///\param[in] system reference to system function call interface
 	///\param[in] name name of the filter as defined in the system
 	Filter( const char* name);
+
+	///\brief Default constructor
+	Filter(){}
 
 	///\brief Copy constructor
 	///\param[in] o copied item
 	Filter( const Filter& o)
 		:m_outputfilter(o.m_outputfilter)
 		,m_inputfilter(o.m_inputfilter){}
+	///\brief Constructor
+	///\param[in] fi input filter
+	///\param[in] fo output filter
+	Filter( const protocol::InputFilterR& fi, const protocol::OutputFilterR& fo)
+		:m_outputfilter(fo)
+		,m_inputfilter(fi){}
 	///\brief Destructor
 	~Filter(){}
 

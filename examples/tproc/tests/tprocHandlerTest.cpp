@@ -336,11 +336,9 @@ private:
 				++ii;
 			}
 		}
-		/* Aba: dereference *itr == end ?! Can't work IMHO, crashes on Windows
-		if (*itr <= nn/4) return 5;
-		if (*itr <= nn/3) return 4;
-		if (*itr <= nn/2) return 3;
-		*/
+		if (end - itr <= nn/4) return 5;
+		if (end - itr <= nn/3) return 4;
+		if (end - itr <= nn/2) return 3;
 		return 1;
 	}
 
@@ -374,6 +372,8 @@ public:
 	}
 };
 
+static std::string selectedTestName;
+
 TEST_F( TProcHandlerTest, tests)
 {
 	enum {NOF_IB=6,NOF_OB=4};
@@ -382,11 +382,26 @@ TEST_F( TProcHandlerTest, tests)
 	std::vector<std::string> tests;
 
 	boost::filesystem::recursive_directory_iterator ditr( boost::filesystem::current_path() / "data"), dend;
+	if (selectedTestName.size())
+	{
+		std::cerr << "executing tests matching '" << selectedTestName << "'" << std::endl;
+	}
 	for (; ditr != dend; ++ditr)
 	{
 		if (boost::iequals( boost::filesystem::extension( *ditr), ".tst"))
 		{
-			tests.push_back( ditr->path().string());
+			if (selectedTestName.size())
+			{
+				if (std::search( ditr->path().string().begin(), ditr->path().string().end(), selectedTestName.begin(), selectedTestName.end()) != ditr->path().string().end())
+				{
+					std::cerr << "selected test '" << *ditr << "'" << std::endl;
+					tests.push_back( ditr->path().string());
+				}
+			}
+			else
+			{
+				tests.push_back( ditr->path().string());
+			}
 		}
 		else if (!boost::filesystem::is_directory( *ditr))
 		{
@@ -425,7 +440,18 @@ TEST_F( TProcHandlerTest, tests)
 
 int main( int argc, char **argv )
 {
-	::testing::InitGoogleTest( &argc, argv );
+	int gtest_ARGC = 1;
+	char* gtest_ARGV[2] = {argv[0], 0};
+	if (argc > 2)
+	{
+		std::cerr << "too many arguments passed to " << argv[0] << std::endl;
+		return 1;
+	}
+	else if (argc == 2)
+	{
+		selectedTestName = argv[1];
+	}
+	::testing::InitGoogleTest( &gtest_ARGC, gtest_ARGV );
 	_Wolframe::log::LogBackend::instance().setConsoleLevel( _Wolframe::log::LogLevel::LOGLEVEL_INFO );
 	return RUN_ALL_TESTS();
 }

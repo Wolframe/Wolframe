@@ -181,6 +181,9 @@ struct InputFilter
 	bool gotEoD() const				{return m_gotEoD;}
 	///\brief Get data at current iterator cursor position
 	void* ptr() const				{return(void*)((char*)m_ptr+m_pos);}
+	///\brief Find out if there is more data left to parse
+	///\return true, if yes
+	bool hasLeft() const				{return (m_pos < m_size);}
 	///\brief Get rest of data from the current iterator cursor position
 	std::size_t size() const			{return (m_pos<m_size)?(m_size-m_pos):0;}
 	///\brief Skip forward current iterator cursor position

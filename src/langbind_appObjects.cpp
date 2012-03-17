@@ -237,10 +237,6 @@ Filter::Filter( const char* name)
 		m_outputfilter = tw.outputFilter();
 	}
 #endif
-	else
-	{
-		LOG_ERROR << "unknown filter '" << name << "'";
-	}
 }
 
 Output::ItemType Output::print( const char* tag, unsigned int tagsize, const char* val, unsigned int valsize)

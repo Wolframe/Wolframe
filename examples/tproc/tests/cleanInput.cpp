@@ -99,9 +99,6 @@ static void removeTrailingEOLN( std::string& input)
 
 int main( int argc, char **argv )
 {
-	std::string tt = "BLA\n\n";
-	removeTrailingEOLN(tt);
-
 	char ch;
 	std::string input;
 

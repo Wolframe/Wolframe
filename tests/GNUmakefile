@@ -45,6 +45,21 @@ INCLUDE_LIBS += \
 
 endif
 
+# libxml2
+ifeq ($(WITH_LIBXML2),1)
+INCLUDE_CXXFLAGS += \
+	-DWITH_LIBXML2
+
+INCLUDE_DIRS += \
+	$(LIBXML2_INCLUDE_DIRS)
+
+INCLUDE_LDFLAGS += \
+	$(LIBXML2_LIB_DIRS)
+
+INCLUDE_LIBS += \
+	$(LIBXML2_LIBS)
+endif
+
 TEST_OBJS =
 
 TEST_CPP_BINS = \
@@ -61,6 +76,7 @@ TEST_CPP_BINS = \
 	protocolArgumentParsing$(EXE) \
 	configValueParser$(EXE) \
 	configStructParser$(EXE) \
+	filter$(EXE) \
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

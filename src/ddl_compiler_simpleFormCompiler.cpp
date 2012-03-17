@@ -117,7 +117,6 @@ struct Source
 {
 	std::string src;
 	std::string::const_iterator start;
-	// Aba: must check for end, otherwise *at can abort on Windows
 	std::string::const_iterator end;
 	std::string::const_iterator at;
 	Source& operator ++()	{++at; return *this;}

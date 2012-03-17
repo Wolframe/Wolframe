@@ -1133,11 +1133,11 @@ TextwolfXmlFilter::TextwolfXmlFilter( std::size_t elementbufsize, std::size_t ta
 	m_outputFilter.reset( new OutputFilter( enc, tagbufsize));
 }
 
-TextwolfXmlFilter::TextwolfXmlFilter( std::size_t, std::size_t tagbufsize, const char* encoding)
+TextwolfXmlFilter::TextwolfXmlFilter( std::size_t elementbufsize, std::size_t tagbufsize, const char* encoding)
 {
 	TextwolfEncoding::Id ei = TextwolfEncoding::getId( encoding);
 	CountedReference<TextwolfEncoding::Id> enc( new TextwolfEncoding::Id( ei));
-	m_inputFilter.reset( 0);
+	m_inputFilter.reset( new InputFilter( enc, elementbufsize));
 	m_outputFilter.reset( new OutputFilter( enc, tagbufsize));
 }
 
