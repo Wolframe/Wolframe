@@ -39,6 +39,7 @@ Project Wolframe.
 #include <boost/algorithm/string.hpp>
 #include "filter/char_filter.hpp"
 #include "filter/line_filter.hpp"
+#include "filter/token_filter.hpp"
 #ifdef WITH_LIBXML2
 #include "filter/libxml2_filter.hpp"
 #endif
@@ -198,6 +199,12 @@ Filter::Filter( const char* name)
 	else if (startsWith( name, "line:"))
 	{
 		filter::LineFilter flt( name+5, DEFAULT_LINE_SIZE);
+		m_inputfilter = flt.inputFilter();
+		m_outputfilter = flt.outputFilter();
+	}
+	else if (startsWith( name, "token:"))
+	{
+		filter::TokenFilter flt( name+6, DEFAULT_LINE_SIZE);
 		m_inputfilter = flt.inputFilter();
 		m_outputfilter = flt.outputFilter();
 	}

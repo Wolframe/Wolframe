@@ -81,6 +81,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	filter_textwolf_filterBase.o \
 	filter_char_filter.o \
 	filter_line_filter.o \
+	filter_token_filter.o \
 	serialize_struct_filtermapBase.o \
 	serialize_ddl_filtermapSerialize.o \
 	serialize_mapContext.o \
