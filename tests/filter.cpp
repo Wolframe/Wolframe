@@ -144,7 +144,18 @@ int main( int argc, char **argv )
 		{
 			switch (flt.m_inputfilter.get()->state())
 			{
-				case protocol::InputFilter::EndOfMessage: goto READ_INPUT;
+				case protocol::InputFilter::EndOfMessage:
+				{
+					if (flt.m_inputfilter.get()->size())
+					{
+						flt.m_inputfilter.get()->setState( protocol::InputFilter::Error, "Buffer too small");
+						goto ERROR_READ;
+					}
+					else
+					{
+						goto READ_INPUT;
+					}
+				}
 				case protocol::InputFilter::Error: goto ERROR_READ;
 				case protocol::InputFilter::Open:
 				{
@@ -169,7 +180,10 @@ int main( int argc, char **argv )
 		{
 			switch (flt.m_outputfilter.get()->state())
 			{
-				case protocol::OutputFilter::EndOfBuffer: goto WRITE_OUTPUT;
+				case protocol::OutputFilter::EndOfBuffer:
+				{
+					goto WRITE_OUTPUT;
+				}
 				case protocol::OutputFilter::Error: goto ERROR_WRITE;
 				case protocol::OutputFilter::Open:
 				{

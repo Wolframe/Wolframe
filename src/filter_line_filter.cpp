@@ -91,7 +91,11 @@ struct InputFilterImpl :public protocol::InputFilter
 			textwolf::UChar ch;
 			while ((ch = *m_itr) != 0)
 			{
-				if (ch == '\r') continue;
+				if (ch == '\r')
+				{
+					++m_itr;
+					continue;
+				}
 				if (ch == '\n')
 				{
 					*bufferpos = buf.size();

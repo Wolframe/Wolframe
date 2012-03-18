@@ -28,7 +28,7 @@ static char getElementTag( typename protocol::OutputFilter::ElementType tp)
 		case protocol::InputFilter::OpenTag: return '>';
 		case protocol::InputFilter::CloseTag: return '<';
 		case protocol::InputFilter::Attribute: return '@';
-		case protocol::InputFilter::Value: return ' ';
+		case protocol::InputFilter::Value: return '=';
 	}
 	return '\0';
 }
@@ -70,11 +70,7 @@ struct OutputFilterImpl :public protocol::OutputFilter
 		{
 			if (ch == '\n')
 			{
-				IOCharset::print( '&', buf);
-				IOCharset::print( '#', buf);
-				IOCharset::print( '1', buf);
-				IOCharset::print( '0', buf);
-				IOCharset::print( ';', buf);
+				IOCharset::print( ' ', buf);
 			}
 			else
 			{
@@ -99,7 +95,14 @@ struct OutputFilterImpl :public protocol::OutputFilter
 		FilterBase<IOCharset,AppCharset>::printToBufferEOL( buf);
 		if (basebuf.overflow())
 		{
-			setState( EndOfBuffer);
+			if (pos() == 0 && size() != 0)
+			{
+				setState( Error, "buffer too small for one element");
+			}
+			else
+			{
+				setState( EndOfBuffer);
+			}
 			return false;
 		}
 		incPos( basebuf.size());
@@ -154,16 +157,17 @@ struct InputFilterImpl :public protocol::InputFilter
 				{
 					setState( protocol::InputFilter::Error, "textwolf: Unknown token tag");
 				}
-				if (*type == protocol::InputFilter::Value)
-				{
-					m_tag = tg;
-					++m_itr;
-				}
+				m_tag = tg;
+				++m_itr;
 			}
 			textwolf::UChar ch;
 			while ((ch = *m_itr) != 0)
 			{
-				if (ch == '\r') continue;
+				if (ch == '\r')
+				{
+					++m_itr;
+					continue;
+				}
 				if (ch == '\n')
 				{
 					*bufferpos = buf.size();
