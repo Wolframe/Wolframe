@@ -63,7 +63,7 @@ logger\wolframemsg.rc: logger\wolframemsg.mc
 logger\logBackendEventlog.obj: logger\wolframemsg.rc
 
 wolframe.lib: $(CPP_OBJS)
-	$(LINK) /lib /nologo /out:$@ $(LDFLAGS) $(LIBS) $?
+	$(LINK) /lib /nologo /out:$@ $(STATIC_LDFLAGS) $(LIBS) $?
 
 local_all:
 

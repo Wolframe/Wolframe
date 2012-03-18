@@ -11,11 +11,11 @@ Table of Contents
       Boost 1.44
     OpenSSL
        Compile and install openssl
-    Install Tcl and Expect
     Compile and install Qt
     Postgresql C client library
       Compiling Postgresql
       Notes for Postgreslql 9.0.4
+    Install Tcl and Expect
   Documentation
 
 Prerequisites
@@ -38,7 +38,9 @@ Prerequisites
 - for native XML support
   - optionally (WITH_MSXML): MSXML 6.0 or later
   - optionally (WITH_XMLLITE): XmlLite SDK
-- optionally (WITH_EXPECT) Expect and Tcl 8.4 or later
+  - note, that this may not work with Express
+    editions as ATL is missing from those editions
+- optionally for testing (WITH_EXPECT) Expect and Tcl 8.4 or later
 - optionally for packaging:
   - Wix 3.5 or later (which needs .NET 2.0 during packaging)
 - optionally to build documentation:
@@ -100,28 +102,23 @@ Despite the name you get also 64-bit versions there.
 Do not copy the OpenSSL binaries to the Windows system directory, copy
 them to the Bin subdirectory of the OpenSSL installation directory!
 
-Install Tcl and Expect
-----------------------
+If you want to compile your own version, use
+- Microsoft Compiler
+- a perl (ActivePerl)
+- optionally NASM
 
-Download from http://www.activestate.com/activetcl/ 
-(32-bit version, the 64-bit version had no Expect available,
-at least at the time of writting)
+perl Configure VC-WIN32 \
+	--prefix="C:\OpenSSL\openssl-1.0.1-win32-debug" \
+	asm threads no-shared
+	
+Make sure there prefix has no spaces in it!
 
-Install ActiveTcl 8.5 to C:\tcl
+ms\do_nasm
 
-Then adapt in 'makefiles\nmake\config.mk':
+nmake /f ms\ntdll.mak
+nmake /f ms\ntdll.mak install
 
-TCP_DIR = C:\tcl
-
-Install Expect 1.1 with:
-
-cd c:\Tcl\bin
-teacup install Expect
-
-Telnet is not enable by default, enable it in "Control Panel",
-"Windows Features" or call:
-
-pkgmgr /iu:"TelnetClient"
+Have a closer look to INSTALL.W32 and INSTALL.W64 of the package itself.
 
 Qt
 --
@@ -181,14 +178,19 @@ You need at least ActivePerl installed.
 cd src\tools\msvc
 copy config_default.pl config.pl
 
-Adapt config.pl to your needs.
+Adapt config.pl to your needsm for instance for SSL support:
+
+openssl=>"C:\OpenSSL\openssl-1.0.1-win32-debug"
 
 You may have to touch preproc.c and preproc.h if build wants
 to start bison and you don't have bison installed.
 
-build DEBUG
+build DEBUG libpq
 
 install C:\<somewhere>
+
+(install fails happily with spaces in pathes, source and destination,
+copy by hand in this case)
 
 Notes for Postgreslql 9.0.4
 ---------------------------
@@ -196,6 +198,24 @@ Notes for Postgreslql 9.0.4
 If your disable OpenSSL (for instance for debugging), you have
 to touch sslinfo.sql in contrib/sslinfo Dito for uuid-ossp.sql,
 pgxml.sql.in.
+
+Notes for Visual Studio 2010
+----------------------------
+
+vcbuild.exe disappeared, you need the following patch to build
+with VS2010:
+
+http://archives.postgresql.org/pgsql-hackers/2011-01/msg00118.php
+
+The patch has some hard coded library names:
+
+cd <openssl-dir>\lib
+mkdir VC
+cd VC
+copy ..\libeay32.dll libeay32MDd.lib (for the 32-bit debug version for example)
+copy ..\ssleay32.dll ssleay32MDd.lib
+
+Maybe newer versions will have the patch integrated.
 
 Notes for 32-bit dependencies
 -----------------------------
@@ -205,6 +225,29 @@ You can get gettext/libintl and other libraries from
 http://gnuwin32.sourceforge.net/packages.html
 
 as packages.
+
+Install Tcl and Expect
+----------------------
+
+Download from http://www.activestate.com/activetcl/ 
+(32-bit version, the 64-bit version had no Expect available,
+at least at the time of writting)
+
+Install ActiveTcl 8.5 to C:\tcl
+
+Then adapt in 'makefiles\nmake\config.mk':
+
+TCP_DIR = C:\tcl
+
+Install Expect 1.1 with:
+
+cd c:\Tcl\bin
+teacup install Expect
+
+Telnet is not enabled by default, enable it in "Control Panel",
+"Windows Features" or call:
+
+pkgmgr /iu:"TelnetClient"
 
 Documentation
 -------------
