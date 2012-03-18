@@ -139,7 +139,6 @@ int main( int argc, char **argv )
 	}
 	PROCESS_READ:
 	{
-		elementBufferPos = 0;
 		if (!flt.m_inputfilter.get()->getNext( &elementType, elementBuffer, sizeof(elementBuffer), &elementBufferPos))
 		{
 			switch (flt.m_inputfilter.get()->state())
@@ -200,6 +199,10 @@ int main( int argc, char **argv )
 				}
 
 			}
+		}
+		else
+		{
+			elementBufferPos = 0;
 		}
 		if (elementType == protocol::InputFilter::OpenTag)
 		{
