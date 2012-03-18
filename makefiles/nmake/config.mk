@@ -87,7 +87,7 @@ PGDLL_WITHOUT_MAJOR_VERSION = 1
 # Tcl 8.5 and Expect
 ####################
 
-TCL_DIR = C:\Program Files (x86)\Tcl8.5.9
+TCL_DIR = C:\Program Files\Tcl
 #TCL_DIR = D:\Program Files\Tcl8.5.9
 EXPECT = $(TCL_DIR)\bin\tclsh.exe
 

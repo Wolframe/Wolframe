@@ -60,7 +60,7 @@ BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib"
 ##############################################################
 
 #OPENSSL_DIR = C:\Programme\OpenSSL-1.0.0a
-OPENSSL_DIR = C:\Program Files\OpenSSL
+OPENSSL_DIR = c:\OpenSSL\openssl-1.0.1-win32-debug
 #OPENSSL_DIR = D:\Programme\OpenSSL
 #OPENSSL_DIR = D:\OpenSSL\Win32
 #OPENSSL_DIR = D:\Program Files\OpenSSL-1.0.0d
@@ -77,9 +77,9 @@ QT_DIR = C:\Qt\4.7.3
 # (http://www.postgresql.org/)
 ##############################
 
-PGSQL_DIR = C:\Program Files\PostgreSQL\9.0
+#PGSQL_DIR = C:\Program Files\PostgreSQL\9.0
 #PGSQL_DIR = D:\Program Files\PostgreSQL\9.0
-#PGSQL_DIR = C:\cygwin\home\Andreas\postgresql-9.0.4-win64-debug
+PGSQL_DIR = C:\cygwin\home\Andreas Baumann\postgresql-9.1.3-win32-debug
 
 # enable depending on libintl.dll and libiconv.dll (deployment only)
 PGDLL_WITHOUT_MAJOR_VERSION = 1
@@ -87,7 +87,7 @@ PGDLL_WITHOUT_MAJOR_VERSION = 1
 # Tcl 8.5 and Expect
 ####################
 
-TCL_DIR = C:\Program Files (x86)\Tcl8.5.9
+TCL_DIR = C:\Program Files\Tcl
 #TCL_DIR = D:\Program Files\Tcl8.5.9
 EXPECT = $(TCL_DIR)\bin\tclsh.exe
 
