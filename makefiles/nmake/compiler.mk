@@ -48,12 +48,14 @@ RC = rc.exe
 
 # linking flags (release)
 !IFNDEF DEBUG
-LDFLAGS = /nologo $(INCLUDE_LDFLAGS)
+LDFLAGS = /nologo /manifest $(INCLUDE_LDFLAGS)
+STATIC_LDFLAGS = /nologo $(INCLUDE_LDFLAGS)
 !ENDIF
 
 # linking flags (debug)
 !IFDEF DEBUG
-LDFLAGS = /nologo /debug $(INCLUDE_LDFLAGS)
+LDFLAGS = /nologo /manifest /debug $(INCLUDE_LDFLAGS)
+STATIC_LDFLAGS = /nologo $(INCLUDE_LDFLAGS)
 !ENDIF
 
 LIBS = $(INCLUDE_LIBS)

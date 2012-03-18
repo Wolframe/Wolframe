@@ -44,7 +44,8 @@ Prerequisites
 
 - gcc c++ 4.1.x or later (preferably 512 MB RAM or Swap)
 - GNU make (preferably 3.82 or newer)
-- boost 1.43.0 or later
+- boost 1.43.0 or later (boost 1.42 works too, but is not
+  recommended)
 - optionally (WITH_SSL) openssl 0.9.7 or later
 - optionally (WITH_LUA) lua 5.2
   (integrated in subdir 'lua')

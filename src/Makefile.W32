@@ -16,7 +16,8 @@ INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
-	$(TOPDIR)\src\libwolframe\wolframe.lib
+	$(TOPDIR)\src\libwolframe\wolframe.lib \
+	advapi32.lib
 
 # openssl
 
@@ -109,11 +110,15 @@ LOCAL_STATIC_LIB_OBJS = \
 	ddl_compiler_simpleFormCompiler.obj \
 	acceptor.obj \
 	getPassword.obj \
-	serverEndpoint.obj \
 	connection.obj \
 	serverConfig.obj \
 	server.obj \
 	procProvider.obj
+
+!IFDEF WITH_SSL
+LOCAL_STATIC_LIB_OBJS = \
+	$(LOCAL_STATIC_LIB_OBJS) serverEndpoint.obj
+!ENDIF
 
 #Lua
 !IFDEF WITH_LUA
@@ -167,7 +172,7 @@ modules: libwolframe
 wolframed.exe: wolframed.obj $(CPP_OBJS) libwolframe\logger\wolframemsg.res
 
 $(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
-	$(LINK) /lib /nologo /out:$@ $(LDFLAGS) $(LIBS) $?
+	$(LINK) /lib /nologo /out:$@ $(STATIC_LDFLAGS) $(LIBS) $?
 
 local_all: $(LOCAL_STATIC_LIB) loadModules-dummy.obj
 
