@@ -62,7 +62,7 @@ LIBRARIES = \
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 lua.lib: $(OBJS)
-	$(LINK) /lib /nologo /out:$@ $(LDFLAGS) $(LIBS) $?
+	$(LINK) /lib /out:$@ $(STATIC_LDFLAGS) $(LIBS) $?
 
 local_all: $(LIBRARIES) $(BINS) 
 

@@ -23,7 +23,6 @@ ABa:
     we should link only the resulting binary, this is exactly the
     opposite of shared libraries on Unix)
 - Windows:
-  - have boost debug libraries
   - username, password for service credentials
   - clean up native Win32 string mess in service code
   - log when service gets installed and uninstalled
