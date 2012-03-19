@@ -83,7 +83,7 @@ public:
 		unsigned int ii;
 		for (ii=0,rt=typeName((Type)(ii)); rt!=0; ii++,rt=typeName((Type)(ii)))
 		{
-			if (std::strcmp( rt, name) == 0)
+			if (boost::algorithm::iequals( rt, name))
 			{
 				tp = (Type)ii;
 				return true;
@@ -299,26 +299,26 @@ bool SimpleFormCompilerImpl::parseIdentifier( Lexem& lexem)
 {
 	while (((*src|32) >= 'a' && (*src|32) <= 'z') || *src == '_' || (*src >= '0' && *src <= '9'))
 	{
-		lexem.value.push_back( *src);
+		lexem.value.push_back( *src | 32);
 		++src;
 	}
 	if (!isDelimiter())
 	{
 		return setError( lexem, "invalid identifier");
 	}
-	if (std::strcmp( lexem.value.c_str(), "form") == 0)
+	if (boost::algorithm::iequals( lexem.value, "form"))
 	{
 		lexem.type = Lexem::Form;
 	}
-	else if (std::strcmp( lexem.value.c_str(), "public") == 0)
+	else if (boost::algorithm::iequals( lexem.value, "public"))
 	{
 		lexem.type = Lexem::Public;
 	}
-	else if (std::strcmp( lexem.value.c_str(), "as") == 0)
+	else if (boost::algorithm::iequals( lexem.value, "as"))
 	{
 		lexem.type = Lexem::As;
 	}
-	else if (std::strcmp( lexem.value.c_str(), "end") == 0)
+	else if (boost::algorithm::iequals( lexem.value, "end"))
 	{
 		lexem.type = Lexem::End;
 	}
@@ -398,6 +398,7 @@ bool SimpleFormCompilerImpl::parseEndOfLine( Lexem& lexem)
 bool SimpleFormCompilerImpl::nextLexem( Lexem& lexem)
 {
 	lexem.value.clear();
+	lexem.type = Lexem::Error;
 	while (*src != 0 && *src <= ' ' && *src != '\r' && *src != '\n') ++src;
 	if (*src == '\r' || *src == '\n') return parseEndOfLine( lexem);
 	if (((*src|32) >= 'a' && (*src|32) <= 'z') || *src == '_') return parseIdentifier( lexem);

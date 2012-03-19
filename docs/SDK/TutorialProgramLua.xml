@@ -1,0 +1,177 @@
+<!-- Tutorial -->
+<sect1>
+<title>Writing Wolframe Programs in Lua</title>
+	<sect2>
+	<title>Introduction</title>
+	<para>You can write programs for the 2nd tier of Wolframe with Lua. Lua is a scripting language designed, implemented, and maintained
+		at PUC-Rio in Brazil by Roberto Ierusalimschy, Waldemar Celes and Luiz Henrique de Figueiredo
+		(see http://www.lua.org/authors.html). A tutorial for the use of Lua is not provided here.
+		For an introduction into programming with Lua see http://www.lua.org. The official manual also available as book
+		is very good. Wolframe introduces some Lua interface to access input and output and to do transactions.
+		The Lua Application Layer doesn't deal with protocol or encryption issues. The program gets just a filter
+		on the input to process, a filter as the output interface for data content to return to the client and an interface
+		to call transaction functions (for example to store and retrieve data from database) or other functions
+		(for example to to print content as PDF). In the following sections we describe this interfaces.
+	</para>
+	</sect2>
+	<sect2>
+	<title>Filter</title>
+	<para>The application input and output can be of different kind. This depends on the sort of
+		application and the client using the service. For different input and output Wolframe provides
+		filters. The system provides a global function
+			<code>filter( )</code>
+		with the name of the filter as string as parameter. If you for example want to process data
+		as XML you need to get a filter by calling
+			<code>filter( "XML:libxml2" )</code>
+		The object returned by this function call can be attached to input or output. It uses the
+		library libxml2 for parsing the XML. You can have different filters for input and output,
+		but only one at a time.
+	</para>
+	</sect2>
+	<sect2>
+	<title>Input</title>
+	<para>Input is a accessed over a global variable input. This object has the following methods:
+			<code>input:as( f )</code>
+		attaches a filter f to the input. Subsequent calls of get() will apply this filter f to get the input elements to process.
+			<code>input:get( )</code>
+		returns an iterator on the input that fetches one or two values per step depending on the filter. Unstructured input
+		fetches one value, the input element. Structured input fetches the element content as first value
+		and the attribute or tag as second value. If one of them is not available, then a boolean false is
+		retured in its place. An XML tag for example is returned as false;tagname. An attribute,
+		value pair is returned as value;name.
+		A content element is returned as value;false or value;nil, depending on the filter type.
+		A close tag is returned as a pair of boolean false values (false;false).
+		The reason for using false, instead of nil, is the special treatment of nil in a Lua for loop.
+		Nil is always terminating the iteration in Lua, no matter what follows this nil. Nil is
+		returned at the end of the data or, if the iteration started in a subsection of the
+		content, as the last tag of context the iteration has started closes. The later
+		construct is used for delegating the processing of subsections.
+	</para>
+	</sect2>
+	<sect2>
+	<title>Output</title>
+	<para>Output is a accessed over a global variable output. This object has the following methods:
+			<code>output:as( f )</code>
+		attaches a filter f to the output. Subsequent calls of print() will apply this filter f to print the
+		output elements returned as content to the client.
+			<code>output:print( c, t)</code>
+		or
+			<code>output:print( c)</code>
+		prints an element to the output. Omitting t, means that an untagged content element is printed.
+		The same happens when you call print with nil or false as second parameter t. With c passed
+		as nil or false you print a open tag or close tag, depending on t. t is a tag name for
+		open tag and nil or false for a close previous tag. With c,t as non nil or false values you
+		print an attribute value assignement.
+	</para>
+	</sect2>
+	<sect2>
+	<title>Form</title>
+	<para>Input and and output of transactions are objects built by an object description. In Wolframe
+		this description of an object is called a form. A form is an ordered array of typed variables
+		and subforms. Forms are defined in modules or interpreted from a source (any DDL like DDT,XSD,etc.).
+		It depends on the user what type of form description and translator to use. Forms are
+		loaded at startup and have a unique name.
+		The system provides a global function
+			<code>form( )</code>
+		with the name of the form as string as parameter. If you for example have a form configured
+		called "employee" and you want to create a employee object from a Lua table, you by call
+			<programlisting language='lua'>
+			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/tutorial/lua_usage_form_1a.lua" parse="text" />
+			</programlisting>
+		The first line creates a function for checking a table with the form and to map it to form data.
+		The second line calls the function and returns the form data for a valid table or nil for an invalid table.
+
+		The function <code>form</code> has a second optional boolean parameter. Passing true as
+		second parameter enforces an abort of the program by exception, if the validation
+		of the form fails. The following example call of <code>bcf</code> will terminate the script with
+		error because some elements of the form are missing:
+			<programlisting language='lua'>
+			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/tutorial/lua_usage_form_1b.lua" parse="text" />
+			</programlisting>
+		Calling the function <code>form</code> with one parameter or false as second parameter returns
+		a function that can be used to check some data properties. This helps to reduce the variety of
+		form descriptions.
+
+		The mapping function of a form works in both directions. If you pass a table to it,
+		it returns the form data. If you pass form data to it, it returns a Lua table created out of it.
+	</para>
+	</sect2>
+	<sect2>
+	<title>Transaction</title>
+	<para>
+		Transactions in a Wolframe Lua program are functions taking a list of form data objects as
+		input and returning a list of form data objects as output. Transaction functions are loaded
+		at startup and have a unique name. The system provides a global function
+			<code>transaction( )</code>
+		with the name of the transaction as parameter. If you for example have a transaction configured
+		called "insertEmployee" and you want to call it with the 'employee' object defined above as
+		input and returning an Id as ouput, you do
+			<programlisting language='lua'>
+			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/tutorial/lua_usage_transaction_1.lua" parse="text" />
+			</programlisting>
+		The first line creates the input form, the second the output form, the third does the insert into
+		the database operation and the 4th line prints it as string to the output.
+	</para>
+	</sect2>
+	<sect2>
+	<title>Examples</title>
+		<sect3>
+		<title>Example 1: A character by character echo program</title>
+		<para>This example echoes the input character by character in UTF-16.
+		<programlisting language='lua'>
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/tutorial/lua_script_1.lua" parse="text" />
+		</programlisting>
+		</para>
+		</sect3>
+		<sect3>
+		<title>Example 2: An line by line echo program</title>
+		<para>This example echoes the input line by line in UTF-8.
+		<programlisting language='lua'>
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/tutorial/lua_script_2.lua" parse="text" />
+		</programlisting>
+		</para>
+		</sect3>
+		<sect3>
+		<title>Example 3: An XML echo program</title>
+		<para>This is a program echoing input as XML using textwolf as filter.
+			Filters created with one call share some information like the character set
+			encoding of the input. So if you want to output the document in the same
+			character set encoding as the input is read you have to bind the input as
+			the output to the same filter object. Calling
+				<code>input:as(filter( "XML:textwolf"))</code>
+			and
+				<code>output:as(filter( "XML:textwolf"))</code>
+			instead in the following example would lead to an echo reading any input in
+			XML and output an XML in the default encoding which is depending on the
+			platform. So it you want to output the XML in the same encoding as the input you have to call input:as and output:as with
+			the same filter object as follows:
+		<programlisting language='lua'>
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/tutorial/lua_script_3.lua" parse="text" />
+		</programlisting>
+		</para>
+		</sect3>
+		<sect3>
+		<title>Example 4: An XML echo program</title>
+		<para>This example does the same as example3 but treats the content of the tag "content" in
+			an own procedure.
+		<programlisting language='lua'>
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/tutorial/lua_script_4.lua" parse="text" />
+		</programlisting>
+		</para>
+		</sect3>
+		<sect3>
+		<title>Example 5: Load XML into a table</title>
+		<para>
+			This example procedure load the content of the XML document into a table and prints the
+			elements 'name' and 'address'. The reading of the input into a table gets very complicated
+			whitout meta description of the document. We suggest here to use forms generated
+			from the document schema DDL (dtd, xml schema, etc.) to map an XML into a table.
+		<programlisting language='lua'>
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/tutorial/lua_script_5.lua" parse="text" />
+		</programlisting>
+		</para>
+		</sect3>
+	</sect2>
+	<para></para>
+</sect1>
+

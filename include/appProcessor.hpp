@@ -61,7 +61,7 @@ public:
 
 	///\brief Get the application processor script function to execute for a protocol command (as defined in configuration)
 	///\param[in] protocolCmd protocol command
-	///\param[out] name of application processor script function to execute
+	///\param[out] functionName name of application processor script function to execute
 	///\param[out] hasIO true, if the application processor script function processes data from network input, false else
 	///\return true, if the command exists
 	virtual bool getCommand( const char* protocolCmd, const char*& functionName, bool& hasIO) const=0;

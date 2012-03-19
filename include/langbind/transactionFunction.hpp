@@ -61,13 +61,12 @@ protected:
 	std::string m_content;			//< command string of the transaction function
 };
 
-///\class TransactionCommandWriterBase
+///\class TransactionCommandWriterFactory
 ///\brief Factory for a transaction command writer
-struct TransactionCommandWriterBase
+struct TransactionCommandWriterFactory
 {
-	TransactionCommandWriterBase(){}
-	TransactionCommandWriterBase( const TransactionCommandWriterBase&){}
-	virtual ~TransactionCommandWriterBase(){}
+	TransactionCommandWriterFactory(){}
+	virtual ~TransactionCommandWriterFactory(){}
 	virtual TransactionCommandWriter* create() const=0;
 };
 
@@ -94,14 +93,13 @@ protected:
 	std::string m_content;			//< result string of the transaction function
 };
 
-///\class TransactionCommandWriterBase
+///\class TransactionCommandWriterFactory
 ///\brief Factory for a transaction command writer
-struct TransactionResultReaderBase
+struct TransactionResultReaderFactory
 {
-	TransactionResultReaderBase(){}
-	TransactionResultReaderBase( const TransactionResultReaderBase&){}
-	virtual ~TransactionResultReaderBase(){}
-	virtual TransactionResultReaderBase* create() const=0;
+	TransactionResultReaderFactory(){}
+	virtual ~TransactionResultReaderFactory(){}
+	virtual TransactionResultReader* create() const=0;
 };
 
 
@@ -112,9 +110,16 @@ class TransactionFunction
 {
 public:
 	///\brief Constructor
-	///\param[in] config read only reference to the configuration of this application processor
+	///\param[in] h Command handler definition for this transaction function
+	///\param[in] w transaction command writer
+	///\param[in] r transaction result reader (parser)
 	TransactionFunction( protocol::CommandBase h, const TransactionCommandWriterBase& w, const TransactionResultReaderBase& r)
 		:m_cmdreader(r),m_cmdwriter(w),m_transactionCmdHandlerBase(h){}
+
+	///\brief Copy constructor
+	///\param[in] o transaction function to copy
+	TransactionFunction( const TransactionFunction& o)
+		:m_cmdreader(o.m_cmdreader),m_cmdwriter(o.m_cmdwriter),m_transactionCmdHandlerBase(o.m_transactionCmdHandlerBase){}
 
 	///\brief Destructor
 	virtual ~DirectmapCommandHandler() {}

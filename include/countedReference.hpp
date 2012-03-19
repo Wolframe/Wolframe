@@ -42,7 +42,7 @@ namespace _Wolframe {
 
 ///\class Reference
 ///\brief Reference to an object that is freed when not referenced anymore.
-///\remark Substitutable by 'boost::shared_ptr<OBJ>'
+///\remark Substitutable by 'shared_ptr'
 ///\tparam OBJ
 template <class OBJ>
 class CountedReference

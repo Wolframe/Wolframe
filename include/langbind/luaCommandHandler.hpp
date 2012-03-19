@@ -54,7 +54,7 @@ public:
 	struct Context;
 
 	///\brief Constructor
-	///\param[in] config read only reference to the configuration of this application processor
+	///\param[in] env reference to the read only environment of this application processor
 	explicit LuaCommandHandler( const LuaCommandEnvironment* env);
 	///\brief Destructor
 	virtual ~LuaCommandHandler();

@@ -107,7 +107,7 @@ public:
 		///\param[in] type_ type of the module
 		Module( const std::string& name_, Type type_=Undefined)		:m_type(type_),m_name(name_),m_load(0) {if (type_==Undefined) setType();}
 		///\brief Copy constructor
-		///\param[in] module to copy
+		///\param[in] o module to copy
 		Module( const Module& o)					:m_type(o.m_type),m_name(o.m_name),m_load(o.m_load){}
 
 		///\brief Determines the type of the module

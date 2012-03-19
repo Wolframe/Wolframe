@@ -1,12 +1,7 @@
 <!-- Appendix -->
 <appendix>
-	<title>Including external text</title>
-
+	<title>Appendix</title>
 	<sect1>
-		<title>The example</title>
-		<para>This is an example of including an external text file.</para>
-		<programlisting language="c++">
-<xi:include href="../include/config/configurationBase.hpp" parse="text" xmlns:xi="http://www.w3.org/2001/XInclude"/>
-		</programlisting>
+		<para>TODO</para>
 	</sect1>
 </appendix>

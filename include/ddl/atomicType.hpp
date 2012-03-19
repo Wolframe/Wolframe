@@ -73,7 +73,7 @@ public:
 
 	///\brief Setter method
 	///\tparam T Type of element to assign
-	///\param[in] element to assign
+	///\param[in] val element to assign
 	///\return true on success, false if the type check fails or on overflow
 	template <typename T>
 	bool set( const T& val)
@@ -105,7 +105,7 @@ public:
 
 	///\brief Getter method
 	///\tparam T Type of element to get
-	///\param[out] element retrieved
+	///\param[out] val element retrieved
 	///\return true on success, false if the type check fails or on overflow
 	template <typename T>
 	bool get( T& val)
@@ -146,7 +146,7 @@ private:
 	///\brief Internally used assingement over another type as intermediate.
 	///\tparam M type serving as intermediate of the assignement (used for type checking)
 	///\tparam S type of the element to assign to this. (source type of the assingement)
-	///\param[in] element to assign to this
+	///\param[in] src element to assign to this
 	template <typename M, typename S>
 	void assign( const S& src)
 	{

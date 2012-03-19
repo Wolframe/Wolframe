@@ -32,7 +32,6 @@ _customer)
 	xmlElement name $3
 	xmlElement addresshdr $4
 	xmlElement street $5
-	xmlElement streetnumber $6
 	xmlElement state $7
 	xmlElement postalcode $8
 	xmlElement country $9

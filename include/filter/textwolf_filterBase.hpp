@@ -154,7 +154,6 @@ struct FilterBase
 	}
 
 	///\brief Prints an end of line marker (EOL) to an STL back insertion sequence buffer in the IO character set encoding
-	///\param [in] ch character to print
 	///\param [in,out] buf buffer to print to
 	template <class BufferType>
 	static void printToBufferEOL( BufferType& buf)

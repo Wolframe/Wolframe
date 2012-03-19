@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/struct/filtermapSerialize.hpp
+///\file serialize/ddl/filtermapSerialize.hpp
 ///\brief Defines the DDL structure serialization for filters
 
 #ifndef _Wolframe_SERIALIZE_DDL_FILTERMAP_HPP_INCLUDED

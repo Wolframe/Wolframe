@@ -60,6 +60,7 @@ public:
 	MemBlock( std::size_t p_size);
 	///\param [in] p_ptr pointer to the memory block (not allocated on your own)
 	///\param [in] p_size size of the memory block p_ptr
+	///\param [in] p_pos iterator position in the memory block
 	MemBlock( void* p_ptr, std::size_t p_size, std::size_t p_pos=0);
 	///\brief Copy constructor
 	///\param [in] o MemBlock to copy
@@ -287,7 +288,7 @@ public:
 	}
 
 	///\brief Print one number as string to the output
-	///\param [in] ch the number to print
+	///\param [in] num value of the number to print
 	bool printNumber( unsigned int num);
 
 	///\brief Print a block to the output
@@ -350,8 +351,8 @@ public:
 	};
 
 	///\brief Constructor
-	///\param [in] p_ptr pointer to the memory block to use
-	///\param [in] p_size size of the memory block in bytes
+	///\param [in] b pointer to the sink to use
+	///\param [in] p_state escaping STM state (EOF escaping)
 	EscapingBuffer( BufferType* b, State p_state)
 		:m_buf(b),m_state(p_state) {}
 

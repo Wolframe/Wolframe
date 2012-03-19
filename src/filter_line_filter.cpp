@@ -43,7 +43,7 @@ struct OutputFilterImpl :public protocol::OutputFilter
 			textwolf::StaticBuffer basebuf( rest(), restsize());
 			protocol::EscapingBuffer<textwolf::StaticBuffer> buf( &basebuf, m_bufstate);
 			FilterBase<IOCharset,AppCharset>::printToBuffer( (const char*)element, elementsize, buf);
-			FilterBase<IOCharset,AppCharset>::printToBufferEOL( buf);
+			FilterBase<IOCharset,AppCharset>::printToBuffer( '\n', buf);
 			if (basebuf.overflow())
 			{
 				setState( EndOfBuffer);
@@ -64,13 +64,15 @@ struct InputFilterImpl :public protocol::InputFilter
 {
 	///\brief Constructor
 	InputFilterImpl( std::size_t genbufsize)
-		:protocol::InputFilter( genbufsize) {}
+		:protocol::InputFilter( genbufsize)
+		,m_curLineLength(0){}
 
 	///\brief Copy constructor
 	///\param [in] o output filter to copy
 	InputFilterImpl( const InputFilterImpl& o)
 		:protocol::InputFilter( o)
-		,m_itr(o.m_itr) {}
+		,m_itr(o.m_itr)
+		,m_curLineLength(o.m_curLineLength) {}
 
 	///\brief self copy
 	///\return copy of this
@@ -98,12 +100,14 @@ struct InputFilterImpl :public protocol::InputFilter
 				}
 				if (ch == '\n')
 				{
+					m_curLineLength = 0;
 					*bufferpos = buf.size();
 					++m_itr;
 					return true;
 				}
 				else
 				{
+					++m_curLineLength;
 					AppCharset::print( ch, buf);
 					if (buf.overflow())
 					{
@@ -112,6 +116,12 @@ struct InputFilterImpl :public protocol::InputFilter
 					}
 					++m_itr;
 				}
+			}
+			if (m_curLineLength != 0)
+			{
+				m_curLineLength = 0;
+				*bufferpos = buf.size();
+				return true;
 			}
 		}
 		catch (SrcIterator::EoM)
@@ -122,7 +132,8 @@ struct InputFilterImpl :public protocol::InputFilter
 		return false;
 	}
 private:
-	textwolf::TextScanner<SrcIterator,AppCharset> m_itr;
+	textwolf::TextScanner<SrcIterator,IOCharset> m_itr;	//< iterator on source
+	std::size_t m_curLineLength;				//< length of current line in unicode characers (not char!)
 };
 
 }//end anonymous namespace

@@ -1,108 +1,66 @@
 <!-- Tutorial -->
-<chapter>
-	<title>Tutorial</title>
-	<sect1>
-		<title>Configuration Definition for a Wolframe Application</title>
-		<sect2>
-		<title>Introduction</title>
-		<para>
-			The Wolframe configuration is defined as a set of structures.
-			The structure of the configuration is hierarchical. Structures can be composed of substructures.
-			The representation format of the configuration is text based and one of the formats supported by
-			a boost property tree. For the mapping of a configuration from the text representation to data
-			you have to provide a description of the configuration structure. Every struct or class definition
-			that is part of your configuration has to implement a static method
-			<code>
-				static const Description* getDescription();
-			</code>
-			that returns a structure naming the elements and defining serialization and deserialization methods for
-			parsing and printing the configuration data.
+<sect1>
+	<title>Configuration Definition for a Wolframe Application</title>
+	<sect2>
+	<title>Introduction</title>
+	<para>
+		The Wolframe configuration is defined as a set of structures.
+		The structure of the configuration is hierarchical. Structures can be composed of substructures.
+		The representation format of the configuration is text based and one of the formats supported by
+		a boost property tree. For the mapping of a configuration from the text representation to data
+		you have to provide a description of the configuration structure. Every struct or class definition
+		that is part of your configuration has to implement a static method
+		<programlisting language='c++'>
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/cpp/configuration_getDescription_prototype.hpp" parse="text" />
+		</programlisting>
+		that returns a structure naming the elements and defining serialization and deserialization methods for
+		parsing and printing the configuration data.
 
-			For building the description items there is a helper template provided, that implements an operator ( )
-			with two arguments: 1. the name of the item and 2. the pointer to member of the item.
-			The operator is templated and builds the two functions from the type of the item in an intrusive way.
-			The intrusive template config::Description is defined in config/description.hpp. This header file you
-			have to include for building a configuration structure description.
-			The non intrusive configuration structure config::DescriptionBase is defined in config/descriptionBase.hpp.
-			This header file you have to include when you want to parse or print the configuration or for the declaration
-			of the configuration structure.
-		</para>
-		</sect2>
-		<sect2>
-		<title>Example 1</title>
-		<code>
-			/// interface: non intrusive configuration structure definition
-
-			#include "config/descriptionBase.hpp"
-
-			struct A
-			{
-				int x;
-				float y;
-
-				static const config::DescriptionBase* description();
-			};
-
-			/// implementation of intrusive configuration description building
-
-			#include "config/description.hpp"
-
-			const config::DescriptionBase* A::description()
-			{
-				struct ThisDescription :public config::Description<A>
-				{
-					ThisDescription()
-					{
-						(*this)
-						( "x", &A::x)
-						( "y", &A::y);
-					}
-				};
-				static const ThisDescription rt;
-				return &rt;
-			}
-		</code>
-		<para>
-			For parsing and printing of the configuration there are two methods defined in <code>config::DescriptionBase</code>:
-			<code>
-				bool parse( void* configStruct, const boost::property_tree::ptree& pt, std::string& errmsg) const;
-			</code>
-			parses the structure and writes the elements to 'configStruct'. Because of the non intrusive
-			definition the configuration object is referenced by a 'void*' ('configStruct'). This is the only
-			non type safe interface for the configuration.
-			When DescriptionBase has been built from 'config::Description&lt;A&gt;', then 'configStruct'
-			has to reference an object of type 'A'. Thus 'configStruct' has to be of type 'A*'.
-			<code>
-				void print( std::ostream& out, const void* configStruct) const;
-			</code>
-			prints the configuration in 'configStruct' to 'out'. The same type unsafety of 'configStruct'
-			as in parse exists also for print. The following example parses and prints the configuration defined
-			in example 1.
-		</para>
-		</sect2>
-		<sect2>
-		<title>Example 2</title>
-		<para>Reading and printing of a configuration</para>
-		<code>
-			A cfg;
-			std::string filename( "a.conf");
-			std::string errmsg;
-			boost::property_tree::ptree pt;
-			try
-			{
-				boost::property_tree::read_info( configfile, pt);
-				if (cfg.description()->parse( &cfg, pt, errmsg))
-				{
-					cfg.description()->print( std::cout, &cfg);
-				}
-			}
-			catch (std::exception& e)
-			{
-				std::cerr << e.what();
-			}
-		</code>
-		</sect2>
-		<para></para>
-	</sect1>
-</chapter>
+		For building the description items there is a helper template provided, that implements an operator ( )
+		with two arguments: 1. the name of the item and 2. the pointer to member of the item.
+		The operator is templated and builds the two functions from the type of the item in an intrusive way.
+		The intrusive template config::Description is defined in config/description.hpp. This header file you
+		have to include for building a configuration structure description.
+		The non intrusive configuration structure config::DescriptionBase is defined in config/descriptionBase.hpp.
+		This header file you have to include when you want to parse or print the configuration or for the declaration
+		of the configuration structure.
+	</para>
+	</sect2>
+	<sect2>
+	<title>Example</title>
+	<para>Defining a configuration structure. Definition of the non intrusive configuration description
+		<programlisting language='c++'>
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/cpp/configurationDescription_1.hpp" parse="text" />
+		</programlisting>
+	</para>
+	<para>Implementing a configuration structure. Definition of the intrusive configuration description
+		<programlisting language='c++'>
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/cpp/configurationDescription_1.cpp" parse="text" />
+		</programlisting>
+	</para>
+	<para>
+		For parsing and printing of the configuration there are two methods defined in <code>config::DescriptionBase</code>:
+		<programlisting language='c++'>
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/cpp/configuration_parse_prototype.hpp" parse="text" />
+		</programlisting>
+		parses the structure and writes the elements to 'configStruct'. Because of the non intrusive
+		definition the configuration object is referenced by a 'void*' ('configStruct'). This is the only
+		non type safe interface for the configuration.
+		When DescriptionBase has been built from 'config::Description&lt;A&gt;', then 'configStruct'
+		has to reference an object of type 'A'. Thus 'configStruct' has to be of type 'A*'.
+		<programlisting language='c++'>
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/cpp/configuration_print_prototype.hpp" parse="text" />
+		</programlisting>
+		prints the configuration in 'configStruct' to 'out'. The same type unsafety of 'configStruct'
+		as in parse exists also for print. The following example parses and prints the configuration defined
+		in example 1.
+	</para>
+	<para>Program reading and printing of a configuration
+		<programlisting language='c++'>
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/cpp/configurationParse_1.cpp" parse="text" />
+		</programlisting>
+	</para>
+	</sect2>
+	<para></para>
+</sect1>
 

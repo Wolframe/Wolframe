@@ -97,7 +97,7 @@ struct InputFilterImpl :public protocol::InputFilter
 		return false;
 	}
 private:
-	textwolf::TextScanner<SrcIterator,AppCharset> m_itr;
+	textwolf::TextScanner<SrcIterator,IOCharset> m_itr;
 };
 
 ///\class OutputFilter

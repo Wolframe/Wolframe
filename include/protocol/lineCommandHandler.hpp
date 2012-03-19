@@ -160,8 +160,8 @@ private:
 	InputBlock::iterator m_itr;				///< iterator to scan protocol input
 	InputBlock::iterator m_end;				///< iterator pointing to end of message buffer
 
-	///\enum State
-	///\brief Enumeration of processor states
+	///\enum CommandState
+	///\brief Enumeration of command processing states
 	enum CommandState
 	{
 		Init,						///< start state, called first time in this session
@@ -196,7 +196,7 @@ private:
 
 ///\brief defines a static function calling a member function with fixed signature
 ///\warning do not declare virtual method calls like this. It is not portable (GCC only) !
-///\TODO make a static assert here for refusing virtual methods here
+//PF:TODO make a static (enable_if) assert here for refusing virtual methods here
 template <class T, int (T::*TerminateDelegationMethod)( CommandHandler*, std::ostream&)>
 struct LineCommandHandlerTerminateDelegationWrapper
 {
@@ -207,7 +207,7 @@ struct LineCommandHandlerTerminateDelegationWrapper
 };
 
 ///\brief defines some template based extensions to line command handler
-///\usage derive LineCommandHandlerImpl from LineCommandHandlerTemplate<LineCommandHandlerImpl>
+// Usage: derive LineCommandHandlerImpl from LineCommandHandlerTemplate<LineCommandHandlerImpl>
 template <class LineCommandHandlerImpl>
 struct LineCommandHandlerTemplate :public LineCommandHandler
 {
@@ -229,7 +229,7 @@ struct LineCommandHandlerTemplate :public LineCommandHandler
 
 ///\brief defines a static function calling a member function with fixed signature
 ///\warning do not declare virtual method calls like this. It is not portable (GCC only) !
-///\TODO make a static assert here for refusing virtual methods here
+//PF:TODO make a static (enable_if) assert here for refusing virtual methods here
 template <class T, int (T::*Method)( int argc, const char** argv, std::ostream& out)>
 struct LineCommandHandlerWrapper
 {

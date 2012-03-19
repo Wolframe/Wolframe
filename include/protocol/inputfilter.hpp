@@ -101,6 +101,7 @@ struct InputFilter
 	///\param [in] data pointer to memory block passed as input
 	///\param [in] datasize of memory block passed as input
 	///\param [in] eoD true, if end of data has been detected
+	///\param [in] pos_ interator position of the input filter
 	void protocolInput( void* data, std::size_t datasize, bool eoD, std::size_t pos_=0)
 	{
 		m_gotEoD = eoD;

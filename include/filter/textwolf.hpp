@@ -439,9 +439,9 @@ struct ByteOrder
 ///\class UCS2
 ///\brief Character set UCS-2 (little/big endian)
 ///\tparam encoding charset::ByteOrder::LE or charset::ByteOrder::BE
-///\remark UCS-2 encoding is defined to be big-endian only. Although the similar designations UCS-2BE and UCS-2LE 
-///  imitate the UTF-16 labels, they do not represent official encoding schemes. (http://en.wikipedia.org/wiki/UTF-16/UCS-2)
-///  therefore we take encoding=ByteOrder::BE as default.
+//   UCS-2 encoding is defined to be big-endian only. Although the similar designations 'UCS-2BE and UCS-2LE
+//   imitate the UTF-16 labels, they do not represent official encoding schemes. (http://en.wikipedia.org/wiki/UTF-16/UCS-2)
+//   therefore we take encoding=ByteOrder::BE as default.
 template <int encoding=ByteOrder::BE>
 struct UCS2
 {

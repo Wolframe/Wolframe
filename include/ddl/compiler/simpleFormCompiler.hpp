@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file ddl/simpleformCompile.hpp
+///\file ddl/compiler/simpleFormCompiler.hpp
 ///\brief interface for a compiler of a self defined DDL for forms
 
 #ifndef _Wolframe_DDL_SIMPLEFORM_COMPILER_HPP_INCLUDED

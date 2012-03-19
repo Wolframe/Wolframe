@@ -50,8 +50,8 @@ public:
 	struct Context;
 
 	///\brief Constructor
-	///\param[in] config read only reference to the configuration of this application processor
-	explicit DirectmapCommandHandler( const DirectmapCommandEnvironment* e);
+	///\param[in] env reference to the read only environment of this application processor
+	explicit DirectmapCommandHandler( const DirectmapCommandEnvironment* env);
 
 	///\brief Destructor
 	virtual ~DirectmapCommandHandler();

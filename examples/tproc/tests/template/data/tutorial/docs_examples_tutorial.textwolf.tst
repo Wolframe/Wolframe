@@ -1,57 +1,52 @@
 #!/bin/sh
-for example in\
-	"timetrack/customer_query_1.xml=timetrack/customer.frm=customer_query"\
-	"timetrack/customer_query_2.xml=timetrack/customer.frm=customer_query"
-do
-query=`echo $example | cut -f1 -d=`
-frmfile=`echo $example | cut -f2 -d=`
-frmname=`echo $example | cut -f3 -d=`
-tstname=`basename $query .xml`
+TOP=../../../../
+MAIN=$TOP/docs/examples/tutorial/
+for example in 1 2 3 4 5; do
 
-output="../`echo $0 | sed 's/template//' | sed 's/.tst$//'`.$tstname.tst"
+output="../`echo $0 | sed 's/template//' | sed 's/.tst$//'`.$example.tst"
 rm -f $output
 echo "Expanding test file $output"
 
 recode lat1..ibmpc >> $output <<!TEST
---
---requires:DISABLED
---input
+**
+**requires:LUA
+**input
 HELLO
 RUN
 !TEST
-./xmltestdoc.sh $cset $testdoc | ../cleanInput BOM EOLN >> $output
+cat $MAIN/lua_script_$example.input.xml | ../cleanInput BOM EOLN >> $output
 recode lat1..ibmpc >> $output <<!TEST
 
 .
 QUIT
---file:echo.lua
-function run( )
-	f = filter( "xml:textwolf")
-	f.empty = false
-
-	input:as( f)
-	output:as( f)
-
-	for c,t in input:get() do
-		output:print( c, t)
-	end
-end
---config
+**file:example_$example.lua
+!TEST
+cat $MAIN/lua_script_$example.lua >> $output
+recode lat1..ibmpc >> $output <<!TEST
+**config
 script {
 	name RUN
-	path echo.lua
+	path example_$example.lua
 	main run
 }
---output
+**output
 OK enter cmd
 !TEST
-./xmltestdoc.sh $cset $testdoc NOEOL | ../cleanInput BOM EOLN >> $output
+if [ $example = 2 ]; then
+# LINE filter prints EOLN at output of non empty not EOLN-terminated last line
+	cat $MAIN/lua_script_$example.output.xml | ../cleanInput BOM >> $output
+elif [ $example = 4 ]; then
+# LIBXML2 prints EOLN at output
+	cat $MAIN/lua_script_$example.output.xml | ../cleanInput BOM >> $output
+else
+	cat $MAIN/lua_script_$example.output.xml | ../cleanInput BOM EOLN >> $output
+fi
 recode lat1..ibmpc >> $output <<!TEST
 
 .
 OK
 BYE
---end
+**end
 
 !TEST
 done

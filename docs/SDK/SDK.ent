@@ -4,6 +4,10 @@
 
 <!ENTITY SDKintroduction		SYSTEM "Introduction.xml">
 
+<!ENTITY SDKtutorials			SYSTEM "Tutorials.xml">
+<!ENTITY SDKtutorialProgramLua		SYSTEM "TutorialProgramLua.xml">
+<!ENTITY SDKtutorialConfiguration	SYSTEM "TutorialConfiguration.xml">
+
 <!ENTITY SDKappendix			SYSTEM "Appendix.xml">
 
 <!ENTITY SDKglossary			SYSTEM "Glossary.xml">
