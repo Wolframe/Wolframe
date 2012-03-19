@@ -45,17 +45,17 @@ function run()
         t = readTable( input:get())
 
         -- print the document from the table
-        output:print( false, 'doc')
-        output:print( false, 'name')
+        output:opentag( 'doc')
+        output:opentag( 'name')
         if t['doc']['name'] then
                 output:print( t['doc']['name'])
         end
-        output:print( false, false)
-        output:print( false, 'country')
+        output:closetag()
+        output:opentag( 'country')
         if t['doc']['country'] then
                 output:print( t['doc']['country'])
         end
-        output:print( false, false)
-        output:print( false, false)
+        output:closetag()
+        output:closetag()
 end
 

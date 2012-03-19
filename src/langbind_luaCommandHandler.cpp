@@ -360,7 +360,7 @@ static int function_output_print( lua_State* ls)
 	}
 	else
 	{
-		return luaL_error( ls, "too many arguments in call of output filter print");
+		return luaL_error( ls, "too many arguments in call of output:print");
 	}
 
 	switch (output->print( item[1]/*tag*/, itemsize[1], item[0]/*val*/, itemsize[0]))
@@ -370,20 +370,71 @@ static int function_output_print( lua_State* ls)
 
 		case Output::Error:
 			msg = output->m_outputfilter->getError();
-			luaL_error( ls, "error in output filter print (%s)", msg?msg:"unknown");
-			return 0;
+			return luaL_error( ls, "error in output:print (%s)", msg?msg:"unknown");
 
 		case Output::Data:
 			return 0;
 	}
-	luaL_error( ls, "illegal state produced by output filter print");
-	return 0;
+	return luaL_error( ls, "illegal state produced by output:print");
 }
 
-static const luaL_Reg filter_methodtable[ 3] =
+static int function_output_opentag( lua_State* ls)
 {
-	{0,0}
-};
+	const char* msg;
+	const char* tag = 0;
+	std::size_t tagsize = 0;
+
+	Output* output = LuaObject<Output>::getSelf( ls, "output", "opentag");
+	if (lua_gettop( ls) == 1)
+	{
+		return luaL_error( ls, "output:opentag called without tag name as argument");
+	}
+	else if (lua_gettop( ls) == 2)
+	{
+		tag = get_printop( ls, 2, tagsize);
+	}
+	else if (lua_gettop( ls) > 2)
+	{
+		return luaL_error( ls, "output:opentag called with too many arguments");
+	}
+	switch (output->print( tag, tagsize, 0/*val*/, 0))
+	{
+		case Output::DoYield:
+			lua_yieldk( ls, 0, 1, function_output_opentag);
+
+		case Output::Error:
+			msg = output->m_outputfilter->getError();
+			return luaL_error( ls, "error in output:opentag (%s)", msg?msg:"unknown");
+
+		case Output::Data:
+			return 0;
+	}
+	return luaL_error( ls, "illegal state produced by output:opentag");
+}
+
+static int function_output_closetag( lua_State* ls)
+{
+	const char* msg;
+
+	Output* output = LuaObject<Output>::getSelf( ls, "output", "closetag");
+	if (lua_gettop( ls) > 1)
+	{
+		return luaL_error( ls, "output:closetag called with too many arguments. no arguments expected");
+	}
+	switch (output->print( 0/*tag*/, 0, 0/*val*/, 0))
+	{
+		case Output::DoYield:
+			lua_yieldk( ls, 0, 1, function_output_opentag);
+
+		case Output::Error:
+			msg = output->m_outputfilter->getError();
+			return luaL_error( ls, "error in output:closetag (%s)", msg?msg:"unknown");
+
+		case Output::Data:
+			return 0;
+	}
+	return luaL_error( ls, "illegal state produced by output:closetag");
+}
 
 static int function_filter( lua_State* ls)
 {
@@ -493,10 +544,12 @@ static const luaL_Reg input_methodtable[ 3] =
 	{0,0}
 };
 
-static const luaL_Reg output_methodtable[ 4] =
+static const luaL_Reg output_methodtable[ 5] =
 {
 	{"as",&function_output_as},
 	{"print",&function_output_print},
+	{"opentag",function_output_opentag},
+	{"closetag",function_output_closetag},
 	{0,0}
 };
 

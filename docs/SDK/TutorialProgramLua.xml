@@ -163,9 +163,11 @@
 		<title>Example 5: Load XML into a table</title>
 		<para>
 			This example procedure load the content of the XML document into a table and prints the
-			elements 'name' and 'address'. The reading of the input into a table gets very complicated
+			elements 'name' and 'country'. The reading of the input into a table gets very complicated
 			whitout meta description of the document. We suggest here to use forms generated
 			from the document schema DDL (dtd, xml schema, etc.) to map an XML into a table.
+			The example prints the output directly from the table. It is using the
+			more convenient and in this example more readable opentag/closetag methods of output.
 		<programlisting language='lua'>
 		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/tutorial/lua_script_5.lua" parse="text" />
 		</programlisting>
