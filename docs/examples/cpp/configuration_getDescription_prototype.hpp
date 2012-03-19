@@ -1,0 +1,2 @@
+
+static const Description* getDescription();
