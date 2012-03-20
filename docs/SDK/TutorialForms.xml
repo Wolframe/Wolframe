@@ -9,7 +9,7 @@
 	</para>
 	<para>
 		Forms can also be defined in a DDL (data definition language) that is used as glue between transactions
-		executed in the 3rd tier and programs executed in the 2nd tier. It depends very much on the
+		executed in the data tier and programs executed in the logic tier. It depends very much on the
 		application what DDL is best to use. Users may already have their data definitions
 		in a certain way defined. The form DDL can be defined in the way you want. Wolframe offers a
 		pluggin mechanism for DLL compilers and provides examples of such compilers. You configure the
@@ -18,7 +18,7 @@
 	<para>
 		With the DDL form description we get a transformation of the form content
 		to a transactions procedure description and a transformation of the transaction function result back
-		into a form. This returned form content can then be inspected by the program in the 2nd tier.
+		into a form. This returned form content can then be inspected by the program in the logic tier.
 		These transformations are independent of the specific form and transaction function. This
 		means that such a transformation has to be written only once per backend and you can define
 		as many database queries and forms using it as you want.

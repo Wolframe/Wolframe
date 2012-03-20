@@ -47,14 +47,10 @@ function run()
         -- print the document from the table
         output:opentag( 'doc')
         output:opentag( 'name')
-        if t['doc']['name'] then
-                output:print( t['doc']['name'])
-        end
+        output:print( t['doc']['name'])
         output:closetag()
         output:opentag( 'country')
-        if t['doc']['country'] then
-                output:print( t['doc']['country'])
-        end
+        output:print( t['doc']['country'])
         output:closetag()
         output:closetag()
 end

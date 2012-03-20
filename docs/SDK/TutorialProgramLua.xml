@@ -3,7 +3,7 @@
 <title>Writing Wolframe Programs in Lua</title>
 	<sect2>
 	<title>Introduction</title>
-	<para>You can write programs for the 2nd tier of Wolframe with Lua. Lua is a scripting language designed, implemented, and maintained
+	<para>You can write programs for the logic tier of Wolframe with Lua. Lua is a scripting language designed, implemented, and maintained
 		at PUC-Rio in Brazil by Roberto Ierusalimschy, Waldemar Celes and Luiz Henrique de Figueiredo
 		(see http://www.lua.org/authors.html). A tutorial for the use of Lua is not provided here.
 		For an introduction into programming with Lua see http://www.lua.org. The official manual also available as book
@@ -140,17 +140,19 @@
 		<sect3>
 		<title>Example 3: An XML echo program</title>
 		<para>This is a program echoing input as XML using textwolf as filter.
-			Filters created with one call share some information like the character set
-			encoding of the input. So if you want to output the document in the same
-			character set encoding as the input is read you have to bind the input as
-			the output to the same filter object. Calling
+			Filters are objects that are processing the data of the objects they are attached.
+			For this they store the current state of processing and an iterator on the data they process.
+			When you attach the same filter object to input and output, then the output filter
+			will share some information like the character set encoding of the input. So if you want to
+			output the document in the same character set encoding as the input is read you have to bind
+			the input as the output to the same filter object. Calling
 				<code>input:as(filter( "XML:textwolf"))</code>
 			and
 				<code>output:as(filter( "XML:textwolf"))</code>
 			instead in the following example would lead to an echo reading any input in
 			XML and output an XML in the default encoding which is depending on the
-			platform. So it you want to output the XML in the same encoding as the input you have to call input:as and output:as with
-			the same filter object as follows:
+			platform. So it you want to output the XML in the same encoding as the input you have to call
+			input:as and output:as with the same filter object as follows:
 		<programlisting language='lua'>
 		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/tutorial/lua_script_3.lua" parse="text" />
 		</programlisting>
@@ -170,7 +172,7 @@
 		<para>
 			This example procedure load the content of the XML document into a table and prints the
 			elements 'name' and 'country'. The reading of the input into a table gets very complicated
-			whitout meta description of the document. We suggest here to use forms generated
+			without meta description of the document. We suggest here to use forms generated
 			from the document schema DDL (dtd, xml schema, etc.) to map an XML into a table.
 			The example prints the output directly from the table. It is using the
 			more convenient and in this example more readable opentag/closetag methods of output.
