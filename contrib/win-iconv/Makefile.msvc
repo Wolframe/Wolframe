@@ -1,0 +1,27 @@
+all: iconv.dll
+
+clean:
+	-erase iconv.dll win_iconv.obj
+	
+CC = cl.exe
+LINK = link.exe
+MT = mt.exe
+
+# release
+!IFNDEF DEBUG
+CFLAGS = /MD /W2 /nologo /O2 /c
+LDFLAGS = /nologo /manifest
+!ENDIF
+
+# debug
+!IFDEF DEBUG
+CFLAGS = /MDd /W2 /nologo /c
+LDFLAGS = /nologo /manifest /debug
+!ENDIF
+
+win_iconv.obj: win_iconv.c
+	$(CC) $(CFLAGS) /DMAKE_DLL /Fo$@ win_iconv.c
+
+iconv.dll: win_iconv.obj
+	$(LINK) /dll $(LDFLAGS) /def:iconv.def /out:$@ $?
+	$(MT) -nologo -manifest $@.manifest -outputresource:$@;1

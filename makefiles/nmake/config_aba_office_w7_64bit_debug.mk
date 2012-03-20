@@ -10,6 +10,8 @@
 # - OPENSSL_DIR: location of the OpenSSL library (WITH_SSL=1 only)
 # - QT_DIR: location of Qt (WITH_QT=1 only)
 # - PGSQL_DIR: location of Postgres libpq and header files (WITH_PGSQL=1 only)
+# - LIBXML2_DIR: location of libxml2 (WITH_LIBXML2=1 only)
+# - LIBXSLT_DIR: location of libxslt (WITH_LIBXSLT=1 only)
 # - TCL_DIR: location of the Active Tcl installation (for testing only)
 # - EXPECT: location of the expect interpreter (for testing only)
 
@@ -81,6 +83,24 @@ PGSQL_DIR = C:\Program Files\PostgreSQL\9.0
 #PGSQL_DIR = D:\Program Files\PostgreSQL\9.0
 #PGSQL_DIR = C:\cygwin\home\Andreas\postgresql-9.0.4-win64-debug
 
+# enable depending on libintl.dll and libiconv.dll (deployment only)
+PGDLL_WITHOUT_MAJOR_VERSION = 1
+
+# win_iconv
+###########
+
+WIN_ICONV_DIR = C:\cygwin\home\Andreas\win-iconv-0.0.3-win64-debug
+
+# libxml2
+#########
+
+LIBXML2_DIR = C:\cygwin\home\Andreas\libxml2-2.7.8-win64-debug
+
+# libxslt
+#########
+
+LIBXSLT_DIR = C:\cygwin\home\Andreas\libxslt-1.1.26-win64-debug
+
 # Tcl 8.5 and Expect
 ####################
 
@@ -96,6 +116,13 @@ EXPECT = $(TCL_DIR)\bin\tclsh.exe
 WIX_DIR = C:\Program Files (x86)\Windows Installer XML v3.5
 # @home PIII
 #WIX_DIR = C:\Program Files\Windows Installer XML v3.5
+
+#WIX_LIBS = dutil_2008.lib wcautil_2008.lib
+WIX_LIBS = dutil_2008_x64.lib wcautil_2008_x64.lib
+
+# architecture of resulting msi
+#WIX_ARCH = x86
+WIX_ARCH = x64
 
 # Doxygen binary to generate API documentation (for docu and deployment)
 ########################################################################

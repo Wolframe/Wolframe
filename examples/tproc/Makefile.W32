@@ -55,6 +55,21 @@ INCLUDE_LIBS = \
 
 !ENDIF
 
+# libxml2
+!IFDEF WITH_LIBXML2
+
+INCLUDE_CXXFLAGS = \
+	$(INCLUDE_CXXFLAGS) /DWITH_LIBXML2
+
+INCLUDE_DIRS = \
+	$(INCLUDE_DIRS) /I. /I"$(LIBXML2_DIR)\include" /I"$(LIBXML2_DIR)\include\libxml" \
+	/I"$(WIN_ICONV_DIR)"
+
+INCLUDE_LIBS = \
+	$(INCLUDE_LIBS) "$(LIBXML2_DIR)\lib\libxml2.lib"
+	
+!ENDIF
+
 # MS XML
 !IFDEF WITH_MSXML
 
@@ -122,6 +137,10 @@ local_test: $(TEST_CPP_BINS)
 !IFDEF WITH_SSL
 	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" tests >> test.bat
 	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" tests >> test.bat
+!ENDIF
+!IFDEF WITH_LIBXML2
+	@-echo copy "$(WIN_ICONV_DIR)\iconv.dll" tests >> test.bat
+	@-echo copy "$(LIBXML2_DIR)\lib\libxml2.dll" tests >> test.bat
 !ENDIF
 	@-echo cd tests >> test.bat
 	@-echo tprocHandlerTest.exe >> test.bat
