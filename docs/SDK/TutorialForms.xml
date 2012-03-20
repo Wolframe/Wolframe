@@ -31,12 +31,10 @@
 	<sect2>
 	<title>Define Forms in Simple Form DDL</title>
 	<para>
-		As example of a form DDL we provide the "Simple Form DDL" as example. The format is base on the "INFO"-format
-		introduced by "Marcin Kalicinski" for the boost property tree library. We used this library to show an example
+		As example of a form DDL we provide the "Simple Form DDL" as example. The format is based on the "INFO"-format
+		introduced by Marcin Kalicinski for the boost property tree library. We used this library to show an example
 		that is easy to understand and small enough.
-		The format uses key value pairs separated with spaces for atomic elements and curly brackets '{' '}' to
-		describe structures. Key is the name of the element and the following value is the assembles the attributes of
-		this element. The attributes are a data type and some operators that describe additional properties.
+		The format uses key value pairs separated with spaces for atomic elements and curly brackets '{' '}' to describe structures. The key is the name of the element and the following value is the assembles the attributes of this element. The attributes are a data type and some operators that describe additional properties.
 	</para>
 	<para>
 		The following data types are known in Simple Form DDL
@@ -50,7 +48,6 @@
 		<member>short</member><member>16 bit integer</member>
 		<member>ushort</member><member>unsigned 16 bit integer</member>
 		<member>char</member><member>1 byte character</member>
-		<member>uchar</member><member>1 byte unsigned character</member>
 		<member>string</member><member>string</member>
 		</simplelist>
 	</para>

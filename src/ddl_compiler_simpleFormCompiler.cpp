@@ -63,14 +63,13 @@ public:
 		short_=AtomicType::short_,
 		ushort_=AtomicType::ushort_,
 		char_=AtomicType::char_,
-		uchar_=AtomicType::uchar_,
 		string_=AtomicType::string_,
 		form_
 	};
 
 	static const char* typeName( Type tp)
 	{
-		static const char* ar[] = {"double","float","long","ulong","int","uint","short","ushort","char","uchar","string","form",0};
+		static const char* ar[] = {"double","float","long","ulong","int","uint","short","ushort","char","string","form",0};
 		return ar[ (int)tp];
 	}
 

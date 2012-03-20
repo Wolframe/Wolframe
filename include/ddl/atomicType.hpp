@@ -52,13 +52,13 @@ public:
 	///\brief What AtomicType can be
 	enum Type
 	{
-		double_,float_,long_,ulong_,int_,uint_,short_,ushort_,char_,uchar_,string_
+		double_,float_,long_,ulong_,int_,uint_,short_,ushort_,char_,string_
 	};
 
 	///\brief Get the name of a type as string
 	static const char* typeName( Type tp)
 	{
-		static const char* ar[] = {"double","float","long","ulong","int","uint","short","ushort","char","uchar","string",0};
+		static const char* ar[] = {"double","float","long","ulong","int","uint","short","ushort","char","string",0};
 		return ar[ (int)tp];
 	}
 	///\brief Get the id of a type by name, if exists
@@ -90,8 +90,7 @@ public:
 				case uint_:	assign<unsigned int,T>( val); break;
 				case short_:	assign<short,T>( val); break;
 				case ushort_:	assign<unsigned short,T>( val); break;
-				case char_:	assign<char,T>( val); break;
-				case uchar_:	assign<unsigned char,T>( val); break;
+				case char_:	assign<unsigned char,T>( val); break;
 				case string_:	boost::lexical_cast<std::string>( val); break;
 			}
 
