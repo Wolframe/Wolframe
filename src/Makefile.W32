@@ -51,6 +51,21 @@ INCLUDE_LIBS = \
 
 !ENDIF
 
+# libxml2
+!IFDEF WITH_LIBXML2
+
+INCLUDE_CXXFLAGS = \
+	$(INCLUDE_CXXFLAGS) /DWITH_LIBXML2
+
+INCLUDE_DIRS = \
+	$(INCLUDE_DIRS) /I. /I"$(LIBXML2_DIR)\include" /I"$(LIBXML2_DIR)\include\libxml" \
+	/I"$(WIN_ICONV_DIR)"
+
+INCLUDE_LIBS = \
+	$(INCLUDE_LIBS) "$(LIBXML2_DIR)\lib\libxml2.lib"
+	
+!ENDIF
+
 # MS XML
 !IFDEF WITH_MSXML
 
@@ -130,6 +145,13 @@ LOCAL_STATIC_LIB_OBJS = \
 	langbind_luaCommandHandler.obj
 !ENDIF
 
+# libxml2
+!IFDEF WITH_LIBXML2
+LOCAL_STATIC_LIB_OBJS = \
+	$(LOCAL_STATIC_LIB_OBJS) \
+	filter_libxml2_filter.obj
+!ENDIF
+
 # MS XML
 !IFDEF WITH_MSXML
 LOCAL_STATIC_LIB_OBJS = \
@@ -194,6 +216,10 @@ copy_prereq:
 	@-copy "$(PGSQL_DIR)\lib\libpq.dll" .
 	@-copy "$(PGSQL_DIR)\bin\libintl*.dll" .
 	@-copy "$(PGSQL_DIR)\bin\libiconv*.dll" .
+!ENDIF
+!IFDEF WITH_LIBXML2
+	@-copy "$(WIN_ICONV_DIR)\iconv.dll" .
+	@-copy "$(LIBXML2_DIR)\lib\libxml2.dll" .
 !ENDIF
 
 run: copy_prereq
