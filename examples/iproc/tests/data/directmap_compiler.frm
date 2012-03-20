@@ -1,30 +1,27 @@
-form PLANT
-	string COMMON []
-	string BOTANICAL
-	uint ZONE
-	string LIGHT
-	string PRICE
-	uint AVAILABILITY
-end
 
-form PHONE
-	string NUMBER
-	string MOBILE
-end
+PLACES {
+	GARDEN []
+	{
+		NAME string
+		ADDRESS
+		{
+			COUNTRY int(49)
+			STREET string
+			CITY string
+			PHONE {
+				NUMBER string
+				MOBILE string
+			}
+		}
+		PLANT []
+		{
+			COMMON string[]
+			BOTANICAL string
+			ZONE uint(1)
+			LIGHT string
+			PRICE string(0.0)
+			AVAILABILITY uint(0)
+		}
+	}
+}
 
-form ADDRESS
-	int COUNTRY
-	string STREET
-	string CITY
-	form PHONE
-end
-
-form GARDEN
-	string NAME
-	form ADDRESS
-	form PLANT []
-end
-
-form PLACES
-	form GARDEN
-end

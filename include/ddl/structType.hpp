@@ -169,6 +169,14 @@ public:
 	///\remark [precondition] this must be of type (ContentType) Vector
 	const StructType& back() const;
 
+	///\brief Access the prototype element of a vector of elements (ContentType Vector)
+	///\remark [precondition] this must be of type (ContentType) Vector
+	StructType& prototype();
+
+	///\brief Access the prototype element of a vector of elements (ContentType Vector)
+	///\remark [precondition] this must be of type (ContentType) Vector
+	const StructType& prototype() const;
+
 	///\brief Get the number of attributes of a struct
 	///\remark returns 0 this is not of type (ContentType) Struct
 	///\return the number of attributes or 0

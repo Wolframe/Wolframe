@@ -36,9 +36,12 @@ Project Wolframe.
 #pragma warning(disable:4996)
 #pragma warning(disable:4127)
 #endif
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/info_parser.hpp>
 #include <iostream>
 #include <gtest/gtest.h>
 #include <boost/thread/thread.hpp>
+#include <stdexcept>
 
 using namespace _Wolframe;
 
@@ -76,6 +79,8 @@ TEST_F( SimpleFormCompilerTest, tests)
 		std::string error;
 		EXPECT_EQ( true, mm.compile( srcstring, sr, error));
 		ASSERT_EQ( "", error);
+		sr.print( std::cerr);
+
 	}
 }
 

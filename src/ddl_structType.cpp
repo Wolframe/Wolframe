@@ -127,13 +127,13 @@ void StructType::defineAttribute( const std::string& name, const StructType& dd)
 	defineAttribute( name.c_str(), dd);
 }
 
-void StructType::defineAsVector( const StructType& prototype)
+void StructType::defineAsVector( const StructType& prototype_)
 {
 	if (m_contentType == Vector) throw std::logic_error( "prototype of vector defined");
 	if (m_contentType == Atomic) throw std::logic_error( "defined as atomic");
 	if (m_elem.size()) throw std::logic_error( "defined as structure");
 	m_contentType = Vector;
-	m_elem.push_back( Element( std::string(), prototype));
+	m_elem.push_back( Element( std::string(), prototype_));
 }
 
 void StructType::push()
@@ -154,6 +154,18 @@ const StructType& StructType::back() const
 	return m_elem.back().second;
 }
 
+StructType& StructType::prototype()
+{
+	REQUIRE(Vector);
+	return m_elem[0].second;
+}
+
+const StructType& StructType::prototype() const
+{
+	REQUIRE(Vector);
+	return m_elem[0].second;
+}
+
 std::size_t StructType::nof_attributes() const
 {
 	return m_nof_attributes;
@@ -169,39 +181,32 @@ StructType& StructType::operator= ( const StructType& o)
 }
 
 
-static void printIndent( std::ostream& out, size_t indent)
+void StructType::print( std::ostream& out, size_t level) const
 {
-	while (indent--) out << "\t";
-}
-
-void StructType::print( std::ostream& out, size_t indent) const
-{
+	std::string indent( level, '\t');
 	switch (m_contentType)
 	{
 		case Atomic:
 		{
-			m_value.print( out, indent);
+			m_value.print( out, level);
 			break;
 		}
 		case Vector:
 		{
 			StructType::Map::const_iterator ii = begin(),ee=end();
 			int idx = 0;
-			while (ii != ee)
+			for (; ii != ee; ++ii)
 			{
 				if (ii->second.m_contentType == Atomic)
 				{
-					printIndent( out, indent);
-					out << "[" << (idx++) << "] ";
+					out << indent << (idx++) << ":";
 					ii->second.value().print( out);
 				}
 				else
 				{
-					printIndent( out, indent);
-					out << "[" << (idx++) << "] {";
-					ii->second.print( out, indent+1);
-					printIndent( out, indent);
-					out << "}";
+					out << indent << (idx++) << ":" << std::endl << indent << "{";
+					ii->second.print( out, level+1);
+					out << indent << "}" << std::endl;
 				}
 			}
 			break;
@@ -209,21 +214,27 @@ void StructType::print( std::ostream& out, size_t indent) const
 		case Struct:
 		{
 			StructType::Map::const_iterator ii = begin(),ee=end();
-			while (ii != ee)
+			for (; ii != ee; ++ii)
 			{
 				if (ii->second.m_contentType == Atomic)
 				{
-					printIndent( out, indent);
-					out << ii->first << "= ";
+					out << indent << ii->first << "= ";
 					ii->second.value().print( out);
+				}
+				else if (ii->second.m_contentType == Vector)
+				{
+					out << indent << ii->first << "[]" << std::endl;
+					out << indent << "prototype:" << std::endl;
+					ii->second.prototype().print( out, level+1);
+					out << indent << "{" << std::endl;
+					ii->second.print( out, level+1);
+					out << indent << "}" << std::endl;
 				}
 				else
 				{
-					printIndent( out, indent);
-					out << ii->first << " {";
-					ii->second.print( out, indent+1);
-					printIndent( out, indent);
-					out << "}";
+					out << indent << ii->first << std::endl << indent << "{" << std::endl;
+					ii->second.print( out, level+1);
+					out << indent << "}" << std::endl;
 				}
 			}
 			break;
