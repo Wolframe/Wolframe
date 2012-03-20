@@ -93,7 +93,19 @@ struct TestDescription
 
 static const char* check_flag( const std::string& flag)
 {
-	if (boost::iequals( flag, "DISABLED")) return "DISABLED ";
+if (boost::iequals( flag, "DISABLED")) return "DISABLED ";
+if (boost::starts_with( flag, "DISABLED "))
+{
+	std::vector<std::string> platforms;
+	boost::split( platforms, flag, boost::is_any_of("\t "));
+	std::vector<std::string>::const_iterator ii = platforms.begin(),ee = platforms.end();
+	for (++ii; ii != ee; ++ii)
+	{
+#if PLATFORM_NETBSD
+		if (boost::iequals( *ii, "NETBSD")) return "DISABLED ON PLATFORM NETBSD ";
+#endif
+	}
+}
 #if !(WITH_LUA)
 	if (boost::iequals( flag, "LUA")) return "WITH_LUA=1 ";
 #endif

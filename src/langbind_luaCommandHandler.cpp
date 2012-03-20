@@ -156,7 +156,7 @@ struct LuaObject :public ObjectType
 			const char* mt = metaTableName<ObjectType>();
 			(void*)new (ls,mt) LuaObject( o);
 		}
-		catch (std::bad_alloc)
+		catch (const std::bad_alloc&)
 		{
 			luaL_error( ls, "memory allocation error in lua context");
 		}
@@ -186,7 +186,7 @@ struct LuaObject :public ObjectType
 		LuaObject* obj = (LuaObject*) luaL_checkudata( ls, -1, metaTableName<ObjectType>());
 		if (!obj)
 		{
-			luaL_error( ls, "reserved global variable '%s' has been changed", name);
+			return luaL_error( ls, "reserved global variable '%s' has been changed", name);
 		}
 		return obj;
 	}
@@ -197,6 +197,7 @@ struct LuaObject :public ObjectType
 		if (lua_gettop( ls) == 0 || (self=(LuaObject*)luaL_checkudata( ls, 1, metaTableName<ObjectType>())) == 0)
 		{
 			luaL_error( ls, "'%s' (metatable '%s') needs self parameter (%s:%s() instead of %s.%s())", name, metaTableName<ObjectType>(), name, method, name, method);
+			return 0;
 		}
 		return self;
 	}
@@ -228,17 +229,17 @@ static int function__LuaObject__index( lua_State* ls)
 	}
 	catch (const std::bad_alloc&)
 	{
-		luaL_error( ls, "out of memory calling %s __index", metaTableName<Object>());
+		return luaL_error( ls, "out of memory calling %s __index", metaTableName<Object>());
 	}
 	catch (const std::exception& e)
 	{
-		luaL_error( ls, "%s __index called with illegal value (%s)", metaTableName<Object>(), e.what());
+		return luaL_error( ls, "%s __index called with illegal value (%s)", metaTableName<Object>(), e.what());
 	}
 	if (rt)
 	{
 		if (overfl)
 		{
-			luaL_error( ls, "%s __index variable size exceeds maximum size (%u)", metaTableName<Object>(), sizeof(valbuf));
+			return luaL_error( ls, "%s __index variable size exceeds maximum size (%u)", metaTableName<Object>(), sizeof(valbuf));
 		}
 
 		lua_pushstring( ls, valbuf);
@@ -246,7 +247,7 @@ static int function__LuaObject__index( lua_State* ls)
 	}
 	else
 	{
-		luaL_error( ls, "%s __index called with unknown variable name", metaTableName<Object>());
+		return luaL_error( ls, "%s __index called with unknown variable name", metaTableName<Object>());
 	}
 	return 0;
 }
@@ -279,11 +280,11 @@ static int function__LuaObject__newindex( lua_State* ls)
 	}
 	catch (const std::bad_alloc&)
 	{
-		luaL_error( ls, "out of memory calling %s __newindex", metaTableName<Object>());
+		return luaL_error( ls, "out of memory calling %s __newindex", metaTableName<Object>());
 	}
 	catch (const std::exception& e)
 	{
-		luaL_error( ls, "%s __newindex called with illegal value (%s)", metaTableName<Object>(), e.what());
+		return luaL_error( ls, "%s __newindex called with illegal value (%s)", metaTableName<Object>(), e.what());
 	}
 	return 0;
 }
@@ -307,25 +308,35 @@ static int function_inputFilter( lua_State* ls)
 	unsigned int itemsize[2];
 	InputFilterClosure* closure = (InputFilterClosure*)lua_touserdata( ls, lua_upvalueindex( 1));
 
-	switch (closure->fetch( item[1]/*tag*/, itemsize[1], item[0]/*val*/, itemsize[0]))
+	try
 	{
-		case InputFilterClosure::DoYield:
-			lua_yieldk( ls, 0, 1, function_inputFilter);
+		switch (closure->fetch( item[1]/*tag*/, itemsize[1], item[0]/*val*/, itemsize[0]))
+		{
+			case InputFilterClosure::DoYield:
+				lua_yieldk( ls, 0, 1, function_inputFilter);
 
-		case InputFilterClosure::EndOfData:
-			return 0;
+			case InputFilterClosure::EndOfData:
+				return 0;
 
-		case InputFilterClosure::Error:
-			luaL_error( ls, "error in iterator");
-			return 0;
+			case InputFilterClosure::Error:
+				luaL_error( ls, "error in iterator");
+				return 0;
 
-		case InputFilterClosure::Data:
-			pushItem( ls, item[0], itemsize[0]);
-			pushItem( ls, item[1], itemsize[1]);
-			return 2;
+			case InputFilterClosure::Data:
+				pushItem( ls, item[0], itemsize[0]);
+				pushItem( ls, item[1], itemsize[1]);
+				return 2;
+		}
 	}
-	luaL_error( ls, "illegal state produced by input filter");
-	return 0;
+	catch (const std::bad_alloc&)
+	{
+		return luaL_error( ls, "out of memory calling input filter fetch");
+	}
+	catch (const std::exception& e)
+	{
+		return luaL_error( ls, "got exception in input filter fetch: (%s)", e.what());
+	}
+	return luaL_error( ls, "illegal state produced by input filter fetch");
 }
 
 static const char* get_printop( lua_State* ls, int index, std::size_t& size)
@@ -363,17 +374,28 @@ static int function_output_print( lua_State* ls)
 		return luaL_error( ls, "too many arguments in call of output:print");
 	}
 
-	switch (output->print( item[1]/*tag*/, itemsize[1], item[0]/*val*/, itemsize[0]))
+	try
 	{
-		case Output::DoYield:
-			lua_yieldk( ls, 0, 1, function_output_print);
+		switch (output->print( item[1]/*tag*/, itemsize[1], item[0]/*val*/, itemsize[0]))
+		{
+			case Output::DoYield:
+				lua_yieldk( ls, 0, 1, function_output_print);
 
-		case Output::Error:
-			msg = output->m_outputfilter->getError();
-			return luaL_error( ls, "error in output:print (%s)", msg?msg:"unknown");
+			case Output::Error:
+				msg = output->m_outputfilter->getError();
+				return luaL_error( ls, "error in output:print (%s)", msg?msg:"unknown");
 
-		case Output::Data:
-			return 0;
+			case Output::Data:
+				return 0;
+		}
+	}
+	catch (const std::bad_alloc&)
+	{
+		return luaL_error( ls, "out of memory calling output:print");
+	}
+	catch (const std::exception& e)
+	{
+		return luaL_error( ls, "got exception in output:print: (%s)", e.what());
 	}
 	return luaL_error( ls, "illegal state produced by output:print");
 }
@@ -397,17 +419,28 @@ static int function_output_opentag( lua_State* ls)
 	{
 		return luaL_error( ls, "output:opentag called with too many arguments");
 	}
-	switch (output->print( tag, tagsize, 0/*val*/, 0))
+	try
 	{
-		case Output::DoYield:
-			lua_yieldk( ls, 0, 1, function_output_opentag);
+		switch (output->print( tag, tagsize, 0/*val*/, 0))
+		{
+			case Output::DoYield:
+				lua_yieldk( ls, 0, 1, function_output_opentag);
 
-		case Output::Error:
-			msg = output->m_outputfilter->getError();
-			return luaL_error( ls, "error in output:opentag (%s)", msg?msg:"unknown");
+			case Output::Error:
+				msg = output->m_outputfilter->getError();
+				return luaL_error( ls, "error in output:opentag (%s)", msg?msg:"unknown");
 
-		case Output::Data:
-			return 0;
+			case Output::Data:
+				return 0;
+		}
+	}
+	catch (const std::bad_alloc&)
+	{
+		return luaL_error( ls, "out of memory calling output:opentag");
+	}
+	catch (const std::exception& e)
+	{
+		return luaL_error( ls, "got exception in output:opentag: (%s)", e.what());
 	}
 	return luaL_error( ls, "illegal state produced by output:opentag");
 }
@@ -421,17 +454,28 @@ static int function_output_closetag( lua_State* ls)
 	{
 		return luaL_error( ls, "output:closetag called with too many arguments. no arguments expected");
 	}
-	switch (output->print( 0/*tag*/, 0, 0/*val*/, 0))
+	try
 	{
-		case Output::DoYield:
-			lua_yieldk( ls, 0, 1, function_output_opentag);
+		switch (output->print( 0/*tag*/, 0, 0/*val*/, 0))
+		{
+			case Output::DoYield:
+				lua_yieldk( ls, 0, 1, function_output_opentag);
 
-		case Output::Error:
-			msg = output->m_outputfilter->getError();
-			return luaL_error( ls, "error in output:closetag (%s)", msg?msg:"unknown");
+			case Output::Error:
+				msg = output->m_outputfilter->getError();
+				return luaL_error( ls, "error in output:closetag (%s)", msg?msg:"unknown");
 
-		case Output::Data:
-			return 0;
+			case Output::Data:
+				return 0;
+		}
+	}
+	catch (const std::bad_alloc&)
+	{
+		return luaL_error( ls, "out of memory calling output:closetag");
+	}
+	catch (const std::exception& e)
+	{
+		return luaL_error( ls, "got exception in output:closetag: (%s)", e.what());
 	}
 	return luaL_error( ls, "illegal state produced by output:closetag");
 }
@@ -466,21 +510,31 @@ static int function_input_as( lua_State* ls)
 		const char* tn = lua_typename( ls, lua_type( ls, 2));
 		luaL_error( ls, "filter type value expected as first argument of input:as instead of %s", tn?tn:"UNKNOWN");
 	}
-	protocol::InputFilter* ff = 0;
-	if (filter->m_inputfilter.get())
+	try
 	{
-		ff = filter->m_inputfilter->copy();
-		if (input->m_inputfilter.get())
+		protocol::InputFilter* ff = 0;
+		if (filter->m_inputfilter.get())
 		{
-			ff->assignContent( *input->m_inputfilter);
+			ff = filter->m_inputfilter->copy();
+			if (input->m_inputfilter.get())
+			{
+				ff->assignContent( *input->m_inputfilter);
+			}
 		}
+		else
+		{
+			luaL_error( ls, "input:as called with a filter with undefined input");
+		}
+		input->m_inputfilter.reset( ff);
 	}
-	else
+	catch (const std::bad_alloc&)
 	{
-		luaL_error( ls, "input:as called with a filter with undefined input");
+		return luaL_error( ls, "out of memory calling input:as");
 	}
-	input->m_inputfilter.reset( ff);
-
+	catch (const std::exception& e)
+	{
+		return luaL_error( ls, "got exception in input:as: (%s)", e.what());
+	}
 	return 0;
 }
 
@@ -497,20 +551,31 @@ static int function_output_as( lua_State* ls)
 		const char* tn = lua_typename( ls, lua_type( ls, 2));
 		luaL_error( ls, "filter type value expected as first argument of output:as instead of %s", tn?tn:"UNKNOWN");
 	}
-	protocol::OutputFilter* ff = 0;
-	if (filter->m_outputfilter.get())
+	try
 	{
-		ff = filter->m_outputfilter->copy();
-		if (output->m_outputfilter.get())
+		protocol::OutputFilter* ff = 0;
+		if (filter->m_outputfilter.get())
 		{
-			ff->assignContent( *output->m_outputfilter);
+			ff = filter->m_outputfilter->copy();
+			if (output->m_outputfilter.get())
+			{
+				ff->assignContent( *output->m_outputfilter);
+			}
 		}
+		else
+		{
+			luaL_error( ls, "output:as called with a filter with undefined output");
+		}
+		output->m_outputfilter.reset( ff);
 	}
-	else
+	catch (const std::bad_alloc&)
 	{
-		luaL_error( ls, "output:as called with a filter with undefined output");
+		return luaL_error( ls, "out of memory calling output:as");
 	}
-	output->m_outputfilter.reset( ff);
+	catch (const std::exception& e)
+	{
+		return luaL_error( ls, "got exception in output:as: (%s)", e.what());
+	}
 	return 0;
 }
 

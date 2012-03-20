@@ -1,5 +1,5 @@
 #!/bin/sh
-for cset in 'UTF-8' 'UTF-16LE' 'UTF-16BE' 'UCS-2LE' 'UCS-2BE'
+for cset in 'UCS-4BE'
 do
 output="../`echo $0 | sed 's/template//' | sed 's/.tst$//'`.$cset.tst"
 rm -f $output
@@ -8,6 +8,7 @@ echo "Expanding test file $output"
 recode lat1..ibmpc >> $output <<!TEST
 --
 --requires:LUA
+--requires:DISABLED NETBSD
 --requires:LIBXML2
 --input
 HELLO
