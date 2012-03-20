@@ -248,6 +248,8 @@ Build win-iconv.dll with the supplied makefile from 'contrib\win-iconv\Makefile.
 
 nmake /nologo /f Makefile.msvc
 
+Adapt WIN_ICONV_DIR in 'makefiles\nmake\config.mk'.
+
 You have to fix the Makefile.msvc:
 
 There are some + where they don't belong:
