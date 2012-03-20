@@ -7,7 +7,7 @@ customer
         {
                 street STRING              ; Street and house number
                 state STRING               ; State
-                country USHORT(49)         ; Countrycode, default switzerland
+                country USHORT(49)         ; Countrycode, default Switzerland
         }
         links[]                            ; List of links to other customers
         {

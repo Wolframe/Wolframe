@@ -1,5 +1,5 @@
 #!/bin/sh
-for cset in 'UTF-8' 'UTF-16LE' 'UTF-16BE' 'UCS-2LE' 'UCS-2BE' 'UCS-4BE'
+for cset in 'UTF-8' 'UTF-16LE' 'UTF-16BE' 'UCS-2LE' 'UCS-2BE'
 do
 output="../`echo $0 | sed 's/template//' | sed 's/.tst$//'`.$cset.tst"
 rm -f $output
