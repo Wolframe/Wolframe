@@ -1,0 +1,86 @@
+<!-- Tutorial -->
+<sect1>
+<title>Writing Wolframe Form Definitions</title>
+	<sect2>
+	<title>Introduction</title>
+	<para>Wolframe forms can be defined in different ways depending on the usage. They can be defined
+		in a module as hardwired structure. In this shape they are used as APIs for functions implemented
+		in modules.
+	</para>
+	<para>
+		Forms can also be defined in a DDL (data definition language) that is used as glue between transactions
+		executed in the 3rd tier and programs executed in the 2nd tier. It depends very much on the
+		application what DDL is best to use. Users may already have their data definitions
+		in a certain way defined. The form DDL can be defined in the way you want. Wolframe offers a
+		pluggin mechanism for DLL compilers and provides examples of such compilers. You configure the
+		DDL sources to load and the compiler to use.
+	</para>
+	<para>
+		With the DDL form description we get a transformation of the form content
+		to a transactions procedure description and a transformation of the transaction function result back
+		into a form. This returned form content can then be inspected by the program in the 2nd tier.
+		These transformations are independent of the specific form and transaction function. This
+		means that such a transformation has to be written only once per backend and you can define
+		as many database queries and forms using it as you want.
+	</para>
+	<para>
+		All forms introduced here are equivalent in use for the programs. In Lua for example they can simply
+		be built from tables or from an input by applying a filter. See the Lua tutorial for details.
+	</para>
+	</sect2>
+	<sect2>
+	<title>Define forms in Simple Form DDL</title>
+	<para>
+		As example of a form DDL we provide the "Simple Form DDL" as example. The format is base on the "INFO"-format
+		introduced by "Marcin Kalicinski" for the boost property tree library. We used this library to show an example
+		that is easy to understand and small enough.
+		The format uses key value pairs separated with spaces for atomic elements and curly brackets '{' '}' to
+		describe structures. Key is the name of the element and the following value is the assembles the attributes of
+		this element. The attributes are a data type and some operators that describe additional properties.
+	</para>
+	<para>
+		The following data types are known in Simple Form DDL
+		<simplelist type="horiz" columns="2">
+		<member>double</member><member>double precision floating point</member>
+		<member>float</member><member>floating point</member>
+		<member>long</member><member>big integer</member>
+		<member>ulong</member><member>unsigned big integer</member>
+		<member>int</member><member>double</member>
+		<member>uint</member><member>unsigned integer</member>
+		<member>short</member><member>16 bit integer</member>
+		<member>ushort</member><member>unsigned 16 bit integer</member>
+		<member>char</member><member>1 byte character</member>
+		<member>uchar</member><member>1 byte unsigned character</member>
+		<member>string</member><member>string</member>
+		</simplelist>
+	</para>
+	<para>
+		The following element attributes are known in Simple Form DDL
+		<simplelist type="horiz" columns="3">
+		<member>@</member><member>prefix of data type</member><member>Expresses that the element is an attribute and not a content element of the structure. This has only influence on the XML or similar representation of the form content</member>
+		<member>[]</member><member>postfix of data type</member><member>Expresses that the element is an array of this type</member>
+		<member>[]</member><member>without data type</member><member>Expresses this element is an array of structures and that the structure defined describes the prototype (initialization) element of the array.</member>
+		<member>(..)</member><member>postfix of data type</member><member>Expresses that '..' (represents any valid value not containing brackets) is the default initialization value of this element.</member>
+		</simplelist>
+	</para>
+	<para>
+		The following example shows a form defined in simple form DDL.
+		<programlisting language='text'>
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/tutorial/ddl_simpleform_1.frm" parse="text" />
+		</programlisting>
+	</para>
+	</sect2>
+	<sect2>
+	<title>Define Forms in C++ as module function API</title>
+	<para>
+	</para>
+	</sect2>
+	<sect2>
+	<title>Define Transaction Procedure Description Writers as Filters</title>
+	</sect2>
+	<sect2>
+	<title>Define Transaction Result Description Readers as Filters</title>
+	</sect2>
+	<para></para>
+</sect1>
+

@@ -6,6 +6,7 @@
 	and terms are common to the language bindings of Wolframe and described in the glossary.
 </para>
 	&SDKtutorialProgramLua;
+	&SDKtutorialForms;
 	&SDKtutorialConfiguration;
 </chapter>
 

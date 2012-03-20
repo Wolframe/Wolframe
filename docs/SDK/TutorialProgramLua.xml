@@ -59,9 +59,15 @@
 			<code>output:print( c)</code>
 		prints an element to the output. Omitting t, means that an untagged content element is printed.
 		The same happens when you call print with nil or false as second parameter t. With c passed
-		as nil or false you print a open tag or close tag, depending on t. t is a tag name for
+		as nil or false with t, you print a open tag or close tag, depending on t. t is a tag name for
 		open tag and nil or false for a close previous tag. With c,t as non nil or false values you
 		print an attribute value assignement.
+	</para>
+	<para>
+		For convenience there are also the functions
+			<code>output:opentag( t)</code> - equivalent to <code>output:print( false, t)</code>,
+			<code>output:closetag( t)</code> - equivalent to <code>output:print( false, false)</code>
+		defined. When explicitely defining an XML structure output in Lus these functions are more readable.
 	</para>
 	</sect2>
 	<sect2>

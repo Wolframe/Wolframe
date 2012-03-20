@@ -5,6 +5,7 @@
 <!ENTITY SDKintroduction		SYSTEM "Introduction.xml">
 
 <!ENTITY SDKtutorials			SYSTEM "Tutorials.xml">
+<!ENTITY SDKtutorialForms		SYSTEM "TutorialForms.xml">
 <!ENTITY SDKtutorialProgramLua		SYSTEM "TutorialProgramLua.xml">
 <!ENTITY SDKtutorialConfiguration	SYSTEM "TutorialConfiguration.xml">
 
