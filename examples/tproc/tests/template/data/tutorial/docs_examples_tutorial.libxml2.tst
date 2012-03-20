@@ -1,7 +1,7 @@
 #!/bin/sh
 TOP=../../../../
 MAIN=$TOP/docs/examples/tutorial/
-for example in 1 2 3 5; do
+for example in 4; do
 
 output="../`echo $0 | sed 's/template//' | sed 's/.tst$//'`.$example.tst"
 rm -f $output
@@ -9,6 +9,7 @@ echo "Expanding test file $output"
 
 recode lat1..ibmpc >> $output <<!TEST
 **
+**requires:LIBXML2
 **requires:LUA
 **input
 HELLO
@@ -32,12 +33,7 @@ script {
 **output
 OK enter cmd
 !TEST
-if [ $example = 2 ]; then
-# LINE filter prints EOLN at output of non empty not EOLN-terminated last line
-	cat $MAIN/lua_script_$example.output.xml | ../cleanInput BOM >> $output
-else
-	cat $MAIN/lua_script_$example.output.xml | ../cleanInput BOM EOLN >> $output
-fi
+cat $MAIN/lua_script_$example.output.xml | ../cleanInput BOM >> $output
 recode lat1..ibmpc >> $output <<!TEST
 
 .
