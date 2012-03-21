@@ -122,6 +122,13 @@ Project Wolframe.
 								<File Id="libeay32.dll" Name="libeay32.dll" DiskId="1" Source="..\src\libeay32.dll"/> 
 							</Component>
 							<?endif?>
+
+							<?ifdef var.with_libxml2?>
+							<Component Id="LibXML2" Guid="{B2788BB1-0226-4365-AB12-C24F21B37134}">
+								<File Id="libxml2.dll" Name="libxml2.dll" DiskId="1" Source="..\src\libxml2.dll"/>
+								<File Id="iconv.dll" Name="iconv.dll" DiskId="1" Source="..\src\iconv.dll"/>
+							</Component>
+							<?endif?>
 							
 							<?ifdef with_pgsql?>
 							<Component Id="PostgresqlDlls" Guid="{3BD6483F-70B2-44D3-9C65-26787635A44B}">
@@ -319,6 +326,9 @@ Project Wolframe.
 				<ComponentRef Id="EventLogRegistryEntries"/>
 				<?ifdef var.with_ssl?>				
 				<ComponentRef Id="OpenSSL"/>
+				<?endif?>
+				<?ifdef var.with_libxml2?>
+				<ComponentRef Id="LibXML2"/>
 				<?endif?>
 				<?ifdef var.with_msxml?>
 				<!-- TODO: merge module for MSXML -->

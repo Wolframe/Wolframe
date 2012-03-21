@@ -26,6 +26,11 @@ WIX_FLAGS = $(WIX_FLAGS) \
 	-dwith_sqlite3=1
 !ENDIF
 
+!IFDEF WITH_LIBXML2
+WIX_FLAGS = $(WIX_FLAGS) \
+	-dwith_libxml2=1
+!ENDIF
+
 !IFDEF WITH_MSXML
 WIX_FLAGS = $(WIX_FLAGS) \
 	-dwith_msxml=1
