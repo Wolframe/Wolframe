@@ -47,31 +47,24 @@ static void printIndent( std::ostream& out, size_t indent)
 
 bool DirectmapCommandEnvironment::FormDescription::load( ddl::StructType& st) const
 {
-	ddl::StructType ddlcres;
+	st.clear();
 	std::string error;
-	if (!m_compiler->compileFile( m_path, ddlcres, error))
+	if (!m_compiler->compileFile( m_path, st, error))
 	{
 		LOG_ERROR << "Failed to compile DDL: " << error;
 		return false;
 	}
-	ddl::StructType::Map::const_iterator itr=ddlcres.find( m_name);
-	if (itr == ddlcres.end())
-	{
-		LOG_ERROR << "Form '" << m_name << "' not found in DDL '" << m_path << "'";
-		return false;
-	}
-	st = itr->second;
 	return true;
 }
 
 void DirectmapCommandEnvironment::print( std::ostream& out, size_t indent) const
 {
 	printIndent( out, indent);
-	out << "Input Form " << m_inputformdescr.m_name << ":";
+	out << "Input Form " << m_inputformdescr.m_path << ":";
 	m_inputform.print( out, indent+1);
 
 	printIndent( out, indent);
-	out << "Output Form " << m_outputformdescr.m_name << ":";
+	out << "Output Form " << m_outputformdescr.m_path << ":";
 	m_outputform.print( out, indent+1);
 }
 

@@ -1,39 +1,46 @@
 #!/bin/sh
 TOP=../../../../
 MAIN=$TOP/docs/examples/tutorial/
-for example in 4; do
-
+for example in\
+	ddl_simpleform_1
+do
 output="../`echo $0 | sed 's/template//' | sed 's/.tst$//'`.$example.tst"
 rm -f $output
 echo "Writing test file $output"
 
 recode lat1..ibmpc >> $output <<!TEST
 **
-**requires:LIBXML2
-**requires:LUA
+**requires:DISABLED
 **input
 HELLO
 RUN
 !TEST
-cat $MAIN/lua_script_$example.input.xml | ../cleanInput BOM EOLN >> $output
+cat $MAIN/$example.input.xml | ../cleanInput BOM EOLN >> $output
 recode lat1..ibmpc >> $output <<!TEST
 
 .
 QUIT
-**file:example_$example.lua
+**file:input.frm
 !TEST
-cat $MAIN/lua_script_$example.lua >> $output
+cat $MAIN/$example.frm >> $output
+recode lat1..ibmpc >> $output <<!TEST
+**file:output.frm
+!TEST
+cat $MAIN/$example.frm >> $output
 recode lat1..ibmpc >> $output <<!TEST
 **config
-script {
+directmap {
 	cmd RUN
-	path example_$example.lua
-	main run
+	ddl simpleform
+	filter XML:textwolf
+	inputform input.frm
+	outputform output.frm
+	function echo
 }
 **output
 OK enter cmd
 !TEST
-cat $MAIN/lua_script_$example.output.xml | ../cleanInput BOM >> $output
+cat $MAIN/$example.input.xml | ../cleanInput BOM EOLN >> $output
 recode lat1..ibmpc >> $output <<!TEST
 
 .

@@ -16,7 +16,7 @@ testdoc=`echo $example | cut -f3 -d=`
 
 output="../`echo $0 | sed 's/template//' | sed 's/.tst$//'`.$tag.$cset.tst"
 rm -f $output
-echo "Expanding test file $output"
+echo "Writing test file $output"
 
 recode lat1..ibmpc >> $output <<!TEST
 --
@@ -45,7 +45,7 @@ function run( )
 end
 --config
 script {
-	name RUN
+	cmd RUN
 	path echo.lua
 	main run
 }

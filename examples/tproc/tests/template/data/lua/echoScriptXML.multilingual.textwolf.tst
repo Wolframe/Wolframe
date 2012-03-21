@@ -3,7 +3,7 @@ for cset in 'UTF-8' 'UTF-16LE' 'UTF-16BE' 'UCS-2LE' 'UCS-2BE' 'UCS-4LE' 'UCS-4BE
 do
 output="../`echo $0 | sed 's/template//' | sed 's/.tst$//'`.$cset.tst"
 rm -f $output
-echo "Expanding test file $output"
+echo "Writing test file $output"
 
 recode lat1..ibmpc >> $output <<!TEST
 --
@@ -30,7 +30,7 @@ function run( )
 end
 --config
 script {
-	name RUN
+	cmd RUN
 	path echo.lua
 	main run
 }

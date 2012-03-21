@@ -55,21 +55,13 @@ struct ScriptConfigStruct
 	static const config::DescriptionBase* description();
 };
 
-struct FormConfigStruct
-{
-	std::string path;				//< path of the DDL source of the form
-	std::string name;				//< name of the form in the source
-
-	///\brief Get the configuration structure description
-	static const config::DescriptionBase* description();
-};
-
 struct DirectMapConfigStruct
 {
 	std::string cmdname;				//< name of the command in the protocol
 	std::string ddlname;				//< name of the DDL (selects the compiler to translate the source)
-	FormConfigStruct input;				//< input form definition
-	FormConfigStruct output;			//< output form definition
+	std::string filtername;				//< name of the filter to use for input and output
+	std::string inputform;				//< input form path (DDL source)
+	std::string outputform;				//< output form path (DDL source)
 	std::string function;				//< name of the transaction function to execute
 
 	///\brief Get the configuration structure description

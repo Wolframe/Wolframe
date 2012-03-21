@@ -18,7 +18,7 @@ function run( )
 end
 **config
 script {
-	name RUN
+	cmd RUN
 	path example_2.lua
 	main run
 }

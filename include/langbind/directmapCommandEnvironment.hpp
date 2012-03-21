@@ -49,8 +49,11 @@ class DirectmapCommandEnvironment :public protocol::CommandEnvironment
 {
 public:
 	///\brief Constructor
-	DirectmapCommandEnvironment( const ddl::CompilerInterface* ddlc, const std::string& in_path, const std::string& in_name, const std::string& out_path, const std::string& out_name)
-		:m_inputformdescr(in_path,in_name,ddlc),m_outputformdescr(out_path,out_name,ddlc){}
+	DirectmapCommandEnvironment( const ddl::CompilerInterface* ddlc, const std::string& filtername_, const std::string& inputform_, const std::string& outputform_, const std::string& function_)
+		:m_inputformdescr(inputform_,ddlc),m_outputformdescr(outputform_,ddlc),m_filtername(filtername_),m_function(function_){}
+	///\brief Copy constructor
+	DirectmapCommandEnvironment( const DirectmapCommandEnvironment& o)
+		:m_inputformdescr(o.m_inputformdescr),m_outputformdescr(o.m_outputformdescr),m_inputform(o.m_inputform),m_outputform(o.m_outputform),m_filtername(o.m_filtername),m_function(o.m_function){}
 
 	///\brief Interface implementation of ConfigurationBase::test() const
 	virtual bool test() const;
@@ -72,11 +75,12 @@ private:
 	struct FormDescription
 	{
 		std::string m_path;
-		std::string m_name;
 		const ddl::CompilerInterface* m_compiler;
 
-		FormDescription( const std::string& p, const std::string& n, const ddl::CompilerInterface* c)
-			:m_path(p),m_name(n),m_compiler(c){}
+		FormDescription( const std::string& p, const ddl::CompilerInterface* c)
+			:m_path(p),m_compiler(c){}
+		FormDescription( const FormDescription& o)
+			:m_path(o.m_path),m_compiler(o.m_compiler){}
 
 		bool load( ddl::StructType& st) const;
 	};
@@ -85,6 +89,8 @@ private:
 	FormDescription m_outputformdescr;		//< output form description
 	ddl::StructType m_inputform;			//< input form prototype
 	ddl::StructType m_outputform;			//< output form prototype
+	std::string m_filtername;			//< filter to use for input output
+	std::string m_function;				//< transaction function to call
 };
 
 }}//namespace

@@ -63,26 +63,10 @@ const config::DescriptionBase* ScriptConfigStruct::description()
 		ThisDescription()
 		{
 			(*this)
-			( "name",	&ScriptConfigStruct::cmdname)
+			( "cmd",	&ScriptConfigStruct::cmdname)
 			( "path",	&ScriptConfigStruct::path)
 			( "main",	&ScriptConfigStruct::main)
 			( "module",	&ScriptConfigStruct::module)
-			;
-		}
-	};
-	static const ThisDescription rt;
-	return &rt;
-}
-
-const config::DescriptionBase* FormConfigStruct::description()
-{
-	struct ThisDescription :public config::Description<FormConfigStruct>
-	{
-		ThisDescription()
-		{
-			(*this)
-			( "path",	&FormConfigStruct::path)
-			( "name",	&FormConfigStruct::name)
 			;
 		}
 	};
@@ -97,10 +81,11 @@ const config::DescriptionBase* DirectMapConfigStruct::description()
 		ThisDescription()
 		{
 			(*this)
-			( "cmdname",	&DirectMapConfigStruct::cmdname)
-			( "ddlname",	&DirectMapConfigStruct::ddlname)
-			( "input",	&DirectMapConfigStruct::input)
-			( "output",	&DirectMapConfigStruct::output)
+			( "cmd",	&DirectMapConfigStruct::cmdname)
+			( "ddl",	&DirectMapConfigStruct::ddlname)
+			( "filter",	&DirectMapConfigStruct::filtername)
+			( "inputform",	&DirectMapConfigStruct::inputform)
+			( "outputform",	&DirectMapConfigStruct::outputform)
 			( "function",	&DirectMapConfigStruct::function)
 			;
 		}
@@ -169,7 +154,7 @@ bool Configuration::defineDirectMap( const DirectMapConfigStruct& dm)
 		if (ddlc && boost::algorithm::iequals( dm.ddlname, ddlc->ddlname()))
 		{
 			langbind::DirectmapCommandEnvironment* env;
-			m_envs.push_back( env=new langbind::DirectmapCommandEnvironment( ddlc, dm.input.path, dm.input.name, dm.output.path, dm.output.name));
+			m_envs.push_back( env=new langbind::DirectmapCommandEnvironment( ddlc, dm.filtername, dm.inputform, dm.outputform, dm.function));
 			protocol::CommandBase* cmd = new protocol::Command< langbind::DirectmapCommandHandler, langbind::DirectmapCommandEnvironment>( dm.cmdname.c_str(), env);
 			m_cmds.push_back( cmd);
 			return true;
@@ -253,28 +238,28 @@ void Configuration::setCanonicalPathes( const std::string& refPath)
 		std::vector<DirectMapConfigStruct>::iterator itr=m_data.directmap.begin(),end=m_data.directmap.end();
 		for (;itr != end; ++itr)
 		{
-			boost::filesystem::path pt( itr->input.path);
+			boost::filesystem::path pt( itr->inputform);
 			if (pt.is_absolute())
 			{
-				itr->input.path = pt.string();
+				itr->inputform = pt.string();
 			}
 			else
 			{
-				itr->input.path = boost::filesystem::absolute( pt, boost::filesystem::path( refPath).branch_path()).string();
+				itr->inputform = boost::filesystem::absolute( pt, boost::filesystem::path( refPath).branch_path()).string();
 			}
 		}
 	}{
 		std::vector<DirectMapConfigStruct>::iterator itr=m_data.directmap.begin(),end=m_data.directmap.end();
 		for (;itr != end; ++itr)
 		{
-			boost::filesystem::path pt( itr->output.path);
+			boost::filesystem::path pt( itr->outputform);
 			if (pt.is_absolute())
 			{
-				itr->output.path = pt.string();
+				itr->outputform = pt.string();
 			}
 			else
 			{
-				itr->output.path = boost::filesystem::absolute( pt, boost::filesystem::path( refPath).branch_path()).string();
+				itr->outputform = boost::filesystem::absolute( pt, boost::filesystem::path( refPath).branch_path()).string();
 			}
 		}
 	}{

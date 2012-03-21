@@ -180,7 +180,7 @@ function run( )
 end
 --config
 script {
-	name RUN
+	cmd RUN
 	path echo.lua
 	main run
 }

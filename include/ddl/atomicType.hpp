@@ -71,6 +71,13 @@ public:
 	///\param[in] o element to copy
 	AtomicType( const AtomicType& o)	:m_type(o.m_type),m_value(o.m_value){}
 
+	///\brief Reset the value
+	void clear()
+	{
+		m_type = string_;
+		m_value.clear();
+	}
+
 	///\brief Setter method
 	///\tparam T Type of element to assign
 	///\param[in] val element to assign
