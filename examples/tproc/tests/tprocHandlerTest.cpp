@@ -101,7 +101,22 @@ if (boost::starts_with( flag, "DISABLED "))
 	std::vector<std::string>::const_iterator ii = platforms.begin(),ee = platforms.end();
 	for (++ii; ii != ee; ++ii)
 	{
-#if PLATFORM_NETBSD
+#ifdef _WIN32
+		if (boost::iequals( *ii, "WIN32")) return "DISABLED ON PLATFORM NETBSD ";
+#endif
+#ifdef LINUX
+		if (boost::iequals( *ii, "LINUX")) return "DISABLED ON PLATFORM NETBSD ";
+#endif
+#ifdef SUNOS
+		if (boost::iequals( *ii, "SUNOS")) return "DISABLED ON PLATFORM NETBSD ";
+#endif
+#ifdef FREEBSD
+		if (boost::iequals( *ii, "FREEBSD")) return "DISABLED ON PLATFORM NETBSD ";
+#endif
+#ifdef OPENBSD
+		if (boost::iequals( *ii, "OPENBSD")) return "DISABLED ON PLATFORM NETBSD ";
+#endif
+#ifdef NETBSD
 		if (boost::iequals( *ii, "NETBSD")) return "DISABLED ON PLATFORM NETBSD ";
 #endif
 	}

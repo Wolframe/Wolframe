@@ -23,12 +23,6 @@ INCLUDE_LIBS = \
 	$(TOPDIR)/src/libwolframe/libwolframe.a \
 	$(LIBS_DL)
 
-# platform
-ifeq "$(PLATFORM)" "NETBSD"
-INCLUDE_CXXFLAGS += \
-	-DPLATFORM_NETBSD
-endif
-
 # lua
 ifeq ($(WITH_LUA),1)
 INCLUDE_CXXFLAGS += \
