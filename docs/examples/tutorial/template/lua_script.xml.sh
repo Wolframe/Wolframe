@@ -11,3 +11,5 @@ done
 ./xmltestdoc.sh 'UCS-2LE' '<item><name>example</name><content><color>blue</color><material>metal</material></content><price>23.45</price></item>' > ../lua_script_4.output.xml
 ./xmltestdoc.sh 'UTF-16BE' '<doc><name>mumbay</name><country>india</country><continent>asia</continent></doc>' > ../lua_script_5.input.xml
 ./xmltestdoc.sh 'UTF-16BE' '<doc><name>mumbay</name><country>india</country></doc>' > ../lua_script_5.output.xml
+./xmltestdoc.sh 'UTF-16LE' '<customer><name>P&#xE4;rnu Linnavalitsus</name><address><street>Suur-Sepa 16</street><district>80098 Pärnu</district><country>372</country></address></customer>' > ../ddl_simpleform_1.input.xml
+./xmltestdoc.sh 'UTF-16LE' '<customer id="1"><name>P&#xE4;rnu Linnavalitsus</name><address><street>Suur-Sepa 16</street><district>80098 Pärnu</district><country>372</country></address></customer>' > ../ddl_simpleform_1.output.xml

@@ -1,23 +1,27 @@
-PUBLIC FORM customer
-	STRING name
-	UINT number
-	STRING addresshdr
-	STRING street
-	STRING state
-	UINT postalcode
-	STRING country
-end
+customer
+{
+	name STRING
+	number UINT
+	addresshdr STRING
+	street STRING
+	state STRING
+	postalcode UINT
+	country STRING
+}
 
-PUBLIC FORM customer_query
-	STRING name
-	STRING addresshdr
-	STRING street
-	STRING state
-	UINT postalcode
-	STRING country
-end
+customer_query
+{
+	name STRING
+	addresshdr STRING
+	street STRING
+	state STRING
+	postalcode UINT
+	country STRING
+}
 
-PUBLIC FORM customer_lookup
-	UINT number
-end
+customer_lookup
+{
+	number UINT
+}
+
 

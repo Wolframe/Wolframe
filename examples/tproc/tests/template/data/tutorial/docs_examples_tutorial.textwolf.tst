@@ -5,7 +5,7 @@ for example in 1 2 3 5; do
 
 output="../`echo $0 | sed 's/template//' | sed 's/.tst$//'`.$example.tst"
 rm -f $output
-echo "Expanding test file $output"
+echo "Writing test file $output"
 
 recode lat1..ibmpc >> $output <<!TEST
 **
@@ -25,7 +25,7 @@ cat $MAIN/lua_script_$example.lua >> $output
 recode lat1..ibmpc >> $output <<!TEST
 **config
 script {
-	name RUN
+	cmd RUN
 	path example_$example.lua
 	main run
 }

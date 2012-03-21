@@ -171,6 +171,14 @@ std::size_t StructType::nof_attributes() const
 	return m_nof_attributes;
 }
 
+void StructType::clear()
+{
+	m_contentType = Struct;
+	m_value.clear();
+	m_elem.clear();
+	m_nof_attributes = 0;
+}
+
 StructType& StructType::operator= ( const StructType& o)
 {
 	m_contentType = o.m_contentType;

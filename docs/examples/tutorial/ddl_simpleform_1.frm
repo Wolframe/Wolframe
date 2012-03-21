@@ -6,10 +6,10 @@ customer
         address                            ; Address of the customer
         {
                 street STRING              ; Street and house number
-                state STRING               ; State
+                district STRING            ; Postalcode/city/state
                 country USHORT(49)         ; Countrycode, default Switzerland
         }
-        links[]                            ; List of links to other customers
+        link[]                             ; List of links to other customers
         {
                 customerid UINT            ; Id of the linked customer
                 description STRING         ; Description of this relation

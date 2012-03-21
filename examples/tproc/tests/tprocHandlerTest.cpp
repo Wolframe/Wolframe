@@ -96,11 +96,14 @@ static const char* check_flag( const std::string& flag)
 if (boost::iequals( flag, "DISABLED")) return "DISABLED ";
 if (boost::starts_with( flag, "DISABLED "))
 {
+	unsigned int nargs=0;
 	std::vector<std::string> platforms;
 	boost::split( platforms, flag, boost::is_any_of("\t "));
 	std::vector<std::string>::const_iterator ii = platforms.begin(),ee = platforms.end();
 	for (++ii; ii != ee; ++ii)
 	{
+		if (ii->size() == 0) continue;
+		++nargs;
 #ifdef _WIN32
 		if (boost::iequals( *ii, "WIN32")) return "DISABLED ON PLATFORM WINDOWS ";
 #endif
@@ -120,6 +123,7 @@ if (boost::starts_with( flag, "DISABLED "))
 		if (boost::iequals( *ii, "NETBSD")) return "DISABLED ON PLATFORM NETBSD ";
 #endif
 	}
+	if (nargs == 0) return "DISABLED ";
 }
 #if !(WITH_LUA)
 	if (boost::iequals( flag, "LUA")) return "WITH_LUA=1 ";

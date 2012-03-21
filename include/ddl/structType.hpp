@@ -187,6 +187,9 @@ public:
 	///\param[in] indent indentiation for items to print
 	void print( std::ostream& out, size_t indent=0) const;
 
+	///\brief Reset the value
+	void clear();
+
 private:
 	///\brief Assert a type precondition of this. (throws an logic_error exception on failure)
 	///\remark Used for checking the preconditions mentioned as remark [precondition]
