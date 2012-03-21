@@ -102,19 +102,19 @@ if (boost::starts_with( flag, "DISABLED "))
 	for (++ii; ii != ee; ++ii)
 	{
 #ifdef _WIN32
-		if (boost::iequals( *ii, "WIN32")) return "DISABLED ON PLATFORM NETBSD ";
+		if (boost::iequals( *ii, "WIN32")) return "DISABLED ON PLATFORM WINDOWS ";
 #endif
 #ifdef LINUX
-		if (boost::iequals( *ii, "LINUX")) return "DISABLED ON PLATFORM NETBSD ";
+		if (boost::iequals( *ii, "LINUX")) return "DISABLED ON PLATFORM LINUX ";
 #endif
 #ifdef SUNOS
-		if (boost::iequals( *ii, "SUNOS")) return "DISABLED ON PLATFORM NETBSD ";
+		if (boost::iequals( *ii, "SUNOS")) return "DISABLED ON PLATFORM SUNOS ";
 #endif
 #ifdef FREEBSD
-		if (boost::iequals( *ii, "FREEBSD")) return "DISABLED ON PLATFORM NETBSD ";
+		if (boost::iequals( *ii, "FREEBSD")) return "DISABLED ON PLATFORM FREEBSD ";
 #endif
 #ifdef OPENBSD
-		if (boost::iequals( *ii, "OPENBSD")) return "DISABLED ON PLATFORM NETBSD ";
+		if (boost::iequals( *ii, "OPENBSD")) return "DISABLED ON PLATFORM OPENBSD ";
 #endif
 #ifdef NETBSD
 		if (boost::iequals( *ii, "NETBSD")) return "DISABLED ON PLATFORM NETBSD ";
