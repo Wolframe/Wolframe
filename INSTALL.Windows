@@ -273,10 +273,6 @@ When there are spaces in the installation prefix, fix it manually in 'config.msv
 before building the library:
 
 PREFIX="C:\Program Files\libxml2-2.7.8-win32"
-BINPREFIX="$(PREFIX)\bin"
-INCPREFIX="$(PREFIX)\include"
-LIBPREFIX="$(PREFIX)\lib"
-SOPREFIX="$(PREFIX)\lib"
 
 nmake /nologo /f Makefile.msvc all
 nmake /nologo /f Makefile.msvc install
@@ -302,10 +298,6 @@ When there are spaces in the installation prefix, fix it manually in 'config.msv
 before building the library:
 
 PREFIX="C:\Program Files\libxml2-2.7.8-win32"
-BINPREFIX="$(PREFIX)\bin"
-INCPREFIX="$(PREFIX)\include"
-LIBPREFIX="$(PREFIX)\lib"
-SOPREFIX="$(PREFIX)\lib"
 
 nmake /nologo /f Makefile.msvc all
 nmake /nologo /f Makefile.msvc install

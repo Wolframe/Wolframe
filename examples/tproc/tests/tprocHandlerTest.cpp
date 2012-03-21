@@ -34,6 +34,11 @@
 // tprocHandler class unit tests using google test framework (gTest)
 //
 
+// Aba: see below, got trouble on VC10 to compile in debug mode
+#ifdef _WIN32
+#pragma warning(disable:4996) 
+#endif
+
 #include "tprocHandler.hpp"
 #include "connectionHandler.hpp"
 #include "handlerConfig.hpp"
@@ -98,6 +103,8 @@ if (boost::starts_with( flag, "DISABLED "))
 {
 	unsigned int nargs=0;
 	std::vector<std::string> platforms;
+	// Aba: the only thing which comes to my mind here is to disable the warning
+	// See http://stackoverflow.com/questions/1301277/c-boost-whats-the-cause-of-this-warning
 	boost::split( platforms, flag, boost::is_any_of("\t "));
 	std::vector<std::string>::const_iterator ii = platforms.begin(),ee = platforms.end();
 	for (++ii; ii != ee; ++ii)
