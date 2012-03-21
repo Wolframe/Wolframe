@@ -30,42 +30,39 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// Wolframe processor base class
-//
+///
+/// Finite State Machine interface
+///
 
-#ifndef _WOLFRAME_PROCESSOR_HPP_INCLUDED
-#define _WOLFRAME_PROCESSOR_HPP_INCLUDED
+#ifndef _FSM_INTERFACE_HPP_INCLUDED
+#define _FSM_INTERFACE_HPP_INCLUDED
 
-#include "FSMinterface.hpp"
+#include <cstddef>
 
-namespace _Wolframe {
-namespace proc {
+/// Finite State Machine operation
+class FSMoperation
+{
+public:
+};
 
-/// base class for Wolframe channel processors
-class Processor
+class FSMinterface
 {
 public:
 	enum FSMsignal	{
 
 	};
 
-	virtual ~Processor()			{}
+	/// Signal the incoming data. buffer is the buffer given to the read operation
+	virtual void getData( const void* data, std::size_t size ) = 0;
 
-	virtual void close() = 0;
+	/// What should the network do next.
+	virtual const FSMoperation nextOperation() = 0;
+
+	/// A timeout timer has fired.
+	virtual void timeout( unsigned short /*id*/ = 0 )	{}
+
+	/// A signal was received from outside.
+	virtual void signal( FSMsignal /*event*/ )		{}
 };
 
-/// Processor Unit
-/// This is the base class for processor unit implementations
-class ProcessorUnit
-{
-public:
-	virtual ~ProcessorUnit()		{}
-
-	// temporary
-	virtual Processor* processor() const = 0;
-};
-
-}} // namespace _Wolframe::proc
-
-#endif // _WOLFRAME_PROCESSOR_HPP_INCLUDED
+#endif // _FSM_INTERFACE_HPP_INCLUDED
