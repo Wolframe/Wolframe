@@ -153,6 +153,8 @@ docs/examples/cpp/configuration_parse_prototype.hpp
 docs/examples/cpp/configuration_print_prototype.hpp
 docs/examples/timetrack/customer_query_1.xml
 docs/examples/timetrack/customer_query_2.xml
+docs/examples/tutorial/ddl_simpleform_1.input.xml
+docs/examples/tutorial/ddl_simpleform_1.output.xml
 docs/examples/tutorial/lua_script_1.input.xml
 docs/examples/tutorial/lua_script_1.output.xml
 docs/examples/tutorial/lua_script_2.input.xml
@@ -329,6 +331,7 @@ include/filter/textwolf_filter.hpp
 include/filter/textwolf.hpp
 include/filter/token_filter.hpp
 include/filter/xmllite_filter.hpp
+include/FSMinterface.hpp
 include/GNUmakefile
 include/langbind/appObjects.hpp
 include/langbind/directmapCommandEnvironment.hpp
@@ -556,6 +559,13 @@ src/modules/authentication/pam/PAMAuthConfig.cpp
 src/modules/authentication/pam/PAMAuth.cpp
 src/modules/authentication/pam/PAMAuth.hpp
 src/modules/authentication/pam/PAMAuthModule.cpp
+src/modules/authentication/plaintext/GNUmakefile
+src/modules/authentication/plaintext/Makefile.W32
+src/modules/authentication/plaintext/PlainTextAuthConfig.cpp
+src/modules/authentication/plaintext/PlainTextAuth.cpp
+src/modules/authentication/plaintext/PlainTextAuth.hpp
+src/modules/authentication/plaintext/PlainTextAuthModule.cpp
+src/modules/authentication/plaintext/PlainTextAuthModule.def
 src/modules/authentication/sasl/GNUmakefile
 src/modules/authentication/sasl/SaslAuthConfig.cpp
 src/modules/authentication/sasl/SaslAuth.cpp
@@ -705,4 +715,3 @@ XML/configuration.rng
 XML/database.rng
 XML/logging.rng
 XML/README
-include/FSMinterface.hpp
