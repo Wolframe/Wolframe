@@ -56,3 +56,21 @@ void AtomicType::print( std::ostream& out, size_t indent) const
 	while (indent--) out << "\t";
 	out << typeName( m_type) << " '" << m_value << "'" << std::endl;
 }
+
+void AtomicType::init()
+{
+	switch (m_type)
+	{
+		case double_:
+		case float_:
+		case long_:
+		case ulong_:
+		case int_:
+		case uint_:
+		case short_:
+		case ushort_:
+		case char_:	m_value = "0"; ;
+		case string_:	m_value.clear();
+	}
+}
+

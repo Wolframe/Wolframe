@@ -32,16 +32,36 @@ Project Wolframe.
 ///\file serialize/struct/luamapBase.cpp
 ///\brief Implements the non intrusive base class of serialization for the lua map
 #include "serialize/struct/luamapBase.hpp"
+#include <stdexcept>
 
 using namespace _Wolframe;
 using namespace serialize;
 
+static int luaException( lua_State* ls)
+{
+	const char* errmsg = lua_tostring( ls, -1);
+	throw std::runtime_error( errmsg?errmsg:"unspecified lua exception");
+	return 0;
+}
+
 void DescriptionBase::parse( void* obj, lua_State* ls) const
 {
+	bool gotError = false;
 	Context ctx;
 	lua_pushnil( ls);
 	lua_pushvalue( ls, -2);
-	if (!m_parse(obj,ls,&ctx))
+	lua_CFunction old_panicf = lua_atpanic( ls, luaException);
+	try
+	{
+		gotError = !m_parse( obj, ls, &ctx);
+	}
+	catch (std::exception& e)
+	{
+		ctx.setError( e.what());
+		gotError = true;
+	}
+	lua_atpanic( ls, old_panicf);
+	if (gotError)
 	{
 		luaL_error( ls, ctx.getLastError());
 	}
@@ -50,8 +70,20 @@ void DescriptionBase::parse( void* obj, lua_State* ls) const
 
 void DescriptionBase::print( const void* obj, lua_State* ls) const
 {
+	bool gotError = false;
 	Context ctx;
-	if (!m_print(obj,ls,&ctx))
+	lua_CFunction old_panicf = lua_atpanic( ls, luaException);
+	try
+	{
+		gotError = !m_print(obj,ls,&ctx);
+	}
+	catch (std::exception& e)
+	{
+		ctx.setError( e.what());
+		gotError = true;
+	}
+	lua_atpanic( ls, old_panicf);
+	if (gotError)
 	{
 		luaL_error( ls, ctx.getLastError());
 	}

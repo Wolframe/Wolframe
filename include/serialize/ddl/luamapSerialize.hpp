@@ -47,8 +47,8 @@ extern "C"
 namespace _Wolframe {
 namespace serialize {
 
-bool parse( ddl::StructType& st, lua_State* ls, Context& ctx);
-bool print( const ddl::StructType& st, lua_State* ls, Context& ctx);
+void parse( ddl::StructType& st, lua_State* ls);
+void print( const ddl::StructType& st, lua_State* ls);
 
 }}//namespace
 #endif

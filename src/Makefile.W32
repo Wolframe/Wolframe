@@ -118,6 +118,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	filter_token_filter.obj \
 	serialize_struct_filtermapBase.obj \
 	serialize_ddl_filtermapSerialize.obj \
+	serialize_ddl_luamapSerialize.obj \
 	serialize_mapContext.obj \
 	ddl_atomicType.obj \
 	ddl_structType.obj \

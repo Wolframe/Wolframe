@@ -146,6 +146,9 @@ public:
 	///\param[in] indent indentiation for items to print
 	void print( std::ostream& out, size_t indent=0) const;
 
+	///\brief Initialize value (reset) depending on type
+	void init();
+
 private:
 	Type m_type;						//< type of this
 	std::string m_value;					//< value of this
