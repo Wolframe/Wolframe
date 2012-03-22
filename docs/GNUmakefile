@@ -92,4 +92,6 @@ local_uninstall:
 	@-rmdir $(DESTDIR)$(datadir)
 
 check:
-	xmllint --noout --xinclude --postvalid --noent WolfBook.xml
+	xmllint --noout --xinclude --postvalid WolfBook.xml
+	xmllint --noout --xinclude --postvalid wolframe.conf-man.xml
+	xmllint --noout --xinclude --postvalid wolframed-man.xml
