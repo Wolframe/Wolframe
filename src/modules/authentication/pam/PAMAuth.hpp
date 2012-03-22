@@ -81,16 +81,18 @@ public:
 	~PAMAuthenticator();
 	virtual const char* typeName() const		{ return "PAMAuth"; }
 
+	AuthenticatorSlice* authSlice()		{ return NULL; }
+
 private:
 	// name of the PAM service
 	std::string		m_service;
-	
+
 	// PAM internal data structure
 	struct pam_conv		m_conv;
-	
+
 	// our void * for PAM data
 	pam_appdata		m_appdata;
-	
+
 	// states of the authenticator state machine
 	enum {
 		_Wolframe_PAM_STATE_NEED_LOGIN,

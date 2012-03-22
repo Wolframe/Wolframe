@@ -71,6 +71,7 @@ public:
 	~TextFileAuthenticator();
 	virtual const char* typeName() const		{ return "TextFileAuth"; }
 
+	AuthenticatorSlice* authSlice()		{ return NULL; }
 private:
 	std::string		m_file;
 };

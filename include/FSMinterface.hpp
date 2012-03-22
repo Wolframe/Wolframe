@@ -39,30 +39,45 @@
 
 #include <cstddef>
 
+namespace _Wolframe {
+
 /// Finite State Machine operation
 class FSMoperation
 {
 public:
+	enum Operation	{
+		READ,
+		WRITE,
+		CLOSE
+	};
 };
 
 class FSMinterface
 {
 public:
 	enum FSMsignal	{
-
+		TIMEOUT,
+		TERMINATE,
+		END_OF_FILE,
+		CANCELLED,
+		BROKEN_PIPE,
+		UNKNOWN_ERROR
 	};
 
-	/// Signal the incoming data. buffer is the buffer given to the read operation
-	virtual void getData( const void* data, std::size_t size ) = 0;
+	/// The input data.
+	virtual void receiveData( const void* data, std::size_t size ) = 0;
 
-	/// What should the network do next.
+	/// What should be done next.
 	virtual const FSMoperation nextOperation() = 0;
 
-	/// A timeout timer has fired.
-	virtual void timeout( unsigned short /*id*/ = 0 )	{}
-
-	/// A signal was received from outside.
+	/// signal the FSM
 	virtual void signal( FSMsignal /*event*/ )		{}
+
+	/// Data not consumed.
+	virtual std::size_t dataLeft( const void*& begin ) = 0;
+
 };
+
+} // namespace _Wolframe
 
 #endif // _FSM_INTERFACE_HPP_INCLUDED

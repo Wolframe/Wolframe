@@ -60,6 +60,12 @@ public:
 	StandardAuthenticator();
 	~StandardAuthenticator();
 	void close();
+
+	// From the FSM interface
+	void receiveData( const void* data, std::size_t size );
+	const FSMoperation nextOperation();
+	void signal( FSMsignal event );
+	std::size_t dataLeft( const void*& begin );
 private:
 };
 

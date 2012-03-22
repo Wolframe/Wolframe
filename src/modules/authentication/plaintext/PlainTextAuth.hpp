@@ -71,6 +71,8 @@ public:
 	~PlainTextAuthenticator();
 	virtual const char* typeName() const		{ return "PlainTextAuth"; }
 
+	AuthenticatorSlice* authSlice()		{ return NULL; }
+
 private:
 	std::string		m_file;
 };
