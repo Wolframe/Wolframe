@@ -246,6 +246,50 @@ Filter::Filter( const char* name)
 #endif
 }
 
+bool Form::getValue( const char* name, std::string& val) const
+{
+	const ddl::StructType* st = m_struct.get();
+	if (!st) return false;
+	if (st->contentType() != ddl::StructType::Struct) return false;
+	ddl::StructType::Map::const_iterator aa=st->find( name);
+	if (aa == st->end() || aa->second.contentType() != ddl::StructType::Atomic) return false;
+	if (!aa->second.value().get( val)) return false;
+	return true;
+}
+
+bool Form::setValue( const char* name, const std::string& val)
+{
+	ddl::StructType* st = m_struct.get();
+	if (!st) return false;
+	if (st->contentType() != ddl::StructType::Struct) return false;
+	ddl::StructType::Map::iterator aa=st->find( name);
+	if (aa == st->end() || aa->second.contentType() != ddl::StructType::Atomic) return false;
+	if (!aa->second.value().set( val)) return false;
+	return true;
+}
+
+bool Form::getValue( const std::size_t idx, std::string& val) const
+{
+	const ddl::StructType* st = m_struct.get();
+	if (!st) return false;
+	if (st->contentType() != ddl::StructType::Vector || idx >st->size()) return false;
+	ddl::StructType::Map::const_iterator aa = st->begin() + idx;
+	if (!(aa < st->end()) || aa->second.contentType() != ddl::StructType::Atomic) return false;
+	if (!aa->second.value().get( val)) return false;
+	return true;
+}
+
+bool Form::setValue( const std::size_t idx, const std::string& val)
+{
+	ddl::StructType* st = m_struct.get();
+	if (!st) return false;
+	if (st->contentType() != ddl::StructType::Vector || idx >st->size()) return false;
+	ddl::StructType::Map::iterator aa = st->begin() + idx;
+	if (!(aa < st->end()) || aa->second.contentType() != ddl::StructType::Atomic) return false;
+	if (!aa->second.value().set( val)) return false;
+	return true;
+}
+
 Output::ItemType Output::print( const char* tag, unsigned int tagsize, const char* val, unsigned int valsize)
 {
 	if (!m_outputfilter.get())

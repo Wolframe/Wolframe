@@ -41,8 +41,9 @@ namespace _Wolframe {
 namespace langbind {
 
 ///\class TransactionCommandWriter
-///\brief Writer class for a transaction command source
-///\remark Used as interface for serialization of a form to a transaction command source
+///\brief Writer class for a transaction command
+///\remark Used as interface for serialization of a form to a transaction command
+///\remark Because serialization is not stream processing this output filter is buffering
 class TransactionCommandWriter :public protocol::OutputFilter
 {
 public:
@@ -50,7 +51,7 @@ public:
 	explicit TransactionCommandWriter()
 		:protocol::OutputFilter(){}
 	///\brief Copy constructor
-	TransactionCommandWriter( const TransactionWriter& o)
+	TransactionCommandWriter( const TransactionCommandWriter& o)
 		:protocol::OutputFilter(o),m_content(o.m_content){}
 	///\brief Destructor
 	virtual ~TransactionCommandWriter(){}
@@ -63,7 +64,7 @@ protected:
 
 ///\class TransactionCommandWriterFactory
 ///\brief Factory for a transaction command writer
-struct TransactionCommandWriterFactory
+struct TransactionOutputFilter
 {
 	TransactionCommandWriterFactory(){}
 	virtual ~TransactionCommandWriterFactory(){}
@@ -71,8 +72,8 @@ struct TransactionCommandWriterFactory
 };
 
 ///\class TransactionResultReader
-///\brief Reader class for a transaction command result
-///\remark Used as interface for deserialization of a transaction command result into a form
+///\brief Reader class for a transaction result
+///\remark Used as interface for deserialization of a transaction result into a form
 class TransactionResultReader :public protocol::InputFilter
 {
 public:
@@ -113,13 +114,13 @@ public:
 	///\param[in] h Command handler definition for this transaction function
 	///\param[in] w transaction command writer
 	///\param[in] r transaction result reader (parser)
-	TransactionFunction( protocol::CommandBase h, const TransactionCommandWriterBase& w, const TransactionResultReaderBase& r)
-		:m_cmdreader(r),m_cmdwriter(w),m_transactionCmdHandlerBase(h){}
+	TransactionFunction( protocol::CommandBase h, const protocol::OutputFilter* cmdwriter_, const protocol::InputFilter* cmdreader_)
+		:m_cmdreader(cmdreader_),m_cmdwriter(cmdwriter_),m_cmd(h){}
 
 	///\brief Copy constructor
 	///\param[in] o transaction function to copy
 	TransactionFunction( const TransactionFunction& o)
-		:m_cmdreader(o.m_cmdreader),m_cmdwriter(o.m_cmdwriter),m_transactionCmdHandlerBase(o.m_transactionCmdHandlerBase){}
+		:m_cmdreader(o.m_cmdreader),m_cmdwriter(o.m_cmdwriter),m_cmd(o.m_cmd){}
 
 	///\brief Destructor
 	virtual ~DirectmapCommandHandler() {}
@@ -130,9 +131,9 @@ public:
 	virtual CallResult call( const char*& err);
 
 private:
-	TransactionResultReaderBase m_cmdreaderbase;
-	TransactionCommandWriterBase m_cmdwriterbase;
-	protocol::CommandBase m_transactionCmdHandlerBase;
+	const protocol::InputFilter* m_cmdreader;
+	const protocol::OutputFilter* m_cmdwriter;
+	protocol::CommandBase m_cmd;
 };
 
 }}//namespace

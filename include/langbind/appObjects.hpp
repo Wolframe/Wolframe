@@ -36,6 +36,7 @@ Project Wolframe.
 #define _Wolframe_langbind_APPOBJECTS_HPP_INCLUDED
 #include "protocol/outputfilter.hpp"
 #include "protocol/inputfilter.hpp"
+#include "ddl/structType.hpp"
 #include <stack>
 #include <string>
 
@@ -124,7 +125,7 @@ struct Filter
 	///\param [in] name case sensitive name of the variable
 	///\param [in] val the value returned
 	///\return true on success, false, if the variable does not exist or the operation failed
-	bool getValue( const char* name, std::string& val)
+	bool getValue( const char* name, std::string& val) const
 	{
 		if (m_inputfilter.get() && m_inputfilter->getValue( name, val)) return true;
 		if (m_outputfilter.get() && m_outputfilter->getValue( name, val)) return true;
@@ -141,6 +142,50 @@ struct Filter
 		if (m_outputfilter.get() && m_outputfilter->setValue( name, value)) return true;
 		return false;
 	}
+};
+
+struct Form
+{
+	ddl::StructTypeR m_struct;
+
+	///\brief Default constructor
+	Form() {}
+
+	///\brief Copy constructor
+	///\param[in] o copied item
+	Form( const Form& o)
+		:m_struct(o.m_struct){}
+	///\brief Constructor
+	///\param[in] st form data
+	Form( const ddl::StructTypeR& st)
+		:m_struct(st){}
+
+	///\brief Destructor
+	~Form(){}
+
+	///\brief Get an atomic member value of the form
+	///\param [in] name case sensitive name of the member
+	///\param [in] val the value returned
+	///\return true on success, false, if the member does not exist or is not atomic
+	bool getValue( const char* name, std::string& val) const;
+
+	///\brief Set an atomic member value of the form
+	///\param [in] name case sensitive name of the member
+	///\param [in] val new value of the member to set
+	///\return true on success, false, if the member does not exist or is not atomic or the passed value is out of range
+	bool setValue( const char* name, const std::string& val);
+
+	///\brief Get an atomic member value of the form that is a vector
+	///\param [in] idx index of the vector element
+	///\param [in] val the value returned
+	///\return true on success, false, if the member does not exist or is not atomic
+	bool getValue( const std::size_t idx, std::string& val) const;
+
+	///\brief Set an atomic member value of the form
+	///\param [in] name case sensitive name of the member
+	///\param [in] val new value of the member to set
+	///\return true on success, false, if the member does not exist or is not atomic or the passed value is out of range
+	bool setValue( const std::size_t idx, const std::string& val);
 };
 
 ///\class InputFilterClosure

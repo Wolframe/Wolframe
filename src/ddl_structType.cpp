@@ -91,6 +91,18 @@ StructType::Map::const_iterator StructType::end() const
 	return m_elem.end();
 }
 
+StructType::Map::iterator StructType::begin()
+{
+	if (m_contentType == Atomic) throw std::logic_error( "defined as atomic");
+	return (m_contentType == Vector)?(m_elem.begin()+1):m_elem.begin();
+}
+
+StructType::Map::iterator StructType::end()
+{
+	if (m_contentType == Atomic) throw std::logic_error( "defined as atomic");
+	return m_elem.end();
+}
+
 AtomicType& StructType::value()
 {
 	REQUIRE(Atomic);

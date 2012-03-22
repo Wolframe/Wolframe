@@ -30,7 +30,7 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file serialize/struct/luamapBase.hpp
-///\brief Defines the non intrusive base class of serialization for the lua map
+///\brief Defines the non intrusive base class of serialization of structures for the lua map
 
 #ifndef _Wolframe_SERIALIZE_STRUCT_LUAMAP_BASE_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_LUAMAP_BASE_HPP_INCLUDED

@@ -41,6 +41,7 @@ Project Wolframe.
 #include <cstddef>
 #include <boost/lexical_cast.hpp>
 #include "ddl/atomicType.hpp"
+#include "countedReference.hpp"
 
 namespace _Wolframe {
 namespace ddl {
@@ -114,6 +115,16 @@ public:
 	///\remark [precondition] this must not be of type (ContentType) Atomic
 	///\return the end iterator
 	Map::const_iterator end() const;
+
+	///\brief Get the begin marker iterator on the elements of this
+	///\remark [precondition] this must not be of type (ContentType) Atomic
+	///\return the begin iterator
+	Map::iterator begin();
+
+	///\brief Get the end marker iterator on the elements of this
+	///\remark [precondition] this must not be of type (ContentType) Atomic
+	///\return the end iterator
+	Map::iterator end();
 
 	///\brief Get the value of this as an atomic type
 	///\remark [precondition] this must be of type (ContentType) Atomic
@@ -190,6 +201,7 @@ public:
 	///\brief Reset the value
 	void clear();
 
+	std::size_t size() const			{return m_elem.size();}
 private:
 	///\brief Assert a type precondition of this. (throws an logic_error exception on failure)
 	///\remark Used for checking the preconditions mentioned as remark [precondition]
@@ -200,6 +212,11 @@ private:
 	Map m_elem;
 	std::size_t m_nof_attributes;
 };
+
+///\typedef StructTypeR
+///\brief Shared struct type reference
+typedef CountedReference<StructType> StructTypeR;
+
 
 }}//namespace
 #endif

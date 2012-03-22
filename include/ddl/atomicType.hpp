@@ -89,16 +89,16 @@ public:
 		{
 			switch (m_type)
 			{
-				case double_:	assign<double,T>( val); break;
-				case float_:	assign<float,T>( val); break;
-				case long_:	assign<long,T>( val); break;
-				case ulong_:	assign<unsigned long,T>( val); break;
-				case int_:	assign<int,T>( val); break;
-				case uint_:	assign<unsigned int,T>( val); break;
-				case short_:	assign<short,T>( val); break;
-				case ushort_:	assign<unsigned short,T>( val); break;
-				case char_:	assign<unsigned char,T>( val); break;
-				case string_:	boost::lexical_cast<std::string>( val); break;
+				case double_:	assign<double,T>( val); return true;
+				case float_:	assign<float,T>( val); return true;
+				case long_:	assign<long,T>( val); return true;
+				case ulong_:	assign<unsigned long,T>( val); return true;
+				case int_:	assign<int,T>( val); return true;
+				case uint_:	assign<unsigned int,T>( val); return true;
+				case short_:	assign<short,T>( val); return true;
+				case ushort_:	assign<unsigned short,T>( val); return true;
+				case char_:	assign<unsigned char,T>( val); return true;
+				case string_:	boost::lexical_cast<std::string>( val); return true;
 			}
 
 		}
@@ -114,11 +114,12 @@ public:
 	///\param[out] val element retrieved
 	///\return true on success, false if the type check fails or on overflow
 	template <typename T>
-	bool get( T& val)
+	bool get( T& val) const
 	{
 		try
 		{
 			val = boost::lexical_cast<T>( m_value);
+			return true;
 		}
 		catch ( const boost::bad_lexical_cast&)
 		{
