@@ -101,4 +101,28 @@ void StandardAuthenticator::close()
 	delete this;
 }
 
+// The FSM interface functions
+// The input data.
+void StandardAuthenticator::receiveData( const void* /*data*/, std::size_t /*size*/ )
+{
+}
+
+// What should be done next.
+const FSMoperation StandardAuthenticator::nextOperation()
+{
+	FSMoperation	op;
+	return op;
+}
+
+// signal the FSM
+void StandardAuthenticator::signal( FSMsignal /*event*/ )
+{
+}
+
+// Data not consumed.
+std::size_t StandardAuthenticator::dataLeft( const void*& /*begin*/ )
+{
+	return 0;
+}
+
 }} // namespace _Wolframe::AAAA

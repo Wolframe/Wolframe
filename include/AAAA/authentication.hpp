@@ -41,20 +41,31 @@
 #include <string>
 
 #include "database/DBprovider.hpp"
+#include "FSMinterface.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
 
-// interface for all authentication mechanisms
-class Authenticator {
+// interface for the authentication global mechanism
+class Authenticator : public _Wolframe::FSMinterface
+{
 public:
-	virtual ~Authenticator( ) { }
+	virtual ~Authenticator()	{}
 
 	// close the authenticator and destroy all
 	// sensible data
-	virtual void close( ) { }
+	virtual void close()		{}
 };
 
+
+/// AuthenticatorSlice
+/// This is the base class for authenticator slices implementations
+/// An authenticator has (usually) several authenticator sliced
+class AuthenticatorSlice : public _Wolframe::FSMinterface
+{
+public:
+	virtual ~AuthenticatorSlice()	{}
+};
 
 /// AuthenticationUnit Unit
 /// This is the base class for authentication unit implementations
@@ -65,6 +76,8 @@ public:
 
 	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ )
 					{ return true; }
+
+	virtual AuthenticatorSlice* authSlice() = 0;
 };
 
 }} // namespace _Wolframe::AAAA

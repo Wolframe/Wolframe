@@ -63,7 +63,7 @@ public:
 	void print( std::ostream& os, size_t indent ) const;
 	void setCanonicalPathes( const std::string& referencePath );
 private:
-	std::string		m_service;	
+	std::string		m_service;
 	std::string		m_confPath;
 };
 
@@ -76,10 +76,12 @@ public:
 	~SaslAuthenticator();
 	virtual const char* typeName() const		{ return "SaslAuth"; }
 
+	AuthenticatorSlice* authSlice()		{ return NULL; }
+
 private:
 	// registered name of the service, should maybe be fixed (or default to) 'wolframe'
-	std::string		m_service;	
-	
+	std::string		m_service;
+
 	// a SASL configuration path for optional config (overridding system-wide one)
 	std::string		m_confPath;
 };
