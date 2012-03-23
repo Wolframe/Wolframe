@@ -18,14 +18,6 @@ ABa:
   - wolframed is build over and over again. mix of real and phony
     target because of parallel builds and dependencies. don't know
     how to solve it
-  - warning LNK4006: __NULL_IMPORT_DESCRIPTOR in src (because we
-    link the library and the executable twice with library dependencies,
-    we should link only the resulting binary, this is exactly the
-    opposite of shared libraries on Unix)
-- Windows:
-  - username, password for service credentials
-  - clean up native Win32 string mess in service code
-  - log when service gets installed and uninstalled
 - Logger:
   - get better interface in logger.hpp (inheriting basic::ostream
     instead of templating? or boost streams or boost:log)
@@ -35,6 +27,9 @@ ABa:
   - OSC
     - Debian release (squeeze/sid) into deb package name
     - OSC revision and build number in deb package name
+  - Windows
+    - read XML properties during change/repair
+    - custom actions need C merge modules
 
 PF:
 
