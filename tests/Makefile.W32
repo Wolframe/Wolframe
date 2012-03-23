@@ -51,7 +51,23 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 	Advapi32.lib Ws2_32.lib \
-	$(TOPDIR)\gtest\gtest-all.obj
+	$(TOPDIR)\gtest\gtest-all.obj \
+	$(TOPDIR)\src\libwolframe\wolframe.lib
+
+# libxml2
+!IFDEF WITH_LIBXML2
+
+INCLUDE_CXXFLAGS = \
+	$(INCLUDE_CXXFLAGS) /DWITH_LIBXML2
+
+INCLUDE_DIRS = \
+	$(INCLUDE_DIRS) /I. /I"$(LIBXML2_DIR)\include" /I"$(LIBXML2_DIR)\include\libxml" \
+	/I"$(WIN_ICONV_DIR)"
+
+INCLUDE_LIBS = \
+	$(INCLUDE_LIBS) "$(LIBXML2_DIR)\lib\libxml2.lib"
+	
+!ENDIF
 
 TEST_CPP_BINS = \
 	threadLeakTest.exe \
