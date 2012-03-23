@@ -207,7 +207,7 @@ protected:
 			name = "UNKNOWN ERROR";
 			break;
 		}
-		m_connHandler->errorOccured( ns );
+		m_connHandler->signalOccured( ns );
 		LOG_DATA << "Signalled " << name << " to processor for connection to " << identifier();
 	}
 
@@ -249,7 +249,7 @@ protected:
 	void handleTimeout( const boost::system::error_code& e )
 	{
 		if ( !e )	{
-			m_connHandler->timeoutOccured();
+			m_connHandler->signalOccured( ConnectionHandler::TIMEOUT_OCCURED );
 			LOG_DEBUG << "Timeout on connection to " << identifier();
 
 			nextOperation();
@@ -281,10 +281,11 @@ protected:
 
 
 	/// Handle a signal from above
+	/// For now we handle only terminate
 	void handleSignal()
 	{
 		LOG_TRACE << "Signal received for connection to " << identifier();
-		m_connHandler->signalOccured();
+		m_connHandler->signalOccured( ConnectionHandler::TERMINATE );
 
 		nextOperation();
 	}

@@ -24,9 +24,7 @@ namespace _Wolframe {
 		void setPeer( const net::RemoteEndpoint& remote );
 
 		void networkInput( const void *begin, std::size_t bytesTransferred );
-		void timeoutOccured();
-		void signalOccured();
-		void errorOccured( NetworkSignal );
+		void signalOccured( NetworkSignal );
 
 		/// Handle a request and produce a reply.
 		const net::NetworkOperation nextOperation();

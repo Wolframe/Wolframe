@@ -419,17 +419,7 @@ void Connection::networkInput( const void* bytes, std::size_t nofBytes)
 		data->networkInput( bytes, nofBytes);
 }
 
-void Connection::timeoutOccured()
-{
-		data->signalTerminate();
-}
-
-void Connection::signalOccured()
-{
-		data->signalTerminate();
-}
-
-void Connection::errorOccured( NetworkSignal )
+void Connection::signalOccured( NetworkSignal )
 {
 		data->signalTerminate();
 }
