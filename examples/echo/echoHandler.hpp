@@ -34,7 +34,7 @@ namespace _Wolframe {
 			HELLO_SENT,
 			READ_INPUT,
 			OUTPUT_MSG,
-			TIMEOUT,
+			TIMEOUT_OCCURED,
 			SIGNALLED,
 			TERMINATING,
 			FINISHED

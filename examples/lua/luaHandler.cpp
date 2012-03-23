@@ -346,7 +346,7 @@ void luaConnection::signalOccured( NetworkSignal signal )
 {
 	const char *signal_s;
 
-	if ( signal == TIMEOUT_OCCURED )	{
+	if ( signal == TIMEOUT )	{
 		LOG_TRACE << "Processor received timeout";
 
 	// 5.1 -> 5.2

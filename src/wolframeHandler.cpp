@@ -234,7 +234,7 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 			}
 		}
 
-	case TIMEOUT:	{
+	case TIMEOUT_OCCURED:	{
 		m_state = TERMINATING;
 		return net::NetworkOperation( net::SendString( "Timeout. :P\n" ));
 	}
@@ -281,8 +281,8 @@ void wolframeConnection::signalOccured( NetworkSignal signal )
 			LOG_TRACE << "Processor received termination signal";
 			break;
 
-		case TIMEOUT_OCCURED:
-			m_state = TIMEOUT;
+		case TIMEOUT:
+			m_state = TIMEOUT_OCCURED;
 			LOG_TRACE << "Processor received timeout signal";
 			break;
 

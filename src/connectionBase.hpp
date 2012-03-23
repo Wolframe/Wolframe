@@ -249,7 +249,7 @@ protected:
 	void handleTimeout( const boost::system::error_code& e )
 	{
 		if ( !e )	{
-			m_connHandler->signalOccured( ConnectionHandler::TIMEOUT_OCCURED );
+			m_connHandler->signalOccured( ConnectionHandler::TIMEOUT );
 			LOG_DEBUG << "Timeout on connection to " << identifier();
 
 			nextOperation();

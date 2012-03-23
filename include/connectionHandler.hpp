@@ -127,7 +127,7 @@ private:
 
 public:
 	enum NetworkSignal	{
-		TIMEOUT_OCCURED,
+		TIMEOUT,
 		TERMINATE,
 		END_OF_FILE,
 		OPERATION_CANCELLED,

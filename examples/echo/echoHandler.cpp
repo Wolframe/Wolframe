@@ -143,7 +143,7 @@ const net::NetworkOperation echoConnection::nextOperation()
 			}
 		}
 
-	case TIMEOUT:	{
+	case TIMEOUT_OCCURED:	{
 		state_ = TERMINATING;
 		return net::NetworkOperation( net::SendString( "Timeout. :P\n" ));
 	}
@@ -178,8 +178,8 @@ void echoConnection::networkInput( const void*, std::size_t bytesTransferred )
 void echoConnection::signalOccured( NetworkSignal signal )
 {
 	switch( signal )	{
-		case TIMEOUT_OCCURED:
-			state_ = TIMEOUT;
+		case TIMEOUT:
+			state_ = TIMEOUT_OCCURED;
 			LOG_TRACE << "Processor received timeout signal";
 			break;
 
