@@ -75,7 +75,6 @@ public:
 
 	/// Data not consumed.
 	virtual std::size_t dataLeft( const void*& begin ) = 0;
-
 };
 
 } // namespace _Wolframe

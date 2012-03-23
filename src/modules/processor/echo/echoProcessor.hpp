@@ -49,6 +49,11 @@ public:
 	~EchoProcessor()				{}
 	const char* typeName() const			{ return "EchoProcessor"; }
 	void close()					{}
+
+	void receiveData( const void* data, std::size_t size );
+	const FSMoperation nextOperation();
+	void signal( FSMsignal event );
+	std::size_t dataLeft( const void*& begin );
 };
 
 
