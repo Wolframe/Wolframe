@@ -81,6 +81,21 @@ QT_DIR = D:\Qt\4.7.2
 PGSQL_DIR = D:\Program Files\PostgreSQL\9.0
 #PGSQL_DIR = C:\cygwin\home\Andreas\postgresql-9.0.4-win64-debug
 
+# win_iconv
+###########
+
+WIN_ICONV_DIR = D:\cygwin\home\Andreas Baumann\win-iconv-0.0.3-win32
+
+# libxml2
+#########
+
+LIBXML2_DIR = D:\cygwin\home\Andreas Baumann\libxml2-2.7.8-win32
+
+# libxslt
+#########
+
+LIBXSLT_DIR = D:\cygwin\home\Andreas Baumann\libxslt-1.1.26-win32
+
 # Tcl 8.5 and Expect
 ####################
 
