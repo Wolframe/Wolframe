@@ -10,7 +10,8 @@ INCLUDE_CXXFLAGS = \
 
 INCLUDE_DIRS = \
 	/I. \
-	/I"$(PLATFORM_SDK_DIR)\Include"
+	/I"$(PLATFORM_SDK_DIR)\Include" \
+	/I..\include
 
 # Note: libraries are picked automatically on Windows!
 # TODO: better probing and correct library path based on Arch and
