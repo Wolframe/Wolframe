@@ -79,7 +79,7 @@ private:
 class XmlLiteFilter :public Filter
 {
 public:
-	XmlLiteFilter( const char*){}
+	XmlLiteFilter( ){}
 };
 
 Filter XmlLiteFilterFactory::create( const char*) const

@@ -44,7 +44,7 @@ class MSXMLFilterFactory :public FilterFactory
 public:
 	MSXMLFilterFactory(){}
 	virtual ~MSXMLFilterFactory(){}
-	virtual FilterBase create( const char* encoding) const;
+	virtual Filter create( const char* encoding) const;
 };
 
 }}//namespace

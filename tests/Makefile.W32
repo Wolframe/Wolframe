@@ -22,7 +22,7 @@ SUBDIRS = \
 
 !IFDEF WITH_LIBHARU
 SUBDIRS = \
-	$(SUBDIRS) libnaru
+	$(SUBDIRS) libharu
 !ENDIF
 
 # MSXML

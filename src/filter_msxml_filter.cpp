@@ -70,7 +70,7 @@ private:
 class MSXMLFilter :public Filter
 {
 public:
-	MSXMLFilter( const char*){}
+	MSXMLFilter( ){}
 };
 
 Filter MSXMLFilterFactory::create( const char*) const
