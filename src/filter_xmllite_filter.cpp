@@ -14,7 +14,7 @@
 // TODO: make it streamable
 
 using namespace _Wolframe;
-using namespace filter;
+using namespace langbind;
 
 namespace {
 
@@ -76,8 +76,15 @@ private:
 
 }//end anonymous namespace
 
-
-XmlLiteFilter::XmlLiteFilter( std::size_t bufsize)
+class XmlLiteFilter :public Filter
 {
+public:
+	XmlLiteFilter( const char*){}
+};
+
+Filter XmlLiteFilterFactory::create( const char*) const
+{
+	return XmlLiteFilter();
 }
+
 

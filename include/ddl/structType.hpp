@@ -213,11 +213,6 @@ private:
 	std::size_t m_nof_attributes;
 };
 
-///\typedef StructTypeR
-///\brief Shared struct type reference
-typedef CountedReference<StructType> StructTypeR;
-
-
 }}//namespace
 #endif
 

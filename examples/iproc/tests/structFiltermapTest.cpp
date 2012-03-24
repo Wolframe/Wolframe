@@ -58,14 +58,14 @@ struct Plant
 	unsigned int availability;
 
 	Plant() :zone(0),availability(0){}
-	static const DescriptionBase* getDescription();
+	static const FiltermapDescriptionBase* getFiltermapDescription();
 };
 
 struct Phone
 {
 	std::string number;
 	std::string mobile;
-	static const DescriptionBase* getDescription();
+	static const FiltermapDescriptionBase* getFiltermapDescription();
 };
 
 struct Address
@@ -76,7 +76,7 @@ struct Address
 	Phone phone;
 
 	Address() :country(0){}
-	static const DescriptionBase* getDescription();
+	static const FiltermapDescriptionBase* getFiltermapDescription();
 };
 
 struct Garden
@@ -86,18 +86,18 @@ struct Garden
 	std::vector<Plant> plants;
 
 	Garden() {}
-	static const DescriptionBase* getDescription();
+	static const FiltermapDescriptionBase* getFiltermapDescription();
 };
 
 struct Places
 {
 	std::vector<Garden> gardens;
-	static const DescriptionBase* getDescription();
+	static const FiltermapDescriptionBase* getFiltermapDescription();
 };
 
-const DescriptionBase* Plant::getDescription()
+const FiltermapDescriptionBase* Plant::getFiltermapDescription()
 {
-	struct ThisDescription :public Description<Plant>
+	struct ThisDescription :public FiltermapDescription<Plant>
 	{
 		ThisDescription()
 		{
@@ -117,9 +117,9 @@ const DescriptionBase* Plant::getDescription()
 }
 
 
-const DescriptionBase* Phone::getDescription()
+const FiltermapDescriptionBase* Phone::getFiltermapDescription()
 {
-	struct ThisDescription :public Description<Phone>
+	struct ThisDescription :public FiltermapDescription<Phone>
 	{
 		ThisDescription()
 		{
@@ -134,9 +134,9 @@ const DescriptionBase* Phone::getDescription()
 	return &rt;
 }
 
-const DescriptionBase* Address::getDescription()
+const FiltermapDescriptionBase* Address::getFiltermapDescription()
 {
-	struct ThisDescription :public Description<Address>
+	struct ThisDescription :public FiltermapDescription<Address>
 	{
 		ThisDescription()
 		{
@@ -153,9 +153,9 @@ const DescriptionBase* Address::getDescription()
 	return &rt;
 }
 
-const DescriptionBase* Garden::getDescription()
+const FiltermapDescriptionBase* Garden::getFiltermapDescription()
 {
-	struct ThisDescription :public Description<Garden>
+	struct ThisDescription :public FiltermapDescription<Garden>
 	{
 		ThisDescription()
 		{
@@ -170,9 +170,9 @@ const DescriptionBase* Garden::getDescription()
 	return &rt;
 }
 
-const DescriptionBase* Places::getDescription()
+const FiltermapDescriptionBase* Places::getFiltermapDescription()
 {
-	struct ThisDescription :public Description<Places>
+	struct ThisDescription :public FiltermapDescription<Places>
 	{
 		ThisDescription()
 		{
@@ -188,9 +188,14 @@ const DescriptionBase* Places::getDescription()
 template <class Struct>
 static int run( const char* root, const std::string& input, std::string& output)
 {
-	langbind::Filter filter( "xml:textwolf");
-	protocol::InputFilter* in = filter.m_inputfilter.get();
-	protocol::OutputFilter* out = filter.m_outputfilter.get();
+	langbind::Filter filter;
+	if (!langbind::GlobalContext().getFilter( "xml:textwolf", filter))
+	{
+		std::cerr << "cannot load filter" << std::endl;
+		return 1;
+	}
+	protocol::InputFilter* in = filter.inputfilter().get();
+	protocol::OutputFilter* out = filter.outputfilter().get();
 
 	if (!in)
 	{
@@ -204,7 +209,7 @@ static int run( const char* root, const std::string& input, std::string& output)
 	}
 	Struct object;
 	Context ctx;
-	const DescriptionBase* ds = Struct::getDescription();
+	const FiltermapDescriptionBase* ds = Struct::getFiltermapDescription();
 
 	in->protocolInput( (void*)input.c_str(), input.size(), true);
 	if (!ds->parse( root, (void*)&object, *in, ctx))

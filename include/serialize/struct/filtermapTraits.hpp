@@ -52,7 +52,7 @@ struct vector_ {};		///< category tag for a std::vector of any type
 struct arithmetic_ {};		///< category tag for a type that is convertible from a string through boost::lexical_cast
 struct bool_ {};		///< category tag for a boolean type
 
-///\brief conditional template for detecting if a type is a class with a static/member method getDescription() returning a const pointer to a structure description as defined in config/descriptionBase.hpp
+///\brief conditional template for detecting if a type is a class with a static/member method getFiltermapDescription() returning a const pointer to a structure description as defined in serialize/filtermapBase.hpp
 /// see http://drdobbs.com/article/print?articleId=227500449&siteSectionName= "Checking Concept Without Concepts in C++"
 template<typename T,bool is_class_type=boost::is_class<T>::value>
 struct has_description_method: boost::false_type {};
@@ -63,17 +63,17 @@ struct has_description_method_noprm
 	typedef char small_type;
 	struct large_type {small_type dummy[2];};
 
-	template<const DescriptionBase* (T::*)()> struct tester_member_signature;
-	template<const DescriptionBase* (*)()> struct tester_static_signature;
+	template<const FiltermapDescriptionBase* (T::*)()> struct tester_member_signature;
+	template<const FiltermapDescriptionBase* (*)()> struct tester_static_signature;
 
 	template<typename U>
-	static small_type has_matching_member(tester_member_signature<&U::getDescription>*);
+	static small_type has_matching_member(tester_member_signature<&U::getFiltermapDescription>*);
 	template<typename U>
-	static small_type has_matching_member(tester_static_signature<&U::getDescription>*);
+	static small_type has_matching_member(tester_static_signature<&U::getFiltermapDescription>*);
 	template<typename U>
 	static large_type has_matching_member(...);
 
-	///\brief value with the boolean property corresponding has getDescription static/member method without paramater
+	///\brief value with the boolean property corresponding has getFiltermapDescription static/member method without paramater
 	static const bool value=sizeof(has_matching_member<T>(0))==sizeof(small_type);
 };
 
@@ -91,7 +91,7 @@ typename boost::enable_if_c<
 	,const vector_&>::type getCategory( const T&) { static vector_ rt; return rt;}
 
 ///\brief get category struct_ for a type
-/// returns struct_ if T has a method description with no params returning a const pointer to a config::DescriptionBase
+/// returns struct_ if T has a method description with no params returning a const pointer to a serialize::FiltermapDescriptionBase
 template <typename T>
 typename boost::enable_if_c<
 	has_description_method<T>::value

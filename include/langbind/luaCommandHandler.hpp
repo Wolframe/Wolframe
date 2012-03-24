@@ -51,7 +51,7 @@ class LuaCommandHandler :public protocol::IOFilterCommandHandler
 public:
 	///\class Context
 	///\brief Execution context of the command handler
-	struct Context;
+	struct InterpreterContext;
 
 	///\brief Constructor
 	///\param[in] env reference to the read only environment of this application processor
@@ -69,14 +69,15 @@ public:
 	lua_State* getLuaState() const;
 
 private:
-	const LuaCommandEnvironment* m_env;	///< reference to static environment
+	const LuaCommandEnvironment* m_env;	//< reference to static environment
 	struct Globals
 	{
 		Input m_input;
 		Output m_output;
 	};
 	Globals m_globals;
-	Context* m_context;			///< execution context of the command handler
+	InterpreterContext* m_interp;		//< interpreter execution context of the command handler
+
 };
 
 }}//namespace

@@ -37,7 +37,7 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace serialize;
 
-bool DescriptionBase::parse( const char* name, void* obj, protocol::InputFilter& in, Context& ctx) const
+bool FiltermapDescriptionBase::parse( const char* name, void* obj, protocol::InputFilter& in, Context& ctx) const
 {
 	protocol::InputFilter* inp = 0;
 	bool rt = true;
@@ -119,7 +119,7 @@ bool DescriptionBase::parse( const char* name, void* obj, protocol::InputFilter&
 	return rt;
 }
 
-bool DescriptionBase::print( const char* name, const void* obj, protocol::OutputFilter& out, Context& ctx) const
+bool FiltermapDescriptionBase::print( const char* name, const void* obj, protocol::OutputFilter& out, Context& ctx) const
 {
 	protocol::OutputFilter* oo = 0;
 	bool rt = true;

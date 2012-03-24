@@ -59,7 +59,7 @@ static void setLuaError( Context* ctx, lua_State* ls, int tagIndex, const char* 
 template <typename T>
 static bool parseObject_( void* obj, const struct_&, lua_State* ls, Context* ctx)
 {
-	static const DescriptionBase* descr = T::getDescription();
+	static const LuamapDescriptionBase* descr = T::getLuamapDescription();
 	
 	if (!lua_istable( ls, -1))
 	{
@@ -77,7 +77,7 @@ static bool parseObject_( void* obj, const struct_&, lua_State* ls, Context* ctx
 			setLuaError( ctx, ls, -5, "string expected as key for struct in table instead of ", lua_typename( ls, lua_type( ls, -1)));
 			return false;
 		}
-		DescriptionBase::Map::const_iterator itr = descr->find( key);
+		LuamapDescriptionBase::Map::const_iterator itr = descr->find( key);
 
 		if (itr == descr->end())
 		{

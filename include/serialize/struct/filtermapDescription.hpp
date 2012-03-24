@@ -58,25 +58,25 @@ static const char* getTypename()
 	return typ;
 }
 
-///\class Description
-///\brief Intrusive configuration description
+///\class FiltermapDescription
+///\brief Intrusive description of a filter/form map
 ///\tparam Structure structure that is represented by this description
 template <class Structure>
-struct Description :public DescriptionBase
+struct FiltermapDescription :public FiltermapDescriptionBase
 {
 	///\brief Operator to build the configuration structure element by element
 	///\tparam Element element type
 	///\param[in] name name of the element
 	///\param[in] eptr pointer to member of the element
 	template <typename Element>
-	Description& operator()( const char* name, Element Structure::*eptr)
+	FiltermapDescription& operator()( const char* name, Element Structure::*eptr)
 	{
-		DescriptionBase::Parse parse_ = &IntrusiveParser<Element>::parse;
-		DescriptionBase::Print print_ = &IntrusivePrinter<Element>::print;
-		DescriptionBase::IsAtomic isAtomic_ = &IntrusiveParser<Element>::isAtomic;
+		FiltermapDescriptionBase::Parse parse_ = &IntrusiveParser<Element>::parse;
+		FiltermapDescriptionBase::Print print_ = &IntrusivePrinter<Element>::print;
+		FiltermapDescriptionBase::IsAtomic isAtomic_ = &IntrusiveParser<Element>::isAtomic;
 
 		std::size_t pp = (std::size_t)&(((Structure*)0)->*eptr);
-		DescriptionBase e( getTypename<Element>(), pp, sizeof(Element), isAtomic_, parse_, print_);
+		FiltermapDescriptionBase e( getTypename<Element>(), pp, sizeof(Element), isAtomic_, parse_, print_);
 		if (find( name) != end())
 		{
 			LOG_ERROR << "duplicate definition of " << name << " in structure";
@@ -85,14 +85,14 @@ struct Description :public DescriptionBase
 		return *this;
 	}
 
-	Description& operator--(int)
+	FiltermapDescription& operator--(int)
 	{
 		defineEndOfAttributes();
 		return *this;
 	}
 
-	Description()
-		:DescriptionBase( getTypename<Structure>(), 0, sizeof(Structure), &IntrusiveParser<Structure>::isAtomic, &IntrusiveParser<Structure>::parse, &IntrusivePrinter<Structure>::print){}
+	FiltermapDescription()
+		:FiltermapDescriptionBase( getTypename<Structure>(), 0, sizeof(Structure), &IntrusiveParser<Structure>::isAtomic, &IntrusiveParser<Structure>::parse, &IntrusivePrinter<Structure>::print){}
 };
 
 }}// end namespace

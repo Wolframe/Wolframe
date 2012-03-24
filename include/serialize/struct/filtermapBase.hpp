@@ -45,21 +45,21 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-class DescriptionBase
+class FiltermapDescriptionBase
 {
 public:
-	typedef std::vector<std::pair<const char*,DescriptionBase> > Map;
+	typedef std::vector<std::pair<const char*,FiltermapDescriptionBase> > Map;
 	typedef bool (*Parse)( const char* tag, void* obj, protocol::InputFilter& flt, Context& ctx, bool isinit);
 	typedef bool (*Print)( const char* tag, const void* obj, protocol::OutputFilter*& out, Context& ctx);
 	typedef bool (*IsAtomic)();
 	Parse parse() const {return m_parse;}
 	Print print() const {return m_print;}
 
-	DescriptionBase( const char* tn, std::size_t os, std::size_t sz, IsAtomic ia, Parse pa, Print pr)
+	FiltermapDescriptionBase( const char* tn, std::size_t os, std::size_t sz, IsAtomic ia, Parse pa, Print pr)
 		:m_typename(tn),m_ofs(os),m_size(sz),m_nof_attributes(std::numeric_limits<std::size_t>::max()),m_isAtomic(ia),m_parse(pa),m_print(pr){}
-	DescriptionBase( const DescriptionBase& o)
+	FiltermapDescriptionBase( const FiltermapDescriptionBase& o)
 		:m_typename(o.m_typename),m_ofs(o.m_ofs),m_size(o.m_size),m_nof_attributes(o.m_nof_attributes),m_elem(o.m_elem),m_isAtomic(o.m_isAtomic),m_parse(o.m_parse),m_print(o.m_print){}
-	DescriptionBase()
+	FiltermapDescriptionBase()
 		:m_typename(0),m_ofs(0),m_size(0),m_nof_attributes(std::numeric_limits<std::size_t>::max()),m_isAtomic(0),m_parse(0),m_print(0){}
 
 	bool parse( const char* name, void* obj, protocol::InputFilter& in, Context& ctx) const;
@@ -92,9 +92,9 @@ public:
 	Map::const_iterator begin() const {return m_elem.begin();}
 	Map::const_iterator end() const {return m_elem.end();}
 
-	void define( const char* name, const DescriptionBase& dd)
+	void define( const char* name, const FiltermapDescriptionBase& dd)
 	{
-		m_elem.push_back( std::pair<const char*,DescriptionBase>(name,dd));
+		m_elem.push_back( std::pair<const char*,FiltermapDescriptionBase>(name,dd));
 	}
 
 	std::size_t nof_attributes() const

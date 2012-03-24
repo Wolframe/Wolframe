@@ -10,7 +10,7 @@
 //#include <whateverMSXML...>
 
 using namespace _Wolframe;
-using namespace filter;
+using namespace langbind;
 
 namespace {
 
@@ -67,8 +67,15 @@ private:
 
 }//end anonymous namespace
 
-
-MSXMLFilter::MSXMLFilter( std::size_t bufsize)
+class MSXMLFilter :public Filter
 {
+public:
+	MSXMLFilter( const char*){}
+};
+
+Filter MSXMLFilterFactory::create( const char*) const
+{
+	return MSXMLFilter();
 }
+
 

@@ -88,23 +88,27 @@ int main( int argc, char **argv )
 
 	if (boost::iequals( filternameIn, filternameOut))
 	{
-		flt = langbind::Filter( filternameIn.c_str());
+		if (!langbind::GlobalContext().getFilter( filternameIn.c_str(), flt))
+		{
+			std::cerr << "unknown filter " << filternameIn << std::endl;
+			return 1;
+		}
 	}
 	else
 	{
-		langbind::Filter in( filternameIn.c_str());
-		langbind::Filter out( filternameOut.c_str());
-		flt = langbind::Filter( in.m_inputfilter, out.m_outputfilter);
-	}
-	if (!flt.m_inputfilter.get())
-	{
-		std::cerr << "unknown input filter " << filternameIn << std::endl;
-		return 1;
-	}
-	if (!flt.m_outputfilter.get())
-	{
-		std::cerr << "unknown output filter " << filternameOut << std::endl;
-		return 2;
+		langbind::Filter in;
+		langbind::Filter out;
+		if (!langbind::GlobalContext().getFilter( filternameIn.c_str(), in))
+		{
+			std::cerr << "unknown input filter " << filternameIn << std::endl;
+			return 1;
+		}
+		if (!langbind::GlobalContext().getFilter( filternameOut.c_str(), out))
+		{
+			std::cerr << "unknown output filter " << filternameOut << std::endl;
+			return 2;
+		}
+		flt = langbind::Filter( in.inputfilter(), out.outputfilter());
 	}
 	char* inputBuffer = new char[ inputBufferSize];
 	char* outputBuffer = new char[ outputBufferSize];
@@ -115,7 +119,7 @@ int main( int argc, char **argv )
 
 	READ_INPUT:
 	{
-		if (flt.m_inputfilter.get()->gotEoD())
+		if (flt.inputfilter().get()->gotEoD())
 		{
 			goto TERMINATE;
 		}
@@ -124,30 +128,30 @@ int main( int argc, char **argv )
 		{
 			++pp;
 		}
-		flt.m_inputfilter.get()->protocolInput( inputBuffer, pp, pp < inputBufferSize);
+		flt.inputfilter().get()->protocolInput( inputBuffer, pp, pp < inputBufferSize);
 		goto PROCESS_READ;
 	}
 	WRITE_OUTPUT:
 	{
-		std::size_t pp = 0, ee=flt.m_outputfilter.get()->pos();
+		std::size_t pp = 0, ee=flt.outputfilter().get()->pos();
 		while (pp < ee && 1 == fwrite( outputBuffer+pp, sizeof(char), 1, stdout))
 		{
 			++pp;
 		}
-		flt.m_outputfilter.get()->init( outputBuffer, outputBufferSize);
+		flt.outputfilter().get()->init( outputBuffer, outputBufferSize);
 		goto PROCESS_WRITE;
 	}
 	PROCESS_READ:
 	{
-		if (!flt.m_inputfilter.get()->getNext( &elementType, elementBuffer, sizeof(elementBuffer), &elementBufferPos))
+		if (!flt.inputfilter().get()->getNext( &elementType, elementBuffer, sizeof(elementBuffer), &elementBufferPos))
 		{
-			switch (flt.m_inputfilter.get()->state())
+			switch (flt.inputfilter().get()->state())
 			{
 				case protocol::InputFilter::EndOfMessage:
 				{
-					if (flt.m_inputfilter.get()->size())
+					if (flt.inputfilter().get()->size())
 					{
-						flt.m_inputfilter.get()->setState( protocol::InputFilter::Error, "Buffer too small");
+						flt.inputfilter().get()->setState( protocol::InputFilter::Error, "Buffer too small");
 						goto ERROR_READ;
 					}
 					else
@@ -158,10 +162,10 @@ int main( int argc, char **argv )
 				case protocol::InputFilter::Error: goto ERROR_READ;
 				case protocol::InputFilter::Open:
 				{
-					protocol::InputFilter* follow = flt.m_inputfilter->createFollow();
+					protocol::InputFilter* follow = flt.inputfilter()->createFollow();
 					if (follow)
 					{
-						flt.m_inputfilter.reset( follow);
+						flt.inputfilter().reset( follow);
 						goto PROCESS_READ;
 					}
 					else
@@ -175,9 +179,9 @@ int main( int argc, char **argv )
 	PROCESS_WRITE:
 	{
 		protocol::OutputFilter::ElementType tt = (protocol::OutputFilter::ElementType) elementType;
-		if (!flt.m_outputfilter.get()->print( tt, elementBuffer, elementBufferPos))
+		if (!flt.outputfilter().get()->print( tt, elementBuffer, elementBufferPos))
 		{
-			switch (flt.m_outputfilter.get()->state())
+			switch (flt.outputfilter().get()->state())
 			{
 				case protocol::OutputFilter::EndOfBuffer:
 				{
@@ -186,10 +190,10 @@ int main( int argc, char **argv )
 				case protocol::OutputFilter::Error: goto ERROR_WRITE;
 				case protocol::OutputFilter::Open:
 				{
-					protocol::OutputFilter* follow = flt.m_outputfilter->createFollow();
+					protocol::OutputFilter* follow = flt.outputfilter()->createFollow();
 					if (follow)
 					{
-						flt.m_outputfilter.reset( follow);
+						flt.outputfilter().reset( follow);
 						goto PROCESS_WRITE;
 					}
 					else
@@ -217,15 +221,15 @@ int main( int argc, char **argv )
 	}
 	ERROR_READ:
 	{
-		std::cerr << "Error in input: '" << flt.m_inputfilter.get()->getError() << "'" << std::endl;
+		std::cerr << "Error in input: '" << flt.inputfilter().get()->getError() << "'" << std::endl;
 		goto TERMINATE;
 	}
 	ERROR_WRITE:
-		std::cerr << "Error in output: '" << flt.m_outputfilter.get()->getError() << "'" << std::endl;
+		std::cerr << "Error in output: '" << flt.outputfilter().get()->getError() << "'" << std::endl;
 		goto TERMINATE;
 	TERMINATE:
 	{
-		std::size_t pp = 0, ee=flt.m_outputfilter.get()->pos();
+		std::size_t pp = 0, ee=flt.outputfilter().get()->pos();
 		while (pp < ee && 1 == fwrite( outputBuffer+pp, sizeof(char), 1, stdout)) ++pp;
 		delete [] inputBuffer;
 		delete [] outputBuffer;

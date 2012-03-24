@@ -34,31 +34,18 @@ Project Wolframe.
 
 #ifndef _Wolframe_TEXTWOLF_FILTER_XML_HPP_INCLUDED
 #define _Wolframe_TEXTWOLF_FILTER_XML_HPP_INCLUDED
-#include "protocol/inputfilter.hpp"
-#include "protocol/outputfilter.hpp"
-#include <string>
-#include <cstddef>
+#include "filter.hpp"
 
 namespace _Wolframe {
-namespace filter {
+namespace langbind {
 
-///\class TextwolfXmlFilter
-class TextwolfXmlFilter
+class TextwolfXmlFilterFactory :public FilterFactory
 {
 public:
-	TextwolfXmlFilter( std::size_t elementbufsize, std::size_t tagbufsize);
-
-	///\remark creates only a output filter of the filter, because input should be determined always by the XML header
-	TextwolfXmlFilter( std::size_t elementbufsize, std::size_t tagbufsize, const char* encoding);
-
-	protocol::InputFilterR inputFilter() const	{return m_inputFilter;}
-	protocol::OutputFilterR outputFilter() const	{return m_outputFilter;}
-
-private:
-	protocol::InputFilterR m_inputFilter;
-	protocol::OutputFilterR m_outputFilter;
+	TextwolfXmlFilterFactory(){}
+	virtual ~TextwolfXmlFilterFactory(){}
+	virtual Filter create( const char* encoding) const;
 };
-
 
 }}//namespace
 #endif

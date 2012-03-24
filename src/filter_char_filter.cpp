@@ -39,7 +39,7 @@ Project Wolframe.
 #include <cstddef>
 
 using namespace _Wolframe;
-using namespace filter;
+using namespace langbind;
 
 namespace {
 
@@ -154,49 +154,62 @@ private:
 }//end anonymous namespace
 
 
-CharFilter::CharFilter( const char *encoding)
+struct CharFilter :public Filter
 {
-	TextwolfEncoding::Id te = TextwolfEncoding::getId( encoding);
-	switch (te)
+	CharFilter()
 	{
-		case TextwolfEncoding::Unknown:
-			break;
-		case TextwolfEncoding::IsoLatin:
-			m_inputFilter.reset( new InputFilterImpl<textwolf::charset::IsoLatin1>());
-			m_outputFilter.reset( new OutputFilterImpl<textwolf::charset::IsoLatin1>());
-			break;
-		case TextwolfEncoding::UTF8:
-			m_inputFilter.reset( new InputFilterImpl<textwolf::charset::UTF8>());
-			m_outputFilter.reset( new OutputFilterImpl<textwolf::charset::UTF8>());
-			break;
-		case TextwolfEncoding::UTF16:
-			m_inputFilter.reset( new InputFilterImpl<textwolf::charset::UTF16BE>());
-			m_outputFilter.reset( new OutputFilterImpl<textwolf::charset::UTF16BE>());
-			break;
-		case TextwolfEncoding::UTF16BE:
-			m_inputFilter.reset( new InputFilterImpl<textwolf::charset::UTF16BE>());
-			m_outputFilter.reset( new OutputFilterImpl<textwolf::charset::UTF16BE>());
-			break;
-		case TextwolfEncoding::UTF16LE:
-			m_inputFilter.reset( new InputFilterImpl<textwolf::charset::UTF16LE>());
-			m_outputFilter.reset( new OutputFilterImpl<textwolf::charset::UTF16LE>());
-			break;
-		case TextwolfEncoding::UCS2BE:
-			m_inputFilter.reset( new InputFilterImpl<textwolf::charset::UCS2BE>());
-			m_outputFilter.reset( new OutputFilterImpl<textwolf::charset::UCS2BE>());
-			break;
-		case TextwolfEncoding::UCS2LE:
-			m_inputFilter.reset( new InputFilterImpl<textwolf::charset::UCS2LE>());
-			m_outputFilter.reset( new OutputFilterImpl<textwolf::charset::UCS2LE>());
-			break;
-		case TextwolfEncoding::UCS4BE:
-			m_inputFilter.reset( new InputFilterImpl<textwolf::charset::UCS4BE>());
-			m_outputFilter.reset( new OutputFilterImpl<textwolf::charset::UCS4BE>());
-			break;
-		case TextwolfEncoding::UCS4LE:
-			m_inputFilter.reset( new InputFilterImpl<textwolf::charset::UCS4LE>());
-			m_outputFilter.reset( new OutputFilterImpl<textwolf::charset::UCS4LE>());
-			break;
+		m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF8>());
+		m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UTF8>());
 	}
+	CharFilter( const char *encoding)
+	{
+		TextwolfEncoding::Id te = TextwolfEncoding::getId( encoding);
+		switch (te)
+		{
+			case TextwolfEncoding::Unknown:
+				break;
+			case TextwolfEncoding::IsoLatin:
+				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::IsoLatin1>());
+				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::IsoLatin1>());
+				break;
+			case TextwolfEncoding::UTF8:
+				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF8>());
+				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UTF8>());
+				break;
+			case TextwolfEncoding::UTF16:
+				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF16BE>());
+				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UTF16BE>());
+				break;
+			case TextwolfEncoding::UTF16BE:
+				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF16BE>());
+				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UTF16BE>());
+				break;
+			case TextwolfEncoding::UTF16LE:
+				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF16LE>());
+				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UTF16LE>());
+				break;
+			case TextwolfEncoding::UCS2BE:
+				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UCS2BE>());
+				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UCS2BE>());
+				break;
+			case TextwolfEncoding::UCS2LE:
+				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UCS2LE>());
+				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UCS2LE>());
+				break;
+			case TextwolfEncoding::UCS4BE:
+				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UCS4BE>());
+				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UCS4BE>());
+				break;
+			case TextwolfEncoding::UCS4LE:
+				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UCS4LE>());
+				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UCS4LE>());
+				break;
+		}
+	}
+};
+
+Filter CharFilterFactory::create( const char* encoding) const
+{
+	return CharFilter( encoding);
 }
 

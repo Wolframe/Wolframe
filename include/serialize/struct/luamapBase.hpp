@@ -50,18 +50,18 @@ extern "C"
 namespace _Wolframe {
 namespace serialize {
 
-class DescriptionBase
+class LuamapDescriptionBase
 {
 public:
-	typedef std::vector<std::pair<const char*,DescriptionBase> > Map;
+	typedef std::vector<std::pair<const char*,LuamapDescriptionBase> > Map;
 	typedef bool (*Parse)( void* obj, lua_State* ls, Context* ctx);
 	typedef bool (*Print)( const void* obj, lua_State* ls, Context* ctx);
 	Parse parse() const {return m_parse;}
 	Print print() const {return m_print;}
 
-	DescriptionBase( const char* tn, std::size_t os, std::size_t sz, Parse pa, Print pr)
+	LuamapDescriptionBase( const char* tn, std::size_t os, std::size_t sz, Parse pa, Print pr)
 		:m_typename(tn),m_ofs(os),m_size(sz),m_parse(pa),m_print(pr){}
-	DescriptionBase( const DescriptionBase& o)
+	LuamapDescriptionBase( const LuamapDescriptionBase& o)
 		:m_typename(o.m_typename),m_ofs(o.m_ofs),m_size(o.m_size),m_elem(o.m_elem),m_parse(o.m_parse),m_print(o.m_print){}
 
 	void parse( void* obj, lua_State* ls) const;
@@ -89,9 +89,9 @@ public:
 	Map::const_iterator begin() const {return m_elem.begin();}
 	Map::const_iterator end() const {return m_elem.end();}
 
-	void define( const char* name, const DescriptionBase& dd)
+	void define( const char* name, const LuamapDescriptionBase& dd)
 	{
-		m_elem.push_back( std::pair<const char*,DescriptionBase>(name,dd));
+		m_elem.push_back( std::pair<const char*,LuamapDescriptionBase>(name,dd));
 	}
 private:
 	const char* m_typename;

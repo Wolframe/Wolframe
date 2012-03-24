@@ -57,18 +57,18 @@ static const char* getTypename()
 	return typ;
 }
 
-///\class Description
-///\brief Intrusive configuration description
+///\class LuamapDescription
+///\brief Intrusive description of a filter/luatable serialization
 ///\tparam Structure structure that is represented by this description
 template <class Structure>
-struct Description :public DescriptionBase
+struct LuamapDescription :public LuamapDescriptionBase
 {
 	///\brief Operator to build the configuration structure element by element
 	///\tparam Element element type
 	///\param[in] name name of the element
 	///\param[in] eptr pointer to member of the element
 	template <typename Element>
-	Description& operator()( const char* name, Element Structure::*eptr)
+	LuamapDescription& operator()( const char* name, Element Structure::*eptr)
 	{
 		// :73:15: error: variable ‘typ’ set but not used [-Werror=unused-but-set-variable]
 		// removed 'typ', again not sure here..
@@ -78,11 +78,11 @@ struct Description :public DescriptionBase
 		}
 		catch (std::bad_typeid)
 		{}
-		DescriptionBase::Parse parse_ = &IntrusiveParser<Element>::parse;
-		DescriptionBase::Print print_ = &IntrusivePrinter<Element>::print;
+		LuamapDescriptionBase::Parse parse_ = &IntrusiveParser<Element>::parse;
+		LuamapDescriptionBase::Print print_ = &IntrusivePrinter<Element>::print;
 
 		std::size_t pp = (std::size_t)&(((Structure*)0)->*eptr);
-		DescriptionBase e( getTypename<Element>(), pp, sizeof(Element), parse_, print_);
+		LuamapDescriptionBase e( getTypename<Element>(), pp, sizeof(Element), parse_, print_);
 		if (find( name) != end())
 		{
 			LOG_ERROR << "duplicate definition of " << name << " in structure";
@@ -90,8 +90,8 @@ struct Description :public DescriptionBase
 		define( name, e);
 		return *this;
 	}
-	Description()
-		:DescriptionBase( getTypename<Structure>(), 0, sizeof(Structure), &IntrusiveParser<Structure>::parse, &IntrusivePrinter<Structure>::print){}
+	LuamapDescription()
+		:LuamapDescriptionBase( getTypename<Structure>(), 0, sizeof(Structure), &IntrusiveParser<Structure>::parse, &IntrusivePrinter<Structure>::print){}
 };
 
 }}// end namespace

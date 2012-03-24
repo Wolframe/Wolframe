@@ -34,8 +34,7 @@ Project Wolframe.
 
 #ifndef _Wolframe_langbind_APPOBJECTS_HPP_INCLUDED
 #define _Wolframe_langbind_APPOBJECTS_HPP_INCLUDED
-#include "protocol/outputfilter.hpp"
-#include "protocol/inputfilter.hpp"
+#include "filter.hpp"
 #include "ddl/structType.hpp"
 #include <stack>
 #include <string>
@@ -43,8 +42,37 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
+///\class FilterMap
+///\brief Map of available filter seen from scripting language binding
+class FilterMap
+{
+public:
+	FilterMap();
+	template <class FilterFactoryClass>
+	void defineFilter( const char* name, const FilterFactoryClass& f)
+	{
+		std::string nam( name);
+		std::transform( nam.begin(), nam.end(), nam.begin(), (int(*)(int)) std::tolower);
+		m_map[ std::string(nam)] = new FilterFactoryClass(f);
+	}
+	bool getFilter( const char* arg, Filter& rt);
+private:
+	std::map<std::string,FilterFactory*> m_map;
+};
+
+///\class GlobalContext
+///\brief Reference to all available processing resources seen from scripting language binding
+class GlobalContext :public FilterMap
+{
+public:
+	GlobalContext(){}
+};
+
+typedef CountedReference<GlobalContext> GlobalContextR;
+
+
 ///\class Output
-///\brief Output as seen from scripting language
+///\brief Output as seen from scripting language binding
 struct Output
 {
 	///\enum ItemType
@@ -71,7 +99,10 @@ struct Output
 	///\return state returned
 	ItemType print( const char* e1, unsigned int e1size, const char* e2, unsigned int e2size);
 
-public:
+	const protocol::OutputFilterR& outputfilter() const		{return m_outputfilter;}
+	protocol::OutputFilterR& outputfilter()				{return m_outputfilter;}
+
+protected:
 	protocol::OutputFilterR m_outputfilter;	///< output filter reference
 
 private:
@@ -82,8 +113,6 @@ private:
 ///\brief input as seen from the application processor program
 struct Input
 {
-	protocol::InputFilterR m_inputfilter;	///< input is defined by the associated input filter
-
 	///\brief Constructor
 	Input(){}
 	///\brief Copy constructor
@@ -91,101 +120,31 @@ struct Input
 	Input( const Input& o) :m_inputfilter(o.m_inputfilter){}
 	///\brief Destructor
 	~Input(){}
+
+	const protocol::InputFilterR& inputfilter() const		{return m_inputfilter;}
+	protocol::InputFilterR& inputfilter()				{return m_inputfilter;}
+protected:
+	protocol::InputFilterR m_inputfilter;			///< input is defined by the associated input filter
 };
 
-///\class Filter
-///\brief input/output filter as seen from the application processor program
-struct Filter
+struct DDLForm
 {
-	protocol::OutputFilterR m_outputfilter;		///< output filter
-	protocol::InputFilterR m_inputfilter;		///< input filter
-
-	///\brief Constructor
-	///\param[in] name name of the filter as defined in the system
-	Filter( const char* name);
+	ddl::StructType m_struct;
 
 	///\brief Default constructor
-	Filter(){}
+	DDLForm() {}
 
 	///\brief Copy constructor
 	///\param[in] o copied item
-	Filter( const Filter& o)
-		:m_outputfilter(o.m_outputfilter)
-		,m_inputfilter(o.m_inputfilter){}
-	///\brief Constructor
-	///\param[in] fi input filter
-	///\param[in] fo output filter
-	Filter( const protocol::InputFilterR& fi, const protocol::OutputFilterR& fo)
-		:m_outputfilter(fo)
-		,m_inputfilter(fi){}
-	///\brief Destructor
-	~Filter(){}
-
-	///\brief Get a member value of the filter
-	///\param [in] name case sensitive name of the variable
-	///\param [in] val the value returned
-	///\return true on success, false, if the variable does not exist or the operation failed
-	bool getValue( const char* name, std::string& val) const
-	{
-		if (m_inputfilter.get() && m_inputfilter->getValue( name, val)) return true;
-		if (m_outputfilter.get() && m_outputfilter->getValue( name, val)) return true;
-		return false;
-	}
-
-	///\brief Set a member value of the filter
-	///\param [in] name case sensitive name of the variable
-	///\param [in] value new value of the variable to set
-	///\return true on success, false, if the variable does not exist or the operation failed
-	bool setValue( const char* name, const std::string& value)
-	{
-		if (m_inputfilter.get() && m_inputfilter->setValue( name, value)) return true;
-		if (m_outputfilter.get() && m_outputfilter->setValue( name, value)) return true;
-		return false;
-	}
-};
-
-struct Form
-{
-	ddl::StructTypeR m_struct;
-
-	///\brief Default constructor
-	Form() {}
-
-	///\brief Copy constructor
-	///\param[in] o copied item
-	Form( const Form& o)
+	DDLForm( const DDLForm& o)
 		:m_struct(o.m_struct){}
 	///\brief Constructor
 	///\param[in] st form data
-	Form( const ddl::StructTypeR& st)
+	DDLForm( const ddl::StructType& st)
 		:m_struct(st){}
 
 	///\brief Destructor
-	~Form(){}
-
-	///\brief Get an atomic member value of the form
-	///\param [in] name case sensitive name of the member
-	///\param [in] val the value returned
-	///\return true on success, false, if the member does not exist or is not atomic
-	bool getValue( const char* name, std::string& val) const;
-
-	///\brief Set an atomic member value of the form
-	///\param [in] name case sensitive name of the member
-	///\param [in] val new value of the member to set
-	///\return true on success, false, if the member does not exist or is not atomic or the passed value is out of range
-	bool setValue( const char* name, const std::string& val);
-
-	///\brief Get an atomic member value of the form that is a vector
-	///\param [in] idx index of the vector element
-	///\param [in] val the value returned
-	///\return true on success, false, if the member does not exist or is not atomic
-	bool getValue( const std::size_t idx, std::string& val) const;
-
-	///\brief Set an atomic member value of the form
-	///\param [in] name case sensitive name of the member
-	///\param [in] val new value of the member to set
-	///\return true on success, false, if the member does not exist or is not atomic or the passed value is out of range
-	bool setValue( const std::size_t idx, const std::string& val);
+	~DDLForm(){}
 };
 
 ///\class InputFilterClosure
@@ -259,6 +218,14 @@ private:
 	std::size_t m_bufsize;					///< allocation size of m_buf
 	std::size_t m_bufpos;					///< number of bytes filled in m_buf
 	std::size_t m_taglevel;					///< current level in tag hierarchy
+};
+
+class AppContext
+{
+public:
+private:
+	std::map<std::string,Filter> m_filtermap;
+	std::map<std::string,DDLForm> m_formmap;
 };
 
 }}//namespace
