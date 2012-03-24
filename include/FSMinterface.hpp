@@ -71,11 +71,10 @@ public:
 	virtual const FSMoperation nextOperation() = 0;
 
 	/// signal the FSM
-	virtual void signal( FSMsignal /*event*/ )		{}
+	virtual void signal( FSMsignal /*event*/ )	{}
 
 	/// Data not consumed.
 	virtual std::size_t dataLeft( const void*& begin ) = 0;
-
 };
 
 } // namespace _Wolframe

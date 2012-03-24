@@ -105,5 +105,26 @@ EchoProcessorUnit::EchoProcessorUnit()
 	MOD_LOG_DEBUG << "Echo processor unit created";
 }
 
+
+//***  Processor ********************************************************
+void EchoProcessor::receiveData( const void* /*data*/, std::size_t /*size*/ )
+{
+}
+
+const FSMoperation EchoProcessor::nextOperation()
+{
+	FSMoperation	op;
+	return op;
+}
+
+void EchoProcessor::signal( FSMsignal /*event*/ )
+{
+}
+
+std::size_t EchoProcessor::dataLeft( const void*& /*begin*/ )
+{
+	return 0;
+}
+
 } // namespace _Wolframe
 

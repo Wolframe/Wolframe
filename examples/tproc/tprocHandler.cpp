@@ -258,21 +258,9 @@ void Connection::networkInput( const void* dt, std::size_t nofBytes)
 	m_cmdhandler.putInput( dt, nofBytes);
 }
 
-void Connection::timeoutOccured()
-{
-	LOG_TRACE << "Got timeout";
-	m_terminated = true;
-}
-
-void Connection::signalOccured()
+void Connection::signalOccured( NetworkSignal)
 {
 	LOG_TRACE << "Got signal";
-	m_terminated = true;
-}
-
-void Connection::errorOccured( NetworkSignal)
-{
-	LOG_TRACE << "Got error";
 	m_terminated = true;
 }
 

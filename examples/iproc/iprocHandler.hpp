@@ -68,12 +68,8 @@ public:
 	///\remark Begin is ignored because it points always to the same block as given by the read network message
 	virtual void networkInput( const void *begin, std::size_t bytesTransferred);
 
-	///\brief Indicate that a timeout has occurred and the connection will be terminated
-	virtual void timeoutOccured();
-	///\brief Indicate that a signal has occurred and the connection will be terminated
-	virtual void signalOccured();
-	///\brief Indicate that an unrecoverable error has occurred and the connection will be terminated
-	virtual void errorOccured( NetworkSignal);
+	///\brief Indicate that an unrecoverable error, a timeout or a terminate signal has occurred and the connection will be terminated
+	virtual void signalOccured( NetworkSignal);
 
 private:
 	///\enum State

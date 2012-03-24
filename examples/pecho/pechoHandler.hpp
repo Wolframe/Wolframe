@@ -58,9 +58,7 @@ namespace pecho {
       virtual const Operation nextOperation();
       virtual void networkInput( const void *begin, std::size_t bytesTransferred);
 
-      virtual void timeoutOccured();
-      virtual void signalOccured();
-      virtual void errorOccured( NetworkSignal);
+      virtual void signalOccured( NetworkSignal);
 
    public:
       struct Private;

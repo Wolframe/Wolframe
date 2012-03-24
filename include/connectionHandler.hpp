@@ -127,6 +127,8 @@ private:
 
 public:
 	enum NetworkSignal	{
+		TIMEOUT,
+		TERMINATE,
 		END_OF_FILE,
 		OPERATION_CANCELLED,
 		BROKEN_PIPE,
@@ -140,14 +142,9 @@ public:
 	/// What should the network do next.
 	virtual const NetworkOperation nextOperation() = 0;
 
-	/// Timeout timer was fired.
-	virtual void timeoutOccured()			{}
 
-	/// A signal was received from outside.
-	virtual void signalOccured()			{}
-
-	/// An error network occured
-	virtual void errorOccured( NetworkSignal )	{}
+	/// A network error, timeout or signal occured
+	virtual void signalOccured( NetworkSignal )	{}
 
 	/// Set the remote peer. The connection is up now.
 	virtual void setPeer( const RemoteEndpoint& remote ) = 0;

@@ -195,7 +195,7 @@ modules: libwolframe
 wolframed.exe: wolframed.obj $(CPP_OBJS) libwolframe\logger\wolframemsg.res
 
 $(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
-	$(LINK) /lib /nologo /out:$@ $(STATIC_LDFLAGS) $(LIBS) $?
+	$(LINK) /lib /nologo /out:$@ $(STATIC_LDFLAGS) $?
 
 local_all: $(LOCAL_STATIC_LIB) loadModules-dummy.obj
 

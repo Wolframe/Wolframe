@@ -43,7 +43,7 @@ namespace _Wolframe {
 namespace proc {
 
 /// base class for Wolframe channel processors
-class Processor
+class Processor : public FSMinterface
 {
 public:
 	enum FSMsignal	{
@@ -55,6 +55,17 @@ public:
 	virtual void close() = 0;
 };
 
+
+/// base class for Wolframe channel processor slices
+class ProcessorSlice
+{
+public:
+	virtual ~ProcessorSlice()		{}
+
+	virtual void close() = 0;
+};
+
+
 /// Processor Unit
 /// This is the base class for processor unit implementations
 class ProcessorUnit
@@ -64,6 +75,7 @@ public:
 
 	// temporary
 	virtual Processor* processor() const = 0;
+//	virtual ProcessorSlice* slice() const = 0;
 };
 
 }} // namespace _Wolframe::proc

@@ -99,21 +99,10 @@ void Connection::networkInput( const void* dt, std::size_t nofBytes)
 	}
 }
 
-void Connection::timeoutOccured()
-{
-	LOG_TRACE << "Got timeout";
-	m_state = Terminate;
-}
 
-void Connection::signalOccured()
+void Connection::signalOccured( NetworkSignal)
 {
 	LOG_TRACE << "Got signal";
-	m_state = Terminate;
-}
-
-void Connection::errorOccured( NetworkSignal)
-{
-	LOG_TRACE << "Got error";
 	m_state = Terminate;
 }
 

@@ -84,6 +84,21 @@ PGSQL_DIR = C:\cygwin\home\Andreas Baumann\postgresql-9.1.3-win32-debug
 # enable depending on libintl.dll and libiconv.dll (deployment only)
 PGDLL_WITHOUT_MAJOR_VERSION = 1
 
+# win_iconv
+###########
+
+WIN_ICONV_DIR = C:\cygwin\home\Andreas Baumann\win-iconv-0.0.3-win32-debug
+
+# libxml2
+#########
+
+LIBXML2_DIR = C:\cygwin\home\Andreas Baumann\libxml2-2.7.8-win32-debug
+
+# libxslt
+#########
+
+LIBXSLT_DIR = C:\cygwin\home\Andreas Baumann\libxslt-1.1.26-win32-debug
+
 # Tcl 8.5 and Expect
 ####################
 

@@ -342,76 +342,75 @@ void luaConnection::networkInput( const void *begin, std::size_t bytesTransferre
 	}
 }
 
-void luaConnection::timeoutOccured()
-{
-	LOG_TRACE << "Processor received timeout";
-
-// 5.1 -> 5.2
-//	lua_pushstring( l, "timeout_occured" );
-//	lua_gettable( l, LUA_GLOBALSINDEX );
-	lua_getglobal( l, "timeout_occured" );
-	int res = lua_pcall( l, 0, 0, 0 );
-	if( res != 0 ) {
-		LOG_FATAL << "Unable to call 'timeout_occured' function: " << lua_tostring( l, -1 );
-		lua_pop( l, 1 );
-		throw new std::runtime_error( "Error in LUA processor" );
-	}
-}
-
-void luaConnection::signalOccured()
-{
-	LOG_TRACE << "Processor received signal";
-
-// 5.1 -> 5.2
-//	lua_pushstring( l, "signal_occured" );
-//	lua_gettable( l, LUA_GLOBALSINDEX );
-	lua_getglobal( l, "signal_occured" );
-	int res = lua_pcall( l, 0, 0, 0 );
-	if( res != 0 ) {
-		LOG_FATAL << "Unable to call 'signal_occured' function: " << lua_tostring( l, -1 );
-		lua_pop( l, 1 );
-		throw new std::runtime_error( "Error in LUA processor" );
-	}
-}
-
-void luaConnection::errorOccured( NetworkSignal signal )
+void luaConnection::signalOccured( NetworkSignal signal )
 {
 	const char *signal_s;
 
-	switch( signal ) {
-	case END_OF_FILE:
-		signal_s = "END_OF_FILE";
-		break;
+	if ( signal == TIMEOUT )	{
+		LOG_TRACE << "Processor received timeout";
 
-	case BROKEN_PIPE:
-		signal_s = "BROKEN_PIPE";
-		break;
-
-	case OPERATION_CANCELLED:
-		signal_s = "OPERATION_CANCELLED";
-		break;
-
-	case UNKNOWN_ERROR:
-		signal_s = "UNKNOWN_ERROR";
-		break;
-
-	default:
-		signal_s = "UNKNOWN_ERROR";
-		break;
+	// 5.1 -> 5.2
+	//	lua_pushstring( l, "timeout_occured" );
+	//	lua_gettable( l, LUA_GLOBALSINDEX );
+		lua_getglobal( l, "timeout_occured" );
+		int res = lua_pcall( l, 0, 0, 0 );
+		if( res != 0 ) {
+			LOG_FATAL << "Unable to call 'timeout_occured' function: " << lua_tostring( l, -1 );
+			lua_pop( l, 1 );
+			throw new std::runtime_error( "Error in LUA processor" );
+		}
 	}
+	else if ( signal == TERMINATE )	{
+		LOG_TRACE << "Processor received signal";
 
-	LOG_TRACE << "Got error '" << signal_s << "'";
+	// 5.1 -> 5.2
+	//	lua_pushstring( l, "signal_occured" );
+	//	lua_gettable( l, LUA_GLOBALSINDEX );
+		lua_getglobal( l, "signal_occured" );
+		int res = lua_pcall( l, 0, 0, 0 );
+		if( res != 0 ) {
+			LOG_FATAL << "Unable to call 'signal_occured' function: " << lua_tostring( l, -1 );
+			lua_pop( l, 1 );
+			throw new std::runtime_error( "Error in LUA processor" );
+		}
+	}
+	else	{
 
-// 5.1 -> 5.2
-//	lua_pushstring( l, "error_occured" );
-//	lua_gettable( l, LUA_GLOBALSINDEX );
-	lua_getglobal( l, "error_occured" );
-	lua_pushstring( l, signal_s );
-	int res = lua_pcall( l, 1, 0, 0 );
-	if( res != 0 ) {
-		LOG_FATAL << "Unable to call 'error_occured' function: " << lua_tostring( l, -1 );
-		lua_pop( l, 1 );
-		throw new std::runtime_error( "Error in LUA processor" );
+		switch( signal ) {
+			case END_OF_FILE:
+				signal_s = "END_OF_FILE";
+				break;
+
+			case BROKEN_PIPE:
+				signal_s = "BROKEN_PIPE";
+				break;
+
+			case OPERATION_CANCELLED:
+				signal_s = "OPERATION_CANCELLED";
+				break;
+
+			case UNKNOWN_ERROR:
+				signal_s = "UNKNOWN_ERROR";
+				break;
+
+			default:
+				signal_s = "UNKNOWN_ERROR";
+				break;
+		}
+
+		LOG_TRACE << "Got signal '" << signal_s << "'";
+
+		// 5.1 -> 5.2
+		//	lua_pushstring( l, "error_occured" );
+		//	lua_gettable( l, LUA_GLOBALSINDEX );
+		lua_getglobal( l, "error_occured" );
+		lua_pushstring( l, signal_s );
+		int res = lua_pcall( l, 1, 0, 0 );
+		if( res != 0 ) {
+			LOG_FATAL << "Unable to call 'error_occured' function: " << lua_tostring( l, -1 );
+			lua_pop( l, 1 );
+			throw new std::runtime_error( "Error in LUA processor" );
+		}
 	}
 }
 

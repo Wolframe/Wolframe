@@ -201,7 +201,7 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 
 	case OUTPUT_MSG:
 		if ( !strncmp( "quit", m_dataStart, 4 ))	{
-			m_state = TERMINATE;
+			m_state = TERMINATING;
 			return net::NetworkOperation( net::SendString( "Bye\n" ));
 		}
 		else	{
@@ -220,7 +220,7 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 			// If we got here, no \n was found, we need to read more
 			// or close the connection if the buffer is full
 			if ( m_dataSize >= m_readBuf.size() )	{
-				m_state = TERMINATE;
+				m_state = TERMINATING;
 				return net::NetworkOperation( net::SendString( "Line too long. Bye.\n" ));
 			}
 			else {
@@ -234,22 +234,22 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 			}
 		}
 
-	case TIMEOUT:	{
-		m_state = TERMINATE;
+	case TIMEOUT_OCCURED:	{
+		m_state = TERMINATING;
 		return net::NetworkOperation( net::SendString( "Timeout. :P\n" ));
 	}
 
 	case SIGNALLED:	{
-		m_state = TERMINATE;
+		m_state = TERMINATING;
 		return net::NetworkOperation( net::SendString( "Server is shutting down. :P\n" ));
 	}
 
 	case FORBIDDEN:	{
-		m_state = TERMINATE;
+		m_state = TERMINATING;
 		return net::NetworkOperation( net::SendString( "Access denied.\n" ));
 	}
 
-	case TERMINATE:	{
+	case TERMINATING:	{
 		m_state = FINISHED;
 		return net::NetworkOperation( net::CloseConnection() );
 	}
@@ -272,38 +272,40 @@ void wolframeConnection::networkInput( const void*, std::size_t bytesTransferred
 	m_dataSize += bytesTransferred;
 }
 
-void wolframeConnection::timeoutOccured()
-{
-	m_state = TIMEOUT;
-	LOG_TRACE << "Processor received timeout";
-}
 
-void wolframeConnection::signalOccured()
-{
-	m_state = SIGNALLED;
-	LOG_TRACE << "Processor received signal";
-}
-
-void wolframeConnection::errorOccured( NetworkSignal signal )
+void wolframeConnection::signalOccured( NetworkSignal signal )
 {
 	switch( signal )	{
-	case END_OF_FILE:
-		LOG_TRACE << "Processor received EOF (read on closed connection)";
-		break;
+		case TERMINATE:
+			m_state = SIGNALLED;
+			LOG_TRACE << "Processor received termination signal";
+			break;
 
-	case BROKEN_PIPE:
-		LOG_TRACE << "Processor received BROKEN PIPE (write on closed connection)";
-		break;
+		case TIMEOUT:
+			m_state = TIMEOUT_OCCURED;
+			LOG_TRACE << "Processor received timeout signal";
+			break;
 
-	case OPERATION_CANCELLED:
-		LOG_TRACE << "Processor received OPERATION CANCELED (should have been requested by us)";
-		break;
+		case END_OF_FILE:
+			LOG_TRACE << "Processor received EOF (read on closed connection)";
+			m_state = TERMINATING;
+			break;
 
-	case UNKNOWN_ERROR:
-		LOG_TRACE << "Processor received an UNKNOWN error from the framework";
-		break;
+		case BROKEN_PIPE:
+			LOG_TRACE << "Processor received BROKEN PIPE (write on closed connection)";
+			m_state = TERMINATING;
+			break;
+
+		case OPERATION_CANCELLED:
+			LOG_TRACE << "Processor received OPERATION CANCELED (should have been requested by us)";
+			m_state = TERMINATING;
+			break;
+
+		case UNKNOWN_ERROR:
+			LOG_TRACE << "Processor received an UNKNOWN error from the framework";
+			m_state = TERMINATING;
+			break;
 	}
-	m_state = TERMINATE;
 }
 
 

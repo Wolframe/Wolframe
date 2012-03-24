@@ -23,9 +23,7 @@ namespace _Wolframe {
 		/// input has been consumed.
 		void networkInput( const void *begin, std::size_t bytesTransferred );
 
-		void timeoutOccured();
-		void signalOccured();
-		void errorOccured( NetworkSignal );
+		void signalOccured( NetworkSignal );
 
 		/// Handle a request and produce a reply.
 		const net::NetworkOperation nextOperation();
@@ -36,9 +34,9 @@ namespace _Wolframe {
 			HELLO_SENT,
 			READ_INPUT,
 			OUTPUT_MSG,
-			TIMEOUT,
+			TIMEOUT_OCCURED,
 			SIGNALLED,
-			TERMINATE,
+			TERMINATING,
 			FINISHED
 		};
 
