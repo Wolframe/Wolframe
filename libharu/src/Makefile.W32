@@ -5,21 +5,12 @@ SUBDIRS =
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
 INCLUDE_CXXFLAGS = \
-	/D_WIN32_WINNT=0x504 \
-	/DLUA_COMPAT_MODULE
-
+	/D_WIN32_WINNT=0x504
+	
 INCLUDE_DIRS = \
 	/I. \
 	/I"$(PLATFORM_SDK_DIR)\Include" \
 	/I..\include
-
-# Note: libraries are picked automatically on Windows!
-# TODO: better probing and correct library path based on Arch and
-# platform SDK version
-#SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib\x64"
-SDK_LDFLAGS = /LIBPATH:"$(PLATFORM_SDK_DIR)\lib"
-INCLUDE_LDFLAGS = \
-	$(SDK_LDFLAGS)
 
 INCLUDE_LIBS =
 
@@ -79,14 +70,25 @@ OBJS = \
 	hpdf_xref.obj
 
 LIBRARIES = \
-	haru.lib
+	hpdf.lib
 	
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-lua.lib: $(OBJS)
-	$(LINK) /lib /out:$@ $(STATIC_LDFLAGS) $(LIBS) $?
+# Tons of warnings! Ignore them..
+# disable libpng images for now, must integrate a libpng first
+!IFNDEF DEBUG
+CFLAGS = /MD /W2 /nologo /O2 /EHsc /c $(INCLUDE_DIRS) /DLIBHPDF_HAVE_NOPNGLIB
+!ENDIF
 
-local_all: $(LIBRARIES) $(BINS) 
+# compilation flags and compilers (debug)
+!IFDEF DEBUG
+CFLAGS = /MDd /Zi /W2 /nologo /O2 /EHsc /c $(INCLUDE_DIRS) /DLIBHPDF_HAVE_NOPNGLIB
+!ENDIF
+
+hpdf.lib: $(OBJS)
+	$(LINK) /lib /out:$@ $(STATIC_LDFLAGS) $?
+
+local_all: $(LIBRARIES)
 
 local_clean:
 

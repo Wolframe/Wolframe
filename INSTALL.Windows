@@ -46,6 +46,9 @@ Prerequisites
 - for XSLT processing
   - optionally (WITH_LIBXSLT): libxslt
   - optionally (WITH_MSXML): MSXML 6.0 or later
+- optionally (WITH_LIBHARU): for PDF creation,
+  WITH_LOCAL_LIBHARY=1 is the default, so the
+  version in 'libharu' is built.
 - optionally for testing (WITH_EXPECT) Expect and Tcl 8.4 or later
 - optionally for packaging:
   - Wix 3.5 or later (which needs .NET 2.0 during packaging)
