@@ -50,7 +50,7 @@ static bool parseAtom( ddl::AtomicType& val, lua_State* ls, Context& ctx)
 				break;
 			break;
 			case LUA_TNUMBER:
-				if (val.set( lua_tonumber(ls,-1)))
+				if (val.set( (double)lua_tonumber(ls,-1)))
 				{
 					ctx.setError( 0, "illegal value for number");
 					return false;
