@@ -1,0 +1,31 @@
+TOPDIR = ..\..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_CXXFLAGS = \
+	/D_WIN32_WINNT=0x504
+
+INCLUDE_DIRS =
+
+TEST_CPP_BINS = \
+	testlibharu.exe
+
+all: $(OBJS) $(CPP_BINS)
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+testlibharu.exe: testlibharu.obj
+
+local_all:
+
+local_clean:
+	@-erase test.bat 2>NUL
+
+local_distclean:
+
+local_test:
+	@-echo @echo off > test.bat
+	@-echo testlibharu >> test.bat
+	@-test.bat

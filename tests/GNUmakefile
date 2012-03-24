@@ -16,6 +16,10 @@ SUBDIRS += libxslt
 endif
 endif
 
+ifeq ($(WITH_LIBHARU),1)
+SUBDIRS += libharu
+endif
+
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
 INCLUDE_CXXFLAGS = \

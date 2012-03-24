@@ -59,6 +59,8 @@ tests/libxml2/testlibxml2
 tests/modules/moduleTest
 tests/AAAA/authenticationTest
 tests/testBoostPath
+tests/filter
+tests/libharu/testlibharu
 examples/echo/echod
 examples/lua/luad
 examples/mtproc/mtprocd

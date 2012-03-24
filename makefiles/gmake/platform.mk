@@ -30,6 +30,7 @@ WITH_LOCAL_SQLITE3 ?= 0
 WITH_PGSQL ?= 0
 WITH_LIBXML2 ?= 0
 WITH_LIBXSLT ?= 0
+WITH_LIBHARU ?= 0
 WITH_QT ?= 0
 WITH_EXAMPLES ?= 1
 ENABLE_NLS ?= 1
@@ -2243,6 +2244,28 @@ endif
 
 endif
 
+
+# libharu
+#########
+
+ifeq ($(WITH_LIBHARU),1)
+ifneq ($(WITH_LOCAL_LIBHARY),1)
+
+ifeq "$(PLATFORM)" "LINUX"
+
+ifeq "$(LINUX_DIST)" "arch"
+LIBHARU_DIR ?= /usr
+LIBHARU_INCLUDE_DIR ?= $(LIBHARU_DIR)/include
+LIBHARU_INCLUDE_DIRS = -I$(LIBHARU_INCLUDE_DIR)
+LIBHARU_LIB_DIR ?= $(LIBHARU_DIR)/lib
+LIBHARU_LIB_DIRS = -L$(LIBHARU_LIB_DIR)
+LIBHARU_LIBS ?= -lhpdf
+endif
+
+endif
+
+endif
+endif
 
 
 # Expect (for testing)
