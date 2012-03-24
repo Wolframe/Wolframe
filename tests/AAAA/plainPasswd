@@ -1,0 +1,9 @@
+# Plain text password file
+#
+# This is only for exemplification purposes. DO NOT USE in production
+# Format is:
+# <username>:<password>:UID:GID:<user info (name)>:.....(ignored)
+
+admin:Good Password:0:0:Wolframe Administrator
+goodusr:User PassWord:1000:100:Good User
+badusr:User BadWord:1001:100:Bad User
