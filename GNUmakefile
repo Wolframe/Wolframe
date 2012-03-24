@@ -4,6 +4,9 @@ TOPDIR = .
 
 SUBDIRS = src gtest tests clients include docs
 
+ifeq ($(WITH_LIBHARU),1)
+SUBDIRS := haru $(SUBDIRS)
+endif
 ifeq ($(WITH_LUA),1)
 SUBDIRS := lua $(SUBDIRS)
 endif

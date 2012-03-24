@@ -8,6 +8,10 @@ SUBDIRS = src gtest tests clients
 SUBDIRS = lua $(SUBDIRS)
 !ENDIF
 
+!IFDEF WITH_LIBHARU
+SUBDIRS = haru $(SUBDIRS)
+!ENDIF
+
 !IFDEF WITH_EXAMPLES
 SUBDIRS = $(SUBDIRS) examples
 !ENDIF
