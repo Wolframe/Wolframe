@@ -7,8 +7,13 @@ SUBDIRS =
 INCLUDE_CXXFLAGS = \
 	/D_WIN32_WINNT=0x504
 
-INCLUDE_DIRS =
+INCLUDE_DIRS = \
+	/I$(TOPDIR)\libhpdf\include
 
+INCLUDE_LIBS = \
+	$(TOPDIR)\libhpdf\src\hpdf.lib \
+	$(TOPDIR)\zlib\zlib.lib
+	
 TEST_CPP_BINS = \
 	testlibhpdf.exe
 

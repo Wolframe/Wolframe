@@ -10,7 +10,9 @@ INCLUDE_CXXFLAGS = \
 INCLUDE_DIRS = \
 	/I. \
 	/I"$(PLATFORM_SDK_DIR)\Include" \
-	/I..\include
+	/I..\include \
+	/I$(TOPDIR)\zlib \
+	/I$(TOPDIR)\libpng
 
 INCLUDE_LIBS =
 
@@ -68,12 +70,10 @@ OBJS = \
 	hpdf_u3d.obj \
 	hpdf_utils.obj \
 	hpdf_xref.obj \
-	hpdf_xref.obj \
 	hpdf_3dmeasure.obj \
 	hpdf_encoder_utf.obj \
 	hpdf_exdata.obj \
-	hpdf_image_ccitt.obj \
-	hpdf_pdfa.obj
+	hpdf_image_ccitt.obj
 
 LIBRARIES = \
 	hpdf.lib
@@ -82,14 +82,14 @@ LIBRARIES = \
 
 # Tons of warnings! Ignore them..
 # disable libpng images for now, must integrate a libpng first
-!IFNDEF DEBUG
-CFLAGS = /MD /W2 /nologo /O2 /EHsc /c $(INCLUDE_DIRS) /DLIBHPDF_HAVE_NOPNGLIB
-!ENDIF
+#!IFNDEF DEBUG
+#CFLAGS = /MD /W2 /nologo /O2 /EHsc /c $(INCLUDE_DIRS)
+#!ENDIF
 
 # compilation flags and compilers (debug)
-!IFDEF DEBUG
-CFLAGS = /MDd /Zi /W2 /nologo /O2 /EHsc /c $(INCLUDE_DIRS) /DLIBHPDF_HAVE_NOPNGLIB
-!ENDIF
+#!IFDEF DEBUG
+#CFLAGS = /MDd /Zi /W2 /nologo /O2 /EHsc /c $(INCLUDE_DIRS)
+#!ENDIF
 
 hpdf.lib: $(OBJS)
 	$(LINK) /lib /out:$@ $(STATIC_LDFLAGS) $?
