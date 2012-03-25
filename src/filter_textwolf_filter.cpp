@@ -59,10 +59,6 @@ struct OutputFilterImpl :public protocol::OutputFilter, public FilterBase<IOChar
 {
 	typedef protocol::OutputFilter Parent;
 
-	enum {
-		TagBufferSize=1024		///< default size of buffer use for storing tag hierarchy of output
-	};
-
 	///\enum XMLState
 	///\brief Enumeration of XML printer states
 	enum XMLState
@@ -76,10 +72,8 @@ struct OutputFilterImpl :public protocol::OutputFilter, public FilterBase<IOChar
 
 	///\brief Constructor
 	///\param [in] bufsize (optional) size of internal buffer to use (for the tag hierarchy stack)
-	OutputFilterImpl( std::size_t bufsize=TagBufferSize)
+	OutputFilterImpl()
 		:m_elemitr(0)
-		,m_tagstk(new char[bufsize?bufsize:(std::size_t)TagBufferSize])
-		,m_tagstksize(bufsize?bufsize:(std::size_t)TagBufferSize)
 		,m_tagstkpos(0)
 		,m_xmlstate(Tag)
 		,m_pendingOpenTag(false)
@@ -91,62 +85,19 @@ struct OutputFilterImpl :public protocol::OutputFilter, public FilterBase<IOChar
 		:protocol::OutputFilter(o)
 		,m_element(o.m_element)
 		,m_elemitr(o.m_elemitr)
-		,m_tagstk( new char[o.m_tagstksize])
-		,m_tagstksize(o.m_tagstksize)
-		,m_tagstkpos(o.m_tagstkpos)
+		,m_tagstk( o.m_tagstk)
+		,m_tagstkpos( o.m_tagstkpos)
 		,m_xmlstate(o.m_xmlstate)
 		,m_pendingOpenTag(o.m_pendingOpenTag)
-		,m_bufstate(o.m_bufstate)
-	{
-		std::memcpy( m_tagstk, o.m_tagstk, m_tagstkpos);
-	}
+		,m_bufstate(o.m_bufstate){}
 
-	virtual ~OutputFilterImpl()
-	{
-		delete [] m_tagstk;
-	}
+	virtual ~OutputFilterImpl(){}
 
 	///\brief self copy
 	///\return copy of this
 	virtual protocol::OutputFilter* copy() const
 	{
 		return new OutputFilterImpl( *this);
-	}
-
-	///\brief Get a member value of the filter
-	///\param [in] name case sensitive name of the variable
-	///\param [in] value the value returned
-	///\return true on success, false, if the variable does not exist or the operation failed
-	virtual bool getValue( const char* name, std::string& value)
-	{
-		if (std::strcmp( name, "tagstacksize") == 0)
-		{
-			value = boost::lexical_cast<std::string>( m_tagstksize);
-			return true;
-		}
-		return Parent::getValue( name, value);
-	}
-
-	///\brief Set a member value of the filter
-	///\param [in] name case sensitive name of the variable
-	///\param [in] value new value of the variable to set
-	///\return true on success, false, if the variable does not exist or the operation failed
-	virtual bool setValue( const char* name, const std::string& value)
-	{
-		std::size_t tagstksize;
-		if (std::strcmp( name, "tagstacksize") == 0)
-		{
-			tagstksize = boost::lexical_cast<std::size_t>( value);
-			if (tagstksize <= m_tagstkpos) return false;
-			char* tagstk = new (std::nothrow) char[ tagstksize];
-			if (!tagstk) return false;
-			std::memcpy( tagstk, m_tagstk, m_tagstkpos);
-			delete [] m_tagstk;
-			m_tagstk = tagstk;
-			m_tagstksize = tagstksize;
-			return true;
-		}
-		return Parent::setValue( name, value);
 	}
 
 	bool emptybuf()
@@ -203,11 +154,7 @@ struct OutputFilterImpl :public protocol::OutputFilter, public FilterBase<IOChar
 				FilterBase<IOCharset,AppCharset>::printToBuffer( '<', buf);
 				FilterBase<IOCharset,AppCharset>::printToBuffer( (const char*)element, elementsize, buf);
 
-				if (!pushTag( element, elementsize))
-				{
-					setState( Error, "textwolf: tag stack exceeds limit");
-					return false;
-				}
+				pushTag( element, elementsize);
 				m_xmlstate = ((const char*)(element))[0]=='?'?Header:Tag;
 				m_pendingOpenTag = true;
 				m_bufstate = buf.state();
@@ -387,33 +334,36 @@ private:
 		return (sizeof(std::size_t) - (n & (sizeof(std::size_t)-1))) & (sizeof(std::size_t)-1);
 	}
 
-	bool pushTag( const void* element, std::size_t elementsize)
+	void pushTag( const void* element, std::size_t elementsize)
 	{
 		std::size_t align = getAlign( elementsize);
-		if (align + elementsize + sizeof(std::size_t) >= m_tagstksize-m_tagstkpos) return false;
-		std::memcpy( m_tagstk + m_tagstkpos, element, elementsize);
 		std::size_t ofs = elementsize + align + sizeof( std::size_t);
+
+		if (m_tagstkpos + ofs > m_tagstk.size())
+		{
+			m_tagstk.resize( m_tagstkpos + ofs);
+		}
+		std::memcpy( const_cast<char*>(m_tagstk.c_str() + m_tagstkpos), element, elementsize);
 		m_tagstkpos += ofs;
-		void* tt = m_tagstk+m_tagstkpos-sizeof( std::size_t);
+		void* tt = const_cast<char*>(m_tagstk.c_str()) + m_tagstkpos - sizeof( std::size_t);
 		*(std::size_t*)(tt) = elementsize;
-		return true;
 	}
 
 	bool topTag( const void*& element, std::size_t& elementsize)
 	{
 		if (m_tagstkpos < sizeof( std::size_t)) return false;
-		void* tt = m_tagstk+m_tagstkpos-sizeof( std::size_t);
+		void* tt = const_cast<char*>(m_tagstk.c_str()) + (m_tagstkpos - sizeof( std::size_t));
 		elementsize = *(std::size_t*)(tt);
 		std::size_t align = getAlign( elementsize);
 		std::size_t ofs = elementsize + align + sizeof( std::size_t);
 		if (ofs > m_tagstkpos) return false;
-		element = m_tagstk + m_tagstkpos - ofs;
+		element = m_tagstk.c_str() + m_tagstkpos - ofs;
 		return true;
 	}
 
 	void popTag()
 	{
-		void* tt = m_tagstk+m_tagstkpos-sizeof( std::size_t);
+		void* tt = const_cast<char*>(m_tagstk.c_str()) + m_tagstkpos - sizeof( std::size_t);
 		std::size_t elementsize = *(std::size_t*)(tt);
 		std::size_t align = getAlign( elementsize);
 		std::size_t ofs = elementsize + align + sizeof( std::size_t);
@@ -423,9 +373,8 @@ private:
 private:
 	std::string m_element;								///< buffer for the currently printed element
 	std::size_t m_elemitr;								///< iterator to pass it to output
-	char* m_tagstk;									///< tag stack buffer
-	std::size_t m_tagstksize;							///< size of tag stack buffer in bytes
-	std::size_t m_tagstkpos;							///< used size of tag stack buffer in bytes
+	std::string m_tagstk;								///< open tag hierarchy stack buffer
+	std::size_t m_tagstkpos;							///< current position in the tag hierarchy stack buffer
 	XMLState m_xmlstate;								///< current state of output
 	bool m_pendingOpenTag;								///< true if last open tag instruction has not been ended yet
 	typename protocol::EscapingBuffer<std::string>::State m_bufstate;		///< state of escaping the output
@@ -942,15 +891,13 @@ public:
 	};
 
 public:
-	OutputFilter( const CountedReference<TextwolfEncoding::Id>& enc, std::size_t tagbufsize)
-		:m_tagbuffersize(tagbufsize)
-		,m_headerPrinted(false)
+	OutputFilter( const CountedReference<TextwolfEncoding::Id>& enc)
+		:m_headerPrinted(false)
 		,m_headerPos(0)
 		,m_encoding(enc){}
 
 	OutputFilter( const OutputFilter& o)
 		:protocol::OutputFilter(o)
-		,m_tagbuffersize(o.m_tagbuffersize)
 		,m_headerPrinted(o.m_headerPrinted)
 		,m_headerPos(o.m_headerPos)
 		,m_header(o.m_header)
@@ -975,31 +922,31 @@ public:
 				setState( Error, "textwolf: cannot handle this encoding");
 				return false;
 			case TextwolfEncoding::IsoLatin:
-				rt = new OutputFilterImpl<tc::IsoLatin1>( m_tagbuffersize);
+				rt = new OutputFilterImpl<tc::IsoLatin1>();
 				break;
 			case TextwolfEncoding::UTF8:
-				rt = new OutputFilterImpl<tc::UTF8>( m_tagbuffersize);
+				rt = new OutputFilterImpl<tc::UTF8>();
 				break;
 			case TextwolfEncoding::UTF16:
-				rt = new OutputFilterImpl<tc::UTF16BE>( m_tagbuffersize);
+				rt = new OutputFilterImpl<tc::UTF16BE>();
 				break;
 			case TextwolfEncoding::UTF16BE:
-				rt = new OutputFilterImpl<tc::UTF16BE>( m_tagbuffersize);
+				rt = new OutputFilterImpl<tc::UTF16BE>();
 				break;
 			case TextwolfEncoding::UTF16LE:
-				rt = new OutputFilterImpl<tc::UTF16LE>( m_tagbuffersize);
+				rt = new OutputFilterImpl<tc::UTF16LE>();
 				break;
 			case TextwolfEncoding::UCS2BE:
-				rt = new OutputFilterImpl<tc::UCS2BE>( m_tagbuffersize);
+				rt = new OutputFilterImpl<tc::UCS2BE>();
 				break;
 			case TextwolfEncoding::UCS2LE:
-				rt = new OutputFilterImpl<tc::UCS2LE>( m_tagbuffersize);
+				rt = new OutputFilterImpl<tc::UCS2LE>();
 				break;
 			case TextwolfEncoding::UCS4BE:
-				rt = new OutputFilterImpl<tc::UCS4BE>( m_tagbuffersize);
+				rt = new OutputFilterImpl<tc::UCS4BE>();
 				break;
 			case TextwolfEncoding::UCS4LE:
-				rt = new OutputFilterImpl<tc::UCS4LE>( m_tagbuffersize);
+				rt = new OutputFilterImpl<tc::UCS4LE>();
 				break;
 		}
 		if (rt)
@@ -1101,7 +1048,6 @@ public:
 	}
 
 private:
-	std::size_t m_tagbuffersize;
 	bool m_headerPrinted;
 	std::size_t m_headerPos;
 	std::string m_header;
@@ -1113,31 +1059,21 @@ private:
 class TextwolfXmlFilter :public Filter
 {
 public:
-	TextwolfXmlFilter( std::size_t tagbufsize)
+	TextwolfXmlFilter( const char* encoding=0)
 	{
 		CountedReference<TextwolfEncoding::Id> enc;
+		if (encoding)
+		{
+			TextwolfEncoding::Id ei = TextwolfEncoding::getId( encoding);
+			enc.reset( new TextwolfEncoding::Id( ei));
+		}
 		m_inputfilter.reset( new InputFilter( enc));
-		m_outputfilter.reset( new OutputFilter( enc, tagbufsize));
-	}
-
-	TextwolfXmlFilter( std::size_t tagbufsize, const char* encoding)
-	{
-		TextwolfEncoding::Id ei = TextwolfEncoding::getId( encoding);
-		CountedReference<TextwolfEncoding::Id> enc( new TextwolfEncoding::Id( ei));
-		m_inputfilter.reset( new InputFilter( enc));
-		m_outputfilter.reset( new OutputFilter( enc, tagbufsize));
+		m_outputfilter.reset( new OutputFilter( enc));
 	}
 };
 
 Filter TextwolfXmlFilterFactory::create( const char* encoding) const
 {
-	if (encoding)
-	{
-		return TextwolfXmlFilter( 256, encoding);
-	}
-	else
-	{
-		return TextwolfXmlFilter( 256);
-	}
+	return TextwolfXmlFilter( encoding);
 }
 
