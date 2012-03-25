@@ -112,9 +112,9 @@ int main( int argc, char **argv )
 	}
 	char* inputBuffer = new char[ inputBufferSize];
 	char* outputBuffer = new char[ outputBufferSize];
-	char elementBuffer[ 4000];
+	const void* element;
+	std::size_t elementsize;
 	protocol::InputFilter::ElementType elementType;
-	std::size_t elementBufferPos = 0;
 	std::size_t taglevel=0;
 
 	READ_INPUT:
@@ -143,7 +143,7 @@ int main( int argc, char **argv )
 	}
 	PROCESS_READ:
 	{
-		if (!flt.inputfilter().get()->getNext( &elementType, elementBuffer, sizeof(elementBuffer), &elementBufferPos))
+		if (!flt.inputfilter().get()->getNext( elementType, element, elementsize))
 		{
 			switch (flt.inputfilter().get()->state())
 			{
@@ -179,7 +179,7 @@ int main( int argc, char **argv )
 	PROCESS_WRITE:
 	{
 		protocol::OutputFilter::ElementType tt = (protocol::OutputFilter::ElementType) elementType;
-		if (!flt.outputfilter().get()->print( tt, elementBuffer, elementBufferPos))
+		if (!flt.outputfilter().get()->print( tt, element, elementsize))
 		{
 			switch (flt.outputfilter().get()->state())
 			{
@@ -203,10 +203,6 @@ int main( int argc, char **argv )
 				}
 
 			}
-		}
-		else
-		{
-			elementBufferPos = 0;
 		}
 		if (elementType == protocol::InputFilter::OpenTag)
 		{

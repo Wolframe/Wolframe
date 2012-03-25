@@ -148,10 +148,8 @@ struct exception	:public std::exception
 /*! \addtogroup Utilities
  *  @{
 */
-///
-/// \class StaticBuffer
-/// \brief Simple back insertion sequence for storing the outputs of textwolf in a contant size buffer
-///
+///\class StaticBuffer
+///\brief Simple back insertion sequence for storing the outputs of textwolf in a contant size buffer
 class StaticBuffer :public throws_exception
 {
 public:

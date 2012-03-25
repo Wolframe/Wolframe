@@ -78,23 +78,24 @@ public:
 		if (m_doc) xmlFreeDoc( m_doc);
 	}
 
-	bool fetch( protocol::InputFilter::ElementType* type, void* buffer, std::size_t buffersize, std::size_t* bufferpos)
+	bool fetch( protocol::InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
 	{
 		bool rt = true;
+	AGAIN:
 		if (!m_doc)
 		{
 			rt = false;
 		}
 		else if (m_value)
 		{
-			*type = protocol::InputFilter::Value;
-			rt = getElement( buffer, buffersize, bufferpos, m_value);
-			if (rt) m_value = 0;
+			type = protocol::InputFilter::Value;
+			getElement( element, elementsize, m_value);
+			m_value = 0;
 		}
 		else if (m_prop && m_propvalues)
 		{
-			*type = protocol::InputFilter::Attribute;
-			rt = getElement( buffer, buffersize, bufferpos, m_prop->name);
+			type = protocol::InputFilter::Attribute;
+			getElement( element, elementsize, m_prop->name);
 			m_value = m_propvalues->content;
 			m_propvalues = m_propvalues->next;
 			if (!m_propvalues)
@@ -115,7 +116,7 @@ public:
 			{
 				m_node = m_nodestk.back();
 				m_nodestk.pop_back();
-				*type = protocol::InputFilter::CloseTag;
+				type = protocol::InputFilter::CloseTag;
 				rt = true;
 			}
 		}
@@ -125,23 +126,23 @@ public:
 			case XML_DOCB_DOCUMENT_NODE:
 			case XML_DOCUMENT_NODE:
 			case XML_ELEMENT_NODE:
-				*type = protocol::InputFilter::OpenTag;
+				type = protocol::InputFilter::OpenTag;
 				m_prop = m_node->properties;
 				if (m_prop) m_propvalues = m_prop->children;
 				m_nodestk.push_back( m_node->next);
-				rt = getElement( buffer, buffersize, bufferpos, m_node->name);
+				getElement( element, elementsize, m_node->name);
 				m_node = m_node->children;
 				break;
 
 			case XML_ATTRIBUTE_NODE:
-				*type = protocol::InputFilter::Attribute;
-				rt = getElement( buffer, buffersize, bufferpos, m_node->name);
+				type = protocol::InputFilter::Attribute;
+				getElement( element, elementsize, m_node->name);
 				m_value = m_node->content;
 				m_node = m_node->next;
 				break;
 
 			case XML_TEXT_NODE:
-				*type = protocol::InputFilter::Value;
+				type = protocol::InputFilter::Value;
 				if (!m_withEmpty)
 				{
 					std::size_t ii=0;
@@ -149,10 +150,10 @@ public:
 					if (m_node->content[ii] == 0)
 					{
 						m_node = m_node->next;
-						return fetch( type, buffer, buffersize, bufferpos);
+						goto AGAIN;
 					}
 				}
-				rt = getElement( buffer, buffersize, bufferpos, m_node->content);
+				getElement( element, elementsize, m_node->content);
 				m_node = m_node->next;
 				break;
 
@@ -172,24 +173,24 @@ public:
 			case XML_XINCLUDE_START:
 			case XML_XINCLUDE_END:
 			default:
-				return fetch( type, buffer, buffersize, bufferpos);
+				goto AGAIN;
 		}
 		return rt;
 	}
 
 private:
-	bool getElement( void* buffer, std::size_t buffersize, std::size_t* bufferpos, const xmlChar* str)
+	void getElement( const void*& element, std::size_t& elementsize, const xmlChar* str)
 	{
-		if (!str) return true;
-
-		std::size_t elemenlen = xmlStrlen( str) * sizeof(*str);
-		if (buffersize - *bufferpos < elemenlen)
+		if (!str)
 		{
-			return false;
+			element = "";
+			elementsize = 0;
 		}
-		std::memcpy( (char*)buffer + *bufferpos, str, elemenlen);
-		*bufferpos += elemenlen;
-		return true;
+		else
+		{
+			elementsize = xmlStrlen( str) * sizeof(*str);
+			element = str;
+		}
 	}
 
 private:
@@ -209,8 +210,8 @@ struct InputFilterImpl :public BufferingInputFilter<Content>
 {
 	typedef BufferingInputFilter<Content> Parent;
 
-	InputFilterImpl( const CountedReference<std::string>& e, std::size_t bufsize)
-		:BufferingInputFilter<Content>(new Content( e), bufsize){}
+	InputFilterImpl( const CountedReference<std::string>& e)
+		:BufferingInputFilter<Content>(new Content( e)){}
 
 	InputFilterImpl( const InputFilterImpl& o) :BufferingInputFilter<Content>(o){}
 
@@ -553,7 +554,7 @@ struct Libxml2Filter :public Filter
 	Libxml2Filter()
 	{
 		CountedReference<std::string> enc;
-		m_inputfilter.reset( new InputFilterImpl( enc, 8092));
+		m_inputfilter.reset( new InputFilterImpl( enc));
 		m_outputfilter.reset( new OutputFilterImpl( enc));
 	}
 };

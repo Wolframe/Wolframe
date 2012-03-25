@@ -492,19 +492,17 @@ template <class IOCharset, class AppCharset=textwolf::charset::UTF8>
 struct InputFilterImpl :public protocol::InputFilter, public FilterBase<IOCharset,AppCharset>
 {
 	typedef protocol::InputFilter Parent;
-	typedef textwolf::XMLScanner<SrcIterator,IOCharset,AppCharset,textwolf::StaticBuffer> XMLScanner;
+	typedef textwolf::XMLScanner<SrcIterator,IOCharset,AppCharset,std::string> XMLScanner;
 
 	///\brief Constructor
-	InputFilterImpl( std::size_t genbufsize, bool withEmpty, bool doTokenize)
-		:protocol::InputFilter( genbufsize)
-		,m_outputbuf(0,0)
-		,m_scanner(0)
+	InputFilterImpl( bool withEmpty, bool doTokenize)
+		:m_scanner(0)
 		,m_withEmpty(withEmpty)
 		,m_doTokenize(doTokenize)
-		,m_bufstart(0)
 	{
 		m_src.setInput( this);
-		m_scanner = new XMLScanner( m_src, m_outputbuf);
+		m_scanner = new XMLScanner( m_src, m_buf);
+		m_scanner->setOutputBuffer( m_buf);
 		m_scanner->doTokenize(m_doTokenize);
 		m_itr = m_scanner->begin(false);
 		m_end = m_scanner->end();
@@ -520,17 +518,16 @@ struct InputFilterImpl :public protocol::InputFilter, public FilterBase<IOCharse
 	///\param [in] o output filter to copy
 	InputFilterImpl( const InputFilterImpl& o)
 		:protocol::InputFilter( o)
-		,m_outputbuf(o.m_outputbuf)
+		,m_buf( o.m_buf)
 		,m_src( o.m_src)
 		,m_scanner(0)
 		,m_withEmpty(o.m_withEmpty)
 		,m_doTokenize(o.m_doTokenize)
-		,m_bufstart(o.m_bufstart)
 	{
 		m_src.setInput( this);
 		m_scanner = new XMLScanner( *o.m_scanner);
 		m_scanner->setSource( m_src);
-		m_scanner->setOutputBuffer( m_outputbuf);
+		m_scanner->setOutputBuffer( m_buf);
 		m_scanner->doTokenize(m_doTokenize);
 		m_itr = m_scanner->begin(false);
 		m_end = m_scanner->end();
@@ -626,25 +623,21 @@ struct InputFilterImpl :public protocol::InputFilter, public FilterBase<IOCharse
 		}
 	};
 
-	///\brief Implementation of protocol::InputFilter::getNext( protocol::OutputFilter::ElementType*, void*, std::size_t, std::size_t*)
-	virtual bool getNext( protocol::InputFilter::ElementType* type, void* buffer, std::size_t buffersize, std::size_t* bufferpos)
+	///\brief implement interface member protocol::InputFilter::getNext( typename protocol::InputFilter::ElementType&,const void*&,std::size_t&)
+	virtual bool getNext( typename protocol::InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
 	{
 		static const ElementTypeMap tmap;
-		if (m_bufstart > *bufferpos)
+		if (state() == Open)
 		{
-			m_bufstart = *bufferpos;
+			m_buf.clear();
 		}
-		textwolf::StaticBuffer buf( (char*)buffer + m_bufstart, buffersize - m_bufstart, *bufferpos - m_bufstart);
-		m_scanner->setOutputBuffer( buf);
-		try
+		else
 		{
 			setState( Open);
+		}
+		try
+		{
 			++m_itr;
-			if (buf.overflow())
-			{
-				setState( protocol::InputFilter::Error, "textwolf: input filter buffer too small for one element");
-				return false;
-			}
 			int st = tmap[ m_itr->type()];
 			if (st == -1)
 			{
@@ -653,41 +646,35 @@ struct InputFilterImpl :public protocol::InputFilter, public FilterBase<IOCharse
 			}
 			else
 			{
-				*type = (protocol::InputFilter::ElementType)st;
+				type = (protocol::InputFilter::ElementType)st;
 				if (!m_withEmpty && m_itr->type() == textwolf::XMLScannerBase::Content)
 				{
-					std::size_t ii=0,nn = buf.size();
-					const unsigned char* cc = (unsigned char*)buf.ptr();
+					std::size_t ii=0,nn = m_buf.size();
+					const unsigned char* cc = (const unsigned char*)m_buf.c_str();
 					for (;ii<nn && cc[ii] <= ' '; ++ii);
-					if (ii==nn)
-					{
-						*bufferpos = m_bufstart;
-						return getNext( type, buffer, buffersize, bufferpos);
-					}
+					if (ii==nn) return getNext( type, element, elementsize);
 				}
-				*bufferpos = m_bufstart + buf.size();
-				m_bufstart = *bufferpos;
+				element = m_buf.c_str();
+				elementsize = m_buf.size();
 				return true;
 			}
 		}
 		catch (SrcIterator::EoM)
 		{
 			setState( EndOfMessage);
-			*bufferpos = m_bufstart + buf.size();
 			return false;
 		};
 		setState( Error, "textwolf: unexpected state");
 		return false;
 	}
 private:
-	textwolf::StaticBuffer m_outputbuf;	///< dummy buffer of size 0 (the buffer redefined in every call getNext. This is a dummy)
+	std::string m_buf;			///< buffer for the currently parsed element
 	SrcIterator m_src;			///< source iterator
 	XMLScanner* m_scanner;			///< XML scanner
 	typename XMLScanner::iterator m_itr;	///< input iterator created from scanned XML from source iterator
 	typename XMLScanner::iterator m_end;	///< end of data (EoD) pointer
 	bool m_withEmpty;			///< do not produce empty tokens (containing only spaces)
 	bool m_doTokenize;			///< do tokenize (whitespace sequences as delimiters)
-	std::size_t m_bufstart;			///< start of the currently fetched token
 };
 
 class InputFilter :public protocol::InputFilter
@@ -706,10 +693,8 @@ public:
 	};
 
 public:
-	InputFilter( const CountedReference<TextwolfEncoding::Id>& enc, std::size_t bufsize)
-		:protocol::InputFilter(bufsize)
-		,m_bufsize(bufsize)
-		,m_headerParsed(false)
+	InputFilter( const CountedReference<TextwolfEncoding::Id>& enc)
+		:m_headerParsed(false)
 		,m_headerParseLeft(0)
 		,m_encoding(enc)
 		,m_withEmpty(true)
@@ -717,7 +702,6 @@ public:
 		{}
 	InputFilter( const InputFilter& o)
 		:protocol::InputFilter(o)
-		,m_bufsize(o.m_bufsize)
 		,m_headerParsed(o.m_headerParsed)
 		,m_headerParseLeft(o.m_headerParseLeft)
 		,m_header(o.m_header)
@@ -792,7 +776,7 @@ public:
 		return new InputFilter( *this);
 	}
 
-	virtual bool getNext( ElementType*, void*, std::size_t, std::size_t*)
+	virtual bool getNext( ElementType&, const void*&, std::size_t&)
 	{
 		for (;;)
 		if (m_headerParsed)
@@ -902,31 +886,31 @@ public:
 			case TextwolfEncoding::Unknown:
 				return 0;
 			case TextwolfEncoding::IsoLatin:
-				rt = new InputFilterImpl<textwolf::charset::IsoLatin1>(m_bufsize,m_withEmpty,m_doTokenize);
+				rt = new InputFilterImpl<textwolf::charset::IsoLatin1>( m_withEmpty,m_doTokenize);
 				break;
 			case TextwolfEncoding::UTF8:
-				rt = new InputFilterImpl<textwolf::charset::UTF8>(m_bufsize,m_withEmpty,m_doTokenize);
+				rt = new InputFilterImpl<textwolf::charset::UTF8>( m_withEmpty,m_doTokenize);
 				break;
 			case TextwolfEncoding::UTF16:
-				rt = new InputFilterImpl<textwolf::charset::UTF16BE>(m_bufsize,m_withEmpty,m_doTokenize);
+				rt = new InputFilterImpl<textwolf::charset::UTF16BE>( m_withEmpty,m_doTokenize);
 				break;
 			case TextwolfEncoding::UTF16BE:
-				rt = new InputFilterImpl<textwolf::charset::UTF16BE>(m_bufsize,m_withEmpty,m_doTokenize);
+				rt = new InputFilterImpl<textwolf::charset::UTF16BE>( m_withEmpty,m_doTokenize);
 				break;
 			case TextwolfEncoding::UTF16LE:
-				rt = new InputFilterImpl<textwolf::charset::UTF16LE>(m_bufsize,m_withEmpty,m_doTokenize);
+				rt = new InputFilterImpl<textwolf::charset::UTF16LE>( m_withEmpty,m_doTokenize);
 				break;
 			case TextwolfEncoding::UCS2BE:
-				rt = new InputFilterImpl<textwolf::charset::UCS2BE>(m_bufsize,m_withEmpty,m_doTokenize);
+				rt = new InputFilterImpl<textwolf::charset::UCS2BE>( m_withEmpty,m_doTokenize);
 				break;
 			case TextwolfEncoding::UCS2LE:
-				rt = new InputFilterImpl<textwolf::charset::UCS2LE>(m_bufsize,m_withEmpty,m_doTokenize);
+				rt = new InputFilterImpl<textwolf::charset::UCS2LE>( m_withEmpty,m_doTokenize);
 				break;
 			case TextwolfEncoding::UCS4BE:
-				rt = new InputFilterImpl<textwolf::charset::UCS4BE>(m_bufsize,m_withEmpty,m_doTokenize);
+				rt = new InputFilterImpl<textwolf::charset::UCS4BE>( m_withEmpty,m_doTokenize);
 				break;
 			case TextwolfEncoding::UCS4LE:
-				rt = new InputFilterImpl<textwolf::charset::UCS4LE>(m_bufsize,m_withEmpty,m_doTokenize);
+				rt = new InputFilterImpl<textwolf::charset::UCS4LE>( m_withEmpty,m_doTokenize);
 				break;
 		}
 		if (rt)
@@ -937,7 +921,6 @@ public:
 	}
 
 private:
-	std::size_t m_bufsize;
 	bool m_headerParsed;
 	char m_headerParseLeft;
 	std::string m_header;
@@ -1130,18 +1113,18 @@ private:
 class TextwolfXmlFilter :public Filter
 {
 public:
-	TextwolfXmlFilter( std::size_t elementbufsize, std::size_t tagbufsize)
+	TextwolfXmlFilter( std::size_t tagbufsize)
 	{
 		CountedReference<TextwolfEncoding::Id> enc;
-		m_inputfilter.reset( new InputFilter( enc, elementbufsize));
+		m_inputfilter.reset( new InputFilter( enc));
 		m_outputfilter.reset( new OutputFilter( enc, tagbufsize));
 	}
 
-	TextwolfXmlFilter( std::size_t elementbufsize, std::size_t tagbufsize, const char* encoding)
+	TextwolfXmlFilter( std::size_t tagbufsize, const char* encoding)
 	{
 		TextwolfEncoding::Id ei = TextwolfEncoding::getId( encoding);
 		CountedReference<TextwolfEncoding::Id> enc( new TextwolfEncoding::Id( ei));
-		m_inputfilter.reset( new InputFilter( enc, elementbufsize));
+		m_inputfilter.reset( new InputFilter( enc));
 		m_outputfilter.reset( new OutputFilter( enc, tagbufsize));
 	}
 };
@@ -1150,11 +1133,11 @@ Filter TextwolfXmlFilterFactory::create( const char* encoding) const
 {
 	if (encoding)
 	{
-		return TextwolfXmlFilter( 8092, 256, encoding);
+		return TextwolfXmlFilter( 256, encoding);
 	}
 	else
 	{
-		return TextwolfXmlFilter( 8092, 256);
+		return TextwolfXmlFilter( 256);
 	}
 }
 

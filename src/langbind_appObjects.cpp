@@ -115,43 +115,15 @@ static InputFilterClosure::ItemType fetchFailureResult( const protocol::InputFil
 
 InputFilterClosure::ItemType InputFilterClosure::fetch( const char*& tag, unsigned int& tagsize, const char*& val, unsigned int& valsize)
 {
-	if (!m_inputfilter.get() || m_bufsize==0)
+	const void* element;
+	std::size_t elementsize;
+
+AGAIN:
+	if (!m_inputfilter.get())
 	{
 		return EndOfData;
 	}
-	if (m_value)
-	{
-		if (!m_inputfilter->getNext( &m_type, m_buf, m_bufsize-1, &m_bufpos))
-		{
-			if (m_inputfilter->state() == protocol::InputFilter::Open)
-			{
-				// at end of data check if there is a follow filter (transformed filter) to continue with:
-				protocol::InputFilter* follow = m_inputfilter->createFollow();
-				if (follow)
-				{
-					m_inputfilter.reset( follow);
-					return fetch( tag, tagsize, val, valsize);
-				}
-			}
-			return fetchFailureResult( *m_inputfilter); 
-		}
-		else if (m_type == protocol::InputFilter::Value)
-		{
-			tag = m_buf;
-			tagsize = m_value-m_buf;
-			val = m_value;
-			valsize = m_bufpos-tagsize;
-			init();
-			return Data;
-		}
-		else
-		{
-			LOG_DATA << "error in XML: attribute value expected";
-			init();
-			return Error;
-		}
-	}
-	if (!m_inputfilter->getNext( &m_type, m_buf, m_bufsize-1, &m_bufpos))
+	if (!m_inputfilter->getNext( m_type, element, elementsize))
 	{
 		if (m_inputfilter->state() == protocol::InputFilter::Open)
 		{
@@ -160,7 +132,7 @@ InputFilterClosure::ItemType InputFilterClosure::fetch( const char*& tag, unsign
 			if (follow)
 			{
 				m_inputfilter.reset( follow);
-				return fetch( tag, tagsize, val, valsize);
+				goto AGAIN;
 			}
 		}
 		return fetchFailureResult( *m_inputfilter);
@@ -171,31 +143,41 @@ InputFilterClosure::ItemType InputFilterClosure::fetch( const char*& tag, unsign
 		{
 			case protocol::InputFilter::OpenTag:
 				m_taglevel += 1;
-				tag = m_buf;
-				tagsize = m_bufpos;
+				tag = (const char*)element;
+				tagsize = elementsize;
 				val = 0;
 				valsize = 0;
-				init();
+				m_gotattr = false;
 				return Data;
 
 			case protocol::InputFilter::Value:
-				tag = 0;
-				tagsize = 0;
-				val = m_buf;
-				valsize = m_bufpos;
-				init();
+				if (m_gotattr)
+				{
+					tag = m_attrbuf.c_str();
+					tagsize = m_attrbuf.size();
+					m_gotattr = false;
+				}
+				else
+				{
+					tag = 0;
+					tagsize = 0;
+				}
+				val = (const char*)element;
+				valsize = elementsize;
 				return Data;
 
 			 case protocol::InputFilter::Attribute:
-				m_value = m_buf+m_bufpos;
-				return fetch( tag, tagsize, val, valsize);
+				m_attrbuf.clear();
+				m_attrbuf.append( (const char*)element, elementsize);
+				m_gotattr = true;
+				goto AGAIN;
 
 			 case protocol::InputFilter::CloseTag:
 				tag = 0;
 				tagsize = 0;
 				val = 0;
 				valsize = 0;
-				init();
+				m_gotattr = false;
 				if (m_taglevel == 0)
 				{
 					return EndOfData;

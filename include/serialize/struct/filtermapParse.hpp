@@ -73,9 +73,10 @@ template <typename T>
 bool parseObject_( const char* tag, void* obj, const struct_&, protocol::InputFilter& inp, Context& ctx, bool isinit)
 {
 	protocol::InputFilter::ElementType typ;
+	const char* element;
+	std::size_t elementsize;
 	static const FiltermapDescriptionBase* descr = T::getFiltermapDescription();
 	unsigned int depth = 0;
-	std::size_t bufpos = 0;
 	std::vector<bool> isinitar( descr->end() - descr->begin(), false);
 
 	if (isinit)
@@ -88,18 +89,17 @@ bool parseObject_( const char* tag, void* obj, const struct_&, protocol::InputFi
 		ctx.setError( tag, "atomic value expected for an attribute value");
 		return false;
 	}
-	while (inp.getNext( &typ, ctx.buf(), Context::bufsize-1, &bufpos))
+	while (inp.getNext( typ, (const void*&) element, elementsize))
 	{
-		ctx.buf()[ bufpos] = 0;
 		switch (typ)
 		{
 			case protocol::InputFilter::OpenTag:
 			{
 				++depth;
-				FiltermapDescriptionBase::Map::const_iterator itr = descr->find( ctx.buf());
+				FiltermapDescriptionBase::Map::const_iterator itr = descr->find( element);
 				if (itr == descr->end())
 				{
-					ctx.setError( ctx.buf(), "unknown element");
+					ctx.setError( element, "unknown element");
 					ctx.setError( tag);
 					return false;
 				}
@@ -117,19 +117,19 @@ bool parseObject_( const char* tag, void* obj, const struct_&, protocol::InputFi
 
 			case protocol::InputFilter::Attribute:
 			{
-				FiltermapDescriptionBase::Map::const_iterator itr = descr->find( ctx.buf());
+				FiltermapDescriptionBase::Map::const_iterator itr = descr->find( element);
 				if (itr == descr->end())
 				{
-					ctx.setError( ctx.buf(), "unknown element");
+					ctx.setError( element, "unknown element");
 					ctx.setError( tag);
 					return false;
 				}
 				if ((std::size_t)(itr-descr->begin()) >= descr->nof_attributes())
 				{
-					ctx.setError( ctx.buf(), "content element expected");
+					ctx.setError( element, "content element expected");
 				}
 				std::size_t idx = itr - descr->begin();
-				if (!itr->second.parse()( ctx.buf(), (char*)obj+itr->second.ofs(), inp, ctx, isinitar[ idx])) return false;
+				if (!itr->second.parse()( element, (char*)obj+itr->second.ofs(), inp, ctx, isinitar[ idx])) return false;
 				isinitar[ idx] = true;
 
 				ctx.endTagConsumed(false);
@@ -138,8 +138,8 @@ bool parseObject_( const char* tag, void* obj, const struct_&, protocol::InputFi
 			case protocol::InputFilter::Value:
 			{
 				std::size_t ii;
-				for (ii=0; ii<bufpos; ii++) if (ctx.buf()[ii]>32) break;
-				if (ii==bufpos) break;
+				for (ii=0; ii<elementsize; ii++) if (((const unsigned char*)element)[ii]>32) break;
+				if (ii==elementsize) break;
 				ctx.endTagConsumed(false);
 				ctx.setError( tag, "structure expected");
 				return false;
@@ -153,7 +153,6 @@ bool parseObject_( const char* tag, void* obj, const struct_&, protocol::InputFi
 				--depth;
 				ctx.endTagConsumed(false);
 		}
-		bufpos = 0;
 	}
 	return true;
 }
@@ -162,16 +161,16 @@ template <typename T>
 bool parseObject_( const char* tag, void* obj, const bool_&, protocol::InputFilter& inp, Context& ctx, bool isinit)
 {
 	protocol::InputFilter::ElementType typ;
-	std::size_t bufpos=0;
+	const char* element;
+	std::size_t elementsize;
 
 	if (isinit)
 	{
 		ctx.setError( tag, "duplicate boolean definition");
 		return false;
 	}
-	if (inp.getNext( &typ, ctx.buf(), Context::bufsize-1, &bufpos))
+	if (inp.getNext( typ, (const void*&)element, elementsize))
 	{
-		ctx.buf()[ bufpos] = 0;
 		switch (typ)
 		{
 			case protocol::InputFilter::OpenTag:
@@ -181,18 +180,18 @@ bool parseObject_( const char* tag, void* obj, const bool_&, protocol::InputFilt
 
 			case protocol::InputFilter::Value:
 			{
-				if (boost::algorithm::iequals( ctx.buf(), "yes")
-				||  boost::algorithm::iequals( ctx.buf(), "y")
-				||  boost::algorithm::iequals( ctx.buf(), "t")
-				||  boost::algorithm::iequals( ctx.buf(), "true"))
+				if (boost::algorithm::iequals( element, "yes")
+				||  boost::algorithm::iequals( element, "y")
+				||  boost::algorithm::iequals( element, "t")
+				||  boost::algorithm::iequals( element, "true"))
 				{
 					*((T*)obj) = true;
 					break;
 				}
-				if (boost::algorithm::iequals( ctx.buf(), "no")
-				||  boost::algorithm::iequals( ctx.buf(), "n")
-				||  boost::algorithm::iequals( ctx.buf(), "f")
-				||  boost::algorithm::iequals( ctx.buf(), "false"))
+				if (boost::algorithm::iequals( element, "no")
+				||  boost::algorithm::iequals( element, "n")
+				||  boost::algorithm::iequals( element, "f")
+				||  boost::algorithm::iequals( element, "false"))
 				{
 					*((T*)obj) = false;
 					break;
@@ -231,16 +230,16 @@ template <typename T>
 static bool parseObject_( const char* tag, void* obj, const arithmetic_&, protocol::InputFilter& inp, Context& ctx, bool isinit)
 {
 	protocol::InputFilter::ElementType typ;
-	std::size_t bufpos=0;
+	const char* element;
+	std::size_t elementsize;
 
 	if (isinit)
 	{
 		ctx.setError( tag, "duplicate value definition");
 		return false;
 	}
-	if (inp.getNext( &typ, ctx.buf(), Context::bufsize-1, &bufpos))
+	if (inp.getNext( typ, (const void*&)element, elementsize))
 	{
-		ctx.buf()[ bufpos] = 0;
 		try
 		{
 			switch (typ)
@@ -251,7 +250,7 @@ static bool parseObject_( const char* tag, void* obj, const arithmetic_&, protoc
 					return false;
 
 				case protocol::InputFilter::Value:
-					*((T*)obj) = boost::lexical_cast<T>( ctx.buf());
+					*((T*)obj) = boost::lexical_cast<T>( element);
 					break;
 
 				case protocol::InputFilter::CloseTag:

@@ -44,11 +44,11 @@ static bool parseObject( const char* tag, ddl::StructType& st, protocol::InputFi
 static bool parseAtom( const char* tag, ddl::AtomicType& val, protocol::InputFilter& inp, Context& ctx)
 {
 	protocol::InputFilter::ElementType typ;
-	std::size_t bufpos=0;
+	const void* element;
+	std::size_t elementsize;
 
-	if (inp.getNext( &typ, ctx.buf(), Context::bufsize-1, &bufpos))
+	if (inp.getNext( typ, element, elementsize))
 	{
-		ctx.buf()[ bufpos] = 0;
 		switch (typ)
 		{
 			case protocol::InputFilter::OpenTag:
@@ -60,7 +60,7 @@ static bool parseAtom( const char* tag, ddl::AtomicType& val, protocol::InputFil
 				return false;
 
 			case protocol::InputFilter::Value:
-				if (!val.set( std::string( ctx.buf())))
+				if (!val.set( std::string( (const char*)element, elementsize)))
 				{
 					ctx.setError( tag, "illegal value");
 					return false;
@@ -68,7 +68,7 @@ static bool parseAtom( const char* tag, ddl::AtomicType& val, protocol::InputFil
 				break;
 
 			case protocol::InputFilter::CloseTag:
-				if (!val.set( std::string( "")))
+				if (!val.set( std::string( "", 0)))
 				{
 					ctx.setError( tag, "cannot convert empty string to value");
 					return false;
@@ -89,12 +89,12 @@ static bool parseStruct( const char* tag, ddl::StructType& st, protocol::InputFi
 {
 	protocol::InputFilter::ElementType typ;
 	unsigned int depth = 0;
-	std::size_t bufpos = 0;
+	const void* element;
+	std::size_t elementsize;
 	std::vector<bool> isinitar;
 
-	while (inp.getNext( &typ, ctx.buf(), Context::bufsize-1, &bufpos))
+	while (inp.getNext( typ, element, elementsize))
 	{
-		ctx.buf()[ bufpos] = 0;
 		switch (typ)
 		{
 			case protocol::InputFilter::OpenTag:
@@ -103,7 +103,7 @@ static bool parseStruct( const char* tag, ddl::StructType& st, protocol::InputFi
 				ddl::StructType::Map::iterator itr = st.find( ctx.buf());
 				if (itr == st.end())
 				{
-					ctx.setError( ctx.buf(), "unknown element");
+					ctx.setError( (const char*)element, "unknown element");
 					ctx.setError( tag);
 					return false;
 				}
@@ -124,13 +124,13 @@ static bool parseStruct( const char* tag, ddl::StructType& st, protocol::InputFi
 				ddl::StructType::Map::iterator itr = st.find( ctx.buf());
 				if (itr == st.end())
 				{
-					ctx.setError( ctx.buf(), "unknown element");
+					ctx.setError( (const char*)element, "unknown element");
 					ctx.setError( tag);
 					return false;
 				}
 				if ((std::size_t)(itr-st.begin()) >= st.nof_attributes())
 				{
-					ctx.setError( ctx.buf(), "content element expected");
+					ctx.setError( (const char*)element, "content element expected");
 				}
 				if (isinitar[ itr-st.begin()])
 				{
@@ -139,7 +139,7 @@ static bool parseStruct( const char* tag, ddl::StructType& st, protocol::InputFi
 				}
 				try
 				{
-					if (!parseAtom( ctx.buf(), itr->second.value(), inp, ctx)) return false;
+					if (!parseAtom( (const char*)element, itr->second.value(), inp, ctx)) return false;
 				}
 				catch (const std::logic_error&)
 				{
@@ -153,8 +153,8 @@ static bool parseStruct( const char* tag, ddl::StructType& st, protocol::InputFi
 			case protocol::InputFilter::Value:
 			{
 				std::size_t ii;
-				for (ii=0; ii<bufpos; ii++) if (ctx.buf()[ii]>32) break;
-				if (ii==bufpos) break;
+				for (ii=0; ii<elementsize; ii++) if (((const char*)element)[ii]>32) break;
+				if (ii==elementsize) break;
 				ctx.endTagConsumed(false);
 				ctx.setError( tag, "structure expected");
 				return false;
@@ -168,7 +168,6 @@ static bool parseStruct( const char* tag, ddl::StructType& st, protocol::InputFi
 				--depth;
 				ctx.endTagConsumed(false);
 		}
-		bufpos = 0;
 	}
 	return true;
 }

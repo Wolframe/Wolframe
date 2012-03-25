@@ -60,7 +60,7 @@ public:
 	{
 	}
 
-	bool fetch( protocol::InputFilter::ElementType* type, void* buffer, std::size_t buffersize, std::size_t* bufferpos)
+	bool fetch( protocol::InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
 	{
 		return false;
 	}

@@ -83,12 +83,11 @@ struct InputFilter
 
 	///\brief Get next element call as methof call
 	///\param [out] type element type parsed
-	///\param [in,out] buffer for returned elements
-	///\param [in] buffersize size of the buffer for the returned elements
-	///\param [in,out] bufferpos before parsed element in and bufferpos after parsed element out
+	///\param [out] element pointer to element returned
+	///\param [out] elementsize size of the element returned
 	///\return true, if success, false, if not.
-	///\remark Check the generator state when false is returned
-	virtual bool getNext( ElementType* type, void* buffer, std::size_t buffersize, std::size_t* bufferpos)=0;
+	///\remark Check the state when false is returned
+	virtual bool getNext( ElementType& type, const void*& element, std::size_t& elementsize)=0;
 
 	///\brief Return the current state
 	///\return the current state
@@ -122,12 +121,11 @@ struct InputFilter
 	}
 
 	///\brief Constructor
-	explicit InputFilter( std::size_t genbufsize)
+	explicit InputFilter()
 		:m_ptr(0)
 		,m_pos(0)
 		,m_size(0)
 		,m_gotEoD(false)
-		,m_genbufsize(genbufsize)
 		,m_state(Open)
 	{
 		m_errorbuf[0] = 0;
@@ -139,7 +137,6 @@ struct InputFilter
 		,m_pos(o.m_pos)
 		,m_size(o.m_size)
 		,m_gotEoD(o.m_gotEoD)
-		,m_genbufsize(o.m_genbufsize)
 	{
 		setState( o.m_state, o.m_errorbuf);
 	}
@@ -148,30 +145,20 @@ struct InputFilter
 	virtual ~InputFilter(){}
 
 	///\brief Get a member value of the filter
-	///\param [in] name case sensitive name of the variable
-	///\param [in] value buffer for the value returned
+	// param [in] name case sensitive name of the variable
+	// param [in] value buffer for the value returned
 	///\return true on success, false, if the variable does not exist or the operation failed
-	virtual bool getValue( const char* name, std::string& value)
+	virtual bool getValue( const char* /*name*/, std::string& /*value*/)
 	{
-		if (strcmp( name, "buffersize") == 0)
-		{
-			value = boost::lexical_cast<std::string>( m_genbufsize);
-			return true;
-		}
 		return false;
 	}
 
 	///\brief Set a member value of the filter
-	///\param [in] name case sensitive name of the variable
-	///\param [in] value new value of the variable to set
+	// param [in] name case sensitive name of the variable
+	// param [in] value new value of the variable to set
 	///\return true on success, false, if the variable does not exist or the operation failed
-	virtual bool setValue( const char* name, const std::string& value)
+	virtual bool setValue( const char* /*name*/, const std::string& /*value*/)
 	{
-		if (std::strcmp( name, "buffersize") == 0)
-		{
-			m_genbufsize = boost::lexical_cast<std::size_t>( value);
-			return true;
-		}
 		return false;
 	}
 
@@ -190,9 +177,6 @@ struct InputFilter
 	///\brief Skip forward current iterator cursor position
 	///\param [in] n number of bytes to skip
 	void skip( std::size_t n)			{if ((m_pos+n)>=m_size) m_pos=m_size; else m_pos+=n;}
-	///\brief Get the size of the buffer used for the generated elements
-	///\return bufsize size of the buffer in bytes
-	std::size_t getGenBufferSize() const		{return m_genbufsize;}
 
 	///\brief Set input filter state with error message
 	///\param [in] s new state
@@ -221,7 +205,6 @@ private:
 	std::size_t m_pos;		//< current iterator cursor position
 	std::size_t m_size;		//< size of network input buffer
 	bool m_gotEoD;			//< got end of data flag
-	std::size_t m_genbufsize;	//< element buffer size (the buffer itself is managed by the user of this class)
 	State m_state;			//< state
 	enum {ErrorBufSize=128};
 	char m_errorbuf[ ErrorBufSize];	//< error string

@@ -167,40 +167,15 @@ public:
 	InputFilterClosure( const protocol::InputFilterR& ig)
 		:m_inputfilter(ig)
 		,m_type(protocol::InputFilter::Value)
-		,m_value(0)
-		,m_buf(0)
-		,m_bufsize(ig->getGenBufferSize())
-		,m_bufpos(0)
-		,m_taglevel(0)
-	{
-		m_buf = new char[ m_bufsize];
-	}
+		,m_gotattr(false)
+		,m_taglevel(0){}
 
 	InputFilterClosure( const InputFilterClosure& o)
 		:m_inputfilter(o.m_inputfilter)
 		,m_type(o.m_type)
-		,m_value(o.m_value)
-		,m_buf(0)
-		,m_bufsize(o.m_bufsize)
-		,m_bufpos(o.m_bufpos)
-		,m_taglevel(o.m_taglevel)
-	{
-		m_buf = new char[ m_bufsize];
-		std::memcpy( m_buf, o.m_buf, m_bufpos);
-	}
-
-	///\brief Destructor
-	~InputFilterClosure()
-	{
-		delete [] m_buf;
-	}
-
-	///\brief Internal buffer reset
-	void init()
-	{
-		m_bufpos = 0;
-		m_value = 0;
-	}
+		,m_attrbuf(o.m_attrbuf)
+		,m_gotattr(o.m_gotattr)
+		,m_taglevel(o.m_taglevel){}
 
 	///\brief Get the next pair of elements
 	///\param[out] e1 first element
@@ -211,13 +186,11 @@ public:
 	ItemType fetch( const char*& e1, unsigned int& e1size, const char*& e2, unsigned int& e2size);
 
 private:
-	protocol::InputFilterR m_inputfilter;			///< rerefence to input with filter
-	protocol::InputFilter::ElementType m_type;		///< current state (last value type parsed)
-	char* m_value;						///< pointer to local copy of value in m_buf
-	char* m_buf;						///< pointer to buffer for local copies of returned values
-	std::size_t m_bufsize;					///< allocation size of m_buf
-	std::size_t m_bufpos;					///< number of bytes filled in m_buf
-	std::size_t m_taglevel;					///< current level in tag hierarchy
+	protocol::InputFilterR m_inputfilter;			//< rerefence to input with filter
+	protocol::InputFilter::ElementType m_type;		//< current state (last value type parsed)
+	std::string m_attrbuf;					//< buffer for attribute name
+	bool m_gotattr;						//< true, if the following value belongs to an attribute
+	std::size_t m_taglevel;					//< current level in tag hierarchy
 };
 
 class AppContext

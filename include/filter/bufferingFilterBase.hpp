@@ -55,8 +55,8 @@ struct BufferingInputFilter :public protocol::InputFilter
 	};
 
 	///\brief Constructor
-	BufferingInputFilter( Content* cref, std::size_t bufsize)
-		:protocol::InputFilter(bufsize),m_inputConsumed(false),m_content(cref){}
+	BufferingInputFilter( Content* cref)
+		:m_inputConsumed(false),m_content(cref){}
 
 	///\brief Destructor
 	~BufferingInputFilter(){}
@@ -73,7 +73,8 @@ struct BufferingInputFilter :public protocol::InputFilter
 		return new BufferingInputFilter( *this);
 	}
 
-	virtual bool getNext( ElementType* type, void* buffer, std::size_t buffersize, std::size_t* bufferpos)
+	///\brief implement interface member protocol::InputFilter::getNext( typename protocol::InputFilter::ElementType&,const void*&,std::size_t&)
+	virtual bool getNext( typename protocol::InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
 	{
 		if (!m_inputConsumed && !bufferInput())
 		{
@@ -86,12 +87,12 @@ struct BufferingInputFilter :public protocol::InputFilter
 			setState( Error, "buffering filter: No content");
 			return false;
 		}
-		if (!dc->fetch( type, buffer, buffersize, bufferpos))
+		if (!dc->fetch( type, element, elementsize))
 		{
 			if (!dc->end())
 			{
 				const char* err = dc->getError();
-				setState( Error, err?err:"buffering filter: element buffer too small to hold one element");
+				setState( Error, err?err:"unknown error");
 			}
 			return false;
 		}

@@ -118,14 +118,22 @@ template <class IOCharset, class AppCharset=textwolf::charset::UTF8>
 struct InputFilterImpl :public protocol::InputFilter
 {
 	///\brief Constructor
-	InputFilterImpl( std::size_t genbufsize)
-		:protocol::InputFilter( genbufsize) {}
+	InputFilterImpl()
+		:m_tag(0)
+	{
+		m_itr.setSource( SrcIterator( this));
+	}
 
 	///\brief Copy constructor
 	///\param [in] o output filter to copy
 	InputFilterImpl( const InputFilterImpl& o)
 		:protocol::InputFilter( o)
-		,m_itr(o.m_itr) {}
+		,m_itr(o.m_itr)
+		,m_tag(o.m_tag)
+		,m_buf(o.m_buf)
+	{
+		m_itr.setSource( SrcIterator( this));
+	}
 
 	///\brief self copy
 	///\return copy of this
@@ -134,18 +142,23 @@ struct InputFilterImpl :public protocol::InputFilter
 		return new InputFilterImpl( *this);
 	}
 
-	///\brief Implementation of protocol::InputFilter::getNext( typename protocol::InputFilter::ElementType*, void*, std::size_t, std::size_t*)
-	virtual bool getNext( typename protocol::InputFilter::ElementType* type, void* buffer, std::size_t buffersize, std::size_t* bufferpos)
+	///\brief implement interface member protocol::InputFilter::getNext( typename protocol::InputFilter::ElementType&,const void*&,std::size_t&)
+	virtual bool getNext( typename protocol::InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
 	{
-		textwolf::StaticBuffer buf( (char*)buffer, buffersize, *bufferpos);
-		setState( Open);
-		*type = Value;
-		m_itr.setSource( SrcIterator( this));
+		if (state() == Open)
+		{
+			m_buf.clear();
+		}
+		else
+		{
+			setState( Open);
+		}
+		type = Value;
 		try
 		{
 			if (m_tag)
 			{
-				if (!getElementType( *type, m_tag))
+				if (!getElementType( type, m_tag))
 				{
 					setState( protocol::InputFilter::Error, "textwolf: Unknown token tag");
 				}
@@ -153,7 +166,7 @@ struct InputFilterImpl :public protocol::InputFilter
 			else
 			{
 				char tg = m_itr.ascii();
-				if (!getElementType( *type, tg))
+				if (!getElementType( type, tg))
 				{
 					setState( protocol::InputFilter::Error, "textwolf: Unknown token tag");
 				}
@@ -170,33 +183,35 @@ struct InputFilterImpl :public protocol::InputFilter
 				}
 				if (ch == '\n')
 				{
-					*bufferpos = buf.size();
+					element = m_buf.c_str();
+					elementsize = m_buf.size();
 					++m_itr;
 					m_tag = '\0';
 					return true;
 				}
 				else
 				{
-					AppCharset::print( ch, buf);
-					if (buf.overflow())
-					{
-						setState( protocol::InputFilter::Error, "textwolf: buffer too small to hold one line");
-						return false;
-					}
+					AppCharset::print( ch, m_buf);
 					++m_itr;
 				}
+			}
+			if (m_buf.size() != 0)
+			{
+				element = m_buf.c_str();
+				elementsize = m_buf.size();
+				return true;
 			}
 		}
 		catch (SrcIterator::EoM)
 		{
 			setState( EndOfMessage);
-			*bufferpos = buf.size();
 		}
 		return false;
 	}
 private:
 	textwolf::TextScanner<SrcIterator,AppCharset> m_itr;	//< src iterator
 	char m_tag;						//< tag defining the currently parsed element type
+	std::string m_buf;					//< buffer for current line => current token
 };
 
 }//end anonymous namespace
@@ -205,52 +220,52 @@ private:
 class TokenFilter :public Filter
 {
 public:
-	TokenFilter( std::size_t bufsize)
+	TokenFilter( const char* encoding=0)
 	{
-		m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF8>(bufsize));
-		m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UTF8>());
-	}
-	TokenFilter( const char *encoding, std::size_t bufsize)
-	{
+		if (!encoding)
+		{
+			m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF8>());
+			m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UTF8>());
+		}
 		TextwolfEncoding::Id te = TextwolfEncoding::getId( encoding);
 		switch (te)
 		{
 			case TextwolfEncoding::Unknown:
 				break;
 			case TextwolfEncoding::IsoLatin:
-				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::IsoLatin1>(bufsize));
+				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::IsoLatin1>());
 				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::IsoLatin1>());
 				break;
 			case TextwolfEncoding::UTF8:
-				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF8>(bufsize));
+				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF8>());
 				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UTF8>());
 				break;
 			case TextwolfEncoding::UTF16:
-				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF16BE>(bufsize));
+				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF16BE>());
 				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UTF16BE>());
 				break;
 			case TextwolfEncoding::UTF16BE:
-				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF16BE>(bufsize));
+				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF16BE>());
 				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UTF16BE>());
 				break;
 			case TextwolfEncoding::UTF16LE:
-				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF16LE>(bufsize));
+				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF16LE>());
 				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UTF16LE>());
 				break;
 			case TextwolfEncoding::UCS2BE:
-				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UCS2BE>(bufsize));
+				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UCS2BE>());
 				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UCS2BE>());
 				break;
 			case TextwolfEncoding::UCS2LE:
-				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UCS2LE>(bufsize));
+				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UCS2LE>());
 				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UCS2LE>());
 				break;
 			case TextwolfEncoding::UCS4BE:
-				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UCS4BE>(bufsize));
+				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UCS4BE>());
 				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UCS4BE>());
 				break;
 			case TextwolfEncoding::UCS4LE:
-				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UCS4LE>(bufsize));
+				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UCS4LE>());
 				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UCS4LE>());
 				break;
 		}
@@ -259,13 +274,6 @@ public:
 
 Filter TokenFilterFactory::create( const char* encoding) const
 {
-	if (encoding)
-	{
-		return TokenFilter( encoding, 8092);
-	}
-	else
-	{
-		return TokenFilter( 8092);
-	}
+	return TokenFilter( encoding);
 }
 

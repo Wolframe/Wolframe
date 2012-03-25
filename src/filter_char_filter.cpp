@@ -48,16 +48,24 @@ namespace {
 template <class IOCharset, class AppCharset=textwolf::charset::UTF8>
 struct InputFilterImpl :public protocol::InputFilter
 {
-	typedef textwolf::StaticBuffer BufferType;
-
 	///\brief Constructor
-	InputFilterImpl() :protocol::InputFilter(8) {}
+	InputFilterImpl()
+		:m_buf( m_bufmem, sizeof(m_bufmem))
+	{
+		m_itr.setSource( SrcIterator( this));
+	}
 
 	///\brief Copy constructor
 	///\param [in] o output filter to copy
 	InputFilterImpl( const InputFilterImpl& o)
 		:protocol::InputFilter( o)
-		,m_itr(o.m_itr) {}
+		,m_itr(o.m_itr)
+		,m_buf( m_bufmem, sizeof(m_bufmem))
+	{
+		m_buf.resize( o.m_buf.size());
+		std::memcpy( m_bufmem, o.m_bufmem, o.m_buf.size());
+		m_itr.setSource( SrcIterator( this));
+	}
 
 	///\brief self copy
 	///\return copy of this
@@ -66,38 +74,34 @@ struct InputFilterImpl :public protocol::InputFilter
 		return new InputFilterImpl( *this);
 	}
 
-	///\brief implement interface member protocol::InputFilter::getNext( typename protocol::InputFilter::ElementType*,void*,std::size_t,std::size_t*)
-	virtual bool getNext( typename protocol::InputFilter::ElementType* type, void* buffer, std::size_t buffersize, std::size_t* bufferpos)
+	///\brief implement interface member protocol::InputFilter::getNext( typename protocol::InputFilter::ElementType&,const void*&,std::size_t&)
+	virtual bool getNext( typename protocol::InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
 	{
-		BufferType buf( (char*)buffer, buffersize, *bufferpos);
 		setState( Open);
-		*type = Value;
-		m_itr.setSource( SrcIterator( this));
+		type = Value;
 		try
 		{
 			textwolf::UChar ch;
 			if ((ch = *m_itr) != 0)
 			{
 				++m_itr;
-				AppCharset::print( ch, buf);
-				if (buf.overflow())
-				{
-					setState( Error, "textwolf: buffer too small to hold one character");
-					return false;
-				}
-				*bufferpos = buf.size();
+				AppCharset::print( ch, m_buf);
+				element = m_buf.ptr();
+				elementsize = m_buf.size();
+				m_buf.clear();
 				return true;
 			}
 		}
 		catch (SrcIterator::EoM)
 		{
 			setState( EndOfMessage);
-			*bufferpos = buf.size();
 		}
 		return false;
 	}
 private:
 	textwolf::TextScanner<SrcIterator,IOCharset> m_itr;
+	char m_bufmem[16];
+	textwolf::StaticBuffer m_buf;
 };
 
 ///\class OutputFilter
@@ -156,13 +160,13 @@ private:
 
 struct CharFilter :public Filter
 {
-	CharFilter()
+	CharFilter( const char *encoding=0)
 	{
-		m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF8>());
-		m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UTF8>());
-	}
-	CharFilter( const char *encoding)
-	{
+		if (!encoding)
+		{
+			m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF8>());
+			m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UTF8>());
+		}
 		TextwolfEncoding::Id te = TextwolfEncoding::getId( encoding);
 		switch (te)
 		{

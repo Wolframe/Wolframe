@@ -55,10 +55,11 @@ bool FiltermapDescriptionBase::parse( const char* name, void* obj, protocol::Inp
 		inp = in.copy();
 		inp->protocolInput( (void*)ctx.content().c_str(), ctx.content().size(), true);
 
-		std::size_t bufpos = 0;
+		const void* element;
+		std::size_t elementsize;
 		protocol::InputFilter::ElementType etyp;
 
-		while (!inp->getNext( &etyp, ctx.buf(), ctx.bufsize-1, &bufpos))
+		while (!inp->getNext( etyp, element, elementsize))
 		{
 			protocol::InputFilter* ff = inp->createFollow();
 			if (!ff)
@@ -72,16 +73,14 @@ bool FiltermapDescriptionBase::parse( const char* name, void* obj, protocol::Inp
 				delete inp;
 				inp = ff;
 			}
-			bufpos = 0;
 		}
-		ctx.buf()[ bufpos] = 0;
 		if (etyp != protocol::InputFilter::OpenTag)
 		{
 			ctx.setError( 0, "failed to parse xml root element");
 			delete inp;
 			return false;
 		}
-		else if (std::strcmp(name, ctx.buf()) != 0)
+		else if (std::strcmp(name, (const char*)element) != 0)
 		{
 			ctx.setError( 0, "xml is of different type than expected");
 			delete inp;
@@ -99,8 +98,7 @@ bool FiltermapDescriptionBase::parse( const char* name, void* obj, protocol::Inp
 		}
 		if (rt && !ctx.endTagConsumed())
 		{
-			bufpos = 0;
-			if (!inp->getNext( &etyp, ctx.buf(), ctx.bufsize-1, &bufpos) || etyp != protocol::InputFilter::CloseTag)
+			if (!inp->getNext( etyp, element, elementsize) || etyp != protocol::InputFilter::CloseTag)
 			{
 				ctx.setError( 0, "xml not properly balanced or illegal");
 				delete inp;
