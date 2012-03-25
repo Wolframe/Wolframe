@@ -80,17 +80,6 @@ LIBRARIES = \
 	
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-# Tons of warnings! Ignore them..
-# disable libpng images for now, must integrate a libpng first
-#!IFNDEF DEBUG
-#CFLAGS = /MD /W2 /nologo /O2 /EHsc /c $(INCLUDE_DIRS)
-#!ENDIF
-
-# compilation flags and compilers (debug)
-#!IFDEF DEBUG
-#CFLAGS = /MDd /Zi /W2 /nologo /O2 /EHsc /c $(INCLUDE_DIRS)
-#!ENDIF
-
 hpdf.lib: $(OBJS)
 	$(LINK) /lib /out:$@ $(STATIC_LDFLAGS) $?
 
