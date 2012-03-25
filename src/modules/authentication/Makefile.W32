@@ -1,6 +1,6 @@
 TOPDIR = ..\..\..
 
-SUBDIRS = database textfile plaintext
+SUBDIRS = database textfile
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
