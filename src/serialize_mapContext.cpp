@@ -93,7 +93,7 @@ bool Context::printElem( protocol::OutputFilter::ElementType tp, const void* ele
 			}
 			if (!out->print( tp, elem, elemsize))
 			{
-				setError( "buffer of output filter too small to hold one element");
+				setError( out->getError());
 				return false;
 			}
 		}

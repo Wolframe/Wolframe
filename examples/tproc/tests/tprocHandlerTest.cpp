@@ -360,31 +360,14 @@ private:
 	enum
 	{
 		EoDBufferSize=4,
-		MinOutBufferSize=24
+		MinOutBufferSize=16
 	};
-
-	static unsigned int buffersizeFactor( const std::string& inp)
-	{
-		unsigned ii=0,nn=inp.size();
-		std::string::const_iterator itr=inp.begin(),end=inp.end();
-		for (;itr != end; ++itr)
-		{
-			if (*itr)
-			{
-				++ii;
-			}
-		}
-		if (end - itr <= nn/4) return 5;
-		if (end - itr <= nn/3) return 4;
-		if (end - itr <= nn/2) return 3;
-		return 1;
-	}
 
 public:
 	TProcHandlerTestInstance( const TestDescription& descr, std::size_t ib, std::size_t ob)
 		:ep( "127.0.0.1", 12345)
 		,m_connection(0)
-		,m_config( ib + EoDBufferSize, buffersizeFactor( descr.input) * (ob + MinOutBufferSize), descr.config)
+		,m_config( ib + EoDBufferSize, ob + MinOutBufferSize, descr.config)
 		,m_input( descr.input)
 		,m_expected( descr.expected)
 		,m_inputBufferSize(ib)

@@ -497,7 +497,7 @@ static int function_output_closetag( lua_State* ls)
 		switch (output->print( 0/*tag*/, 0, 0/*val*/, 0))
 		{
 			case Output::DoYield:
-				lua_yieldk( ls, 0, 1, function_output_opentag);
+				lua_yieldk( ls, 0, 1, function_output_closetag);
 
 			case Output::Error:
 				msg = output->outputfilter()->getError();

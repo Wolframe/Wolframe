@@ -60,7 +60,7 @@ static bool printElem( protocol::OutputFilter::ElementType tp, const void* elem,
 			}
 			if (!out->print( tp, elem, elemsize))
 			{
-				ctx.setError( "buffer of output filter too small to hold one element");
+				ctx.setError( out->getError());
 				return false;
 			}
 		}
