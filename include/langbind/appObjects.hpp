@@ -49,6 +49,8 @@ class FilterMap
 {
 public:
 	FilterMap();
+	~FilterMap();
+
 	template <class FilterFactoryClass>
 	void defineFilter( const char* name, const FilterFactoryClass& f)
 	{

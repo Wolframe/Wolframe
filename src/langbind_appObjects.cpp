@@ -55,6 +55,15 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace langbind;
 
+FilterMap::~FilterMap()
+{
+	std::map<std::string,FilterFactory*>::iterator ii=m_map.begin(),ee=m_map.end();
+	for (;ii!=ee;++ii)
+	{
+		delete ii->second;
+	}
+}
+
 bool FilterMap::getFilter( const char* arg, Filter& rt)
 {
 	std::size_t nn = std::strlen(arg);
