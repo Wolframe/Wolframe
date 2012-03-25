@@ -71,7 +71,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	hpdf_pdfa.o
 
 LOCAL_STATIC_LIB = \
-	libharu.a
+	libhpdf.a
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

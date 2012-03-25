@@ -16,11 +16,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <setjmp.h>
-#ifdef WITH_LOCAL_LIBHPDF
-#include "libhpdf/hpdf.h"
-#else
 #include "hpdf.h"
-#endif
 
 jmp_buf env;
 

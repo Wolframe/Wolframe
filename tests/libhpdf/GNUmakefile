@@ -9,7 +9,7 @@ INCLUDE_CXXFLAGS = \
 
 # libharu
 
-ifneq ($(WITH_LOCAL_LIBHARY),1)
+ifneq ($(WITH_LOCAL_LIBHPDF),1)
 
 INCLUDE_DIRS += \
 	$(LIBHPDF_INCLUDE_DIRS)
@@ -22,19 +22,19 @@ INCLUDE_LIBS += \
 
 endif
 
-ifeq ($(WITH_LOCAL_LIBHARY),1)
+ifeq ($(WITH_LOCAL_LIBHPDF),1)
 
 INCLUDE_CXXFLAGS += \
 	-DWITH_LOCAL_LIBHPDF
 	
 INCLUDE_DIRS += \
-	$(TOPDIR)/libhpdf/include
+	-I$(TOPDIR)/libhpdf/include
 
-INCLUDE_LDFLAGS += \
-	$(LIBHPDF_LIB_DIRS)
+INCLUDE_LDFLAGS =
 
 INCLUDE_LIBS += \
-	$(LIBHPDF_LIBS)
+	$(TOPDIR)/libhpdf/src/libhpdf.a \
+	-lz -lpng
 
 endif
 
