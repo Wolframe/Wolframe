@@ -67,9 +67,10 @@ Prerequisites
   - dia: to convert images to svg
 - optionally (WITH_LIBXML2)
 - optionally (WITH_LIBXSLT), needs LIBXML2 too
-- optionally (WITH_LIBHARU): for PDF creation,
-  WITH_LOCAL_LIBHARY=1 uses the supplied version in
-  the 'libharu' subdirectory
+- optionally (WITH_LIBHPDF): for PDF creation,
+  WITH_LOCAL_LIBHPDF=1 uses the supplied version in
+  the 'libhpdf' subdirectory (only if there is really
+  no libhpdf installed on the system!)
 
 Configuration of the build
 --------------------------
