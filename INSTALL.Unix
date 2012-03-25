@@ -217,10 +217,13 @@ Ubuntu 10.04.1 LTS
 Optional packages: libqt4-dev,
                    libpam-dev (1.1.1), libsasl2-dev (2.1.23),
                    libsqlite3-dev (3.6.22), libpq-dev (8.4.7),
-                   libxml2-dev (2.7.6)
+                   libxml2-dev (2.7.6), libpng-dev (1.2.42),
+                   zlib1g-dev (1.2.3.3.dfsg-15ubuntu1)
 
 libboost-dev is 1.40, too old, missing asio features and property_tree, build
 you own boost. gcc on Debian complains a lot about boost header files..
+
+Use WITH_LOCAL_LIBHARU=1 for PDF support.
 
 For building the documentation you need 'xsltproc', 'docbook-xsl' and 'doxygen'.
 
