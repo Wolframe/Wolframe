@@ -150,11 +150,17 @@ ifeq ($(WITH_LIBXSLT),1)
 	@echo "LIBXSLT_LIBS: $(LIBXSLT_LIBS)"
 endif
 ifeq ($(WITH_LIBHPDF),1)
+ifeq ($(WITH_LOCAL_LIBHPDF),0)
 	@echo
 	@echo "LIBHPDF_DIR: $(LIBHPDF_DIR)"
 	@echo "LIBHPDF_INCLUDE_DIRS: $(LIBHPDF_INCLUDE_DIRS)"
 	@echo "LIBHPDF_LIB_DIRS: $(LIBHPDF_LIB_DIRS)"
 	@echo "LIBHPDF_LIBS: $(LIBHPDF_LIBS)"
+endif
+ifeq ($(WITH_LOCAL_LIBHPDF),1)
+	@echo
+	@echo "using local libhpdf.."
+endif
 endif
 	@echo
 	@echo "Additional build options:"

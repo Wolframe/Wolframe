@@ -71,6 +71,7 @@ Prerequisites
   WITH_LOCAL_LIBHPDF=1 uses the supplied version in
   the 'libhpdf' subdirectory (only if there is really
   no libhpdf installed on the system!)
+  - zlib and libpng development libraries are also needed
 
 Configuration of the build
 --------------------------
@@ -141,6 +142,8 @@ Fetch from normal repository: openssl-devel, pam-devel (0.99.6), cyrus-sasl-deve
 
 Boost is not available in a decent version (1.33), build your own one.
 
+Use WITH_LOCAL_LIBHARU=1 for PDF support.
+
 Qt (4.2.1) is too old, compile your own one.
 
 For building the documentation you need 'libxslt', 'doxygen' and
@@ -153,9 +156,12 @@ RHEL/Centos/SL 6
 Optional packages:
 Fetch from normal repository: openssl-devel, pam-devel (0.99.6), cyrus-sasl-devel (2.1.22),
                               sqlite-devel (3.3.6), postgresql-devel (8.1.23),
-                              libxml2-devel (2.7.6), libxslt-devel (1.1.26)
+                              libxml2-devel (2.7.6), libxslt-devel (1.1.26),
+                              zlib-devel (1.2.3-27), libpng-devel (1.2.48-1)
 
 Boost is available in an almost usable version (1.39.0), build your own one.
+
+Use WITH_LOCAL_LIBHARU=1 for PDF support.
 
 Qt (4.2.1) is too old, compile your own one.
 
