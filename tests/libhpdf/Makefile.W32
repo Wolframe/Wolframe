@@ -27,6 +27,7 @@ local_all:
 
 local_clean:
 	@-erase test.bat 2>NUL
+	@-erase *.pdf 2>NUL
 
 local_distclean:
 
