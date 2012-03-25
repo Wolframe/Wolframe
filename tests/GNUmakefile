@@ -16,8 +16,8 @@ SUBDIRS += libxslt
 endif
 endif
 
-ifeq ($(WITH_LIBHARU),1)
-SUBDIRS += libharu
+ifeq ($(WITH_LIBHPDF),1)
+SUBDIRS += libhpdf
 endif
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk

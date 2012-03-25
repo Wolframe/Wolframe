@@ -1,0 +1,103 @@
+TOPDIR = ..\..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_CXXFLAGS = \
+	/D_WIN32_WINNT=0x504
+	
+INCLUDE_DIRS = \
+	/I. \
+	/I"$(PLATFORM_SDK_DIR)\Include" \
+	/I..\include
+
+INCLUDE_LIBS =
+
+OBJS = \
+	hpdf_annotation.obj \
+	hpdf_array.obj \
+	hpdf_binary.obj \
+	hpdf_boolean.obj \
+	hpdf_catalog.obj \
+	hpdf_destination.obj \
+	hpdf_dict.obj \
+	hpdf_doc.obj \
+	hpdf_doc_png.obj \
+	hpdf_encoder.obj \
+	hpdf_encoder_cns.obj \
+	hpdf_encoder_cnt.obj \
+	hpdf_encoder_jp.obj \
+	hpdf_encoder_kr.obj \
+	hpdf_encrypt.obj \
+	hpdf_encryptdict.obj \
+	hpdf_error.obj \
+	hpdf_ext_gstate.obj \
+	hpdf_font.obj \
+	hpdf_font_cid.obj \
+	hpdf_fontdef_base14.obj \
+	hpdf_fontdef.obj \
+	hpdf_fontdef_cid.obj \
+	hpdf_fontdef_cns.obj \
+	hpdf_fontdef_cnt.obj \
+	hpdf_fontdef_jp.obj \
+	hpdf_fontdef_kr.obj \
+	hpdf_fontdef_tt.obj \
+	hpdf_fontdef_type1.obj \
+	hpdf_font_tt.obj \
+	hpdf_font_type1.obj \
+	hpdf_gstate.obj \
+	hpdf_image.obj \
+	hpdf_image_png.obj \
+	hpdf_info.obj \
+	hpdf_list.obj \
+	hpdf_mmgr.obj \
+	hpdf_name.obj \
+	hpdf_namedict.obj \
+	hpdf_null.obj \
+	hpdf_number.obj \
+	hpdf_objects.obj \
+	hpdf_outline.obj \
+	hpdf_page_label.obj \
+	hpdf_page_operator.obj \
+	hpdf_pages.obj \
+	hpdf_pdfa.obj \
+	hpdf_real.obj \
+	hpdf_streams.obj \
+	hpdf_string.obj \
+	hpdf_u3d.obj \
+	hpdf_utils.obj \
+	hpdf_xref.obj \
+	hpdf_xref.obj \
+	hpdf_3dmeasure.obj \
+	hpdf_encoder_utf.obj \
+	hpdf_exdata.obj \
+	hpdf_image_ccitt.obj \
+	hpdf_pdfa.obj
+
+LIBRARIES = \
+	hpdf.lib
+	
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+# Tons of warnings! Ignore them..
+# disable libpng images for now, must integrate a libpng first
+!IFNDEF DEBUG
+CFLAGS = /MD /W2 /nologo /O2 /EHsc /c $(INCLUDE_DIRS) /DLIBHPDF_HAVE_NOPNGLIB
+!ENDIF
+
+# compilation flags and compilers (debug)
+!IFDEF DEBUG
+CFLAGS = /MDd /Zi /W2 /nologo /O2 /EHsc /c $(INCLUDE_DIRS) /DLIBHPDF_HAVE_NOPNGLIB
+!ENDIF
+
+hpdf.lib: $(OBJS)
+	$(LINK) /lib /out:$@ $(STATIC_LDFLAGS) $?
+
+local_all: $(LIBRARIES)
+
+local_clean:
+
+local_distclean:
+
+local_test:
