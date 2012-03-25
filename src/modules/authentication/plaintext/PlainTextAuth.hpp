@@ -39,6 +39,7 @@
 
 #include <string>
 #include "AAAA/authentication.hpp"
+#include "AAAA/user.hpp"
 #include "moduleInterface.hpp"
 
 namespace _Wolframe {
@@ -69,12 +70,33 @@ class PlainTextAuthenticator : public AuthenticationUnit
 public:
 	PlainTextAuthenticator( const std::string& filename );
 	~PlainTextAuthenticator();
-	virtual const char* typeName() const		{ return "PlainTextAuth"; }
+	virtual const char* typeName() const	{ return "PlainTextAuth"; }
 
-	AuthenticatorSlice* authSlice()		{ return NULL; }
+	AuthenticatorSlice* authSlice();
 
+	bool authenticate( std::string username, std::string password, User& user ) const;
 private:
 	std::string		m_file;
+};
+
+
+class PlainTextAuthSlice : public AuthenticatorSlice
+{
+public:
+	PlainTextAuthSlice( const PlainTextAuthenticator& backend )
+		: m_backend( backend )		{}
+	~PlainTextAuthSlice();
+	void close()				{ delete this; }
+
+	const char* typeName() const		{ return m_backend.typeName(); }
+	AuthProtocol protocolType() const	{ return AuthenticatorSlice::PLAIN; }
+
+	void receiveData( const void* data, std::size_t size );
+	const FSMoperation nextOperation();
+	void signal( FSMsignal /*event*/ );
+	std::size_t dataLeft( const void*& begin );
+private:
+	const PlainTextAuthenticator&	m_backend;
 };
 
 
@@ -82,11 +104,11 @@ class PlainTextAuthContainer : public ObjectContainer< AuthenticationUnit >
 {
 public:
 	PlainTextAuthContainer( const PlainTextAuthConfig& conf );
-	~PlainTextAuthContainer()			{}
+	~PlainTextAuthContainer()		{}
 
-	virtual const char* objectName() const		{ return m_auth->typeName(); }
+	virtual const char* objectName() const	{ return m_auth->typeName(); }
 	virtual AuthenticationUnit* object() const	{ return m_auth; }
-	void dispose()					{ m_auth = NULL; delete this; }
+	void dispose()				{ m_auth = NULL; delete this; }
 private:
 	PlainTextAuthenticator*	m_auth;
 };

@@ -77,6 +77,17 @@ void PlainTextAuthConfig::setCanonicalPathes( const std::string& refPath )
 }
 
 
+//***********************************************************************
+
+PlainTextAuthContainer::PlainTextAuthContainer( const PlainTextAuthConfig& conf )
+{
+	m_auth = new PlainTextAuthenticator( conf.m_file );
+	MOD_LOG_NOTICE << "Plain text authenticator container created";
+}
+
+
+//***********************************************************************
+
 PlainTextAuthenticator::PlainTextAuthenticator( const std::string& filename )
 	: m_file( filename )
 {
@@ -87,11 +98,34 @@ PlainTextAuthenticator::~PlainTextAuthenticator()
 {
 }
 
-
-PlainTextAuthContainer::PlainTextAuthContainer( const PlainTextAuthConfig& conf )
+AuthenticatorSlice* PlainTextAuthenticator::authSlice()
 {
-	m_auth = new PlainTextAuthenticator( conf.m_file );
-	MOD_LOG_NOTICE << "Plain text authenticator container created";
+	return new PlainTextAuthSlice( *this );
+}
+
+bool PlainTextAuthenticator::authenticate( std::string username, std::string password,
+					   User& user ) const
+{
+	return true;
+}
+
+
+//***********************************************************************
+
+void PlainTextAuthSlice::receiveData( const void* /*data*/, std::size_t /*size*/ )
+{
+}
+
+const FSMoperation PlainTextAuthSlice::nextOperation()
+{
+}
+
+void PlainTextAuthSlice::signal( FSMsignal /*event*/ )
+{
+}
+
+std::size_t PlainTextAuthSlice::dataLeft( const void*& /*begin*/ )
+{
 }
 
 }} // namespace _Wolframe::AAAA

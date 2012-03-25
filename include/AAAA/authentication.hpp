@@ -64,7 +64,16 @@ public:
 class AuthenticatorSlice : public _Wolframe::FSMinterface
 {
 public:
+	enum AuthProtocol	{
+		PLAIN,			/// Plain text
+		CHAP,			/// Challenge-response
+		SASL			/// SASL dialog
+	};
+
 	virtual ~AuthenticatorSlice()	{}
+	virtual void close()		{}
+
+	virtual AuthProtocol protocolType() const = 0;
 };
 
 /// AuthenticationUnit Unit

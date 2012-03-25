@@ -16,5 +16,7 @@ find . -name 'README*' -type f -print >>/tmp/$$
 find . -name 'INSTALL*' -type f -print >>/tmp/$$
 find . -name 'TODO*' -type f -print >>/tmp/$$
 find . -name 'BUGS*' -type f -print >>/tmp/$$
+find . -name 'passwd' -type f -print >>/tmp/$$
+find . -name 'plainPasswd' -type f -print >>/tmp/$$
 
 cat /tmp/$$ | sed -e 's|^\./||' | sort -u

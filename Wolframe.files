@@ -310,6 +310,7 @@ include/AAAA/AAAAprovider.hpp
 include/AAAA/audit.hpp
 include/AAAA/authentication.hpp
 include/AAAA/authorization.hpp
+include/AAAA/user.hpp
 include/appConfig.hpp
 include/appProcessor.hpp
 include/appProperties.hpp
@@ -395,7 +396,6 @@ include/serverEndpoint.hpp
 include/singleton.hpp
 include/SSLcertificateInfo.hpp
 include/standardConfigs.hpp
-include/user.hpp
 include/version.hpp
 INSTALL.Unix
 INSTALL.Windows
@@ -582,6 +582,7 @@ src/modules/authentication/plaintext/PlainTextAuth.cpp
 src/modules/authentication/plaintext/PlainTextAuth.hpp
 src/modules/authentication/plaintext/PlainTextAuthModule.cpp
 src/modules/authentication/plaintext/PlainTextAuthModule.def
+src/modules/authentication/plaintext/README.txt
 src/modules/authentication/sasl/GNUmakefile
 src/modules/authentication/sasl/SaslAuthConfig.cpp
 src/modules/authentication/sasl/SaslAuth.cpp
@@ -658,6 +659,8 @@ src/wolframe.xml
 tests/AAAA/authenticationTest.cpp
 tests/AAAA/GNUmakefile
 tests/AAAA/Makefile.W32
+tests/AAAA/passwd
+tests/AAAA/plainPasswd
 tests/AAAA/sasl.conf
 tests/config/GNUmakefile
 tests/configStructParser.cpp
