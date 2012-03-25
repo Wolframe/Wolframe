@@ -68,7 +68,7 @@ static bool parseAtom( const char* tag, ddl::AtomicType& val, protocol::InputFil
 				break;
 
 			case protocol::InputFilter::CloseTag:
-				if (!val.set( std::string( "", 0)))
+				if (!val.set( std::string( "")))
 				{
 					ctx.setError( tag, "cannot convert empty string to value");
 					return false;
