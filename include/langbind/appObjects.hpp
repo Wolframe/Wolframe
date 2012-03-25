@@ -38,6 +38,7 @@ Project Wolframe.
 #include "ddl/structType.hpp"
 #include <stack>
 #include <string>
+#include <algorithm>
 
 namespace _Wolframe {
 namespace langbind {
