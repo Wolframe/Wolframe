@@ -138,7 +138,7 @@ RHEL/Centos/SL 5
 Optional packages:
 Fetch from normal repository: openssl-devel, pam-devel (0.99.6), cyrus-sasl-devel (2.1.22),
                               sqlite-devel (3.3.6), postgresql-devel (8.1.23), libxml2-devel (2.6.26),
-                              libxslt-devel (1.1.17)
+                              libxslt-devel (1.1.17), zlib-devel (1.2.3-4), libpng-devel (1.2.10-16)
 
 Boost is not available in a decent version (1.33), build your own one.
 
