@@ -75,12 +75,12 @@ static bool printObject( const char* tag, const T& obj, protocol::OutputFilter*&
 template <typename T>
 bool print_( const char* tag, const void* obj, const struct_&, protocol::OutputFilter*& out, Context& ctx)
 {
-	static const DescriptionBase* descr = T::getDescription();
+	static const FiltermapDescriptionBase* descr = T::getFiltermapDescription();
 	bool isContent = true;
 
 	if (tag && !printElem( protocol::OutputFilter::OpenTag, tag, std::strlen(tag), out, ctx)) return false;
 
-	DescriptionBase::Map::const_iterator itr = descr->begin(),end = descr->end();
+	FiltermapDescriptionBase::Map::const_iterator itr = descr->begin(),end = descr->end();
 	for (std::size_t idx=0; itr != end; ++itr,++idx)
 	{
 		if (itr->second.isAtomic() && !isContent && idx < descr->nof_attributes())

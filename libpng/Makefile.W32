@@ -1,0 +1,48 @@
+TOPDIR = ..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_CXXFLAGS = \
+	/D_WIN32_WINNT=0x504
+	
+INCLUDE_DIRS = \
+	/I. \
+	/I$(TOPDIR)\zlib
+
+INCLUDE_LIBS =
+
+OBJS = \
+	png.obj \
+	pngerror.obj \
+	pngget.obj \
+	pngmem.obj \
+	pngpread.obj \
+	pngread.obj \
+	pngrio.obj \
+	pngrtran.obj \
+	pngrutil.obj \
+	pngset.obj \
+	pngtest.obj \
+	pngtrans.obj \
+	pngwio.obj \
+	pngwrite.obj \
+	pngwtran.obj \
+	pngwutil.obj
+
+LIBRARIES = \
+	libpng.lib
+	
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+libpng.lib: $(OBJS)
+	$(LINK) /lib /out:$@ $(STATIC_LDFLAGS) $?
+
+local_all: $(LIBRARIES)
+
+local_clean:
+
+local_distclean:
+
+local_test:

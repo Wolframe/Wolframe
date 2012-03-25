@@ -59,9 +59,11 @@ tests/libxml2/testlibxml2
 tests/modules/moduleTest
 tests/AAAA/authenticationTest
 tests/testBoostPath
+tests/filter
+tests/libhpdf/testlibhpdf
+tests/libhpdf/*.pdf
 examples/echo/echod
 examples/lua/luad
-examples/mtproc/mtprocd
 examples/pecho/pechod
 examples/pecho/tests/pechoHandlerTest
 examples/iproc/iprocd

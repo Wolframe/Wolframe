@@ -34,22 +34,17 @@ Project Wolframe.
 
 #ifndef _Wolframe_FILTER_TOKEN_HPP_INCLUDED
 #define _Wolframe_FILTER_TOKEN_HPP_INCLUDED
-#include "protocol/inputfilter.hpp"
-#include "protocol/outputfilter.hpp"
+#include "filter.hpp"
 
 namespace _Wolframe {
-namespace filter {
+namespace langbind {
 
-struct TokenFilter
+class TokenFilterFactory :public FilterFactory
 {
 public:
-	TokenFilter( const char* encoding, std::size_t bufsize);
-
-	protocol::InputFilterR inputFilter() const	{return m_inputFilter;}
-	protocol::OutputFilterR outputFilter() const	{return m_outputFilter;}
-private:
-	protocol::InputFilterR m_inputFilter;
-	protocol::OutputFilterR m_outputFilter;
+	TokenFilterFactory(){}
+	virtual ~TokenFilterFactory(){}
+	virtual Filter create( const char* encoding) const;
 };
 
 }}//namespace

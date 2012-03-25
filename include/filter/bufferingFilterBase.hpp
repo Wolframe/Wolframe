@@ -40,7 +40,7 @@ Project Wolframe.
 #include <cstddef>
 
 namespace _Wolframe {
-namespace filter {
+namespace langbind {
 
 template <class Content, class BufferType=std::string>
 struct BufferingInputFilter :public protocol::InputFilter

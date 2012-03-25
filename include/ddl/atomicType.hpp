@@ -38,6 +38,7 @@ Project Wolframe.
 #include <stdexcept>
 #include <cstddef>
 #include <cstring>
+#include <boost/utility/enable_if.hpp>
 #include <boost/lexical_cast.hpp>
 
 namespace _Wolframe {
@@ -158,10 +159,18 @@ private:
 	///\tparam S type of the element to assign to this. (source type of the assingement)
 	///\param[in] src element to assign to this
 	template <typename M, typename S>
-	void assign( const S& src)
+	typename boost::disable_if_c<
+		boost::is_same<M,S>::value,void>::type assign( const S& src)
 	{
 		M im = boost::lexical_cast<M>( src);
 		m_value = boost::lexical_cast<std::string>(im);
+	}
+
+	template <typename M, typename S>
+	typename boost::enable_if_c<
+		boost::is_same<M,S>::value,void>::type assign( const S& src)
+	{
+		m_value = boost::lexical_cast<std::string>(src);
 	}
 };
 

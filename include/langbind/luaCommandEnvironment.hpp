@@ -37,6 +37,7 @@
 #include "standardConfigs.hpp"
 #include "config/descriptionBase.hpp"
 #include "protocol/commandHandler.hpp"
+#include "langbind/appObjects.hpp"
 #include <string>
 #include <vector>
 
@@ -131,9 +132,9 @@ public:
 		virtual bool check() const;
 
 	private:
-		Type m_type;				//< type of the module
-		std::string m_name;			//< name of the module
-		ModuleLoad m_load;			//< function to load the module into the interpreter context
+		Type m_type;					//< type of the module
+		std::string m_name;				//< name of the module
+		ModuleLoad m_load;				//< function to load the module into the interpreter context
 	};
 	///\brief Get the main function
 	///\return main function
@@ -144,11 +145,10 @@ public:
 	///\brief Get the list of modules without the main
 	///\return list of modules without the main
 	const std::vector<Module>& modules() const	{return m_modules;}
-
 private:
-	std::string m_main;				//< main function
-	Module m_mainmodule;				//< main module
-	std::vector<Module> m_modules;			//< list of modules without the main
+	std::string m_main;		//< main function
+	Module m_mainmodule;		//< main module
+	std::vector<Module> m_modules;	//< list of modules without the main
 };
 
 }}//namespace

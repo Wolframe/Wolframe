@@ -34,6 +34,7 @@ Project Wolframe.
 #include "filter/textwolf_filter.hpp"
 #include "filter/textwolf_filterBase.hpp"
 #include "filter/textwolf.hpp"
+#include "filter.hpp"
 #include "protocol/inputfilter.hpp"
 #include "protocol/outputfilter.hpp"
 #include <string>
@@ -45,7 +46,7 @@ Project Wolframe.
 #include <boost/lexical_cast.hpp>
 
 using namespace _Wolframe;
-using namespace filter;
+using namespace langbind;
 
 namespace {
 
@@ -1126,18 +1127,34 @@ private:
 
 }//end anonymous namespace
 
-TextwolfXmlFilter::TextwolfXmlFilter( std::size_t elementbufsize, std::size_t tagbufsize)
+class TextwolfXmlFilter :public Filter
 {
-	CountedReference<TextwolfEncoding::Id> enc;
-	m_inputFilter.reset( new InputFilter( enc, elementbufsize));
-	m_outputFilter.reset( new OutputFilter( enc, tagbufsize));
-}
+public:
+	TextwolfXmlFilter( std::size_t elementbufsize, std::size_t tagbufsize)
+	{
+		CountedReference<TextwolfEncoding::Id> enc;
+		m_inputfilter.reset( new InputFilter( enc, elementbufsize));
+		m_outputfilter.reset( new OutputFilter( enc, tagbufsize));
+	}
 
-TextwolfXmlFilter::TextwolfXmlFilter( std::size_t elementbufsize, std::size_t tagbufsize, const char* encoding)
+	TextwolfXmlFilter( std::size_t elementbufsize, std::size_t tagbufsize, const char* encoding)
+	{
+		TextwolfEncoding::Id ei = TextwolfEncoding::getId( encoding);
+		CountedReference<TextwolfEncoding::Id> enc( new TextwolfEncoding::Id( ei));
+		m_inputfilter.reset( new InputFilter( enc, elementbufsize));
+		m_outputfilter.reset( new OutputFilter( enc, tagbufsize));
+	}
+};
+
+Filter TextwolfXmlFilterFactory::create( const char* encoding) const
 {
-	TextwolfEncoding::Id ei = TextwolfEncoding::getId( encoding);
-	CountedReference<TextwolfEncoding::Id> enc( new TextwolfEncoding::Id( ei));
-	m_inputFilter.reset( new InputFilter( enc, elementbufsize));
-	m_outputFilter.reset( new OutputFilter( enc, tagbufsize));
+	if (encoding)
+	{
+		return TextwolfXmlFilter( 8092, 256, encoding);
+	}
+	else
+	{
+		return TextwolfXmlFilter( 8092, 256);
+	}
 }
 

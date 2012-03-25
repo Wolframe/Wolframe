@@ -31,7 +31,8 @@ Project Wolframe.
 ************************************************************************/
 ///\file appObjects.cpp
 ///\brief implementation of scripting language objects
-
+#include <algorithm>
+#include <cctype>
 #include "langbind/appObjects.hpp"
 #include "logger-v1.hpp"
 #include "protocol/inputfilter.hpp"
@@ -53,6 +54,43 @@ Project Wolframe.
 
 using namespace _Wolframe;
 using namespace langbind;
+
+bool FilterMap::getFilter( const char* arg, Filter& rt)
+{
+	std::size_t nn = std::strlen(arg);
+	std::size_t ii = nn;
+	std::string nam( arg);
+	std::transform( nam.begin(), nam.end(), nam.begin(), (int(*)(int)) std::tolower);
+	do
+	{
+		nam.resize(ii);
+		std::map<std::string,FilterFactory*>::const_iterator itr=m_map.find( nam),end=m_map.end();
+		if (itr != end)
+		{
+			rt = itr->second->create( (ii==nn)?0:(arg+ii+1));
+			return true;
+		}
+		for (ii=nn; ii>0 && arg[ii] != ':'; --ii);
+	}
+	while (ii>0);
+	return false;
+}
+
+FilterMap::FilterMap()
+{
+	defineFilter( "char", CharFilterFactory());
+	defineFilter( "line", LineFilterFactory());
+	defineFilter( "xml:textwolf", TextwolfXmlFilterFactory());
+#ifdef WITH_LIBXML2
+	defineFilter( "xml:libxml2", Libxml2FilterFactory());
+#endif
+#ifdef WITH_XMLLITE
+	defineFilter( "xml:xmllite", Libxml2FilterFactory());
+#endif
+#ifdef WITH_MSXML
+	defineFilter( "xml:msxml", Libxml2FilterFactory());
+#endif
+}
 
 static InputFilterClosure::ItemType fetchFailureResult( const protocol::InputFilter& ff)
 {
@@ -171,123 +209,6 @@ InputFilterClosure::ItemType InputFilterClosure::fetch( const char*& tag, unsign
 	}
 	LOG_ERROR << "illegal state in iterator";
 	return Error;
-}
-
-static bool startsWith( const char* str, const char* prefix)
-{
-	std::size_t str_len = std::strlen( str);
-	std::size_t prefix_len = std::strlen( prefix);
-	if (str_len < prefix_len) return false;
-	const std::string nm( str, prefix_len);
-	return boost::algorithm::iequals( nm, prefix);
-}
-
-static bool equalIdent( const char* str, const char* prefix)
-{
-	return boost::algorithm::iequals( str, prefix);
-}
-
-Filter::Filter( const char* name)
-{
-	enum {DEFAULT_LINE_SIZE=2048,DEFAULT_INPUT_SIZE=4096,DEFAULT_OUTPUT_SIZE=4096};
-	if (startsWith( name, "char:"))
-	{
-		filter::CharFilter flt( name+5);
-		m_inputfilter = flt.inputFilter();
-		m_outputfilter = flt.outputFilter();
-	}
-	else if (startsWith( name, "line:"))
-	{
-		filter::LineFilter flt( name+5, DEFAULT_LINE_SIZE);
-		m_inputfilter = flt.inputFilter();
-		m_outputfilter = flt.outputFilter();
-	}
-	else if (startsWith( name, "token:"))
-	{
-		filter::TokenFilter flt( name+6, DEFAULT_LINE_SIZE);
-		m_inputfilter = flt.inputFilter();
-		m_outputfilter = flt.outputFilter();
-	}
-	else if (equalIdent( name, "xml:textwolf"))
-	{
-		filter::TextwolfXmlFilter tw( DEFAULT_INPUT_SIZE, DEFAULT_OUTPUT_SIZE);
-		m_inputfilter = tw.inputFilter();
-		m_outputfilter = tw.outputFilter();
-	}
-	else if (startsWith( name, "xml:textwolf:"))
-	{
-		filter::TextwolfXmlFilter tw( DEFAULT_INPUT_SIZE, DEFAULT_OUTPUT_SIZE, name+strlen("xml:textwolf:"));
-		m_inputfilter = tw.inputFilter();
-		m_outputfilter = tw.outputFilter();
-	}
-#ifdef WITH_LIBXML2
-	else if (equalIdent( name, "xml:libxml2"))
-	{
-		filter::Libxml2Filter tw( DEFAULT_INPUT_SIZE);
-		m_inputfilter = tw.inputFilter();
-		m_outputfilter = tw.outputFilter();
-	}
-#endif
-#ifdef WITH_XMLLITE
-	else if (equalIdent( name, "xml:xmllite"))
-	{
-		filter::XmlLiteFilter tw( DEFAULT_INPUT_SIZE);
-		m_inputfilter = tw.inputFilter();
-		m_outputfilter = tw.outputFilter();
-	}
-#endif
-#ifdef WITH_MSXML
-	else if (equalIdent( name, "xml:msxml"))
-	{
-		filter::MSXMLFilter tw( DEFAULT_INPUT_SIZE);
-		m_inputfilter = tw.inputFilter();
-		m_outputfilter = tw.outputFilter();
-	}
-#endif
-}
-
-bool Form::getValue( const char* name, std::string& val) const
-{
-	const ddl::StructType* st = m_struct.get();
-	if (!st) return false;
-	if (st->contentType() != ddl::StructType::Struct) return false;
-	ddl::StructType::Map::const_iterator aa=st->find( name);
-	if (aa == st->end() || aa->second.contentType() != ddl::StructType::Atomic) return false;
-	if (!aa->second.value().get( val)) return false;
-	return true;
-}
-
-bool Form::setValue( const char* name, const std::string& val)
-{
-	ddl::StructType* st = m_struct.get();
-	if (!st) return false;
-	if (st->contentType() != ddl::StructType::Struct) return false;
-	ddl::StructType::Map::iterator aa=st->find( name);
-	if (aa == st->end() || aa->second.contentType() != ddl::StructType::Atomic) return false;
-	if (!aa->second.value().set( val)) return false;
-	return true;
-}
-
-bool Form::getValue( const std::size_t idx, std::string& val) const
-{
-	const ddl::StructType* st = m_struct.get();
-	if (!st) return false;
-	if (st->contentType() != ddl::StructType::Vector || idx >st->size()) return false;
-	ddl::StructType::Map::const_iterator aa = st->begin() + idx;
-	if (!(aa < st->end()) || aa->second.contentType() != ddl::StructType::Atomic) return false;
-	if (!aa->second.value().get( val)) return false;
-	return true;
-}
-
-bool Form::setValue( const std::size_t idx, const std::string& val)
-{
-	ddl::StructType* st = m_struct.get();
-	if (!st) return false;
-	if (st->contentType() != ddl::StructType::Vector || idx >st->size()) return false;
-	ddl::StructType::Map::iterator aa = st->begin() + idx;
-	if (!(aa < st->end()) || aa->second.contentType() != ddl::StructType::Atomic) return false;
-	if (!aa->second.value().set( val)) return false;
-	return true;
 }
 
 Output::ItemType Output::print( const char* tag, unsigned int tagsize, const char* val, unsigned int valsize)

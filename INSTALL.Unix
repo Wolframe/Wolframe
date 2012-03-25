@@ -67,6 +67,10 @@ Prerequisites
   - dia: to convert images to svg
 - optionally (WITH_LIBXML2)
 - optionally (WITH_LIBXSLT), needs LIBXML2 too
+- optionally (WITH_LIBHPDF): for PDF creation,
+  WITH_LOCAL_LIBHPDF=1 uses the supplied version in
+  the 'libhpdf' subdirectory (only if there is really
+  no libhpdf installed on the system!)
 
 Configuration of the build
 --------------------------
@@ -387,7 +391,7 @@ Archlinux
 Required packages: boost and boost-libs
 Optional packages: openssl, qt, pam, libsasl,
                    sqlite3, postgresql-libs,
-                   libxml2, libxslt
+                   libxml2, libxslt, libharu
 
 For building the documentation you need 'xsltproc', 'docbook-xsl' and 'doxygen'.
 'fop' (together with 'java-batik', 'java-commons-io', 'java-avalon-framework',

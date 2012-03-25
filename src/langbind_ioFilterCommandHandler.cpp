@@ -35,6 +35,7 @@
 #include "langbind/ioFilterCommandHandler.hpp"
 #include "logger-v1.hpp"
 #include "filter/char_filter.hpp"
+#include "filter.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::protocol;
@@ -45,9 +46,10 @@ IOFilterCommandHandler::IOFilterCommandHandler()
 	,m_writedatasize(0)
 	,m_itrpos(0)
 {
-	filter::CharFilter flt( "UTF-8");
-	m_inputfilter = flt.inputFilter();
-	m_outputfilter = flt.outputFilter();
+	static langbind::CharFilterFactory defaultff;
+	langbind::Filter flt = defaultff.create( "UTF-8");
+	m_inputfilter = flt.inputfilter();
+	m_outputfilter = flt.outputfilter();
 }
 
 IOFilterCommandHandler::~IOFilterCommandHandler()

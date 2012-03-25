@@ -40,7 +40,7 @@ Project Wolframe.
 #include <cstddef>
 
 namespace _Wolframe {
-namespace filter {
+namespace langbind {
 
 ///\class StrIterator
 ///\brief input iterator on a constant string returning null characters after EOF 

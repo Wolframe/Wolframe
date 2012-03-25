@@ -83,10 +83,10 @@ bool push_( const void* obj, lua_State* ls, Context* ctx)
 template <typename T>
 bool printObject_( const void* obj, const struct_&, lua_State* ls, Context* ctx)
 {
-	static const DescriptionBase* descr = T::getDescription();
+	static const LuamapDescriptionBase* descr = T::getLuamapDescription();
 	
 	lua_newtable( ls);
-	DescriptionBase::Map::const_iterator itr = descr->begin();
+	LuamapDescriptionBase::Map::const_iterator itr = descr->begin();
 	while (itr != descr->end())
 	{
 		lua_pushstring( ls, itr->first);

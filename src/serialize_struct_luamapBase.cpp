@@ -44,7 +44,7 @@ static int luaException( lua_State* ls)
 	return 0;
 }
 
-void DescriptionBase::parse( void* obj, lua_State* ls) const
+void LuamapDescriptionBase::parse( void* obj, lua_State* ls) const
 {
 	bool gotError = false;
 	Context ctx;
@@ -68,7 +68,7 @@ void DescriptionBase::parse( void* obj, lua_State* ls) const
 	lua_pop( ls, 2);
 }
 
-void DescriptionBase::print( const void* obj, lua_State* ls) const
+void LuamapDescriptionBase::print( const void* obj, lua_State* ls) const
 {
 	bool gotError = false;
 	Context ctx;

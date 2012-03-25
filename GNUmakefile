@@ -8,6 +8,12 @@ ifeq ($(WITH_LUA),1)
 SUBDIRS := lua $(SUBDIRS)
 endif
 
+ifeq ($(WITH_LIBHPDF),1)
+ifeq ($(WITH_LOCAL_LIBHPDF),1)
+SUBDIRS := libhpdf $(SUBDIRS)
+endif
+endif
+
 ifeq ($(WITH_EXAMPLES),1)
 SUBDIRS += examples
 endif

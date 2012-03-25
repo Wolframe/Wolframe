@@ -73,7 +73,7 @@ template <typename T>
 bool parseObject_( const char* tag, void* obj, const struct_&, protocol::InputFilter& inp, Context& ctx, bool isinit)
 {
 	protocol::InputFilter::ElementType typ;
-	static const DescriptionBase* descr = T::getDescription();
+	static const FiltermapDescriptionBase* descr = T::getFiltermapDescription();
 	unsigned int depth = 0;
 	std::size_t bufpos = 0;
 	std::vector<bool> isinitar( descr->end() - descr->begin(), false);
@@ -96,7 +96,7 @@ bool parseObject_( const char* tag, void* obj, const struct_&, protocol::InputFi
 			case protocol::InputFilter::OpenTag:
 			{
 				++depth;
-				DescriptionBase::Map::const_iterator itr = descr->find( ctx.buf());
+				FiltermapDescriptionBase::Map::const_iterator itr = descr->find( ctx.buf());
 				if (itr == descr->end())
 				{
 					ctx.setError( ctx.buf(), "unknown element");
@@ -117,7 +117,7 @@ bool parseObject_( const char* tag, void* obj, const struct_&, protocol::InputFi
 
 			case protocol::InputFilter::Attribute:
 			{
-				DescriptionBase::Map::const_iterator itr = descr->find( ctx.buf());
+				FiltermapDescriptionBase::Map::const_iterator itr = descr->find( ctx.buf());
 				if (itr == descr->end())
 				{
 					ctx.setError( ctx.buf(), "unknown element");

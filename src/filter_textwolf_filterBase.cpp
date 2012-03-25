@@ -35,7 +35,7 @@ Project Wolframe.
 #include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
-using namespace filter;
+using namespace langbind;
 
 static std::string getname( const char* name)
 {

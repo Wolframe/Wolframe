@@ -4,6 +4,10 @@ TOPDIR = .
 
 SUBDIRS = src gtest tests clients
 
+!IFDEF WITH_LIBHPDF
+SUBDIRS = zlib libpng libhpdf $(SUBDIRS)
+!ENDIF
+
 !IFDEF WITH_LUA
 SUBDIRS = lua $(SUBDIRS)
 !ENDIF

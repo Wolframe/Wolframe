@@ -16,6 +16,10 @@ SUBDIRS += libxslt
 endif
 endif
 
+ifeq ($(WITH_LIBHPDF),1)
+SUBDIRS += libhpdf
+endif
+
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
 INCLUDE_CXXFLAGS = \

@@ -69,14 +69,14 @@ struct Plant
 	unsigned int availability;
 
 	Plant() :zone(0),availability(0){}
-	static const DescriptionBase* getDescription();
+	static const LuamapDescriptionBase* getLuamapDescription();
 };
 
 struct Phone
 {
 	std::string number;
 	std::string mobile;
-	static const DescriptionBase* getDescription();
+	static const LuamapDescriptionBase* getLuamapDescription();
 };
 
 struct Address
@@ -87,7 +87,7 @@ struct Address
 	Phone phone;
 
 	Address() :country(0){}
-	static const DescriptionBase* getDescription();
+	static const LuamapDescriptionBase* getLuamapDescription();
 };
 
 struct Garden
@@ -97,24 +97,24 @@ struct Garden
 	std::vector<Plant> plants;
 
 	Garden() {}
-	static const DescriptionBase* getDescription();
+	static const LuamapDescriptionBase* getLuamapDescription();
 };
 
 struct Places
 {
 	std::vector<Garden> gardens;
-	static const DescriptionBase* getDescription();
+	static const LuamapDescriptionBase* getLuamapDescription();
 };
 
 struct Document
 {
 	Places places;
-	static const DescriptionBase* getDescription();
+	static const LuamapDescriptionBase* getLuamapDescription();
 };
 
-const DescriptionBase* Plant::getDescription()
+const LuamapDescriptionBase* Plant::getLuamapDescription()
 {
-	struct ThisDescription :public Description<Plant>
+	struct ThisDescription :public LuamapDescription<Plant>
 	{
 		ThisDescription()
 		{
@@ -133,9 +133,9 @@ const DescriptionBase* Plant::getDescription()
 }
 
 
-const DescriptionBase* Phone::getDescription()
+const LuamapDescriptionBase* Phone::getLuamapDescription()
 {
-	struct ThisDescription :public Description<Phone>
+	struct ThisDescription :public LuamapDescription<Phone>
 	{
 		ThisDescription()
 		{
@@ -149,9 +149,9 @@ const DescriptionBase* Phone::getDescription()
 	return &rt;
 }
 
-const DescriptionBase* Address::getDescription()
+const LuamapDescriptionBase* Address::getLuamapDescription()
 {
-	struct ThisDescription :public Description<Address>
+	struct ThisDescription :public LuamapDescription<Address>
 	{
 		ThisDescription()
 		{
@@ -167,9 +167,9 @@ const DescriptionBase* Address::getDescription()
 	return &rt;
 }
 
-const DescriptionBase* Garden::getDescription()
+const LuamapDescriptionBase* Garden::getLuamapDescription()
 {
-	struct ThisDescription :public Description<Garden>
+	struct ThisDescription :public LuamapDescription<Garden>
 	{
 		ThisDescription()
 		{
@@ -184,9 +184,9 @@ const DescriptionBase* Garden::getDescription()
 	return &rt;
 }
 
-const DescriptionBase* Places::getDescription()
+const LuamapDescriptionBase* Places::getLuamapDescription()
 {
-	struct ThisDescription :public Description<Places>
+	struct ThisDescription :public LuamapDescription<Places>
 	{
 		ThisDescription()
 		{
@@ -199,9 +199,9 @@ const DescriptionBase* Places::getDescription()
 	return &rt;
 }
 
-const DescriptionBase* Document::getDescription()
+const LuamapDescriptionBase* Document::getLuamapDescription()
 {
-	struct ThisDescription :public Description<Document>
+	struct ThisDescription :public LuamapDescription<Document>
 	{
 		ThisDescription()
 		{
@@ -224,7 +224,7 @@ template <class Struct>
 static int luaSerializationTest( lua_State* ls)
 {
 	Struct obj;
-	const DescriptionBase* ds = Struct::getDescription();
+	const LuamapDescriptionBase* ds = Struct::getLuamapDescription();
 	lua_pushvalue( ls, 1);
 	ds->parse( &obj, ls);
 	ds->print( &obj, ls);
@@ -235,9 +235,14 @@ template <class Struct>
 static int run( const IProcTestConfiguration& cfg, const std::string& input, std::string& output)
 {
 	char outputbuf[ 8192];
-	langbind::Filter filter( "xml:textwolf");
-	protocol::InputFilter* in = filter.m_inputfilter.get();
-	protocol::OutputFilter* out = filter.m_outputfilter.get();
+	langbind::Filter filter;
+	if (!langbind::GlobalContext().getFilter( "xml:textwolf", filter))
+	{
+		std::cerr << "cannot load filter" << std::endl;
+		return 1;
+	}
+	protocol::InputFilter* in = filter.inputfilter().get();
+	protocol::OutputFilter* out = filter.outputfilter().get();
 	if (!in)
 	{
 		LOG_ERROR << "error in serialization: no valid input filter defined";
@@ -254,8 +259,8 @@ static int run( const IProcTestConfiguration& cfg, const std::string& input, std
 	lua_setglobal( ls, "transform");
 
 	in->protocolInput( (void*)input.c_str(), input.size(), true);
-	processor.setFilter( filter.m_inputfilter);
-	processor.setFilter( filter.m_outputfilter);
+	processor.setFilter( filter.inputfilter());
+	processor.setFilter( filter.outputfilter());
 	for (;;)
 	{
 		const char* errorCode = 0;
@@ -263,20 +268,20 @@ static int run( const IProcTestConfiguration& cfg, const std::string& input, std
 		{
 			case LuaCommandHandler::Yield:
 			{
-				void* content = filter.m_outputfilter->ptr();
-				unsigned int contentsize = filter.m_outputfilter->pos();
+				void* content = filter.outputfilter()->ptr();
+				unsigned int contentsize = filter.outputfilter()->pos();
 				output.append( (char*)content, contentsize);
-				filter.m_outputfilter->release();
-				filter.m_outputfilter->init( outputbuf, sizeof(outputbuf));
+				filter.outputfilter()->release();
+				filter.outputfilter()->init( outputbuf, sizeof(outputbuf));
 				break;
 			}
 
 			case LuaCommandHandler::Ok:
 			{
-				void* content = filter.m_outputfilter->ptr();
-				unsigned int contentsize = filter.m_outputfilter->pos();
+				void* content = filter.outputfilter()->ptr();
+				unsigned int contentsize = filter.outputfilter()->pos();
 				output.append( (char*)content, contentsize);
-				filter.m_outputfilter->release();
+				filter.outputfilter()->release();
 				return 0;
 			}
 

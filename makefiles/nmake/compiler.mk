@@ -26,7 +26,7 @@
 
 # compilation flags and compilers (release)
 !IFNDEF DEBUG
-COMMON_COMPILE_FLAGS = /MD /W2 /nologo /O2 /EHsc /c $(INCLUDE_DIRS)
+COMMON_COMPILE_FLAGS = /MD /W2 /WX /nologo /O2 /EHsc /c $(INCLUDE_DIRS)
 !ENDIF
 
 # compilation flags and compilers (debug)

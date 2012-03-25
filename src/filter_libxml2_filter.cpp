@@ -14,7 +14,7 @@
 #include <libxml/xmlsave.h>
 
 using namespace _Wolframe;
-using namespace filter;
+using namespace langbind;
 
 namespace {
 
@@ -548,11 +548,19 @@ private:
 
 }//end anonymous namespace
 
-
-Libxml2Filter::Libxml2Filter( std::size_t bufsize)
+struct Libxml2Filter :public Filter
 {
-	CountedReference<std::string> enc;
-	m_inputFilter.reset( new InputFilterImpl( enc, bufsize));
-	m_outputFilter.reset( new OutputFilterImpl( enc));
+	Libxml2Filter()
+	{
+		CountedReference<std::string> enc;
+		m_inputfilter.reset( new InputFilterImpl( enc, 8092));
+		m_outputfilter.reset( new OutputFilterImpl( enc));
+	}
+};
+
+Filter Libxml2FilterFactory::create( const char*) const
+{
+	return Libxml2Filter();
 }
+
 
