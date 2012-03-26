@@ -38,6 +38,7 @@
 #include <ostream>
 #include <iostream>
 #include <fstream>
+#include <algorithm>
 
 #include "logger-v1.hpp"
 #include "PlainTextAuth.hpp"
