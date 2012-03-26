@@ -34,33 +34,43 @@
 //
 //
 
-#ifndef _USER_HPP_INCLUDED
-#define _USER_HPP_INCLUDED
+#include "logger-v1.hpp"
+#include <gtest/gtest.h>
 
-#include <string>
+#include "PlainTextAuth.hpp"
 
-namespace _Wolframe {
-namespace AAAA {
+using namespace _Wolframe::AAAA;
+using namespace _Wolframe::log;
+using namespace _Wolframe;
+using namespace std;
 
-class User
+// make the logger in the modules work
+_Wolframe::log::LogBackend*	logBackendPtr;
+
+// The fixture for testing class _Wolframe::module
+class AuthenticationFixture : public ::testing::Test
 {
-public:
-	User( const std::string& uName, unsigned UID, unsigned GID, const std::string& Name )
-		: m_uname( uName ), m_uid( UID ), m_gid( GID ), m_name( Name )	{}
+protected:
+	LogBackend& logBack;
 
-	~User();
-
-	const std::string& uname() const		{ return m_uname; }
-	unsigned uid() const				{ return m_uid; }
-	unsigned gid() const				{ return m_gid; }
-	const std::string& name() const			{ return m_name; }
-private:
-	const std::string	m_uname;
-	const unsigned		m_uid;
-	const unsigned		m_gid;
-	const std::string	m_name;
+	AuthenticationFixture( ) :
+		logBack( LogBackend::instance( ) )
+	{
+		// set temporary logger pointer to the logger instantiated
+		// in the test fixture
+		logBackendPtr = &logBack;
+		logBack.setConsoleLevel( LogLevel::LOGLEVEL_DATA );
+	}
 };
 
-}} // namespace _Wolframe::AAAA
+TEST_F( AuthenticationFixture, PlainTextAuthenticator )
+{
+	PlainTextAuthenticator authenticator( "plainPasswd" );
+	ASSERT_STREQ( authenticator.typeName( ), "PlainTextAuth" );
+}
 
-#endif // _USER_HPP_INCLUDED
+int main( int argc, char **argv )
+{
+	::testing::InitGoogleTest( &argc, argv );
+	return RUN_ALL_TESTS( );
+}

@@ -74,7 +74,7 @@ public:
 
 	AuthenticatorSlice* authSlice();
 
-	bool authenticate( std::string username, std::string password, User& user ) const;
+	User* authenticate( std::string username, std::string password ) const;
 private:
 	std::string		m_file;
 };

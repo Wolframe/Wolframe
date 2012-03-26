@@ -34,33 +34,26 @@
 //
 //
 
-#ifndef _USER_HPP_INCLUDED
-#define _USER_HPP_INCLUDED
-
 #include <string>
+#include <climits>
+#include <AAAA/user.hpp>
 
-namespace _Wolframe {
-namespace AAAA {
+using namespace _Wolframe::AAAA;
 
-class User
+User::~User()
 {
-public:
-	User( const std::string& uName, unsigned UID, unsigned GID, const std::string& Name )
-		: m_uname( uName ), m_uid( UID ), m_gid( GID ), m_name( Name )	{}
+	std::size_t i;
+	char* cptr;
+	unsigned* uptr;
 
-	~User();
+	for ( i = 0, cptr = const_cast< char* >( m_uname.c_str() );
+	      i < m_uname.length(); i++, cptr++ )
+		*cptr = 'x';
 
-	const std::string& uname() const		{ return m_uname; }
-	unsigned uid() const				{ return m_uid; }
-	unsigned gid() const				{ return m_gid; }
-	const std::string& name() const			{ return m_name; }
-private:
-	const std::string	m_uname;
-	const unsigned		m_uid;
-	const unsigned		m_gid;
-	const std::string	m_name;
-};
+	uptr = const_cast< unsigned* >( &m_uid ); *uptr = UINT_MAX;
+	uptr = const_cast< unsigned* >( &m_gid ); *uptr = UINT_MAX;
 
-}} // namespace _Wolframe::AAAA
-
-#endif // _USER_HPP_INCLUDED
+	for ( i = 0, cptr = const_cast< char* >( m_name.c_str() );
+	      i < m_name.length(); i++, cptr++ )
+		*cptr = 'x';
+}

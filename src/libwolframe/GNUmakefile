@@ -50,6 +50,7 @@ PROVIDER_OBJS = \
 CPP_OBJS = \
 	$(LOGGER_OBJS) \
 	$(PROVIDER_OBJS) \
+	user.o \
 	moduleDirectory.o \
 	resolvePath.o \
 	referenceConfig.o

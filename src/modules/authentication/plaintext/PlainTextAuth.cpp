@@ -36,10 +36,14 @@
 
 #include <string>
 #include <ostream>
+#include <iostream>
+#include <fstream>
 
 #include "logger-v1.hpp"
 #include "PlainTextAuth.hpp"
 
+#include <boost/algorithm/string/trim_all.hpp>
+#include <boost/lexical_cast.hpp>
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include "miscUtils.hpp"
@@ -103,10 +107,82 @@ AuthenticatorSlice* PlainTextAuthenticator::authSlice()
 	return new PlainTextAuthSlice( *this );
 }
 
-bool PlainTextAuthenticator::authenticate( std::string username, std::string password,
-					   User& user ) const
+User* PlainTextAuthenticator::authenticate( std::string username, std::string password) const
 {
-	return true;
+	try	{
+		std::ifstream	pwdFile( m_file.c_str() );
+		MOD_LOG_TRACE << "Plain text authenticator opened file '" << m_file << "'";
+		while( !pwdFile.eof())	{
+			std::string line;
+			std::getline( pwdFile, line );
+			boost::algorithm::trim_all( line );
+			if ( line[0] == '#' || line.empty() )
+				continue;
+
+			std::size_t  start = 0, end = 0;
+			std::string usr, pwd, s_uid, s_gid, name;
+			if ( end != std::string::npos)	{
+				end = line.find( ":", start );
+				usr = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
+				start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
+			}
+MOD_LOG_TRACE << "Plain text authenticator user: '" << usr << "'";
+			if ( usr != username )
+				continue;
+
+			if ( end != std::string::npos)	{
+				end = line.find( ":", start );
+				pwd = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
+				start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
+			}
+MOD_LOG_TRACE << "Plain text authenticator password: '" << pwd << "'";
+			if ( pwd != password )
+				return NULL;
+
+			if ( end != std::string::npos)	{
+				end = line.find( ":", start );
+				s_uid = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
+				start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
+			}
+			unsigned uid;
+			try	{
+				uid = boost::lexical_cast< unsigned >( s_uid );
+			}
+			catch( boost::bad_lexical_cast& )	{
+				MOD_LOG_ERROR << "Invalid UID in password file '" << m_file << "': " << s_uid;
+				return NULL;
+			}
+MOD_LOG_TRACE << "Plain text authenticator UID: '" << uid << "'";
+
+			if ( end != std::string::npos)	{
+				end = line.find( ":", start );
+				s_gid = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
+				start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
+			}
+			unsigned gid;
+			try	{
+				gid = boost::lexical_cast< unsigned >( s_gid );
+			}
+			catch( boost::bad_lexical_cast& )	{
+				MOD_LOG_ERROR << "Invalid GID in password file '" << m_file << "': " << s_gid;
+				return NULL;
+			}
+			MOD_LOG_TRACE << "Plain text authenticator GID: '" << gid << "'";
+
+			if ( end != std::string::npos)	{
+				end = line.find( ":", start );
+				name = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
+				start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
+			}
+			MOD_LOG_TRACE << "Plain text authenticator name: '" << name << "'";
+			return new User( usr, uid, gid, name );
+		}
+		return NULL;
+	}
+	catch( std::exception& e)	{
+		MOD_LOG_TRACE << "Unable to read plain text authentication file '" << m_file << "': " << e.what();
+		return NULL;
+	}
 }
 
 
