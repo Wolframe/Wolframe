@@ -31,7 +31,7 @@
 
 ************************************************************************/
 //
-//
+// plain text password authenticator tests
 //
 
 #include "logger-v1.hpp"

@@ -47,6 +47,23 @@
 namespace _Wolframe {
 namespace proc {
 
+// Standard authentication class and authentication provider
+class StandardProcessor : public Processor
+{
+public:
+	StandardProcessor();
+	~StandardProcessor();
+	void close();
+
+	// From the FSM interface
+	void receiveData( const void* data, std::size_t size );
+	const FSMoperation nextOperation();
+	void signal( FSMsignal event );
+	std::size_t dataLeft( const void*& begin );
+private:
+};
+
+
 class ProcessorProvider::ProcessorProvider_Impl
 {
 public:
