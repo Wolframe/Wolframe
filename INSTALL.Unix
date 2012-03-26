@@ -453,7 +453,8 @@ Required packages: boost (1.42.0p7)
 Optional packages: cyrus-sasl2 (from ports tree, 2.1.23p7),
                    qt4 (qt4-4.7.3p0),
                    sqlite3 (3.7.5), postgresql-client (9.0.4),
-                   libxml (2.7.8p2), libxslt (1.1.26p2)
+                   libxml (2.7.8p2), libxslt (1.1.26p2),
+                   png (1.5.4)
 
 You need 'gmake' (3.82).
 
@@ -468,6 +469,8 @@ For some optional packages you need the OpenBSD ports tree and
 you have to build the packages on your own.
 
 For testing you need 'expect-5.44.1.15p0-no_tk'.
+
+Use WITH_LOCAL_LIBHPDF=1 for PDF support.
 
 NetBSD 5.1
 ----------
