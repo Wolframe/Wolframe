@@ -379,6 +379,8 @@ For building the PDF wolfbook install 'fop'.
 
 When rebuilding the SVG images of the documentation you also need 'dia'.
 
+Use WITH_LOCAL_LIBHPDF=1 for PDF support.
+
 Slackware 13.1
 --------------
 
@@ -427,6 +429,8 @@ You need 'gmake' (3.81_4).
 
 So far no PAM support.
 
+Use WITH_LOCAL_LIBHPDF=1 for PDF support.
+
 FreeBSD 9.0
 -----------
 
@@ -434,11 +438,13 @@ Required packages: boost-libs (1.45.0)
 Optional packages: qt4-gui (4.7.4), qt4-moc (4.7.4), qt4-network (4.7.4),
                    qt4-designer (4.7.4), cyrus-sasl (2.1.25_1),
                    sqlite3 (3.7.9), postgresql (9.1.2), libxml2 (2.7.8_1),
-                   libxslt (1.1.26_3)
+                   libxslt (1.1.26_3), png (1.4.8), zlib (1.1.0)
 
 You need 'gmake' (3.82).
 
 So far no PAM support.
+
+Use WITH_LOCAL_LIBHPDF=1 for PDF support.
 
 OpenBSD 5.0
 -----------

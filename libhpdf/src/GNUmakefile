@@ -4,11 +4,13 @@ SUBDIRS =
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
-INCLUDE_LDFLAGS = \
-	$(LIBHARU_PLATFORM_LDFLAGS)
+INCLUDE_DIRS = \
+	$(LIBPNG_INCLUDE_DIRS)
 
-INCLUDE_LIBS = \
-	$(LIBHARU_PLATFORM_LIBS)
+INCLUDE_LDFLAGS = \
+	$(LIBPNG_LIB_DIRS)
+
+INCLUDE_LIBS =
 
 LOCAL_STATIC_LIB_OBJS = \
 	hpdf_annotation.o \
@@ -79,7 +81,7 @@ LOCAL_STATIC_LIB = \
 # we get too many spurios errors and problems (for instance in abuild
 # checks on openSuSE). This doesn't mean they should not be fixed
 # though upstream!
-ALL_CFLAGS = -O2 -Wall -I. -I../include
+CFLAGS = -O2 -Wall -I. -I../include
 
 $(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
 	ar rcs $(LOCAL_STATIC_LIB) $(LOCAL_STATIC_LIB_OBJS)
