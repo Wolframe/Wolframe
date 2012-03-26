@@ -91,6 +91,7 @@ TEST_CPP_BINS = \
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 authenticationTest$(EXE): $(CPP_OBJS)
+plainPasswdTest$(EXE): $(CPP_OBJS)
 
 local_all:
 
