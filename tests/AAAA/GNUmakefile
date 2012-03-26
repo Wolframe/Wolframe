@@ -12,7 +12,8 @@ INCLUDE_DIRS = \
 	-I$(BOOST_INCLUDE_DIR) \
 	-I$(TOPDIR)/gtest/include \
 	-I$(TOPDIR)/src/modules/authentication/textfile \
-	-I$(TOPDIR)/src/modules/authentication/database
+	-I$(TOPDIR)/src/modules/authentication/database \
+	-I$(TOPDIR)/src/modules/authentication/plaintext
 
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR)
@@ -27,7 +28,8 @@ INCLUDE_LIBS = \
 
 CPP_OBJS = \
 	$(TOPDIR)/src/modules/authentication/textfile/TextFileAuth.o \
-	$(TOPDIR)/src/modules/authentication/database/DBauth.o
+	$(TOPDIR)/src/modules/authentication/database/DBauth.o \
+	$(TOPDIR)/src/modules/authentication/plaintext/PlainTextAuth.o \
 
 # openssl
 
@@ -83,7 +85,8 @@ CPP_OBJS += \
 endif
 
 TEST_CPP_BINS = \
-	authenticationTest$(EXE)
+	authenticationTest$(EXE) \
+	plainPasswdTest$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
@@ -113,5 +116,7 @@ endif
 local_test: sasl.db $(TEST_CPP_BINS)
 ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./authenticationTest
+	@echo
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./plainPasswdTest
 	@echo
 endif

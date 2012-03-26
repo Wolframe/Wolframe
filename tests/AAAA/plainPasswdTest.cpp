@@ -59,15 +59,73 @@ protected:
 		// set temporary logger pointer to the logger instantiated
 		// in the test fixture
 		logBackendPtr = &logBack;
-		logBack.setConsoleLevel( LogLevel::LOGLEVEL_DATA );
+//		logBack.setConsoleLevel( LogLevel::LOGLEVEL_DATA );
+		logBack.setConsoleLevel( LogLevel::LOGLEVEL_INFO );
 	}
 };
 
-TEST_F( AuthenticationFixture, PlainTextAuthenticator )
+TEST_F( AuthenticationFixture, typeName )
 {
 	PlainTextAuthenticator authenticator( "plainPasswd" );
 	ASSERT_STREQ( authenticator.typeName( ), "PlainTextAuth" );
 }
+
+TEST_F( AuthenticationFixture, validUsers )
+{
+	User*	user;
+	PlainTextAuthenticator authenticator( "plainPasswd" );
+
+	user = authenticator.authenticate( "admin", "Good Password" );
+	ASSERT_TRUE( user != NULL );
+	ASSERT_STREQ( "admin", user->uname().c_str() );
+	ASSERT_EQ( 0, user->uid() );
+	ASSERT_EQ( 0, user->gid() );
+	ASSERT_STREQ( "Wolframe Administrator", user->name().c_str() );
+	delete user;
+
+	user = authenticator.authenticate( "goodusr", "User PassWord" );
+	ASSERT_TRUE( user != NULL );
+	ASSERT_STREQ( "goodusr", user->uname().c_str() );
+	ASSERT_EQ( 1000, user->uid() );
+	ASSERT_EQ( 100, user->gid() );
+	ASSERT_STREQ( "Good User", user->name().c_str() );
+	delete user;
+
+	user = authenticator.authenticate( "badusr", "User BadWord" );
+	ASSERT_TRUE( user != NULL );
+	ASSERT_STREQ( "badusr", user->uname().c_str() );
+	ASSERT_EQ( 1001, user->uid() );
+	ASSERT_EQ( 100, user->gid() );
+	ASSERT_STREQ( "Bad User", user->name().c_str() );
+	delete user;
+}
+
+TEST_F( AuthenticationFixture, invalidPasswords )
+{
+	User*	user;
+	PlainTextAuthenticator authenticator( "plainPasswd" );
+
+	user = authenticator.authenticate( "admin", "Goood Password" );
+	ASSERT_EQ( NULL, user );
+	user = authenticator.authenticate( "goodusr", "User Password" );
+	ASSERT_EQ( NULL, user );
+	user = authenticator.authenticate( "badusr", "user BadWord" );
+	ASSERT_EQ( NULL, user );
+}
+
+TEST_F( AuthenticationFixture, invalidUsers )
+{
+	User*	user;
+	PlainTextAuthenticator authenticator( "plainPasswd" );
+
+	user = authenticator.authenticate( "adminn", "xx" );
+	ASSERT_EQ( NULL, user );
+	user = authenticator.authenticate( "gooduser", "xx" );
+	ASSERT_EQ( NULL, user );
+	user = authenticator.authenticate( "baduser", "xx" );
+	ASSERT_EQ( NULL, user );
+}
+
 
 int main( int argc, char **argv )
 {

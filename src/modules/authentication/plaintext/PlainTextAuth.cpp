@@ -188,6 +188,11 @@ MOD_LOG_TRACE << "Plain text authenticator UID: '" << uid << "'";
 
 //***********************************************************************
 
+PlainTextAuthSlice::~PlainTextAuthSlice()
+{
+
+}
+
 void PlainTextAuthSlice::receiveData( const void* /*data*/, std::size_t /*size*/ )
 {
 }
