@@ -480,7 +480,8 @@ NetBSD 5.1
 Required packages: boost-headers (1.47.0), boost-libs (1.47.0)
 Optional packages: cyrus-sasl (2.1.25), qt4 (4.7.4),
                    sqlite3 (3.7.9), postgresql91-client (9.1.2),
-                   libxml2 (2.7.8nb8), libxslt (1.1.26nb1)
+                   libxml2 (2.7.8nb8), libxslt (1.1.26nb1),
+                   zlib (1.2.3), png (1.5.9)
 
 You need 'gmake' (3.82db3).
 
@@ -488,6 +489,8 @@ NetBSD contains SSL libraries per default no packages needed.
 Also PAM modules.
 
 For testing you need 'tcl-expect' (5.43.0nb1).
+
+Use WITH_LOCAL_LIBHPDF=1 for PDF support.
 
 Solaris 10
 ----------
