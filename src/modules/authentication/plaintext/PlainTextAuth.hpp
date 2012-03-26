@@ -74,7 +74,7 @@ public:
 
 	AuthenticatorSlice* authSlice();
 
-	bool authenticate( std::string username, std::string password, User& user ) const;
+	User* authenticate( std::string username, std::string password ) const;
 private:
 	std::string		m_file;
 };
@@ -93,7 +93,7 @@ public:
 
 	void receiveData( const void* data, std::size_t size );
 	const FSMoperation nextOperation();
-	void signal( FSMsignal /*event*/ );
+	void signal( FSMsignal event );
 	std::size_t dataLeft( const void*& begin );
 private:
 	const PlainTextAuthenticator&	m_backend;
