@@ -161,6 +161,16 @@ ifeq ($(WITH_LOCAL_LIBHPDF),1)
 	@echo
 	@echo "using local libhpdf.."
 endif
+	@echo
+	@echo "LIBPNG_DIR: $(LIBPNG_DIR)"
+	@echo "LIBPNG_INCLUDE_DIRS: $(LIBPNG_INCLUDE_DIRS)"
+	@echo "LIBPNG_LIB_DIRS: $(LIBPNG_LIB_DIRS)"
+	@echo "LIBPNG_LIBS: $(LIBPNG_LIBS)"
+	@echo
+	@echo "LIBZ_DIR: $(LIBZ_DIR)"
+	@echo "LIBZ_INCLUDE_DIRS: $(LIBZ_INCLUDE_DIRS)"
+	@echo "LIBZ_LIB_DIRS: $(LIBZ_LIB_DIRS)"
+	@echo "LIBZ_LIBS: $(LIBZ_LIBS)"
 endif
 	@echo
 	@echo "Additional build options:"

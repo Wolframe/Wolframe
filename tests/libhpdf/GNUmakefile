@@ -30,13 +30,16 @@ INCLUDE_CXXFLAGS += \
 INCLUDE_DIRS += \
 	-I$(TOPDIR)/libhpdf/include
 
-INCLUDE_LDFLAGS =
-
 INCLUDE_LIBS += \
-	$(TOPDIR)/libhpdf/src/libhpdf.a \
-	-lz -lpng
+	$(TOPDIR)/libhpdf/src/libhpdf.a
 
 endif
+
+INCLUDE_LDFLAGS += \
+	$(LIBPNG_LIB_DIRS) $(LIBPNG_LIBS)
+
+INCLUDE_LIBS += \
+	$(LIBPNG_LIBS) $(LIBZ_LIBS)
 
 TEST_CPP_BINS = \
 	testlibhpdf$(EXE)

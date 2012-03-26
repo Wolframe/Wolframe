@@ -142,7 +142,7 @@ Fetch from normal repository: openssl-devel, pam-devel (0.99.6), cyrus-sasl-deve
 
 Boost is not available in a decent version (1.33), build your own one.
 
-Use WITH_LOCAL_LIBHARU=1 for PDF support.
+Use WITH_LOCAL_LIBHPDF=1 for PDF support.
 
 Qt (4.2.1) is too old, compile your own one.
 
@@ -161,7 +161,7 @@ Fetch from normal repository: openssl-devel, pam-devel (0.99.6), cyrus-sasl-deve
 
 Boost is available in an almost usable version (1.39.0), build your own one.
 
-Use WITH_LOCAL_LIBHARU=1 for PDF support.
+Use WITH_LOCAL_LIBHPDF=1 for PDF support.
 
 Qt (4.2.1) is too old, compile your own one.
 
@@ -229,7 +229,7 @@ Optional packages: libqt4-dev,
 libboost-dev is 1.40, too old, missing asio features and property_tree, build
 you own boost. gcc on Debian complains a lot about boost header files..
 
-Use WITH_LOCAL_LIBHARU=1 for PDF support.
+Use WITH_LOCAL_LIBHPDF=1 for PDF support.
 
 For building the documentation you need 'xsltproc', 'docbook-xsl' and 'doxygen'.
 
@@ -356,12 +356,14 @@ No problems with the supplied packages at all, everything builds out of the box:
 Required packages: boost-devel (1.44.0)
 Optional packages: qt-devel (4.7.1), pam-devel (1.1.3), cyrus-sasl-devel (2.1.23),
                    sqlite3-devel (3.7.5), postgresql-devel (9.0.3), libxml2-dev (2.7.8),
-                   libxslt-devel (1.1.26)
+                   libxslt-devel (1.1.26), zlib-devel (1.2.5-9.10.1), libpng-devel (1.2.47-0.8.1)
 
 For building the documentation you need 'libxslt', 'docbook-style-xsl' and 'doxygen'.
 For building the PDF wolfbook install 'fop'.
 
 When rebuilding the SVG images of the documentation you also need 'dia'.
+
+Use WITH_LOCAL_LIBHPDF=1 for PDF support.
 
 SLES 11 SP1
 -----------
@@ -376,6 +378,8 @@ For building the documentation you need 'libxslt', 'docbook-style-xsl' and 'doxy
 For building the PDF wolfbook install 'fop'.
 
 When rebuilding the SVG images of the documentation you also need 'dia'.
+
+Use WITH_LOCAL_LIBHPDF=1 for PDF support.
 
 Slackware 13.1
 --------------
@@ -425,6 +429,8 @@ You need 'gmake' (3.81_4).
 
 So far no PAM support.
 
+Use WITH_LOCAL_LIBHPDF=1 for PDF support.
+
 FreeBSD 9.0
 -----------
 
@@ -432,11 +438,13 @@ Required packages: boost-libs (1.45.0)
 Optional packages: qt4-gui (4.7.4), qt4-moc (4.7.4), qt4-network (4.7.4),
                    qt4-designer (4.7.4), cyrus-sasl (2.1.25_1),
                    sqlite3 (3.7.9), postgresql (9.1.2), libxml2 (2.7.8_1),
-                   libxslt (1.1.26_3)
+                   libxslt (1.1.26_3), png (1.4.8), zlib (1.1.0)
 
 You need 'gmake' (3.82).
 
 So far no PAM support.
+
+Use WITH_LOCAL_LIBHPDF=1 for PDF support.
 
 OpenBSD 5.0
 -----------
@@ -490,7 +498,6 @@ pkgadd -d http://get.opencsw.org/now
 
 pkgutil --install CSWgcc4core CSWgcc4g++ CSWgmake
 
-
 Make sure the build environment is always set as follows:
 
 PATH=/opt/csw/bin:/usr/ccs/bin:/usr/bin:/bin:/opt/csw/sbin:/usr/sbin:/sbin
@@ -538,6 +545,8 @@ Optional packages from Sun installation disk:
   SUNWlxsl
 
 CSWsqlite3 misses the header files, so use internally supplied version with WITH_LOCAL_SQLITE1=1
+
+Use WITH_LOCAL_LIBHPDF=1 for PDF support.
 
 PAM is available natively, just add WITH_PAM=1
 

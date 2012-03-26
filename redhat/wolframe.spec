@@ -89,6 +89,7 @@
 %define with_sasl	1
 %define with_libxml2	1
 %define with_libxslt	1
+%define with_libhpdf	1
 %define with_examples	1
 
 # Qt is far too old on some platforms, we also don't want to build a local
@@ -207,8 +208,19 @@ Requires: libxml2 >= 2.6
 BuildRequires: libxslt-devel >= 1.0
 Requires: libxslt >= 1.0
 %endif
+%if %{with_libhpdf}
+BuildRequires: libpng-devel
+BuildRequires: zlib-devel
+%endif
 BuildRequires: gcc-c++
 BuildRequires: doxygen
+
+# libhpdf is never available in a decent version,
+# build local one
+%define with_local_libhpdf      0
+%if %{with_libhpdf}
+%define with_local_libhpdf	1
+%endif
 
 # postgres database module
 %if %{with_pgsql}
@@ -388,6 +400,7 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make help \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
+	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
 	WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=/etc libdir=%{_libdir}
 
@@ -404,6 +417,7 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make config \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
+	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
 	WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=/etc libdir=%{_libdir}
 
@@ -421,6 +435,7 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make all \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
+	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
 	WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=/etc libdir=%{_libdir}
 
@@ -445,6 +460,7 @@ make DESTDIR=$RPM_BUILD_ROOT install \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
+	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
 	WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=/etc libdir=%{_libdir}
 
