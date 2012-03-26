@@ -58,6 +58,7 @@ tests/database/test.db
 tests/libxml2/testlibxml2
 tests/modules/moduleTest
 tests/AAAA/authenticationTest
+tests/AAAA/plainPasswdTest
 tests/testBoostPath
 tests/filter
 tests/libhpdf/testlibhpdf
