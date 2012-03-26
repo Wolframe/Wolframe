@@ -492,7 +492,6 @@ pkgadd -d http://get.opencsw.org/now
 
 pkgutil --install CSWgcc4core CSWgcc4g++ CSWgmake
 
-
 Make sure the build environment is always set as follows:
 
 PATH=/opt/csw/bin:/usr/ccs/bin:/usr/bin:/bin:/opt/csw/sbin:/usr/sbin:/sbin
@@ -540,6 +539,8 @@ Optional packages from Sun installation disk:
   SUNWlxsl
 
 CSWsqlite3 misses the header files, so use internally supplied version with WITH_LOCAL_SQLITE1=1
+
+Use WITH_LOCAL_LIBHPDF=1 for PDF support.
 
 PAM is available natively, just add WITH_PAM=1
 
