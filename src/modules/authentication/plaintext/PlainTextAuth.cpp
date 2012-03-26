@@ -118,6 +118,8 @@ void PlainTextAuthSlice::receiveData( const void* /*data*/, std::size_t /*size*/
 
 const FSMoperation PlainTextAuthSlice::nextOperation()
 {
+	FSMoperation	op;
+	return op;
 }
 
 void PlainTextAuthSlice::signal( FSMsignal /*event*/ )
@@ -126,6 +128,7 @@ void PlainTextAuthSlice::signal( FSMsignal /*event*/ )
 
 std::size_t PlainTextAuthSlice::dataLeft( const void*& /*begin*/ )
 {
+	return 0;
 }
 
 }} // namespace _Wolframe::AAAA
