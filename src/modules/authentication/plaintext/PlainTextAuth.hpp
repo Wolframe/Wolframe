@@ -74,7 +74,7 @@ public:
 
 	AuthenticatorSlice* authSlice();
 
-	User* authenticate( std::string username, std::string password ) const;
+	User* authenticate( std::string username, std::string password, bool caseSensitveUser ) const;
 private:
 	std::string		m_file;
 };
