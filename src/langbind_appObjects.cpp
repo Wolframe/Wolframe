@@ -122,6 +122,27 @@ const DDLForm DDLFormMap::getForm( const char* name) const
 	}
 }
 
+static GlobalContextR g_context; //< PF:HACK: global variable - should be passed here. no clue how ... (singleton?)
+
+void _Wolframe::langbind::defineGlobalContext( const GlobalContextR& context)
+{
+	g_context = context;
+}
+
+GlobalContext* _Wolframe::langbind::getGlobalContext()
+{
+	return g_context.get();
+}
+
+struct AutoCreateGlobalContext
+{
+	AutoCreateGlobalContext()
+	{
+		g_context.reset( new GlobalContext());
+	}
+};
+AutoCreateGlobalContext g_autoCreateGlobalContext;
+
 
 static InputFilterClosure::ItemType fetchFailureResult( const protocol::InputFilter& ff)
 {

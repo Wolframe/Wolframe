@@ -80,6 +80,8 @@ private:
 
 };
 
+void defineLuaGlobalContext( const GlobalContextR& context);
+
 }}//namespace
 #endif
 

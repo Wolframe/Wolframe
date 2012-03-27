@@ -691,8 +691,6 @@ struct LuaCommandHandler::InterpreterContext
 	}
 };
 
-static GlobalContext g_context; //< PF:HACK: global variable - should be passed here. no clue how ... (singleton?)
-
 LuaCommandHandler::LuaCommandHandler( const LuaCommandEnvironment* env)
 		:m_env(env),m_interp(0)
 {
@@ -704,7 +702,7 @@ LuaCommandHandler::LuaCommandHandler( const LuaCommandEnvironment* env)
 	LuaObject<Filter>::createMetatable( m_interp->ls, &function__LuaObject__index<Filter>, &function__LuaObject__newindex<Filter>, 0);
 	LuaObject<InputFilterClosure>::createMetatable( m_interp->ls, 0, 0, 0);
 	setGlobalSingletonPointer<const LuaCommandEnvironment>( m_interp->ls, env);
-	setGlobalSingletonPointer<GlobalContext>( m_interp->ls, &g_context);
+	setGlobalSingletonPointer<GlobalContext>( m_interp->ls, getGlobalContext());
 	lua_pushcfunction( m_interp->ls, &function_yield);
 	lua_setglobal( m_interp->ls, "yield");
 	lua_pushcfunction( m_interp->ls, &function_filter);

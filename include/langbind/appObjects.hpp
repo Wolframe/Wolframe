@@ -209,6 +209,11 @@ class GlobalContext :public FilterMap, public DDLFormMap
 public:
 	GlobalContext(){}
 };
+typedef CountedReference<GlobalContext> GlobalContextR;
+
+
+void defineGlobalContext( const GlobalContextR& context);
+GlobalContext* getGlobalContext();
 
 }}//namespace
 #endif
