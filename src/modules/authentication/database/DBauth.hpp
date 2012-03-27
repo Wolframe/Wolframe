@@ -52,7 +52,7 @@ public:
 		: config::ObjectConfiguration( cfgName, logParent, logName ),
 		  m_dbConfig( "", logParent, "Database" )	{}
 
-	virtual const char* objectName() const			{ return "DatabaseAuth"; }
+	virtual const char* objectName() const			{ return "DBAuth"; }
 
 	/// methods
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,
@@ -76,7 +76,6 @@ class DBauthenticator : public AuthenticationUnit
 public:
 	DBauthenticator( const std::string& dbLabel );
 	~DBauthenticator();
-	const char* objectName() const			{ return "DatabaseAuth"; }
 	const char* typeName() const			{ return "DBAuth"; }
 
 	bool resolveDB( const db::DatabaseProvider& db );
@@ -92,10 +91,10 @@ class DBauthContainer : public ObjectContainer< AuthenticationUnit >
 {
 public:
 	DBauthContainer( const DatabaseAuthConfig& conf );
-	~DBauthContainer()					{}
+	~DBauthContainer()				{}
 
-	virtual const char* objectName() const			{ return m_auth->objectName(); }
-	virtual AuthenticationUnit* object() const		{ return m_auth; }
+	virtual const char* objectName() const		{ return m_auth->typeName(); }
+	virtual AuthenticationUnit* object() const	{ return m_auth; }
 	void dispose()					{ m_auth = NULL; delete this; }
 private:
 	DBauthenticator*	m_auth;

@@ -135,14 +135,14 @@ Project Wolframe.
 			<connections>5</connections>
 			<acquireTimeout>10</acquireTimeout>
 		</PostgreSQL>
--->		
+-->
 		<SQLite>
 			<identifier>sqlitedb</identifier>
 			<filename>primary.db</filename>
 <!--			<filename>/var/lib/wolframe/primary.db</filename> -->
 		</SQLite>
 	</database>
-	
+
 	<!--	Logging parameters -->
 	<logging>
 		<!--	log level for console (stderr) logging -->
@@ -170,7 +170,7 @@ Project Wolframe.
 			<level>INFO</level>
 		</eventlog>
 	</logging>
-	
+
 	<!-- Authentication, authorization, auditing and accounting configuration -->
 	<AAAA>
 
@@ -180,18 +180,18 @@ Project Wolframe.
 			<database>sqlitedb</database>
 			<file>wolframe.auth</file>
 		</authentication>
-		
+
 		<Authorization>
 			<default>deny</default> <!-- what to do when there is no authorization information -->
 
 <!--
 			<database>
-				<name>"PostgreSQL database authorization"</name>
+				<identifier>"PostgreSQL database authorization"</identifier>
 				<database>pgdb</database>
 			</database>
 
 			<database>
-				<name>"SQLite database authorization"</name>
+				<identifier>"SQLite database authorization"</identifier>
 				<database>sqlitedb</database>
 			</database>
 -->
@@ -200,12 +200,12 @@ Project Wolframe.
 		<Audit>
 			<!-- Audit is mandatory ? If set to yes operations will fail if audit fails -->
 			<mandatory>yes</mandatory>
-			
+
 			<TextFile>
 				<required>yes</required>
 				<file>wolframe.audit</file>
 			</TextFile>
-			
+
 			<Database>
 				<required>no</required>
 				<database>sqlitedb</database>
@@ -223,6 +223,6 @@ Project Wolframe.
 			<timeout>10</timeout>
 		</EchoProcessor>
 	</Processor>
-	
+
 </configuration>
-	
+

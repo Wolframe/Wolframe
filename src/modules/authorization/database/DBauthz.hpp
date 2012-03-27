@@ -60,7 +60,7 @@ public:
 
 	void print( std::ostream& os, size_t indent ) const;
 private:
-	std::string	m_name;
+	std::string	m_identifier;
 	std::string	m_dbConfig;
 };
 
@@ -72,13 +72,13 @@ public:
 	DBauthorizer( const std::string& Name, const std::string& DbLabel );
 	~DBauthorizer();
 	const char* typeName() const		{ return "DatabaseAuthorization"; }
-	const char* name() const		{ return m_name.c_str(); }
+	const char* identifier() const		{ return m_identifier.c_str(); }
 
 	bool resolveDB( const db::DatabaseProvider& db );
 
 	AuthorizationUnit::Result allowed( const AAAAObject& );
 private:
-	const std::string	m_name;
+	const std::string	m_identifier;
 	const std::string	m_dbLabel;
 	const db::Database*	m_db;
 

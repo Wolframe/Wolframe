@@ -44,7 +44,7 @@ namespace AAAA {
 
 //***  Database authorizer  *********************************************
 DBauthorizer::DBauthorizer( const std::string& Name, const std::string& DbLabel )
-	: m_name( Name ), m_dbLabel( DbLabel )
+	: m_identifier( Name ), m_dbLabel( DbLabel )
 {
 	m_db = NULL;
 	if ( m_dbLabel.empty() )
@@ -103,7 +103,7 @@ AuthorizationUnit::Result DBauthorizer::connectionAllowed( const net::LocalEndpo
 //***  Database authorizer container  ***********************************
 DBauthzContainer::DBauthzContainer( const DatabaseAuthzConfig& conf )
 {
-	m_authz = new DBauthorizer( conf.m_name, conf.m_dbConfig );
+	m_authz = new DBauthorizer( conf.m_identifier, conf.m_dbConfig );
 	MOD_LOG_TRACE << "Database authorizer container created";
 }
 

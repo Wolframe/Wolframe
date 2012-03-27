@@ -79,7 +79,7 @@ public:
 	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ )
 					{ return true; }
 
-	virtual const char* name() const = 0;
+	virtual const char* identifier() const = 0;
 
 	virtual Result allowed( const AAAAObject& ) = 0;
 };

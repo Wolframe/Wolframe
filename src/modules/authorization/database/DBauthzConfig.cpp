@@ -51,9 +51,10 @@ bool DatabaseAuthzConfig::parse( const config::ConfigurationTree& pt, const std:
 	bool retVal = true;
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
-		if ( boost::algorithm::iequals( L1it->first, "name" ))	{
-			bool isDefined = ( !m_name.empty() );
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_name, &isDefined ))
+		if ( boost::algorithm::iequals( L1it->first, "identifier" ) ||
+				boost::algorithm::iequals( L1it->first, "ID" ))	{
+			bool isDefined = ( !m_identifier.empty() );
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_identifier, &isDefined ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "database" ))	{
@@ -80,7 +81,7 @@ void DatabaseAuthzConfig::print( std::ostream& os, size_t indent ) const
 {
 	std::string indStr( indent, ' ' );
 	os << indStr << sectionName() << std::endl;
-	os << indStr << "   Identifier: " << m_name << std::endl;
+	os << indStr << "   Identifier: " << m_identifier << std::endl;
 	os << indStr << "   Database: " << m_dbConfig << std::endl;
 }
 
