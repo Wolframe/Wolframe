@@ -7,7 +7,7 @@ the passwords in plain text.
 
 The format of the file is:
 
-<username>:<password>:UID:GID:<user info (name)>:.....(ignored)
+<username>:<password>:<user info (name)>:.....(ignored)
 
 The protocol is very simple. It is one message in the format
 	USER <username> PASS(WORD) <password>

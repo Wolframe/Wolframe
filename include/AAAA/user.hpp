@@ -38,6 +38,7 @@
 #define _USER_HPP_INCLUDED
 
 #include <string>
+#include <ctime>
 
 namespace _Wolframe {
 namespace AAAA {
@@ -45,19 +46,20 @@ namespace AAAA {
 class User
 {
 public:
-	User( const std::string& uName, unsigned UID, unsigned GID, const std::string& Name )
-		: m_uname( uName ), m_uid( UID ), m_gid( GID ), m_name( Name )	{}
+	User( const std::string& Authenticator, const std::string& uName, const std::string& Name )
+		: m_authenticator( Authenticator ), m_loginTime( time( NULL )),
+		  m_uname( uName ), m_name( Name )	{}
 
 	~User();
 
+	const std::string& authorizer() const		{ return m_authenticator; }
+	time_t loginTime() const			{ return m_loginTime; }
 	const std::string& uname() const		{ return m_uname; }
-	unsigned uid() const				{ return m_uid; }
-	unsigned gid() const				{ return m_gid; }
 	const std::string& name() const			{ return m_name; }
 private:
+	const std::string	m_authenticator;
+	const time_t		m_loginTime;
 	const std::string	m_uname;
-	const unsigned		m_uid;
-	const unsigned		m_gid;
 	const std::string	m_name;
 };
 

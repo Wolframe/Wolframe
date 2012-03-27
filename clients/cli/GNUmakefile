@@ -41,6 +41,7 @@ local_all:
 local_clean:
 
 local_distclean:
+	-rm -f primary.db
 
 local_test:
 ifeq ($(WITH_EXPECT),1)

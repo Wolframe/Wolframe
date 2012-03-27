@@ -78,24 +78,18 @@ TEST_F( AuthenticationFixture, validUsers )
 	user = authenticator.authenticate( "admin", "Good Password", true );
 	ASSERT_TRUE( user != NULL );
 	ASSERT_STREQ( "admin", user->uname().c_str() );
-	ASSERT_EQ( 0, user->uid() );
-	ASSERT_EQ( 0, user->gid() );
 	ASSERT_STREQ( "Wolframe Administrator", user->name().c_str() );
 	delete user;
 
 	user = authenticator.authenticate( "goodusr", "User PassWord", true );
 	ASSERT_TRUE( user != NULL );
 	ASSERT_STREQ( "goodusr", user->uname().c_str() );
-	ASSERT_EQ( 1000, user->uid() );
-	ASSERT_EQ( 100, user->gid() );
 	ASSERT_STREQ( "Good User", user->name().c_str() );
 	delete user;
 
 	user = authenticator.authenticate( "badusr", "User BadWord", true );
 	ASSERT_TRUE( user != NULL );
 	ASSERT_STREQ( "badusr", user->uname().c_str() );
-	ASSERT_EQ( 1001, user->uid() );
-	ASSERT_EQ( 100, user->gid() );
 	ASSERT_STREQ( "Bad User", user->name().c_str() );
 	delete user;
 }
@@ -108,24 +102,18 @@ TEST_F( AuthenticationFixture, caseInsensitive_Pass )
 	user = authenticator.authenticate( "AdMiN", "Good Password", false );
 	ASSERT_TRUE( user != NULL );
 	ASSERT_STREQ( "admin", user->uname().c_str() );
-	ASSERT_EQ( 0, user->uid() );
-	ASSERT_EQ( 0, user->gid() );
 	ASSERT_STREQ( "Wolframe Administrator", user->name().c_str() );
 	delete user;
 
 	user = authenticator.authenticate( "GoodUsr", "User PassWord", false );
 	ASSERT_TRUE( user != NULL );
 	ASSERT_STREQ( "goodusr", user->uname().c_str() );
-	ASSERT_EQ( 1000, user->uid() );
-	ASSERT_EQ( 100, user->gid() );
 	ASSERT_STREQ( "Good User", user->name().c_str() );
 	delete user;
 
 	user = authenticator.authenticate( "BadUsr", "User BadWord", false );
 	ASSERT_TRUE( user != NULL );
 	ASSERT_STREQ( "badusr", user->uname().c_str() );
-	ASSERT_EQ( 1001, user->uid() );
-	ASSERT_EQ( 100, user->gid() );
 	ASSERT_STREQ( "Bad User", user->name().c_str() );
 	delete user;
 }

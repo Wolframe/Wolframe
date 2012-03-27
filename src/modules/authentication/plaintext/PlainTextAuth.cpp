@@ -43,7 +43,6 @@
 #include "PlainTextAuth.hpp"
 
 #include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include "miscUtils.hpp"
@@ -121,7 +120,7 @@ User* PlainTextAuthenticator::authenticate( std::string username, std::string pa
 				continue;
 
 			std::size_t  start = 0, end = 0;
-			std::string usr, pwd, s_uid, s_gid, name;
+			std::string usr, pwd, name;
 			if ( end != std::string::npos)	{
 				end = line.find( ":", start );
 				usr = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
@@ -143,41 +142,11 @@ User* PlainTextAuthenticator::authenticate( std::string username, std::string pa
 
 			if ( end != std::string::npos)	{
 				end = line.find( ":", start );
-				s_uid = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
-				start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
-			}
-			unsigned uid;
-			try	{
-				uid = boost::lexical_cast< unsigned >( s_uid );
-			}
-			catch( boost::bad_lexical_cast& )	{
-				MOD_LOG_ERROR << "Invalid UID in password file '" << m_file << "': " << s_uid;
-				return NULL;
-			}
-//MOD_LOG_TRACE << "Plain text authenticator UID: '" << uid << "'";
-
-			if ( end != std::string::npos)	{
-				end = line.find( ":", start );
-				s_gid = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
-				start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
-			}
-			unsigned gid;
-			try	{
-				gid = boost::lexical_cast< unsigned >( s_gid );
-			}
-			catch( boost::bad_lexical_cast& )	{
-				MOD_LOG_ERROR << "Invalid GID in password file '" << m_file << "': " << s_gid;
-				return NULL;
-			}
-//MOD_LOG_TRACE << "Plain text authenticator GID: '" << gid << "'";
-
-			if ( end != std::string::npos)	{
-				end = line.find( ":", start );
 				name = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
 				start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
 			}
 //MOD_LOG_TRACE << "Plain text authenticator name: '" << name << "'";
-			return new User( usr, uid, gid, name );
+			return new User( "PlainText", usr, name );
 		}
 		return NULL;
 	}
