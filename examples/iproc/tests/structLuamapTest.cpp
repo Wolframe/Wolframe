@@ -236,11 +236,7 @@ static int run( const IProcTestConfiguration& cfg, const std::string& input, std
 {
 	char outputbuf[ 8192];
 	langbind::Filter filter;
-	if (!langbind::GlobalContext().getFilter( "xml:textwolf", filter))
-	{
-		std::cerr << "cannot load filter" << std::endl;
-		return 1;
-	}
+	filter = langbind::GlobalContext().getFilter( "xml:textwolf");
 	protocol::InputFilter* in = filter.inputfilter().get();
 	protocol::OutputFilter* out = filter.outputfilter().get();
 	if (!in)

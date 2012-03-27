@@ -57,14 +57,14 @@ using namespace langbind;
 
 FilterMap::~FilterMap()
 {
-	std::map<std::string,FilterFactory*>::iterator ii=m_map.begin(),ee=m_map.end();
+	std::map<std::string,const FilterFactory*>::iterator ii=m_map.begin(),ee=m_map.end();
 	for (;ii!=ee;++ii)
 	{
 		delete ii->second;
 	}
 }
 
-bool FilterMap::getFilter( const char* arg, Filter& rt)
+Filter FilterMap::getFilter( const char* arg)
 {
 	std::size_t nn = std::strlen(arg);
 	std::size_t ii = nn;
@@ -73,16 +73,16 @@ bool FilterMap::getFilter( const char* arg, Filter& rt)
 	do
 	{
 		nam.resize(ii);
-		std::map<std::string,FilterFactory*>::const_iterator itr=m_map.find( nam),end=m_map.end();
+		std::map<std::string,const FilterFactory*>::const_iterator itr=m_map.find( nam),end=m_map.end();
 		if (itr != end)
 		{
-			rt = itr->second->create( (ii==nn)?0:(arg+ii+1));
-			return true;
+			Filter rt = itr->second->create( (ii==nn)?0:(arg+ii+1));
+			return rt;
 		}
 		for (ii=nn; ii>0 && arg[ii] != ':'; --ii);
 	}
 	while (ii>0);
-	return false;
+	return Filter();
 }
 
 FilterMap::FilterMap()
@@ -100,6 +100,28 @@ FilterMap::FilterMap()
 	defineFilter( "xml:msxml", Libxml2FilterFactory());
 #endif
 }
+
+void DDLFormMap::defineForm( const char* name, const DDLForm& f)
+{
+	std::string nam( name);
+	std::transform( nam.begin(), nam.end(), nam.begin(), (int(*)(int)) std::tolower);
+	m_map[ std::string(nam)] = f;
+}
+
+const DDLForm DDLFormMap::getForm( const char* name) const
+{
+	std::string nam( name);
+	std::map<std::string,DDLForm>::const_iterator ii=m_map.find( nam),ee=m_map.end();
+	if (ii == ee)
+	{
+		return DDLForm();
+	}
+	else
+	{
+		return ii->second;
+	}
+}
+
 
 static InputFilterClosure::ItemType fetchFailureResult( const protocol::InputFilter& ff)
 {

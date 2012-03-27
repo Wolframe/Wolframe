@@ -189,13 +189,14 @@ template <class Struct>
 static int run( const char* root, const std::string& input, std::string& output)
 {
 	langbind::Filter filter;
-	if (!langbind::GlobalContext().getFilter( "xml:textwolf", filter))
+	filter = langbind::GlobalContext().getFilter( "xml:textwolf");
+	protocol::InputFilter* in = filter.inputfilter().get();
+	protocol::OutputFilter* out = filter.outputfilter().get();
+	if (!in || !out)
 	{
 		std::cerr << "cannot load filter" << std::endl;
 		return 1;
 	}
-	protocol::InputFilter* in = filter.inputfilter().get();
-	protocol::OutputFilter* out = filter.outputfilter().get();
 
 	if (!in)
 	{

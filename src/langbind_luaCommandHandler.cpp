@@ -536,9 +536,10 @@ static int function_filter( lua_State* ls)
 	Filter flt;
 	try
 	{
-		if (!ctx->getFilter( name, flt))
+		flt = ctx->getFilter( name);
+		if (!flt.inputfilter().get() && !flt.outputfilter().get())
 		{
-			return luaL_error( ls, "could not create filter '%s'", name);
+			return luaL_error( ls, "could not get filter '%s'", name);
 		}
 	}
 	catch (const std::exception& e)

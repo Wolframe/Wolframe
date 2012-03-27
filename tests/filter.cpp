@@ -88,7 +88,8 @@ int main( int argc, char **argv )
 
 	if (boost::iequals( filternameIn, filternameOut))
 	{
-		if (!langbind::GlobalContext().getFilter( filternameIn.c_str(), flt))
+		flt = langbind::GlobalContext().getFilter( filternameIn.c_str());
+		if (!flt.inputfilter().get() && !flt.outputfilter().get())
 		{
 			std::cerr << "unknown filter " << filternameIn << std::endl;
 			return 1;
@@ -98,12 +99,14 @@ int main( int argc, char **argv )
 	{
 		langbind::Filter in;
 		langbind::Filter out;
-		if (!langbind::GlobalContext().getFilter( filternameIn.c_str(), in))
+		in = langbind::GlobalContext().getFilter( filternameIn.c_str());
+		if (!in.inputfilter().get())
 		{
 			std::cerr << "unknown input filter " << filternameIn << std::endl;
 			return 1;
 		}
-		if (!langbind::GlobalContext().getFilter( filternameOut.c_str(), out))
+		out = langbind::GlobalContext().getFilter( filternameOut.c_str());
+		if (!out.outputfilter().get())
 		{
 			std::cerr << "unknown output filter " << filternameOut << std::endl;
 			return 2;

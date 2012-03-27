@@ -43,37 +43,6 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
-///\class FilterMap
-///\brief Map of available filter seen from scripting language binding
-class FilterMap
-{
-public:
-	FilterMap();
-	~FilterMap();
-
-	template <class FilterFactoryClass>
-	void defineFilter( const char* name, const FilterFactoryClass& f)
-	{
-		std::string nam( name);
-		std::transform( nam.begin(), nam.end(), nam.begin(), (int(*)(int)) std::tolower);
-		m_map[ std::string(nam)] = new FilterFactoryClass(f);
-	}
-	bool getFilter( const char* arg, Filter& rt);
-private:
-	std::map<std::string,FilterFactory*> m_map;
-};
-
-///\class GlobalContext
-///\brief Reference to all available processing resources seen from scripting language binding
-class GlobalContext :public FilterMap
-{
-public:
-	GlobalContext(){}
-};
-
-typedef CountedReference<GlobalContext> GlobalContextR;
-
-
 ///\class Output
 ///\brief Output as seen from scripting language binding
 struct Output
@@ -141,6 +110,7 @@ struct DDLForm
 	///\param[in] o copied item
 	DDLForm( const DDLForm& o)
 		:m_struct(o.m_struct){}
+
 	///\brief Constructor
 	///\param[in] st form data
 	DDLForm( const ddl::StructType& st)
@@ -196,12 +166,48 @@ private:
 	std::size_t m_taglevel;					//< current level in tag hierarchy
 };
 
-class AppContext
+///\class FilterMap
+///\brief Map of available filters seen from scripting language binding
+class FilterMap
 {
 public:
+	FilterMap();
+	~FilterMap();
+
+	template <class FilterFactoryClass>
+	void defineFilter( const char* name, const FilterFactoryClass& f)
+	{
+		std::string nam( name);
+		std::transform( nam.begin(), nam.end(), nam.begin(), (int(*)(int)) std::tolower);
+		m_map[ std::string(nam)] = new FilterFactoryClass(f);
+	}
+
+	Filter getFilter( const char* arg);
 private:
-	std::map<std::string,Filter> m_filtermap;
-	std::map<std::string,DDLForm> m_formmap;
+	std::map<std::string,const FilterFactory*> m_map;
+};
+
+///\class DDLFormMap
+///\brief Map of available forms seen from scripting language binding
+class DDLFormMap
+{
+public:
+	DDLFormMap(){}
+	~DDLFormMap(){}
+
+	void defineForm( const char* name, const DDLForm& f);
+
+	const DDLForm getForm( const char* name) const;
+private:
+	std::map<std::string,DDLForm> m_map;
+};
+
+///\class GlobalContext
+///\brief Reference to all available processing resources seen from scripting language binding
+class GlobalContext :public FilterMap, public DDLFormMap
+{
+public:
+	GlobalContext(){}
 };
 
 }}//namespace
