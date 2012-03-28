@@ -8,6 +8,10 @@ SUBDIRS = src gtest tests clients
 SUBDIRS = zlib libpng libhpdf $(SUBDIRS)
 !ENDIF
 
+!IFDEF WITH_LOCAL_SQLITE3
+SUBDIRS = sqlite3 $(SUBDIRS)
+!ENDIF
+
 !IFDEF WITH_LUA
 SUBDIRS = lua $(SUBDIRS)
 !ENDIF

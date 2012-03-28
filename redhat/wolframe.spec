@@ -394,8 +394,10 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make help \
 %endif
 %if %{build_sqlite}
 	WITH_LOCAL_SQLITE3=%{build_sqlite} \
+%else
+	WITH_SYSTEM_SQLITE3=1 \
 %endif
-	WITH_SSL=%{with_ssl} WITH_SQLITE3=%{with_sqlite} \
+	WITH_SSL=%{with_ssl} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
@@ -411,8 +413,10 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make config \
 %endif
 %if %{build_sqlite}
 	WITH_LOCAL_SQLITE3=%{build_sqlite} \
+%else
+	WITH_SYSTEM_SQLITE3=1 \
 %endif
-	WITH_SSL=%{with_ssl} WITH_SQLITE3=%{with_sqlite} \
+	WITH_SSL=%{with_ssl} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
@@ -429,8 +433,10 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make all \
 %endif
 %if %{build_sqlite}
 	WITH_LOCAL_SQLITE3=%{build_sqlite} \
+%else
+	WITH_SYSTEM_SQLITE3=1 \
 %endif
-	WITH_SSL=%{with_ssl} WITH_SQLITE3=%{with_sqlite} \
+	WITH_SSL=%{with_ssl} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
@@ -454,8 +460,10 @@ make DESTDIR=$RPM_BUILD_ROOT install \
 %endif
 %if %{build_sqlite}
 	WITH_LOCAL_SQLITE3=%{build_sqlite} \
+%else
+	WITH_SYSTEM_SQLITE3=1 \
 %endif
-	WITH_SSL=%{with_ssl} WITH_SQLITE3=%{with_sqlite} \
+	WITH_SSL=%{with_ssl} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \

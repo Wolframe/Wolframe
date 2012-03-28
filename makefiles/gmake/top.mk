@@ -116,7 +116,7 @@ ifeq ($(WITH_SASL),1)
 	@echo "SASL_LIBS: $(SASL_LIBS)"
 endif
 ifeq ($(WITH_SQLITE3),1)
-ifeq ($(WITH_LOCAL_SQLITE3),0)
+ifeq ($(WITH_SYSTEM_SQLITE3),1)
 	@echo
 	@echo "SQLITE3_DIR: $(SQLITE3_DIR)"
 	@echo "SQLITE3_INCLUDE_DIR: $(SQLITE3_INCLUDE_DIR)"
@@ -150,7 +150,7 @@ ifeq ($(WITH_LIBXSLT),1)
 	@echo "LIBXSLT_LIBS: $(LIBXSLT_LIBS)"
 endif
 ifeq ($(WITH_LIBHPDF),1)
-ifeq ($(WITH_LOCAL_LIBHPDF),0)
+ifeq ($(WITH_SYSTEM_LIBHPDF),1)
 	@echo
 	@echo "LIBHPDF_DIR: $(LIBHPDF_DIR)"
 	@echo "LIBHPDF_INCLUDE_DIRS: $(LIBHPDF_INCLUDE_DIRS)"

@@ -2,6 +2,8 @@ TOPDIR = ../../..
 
 SUBDIRS =
 
+-include $(TOPDIR)/makefiles/gmake/platform.mk
+
 # Postgresql
 ifeq ($(WITH_PGSQL),1)
 SUBDIRS += postgresql

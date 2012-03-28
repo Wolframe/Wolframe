@@ -51,9 +51,9 @@ Prerequisites
   (integrated in subdir 'lua')
 - for the optional Qt client
   - optionally (WITH_QT) Qt 4, 4.5.x or later
-- for database support
-  - optionally (WITH_SQLITE3), WITH_LOCAL_SQLITE3=1 uses the
-    supplied amalgamation
+- for database support (WITH_SYSTEM_SQLITE3): sqlite3
+  WITH_LOCAL_SQLITE3=1 uses the supplied amalgamation
+  instead of the system version
   - optionally (WITH_PGSQL)
 - for optional authentication mechanisms:
   - optionally (WITH_PAM)

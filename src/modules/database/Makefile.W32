@@ -2,6 +2,8 @@ TOPDIR = ..\..\..
 
 SUBDIRS =
 
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
 # PostgreSQL
 !IFDEF WITH_PGSQL
 SUBDIRS = \

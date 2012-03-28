@@ -1,0 +1,30 @@
+TOPDIR = ..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_CXXFLAGS = \
+	/D_WIN32_WINNT=0x504
+	
+INCLUDE_DIRS = \
+	/I.
+
+OBJS = \
+	sqlite3.obj
+
+LIBRARIES = \
+	sqlite3.lib
+	
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+sqlite3.lib: $(OBJS)
+	$(LINK) /lib /out:$@ $(STATIC_LDFLAGS) $?
+
+local_all: $(LIBRARIES)
+
+local_clean:
+
+local_distclean:
+
+local_test:
