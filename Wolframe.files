@@ -119,11 +119,6 @@ clients/qt/HistoryLineEdit.hpp
 clients/qt/MainWindow.cpp
 clients/qt/MainWindow.hpp
 clients/qt/Makefile.W32
-clients/qt/moc_AbstractFormLoader.cpp
-clients/qt/moc_DebugTerminal.cpp
-clients/qt/moc_HistoryLineEdit.cpp
-clients/qt/moc_MainWindow.cpp
-clients/qt/moc_WolframeClient.cpp
 clients/qt/qtclient.cpp
 clients/qt/README
 clients/qt/TODOS
@@ -591,6 +586,8 @@ makefiles/README
 Makefile.W32
 po/README
 README
+sqlite3/GNUmakefile
+sqlite3/Makefile.W32
 sqlite3/README
 sqlite3/sqlite3.c
 sqlite3/sqlite3.h
@@ -664,6 +661,7 @@ src/libwolframe/provider/DBproviderImpl.cpp
 src/libwolframe/provider/DBproviderImpl.hpp
 src/libwolframe/referenceConfig.cpp
 src/libwolframe/resolvePath.cpp
+src/libwolframe/user.cpp
 src/loadModules.cpp
 src/loadModules-dummy.cpp
 src/Makefile.W32
@@ -783,6 +781,7 @@ tests/AAAA/GNUmakefile
 tests/AAAA/Makefile.W32
 tests/AAAA/passwd
 tests/AAAA/plainPasswd
+tests/AAAA/plainPasswdTest.cpp
 tests/AAAA/sasl.conf
 tests/config/GNUmakefile
 tests/configStructParser.cpp
@@ -888,5 +887,3 @@ zlib/zconf.h
 zlib/zlib.h
 zlib/zutil.c
 zlib/zutil.h
-src/libwolframe/user.cpp
-tests/AAAA/plainPasswdTest.cpp
