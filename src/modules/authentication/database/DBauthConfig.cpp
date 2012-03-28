@@ -35,15 +35,55 @@
 //
 
 #include "DBauth.hpp"
-#include "config/configurationBase.hpp"
+#include "config/valueParser.hpp"
+#include "config/ConfigurationTree.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
 
-bool DBAuthConfig::parse( const config::ConfigurationTree& pt, const std::string& node,
-				const module::ModulesDirectory* modules )
+bool DBAuthConfig::parse( const config::ConfigurationTree& pt, const std::string& /*node*/,
+				const module::ModulesDirectory* /*modules*/ )
 {
-	return m_dbConfig.parse( pt, node, modules );
+	using namespace config;
+
+	bool retVal = true;
+
+	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
+		if ( boost::algorithm::iequals( L1it->first, "identifier" ))	{
+			bool isDefined = ( !m_identifier.empty() );
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_identifier, &isDefined ))
+				retVal = false;
+		}
+		else if ( boost::algorithm::iequals( L1it->first, "database" ))	{
+			bool isDefined = ( !m_dbLabel.empty() );
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_dbLabel, &isDefined ))
+				retVal = false;
+		}
+		else	{
+			MOD_LOG_WARNING << logPrefix() << "unknown configuration option: '"
+					<< L1it->first << "'";
+		}
+	}
+	return retVal;
+}
+
+
+bool DBAuthConfig::check() const
+{
+	if ( m_dbLabel.empty() )	{
+		MOD_LOG_ERROR << logPrefix() << "database label cannot be empty";
+		return false;
+	}
+	return true;
+}
+
+
+void DBAuthConfig::print( std::ostream& os, size_t indent ) const
+{
+	std::string indStr( indent, ' ' );
+	os << indStr << sectionName() << std::endl;
+	os << indStr << "   Identifier: " << m_identifier << std::endl;
+	os << indStr << "   Database: " << m_dbLabel << std::endl;
 }
 
 }} // namespace _Wolframe::config

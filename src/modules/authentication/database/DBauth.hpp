@@ -49,40 +49,37 @@ class DBAuthConfig : public config::ObjectConfiguration
 	friend class DBauthContainer;
 public:
 	DBAuthConfig( const char* cfgName, const char* logParent, const char* logName )
-		: config::ObjectConfiguration( cfgName, logParent, logName ),
-		  m_dbConfig( "", logParent, "Database" )	{}
+		: config::ObjectConfiguration( cfgName, logParent, logName )	{}
 
-	virtual const char* objectName() const			{ return "DBAuth"; }
+	virtual const char* objectName() const		{ return "DBAuth"; }
 
 	/// methods
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,
 		    const module::ModulesDirectory* modules );
-	bool check() const					{ return m_dbConfig.check(); }
+	bool check() const;
 
-	void print( std::ostream& os, size_t indent ) const	{
-		std::string indStr( indent, ' ' );
-		os << indStr << sectionName();
-		m_dbConfig.print( os, 0 );
-	}
+	void print( std::ostream& os, size_t indent ) const;
 
-	void setCanonicalPathes( const std::string& refPath )	{ m_dbConfig.setCanonicalPathes( refPath ); }
+	void setCanonicalPathes( const std::string& refPath );
 private:
-	config::ReferenceConfig	m_dbConfig;
+	std::string	m_identifier;
+	std::string	m_dbLabel;
 };
 
 
 class DBauthenticator : public AuthenticationUnit
 {
 public:
-	DBauthenticator( const std::string& dbLabel );
+	DBauthenticator( const std::string& Identifier, const std::string& dbLabel );
 	~DBauthenticator();
+
 	const char* typeName() const			{ return "DBAuth"; }
 
 	bool resolveDB( const db::DatabaseProvider& db );
 
 	AuthenticatorSlice* authSlice()			{ return NULL; }
 private:
-	std::string		m_dbLabel;
+	const std::string	m_dbLabel;
 	const db::Database*	m_db;
 };
 

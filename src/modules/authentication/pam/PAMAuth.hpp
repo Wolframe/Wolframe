@@ -77,11 +77,12 @@ typedef struct {
 class PAMAuthenticator : public AuthenticationUnit
 {
 public:
-	PAMAuthenticator( const std::string& service );
+	PAMAuthenticator( const std::string& Identifier, unsigned short ID,
+			  const std::string& service );
 	~PAMAuthenticator();
 	virtual const char* typeName() const		{ return "PAMAuth"; }
 
-	AuthenticatorSlice* authSlice()		{ return NULL; }
+	AuthenticatorSlice* authSlice()			{ return NULL; }
 
 private:
 	// name of the PAM service
@@ -108,7 +109,7 @@ class PAMAuthContainer : public ObjectContainer< AuthenticationUnit >
 {
 public:
 	PAMAuthContainer( const PAMAuthConfig& conf );
-	~PAMAuthContainer()			{}
+	~PAMAuthContainer()				{}
 
 	virtual const char* objectName() const		{ return m_auth->typeName(); }
 	virtual AuthenticationUnit* object() const	{ return m_auth; }

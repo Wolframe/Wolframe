@@ -51,24 +51,64 @@ namespace AAAA {
 bool PlainTextAuthConfig::parse( const config::ConfigurationTree& pt, const std::string& node,
 				 const module::ModulesDirectory* /*modules*/ )
 {
-	using namespace _Wolframe::config;
+	using namespace config;
+
 	bool retVal = true;
 
-	if ( boost::algorithm::iequals( node, "plaintext" ))	{
-		bool isDefined = ( !m_file.empty() );
-		if ( !Parser::getValue( logPrefix().c_str(), node.c_str(),
-					pt.get_value<std::string>(), m_file, &isDefined ))
-			retVal = false;
+	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
+		if ( boost::algorithm::iequals( L1it->first, "identifier" ))	{
+			bool isDefined = ( !m_identifier.empty() );
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_identifier, &isDefined ))
+				retVal = false;
+		}
+		else if ( boost::algorithm::iequals( L1it->first, "file" )
+			  || boost::algorithm::iequals( L1it->first, "filename" ))	{
+			bool isDefined = ( !m_file.empty() );
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_file, &isDefined ))
+				retVal = false;
+			else	{
+				if ( ! boost::filesystem::path( m_file ).is_absolute() )
+					MOD_LOG_WARNING << logPrefix() << "authentication file path is not absolute: "
+						    << m_file;
+			}
+		}
 		else	{
-			if ( ! boost::filesystem::path( m_file ).is_absolute() )
-				MOD_LOG_WARNING << logPrefix() << "authentication file path is not absolute: "
-						<< m_file;
+			MOD_LOG_WARNING << logPrefix() << "unknown configuration option: '"
+					<< L1it->first << "'";
 		}
 	}
-	else	{
-		MOD_LOG_WARNING << logPrefix() << "unknown configuration option: '" << node << "'";
-	}
 	return retVal;
+}
+
+
+bool PlainTextAuthConfig::check() const
+{
+	if ( m_file.empty() )	{
+		MOD_LOG_ERROR << logPrefix() << "Authentication filename cannot be empty";
+		return false;
+	}
+	return true;
+}
+
+void PlainTextAuthConfig::print( std::ostream& os, size_t indent ) const
+{
+	std::string indStr( indent, ' ' );
+	os << indStr << sectionName() << std::endl;
+	os << indStr << "   Identifier: " << m_identifier << std::endl;
+	os << indStr << "   File: " << m_file << std::endl;
+}
+
+void PlainTextAuthConfig::setCanonicalPathes( const std::string& refPath )
+{
+	using namespace boost::filesystem;
+
+	if ( ! m_file.empty() )	{
+		if ( ! path( m_file ).is_absolute() )
+			m_file = resolvePath( absolute( m_file,
+							path( refPath ).branch_path()).string());
+		else
+			m_file = resolvePath( m_file );
+	}
 }
 
 }} // namespace _Wolframe::config

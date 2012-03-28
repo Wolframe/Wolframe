@@ -47,7 +47,7 @@ static ContainerBuilder* createModule( void )
 {
 	static module::ContainerDescription< AAAA::PlainTextAuthContainer,
 			AAAA::PlainTextAuthConfig > mod( "Plain text authentication", "Authentication",
-							 "plaintext", "PlainTextAuth" );
+							 "PlainText", "PlainTextAuth" );
 	return &mod;
 }
 

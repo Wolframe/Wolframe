@@ -43,8 +43,8 @@ namespace _Wolframe {
 namespace AAAA {
 
 //***  Database authorizer  *********************************************
-DBauthorizer::DBauthorizer( const std::string& Name, const std::string& DbLabel )
-	: m_identifier( Name ), m_dbLabel( DbLabel )
+DBauthorizer::DBauthorizer( const std::string& Identifier, const std::string& DbLabel )
+	: AuthorizationUnit( Identifier ), m_dbLabel( DbLabel )
 {
 	m_db = NULL;
 	if ( m_dbLabel.empty() )

@@ -172,7 +172,7 @@ static int pam_conv_func(	int nmsg, const struct pam_message **msg,
 // Solaris hat different API in pam_get_item
 #ifdef SUNOS
 				rc = pam_get_item( appdata->h, PAM_USER_PROMPT, (void **)&login_prompt_union.v );
-#else				
+#else
 				rc = pam_get_item( appdata->h, PAM_USER_PROMPT, &login_prompt_union.v );
 #endif
 				if( rc != PAM_SUCCESS ) {
@@ -219,8 +219,9 @@ error:
 	return PAM_CONV_ERR;
 }
 
-PAMAuthenticator::PAMAuthenticator( const std::string& service )
-	: m_service( service )
+PAMAuthenticator::PAMAuthenticator( const std::string& Identifier, unsigned short ID,
+				    const std::string& service )
+	: AuthenticationUnit( Identifier, ID ), m_service( service )
 {
 	m_appdata.h = NULL;
 	m_appdata.has_pass = false;

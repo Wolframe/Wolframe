@@ -69,16 +69,14 @@ private:
 class DBauthorizer : public AuthorizationUnit
 {
 public:
-	DBauthorizer( const std::string& Name, const std::string& DbLabel );
+	DBauthorizer( const std::string& Identifier, const std::string& DbLabel );
 	~DBauthorizer();
 	const char* typeName() const		{ return "DatabaseAuthorization"; }
-	const char* identifier() const		{ return m_identifier.c_str(); }
 
 	bool resolveDB( const db::DatabaseProvider& db );
 
 	AuthorizationUnit::Result allowed( const AAAAObject& );
 private:
-	const std::string	m_identifier;
 	const std::string	m_dbLabel;
 	const db::Database*	m_db;
 

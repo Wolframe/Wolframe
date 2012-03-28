@@ -60,6 +60,7 @@ public:
 	void print( std::ostream& os, size_t indent ) const;
 	void setCanonicalPathes( const std::string& referencePath );
 private:
+	std::string	m_identifier;
 	std::string	m_file;
 };
 
@@ -67,13 +68,13 @@ private:
 class TextFileAuthenticator : public AuthenticationUnit
 {
 public:
-	TextFileAuthenticator( const std::string& filename );
+	TextFileAuthenticator( const std::string& Identifier, const std::string& filename );
 	~TextFileAuthenticator();
 	virtual const char* typeName() const		{ return "TextFileAuth"; }
 
-	AuthenticatorSlice* authSlice()		{ return NULL; }
+	AuthenticatorSlice* authSlice()			{ return NULL; }
 private:
-	std::string		m_file;
+	const std::string	m_file;
 };
 
 

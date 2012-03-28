@@ -50,11 +50,10 @@ namespace AAAA {
 class Authenticator : public _Wolframe::FSMinterface
 {
 public:
-	virtual ~Authenticator()	{}
+	virtual ~Authenticator()		{}
 
-	// close the authenticator and destroy all
-	// sensible data
-	virtual void close()		{}
+	// close the authenticator and destroy all sensible data
+	virtual void close()			{}
 };
 
 
@@ -70,8 +69,8 @@ public:
 		SASL			/// SASL dialog
 	};
 
-	virtual ~AuthenticatorSlice()	{}
-	virtual void close()		{}
+	virtual ~AuthenticatorSlice()		{}
+	virtual void close()			{}
 
 	virtual AuthProtocol protocolType() const = 0;
 };
@@ -81,14 +80,20 @@ public:
 class AuthenticationUnit
 {
 public:
-	virtual ~AuthenticationUnit()	{}
+	AuthenticationUnit( const std::string& Identifier )
+		: m_identifier( Identifier )	{}
+
+	virtual ~AuthenticationUnit()		{}
+
+	const std::string& identifier() const	{ return m_identifier; }
 
 	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ )
-					{ return true; }
+						{ return true; }
 	virtual const char* typeName() const = 0;
-//	virtual const char* identifier() const = 0;
 
 	virtual AuthenticatorSlice* authSlice() = 0;
+private:
+	const std::string	m_identifier;
 };
 
 }} // namespace _Wolframe::AAAA

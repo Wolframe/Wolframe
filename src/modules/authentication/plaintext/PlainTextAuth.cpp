@@ -51,48 +51,20 @@ namespace _Wolframe {
 namespace AAAA {
 
 /// Plain text authentication
-bool PlainTextAuthConfig::check() const
-{
-	if ( m_file.empty() )	{
-		MOD_LOG_ERROR << logPrefix() << "Authentication filename cannot be empty";
-		return false;
-	}
-	return true;
-}
-
-void PlainTextAuthConfig::print( std::ostream& os, size_t indent ) const
-{
-	std::string indStr( indent, ' ' );
-	os << indStr << sectionName() << ": " << m_file << std::endl;
-}
-
-void PlainTextAuthConfig::setCanonicalPathes( const std::string& refPath )
-{
-	using namespace boost::filesystem;
-
-	if ( ! m_file.empty() )	{
-		if ( ! path( m_file ).is_absolute() )
-			m_file = resolvePath( absolute( m_file,
-							path( refPath ).branch_path()).string());
-		else
-			m_file = resolvePath( m_file );
-	}
-}
-
-
 //***********************************************************************
 
 PlainTextAuthContainer::PlainTextAuthContainer( const PlainTextAuthConfig& conf )
 {
-	m_auth = new PlainTextAuthenticator( conf.m_file );
+	m_auth = new PlainTextAuthenticator( conf.m_identifier, conf.m_file );
 	MOD_LOG_NOTICE << "Plain text authenticator container created";
 }
 
 
 //***********************************************************************
 
-PlainTextAuthenticator::PlainTextAuthenticator( const std::string& filename )
-	: m_file( filename )
+PlainTextAuthenticator::PlainTextAuthenticator( const std::string& Identifier,
+						const std::string& filename )
+	: AuthenticationUnit( Identifier ), m_file( filename )
 {
 	MOD_LOG_DEBUG << "Plain text authenticator created with file '" << m_file << "'";
 }

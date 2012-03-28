@@ -48,39 +48,13 @@ namespace _Wolframe {
 namespace AAAA {
 
 /// Text file authentication
-bool TextFileAuthConfig::check() const
+
+TextFileAuthenticator::TextFileAuthenticator( const std::string& Identifier,
+					      const std::string& filename )
+	: AuthenticationUnit( Identifier ), m_file( filename )
 {
-	if ( m_file.empty() )	{
-		MOD_LOG_ERROR << logPrefix() << "Authentication filename cannot be empty";
-		return false;
-	}
-	return true;
-}
-
-void TextFileAuthConfig::print( std::ostream& os, size_t indent ) const
-{
-	std::string indStr( indent, ' ' );
-	os << indStr << sectionName() << ": " << m_file << std::endl;
-}
-
-void TextFileAuthConfig::setCanonicalPathes( const std::string& refPath )
-{
-	using namespace boost::filesystem;
-
-	if ( ! m_file.empty() )	{
-		if ( ! path( m_file ).is_absolute() )
-			m_file = resolvePath( absolute( m_file,
-							path( refPath ).branch_path()).string());
-		else
-			m_file = resolvePath( m_file );
-	}
-}
-
-
-TextFileAuthenticator::TextFileAuthenticator( const std::string& filename )
-	: m_file( filename )
-{
-	MOD_LOG_DEBUG << "Text file authenticator created with file '" << m_file << "'";
+	MOD_LOG_DEBUG << "Text file authenticator '" << identifier()
+		      << "' created with file '" << m_file << "'";
 }
 
 TextFileAuthenticator::~TextFileAuthenticator()
@@ -90,7 +64,7 @@ TextFileAuthenticator::~TextFileAuthenticator()
 
 TextFileAuthContainer::TextFileAuthContainer( const TextFileAuthConfig& conf )
 {
-	m_auth = new TextFileAuthenticator( conf.m_file );
+	m_auth = new TextFileAuthenticator( conf.m_identifier, conf.m_file );
 	MOD_LOG_NOTICE << "Text file authenticator container created";
 }
 

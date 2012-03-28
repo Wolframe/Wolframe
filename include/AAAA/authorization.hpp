@@ -72,14 +72,20 @@ public:
 		ERROR
 	};
 
-	virtual ~AuthorizationUnit()	{}
+	AuthorizationUnit( const std::string& Identifier )
+		: m_identifier( Identifier )	{}
+
+	virtual ~AuthorizationUnit()		{}
+
+	const std::string& identifier() const	{ return m_identifier; }
 
 	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ )
-					{ return true; }
+						{ return true; }
 	virtual const char* typeName() const = 0;
-	virtual const char* identifier() const = 0;
 
 	virtual Result allowed( const AAAAObject& ) = 0;
+private:
+	const std::string	m_identifier;
 };
 
 }} // namespace _Wolframe::AAAA

@@ -61,6 +61,7 @@ public:
 	void print( std::ostream& os, size_t indent ) const;
 	void setCanonicalPathes( const std::string& referencePath );
 private:
+	std::string		m_identifier;
 	std::string		m_file;
 };
 
@@ -68,7 +69,7 @@ private:
 class PlainTextAuthenticator : public AuthenticationUnit
 {
 public:
-	PlainTextAuthenticator( const std::string& filename );
+	PlainTextAuthenticator( const std::string& Identifier, const std::string& filename );
 	~PlainTextAuthenticator();
 	virtual const char* typeName() const	{ return "PlainTextAuth"; }
 
@@ -76,7 +77,7 @@ public:
 
 	User* authenticate( std::string username, std::string password, bool caseSensitveUser ) const;
 private:
-	std::string		m_file;
+	const std::string	m_file;
 };
 
 

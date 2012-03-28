@@ -42,14 +42,15 @@
 namespace _Wolframe {
 namespace AAAA {
 
-DBauthenticator::DBauthenticator( const std::string& dbLabel )
-	: m_dbLabel( dbLabel )
+DBauthenticator::DBauthenticator( const std::string& Identifier, const std::string& dbLabel )
+	: AuthenticationUnit( Identifier ), m_dbLabel( dbLabel )
 {
 	m_db = NULL;
 	if ( m_dbLabel.empty() )
 		throw std::logic_error( "Empty database reference in DBauthContainer" );
 
-	MOD_LOG_DEBUG << "Database authenticator created with database reference '" << m_dbLabel << "'";
+	MOD_LOG_DEBUG << "Database authenticator '" << identifier()
+		      << "' created with database reference '" << m_dbLabel << "'";
 }
 
 DBauthenticator::~DBauthenticator()
@@ -76,7 +77,7 @@ bool DBauthenticator::resolveDB( const db::DatabaseProvider& db )
 
 DBauthContainer::DBauthContainer( const DBAuthConfig& conf )
 {
-	m_auth = new DBauthenticator( conf.m_dbConfig.label() );
+	m_auth = new DBauthenticator( conf.m_identifier, conf.m_dbLabel );
 	MOD_LOG_NOTICE << "Database authenticator container created";
 }
 
