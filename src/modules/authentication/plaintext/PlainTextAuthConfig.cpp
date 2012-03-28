@@ -54,7 +54,7 @@ bool PlainTextAuthConfig::parse( const config::ConfigurationTree& pt, const std:
 	using namespace _Wolframe::config;
 	bool retVal = true;
 
-	if ( boost::algorithm::iequals( node, "file" ) || boost::algorithm::iequals( node, "filename" ))	{
+	if ( boost::algorithm::iequals( node, "plaintext" ))	{
 		bool isDefined = ( !m_file.empty() );
 		if ( !Parser::getValue( logPrefix().c_str(), node.c_str(),
 					pt.get_value<std::string>(), m_file, &isDefined ))

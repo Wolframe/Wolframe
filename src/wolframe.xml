@@ -90,12 +90,12 @@ Project Wolframe.
 		<socket>
 			<address>localhost</address>
 			<port>7662</port>
-			<name>Interface 1</name>	<!--	Interfaces can be named for AAA purposes -->
+			<identifier>Interface 1</identifier><!--	Interfaces can be named for AAA purposes -->
 		</socket>
 		<SSLsocket>
 			<address>0.0.0.0</address>
 			<port>7961</port>
-			<name>Interface 1</name>	<!--	Many interfaces can have the same name and
+			<identifier>Interface 1</identifier><!--	Many interfaces can have the same name and
 								they can be refered as one group in AAAA -->
 			<!--	SSL parameters: required if SSLsocket is defined -->
 			<certificate>../tests/SSL/wolframed.crt</certificate><!-- Server certificate file (PEM) -->
@@ -107,7 +107,7 @@ Project Wolframe.
 		<SSLsocket>
 			<address>127.0.0.1</address>
 			<port>7962</port>
-			<name>Interface 2</name>
+			<identifier>Interface 2</identifier>
 			<maxConnections>2</maxConnections>
 			<!--	SSL parameters: required if SSLsocket is defined -->
 			<certificate>../tests/SSL/wolframed.crt</certificate>
@@ -128,7 +128,7 @@ Project Wolframe.
 			<identifier>pgdb</identifier>
 			<host>localhost</host>
 			<port>5432</port>
-			<name>wolframe</name>
+			<database>wolframe</database>
 			<user>wolframe</user>
 			<password>blabla</password>
 			<connectionTimeout>10</connectionTimeout>

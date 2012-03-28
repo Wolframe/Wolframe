@@ -85,6 +85,8 @@ public:
 
 	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ )
 					{ return true; }
+	virtual const char* typeName() const = 0;
+//	virtual const char* identifier() const = 0;
 
 	virtual AuthenticatorSlice* authSlice() = 0;
 };

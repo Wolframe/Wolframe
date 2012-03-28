@@ -68,7 +68,7 @@ bool PostgreSQLconfig::parse( const config::ConfigurationTree& pt, const std::st
 						Parser::RangeDomain<unsigned short>( 1 ), &portDefined ))
 				retVal = false;
 		}
-		else if ( boost::algorithm::iequals( L1it->first, "name" ))	{
+		else if ( boost::algorithm::iequals( L1it->first, "database" ))	{
 			bool isDefined = ( !dbName.empty());
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, dbName, &isDefined ))
 				retVal = false;

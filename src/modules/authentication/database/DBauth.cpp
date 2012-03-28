@@ -74,7 +74,7 @@ bool DBauthenticator::resolveDB( const db::DatabaseProvider& db )
 }
 
 
-DBauthContainer::DBauthContainer( const DatabaseAuthConfig& conf )
+DBauthContainer::DBauthContainer( const DBAuthConfig& conf )
 {
 	m_auth = new DBauthenticator( conf.m_dbConfig.label() );
 	MOD_LOG_NOTICE << "Database authenticator container created";

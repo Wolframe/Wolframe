@@ -40,7 +40,7 @@
 namespace _Wolframe {
 namespace AAAA {
 
-bool DatabaseAuthConfig::parse( const config::ConfigurationTree& pt, const std::string& node,
+bool DBAuthConfig::parse( const config::ConfigurationTree& pt, const std::string& node,
 				const module::ModulesDirectory* modules )
 {
 	return m_dbConfig.parse( pt, node, modules );

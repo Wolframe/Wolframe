@@ -46,7 +46,7 @@ namespace module {
 static ContainerBuilder* createModule( void )
 {
 	static module::ContainerDescription< AAAA::DBauthContainer,
-			AAAA::DatabaseAuthConfig > mod( "Authentication database", "Authentication",
+			AAAA::DBAuthConfig > mod( "Authentication database", "Authentication",
 							"database", "DBAuth" );
 	return &mod;
 }

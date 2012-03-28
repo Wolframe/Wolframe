@@ -45,15 +45,15 @@ namespace net	{
 	{
 	public:
 		ServerTCPendpoint( const std::string& Host, unsigned short Port,
-				   const std::string& Name, unsigned short maxConn = 0 )
+				   const std::string& Identifier, unsigned short maxConn = 0 )
 			: LocalTCPendpoint( Host, Port ),
-			  m_name( Name ), m_maxConn( maxConn )	{}
+			  m_identifier( Identifier ), m_maxConn( maxConn )	{}
 
 		unsigned short maxConnections() const		{ return m_maxConn; }
-		const std::string& name() const			{ return m_name; }
+		const std::string& identifier() const		{ return m_identifier; }
 
 	private:
-		const std::string	m_name;
+		const std::string	m_identifier;
 		const unsigned short	m_maxConn;
 	};
 
@@ -65,10 +65,10 @@ namespace net	{
 		friend class server;
 	public:
 		ServerSSLendpoint( const std::string& Host, unsigned short Port,
-				   const std::string& Name, unsigned short maxConn,
+				   const std::string& Identifier, unsigned short maxConn,
 				   const std::string& Certificate, const std::string& Key,
 				   bool verify, const std::string& CAdir, const std::string& CAchainFile )
-			: LocalSSLendpoint( Host, Port ), m_name( Name ), m_maxConn( maxConn )
+			: LocalSSLendpoint( Host, Port ), m_identifier( Identifier ), m_maxConn( maxConn )
 		{
 			cert_ = Certificate;
 			key_ = Key;
@@ -78,7 +78,7 @@ namespace net	{
 		}
 
 		unsigned short maxConnections() const	{ return m_maxConn; }
-		const std::string& name() const		{ return m_name; }
+		const std::string& identifier() const	{ return m_identifier; }
 		const std::string& certificate() const	{ return cert_; }
 		const std::string& key() const		{ return key_; }
 		const std::string& CAdirectory() const	{ return CAdir_; }
@@ -88,7 +88,7 @@ namespace net	{
 		void setAbsolutePath( const std::string& referencePath );
 
 	private:
-		const std::string	m_name;
+		const std::string	m_identifier;
 		const unsigned short	m_maxConn;
 		std::string		cert_;
 		std::string		key_;

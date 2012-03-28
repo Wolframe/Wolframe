@@ -44,11 +44,11 @@
 namespace _Wolframe {
 namespace AAAA {
 
-class DatabaseAuthConfig : public config::ObjectConfiguration
+class DBAuthConfig : public config::ObjectConfiguration
 {
 	friend class DBauthContainer;
 public:
-	DatabaseAuthConfig( const char* cfgName, const char* logParent, const char* logName )
+	DBAuthConfig( const char* cfgName, const char* logParent, const char* logName )
 		: config::ObjectConfiguration( cfgName, logParent, logName ),
 		  m_dbConfig( "", logParent, "Database" )	{}
 
@@ -90,7 +90,7 @@ private:
 class DBauthContainer : public ObjectContainer< AuthenticationUnit >
 {
 public:
-	DBauthContainer( const DatabaseAuthConfig& conf );
+	DBauthContainer( const DBAuthConfig& conf );
 	~DBauthContainer()				{}
 
 	virtual const char* objectName() const		{ return m_auth->typeName(); }
