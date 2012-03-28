@@ -8,7 +8,7 @@ SUBDIRS = src gtest tests clients
 SUBDIRS = zlib libpng libhpdf $(SUBDIRS)
 !ENDIF
 
-!IFDEF WITH_LOCAL_SQLITE3
+!IFDEF WITH_SQLITE3
 SUBDIRS = sqlite3 $(SUBDIRS)
 !ENDIF
 

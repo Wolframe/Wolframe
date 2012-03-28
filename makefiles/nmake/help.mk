@@ -30,8 +30,7 @@ DEBUG=1                build using debug compiler and linker flags
 WITH_EXPECT=1          use Expect/Tcl for system testing
 
 Example:
-nmake /nologo /f Makefile.W32 WITH_SSL=1 WITH_EXPECT=1 WITH_LUA=1
-                              WITH_QT=1 WITH_SQLITE3=1 WITH_PGSQL=1
-                              WITH_LIBXML2=1 WITH_LIBXSLT=1
-                              WITH_LIBHPDF=1 WITH_EXAMPLES=1
+nmake /nologo /f Makefile.W32 WITH_SSL=1 WITH_EXPECT=1 WITH_LUA=1 WITH_QT=1
+                              WITH_SQLITE3=1 WITH_PGSQL=1 WITH_LIBXML2=1
+			      WITH_LIBXSLT=1 WITH_LIBHPDF=1 WITH_EXAMPLES=1
                               WITH_MSXML=1 WITH_XMLLITE=1

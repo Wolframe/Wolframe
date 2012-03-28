@@ -18,6 +18,7 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
+	$(TOPDIR)\sqlite3\sqlite3.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib
 
 DYNAMIC_MODULE = \
@@ -26,8 +27,7 @@ DYNAMIC_MODULE = \
 CPP_OBJS = \
 	SQLite.obj \
 	SQLiteConfig.obj \
-	SQLiteModule.obj \
-	$(TOPDIR)\sqlite3\sqlite3.obj
+	SQLiteModule.obj
 
 all: $(DYNAMIC_MODULE)
 
@@ -39,7 +39,6 @@ $(DYNAMIC_MODULE): $(CPP_OBJS)
 local_all:
 
 local_clean:
-	@-erase $(TOPDIR)\sqlite3\*.obj 2>NUL
 
 local_distclean:
 
