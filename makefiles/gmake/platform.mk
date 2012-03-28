@@ -2697,6 +2697,11 @@ endif
 
 endif
 
+ifeq ($(WITH_LOCAL_LIBHPDF),1)
+LIBHPDF_INCLUDE_DIRS += $(LIBPNG_LIBS)
+LIBHPDF_LIB_DIRS += $(LIBPNG_LIBS)
+endif
+
 # zlib
 ######
 
@@ -2907,14 +2912,7 @@ endif
 ifeq ($(WITH_LOCAL_LIBHPDF),1)
 LIBHPDF_INCLUDE_DIRS += $(LIBZ_LIBS)
 LIBHPDF_LIB_DIRS += $(LIBZ_LIBS)
-
-#INCLUDE_LDFLAGS += \
-#	$(LIBPNG_LIB_DIRS) $(LIBPNG_LIBS)
-
-#INCLUDE_LIBS += \
-#	$(LIBPNG_LIBS) $(LIBZ_LIBS)
 endif
-
 
 # Expect (for testing)
 ######################
