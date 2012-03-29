@@ -47,7 +47,7 @@ static ContainerBuilder* createModule( void )
 {
 	static module::ContainerDescription< AAAA::TextFileAuthContainer,
 			AAAA::TextFileAuthConfig > mod( "Authentication file", "Authentication",
-							"file", "TextFileAuth" );
+							"TextFile", "TextFileAuth" );
 	return &mod;
 }
 

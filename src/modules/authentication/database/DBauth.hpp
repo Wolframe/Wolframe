@@ -60,7 +60,7 @@ public:
 
 	void print( std::ostream& os, size_t indent ) const;
 
-	void setCanonicalPathes( const std::string& refPath );
+	void setCanonicalPathes( const std::string& /*refPath*/ )	{}
 private:
 	std::string	m_identifier;
 	std::string	m_dbLabel;

@@ -55,7 +55,13 @@ bool SaslAuthConfig::parse( const config::ConfigurationTree& pt, const std::stri
 	bool retVal = true;
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
-		if ( boost::algorithm::iequals( L1it->first, "service" ))	{
+		if ( boost::algorithm::iequals( L1it->first, "identifier" ))	{
+			bool isDefined = ( !m_identifier.empty() );
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_identifier, &isDefined )) {
+				retVal = false;
+			}
+		}
+		else if ( boost::algorithm::iequals( L1it->first, "service" ))	{
 			bool isDefined = ( !m_service.empty() );
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_service, &isDefined )) {
 				retVal = false;
