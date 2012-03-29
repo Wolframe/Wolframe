@@ -66,14 +66,14 @@ protected:
 
 TEST_F( AuthenticationFixture, typeName )
 {
-	PlainTextAuthenticator authenticator( "plainPasswd" );
+	PlainTextAuthenticator authenticator( "", "plainPasswd" );
 	ASSERT_STREQ( authenticator.typeName( ), "PlainTextAuth" );
 }
 
 TEST_F( AuthenticationFixture, validUsers )
 {
 	User*	user;
-	PlainTextAuthenticator authenticator( "plainPasswd" );
+	PlainTextAuthenticator authenticator( "", "plainPasswd" );
 
 	user = authenticator.authenticate( "admin", "Good Password", true );
 	ASSERT_TRUE( user != NULL );
@@ -97,7 +97,7 @@ TEST_F( AuthenticationFixture, validUsers )
 TEST_F( AuthenticationFixture, caseInsensitive_Pass )
 {
 	User*	user;
-	PlainTextAuthenticator authenticator( "plainPasswd" );
+	PlainTextAuthenticator authenticator( "", "plainPasswd" );
 
 	user = authenticator.authenticate( "AdMiN", "Good Password", false );
 	ASSERT_TRUE( user != NULL );
@@ -121,7 +121,7 @@ TEST_F( AuthenticationFixture, caseInsensitive_Pass )
 TEST_F( AuthenticationFixture, caseInsensitive_Fail )
 {
 	User*	user;
-	PlainTextAuthenticator authenticator( "plainPasswd" );
+	PlainTextAuthenticator authenticator( "", "plainPasswd" );
 
 	user = authenticator.authenticate( "AdMiN", "Good Password", true );
 	ASSERT_EQ( NULL, user );
@@ -134,7 +134,7 @@ TEST_F( AuthenticationFixture, caseInsensitive_Fail )
 TEST_F( AuthenticationFixture, invalidPasswords )
 {
 	User*	user;
-	PlainTextAuthenticator authenticator( "plainPasswd" );
+	PlainTextAuthenticator authenticator( "", "plainPasswd" );
 
 	user = authenticator.authenticate( "admin", "Goood Password", true );
 	ASSERT_EQ( NULL, user );
@@ -147,7 +147,7 @@ TEST_F( AuthenticationFixture, invalidPasswords )
 TEST_F( AuthenticationFixture, invalidUsers )
 {
 	User*	user;
-	PlainTextAuthenticator authenticator( "plainPasswd" );
+	PlainTextAuthenticator authenticator( "", "plainPasswd" );
 
 	user = authenticator.authenticate( "adminn", "xx", true );
 	ASSERT_EQ( NULL, user );
@@ -156,6 +156,19 @@ TEST_F( AuthenticationFixture, invalidUsers )
 	user = authenticator.authenticate( "baduser", "xx", true );
 	ASSERT_EQ( NULL, user );
 }
+
+//TEST_F( AuthenticationFixture, invalidFile )
+//{
+//	User*	user;
+//	PlainTextAuthenticator authenticator( "", "plainPasswds" );
+
+//	user = authenticator.authenticate( "admin", "xx", true );
+//	ASSERT_EQ( NULL, user );
+//	user = authenticator.authenticate( "goodusr", "xx", true );
+//	ASSERT_EQ( NULL, user );
+//	user = authenticator.authenticate( "badusr", "xx", true );
+//	ASSERT_EQ( NULL, user );
+//}
 
 
 int main( int argc, char **argv )

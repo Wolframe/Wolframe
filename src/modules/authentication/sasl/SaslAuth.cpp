@@ -61,6 +61,7 @@ void SaslAuthConfig::print( std::ostream& os, size_t indent ) const
 {
 	std::string indStr( indent, ' ' );
 	os << indStr << sectionName() << std::endl;
+	os << indStr << "   Identifier: " << m_identifier << std::endl;
 	os << indStr << "   SASL service: " << m_service << std::endl;
 	if( !m_confPath.empty( ) ) {
 		os << indStr << "   SASL local configuration: " << m_confPath << std::endl;
@@ -80,9 +81,10 @@ void SaslAuthConfig::setCanonicalPathes( const std::string& refPath )
 	}
 }
 
-SaslAuthenticator::SaslAuthenticator( const std::string& service,
-		   const std::string& confPath )
-	: m_service( service ), m_confPath( confPath )
+SaslAuthenticator::SaslAuthenticator( const std::string& Identifier,
+		   const std::string& service, const std::string& confPath )
+	: AuthenticationUnit( Identifier ),
+	  m_service( service ), m_confPath( confPath )
 {
 	MOD_LOG_DEBUG << "SASL authenticator created for service '" << m_service << "'";
 	if( !m_confPath.empty( ) ) {
@@ -97,7 +99,8 @@ SaslAuthenticator::~SaslAuthenticator()
 
 SaslAuthContainer::SaslAuthContainer( const SaslAuthConfig& conf )
 {
-	m_auth = new SaslAuthenticator( conf.m_service, conf.m_confPath );
+	m_auth = new SaslAuthenticator( conf.m_identifier,
+					conf.m_service, conf.m_confPath );
 	MOD_LOG_NOTICE << "SASL authenticator container created";
 }
 

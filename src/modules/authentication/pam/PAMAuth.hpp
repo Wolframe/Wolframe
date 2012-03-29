@@ -61,6 +61,7 @@ public:
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 private:
+	std::string	m_identifier;
 	std::string	m_service;
 };
 
@@ -77,7 +78,7 @@ typedef struct {
 class PAMAuthenticator : public AuthenticationUnit
 {
 public:
-	PAMAuthenticator( const std::string& Identifier, unsigned short ID,
+	PAMAuthenticator( const std::string& Identifier,
 			  const std::string& service );
 	~PAMAuthenticator();
 	virtual const char* typeName() const		{ return "PAMAuth"; }
@@ -86,7 +87,7 @@ public:
 
 private:
 	// name of the PAM service
-	std::string		m_service;
+	const std::string	m_service;
 
 	// PAM internal data structure
 	struct pam_conv		m_conv;

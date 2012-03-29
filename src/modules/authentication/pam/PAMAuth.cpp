@@ -57,7 +57,8 @@ void PAMAuthConfig::print( std::ostream& os, size_t indent ) const
 {
 	std::string indStr( indent, ' ' );
 	os << indStr << sectionName() << std::endl;
-	os << indStr << "   PAM service: " << m_service << std::endl;
+	os << indStr << "   Identifier: " << m_identifier << std::endl;
+	os << indStr << "   Service: " << m_service << std::endl;
 }
 
 // Solaris defines the pam client callback function slightly different
@@ -219,9 +220,9 @@ error:
 	return PAM_CONV_ERR;
 }
 
-PAMAuthenticator::PAMAuthenticator( const std::string& Identifier, unsigned short ID,
+PAMAuthenticator::PAMAuthenticator( const std::string& Identifier,
 				    const std::string& service )
-	: AuthenticationUnit( Identifier, ID ), m_service( service )
+	: AuthenticationUnit( Identifier ), m_service( service )
 {
 	m_appdata.h = NULL;
 	m_appdata.has_pass = false;
@@ -240,7 +241,7 @@ PAMAuthenticator::~PAMAuthenticator()
 
 PAMAuthContainer::PAMAuthContainer( const PAMAuthConfig& conf )
 {
-	m_auth = new PAMAuthenticator( conf.m_service );
+	m_auth = new PAMAuthenticator( conf.m_identifier, conf.m_service );
 	MOD_LOG_NOTICE << "PAM authenticator container created";
 }
 
