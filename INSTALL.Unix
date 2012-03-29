@@ -468,7 +468,7 @@ Optional packages: cyrus-sasl2 (from ports tree, 2.1.23p7),
                    qt4 (qt4-4.7.3p0),
                    sqlite3 (3.7.5), postgresql-client (9.0.4),
                    libxml (2.7.8p2), libxslt (1.1.26p2),
-                   png (1.5.4)
+                   png (1.5.4), gmp (gmp-5.0.2p0)
 
 You need 'gmake' (3.82).
 
