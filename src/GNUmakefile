@@ -74,6 +74,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	protocol_commandHandler.o \
 	protocol_lineCommandHandler.o \
 	langbind_appObjects.o \
+	langbind_appConfig.o \
 	langbind_ioFilterCommandHandler.o \
 	langbind_directmapCommandEnvironment.o \
 	langbind_directmapCommandHandler.o \
