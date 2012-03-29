@@ -20,6 +20,10 @@ ifeq ($(WITH_LIBHPDF),1)
 SUBDIRS += libhpdf
 endif
 
+ifeq ($(WITH_LIBGMP),1)
+SUBDIRS += bignum
+endif
+
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
 INCLUDE_CXXFLAGS = \

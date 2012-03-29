@@ -47,6 +47,13 @@ LOCAL_STATIC_LIB_OBJS = \
 LOCAL_STATIC_LIB = \
 	liblua.a
 
+INCLUDE_LIBS += $(LOCAL_STATIC_LIB) $(LUA_PLATFORM_BINARY_LIBS)
+
+BINS = \
+	lua$(EXE)
+
+lua$(EXE): liblua.a
+
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 # overwrite flags so they fit to how Lua people compile the software.
@@ -59,7 +66,6 @@ $(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
 	ar rcs $(LOCAL_STATIC_LIB) $(LOCAL_STATIC_LIB_OBJS)
 
 local_all: $(LOCAL_STATIC_LIB)
-
 
 local_clean:
 	@rm -f $(LOCAL_STATIC_LIB) $(LOCAL_STATIC_LIB_OBJS)
