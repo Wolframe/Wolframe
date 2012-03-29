@@ -91,6 +91,18 @@ struct PluginModuleAPIConfigStruct
 	static const config::DescriptionBase* description();
 };
 
+struct EnvironmentConfigStruct
+{
+	std::vector<DDLCompilerConfigStruct> ddl;			//< definitions of DDLs
+	std::vector<DDLFormConfigStruct> form;				//< definitions of forms
+	std::vector<FilterConfigStruct> filter;				//< definitions of filters
+	std::vector<TransactionFunctionConfigStruct> transaction;	//< definitions of transaction functions
+	std::vector<PluginModuleAPIConfigStruct> plugin;		//< definitions of the plugin APIs
+
+	///\brief Get the configuration structure description
+	static const config::DescriptionBase* description();
+};
+
 }}//namespace
 #endif
 

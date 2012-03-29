@@ -122,4 +122,23 @@ const config::DescriptionBase* PluginModuleAPIConfigStruct::description()
 	return &rt;
 }
 
+const config::DescriptionBase* EnvironmentConfigStruct::description()
+{
+	struct ThisDescription :public config::Description<EnvironmentConfigStruct>
+	{
+		ThisDescription()
+		{
+			(*this)
+			( "DDL",		&EnvironmentConfigStruct::ddl)
+			( "form",		&EnvironmentConfigStruct::form)
+			( "filter",		&EnvironmentConfigStruct::filter)
+			( "transaction",	&EnvironmentConfigStruct::transaction)
+			( "plugin",		&EnvironmentConfigStruct::plugin)
+			;
+		}
+	};
+	static const ThisDescription rt;
+	return &rt;
+}
+
 
