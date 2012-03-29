@@ -224,7 +224,8 @@ Optional packages: libqt4-dev,
                    libpam-dev (1.1.1), libsasl2-dev (2.1.23),
                    libsqlite3-dev (3.6.22), libpq-dev (8.4.7),
                    libxml2-dev (2.7.6), libpng-dev (1.2.42),
-                   zlib1g-dev (1.2.3.3.dfsg-15ubuntu1)
+                   zlib1g-dev (1.2.3.3.dfsg-15ubuntu1),
+                   libgmp3-dev (2:4.3.2+dfsg-1ubuntu1)
 
 libboost-dev is 1.40, too old, missing asio features and property_tree, build
 you own boost. gcc on Debian complains a lot about boost header files..
@@ -404,7 +405,8 @@ Archlinux
 Required packages: boost and boost-libs
 Optional packages: openssl, qt, pam, libsasl,
                    sqlite3, postgresql-libs,
-                   libxml2, libxslt, libharu
+                   libxml2, libxslt, libharu,
+                   gmp
 
 For building the documentation you need 'xsltproc', 'docbook-xsl' and 'doxygen'.
 'fop' (together with 'java-batik', 'java-commons-io', 'java-avalon-framework',
