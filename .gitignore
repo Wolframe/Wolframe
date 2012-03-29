@@ -101,3 +101,5 @@ examples/tproc/tests/temp/
 *.msi
 *.tlh
 *.tli
+tests/bignum/testlibgmp_cpp
+tests/bignum/testlibgmp_c
