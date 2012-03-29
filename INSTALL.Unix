@@ -495,7 +495,7 @@ Required packages: boost-headers (1.47.0), boost-libs (1.47.0)
 Optional packages: cyrus-sasl (2.1.25), qt4 (4.7.4),
                    sqlite3 (3.7.9), postgresql91-client (9.1.2),
                    libxml2 (2.7.8nb8), libxslt (1.1.26nb1),
-                   zlib (1.2.3), png (1.5.9)
+                   zlib (1.2.3), png (1.5.9), gmp (5.0.2nb1)
 
 You need 'gmake' (3.82db3).
 
