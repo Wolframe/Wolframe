@@ -23,16 +23,15 @@
 # /Wp64 breaks Qt and SSL
 # /Wall: enable all warnings (produces tons of warnings!)
 # /WX: treat warnings as errors
-# /wd4146: ignore errors in boost::lexical_cast for signed/unsignednewss
 
 # compilation flags and compilers (release)
 !IFNDEF DEBUG
-COMMON_COMPILE_FLAGS = /MD /W2 /wd4146 /WX /nologo /O2 /EHsc /c $(INCLUDE_DIRS)
+COMMON_COMPILE_FLAGS = /MD /W2 /WX /nologo /O2 /EHsc /c $(INCLUDE_DIRS)
 !ENDIF
 
 # compilation flags and compilers (debug)
 !IFDEF DEBUG
-COMMON_COMPILE_FLAGS = /MDd /Zi /W2 /wd4146 /WX /nologo /O2 /EHsc /c $(INCLUDE_DIRS)
+COMMON_COMPILE_FLAGS = /MDd /Zi /W2 /WX /nologo /O2 /EHsc /c $(INCLUDE_DIRS)
 !ENDIF
 
 COMPILE_FLAGS = $(COMMON_COMPILE_FLAGS)
