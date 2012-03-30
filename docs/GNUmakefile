@@ -21,11 +21,11 @@ XSLT_HTML = \
 
 XSLT_PDF = \
 	$(XSLTPROC) --nonet --xinclude \
+	--stringparam draft.mode yes \
 	output-pdf.xsl
 
 XSLT_EPUB = \
 	$(XSLTPROC) --nonet --xinclude \
-	--stringparam draft.mode yes \
 	output-epub.xsl
 
 local_all:
