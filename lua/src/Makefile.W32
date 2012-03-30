@@ -49,13 +49,23 @@ OBJS = \
 
 LIBRARIES = \
 	lua.lib
+
+INCLUDE_LIBS = $(INCLUDE_LIBS) $(LOCAL_STATIC_LIB)
+
+BINS = \
+	lua.exe
 	
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+lua.obj: lua.c
+lua.exe: lua.lib
+	$(LINK) $(LDFLAGS) $(LIBS) /out:$@ lua.lib lua.obj $**
+	$(MT) -nologo -manifest $@.manifest -outputresource:$@;1
 
 lua.lib: $(OBJS)
 	$(LINK) /lib /out:$@ $(STATIC_LDFLAGS) $(LIBS) $?
 
-local_all: $(LIBRARIES) $(BINS) 
+local_all: $(LIBRARIES) $(BINS)
 
 local_clean:
 
