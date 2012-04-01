@@ -1,0 +1,112 @@
+TOPDIR = ..
+
+SUBDIRS = mpn mpz mpq mpf printf scanf cxx
+
+GMPCOMMON_OBJS = \
+	version.obj \
+	errno.obj \
+	memory.obj \
+	assert.obj \
+	tal-reent.obj \
+	mp_bpl.obj \
+	mp_clz_tab.obj \
+	mp_dv_tab.obj \
+	mp_get_fns.obj \
+	mp_minv_tab.obj \
+	mp_set_fns.obj \
+	nextprime.obj \
+	rand.obj \
+	randbui.obj \
+	randclr.obj \
+	randdef.obj \
+	randiset.obj \
+	randlc2s.obj \
+	randlc2x.obj \
+	randmt.obj \
+	randmts.obj \
+	randmui.obj \
+	rands.obj \
+	randsd.obj \
+	randsdui.obj \
+	extract-dbl.obj \
+	invalid.obj \
+	dumbmp.obj
+#	tal-debug.obj tal-notreent.obj tal-reent.obj
+	
+BINS = \
+	gen-fib.exe \
+	gen-bases.exe \
+	gen-psqr.exe \
+	gen-trialdivtab.exe \
+	gen-fac_ui.exe
+
+LIBRARIES = \
+	gmpcommon.lib
+
+INCLUDE_CFLAGS = \
+	/D_WIN32_WINNT=0x504 \
+	/wd4146
+
+INCLUDE_DIRS = \
+	/I. /Impn\generic
+
+WIN64=1
+!IFDEF WIN64
+GMP_LIMB_BITS = 64
+!ELSE
+GMP_LIMB_BITS = 32
+!ENDIF
+GMP_NAIL_BITS = 0
+
+all: $(GMPCOMMON_OBJS) $(LIBRARIES)
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+gen-fib.exe: gen-fib.obj
+gen-bases.exe: gen-bases.obj
+gen-psqr.exe: gen-psqr.obj
+gen-trialdivtab.exe: gen-trialdivtab.obj
+gen-fac_ui.exe: gen-fac_ui.obj
+
+version.c: fib_table.h mp_bases.h
+memory.c: fib_table.h mp_bases.h
+
+fib_table.h: gen-fib.exe
+	gen-fib header $(GMP_LIMB_BITS) $(GMP_NAIL_BITS) >fib_table.h
+
+mpn\fib_table.c: gen-fib.exe
+	gen-fib table $(GMP_LIMB_BITS) $(GMP_NAIL_BITS) >mpn\fib_table.c
+
+mp_bases.h: gen-bases.exe
+	gen-bases header $(GMP_LIMB_BITS) $(GMP_NAIL_BITS) >mp_bases.h
+
+mpn\mp_bases.c: gen-bases.exe
+	gen-bases table $(GMP_LIMB_BITS) $(GMP_NAIL_BITS) >mpn/mp_bases.c
+
+mpn\perfsqr.h: gen-psqr.exe
+	gen-psqr $(GMP_LIMB_BITS) $(GMP_NAIL_BITS) >mpn\perfsqr.h
+
+mpz\fac_ui.h: gen-fac_ui.exe
+	gen-fac_ui $(GMP_LIMB_BITS) $(GMP_NAIL_BITS) >mpz/fac_ui.h
+	
+local_all: fib_table.h mpn\fib_table.c mp_bases.h mpn\mp_bases.c mpn\perfsqr.h gen-psqr.c trialdivtab.h mpz\fac_ui.h
+
+trialdivtab.h: gen-trialdivtab.exe
+	gen-trialdivtab $(GMP_LIMB_BITS) 8000 >trialdivtab.h
+
+gmpcommon.lib: $(GMPCOMMON_OBJS)
+	$(LINK) /lib /nologo /out:$@ $(STATIC_LDFLAGS) $(LIBS) $?
+
+local_clean:
+	@-erase $(LIBRARIES) 2>NUL
+	@-erase fib_table.h mpn\fib_table.c 2>NUL
+	@-erase mp_bases.h mpn\mp_bases.c 2>NUL
+	@-erase mpn\perfsqr.h 2>NUL
+	@-erase trialdivtab.h 2>NUL
+	@-erase mpz\fac_ui.h 2>NUL
+
+local_distclean:
+
+local_install:
+
+local_test:

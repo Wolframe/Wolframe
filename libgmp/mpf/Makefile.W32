@@ -1,0 +1,101 @@
+TOPDIR = ..\..
+
+SUBDIRS =
+
+INCLUDE_CFLAGS = \
+	/D_WIN32_WINNT=0x504 \
+	/wd4146 /wd4244
+	
+INCLUDE_DIRS = \
+	/I. /I.. /I..\mpn\generic
+
+INCLUDE_LDFLAGS =
+
+INCLUDE_LIBS =
+
+LIBRARIES = \
+	mpf.lib
+
+OBJS = \
+	abs.obj \
+	add.obj \
+	add_ui.obj \
+	ceilfloor.obj \
+	clear.obj \
+	clears.obj \
+	cmp.obj \
+	cmp_d.obj \
+	cmp_si.obj \
+	cmp_ui.obj \
+	div.obj \
+	div_2exp.obj \
+	div_ui.obj \
+	dump.obj \
+	eq.obj \
+	fits_sint.obj \
+	fits_slong.obj \
+	fits_sshort.obj \
+	fits_uint.obj \
+	fits_ulong.obj \
+	fits_ushort.obj \
+	get_d.obj \
+	get_d_2exp.obj \
+	get_dfl_prec.obj \
+	get_prc.obj \
+	get_si.obj \
+	get_str.obj \
+	get_ui.obj \
+	init.obj \
+	init2.obj \
+	inits.obj \
+	inp_str.obj \
+	int_p.obj \
+	iset.obj \
+	iset_d.obj \
+	iset_si.obj \
+	iset_str.obj \
+	iset_ui.obj \
+	mul.obj \
+	mul_2exp.obj \
+	mul_ui.obj \
+	neg.obj \
+	out_str.obj \
+	pow_ui.obj \
+	random2.obj \
+	reldiff.obj \
+	set.obj \
+	set_d.obj \
+	set_dfl_prec.obj \
+	set_prc.obj \
+	set_prc_raw.obj \
+	set_q.obj \
+	set_si.obj \
+	set_str.obj \
+	set_ui.obj \
+	set_z.obj \
+	size.obj \
+	sqrt.obj \
+	sqrt_ui.obj \
+	sub.obj \
+	sub_ui.obj \
+	swap.obj \
+	trunc.obj \
+	ui_div.obj \
+	ui_sub.obj \
+	urandomb.obj
+
+all: $(OBJS) $(LIBRARIES)
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+mpf.lib: $(OBJS)
+	$(LINK) /lib /nologo /out:$@ $(STATIC_LDFLAGS) $(LIBS) $?
+
+local_all:
+
+local_clean:
+	@-erase $(LIBRARIES) 2>NUL
+
+local_distclean:
+
+local_test:

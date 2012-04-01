@@ -62,7 +62,7 @@ LIBS = $(INCLUDE_LIBS)
 LINK = link.exe
 CXX_LINK = link.exe
 
-.SUFFIXES: .c .cpp .obj .exe .mc .rc .res
+.SUFFIXES: .c .cpp .cc .obj .exe .mc .rc .res
 
 .c.obj:
 	$(CC) $(CFLAGS) /Fo$@ $<
@@ -70,10 +70,16 @@ CXX_LINK = link.exe
 .cpp.obj:
 	$(CXX) $(CXXFLAGS) /Fo$@ $<
 
+.cc.obj:
+	$(CXX) $(CXXFLAGS) /Fo$@ $<
+
 .c.dllobj:
 	$(CC) $(CFLAGS) /D "BUILD_SHARED" /Fo$@ $<
 
 .cpp.dllobj:
+	$(CXX) $(CXXFLAGS) /D "BUILD_SHARED" /Fo$@ $<
+	
+.cc.dllobj:
 	$(CXX) $(CXXFLAGS) /D "BUILD_SHARED" /Fo$@ $<
 
 .obj.exe:

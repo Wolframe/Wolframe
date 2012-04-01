@@ -1,0 +1,46 @@
+TOPDIR = ..\..
+
+SUBDIRS =
+
+INCLUDE_CXXFLAGS = \
+	/D_WIN32_WINNT=0x504 \
+	/wd4146
+	
+INCLUDE_DIRS = \
+	/I. /I.. /I..\mpn\generic
+
+INCLUDE_LDFLAGS =
+
+INCLUDE_LIBS =
+
+LIBRARIES = \
+	gmpxx.lib
+
+OBJS = \
+	dummy.obj \
+	isfuns.obj \
+	ismpf.obj \
+	ismpq.obj \
+	ismpz.obj \
+	ismpznw.obj \
+	osdoprnti.obj \
+	osfuns.obj \
+	osmpf.obj \
+	osmpq.obj \
+	osmpz.obj
+
+all: $(OBJS) $(LIBRARIES)
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+gmpxx.lib: $(OBJS)
+	$(LINK) /lib /nologo /out:$@ $(STATIC_LDFLAGS) $(LIBS) $?
+
+local_all:
+
+local_clean:
+	@-erase $(LIBRARIES) 2>NUL
+
+local_distclean:
+
+local_test:

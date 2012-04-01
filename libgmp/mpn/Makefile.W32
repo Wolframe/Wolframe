@@ -1,0 +1,178 @@
+TOPDIR = ..\..
+
+SUBDIRS =
+
+INCLUDE_CFLAGS = \
+	/D_WIN32_WINNT=0x504 \
+	/wd4146 /wd4244 /wd4700
+
+INCLUDE_DIRS = \
+	/I.. /I. /Igeneric
+
+INCLUDE_LDFLAGS =
+
+INCLUDE_LIBS =
+
+LIBRARIES = \
+	mpn.lib
+
+OBJS = \
+	generic\add.obj \
+	generic\add_1.obj \
+	generic\add_n.obj \
+	generic\addmul_1.obj \
+	generic\addsub_n.obj \
+	generic\bdiv_dbm1c.obj \
+	generic\bdiv_q.obj \
+	generic\bdiv_q_1.obj \
+	generic\bdiv_qr.obj \
+	generic\binvert.obj \
+	generic\cmp.obj \
+	generic\com.obj \
+	generic\copyd.obj \
+	generic\copyi.obj \
+	generic\dcpi1_bdiv_q.obj \
+	generic\dcpi1_bdiv_qr.obj \
+	generic\dcpi1_div_q.obj \
+	generic\dcpi1_div_qr.obj \
+	generic\dcpi1_divappr_q.obj \
+	generic\div_q.obj \
+	generic\dive_1.obj \
+	generic\diveby3.obj \
+	generic\divexact.obj \
+	generic\divis.obj \
+	generic\divrem.obj \
+	generic\divrem_1.obj \
+	generic\divrem_2.obj \
+	generic\dump.obj \
+	generic\fib2_ui.obj \
+	generic\gcd.obj \
+	generic\gcd_1.obj \
+	generic\gcd_lehmer.obj \
+	generic\gcd_subdiv_step.obj \
+	generic\gcdext.obj \
+	generic\gcdext_1.obj \
+	generic\gcdext_lehmer.obj \
+	generic\gcdext_subdiv_step.obj \
+	generic\get_d.obj \
+	generic\get_str.obj \
+	generic\hgcd.obj \
+	generic\hgcd2.obj \
+	generic\invert.obj \
+	generic\invertappr.obj \
+	generic\jacbase.obj \
+	generic\logops_n.obj \
+	generic\lshift.obj \
+	generic\lshiftc.obj \
+	generic\matrix22_mul.obj \
+	generic\mod_1.obj \
+	generic\mod_1_1.obj \
+	generic\mod_1_2.obj \
+	generic\mod_1_3.obj \
+	generic\mod_1_4.obj \
+	generic\mod_34lsub1.obj \
+	generic\mode1o.obj \
+	generic\mu_bdiv_q.obj \
+	generic\mu_bdiv_qr.obj \
+	generic\mu_div_q.obj \
+	generic\mu_div_qr.obj \
+	generic\mu_divappr_q.obj \
+	generic\mul.obj \
+	generic\mul_1.obj \
+	generic\mul_basecase.obj \
+	generic\mul_fft.obj \
+	generic\mul_n.obj \
+	generic\mullo_basecase.obj \
+	generic\mullo_n.obj \
+	generic\mulmod_bnm1.obj \
+	generic\neg.obj \
+	generic\nussbaumer_mul.obj \
+	generic\perfpow.obj \
+	generic\perfsqr.obj \
+	generic\popcount.obj \
+	generic\hamdist.obj \
+	generic\pow_1.obj \
+	generic\powlo.obj \
+	generic\powm.obj \
+	generic\powm_sec.obj \
+	generic\pre_divrem_1.obj \
+	generic\pre_mod_1.obj \
+	generic\random.obj \
+	generic\random2.obj \
+	generic\redc_1.obj \
+	generic\redc_1_sec.obj \
+	generic\redc_2.obj \
+	generic\redc_n.obj \
+	generic\remove.obj \
+	generic\rootrem.obj \
+	generic\rshift.obj \
+	generic\sbpi1_bdiv_q.obj \
+	generic\sbpi1_bdiv_qr.obj \
+	generic\sbpi1_div_q.obj \
+	generic\sbpi1_div_qr.obj \
+	generic\sbpi1_divappr_q.obj \
+	generic\scan0.obj \
+	generic\scan1.obj \
+	generic\set_str.obj \
+	generic\sizeinbase.obj \
+	generic\sqr.obj \
+	generic\sqr_basecase.obj \
+	generic\sqrmod_bnm1.obj \
+	generic\sqrtrem.obj \
+	generic\sub.obj \
+	generic\sub_1.obj \
+	generic\sub_n.obj \
+	generic\subcnd_n.obj \
+	generic\submul_1.obj \
+	generic\tdiv_qr.obj \
+	generic\toom_couple_handling.obj \
+	generic\toom_eval_dgr3_pm1.obj \
+	generic\toom_eval_dgr3_pm2.obj \
+	generic\toom_eval_pm1.obj \
+	generic\toom_eval_pm2.obj \
+	generic\toom_eval_pm2exp.obj \
+	generic\toom_eval_pm2rexp.obj \
+	generic\toom_interpolate_12pts.obj \
+	generic\toom_interpolate_16pts.obj \
+	generic\toom_interpolate_5pts.obj \
+	generic\toom_interpolate_6pts.obj \
+	generic\toom_interpolate_7pts.obj \
+	generic\toom_interpolate_8pts.obj \
+	generic\toom2_sqr.obj \
+	generic\toom22_mul.obj \
+	generic\toom3_sqr.obj \
+	generic\toom32_mul.obj \
+	generic\toom33_mul.obj \
+	generic\toom4_sqr.obj \
+	generic\toom42_mul.obj \
+	generic\toom43_mul.obj \
+	generic\toom44_mul.obj \
+	generic\toom52_mul.obj \
+	generic\toom53_mul.obj \
+	generic\toom6_sqr.obj \
+	generic\toom62_mul.obj \
+	generic\toom63_mul.obj \
+	generic\toom6h_mul.obj \
+	generic\toom8_sqr.obj \
+	generic\toom8h_mul.obj \
+	generic\trialdiv.obj \
+	generic\udiv_w_sdiv.obj \
+	generic\zero.obj \
+	fib_table.obj \
+	mp_bases.obj
+
+all: $(OBJS) $(LIBRARIES)
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+mpn.lib: $(OBJS)
+	$(LINK) /lib /nologo /out:$@ $(STATIC_LDFLAGS) $(LIBS) $?
+
+local_all:
+
+local_clean:
+	@-erase $(LIBRARIES) generic\*.obj 2>NUL
+
+local_distclean:
+
+local_test:
