@@ -30,6 +30,8 @@ OBJS = \
 	
 all: $(DYNAMIC_MODULE)
 
+test: $(DYNAMIC_MODULE) local_test
+
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 $(DYNAMIC_MODULE): $(OBJS)
