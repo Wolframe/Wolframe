@@ -39,15 +39,15 @@
 #include "protocol/commandHandler.hpp"
 #include "config/descriptionBase.hpp"
 #include "ddl/compilerInterface.hpp"
-#include "standardConfigs.hpp"
+#include "config/configurationBase.hpp"
 
 namespace _Wolframe {
 namespace langbind {
 
 struct DDLCompilerConfigStruct
 {
-	std::string name;				//< name of DDL referenced by form definitions
-	std::string modulepath;				//< path of the DDL compiler module
+	std::string name;						//< name of DDL referenced by form definitions
+	std::string modulepath;						//< path of the DDL compiler module
 
 	///\brief Get the configuration structure description
 	static const config::DescriptionBase* description();
@@ -55,9 +55,9 @@ struct DDLCompilerConfigStruct
 
 struct DDLFormConfigStruct
 {
-	std::string name;				//< name of the form
-	std::string ddlname;				//< name of DDL referencing the DDL compiler (langbind::DDLCompilerConfigStruct)
-	std::string sourcepath;				//< path of the DDL source of this form
+	std::string name;						//< name of the form
+	std::string DDL;						//< name of DDL referencing the DDL compiler (langbind::DDLCompilerConfigStruct)
+	std::string sourcepath;						//< path of the DDL source of this form
 
 	///\brief Get the configuration structure description
 	static const config::DescriptionBase* description();
@@ -65,8 +65,8 @@ struct DDLFormConfigStruct
 
 struct FilterConfigStruct
 {
-	std::string name;				//< name of the form
-	std::string modulepath;				//< path of filter module
+	std::string name;						//< name of the form
+	std::string modulepath;						//< path of filter module
 
 	///\brief Get the configuration structure description
 	static const config::DescriptionBase* description();
@@ -74,9 +74,9 @@ struct FilterConfigStruct
 
 struct TransactionFunctionConfigStruct
 {
-	std::string name;				//< name of the transaction function
-	std::string cmdhandler;				//< identifier of the transaction function handler (protocol::CommandHandler)
-	std::string filtermodulepath;			//< name of the module defining the transaction command reader/writer
+	std::string name;						//< name of the transaction function
+	std::string filter;						//< name of the filter defining the transaction command reader/writer
+	std::string modulepath;						//< path of the transaction function handler module (protocol::CommandHandler)
 
 	///\brief Get the configuration structure description
 	static const config::DescriptionBase* description();
@@ -84,8 +84,8 @@ struct TransactionFunctionConfigStruct
 
 struct PluginModuleAPIConfigStruct
 {
-	std::string name;				//< name of the plug-in function
-	std::string modulepath;				//< path of filter module with the API form definition and the function implementation
+	std::string name;						//< name of the plug-in function
+	std::string modulepath;						//< path of filter module with the API form definition and the function implementation
 
 	///\brief Get the configuration structure description
 	static const config::DescriptionBase* description();
@@ -93,7 +93,7 @@ struct PluginModuleAPIConfigStruct
 
 struct EnvironmentConfigStruct
 {
-	std::vector<DDLCompilerConfigStruct> ddl;			//< definitions of DDLs
+	std::vector<DDLCompilerConfigStruct> DDL;			//< definitions of DDLs
 	std::vector<DDLFormConfigStruct> form;				//< definitions of forms
 	std::vector<FilterConfigStruct> filter;				//< definitions of filters
 	std::vector<TransactionFunctionConfigStruct> transaction;	//< definitions of transaction functions
@@ -101,6 +101,21 @@ struct EnvironmentConfigStruct
 
 	///\brief Get the configuration structure description
 	static const config::DescriptionBase* description();
+};
+
+///\brief application environment configuration
+class ApplicationEnvironmentConfig : public config::ConfigurationBase
+{
+public:
+	ApplicationEnvironmentConfig() : ConfigurationBase( "Application Environment", NULL, "Application environment configuration" )	{}
+	~ApplicationEnvironmentConfig();
+
+	bool parse( const config::ConfigurationTree& pt, const std::string& node, const module::ModulesDirectory* modules );
+	bool check() const;
+	void print( std::ostream& os, std::size_t indent) const;
+	virtual void setCanonicalPathes( const std::string& referencePath );
+private:
+	EnvironmentConfigStruct m_config;
 };
 
 }}//namespace

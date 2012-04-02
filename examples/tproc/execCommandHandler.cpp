@@ -54,7 +54,7 @@ ExecCommandHandler::ExecCommandHandler( const std::vector<std::string>& rcmds_, 
 	std::vector< CountedReference< protocol::CommandBase> >::const_iterator itr=m_cmds.begin(), end=m_cmds.end();
 	for (; itr!=end; ++itr)
 	{
-		m_parser.add( itr->get()->protocolCmdName());
+		m_parser.add( itr->get()->cmdName());
 	}
 }
 

@@ -80,7 +80,7 @@ struct DescriptionBase
 	///\brief Print the configuration structure with values from the configuration
 	///\param[out] stream to print to
 	///\param[in] configStruct structure to print
-	void print( std::ostream& out, const void* configStruct) const;
+	void print( std::ostream& out, const void* configStruct, unsigned int indent=0) const;
 };
 
 

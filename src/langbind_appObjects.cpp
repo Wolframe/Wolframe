@@ -55,16 +55,14 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace langbind;
 
-FilterMap::~FilterMap()
+void FilterMap::defineFilter( const char* name, const FilterFactoryR& f)
 {
-	std::map<std::string,const FilterFactory*>::iterator ii=m_map.begin(),ee=m_map.end();
-	for (;ii!=ee;++ii)
-	{
-		delete ii->second;
-	}
+	std::string nam( name);
+	std::transform( nam.begin(), nam.end(), nam.begin(), (int(*)(int)) std::tolower);
+	m_map[ nam] = f;
 }
 
-Filter FilterMap::getFilter( const char* arg)
+bool FilterMap::getFilter( const char* arg, Filter& rt)
 {
 	std::size_t nn = std::strlen(arg);
 	std::size_t ii = nn;
@@ -73,31 +71,31 @@ Filter FilterMap::getFilter( const char* arg)
 	do
 	{
 		nam.resize(ii);
-		std::map<std::string,const FilterFactory*>::const_iterator itr=m_map.find( nam),end=m_map.end();
+		std::map<std::string,FilterFactoryR>::const_iterator itr=m_map.find( nam),end=m_map.end();
 		if (itr != end)
 		{
-			Filter rt = itr->second->create( (ii==nn)?0:(arg+ii+1));
-			return rt;
+			rt = itr->second->create( (ii==nn)?0:(arg+ii+1));
+			return true;
 		}
 		for (ii=nn; ii>0 && arg[ii] != ':'; --ii);
 	}
 	while (ii>0);
-	return Filter();
+	return false;
 }
 
 FilterMap::FilterMap()
 {
-	defineFilter( "char", CharFilterFactory());
-	defineFilter( "line", LineFilterFactory());
-	defineFilter( "xml:textwolf", TextwolfXmlFilterFactory());
+	defineFilter( "char", FilterFactoryR( new CharFilterFactory()));
+	defineFilter( "line", FilterFactoryR( new LineFilterFactory()));
+	defineFilter( "xml:textwolf", FilterFactoryR( new TextwolfXmlFilterFactory()));
 #ifdef WITH_LIBXML2
-	defineFilter( "xml:libxml2", Libxml2FilterFactory());
+	defineFilter( "xml:libxml2", FilterFactoryR( new Libxml2FilterFactory()));
 #endif
 #ifdef WITH_XMLLITE
-	defineFilter( "xml:xmllite", Libxml2FilterFactory());
+	defineFilter( "xml:xmllite", FilterFactoryR( new Libxml2FilterFactory()));
 #endif
 #ifdef WITH_MSXML
-	defineFilter( "xml:msxml", Libxml2FilterFactory());
+	defineFilter( "xml:msxml", FilterFactoryR( new Libxml2FilterFactory()));
 #endif
 }
 
@@ -105,24 +103,71 @@ void DDLFormMap::defineForm( const char* name, const DDLForm& f)
 {
 	std::string nam( name);
 	std::transform( nam.begin(), nam.end(), nam.begin(), (int(*)(int)) std::tolower);
-	m_map[ std::string(nam)] = f;
+	m_map[ nam] = f;
 }
 
-const DDLForm DDLFormMap::getForm( const char* name) const
+bool DDLFormMap::getForm( const char* name, DDLForm& rt) const
 {
 	std::string nam( name);
+	std::transform( nam.begin(), nam.end(), nam.begin(), (int(*)(int)) std::tolower);
 	std::map<std::string,DDLForm>::const_iterator ii=m_map.find( nam),ee=m_map.end();
 	if (ii == ee)
 	{
-		return DDLForm();
+		return false;
 	}
 	else
 	{
-		return ii->second;
+		rt = ii->second;
+		return true;
 	}
 }
 
-static GlobalContextR g_context; //< PF:HACK: global variable - should be passed here. no clue how ... (singleton?)
+bool TransactionFunctionMap::getTransactionFunction( const char* name, TransactionFunction& rt) const
+{
+	std::string nam( name);
+	std::transform( nam.begin(), nam.end(), nam.begin(), (int(*)(int)) std::tolower);
+	std::map<std::string,TransactionFunction>::const_iterator ii=m_map.find( nam),ee=m_map.end();
+	if (ii == ee)
+	{
+		return false;
+	}
+	else
+	{
+		rt = ii->second;
+		return true;
+	}
+}
+
+void TransactionFunctionMap::defineTransactionFunction( const char* name, const TransactionFunction& f)
+{
+	std::string nam( name);
+	std::transform( nam.begin(), nam.end(), nam.begin(), (int(*)(int)) std::tolower);
+	m_map[ nam] = f;
+}
+
+void DDLCompilerMap::defineDDLCompiler( const char* name, const ddl::CompilerInterfaceR& ci)
+{
+	std::string nam( name);
+	std::transform( nam.begin(), nam.end(), nam.begin(), (int(*)(int)) std::tolower);
+	m_map[ nam] = ci;
+}
+
+bool DDLCompilerMap::getDDLCompiler( const char* name, ddl::CompilerInterfaceR& rt) const
+{
+	std::string nam( name);
+	std::map<std::string,ddl::CompilerInterfaceR>::const_iterator ii=m_map.find( nam),ee=m_map.end();
+	if (ii == ee)
+	{
+		return false;
+	}
+	else
+	{
+		rt = ii->second;
+		return true;
+	}
+}
+
+static GlobalContextR g_context;
 
 void _Wolframe::langbind::defineGlobalContext( const GlobalContextR& context)
 {

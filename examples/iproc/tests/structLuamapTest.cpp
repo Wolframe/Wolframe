@@ -236,7 +236,11 @@ static int run( const IProcTestConfiguration& cfg, const std::string& input, std
 {
 	char outputbuf[ 8192];
 	langbind::Filter filter;
-	filter = langbind::GlobalContext().getFilter( "xml:textwolf");
+	if (!langbind::GlobalContext().getFilter( "xml:textwolf", filter))
+	{
+		LOG_ERROR << "error in serialization: no valid filter defined";
+		return 1;
+	}
 	protocol::InputFilter* in = filter.inputfilter().get();
 	protocol::OutputFilter* out = filter.outputfilter().get();
 	if (!in)

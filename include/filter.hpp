@@ -36,6 +36,7 @@ Project Wolframe.
 #define _Wolframe_FILTER_INTERFACE_HPP_INCLUDED
 #include "protocol/inputfilter.hpp"
 #include "protocol/outputfilter.hpp"
+#include "countedReference.hpp"
 #include <map>
 #include <string>
 
@@ -90,6 +91,7 @@ struct FilterFactory
 	virtual Filter create( const char* arg) const=0;
 };
 
+typedef CountedReference<FilterFactory> FilterFactoryR;
 
 }}//namespace
 #endif

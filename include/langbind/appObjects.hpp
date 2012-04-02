@@ -36,6 +36,8 @@ Project Wolframe.
 #define _Wolframe_langbind_APPOBJECTS_HPP_INCLUDED
 #include "filter.hpp"
 #include "ddl/structType.hpp"
+#include "ddl/compilerInterface.hpp"
+#include "protocol/commandHandler.hpp"
 #include <stack>
 #include <string>
 #include <algorithm>
@@ -172,19 +174,14 @@ class FilterMap
 {
 public:
 	FilterMap();
-	~FilterMap();
+	~FilterMap(){}
+	FilterMap( const FilterMap& o)
+		:m_map(o.m_map){}
 
-	template <class FilterFactoryClass>
-	void defineFilter( const char* name, const FilterFactoryClass& f)
-	{
-		std::string nam( name);
-		std::transform( nam.begin(), nam.end(), nam.begin(), (int(*)(int)) std::tolower);
-		m_map[ std::string(nam)] = new FilterFactoryClass(f);
-	}
-
-	Filter getFilter( const char* arg);
+	void defineFilter( const char* name, const FilterFactoryR& f);
+	bool getFilter( const char* arg, Filter& rt);
 private:
-	std::map<std::string,const FilterFactory*> m_map;
+	std::map<std::string,FilterFactoryR> m_map;
 };
 
 ///\class DDLFormMap
@@ -196,15 +193,75 @@ public:
 	~DDLFormMap(){}
 
 	void defineForm( const char* name, const DDLForm& f);
-
-	const DDLForm getForm( const char* name) const;
+	bool getForm( const char* name, DDLForm& rt) const;
 private:
 	std::map<std::string,DDLForm> m_map;
 };
 
+struct TransactionFunction
+{
+	///\brief Default constructor
+	TransactionFunction() {}
+
+	///\brief Copy constructor
+	///\param[in] o copied item
+	TransactionFunction( const TransactionFunction& o)
+		:m_cmdwriter(o.m_cmdwriter),m_resultreader(o.m_resultreader),m_cmd(o.m_cmd){}
+
+	///\brief Constructor
+	///\param[in] st form data
+	TransactionFunction( const protocol::OutputFilterR& w, const protocol::InputFilterR& r, const protocol::CommandBaseR& c)
+		:m_cmdwriter(w),m_resultreader(r),m_cmd(c){}
+
+	///\brief Destructor
+	~TransactionFunction(){}
+
+	const protocol::OutputFilterR& cmdwriter() const		{return m_cmdwriter;}
+	protocol::OutputFilterR& cmdwriter()				{return m_cmdwriter;}
+
+	const protocol::InputFilterR& resultreader() const		{return m_resultreader;}
+	protocol::InputFilterR& resultreader()				{return m_resultreader;}
+
+	const protocol::CommandBaseR& cmd() const			{return m_cmd;}
+	protocol::CommandBaseR& cmd()					{return m_cmd;}
+
+protected:
+	protocol::OutputFilterR m_cmdwriter;
+	protocol::InputFilterR m_resultreader;
+	protocol::CommandBaseR m_cmd;
+};
+
+///\class TransactionFunctionMap
+///\brief Map of available transaction functions seen from scripting language binding
+class TransactionFunctionMap
+{
+public:
+	TransactionFunctionMap(){}
+	~TransactionFunctionMap(){}
+
+	void defineTransactionFunction( const char* name, const TransactionFunction& f);
+	bool getTransactionFunction( const char* name, TransactionFunction& rt) const;
+private:
+	std::map<std::string,TransactionFunction> m_map;
+};
+
+///\class DDLCompilerMap
+///\brief Map of available DDL compilers seen from scripting language binding
+class DDLCompilerMap
+{
+public:
+	DDLCompilerMap(){}
+	~DDLCompilerMap(){}
+
+	void defineDDLCompiler( const char* name, const ddl::CompilerInterfaceR& ci);
+	bool getDDLCompiler( const char* name, ddl::CompilerInterfaceR& rt) const;
+private:
+	std::map<std::string,ddl::CompilerInterfaceR> m_map;
+};
+
 ///\class GlobalContext
 ///\brief Reference to all available processing resources seen from scripting language binding
-class GlobalContext :public FilterMap, public DDLFormMap
+class GlobalContext :public FilterMap, public DDLFormMap, public TransactionFunctionMap, public DDLCompilerMap
 {
 public:
 	GlobalContext(){}

@@ -69,14 +69,14 @@ bool DescriptionBase::parse( void* configStruct, const boost::property_tree::ptr
 	return false;
 }
 
-void DescriptionBase::print( std::ostream& out, const void* configStruct) const
+void DescriptionBase::print( std::ostream& out, const void* configStruct, unsigned int indent) const
 {
 	std::vector<Item>::const_iterator end = m_ar.end();
 	std::vector<Item>::const_iterator itr = m_ar.begin();
 
 	while (itr != end)
 	{
-		itr->m_print( out, itr->m_name.c_str(), configStruct, itr->m_ofs, 0);
+		itr->m_print( out, itr->m_name.c_str(), configStruct, itr->m_ofs, indent);
 		itr++;
 	}
 }

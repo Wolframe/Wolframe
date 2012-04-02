@@ -128,16 +128,16 @@ class CommandBase
 {
 public:
 	CommandBase( const std::string& nam, const CommandEnvironment* env_)
-		:m_protocolCmdName(nam),m_env(env_){}
+		:m_cmdName(nam),m_env(env_){}
 	CommandBase( const CommandBase& o)
-		:m_protocolCmdName(o.m_protocolCmdName),m_env(o.m_env){}
+		:m_cmdName(o.m_cmdName),m_env(o.m_env){}
 	CommandBase()
-		:m_protocolCmdName(0),m_env(0){}
+		:m_cmdName(0),m_env(0){}
 	virtual ~CommandBase() {}
 
-	const char* protocolCmdName() const
+	const char* cmdName() const
 	{
-		return m_protocolCmdName.c_str();
+		return m_cmdName.c_str();
 	}
 
 	virtual CountedReference<CommandHandler> create( int /*argc*/, const char** /*argv*/) const
@@ -151,9 +151,12 @@ public:
 	}
 
 protected:
-	std::string m_protocolCmdName;
+	std::string m_cmdName;
 	const CommandEnvironment* m_env;
 };
+
+typedef CountedReference<CommandBase> CommandBaseR;
+
 
 
 template <class CommandHandlerClass, class CommandEnvironmentClass>

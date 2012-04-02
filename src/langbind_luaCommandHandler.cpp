@@ -536,8 +536,7 @@ static int function_filter( lua_State* ls)
 	Filter flt;
 	try
 	{
-		flt = ctx->getFilter( name);
-		if (!flt.inputfilter().get() && !flt.outputfilter().get())
+		if (!ctx->getFilter( name, flt))
 		{
 			return luaL_error( ls, "could not get filter '%s'", name);
 		}
