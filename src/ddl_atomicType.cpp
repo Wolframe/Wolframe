@@ -63,8 +63,7 @@ void AtomicType::init()
 	{
 		case double_:
 		case float_:
-		case long_:
-		case ulong_:
+		case bigint_:
 		case int_:
 		case uint_:
 		case short_:

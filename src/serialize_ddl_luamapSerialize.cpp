@@ -219,26 +219,14 @@ static bool printAtom( const ddl::StructType& st, lua_State* ls, Context& ctx)
 			lua_pushnumber( ls, val);
 			break;
 		}
-		case ddl::AtomicType::long_:
+		case ddl::AtomicType::bigint_:
 		{
-			long val;
-			if (!atm.get( val))
+			if (!atm.get( ctx.content()))
 			{
-				ctx.setError( 0, "could not convert value to long");
+				ctx.setError( 0, "could not convert value to bigint");
 				return false;
 			}
-			lua_pushnumber( ls, val);
-			break;
-		}
-		case ddl::AtomicType::ulong_:
-		{
-			unsigned long val;
-			if (!atm.get( val))
-			{
-				ctx.setError( 0, "could not convert value to unsigned long");
-				return false;
-			}
-			lua_pushnumber( ls, val);
+			lua_pushlstring( ls, ctx.content().c_str(), ctx.content().size());
 			break;
 		}
 		case ddl::AtomicType::int_:

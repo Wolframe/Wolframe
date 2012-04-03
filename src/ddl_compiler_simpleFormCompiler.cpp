@@ -56,8 +56,7 @@ public:
 	{
 		double_=AtomicType::double_,
 		float_=AtomicType::float_,
-		long_=AtomicType::long_,
-		ulong_=AtomicType::ulong_,
+		bigint_=AtomicType::bigint_,
 		int_=AtomicType::int_,
 		uint_=AtomicType::uint_,
 		short_=AtomicType::short_,
@@ -69,7 +68,7 @@ public:
 
 	static const char* typeName( Type tp)
 	{
-		static const char* ar[] = {"double","float","long","ulong","int","uint","short","ushort","char","string","form",0};
+		static const char* ar[] = {"double","float","bigint","int","uint","short","ushort","char","string","form",0};
 		return ar[ (int)tp];
 	}
 
