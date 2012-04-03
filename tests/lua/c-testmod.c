@@ -36,7 +36,7 @@ static int testmod_initialize( lua_State *l )
 
 TESTMOD_API int luaopen_testmod( lua_State *l )
 {
-	lua_pushcfunction( l, testmod_initialize );
+	luaL_newlib( l, testmod_prv );
 	
 	return 1;
 }
