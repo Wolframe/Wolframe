@@ -2,6 +2,10 @@ TOPDIR = ..
 
 SUBDIRS = modules AAAA
 
+ifeq ($(WITH_LUA),1)
+SUBDIRS += lua
+endif
+
 ifeq ($(WITH_EXPECT),1)
 SUBDIRS += expect config
 endif
