@@ -37,82 +37,8 @@ Project Wolframe.
 #include <boost/lexical_cast.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
-
-#if WITH_LIBGMP
-extern "C"
-{
-#include <gmp.h>
-}
-#endif
-
 namespace _Wolframe {
 namespace ddl {
-
-#if WITH_LIBGMP
-struct Bigint
-{
-	Bigint()
-	{
-		mpz_init( m_value);
-	}
-	~Bigint()
-	{
-		mpz_clear( m_value);
-	}
-
-	bool set( const std::string& o)
-	{
-		if (0>mpz_set_str( m_value, o.c_str()))
-		{
-			return false;
-		}
-		return true;
-	}
-
-	void set( const int& o)			{mpz_set_ui( m_value, o);}
-	void set( const unsigned int& o)	{mpz_set_ui( m_value, o);}
-
-	void set( const int& o)			{mpz_set_si( m_value, o);}
-	void set( const unsigned short& o)	{mpz_set_ui( m_value, o);}
-	void set( const short& o)		{mpz_set_si( m_value, o);}
-
-	void set( const unsigned char& o)	{mpz_set_ui( m_value, o);}
-	void set( const char& o)		{mpz_set_si( m_value, o);}
-
-	void set( const double& o)		{mpz_set_d( m_value, o);}
-	void set( const float& o)		{mpz_set_f( m_value, o);}
-
-	bool get( std::string& x)
-	{
-		try
-		{
-			char *buffer = (char*)malloc( mpz_sizeinbase( m_value,10)+3);
-			mpz_get_str( buffer, 10, m_value);
-			o.clear();
-			o.append( buffer);
-			return true;
-		}
-		catch (std::exception&)
-		{
-			return false;
-		}
-	}
-
-	bool get( int& x)			{x = mpz_get_ui( m_value);}
-	bool get( unsigned int& x)		{x = mpz_get_ui( m_value);}
-
-	bool get( int& x)			{x = mpz_get_si( m_value);}
-	bool get( unsigned short& x)		{x = mpz_get_ui( m_value);}
-	bool get( short& x)			{x = mpz_get_si( m_value);}
-
-	bool get( unsigned char& x)		{x = mpz_get_ui( m_value);}
-	bool get( char& x)			{x = mpz_get_si( m_value);}
-
-	bool get( double& x)			{x = mpz_get_d( m_value);}
-	bool get( float& x)			{x = mpz_get_f( m_value);}
-};
-
-#else
 
 struct Bigint
 {
@@ -159,6 +85,6 @@ struct Bigint
 private:
 	std::string m_value;
 };
-#endif
+
 }} //namespace
 #endif
