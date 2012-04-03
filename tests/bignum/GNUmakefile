@@ -2,10 +2,6 @@ TOPDIR = ../..
 
 SUBDIRS =
 
-ifeq ($(WITH_LUA),1)
-SUBDIRS += lgmp
-endif
-
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
 INCLUDE_DIRS = \

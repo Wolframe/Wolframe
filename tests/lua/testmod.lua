@@ -7,6 +7,7 @@ local _ENV = {}
 local prv = {}
 local aux = {}
 prv = require "c-testmod"
+-- (prv, aux)
 
 function func( s, i, f )
 	return prv.func( s, i, f )

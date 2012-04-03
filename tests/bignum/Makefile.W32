@@ -2,11 +2,6 @@ TOPDIR = ..\..
 
 SUBDIRS =
 
-!IFDEF WITH_LUA
-SUBDIRS = \
-	$(SUBDIRS) lgmp
-!ENDIF
-
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
 INCLUDE_CFLAGS = \

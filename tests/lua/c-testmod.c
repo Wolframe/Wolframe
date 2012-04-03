@@ -27,13 +27,6 @@ static const luaL_Reg testmod_prv[] = {
 	{ NULL, NULL }
 };
 
-static int testmod_initialize( lua_State *l )
-{
-	luaL_setfuncs( l, testmod_prv, 1 );
-
-	return 0;
-}
-
 TESTMOD_API int luaopen_testmod( lua_State *l )
 {
 	luaL_newlib( l, testmod_prv );
