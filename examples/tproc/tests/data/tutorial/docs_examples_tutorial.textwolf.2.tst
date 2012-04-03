@@ -17,11 +17,12 @@ function run( )
         end
 end
 **config
+proc {
 script {
 	cmd RUN
 	path example_2.lua
 	main run
-}
+}}
 **output
 OK enter cmd
 姚 明

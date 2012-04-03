@@ -112,6 +112,8 @@ const config::DescriptionBase* ConfigurationStruct::description()
 	return &rt;
 }
 
+ConfigurationStruct::ConfigurationStruct()
+	:input_bufsize(4096),output_bufsize(4096){}	//< PF:TODO: should be set to system defaults
 
 Configuration::Configuration()
 	:ConfigurationBase( "tproc", 0, "tproc")

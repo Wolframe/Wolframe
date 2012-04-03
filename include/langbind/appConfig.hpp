@@ -30,10 +30,10 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file tprocHandlerConfig.hpp
-///\brief tproc handler configuration
-#ifndef _Wolframe_TPROC_HANDLER_CONFIGURATION_HPP_INCLUDED
-#define _Wolframe_TPROC_HANDLER_CONFIGURATION_HPP_INCLUDED
+///\file langbind/appConfig.hpp
+///\brief configuration of the processor environment
+#ifndef _Wolframe_APPLICATION_ENVIRONMENT_CONFIGURATION_HPP_INCLUDED
+#define _Wolframe_APPLICATION_ENVIRONMENT_CONFIGURATION_HPP_INCLUDED
 #include <vector>
 #include <string>
 #include "protocol/commandHandler.hpp"
@@ -108,7 +108,7 @@ class ApplicationEnvironmentConfig : public config::ConfigurationBase
 {
 public:
 	ApplicationEnvironmentConfig() : ConfigurationBase( "Application Environment", NULL, "Application environment configuration" )	{}
-	~ApplicationEnvironmentConfig();
+	~ApplicationEnvironmentConfig() {}
 
 	bool parse( const config::ConfigurationTree& pt, const std::string& node, const module::ModulesDirectory* modules );
 	bool check() const;

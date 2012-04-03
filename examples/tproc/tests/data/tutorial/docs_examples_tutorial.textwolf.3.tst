@@ -18,11 +18,12 @@ function run( )
         end
 end
 **config
+proc {
 script {
 	cmd RUN
 	path example_3.lua
 	main run
-}
+}}
 **output
 OK enter cmd
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>

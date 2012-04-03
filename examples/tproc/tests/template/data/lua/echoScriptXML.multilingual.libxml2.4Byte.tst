@@ -32,11 +32,12 @@ function run( )
 	end
 end
 --config
+proc {
 script {
 	cmd RUN
 	path echo.lua
 	main run
-}
+}}
 --output
 OK enter cmd
 !TEST

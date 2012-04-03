@@ -29,6 +29,7 @@ recode lat1..ibmpc >> $output <<!TEST
 cat $MAIN/$example.frm >> $output
 recode lat1..ibmpc >> $output <<!TEST
 **config
+proc {
 directmap {
 	cmd RUN
 	ddl simpleform
@@ -36,7 +37,7 @@ directmap {
 	inputform input.frm
 	outputform output.frm
 	function echo
-}
+}}
 **output
 OK enter cmd
 !TEST

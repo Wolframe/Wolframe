@@ -43,7 +43,7 @@ GCC_MINOR_VERSION ?=	$(shell $(TOPDIR)/makefiles/gmake/guess_env --gcc-minor-ver
 
 # compilation flags and compilers
 COMMON_COMPILE_FLAGS = \
-	-pipe \
+	-pipe -g -O0 \
 	-fstrict-aliasing \
 	-pedantic -Wall \
 	-Wno-long-long \

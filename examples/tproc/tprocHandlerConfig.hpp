@@ -77,6 +77,7 @@ struct ConfigurationStruct
 
 	///\brief Get the configuration structure description
 	static const config::DescriptionBase* description();
+	ConfigurationStruct();
 };
 
 ///\class Configuration

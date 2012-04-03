@@ -42,6 +42,10 @@
 #include "tprocHandler.hpp"
 #include "connectionHandler.hpp"
 #include "handlerConfig.hpp"
+#include "langbind/appConfig.hpp"
+#include "appConfig.hpp"
+///PF:HACK: Command Line is needed to instantiate the application configuration object:
+#include "../src/commandLine.hpp"
 #include "moduleInterface.hpp"
 #include "config/ConfigurationTree.hpp"
 #include "testHandlerTemplates.hpp"
@@ -61,26 +65,50 @@
 using namespace _Wolframe;
 using namespace _Wolframe::tproc;
 
-class TestConfiguration :public Configuration
+static int g_gtest_ARGC = 0;
+static char* g_gtest_ARGV[2] = {0, 0};
+
+class TestConfiguration :public tproc::Configuration
 {
 public:
 	TestConfiguration( const TestConfiguration& o)
 		:Configuration(o)
+		,m_cmdLine(o.m_cmdLine)
+		,m_modules(o.m_modules)
+		,m_appConfig(o.m_appConfig)
+		,m_langbindConfig(o.m_langbindConfig)
 	{}
 
-	TestConfiguration( std::size_t ib, std::size_t ob, const std::string& config)
+	TestConfiguration()
+	{
+		m_data.input_bufsize = 0;
+		m_data.output_bufsize = 0;
+
+		m_appConfig.addConfig( "proc", this);
+		m_appConfig.addConfig( "env", &m_langbindConfig);
+
+		boost::filesystem::path configFile( boost::filesystem::current_path() / "temp" / "test.cfg");
+		if (boost::filesystem::exists( configFile))
+		{
+			if (!m_appConfig.parse( configFile.string().c_str(), config::ApplicationConfiguration::CONFIG_INFO))
+			{
+				throw std::runtime_error( "Error in configuration");
+			}
+		}
+		m_cmdLine.parse( g_gtest_ARGC, g_gtest_ARGV);
+		m_appConfig.finalize( m_cmdLine);
+	}
+
+	void setBuffers( std::size_t ib, std::size_t ob)
 	{
 		m_data.input_bufsize = ib;
 		m_data.output_bufsize = ob;
-
-		std::istringstream cfgreader( config);
-		boost::property_tree::ptree pt;
-		boost::property_tree::read_info( cfgreader, pt);
-
-		module::ModulesDirectory modules;
-		if (!parse( config::ConfigurationTree(pt), std::string("tproc"), &modules)) throw std::runtime_error( "error in configuration");
-		setCanonicalPathes( (boost::filesystem::current_path() / "temp" / "example.txt").string());
 	}
+private:
+	config::CmdLineConfig m_cmdLine;
+	module::ModulesDirectory m_modules;
+	config::ApplicationConfiguration m_appConfig;
+	langbind::ApplicationEnvironmentConfig m_langbindConfig;
 };
 
 struct TestDescription
@@ -324,6 +352,8 @@ static const TestDescription getTestDescription( const std::string& pt)
 		else if (boost::iequals( *hi, "config"))
 		{
 			rt.config.append( *itr);
+			boost::filesystem::path fn( boost::filesystem::current_path() / "temp" / "test.cfg");
+			writeFile( fn.string(), rt.config);
 		}
 		else if (boost::starts_with( *hi, "file:"))
 		{
@@ -350,12 +380,10 @@ class TProcHandlerTestInstance
 private:
 	net::LocalTCPendpoint ep;
 	tproc::Connection* m_connection;
-	TestConfiguration m_config;
+	TestConfiguration* m_config;
 	std::string m_input;
 	std::string m_output;
 	std::string m_expected;
-	std::size_t m_inputBufferSize;
-	std::size_t m_outputBufferSize;
 
 	enum
 	{
@@ -364,16 +392,15 @@ private:
 	};
 
 public:
-	TProcHandlerTestInstance( const TestDescription& descr, std::size_t ib, std::size_t ob)
+	TProcHandlerTestInstance( const TestDescription& descr, TestConfiguration* config, std::size_t ib, std::size_t ob)
 		:ep( "127.0.0.1", 12345)
 		,m_connection(0)
-		,m_config( ib + EoDBufferSize, ob + MinOutBufferSize, descr.config)
+		,m_config( config)
 		,m_input( descr.input)
 		,m_expected( descr.expected)
-		,m_inputBufferSize(ib)
-		,m_outputBufferSize(ob)
 	{
-		m_connection = new tproc::Connection( ep, &m_config);
+		m_config->setBuffers( ib + EoDBufferSize, ob + MinOutBufferSize);
+		m_connection = new tproc::Connection( ep, m_config);
 	}
 
 	~TProcHandlerTestInstance()
@@ -444,11 +471,12 @@ TEST_F( TProcHandlerTest, tests)
 			continue;
 		}
 		std::cerr << "processing test '" << *itr << "'" << std::endl;
+		TestConfiguration testConfiguration;
 		for (int ii=0; ii<NOF_IB; ii++)
 		{
 			for (int oo=0; oo<NOF_OB; oo++)
 			{
-				TProcHandlerTestInstance test( td, ib[ii], ob[oo]);
+				TProcHandlerTestInstance test( td, &testConfiguration, ib[ii], ob[oo]);
 				int trt = test.run();
 				if (trt != 0) boost::this_thread::sleep( boost::posix_time::seconds( 1 ) );
 				EXPECT_EQ( 0, trt);
@@ -461,8 +489,8 @@ TEST_F( TProcHandlerTest, tests)
 
 int main( int argc, char **argv )
 {
-	int gtest_ARGC = 1;
-	char* gtest_ARGV[2] = {argv[0], 0};
+	g_gtest_ARGC = 1;
+	g_gtest_ARGV[0] = argv[0];
 	if (argc > 2)
 	{
 		std::cerr << "too many arguments passed to " << argv[0] << std::endl;
@@ -472,7 +500,7 @@ int main( int argc, char **argv )
 	{
 		selectedTestName = argv[1];
 	}
-	::testing::InitGoogleTest( &gtest_ARGC, gtest_ARGV );
+	::testing::InitGoogleTest( &g_gtest_ARGC, g_gtest_ARGV );
 	_Wolframe::log::LogBackend::instance().setConsoleLevel( _Wolframe::log::LogLevel::LOGLEVEL_INFO );
 	return RUN_ALL_TESTS();
 }

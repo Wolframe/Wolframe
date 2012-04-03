@@ -107,7 +107,7 @@ private:
 	std::list<std::string>			m_modFiles;
 
 	const module::ModulesDirectory*		m_modDir;
-
+public:
 	bool addConfig( const std::string& nodeName, ConfigurationBase* conf );
 };
 

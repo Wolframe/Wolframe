@@ -20,11 +20,12 @@ function run( )
 	end
 end
 --config
+proc {
 script {
 	cmd RUN
 	path echo.lua
 	main run
-}
+}}
 --output
 OK enter cmd
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
