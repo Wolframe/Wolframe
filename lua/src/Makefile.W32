@@ -4,7 +4,7 @@ SUBDIRS =
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
-INCLUDE_CXXFLAGS = \
+INCLUDE_CFLAGS = \
 	/D_WIN32_WINNT=0x504
 
 INCLUDE_DIRS = \
