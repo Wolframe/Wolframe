@@ -25,10 +25,10 @@ if { [catch {
 		"OK expecting command\r"	{ send_user " --> Connected.\n" }
 	}
 
-	send "CAPA\r"
+	send "capa\r"
 	expect -re "OK capa .*\r"         {send_user " --> Capabilities.\n"}
 
-	send "Echo tolower\r"
+	send "echo tolower\r"
 	send "ABc Def\r"
 	expect -re "abc def\r"            {send_user " --> echo line 1.\n"}
 	send "aBc def\r"

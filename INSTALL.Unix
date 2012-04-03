@@ -559,7 +559,8 @@ Optional packages to install from CSW:
   libssl_dev (0.9.8t)
   CSWpostgresql (8.3.1)
   CSWexpect (5.41.1)
-  CSWsasl-dev and CSWsasl (2.1.25.REV-2012.01.20)
+  CSWsasl-dev and CSWsasl (2.1.25)
+  CSWlibgmp-dev (5.0.2)
 Optional packages from Sun installation disk:
   SUNWlxml
   SUNWlxsl
