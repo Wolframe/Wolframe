@@ -50,16 +50,16 @@ struct Context
 
 	const char* getLastError() const		{return m_lasterror;}
 	char* buf() const				{return m_buf;}
-	const std::string& content() const		{return m_content;}
 	void append( const char* c, std::size_t n)	{m_content.append( c,n);}
 	void clear()					{m_content.clear();}
 	void endTagConsumed( bool v)			{m_endTagConsumed=v;}
 	bool endTagConsumed()				{return m_endTagConsumed;}
+	const std::string& content() const		{return m_content;}
+	std::string& content()				{return m_content;}
 
 	void setError( const char* tt, const char* msg, const char* msgparam=0);
 	void setError( const char* tt);
 	bool printElem( protocol::OutputFilter::ElementType tp, const void* elem, std::size_t elemsize, protocol::OutputFilter*& out);
-
 private:
 	char* m_lasterror;
 	char* m_buf;

@@ -29,47 +29,62 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file ddl_atomicType.cpp
-///\brief implementation of the form DDL atomic type
-#include "ddl/atomicType.hpp"
+///\file ddl/bignumType.hpp
+///\brief Defines a bignum type for the DDLs used for forms
+#ifndef _Wolframe_DDL_BIGNUMTYPE_HPP_INCLUDED
+#define _Wolframe_DDL_BIGNUMTYPE_HPP_INCLUDED
+#include <string>
+#include <boost/lexical_cast.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 
-using namespace _Wolframe;
-using namespace ddl;
+namespace _Wolframe {
+namespace ddl {
 
-bool AtomicType::getType( const char* name, Type& tp)
+struct Bigint
 {
-	const char* rt;
-	unsigned int ii;
-	for (ii=0,rt=typeName((Type)(ii)); rt!=0; ii++,rt=typeName((Type)(ii)))
+	Bigint() {}
+	~Bigint() {}
+
+	template <typename Type>
+	bool set( const Type& o)
 	{
-		if (std::strcmp( rt, name) == 0)
+		try
 		{
-			tp = (Type)ii;
+			m_value = boost::lexical_cast<std::string>(o);
+			std::string::const_iterator itr = m_value.begin();
+			if (*itr == '-') ++itr;
+			for (; itr!=m_value.end(); ++itr)
+			{
+				if (*itr < '0' || *itr > '9')
+				{
+					m_value.clear();
+					throw std::logic_error("cannot convert to bigint");
+				}
+			}
 			return true;
 		}
+		catch (const std::exception&)
+		{
+			return false;
+		}
 	}
-	return false;
-}
 
-void AtomicType::print( std::ostream& out, size_t indent) const
-{
-	while (indent--) out << "\t";
-	out << typeName( m_type) << " '" << m_value << "'" << std::endl;
-}
-
-void AtomicType::init()
-{
-	switch (m_type)
+	template <typename Type>
+	bool get( Type& o)
 	{
-		case double_:
-		case float_:
-		case bigint_:
-		case int_:
-		case uint_:
-		case short_:
-		case ushort_:
-		case char_:	m_value = "0"; ;
-		case string_:	m_value.clear();
+		try
+		{
+			o = boost::lexical_cast<Type>( m_value);
+			return true;
+		}
+		catch (const std::exception&)
+		{
+			return false;
+		}
 	}
-}
+private:
+	std::string m_value;
+};
 
+}} //namespace
+#endif

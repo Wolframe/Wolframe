@@ -40,6 +40,8 @@ Project Wolframe.
 #include <cstring>
 #include <boost/utility/enable_if.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/numeric/conversion/cast.hpp>
+#include "ddl/bignumType.hpp"
 
 namespace _Wolframe {
 namespace ddl {
@@ -53,13 +55,13 @@ public:
 	///\brief What AtomicType can be
 	enum Type
 	{
-		double_,float_,long_,ulong_,int_,uint_,short_,ushort_,char_,string_
+		double_,float_,bigint_,int_,uint_,short_,ushort_,char_,string_
 	};
 
 	///\brief Get the name of a type as string
 	static const char* typeName( Type tp)
 	{
-		static const char* ar[] = {"double","float","long","ulong","int","uint","short","ushort","char","string",0};
+		static const char* ar[] = {"double","float","bigint","int","uint","short","ushort","char","string",0};
 		return ar[ (int)tp];
 	}
 	///\brief Get the id of a type by name, if exists
@@ -92,8 +94,7 @@ public:
 			{
 				case double_:	assign<double,T>( val); return true;
 				case float_:	assign<float,T>( val); return true;
-				case long_:	assign<long,T>( val); return true;
-				case ulong_:	assign<unsigned long,T>( val); return true;
+				case bigint_:	assign_bigint<T>( val); return true;
 				case int_:	assign<int,T>( val); return true;
 				case uint_:	assign<unsigned int,T>( val); return true;
 				case short_:	assign<short,T>( val); return true;
@@ -104,6 +105,10 @@ public:
 
 		}
 		catch ( const boost::bad_lexical_cast&)
+		{
+			return false;
+		}
+		catch ( const boost::bad_numeric_cast&)
 		{
 			return false;
 		}
@@ -160,17 +165,34 @@ private:
 	///\param[in] src element to assign to this
 	template <typename M, typename S>
 	typename boost::disable_if_c<
-		boost::is_same<M,S>::value,void>::type assign( const S& src)
+		boost::is_same<M,S>::value || boost::is_same<std::string,S>::value,void>::type assign( const S& src)
+	{
+		M im = boost::numeric_cast<M>( src);
+		m_value = boost::lexical_cast<std::string>(im);
+	}
+
+	template <typename M, typename S>
+	typename boost::enable_if_c<
+		boost::is_same<M,S>::value && !boost::is_same<std::string,S>::value,void>::type assign( const S& src)
+	{
+		m_value = boost::lexical_cast<std::string>(src);
+	}
+
+	template <typename M, typename S>
+	typename boost::enable_if_c<
+		!boost::is_same<M,S>::value && boost::is_same<std::string,S>::value,void>::type assign( const S& src)
 	{
 		M im = boost::lexical_cast<M>( src);
 		m_value = boost::lexical_cast<std::string>(im);
 	}
 
 	template <typename M, typename S>
-	typename boost::enable_if_c<
-		boost::is_same<M,S>::value,void>::type assign( const S& src)
+	bool assign_bigint( const S& src)
 	{
-		m_value = boost::lexical_cast<std::string>(src);
+		Bigint val;
+		if (!val.set( src)) return false;
+		if (!val.get( m_value)) return false;
+		return true;
 	}
 };
 
