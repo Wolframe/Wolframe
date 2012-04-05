@@ -52,7 +52,9 @@
 
 		&AppPreface;
 		&AppIntroduction;
-		&ThreeTierArchitecture;
+		&AppGettingStarted;
+		&AppComplexServer;
+		&AppComponents;
 		&AppSSL;
 		&AppAppendix;
 		&AppGlossary;
