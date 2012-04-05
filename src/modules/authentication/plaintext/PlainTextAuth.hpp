@@ -83,9 +83,14 @@ private:
 
 class PlainTextAuthSlice : public AuthenticatorSlice
 {
+	enum	FSMstate	{
+		INIT,
+		PARSING,
+		FINISHED
+	};
+
 public:
-	PlainTextAuthSlice( const PlainTextAuthenticator& backend )
-		: m_backend( backend )		{}
+	PlainTextAuthSlice( const PlainTextAuthenticator& backend );
 	~PlainTextAuthSlice();
 	void close()				{ delete this; }
 
@@ -96,8 +101,13 @@ public:
 	const FSMoperation nextOperation();
 	void signal( FSMsignal event );
 	std::size_t dataLeft( const void*& begin );
+
+	User* user();
 private:
 	const PlainTextAuthenticator&	m_backend;
+	User*				m_user;
+	std::string			m_username;
+	std::string			m_password;
 };
 
 

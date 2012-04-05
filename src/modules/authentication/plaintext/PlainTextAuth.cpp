@@ -130,10 +130,16 @@ User* PlainTextAuthenticator::authenticate( std::string username, std::string pa
 
 
 //***********************************************************************
+PlainTextAuthSlice::PlainTextAuthSlice( const PlainTextAuthenticator& backend )
+	: m_backend( backend )
+{
+	m_user = NULL;
+}
 
 PlainTextAuthSlice::~PlainTextAuthSlice()
 {
-
+	if ( m_user != NULL )
+		delete m_user;
 }
 
 void PlainTextAuthSlice::receiveData( const void* /*data*/, std::size_t /*size*/ )
@@ -153,6 +159,13 @@ void PlainTextAuthSlice::signal( FSMsignal /*event*/ )
 std::size_t PlainTextAuthSlice::dataLeft( const void*& /*begin*/ )
 {
 	return 0;
+}
+
+User* PlainTextAuthSlice::user()
+{
+	User* ret = m_user;
+	m_user = NULL;
+	return ret;
 }
 
 }} // namespace _Wolframe::AAAA

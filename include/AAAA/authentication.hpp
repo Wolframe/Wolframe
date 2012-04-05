@@ -40,6 +40,7 @@
 
 #include <string>
 
+#include "user.hpp"
 #include "database/DBprovider.hpp"
 #include "FSMinterface.hpp"
 
@@ -65,7 +66,7 @@ class AuthenticatorSlice : public _Wolframe::FSMinterface
 public:
 	enum AuthProtocol	{
 		PLAIN,			/// Plain text
-		CHAP,			/// Challenge-response
+		CRAM,			/// Challenge-response
 		SASL			/// SASL dialog
 	};
 
@@ -73,6 +74,7 @@ public:
 	virtual void close()			{}
 
 	virtual AuthProtocol protocolType() const = 0;
+	virtual User* user() = 0;
 };
 
 /// AuthenticationUnit Unit
