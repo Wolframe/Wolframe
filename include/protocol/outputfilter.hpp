@@ -140,10 +140,6 @@ struct OutputFilter :public OutputBlock
 		init( 0, 0);
 	}
 
-	///\brief Get the current cursor position as pointer for the next print
-	///\return the current cursor position (where to print the next element to)
-	void* cur() const				{return (void*)(charptr()+pos());}
-
 	///\brief Print the next element to the buffer
 	///\param [in] type type of element to print
 	///\param [in] element content of element to print

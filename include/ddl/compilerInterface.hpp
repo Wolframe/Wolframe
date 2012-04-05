@@ -46,7 +46,8 @@ namespace ddl {
 ///\brief Interface for DDL compilers
 struct CompilerInterface
 {
-	explicit CompilerInterface( const std::string& n) :m_ddlname(n) {};
+	explicit CompilerInterface( const std::string& n) :m_ddlname(n) {}
+	virtual ~CompilerInterface(){}
 
 	///\brief Compile a source from a string
 	///\param[in] srcstring source as string

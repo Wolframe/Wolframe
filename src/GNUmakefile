@@ -59,6 +59,13 @@ INCLUDE_LIBS += \
 	$(LIBXML2_LIBS)
 endif
 
+# libgmp
+ifeq ($(WITH_LIBGMP),1)
+INCLUDE_CXXFLAGS += \
+	-DWITH_LIBGMP
+INCLUDE_LIBS += \
+	$(LIBGMP_LIBS)
+endif
 
 LOCAL_STATIC_LIB = \
 	libwolframe.a
@@ -91,6 +98,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	ddl_structType.o \
 	ddl_compilerInterface.o \
 	ddl_compiler_simpleFormCompiler.o \
+	types_bignum.o \
 	acceptor.o \
 	getPassword.o \
 	serverEndpoint.o \
