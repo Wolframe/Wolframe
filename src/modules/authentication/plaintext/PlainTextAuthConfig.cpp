@@ -48,7 +48,7 @@
 namespace _Wolframe {
 namespace AAAA {
 
-bool PlainTextAuthConfig::parse( const config::ConfigurationTree& pt, const std::string& node,
+bool PlainTextAuthConfig::parse( const config::ConfigurationTree& pt, const std::string& /*node*/,
 				 const module::ModulesDirectory* /*modules*/ )
 {
 	using namespace config;
