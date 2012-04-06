@@ -53,7 +53,7 @@ struct arithmetic_ {};		///< category tag for a type that is convertible from/to
 struct string_ {};		///< category tag for a type that is convertible from/to a string through boost::lexical_cast
 
 ///\brief conditional template for detecting if a type is a class with a static/member method getLuamapDescription() returning a const pointer to a structure description as defined in serialize/luamapBase.hpp
-/// see http://drdobbs.com/article/print?articleId=227500449&siteSectionName= "Checking Concept Without Concepts in C++"
+///\remark see http://drdobbs.com/article/print?articleId=227500449&siteSectionName= "Checking Concept Without Concepts in C++"
 template<typename T,bool is_class_type=boost::is_class<T>::value>
 struct has_description_method: boost::false_type {};
 
@@ -84,28 +84,28 @@ struct has_description_method<T,true>:
 
 
 ///\brief get category vector_ for a type
-/// returns vector_ if  std::vector<T::value_type> EQUALS T. This is true, when T is a std::vector of any kind
+///\ return vector_ if  std::vector<T::value_type> EQUALS T. This is true, when T is a std::vector of any kind
 template <typename T>
 typename boost::enable_if_c<
 	boost::is_same< std::vector< typename T::value_type> ,T>::value && !boost::is_same<std::string,T>::value
 	,const vector_>::type getCategory( const T&) { return vector_();}
 
 ///\brief get category struct_ for a type
-/// returns struct_ if T has a method description with no params returning a const pointer to a serialize::LuamapDescriptionBase
+///\ return struct_ if T has a method description with no params returning a const pointer to a serialize::LuamapDescriptionBase
 template <typename T>
 typename boost::enable_if_c<
 	has_description_method<T>::value
 	,const struct_>::type getCategory( const T&) { return struct_();}
 
 ///\brief get category arithmetic_ for a type
-/// returns arithmetic_ if T fulfills the is_arithmetic condition
+///\ return arithmetic_ if T fulfills the is_arithmetic condition
 template <typename T>
 typename boost::enable_if_c<
 	(boost::is_arithmetic<T>::value)
 	,const arithmetic_>::type getCategory( const T&) { return arithmetic_();}
 
 ///\brief get category string_ for a type
-/// returns string_ if T is a std::string 
+///\ return string_ if T is a std::string
 template <typename T>
 typename boost::enable_if_c<
 	(boost::is_same<std::string,T>::value)
@@ -117,21 +117,21 @@ struct luastring_{};
 struct luastruct_{};
 
 ///\brief get category luanumeric_ for a type
-/// returns luanumeric_ if T fulfills the is_arithmetic condition or is a string
+///\ return luanumeric_ if T fulfills the is_arithmetic condition or is a string
 template <typename T>
 typename boost::enable_if_c<
 	(boost::is_arithmetic<T>::value && !boost::is_same<bool,T>::value)
 	,const luanumeric_>::type getLuaCategory( const T&) { return luanumeric_();}
 
 ///\brief get category luabool_ for a type
-/// returns luabool_ if T is a bool
+///\ return luabool_ if T is a bool
 template <typename T>
 typename boost::enable_if_c<
 	boost::is_same<bool,T>::value
 	,const luabool_>::type getLuaCategory( const T&) { return luabool_();}
 
 ///\brief get category luastring_ for a type
-/// returns luastring_ if T is a bool
+///\ return luastring_ if T is a bool
 template <typename T>
 typename boost::enable_if_c<
 	boost::is_same<std::string,T>::value

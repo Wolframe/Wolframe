@@ -56,9 +56,10 @@ public:
 #if WITH_LIBGMP
 	Bignum& operator+( const Bignum& a);
 	Bignum& operator-( const Bignum& a);
+	Bignum& operator-();
 	Bignum& operator*( const Bignum& a);
 	Bignum& operator/( const Bignum& a);
-	Bignum& pow( const unsigned int& a);
+	Bignum& pow( unsigned int a);
 #endif
 	Bignum& neg();
 

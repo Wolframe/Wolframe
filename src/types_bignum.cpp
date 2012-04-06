@@ -345,7 +345,7 @@ Bignum& Bignum::operator/( const Bignum& arg)
 	return *this;
 }
 
-Bignum& Bignum::pow( const unsigned int& arg)
+Bignum& Bignum::pow( unsigned int arg)
 {
 	std::size_t bufsize = m_value.size() * arg + 2;
 	IntUiBinOperation<mpz_pow_ui>::eval( m_value, (const std::string&)m_value, (unsigned long)arg, bufsize, m_exp*arg);
