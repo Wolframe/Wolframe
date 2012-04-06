@@ -49,7 +49,7 @@ struct ElementPrinter
 {
 	static void print( std::ostream& out, const char* name, const void* st, std::size_t ofs, unsigned int indent)
 	{
-		printElement( out, name, *reinterpret_cast<const Element*>((void*)((char*)st + ofs)), indent);
+		printElement( out, name, *reinterpret_cast<const Element*>((const void*)((const char*)st + ofs)), indent);
 	}
 };
 

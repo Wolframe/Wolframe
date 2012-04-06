@@ -53,14 +53,14 @@ public:
 		:m_value(o.m_value),m_exp(o.m_exp){}
 	~Bignum(){}
 
+#if WITH_LIBGMP
 	Bignum& operator+( const Bignum& a);
 	Bignum& operator-( const Bignum& a);
 	Bignum& operator*( const Bignum& a);
 	Bignum& operator/( const Bignum& a);
-	Bignum& neg();
-	Bignum& pow( const Bignum& a);
 	Bignum& pow( const unsigned int& a);
-	Bignum& pow( const double& a);
+#endif
+	Bignum& neg();
 
 	bool set( const std::string& val);
 	void get( std::string& val);

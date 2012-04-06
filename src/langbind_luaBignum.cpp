@@ -47,39 +47,47 @@ namespace luaname
 	static const char* Bignum = "wolframe.Bignum";
 }
 
-static int bignum_add( lua_State* ls);
-static int bignum_sub( lua_State* ls);
-static int bignum_mul( lua_State* ls);
-static int bignum_div( lua_State* ls);
-static int bignum_pow( lua_State* ls);
-static int bignum_lt( lua_State* ls);
-static int bignum_le( lua_State* ls);
-static int bignum_eq( lua_State* ls);
-static int bignum_call( lua_State* ls);
-static int bignum_unm( lua_State* ls);
-static int bignum_tostring( lua_State* ls);
-static int bignum_len( lua_State* ls);
-static int bignum_gc( lua_State* ls);
-
-static const luaL_Reg methodtable[] =
-{
-	{"__add",	&bignum_add},
-	{"__sub",	&bignum_sub},
-	{"__mul",	&bignum_mul},
-	{"__div",	&bignum_div},
-	{"__pow",	&bignum_pow},
-	{"__lt",	&bignum_lt},
-	{"__le",	&bignum_le},
-	{"__eq",	&bignum_eq},
-	{"__call",	&bignum_eq},
-	{"__unm",	&bignum_unm},
-	{"__tostring",	&bignum_tostring},
-	{"__len",	&bignum_len},
-	{"__gc",	&bignum_gc}
-};
-
 struct LuaBignum :public types::Bignum
 {
+	static const luaL_Reg methodtable[14];
+
+	template <bool Fun(types::Bignum& ) LuaBignum::*method>
+	static int
+
+	static void createMetatable( lua_State* ls, lua_CFunction indexf, lua_CFunction newindexf, const luaL_Reg* mt)
+	{
+		luaL_newmetatable( ls, metaTableName<ObjectType>());
+		lua_pushliteral( ls, "__index");
+		if (indexf)
+		{
+			lua_pushcfunction( ls, indexf);
+		}
+		else
+		{
+			lua_pushvalue( ls, -2);
+		}
+		lua_rawset( ls, -3);
+
+		lua_pushliteral( ls, "__newindex");
+		if (newindexf)
+		{
+			lua_pushcfunction( ls, newindexf);
+		}
+		else
+		{
+			lua_pushvalue( ls, -2);
+		}
+		lua_rawset( ls, -3);
+
+		if (mt) luaL_setfuncs( ls, mt, 0);
+
+		lua_pushliteral( ls, "__gc");
+		lua_pushcfunction( ls, destroy);
+		lua_rawset( ls, -3);
+
+		lua_pop( ls, 1);
+	}
+
 	void* operator new (std::size_t num_bytes, lua_State* ls) throw (std::bad_alloc)
 	{
 		void* rt = lua_newuserdata( ls, num_bytes);
@@ -93,41 +101,31 @@ struct LuaBignum :public types::Bignum
 	//\warning CAUTION: DO NOT CALL THIS FUNCTION ! DOES NOT WORK ON MSVC 9.0. (The compiler links with the std delete) (just avoids C4291 warning)
 	void operator delete (void *, lua_State*) {}
 
-	static void destroy()
+	static void destroy( lua_State* ls)
 	{
 		LuaBignum *THIS = (LuaBignum*)lua_touserdata( ls, 1);
 		if (THIS) THIS->~LuaObject();
 	}
 };
 
-static int bignum_add( lua_State* ls);
-static int bignum_sub( lua_State* ls);
-static int bignum_mul( lua_State* ls);
-static int bignum_div( lua_State* ls);
-static int bignum_pow( lua_State* ls);
-static int bignum_lt( lua_State* ls);
-static int bignum_le( lua_State* ls);
-static int bignum_eq( lua_State* ls);
-static int bignum_call( lua_State* ls)
+static const luaL_Reg methodtable[] =
 {
-}
+	{"__add",	&LuaBignum::lreg_add},
+	{"__sub",	&LuaBignum::lreg_sub},
+	{"__mul",	&LuaBignum::lreg_mul},
+	{"__div",	&LuaBignum::lreg_div},
+	{"__pow",	&LuaBignum::lreg_pow},
+	{"__lt",	&LuaBignum::lreg_lt},
+	{"__le",	&LuaBignum::lreg_le},
+	{"__eq",	&LuaBignum::lreg_eq},
+	{"__call",	&LuaBignum::lreg_eq},
+	{"__unm",	&LuaBignum::lreg_unm},
+	{"__tostring",	&LuaBignum::lreg_tostring},
+	{"__len",	&LuaBignum::lreg_len},
+	{"__gc",	&LuaBignum::destroy},
+	{0,0}
+};
 
-static int bignum_unm( lua_State* ls)
-{
-}
-
-static int bignum_tostring( lua_State* ls)
-{
-}
-
-static int bignum_len( lua_State* ls)
-{
-}
-
-static int bignum_gc( lua_State* ls)
-{
-	LuaBignum::destroy();
-}
 
 
 

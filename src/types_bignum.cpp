@@ -42,6 +42,7 @@ Project Wolframe.
 #include "boost/thread/mutex.hpp"
 #include "boost/thread/tss.hpp"
 #include "boost/scoped_ptr.hpp"
+#include "boost/scoped_array.hpp"
 
 using namespace _Wolframe::types;
 
@@ -185,20 +186,23 @@ struct StaticInitializations
 static StaticInitializations g_staticInitializations;
 
 
-static bool enter()
+static bool enter_GMP()
 {
 	ThreadMemory* tm = init_threadMemory();
 	if (!tm) return false;
 	int st = ::setjmp(tm->env);
-	if (st)
+	if (st != 0)
 	{
 		releaseThreadMemory();
 		return false;
 	}
-	return true;
+	else
+	{
+		return true;
+	}
 }
 
-static void leave()
+static void leave_GMP()
 {
 	releaseThreadMemory();
 }
@@ -218,15 +222,15 @@ struct IntBinOperation
 {
 	static void eval( std::string& dest, const std::string& a, const std::string& b, std::size_t bufsize, std::size_t rexp_=0)
 	{
-		char* buf = new char[ bufsize];
-		if (!enter())
-		{
-			delete [] buf;
-			throw std::bad_alloc();
-		}
+		boost::scoped_array<char> bufptr( new char[ bufsize]);
+		char* buf = bufptr.get();
+		if (!enter_GMP()) throw std::runtime_error( "GMP malloc error");
+
 		mpz_t aa, bb, rr;
-		mpz_init_set_str ( aa, a.c_str(), 10);
-		mpz_init_set_str ( bb, b.c_str(), 10);
+		mpz_init( aa);
+		mpz_init( bb);
+		mpz_set_str ( aa, a.c_str(), 10);
+		mpz_set_str ( bb, b.c_str(), 10);
 		OP( rr, aa, bb);
 		if (rexp_) mpz_div_ui( rr, rr, rexp_*10);
 		mpz_get_str( buf, 10, rr);
@@ -234,18 +238,33 @@ struct IntBinOperation
 		mpz_clear( bb);
 		mpz_clear( rr);
 
-		leave();
+		leave_GMP();
 		dest.clear();
-		try
-		{
-			dest.append( buf);
-		}
-		catch (std::exception&)
-		{
-			delete [] buf;
-			throw std::bad_alloc();
-		}
-		delete [] buf;
+		dest.append( buf);
+	}
+};
+
+template <void (*OP)( mpz_ptr,mpz_srcptr,unsigned long)>
+struct IntUiBinOperation
+{
+	static void eval( std::string& dest, const std::string& a, unsigned int bb, std::size_t bufsize, std::size_t rexp_=0)
+	{
+		boost::scoped_array<char> bufptr( new char[ bufsize]);
+		char* buf = bufptr.get();
+		if (!enter_GMP()) throw std::runtime_error( "GMP malloc error");
+
+		mpz_t aa, rr;
+		mpz_init( aa);
+		mpz_set_str ( aa, a.c_str(), 10);
+		OP( rr, aa, bb);
+		if (rexp_) mpz_div_ui( rr, rr, rexp_*10);
+		mpz_get_str( buf, 10, rr);
+		mpz_clear( aa);
+		mpz_clear( rr);
+
+		leave_GMP();
+		dest.clear();
+		dest.append( buf);
 	}
 };
 
@@ -326,39 +345,14 @@ Bignum& Bignum::operator/( const Bignum& arg)
 	return *this;
 }
 
-#else
-Bignum& Bignum::operator+( const Bignum& arg)
+Bignum& Bignum::pow( const unsigned int& arg)
 {
-	throw std::logic_error( "operation '+' not available for bignum type (no LIBGMP support)");
+	std::size_t bufsize = m_value.size() * arg + 2;
+	IntUiBinOperation<mpz_pow_ui>::eval( m_value, (const std::string&)m_value, (unsigned long)arg, bufsize, m_exp*arg);
+	return *this;
 }
-Bignum& Bignum::operator-( const Bignum& arg)
-{
-	throw std::logic_error( "operation '-' not available for bignum type (no LIBGMP support)");
-}
-Bignum& Bignum::operator*( const Bignum& arg)
-{
-	throw std::logic_error( "operation '*' not available for bignum type (no LIBGMP support)");
-}
-Bignum& Bignum::operator/( const Bignum& arg)
-{
-	throw std::logic_error( "operation '/' not available for bignum type (no LIBGMP support)");
-}
+
 #endif
-
-Bignum& Bignum::pow( const Bignum& a)
-{
-	throw std::logic_error( "operation '^' not available for bignum type (not implemented yet)");
-}
-
-Bignum& Bignum::pow( const unsigned int& a)
-{
-	throw std::logic_error( "operation '^' not available for bignum type (not implemented yet)");
-}
-
-Bignum& Bignum::pow( const double& a)
-{
-	throw std::logic_error( "operation '^' not available for bignum type (not implemented yet)");
-}
 
 Bignum& Bignum::neg()
 {
