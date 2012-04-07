@@ -207,20 +207,20 @@ static void leave_GMP()
 	releaseThreadMemory();
 }
 
-static std::size_t bufsize_operation_1stOrder( std::size_t o1, std::size_t o2, std::size_t exp)
+static std::size_t bufsize_operation_1stOrder( std::size_t o1, std::size_t o2, std::size_t dec)
 {
-	return ((o1 > o2)?(o1+2):(o2+2)) + exp+1;
+	return ((o1 > o2)?(o1+2):(o2+2)) + dec+1;
 }
 
-static std::size_t bufsize_operation_2ndOrder( std::size_t o1, std::size_t o2, std::size_t exp)
+static std::size_t bufsize_operation_2ndOrder( std::size_t o1, std::size_t o2, std::size_t dec)
 {
-	return (o1 + o2 +2 + exp);
+	return (o1 + o2 +2 + dec);
 }
 
 template <void (*OP)( mpz_ptr,mpz_srcptr,mpz_srcptr)>
 struct IntBinOperation
 {
-	static void eval( std::string& dest, const std::string& a, const std::string& b, std::size_t bufsize, std::size_t rexp_=0)
+	static void eval( std::string& dest, const std::string& a, const std::string& b, std::size_t bufsize, std::size_t rdec_=0)
 	{
 		boost::scoped_array<char> bufptr( new char[ bufsize]);
 		char* buf = bufptr.get();
@@ -232,7 +232,7 @@ struct IntBinOperation
 		mpz_set_str ( aa, a.c_str(), 10);
 		mpz_set_str ( bb, b.c_str(), 10);
 		OP( rr, aa, bb);
-		if (rexp_) mpz_div_ui( rr, rr, rexp_*10);
+		if (rdec_) mpz_div_ui( rr, rr, rdec_*10);
 		mpz_get_str( buf, 10, rr);
 		mpz_clear( aa);
 		mpz_clear( bb);
@@ -247,7 +247,7 @@ struct IntBinOperation
 template <void (*OP)( mpz_ptr,mpz_srcptr,unsigned long)>
 struct IntUiBinOperation
 {
-	static void eval( std::string& dest, const std::string& a, unsigned int bb, std::size_t bufsize, std::size_t rexp_=0)
+	static void eval( std::string& dest, const std::string& a, unsigned int bb, std::size_t bufsize, std::size_t rdec_=0)
 	{
 		boost::scoped_array<char> bufptr( new char[ bufsize]);
 		char* buf = bufptr.get();
@@ -257,7 +257,7 @@ struct IntUiBinOperation
 		mpz_init( aa);
 		mpz_set_str ( aa, a.c_str(), 10);
 		OP( rr, aa, bb);
-		if (rexp_) mpz_div_ui( rr, rr, rexp_*10);
+		if (rdec_) mpz_div_ui( rr, rr, rdec_*10);
 		mpz_get_str( buf, 10, rr);
 		mpz_clear( aa);
 		mpz_clear( rr);
@@ -268,111 +268,136 @@ struct IntUiBinOperation
 	}
 };
 
-static void increxp( std::string& value, std::size_t exp_)
+static void incrdec( std::string& value, std::size_t dec_)
 {
-	for (std::size_t ii=0; ii<exp_; ++ii)
+	for (std::size_t ii=0; ii<dec_; ++ii)
 	{
 		value.push_back( '0');
 	}
 }
 
-Bignum& Bignum::operator+( const Bignum& arg)
+Bignum& Bignum::operator+=( const Bignum& arg)
 {
-	if (m_exp < arg.m_exp)
+	if (m_dec < arg.m_dec)
 	{
-		increxp( m_value, arg.m_exp - m_exp);
-		m_exp = arg.m_exp;
+		incrdec( m_value, arg.m_dec - m_dec);
+		m_dec = arg.m_dec;
 	}
-	if (m_exp == arg.m_exp)
+	if (m_dec == arg.m_dec)
 	{
-		std::size_t bufsize = bufsize_operation_1stOrder( m_value.size(), arg.m_value.size(), m_exp);
+		std::size_t bufsize = bufsize_operation_1stOrder( m_value.size(), arg.m_value.size(), m_dec);
 		IntBinOperation<mpz_add>::eval( m_value, (const std::string&)m_value, arg.m_value, bufsize);
 	}
 	else
 	{
 		std::string argval( arg.m_value);
-		increxp( argval, m_exp);
-		std::size_t bufsize = bufsize_operation_1stOrder( m_value.size(), argval.size(), m_exp);
+		incrdec( argval, m_dec);
+		std::size_t bufsize = bufsize_operation_1stOrder( m_value.size(), argval.size(), m_dec);
 		IntBinOperation<mpz_add>::eval( m_value, (const std::string&)m_value, argval, bufsize);
 	}
 	return *this;
 }
 
-Bignum& Bignum::operator-( const Bignum& arg)
+Bignum& Bignum::operator-=( const Bignum& arg)
 {
-	if (m_exp < arg.m_exp)
+	if (m_dec < arg.m_dec)
 	{
-		increxp( m_value, arg.m_exp - m_exp);
-		m_exp = arg.m_exp;
+		incrdec( m_value, arg.m_dec - m_dec);
+		m_dec = arg.m_dec;
 	}
-	if (m_exp == arg.m_exp)
+	if (m_dec == arg.m_dec)
 	{
-		std::size_t bufsize = bufsize_operation_1stOrder( m_value.size(), arg.m_value.size(), m_exp);
+		std::size_t bufsize = bufsize_operation_1stOrder( m_value.size(), arg.m_value.size(), m_dec);
 		IntBinOperation<mpz_sub>::eval( m_value, (const std::string&)m_value, arg.m_value, bufsize);
 	}
 	else
 	{
 		std::string argval( arg.m_value);
-		increxp( argval, m_exp-arg.m_exp);
-		std::size_t bufsize = bufsize_operation_1stOrder( m_value.size(), argval.size(), m_exp);
+		incrdec( argval, m_dec-arg.m_dec);
+		std::size_t bufsize = bufsize_operation_1stOrder( m_value.size(), argval.size(), m_dec);
 		IntBinOperation<mpz_sub>::eval( m_value, (const std::string&)m_value, argval, bufsize);
 	}
 	return *this;
 }
 
-Bignum& Bignum::operator*( const Bignum& arg)
+Bignum& Bignum::operator*=( const Bignum& arg)
 {
-	if (m_exp < arg.m_exp)
+	if (m_dec < arg.m_dec)
 	{
-		increxp( m_value, arg.m_exp - m_exp);
-		m_exp = arg.m_exp;
+		incrdec( m_value, arg.m_dec - m_dec);
+		m_dec = arg.m_dec;
 	}
-	std::size_t bufsize = bufsize_operation_2ndOrder( m_value.size(), arg.m_value.size(), m_exp);
-	IntBinOperation<mpz_mul>::eval( m_value, (const std::string&)m_value, arg.m_value, bufsize, m_exp);
+	std::size_t bufsize = bufsize_operation_2ndOrder( m_value.size(), arg.m_value.size(), m_dec);
+	IntBinOperation<mpz_mul>::eval( m_value, (const std::string&)m_value, arg.m_value, bufsize, m_dec);
 	return *this;
 }
 
-Bignum& Bignum::operator/( const Bignum& arg)
+Bignum& Bignum::operator/=( const Bignum& arg)
 {
-	if (m_exp < arg.m_exp)
+	if (m_dec < arg.m_dec)
 	{
-		increxp( m_value, arg.m_exp - m_exp);
-		m_exp = arg.m_exp;
+		incrdec( m_value, arg.m_dec - m_dec);
+		m_dec = arg.m_dec;
 	}
-	increxp( m_value, arg.m_exp);
-	std::size_t bufsize = bufsize_operation_1stOrder( m_value.size(), arg.m_value.size(), m_exp);
+	incrdec( m_value, arg.m_dec);
+	std::size_t bufsize = bufsize_operation_1stOrder( m_value.size(), arg.m_value.size(), m_dec);
 	IntBinOperation<mpz_div>::eval( m_value, (const std::string&)m_value, arg.m_value, bufsize);
 	return *this;
 }
 
-Bignum& Bignum::pow( unsigned int arg)
+Bignum Bignum::pow( unsigned int arg) const
 {
+	Bignum rt;
 	std::size_t bufsize = m_value.size() * arg + 2;
-	IntUiBinOperation<mpz_pow_ui>::eval( m_value, (const std::string&)m_value, (unsigned long)arg, bufsize, m_exp*arg);
+	rt.m_dec = m_dec;
+	IntUiBinOperation<mpz_pow_ui>::eval( rt.m_value, (const std::string&)m_value, (unsigned long)arg, bufsize, m_dec*arg);
 	return *this;
 }
 
 #endif
 
+
+Bignum Bignum::operator-() const
+{
+	Bignum rt;
+	rt.m_dec = m_dec;
+	if (m_value.size() != 0)
+	{
+		if (m_value[0] == '-')
+		{
+			rt.m_value.append( m_value.c_str()+1, m_value.size()-1);
+		}
+		else
+		{
+			rt.m_value.push_back('-');
+			rt.m_value.append( m_value);
+		}
+	}
+	return rt;
+}
+
 Bignum& Bignum::neg()
 {
-	if (m_value[0] == '-')
+	if (m_value.size() != 0)
 	{
-		std::string val( m_value.c_str()+1, m_value.size()-1);
-		m_value = val;
-	}
-	else
-	{
-		std::string val("-");
-		val.append( m_value);
-		m_value = val;
+		if (m_value[0] == '-')
+		{
+			std::string val( m_value.c_str()+1, m_value.size()-1);
+			m_value = val;
+		}
+		else
+		{
+			std::string val("-");
+			val.append( m_value);
+			m_value = val;
+		}
 	}
 	return *this;
 }
 
 bool Bignum::set( const std::string& val)
 {
-	m_exp = 0;
+	m_dec = 0;
 	m_value.clear();
 
 	std::string::const_iterator itr = val.begin();
@@ -402,7 +427,7 @@ bool Bignum::set( const std::string& val)
 			{
 				return false;
 			}
-			++m_exp;
+			++m_dec;
 			m_value.push_back( *itr);
 		}
 	}
@@ -412,10 +437,10 @@ bool Bignum::set( const std::string& val)
 void Bignum::get( std::string& val)
 {
 	val.clear();
-	std::size_t gg = (m_value.size()>m_exp)?(m_value.size()-m_exp):0;
+	std::size_t gg = (m_value.size()>m_dec)?(m_value.size()-m_dec):0;
 	val.append( m_value.c_str(), gg);
 	val.push_back( '.');
-	for (std::size_t ll=gg; ll < m_exp; ++ll)
+	for (std::size_t ll=gg; ll < m_dec; ++ll)
 	{
 		val.push_back( '0');
 	}

@@ -256,12 +256,12 @@ static int function__LuaObject__index( lua_State* ls)
 
 	bool rt = false;
 	bool overfl = false;
-	char valbuf[ 128];
+	char valbuf[ 256];
 	try
 	{
 		std::string val;
 		rt = obj->getValue( key, val);
-		std::size_t nn = (overfl=(val.size() >= sizeof( valbuf)))?127:val.size();
+		std::size_t nn = (overfl=(val.size() >= sizeof( valbuf)))?(sizeof( valbuf)-1):val.size();
 		std::memcpy( valbuf, val.c_str(), nn);
 		valbuf[ nn] = 0;
 	}

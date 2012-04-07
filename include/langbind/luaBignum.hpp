@@ -34,9 +34,15 @@ Project Wolframe.
 #ifndef _Wolframe_LANGBIND_LUA_BIGNUM_HPP_INCLUDED
 #define _Wolframe_LANGBIND_LUA_BIGNUM_HPP_INCLUDED
 
+extern "C"
+{
+#include "lua.h"
+}
+
 namespace _Wolframe {
 namespace langbind {
 
+int initBignumModule( lua_State* ls);
 
 }} //namespace
 #endif

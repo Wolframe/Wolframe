@@ -46,32 +46,36 @@ class Bignum
 {
 public:
 	Bignum()
-		:m_value("0"),m_exp(0){}
+		:m_value("0"),m_dec(0){}
 	Bignum( const std::string& v, std::size_t p=0)
-		:m_value(v),m_exp(p){}
+		:m_value(v),m_dec(p){}
 	Bignum( const Bignum& o)
-		:m_value(o.m_value),m_exp(o.m_exp){}
+		:m_value(o.m_value),m_dec(o.m_dec){}
 	~Bignum(){}
 
 #if WITH_LIBGMP
-	Bignum& operator+( const Bignum& a);
-	Bignum& operator-( const Bignum& a);
-	Bignum& operator-();
-	Bignum& operator*( const Bignum& a);
-	Bignum& operator/( const Bignum& a);
-	Bignum& pow( unsigned int a);
+	Bignum& operator+=( const Bignum& a);
+	Bignum& operator-=( const Bignum& a);
+	Bignum& operator*=( const Bignum& a);
+	Bignum& operator/=( const Bignum& a);
+
+	Bignum operator+( const Bignum& a) const		{Bignum rt(*this); return rt += a;}
+	Bignum operator-( const Bignum& a) const		{Bignum rt(*this); return rt -= a;}
+	Bignum operator*( const Bignum& a) const		{Bignum rt(*this); return rt *= a;}
+	Bignum operator/( const Bignum& a) const		{Bignum rt(*this); return rt /= a;}
+	Bignum pow( unsigned int a) const;
 #endif
+	Bignum operator-() const;
 	Bignum& neg();
 
 	bool set( const std::string& val);
 	void get( std::string& val);
 
-	std::size_t size() const		{return m_value.size();}
+	std::size_t size() const				{return m_value.size();}
+
 private:
-	bool checkValue( const std::string& val);
-private:
-	std::string m_value;
-	std::size_t m_exp;
+	std::string m_value;			//< number digits with sign
+	std::size_t m_dec;			//< number of decimal places (in m_value)
 };
 
 }} //namespace

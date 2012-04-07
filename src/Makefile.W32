@@ -117,6 +117,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	filter_char_filter.obj \
 	filter_line_filter.obj \
 	filter_token_filter.obj \
+	types_bignum.obj \
 	serialize_struct_filtermapBase.obj \
 	serialize_ddl_filtermapSerialize.obj \
 	serialize_ddl_luamapSerialize.obj \
@@ -143,6 +144,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	$(LOCAL_STATIC_LIB_OBJS) \
 	serialize_struct_luamapBase.obj \
 	langbind_luaDebug.obj \
+	langbind_luaBignum.obj \
 	langbind_luaCommandEnvironment.obj \
 	langbind_luaCommandHandler.obj
 !ENDIF
