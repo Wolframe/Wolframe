@@ -39,10 +39,12 @@ Project Wolframe.
 #include <cstring>
 #include <iostream>
 #include "config/traits.hpp"
-#include "logger/logLevel.hpp"
 
 namespace _Wolframe {
 namespace config {
+
+template <typename T>
+static void printElement( std::ostream& out, const char* name, const T& value, unsigned int indent);
 
 template <typename Element>
 struct ElementPrinter
@@ -102,22 +104,6 @@ static void printElement_( std::ostream& out, const char* name, const T& value, 
 {
 	print_indent( out, indent);
 	out << name << " = '" << std::string(value?"true":"false") << "'" << std::endl;
-}
-
-///\brief prints a log::LogLevel::Level element
-template <typename T>
-static void printElement_( std::ostream& out, const char* name, const T& value, const traits::loglevel_&, unsigned int indent)
-{
-	print_indent( out, indent);
-	out << name << " = '" << value << "'" << std::endl;
-}
-
-///\brief prints a log::SyslogFacility::Facility element
-template <typename T>
-static void printElement_( std::ostream& out, const char* name, const T& value, const traits::syslogfacility_&, unsigned int indent)
-{
-	print_indent( out, indent);
-	out << name << " = '" << value << "'" << std::endl;
 }
 
 ///\brief stub for printing a pointer

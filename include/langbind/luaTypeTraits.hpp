@@ -379,7 +379,7 @@ struct LuaSetValue
 
 		if (tp == LUA_TBOOLEAN)
 		{
-			val = lua_toboolean( ls, 3)?"1":"0";
+			val = lua_toboolean( ls, 3)?"true":"false";
 		}
 		else
 		{

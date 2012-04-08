@@ -52,46 +52,46 @@ struct LoggerConfig
 {
 	struct ToStderr
 	{
-		LogLevel::Level loglevel;
+		std::string loglevel;
 
 		ToStderr()
-			:loglevel(LogLevel::LOGLEVEL_INFO){}
+			:loglevel("INFO"){}
 
 		static const config::DescriptionBase* description();
 	};
 
 	struct ToFile
 	{
-		LogLevel::Level loglevel;
+		std::string loglevel;
 		std::string filename;
 
 		ToFile()
-			:loglevel(LogLevel::LOGLEVEL_INFO){}
+			:loglevel("INFO"){}
 
 		static const config::DescriptionBase* description();
 	};
 
 	struct ToSyslog
 	{
-		LogLevel::Level loglevel;
-		SyslogFacility::Facility facility;
+		std::string loglevel;
+		std::string facility;
 		std::string ident;
 
 		ToSyslog()
-			:loglevel(LogLevel::LOGLEVEL_INFO)
-			,facility(SyslogFacility::WOLFRAME_SYSLOG_FACILITY_LOCAL2){}
+			:loglevel("INFO")
+			,facility("LOCAL2"){}
 
 		static const config::DescriptionBase* description();
 	};
 
 	struct ToEventlog
 	{
-		LogLevel::Level loglevel;
+		std::string loglevel;
 		std::string name;
 		std::string source;
 
 		ToEventlog()
-			:loglevel(LogLevel::LOGLEVEL_INFO){}
+			:loglevel("INFO"){}
 
 		static const config::DescriptionBase* description();
 	};

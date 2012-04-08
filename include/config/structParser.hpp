@@ -178,36 +178,6 @@ static void parseElement_( const char* name, T& value, const traits::bool_&, con
 	parseElement_( name, value, domain, pt);
 }
 
-
-///\brief parses a log level element
-template <typename T>
-static void parseElement_( const char* name, T& value, const traits::loglevel_&, const boost::property_tree::ptree& pt)
-{
-	static const char* elems[] =
-	{
-		"DATA", "TRACE", "DEBUG", "INFO", "NOTICE", "WARNING", "ERROR", "SEVERE", "CRITICAL", "ALERT", "FATAL"
-	};
-	Parser::EnumDomain domain( 11U, elems);
-	parseElement_( name, value, domain, pt);
-}
-
-
-///\brief parses an syslog facility element
-template <typename T>
-static void parseElement_( const char* name, T& value, const traits::syslogfacility_&, const boost::property_tree::ptree& pt)
-{
-	static const char* elems[] =
-	{
-		"KERN", "USER", "MAIL", "DAEMON", "AUTH", "SYSLOG", "LPR",
-		"NEWS", "UUCP", "CRON", "AUTHPRIV", "FTP", "NTP", "SECURITY",
-		"CONSOLE", "AUDIT", "LOCAL0", "LOCAL1", "LOCAL2", "LOCAL3",
-		"LOCAL4", "LOCAL5", "LOCAL6", "LOCAL7"
-	};
-	Parser::EnumDomain domain( 24U, elems);
-	parseElement_( name, value, domain, pt);
-}
-
-
 ///\brief parses an element with indirection (searches it in pt)
 template <typename T>
 static void parseElement1( const char* name, T& value, const boost::property_tree::ptree& pt)

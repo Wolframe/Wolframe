@@ -41,7 +41,6 @@ Project Wolframe.
 #include <boost/type_traits/function_traits.hpp>
 #include "config/descriptionBase.hpp"
 #include "config/configurationBase.hpp"
-#include "logger/logLevel.hpp"
 
 namespace _Wolframe {
 namespace config {
@@ -57,8 +56,6 @@ struct arithmetic_ :public atom_ {};		///< category tag for a type that is conve
 struct bool_ :public atom_ {};			///< category tag for a boolean type
 struct pointer_ :public atom_{};		///< category tag for a pointer type
 struct cfgbase_ :public foreign_{};		///< category tag for a struct derived from ConfigurationBase
-struct loglevel_ :public atom_{};		///< category tag for a log level
-struct syslogfacility_ :public atom_{};		///< category tag for a syslog facility
 
 ///\brief conditional template for detecting if a type is a class with a static/member method description() returning a const pointer to a structure description as defined in config/descriptionBase.hpp
 /// see http://drdobbs.com/article/print?articleId=227500449&siteSectionName= "Checking Concept Without Concepts in C++"
@@ -121,23 +118,6 @@ template <typename T>
 typename boost::enable_if_c<
 	boost::is_same<bool,T>::value
 	,bool_>::type getCategory( const T&) { return bool_();}
-
-
-///\brief get category loglevel_ for a type
-/// returns loglevel_ if T is a log level
-template <typename T>
-typename boost::enable_if_c<
-boost::is_same<log::LogLevel::Level,T>::value
-	,loglevel_>::type getCategory( const T&) { return loglevel_();}
-
-
-///\brief get category syslogfacility_ for a type
-/// returns loglevel_ if T is a syslog facility
-template <typename T>
-typename boost::enable_if_c<
-boost::is_same<log::SyslogFacility::Facility,T>::value
-	,syslogfacility_>::type getCategory( const T&) { return syslogfacility_();}
-
 
 ///\brief get category pointer_ for a type
 /// returns pointer_ if T fulfills the is_pointer properry
