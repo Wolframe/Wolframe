@@ -33,7 +33,7 @@
 ///\file langbind_appConfig.cpp
 ///\brief Implementation of the language binding objects configuration
 #include "langbind/appConfig.hpp"
-#include "config/description.hpp"
+#include "logger-v1.hpp"
 #include <string>
 #include <vector>
 #include <map>
@@ -41,128 +41,7 @@
 #include <boost/filesystem.hpp>
 
 using namespace _Wolframe;
-using namespace _Wolframe::langbind;
-
-const config::DescriptionBase* DDLCompilerConfigStruct::description()
-{
-	struct ThisDescription :public config::Description<DDLCompilerConfigStruct>
-	{
-		ThisDescription()
-		{
-			(*this)
-			( "name",	&DDLCompilerConfigStruct::name)
-			( "modulepath",	&DDLCompilerConfigStruct::modulepath)
-			;
-		}
-	};
-	static const ThisDescription rt;
-	return &rt;
-}
-
-const config::DescriptionBase* DDLFormConfigStruct::description()
-{
-	struct ThisDescription :public config::Description<DDLFormConfigStruct>
-	{
-		ThisDescription()
-		{
-			(*this)
-			( "name",	&DDLFormConfigStruct::name)
-			( "DDL",	&DDLFormConfigStruct::DDL)
-			( "sourcepath",	&DDLFormConfigStruct::sourcepath)
-			;
-		}
-	};
-	static const ThisDescription rt;
-	return &rt;
-}
-
-const config::DescriptionBase* FilterConfigStruct::description()
-{
-	struct ThisDescription :public config::Description<FilterConfigStruct>
-	{
-		ThisDescription()
-		{
-			(*this)
-			( "name",	&FilterConfigStruct::name)
-			( "modulepath",	&FilterConfigStruct::modulepath)
-			;
-		}
-	};
-	static const ThisDescription rt;
-	return &rt;
-}
-
-const config::DescriptionBase* TransactionFunctionConfigStruct::description()
-{
-	struct ThisDescription :public config::Description<TransactionFunctionConfigStruct>
-	{
-		ThisDescription()
-		{
-			(*this)
-			( "name",		&TransactionFunctionConfigStruct::name)
-			( "filter",		&TransactionFunctionConfigStruct::filter)
-			( "modulepath",		&TransactionFunctionConfigStruct::modulepath)
-			;
-		}
-	};
-	static const ThisDescription rt;
-	return &rt;
-}
-
-const config::DescriptionBase* PluginModuleAPIConfigStruct::description()
-{
-	struct ThisDescription :public config::Description<PluginModuleAPIConfigStruct>
-	{
-		ThisDescription()
-		{
-			(*this)
-			( "name",	&PluginModuleAPIConfigStruct::name)
-			( "modulepath",	&PluginModuleAPIConfigStruct::modulepath)
-			;
-		}
-	};
-	static const ThisDescription rt;
-	return &rt;
-}
-
-const config::DescriptionBase* EnvironmentConfigStruct::description()
-{
-	struct ThisDescription :public config::Description<EnvironmentConfigStruct>
-	{
-		ThisDescription()
-		{
-			(*this)
-			( "DDL",		&EnvironmentConfigStruct::DDL)
-			( "form",		&EnvironmentConfigStruct::form)
-			( "filter",		&EnvironmentConfigStruct::filter)
-			( "transaction",	&EnvironmentConfigStruct::transaction)
-			( "plugin",		&EnvironmentConfigStruct::plugin)
-			;
-		}
-	};
-	static const ThisDescription rt;
-	return &rt;
-}
-
-
-bool ApplicationEnvironmentConfig::parse( const config::ConfigurationTree& pt, const std::string&, const module::ModulesDirectory*)
-{
-	try
-	{
-		std::string errmsg;
-		if (!m_config.description()->parse( (void*)&m_config, (const boost::property_tree::ptree&)pt, errmsg))
-		{
-			LOG_ERROR << "Error in configuration: " << errmsg;
-			return false;
-		}
-		return true;
-	}
-	catch (std::exception& e)
-	{
-		LOG_ERROR << "Error parsing configuration: " << e.what();
-		return false;
-	}
-}
+using namespace langbind;
 
 bool ApplicationEnvironmentConfig::check() const
 {
@@ -275,6 +154,25 @@ bool ApplicationEnvironmentConfig::check() const
 		}
 	}
 	return true;
+}
+
+bool ApplicationEnvironmentConfig::parse( const config::ConfigurationTree& pt, const std::string&, const module::ModulesDirectory*)
+{
+	try
+	{
+		std::string errmsg;
+		if (!m_config.description()->parse( (void*)&m_config, (const boost::property_tree::ptree&)pt, errmsg))
+		{
+			LOG_ERROR << "Error in configuration: " << errmsg;
+			return false;
+		}
+		return true;
+	}
+	catch (std::exception& e)
+	{
+		LOG_ERROR << "Error parsing configuration: " << e.what();
+		return false;
+	}
 }
 
 void ApplicationEnvironmentConfig::print( std::ostream& os, std::size_t indent) const

@@ -1,4 +1,4 @@
- /************************************************************************
+/************************************************************************
 
  Copyright (C) 2011 Project Wolframe.
  All rights reserved.
@@ -30,37 +30,44 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file langbind/appConfig.hpp
-///\brief Configuration of the processor environment
-#ifndef _Wolframe_APPLICATION_ENVIRONMENT_CONFIGURATION_HPP_INCLUDED
-#define _Wolframe_APPLICATION_ENVIRONMENT_CONFIGURATION_HPP_INCLUDED
-#include <vector>
-#include <string>
-#include "protocol/commandHandler.hpp"
-#include "config/descriptionBase.hpp"
-#include "ddl/compilerInterface.hpp"
-#include "config/configurationBase.hpp"
+///\file langbind_appConfig_ddl.cpp
+///\brief Part of langbind_appConfig.cpp
 #include "langbind/appConfig_struct.hpp"
+#include "config/description.hpp"
 
-namespace _Wolframe {
-namespace langbind {
+using namespace _Wolframe;
+using namespace _Wolframe::langbind;
 
-///\brief application environment configuration
-class ApplicationEnvironmentConfig : public config::ConfigurationBase
+const config::DescriptionBase* DDLCompilerConfigStruct::description()
 {
-public:
-	ApplicationEnvironmentConfig() : ConfigurationBase( "Application Environment", NULL, "Application environment configuration" )	{}
-	~ApplicationEnvironmentConfig() {}
+	struct ThisDescription :public config::Description<DDLCompilerConfigStruct>
+	{
+		ThisDescription()
+		{
+			(*this)
+			( "name",		&DDLCompilerConfigStruct::name)
+			( "modulepath",		&DDLCompilerConfigStruct::modulepath)
+			;
+		}
+	};
+	static const ThisDescription rt;
+	return &rt;
+}
 
-	bool parse( const config::ConfigurationTree& pt, const std::string& node, const module::ModulesDirectory* modules );
-	bool check() const;
-	void print( std::ostream& os, std::size_t indent) const;
-	virtual void setCanonicalPathes( const std::string& referencePath );
-private:
-	EnvironmentConfigStruct m_config;
-};
-
-}}//namespace
-#endif
-
+const config::DescriptionBase* DDLFormConfigStruct::description()
+{
+	struct ThisDescription :public config::Description<DDLFormConfigStruct>
+	{
+		ThisDescription()
+		{
+			(*this)
+			( "name",		&DDLFormConfigStruct::name)
+			( "DDL",		&DDLFormConfigStruct::DDL)
+			( "sourcepath",		&DDLFormConfigStruct::sourcepath)
+			;
+		}
+	};
+	static const ThisDescription rt;
+	return &rt;
+}
 
