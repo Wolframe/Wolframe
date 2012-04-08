@@ -112,6 +112,7 @@ LOCAL_STATIC_LIB_OBJS = \
 ifeq ($(WITH_LUA),1)
 LOCAL_STATIC_LIB_OBJS += \
 	serialize_struct_luamapBase.o \
+	langbind_luaScript.o \
 	langbind_luaDebug.o \
 	langbind_luaBignum.o \
 	langbind_luaCommandEnvironment.o \
