@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file langbind_appConfig_ddl.cpp
-///\brief Part of langbind_appConfig.cpp
+///\file langbind_appConfig_struct.cpp
+///\brief Implementation of the data structures of the processor environment configuration
 #include "langbind/appConfig_struct.hpp"
 #include "config/description.hpp"
 
@@ -64,6 +64,75 @@ const config::DescriptionBase* DDLFormConfigStruct::description()
 			( "name",		&DDLFormConfigStruct::name)
 			( "DDL",		&DDLFormConfigStruct::DDL)
 			( "sourcepath",		&DDLFormConfigStruct::sourcepath)
+			;
+		}
+	};
+	static const ThisDescription rt;
+	return &rt;
+}
+
+const config::DescriptionBase* FilterConfigStruct::description()
+{
+	struct ThisDescription :public config::Description<FilterConfigStruct>
+	{
+		ThisDescription()
+		{
+			(*this)
+			( "name",		&FilterConfigStruct::name)
+			( "modulepath",		&FilterConfigStruct::modulepath)
+			;
+		}
+	};
+	static const ThisDescription rt;
+	return &rt;
+}
+
+
+const config::DescriptionBase* PluginModuleAPIConfigStruct::description()
+{
+	struct ThisDescription :public config::Description<PluginModuleAPIConfigStruct>
+	{
+		ThisDescription()
+		{
+			(*this)
+			( "name",		&PluginModuleAPIConfigStruct::name)
+			( "modulepath",		&PluginModuleAPIConfigStruct::modulepath)
+			;
+		}
+	};
+	static const ThisDescription rt;
+	return &rt;
+}
+
+const config::DescriptionBase* TransactionFunctionConfigStruct::description()
+{
+	struct ThisDescription :public config::Description<TransactionFunctionConfigStruct>
+	{
+		ThisDescription()
+		{
+			(*this)
+			( "name",		&TransactionFunctionConfigStruct::name)
+			( "filter",		&TransactionFunctionConfigStruct::filter)
+			( "modulepath",		&TransactionFunctionConfigStruct::modulepath)
+			;
+		}
+	};
+	static const ThisDescription rt;
+	return &rt;
+}
+
+const config::DescriptionBase* EnvironmentConfigStruct::description()
+{
+	struct ThisDescription :public config::Description<EnvironmentConfigStruct>
+	{
+		ThisDescription()
+		{
+			(*this)
+			( "DDL",		&EnvironmentConfigStruct::DDL)
+			( "form",		&EnvironmentConfigStruct::form)
+			( "filter",		&EnvironmentConfigStruct::filter)
+			( "transaction",	&EnvironmentConfigStruct::transaction)
+			( "plugin",		&EnvironmentConfigStruct::plugin)
 			;
 		}
 	};
