@@ -79,6 +79,15 @@ struct TransactionFunctionConfigStruct
 	static const config::DescriptionBase* description();
 };
 
+struct ScriptCommandConfigStruct
+{
+	std::string name;						//< name of the function in the script (globally unique)
+	std::string sourcepath;						//< path of the script source
+
+	///\brief Get the configuration structure description
+	static const config::DescriptionBase* description();
+};
+
 struct PluginModuleAPIConfigStruct
 {
 	std::string name;						//< name of the plug-in function
@@ -94,6 +103,7 @@ struct EnvironmentConfigStruct
 	std::vector<DDLFormConfigStruct> form;				//< definitions of forms
 	std::vector<FilterConfigStruct> filter;				//< definitions of filters
 	std::vector<TransactionFunctionConfigStruct> transaction;	//< definitions of transaction functions
+	std::vector<ScriptCommandConfigStruct> script;			//< definitions of script functions
 	std::vector<PluginModuleAPIConfigStruct> plugin;		//< definitions of the plugin APIs
 
 	///\brief Get the configuration structure description

@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file appObjects.cpp
+///\file langbind_appObjects.cpp
 ///\brief implementation of scripting language objects
 #include <algorithm>
 #include <cctype>
@@ -166,28 +166,6 @@ bool DDLCompilerMap::getDDLCompiler( const char* name, ddl::CompilerInterfaceR& 
 		return true;
 	}
 }
-
-static GlobalContextR g_context;
-
-void _Wolframe::langbind::defineGlobalContext( const GlobalContextR& context)
-{
-	g_context = context;
-}
-
-GlobalContext* _Wolframe::langbind::getGlobalContext()
-{
-	return g_context.get();
-}
-
-struct AutoCreateGlobalContext
-{
-	AutoCreateGlobalContext()
-	{
-		g_context.reset( new GlobalContext());
-	}
-};
-AutoCreateGlobalContext g_autoCreateGlobalContext;
-
 
 static InputFilterClosure::ItemType fetchFailureResult( const protocol::InputFilter& ff)
 {

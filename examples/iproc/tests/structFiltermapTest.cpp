@@ -35,6 +35,7 @@ Project Wolframe.
 #include "serialize/struct/filtermapDescription.hpp"
 #include "serialize/struct/filtermapBase.hpp"
 #include "langbind/appObjects.hpp"
+#include "langbind/appGlobalContext.hpp"
 #include "logger-v1.hpp"
 #include "tests/testUtils.hpp"
 #ifdef _WIN32

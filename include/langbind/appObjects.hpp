@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file appObjects.hpp
+///\file langbind/appObjects.hpp
 ///\brief interface for application processor scripting language to system objects
 
 #ifndef _Wolframe_langbind_APPOBJECTS_HPP_INCLUDED
@@ -258,19 +258,6 @@ public:
 private:
 	std::map<std::string,ddl::CompilerInterfaceR> m_map;
 };
-
-///\class GlobalContext
-///\brief Reference to all available processing resources seen from scripting language binding
-class GlobalContext :public FilterMap, public DDLFormMap, public TransactionFunctionMap, public DDLCompilerMap
-{
-public:
-	GlobalContext(){}
-};
-typedef CountedReference<GlobalContext> GlobalContextR;
-
-
-void defineGlobalContext( const GlobalContextR& context);
-GlobalContext* getGlobalContext();
 
 }}//namespace
 #endif

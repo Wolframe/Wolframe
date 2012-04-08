@@ -33,6 +33,7 @@
 ///\brief Program using filters to map stdin to stdout
 
 #include "langbind/appObjects.hpp"
+#include "langbind/appGlobalContext.hpp"
 #include <boost/algorithm/string.hpp>
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>

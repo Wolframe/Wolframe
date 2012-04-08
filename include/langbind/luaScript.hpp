@@ -36,6 +36,8 @@ Project Wolframe.
 #include <string>
 #include <map>
 #include <vector>
+#include <stdexcept>
+#if WITH_LUA
 extern "C" {
 	#include "lua.h"
 }
@@ -88,6 +90,25 @@ private:
 	std::map<std::string,std::size_t> m_pathmap;
 	std::map<std::string,std::size_t> m_procmap;
 };
-
 }}//namespace
+
+#else
+namespace _Wolframe {
+namespace langbind {
+
+struct LuaScriptInstance {};
+struct LuaFunctionMap
+{
+	void defineLuaFunction( const char*, const char*)
+	{
+		throw std::runtime_error("Wolframe built without lua support");
+	}
+	bool getLuaScriptInstance( const char*, LuaScriptInstance&) const
+	{
+		return false;
+	}
+};
+}}//namespace
+
+#endif
 #endif

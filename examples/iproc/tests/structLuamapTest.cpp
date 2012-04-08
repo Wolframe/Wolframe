@@ -37,6 +37,7 @@ Project Wolframe.
 #include "iprocHandlerConfig.hpp"
 #include "langbind/luaCommandEnvironment.hpp"
 #include "langbind/appObjects.hpp"
+#include "langbind/appGlobalContext.hpp"
 #include "langbind/luaCommandHandler.hpp"
 #include "logger-v1.hpp"
 #include "tests/testUtils.hpp"

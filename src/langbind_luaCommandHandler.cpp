@@ -32,6 +32,7 @@ Project Wolframe.
 #include "langbind/luaCommandHandler.hpp"
 #include "langbind/luaDebug.hpp"
 #include "langbind/appObjects.hpp"
+#include "langbind/appGlobalContext.hpp"
 #include "logger-v1.hpp"
 #include "protocol/outputfilter.hpp"
 #include "protocol/inputfilter.hpp"

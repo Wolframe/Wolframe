@@ -121,6 +121,22 @@ const config::DescriptionBase* TransactionFunctionConfigStruct::description()
 	return &rt;
 }
 
+const config::DescriptionBase* ScriptCommandConfigStruct::description()
+{
+	struct ThisDescription :public config::Description<ScriptCommandConfigStruct>
+	{
+		ThisDescription()
+		{
+			(*this)
+			( "name",		&ScriptCommandConfigStruct::name)
+			( "sourcepath",		&ScriptCommandConfigStruct::sourcepath)
+			;
+		}
+	};
+	static const ThisDescription rt;
+	return &rt;
+}
+
 const config::DescriptionBase* EnvironmentConfigStruct::description()
 {
 	struct ThisDescription :public config::Description<EnvironmentConfigStruct>
@@ -132,6 +148,7 @@ const config::DescriptionBase* EnvironmentConfigStruct::description()
 			( "form",		&EnvironmentConfigStruct::form)
 			( "filter",		&EnvironmentConfigStruct::filter)
 			( "transaction",	&EnvironmentConfigStruct::transaction)
+			( "script",		&EnvironmentConfigStruct::script)
 			( "plugin",		&EnvironmentConfigStruct::plugin)
 			;
 		}
