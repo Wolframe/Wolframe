@@ -35,6 +35,7 @@ Project Wolframe.
 #ifndef _Wolframe_langbind_APP_GLOBAL_CONTEXT_HPP_INCLUDED
 #define _Wolframe_langbind_APP_GLOBAL_CONTEXT_HPP_INCLUDED
 #include "langbind/appObjects.hpp"
+#include "langbind/appConfig.hpp"
 #include "langbind/luaScript.hpp"
 
 namespace _Wolframe {
@@ -51,6 +52,7 @@ class GlobalContext
 {
 public:
 	GlobalContext(){}
+	bool load( const ApplicationEnvironmentConfig& config);
 };
 typedef CountedReference<GlobalContext> GlobalContextR;
 

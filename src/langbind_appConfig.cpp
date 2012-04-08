@@ -45,12 +45,13 @@ using namespace langbind;
 
 bool ApplicationEnvironmentConfig::check() const
 {
+	bool rt = true;
 	std::map<std::string,bool> filters;
 	std::map<std::string,bool> compilers;
 	std::map<std::string,bool> forms;
 	std::map<std::string,bool> functions;
+	std::map<std::string,bool> scripts;
 	std::map<std::string,bool> plugins;
-
 	{
 		compilers[ "simpleform"] = true;
 		std::vector<DDLCompilerConfigStruct>::const_iterator itr=m_config.DDL.begin(),end=m_config.DDL.end();
@@ -59,13 +60,13 @@ bool ApplicationEnvironmentConfig::check() const
 			if (compilers[ itr->name])
 			{
 				LOG_ERROR << "Duplicate definition or using reserved name for compiler " << itr->name;
-				return false;
+				rt = false;
 			}
 			compilers[ itr->name] = true;
 			if (!boost::filesystem::exists( itr->modulepath))
 			{
-				LOG_ERROR << "Path of DDL compiler module does not exist";
-				return false;
+				LOG_ERROR << "Path of DDL compiler module does not exist: " << itr->modulepath;
+				rt = false;
 			}
 		}
 	}
@@ -76,18 +77,18 @@ bool ApplicationEnvironmentConfig::check() const
 			if (forms[ itr->name])
 			{
 				LOG_ERROR << "Duplicate definition or using reserved name for form " << itr->name;
-				return false;
+				rt = false;
 			}
 			forms[ itr->name] = true;
 			if (!compilers[ itr->DDL])
 			{
 				LOG_ERROR << "Undefined DDL used for form definition" << itr->name;
-				return false;
+				rt = false;
 			}
 			if (!boost::filesystem::exists( itr->sourcepath))
 			{
-				LOG_ERROR << "Path of DDL form source file does not exist";
-				return false;
+				LOG_ERROR << "Path of DDL form source file does not exist: " << itr->sourcepath;
+				rt = false;
 			}
 		}
 	}
@@ -104,13 +105,13 @@ bool ApplicationEnvironmentConfig::check() const
 			if (filters[ itr->name])
 			{
 				LOG_ERROR << "Duplicate definition or using reserved name for filter " << itr->name;
-				return false;
+				rt = false;
 			}
 			filters[ itr->name] = true;
 			if (!boost::filesystem::exists( itr->modulepath))
 			{
-				LOG_ERROR << "Path of filter module does not exist";
-				return false;
+				LOG_ERROR << "Path of filter module does not exist: " << itr->modulepath;
+				rt = false;
 			}
 		}
 	}
@@ -121,18 +122,35 @@ bool ApplicationEnvironmentConfig::check() const
 			if (functions[ itr->name])
 			{
 				LOG_ERROR << "Duplicate definition or using reserved name for transaction function " << itr->name;
-				return false;
+				rt = false;
 			}
 			functions[ itr->name] = true;
 			if (!filters[ itr->filter])
 			{
 				LOG_ERROR << "Undefined filter '" << itr->filter << "'used for transaction function command reader/writer in " << itr->name;
-				return false;
+				rt = false;
 			}
 			if (!boost::filesystem::exists( itr->modulepath))
 			{
-				LOG_ERROR << "Path of transaction function command handler module does not exist";
-				return false;
+				LOG_ERROR << "Path of transaction function command handler module does not exist: " << itr->modulepath;
+				rt = false;
+			}
+		}
+	}
+	{
+		std::vector<ScriptCommandConfigStruct>::const_iterator itr=m_config.script.begin(),end=m_config.script.end();
+		for (;itr!=end; ++itr)
+		{
+			if (scripts[ itr->name])
+			{
+				LOG_ERROR << "Duplicate definition of script procedure: " << itr->name;
+				rt = false;
+			}
+			scripts[ itr->name] = true;
+			if (!boost::filesystem::exists( itr->sourcepath))
+			{
+				LOG_ERROR << "Path of script procedure does not exist: " << itr->sourcepath;
+				rt = false;
 			}
 		}
 	}
@@ -143,17 +161,17 @@ bool ApplicationEnvironmentConfig::check() const
 			if (plugins[ itr->name])
 			{
 				LOG_ERROR << "Duplicate definition or using reserved name for transaction function " << itr->name;
-				return false;
+				rt = false;
 			}
 			plugins[ itr->name] = true;
 			if (!boost::filesystem::exists( itr->modulepath))
 			{
-				LOG_ERROR << "Path of plugin function module does not exist";
-				return false;
+				LOG_ERROR << "Path of plugin function module does not exist: " << itr->modulepath;
+				rt = false;
 			}
 		}
 	}
-	return true;
+	return rt;
 }
 
 bool ApplicationEnvironmentConfig::parse( const config::ConfigurationTree& pt, const std::string&, const module::ModulesDirectory*)

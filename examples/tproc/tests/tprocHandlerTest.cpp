@@ -43,6 +43,7 @@
 #include "connectionHandler.hpp"
 #include "handlerConfig.hpp"
 #include "langbind/appConfig.hpp"
+#include "langbind/appGlobalContext.hpp"
 #include "appConfig.hpp"
 ///PF:HACK: Command Line is needed to instantiate the application configuration object:
 #include "../src/commandLine.hpp"
@@ -97,6 +98,9 @@ public:
 		}
 		m_cmdLine.parse( g_gtest_ARGC, g_gtest_ARGV);
 		m_appConfig.finalize( m_cmdLine);
+
+		langbind::defineGlobalContext( new langbind::GlobalContext());
+		langbind::getGlobalContext()->load( m_langbindConfig);
 	}
 
 	void setBuffers( std::size_t ib, std::size_t ob)

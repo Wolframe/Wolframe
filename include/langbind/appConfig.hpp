@@ -56,6 +56,8 @@ public:
 	bool check() const;
 	void print( std::ostream& os, std::size_t indent) const;
 	virtual void setCanonicalPathes( const std::string& referencePath );
+
+	const EnvironmentConfigStruct& data() const					{return m_config;}
 private:
 	EnvironmentConfigStruct m_config;
 };

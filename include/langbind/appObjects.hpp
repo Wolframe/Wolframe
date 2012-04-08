@@ -250,7 +250,7 @@ private:
 class DDLCompilerMap
 {
 public:
-	DDLCompilerMap(){}
+	DDLCompilerMap();
 	~DDLCompilerMap(){}
 
 	void defineDDLCompiler( const char* name, const ddl::CompilerInterfaceR& ci);

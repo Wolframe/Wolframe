@@ -32,6 +32,7 @@ Project Wolframe.
 ///\file langbind_appObjects.cpp
 ///\brief implementation of scripting global context
 #include "langbind/appGlobalContext.hpp"
+#include "logger-v1.hpp"
 
 using namespace _Wolframe;
 using namespace langbind;
@@ -57,5 +58,80 @@ struct AutoCreateGlobalContext
 };
 AutoCreateGlobalContext g_autoCreateGlobalContext;
 
+bool GlobalContext::load( const ApplicationEnvironmentConfig& config)
+{
+	bool rt = true;
+	{
+		std::vector<DDLCompilerConfigStruct>::const_iterator itr=config.data().DDL.begin(),end=config.data().DDL.end();
+		for (;itr!=end; ++itr)
+		{
+			LOG_INFO << "Loading DDL compiler " << itr->name;
+			///TODO: load compiler from module itr->modulepath
+			///Call defineDDLCompiler( const char* name, const ddl::CompilerInterfaceR& ci);
+		}
+	}
+	{
+		std::vector<DDLFormConfigStruct>::const_iterator itr=config.data().form.begin(),end=config.data().form.end();
+		for (;itr!=end; ++itr)
+		{
+			LOG_INFO << "Loading DDL form " << itr->name;
+			ddl::CompilerInterfaceR ci;
+			if (!getDDLCompiler( itr->DDL.c_str(), ci))
+			{
+				LOG_ERROR << "Unknown DDL of form" << itr->DDL;
+				rt = false;
+			}
+			else
+			{
+				ddl::StructType form;
+				std::string error;
+				if (!ci->compileFile( itr->sourcepath, form, error))
+				{
+					LOG_ERROR << "Error in DDL form source: " << error;
+					rt = false;
+				}
+				else
+				{
+					defineForm( itr->name.c_str(), form);
+				}
+			}
+		}
+	}
+	{
+		std::vector<FilterConfigStruct>::const_iterator itr=config.data().filter.begin(),end=config.data().filter.end();
+		for (;itr!=end; ++itr)
+		{
+			LOG_INFO << "Loading filter " << itr->name;
+			///TODO: load filter from itr->modulepath
+			///Call defineFilter( const char* name, const FilterFactoryR& f);
+		}
+	}
+	{
+		std::vector<TransactionFunctionConfigStruct>::const_iterator itr=config.data().transaction.begin(),end=config.data().transaction.end();
+		for (;itr!=end; ++itr)
+		{
+			LOG_INFO << "Loading transaction function " << itr->name;
+			///TODO: load transaction function from itr->modulepath
+			///Call defineTransactionFunction( const char* name, const TransactionFunction& f);
+		}
+	}
+	{
+		std::vector<ScriptCommandConfigStruct>::const_iterator itr=config.data().script.begin(),end=config.data().script.end();
+		for (;itr!=end; ++itr)
+		{
+			defineLuaFunction( itr->name.c_str(), itr->sourcepath.c_str());
+		}
+	}
+	{
+		std::vector<PluginModuleAPIConfigStruct>::const_iterator itr=config.data().plugin.begin(),end=config.data().plugin.end();
+		for (;itr!=end; ++itr)
+		{
+			LOG_INFO << "Loading plugin module function " << itr->name;
+			///TODO: load plugin module function from itr->modulepath
+			///API for defining the function is not yet available !
+		}
+	}
+	return rt;
+}
 
 

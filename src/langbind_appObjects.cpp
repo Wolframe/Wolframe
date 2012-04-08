@@ -34,6 +34,8 @@ Project Wolframe.
 #include <algorithm>
 #include <cctype>
 #include "langbind/appObjects.hpp"
+#include "ddl/compiler/simpleFormCompiler.hpp"
+#include "ddl/compilerInterface.hpp"
 #include "logger-v1.hpp"
 #include "protocol/inputfilter.hpp"
 #include "protocol/outputfilter.hpp"
@@ -150,6 +152,12 @@ void DDLCompilerMap::defineDDLCompiler( const char* name, const ddl::CompilerInt
 	std::string nam( name);
 	std::transform( nam.begin(), nam.end(), nam.begin(), (int(*)(int)) std::tolower);
 	m_map[ nam] = ci;
+}
+
+DDLCompilerMap::DDLCompilerMap()
+{
+	ddl::CompilerInterfaceR simpleformCompiler( new ddl::SimpleFormCompiler());
+	m_map[ simpleformCompiler->ddlname()] = simpleformCompiler;
 }
 
 bool DDLCompilerMap::getDDLCompiler( const char* name, ddl::CompilerInterfaceR& rt) const
