@@ -24,14 +24,14 @@
 	<setinfo>
 		<title>Wolframe documentation</title>
 		<copyright>
-			<year>2011</year>
+			<year>2011, 2012</year>
 			<holder>Project Wolframe</holder>
 		</copyright>
 		<edition>version &BookSetVersion;</edition>
 		<pubdate>&BookSetPublicationDate;</pubdate>
 	</setinfo>
 
-	<book id="book_AppServer">
+	<book id="book_AppServer" lang="en">
 		<title>Wolframe Application Server</title>
 		<subtitle>Application Building Manual</subtitle>
 		<titleabbrev>WAS</titleabbrev>
@@ -42,7 +42,7 @@
 			<pubdate>&BookSetPublicationDate; version &BookSetVersion;</pubdate>
 
 			<copyright>
-				<year>2011</year>
+				<year>2011, 2012</year>
 				<holder>Project Wolframe</holder>
 			</copyright>
 			<legalnotice>
@@ -65,7 +65,7 @@
 		</index>
 	</book>
 
-	<book id="book_SDK">
+	<book id="book_SDK" lang="en">
 		<title>Building Wolframe Services</title>
 		<subtitle>Service Development Kit</subtitle>
 		<titleabbrev>SDK</titleabbrev>
@@ -76,7 +76,7 @@
 			<pubdate>&BookSetPublicationDate; version &BookSetVersion;</pubdate>
 
 			<copyright>
-				<year>2011</year>
+				<year>2011, 2012</year>
 				<holder>Project Wolframe</holder>
 			</copyright>
 			<legalnotice>

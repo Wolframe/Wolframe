@@ -179,6 +179,11 @@ docs/examples/tutorial/lua_usage_transaction_1.lua
 docs/GNUmakefile
 docs/images/GNUmakefile
 docs/Makefile.W32
+docs/output-epub.xsl
+docs/output-html-chunked.xsl
+docs/output-html.xsl
+docs/output-pdf.xsl
+docs/output-rtf.xsl
 docs/SDK/Appendix.xml
 docs/SDK/Glossary.xml
 docs/SDK/Introduction.xml
