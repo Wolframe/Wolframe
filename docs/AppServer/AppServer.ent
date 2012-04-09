@@ -6,9 +6,10 @@
 
 <!ENTITY AppGettingStarted		SYSTEM "GettingStarted.xml">
 <!ENTITY AppComplexServer		SYSTEM "ComplexServer.xml">
+<!ENTITY AppCompleteServer		SYSTEM "CompleteServer.xml">
 <!ENTITY AppComponents			SYSTEM "Components.xml">
 
-<!ENTITY AppSSL				SYSTEM "SSL.xml">
+<!ENTITY AppSecurity			SYSTEM "Security.xml">
 
 <!ENTITY AppAppendix			SYSTEM "Appendix.xml">
 
