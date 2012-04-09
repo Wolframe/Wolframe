@@ -8,10 +8,9 @@
 
 <glossdiv><title>A</title>
 
-	<glossentry id="AAAA"><glossterm>Authentication, Authorization, Accounting and Auditing</glossterm>
-		<acronym>AAAA</acronym>
+	<glossentry id="AAAA"><glossterm><acronym>AAAA</acronym></glossterm>
 		<glossdef>
-			<para>Some reasonable definition here. BTW, this just an example.</para>
+			<para>Acronym for Authentication, Authorization, Accounting and Auditing</para>
 			<glossseealso otherterm="Authentication">Authentication</glossseealso>
 			<glossseealso otherterm="Authorization">Authorization</glossseealso>
 			<glossseealso otherterm="Accounting">Accounting</glossseealso>
@@ -46,8 +45,31 @@
 			<glossseealso otherterm="AAAA">AAAA</glossseealso>
 		</glossdef>
 	</glossentry>
-
 </glossdiv>
 
+<glossdiv><title>S</title>
+	<glossentry id="SSL"><glossterm><acronym>SSL</acronym></glossterm>
+		<glossdef>
+			<para>Secure Sockets Layer</para>
+			<para>Cryptographic protocols which provide secure communications on the Internet.
+			SSL is a predecessor to TLS</para>
+			<glossseealso otherterm="TLS">TLS</glossseealso>
+		</glossdef>
+	</glossentry>
+</glossdiv>
+
+<glossdiv><title>T</title>
+	<glossentry id="TLS"><glossterm><acronym>TLS</acronym></glossterm>
+		<glossdef>
+			<para>Transport Layer Security</para>
+			<para>Transport Layer Security (TLS) and its predecessor, Secure Sockets Layer (SSL),
+			are cryptographic protocols that provide communication security over the Internet.
+			TLS and SSL encrypt the segments of network connections above the Transport Layer,
+			using asymmetric cryptography for key exchange, symmetric encryption for privacy,
+			and message authentication codes for message integrity. <citation>Wikipedia</citation></para>
+			<glossseealso otherterm="SSL">SSL</glossseealso>
+		</glossdef>
+	</glossentry>
+</glossdiv>
 
 </glossary>
