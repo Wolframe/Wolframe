@@ -35,7 +35,7 @@
 ///
 
 #include "tprocHandler.hpp"
-#include "execCommandHandler.hpp"
+#include "protocol/execCommandHandler.hpp"
 #include "logger-v1.hpp"
 #include <stdexcept>
 
@@ -169,7 +169,7 @@ int CommandHandler::doCmd2B( int argc, const char** argv, std::ostream& out)
 
 int CommandHandler::endRun( protocol::CommandHandler* ch, std::ostream& out)
 {
-	ExecCommandHandler* chnd = dynamic_cast<ExecCommandHandler*>( ch);
+	protocol::ExecCommandHandler* chnd = dynamic_cast<protocol::ExecCommandHandler*>( ch);
 	int argc;
 	const char** argv;
 	const char* lastcmd = chnd->getCommand( argc, argv);
@@ -209,7 +209,7 @@ int CommandHandler::doCmd3A( int argc, const char** argv, std::ostream& out)
 		out << endl();
 		try
 		{
-			CommandHandler* ch = (CommandHandler*)new ExecCommandHandler( cmds(), m_config->getCommands());
+			CommandHandler* ch = (CommandHandler*)new protocol::ExecCommandHandler( cmds(), m_config->getCommands());
 			delegateProcessing<&CommandHandler::endRun>( ch);
 		}
 		catch (const std::exception& e)
@@ -243,7 +243,7 @@ int CommandHandler::doHello( int argc, const char**, std::ostream& out)
 	}
 	try
 	{
-		CommandHandler* ch = (CommandHandler*)new ExecCommandHandler( cmds(), m_config->getCommands());
+		CommandHandler* ch = (CommandHandler*)new protocol::ExecCommandHandler( cmds(), m_config->getCommands());
 			delegateProcessing<&CommandHandler::endRun>( ch);
 	}
 	catch (const std::exception& e)

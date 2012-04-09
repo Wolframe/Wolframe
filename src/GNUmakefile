@@ -80,6 +80,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	protocol_ioblocks.o \
 	protocol_commandHandler.o \
 	protocol_lineCommandHandler.o \
+	protocol_execCommandHandler.o \
 	langbind_appObjects.o \
 	langbind_appGlobalContext.o \
 	langbind_appConfig_struct.o \

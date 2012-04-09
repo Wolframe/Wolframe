@@ -30,12 +30,12 @@
  Project Wolframe.
 
 ************************************************************************/
-#include "execCommandHandler.hpp"
+#include "protocol/execCommandHandler.hpp"
 #include "protocol/ioblocks.hpp"
 #include "logger-v1.hpp"
 
 using namespace _Wolframe;
-using namespace _Wolframe::tproc;
+using namespace _Wolframe::protocol;
 
 ExecCommandHandler::ExecCommandHandler( const std::vector<std::string>& rcmds_, const std::vector< CountedReference<protocol::CommandBase> >& cmds_)
 	:m_state(Init),m_buffer(1024),m_argBuffer(&m_buffer),m_cmdidx(-1),m_cmds(cmds_),m_cmdhandler(0)
