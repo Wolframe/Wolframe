@@ -30,9 +30,12 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file execCommandHandler.hpp
-#ifndef _Wolframe_TPROC_EXEC_COMMAND_HANDLER_HPP_INCLUDED
-#define _Wolframe_TPROC_EXEC_COMMAND_HANDLER_HPP_INCLUDED
+///\file protocol/execCommandHandler.hpp
+///\brief command handler for the selection and execution of commands defined as a list of command handlers.
+//        Includes interpreting of commands that belong to the caller and return control to the caller, if any of them is issued.
+//        Includes also a 'Capa' command for showing the list of available commands
+#ifndef _Wolframe_PROTOCOL_EXEC_COMMAND_HANDLER_HPP_INCLUDED
+#define _Wolframe_PROTOCOL_EXEC_COMMAND_HANDLER_HPP_INCLUDED
 #include "protocol/commandHandler.hpp"
 #include "protocol/ioblocks.hpp"
 #include "protocol/parser.hpp"
@@ -43,7 +46,7 @@
 #include <string>
 
 namespace _Wolframe {
-namespace tproc {
+namespace protocol {
 
 class ExecCommandHandler :public protocol::CommandHandler
 {
