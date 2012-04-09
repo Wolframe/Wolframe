@@ -1,7 +1,53 @@
 <glossary>
 	<title>Glossary</title>
 	<para>
-	TODO (PF: the glossary for the SDK is in the SDK section. the document here contained old stuff and copy paste)	
+		This is the glossary for the Wolframe Application Building Manual.
+		It covers most of the terms used in a Wolframe application,
+		although some of the terms might be found only in the SDK manual.
 	</para>
+
+<glossdiv><title>A</title>
+
+	<glossentry id="AAAA"><glossterm>Authentication, Authorization, Accounting and Auditing</glossterm>
+		<acronym>AAAA</acronym>
+		<glossdef>
+			<para>Some reasonable definition here. BTW, this just an example.</para>
+			<glossseealso otherterm="Authentication">Authentication</glossseealso>
+			<glossseealso otherterm="Authorization">Authorization</glossseealso>
+			<glossseealso otherterm="Accounting">Accounting</glossseealso>
+			<glossseealso otherterm="Auditing">Auditing</glossseealso>
+		</glossdef>
+	</glossentry>
+
+	<glossentry id="Authentication"><glossterm>Authentication</glossterm>
+		<glossdef>
+			<para>Some reasonable definition here. BTW, this just an example.</para>
+			<glossseealso otherterm="AAAA">AAAA</glossseealso>
+		</glossdef>
+	</glossentry>
+
+	<glossentry id="Authorization"><glossterm>Authorization</glossterm>
+		<glossdef>
+			<para>Some reasonable definition here. BTW, this just an example.</para>
+			<glossseealso otherterm="AAAA">AAAA</glossseealso>
+		</glossdef>
+	</glossentry>
+
+	<glossentry id="Accounting"><glossterm>Accounting</glossterm>
+		<glossdef>
+			<para>Some reasonable definition here. BTW, this just an example.</para>
+			<glossseealso otherterm="AAAA">AAAA</glossseealso>
+		</glossdef>
+	</glossentry>
+
+	<glossentry id="Auditing"><glossterm>Auditing</glossterm>
+		<glossdef>
+			<para>Some reasonable definition here. BTW, this just an example.</para>
+			<glossseealso otherterm="AAAA">AAAA</glossseealso>
+		</glossdef>
+	</glossentry>
+
+</glossdiv>
+
 
 </glossary>
