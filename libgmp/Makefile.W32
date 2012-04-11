@@ -2,6 +2,8 @@ TOPDIR = ..
 
 SUBDIRS = mpn mpz mpq mpf printf scanf cxx
 
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
 GMPCOMMON_OBJS = \
 	version.obj \
 	errno.obj \
@@ -50,7 +52,6 @@ INCLUDE_CFLAGS = \
 INCLUDE_DIRS = \
 	/I. /Impn\generic
 
-WIN64=1
 !IFDEF WIN64
 GMP_LIMB_BITS = 64
 !ELSE

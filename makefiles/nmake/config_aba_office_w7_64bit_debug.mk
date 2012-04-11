@@ -124,6 +124,12 @@ WIX_LIBS = dutil_2008_x64.lib wcautil_2008_x64.lib
 #WIX_ARCH = x86
 WIX_ARCH = x64
 
+# libgmp
+########
+
+# define for 64 bit, undefine for 32 bit
+WIN64=1
+
 # XSLT processor
 ################
 
