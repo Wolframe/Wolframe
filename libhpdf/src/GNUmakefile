@@ -80,7 +80,7 @@ LOCAL_STATIC_LIB = \
 # we get too many spurios errors and problems (for instance in abuild
 # checks on openSuSE). This doesn't mean they should not be fixed
 # though upstream!
-ALL_CFLAGS = -O2 -Wall -I. -I../include
+ALL_CFLAGS = -O2 -Wall -I. -I../include $(INCLUDE_DIRS) $(INCLUDE_CFLAGS)
 
 $(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
 	ar rcs $(LOCAL_STATIC_LIB) $(LOCAL_STATIC_LIB_OBJS)
