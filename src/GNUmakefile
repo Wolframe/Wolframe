@@ -147,7 +147,11 @@ CPP_BINS = \
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 modules: libwolframe
+
 wolframed$(EXE): libwolframe
+
+wolframed$(EXE): wolframed.o $(OBJS) $(CPP_OBJS)
+	$(CXX_LINK) -o $@ $(ALL_LDFLAGS) $(OBJS) $(CPP_OBJS) $< $(LIBS)
 
 local_all: $(LOCAL_STATIC_LIB) loadModules-dummy.o
 
