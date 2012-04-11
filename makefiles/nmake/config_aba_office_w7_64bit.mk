@@ -122,10 +122,11 @@ WIX_LIBS = dutil_2008_x64.lib wcautil_2008_x64.lib
 #WIX_ARCH = x86
 WIX_ARCH = x64
 
-# XSLT processor
-################
+# libgmp
+########
 
-XSLTPROC = C:\cygwin\home\Andreas\libxslt-1.1.26-win64\bin\xsltproc.exe
+# define for 64 bit, undefine for 32 bit
+WIN64=1
 
 # DocBook and Stylesheets
 #########################

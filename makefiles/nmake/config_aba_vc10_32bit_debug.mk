@@ -128,11 +128,6 @@ WIX_ARCH = x64
 # define for 64 bit, undefine for 32 bit
 #WIN64=1
 
-# XSLT processor
-################
-
-XSLTPROC = C:\cygwin\home\Andreas\libxslt-1.1.26-win64\bin\xsltproc.exe
-
 # DocBook and Stylesheets
 #########################
 

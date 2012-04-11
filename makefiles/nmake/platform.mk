@@ -35,3 +35,8 @@ LIGHT = "$(WIX_DIR)\bin\light.exe"
 LIT = "$(WIX_DIR)\bin\lit.exe"
 SMOKE = "$(WIX_DIR)\bin\smoke.exe"
 SETUPBLD = "$(WIX_DIR)\bin\setupbld.exe"
+
+# XSLT processor
+################
+
+XSLTPROC = $(LIBXSLT_DIR)\bin\xsltproc.exe

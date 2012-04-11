@@ -124,6 +124,17 @@ WIX_LIBS = dutil_2008.lib wcautil_2008.lib
 WIX_ARCH = x86
 #WIX_ARCH = x64
 
+# libgmp
+########
+
+# define for 64 bit, undefine for 32 bit
+#WIN64=1
+
+# DocBook and Stylesheets
+#########################
+
+XSLT_HTMLHELP_STYLESHEET = C:\cygwin\home\Andreas\docbook-xsl-1.76.1\htmlhelp\htmlhelp.xsl
+
 # Doxygen binary to generate API documentation (for docu and deployment)
 ########################################################################
 
