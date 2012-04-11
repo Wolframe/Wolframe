@@ -86,12 +86,12 @@ bool print_( const char* tag, const void* obj, const struct_&, protocol::OutputF
 		if (itr->second.isAtomic() && !isContent && idx < descr->nof_attributes())
 		{
 			if (!printElem( protocol::OutputFilter::Attribute, itr->first, std::strlen(itr->first), out, ctx)) return false;
-			if (!itr->second.print()( 0, (char*)obj+itr->second.ofs(), out, ctx)) return false;
+			if (!itr->second.print()( 0, const_cast<char*>((const char *)obj+itr->second.ofs()), out, ctx)) return false;
 		}
 		else
 		{
 			isContent = true;
-			if (!itr->second.print()( itr->first, (char*)obj+itr->second.ofs(), out, ctx)) return false;
+			if (!itr->second.print()( itr->first, const_cast<char*>((const char *)obj+itr->second.ofs()), out, ctx)) return false;
 		}
 	}
 	if (tag && !printElem( protocol::OutputFilter::CloseTag, "", 0, out, ctx)) return false;
@@ -102,7 +102,7 @@ template <typename T>
 bool print_( const char* tag, const void* obj, const arithmetic_&, protocol::OutputFilter*& out, Context& ctx)
 {
 	if (tag && !printElem( protocol::OutputFilter::OpenTag, tag, std::strlen(tag), out, ctx)) return false;
-	std::string value( boost::lexical_cast<std::string>( *((T*)obj)));
+	std::string value( boost::lexical_cast<std::string>( *(const_cast<T*>((const T*)obj))));
 	if (!printElem( protocol::OutputFilter::Value, value.c_str(), value.size(), out, ctx)) return false;
 	if (tag && !printElem( protocol::OutputFilter::CloseTag, "", 0, out, ctx)) return false;
 	return true;
@@ -125,7 +125,7 @@ bool print_( const char* tag, const void* obj, const vector_&, protocol::OutputF
 		ctx.setError( 0, "non printable structure");
 		return false;
 	}
-	for (typename T::const_iterator itr=((T*)obj)->begin(); itr!=((T*)obj)->end(); itr++)
+	for (typename T::const_iterator itr=(const_cast<T*>((const T*)obj))->begin(); itr!=(const_cast<T*>((const T*)obj))->end(); itr++)
 	{
 		printElem( protocol::OutputFilter::OpenTag, tag, strlen(tag), out, ctx);
 		if (!printObject<typename T::value_type>( 0, *itr, out, ctx)) return false;
@@ -137,7 +137,7 @@ bool print_( const char* tag, const void* obj, const vector_&, protocol::OutputF
 template <typename T>
 static bool printObject( const char* tag, const T& obj, protocol::OutputFilter*& out, Context& ctx)
 {
-	return print_<T>( tag, (void*)&obj, getCategory(obj), out, ctx);
+	return print_<T>( tag, (const void*)&obj, getCategory(obj), out, ctx);
 }
 
 template <typename T>
@@ -145,7 +145,7 @@ struct IntrusivePrinter
 {
 	static bool print( const char* tag, const void* obj, protocol::OutputFilter*& out, Context& ctx)
 	{
-		if (!print_<T>( tag, obj, getCategory(*(T*)obj), out, ctx)) return false;
+		if (!print_<T>( tag, obj, getCategory(*const_cast<T*>((const T*)obj)), out, ctx)) return false;
 		ctx.append( out->charptr(), out->pos());
 		out->release();
 		return true;

@@ -154,7 +154,7 @@ const net::NetworkOperation Connection::nextOperation()
 					}
 					default:
 					{
-						if (m_cmdidx >= NofCommands && (m_cmdidx - NofCommands) < m_cmds.size())
+						if (m_cmdidx >= NofCommands && ((unsigned int)m_cmdidx - NofCommands) < m_cmds.size())
 						{
 							m_state = ParseArgs;
 							continue;

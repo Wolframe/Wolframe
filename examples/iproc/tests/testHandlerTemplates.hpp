@@ -82,7 +82,7 @@ int runTestIO( char* in, char* end, std::string& out, Connection& connection)
 		{
 			case NetworkOperation::READ:
 			{
-				char* data = const_cast<char*>((char*)netop.data());
+				char* data = const_cast<char*>((const char*)netop.data());
 				unsigned int size = netop.size();
 				unsigned int ii;
 				for (ii=0; ii<size && in<end; ii++,in++)
@@ -96,7 +96,7 @@ int runTestIO( char* in, char* end, std::string& out, Connection& connection)
 
 			case NetworkOperation::WRITE:
 			{
-				char* data = (char*)netop.data();
+				char* data = const_cast<char *>((const char *)netop.data());
 				std::size_t ii,size = netop.size();
 				for (ii=0; ii<size; ii++)
 				{
