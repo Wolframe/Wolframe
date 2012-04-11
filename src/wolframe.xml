@@ -176,9 +176,20 @@ Project Wolframe.
 
 		<authentication>
 			<allowAnonymous>yes</allowAnonymous>
-			<!-- <database>pgdb</database> -->
-			<database>sqlitedb</database>
-			<file>wolframe.auth</file>
+			<database>
+				<identifier>SQLite database authentication</identifier>
+				<database>sqlitedb</database>
+			</database>
+<!--
+			<database>
+				<identifier>PostgreSQL database authentication</identifier>
+				<database>pgdb</database>
+			</database>
+-->
+			<TextFile>
+				<identifier>Text file authentication</identifier>
+				<file>wolframe.auth</file>
+			</TextFile>
 		</authentication>
 
 		<Authorization>
