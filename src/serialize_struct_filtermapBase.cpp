@@ -53,7 +53,7 @@ bool FiltermapDescriptionBase::parse( const char* name, void* obj, protocol::Inp
 		}
 		in.setState( protocol::InputFilter::Open);
 		inp = in.copy();
-		inp->protocolInput( (void*)ctx.content().c_str(), ctx.content().size(), true);
+		inp->protocolInput( const_cast<void *>((const void*)(ctx.content().c_str())), ctx.content().size(), true);
 
 		const void* element;
 		std::size_t elementsize;

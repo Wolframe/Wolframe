@@ -920,7 +920,7 @@ public:
 		{
 			case TextwolfEncoding::Unknown:
 				setState( Error, "textwolf: cannot handle this encoding");
-				return false;
+				return NULL;
 			case TextwolfEncoding::IsoLatin:
 				rt = new OutputFilterImpl<tc::IsoLatin1>();
 				break;
