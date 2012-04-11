@@ -431,7 +431,7 @@ public:
 		{
 			m_valuestrbuf.clear();
 			m_valuestrbuf.append( (const char*)element, elementsize);
-			return (xmlChar*)m_valuestrbuf.c_str();
+			return const_cast<xmlChar*>( (const unsigned char *)m_valuestrbuf.c_str());
 		}
 
 		std::size_t printNextChunk( void* out, std::size_t outsize)
