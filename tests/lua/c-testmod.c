@@ -12,7 +12,6 @@
 #include "lauxlib.h"
 
 static int testmod_func( lua_State *l );
-static int testmod_initialize( lua_State *l );
 TESTMOD_API int luaopen_testmod( lua_State *l );
 
 static int testmod_func( lua_State *l )
