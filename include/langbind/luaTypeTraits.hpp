@@ -35,6 +35,7 @@ Project Wolframe.
 #define _Wolframe_LANGBIND_LUA_TYPE_TRAITS_HPP_INCLUDED
 #include <string>
 #include <stdexcept>
+#include <cstring>
 
 extern "C"
 {
