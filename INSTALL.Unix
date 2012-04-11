@@ -419,7 +419,7 @@ Archlinux
 
 Required packages: boost and boost-libs
 Optional packages: openssl, qt, pam, libsasl,
-                   sqlite3, postgresql-libs,
+                   sqlite, postgresql-libs,
                    libxml2, libxslt, libharu,
                    gmp
 

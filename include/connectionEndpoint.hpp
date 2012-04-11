@@ -62,6 +62,8 @@ public:
 	ConnectionEndpoint( const std::string& Host, unsigned short Port )
 		: m_host( Host ), m_port( Port )	{}
 
+	virtual ~ConnectionEndpoint( ) {}
+
 	const std::string& host() const			{ return m_host; }
 	unsigned short port() const			{ return m_port; }
 	virtual ConnectionType type() const = 0;
