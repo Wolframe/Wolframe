@@ -48,6 +48,9 @@ namespace config {
 template <typename T>
 static void parseElement( const char* name, T& value, const boost::property_tree::ptree& pt);
 
+template <typename T>
+static void parseElement1( const char* name, T& value, const boost::property_tree::ptree& pt);
+
 template <typename Element>
 struct ElementParser
 {
