@@ -119,9 +119,14 @@ Project Wolframe.
 
 		<authentication>
 			<allowAnonymous>yes</allowAnonymous>
-			<!-- <database>pgdb</database> -->
-			<database>#inserted by installer#</database>
-			<file>#inserted by installer#</file>
+			<database>
+				<identifier>database authentication</identifier>
+				<database>#inserted by installer#</database>
+			</database>
+			<TextFile>
+				<identifier>Text file authentication</identifier>
+				<file>#inserted by installer#</file>
+			</TextFile>
 		</authentication>
 		
 		<Authorization>

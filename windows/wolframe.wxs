@@ -242,7 +242,7 @@ Project Wolframe.
 								<util:XmlFile Id="AppendConfigModAuthDatabase" Action="createElement" ElementPath="/configuration/LoadModules"
 								              Name="module" Value="[INSTALLDIR]modules\mod_auth_database.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
-								<util:XmlFile Id="UpdateConfigModAuthDatabaseReference" Action="setValue" ElementPath="/configuration/AAAA/authentication/database"
+								<util:XmlFile Id="UpdateConfigModAuthDatabaseReference" Action="setValue" ElementPath="/configuration/AAAA/authentication/database/database"
 								              Value="[WOLFRAME_DATABASE_TYPE]"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							</Component>
@@ -252,7 +252,7 @@ Project Wolframe.
 								<util:XmlFile Id="AppendConfigModAuthTextfile" Action="createElement" ElementPath="/configuration/LoadModules"
 								              Name="module" Value="[INSTALLDIR]modules\mod_auth_textfile.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
-								<util:XmlFile Id="UpdateAuthTextfileLocation" Action="setValue" ElementPath="/configuration/AAAA/authentication/file"
+								<util:XmlFile Id="UpdateAuthTextfileLocation" Action="setValue" ElementPath="/configuration/AAAA/authentication/TextFile/file"
 								              Value="[INSTALLDIR]data\auth.txt"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							</Component>
