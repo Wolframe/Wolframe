@@ -6,7 +6,7 @@ SUBDIRS = libwolframe modules
 
 local_all:
 
-doc: doc-doxygen
+doc: doc-doxygen doc-htmlhelp
 
 doc-doxygen:
 	@cd $(TOPDIR) & "$(DOXYGEN)" docs\doxygen.conf
@@ -21,8 +21,9 @@ doc-htmlhelp:
 	@-copy "$(WIN_ICONV_DIR)\iconv.dll" . >> test.bat
 	@-copy "$(LIBXML2_DIR)\lib\libxml2.dll" .
 	@-copy "$(LIBXSLT_DIR)\lib\libxslt.dll" .
-	"$(XSLTPROC)" -p output\htmlhelp\WolfBook "$(XSLT_HTMLHELP_STYLESHEET)" Wolframe.xml
-	"$(HHC_LOCATION)" output\htmlhelp\htmlhelp.hhp
+	@-copy "$(LIBXSLT_DIR)\lib\libexslt.dll" .
+	@"$(XSLTPROC)" --xinclude --stringparam draft.mode yes -o output\htmlhelp\WolfBook.html "$(XSLT_HTMLHELP_STYLESHEET)" WolfBook.xml
+	@-"$(HHC_LOCATION)" output\htmlhelp\htmlhelp.hhp
 
 doxygen\html\index.chm: doxygen\html\index.hhp
 	@-"$(HHC_LOCATION)" $@
