@@ -3148,6 +3148,10 @@ endif
 
 ifeq ($(WITH_MPFR),1)
 
+ifneq ($(WITH_LIBGMP),1)
+$(error MPFR requires libgmp, so specify also WITH_LIBGMP=1)
+endif
+
 ifeq "$(PLATFORM)" "LINUX"
 
 ifeq "$(LINUX_DIST)" "arch"
