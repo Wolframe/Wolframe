@@ -25,6 +25,7 @@ WITH_EXAMPLES=1        build and test the examples
 WITH_LIBHPDF=1         build code for creating PDFs with LibHpdf
 WITH_LIBGMP=1          build support for big integers and reals (using GMP)
 WITH_MPFR=1            build support for big floating point numbers using MPFR)
+
 Avaliable optional features during testing only:
 
 DEBUG=1                build using debug compiler and linker flags
