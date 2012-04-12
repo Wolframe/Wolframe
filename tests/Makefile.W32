@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = modules AAAA
+SUBDIRS = modules AAAA bignum
 
 # all broken on windows due to working telnet
 #!IFDEF WITH_EXPECT
@@ -23,11 +23,6 @@ SUBDIRS = \
 !IFDEF WITH_LIBHPDF
 SUBDIRS = \
 	$(SUBDIRS) libhpdf
-!ENDIF
-
-!IFDEF WITH_LIBGMP
-SUBDIRS = \
-	$(SUBDIRS) bignum
 !ENDIF
 
 # MSXML

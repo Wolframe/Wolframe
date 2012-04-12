@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = modules AAAA
+SUBDIRS = modules AAAA bignum
 
 ifeq ($(WITH_LUA),1)
 SUBDIRS += lua
@@ -22,10 +22,6 @@ endif
 
 ifeq ($(WITH_LIBHPDF),1)
 SUBDIRS += libhpdf
-endif
-
-ifeq ($(WITH_LIBGMP),1)
-SUBDIRS += bignum
 endif
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
