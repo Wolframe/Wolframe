@@ -573,6 +573,7 @@ Optional packages to install from CSW:
   CSWexpect (5.41.1)
   CSWsasl-dev and CSWsasl (2.1.25)
   CSWlibgmp-dev (5.0.2)
+  CSWlibmpfr-dev (3.1.0)
 Optional packages from Sun installation disk:
   SUNWlxml
   SUNWlxsl
