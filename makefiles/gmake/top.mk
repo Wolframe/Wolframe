@@ -180,12 +180,29 @@ ifeq ($(WITH_LIBGMP),1)
 	@echo "LIBGMP_LIBS: $(LIBGMP_LIBS)"
 	@echo "LIBGMP_CXX_LIBS: $(LIBGMP_CXX_LIBS)"
 endif
-ifeq ($(WITH_MPFR),1)
+ifeq ($(WITH_LIBHPDF),1)
+ifeq ($(WITH_SYSTEM_LIBHPDF),1)
+	@echo
+	@echo "LIBHPDF_DIR: $(LIBHPDF_DIR)"
+	@echo "LIBHPDF_INCLUDE_DIRS: $(LIBHPDF_INCLUDE_DIRS)"
+	@echo "LIBHPDF_LIB_DIRS: $(LIBHPDF_LIB_DIRS)"
+	@echo "LIBHPDF_LIBS: $(LIBHPDF_LIBS)"
+endif
+ifeq ($(WITH_LOCAL_LIBHPDF),1)
+	@echo
+	@echo "using local libhpdf.."
+endif
+ifeq ($(WITH_SYSTEM_MPFR),1)
 	@echo
 	@echo "MPFR_DIR: $(MPFR_DIR)"
 	@echo "MPFR_INCLUDE_DIRS: $(MPFR_INCLUDE_DIRS)"
 	@echo "MPFR_LIB_DIRS: $(MPFR_LIB_DIRS)"
 	@echo "MPFR_LIBS: $(MPFR_LIBS)"
+endif
+ifeq ($(WITH_LOCAL_MPFR),1)
+	@echo
+	@echo "using local MPFR.."
+endif
 endif
 	@echo
 	@echo "Additional build options:"

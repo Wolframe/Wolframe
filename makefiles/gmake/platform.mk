@@ -2503,7 +2503,7 @@ endif
 # libpng
 ########
 
-ifeq ($(WITH_LIBHPDF),1)
+ifeq ($(WITH_SYSTEM_LIBHPDF),1)
 
 ifeq "$(PLATFORM)" "LINUX"
 
@@ -3183,7 +3183,18 @@ endif
 # mpfr
 ######
 
-ifeq ($(WITH_MPFR),1)
+ifeq ($(WITH_SYSTEM_MPFR),1)
+WITH_MPFR = 1
+ifeq ($(WITH_LOCAL_MPFR),1)
+$(error Specify one of WITH_SYSTEM_MPFR or WITH_LOCAL_MPFR, not both!)
+endif
+else
+ifeq ($(WITH_LOCAL_MPFR),1)
+WITH_MPFR = 1
+endif
+endif
+
+ifeq ($(WITH_SYSTEM_MPFR),1)
 
 ifneq ($(WITH_LIBGMP),1)
 $(error MPFR requires libgmp, so specify also WITH_LIBGMP=1)
@@ -3398,6 +3409,15 @@ MPFR_LIBS ?= -lmpfr
 endif
 endif
 
+endif
+
+ifeq ($(WITH_LOCAL_MPFR),1)
+MPFR_DIR = $(TOPDIR)/mpfr
+MPFR_INCLUDE_DIR = $(MPFR_DIR)/src
+MPFR_INCLUDE_DIRS = -I$(MPFR_INCLUDE_DIR)
+MPFR_LIB_DIR = $(MPFR_DIR)/src
+MPFR_LIB_DIRS =
+MPFR_LIBS = $(MPFR_DIR)/src/libmpfr.a
 endif
 
 # Expect (for testing)

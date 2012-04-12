@@ -31,7 +31,8 @@ WITH_LIBXSLT=1         build code using libxslt
 WITH_SYSTEM_LIBHPDF=1  build code for creating PDFs with LibHpdf (from system)
 WITH_LOCAL_LIBHPDF=1   force building of local version of LibHpdf
 WITH_LIBGMP=1          build support for big integers and reals (using GMP)
-WITH_MPFR=1            build support for big floats (using MPFR)
+WITH_SYSTEM_MPFR=1     build support for big floats (using MPFR from system)
+WITH_LOCAL_MPFS=1      force building of local verison of MPFR
 
 Some more obscure options:
 
@@ -46,7 +47,8 @@ WITH_EXPECT=1          use Expect/Tcl for system testing
 Example:
 make WITH_SSL=1 WITH_EXPECT=1 WITH_QT=1 WITH_PAM=1 WITH_SASL=1 \
      WITH_SYSTEM_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 \
-     WITH_LIBXSLT=1 WITH_LOCAL_LIBHPDF=1 WITH_LIBGMP=1 WITH_MPFR=1
+     WITH_LIBXSLT=1 WITH_LOCAL_LIBHPDF=1 WITH_LIBGMP=1 \
+     WITH_SYSTEM_MPFR=1
 
 To build the documentation call:
 

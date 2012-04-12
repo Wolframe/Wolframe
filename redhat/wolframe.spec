@@ -107,11 +107,10 @@
 
 # no MPFR on RHEL 5 (TODO: build our own version later)
 
+#define build_mpfr 0
 %if %{with_mpfr}
-%if %{rhel}
-%if %{rhel4} || %{rhel5}
-%define with_mpfr 0
-%endif
+%if %{rhel} || %{centos4} || %{centos5}
+%define build_mpfr 1
 %endif
 %endif
 
@@ -229,17 +228,19 @@ BuildRequires: gmp-devel
 Requires: gmp
 %endif
 %if %{with_mpfr}
+%if !%{build_mpfr}
 BuildRequires: mpfr-devel
 Requires: mpfr
+%endif
 %endif
 BuildRequires: gcc-c++
 BuildRequires: doxygen
 
 # libhpdf is never available in a decent version,
 # build local one
-%define with_local_libhpdf      0
+%define with_local_libhpdf 0
 %if %{with_libhpdf}
-%define with_local_libhpdf	1
+%define with_local_libhpdf 1
 %endif
 
 # postgres database module
@@ -415,7 +416,7 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make help \
 %if %{build_sqlite}
 	WITH_LOCAL_SQLITE3=%{build_sqlite} \
 %else
-	WITH_SYSTEM_SQLITE3=1 \
+	WITH_SYSTEM_SQLITE3=%{with_sqlite} \
 %endif
 	WITH_SSL=%{with_ssl} \
 	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
@@ -424,7 +425,11 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make help \
 	WITH_LIBXSLT=%{with_libxslt} \
 	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
 	WITH_LIBGMP=%{with_libgmp} \
-	WITH_MPFR=%{with_mpfr} \
+%if %{build_mpfr}
+	WITH_LOCAL_MPFR=%{build_mpfr} \
+%else
+	WITH_SYSTEM_MPFR=%{with_mpfr} \
+%endif
 	WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=/etc libdir=%{_libdir}
 
@@ -445,7 +450,11 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make config \
 	WITH_LIBXSLT=%{with_libxslt} \
 	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
 	WITH_LIBGMP=%{with_libgmp} \
-	WITH_MPFR=%{with_mpfr} \
+%if %{build_mpfr}
+	WITH_LOCAL_MPFR=%{build_mpfr} \
+%else
+	WITH_SYSTEM_MPFR=%{with_mpfr} \
+%endif
 	WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=/etc libdir=%{_libdir}
 
@@ -467,7 +476,11 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make all \
 	WITH_LIBXSLT=%{with_libxslt} \
 	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
 	WITH_LIBGMP=%{with_libgmp} \
-	WITH_MPFR=%{with_mpfr} \
+%if %{build_mpfr}
+	WITH_LOCAL_MPFR=%{build_mpfr} \
+%else
+	WITH_SYSTEM_MPFR=%{with_mpfr} \
+%endif
 	WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=/etc libdir=%{_libdir}
 
@@ -496,7 +509,11 @@ make DESTDIR=$RPM_BUILD_ROOT install \
 	WITH_LIBXSLT=%{with_libxslt} \
 	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
 	WITH_LIBGMP=%{with_libgmp} \
-	WITH_MPFR=%{with_mpfr} \
+%if %{build_mpfr}
+	WITH_LOCAL_MPFR=%{build_mpfr} \
+%else
+	WITH_SYSTEM_MPFR=%{with_mpfr} \
+%endif
 	WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=/etc libdir=%{_libdir}
 

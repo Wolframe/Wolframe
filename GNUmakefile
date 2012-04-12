@@ -4,10 +4,8 @@ TOPDIR = .
 
 SUBDIRS = src gtest tests clients include docs
 
-ifeq ($(WITH_LIBHPDF),1)
 ifeq ($(WITH_LOCAL_LIBHPDF),1)
 SUBDIRS := libhpdf $(SUBDIRS)
-endif
 endif
 
 ifeq ($(WITH_LOCAL_SQLITE3),1)
@@ -16,6 +14,10 @@ endif
 
 ifeq ($(WITH_LUA),1)
 SUBDIRS := lua $(SUBDIRS)
+endif
+
+ifeq ($(WITH_LOCAL_MPFR),1)
+SUBDIRS := mpfr $(SUBDIRS)
 endif
 
 ifeq ($(WITH_EXAMPLES),1)
