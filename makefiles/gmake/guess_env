@@ -58,7 +58,7 @@ else
 						LINUX_REV=`cat /etc/debian_version | cut -d . -f 1`
 					elif test -f /etc/slackware-version; then
 						LINUX_DIST='slackware'
-						LINUX_REV=`cat /etc/slackware-version | cut -d ' ' -f 2 | cut -d . -f 1`
+						LINUX_REV=`cat /etc/slackware-version | cut -d ' ' -f 2 | cut -d . -f 1,2`
 					elif test -f /etc/redhat-release; then
 						LINUX_DIST='redhat'
 						LINUX_REV=`cat /etc/redhat-release | sed s/.*release\ // | sed s/\ .*// | cut -f 1 -d .`

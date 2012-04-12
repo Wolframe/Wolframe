@@ -355,15 +355,24 @@ BOOST_LIBRARY_TAG ?=
 endif
 
 ifeq "$(LINUX_DIST)" "slackware"
+
 ifdef BOOST_DIR
 BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
 BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
 endif
 ifndef BOOST_DIR
+ifeq "$(LINUX_REV)" "13.37"
+BOOST_DIR ?= /usr
+BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
+BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
+BOOST_LIBRARY_TAG ?=
+else
 BOOST_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 BOOST_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 BOOST_LIBRARY_TAG ?= NOT SUPPLIED ON THIS PLATFORM
 endif
+endif
+
 endif
 
 # Ubuntu
@@ -705,7 +714,7 @@ QT_LDFLAGS =
 endif
 
 ifeq "$(LINUX_DIST)" "slackware"
-QT_DIR ?= /usr
+QT_DIR ?= /usr/lib/qt
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
 QT_MOC ?= $(QT_DIR)/bin/moc
@@ -2507,6 +2516,15 @@ LIBPNG_LIB_DIRS = -L$(LIBPNG_LIB_DIR)
 LIBPNG_LIBS ?= -lpng
 endif
 
+ifeq "$(LINUX_DIST)" "slackware"
+LIBPNG_DIR ?= /usr
+LIBPNG_INCLUDE_DIR ?= $(LIBPNG_DIR)/include
+LIBPNG_INCLUDE_DIRS = -I$(LIBPNG_INCLUDE_DIR)
+LIBPNG_LIB_DIR ?= $(LIBPNG_DIR)/lib
+LIBPNG_LIB_DIRS = -L$(LIBPNG_LIB_DIR)
+LIBPNG_LIBS ?= -lpng
+endif
+
 # Ubuntu
 
 ifeq "$(LINUX_DIST)" "ubuntu"
@@ -2720,6 +2738,15 @@ LIBZ_LIB_DIRS = -L$(LIBZ_LIB_DIR)
 LIBZ_LIBS ?= -lz
 endif
 
+ifeq "$(LINUX_DIST)" "slackware"
+LIBZ_DIR ?= /usr
+LIBZ_INCLUDE_DIR ?= $(LIBZ_DIR)/include
+LIBZ_INCLUDE_DIRS = -I$(LIBZ_INCLUDE_DIR)
+LIBZ_LIB_DIR ?= $(LIBZ_DIR)/lib
+LIBZ_LIB_DIRS = -L$(LIBZ_LIB_DIR)
+LIBZ_LIBS ?= -lz
+endif
+
 # Ubuntu
 
 ifeq "$(LINUX_DIST)" "ubuntu"
@@ -2925,6 +2952,16 @@ ifeq ($(WITH_LIBGMP),1)
 ifeq "$(PLATFORM)" "LINUX"
 
 ifeq "$(LINUX_DIST)" "arch"
+LIBGMP_DIR ?= /usr
+LIBGMP_INCLUDE_DIR ?= $(LIBGMP_DIR)/include
+LIBGMP_INCLUDE_DIRS = -I$(LIBGMP_INCLUDE_DIR)
+LIBGMP_LIB_DIR ?= $(LIBGMP_DIR)/lib
+LIBGMP_LIB_DIRS = -L$(LIBGMP_LIB_DIR)
+LIBGMP_LIBS ?= -lgmp
+LIBGMP_CXX_LIBS ?= -lgmpxx
+endif
+
+ifeq "$(LINUX_DIST)" "slackware"
 LIBGMP_DIR ?= /usr
 LIBGMP_INCLUDE_DIR ?= $(LIBGMP_DIR)/include
 LIBGMP_INCLUDE_DIRS = -I$(LIBGMP_INCLUDE_DIR)
@@ -3155,6 +3192,15 @@ endif
 ifeq "$(PLATFORM)" "LINUX"
 
 ifeq "$(LINUX_DIST)" "arch"
+MPFR_DIR ?= /usr
+MPFR_INCLUDE_DIR ?= $(MPFR_DIR)/include
+MPFR_INCLUDE_DIRS = -I$(MPFR_INCLUDE_DIR)
+MPFR_LIB_DIR ?= $(MPFR_DIR)/lib
+MPFR_LIB_DIRS = -L$(MPFR_LIB_DIR)
+MPFR_LIBS ?= -lmpfr
+endif
+
+ifeq "$(LINUX_DIST)" "slackware"
 MPFR_DIR ?= /usr
 MPFR_INCLUDE_DIR ?= $(MPFR_DIR)/include
 MPFR_INCLUDE_DIRS = -I$(MPFR_INCLUDE_DIR)
