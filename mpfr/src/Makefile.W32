@@ -4,7 +4,7 @@ SUBDIRS =
 
 INCLUDE_CFLAGS = \
 	/D_WIN32_WINNT=0x504 \
-	/wd4146 /wd4244
+	/wd4146 /wd4244 /wd4756
 
 INCLUDE_DIRS = \
 	/I. \
