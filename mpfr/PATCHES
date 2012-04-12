@@ -1,0 +1,8 @@
+__gmp_const
+large-prec
+logging-varfmt
+logging-freeze
+gmp41compat
+vasprintf
+lib-search-path
+mpfr_unlikely

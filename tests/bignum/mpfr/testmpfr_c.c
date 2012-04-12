@@ -5,6 +5,8 @@
 #include <gmp.h>
 #include <mpfr.h>
 
+#ifndef _WIN32
+
 static void reverse( char *s ) {
 	int i, j;
 	char c;   
@@ -47,6 +49,8 @@ static char *itoa( int value, char *string, int radix ) {
 
         return string;
 }
+
+#endif
 
 static char *mpfr2str( mpfr_t a, char *s, size_t len )
 {
