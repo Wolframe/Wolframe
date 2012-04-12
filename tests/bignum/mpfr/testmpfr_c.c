@@ -54,10 +54,7 @@ static char *mpfr2str( mpfr_t a, char *s, size_t len )
 	char *s1, *s2;
 	char *p1;
 	char *d;
-	
-	mpfr_out_str( stdout, 10, 0, a, GMP_RNDD );
-	puts( "" );
-	
+		
 	if( mpfr_nan_p( a ) ) {
 		if( len < 4 ) return NULL;
 		strcpy( s, "NaN" );
