@@ -3143,6 +3143,213 @@ endif
 
 endif
 
+# mpfr
+######
+
+ifeq ($(WITH_MPFR),1)
+
+ifeq "$(PLATFORM)" "LINUX"
+
+ifeq "$(LINUX_DIST)" "arch"
+MPFR_DIR ?= /usr
+MPFR_INCLUDE_DIR ?= $(MPFR_DIR)/include
+MPFR_INCLUDE_DIRS = -I$(MPFR_INCLUDE_DIR)
+MPFR_LIB_DIR ?= $(MPFR_DIR)/lib
+MPFR_LIB_DIRS = -L$(MPFR_LIB_DIR)
+MPFR_LIBS ?= -lmpfr
+endif
+
+# Ubuntu
+
+ifeq "$(LINUX_DIST)" "ubuntu"
+
+ifeq "$(LINUX_REV)" "12.04"
+MPFR_DIR ?= /usr
+MPFR_INCLUDE_DIR ?= $(MPFR_DIR)/include
+MPFR_INCLUDE_DIRS = -I$(MPFR_INCLUDE_DIR)
+MPFR_LIB_DIR ?= $(MPFR_DIR)/lib
+MPFR_LIB_DIRS = -L$(MPFR_LIB_DIR)
+MPFR_LIBS ?= -lmpfr
+endif
+
+ifeq "$(LINUX_REV)" "11.10"
+MPFR_DIR ?= /usr
+MPFR_INCLUDE_DIR ?= $(MPFR_DIR)/include
+MPFR_INCLUDE_DIRS = -I$(MPFR_INCLUDE_DIR)
+MPFR_LIB_DIR ?= $(MPFR_DIR)/lib
+MPFR_LIB_DIRS = -L$(MPFR_LIB_DIR)
+MPFR_LIBS ?= -lmpfr
+endif
+
+ifeq "$(LINUX_REV)" "11.04"
+MPFR_DIR ?= /usr
+MPFR_INCLUDE_DIR ?= $(MPFR_DIR)/include
+MPFR_INCLUDE_DIRS = -I$(MPFR_INCLUDE_DIR)
+MPFR_LIB_DIR ?= $(MPFR_DIR)/lib
+MPFR_LIB_DIRS = -L$(MPFR_LIB_DIR)
+MPFR_LIBS ?= -lmpfr
+endif
+
+ifeq "$(LINUX_REV)" "10.10"
+MPFR_DIR ?= /usr
+MPFR_INCLUDE_DIR ?= $(MPFR_DIR)/include
+MPFR_INCLUDE_DIRS = -I$(MPFR_INCLUDE_DIR)
+MPFR_LIB_DIR ?= $(MPFR_DIR)/lib
+MPFR_LIB_DIRS = -L$(MPFR_LIB_DIR)
+MPFR_LIBS ?= -lmpfr
+endif
+
+ifeq "$(LINUX_REV)" "10.04"
+MPFR_DIR ?= /usr
+MPFR_INCLUDE_DIR ?= $(MPFR_DIR)/include
+MPFR_INCLUDE_DIRS = -I$(MPFR_INCLUDE_DIR)
+MPFR_LIB_DIR ?= $(MPFR_DIR)/lib
+MPFR_LIB_DIRS = -L$(MPFR_LIB_DIR)
+MPFR_LIBS ?= -lmpfr
+endif
+
+endif
+
+ifeq "$(LINUX_DIST)" "redhat"
+
+# RHEL4
+ifeq "$(LINUX_REV)" "4"
+MPFR_DIR ?= /usr
+MPFR_INCLUDE_DIR ?= $(MPFR_DIR)/include
+MPFR_INCLUDE_DIRS = -I$(MPFR_INCLUDE_DIR)
+MPFR_LIB_DIR ?= $(MPFR_DIR)/lib
+MPFR_LIB_DIRS = -L$(MPFR_LIB_DIR)
+MPFR_LIBS ?= -lmpfr
+endif
+
+# RHEL5
+ifeq "$(LINUX_REV)" "5"
+MPFR_DIR ?= /usr
+MPFR_INCLUDE_DIR ?= $(MPFR_DIR)/include
+MPFR_INCLUDE_DIRS = -I$(MPFR_INCLUDE_DIR)
+MPFR_LIB_DIR ?= $(MPFR_DIR)/lib
+MPFR_LIB_DIRS = -L$(MPFR_LIB_DIR)
+MPFR_LIBS ?= -lmpfr
+endif
+
+# RHEL6
+ifeq "$(LINUX_REV)" "6"
+MPFR_DIR ?= /usr
+MPFR_INCLUDE_DIR ?= $(MPFR_DIR)/include
+MPFR_INCLUDE_DIRS = -I$(MPFR_INCLUDE_DIR)
+MPFR_LIB_DIR ?= $(MPFR_DIR)/lib
+MPFR_LIB_DIRS = -L$(MPFR_LIB_DIR)
+MPFR_LIBS ?= -lmpfr
+endif
+
+# Fedora 14
+ifeq "$(LINUX_REV)" "14"
+MPFR_DIR ?= /usr
+MPFR_INCLUDE_DIR ?= $(MPFR_DIR)/include
+MPFR_INCLUDE_DIRS = -I$(MPFR_INCLUDE_DIR)
+MPFR_LIB_DIR ?= $(MPFR_DIR)/lib
+MPFR_LIB_DIRS = -L$(MPFR_LIB_DIR)
+MPFR_LIBS ?= -lmpfr
+endif
+
+# Fedora 15
+ifeq "$(LINUX_REV)" "15"
+MPFR_DIR ?= /usr
+MPFR_INCLUDE_DIR ?= $(MPFR_DIR)/include
+MPFR_INCLUDE_DIRS = -I$(MPFR_INCLUDE_DIR)
+MPFR_LIB_DIR ?= $(MPFR_DIR)/lib
+MPFR_LIB_DIRS = -L$(MPFR_LIB_DIR)
+MPFR_LIBS ?= -lmpfr
+endif
+
+# Fedora 16
+ifeq "$(LINUX_REV)" "16"
+MPFR_DIR ?= /usr
+MPFR_INCLUDE_DIR ?= $(MPFR_DIR)/include
+MPFR_INCLUDE_DIRS = -I$(MPFR_INCLUDE_DIR)
+MPFR_LIB_DIR ?= $(MPFR_DIR)/lib
+MPFR_LIB_DIRS = -L$(MPFR_LIB_DIR)
+MPFR_LIBS ?= -lmpfr
+endif
+
+endif
+
+ifeq "$(LINUX_DIST)" "sles"
+MPFR_DIR ?= /usr
+MPFR_INCLUDE_DIR ?= $(MPFR_DIR)/include
+MPFR_INCLUDE_DIRS = -I$(MPFR_INCLUDE_DIR)
+MPFR_LIB_DIR ?= $(MPFR_DIR)/lib
+MPFR_LIB_DIRS = -L$(MPFR_LIB_DIR)
+MPFR_LIBS ?= -lmpfr
+endif
+
+ifeq "$(LINUX_DIST)" "suse"
+MPFR_DIR ?= /usr
+MPFR_INCLUDE_DIR ?= $(MPFR_DIR)/include
+MPFR_INCLUDE_DIRS = -I$(MPFR_INCLUDE_DIR)
+MPFR_LIB_DIR ?= $(MPFR_DIR)/lib
+MPFR_LIB_DIRS = -L$(MPFR_LIB_DIR)
+MPFR_LIBS ?= -lmpfr
+endif
+
+endif
+
+ifeq "$(PLATFORM)" "SUNOS"
+ifeq "$(OS_MAJOR_VERSION)" "5"
+ifeq "$(OS_MINOR_VERSION)" "10"
+MPFR_DIR ?= /opt/csw
+MPFR_INCLUDE_DIR ?= $(MPFR_DIR)/include
+MPFR_INCLUDE_DIRS = -I$(MPFR_INCLUDE_DIR)
+MPFR_LIB_DIR ?= $(MPFR_DIR)/lib
+MPFR_LIB_DIRS = -L$(MPFR_LIB_DIR)
+MPFR_LIBS ?= -lmpfr
+endif
+endif
+endif
+
+ifeq "$(PLATFORM)" "FREEBSD"
+ifeq "$(OS_MAJOR_VERSION)" "8"
+MPFR_DIR ?= /usr/local
+MPFR_INCLUDE_DIR ?= $(MPFR_DIR)/include
+MPFR_INCLUDE_DIRS = -I$(MPFR_INCLUDE_DIR)
+MPFR_LIB_DIR ?= $(MPFR_DIR)/lib
+MPFR_LIB_DIRS = -L$(MPFR_LIB_DIR)
+MPFR_LIBS ?= -lmpfr
+endif
+ifeq "$(OS_MAJOR_VERSION)" "9"
+MPFR_DIR ?= /usr/local
+MPFR_INCLUDE_DIR ?= $(MPFR_DIR)/include
+MPFR_INCLUDE_DIRS = -I$(MPFR_INCLUDE_DIR)
+MPFR_LIB_DIR ?= $(MPFR_DIR)/lib
+MPFR_LIB_DIRS = -L$(MPFR_LIB_DIR)
+MPFR_LIBS ?= -lmpfr
+endif
+endif
+
+ifeq "$(PLATFORM)" "OPENBSD"
+ifeq "$(OS_MAJOR_VERSION)" "5"
+MPFR_DIR ?= /usr/local
+MPFR_INCLUDE_DIR ?= $(MPFR_DIR)/include
+MPFR_INCLUDE_DIRS = -I$(MPFR_INCLUDE_DIR)
+MPFR_LIB_DIR ?= $(MPFR_DIR)/lib
+MPFR_LIB_DIRS = -L$(MPFR_LIB_DIR)
+MPFR_LIBS ?= -lmpfr
+endif
+endif
+
+ifeq "$(PLATFORM)" "NETBSD"
+ifeq "$(OS_MAJOR_VERSION)" "5"
+MPFR_DIR ?= /usr/pkg
+MPFR_INCLUDE_DIR ?= $(MPFR_DIR)/include
+MPFR_INCLUDE_DIRS = -I$(MPFR_INCLUDE_DIR)
+MPFR_LIB_DIR ?= $(MPFR_DIR)/lib
+MPFR_LIB_DIRS = -L$(MPFR_LIB_DIR)
+MPFR_LIBS ?= -lmpfr
+endif
+endif
+
+endif
+
 # Expect (for testing)
 ######################
 

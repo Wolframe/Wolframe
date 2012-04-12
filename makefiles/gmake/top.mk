@@ -180,6 +180,13 @@ ifeq ($(WITH_LIBGMP),1)
 	@echo "LIBGMP_LIBS: $(LIBGMP_LIBS)"
 	@echo "LIBGMP_CXX_LIBS: $(LIBGMP_CXX_LIBS)"
 endif
+ifeq ($(WITH_MPFR),1)
+	@echo
+	@echo "MPFR_DIR: $(MPFR_DIR)"
+	@echo "MPFR_INCLUDE_DIRS: $(MPFR_INCLUDE_DIRS)"
+	@echo "MPFR_LIB_DIRS: $(MPFR_LIB_DIRS)"
+	@echo "MPFR_LIBS: $(MPFR_LIBS)"
+endif
 	@echo
 	@echo "Additional build options:"
 	@echo
