@@ -14,16 +14,14 @@ INCLUDE_CXXFLAGS = \
 
 INCLUDE_DIRS = \
 	/I. /I$(TOPDIR)\libgmp \
-	/I$(TOPDIR)\mpfr
+	/I$(TOPDIR)\mpfr\src
 
 INCLUDE_LDFLAGS =
 
 INCLUDE_LIBS = \
-	$(TOPDIR)\mpfr\mpfr.lib \
-	libgmp\mpz\mpz.lib \
+	$(TOPDIR)\mpfr\src\mpfr.lib \
 	$(TOPDIR)\libgmp\mpn\mpn.lib \
-	$(TOPDIR)\libgmp\gmpcommon.lib \
-	$(TOPDIR)\libgmp\printf\printf.lib \
+	$(TOPDIR)\libgmp\gmpcommon.lib
 
 TEST_CPP_BINS = \
 	testmpfr_c.exe
