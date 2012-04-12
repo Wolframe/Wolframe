@@ -72,7 +72,8 @@ Prerequisites
   WITH_LOCAL_LIBHPDF=1 to use the supplied version in
   the 'libhpdf' subdirectory. In this case also 
   'zlib' and 'libpng' development libraries are needed
-- optionally (WITH_LIBGMP), for high-precission calculations
+- optionally (WITH_LIBGMP), for bigint support
+- optionally (WITH_MPFR): for big floating point support
 
 Configuration of the build
 --------------------------

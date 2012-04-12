@@ -91,6 +91,7 @@
 %define with_libxslt	1
 %define with_libhpdf	1
 %define with_libgmp	1
+%define with_mpfr	1
 %define with_examples	1
 
 # Qt is far too old on some platforms, we also don't want to build a local
@@ -102,6 +103,16 @@
 %endif
 %if %{fedora} || %{suse} || %{sles}
 %define with_qt		1
+%endif
+
+# no MPFR on RHEL 5 (TODO: build our own version later)
+
+%if %{with_mpfr}
+%if %{rhel}
+%if %{rhel4} || %{rhel5}
+%define with_mpfr 0
+%endif
+%endif
 %endif
 
 # Boost has sometimes a different layout in the shared libraries, don't
@@ -215,6 +226,11 @@ BuildRequires: zlib-devel
 %endif
 %if %{with_libgmp}
 BuildRequires: gmp-devel
+Requires: gmp
+%endif
+%if %{with_mpfr}
+BuildRequires: mpfr-devel
+Requires: mpfr
 %endif
 BuildRequires: gcc-c++
 BuildRequires: doxygen
@@ -408,6 +424,7 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make help \
 	WITH_LIBXSLT=%{with_libxslt} \
 	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
 	WITH_LIBGMP=%{with_libgmp} \
+	WITH_MPFR=%{with_mpfr} \
 	WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=/etc libdir=%{_libdir}
 
@@ -428,6 +445,7 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make config \
 	WITH_LIBXSLT=%{with_libxslt} \
 	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
 	WITH_LIBGMP=%{with_libgmp} \
+	WITH_MPFR=%{with_mpfr} \
 	WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=/etc libdir=%{_libdir}
 
@@ -449,6 +467,7 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make all \
 	WITH_LIBXSLT=%{with_libxslt} \
 	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
 	WITH_LIBGMP=%{with_libgmp} \
+	WITH_MPFR=%{with_mpfr} \
 	WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=/etc libdir=%{_libdir}
 
@@ -477,6 +496,7 @@ make DESTDIR=$RPM_BUILD_ROOT install \
 	WITH_LIBXSLT=%{with_libxslt} \
 	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
 	WITH_LIBGMP=%{with_libgmp} \
+	WITH_MPFR=%{with_mpfr} \
 	WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=/etc libdir=%{_libdir}
 
