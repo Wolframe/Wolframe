@@ -109,8 +109,13 @@
 
 #define build_mpfr 0
 %if %{with_mpfr}
-%if %{rhel} || %{centos5}
+%if %{rhel}
 %define build_mpfr 1
+%endif
+%if %{centos}
+%if %{centos5}
+%define build_mpfr 1
+%endif
 %endif
 %endif
 
