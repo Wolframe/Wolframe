@@ -18,6 +18,16 @@
 		<title>Storing data</title>
 		<para><code>Wolframe</code> is 3-tier.
 		</para>
+		<sect2>
+			<title>Using a PostgreSQL database</title>
+			<para><code>Wolframe</code> is 3-tier.
+			</para>
+		</sect2>
+		<sect2>
+			<title>Using a SQLite database</title>
+			<para><code>Wolframe</code> is 3-tier.
+			</para>
+		</sect2>
 	</sect1>
 
 	<sect1>

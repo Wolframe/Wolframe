@@ -12,11 +12,11 @@
 		<title>System Requirements</title>
 		<para></para>
 		<sect2>
-			<title>System V systems</title>
+			<title>Linux</title>
 			<para></para>
 		</sect2>
 		<sect2>
-			<title>BSD systems</title>
+			<title>FreeBSD, NetBSD and OpenBSD</title>
 			<para></para>
 		</sect2>
 		<sect2>
