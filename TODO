@@ -6,30 +6,6 @@ MBa:
 
 ABa:
 
-- wolfcli
-  - netcat with authentication and SSL
-- authentication
-  - redo interface (now in Attic)
-  - then plugins for
-    - LDAP
-    - AD/Windows Kerberos
-    - SASL
-- makefiles
-  - wolframed is build over and over again. mix of real and phony
-    target because of parallel builds and dependencies. don't know
-    how to solve it
-- Logger:
-  - get better interface in logger.hpp (inheriting basic::ostream
-    instead of templating? or boost streams or boost:log)
-- FreeBSD
-  - OpenPAM instead of Linux-PAM
-- packaging
-  - OSC
-    - Debian release (squeeze/sid) into deb package name
-    - OSC revision and build number in deb package name
-  - Windows
-    - read XML properties during change/repair
-    - custom actions need C merge modules
 
 PF:
 
