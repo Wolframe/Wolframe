@@ -39,6 +39,7 @@
 #include <map>
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
+#include "miscUtils.hpp"
 
 using namespace _Wolframe;
 using namespace langbind;
