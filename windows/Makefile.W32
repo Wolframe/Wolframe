@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = extxmlprop
+SUBDIRS =
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
