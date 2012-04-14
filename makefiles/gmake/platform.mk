@@ -2576,6 +2576,30 @@ endif
 
 endif
 
+# Debian
+
+ifeq "$(LINUX_DIST)" "debian"
+
+ifeq "$(LINUX_REV)" "5"
+LIBPNG_DIR ?= /usr
+LIBPNG_INCLUDE_DIR ?= $(LIBPNG_DIR)/include
+LIBPNG_INCLUDE_DIRS = -I$(LIBPNG_INCLUDE_DIR)
+LIBPNG_LIB_DIR ?= $(LIBPNG_DIR)/lib
+LIBPNG_LIB_DIRS = -L$(LIBPNG_LIB_DIR)
+LIBPNG_LIBS ?= -lpng
+endif
+
+ifeq "$(LINUX_REV)" "6"
+LIBPNG_DIR ?= /usr
+LIBPNG_INCLUDE_DIR ?= $(LIBPNG_DIR)/include
+LIBPNG_INCLUDE_DIRS = -I$(LIBPNG_INCLUDE_DIR)
+LIBPNG_LIB_DIR ?= $(LIBPNG_DIR)/lib
+LIBPNG_LIB_DIRS = -L$(LIBPNG_LIB_DIR)
+LIBPNG_LIBS ?= -lpng
+endif
+
+endif
+
 ifeq "$(LINUX_DIST)" "redhat"
 
 # RHEL4
@@ -2788,6 +2812,30 @@ LIBZ_LIBS ?= -lz
 endif
 
 ifeq "$(LINUX_REV)" "10.04"
+LIBZ_DIR ?= /usr
+LIBZ_INCLUDE_DIR ?= $(LIBZ_DIR)/include
+LIBZ_INCLUDE_DIRS = -I$(LIBZ_INCLUDE_DIR)
+LIBZ_LIB_DIR ?= $(LIBZ_DIR)/lib
+LIBZ_LIB_DIRS = -L$(LIBZ_LIB_DIR)
+LIBZ_LIBS ?= -lz
+endif
+
+endif
+
+# Debian
+
+ifeq "$(LINUX_DIST)" "debian"
+
+ifeq "$(LINUX_REV)" "5"
+LIBZ_DIR ?= /usr
+LIBZ_INCLUDE_DIR ?= $(LIBZ_DIR)/include
+LIBZ_INCLUDE_DIRS = -I$(LIBZ_INCLUDE_DIR)
+LIBZ_LIB_DIR ?= $(LIBZ_DIR)/lib
+LIBZ_LIB_DIRS = -L$(LIBZ_LIB_DIR)
+LIBZ_LIBS ?= -lz
+endif
+
+ifeq "$(LINUX_REV)" "6"
 LIBZ_DIR ?= /usr
 LIBZ_INCLUDE_DIR ?= $(LIBZ_DIR)/include
 LIBZ_INCLUDE_DIRS = -I$(LIBZ_INCLUDE_DIR)
@@ -3014,6 +3062,30 @@ LIBGMP_DIR ?= /usr
 LIBGMP_INCLUDE_DIR ?= $(LIBGMP_DIR)/include
 LIBGMP_INCLUDE_DIRS = -I$(LIBGMP_INCLUDE_DIR)
 LIBGMP_LIB_DIR ?= $(LIBGMP_DIR)/lib
+LIBGMP_LIB_DIRS = -L$(LIBGMP_LIB_DIR)
+LIBGMP_LIBS ?= -lgmp
+endif
+
+endif
+
+# Debian
+
+ifeq "$(LINUX_DIST)" "debian"
+
+ifeq "$(LINUX_REV)" "5"
+LIBGMP_DIR ?= /usr
+LIBGMP_INCLUDE_DIR ?= $(LIBGMP_DIR)/include  
+LIBGMP_INCLUDE_DIRS = -I$(LIBGMP_INCLUDE_DIR)
+LIBGMP_LIB_DIR ?= $(LIBGMP_DIR)/lib  
+LIBGMP_LIB_DIRS = -L$(LIBGMP_LIB_DIR)
+LIBGMP_LIBS ?= -lgmp
+endif
+
+ifeq "$(LINUX_REV)" "6"
+LIBGMP_DIR ?= /usr
+LIBGMP_INCLUDE_DIR ?= $(LIBGMP_DIR)/include  
+LIBGMP_INCLUDE_DIRS = -I$(LIBGMP_INCLUDE_DIR)
+LIBGMP_LIB_DIR ?= $(LIBGMP_DIR)/lib  
 LIBGMP_LIB_DIRS = -L$(LIBGMP_LIB_DIR)
 LIBGMP_LIBS ?= -lgmp
 endif

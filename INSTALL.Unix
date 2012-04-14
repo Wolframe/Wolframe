@@ -345,7 +345,9 @@ Debian 6.0
 
 Optional packages: libqt4-dev (4.6.3), libpam-dev (1.1.1),
                    libsasl2-dev (2.1.23), libsqlite3-dev (3.7.3),
-                   libpq-dev (8.4.7), libxml2-dev (2.7.8)
+                   libpq-dev (8.4.7), libxml2-dev (2.7.8),
+                   libxslt1-dev (1.1.26), libpng12-dev (1.2.44),
+                   zlib1g-dev (1.2.3.4), libgmp3-dev (4.3.2)
 
 libboost-dev is 1.42, slightly too old. Compile your own version.
 

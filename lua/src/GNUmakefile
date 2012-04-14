@@ -52,7 +52,8 @@ INCLUDE_LIBS += $(LOCAL_STATIC_LIB)
 BINS = \
 	lua$(EXE)
 
-lua$(EXE): liblua.a
+lua$(EXE): lua.o liblua.a
+	$(LINK) -o $@ $(ALL_LDFLAGS) $< $(LIBS)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
