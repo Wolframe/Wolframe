@@ -7,7 +7,7 @@ Build-Depends: debhelper (>= 4.1.16),
  libboost-program-options1.46-dev, libboost-filesystem1.46-dev,
  libssl-dev, libqt4-dev, libpam-dev, libsasl2-dev,
  libsqlite3-dev, libpq-dev, libxml2-dev, zlib1g-dev, libpng-dev,
- libgmp3-dev, libmpfr-dev
+ libgmp3-dev
 Standards-Version: 3.8.3
 Homepage: http://www.wolframe.net
 

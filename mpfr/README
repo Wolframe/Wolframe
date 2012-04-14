@@ -1,8 +1,0 @@
-This is a local copy of MPFR. Nothing has been changed but adding
-compilation on Windows using native tools NMAKE.EXE and CL.EXE, LINK.EXE
-The autoconf and porting directories have been removed, they are available
-from the official download site of MPFR.
-
-Currently we don't use assembly at all, only functions in generic.
-On Windows only Intel processors are of interest anyway:
-so mparam.h is the generic/mparam.h

@@ -50,8 +50,6 @@ Prerequisites
   using the provided version in 'libhpdf'
 - optionally (WITH_LIBGMP): for bigint support,
   using the provided library in 'libgmp'
-- optionally (WITH_MPFR): for big floating point support,
-  using the provided library in 'mpfr'
 - optionally for testing (WITH_EXPECT) Expect and Tcl 8.4 or later
 - optionally for packaging:
   - Wix 3.5 or later (which needs .NET 2.0 during packaging)

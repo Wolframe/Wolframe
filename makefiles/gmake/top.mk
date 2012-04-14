@@ -192,16 +192,12 @@ ifeq ($(WITH_LOCAL_LIBHPDF),1)
 	@echo
 	@echo "using local libhpdf.."
 endif
-ifeq ($(WITH_SYSTEM_MPFR),1)
+ifeq ($(WITH_GMP),1)
 	@echo
-	@echo "MPFR_DIR: $(MPFR_DIR)"
-	@echo "MPFR_INCLUDE_DIRS: $(MPFR_INCLUDE_DIRS)"
-	@echo "MPFR_LIB_DIRS: $(MPFR_LIB_DIRS)"
-	@echo "MPFR_LIBS: $(MPFR_LIBS)"
-endif
-ifeq ($(WITH_LOCAL_MPFR),1)
-	@echo
-	@echo "using local MPFR.."
+	@echo "LIBGMP_DIR: $(LIBGMP_DIR)"
+	@echo "LIBGMP_INCLUDE_DIRS: $(LIBGMP_INCLUDE_DIRS)"
+	@echo "LIBGMP_LIB_DIRS: $(LIBGMP_LIB_DIRS)"
+	@echo "LIBGMP_LIBS: $(LIBGMP_LIBS)"
 endif
 endif
 	@echo

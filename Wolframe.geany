@@ -19,6 +19,3 @@ long_line_column=72
 [files]
 current_page=1
 FILE_NAME_0=0;None;0;16;1;1;0;/home/abaumann/projects/Wolframe/INSTALL.Unix;0;8
-FILE_NAME_1=1107;C;0;16;1;1;0;/home/abaumann/projects/Wolframe/tests/bignum/mpfr/testmpfr_c.c;0;8
-FILE_NAME_2=356;Make;0;16;1;1;0;/home/abaumann/projects/Wolframe/tests/bignum/mpfr/GNUmakefile;0;8
-FILE_NAME_3=203;Make;0;16;1;1;0;/home/abaumann/projects/Wolframe/tests/bignum/mpfr/Makefile.W32;0;8

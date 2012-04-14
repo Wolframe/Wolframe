@@ -16,10 +16,6 @@ ifeq ($(WITH_LUA),1)
 SUBDIRS := lua $(SUBDIRS)
 endif
 
-ifeq ($(WITH_LOCAL_MPFR),1)
-SUBDIRS := mpfr $(SUBDIRS)
-endif
-
 ifeq ($(WITH_EXAMPLES),1)
 SUBDIRS += examples
 endif

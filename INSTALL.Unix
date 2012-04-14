@@ -73,7 +73,6 @@ Prerequisites
   the 'libhpdf' subdirectory. In this case also 
   'zlib' and 'libpng' development libraries are needed
 - optionally (WITH_LIBGMP), for bigint support
-- optionally (WITH_MPFR): for big floating point support
 
 Configuration of the build
 --------------------------
@@ -143,8 +142,6 @@ Fetch from normal repository: openssl-devel, pam-devel (0.99.6), cyrus-sasl-deve
                               libxslt-devel (1.1.17), zlib-devel (1.2.3-4), libpng-devel (1.2.10-16),
                               gmp-devel (4.1.4)
 
-mpfr-devel is missing. You have to compile your own one.
-
 Boost is not available in a decent version (1.33), build your own one.
 
 Use WITH_LOCAL_LIBHPDF=1 for PDF support.
@@ -163,7 +160,7 @@ Fetch from normal repository: openssl-devel, pam-devel (0.99.6), cyrus-sasl-deve
                               sqlite-devel (3.3.6), postgresql-devel (8.1.23),
                               libxml2-devel (2.7.6), libxslt-devel (1.1.26),
                               zlib-devel (1.2.3-27), libpng-devel (1.2.48-1),
-                              gmp-devel (4.3.1), mpfr-devel (2.4.1)
+                              gmp-devel (4.3.1)
 
 Boost is available in an almost usable version (1.39.0), build your own one.
 
@@ -310,8 +307,7 @@ Optional packages: libssl-dev (1.0.0e), libqt4-dev (4.7.4),
                    libpam0g-dev (1.1.3), libsasl2-dev (2.1.24),
                    libsqlite3-dev (3.7.7), libpq-dev (9.1.3),
                    libxml2-dev (2.7.8), libxslt1-dev (1.1.26)
-                   libpng-dev (1.2.46), libgmp-dev (5.0.1),
-                   libmpfr-dev (3.0.1)
+                   libpng-dev (1.2.46), libgmp-dev (5.0.1)
 
 Use WITH_LOCAL_LIBHPDF=1 for PDF support.
 
@@ -446,7 +442,7 @@ FreeBSD 8.2
 Required packages: boost-libs (1.45.0)
 Optional packages: qt4-gui (4.7.1), cyrus-sasl (2.1.23)
                    sqlite3 (3.7.4), postgresql (9.0.3), libxml2 (2.7.8),
-                   png (1.4.8), gmp (5.0.4), mpfr (3.1.0_2)
+                   png (1.4.8), gmp (5.0.4)
 
 You need 'gmake' (3.81_4).
 
@@ -462,7 +458,7 @@ Optional packages: qt4-gui (4.7.4), qt4-moc (4.7.4), qt4-network (4.7.4),
                    qt4-designer (4.7.4), cyrus-sasl (2.1.25_1),
                    sqlite3 (3.7.9), postgresql (9.1.2), libxml2 (2.7.8_1),
                    libxslt (1.1.26_3), png (1.4.8), zlib (1.1.0),
-                   gmp (5.0.4), mpfr (3.1.0_2)
+                   gmp (5.0.4)
 
 You need 'gmake' (3.82).
 
@@ -478,7 +474,7 @@ Optional packages: cyrus-sasl2 (from ports tree, 2.1.23p7),
                    qt4 (qt4-4.7.3p0),
                    sqlite3 (3.7.5), postgresql-client (9.0.4),
                    libxml (2.7.8p2), libxslt (1.1.26p2),
-                   png (1.5.4), gmp (5.0.2p0), mpfr (3.0.1.4)
+                   png (1.5.4), gmp (5.0.2p0)
 
 You need 'gmake' (3.82).
 
@@ -505,9 +501,7 @@ Required packages: boost-headers (1.47.0), boost-libs (1.47.0)
 Optional packages: cyrus-sasl (2.1.25), qt4 (4.7.4),
                    sqlite3 (3.7.9), postgresql91-client (9.1.2),
                    libxml2 (2.7.8nb8), libxslt (1.1.26nb1),
-                   zlib (1.2.3), png (1.5.9), gmp (5.0.2nb1),
-                   mpfr (3.0.1.3)
-
+                   zlib (1.2.3), png (1.5.9), gmp (5.0.2nb1)
 
 You need 'gmake' (3.82db3).
 
@@ -573,7 +567,6 @@ Optional packages to install from CSW:
   CSWexpect (5.41.1)
   CSWsasl-dev and CSWsasl (2.1.25)
   CSWlibgmp-dev (5.0.2)
-  CSWlibmpfr-dev (3.1.0)
 Optional packages from Sun installation disk:
   SUNWlxml
   SUNWlxsl

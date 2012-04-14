@@ -7,11 +7,6 @@ SUBDIRS = \
 	$(SUBDIRS) libgmp
 !ENDIF
 
-!IFDEF WITH_MPFR
-SUBDIRS = \
-	$(SUBDIRS) mpfr
-!ENDIF
-
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 local_all:

@@ -4,10 +4,6 @@ TOPDIR = .
 
 SUBDIRS = src gtest tests clients
 
-!IFDEF WITH_MPFR
-SUBDIRS = mpfr $(SUBDIRS)
-!ENDIF
-
 !IFDEF WITH_LIBGMP
 SUBDIRS = libgmp $(SUBDIRS)
 !ENDIF
