@@ -35,6 +35,7 @@ Project Wolframe.
 #include "gmp.h"
 #endif
 #include "types/bignum.hpp"
+#include <malloc.h>
 #include <stdlib.h>
 #include <setjmp.h>
 #include "boost/thread/thread.hpp"

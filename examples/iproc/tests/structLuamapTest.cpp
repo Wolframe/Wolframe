@@ -259,7 +259,7 @@ static int run( const IProcTestConfiguration& cfg, const std::string& input, std
 	lua_pushcfunction( ls, &luaSerializationTest<Struct>);
 	lua_setglobal( ls, "transform");
 
-	in->protocolInput( const_cast<void*>((const void *)input.c_str()), input.size(), true);
+	in->protocolInput( (void*)input.c_str(), input.size(), true);
 	processor.setFilter( filter.inputfilter());
 	processor.setFilter( filter.outputfilter());
 	for (;;)

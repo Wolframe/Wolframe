@@ -160,6 +160,8 @@ $(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
 
 local_clean:
 	@rm -f $(LOCAL_STATIC_LIB)
+	@rm -f primary.db
+	@rm -f loadModules-dummy.o
 
 local_distclean:
 

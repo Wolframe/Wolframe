@@ -217,7 +217,7 @@ static int run( const char* root, const std::string& input, std::string& output)
 	Context ctx;
 	const FiltermapDescriptionBase* ds = Struct::getFiltermapDescription();
 
-	in->protocolInput( const_cast<void*>((const void *)input.c_str()), input.size(), true);
+	in->protocolInput( (void*)input.c_str(), input.size(), true);
 	if (!ds->parse( root, (void*)&object, *in, ctx))
 	{
 		LOG_ERROR << "error in serialization of " << root << " " << ctx.getLastError();
