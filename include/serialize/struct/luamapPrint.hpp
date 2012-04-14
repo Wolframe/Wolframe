@@ -48,21 +48,21 @@ struct IntrusivePrinter;
 template <typename T>
 bool pushAtom_( const void* obj, const luanumeric_&, lua_State* ls, Context*)
 {
-	lua_pushnumber( ls, *(const_cast<T*>((const T*)obj)));
+	lua_pushnumber( ls, *((T*)obj));
 	return true;
 }
 
 template <typename T>
 bool pushAtom_( const void* obj, const luabool_&, lua_State* ls, Context*)
 {
-	lua_pushboolean( ls, *(const_cast<T*>((const T *)obj)));
+	lua_pushboolean( ls, *((T*)obj));
 	return true;
 }
 
 template <typename T>
 bool pushAtom_( const void* obj, const luastring_&, lua_State* ls, Context*)
 {
-	lua_pushstring( ls, (const_cast<T*>((const T*)obj))->c_str());
+	lua_pushstring( ls, ((T*)obj)->c_str());
 	return true;
 }
 
@@ -90,7 +90,7 @@ bool printObject_( const void* obj, const struct_&, lua_State* ls, Context* ctx)
 	while (itr != descr->end())
 	{
 		lua_pushstring( ls, itr->first);
-		if (!itr->second.print()( const_cast<char*>((const char *)obj)+itr->second.ofs(), ls, ctx))
+		if (!itr->second.print()( (char*)obj+itr->second.ofs(), ls, ctx))
 		{
 			ctx->setError( itr->first);
 			return false;
@@ -119,8 +119,8 @@ bool printObject_( const void* obj, const vector_&, lua_State* ls, Context* ctx)
 	lua_newtable( ls);
 	std::size_t index = 0;
 
-	typename T::const_iterator itr = (const_cast<T*>((const T *)obj))->begin();
-	while (itr != (const_cast<T*>((const T*)obj))->end())
+	typename T::const_iterator itr = ((T*)obj)->begin();
+	while (itr != ((T*)obj)->end())
 	{
 		lua_pushnumber( ls, (lua_Number)(++index));
 		if (!IntrusivePrinter<typename T::value_type>::print( (const void*)&(*itr), ls, ctx))
@@ -138,7 +138,7 @@ struct IntrusivePrinter
 {
 	static bool print( const void* obj, lua_State* ls, Context* ctx)
 	{
-		return printObject_<T>( obj, getCategory(*const_cast<T*>((const T*)obj)), ls, ctx);
+		return printObject_<T>( obj, getCategory(*(T*)obj), ls, ctx);
 	}
 };
 

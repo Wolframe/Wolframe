@@ -40,7 +40,6 @@ Project Wolframe.
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
-#include <cctype>
 extern "C" {
 	#include <lualib.h>
 	#include <lauxlib.h>
