@@ -19,10 +19,8 @@ INCLUDE_LDFLAGS =
 
 INCLUDE_LIBS = \
 	$(TOPDIR)\libgmp\mpz\mpz.lib \
-	$(TOPDIR)\libgmp\mpn\mpn.lib \
 	$(TOPDIR)\libgmp\gmpcommon.lib \
-	$(TOPDIR)\libgmp\printf\printf.lib \
-	$(TOPDIR)\libgmp\cxx\gmpxx.lib
+	$(TOPDIR)\libgmp\mpn\mpn.lib
 
 TEST_CPP_BINS = \
 	testlibgmp_c.exe
