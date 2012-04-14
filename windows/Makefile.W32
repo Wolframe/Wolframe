@@ -4,11 +4,6 @@ SUBDIRS =
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
-all: dependencies
-
-dependencies:
-	cd extxmlprop & $(MAKE) /nologo /f Makefile.W32 all
-
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 !IFDEF WITH_SSL
@@ -48,8 +43,7 @@ WIX_FLAGS = $(WIX_FLAGS) \
 !ENDIF
 
 WIX_EXTENSIONS = \
-	-ext WixUIExtension -ext WixUtilExtension -ext WixFirewallExtension \
-	-ext extxmlprop\WixContribExtension.dll
+	-ext WixUIExtension -ext WixUtilExtension -ext WixFirewallExtension
 	
 WIX_OBJS = \
 	wolframe.wixobj \
