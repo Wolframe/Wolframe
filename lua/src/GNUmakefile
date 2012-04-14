@@ -47,13 +47,8 @@ LOCAL_STATIC_LIB_OBJS = \
 LOCAL_STATIC_LIB = \
 	liblua.a
 
-INCLUDE_LIBS += $(LOCAL_STATIC_LIB)
-
 LOCAL_BINS = \
 	lua$(EXE)
-
-lua$(EXE): lua.o liblua.a
-	$(LINK) -o $@ $(ALL_LDFLAGS) $< $(LIBS)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
@@ -66,11 +61,15 @@ ALL_CFLAGS = -O2 -Wall $(LUA_PLATFORM_CFLAGS) -I. $(SO_COMPILE_FLAGS)
 $(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
 	ar rcs $(LOCAL_STATIC_LIB) $(LOCAL_STATIC_LIB_OBJS)
 
+lua$(EXE): lua.o liblua.a
+	$(LINK) -o $@ $(ALL_LDFLAGS) lua.o liblua.a $(LIBS)
+
 local_all: $(LOCAL_STATIC_LIB) $(LOCAL_BINS)
 
 local_clean:
 	@rm -f $(LOCAL_STATIC_LIB) $(LOCAL_STATIC_LIB_OBJS)
 	@rm -f *.sho++
+	@rm -f lua.o
 
 local_distclean:
 
