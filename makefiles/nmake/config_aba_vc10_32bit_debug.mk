@@ -110,10 +110,7 @@ EXPECT = $(TCL_DIR)\bin\tclsh.exe
 # used for deployment only!
 #########################
 
-# @office
-WIX_DIR = C:\Program Files (x86)\Windows Installer XML v3.5
-# @home PIII
-#WIX_DIR = C:\Program Files\Windows Installer XML v3.5
+WIX_DIR = C:\Program Files\Windows Installer XML v3.5
 
 #WIX_LIBS = dutil_2008.lib wcautil_2008.lib
 WIX_LIBS = dutil_2008_x64.lib wcautil_2008_x64.lib
@@ -121,6 +118,10 @@ WIX_LIBS = dutil_2008_x64.lib wcautil_2008_x64.lib
 # architecture of resulting msi
 #WIX_ARCH = x86
 WIX_ARCH = x64
+
+#PGDLL_LIBRARIES=1
+
+#PGDLL_WITHOUT_MAJOR_VERSION=1
 
 # libgmp
 ########
@@ -131,15 +132,15 @@ WIX_ARCH = x64
 # DocBook and Stylesheets
 #########################
 
-XSLT_HTMLHELP_STYLESHEET = C:\cygwin\home\Andreas\docbook-xsl-1.76.1\htmlhelp\htmlhelp.xsl
+XSLT_HTMLHELP_STYLESHEET = C:\cygwin\home\Andreas Baumann\docbook-xsl-1.76.1\htmlhelp\htmlhelp.xsl
 
 # Doxygen binary to generate API documentation (for docu and deployment)
 ########################################################################
 
-DOXYGEN = C:\Program Files\Doxygen\doxygen.exe
+DOXYGEN = C:\Program Files\Doxygen\bin\doxygen.exe
 
 # Microsoft HTML Help Workshop (for documentation building and deployment)
 ##########################################################################
 
-HHC_LOCATION = C:\Program Files (x86)\HTML Help Workshop\hhc.exe
+HHC_LOCATION = C:\Program Files\HTML Help Workshop\hhc.exe
 
