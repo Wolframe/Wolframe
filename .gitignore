@@ -45,8 +45,6 @@ tests/xmlselectHandlerTest
 tests/protocolArgumentParsing
 tests/poolTest
 tests/resolvePathTest
-tests/AAAA/authTest
-tests/AAAA/sasl.db
 tests/mtprocHandler
 tests/ptreeGenerator
 tests/configHelpersTest
@@ -58,7 +56,8 @@ tests/database/test.db
 tests/libxml2/testlibxml2
 tests/modules/moduleTest
 tests/AAAA/authenticationTest
-tests/AAAA/plainPasswdTest
+tests/AAAA/textFileTest
+tests/AAAA/sasl.db
 tests/testBoostPath
 tests/filter
 tests/libhpdf/testlibhpdf
