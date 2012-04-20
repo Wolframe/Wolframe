@@ -1,5 +1,5 @@
 LIBRARY mod_auth_textfile
-DESCRIPTION "Wolframe module"
+DESCRIPTION "Wolframe text file authentication module"
 
 EXPORTS
 entryPoint	@1

@@ -31,14 +31,16 @@
 
 ************************************************************************/
 //
-// text file authentication
+// Text file authentication
 //
 
 #ifndef _TEXT_FILE_AUTHENTICATION_HPP_INCLUDED
 #define _TEXT_FILE_AUTHENTICATION_HPP_INCLUDED
 
 #include <string>
+#include <vector>
 #include "AAAA/authentication.hpp"
+#include "AAAA/user.hpp"
 #include "moduleInterface.hpp"
 
 namespace _Wolframe {
@@ -60,8 +62,8 @@ public:
 	void print( std::ostream& os, size_t indent ) const;
 	void setCanonicalPathes( const std::string& referencePath );
 private:
-	std::string	m_identifier;
-	std::string	m_file;
+	std::string			m_identifier;
+	std::string			m_file;
 };
 
 
@@ -72,9 +74,43 @@ public:
 	~TextFileAuthenticator();
 	virtual const char* typeName() const		{ return "TextFileAuth"; }
 
-	AuthenticatorSlice* authSlice()			{ return NULL; }
+	AuthenticatorSlice* authSlice();
+
+	User* authenticate( std::string username, std::string password, bool caseSensitveUser ) const;
+	User* authenticate( std::vector<unsigned char>& challenge,
+			    std::vector<unsigned char>& response, bool caseSensitveUser ) const;
 private:
-	const std::string	m_file;
+	const std::string		m_file;
+};
+
+
+class TextFileAuthSlice : public AuthenticatorSlice
+{
+	enum	FSMstate	{
+		INIT,
+		PARSING,
+		FINISHED
+	};
+
+public:
+	TextFileAuthSlice( const TextFileAuthenticator& backend );
+	~TextFileAuthSlice();
+	void close()					{ delete this; }
+
+	const char* typeName() const			{ return m_backend.typeName(); }
+	AuthProtocol protocolType() const		{ return AuthenticatorSlice::PLAIN; }
+
+	void receiveData( const void* data, std::size_t size );
+	const FSMoperation nextOperation();
+	void signal( FSMsignal event );
+	std::size_t dataLeft( const void*& begin );
+
+	User* user();
+private:
+	const TextFileAuthenticator&	m_backend;
+	User*				m_user;
+	std::string			m_username;
+	std::string			m_password;
 };
 
 
@@ -88,7 +124,7 @@ public:
 	virtual AuthenticationUnit* object() const	{ return m_auth; }
 	void dispose()					{ m_auth = NULL; delete this; }
 private:
-	TextFileAuthenticator*	m_auth;
+	TextFileAuthenticator*		m_auth;
 };
 
 }} // namespace _Wolframe::AAAA

@@ -31,13 +31,13 @@
 
 ************************************************************************/
 //
-// plain text password authenticator tests
+// text file authenticator tests
 //
 
 #include "logger-v1.hpp"
 #include <gtest/gtest.h>
 
-#include "PlainTextAuth.hpp"
+#include "TextFileAuth.hpp"
 
 using namespace _Wolframe::AAAA;
 using namespace _Wolframe::log;
@@ -66,14 +66,14 @@ protected:
 
 TEST_F( AuthenticationFixture, typeName )
 {
-	PlainTextAuthenticator authenticator( "", "plainPasswd" );
-	ASSERT_STREQ( authenticator.typeName( ), "PlainTextAuth" );
+	TextFileAuthenticator authenticator( "", "plainPasswd" );
+	ASSERT_STREQ( authenticator.typeName( ), "TextFileAuth" );
 }
 
 TEST_F( AuthenticationFixture, validUsers )
 {
 	User*	user;
-	PlainTextAuthenticator authenticator( "", "plainPasswd" );
+	TextFileAuthenticator authenticator( "", "plainPasswd" );
 
 	user = authenticator.authenticate( "admin", "Good Password", true );
 	ASSERT_TRUE( user != NULL );
@@ -97,7 +97,7 @@ TEST_F( AuthenticationFixture, validUsers )
 TEST_F( AuthenticationFixture, caseInsensitive_Pass )
 {
 	User*	user;
-	PlainTextAuthenticator authenticator( "", "plainPasswd" );
+	TextFileAuthenticator authenticator( "", "plainPasswd" );
 
 	user = authenticator.authenticate( "AdMiN", "Good Password", false );
 	ASSERT_TRUE( user != NULL );
@@ -121,7 +121,7 @@ TEST_F( AuthenticationFixture, caseInsensitive_Pass )
 TEST_F( AuthenticationFixture, caseInsensitive_Fail )
 {
 	User*	user;
-	PlainTextAuthenticator authenticator( "", "plainPasswd" );
+	TextFileAuthenticator authenticator( "", "plainPasswd" );
 
 	user = authenticator.authenticate( "AdMiN", "Good Password", true );
 	ASSERT_EQ( NULL, user );
@@ -134,7 +134,7 @@ TEST_F( AuthenticationFixture, caseInsensitive_Fail )
 TEST_F( AuthenticationFixture, invalidPasswords )
 {
 	User*	user;
-	PlainTextAuthenticator authenticator( "", "plainPasswd" );
+	TextFileAuthenticator authenticator( "", "plainPasswd" );
 
 	user = authenticator.authenticate( "admin", "Goood Password", true );
 	ASSERT_EQ( NULL, user );
@@ -147,7 +147,7 @@ TEST_F( AuthenticationFixture, invalidPasswords )
 TEST_F( AuthenticationFixture, invalidUsers )
 {
 	User*	user;
-	PlainTextAuthenticator authenticator( "", "plainPasswd" );
+	TextFileAuthenticator authenticator( "", "plainPasswd" );
 
 	user = authenticator.authenticate( "adminn", "xx", true );
 	ASSERT_EQ( NULL, user );

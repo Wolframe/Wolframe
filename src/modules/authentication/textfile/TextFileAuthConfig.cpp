@@ -31,7 +31,7 @@
 
 ************************************************************************/
 //
-//
+// Text file authentication configuration
 //
 
 #include "logger-v1.hpp"
@@ -110,6 +110,5 @@ void TextFileAuthConfig::setCanonicalPathes( const std::string& refPath )
 			m_file = resolvePath( m_file );
 	}
 }
-
 
 }} // namespace _Wolframe::config

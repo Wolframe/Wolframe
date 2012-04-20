@@ -1,5 +1,0 @@
-LIBRARY mod_auth_plaintext
-DESCRIPTION "Wolframe module"
-
-EXPORTS
-entryPoint	@1
