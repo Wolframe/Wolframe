@@ -1,9 +1,0 @@
-# Plain text password file
-#
-# This is only for exemplification purposes. DO NOT USE it in production !
-# Format is:
-# <username>:<password>:<user info (name)>:.....(ignored)
-
-admin:Good Password:Wolframe Administrator
-goodusr:User PassWord:Good User
-badusr:User BadWord:Bad User

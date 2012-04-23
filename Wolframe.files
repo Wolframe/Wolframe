@@ -95,6 +95,11 @@ clients/qt/HistoryLineEdit.hpp
 clients/qt/MainWindow.cpp
 clients/qt/MainWindow.hpp
 clients/qt/Makefile.W32
+clients/qt/moc_AbstractFormLoader.cpp
+clients/qt/moc_DebugTerminal.cpp
+clients/qt/moc_HistoryLineEdit.cpp
+clients/qt/moc_MainWindow.cpp
+clients/qt/moc_WolframeClient.cpp
 clients/qt/qtclient.cpp
 clients/qt/README
 clients/qt/TODOS
@@ -1254,7 +1259,6 @@ tests/AAAA/authenticationTest.cpp
 tests/AAAA/GNUmakefile
 tests/AAAA/Makefile.W32
 tests/AAAA/passwd
-tests/AAAA/plainPasswd
 tests/AAAA/sasl.conf
 tests/AAAA/textFileTest.cpp
 tests/bignum/GNUmakefile

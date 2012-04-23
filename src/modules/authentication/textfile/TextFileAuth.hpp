@@ -76,7 +76,8 @@ public:
 
 	AuthenticatorSlice* authSlice();
 
-	User* authenticate( std::string username, std::string password, bool caseSensitveUser ) const;
+	User* authenticate( const std::string& username, const std::string& password,
+			    bool caseSensitveUser ) const;
 	User* authenticate( std::vector<unsigned char>& challenge,
 			    std::vector<unsigned char>& response, bool caseSensitveUser ) const;
 private:
