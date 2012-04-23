@@ -71,7 +71,7 @@ INCLUDE_DIRS = \
 
 INCLUDE_LIBS = \
 	$(INCLUDE_LIBS) "$(LIBXML2_DIR)\lib\libxml2.lib"
-	
+
 !ENDIF
 
 TEST_CPP_BINS = \
@@ -80,6 +80,8 @@ TEST_CPP_BINS = \
 	versionTest.exe \
 	testMethodMemberPointerTemplate.exe \
 	counterTest.exe \
+	bytes2hexTest.exe \
+	testSHA2.exe \
 	resolvePathTest.exe \
 	testBoostPath.exe \
 	singletonTest.exe \

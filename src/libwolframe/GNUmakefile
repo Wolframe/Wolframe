@@ -56,6 +56,7 @@ CPP_OBJS = \
 	referenceConfig.o
 
 OBJS = \
+	byte2hex.o \
 	sha2.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

@@ -75,6 +75,7 @@ TEST_CPP_BINS = \
 	resolvePathTest$(EXE) \
 	testBoostPath$(EXE) \
 	singletonTest$(EXE) \
+	byte2hexTest$(EXE) \
 	testSHA2$(EXE) \
 	poolTest$(EXE) \
 	logTest$(EXE) \
@@ -86,6 +87,9 @@ TEST_CPP_BINS = \
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 logTest$(EXE): $(TOPDIR)/src/libwolframe.a
+testSHA2$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
+byte2hexTest$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
+
 
 local_all:
 
@@ -115,6 +119,8 @@ ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./singletonTest
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./testSHA2
+	@echo
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./byte2hexTest
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./protocolArgumentParsing
 	@echo

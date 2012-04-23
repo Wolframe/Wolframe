@@ -52,7 +52,7 @@ static const char message2b[] =	"abcdefghbcdefghicdefghijdefghijkefghij"
 static const unsigned message3len = 1000000;
 
 /* SHA-224 */
-TEST( ResolvePathFixture, SHA224 )
+TEST( SHA2fixture, SHA224 )
 {
 	static const char *testVectors[3] = {
 		"23097d223405d8228642a477bda255b32aadbce4bda0b3f7e36c9da7",
@@ -84,7 +84,7 @@ TEST( ResolvePathFixture, SHA224 )
 }
 
 /* SHA-256 */
-TEST( ResolvePathFixture, SHA256 )
+TEST( SHA2fixture, SHA256 )
 {
 	static const char *testVectors[3] = {
 		"ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad",
@@ -116,7 +116,7 @@ TEST( ResolvePathFixture, SHA256 )
 }
 
 /* SHA-384 */
-TEST( ResolvePathFixture, SHA384 )
+TEST( SHA2fixture, SHA384 )
 {
 	static const char *testVectors[3] = {
 		"cb00753f45a35e8bb5a03d699ac65007272c32ab0eded1631a8b605a43ff5bed"
@@ -151,7 +151,7 @@ TEST( ResolvePathFixture, SHA384 )
 }
 
 /* SHA-512 */
-TEST( ResolvePathFixture, SHA512 )
+TEST( SHA2fixture, SHA512 )
 {
 	static const char *testVectors[3] = {
 		"ddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a"

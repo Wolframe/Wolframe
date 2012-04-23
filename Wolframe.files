@@ -30,9 +30,6 @@ makefiles/nmake/top.mk
 .Attic/appException.hpp
 .Attic/base64.cpp
 .Attic/base64.hpp
-.Attic/byte2hex.c
-.Attic/byte2hex.cpp
-.Attic/byte2hex.h
 .Attic/CRAM.c
 .Attic/CRAM.h
 .Attic/date.hpp
@@ -302,6 +299,7 @@ include/appConfig.hpp
 include/appProcessor.hpp
 include/appProperties.hpp
 include/atomicCounter.hpp
+include/byte2hex.h
 include/config/configurationBase.hpp
 include/config/ConfigurationTree.hpp
 include/config/descriptionBase.hpp
@@ -1110,6 +1108,7 @@ src/langbind_luaCommandEnvironment.cpp
 src/langbind_luaCommandHandler.cpp
 src/langbind_luaDebug.cpp
 src/langbind_luaScript.cpp
+src/libwolframe/byte2hex.c
 src/libwolframe/GNUmakefile
 src/libwolframe/logger/logBackendConsole.cpp
 src/libwolframe/logger/logBackendConsole.hpp
@@ -1267,6 +1266,7 @@ tests/bignum/libgmp/Makefile.W32
 tests/bignum/libgmp/testlibgmp_c.c
 tests/bignum/libgmp/testlibgmp_cpp.cpp
 tests/bignum/Makefile.W32
+tests/byte2hexTest.cpp
 tests/config/GNUmakefile
 tests/configStructParser.cpp
 tests/configValueParser.cpp

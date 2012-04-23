@@ -54,6 +54,7 @@ CPP_OBJS = \
 	referenceConfig.obj
 
 OBJS = \
+	byte2hex.obj \
 	sha2.obj
 
 all: $(OBJS) $(CPP_OBJS) $(LIBRARIES)
