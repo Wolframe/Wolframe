@@ -53,7 +53,10 @@ CPP_OBJS = \
 	resolvePath.obj \
 	referenceConfig.obj
 
-all: $(CPP_OBJS) $(LIBRARIES)
+OBJS = \
+	sha2.obj
+
+all: $(OBJS) $(CPP_OBJS) $(LIBRARIES)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
@@ -63,7 +66,7 @@ logger\wolframemsg.res: logger\wolframemsg.rc
 logger\wolframemsg.rc: logger\wolframemsg.mc
 logger\logBackendEventlog.obj: logger\wolframemsg.rc
 
-wolframe.lib: $(CPP_OBJS)
+wolframe.lib: $(OBJS) $(CPP_OBJS)
 	$(LINK) /lib /nologo /out:$@ $(STATIC_LDFLAGS) $(LIBS) $?
 
 local_all:

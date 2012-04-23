@@ -13,10 +13,12 @@ find . -name '*.lua' -type f -print >>/tmp/$$
 find . -name '*.rng' -type f -print >>/tmp/$$
 find docs -name '*.ent' -type f -print >>/tmp/$$
 find . -name 'header.txt' -type f -print >>/tmp/$$
-find . -name 'README*' -type f -print >>/tmp/$$
-find . -name 'INSTALL*' -type f -print >>/tmp/$$
-find . -name 'TODO*' -type f -print >>/tmp/$$
-find . -name 'BUGS*' -type f -print >>/tmp/$$
+find . -iname 'AUTHORS*' -type f -print >>/tmp/$$
+find . -iname 'Credits*' -type f -print >>/tmp/$$
+find . -iname 'README*' -type f -print >>/tmp/$$
+find . -iname 'INSTALL*' -type f -print >>/tmp/$$
+find . -iname 'TODO*' -type f -print >>/tmp/$$
+find . -iname 'BUGS*' -type f -print >>/tmp/$$
 find . -name 'passwd' -type f -print >>/tmp/$$
 find . -name 'plainPasswd' -type f -print >>/tmp/$$
 

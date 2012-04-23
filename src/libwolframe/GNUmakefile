@@ -55,6 +55,9 @@ CPP_OBJS = \
 	resolvePath.o \
 	referenceConfig.o
 
+OBJS = \
+	sha2.o
+
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 local_all:

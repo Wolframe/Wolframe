@@ -41,6 +41,7 @@ tests/versionTest
 tests/logTest
 tests/threadLeakTest
 tests/counterTest
+tests/testSHA2
 tests/xmlselectHandlerTest
 tests/protocolArgumentParsing
 tests/poolTest

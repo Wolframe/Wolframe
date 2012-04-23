@@ -69,6 +69,7 @@ makefiles/nmake/top.mk
 .Attic/testPGleak.cpp
 .Attic/xmlselect/xmlIterator.cpp
 .Attic/xmlselect/xmlIterator.hpp
+AUTHORS
 clients/Android/AndroidManifest.xml
 clients/Android/build.xml
 clients/Android/README.txt
@@ -94,11 +95,6 @@ clients/qt/HistoryLineEdit.hpp
 clients/qt/MainWindow.cpp
 clients/qt/MainWindow.hpp
 clients/qt/Makefile.W32
-clients/qt/moc_AbstractFormLoader.cpp
-clients/qt/moc_DebugTerminal.cpp
-clients/qt/moc_HistoryLineEdit.cpp
-clients/qt/moc_MainWindow.cpp
-clients/qt/moc_WolframeClient.cpp
 clients/qt/qtclient.cpp
 clients/qt/README
 clients/qt/TODOS
@@ -109,6 +105,7 @@ contrib/osc/boost/debian/README.Debian
 contrib/osc/boost/debian/README.source
 contrib/osc/README
 contrib/README
+Credits
 debian/README.source
 docs/AppServer/Appendix.xml
 docs/AppServer/AppServer.ent
@@ -387,6 +384,7 @@ include/serialize/struct/luamapParse.hpp
 include/serialize/struct/luamapPrint.hpp
 include/serialize/struct/luamapTraits.hpp
 include/serverEndpoint.hpp
+include/sha2.h
 include/singleton.hpp
 include/SSLcertificateInfo.hpp
 include/standardConfigs.hpp
@@ -989,6 +987,7 @@ libpng/pngwio.c
 libpng/pngwrite.c
 libpng/pngwtran.c
 libpng/pngwutil.c
+lua/doc/readme.html
 lua/GNUmakefile
 lua/INSTALL
 lua/Makefile.W32
@@ -1055,6 +1054,7 @@ lua/src/lvm.h
 lua/src/lzio.c
 lua/src/lzio.h
 lua/src/Makefile.W32
+makefiles/gmake/install.mk
 makefiles/README
 Makefile.W32
 po/README
@@ -1139,6 +1139,7 @@ src/libwolframe/provider/DBproviderImpl.cpp
 src/libwolframe/provider/DBproviderImpl.hpp
 src/libwolframe/referenceConfig.cpp
 src/libwolframe/resolvePath.cpp
+src/libwolframe/sha2.c
 src/libwolframe/user.cpp
 src/loadModules.cpp
 src/loadModules-dummy.cpp
@@ -1315,6 +1316,7 @@ tests/SSL/README.txt
 tests/testBoostPath.cpp
 tests/testMethodMemberPointerTemplate.cpp
 tests/testNamedRetVal.cpp
+tests/testSHA2.cpp
 tests/threadLeakTest.cpp
 tests/versionTest.cpp
 tests/xmllite/Makefile.W32
@@ -1322,6 +1324,7 @@ tests/xmllite/test.xml
 tests/xmllite/testxmllite.cpp
 TODO
 windows/Makefile.W32
+windows/Readme.txt
 windows/wolframe.xml
 XML/configuration.rng
 XML/database.rng
