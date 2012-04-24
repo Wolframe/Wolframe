@@ -40,6 +40,7 @@
 #include "logger-v1.hpp"
 #include "TextFileAuth.hpp"
 #include "sha2.h"
+#include "byte2hex.h"
 
 #include <boost/algorithm/string.hpp>
 #define BOOST_FILESYSTEM_VERSION 3
@@ -110,14 +111,14 @@ User* TextFileAuthenticator::authenticate( const std::string& username,
 			}
 //MOD_LOG_TRACE << "Text file authenticator password: '" << pwd << "'";
 
-			unsigned char digest[ SHA224_DIGEST_SIZE ];
-			char output[ 2 * SHA224_DIGEST_SIZE + 1 ];
-			output[ 2 * SHA224_DIGEST_SIZE ] = '\0';
+			unsigned char pwDigest[ SHA224_DIGEST_SIZE ];
+			if ( ! hex2byte( pwd.c_str(), pwDigest, SHA224_DIGEST_SIZE ))
+				return NULL;
 
-			sha224((const unsigned char *)password.c_str(), password.length(), digest );
-			for ( int i = 0; i < SHA224_DIGEST_SIZE; i++ )
-				sprintf( output + 2 * i, "%02x", digest[i] );
-			if ( pwd != output )
+			unsigned char inDigest[ SHA224_DIGEST_SIZE ];
+			sha224((const unsigned char *)password.c_str(), password.length(), inDigest );
+
+			if ( memcmp( pwDigest, inDigest, SHA224_DIGEST_SIZE ))
 				return NULL;
 
 			if ( end != std::string::npos)	{

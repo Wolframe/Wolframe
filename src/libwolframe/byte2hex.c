@@ -30,7 +30,6 @@
  Project Wolframe.
 
 ************************************************************************/
-
 /**
  * @defgroup hex2byte Convertion between ASCII hex string and data block
  * @ingroup miscFunctions
