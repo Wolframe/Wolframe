@@ -88,6 +88,11 @@ bool AAAAconfiguration::parse( const config::ConfigurationTree& pt, const std::s
 								 Parser::BoolDomain(), &allowDefined ))
 						retVal = false;
 				}
+				else if ( boost::algorithm::iequals( "randomDevice", L2it->first ))	{
+					bool isDefined = ( !m_randomDevice.empty() );
+					if ( ! Parser::getValue( logStr.c_str(), *L2it, m_randomDevice, &isDefined ))
+						retVal = false;
+				}
 				else if ( modules )	{
 					module::ContainerBuilder* builder = modules->getContainer( "Authentication", L2it->first );
 					if ( builder )	{
@@ -179,6 +184,7 @@ void AAAAconfiguration::print( std::ostream& os, size_t /* indent */ ) const
 	os << sectionName() << std::endl;
 	os << "   Authentication" << std::endl;
 	os << "      Allow anonymous login: " << (m_allowAnonymous ? "yes" : "no") << std::endl;
+	os << "      Random numbers device: " << m_randomDevice << std::endl;
 	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_authConfig.begin();
 								it != m_authConfig.end(); it++ )
 		(*it)->print( os, 6 );
