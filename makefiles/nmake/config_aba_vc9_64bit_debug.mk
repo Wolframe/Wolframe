@@ -124,6 +124,10 @@ WIX_LIBS = dutil_2008_x64.lib wcautil_2008_x64.lib
 #WIX_ARCH = x86
 WIX_ARCH = x64
 
+PGDLL_LIBRARIES=1
+
+#PGDLL_WITHOUT_MAJOR_VERSION=1
+
 # libgmp
 ########
 
