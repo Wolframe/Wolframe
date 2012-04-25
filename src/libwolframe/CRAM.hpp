@@ -30,19 +30,18 @@
  Project Wolframe.
 
 ************************************************************************/
-/*
- * Challenge Response Authentication Mechanism
- *
- */
+//
+// Challenge Response Authentication Mechanism
+//
 
-#ifndef _CRAM_H_INCLUDED
-#define _CRAM_H_INCLUDED
+#ifndef _CRAM_HPP_INCLUDED
+#define _CRAM_HPP_INCLUDED
 
-#define	HASH_BLOCK_SIZE			( 1024 / 8 )
-#define	HASH_DIGEST_SIZE		(  512 / 8 )
-#define	PASSWORD_DIGEST_SIZE		(  224 / 8 )
-#define	CRAM_CHALLENGE_SIZE		HASH_BLOCK_SIZE
-#define	CRAM_RESPONSE_SIZE		HASH_DIGEST_SIZE
+static const size_t HASH_BLOCK_SIZE = 1024 / 8;
+static const size_t HASH_DIGEST_SIZE = 512 / 8;
+static const size_t PASSWORD_DIGEST_SIZE = 224 / 8;
+static const size_t CRAM_CHALLENGE_SIZE = HASH_BLOCK_SIZE;
+static const size_t CRAM_RESPONSE_SIZE = HASH_DIGEST_SIZE;
 
 #define	PASSWORD_HASH_STRING_SIZE	( 2 * PASSWORD_HASH_SIZE + 1 )
 #define	CRAM_CHALLENGE_STRING_SIZE	( 2 * CRAM_CHALLENGE_SIZE + 1 )
@@ -64,5 +63,5 @@ char *CRAMresponse( const unsigned char *challenge, const char *passwordHash, ch
 }
 #endif
 
-#endif	/* _CRAM_H_INCLUDED */
+#endif	/* _CRAM_HPP_INCLUDED */
 
