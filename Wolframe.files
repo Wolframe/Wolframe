@@ -30,8 +30,6 @@ makefiles/nmake/top.mk
 .Attic/appException.hpp
 .Attic/base64.cpp
 .Attic/base64.hpp
-.Attic/CRAM.c
-.Attic/CRAM.h
 .Attic/date.hpp
 .Attic/ErrorCode.hpp
 .Attic/filtermapError.hpp
@@ -92,11 +90,6 @@ clients/qt/HistoryLineEdit.hpp
 clients/qt/MainWindow.cpp
 clients/qt/MainWindow.hpp
 clients/qt/Makefile.W32
-clients/qt/moc_AbstractFormLoader.cpp
-clients/qt/moc_DebugTerminal.cpp
-clients/qt/moc_HistoryLineEdit.cpp
-clients/qt/moc_MainWindow.cpp
-clients/qt/moc_WolframeClient.cpp
 clients/qt/qtclient.cpp
 clients/qt/README
 clients/qt/TODOS
@@ -1109,6 +1102,8 @@ src/langbind_luaCommandHandler.cpp
 src/langbind_luaDebug.cpp
 src/langbind_luaScript.cpp
 src/libwolframe/byte2hex.c
+src/libwolframe/CRAM.cpp
+src/libwolframe/CRAM.hpp
 src/libwolframe/GNUmakefile
 src/libwolframe/logger/logBackendConsole.cpp
 src/libwolframe/logger/logBackendConsole.hpp
