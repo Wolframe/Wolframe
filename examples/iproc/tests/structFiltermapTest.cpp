@@ -43,7 +43,7 @@ Project Wolframe.
 #pragma warning(disable:4127)
 #endif
 #include <iostream>
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 #include <boost/thread/thread.hpp>
 
 using namespace _Wolframe;

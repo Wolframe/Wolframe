@@ -39,7 +39,7 @@
 #include <boost/thread/thread.hpp>
 
 #include "objectPool.hpp"
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 
 class testObject	{

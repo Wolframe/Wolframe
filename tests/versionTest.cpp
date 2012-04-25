@@ -8,7 +8,7 @@
 #include <ctime>
 
 #include "version.hpp"
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 
 #define	MAX_STRING	128

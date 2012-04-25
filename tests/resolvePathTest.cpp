@@ -3,7 +3,7 @@
 //
 
 #include "miscUtils.hpp"
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 
 // Tests the Version constructors and members

@@ -3,7 +3,7 @@
 //
 
 #include "logger-v1.hpp"
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 #if !defined( _WIN32 )
 #include <sys/stat.h>

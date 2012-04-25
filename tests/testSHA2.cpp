@@ -34,7 +34,7 @@
 // SHA2 unit tests
 //
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 #include <cstring>
 #include "sha2.h"
 

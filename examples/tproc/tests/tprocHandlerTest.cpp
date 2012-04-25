@@ -54,7 +54,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/property_tree/info_parser.hpp>
 #include <boost/algorithm/string.hpp>
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 #include <boost/thread/thread.hpp>
 #include <map>
 #include <string>

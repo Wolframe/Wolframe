@@ -38,7 +38,7 @@
 #include "connectionHandler.hpp"
 #include "handlerConfig.hpp"
 #include "testHandlerTemplates.hpp"
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>

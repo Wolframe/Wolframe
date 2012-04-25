@@ -3,7 +3,7 @@
 ///
 
 #include "config/valueParser.hpp"
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 #include <boost/property_tree/xml_parser.hpp>
 #include <iostream>
 

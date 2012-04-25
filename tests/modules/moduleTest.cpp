@@ -4,7 +4,7 @@
 
 #include "logger-v1.hpp"
 #include "moduleInterface.hpp"
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 #include "tests/mod_test/common.hpp"
 #include "tests/mod_test_containers/common.hpp"

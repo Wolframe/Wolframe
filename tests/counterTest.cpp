@@ -8,7 +8,7 @@
 #include <boost/thread/thread.hpp>
 
 #include "atomicCounter.hpp"
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 
 _Wolframe::AtomicCounter< unsigned long >	ulCounter0;

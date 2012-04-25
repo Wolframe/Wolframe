@@ -3,7 +3,7 @@
 //
 
 #include "logger-v1.hpp"
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 // Aba: avoiding module loader here on purpose, so we include the things to
 // test with conditional compilation

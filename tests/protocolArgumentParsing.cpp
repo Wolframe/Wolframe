@@ -4,7 +4,7 @@
 
 
 #include "protocol.hpp"
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 #include <stdlib.h>
 
 using namespace _Wolframe;

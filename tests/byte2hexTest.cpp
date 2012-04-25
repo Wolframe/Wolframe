@@ -34,7 +34,7 @@
 //
 // byte <-> ASCII hex conversion tests
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 #include "byte2hex.h"
 
 TEST( Bytes_2_Hex, SHA224 )

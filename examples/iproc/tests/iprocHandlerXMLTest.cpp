@@ -44,7 +44,7 @@
 #include <stdexcept>
 #include <stdio.h>
 #include <boost/lexical_cast.hpp>
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 using namespace _Wolframe;
 using namespace _Wolframe::iproc;

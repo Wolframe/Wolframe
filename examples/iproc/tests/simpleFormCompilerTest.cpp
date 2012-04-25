@@ -39,7 +39,7 @@ Project Wolframe.
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/info_parser.hpp>
 #include <iostream>
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 #include <boost/thread/thread.hpp>
 #include <stdexcept>
 

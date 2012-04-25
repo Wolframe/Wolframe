@@ -38,7 +38,7 @@
 #include "pechoHandler.hpp"
 #include "connectionHandler.hpp"
 #include "testHandlerTemplates.hpp"
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 #include <stdlib.h>
 #include <boost/thread/thread.hpp>
 
