@@ -90,6 +90,11 @@ clients/qt/HistoryLineEdit.hpp
 clients/qt/MainWindow.cpp
 clients/qt/MainWindow.hpp
 clients/qt/Makefile.W32
+clients/qt/moc_AbstractFormLoader.cpp
+clients/qt/moc_DebugTerminal.cpp
+clients/qt/moc_HistoryLineEdit.cpp
+clients/qt/moc_MainWindow.cpp
+clients/qt/moc_WolframeClient.cpp
 clients/qt/qtclient.cpp
 clients/qt/README
 clients/qt/TODOS
@@ -220,8 +225,8 @@ examples/lua/appProperties.cpp
 examples/lua/echo.lua
 examples/lua/GNUmakefile
 examples/lua/handlerConfig.hpp
-examples/lua/lua.conf
 examples/lua/luaConfig.cpp
+examples/lua/luad.conf
 examples/lua/luad.cpp
 examples/lua/luaHandler.cpp
 examples/lua/luaHandler.hpp

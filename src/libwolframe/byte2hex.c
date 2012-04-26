@@ -119,14 +119,14 @@ char *byte2hex( const unsigned char *data, size_t size, char *outStr, size_t out
  *		or NULL if the output buffer is not large enough
  *		or if the string has invalid hex characters
  */
-unsigned char *hex2byte( const char *hexStr, unsigned char *outData, size_t outSize )
+int hex2byte( const char *hexStr, unsigned char *outData, size_t outSize )
 {
-	size_t		len;
+	size_t		len = 0;
+	const char	*inStr = hexStr;
 	unsigned char	*data = outData;
-	char		*inStr;
 
 	if ( outSize == 0 )
-		return NULL;
+		return -1;
 	else
 		*outData = 0;
 
@@ -134,11 +134,11 @@ unsigned char *hex2byte( const char *hexStr, unsigned char *outData, size_t outS
 		if ( isxdigit( *inStr ))
 			len++;
 		else if ( ! isspace( *inStr ))
-			return NULL;
+			return -2;
 	}
 
 	if ( len > outSize * 2 )
-		return( NULL );
+		return( -1 );
 
 	while( *hexStr )	{
 		if ( isxdigit( *hexStr ))	{
@@ -152,7 +152,7 @@ unsigned char *hex2byte( const char *hexStr, unsigned char *outData, size_t outS
 		}
 		hexStr++;
 	}
-	return( outData );
+	return( data - outData );
 }
 
 

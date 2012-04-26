@@ -84,7 +84,7 @@ User* TextFileAuthenticator::authenticate( const std::string& username,
 {
 	try	{
 		std::ifstream	pwdFile( m_file.c_str() );
-		MOD_LOG_TRACE << "Text file authenticator opened file '" << m_file << "'";
+		MOD_LOG_TRACE << "Text file authenticator '" << identifier() << "' opened file '" << m_file << "'";
 		while( !pwdFile.eof())	{
 			std::string line;
 			std::getline( pwdFile, line );
@@ -99,7 +99,6 @@ User* TextFileAuthenticator::authenticate( const std::string& username,
 				usr = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
 				start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
 			}
-//MOD_LOG_TRACE << "Text file authenticator user: '" << usr << "'";
 			if (( caseSensitveUser && usr != username ) ||
 					( !caseSensitveUser && !boost::algorithm::iequals( usr, username )))
 				continue;
@@ -109,12 +108,12 @@ User* TextFileAuthenticator::authenticate( const std::string& username,
 				pwd = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
 				start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
 			}
-//MOD_LOG_TRACE << "Text file authenticator password: '" << pwd << "'";
 
 			unsigned char pwDigest[ SHA224_DIGEST_SIZE ];
-			if ( ! hex2byte( pwd.c_str(), pwDigest, SHA224_DIGEST_SIZE ))
+			if ( hex2byte( pwd.c_str(), pwDigest, SHA224_DIGEST_SIZE ) < 0 )	{
+				MOD_LOG_WARNING << "Authentication: " << identifier() << ": error parsing password hash for user: '" << usr << "'";
 				return NULL;
-
+			}
 			unsigned char inDigest[ SHA224_DIGEST_SIZE ];
 			sha224((const unsigned char *)password.c_str(), password.length(), inDigest );
 
@@ -126,7 +125,7 @@ User* TextFileAuthenticator::authenticate( const std::string& username,
 				name = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
 				start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
 			}
-//MOD_LOG_TRACE << "Text file authenticator name: '" << name << "'";
+
 			return new User( "PlainText", usr, name );
 		}
 		return NULL;
