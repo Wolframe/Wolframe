@@ -84,6 +84,7 @@ TEST_CPP_BINS = \
 	testBoostPath.exe \
 	singletonTest.exe \
 	byte2hexTest.exe \
+	CRAMtest.exe \
 	testSHA2.exe \
 	poolTest.exe \
 	logTest.exe \
@@ -109,6 +110,7 @@ singletonTest.exe: singletonTest.obj $(TOPDIR)\src\wolframe.lib
 poolTest.exe: poolTest.obj $(TOPDIR)\src\wolframe.lib
 testSHA2.exe: testSHA2.obj $(TOPDIR)\src\libwolframe\wolframe.lib
 byte2hexTest.exe: byte2hexTest.obj $(TOPDIR)\src\libwolframe\wolframe.lib
+CRAMtest.exe: CRAMtest.obj $(TOPDIR)\src\libwolframe\wolframe.lib
 logTest.exe: logTest.obj $(TOPDIR)\src\wolframe.lib
 protocolArgumentParsing.exe: protocolArgumentParsing.obj $(TOPDIR)\src\wolframe.lib
 configStructParser.exe: configStructParser.obj $(TOPDIR)\src\wolframe.lib
@@ -134,6 +136,7 @@ local_test:
 	@-echo singletonTest >> test.bat
 	@-echo testSHA2 >> test.bat
 	@-echo byte2hexTest >> test.bat
+	@-echo CRAMtest >> test.bat
 	@-echo protocolArgumentParsing >> test.bat
 	@-echo echo off >> test.bat
 	@-test.bat

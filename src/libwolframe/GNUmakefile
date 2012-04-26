@@ -17,7 +17,8 @@ INCLUDE_DIRS = \
 
 INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
-	-lboost_filesystem
+	-lboost_filesystem \
+	-lboost_random
 
 STATIC_LIB = libwolframe.a
 
@@ -53,7 +54,8 @@ CPP_OBJS = \
 	user.o \
 	moduleDirectory.o \
 	resolvePath.o \
-	referenceConfig.o
+	referenceConfig.o \
+		CRAM.o
 
 OBJS = \
 	byte2hex.o \

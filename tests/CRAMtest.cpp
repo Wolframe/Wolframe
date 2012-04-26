@@ -31,37 +31,21 @@
 
 ************************************************************************/
 //
-// Challenge Response Authentication Mechanism
+// CRAM tests
 //
+#include "gtest/gtest.h"
+#include "AAAA/CRAM.hpp"
 
-#ifndef _CRAM_HPP_INCLUDED
-#define _CRAM_HPP_INCLUDED
-
-static const size_t HASH_BLOCK_SIZE = 1024 / 8;
-static const size_t HASH_DIGEST_SIZE = 512 / 8;
-static const size_t PASSWORD_DIGEST_SIZE = 224 / 8;
-static const size_t CRAM_CHALLENGE_SIZE = HASH_BLOCK_SIZE;
-static const size_t CRAM_RESPONSE_SIZE = HASH_DIGEST_SIZE;
-
-#define	PASSWORD_HASH_STRING_SIZE	( 2 * PASSWORD_HASH_SIZE + 1 )
-#define	CRAM_CHALLENGE_STRING_SIZE	( 2 * CRAM_CHALLENGE_SIZE + 1 )
-#define	CRAM_RESPONSE_STRING_SIZE	( 2 * CRAM_RESPONSE_SIZE + 1 )
-
-#include <stdlib.h>
-
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
-char *passwordHash( char *password, char *buffer, size_t size );
-
-char *CRAMchallenge( char *buffer, size_t size );
-
-char *CRAMresponse( const unsigned char *challenge, const char *passwordHash, char *buffer, size_t size );
-
-#ifdef __cplusplus
+TEST( CRAM, Challenge )
+{
+	_Wolframe::AAAA::CRAMchallenge	challenge( "/dev/urandom" );
+	std::cout << challenge.toString();
+	ASSERT_TRUE( false );
 }
-#endif
 
-#endif	/* _CRAM_HPP_INCLUDED */
+int main( int argc, char **argv )
+{
+	::testing::InitGoogleTest( &argc, argv );
+	return RUN_ALL_TESTS();
+}
 

@@ -292,6 +292,7 @@ include/AAAA/AAAAprovider.hpp
 include/AAAA/audit.hpp
 include/AAAA/authentication.hpp
 include/AAAA/authorization.hpp
+include/AAAA/CRAM.hpp
 include/AAAA/user.hpp
 include/appConfig.hpp
 include/appProcessor.hpp
@@ -1108,7 +1109,6 @@ src/langbind_luaDebug.cpp
 src/langbind_luaScript.cpp
 src/libwolframe/byte2hex.c
 src/libwolframe/CRAM.cpp
-src/libwolframe/CRAM.hpp
 src/libwolframe/GNUmakefile
 src/libwolframe/logger/logBackendConsole.cpp
 src/libwolframe/logger/logBackendConsole.hpp
@@ -1273,6 +1273,7 @@ tests/configValueParser.cpp
 tests/config/wolframe-posix.conf
 tests/config/wolframe-win.conf
 tests/counterTest.cpp
+tests/CRAMtest.cpp
 tests/expect/GNUmakefile
 tests/expect/Makefile.W32
 tests/expect/wolframe.conf
