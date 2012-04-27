@@ -54,7 +54,13 @@
 #include "sha2.h"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
+
+#include <boost/version.hpp>
+#if BOOST_VERSION >= 104700
 #include <boost/random/random_device.hpp>
+#else
+#include <boost/nondet_random.hpp>
+#endif
 
 using namespace _Wolframe::AAAA;
 
@@ -81,7 +87,6 @@ std::string PasswordHash::toString()
 	return std::string( buffer );
 }
 
-
 CRAMchallenge::CRAMchallenge( const std::string& randomDevice )
 {
 	memset( m_challenge, 0, CRAM_CHALLENGE_SIZE );
@@ -90,10 +95,21 @@ CRAMchallenge::CRAMchallenge( const std::string& randomDevice )
 			reinterpret_cast<boost::posix_time::ptime *>( m_challenge );
 	*pt = boost::posix_time::ptime( boost::posix_time::microsec_clock::universal_time());
 
+#if BOOST_VERSION >= 104700
 	boost::random::random_device	rnd( randomDevice );
+#else
+	boost::random_device	rnd( randomDevice );
+#endif
 	unsigned char *start = m_challenge + sizeof( boost::posix_time::ptime );
 	unsigned char *end = m_challenge + sizeof( m_challenge );
+
+#if BOOST_VERSION >= 104700
 	rnd.generate( start, end );
+#else
+	for( ; start != end; start++ ) {
+		*start = rnd( );
+	}
+#endif
 }
 
 std::string CRAMchallenge::toString()
