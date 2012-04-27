@@ -38,7 +38,13 @@
 #define _CRAM_HPP_INCLUDED
 
 #include <string>
+#ifdef _WIN32
+#define WIN32_MEAN_AND_LEAN
+#include <windows.h>
+#define ssize_t SSIZE_T
+#else
 #include <sys/types.h>
+#endif
 
 namespace _Wolframe {
 namespace AAAA {
