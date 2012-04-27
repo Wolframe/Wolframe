@@ -174,16 +174,12 @@ class SSLWolfClient : public WolfClient
 			// TODO: if ec.value( ) == EOF(code?) -> return;
 			if( ec ) {
 				m_io_service.stop( );
-#if BOOST_VERSION >= 104300
 				if( ec.category( ) == boost::system::system_category( ) &&
 				    ec.value( ) == boost::system::errc::operation_canceled ) {
 					// The server sends a timeout, we get a ECANCELED (errno.h)
 				} else {
-#endif
 					std::cerr << "Read error: " << ec.message( ) << " (" << ec.value( ) << ")" << std::endl;
-#if BOOST_VERSION >= 104300
 				}
-#endif
 				return;
 			}
 
@@ -281,16 +277,12 @@ class PlainWolfClient : public WolfClient
 			// TODO: if ec.value( ) == EOF(code?) -> return;
 			if( ec ) {
 				m_io_service.stop( );
-#if BOOST_VERSION >= 104300
 				if( ec.category( ) == boost::system::system_category( ) &&
 				    ec.value( ) == boost::system::errc::operation_canceled ) {
 					// The server sends a timeout, we get a ECANCELED (errno.h)
 				} else {
-#endif
 					std::cerr << "Read error: " << ec.message( ) << " (" << ec.value( ) << ")" << std::endl;
-#if BOOST_VERSION >= 104300
 				}
-#endif
 				return;
 			}
 

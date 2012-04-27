@@ -28,8 +28,7 @@ Prerequisites
 - mc.exe may be missing in your path (for instance on VC8),
   usually it is available as part of the Platform SDK,
   copy it into the path
-- boost 1.43.0 or later (boost 1.42 works too, but is not
-  recommended)
+- boost 1.43.0 or later
 - optionally (WITH_SSL) openssl 0.9.8 or later
 - optionally (WITH_LUA) lua 5.2
   (integrated in subdir 'lua')
@@ -77,7 +76,7 @@ in a Visual Studio C++ command line:
 
 bootstrap
 .\bjam --prefix=C:\<myplace>\boost_1_46_0
-	--with-thread --with-filesystem --with-system --with-program_options --with-date_time --with-regex 
+	--with-thread --with-filesystem --with-system --with-program_options --with-date_time --with-regex --with-random
 	architecture=x86 address-model=64 toolset=msvc 
 	install
 

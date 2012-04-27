@@ -38,6 +38,7 @@
 #define _CRAM_HPP_INCLUDED
 
 #include <string>
+#include <sys/types.h>
 
 namespace _Wolframe {
 namespace AAAA {

@@ -30,11 +30,11 @@ Table of Contents
   Instructions for other Unixes
     FreeBSD 8.2
     FreeBSD 9.0
-    OpenBSD 5.0
     NetBSD 5.1
     Solaris 10
       Solaris 10 (CSW toolchain)
   Broken and non-working instructions for other Unixes
+    OpenBSD 5.0
     Solaris 10 (SFW gcc toolchain)
     Solaris 10 (Sun Forte toolchain)
     Solaris 10 (Sunfreeware GCC toolchain)
@@ -44,8 +44,7 @@ Prerequisites
 
 - gcc c++ 4.1.x or later (preferably 512 MB RAM or Swap)
 - GNU make (preferably 3.82 or newer)
-- boost 1.43.0 or later (boost 1.42 works too, but is not
-  recommended)
+- boost 1.43.0 or later
 - optionally (WITH_SSL) openssl 0.9.7 or later
 - optionally (WITH_LUA) lua 5.2
   (integrated in subdir 'lua')
@@ -105,7 +104,7 @@ Compile and install boost
 -------------------------
 
 ./bootstrap.sh --prefix=/usr/local/boost-1.48.0 \
-	--with-libraries=thread,filesystem,system,program_options,date_time,regex
+	--with-libraries=thread,filesystem,system,program_options,date_time,regex,random
 ./bjam install
 
 configure Wolframe in ~/config.mk and
@@ -470,31 +469,6 @@ So far no PAM support.
 
 Use WITH_LOCAL_LIBHPDF=1 for PDF support.
 
-OpenBSD 5.0
------------
-
-Required packages: boost (1.42.0p7)
-Optional packages: cyrus-sasl2 (from ports tree, 2.1.23p7),
-                   qt4 (qt4-4.7.3p0),
-                   sqlite3 (3.7.5), postgresql-client (9.0.4),
-                   libxml (2.7.8p2), libxslt (1.1.26p2),
-                   png (1.5.4), gmp (5.0.2p0)
-
-You need 'gmake' (3.82).
-
-For NLS support you need 'libintl' and 'gettext'.
-
-OpenBSD has no PAM, but BSD Authentication, which is currently not
-supported by Wolframe.
-
-OpenBSD contains SSL libraries per default no packages needed.
-
-For some optional packages you need the OpenBSD ports tree and
-you have to build the packages on your own.
-
-For testing you need 'expect-5.44.1.15p0-no_tk'.
-
-Use WITH_LOCAL_LIBHPDF=1 for PDF support.
 
 NetBSD 5.1
 ----------
@@ -724,3 +698,32 @@ Optional packages: sqlite (SMCsqlite, 3.7.2), postgresql (SMCpgsql, 9.1.0)
 problems you may have:
 
 visibility attribute not supported in this configuration; ignored
+
+OpenBSD 5.0
+-----------
+
+Note: Broken: boost 1.42 is too old! Missing random library and
+some Asio functions. Also missing some filesystem things (is_absolute).
+
+Required packages: boost (1.42.0p7)
+Optional packages: cyrus-sasl2 (from ports tree, 2.1.23p7),
+                   qt4 (qt4-4.7.3p0),
+                   sqlite3 (3.7.5), postgresql-client (9.0.4),
+                   libxml (2.7.8p2), libxslt (1.1.26p2),
+                   png (1.5.4), gmp (5.0.2p0)
+
+You need 'gmake' (3.82).
+
+For NLS support you need 'libintl' and 'gettext'.
+
+OpenBSD has no PAM, but BSD Authentication, which is currently not
+supported by Wolframe.
+
+OpenBSD contains SSL libraries per default no packages needed.
+
+For some optional packages you need the OpenBSD ports tree and
+you have to build the packages on your own.
+
+For testing you need 'expect-5.44.1.15p0-no_tk'.
+
+Use WITH_LOCAL_LIBHPDF=1 for PDF support.
