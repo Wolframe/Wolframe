@@ -38,7 +38,11 @@
 
 TEST( CRAM, Challenge )
 {
+#ifdef _WIN32
+	_Wolframe::AAAA::CRAMchallenge	challenge( MS_DEF_PROV );
+#else
 	_Wolframe::AAAA::CRAMchallenge	challenge( "/dev/urandom" );
+#endif
 	std::cout << challenge.toString();
 	ASSERT_TRUE( true );
 }
