@@ -31,6 +31,7 @@ Table of Contents
     FreeBSD 8.2
     FreeBSD 9.0
     NetBSD 5.1
+    OpenBSD 5.0
     Solaris 10
       Solaris 10 (CSW toolchain)
   Broken and non-working instructions for other Unixes
@@ -491,6 +492,36 @@ For testing you need 'tcl-expect' (5.43.0nb1).
 
 Use WITH_LOCAL_LIBHPDF=1 for PDF support.
 
+OpenBSD 5.0
+-----------
+
+Required packages: boost (1.42.0p7)
+Optional packages: cyrus-sasl2 (from ports tree, 2.1.23p7),
+                   qt4 (qt4-4.7.3p0),
+                   sqlite3 (3.7.5), postgresql-client (9.0.4),
+                   libxml (2.7.8p2), libxslt (1.1.26p2),
+                   png (1.5.4), gmp (5.0.2p0)
+
+You need 'gmake' (3.82).
+
+The boost package misses the libboost_random.so shared library,
+so build it in /usr/ports/devel/boost and add the
+--with-liraries=...random...
+
+For NLS support you need 'libintl' and 'gettext'.
+
+OpenBSD has no PAM, but BSD Authentication, which is currently not
+supported by Wolframe.
+
+OpenBSD contains SSL libraries per default no packages needed.
+
+For some optional packages you need the OpenBSD ports tree and
+you have to build the packages on your own.
+
+For testing you need 'expect-5.44.1.15p0-no_tk'.
+
+Use WITH_LOCAL_LIBHPDF=1 for PDF support.
+
 Solaris 10
 ----------
 
@@ -700,31 +731,3 @@ problems you may have:
 
 visibility attribute not supported in this configuration; ignored
 
-OpenBSD 5.0
------------
-
-Note: Broken: boost 1.42 is too old! Missing random library and
-some Asio functions. Also missing some filesystem things (is_absolute).
-
-Required packages: boost (1.42.0p7)
-Optional packages: cyrus-sasl2 (from ports tree, 2.1.23p7),
-                   qt4 (qt4-4.7.3p0),
-                   sqlite3 (3.7.5), postgresql-client (9.0.4),
-                   libxml (2.7.8p2), libxslt (1.1.26p2),
-                   png (1.5.4), gmp (5.0.2p0)
-
-You need 'gmake' (3.82).
-
-For NLS support you need 'libintl' and 'gettext'.
-
-OpenBSD has no PAM, but BSD Authentication, which is currently not
-supported by Wolframe.
-
-OpenBSD contains SSL libraries per default no packages needed.
-
-For some optional packages you need the OpenBSD ports tree and
-you have to build the packages on your own.
-
-For testing you need 'expect-5.44.1.15p0-no_tk'.
-
-Use WITH_LOCAL_LIBHPDF=1 for PDF support.

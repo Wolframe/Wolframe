@@ -18,8 +18,12 @@ INCLUDE_LIBS = \
 	-lwolframe \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_program_options \
-	-lboost_filesystem -lboost_random \
+	-lboost_filesystem \
 	$(LIBS_DL)
+
+ifneq "$(PLATFORM)" "OPENBSD"
+INCLUDE_LIBS += -lboost_random
+endif
 
 # openssl
 ifeq ($(WITH_SSL),1)
