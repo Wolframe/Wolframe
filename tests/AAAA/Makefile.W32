@@ -30,11 +30,15 @@ CPP_OBJS = \
 	$(TOPDIR)\src\modules\authentication\database\DBauth.obj
 
 TEST_CPP_BINS = \
-	authenticationTest.exe
+	authenticationTest.exe \
+	textFileTest.exe \
+	textFileCRAMest.exe
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 authenticationTest.exe: authenticationTest.obj $(CPP_OBJS) $(TOPDIR)\src\wolframe.lib
+textFileTest.exe: textFileTest.obj $(CPP_OBJS) $(TOPDIR)\src\wolframe.lib
+textFileCRAMest.exe: textFileCRAMest.obj $(CPP_OBJS) $(TOPDIR)\src\wolframe.lib
 
 local_all:
 
@@ -47,5 +51,7 @@ local_test:
 	@-echo @echo off > test.bat
 	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
 	@-echo authenticationTest >> test.bat
+	@-echo textFileTest >> test.bat
+	@-echo textFileCRAMest >> test.bat
 	@-echo echo off >> test.bat
 	@-test.bat

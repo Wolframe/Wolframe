@@ -91,16 +91,16 @@ CRAMchallenge::CRAMchallenge( const std::string& randomDevice )
 {
 	memset( m_challenge, 0, CRAM_CHALLENGE_SIZE );
 
-	boost::posix_time::ptime *pt =
-			reinterpret_cast<boost::posix_time::ptime *>( m_challenge );
-	*pt = boost::posix_time::ptime( boost::posix_time::microsec_clock::universal_time());
+	boost::posix_time::ptime pt =
+			boost::posix_time::ptime( boost::posix_time::microsec_clock::universal_time());
+	sha256((const unsigned char*)&pt, sizeof( pt ), m_challenge );
 
 #if BOOST_VERSION >= 104700
 	boost::random::random_device	rnd( randomDevice );
 #else
 	boost::random_device	rnd( randomDevice );
 #endif
-	unsigned char *start = m_challenge + sizeof( boost::posix_time::ptime );
+	unsigned char *start = m_challenge + SHA256_DIGEST_SIZE;
 	unsigned char *end = m_challenge + sizeof( m_challenge );
 
 #if BOOST_VERSION >= 104700
@@ -141,8 +141,8 @@ CRAMresponse::CRAMresponse( const CRAMchallenge& challenge,
 	sha512( buffer, CRAM_CHALLENGE_SIZE, m_response );
 }
 
-CRAMresponse::CRAMresponse(const std::string& challenge,
-			   const std::string &username, const std::string& pwdHash )
+CRAMresponse::CRAMresponse( const std::string& challenge,
+			    const std::string &username, const std::string& pwdHash )
 {
 	unsigned char chlng[ CRAM_CHALLENGE_SIZE ];
 	unsigned char buffer[ CRAM_CHALLENGE_SIZE ];
@@ -175,6 +175,15 @@ std::string CRAMresponse::toString()
 bool CRAMresponse::operator == ( const CRAMresponse& rhs )
 {
 	return !memcmp( this->m_response, rhs.m_response, CRAM_RESPONSE_SIZE );
+}
+
+bool CRAMresponse::operator == ( const std::string& rhs )
+{
+	unsigned char	buffer[ CRAM_RESPONSE_SIZE ];
+
+	if ( hex2byte( rhs.c_str(), buffer, CRAM_RESPONSE_SIZE ) != CRAM_RESPONSE_SIZE )
+		return false;
+	return !memcmp( this->m_response, buffer, CRAM_RESPONSE_SIZE );
 }
 
 /** @} *//* CRAM */

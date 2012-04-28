@@ -160,7 +160,7 @@ TEST_F( AuthenticationFixture, invalidUsers )
 //TEST_F( AuthenticationFixture, invalidFile )
 //{
 //	User*	user;
-//	TextFileAuthenticator authenticator( "", "passwds" );
+//	PlainTextAuthenticator authenticator( "", "passwds" );
 
 //	user = authenticator.authenticate( "admin", "xx", true );
 //	ASSERT_EQ( NULL, user );

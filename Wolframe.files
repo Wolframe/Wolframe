@@ -1259,6 +1259,7 @@ tests/AAAA/GNUmakefile
 tests/AAAA/Makefile.W32
 tests/AAAA/passwd
 tests/AAAA/sasl.conf
+tests/AAAA/textFileCRAMtest.cpp
 tests/AAAA/textFileTest.cpp
 tests/bignum/GNUmakefile
 tests/bignum/libgmp/GNUmakefile

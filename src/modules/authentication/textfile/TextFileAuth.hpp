@@ -41,6 +41,7 @@
 #include <vector>
 #include "AAAA/authentication.hpp"
 #include "AAAA/user.hpp"
+#include "AAAA/CRAM.hpp"
 #include "moduleInterface.hpp"
 
 namespace _Wolframe {
@@ -78,8 +79,8 @@ public:
 
 	User* authenticate( const std::string& username, const std::string& password,
 			    bool caseSensitveUser ) const;
-	User* authenticate( std::vector<unsigned char>& challenge,
-			    std::vector<unsigned char>& response, bool caseSensitveUser ) const;
+	User* authenticate( const CRAMchallenge& challenge, const CRAMresponse& response,
+			    bool caseSensitveUser ) const;
 private:
 	const std::string		m_file;
 };
