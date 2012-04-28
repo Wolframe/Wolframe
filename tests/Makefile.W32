@@ -117,7 +117,7 @@ protocolArgumentParsing.exe: protocolArgumentParsing.obj $(TOPDIR)\src\wolframe.
 configStructParser.exe: configStructParser.obj $(TOPDIR)\src\wolframe.lib
 configValueParser.exe: configValueParser.obj $(TOPDIR)\src\wolframe.lib
 filter.exe: filter.obj $(TOPDIR)\src\wolframe.lib
-testTimer.exe: testTimer.obj
+testTimers.exe: testTimers.obj
 
 local_all:
 
