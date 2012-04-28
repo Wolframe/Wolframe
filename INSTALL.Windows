@@ -7,10 +7,8 @@ Table of Contents
   Prerequisites
     Boost
       Compile and install boost
-      Notes on special Boost versions
-      Boost 1.44
     OpenSSL
-       Compile and install openssl
+      Compile and install openssl
     Compile and install Qt
     Postgresql C client library
       Compiling Postgresql
@@ -63,10 +61,10 @@ Boost
 
 Get boost from http://boostpro.com or http://boost.teeks99.com
 
-Install for instance into C:\Program Files\Boost\Boost_1_46
+Install for instance into C:\Program Files\Boost\Boost_1_49
 
 configure 'makefile\nmake\config.mk' and 
-set BOOST_DIR to C:\Program Files\Boost\Boost_1_46
+set BOOST_DIR to C:\Program Files\Boost\Boost_1_49
 
 Compile and install boost
 -------------------------
@@ -75,28 +73,19 @@ If you insist to compile Boost from scratch, do the following
 in a Visual Studio C++ command line:
 
 bootstrap
-.\bjam --prefix=C:\<myplace>\boost_1_46_0
+.\bjam --prefix=C:\<myplace>\boost_1_49_0
 	--with-thread --with-filesystem --with-system --with-program_options --with-date_time --with-regex --with-random
 	architecture=x86 address-model=64 toolset=msvc 
 	install
 
 with variant, architecture, address-mode and toolset fitting your needs.
 
-set BOOST_DIR to C:\<myhome>\boost-1_46_0
+set BOOST_DIR to C:\<myplace>\boost-1_49_0
 
-These instructions are for boost 1.46, other versions may vary.
+These instructions are for boost 1.49, other versions may vary.
 
 Careful: Always check %LIB% and the 'setenv' environment of the SDK! You can
 end up in 64-bit code using 32-bit libraries otherwise. :-)
-
-Notes on special Boost versions
--------------------------------
-
-Boost 1.44
-----------
-
-Boost 1.44 needs an essential patch, see:
-https://svn.boost.org/trac/boost/ticket/4487
 
 OpenSSL
 -------

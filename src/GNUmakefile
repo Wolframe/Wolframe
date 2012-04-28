@@ -18,7 +18,7 @@ INCLUDE_LIBS = \
 	-lwolframe \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_program_options \
-	-lboost_filesystem \
+	-lboost_filesystem -lboost_random \
 	$(LIBS_DL)
 
 # openssl

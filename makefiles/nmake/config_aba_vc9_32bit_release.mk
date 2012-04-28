@@ -21,19 +21,19 @@
 # version of the boost library
 
 #BOOST_VERSION = 1_46_1
-BOOST_VERSION = 1_46_0
+BOOST_VERSION = 1_49_0
 
 # base dir where boost is installed
 
 #BOOST_DIR = C:\Programme\boost\boost_$(BOOST_VERSION)
 #BOOST_DIR = C:\Program Files\boost\boost_$(BOOST_VERSION)
 #BOOST_DIR = D:\Programme\boost\boost_$(BOOST_VERSION)
-BOOST_DIR = C:\Cygwin\home\Andreas\boost_1_46_0-win32
+BOOST_DIR = C:\Cygwin\home\Andreas\boost_1_49_0-win32
 #BOOST_DIR = D:\boost\boost_1_45_0
 #BOOST_DIR = D:\Program Files\boost\boost_$(BOOST_VERSION)
 
 # depends on the choosen boost layout
-BOOST_INCLUDE_DIR = $(BOOST_DIR)\Include\boost-1_46
+BOOST_INCLUDE_DIR = $(BOOST_DIR)\Include\boost-1_49
 #BOOST_INCLUDE_DIR = $(BOOST_DIR)
 
 # visual studio version used for compiling
