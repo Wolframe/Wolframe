@@ -151,7 +151,7 @@ endif
 
 $(bjam):
 	./bootstrap.sh --with-icu --prefix=$(CURDIR)/debian/tmp/usr \
-		--with-libraries=thread,filesystem,system,program_options,date_time
+		--with-libraries=thread,filesystem,system,program_options,date_time,random
 
 user-config.jam:
 	echo $(TOOLSET_CONFIG) > $@
