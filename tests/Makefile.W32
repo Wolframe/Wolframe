@@ -92,7 +92,7 @@ TEST_CPP_BINS = \
 	configStructParser.exe \
 	configValueParser.exe \
 	filter.exe \
-	testTimer.exe
+	testTimers.exe
 
 OBJS = \
 
