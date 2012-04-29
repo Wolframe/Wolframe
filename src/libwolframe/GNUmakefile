@@ -60,6 +60,10 @@ CPP_OBJS = \
 	referenceConfig.o \
 	CRAM.o
 
+ifeq "$(PLATFORM)" "OPENBSD"
+CPP_OBJS += random_device.o
+endif
+
 OBJS = \
 	byte2hex.o \
 	sha2.o

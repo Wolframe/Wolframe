@@ -14,7 +14,7 @@ SOVERSION = 1.46.1
 SHLIBS_VERSION = (>= 1.46.1-1)
 
 # Boost libraries for which we want separate packages
-boost_libs := date-time filesystem program-options system thread
+boost_libs := date-time filesystem program-options system thread random
 
 # these are special cases, where /usr/lib name differs from Boost library name
 boost_lib_math := math_c99 math_c99f math_tr1 math_tr1f
@@ -151,7 +151,7 @@ endif
 
 $(bjam):
 	./bootstrap.sh --with-icu --prefix=$(CURDIR)/debian/tmp/usr \
-		--with-libraries=thread,filesystem,system,program_options,date_time
+		--with-libraries=thread,filesystem,system,program_options,date_time,random
 
 user-config.jam:
 	echo $(TOOLSET_CONFIG) > $@

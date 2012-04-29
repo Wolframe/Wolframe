@@ -38,8 +38,11 @@ INCLUDE_LIBS = \
 	$(TOPDIR)/src/libwolframe.a \
 	$(TOPDIR)/src/libwolframe/libwolframe.a \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
-	-lboost_filesystem -lboost_system \
-	-lboost_random
+	-lboost_filesystem -lboost_system
+
+ifneq "$(PLATFORM)" "OPENBSD"
+INCLUDE_LIBS += -lboost_random
+endif
 
 # openssl
 
@@ -84,7 +87,8 @@ TEST_CPP_BINS = \
 	protocolArgumentParsing$(EXE) \
 	configValueParser$(EXE) \
 	configStructParser$(EXE) \
-	filter$(EXE)
+	filter$(EXE) \
+	testTimers$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
