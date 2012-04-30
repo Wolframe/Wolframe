@@ -49,18 +49,14 @@
 #include <stdexcept>
 #include <cstring>
 
+#include <fcntl.h>
+#include <unistd.h>
+
 #include "AAAA/CRAM.hpp"
 #include "byte2hex.h"
 #include "sha2.h"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
-
-#include <boost/version.hpp>
-#if BOOST_VERSION >= 104700
-#include <boost/random/random_device.hpp>
-#else
-#include <boost/nondet_random.hpp>
-#endif
 
 using namespace _Wolframe::AAAA;
 
@@ -95,21 +91,13 @@ CRAMchallenge::CRAMchallenge( const std::string& randomDevice )
 			boost::posix_time::ptime( boost::posix_time::microsec_clock::universal_time());
 	sha256((const unsigned char*)&pt, sizeof( pt ), m_challenge );
 
-#if BOOST_VERSION >= 104700
-	boost::random::random_device	rnd( randomDevice );
-#else
-	boost::random_device	rnd( randomDevice );
-#endif
-	unsigned char *start = m_challenge + SHA256_DIGEST_SIZE;
-	unsigned char *end = m_challenge + sizeof( m_challenge );
-
-#if BOOST_VERSION >= 104700
-	rnd.generate( start, end );
-#else
-	for( ; start != end; start++ ) {
-		*start = rnd( );
+	int hndl = open( randomDevice.c_str(), O_RDONLY );
+	if ( hndl < 0 )	{
+		throw std::runtime_error( "Error opening " );
 	}
-#endif
+
+	read( hndl, m_challenge + SHA256_DIGEST_SIZE, CRAM_CHALLENGE_SIZE - SHA256_DIGEST_SIZE );
+	close( hndl );
 }
 
 std::string CRAMchallenge::toString()
