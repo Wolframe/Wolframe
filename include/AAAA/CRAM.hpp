@@ -79,14 +79,16 @@ private:
 class CRAMresponse
 {
 public:
-	CRAMresponse(const CRAMchallenge& challenge,
-		     const std::string& username, const std::string &pwdHash);
+	CRAMresponse( const CRAMchallenge& challenge,
+		      const std::string& username, const std::string &pwdHash);
 	CRAMresponse( const std::string& challenge,
 		      const std::string& username, const std::string& pwdHash );
 
 	std::string toString();
 	bool operator == ( const CRAMresponse& rhs );
 	bool operator != ( const CRAMresponse& rhs )	{ return !( *this == rhs ); }
+	bool operator == ( const std::string& rhs );
+	bool operator != ( const std::string& rhs )	{ return !( *this == rhs ); }
 private:
 	unsigned char	m_response[ CRAM_RESPONSE_SIZE ];
 };

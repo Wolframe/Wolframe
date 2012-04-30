@@ -22,7 +22,7 @@ INCLUDE_LIBS = \
 	$(TOPDIR)/src/libwolframe.a \
 	$(TOPDIR)/src/libwolframe/libwolframe.a \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
-	-lboost_filesystem -lboost_system \
+	-lboost_filesystem -lboost_system -lboost_random \
 	$(LIBS_DL)
 
 CPP_OBJS = \
@@ -84,12 +84,14 @@ endif
 
 TEST_CPP_BINS = \
 	authenticationTest$(EXE) \
-	textFileTest$(EXE)
+	textFileTest$(EXE) \
+	textFileCRAMtest$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 authenticationTest$(EXE): $(CPP_OBJS)
 textFileTest$(EXE): $(CPP_OBJS)
+textFileCRAMtest$(EXE): $(CPP_OBJS)
 
 local_all:
 
@@ -117,5 +119,7 @@ ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./authenticationTest
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./textFileTest
+	@echo
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./textFileCRAMtest
 	@echo
 endif
