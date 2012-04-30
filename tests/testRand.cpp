@@ -12,6 +12,7 @@
 
 int main()
 {
+#ifndef _WIN32
 	unsigned char buf[39];
 
 	int f = open( "/dev/urandom", O_RDONLY );
@@ -32,8 +33,6 @@ int main()
 	}
 
 	(void)close( f );
-
-#ifndef _WIN32
 #else
 	HCRYPTPROV provider = 0;
 
