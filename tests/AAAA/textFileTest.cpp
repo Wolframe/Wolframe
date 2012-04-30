@@ -157,18 +157,18 @@ TEST_F( AuthenticationFixture, invalidUsers )
 	ASSERT_EQ( NULL, user );
 }
 
-//TEST_F( AuthenticationFixture, invalidFile )
-//{
-//	User*	user;
-//	TextFileAuthenticator authenticator( "", "passwds" );
+TEST_F( AuthenticationFixture, invalidFile )
+{
+	User*	user;
+	TextFileAuthenticator authenticator( "", "passwds" );
 
-//	user = authenticator.authenticate( "admin", "xx", true );
-//	ASSERT_EQ( NULL, user );
-//	user = authenticator.authenticate( "goodusr", "xx", true );
-//	ASSERT_EQ( NULL, user );
-//	user = authenticator.authenticate( "badusr", "xx", true );
-//	ASSERT_EQ( NULL, user );
-//}
+	user = authenticator.authenticate( "admin", "xx", true );
+	ASSERT_EQ( NULL, user );
+	user = authenticator.authenticate( "goodusr", "xx", true );
+	ASSERT_EQ( NULL, user );
+	user = authenticator.authenticate( "badusr", "xx", true );
+	ASSERT_EQ( NULL, user );
+}
 
 
 int main( int argc, char **argv )

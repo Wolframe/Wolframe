@@ -35,8 +35,9 @@
 //
 
 #include <string>
-#include <fstream>
 
+#include <fstream>
+#include <iostream>
 #include "logger-v1.hpp"
 #include "TextFileAuth.hpp"
 #include "sha2.h"
@@ -85,6 +86,11 @@ User* TextFileAuthenticator::authenticate( const std::string& username,
 {
 	try	{
 		std::ifstream	pwdFile( m_file.c_str() );
+		if ( ! pwdFile.is_open() )	{
+			MOD_LOG_WARNING << "Unable to read text file authentication file '" << m_file << "'";
+			return NULL;
+		}
+		pwdFile.exceptions( std::ifstream::failbit | std::ifstream::badbit );
 		MOD_LOG_TRACE << "Text file authenticator '" << identifier() << "' opened file '" << m_file << "'";
 		while( !pwdFile.eof())	{
 			std::string line;
@@ -132,7 +138,7 @@ User* TextFileAuthenticator::authenticate( const std::string& username,
 		return NULL;
 	}
 	catch( std::exception& e )	{
-		MOD_LOG_TRACE << "Unable to read text file authentication file '" << m_file << "': " << e.what();
+		MOD_LOG_WARNING << "Unable to read text file authentication file '" << m_file << "': " << e.what();
 		return NULL;
 	}
 }
