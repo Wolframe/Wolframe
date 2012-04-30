@@ -74,7 +74,7 @@ in a Visual Studio C++ command line:
 
 bootstrap
 .\bjam --prefix=C:\<myplace>\boost_1_49_0
-	--with-thread --with-filesystem --with-system --with-program_options --with-date_time --with-regex --with-random
+	--with-thread --with-filesystem --with-system --with-program_options --with-date_time
 	architecture=x86 address-model=64 toolset=msvc 
 	install
 

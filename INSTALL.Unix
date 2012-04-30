@@ -106,7 +106,7 @@ Compile and install boost
 -------------------------
 
 ./bootstrap.sh --prefix=/usr/local/boost-1.48.0 \
-	--with-libraries=thread,filesystem,system,program_options,date_time,regex,random
+	--with-libraries=thread,filesystem,system,program_options,date_time
 ./bjam install
 
 configure Wolframe in ~/config.mk and
@@ -532,10 +532,6 @@ Optional packages: cyrus-sasl2 (from ports tree, 2.1.23p7),
 
 You need 'gmake' (3.82).
 
-The boost package misses the libboost_random.so shared library,
-so build it in /usr/ports/devel/boost and add the
---with-liraries=...random...
-
 For NLS support you need 'libintl' and 'gettext'.
 
 OpenBSD has no PAM, but BSD Authentication, which is currently not
@@ -596,7 +592,7 @@ using gcc : 4.6.2 : g++ : <compileflags>-mcpu=v9 ;
 Build and install normally:
 
 ./bootstrap.sh --prefix=/opt/csw/boost-1.48.0 \
-	--with-libraries=thread,filesystem,system,program_options,date_time,regex
+	--with-libraries=thread,filesystem,system,program_options,date_time
 ./b2 -d2 install
 
 Optional packages to install from CSW:
@@ -664,7 +660,7 @@ namespace boost
 Build and install normally:
 
 ./bootstrap.sh --prefix=/usr/local/boost-1.48.0 \
-	--with-libraries=thread,filesystem,system,program_options,date_time,regex
+	--with-libraries=thread,filesystem,system,program_options,date_time
 ./b2 -d2 install
 
 LibXML2 and LibXSLT are there per default (packages 'SMClxml' and 'SMClxslt') and
@@ -713,7 +709,7 @@ Build boost with the sun toolset:
 
 ./bootstrap.sh --prefix=/usr/local/boost-1.48.0 \
 	--with-toolset=sun \
-	--with-libraries=thread,filesystem,system,program_options,date_time,regex
+	--with-libraries=thread,filesystem,system,program_options,date_time
 
 Problems:
 
