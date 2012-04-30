@@ -81,8 +81,6 @@ void get_time(LARGE_INTEGER frequency, const reference_point&
 
 int main( int argc, char *argv[] )
 {
-	boost::posix_time::ptime t;
-
 	if( argc != 2 ) {
 		std::cerr << "usage: testTimers.exe <number of tests>" << std::endl;
 		return 1;
@@ -91,39 +89,94 @@ int main( int argc, char *argv[] )
 	
 	// not quite accurate, Windows, roughly 10 ms resolution,
 	// Unix no problem, down to the microsecond different
-	std::cout << "boost::posix_time" << std::endl;
+	boost::posix_time::ptime *t =
+		(boost::posix_time::ptime *)malloc( nof_iters * sizeof( boost::posix_time::ptime ) );
 	for( int i = 0; i < nof_iters; i++ ) {
-		t = boost::posix_time::ptime(
+		t[i] = boost::posix_time::ptime(
 			boost::posix_time::microsec_clock::universal_time( ) );
-		std::cout << t << std::endl;
+	}
+	std::cout << "boost::posix_time" << std::endl;
+	boost::posix_time::ptime tlast = t[0];
+	int tcount = 0;
+	for( int i = 0; i < nof_iters; i++ ) {
+		if( tlast != t[i] ) {
+			std::cout << tcount << " times " << t[i-1] << std::endl;
+			tlast = t[i];
+			tcount = 0;
+		} else {
+			tcount++;
+		}
+	}
+	if( tcount > 0 ) {
+		std::cout << tcount << " times " << t[nof_iters-1] << std::endl;
 	}
 	std::cout << "------------------" << std::endl;
+	free( t );
 
 #ifdef _WIN32
 	// _ftime_s: much faster, but also ~10 ms resolution
-	struct _timeb tb;
-	
-	std::cout << "Win32 _ftime_s" << std::endl;
+	struct _timeb *tb =
+		(struct _timeb *)malloc( nof_iters * sizeof( struct _timeb ) );
 	for( int i = 0; i < nof_iters; i++ ) {
-		_ftime_s( &tb );
+		_ftime_s( &tb[i] );
+	}
+	std::cout << "Win32 _ftime_s" << std::endl;
+	struct _timeb tblast = tb[0];
+	tcount = 0;
+	for( int i = 0; i < nof_iters; i++ ) {
+		if( tblast.millitm != tb[i].millitm ) {		
+			std::cout 	<< std::setfill( '0' )
+					<< tcount << " times "
+					<< tb[i-1].time << "." << std::setw( 3 )
+					<< tb[i-1].millitm << std::endl;
+			tcount = 0;
+			tblast = tb[i];
+		} else {
+			tcount++;
+		}
+	}
+	if( tcount > 0 ) {
 		std::cout 	<< std::setfill( '0' )
-				<< tb.time << "." << std::setw( 3 )
-				<< tb.millitm << std::endl;
+				<< tcount << " times "
+				<< tb[nof_iters-1].time << "." << std::setw( 3 )
+				<< tb[nof_iters-1].millitm << std::endl;
 	}
 	std::cout << "------------------" << std::endl;
+	free( tb );
 	
 	// GetSystemTime (also ~10 ms resolution)
-	SYSTEMTIME st;
+	SYSTEMTIME *st =
+		(SYSTEMTIME *)malloc( nof_iters * sizeof( SYSTEMTIME ) );
 	std::cout << "Win32 GetSystemTime" << std::endl;
 	for( int i = 0; i < nof_iters; i++ ) {
-		GetSystemTime( &st );
+		GetSystemTime( &st[i] );
+	}
+	SYSTEMTIME stlast = st[0];
+	tcount = 0;
+	for( int i = 0; i < nof_iters; i++ ) {
+		if( stlast.wMilliseconds != st[i].wMilliseconds ) {
+			std::cout 	<< std::setfill( '0' )
+					<< tcount << " times "
+					<< std::setw( 2 ) << st[i-1].wHour << ':'
+					<< std::setw( 2 ) << st[i-1].wMinute << ':'
+					<< std::setw( 2 ) << st[i-1].wSecond << '.'
+					<< std::setw( 3 ) << st[i-1].wMilliseconds << std::endl;
+			tcount = 0;
+			stlast = st[i];
+		} else {
+			tcount++;
+		}
+	}
+	if( tcount > 0 ) {
 		std::cout 	<< std::setfill( '0' )
-				<< std::setw( 2 ) << st.wHour << ':'
-				<< std::setw( 2 ) << st.wMinute << ':'
-				<< std::setw( 2 ) << st.wSecond << '.'
-				<< std::setw( 3 ) << st.wMilliseconds << std::endl;
+				<< tcount << " times "
+				<< std::setw( 2 ) << st[nof_iters-1].wHour << ':'
+				<< std::setw( 2 ) << st[nof_iters-1].wMinute << ':'
+				<< std::setw( 2 ) << st[nof_iters-1].wSecond << '.'
+				<< std::setw( 3 ) << st[nof_iters-1].wMilliseconds << std::endl;	
 	}
 	std::cout << "------------------" << std::endl;	
+	free( st );
 	
 	// GetSystemTimeAsFileTime: the same
 	// GetTickCount has the same resolution (by documentation)
@@ -133,20 +186,42 @@ int main( int argc, char *argv[] )
 	// simple example
 	reference_point ref_point;
 	LARGE_INTEGER   frequency;
-	FILETIME        file_time;
-	SYSTEMTIME      system_time;
+	FILETIME        *file_time;
+	SYSTEMTIME      *system_time;
 
-	std::cout << "Win32 article simplistic sync" << std::endl;
 	::QueryPerformanceFrequency(&frequency);
 	simplistic_synchronize(ref_point);
+	file_time = (FILETIME *)malloc( nof_iters * sizeof( FILETIME ) );
+	system_time = (SYSTEMTIME *)malloc( nof_iters * sizeof( SYSTEMTIME ) );
 	for( int i = 0; i < nof_iters; i++ ) {
-		get_time(frequency, ref_point, file_time);
-		::FileTimeToSystemTime(&file_time, &system_time);
-		std::cout 	<< std::setw(2) << system_time.wHour << ':'
-				<< std::setw(2) << system_time.wMinute << ':'
-				<< std::setw(2) << system_time.wSecond << '.'
-				<< std::setw(3) << system_time.wMilliseconds << std::endl;
+		get_time(frequency, ref_point, file_time[i]);
+	}
+	for( int i = 0; i < nof_iters; i++ ) {
+		::FileTimeToSystemTime(&file_time[i], &system_time[i]);
+	}		
+	tcount = 0;
+	SYSTEMTIME slast = system_time[0];
+	std::cout << "Win32 article simplistic sync" << std::endl;
+	for( int i = 0; i < nof_iters; i++ ) {
+		if( slast.wMilliseconds != system_time[i].wMilliseconds ) {
+			std::cout 	<< tcount << " times "
+					<< std::setw(2) << system_time[i-1].wHour << ':'
+					<< std::setw(2) << system_time[i-1].wMinute << ':'
+					<< std::setw(2) << system_time[i-1].wSecond << '.'
+					<< std::setw(3) << system_time[i-1].wMilliseconds << std::endl;
+			tcount = 0;
+			slast = system_time[i];
+		} else {
+			tcount++;
+		}
 	}	
+	if( tcount > 0 ) {
+		std::cout 	<< tcount << " times "
+				<< std::setw(2) << system_time[nof_iters-1].wHour << ':'
+				<< std::setw(2) << system_time[nof_iters-1].wMinute << ':'
+				<< std::setw(2) << system_time[nof_iters-1].wSecond << '.'
+				<< std::setw(3) << system_time[nof_iters-1].wMilliseconds << std::endl;
+	}
 	std::cout << "------------------" << std::endl;	
 #endif
 
