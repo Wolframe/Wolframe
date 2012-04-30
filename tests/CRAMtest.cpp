@@ -34,6 +34,7 @@
 // CRAM tests
 //
 #include "gtest/gtest.h"
+#include <stdexcept>
 #include "AAAA/CRAM.hpp"
 
 TEST( CRAM, Challenge )
@@ -46,6 +47,13 @@ TEST( CRAM, Challenge )
 	std::cout << challenge.toString();
 	ASSERT_TRUE( true );
 }
+
+#ifndef _WIN32
+TEST( CRAM, WrongDevice )
+{
+	ASSERT_THROW( _Wolframe::AAAA::CRAMchallenge challenge( "/Wrong/Device" ), std::runtime_error );
+}
+#endif
 
 int main( int argc, char **argv )
 {

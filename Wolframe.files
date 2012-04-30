@@ -1141,7 +1141,6 @@ src/libwolframe/provider/Authorization.cpp
 src/libwolframe/provider/DBproviderConfig.cpp
 src/libwolframe/provider/DBproviderImpl.cpp
 src/libwolframe/provider/DBproviderImpl.hpp
-src/libwolframe/random_device.cpp
 src/libwolframe/referenceConfig.cpp
 src/libwolframe/resolvePath.cpp
 src/libwolframe/sha2.c
@@ -1323,6 +1322,7 @@ tests/SSL/README.txt
 tests/testBoostPath.cpp
 tests/testMethodMemberPointerTemplate.cpp
 tests/testNamedRetVal.cpp
+tests/testRand.cpp
 tests/testSHA2.cpp
 tests/testTimers.cpp
 tests/threadLeakTest.cpp
