@@ -49,8 +49,14 @@
 #include <stdexcept>
 #include <cstring>
 
+#ifndef _WIN32
 #include <fcntl.h>
+#include <sys/types.h>
 #include <unistd.h>
+#else
+#define WIN32_MEAN_AND_LEAN
+#include <windows.h>
+#endif
 
 #include "AAAA/CRAM.hpp"
 #include "byte2hex.h"
@@ -91,6 +97,7 @@ CRAMchallenge::CRAMchallenge( const std::string& randomDevice )
 			boost::posix_time::ptime( boost::posix_time::microsec_clock::universal_time());
 	sha256((const unsigned char*)&pt, sizeof( pt ), m_challenge );
 
+#ifndef _WIN32
 	int hndl = open( randomDevice.c_str(), O_RDONLY );
 	if ( hndl < 0 )	{
 		throw std::runtime_error( "Error opening " );
@@ -98,6 +105,22 @@ CRAMchallenge::CRAMchallenge( const std::string& randomDevice )
 
 	read( hndl, m_challenge + SHA256_DIGEST_SIZE, CRAM_CHALLENGE_SIZE - SHA256_DIGEST_SIZE );
 	close( hndl );
+#else
+	HCRYPTPROV provider = 0;
+
+	if( !CryptAcquireContext( &provider, 0, 0, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT | CRYPT_SILENT ) ) {
+		throw std::runtime_error( "Error opening cyrpto context" );
+	}
+
+	if( !CryptGenRandom( provider, CRAM_CHALLENGE_SIZE - SHA256_DIGEST_SIZE, static_cast<BYTE *>( m_challenge + SHA256_DIGEST_SIZE ) ) ) {
+		CryptReleaseContext( provider, 0 );
+		throw std::runtime_error( "Error generating random data " );
+	}
+
+	if( !CryptReleaseContext( provider, 0 ) ) {
+		throw std::runtime_error( "Error closing cyrpto context" );
+	}	
+#endif
 }
 
 std::string CRAMchallenge::toString()
