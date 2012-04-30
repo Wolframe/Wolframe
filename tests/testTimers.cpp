@@ -201,26 +201,37 @@ int main( int argc, char *argv[] )
 	}		
 	tcount = 0;
 	SYSTEMTIME slast = system_time[0];
+	FILETIME flast = file_time[0];
 	std::cout << "Win32 article simplistic sync" << std::endl;
 	for( int i = 0; i < nof_iters; i++ ) {
-		if( slast.wMilliseconds != system_time[i].wMilliseconds ) {
+		if( flast.dwLowDateTime != file_time[i].dwLowDateTime ) {
+//		if( slast.wMilliseconds != system_time[i].wMilliseconds ) {
 			std::cout 	<< tcount + 1 << " times "
+					<< file_time[i-1].dwHighDateTime << "."
+					<< file_time[i-1].dwLowDateTime
+/*
 					<< std::setw(2) << system_time[i-1].wHour << ':'
 					<< std::setw(2) << system_time[i-1].wMinute << ':'
 					<< std::setw(2) << system_time[i-1].wSecond << '.'
-					<< std::setw(3) << system_time[i-1].wMilliseconds << std::endl;
+					<< std::setw(3) << system_time[i-1].wMilliseconds
+*/
+					<< std::endl;
 			tcount = 0;
-			slast = system_time[i];
+//			slast = system_time[i];
+			flast = file_time[i];
 		} else {
 			tcount++;
 		}
 	}	
 	if( tcount > 0 ) {
 		std::cout 	<< tcount << " times "
-				<< std::setw(2) << system_time[nof_iters-1].wHour << ':'
-				<< std::setw(2) << system_time[nof_iters-1].wMinute << ':'
-				<< std::setw(2) << system_time[nof_iters-1].wSecond << '.'
-				<< std::setw(3) << system_time[nof_iters-1].wMilliseconds << std::endl;
+				<< file_time[nof_iters-1].dwHighDateTime << "."
+				<< file_time[nof_iters-1].dwLowDateTime
+//				<< std::setw(2) << system_time[nof_iters-1].wHour << ':'
+//				<< std::setw(2) << system_time[nof_iters-1].wMinute << ':'
+//				<< std::setw(2) << system_time[nof_iters-1].wSecond << '.'
+//				<< std::setw(3) << system_time[nof_iters-1].wMilliseconds
+				<< std::endl;
 	}
 	std::cout << "------------------" << std::endl;	
 #endif
