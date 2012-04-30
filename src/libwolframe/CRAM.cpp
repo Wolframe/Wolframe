@@ -56,6 +56,9 @@
 #else
 #define WIN32_MEAN_AND_LEAN
 #include <windows.h>
+#include <sys/types.h>
+#include <sys/timeb.h>
+#include <time.h>
 #endif
 
 #include "AAAA/CRAM.hpp"
@@ -93,9 +96,25 @@ CRAMchallenge::CRAMchallenge( const std::string& randomDevice )
 {
 	memset( m_challenge, 0, CRAM_CHALLENGE_SIZE );
 
+#ifndef _WIN32
 	boost::posix_time::ptime pt =
 			boost::posix_time::ptime( boost::posix_time::microsec_clock::universal_time());
 	sha256((const unsigned char*)&pt, sizeof( pt ), m_challenge );
+#else
+	FILETIME t0 = { 0, 0}, t1 = { 0, 0 };
+	LARGE_INTEGER li;
+
+	GetSystemTimeAsFileTime( &t0 );
+	do {
+		GetSystemTimeAsFileTime( &t1 );
+		QueryPerformanceCounter( &li );
+	} while( 	( t0.dwHighDateTime == t1.dwHighDateTime ) &&
+			( t0.dwLowDateTime == t1.dwLowDateTime ) );
+			
+	t1.dwLowDateTime += li.QuadPart;
+	
+	sha256((const unsigned char *)&t1, sizeof( t1 ), m_challenge );	
+#endif
 
 #ifndef _WIN32
 	int hndl = open( randomDevice.c_str(), O_RDONLY );
@@ -118,7 +137,7 @@ CRAMchallenge::CRAMchallenge( const std::string& randomDevice )
 #else
 	HCRYPTPROV provider = 0;
 
-	if( !CryptAcquireContext( &provider, 0, 0, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT | CRYPT_SILENT ) ) {
+	if( !CryptAcquireContext( &provider, 0, randomDevice.c_str( ), PROV_RSA_FULL, CRYPT_VERIFYCONTEXT | CRYPT_SILENT ) ) {
 		throw std::runtime_error( "Error opening cyrpto context" );
 	}
 
