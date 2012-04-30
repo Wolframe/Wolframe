@@ -21,10 +21,6 @@ INCLUDE_LIBS = \
 	-lboost_filesystem \
 	$(LIBS_DL)
 
-ifneq "$(PLATFORM)" "OPENBSD"
-INCLUDE_LIBS += -lboost_random
-endif
-
 # openssl
 ifeq ($(WITH_SSL),1)
 

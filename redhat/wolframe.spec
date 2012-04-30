@@ -387,7 +387,7 @@ Qt client for the Wolframe server.
 %if %{build_boost}
 cd %{_builddir}/boost_%{boost_underscore_version}
 ./bootstrap.sh --prefix=/tmp/boost-%{boost_version} \
-	--with-libraries=thread,filesystem,system,program_options,date_time,random
+	--with-libraries=thread,filesystem,system,program_options,date_time
 ./bjam %{?_smp_mflags} install
 %endif
 

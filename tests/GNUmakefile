@@ -40,10 +40,6 @@ INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_filesystem -lboost_system
 
-ifneq "$(PLATFORM)" "OPENBSD"
-INCLUDE_LIBS += -lboost_random
-endif
-
 # openssl
 
 ifeq ($(WITH_SSL),1)
