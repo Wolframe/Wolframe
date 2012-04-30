@@ -40,10 +40,6 @@ INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_filesystem -lboost_system
 
-ifneq "$(PLATFORM)" "OPENBSD"
-INCLUDE_LIBS += -lboost_random
-endif
-
 # openssl
 
 ifeq ($(WITH_SSL),1)
@@ -88,7 +84,8 @@ TEST_CPP_BINS = \
 	configValueParser$(EXE) \
 	configStructParser$(EXE) \
 	filter$(EXE) \
-	testTimers$(EXE)
+	testTimers$(EXE) \
+	testRand$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

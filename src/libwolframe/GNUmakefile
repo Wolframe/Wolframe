@@ -19,10 +19,6 @@ INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_filesystem
 
-ifneq "$(PLATFORM)" "OPENBSD"
-INCLUDE_LIBS += -lboost_random
-endif
-
 STATIC_LIB = libwolframe.a
 
 DYNAMIC_LIB = libwolframe.so
@@ -59,10 +55,6 @@ CPP_OBJS = \
 	resolvePath.o \
 	referenceConfig.o \
 	CRAM.o
-
-ifeq "$(PLATFORM)" "OPENBSD"
-CPP_OBJS += random_device.o
-endif
 
 OBJS = \
 	byte2hex.o \

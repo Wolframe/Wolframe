@@ -92,7 +92,8 @@ TEST_CPP_BINS = \
 	configStructParser.exe \
 	configValueParser.exe \
 	filter.exe \
-	testTimers.exe
+	testTimers.exe \
+	testRand.exe
 
 OBJS = \
 
@@ -118,6 +119,7 @@ configStructParser.exe: configStructParser.obj $(TOPDIR)\src\wolframe.lib
 configValueParser.exe: configValueParser.obj $(TOPDIR)\src\wolframe.lib
 filter.exe: filter.obj $(TOPDIR)\src\wolframe.lib
 testTimers.exe: testTimers.obj
+testRand.exe: testRand.obj
 
 local_all:
 
