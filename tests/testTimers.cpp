@@ -100,7 +100,7 @@ int main( int argc, char *argv[] )
 	int tcount = 0;
 	for( int i = 0; i < nof_iters; i++ ) {
 		if( tlast != t[i] ) {
-			std::cout << tcount << " times " << t[i-1] << std::endl;
+			std::cout << tcount + 1 << " times " << t[i-1] << std::endl;
 			tlast = t[i];
 			tcount = 0;
 		} else {
@@ -126,7 +126,7 @@ int main( int argc, char *argv[] )
 	for( int i = 0; i < nof_iters; i++ ) {
 		if( tblast.millitm != tb[i].millitm ) {		
 			std::cout 	<< std::setfill( '0' )
-					<< tcount << " times "
+					<< tcount + 1 << " times "
 					<< tb[i-1].time << "." << std::setw( 3 )
 					<< tb[i-1].millitm << std::endl;
 			tcount = 0;
@@ -156,7 +156,7 @@ int main( int argc, char *argv[] )
 	for( int i = 0; i < nof_iters; i++ ) {
 		if( stlast.wMilliseconds != st[i].wMilliseconds ) {
 			std::cout 	<< std::setfill( '0' )
-					<< tcount << " times "
+					<< tcount + 1 << " times "
 					<< std::setw( 2 ) << st[i-1].wHour << ':'
 					<< std::setw( 2 ) << st[i-1].wMinute << ':'
 					<< std::setw( 2 ) << st[i-1].wSecond << '.'
@@ -204,7 +204,7 @@ int main( int argc, char *argv[] )
 	std::cout << "Win32 article simplistic sync" << std::endl;
 	for( int i = 0; i < nof_iters; i++ ) {
 		if( slast.wMilliseconds != system_time[i].wMilliseconds ) {
-			std::cout 	<< tcount << " times "
+			std::cout 	<< tcount + 1 << " times "
 					<< std::setw(2) << system_time[i-1].wHour << ':'
 					<< std::setw(2) << system_time[i-1].wMinute << ':'
 					<< std::setw(2) << system_time[i-1].wSecond << '.'
