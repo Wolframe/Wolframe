@@ -93,10 +93,20 @@ CRAMchallenge::CRAMchallenge( const std::string& randomDevice )
 
 	int hndl = open( randomDevice.c_str(), O_RDONLY );
 	if ( hndl < 0 )	{
-		throw std::runtime_error( "Error opening " );
+		std::string errMsg = "Error opening '" + randomDevice + "': ";
+		throw std::runtime_error( errMsg );
 	}
 
-	read( hndl, m_challenge + SHA256_DIGEST_SIZE, CRAM_CHALLENGE_SIZE - SHA256_DIGEST_SIZE );
+	int rndPart = read( hndl, m_challenge + SHA256_DIGEST_SIZE, CRAM_CHALLENGE_SIZE - SHA256_DIGEST_SIZE );
+	if ( rndPart < 0 )	{
+		std::string errMsg = "Error reading '" + randomDevice + "'";
+		throw std::runtime_error( errMsg );
+	}
+	else if ( rndPart < CRAM_CHALLENGE_SIZE - SHA256_DIGEST_SIZE )	{
+		std::string errMsg = "Not enough bytes in '" + randomDevice + "' ?!?";
+		throw std::logic_error( errMsg );
+	}
+
 	close( hndl );
 }
 
