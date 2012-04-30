@@ -1,11 +1,39 @@
 #include <iostream>
-#ifdef _WIN32
+#include <iomanip>
+
+#ifndef _WIN32
+#include <unistd.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#else
+#define WIN32_MEAN_AND_LEAN
 #include <windows.h>
 #endif
 
 int main()
 {
-#ifdef _WIN32
+#ifndef _WIN32
+	unsigned char buf[39];
+
+	int f = open( "/dev/urandom", O_RDONLY );
+
+	if( read( f, (void *)buf, 39 ) < 0 ) {
+		(void)close( f );
+		return 1;
+	}
+
+	for( int i = 0; i < 39; i++ ) { 
+		std::cout 	<< std::hex << std::setfill( '0' ) << std::setw( 2 )
+				<< static_cast<unsigned int>( buf[i] );
+	}
+	std::cout << std::endl;
+
+	if( f < 0 ) {
+		return 1;
+	}
+
+	(void)close( f );
+#else
 	HCRYPTPROV provider = 0;
 
 	if( !CryptAcquireContextW( &provider, 0, 0, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT | CRYPT_SILENT ) ) {
@@ -20,7 +48,8 @@ int main()
 	}
 
 	for( int i = 0; i < 39; i++ ) { 
-		std::cout << std::hex << static_cast<unsigned int>( buf[i] );
+    std::cout 	<< std::hex << std::setfill( '0' ) << std::setw( 2 )
+				<< static_cast<unsigned int>( buf[i] );
 	}
 	std::cout << std::endl;
 
