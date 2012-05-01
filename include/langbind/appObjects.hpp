@@ -223,7 +223,7 @@ public:
 	///\param[in] c function to call
 	///\param[in] p part of the api describing the input
 	///\param[in] r part of the api describing the function result
-	PluginFunction( const Call c, const serialize::FiltermapDescriptionBase* p, const serialize::FiltermapDescriptionBase* r)
+	PluginFunction( Call c, const serialize::FiltermapDescriptionBase* p, const serialize::FiltermapDescriptionBase* r)
 		:m_call(c),m_api_param(p),m_api_result(r){}
 
 private:
@@ -401,7 +401,7 @@ public:
 	///\param[in] c function to call
 	///\param[in] p part of the api describing the input
 	///\param[in] r part of the api describing the function result
-	LuaPluginFunction( const Call c, const serialize::LuamapDescriptionBase* p, const serialize::LuamapDescriptionBase* r)
+	LuaPluginFunction( Call c, const serialize::LuamapDescriptionBase* p, const serialize::LuamapDescriptionBase* r)
 		:m_call(c),m_api_param(p),m_api_result(r){}
 
 	int call( lua_State* ls) const;
