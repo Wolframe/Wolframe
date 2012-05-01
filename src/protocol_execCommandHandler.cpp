@@ -32,7 +32,9 @@
 ************************************************************************/
 #include "protocol/execCommandHandler.hpp"
 #include "protocol/ioblocks.hpp"
+#if WITH_LUA
 #include "langbind/luaCommandHandler.hpp"
+#endif
 #include "langbind/directmapCommandHandler.hpp"
 #include "langbind/appGlobalContext.hpp"
 #include "logger-v1.hpp"
@@ -266,16 +268,18 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 				{
 					try
 					{
-						langbind::LuaScriptInstanceR li;
 						langbind::TransactionFunction tf;
 						const char* procname = m_cmds[ m_cmdidx - m_nofParentCmds - 2].c_str();
 						langbind::GlobalContext* gctx = langbind::getGlobalContext();
-
+#if WITH_LUA
+						langbind::LuaScriptInstanceR li;
 						if (gctx->getLuaScriptInstance( procname, li))
 						{
 							m_cmdhandler.reset( new langbind::LuaCommandHandler());
 						}
-						else if (gctx->getTransactionFunction( procname, tf))
+						else
+#endif
+						if (gctx->getTransactionFunction( procname, tf))
 						{
 							m_cmdhandler.reset( new langbind::DirectmapCommandHandler());
 						}

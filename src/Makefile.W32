@@ -146,7 +146,6 @@ LOCAL_STATIC_LIB_OBJS = \
 LOCAL_STATIC_LIB_OBJS = \
 	$(LOCAL_STATIC_LIB_OBJS) \
 	serialize_struct_luamapBase.obj \
-	langbind_luaScript.obj \
 	langbind_luaDebug.obj \
 	langbind_luaBignum.obj \
 	langbind_luaCommandHandler.obj

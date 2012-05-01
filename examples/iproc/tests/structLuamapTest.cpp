@@ -35,7 +35,6 @@ Project Wolframe.
 #include "serialize/struct/luamapDescription.hpp"
 #include "serialize/struct/luamapBase.hpp"
 #include "iprocHandlerConfig.hpp"
-#include "langbind/luaScript.hpp"
 #include "langbind/appObjects.hpp"
 #include "langbind/appGlobalContext.hpp"
 #include "langbind/luaCommandHandler.hpp"

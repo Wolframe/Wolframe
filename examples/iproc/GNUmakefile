@@ -100,6 +100,7 @@ local_all: $(CPP_BINS)
 
 local_clean:
 	rm -Rf tests/result
+	rm -Rf tests/temp
 
 local_distclean:
 

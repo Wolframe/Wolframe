@@ -31,8 +31,6 @@ Project Wolframe.
 ************************************************************************/
 ///\file langbind_appObjects.cpp
 ///\brief implementation of scripting language objects
-#include <algorithm>
-#include <cctype>
 #include "langbind/appObjects.hpp"
 #include "ddl/compiler/simpleFormCompiler.hpp"
 #include "ddl/compilerInterface.hpp"
@@ -43,6 +41,12 @@ Project Wolframe.
 #include "filter/char_filter.hpp"
 #include "filter/line_filter.hpp"
 #include "filter/token_filter.hpp"
+#include <algorithm>
+#include <cctype>
+#include <string>
+#include <fstream>
+#include <iostream>
+#include <stdexcept>
 #ifdef WITH_LIBXML2
 #include "filter/libxml2_filter.hpp"
 #endif
@@ -53,15 +57,49 @@ Project Wolframe.
 #if WITH_MSXML
 #include "filter/msxml_filter.hpp"
 #endif
+#if WITH_LUA
+#include "langbind/luaDebug.hpp"
+extern "C" {
+	#include <lualib.h>
+	#include <lauxlib.h>
+	#include <lua.h>
+}
+#endif
 
 using namespace _Wolframe;
 using namespace langbind;
 
-void FilterMap::defineFilter( const char* name, const FilterFactoryR& f)
+namespace //anonymous
+{
+template <class Object>
+void defineObject( std::map<std::string,Object>& m_map, const char* name, const Object& obj)
 {
 	std::string nam( name);
-	std::transform( nam.begin(), nam.end(), nam.begin(), (int(*)(int)) std::tolower);
-	m_map[ nam] = f;
+	std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
+	m_map[ nam] = obj;
+}
+
+template <class Object>
+bool getObject( const std::map<std::string,Object>& m_map, const char* name, Object& obj)
+{
+	std::string nam( name);
+	std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
+	typename std::map<std::string,Object>::const_iterator ii=m_map.find( nam),ee=m_map.end();
+	if (ii == ee)
+	{
+		return false;
+	}
+	else
+	{
+		obj = ii->second;
+		return true;
+	}
+}
+}//anonymous namespace
+
+void FilterMap::defineFilter( const char* name, const FilterFactoryR& f)
+{
+	defineObject( m_map, name, f);
 }
 
 bool FilterMap::getFilter( const char* arg, Filter& rt)
@@ -69,7 +107,7 @@ bool FilterMap::getFilter( const char* arg, Filter& rt)
 	std::size_t nn = std::strlen(arg);
 	std::size_t ii = nn;
 	std::string nam( arg);
-	std::transform( nam.begin(), nam.end(), nam.begin(), (int(*)(int)) std::tolower);
+	std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
 	do
 	{
 		nam.resize(ii);
@@ -103,55 +141,32 @@ FilterMap::FilterMap()
 
 void DDLFormMap::defineForm( const char* name, const DDLForm& f)
 {
-	std::string nam( name);
-	std::transform( nam.begin(), nam.end(), nam.begin(), (int(*)(int)) std::tolower);
-	m_map[ nam] = f;
+	defineObject( m_map, name, f);
 }
 
 bool DDLFormMap::getForm( const char* name, DDLForm& rt) const
 {
-	std::string nam( name);
-	std::transform( nam.begin(), nam.end(), nam.begin(), (int(*)(int)) std::tolower);
-	std::map<std::string,DDLForm>::const_iterator ii=m_map.find( nam),ee=m_map.end();
-	if (ii == ee)
-	{
-		return false;
-	}
-	else
-	{
-		rt = ii->second;
-		return true;
-	}
+	return getObject( m_map, name, rt);
 }
 
-bool TransactionFunctionMap::getTransactionFunction( const char* name, TransactionFunction& rt) const
+void PluginFunctionMap::definePluginFunction( const char* name, const PluginFunction& f)
 {
-	std::string nam( name);
-	std::transform( nam.begin(), nam.end(), nam.begin(), (int(*)(int)) std::tolower);
-	std::map<std::string,TransactionFunction>::const_iterator ii=m_map.find( nam),ee=m_map.end();
-	if (ii == ee)
-	{
-		return false;
-	}
-	else
-	{
-		rt = ii->second;
-		return true;
-	}
+	defineObject( m_map, name, f);
+}
+
+bool PluginFunctionMap::getPluginFunction( const char* name, PluginFunction& rt) const
+{
+	return getObject( m_map, name, rt);
 }
 
 void TransactionFunctionMap::defineTransactionFunction( const char* name, const TransactionFunction& f)
 {
-	std::string nam( name);
-	std::transform( nam.begin(), nam.end(), nam.begin(), (int(*)(int)) std::tolower);
-	m_map[ nam] = f;
+	defineObject( m_map, name, f);
 }
 
-void DDLCompilerMap::defineDDLCompiler( const char* name, const ddl::CompilerInterfaceR& ci)
+bool TransactionFunctionMap::getTransactionFunction( const char* name, TransactionFunction& rt) const
 {
-	std::string nam( name);
-	std::transform( nam.begin(), nam.end(), nam.begin(), (int(*)(int)) std::tolower);
-	m_map[ nam] = ci;
+	return getObject( m_map, name, rt);
 }
 
 DDLCompilerMap::DDLCompilerMap()
@@ -160,19 +175,14 @@ DDLCompilerMap::DDLCompilerMap()
 	m_map[ simpleformCompiler->ddlname()] = simpleformCompiler;
 }
 
+void DDLCompilerMap::defineDDLCompiler( const char* name, const ddl::CompilerInterfaceR& f)
+{
+	defineObject( m_map, name, f);
+}
+
 bool DDLCompilerMap::getDDLCompiler( const char* name, ddl::CompilerInterfaceR& rt) const
 {
-	std::string nam( name);
-	std::map<std::string,ddl::CompilerInterfaceR>::const_iterator ii=m_map.find( nam),ee=m_map.end();
-	if (ii == ee)
-	{
-		return false;
-	}
-	else
-	{
-		rt = ii->second;
-		return true;
-	}
+	return getObject( m_map, name, rt);
 }
 
 static InputFilterClosure::ItemType fetchFailureResult( const protocol::InputFilter& ff)
@@ -401,6 +411,175 @@ Output::ItemType Output::print( const char* tag, unsigned int tagsize, const cha
 	}
 }
 
+#if WITH_LUA
+static int function_printlog( lua_State *ls)
+{
+	/* first parameter maps to a log level, rest gets printed depending on
+	 * whether it's a string or a number
+	 */
+	int ii,nn = lua_gettop(ls);
+	if (nn <= 0)
+	{
+		LOG_ERROR << "no arguments passed to 'printlog'";
+		return 0;
+	}
+	const char *logLevel = luaL_checkstring( ls, 1);
+	std::string logmsg;
+
+	for (ii=2; ii<=nn; ii++)
+	{
+		if (!getDescription( ls, ii, logmsg))
+		{
+			LOG_ERROR << "failed to map 'printLog' arguments to a string";
+		}
+	}
+	_Wolframe::log::LogLevel::Level lv = _Wolframe::log::LogLevel::strToLogLevel( logLevel);
+	if (lv == _Wolframe::log::LogLevel::LOGLEVEL_UNDEFINED)
+	{
+		LOG_ERROR << "'printLog' called with undefined loglevel '" << logLevel << "' as first argument";
+	}
+	else
+	{
+		_Wolframe::log::Logger( _Wolframe::log::LogBackend::instance() ).Get( lv )
+			<< _Wolframe::log::LogComponent::LogLua
+			<< logmsg;
+	}
+	return 0;
+}
+
+LuaScript::LuaScript( const char* path_)
+	:m_path(path_)
+{
+	char buf;
+	std::fstream ff;
+	ff.open( path_, std::ios::in);
+	while (ff.read( &buf, sizeof(buf)))
+	{
+		m_content.push_back( buf);
+	}
+	if ((ff.rdstate() & std::ifstream::eofbit) == 0)
+	{
+		LOG_ERROR << "failed to read lua script from file: '" << path_ << "'";
+		throw std::runtime_error( "read lua script from file");
+	}
+	ff.close();
+}
+
+LuaScriptInstance::LuaScriptInstance( const LuaScript* script_)
+	:m_ls(0),m_thread(0),m_threadref(0),m_script(script_)
+{
+	m_ls = luaL_newstate();
+	if (!m_ls) throw std::runtime_error( "failed to create lua state");
+
+	// create thread and prevent garbage collecting of it (http://permalink.gmane.org/gmane.comp.lang.lua.general/22680)
+	m_thread = lua_newthread( m_ls);
+	lua_pushvalue( m_ls, -1);
+	m_threadref = luaL_ref( m_ls, LUA_REGISTRYINDEX);
+
+	if (luaL_loadbuffer( m_ls, m_script->content().c_str(), m_script->content().size(), m_script->path().c_str()))
+	{
+		std::ostringstream buf;
+		buf << "Failed to load script '" << m_script->path() << "':" << lua_tostring( m_ls, -1);
+		throw std::runtime_error( buf.str());
+	}
+	// open standard lua libraries
+	luaL_openlibs( m_ls);
+
+	// register logging function already here because then it can be used in the script initilization part
+	lua_pushcfunction( m_ls, &function_printlog);
+	lua_setglobal( m_ls, "printlog");
+
+	// open additional libraries defined for this script
+	std::vector<LuaScript::Module>::const_iterator ii=m_script->modules().begin(), ee=m_script->modules().end();
+	for (;ii!=ee; ++ii)
+	{
+		if (ii->m_initializer( m_ls))
+		{
+			std::ostringstream buf;
+			buf << "module '" << ii->m_name << "' initialization failed: " << lua_tostring( m_ls, -1);
+			throw std::runtime_error( buf.str());
+		}
+	}
+
+	// call main, we may have to initialize LUA modules there
+	if (lua_pcall( m_ls, 0, LUA_MULTRET, 0) != 0)
+	{
+		std::ostringstream buf;
+		buf << "Unable to call main entry of script: " << lua_tostring( m_ls, -1 );
+		throw std::runtime_error( buf.str());
+	}
+}
+
+LuaScriptInstance::~LuaScriptInstance()
+{
+	if (m_ls)
+	{
+		luaL_unref( m_ls, LUA_REGISTRYINDEX, m_threadref);
+		lua_close( m_ls);
+	}
+}
+
+LuaFunctionMap::~LuaFunctionMap()
+{
+	std::vector<LuaScript*>::iterator ii=m_ar.begin(),ee=m_ar.end();
+	while (ii != ee)
+	{
+		delete *ii;
+		++ii;
+	}
+}
+
+void LuaFunctionMap::defineLuaFunction( const char* name, const LuaScript& script)
+{
+	std::string nam( name);
+	std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
+	{
+		std::map<std::string,std::size_t>::const_iterator ii=m_procmap.find( nam),ee=m_procmap.end();
+		if (ii != ee)
+		{
+			std::ostringstream buf;
+			buf << "Duplicate definition of function '" << nam << "'";
+			throw std::runtime_error( buf.str());
+		}
+	}
+	std::size_t scriptId;
+	std::map<std::string,std::size_t>::const_iterator ii=m_pathmap.find( script.path()),ee=m_pathmap.end();
+	if (ii != ee)
+	{
+		scriptId = ii->second;
+	}
+	else
+	{
+		scriptId = m_ar.size();
+		m_ar.push_back( new LuaScript( script));	//< load its content from file
+		LuaScriptInstance( m_ar.back());		//< check, if it can be compiled
+		m_pathmap[ script.path()] = scriptId;
+	}
+	m_procmap[ nam] = scriptId;
+}
+
+bool LuaFunctionMap::getLuaScriptInstance( const char* procname, LuaScriptInstanceR& rt) const
+{
+	std::string nam( procname);
+	std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
+
+	std::map<std::string,std::size_t>::const_iterator ii=m_procmap.find( nam),ee=m_procmap.end();
+	if (ii == ee) return false;
+	rt = LuaScriptInstanceR( new LuaScriptInstance( m_ar[ ii->second]));
+	return true;
+}
+
+void LuaPluginFunctionMap::defineLuaPluginFunction( const char* name, const LuaPluginFunction& f)
+{
+	defineObject( m_map, name, f);
+}
+
+bool LuaPluginFunctionMap::getLuaPluginFunction( const char* name, LuaPluginFunction& rt) const
+{
+	return getObject( m_map, name, rt);
+}
+
+#endif
 
 
 

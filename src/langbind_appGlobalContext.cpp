@@ -115,6 +115,7 @@ bool GlobalContext::load( const ApplicationEnvironmentConfig& config)
 			///Call defineTransactionFunction( const char* name, const TransactionFunction& f);
 		}
 	}
+#if WITH_LUA
 	{
 		std::vector<ScriptCommandConfigStruct>::const_iterator itr=config.data().script.begin(),end=config.data().script.end();
 		for (;itr!=end; ++itr)
@@ -122,6 +123,7 @@ bool GlobalContext::load( const ApplicationEnvironmentConfig& config)
 			defineLuaFunction( itr->name.c_str(), itr->sourcepath.c_str());
 		}
 	}
+#endif
 	{
 		std::vector<PluginModuleAPIConfigStruct>::const_iterator itr=config.data().plugin.begin(),end=config.data().plugin.end();
 		for (;itr!=end; ++itr)

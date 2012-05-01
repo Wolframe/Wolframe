@@ -30,17 +30,23 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file langbind/appObjects.hpp
-///\brief interface for application processor scripting language to system objects
-
+///\brief interface to system objects for processor language bindings
 #ifndef _Wolframe_langbind_APPOBJECTS_HPP_INCLUDED
 #define _Wolframe_langbind_APPOBJECTS_HPP_INCLUDED
 #include "filter.hpp"
 #include "ddl/structType.hpp"
 #include "ddl/compilerInterface.hpp"
+#include "serialize/struct/filtermapBase.hpp"
 #include "protocol/commandHandler.hpp"
 #include <stack>
 #include <string>
 #include <algorithm>
+#if WITH_LUA
+extern "C" {
+	#include "serialize/struct/luamapBase.hpp"
+	#include "lua.h"
+}
+#endif
 
 namespace _Wolframe {
 namespace langbind {
@@ -99,27 +105,6 @@ struct Input
 	protocol::InputFilterR& inputfilter()				{return m_inputfilter;}
 protected:
 	protocol::InputFilterR m_inputfilter;			///< input is defined by the associated input filter
-};
-
-struct DDLForm
-{
-	ddl::StructType m_struct;
-
-	///\brief Default constructor
-	DDLForm() {}
-
-	///\brief Copy constructor
-	///\param[in] o copied item
-	DDLForm( const DDLForm& o)
-		:m_struct(o.m_struct){}
-
-	///\brief Constructor
-	///\param[in] st form data
-	DDLForm( const ddl::StructType& st)
-		:m_struct(st){}
-
-	///\brief Destructor
-	~DDLForm(){}
 };
 
 ///\class InputFilterClosure
@@ -184,6 +169,28 @@ private:
 	std::map<std::string,FilterFactoryR> m_map;
 };
 
+///\class DDLForm
+struct DDLForm
+{
+	ddl::StructType m_struct;
+
+	///\brief Default constructor
+	DDLForm() {}
+
+	///\brief Copy constructor
+	///\param[in] o copied item
+	DDLForm( const DDLForm& o)
+		:m_struct(o.m_struct){}
+
+	///\brief Constructor
+	///\param[in] st form data
+	DDLForm( const ddl::StructType& st)
+		:m_struct(st){}
+
+	///\brief Destructor
+	~DDLForm(){}
+};
+
 ///\class DDLFormMap
 ///\brief Map of available forms seen from scripting language binding
 class DDLFormMap
@@ -198,8 +205,51 @@ private:
 	std::map<std::string,DDLForm> m_map;
 };
 
-struct TransactionFunction
+///\class PluginFunction
+class PluginFunction
 {
+public:
+	typedef int (Call)( const void* in, void* out);
+
+	///\brief Default constructor
+	PluginFunction() {}
+
+	///\brief Copy constructor
+	///\param[in] o copied item
+	PluginFunction( const PluginFunction& o)
+		:m_call(o.m_call),m_api_param(o.m_api_param),m_api_result(o.m_api_result){}
+
+	///\brief Constructor
+	///\param[in] c function to call
+	///\param[in] p part of the api describing the input
+	///\param[in] r part of the api describing the function result
+	PluginFunction( const Call c, const serialize::FiltermapDescriptionBase* p, const serialize::FiltermapDescriptionBase* r)
+		:m_call(c),m_api_param(p),m_api_result(r){}
+
+private:
+	Call* m_call;
+	const serialize::FiltermapDescriptionBase* m_api_param;
+	const serialize::FiltermapDescriptionBase* m_api_result;
+};
+
+///\class PluginFunctionMap
+///\brief Map of available transaction functions seen from scripting language binding
+class PluginFunctionMap
+{
+public:
+	PluginFunctionMap(){}
+	~PluginFunctionMap(){}
+
+	void definePluginFunction( const char* name, const PluginFunction& f);
+	bool getPluginFunction( const char* name, PluginFunction& rt) const;
+private:
+	std::map<std::string,PluginFunction> m_map;
+};
+
+///\class TransactionFunction
+class TransactionFunction
+{
+public:
 	///\brief Default constructor
 	TransactionFunction() {}
 
@@ -209,7 +259,9 @@ struct TransactionFunction
 		:m_cmdwriter(o.m_cmdwriter),m_resultreader(o.m_resultreader),m_cmd(o.m_cmd){}
 
 	///\brief Constructor
-	///\param[in] st form data
+	///\param[in] w command input writer
+	///\param[in] r command output reader
+	///\param[in] c command execute handler
 	TransactionFunction( const protocol::OutputFilterR& w, const protocol::InputFilterR& r, const protocol::CommandBaseR& c)
 		:m_cmdwriter(w),m_resultreader(r),m_cmd(c){}
 
@@ -225,10 +277,10 @@ struct TransactionFunction
 	const protocol::CommandBaseR& cmd() const			{return m_cmd;}
 	protocol::CommandBaseR& cmd()					{return m_cmd;}
 
-protected:
-	protocol::OutputFilterR m_cmdwriter;
-	protocol::InputFilterR m_resultreader;
-	protocol::CommandBaseR m_cmd;
+private:
+	protocol::OutputFilterR m_cmdwriter;				//< command input writer
+	protocol::InputFilterR m_resultreader;				//< command result reader
+	protocol::CommandBaseR m_cmd;					//< command execute handler
 };
 
 ///\class TransactionFunctionMap
@@ -259,6 +311,126 @@ private:
 	std::map<std::string,ddl::CompilerInterfaceR> m_map;
 };
 
-}}//namespace
+
+#if WITH_LUA
+class LuaScript
+{
+public:
+	struct Module
+	{
+		std::string m_name;
+		lua_CFunction m_initializer;
+
+		Module( const Module& o)				:m_name(o.m_name),m_initializer(o.m_initializer){}
+		Module( const std::string& n, const lua_CFunction f)	:m_name(n),m_initializer(f){}
+	};
+
+public:
+	LuaScript( const char* path_);
+	LuaScript( const LuaScript& o)
+		:m_modules(o.m_modules),m_path(o.m_path),m_content(o.m_content){}
+	~LuaScript(){}
+
+	void addModule( const std::string& n, lua_CFunction f)		{m_modules.push_back( Module( n, f));}
+
+	const std::vector<Module>& modules() const			{return m_modules;}
+	const std::string& path() const					{return m_path;}
+	const std::string& content() const				{return m_content;}
+
+private:
+	std::vector<Module> m_modules;
+	std::string m_path;
+	std::string m_content;
+};
+
+class LuaScriptInstance
+{
+public:
+	explicit LuaScriptInstance( const LuaScript* script);
+	~LuaScriptInstance();
+
+	lua_State* ls()				{return m_ls;}
+	lua_State* thread()			{return m_thread;}
+private:
+	lua_State* m_ls;
+	lua_State* m_thread;
+	int m_threadref;
+	const LuaScript* m_script;
+
+private:
+	LuaScriptInstance( const LuaScriptInstance&){}
+};
+
+typedef CountedReference<LuaScriptInstance> LuaScriptInstanceR;
+
+
+///\class LuaFunctionMap
+///\brief Map of available Lua functions
+class LuaFunctionMap
+{
+public:
+	LuaFunctionMap(){}
+	~LuaFunctionMap();
+
+	void defineLuaFunction( const char* procname, const LuaScript& script);
+	bool getLuaScriptInstance( const char* procname, LuaScriptInstanceR& rt) const;
+private:
+	LuaFunctionMap( const LuaFunctionMap&){}
+
+private:
+	std::vector<LuaScript*> m_ar;
+	std::map<std::string,std::size_t> m_pathmap;
+	std::map<std::string,std::size_t> m_procmap;
+};
+
+///\class LuaPluginFunction
+class LuaPluginFunction
+{
+public:
+	typedef int (Call)( const void* in, void* out);
+
+	///\brief Default constructor
+	LuaPluginFunction() {}
+
+	///\brief Copy constructor
+	///\param[in] o copied item
+	LuaPluginFunction( const LuaPluginFunction& o)
+		:m_call(o.m_call),m_api_param(o.m_api_param),m_api_result(o.m_api_result){}
+
+	///\brief Constructor
+	///\param[in] c function to call
+	///\param[in] p part of the api describing the input
+	///\param[in] r part of the api describing the function result
+	LuaPluginFunction( const Call c, const serialize::LuamapDescriptionBase* p, const serialize::LuamapDescriptionBase* r)
+		:m_call(c),m_api_param(p),m_api_result(r){}
+
+	int call( lua_State* ls) const;
+private:
+	Call* m_call;
+	const serialize::LuamapDescriptionBase* m_api_param;
+	const serialize::LuamapDescriptionBase* m_api_result;
+};
+
+///\class LuaPluginFunctionMap
+///\brief Map of available plugin functions seen from scripting language binding
+class LuaPluginFunctionMap
+{
+public:
+	LuaPluginFunctionMap(){}
+	~LuaPluginFunctionMap(){}
+
+	void defineLuaPluginFunction( const char* name, const LuaPluginFunction& f);
+	bool getLuaPluginFunction( const char* name, LuaPluginFunction& rt) const;
+private:
+	std::map<std::string,LuaPluginFunction> m_map;
+};
+
+#else
+
+struct LuaFunctionMap {};
+struct LuaPluginFunctionMap {};
+
+#endif
+}} //namespace
 #endif
 

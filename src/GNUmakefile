@@ -95,7 +95,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	filter_token_filter.o \
 	serialize_struct_filtermapBase.o \
 	serialize_ddl_filtermapSerialize.o \
-	serialize_ddl_luamapSerialize.o \
 	serialize_mapContext.o \
 	ddl_atomicType.o \
 	ddl_structType.o \
@@ -114,7 +113,7 @@ LOCAL_STATIC_LIB_OBJS = \
 ifeq ($(WITH_LUA),1)
 LOCAL_STATIC_LIB_OBJS += \
 	serialize_struct_luamapBase.o \
-	langbind_luaScript.o \
+	serialize_ddl_luamapSerialize.o \
 	langbind_luaDebug.o \
 	langbind_luaBignum.o \
 	langbind_luaCommandHandler.o
@@ -168,10 +167,12 @@ local_distclean:
 local_install:
 	$(INSTALL) -d -m 0755 $(DESTDIR)$(sbindir)
 	$(INSTALL) -m 0775 wolframed $(DESTDIR)$(sbindir)
+	$(INSTALL) -m 0775 wolfilter $(DESTDIR)$(sbindir)
 	$(INSTALL) -d -m 0755 $(DESTDIR)$(sysconfdir)/wolframe
 	$(INSTALL) -m 0755 wolframe.conf $(DESTDIR)$(sysconfdir)/wolframe
 
 local_uninstall:
+	@-rm -f $(DESTDIR)$(sbindir)/wolfilter
 	@-rm -f $(DESTDIR)$(sbindir)/wolframed
 	@-rmdir $(DESTDIR)$(sbindir)
 	@-rm -f $(DESTDIR)$(sysconfdir)/wolframe/wolframe.conf

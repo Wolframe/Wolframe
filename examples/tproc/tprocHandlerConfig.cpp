@@ -115,13 +115,21 @@ bool Configuration::test() const
 	std::vector<protocol::ExecCommandHandler::Command>::const_iterator itr=m_commands.begin();
 	while (itr != m_commands.end())
 	{
-		langbind::LuaScriptInstanceR li;
 		langbind::TransactionFunction tf;
-		if (!gctx->getLuaScriptInstance( itr->m_procname.c_str(), li) && !gctx->getTransactionFunction( itr->m_procname.c_str(), tf))
+#if WITH_LUA
+		langbind::LuaScriptInstanceR li;
+		if (gctx->getLuaScriptInstance( itr->m_procname.c_str(), li))
+		{}
+		else
+#endif
+		if (gctx->getTransactionFunction( itr->m_procname.c_str(), tf))
+		{}
+		else
 		{
 			LOG_ERROR << "Error in configuration. Function not found: '" << itr->m_procname << "'";
 			rt = false;
 		}
+
 		++itr;
 	}
 	return rt;

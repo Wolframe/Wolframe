@@ -34,7 +34,9 @@
 ///\brief Implementation of a simple protocol based command handler calling a lus script
 
 #include "iprocHandler.hpp"
+#if WITH_LUA
 #include "langbind/luaCommandHandler.hpp"
+#endif
 #include "langbind/directmapCommandHandler.hpp"
 #include "langbind/appGlobalContext.hpp"
 #include "logger-v1.hpp"
@@ -248,16 +250,18 @@ const net::NetworkOperation Connection::nextOperation()
 					default:
 						try
 						{
-							langbind::LuaScriptInstanceR li;
 							langbind::TransactionFunction tf;
 							const char* procname = m_config->commands()[ m_cmdidx - NofCommands].m_procname.c_str();
 							langbind::GlobalContext* gctx = langbind::getGlobalContext();
-
+#if WITH_LUA
+							langbind::LuaScriptInstanceR li;
 							if (gctx->getLuaScriptInstance( procname, li))
 							{
 								m_cmdhandler.reset( new langbind::LuaCommandHandler());
 							}
-							else if (gctx->getTransactionFunction( procname, tf))
+							else
+#endif
+							if (gctx->getTransactionFunction( procname, tf))
 							{
 								m_cmdhandler.reset( new langbind::DirectmapCommandHandler());
 							}

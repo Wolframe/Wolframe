@@ -35,7 +35,6 @@ Project Wolframe.
 #define _Wolframe_langbind_LUA_COMMAND_HANDLER_HPP_INCLUDED
 #include "langbind/appObjects.hpp"
 #include "langbind/ioFilterCommandHandler.hpp"
-#include "langbind/luaScript.hpp"
 
 namespace _Wolframe {
 namespace langbind {

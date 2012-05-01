@@ -148,7 +148,9 @@ const config::DescriptionBase* EnvironmentConfigStruct::description()
 			( "form",		&EnvironmentConfigStruct::form)
 			( "filter",		&EnvironmentConfigStruct::filter)
 			( "transaction",	&EnvironmentConfigStruct::transaction)
+#if WITH_LUA
 			( "script",		&EnvironmentConfigStruct::script)
+#endif
 			( "plugin",		&EnvironmentConfigStruct::plugin)
 			;
 		}
