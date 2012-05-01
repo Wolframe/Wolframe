@@ -30,8 +30,6 @@ makefiles/nmake/top.mk
 .Attic/appException.hpp
 .Attic/base64.cpp
 .Attic/base64.hpp
-.Attic/CRAM.c
-.Attic/CRAM.h
 .Attic/date.hpp
 .Attic/ErrorCode.hpp
 .Attic/filtermapError.hpp
@@ -227,8 +225,8 @@ examples/lua/appProperties.cpp
 examples/lua/echo.lua
 examples/lua/GNUmakefile
 examples/lua/handlerConfig.hpp
-examples/lua/lua.conf
 examples/lua/luaConfig.cpp
+examples/lua/luad.conf
 examples/lua/luad.cpp
 examples/lua/luaHandler.cpp
 examples/lua/luaHandler.hpp
@@ -294,6 +292,7 @@ include/AAAA/AAAAprovider.hpp
 include/AAAA/audit.hpp
 include/AAAA/authentication.hpp
 include/AAAA/authorization.hpp
+include/AAAA/CRAM.hpp
 include/AAAA/user.hpp
 include/appConfig.hpp
 include/appProcessor.hpp
@@ -1109,6 +1108,7 @@ src/langbind_luaCommandHandler.cpp
 src/langbind_luaDebug.cpp
 src/langbind_luaScript.cpp
 src/libwolframe/byte2hex.c
+src/libwolframe/CRAM.cpp
 src/libwolframe/GNUmakefile
 src/libwolframe/logger/logBackendConsole.cpp
 src/libwolframe/logger/logBackendConsole.hpp
@@ -1259,6 +1259,7 @@ tests/AAAA/GNUmakefile
 tests/AAAA/Makefile.W32
 tests/AAAA/passwd
 tests/AAAA/sasl.conf
+tests/AAAA/textFileCRAMtest.cpp
 tests/AAAA/textFileTest.cpp
 tests/bignum/GNUmakefile
 tests/bignum/libgmp/GNUmakefile
@@ -1273,6 +1274,7 @@ tests/configValueParser.cpp
 tests/config/wolframe-posix.conf
 tests/config/wolframe-win.conf
 tests/counterTest.cpp
+tests/CRAMtest.cpp
 tests/expect/GNUmakefile
 tests/expect/Makefile.W32
 tests/expect/wolframe.conf
@@ -1320,7 +1322,9 @@ tests/SSL/README.txt
 tests/testBoostPath.cpp
 tests/testMethodMemberPointerTemplate.cpp
 tests/testNamedRetVal.cpp
+tests/testRand.cpp
 tests/testSHA2.cpp
+tests/testTimers.cpp
 tests/threadLeakTest.cpp
 tests/versionTest.cpp
 tests/xmllite/Makefile.W32

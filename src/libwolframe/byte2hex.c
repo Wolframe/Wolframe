@@ -48,8 +48,10 @@
 #include <string.h>
 #include <ctype.h>
 
-static char	hexDigit[16] = { '0', '1', '2', '3', '4', '5', '6', '7',
-				'8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+#include <stdio.h>
+
+static char hexDigit[16] = { '0', '1', '2', '3', '4', '5', '6', '7',
+			     '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
 static unsigned char hDigit2byte( int hex )
 {
@@ -115,25 +117,42 @@ char *byte2hex( const unsigned char *data, size_t size, char *outStr, size_t out
  *
  * @return	pointer to the output buffer if successful
  *		or NULL if the output buffer is not large enough
+ *		or if the string has invalid hex characters
  */
-unsigned char *hex2byte( const char *hexStr, unsigned char *outData, size_t outSize )
+int hex2byte( const char *hexStr, unsigned char *outData, size_t outSize )
 {
-	size_t		len;
+	size_t		len = 0;
+	const char	*inStr = hexStr;
 	unsigned char	*data = outData;
 
-	if (( len = strlen( hexStr )) > outSize * 2 )
-		return( NULL );
-	if ( len % 2 )	{
-		*data = hDigit2byte( toupper( *hexStr ));
-		data++, hexStr++;
+	if ( outSize == 0 )
+		return -1;
+	else
+		*outData = 0;
+
+	for ( inStr = hexStr, len = 0; *inStr; inStr++ )	{
+		if ( isxdigit( *inStr ))
+			len++;
+		else if ( ! isspace( *inStr ))
+			return -2;
 	}
+
+	if ( len > outSize * 2 )
+		return( -1 );
+
 	while( *hexStr )	{
-		*data = (unsigned char)( hDigit2byte( toupper( *hexStr )) << 4 );
+		if ( isxdigit( *hexStr ))	{
+			if ( len % 2 )	{
+				*data |= hDigit2byte( toupper( *hexStr ));
+				data++;
+			}
+			else
+				*data = (unsigned char)( hDigit2byte( toupper( *hexStr )) << 4 );
+			len--;
+		}
 		hexStr++;
-		*data |= hDigit2byte( toupper( *hexStr ));
-		data++, hexStr++;
 	}
-	return( outData );
+	return( data - outData );
 }
 
 

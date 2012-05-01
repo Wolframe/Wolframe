@@ -72,5 +72,5 @@ run: $(CPP_BINS)
 !ENDIF
 	@-echo copy "$(LUA_DIR)\src\lua51.dll" . >> test.bat
 	@-echo echo Running the Wolframe server... >> test.bat
-	@-echo luad.exe -c lua.conf -d DATA >> test.bat
+	@-echo luad.exe -c luad.conf -d DATA >> test.bat
 	@-test.bat

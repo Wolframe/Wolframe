@@ -30,37 +30,34 @@
  Project Wolframe.
 
 ************************************************************************/
-/**
- * @file byte2hex.h
- * @brief Header file for conversion between ASCII hex string and data block
- * @author Mihai Barbos <mihai.barbos@gmail.com>
- */
+//
+// CRAM tests
+//
+#include "gtest/gtest.h"
+#include <stdexcept>
+#include "AAAA/CRAM.hpp"
 
-/*
- * hex string to data block and back
- *
- */
-
-#ifndef _BYTE2HEX_H_INCLUDED
-#define _BYTE2HEX_H_INCLUDED
-
-
-#include <stdlib.h>			/* for size_t */
-
-
-#ifdef	__cplusplus
-extern "C" {
+TEST( CRAM, Challenge )
+{
+#ifdef _WIN32
+	_Wolframe::AAAA::CRAMchallenge	challenge( MS_DEF_PROV );
+#else
+	_Wolframe::AAAA::CRAMchallenge	challenge( "/dev/urandom" );
 #endif
+	std::cout << challenge.toString();
+	ASSERT_TRUE( true );
+}
 
-
-char *byte2hex( const unsigned char *data, size_t size, char *outStr, size_t outSize );
-
-int hex2byte( const char *hexStr, unsigned char *outData, size_t outSize );
-
-
-#ifdef __cplusplus
+#ifndef _WIN32
+TEST( CRAM, WrongDevice )
+{
+	ASSERT_THROW( _Wolframe::AAAA::CRAMchallenge challenge( "/Wrong/Device" ), std::runtime_error );
 }
 #endif
 
-#endif	/* _BYTE2HEX_H_INCLUDED */
+int main( int argc, char **argv )
+{
+	::testing::InitGoogleTest( &argc, argv );
+	return RUN_ALL_TESTS();
+}
 

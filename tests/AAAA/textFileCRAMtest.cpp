@@ -59,8 +59,8 @@ protected:
 		// set temporary logger pointer to the logger instantiated
 		// in the test fixture
 		logBackendPtr = &logBack;
-		logBack.setConsoleLevel( LogLevel::LOGLEVEL_DATA );
-//		logBack.setConsoleLevel( LogLevel::LOGLEVEL_INFO );
+//		logBack.setConsoleLevel( LogLevel::LOGLEVEL_DATA );
+		logBack.setConsoleLevel( LogLevel::LOGLEVEL_INFO );
 	}
 };
 

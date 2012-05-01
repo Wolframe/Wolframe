@@ -51,7 +51,8 @@ CPP_OBJS = \
 	user.obj \
 	moduleDirectory.obj \
 	resolvePath.obj \
-	referenceConfig.obj
+	referenceConfig.obj \
+	CRAM.obj
 
 OBJS = \
 	byte2hex.obj \

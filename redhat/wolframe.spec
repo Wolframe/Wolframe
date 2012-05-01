@@ -559,7 +559,6 @@ fi
 %{_libdir}/wolframe/modules/mod_audit_database.so
 
 %{_libdir}/wolframe/modules/mod_auth_textfile.so
-%{_libdir}/wolframe/modules/mod_auth_plaintext.so
 %{_libdir}/wolframe/modules/mod_auth_database.so
 
 %{_libdir}/wolframe/modules/mod_authz_database.so

@@ -43,6 +43,7 @@ tests/threadLeakTest
 tests/counterTest
 tests/testSHA2
 tests/byte2hexTest
+tests/CRAMtest
 tests/xmlselectHandlerTest
 tests/protocolArgumentParsing
 tests/poolTest

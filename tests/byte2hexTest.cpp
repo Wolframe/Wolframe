@@ -37,7 +37,8 @@
 #include "gtest/gtest.h"
 #include "byte2hex.h"
 
-TEST( Bytes_2_Hex, SHA224 )
+
+TEST( byte2hex, Bytes_to_HEX )
 {
 	unsigned char	bytes[16];
 	char		output[33];
@@ -45,15 +46,90 @@ TEST( Bytes_2_Hex, SHA224 )
 
 	for ( i = 0; i < 16; i++ )
 		bytes[i] = 0;
-	ASSERT_STREQ( byte2hex( bytes, 11, output, 33 ), "0000000000000000000000" );
+	ASSERT_STREQ( "0000000000000000000000", byte2hex( bytes, 11, output, 33 ));
 
 	for ( i = 0; i < 16; i++ )
 		bytes[i] = 0xff;
-	ASSERT_STREQ( byte2hex( bytes, 8, output, 33 ), "FFFFFFFFFFFFFFFF" );
+	ASSERT_STREQ( "FFFFFFFFFFFFFFFF", byte2hex( bytes, 8, output, 33 ));
 
-	ASSERT_TRUE( byte2hex( bytes, 78, output, 33 ) == NULL );
+	for ( i = 0; i < 16; i++ )
+		bytes[i] = i;
+	ASSERT_STREQ( "000102030405060708090A0B0C0D0E0F", byte2hex( bytes, 16, output, 33 ));
+}
 
+TEST( byte2hex, Bytes_to_HEX_Overflow )
+{
+	unsigned char	bytes[16];
+	char		output[33];
+
+	ASSERT_TRUE( byte2hex( bytes, 16, output, 33 ) != NULL );
+	ASSERT_TRUE( byte2hex( bytes, 17, output, 0 ) == NULL );
 	ASSERT_TRUE( byte2hex( bytes, 0, output, 0 ) == NULL );
+	ASSERT_TRUE( byte2hex( bytes, 0, output, 1 ) != NULL );
+}
+
+TEST( byte2hex, HEX_to_bytes_Invalid_char )
+{
+	unsigned char	bytes[16];
+
+	ASSERT_TRUE( hex2byte( "ghijklmnopqrstuvwx", bytes, 16 ) < 0 );
+	ASSERT_TRUE( hex2byte( "GHIJKLMNOPQRSTUVWX", bytes, 16 ) < 0 );
+	ASSERT_TRUE( hex2byte( " \t \n ", bytes, 16 ) == 0 );
+}
+
+TEST( byte2hex, HEX_to_bytes_Overflow )
+{
+	unsigned char	bytes[4];
+
+	ASSERT_TRUE( hex2byte( "00 00 00 00", bytes, 4 ) == 4 );
+	ASSERT_TRUE( hex2byte( "00 00 00 00 00", bytes, 4 ) < 0 );
+}
+
+TEST( byte2hex, HEX_to_bytes )
+{
+	unsigned char	bytes[16];
+	char		output[33];
+	int		i;
+
+	for ( i = 0; i < 16; i++ )
+		bytes[i] = 0xff;
+	ASSERT_TRUE( hex2byte( "0000000000000000000000", bytes, 16 ) == 11 );
+	ASSERT_STREQ( "0000000000000000000000", byte2hex( bytes, 11, output, 33 ));
+
+	for ( i = 0; i < 16; i++ )
+		bytes[i] = 0xff;
+	ASSERT_TRUE( hex2byte( "00 00 00 00 00 00 00 00 00 00 00", bytes, 16 ) == 11 );
+	ASSERT_STREQ( "0000000000000000000000", byte2hex( bytes, 11, output, 33 ));
+
+	for ( i = 0; i < 16; i++ )
+		bytes[i] = 0xff;
+	ASSERT_TRUE( hex2byte( "0 00 00 00 00 00 00 00 00 00 00", bytes, 16 ) == 11 );
+	ASSERT_STREQ( "0000000000000000000000", byte2hex( bytes, 11, output, 33 ));
+
+	for ( i = 0; i < 16; i++ )
+		bytes[i] = 0xff;
+	ASSERT_TRUE( hex2byte( " 0 00 00 00 00 00 00 00 00 00 00", bytes, 16 ) == 11 );
+	ASSERT_STREQ( "0000000000000000000000", byte2hex( bytes, 11, output, 33 ));
+
+	for ( i = 0; i < 16; i++ )
+		bytes[i] = 0x00;
+	ASSERT_TRUE( hex2byte( "FFFFFFFFFFFFFFFF", bytes, 16 ) == 8 );
+	ASSERT_STREQ( "FFFFFFFFFFFFFFFF", byte2hex( bytes, 8, output, 33 ));
+
+	for ( i = 0; i < 16; i++ )
+		bytes[i] = 0x00;
+	ASSERT_TRUE( hex2byte( "FF FF FF FF FF FF FF FF", bytes, 16 ) == 8 );
+	ASSERT_STREQ( "FFFFFFFFFFFFFFFF", byte2hex( bytes, 8, output, 33 ));
+
+	for ( i = 0; i < 16; i++ )
+		bytes[i] = 0x00;
+	ASSERT_TRUE( hex2byte( "F FF FF FF FF FF FF FF", bytes, 16 ) == 8 );
+	ASSERT_STREQ( "0FFFFFFFFFFFFFFF", byte2hex( bytes, 8, output, 33 ));
+
+	for ( i = 0; i < 16; i++ )
+		bytes[i] = 0x00;
+	ASSERT_TRUE( hex2byte( " F FF FF FF FF FF FF FF", bytes, 16 ) == 8 );
+	ASSERT_STREQ( "0FFFFFFFFFFFFFFF" , byte2hex( bytes, 8, output, 33 ));
 }
 
 int main( int argc, char **argv )

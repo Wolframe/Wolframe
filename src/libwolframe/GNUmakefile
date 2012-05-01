@@ -53,7 +53,8 @@ CPP_OBJS = \
 	user.o \
 	moduleDirectory.o \
 	resolvePath.o \
-	referenceConfig.o
+	referenceConfig.o \
+	CRAM.o
 
 OBJS = \
 	byte2hex.o \

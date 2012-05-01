@@ -72,4 +72,4 @@ endif
 
 run: $(CPP_BINS)
 	@echo "Running the Wolframe server..."
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./luad -c lua.conf -f
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./luad -c luad.conf -f

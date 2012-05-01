@@ -35,12 +35,14 @@
 //
 
 #include <string>
-#include <fstream>
 
+#include <fstream>
+#include <iostream>
 #include "logger-v1.hpp"
 #include "TextFileAuth.hpp"
 #include "sha2.h"
 #include "byte2hex.h"
+#include "AAAA/CRAM.hpp"
 
 #include <boost/algorithm/string.hpp>
 #define BOOST_FILESYSTEM_VERSION 3
@@ -82,9 +84,70 @@ User* TextFileAuthenticator::authenticate( const std::string& username,
 					   const std::string& password,
 					   bool caseSensitveUser ) const
 {
+	std::ifstream	pwdFile( m_file.c_str() );
+	if ( ! pwdFile.is_open() )	{
+		MOD_LOG_WARNING << "Unable to read text file authentication file '" << m_file << "'";
+		return NULL;
+	}
+
+	MOD_LOG_TRACE << "Text file authenticator '" << identifier() << "' opened file '" << m_file << "'";
+	while( !pwdFile.eof())	{
+		std::string line;
+		std::getline( pwdFile, line );
+		//			MOD_LOG_WARNING << "Unable to read text file authentication file '" << m_file << "': " << e.what();
+		//			return NULL;
+
+		MOD_LOG_DEBUG << "Read line '" << line << "'";
+		boost::algorithm::trim( line );
+		if ( line[0] == '#' || line.empty() )
+			continue;
+
+		std::size_t  start = 0, end = 0;
+		std::string usr, pwd, name;
+		if ( end != std::string::npos )	{
+			end = line.find( ":", start );
+			usr = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
+			start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
+		}
+		if (( caseSensitveUser && usr != username ) ||
+				( !caseSensitveUser && !boost::algorithm::iequals( usr, username )))
+			continue;
+
+		if ( end != std::string::npos )	{
+			end = line.find( ":", start );
+			pwd = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
+			start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
+		}
+
+		unsigned char pwDigest[ SHA224_DIGEST_SIZE ];
+		if ( hex2byte( pwd.c_str(), pwDigest, SHA224_DIGEST_SIZE ) < 0 )	{
+			MOD_LOG_WARNING << "Authentication: " << identifier() << ": error parsing password hash for user: '" << usr << "'";
+			return NULL;
+		}
+		unsigned char inDigest[ SHA224_DIGEST_SIZE ];
+		sha224((const unsigned char *)password.c_str(), password.length(), inDigest );
+
+		if ( memcmp( pwDigest, inDigest, SHA224_DIGEST_SIZE ))
+			return NULL;
+
+		if ( end != std::string::npos )	{
+			end = line.find( ":", start );
+			name = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
+			start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
+		}
+
+		return new User( "TextFile", usr, name );
+	}
+	return NULL;
+}
+
+User* TextFileAuthenticator::authenticate( const CRAMchallenge& challenge,
+					   const CRAMresponse& response,
+					   bool caseSensitveUser ) const
+{
 	try	{
 		std::ifstream	pwdFile( m_file.c_str() );
-		MOD_LOG_TRACE << "Text file authenticator opened file '" << m_file << "'";
+		MOD_LOG_TRACE << "Text file authenticator '" << identifier() << "' opened file '" << m_file << "'";
 		while( !pwdFile.eof())	{
 			std::string line;
 			std::getline( pwdFile, line );
@@ -94,44 +157,35 @@ User* TextFileAuthenticator::authenticate( const std::string& username,
 
 			std::size_t  start = 0, end = 0;
 			std::string usr, pwd, name;
-			if ( end != std::string::npos)	{
+			if ( end != std::string::npos )	{
 				end = line.find( ":", start );
 				usr = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
 				start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
 			}
-//MOD_LOG_TRACE << "Text file authenticator user: '" << usr << "'";
-			if (( caseSensitveUser && usr != username ) ||
-					( !caseSensitveUser && !boost::algorithm::iequals( usr, username )))
-				continue;
+			if ( caseSensitveUser  )
+				boost::to_lower( usr );
 
-			if ( end != std::string::npos)	{
+			if ( end != std::string::npos )	{
 				end = line.find( ":", start );
 				pwd = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
 				start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
 			}
-//MOD_LOG_TRACE << "Text file authenticator password: '" << pwd << "'";
 
-			unsigned char pwDigest[ SHA224_DIGEST_SIZE ];
-			if ( ! hex2byte( pwd.c_str(), pwDigest, SHA224_DIGEST_SIZE ))
-				return NULL;
+			CRAMresponse	local( challenge, usr, pwd );
+			if ( local != response )
+				continue;
 
-			unsigned char inDigest[ SHA224_DIGEST_SIZE ];
-			sha224((const unsigned char *)password.c_str(), password.length(), inDigest );
-
-			if ( memcmp( pwDigest, inDigest, SHA224_DIGEST_SIZE ))
-				return NULL;
-
-			if ( end != std::string::npos)	{
+			if ( end != std::string::npos )	{
 				end = line.find( ":", start );
 				name = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
 				start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
 			}
-//MOD_LOG_TRACE << "Text file authenticator name: '" << name << "'";
-			return new User( "PlainText", usr, name );
+
+			return new User( "TextFile", usr, name );
 		}
 		return NULL;
 	}
-	catch( std::exception& e)	{
+	catch( std::exception& e )	{
 		MOD_LOG_TRACE << "Unable to read text file authentication file '" << m_file << "': " << e.what();
 		return NULL;
 	}
