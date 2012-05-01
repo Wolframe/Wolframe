@@ -19,8 +19,13 @@ QT_LDFLAGS = /LIBPATH:"$(QT_DIR)\lib"
 INCLUDE_LDFLAGS = \
 	$(QT_LDFLAGS)
 
+!IFNDEF DEBUG
 INCLUDE_LIBS = \
 	QtCore4.lib QtGui4.lib QtUiTools.lib QtNetwork4.lib
+!ELSE
+INCLUDE_LIBS = \
+	QtCored4.lib QtGuid4.lib QtUiToolsd.lib QtNetworkd4.lib
+!ENDIF
 
 # openssl
 
@@ -93,9 +98,15 @@ local_test:
 
 run: $(CPP_BINS)
 	@-echo @echo off > test.bat
-	@-echo copy $(QT_DIR)\bin\QtCore4.dll . >> test.bat
+!IFNDEF DEBUG
+	@-echo set PATH=$(QT_DIR)\binQtCore4.dll . >> test.bat
 	@-echo copy $(QT_DIR)\bin\QtGui4.dll . >> test.bat
 	@-echo copy $(QT_DIR)\bin\QtNetwork4.dll . >> test.bat
+!ELSE
+	@-echo copy $(QT_DIR)\bin\QtCored4.dll . >> test.bat
+	@-echo copy $(QT_DIR)\bin\QtGuid4.dll . >> test.bat
+	@-echo copy $(QT_DIR)\bin\QtNetworkd4.dll . >> test.bat
+!ENDIF
 !IFDEF WITH_SSL
 	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat
 	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >> test.bat

@@ -32,13 +32,13 @@ CPP_OBJS = \
 TEST_CPP_BINS = \
 	authenticationTest.exe \
 	textFileTest.exe \
-	textFileCRAMest.exe
+	textFileCRAMtest.exe
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 authenticationTest.exe: authenticationTest.obj $(CPP_OBJS) $(TOPDIR)\src\wolframe.lib
 textFileTest.exe: textFileTest.obj $(CPP_OBJS) $(TOPDIR)\src\wolframe.lib
-textFileCRAMest.exe: textFileCRAMest.obj $(CPP_OBJS) $(TOPDIR)\src\wolframe.lib
+textFileCRAMtest.exe: textFileCRAMtest.obj $(CPP_OBJS) $(TOPDIR)\src\wolframe.lib
 
 local_all:
 
@@ -52,6 +52,6 @@ local_test:
 	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
 	@-echo authenticationTest >> test.bat
 	@-echo textFileTest >> test.bat
-	@-echo textFileCRAMest >> test.bat
+	@-echo textFileCRAMtest >> test.bat
 	@-echo echo off >> test.bat
 	@-test.bat
