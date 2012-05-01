@@ -30,34 +30,15 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file langbind/pipe.hpp
-///\brief Interface for a pipe (istream|ostream) through wolframe mappings like filters, forms, functions
-#ifndef _Wolframe_langbind_IOSTREAMFILTER_HPP_INCLUDED
-#define _Wolframe_langbind_IOSTREAMFILTER_HPP_INCLUDED
-#include <string>
+///\brief Program using filters to map stdin to stdout
+#include <fstream>
 #include <iostream>
+#include "langbind/iostreamfilter.hpp"
 
-namespace _Wolframe {
-namespace langbind {
+using namespace _Wolframe;
 
-///\brief Maps input to output through a filter
-///\param[in] ifl
-///\param[in] ib
-///\param[in] ofl
-///\param[in] ob
-///\param[in,out] in
-///\param[in,out] out
-int iostreamfilter( const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& in, std::ostream& out);
+int main( int argc, const char **argv )
+{
+	return langbind::iostreamfilter( argc, argv, std::cin, std::cout, std::cerr);
+}
 
-///\brief Maps input to output by a protocol::commandHandler
-///\param[in] ifl
-///\param[in] ib
-///\param[in] ofl
-///\param[in] ob
-///\param[in] proc
-///\param[in,out] in
-///\param[in,out] out
-int iostreamfilter( const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, const std::string& proc, std::istream& in, std::ostream& out);
-
-}}//namespace
-#endif

@@ -33,12 +33,77 @@
 ///\brief Program using filters to map stdin to stdout
 #include <fstream>
 #include <iostream>
+#include <cstring>
+#include <cstdlib>
 #include "langbind/iostreamfilter.hpp"
 
 using namespace _Wolframe;
 
+static void printUsage()
+{
+	std::cerr << "filter <inputfilter> [ <command> ] <outputfilter>" << std::endl;
+	std::cerr << "inputfilter :Name of the input filter plus an optional '/' plus buffer size" << std::endl;
+	std::cerr << "outputfilter :Name of the output filter plus an optional '/' plus buffer size" << std::endl << std::endl;
+
+	std::cerr << "   example: 'filter xml:textwolf/256 xml:textwolf:UTF-8/128'" << std::endl;
+	std::cerr << "      input = xml:textwolf/256 = using textwolf XML with a buffer of 256 bytes" << std::endl;
+	std::cerr << "      output = xml:textwolf:UTF-16/128 = using textwolf XML with UTF-8 encoding and a buffer of 128 bytes" << std::endl;
+}
+
 int main( int argc, const char **argv )
 {
-	return langbind::iostreamfilter( argc, argv, std::cin, std::cout, std::cerr);
+	const char* infiltername = 0;
+	const char* outfiltername = 0;
+	const char* procname = 0;
+	std::size_t inputBufferSize = 1024;
+	std::size_t outputBufferSize = 1024;
+
+	if (argc == 4)
+	{
+		infiltername = argv[1];
+		procname = argv[2];
+		outfiltername = argv[3];
+	}
+	else if (argc == 3)
+	{
+		infiltername = argv[1];
+		outfiltername = argv[2];
+	}
+	else if (argc > 4)
+	{
+		std::cerr << "too many arguments passed to " << argv[0] << std::endl;
+		printUsage();
+		return 1;
+	}
+	else if (argc < 3)
+	{
+		std::cerr << "too many arguments passed to " << argv[0] << std::endl;
+		printUsage();
+		return 2;
+	}
+	std::string filternameIn( infiltername);
+	std::string filternameOut( outfiltername);
+	const char* bp;
+
+	bp = std::strchr( filternameIn.c_str(), '/');
+	if (bp)
+	{
+		inputBufferSize = (std::size_t)atoi( bp+1);
+		filternameIn.resize( bp-filternameIn.c_str());
+	}
+	bp = std::strchr( filternameOut.c_str(), '/');
+	if (bp)
+	{
+		outputBufferSize = (std::size_t)atoi( bp+1);
+		filternameOut.resize( bp-filternameOut.c_str());
+	}
+	if (procname)
+	{
+		return langbind::iostreamfilter( filternameIn.c_str(), inputBufferSize, filternameOut.c_str(), outputBufferSize, procname, std::cin, std::cout);
+	}
+	else
+	{
+		return langbind::iostreamfilter( filternameIn.c_str(), inputBufferSize, filternameOut.c_str(), outputBufferSize, std::cin, std::cout);
+	}
 }
 

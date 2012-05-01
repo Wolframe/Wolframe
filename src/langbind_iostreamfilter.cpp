@@ -33,13 +33,15 @@
 ///\file langbind/pipe.hpp
 ///\brief Implementation for a pipe (istream|ostream) through wolframe mappings like filters, forms, functions
 
+#include "logger-v1.hpp"
 #include "langbind/appObjects.hpp"
 #include "langbind/appGlobalContext.hpp"
 #include "langbind/iostreamfilter.hpp"
 #include "filter/token_filter.hpp"
+#if WITH_LUA
+#include "langbind/luaCommandHandler.hpp"
+#endif
 #include <boost/algorithm/string.hpp>
-#define BOOST_FILESYSTEM_VERSION 3
-#include <boost/filesystem.hpp>
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -47,58 +49,50 @@
 using namespace _Wolframe;
 using namespace langbind;
 
-static void printUsage( std::ostream& eout)
+int _Wolframe::langbind::iostreamfilter( const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, const std::string& proc, std::istream& is, std::ostream& os)
 {
-	eout << "filter <inputfilter> { <command> } <outputfilter>" << std::endl;
-	eout << "inputfilter :Name of the input filter plus an optional '/' plus buffer size" << std::endl;
-	eout << "outputfilter :Name of the output filter plus an optional '/' plus buffer size" << std::endl << std::endl;
+	langbind::GlobalContext* gc = langbind::getGlobalContext();
+	PluginFunction pf;
+	DDLForm df;
+	TransactionFunction tf;
+	CountedReference<protocol::CommandHandler> cmdhandler;
 
-	eout << "   example: 'filter xml:textwolf/256 xml:textwolf:UTF-8/128'" << std::endl;
-	eout << "      input = xml:textwolf/256 = using textwolf XML with a buffer of 256 bytes" << std::endl;
-	eout << "      output = xml:textwolf:UTF-16/128 = using textwolf XML with UTF-8 encoding and a buffer of 128 bytes" << std::endl;
+#if WITH_LUA
+	LuaScriptInstanceR sc;
+	if (gc->getLuaScriptInstance( proc.c_str(), sc))
+	{
+		cmdhandler.reset( new langbind::LuaCommandHandler());
+	}
+	else
+#endif
+	if (gc->getPluginFunction( proc.c_str(), pf))
+	{
+	}
+	else if (gc->getForm( proc.c_str(), df))
+	{
+	}
+	else if (gc->getTransactionFunction( proc.c_str(), tf))
+	{
+	}
+	else
+	{
+		LOG_ERROR << "mapping command not found: '" << proc.c_str() << "'";
+	}
+	return _Wolframe::langbind::iostreamfilter( ifl, ib, ofl, ob, is, os);
 }
 
-int _Wolframe::langbind::iostreamfilter( int argc, const char** argv, std::istream& pin, std::ostream& pout, std::ostream& eout)
+int _Wolframe::langbind::iostreamfilter( const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& is, std::ostream& os)
 {
-	if (argc > 3)
-	{
-		eout << "too many arguments passed to " << argv[0] << std::endl;
-		printUsage( eout);
-		return 1;
-	}
-	else if (argc < 3)
-	{
-		eout << "too many arguments passed to " << argv[0] << std::endl;
-		printUsage( eout);
-		return 2;
-	}
-
+	langbind::GlobalContext* gc = langbind::getGlobalContext();
 	langbind::FilterFactoryR tf( new langbind::TokenFilterFactory());
-	langbind::GlobalContext().defineFilter( "token", tf);
+	gc->defineFilter( "token", tf);
 
-	std::size_t inputBufferSize = 256;
-	std::size_t outputBufferSize = 256;
-	std::string filternameIn( argv[1]);
-	std::string filternameOut( argv[2]);
-	const char* bp;
-	bp = std::strchr( filternameIn.c_str(), '/');
-	if (bp)
-	{
-		inputBufferSize = (std::size_t)atoi( bp+1);
-		filternameIn.resize( bp-filternameIn.c_str());
-	}
-	bp = std::strchr( filternameOut.c_str(), '/');
-	if (bp)
-	{
-		outputBufferSize = (std::size_t)atoi( bp+1);
-		filternameOut.resize( bp-filternameOut.c_str());
-	}
 	langbind::Filter flt;
-	if (boost::iequals( filternameIn, filternameOut))
+	if (boost::iequals( ofl, ifl))
 	{
-		if (!langbind::GlobalContext().getFilter( filternameIn.c_str(), flt))
+		if (!gc->getFilter( ifl.c_str(), flt))
 		{
-			eout << "unknown filter " << filternameIn << std::endl;
+			LOG_ERROR << "unknown filter '" << ifl << "'";
 			return 1;
 		}
 	}
@@ -106,20 +100,20 @@ int _Wolframe::langbind::iostreamfilter( int argc, const char** argv, std::istre
 	{
 		langbind::Filter in;
 		langbind::Filter out;
-		if (!langbind::GlobalContext().getFilter( filternameIn.c_str(), in))
+		if (!gc->getFilter( ifl.c_str(), in))
 		{
-			eout << "unknown input filter " << filternameIn << std::endl;
+			LOG_ERROR << "unknown input filter '" << ofl << "'";
 			return 1;
 		}
-		if (!langbind::GlobalContext().getFilter( filternameOut.c_str(), out))
+		if (!gc->getFilter( ofl.c_str(), out))
 		{
-			eout << "unknown output filter " << filternameOut << std::endl;
+			LOG_ERROR << "unknown output filter '" << ofl << "'";
 			return 2;
 		}
 		flt = langbind::Filter( in.inputfilter(), out.outputfilter());
 	}
-	char* inputBuffer = new char[ inputBufferSize];
-	char* outputBuffer = new char[ outputBufferSize];
+	char* inputBuffer = new char[ ib];
+	char* outputBuffer = new char[ ob];
 	const void* element;
 	std::size_t elementsize;
 	protocol::InputFilter::ElementType elementType;
@@ -132,18 +126,18 @@ int _Wolframe::langbind::iostreamfilter( int argc, const char** argv, std::istre
 			goto TERMINATE;
 		}
 		std::size_t pp = 0;
-		while (pp < inputBufferSize && !pin.eof())
+		while (pp < ib && !is.eof())
 		{
-			pin.read( inputBuffer+pp, sizeof(char));
+			is.read( inputBuffer+pp, sizeof(char));
 			++pp;
 		}
-		flt.inputfilter().get()->protocolInput( inputBuffer, pp, pp < inputBufferSize);
+		flt.inputfilter().get()->protocolInput( inputBuffer, pp, pp < ib);
 		goto PROCESS_READ;
 	}
 	WRITE_OUTPUT:
 	{
-		pout.write( outputBuffer, flt.outputfilter().get()->pos());
-		flt.outputfilter().get()->init( outputBuffer, outputBufferSize);
+		os.write( outputBuffer, flt.outputfilter().get()->pos());
+		flt.outputfilter().get()->init( outputBuffer, ib);
 		goto PROCESS_WRITE;
 	}
 	PROCESS_READ:
@@ -222,15 +216,17 @@ int _Wolframe::langbind::iostreamfilter( int argc, const char** argv, std::istre
 	}
 	ERROR_READ:
 	{
-		eout << "Error in input: '" << flt.inputfilter().get()->getError() << "'" << std::endl;
+		LOG_ERROR << "Error in input: '" << flt.inputfilter().get()->getError() << "'";
 		goto TERMINATE;
 	}
 	ERROR_WRITE:
-		eout << "Error in output: '" << flt.outputfilter().get()->getError() << "'" << std::endl;
+	{
+		LOG_ERROR << "Error in output: '" << flt.outputfilter().get()->getError() << "'";
 		goto TERMINATE;
+	}
 	TERMINATE:
 	{
-		pout.write( outputBuffer, flt.outputfilter().get()->pos());
+		os.write( outputBuffer, flt.outputfilter().get()->pos());
 		delete [] inputBuffer;
 		delete [] outputBuffer;
 	}
