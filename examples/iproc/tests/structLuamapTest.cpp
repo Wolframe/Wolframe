@@ -218,10 +218,17 @@ template <class Struct>
 static int luaSerializationTest( lua_State* ls)
 {
 	Struct obj;
+	serialize::Context ctx;
 	const LuamapDescriptionBase* ds = Struct::getLuamapDescription();
 	lua_pushvalue( ls, 1);
-	ds->parse( &obj, ls);
-	ds->print( &obj, ls);
+	if (!ds->parse( &obj, ls, &ctx))
+	{
+		luaL_error( ls, ctx.getLastError());
+	}
+	if (!ds->print( &obj, ls, &ctx))
+	{
+		luaL_error( ls, ctx.getLastError());
+	}
 	return 1;
 }
 

@@ -56,17 +56,30 @@ public:
 	typedef std::vector<std::pair<const char*,LuamapDescriptionBase> > Map;
 	typedef bool (*Parse)( void* obj, lua_State* ls, Context* ctx);
 	typedef bool (*Print)( const void* obj, lua_State* ls, Context* ctx);
+	typedef bool (*Constructor)( void* obj);
+	typedef void (*Destructor)( void* obj);
+
 	Parse parse() const {return m_parse;}
 	Print print() const {return m_print;}
 
+	LuamapDescriptionBase( Constructor c, Destructor d, const char* tn, std::size_t os, std::size_t sz, Parse pa, Print pr)
+		:m_constructor(c),m_destructor(d),m_typename(tn),m_ofs(os),m_size(sz),m_parse(pa),m_print(pr){}
 	LuamapDescriptionBase( const char* tn, std::size_t os, std::size_t sz, Parse pa, Print pr)
-		:m_typename(tn),m_ofs(os),m_size(sz),m_parse(pa),m_print(pr){}
+		:m_constructor(0),m_destructor(0),m_typename(tn),m_ofs(os),m_size(sz),m_parse(pa),m_print(pr){}
 	LuamapDescriptionBase( const LuamapDescriptionBase& o)
-		:m_typename(o.m_typename),m_ofs(o.m_ofs),m_size(o.m_size),m_elem(o.m_elem),m_parse(o.m_parse),m_print(o.m_print){}
+		:m_constructor(o.m_constructor),m_destructor(o.m_destructor),m_typename(o.m_typename),m_ofs(o.m_ofs),m_size(o.m_size),m_elem(o.m_elem),m_parse(o.m_parse),m_print(o.m_print){}
 
-	void parse( void* obj, lua_State* ls) const;
-	void print( const void* obj, lua_State* ls) const;
+	bool parse( void* obj, lua_State* ls, Context* ctx) const;
+	bool print( const void* obj, lua_State* ls, Context* ctx) const;
 
+	bool init( void* obj) const
+	{
+		return (m_constructor)?m_constructor( obj):true;
+	}
+	void done( void* obj) const
+	{
+		if (m_destructor) m_destructor( obj);
+	}
 	std::size_t size() const
 	{
 		return m_size;
@@ -94,6 +107,8 @@ public:
 		m_elem.push_back( std::pair<const char*,LuamapDescriptionBase>(name,dd));
 	}
 private:
+	Constructor m_constructor;
+	Destructor m_destructor;
 	const char* m_typename;
 	std::size_t m_ofs;
 	std::size_t m_size;

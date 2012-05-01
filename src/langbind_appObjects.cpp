@@ -43,10 +43,12 @@ Project Wolframe.
 #include "filter/token_filter.hpp"
 #include <algorithm>
 #include <cctype>
+#include <cstdlib>
 #include <string>
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
+
 #ifdef WITH_LIBXML2
 #include "filter/libxml2_filter.hpp"
 #endif
@@ -567,6 +569,62 @@ bool LuaFunctionMap::getLuaScriptInstance( const char* procname, LuaScriptInstan
 	if (ii == ee) return false;
 	rt = LuaScriptInstanceR( new LuaScriptInstance( m_ar[ ii->second]));
 	return true;
+}
+
+int LuaPluginFunction::call( lua_State* ls) const
+{
+	bool ok = true;
+	serialize::Context ctx;
+	int rt = 0;
+
+	void* dt = lua_newuserdata( ls, m_api_param->size() + m_api_result->size());
+	std::memset( dt, 0, m_api_param->size() + m_api_result->size());
+	void* input_struct = (void*)dt;
+	void* result_struct = (void*)((char*)dt + m_api_param->size());
+
+	if (!m_api_param->init( input_struct))
+	{
+		ctx.setError( 0, "Could not initialize api input object");
+		ok = false;
+		goto EXIT_FUNCTION1;
+	}
+	if (!m_api_result->init( result_struct))
+	{
+		m_api_param->done( input_struct);
+		ctx.setError( 0, "Could not initialize api result object");
+		ok = false;
+		goto EXIT_FUNCTION2;
+	}
+	if (!m_api_param->parse( input_struct, ls, &ctx))
+	{
+		ok = false;
+		goto EXIT_FUNCTION3;
+	}
+	try
+	{
+		rt = m_call( input_struct, result_struct);
+	}
+	catch (const std::exception& e)
+	{
+		ctx.setError( 0, e.what());
+		ok = false;
+		goto EXIT_FUNCTION3;
+	}
+	if (!m_api_param->print( result_struct, ls, &ctx))
+	{
+		ok = false;
+		goto EXIT_FUNCTION3;
+	}
+EXIT_FUNCTION3:
+	m_api_param->done( input_struct);
+EXIT_FUNCTION2:
+	m_api_result->done( result_struct);
+EXIT_FUNCTION1:
+	if (!ok)
+	{
+		luaL_error( ls, ctx.getLastError());
+	}
+	return rt;
 }
 
 void LuaPluginFunctionMap::defineLuaPluginFunction( const char* name, const LuaPluginFunction& f)
