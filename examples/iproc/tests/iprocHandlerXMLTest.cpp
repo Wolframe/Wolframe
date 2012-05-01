@@ -30,7 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file iprocHandlerXMLTest.cpp class unit tests using google test framework (gTest)
+///\\file iprocHandlerXMLTest.cpp class unit tests using google test framework (gTest)
 
 #include "iprocHandler.hpp"
 #include "connectionHandler.hpp"
@@ -131,7 +131,7 @@ public:
 		config << "env {" << std::endl;
 		config << "   script {" << std::endl;
 		config << "      name run" << std::endl;
-		config << "      sourcepath " << scriptpath << std::endl;
+		config << "      sourcepath \"" << scriptpath << "\"" << std::endl;
 		config << "   }" << std::endl;
 		config << "}" << std::endl;
 		config << "proc {" << std::endl;
@@ -185,10 +185,11 @@ TEST_F( IProcHandlerXMLTest, tests)
 			for (unsigned int ob=0; ob<NofBufferSizes; ob++)
 			{
 				std::string testoutput;
+				std::string scriptpath( "../scripts/");
+				scriptpath.append( testDescriptions[ti].scriptfile);
 
 				IProcTestConfiguration config(
-						(boost::filesystem::current_path() / "scripts"/ testDescriptions[ti].scriptfile).string(),
-						BufferSize[ib]+EoDBufferSize,
+						scriptpath, BufferSize[ib]+EoDBufferSize,
 						BufferSize[ob]+testDescriptions[ti].elementBuffersize);
 				iproc::Connection connection( ep, &config);
 

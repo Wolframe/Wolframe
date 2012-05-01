@@ -74,7 +74,7 @@ public:
 		config << "env {" << std::endl;
 		config << "   script {" << std::endl;
 		config << "      name run" << std::endl;
-		config << "      sourcepath " << scriptpath << std::endl;
+		config << "      sourcepath \"" << scriptpath << "\"" << std::endl;
 		config << "   }" << std::endl;
 		config << "}" << std::endl;
 		config << "proc {" << std::endl;
@@ -215,7 +215,7 @@ protected:
 		:ep( "127.0.0.1", 12345)
 		,m_connection(0)
 		,m_config(
-			(boost::filesystem::current_path() / "scripts"/ "test_echo_char.lua").string(),
+			"../scripts/test_echo_char.lua",
 			TestDescription().inputBufferSize + EoDBufferSize,
 			TestDescription().outputBufferSize + EscBufferSize)
 		{}
