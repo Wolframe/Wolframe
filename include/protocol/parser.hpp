@@ -152,14 +152,18 @@ public:
 	///\param [in] cmd command to define
 	void add( const char* cmd)
 	{
-		m_cmdmap.push_back( cmd);
+		std::string nam( cmd);
+		std::transform( nam.begin(), nam.end(), nam.begin(), (int(*)(int)) std::tolower);
+		m_cmdmap.push_back( nam);
 	}
 
 	///\brief Add a command to the protocol parser (case insensitive)
 	///\param [in] cmd command to define
 	void add( const std::string& cmd)
 	{
-		m_cmdmap.push_back( cmd);
+		std::string nam( cmd);
+		std::transform( nam.begin(), nam.end(), nam.begin(), (int(*)(int)) std::tolower);
+		m_cmdmap.push_back( nam);
 	}
 
 	std::size_t size() const
@@ -217,7 +221,7 @@ public:
 		{
 			char ch = *src;
 			++src;
-			buf.push_back( ch);
+			buf.push_back( std::tolower( ch));
 		}
 		if (src == end) return -1;
 

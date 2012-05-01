@@ -33,6 +33,7 @@ Project Wolframe.
 ///\brief interface for the scripting language Lua
 #ifndef _Wolframe_langbind_LUASCRIPT_HPP_INCLUDED
 #define _Wolframe_langbind_LUASCRIPT_HPP_INCLUDED
+#include "countedReference.hpp"
 #include <string>
 #include <map>
 #include <vector>
@@ -47,15 +48,30 @@ namespace langbind {
 
 class LuaScript
 {
+private:
+	struct Module
+	{
+		std::string m_name;
+		lua_CFunction m_initializer;
+
+		Module( const Module& o)				:m_name(o.m_name),m_initializer(o.m_initializer){}
+		Module( const std::string& n, const lua_CFunction f)	:m_name(n),m_initializer(f){}
+	};
+
 public:
 	LuaScript( const char* path_);
 	LuaScript( const LuaScript& o)
-		:m_path(o.m_path),m_content(o.m_content){}
+		:m_modules(o.m_modules),m_path(o.m_path),m_content(o.m_content){}
 	~LuaScript(){}
 
-	const std::string& path() const		{return m_path;}
-	const std::string& content() const	{return m_content;}
+	void addModule( const std::string& n, lua_CFunction f)		{m_modules.push_back( Module( n, f));}
+
+	const std::vector<Module>& modules() const			{return m_modules;}
+	const std::string& path() const					{return m_path;}
+	const std::string& content() const				{return m_content;}
+
 private:
+	std::vector<Module> m_modules;
 	std::string m_path;
 	std::string m_content;
 };
@@ -63,16 +79,22 @@ private:
 class LuaScriptInstance
 {
 public:
-	LuaScriptInstance( const LuaScript* script);
-	LuaScriptInstance( const LuaScriptInstance& o)
-		:m_ls(o.m_ls),m_script(o.m_script){}
+	explicit LuaScriptInstance( const LuaScript* script);
 	~LuaScriptInstance();
 
 	lua_State* ls()				{return m_ls;}
+	lua_State* thread()			{return m_thread;}
 private:
 	lua_State* m_ls;
+	lua_State* m_thread;
+	int m_threadref;
 	const LuaScript* m_script;
+
+private:
+	LuaScriptInstance( const LuaScriptInstance&){}
 };
+
+typedef CountedReference<LuaScriptInstance> LuaScriptInstanceR;
 
 
 ///\class LuaFunctionMap
@@ -81,12 +103,15 @@ class LuaFunctionMap
 {
 public:
 	LuaFunctionMap(){}
-	~LuaFunctionMap(){}
+	~LuaFunctionMap();
 
-	void defineLuaFunction( const char* procname, const char* scriptpath);
-	bool getLuaScriptInstance( const char* procname, LuaScriptInstance& rt) const;
+	void defineLuaFunction( const char* procname, const LuaScript& script);
+	bool getLuaScriptInstance( const char* procname, LuaScriptInstanceR& rt) const;
 private:
-	std::vector<LuaScript> m_ar;
+	LuaFunctionMap( const LuaFunctionMap&){}
+
+private:
+	std::vector<LuaScript*> m_ar;
 	std::map<std::string,std::size_t> m_pathmap;
 	std::map<std::string,std::size_t> m_procmap;
 };
@@ -99,7 +124,7 @@ namespace langbind {
 struct LuaScriptInstance {};
 struct LuaFunctionMap
 {
-	void defineLuaFunction( const char*, const char*)
+	void defineLuaFunction( const char*, const LuaScript&)
 	{
 		throw std::runtime_error("Wolframe built without lua support");
 	}

@@ -243,6 +243,13 @@ void ApplicationEnvironmentConfig::setCanonicalPathes( const std::string& refere
 		}
 	}
 	{
+		std::vector<ScriptCommandConfigStruct>::iterator itr=m_config.script.begin(),end=m_config.script.end();
+		for (;itr!=end; ++itr)
+		{
+			setCanonicalPath( itr->sourcepath, referencePath);
+		}
+	}
+	{
 		std::vector<PluginModuleAPIConfigStruct>::iterator itr=m_config.plugin.begin(),end=m_config.plugin.end();
 		for (;itr!=end; ++itr)
 		{

@@ -76,13 +76,13 @@ private:
 	///\brief Enumeration of processor states
 	enum State
 	{
-		Init,				///< start state, called first time in this session
-		EnterCommand,			///< parse command
-		ParseArgs,			///< parse command arguments
-		ParseArgsEOL,			///< parse end of line after command arguments
-		Processing,			///< running a command
-		ProtocolError,			///< a protocol error (bad command etc) appeared and the rest of the line has to be discarded
-		Terminate			///< terminate application processor session (close for network)
+		Init,				//< start state, called first time in this session
+		EnterCommand,			//< parse command
+		ParseArgs,			//< parse command arguments
+		ParseArgsEOL,			//< parse end of line after command arguments
+		Processing,			//< running a command
+		ProtocolError,			//< a protocol error (bad command etc) appeared and the rest of the line has to be discarded
+		Terminate			//< terminate application processor session (close for network)
 	};
 	///\brief Returns the state as string for logging etc.
 	///\param [in] i state to get as string
@@ -95,9 +95,9 @@ private:
 	///\brief Enumeration of processor commands in the protocol after handshaking
 	enum Command
 	{
-		empty,				///< empty line (to not get an error for no command)
-		capa,				///< get the protocol capabilities
-		quit				///< BYE and terminate
+		empty,				//< empty line (to not get an error for no command)
+		capa,				//< get the protocol capabilities
+		quit				//< BYE and terminate
 
 	};
 	enum {NofCommands=3};
@@ -110,25 +110,21 @@ private:
 		return ar[c];
 	}
 
-	State m_state;							///< state of the processor (protocol main statemachine)
+	State m_state;							//< state of the processor (protocol main statemachine)
 
-	protocol::Buffer m_buffer;					///< context (sub state) for partly parsed input lines
-	protocol::CArgBuffer<protocol::Buffer> m_argBuffer;		///< buffer for the arguments
+	protocol::Buffer m_buffer;					//< context (sub state) for partly parsed input lines
+	protocol::CArgBuffer<protocol::Buffer> m_argBuffer;		//< buffer for the arguments
 
-	protocol::InputBlock m_input;					///< buffer for network read messages
-	protocol::OutputBlock m_output;					///< buffer for network write messages
+	protocol::InputBlock m_input;					//< buffer for network read messages
+	protocol::OutputBlock m_output;					//< buffer for network write messages
 
-	protocol::InputBlock::iterator m_itr;				///< iterator to scan protocol input
-	protocol::InputBlock::iterator m_end;				///< iterator pointing to end of message buffer
+	protocol::InputBlock::iterator m_itr;				//< iterator to scan protocol input
+	protocol::InputBlock::iterator m_end;				//< iterator pointing to end of message buffer
 
-	const Configuration* m_config;					///< configuration
-	protocol::CmdParser<protocol::Buffer> m_parser;			///< context dependent command parser definition
-	int m_cmdidx;							///< command parsed
-	std::vector< CountedReference<protocol::CommandBase> > m_cmds;	///< list of commands available
-	CountedReference<protocol::CommandHandler> m_cmdhandler;	///< currently executed command
-
-	///\brief tries to load the list of currently available commands
-	bool loadCommands();
+	const Configuration* m_config;					//< configuration
+	protocol::CmdParser<protocol::Buffer> m_parser;			//< context dependent command parser definition
+	int m_cmdidx;							//< command parsed
+	CountedReference<protocol::CommandHandler> m_cmdhandler;	//< currently executed command
 
 	///\brief Helper function to send a line message with CRLF termination as C string
 	///\param [in] str head of the line to write

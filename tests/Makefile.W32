@@ -89,8 +89,7 @@ TEST_CPP_BINS = \
 	logTest.exe \
 	protocolArgumentParsing.exe \
 	configStructParser.exe \
-	configValueParser.exe \
-	filter.exe
+	configValueParser.exe
 
 OBJS = \
 

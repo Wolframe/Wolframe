@@ -30,10 +30,13 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Program using filters to map stdin to stdout
+///\file langbind/pipe.hpp
+///\brief Implementation for a pipe (istream|ostream) through wolframe mappings like filters, forms, functions
 
 #include "langbind/appObjects.hpp"
 #include "langbind/appGlobalContext.hpp"
+#include "langbind/iostreamfilter.hpp"
+#include "filter/token_filter.hpp"
 #include <boost/algorithm/string.hpp>
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
@@ -42,32 +45,37 @@
 #include <iostream>
 
 using namespace _Wolframe;
+using namespace langbind;
 
-static void printUsage()
+static void printUsage( std::ostream& eout)
 {
-	std::cerr << "filter <inputfilter> <outputfilter>" << std::endl;
-	std::cerr << "inputfilter :Name of the input filter plus an optional '/' plus buffer size" << std::endl;
-	std::cerr << "outputfilter :Name of the output filter plus an optional '/' plus buffer size" << std::endl << std::endl;
+	eout << "filter <inputfilter> { <command> } <outputfilter>" << std::endl;
+	eout << "inputfilter :Name of the input filter plus an optional '/' plus buffer size" << std::endl;
+	eout << "outputfilter :Name of the output filter plus an optional '/' plus buffer size" << std::endl << std::endl;
 
-	std::cerr << "   example: 'filter xml:textwolf/256 xml:textwolf:UTF-8/128'" << std::endl;
-	std::cerr << "      input = xml:textwolf/256 = using textwolf XML with a buffer of 256 bytes" << std::endl;
-	std::cerr << "      output = xml:textwolf:UTF-16/128 = using textwolf XML with UTF-8 encoding and a buffer of 128 bytes" << std::endl;
+	eout << "   example: 'filter xml:textwolf/256 xml:textwolf:UTF-8/128'" << std::endl;
+	eout << "      input = xml:textwolf/256 = using textwolf XML with a buffer of 256 bytes" << std::endl;
+	eout << "      output = xml:textwolf:UTF-16/128 = using textwolf XML with UTF-8 encoding and a buffer of 128 bytes" << std::endl;
 }
 
-int main( int argc, char **argv )
+int _Wolframe::langbind::iostreamfilter( int argc, const char** argv, std::istream& pin, std::ostream& pout, std::ostream& eout)
 {
 	if (argc > 3)
 	{
-		std::cerr << "too many arguments passed to " << argv[0] << std::endl;
-		printUsage();
+		eout << "too many arguments passed to " << argv[0] << std::endl;
+		printUsage( eout);
 		return 1;
 	}
 	else if (argc < 3)
 	{
-		std::cerr << "too many arguments passed to " << argv[0] << std::endl;
-		printUsage();
+		eout << "too many arguments passed to " << argv[0] << std::endl;
+		printUsage( eout);
 		return 2;
 	}
+
+	langbind::FilterFactoryR tf( new langbind::TokenFilterFactory());
+	langbind::GlobalContext().defineFilter( "token", tf);
+
 	std::size_t inputBufferSize = 256;
 	std::size_t outputBufferSize = 256;
 	std::string filternameIn( argv[1]);
@@ -90,7 +98,7 @@ int main( int argc, char **argv )
 	{
 		if (!langbind::GlobalContext().getFilter( filternameIn.c_str(), flt))
 		{
-			std::cerr << "unknown filter " << filternameIn << std::endl;
+			eout << "unknown filter " << filternameIn << std::endl;
 			return 1;
 		}
 	}
@@ -100,12 +108,12 @@ int main( int argc, char **argv )
 		langbind::Filter out;
 		if (!langbind::GlobalContext().getFilter( filternameIn.c_str(), in))
 		{
-			std::cerr << "unknown input filter " << filternameIn << std::endl;
+			eout << "unknown input filter " << filternameIn << std::endl;
 			return 1;
 		}
 		if (!langbind::GlobalContext().getFilter( filternameOut.c_str(), out))
 		{
-			std::cerr << "unknown output filter " << filternameOut << std::endl;
+			eout << "unknown output filter " << filternameOut << std::endl;
 			return 2;
 		}
 		flt = langbind::Filter( in.inputfilter(), out.outputfilter());
@@ -124,8 +132,9 @@ int main( int argc, char **argv )
 			goto TERMINATE;
 		}
 		std::size_t pp = 0;
-		while (pp < inputBufferSize && 1 == fread( inputBuffer+pp, sizeof(char), 1, stdin))
+		while (pp < inputBufferSize && !pin.eof())
 		{
+			pin.read( inputBuffer+pp, sizeof(char));
 			++pp;
 		}
 		flt.inputfilter().get()->protocolInput( inputBuffer, pp, pp < inputBufferSize);
@@ -133,11 +142,7 @@ int main( int argc, char **argv )
 	}
 	WRITE_OUTPUT:
 	{
-		std::size_t pp = 0, ee=flt.outputfilter().get()->pos();
-		while (pp < ee && 1 == fwrite( outputBuffer+pp, sizeof(char), 1, stdout))
-		{
-			++pp;
-		}
+		pout.write( outputBuffer, flt.outputfilter().get()->pos());
 		flt.outputfilter().get()->init( outputBuffer, outputBufferSize);
 		goto PROCESS_WRITE;
 	}
@@ -217,16 +222,15 @@ int main( int argc, char **argv )
 	}
 	ERROR_READ:
 	{
-		std::cerr << "Error in input: '" << flt.inputfilter().get()->getError() << "'" << std::endl;
+		eout << "Error in input: '" << flt.inputfilter().get()->getError() << "'" << std::endl;
 		goto TERMINATE;
 	}
 	ERROR_WRITE:
-		std::cerr << "Error in output: '" << flt.outputfilter().get()->getError() << "'" << std::endl;
+		eout << "Error in output: '" << flt.outputfilter().get()->getError() << "'" << std::endl;
 		goto TERMINATE;
 	TERMINATE:
 	{
-		std::size_t pp = 0, ee=flt.outputfilter().get()->pos();
-		while (pp < ee && 1 == fwrite( outputBuffer+pp, sizeof(char), 1, stdout)) ++pp;
+		pout.write( outputBuffer, flt.outputfilter().get()->pos());
 		delete [] inputBuffer;
 		delete [] outputBuffer;
 	}

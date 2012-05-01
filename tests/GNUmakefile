@@ -81,8 +81,7 @@ TEST_CPP_BINS = \
 	logTest$(EXE) \
 	protocolArgumentParsing$(EXE) \
 	configValueParser$(EXE) \
-	configStructParser$(EXE) \
-	filter$(EXE)
+	configStructParser$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

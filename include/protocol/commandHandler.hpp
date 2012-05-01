@@ -62,7 +62,7 @@ public:
 	///\brief Pass the parameters for processing
 	///\param [in] argc number of arguments of the protocol command
 	///\param [in] argv arguments of the protocol command
-	void passParameters( int argc, const char** argv);
+	void passParameters( const std::string& nam, int argc, const char** argv);
 
 	///\brief Define the input buffer for processing the command
 	///\param [in] buf buffer for the data to process
@@ -103,79 +103,46 @@ public:
 	int statusCode() const				{return m_statusCode;}
 
 protected:
+	std::string m_name;
 	std::vector< std::string > m_argBuffer;		///< buffer type for the command arguments
 	int m_statusCode;				///< error code of operation for the client
-};
-
-
-struct CommandEnvironment
-{
-	CommandEnvironment(){}
-	virtual ~CommandEnvironment(){}
-
-	///\brief interface implementation of ConfigurationBase::test() const
-	virtual bool test() const=0;
-
-	///\brief interface implementation of ConfigurationBase::check() const
-	virtual bool check() const=0;
-
-	///\brief interface implementation of ConfigurationBase::print(std::ostream& os, size_t indent) const
-	virtual void print( std::ostream&, size_t indent=0) const=0;
 };
 
 
 class CommandBase
 {
 public:
-	CommandBase( const std::string& nam, const CommandEnvironment* env_)
-		:m_cmdName(nam),m_env(env_){}
-	CommandBase( const CommandBase& o)
-		:m_cmdName(o.m_cmdName),m_env(o.m_env){}
-	CommandBase()
-		:m_cmdName(0),m_env(0){}
+	explicit
+	CommandBase( const std::string& nam)
+		:m_cmdName(nam),m_procName(nam) {}
+	CommandBase( const std::string& nam, const std::string& procnam)
+		:m_cmdName(nam),m_procName(procnam) {}
+
 	virtual ~CommandBase() {}
 
-	const char* cmdName() const
-	{
-		return m_cmdName.c_str();
-	}
-
-	virtual CountedReference<CommandHandler> create( int /*argc*/, const char** /*argv*/) const
+	virtual CountedReference<CommandHandler> create() const
 	{
 		return CountedReference<CommandHandler>(0);
 	}
-
-	const CommandEnvironment* env() const
-	{
-		return m_env;
-	}
-
-protected:
+	const char* cmdName() const		{return m_cmdName.c_str();}
+	const std::string& procName() const	{return m_procName;}
+private:
 	std::string m_cmdName;
-	const CommandEnvironment* m_env;
+	std::string m_procName;
 };
 
 typedef CountedReference<CommandBase> CommandBaseR;
 
 
-
-template <class CommandHandlerClass, class CommandEnvironmentClass>
+template <class CommandHandlerClass>
 struct Command :public CommandBase
 {
-	Command( const char* nam, const CommandEnvironmentClass* env_)
-		:CommandBase(nam, dynamic_cast<const CommandEnvironment*>(env_))
-	{
-		if (!dynamic_cast<const CommandEnvironmentClass*>(m_env))
-		{
-			throw std::logic_error( "Base class mismatch or RTTI support is switched off");
-		}
-	}
+	Command( const std::string& nam) :CommandBase(nam) {}
 	virtual ~Command(){}
 
-	virtual CountedReference<CommandHandler> create( int argc, const char** argv) const
+	virtual CountedReference<CommandHandler> create() const
 	{
-		CommandHandlerClass* rt = new CommandHandlerClass( dynamic_cast<const CommandEnvironmentClass*>(m_env));
-		rt->passParameters( argc, argv);
+		CommandHandlerClass* rt = new CommandHandlerClass();
 		return CountedReference<CommandHandler>( rt);
 	}
 };

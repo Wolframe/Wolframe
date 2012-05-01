@@ -17,12 +17,15 @@ function run( )
 	end
 end
 --config
+env {
+	script {
+		name run
+		sourcepath echo.lua
+	}
+}
 proc {
-script {
-	cmd RUN
-	path echo.lua
-	main run
-}}
+	cmd run
+}
 --output
 OK CMD1A '1'
 OK CMD2A '2'

@@ -37,6 +37,7 @@
 #include <vector>
 #include <string>
 #include "protocol/commandHandler.hpp"
+#include "protocol/execCommandHandler.hpp"
 #include "config/descriptionBase.hpp"
 #include "ddl/compilerInterface.hpp"
 #include "standardConfigs.hpp"
@@ -44,55 +45,28 @@
 namespace _Wolframe {
 namespace tproc {
 
-struct ScriptConfigStruct
-{
-	std::string cmdname;				//< name of the command in the protocol
-	std::string path;				//< path of the script to execute
-	std::string main;				//< path of the function in the script to execute
-	std::vector<std::string> module;		//< list of additional modules to load
-
-	///\brief Get the configuration structure description
-	static const config::DescriptionBase* description();
-};
-
-struct DirectMapConfigStruct
-{
-	std::string cmdname;				//< name of the command in the protocol
-	std::string ddlname;				//< name of the DDL (selects the compiler to translate the source)
-	std::string filtername;				//< name of the filter to use for input and output
-	std::string inputform;				//< input form path (DDL source)
-	std::string outputform;				//< output form path (DDL source)
-	std::string function;				//< name of the transaction function to execute
-
-	///\brief Get the configuration structure description
-	static const config::DescriptionBase* description();
-};
-
-struct ConfigurationStruct
-{
-	std::vector<ScriptConfigStruct> script;		//< script definitions
-	std::vector<DirectMapConfigStruct> directmap;	//< direct map definitions
-	std::size_t input_bufsize;			//< size of input network message buffers in bytes (should only be configured for testing)
-	std::size_t output_bufsize;			//< size of output network message buffers in bytes (should only be configured for testing)
-
-	///\brief Get the configuration structure description
-	static const config::DescriptionBase* description();
-	ConfigurationStruct();
-};
-
 ///\class Configuration
 ///\brief Configuration structure
 class Configuration :public config::ConfigurationBase
 {
 public:
-	Configuration();
-	Configuration( const Configuration& o)	:config::ConfigurationBase(o),m_data(o.m_data),m_cmds(o.m_cmds),m_envs(o.m_envs),m_compilers(o.m_compilers){}
+	Configuration()
+		:ConfigurationBase( "tproc", 0, "tproc") {}
+
+	Configuration( const std::vector<protocol::ExecCommandHandler::Command>& cc, std::size_t ib, std::size_t ob)
+		:config::ConfigurationBase("tproc", 0, "tproc")
+		,m_commands(cc)
+		,m_input_bufsize(ib)
+		,m_output_bufsize(ob){}
+
+	Configuration( const Configuration& o)
+		:config::ConfigurationBase(o)
+		,m_commands(o.m_commands)
+		,m_input_bufsize(o.m_input_bufsize)
+		,m_output_bufsize(o.m_output_bufsize){}
 
 	///\brief interface implementation of ConfigurationBase::parse( const config::ConfigurationTree&, const std::string&, const module::ModulesDirectory*)
 	bool parse( const config::ConfigurationTree& pt, const std::string& node, const module::ModulesDirectory* modules );
-
-	///\brief return all currently available commands
-	const std::vector< CountedReference<protocol::CommandBase> >& getCommands( const char* privileges=0) const;
 
 	///\brief interface implementation of ConfigurationBase::test() const
 	virtual bool test() const;
@@ -103,23 +77,29 @@ public:
 	///\brief interface implementation of ConfigurationBase::print(std::ostream& os, size_t indent) const
 	virtual void print( std::ostream&, size_t indent=0) const;
 
-	///\brief interface implementation of ConfigurationBase::setCanonicalPathes(const std::string&)
-	virtual void setCanonicalPathes( const std::string&);
-
 	///\brief return size of the buffer used for input network messages in bytes
-	std::size_t input_bufsize() const		{return m_data.input_bufsize;}
+	std::size_t input_bufsize() const						{return m_input_bufsize;}
 	///\brief return size of the buffer used for output network messages in bytes
-	std::size_t output_bufsize() const		{return m_data.output_bufsize;}
+	std::size_t output_bufsize() const						{return m_output_bufsize;}
 
-protected:
-	bool defineScript( const ScriptConfigStruct& sc);
-	bool defineDirectMap( const DirectMapConfigStruct& dm);
+	///\brief return all currently available commands
+	const std::vector<protocol::ExecCommandHandler::Command>& commands() const	{return m_commands;}
 
-	ConfigurationStruct m_data;
 private:
-	std::vector< CountedReference<protocol::CommandBase> > m_cmds;		//< factories for the command handlers
-	std::vector< CountedReference<protocol::CommandEnvironment> > m_envs;	//< static environments of the command handlers
-	std::vector< CountedReference<ddl::CompilerInterface> > m_compilers;	//< compilers for translating DDL definitions
+	std::vector<protocol::ExecCommandHandler::Command> m_commands;			//< command definitions
+	std::size_t m_input_bufsize;							//< size of input network message buffers in bytes (not configured, but hardcoded by the messaging layer)
+	std::size_t m_output_bufsize;							//< size of output network message buffers in bytes (not configured, but hardcoded by the messaging layer)
+
+public:
+	///\brief Set the buffer sizes for tests
+	///\remark Should only be called in tests or by the core
+	///\param[in] ib size of input buffer in bytes
+	///\param[in] ob size of output buffer in bytes
+	void setBuffers( std::size_t ib, std::size_t ob)
+	{
+		m_input_bufsize = ib;
+		m_output_bufsize = ob;
+	}
 };
 }}//namespace
 #endif

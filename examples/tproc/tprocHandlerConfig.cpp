@@ -35,9 +35,8 @@
 #include "countedReference.hpp"
 #include "tprocHandlerConfig.hpp"
 #include "langbind/ioFilterCommandHandler.hpp"
-#include "langbind/directmapCommandEnvironment.hpp"
 #include "langbind/directmapCommandHandler.hpp"
-#include "ddl/compiler/simpleFormCompiler.hpp"
+#include "langbind/appGlobalContext.hpp"
 #include "protocol/commandHandler.hpp"
 #include "config/description.hpp"
 #include <string>
@@ -47,52 +46,16 @@
 #include <boost/filesystem.hpp>
 #include "miscUtils.hpp"
 
-#if WITH_LUA
-#include "langbind/appObjects.hpp"
-#include "langbind/luaCommandEnvironment.hpp"
-#include "langbind/luaCommandHandler.hpp"
-#endif
-
 using namespace _Wolframe;
 using namespace _Wolframe::tproc;
 
-const config::DescriptionBase* ScriptConfigStruct::description()
+struct ConfigurationStruct
 {
-	struct ThisDescription :public config::Description<ScriptConfigStruct>
-	{
-		ThisDescription()
-		{
-			(*this)
-			( "cmd",	&ScriptConfigStruct::cmdname)
-			( "path",	&ScriptConfigStruct::path)
-			( "main",	&ScriptConfigStruct::main)
-			( "module",	&ScriptConfigStruct::module)
-			;
-		}
-	};
-	static const ThisDescription rt;
-	return &rt;
-}
+	std::vector<std::string> cmd;			//< command definitions
 
-const config::DescriptionBase* DirectMapConfigStruct::description()
-{
-	struct ThisDescription :public config::Description<DirectMapConfigStruct>
-	{
-		ThisDescription()
-		{
-			(*this)
-			( "cmd",	&DirectMapConfigStruct::cmdname)
-			( "ddl",	&DirectMapConfigStruct::ddlname)
-			( "filter",	&DirectMapConfigStruct::filtername)
-			( "inputform",	&DirectMapConfigStruct::inputform)
-			( "outputform",	&DirectMapConfigStruct::outputform)
-			( "function",	&DirectMapConfigStruct::function)
-			;
-		}
-	};
-	static const ThisDescription rt;
-	return &rt;
-}
+	///\brief Get the configuration structure description
+	static const config::DescriptionBase* description();
+};
 
 const config::DescriptionBase* ConfigurationStruct::description()
 {
@@ -101,10 +64,7 @@ const config::DescriptionBase* ConfigurationStruct::description()
 		ThisDescription()
 		{
 			(*this)
-			( "directmap",	&ConfigurationStruct::directmap)
-			( "script",	&ConfigurationStruct::script)
-			( "inputbuf",	&ConfigurationStruct::input_bufsize)
-			( "outputbuf",	&ConfigurationStruct::output_bufsize)
+			( "cmd",	&ConfigurationStruct::cmd)
 			;
 		}
 	};
@@ -112,69 +72,32 @@ const config::DescriptionBase* ConfigurationStruct::description()
 	return &rt;
 }
 
-ConfigurationStruct::ConfigurationStruct()
-	:input_bufsize(4096),output_bufsize(4096){}	//< PF:TODO: should be set to system defaults
-
-Configuration::Configuration()
-	:ConfigurationBase( "tproc", 0, "tproc")
-{
-	m_compilers.push_back( new ddl::SimpleFormCompiler());
-}
-
-#if WITH_LUA
-static bool isLuaScript( const std::string& path)
-{
-	return (path.size()>4 && boost::algorithm::iequals( path.c_str()+path.size()-4, ".lua"));
-}
-#endif
-
-bool Configuration::defineScript( const ScriptConfigStruct& sc)
-{
-#if WITH_LUA
-	if (isLuaScript( sc.path))
-	{
-		langbind::LuaCommandEnvironment* env;
-		m_envs.push_back( env=new langbind::LuaCommandEnvironment( sc.main, sc.path, sc.module));
-		protocol::CommandBase* cmd = new protocol::Command< langbind::LuaCommandHandler, langbind::LuaCommandEnvironment>( sc.cmdname.c_str(), env);
-		m_cmds.push_back( cmd);
-	}
-	else
-#endif
-	{
-		LOG_ERROR << "Unknown type of script loaded: " << sc.path;
-		return false;
-	}
-	return true;
-}
-
-bool Configuration::defineDirectMap( const DirectMapConfigStruct& dm)
-{
-	std::vector<CountedReference<ddl::CompilerInterface> >::const_iterator itr=m_compilers.begin(),end=m_compilers.end();
-	for (; itr != end; ++itr)
-	{
-		ddl::CompilerInterface* ddlc = itr->get();
-		if (ddlc && boost::algorithm::iequals( dm.ddlname, ddlc->ddlname()))
-		{
-			langbind::DirectmapCommandEnvironment* env;
-			m_envs.push_back( env=new langbind::DirectmapCommandEnvironment( ddlc, dm.filtername, dm.inputform, dm.outputform, dm.function));
-			protocol::CommandBase* cmd = new protocol::Command< langbind::DirectmapCommandHandler, langbind::DirectmapCommandEnvironment>( dm.cmdname.c_str(), env);
-			m_cmds.push_back( cmd);
-			return true;
-		}
-	}
-	LOG_ERROR << "Unknown type of DDL: '" << dm.ddlname << "'";
-	return false;
-}
-
 bool Configuration::parse( const config::ConfigurationTree& pt, const std::string&, const module::ModulesDirectory*)
 {
 	try
 	{
+		ConfigurationStruct data;
 		std::string errmsg;
-		if (!m_data.description()->parse( (void*)&m_data, (const boost::property_tree::ptree&)pt, errmsg))
+		if (!data.description()->parse( (void*)&data, (const boost::property_tree::ptree&)pt, errmsg))
 		{
 			LOG_ERROR << "Error in configuration: " << errmsg;
 			return false;
+		}
+		std::vector<std::string>::const_iterator itr=data.cmd.begin();
+		while (itr != data.cmd.end())
+		{
+			std::stringstream cmdstr( *itr);
+			std::string nam;
+
+			if (std::getline( cmdstr, nam, '='))
+			{
+				m_commands.push_back( protocol::ExecCommandHandler::Command( nam, cmdstr.str()));
+			}
+			else
+			{
+				m_commands.push_back( protocol::ExecCommandHandler::Command( *itr));
+			}
+			++itr;
 		}
 		return true;
 	}
@@ -187,101 +110,36 @@ bool Configuration::parse( const config::ConfigurationTree& pt, const std::strin
 
 bool Configuration::test() const
 {
-	std::vector< CountedReference<protocol::CommandBase> >::const_iterator itr=m_cmds.begin(),end=m_cmds.end();
-	for (;itr!=end; ++itr)
+	bool rt = true;
+	langbind::GlobalContext* gctx = langbind::getGlobalContext();
+	std::vector<protocol::ExecCommandHandler::Command>::const_iterator itr=m_commands.begin();
+	while (itr != m_commands.end())
 	{
-		if (!itr->get()->env()->test()) return false;
+		langbind::LuaScriptInstanceR li;
+		langbind::TransactionFunction tf;
+		if (!gctx->getLuaScriptInstance( itr->m_procname.c_str(), li) && !gctx->getTransactionFunction( itr->m_procname.c_str(), tf))
+		{
+			LOG_ERROR << "Error in configuration. Function not found: '" << itr->m_procname << "'";
+			rt = false;
+		}
+		++itr;
 	}
-	return true;
+	return rt;
 }
 
 bool Configuration::check() const
 {
-	std::vector<CountedReference< protocol::CommandBase> >::const_iterator itr=m_cmds.begin(),end=m_cmds.end();
-	for (;itr!=end; ++itr)
-	{
-		if (itr->get()->env())
-		{
-			if (!itr->get()->env()->check()) return false;
-		}
-	}
-	return true;
+	return test();
 }
 
 void Configuration::print( std::ostream& o, size_t i) const
 {
-	std::vector<CountedReference< protocol::CommandBase> >::const_iterator itr=m_cmds.begin(),end=m_cmds.end();
+	std::vector<protocol::ExecCommandHandler::Command>::const_iterator itr=m_commands.begin(),end=m_commands.end();
+	std::string ind( '\t', i);
 	for (;itr!=end; ++itr)
 	{
-		if (itr->get()->env())
-		{
-			itr->get()->env()->print( o, i);
-		}
+		o << ind << "command '" << itr->m_cmdname << "'" << " -> '" << itr->m_procname << "'" << std::endl;
 	}
-}
-
-void Configuration::setCanonicalPathes( const std::string& refPath)
-{
-	{
-		std::vector<ScriptConfigStruct>::iterator itr=m_data.script.begin(),end=m_data.script.end();
-		for (;itr != end; ++itr)
-		{
-			boost::filesystem::path pt(itr->path);
-			if (pt.is_absolute())
-			{
-				itr->path = pt.string();
-			}
-			else
-			{
-				itr->path = boost::filesystem::absolute( pt, boost::filesystem::path( refPath).branch_path()).string();
-			}
-		}
-	}{
-		std::vector<DirectMapConfigStruct>::iterator itr=m_data.directmap.begin(),end=m_data.directmap.end();
-		for (;itr != end; ++itr)
-		{
-			boost::filesystem::path pt( itr->inputform);
-			if (pt.is_absolute())
-			{
-				itr->inputform = pt.string();
-			}
-			else
-			{
-				itr->inputform = boost::filesystem::absolute( pt, boost::filesystem::path( refPath).branch_path()).string();
-			}
-		}
-	}{
-		std::vector<DirectMapConfigStruct>::iterator itr=m_data.directmap.begin(),end=m_data.directmap.end();
-		for (;itr != end; ++itr)
-		{
-			boost::filesystem::path pt( itr->outputform);
-			if (pt.is_absolute())
-			{
-				itr->outputform = pt.string();
-			}
-			else
-			{
-				itr->outputform = boost::filesystem::absolute( pt, boost::filesystem::path( refPath).branch_path()).string();
-			}
-		}
-	}{
-		std::vector<ScriptConfigStruct>::iterator itr=m_data.script.begin(),end=m_data.script.end();
-		for (;itr != end; ++itr)
-		{
-			if (!defineScript( *itr)) throw std::runtime_error( "direct map load error");
-		}
-	}{
-		std::vector<DirectMapConfigStruct>::iterator itr=m_data.directmap.begin(),end=m_data.directmap.end();
-		for (;itr != end; ++itr)
-		{
-			if (!defineDirectMap( *itr)) throw std::runtime_error( "direct map load error");
-		}
-	}
-}
-
-const std::vector<CountedReference< protocol::CommandBase> >& Configuration::getCommands( const char* ) const
-{
-	return m_cmds;
 }
 
 

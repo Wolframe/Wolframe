@@ -42,25 +42,38 @@ bool DescriptionBase::parse( void* configStruct, const boost::property_tree::ptr
 {
 	try
 	{
-		try
-		{
-			std::vector<DescriptionBase::Item>::const_iterator itr,end;
+		std::vector<DescriptionBase::Item>::const_iterator itr,end;
 
+		for (itr=m_ar.begin(),end=m_ar.end(); itr != end; ++itr)
+		{
+			itr->m_parse( itr->m_name.c_str(), configStruct, itr->m_ofs, pt);
+		}
+		//check if all configuration elements are defined in the description
+		boost::property_tree::ptree::const_iterator pi,pe;
+		for (pi=pt.begin(),pe=pt.end(); pi != pe; pi++)
+		{
 			for (itr=m_ar.begin(),end=m_ar.end(); itr != end; ++itr)
 			{
-				itr->m_parse( itr->m_name.c_str(), configStruct, itr->m_ofs, pt);
+				if (boost::iequals( pi->first, itr->m_name.c_str())) break;
 			}
-			return true;
+			if (itr == end)
+			{
+				errmsg.append( "undefined element '");
+				errmsg.append( pi->first);
+				errmsg.append( "'");
+				return false;
+			}
 		}
-		catch (const config::ParseError& e)
-		{
-			errmsg.clear();
-			errmsg.append( "parse error in configuration at element ");
-			errmsg.append( e.m_location);
-			errmsg.append( ": '");
-			errmsg.append( e.m_message);
-			errmsg.append( "'");
-		}
+		return true;
+	}
+	catch (const config::ParseError& e)
+	{
+		errmsg.clear();
+		errmsg.append( "parse error in configuration at element ");
+		errmsg.append( e.m_location);
+		errmsg.append( ": '");
+		errmsg.append( e.m_message);
+		errmsg.append( "'");
 	}
 	catch (const std::exception& e)
 	{
@@ -71,13 +84,10 @@ bool DescriptionBase::parse( void* configStruct, const boost::property_tree::ptr
 
 void DescriptionBase::print( std::ostream& out, const void* configStruct, unsigned int indent) const
 {
-	std::vector<Item>::const_iterator end = m_ar.end();
-	std::vector<Item>::const_iterator itr = m_ar.begin();
-
-	while (itr != end)
+	std::vector<Item>::const_iterator itr = m_ar.begin(), end = m_ar.end();
+	for (; itr != end; ++itr)
 	{
 		itr->m_print( out, itr->m_name.c_str(), configStruct, itr->m_ofs, indent);
-		itr++;
 	}
 }
 

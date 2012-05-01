@@ -30,19 +30,17 @@
  Project Wolframe.
 
 ************************************************************************/
-#include "protocol/commandHandler.hpp"
-#include "logger-v1.hpp"
+///\file langbind/pipe.hpp
+///\brief Interface for a pipe (istream|ostream) through wolframe mappings like filters, forms, functions
+#ifndef _Wolframe_langbind_PIPE_HPP_INCLUDED
+#define _Wolframe_langbind_PIPE_HPP_INCLUDED
+#include <string>
+#include <iostream>
 
-using namespace _Wolframe;
-using namespace _Wolframe::protocol;
+namespace _Wolframe {
+namespace langbind {
 
-void CommandHandler::passParameters( const std::string& nam, int argc, const char** argv)
-{
-	m_name = nam;
-	for (int ii=0; ii<argc; ii++)
-	{
-		m_argBuffer.push_back( argv[ ii]);
-	}
-}
+int iostreamfilter( int argc, const char** argv, std::istream& in, std::ostream& out, std::ostream& eout);
 
-
+}}//namespace
+#endif

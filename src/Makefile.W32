@@ -113,8 +113,8 @@ LOCAL_STATIC_LIB_OBJS = \
 	langbind_appConfig_struct.obj \
 	langbind_appConfig.obj \
 	langbind_ioFilterCommandHandler.obj \
-	langbind_directmapCommandEnvironment.obj \
 	langbind_directmapCommandHandler.obj \
+	langbind_iostreamfilter.obj \
 	filter_textwolf_filter.obj \
 	filter_textwolf_filterBase.obj \
 	filter_char_filter.obj \
@@ -149,7 +149,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	langbind_luaScript.obj \
 	langbind_luaDebug.obj \
 	langbind_luaBignum.obj \
-	langbind_luaCommandEnvironment.obj \
 	langbind_luaCommandHandler.obj
 !ENDIF
 
@@ -189,8 +188,9 @@ CPP_OBJS = \
 	winMain.obj
 
 CPP_BINS = \
-	wolframed.exe
-	
+	wolframed.exe \
+	wolfilter.exe
+
 all: dependencies $(CPP_OBJS) $(CPP_BINS)
 
 dependencies:

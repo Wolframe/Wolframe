@@ -86,7 +86,7 @@ static void printElement_( std::ostream& out, const char* name, const T& value, 
 	typename T::const_iterator itr,end;
 	for (itr=value.begin(), end = value.end(); itr != end; ++itr)
 	{
-		printElement( out, name, &*itr, indent);
+		printElement( out, name, *itr, indent);
 	}
 }
 
@@ -104,14 +104,6 @@ static void printElement_( std::ostream& out, const char* name, const T& value, 
 {
 	print_indent( out, indent);
 	out << name << " = '" << std::string(value?"true":"false") << "'" << std::endl;
-}
-
-///\brief stub for printing a pointer
-template <typename T>
-static void printElement_( std::ostream& out, const char* name, T&, const traits::pointer_&, unsigned int indent)
-{
-	print_indent( out, indent);
-	out << name << " = ?" << std::endl;
 }
 
 ///\brief the unified print function

@@ -35,7 +35,7 @@ Project Wolframe.
 #include "serialize/struct/luamapDescription.hpp"
 #include "serialize/struct/luamapBase.hpp"
 #include "iprocHandlerConfig.hpp"
-#include "langbind/luaCommandEnvironment.hpp"
+#include "langbind/luaScript.hpp"
 #include "langbind/appObjects.hpp"
 #include "langbind/appGlobalContext.hpp"
 #include "langbind/luaCommandHandler.hpp"
@@ -215,12 +215,6 @@ const LuamapDescriptionBase* Document::getLuamapDescription()
 	return &rt;
 }
 
-class IProcTestConfiguration :public LuaCommandEnvironment
-{
-public:
-	IProcTestConfiguration ( const std::string& scriptpath) :LuaCommandEnvironment( "run",  scriptpath){}
-};
-
 template <class Struct>
 static int luaSerializationTest( lua_State* ls)
 {
@@ -233,11 +227,22 @@ static int luaSerializationTest( lua_State* ls)
 }
 
 template <class Struct>
-static int run( const IProcTestConfiguration& cfg, const std::string& input, std::string& output)
+static int registerTransformFunc( lua_State* ls)
 {
+	lua_pushcfunction( ls, &luaSerializationTest<Struct>);
+	lua_setglobal( ls, "transform");
+	return 0;
+}
+
+template <class Struct>
+static int run( const std::string& scriptpath, const std::string& input, std::string& output)
+{
+	langbind::defineGlobalContext( langbind::GlobalContextR( new langbind::GlobalContext()));
+	langbind::GlobalContext* gc = langbind::getGlobalContext();
+
 	char outputbuf[ 8192];
 	langbind::Filter filter;
-	if (!langbind::GlobalContext().getFilter( "xml:textwolf", filter))
+	if (!gc->getFilter( "xml:textwolf", filter))
 	{
 		LOG_ERROR << "error in serialization: no valid filter defined";
 		return 1;
@@ -254,10 +259,12 @@ static int run( const IProcTestConfiguration& cfg, const std::string& input, std
 		LOG_ERROR << "error in serialization: no valid output filter defined";
 		return 2;
 	}
-	LuaCommandHandler processor( &cfg);
-	lua_State* ls = processor.getLuaState();
-	lua_pushcfunction( ls, &luaSerializationTest<Struct>);
-	lua_setglobal( ls, "transform");
+	LuaScript script( scriptpath.c_str());
+	script.addModule( "transformations", registerTransformFunc<Struct>);
+	gc->defineLuaFunction( "run", script);
+
+	LuaCommandHandler processor;
+	processor.passParameters( "run", 0, 0);
 
 	in->protocolInput( (void*)input.c_str(), input.size(), true);
 	processor.setFilter( filter.inputfilter());
@@ -296,7 +303,7 @@ static int run( const IProcTestConfiguration& cfg, const std::string& input, std
 	return 0;
 }
 
-typedef int (*runFunction)( const IProcTestConfiguration& cfg, const std::string& input, std::string& output);
+typedef int (*runFunction)( const std::string& scriptpath, const std::string& input, std::string& output);
 
 struct TestDescription
 {
@@ -332,8 +339,8 @@ TEST_F( StructLuamapTest, tests)
 	{
 		wtest::Data data( testDescription[ti].name, testDescription[ti].datafile);
 		std::string testoutput;
-		IProcTestConfiguration cfg( (boost::filesystem::current_path() / "scripts"/ testDescription[ti].scriptname).string());
-		EXPECT_EQ( 0, testDescription[ti].run( cfg, data.input, testoutput));
+		std::string scriptpath( (boost::filesystem::current_path() / "scripts"/ testDescription[ti].scriptname).string());
+		EXPECT_EQ( 0, testDescription[ti].run( scriptpath, data.input, testoutput));
 		data.check( testoutput);
 		ASSERT_EQ( data.expected, testoutput);
 	}
@@ -342,7 +349,7 @@ TEST_F( StructLuamapTest, tests)
 int main( int argc, char **argv )
 {
 	wtest::Data::createDataDir( "result");
-	::testing::InitGoogleTest( &argc, argv );
+	::testing::InitGoogleTest( &argc, argv);
 	return RUN_ALL_TESTS();
 }
 

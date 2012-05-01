@@ -30,10 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///
 ///\file tprocHandler.hpp
-///\brief example connection handler as processor executing lua scripts
-///
+///\brief example connection handler as processor executing lua scripts with a complex protocol
 
 #ifndef _Wolframe_tproc_HANDLER_HPP_INCLUDED
 #define _Wolframe_tproc_HANDLER_HPP_INCLUDED

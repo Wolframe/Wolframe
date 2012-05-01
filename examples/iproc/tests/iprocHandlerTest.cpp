@@ -30,14 +30,19 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// iprocHandler class unit tests using google test framework (gTest)
-//
+///\file iprocHandlerTest.cpp
+///\brief Class unit tests using google test framework (gTest)
 
 #include "iprocHandler.hpp"
 #include "connectionHandler.hpp"
 #include "handlerConfig.hpp"
+#include "langbind/appGlobalContext.hpp"
+///PF:HACK: Command Line is needed to instantiate the application configuration object:
+#include "../src/commandLine.hpp"
+#include "moduleInterface.hpp"
+#include "config/ConfigurationTree.hpp"
 #include "testHandlerTemplates.hpp"
+#include "testUtils.hpp"
 #include "gtest/gtest.h"
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
@@ -47,19 +52,55 @@
 using namespace _Wolframe;
 using namespace _Wolframe::iproc;
 
+static int g_gtest_ARGC = 0;
+static char* g_gtest_ARGV[2] = {0, 0};
+
 class IProcTestConfiguration :public Configuration
 {
 public:
-	IProcTestConfiguration ( const std::string& scriptpath, std::size_t ib, std::size_t ob)
+	IProcTestConfiguration( const IProcTestConfiguration& o)
+		:Configuration(o)
+		,m_cmdLine(o.m_cmdLine)
+		,m_appConfig(o.m_appConfig)
+		,m_langbindConfig(o.m_langbindConfig)
+	{}
+	IProcTestConfiguration( const std::string& scriptpath, std::size_t ib, std::size_t ob)
 	{
-		m_data.input_bufsize = ib;
-		m_data.output_bufsize = ob;
-		ScriptConfigStruct sc;
-		sc.name = "run";
-		sc.main = "run";
-		sc.path = scriptpath;
-		if (!defineScript( sc)) throw std::logic_error( "cannot define test configuration");
+		m_appConfig.addConfig( "proc", this);
+		m_appConfig.addConfig( "env", &m_langbindConfig);
+
+		boost::filesystem::path configFile( boost::filesystem::current_path() / "temp" / "test.cfg");
+		std::ostringstream config;
+		config << "env {" << std::endl;
+		config << "   script {" << std::endl;
+		config << "      name run" << std::endl;
+		config << "      sourcepath " << scriptpath << std::endl;
+		config << "   }" << std::endl;
+		config << "}" << std::endl;
+		config << "proc {" << std::endl;
+		config << "   cmd run" << std::endl;
+		config << "}" << std::endl;
+		wtest::Data::writeFile( configFile.string().c_str(), config.str());
+
+		if (boost::filesystem::exists( configFile))
+		{
+			if (!m_appConfig.parse( configFile.string().c_str(), config::ApplicationConfiguration::CONFIG_INFO))
+			{
+				throw std::runtime_error( "Error in configuration");
+			}
+		}
+		m_cmdLine.parse( g_gtest_ARGC, g_gtest_ARGV);
+		m_appConfig.finalize( m_cmdLine);
+
+		setBuffers( ib, ob);
+		langbind::defineGlobalContext( new langbind::GlobalContext());
+		langbind::getGlobalContext()->load( m_langbindConfig);
 	}
+
+private:
+	config::CmdLineConfig m_cmdLine;
+	config::ApplicationConfiguration m_appConfig;
+	langbind::ApplicationEnvironmentConfig m_langbindConfig;
 };
 
 static const char* getRandomAsciiString( unsigned int maxStringSize=4096)
@@ -262,8 +303,7 @@ TYPED_TEST_CASE( IProcHandlerTest, MyTypes);
 TYPED_TEST( IProcHandlerTest, ExpectedResult )
 {
 	std::string output;
-	char* itr = const_cast<char*>( this->m_input.c_str());
-	EXPECT_EQ( 0, test::runTestIO( itr, itr+this->m_input.size(), output, *this->m_connection));
+	EXPECT_EQ( 0, test::runTestIO( this->m_input, output, *this->m_connection));
 
 #define _Wolframe_LOWLEVEL_DEBUG
 #ifdef _Wolframe_LOWLEVEL_DEBUG
@@ -287,7 +327,15 @@ TYPED_TEST( IProcHandlerTest, ExpectedResult )
 
 int main( int argc, char **argv )
 {
-	::testing::InitGoogleTest( &argc, argv );
+	g_gtest_ARGC = 1;
+	g_gtest_ARGV[0] = argv[0];
+	if (argc > 1)
+	{
+		std::cerr << "too many arguments passed to " << argv[0] << std::endl;
+		return 1;
+	}
+	wtest::Data::createDataDir( "temp");
+	::testing::InitGoogleTest( &g_gtest_ARGC, g_gtest_ARGV );
 	_Wolframe::log::LogBackend::instance().setConsoleLevel( _Wolframe::log::LogLevel::LOGLEVEL_INFO );
 	return RUN_ALL_TESTS();
 }

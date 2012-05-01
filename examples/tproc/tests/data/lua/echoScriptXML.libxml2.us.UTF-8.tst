@@ -22,12 +22,15 @@ function run( )
 	end
 end
 --config
+env {
+	script {
+		name run
+		sourcepath echo.lua
+	}
+}
 proc {
-script {
-	cmd RUN
-	path echo.lua
-	main run
-}}
+	cmd run
+}
 --output
 OK enter cmd
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>

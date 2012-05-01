@@ -30,11 +30,13 @@
  Project Wolframe.
 
 ************************************************************************/
-///
 ///\file iprocHandler.cpp
-///
+///\brief Implementation of a simple protocol based command handler calling a lus script
 
 #include "iprocHandler.hpp"
+#include "langbind/luaCommandHandler.hpp"
+#include "langbind/directmapCommandHandler.hpp"
+#include "langbind/appGlobalContext.hpp"
 #include "logger-v1.hpp"
 #include <stdexcept>
 
@@ -154,7 +156,7 @@ const net::NetworkOperation Connection::nextOperation()
 					}
 					default:
 					{
-						if (m_cmdidx >= NofCommands && (m_cmdidx - NofCommands) < m_cmds.size())
+						if (m_cmdidx >= NofCommands && (m_cmdidx - NofCommands) < m_config->commands().size())
 						{
 							m_state = ParseArgs;
 							continue;
@@ -246,19 +248,24 @@ const net::NetworkOperation Connection::nextOperation()
 					default:
 						try
 						{
-							m_cmdhandler = m_cmds[ m_cmdidx - NofCommands]->create( m_argBuffer.argc(), m_argBuffer.argv());
-							if (m_cmdhandler.get())
+							langbind::LuaScriptInstanceR li;
+							langbind::TransactionFunction tf;
+							const char* procname = m_config->commands()[ m_cmdidx - NofCommands].m_procname.c_str();
+							langbind::GlobalContext* gctx = langbind::getGlobalContext();
+
+							if (gctx->getLuaScriptInstance( procname, li))
 							{
-								m_state = Processing;
-								m_cmdhandler->setInputBuffer( m_input.ptr(), m_input.size());
-								m_cmdhandler->putInput( m_itr.ptr(), m_end-m_itr);
-								m_cmdhandler->setOutputBuffer( m_output.ptr(), m_output.size(), m_output.pos());
+								m_cmdhandler.reset( new langbind::LuaCommandHandler());
 							}
-							else
+							else if (gctx->getTransactionFunction( procname, tf))
 							{
-								m_state = ProtocolError;
-								return WriteLine( "BAD command not implemented");
+								m_cmdhandler.reset( new langbind::DirectmapCommandHandler());
 							}
+							m_cmdhandler->passParameters( procname, m_argBuffer.argc(), m_argBuffer.argv());
+							m_state = Processing;
+							m_cmdhandler->setInputBuffer( m_input.ptr(), m_input.size());
+							m_cmdhandler->putInput( m_itr.ptr(), m_end-m_itr);
+							m_cmdhandler->setOutputBuffer( m_output.ptr(), m_output.size(), m_output.pos());
 						}
 						catch (std::exception& e)
 						{
@@ -336,25 +343,6 @@ const net::NetworkOperation Connection::nextOperation()
 	return net::CloseConnection();
 }
 
-bool Connection::loadCommands()
-{
-	try
-	{
-		m_parser = protocol::CmdParser<protocol::Buffer>( &commandName);
-		std::vector< CountedReference< protocol::CommandBase> >::const_iterator itr=m_cmds.begin(), end=m_cmds.end();
-		for (; itr!=end; ++itr)
-		{
-			m_parser.add( itr->get()->cmdName());
-		}
-		return true;
-	}
-	catch (std::exception& e)
-	{
-		LOG_ERROR << "Cannot initialize protocol context " << e.what();
-		return false;
-	}
-}
-
 Connection::Connection( const net::LocalEndpoint& local, const Configuration* config)
 	:m_state(Init)
 	,m_buffer(256)
@@ -363,11 +351,16 @@ Connection::Connection( const net::LocalEndpoint& local, const Configuration* co
 	,m_output(config->output_bufsize())
 	,m_config(config)
 	,m_cmdidx( -1)
-	,m_cmds( config->getCommands())
 {
 	m_itr = m_input.begin();
 	m_end = m_input.end();
-	loadCommands();
+
+	m_parser = protocol::CmdParser<protocol::Buffer>( &commandName);
+	std::vector<Configuration::Command>::const_iterator itr=m_config->commands().begin(), end=m_config->commands().end();
+	for (; itr!=end; ++itr)
+	{
+		m_parser.add( itr->m_cmdname);
+	}
 	LOG_TRACE << "Created connection handler for " << local.toString();
 }
 

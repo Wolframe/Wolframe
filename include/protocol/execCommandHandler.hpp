@@ -48,13 +48,23 @@
 namespace _Wolframe {
 namespace protocol {
 
-class ExecCommandHandler :public protocol::CommandHandler
+class ExecCommandHandler :public CommandHandler
 {
+public:
+	struct Command
+	{
+		std::string m_cmdname;
+		std::string m_procname;
+
+		Command( const Command& o)				:m_cmdname(o.m_cmdname),m_procname(o.m_procname){}
+		Command( const std::string& c, const std::string& p)	:m_cmdname(c),m_procname(p){}
+		Command( const std::string& c)				:m_cmdname(c),m_procname(c){}
+	};
 public:
 	///\brief Constructor
 	///\param[in] rcmds_ array of commands that should return control to the caller
 	///\param[in] cmds_ array of command handlers with commands executed by this command handler
-	explicit ExecCommandHandler( const std::vector<std::string>& rcmds_, const std::vector< CountedReference<protocol::CommandBase> >& cmds_);
+	explicit ExecCommandHandler( const std::vector<std::string>& rcmds_, const std::vector<Command>& cmds_);
 
 	///\brief Destructor
 	virtual ~ExecCommandHandler();
@@ -88,40 +98,49 @@ private:
 	///\brief Enumeration of processor states
 	enum State
 	{
-		Init,				///< start state, called first time in this session
-		EnterCommand,			///< parse command
-		ParseArgs,			///< parse command arguments
-		ParseArgsEOL,			///< parse end of line after command arguments
-		Processing,			///< running a command
-		ProtocolError,			///< a protocol error (bad command etc) appeared and the rest of the line has to be discarded
-		PrintCapabilities,		///< print capabilities
-		Terminate			///< terminate application processor session (close for network)
+		Init,				//< start state, called first time in this session
+		EnterCommand,			//< parse command
+		ParseArgs,			//< parse command arguments
+		ParseArgsEOL,			//< parse end of line after command arguments
+		Processing,			//< running a command
+		ProtocolError,			//< a protocol error (bad command etc) appeared and the rest of the line has to be discarded
+		PrintCapabilities,		//< print capabilities
+		Terminate			//< terminate application processor session (close for network)
 	};
 	///\brief Returns the state as string for logging etc.
 	///\param [in] i state to get as string
 	static const char* stateName( State i)
 	{
-		static const char* ar[] = {"Init","EnterCommand","ParseArgs","ParseArgsEOL","Processing","ProtocolError","PrintCapabilities","Terminate"};
+		static const char* ar[] = {
+			"Init",
+			"EnterCommand",
+			"ParseArgs",
+			"ParseArgsEOL",
+			"Processing",
+			"ProtocolError",
+			"PrintCapabilities",
+			"Terminate"
+		};
 		return ar[i];
 	}
-	State m_state;							///< processing state of the command handler
+	State m_state;						//< processing state of the command handler
 
-	protocol::Buffer m_buffer;					///< context (sub state) for partly parsed input lines
-	protocol::CArgBuffer<protocol::Buffer> m_argBuffer;		///< buffer for the arguments
+	Buffer m_buffer;					//< context (sub state) for partly parsed input lines
+	CArgBuffer<Buffer> m_argBuffer;				//< buffer for the arguments
 
-	protocol::InputBlock m_input;					///< buffer for network read messages
-	protocol::OutputBlock m_output;					///< buffer for network write messages
+	InputBlock m_input;					//< buffer for network read messages
+	OutputBlock m_output;					//< buffer for network write messages
 
-	protocol::InputBlock::iterator m_itr;				///< iterator to scan protocol input
-	protocol::InputBlock::iterator m_end;				///< iterator pointing to end of message buffer
+	InputBlock::iterator m_itr;				//< iterator to scan protocol input
+	InputBlock::iterator m_end;				//< iterator pointing to end of message buffer
 
-	protocol::CmdParser<protocol::Buffer> m_parser;			///< context dependent command parser definition
-	int m_cmdidx;							///< command parsed
-	int m_nofParentCmds;						///< number of commands passed by the owner to get control back
-	std::vector< CountedReference<protocol::CommandBase> > m_cmds;	///< list of commands available
-	CountedReference<protocol::CommandHandler> m_cmdhandler;	///< currently executed command
-	std::string m_capastr;						///< capability string to print
-	std::size_t m_capaitr;						///< index in capabilities
+	CmdParser<Buffer> m_parser;				//< context dependent command parser definition
+	int m_cmdidx;						//< command parsed
+	int m_nofParentCmds;					//< number of commands passed by the owner to get control back
+	std::vector<std::string> m_cmds;			//< list of commands available
+	CountedReference<CommandHandler> m_cmdhandler;		//< currently executed command
+	std::string m_capastr;					//< capability string to print
+	std::size_t m_capaitr;					//< index in capabilities
 };
 
 }}

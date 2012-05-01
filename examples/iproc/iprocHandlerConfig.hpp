@@ -36,67 +36,43 @@
 #define _Wolframe_IPROC_HANDLER_CONFIGURATION_HPP_INCLUDED
 #include <vector>
 #include <string>
-#include "protocol/commandHandler.hpp"
 #include "config/descriptionBase.hpp"
 #include "standardConfigs.hpp"
 
 namespace _Wolframe {
 namespace iproc {
 
-struct ScriptConfigStruct
-{
-	std::string name;
-	std::string path;
-	std::string main;
-	std::vector<std::string> module;
-
-	static const config::DescriptionBase* description();
-};
-
-struct FormConfigStruct
-{
-	std::string name;
-	std::string path;
-	std::string main;
-
-	static const config::DescriptionBase* description();
-};
-
-struct DirectMapConfigStruct
-{
-	FormConfigStruct input;
-	FormConfigStruct output;
-	std::string function;
-
-	static const config::DescriptionBase* description();
-};
-
-struct ConfigurationStruct
-{
-	ConfigurationStruct( const ConfigurationStruct& o)
-		:script(o.script),input_bufsize(o.input_bufsize),output_bufsize(o.output_bufsize){}
-	ConfigurationStruct()
-		:input_bufsize(1024),output_bufsize(1024){}
-
-	std::vector<ScriptConfigStruct> script;		//< script definitions
-	std::vector<DirectMapConfigStruct> directmap;	//< direct map definitions
-	std::size_t input_bufsize;			//< size of input network message buffers in bytes (should only be configured for testing)
-	std::size_t output_bufsize;			//< size of output network message buffers in bytes (should only be configured for testing)
-
-	static const config::DescriptionBase* description();
-};
-
-
+///\class Configuration
+///\brief Configuration description of the 'iproc' example
 class Configuration :public config::ConfigurationBase
 {
 public:
-	Configuration();
-	Configuration( const Configuration& o)	:config::ConfigurationBase(o),m_data(o.m_data),m_cmds(o.m_cmds),m_envs(o.m_envs){}
+	struct Command
+	{
+		std::string m_cmdname;
+		std::string m_procname;
+
+		Command( const Command& o)				:m_cmdname(o.m_cmdname),m_procname(o.m_procname){}
+		Command( const std::string& c, const std::string& p)	:m_cmdname(c),m_procname(p){}
+		Command( const std::string& c)				:m_cmdname(c),m_procname(c){}
+	};
+public:
+	Configuration()
+		:ConfigurationBase( "iproc", 0, "iproc") {}
+
+	Configuration( const std::vector<Command>& cc, std::size_t ib, std::size_t ob)
+		:config::ConfigurationBase("iproc", 0, "iproc")
+		,m_commands(cc)
+		,m_input_bufsize(ib)
+		,m_output_bufsize(ob){}
+
+	Configuration( const Configuration& o)
+		:config::ConfigurationBase(o)
+		,m_commands(o.m_commands)
+		,m_input_bufsize(o.m_input_bufsize)
+		,m_output_bufsize(o.m_output_bufsize){}
 
 	bool parse( const config::ConfigurationTree& pt, const std::string& node, const module::ModulesDirectory* modules );
-
-	///\brief return all currently available commands
-	const std::vector< CountedReference<protocol::CommandBase> >& getCommands( const char* privileges=0) const;
 
 	///\brief interface implementation of ConfigurationBase::test() const
 	virtual bool test() const;
@@ -107,22 +83,29 @@ public:
 	///\brief interface implementation of ConfigurationBase::print(std::ostream& os, size_t indent) const
 	virtual void print( std::ostream&, size_t indent=0) const;
 
-	///\brief interface implementation of ConfigurationBase::setCanonicalPathes(const std::string&)
-	virtual void setCanonicalPathes( const std::string&);
-
 	///\brief return size of the buffer used for input network messages in bytes
-	std::size_t input_bufsize() const		{return m_data.input_bufsize;}
+	std::size_t input_bufsize() const		{return m_input_bufsize;}
 	///\brief return size of the buffer used for output network messages in bytes
-	std::size_t output_bufsize() const		{return m_data.output_bufsize;}
+	std::size_t output_bufsize() const		{return m_output_bufsize;}
 
-protected:
-	bool defineScript( const ScriptConfigStruct& sc);
-	bool defineDirectMap( const DirectMapConfigStruct& dm);
+	///\brief return all currently available commands
+	const std::vector<Command>& commands() const	{return m_commands;}
 
-	ConfigurationStruct m_data;
 private:
-	std::vector< CountedReference<protocol::CommandBase> > m_cmds;		//< factories for the command handlers
-	std::vector< CountedReference<protocol::CommandEnvironment> > m_envs;	//< static environments of the command handlers
+	std::vector<Command> m_commands;		//< command definitions
+	std::size_t m_input_bufsize;			//< size of input network message buffers in bytes (not configured, but hardcoded by the messaging layer)
+	std::size_t m_output_bufsize;			//< size of output network message buffers in bytes (not configured, but hardcoded by the messaging layer)
+
+public:
+	///\brief Set the buffer sizes for tests
+	///\remark Should only be called in tests or by the core
+	///\param[in] ib size of input buffer in bytes
+	///\param[in] ob size of output buffer in bytes
+	void setBuffers( std::size_t ib, std::size_t ob)
+	{
+		m_input_bufsize = ib;
+		m_output_bufsize = ob;
+	}
 };
 }}//namespace
 #endif

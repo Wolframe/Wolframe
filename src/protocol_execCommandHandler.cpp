@@ -32,29 +32,33 @@
 ************************************************************************/
 #include "protocol/execCommandHandler.hpp"
 #include "protocol/ioblocks.hpp"
+#include "langbind/luaCommandHandler.hpp"
+#include "langbind/directmapCommandHandler.hpp"
+#include "langbind/appGlobalContext.hpp"
 #include "logger-v1.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::protocol;
 
-ExecCommandHandler::ExecCommandHandler( const std::vector<std::string>& rcmds_, const std::vector< CountedReference<protocol::CommandBase> >& cmds_)
-	:m_state(Init),m_buffer(1024),m_argBuffer(&m_buffer),m_cmdidx(-1),m_cmds(cmds_),m_cmdhandler(0)
+ExecCommandHandler::ExecCommandHandler( const std::vector<std::string>& rcmds_, const std::vector<Command>& cmds_)
+	:m_state(Init),m_buffer(1024),m_argBuffer(&m_buffer),m_cmdidx(-1),m_cmdhandler(0)
 {
 	m_itr = m_input.begin();
 	m_end = m_input.begin();
 
 	for (std::vector<std::string>::const_iterator ii=rcmds_.begin(),ee=rcmds_.end(); ii!=ee; ++ii)
 	{
-		if (ii->size() > 0) m_parser.add( *ii);		//... do not add empty command
+		if (ii->size() > 0) m_parser.add( *ii);			//... do not add empty command
 	}
 	m_nofParentCmds = (int)m_parser.size();
-	m_parser.add( "CAPA");					//... cmd[m_nofParentCmds] => CAPAbilities
-	m_parser.add( "");					//... cmd[m_nofParentCmds+1] => empty command
+	m_parser.add( "CAPA");						//... cmd[m_nofParentCmds] => CAPAbilities
+	m_parser.add( "");						//... cmd[m_nofParentCmds+1] => empty command
 
-	std::vector< CountedReference< protocol::CommandBase> >::const_iterator itr=m_cmds.begin(), end=m_cmds.end();
+	std::vector<Command>::const_iterator itr=cmds_.begin(), end=cmds_.end();
 	for (; itr!=end; ++itr)
 	{
-		m_parser.add( itr->get()->cmdName());
+		m_parser.add( itr->m_cmdname);
+		m_cmds.push_back( itr->m_procname);
 	}
 }
 
@@ -63,13 +67,13 @@ ExecCommandHandler::~ExecCommandHandler()
 
 void ExecCommandHandler::setInputBuffer( void* buf, std::size_t allocsize)
 {
-	m_input = protocol::InputBlock( (char*)buf, allocsize);
+	m_input = InputBlock( (char*)buf, allocsize);
 }
 
 void ExecCommandHandler::setOutputBuffer( void* buf, std::size_t size, std::size_t pos)
 {
 	if (size < 16) throw std::logic_error("output buffer smaller than 16 bytes");
-	m_output = protocol::OutputBlock( buf, size, pos);
+	m_output = OutputBlock( buf, size, pos);
 	if (m_cmdhandler.get())
 	{
 		m_cmdhandler->setOutputBuffer( buf, size, pos);
@@ -148,7 +152,7 @@ const char* ExecCommandHandler::getCommand( int& argc, const char**& argv)
 	}
 }
 
-protocol::CommandHandler::Operation ExecCommandHandler::nextOperation()
+CommandHandler::Operation ExecCommandHandler::nextOperation()
 {
 	for (;;)
 	{
@@ -192,7 +196,7 @@ protocol::CommandHandler::Operation ExecCommandHandler::nextOperation()
 
 			case ParseArgs:
 			{
-				if (!protocol::CmdParser<protocol::Buffer>::getLine( m_itr, m_end, m_argBuffer))
+				if (!CmdParser<Buffer>::getLine( m_itr, m_end, m_argBuffer))
 				{
 					if (m_itr == m_end)
 					{
@@ -211,7 +215,7 @@ protocol::CommandHandler::Operation ExecCommandHandler::nextOperation()
 
 			case ParseArgsEOL:
 			{
-				if (!protocol::CmdParser<protocol::Buffer>::consumeEOL( m_itr, m_end))
+				if (!CmdParser<Buffer>::consumeEOL( m_itr, m_end))
 				{
 					if (m_itr == m_end)
 					{
@@ -262,20 +266,25 @@ protocol::CommandHandler::Operation ExecCommandHandler::nextOperation()
 				{
 					try
 					{
-						m_cmdhandler = m_cmds[ m_cmdidx - m_nofParentCmds - 2]->create( m_argBuffer.argc(), m_argBuffer.argv());
-						if (m_cmdhandler.get())
+						langbind::LuaScriptInstanceR li;
+						langbind::TransactionFunction tf;
+						const char* procname = m_cmds[ m_cmdidx - m_nofParentCmds - 2].c_str();
+						langbind::GlobalContext* gctx = langbind::getGlobalContext();
+
+						if (gctx->getLuaScriptInstance( procname, li))
 						{
-							m_state = Processing;
-							m_cmdhandler->setInputBuffer( m_input.ptr(), m_input.size());
-							m_cmdhandler->setOutputBuffer( m_output.ptr(), m_output.size(), m_output.pos());
-							m_cmdhandler->putInput( m_input.charptr() + (m_itr-m_input.begin()), m_end-m_itr);
+							m_cmdhandler.reset( new langbind::LuaCommandHandler());
 						}
-						else
+						else if (gctx->getTransactionFunction( procname, tf))
 						{
-							m_state = ProtocolError;
-							m_output.print( "BAD command\r\n");
-							return WRITE;
+							m_cmdhandler.reset( new langbind::DirectmapCommandHandler());
 						}
+						m_cmdhandler->passParameters( procname, m_argBuffer.argc(), m_argBuffer.argv());
+						m_state = Processing;
+						m_cmdhandler->setInputBuffer( m_input.ptr(), m_input.size());
+						m_cmdhandler->putInput( m_itr.ptr(), m_end-m_itr);
+						m_cmdhandler->setOutputBuffer( m_output.ptr(), m_output.size(), m_output.pos());
+
 					}
 					catch (std::exception& e)
 					{
@@ -338,8 +347,8 @@ protocol::CommandHandler::Operation ExecCommandHandler::nextOperation()
 
 			case ProtocolError:
 			{
-				if (!protocol::CmdParser<protocol::Buffer>::skipLine( m_itr, m_end)
-				||  !protocol::CmdParser<protocol::Buffer>::consumeEOL( m_itr, m_end))
+				if (!CmdParser<Buffer>::skipLine( m_itr, m_end)
+				||  !CmdParser<Buffer>::consumeEOL( m_itr, m_end))
 				{
 					return READ;
 				}

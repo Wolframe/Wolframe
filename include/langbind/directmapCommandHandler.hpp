@@ -33,7 +33,6 @@ Project Wolframe.
 ///\brief interface to the directmap command handler
 #ifndef _Wolframe_langbind_DIRECTMAP_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_langbind_DIRECTMAP_COMMAND_HANDLER_HPP_INCLUDED
-#include "directmapCommandEnvironment.hpp"
 #include "appObjects.hpp"
 #include "ioFilterCommandHandler.hpp"
 
@@ -50,9 +49,7 @@ public:
 	struct Context;
 
 	///\brief Constructor
-	///\param[in] env reference to the read only environment of this application processor
-	explicit DirectmapCommandHandler( const DirectmapCommandEnvironment* env);
-
+	DirectmapCommandHandler();
 	///\brief Destructor
 	virtual ~DirectmapCommandHandler();
 
@@ -62,7 +59,6 @@ public:
 	virtual CallResult call( const char*& err);
 
 private:
-	const DirectmapCommandEnvironment* m_env;	///< reference to static environment
 	Context* m_context;				///< execution context of the command handler
 };
 

@@ -30,19 +30,16 @@
  Project Wolframe.
 
 ************************************************************************/
-#include "protocol/commandHandler.hpp"
-#include "logger-v1.hpp"
+///\brief Program using filters to map stdin to stdout
+#include "langbind/iostreamfilter.hpp"
+#include <fstream>
+#include <iostream>
 
 using namespace _Wolframe;
-using namespace _Wolframe::protocol;
 
-void CommandHandler::passParameters( const std::string& nam, int argc, const char** argv)
+int main( int argc, const char **argv )
 {
-	m_name = nam;
-	for (int ii=0; ii<argc; ii++)
-	{
-		m_argBuffer.push_back( argv[ ii]);
-	}
+	return langbind::iostreamfilter( argc, argv, std::cin, std::cout, std::cerr);
 }
 
 

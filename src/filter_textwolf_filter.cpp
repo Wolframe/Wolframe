@@ -63,18 +63,17 @@ struct OutputFilterImpl :public protocol::OutputFilter, public FilterBase<IOChar
 	///\brief Enumeration of XML printer states
 	enum XMLState
 	{
-		Content,		///< processing content
-		Tag,			///< processing inside a tag defintion
-		Attribute,		///< processing inside a tag defintion, just read an attribute
-		Header,			///< processing inside a header defintion
-		HeaderAttribute		///< processing inside a header defintion, just read an attribute
+		Content,		//< processing content
+		Tag,			//< processing inside a tag defintion
+		Attribute,		//< processing inside a tag defintion, just read an attribute
+		Header,			//< processing inside a header defintion
+		HeaderAttribute		//< processing inside a header defintion, just read an attribute
 	};
 
 	///\brief Constructor
 	///\param [in] bufsize (optional) size of internal buffer to use (for the tag hierarchy stack)
 	OutputFilterImpl()
 		:m_elemitr(0)
-		,m_tagstkpos(0)
 		,m_xmlstate(Tag)
 		,m_pendingOpenTag(false)
 		,m_bufstate(protocol::EscapingBuffer<std::string>::SRC){}
@@ -86,7 +85,6 @@ struct OutputFilterImpl :public protocol::OutputFilter, public FilterBase<IOChar
 		,m_element(o.m_element)
 		,m_elemitr(o.m_elemitr)
 		,m_tagstk( o.m_tagstk)
-		,m_tagstkpos( o.m_tagstkpos)
 		,m_xmlstate(o.m_xmlstate)
 		,m_pendingOpenTag(o.m_pendingOpenTag)
 		,m_bufstate(o.m_bufstate){}
@@ -334,50 +332,94 @@ private:
 		return (sizeof(std::size_t) - (n & (sizeof(std::size_t)-1))) & (sizeof(std::size_t)-1);
 	}
 
+	struct TagStack
+	{
+		enum {InitStackSize=256};
+		char* m_ptr;
+		std::size_t m_pos;	//< current position in the tag hierarchy stack buffer
+		std::size_t m_size;	//< current position in the tag hierarchy stack buffer
+
+		~TagStack()
+		{
+			if (m_ptr) std::free( m_ptr);
+		}
+
+		TagStack()
+			:m_ptr(0),m_pos(0),m_size(InitStackSize)
+		{
+			if ((m_ptr=(char*)std::malloc( m_size)) == 0) throw std::bad_alloc();
+		}
+		TagStack( const TagStack& o)
+			:m_ptr(0),m_pos(o.m_pos),m_size(o.m_size)
+		{
+			if ((m_ptr=(char*)std::malloc( m_size)) == 0) throw std::bad_alloc();
+			std::memcpy( m_ptr, o.m_ptr, m_pos);
+		}
+
+		void push( const char* pp, std::size_t nn, std::size_t ofs)
+		{
+			if (m_pos + ofs > m_size)
+			{
+				while (m_pos + ofs > m_size) m_size *= 2;
+				if (m_pos + ofs > m_size) throw std::bad_alloc();
+				if (nn > ofs) throw std::logic_error( "invalid tag offset");
+				char* xx = (char*)std::realloc( m_ptr, m_size);
+				if (!xx) throw std::bad_alloc();
+				m_ptr = xx;
+			}
+			std::memcpy( m_ptr + m_pos, pp, nn);
+			m_pos += ofs;
+		}
+
+		void pop( std::size_t ofs)
+		{
+			if (m_pos < ofs) throw std::runtime_error( "corrupt tag stack");
+			m_pos -= ofs;
+		}
+	};
+
 	void pushTag( const void* element, std::size_t elementsize)
 	{
 		std::size_t align = getAlign( elementsize);
 		std::size_t ofs = elementsize + align + sizeof( std::size_t);
-
-		if (m_tagstkpos + ofs > m_tagstk.size())
-		{
-			m_tagstk.resize( m_tagstkpos + ofs);
-		}
-		std::memcpy( const_cast<char*>(m_tagstk.c_str() + m_tagstkpos), element, elementsize);
-		m_tagstkpos += ofs;
-		void* tt = const_cast<char*>(m_tagstk.c_str()) + m_tagstkpos - sizeof( std::size_t);
+		m_tagstk.push( (const char*)element, elementsize, ofs);
+		void* tt = m_tagstk.m_ptr + m_tagstk.m_pos - sizeof( std::size_t);
 		*(std::size_t*)(tt) = elementsize;
+	}
+
+	std::size_t tagOfs( std::size_t& elementsize)
+	{
+		if (m_tagstk.m_pos < sizeof( std::size_t)) return false;
+		void* tt = m_tagstk.m_ptr + (m_tagstk.m_pos - sizeof( std::size_t));
+		elementsize = *(std::size_t*)(tt);
+		std::size_t align = getAlign( elementsize);
+		std::size_t ofs = elementsize + align + sizeof( std::size_t);
+		if (ofs > m_tagstk.m_pos) return 0;
+		return ofs;
 	}
 
 	bool topTag( const void*& element, std::size_t& elementsize)
 	{
-		if (m_tagstkpos < sizeof( std::size_t)) return false;
-		void* tt = const_cast<char*>(m_tagstk.c_str()) + (m_tagstkpos - sizeof( std::size_t));
-		elementsize = *(std::size_t*)(tt);
-		std::size_t align = getAlign( elementsize);
-		std::size_t ofs = elementsize + align + sizeof( std::size_t);
-		if (ofs > m_tagstkpos) return false;
-		element = m_tagstk.c_str() + m_tagstkpos - ofs;
+		std::size_t ofs = tagOfs(elementsize);
+		if (!ofs) return false;
+		element = m_tagstk.m_ptr + m_tagstk.m_pos - ofs;
 		return true;
 	}
 
 	void popTag()
 	{
-		void* tt = const_cast<char*>(m_tagstk.c_str()) + m_tagstkpos - sizeof( std::size_t);
-		std::size_t elementsize = *(std::size_t*)(tt);
-		std::size_t align = getAlign( elementsize);
-		std::size_t ofs = elementsize + align + sizeof( std::size_t);
-		if (m_tagstkpos < ofs) throw std::logic_error( "tag stack for output is corrupt");
-		m_tagstkpos -= ofs;
+		std::size_t elementsize=0;
+		std::size_t ofs = tagOfs(elementsize);
+		if (ofs > m_tagstk.m_pos) throw std::logic_error( "tag stack for output is corrupt");
+		m_tagstk.m_pos -= ofs;
 	}
 private:
-	std::string m_element;								///< buffer for the currently printed element
-	std::size_t m_elemitr;								///< iterator to pass it to output
-	std::string m_tagstk;								///< open tag hierarchy stack buffer
-	std::size_t m_tagstkpos;							///< current position in the tag hierarchy stack buffer
-	XMLState m_xmlstate;								///< current state of output
-	bool m_pendingOpenTag;								///< true if last open tag instruction has not been ended yet
-	typename protocol::EscapingBuffer<std::string>::State m_bufstate;		///< state of escaping the output
+	std::string m_element;							//< buffer for the currently printed element
+	std::size_t m_elemitr;							//< iterator to pass it to output
+	TagStack m_tagstk;							//< open tag hierarchy stack buffer
+	XMLState m_xmlstate;							//< current state of output
+	bool m_pendingOpenTag;							//< true if last open tag instruction has not been ended yet
+	typename protocol::EscapingBuffer<std::string>::State m_bufstate;	//< state of escaping the output
 };
 
 
@@ -617,13 +659,13 @@ struct InputFilterImpl :public protocol::InputFilter, public FilterBase<IOCharse
 		return false;
 	}
 private:
-	std::string m_buf;			///< buffer for the currently parsed element
-	SrcIterator m_src;			///< source iterator
-	XMLScanner* m_scanner;			///< XML scanner
-	typename XMLScanner::iterator m_itr;	///< input iterator created from scanned XML from source iterator
-	typename XMLScanner::iterator m_end;	///< end of data (EoD) pointer
-	bool m_withEmpty;			///< do not produce empty tokens (containing only spaces)
-	bool m_doTokenize;			///< do tokenize (whitespace sequences as delimiters)
+	std::string m_buf;			//< buffer for the currently parsed element
+	SrcIterator m_src;			//< source iterator
+	XMLScanner* m_scanner;			//< XML scanner
+	typename XMLScanner::iterator m_itr;	//< input iterator created from scanned XML from source iterator
+	typename XMLScanner::iterator m_end;	//< end of data (EoD) pointer
+	bool m_withEmpty;			//< do not produce empty tokens (containing only spaces)
+	bool m_doTokenize;			//< do tokenize (whitespace sequences as delimiters)
 };
 
 class InputFilter :public protocol::InputFilter
@@ -635,10 +677,10 @@ public:
 	///\brief Enumeration of error codes
 	enum ErrorCodes
 	{
-		Ok,			///< no error
-		ErrCreateFilter,	///< could not create filter
-		ErrEncoding,		///< could not create filter for this encoding
-		ErrXML			///< error in XML
+		Ok,			//< no error
+		ErrCreateFilter,	//< could not create filter
+		ErrEncoding,		//< could not create filter for this encoding
+		ErrXML			//< error in XML
 	};
 
 public:
@@ -885,9 +927,9 @@ public:
 	///\brief Enumeration of error codes
 	enum ErrorCodes
 	{
-		Ok,			///< no error
-		ErrEncoding,		///< tack stack overflow
-		ErrCreateFilter		///< could not output filter
+		Ok,			//< no error
+		ErrEncoding,		//< tack stack overflow
+		ErrCreateFilter		//< could not output filter
 	};
 
 public:

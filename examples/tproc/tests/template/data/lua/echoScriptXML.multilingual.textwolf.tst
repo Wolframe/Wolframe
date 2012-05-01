@@ -29,12 +29,15 @@ function run( )
 	end
 end
 --config
+env {
+	script {
+		name run
+		sourcepath echo.lua
+	}
+}
 proc {
-script {
-	cmd RUN
-	path echo.lua
-	main run
-}}
+	cmd run
+}
 --output
 OK enter cmd
 !TEST

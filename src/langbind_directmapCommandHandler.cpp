@@ -45,8 +45,8 @@ struct DirectmapCommandHandler::Context
 {
 };
 
-DirectmapCommandHandler::DirectmapCommandHandler( const DirectmapCommandEnvironment* e)
-	:m_env(e),m_context(0){}
+DirectmapCommandHandler::DirectmapCommandHandler()
+	:m_context(0){}
 
 DirectmapCommandHandler::~DirectmapCommandHandler() {}
 

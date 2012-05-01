@@ -29,15 +29,14 @@ recode lat1..ibmpc >> $output <<!TEST
 cat $MAIN/$example.frm >> $output
 recode lat1..ibmpc >> $output <<!TEST
 **config
+env {
+	directmap {
+		name run
+	}
+}
 proc {
-directmap {
-	cmd RUN
-	ddl simpleform
-	filter XML:textwolf
-	inputform input.frm
-	outputform output.frm
-	function echo
-}}
+	cmd run
+}
 **output
 OK enter cmd
 !TEST

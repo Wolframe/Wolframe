@@ -219,13 +219,6 @@ static void parseElement1( const char* name, T& value, const boost::property_tre
 	}
 }
 
-///\brief parses a all elements of a vector (n elements with same name in pt)
-template <typename T>
-static void parseElement_( const char* name, T&, const traits::pointer_&, const boost::property_tree::ptree&)
-{
-	throw ParseError( name, "pointer not supported in configuration description");
-}
-
 ///\brief the unified parse function
 template <typename T>
 static void parseElement( const char* name, T& value, const boost::property_tree::ptree& pt)

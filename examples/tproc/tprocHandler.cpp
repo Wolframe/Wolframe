@@ -30,9 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-///
 ///\file tprocHandler.cpp
-///
 
 #include "tprocHandler.hpp"
 #include "protocol/execCommandHandler.hpp"
@@ -209,7 +207,7 @@ int CommandHandler::doCmd3A( int argc, const char** argv, std::ostream& out)
 		out << endl();
 		try
 		{
-			CommandHandler* ch = (CommandHandler*)new protocol::ExecCommandHandler( cmds(), m_config->getCommands());
+			CommandHandler* ch = (CommandHandler*)new protocol::ExecCommandHandler( cmds(), m_config->commands());
 			delegateProcessing<&CommandHandler::endRun>( ch);
 		}
 		catch (const std::exception& e)
@@ -243,7 +241,7 @@ int CommandHandler::doHello( int argc, const char**, std::ostream& out)
 	}
 	try
 	{
-		CommandHandler* ch = (CommandHandler*)new protocol::ExecCommandHandler( cmds(), m_config->getCommands());
+		CommandHandler* ch = (CommandHandler*)new protocol::ExecCommandHandler( cmds(), m_config->commands());
 			delegateProcessing<&CommandHandler::endRun>( ch);
 	}
 	catch (const std::exception& e)

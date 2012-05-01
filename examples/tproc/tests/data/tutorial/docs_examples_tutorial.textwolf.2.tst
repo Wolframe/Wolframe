@@ -17,12 +17,15 @@ function run( )
         end
 end
 **config
+env {
+	script {
+		name run
+		sourcepath example_2.lua
+	}
+}
 proc {
-script {
-	cmd RUN
-	path example_2.lua
-	main run
-}}
+	cmd run
+}
 **output
 OK enter cmd
 姚 明

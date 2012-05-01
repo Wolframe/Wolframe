@@ -25,12 +25,15 @@ QUIT
 cat $MAIN/lua_script_$example.lua >> $output
 recode lat1..ibmpc >> $output <<!TEST
 **config
+env {
+	script {
+		name run
+		sourcepath example_$example.lua
+	}
+}
 proc {
-script {
-	cmd RUN
-	path example_$example.lua
-	main run
-}}
+	cmd run
+}
 **output
 OK enter cmd
 !TEST

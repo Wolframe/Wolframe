@@ -86,8 +86,8 @@ LOCAL_STATIC_LIB_OBJS = \
 	langbind_appConfig_struct.o \
 	langbind_appConfig.o \
 	langbind_ioFilterCommandHandler.o \
-	langbind_directmapCommandEnvironment.o \
 	langbind_directmapCommandHandler.o \
+	langbind_iostreamfilter.o \
 	filter_textwolf_filter.o \
 	filter_textwolf_filterBase.o \
 	filter_char_filter.o \
@@ -117,7 +117,6 @@ LOCAL_STATIC_LIB_OBJS += \
 	langbind_luaScript.o \
 	langbind_luaDebug.o \
 	langbind_luaBignum.o \
-	langbind_luaCommandEnvironment.o \
 	langbind_luaCommandHandler.o
 endif
 
@@ -142,7 +141,8 @@ CPP_OBJS = \
 	posixMain.o
 
 CPP_BINS = \
-	wolframed$(EXE)
+	wolframed$(EXE) \
+	wolfilter$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

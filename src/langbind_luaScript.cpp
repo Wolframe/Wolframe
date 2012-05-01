@@ -32,7 +32,6 @@ Project Wolframe.
 ///\file langbind/luaScript.cpp
 ///\brief implementation of a Lua script
 #include "langbind/luaScript.hpp"
-#include "langbind/luaBignum.hpp"
 #include "langbind/luaDebug.hpp"
 #include "logger-v1.hpp"
 #include <algorithm>
@@ -88,49 +87,86 @@ static int function_printlog( lua_State *ls)
 LuaScript::LuaScript( const char* path_)
 	:m_path(path_)
 {
-	std::ifstream ff( path_);
-	m_content = std::string((std::istreambuf_iterator<char>(ff)), std::istreambuf_iterator<char>());
+	char buf;
+	std::fstream ff;
+	ff.open( path_, std::ios::in);
+	while (ff.read( &buf, sizeof(buf)))
+	{
+		m_content.push_back( buf);
+	}
+	if ((ff.rdstate() & std::ifstream::eofbit) == 0)
+	{
+		LOG_ERROR << "failed to read lua script from file: '" << path_ << "'";
+		throw std::runtime_error( "read lua script from file");
+	}
+	ff.close();
 }
 
 LuaScriptInstance::LuaScriptInstance( const LuaScript* script_)
-	:m_ls(0),m_script(script_)
+	:m_ls(0),m_thread(0),m_threadref(0),m_script(script_)
 {
 	m_ls = luaL_newstate();
 	if (!m_ls) throw std::runtime_error( "failed to create lua state");
+
+	// create thread and prevent garbage collecting of it (http://permalink.gmane.org/gmane.comp.lang.lua.general/22680)
+	m_thread = lua_newthread( m_ls);
+	lua_pushvalue( m_ls, -1);
+	m_threadref = luaL_ref( m_ls, LUA_REGISTRYINDEX);
 
 	if (luaL_loadbuffer( m_ls, m_script->content().c_str(), m_script->content().size(), m_script->path().c_str()))
 	{
 		std::ostringstream buf;
 		buf << "Failed to load script '" << m_script->path() << "':" << lua_tostring( m_ls, -1);
-		lua_close( m_ls);
-		m_ls = 0;
 		throw std::runtime_error( buf.str());
 	}
+	// open standard lua libraries
+	luaL_openlibs( m_ls);
+
 	// register logging function already here because then it can be used in the script initilization part
 	lua_pushcfunction( m_ls, &function_printlog);
 	lua_setglobal( m_ls, "printlog");
 
-	// load additional modules defined by Wolframe
-	initBignumModule( m_ls);
+	// open additional libraries defined for this script
+	std::vector<LuaScript::Module>::const_iterator ii=m_script->modules().begin(), ee=m_script->modules().end();
+	for (;ii!=ee; ++ii)
+	{
+		if (ii->m_initializer( m_ls))
+		{
+			std::ostringstream buf;
+			buf << "module '" << ii->m_name << "' initialization failed: " << lua_tostring( m_ls, -1);
+			throw std::runtime_error( buf.str());
+		}
+	}
 
 	// call main, we may have to initialize LUA modules there
 	if (lua_pcall( m_ls, 0, LUA_MULTRET, 0) != 0)
 	{
 		std::ostringstream buf;
 		buf << "Unable to call main entry of script: " << lua_tostring( m_ls, -1 );
-		lua_close( m_ls);
-		m_ls = 0;
 		throw std::runtime_error( buf.str());
 	}
 }
 
 LuaScriptInstance::~LuaScriptInstance()
 {
-	if (!m_ls) lua_close( m_ls);
+	if (m_ls)
+	{
+		luaL_unref( m_ls, LUA_REGISTRYINDEX, m_threadref);
+		lua_close( m_ls);
+	}
 }
 
+LuaFunctionMap::~LuaFunctionMap()
+{
+	std::vector<LuaScript*>::iterator ii=m_ar.begin(),ee=m_ar.end();
+	while (ii != ee)
+	{
+		delete *ii;
+		++ii;
+	}
+}
 
-void LuaFunctionMap::defineLuaFunction( const char* name, const char* scriptpath)
+void LuaFunctionMap::defineLuaFunction( const char* name, const LuaScript& script)
 {
 	std::string nam( name);
 	std::transform( nam.begin(), nam.end(), nam.begin(), (int(*)(int)) std::tolower);
@@ -144,32 +180,29 @@ void LuaFunctionMap::defineLuaFunction( const char* name, const char* scriptpath
 		}
 	}
 	std::size_t scriptId;
+	std::map<std::string,std::size_t>::const_iterator ii=m_pathmap.find( script.path()),ee=m_pathmap.end();
+	if (ii != ee)
 	{
-		std::string path( scriptpath);
-		std::map<std::string,std::size_t>::const_iterator ii=m_pathmap.find( path),ee=m_pathmap.end();
-		if (ii != ee)
-		{
-			scriptId = ii->second;
-		}
-		else
-		{
-			scriptId = m_ar.size();
-			m_ar.push_back( LuaScript( path.c_str()));	//< load its content from file
-			LuaScriptInstance( &m_ar.back());		//< check, if it can be compiled
-			m_pathmap[ path] = scriptId;
-		}
-		m_procmap[ nam] = scriptId;
+		scriptId = ii->second;
 	}
+	else
+	{
+		scriptId = m_ar.size();
+		m_ar.push_back( new LuaScript( script));	//< load its content from file
+		LuaScriptInstance( m_ar.back());		//< check, if it can be compiled
+		m_pathmap[ script.path()] = scriptId;
+	}
+	m_procmap[ nam] = scriptId;
 }
 
-bool LuaFunctionMap::getLuaScriptInstance( const char* procname, LuaScriptInstance& rt) const
+bool LuaFunctionMap::getLuaScriptInstance( const char* procname, LuaScriptInstanceR& rt) const
 {
 	std::string nam( procname);
 	std::transform( nam.begin(), nam.end(), nam.begin(), (int(*)(int)) std::tolower);
 
 	std::map<std::string,std::size_t>::const_iterator ii=m_procmap.find( nam),ee=m_procmap.end();
 	if (ii == ee) return false;
-	rt = LuaScriptInstance( &m_ar[ ii->second]);
+	rt = LuaScriptInstanceR( new LuaScriptInstance( m_ar[ ii->second]));
 	return true;
 }
 

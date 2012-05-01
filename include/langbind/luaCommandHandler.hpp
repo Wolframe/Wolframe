@@ -33,13 +33,9 @@ Project Wolframe.
 ///\brief interface to the lua command handler
 #ifndef _Wolframe_langbind_LUA_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_langbind_LUA_COMMAND_HANDLER_HPP_INCLUDED
-#include "luaCommandEnvironment.hpp"
-#include "appObjects.hpp"
-#include "ioFilterCommandHandler.hpp"
-extern "C"
-{
-#include "lua.h"
-}
+#include "langbind/appObjects.hpp"
+#include "langbind/ioFilterCommandHandler.hpp"
+#include "langbind/luaScript.hpp"
 
 namespace _Wolframe {
 namespace langbind {
@@ -54,30 +50,25 @@ public:
 	struct InterpreterContext;
 
 	///\brief Constructor
-	///\param[in] env reference to the read only environment of this application processor
-	explicit LuaCommandHandler( const LuaCommandEnvironment* env);
+	LuaCommandHandler(){}
 	///\brief Destructor
-	virtual ~LuaCommandHandler();
+	virtual ~LuaCommandHandler(){}
 
 	///\brief Execute the Lua script
 	///\param[out] err error code in case of error
 	///\return CallResult status (See protocol::IOFilterCommandHandler::CallResult)
 	virtual CallResult call( const char*& err);
 
-	///\brief Get the current lua state (not the thread!)
-	///\return the current lua state
-	lua_State* getLuaState() const;
-
 private:
-	const LuaCommandEnvironment* m_env;	//< reference to static environment
+	bool loadScript();
+
 	struct Globals
 	{
 		Input m_input;
 		Output m_output;
 	};
 	Globals m_globals;
-	InterpreterContext* m_interp;		//< interpreter execution context of the command handler
-
+	LuaScriptInstanceR m_interp;
 };
 
 }}//namespace

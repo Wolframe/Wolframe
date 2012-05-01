@@ -30,9 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// tprocHandler class unit tests using google test framework (gTest)
-//
+///\file tprocHandlerTest.cpp
+///\brief Class unit tests using google test framework (gTest)
 
 // Aba: see below, got trouble on VC10 to compile in debug mode
 #ifdef _WIN32
@@ -75,16 +74,12 @@ public:
 	TestConfiguration( const TestConfiguration& o)
 		:Configuration(o)
 		,m_cmdLine(o.m_cmdLine)
-		,m_modules(o.m_modules)
 		,m_appConfig(o.m_appConfig)
 		,m_langbindConfig(o.m_langbindConfig)
 	{}
 
 	TestConfiguration()
 	{
-		m_data.input_bufsize = 0;
-		m_data.output_bufsize = 0;
-
 		m_appConfig.addConfig( "proc", this);
 		m_appConfig.addConfig( "env", &m_langbindConfig);
 
@@ -102,15 +97,8 @@ public:
 		langbind::defineGlobalContext( new langbind::GlobalContext());
 		langbind::getGlobalContext()->load( m_langbindConfig);
 	}
-
-	void setBuffers( std::size_t ib, std::size_t ob)
-	{
-		m_data.input_bufsize = ib;
-		m_data.output_bufsize = ob;
-	}
 private:
 	config::CmdLineConfig m_cmdLine;
-	module::ModulesDirectory m_modules;
 	config::ApplicationConfiguration m_appConfig;
 	langbind::ApplicationEnvironmentConfig m_langbindConfig;
 };
@@ -421,9 +409,8 @@ public:
 
 	int run()
 	{
-		char* itr = const_cast<char*>( m_input.c_str());
 		m_output.clear();
-		return test::runTestIO( itr, itr+m_input.size(), m_output, *m_connection);
+		return test::runTestIO( m_input, m_output, *m_connection);
 	}
 };
 

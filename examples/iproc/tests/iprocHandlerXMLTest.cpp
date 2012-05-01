@@ -35,6 +35,11 @@
 #include "iprocHandler.hpp"
 #include "connectionHandler.hpp"
 #include "handlerConfig.hpp"
+#include "langbind/appGlobalContext.hpp"
+///PF:HACK: Command Line is needed to instantiate the application configuration object:
+#include "../src/commandLine.hpp"
+#include "moduleInterface.hpp"
+#include "config/ConfigurationTree.hpp"
 #include "testHandlerTemplates.hpp"
 #include "testUtils.hpp"
 #include <iostream>
@@ -104,19 +109,55 @@ static const TestDescription testDescriptions[] =
 	{0,0,0,0}
 };
 
+static int g_gtest_ARGC = 0;
+static char* g_gtest_ARGV[2] = {0, 0};
+
 class IProcTestConfiguration :public Configuration
 {
 public:
-	IProcTestConfiguration ( const std::string& scriptpath, std::size_t ib, std::size_t ob)
+	IProcTestConfiguration( const IProcTestConfiguration& o)
+		:Configuration(o)
+		,m_cmdLine(o.m_cmdLine)
+		,m_appConfig(o.m_appConfig)
+		,m_langbindConfig(o.m_langbindConfig)
+	{}
+	IProcTestConfiguration( const std::string& scriptpath, std::size_t ib, std::size_t ob)
 	{
-		m_data.input_bufsize = ib;
-		m_data.output_bufsize = ob;
-		ScriptConfigStruct sc;
-		sc.name = "run";
-		sc.main = "run";
-		sc.path = scriptpath;
-		if (!defineScript( sc)) throw std::logic_error( "cannot define test configuration");
+		m_appConfig.addConfig( "proc", this);
+		m_appConfig.addConfig( "env", &m_langbindConfig);
+
+		boost::filesystem::path configFile( boost::filesystem::current_path() / "temp" / "test.cfg");
+		std::ostringstream config;
+		config << "env {" << std::endl;
+		config << "   script {" << std::endl;
+		config << "      name run" << std::endl;
+		config << "      sourcepath " << scriptpath << std::endl;
+		config << "   }" << std::endl;
+		config << "}" << std::endl;
+		config << "proc {" << std::endl;
+		config << "   cmd run" << std::endl;
+		config << "}" << std::endl;
+		wtest::Data::writeFile( configFile.string().c_str(), config.str());
+
+		if (boost::filesystem::exists( configFile))
+		{
+			if (!m_appConfig.parse( configFile.string().c_str(), config::ApplicationConfiguration::CONFIG_INFO))
+			{
+				throw std::runtime_error( "Error in configuration");
+			}
+		}
+		m_cmdLine.parse( g_gtest_ARGC, g_gtest_ARGV);
+		m_appConfig.finalize( m_cmdLine);
+
+		setBuffers( ib, ob);
+		langbind::defineGlobalContext( new langbind::GlobalContext());
+		langbind::getGlobalContext()->load( m_langbindConfig);
 	}
+
+private:
+	config::CmdLineConfig m_cmdLine;
+	config::ApplicationConfiguration m_appConfig;
+	langbind::ApplicationEnvironmentConfig m_langbindConfig;
 };
 
 class IProcHandlerXMLTest : public ::testing::Test
@@ -151,10 +192,7 @@ TEST_F( IProcHandlerXMLTest, tests)
 						BufferSize[ob]+testDescriptions[ti].elementBuffersize);
 				iproc::Connection connection( ep, &config);
 
-				char* in_start = const_cast<char*>(data.input.c_str());
-				char* in_end = const_cast<char*>(data.input.c_str() + data.input.size());
-
-				EXPECT_EQ( 0, test::runTestIO( in_start, in_end, testoutput, connection));
+				EXPECT_EQ( 0, test::runTestIO( data.input, testoutput, connection));
 				data.check( testoutput);
 				ASSERT_EQ( data.expected, testoutput);
 			}
@@ -164,8 +202,16 @@ TEST_F( IProcHandlerXMLTest, tests)
 
 int main( int argc, char **argv )
 {
+	g_gtest_ARGC = 1;
+	g_gtest_ARGV[0] = argv[0];
+	if (argc > 1)
+	{
+		std::cerr << "too many arguments passed to " << argv[0] << std::endl;
+		return 1;
+	}
+	wtest::Data::createDataDir( "temp");
 	wtest::Data::createDataDir( "result");
-	::testing::InitGoogleTest( &argc, argv );
+	::testing::InitGoogleTest( &g_gtest_ARGC, g_gtest_ARGV );
 	return RUN_ALL_TESTS();
 }
 

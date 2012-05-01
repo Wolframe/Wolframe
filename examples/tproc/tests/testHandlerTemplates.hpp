@@ -59,7 +59,7 @@ public:
 	}
 
 	unsigned timeout() const	{ return timeout_; }
-	const void* data() const	{ return (const void*)data_; }
+	void* data() const		{ return data_; }
 	void* buffer()			{ return data_; }
 	std::size_t size() const	{ return size_; }
 	Operation operation() const	{ return operation_; }
@@ -73,8 +73,9 @@ private:
 
 
 template <class Connection>
-int runTestIO( char* in, char* end, std::string& out, Connection& connection)
+int runTestIO( const std::string& inp, std::string& out, Connection& connection)
 {
+	std::string::const_iterator in=inp.begin(),en=inp.end();
 	for (;;)
 	{
 		NetworkOperation netop( connection.nextOperation());
@@ -82,10 +83,10 @@ int runTestIO( char* in, char* end, std::string& out, Connection& connection)
 		{
 			case NetworkOperation::READ:
 			{
-				char* data = const_cast<char*>((char*)netop.data());
+				char* data = (char*)netop.data();
 				unsigned int size = netop.size();
 				unsigned int ii;
-				for (ii=0; ii<size && in<end; ii++,in++)
+				for (ii=0; ii<size && in<en; ii++,in++)
 				{
 					data[ii]=*in;
 				}

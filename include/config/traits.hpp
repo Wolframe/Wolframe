@@ -54,7 +54,6 @@ struct struct_ {};				///< category tag for a structure with named elements
 struct vector_ :public nonstruct_{};		///< category tag for a std::vector of any type
 struct arithmetic_ :public atom_ {};		///< category tag for a type that is convertible from a string through boost::lexical_cast
 struct bool_ :public atom_ {};			///< category tag for a boolean type
-struct pointer_ :public atom_{};		///< category tag for a pointer type
 struct cfgbase_ :public foreign_{};		///< category tag for a struct derived from ConfigurationBase
 
 ///\brief conditional template for detecting if a type is a class with a static/member method description() returning a const pointer to a structure description as defined in config/descriptionBase.hpp
@@ -118,14 +117,6 @@ template <typename T>
 typename boost::enable_if_c<
 	boost::is_same<bool,T>::value
 	,bool_>::type getCategory( const T&) { return bool_();}
-
-///\brief get category pointer_ for a type
-/// returns pointer_ if T fulfills the is_pointer properry
-template <typename T>
-typename boost::enable_if_c<
-	boost::is_pointer<T>::value
-	,pointer_>::type getCategory( const T&) { return pointer_();}
-
 
 ///\brief get category pointer_ for a type
 /// returns cfgbase_ if T fulfills the is_base_of<ConfigurationBase,T> properry
