@@ -31,9 +31,9 @@
 
 ************************************************************************/
 ///\brief Program using filters to map stdin to stdout
-#include "langbind/iostreamfilter.hpp"
 #include <fstream>
 #include <iostream>
+#include "langbind/iostreamfilter.hpp"
 
 using namespace _Wolframe;
 
@@ -41,5 +41,4 @@ int main( int argc, const char **argv )
 {
 	return langbind::iostreamfilter( argc, argv, std::cin, std::cout, std::cerr);
 }
-
 

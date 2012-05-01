@@ -153,7 +153,7 @@ public:
 	void add( const char* cmd)
 	{
 		std::string nam( cmd);
-		std::transform( nam.begin(), nam.end(), nam.begin(), (int(*)(int)) std::tolower);
+		std::transform( nam.begin(), nam.end(), nam.begin(), tolower);
 		m_cmdmap.push_back( nam);
 	}
 
@@ -162,7 +162,7 @@ public:
 	void add( const std::string& cmd)
 	{
 		std::string nam( cmd);
-		std::transform( nam.begin(), nam.end(), nam.begin(), (int(*)(int)) std::tolower);
+		std::transform( nam.begin(), nam.end(), nam.begin(), tolower);
 		m_cmdmap.push_back( nam);
 	}
 
@@ -221,7 +221,7 @@ public:
 		{
 			char ch = *src;
 			++src;
-			buf.push_back( std::tolower( ch));
+			buf.push_back( tolower( ch));
 		}
 		if (src == end) return -1;
 

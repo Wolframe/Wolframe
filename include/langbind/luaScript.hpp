@@ -48,7 +48,7 @@ namespace langbind {
 
 class LuaScript
 {
-private:
+public:
 	struct Module
 	{
 		std::string m_name;

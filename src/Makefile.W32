@@ -200,6 +200,7 @@ dependencies:
 
 modules: libwolframe
 wolframed.exe: wolframed.obj $(CPP_OBJS) libwolframe\logger\wolframemsg.res
+wolfilter.exe: wolfilter.obj $(CPP_OBJS) libwolframe\logger\wolframemsg.res
 
 $(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
 	$(LINK) /lib /nologo /out:$@ $(STATIC_LDFLAGS) $?
