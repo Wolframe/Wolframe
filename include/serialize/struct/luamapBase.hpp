@@ -76,10 +76,12 @@ public:
 	{
 		return (m_constructor)?m_constructor( obj):true;
 	}
+
 	void done( void* obj) const
 	{
 		if (m_destructor) m_destructor( obj);
 	}
+
 	std::size_t size() const
 	{
 		return m_size;

@@ -41,6 +41,7 @@ Project Wolframe.
 #include <stack>
 #include <string>
 #include <algorithm>
+#include <boost/shared_ptr.hpp>
 #if WITH_LUA
 extern "C" {
 	#include "serialize/struct/luamapBase.hpp"
@@ -59,9 +60,9 @@ struct Output
 	///\brief Output state
 	enum ItemType
 	{
-		Data,		///< normal processing
-		DoYield,	///< yield because rest of buffer not sufficient to complete operation
-		Error		///< logic error in output. Operation is not possible
+		Data,		//< normal processing
+		DoYield,	//< yield because rest of buffer not sufficient to complete operation
+		Error		//< logic error in output. Operation is not possible
 	};
 	///\brief Constructor
 	Output() :m_state(0){}
@@ -83,10 +84,10 @@ struct Output
 	protocol::OutputFilterR& outputfilter()				{return m_outputfilter;}
 
 protected:
-	protocol::OutputFilterR m_outputfilter;	///< output filter reference
+	protocol::OutputFilterR m_outputfilter;	//< output filter reference
 
 private:
-	unsigned int m_state;						///< current state for outputs with more than one elements
+	unsigned int m_state;						//< current state for outputs with more than one elements
 };
 
 ///\class Input
@@ -104,7 +105,7 @@ struct Input
 	const protocol::InputFilterR& inputfilter() const		{return m_inputfilter;}
 	protocol::InputFilterR& inputfilter()				{return m_inputfilter;}
 protected:
-	protocol::InputFilterR m_inputfilter;			///< input is defined by the associated input filter
+	protocol::InputFilterR m_inputfilter;			//< input is defined by the associated input filter
 };
 
 ///\class InputFilterClosure
@@ -116,10 +117,10 @@ public:
 	///\brief Input loop state
 	enum ItemType
 	{
-		EndOfData,	///< End of processed content reached
-		Data,		///< normal processing, loop can continue
-		DoYield,	///< have to yield and request more network input
-		Error		///< have to stop processing because of an error
+		EndOfData,	//< End of processed content reached
+		Data,		//< normal processing, loop can continue
+		DoYield,	//< have to yield and request more network input
+		Error		//< have to stop processing because of an error
 	};
 
 	///\brief Constructor
@@ -212,21 +213,40 @@ public:
 	typedef int (Call)( const void* in, void* out);
 
 	///\brief Default constructor
-	PluginFunction() {}
+	PluginFunction()
+		:m_state(-1),m_call(0),m_api_param(0),m_api_result(0){}
 
 	///\brief Copy constructor
 	///\param[in] o copied item
 	PluginFunction( const PluginFunction& o)
-		:m_call(o.m_call),m_api_param(o.m_api_param),m_api_result(o.m_api_result){}
+		:m_state(o.m_state),m_data(o.m_data),m_call(o.m_call),m_api_param(o.m_api_param),m_api_result(o.m_api_result)
+	{
+		if (m_state > 0) throw std::runtime_error( "illegal copy of plugin function not in initial state");
+	}
 
 	///\brief Constructor
 	///\param[in] c function to call
 	///\param[in] p part of the api describing the input
 	///\param[in] r part of the api describing the function result
 	PluginFunction( const Call c, const serialize::FiltermapDescriptionBase* p, const serialize::FiltermapDescriptionBase* r)
-		:m_call(c),m_api_param(p),m_api_result(r){}
+		:m_state(0),m_data(std::calloc( p->size() + r->size(), 1), std::free),m_call(c),m_api_param(p),m_api_result(r){}
+
+	///\brief Destructor
+	~PluginFunction();
+
+	///\enum CallResult
+	///\brief Enumeration of call states of the plugin function call processing
+	enum CallResult
+	{
+		Ok,		//< successful termination of call
+		Error,		//< termination of call with error (not completed)
+		Yield		//< call interrupted with request for a network operation
+	};
+	CallResult call( protocol::InputFilter& ifl, protocol::OutputFilter& ofl);
 
 private:
+	int m_state;
+	boost::shared_ptr<void> m_data;
 	Call* m_call;
 	const serialize::FiltermapDescriptionBase* m_api_param;
 	const serialize::FiltermapDescriptionBase* m_api_result;

@@ -51,14 +51,19 @@ public:
 	typedef std::vector<std::pair<const char*,FiltermapDescriptionBase> > Map;
 	typedef bool (*Parse)( const char* tag, void* obj, protocol::InputFilter& flt, Context& ctx, bool isinit);
 	typedef bool (*Print)( const char* tag, const void* obj, protocol::OutputFilter*& out, Context& ctx);
+	typedef bool (*Constructor)( void* obj);
+	typedef void (*Destructor)( void* obj);
 	typedef bool (*IsAtomic)();
+
 	Parse parse() const {return m_parse;}
 	Print print() const {return m_print;}
 
+	FiltermapDescriptionBase( Constructor c, Destructor d, const char* tn, std::size_t os, std::size_t sz, IsAtomic ia, Parse pa, Print pr)
+		:m_constructor(c),m_destructor(d),m_typename(tn),m_ofs(os),m_size(sz),m_nof_attributes(std::numeric_limits<std::size_t>::max()),m_isAtomic(ia),m_parse(pa),m_print(pr){}
 	FiltermapDescriptionBase( const char* tn, std::size_t os, std::size_t sz, IsAtomic ia, Parse pa, Print pr)
-		:m_typename(tn),m_ofs(os),m_size(sz),m_nof_attributes(std::numeric_limits<std::size_t>::max()),m_isAtomic(ia),m_parse(pa),m_print(pr){}
+		:m_constructor(0),m_destructor(0),m_typename(tn),m_ofs(os),m_size(sz),m_nof_attributes(std::numeric_limits<std::size_t>::max()),m_isAtomic(ia),m_parse(pa),m_print(pr){}
 	FiltermapDescriptionBase( const FiltermapDescriptionBase& o)
-		:m_typename(o.m_typename),m_ofs(o.m_ofs),m_size(o.m_size),m_nof_attributes(o.m_nof_attributes),m_elem(o.m_elem),m_isAtomic(o.m_isAtomic),m_parse(o.m_parse),m_print(o.m_print){}
+		:m_constructor(o.m_constructor),m_destructor(o.m_destructor),m_typename(o.m_typename),m_ofs(o.m_ofs),m_size(o.m_size),m_nof_attributes(o.m_nof_attributes),m_elem(o.m_elem),m_isAtomic(o.m_isAtomic),m_parse(o.m_parse),m_print(o.m_print){}
 	FiltermapDescriptionBase()
 		:m_typename(0),m_ofs(0),m_size(0),m_nof_attributes(std::numeric_limits<std::size_t>::max()),m_isAtomic(0),m_parse(0),m_print(0){}
 
@@ -68,6 +73,16 @@ public:
 	bool isAtomic() const
 	{
 		return m_isAtomic();
+	}
+
+	bool init( void* obj) const
+	{
+		return (m_constructor)?m_constructor( obj):true;
+	}
+
+	void done( void* obj) const
+	{
+		if (m_destructor) m_destructor( obj);
 	}
 
 	std::size_t size() const
@@ -107,6 +122,8 @@ public:
 		m_nof_attributes = m_elem.size();
 	}
 private:
+	Constructor m_constructor;
+	Destructor m_destructor;
 	const char* m_typename;
 	std::size_t m_ofs;
 	std::size_t m_size;

@@ -112,10 +112,12 @@ struct LuamapDescription :public LuamapDescriptionBase
 			return false;
 		}
 	}
+
 	static void destructor( void* obj)
 	{
 		((Structure*)obj)->~Structure();
 	}
+
 	LuamapDescription()
 		:LuamapDescriptionBase( &constructor, &destructor, getTypename<Structure>(), 0, sizeof(Structure), &IntrusiveParser<Structure>::parse, &IntrusivePrinter<Structure>::print){}
 };

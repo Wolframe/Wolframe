@@ -87,9 +87,9 @@ public:
 	///\brief Enumeration of call states of this application processor instance
 	enum CallResult
 	{
-		Ok,		///< successful termination of call
-		Error,		///< termination of call with error (not completed)
-		Yield		///< call interrupted with request for a network operation
+		Ok,		//< successful termination of call
+		Error,		//< termination of call with error (not completed)
+		Yield		//< call interrupted with request for a network operation
 	};
 	static const char* callResultName( CallResult cr)
 	{
@@ -115,16 +115,16 @@ private:
 		return ar[ (int)st];
 	}
 
-	State m_state;				///< processing state machine state
-	const void* m_writedata;		///< bytes to write next (WRITE)
-	std::size_t m_writedatasize;		///< number of bytes to write next (WRITE)
+	State m_state;				//< processing state machine state
+	const void* m_writedata;		//< bytes to write next (WRITE)
+	std::size_t m_writedatasize;		//< number of bytes to write next (WRITE)
 
-	InputBlock m_input;			///< input buffer
-	InputBlock::iterator m_eoD;		///< input end of data marker
-	std::size_t m_itrpos;			///< read start position in buffer for the command handler
+	InputBlock m_input;			//< input buffer
+	InputBlock::iterator m_eoD;		//< input end of data marker
+	std::size_t m_itrpos;			//< read start position in buffer for the command handler
 protected:
-	InputFilterR m_inputfilter;		///< network input interface for the interpreter
-	OutputFilterR m_outputfilter;		///< network output interface for the interpreter
+	InputFilterR m_inputfilter;		//< network input interface for the interpreter
+	OutputFilterR m_outputfilter;		//< network output interface for the interpreter
 };
 }}
 #endif

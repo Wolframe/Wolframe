@@ -151,6 +151,113 @@ bool DDLFormMap::getForm( const char* name, DDLForm& rt) const
 	return getObject( m_map, name, rt);
 }
 
+PluginFunction::CallResult PluginFunction::call( protocol::InputFilter& ifl, protocol::OutputFilter& ofl)
+{
+	if (m_state) return Error;
+
+	serialize::Context ctx;
+	void* input_struct = m_data.get();
+	void* result_struct = (void*)((char*)m_data.get() + m_api_param->size());
+
+	switch (m_state)
+	{
+		case 0:
+			if (!m_api_param->init( input_struct))
+			{
+				LOG_ERROR << "Could not initialize api input object for plugin function";
+				return Error;
+			}
+			m_state = 1;
+		case 1:
+			if (!m_api_result->init( result_struct))
+			{
+				LOG_ERROR << "Could not initialize api result object for plugin function";
+				return Error;
+			}
+			m_state = 2;
+		case 2:
+			if (!m_api_param->parse( "", input_struct, ifl, ctx))
+			{
+				switch (ifl.state())
+				{
+					case protocol::InputFilter::Open:
+						ctx.setError( 0, "Unknown error");
+						return Error;
+
+					case protocol::InputFilter::EndOfMessage:
+						return Yield;
+
+					case protocol::InputFilter::Error:
+						ctx.setError( 0, ifl.getError());
+						return Error;
+				}
+			}
+			m_state = 3;
+		case 3:
+			try
+			{
+				int rt = m_call( input_struct, result_struct);
+				if (rt != 0)
+				{
+					LOG_ERROR << "error in call of plugin function. error code = " << rt;
+					return Error;
+				}
+			}
+			catch (const std::exception& e)
+			{
+				LOG_ERROR << "exception in plugin function call: " << e.what();
+				return Error;
+			}
+			m_state = 4;
+		case 4:
+			if (!m_api_param->print( "", result_struct, ofl, ctx))
+			{
+				switch (ofl.state())
+				{
+					case protocol::OutputFilter::Open:
+						ctx.setError( 0, "Unknown error");
+						return Error;
+
+					case protocol::OutputFilter::EndOfBuffer:
+						return Yield;
+
+					case protocol::OutputFilter::Error:
+						ctx.setError( 0, ofl.getError());
+						return Error;
+				}
+			}
+			m_state = 5;
+		case 5:
+			m_api_param->done( input_struct);
+			m_api_result->done( result_struct);
+			std::memset( m_data.get(), 0, m_api_param->size() + m_api_result->size());
+			m_state = 0;
+	}
+	return Ok;
+}
+
+PluginFunction::~PluginFunction()
+{
+	if (m_state >= 0)
+	{
+		void* input_struct = m_data.get();
+		void* result_struct = (void*)((char*)m_data.get() + m_api_param->size());
+
+		switch (m_state)
+		{
+			case 0:
+				break;
+			case 5:
+			case 4:
+			case 3:
+			case 2:
+				m_api_result->done( result_struct);
+			case 1:
+				m_api_param->done( input_struct);
+		}
+	}
+}
+
 void PluginFunctionMap::definePluginFunction( const char* name, const PluginFunction& f)
 {
 	defineObject( m_map, name, f);
@@ -603,6 +710,13 @@ int LuaPluginFunction::call( lua_State* ls) const
 	try
 	{
 		rt = m_call( input_struct, result_struct);
+		if (rt != 0)
+		{
+			m_api_param->done( input_struct);
+			m_api_result->done( result_struct);
+			lua_pushnumber( ls, rt);
+			return 1;
+		}
 	}
 	catch (const std::exception& e)
 	{
@@ -624,7 +738,7 @@ EXIT_FUNCTION1:
 	{
 		luaL_error( ls, ctx.getLastError());
 	}
-	return rt;
+	return 1;
 }
 
 void LuaPluginFunctionMap::defineLuaPluginFunction( const char* name, const LuaPluginFunction& f)

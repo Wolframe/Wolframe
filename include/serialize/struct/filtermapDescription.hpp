@@ -91,8 +91,35 @@ struct FiltermapDescription :public FiltermapDescriptionBase
 		return *this;
 	}
 
+	static bool constructor( void* obj)
+	{
+		///\brief create operator new for Structure on an already allocated chunk to call it's constructor
+		struct StructureShell :public Structure
+		{
+			void* operator new( std::size_t num_bytes, void* obj) throw (std::bad_alloc)
+			{
+				if (sizeof(StructureShell) != num_bytes) throw std::bad_alloc();
+				return obj;
+			}
+		};
+		try
+		{
+			new (obj) StructureShell();
+			return true;
+		}
+		catch (const std::exception&)
+		{
+			return false;
+		}
+	}
+
+	static void destructor( void* obj)
+	{
+		((Structure*)obj)->~Structure();
+	}
+
 	FiltermapDescription()
-		:FiltermapDescriptionBase( getTypename<Structure>(), 0, sizeof(Structure), &IntrusiveParser<Structure>::isAtomic, &IntrusiveParser<Structure>::parse, &IntrusivePrinter<Structure>::print){}
+		:FiltermapDescriptionBase( &constructor, &destructor, getTypename<Structure>(), 0, sizeof(Structure), &IntrusiveParser<Structure>::isAtomic, &IntrusiveParser<Structure>::parse, &IntrusivePrinter<Structure>::print){}
 };
 
 }}// end namespace
