@@ -22,7 +22,7 @@ INCLUDE_LIBS = \
 	$(TOPDIR)/src/libwolframe.a \
 	$(TOPDIR)/src/libwolframe/libwolframe.a \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
-	-lboost_filesystem -lboost_system -lboost_random \
+	-lboost_filesystem -lboost_system \
 	$(LIBS_DL)
 
 CPP_OBJS = \
