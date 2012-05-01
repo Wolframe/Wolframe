@@ -228,7 +228,7 @@ public:
 	///\param[in] c function to call
 	///\param[in] p part of the api describing the input
 	///\param[in] r part of the api describing the function result
-	PluginFunction( const Call c, const serialize::FiltermapDescriptionBase* p, const serialize::FiltermapDescriptionBase* r)
+	PluginFunction( Call c, const serialize::FiltermapDescriptionBase* p, const serialize::FiltermapDescriptionBase* r)
 		:m_state(0),m_data(std::calloc( p->size() + r->size(), 1), std::free),m_call(c),m_api_param(p),m_api_result(r){}
 
 	///\brief Destructor
@@ -247,7 +247,7 @@ public:
 private:
 	int m_state;
 	boost::shared_ptr<void> m_data;
-	const Call* m_call;
+	Call* m_call;
 	const serialize::FiltermapDescriptionBase* m_api_param;
 	const serialize::FiltermapDescriptionBase* m_api_result;
 };
