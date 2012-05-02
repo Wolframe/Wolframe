@@ -39,6 +39,15 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
+///\brief Create the context for executing a Lua for the Lua command handler. Used for executing a script outside of the command handler in the same way
+///\param[in] name of the command to execute, referencing the script
+///\param[in] input_ input definition for the input to process
+///\param[in] output_ output definition for the output to print
+///\return instance of  Lua script with all basic system objects defined
+LuaScriptInstanceR createLuaScriptInstance( const char* name, const Input& input_, const Output& output_);
+
+
+
 ///\class LuaCommandHandler
 ///\brief command handler instance for processing a call as Lua script
 class LuaCommandHandler :public protocol::IOFilterCommandHandler
@@ -59,14 +68,6 @@ public:
 	virtual CallResult call( const char*& err);
 
 private:
-	bool loadScript();
-
-	struct Globals
-	{
-		Input m_input;
-		Output m_output;
-	};
-	Globals m_globals;
 	LuaScriptInstanceR m_interp;
 };
 

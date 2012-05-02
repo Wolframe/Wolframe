@@ -68,7 +68,10 @@ struct Output
 	Output() :m_state(0){}
 	///\brief Copy constructor
 	///\param[in] o copied item
-	Output( const Output& o) :m_outputfilter(o.m_outputfilter),m_state(0){}
+	Output( const Output& o) :m_outputfilter(o.m_outputfilter),m_state(o.m_state){}
+	///\brief Constructor by output filter
+	///\param[in] flt output filter reference
+	Output( const protocol::OutputFilterR& flt) :m_outputfilter(flt),m_state(0){}
 	///\brief Destructor
 	~Output(){}
 
@@ -99,6 +102,9 @@ struct Input
 	///\brief Copy constructor
 	///\param[in] o copied item
 	Input( const Input& o) :m_inputfilter(o.m_inputfilter){}
+	///\brief Constructor by input filter
+	///\param[in] flt input filter reference
+	Input( const protocol::InputFilterR& flt) :m_inputfilter(flt){}
 	///\brief Destructor
 	~Input(){}
 
@@ -282,7 +288,7 @@ public:
 	///\param[in] w command input writer
 	///\param[in] r command output reader
 	///\param[in] c command execute handler
-	TransactionFunction( const protocol::OutputFilterR& w, const protocol::InputFilterR& r, const protocol::CommandBaseR& c)
+	TransactionFunction( const protocol::OutputFilterR& w, const protocol::InputFilterR& r, const protocol::CommandHandlerR& c)
 		:m_cmdwriter(w),m_resultreader(r),m_cmd(c){}
 
 	///\brief Destructor
@@ -294,13 +300,36 @@ public:
 	const protocol::InputFilterR& resultreader() const		{return m_resultreader;}
 	protocol::InputFilterR& resultreader()				{return m_resultreader;}
 
-	const protocol::CommandBaseR& cmd() const			{return m_cmd;}
-	protocol::CommandBaseR& cmd()					{return m_cmd;}
+	const protocol::CommandHandlerR& cmd() const			{return m_cmd;}
+	protocol::CommandHandlerR& cmd()				{return m_cmd;}
 
+	typedef protocol::CommandHandlerR (*CreateCommandHandler)( const char* name);
+	struct Definition
+	{
+		Definition(){}
+		Definition( const Definition& o)
+			:m_cmdwriter(o.m_cmdwriter),m_resultreader(o.m_resultreader),m_cmdconstructor(o.m_cmdconstructor){}
+		Definition( const protocol::OutputFilterR& w, const protocol::InputFilterR& r, CreateCommandHandler c)
+			:m_cmdwriter(w),m_resultreader(r),m_cmdconstructor(c){}
+
+		protocol::OutputFilterR m_cmdwriter;			//< command input writer
+		protocol::InputFilterR m_resultreader;			//< command result reader
+		CreateCommandHandler m_cmdconstructor;
+
+		TransactionFunction create( const char* name) const
+		{
+			TransactionFunction rt;
+			rt.m_cmdwriter.reset( m_cmdwriter->copy());
+			rt.m_resultreader.reset( m_resultreader->copy());
+			rt.m_cmd = m_cmdconstructor( name);
+			return rt;
+		}
+	};
 private:
+	friend class Defintion;
 	protocol::OutputFilterR m_cmdwriter;				//< command input writer
 	protocol::InputFilterR m_resultreader;				//< command result reader
-	protocol::CommandBaseR m_cmd;					//< command execute handler
+	protocol::CommandHandlerR m_cmd;				//< command execute handler
 };
 
 ///\class TransactionFunctionMap
@@ -311,10 +340,10 @@ public:
 	TransactionFunctionMap(){}
 	~TransactionFunctionMap(){}
 
-	void defineTransactionFunction( const char* name, const TransactionFunction& f);
+	void defineTransactionFunction( const char* name, const TransactionFunction::Definition& f);
 	bool getTransactionFunction( const char* name, TransactionFunction& rt) const;
 private:
-	std::map<std::string,TransactionFunction> m_map;
+	std::map<std::string,TransactionFunction::Definition> m_map;
 };
 
 ///\class DDLCompilerMap

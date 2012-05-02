@@ -108,44 +108,7 @@ protected:
 	int m_statusCode;				///< error code of operation for the client
 };
 
-
-class CommandBase
-{
-public:
-	explicit
-	CommandBase( const std::string& nam)
-		:m_cmdName(nam),m_procName(nam) {}
-	CommandBase( const std::string& nam, const std::string& procnam)
-		:m_cmdName(nam),m_procName(procnam) {}
-
-	virtual ~CommandBase() {}
-
-	virtual CountedReference<CommandHandler> create() const
-	{
-		return CountedReference<CommandHandler>(0);
-	}
-	const char* cmdName() const		{return m_cmdName.c_str();}
-	const std::string& procName() const	{return m_procName;}
-private:
-	std::string m_cmdName;
-	std::string m_procName;
-};
-
-typedef CountedReference<CommandBase> CommandBaseR;
-
-
-template <class CommandHandlerClass>
-struct Command :public CommandBase
-{
-	Command( const std::string& nam) :CommandBase(nam) {}
-	virtual ~Command(){}
-
-	virtual CountedReference<CommandHandler> create() const
-	{
-		CommandHandlerClass* rt = new CommandHandlerClass();
-		return CountedReference<CommandHandler>( rt);
-	}
-};
+typedef CountedReference<CommandHandler> CommandHandlerR;
 
 }}
 #endif

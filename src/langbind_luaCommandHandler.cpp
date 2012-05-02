@@ -677,23 +677,24 @@ static const luaL_Reg output_methodtable[ 5] =
 	{0,0}
 };
 
-bool LuaCommandHandler::loadScript()
+LuaScriptInstanceR _Wolframe::langbind::createLuaScriptInstance( const char* name, const Input& input_, const Output& output_)
 {
+	LuaScriptInstanceR rt;
 	GlobalContext* gc = getGlobalContext();
-	if (!gc->getLuaScriptInstance( m_name.c_str(), m_interp)) return false;
-	m_globals.m_input.inputfilter() = m_inputfilter;
-	m_globals.m_output.outputfilter() = m_outputfilter;
-	LuaObject<Input>::createGlobal( m_interp->ls(), "input", m_globals.m_input, input_methodtable);
-	LuaObject<Output>::createGlobal( m_interp->ls(), "output", m_globals.m_output, output_methodtable);
-	LuaObject<Filter>::createMetatable( m_interp->ls(), &function__LuaObject__index<Filter>, &function__LuaObject__newindex<Filter>, 0);
-	LuaObject<InputFilterClosure>::createMetatable( m_interp->ls(), 0, 0, 0);
-	setGlobalSingletonPointer<GlobalContext>( m_interp->ls(), getGlobalContext());
-	lua_pushcfunction( m_interp->ls(), &function_yield);
-	lua_setglobal( m_interp->ls(), "yield");
-	lua_pushcfunction( m_interp->ls(), &function_filter);
-	lua_setglobal( m_interp->ls(), "filter");
-	return true;
+	if (!gc->getLuaScriptInstance( name, rt)) throw std::runtime_error( "invalid command name");
+	lua_State* ls = rt->ls();
+	LuaObject<Input>::createGlobal( ls, "input", input_, input_methodtable);
+	LuaObject<Output>::createGlobal( ls, "output", output_, output_methodtable);
+	LuaObject<Filter>::createMetatable( ls, &function__LuaObject__index<Filter>, &function__LuaObject__newindex<Filter>, 0);
+	LuaObject<InputFilterClosure>::createMetatable( ls, 0, 0, 0);
+	setGlobalSingletonPointer<GlobalContext>( ls, getGlobalContext());
+	lua_pushcfunction( ls, &function_yield);
+	lua_setglobal( ls, "yield");
+	lua_pushcfunction( ls, &function_filter);
+	lua_setglobal( ls, "filter");
+	return rt;
 }
+
 
 LuaCommandHandler::CallResult LuaCommandHandler::call( const char*& errorCode)
 {
@@ -702,9 +703,13 @@ LuaCommandHandler::CallResult LuaCommandHandler::call( const char*& errorCode)
 
 	if (!m_interp.get())
 	{
-		if (!loadScript())
+		try
 		{
-			LOG_ERROR << "Failed to load script and initialize execution context";
+			m_interp = createLuaScriptInstance( m_name.c_str(), m_inputfilter, m_outputfilter);
+		}
+		catch (const std::exception& e)
+		{
+			LOG_ERROR << "Failed to load script and initialize execution context: " << e.what();
 			errorCode = "init script";
 			return Error;
 		}

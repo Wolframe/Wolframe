@@ -268,14 +268,17 @@ bool PluginFunctionMap::getPluginFunction( const char* name, PluginFunction& rt)
 	return getObject( m_map, name, rt);
 }
 
-void TransactionFunctionMap::defineTransactionFunction( const char* name, const TransactionFunction& f)
+void TransactionFunctionMap::defineTransactionFunction( const char* name, const TransactionFunction::Definition& f)
 {
 	defineObject( m_map, name, f);
 }
 
 bool TransactionFunctionMap::getTransactionFunction( const char* name, TransactionFunction& rt) const
 {
-	return getObject( m_map, name, rt);
+	TransactionFunction::Definition def;
+	if (!getObject( m_map, name, def)) return false;
+	rt = def.create( name);
+	return true;
 }
 
 DDLCompilerMap::DDLCompilerMap()
