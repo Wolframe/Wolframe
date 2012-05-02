@@ -37,6 +37,11 @@
 #include <stdexcept>
 #include "AAAA/CRAM.hpp"
 
+#ifdef _WIN32
+#define WIN32_MEAN_AND_LEAN
+#include <windows.h>
+#endif
+
 TEST( CRAM, Challenge )
 {
 #ifdef _WIN32
