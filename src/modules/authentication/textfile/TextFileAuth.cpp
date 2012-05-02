@@ -36,8 +36,9 @@
 
 #include <string>
 
-#include <fstream>
-#include <iostream>
+#include <cstdio>
+#include <cerrno>
+
 #include "logger-v1.hpp"
 #include "TextFileAuth.hpp"
 #include "sha2.h"
@@ -81,26 +82,38 @@ AuthenticatorSlice* TextFileAuthenticator::authSlice()
 }
 
 
-static const int PWD_LINE_SIZE = 1024;
+static const std::size_t PWD_LINE_SIZE = 1024;
 
 User* TextFileAuthenticator::authenticate( const std::string& username,
 					   const std::string& password,
 					   bool caseSensitveUser ) const
 {
-	std::ifstream	pwdFile( m_file.c_str() );
-	if ( ! pwdFile.is_open() )	{
-		MOD_LOG_WARNING << "Unable to read text file authentication file '" << m_file << "'";
+	FILE*	pwdFile;
+	if ( ! ( pwdFile = fopen( m_file.c_str(), "r" )))	{
+		MOD_LOG_ERROR << "Authentication: " << identifier() << ": unable to open authentication file '"
+			      << m_file << "': " << strerror( errno );
 		return NULL;
 	}
+	MOD_LOG_TRACE << "Authentication: " << identifier() << ": opened file '" << m_file << "'";
 
-	MOD_LOG_TRACE << "Text file authenticator '" << identifier() << "' opened file '" << m_file << "'";
-	while( !pwdFile.eof())	{
-		std::string line;
-		std::getline( pwdFile, line );
-		//			MOD_LOG_WARNING << "Unable to read text file authentication file '" << m_file << "': " << e.what();
-		//			return NULL;
+	char	lineBuf[ PWD_LINE_SIZE + 2];
+	while( ! feof( pwdFile ))	{
+		if ( ! fgets( lineBuf,  PWD_LINE_SIZE, pwdFile ))	{
+			int err = errno;
+			if ( feof( pwdFile ))	{		// EOF reached with nothing to read
+				fclose( pwdFile );
+				return NULL;
+			}
+			else	{
+				MOD_LOG_ERROR << "Authentication: " << identifier()
+					      << ": unable to read from authentication file '"
+					      << m_file << "': " << strerror( err );
+				fclose( pwdFile );
+				return NULL;
+			}
+		}
 
-		MOD_LOG_DEBUG << "Read line '" << line << "'";
+		std::string line( lineBuf );
 		boost::algorithm::trim( line );
 		if ( line[0] == '#' || line.empty() )
 			continue;
@@ -124,23 +137,28 @@ User* TextFileAuthenticator::authenticate( const std::string& username,
 
 		unsigned char pwDigest[ SHA224_DIGEST_SIZE ];
 		if ( hex2byte( pwd.c_str(), pwDigest, SHA224_DIGEST_SIZE ) < 0 )	{
-			MOD_LOG_WARNING << "Authentication: " << identifier() << ": error parsing password hash for user: '" << usr << "'";
+			MOD_LOG_WARNING << "Authentication: " << identifier() << ": error parsing password hash for user: '"
+					<< usr << "'";
+			fclose( pwdFile );
 			return NULL;
 		}
 		unsigned char inDigest[ SHA224_DIGEST_SIZE ];
 		sha224((const unsigned char *)password.c_str(), password.length(), inDigest );
 
-		if ( memcmp( pwDigest, inDigest, SHA224_DIGEST_SIZE ))
+		if ( memcmp( pwDigest, inDigest, SHA224_DIGEST_SIZE ))	{
+			fclose( pwdFile );
 			return NULL;
+		}
 
 		if ( end != std::string::npos )	{
 			end = line.find( ":", start );
 			name = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
 			start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
 		}
-
+		fclose( pwdFile );
 		return new User( "TextFile", usr, name );
 	}
+	fclose( pwdFile );
 	return NULL;
 }
 
@@ -148,50 +166,67 @@ User* TextFileAuthenticator::authenticate( const CRAMchallenge& challenge,
 					   const CRAMresponse& response,
 					   bool caseSensitveUser ) const
 {
-	try	{
-		std::ifstream	pwdFile( m_file.c_str() );
-		MOD_LOG_TRACE << "Text file authenticator '" << identifier() << "' opened file '" << m_file << "'";
-		while( !pwdFile.eof())	{
-			std::string line;
-			std::getline( pwdFile, line );
-			boost::algorithm::trim( line );
-			if ( line[0] == '#' || line.empty() )
-				continue;
+	FILE*	pwdFile;
+	if ( ! ( pwdFile = fopen( m_file.c_str(), "r" )))	{
+		MOD_LOG_ERROR << "Authentication: " << identifier() << ": unable to open authentication file '"
+			      << m_file << "': " << strerror( errno );
+		return NULL;
+	}
+	MOD_LOG_TRACE << "Authentication: " << identifier() << ": opened file '" << m_file << "'";
 
-			std::size_t  start = 0, end = 0;
-			std::string usr, pwd, name;
-			if ( end != std::string::npos )	{
-				end = line.find( ":", start );
-				usr = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
-				start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
+	char	lineBuf[ PWD_LINE_SIZE + 2];
+	while( ! feof( pwdFile ))	{
+		if ( ! fgets( lineBuf,  PWD_LINE_SIZE, pwdFile ))	{
+			int err = errno;
+			if ( feof( pwdFile ))	{		// EOF reached with nothing to read
+				fclose( pwdFile );
+				return NULL;
 			}
-			if ( caseSensitveUser  )
-				boost::to_lower( usr );
-
-			if ( end != std::string::npos )	{
-				end = line.find( ":", start );
-				pwd = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
-				start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
+			else	{
+				MOD_LOG_ERROR << "Authentication: " << identifier()
+					      << ": unable to read from authentication file '"
+					      << m_file << "': " << strerror( err );
+				fclose( pwdFile );
+				return NULL;
 			}
-
-			CRAMresponse	local( challenge, usr, pwd );
-			if ( local != response )
-				continue;
-
-			if ( end != std::string::npos )	{
-				end = line.find( ":", start );
-				name = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
-				start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
-			}
-
-			return new User( "TextFile", usr, name );
 		}
-		return NULL;
+
+		std::string line( lineBuf );
+		boost::algorithm::trim( line );
+		if ( line[0] == '#' || line.empty() )
+			continue;
+
+		std::size_t  start = 0, end = 0;
+		std::string usr, pwd, name;
+		if ( end != std::string::npos )	{
+			end = line.find( ":", start );
+			usr = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
+			start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
+		}
+		if ( caseSensitveUser  )
+			boost::to_lower( usr );
+
+		if ( end != std::string::npos )	{
+			end = line.find( ":", start );
+			pwd = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
+			start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
+		}
+
+		CRAMresponse	local( challenge, usr, pwd );
+		if ( local != response )
+			continue;
+
+		if ( end != std::string::npos )	{
+			end = line.find( ":", start );
+			name = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
+			start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
+		}
+
+		fclose( pwdFile );
+		return new User( "TextFile", usr, name );
 	}
-	catch( std::exception& e )	{
-		MOD_LOG_TRACE << "Unable to read text file authentication file '" << m_file << "': " << e.what();
-		return NULL;
-	}
+	fclose( pwdFile );
+	return NULL;
 }
 
 
