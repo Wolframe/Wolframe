@@ -139,6 +139,8 @@ local_test:
 	@-echo singletonTest >> test.bat
 	@-echo testSHA2 >> test.bat
 	@-echo byte2hexTest >> test.bat
+	@-echo testRand >> test.bat
+	@-echo testTimestamp >> test.bat
 	@-echo CRAMtest >> test.bat
 	@-echo protocolArgumentParsing >> test.bat
 	@-echo echo off >> test.bat
