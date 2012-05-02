@@ -15,23 +15,14 @@ TEST( Timestamp, Precision )
 {
 #ifndef _WIN32
 	boost::posix_time::ptime t[NOF_ITERS];
+	
 	for( int i = 0; i < NOF_ITERS; i++ ) {
 		t[i] = boost::posix_time::ptime(
 			boost::posix_time::microsec_clock::universal_time( ) );
 	}
-	boost::posix_time::ptime tlast = 0;
-	int tcount = 0;
+	
 	for( int i = 0; i < NOF_ITERS; i++ ) {
-		if( tlast != t[i] ) {
-			std::cout << tcount + 1 << " times " << t[i-1] << std::endl;
-			tlast = t[i];
-			tcount = 0;
-		} else {
-			tcount++;
-		}
-	}
-	if( tcount > 0 ) {
-		std::cout << tcount << " times " << t[nof_iters-1] << std::endl;
+		std::cout << t[i] << std::endl;
 	}
 #endif
 
