@@ -101,19 +101,15 @@ CRAMchallenge::CRAMchallenge( const std::string& randomDevice )
 			boost::posix_time::ptime( boost::posix_time::microsec_clock::universal_time());
 	sha256((const unsigned char*)&pt, sizeof( pt ), m_challenge );
 #else
-	FILETIME t0 = { 0, 0}, t1 = { 0, 0 };
+	FILETIME ft = { 0, 0 };
 	LARGE_INTEGER li;
 
-	GetSystemTimeAsFileTime( &t0 );
-	do {
-		GetSystemTimeAsFileTime( &t1 );
-		QueryPerformanceCounter( &li );
-	} while( 	( t0.dwHighDateTime == t1.dwHighDateTime ) &&
-			( t0.dwLowDateTime == t1.dwLowDateTime ) );
+	GetSystemTimeAsFileTime( &ft );
+	QueryPerformanceCounter( &li );
 
-	t1.dwLowDateTime += li.QuadPart;
+	ft.dwLowDateTime += li.QuadPart;
 
-	sha256((const unsigned char *)&t1, sizeof( t1 ), m_challenge );
+	sha256((const unsigned char *)&ft, sizeof( ft ), m_challenge );
 #endif
 
 #ifndef _WIN32
