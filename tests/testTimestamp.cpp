@@ -28,7 +28,7 @@ TEST( Timestamp, Precision )
 
 #ifdef _WIN32
 	FILETIME ft[NOF_ITERS];
-	memset( ft, NOF_ITERS, sizeof( FILETIME ) );
+	memset( ft, 0, NOF_ITERS * sizeof( FILETIME ) );
 	LARGE_INTEGER li;
 
 	for( int i = 0; i < NOF_ITERS; i++ ) {
