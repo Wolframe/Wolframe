@@ -56,6 +56,7 @@ public:
 	///\brief Constructor
 	CommandHandler()
 		:m_statusCode(0){}
+
 	///\brief Destructor
 	virtual ~CommandHandler(){}
 

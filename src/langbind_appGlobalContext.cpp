@@ -67,7 +67,7 @@ bool GlobalContext::load( const ApplicationEnvironmentConfig& config)
 		{
 			LOG_INFO << "Loading DDL compiler " << itr->name;
 			///TODO: load compiler from module itr->modulepath
-			///Call defineDDLCompiler( const char* name, const ddl::CompilerInterfaceR& ci);
+			///Call defineDDLCompiler( const std::string& name, const ddl::CompilerInterfaceR& ci);
 		}
 	}
 	{
@@ -103,7 +103,7 @@ bool GlobalContext::load( const ApplicationEnvironmentConfig& config)
 		{
 			LOG_INFO << "Loading filter " << itr->name;
 			///TODO: load filter from itr->modulepath
-			///Call defineFilter( const char* name, const FilterFactoryR& f);
+			///Call defineFilter( const std::string& name, const FilterFactoryR& f);
 		}
 	}
 	{
@@ -112,7 +112,7 @@ bool GlobalContext::load( const ApplicationEnvironmentConfig& config)
 		{
 			LOG_INFO << "Loading transaction function " << itr->name;
 			///TODO: load transaction function from itr->modulepath
-			///Call defineTransactionFunction( const char* name, const TransactionFunction& f);
+			///Call defineTransactionFunction( const std::string& name, const TransactionFunction& f);
 		}
 	}
 #if WITH_LUA
@@ -120,7 +120,7 @@ bool GlobalContext::load( const ApplicationEnvironmentConfig& config)
 		std::vector<ScriptCommandConfigStruct>::const_iterator itr=config.data().script.begin(),end=config.data().script.end();
 		for (;itr!=end; ++itr)
 		{
-			defineLuaFunction( itr->name.c_str(), itr->sourcepath.c_str());
+			defineLuaFunction( itr->name, itr->sourcepath);
 		}
 	}
 #endif
@@ -135,5 +135,37 @@ bool GlobalContext::load( const ApplicationEnvironmentConfig& config)
 	}
 	return rt;
 }
+
+bool GlobalContext::getTransactionFunctionElements( const std::string& name, TransactionFunction& tf, DDLFormR& par, DDLFormR& res)
+{
+	std::string funcnam;
+	std::string parnam;
+	std::string resnam;
+	const char* parnam_;
+	const char* resnam_;
+	if ((parnam_ = std::strchr( name.c_str(), ':')) == 0) return false;
+	funcnam = std::string( name, parnam_ - name.c_str());
+	if ((resnam_ = std::strchr( ++parnam_, ':')) == 0) return false;
+	parnam = std::string( parnam_, resnam_ - parnam_);
+	resnam = std::string( ++resnam_);
+
+	if (!getForm( parnam, par))
+	{
+		LOG_ERROR << "unknown form name '" << parnam << "'";
+		return false;
+	}
+	if (!getForm( resnam, res))
+	{
+		LOG_ERROR << "unknown form name '" << resnam << "'";
+		return false;
+	}
+	if (!getTransactionFunction( funcnam, tf))
+	{
+		LOG_ERROR << "unknown transaction function name '" << funcnam << "'";
+		return false;
+	}
+	return true;
+}
+
 
 

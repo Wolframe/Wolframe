@@ -34,6 +34,7 @@ Project Wolframe.
 #include "langbind/appObjects.hpp"
 #include "ddl/compiler/simpleFormCompiler.hpp"
 #include "ddl/compilerInterface.hpp"
+#include "serialize/ddl/filtermapSerialize.hpp"
 #include "logger-v1.hpp"
 #include "protocol/inputfilter.hpp"
 #include "protocol/outputfilter.hpp"
@@ -74,7 +75,7 @@ using namespace langbind;
 namespace //anonymous
 {
 template <class Object>
-void defineObject( std::map<std::string,Object>& m_map, const char* name, const Object& obj)
+void defineObject( std::map<std::string,Object>& m_map, const std::string& name, const Object& obj)
 {
 	std::string nam( name);
 	std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
@@ -82,7 +83,7 @@ void defineObject( std::map<std::string,Object>& m_map, const char* name, const 
 }
 
 template <class Object>
-bool getObject( const std::map<std::string,Object>& m_map, const char* name, Object& obj)
+bool getObject( const std::map<std::string,Object>& m_map, const std::string& name, Object& obj)
 {
 	std::string nam( name);
 	std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
@@ -99,14 +100,14 @@ bool getObject( const std::map<std::string,Object>& m_map, const char* name, Obj
 }
 }//anonymous namespace
 
-void FilterMap::defineFilter( const char* name, const FilterFactoryR& f)
+void FilterMap::defineFilter( const std::string& name, const FilterFactoryR& f)
 {
 	defineObject( m_map, name, f);
 }
 
-bool FilterMap::getFilter( const char* arg, Filter& rt)
+bool FilterMap::getFilter( const std::string& arg, Filter& rt)
 {
-	std::size_t nn = std::strlen(arg);
+	std::size_t nn = arg.size();
 	std::size_t ii = nn;
 	std::string nam( arg);
 	std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
@@ -116,7 +117,7 @@ bool FilterMap::getFilter( const char* arg, Filter& rt)
 		std::map<std::string,FilterFactoryR>::const_iterator itr=m_map.find( nam),end=m_map.end();
 		if (itr != end)
 		{
-			rt = itr->second->create( (ii==nn)?0:(arg+ii+1));
+			rt = itr->second->create( (ii==nn)?0:(arg.c_str()+ii+1));
 			return true;
 		}
 		for (ii=nn; ii>0 && arg[ii] != ':'; --ii);
@@ -141,12 +142,12 @@ FilterMap::FilterMap()
 #endif
 }
 
-void DDLFormMap::defineForm( const char* name, const DDLForm& f)
+void DDLFormMap::defineForm( const std::string& name, const DDLForm& f)
 {
 	defineObject( m_map, name, f);
 }
 
-bool DDLFormMap::getForm( const char* name, DDLFormR& rt) const
+bool DDLFormMap::getForm( const std::string& name, DDLFormR& rt) const
 {
 	rt = DDLFormR( new DDLForm());
 	return getObject( m_map, name, *rt.get());
@@ -259,31 +260,110 @@ PluginFunction::~PluginFunction()
 	}
 }
 
-void PluginFunctionMap::definePluginFunction( const char* name, const PluginFunction& f)
+void PluginFunctionMap::definePluginFunction( const std::string& name, const PluginFunction& f)
 {
 	defineObject( m_map, name, f);
 }
 
-bool PluginFunctionMap::getPluginFunction( const char* name, PluginFunction& rt) const
+bool PluginFunctionMap::getPluginFunction( const std::string& name, PluginFunction& rt) const
 {
 	return getObject( m_map, name, rt);
 }
 
-void TransactionFunctionMap::defineTransactionFunction( const char* name, const TransactionFunction::Definition& f)
+bool TransactionFunction::call( const DDLForm& param, DDLForm& result)
+{
+	protocol::CommandHandler* cmd = m_cmd.get();
+	protocol::OutputFilter* wr = m_cmdwriter.get();
+	protocol::InputFilter* rd = m_resultreader.get();
+	if (!cmd || !wr || !rd)
+	{
+		LOG_ERROR << "incomplete transaction function call definition";
+		return false;
+	}
+	protocol::OutputFilterR wrs( wr = wr->copy());
+	protocol::InputFilterR rds( rd = rd->copy());
+
+	serialize::Context pctx;
+	if (!serialize::print( param.m_struct, wr, pctx))
+	{
+		LOG_ERROR << "error writing transaction command: " << pctx.getLastError();
+		return false;
+	}
+	enum {inbufsize=1024, outbufsize=1024};
+	char inbuf[ inbufsize];
+	char outbuf[ outbufsize];
+	std::size_t ii = 0;
+
+	cmd->setInputBuffer( inbuf, inbufsize);
+	cmd->setOutputBuffer( outbuf, outbufsize, 0);
+
+	std::string resultstr;
+	protocol::CommandHandler::Operation op = protocol::CommandHandler::READ;
+
+	for(;;)
+	{
+		switch (op)
+		{
+			case protocol::CommandHandler::READ:
+			{
+				std::size_t rr = pctx.content().size()-ii;
+				if (rr > inbufsize) rr = inbufsize;
+				memcpy( inbuf, pctx.content().c_str()+ii, rr);
+				cmd->putInput( inbuf, rr);
+				op = cmd->nextOperation();
+				continue;
+			}
+			case protocol::CommandHandler::WRITE:
+			{
+				const void* oo;
+				std::size_t nn;
+				cmd->getOutput( oo, nn);
+				resultstr.append( (const char*)oo, nn);
+				op = cmd->nextOperation();
+				continue;
+			}
+			case protocol::CommandHandler::CLOSED:
+			{
+				serialize::Context rctx;
+				rd->protocolInput( resultstr.c_str(), resultstr.size(), true);
+				if (!serialize::parse( result.m_struct, *rd, rctx))
+				{
+					LOG_ERROR << "error reading transaction result: " << rctx.getLastError();
+					return false;
+				}
+				return true;
+			}
+		}
+	}
+}
+
+bool TransactionFunctionMap::hasTransactionFunction( const std::string& name) const
+{
+	const char* ee = std::strchr( name.c_str(), ':');
+	if (ee)
+	{
+		std::string nam( name.c_str(), ee-name.c_str());
+		std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
+		return m_map.find( nam) != m_map.end();
+	}
+	else
+	{
+		std::string nam( name);
+		std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
+		return m_map.find( nam) != m_map.end();
+	}
+}
+
+void TransactionFunctionMap::defineTransactionFunction( const std::string& name, const TransactionFunction::Definition& f)
 {
 	defineObject( m_map, name, f);
 }
 
-bool TransactionFunctionMap::hasTransactionFunction( const char* name) const
-{
-	return m_map.find( name) != m_map.end();
-}
-
-bool TransactionFunctionMap::getTransactionFunction( const char* name, const DDLFormR& ifm, const DDLFormR& ofm, TransactionFunction& rt) const
+bool TransactionFunctionMap::getTransactionFunction( const std::string& name, TransactionFunction& rt) const
 {
 	TransactionFunction::Definition def;
 	if (!getObject( m_map, name, def)) return false;
-	rt = def.create( name, ifm, ofm);
+	rt = def.create( name);
 	return true;
 }
 
@@ -293,12 +373,12 @@ DDLCompilerMap::DDLCompilerMap()
 	m_map[ simpleformCompiler->ddlname()] = simpleformCompiler;
 }
 
-void DDLCompilerMap::defineDDLCompiler( const char* name, const ddl::CompilerInterfaceR& f)
+void DDLCompilerMap::defineDDLCompiler( const std::string& name, const ddl::CompilerInterfaceR& f)
 {
 	defineObject( m_map, name, f);
 }
 
-bool DDLCompilerMap::getDDLCompiler( const char* name, ddl::CompilerInterfaceR& rt) const
+bool DDLCompilerMap::getDDLCompiler( const std::string& name, ddl::CompilerInterfaceR& rt) const
 {
 	return getObject( m_map, name, rt);
 }
@@ -565,12 +645,12 @@ static int function_printlog( lua_State *ls)
 	return 0;
 }
 
-LuaScript::LuaScript( const char* path_)
+LuaScript::LuaScript( const std::string& path_)
 	:m_path(path_)
 {
 	char buf;
 	std::fstream ff;
-	ff.open( path_, std::ios::in);
+	ff.open( path_.c_str(), std::ios::in);
 	while (ff.read( &buf, sizeof(buf)))
 	{
 		m_content.push_back( buf);
@@ -647,7 +727,7 @@ LuaFunctionMap::~LuaFunctionMap()
 	}
 }
 
-void LuaFunctionMap::defineLuaFunction( const char* name, const LuaScript& script)
+void LuaFunctionMap::defineLuaFunction( const std::string& name, const LuaScript& script)
 {
 	std::string nam( name);
 	std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
@@ -676,7 +756,7 @@ void LuaFunctionMap::defineLuaFunction( const char* name, const LuaScript& scrip
 	m_procmap[ nam] = scriptId;
 }
 
-bool LuaFunctionMap::getLuaScriptInstance( const char* procname, LuaScriptInstanceR& rt) const
+bool LuaFunctionMap::getLuaScriptInstance( const std::string& procname, LuaScriptInstanceR& rt) const
 {
 	std::string nam( procname);
 	std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
@@ -750,12 +830,12 @@ EXIT_FUNCTION1:
 	return 1;
 }
 
-void LuaPluginFunctionMap::defineLuaPluginFunction( const char* name, const LuaPluginFunction& f)
+void LuaPluginFunctionMap::defineLuaPluginFunction( const std::string& name, const LuaPluginFunction& f)
 {
 	defineObject( m_map, name, f);
 }
 
-bool LuaPluginFunctionMap::getLuaPluginFunction( const char* name, LuaPluginFunction& rt) const
+bool LuaPluginFunctionMap::getLuaPluginFunction( const std::string& name, LuaPluginFunction& rt) const
 {
 	return getObject( m_map, name, rt);
 }

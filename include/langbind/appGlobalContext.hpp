@@ -54,6 +54,14 @@ class GlobalContext
 public:
 	GlobalContext(){}
 	bool load( const ApplicationEnvironmentConfig& config);
+
+
+	///\brief Get the TransactionFunction and its input and output specification by its composite name (function:paramform:resultform)
+	///\param[in] name composite transaction function name
+	///\param[out] tf returned transaction function
+	///\param[out] par returned transaction function parameters form
+	///\param[out] res returned transaction function result form
+	bool getTransactionFunctionElements( const std::string& name, TransactionFunction& rt, DDLFormR& param, DDLFormR& result);
 };
 typedef CountedReference<GlobalContext> GlobalContextR;
 

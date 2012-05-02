@@ -170,11 +170,12 @@ public:
 	FilterMap( const FilterMap& o)
 		:m_map(o.m_map){}
 
-	void defineFilter( const char* name, const FilterFactoryR& f);
-	bool getFilter( const char* arg, Filter& rt);
+	void defineFilter( const std::string& name, const FilterFactoryR& f);
+	bool getFilter( const std::string& arg, Filter& rt);
 private:
 	std::map<std::string,FilterFactoryR> m_map;
 };
+
 
 ///\class DDLForm
 struct DDLForm
@@ -208,8 +209,8 @@ public:
 	DDLFormMap(){}
 	~DDLFormMap(){}
 
-	void defineForm( const char* name, const DDLForm& f);
-	bool getForm( const char* name, DDLFormR& rt) const;
+	void defineForm( const std::string& name, const DDLForm& f);
+	bool getForm( const std::string& name, DDLFormR& rt) const;
 private:
 	std::map<std::string,DDLForm> m_map;
 };
@@ -243,7 +244,7 @@ public:
 	~PluginFunction();
 
 	///\enum CallResult
-	///\brief Enumeration of call states of the plugin function call processing
+	///\brief Enumeration of call states of a function call processing
 	enum CallResult
 	{
 		Ok,		//< successful termination of call
@@ -268,11 +269,12 @@ public:
 	PluginFunctionMap(){}
 	~PluginFunctionMap(){}
 
-	void definePluginFunction( const char* name, const PluginFunction& f);
-	bool getPluginFunction( const char* name, PluginFunction& rt) const;
+	void definePluginFunction( const std::string& name, const PluginFunction& f);
+	bool getPluginFunction( const std::string& name, PluginFunction& rt) const;
 private:
 	std::map<std::string,PluginFunction> m_map;
 };
+
 
 ///\class TransactionFunction
 class TransactionFunction
@@ -296,16 +298,13 @@ public:
 	///\brief Destructor
 	~TransactionFunction(){}
 
-	const protocol::OutputFilterR& cmdwriter() const		{return m_cmdwriter;}
-	protocol::OutputFilterR& cmdwriter()				{return m_cmdwriter;}
+	///\brief Transaction function call
+	///\param[in] param function call arguments
+	///\param[in,out] result function call result
+	///\return true on success, false else
+	bool call( const DDLForm& param, DDLForm& result);
 
-	const protocol::InputFilterR& resultreader() const		{return m_resultreader;}
-	protocol::InputFilterR& resultreader()				{return m_resultreader;}
-
-	const protocol::CommandHandlerR& cmd() const			{return m_cmd;}
-	protocol::CommandHandlerR& cmd()				{return m_cmd;}
-
-	typedef protocol::CommandHandlerR (*CreateCommandHandler)( const char* name);
+	typedef protocol::CommandHandlerR (*CreateCommandHandler)( const std::string& name);
 	struct Definition
 	{
 		Definition(){}
@@ -318,11 +317,9 @@ public:
 		protocol::InputFilterR m_resultreader;			//< command result reader
 		CreateCommandHandler m_cmdconstructor;
 
-		TransactionFunction create( const char* name, const DDLFormR& ifm, const DDLFormR& ofm) const
+		TransactionFunction create( const std::string& name) const
 		{
 			TransactionFunction rt;
-			rt.m_inputform = ifm;
-			rt.m_outputform = ofm;
 			rt.m_cmdwriter.reset( m_cmdwriter->copy());
 			rt.m_resultreader.reset( m_resultreader->copy());
 			rt.m_cmd = m_cmdconstructor( name);
@@ -331,8 +328,6 @@ public:
 	};
 private:
 	friend class Defintion;
-	DDLFormR m_inputform;						//< reference of input form
-	DDLFormR m_outputform;						//< reference of output form
 	protocol::OutputFilterR m_cmdwriter;				//< command input writer
 	protocol::InputFilterR m_resultreader;				//< command result reader
 	protocol::CommandHandlerR m_cmd;				//< command execute handler
@@ -346,12 +341,13 @@ public:
 	TransactionFunctionMap(){}
 	~TransactionFunctionMap(){}
 
-	void defineTransactionFunction( const char* name, const TransactionFunction::Definition& f);
-	bool hasTransactionFunction( const char* name) const;
-	bool getTransactionFunction( const char* name, const DDLFormR& ifm, const DDLFormR& ofm, TransactionFunction& rt) const;
+	void defineTransactionFunction( const std::string& name, const TransactionFunction::Definition& f);
+	bool hasTransactionFunction( const std::string& name) const;
+	bool getTransactionFunction( const std::string& name, TransactionFunction& rt) const;
 private:
 	std::map<std::string,TransactionFunction::Definition> m_map;
 };
+
 
 ///\class DDLCompilerMap
 ///\brief Map of available DDL compilers seen from scripting language binding
@@ -361,8 +357,8 @@ public:
 	DDLCompilerMap();
 	~DDLCompilerMap(){}
 
-	void defineDDLCompiler( const char* name, const ddl::CompilerInterfaceR& ci);
-	bool getDDLCompiler( const char* name, ddl::CompilerInterfaceR& rt) const;
+	void defineDDLCompiler( const std::string& name, const ddl::CompilerInterfaceR& ci);
+	bool getDDLCompiler( const std::string& name, ddl::CompilerInterfaceR& rt) const;
 private:
 	std::map<std::string,ddl::CompilerInterfaceR> m_map;
 };
@@ -382,7 +378,7 @@ public:
 	};
 
 public:
-	LuaScript( const char* path_);
+	LuaScript( const std::string& path_);
 	LuaScript( const LuaScript& o)
 		:m_modules(o.m_modules),m_path(o.m_path),m_content(o.m_content){}
 	~LuaScript(){}
@@ -428,8 +424,8 @@ public:
 	LuaFunctionMap(){}
 	~LuaFunctionMap();
 
-	void defineLuaFunction( const char* procname, const LuaScript& script);
-	bool getLuaScriptInstance( const char* procname, LuaScriptInstanceR& rt) const;
+	void defineLuaFunction( const std::string& procname, const LuaScript& script);
+	bool getLuaScriptInstance( const std::string& procname, LuaScriptInstanceR& rt) const;
 private:
 	LuaFunctionMap( const LuaFunctionMap&){}
 
@@ -475,8 +471,8 @@ public:
 	LuaPluginFunctionMap(){}
 	~LuaPluginFunctionMap(){}
 
-	void defineLuaPluginFunction( const char* name, const LuaPluginFunction& f);
-	bool getLuaPluginFunction( const char* name, LuaPluginFunction& rt) const;
+	void defineLuaPluginFunction( const std::string& name, const LuaPluginFunction& f);
+	bool getLuaPluginFunction( const std::string& name, LuaPluginFunction& rt) const;
 private:
 	std::map<std::string,LuaPluginFunction> m_map;
 };

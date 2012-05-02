@@ -101,7 +101,7 @@ struct InputFilter
 	///\param [in] datasize of memory block passed as input
 	///\param [in] eoD true, if end of data has been detected
 	///\param [in] pos_ interator position of the input filter
-	void protocolInput( void* data, std::size_t datasize, bool eoD, std::size_t pos_=0)
+	void protocolInput( const void* data, std::size_t datasize, bool eoD, std::size_t pos_=0)
 	{
 		m_gotEoD = eoD;
 		m_ptr = data;
@@ -168,7 +168,7 @@ struct InputFilter
 	///\brief Get end of data flag passed to input filter. Tells if more network input has to be passed to the application processor
 	bool gotEoD() const				{return m_gotEoD;}
 	///\brief Get data at current iterator cursor position
-	void* ptr() const				{return(void*)((char*)m_ptr+m_pos);}
+	const void* ptr() const				{return(const void*)((const char*)m_ptr+m_pos);}
 	///\brief Find out if there is more data left to parse
 	///\return true, if yes
 	bool hasLeft() const				{return (m_pos < m_size);}
@@ -201,7 +201,7 @@ struct InputFilter
 	///\return the current iterator position as byte offset
 	std::size_t pos() const				{return m_pos;}
 private:
-	void* m_ptr;			//< pointer to network input buffer
+	const void* m_ptr;		//< pointer to network input buffer
 	std::size_t m_pos;		//< current iterator cursor position
 	std::size_t m_size;		//< size of network input buffer
 	bool m_gotEoD;			//< got end of data flag
