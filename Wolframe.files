@@ -32,11 +32,6 @@ makefiles/nmake/top.mk
 .Attic/base64.hpp
 .Attic/date.hpp
 .Attic/ErrorCode.hpp
-.Attic/filtermapError.hpp
-.Attic/iproc/langbind/directmapTransaction.cpp
-.Attic/iproc/langbind/directmapTransaction.hpp
-.Attic/iproc/langbind/luaTransaction.cpp
-.Attic/iproc/langbind/luaTransaction.hpp
 .Attic/loadModule/cross.cpp
 .Attic/loadModule/fromPatrick/moduleLoader_dlfcn.cpp
 .Attic/loadModule/fromPatrick/moduleLoader_Windows.cpp
@@ -47,7 +42,6 @@ makefiles/nmake/top.mk
 .Attic/loadModule/Makefile.W32
 .Attic/loadModule/moduleBase.hpp
 .Attic/luamapError.hpp
-.Attic/luaSerialize.hpp
 .Attic/manpage-template.xml
 .Attic/mtproc/implementation_c.c
 .Attic/mtproc/implementation_c.h
@@ -55,9 +49,6 @@ makefiles/nmake/top.mk
 .Attic/mtproc/propertyTree.cpp
 .Attic/mtproc/propertyTree.hpp
 .Attic/printers.c
-.Attic/serialize/appProcessorSystemCall.hpp
-.Attic/serialize/descriptionBase.hpp
-.Attic/serialize/traits.hpp
 .Attic/SSLtest.c
 .Attic/streamIterator.hpp
 .Attic/testLeak.cpp
@@ -90,11 +81,6 @@ clients/qt/HistoryLineEdit.hpp
 clients/qt/MainWindow.cpp
 clients/qt/MainWindow.hpp
 clients/qt/Makefile.W32
-clients/qt/moc_AbstractFormLoader.cpp
-clients/qt/moc_DebugTerminal.cpp
-clients/qt/moc_HistoryLineEdit.cpp
-clients/qt/moc_MainWindow.cpp
-clients/qt/moc_WolframeClient.cpp
 clients/qt/qtclient.cpp
 clients/qt/README
 clients/qt/TODOS
@@ -340,11 +326,10 @@ include/langbind/appGlobalContext.hpp
 include/langbind/appObjects.hpp
 include/langbind/directmapCommandHandler.hpp
 include/langbind/ioFilterCommandHandler.hpp
-include/langbind/luaBignum.hpp
 include/langbind/iostreamfilter.hpp
+include/langbind/luaBignum.hpp
 include/langbind/luaCommandHandler.hpp
 include/langbind/luaDebug.hpp
-include/langbind/luaScript.hpp
 include/langbind/luaTypeArithmetic.hpp
 include/langbind/luaTypeTraits.hpp
 include/logger/logBackend.hpp
@@ -1097,14 +1082,12 @@ src/langbind_appConfig.cpp
 src/langbind_appConfig_struct.cpp
 src/langbind_appGlobalContext.cpp
 src/langbind_appObjects.cpp
-src/langbind_directmapCommandEnvironment.cpp
 src/langbind_directmapCommandHandler.cpp
 src/langbind_ioFilterCommandHandler.cpp
+src/langbind_iostreamfilter.cpp
 src/langbind_luaBignum.cpp
-src/langbind_luaCommandEnvironment.cpp
 src/langbind_luaCommandHandler.cpp
 src/langbind_luaDebug.cpp
-src/langbind_luaScript.cpp
 src/libwolframe/byte2hex.c
 src/libwolframe/CRAM.cpp
 src/libwolframe/GNUmakefile
@@ -1246,6 +1229,7 @@ src/SSLcertificateInfo.cpp
 src/types_bignum.cpp
 src/version.cpp
 src/winMain.cpp
+src/wolfilter.cpp
 src/wolframe.conf
 src/wolframed.cpp
 src/wolframeHandler.cpp
@@ -1276,7 +1260,6 @@ tests/CRAMtest.cpp
 tests/expect/GNUmakefile
 tests/expect/Makefile.W32
 tests/expect/wolframe.conf
-tests/filter.cpp
 tests/GNUmakefile
 tests/libhpdf/GNUmakefile
 tests/libhpdf/Makefile.W32
@@ -1323,6 +1306,7 @@ tests/testNamedRetVal.cpp
 tests/testRand.cpp
 tests/testSHA2.cpp
 tests/testTimers.cpp
+tests/testWolfilter.cpp
 tests/threadLeakTest.cpp
 tests/versionTest.cpp
 tests/xmllite/Makefile.W32

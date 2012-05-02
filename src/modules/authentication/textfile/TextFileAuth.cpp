@@ -80,6 +80,9 @@ AuthenticatorSlice* TextFileAuthenticator::authSlice()
 	return new TextFileAuthSlice( *this );
 }
 
+
+static const int PWD_LINE_SIZE = 1024;
+
 User* TextFileAuthenticator::authenticate( const std::string& username,
 					   const std::string& password,
 					   bool caseSensitveUser ) const

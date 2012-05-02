@@ -69,9 +69,9 @@
 
 using namespace _Wolframe::AAAA;
 
-static const ssize_t PASSWORD_HASH_STRING_SIZE = 2 * PASSWORD_DIGEST_SIZE + 1;
-static const ssize_t CRAM_CHALLENGE_STRING_SIZE = 2 * CRAM_CHALLENGE_SIZE + 1;
-static const ssize_t CRAM_RESPONSE_STRING_SIZE = 2 * CRAM_RESPONSE_SIZE + 1;
+static const int PASSWORD_HASH_STRING_SIZE = 2 * PASSWORD_DIGEST_SIZE + 1;
+static const int CRAM_CHALLENGE_STRING_SIZE = 2 * CRAM_CHALLENGE_SIZE + 1;
+static const int CRAM_RESPONSE_STRING_SIZE = 2 * CRAM_RESPONSE_SIZE + 1;
 
 
 PasswordHash::PasswordHash( const std::string& password )
@@ -110,10 +110,10 @@ CRAMchallenge::CRAMchallenge( const std::string& randomDevice )
 		QueryPerformanceCounter( &li );
 	} while( 	( t0.dwHighDateTime == t1.dwHighDateTime ) &&
 			( t0.dwLowDateTime == t1.dwLowDateTime ) );
-			
+
 	t1.dwLowDateTime += li.QuadPart;
-	
-	sha256((const unsigned char *)&t1, sizeof( t1 ), m_challenge );	
+
+	sha256((const unsigned char *)&t1, sizeof( t1 ), m_challenge );
 #endif
 
 #ifndef _WIN32
@@ -148,7 +148,7 @@ CRAMchallenge::CRAMchallenge( const std::string& randomDevice )
 
 	if( !CryptReleaseContext( provider, 0 ) ) {
 		throw std::runtime_error( "Error closing cyrpto context" );
-	}	
+	}
 #endif
 }
 

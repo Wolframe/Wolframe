@@ -1,0 +1,12 @@
+# Wolframe password file
+#
+# This is only for exemplification purposes.
+# Format is:
+# <username>:<BCD password hash (SHA-224)>:<user info (name)>:.....(ignored)
+
+# has a 'g'
+admin:1841bac2def7cf53a978g0414aa8d5c3e7c4618899709c84fedcdcd6:Wolframe Administrator
+# 1 digit more
+goodusr:e58d04cb313e8b5d48301e002d25ee15f1c5cebbe18508fb7617016a6:Good User
+# 2 digits less
+badusr:ebd90de8523ab40112110ad885548a2194dd323ce40e2f95332660:Bad User

@@ -49,11 +49,11 @@
 namespace _Wolframe {
 namespace AAAA {
 
-static const ssize_t CRAM_BLOCK_SIZE = 1024 / 8;
-static const ssize_t CRAM_DIGEST_SIZE = 512 / 8;
-static const ssize_t PASSWORD_DIGEST_SIZE = 224 / 8;
-static const ssize_t CRAM_CHALLENGE_SIZE = CRAM_BLOCK_SIZE;
-static const ssize_t CRAM_RESPONSE_SIZE = CRAM_DIGEST_SIZE;
+static const int CRAM_BLOCK_SIZE = 1024 / 8;
+static const int CRAM_DIGEST_SIZE = 512 / 8;
+static const int PASSWORD_DIGEST_SIZE = 224 / 8;
+static const int CRAM_CHALLENGE_SIZE = CRAM_BLOCK_SIZE;
+static const int CRAM_RESPONSE_SIZE = CRAM_DIGEST_SIZE;
 
 class PasswordHash
 {
