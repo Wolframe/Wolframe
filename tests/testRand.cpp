@@ -1,6 +1,8 @@
 #include <iostream>
 #include <iomanip>
 
+#include "gtest/gtest.h"
+
 #ifndef _WIN32
 #include <unistd.h>
 #include <sys/stat.h>
@@ -10,42 +12,44 @@
 #include <windows.h>
 #endif
 
-int main()
+TEST( Random, Randomness )
 {
-#ifndef _WIN32
 	unsigned char buf[39];
-
+	
+#ifndef _WIN32
+	ssize_t bytes;
+	
 	int f = open( "/dev/urandom", O_RDONLY );
-
-	if( read( f, (void *)buf, 39 ) < 0 ) {
-		(void)close( f );
-		return 1;
-	}
-
-	for( int i = 0; i < 39; i++ ) { 
-		std::cout 	<< std::hex << std::setfill( '0' ) << std::setw( 2 )
-				<< static_cast<unsigned int>( buf[i] );
-	}
-	std::cout << std::endl;
-
 	if( f < 0 ) {
-		return 1;
+		FAIL( ) << "open /dev/urandom";
+	}
+
+	if( ( bytes = read( f, (void *)buf, 39 ) ) < 0 ) {
+		(void)close( f );
+		FAIL( ) << "read error";
+	}
+	
+	if( bytes != 39 ) {
+		FAIL( ) << "short read, got only " << bytes << " bytes";
 	}
 
 	(void)close( f );
 #else
 	HCRYPTPROV provider = 0;
 
-	if( !CryptAcquireContextW( &provider, 0, 0, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT | CRYPT_SILENT ) ) {
-		return 1;
+	if( !CryptAcquireContext( &provider, 0, MS_DEF_PROV, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT | CRYPT_SILENT ) ) {
+		FAIL( ) << "CryptGenRandom";
 	}
 
-	BYTE buf[39];
-
-	if( !CryptGenRandom( provider, 39, buf ) ) {
+	if( !CryptGenRandom( provider, 39, static_cast<BYTE *>( buf ) ) ) {
 		CryptReleaseContext( provider, 0 );
-		return 1;
+		FAIL( ) << "CryptGenRandom";
 	}
+
+	if( !CryptReleaseContext( provider, 0 ) ) {
+		FAIL( ) << "CryptReleaseContext";
+	}
+#endif
 
 	for( int i = 0; i < 39; i++ ) { 
 		std::cout 	<< std::hex << std::setfill( '0' ) << std::setw( 2 )
@@ -53,10 +57,11 @@ int main()
 	}
 	std::cout << std::endl;
 
-	if( !CryptReleaseContext( provider, 0 ) ) {
-		return 1;
-	}
-#endif
+	SUCCEED( );
+}
 
-	return 0;
+int main( int argc, char **argv )
+{
+	::testing::InitGoogleTest( &argc, argv );
+	return RUN_ALL_TESTS( );
 }
