@@ -198,6 +198,8 @@ struct DDLForm
 	~DDLForm(){}
 };
 
+typedef CountedReference<DDLForm> DDLFormR;
+
 ///\class DDLFormMap
 ///\brief Map of available forms seen from scripting language binding
 class DDLFormMap
@@ -207,7 +209,7 @@ public:
 	~DDLFormMap(){}
 
 	void defineForm( const char* name, const DDLForm& f);
-	bool getForm( const char* name, DDLForm& rt) const;
+	bool getForm( const char* name, DDLFormR& rt) const;
 private:
 	std::map<std::string,DDLForm> m_map;
 };
@@ -316,9 +318,11 @@ public:
 		protocol::InputFilterR m_resultreader;			//< command result reader
 		CreateCommandHandler m_cmdconstructor;
 
-		TransactionFunction create( const char* name) const
+		TransactionFunction create( const char* name, const DDLFormR& ifm, const DDLFormR& ofm) const
 		{
 			TransactionFunction rt;
+			rt.m_inputform = ifm;
+			rt.m_outputform = ofm;
 			rt.m_cmdwriter.reset( m_cmdwriter->copy());
 			rt.m_resultreader.reset( m_resultreader->copy());
 			rt.m_cmd = m_cmdconstructor( name);
@@ -327,6 +331,8 @@ public:
 	};
 private:
 	friend class Defintion;
+	DDLFormR m_inputform;						//< reference of input form
+	DDLFormR m_outputform;						//< reference of output form
 	protocol::OutputFilterR m_cmdwriter;				//< command input writer
 	protocol::InputFilterR m_resultreader;				//< command result reader
 	protocol::CommandHandlerR m_cmd;				//< command execute handler
@@ -341,7 +347,8 @@ public:
 	~TransactionFunctionMap(){}
 
 	void defineTransactionFunction( const char* name, const TransactionFunction::Definition& f);
-	bool getTransactionFunction( const char* name, TransactionFunction& rt) const;
+	bool hasTransactionFunction( const char* name) const;
+	bool getTransactionFunction( const char* name, const DDLFormR& ifm, const DDLFormR& ofm, TransactionFunction& rt) const;
 private:
 	std::map<std::string,TransactionFunction::Definition> m_map;
 };
