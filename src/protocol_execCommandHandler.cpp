@@ -279,7 +279,7 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 						}
 						else
 #endif
-						if (gctx->getTransactionFunction( procname, tf))
+						if (gctx->hasTransactionFunction( procname))
 						{
 							m_cmdhandler.reset( new langbind::DirectmapCommandHandler());
 						}

@@ -146,9 +146,10 @@ void DDLFormMap::defineForm( const char* name, const DDLForm& f)
 	defineObject( m_map, name, f);
 }
 
-bool DDLFormMap::getForm( const char* name, DDLForm& rt) const
+bool DDLFormMap::getForm( const char* name, DDLFormR& rt) const
 {
-	return getObject( m_map, name, rt);
+	rt = DDLFormR( new DDLForm());
+	return getObject( m_map, name, *rt.get());
 }
 
 PluginFunction::CallResult PluginFunction::call( protocol::InputFilter& ifl, protocol::OutputFilter& ofl)
@@ -273,11 +274,16 @@ void TransactionFunctionMap::defineTransactionFunction( const char* name, const 
 	defineObject( m_map, name, f);
 }
 
-bool TransactionFunctionMap::getTransactionFunction( const char* name, TransactionFunction& rt) const
+bool TransactionFunctionMap::hasTransactionFunction( const char* name) const
+{
+	return m_map.find( name) != m_map.end();
+}
+
+bool TransactionFunctionMap::getTransactionFunction( const char* name, const DDLFormR& ifm, const DDLFormR& ofm, TransactionFunction& rt) const
 {
 	TransactionFunction::Definition def;
 	if (!getObject( m_map, name, def)) return false;
-	rt = def.create( name);
+	rt = def.create( name, ifm, ofm);
 	return true;
 }
 

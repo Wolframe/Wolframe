@@ -53,8 +53,7 @@ int _Wolframe::langbind::iostreamfilter( const std::string& ifl, std::size_t ib,
 {
 	langbind::GlobalContext* gc = langbind::getGlobalContext();
 	PluginFunction pf;
-	DDLForm df;
-	TransactionFunction tf;
+	DDLFormR df;
 	CountedReference<protocol::CommandHandler> cmdhandler;
 
 #if WITH_LUA
@@ -71,7 +70,7 @@ int _Wolframe::langbind::iostreamfilter( const std::string& ifl, std::size_t ib,
 	else if (gc->getForm( proc.c_str(), df))
 	{
 	}
-	else if (gc->getTransactionFunction( proc.c_str(), tf))
+	else if (gc->hasTransactionFunction( proc.c_str()))
 	{
 	}
 	else
