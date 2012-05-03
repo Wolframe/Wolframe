@@ -47,7 +47,8 @@ namespace langbind {
 ///\param[in] ob
 ///\param[in,out] in
 ///\param[in,out] out
-int iostreamfilter( const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& in, std::ostream& out);
+///\return true on success, false else
+bool iostreamfilter( const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& in, std::ostream& out);
 
 ///\brief Maps input to output by a cmdbind::CommandHandler
 ///\param[in] ifl
@@ -57,7 +58,8 @@ int iostreamfilter( const std::string& ifl, std::size_t ib, const std::string& o
 ///\param[in] proc
 ///\param[in,out] in
 ///\param[in,out] out
-int iostreamfilter( const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, const std::string& proc, std::istream& in, std::ostream& out);
+///\return true on success, false else
+bool iostreamfilter( const std::string& proc, const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& in, std::ostream& out);
 
 }}//namespace
 #endif

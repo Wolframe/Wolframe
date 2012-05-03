@@ -58,7 +58,11 @@ LuaCommandHandler::CallResult LuaCommandHandler::call( const char*& errorCode)
 	{
 		try
 		{
-			m_interp = createLuaScriptInstance( m_name.c_str(), m_inputfilter, m_outputfilter);
+			m_interp = createLuaScriptInstance( m_name, m_inputfilter, m_outputfilter);
+			if (!m_interp.get())
+			{
+				LOG_ERROR << "Unknown lua script '" << m_name << "'";
+			}
 		}
 		catch (const std::exception& e)
 		{

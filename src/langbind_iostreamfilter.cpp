@@ -49,18 +49,159 @@
 using namespace _Wolframe;
 using namespace langbind;
 
-int _Wolframe::langbind::iostreamfilter( const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, const std::string& proc, std::istream& is, std::ostream& os)
+
+static langbind::Filter getFilter( langbind::GlobalContext* gc, const std::string& ifl, const std::string& ofl)
+{
+	langbind::Filter rt;
+	if (boost::iequals( ofl, ifl))
+	{
+		if (!gc->getFilter( ifl.c_str(), rt))
+		{
+			LOG_ERROR << "unknown filter '" << ifl << "'";
+			return rt;
+		}
+	}
+	else
+	{
+		langbind::Filter in;
+		langbind::Filter out;
+		if (!gc->getFilter( ifl.c_str(), in))
+		{
+			LOG_ERROR << "unknown input filter '" << ofl << "'";
+			return rt;
+		}
+		if (!gc->getFilter( ofl.c_str(), out))
+		{
+			LOG_ERROR << "unknown output filter '" << ofl << "'";
+			return rt;
+		}
+		rt = langbind::Filter( in.inputfilter(), out.outputfilter());
+	}
+	return rt;
+}
+
+static bool readInput( char* buf, unsigned int bufsize, std::istream& is, protocol::InputFilterR& iflt)
+{
+	if (iflt->gotEoD()) return false;
+	std::size_t pp = 0;
+	while (pp < bufsize && !is.eof())
+	{
+		is.read( buf+pp, sizeof(char));
+		++pp;
+	}
+	iflt->protocolInput( buf, pp, is.eof());
+	return true;
+}
+
+static void writeOutput( char* buf, unsigned int size, std::ostream& os, protocol::OutputFilterR& oflt)
+{
+	os.write( buf, oflt->pos());
+	oflt->init( buf, size);
+}
+
+static bool followInput( protocol::InputFilterR& iflt)
+{
+	protocol::InputFilter* follow = iflt->createFollow();
+	if (follow)
+	{
+		iflt.reset( follow);
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+static bool followOutput( protocol::OutputFilterR& oflt)
+{
+	protocol::OutputFilter* follow = oflt->createFollow();
+	if (follow)
+	{
+		oflt.reset( follow);
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+struct BufferStruct
+{
+	boost::shared_ptr<char> mem;
+	char* inbuf;
+	char* outbuf;
+	std::size_t insize;
+	std::size_t outsize;
+
+	BufferStruct( std::size_t ib, std::size_t ob)
+		:mem( (char*)std::calloc( ib+ob, 1), std::free),insize(ib),outsize(ob)
+	{
+		inbuf = mem.get();
+		outbuf = mem.get()+ib;
+	}
+};
+
+static bool processIO( BufferStruct& buf, langbind::Filter& flt, std::istream& is, std::ostream& os)
+{
+	const char* errmsg;
+	if (!flt.inputfilter().get() || !flt.outputfilter().get())
+	{
+		LOG_ERROR << "Error lost filter";
+		return false;
+	}
+	switch (flt.inputfilter()->state())
+	{
+		case protocol::InputFilter::Open:
+			break;
+
+		case protocol::InputFilter::EndOfMessage:
+			return readInput( buf.inbuf, buf.insize, is, flt.inputfilter());
+
+		case protocol::InputFilter::Error:
+			errmsg = flt.inputfilter()->getError();
+			LOG_ERROR << "Error in input filter: " << (errmsg?errmsg:"unknown");
+			return false;
+	}
+	switch (flt.outputfilter()->state())
+	{
+		case protocol::OutputFilter::Open:
+			if (followOutput( flt.outputfilter())) return true;
+			if (followInput( flt.inputfilter())) return true;
+
+		case protocol::OutputFilter::EndOfBuffer:
+			writeOutput( buf.outbuf, buf.outsize, os, flt.outputfilter());
+			return true;
+
+		case protocol::OutputFilter::Error:
+			errmsg = flt.outputfilter()->getError();
+			LOG_ERROR << "Error in output filter: " << (errmsg?errmsg:"unknown");
+			return false;
+	}
+	return true;
+}
+
+bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& is, std::ostream& os)
 {
 	langbind::GlobalContext* gc = langbind::getGlobalContext();
 	PluginFunction pf;
 	DDLFormR df;
-	CountedReference<cmdbind::CommandHandler> cmdhandler;
+	langbind::Filter flt = getFilter( gc, ifl, ofl);
+	BufferStruct buf( ib, ob);
+	flt.outputfilter().get()->init( buf.outbuf, buf.outsize);
 
 #if WITH_LUA
-	LuaScriptInstanceR sc;
-	if (gc->getLuaScriptInstance( proc.c_str(), sc))
+	LuaScriptInstanceR sc = createLuaScriptInstance( proc, flt.inputfilter(), flt.outputfilter());
+	if (sc.get())
 	{
-		cmdhandler.reset( new cmdbind::LuaCommandHandler());
+		lua_getglobal( sc->thread(), proc.c_str());
+		int rt = lua_resume( sc->thread(), NULL, 0);
+		while (rt == LUA_YIELD)
+		{
+			if (!processIO( buf, flt, is, os)) break;
+			rt = lua_resume( sc->thread(), NULL, 0);
+		}
 	}
 	else
 #endif
@@ -76,43 +217,21 @@ int _Wolframe::langbind::iostreamfilter( const std::string& ifl, std::size_t ib,
 	else
 	{
 		LOG_ERROR << "mapping command not found: '" << proc.c_str() << "'";
+		return false;
 	}
-	return _Wolframe::langbind::iostreamfilter( ifl, ib, ofl, ob, is, os);
+	return true;
 }
 
-int _Wolframe::langbind::iostreamfilter( const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& is, std::ostream& os)
+bool _Wolframe::langbind::iostreamfilter( const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& is, std::ostream& os)
 {
 	langbind::GlobalContext* gc = langbind::getGlobalContext();
 	langbind::FilterFactoryR tf( new langbind::TokenFilterFactory());
 	gc->defineFilter( "token", tf);
 
-	langbind::Filter flt;
-	if (boost::iequals( ofl, ifl))
-	{
-		if (!gc->getFilter( ifl.c_str(), flt))
-		{
-			LOG_ERROR << "unknown filter '" << ifl << "'";
-			return 1;
-		}
-	}
-	else
-	{
-		langbind::Filter in;
-		langbind::Filter out;
-		if (!gc->getFilter( ifl.c_str(), in))
-		{
-			LOG_ERROR << "unknown input filter '" << ofl << "'";
-			return 1;
-		}
-		if (!gc->getFilter( ofl.c_str(), out))
-		{
-			LOG_ERROR << "unknown output filter '" << ofl << "'";
-			return 2;
-		}
-		flt = langbind::Filter( in.inputfilter(), out.outputfilter());
-	}
-	char* inputBuffer = new char[ ib];
-	char* outputBuffer = new char[ ob];
+	langbind::Filter flt = getFilter( gc, ifl, ofl);
+	BufferStruct buf( ib, ob);
+	flt.outputfilter().get()->init( buf.outbuf, buf.outsize);
+
 	const void* element;
 	std::size_t elementsize;
 	protocol::InputFilter::ElementType elementType;
@@ -120,23 +239,12 @@ int _Wolframe::langbind::iostreamfilter( const std::string& ifl, std::size_t ib,
 
 	READ_INPUT:
 	{
-		if (flt.inputfilter().get()->gotEoD())
-		{
-			goto TERMINATE;
-		}
-		std::size_t pp = 0;
-		while (pp < ib && !is.eof())
-		{
-			is.read( inputBuffer+pp, sizeof(char));
-			++pp;
-		}
-		flt.inputfilter().get()->protocolInput( inputBuffer, pp, pp < ib);
+		if (!readInput( buf.inbuf, buf.insize, is, flt.inputfilter())) goto TERMINATE;
 		goto PROCESS_READ;
 	}
 	WRITE_OUTPUT:
 	{
-		os.write( outputBuffer, flt.outputfilter().get()->pos());
-		flt.outputfilter().get()->init( outputBuffer, ib);
+		writeOutput( buf.outbuf, buf.outsize, os, flt.outputfilter());
 		goto PROCESS_WRITE;
 	}
 	PROCESS_READ:
@@ -225,11 +333,9 @@ int _Wolframe::langbind::iostreamfilter( const std::string& ifl, std::size_t ib,
 	}
 	TERMINATE:
 	{
-		os.write( outputBuffer, flt.outputfilter().get()->pos());
-		delete [] inputBuffer;
-		delete [] outputBuffer;
+		os.write( buf.outbuf, flt.outputfilter().get()->pos());
 	}
-	return 0;
+	return true;
 }
 
 

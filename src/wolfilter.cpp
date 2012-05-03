@@ -99,7 +99,7 @@ int main( int argc, const char **argv )
 	}
 	if (procname)
 	{
-		return langbind::iostreamfilter( filternameIn.c_str(), inputBufferSize, filternameOut.c_str(), outputBufferSize, procname, std::cin, std::cout);
+		return langbind::iostreamfilter( procname, filternameIn.c_str(), inputBufferSize, filternameOut.c_str(), outputBufferSize, std::cin, std::cout);
 	}
 	else
 	{

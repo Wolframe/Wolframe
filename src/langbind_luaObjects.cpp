@@ -675,21 +675,23 @@ static const luaL_Reg output_methodtable[ 5] =
 	{0,0}
 };
 
-LuaScriptInstanceR _Wolframe::langbind::createLuaScriptInstance( const char* name, const Input& input_, const Output& output_)
+LuaScriptInstanceR _Wolframe::langbind::createLuaScriptInstance( const std::string& name, const Input& input_, const Output& output_)
 {
 	LuaScriptInstanceR rt;
 	GlobalContext* gc = getGlobalContext();
-	if (!gc->getLuaScriptInstance( name, rt)) throw std::runtime_error( "invalid command name");
-	lua_State* ls = rt->ls();
-	LuaObject<Input>::createGlobal( ls, "input", input_, input_methodtable);
-	LuaObject<Output>::createGlobal( ls, "output", output_, output_methodtable);
-	LuaObject<Filter>::createMetatable( ls, &function__LuaObject__index<Filter>, &function__LuaObject__newindex<Filter>, 0);
-	LuaObject<InputFilterClosure>::createMetatable( ls, 0, 0, 0);
-	setGlobalSingletonPointer<GlobalContext>( ls, getGlobalContext());
-	lua_pushcfunction( ls, &function_yield);
-	lua_setglobal( ls, "yield");
-	lua_pushcfunction( ls, &function_filter);
-	lua_setglobal( ls, "filter");
+	if (gc->getLuaScriptInstance( name, rt))
+	{
+		lua_State* ls = rt->ls();
+		LuaObject<Input>::createGlobal( ls, "input", input_, input_methodtable);
+		LuaObject<Output>::createGlobal( ls, "output", output_, output_methodtable);
+		LuaObject<Filter>::createMetatable( ls, &function__LuaObject__index<Filter>, &function__LuaObject__newindex<Filter>, 0);
+		LuaObject<InputFilterClosure>::createMetatable( ls, 0, 0, 0);
+		setGlobalSingletonPointer<GlobalContext>( ls, getGlobalContext());
+		lua_pushcfunction( ls, &function_yield);
+		lua_setglobal( ls, "yield");
+		lua_pushcfunction( ls, &function_filter);
+		lua_setglobal( ls, "filter");
+	}
 	return rt;
 }
 

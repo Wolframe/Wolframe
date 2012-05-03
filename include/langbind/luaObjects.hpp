@@ -51,7 +51,7 @@ namespace langbind {
 ///\param[in] input_ input definition for the input to process
 ///\param[in] output_ output definition for the output to print
 ///\return instance of  Lua script with all basic system objects defined
-LuaScriptInstanceR createLuaScriptInstance( const char* name, const Input& input_, const Output& output_);
+LuaScriptInstanceR createLuaScriptInstance( const std::string& name, const Input& input_, const Output& output_);
 
 }}//namespace
 #endif
