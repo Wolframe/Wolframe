@@ -39,6 +39,14 @@ local_test:
 	@-echo @echo off > test.bat
 	@-echo copy "$(LIBXML2_DIR)\lib\libxml2.dll" . >> test.bat
 	@-echo copy "$(WIN_ICONV_DIR)\iconv.dll" . >> test.bat
+	@-echo UTF8
 	@-echo testlibxml2 test-UTF8.xml >> test.bat
+	@-echo UCS2BE
 	@-echo testlibxml2 test-UCS-2BE.xml >> test.bat
+	@-echo UCS2LE
+	@-echo testlibxml2 test-UCS-2LE.xml >> test.bat
+	@-echo UTF16BE
+	@-echo testlibxml2 test-UTF-16BE.xml >> test.bat
+	@-echo UTF16LE
+	@-echo testlibxml2 test-UTF-16LE.xml >> test.bat
 	@-test.bat
