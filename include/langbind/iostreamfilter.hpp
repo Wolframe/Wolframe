@@ -49,7 +49,7 @@ namespace langbind {
 ///\param[in,out] out
 int iostreamfilter( const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& in, std::ostream& out);
 
-///\brief Maps input to output by a protocol::commandHandler
+///\brief Maps input to output by a cmdbind::CommandHandler
 ///\param[in] ifl
 ///\param[in] ib
 ///\param[in] ofl

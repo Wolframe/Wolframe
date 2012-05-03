@@ -33,7 +33,7 @@
 ///\file tprocHandler.cpp
 
 #include "tprocHandler.hpp"
-#include "protocol/execCommandHandler.hpp"
+#include "cmdbind/execCommandHandler.hpp"
 #include "logger-v1.hpp"
 #include <stdexcept>
 
@@ -47,7 +47,7 @@ enum State
 	State3
 };
 
-struct STM :public protocol::LineCommandHandlerSTMTemplate<CommandHandler>
+struct STM :public cmdbind::LineCommandHandlerSTMTemplate<CommandHandler>
 {
 	STM()
 	{
@@ -165,9 +165,9 @@ int CommandHandler::doCmd2B( int argc, const char** argv, std::ostream& out)
 	}
 }
 
-int CommandHandler::endRun( protocol::CommandHandler* ch, std::ostream& out)
+int CommandHandler::endRun( cmdbind::CommandHandler* ch, std::ostream& out)
 {
-	protocol::ExecCommandHandler* chnd = dynamic_cast<protocol::ExecCommandHandler*>( ch);
+	cmdbind::ExecCommandHandler* chnd = dynamic_cast<cmdbind::ExecCommandHandler*>( ch);
 	int argc;
 	const char** argv;
 	const char* lastcmd = chnd->getCommand( argc, argv);
@@ -207,7 +207,7 @@ int CommandHandler::doCmd3A( int argc, const char** argv, std::ostream& out)
 		out << endl();
 		try
 		{
-			CommandHandler* ch = (CommandHandler*)new protocol::ExecCommandHandler( cmds(), m_config->commands());
+			CommandHandler* ch = (CommandHandler*)new cmdbind::ExecCommandHandler( cmds(), m_config->commands());
 			delegateProcessing<&CommandHandler::endRun>( ch);
 		}
 		catch (const std::exception& e)
@@ -241,7 +241,7 @@ int CommandHandler::doHello( int argc, const char**, std::ostream& out)
 	}
 	try
 	{
-		CommandHandler* ch = (CommandHandler*)new protocol::ExecCommandHandler( cmds(), m_config->commands());
+		CommandHandler* ch = (CommandHandler*)new cmdbind::ExecCommandHandler( cmds(), m_config->commands());
 			delegateProcessing<&CommandHandler::endRun>( ch);
 	}
 	catch (const std::exception& e)
@@ -274,15 +274,15 @@ const net::NetworkOperation Connection::nextOperation()
 	}
 	switch(m_cmdhandler.nextOperation())
 	{
-		case protocol::CommandHandler::READ:
+		case cmdbind::CommandHandler::READ:
 			m_cmdhandler.getInputBlock( inpp, inppsize);
 			return net::ReadData( inpp, inppsize);
 
-		case protocol::CommandHandler::WRITE:
+		case cmdbind::CommandHandler::WRITE:
 			m_cmdhandler.getOutput( outpp, outppsize);
 			return net::SendData( outpp, outppsize);
 
-		case protocol::CommandHandler::CLOSED:
+		case cmdbind::CommandHandler::CLOSED:
 			return net::CloseConnection();
 	}
 	return net::CloseConnection();

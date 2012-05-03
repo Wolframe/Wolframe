@@ -30,14 +30,15 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file langbind_ioFilterCommandHandler.cpp
+///\file cmdbind_ioFilterCommandHandler.cpp
 
-#include "langbind/ioFilterCommandHandler.hpp"
+#include "cmdbind/ioFilterCommandHandler.hpp"
 #include "logger-v1.hpp"
 #include "filter/char_filter.hpp"
 #include "filter.hpp"
 
 using namespace _Wolframe;
+using namespace _Wolframe::cmdbind;
 using namespace _Wolframe::protocol;
 
 IOFilterCommandHandler::IOFilterCommandHandler()

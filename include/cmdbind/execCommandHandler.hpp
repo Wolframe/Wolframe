@@ -30,13 +30,13 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file protocol/execCommandHandler.hpp
+///\file cmdbind/execCommandHandler.hpp
 ///\brief command handler for the selection and execution of commands defined as a list of command handlers.
 //        Includes interpreting of commands that belong to the caller and return control to the caller, if any of them is issued.
 //        Includes also a 'Capa' command for showing the list of available commands
-#ifndef _Wolframe_PROTOCOL_EXEC_COMMAND_HANDLER_HPP_INCLUDED
-#define _Wolframe_PROTOCOL_EXEC_COMMAND_HANDLER_HPP_INCLUDED
-#include "protocol/commandHandler.hpp"
+#ifndef _Wolframe_cmdbind_EXEC_COMMAND_HANDLER_HPP_INCLUDED
+#define _Wolframe_cmdbind_EXEC_COMMAND_HANDLER_HPP_INCLUDED
+#include "cmdbind/commandHandler.hpp"
 #include "protocol/ioblocks.hpp"
 #include "protocol/parser.hpp"
 #include "connectionHandler.hpp"
@@ -46,7 +46,7 @@
 #include <string>
 
 namespace _Wolframe {
-namespace protocol {
+namespace cmdbind {
 
 class ExecCommandHandler :public CommandHandler
 {
@@ -125,16 +125,16 @@ private:
 	}
 	State m_state;						//< processing state of the command handler
 
-	Buffer m_buffer;					//< context (sub state) for partly parsed input lines
-	CArgBuffer<Buffer> m_argBuffer;				//< buffer for the arguments
+	protocol::Buffer m_buffer;				//< context (sub state) for partly parsed input lines
+	protocol::CArgBuffer<protocol::Buffer> m_argBuffer;	//< buffer for the arguments
 
-	InputBlock m_input;					//< buffer for network read messages
-	OutputBlock m_output;					//< buffer for network write messages
+	protocol::InputBlock m_input;				//< buffer for network read messages
+	protocol::OutputBlock m_output;				//< buffer for network write messages
 
-	InputBlock::iterator m_itr;				//< iterator to scan protocol input
-	InputBlock::iterator m_end;				//< iterator pointing to end of message buffer
+	protocol::InputBlock::iterator m_itr;			//< iterator to scan protocol input
+	protocol::InputBlock::iterator m_end;			//< iterator pointing to end of message buffer
 
-	CmdParser<Buffer> m_parser;				//< context dependent command parser definition
+	protocol::CmdParser<protocol::Buffer> m_parser;		//< context dependent command parser definition
 	int m_cmdidx;						//< command parsed
 	int m_nofParentCmds;					//< number of commands passed by the owner to get control back
 	std::vector<std::string> m_cmds;			//< list of commands available

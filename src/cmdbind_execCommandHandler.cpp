@@ -30,16 +30,17 @@
  Project Wolframe.
 
 ************************************************************************/
-#include "protocol/execCommandHandler.hpp"
+#include "cmdbind/execCommandHandler.hpp"
 #include "protocol/ioblocks.hpp"
 #if WITH_LUA
-#include "langbind/luaCommandHandler.hpp"
+#include "cmdbind/luaCommandHandler.hpp"
 #endif
-#include "langbind/directmapCommandHandler.hpp"
+#include "cmdbind/directmapCommandHandler.hpp"
 #include "langbind/appGlobalContext.hpp"
 #include "logger-v1.hpp"
 
 using namespace _Wolframe;
+using namespace _Wolframe::cmdbind;
 using namespace _Wolframe::protocol;
 
 ExecCommandHandler::ExecCommandHandler( const std::vector<std::string>& rcmds_, const std::vector<Command>& cmds_)
@@ -275,13 +276,13 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 						langbind::LuaScriptInstanceR li;
 						if (gctx->getLuaScriptInstance( procname, li))
 						{
-							m_cmdhandler.reset( new langbind::LuaCommandHandler());
+							m_cmdhandler.reset( new cmdbind::LuaCommandHandler());
 						}
 						else
 #endif
 						if (gctx->hasTransactionFunction( procname))
 						{
-							m_cmdhandler.reset( new langbind::DirectmapCommandHandler());
+							m_cmdhandler.reset( new cmdbind::DirectmapCommandHandler());
 						}
 						m_cmdhandler->passParameters( procname, m_argBuffer.argc(), m_argBuffer.argv());
 						m_state = Processing;

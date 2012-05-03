@@ -29,19 +29,19 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file directmapCommandHandler.hpp
+///\file cmdbind/directmapCommandHandler.hpp
 ///\brief interface to the directmap command handler
-#ifndef _Wolframe_langbind_DIRECTMAP_COMMAND_HANDLER_HPP_INCLUDED
-#define _Wolframe_langbind_DIRECTMAP_COMMAND_HANDLER_HPP_INCLUDED
-#include "appObjects.hpp"
+#ifndef _Wolframe_cmdbind_DIRECTMAP_COMMAND_HANDLER_HPP_INCLUDED
+#define _Wolframe_cmdbind_DIRECTMAP_COMMAND_HANDLER_HPP_INCLUDED
+#include "langbind/appObjects.hpp"
 #include "ioFilterCommandHandler.hpp"
 
 namespace _Wolframe {
-namespace langbind {
+namespace cmdbind {
 
 ///\class DirectmapCommandHandler
 ///\brief command handler instance for processing a call as Directmap (mapping with forms and a transaction function)
-class DirectmapCommandHandler :public protocol::IOFilterCommandHandler
+class DirectmapCommandHandler :public IOFilterCommandHandler
 {
 public:
 	///\class Context
@@ -55,11 +55,11 @@ public:
 
 	///\brief Execute the Directmap
 	///\param[out] err error code in case of error
-	///\return CallResult status (See protocol::IOFilterCommandHandler::CallResult)
+	///\return CallResult status (See IOFilterCommandHandler::CallResult)
 	virtual CallResult call( const char*& err);
 
 private:
-	Context* m_context;				///< execution context of the command handler
+	Context* m_context;		//< execution context of the command handler
 };
 
 }}//namespace

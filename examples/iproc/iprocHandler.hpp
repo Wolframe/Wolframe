@@ -30,22 +30,21 @@
  Project Wolframe.
 
 ************************************************************************/
-///
 ///\file iprocHandler.hpp
-///\brief example connection handler as processor executing lua scripts
-///
+///\brief Example connection handler with simple protocol
 
 #ifndef _Wolframe_iproc_HANDLER_HPP_INCLUDED
 #define _Wolframe_iproc_HANDLER_HPP_INCLUDED
 #include "connectionHandler.hpp"
 #include "handlerConfig.hpp"
-#include "protocol/commandHandler.hpp"
+#include "cmdbind/commandHandler.hpp"
 #include "protocol.hpp"
 
 namespace _Wolframe {
 namespace iproc {
 
-/// The connection handler
+//\class Connection
+//\brief The connection handler
 class Connection : public net::ConnectionHandler
 {
 public:
@@ -124,7 +123,7 @@ private:
 	const Configuration* m_config;					//< configuration
 	protocol::CmdParser<protocol::Buffer> m_parser;			//< context dependent command parser definition
 	int m_cmdidx;							//< command parsed
-	CountedReference<protocol::CommandHandler> m_cmdhandler;	//< currently executed command
+	CountedReference<cmdbind::CommandHandler> m_cmdhandler;	//< currently executed command
 
 	///\brief Helper function to send a line message with CRLF termination as C string
 	///\param [in] str head of the line to write

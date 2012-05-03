@@ -271,7 +271,7 @@ bool PluginFunctionMap::getPluginFunction( const std::string& name, PluginFuncti
 
 bool TransactionFunction::call( const DDLForm& param, DDLForm& result)
 {
-	protocol::CommandHandler* cmd = m_cmd.get();
+	cmdbind::CommandHandler* cmd = m_cmd.get();
 	protocol::OutputFilter* wr = m_cmdwriter.get();
 	protocol::InputFilter* rd = m_resultreader.get();
 	if (!cmd || !wr || !rd)
@@ -297,13 +297,13 @@ bool TransactionFunction::call( const DDLForm& param, DDLForm& result)
 	cmd->setOutputBuffer( outbuf, outbufsize, 0);
 
 	std::string resultstr;
-	protocol::CommandHandler::Operation op = protocol::CommandHandler::READ;
+	cmdbind::CommandHandler::Operation op = cmdbind::CommandHandler::READ;
 
 	for(;;)
 	{
 		switch (op)
 		{
-			case protocol::CommandHandler::READ:
+			case cmdbind::CommandHandler::READ:
 			{
 				std::size_t rr = pctx.content().size()-ii;
 				if (rr > inbufsize) rr = inbufsize;
@@ -312,7 +312,7 @@ bool TransactionFunction::call( const DDLForm& param, DDLForm& result)
 				op = cmd->nextOperation();
 				continue;
 			}
-			case protocol::CommandHandler::WRITE:
+			case cmdbind::CommandHandler::WRITE:
 			{
 				const void* oo;
 				std::size_t nn;
@@ -321,7 +321,7 @@ bool TransactionFunction::call( const DDLForm& param, DDLForm& result)
 				op = cmd->nextOperation();
 				continue;
 			}
-			case protocol::CommandHandler::CLOSED:
+			case cmdbind::CommandHandler::CLOSED:
 			{
 				serialize::Context rctx;
 				rd->protocolInput( resultstr.c_str(), resultstr.size(), true);

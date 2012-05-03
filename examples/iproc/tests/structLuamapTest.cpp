@@ -37,7 +37,7 @@ Project Wolframe.
 #include "iprocHandlerConfig.hpp"
 #include "langbind/appObjects.hpp"
 #include "langbind/appGlobalContext.hpp"
-#include "langbind/luaCommandHandler.hpp"
+#include "cmdbind/luaCommandHandler.hpp"
 #include "logger-v1.hpp"
 #include "tests/testUtils.hpp"
 extern "C"
@@ -57,6 +57,7 @@ extern "C"
 using namespace _Wolframe;
 using namespace _Wolframe::iproc;
 using namespace _Wolframe::langbind;
+using namespace _Wolframe::cmdbind;
 using namespace _Wolframe::serialize;
 
 struct Plant

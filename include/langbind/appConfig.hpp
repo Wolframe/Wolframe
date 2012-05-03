@@ -36,11 +36,11 @@
 #define _Wolframe_APPLICATION_ENVIRONMENT_CONFIGURATION_HPP_INCLUDED
 #include <vector>
 #include <string>
-#include "protocol/commandHandler.hpp"
-#include "config/descriptionBase.hpp"
-#include "ddl/compilerInterface.hpp"
-#include "config/configurationBase.hpp"
+#include "cmdbind/commandHandler.hpp"
 #include "langbind/appConfig_struct.hpp"
+#include "config/descriptionBase.hpp"
+#include "config/configurationBase.hpp"
+#include "ddl/compilerInterface.hpp"
 
 namespace _Wolframe {
 namespace langbind {
@@ -57,7 +57,7 @@ public:
 	void print( std::ostream& os, std::size_t indent) const;
 	virtual void setCanonicalPathes( const std::string& referencePath );
 
-	const EnvironmentConfigStruct& data() const					{return m_config;}
+	const EnvironmentConfigStruct& data() const				{return m_config;}
 private:
 	EnvironmentConfigStruct m_config;
 };

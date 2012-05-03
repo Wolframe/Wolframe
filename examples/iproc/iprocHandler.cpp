@@ -35,9 +35,9 @@
 
 #include "iprocHandler.hpp"
 #if WITH_LUA
-#include "langbind/luaCommandHandler.hpp"
+#include "cmdbind/luaCommandHandler.hpp"
 #endif
-#include "langbind/directmapCommandHandler.hpp"
+#include "cmdbind/directmapCommandHandler.hpp"
 #include "langbind/appGlobalContext.hpp"
 #include "logger-v1.hpp"
 #include <stdexcept>
@@ -256,13 +256,13 @@ const net::NetworkOperation Connection::nextOperation()
 							langbind::LuaScriptInstanceR li;
 							if (gctx->getLuaScriptInstance( procname, li))
 							{
-								m_cmdhandler.reset( new langbind::LuaCommandHandler());
+								m_cmdhandler.reset( new cmdbind::LuaCommandHandler());
 							}
 							else
 #endif
 							if (gctx->hasTransactionFunction( procname))
 							{
-								m_cmdhandler.reset( new langbind::DirectmapCommandHandler());
+								m_cmdhandler.reset( new cmdbind::DirectmapCommandHandler());
 							}
 							m_cmdhandler->passParameters( procname, m_argBuffer.argc(), m_argBuffer.argv());
 							m_state = Processing;
@@ -290,14 +290,14 @@ const net::NetworkOperation Connection::nextOperation()
 				{
 					switch (m_cmdhandler->nextOperation())
 					{
-						case protocol::CommandHandler::READ:
+						case cmdbind::CommandHandler::READ:
 							return readDataOp();
 						break;
-						case protocol::CommandHandler::WRITE:
+						case cmdbind::CommandHandler::WRITE:
 							m_cmdhandler->getOutput( content, contentsize);
 							return net::SendData( content, contentsize);
 						break;
-						case protocol::CommandHandler::CLOSED:
+						case cmdbind::CommandHandler::CLOSED:
 							m_cmdhandler->getDataLeft( content, contentsize);
 							pos = (const char*)content - m_input.charptr();
 							m_input.setPos( pos + contentsize);

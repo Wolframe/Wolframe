@@ -36,18 +36,18 @@
 #ifndef _Wolframe_tproc_HANDLER_HPP_INCLUDED
 #define _Wolframe_tproc_HANDLER_HPP_INCLUDED
 #include "connectionHandler.hpp"
-#include "protocol/lineCommandHandler.hpp"
+#include "cmdbind/lineCommandHandler.hpp"
 #include "handlerConfig.hpp"
 #include "protocol.hpp"
 
 namespace _Wolframe {
 namespace tproc {
 
-class CommandHandler :public protocol::LineCommandHandlerTemplate<CommandHandler>
+class CommandHandler :public cmdbind::LineCommandHandlerTemplate<CommandHandler>
 {
 public:
-	CommandHandler( const protocol::LineCommandHandlerSTM* stm, const Configuration* cfg)
-		:protocol::LineCommandHandlerTemplate<CommandHandler>( stm),m_config(cfg){}
+	CommandHandler( const cmdbind::LineCommandHandlerSTM* stm, const Configuration* cfg)
+		:cmdbind::LineCommandHandlerTemplate<CommandHandler>( stm),m_config(cfg){}
 
 	//methods called by the protocol and implemented here
 	int doHello( int argc, const char** argv, std::ostream& out);
@@ -57,7 +57,7 @@ public:
 	int doCmd2A( int argc, const char** argv, std::ostream& out);
 	int doCmd2B( int argc, const char** argv, std::ostream& out);
 	int doCmd3A( int argc, const char** argv, std::ostream& out);
-	int endRun( protocol::CommandHandler* ch, std::ostream& out);
+	int endRun( cmdbind::CommandHandler* ch, std::ostream& out);
 	int doRun( int argc, const char** argv, std::ostream& out);
 	int doCmdQUIT( int argc, const char** argv, std::ostream& out);
 private:

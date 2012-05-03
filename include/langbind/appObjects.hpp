@@ -37,7 +37,7 @@ Project Wolframe.
 #include "ddl/structType.hpp"
 #include "ddl/compilerInterface.hpp"
 #include "serialize/struct/filtermapBase.hpp"
-#include "protocol/commandHandler.hpp"
+#include "cmdbind/commandHandler.hpp"
 #include <stack>
 #include <string>
 #include <algorithm>
@@ -292,7 +292,7 @@ public:
 	///\param[in] w command input writer
 	///\param[in] r command output reader
 	///\param[in] c command execute handler
-	TransactionFunction( const protocol::OutputFilterR& w, const protocol::InputFilterR& r, const protocol::CommandHandlerR& c)
+	TransactionFunction( const protocol::OutputFilterR& w, const protocol::InputFilterR& r, const cmdbind::CommandHandlerR& c)
 		:m_cmdwriter(w),m_resultreader(r),m_cmd(c){}
 
 	///\brief Destructor
@@ -304,7 +304,7 @@ public:
 	///\return true on success, false else
 	bool call( const DDLForm& param, DDLForm& result);
 
-	typedef protocol::CommandHandlerR (*CreateCommandHandler)( const std::string& name);
+	typedef cmdbind::CommandHandlerR (*CreateCommandHandler)( const std::string& name);
 	struct Definition
 	{
 		Definition(){}
@@ -330,7 +330,7 @@ private:
 	friend class Defintion;
 	protocol::OutputFilterR m_cmdwriter;				//< command input writer
 	protocol::InputFilterR m_resultreader;				//< command result reader
-	protocol::CommandHandlerR m_cmd;				//< command execute handler
+	cmdbind::CommandHandlerR m_cmd;				//< command execute handler
 };
 
 ///\class TransactionFunctionMap

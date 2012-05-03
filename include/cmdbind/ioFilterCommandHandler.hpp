@@ -30,16 +30,16 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file langbind/ioFilterCommandHandler.hpp
-#ifndef _Wolframe_IOFILTER_COMMAND_HANDLER_HPP_INCLUDED
-#define _Wolframe_IOFILTER_COMMAND_HANDLER_HPP_INCLUDED
+///\file cmdbind/ioFilterCommandHandler.hpp
+#ifndef _Wolframe_cmdbind_IOFILTER_COMMAND_HANDLER_HPP_INCLUDED
+#define _Wolframe_cmdbind_IOFILTER_COMMAND_HANDLER_HPP_INCLUDED
 #include "protocol.hpp"
 #include "protocol/ioblocks.hpp"
-#include "protocol/commandHandler.hpp"
+#include "cmdbind/commandHandler.hpp"
 #include "connectionHandler.hpp"
 
 namespace _Wolframe {
-namespace protocol {
+namespace cmdbind {
 
 ///\class IOFilterCommandHandler
 ///\brief Command handler processing filter input/output
@@ -115,16 +115,16 @@ private:
 		return ar[ (int)st];
 	}
 
-	State m_state;				//< processing state machine state
-	const void* m_writedata;		//< bytes to write next (WRITE)
-	std::size_t m_writedatasize;		//< number of bytes to write next (WRITE)
+	State m_state;					//< processing state machine state
+	const void* m_writedata;			//< bytes to write next (WRITE)
+	std::size_t m_writedatasize;			//< number of bytes to write next (WRITE)
 
-	InputBlock m_input;			//< input buffer
-	InputBlock::iterator m_eoD;		//< input end of data marker
-	std::size_t m_itrpos;			//< read start position in buffer for the command handler
+	protocol::InputBlock m_input;			//< input buffer
+	protocol::InputBlock::iterator m_eoD;		//< input end of data marker
+	std::size_t m_itrpos;				//< read start position in buffer for the command handler
 protected:
-	InputFilterR m_inputfilter;		//< network input interface for the interpreter
-	OutputFilterR m_outputfilter;		//< network output interface for the interpreter
+	protocol::InputFilterR m_inputfilter;		//< network input interface for the interpreter
+	protocol::OutputFilterR m_outputfilter;		//< network output interface for the interpreter
 };
 }}
 #endif

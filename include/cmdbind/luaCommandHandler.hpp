@@ -29,19 +29,19 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file luaCommandHandler.hpp
+///\file cmdbind/luaCommandHandler.hpp
 ///\brief interface to the lua command handler
-#ifndef _Wolframe_langbind_LUA_COMMAND_HANDLER_HPP_INCLUDED
-#define _Wolframe_langbind_LUA_COMMAND_HANDLER_HPP_INCLUDED
-#include "langbind/appObjects.hpp"
-#include "langbind/ioFilterCommandHandler.hpp"
+#ifndef _Wolframe_cmdbind_LUA_COMMAND_HANDLER_HPP_INCLUDED
+#define _Wolframe_cmdbind_LUA_COMMAND_HANDLER_HPP_INCLUDED
+#include "cmdbind/ioFilterCommandHandler.hpp"
+#include "langbind/luaObjects.hpp"
 
 namespace _Wolframe {
-namespace langbind {
+namespace cmdbind {
 
 ///\class LuaCommandHandler
 ///\brief command handler instance for processing a call as Lua script
-class LuaCommandHandler :public protocol::IOFilterCommandHandler
+class LuaCommandHandler :public IOFilterCommandHandler
 {
 public:
 	///\class Context
@@ -55,11 +55,11 @@ public:
 
 	///\brief Execute the Lua script
 	///\param[out] err error code in case of error
-	///\return CallResult status (See protocol::IOFilterCommandHandler::CallResult)
+	///\return CallResult status (See IOFilterCommandHandler::CallResult)
 	virtual CallResult call( const char*& err);
 
 private:
-	LuaScriptInstanceR m_interp;
+	langbind::LuaScriptInstanceR m_interp;
 };
 
 }}//namespace

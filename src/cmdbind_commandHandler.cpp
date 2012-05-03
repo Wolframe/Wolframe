@@ -30,11 +30,11 @@
  Project Wolframe.
 
 ************************************************************************/
-#include "protocol/commandHandler.hpp"
+#include "cmdbind/commandHandler.hpp"
 #include "logger-v1.hpp"
 
 using namespace _Wolframe;
-using namespace _Wolframe::protocol;
+using namespace _Wolframe::cmdbind;
 
 void CommandHandler::passParameters( const std::string& nam, int argc, const char** argv)
 {

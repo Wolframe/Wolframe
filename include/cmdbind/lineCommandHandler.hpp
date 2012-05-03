@@ -30,11 +30,11 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file protocol/commandHandler.hpp
+///\file cmdbind/commandHandler.hpp
 ///\brief interface to a generic command handler for a networkHandler command with delegation of network I/O until the command context is left
-#ifndef _Wolframe_PROTOCOL_LINE_COMMAND_HANDLER_HPP_INCLUDED
-#define _Wolframe_PROTOCOL_LINE_COMMAND_HANDLER_HPP_INCLUDED
-#include "protocol/commandHandler.hpp"
+#ifndef _Wolframe_cmdbind_LINE_COMMAND_HANDLER_HPP_INCLUDED
+#define _Wolframe_cmdbind_LINE_COMMAND_HANDLER_HPP_INCLUDED
+#include "cmdbind/commandHandler.hpp"
 #include "protocol/ioblocks.hpp"
 #include "protocol/parser.hpp"
 #include "connectionHandler.hpp"
@@ -45,7 +45,7 @@
 #include <iostream>
 
 namespace _Wolframe {
-namespace protocol {
+namespace cmdbind {
 
 ///\brief State machine definition of a LineCommandHandler
 class LineCommandHandlerSTM
@@ -154,24 +154,24 @@ protected:
 	int runCommand( const char* cmd_, int argc_, const char** argv_, std::ostream& out);
 
 private:
-	InputBlock m_input;					///< buffer for network read messages
-	OutputBlock m_output;					///< buffer for network write messages
+	protocol::InputBlock m_input;				//< buffer for network read messages
+	protocol::OutputBlock m_output;				//< buffer for network write messages
 
-	InputBlock::iterator m_itr;				///< iterator to scan protocol input
-	InputBlock::iterator m_end;				///< iterator pointing to end of message buffer
+	protocol::InputBlock::iterator m_itr;			//< iterator to scan protocol input
+	protocol::InputBlock::iterator m_end;			//< iterator pointing to end of message buffer
 
 	///\enum CommandState
 	///\brief Enumeration of command processing states
 	enum CommandState
 	{
-		Init,						///< start state, called first time in this session
-		ProcessingDelegation,				///< the command execution has been delegated to another command handler
-		EnterCommand,					///< parse command
-		ParseArgs,					///< parse command arguments
-		ParseArgsEOL,					///< parse end of line after command arguments
-		ProtocolError,					///< a protocol error (bad command etc) appeared and the rest of the line has to be discarded
-		ProcessOutput,					///< prints the command output to the output buffer
-		Terminate					///< terminate application processor session (close for network)
+		Init,						//< start state, called first time in this session
+		ProcessingDelegation,				//< the command execution has been delegated to another command handler
+		EnterCommand,					//< parse command
+		ParseArgs,					//< parse command arguments
+		ParseArgsEOL,					//< parse end of line after command arguments
+		ProtocolError,					//< a protocol error (bad command etc) appeared and the rest of the line has to be discarded
+		ProcessOutput,					//< prints the command output to the output buffer
+		Terminate					//< terminate application processor session (close for network)
 	};
 	///\brief Returns the state as string for logging etc.
 	///\param [in] i state to get as string
@@ -180,17 +180,17 @@ private:
 		static const char* ar[] = {"Init","ProcessingDelegation","EnterCommand","ParseArgs","ParseArgsEOL","ProtocolError","ProcessOutput","Terminate"};
 		return ar[i];
 	}
-	CommandHandler* m_delegateHandler;			///< command handler that processes the I/O delegated from this command handler until it return a CLOSE and gets destroyed again
-	DelegateHandlerEnd m_delegateHandlerEnd;		///< function type called after termination of m_delegateHandler
-	const LineCommandHandlerSTM* m_stm;			///< command level protocol state machine
-	protocol::CArgBuffer< std::string > m_argBuffer;	///< buffer type for the command arguments
-	std::string m_buffer;					///< line buffer
-	CommandState m_cmdstateidx;				///< current state of command execution
-	std::size_t m_stateidx;					///< current state in the STM
-	int m_cmdidx;						///< index of the command to execute starting with 0 (-1 = undefined command)
-	int m_resultstate;					///< result state of the last command
-	std::string m_resultstr;				///< content the command output stream after command execution
-	std::size_t m_resultitr;				///< iterator on m_result to send the output via network output
+	CommandHandler* m_delegateHandler;			//< command handler that processes the I/O delegated from this command handler until it return a CLOSE and gets destroyed again
+	DelegateHandlerEnd m_delegateHandlerEnd;		//< function type called after termination of m_delegateHandler
+	const LineCommandHandlerSTM* m_stm;			//< command level protocol state machine
+	protocol::CArgBuffer< std::string > m_argBuffer;	//< buffer type for the command arguments
+	std::string m_buffer;					//< line buffer
+	CommandState m_cmdstateidx;				//< current state of command execution
+	std::size_t m_stateidx;					//< current state in the STM
+	int m_cmdidx;						//< index of the command to execute starting with 0 (-1 = undefined command)
+	int m_resultstate;					//< result state of the last command
+	std::string m_resultstr;				//< content the command output stream after command execution
+	std::size_t m_resultitr;				//< iterator on m_result to send the output via network output
 };
 
 

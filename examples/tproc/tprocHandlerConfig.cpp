@@ -34,10 +34,10 @@
 ///\brief Implementation of the tproc connection handler configuration
 #include "countedReference.hpp"
 #include "tprocHandlerConfig.hpp"
-#include "langbind/ioFilterCommandHandler.hpp"
-#include "langbind/directmapCommandHandler.hpp"
 #include "langbind/appGlobalContext.hpp"
-#include "protocol/commandHandler.hpp"
+#include "cmdbind/ioFilterCommandHandler.hpp"
+#include "cmdbind/directmapCommandHandler.hpp"
+#include "cmdbind/commandHandler.hpp"
 #include "config/description.hpp"
 #include <string>
 #include <vector>
@@ -91,11 +91,11 @@ bool Configuration::parse( const config::ConfigurationTree& pt, const std::strin
 
 			if (std::getline( cmdstr, nam, '='))
 			{
-				m_commands.push_back( protocol::ExecCommandHandler::Command( nam, cmdstr.str()));
+				m_commands.push_back( cmdbind::ExecCommandHandler::Command( nam, cmdstr.str()));
 			}
 			else
 			{
-				m_commands.push_back( protocol::ExecCommandHandler::Command( *itr));
+				m_commands.push_back( cmdbind::ExecCommandHandler::Command( *itr));
 			}
 			++itr;
 		}
@@ -112,7 +112,7 @@ bool Configuration::test() const
 {
 	bool rt = true;
 	langbind::GlobalContext* gctx = langbind::getGlobalContext();
-	std::vector<protocol::ExecCommandHandler::Command>::const_iterator itr=m_commands.begin();
+	std::vector<cmdbind::ExecCommandHandler::Command>::const_iterator itr=m_commands.begin();
 	while (itr != m_commands.end())
 	{
 #if WITH_LUA
@@ -141,7 +141,7 @@ bool Configuration::check() const
 
 void Configuration::print( std::ostream& o, size_t i) const
 {
-	std::vector<protocol::ExecCommandHandler::Command>::const_iterator itr=m_commands.begin(),end=m_commands.end();
+	std::vector<cmdbind::ExecCommandHandler::Command>::const_iterator itr=m_commands.begin(),end=m_commands.end();
 	std::string ind( '\t', i);
 	for (;itr!=end; ++itr)
 	{

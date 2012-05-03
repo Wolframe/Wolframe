@@ -30,17 +30,17 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file protocol/commandHandler.hpp
+///\file cmdbind/commandHandler.hpp
 ///\brief interface to a generic command handler for a networkHandler command with delegation of network I/O until the command context is left
-#ifndef _Wolframe_PROTOCOL_COMMAND_HANDLER_HPP_INCLUDED
-#define _Wolframe_PROTOCOL_COMMAND_HANDLER_HPP_INCLUDED
+#ifndef _Wolframe_CMDBIND_COMMAND_HANDLER_HPP_INCLUDED
+#define _Wolframe_CMDBIND_COMMAND_HANDLER_HPP_INCLUDED
 #include "countedReference.hpp"
 #include <vector>
 #include <string>
 #include <stdexcept>
 
 namespace _Wolframe {
-namespace protocol {
+namespace cmdbind {
 
 class CommandHandler
 {

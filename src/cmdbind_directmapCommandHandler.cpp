@@ -29,68 +29,31 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-#include "langbind/luaCommandHandler.hpp"
-#include "langbind/luaDebug.hpp"
+#include "cmdbind/directmapCommandHandler.hpp"
 #include "langbind/appObjects.hpp"
-#include "langbind/luaObjects.hpp"
 #include "logger-v1.hpp"
+#include "protocol/outputfilter.hpp"
+#include "protocol/inputfilter.hpp"
 #include <stdexcept>
 #include <cstddef>
 #include <boost/lexical_cast.hpp>
 
-extern "C"
-{
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
-}
-
 using namespace _Wolframe;
-using namespace langbind;
+using namespace cmdbind;
 
-LuaCommandHandler::CallResult LuaCommandHandler::call( const char*& errorCode)
+struct DirectmapCommandHandler::Context
 {
-	int rt = 0;
-	errorCode = 0;
+};
 
-	if (!m_interp.get())
-	{
-		try
-		{
-			m_interp = createLuaScriptInstance( m_name.c_str(), m_inputfilter, m_outputfilter);
-		}
-		catch (const std::exception& e)
-		{
-			LOG_ERROR << "Failed to load script and initialize execution context: " << e.what();
-			errorCode = "init script";
-			return Error;
-		}
-		// call the function (for the first time)
-		lua_getglobal( m_interp->thread(), m_name.c_str());
-		std::vector<std::string>::const_iterator itr=m_argBuffer.begin(),end=m_argBuffer.end();
-		for (;itr != end; ++itr)
-		{
-			lua_pushlstring( m_interp->thread(), itr->c_str(), itr->size());
-		}
-		rt = lua_resume( m_interp->thread(), NULL, m_argBuffer.size());
-	}
-	else
-	{
-		// call the function (subsequently until termination)
-		rt = lua_resume( m_interp->thread(), NULL, 0);
-	}
-	if (rt == LUA_YIELD)
-	{
-		return Yield;
-	}
-	else if (rt != 0)
-	{
-		const char* msg = lua_tostring( m_interp->thread(), -1);
-		LOG_ERROR << "error calling function '" << m_name.c_str() << "':" << msg;
-		errorCode = "lua call failed";
-		return Error;
-	}
-	return Ok;
+DirectmapCommandHandler::DirectmapCommandHandler()
+	:m_context(0){}
+
+DirectmapCommandHandler::~DirectmapCommandHandler() {}
+
+IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& err)
+{
+	err = "NOT IMPLEMENTED";
+	return IOFilterCommandHandler::Error;
 }
 
 

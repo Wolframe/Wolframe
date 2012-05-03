@@ -39,7 +39,7 @@
 #include "langbind/iostreamfilter.hpp"
 #include "filter/token_filter.hpp"
 #if WITH_LUA
-#include "langbind/luaCommandHandler.hpp"
+#include "cmdbind/luaCommandHandler.hpp"
 #endif
 #include <boost/algorithm/string.hpp>
 #include <string>
@@ -54,13 +54,13 @@ int _Wolframe::langbind::iostreamfilter( const std::string& ifl, std::size_t ib,
 	langbind::GlobalContext* gc = langbind::getGlobalContext();
 	PluginFunction pf;
 	DDLFormR df;
-	CountedReference<protocol::CommandHandler> cmdhandler;
+	CountedReference<cmdbind::CommandHandler> cmdhandler;
 
 #if WITH_LUA
 	LuaScriptInstanceR sc;
 	if (gc->getLuaScriptInstance( proc.c_str(), sc))
 	{
-		cmdhandler.reset( new langbind::LuaCommandHandler());
+		cmdhandler.reset( new cmdbind::LuaCommandHandler());
 	}
 	else
 #endif

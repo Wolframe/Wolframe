@@ -78,16 +78,16 @@ LOCAL_STATIC_LIB_OBJS = \
 	appConfig.o \
 	config_descriptionBase.o \
 	protocol_ioblocks.o \
-	protocol_commandHandler.o \
-	protocol_lineCommandHandler.o \
-	protocol_execCommandHandler.o \
 	langbind_appObjects.o \
 	langbind_appGlobalContext.o \
 	langbind_appConfig_struct.o \
 	langbind_appConfig.o \
-	langbind_ioFilterCommandHandler.o \
-	langbind_directmapCommandHandler.o \
 	langbind_iostreamfilter.o \
+	cmdbind_commandHandler.o \
+	cmdbind_lineCommandHandler.o \
+	cmdbind_execCommandHandler.o \
+	cmdbind_ioFilterCommandHandler.o \
+	cmdbind_directmapCommandHandler.o \
 	filter_textwolf_filter.o \
 	filter_textwolf_filterBase.o \
 	filter_char_filter.o \
@@ -117,7 +117,7 @@ LOCAL_STATIC_LIB_OBJS += \
 	langbind_luaObjects.o \
 	langbind_luaDebug.o \
 	langbind_luaBignum.o \
-	langbind_luaCommandHandler.o
+	cmdbind_luaCommandHandler.o
 endif
 
 #LIBXML2

@@ -73,7 +73,7 @@ struct TransactionFunctionConfigStruct
 {
 	std::string name;						//< name of the transaction function
 	std::string filter;						//< name of the filter defining the transaction command reader/writer
-	std::string modulepath;						//< path of the transaction function handler module (protocol::CommandHandler)
+	std::string modulepath;						//< path of the transaction function handler module (cmdbind::CommandHandler)
 
 	///\brief Get the configuration structure description
 	static const config::DescriptionBase* description();
