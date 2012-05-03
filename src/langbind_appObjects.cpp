@@ -32,16 +32,15 @@ Project Wolframe.
 ///\file langbind_appObjects.cpp
 ///\brief implementation of scripting language objects
 #include "langbind/appObjects.hpp"
-#include "ddl/compiler/simpleFormCompiler.hpp"
-#include "ddl/compilerInterface.hpp"
 #include "serialize/ddl/filtermapSerialize.hpp"
+#include "ddl/compiler/simpleFormCompiler.hpp"
 #include "logger-v1.hpp"
 #include "protocol/inputfilter.hpp"
 #include "protocol/outputfilter.hpp"
-#include <boost/algorithm/string.hpp>
 #include "filter/char_filter.hpp"
 #include "filter/line_filter.hpp"
 #include "filter/token_filter.hpp"
+#include <boost/algorithm/string.hpp>
 #include <algorithm>
 #include <cctype>
 #include <cstdlib>

@@ -114,6 +114,7 @@ ifeq ($(WITH_LUA),1)
 LOCAL_STATIC_LIB_OBJS += \
 	serialize_struct_luamapBase.o \
 	serialize_ddl_luamapSerialize.o \
+	langbind_luaObjects.o \
 	langbind_luaDebug.o \
 	langbind_luaBignum.o \
 	langbind_luaCommandHandler.o

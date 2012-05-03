@@ -29,38 +29,29 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file luaCommandHandler.hpp
-///\brief interface to the lua command handler
-#ifndef _Wolframe_langbind_LUA_COMMAND_HANDLER_HPP_INCLUDED
-#define _Wolframe_langbind_LUA_COMMAND_HANDLER_HPP_INCLUDED
+///\file langbind/luaObjects.hpp
+///\brief interface to system objects for processor language bindings
+#ifndef _Wolframe_langbind_LUAOBJECTS_HPP_INCLUDED
+#define _Wolframe_langbind_LUAOBJECTS_HPP_INCLUDED
+#include "filter.hpp"
 #include "langbind/appObjects.hpp"
-#include "langbind/ioFilterCommandHandler.hpp"
+#include <boost/shared_ptr.hpp>
+
+#if WITH_LUA
+extern "C" {
+	#include "lua.h"
+}
+#endif
 
 namespace _Wolframe {
 namespace langbind {
 
-///\class LuaCommandHandler
-///\brief command handler instance for processing a call as Lua script
-class LuaCommandHandler :public protocol::IOFilterCommandHandler
-{
-public:
-	///\class Context
-	///\brief Execution context of the command handler
-	struct InterpreterContext;
-
-	///\brief Constructor
-	LuaCommandHandler(){}
-	///\brief Destructor
-	virtual ~LuaCommandHandler(){}
-
-	///\brief Execute the Lua script
-	///\param[out] err error code in case of error
-	///\return CallResult status (See protocol::IOFilterCommandHandler::CallResult)
-	virtual CallResult call( const char*& err);
-
-private:
-	LuaScriptInstanceR m_interp;
-};
+///\brief Create the context for executing a Lua for the Lua command handler. Used for executing a script outside of the command handler in the same way
+///\param[in] name of the command to execute, referencing the script
+///\param[in] input_ input definition for the input to process
+///\param[in] output_ output definition for the output to print
+///\return instance of  Lua script with all basic system objects defined
+LuaScriptInstanceR createLuaScriptInstance( const char* name, const Input& input_, const Output& output_);
 
 }}//namespace
 #endif
