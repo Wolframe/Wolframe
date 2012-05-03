@@ -39,5 +39,6 @@ local_test:
 	@-echo @echo off > test.bat
 	@-echo copy "$(LIBXML2_DIR)\lib\libxml2.dll" . >> test.bat
 	@-echo copy "$(WIN_ICONV_DIR)\iconv.dll" . >> test.bat
-	@-echo testlibxml2 test.xml >> test.bat
+	@-echo testlibxml2 test-UTF8.xml >> test.bat
+	@-echo testlibxml2 test-UCS-2BE.xml >> test.bat
 	@-test.bat

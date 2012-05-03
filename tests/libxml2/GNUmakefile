@@ -34,7 +34,16 @@ local_clean:
 local_distclean:
 
 local_test: $(TEST_CPP_BINS)
-	@LD_LIBRARY_PATH=$(LIBXML2_LIB_DIR) ./testlibxml2 test.xml
+	@echo "UTF8"
+	@LD_LIBRARY_PATH=$(LIBXML2_LIB_DIR) ./testlibxml2 test-UTF8.xml
+	@echo "UCS2BE"
+	@LD_LIBRARY_PATH=$(LIBXML2_LIB_DIR) ./testlibxml2 test-UCS-2BE.xml
+	@echo "UCS2LE"
+	@LD_LIBRARY_PATH=$(LIBXML2_LIB_DIR) ./testlibxml2 test-UCS-2LE.xml
+	@echo "UCS16BE"
+	@LD_LIBRARY_PATH=$(LIBXML2_LIB_DIR) ./testlibxml2 test-UTF-16BE.xml
+	@echo "UCS16LE"
+	@LD_LIBRARY_PATH=$(LIBXML2_LIB_DIR) ./testlibxml2 test-UTF-16LE.xml
 	@echo
 	@echo
 
