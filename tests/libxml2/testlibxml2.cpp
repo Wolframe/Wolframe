@@ -1,17 +1,41 @@
 // modified example, original from http://xmlsoft.org/examples/parse1.c
 
 #include <iostream>
+#include <string>
+
 #include <libxml/parser.h>
 #include <libxml/tree.h>   
 
-namespace
-{
-	void example1Func( const char *filename )
-	{
-		xmlDocPtr doc;
+namespace {
 
-		doc = xmlReadFile( filename, NULL, 0 );
-		xmlFreeDoc( doc );
+std::string repeat( const std::string &s, int times )
+{
+	std::string res;
+	
+	res.reserve( times * s.length( ) );
+	for( int i = 0; i < times; i++ ) {
+		res += s;
+	}
+	
+	return res;
+}
+
+} // anon namspace
+
+void print_structure( xmlNode *node, const int depth )
+{
+	for( xmlNode *cur = node; cur != 0; cur = cur->next ) {
+		if( cur->type == XML_ELEMENT_NODE ) {
+			std::cout << repeat( " ", depth ) <<
+				"<" << cur->name << ">" << std::endl;
+		}
+		
+		if( cur->type == XML_TEXT_NODE ) {
+			std::cout << repeat( " " , depth ) <<
+				cur->content << std::endl;
+		}
+		
+		print_structure( cur->children, depth+1 );
 	}
 }
 
@@ -23,11 +47,27 @@ int main( int argc, char** argv )
 		return 1;
 	}
 
-	example1Func( argv[1] );
+	xmlDocPtr doc;
+
+	doc = xmlReadFile( argv[1], NULL, 0 );
+	xmlNodePtr root;
+	
+	root = xmlDocGetRootElement( doc );
+	if( root == NULL ) {
+		std::cerr << "ERROR: empty document" << std::endl;
+		return 1;
+	}
+	
+	if( xmlStrcmp( root->name, (const xmlChar *)"catalog" ) ) {
+		std::cerr << "ERROR: expected 'catalog' root node" << std::endl;
+		return 1;
+	}
+	
+	print_structure( root, 1 );
+	
+	xmlFreeDoc( doc );
 
 	xmlCleanupParser( );
 
-	std::cout << "libxml test OK" << std::endl;
-	
 	return 0;
 }
