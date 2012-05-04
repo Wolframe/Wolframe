@@ -45,5 +45,6 @@ local_test:
 	@-echo copy "$(WIN_ICONV_DIR)\iconv.dll" . >> test.bat
 	@for %%e IN ( $(ENCODINGS) ) do \
 		@echo echo Testing libxml2 with encoding %%e >> test.bat & \
-		echo testlibxml2 test-%%e.xml ^> %%e.RES >> test.bat
+		echo testlibxml2 test-%%e.xml ^> %%e.RES >> test.bat & \
+		echo fc %%e.MUST %%e.RES ^> %%e.DIFF >> test.bat
 	@-test.bat
