@@ -137,8 +137,8 @@ User* TextFileAuthenticator::authenticate( const std::string& username,
 
 		unsigned char pwDigest[ SHA224_DIGEST_SIZE ];
 		if ( hex2byte( pwd.c_str(), pwDigest, SHA224_DIGEST_SIZE ) < 0 )	{
-			MOD_LOG_WARNING << "Authentication: " << identifier() << ": error parsing password hash for user: '"
-					<< usr << "'";
+			MOD_LOG_ERROR << "Authentication: " << identifier() << ": error parsing password hash for user '"
+				      << usr << "'";
 			fclose( pwdFile );
 			return NULL;
 		}
@@ -153,8 +153,12 @@ User* TextFileAuthenticator::authenticate( const std::string& username,
 		if ( end != std::string::npos )	{
 			end = line.find( ":", start );
 			name = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
-			start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
+			boost::algorithm::trim( name );
 		}
+
+		if ( name.empty())
+			MOD_LOG_WARNING << "Authentication: " << identifier() << ": no name for user '"
+					<< usr << "'";
 		fclose( pwdFile );
 		return new User( "TextFile", usr, name );
 	}
@@ -212,16 +216,26 @@ User* TextFileAuthenticator::authenticate( const CRAMchallenge& challenge,
 			start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
 		}
 
-		CRAMresponse	local( challenge, usr, pwd );
-		if ( local != response )
+		try	{
+			CRAMresponse	local( challenge, usr, pwd );
+			if ( local != response )
+				continue;
+		}
+		catch ( std::exception& e)	{
+			MOD_LOG_ERROR << "Authentication: " << identifier() << ": error parsing password hash for user '"
+				      << usr << "'";
 			continue;
+		}
 
 		if ( end != std::string::npos )	{
 			end = line.find( ":", start );
 			name = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
-			start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
+			boost::algorithm::trim( name );
 		}
 
+		if ( name.empty())
+			MOD_LOG_WARNING << "Authentication: " << identifier() << ": no name for user '"
+					<< usr << "'";
 		fclose( pwdFile );
 		return new User( "TextFile", usr, name );
 	}

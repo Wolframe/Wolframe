@@ -84,14 +84,12 @@ endif
 
 TEST_CPP_BINS = \
 	authenticationTest$(EXE) \
-	textFileTest$(EXE) \
-	textFileCRAMtest$(EXE)
+	textFileTest$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 authenticationTest$(EXE): $(CPP_OBJS)
 textFileTest$(EXE): $(CPP_OBJS)
-textFileCRAMtest$(EXE): $(CPP_OBJS)
 
 local_all:
 
@@ -119,7 +117,5 @@ ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./authenticationTest
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./textFileTest
-	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./textFileCRAMtest
 	@echo
 endif

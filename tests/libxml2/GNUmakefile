@@ -30,21 +30,25 @@ TEST_CPP_BINS = \
 local_all:
 
 local_clean:
+	@-rm *.RES
+	@-rm *.DIFF
 
 local_distclean:
 
+ENCODINGS=UTF-8 UCS-2LE UCS-2BE UTF-16LE UTF-16BE
+
 local_test: $(TEST_CPP_BINS)
-	@echo "UTF8"
-	@LD_LIBRARY_PATH=$(LIBXML2_LIB_DIR) ./testlibxml2 test-UTF8.xml
-	@echo "UCS2BE"
-	@LD_LIBRARY_PATH=$(LIBXML2_LIB_DIR) ./testlibxml2 test-UCS-2BE.xml
-	@echo "UCS2LE"
-	@LD_LIBRARY_PATH=$(LIBXML2_LIB_DIR) ./testlibxml2 test-UCS-2LE.xml
-	@echo "UCS16BE"
-	@LD_LIBRARY_PATH=$(LIBXML2_LIB_DIR) ./testlibxml2 test-UTF-16BE.xml
-	@echo "UCS16LE"
-	@LD_LIBRARY_PATH=$(LIBXML2_LIB_DIR) ./testlibxml2 test-UTF-16LE.xml
-	@echo
-	@echo
+	for e in $(ENCODINGS); do \
+		echo "Testing libxml2 with encoding $$e"; \
+		LD_LIBRARY_PATH=$(LIBXML2_LIB_DIR) ./testlibxml2 test-$$e.xml > $$e.RES; \
+		diff $$e.MUST $$e.RES > $$e.DIFF; \
+	done
 
 local_longtest:
+
+testdata:
+	for e in $(ENCODINGS); do \
+		sed "s/encoding=\"UTF-8\"/encoding=\"$$e\"/" test-orig.xml > x; \
+		iconv -f UTF-8 -t $$e -o test-$$e.xml x; \
+	done
+	
