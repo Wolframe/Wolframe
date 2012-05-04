@@ -200,7 +200,7 @@ static bool parseObject( const char* tag, ddl::StructType& st, protocol::InputFi
 	return rt;
 }
 
-bool printObject( const char* tag, const ddl::StructType& st, protocol::OutputFilter*& out, Context& ctx)
+bool printObject( const char* tag, const ddl::StructType& st, protocol::OutputFilterR& out, Context& ctx)
 {
 	switch (st.contentType())
 	{
@@ -249,7 +249,7 @@ bool _Wolframe::serialize::parse( ddl::StructType& st, protocol::InputFilter& fl
 	return parseObject( 0, st, flt, ctx, false);
 }
 
-bool _Wolframe::serialize::print( const ddl::StructType& st, protocol::OutputFilter*& out, Context& ctx)
+bool _Wolframe::serialize::print( const ddl::StructType& st, protocol::OutputFilterR& out, Context& ctx)
 {
 	return printObject( 0, st, out, ctx);
 }

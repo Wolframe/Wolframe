@@ -59,7 +59,7 @@ struct Context
 
 	void setError( const char* tt, const char* msg, const char* msgparam=0);
 	void setError( const char* tt);
-	bool printElem( protocol::OutputFilter::ElementType tp, const void* elem, std::size_t elemsize, protocol::OutputFilter*& out);
+	bool printElem( protocol::OutputFilter::ElementType tp, const void* elem, std::size_t elemsize, protocol::OutputFilterR& out);
 private:
 	char* m_lasterror;
 	char* m_buf;

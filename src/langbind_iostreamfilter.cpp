@@ -37,6 +37,7 @@
 #include "langbind/appObjects.hpp"
 #include "langbind/appGlobalContext.hpp"
 #include "langbind/iostreamfilter.hpp"
+#include "serialize/ddl/filtermapSerialize.hpp"
 #include "filter/token_filter.hpp"
 #if WITH_LUA
 #include "cmdbind/luaCommandHandler.hpp"
@@ -169,6 +170,7 @@ static bool processIO( BufferStruct& buf, langbind::Filter& flt, std::istream& i
 		case protocol::OutputFilter::Open:
 			if (followOutput( flt.outputfilter())) return true;
 			if (followInput( flt.inputfilter())) return true;
+			return false;
 
 		case protocol::OutputFilter::EndOfBuffer:
 			writeOutput( buf.outbuf, buf.outsize, os, flt.outputfilter());
@@ -202,17 +204,44 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 			if (!processIO( buf, flt, is, os)) break;
 			rt = lua_resume( sc->thread(), NULL, 0);
 		}
+		if (rt)
+		{
+			const char* msg = lua_tostring( sc->thread(), -1);
+			LOG_ERROR << "Error in lua script: '" << msg << "'";
+			return false;
+		}
 	}
 	else
 #endif
 	if (gc->getPluginFunction( proc.c_str(), pf))
 	{
+		langbind::PluginFunction::CallResult rt = pf.call( *flt.inputfilter(), *flt.outputfilter());
+		while (rt == langbind::PluginFunction::Yield)
+		{
+			if (!processIO( buf, flt, is, os)) break;
+			rt = pf.call( *flt.inputfilter(), *flt.outputfilter());
+		}
+		return (rt == langbind::PluginFunction::Ok);
 	}
 	else if (gc->getForm( proc.c_str(), df))
 	{
+		serialize::Context ictx;
+		if (!serialize::parse( df->m_struct, *flt.inputfilter(), ictx))
+		{
+			LOG_ERROR << "Error in form serialization: '" << ictx.getLastError() << "'";
+			return false;
+		}
+		serialize::Context octx;
+		if (!serialize::print( df->m_struct, flt.outputfilter(), octx))
+		{
+			LOG_ERROR << "Error in form printing: '" << octx.getLastError() << "'";
+			return false;
+		}
+		os.write( octx.content().c_str(), octx.content().size());
 	}
 	else if (gc->hasTransactionFunction( proc.c_str()))
 	{
+
 	}
 	else
 	{

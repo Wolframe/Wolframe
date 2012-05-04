@@ -44,7 +44,7 @@ namespace _Wolframe {
 namespace serialize {
 
 bool parse( ddl::StructType& st, protocol::InputFilter& flt, Context& ctx);
-bool print( const ddl::StructType& st, protocol::OutputFilter*& out, Context& ctx);
+bool print( const ddl::StructType& st, protocol::OutputFilterR& out, Context& ctx);
 
 }}//namespace
 #endif

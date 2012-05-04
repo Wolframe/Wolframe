@@ -77,7 +77,7 @@ void Context::setMsg( const char* m1, char dd, const char* m2, const char* m3)
 	m_lasterror[ m1len+m2len+m3len+1] = '\0';
 }
 
-bool Context::printElem( protocol::OutputFilter::ElementType tp, const void* elem, std::size_t elemsize, protocol::OutputFilter*& out)
+bool Context::printElem( protocol::OutputFilter::ElementType tp, const void* elem, std::size_t elemsize, protocol::OutputFilterR& out)
 {
 	if (!out->print( tp, elem, elemsize))
 	{
@@ -88,8 +88,7 @@ bool Context::printElem( protocol::OutputFilter::ElementType tp, const void* ele
 			protocol::OutputFilter* ff = out->createFollow();
 			if (ff)
 			{
-				delete out;
-				out = ff;
+				out.reset( ff);
 			}
 			if (!out->print( tp, elem, elemsize))
 			{

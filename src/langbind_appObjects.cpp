@@ -272,18 +272,13 @@ bool PluginFunctionMap::getPluginFunction( const std::string& name, PluginFuncti
 bool TransactionFunction::call( const DDLForm& param, DDLForm& result)
 {
 	cmdbind::CommandHandler* cmd = m_cmd.get();
-	protocol::OutputFilter* wr = m_cmdwriter.get();
-	protocol::InputFilter* rd = m_resultreader.get();
-	if (!cmd || !wr || !rd)
+	if (!cmd || m_cmdwriter.get() || m_resultreader.get())
 	{
 		LOG_ERROR << "incomplete transaction function call definition";
 		return false;
 	}
-	protocol::OutputFilterR wrs( wr = wr->copy());
-	protocol::InputFilterR rds( rd = rd->copy());
-
 	serialize::Context pctx;
-	if (!serialize::print( param.m_struct, wr, pctx))
+	if (!serialize::print( param.m_struct, m_cmdwriter, pctx))
 	{
 		LOG_ERROR << "error writing transaction command: " << pctx.getLastError();
 		return false;
@@ -324,8 +319,8 @@ bool TransactionFunction::call( const DDLForm& param, DDLForm& result)
 			case cmdbind::CommandHandler::CLOSED:
 			{
 				serialize::Context rctx;
-				rd->protocolInput( resultstr.c_str(), resultstr.size(), true);
-				if (!serialize::parse( result.m_struct, *rd, rctx))
+				m_resultreader->protocolInput( resultstr.c_str(), resultstr.size(), true);
+				if (!serialize::parse( result.m_struct, *m_resultreader, rctx))
 				{
 					LOG_ERROR << "error reading transaction result: " << rctx.getLastError();
 					return false;
