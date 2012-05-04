@@ -42,6 +42,11 @@
 #include "byte2hex.h"
 #include <boost/algorithm/string.hpp>
 
+#ifdef _WIN32
+#define WIN32_MEAN_AND_LEAN
+#include <windows.h>
+#endif
+
 using namespace _Wolframe::AAAA;
 using namespace _Wolframe::log;
 using namespace _Wolframe;
@@ -71,7 +76,11 @@ protected:
 static User* CRAMauth( TextFileAuthenticator& auth, const std::string& user, const std::string& passwd,
 			    bool caseSensitve )
 {
+#ifdef _WIN32
+	CRAMchallenge	challenge( MS_DEF_PROV );
+#else
 	CRAMchallenge	challenge( "/dev/urandom" );
+#endif
 
 	std::string usr;
 	if ( caseSensitve )

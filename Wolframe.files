@@ -82,11 +82,6 @@ clients/qt/HistoryLineEdit.hpp
 clients/qt/MainWindow.cpp
 clients/qt/MainWindow.hpp
 clients/qt/Makefile.W32
-clients/qt/moc_AbstractFormLoader.cpp
-clients/qt/moc_DebugTerminal.cpp
-clients/qt/moc_HistoryLineEdit.cpp
-clients/qt/moc_MainWindow.cpp
-clients/qt/moc_WolframeClient.cpp
 clients/qt/qtclient.cpp
 clients/qt/README
 clients/qt/TODOS
@@ -1274,11 +1269,12 @@ tests/libhpdf/testlibhpdf.cpp
 tests/libxml2/GNUmakefile
 tests/libxml2/Makefile.W32
 tests/libxml2/testlibxml2.cpp
+tests/libxml2/test-orig.xml
 tests/libxml2/test-UCS-2BE.xml
 tests/libxml2/test-UCS-2LE.xml
 tests/libxml2/test-UTF-16BE.xml
 tests/libxml2/test-UTF-16LE.xml
-tests/libxml2/test-UTF8.xml
+tests/libxml2/test-UTF-8.xml
 tests/libxslt/GNUmakefile
 tests/libxslt/Makefile.W32
 tests/libxslt/test1.xml
