@@ -36,6 +36,11 @@ void print_structure( xmlNode *node, const int depth )
 		}
 		
 		print_structure( cur->children, depth+1 );
+		
+		if( cur->type == XML_ELEMENT_NODE ) {
+			std::cout << repeat( " ", depth ) <<
+				"</" << cur->name << ">" << std::endl;
+		}
 	}
 }
 
@@ -58,8 +63,8 @@ int main( int argc, char** argv )
 		return 1;
 	}
 	
-	if( xmlStrcmp( root->name, (const xmlChar *)"catalog" ) ) {
-		std::cerr << "ERROR: expected 'catalog' root node" << std::endl;
+	if( xmlStrcmp( root->name, (const xmlChar *)"list" ) ) {
+		std::cerr << "ERROR: expected 'list' root node" << std::endl;
 		return 1;
 	}
 	
