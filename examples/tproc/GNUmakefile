@@ -95,10 +95,10 @@ local_install:
 
 local_test: $(TEST_BINS)
 ifeq ($(RUN_TESTS),1)
-	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./tprocHandlerTest$(EXE)
+	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(LIBXML2_LIB_DIR) ./tprocHandlerTest$(EXE)
 endif
 
 run: $(CPP_BINS)
 	@echo "Running the Wolframe tproc example..."
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./tprocd -c tproc.conf -f
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(LIBXML2_LIB_DIR) ./tprocd -c tproc.conf -f
 

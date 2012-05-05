@@ -108,16 +108,16 @@ local_install:
 
 local_test: $(TEST_BINS)
 ifeq ($(RUN_TESTS),1)
-	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./simpleFormCompilerTest$(EXE)
-	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./structFiltermapTest$(EXE)
+	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(LIBXML2_LIB_DIR) ./simpleFormCompilerTest$(EXE)
+	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(LIBXML2_LIB_DIR) ./structFiltermapTest$(EXE)
 ifeq ($(WITH_LUA),1)
-	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./iprocHandlerTest$(EXE)
-	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./iprocHandlerXMLTest$(EXE)
-	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./structLuamapTest$(EXE)
+	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(LIBXML2_LIB_DIR) ./iprocHandlerTest$(EXE)
+	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(LIBXML2_LIB_DIR) ./iprocHandlerXMLTest$(EXE)
+	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(LIBXML2_LIB_DIR) ./structLuamapTest$(EXE)
 endif
 endif
 
 run: $(CPP_BINS)
 	@echo "Running the Wolframe iproc example..."
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./iprocd -c iproc.conf -f
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(LIBXML2_LIB_DIR) ./iprocd -c iproc.conf -f
 
