@@ -41,32 +41,35 @@ using namespace _Wolframe;
 
 static void printUsage()
 {
-	std::cerr << "filter <inputfilter> [ <command> ] <outputfilter>" << std::endl;
-	std::cerr << "inputfilter :Name of the input filter plus an optional '/' plus buffer size" << std::endl;
-	std::cerr << "outputfilter :Name of the output filter plus an optional '/' plus buffer size" << std::endl << std::endl;
+	std::cerr << "wolfilter <cmd> <inputfilter> [ <outputfilter> ]" << std::endl;
+	std::cerr << "cmd          :Name of the command to execute ('-' for no command)" << std::endl;
+	std::cerr << "inputfilter  :Name of the input filter plus an optional '/' plus buffer size" << std::endl;
+	std::cerr << "outputfilter :Name of the output filter plus an optional '/' plus buffer size"<< std::endl;
+	std::cerr << "              If not specified, then output filter equals input filter"  << std::endl  << std::endl;
 
-	std::cerr << "   example: 'filter xml:textwolf/256 xml:textwolf:UTF-8/128'" << std::endl;
+	std::cerr << "   example: 'filter - xml:textwolf/256 xml:textwolf:UTF-8/128'" << std::endl;
 	std::cerr << "      input = xml:textwolf/256 = using textwolf XML with a buffer of 256 bytes" << std::endl;
 	std::cerr << "      output = xml:textwolf:UTF-16/128 = using textwolf XML with UTF-8 encoding and a buffer of 128 bytes" << std::endl;
 }
 
 int main( int argc, const char **argv )
 {
-	const char* infiltername = 0;
-	const char* outfiltername = 0;
-	const char* procname = 0;
-	std::size_t inputBufferSize = 1024;
-	std::size_t outputBufferSize = 1024;
+	std::string infiltername;
+	std::string outfiltername;
+	std::string procname;
+	std::size_t inputbufsize = 1024;
+	std::size_t outputbufsize = 1024;
 
 	if (argc == 4)
 	{
-		infiltername = argv[1];
-		procname = argv[2];
+		procname = argv[1];
+		infiltername = argv[2];
 		outfiltername = argv[3];
 	}
 	else if (argc == 3)
 	{
-		infiltername = argv[1];
+		procname = argv[1];
+		infiltername = argv[2];
 		outfiltername = argv[2];
 	}
 	else if (argc > 4)
@@ -77,33 +80,37 @@ int main( int argc, const char **argv )
 	}
 	else if (argc < 3)
 	{
-		std::cerr << "too many arguments passed to " << argv[0] << std::endl;
+		std::cerr << "too few arguments passed to " << argv[0] << std::endl;
 		printUsage();
 		return 2;
 	}
-	std::string filternameIn( infiltername);
-	std::string filternameOut( outfiltername);
 	const char* bp;
 
-	bp = std::strchr( filternameIn.c_str(), '/');
+	bp = std::strchr( infiltername.c_str(), '/');
 	if (bp)
 	{
-		inputBufferSize = (std::size_t)atoi( bp+1);
-		filternameIn.resize( bp-filternameIn.c_str());
+		inputbufsize = (std::size_t)atoi( bp+1);
+		infiltername.resize( bp-infiltername.c_str());
 	}
-	bp = std::strchr( filternameOut.c_str(), '/');
+	bp = std::strchr( outfiltername.c_str(), '/');
 	if (bp)
 	{
-		outputBufferSize = (std::size_t)atoi( bp+1);
-		filternameOut.resize( bp-filternameOut.c_str());
+		outputbufsize = (std::size_t)atoi( bp+1);
+		outfiltername.resize( bp-outfiltername.c_str());
 	}
-	if (procname)
+	if ((int)inputbufsize <= 0)
 	{
-		return langbind::iostreamfilter( procname, filternameIn.c_str(), inputBufferSize, filternameOut.c_str(), outputBufferSize, std::cin, std::cout);
+		std::cerr << "illegal size of input buffer: " << (int)inputbufsize << std::endl;
 	}
-	else
+	if ((int)outputbufsize <= 0)
 	{
-		return langbind::iostreamfilter( filternameIn.c_str(), inputBufferSize, filternameOut.c_str(), outputBufferSize, std::cin, std::cout);
+		std::cerr << "illegal size of output buffer: " << (int)outputbufsize << std::endl;
 	}
+	if (!langbind::iostreamfilter( procname, infiltername, inputbufsize, outfiltername, outputbufsize, std::cin, std::cout))
+	{
+		std::cerr << "conversion error" << std::endl;
+		return 3;
+	}
+	return 0;
 }
 

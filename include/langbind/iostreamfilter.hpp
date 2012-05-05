@@ -40,26 +40,16 @@
 namespace _Wolframe {
 namespace langbind {
 
-///\brief Maps input to output through a filter
-///\param[in] ifl
-///\param[in] ib
-///\param[in] ofl
-///\param[in] ob
-///\param[in,out] in
-///\param[in,out] out
+///\brief Maps input to output through a filter and a conversion procedure.
+///\param[in] proc conversion procedure name. emty for no conversion
+///\param[in] ifl input filter name
+///\param[in] ib input buffer size
+///\param[in] ofl output filter name
+///\param[in] ob output buffer size
+///\param[in,out] is input stream
+///\param[in,out] os output stream
 ///\return true on success, false else
-bool iostreamfilter( const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& in, std::ostream& out);
-
-///\brief Maps input to output by a cmdbind::CommandHandler
-///\param[in] ifl
-///\param[in] ib
-///\param[in] ofl
-///\param[in] ob
-///\param[in] proc
-///\param[in,out] in
-///\param[in,out] out
-///\return true on success, false else
-bool iostreamfilter( const std::string& proc, const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& in, std::ostream& out);
+bool iostreamfilter( const std::string& proc, const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& is, std::ostream& os);
 
 }}//namespace
 #endif

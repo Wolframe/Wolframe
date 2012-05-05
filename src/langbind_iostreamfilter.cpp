@@ -187,184 +187,99 @@ static bool processIO( BufferStruct& buf, langbind::Filter& flt, std::istream& i
 bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& is, std::ostream& os)
 {
 	langbind::GlobalContext* gc = langbind::getGlobalContext();
-	PluginFunction pf;
-	DDLFormR df;
 	langbind::Filter flt = getFilter( gc, ifl, ofl);
 	BufferStruct buf( ib, ob);
 	flt.outputfilter().get()->init( buf.outbuf, buf.outsize);
 
+	if (proc.size() == 0 || proc == "-")
+	{
+		langbind::FilterFactoryR tf( new langbind::TokenFilterFactory());
+		gc->defineFilter( "token", tf);
+
+		const void* elem;
+		std::size_t elemsize;
+		protocol::InputFilter::ElementType ietype;
+		protocol::OutputFilter::ElementType oetype;
+
+		for (;;)
+		{
+			if (!flt.inputfilter().get()->getNext( ietype, elem, elemsize))
+			{
+				if (!processIO( buf, flt, is, os)) break;
+				continue;
+			}
+			oetype = (protocol::OutputFilter::ElementType) ietype;
+			if (!flt.outputfilter().get()->print( oetype, elem, elemsize))
+			{
+				if (!processIO( buf, flt, is, os)) break;
+				continue;
+			}
+		}
+	}
 #if WITH_LUA
-	LuaScriptInstanceR sc = createLuaScriptInstance( proc, flt.inputfilter(), flt.outputfilter());
-	if (sc.get())
 	{
-		lua_getglobal( sc->thread(), proc.c_str());
-		int rt = lua_resume( sc->thread(), NULL, 0);
-		while (rt == LUA_YIELD)
+		LuaScriptInstanceR sc = createLuaScriptInstance( proc, flt.inputfilter(), flt.outputfilter());
+		if (sc.get())
 		{
-			if (!processIO( buf, flt, is, os)) break;
-			rt = lua_resume( sc->thread(), NULL, 0);
-		}
-		if (rt)
-		{
-			const char* msg = lua_tostring( sc->thread(), -1);
-			LOG_ERROR << "Error in lua script: '" << msg << "'";
-			return false;
+			lua_getglobal( sc->thread(), proc.c_str());
+			int rt = lua_resume( sc->thread(), NULL, 0);
+			while (rt == LUA_YIELD)
+			{
+				if (!processIO( buf, flt, is, os)) break;
+				rt = lua_resume( sc->thread(), NULL, 0);
+			}
+			if (rt)
+			{
+				const char* msg = lua_tostring( sc->thread(), -1);
+				LOG_ERROR << "Error in lua script: '" << msg << "'";
+				return false;
+			}
+			return true;
 		}
 	}
-	else
 #endif
-	if (gc->getPluginFunction( proc.c_str(), pf))
 	{
-		langbind::PluginFunction::CallResult rt = pf.call( *flt.inputfilter(), *flt.outputfilter());
-		while (rt == langbind::PluginFunction::Yield)
+		PluginFunction pf;
+		if (gc->getPluginFunction( proc.c_str(), pf))
 		{
-			if (!processIO( buf, flt, is, os)) break;
-			rt = pf.call( *flt.inputfilter(), *flt.outputfilter());
-		}
-		return (rt == langbind::PluginFunction::Ok);
-	}
-	else if (gc->getForm( proc.c_str(), df))
-	{
-		serialize::Context ictx;
-		if (!serialize::parse( df->m_struct, *flt.inputfilter(), ictx))
-		{
-			LOG_ERROR << "Error in form serialization: '" << ictx.getLastError() << "'";
-			return false;
-		}
-		serialize::Context octx;
-		if (!serialize::print( df->m_struct, flt.outputfilter(), octx))
-		{
-			LOG_ERROR << "Error in form printing: '" << octx.getLastError() << "'";
-			return false;
-		}
-		os.write( octx.content().c_str(), octx.content().size());
-	}
-	else if (gc->hasTransactionFunction( proc.c_str()))
-	{
-
-	}
-	else
-	{
-		LOG_ERROR << "mapping command not found: '" << proc.c_str() << "'";
-		return false;
-	}
-	return true;
-}
-
-bool _Wolframe::langbind::iostreamfilter( const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& is, std::ostream& os)
-{
-	langbind::GlobalContext* gc = langbind::getGlobalContext();
-	langbind::FilterFactoryR tf( new langbind::TokenFilterFactory());
-	gc->defineFilter( "token", tf);
-
-	langbind::Filter flt = getFilter( gc, ifl, ofl);
-	BufferStruct buf( ib, ob);
-	flt.outputfilter().get()->init( buf.outbuf, buf.outsize);
-
-	const void* element;
-	std::size_t elementsize;
-	protocol::InputFilter::ElementType elementType;
-	std::size_t taglevel=0;
-
-	READ_INPUT:
-	{
-		if (!readInput( buf.inbuf, buf.insize, is, flt.inputfilter())) goto TERMINATE;
-		goto PROCESS_READ;
-	}
-	WRITE_OUTPUT:
-	{
-		writeOutput( buf.outbuf, buf.outsize, os, flt.outputfilter());
-		goto PROCESS_WRITE;
-	}
-	PROCESS_READ:
-	{
-		if (!flt.inputfilter().get()->getNext( elementType, element, elementsize))
-		{
-			switch (flt.inputfilter().get()->state())
+			langbind::PluginFunction::CallResult rt = pf.call( *flt.inputfilter(), *flt.outputfilter());
+			while (rt == langbind::PluginFunction::Yield)
 			{
-				case protocol::InputFilter::EndOfMessage:
-				{
-					if (flt.inputfilter().get()->size())
-					{
-						flt.inputfilter().get()->setState( protocol::InputFilter::Error, "Buffer too small");
-						goto ERROR_READ;
-					}
-					else
-					{
-						goto READ_INPUT;
-					}
-				}
-				case protocol::InputFilter::Error: goto ERROR_READ;
-				case protocol::InputFilter::Open:
-				{
-					protocol::InputFilter* follow = flt.inputfilter()->createFollow();
-					if (follow)
-					{
-						flt.inputfilter().reset( follow);
-						goto PROCESS_READ;
-					}
-					else
-					{
-						goto ERROR_READ;
-					}
-				}
+				if (!processIO( buf, flt, is, os)) break;
+				rt = pf.call( *flt.inputfilter(), *flt.outputfilter());
 			}
+			return (rt == langbind::PluginFunction::Ok);
 		}
 	}
-	PROCESS_WRITE:
 	{
-		protocol::OutputFilter::ElementType tt = (protocol::OutputFilter::ElementType) elementType;
-		if (!flt.outputfilter().get()->print( tt, element, elementsize))
+		DDLFormR df;
+		if (gc->getForm( proc.c_str(), df))
 		{
-			switch (flt.outputfilter().get()->state())
+			serialize::Context ictx;
+			if (!serialize::parse( df->m_struct, *flt.inputfilter(), ictx))
 			{
-				case protocol::OutputFilter::EndOfBuffer:
-				{
-					goto WRITE_OUTPUT;
-				}
-				case protocol::OutputFilter::Error: goto ERROR_WRITE;
-				case protocol::OutputFilter::Open:
-				{
-					protocol::OutputFilter* follow = flt.outputfilter()->createFollow();
-					if (follow)
-					{
-						flt.outputfilter().reset( follow);
-						goto PROCESS_WRITE;
-					}
-					else
-					{
-						goto ERROR_WRITE;
-					}
-				}
-
+				LOG_ERROR << "Error in form serialization: '" << ictx.getLastError() << "'";
+				return false;
 			}
+			serialize::Context octx;
+			if (!serialize::print( df->m_struct, flt.outputfilter(), octx))
+			{
+				LOG_ERROR << "Error in form printing: '" << octx.getLastError() << "'";
+				return false;
+			}
+			os.write( octx.content().c_str(), octx.content().size());
+			return true;
 		}
-		if (elementType == protocol::InputFilter::OpenTag)
+	}
+	{
+		if (gc->hasTransactionFunction( proc.c_str()))
 		{
-			++taglevel;
+
+			return true;
 		}
-		else if (elementType == protocol::InputFilter::CloseTag)
-		{
-			--taglevel;
-			if (taglevel == 0) goto TERMINATE;
-		}
-		goto PROCESS_READ;
 	}
-	ERROR_READ:
-	{
-		LOG_ERROR << "Error in input: '" << flt.inputfilter().get()->getError() << "'";
-		goto TERMINATE;
-	}
-	ERROR_WRITE:
-	{
-		LOG_ERROR << "Error in output: '" << flt.outputfilter().get()->getError() << "'";
-		goto TERMINATE;
-	}
-	TERMINATE:
-	{
-		os.write( buf.outbuf, flt.outputfilter().get()->pos());
-	}
-	return true;
+	LOG_ERROR << "mapping command not found: '" << proc.c_str() << "'";
+	return false;
 }
 
 
