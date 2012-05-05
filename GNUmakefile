@@ -2,7 +2,7 @@ TOPDIR = .
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
-SUBDIRS = src gtest tests clients include docs
+SUBDIRS = src gtest wtest tests clients include docs
 
 ifeq ($(WITH_LOCAL_LIBHPDF),1)
 SUBDIRS := libhpdf $(SUBDIRS)

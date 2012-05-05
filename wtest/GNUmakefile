@@ -14,7 +14,7 @@ INCLUDE_DIRS = \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LIBS = \
-	-lboost_filesystem
+	-lboost_filesystem -lboost_system
 
 # openssl
 ifeq ($(WITH_SSL),1)
@@ -46,15 +46,13 @@ LOCAL_STATIC_LIB = \
 LOCAL_STATIC_LIB_OBJS = \
 	testDescription.o
 
-CPP_OBJS =
+CPP_OBJS = \
+	testDescription.o
 
 CPP_BINS = \
 	wtestcheck$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
-
-wtestcheck$(EXE): wtestcheck.o $(OBJS) $(CPP_OBJS) $(LOCAL_STATIC_LIB)
-	$(CXX_LINK) -o $@ $(ALL_LDFLAGS) $(OBJS) $(CPP_OBJS) $<  $(LOCAL_STATIC_LIB) $(LIBS)
 
 local_all: $(LOCAL_STATIC_LIB)
 
@@ -71,4 +69,3 @@ local_install:
 local_uninstall:
 
 local_test:
-

@@ -60,14 +60,14 @@ CPP_OBJS =
 CPP_BINS = \
 	wtestcheck.exe
 
-all: dependencies $(CPP_OBJS) $(CPP_BINS)
+all: dependencies $(CPP_OBJS) $(CPP_BINS) $(LOCAL_STATIC_LIB)
 
 dependencies:
 	cd libwtest & $(MAKE) /nologo /f Makefile.w32 all
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-wtestcheck.exe: $(CPP_OBJS) libwolframe\logger\wtestcheckmsg.res
+wtestcheck.exe: $(CPP_OBJS)
 
 $(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
 	$(LINK) /lib /nologo /out:$@ $(STATIC_LDFLAGS) $?
@@ -76,8 +76,7 @@ local_all: $(LOCAL_STATIC_LIB)
 
 local_clean:
 	@-erase $(LOCAL_STATIC_LIB) 2>NUL
-	@-erase $(CPP_OBJS) 2>NUL
-	@-erase test.bat 2>NUL
+	@-erase $(LOCAL_STATIC_LIB_OBJS) 2>NUL
 
 local_distclean:
 
