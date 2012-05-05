@@ -168,12 +168,14 @@ local_distclean:
 local_install:
 	$(INSTALL) -d -m 0755 $(DESTDIR)$(sbindir)
 	$(INSTALL) -m 0775 wolframed $(DESTDIR)$(sbindir)
-	$(INSTALL) -m 0775 wolfilter $(DESTDIR)$(sbindir)
+	$(INSTALL) -d -m 0755 $(DESTDIR)$(bindir)
+	$(INSTALL) -m 0775 wolfilter $(DESTDIR)$(bindir)
 	$(INSTALL) -d -m 0755 $(DESTDIR)$(sysconfdir)/wolframe
 	$(INSTALL) -m 0755 wolframe.conf $(DESTDIR)$(sysconfdir)/wolframe
 
 local_uninstall:
-	@-rm -f $(DESTDIR)$(sbindir)/wolfilter
+	@-rm -f $(DESTDIR)$(bindir)/wolfilter
+	@-rmdir $(DESTDIR)$(bindir)
 	@-rm -f $(DESTDIR)$(sbindir)/wolframed
 	@-rmdir $(DESTDIR)$(sbindir)
 	@-rm -f $(DESTDIR)$(sysconfdir)/wolframe/wolframe.conf
