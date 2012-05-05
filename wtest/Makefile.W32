@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = libwtest
+SUBDIRS =
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
@@ -60,14 +60,11 @@ CPP_OBJS =
 CPP_BINS = \
 	wtestcheck.exe
 
-all: dependencies $(CPP_OBJS) $(CPP_BINS) $(LOCAL_STATIC_LIB)
-
-dependencies:
-	cd libwtest & $(MAKE) /nologo /f Makefile.w32 all
+all: $(CPP_OBJS) $(CPP_BINS) $(LOCAL_STATIC_LIB)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-wtestcheck.exe: $(CPP_OBJS)
+wtestcheck.exe: wtestcheck.obj $(LOCAL_STATIC_LIB)
 
 $(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
 	$(LINK) /lib /nologo /out:$@ $(STATIC_LDFLAGS) $?
