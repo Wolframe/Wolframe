@@ -13,7 +13,7 @@ INCLUDE_DIRS = \
 	/I"$(BOOST_INCLUDE_DIR)" \
 	/I"$(PLATFORM_SDK_DIR)\Include" \
 	/I$(TOPDIR)\gtest\include \
-	/I$(TOPDIR)\include
+	/I$(TOPDIR)\wtest
 
 # Note: libraries are picked automatically on Windows!
 INCLUDE_LDFLAGS = \
