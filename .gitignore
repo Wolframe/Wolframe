@@ -106,3 +106,11 @@ examples/tproc/tests/temp/
 tests/bignum/libgmp/testlibgmp_c
 tests/bignum/libgmp/testlibgmp_cpp
 tests/bignum/mpfr/testmpfr_c
+*.RES
+*.DIFF
+clients/cli/primary.db
+examples/iproc/tests/temp/
+src/wolfilter
+tests/AAAA/textFileCRAMtest
+tests/testRand
+tests/testTimestamp
