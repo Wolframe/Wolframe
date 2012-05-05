@@ -46,6 +46,7 @@
 #include "appConfig.hpp"
 ///PF:HACK: Command Line is needed to instantiate the application configuration object:
 #include "../src/commandLine.hpp"
+#include "testDescription.hpp"
 #include "moduleInterface.hpp"
 #include "config/ConfigurationTree.hpp"
 #include "testHandlerTemplates.hpp"
@@ -103,264 +104,6 @@ private:
 	langbind::ApplicationEnvironmentConfig m_langbindConfig;
 };
 
-struct TestDescription
-{
-	std::string input;
-	std::string expected;
-	std::string config;
-	std::string requires;
-
-	TestDescription(){}
-	TestDescription( const TestDescription& o)
-		:input(o.input),expected(o.expected),config(o.config),requires(o.requires)
-	{}
-};
-
-static const char* check_flag( const std::string& flag)
-{
-if (boost::iequals( flag, "DISABLED")) return "DISABLED ";
-if (boost::starts_with( flag, "DISABLED "))
-{
-	unsigned int nargs=0;
-	std::vector<std::string> platforms;
-	// Aba: the only thing which comes to my mind here is to disable the warning
-	// See http://stackoverflow.com/questions/1301277/c-boost-whats-the-cause-of-this-warning
-	boost::split( platforms, flag, boost::is_any_of("\t "));
-	std::vector<std::string>::const_iterator ii = platforms.begin(),ee = platforms.end();
-	for (++ii; ii != ee; ++ii)
-	{
-		if (ii->size() == 0) continue;
-		++nargs;
-#ifdef _WIN32
-		if (boost::iequals( *ii, "WIN32")) return "DISABLED ON PLATFORM WINDOWS ";
-#endif
-#ifdef LINUX
-		if (boost::iequals( *ii, "LINUX")) return "DISABLED ON PLATFORM LINUX ";
-#endif
-#ifdef SUNOS
-		if (boost::iequals( *ii, "SUNOS")) return "DISABLED ON PLATFORM SUNOS ";
-#endif
-#ifdef FREEBSD
-		if (boost::iequals( *ii, "FREEBSD")) return "DISABLED ON PLATFORM FREEBSD ";
-#endif
-#ifdef OPENBSD
-		if (boost::iequals( *ii, "OPENBSD")) return "DISABLED ON PLATFORM OPENBSD ";
-#endif
-#ifdef NETBSD
-		if (boost::iequals( *ii, "NETBSD")) return "DISABLED ON PLATFORM NETBSD ";
-#endif
-	}
-	if (nargs == 0) return "DISABLED ";
-}
-#if !(WITH_LUA)
-	if (boost::iequals( flag, "LUA")) return "WITH_LUA=1 ";
-#endif
-#if !(WITH_LIBGMP)
-	if (boost::iequals( flag, "LIBGMP")) return "WITH_LIBGMP=1 ";
-#endif
-#if !(WITH_SSL)
-	if (boost::iequals( flag, "SSL")) return "WITH_SSL=1 ";
-#endif
-#if !(WITH_QT)
-	if (boost::iequals( flag, "QT")) return "WITH_QT=1 ";
-#endif
-#if !(WITH_PAM)
-	if (boost::iequals( flag, "PAM")) return "WITH_PAM=1 ";
-#endif
-#if !(WITH_SASL)
-	if (boost::iequals( flag, "SASL")) return "WITH_SASL=1 ";
-#endif
-#if !(WITH_SQLITE3)
-	if (boost::iequals( flag, "SQLITE3")) return "WITH_SQLITE3=1 ";
-#endif
-#if !(WITH_LOCAL_SQLITE3)
-	if (boost::iequals( flag, "LOCAL_SQLITE3")) return "WITH_LOCAL_SQLITE3=1 ";
-#endif
-#if !(WITH_PGSQL)
-	if (boost::iequals( flag, "PGSQL")) return "WITH_PGSQL=1 ";
-#endif
-#if !(WITH_LIBXML2)
-	if (boost::iequals( flag, "LIBXML2")) return "WITH_LIBXML2=1 ";
-#endif
-#if !(WITH_XMLLITE)
-	if (boost::iequals( flag, "XMLLITE")) return "WITH_XMLLITE=1 ";
-#endif
-#if !(WITH_MSXML)
-	if (boost::iequals( flag, "MSXML")) return "WITH_MSXML=1 ";
-#endif
-#if !(WITH_LIBXSLT)
-	if (boost::iequals( flag, "LIBXSLT")) return "WITH_LIBXSLT=1 ";
-#endif
-	return "";
-}
-
-static void readFile( const std::string& pt, std::vector<std::string>& hdr, std::vector<std::string>& out, std::string& requires)
-{
-	std::string element;
-	char chb;
-	std::fstream infh;
-	infh.exceptions( std::ifstream::failbit | std::ifstream::badbit);
-	infh.open( pt.c_str(), std::ios::in | std::ios::binary);
-	std::string splitstr;
-	std::string::const_iterator splititr;
-	enum
-	{
-		PARSE_HDR,
-		PARSE_OUT,
-		PARSE_NOT
-	}
-	type = PARSE_HDR;
-
-	while (infh.read( &chb, sizeof(chb)))
-	{
-		if (chb == '\r' || chb == '\n') break;
-		splitstr.push_back( chb);
-	}
-	splititr = splitstr.begin();
-	if (splititr == splitstr.end())
-	{
-		throw std::runtime_error( "illegal test definition file. no split tag defined at file start");
-	}
-	while (infh.read( &chb, sizeof(chb)))
-	{
-		if (chb != '\r' && chb != '\n') break;
-	}
-	do
-	{
-		if (chb != *splititr) break;
-		++splititr;
-	}
-	while (splititr != splitstr.end() && infh.read( &chb, sizeof(chb)));
-
-	if (splititr != splitstr.end())
-	{
-		throw std::runtime_error( "illegal test definition file. header expected after split tag definition");
-	}
-	splititr = splitstr.begin();
-
-	while (infh.read( &chb, sizeof(chb)))
-	{
-		if (type == PARSE_HDR)
-		{
-			if (chb == '\n')
-			{
-				std::string tag( std::string( element.c_str(), element.size()));
-				boost::trim( tag);
-				if (boost::iequals( tag, "end"))
-				{
-					infh.close();
-					return;
-				}
-				else if (boost::starts_with( tag, "requires:"))
-				{
-					std::size_t nn = std::strlen("requires:");
-					std::string flagname( std::string( tag.c_str()+nn, tag.size()-nn));
-					boost::trim( flagname);
-					requires.append( check_flag( flagname));
-					type = PARSE_NOT;
-					splititr = splitstr.begin();
-				}
-				else
-				{
-					hdr.push_back( tag);
-					element.clear();
-					type = PARSE_OUT;
-				}
-			}
-			else
-			{
-				element.push_back( chb);
-			}
-		}
-		else if (type == PARSE_OUT)
-		{
-			element.push_back( chb);
-			if (chb == *splititr)
-			{
-				++splititr;
-				if (splititr == splitstr.end())
-				{
-					out.push_back( std::string( element.c_str(), element.size() - splitstr.size()));
-					element.clear();
-					type = PARSE_HDR;
-					splititr = splitstr.begin();
-				}
-			}
-			else
-			{
-				splititr = splitstr.begin();
-			}
-		}
-		else if (type == PARSE_NOT)
-		{
-			if (chb == *splititr)
-			{
-				++splititr;
-				if (splititr == splitstr.end())
-				{
-					element.clear();
-					type = PARSE_HDR;
-					splititr = splitstr.begin();
-				}
-			}
-			else if (chb > ' ' || chb < 0)
-			{
-				throw std::runtime_error( "illegal test definition file. tag definition expected");
-			}
-			else
-			{
-				splititr = splitstr.begin();
-			}
-		}
-	}
-	throw std::runtime_error( "no end tag at end of file");
-}
-
-static void writeFile( const std::string& pt, const std::string& content)
-{
-	std::fstream ff( pt.c_str(), std::ios::out | std::ios::binary);
-	ff.exceptions( std::ifstream::failbit | std::ifstream::badbit);
-	ff.write( content.c_str(), content.size());
-}
-
-
-static const TestDescription getTestDescription( const std::string& pt)
-{
-	TestDescription rt;
-	std::vector<std::string> header;
-	std::vector<std::string> content;
-	readFile( pt, header, content, rt.requires);
-
-	std::vector<std::string>::const_iterator hi=header.begin();
-	std::vector<std::string>::const_iterator itr=content.begin(),end=content.end();
-
-	for (;itr != end; ++itr,++hi)
-	{
-		if (boost::iequals( *hi, "input"))
-		{
-			rt.input.append( *itr);
-		}
-		else if (boost::iequals( *hi, "output"))
-		{
-			rt.expected.append( *itr);
-		}
-		else if (boost::iequals( *hi, "config"))
-		{
-			rt.config.append( *itr);
-			boost::filesystem::path fn( boost::filesystem::current_path() / "temp" / "test.cfg");
-			writeFile( fn.string(), rt.config);
-		}
-		else if (boost::starts_with( *hi, "file:"))
-		{
-			std::string filename( hi->c_str()+std::strlen("file:"));
-			boost::trim( filename);
-			boost::filesystem::path fn( boost::filesystem::current_path() / "temp" / filename);
-			writeFile( fn.string(), *itr);
-		}
-	}
-	return rt;
-}
-
 class TProcHandlerTest : public ::testing::Test
 {
 protected:
@@ -387,7 +130,7 @@ private:
 	};
 
 public:
-	TProcHandlerTestInstance( const TestDescription& descr, TestConfiguration* config, std::size_t ib, std::size_t ob)
+	TProcHandlerTestInstance( const wtest::TestDescription& descr, TestConfiguration* config, std::size_t ib, std::size_t ob)
 		:ep( "127.0.0.1", 12345)
 		,m_connection(0)
 		,m_config( config)
@@ -458,7 +201,7 @@ TEST_F( TProcHandlerTest, tests)
 		boost::filesystem::remove_all( boost::filesystem::current_path() / "temp" );
 		boost::filesystem::create_directory( boost::filesystem::current_path() / "temp");
 
-		const TestDescription td = getTestDescription( *itr);
+		wtest::TestDescription td( *itr);
 		if (td.requires.size())
 		{
 			std::cerr << "skipping test '" << *itr << "' ( is " << td.requires << ")" << std::endl;

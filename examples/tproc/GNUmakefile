@@ -9,7 +9,8 @@ INCLUDE_CXXFLAGS =
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include \
 	-I$(BOOST_INCLUDE_DIR) \
-	-I$(TOPDIR)/gtest/include
+	-I$(TOPDIR)/gtest/include \
+	-I$(TOPDIR)/wtest
 
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR)
@@ -21,6 +22,7 @@ INCLUDE_LIBS = \
 	$(TOPDIR)/gtest/gtest-all.o \
 	$(TOPDIR)/src/libwolframe.a \
 	$(TOPDIR)/src/libwolframe/libwolframe.a \
+	$(TOPDIR)/wtest/wolftest.a \
 	$(LIBS_DL)
 
 # lua
@@ -78,11 +80,8 @@ TEST_BINS = \
 CPP_BINS = \
 	tprocd$(EXE)
 
-tprocd$(EXE): $(TOPDIR)/src/loadModules-dummy.o $(TOPDIR)/src/posixMain.o $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
-
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
-tests/tprocHandlerTest$(EXE): tests/tprocHandlerTest.o $(OBJS) $(TOPDIR)/src/libwolframe.a
 
 local_all: $(CPP_BINS)
 
