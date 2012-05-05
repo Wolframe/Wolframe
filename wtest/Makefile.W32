@@ -1,0 +1,85 @@
+TOPDIR = ..
+
+SUBDIRS = libwtest
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_CXXFLAGS = \
+	/D_WIN32_WINNT=0x504
+
+INCLUDE_DIRS = \
+	/I. \
+	/I$(TOPDIR)\include \
+	/I"$(BOOST_INCLUDE_DIR)"
+
+INCLUDE_LDFLAGS = \
+	$(BOOST_LDFLAGS)
+
+INCLUDE_LIBS = \
+	advapi32.lib
+
+# openssl
+
+!IFDEF WITH_SSL
+INCLUDE_CXXFLAGS = \
+	$(INCLUDE_CXXFLAGS) /DWITH_SSL
+!ENDIF
+
+# Lua
+!IFDEF WITH_LUA
+INCLUDE_CXXFLAGS = \
+	$(INCLUDE_CXXFLAGS) /DWITH_LUA
+!ENDIF
+
+# libxml2
+!IFDEF WITH_LIBXML2
+INCLUDE_CXXFLAGS = \
+	$(INCLUDE_CXXFLAGS) /DWITH_LIBXML2
+!ENDIF
+
+# MS XML
+!IFDEF WITH_MSXML
+INCLUDE_CXXFLAGS = \
+	$(INCLUDE_CXXFLAGS) /DWITH_MSXML
+!ENDIF
+
+# XmlLite
+!IFDEF WITH_XMLLITE
+INCLUDE_CXXFLAGS = \
+	$(INCLUDE_CXXFLAGS) /DWITH_XMLLITE
+!ENDIF
+
+LOCAL_STATIC_LIB = \
+	wtest.lib
+
+LOCAL_STATIC_LIB_OBJS = \
+	testDescription.obj
+
+CPP_OBJS =
+
+CPP_BINS = \
+	wtestcheck.exe
+
+all: dependencies $(CPP_OBJS) $(CPP_BINS)
+
+dependencies:
+	cd libwtest & $(MAKE) /nologo /f Makefile.w32 all
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+wtestcheck.exe: $(CPP_OBJS) libwolframe\logger\wtestcheckmsg.res
+
+$(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
+	$(LINK) /lib /nologo /out:$@ $(STATIC_LDFLAGS) $?
+
+local_all: $(LOCAL_STATIC_LIB)
+
+local_clean:
+	@-erase $(LOCAL_STATIC_LIB) 2>NUL
+	@-erase $(CPP_OBJS) 2>NUL
+	@-erase test.bat 2>NUL
+
+local_distclean:
+
+local_test:
+
