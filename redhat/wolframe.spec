@@ -30,14 +30,18 @@
 %endif
 
 %define centos 0
+%define centos5 0
 %if 0%{?centos_version} >= 500 && 0%{?centos_version} <= 599
 %define dist centos5
 %define centos 1
+%define centos5 1
 %endif
 
+%define centos6 0
 %if 0%{?centos_version} >= 600 && 0%{?centos_version} <= 699
 %define dist centos6
 %define centos 1
+%define centos6 1
 %endif
 
 %define fedora 0
@@ -121,6 +125,24 @@
 %define boost_underscore_version 1_46_1
 %endif
 
+# build local libxml2 for distributions which have a too old broken version
+
+%if %{with_libxml2}
+%define build_libxml2 0
+%if %{rhel}
+%if %{rhel5}
+%define build_libxml2 1
+%define libxml2_version 2.7.8
+%endif
+%endif
+%if %{centos}
+%if %{centos5}
+%define build_libxml2 1
+%define libxml2_version 2.7.8
+%endif
+%endif
+%endif
+
 # init script to start the daemon
 
 %if %{rhel} || %{centos} || %{fedora}
@@ -139,11 +161,12 @@ Version: 0.0.1
 Release: 0.2
 License: Wolframe License
 Group: Application/Business
-%if %{build_boost}
-Source0: %{name}_%{version}.tar.gz
-Source1: boost_%{boost_underscore_version}.tar.gz
-%else
 Source: %{name}_%{version}.tar.gz
+%if %{build_boost}
+Source1: boost_%{boost_underscore_version}.tar.gz 
+%endif
+%if %{build_libxml2}
+Source2: libxml2-sources-%{libxml2_version}.tar.gz
 %endif
 
 URL: http://www.wolframe.net/
@@ -202,8 +225,10 @@ BuildRequires: pam-devel >= 0.77
 BuildRequires: cyrus-sasl-devel >= 2.1.19
 %endif
 %if %{with_libxml2}
+%if !%{build_libxml2}
 BuildRequires: libxml2-devel >= 2.6
 Requires: libxml2 >= 2.6
+%endif
 %endif
 %if %{with_libxslt}
 BuildRequires: libxslt-devel >= 1.0
@@ -376,10 +401,14 @@ Qt client for the Wolframe server.
 
 %prep
 
+%if %{build_boost} && %{build_libxml2}
+%setup -T -D -b 0 -b 1 -b 2
+%else
 %if %{build_boost}
 %setup -T -D -b 0 -b 1
 %else
 %setup
+%endif
 %endif
 
 %build
@@ -391,11 +420,21 @@ cd %{_builddir}/boost_%{boost_underscore_version}
 ./bjam %{?_smp_mflags} install
 %endif
 
+%if %{build_libxml2}
+cd %{_builddir}/libxml2-%{libxml2_version}
+./configure --prefix=/tmp/libxml2-%{libxml2_version}
+make %{?_smp_mflags}
+make install
+%endif
+
 cd %{_builddir}/%{name}-%{version}
 LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make help \
 %if %{build_boost}
 	BOOST_DIR=/tmp/boost-%{boost_version} \
 	%{boost_library_tag} \
+%endif
+%if %{build_libxml2}
+	LIBXML2_DIR=/tmp/libxml2-%{libxml2_version} \
 %endif
 %if %{build_sqlite}
 	WITH_LOCAL_SQLITE3=%{build_sqlite} \
@@ -417,6 +456,9 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make config \
 	BOOST_DIR=/tmp/boost-%{boost_version} \
 	%{boost_library_tag} \
 %endif
+%if %{build_libxml2}
+	LIBXML2_DIR=/tmp/libxml2-%{libxml2_version} \
+%endif
 %if %{build_sqlite}
 	WITH_LOCAL_SQLITE3=%{build_sqlite} \
 %else
@@ -437,6 +479,9 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make all \
 %if %{build_boost}
 	BOOST_DIR=/tmp/boost-%{boost_version} \
 	%{boost_library_tag} \
+%endif
+%if %{build_libxml2}
+	LIBXML2_DIR=/tmp/libxml2-%{libxml2_version} \
 %endif
 %if %{build_sqlite}
 	WITH_LOCAL_SQLITE3=%{build_sqlite} \
@@ -466,6 +511,9 @@ make DESTDIR=$RPM_BUILD_ROOT install \
 	BOOST_DIR=/tmp/boost-%{boost_version} \
 	%{boost_library_tag} \
 %endif
+%if %{build_libxml2}
+	LIBXML2_DIR=/tmp/libxml2-%{libxml2_version} \
+%endif
 %if %{build_sqlite}
 	WITH_LOCAL_SQLITE3=%{build_sqlite} \
 %else
@@ -483,16 +531,21 @@ make DESTDIR=$RPM_BUILD_ROOT install \
 
 cd docs && make DESTDIR=$RPM_BUILD_ROOT install && cd ..
 
-%if %{build_boost}
 # copy local versions of shared libraries of boost for platforms missing a decent
 # version of boost
-mkdir -p $RPM_BUILD_ROOT%{_libdir}/wolframe
+%if %{build_boost}
 for i in \
 	libboost_program_options.so.%{boost_version} libboost_system.so.%{boost_version} \
 	libboost_filesystem.so.%{boost_version} libboost_thread.so.%{boost_version} \
 	libboost_date_time.so.%{boost_version}; do
     cp /tmp/boost-%{boost_version}/lib/$i $RPM_BUILD_ROOT%{_libdir}/wolframe/
 done
+%endif
+
+# copy a decent version of libxml2 to local library directory for platforms
+# which need it
+%if %{build_libxml2}
+cp /tmp/libxml2-%{libxml2_version}/lib/libxml2.so.%{libxml2_version} $RPM_BUILD_ROOT%{_libdir}/wolframe/
 %endif
 
 mkdir -p $RPM_BUILD_ROOT%{_initrddir}
@@ -535,18 +588,22 @@ fi
 %defattr( -, root, root )
 %attr( 554, root, root) %{_initrddir}/%{name}
 %{_sbindir}/wolframed
+%{_bindir}/wolfilter
 %dir %attr(0755, root, root) %{_sysconfdir}/wolframe
 %config %attr(0755, root, root) %{_sysconfdir}/wolframe/wolframe.conf
 #%attr(0755, WOLFRAME_USR, WOLFRAME_GRP) %dir /var/log/wolframe
 #%attr(0755, WOLFRAME_USR, WOLFRAME_GRP) %dir /var/run/wolframe
 
 %if %{build_boost}
-%dir %{_libdir}/wolframe
 %{_libdir}/wolframe/libboost_program_options.so.%{boost_version}
 %{_libdir}/wolframe/libboost_system.so.%{boost_version}
 %{_libdir}/wolframe/libboost_filesystem.so.%{boost_version}
 %{_libdir}/wolframe/libboost_thread.so.%{boost_version}
 %{_libdir}/wolframe/libboost_date_time.so.%{boost_version}
+%endif
+
+%if %{build_libxml2}
+%{_libdir}/wolframe/libxml2.so.%{libxml2_version}
 %endif
 
 %dir %{_libdir}/wolframe
