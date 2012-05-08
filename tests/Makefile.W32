@@ -92,6 +92,7 @@ TEST_CPP_BINS = \
 	configStructParser.exe \
 	configValueParser.exe \
 	testRand.exe \
+	testProtocolLFdotEscaping.exe \
 	testTimestamp.exe
 
 OBJS = \
@@ -116,7 +117,8 @@ logTest.exe: logTest.obj $(TOPDIR)\src\wolframe.lib
 protocolArgumentParsing.exe: protocolArgumentParsing.obj $(TOPDIR)\src\wolframe.lib
 configStructParser.exe: configStructParser.obj $(TOPDIR)\src\wolframe.lib
 configValueParser.exe: configValueParser.obj $(TOPDIR)\src\wolframe.lib
-filter.exe: filter.obj $(TOPDIR)\src\wolframe.lib
+testProtocolLFdotEscaping.exe: testProtocolLFdotEscaping.obj $(TOPDIR)\src\wolframe.lib
+testWolfilter.exe: testWolfilter.obj $(TOPDIR)\src\wolframe.lib
 testRand.exe: testRand.obj
 testTimestamp.exe: testTimestamp.obj
 
@@ -143,6 +145,7 @@ local_test:
 	@-echo testTimestamp >> test.bat
 	@-echo CRAMtest >> test.bat
 	@-echo protocolArgumentParsing >> test.bat
+	@-echo testProtocolLFdotEscaping >> test.bat
 	@-echo echo off >> test.bat
 	@-test.bat
 
