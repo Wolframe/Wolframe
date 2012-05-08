@@ -81,4 +81,3 @@ struct AssignementList
 }}
 #endif
 
-

@@ -2,6 +2,26 @@
 
  Copyright (C) 2011 Project Wolframe.
  All rights reserved.
+patrick@toimup:~/Projects/github/Wolframe$ git diff
+diff --git a/tests/testProtocolLFdotEscaping.cpp b/tests/testProtocolLFdotEscaping.cpp
+index c7e31de..75de46d 100644
+-- a/tests/testProtocolLFdotEscaping.cpp
++++ b/tests/testProtocolLFdotEscaping.cpp
+@@ -126,4 +126,3 @@ int main( int argc, char **argv )
+	return RUN_ALL_TESTS();
+ }
+
+
+diff --git a/tests/wolfilter/src/employee_assignment_print.cpp b/tests/wolfilter/src/employee_assignment_print.cpp
+deleted file mode 100644
+index 64713d9..0000000
+-- a/tests/wolfilter/src/employee_assignment_print.cpp
++++ /dev/null
+@@ -1,103 +0,0 @@
+/************************************************************************
+
+ Copyright (C) 2011 Project Wolframe.
+ All rights reserved.
 
  This file is part of Project Wolframe.
 
@@ -100,4 +120,3 @@ serialize::MapDescriptionBase* AssignmentList::getMapDescription()
 	static ThisDescription rt;
 	return &rt;
 }
-
