@@ -546,6 +546,7 @@ done
 # which need it
 %if %{build_libxml2}
 cp /tmp/libxml2-%{libxml2_version}/lib/libxml2.so.%{libxml2_version} $RPM_BUILD_ROOT%{_libdir}/wolframe/
+ln -s libxml2.so.%{libxml2_version} $RPM_BUILD_ROOT%{_libdir}/wolframe/libxml2.so.2
 %endif
 
 mkdir -p $RPM_BUILD_ROOT%{_initrddir}
@@ -604,6 +605,7 @@ fi
 
 %if %{build_libxml2}
 %{_libdir}/wolframe/libxml2.so.%{libxml2_version}
+%{_libdir}/wolframe/libxml2.so.2
 %endif
 
 %dir %{_libdir}/wolframe
