@@ -153,6 +153,9 @@ wolframed$(EXE): libwolframe
 wolframed$(EXE): wolframed.o $(OBJS) $(CPP_OBJS)
 	$(CXX_LINK) -o $@ $(ALL_LDFLAGS) $(OBJS) $(CPP_OBJS) $< $(LIBS)
 
+wolfilter$(EXE): wolfilter.o $(OBJS) $(CPP_OBJS)
+	$(CXX_LINK) -o $@ $(ALL_LDFLAGS) $(OBJS) $(CPP_OBJS) $< $(LIBS)
+
 local_all: $(LOCAL_STATIC_LIB) loadModules-dummy.o
 
 $(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
