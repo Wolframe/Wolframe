@@ -51,7 +51,7 @@ class MemBlock
 {
 public:
 	//element typedefs
-	typedef char value_type;		///< basic STL vector typedefs
+	typedef char value_type;		//< basic STL vector typedefs
 
 	///\brief Constructor
 	MemBlock();
@@ -120,10 +120,10 @@ public:
 	char& operator[]( std::size_t idx)			{if (idx>=m_pos) throw ArrayBoundReadError(); return charptr()[idx];}
 
 private:
-	void* m_ptr;		///< pointer to buffer
-	std::size_t m_size;	///< allocation size in bytes of this buffer
-	std::size_t m_pos;	///< current byte position of the cursor
-	bool m_allocated;	///< true, if the memory of the buffer \c m_ptr is owned by this class and has to be freed again in the destructor
+	void* m_ptr;		//< pointer to buffer
+	std::size_t m_size;	//< allocation size in bytes of this buffer
+	std::size_t m_pos;	//< current byte position of the cursor
+	bool m_allocated;	//< true, if the memory of the buffer \c m_ptr is owned by this class and has to be freed again in the destructor
 };
 
 
@@ -139,12 +139,12 @@ public:
 	///\class EoD
 	///\brief States of the automaton recognizing end of data and unescaping escape sequences in data
 	///
-	/// See method getEoD(iterator)
-	///
-	/// The end of data is marked with a sequence "\n.\r" or "\n.\n".
-	/// If such a sequence appears by accident in the content it has to be escaped with a dot as "\n..\r" or "\n..\r".
-	/// The additional dot after the end of line escapes any other character sequence too.
-	/// As consequence every line starting with a dot has to be escaped.
+	// See method getEoD(iterator)
+	//
+	// The end of data is marked with a sequence "\n.\r" or "\n.\n".
+	// If such a sequence appears by accident in the content it has to be escaped with a dot as "\n..\r" or "\n..\r".
+	// The additional dot after the end of line escapes any other character sequence too.
+	// As consequence every line starting with a dot has to be escaped.
 	///
 	struct EoD
 	{
@@ -152,12 +152,12 @@ public:
 		///\brief enumeration of states for handling eoD
 		enum State
 		{
-			SRC,			///< parsing content
-			CR,			///< detected an CarriageReturn in state SRC, belonging either to a CRLF or a LF sequence
-			CR_LF,			///< detected an LineFeed in state SRC or CR, belonging either to a CRLF or a LF sequence
-			CR_LF_DOT,		///< detected a '.' (dot) in state CR_LF
-			CR_LF_DOT_CR,		///< detected a CarriageReturn CR in state CR_LF_DOT. Here we assume that end of data is reached
-			CR_LF_DOT_CR_LF		///< detected a LineFeed LF in state CR_LF_DOT or CR_LF_DOT_CR. Here we assume at last that end of data is reached
+			SRC,			//< parsing content
+			CR,			//< detected an CarriageReturn in state SRC, belonging either to a CRLF or a LF sequence
+			CR_LF,			//< detected an LineFeed in state SRC or CR, belonging either to a CRLF or a LF sequence
+			CR_LF_DOT,		//< detected a '.' (dot) in state CR_LF
+			CR_LF_DOT_CR,		//< detected a CarriageReturn CR in state CR_LF_DOT. Here we assume that end of data is reached
+			CR_LF_DOT_CR_LF		//< detected a LineFeed LF in state CR_LF_DOT or CR_LF_DOT_CR. Here we assume at last that end of data is reached
 		};
 	};
 
@@ -252,9 +252,9 @@ private:
 
 ///\class OutputBlock
 ///\brief Protocol output buffer
-///
-/// Print as buffer is available and then order to "ship" what you printed.
-///
+//
+// Print as buffer is available and then order to "ship" what you printed.
+//
 class OutputBlock :public MemBlock
 {
 public:
@@ -334,60 +334,35 @@ public:
 	void release()						{setPos(0);}
 };
 
-///\class EscapingBuffer
-///\brief Back insertion sequence for content data where LF '.' sequences have to be escaped for the prococol
-///\tparam Inherited back insertion sequence base
-template <class BufferType>
-class EscapingBuffer
+
+///\class EscapeBuffer
+///\brief Statemachine used for replacing "LF DOT" sequences in a buffer with "LF DOT DOT"
+class EscapeBuffer
 {
 public:
+	EscapeBuffer();
+	~EscapeBuffer();
+
+	void process( char* aa, std::size_t aasize, std::size_t& aapos);
+	bool hasData() const {return m_itr != m_end;}
+
+private:
+	void push( char ch);
+
+private:
 	///\enum State
 	///\brief enumeration of states for escaping LF '.' sequences to LF '.' '.'
 	enum State
 	{
-		SRC,			///< parsing content
-		LF,			///< detected an LineFeed in state SRC
-		LF_DOT			///< LF and additional '.' not printed yet
+		SRC,			//< parsing content
+		LF			//< detected an LineFeed in state SRC
 	};
-
-	///\brief Constructor
-	///\param [in] b pointer to the sink to use
-	///\param [in] p_state escaping STM state (EOF escaping)
-	EscapingBuffer( BufferType* b, State p_state)
-		:m_buf(b),m_state(p_state) {}
-
-	///\brief get the current state of escaping LF DOT
-	State state() const
-	{
-		return m_state;
-	}
-
-	///\brief redirect to BufferType::push_back(char) with escaping of LF DOT as LF DOT DOT
-	void push_back( char ch)
-	{
-		m_buf->push_back( ch);
-		if (ch == '\n')
-		{
-			m_state = LF;
-		}
-		else if (ch == '.')
-		{
-			if (m_state == LF)
-			{
-				m_state = LF_DOT;
-				m_buf->push_back( ch);
-
-			}
-			m_state = SRC;
-		}
-		else
-		{
-			m_state = SRC;
-		}
-	}
-private:
-	BufferType* m_buf;	///< the buffer to use
-	State m_state;		///< the current state of escaping LF DOT as LF DOT DOT
+	enum {InitDataSize=2};
+	char* m_data;
+	std::size_t m_itr;
+	std::size_t m_end;
+	std::size_t m_size;
+	State m_state;
 };
 
 } // namespace protocol

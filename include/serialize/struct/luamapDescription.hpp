@@ -44,26 +44,17 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-template <class Element>
-static const char* getTypename()
-{
-	const char* typ = 0;
-	try
-	{
-		typ = typeid(Element).name();
-	}
-	catch (std::bad_typeid)
-	{}
-	return typ;
-}
-
 ///\class LuamapDescription
 ///\brief Intrusive description of a filter/luatable serialization
 ///\tparam Structure structure that is represented by this description
 template <class Structure>
 struct LuamapDescription :public LuamapDescriptionBase
 {
-	///\brief Operator to build the configuration structure element by element
+	///\brief Constructor
+	LuamapDescription()
+		:LuamapDescriptionBase( &constructor, &destructor, getTypename<Structure>(), 0, sizeof(Structure), &LuamapIntrusiveParser<Structure>::parse, &LuamapIntrusivePrinter<Structure>::print){}
+
+	///\brief Operator to build the structure description element by element
 	///\tparam Element element type
 	///\param[in] name name of the element
 	///\param[in] eptr pointer to member of the element
@@ -78,8 +69,8 @@ struct LuamapDescription :public LuamapDescriptionBase
 		}
 		catch (std::bad_typeid)
 		{}
-		LuamapDescriptionBase::Parse parse_ = &IntrusiveParser<Element>::parse;
-		LuamapDescriptionBase::Print print_ = &IntrusivePrinter<Element>::print;
+		LuamapDescriptionBase::Parse parse_ = &LuamapIntrusiveParser<Element>::parse;
+		LuamapDescriptionBase::Print print_ = &LuamapIntrusivePrinter<Element>::print;
 
 		std::size_t pp = (std::size_t)&(((Structure*)0)->*eptr);
 		LuamapDescriptionBase e( getTypename<Element>(), pp, sizeof(Element), parse_, print_);
@@ -118,8 +109,18 @@ struct LuamapDescription :public LuamapDescriptionBase
 		((Structure*)obj)->~Structure();
 	}
 
-	LuamapDescription()
-		:LuamapDescriptionBase( &constructor, &destructor, getTypename<Structure>(), 0, sizeof(Structure), &IntrusiveParser<Structure>::parse, &IntrusivePrinter<Structure>::print){}
+	template <class Element>
+	static const char* getTypename()
+	{
+		const char* typ = 0;
+		try
+		{
+			typ = typeid(Element).name();
+		}
+		catch (std::bad_typeid)
+		{}
+		return typ;
+	}
 };
 
 }}// end namespace

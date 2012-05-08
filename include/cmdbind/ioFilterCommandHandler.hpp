@@ -115,6 +115,8 @@ private:
 		return ar[ (int)st];
 	}
 
+	protocol::EscapeBuffer m_escapeBuffer;
+
 	State m_state;					//< processing state machine state
 	const void* m_writedata;			//< bytes to write next (WRITE)
 	std::size_t m_writedatasize;			//< number of bytes to write next (WRITE)

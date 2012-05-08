@@ -33,11 +33,6 @@
 ///\file tprocHandlerTest.cpp
 ///\brief Class unit tests using google test framework (gTest)
 
-// Aba: see below, got trouble on VC10 to compile in debug mode
-#ifdef _WIN32
-#pragma warning(disable:4996) 
-#endif
-
 #include "tprocHandler.hpp"
 #include "connectionHandler.hpp"
 #include "handlerConfig.hpp"

@@ -108,6 +108,7 @@ bool FilterMap::getFilter( const std::string& arg, Filter& rt)
 {
 	std::size_t nn = arg.size();
 	std::size_t ii = nn;
+	std::size_t aa = nn;
 	std::string nam( arg);
 	std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
 	do
@@ -116,12 +117,14 @@ bool FilterMap::getFilter( const std::string& arg, Filter& rt)
 		std::map<std::string,FilterFactoryR>::const_iterator itr=m_map.find( nam),end=m_map.end();
 		if (itr != end)
 		{
-			rt = itr->second->create( (ii==nn)?0:(arg.c_str()+ii+1));
+			rt = itr->second->create( (ii==nn)?0:(arg.c_str()+aa));
 			return true;
 		}
-		for (ii=nn; ii>0 && arg[ii] != ':'; --ii);
+		for (nn=ii; ii>0 && arg[ii] != ':'; --ii);
+		aa = ii + 1;
+		for (++ii; ii>0 && arg[ii-1] == ':'; --ii);
 	}
-	while (ii>0);
+	while (ii>0 && ii<nn);
 	return false;
 }
 

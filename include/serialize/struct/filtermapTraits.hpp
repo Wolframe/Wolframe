@@ -46,19 +46,20 @@ Project Wolframe.
 
 namespace _Wolframe {
 namespace serialize {
+namespace filtertraits {
 
-struct struct_ {};		///< category tag for a structure with named elements
-struct vector_ {};		///< category tag for a std::vector of any type
-struct arithmetic_ {};		///< category tag for a type that is convertible from a string through boost::lexical_cast
-struct bool_ {};		///< category tag for a boolean type
+struct struct_ {};		//< category tag for a structure with named elements
+struct vector_ {};		//< category tag for a std::vector of any type
+struct arithmetic_ {};		//< category tag for a type that is convertible from a string through boost::lexical_cast
+struct bool_ {};		//< category tag for a boolean type
 
 ///\brief conditional template for detecting if a type is a class with a static/member method getFiltermapDescription() returning a const pointer to a structure description as defined in serialize/filtermapBase.hpp
 /// see http://drdobbs.com/article/print?articleId=227500449&siteSectionName= "Checking Concept Without Concepts in C++"
 template<typename T,bool is_class_type=boost::is_class<T>::value>
-struct has_description_method: boost::false_type {};
+struct has_filtermap_description_method: boost::false_type {};
 
 template<typename T>
-struct has_description_method_noprm
+struct has_filtermap_description_method_noprm
 {
 	typedef char small_type;
 	struct large_type {small_type dummy[2];};
@@ -78,8 +79,8 @@ struct has_description_method_noprm
 };
 
 template<typename T>
-struct has_description_method<T,true>:
-	boost::integral_constant<bool, has_description_method_noprm<T>::value>
+struct has_filtermap_description_method<T,true>:
+	boost::integral_constant<bool, has_filtermap_description_method_noprm<T>::value>
 {};
 
 
@@ -94,7 +95,7 @@ typename boost::enable_if_c<
 /// returns struct_ if T has a method description with no params returning a const pointer to a serialize::FiltermapDescriptionBase
 template <typename T>
 typename boost::enable_if_c<
-	has_description_method<T>::value
+	has_filtermap_description_method<T>::value
 	,const struct_&>::type getCategory( const T&) { static struct_ rt; return rt;}
 
 ///\brief get category arithmetic_ for a type
@@ -111,5 +112,5 @@ typename boost::enable_if_c<
 	boost::is_same<bool,T>::value
 	,const bool_&>::type getCategory( const T&) { static bool_ rt; return rt;}
 
-}}// end namespace
+}}}// end namespace
 #endif

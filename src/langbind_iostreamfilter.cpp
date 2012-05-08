@@ -88,7 +88,7 @@ static bool readInput( char* buf, unsigned int bufsize, std::istream& is, protoc
 	while (pp < bufsize && !is.eof())
 	{
 		is.read( buf+pp, sizeof(char));
-		++pp;
+		if (!is.eof()) ++pp;
 	}
 	iflt->protocolInput( buf, pp, is.eof());
 	return true;
@@ -184,37 +184,49 @@ static bool processIO( BufferStruct& buf, langbind::Filter& flt, std::istream& i
 	return true;
 }
 
+bool finalIOState( const langbind::Filter& flt)
+{
+	return	flt.inputfilter()->state() != protocol::InputFilter::Error
+		&& flt.inputfilter()->gotEoD()
+		&& !flt.inputfilter()->hasLeft()
+		&& flt.outputfilter()->state() == protocol::OutputFilter::Open;
+}
+
+
 bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& is, std::ostream& os)
 {
 	langbind::GlobalContext* gc = langbind::getGlobalContext();
+	langbind::FilterFactoryR tf( new langbind::TokenFilterFactory());
+	gc->defineFilter( "token", tf);
+
 	langbind::Filter flt = getFilter( gc, ifl, ofl);
+	if (!flt.inputfilter().get() || !flt.outputfilter().get()) return false;
+
 	BufferStruct buf( ib, ob);
 	flt.outputfilter().get()->init( buf.outbuf, buf.outsize);
 
 	if (proc.size() == 0 || proc == "-")
 	{
-		langbind::FilterFactoryR tf( new langbind::TokenFilterFactory());
-		gc->defineFilter( "token", tf);
-
 		const void* elem;
 		std::size_t elemsize;
 		protocol::InputFilter::ElementType ietype;
 		protocol::OutputFilter::ElementType oetype;
 
-		for (;;)
+		while (!flt.inputfilter()->gotEoD() || flt.inputfilter()->hasLeft())
 		{
-			if (!flt.inputfilter().get()->getNext( ietype, elem, elemsize))
+			while (!flt.inputfilter().get()->getNext( ietype, elem, elemsize))
 			{
-				if (!processIO( buf, flt, is, os)) break;
-				continue;
+				if (!processIO( buf, flt, is, os)) goto _END_FILTER_LOOP;
 			}
 			oetype = (protocol::OutputFilter::ElementType) ietype;
-			if (!flt.outputfilter().get()->print( oetype, elem, elemsize))
+			while (!flt.outputfilter().get()->print( oetype, elem, elemsize))
 			{
-				if (!processIO( buf, flt, is, os)) break;
-				continue;
+				if (!processIO( buf, flt, is, os)) goto _END_FILTER_LOOP;
 			}
 		}
+		_END_FILTER_LOOP:
+		writeOutput( buf.outbuf, buf.outsize, os, flt.outputfilter());
+		return finalIOState( flt);
 	}
 #if WITH_LUA
 	{

@@ -20,11 +20,11 @@ CREATE TABLE customer (
 
 CREATE TABLE customercontact (
 	firstname TEXT,
-        surname TEXT,
+	surname TEXT,
 	department VARCHAR(15), 
-        number SERIAL PRIMARY KEY,
-        phone TEXT,
-        email TEXT,
+	number SERIAL PRIMARY KEY,
+	phone TEXT,
+	email TEXT,
 	customernumber REFERENCES customer(number) 
 )
 

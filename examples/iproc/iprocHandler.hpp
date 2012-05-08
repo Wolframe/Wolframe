@@ -123,7 +123,7 @@ private:
 	const Configuration* m_config;					//< configuration
 	protocol::CmdParser<protocol::Buffer> m_parser;			//< context dependent command parser definition
 	int m_cmdidx;							//< command parsed
-	CountedReference<cmdbind::CommandHandler> m_cmdhandler;	//< currently executed command
+	CountedReference<cmdbind::CommandHandler> m_cmdhandler;		//< currently executed command
 
 	///\brief Helper function to send a line message with CRLF termination as C string
 	///\param [in] str head of the line to write

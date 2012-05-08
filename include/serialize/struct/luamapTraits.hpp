@@ -46,19 +46,20 @@ Project Wolframe.
 
 namespace _Wolframe {
 namespace serialize {
+namespace luatraits {
 
-struct struct_ {};  		///< category tag for a structure with named elements
-struct vector_ {};		///< category tag for a std::vector of any type
-struct arithmetic_ {};		///< category tag for a type that is convertible from/to a string through boost::lexical_cast
-struct string_ {};		///< category tag for a type that is convertible from/to a string through boost::lexical_cast
+struct struct_ {};  		//< category tag for a structure with named elements
+struct vector_ {};		//< category tag for a std::vector of any type
+struct arithmetic_ {};		//< category tag for a type that is convertible from/to a string through boost::lexical_cast
+struct string_ {};		//< category tag for a type that is convertible from/to a string through boost::lexical_cast
 
 ///\brief conditional template for detecting if a type is a class with a static/member method getLuamapDescription() returning a const pointer to a structure description as defined in serialize/luamapBase.hpp
 ///\remark see http://drdobbs.com/article/print?articleId=227500449&siteSectionName= "Checking Concept Without Concepts in C++"
 template<typename T,bool is_class_type=boost::is_class<T>::value>
-struct has_description_method: boost::false_type {};
+struct has_luamap_description_method: boost::false_type {};
 
 template<typename T>
-struct has_description_method_noprm
+struct has_luamap_description_method_noprm
 {
 	typedef char small_type;
 	struct large_type {small_type dummy[2];};
@@ -78,8 +79,8 @@ struct has_description_method_noprm
 };
 
 template<typename T>
-struct has_description_method<T,true>:
-	boost::integral_constant<bool, has_description_method_noprm<T>::value>
+struct has_luamap_description_method<T,true>:
+	boost::integral_constant<bool, has_luamap_description_method_noprm<T>::value>
 {};
 
 
@@ -94,7 +95,7 @@ typename boost::enable_if_c<
 ///\ return struct_ if T has a method description with no params returning a const pointer to a serialize::LuamapDescriptionBase
 template <typename T>
 typename boost::enable_if_c<
-	has_description_method<T>::value
+	has_luamap_description_method<T>::value
 	,const struct_>::type getCategory( const T&) { return struct_();}
 
 ///\brief get category arithmetic_ for a type
@@ -142,5 +143,5 @@ typename boost::enable_if_c<
 	(!boost::is_arithmetic<T>::value && !boost::is_same<bool,T>::value && !boost::is_same<std::string,T>::value)
 	,const luastruct_>::type getLuaCategory( const T&) { return luastruct_();}
 
-}}//namespace
+}}}//namespace
 #endif

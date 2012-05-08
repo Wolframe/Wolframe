@@ -43,31 +43,31 @@ namespace _Wolframe {
 namespace serialize {
 
 template <typename T>
-struct IntrusivePrinter;
+struct LuamapIntrusivePrinter;
 
 template <typename T>
-bool pushAtom_( const void* obj, const luanumeric_&, lua_State* ls, Context*)
+bool pushAtom_( const void* obj, const luatraits::luanumeric_&, lua_State* ls, Context*)
 {
 	lua_pushnumber( ls, *((T*)obj));
 	return true;
 }
 
 template <typename T>
-bool pushAtom_( const void* obj, const luabool_&, lua_State* ls, Context*)
+bool pushAtom_( const void* obj, const luatraits::luabool_&, lua_State* ls, Context*)
 {
 	lua_pushboolean( ls, *((T*)obj));
 	return true;
 }
 
 template <typename T>
-bool pushAtom_( const void* obj, const luastring_&, lua_State* ls, Context*)
+bool pushAtom_( const void* obj, const luatraits::luastring_&, lua_State* ls, Context*)
 {
 	lua_pushstring( ls, ((T*)obj)->c_str());
 	return true;
 }
 
 template <typename T>
-bool pushAtom_( const void* obj, const luastruct_&, lua_State* ls, Context* ctx)
+bool pushAtom_( const void* obj, const luatraits::luastruct_&, lua_State* ls, Context* ctx)
 {
 	ctx->setError( 0, "atomic value expected");
 	return false;
@@ -76,12 +76,12 @@ bool pushAtom_( const void* obj, const luastruct_&, lua_State* ls, Context* ctx)
 template <typename T>
 bool push_( const void* obj, lua_State* ls, Context* ctx)
 {
-	return pushAtom_<T>( obj, getLuaCategory(T()), ls, ctx);
+	return pushAtom_<T>( obj, luatraits::getLuaCategory(T()), ls, ctx);
 }
 
 
 template <typename T>
-bool printObject_( const void* obj, const struct_&, lua_State* ls, Context* ctx)
+bool printObject_( const void* obj, const luatraits::struct_&, lua_State* ls, Context* ctx)
 {
 	static const LuamapDescriptionBase* descr = T::getLuamapDescription();
 	
@@ -102,19 +102,19 @@ bool printObject_( const void* obj, const struct_&, lua_State* ls, Context* ctx)
 }
 
 template <typename T>
-bool printObject_( const void* obj, const arithmetic_&, lua_State* ls, Context* ctx)
+bool printObject_( const void* obj, const luatraits::arithmetic_&, lua_State* ls, Context* ctx)
 {
 	return push_<T>( obj, ls, ctx);
 }
 
 template <typename T>
-bool printObject_( const void* obj, const string_&, lua_State* ls, Context* ctx)
+bool printObject_( const void* obj, const luatraits::string_&, lua_State* ls, Context* ctx)
 {
 	return push_<T>( obj, ls, ctx);
 }
 
 template <typename T>
-bool printObject_( const void* obj, const vector_&, lua_State* ls, Context* ctx)
+bool printObject_( const void* obj, const luatraits::vector_&, lua_State* ls, Context* ctx)
 {
 	lua_newtable( ls);
 	std::size_t index = 0;
@@ -123,7 +123,7 @@ bool printObject_( const void* obj, const vector_&, lua_State* ls, Context* ctx)
 	while (itr != ((T*)obj)->end())
 	{
 		lua_pushnumber( ls, (lua_Number)(++index));
-		if (!IntrusivePrinter<typename T::value_type>::print( (const void*)&(*itr), ls, ctx))
+		if (!LuamapIntrusivePrinter<typename T::value_type>::print( (const void*)&(*itr), ls, ctx))
 		{
 			return false;
 		}
@@ -134,11 +134,11 @@ bool printObject_( const void* obj, const vector_&, lua_State* ls, Context* ctx)
 }
 
 template <typename T>
-struct IntrusivePrinter
+struct LuamapIntrusivePrinter
 {
 	static bool print( const void* obj, lua_State* ls, Context* ctx)
 	{
-		return printObject_<T>( obj, getCategory(*(T*)obj), ls, ctx);
+		return printObject_<T>( obj, luatraits::getCategory(*(T*)obj), ls, ctx);
 	}
 };
 

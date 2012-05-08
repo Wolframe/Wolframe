@@ -109,18 +109,13 @@ private:
 template <class IOCharset, class AppCharset=textwolf::charset::UTF8>
 struct OutputFilterImpl :public protocol::OutputFilter
 {
-	typedef protocol::EscapingBuffer<textwolf::StaticBuffer> EscapingBuffer;
-
 	///\brief Constructor
-	OutputFilterImpl()
-		:m_bufstate(EscapingBuffer::SRC){}
+	OutputFilterImpl(){}
 
 	///\brief Copy constructor
 	///\param [in] o output filter to copy
 	OutputFilterImpl( const OutputFilterImpl& o)
-		:protocol::OutputFilter(o)
-		,m_bufstate(o.m_bufstate)
-	{}
+		:protocol::OutputFilter(o){}
 
 	///\brief self copy
 	///\return copy of this
@@ -138,22 +133,18 @@ struct OutputFilterImpl :public protocol::OutputFilter
 	{
 		if (type == Value)
 		{
-			textwolf::StaticBuffer basebuf( rest(), restsize());
-			EscapingBuffer buf( &basebuf, m_bufstate);
+			textwolf::StaticBuffer buf( rest(), restsize());
 
 			FilterBase<IOCharset,AppCharset>::printToBuffer( (const char*)element, elementsize, buf);
-			if (basebuf.overflow())
+			if (buf.overflow())
 			{
 				setState( EndOfBuffer);
 				return false;
 			}
-			incPos( basebuf.size());
-			m_bufstate = buf.state();
+			incPos( buf.size());
 		}
 		return true;
 	}
-private:
-	typename EscapingBuffer::State m_bufstate;	///< state of escaping the output
 };
 }//end anonymous namespace
 

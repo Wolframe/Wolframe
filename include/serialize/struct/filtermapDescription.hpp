@@ -45,35 +45,26 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-template <class Element>
-static const char* getTypename()
-{
-	const char* typ = 0;
-	try
-	{
-		typ = typeid(Element).name();
-	}
-	catch (std::bad_typeid)
-	{}
-	return typ;
-}
-
 ///\class FiltermapDescription
 ///\brief Intrusive description of a filter/form map
 ///\tparam Structure structure that is represented by this description
 template <class Structure>
 struct FiltermapDescription :public FiltermapDescriptionBase
 {
-	///\brief Operator to build the configuration structure element by element
+	///\brief Constructor
+	FiltermapDescription()
+		:FiltermapDescriptionBase( &constructor, &destructor, getTypename<Structure>(), 0, sizeof(Structure), &FiltermapIntrusiveParser<Structure>::isAtomic, &FiltermapIntrusiveParser<Structure>::parse, &FiltermapIntrusivePrinter<Structure>::print){}
+
+	///\brief Operator to build the structure description element by element
 	///\tparam Element element type
 	///\param[in] name name of the element
 	///\param[in] eptr pointer to member of the element
 	template <typename Element>
 	FiltermapDescription& operator()( const char* name, Element Structure::*eptr)
 	{
-		FiltermapDescriptionBase::Parse parse_ = &IntrusiveParser<Element>::parse;
-		FiltermapDescriptionBase::Print print_ = &IntrusivePrinter<Element>::print;
-		FiltermapDescriptionBase::IsAtomic isAtomic_ = &IntrusiveParser<Element>::isAtomic;
+		FiltermapDescriptionBase::Parse parse_ = &FiltermapIntrusiveParser<Element>::parse;
+		FiltermapDescriptionBase::Print print_ = &FiltermapIntrusivePrinter<Element>::print;
+		FiltermapDescriptionBase::IsAtomic isAtomic_ = &FiltermapIntrusiveParser<Element>::isAtomic;
 
 		std::size_t pp = (std::size_t)&(((Structure*)0)->*eptr);
 		FiltermapDescriptionBase e( getTypename<Element>(), pp, sizeof(Element), isAtomic_, parse_, print_);
@@ -118,8 +109,19 @@ struct FiltermapDescription :public FiltermapDescriptionBase
 		((Structure*)obj)->~Structure();
 	}
 
-	FiltermapDescription()
-		:FiltermapDescriptionBase( &constructor, &destructor, getTypename<Structure>(), 0, sizeof(Structure), &IntrusiveParser<Structure>::isAtomic, &IntrusiveParser<Structure>::parse, &IntrusivePrinter<Structure>::print){}
+	template <class Element>
+	static const char* getTypename()
+	{
+		const char* typ = 0;
+		try
+		{
+			typ = typeid(Element).name();
+		}
+		catch (std::bad_typeid)
+		{}
+		return typ;
+	}
+
 };
 
 }}// end namespace

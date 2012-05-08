@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/struct/luamapParse.hpp
-///\brief Defines the intrusive implementation of the parsing part of serialization for the lua map
+//\file serialize/struct/luamapParse.hpp
+//\brief Defines the intrusive implementation of the parsing part of serialization for the lua map
 #ifndef _Wolframe_SERIALIZE_STRUCT_LUAMAP_PARSE_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_LUAMAP_PARSE_HPP_INCLUDED
 #include "serialize/mapContext.hpp"
@@ -46,7 +46,7 @@ namespace _Wolframe {
 namespace serialize {
 
 template <typename T>
-struct IntrusiveParser;
+struct LuamapIntrusiveParser;
 
 static void setLuaError( Context* ctx, lua_State* ls, int tagIndex, const char* msg, const char* param)
 {
@@ -57,7 +57,7 @@ static void setLuaError( Context* ctx, lua_State* ls, int tagIndex, const char* 
 }
 
 template <typename T>
-static bool parseObject_( void* obj, const struct_&, lua_State* ls, Context* ctx)
+static bool parseObject_( void* obj, const luatraits::struct_&, lua_State* ls, Context* ctx)
 {
 	static const LuamapDescriptionBase* descr = T::getLuamapDescription();
 	
@@ -97,7 +97,7 @@ static bool parseObject_( void* obj, const struct_&, lua_State* ls, Context* ctx
 }
 
 template <typename T>
-static bool parseObject_( void* obj, const string_&, lua_State* ls, Context* ctx)
+static bool parseObject_( void* obj, const luatraits::string_&, lua_State* ls, Context* ctx)
 {
 	bool rt = true;
 	try
@@ -153,7 +153,7 @@ typename boost::enable_if_c<boost::is_integral<T>::value,T>::type convertNumber(
 }
 
 template <typename T>
-static bool parseObject_( void* obj, const arithmetic_&, lua_State* ls, Context* ctx)
+static bool parseObject_( void* obj, const luatraits::arithmetic_&, lua_State* ls, Context* ctx)
 {
 	bool rt = true;
 	try
@@ -183,7 +183,7 @@ template <typename T>
 static bool parseVectorElement( void* vectorobj, lua_State* ls, Context* ctx)
 {
 	typename T::value_type val;
-	if (!IntrusiveParser<typename T::value_type>::parse( &val, ls, ctx))
+	if (!LuamapIntrusiveParser<typename T::value_type>::parse( &val, ls, ctx))
 	{
 		return false;
 	}
@@ -200,16 +200,16 @@ static bool parseVectorElement( void* vectorobj, lua_State* ls, Context* ctx)
 }
 
 template <typename T>
-static bool parseObject_( void* obj, const vector_&, lua_State* ls, Context* ctx)
+static bool parseObject_( void* obj, const luatraits::vector_&, lua_State* ls, Context* ctx)
 {
 	std::size_t vecidx = 0;
 	if (!lua_istable( ls, -1))
 	{
-		/// ... If the element parsed as a vector is not a table,
-		/// ... then we assume it to be the single atomic
-		/// ... element of the vector parsed. If this hypothesis
-		/// ... works, everything is fine. If not we have to give
-		/// ... up with an error.
+		// ... If the element parsed as a vector is not a table,
+		// ... then we assume it to be the single atomic
+		// ... element of the vector parsed. If this hypothesis
+		// ... works, everything is fine. If not we have to give
+		// ... up with an error.
 		if (!parseVectorElement<T>( obj, ls, ctx))
 		{
 			ctx->setError( 0, "single vector element does not match to element type");
@@ -224,12 +224,12 @@ static bool parseObject_( void* obj, const vector_&, lua_State* ls, Context* ctx
 		{
 			if (vecidx == 0)
 			{
-				/// ... If the table parsed as a vector
-				/// ... has not a number index as first element,
-				/// ... then we assume it to be the single structure
-				/// ... element of the vector parsed. If this hypothesis
-				/// ... works, everything is fine. If not we have to give
-				/// ... up with an error.
+				// ... If the table parsed as a vector
+				// ... has not a number index as first element,
+				// ... then we assume it to be the single structure
+				// ... element of the vector parsed. If this hypothesis
+				// ... works, everything is fine. If not we have to give
+				// ... up with an error.
 				lua_pushvalue( ls, -3);
 				if (!parseVectorElement<T>( obj, ls, ctx))
 				{
@@ -253,11 +253,11 @@ static bool parseObject_( void* obj, const vector_&, lua_State* ls, Context* ctx
 }
 
 template <typename T>
-struct IntrusiveParser
+struct LuamapIntrusiveParser
 {
 	static bool parse( void* obj, lua_State* ls, Context* ctx)
 	{
-		return parseObject_<T>( obj, getCategory(*(T*)obj), ls, ctx);
+		return parseObject_<T>( obj, luatraits::getCategory(*(T*)obj), ls, ctx);
 	}
 };
 }}//namespace

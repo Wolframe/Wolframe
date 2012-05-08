@@ -190,7 +190,7 @@ TEST_F( IProcHandlerXMLTest, tests)
 
 				IProcTestConfiguration config(
 						scriptpath, BufferSize[ib]+EoDBufferSize,
-						BufferSize[ob]+testDescriptions[ti].elementBuffersize);
+						BufferSize[ob]);
 				iproc::Connection connection( ep, &config);
 
 				EXPECT_EQ( 0, test::runTestIO( data.input, testoutput, connection));

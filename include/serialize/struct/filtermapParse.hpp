@@ -52,25 +52,25 @@ namespace serialize {
 template <typename T>
 static void parseObject( const char* tag, T& obj, protocol::InputFilter& inp, bool);
 
-bool isAtomic_( const struct_&)
+bool isAtomic_( const filtertraits::struct_&)
 {
 	return false;
 }
-bool isAtomic_( const vector_&)
+bool isAtomic_( const filtertraits::vector_&)
 {
 	return false;
 }
-bool isAtomic_( const arithmetic_&)
+bool isAtomic_( const filtertraits::arithmetic_&)
 {
 	return true;
 }
-bool isAtomic_( const bool_&)
+bool isAtomic_( const filtertraits::bool_&)
 {
 	return true;
 }
 
 template <typename T>
-bool parseObject_( const char* tag, void* obj, const struct_&, protocol::InputFilter& inp, Context& ctx, bool isinit)
+bool parseObject_( const char* tag, void* obj, const filtertraits::struct_&, protocol::InputFilter& inp, Context& ctx, bool isinit)
 {
 	protocol::InputFilter::ElementType typ;
 	const char* element;
@@ -158,7 +158,7 @@ bool parseObject_( const char* tag, void* obj, const struct_&, protocol::InputFi
 }
 
 template <typename T>
-bool parseObject_( const char* tag, void* obj, const bool_&, protocol::InputFilter& inp, Context& ctx, bool isinit)
+bool parseObject_( const char* tag, void* obj, const filtertraits::bool_&, protocol::InputFilter& inp, Context& ctx, bool isinit)
 {
 	protocol::InputFilter::ElementType typ;
 	const char* element;
@@ -213,7 +213,7 @@ bool parseObject_( const char* tag, void* obj, const bool_&, protocol::InputFilt
 }
 
 template <typename T>
-bool parseObject_( const char* tag, void* obj, const vector_&, protocol::InputFilter& inp, Context& ctx, bool)
+bool parseObject_( const char* tag, void* obj, const filtertraits::vector_&, protocol::InputFilter& inp, Context& ctx, bool)
 {
 	typename T::value_type val;
 	if (!parseObject( tag, val, inp, ctx, false))
@@ -227,7 +227,7 @@ bool parseObject_( const char* tag, void* obj, const vector_&, protocol::InputFi
 }
 
 template <typename T>
-static bool parseObject_( const char* tag, void* obj, const arithmetic_&, protocol::InputFilter& inp, Context& ctx, bool isinit)
+static bool parseObject_( const char* tag, void* obj, const filtertraits::arithmetic_&, protocol::InputFilter& inp, Context& ctx, bool isinit)
 {
 	protocol::InputFilter::ElementType typ;
 	const char* element;
@@ -276,7 +276,7 @@ static bool parseObject_( const char* tag, void* obj, const arithmetic_&, protoc
 template <typename T>
 static bool parseObject( const char* tag, T& obj, protocol::InputFilter& inp, Context& ctx, bool isinit)
 {
-	if (!_Wolframe::serialize::parseObject_<T>( tag, (void*)&obj, getCategory(obj), inp, ctx, isinit))
+	if (!_Wolframe::serialize::parseObject_<T>( tag, (void*)&obj, filtertraits::getCategory(obj), inp, ctx, isinit))
 	{
 		ctx.setError( tag);
 		return false;
@@ -285,17 +285,17 @@ static bool parseObject( const char* tag, T& obj, protocol::InputFilter& inp, Co
 }
 
 template <typename T>
-struct IntrusiveParser
+struct FiltermapIntrusiveParser
 {
 	static bool isAtomic()
 	{
 		T* obj = 0;
-		return isAtomic_( getCategory(*obj));
+		return isAtomic_( filtertraits::getCategory(*obj));
 	}
 
 	static bool parse( const char* tag, void* obj, protocol::InputFilter& inp, Context& ctx, bool isinit)
 	{
-		return parseObject_<T>( tag, obj, getCategory(*(T*)obj), inp, ctx, isinit);
+		return parseObject_<T>( tag, obj, filtertraits::getCategory(*(T*)obj), inp, ctx, isinit);
 	}
 };
 

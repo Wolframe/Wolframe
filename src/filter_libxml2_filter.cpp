@@ -303,8 +303,6 @@ public:
 			,m_writerbuf(0)
 			,m_writer(0)
 			,m_valuebuf(0)
-			,m_bufstate(protocol::EscapingBuffer<protocol::Buffer>::SRC)
-
 		{
 			m_writerbuf = xmlBufferCreate();
 			if (!m_writerbuf)
@@ -437,14 +435,12 @@ public:
 		std::size_t printNextChunk( void* out, std::size_t outsize)
 		{
 			protocol::Buffer buf( (char*)out, outsize);
-			protocol::EscapingBuffer<protocol::Buffer> ebuf( &buf, m_bufstate);
 
 			while (m_contentitr != m_contentend && buf.size()+1 < outsize)
 			{
-				ebuf.push_back( *m_contentitr);
+				buf.push_back( *m_contentitr);
 				++m_contentitr;
 			}
-			m_bufstate = ebuf.state();
 			return buf.size();
 		}
 
@@ -460,7 +456,6 @@ public:
 		std::string m_content;
 		std::string::const_iterator m_contentitr;
 		std::string::const_iterator m_contentend;
-		protocol::EscapingBuffer<protocol::Buffer>::State m_bufstate;
 	};
 
 	bool flushBuffer( Document* dc)

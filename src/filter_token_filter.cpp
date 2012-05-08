@@ -39,15 +39,12 @@ template <class IOCharset, class AppCharset=textwolf::charset::UTF8>
 struct OutputFilterImpl :public protocol::OutputFilter
 {
 	///\brief Constructor
-	OutputFilterImpl()
-		:m_bufstate(protocol::EscapingBuffer<textwolf::StaticBuffer>::SRC){}
+	OutputFilterImpl(){}
 
 	///\brief Copy constructor
 	///\param [in] o output filter to copy
 	OutputFilterImpl( const OutputFilterImpl& o)
-		:protocol::OutputFilter(o)
-		,m_bufstate(o.m_bufstate)
-	{}
+		:protocol::OutputFilter(o){}
 
 	///\brief self copy
 	///\return copy of this
@@ -60,7 +57,7 @@ struct OutputFilterImpl :public protocol::OutputFilter
 	///\param [in] src pointer to attribute value string to print
 	///\param [in] srcsize size of src in bytes
 	///\param [in,out] buf buffer to print to
-	static void printToBufferEscEOL( const char* src, std::size_t srcsize, protocol::EscapingBuffer<textwolf::StaticBuffer>& buf)
+	static void printToBufferEscEOL( const char* src, std::size_t srcsize, textwolf::StaticBuffer& buf)
 	{
 		StrIterator itr( src, srcsize);
 		textwolf::TextScanner<StrIterator,AppCharset> ts( itr);
@@ -88,12 +85,11 @@ struct OutputFilterImpl :public protocol::OutputFilter
 	///\return true, if success, false else
 	virtual bool print( typename protocol::OutputFilter::ElementType type, const void* element, std::size_t elementsize)
 	{
-		textwolf::StaticBuffer basebuf( rest(), restsize());
-		protocol::EscapingBuffer<textwolf::StaticBuffer> buf( &basebuf, m_bufstate);
+		textwolf::StaticBuffer buf( rest(), restsize());
 		FilterBase<IOCharset,AppCharset>::printToBuffer( getElementTag( type), buf);
 		printToBufferEscEOL( (const char*)element, elementsize, buf);
 		FilterBase<IOCharset,AppCharset>::printToBufferEOL( buf);
-		if (basebuf.overflow())
+		if (buf.overflow())
 		{
 			if (pos() == 0 && size() != 0)
 			{
@@ -105,12 +101,9 @@ struct OutputFilterImpl :public protocol::OutputFilter
 			}
 			return false;
 		}
-		incPos( basebuf.size());
-		m_bufstate = buf.state();
+		incPos( buf.size());
 		return true;
 	}
-private:
-	typename protocol::EscapingBuffer<textwolf::StaticBuffer>::State m_bufstate;	///< state of escaping the output
 };
 
 ///\class InputFilter

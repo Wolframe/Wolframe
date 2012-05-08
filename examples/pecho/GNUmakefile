@@ -9,7 +9,8 @@ INCLUDE_CXXFLAGS =
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include \
 	-I$(BOOST_INCLUDE_DIR) \
-	-I$(TOPDIR)/gtest/include
+	-I$(TOPDIR)/gtest/include \
+	-I$(TOPDIR)/wtest
 
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR)

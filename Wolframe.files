@@ -1316,6 +1316,7 @@ tests/testTimestamp.cpp
 tests/testWolfilter.cpp
 tests/threadLeakTest.cpp
 tests/versionTest.cpp
+tests/testWolfilter.cpp
 tests/xmllite/Makefile.W32
 tests/xmllite/test.xml
 tests/xmllite/testxmllite.cpp

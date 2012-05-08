@@ -84,7 +84,6 @@ CommandHandler::Operation IOFilterCommandHandler::nextOperation()
 			return CLOSED;
 
 		case FlushingOutput:
-			m_state = Processing;
 			if (!(flt = m_outputfilter.get()))
 			{
 				LOG_ERROR << "Output filter undefined";
@@ -94,6 +93,8 @@ CommandHandler::Operation IOFilterCommandHandler::nextOperation()
 			}
 			m_writedata = flt->ptr();
 			m_writedatasize = flt->pos();
+			m_escapeBuffer.process( flt->charptr(), flt->size(), m_writedatasize);
+			if (!m_escapeBuffer.hasData()) m_state = Processing;
 			flt->setPos(0);
 			return WRITE;
 
