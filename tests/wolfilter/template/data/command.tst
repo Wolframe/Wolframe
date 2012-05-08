@@ -17,8 +17,7 @@ recode lat1..ibmpc >> $output <<!TEST
 --input
 !TEST
 cat doc/$doc.UTF-8.xml | sed "s/UTF-8/$cset/" | recode UTF-8..$cset | ../../../wtest/cleanInput BOM EOLN >> $output
-recode lat1..ibmpc >> $output <<!TEST
-
+cat >> $output <<!TEST
 --config
 !TEST
 echo $cmd >> $output
@@ -26,8 +25,7 @@ recode lat1..ibmpc >> $output <<!TEST
 --output
 !TEST
 cat doc/$doc.UTF-8.xml | sed "s/UTF-8/$cset/" | recode UTF-8..$cset | ../../../wtest/cleanInput BOM EOLN >> $output
-recode lat1..ibmpc >> $output <<!TEST
-
+cat >> $output <<!TEST
 --end
 !TEST
 done

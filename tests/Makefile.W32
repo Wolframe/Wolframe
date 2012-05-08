@@ -48,7 +48,8 @@ INCLUDE_DIRS = \
 	/I$(TOPDIR)\src \
 	/I"$(BOOST_INCLUDE_DIR)" \
 	/I"$(PLATFORM_SDK_DIR)\Include" \
-	/I$(TOPDIR)\gtest\include
+	/I$(TOPDIR)\gtest\include \
+	/I$(TOPDIR)\wtest
 
 # Note: libraries are picked automatically on Windows!
 INCLUDE_LDFLAGS = \
@@ -57,6 +58,7 @@ INCLUDE_LDFLAGS = \
 INCLUDE_LIBS = \
 	Advapi32.lib Ws2_32.lib \
 	$(TOPDIR)\gtest\gtest-all.obj \
+	$(TOPDIR)\wtest\wtest.lib \
 	$(TOPDIR)\src\libwolframe\wolframe.lib
 
 # libxml2
@@ -89,10 +91,13 @@ TEST_CPP_BINS = \
 	poolTest.exe \
 	logTest.exe \
 	protocolArgumentParsing.exe \
+	testProtocolLFdotEscaping.exe \
 	configStructParser.exe \
 	configValueParser.exe \
 	testRand.exe \
 	testTimestamp.exe
+# \
+#	testWolfilter.exe
 
 OBJS = \
 
@@ -116,7 +121,8 @@ logTest.exe: logTest.obj $(TOPDIR)\src\wolframe.lib
 protocolArgumentParsing.exe: protocolArgumentParsing.obj $(TOPDIR)\src\wolframe.lib
 configStructParser.exe: configStructParser.obj $(TOPDIR)\src\wolframe.lib
 configValueParser.exe: configValueParser.obj $(TOPDIR)\src\wolframe.lib
-filter.exe: filter.obj $(TOPDIR)\src\wolframe.lib
+testProtocolLFdotEscaping.exe: testProtocolLFdotEscaping.obj $(TOPDIR)\src\wolframe.lib
+testWolfilter.exe: testWolfilter.obj $(TOPDIR)\src\wolframe.lib
 testRand.exe: testRand.obj
 testTimestamp.exe: testTimestamp.obj
 
@@ -143,6 +149,8 @@ local_test:
 	@-echo testTimestamp >> test.bat
 	@-echo CRAMtest >> test.bat
 	@-echo protocolArgumentParsing >> test.bat
+	@-echo testProtocolLFdotEscaping >> test.bat
+#	@-echo testWolfilter >> test.bat
 	@-echo echo off >> test.bat
 	@-test.bat
 

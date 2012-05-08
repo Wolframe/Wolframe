@@ -28,13 +28,15 @@ INCLUDE_DIRS = \
 	-I$(TOPDIR)/include -I. \
 	-I$(TOPDIR)/src \
 	-I$(BOOST_INCLUDE_DIR) \
-	-I$(TOPDIR)/gtest/include
+	-I$(TOPDIR)/gtest/include \
+	-I$(TOPDIR)/wtest
 
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
 	$(TOPDIR)/gtest/gtest-all.o \
+	$(TOPDIR)/wtest/wolftest.a \
 	$(TOPDIR)/src/libwolframe.a \
 	$(TOPDIR)/src/libwolframe/libwolframe.a \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
@@ -81,10 +83,13 @@ TEST_CPP_BINS = \
 	poolTest$(EXE) \
 	logTest$(EXE) \
 	protocolArgumentParsing$(EXE) \
+	testProtocolLFdotEscaping$(EXE) \
 	configValueParser$(EXE) \
 	configStructParser$(EXE) \
 	testRand$(EXE) \
 	testTimestamp$(EXE)
+# \
+#	testWolfilter$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
@@ -92,6 +97,8 @@ logTest$(EXE): $(TOPDIR)/src/libwolframe.a
 testSHA2$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 byte2hexTest$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 CRAMtest$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
+testProtocolLFdotEscaping$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
+testWolfilter$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 
 local_all:
 
@@ -136,6 +143,10 @@ ifeq ($(RUN_TESTS),1)
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./configStructParser $(TOPDIR)/src/wolframe.conf
 	@echo
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./testProtocolLFdotEscaping
+	@echo
+#	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./testWolfilter
+#	@echo
 	@echo
 endif
 

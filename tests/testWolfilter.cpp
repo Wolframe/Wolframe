@@ -60,12 +60,13 @@ static void prepareTest()
 						test::convertAssignmentList,
 						test::AssignmentList::getFiltermapDescription(),
 						test::AssignmentList::getFiltermapDescription()));
-
+#if WITH_LUA
 	gct->defineLuaPluginFunction( "employee_assignment_convert",
 					langbind::LuaPluginFunction(
 						test::convertAssignmentList,
 						test::AssignmentList::getLuamapDescription(),
 						test::AssignmentList::getLuamapDescription()));
+#endif
 }
 
 class WolfilterTest : public ::testing::Test

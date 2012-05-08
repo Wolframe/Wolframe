@@ -161,8 +161,7 @@
 ως εν σπέρματι την υπόθεσιν της Αντιγόνης του Σοφοκλέους, έκαμε<br/>
 πολλούς των κριτικών να υποπτεύωσιν ότι οφείλεται ίσως εις<br/>
 μεταγενεστέραν διασκευήν.
-</excerpt></book><book id="4" dsc="Unicode: Artificial Example With Codepoints beyond 0xFFFF"><excerpt><div>󰎯󰎠</div><div>󰎻󰎪-󰎾󰎢བ󰊷</div><div>󰋁󰎵󰏁-󰎠:㈲󰎺;󰎬ʤ:̳̳ 󰊺</div></excerpt></book></list>
---config
+</excerpt></book><book id="4" dsc="Unicode: Artificial Example With Codepoints beyond 0xFFFF"><excerpt><div>󰎯󰎠</div><div>󰎻󰎪-󰎾󰎢བ󰊷</div><div>󰋁󰎵󰏁-󰎠:㈲󰎺;󰎬ʤ:̳̳ 󰊺</div></excerpt></book></list>--config
 - xml::textwolf
 --output
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -326,5 +325,4 @@
 ως εν σπέρματι την υπόθεσιν της Αντιγόνης του Σοφοκλέους, έκαμε<br/>
 πολλούς των κριτικών να υποπτεύωσιν ότι οφείλεται ίσως εις<br/>
 μεταγενεστέραν διασκευήν.
-</excerpt></book><book id="4" dsc="Unicode: Artificial Example With Codepoints beyond 0xFFFF"><excerpt><div>󰎯󰎠</div><div>󰎻󰎪-󰎾󰎢བ󰊷</div><div>󰋁󰎵󰏁-󰎠:㈲󰎺;󰎬ʤ:̳̳ 󰊺</div></excerpt></book></list>
---end
+</excerpt></book><book id="4" dsc="Unicode: Artificial Example With Codepoints beyond 0xFFFF"><excerpt><div>󰎯󰎠</div><div>󰎻󰎪-󰎾󰎢བ󰊷</div><div>󰋁󰎵󰏁-󰎠:㈲󰎺;󰎬ʤ:̳̳ 󰊺</div></excerpt></book></list>--end

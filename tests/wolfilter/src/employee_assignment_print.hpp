@@ -30,10 +30,10 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file wolfilter/src/employee_assignement_print.hpp
+///\file wolfilter/src/employee_assignment_print.hpp
 ///\brief Interface wolfilter test plugin function
-#ifndef _Wolframe_TESTS_WOLFILTER_employee_assignement_print_HPP_INCLUDED
-#define _Wolframe_TESTS_WOLFILTER_employee_assignement_print_HPP_INCLUDED
+#ifndef _Wolframe_TESTS_WOLFILTER_employee_assignment_print_HPP_INCLUDED
+#define _Wolframe_TESTS_WOLFILTER_employee_assignment_print_HPP_INCLUDED
 #include "serialize/struct/mapStructure.hpp"
 #include <string>
 
@@ -61,8 +61,8 @@ struct Employee
 	static serialize::MapDescriptionBase* getMapDescription();
 };
 
-struct Assignement
-	:public serialize::StructureDefinition<Assignement>
+struct Assignment
+	:public serialize::StructureDefinition<Assignment>
 {
 	std::vector<Task> task;
 	Employee employee;
@@ -71,13 +71,16 @@ struct Assignement
 	static serialize::MapDescriptionBase* getMapDescription();
 };
 
-struct AssignementList
-	:public serialize::StructureDefinition<AssignementList>
+struct AssignmentList
+	:public serialize::StructureDefinition<AssignmentList>
 {
-	std::vector<Assignement> assignement;
+	std::vector<Assignment> assignment;
 
 	static serialize::MapDescriptionBase* getMapDescription();
 };
+
+int convertAssignmentList( const void*, void*){ return 0;}
+
 }}
 #endif
 
