@@ -95,6 +95,7 @@ TEST_CPP_BINS = \
 	configStructParser.exe \
 	configValueParser.exe \
 	testRand.exe \
+	testProtocolLFdotEscaping.exe \
 	testTimestamp.exe
 # \
 #	testWolfilter.exe
