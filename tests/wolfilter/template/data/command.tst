@@ -1,7 +1,12 @@
 #!/bin/sh
 for example in\
-	"filter=multilingual=UTF-8=- xml::textwolf" \
-	"filter=multilingual=UTF-16LE=- xml::textwolf"
+	"filter=multilingual=UTF-8=- xml:textwolf" \
+	"filter=multilingual=UTF-16LE=- xml:textwolf" \
+	"filter=multilingual=UTF-16BE=- xml:textwolf" \
+	"filter=multilingual=UCS-2LE=- xml:textwolf" \
+	"filter=multilingual=UCS-2BE=- xml:textwolf" \
+	"filter=multilingual=UCS-4LE=- xml:textwolf" \
+        "filter=multilingual=UCS-4BE=- xml:textwolf"
 do
 name=`echo $example | cut -f1 -d=`
 doc=`echo $example | cut -f2 -d=`

@@ -47,6 +47,9 @@
 #include <sstream>
 #include <iostream>
 
+///\remark Hack for linking this stuff to the test program. Cannot do it in the makefile unfortunately
+#include "wolfilter/src/employee_assignment_print.cpp"
+
 static int g_gtest_ARGC = 0;
 static char* g_gtest_ARGV[2] = {0, 0};
 
@@ -120,8 +123,8 @@ TEST_F( WolfilterTest, tests)
 	std::vector<std::string>::const_iterator itr=tests.begin(),end=tests.end();
 	for (testno=0; itr != end; ++itr,++testno)
 	{
-		boost::filesystem::remove_all( boost::filesystem::current_path() / "wolfilter" / "temp" );
-		boost::filesystem::create_directory( boost::filesystem::current_path() / "wolfilter" / "temp");
+		boost::filesystem::remove_all( boost::filesystem::current_path() / "temp" );
+		boost::filesystem::create_directory( boost::filesystem::current_path() / "temp");
 
 		wtest::TestDescription td( *itr);
 		if (td.requires.size())
@@ -178,17 +181,17 @@ TEST_F( WolfilterTest, tests)
 		EXPECT_EQ( true, trt);
 		if (td.expected != out.str())
 		{
-			boost::filesystem::path OUTPUT( boost::filesystem::current_path() / "wolfilter" / "temp" / "OUTPUT");
+			boost::filesystem::path OUTPUT( boost::filesystem::current_path() / "temp" / "OUTPUT");
 			std::fstream oo( OUTPUT.string().c_str(), std::ios::out | std::ios::binary);
 			oo.write( out.str().c_str(), out.str().size());
 			if (oo.bad()) std::cerr << "error writing file '" << OUTPUT.string() << "'" << std::endl;
 
-			boost::filesystem::path EXPECT( boost::filesystem::current_path() / "wolfilter" / "temp" / "EXPECT");
+			boost::filesystem::path EXPECT( boost::filesystem::current_path() / "temp" / "EXPECT");
 			std::fstream ee( EXPECT.string().c_str(), std::ios::out | std::ios::binary);
 			ee.write( td.expected.c_str(), td.expected.size());
 			if (ee.bad()) std::cerr << "error writing file '" << EXPECT.string() << "'" << std::endl;
 
-			boost::filesystem::path INPUT( boost::filesystem::current_path() / "wolfilter" / "temp" / "INPUT");
+			boost::filesystem::path INPUT( boost::filesystem::current_path() / "temp" / "INPUT");
 			std::fstream ss( INPUT.string().c_str(), std::ios::out | std::ios::binary);
 			ss.write( td.input.c_str(), td.input.size());
 			if (ss.bad()) std::cerr << "error writing file '" << INPUT.string() << "'" << std::endl;

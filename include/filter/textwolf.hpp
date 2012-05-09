@@ -1,4 +1,4 @@
-/**
+/*
 ---------------------------------------------------------------------
     The template library textwolf implements an input iterator on
     a set of XML path expressions without backward references on an
@@ -31,7 +31,7 @@
 	For documentation see 'http://patrickfrey.github.com/textwolf'
 
 --------------------------------------------------------------------
-**/
+*/
 
 #ifndef __TEXTWOLF_HPP__
 #define __TEXTWOLF_HPP__
@@ -91,16 +91,16 @@ struct throws_exception
 	///\brief Enumeration of error cases
 	enum Cause
 	{
-		Unknown,			///< uknown error
-		DimOutOfRange,			///< memory reserved for statically allocated table or memory block is too small. Increase the size of memory block passed to the XML path select automaton. Usage error !
-		StateNumbersNotAscending,	///< XML scanner automaton definition check failed. Labels of states must be equal to their indices. Internal textwold error !
-		InvalidParam,			///< parameter check in automaton definition failed. Internal textwold error !
-		InvalidState,			///< invalied state definition in automaton. Internal textwold error !
-		IllegalParam,			///< parameter check in automaton definition failed. Internal textwold error !
-		IllegalAttributeName,		///< invalid string for a tag or attribute in the automaton definition. Usage error !
-		OutOfMem,			///< out of memory in the automaton definition. System error (std::bad_alloc) !
-		ArrayBoundsReadWrite,		///< invalid array access. Internal textwold error !
-		NotAllowedOperation		///< defining an operation in an automaton definition that is not allowed there. Usage error !
+		Unknown,			//< uknown error
+		DimOutOfRange,			//< memory reserved for statically allocated table or memory block is too small. Increase the size of memory block passed to the XML path select automaton. Usage error !
+		StateNumbersNotAscending,	//< XML scanner automaton definition check failed. Labels of states must be equal to their indices. Internal textwold error !
+		InvalidParam,			//< parameter check in automaton definition failed. Internal textwold error !
+		InvalidState,			//< invalied state definition in automaton. Internal textwold error !
+		IllegalParam,			//< parameter check in automaton definition failed. Internal textwold error !
+		IllegalAttributeName,		//< invalid string for a tag or attribute in the automaton definition. Usage error !
+		OutOfMem,			//< out of memory in the automaton definition. System error (std::bad_alloc) !
+		ArrayBoundsReadWrite,		//< invalid array access. Internal textwold error !
+		NotAllowedOperation		//< defining an operation in an automaton definition that is not allowed there. Usage error !
 	};
 };
 
@@ -109,7 +109,7 @@ struct throws_exception
 struct exception	:public std::exception
 {
 	typedef throws_exception::Cause Cause;
-	Cause cause;										///< exception cause tag
+	Cause cause;										//< exception cause tag
 
 	///\brief Constructor
 	///\return exception object
@@ -242,11 +242,11 @@ public:
 	///\return true if a push_back would have caused an array bounds write
 	bool overflow() const			{return m_overflow;}
 private:
-	std::size_t m_pos;			///< current cursor position of the buffer (number of added characters)
-	std::size_t m_size;			///< allocation size of the buffer in bytes
-	char* m_ar;				///< buffer content
-	bool m_allocated;			///< true, if the buffer is allocated by this class and not passed by constructor
-	bool m_overflow;			///< true, if an array bounds write would have happened with push_back
+	std::size_t m_pos;			//< current cursor position of the buffer (number of added characters)
+	std::size_t m_size;			//< allocation size of the buffer in bytes
+	char* m_ar;				//< buffer content
+	bool m_allocated;			//< true, if the buffer is allocated by this class and not passed by constructor
+	bool m_overflow;			//< true, if an array bounds write would have happened with push_back
 };
 
 /*! @} */
@@ -269,7 +269,7 @@ public:
 	enum Constant {nullvalue=nullvalue_};
 
 private:
-	RESTYPE ar[ RANGE];		///< the map elements
+	RESTYPE ar[ RANGE];		//< the map elements
 public:
 	///\brief Constructor
 	CharMap()									{for (unsigned int ii=0; ii<RANGE; ii++) ar[ii]=(valuetype)nullvalue;}
@@ -291,12 +291,12 @@ public:
 ///\namespace charset
 ///\brief Predefined character set encodings
 ///
-/// Predefined character set encoding definitions:
-/// 1) Iso-Latin-1
-/// 2) UCS2   (little or big endian)
-/// 3) UCS4   (little or big endian)
-/// 4) UTF-8  (see http://de.wikipedia.org/wiki/UTF-8 for algorithms)
-/// 5) UTF-16 (little or big endian, no implicit BOM swapping) see http://en.wikipedia.org/wiki/UTF-16/UCS-2 for algorithms)
+// Predefined character set encoding definitions:
+// 1) Iso-Latin-1
+// 2) UCS2   (little or big endian)
+// 3) UCS4   (little or big endian)
+// 4) UTF8   (see http://de.wikipedia.org/wiki/UTF-8 for algorithms)
+// 5) UTF16  (little or big endian, no implicit BOM swapping) see http://en.wikipedia.org/wiki/UTF-16/UCS-2 for algorithms)
 ///
 namespace charset {
 
@@ -429,8 +429,8 @@ struct ByteOrder
 {
 	enum
 	{
-		LE=0,		///< little endian
-		BE=1		///< big endian
+		LE=0,		//< little endian
+		BE=1		//< big endian
 	};
 };
 
@@ -445,10 +445,10 @@ struct UCS2
 {
 	enum
 	{
-		LSB=(encoding==ByteOrder::BE),			///< least significant byte index (0 or 1)
-		MSB=(encoding==ByteOrder::LE),			///< most significant byte index (0 or 1)
-		Print1shift=(encoding==ByteOrder::BE)?8:0,	///< value to shift with to get the 1st character to print
-		Print2shift=(encoding==ByteOrder::LE)?8:0,	///< value to shift with to get the 2nd character to print
+		LSB=(encoding==ByteOrder::BE),			//< least significant byte index (0 or 1)
+		MSB=(encoding==ByteOrder::LE),			//< most significant byte index (0 or 1)
+		Print1shift=(encoding==ByteOrder::BE)?8:0,	//< value to shift with to get the 1st character to print
+		Print2shift=(encoding==ByteOrder::LE)?8:0,	//< value to shift with to get the 2nd character to print
 		MaxChar=0xFFFF
 	};
 
@@ -526,10 +526,10 @@ struct UCS4
 		B1=(encoding==ByteOrder::BE)?2:1,
 		B2=(encoding==ByteOrder::BE)?1:2,
 		B3=(encoding==ByteOrder::BE)?0:3,
-		Print1shift=(encoding==ByteOrder::BE)?24:0,	///< value to shift with to get the 1st character to print
-		Print2shift=(encoding==ByteOrder::BE)?16:8,	///< value to shift with to get the 2nd character to print
-		Print3shift=(encoding==ByteOrder::BE)?8:16,	///< value to shift with to get the 3rd character to print
-		Print4shift=(encoding==ByteOrder::BE)?0:24,	///< value to shift with to get the 4th character to print
+		Print1shift=(encoding==ByteOrder::BE)?24:0,	//< value to shift with to get the 1st character to print
+		Print2shift=(encoding==ByteOrder::BE)?16:8,	//< value to shift with to get the 2nd character to print
+		Print3shift=(encoding==ByteOrder::BE)?8:16,	//< value to shift with to get the 3rd character to print
+		Print4shift=(encoding==ByteOrder::BE)?0:24,	//< value to shift with to get the 4th character to print
 		MaxChar=0xFFFFFFFF
 	};
 
@@ -744,22 +744,22 @@ struct UTF8
 ///\brief Character set UTF16 (little/big endian)
 ///\tparam encoding ByteOrder::LE or ByteOrder::BE
 ///\remark BOM character sequences are not interpreted as such and byte swapping is not done implicitely
-///	It is left to the caller to detect BOM or its inverse and to switch the iterator.
+//	It is left to the caller to detect BOM or its inverse and to switch the iterator.
 ///\remark See http://en.wikipedia.org/wiki/UTF-16/UCS-2: ... If the endian architecture of the decoder 
-///	matches that of the encoder, the decoder detects the 0xFEFF value, but an opposite-endian decoder 
-///	interprets the BOM as the non-character value U+FFFE reserved for this purpose. This incorrect
-///	result provides a hint to perform byte-swapping for the remaining values. If the BOM is missing,
-///	the standard says that big-endian encoding should be assumed....
+//	matches that of the encoder, the decoder detects the 0xFEFF value, but an opposite-endian decoder
+//	interprets the BOM as the non-character value U+FFFE reserved for this purpose. This incorrect
+//	result provides a hint to perform byte-swapping for the remaining values. If the BOM is missing,
+//	the standard says that big-endian encoding should be assumed....
 template <int encoding=ByteOrder::BE>
 class UTF16
 {
 private:
 	enum
 	{
-		LSB=(encoding==ByteOrder::BE),			///< least significant byte index (0 or 1)
-		MSB=(encoding==ByteOrder::LE),			///< most significant byte index (0 or 1)
-		Print1shift=(encoding==ByteOrder::BE)?8:0,	///< value to shift with to get the 1st character to print
-		Print2shift=(encoding==ByteOrder::LE)?8:0,	///< value to shift with to get the 2nd character to print
+		LSB=(encoding==ByteOrder::BE),			//< least significant byte index (0 or 1)
+		MSB=(encoding==ByteOrder::LE),			//< most significant byte index (0 or 1)
+		Print1shift=(encoding==ByteOrder::BE)?8:0,	//< value to shift with to get the 1st character to print
+		Print2shift=(encoding==ByteOrder::LE)?8:0,	//< value to shift with to get the 2nd character to print
 		MaxChar=0x10FFFF
 	};
 public:
@@ -886,24 +886,24 @@ struct UTF16BE :public UTF16<ByteOrder::BE> {};
 ///\brief Enumeration of control characters needed as events for XML scanner statemachine
 enum ControlCharacter
 {
-	Undef=0,		///< not defined (beyond ascii)
-	EndOfText,		///< end of data (EOF,EOD,.)
-	EndOfLine,		///< end of line
-	Cntrl,			///< control character
-	Space,			///< space, tab, etc..
-	Amp,			///< ampersant ('&')
-	Lt,			///< lesser than '<'
-	Equal,			///< equal '='
-	Gt,			///< greater than '>'
-	Slash,			///< slash '/'
-	Exclam,			///< exclamation mark '!'
-	Questm,			///< question mark '?'
-	Sq,			///< single quote
-	Dq,			///< double quote
-	Osb,			///< open square bracket '['
-	Csb,			///< close square bracket ']'
-	Any,			///< any ascii character with meaning
-	NofControlCharacter=17	///< total number of control characters
+	Undef=0,		//< not defined (beyond ascii)
+	EndOfText,		//< end of data (EOF,EOD,.)
+	EndOfLine,		//< end of line
+	Cntrl,			//< control character
+	Space,			//< space, tab, etc..
+	Amp,			//< ampersant ('&')
+	Lt,			//< lesser than '<'
+	Equal,			//< equal '='
+	Gt,			//< greater than '>'
+	Slash,			//< slash '/'
+	Exclam,			//< exclamation mark '!'
+	Questm,			//< question mark '?'
+	Sq,			//< single quote
+	Dq,			//< double quote
+	Osb,			//< open square bracket '['
+	Csb,			//< close square bracket ']'
+	Any,			//< any ascii character with meaning
+	NofControlCharacter=17	//< total number of control characters
 };
 
 ///\class ControlCharacterM
@@ -934,11 +934,11 @@ template <class Iterator, class CharSet>
 class TextScanner
 {
 private:
-	Iterator input;			///< source iterator
-	char buf[8];			///< buffer for one character (the current character parsed)
-	UChar val;			///< Unicode character representation of the current character parsed
-	char cur;			///< ASCII character representation of the current character parsed
-	unsigned int state;		///< current state of the text scanner
+	Iterator input;			//< source iterator
+	char buf[8];			//< buffer for one character (the current character parsed)
+	UChar val;			//< Unicode character representation of the current character parsed
+	char cur;			//< ASCII character representation of the current character parsed
+	unsigned int state;		//< current state of the text scanner
 
 public:
 	///\class ControlCharMap
@@ -1073,25 +1073,25 @@ class ScannerStatemachine :public throws_exception
 public:
 	enum
 	{
-		MaxNofStates=64			///< maximum number of states (fixed allocated array for state machine)
+		MaxNofStates=64			//< maximum number of states (fixed allocated array for state machine)
 	};
 	///\class Element
 	///\brief One state in the state machine
 	struct Element
 	{
-		int fallbackState;		///< state transition if the event does not match (it belongs to the next state = fallbackState)
-		int missError;			///< error code in case of an event that does not match and there is no fallback
+		int fallbackState;		//< state transition if the event does not match (it belongs to the next state = fallbackState)
+		int missError;			//< error code in case of an event that does not match and there is no fallback
 
 		///\class Action
 		///\brief Definition of action fired by the state machine
 		struct Action
 		{
-			int op;			///< action operand
-			int arg;		///< action argument
+			int op;			//< action operand
+			int arg;		//< action argument
 		};
-		Action action;			///< action executed after entering this state
-		char nofnext;			///< number of follow states defined
-		char next[ NofControlCharacter];///< follow state fired by an event (control character type parsed)
+		Action action;			//< action executed after entering this state
+		char nofnext;			//< number of follow states defined
+		char next[ NofControlCharacter];//< follow state fired by an event (control character type parsed)
 
 		///\brief Constructor
 		Element() :fallbackState(-1),missError(-1),nofnext(0)
@@ -1111,8 +1111,8 @@ public:
 	}
 
 private:
-	Element tab[ MaxNofStates];	///< states of the STM
-	unsigned int size;		///< number of states defined in the STM
+	Element tab[ MaxNofStates];	//< states of the STM
+	unsigned int size;		//< number of states defined in the STM
 
 	///\brief Create a new state
 	///\param [in] stateIdx index of the state (must be the size of the STM array, so that state identifiers can be named by enumeration constants for better readability)
@@ -1219,23 +1219,23 @@ public:
 	///\brief Enumeration of XML element types returned by an XML scanner
 	enum ElementType
 	{
-		None,					///< empty (NULL)
-		ErrorOccurred,				///< XML scanning error error reported
-		HeaderStart,				///< open XML header tag
-		HeaderAttribName,			///< tag attribute name in the XML header
-		HeaderAttribValue,			///< tag attribute value in the XML header
-		HeaderEnd,				///< end of XML header event (after parsing '?&gt;')
-		TagAttribName,				///< tag attribute name (e.g. "id" in &lt;person id='5'&gt;
-		TagAttribValue,				///< tag attribute value (e.g. "5" in &lt;person id='5'&gt;
-		OpenTag,				///< open tag (e.g. "bla" for "&lt;bla...")
-		CloseTag,				///< close tag (e.g. "bla" for "&lt;/bla&gt;")
-		CloseTagIm,				///< immediate close tag (e.g. "bla" for "&lt;bla /&gt;")
-		Content,				///< content element string (separated by spaces or end of line)
-		Exit					///< end of document
+		None,					//< empty (NULL)
+		ErrorOccurred,				//< XML scanning error error reported
+		HeaderStart,				//< open XML header tag
+		HeaderAttribName,			//< tag attribute name in the XML header
+		HeaderAttribValue,			//< tag attribute value in the XML header
+		HeaderEnd,				//< end of XML header event (after parsing '?&gt;')
+		TagAttribName,				//< tag attribute name (e.g. "id" in &lt;person id='5'&gt;
+		TagAttribValue,				//< tag attribute value (e.g. "5" in &lt;person id='5'&gt;
+		OpenTag,				//< open tag (e.g. "bla" for "&lt;bla...")
+		CloseTag,				//< close tag (e.g. "bla" for "&lt;/bla&gt;")
+		CloseTagIm,				//< immediate close tag (e.g. "bla" for "&lt;bla /&gt;")
+		Content,				//< content element string (separated by spaces or end of line)
+		Exit					//< end of document
 	};
 	enum
 	{
-		NofElementTypes=Exit+1		///< number of XML element types defined
+		NofElementTypes=Exit+1		//< number of XML element types defined
 	};
 
 	///\brief Get the XML element type as string
@@ -1251,21 +1251,21 @@ public:
 	///\brief Enumeration of XML scanner error codes
 	enum Error
 	{
-		Ok,					///< no error, everything is OK
-		ErrExpectedOpenTag,			///< expected an open tag in this state
-		ErrExpectedXMLTag,			///< expected an <?xml tag in this state
-		ErrUnexpectedEndOfText,			///< unexpected end of text in the middle of the XML definition
-		ErrOutputBufferTooSmall,		///< scaned element in XML to big to fit in the buffer provided for it
-		ErrSyntaxToken,				///< a specific string expected as token in XML but does not match
-		ErrStringNotTerminated,			///< attribute string in XML not terminated on the same line
-		ErrUndefinedCharacterEntity,		///< named entity is not defined in the entity map 
-		ErrExpectedTagEnd,			///< expected end of tag
-		ErrExpectedEqual,			///< expected equal in tag attribute definition
-		ErrExpectedTagAttribute,		///< expected tag attribute
-		ErrExpectedCDATATag,			///< expected CDATA tag definition
-		ErrInternal,				///< internal error (textwolf implementation error)
-		ErrUnexpectedEndOfInput,		///< unexpected end of input stream
-		ErrExpectedEndOfLine			///< expected mandatory end of line (after XML header)
+		Ok,					//< no error, everything is OK
+		ErrExpectedOpenTag,			//< expected an open tag in this state
+		ErrExpectedXMLTag,			//< expected an <?xml tag in this state
+		ErrUnexpectedEndOfText,			//< unexpected end of text in the middle of the XML definition
+		ErrOutputBufferTooSmall,		//< scaned element in XML to big to fit in the buffer provided for it
+		ErrSyntaxToken,				//< a specific string expected as token in XML but does not match
+		ErrStringNotTerminated,			//< attribute string in XML not terminated on the same line
+		ErrUndefinedCharacterEntity,		//< named entity is not defined in the entity map
+		ErrExpectedTagEnd,			//< expected end of tag
+		ErrExpectedEqual,			//< expected equal in tag attribute definition
+		ErrExpectedTagAttribute,		//< expected tag attribute
+		ErrExpectedCDATATag,			//< expected CDATA tag definition
+		ErrInternal,				//< internal error (textwolf implementation error)
+		ErrUnexpectedEndOfInput,		//< unexpected end of input stream
+		ErrExpectedEndOfLine			//< expected mandatory end of line (after XML header)
 	};
 
 	///\brief Get the error code as string
@@ -1474,28 +1474,28 @@ private:
 		///\remark These states define where the scanner has to continue parsing when it was interrupted by an EoD exception and reentered again with more input to process.
 		enum Id
 		{
-			Start,				///< start state (no parsing action performed at the moment)
-			ParsingDone,			///< scanner war interrupted after parsing something when accessing the follow character
-			ParsingKey,			///< scanner was interrupted when parsing a key
-			ParsingEntity,			///< scanner was interrupted when parsing an XML character entity
-			ParsingNumericEntity,		///< scanner was interrupted when parsing an XML numeric character entity
-			ParsingNumericBaseEntity,	///< scanner was interrupted when parsing an XML basic character entity (apos,amp,etc..)
-			ParsingNamedEntity,		///< scanner was interrupted when parsing an XML named character entity
-			ParsingToken			///< scanner was interrupted when parsing a token (not in entity cotext)
+			Start,				//< start state (no parsing action performed at the moment)
+			ParsingDone,			//< scanner war interrupted after parsing something when accessing the follow character
+			ParsingKey,			//< scanner was interrupted when parsing a key
+			ParsingEntity,			//< scanner was interrupted when parsing an XML character entity
+			ParsingNumericEntity,		//< scanner was interrupted when parsing an XML numeric character entity
+			ParsingNumericBaseEntity,	//< scanner was interrupted when parsing an XML basic character entity (apos,amp,etc..)
+			ParsingNamedEntity,		//< scanner was interrupted when parsing an XML named character entity
+			ParsingToken			//< scanner was interrupted when parsing a token (not in entity cotext)
 		};
-		Id id;					///< the scanner token parser state
+		Id id;					//< the scanner token parser state
 
-		enum EolnState				///< end of line state to fulfill the W3C requirements for end of line mapping (see http://www.w3.org/TR/xml/: 2.11 End-of-Line Handling)
+		enum EolnState				//< end of line state to fulfill the W3C requirements for end of line mapping (see http://www.w3.org/TR/xml/: 2.11 End-of-Line Handling)
 		{
 			SRC,CR
 		};
-		EolnState eolnState;			///< the scanner end of line state
+		EolnState eolnState;			//< the scanner end of line state
 
-		unsigned int pos;			///< entity buffer position (buf)
-		unsigned int base;			///< numeric entity base (10 for decimal/16 for hexadecimal)
-		EChar value;				///< parsed entity value
-		char buf[ 16];				///< parsed entity buffer
-		UChar curchr_saved;			///< save current character parsed for the case we cannot print it (output buffer too small)
+		unsigned int pos;			//< entity buffer position (buf)
+		unsigned int base;			//< numeric entity base (10 for decimal/16 for hexadecimal)
+		EChar value;				//< parsed entity value
+		char buf[ 16];				//< parsed entity buffer
+		UChar curchr_saved;			//< save current character parsed for the case we cannot print it (output buffer too small)
 
 		///\brief Constructor
 		TokState()				:id(Start),eolnState(SRC),pos(0),base(0),value(0),curchr_saved(0) {}
@@ -1508,7 +1508,7 @@ private:
 			id=id_;eolnState=eolnState_;pos=0;base=0;value=0;curchr_saved=0;
 		}
 	};
-	TokState tokstate;								///< the entity parsing state of this XML scanner
+	TokState tokstate;								//< the entity parsing state of this XML scanner
 
 public:
 	typedef InputCharSet_ InputCharSet;
@@ -1981,12 +1981,12 @@ public:
 	}
 
 private:
-	STMState state;			///< current state of the XML scanner
-	bool m_doTokenize;		///< true, if we do tokenize the input, false if we get the content according the W3C default (see http://www.w3.org/TR/xml: 2.10 White Space Handling)
-	Error error;			///< last error code
-	InputReader m_src;		///< source input iterator
-	const EntityMap* m_entityMap;	///< map with entities defined by the caller
-	OutputBuffer* m_outputBuf;	///< buffer to use for output
+	STMState state;			//< current state of the XML scanner
+	bool m_doTokenize;		//< true, if we do tokenize the input, false if we get the content according the W3C default (see http://www.w3.org/TR/xml: 2.10 White Space Handling)
+	Error error;			//< last error code
+	InputReader m_src;		//< source input iterator
+	const EntityMap* m_entityMap;	//< map with entities defined by the caller
+	OutputBuffer* m_outputBuf;	//< buffer to use for output
 
 public:
 	///\brief Constructor
@@ -2171,9 +2171,9 @@ public:
 		{
 		private:
 			friend class iterator;
-			ElementType m_type;		///< type of the element
-			const char* m_content;		///< value string of the element
-			std::size_t m_size;		///< size of the value string in bytes
+			ElementType m_type;		//< type of the element
+			const char* m_content;		//< value string of the element
+			std::size_t m_size;		//< size of the value string in bytes
 		public:
 			///\brief Type of the current element as string
 			const char* name() const	{return getElementTypeName( m_type);}
@@ -2200,8 +2200,8 @@ public:
 		typedef std::input_iterator_tag iterator_category;
 
 	private:
-		Element element;						///< currently visited element
-		ThisXMLScanner* input;				///< XML scanner
+		Element element;						//< currently visited element
+		ThisXMLScanner* input;				//< XML scanner
 
 		///\brief Skip to the next element
 		///\param [in] mask element types that should be printed to the output buffer (1 -> print, 0 -> mask out, just return the element as event)
@@ -2322,15 +2322,15 @@ class XMLPathSelectAutomaton :public throws_exception
 public:
 	enum
 	{
-		defaultMemUsage=3*1024,		///< default memory usage of the XML path select process, if not specified else
-		defaultMaxDepth=32		///< default max tag stack depth, if not specified else
+		defaultMemUsage=3*1024,		//< default memory usage of the XML path select process, if not specified else
+		defaultMaxDepth=32		//< default max tag stack depth, if not specified else
 	};
-	std::size_t memUsage;			///< total memory usage
-	unsigned int maxDepth;			///< max tag stack depth
-	std::size_t maxScopeStackSize;		///< max scope stack depth
-	unsigned int maxFollows;		///< maximum number of tokens searched in depth
-	unsigned int maxTriggers;		///< maximum number of open triggers
-	unsigned int maxTokens;			///< maximum number of open tokens
+	std::size_t memUsage;			//< total memory usage
+	unsigned int maxDepth;			//< max tag stack depth
+	std::size_t maxScopeStackSize;		//< max scope stack depth
+	unsigned int maxFollows;		//< maximum number of tokens searched in depth
+	unsigned int maxTriggers;		//< maximum number of open triggers
+	unsigned int maxTokens;			//< maximum number of open tokens
 
 public:
 	///\brief Constructor
@@ -2348,12 +2348,12 @@ public:
 	///\brief Enumeration of operation types in the automaton definition
 	enum Operation
 	{
-		Content,			///< searching content token
-		Tag,				///< searching a tag
-		Attribute,			///< searching an attribute
-		ThisAttributeValue,		///< checking the value of the attribute just parsed (not an arbitrary but this one)
-		AttributeValue,			///< searching a value of an attribute
-		ContentStart			///< looking for the start of content (to signal the end of the XML header)
+		Content,			//< searching content token
+		Tag,				//< searching a tag
+		Attribute,			//< searching an attribute
+		ThisAttributeValue,		//< checking the value of the attribute just parsed (not an arbitrary but this one)
+		AttributeValue,			//< searching a value of an attribute
+		ContentStart			//< looking for the start of content (to signal the end of the XML header)
 	};
 
 	///\brief Get the name of the operation as string
@@ -2368,8 +2368,8 @@ public:
 	///\brief Mask to query for element types, if they match or not
 	struct Mask
 	{
-		unsigned short pos;			///< positively selected elements bitmask
-		unsigned short neg;			///< negatively selected elements bitmask that determines when a search pattern is given up copletely
+		unsigned short pos;			//< positively selected elements bitmask
+		unsigned short neg;			//< negatively selected elements bitmask that determines when a search pattern is given up copletely
 
 		///\brief Tells if mask does not select anything anymore
 		///\return true if it is not active anymore
@@ -2448,11 +2448,11 @@ public:
 	///\brief Core of an automaton state definition that is used during XML processing
 	struct Core
 	{
-		Mask mask;			///< mask definiting what tokens are matching this state
-		bool follow;			///< true, if the state is seeking tokens in all follow scopes in the XML tree
-		int typeidx;			///< type of the element emitted by this state on a match
-		int cnt_start;			///< lower bound of the element index matching (for index ranges)
-		int cnt_end;			///< upper bound of the element index matching (for index ranges)
+		Mask mask;			//< mask definiting what tokens are matching this state
+		bool follow;			//< true, if the state is seeking tokens in all follow scopes in the XML tree
+		int typeidx;			//< type of the element emitted by this state on a match
+		int cnt_start;			//< lower bound of the element index matching (for index ranges)
+		int cnt_end;			//< upper bound of the element index matching (for index ranges)
 
 		///\brief Constructor
 		Core()			:follow(false),typeidx(0),cnt_start(0),cnt_end(-1) {}
@@ -2465,12 +2465,12 @@ public:
 	///\brief State of an automaton in its definition
 	struct State
 	{
-		Core core;			///< core of the state (the part used in processing)
-		unsigned int keysize;		///< key size of the element
-		char* key;			///< key of the element
-		char* srckey;			///< key of the element as in source (for debugging or reporting, etc.)
-		int next;			///< follow state
-		int link;			///< alternative state to check
+		Core core;			//< core of the state (the part used in processing)
+		unsigned int keysize;		//< key size of the element
+		char* key;			//< key of the element
+		char* srckey;			//< key of the element as in source (for debugging or reporting, etc.)
+		int next;			//< follow state
+		int link;			//< alternative state to check
 
 		///\brief Constructor
 		State()
@@ -2562,14 +2562,14 @@ public:
 			link = p_link;
 		}
 	};
-	std::vector<State> states;							///< the states of the statemachine
+	std::vector<State> states;							//< the states of the statemachine
 
 	///\class Token
 	///\brief Active or passive but still valid token of the XML processing (this is a trigger waiting to match)
 	struct Token
 	{
-		Core core;											///< core of the state
-		int stateidx;										///< index into the automaton, poiting to the state
+		Core core;											//< core of the state
+		int stateidx;										//< index into the automaton, poiting to the state
 
 		///\brief Constructor
 		Token()						:stateidx(-1) {}
@@ -2585,16 +2585,16 @@ public:
 	///\brief Tag scope definition
 	struct Scope
 	{
-		Mask mask;					///< joined mask of all tokens active in this scope
-		Mask followMask;				///< joined mask of all tokens active in this and all sub scopes of this scope
+		Mask mask;					//< joined mask of all tokens active in this scope
+		Mask followMask;				//< joined mask of all tokens active in this and all sub scopes of this scope
 
 		///\class Range
 		///\brief Range on the token stack with all tokens that belong to this scope
 		struct Range
 		{
-			unsigned int tokenidx_from;		///< lower bound token index
-			unsigned int tokenidx_to;		///< upper bound token index
-			unsigned int followidx;			///< pointer to follow token stack with tokens active in this and all sub scopes of this scope
+			unsigned int tokenidx_from;		//< lower bound token index
+			unsigned int tokenidx_to;		//< upper bound token index
+			unsigned int followidx;			//< pointer to follow token stack with tokens active in this and all sub scopes of this scope
 
 			///\brief Constructor
 			Range()				:tokenidx_from(0),tokenidx_to(0),followidx(0) {}
@@ -2602,7 +2602,7 @@ public:
 			///\param[in] orig scope to copy
 			Range( const Scope& orig)	:tokenidx_from(orig.tokenidx_from),tokenidx_to(orig.tokenidx_to),followidx(orig.followidx) {}
 		};
-		Range range;							///< valid (active) token range of this scope (on the token stacks)
+		Range range;							//< valid (active) token range of this scope (on the token stacks)
 
 		///\brief Copy constructor
 		///\param[in] orig scope to copy
@@ -2731,15 +2731,15 @@ public:
 	struct PathElement :throws_exception
 	{
 	private:
-		XMLPathSelectAutomaton* xs;		///< XML Path select automaton where this node is an element of
-		int stateidx;							///< state of this element in the automaton
+		XMLPathSelectAutomaton* xs;		//< XML Path select automaton where this node is an element of
+		int stateidx;							//< state of this element in the automaton
 		
 		///\class Range
 		///\brief Element counting range defining what are indices of valid elements
 		struct Range
 		{
-			int start;							///< index of starting element starting with 0
-			int end;								///< index of upper boundary element (not belonging to range anymore). -1 if undefined (unlimited)
+			int start;							//< index of starting element starting with 0
+			int end;								//< index of upper boundary element (not belonging to range anymore). -1 if undefined (unlimited)
 
 			///\brief Copy constructor
 			///\param [in] o range element to copy
@@ -2754,10 +2754,10 @@ public:
 			///\brief Constructor
 			Range()				:start(0),end(-1){}
 		};
-		Range range;			///< Index range of this XML path element
-		bool follow;			///< true, if this element is active (firing) for all sub scopes of the activation scope
-		Mask pushOpMask;		///< mask for firing element actions
-		Mask printOpMask;		///< mask for printing element actions
+		Range range;			//< Index range of this XML path element
+		bool follow;			//< true, if this element is active (firing) for all sub scopes of the activation scope
+		Mask pushOpMask;		//< mask for firing element actions
+		Mask printOpMask;		//< mask for printing element actions
 
 	private:
 		///\brief Define an output operation for a certain element type in this state
@@ -2960,8 +2960,8 @@ public:
 	typedef EntityMap_ EntityMap;
 
 private:
-	ThisXMLScanner scan;				///< XML Scanner for fetching elements for the automaton input
-	const ThisXMLPathSelectAutomaton* atm;		///< XML select automaton used
+	ThisXMLScanner scan;				//< XML Scanner for fetching elements for the automaton input
+	const ThisXMLPathSelectAutomaton* atm;		//< XML select automaton used
 	typedef typename ThisXMLPathSelectAutomaton::Mask Mask;
 	typedef typename ThisXMLPathSelectAutomaton::Token Token;
 	typedef typename ThisXMLPathSelectAutomaton::Hash Hash;
@@ -2974,9 +2974,9 @@ private:
 	template <typename Element>
 	class Array :public throws_exception
 	{
-		Element* m_ar;				///< pointer to elements
-		std::size_t m_size;			///< fill size (number of elements inserted)
-		std::size_t m_maxSize;			///< allocation size (space reserved for this number of elements)
+		Element* m_ar;				//< pointer to elements
+		std::size_t m_size;			//< fill size (number of elements inserted)
+		std::size_t m_maxSize;			//< allocation size (space reserved for this number of elements)
 	public:
 		///\brief Constructor
 		///\param [in] p_maxSize allocation size (number of elements) to reserve
@@ -3035,20 +3035,20 @@ private:
 		bool empty() const			{return m_size==0;}
 	};
 
-	Array<Scope> scopestk;		///< stack of scopes opened
-	Array<unsigned int> follows;	///< indices of tokens active in all descendant scopes
-	Array<int> triggers;		///< triggered elements
-	Array<Token> tokens;		///< list of waiting tokens
+	Array<Scope> scopestk;		//< stack of scopes opened
+	Array<unsigned int> follows;	//< indices of tokens active in all descendant scopes
+	Array<int> triggers;		//< triggered elements
+	Array<Token> tokens;		//< list of waiting tokens
 
 	///\class Context
 	///\brief State variables without stacks of the automaton
 	struct Context
 	{
-		XMLScannerBase::ElementType type;	///< element type processed
-		const char* key;			///< string value of element processed
-		unsigned int keysize;			///< size of string value in bytes of element processed
-		Scope scope;				///< active scope
-		unsigned int scope_iter;		///< position of currently visited token in the active scope
+		XMLScannerBase::ElementType type;	//< element type processed
+		const char* key;			//< string value of element processed
+		unsigned int keysize;			//< size of string value in bytes of element processed
+		Scope scope;				//< active scope
+		unsigned int scope_iter;		//< position of currently visited token in the active scope
 
 		///\brief Constructor
 		Context()				:type(XMLScannerBase::Content),key(0),keysize(0) {}
@@ -3065,7 +3065,7 @@ private:
 			scope_iter = scope.range.tokenidx_from;
 		}
 	};
-	Context context;		///< state variables without stacks of the automaton
+	Context context;		//< state variables without stacks of the automaton
 
 	///\brief Activate a state by index
 	///\param stateidx index of the state to activate
@@ -3323,10 +3323,10 @@ public:
 			///\brief state of the iterator
 			enum State
 			{
-				Ok,				///< normal
-				EndOfOutput,	///< end of output triggered
-				EndOfInput,		///< end of input triggered
-				ErrorState		///< error occurred (identifier as string is in the output token buffer)
+				Ok,				//< normal
+				EndOfOutput,	//< end of output triggered
+				EndOfInput,		//< end of input triggered
+				ErrorState		//< error occurred (identifier as string is in the output token buffer)
 			};
 
 			///\brief Constructor
@@ -3345,11 +3345,11 @@ public:
 			///\brief Get the size of the content of the currently visited element in bytes
 			unsigned int size() const		{return m_size;}
 		private:
-			friend class iterator;		///< friend to intialize the elements
-			State m_state;			///< current state
-			int m_type;			///< currently visited element type
-			const char* m_content;		///< currently visited element content
-			unsigned int m_size;		///< size of the content of the currently visited element in bytes
+			friend class iterator;		//< friend to intialize the elements
+			State m_state;			//< current state
+			int m_type;			//< currently visited element type
+			const char* m_content;		//< currently visited element content
+			unsigned int m_size;		//< size of the content of the currently visited element in bytes
 		};
 		typedef Element value_type;
 		typedef std::size_t difference_type;
@@ -3358,8 +3358,8 @@ public:
 		typedef std::input_iterator_tag iterator_category;
 
 	private:
-		Element element;		///< currently visited element
-		ThisXMLPathSelect* input;		///< producing XML path selection stream
+		Element element;		//< currently visited element
+		ThisXMLPathSelect* input;		//< producing XML path selection stream
 
 		///\brief Skip to next element
 		///\return *this

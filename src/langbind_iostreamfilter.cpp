@@ -214,9 +214,10 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 
 		while (!flt.inputfilter()->gotEoD() || flt.inputfilter()->hasLeft())
 		{
-			while (!flt.inputfilter().get()->getNext( ietype, elem, elemsize))
+			if (!flt.inputfilter().get()->getNext( ietype, elem, elemsize))
 			{
 				if (!processIO( buf, flt, is, os)) goto _END_FILTER_LOOP;
+				continue;
 			}
 			oetype = (protocol::OutputFilter::ElementType) ietype;
 			while (!flt.outputfilter().get()->print( oetype, elem, elemsize))

@@ -66,6 +66,20 @@ INCLUDE_LIBS += \
 	$(LIBXML2_LIBS)
 endif
 
+# lua
+ifeq ($(WITH_LUA),1)
+INCLUDE_CXXFLAGS += \
+	-DWITH_LUA
+
+INCLUDE_DIRS += \
+	-I$(TOPDIR)/lua/src
+
+INCLUDE_LIBS += \
+	$(TOPDIR)/lua/src/liblua.a \
+	$(LIBS_DL)
+endif
+
+
 TEST_OBJS =
 
 TEST_CPP_BINS = \
@@ -87,9 +101,8 @@ TEST_CPP_BINS = \
 	configValueParser$(EXE) \
 	configStructParser$(EXE) \
 	testRand$(EXE) \
-	testTimestamp$(EXE)
-# \
-#	testWolfilter$(EXE)
+	testTimestamp$(EXE) \
+	testWolfilter$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
@@ -145,8 +158,8 @@ ifeq ($(RUN_TESTS),1)
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./testProtocolLFdotEscaping
 	@echo
-#	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./testWolfilter
-#	@echo
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./testWolfilter
+	@echo
 	@echo
 endif
 
