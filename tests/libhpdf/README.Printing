@@ -1,0 +1,20 @@
+raw printing:
+libhpdf
+http://podofo.sourceforge.net
+
+reporting:
+http://www.java4less.com/print_java_e.htm
+http://stackoverflow.com/questions/126622/open-source-reporting-engines
+	http://www.eclipse.org/birt/phoenix/
+	http://jasperforge.org/projects/jasperreports
+
+barcode
+http://arcana.linux.it/software/barcode/barcode.html, sadly GPL only,
+and a little bit old, but support Postscript and 
+http://www.libdmtx.org/
+
+UCP-A
+Code 2 of 5
+Code 3 of 9
+Aztec
+QR code
