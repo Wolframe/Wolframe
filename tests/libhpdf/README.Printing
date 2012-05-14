@@ -3,8 +3,13 @@ libhpdf
 http://podofo.sourceforge.net
 
 reporting:
-http://www.java4less.com/print_java_e.htm
 http://stackoverflow.com/questions/126622/open-source-reporting-engines
+http://code.google.com/p/exaro/
+http://www.oofile.com.au/reportwriter.html
+http://rlib.sicompos.com/
+
+Javaish, no option:
+	http://www.java4less.com/print_java_e.htm
 	http://www.eclipse.org/birt/phoenix/
 	http://jasperforge.org/projects/jasperreports
 
