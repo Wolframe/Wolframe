@@ -14,8 +14,7 @@ INCLUDE_LIBS = \
 	$(LIBHPDF_LIBS)
 
 TEST_CPP_BINS = \
-	testlibhpdf$(EXE) \
-	testbarcode$(EXE)
+	testlibhpdf$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
