@@ -433,7 +433,7 @@ bool Bignum::set( const std::string& val)
 	return true;
 }
 
-void Bignum::get( std::string& val)
+void Bignum::get( std::string& val) const
 {
 	val.clear();
 	std::size_t gg = (m_value.size()>m_dec)?(m_value.size()-m_dec):0;
@@ -450,5 +450,11 @@ void Bignum::get( std::string& val)
 	}
 }
 
-
+std::ostream& operator<<( std::ostream& o, const _Wolframe::types::Bignum& b )
+{
+	std::string s;
+	b.get( s );
+	o << s;
+	return o;
+}
 

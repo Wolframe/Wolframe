@@ -119,6 +119,7 @@ local_clean:
 	-rm -f $(TEST_CPP_BINS)
 	-rm -f *.o
 	-rm -f logTest.log
+	-rm -rf temp
 
 local_distclean:
 

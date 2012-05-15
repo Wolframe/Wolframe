@@ -37,6 +37,9 @@ Project Wolframe.
 #include <stdexcept>
 #include <cstring>
 
+#include <boost/integer_traits.hpp>
+#include <boost/utility/enable_if.hpp>
+
 extern "C"
 {
 #include "lua.h"

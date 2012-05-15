@@ -23,13 +23,13 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\libgmp\mpn\mpn.lib
 
 TEST_CPP_BINS = \
-	testlibgmp_c.exe
+	testlibgmp.exe
 
 all: $(TEST_CPP_BINS)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-testlibgmp_c.exe: testlibgmp_c.obj
+testlibgmp.exe: testlibgmp.obj
 
 local_all:
 
@@ -40,6 +40,6 @@ local_distclean:
 
 local_test:
 	@-echo @echo off > test.bat
-	@-echo testlibgmp_c 4 5 >> test.bat
-	@-echo testlibgmp_c 424234238490238409238402380482304 52342342342342342342342323 >> test.bat
+	@-echo testlibgmp 4 5 >> test.bat
+	@-echo testlibgmp 424234238490238409238402380482304 52342342342342342342342323 >> test.bat
 	@-test.bat

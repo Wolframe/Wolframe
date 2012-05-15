@@ -35,9 +35,7 @@ Project Wolframe.
 #define _Wolframe_TYPES_BIGNUM_HPP_INCLUDED
 #include <string>
 #include <stdexcept>
-#include <boost/lexical_cast.hpp>
-#include <boost/numeric/conversion/cast.hpp>
-#include "logger-v1.hpp"
+#include <iostream>
 
 namespace _Wolframe {
 namespace types {
@@ -69,9 +67,10 @@ public:
 	Bignum& neg();
 
 	bool set( const std::string& val);
-	void get( std::string& val);
+	void get( std::string& val) const;
 
 	std::size_t size() const				{return m_value.size();}
+	
 
 private:
 	std::string m_value;			//< number digits with sign
@@ -79,4 +78,7 @@ private:
 };
 
 }} //namespace
+
+std::ostream& operator<<( std::ostream& o, const _Wolframe::types::Bignum& b );
+
 #endif
