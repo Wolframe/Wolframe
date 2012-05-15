@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!DOCTYPE report>
+<Report fontSize="9" orientation="portrait">
+	<PageHeader>
+		<Output>
+			<Line fontSize="13">
+				<Image value="'wolf.jpeg'" type="'jpeg'" width="32" height="32"/>
+				<literal>Wolframe Employee List</literal>
+			</Line>
+			<HorizontalLine size="2" bgcolor="'black'"/>
+		</Output>
+	</PageHeader>
+
+	<Detail>
+		<FieldHeaders>
+			<Output>
+				<HorizontalLine size="1" bgcolor="'black'"/>
+				<Line bgcolor="'0xe5e5e5'">
+					<literal width="15" col="1">First Name</literal>
+					<literal width="15" col="1">Last Name</literal>
+					<literal width="10" col="1">Income</literal>
+				</Line>
+			</Output>
+		</FieldHeaders>
+
+		<FieldDetails>
+			<Output>
+				<Line>
+					<field value="firstname" width="15" align="left" col="1"/>
+					<field value="lastname" width="15" align="left" col="1"/>
+					<field value="amount" width="10" align="left" col="1"/>
+				</Line>
+			</Output>
+		</FieldDetails>
+	</Detail>
+</Report>
