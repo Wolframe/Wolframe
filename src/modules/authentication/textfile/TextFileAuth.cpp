@@ -84,9 +84,9 @@ AuthenticatorSlice* TextFileAuthenticator::authSlice()
 
 static const std::size_t PWD_LINE_SIZE = 1024;
 
-User* TextFileAuthenticator::authenticate( const std::string& username,
-					   const std::string& password,
-					   bool caseSensitveUser ) const
+User* TextFileAuthenticator::authenticatePlain( const std::string& username,
+						const std::string& password,
+						bool caseSensitveUser ) const
 {
 	FILE*	pwdFile;
 	if ( ! ( pwdFile = fopen( m_file.c_str(), "r" )))	{
@@ -166,8 +166,16 @@ User* TextFileAuthenticator::authenticate( const std::string& username,
 	return NULL;
 }
 
+
 User* TextFileAuthenticator::authenticate( const CRAMchallenge& challenge,
 					   const CRAMresponse& response,
+					   bool caseSensitveUser ) const
+{
+	return authenticate( challenge, response.toString(), caseSensitveUser );
+}
+
+User* TextFileAuthenticator::authenticate( const CRAMchallenge& challenge,
+					   const std::string& response,
 					   bool caseSensitveUser ) const
 {
 	FILE*	pwdFile;

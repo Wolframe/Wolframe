@@ -195,7 +195,7 @@ CRAMresponse::CRAMresponse( const std::string& challenge,
 	sha512( buffer, CRAM_CHALLENGE_SIZE, m_response );
 }
 
-std::string CRAMresponse::toString()
+std::string CRAMresponse::toString() const
 {
 	char	buffer[ CRAM_RESPONSE_STRING_SIZE ];
 

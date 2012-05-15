@@ -77,7 +77,7 @@ public:
 	CRAMresponse( const std::string& challenge,
 		      const std::string& username, const std::string& pwdHash );
 
-	std::string toString();
+	std::string toString() const;
 	bool operator == ( const CRAMresponse& rhs );
 	bool operator != ( const CRAMresponse& rhs )	{ return !( *this == rhs ); }
 	bool operator == ( const std::string& rhs );

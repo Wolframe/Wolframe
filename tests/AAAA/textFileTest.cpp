@@ -109,19 +109,19 @@ TEST_F( AuthenticationFixture, fileWithoutNewLine )
 	User*	user;
 	TextFileAuthenticator authenticator( "", "passwd-noNL" );
 
-	user = authenticator.authenticate( "admin", "Good Password", true );
+	user = authenticator.authenticatePlain( "admin", "Good Password", true );
 	ASSERT_TRUE( user != NULL );
 	ASSERT_STREQ( "admin", user->uname().c_str() );
 	ASSERT_STREQ( "Wolframe Administrator", user->name().c_str() );
 	delete user;
 
-	user = authenticator.authenticate( "goodusr", "User PassWord", true );
+	user = authenticator.authenticatePlain( "goodusr", "User PassWord", true );
 	ASSERT_TRUE( user != NULL );
 	ASSERT_STREQ( "goodusr", user->uname().c_str() );
 	ASSERT_STREQ( "Good User", user->name().c_str() );
 	delete user;
 
-	user = authenticator.authenticate( "badusr", "User BadWord", true );
+	user = authenticator.authenticatePlain( "badusr", "User BadWord", true );
 	ASSERT_TRUE( user != NULL );
 	ASSERT_STREQ( "badusr", user->uname().c_str() );
 	ASSERT_STREQ( "Bad User", user->name().c_str() );
@@ -133,18 +133,18 @@ TEST_F( AuthenticationFixture, validUsers )
 	User*	user;
 	TextFileAuthenticator authenticator( "", "passwd" );
 
-	user = authenticator.authenticate( "admin", "Good Password", true );
+	user = authenticator.authenticatePlain( "admin", "Good Password", true );
 	ASSERT_TRUE( user != NULL );
 	ASSERT_STREQ( "admin", user->uname().c_str() );
 	ASSERT_STREQ( "Wolframe Administrator", user->name().c_str() );
 	delete user;
 
-	user = authenticator.authenticate( "goodusr", "User PassWord", true );
+	user = authenticator.authenticatePlain( "goodusr", "User PassWord", true );
 	ASSERT_TRUE( user != NULL );
 	ASSERT_STREQ( "goodusr", user->uname().c_str() );
 	delete user;
 
-	user = authenticator.authenticate( "badusr", "User BadWord", true );
+	user = authenticator.authenticatePlain( "badusr", "User BadWord", true );
 	ASSERT_TRUE( user != NULL );
 	ASSERT_STREQ( "badusr", user->uname().c_str() );
 	ASSERT_STREQ( "Bad User", user->name().c_str() );
@@ -157,18 +157,18 @@ TEST_F( AuthenticationFixture, caseInsensitive_Pass )
 	User*	user;
 	TextFileAuthenticator authenticator( "", "passwd" );
 
-	user = authenticator.authenticate( "AdMiN", "Good Password", false );
+	user = authenticator.authenticatePlain( "AdMiN", "Good Password", false );
 	ASSERT_TRUE( user != NULL );
 	ASSERT_STREQ( "admin", user->uname().c_str() );
 	ASSERT_STREQ( "Wolframe Administrator", user->name().c_str() );
 	delete user;
 
-	user = authenticator.authenticate( "GoodUsr", "User PassWord", false );
+	user = authenticator.authenticatePlain( "GoodUsr", "User PassWord", false );
 	ASSERT_TRUE( user != NULL );
 	ASSERT_STREQ( "goodusr", user->uname().c_str() );
 	delete user;
 
-	user = authenticator.authenticate( "BadUsr", "User BadWord", false );
+	user = authenticator.authenticatePlain( "BadUsr", "User BadWord", false );
 	ASSERT_TRUE( user != NULL );
 	ASSERT_STREQ( "badusr", user->uname().c_str() );
 	ASSERT_STREQ( "Bad User", user->name().c_str() );
@@ -180,11 +180,11 @@ TEST_F( AuthenticationFixture, caseInsensitive_Fail )
 	User*	user;
 	TextFileAuthenticator authenticator( "", "passwd" );
 
-	user = authenticator.authenticate( "AdMiN", "Good Password", true );
+	user = authenticator.authenticatePlain( "AdMiN", "Good Password", true );
 	ASSERT_EQ( NULL, user );
-	user = authenticator.authenticate( "GoodUsr", "User PassWord", true );
+	user = authenticator.authenticatePlain( "GoodUsr", "User PassWord", true );
 	ASSERT_EQ( NULL, user );
-	user = authenticator.authenticate( "BadUsr", "User BadWord", true );
+	user = authenticator.authenticatePlain( "BadUsr", "User BadWord", true );
 	ASSERT_EQ( NULL, user );
 }
 
@@ -193,11 +193,11 @@ TEST_F( AuthenticationFixture, wrongPasswords )
 	User*	user;
 	TextFileAuthenticator authenticator( "", "passwd" );
 
-	user = authenticator.authenticate( "admin", "Goood Password", true );
+	user = authenticator.authenticatePlain( "admin", "Goood Password", true );
 	ASSERT_EQ( NULL, user );
-	user = authenticator.authenticate( "goodusr", "User Password", true );
+	user = authenticator.authenticatePlain( "goodusr", "User Password", true );
 	ASSERT_EQ( NULL, user );
-	user = authenticator.authenticate( "badusr", "user BadWord", true );
+	user = authenticator.authenticatePlain( "badusr", "user BadWord", true );
 	ASSERT_EQ( NULL, user );
 }
 
@@ -206,11 +206,11 @@ TEST_F( AuthenticationFixture, nonExistentUsers )
 	User*	user;
 	TextFileAuthenticator authenticator( "", "passwd" );
 
-	user = authenticator.authenticate( "adminn", "xx", true );
+	user = authenticator.authenticatePlain( "adminn", "xx", true );
 	ASSERT_EQ( NULL, user );
-	user = authenticator.authenticate( "gooduser", "xx", true );
+	user = authenticator.authenticatePlain( "gooduser", "xx", true );
 	ASSERT_EQ( NULL, user );
-	user = authenticator.authenticate( "baduser", "xx", true );
+	user = authenticator.authenticatePlain( "baduser", "xx", true );
 	ASSERT_EQ( NULL, user );
 }
 
@@ -220,11 +220,11 @@ TEST_F( AuthenticationFixture, invalidPasswordHashes )
 	TextFileAuthenticator authenticator( "", "passwd" );
 
 
-	user = authenticator.authenticate( "badmin", "Good Password", true );
+	user = authenticator.authenticatePlain( "badmin", "Good Password", true );
 	ASSERT_EQ( NULL, user );
-	user = authenticator.authenticate( "wrongusr", "User PassWord", true );
+	user = authenticator.authenticatePlain( "wrongusr", "User PassWord", true );
 	ASSERT_EQ( NULL, user );
-	user = authenticator.authenticate( "shortusr", "User BadWord", true );
+	user = authenticator.authenticatePlain( "shortusr", "User BadWord", true );
 	ASSERT_EQ( NULL, user );
 }
 
@@ -233,11 +233,11 @@ TEST_F( AuthenticationFixture, nonexistentFile )
 	User*	user;
 	TextFileAuthenticator authenticator( "", "passwds" );
 
-	user = authenticator.authenticate( "admin", "xx", true );
+	user = authenticator.authenticatePlain( "admin", "xx", true );
 	ASSERT_EQ( NULL, user );
-	user = authenticator.authenticate( "goodusr", "xx", true );
+	user = authenticator.authenticatePlain( "goodusr", "xx", true );
 	ASSERT_EQ( NULL, user );
-	user = authenticator.authenticate( "badusr", "xx", true );
+	user = authenticator.authenticatePlain( "badusr", "xx", true );
 	ASSERT_EQ( NULL, user );
 }
 
