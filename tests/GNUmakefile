@@ -1,6 +1,8 @@
 TOPDIR = ..
 
-SUBDIRS = modules AAAA bignum
+SUBDIRS = modules AAAA
+# SUBDIRS = modules AAAA bignum
+
 
 ifeq ($(WITH_EXPECT),1)
 SUBDIRS += expect config

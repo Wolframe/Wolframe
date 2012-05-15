@@ -49,6 +49,7 @@ makefiles/nmake/top.mk
 .Attic/mtproc/propertyTree.cpp
 .Attic/mtproc/propertyTree.hpp
 .Attic/printers.c
+.Attic/rijndael.c
 .Attic/SSLtest.c
 .Attic/streamIterator.hpp
 .Attic/testLeak.cpp
@@ -82,6 +83,11 @@ clients/qt/HistoryLineEdit.hpp
 clients/qt/MainWindow.cpp
 clients/qt/MainWindow.hpp
 clients/qt/Makefile.W32
+clients/qt/moc_AbstractFormLoader.cpp
+clients/qt/moc_DebugTerminal.cpp
+clients/qt/moc_HistoryLineEdit.cpp
+clients/qt/moc_MainWindow.cpp
+clients/qt/moc_WolframeClient.cpp
 clients/qt/qtclient.cpp
 clients/qt/README
 clients/qt/TODOS
@@ -1244,9 +1250,9 @@ tests/AAAA/textFileTest.cpp
 tests/bignum/GNUmakefile
 tests/bignum/libgmp/GNUmakefile
 tests/bignum/libgmp/Makefile.W32
-tests/bignum/libgmp/testlibgmp_c.c
-tests/bignum/libgmp/testlibgmp_cpp.cpp
+tests/bignum/libgmp/testlibgmp.c
 tests/bignum/Makefile.W32
+tests/bignum/testbignum.cpp
 tests/byte2hexTest.cpp
 tests/config/GNUmakefile
 tests/configStructParser.cpp
@@ -1262,7 +1268,6 @@ tests/GNUmakefile
 tests/libhpdf/GNUmakefile
 tests/libhpdf/Makefile.W32
 tests/libhpdf/README.Printing
-tests/libhpdf/testbarcode.cpp
 tests/libhpdf/testlibhpdf.cpp
 tests/libxml2/GNUmakefile
 tests/libxml2/Makefile.W32

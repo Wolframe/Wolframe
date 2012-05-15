@@ -16,7 +16,7 @@ INCLUDE_DIRS = \
 INCLUDE_LDFLAGS =
 
 INCLUDE_LIBS = \
-        $(TOPDIR)/src/libwolframe.a \
+	$(TOPDIR)/src/libwolframe.a \
 	-lboost_thread$(BOOST_LIBRARY_TAG)
 
 # libgmp
