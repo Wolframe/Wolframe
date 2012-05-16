@@ -1,0 +1,37 @@
+TOPDIR = ..\..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_CXXFLAGS = \
+	/D_WIN32_WINNT=0x504
+
+INCLUDE_DIRS = \
+	/I$(TOPDIR)\libhpdf\include
+
+INCLUDE_LIBS = \
+	$(TOPDIR)\libhpdf\src\hpdf.lib \
+	$(TOPDIR)\zlib\zlib.lib
+	
+TEST_CPP_BINS = \
+	testlibhpdf.exe
+
+all: $(OBJS) $(CPP_BINS)
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+testlibhpdf.exe: testlibhpdf.obj
+
+local_all:
+
+local_clean:
+	@-erase test.bat 2>NUL
+	@-erase *.pdf 2>NUL
+
+local_distclean:
+
+local_test:
+	@-echo @echo off > test.bat
+	@-echo testlibhpdf >> test.bat
+	@-test.bat
