@@ -5,6 +5,12 @@
 
 using namespace std;
 
+struct _private {
+	gchar *error;
+};
+
+#define INPUT_PRIVATE( input ) ( ( (struct _private *)input->_private ) )
+
 static gint wolf_rlib_input_close( gpointer input_ptr )
 {
 	return 0;
@@ -13,7 +19,10 @@ static gint wolf_rlib_input_close( gpointer input_ptr )
 static gint wolf_rlib_free_input_filter( gpointer input_ptr )
 {
 	struct input_filter *input = (struct input_filter *)input_ptr;
+
+	g_free( input->_private );
 	g_free( input );
+
 	return 0;
 }
 
@@ -44,12 +53,16 @@ static gint wolf_rlib_isdone( gpointer input_ptr, gpointer result_ptr )
 
 static const gchar* wolf_rlib_get_error( gpointer input_ptr )
 {
-	return "ERROR";
+	struct input_filter *input = (struct input_filter *)input_ptr;
+
+	return INPUT_PRIVATE( input )->error;
 }
 
 static void *wolf_rlib_new_result_from_query( gpointer input_ptr, gchar *query ) 
 {
-	cerr << "query: " << query << endl;
+	struct input_filter *input = (struct input_filter *)input_ptr;
+
+	INPUT_PRIVATE( input )->error = "";
 	
 	return NULL;
 }
@@ -74,7 +87,8 @@ gpointer wolf_rlib_new_input_filter( )
 	
 	input = (struct input_filter *)g_malloc( sizeof( struct input_filter ) );
 	memset( input, 0, sizeof( struct input_filter ) );
-	input->_private = 0;
+	input->_private = (struct _private *)g_malloc( sizeof( struct _private ) );
+	memset( input->_private, 0, sizeof( struct _private) );
 	input->input_close = wolf_rlib_input_close;
 	input->first = wolf_rlib_first;
 	input->next = wolf_rlib_next;
