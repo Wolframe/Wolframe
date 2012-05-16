@@ -58,7 +58,8 @@ namespace AAAA {
 TextFileAuthContainer::TextFileAuthContainer( const TextFileAuthConfig& conf )
 {
 	m_auth = new TextFileAuthenticator( conf.m_identifier, conf.m_file );
-	MOD_LOG_NOTICE << "Text file authenticator container created";
+	MOD_LOG_DEBUG << "Text file authenticator container created for '"
+		      << conf.m_identifier << "'";
 }
 
 

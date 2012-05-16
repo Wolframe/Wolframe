@@ -51,21 +51,45 @@ bool EchoProcConfig::parse( const config::ConfigurationTree& pt, const std::stri
 			    const module::ModulesDirectory* /*modules*/ )
 {
 	bool retVal = true;
-	bool isDefined = false;
+	bool timeoutDefined = false;
+	bool opDefined = false;
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "timeout" ))	{
 			if ( !config::Parser::getValue( logPrefix().c_str(), *L1it, m_timeout ))
 				retVal = false;
-			isDefined = true;
+			timeoutDefined = true;
+		}
+		else if ( boost::algorithm::iequals( L1it->first, "defaultOp" ) ||
+			  boost::algorithm::iequals( L1it->first, "defaultOperation" ))	{
+			std::string	opName;
+			if ( !config::Parser::getValue( logPrefix().c_str(), *L1it, opName ))
+				retVal = false;
+			if ( boost::algorithm::iequals( opName, "echo" ))	{
+				opDefined = true;
+				m_operation = EchoProcessorUnit::ECHO;
+			}
+			else if ( boost::algorithm::iequals( opName, "to_upper" ))	{
+				opDefined = true;
+				m_operation = EchoProcessorUnit::TO_UPPER;
+			}
+			else if ( boost::algorithm::iequals( opName, "to_lower" ))	{
+				opDefined = true;
+				m_operation = EchoProcessorUnit::TO_LOWER;
+			}
+			else
+				MOD_LOG_WARNING << logPrefix() << "unknown default operation: '"
+						<< opName << "'";
 		}
 		else	{
 			MOD_LOG_WARNING << logPrefix() << "unknown configuration option: '"
 				    << L1it->first << "'";
 		}
 	}
-	if ( ! isDefined )
+	if ( ! timeoutDefined )
 		m_timeout = 0;
+	if ( ! opDefined )
+		m_operation = EchoProcessorUnit::ECHO;
 
 	return retVal;
 }
@@ -92,19 +116,58 @@ void EchoProcConfig::setCanonicalPathes( const std::string& /*refPath*/ )
 
 
 //***  Processor unit container  ****************************************
-EchoProcContainer::EchoProcContainer( const EchoProcConfig& /*conf*/ )
+EchoProcContainer::EchoProcContainer( const EchoProcConfig& conf )
 {
-	m_proc = new EchoProcessorUnit();
+	m_proc = new EchoProcessorUnit( conf.m_operation );
 	MOD_LOG_TRACE << "Echo processor container created";
 }
 
 
 //***  Processor unit  **************************************************
-EchoProcessorUnit::EchoProcessorUnit()
+EchoProcessorUnit::EchoProcessorUnit( Operation operation )
 {
-	MOD_LOG_DEBUG << "Echo processor unit created";
+	m_operation = operation;
+
+	const char *opName;
+	switch( m_operation )	{
+		case UNDEFINED:
+			m_operation = ECHO;
+			MOD_LOG_WARNING << "Echo processor operation is undefined. Setting operation to ECHO";
+			 // break is intentionally missing
+		case ECHO:
+			opName = "echo";
+			break;
+		case TO_UPPER:
+			opName = "to upper";
+			break;
+		case TO_LOWER:
+			opName = "to lower";
+			break;
+		default:
+			throw std::logic_error( "Echo Processor constructor: invalid operation" );
+	}
+
+	MOD_LOG_DEBUG << "Echo processor unit created with default operation: " << opName;
 }
 
+
+std::string& EchoProcessorUnit::process( std::string& input )
+{
+	switch( m_operation )	{
+		case ECHO:
+			break;
+		case TO_UPPER:
+			boost::algorithm::to_upper( input );
+			break;
+		case TO_LOWER:
+			boost::algorithm::to_lower( input );
+			break;
+		case UNDEFINED:
+		default:
+			throw std::logic_error( "Echo Processor constructor: invalid operation" );
+	}
+	return input;
+}
 
 //***  Processor ********************************************************
 void EchoProcessor::receiveData( const void* /*data*/, std::size_t /*size*/ )

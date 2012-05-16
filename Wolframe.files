@@ -1268,7 +1268,9 @@ tests/GNUmakefile
 tests/libhpdf/GNUmakefile
 tests/libhpdf/Makefile.W32
 tests/libhpdf/README.Printing
+tests/libhpdf/rlibreport.xml
 tests/libhpdf/testlibhpdf.cpp
+tests/libhpdf/testrlib.cpp
 tests/libxml2/GNUmakefile
 tests/libxml2/Makefile.W32
 tests/libxml2/testlibxml2.cpp

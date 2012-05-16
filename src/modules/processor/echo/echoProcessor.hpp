@@ -60,10 +60,21 @@ public:
 class EchoProcessorUnit : public proc::ProcessorUnit
 {
 public:
-	EchoProcessorUnit();
+	enum Operation	{
+		UNDEFINED,
+		ECHO,
+		TO_UPPER,
+		TO_LOWER
+	};
+
+	EchoProcessorUnit( Operation operation );
 	~EchoProcessorUnit()				{}
 	const char* typeName() const			{ return "EchoProcessor"; }
 	proc::Processor* processor() const		{ return new EchoProcessor; }
+
+	std::string& process( std::string& input );
+private:
+	Operation	m_operation;
 };
 
 
@@ -83,7 +94,8 @@ public:
 	void print( std::ostream& os, size_t indent ) const;
 	void setCanonicalPathes( const std::string& referencePath );
 private:
-	unsigned short	m_timeout;
+	EchoProcessorUnit::Operation	m_operation;
+	unsigned short			m_timeout;
 };
 
 
