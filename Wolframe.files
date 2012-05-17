@@ -83,11 +83,6 @@ clients/qt/HistoryLineEdit.hpp
 clients/qt/MainWindow.cpp
 clients/qt/MainWindow.hpp
 clients/qt/Makefile.W32
-clients/qt/moc_AbstractFormLoader.cpp
-clients/qt/moc_DebugTerminal.cpp
-clients/qt/moc_HistoryLineEdit.cpp
-clients/qt/moc_MainWindow.cpp
-clients/qt/moc_WolframeClient.cpp
 clients/qt/qtclient.cpp
 clients/qt/README
 clients/qt/TODOS
@@ -1180,6 +1175,7 @@ src/modules/authentication/textfile/TextFileAuth.cpp
 src/modules/authentication/textfile/TextFileAuth.hpp
 src/modules/authentication/textfile/TextFileAuthModule.cpp
 src/modules/authentication/textfile/TextFileAuthModule.def
+src/modules/authentication/textfile/wolfpasswd.cpp
 src/modules/authorization/database/DBauthzConfig.cpp
 src/modules/authorization/database/DBauthz.cpp
 src/modules/authorization/database/DBauthz.hpp
@@ -1268,9 +1264,7 @@ tests/GNUmakefile
 tests/libhpdf/GNUmakefile
 tests/libhpdf/Makefile.W32
 tests/libhpdf/README.Printing
-tests/libhpdf/rlibreport.xml
 tests/libhpdf/testlibhpdf.cpp
-tests/libhpdf/testrlib.cpp
 tests/libxml2/GNUmakefile
 tests/libxml2/Makefile.W32
 tests/libxml2/testlibxml2.cpp
@@ -1310,6 +1304,13 @@ tests/msxslt/test.xml
 tests/poolTest.cpp
 tests/protocolArgumentParsing.cpp
 tests/resolvePathTest.cpp
+tests/rlib/GNUmakefile
+tests/rlib/Makefile.W32
+tests/rlib/rlibfilter.cpp
+tests/rlib/rlibfilter.hpp
+tests/rlib/rlibreport.xml
+tests/rlib/testrlib1.cpp
+tests/rlib/testrlib2.cpp
 tests/singletonTest.cpp
 tests/SSL/README.txt
 tests/testBoostPath.cpp

@@ -25,6 +25,12 @@ CPP_OBJS = \
 	TextFileAuth.o \
 	TextFileAuthModule.o
 
+CPP_BINS = \
+	wolfpasswd$(EXE)
+
+wolfpasswd$(EXE): wolfpasswd.o
+	$(CXX_LINK) -o $@ $(ALL_LDFLAGS) $< -lboost_program_options -lboost_system
+
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 local_all:

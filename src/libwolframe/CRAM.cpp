@@ -92,6 +92,19 @@ std::string PasswordHash::toString()
 	return std::string( buffer );
 }
 
+std::string PasswordHash::toBase64()
+{
+	char	buffer[ PASSWORD_HASH_STRING_SIZE ];
+
+	memset( buffer, 0, PASSWORD_HASH_STRING_SIZE );
+
+	if ( byte2hex( m_hash, PASSWORD_DIGEST_SIZE,
+		       buffer, PASSWORD_HASH_STRING_SIZE ) == NULL )
+		throw std::logic_error( "PasswordHash::toString() cannot convert hash ?!?" );
+
+	return std::string( buffer );
+}
+
 CRAMchallenge::CRAMchallenge( const std::string& randomDevice )
 {
 	memset( m_challenge, 0, CRAM_CHALLENGE_SIZE );

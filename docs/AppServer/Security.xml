@@ -62,6 +62,18 @@
 			<para></para>
 			<sect3>
 				<title>Setting up a Certificate Authority</title>
+				<code> mkdir -m 0755 \
+				/etc/pki_jungle/myCA \
+				/etc/pki_jungle/myCA/private \
+				/etc/pki_jungle/myCA/certs \
+				/etc/pki_jungle/myCA/newcerts \
+				/etc/pki_jungle/myCA/crl</code>
+
+				<code>openssl req -config openssl.my.cnf -new -x509 -extensions v3_ca -keyout private/myca.key -out certs/myca.crt -days 1825</code>
+
+				<code>openssl req -config openssl.my.cnf -new -nodes -keyout private/server.key -out server.csr -days 365</code>
+
+				<code>openssl ca -config openssl.my.cnf -policy policy_anything -out certs/server.crt -infiles server.csr</code>
 				<para></para>
 			</sect3>
 			<sect3>
