@@ -41,30 +41,73 @@ namespace PO = boost::program_options;
 
 int main( int argc, char* argv[] )
 {
-	PO::options_description desc( "wolfpasswd [-cD] passwordfile username\n"
-				      "wolfpasswd -b[c] passwordfile username password\n"
-				      "wolfpasswd -n username\n"
-				      "wolfpasswd -nb username password\n" );
+	PO::options_description desc( "Usage:\n"
+				      "  wolfpasswd [-cD] passwordfile username\n"
+				      "  wolfpasswd -b[c] passwordfile username password\n"
+				      "  wolfpasswd -n username\n"
+				      "  wolfpasswd -nb username password\n"
+				      "  wolfpasswd -h\n"
+				      "Options" );
 	desc.add_options()
-			( "create,c", "Create a new file." )
-			( "display-only,n", "Don't update file; display results on stdout." )
+			( "help,h", "Display this help message." )
+			( "create,c", "Create the file if it doesn't exist." )
+			( "display-only,n", "Don't update the password file; display results on stdout." )
 			( "command-line-password,b", "Use the password from the command line instead of prompting for it.")
 			( "delete,D", "Delete the specified user." )
 			;
 
-	PO::variables_map vm;
-	PO::store(PO::parse_command_line(argc, argv, desc), vm);
-	PO::notify(vm);
+	PO::options_description args( "Arguments" );
+	args.add_options()
+			( "posArgs", PO::value< std::vector<std::string> >(), "positional arguments" )
+			;
+	args.add( desc );
 
-	if (vm.count("help")) {
-	    std::cout << desc << "\n";
-	    return 1;
+	PO::positional_options_description posArgs;
+	posArgs.add( "posArgs", 3 );
+
+	PO::variables_map vm;
+	try	{
+		PO::store( PO::command_line_parser( argc, argv ).
+					  options( args ).positional( posArgs ).run(), vm );
+		PO::notify( vm );
+	}
+	catch( std::exception& e )	{
+		std::cerr << "\nERROR: " << e.what() << "\n\n";
+		std::cout << desc << "\n";
+		return 2;
 	}
 
-	if (vm.count("compression")) {
-	    std::cout << "Compression level was set to "
-	 << vm["compression"].as<int>() << ".\n";
-	} else {
-	    std::cout << "Compression level was not set.\n";
+	bool	createFile = false;
+	bool	displayOnly = false;
+	bool	cmdLinePwd = false;
+	bool	delUser = false;
+
+	if ( vm.count( "create" ))
+		createFile = true;
+	if ( vm.count( "display-only" ))
+		displayOnly = true;
+	if ( vm.count( "command-line-password" ))
+		cmdLinePwd = true;
+	if ( vm.count( "delete" ))
+		delUser = true;
+
+	if ( vm.count( "help" ))	{
+		if ( createFile || displayOnly|| cmdLinePwd || delUser
+				|| vm.count( "posArgs" ))
+			std::cout << "\nWARNING: --help ignores all other flags and arguments.\n\n";
+		std::cout << desc << "\n";
+		return 1;
+	}
+
+	if ( !vm.count( "posArgs" ))	{
+		std::cerr << "\nERROR: no arguments given.\n\n";
+		std::cout << desc << "\n";
+	}
+	else	{
+		std::cout << "Program arguments (" << vm.count( "posArgs" ) << "):\n";
+		for ( std::vector<std::string>::const_iterator it = vm["posArgs"].as< std::vector<std::string> >().begin();
+						it != vm["posArgs"].as< std::vector<std::string> >().end(); it ++ )
+			std::cout << "\t" << *it << "\n";
+		std::cout << std::endl;
 	}
 }
