@@ -117,3 +117,4 @@ tests/temp/
 tests/testProtocolLFdotEscaping
 tests/testWolfilter
 wtest/wtestcheck
+src/modules/authentication/textfile/wolfpasswd

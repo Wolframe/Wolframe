@@ -52,15 +52,15 @@ int main( int argc, char* argv[] )
 			( "help,h", "Display this help message." )
 			( "create,c", "Create the file if it doesn't exist." )
 			( "display-only,n", "Don't update the password file; display results on stdout." )
-			( "command-line-password,b", "Use the password from the command line instead of prompting for it.")
+			( "batch,b", "Use the password from the command line instead of prompting for it.")
 			( "delete,D", "Delete the specified user." )
 			;
 
-	PO::options_description args( "Arguments" );
-	args.add_options()
+	PO::options_description cmdArgs( "Arguments" );
+	cmdArgs.add_options()
 			( "posArgs", PO::value< std::vector<std::string> >(), "positional arguments" )
 			;
-	args.add( desc );
+	cmdArgs.add( desc );
 
 	PO::positional_options_description posArgs;
 	posArgs.add( "posArgs", 3 );
@@ -68,7 +68,7 @@ int main( int argc, char* argv[] )
 	PO::variables_map vm;
 	try	{
 		PO::store( PO::command_line_parser( argc, argv ).
-					  options( args ).positional( posArgs ).run(), vm );
+			   options( cmdArgs ).positional( posArgs ).run(), vm );
 		PO::notify( vm );
 	}
 	catch( std::exception& e )	{
@@ -79,20 +79,21 @@ int main( int argc, char* argv[] )
 
 	bool	createFile = false;
 	bool	displayOnly = false;
-	bool	cmdLinePwd = false;
+	bool	batchPwd = false;
 	bool	delUser = false;
 
 	if ( vm.count( "create" ))
 		createFile = true;
 	if ( vm.count( "display-only" ))
 		displayOnly = true;
-	if ( vm.count( "command-line-password" ))
-		cmdLinePwd = true;
+	if ( vm.count( "batch" ))
+		batchPwd = true;
 	if ( vm.count( "delete" ))
 		delUser = true;
 
+	// deal with help
 	if ( vm.count( "help" ))	{
-		if ( createFile || displayOnly|| cmdLinePwd || delUser
+		if ( createFile || displayOnly|| batchPwd || delUser
 				|| vm.count( "posArgs" ))
 			std::cout << "\nWARNING: --help ignores all other flags and arguments.\n\n";
 		std::cout << desc << "\n";
@@ -102,12 +103,112 @@ int main( int argc, char* argv[] )
 	if ( !vm.count( "posArgs" ))	{
 		std::cerr << "\nERROR: no arguments given.\n\n";
 		std::cout << desc << "\n";
+		return 2;
 	}
+	const std::vector<std::string>& args = vm["posArgs"].as< std::vector<std::string> >();
+
+	// display only
+	if ( displayOnly )	{
+		bool	wrong = false;
+		if ( createFile )	{
+			std::cerr << "\nERROR: --create cannot be used with --display-only.";
+			wrong = true;
+		}
+		if ( delUser )	{
+			std::cerr << "\nERROR: --delete cannot be used with --display-only.";
+			wrong = true;
+		}
+		if ( batchPwd )	{
+			if ( args.size() < 2 )	{
+				std::cerr << "\nERROR: too few arguments.";
+				wrong = true;
+			}
+			else if ( args.size() > 2 )	{
+				std::cerr << "\nERROR: too many arguments.";
+				wrong = true;
+			}
+		}
+		else	{
+			if ( args.size() > 1 )	{
+				std::cerr << "\nERROR: too many arguments.";
+				wrong = true;
+			}
+		}
+		if ( wrong )	{
+			std::cout << "\n\n" << desc << "\n";
+			return 2;
+		}
+
+		// All parameters are OK
+		if ( batchPwd )	{
+			std::cout << "Display only user '" << args[0] << "' with password '"
+				  << args[1]<< "'";
+			// do the job
+		}
+		else	{
+			std::cout << "Display only user '" << args[0] << "'";
+			// read password
+			// do the job
+		}
+	}
+	// delete user
+	else if ( delUser )	{
+		bool	wrong = false;
+		if ( createFile )	{
+			std::cerr << "\nERROR: --create cannot be used with --delete.";
+			wrong = true;
+		}
+		if ( args.size() < 2 )	{
+			std::cerr << "\nERROR: too few arguments.";
+			wrong = true;
+		}
+		else if ( args.size() > 2 )	{
+			std::cerr << "\nERROR: too many arguments.";
+			wrong = true;
+		}
+		if ( wrong )	{
+			std::cout << "\n\n" << desc << "\n";
+			return 2;
+		}
+
+		// All parameters are OK
+		std::cout << "Delete user '" << args[1] << "' from password file '"
+			  << args[0] << "'";
+		// do the job
+	}
+	// normal operation
 	else	{
-		std::cout << "Program arguments (" << vm.count( "posArgs" ) << "):\n";
-		for ( std::vector<std::string>::const_iterator it = vm["posArgs"].as< std::vector<std::string> >().begin();
-						it != vm["posArgs"].as< std::vector<std::string> >().end(); it ++ )
-			std::cout << "\t" << *it << "\n";
-		std::cout << std::endl;
+		bool	wrong = false;
+		if ( batchPwd )	{
+			if ( args.size() < 3 )	{
+				std::cerr << "\nERROR: too few arguments.";
+				wrong = true;
+			}
+		}
+		else	{
+			if ( args.size() > 2 )	{
+				std::cerr << "\nERROR: too many arguments.";
+				wrong = true;
+			}
+		}
+		if ( wrong )	{
+			std::cout << "\n\n" << desc << "\n";
+			return 2;
+		}
+
+		// Al parameters are OK
+		if ( createFile )
+			std::cout << "Create password file '" << args[0] << "'\n";
+		if ( batchPwd )	{
+			std::cout << "Change / add user '" << args[1] << "', password file '"
+				  << args[0] << "', password '" << args[2] << "'";
+		}
+		else	{
+			std::cout << "Change / add user '" << args[1] << "', password file '"
+				  << args[0] << "'";
+		}
+		// do the job
 	}
+	std::cout << "\nDone.\n\n";
+	return 0;
 }
