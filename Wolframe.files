@@ -1373,3 +1373,5 @@ zlib/zconf.h
 zlib/zlib.h
 zlib/zutil.c
 zlib/zutil.h
+src/modules/authentication/textfile/passwdFile.hpp
+src/modules/authentication/textfile/passwdFile.cpp

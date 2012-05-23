@@ -63,7 +63,7 @@ int main( int argc, char* argv[] )
 	cmdArgs.add( desc );
 
 	PO::positional_options_description posArgs;
-	posArgs.add( "posArgs", 3 );
+	posArgs.add( "posArgs", -1 );
 
 	PO::variables_map vm;
 	try	{
@@ -184,8 +184,16 @@ int main( int argc, char* argv[] )
 				std::cerr << "\nERROR: too few arguments.";
 				wrong = true;
 			}
+			else if ( args.size() > 3 )	{
+				std::cerr << "\nERROR: too many arguments.";
+				wrong = true;
+			}
 		}
 		else	{
+			if ( args.size() < 2 )	{
+				std::cerr << "\nERROR: too few arguments.";
+				wrong = true;
+			}
 			if ( args.size() > 2 )	{
 				std::cerr << "\nERROR: too many arguments.";
 				wrong = true;
