@@ -37,8 +37,33 @@
 #ifndef _PASSWDFILE_HPP_INCLUDED
 #define _PASSWDFILE_HPP_INCLUDED
 
+#include <string>
+#include <cstdio>
+
 namespace _Wolframe {
 namespace AAAA {
+
+std::string getPassword( const std::string& prompt = "Enter password> ", const char displayChar = '*' );
+
+class PasswordFile
+{
+public:
+	PasswordFile();
+	PasswordFile( const std::string& filename );
+
+	bool open();
+	bool open( const std::string& filename, bool create = false );
+	bool create( const std::string& filename );
+
+	bool addUser( const std::string& user, const std::string& password,
+		      const std::string& userInfo, const std::string& comment );
+	bool modifyUser(const std::string& user, const std::string& password,
+			const std::string& userInfo, const std::string& comment );
+	bool addOrModifyUser(const std::string& user, const std::string& password,
+			     const std::string& userInfo, const std::string& comment );
+private:
+	const std::string	m_filename;
+};
 
 }} // namepspace _Wolframe::AAAA
 
