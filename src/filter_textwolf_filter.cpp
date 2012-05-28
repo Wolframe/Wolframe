@@ -173,7 +173,7 @@ struct InputFilterImpl:public InputFilter
 	}
 
 	///\brief implement interface member InputFilter::getNext(typename InputFilter::ElementType&,const void*&,std::size_t&)
-	virtual bool getNext( typename InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
+	virtual bool getNext( InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
 	{
 		struct ElementTypeMap :public textwolf::CharMap<int,-1,textwolf::XMLScannerBase::NofElementTypes>
 		{
