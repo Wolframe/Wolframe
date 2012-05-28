@@ -159,7 +159,6 @@ local_test: $(TEST_CPP_BINS)
 !IFDEF WITH_LUA
 	@-echo iprocHandlerTest.exe >> test.bat
 	@-echo iprocHandlerXMLTest.exe >> test.bat
-	@-echo structLuamapTest.exe >> test.bat
 !ENDIF
 	@-test.bat
 
