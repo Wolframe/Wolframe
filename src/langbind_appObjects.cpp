@@ -35,8 +35,7 @@ Project Wolframe.
 #include "serialize/ddl/filtermapSerialize.hpp"
 #include "ddl/compiler/simpleFormCompiler.hpp"
 #include "logger-v1.hpp"
-#include "protocol/inputfilter.hpp"
-#include "protocol/outputfilter.hpp"
+#include "filter/filter.hpp"
 #include "filter/char_filter.hpp"
 #include "filter/line_filter.hpp"
 #include "filter/token_filter.hpp"
@@ -155,96 +154,104 @@ bool DDLFormMap::getForm( const std::string& name, DDLFormR& rt) const
 	return getObject( m_map, name, *rt.get());
 }
 
-PluginFunction::CallResult PluginFunction::call( protocol::InputFilter& ifl, protocol::OutputFilter& ofl)
+PluginFunction::CallResult PluginFunction::call( BufferingInputFilter& ifl, OutputFilter& ofl)
 {
-	if (m_state) return Error;
-
-	serialize::Context ctx;
-	void* input_struct = m_data.get();
+	if (m_lastres == Error) return Error;
+	void* param_struct = m_data.get();
 	void* result_struct = (void*)((char*)m_data.get() + m_api_param->size());
 
 	switch (m_state)
 	{
 		case 0:
-			if (!m_api_param->init( input_struct))
+			m_ctx.clear();
+			if (!m_api_param->init( param_struct))
 			{
-				LOG_ERROR << "Could not initialize api input object for plugin function";
-				return Error;
+				LOG_ERROR << "could not initialize api input object for plugin function";
+				return m_lastres=Error;
 			}
 			m_state = 1;
 		case 1:
 			if (!m_api_result->init( result_struct))
 			{
-				LOG_ERROR << "Could not initialize api result object for plugin function";
-				return Error;
+				LOG_ERROR << "could not initialize api result object for plugin function";
+				return m_lastres=Error;
 			}
 			m_state = 2;
 		case 2:
-			if (!m_api_param->parse( "", input_struct, ifl, ctx))
+			if (!m_api_param->parse( param_struct, ifl, m_ctx))
 			{
 				switch (ifl.state())
 				{
-					case protocol::InputFilter::Open:
-						ctx.setError( 0, "Unknown error");
-						return Error;
+					case InputFilter::Open:
+						if (m_ctx.getLastError())
+						{
+							LOG_ERROR << "API parameter: " << m_ctx.getLastError();
+						}
+						return m_lastres=Error;
 
-					case protocol::InputFilter::EndOfMessage:
-						return Yield;
+					case InputFilter::EndOfMessage:
+						return m_lastres=Yield;
 
-					case protocol::InputFilter::Error:
-						ctx.setError( 0, ifl.getError());
-						return Error;
+					case InputFilter::Error:
+						m_ctx.setError( ifl.getError());
+						LOG_ERROR << "input filter error: " << m_ctx.getLastError();
+						return m_lastres=Error;
 				}
 			}
 			m_state = 3;
 		case 3:
 			try
 			{
-				int rt = m_call( input_struct, result_struct);
+				m_ctx.clear();
+				int rt = m_call( result_struct, param_struct);
 				if (rt != 0)
 				{
 					LOG_ERROR << "error in call of plugin function. error code = " << rt;
-					return Error;
+					return m_lastres=Error;
 				}
 			}
 			catch (const std::exception& e)
 			{
 				LOG_ERROR << "exception in plugin function call: " << e.what();
-				return Error;
+				return m_lastres=Error;
 			}
 			m_state = 4;
 		case 4:
-			if (!m_api_param->print( "", result_struct, ofl, ctx))
+			if (!m_api_param->print( result_struct, ofl, m_ctx))
 			{
 				switch (ofl.state())
 				{
-					case protocol::OutputFilter::Open:
-						ctx.setError( 0, "Unknown error");
-						return Error;
+					case OutputFilter::Open:
+						if (m_ctx.getLastError())
+						{
+							LOG_ERROR << "API result: " << m_ctx.getLastError();
+						}
+						return m_lastres=Error;
 
-					case protocol::OutputFilter::EndOfBuffer:
-						return Yield;
+					case OutputFilter::EndOfBuffer:
+						return m_lastres=Yield;
 
-					case protocol::OutputFilter::Error:
-						ctx.setError( 0, ofl.getError());
-						return Error;
+					case OutputFilter::Error:
+						m_ctx.setError( ofl.getError());
+						LOG_ERROR << "output filter error: " << m_ctx.getLastError();
+						return m_lastres=Error;
 				}
 			}
 			m_state = 5;
 		case 5:
-			m_api_param->done( input_struct);
+			m_api_param->done( param_struct);
 			m_api_result->done( result_struct);
 			std::memset( m_data.get(), 0, m_api_param->size() + m_api_result->size());
 			m_state = 0;
 	}
-	return Ok;
+	return m_lastres=Ok;
 }
 
 PluginFunction::~PluginFunction()
 {
 	if (m_state >= 0)
 	{
-		void* input_struct = m_data.get();
+		void* param_struct = m_data.get();
 		void* result_struct = (void*)((char*)m_data.get() + m_api_param->size());
 
 		switch (m_state)
@@ -257,7 +264,7 @@ PluginFunction::~PluginFunction()
 			case 2:
 				m_api_result->done( result_struct);
 			case 1:
-				m_api_param->done( input_struct);
+				m_api_param->done( param_struct);
 		}
 	}
 }
@@ -275,13 +282,13 @@ bool PluginFunctionMap::getPluginFunction( const std::string& name, PluginFuncti
 bool TransactionFunction::call( const DDLForm& param, DDLForm& result)
 {
 	cmdbind::CommandHandler* cmd = m_cmd.get();
-	if (!cmd || m_cmdwriter.get() || m_resultreader.get())
+	if (!cmd || !m_cmdwriter.get() || !m_resultreader.get())
 	{
 		LOG_ERROR << "incomplete transaction function call definition";
 		return false;
 	}
 	serialize::Context pctx;
-	if (!serialize::print( param.m_struct, m_cmdwriter, pctx))
+	if (!serialize::print( param.m_struct, *m_cmdwriter, pctx))
 	{
 		LOG_ERROR << "error writing transaction command: " << pctx.getLastError();
 		return false;
@@ -322,8 +329,10 @@ bool TransactionFunction::call( const DDLForm& param, DDLForm& result)
 			case cmdbind::CommandHandler::CLOSED:
 			{
 				serialize::Context rctx;
-				m_resultreader->protocolInput( resultstr.c_str(), resultstr.size(), true);
-				if (!serialize::parse( result.m_struct, *m_resultreader, rctx))
+				BufferingInputFilter rr( m_resultreader.get());
+				rr.putInput( resultstr.c_str(), resultstr.size(), true);
+
+				if (!serialize::parse( result.m_struct, rr, rctx))
 				{
 					LOG_ERROR << "error reading transaction result: " << rctx.getLastError();
 					return false;
@@ -380,20 +389,20 @@ bool DDLCompilerMap::getDDLCompiler( const std::string& name, ddl::CompilerInter
 	return getObject( m_map, name, rt);
 }
 
-static InputFilterClosure::ItemType fetchFailureResult( const protocol::InputFilter& ff)
+static InputFilterClosure::ItemType fetchFailureResult( const InputFilter& ff)
 {
 	const char* msg;
 	switch (ff.state())
 	{
-		case protocol::InputFilter::EndOfMessage:
+		case InputFilter::EndOfMessage:
 			return InputFilterClosure::DoYield;
 
-		case protocol::InputFilter::Error:
+		case InputFilter::Error:
 			msg = ff.getError();
 			LOG_ERROR << "error in input filter (" << (msg?msg:"unknown") << ")";
 			return InputFilterClosure::Error;
 
-		case protocol::InputFilter::Open:
+		case InputFilter::Open:
 			LOG_DATA << "end of input";
 			return InputFilterClosure::EndOfData;
 	}
@@ -413,23 +422,13 @@ AGAIN:
 	}
 	if (!m_inputfilter->getNext( m_type, element, elementsize))
 	{
-		if (m_inputfilter->state() == protocol::InputFilter::Open)
-		{
-			// at end of data check if there is a follow filter (transformed filter) to continue with:
-			protocol::InputFilter* follow = m_inputfilter->createFollow();
-			if (follow)
-			{
-				m_inputfilter.reset( follow);
-				goto AGAIN;
-			}
-		}
 		return fetchFailureResult( *m_inputfilter);
 	}
 	else
 	{
 		switch (m_type)
 		{
-			case protocol::InputFilter::OpenTag:
+			case InputFilter::OpenTag:
 				m_taglevel += 1;
 				tag = (const char*)element;
 				tagsize = elementsize;
@@ -438,7 +437,7 @@ AGAIN:
 				m_gotattr = false;
 				return Data;
 
-			case protocol::InputFilter::Value:
+			case InputFilter::Value:
 				if (m_gotattr)
 				{
 					tag = m_attrbuf.c_str();
@@ -454,13 +453,13 @@ AGAIN:
 				valsize = elementsize;
 				return Data;
 
-			 case protocol::InputFilter::Attribute:
+			 case InputFilter::Attribute:
 				m_attrbuf.clear();
 				m_attrbuf.append( (const char*)element, elementsize);
 				m_gotattr = true;
 				goto AGAIN;
 
-			 case protocol::InputFilter::CloseTag:
+			 case InputFilter::CloseTag:
 				tag = 0;
 				tagsize = 0;
 				val = 0;
@@ -497,10 +496,10 @@ Output::ItemType Output::print( const char* tag, unsigned int tagsize, const cha
 				switch (m_state)
 				{
 					case 0:
-						if (!m_outputfilter->print( protocol::OutputFilter::Attribute, tag, tagsize)) break;
+						if (!m_outputfilter->print( OutputFilter::Attribute, tag, tagsize)) break;
 						m_state ++;
 					case 1:
-						if (!m_outputfilter->print( protocol::OutputFilter::Value, val, valsize)) break;
+						if (!m_outputfilter->print( OutputFilter::Value, val, valsize)) break;
 						m_state ++;
 					case 2:
 						m_state = 0;
@@ -512,38 +511,17 @@ Output::ItemType Output::print( const char* tag, unsigned int tagsize, const cha
 					LOG_ERROR << "error in output filter (" << err << ")";
 					return Error;
 				}
-				else if (m_outputfilter->state() != protocol::OutputFilter::EndOfBuffer)
-				{
-					// in case of return false and no error check if there is a follow format ouptut filter to continue with:
-					protocol::OutputFilter* follow = m_outputfilter->createFollow();
-					if (follow)
-					{
-						m_outputfilter.reset( follow);
-						return print( tag, tagsize, val, valsize);
-					}
-
-				}
 				return DoYield;
 			}
 			else
 			{
-				if (!m_outputfilter->print( protocol::OutputFilter::OpenTag, tag, tagsize))
+				if (!m_outputfilter->print( OutputFilter::OpenTag, tag, tagsize))
 				{
 					const char* err = m_outputfilter->getError();
 					if (err)
 					{
 						LOG_ERROR << "error in output filter open tag (" << err << ")";
 						return Error;
-					}
-					else  if (m_outputfilter->state() != protocol::OutputFilter::EndOfBuffer)
-					{
-						// in case of return false and no error check if there is a follow format ouptut filter to continue with:
-						protocol::OutputFilter* follow = m_outputfilter->createFollow();
-						if (follow)
-						{
-							m_outputfilter.reset( follow);
-							return print( tag, tagsize, val, valsize);
-						}
 					}
 					return DoYield;
 				}
@@ -552,7 +530,7 @@ Output::ItemType Output::print( const char* tag, unsigned int tagsize, const cha
 		}
 		else if (val)
 		{
-			if (!m_outputfilter->print( protocol::OutputFilter::Value, val, valsize))
+			if (!m_outputfilter->print( OutputFilter::Value, val, valsize))
 			{
 				const char* err = m_outputfilter->getError();
 				if (err)
@@ -560,39 +538,19 @@ Output::ItemType Output::print( const char* tag, unsigned int tagsize, const cha
 					LOG_ERROR << "error in output filter value (" << err << ")";
 					return Error;
 				}
-				else if (m_outputfilter->state() != protocol::OutputFilter::EndOfBuffer)
-				{
-					// in case of return false and no error check if there is a follow format ouptut filter to continue with:
-					protocol::OutputFilter* follow = m_outputfilter->createFollow();
-					if (follow)
-					{
-						m_outputfilter.reset( follow);
-						return print( tag, tagsize, val, valsize);
-					}
-				}
 				return DoYield;
 			}
 			return Data;
 		}
 		else
 		{
-			if (!m_outputfilter->print( protocol::OutputFilter::CloseTag, 0, 0))
+			if (!m_outputfilter->print( OutputFilter::CloseTag, 0, 0))
 			{
 				const char* err = m_outputfilter->getError();
 				if (err)
 				{
 					LOG_ERROR << "error in output filter close tag (" << err << ")";
 					return Error;
-				}
-				else if (m_outputfilter->state() != protocol::OutputFilter::EndOfBuffer)
-				{
-					// in case of return false and no error check if there is a follow format ouptut filter to continue with:
-					protocol::OutputFilter* follow = m_outputfilter->createFollow();
-					if (follow)
-					{
-						m_outputfilter.reset( follow);
-						return print( tag, tagsize, val, valsize);
-					}
 				}
 				return DoYield;
 			}
@@ -767,15 +725,15 @@ bool LuaFunctionMap::getLuaScriptInstance( const std::string& procname, LuaScrip
 int LuaPluginFunction::call( lua_State* ls) const
 {
 	bool ok = true;
-	serialize::Context ctx;
 	int rt = 0;
+	serialize::Context ctx;
 
 	void* dt = lua_newuserdata( ls, m_api_param->size() + m_api_result->size());
 	std::memset( dt, 0, m_api_param->size() + m_api_result->size());
-	void* input_struct = (void*)dt;
+	void* param_struct = (void*)dt;
 	void* result_struct = (void*)((char*)dt + m_api_param->size());
 
-	if (!m_api_param->init( input_struct))
+	if (!m_api_param->init( param_struct))
 	{
 		ctx.setError( 0, "Could not initialize api input object");
 		ok = false;
@@ -783,22 +741,22 @@ int LuaPluginFunction::call( lua_State* ls) const
 	}
 	if (!m_api_result->init( result_struct))
 	{
-		m_api_param->done( input_struct);
+		m_api_param->done( param_struct);
 		ctx.setError( 0, "Could not initialize api result object");
 		ok = false;
 		goto EXIT_FUNCTION2;
 	}
-	if (!m_api_param->parse( input_struct, ls, &ctx))
+	if (!m_api_param->parse( param_struct, ls, &ctx))
 	{
 		ok = false;
 		goto EXIT_FUNCTION3;
 	}
 	try
 	{
-		rt = m_call( input_struct, result_struct);
+		rt = m_call( result_struct, param_struct);
 		if (rt != 0)
 		{
-			m_api_param->done( input_struct);
+			m_api_param->done( param_struct);
 			m_api_result->done( result_struct);
 			lua_pushnumber( ls, rt);
 			return 1;
@@ -816,7 +774,7 @@ int LuaPluginFunction::call( lua_State* ls) const
 		goto EXIT_FUNCTION3;
 	}
 EXIT_FUNCTION3:
-	m_api_param->done( input_struct);
+	m_api_param->done( param_struct);
 EXIT_FUNCTION2:
 	m_api_result->done( result_struct);
 EXIT_FUNCTION1:

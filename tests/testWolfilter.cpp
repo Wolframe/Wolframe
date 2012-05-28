@@ -60,15 +60,15 @@ static void prepareTest()
 	langbind::GlobalContext* gct = langbind::getGlobalContext();
 	gct->definePluginFunction( "employee_assignment_convert",
 					langbind::PluginFunction(
-						test::convertAssignmentList,
-						test::AssignmentList::getFiltermapDescription(),
-						test::AssignmentList::getFiltermapDescription()));
+						test::convertAssignmentListDoc,
+						test::AssignmentListDoc::getFiltermapDescription(),
+						test::AssignmentListDoc::getFiltermapDescription()));
 #if WITH_LUA
 	gct->defineLuaPluginFunction( "employee_assignment_convert",
 					langbind::LuaPluginFunction(
-						test::convertAssignmentList,
-						test::AssignmentList::getLuamapDescription(),
-						test::AssignmentList::getLuamapDescription()));
+						test::convertAssignmentListDoc,
+						test::AssignmentListDoc::getLuamapDescription(),
+						test::AssignmentListDoc::getLuamapDescription()));
 #endif
 }
 
@@ -185,16 +185,19 @@ TEST_F( WolfilterTest, tests)
 			std::fstream oo( OUTPUT.string().c_str(), std::ios::out | std::ios::binary);
 			oo.write( out.str().c_str(), out.str().size());
 			if (oo.bad()) std::cerr << "error writing file '" << OUTPUT.string() << "'" << std::endl;
+			oo.close();
 
 			boost::filesystem::path EXPECT( boost::filesystem::current_path() / "temp" / "EXPECT");
 			std::fstream ee( EXPECT.string().c_str(), std::ios::out | std::ios::binary);
 			ee.write( td.expected.c_str(), td.expected.size());
 			if (ee.bad()) std::cerr << "error writing file '" << EXPECT.string() << "'" << std::endl;
+			ee.close();
 
 			boost::filesystem::path INPUT( boost::filesystem::current_path() / "temp" / "INPUT");
 			std::fstream ss( INPUT.string().c_str(), std::ios::out | std::ios::binary);
 			ss.write( td.input.c_str(), td.input.size());
 			if (ss.bad()) std::cerr << "error writing file '" << INPUT.string() << "'" << std::endl;
+			ss.close();
 
 			std::cerr << "test output does not match for '" << *itr << "'" << std::endl;
 			std::cerr << "INPUT  written to file '"  << INPUT.string() << "'" << std::endl;

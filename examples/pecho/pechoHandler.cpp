@@ -29,10 +29,10 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///
-/// \file pechoHandler.cpp
-///
-#include "protocol.hpp"
+///\file pechoHandler.cpp
+
+#include "protocol/parser.hpp"
+#include "protocol/ioblocks.hpp"
 #include "pechoHandler.hpp"
 #include "logger-v1.hpp"
 

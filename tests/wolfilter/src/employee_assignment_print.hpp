@@ -79,7 +79,16 @@ struct AssignmentList
 	static serialize::MapDescriptionBase* getMapDescription();
 };
 
-int convertAssignmentList( const void*, void*){ return 0;}
+struct AssignmentListDoc
+	:public serialize::StructureDefinition<AssignmentListDoc>
+{
+	AssignmentList assignmentlist;
+
+	static serialize::MapDescriptionBase* getMapDescription();
+	static int convert( AssignmentListDoc& res, const AssignmentListDoc& param);
+};
+
+int convertAssignmentListDoc( void* res, const void* param);
 
 }}
 #endif

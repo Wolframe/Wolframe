@@ -10,6 +10,7 @@ INCLUDE_CXXFLAGS = \
 INCLUDE_DIRS = \
 	/I. \
 	/I$(TOPDIR)\include \
+	/I$(TOPDIR)\include\filter \
 	/I"$(BOOST_INCLUDE_DIR)"
 
 INCLUDE_LDFLAGS = \
@@ -115,8 +116,8 @@ LOCAL_STATIC_LIB_OBJS = \
 	cmdbind_execCommandHandler.obj \
 	cmdbind_ioFilterCommandHandler.obj \
 	cmdbind_directmapCommandHandler.obj \
+	filter_filterbase.obj \
 	filter_textwolf_filter.obj \
-	filter_textwolf_filterBase.obj \
 	filter_char_filter.obj \
 	filter_line_filter.obj \
 	filter_token_filter.obj \

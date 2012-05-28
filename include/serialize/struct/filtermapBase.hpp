@@ -34,8 +34,8 @@ Project Wolframe.
 
 #ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_BASE_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_BASE_HPP_INCLUDED
-#include "protocol/inputfilter.hpp"
-#include "protocol/outputfilter.hpp"
+#include "filter/inputfilter.hpp"
+#include "filter/outputfilter.hpp"
 #include "serialize/mapContext.hpp"
 #include <cstddef>
 #include <string>
@@ -48,15 +48,16 @@ namespace serialize {
 class FiltermapDescriptionBase
 {
 public:
-	typedef std::vector<std::pair<const char*,FiltermapDescriptionBase> > Map;
-	typedef bool (*Parse)( const char* tag, void* obj, protocol::InputFilter& flt, Context& ctx, bool isinit);
-	typedef bool (*Print)( const char* tag, const void* obj, protocol::OutputFilter*& out, Context& ctx);
+	typedef std::vector<std::pair<std::string,FiltermapDescriptionBase> > Map;
+	typedef bool (*Parse)( void* obj, langbind::InputFilter& flt, Context& ctx, bool isinit);
+	typedef bool (*Print)( const char* tag, const void* obj, langbind::OutputFilter& out, Context& ctx);
 	typedef bool (*Constructor)( void* obj);
 	typedef void (*Destructor)( void* obj);
 	typedef bool (*IsAtomic)();
 
-	Parse parse() const {return m_parse;}
-	Print print() const {return m_print;}
+	Parse parse() const		{return m_parse;}
+	Print print() const		{return m_print;}
+	bool isAtomic() const		{return m_isAtomic();}
 
 	FiltermapDescriptionBase( Constructor c, Destructor d, const char* tn, std::size_t os, std::size_t sz, IsAtomic ia, Parse pa, Print pr)
 		:m_constructor(c),m_destructor(d),m_typename(tn),m_ofs(os),m_size(sz),m_nof_attributes(std::numeric_limits<std::size_t>::max()),m_isAtomic(ia),m_parse(pa),m_print(pr){}
@@ -67,13 +68,8 @@ public:
 	FiltermapDescriptionBase()
 		:m_typename(0),m_ofs(0),m_size(0),m_nof_attributes(std::numeric_limits<std::size_t>::max()),m_isAtomic(0),m_parse(0),m_print(0){}
 
-	bool parse( const char* name, void* obj, protocol::InputFilter& in, Context& ctx) const;
-	bool print( const char* name, const void* obj, protocol::OutputFilter& out, Context& ctx) const;
-
-	bool isAtomic() const
-	{
-		return m_isAtomic();
-	}
+	bool parse( void* obj, langbind::BufferingInputFilter& in, Context& ctx) const;
+	bool print( const void* obj, langbind::OutputFilter& out, Context& ctx) const;
 
 	bool init( void* obj) const
 	{
@@ -95,11 +91,11 @@ public:
 		return m_ofs;
 	}
 
-	Map::const_iterator find( const char* name) const
+	Map::const_iterator find( const std::string& name) const
 	{
 		for (Map::const_iterator itr = m_elem.begin(); itr!=m_elem.end(); ++itr)
 		{
-			if (std::strcmp( itr->first, name) == 0) return itr;
+			if (itr->first == name) return itr;
 		}
 		return m_elem.end();
 	}
@@ -107,9 +103,9 @@ public:
 	Map::const_iterator begin() const {return m_elem.begin();}
 	Map::const_iterator end() const {return m_elem.end();}
 
-	void define( const char* name, const FiltermapDescriptionBase& dd)
+	void define( const std::string& name, const FiltermapDescriptionBase& dd)
 	{
-		m_elem.push_back( std::pair<const char*,FiltermapDescriptionBase>(name,dd));
+		m_elem.push_back( Map::value_type(name,dd));
 	}
 
 	std::size_t nof_attributes() const

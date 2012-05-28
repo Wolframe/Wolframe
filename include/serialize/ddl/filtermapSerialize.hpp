@@ -34,8 +34,8 @@ Project Wolframe.
 
 #ifndef _Wolframe_SERIALIZE_DDL_FILTERMAP_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_DDL_FILTERMAP_HPP_INCLUDED
-#include "protocol/inputfilter.hpp"
-#include "protocol/outputfilter.hpp"
+#include "filter/inputfilter.hpp"
+#include "filter/outputfilter.hpp"
 #include "serialize/mapContext.hpp"
 #include "ddl/structType.hpp"
 #include <cstddef>
@@ -43,8 +43,8 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-bool parse( ddl::StructType& st, protocol::InputFilter& flt, Context& ctx);
-bool print( const ddl::StructType& st, protocol::OutputFilterR& out, Context& ctx);
+bool parse( ddl::StructType& st, langbind::BufferingInputFilter& flt, Context& ctx);
+bool print( const ddl::StructType& st, langbind::OutputFilter& out, Context& ctx);
 
 }}//namespace
 #endif

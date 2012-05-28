@@ -35,36 +35,32 @@ Project Wolframe.
 #ifndef _Wolframe_SERIALIZE_STRUCT_MAPCONTEXT_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_MAPCONTEXT_HPP_INCLUDED
 #include <string>
-#include "protocol/inputfilter.hpp"
-#include "protocol/outputfilter.hpp"
+#include "filter/inputfilter.hpp"
+#include "filter/outputfilter.hpp"
 
 namespace _Wolframe {
 namespace serialize {
 
 struct Context
 {
-	enum {bufsize=4096,errbufsize=256};
-
 	Context();
-	~Context();
+	~Context(){}
 
-	const char* getLastError() const		{return m_lasterror;}
-	char* buf() const				{return m_buf;}
+	const char* getLastError() const		{return m_lasterror[0]?m_lasterror:0;}
 	void append( const char* c, std::size_t n)	{m_content.append( c,n);}
-	void clear()					{m_content.clear();}
-	void endTagConsumed( bool v)			{m_endTagConsumed=v;}
-	bool endTagConsumed()				{return m_endTagConsumed;}
+	void clear();
+	void followTagConsumed( bool v)			{m_followTagConsumed=v;}
+	bool followTagConsumed()			{return m_followTagConsumed;}
 	const std::string& content() const		{return m_content;}
 	std::string& content()				{return m_content;}
 
-	void setError( const char* tt, const char* msg, const char* msgparam=0);
-	void setError( const char* tt);
-	bool printElem( protocol::OutputFilter::ElementType tp, const void* elem, std::size_t elemsize, protocol::OutputFilterR& out);
+	void setTag( const char* tag);
+	void setError( const char* msg, const char* msgparam=0);
+	bool printElem( langbind::OutputFilter::ElementType tp, const void* elem, std::size_t elemsize, langbind::OutputFilter& out);
 private:
-	char* m_lasterror;
-	char* m_buf;
+	char m_lasterror[ 256];
 	std::string m_content;
-	bool m_endTagConsumed;
+	bool m_followTagConsumed;
 
 	void setMsg( const char* m1, char dd, const char* m2, const char* m3=0);
 };

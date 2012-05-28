@@ -81,6 +81,11 @@ public:
 	///\param [in] p_size size of buffer to use
 	void set( void* p_ptr, std::size_t p_size);
 
+	///\brief Set the buffer to be used by this class (as non allocated by this class)
+	///\param [in] p_ptr new buffer to use
+	///\param [in] p_size size of buffer to use
+	void set( const void* p_ptr, std::size_t p_size)	{set( const_cast<void*>(p_ptr), p_size);}
+
 	///\brief Constant void pointer to start of buffer
 	void* ptr()						{return m_ptr;}
 

@@ -65,7 +65,6 @@ struct FiltermapDescription :public FiltermapDescriptionBase
 		FiltermapDescriptionBase::Parse parse_ = &FiltermapIntrusiveParser<Element>::parse;
 		FiltermapDescriptionBase::Print print_ = &FiltermapIntrusivePrinter<Element>::print;
 		FiltermapDescriptionBase::IsAtomic isAtomic_ = &FiltermapIntrusiveParser<Element>::isAtomic;
-
 		std::size_t pp = (std::size_t)&(((Structure*)0)->*eptr);
 		FiltermapDescriptionBase e( getTypename<Element>(), pp, sizeof(Element), isAtomic_, parse_, print_);
 		if (find( name) != end())

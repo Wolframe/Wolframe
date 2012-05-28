@@ -196,7 +196,8 @@ struct LuaObject :public ObjectType
 		LuaObject* obj = (LuaObject*) luaL_checkudata( ls, -1, metaTableName<ObjectType>());
 		if (!obj)
 		{
-			return luaL_error( ls, "reserved global variable '%s' has been changed", name);
+			luaL_error( ls, "reserved global variable '%s' has been changed", name);
+			return 0;
 		}
 		return obj;
 	}
@@ -317,7 +318,7 @@ static int function__LuaObject__newindex( lua_State* ls)
 	{
 		if (!obj->setValue( key, val))
 		{
-			luaL_error( ls, "%s __newindex called with unknown variable name", metaTableName<Object>());
+			luaL_error( ls, "%s __newindex called with unknown variable name '%s'", metaTableName<Object>(), key);
 		}
 	}
 	catch (const std::bad_alloc&)
@@ -569,20 +570,25 @@ static int function_input_as( lua_State* ls)
 	}
 	try
 	{
-		protocol::InputFilter* ff = 0;
+		langbind::InputFilter* ff = 0;
 		if (filter->inputfilter().get())
 		{
 			ff = filter->inputfilter()->copy();
 			if (input->inputfilter().get())
 			{
-				ff->assignContent( *input->inputfilter());
+				// assign the rest of the input to the new filter attached
+				const void* chunk;
+				std::size_t chunksize;
+				bool chunkend;
+				input->inputfilter()->getRest( chunk, chunksize, chunkend);
+				ff->putInput( chunk, chunksize, chunkend);
 			}
+			input->inputfilter().reset( ff);
 		}
 		else
 		{
 			luaL_error( ls, "input:as called with a filter with undefined input");
 		}
-		input->inputfilter().reset( ff);
 	}
 	catch (const std::bad_alloc&)
 	{
@@ -610,13 +616,13 @@ static int function_output_as( lua_State* ls)
 	}
 	try
 	{
-		protocol::OutputFilter* ff = 0;
+		langbind::OutputFilter* ff = 0;
 		if (filter->outputfilter().get())
 		{
 			ff = filter->outputfilter()->copy();
 			if (output->outputfilter().get())
 			{
-				ff->assignContent( *output->outputfilter());
+				ff->assignState( *output->outputfilter());
 			}
 		}
 		else

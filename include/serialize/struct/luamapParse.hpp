@@ -52,7 +52,8 @@ static void setLuaError( Context* ctx, lua_State* ls, int tagIndex, const char* 
 {
 	lua_pushvalue( ls, tagIndex);
 	const char* tablename = lua_tostring( ls, -1);
-	ctx->setError( tablename, msg, param);
+	ctx->setError( msg, param);
+	ctx->setTag( tablename);
 	lua_pop( ls, 1);
 }
 
@@ -63,7 +64,7 @@ static bool parseObject_( void* obj, const luatraits::struct_&, lua_State* ls, C
 	
 	if (!lua_istable( ls, -1))
 	{
-		ctx->setError( 0, "table expected for structure");
+		ctx->setError( "table expected for structure");
 		return false;
 	}
 

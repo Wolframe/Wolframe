@@ -254,8 +254,8 @@ static int run( const std::string& scriptpath, const std::string& input, std::st
 		LOG_ERROR << "error in serialization: no valid filter defined";
 		return 1;
 	}
-	protocol::InputFilter* in = filter.inputfilter().get();
-	protocol::OutputFilter* out = filter.outputfilter().get();
+	langbind::InputFilter* in = filter.inputfilter().get();
+	langbind::OutputFilter* out = filter.outputfilter().get();
 	if (!in)
 	{
 		LOG_ERROR << "error in serialization: no valid input filter defined";
@@ -273,7 +273,7 @@ static int run( const std::string& scriptpath, const std::string& input, std::st
 	LuaCommandHandler processor;
 	processor.passParameters( "run", 0, 0);
 
-	in->protocolInput( (void*)input.c_str(), input.size(), true);
+	in->putInput( (void*)input.c_str(), input.size(), true);
 	processor.setFilter( filter.inputfilter());
 	processor.setFilter( filter.outputfilter());
 	for (;;)
@@ -283,20 +283,17 @@ static int run( const std::string& scriptpath, const std::string& input, std::st
 		{
 			case LuaCommandHandler::Yield:
 			{
-				void* content = filter.outputfilter()->ptr();
-				unsigned int contentsize = filter.outputfilter()->pos();
-				output.append( (char*)content, contentsize);
-				filter.outputfilter()->release();
-				filter.outputfilter()->init( outputbuf, sizeof(outputbuf));
+				std::size_t outputsize = filter.outputfilter()->getPosition();
+				output.append( outputbuf, outputsize);
+				filter.outputfilter()->setOutputBuffer( outputbuf, sizeof(outputbuf));
 				break;
 			}
 
 			case LuaCommandHandler::Ok:
 			{
-				void* content = filter.outputfilter()->ptr();
-				unsigned int contentsize = filter.outputfilter()->pos();
-				output.append( (char*)content, contentsize);
-				filter.outputfilter()->release();
+				std::size_t outputsize = filter.outputfilter()->getPosition();
+				output.append( outputbuf, outputsize);
+				filter.outputfilter()->setOutputBuffer( outputbuf, sizeof(outputbuf));
 				return 0;
 			}
 

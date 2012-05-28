@@ -30,7 +30,6 @@ Project Wolframe.
 
 ************************************************************************/
 #include "protocol/ioblocks.hpp"
-#include "protocol.hpp"
 #include <cstring>
 #include <new>
 

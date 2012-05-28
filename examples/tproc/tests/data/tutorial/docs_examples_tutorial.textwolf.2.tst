@@ -5,6 +5,7 @@ HELLO
 RUN
 姚 明
 yao ming
+
 .
 QUIT
 **file:example_2.lua

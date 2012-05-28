@@ -81,51 +81,24 @@ static langbind::Filter getFilter( langbind::GlobalContext* gc, const std::strin
 	return rt;
 }
 
-static bool readInput( char* buf, unsigned int bufsize, std::istream& is, protocol::InputFilterR& iflt)
+static bool readInput( char* buf, unsigned int bufsize, std::istream& is, InputFilter& iflt)
 {
-	if (iflt->gotEoD()) return false;
 	std::size_t pp = 0;
 	while (pp < bufsize && !is.eof())
 	{
 		is.read( buf+pp, sizeof(char));
 		if (!is.eof()) ++pp;
 	}
-	iflt->protocolInput( buf, pp, is.eof());
-	return true;
+	iflt.putInput( buf, pp, is.eof());
+	iflt.setState( InputFilter::Open);
+	return (!is.eof() || pp);
 }
 
-static void writeOutput( char* buf, unsigned int size, std::ostream& os, protocol::OutputFilterR& oflt)
+static void writeOutput( char* buf, unsigned int size, std::ostream& os, OutputFilter& oflt)
 {
-	os.write( buf, oflt->pos());
-	oflt->init( buf, size);
-}
-
-static bool followInput( protocol::InputFilterR& iflt)
-{
-	protocol::InputFilter* follow = iflt->createFollow();
-	if (follow)
-	{
-		iflt.reset( follow);
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-static bool followOutput( protocol::OutputFilterR& oflt)
-{
-	protocol::OutputFilter* follow = oflt->createFollow();
-	if (follow)
-	{
-		oflt.reset( follow);
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	os.write( buf, oflt.getPosition());
+	oflt.setOutputBuffer( buf, size);
+	oflt.setState( OutputFilter::Open);
 }
 
 struct BufferStruct
@@ -144,54 +117,43 @@ struct BufferStruct
 	}
 };
 
-static bool processIO( BufferStruct& buf, langbind::Filter& flt, std::istream& is, std::ostream& os)
+static bool processIO( BufferStruct& buf, langbind::InputFilter* iflt, langbind::OutputFilter* oflt, std::istream& is, std::ostream& os)
 {
 	const char* errmsg;
-	if (!flt.inputfilter().get() || !flt.outputfilter().get())
+	if (!iflt || !oflt)
 	{
 		LOG_ERROR << "Error lost filter";
 		return false;
 	}
-	switch (flt.inputfilter()->state())
+	switch (iflt->state())
 	{
-		case protocol::InputFilter::Open:
+		case InputFilter::Open:
 			break;
 
-		case protocol::InputFilter::EndOfMessage:
-			return readInput( buf.inbuf, buf.insize, is, flt.inputfilter());
+		case InputFilter::EndOfMessage:
+			return readInput( buf.inbuf, buf.insize, is, *iflt);
 
-		case protocol::InputFilter::Error:
-			errmsg = flt.inputfilter()->getError();
+		case InputFilter::Error:
+			errmsg = iflt->getError();
 			LOG_ERROR << "Error in input filter: " << (errmsg?errmsg:"unknown");
 			return false;
 	}
-	switch (flt.outputfilter()->state())
+	switch (oflt->state())
 	{
-		case protocol::OutputFilter::Open:
-			if (followOutput( flt.outputfilter())) return true;
-			if (followInput( flt.inputfilter())) return true;
+		case OutputFilter::Open:
 			return false;
 
-		case protocol::OutputFilter::EndOfBuffer:
-			writeOutput( buf.outbuf, buf.outsize, os, flt.outputfilter());
+		case OutputFilter::EndOfBuffer:
+			writeOutput( buf.outbuf, buf.outsize, os, *oflt);
 			return true;
 
-		case protocol::OutputFilter::Error:
-			errmsg = flt.outputfilter()->getError();
+		case OutputFilter::Error:
+			errmsg = oflt->getError();
 			LOG_ERROR << "Error in output filter: " << (errmsg?errmsg:"unknown");
 			return false;
 	}
 	return true;
 }
-
-bool finalIOState( const langbind::Filter& flt)
-{
-	return	flt.inputfilter()->state() != protocol::InputFilter::Error
-		&& flt.inputfilter()->gotEoD()
-		&& !flt.inputfilter()->hasLeft()
-		&& flt.outputfilter()->state() == protocol::OutputFilter::Open;
-}
-
 
 bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& is, std::ostream& os)
 {
@@ -203,31 +165,30 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 	if (!flt.inputfilter().get() || !flt.outputfilter().get()) return false;
 
 	BufferStruct buf( ib, ob);
-	flt.outputfilter().get()->init( buf.outbuf, buf.outsize);
+	flt.outputfilter()->setOutputBuffer( buf.outbuf, buf.outsize);
 
 	if (proc.size() == 0 || proc == "-")
 	{
 		const void* elem;
 		std::size_t elemsize;
-		protocol::InputFilter::ElementType ietype;
-		protocol::OutputFilter::ElementType oetype;
+		InputFilter::ElementType etype;
 
-		while (!flt.inputfilter()->gotEoD() || flt.inputfilter()->hasLeft())
+		for (;;)
 		{
-			if (!flt.inputfilter().get()->getNext( ietype, elem, elemsize))
+			if (!flt.inputfilter().get()->getNext( etype, elem, elemsize))
 			{
-				if (!processIO( buf, flt, is, os)) goto _END_FILTER_LOOP;
+				if (!processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)) goto _END_FILTER_LOOP;
 				continue;
 			}
-			oetype = (protocol::OutputFilter::ElementType) ietype;
-			while (!flt.outputfilter().get()->print( oetype, elem, elemsize))
+			while (!flt.outputfilter().get()->print( etype, elem, elemsize))
 			{
-				if (!processIO( buf, flt, is, os)) goto _END_FILTER_LOOP;
+				if (!processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)) goto _END_FILTER_LOOP;
 			}
 		}
 		_END_FILTER_LOOP:
-		writeOutput( buf.outbuf, buf.outsize, os, flt.outputfilter());
-		return finalIOState( flt);
+		writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
+		return	flt.inputfilter()->state() == InputFilter::Open
+			&& flt.outputfilter()->state() == OutputFilter::Open;
 	}
 #if WITH_LUA
 	{
@@ -238,13 +199,13 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 			int rt = lua_resume( sc->thread(), NULL, 0);
 			while (rt == LUA_YIELD)
 			{
-				if (!processIO( buf, flt, is, os)) break;
+				if (!processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)) break;
 				rt = lua_resume( sc->thread(), NULL, 0);
 			}
 			if (rt)
 			{
 				const char* msg = lua_tostring( sc->thread(), -1);
-				LOG_ERROR << "Error in lua script: '" << msg << "'";
+				LOG_ERROR << "error in lua script: '" << msg << "'";
 				return false;
 			}
 			return true;
@@ -255,13 +216,26 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 		PluginFunction pf;
 		if (gc->getPluginFunction( proc.c_str(), pf))
 		{
-			langbind::PluginFunction::CallResult rt = pf.call( *flt.inputfilter(), *flt.outputfilter());
+			BufferingInputFilter ff( flt.inputfilter().get());
+			langbind::PluginFunction::CallResult rt = pf.call( ff, *flt.outputfilter());
 			while (rt == langbind::PluginFunction::Yield)
 			{
-				if (!processIO( buf, flt, is, os)) break;
-				rt = pf.call( *flt.inputfilter(), *flt.outputfilter());
+				if (processIO( buf, &ff, flt.outputfilter().get(), is, os)
+				|| (ff.state() == InputFilter::Open && flt.outputfilter()->state() == OutputFilter::Open))
+				{
+					rt = pf.call( ff, *flt.outputfilter());
+				}
 			}
-			return (rt == langbind::PluginFunction::Ok);
+			if (rt == langbind::PluginFunction::Ok)
+			{
+				os.write( pf.content().c_str(), pf.content().size());
+				return true;
+			}
+			else
+			{
+				LOG_ERROR << "error in plugin function: '" << pf.getLastError() << "'";
+				return false;
+			}
 		}
 	}
 	{
@@ -269,15 +243,24 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 		if (gc->getForm( proc.c_str(), df))
 		{
 			serialize::Context ictx;
-			if (!serialize::parse( df->m_struct, *flt.inputfilter(), ictx))
+			BufferingInputFilter ff( flt.inputfilter().get());
+			bool rt;
+			for (;;)
 			{
-				LOG_ERROR << "Error in form serialization: '" << ictx.getLastError() << "'";
-				return false;
+				rt = serialize::parse( df->m_struct, ff, ictx);
+				if (rt) break;
+
+				if (ff.state() == InputFilter::EndOfMessage)
+				{
+					if (!processIO( buf, &ff, flt.outputfilter().get(), is, os)) break;
+					continue;
+				}
+				LOG_ERROR << "error in form serialization: '" << ictx.getLastError() << "'";
 			}
 			serialize::Context octx;
-			if (!serialize::print( df->m_struct, flt.outputfilter(), octx))
+			if (!serialize::print( df->m_struct, *flt.outputfilter(), octx))
 			{
-				LOG_ERROR << "Error in form printing: '" << octx.getLastError() << "'";
+				LOG_ERROR << "error in form printing: '" << octx.getLastError() << "'";
 				return false;
 			}
 			os.write( octx.content().c_str(), octx.content().size());

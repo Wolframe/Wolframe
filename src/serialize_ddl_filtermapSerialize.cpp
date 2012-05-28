@@ -38,12 +38,12 @@ using namespace _Wolframe;
 using namespace serialize;
 
 // forward declaration
-static bool parseObject( const char* tag, ddl::StructType& st, protocol::InputFilter& inp, Context& ctx, bool isinit);
+static bool parseObject( ddl::StructType& st, langbind::InputFilter& inp, Context& ctx, bool isinit);
 
 
-static bool parseAtom( const char* tag, ddl::AtomicType& val, protocol::InputFilter& inp, Context& ctx)
+static bool parseAtom( ddl::AtomicType& val, langbind::InputFilter& inp, Context& ctx)
 {
-	protocol::InputFilter::ElementType typ;
+	langbind::InputFilter::ElementType typ;
 	const void* element;
 	std::size_t elementsize;
 
@@ -51,43 +51,38 @@ static bool parseAtom( const char* tag, ddl::AtomicType& val, protocol::InputFil
 	{
 		switch (typ)
 		{
-			case protocol::InputFilter::OpenTag:
-				ctx.setError( tag, "content value expected instead of tag");
+			case langbind::InputFilter::OpenTag:
+				ctx.setError( "content value expected instead of tag");
 				return false;
 
-			case protocol::InputFilter::Attribute:
-				ctx.setError( tag, "content value expected instead of attribute");
+			case langbind::InputFilter::Attribute:
+				ctx.setError( "content value expected instead of attribute");
 				return false;
 
-			case protocol::InputFilter::Value:
+			case langbind::InputFilter::Value:
 				if (!val.set( std::string( (const char*)element, elementsize)))
 				{
-					ctx.setError( tag, "illegal value");
+					ctx.setError( "illegal value");
 					return false;
 				}
 				break;
 
-			case protocol::InputFilter::CloseTag:
+			case langbind::InputFilter::CloseTag:
 				if (!val.set( std::string( "")))
 				{
-					ctx.setError( tag, "cannot convert empty string to value");
+					ctx.setError( "cannot convert empty string to value");
 					return false;
 				}
-				ctx.endTagConsumed(true);
+				ctx.followTagConsumed(true);
 				break;
 		}
 	}
-	else
-	{
-		ctx.setError( tag, "unexpected end of content");
-		return false;
-	}
-	return true;
+	return (inp.state() == langbind::InputFilter::Open);
 }
 
-static bool parseStruct( const char* tag, ddl::StructType& st, protocol::InputFilter& inp, Context& ctx)
+static bool parseStruct( ddl::StructType& st, langbind::InputFilter& inp, Context& ctx)
 {
-	protocol::InputFilter::ElementType typ;
+	langbind::InputFilter::ElementType typ;
 	unsigned int depth = 0;
 	const void* element;
 	std::size_t elementsize;
@@ -97,82 +92,88 @@ static bool parseStruct( const char* tag, ddl::StructType& st, protocol::InputFi
 	{
 		switch (typ)
 		{
-			case protocol::InputFilter::OpenTag:
+			case langbind::InputFilter::OpenTag:
 			{
 				++depth;
-				ddl::StructType::Map::iterator itr = st.find( ctx.buf());
+				ddl::StructType::Map::iterator itr = st.find( std::string( (const char*)element, elementsize));
 				if (itr == st.end())
 				{
-					ctx.setError( (const char*)element, "unknown element");
-					ctx.setError( tag);
+					ctx.setError( "unknown element", (const char*)element);
 					return false;
 				}
-				if (!parseObject( 0, itr->second, inp, ctx, isinitar[ itr-st.begin()])) return false;
+				if (!parseObject( itr->second, inp, ctx, isinitar[ itr-st.begin()]))
+				{
+					ctx.setTag( itr->first.c_str());
+					return false;
+				}
 				isinitar[ itr-st.begin()] = true;
 
-				if (ctx.endTagConsumed())
+				if (ctx.followTagConsumed())
 				{
 					--depth;
-					ctx.endTagConsumed(false);
+					ctx.followTagConsumed(false);
 					return true;
 				}
 				break;
 			}
 
-			case protocol::InputFilter::Attribute:
+			case langbind::InputFilter::Attribute:
 			{
-				ddl::StructType::Map::iterator itr = st.find( ctx.buf());
+				ddl::StructType::Map::iterator itr = st.find( std::string( (const char*)element, elementsize));
 				if (itr == st.end())
 				{
-					ctx.setError( (const char*)element, "unknown element");
-					ctx.setError( tag);
+					ctx.setError( "unknown element", (const char*)element);
 					return false;
 				}
 				if ((std::size_t)(itr-st.begin()) >= st.nof_attributes())
 				{
-					ctx.setError( (const char*)element, "content element expected");
+					ctx.setError( "content element expected", (const char*)element);
 				}
 				if (isinitar[ itr-st.begin()])
 				{
-					ctx.setError( tag, "duplicate value definition");
+					ctx.setError( "duplicate value definition", (const char*)element);
 					return false;
 				}
 				try
 				{
-					if (!parseAtom( (const char*)element, itr->second.value(), inp, ctx)) return false;
+					if (!parseAtom( itr->second.value(), inp, ctx))
+					{
+						ctx.setTag( (const char*)element);
+						return false;
+					}
 				}
 				catch (const std::logic_error&)
 				{
-					ctx.setError( tag, "Attribute is not atomic");
+					ctx.setError( "Attribute is not atomic");
 				}
 				isinitar[ itr-st.begin()] = true;
 
-				ctx.endTagConsumed(false);
+				ctx.followTagConsumed(false);
 				break;
 			}
-			case protocol::InputFilter::Value:
+			case langbind::InputFilter::Value:
 			{
 				std::size_t ii;
 				for (ii=0; ii<elementsize; ii++) if (((const char*)element)[ii]>32) break;
 				if (ii==elementsize) break;
-				ctx.endTagConsumed(false);
-				ctx.setError( tag, "structure expected");
+				ctx.followTagConsumed(false);
+				ctx.setError( "structure expected");
 				return false;
 			}
-			case protocol::InputFilter::CloseTag:
+			case langbind::InputFilter::CloseTag:
 				if (depth == 0)
 				{
-					ctx.endTagConsumed(true);
+					ctx.followTagConsumed(true);
 					return true;
 				}
 				--depth;
-				ctx.endTagConsumed(false);
+				ctx.followTagConsumed(false);
 		}
 	}
-	return true;
+	return (inp.state() == langbind::InputFilter::Open);
 }
 
-static bool parseObject( const char* tag, ddl::StructType& st, protocol::InputFilter& inp, Context& ctx, bool isinit)
+static bool parseObject( ddl::StructType& st, langbind::InputFilter& inp, Context& ctx, bool isinit)
 {
 	bool rt = false;
 	switch (st.contentType())
@@ -180,56 +181,56 @@ static bool parseObject( const char* tag, ddl::StructType& st, protocol::InputFi
 		case ddl::StructType::Atomic:
 			if (isinit)
 			{
-				ctx.setError( tag, "duplicate value definition");
+				ctx.setError( "duplicate value definition");
 				return false;
 			}
-			rt = parseAtom( tag, st.value(), inp, ctx);
+			rt = parseAtom( st.value(), inp, ctx);
 
 		case ddl::StructType::Vector:
 			st.push();
-			rt = parseObject( tag, st.back(), inp, ctx, false);
+			rt = parseObject( st.back(), inp, ctx, false);
 
 		case ddl::StructType::Struct:
 			if (isinit)
 			{
-				ctx.setError( tag, "duplicate structure definition");
+				ctx.setError( "duplicate structure definition");
 				return false;
 			}
-			rt = parseStruct( tag, st, inp, ctx);
+			rt = parseStruct( st, inp, ctx);
 	}
 	return rt;
 }
 
-bool printObject( const char* tag, const ddl::StructType& st, protocol::OutputFilterR& out, Context& ctx)
+bool printObject( const char* tag, const ddl::StructType& st, langbind::OutputFilter& out, Context& ctx)
 {
 	switch (st.contentType())
 	{
 		case ddl::StructType::Atomic:
 		{
-			if (tag && !ctx.printElem( protocol::OutputFilter::OpenTag, tag, std::strlen(tag), out)) return false;
-			if (!ctx.printElem( protocol::OutputFilter::Value, st.value().value().c_str(), st.value().value().size(), out)) return false;
-			if (tag && !ctx.printElem( protocol::OutputFilter::CloseTag, "", 0, out)) return false;
+			if (tag && !ctx.printElem( langbind::OutputFilter::OpenTag, tag, std::strlen(tag), out)) return false;
+			if (!ctx.printElem( langbind::OutputFilter::Value, st.value().value().c_str(), st.value().value().size(), out)) return false;
+			if (tag && !ctx.printElem( langbind::OutputFilter::CloseTag, "", 0, out)) return false;
 		}
 		case ddl::StructType::Vector:
 		{
 			ddl::StructType::Map::const_iterator itr=st.begin(), end=st.end();
 			for (; itr != end; ++itr)
 			{
-				if (!printObject( tag, itr->second, out, ctx)) return false;
+				if (!printObject( itr->first.c_str(), itr->second, out, ctx)) return false;
 			}
 		}
 		case ddl::StructType::Struct:
 		{
 			bool isContent = false;
-			if (tag && !ctx.printElem( protocol::OutputFilter::OpenTag, tag, std::strlen(tag), out)) return false;
+			if (tag && !ctx.printElem( langbind::OutputFilter::OpenTag, tag, std::strlen(tag), out)) return false;
 
 			ddl::StructType::Map::const_iterator itr=st.begin(), end=st.end();
 			for (std::size_t idx=0; itr != end; ++itr,++idx)
 			{
 				if (!isContent && itr->second.contentType() == ddl::StructType::Atomic && idx >= st.nof_attributes())
 				{
-					if (!ctx.printElem( protocol::OutputFilter::Attribute, itr->first.c_str(), itr->first.size(), out)) return false;
-					if (!ctx.printElem( protocol::OutputFilter::Value, itr->second.value().value().c_str(), itr->second.value().value().size(), out)) return false;
+					if (!ctx.printElem( langbind::OutputFilter::Attribute, itr->first.c_str(), itr->first.size(), out)) return false;
+					if (!ctx.printElem( langbind::OutputFilter::Value, itr->second.value().value().c_str(), itr->second.value().value().size(), out)) return false;
 				}
 				else
 				{
@@ -237,21 +238,21 @@ bool printObject( const char* tag, const ddl::StructType& st, protocol::OutputFi
 					if (!printObject( itr->first.c_str(), itr->second, out, ctx)) return false;
 				}
 			}
-			if (tag && !ctx.printElem( protocol::OutputFilter::CloseTag, "", 0, out)) return false;
+			if (tag && !ctx.printElem( langbind::OutputFilter::CloseTag, "", 0, out)) return false;
 		}
 	}
 	return true;
 }
 
 
-bool _Wolframe::serialize::parse( ddl::StructType& st, protocol::InputFilter& flt, Context& ctx)
+bool _Wolframe::serialize::parse( ddl::StructType& st, langbind::BufferingInputFilter& flt, Context& ctx)
 {
-	return parseObject( 0, st, flt, ctx, false);
+	return parseObject( st, flt, ctx, false);
 }
 
-bool _Wolframe::serialize::print( const ddl::StructType& st, protocol::OutputFilterR& out, Context& ctx)
+bool _Wolframe::serialize::print( const ddl::StructType& st, langbind::OutputFilter& out, Context& ctx)
 {
-	return printObject( 0, st, out, ctx);
+	return printObject( (const char*)0, st, out, ctx);
 }
 
 

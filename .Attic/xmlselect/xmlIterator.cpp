@@ -30,7 +30,7 @@ Project Wolframe.
 
 ************************************************************************/
 #include "xmlIterator.hpp"
-#include "protocol.hpp"
+#include "protocol/buffer.hpp"
 #include "textwolf.hpp"
 #include <vector>
 #include <cstring>

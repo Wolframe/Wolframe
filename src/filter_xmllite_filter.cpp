@@ -2,7 +2,6 @@
 #error Compiling a XmlLite module without XmlLite support enabled
 #endif
 #include "filter/xmllite_filter.hpp"
-#include "filter/bufferingFilterBase.hpp"
 #include <cstddef>
 #include <cstring>
 #include <vector>

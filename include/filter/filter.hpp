@@ -29,14 +29,14 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filter.hpp
+///\file filter/filter.hpp
 ///\brief Interface for filter modules
 
-#ifndef _Wolframe_FILTER_INTERFACE_HPP_INCLUDED
-#define _Wolframe_FILTER_INTERFACE_HPP_INCLUDED
-#include "protocol/inputfilter.hpp"
-#include "protocol/outputfilter.hpp"
+#ifndef _Wolframe_FILTER_FILTER_INTERFACE_HPP_INCLUDED
+#define _Wolframe_FILTER_FILTER_INTERFACE_HPP_INCLUDED
 #include "countedReference.hpp"
+#include "filter/inputfilter.hpp"
+#include "filter/outputfilter.hpp"
 #include <map>
 #include <string>
 
@@ -46,17 +46,17 @@ namespace langbind {
 struct Filter
 {
 public:
-	Filter( const protocol::InputFilterR& i_, const protocol::OutputFilterR& o_)
+	Filter( const InputFilterR& i_, const OutputFilterR& o_)
 		:m_inputfilter(i_),m_outputfilter(o_){}
 	Filter( const Filter& o)
 		:m_inputfilter(o.m_inputfilter),m_outputfilter(o.m_outputfilter){}
 	Filter(){}
 	~Filter(){}
 
-	const protocol::InputFilterR& inputfilter() const	{return m_inputfilter;}
-	const protocol::OutputFilterR& outputfilter() const	{return m_outputfilter;}
-	protocol::InputFilterR& inputfilter()			{return m_inputfilter;}
-	protocol::OutputFilterR& outputfilter()			{return m_outputfilter;}
+	const InputFilterR& inputfilter() const		{return m_inputfilter;}
+	const OutputFilterR& outputfilter() const	{return m_outputfilter;}
+	InputFilterR& inputfilter()			{return m_inputfilter;}
+	OutputFilterR& outputfilter()			{return m_outputfilter;}
 
 	///\brief Get a member value of the filter
 	///\param [in] name case sensitive name of the variable
@@ -80,8 +80,8 @@ public:
 		return false;
 	}
 protected:
-	protocol::InputFilterR m_inputfilter;
-	protocol::OutputFilterR m_outputfilter;
+	InputFilterR m_inputfilter;
+	OutputFilterR m_outputfilter;
 };
 
 struct FilterFactory

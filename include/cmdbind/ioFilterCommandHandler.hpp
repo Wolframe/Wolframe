@@ -33,8 +33,8 @@
 ///\file cmdbind/ioFilterCommandHandler.hpp
 #ifndef _Wolframe_cmdbind_IOFILTER_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_cmdbind_IOFILTER_COMMAND_HANDLER_HPP_INCLUDED
-#include "protocol.hpp"
 #include "protocol/ioblocks.hpp"
+#include "filter/filter.hpp"
 #include "cmdbind/commandHandler.hpp"
 #include "connectionHandler.hpp"
 
@@ -53,12 +53,12 @@ public:
 	///\brief Destructor
 	virtual ~IOFilterCommandHandler();
 
-	void setFilter( const protocol::InputFilterR& in)
+	void setFilter( const langbind::InputFilterR& in)
 	{
 		m_inputfilter = in;
 	}
 
-	void setFilter( const protocol::OutputFilterR& out)
+	void setFilter( const langbind::OutputFilterR& out)
 	{
 		m_outputfilter = out;
 	}
@@ -122,11 +122,15 @@ private:
 	std::size_t m_writedatasize;			//< number of bytes to write next (WRITE)
 
 	protocol::InputBlock m_input;			//< input buffer
+	protocol::OutputBlock m_output;			//< output buffer
 	protocol::InputBlock::iterator m_eoD;		//< input end of data marker
 	std::size_t m_itrpos;				//< read start position in buffer for the command handler
+
+private:
+	void getFilterOutputWriteData();
 protected:
-	protocol::InputFilterR m_inputfilter;		//< network input interface for the interpreter
-	protocol::OutputFilterR m_outputfilter;		//< network output interface for the interpreter
+	langbind::InputFilterR m_inputfilter;		//< network input interface for the interpreter
+	langbind::OutputFilterR m_outputfilter;		//< network output interface for the interpreter
 };
 }}
 #endif

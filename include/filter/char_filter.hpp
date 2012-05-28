@@ -34,7 +34,7 @@ Project Wolframe.
 
 #ifndef _Wolframe_FILTER_CHAR_HPP_INCLUDED
 #define _Wolframe_FILTER_CHAR_HPP_INCLUDED
-#include "filter.hpp"
+#include "filter/filter.hpp"
 
 namespace _Wolframe {
 namespace langbind {

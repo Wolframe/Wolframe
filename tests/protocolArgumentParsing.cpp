@@ -1,9 +1,5 @@
-//
-// pechoHandler class unit tests using google test framework (gTest)
-//
-
-
-#include "protocol.hpp"
+#include "protocol/parser.hpp"
+#include "protocol/buffers.hpp"
 #include "gtest/gtest.h"
 #include <stdlib.h>
 

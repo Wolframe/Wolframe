@@ -1,6 +1,42 @@
+/************************************************************************
+Copyright (C) 2011 Project Wolframe.
+All rights reserved.
+
+This file is part of Project Wolframe.
+
+Commercial Usage
+Licensees holding valid Project Wolframe Commercial licenses may
+use this file in accordance with the Project Wolframe
+Commercial License Agreement provided with the Software or,
+alternatively, in accordance with the terms contained
+in a written agreement between the licensee and Project Wolframe.
+
+GNU General Public License Usage
+Alternatively, you can redistribute this file and/or modify it
+under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Wolframe is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the ied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Wolframe. If not, see <http://www.gnu.org/licenses/>.
+
+If you have questions regarding the use of this file, please contact
+Project Wolframe.
+
+************************************************************************/
+///\file filter_token_filter.cpp
+///\brief Filter implementation a filter for debug input/output
+
 #include "filter/token_filter.hpp"
-#include "filter/textwolf.hpp"
-#include "filter/textwolf_filterBase.hpp"
+#include "filter/textwolf/charset.hpp"
+#include "filter/textwolf/sourceiterator.hpp"
+#include "filter/textwolf/textscanner.hpp"
+#include "filter/textwolf/cstringiterator.hpp"
 #include <cstring>
 #include <cstddef>
 
@@ -9,46 +45,47 @@ using namespace langbind;
 
 namespace {
 
-static bool getElementType( protocol::InputFilter::ElementType& et, char ch)
+static bool getElementType( InputFilter::ElementType& et, char ch)
 {
 	switch (ch)
 	{
-		case '>': et = protocol::InputFilter::OpenTag; return true;
-		case '<': et = protocol::InputFilter::CloseTag; return true;
-		case '@': et = protocol::InputFilter::Attribute; return true;
-		case '=': et = protocol::InputFilter::Value; return true;
+		case '>': et = InputFilter::OpenTag; return true;
+		case '<': et = InputFilter::CloseTag; return true;
+		case '@': et = InputFilter::Attribute; return true;
+		case '=': et = InputFilter::Value; return true;
 	}
 	return false;
 }
 
-static char getElementTag( protocol::OutputFilter::ElementType tp)
+static char getElementTag( OutputFilter::ElementType tp)
 {
 	switch (tp)
 	{
-		case protocol::InputFilter::OpenTag: return '>';
-		case protocol::InputFilter::CloseTag: return '<';
-		case protocol::InputFilter::Attribute: return '@';
-		case protocol::InputFilter::Value: return '=';
+		case InputFilter::OpenTag: return '>';
+		case InputFilter::CloseTag: return '<';
+		case InputFilter::Attribute: return '@';
+		case InputFilter::Value: return '=';
 	}
 	return '\0';
 }
 
 
-///\class OutputFilter
+///\class OutputFilterImpl
 template <class IOCharset, class AppCharset=textwolf::charset::UTF8>
-struct OutputFilterImpl :public protocol::OutputFilter
+struct OutputFilterImpl :public OutputFilter
 {
 	///\brief Constructor
-	OutputFilterImpl(){}
+	OutputFilterImpl()
+		:m_elemitr(0){}
 
 	///\brief Copy constructor
 	///\param [in] o output filter to copy
 	OutputFilterImpl( const OutputFilterImpl& o)
-		:protocol::OutputFilter(o){}
+		:OutputFilter(o),m_elemitr(o.m_elemitr){}
 
 	///\brief self copy
 	///\return copy of this
-	virtual protocol::OutputFilter* copy() const
+	virtual OutputFilter* copy() const
 	{
 		return new OutputFilterImpl( *this);
 	}
@@ -57,10 +94,10 @@ struct OutputFilterImpl :public protocol::OutputFilter
 	///\param [in] src pointer to attribute value string to print
 	///\param [in] srcsize size of src in bytes
 	///\param [in,out] buf buffer to print to
-	static void printToBufferEscEOL( const char* src, std::size_t srcsize, textwolf::StaticBuffer& buf)
+	static void printToBufferEscEOL( const char* src, std::size_t srcsize, std::string& buf)
 	{
-		StrIterator itr( src, srcsize);
-		textwolf::TextScanner<StrIterator,AppCharset> ts( itr);
+		textwolf::CStringIterator itr( src, srcsize);
+		textwolf::TextScanner<textwolf::CStringIterator,AppCharset> ts( itr);
 
 		textwolf::UChar ch;
 		while ((ch = ts.chr()) != 0)
@@ -77,70 +114,105 @@ struct OutputFilterImpl :public protocol::OutputFilter
 		}
 	}
 
+	bool emptybuf()
+	{
+		std::size_t nn = m_elembuf.size() - m_elemitr;
+		m_elemitr += write( m_elembuf.c_str() + m_elemitr, nn);
+		if (m_elemitr == m_elembuf.size())
+		{
+			m_elembuf.clear();
+			m_elemitr = 0;
+			return true;
+		}
+		return false;
+	}
 
-	///\brief Implementation of protocol::OutputFilter::print(typename protocol::OutputFilter::ElementType,const void*,std::size_t)
+	///\brief Implementation of OutputFilter::print(typename OutputFilter::ElementType,const void*,std::size_t)
 	///\param [in] type type of the element to print
 	///\param [in] element pointer to the element to print
 	///\param [in] elementsize size of the element to print in bytes
 	///\return true, if success, false else
-	virtual bool print( typename protocol::OutputFilter::ElementType type, const void* element, std::size_t elementsize)
+	virtual bool print( typename OutputFilter::ElementType type, const void* element, std::size_t elementsize)
 	{
-		textwolf::StaticBuffer buf( rest(), restsize());
-		FilterBase<IOCharset,AppCharset>::printToBuffer( getElementTag( type), buf);
-		printToBufferEscEOL( (const char*)element, elementsize, buf);
-		FilterBase<IOCharset,AppCharset>::printToBufferEOL( buf);
-		if (buf.overflow())
+		setState( Open);
+		if (m_elemitr < m_elembuf.size())
 		{
-			if (pos() == 0 && size() != 0)
-			{
-				setState( Error, "buffer too small for one element");
-			}
-			else
+			// there is something to print left from last time
+			if (!emptybuf())
 			{
 				setState( EndOfBuffer);
+				return false;
 			}
+			// we finished the printing left
+			return true;
+		}
+		IOCharset::print( getElementTag( type), m_elembuf);
+		printToBufferEscEOL( (const char*)element, elementsize, m_elembuf);
+		if (!emptybuf())
+		{
+			setState( EndOfBuffer);
 			return false;
 		}
-		incPos( buf.size());
 		return true;
 	}
+private:
+	std::string m_elembuf;				//< buffer for the currently printed element
+	std::size_t m_elemitr;				//< iterator to pass it to output
 };
 
-///\class InputFilter
+///\class InputFilterImpl
 template <class IOCharset, class AppCharset=textwolf::charset::UTF8>
-struct InputFilterImpl :public protocol::InputFilter
+struct InputFilterImpl :public InputFilter
 {
+	typedef textwolf::TextScanner<textwolf::SrcIterator,IOCharset> TextScanner;
+
 	///\brief Constructor
 	InputFilterImpl()
 		:m_tag(0)
-	{
-		m_itr.setSource( SrcIterator( this));
-	}
+		,m_src(0)
+		,m_srcsize(0)
+		,m_srcend(false){}
 
 	///\brief Copy constructor
 	///\param [in] o output filter to copy
 	InputFilterImpl( const InputFilterImpl& o)
-		:protocol::InputFilter( o)
+		:InputFilter( o)
 		,m_itr(o.m_itr)
 		,m_tag(o.m_tag)
-		,m_buf(o.m_buf)
-	{
-		m_itr.setSource( SrcIterator( this));
-	}
+		,m_elembuf(o.m_elembuf)
+		,m_src(o.m_src)
+		,m_srcsize(o.m_srcsize)
+		,m_srcend(o.m_srcend){}
 
 	///\brief self copy
 	///\return copy of this
-	virtual protocol::InputFilter* copy() const
+	virtual InputFilter* copy() const
 	{
 		return new InputFilterImpl( *this);
 	}
 
-	///\brief implement interface member protocol::InputFilter::getNext( typename protocol::InputFilter::ElementType&,const void*&,std::size_t&)
-	virtual bool getNext( typename protocol::InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
+	///\brief implement interface member InputFilterImpl::putInput(const void*,std::size_t,bool)
+	virtual void putInput( const void* ptr, std::size_t size, bool end)
+	{
+		m_src = (const char*)ptr;
+		m_srcend = end;
+		m_srcsize = size;
+		m_itr.setSource( textwolf::SrcIterator( m_src, m_srcsize, m_srcend));
+	}
+
+	virtual void getRest( const void*& ptr, std::size_t& size, bool& end)
+	{
+		ptr = m_src + m_itr.getPosition();
+		size = m_srcsize - m_itr.getPosition();
+		end = m_srcend;
+	}
+
+	///\brief implement interface member InputFilter::getNext( typename InputFilter::ElementType&,const void*&,std::size_t&)
+	virtual bool getNext( typename InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
 	{
 		if (state() == Open)
 		{
-			m_buf.clear();
+			m_elembuf.clear();
 		}
 		else
 		{
@@ -153,7 +225,7 @@ struct InputFilterImpl :public protocol::InputFilter
 			{
 				if (!getElementType( type, m_tag))
 				{
-					setState( protocol::InputFilter::Error, "textwolf: Unknown token tag");
+					setState( InputFilter::Error, "textwolf: Unknown token tag");
 				}
 			}
 			else
@@ -161,7 +233,7 @@ struct InputFilterImpl :public protocol::InputFilter
 				char tg = m_itr.ascii();
 				if (!getElementType( type, tg))
 				{
-					setState( protocol::InputFilter::Error, "textwolf: Unknown token tag");
+					setState( InputFilter::Error, "textwolf: Unknown token tag");
 				}
 				m_tag = tg;
 				++m_itr;
@@ -176,35 +248,38 @@ struct InputFilterImpl :public protocol::InputFilter
 				}
 				if (ch == '\n')
 				{
-					element = m_buf.c_str();
-					elementsize = m_buf.size();
+					element = m_elembuf.c_str();
+					elementsize = m_elembuf.size();
 					++m_itr;
 					m_tag = '\0';
 					return true;
 				}
 				else
 				{
-					AppCharset::print( ch, m_buf);
+					AppCharset::print( ch, m_elembuf);
 					++m_itr;
 				}
 			}
-			if (m_buf.size() != 0)
+			if (m_elembuf.size() != 0)
 			{
-				element = m_buf.c_str();
-				elementsize = m_buf.size();
+				element = m_elembuf.c_str();
+				elementsize = m_elembuf.size();
 				return true;
 			}
 		}
-		catch (SrcIterator::EoM)
+		catch (textwolf::SrcIterator::EoM)
 		{
 			setState( EndOfMessage);
 		}
 		return false;
 	}
 private:
-	textwolf::TextScanner<SrcIterator,AppCharset> m_itr;	//< src iterator
-	char m_tag;						//< tag defining the currently parsed element type
-	std::string m_buf;					//< buffer for current line => current token
+	TextScanner m_itr;		//< src iterator
+	char m_tag;			//< tag defining the currently parsed element type
+	std::string m_elembuf;		//< buffer for current line => current token
+	const char* m_src;		//< pointer to current chunk parsed
+	std::size_t m_srcsize;		//< size of the current chunk parsed in bytes
+	bool m_srcend;			//< true if end of message is in current chunk parsed
 };
 
 }//end anonymous namespace
@@ -220,47 +295,69 @@ public:
 			m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF8>());
 			m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UTF8>());
 		}
-		TextwolfEncoding::Id te = TextwolfEncoding::getId( encoding);
-		switch (te)
+		else
 		{
-			case TextwolfEncoding::Unknown:
-				break;
-			case TextwolfEncoding::IsoLatin:
+			std::string enc;
+			parseEncoding( enc, encoding);
+
+			if ((enc.size() >= 8 && std::memcmp( enc.c_str(), "isolatin", enc.size())== 0)
+			||  (enc.size() >= 7 && std::memcmp( enc.c_str(), "iso8859", enc.size()) == 0))
+			{
 				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::IsoLatin1>());
 				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::IsoLatin1>());
-				break;
-			case TextwolfEncoding::UTF8:
+			}
+			else if (enc.size() == 0 || enc == "utf8")
+			{
 				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF8>());
 				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UTF8>());
-				break;
-			case TextwolfEncoding::UTF16:
+			}
+			else if (enc == "utf16" || enc == "utf16be")
+			{
 				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF16BE>());
 				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UTF16BE>());
-				break;
-			case TextwolfEncoding::UTF16BE:
-				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF16BE>());
-				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UTF16BE>());
-				break;
-			case TextwolfEncoding::UTF16LE:
+			}
+			else if (enc == "utf16le")
+			{
 				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF16LE>());
 				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UTF16LE>());
-				break;
-			case TextwolfEncoding::UCS2BE:
+			}
+			else if (enc == "ucs2" || enc == "ucs2be")
+			{
 				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UCS2BE>());
 				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UCS2BE>());
-				break;
-			case TextwolfEncoding::UCS2LE:
+			}
+			else if (enc == "ucs2le")
+			{
 				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UCS2LE>());
 				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UCS2LE>());
-				break;
-			case TextwolfEncoding::UCS4BE:
+			}
+			else if (enc == "ucs4" || enc == "ucs4be")
+			{
 				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UCS4BE>());
 				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UCS4BE>());
-				break;
-			case TextwolfEncoding::UCS4LE:
+			}
+			else if (enc == "ucs4le")
+			{
 				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UCS4LE>());
 				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UCS4LE>());
-				break;
+			}
+			else
+			{
+				throw std::runtime_error( "unknown character set encoding");
+			}
+		}
+	}
+
+	static void parseEncoding( std::string& dest, const std::string& src)
+	{
+		dest.clear();
+		std::string::const_iterator cc=src.begin();
+		for (; cc != src.end(); ++cc)
+		{
+			if (*cc <= ' ') continue;
+			if (*cc == '-') continue;
+			if (*cc == ' ') continue;
+			dest.push_back( ::tolower( *cc));
 		}
 	}
 };

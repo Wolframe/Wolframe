@@ -35,11 +35,11 @@
 #include "cmdbind/ioFilterCommandHandler.hpp"
 #include "logger-v1.hpp"
 #include "filter/char_filter.hpp"
-#include "filter.hpp"
+#include "filter/filter.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::cmdbind;
-using namespace _Wolframe::protocol;
+using namespace _Wolframe::langbind;
 
 IOFilterCommandHandler::IOFilterCommandHandler()
 	:m_state(Processing)
@@ -63,7 +63,8 @@ void IOFilterCommandHandler::setInputBuffer( void* buf, std::size_t allocsize)
 
 void IOFilterCommandHandler::setOutputBuffer( void* buf, std::size_t size, std::size_t pos)
 {
-	if (m_outputfilter.get()) m_outputfilter->init( (char*)buf+pos, size-pos);
+	m_output = protocol::OutputBlock( buf, size, pos);
+	if (m_outputfilter.get()) m_outputfilter->setOutputBuffer( (char*)buf+pos, size-pos);
 }
 
 enum
@@ -72,6 +73,16 @@ enum
 	ErrProcessing=-2,
 	ErrResources=-3
 };
+
+void IOFilterCommandHandler::getFilterOutputWriteData()
+{
+	OutputFilter* flt = m_outputfilter.get();
+	m_writedata = m_output.ptr();
+	m_writedatasize = flt->getPosition()+m_output.pos();
+	m_escapeBuffer.process( m_output.charptr(), m_output.size(), m_writedatasize);
+	m_output.setPos(0);
+	flt->setOutputBuffer( m_output.ptr(), m_output.size());
+}
 
 CommandHandler::Operation IOFilterCommandHandler::nextOperation()
 {
@@ -91,24 +102,19 @@ CommandHandler::Operation IOFilterCommandHandler::nextOperation()
 				m_state = DiscardInput;
 				return READ;
 			}
-			m_writedata = flt->ptr();
-			m_writedatasize = flt->pos();
-			m_escapeBuffer.process( flt->charptr(), flt->size(), m_writedatasize);
-			if (!m_escapeBuffer.hasData()) m_state = Processing;
-			flt->setPos(0);
+			getFilterOutputWriteData();
+			if (!m_escapeBuffer.hasData())
+			{
+				m_state = Processing;
+				flt->setState( OutputFilter::Open);
+			}
 			return WRITE;
 
 		case DiscardInput:
-			flt = m_outputfilter.get();
-			if (flt)
+			if (m_outputfilter.get())
 			{
-				m_writedatasize=flt->pos();
-				if (m_writedatasize)
-				{
-					m_writedata = flt->ptr();
-					flt->setPos(0);
-					return WRITE;
-				}
+				getFilterOutputWriteData();
+				if (m_writedatasize) return WRITE;
 			}
 			if (m_input.gotEoD())
 			{
@@ -164,12 +170,8 @@ CommandHandler::Operation IOFilterCommandHandler::nextOperation()
 								continue;
 
 							case OutputFilter::EndOfBuffer:
-								if (m_outputfilter->pos() > 0)
-								{
-									m_state = FlushingOutput;
-									continue;
-								}
-								/* no break here !*/
+								m_state = FlushingOutput;
+								continue;
 
 							case OutputFilter::Error:
 								errmsg = m_outputfilter->getError();
@@ -204,7 +206,8 @@ void IOFilterCommandHandler::putInput( const void *begin, std::size_t bytesTrans
 	InputFilter* flt = m_inputfilter.get();
 	if (flt)
 	{
-		flt->protocolInput( start.ptr(), m_eoD-start, m_input.gotEoD());
+		flt->putInput( start.ptr(), m_eoD-start, m_input.gotEoD());
+		flt->setState( InputFilter::Open);
 	}
 }
 

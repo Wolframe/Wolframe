@@ -33,6 +33,7 @@ proc {
 OK enter cmd
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <employee><firstname>姚</firstname><surname>明</surname><phone>021436587</phone><email>yao.ming@gmail.com</email><jobtitle>sportsman</jobtitle></employee>
+
 .
 OK
 BYE

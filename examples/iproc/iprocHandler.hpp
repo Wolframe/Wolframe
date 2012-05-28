@@ -38,7 +38,8 @@
 #include "connectionHandler.hpp"
 #include "handlerConfig.hpp"
 #include "cmdbind/commandHandler.hpp"
-#include "protocol.hpp"
+#include "protocol/ioblocks.hpp"
+#include "protocol/parser.hpp"
 
 namespace _Wolframe {
 namespace iproc {
