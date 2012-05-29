@@ -36,7 +36,6 @@ Project Wolframe.
 #define _Wolframe_FILTER_OUTPUTFILTER_INTERFACE_HPP_INCLUDED
 #include "countedReference.hpp"
 #include "filter/filterbase.hpp"
-#include <map>
 #include <string>
 #include <cstring>
 
@@ -87,14 +86,14 @@ public:
 		return m_pos;
 	}
 
-	///\brief Print the next element to the buffer
+	///\brief Print the follow element to the buffer
 	///\param [in] type type of element to print
 	///\param [in] element content of element to print
 	///\param [in] elementsize size of element to print in bytes
 	///\return true, on success, false, if failed
 	virtual bool print( ElementType type, const void* element, std::size_t elementsize)=0;
 
-	///\brief Print the next element to the buffer
+	///\brief Print the follow element to the buffer
 	///\param [in] type type of element to print
 	///\param [in] element content of element to print
 	///\return true, on success, false, if failed

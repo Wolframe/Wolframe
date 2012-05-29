@@ -29,24 +29,52 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/ddl/filtermapSerialize.hpp
-///\brief Defines the DDL structure serialization for filters
+///\file filter/typecastfilter.hpp
+///\brief Typed input/output filter wrapper template
 
-#ifndef _Wolframe_SERIALIZE_DDL_FILTERMAP_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_DDL_FILTERMAP_HPP_INCLUDED
+#ifndef _Wolframe_SERIALIZE_FILTER_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_FILTER_HPP_INCLUDED
 #include "filter/inputfilter.hpp"
 #include "filter/outputfilter.hpp"
-#include "filter/bufferingfilter.hpp"
-#include "serialize/mapContext.hpp"
-#include "ddl/structType.hpp"
-#include <cstddef>
+#include "filter/typedfilter.hpp"
 
 namespace _Wolframe {
-namespace serialize {
+namespace langbind {
 
-bool parse( ddl::StructType& st, langbind::BufferingInputFilter& flt, Context& ctx);
-bool print( const ddl::StructType& st, langbind::OutputFilter& out, Context& ctx);
+class SerializeInputFilter :public TypedInputFilter
+{
+public:
+	SerializeInputFilter( InputFilter* inp=0)
+		:m_inputfilter(inp){}
+	SerializeInputFilter( const SerializeInputFilter& o)
+		:m_inputfilter(o.m_inputfilter){}
+	virtual ~SerializeInputFilter(){}
+
+	///\brief Implementation of TypedInputFilter::getNext(ElementType&,Element&)
+	virtual bool getNext( ElementType& type, Element& element);
+
+private:
+	InputFilter* m_inputfilter;
+};
+
+
+class SerializeOutputFilter :public TypedOutputFilter
+{
+public:
+	SerializeOutputFilter( OutputFilter* out=0)
+		:m_outputfilter(out){}
+	SerializeOutputFilter( const SerializeOutputFilter& o)
+		:m_outputfilter(o.m_outputfilter){}
+	virtual ~SerializeOutputFilter(){}
+
+	///\brief Implementation of TypedOutputFilter::print( ElementType type, const Element& element)
+	virtual bool print( ElementType type, const Element& element);
+
+private:
+	OutputFilter* m_outputfilter;
+};
 
 }}//namespace
 #endif
+
 

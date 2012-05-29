@@ -29,24 +29,57 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/ddl/filtermapSerialize.hpp
-///\brief Defines the DDL structure serialization for filters
+///\file filter/typedfilter.hpp
+///\brief Typed interface for input/output filter
 
-#ifndef _Wolframe_SERIALIZE_DDL_FILTERMAP_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_DDL_FILTERMAP_HPP_INCLUDED
+#ifndef _Wolframe_FILTER_TYPEDFILTER_INTERFACE_HPP_INCLUDED
+#define _Wolframe_FILTER_TYPEDFILTER_INTERFACE_HPP_INCLUDED
+#include "countedReference.hpp"
+#include "filter/filterbase.hpp"
 #include "filter/inputfilter.hpp"
 #include "filter/outputfilter.hpp"
-#include "filter/bufferingfilter.hpp"
-#include "serialize/mapContext.hpp"
-#include "ddl/structType.hpp"
-#include <cstddef>
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
-namespace serialize {
+namespace langbind {
 
-bool parse( ddl::StructType& st, langbind::BufferingInputFilter& flt, Context& ctx);
-bool print( const ddl::StructType& st, langbind::OutputFilter& out, Context& ctx);
+
+///\class TypedInputFilter
+///\brief Input filter with atomic values having a type
+class TypedInputFilter :public TypedFilterBase
+{
+public:
+	TypedInputFilter(){}
+	virtual ~TypedInputFilter(){}
+
+	///\brief Get next element
+	///\param [out] type element type parsed
+	///\param [out] element reference to element returned
+	///\return true, if success, false, if not.
+	///\remark Check the state when false is returned
+	virtual bool getNext( ElementType& type, Element& element)=0;
+};
+
+
+///\class TypedOutputFilter
+///\brief Output filter with atomic values having a type
+class TypedOutputFilter :public TypedFilterBase
+{
+public:
+	TypedOutputFilter(){}
+	virtual ~TypedOutputFilter(){}
+
+	///\brief Get next element
+	///\param [out] type element type parsed
+	///\param [out] element reference to element returned
+	///\return true, if success, false, if not.
+	///\remark Check the state when false is returned
+	virtual bool print( ElementType type, const Element& element)=0;
+};
+
+
 
 }}//namespace
 #endif
+
 

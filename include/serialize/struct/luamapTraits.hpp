@@ -132,12 +132,14 @@ typename boost::enable_if_c<
 	,const luabool_>::type getLuaCategory( const T&) { return luabool_();}
 
 ///\brief get category luastring_ for a type
-///\ return luastring_ if T is a bool
+///\ return luastring_ if T is a string
 template <typename T>
 typename boost::enable_if_c<
 	boost::is_same<std::string,T>::value
 	,const luastring_>::type getLuaCategory( const T&) { return luastring_();}
 
+///\brief get category luastruct_ for a type
+///\ return luastruct_ if T is a structure
 template <typename T>
 typename boost::enable_if_c<
 	(!boost::is_arithmetic<T>::value && !boost::is_same<bool,T>::value && !boost::is_same<std::string,T>::value)
