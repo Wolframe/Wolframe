@@ -29,12 +29,12 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file textwolf_filter.hpp
+///\file filter/textwolf_filter.hpp
 ///\brief Filter reading/writing xml with the textwolf xml library
 
 #ifndef _Wolframe_TEXTWOLF_FILTER_XML_HPP_INCLUDED
 #define _Wolframe_TEXTWOLF_FILTER_XML_HPP_INCLUDED
-#include "filter.hpp"
+#include "filter/filter.hpp"
 
 namespace _Wolframe {
 namespace langbind {

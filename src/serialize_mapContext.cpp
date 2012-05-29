@@ -34,29 +34,30 @@ Project Wolframe.
 
 #include "serialize/mapContext.hpp"
 #include <cstring>
+#include <stdexcept>
 
 using namespace _Wolframe;
 using namespace serialize;
 
 Context::Context()
-	:m_buf(new char[ bufsize+errbufsize+256])
-	,m_endTagConsumed(false)
+	:m_followTagConsumed(false)
 {
-	m_buf[0] = 0;
-	m_lasterror = m_buf+bufsize;
+	m_lasterror[0] = 0;
 }
 
-Context::~Context()
+void Context::clear()
 {
-	delete [] m_buf;
+	m_content.clear();
+	m_lasterror[0] = 0;
+	m_followTagConsumed = false;
 }
 
-void Context::setError( const char* tt, const char* msg, const char* msgparam)
+void Context::setError( const char* msg, const char* msgparam)
 {
-	setMsg( tt, ':', msg, msgparam);
+	setMsg( " ", ' ', msg, msgparam);
 }
 
-void Context::setError( const char* tt)
+void Context::setTag( const char* tt)
 {
 	if (!tt) return;
 	setMsg( tt, '/', m_lasterror);
@@ -64,39 +65,51 @@ void Context::setError( const char* tt)
 
 void Context::setMsg( const char* m1, char dd, const char* m2, const char* m3)
 {
-	std::size_t m1len = m1?std::strlen(m1):0;
-	std::size_t m2len = m2?std::strlen(m2):0;
-	std::size_t m3len = m3?std::strlen(m3):0;
-	if (m1len >= errbufsize-1) m1len = errbufsize-2;
-	if (m2len >= errbufsize-m1len) m2len = errbufsize-m1len-1;
-	if (m3len >= errbufsize-m1len-m2len) m3len = errbufsize-m1len-m2len;
-	std::memmove( m_lasterror+m1len+m2len+1, m3?m3:"", m3len);
-	std::memmove( m_lasterror+m1len+1, m2?m2:"", m2len);
-	std::memmove( m_lasterror, m1?m1:"", m1len);
-	m_lasterror[ m1len] = dd;
-	m_lasterror[ m1len+m2len+m3len+1] = '\0';
+	try
+	{
+		std::string msg;
+		if (m1) msg.append( m1);
+		if (dd) msg.push_back( dd);
+		if (m2) msg.append( m2);
+		if (m3)
+		{
+			msg.append( " (");
+			msg.append( m3);
+			msg.push_back(')');
+		}
+		std::size_t nn = msg.size();
+		if (nn >=  sizeof(m_lasterror)) nn = sizeof(m_lasterror)-1;
+		std::memcpy( m_lasterror, msg.c_str(), nn);
+		m_lasterror[ nn] = 0;
+	}
+	catch (const std::bad_alloc& e)
+	{
+		std::size_t nn = std::strlen( e.what());
+		if (nn >=  sizeof(m_lasterror)) nn = sizeof(m_lasterror)-1;
+		std::memcpy( m_lasterror, e.what(), nn);
+		m_lasterror[ nn] = 0;
+	}
 }
 
-bool Context::printElem( protocol::OutputFilter::ElementType tp, const void* elem, std::size_t elemsize, protocol::OutputFilterR& out)
+bool Context::printElem( langbind::OutputFilter::ElementType tp, const void* elem, std::size_t elemsize, langbind::OutputFilter& out)
 {
-	if (!out->print( tp, elem, elemsize))
+	char buf[ 2048];
+
+	if (out.getPosition()) throw std::runtime_error( "unconsumed output in filter serialization");
+	out.setOutputBuffer( (void*)buf, sizeof(buf));
+
+	while (!out.print( tp, elem, elemsize) && out.state() == langbind::OutputFilter::EndOfBuffer)
 	{
-		append( out->charptr(), out->pos());
-		out->release();
-		if (!out->print( tp, elem, elemsize))
-		{
-			protocol::OutputFilter* ff = out->createFollow();
-			if (ff)
-			{
-				out.reset( ff);
-			}
-			if (!out->print( tp, elem, elemsize))
-			{
-				setError( out->getError());
-				return false;
-			}
-		}
+		append( buf, out.getPosition());
+		out.setOutputBuffer( (void*)buf, sizeof(buf));
 	}
+	if (out.state() == langbind::OutputFilter::Error)
+	{
+		setError( out.getError());
+		return false;
+	}
+	append( buf, out.getPosition());
+	out.setOutputBuffer( (void*)buf, sizeof(buf));
 	return true;
 }
 

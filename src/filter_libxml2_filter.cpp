@@ -2,16 +2,17 @@
 #error Compiling a libxml2 module without libxml2 support enabled
 #endif
 #include "filter/libxml2_filter.hpp"
-#include "filter/bufferingFilterBase.hpp"
 #include <cstddef>
 #include <cstring>
 #include <vector>
 #include <string>
+#include <stdexcept>
 #include "libxml/parser.h"
 #include "libxml/tree.h"
 #include "libxml/encoding.h"
 #include "libxml/xmlwriter.h"
 #include "libxml/xmlsave.h"
+#include <boost/shared_ptr.hpp>
 
 using namespace _Wolframe;
 using namespace langbind;
@@ -32,69 +33,179 @@ struct LibXml2Init
 };
 static LibXml2Init libXml2Init;
 
-class Content
+
+class DocumentReader
 {
 public:
-	Content( const CountedReference<std::string>& e, bool withEmpty=true) :m_doc(0),m_node(0),m_value(0),m_prop(0),m_propvalues(0),m_encoding(e),m_withEmpty(withEmpty){}
+	DocumentReader(){}
 
-	bool end() const
+	DocumentReader( const DocumentReader& o)
+		:m_ptr(o.m_ptr){}
+
+	DocumentReader( const char* content, std::size_t contentsize)
 	{
-		return (m_doc == 0);
+		int options = XML_PARSE_NOENT | XML_PARSE_COMPACT | XML_PARSE_NONET | XML_PARSE_NODICT;
+		xmlDocPtr pp = xmlReadMemory( content, contentsize, "noname.xml", NULL, options);
+		if (pp)
+		{
+			m_ptr = boost::shared_ptr<xmlDoc>( pp, xmlFreeDoc);
+		}
+	}
+	xmlDocPtr get() const
+	{
+		return m_ptr.get();
+	}
+private:
+	boost::shared_ptr<xmlDoc> m_ptr;
+};
+
+class DocumentWriter
+{
+public:
+	DocumentWriter(){}
+
+	DocumentWriter( const DocumentWriter& o)
+		:m_writerbuf(o.m_writerbuf)
+		,m_writer(o.m_writer){}
+
+	DocumentWriter( const char* encoding)
+	{
+		xmlBufferPtr bb = xmlBufferCreate();
+		if (bb)
+		{
+			m_writerbuf = boost::shared_ptr<xmlBuffer>( bb, xmlBufferFree);
+			xmlTextWriterPtr ww = xmlNewTextWriterMemory( bb, 0);
+			if (ww)
+			{
+				m_writer = boost::shared_ptr<xmlTextWriter>( ww, xmlFreeTextWriter);
+				if (0>xmlTextWriterStartDocument( ww, "1.0", encoding, "yes"))
+				{
+					m_writer.reset();
+					m_writerbuf.reset();
+				}
+			}
+		}
 	}
 
-	///\brief Get the last error, if the filter got into an error state
-	///\return the last error as string or 0
-	const char* getError() const
+	xmlTextWriterPtr get() const
 	{
-		return m_error.size()?m_error.c_str():0;
+		return m_writer.get();
 	}
 
-	bool open( const void* content, std::size_t size)
+	const std::string getElement()
 	{
-		if (m_doc) xmlFreeDoc( m_doc);
+		return std::string(
+			(const char*)xmlBufferContent( m_writerbuf.get()),
+			xmlBufferLength( m_writerbuf.get()));
+
+	}
+private:
+	boost::shared_ptr<xmlBuffer> m_writerbuf;
+	boost::shared_ptr<xmlTextWriter> m_writer;
+};
+
+
+
+struct InputFilterImpl :public InputFilter
+{
+	InputFilterImpl( const CountedReference<std::string>& e)
+		:m_node(0)
+		,m_value(0)
+		,m_prop(0)
+		,m_propvalues(0)
+		,m_withEmpty(false)
+		,m_encoding(e){}
+
+	InputFilterImpl( const InputFilterImpl& o)
+		:m_doc(o.m_doc)
+		,m_node(o.m_node)
+		,m_value(o.m_value)
+		,m_prop(o.m_prop)
+		,m_propvalues(o.m_propvalues)
+		,m_withEmpty(o.m_withEmpty)
+		,m_elembuf(o.m_elembuf)
+		,m_encoding(o.m_encoding){}
+
+	///\brief Implements InputFilter::copy()
+	virtual InputFilter* copy() const
+	{
+		return new InputFilterImpl(*this);
+	}
+
+	///\brief Implements FilterBase::getValue(const char*,std::string&)
+	virtual bool getValue( const char* name, std::string& val) const
+	{
+		if (std::strcmp( name, "empty") == 0)
+		{
+			val = m_withEmpty?"true":"false";
+			return true;
+		}
+		return InputFilter::getValue( name, val);
+	}
+
+	///\brief Implements FilterBase::setValue(const char*,const std::string&)
+	virtual bool setValue( const char* name, const std::string& value)
+	{
+		if (std::strcmp( name, "empty") == 0)
+		{
+			if (std::strcmp( value.c_str(), "true") == 0)
+			{
+				m_withEmpty = true;
+			}
+			else if (std::strcmp( value.c_str(), "false") == 0)
+			{
+				m_withEmpty = false;
+			}
+			else
+			{
+				return false;
+			}
+			return true;
+		}
+		return InputFilter::setValue( name, value);
+	}
+
+	///\brief Implements InputFilter::putInput(const void*,std::size_t,bool)
+	virtual void putInput( const void* content, std::size_t contentsize, bool end)
+	{
+		if (!end) throw std::logic_error( "internal: need buffering input filter");
 		m_nodestk.clear();
 
-		int options = XML_PARSE_NOENT | XML_PARSE_COMPACT | XML_PARSE_NONET | XML_PARSE_NODICT;
-		m_doc = xmlReadMemory( (const char*)content, size, "noname.xml", NULL, options);
-		if (!m_doc)
+		m_doc = DocumentReader( (const char*)content, contentsize);
+		if (!m_doc.get())
 		{
 			xmlError* err = xmlGetLastError();
-			if (err) m_error.append( err->message);
-			return false;
+			setState( Error, err->message);
 		}
-		m_node = xmlDocGetRootElement( m_doc);
-		std::string enc;
-		const xmlChar* ec = m_doc->encoding;
+		m_node = xmlDocGetRootElement( m_doc.get());
+		const xmlChar* ec = m_doc.get()->encoding;
+		m_encoding.reset( new std::string);
 		for (int ii=0; ec[ii]!=0; ii++)
 		{
-			enc.push_back((unsigned char)ec[ii]);
+			m_encoding->push_back((unsigned char)ec[ii]);
 		}
-		m_encoding.reset( new std::string(enc));
-		return true;
 	}
 
-	~Content()
+	///\brief implement interface member InputFilter::getNext( typename FilterBase::ElementType&,const void*&,std::size_t&)
+	virtual bool getNext( InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
 	{
-		if (m_doc) xmlFreeDoc( m_doc);
-	}
-
-	bool fetch( protocol::InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
-	{
+		if (state() == Error) return false;
+		setState( Open);
 		bool rt = true;
 	AGAIN:
-		if (!m_doc)
+		if (!m_doc.get())
 		{
 			rt = false;
 		}
 		else if (m_value)
 		{
-			type = protocol::InputFilter::Value;
+			type = InputFilter::Value;
 			getElement( element, elementsize, m_value);
 			m_value = 0;
 		}
 		else if (m_prop && m_propvalues)
 		{
-			type = protocol::InputFilter::Attribute;
+			type = InputFilter::Attribute;
 			getElement( element, elementsize, m_prop->name);
 			m_value = m_propvalues->content;
 			m_propvalues = m_propvalues->next;
@@ -108,15 +219,14 @@ public:
 		{
 			if (m_nodestk.empty())
 			{
-				xmlFreeDoc( m_doc);
-				m_doc = 0;
+				m_doc = DocumentReader();
 				rt = false;
 			}
 			else
 			{
 				m_node = m_nodestk.back();
 				m_nodestk.pop_back();
-				type = protocol::InputFilter::CloseTag;
+				type = InputFilter::CloseTag;
 				rt = true;
 			}
 		}
@@ -126,7 +236,7 @@ public:
 			case XML_DOCB_DOCUMENT_NODE:
 			case XML_DOCUMENT_NODE:
 			case XML_ELEMENT_NODE:
-				type = protocol::InputFilter::OpenTag;
+				type = InputFilter::OpenTag;
 				m_prop = m_node->properties;
 				if (m_prop) m_propvalues = m_prop->children;
 				m_nodestk.push_back( m_node->next);
@@ -135,14 +245,14 @@ public:
 				break;
 
 			case XML_ATTRIBUTE_NODE:
-				type = protocol::InputFilter::Attribute;
+				type = InputFilter::Attribute;
 				getElement( element, elementsize, m_node->name);
 				m_value = m_node->content;
 				m_node = m_node->next;
 				break;
 
 			case XML_TEXT_NODE:
-				type = protocol::InputFilter::Value;
+				type = InputFilter::Value;
 				if (!m_withEmpty)
 				{
 					std::size_t ii=0;
@@ -192,354 +302,200 @@ private:
 			element = str;
 		}
 	}
-
 private:
-	friend struct InputFilterImpl;
-	xmlDocPtr m_doc;
+	DocumentReader m_doc;
 	xmlNode* m_node;
 	xmlChar* m_value;
 	xmlAttr* m_prop;
 	xmlNode* m_propvalues;
 	std::vector<xmlNode*> m_nodestk;
-	CountedReference<std::string> m_encoding;
-	std::string m_error;
 	bool m_withEmpty;
-};
-
-struct InputFilterImpl :public BufferingInputFilter<Content>
-{
-	typedef BufferingInputFilter<Content> Parent;
-
-	InputFilterImpl( const CountedReference<std::string>& e)
-		:BufferingInputFilter<Content>(new Content( e)){}
-
-	InputFilterImpl( const InputFilterImpl& o) :BufferingInputFilter<Content>(o){}
-
-	///\brief Get a member value of the filter
-	///\param [in] name case sensitive name of the variable
-	///\param [in] val the value returned
-	///\return true on success, false, if the variable does not exist or the operation failed
-	virtual bool getValue( const char* name, std::string& val)
-	{
-		Content* dc = content();
-		if (std::strcmp( name, "empty") == 0)
-		{
-			val = dc->m_withEmpty?"true":"false";
-			return true;
-		}
-		return Parent::getValue( name, val);
-	}
-
-	///\brief Set a member value of the filter
-	///\param [in] name case sensitive name of the variable
-	///\param [in] value new value of the variable to set
-	///\return true on success, false, if the variable does not exist or the operation failed
-	virtual bool setValue( const char* name, const std::string& value)
-	{
-		Content* dc = content();
-		if (std::strcmp( name, "empty") == 0)
-		{
-			if (std::strcmp( value.c_str(), "true") == 0)
-			{
-				dc->m_withEmpty = true;
-			}
-			else if (std::strcmp( value.c_str(), "false") == 0)
-			{
-				dc->m_withEmpty = false;
-			}
-			else
-			{
-				return false;
-			}
-			return true;
-		}
-		return Parent::setValue( name, value);
-	}
+	std::string m_elembuf;
+	CountedReference<std::string> m_encoding;
 };
 
 
-class OutputFilterImpl :public protocol::OutputFilter
+class OutputFilterImpl :public OutputFilter
 {
-public:
-	enum Error
-	{
-		Ok,
-		ErrIllegalOperation,
-		ErrIllegalState,
-		ErrOutOfMem,
-		ErrCreateWriter,
-		ErrCreateDocument,
-		ErrLibXMLEndElement,
-		ErrLibXMLAttribute,
-		ErrLibXMLStartElement,
-		ErrLibXMLMultiRootElement,
-		ErrLibXMLText
-	};
-
-	static const char* errorName( Error e)
-	{
-		static const char* ar[] =
-					{0
-					,"illegal operation"
-					,"illegal state"
-					,"out of mem"
-					,"create writer failed"
-					,"create document failed",
-					"XML end element error",
-					"XML attribute error",
-					"XML start element error",
-					"XML multi root element",
-					"XML text error"};
-		return ar[ (int)e];
-	}
-
-	class Document
-	{
-	public:
-		Document( const char* encoding)
-			:m_nofroot(0)
-			,m_taglevel(0)
-			,m_error(Ok)
-			,m_writerbuf(0)
-			,m_writer(0)
-			,m_valuebuf(0)
-		{
-			m_writerbuf = xmlBufferCreate();
-			if (!m_writerbuf)
-			{
-				m_error = ErrOutOfMem;
-				return;
-			}
-			m_writer = xmlNewTextWriterMemory( m_writerbuf, 0);
-			if (!m_writer)
-			{
-				m_error = ErrCreateWriter;
-				return;
-			}
-			if (0>xmlTextWriterStartDocument( m_writer, "1.0", encoding, "yes"))
-			{
-				m_error = ErrCreateDocument;
-				return;
-			}
-		}
-
-		~Document()
-		{
-			if (m_valuebuf) xmlFree( m_valuebuf);
-			if (m_writer) xmlFreeTextWriter( m_writer);
-			if (m_writerbuf) xmlBufferFree( m_writerbuf);
-		}
-
-		bool print( ElementType type, const void* element, std::size_t elementsize)
-		{
-			bool rt = true;
-			switch (type)
-			{
-				case protocol::OutputFilter::OpenTag:
-					m_attribname.clear();
-					if (m_taglevel == 0)
-					{
-						if (m_nofroot > 0)
-						{
-							m_error = ErrLibXMLMultiRootElement;
-							rt = false;
-						}
-						else
-						{
-							m_nofroot += 1;
-						}
-					}
-					if (0>xmlTextWriterStartElement( m_writer, getElement( element, elementsize)))
-					{
-						m_error = ErrLibXMLStartElement;
-						rt = false;
-					}
-					m_taglevel += 1;
-					break;
-
-				case protocol::OutputFilter::Attribute:
-					if (m_attribname.size())
-					{
-						m_error = ErrIllegalOperation;
-						rt = false;
-					}
-					m_attribname.clear();
-					m_attribname.append( (const char*)element, elementsize);
-					break;
-
-				case protocol::OutputFilter::Value:
-					if (m_attribname.empty())
-					{
-						if (0>xmlTextWriterWriteString( m_writer, getElement( element, elementsize)))
-						{
-							m_error = ErrLibXMLText;
-							rt = false;
-						}
-					}
-					else if (0>xmlTextWriterWriteAttribute( m_writer, getXmlString(m_attribname), getElement( element, elementsize)))
-					{
-						m_error = ErrLibXMLAttribute;
-						rt = false;
-					}
-					else
-					{
-						m_attribname.clear();
-					}
-					break;
-
-				case protocol::OutputFilter::CloseTag:
-					if (0>xmlTextWriterEndElement( m_writer))
-					{
-						m_error = ErrLibXMLEndElement;
-						rt = false;
-					}
-					else if (m_taglevel == 1)
-					{
-						if (0>xmlTextWriterEndDocument( m_writer))
-						{
-							m_error = ErrLibXMLEndElement;
-							rt = false;
-						}
-						else
-						{
-							std::size_t nn = xmlBufferLength( m_writerbuf);
-							m_content.clear();
-							m_content.append( (const char*)xmlBufferContent( m_writerbuf), nn);
-							m_contentitr = m_content.begin();
-							m_contentend = m_content.end();
-						}
-					}
-					m_taglevel -= 1;
-					m_attribname.clear();
-					break;
-
-				default:
-					m_error = ErrIllegalState;
-					rt = false;
-			}
-			return rt;
-		}
-
-		static const xmlChar* getXmlString( const std::string& aa)
-		{
-			return (const xmlChar*)aa.c_str();
-		}
-
-		xmlChar* getElement( const void* element, std::size_t elementsize)
-		{
-			m_valuestrbuf.clear();
-			m_valuestrbuf.append( (const char*)element, elementsize);
-			return (xmlChar*)m_valuestrbuf.c_str();
-		}
-
-		std::size_t printNextChunk( void* out, std::size_t outsize)
-		{
-			protocol::Buffer buf( (char*)out, outsize);
-
-			while (m_contentitr != m_contentend && buf.size()+1 < outsize)
-			{
-				buf.push_back( *m_contentitr);
-				++m_contentitr;
-			}
-			return buf.size();
-		}
-
-	public:
-		int m_nofroot;
-		int m_taglevel;
-		Error m_error;
-		xmlBufferPtr m_writerbuf;
-		xmlTextWriterPtr m_writer;
-		xmlChar* m_valuebuf;
-		std::string m_attribname;
-		std::string m_valuestrbuf;
-		std::string m_content;
-		std::string::const_iterator m_contentitr;
-		std::string::const_iterator m_contentend;
-	};
-
-	bool flushBuffer( Document* dc)
-	{
-		bool rt = true;
-		// if we have the whole document, then we start to print it and return an error, as long as we still have data:
-		if (dc->m_contentitr < dc->m_contentend)
-		{
-			std::size_t nn = dc->printNextChunk( rest(), restsize());
-			incPos( nn);
-			if (dc->m_contentitr == dc->m_contentend)
-			{
-				setState( protocol::OutputFilter::Open);
-				rt = true;
-			}
-			else
-			{
-				setState( protocol::OutputFilter::EndOfBuffer);
-				rt = false;
-			}
-		}
-		else
-		{
-			setState( protocol::OutputFilter::Open);
-		}
-		return rt;
-	}
-
-public:
-	virtual bool print( ElementType type, const void* element, std::size_t elementsize)
-	{
-		bool rt = true;
-		Document* dc;
-
-		if ((dc = m_document.get()) == 0)
-		{
-			const char* ec = m_encoding.get()?m_encoding.get()->c_str():"UTF-8";
-			m_document.reset( dc = new Document( ec));
-		}
-		if (dc->m_taglevel == 0 && dc->m_nofroot == 1)
-		{
-			rt = flushBuffer( dc);
-		}
-		else if (dc->print( type, element, elementsize))
-		{
-			if (dc->m_taglevel == 0 && dc->m_nofroot == 1)
-			{
-				rt = flushBuffer( dc);
-			}
-			else
-			{
-				setState( protocol::OutputFilter::Open);
-				rt = true;
-			}
-		}
-		else
-		{
-			setState( protocol::OutputFilter::Error, OutputFilterImpl::errorName( dc->m_error));
-			rt = false;
-		}
-		return rt;
-	}
 public:
 	OutputFilterImpl( const CountedReference<std::string>& enc)
 		:m_encoding(enc)
-		,m_document(0){}
+		,m_nofroot(0)
+		,m_taglevel(0)
+		,m_elemitr(0){}
 
 	OutputFilterImpl( const OutputFilterImpl& o)
-		:protocol::OutputFilter(o)
+		:OutputFilter(o)
 		,m_encoding(o.m_encoding)
-		,m_document(o.m_document){}
+		,m_doc(o.m_doc)
+		,m_nofroot(o.m_nofroot)
+		,m_taglevel(o.m_taglevel)
+		,m_attribname(o.m_attribname)
+		,m_valuestrbuf(o.m_valuestrbuf)
+		,m_elembuf(o.m_elembuf)
+		,m_elemitr(o.m_elemitr){}
 
 	virtual ~OutputFilterImpl(){}
 
-	///\brief self copy
-	///\return copy of this
+	///\brief Implementation of OutputFilter::copy()
 	virtual OutputFilterImpl* copy() const
 	{
 		return new OutputFilterImpl( *this);
 	}
 
+	///\brief Implementation of OutputFilter::print( ElementType, const void*,std::size_t)
+	virtual bool print( ElementType type, const void* element, std::size_t elementsize)
+	{
+		bool rt = true;
+		xmlTextWriterPtr xmlout = m_doc.get();
+
+		if (!xmlout)
+		{
+			const char* ec = m_encoding.get()?m_encoding.get()->c_str():"UTF-8";
+			m_doc = DocumentWriter( ec);
+			xmlout = m_doc.get();
+			if (!xmlout)
+			{
+				setState( Error, "libxml2 filter: writer creation failed");
+				return false;
+			}
+		}
+		if (m_taglevel == 0 && m_nofroot == 1)
+		{
+			return flushBuffer();
+		}
+		switch (type)
+		{
+			case OutputFilter::OpenTag:
+				m_attribname.clear();
+				if (m_taglevel == 0)
+				{
+					if (m_nofroot > 0)
+					{
+						setState( Error, "libxml2 filter: multi root element error");
+						rt = false;
+					}
+					else
+					{
+						m_nofroot += 1;
+					}
+				}
+				if (0>xmlTextWriterStartElement( xmlout, getElement( element, elementsize)))
+				{
+					setState( Error, "libxml2 filter: write start element error");
+					rt = false;
+				}
+				m_taglevel += 1;
+				break;
+
+			case OutputFilter::Attribute:
+				if (m_attribname.size())
+				{
+					setState( Error, "libxml2 filter: illegal operation");
+					rt = false;
+				}
+				m_attribname.clear();
+				m_attribname.append( (const char*)element, elementsize);
+				break;
+
+			case OutputFilter::Value:
+				if (m_attribname.empty())
+				{
+					if (0>xmlTextWriterWriteString( xmlout, getElement( element, elementsize)))
+					{
+						setState( Error, "libxml2 filter: write value error");
+						rt = false;
+					}
+				}
+				else if (0>xmlTextWriterWriteAttribute( xmlout, getXmlString(m_attribname), getElement( element, elementsize)))
+				{
+					setState( Error, "libxml2 filter: write attribute error");
+					rt = false;
+				}
+				else
+				{
+					m_attribname.clear();
+				}
+				break;
+
+			case OutputFilter::CloseTag:
+				if (0>xmlTextWriterEndElement( xmlout))
+				{
+					setState( Error, "libxml2 filter: write close tag error");
+					rt = false;
+				}
+				else if (m_taglevel == 1)
+				{
+					if (0>xmlTextWriterEndDocument( xmlout))
+					{
+						setState( Error, "libxml2 filter: write end document error");
+						rt = false;
+					}
+					else
+					{
+						m_elembuf = m_doc.getElement();
+						m_elemitr = 0;
+						m_taglevel = 0;
+						return flushBuffer();
+					}
+				}
+				m_taglevel -= 1;
+				m_attribname.clear();
+				break;
+
+			default:
+				setState( Error, "libxml2 filter: illegal state");
+				rt = false;
+		}
+		return rt;
+	}
+
+private:
+	static const xmlChar* getXmlString( const std::string& aa)
+	{
+		return (const xmlChar*)aa.c_str();
+	}
+
+	xmlChar* getElement( const void* element, std::size_t elementsize)
+	{
+		m_valuestrbuf.clear();
+		m_valuestrbuf.append( (const char*)element, elementsize);
+		return (xmlChar*)m_valuestrbuf.c_str();
+	}
+
+	bool flushBuffer()
+	{
+		bool rt = true;
+		// if we have the whole document, then we start to print it and return an error, as long as we still have data:
+		if (m_elemitr < m_elembuf.size())
+		{
+			m_elemitr += write( m_elembuf.c_str() + m_elemitr, m_elembuf.size() - m_elemitr);
+			if (m_elemitr == m_elembuf.size())
+			{
+				setState( OutputFilter::Open);
+				rt = true;
+			}
+			else
+			{
+				setState( OutputFilter::EndOfBuffer);
+				rt = false;
+			}
+		}
+		else
+		{
+			setState( OutputFilter::Open);
+		}
+		return rt;
+	}
 private:
 	CountedReference<std::string> m_encoding;
-	CountedReference<Document> m_document;
+	DocumentWriter m_doc;
+	int m_nofroot;
+	int m_taglevel;
+	std::string m_attribname;
+	std::string m_valuestrbuf;
+	std::string m_elembuf;
+	std::size_t m_elemitr;
 };
 
 }//end anonymous namespace
@@ -549,7 +505,9 @@ struct Libxml2Filter :public Filter
 	Libxml2Filter()
 	{
 		CountedReference<std::string> enc;
-		m_inputfilter.reset( new InputFilterImpl( enc));
+		InputFilterImpl impl( enc);
+
+		m_inputfilter.reset( new BufferingInputFilter( &impl));
 		m_outputfilter.reset( new OutputFilterImpl( enc));
 	}
 };

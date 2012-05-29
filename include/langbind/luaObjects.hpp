@@ -33,7 +33,7 @@ Project Wolframe.
 ///\brief interface to system objects for processor language bindings
 #ifndef _Wolframe_langbind_LUAOBJECTS_HPP_INCLUDED
 #define _Wolframe_langbind_LUAOBJECTS_HPP_INCLUDED
-#include "filter.hpp"
+#include "filter/filter.hpp"
 #include "langbind/appObjects.hpp"
 #include <boost/shared_ptr.hpp>
 

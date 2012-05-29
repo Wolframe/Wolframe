@@ -2,7 +2,6 @@
 #error Compiling a MSXML module without MSXML support enabled
 #endif
 #include "filter/msxml_filter.hpp"
-#include "filter/bufferingFilterBase.hpp"
 #include <cstddef>
 #include <cstring>
 #include <vector>

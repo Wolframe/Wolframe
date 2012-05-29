@@ -76,8 +76,7 @@ OBJS = \
 TEST_BINS = \
 	tests/iprocHandlerTest$(EXE) \
 	tests/iprocHandlerXMLTest$(EXE) \
-	tests/simpleFormCompilerTest$(EXE) \
-	tests/structFiltermapTest$(EXE)
+	tests/simpleFormCompilerTest$(EXE)
 
 ifeq ($(WITH_LUA),1)
 TEST_BINS += \
@@ -110,7 +109,6 @@ local_install:
 local_test: $(TEST_BINS)
 ifeq ($(RUN_TESTS),1)
 	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(LIBXML2_LIB_DIR) ./simpleFormCompilerTest$(EXE)
-	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(LIBXML2_LIB_DIR) ./structFiltermapTest$(EXE)
 ifeq ($(WITH_LUA),1)
 	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(LIBXML2_LIB_DIR) ./iprocHandlerTest$(EXE)
 	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(LIBXML2_LIB_DIR) ./iprocHandlerXMLTest$(EXE)

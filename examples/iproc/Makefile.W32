@@ -117,8 +117,7 @@ all: $(OBJS) $(CPP_BINS)
 TEST_CPP_BINS = \
 	tests\iprocHandlerTest.exe \
 	tests\iprocHandlerXMLTest.exe \
-	tests\simpleFormCompilerTest.exe \
-	tests\structFiltermapTest.exe
+	tests\simpleFormCompilerTest.exe
 
 !IFDEF WITH_LUA
 TEST_CPP_BINS = \
@@ -157,11 +156,9 @@ local_test: $(TEST_CPP_BINS)
 !ENDIF
 	@-echo cd tests >> test.bat
 	@-echo simpleFormCompilerTest.exe >> test.bat
-	@-echo structFiltermapTest.exe >> test.bat
 !IFDEF WITH_LUA
 	@-echo iprocHandlerTest.exe >> test.bat
 	@-echo iprocHandlerXMLTest.exe >> test.bat
-	@-echo structLuamapTest.exe >> test.bat
 !ENDIF
 	@-test.bat
 

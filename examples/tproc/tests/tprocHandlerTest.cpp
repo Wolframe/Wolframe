@@ -210,9 +210,35 @@ TEST_F( TProcHandlerTest, tests)
 			{
 				TProcHandlerTestInstance test( td, &testConfiguration, ib[ii], ob[oo]);
 				int trt = test.run();
-				if (trt != 0) boost::this_thread::sleep( boost::posix_time::seconds( 1 ) );
+				if (trt != 0) boost::this_thread::sleep( boost::posix_time::seconds( 3 ) );
 				EXPECT_EQ( 0, trt);
-				if (test.expected() != test.output()) boost::this_thread::sleep( boost::posix_time::seconds( 1 ) );
+
+				if (test.expected() != test.output())
+				{
+					boost::filesystem::path OUTPUT( boost::filesystem::current_path() / "temp" / "OUTPUT");
+					std::fstream outputf( OUTPUT.string().c_str(), std::ios::out | std::ios::binary);
+					outputf.write( test.output().c_str(), test.output().size());
+					if (outputf.bad()) std::cerr << "error writing file '" << OUTPUT.string() << "'" << std::endl;
+					outputf.close();
+
+					boost::filesystem::path EXPECT( boost::filesystem::current_path() / "temp" / "EXPECT");
+					std::fstream expectedf( EXPECT.string().c_str(), std::ios::out | std::ios::binary);
+					expectedf.write( test.expected().c_str(), test.expected().size());
+					if (expectedf.bad()) std::cerr << "error writing file '" << EXPECT.string() << "'" << std::endl;
+					expectedf.close();
+
+					boost::filesystem::path INPUT( boost::filesystem::current_path() / "temp" / "INPUT");
+					std::fstream inputf( INPUT.string().c_str(), std::ios::out | std::ios::binary);
+					inputf.write( test.input().c_str(), test.input().size());
+					if (inputf.bad()) std::cerr << "error writing file '" << INPUT.string() << "'" << std::endl;
+					inputf.close();
+
+					std::cerr << "test output [" << ib[ii] << "/" << ob[oo] << "] does not match for '" << *itr << "'" << std::endl;
+					std::cerr << "INPUT  written to file '"  << INPUT.string() << "'" << std::endl;
+					std::cerr << "OUTPUT written to file '" << OUTPUT.string() << "'" << std::endl;
+					std::cerr << "EXPECT written to file '" << EXPECT.string() << "'" << std::endl;
+					boost::this_thread::sleep( boost::posix_time::seconds( 3 ) );
+				}
 				EXPECT_EQ( test.expected(), test.output());
 			}
 		}

@@ -113,7 +113,6 @@ void ExecCommandHandler::getOutput( const void*& begin, std::size_t& bytesToTran
 {
 	if (m_cmdhandler.get())
 	{
-		if (m_output.pos()) throw std::logic_error( "illegal state in exec command handler protocol");
 		m_cmdhandler->getOutput( begin, bytesToTransfer);
 	}
 	else
@@ -289,7 +288,6 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 						m_cmdhandler->setInputBuffer( m_input.ptr(), m_input.size());
 						m_cmdhandler->putInput( m_itr.ptr(), m_end-m_itr);
 						m_cmdhandler->setOutputBuffer( m_output.ptr(), m_output.size(), m_output.pos());
-
 					}
 					catch (std::exception& e)
 					{

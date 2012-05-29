@@ -59,6 +59,7 @@ proc {
 OK enter cmd
 !TEST
 ./xmltestdoc.sh $cset $testdoc NOEOL | ../cleanInput BOM EOLN >> $output
+echo "" | recode UTF-8..$cset >> $output
 recode lat1..ibmpc >> $output <<!TEST
 
 .

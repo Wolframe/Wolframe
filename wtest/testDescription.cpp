@@ -215,7 +215,8 @@ static void readFile( const std::string& pt, std::vector<std::string>& hdr, std:
 				++splititr;
 				if (splititr == splitstr.end())
 				{
-					out.push_back( std::string( element.c_str(), element.size() - splitstr.size()));
+					std::string outelem( element.c_str(), element.size() - splitstr.size());
+					out.push_back( outelem);
 					element.clear();
 					type = PARSE_HDR;
 					splititr = splitstr.begin();

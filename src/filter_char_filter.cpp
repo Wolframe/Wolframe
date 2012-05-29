@@ -29,12 +29,14 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file char_filter.cpp
+///\file filter_char_filter.cpp
 ///\brief Filter implementation reading/writing character by character
 
 #include "filter/char_filter.hpp"
-#include "filter/textwolf_filterBase.hpp"
-#include "filter/textwolf.hpp"
+#include "filter/textwolf/charset.hpp"
+#include "filter/textwolf/sourceiterator.hpp"
+#include "filter/textwolf/textscanner.hpp"
+#include "filter/textwolf/cstringiterator.hpp"
 #include <cstring>
 #include <cstddef>
 
@@ -43,39 +45,59 @@ using namespace langbind;
 
 namespace {
 
-///\class InputFilter
+///\class InputFilterImpl
 ///\brief input filter for single characters
 template <class IOCharset, class AppCharset=textwolf::charset::UTF8>
-struct InputFilterImpl :public protocol::InputFilter
+struct InputFilterImpl :public InputFilter
 {
+	typedef textwolf::TextScanner<textwolf::SrcIterator,IOCharset> TextScanner;
+
 	///\brief Constructor
 	InputFilterImpl()
-		:m_buf( m_bufmem, sizeof(m_bufmem))
-	{
-		m_itr.setSource( SrcIterator( this));
-	}
+		:m_elembuf( m_elembufmem, sizeof(m_elembufmem))
+		,m_src(0)
+		,m_srcsize(0)
+		,m_srcend(false){}
 
 	///\brief Copy constructor
 	///\param [in] o output filter to copy
 	InputFilterImpl( const InputFilterImpl& o)
-		:protocol::InputFilter( o)
+		:InputFilter( o)
 		,m_itr(o.m_itr)
-		,m_buf( m_bufmem, sizeof(m_bufmem))
+		,m_elembuf( m_elembufmem, sizeof(m_elembufmem))
+		,m_src(o.m_src)
+		,m_srcsize(o.m_srcsize)
+		,m_srcend(o.m_srcend)
 	{
-		m_buf.resize( o.m_buf.size());
-		std::memcpy( m_bufmem, o.m_bufmem, o.m_buf.size());
-		m_itr.setSource( SrcIterator( this));
+		m_elembuf.resize( o.m_elembuf.size());
+		std::memcpy( m_elembufmem, o.m_elembufmem, o.m_elembuf.size());
 	}
 
 	///\brief self copy
 	///\return copy of this
-	virtual protocol::InputFilter* copy() const
+	virtual InputFilter* copy() const
 	{
 		return new InputFilterImpl( *this);
 	}
 
-	///\brief implement interface member protocol::InputFilter::getNext( typename protocol::InputFilter::ElementType&,const void*&,std::size_t&)
-	virtual bool getNext( typename protocol::InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
+	///\brief implement interface member InputFilter::putInput(const void*,std::size_t,bool)
+	virtual void putInput( const void* ptr, std::size_t size, bool end)
+	{
+		m_src = (const char*)ptr;
+		m_srcend = end;
+		m_srcsize = size;
+		m_itr.setSource( textwolf::SrcIterator( m_src, m_srcsize, m_srcend));
+	}
+
+	virtual void getRest( const void*& ptr, std::size_t& size, bool& end)
+	{
+		ptr = m_src + m_itr.getPosition();
+		size = m_srcsize - m_itr.getPosition();
+		end = m_srcend;
+	}
+
+	///\brief implement interface member InputFilter::getNext( typename InputFilter::ElementType&,const void*&,std::size_t&)
+	virtual bool getNext( typename InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
 	{
 		setState( Open);
 		type = Value;
@@ -85,66 +107,112 @@ struct InputFilterImpl :public protocol::InputFilter
 			if ((ch = *m_itr) != 0)
 			{
 				++m_itr;
-				AppCharset::print( ch, m_buf);
-				element = m_buf.ptr();
-				elementsize = m_buf.size();
-				m_buf.clear();
+				AppCharset::print( ch, m_elembuf);
+				element = m_elembuf.ptr();
+				elementsize = m_elembuf.size();
+				m_elembuf.clear();
 				return true;
 			}
 		}
-		catch (SrcIterator::EoM)
+		catch (textwolf::SrcIterator::EoM)
 		{
 			setState( EndOfMessage);
 		}
 		return false;
 	}
 private:
-	textwolf::TextScanner<SrcIterator,IOCharset> m_itr;
-	char m_bufmem[16];
-	textwolf::StaticBuffer m_buf;
+	TextScanner m_itr;			//< iterator on input
+	char m_elembufmem[16];
+	textwolf::StaticBuffer m_elembuf;
+	const char* m_src;			//< pointer to current chunk parsed
+	std::size_t m_srcsize;			//< size of the current chunk parsed in bytes
+	bool m_srcend;				//< true if end of message is in current chunk parsed
 };
 
-///\class OutputFilter
+///\class OutputFilterImpl
 ///\brief output filter filter for single characters
 template <class IOCharset, class AppCharset=textwolf::charset::UTF8>
-struct OutputFilterImpl :public protocol::OutputFilter
+struct OutputFilterImpl :public OutputFilter
 {
 	///\brief Constructor
-	OutputFilterImpl(){}
+	OutputFilterImpl()
+		:m_elemitr(0){}
 
 	///\brief Copy constructor
 	///\param [in] o output filter to copy
 	OutputFilterImpl( const OutputFilterImpl& o)
-		:protocol::OutputFilter(o){}
+		:OutputFilter(o)
+		,m_elemitr(o.m_elemitr){}
 
 	///\brief self copy
 	///\return copy of this
-	virtual protocol::OutputFilter* copy() const
+	virtual OutputFilter* copy() const
 	{
 		return new OutputFilterImpl( *this);
 	}
 
-	///\brief Implementation of protocol::OutputFilter::print(typename protocol::OutputFilter::ElementType,const void*,std::size_t)
+	///\brief Prints a character string to an STL back insertion sequence buffer in the IO character set encoding
+	///\param [in] src pointer to string to print
+	///\param [in] srcsize size of src in bytes
+	static void printToBuffer( const char* src, std::size_t srcsize, std::string& buf)
+	{
+		textwolf::CStringIterator itr( src, srcsize);
+		textwolf::TextScanner<textwolf::CStringIterator,AppCharset> ts( itr);
+
+		textwolf::UChar ch;
+		while ((ch = ts.chr()) != 0)
+		{
+			IOCharset::print( ch, buf);
+			++ts;
+		}
+	}
+
+	bool emptybuf()
+	{
+		std::size_t nn = m_elembuf.size() - m_elemitr;
+		m_elemitr += write( m_elembuf.c_str() + m_elemitr, nn);
+		if (m_elemitr == m_elembuf.size())
+		{
+			m_elembuf.clear();
+			m_elemitr = 0;
+			return true;
+		}
+		return false;
+	}
+
+	///\brief Implementation of OutputFilter::print(typename OutputFilter::ElementType,const void*,std::size_t)
 	///\param [in] type type of the element to print
 	///\param [in] element pointer to the element to print
 	///\param [in] elementsize size of the element to print in bytes
 	///\return true, if success, false else
-	virtual bool print( typename protocol::OutputFilter::ElementType type, const void* element, std::size_t elementsize)
+	virtual bool print( typename OutputFilter::ElementType type, const void* element, std::size_t elementsize)
 	{
-		if (type == Value)
+		setState( Open);
+		if (m_elemitr < m_elembuf.size())
 		{
-			textwolf::StaticBuffer buf( rest(), restsize());
-
-			FilterBase<IOCharset,AppCharset>::printToBuffer( (const char*)element, elementsize, buf);
-			if (buf.overflow())
+			// there is something to print left from last time
+			if (!emptybuf())
 			{
 				setState( EndOfBuffer);
 				return false;
 			}
-			incPos( buf.size());
+			// we finished the printing left
+			return true;
+		}
+		if (type == Value)
+		{
+			printToBuffer( (const char*)element, elementsize, m_elembuf);
+			if (!emptybuf())
+			{
+				setState( EndOfBuffer);
+				return false;
+			}
 		}
 		return true;
 	}
+private:
+	std::string m_elembuf;				//< buffer for the currently printed element
+	std::size_t m_elemitr;				//< iterator to pass it to output
 };
 }//end anonymous namespace
 
@@ -158,47 +226,69 @@ struct CharFilter :public Filter
 			m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF8>());
 			m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UTF8>());
 		}
-		TextwolfEncoding::Id te = TextwolfEncoding::getId( encoding);
-		switch (te)
+		else
 		{
-			case TextwolfEncoding::Unknown:
-				break;
-			case TextwolfEncoding::IsoLatin:
+			std::string enc;
+			parseEncoding( enc, encoding);
+
+			if ((enc.size() >= 8 && std::memcmp( enc.c_str(), "isolatin", 8)== 0)
+			||  (enc.size() >= 7 && std::memcmp( enc.c_str(), "iso8859", 7) == 0))
+			{
 				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::IsoLatin1>());
 				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::IsoLatin1>());
-				break;
-			case TextwolfEncoding::UTF8:
+			}
+			else if (enc.size() == 0 || enc == "utf8")
+			{
 				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF8>());
 				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UTF8>());
-				break;
-			case TextwolfEncoding::UTF16:
+			}
+			else if (enc == "utf16" || enc == "utf16be")
+			{
 				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF16BE>());
 				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UTF16BE>());
-				break;
-			case TextwolfEncoding::UTF16BE:
-				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF16BE>());
-				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UTF16BE>());
-				break;
-			case TextwolfEncoding::UTF16LE:
+			}
+			else if (enc == "utf16le")
+			{
 				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF16LE>());
 				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UTF16LE>());
-				break;
-			case TextwolfEncoding::UCS2BE:
+			}
+			else if (enc == "ucs2" || enc == "ucs2be")
+			{
 				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UCS2BE>());
 				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UCS2BE>());
-				break;
-			case TextwolfEncoding::UCS2LE:
+			}
+			else if (enc == "ucs2le")
+			{
 				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UCS2LE>());
 				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UCS2LE>());
-				break;
-			case TextwolfEncoding::UCS4BE:
+			}
+			else if (enc == "ucs4" || enc == "ucs4be")
+			{
 				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UCS4BE>());
 				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UCS4BE>());
-				break;
-			case TextwolfEncoding::UCS4LE:
+			}
+			else if (enc == "ucs4le")
+			{
 				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UCS4LE>());
 				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UCS4LE>());
-				break;
+			}
+			else
+			{
+				throw std::runtime_error( "unknown character set encoding");
+			}
+		}
+	}
+
+	static void parseEncoding( std::string& dest, const std::string& src)
+	{
+		dest.clear();
+		std::string::const_iterator cc=src.begin();
+		for (; cc != src.end(); ++cc)
+		{
+			if (*cc <= ' ') continue;
+			if (*cc == '-') continue;
+			if (*cc == ' ') continue;
+			dest.push_back( ::tolower( *cc));
 		}
 	}
 };

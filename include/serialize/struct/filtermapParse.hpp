@@ -33,7 +33,7 @@ Project Wolframe.
 ///\brief Defines the intrusive implementation of the parsing part of serialization/deserialization of filters
 #ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PARSE_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PARSE_HPP_INCLUDED
-#include "protocol/inputfilter.hpp"
+#include "filter/inputfilter.hpp"
 #include "serialize/struct/filtermapTraits.hpp"
 #include "serialize/struct/filtermapBase.hpp"
 #include "logger-v1.hpp"
@@ -50,7 +50,7 @@ namespace _Wolframe {
 namespace serialize {
 
 template <typename T>
-static void parseObject( const char* tag, T& obj, protocol::InputFilter& inp, bool);
+static void parseObject( T& obj, langbind::InputFilter& inp, bool);
 
 bool isAtomic_( const filtertraits::struct_&)
 {
@@ -69,122 +69,128 @@ bool isAtomic_( const filtertraits::bool_&)
 	return true;
 }
 
+
 template <typename T>
-bool parseObject_( const char* tag, void* obj, const filtertraits::struct_&, protocol::InputFilter& inp, Context& ctx, bool isinit)
+bool parseObject_( void* obj, const filtertraits::struct_&, langbind::InputFilter& inp, Context& ctx, bool isinit)
 {
-	protocol::InputFilter::ElementType typ;
+	langbind::InputFilter::ElementType typ;
 	const char* element;
 	std::size_t elementsize;
 	static const FiltermapDescriptionBase* descr = T::getFiltermapDescription();
-	unsigned int depth = 0;
 	std::vector<bool> isinitar( descr->end() - descr->begin(), false);
 
 	if (isinit)
 	{
-		ctx.setError( tag, "duplicate structure definition");
+		ctx.setError( "duplicate structure definition");
 		return false;
 	}
-	if (tag)
+	while (ctx.followTagConsumed() || inp.getNext( typ, (const void*&) element, elementsize))
 	{
-		ctx.setError( tag, "atomic value expected for an attribute value");
-		return false;
-	}
-	while (inp.getNext( typ, (const void*&) element, elementsize))
-	{
+		ctx.followTagConsumed(false);
 		switch (typ)
 		{
-			case protocol::InputFilter::OpenTag:
+			case langbind::InputFilter::OpenTag:
 			{
-				++depth;
-				FiltermapDescriptionBase::Map::const_iterator itr = descr->find( element);
+				FiltermapDescriptionBase::Map::const_iterator itr = descr->find( (const char*)element);
 				if (itr == descr->end())
 				{
-					ctx.setError( element, "unknown element");
-					ctx.setError( tag);
+					ctx.setError( "unknown element", element);
 					return false;
 				}
 				std::size_t idx = itr - descr->begin();
-				if (!itr->second.parse()( 0, (char*)obj+itr->second.ofs(), inp, ctx, isinitar[ idx])) return false;
-				isinitar[ idx] = true;
-				if (ctx.endTagConsumed())
+				if (!itr->second.parse()( (char*)obj+itr->second.ofs(), inp, ctx, isinitar[ idx]))
 				{
-					--depth;
-					ctx.endTagConsumed(false);
-					return true;
+					ctx.setTag( element);
+					return false;
+				}
+				isinitar[ idx] = true;
+				if (!ctx.followTagConsumed())
+				{
+					if (!inp.getNext( typ, (const void*&) element, elementsize) || typ != langbind::InputFilter::CloseTag)
+					{
+						ctx.setError( "incomplete element. tag close expected");
+						return false;
+					}
+				}
+				else
+				{
+					ctx.followTagConsumed(false);
 				}
 				break;
 			}
 
-			case protocol::InputFilter::Attribute:
+			case langbind::InputFilter::Attribute:
 			{
-				FiltermapDescriptionBase::Map::const_iterator itr = descr->find( element);
+				FiltermapDescriptionBase::Map::const_iterator itr = descr->find( (const char*)element);
 				if (itr == descr->end())
 				{
-					ctx.setError( element, "unknown element");
-					ctx.setError( tag);
+					ctx.setError( "unknown attribute", element);
 					return false;
 				}
 				if ((std::size_t)(itr-descr->begin()) >= descr->nof_attributes())
 				{
-					ctx.setError( element, "content element expected");
+					ctx.setError( "content element expected", element);
+					return false;
 				}
 				std::size_t idx = itr - descr->begin();
-				if (!itr->second.parse()( element, (char*)obj+itr->second.ofs(), inp, ctx, isinitar[ idx])) return false;
+				if (!itr->second.parse()( (char*)obj+itr->second.ofs(), inp, ctx, isinitar[ idx]))
+				{
+					ctx.setTag( element);
+					return false;
+				}
 				isinitar[ idx] = true;
-
-				ctx.endTagConsumed(false);
 				break;
 			}
-			case protocol::InputFilter::Value:
+			case langbind::InputFilter::Value:
 			{
 				std::size_t ii;
 				for (ii=0; ii<elementsize; ii++) if (((const unsigned char*)element)[ii]>32) break;
 				if (ii==elementsize) break;
-				ctx.endTagConsumed(false);
-				ctx.setError( tag, "structure expected");
+				ctx.setError( "structure expected");
 				return false;
 			}
-			case protocol::InputFilter::CloseTag:
-				if (depth == 0)
-				{
-					ctx.endTagConsumed(true);
-					return true;
-				}
-				--depth;
-				ctx.endTagConsumed(false);
+			case langbind::InputFilter::CloseTag:
+				ctx.followTagConsumed(true);
+				return true;
 		}
 	}
-	return true;
+	if (inp.state() == langbind::InputFilter::Error)
+	{
+		ctx.setError( inp.getError());
+		return false;
+	}
+	return (inp.state() == langbind::InputFilter::Open);
 }
 
 template <typename T>
-bool parseObject_( const char* tag, void* obj, const filtertraits::bool_&, protocol::InputFilter& inp, Context& ctx, bool isinit)
+bool parseObject_( void* obj, const filtertraits::bool_&, langbind::InputFilter& inp, Context& ctx, bool isinit)
 {
-	protocol::InputFilter::ElementType typ;
+	langbind::InputFilter::ElementType typ;
 	const char* element;
 	std::size_t elementsize;
 
 	if (isinit)
 	{
-		ctx.setError( tag, "duplicate boolean definition");
+		ctx.setError( "duplicate boolean definition");
 		return false;
 	}
 	if (inp.getNext( typ, (const void*&)element, elementsize))
 	{
 		switch (typ)
 		{
-			case protocol::InputFilter::OpenTag:
-			case protocol::InputFilter::Attribute:
-				ctx.setError( tag, "atomic value expected instead of structure");
+			case langbind::InputFilter::OpenTag:
+			case langbind::InputFilter::Attribute:
+				ctx.setError( "atomic value expected instead of structure");
 				return false;
 
-			case protocol::InputFilter::Value:
+			case langbind::InputFilter::Value:
 			{
 				if (boost::algorithm::iequals( element, "yes")
 				||  boost::algorithm::iequals( element, "y")
 				||  boost::algorithm::iequals( element, "t")
 				||  boost::algorithm::iequals( element, "true"))
 				{
+					ctx.followTagConsumed(false);
 					*((T*)obj) = true;
 					break;
 				}
@@ -193,49 +199,55 @@ bool parseObject_( const char* tag, void* obj, const filtertraits::bool_&, proto
 				||  boost::algorithm::iequals( element, "f")
 				||  boost::algorithm::iequals( element, "false"))
 				{
+					ctx.followTagConsumed(false);
 					*((T*)obj) = false;
 					break;
 				}
-				ctx.setError( tag, "boolean value expected");
+				ctx.setError( "boolean value expected");
 				return false;
 			}
-			case protocol::InputFilter::CloseTag:
-				ctx.setError( tag, "boolean value expected");
+			case langbind::InputFilter::CloseTag:
+				ctx.followTagConsumed(true);
+				ctx.setError( "boolean value expected");
 				return false;
 		}
-		return true;
+		return (inp.state() == langbind::InputFilter::Open);
+	}
+	else if (inp.state() == langbind::InputFilter::Error)
+	{
+		ctx.setError( inp.getError());
+		return false;
 	}
 	else
 	{
-		ctx.setError( tag, "unexpected end of document");
+		ctx.setError( "unexpected end of document");
 		return false;
 	}
 }
 
 template <typename T>
-bool parseObject_( const char* tag, void* obj, const filtertraits::vector_&, protocol::InputFilter& inp, Context& ctx, bool)
+bool parseObject_( void* obj, const filtertraits::vector_&, langbind::InputFilter& inp, Context& ctx, bool)
 {
 	typename T::value_type val;
-	if (!parseObject( tag, val, inp, ctx, false))
+
+	if (!parseObject( val, inp, ctx, false))
 	{
-		ctx.setError( tag);
 		return false;
 	}
 	((T*)obj)->push_back( val);
-	ctx.endTagConsumed(false);
 	return true;
 }
 
 template <typename T>
-static bool parseObject_( const char* tag, void* obj, const filtertraits::arithmetic_&, protocol::InputFilter& inp, Context& ctx, bool isinit)
+static bool parseObject_( void* obj, const filtertraits::arithmetic_&, langbind::InputFilter& inp, Context& ctx, bool isinit)
 {
-	protocol::InputFilter::ElementType typ;
+	langbind::InputFilter::ElementType typ;
 	const char* element;
 	std::size_t elementsize;
 
 	if (isinit)
 	{
-		ctx.setError( tag, "duplicate value definition");
+		ctx.setError( "duplicate value definition");
 		return false;
 	}
 	if (inp.getNext( typ, (const void*&)element, elementsize))
@@ -244,41 +256,46 @@ static bool parseObject_( const char* tag, void* obj, const filtertraits::arithm
 		{
 			switch (typ)
 			{
-				case protocol::InputFilter::OpenTag:
-				case protocol::InputFilter::Attribute:
-					ctx.setError( tag, "arithmetic value or string expected");
+				case langbind::InputFilter::OpenTag:
+				case langbind::InputFilter::Attribute:
+					ctx.setError( "arithmetic value or string expected");
 					return false;
 
-				case protocol::InputFilter::Value:
+				case langbind::InputFilter::Value:
+					ctx.followTagConsumed(false);
 					*((T*)obj) = boost::lexical_cast<T>( element);
 					break;
 
-				case protocol::InputFilter::CloseTag:
+				case langbind::InputFilter::CloseTag:
 					*((T*)obj) = boost::lexical_cast<T>( "");
-					ctx.endTagConsumed(true);
+					ctx.followTagConsumed(true);
 					break;
 			}
+			return true;
 		}
 		catch (boost::bad_lexical_cast& e)
 		{
-			ctx.setError( tag, e.what());
+			ctx.setError( e.what());
 			return false;
 		}
 	}
-	else
+	else if (inp.state() == langbind::InputFilter::Error)
 	{
-		ctx.setError( tag, "unexpected end of document");
+		ctx.setError( inp.getError());
 		return false;
 	}
-	return true;
+	else
+	{
+		ctx.setError( "unexpected end of document");
+		return false;
+	}
 }
 
 template <typename T>
-static bool parseObject( const char* tag, T& obj, protocol::InputFilter& inp, Context& ctx, bool isinit)
+static bool parseObject( T& obj, langbind::InputFilter& inp, Context& ctx, bool isinit)
 {
-	if (!_Wolframe::serialize::parseObject_<T>( tag, (void*)&obj, filtertraits::getCategory(obj), inp, ctx, isinit))
+	if (!_Wolframe::serialize::parseObject_<T>( (void*)&obj, filtertraits::getCategory(obj), inp, ctx, isinit))
 	{
-		ctx.setError( tag);
 		return false;
 	}
 	return true;
@@ -293,9 +310,9 @@ struct FiltermapIntrusiveParser
 		return isAtomic_( filtertraits::getCategory(*obj));
 	}
 
-	static bool parse( const char* tag, void* obj, protocol::InputFilter& inp, Context& ctx, bool isinit)
+	static bool parse( void* obj, langbind::InputFilter& inp, Context& ctx, bool isinit)
 	{
-		return parseObject_<T>( tag, obj, filtertraits::getCategory(*(T*)obj), inp, ctx, isinit);
+		return parseObject_<T>( obj, filtertraits::getCategory(*(T*)obj), inp, ctx, isinit);
 	}
 };
 

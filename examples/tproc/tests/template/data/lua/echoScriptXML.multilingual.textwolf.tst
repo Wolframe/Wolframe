@@ -42,6 +42,7 @@ proc {
 OK enter cmd
 !TEST
 cat data/multilingual.UTF-8.xml | sed "s/UTF-8/$cset/" | recode UTF-8..$cset | ../cleanInput BOM EOLN >> $output
+echo "" | recode UTF-8..$cset >> $output
 recode lat1..ibmpc >> $output <<!TEST
 
 .

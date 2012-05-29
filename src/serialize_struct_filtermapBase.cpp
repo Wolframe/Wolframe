@@ -33,114 +33,42 @@ Project Wolframe.
 ///\brief Implements the non intrusive base class of serialization/deserialization of filters
 #include "serialize/struct/filtermapBase.hpp"
 #include <cstring>
+#include <stdexcept>
 
 using namespace _Wolframe;
 using namespace serialize;
 
-bool FiltermapDescriptionBase::parse( const char* name, void* obj, protocol::InputFilter& in, Context& ctx) const
+bool FiltermapDescriptionBase::parse( void* obj, langbind::BufferingInputFilter& in, Context& ctx) const
 {
-	protocol::InputFilter* inp = 0;
 	bool rt = true;
 	try
 	{
-		ctx.append( (char*)in.ptr(), in.size());
-		in.skip( in.size());
-
-		if (!in.gotEoD())
-		{
-			in.setState( protocol::InputFilter::EndOfMessage);
-			return false;
-		}
-		in.setState( protocol::InputFilter::Open);
-		inp = in.copy();
-		inp->protocolInput( (void*)ctx.content().c_str(), ctx.content().size(), true);
-
-		const void* element;
-		std::size_t elementsize;
-		protocol::InputFilter::ElementType etyp;
-
-		while (!inp->getNext( etyp, element, elementsize))
-		{
-			protocol::InputFilter* ff = inp->createFollow();
-			if (!ff)
-			{
-				ctx.setError( 0, "failed to parse xml header");
-				delete inp;
-				return false;
-			}
-			else
-			{
-				delete inp;
-				inp = ff;
-			}
-		}
-		if (etyp != protocol::InputFilter::OpenTag)
-		{
-			ctx.setError( 0, "failed to parse xml root element");
-			delete inp;
-			return false;
-		}
-		else if (std::strcmp(name, (const char*)element) != 0)
-		{
-			ctx.setError( 0, "xml is of different type than expected");
-			delete inp;
-			return false;
-		}
-		else if (m_parse)
-		{
-			rt &= m_parse( 0, obj, *inp, ctx, false);
-		}
-		else
-		{
-			ctx.setError( 0, "null parser called");
-			delete inp;
-			return false;
-		}
-		if (rt && !ctx.endTagConsumed())
-		{
-			if (!inp->getNext( etyp, element, elementsize) || etyp != protocol::InputFilter::CloseTag)
-			{
-				ctx.setError( 0, "xml not properly balanced or illegal");
-				delete inp;
-				return false;
-			}
-		}
+		if (!m_parse) throw std::runtime_error( "null parser called");
+		rt = m_parse( obj, in, ctx, false);
 	}
 	catch (std::exception& e)
 	{
-		ctx.setError( 0, e.what());
-		delete inp;
+		ctx.setError( e.what());
 		return false;
 	}
-	ctx.clear();
-	if (inp) delete inp;
 	return rt;
 }
 
-bool FiltermapDescriptionBase::print( const char* name, const void* obj, protocol::OutputFilter& out, Context& ctx) const
+bool FiltermapDescriptionBase::print( const void* obj, langbind::OutputFilter& out, Context& ctx) const
 {
-	protocol::OutputFilter* oo = 0;
 	bool rt = true;
 	try
 	{
-		if (m_print)
-		{
-			oo = out.copy();
-			oo->init( (void*)ctx.buf(), ctx.bufsize);
-			rt = m_print( name, obj, oo, ctx);
-		}
-		else
-		{
-			ctx.setError( 0, "null printer called");
-			rt = false;
-		}
+		if (!m_print) throw std::runtime_error( "null printer called");
+		char buf[ 4096];
+		out.setOutputBuffer( buf, sizeof( buf));
+		rt = m_print( 0, obj, out, ctx);
 	}
 	catch (std::exception& e)
 	{
-		ctx.setError( name, e.what());
+		ctx.setError( e.what());
 		rt = false;
 	}
-	if (oo) delete oo;
 	return rt;
 }
 

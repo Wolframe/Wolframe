@@ -29,12 +29,12 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file line_filter.hpp
+///\file filter/line_filter.hpp
 ///\brief Filter reading/writing line by line
 
 #ifndef _Wolframe_FILTER_TOKEN_HPP_INCLUDED
 #define _Wolframe_FILTER_TOKEN_HPP_INCLUDED
-#include "filter.hpp"
+#include "filter/filter.hpp"
 
 namespace _Wolframe {
 namespace langbind {

@@ -33,7 +33,7 @@ Project Wolframe.
 ///\brief interface to system objects for processor language bindings
 #ifndef _Wolframe_langbind_APPOBJECTS_HPP_INCLUDED
 #define _Wolframe_langbind_APPOBJECTS_HPP_INCLUDED
-#include "filter.hpp"
+#include "filter/filter.hpp"
 #include "ddl/structType.hpp"
 #include "ddl/compilerInterface.hpp"
 #include "serialize/struct/filtermapBase.hpp"
@@ -71,7 +71,7 @@ struct Output
 	Output( const Output& o) :m_outputfilter(o.m_outputfilter),m_state(o.m_state){}
 	///\brief Constructor by output filter
 	///\param[in] flt output filter reference
-	Output( const protocol::OutputFilterR& flt) :m_outputfilter(flt),m_state(0){}
+	Output( const OutputFilterR& flt) :m_outputfilter(flt),m_state(0){}
 	///\brief Destructor
 	~Output(){}
 
@@ -83,14 +83,12 @@ struct Output
 	///\return state returned
 	ItemType print( const char* e1, unsigned int e1size, const char* e2, unsigned int e2size);
 
-	const protocol::OutputFilterR& outputfilter() const		{return m_outputfilter;}
-	protocol::OutputFilterR& outputfilter()				{return m_outputfilter;}
-
-protected:
-	protocol::OutputFilterR m_outputfilter;	//< output filter reference
+	const OutputFilterR& outputfilter() const		{return m_outputfilter;}
+	OutputFilterR& outputfilter()				{return m_outputfilter;}
 
 private:
-	unsigned int m_state;						//< current state for outputs with more than one elements
+	OutputFilterR m_outputfilter;				//< output filter reference
+	unsigned int m_state;					//< current state for outputs with more than one elements
 };
 
 ///\class Input
@@ -104,14 +102,15 @@ struct Input
 	Input( const Input& o) :m_inputfilter(o.m_inputfilter){}
 	///\brief Constructor by input filter
 	///\param[in] flt input filter reference
-	Input( const protocol::InputFilterR& flt) :m_inputfilter(flt){}
+	Input( const InputFilterR& flt) :m_inputfilter(flt){}
 	///\brief Destructor
 	~Input(){}
 
-	const protocol::InputFilterR& inputfilter() const		{return m_inputfilter;}
-	protocol::InputFilterR& inputfilter()				{return m_inputfilter;}
-protected:
-	protocol::InputFilterR m_inputfilter;			//< input is defined by the associated input filter
+	const InputFilterR& inputfilter() const		{return m_inputfilter;}
+	InputFilterR& inputfilter()			{return m_inputfilter;}
+
+private:
+	InputFilterR m_inputfilter;			//< input is defined by the associated input filter
 };
 
 ///\class InputFilterClosure
@@ -131,9 +130,9 @@ public:
 
 	///\brief Constructor
 	///\param[in] ig input filter reference from input
-	InputFilterClosure( const protocol::InputFilterR& ig)
+	InputFilterClosure( const InputFilterR& ig)
 		:m_inputfilter(ig)
-		,m_type(protocol::InputFilter::Value)
+		,m_type(InputFilter::Value)
 		,m_gotattr(false)
 		,m_taglevel(0){}
 
@@ -152,12 +151,13 @@ public:
 	///\return state returned
 	ItemType fetch( const char*& e1, unsigned int& e1size, const char*& e2, unsigned int& e2size);
 
+	const InputFilterR& inputfilter() const	{return m_inputfilter;}
 private:
-	protocol::InputFilterR m_inputfilter;			//< rerefence to input with filter
-	protocol::InputFilter::ElementType m_type;		//< current state (last value type parsed)
-	std::string m_attrbuf;					//< buffer for attribute name
-	bool m_gotattr;						//< true, if the following value belongs to an attribute
-	std::size_t m_taglevel;					//< current level in tag hierarchy
+	InputFilterR m_inputfilter;			//< rerefence to input with filter
+	InputFilter::ElementType m_type;		//< current state (last value type parsed)
+	std::string m_attrbuf;				//< buffer for attribute name
+	bool m_gotattr;					//< true, if the following value belongs to an attribute
+	std::size_t m_taglevel;				//< current level in tag hierarchy
 };
 
 ///\class FilterMap
@@ -219,16 +219,16 @@ private:
 class PluginFunction
 {
 public:
-	typedef int (Call)( const void* in, void* out);
+	typedef int (Call)( void* res, const void* param);
 
 	///\brief Default constructor
 	PluginFunction()
-		:m_state(-1),m_call(0),m_api_param(0),m_api_result(0){}
+		:m_state(-1),m_lastres(Error),m_call(0),m_api_param(0),m_api_result(0){}
 
 	///\brief Copy constructor
 	///\param[in] o copied item
 	PluginFunction( const PluginFunction& o)
-		:m_state(o.m_state),m_data(o.m_data),m_call(o.m_call),m_api_param(o.m_api_param),m_api_result(o.m_api_result)
+		:m_state(o.m_state),m_lastres(o.m_lastres),m_data(o.m_data),m_call(o.m_call),m_api_param(o.m_api_param),m_api_result(o.m_api_result)
 	{
 		if (m_state > 0) throw std::runtime_error( "illegal copy of plugin function not in initial state");
 	}
@@ -238,7 +238,7 @@ public:
 	///\param[in] p part of the api describing the input
 	///\param[in] r part of the api describing the function result
 	PluginFunction( Call c, const serialize::FiltermapDescriptionBase* p, const serialize::FiltermapDescriptionBase* r)
-		:m_state(0),m_data(std::calloc( p->size() + r->size(), 1), std::free),m_call(c),m_api_param(p),m_api_result(r){}
+		:m_state(0),m_lastres(Ok),m_data(std::calloc( p->size() + r->size(), 1), std::free),m_call(c),m_api_param(p),m_api_result(r){}
 
 	///\brief Destructor
 	~PluginFunction();
@@ -251,14 +251,18 @@ public:
 		Error,		//< termination of call with error (not completed)
 		Yield		//< call interrupted with request for a network operation
 	};
-	CallResult call( protocol::InputFilter& ifl, protocol::OutputFilter& ofl);
+	CallResult call( BufferingInputFilter& ifl, OutputFilter& ofl);
 
+	const char* getLastError() const		{return m_ctx.getLastError();}
+	const std::string& content() const		{return m_ctx.content();}
 private:
 	int m_state;
+	CallResult m_lastres;
 	boost::shared_ptr<void> m_data;
 	Call* m_call;
 	const serialize::FiltermapDescriptionBase* m_api_param;
 	const serialize::FiltermapDescriptionBase* m_api_result;
+	serialize::Context m_ctx;
 };
 
 ///\class PluginFunctionMap
@@ -292,7 +296,7 @@ public:
 	///\param[in] w command input writer
 	///\param[in] r command output reader
 	///\param[in] c command execute handler
-	TransactionFunction( const protocol::OutputFilterR& w, const protocol::InputFilterR& r, const cmdbind::CommandHandlerR& c)
+	TransactionFunction( const OutputFilterR& w, const InputFilterR& r, const cmdbind::CommandHandlerR& c)
 		:m_cmdwriter(w),m_resultreader(r),m_cmd(c){}
 
 	///\brief Destructor
@@ -310,11 +314,11 @@ public:
 		Definition(){}
 		Definition( const Definition& o)
 			:m_cmdwriter(o.m_cmdwriter),m_resultreader(o.m_resultreader),m_cmdconstructor(o.m_cmdconstructor){}
-		Definition( const protocol::OutputFilterR& w, const protocol::InputFilterR& r, CreateCommandHandler c)
+		Definition( const OutputFilterR& w, const InputFilterR& r, CreateCommandHandler c)
 			:m_cmdwriter(w),m_resultreader(r),m_cmdconstructor(c){}
 
-		protocol::OutputFilterR m_cmdwriter;			//< command input writer
-		protocol::InputFilterR m_resultreader;			//< command result reader
+		OutputFilterR m_cmdwriter;			//< command input writer
+		InputFilterR m_resultreader;			//< command result reader
 		CreateCommandHandler m_cmdconstructor;
 
 		TransactionFunction create( const std::string& name) const
@@ -328,8 +332,8 @@ public:
 	};
 private:
 	friend class Defintion;
-	protocol::OutputFilterR m_cmdwriter;				//< command input writer
-	protocol::InputFilterR m_resultreader;				//< command result reader
+	OutputFilterR m_cmdwriter;				//< command input writer
+	InputFilterR m_resultreader;				//< command result reader
 	cmdbind::CommandHandlerR m_cmd;				//< command execute handler
 };
 
@@ -439,7 +443,7 @@ private:
 class LuaPluginFunction
 {
 public:
-	typedef int (Call)( const void* in, void* out);
+	typedef int (Call)( void* res, const void* param);
 
 	///\brief Default constructor
 	LuaPluginFunction() {}

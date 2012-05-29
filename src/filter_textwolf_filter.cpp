@@ -29,102 +29,264 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file textwolf_filter.cpp
+///\file filter_textwolf_filter.cpp
 ///\brief Filter implementation reading/writing xml with the textwolf xml library
 #include "filter/textwolf_filter.hpp"
-#include "filter/textwolf_filterBase.hpp"
-#include "filter/textwolf.hpp"
-#include "filter.hpp"
-#include "protocol/inputfilter.hpp"
-#include "protocol/outputfilter.hpp"
+#include "filter/textwolf/sourceiterator.hpp"
+#include "filter/textwolf/xmlparser.hpp"
+#include "filter/textwolf/xmlprinter.hpp"
+#include "filter/textwolf/cstringiterator.hpp"
 #include <string>
-#include <cstring>
 #include <cstddef>
-#include <cstdio>
-#include <cstdlib>
-#include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
 
 using namespace _Wolframe;
 using namespace langbind;
 
+
 namespace {
 
-///\class OutputFilterImpl
-///\brief output filter filter for XML using textwolf
-///\tparam IOCharset character set encoding of input and output
-///\tparam AppCharset character set encoding of the application processor
-template <class IOCharset, class AppCharset=textwolf::charset::UTF8>
-struct OutputFilterImpl :public protocol::OutputFilter, public FilterBase<IOCharset,AppCharset>
-{
-	typedef protocol::OutputFilter Parent;
+typedef textwolf::XMLParser<textwolf::CStringIterator,std::string>  XMLParser;
 
-	///\enum XMLState
-	///\brief Enumeration of XML printer states
-	enum XMLState
+struct XMLFilterAttributes
+{
+	CountedReference<std::string> m_encoding;
+
+	void setEncoding( const std::string& encoding)
 	{
-		Content,		//< processing content
-		Tag,			//< processing inside a tag defintion
-		Attribute,		//< processing inside a tag defintion, just read an attribute
-		Header,			//< processing inside a header defintion
-		HeaderAttribute		//< processing inside a header defintion, just read an attribute
-	};
+		m_encoding.reset( new std::string( encoding));
+	}
+	const std::string& getEncoding()
+	{
+		static std::string empty;
+		return m_encoding.get()?(*m_encoding.get()):empty;
+	}
+	XMLFilterAttributes(){}
+	XMLFilterAttributes( const XMLFilterAttributes& o) :m_encoding(o.m_encoding){}
+};
+
+///\class InputFilterImpl
+///\brief input filter for XML using textwolf
+struct InputFilterImpl:public InputFilter
+{
+	typedef InputFilter Parent;
+
+	///\brief Constructor
+	InputFilterImpl( const XMLFilterAttributes& attr)
+		:m_attributes(attr)
+		,m_parser( attr)
+		,m_src(0)
+		,m_srcsize(0)
+		,m_srcend(false){}
+
+
+	///\brief Copy constructor
+	///\param [in] o output filter to copy
+	InputFilterImpl( const InputFilterImpl& o)
+		:InputFilter( o)
+		,m_attributes( o.m_attributes)
+		,m_parser( o.m_parser)
+		,m_src(o.m_src)
+		,m_srcsize(o.m_srcsize)
+		,m_srcend(o.m_srcend){}
+
+	///\brief Get a member value of the filter
+	///\param [in] name case sensitive name of the variable
+	///\param [in] val the value returned
+	///\return true on success, false, if the variable does not exist or the operation failed
+	virtual bool getValue( const char* name, std::string& val) const
+	{
+		if (std::strcmp( name, "empty") == 0)
+		{
+			val = m_parser.withEmpty();
+			return true;
+		}
+		if (std::strcmp( name, "tokenize") == 0)
+		{
+			val = m_parser.doTokenize();
+			return true;
+		}
+		return Parent::getValue( name, val);
+	}
+
+	///\brief Set a member value of the filter
+	///\param [in] name case sensitive name of the variable
+	///\param [in] value new value of the variable to set
+	///\return true on success, false, if the variable does not exist or the operation failed
+	virtual bool setValue( const char* name, const std::string& value)
+	{
+		if (std::strcmp( name, "empty") == 0)
+		{
+			if (std::strcmp( value.c_str(), "true") == 0)
+			{
+				m_parser.withEmpty(true);
+			}
+			else if (std::strcmp( value.c_str(), "false") == 0)
+			{
+				m_parser.withEmpty(false);
+			}
+			else
+			{
+				return false;
+			}
+			return true;
+		}
+		if (std::strcmp( name, "tokenize") == 0)
+		{
+			if (std::strcmp( value.c_str(), "true") == 0)
+			{
+				m_parser.doTokenize(true);
+			}
+			else if (std::strcmp( value.c_str(), "false") == 0)
+			{
+				m_parser.doTokenize(false);
+			}
+			else
+			{
+				return false;
+			}
+			return true;
+		}
+		return Parent::setValue( name, value);
+	}
+
+	///\brief self copy
+	///\return copy of this
+	virtual InputFilter* copy() const
+	{
+		return new InputFilterImpl( *this);
+	}
+
+	///\brief implement interface member InputFilter::putInput(const void*,std::size_t,bool)
+	virtual void putInput( const void* ptr, std::size_t size, bool end)
+	{
+		m_src = (const char*)ptr;
+		m_srcend = end;
+		m_srcsize = size;
+		m_parser.putInput( m_src, m_srcsize, m_srcend);
+	}
+
+	virtual void getRest( const void*& ptr, std::size_t& size, bool& end)
+	{
+		ptr = m_src + m_parser.getPosition();
+		size = m_srcsize - m_parser.getPosition();
+		end = m_srcend;
+	}
+
+	///\brief implement interface member InputFilter::getNext(typename InputFilter::ElementType&,const void*&,std::size_t&)
+	virtual bool getNext( InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
+	{
+		struct ElementTypeMap :public textwolf::CharMap<int,-1,textwolf::XMLScannerBase::NofElementTypes>
+		{
+			ElementTypeMap()
+			{
+				(*this)
+				(textwolf::XMLScannerBase::None,-1)
+				(textwolf::XMLScannerBase::ErrorOccurred,-1)
+				(textwolf::XMLScannerBase::HeaderStart,(int)OpenTag)
+				(textwolf::XMLScannerBase::HeaderAttribName,(int)Attribute)
+				(textwolf::XMLScannerBase::HeaderAttribValue,(int)Value)
+				(textwolf::XMLScannerBase::HeaderEnd,(int)CloseTag)
+				(textwolf::XMLScannerBase::TagAttribName,(int)Attribute)
+				(textwolf::XMLScannerBase::TagAttribValue,(int)Value)
+				(textwolf::XMLScannerBase::OpenTag,(int)OpenTag)
+				(textwolf::XMLScannerBase::CloseTag,(int)CloseTag)
+				(textwolf::XMLScannerBase::CloseTagIm,(int)CloseTag)
+				(textwolf::XMLScannerBase::Content,(int)Value)
+				(textwolf::XMLScannerBase::Exit,-1);
+			}
+		};
+		static const ElementTypeMap tmap;
+		try
+		{
+			const char* ee;
+			textwolf::XMLScannerBase::ElementType et = m_parser.getNext( ee, elementsize);
+			element = (const void*)ee;
+
+			int st = tmap[ et];
+			if (st == -1)
+			{
+				if (et != textwolf::XMLScannerBase::Exit)
+				{
+					setState( Error, "textwolf: syntax error in XML");
+				}
+				return false;
+			}
+			else
+			{
+				type = (InputFilterImpl::ElementType)st;
+				return true;
+			}
+		}
+		catch (textwolf::SrcIterator::EoM)
+		{
+			setState( EndOfMessage);
+			return false;
+		};
+		return false;
+	}
+private:
+	typedef textwolf::XMLParser<std::string,XMLFilterAttributes> XMLParser;
+
+	XMLFilterAttributes m_attributes;	//< common attributes of input and output filter
+	XMLParser m_parser;			//< XML parser
+	const char* m_src;			//< pointer to current chunk parsed
+	std::size_t m_srcsize;			//< size of the current chunk parsed in bytes
+	bool m_srcend;				//< true if end of message is in current chunk parsed
+};
+
+///\class OutputFilter
+///\brief output filter filter for XML using textwolf
+struct OutputFilterImpl :public OutputFilter
+{
+	typedef OutputFilter Parent;
 
 	///\brief Constructor
 	///\param [in] bufsize (optional) size of internal buffer to use (for the tag hierarchy stack)
-	OutputFilterImpl()
+	OutputFilterImpl( const XMLFilterAttributes& attr)
 		:m_elemitr(0)
-		,m_xmlstate(Tag)
-		,m_pendingOpenTag(false){}
+		,m_attributes(attr)
+		,m_printer(attr){}
 
 	///\brief Copy constructor
 	///\param [in] o output filter to copy
 	OutputFilterImpl( const OutputFilterImpl& o)
-		:protocol::OutputFilter(o)
-		,m_element(o.m_element)
+		:OutputFilter(o)
+		,m_elembuf(o.m_elembuf)
 		,m_elemitr(o.m_elemitr)
-		,m_tagstk( o.m_tagstk)
-		,m_xmlstate(o.m_xmlstate)
-		,m_pendingOpenTag(o.m_pendingOpenTag){}
+		,m_attributes(o.m_attributes)
+		,m_printer(o.m_printer){}
 
 	virtual ~OutputFilterImpl(){}
 
 	///\brief self copy
 	///\return copy of this
-	virtual protocol::OutputFilter* copy() const
+	virtual OutputFilter* copy() const
 	{
 		return new OutputFilterImpl( *this);
 	}
 
 	bool emptybuf()
 	{
-		std::size_t nn = m_element.size() - m_elemitr;
-		if (nn > restsize())
+		std::size_t nn = m_elembuf.size() - m_elemitr;
+		m_elemitr += write( m_elembuf.c_str() + m_elemitr, nn);
+		if (m_elemitr == m_elembuf.size())
 		{
-			nn = restsize();
-		}
-		std::memcpy( rest(), m_element.c_str() + m_elemitr, nn);
-		m_elemitr += nn;
-		incPos( nn);
-
-		if (m_elemitr == m_element.size())
-		{
-			m_element.clear();
+			m_elembuf.clear();
 			m_elemitr = 0;
 			return true;
 		}
 		return false;
 	}
 
-	///\brief Implementation of protocol::OutputFilter::print(protocol::OutputFilter::ElementType,const void*,std::size_t)
+	///\brief Implementation of OutputFilter::print(OutputFilter::ElementType,const void*,std::size_t)
 	///\param [in] type type of the element to print
 	///\param [in] element pointer to the element to print
 	///\param [in] elementsize size of the element to print in bytes
 	///\return true, if success, false else
-	virtual bool print( protocol::OutputFilter::ElementType type, const void* element, std::size_t elementsize)
+	virtual bool print( OutputFilter::ElementType type, const void* element, std::size_t elementsize)
 	{
 		setState( Open);
-		if (m_elemitr < m_element.size())
+		if (m_elemitr < m_elembuf.size())
 		{
 			// there is something to print left from last time
 			if (!emptybuf())
@@ -132,958 +294,55 @@ struct OutputFilterImpl :public protocol::OutputFilter, public FilterBase<IOChar
 				setState( EndOfBuffer);
 				return false;
 			}
-			// we finished the printing left
+			// we've done the printing left
 			return true;
 		}
-		const void* cltag;
-		std::size_t cltagsize;
-
 		switch (type)
 		{
-			case protocol::OutputFilter::OpenTag:
-				if (m_pendingOpenTag == true)
+			case OutputFilter::OpenTag:
+				if (!m_printer.printOpenTag( (const char*)element, elementsize, m_elembuf))
 				{
-					FilterBase<IOCharset,AppCharset>::printToBuffer( '>', m_element);
-				}
-				FilterBase<IOCharset,AppCharset>::printToBuffer( '<', m_element);
-				FilterBase<IOCharset,AppCharset>::printToBuffer( (const char*)element, elementsize, m_element);
-
-				pushTag( element, elementsize);
-				m_xmlstate = ((const char*)(element))[0]=='?'?Header:Tag;
-				m_pendingOpenTag = true;
-
-				if (!emptybuf())
-				{
-					setState( EndOfBuffer);
+					setState( Error, "textwolf: illegal print operation (open tag)");
 					return false;
 				}
-				return true;
-
-			case protocol::OutputFilter::Attribute:
-				if (!m_pendingOpenTag)
+				break;
+			case OutputFilter::CloseTag:
+				if (!m_printer.printCloseTag( m_elembuf))
 				{
-					setState( Error, "textwolf: illegal operation");
+					setState( Error, "textwolf: illegal print operation (close tag)");
 					return false;
 				}
-				FilterBase<IOCharset,AppCharset>::printToBuffer( ' ', m_element);
-				FilterBase<IOCharset,AppCharset>::printToBuffer( (const char*)element, elementsize, m_element);
-				FilterBase<IOCharset,AppCharset>::printToBuffer( '=', m_element);
-
-				m_xmlstate = (m_xmlstate==Header)?HeaderAttribute:Attribute;
-
-				if (!emptybuf())
+				break;
+			case OutputFilter::Attribute:
+				if (!m_printer.printAttribute( (const char*)element, elementsize, m_elembuf))
 				{
-					setState( EndOfBuffer);
+					setState( Error, "textwolf: illegal print operation (attribute)");
 					return false;
 				}
-				return true;
-
-			case protocol::OutputFilter::Value:
-				if (m_xmlstate == Attribute)
+				break;
+			case OutputFilter::Value:
+				if (!m_printer.printValue( (const char*)element, elementsize, m_elembuf))
 				{
-					printToBufferAttributeValue( (const char*)element, elementsize, m_element);
-					m_xmlstate = Tag;
-				}
-				else if (m_xmlstate == HeaderAttribute)
-				{
-					printToBufferAttributeValue( (const char*)element, elementsize, m_element);
-					m_xmlstate = Header;
-				}
-				else
-				{
-					if (m_pendingOpenTag == true)
-					{
-						FilterBase<IOCharset,AppCharset>::printToBuffer( '>', m_element);
-					}
-					printToBufferContent( (const char*)element, elementsize, m_element);
-					m_pendingOpenTag = false;
-					m_xmlstate = Content;
-				}
-				if (!emptybuf())
-				{
-					setState( EndOfBuffer);
+					setState( Error, "textwolf: illegal print operation (value)");
 					return false;
 				}
-				return true;
-
-			case protocol::OutputFilter::CloseTag:
-				if (!topTag( cltag, cltagsize) || !cltagsize)
-				{
-					setState( Error, "textwolf: tags not balanced");
-					return false;
-				}
-				if (m_xmlstate == Header)
-				{
-					FilterBase<IOCharset,AppCharset>::printToBuffer( '?', m_element);
-					FilterBase<IOCharset,AppCharset>::printToBuffer( '>', m_element);
-					FilterBase<IOCharset,AppCharset>::printToBufferEOL( m_element);
-				}
-				else if (m_pendingOpenTag == true)
-				{
-					FilterBase<IOCharset,AppCharset>::printToBuffer( '/', m_element);
-					FilterBase<IOCharset,AppCharset>::printToBuffer( '>', m_element);
-				}
-				else
-				{
-					FilterBase<IOCharset,AppCharset>::printToBuffer( '<', m_element);
-					FilterBase<IOCharset,AppCharset>::printToBuffer( '/', m_element);
-					FilterBase<IOCharset,AppCharset>::printToBuffer( (const char*)cltag, cltagsize, m_element);
-					FilterBase<IOCharset,AppCharset>::printToBuffer( '>', m_element);
-				}
-				m_xmlstate = Content;
-				m_pendingOpenTag = false;
-				popTag();
-
-				if (!emptybuf())
-				{
-					setState( EndOfBuffer);
-					return false;
-				}
-				return true;
+				break;
 		}
-		setState( Error, "textwolf: illegal state");
-		return false;
-	}
-private:
-	///\brief print a character substitute or the character itself
-	///\param [in,out] buf buffer to print to
-	///\param [in] nof_echr number of elements in echr and estr
-	///\param [in] echr ASCII characters to substitute
-	///\param [in] estr ASCII strings to substitute with (array parallel to echr)
-	static void printEsc( char ch, std::string& buf, unsigned int nof_echr, const char* echr, const char** estr)
-	{
-		const char* cc = (const char*)memchr( echr, ch, nof_echr);
-		if (cc)
+		if (!emptybuf())
 		{
-			unsigned int ii = 0;
-			const char* tt = estr[ cc-echr];
-			while (tt[ii]) IOCharset::print( tt[ii++], buf);
+			setState( EndOfBuffer);
+			return false;
 		}
-		else
-		{
-			IOCharset::print( ch, buf);
-		}
-	}
-
-	///\brief print a value with some characters replaced by a string
-	///\param [in] src pointer to attribute value string to print
-	///\param [in] srcsize size of src in bytes
-	///\param [in,out] buf buffer to print to
-	///\param [in] nof_echr number of elements in echr and estr
-	///\param [in] echr ASCII characters to substitute
-	///\param [in] estr ASCII strings to substitute with (array parallel to echr)
-	static void printToBufferSubstChr( const char* src, std::size_t srcsize, std::string& buf, unsigned int nof_echr, const char* echr, const char** estr)
-	{
-		StrIterator itr( src, srcsize);
-		textwolf::TextScanner<StrIterator,AppCharset> ts( itr);
-
-		textwolf::UChar ch;
-		while ((ch = ts.chr()) != 0)
-		{
-			if (ch < 128)
-			{
-				printEsc( (char)ch, buf, nof_echr, echr, estr);
-			}
-			else
-			{
-				IOCharset::print( ch, buf);
-			}
-			++ts;
-		}
-	}
-
-	///\brief print attribute value string
-	///\param [in] src pointer to attribute value string to print
-	///\param [in] srcsize size of src in bytes
-	///\param [in,out] buf buffer to print to
-	static void printToBufferAttributeValue( const char* src, std::size_t srcsize, std::string& buf)
-	{
-		enum {nof_echr = 12};
-		static const char* estr[nof_echr] = {"&lt;", "&gt;", "&apos;", "&quot;", "&amp;", "&#0;", "&#8;", "&#9;", "&#10;", "&#13;"};
-		static const char echr[nof_echr+1] = "<>'\"&\0\b\t\n\r";
-		IOCharset::print( '"', buf);
-		printToBufferSubstChr( src, srcsize, buf, nof_echr, echr, estr);
-		IOCharset::print( '"', buf);
-	}
-
-	///\brief print content value string
-	///\param [in] src pointer to content string to print
-	///\param [in] srcsize size of src in bytes
-	///\param [in,out] buf buffer to print to
-	static void printToBufferContent( const char* src, std::size_t srcsize, std::string& buf)
-	{
-		enum {nof_echr = 6};
-		static const char* estr[nof_echr] = {"&lt;", "&gt;", "&amp;", "&#0;", "&#8;"};
-		static const char echr[nof_echr+1] = "<>&\0\b";
-		printToBufferSubstChr( src, srcsize, buf, nof_echr, echr, estr);
-	}
-
-	static std::size_t getAlign( std::size_t n)
-	{
-		return (sizeof(std::size_t) - (n & (sizeof(std::size_t)-1))) & (sizeof(std::size_t)-1);
-	}
-
-	struct TagStack
-	{
-		enum {InitStackSize=256};
-		char* m_ptr;
-		std::size_t m_pos;	//< current position in the tag hierarchy stack buffer
-		std::size_t m_size;	//< current position in the tag hierarchy stack buffer
-
-		~TagStack()
-		{
-			if (m_ptr) std::free( m_ptr);
-		}
-
-		TagStack()
-			:m_ptr(0),m_pos(0),m_size(InitStackSize)
-		{
-			if ((m_ptr=(char*)std::malloc( m_size)) == 0) throw std::bad_alloc();
-		}
-		TagStack( const TagStack& o)
-			:m_ptr(0),m_pos(o.m_pos),m_size(o.m_size)
-		{
-			if ((m_ptr=(char*)std::malloc( m_size)) == 0) throw std::bad_alloc();
-			std::memcpy( m_ptr, o.m_ptr, m_pos);
-		}
-
-		void push( const char* pp, std::size_t nn, std::size_t ofs)
-		{
-			if (m_pos + ofs > m_size)
-			{
-				while (m_pos + ofs > m_size) m_size *= 2;
-				if (m_pos + ofs > m_size) throw std::bad_alloc();
-				if (nn > ofs) throw std::logic_error( "invalid tag offset");
-				char* xx = (char*)std::realloc( m_ptr, m_size);
-				if (!xx) throw std::bad_alloc();
-				m_ptr = xx;
-			}
-			std::memcpy( m_ptr + m_pos, pp, nn);
-			m_pos += ofs;
-		}
-
-		void pop( std::size_t ofs)
-		{
-			if (m_pos < ofs) throw std::runtime_error( "corrupt tag stack");
-			m_pos -= ofs;
-		}
-	};
-
-	void pushTag( const void* element, std::size_t elementsize)
-	{
-		std::size_t align = getAlign( elementsize);
-		std::size_t ofs = elementsize + align + sizeof( std::size_t);
-		m_tagstk.push( (const char*)element, elementsize, ofs);
-		void* tt = m_tagstk.m_ptr + m_tagstk.m_pos - sizeof( std::size_t);
-		*(std::size_t*)(tt) = elementsize;
-	}
-
-	std::size_t tagOfs( std::size_t& elementsize)
-	{
-		if (m_tagstk.m_pos < sizeof( std::size_t)) return false;
-		void* tt = m_tagstk.m_ptr + (m_tagstk.m_pos - sizeof( std::size_t));
-		elementsize = *(std::size_t*)(tt);
-		std::size_t align = getAlign( elementsize);
-		std::size_t ofs = elementsize + align + sizeof( std::size_t);
-		if (ofs > m_tagstk.m_pos) return 0;
-		return ofs;
-	}
-
-	bool topTag( const void*& element, std::size_t& elementsize)
-	{
-		std::size_t ofs = tagOfs(elementsize);
-		if (!ofs) return false;
-		element = m_tagstk.m_ptr + m_tagstk.m_pos - ofs;
 		return true;
 	}
 
-	void popTag()
-	{
-		std::size_t elementsize=0;
-		std::size_t ofs = tagOfs(elementsize);
-		if (ofs > m_tagstk.m_pos) throw std::logic_error( "tag stack for output is corrupt");
-		m_tagstk.m_pos -= ofs;
-	}
 private:
-	std::string m_element;							//< buffer for the currently printed element
-	std::size_t m_elemitr;							//< iterator to pass it to output
-	TagStack m_tagstk;							//< open tag hierarchy stack buffer
-	XMLState m_xmlstate;							//< current state of output
-	bool m_pendingOpenTag;							//< true if last open tag instruction has not been ended yet
-};
+	typedef textwolf::XMLPrinter<std::string,XMLFilterAttributes> XMLPrinter;
 
-
-static bool getEncoding( const std::string& xmlHeader, TextwolfEncoding::Id &enc)
-{
-	bool rt = true;
-	enc = TextwolfEncoding::Unknown;
-	typedef textwolf::XMLScanner<char*,textwolf::charset::UTF8,textwolf::charset::UTF8,std::string> Scan;
-	char* src = const_cast<char*>( xmlHeader.c_str());
-	std::string valuebuf;
-	std::string encoding;
-	Scan scan( src, valuebuf);
-	Scan::iterator itr = scan.begin(),end = scan.end();
-	bool encodingAttributeParsed = false;
-
-	while (itr != end)
-	{
-		switch (itr->type())
-		{
-			case textwolf::XMLScannerBase::ErrorOccurred:
-			case textwolf::XMLScannerBase::None:
-				return false;
-
-			case textwolf::XMLScannerBase::HeaderStart:
-			case textwolf::XMLScannerBase::HeaderEnd:
-			case textwolf::XMLScannerBase::TagAttribName:
-			case textwolf::XMLScannerBase::TagAttribValue:
-			case textwolf::XMLScannerBase::OpenTag:
-			case textwolf::XMLScannerBase::CloseTag:
-			case textwolf::XMLScannerBase::CloseTagIm:
-			case textwolf::XMLScannerBase::Content:
-			case textwolf::XMLScannerBase::Exit:
-				encodingAttributeParsed = false;
-				break;
-
-			case textwolf::XMLScannerBase::HeaderAttribName:
-				encodingAttributeParsed = (strcmp( valuebuf.c_str(), "encoding") == 0);
-				break;
-
-			case textwolf::XMLScannerBase::HeaderAttribValue:
-				if (encodingAttributeParsed)
-				{
-					enc = TextwolfEncoding::getId( valuebuf.c_str());
-					return true;
-				}
-				encodingAttributeParsed = false;
-				break;
-			default:
-				encodingAttributeParsed = false;
-		}
-		++itr;
-	}
-	return rt;
-}
-
-///\class InputFilterImpl
-///\brief input filter for XML using textwolf
-///\tparam IOCharset character set encoding of input and output
-///\tparam AppCharset character set encoding of the application processor
-template <class IOCharset, class AppCharset=textwolf::charset::UTF8>
-struct InputFilterImpl :public protocol::InputFilter, public FilterBase<IOCharset,AppCharset>
-{
-	typedef protocol::InputFilter Parent;
-	typedef textwolf::XMLScanner<SrcIterator,IOCharset,AppCharset,std::string> XMLScanner;
-
-	///\brief Constructor
-	InputFilterImpl( bool withEmpty, bool doTokenize)
-		:m_scanner(0)
-		,m_withEmpty(withEmpty)
-		,m_doTokenize(doTokenize)
-	{
-		m_src.setInput( this);
-		m_scanner = new XMLScanner( m_src, m_buf);
-		m_scanner->setOutputBuffer( m_buf);
-		m_scanner->doTokenize(m_doTokenize);
-		m_itr = m_scanner->begin(false);
-		m_end = m_scanner->end();
-	}
-
-	///\brief Destructor
-	virtual ~InputFilterImpl()
-	{
-		delete m_scanner;
-	}
-
-	///\brief Copy constructor
-	///\param [in] o output filter to copy
-	InputFilterImpl( const InputFilterImpl& o)
-		:protocol::InputFilter( o)
-		,m_buf( o.m_buf)
-		,m_src( o.m_src)
-		,m_scanner(0)
-		,m_withEmpty(o.m_withEmpty)
-		,m_doTokenize(o.m_doTokenize)
-	{
-		m_src.setInput( this);
-		m_scanner = new XMLScanner( *o.m_scanner);
-		m_scanner->setSource( m_src);
-		m_scanner->setOutputBuffer( m_buf);
-		m_scanner->doTokenize(m_doTokenize);
-		m_itr = m_scanner->begin(false);
-		m_end = m_scanner->end();
-	}
-
-	///\brief Get a member value of the filter
-	///\param [in] name case sensitive name of the variable
-	///\param [in] val the value returned
-	///\return true on success, false, if the variable does not exist or the operation failed
-	virtual bool getValue( const char* name, std::string& val)
-	{
-		if (std::strcmp( name, "empty") == 0)
-		{
-			val = m_withEmpty?"true":"false";
-			return true;
-		}
-		if (std::strcmp( name, "tokenize") == 0)
-		{
-			val = m_doTokenize?"true":"false";
-			return true;
-		}
-		return Parent::getValue( name, val);
-	}
-
-	///\brief Set a member value of the filter
-	///\param [in] name case sensitive name of the variable
-	///\param [in] value new value of the variable to set
-	///\return true on success, false, if the variable does not exist or the operation failed
-	virtual bool setValue( const char* name, const std::string& value)
-	{
-		if (std::strcmp( name, "empty") == 0)
-		{
-			if (std::strcmp( value.c_str(), "true") == 0)
-			{
-				m_withEmpty = true;
-			}
-			else if (std::strcmp( value.c_str(), "false") == 0)
-			{
-				m_withEmpty = false;
-			}
-			else
-			{
-				return false;
-			}
-			return true;
-		}
-		if (std::strcmp( name, "tokenize") == 0)
-		{
-			if (std::strcmp( value.c_str(), "true") == 0)
-			{
-				m_doTokenize = true;
-				if (m_scanner) m_scanner->doTokenize(true);
-			}
-			else if (std::strcmp( value.c_str(), "false") == 0)
-			{
-				m_doTokenize = false;
-				if (m_scanner) m_scanner->doTokenize(false);
-			}
-			else
-			{
-				return false;
-			}
-			return true;
-		}
-		return Parent::setValue( name, value);
-	}
-
-	///\brief self copy
-	///\return copy of this
-	virtual protocol::InputFilter* copy() const
-	{
-		return new InputFilterImpl( *this);
-	}
-
-	struct ElementTypeMap :public textwolf::CharMap<int,-1,textwolf::XMLScannerBase::NofElementTypes>
-	{
-		ElementTypeMap()
-		{
-			(*this)
-			(textwolf::XMLScannerBase::None,-1)
-			(textwolf::XMLScannerBase::ErrorOccurred,-1)
-			(textwolf::XMLScannerBase::HeaderStart,(int)OpenTag)
-			(textwolf::XMLScannerBase::HeaderAttribName,(int)Attribute)
-			(textwolf::XMLScannerBase::HeaderAttribValue,(int)Value)
-			(textwolf::XMLScannerBase::HeaderEnd,(int)CloseTag)
-			(textwolf::XMLScannerBase::TagAttribName,(int)Attribute)
-			(textwolf::XMLScannerBase::TagAttribValue,(int)Value)
-			(textwolf::XMLScannerBase::OpenTag,(int)OpenTag)
-			(textwolf::XMLScannerBase::CloseTag,(int)CloseTag)
-			(textwolf::XMLScannerBase::CloseTagIm,(int)CloseTag)
-			(textwolf::XMLScannerBase::Content,(int)Value)
-			(textwolf::XMLScannerBase::Exit,(int)CloseTag);
-		}
-	};
-
-	///\brief implement interface member protocol::InputFilter::getNext( typename protocol::InputFilter::ElementType&,const void*&,std::size_t&)
-	virtual bool getNext( typename protocol::InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
-	{
-		static const ElementTypeMap tmap;
-		if (state() == Open)
-		{
-			m_buf.clear();
-		}
-		else
-		{
-			setState( Open);
-		}
-		try
-		{
-			++m_itr;
-			int st = tmap[ m_itr->type()];
-			if (st == -1)
-			{
-				setState( Error, "textwolf: syntax error in XML");
-				return false;
-			}
-			else
-			{
-				type = (protocol::InputFilter::ElementType)st;
-				if (!m_withEmpty && m_itr->type() == textwolf::XMLScannerBase::Content)
-				{
-					std::size_t ii=0,nn = m_buf.size();
-					const unsigned char* cc = (const unsigned char*)m_buf.c_str();
-					for (;ii<nn && cc[ii] <= ' '; ++ii);
-					if (ii==nn) return getNext( type, element, elementsize);
-				}
-				element = m_buf.c_str();
-				elementsize = m_buf.size();
-				return true;
-			}
-		}
-		catch (SrcIterator::EoM)
-		{
-			setState( EndOfMessage);
-			return false;
-		};
-		setState( Error, "textwolf: unexpected state");
-		return false;
-	}
-private:
-	std::string m_buf;			//< buffer for the currently parsed element
-	SrcIterator m_src;			//< source iterator
-	XMLScanner* m_scanner;			//< XML scanner
-	typename XMLScanner::iterator m_itr;	//< input iterator created from scanned XML from source iterator
-	typename XMLScanner::iterator m_end;	//< end of data (EoD) pointer
-	bool m_withEmpty;			//< do not produce empty tokens (containing only spaces)
-	bool m_doTokenize;			//< do tokenize (whitespace sequences as delimiters)
-};
-
-class InputFilter :public protocol::InputFilter
-{
-public:
-	typedef protocol::InputFilter Parent;
-
-	///\enum ErrorCodes
-	///\brief Enumeration of error codes
-	enum ErrorCodes
-	{
-		Ok,			//< no error
-		ErrCreateFilter,	//< could not create filter
-		ErrEncoding,		//< could not create filter for this encoding
-		ErrXML			//< error in XML
-	};
-
-public:
-	InputFilter( const CountedReference<TextwolfEncoding::Id>& enc)
-		:m_headerParsed(false)
-		,m_headerParseLeft(0)
-		,m_encoding(enc)
-		,m_withEmpty(true)
-		,m_doTokenize(false)
-		{}
-	InputFilter( const InputFilter& o)
-		:protocol::InputFilter(o)
-		,m_headerParsed(o.m_headerParsed)
-		,m_headerParseLeft(o.m_headerParseLeft)
-		,m_header(o.m_header)
-		,m_encoding(o.m_encoding)
-		,m_withEmpty(o.m_withEmpty)
-		,m_doTokenize(o.m_doTokenize){}
-
-	virtual ~InputFilter(){}
-
-	///\brief Get a member value of the filter
-	///\param [in] name case sensitive name of the variable
-	///\param [in] val the value returned
-	///\return true on success, false, if the variable does not exist or the operation failed
-	virtual bool getValue( const char* name, std::string& val)
-	{
-		if (std::strcmp( name, "empty") == 0)
-		{
-			val = m_withEmpty?"true":"false";
-			return true;
-		}
-		if (std::strcmp( name, "tokenize") == 0)
-		{
-			val = m_doTokenize?"true":"false";
-			return true;
-		}
-		return Parent::getValue( name, val);
-	}
-
-	///\brief Set a member value of the filter
-	///\param [in] name case sensitive name of the variable
-	///\param [in] value new value of the variable to set
-	///\return true on success, false, if the variable does not exist or the operation failed
-	virtual bool setValue( const char* name, const std::string& value)
-	{
-		if (std::strcmp( name, "empty") == 0)
-		{
-			if (std::strcmp( value.c_str(), "true") == 0)
-			{
-				m_withEmpty = true;
-			}
-			else if (std::strcmp( value.c_str(), "false") == 0)
-			{
-				m_withEmpty = false;
-			}
-			else
-			{
-				return false;
-			}
-			return true;
-		}
-		if (std::strcmp( name, "tokenize") == 0)
-		{
-			if (std::strcmp( value.c_str(), "true") == 0)
-			{
-				m_doTokenize = true;
-			}
-			else if (std::strcmp( value.c_str(), "false") == 0)
-			{
-				m_doTokenize = false;
-			}
-			else
-			{
-				return false;
-			}
-			return true;
-		}
-		return Parent::setValue( name, value);
-	}
-
-	virtual protocol::InputFilter* copy() const
-	{
-		return new InputFilter( *this);
-	}
-
-	virtual bool getNext( ElementType&, const void*&, std::size_t&)
-	{
-		for (;;)
-		if (m_headerParsed)
-		{
-			return false;
-		}
-		else if (m_headerParseLeft)
-		{
-			const char* cc = (char*)ptr();
-			std::size_t nn = size();
-			std::size_t ii = 0;
-			for (;ii < nn && m_headerParseLeft>0; ++ii,--m_headerParseLeft)
-			{
-				if (cc[ii] != '\0')
-				{
-					setState( Error, "textwolf: syntax error in XML");
-					return false;
-				}
-			}
-			skip( ii);
-			if (m_headerParseLeft)
-			{
-				setState( EndOfMessage);
-			}
-			else
-			{
-				m_headerParsed = true;
-				setState( Open);
-			}
-			return false;
-		}
-		else
-		{
-			const char* cc = (char*)ptr();
-			std::size_t nn = size();
-			std::size_t ii = 0;
-			for (;ii < nn; ++ii)
-			{
-				if (cc[ii] == '\n') break;
-				if (cc[ii] != '\0')
-				{
-					if (cc[ii] < 0 || m_header.size() > 128)
-					{
-						setState( Error, "textwolf: syntax error in XML");
-						return false;
-					}
-					m_header.push_back( cc[ii]);
-				}
-			}
-			if (ii < nn)
-			{
-				TextwolfEncoding::Id enc;
-
-				m_header.push_back( '\n');
-				skip( ii+1);
-
-				if (getEncoding( m_header, enc))
-				{
-					m_encoding.reset( new TextwolfEncoding::Id( enc));
-					if (enc == TextwolfEncoding::Unknown)
-					{
-						setState( Error, "textwolf: cannot handle this encoding");
-					}
-					else
-					{
-						setState( Open);
-
-						if (enc == TextwolfEncoding::UTF16LE
-						|| enc == TextwolfEncoding::UCS2LE)
-						{
-							m_headerParseLeft = 1;
-							continue;
-						}
-						else if (enc == TextwolfEncoding::UCS4LE)
-						{
-							m_headerParseLeft = 3;
-							continue;
-						}
-						else
-						{
-							m_headerParseLeft = 0;
-						}
-					}
-				}
-				else
-				{
-					setState( Error, "textwolf: syntax error in XML");
-				}
-				m_headerParsed = true;
-			}
-			else
-			{
-				skip( nn);
-				setState( EndOfMessage);
-			}
-			return false;
-		}
-	}
-
-	virtual protocol::InputFilter* createFollow() const
-	{
-		if (!m_headerParsed) return 0;
-		TextwolfEncoding::Id enc = m_encoding.get()?*m_encoding.get():TextwolfEncoding::Unknown;
-		protocol::InputFilter* rt = 0;
-		switch (enc)
-		{
-			case TextwolfEncoding::Unknown:
-				return 0;
-			case TextwolfEncoding::IsoLatin:
-				rt = new InputFilterImpl<textwolf::charset::IsoLatin1>( m_withEmpty,m_doTokenize);
-				break;
-			case TextwolfEncoding::UTF8:
-				rt = new InputFilterImpl<textwolf::charset::UTF8>( m_withEmpty,m_doTokenize);
-				break;
-			case TextwolfEncoding::UTF16:
-				rt = new InputFilterImpl<textwolf::charset::UTF16BE>( m_withEmpty,m_doTokenize);
-				break;
-			case TextwolfEncoding::UTF16BE:
-				rt = new InputFilterImpl<textwolf::charset::UTF16BE>( m_withEmpty,m_doTokenize);
-				break;
-			case TextwolfEncoding::UTF16LE:
-				rt = new InputFilterImpl<textwolf::charset::UTF16LE>( m_withEmpty,m_doTokenize);
-				break;
-			case TextwolfEncoding::UCS2BE:
-				rt = new InputFilterImpl<textwolf::charset::UCS2BE>( m_withEmpty,m_doTokenize);
-				break;
-			case TextwolfEncoding::UCS2LE:
-				rt = new InputFilterImpl<textwolf::charset::UCS2LE>( m_withEmpty,m_doTokenize);
-				break;
-			case TextwolfEncoding::UCS4BE:
-				rt = new InputFilterImpl<textwolf::charset::UCS4BE>( m_withEmpty,m_doTokenize);
-				break;
-			case TextwolfEncoding::UCS4LE:
-				rt = new InputFilterImpl<textwolf::charset::UCS4LE>( m_withEmpty,m_doTokenize);
-				break;
-		}
-		if (rt)
-		{
-			*rt = *this;
-		}
-		return rt;
-	}
-
-private:
-	bool m_headerParsed;
-	char m_headerParseLeft;
-	std::string m_header;
-	CountedReference<TextwolfEncoding::Id> m_encoding;
-	bool m_withEmpty;
-	bool m_doTokenize;
-};
-
-class OutputFilter :public protocol::OutputFilter
-{
-public:
-	///\enum ErrorCodes
-	///\brief Enumeration of error codes
-	enum ErrorCodes
-	{
-		Ok,			//< no error
-		ErrEncoding,		//< tack stack overflow
-		ErrCreateFilter		//< could not output filter
-	};
-
-public:
-	OutputFilter( const CountedReference<TextwolfEncoding::Id>& enc)
-		:m_headerPrinted(false)
-		,m_headerPos(0)
-		,m_encoding(enc){}
-
-	OutputFilter( const OutputFilter& o)
-		:protocol::OutputFilter(o)
-		,m_headerPrinted(o.m_headerPrinted)
-		,m_headerPos(o.m_headerPos)
-		,m_header(o.m_header)
-		,m_encoding(o.m_encoding){}
-
-	virtual ~OutputFilter(){}
-
-	virtual OutputFilter* copy() const
-	{
-		return new OutputFilter( *this);
-	}
-
-	virtual protocol::OutputFilter* createFollow()
-	{
-		namespace tc = textwolf::charset;
-		if (!m_headerPrinted) return 0;
-		TextwolfEncoding::Id enc = m_encoding.get()?*m_encoding.get():TextwolfEncoding::UTF8;
-		protocol::OutputFilter* rt = 0;
-		switch (enc)
-		{
-			case TextwolfEncoding::Unknown:
-				setState( Error, "textwolf: cannot handle this encoding");
-				return false;
-			case TextwolfEncoding::IsoLatin:
-				rt = new OutputFilterImpl<tc::IsoLatin1>();
-				break;
-			case TextwolfEncoding::UTF8:
-				rt = new OutputFilterImpl<tc::UTF8>();
-				break;
-			case TextwolfEncoding::UTF16:
-				rt = new OutputFilterImpl<tc::UTF16BE>();
-				break;
-			case TextwolfEncoding::UTF16BE:
-				rt = new OutputFilterImpl<tc::UTF16BE>();
-				break;
-			case TextwolfEncoding::UTF16LE:
-				rt = new OutputFilterImpl<tc::UTF16LE>();
-				break;
-			case TextwolfEncoding::UCS2BE:
-				rt = new OutputFilterImpl<tc::UCS2BE>();
-				break;
-			case TextwolfEncoding::UCS2LE:
-				rt = new OutputFilterImpl<tc::UCS2LE>();
-				break;
-			case TextwolfEncoding::UCS4BE:
-				rt = new OutputFilterImpl<tc::UCS4BE>();
-				break;
-			case TextwolfEncoding::UCS4LE:
-				rt = new OutputFilterImpl<tc::UCS4LE>();
-				break;
-		}
-		if (rt)
-		{
-			*rt = *this;
-		}
-		return rt;
-	}
-
-	virtual bool print( ElementType, const void*, std::size_t)
-	{
-		if (m_headerPrinted)
-		{
-			setState( Open);
-			return false;
-		}
-		if (m_header.size() == 0)
-		{
-			TextwolfEncoding::Id enc = m_encoding.get()?*m_encoding.get():TextwolfEncoding::UTF8;
-			namespace tc = textwolf::charset;
-
-			switch (enc)
-			{
-				case TextwolfEncoding::Unknown:
-				{
-					setState( Error, "textwolf: cannot handle this encoding");
-					return false;
-				}
-				case TextwolfEncoding::IsoLatin:
-				{
-					m_header = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" standalone=\"yes\"?>\n";
-					break;
-				}
-				case TextwolfEncoding::UTF8:
-				{
-					m_header = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n";
-					break;
-				}
-				case TextwolfEncoding::UTF16:
-				{
-					typedef FilterBase<tc::UTF16<>,tc::IsoLatin1> FLT;
-					const char* elem = "<?xml version=\"1.0\" encoding=\"UTF-16\" standalone=\"yes\"?>\n";
-					FLT::printToBuffer( (const char*)elem, std::strlen(elem), m_header);
-					break;
-				}
-				case TextwolfEncoding::UTF16BE:
-				{
-					typedef FilterBase<tc::UTF16<tc::ByteOrder::BE>,tc::IsoLatin1> FLT;
-					const char* elem = "<?xml version=\"1.0\" encoding=\"UTF-16BE\" standalone=\"yes\"?>\n";
-					FLT::printToBuffer( (const char*)elem, std::strlen(elem), m_header);
-					break;
-				}
-				case TextwolfEncoding::UTF16LE:
-				{
-					typedef FilterBase<tc::UTF16<tc::ByteOrder::LE>,tc::IsoLatin1> FLT;
-					const char* elem = "<?xml version=\"1.0\" encoding=\"UTF-16LE\" standalone=\"yes\"?>\n";
-					FLT::printToBuffer( (const char*)elem, std::strlen(elem), m_header);
-					break;
-				}
-				case TextwolfEncoding::UCS2BE:
-				{
-					typedef FilterBase<tc::UCS2<tc::ByteOrder::BE>,tc::IsoLatin1> FLT;
-					const char* elem = "<?xml version=\"1.0\" encoding=\"UCS-2BE\" standalone=\"yes\"?>\n";
-					FLT::printToBuffer( (const char*)elem, std::strlen(elem), m_header);
-					break;
-				}
-				case TextwolfEncoding::UCS2LE:
-				{
-					typedef FilterBase<tc::UCS2<tc::ByteOrder::LE>,tc::IsoLatin1> FLT;
-					const char* elem = "<?xml version=\"1.0\" encoding=\"UCS-2LE\" standalone=\"yes\"?>\n";
-					FLT::printToBuffer( (const char*)elem, std::strlen(elem), m_header);
-					break;
-				}
-				case TextwolfEncoding::UCS4BE:
-				{
-					typedef FilterBase<tc::UCS4<tc::ByteOrder::BE>,tc::IsoLatin1> FLT;
-					const char* elem = "<?xml version=\"1.0\" encoding=\"UCS-4BE\" standalone=\"yes\"?>\n";
-					FLT::printToBuffer( (const char*)elem, std::strlen(elem), m_header);
-					break;
-				}
-				case TextwolfEncoding::UCS4LE:
-				{
-					typedef FilterBase<tc::UCS4<tc::ByteOrder::LE>,tc::IsoLatin1> FLT;
-					const char* elem = "<?xml version=\"1.0\" encoding=\"UCS-4LE\" standalone=\"yes\"?>\n";
-					FLT::printToBuffer( (const char*)elem, std::strlen(elem), m_header);
-					break;
-				}
-			}
-			m_headerPos = 0;
-		}
-		std::size_t nn = m_header.size() - m_headerPos;
-		if (nn > restsize()) nn = restsize();
-		memcpy( rest(), m_header.c_str()+m_headerPos, nn);
-		incPos( nn);
-		m_headerPos += nn;
-		m_headerPrinted = (m_headerPos == m_header.size());
-		setState( EndOfBuffer);
-		return false;
-	}
-
-private:
-	bool m_headerPrinted;
-	std::size_t m_headerPos;
-	std::string m_header;
-	CountedReference<TextwolfEncoding::Id> m_encoding;
+	std::string m_elembuf;				//< buffer for the currently printed element
+	std::size_t m_elemitr;				//< iterator to pass it to output
+	XMLFilterAttributes m_attributes;		//< common attributes of input and output filter
+	XMLPrinter m_printer;				//< xml printer object
 };
 
 }//end anonymous namespace
@@ -1093,14 +352,13 @@ class TextwolfXmlFilter :public Filter
 public:
 	TextwolfXmlFilter( const char* encoding=0)
 	{
-		CountedReference<TextwolfEncoding::Id> enc;
+		XMLFilterAttributes attr;
 		if (encoding)
 		{
-			TextwolfEncoding::Id ei = TextwolfEncoding::getId( encoding);
-			enc.reset( new TextwolfEncoding::Id( ei));
+			attr.setEncoding( encoding);
 		}
-		m_inputfilter.reset( new InputFilter( enc));
-		m_outputfilter.reset( new OutputFilter( enc));
+		m_inputfilter.reset( new InputFilterImpl( attr));
+		m_outputfilter.reset( new OutputFilterImpl( attr));
 	}
 };
 

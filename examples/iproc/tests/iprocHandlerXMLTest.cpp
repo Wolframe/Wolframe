@@ -70,6 +70,18 @@ enum
 static const TestDescription testDescriptions[] =
 {
 	{
+		"echo_xml_IsoLatin1",
+		"test_echo_xml.lua",
+		"test_IsoLatin1.xml", 32
+	},
+#ifdef WITH_LIBXML2
+	{
+		"echo_xml_utf8_with_libxml",
+		"test_echo_xml_libxml2.lua",
+		"test_UTF8.xml", 48
+	},
+#endif
+	{
 		"echo_xml_UCS4",
 		"test_echo_xml.lua",
 		"test_UCS4BE.xml", 128
@@ -84,21 +96,9 @@ static const TestDescription testDescriptions[] =
 		"test_echo_xml_utf8.lua",
 		"test_UTF16.xml", 64
 	},
-#ifdef WITH_LIBXML2
-	{
-		"echo_xml_utf8_with_libxml",
-		"test_echo_xml_libxml2.lua",
-		"test_UTF8.xml", 48
-	},
-#endif
 	{
 		"echo_xml_IsoLatin1_to_utf8",
 		"test_echo_xml_utf8.lua",
-		"test_IsoLatin1.xml", 32
-	},
-	{
-		"echo_xml_IsoLatin1",
-		"test_echo_xml.lua",
 		"test_IsoLatin1.xml", 32
 	},
 	{

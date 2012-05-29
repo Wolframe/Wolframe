@@ -38,7 +38,7 @@
 #include "connectionHandler.hpp"
 #include "cmdbind/lineCommandHandler.hpp"
 #include "handlerConfig.hpp"
-#include "protocol.hpp"
+#include "protocol/ioblocks.hpp"
 
 namespace _Wolframe {
 namespace tproc {

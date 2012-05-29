@@ -14,7 +14,7 @@ recode lat1..ibmpc >> $output <<!TEST
 HELLO
 RUN
 !TEST
-cat $MAIN/lua_script_$example.input.xml | ../cleanInput BOM EOLN >> $output
+cat $MAIN/lua_script_$example.input.xml | ../cleanInput BOM >> $output
 recode lat1..ibmpc >> $output <<!TEST
 
 .
@@ -36,12 +36,7 @@ proc {
 **output
 OK enter cmd
 !TEST
-if [ $example = 2 ]; then
-# LINE filter prints EOLN at output of non empty not EOLN-terminated last line
-	cat $MAIN/lua_script_$example.output.xml | ../cleanInput BOM >> $output
-else
-	cat $MAIN/lua_script_$example.output.xml | ../cleanInput BOM EOLN >> $output
-fi
+cat $MAIN/lua_script_$example.output.xml | ../cleanInput BOM >> $output
 recode lat1..ibmpc >> $output <<!TEST
 
 .

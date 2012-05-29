@@ -52,34 +52,34 @@ static bool parseAtom( ddl::AtomicType& val, lua_State* ls, Context& ctx)
 			case LUA_TNUMBER:
 				if (val.set( (double)lua_tonumber(ls,-1)))
 				{
-					ctx.setError( 0, "illegal value for number");
+					ctx.setError( "illegal value for number");
 					return false;
 				}
 			break;
 			case LUA_TBOOLEAN:
 				if (val.set( lua_toboolean(ls,-1)?1:0))
 				{
-					ctx.setError( 0, "illegal value for boolean");
+					ctx.setError( "illegal value for boolean");
 					return false;
 				}
 			break;
 			case LUA_TSTRING:
 				if (val.set( std::string( lua_tostring(ls,-1))))
 				{
-					ctx.setError( 0, "illegal value for string");
+					ctx.setError( "illegal value for string");
 					return false;
 				}
 			break;
-			case LUA_TTABLE: ctx.setError( 0, "arithmetic value expected instead of table"); rt = false; break;
-			case LUA_TFUNCTION: ctx.setError( 0, "arithmetic value expected instead of function"); rt = false; break;
-			case LUA_TUSERDATA: ctx.setError( 0, "arithmetic value expected instead of userdata"); rt = false; break;
-			case LUA_TTHREAD: ctx.setError( 0, "arithmetic value expected instead of thread"); rt = false; break;
-			case LUA_TLIGHTUSERDATA: ctx.setError( 0, "arithmetic value expected instead of lightuserdata"); rt = false; break;
+			case LUA_TTABLE: ctx.setError( "arithmetic value expected instead of table"); rt = false; break;
+			case LUA_TFUNCTION: ctx.setError( "arithmetic value expected instead of function"); rt = false; break;
+			case LUA_TUSERDATA: ctx.setError( "arithmetic value expected instead of userdata"); rt = false; break;
+			case LUA_TTHREAD: ctx.setError( "arithmetic value expected instead of thread"); rt = false; break;
+			case LUA_TLIGHTUSERDATA: ctx.setError( "arithmetic value expected instead of lightuserdata"); rt = false; break;
 		}
 	}
 	catch (const std::exception& e)
 	{
-		ctx.setError( 0, e.what());
+		ctx.setError( e.what());
 		rt = false;
 	}
 	return rt;
@@ -89,7 +89,7 @@ static bool parseStruct( ddl::StructType& st, lua_State* ls, Context& ctx)
 {
 	if (!lua_istable( ls, -1))
 	{
-		ctx.setError( 0, "table expected for structure");
+		ctx.setError( "table expected for structure");
 		return false;
 	}
 	lua_pushnil( ls);
@@ -99,21 +99,21 @@ static bool parseStruct( ddl::StructType& st, lua_State* ls, Context& ctx)
 		const char* key = lua_tostring( ls, -1);
 		if (!key)
 		{
-			ctx.setError( 0, "string expected as key for struct in table instead of ", lua_typename( ls, lua_type( ls, -1)));
+			ctx.setError( "string expected as key for struct in table instead of ", lua_typename( ls, lua_type( ls, -1)));
 			return false;
 		}
 		ddl::StructType::Map::iterator itr = st.find( key);
 
 		if (itr == st.end())
 		{
-			ctx.setError( 0, "element not defined ", key);
+			ctx.setError( "element not defined ", key);
 			return false;
 		}
 		lua_pop( ls, 1);
 
 		if (!parseObject( itr->second, ls, ctx))
 		{
-			ctx.setError( itr->first.c_str());
+			ctx.setTag( itr->first.c_str());
 			return false;
 		}
 		lua_pop( ls, 1);
@@ -134,7 +134,7 @@ static bool parseVector( ddl::StructType& st, lua_State* ls, Context& ctx)
 		st.push();
 		if (!parseObject( st.back(), ls, ctx))
 		{
-			ctx.setError( 0, "table expected for vector or one vector element");
+			ctx.setError( "table expected for vector or one vector element");
 			return false;
 		}
 	}
@@ -147,7 +147,7 @@ static bool parseVector( ddl::StructType& st, lua_State* ls, Context& ctx)
 			{
 				if (index++ == 0)
 				{
-					ctx.setError( 0, "parsed table is not a vector");
+					ctx.setError( "parsed table is not a vector");
 					return false;
 				}
 				else
@@ -157,7 +157,7 @@ static bool parseVector( ddl::StructType& st, lua_State* ls, Context& ctx)
 					st.push();
 					if (!parseObject( st.back(), ls, ctx))
 					{
-						ctx.setError( 0, "table expected for vector or one vector element");
+						ctx.setError( "table expected for vector or one vector element");
 						return false;
 					}
 					lua_pop( ls, 3);
@@ -202,7 +202,7 @@ static bool printAtom( const ddl::StructType& st, lua_State* ls, Context& ctx)
 			double val;
 			if (!atm.get( val))
 			{
-				ctx.setError( 0, "could not convert value to double");
+				ctx.setError( "could not convert value to double");
 				return false;
 			}
 			lua_pushnumber( ls, val);
@@ -213,7 +213,7 @@ static bool printAtom( const ddl::StructType& st, lua_State* ls, Context& ctx)
 			float val;
 			if (!atm.get( val))
 			{
-				ctx.setError( 0, "could not convert value to float");
+				ctx.setError( "could not convert value to float");
 				return false;
 			}
 			lua_pushnumber( ls, val);
@@ -223,7 +223,7 @@ static bool printAtom( const ddl::StructType& st, lua_State* ls, Context& ctx)
 		{
 			if (!atm.get( ctx.content()))
 			{
-				ctx.setError( 0, "could not convert value to bigint");
+				ctx.setError( "could not convert value to bigint");
 				return false;
 			}
 			lua_pushlstring( ls, ctx.content().c_str(), ctx.content().size());
@@ -234,7 +234,7 @@ static bool printAtom( const ddl::StructType& st, lua_State* ls, Context& ctx)
 			int val;
 			if (!atm.get( val))
 			{
-				ctx.setError( 0, "could not convert value to int");
+				ctx.setError( "could not convert value to int");
 				return false;
 			}
 			lua_pushnumber( ls, val);
@@ -245,7 +245,7 @@ static bool printAtom( const ddl::StructType& st, lua_State* ls, Context& ctx)
 			unsigned int val;
 			if (!atm.get( val))
 			{
-				ctx.setError( 0, "could not convert value to unsigned int");
+				ctx.setError( "could not convert value to unsigned int");
 				return false;
 			}
 			lua_pushnumber( ls, val);
@@ -256,7 +256,7 @@ static bool printAtom( const ddl::StructType& st, lua_State* ls, Context& ctx)
 			short val;
 			if (!atm.get( val))
 			{
-				ctx.setError( 0, "could not convert value to short");
+				ctx.setError( "could not convert value to short");
 				return false;
 			}
 			lua_pushnumber( ls, val);
@@ -267,7 +267,7 @@ static bool printAtom( const ddl::StructType& st, lua_State* ls, Context& ctx)
 			unsigned short val;
 			if (!atm.get( val))
 			{
-				ctx.setError( 0, "could not convert value to unsigned short");
+				ctx.setError( "could not convert value to unsigned short");
 				return false;
 			}
 			lua_pushnumber( ls, val);
@@ -278,7 +278,7 @@ static bool printAtom( const ddl::StructType& st, lua_State* ls, Context& ctx)
 			char val;
 			if (!atm.get( val))
 			{
-				ctx.setError( 0, "could not convert value to char");
+				ctx.setError( "could not convert value to char");
 				return false;
 			}
 			lua_pushlstring( ls, &val, 1);
@@ -289,7 +289,7 @@ static bool printAtom( const ddl::StructType& st, lua_State* ls, Context& ctx)
 			std::string val;
 			if (!atm.get( val))
 			{
-				ctx.setError( 0, "could not convert value to string");
+				ctx.setError( "could not convert value to string");
 				return false;
 			}
 			lua_pushlstring( ls, val.c_str(), val.size());
@@ -308,7 +308,7 @@ static bool printStruct( const ddl::StructType& st, lua_State* ls, Context& ctx)
 		lua_pushlstring( ls, itr->first.c_str(), itr->first.size());
 		if (!printObject( itr->second, ls, ctx))
 		{
-			ctx.setError( itr->first.c_str());
+			ctx.setTag( itr->first.c_str());
 			return false;
 		}
 		lua_settable( ls, -3);
@@ -328,7 +328,7 @@ static bool printVector( const ddl::StructType& st, lua_State* ls, Context& ctx)
 		lua_pushnumber( ls, (lua_Number)(++index));
 		if (!printObject( itr->second, ls, ctx))
 		{
-			ctx.setError( itr->first.c_str());
+			ctx.setTag( itr->first.c_str());
 			return false;
 		}
 		lua_settable( ls, -3);

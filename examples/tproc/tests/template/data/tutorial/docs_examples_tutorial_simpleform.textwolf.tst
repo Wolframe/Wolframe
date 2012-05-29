@@ -41,6 +41,7 @@ proc {
 OK enter cmd
 !TEST
 cat $MAIN/$example.input.xml | ../cleanInput BOM EOLN >> $output
+echo "" | recode UTF-8..$cset >> $output
 recode lat1..ibmpc >> $output <<!TEST
 
 .

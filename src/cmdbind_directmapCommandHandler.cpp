@@ -32,8 +32,6 @@ Project Wolframe.
 #include "cmdbind/directmapCommandHandler.hpp"
 #include "langbind/appObjects.hpp"
 #include "logger-v1.hpp"
-#include "protocol/outputfilter.hpp"
-#include "protocol/inputfilter.hpp"
 #include <stdexcept>
 #include <cstddef>
 #include <boost/lexical_cast.hpp>
