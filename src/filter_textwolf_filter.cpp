@@ -32,10 +32,10 @@ Project Wolframe.
 ///\file filter_textwolf_filter.cpp
 ///\brief Filter implementation reading/writing xml with the textwolf xml library
 #include "filter/textwolf_filter.hpp"
-#include "filter/textwolf/sourceiterator.hpp"
-#include "filter/textwolf/xmlparser.hpp"
-#include "filter/textwolf/xmlprinter.hpp"
-#include "filter/textwolf/cstringiterator.hpp"
+#include "textwolf/sourceiterator.hpp"
+#include "textwolf/xmlparser.hpp"
+#include "textwolf/xmlprinter.hpp"
+#include "textwolf/cstringiterator.hpp"
 #include <string>
 #include <cstddef>
 

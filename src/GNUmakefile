@@ -12,7 +12,7 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include \
-	-I$(TOPDIR)/include/filter \
+	-I$(TOPDIR) \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LIBS = \
