@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/struct/filtermapParse.hpp
-///\brief Defines the intrusive implementation of the parsing part of serialization/deserialization of filters
+///\file serialize/struct/filtermapParseValue.hpp
+///\brief Defines the intrucsive parsing of a typed filter element for serialization
 #ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PARSE_VALUE_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PARSE_VALUE_HPP_INCLUDED
 #include <boost/lexical_cast.hpp>
@@ -98,7 +98,6 @@ template <typename ValueType>
 typename boost::enable_if_c<boost::is_same<bool,ValueType>::value,bool>::type
 valueCast( ValueType& val, const TypedInputFilter::Element& element) const
 {
-	int boolnum = 2;
 	try
 	{
 		switch (element.type)
@@ -167,6 +166,10 @@ valueCast( ValueType& val, const TypedInputFilter::Element& element) const
 		}
 	}
 	catch (const std::bad_lexical_cast&)
+	{
+		return false;
+	}
+	catch (const std::bad_numeric_cast&)
 	{
 		return false;
 	}
