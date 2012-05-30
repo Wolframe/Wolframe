@@ -83,6 +83,39 @@ private:
 	char m_errorbuf[ ErrorBufSize];		//< error string
 };
 
+struct TypedFilterBase :public FilterBase
+{
+public:
+	struct Element
+	{
+		///\enum Type
+		///\brief Typed filter element type
+		enum Type
+		{
+			bool_,double_,int_,uint_,string_
+		};
+		///\enum String
+		///\brief POD data type for string as part of an union
+		struct String
+		{
+			std::size_t size;
+			const void* ptr;
+		};
+		///\enum Value
+		///\brief Different incarnations of values depending of the elements type
+		union Value
+		{
+			bool bool_;
+			double double_;
+			int int_;
+			unsigned int uint_;
+			String string_;
+		};
+		Type type;
+		Value value;
+	};
+};
+
 }}//namespace
 #endif
 

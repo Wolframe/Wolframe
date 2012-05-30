@@ -33,10 +33,10 @@ Project Wolframe.
 ///\brief Filter implementation a filter for debug input/output
 
 #include "filter/token_filter.hpp"
-#include "filter/textwolf/charset.hpp"
-#include "filter/textwolf/sourceiterator.hpp"
-#include "filter/textwolf/textscanner.hpp"
-#include "filter/textwolf/cstringiterator.hpp"
+#include "textwolf/charset.hpp"
+#include "textwolf/sourceiterator.hpp"
+#include "textwolf/textscanner.hpp"
+#include "textwolf/cstringiterator.hpp"
 #include <cstring>
 #include <cstddef>
 

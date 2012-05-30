@@ -12,7 +12,7 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include \
-	-I$(TOPDIR)/include/filter \
+	-I$(TOPDIR) \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LIBS = \
@@ -90,6 +90,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	cmdbind_ioFilterCommandHandler.o \
 	cmdbind_directmapCommandHandler.o \
 	filter_filterbase.o \
+	filter_serializefilter.o \
 	filter_textwolf_filter.o \
 	filter_char_filter.o \
 	filter_line_filter.o \

@@ -36,7 +36,6 @@ Project Wolframe.
 #define _Wolframe_FILTER_INPUTFILTER_INTERFACE_HPP_INCLUDED
 #include "countedReference.hpp"
 #include "filter/filterbase.hpp"
-#include <map>
 #include <string>
 
 namespace _Wolframe {
@@ -55,6 +54,7 @@ public:
 		EndOfMessage,	//< have to yield processing because end of message reached
 		Error		//< have to stop processing with an error
 	};
+
 	InputFilter()
 		:m_state(Open){}
 
@@ -81,7 +81,7 @@ public:
 		end = false;
 	}
 
-	///\brief Get next element call as methof call
+	///\brief Get next element
 	///\param [out] type element type parsed
 	///\param [out] element pointer to element returned
 	///\param [out] elementsize size of the element returned
@@ -100,75 +100,6 @@ public:
 
 private:
 	State m_state;				//< state
-};
-
-
-///\class BufferingInputFilter
-///\brief Input filter that buffers the input before redirecting to InputFilter::getNext(ElementType&,const void*&,std::size_t&)
-class BufferingInputFilter :public InputFilter
-{
-public:
-	BufferingInputFilter( InputFilter* ref)
-		:m_ref(ref->copy()),m_end(false){}
-	BufferingInputFilter( const BufferingInputFilter& o)
-		:m_ref(o.m_ref->copy()),m_end(o.m_end){}
-	virtual ~BufferingInputFilter()
-	{
-		delete m_ref;
-	}
-
-	///\brief Implements InputFilter::copy()const
-	virtual InputFilter* copy() const
-	{
-		return new BufferingInputFilter( m_ref);
-	}
-
-	///\brief Implements InputFilter::putInput(const void*,std::size_t,bool)
-	virtual void putInput( const void* ptr, std::size_t size, bool end)
-	{
-		m_buf.append( (const char*)ptr, size);
-		if (end)
-		{
-			m_ref->putInput( m_buf.c_str(), m_buf.size(), m_end=true);
-		}
-	}
-
-	///\brief Implements InputFilter::getNext(ElementType&,const void*&,std::size_t&)
-	virtual bool getNext( ElementType& type, const void*& element, std::size_t& elementsize)
-	{
-		if (m_end)
-		{
-			bool rt = m_ref->getNext( type, element, elementsize);
-			setState( m_ref->state(), m_ref->getError());
-			return rt;
-		}
-		else
-		{
-			setState( EndOfMessage);
-			return false;
-		}
-	}
-
-	///\brief Implements FilterBase::getValue(const char*,std::string&)
-	virtual bool getValue( const char* name, std::string& val) const
-	{
-		return m_ref->getValue( name, val);
-	}
-
-	///\brief Implements FilterBase::setValue(const char*,const std::string&)
-	virtual bool setValue( const char* name, const std::string& val)
-	{
-		return m_ref->setValue( name, val);
-	}
-
-	InputFilter* reference() const
-	{
-		return m_ref;
-	}
-private:
-	InputFilter* m_ref;
-	std::string m_buf;
-	bool m_end;
 };
 
 ///\typedef InputFilterR

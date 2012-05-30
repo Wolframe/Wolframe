@@ -41,9 +41,6 @@ Project Wolframe.
 #include <string>
 #include <cstddef>
 #include <cstring>
-#include <boost/algorithm/string/predicate.hpp>
-#include <boost/any.hpp>
-#include <boost/cast.hpp>
 #include <boost/lexical_cast.hpp>
 
 namespace _Wolframe {
