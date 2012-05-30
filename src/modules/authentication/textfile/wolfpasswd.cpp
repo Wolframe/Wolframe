@@ -37,7 +37,10 @@
 #include <boost/program_options.hpp>
 #include <string>
 
+#include "passwdFile.hpp"
+
 namespace PO = boost::program_options;
+namespace WA = _Wolframe::AAAA;
 
 int main( int argc, char* argv[] )
 {
@@ -142,12 +145,14 @@ int main( int argc, char* argv[] )
 		// All parameters are OK
 		if ( batchPwd )	{
 			std::cout << "Display only user '" << args[0] << "' with password '"
-				  << args[1]<< "'";
+				  << args[1] << "'";
 			// do the job
 		}
 		else	{
-			std::cout << "Display only user '" << args[0] << "'";
-			// read password
+			std::string passwd;
+			WA::getPassword( passwd, "Password prompt", '*' );
+			std::cout << "Display only user '" << args[0] << "' with password '"
+				  << passwd << "'";
 			// do the job
 		}
 	}
