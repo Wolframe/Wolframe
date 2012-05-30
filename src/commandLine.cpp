@@ -102,7 +102,7 @@ bool CmdLineConfig::parse( int argc, char* argv[] )
 			if ( command == DEFAULT )
 				command = PRINT_VERSION;
 			else	{
-				errMsg_ = "-v (--version) can not be specified together with -h|-p|-t|-T";
+				errMsg_ = "-v (--version) cannot be specified together with -h|-p|-t|-T";
 				return false;
 			}
 		}
@@ -111,7 +111,7 @@ bool CmdLineConfig::parse( int argc, char* argv[] )
 			if ( command == DEFAULT )
 				command = PRINT_HELP;
 			else	{
-				errMsg_ = "-h (--help) can not be specified together with -v|-p|-t|-T";
+				errMsg_ = "-h (--help) cannot be specified together with -v|-p|-t|-T";
 				return false;
 			}
 		}
@@ -119,7 +119,7 @@ bool CmdLineConfig::parse( int argc, char* argv[] )
 			if ( command == DEFAULT )
 				command = PRINT_CONFIG;
 			else	{
-				errMsg_ = "-p (--print-config) can not be specified together with -v|-h|-t|-T";
+				errMsg_ = "-p (--print-config) cannot be specified together with -v|-h|-t|-T";
 				return false;
 			}
 		}
@@ -127,7 +127,7 @@ bool CmdLineConfig::parse( int argc, char* argv[] )
 			if ( command == DEFAULT )
 				command = CHECK_CONFIG;
 			else	{
-				errMsg_ = "-t (--check-config) can not be specified together with -v|-h|-p|-T";
+				errMsg_ = "-t (--check-config) cannot be specified together with -v|-h|-p|-T";
 				return false;
 			}
 		}
@@ -135,7 +135,7 @@ bool CmdLineConfig::parse( int argc, char* argv[] )
 			if ( command == DEFAULT )
 				command = TEST_CONFIG;
 			else	{
-				errMsg_ = "-T (--test-config) can not be specified together with -v|-h|-p|-t";
+				errMsg_ = "-T (--test-config) cannot be specified together with -v|-h|-p|-t";
 				return false;
 			}
 		}
@@ -145,7 +145,7 @@ bool CmdLineConfig::parse( int argc, char* argv[] )
 			if ( command == DEFAULT )
 				command = INSTALL_SERVICE;
 			else	{
-				errMsg_ = "--install can not be specified together with -v|-h|-p|-t|-T";
+				errMsg_ = "--install cannot be specified together with -v|-h|-p|-t|-T";
 				return false;
 			}
 		}
@@ -154,7 +154,7 @@ bool CmdLineConfig::parse( int argc, char* argv[] )
 			if ( command == DEFAULT )
 				command = REMOVE_SERVICE;
 			else	{
-				errMsg_ = "--remove can not be specified together with -v|-h|-p|-t|-T";
+				errMsg_ = "--remove cannot be specified together with -v|-h|-p|-t|-T";
 				return false;
 			}
 		}
@@ -163,7 +163,7 @@ bool CmdLineConfig::parse( int argc, char* argv[] )
 			if ( command == DEFAULT )
 				command = RUN_SERVICE;
 			else	{
-				errMsg_ = "--service can not be specified together with -v|-h|-p|-t|-T";
+				errMsg_ = "--service cannot be specified together with -v|-h|-p|-t|-T";
 				return false;
 			}
 		}
@@ -178,7 +178,7 @@ bool CmdLineConfig::parse( int argc, char* argv[] )
 				case CHECK_CONFIG:
 				case TEST_CONFIG:
 				case PRINT_CONFIG:
-					errMsg_ = "-f (--foreground) make no sense together with -v|-h|-p|-t|-T";
+					errMsg_ = "-f (--foreground) makes no sense together with -v|-h|-p|-t|-T";
 					break;
 				case DEFAULT:
 					break;
