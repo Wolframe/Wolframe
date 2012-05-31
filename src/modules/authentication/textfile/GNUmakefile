@@ -34,7 +34,7 @@ PASSWD_LIBS = -lboost_program_options -lboost_system
 CPP_BINS = \
 	wolfpasswd$(EXE)
 
-wolfpasswd$(EXE): wolfpasswd.o
+wolfpasswd$(EXE): wolfpasswd.o $(PASSWD_OBJS)
 	$(CXX_LINK) -o $@ $(ALL_LDFLAGS) $(PASSWD_OBJS) $< $(PASSWD_LIBS)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
