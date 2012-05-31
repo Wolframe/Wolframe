@@ -43,9 +43,6 @@
 namespace _Wolframe {
 namespace AAAA {
 
-void getPassword( std::string& password, const std::string& prompt = "Enter password> ",
-		  const char displayChar = '*' );
-
 class PasswordFile
 {
 public:

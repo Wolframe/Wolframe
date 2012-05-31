@@ -35,91 +35,11 @@
 //
 
 #include <string>
-#include <iostream>
-
-#include <unistd.h>
 
 #include "passwdFile.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
-
-void getPassword( std::string& password, const std::string& prompt, const char /*displayChar*/ )
-{
-	char* pass = getpass( prompt.c_str() );
-	password = pass;
-//	std::cout << prompt;
-
-//	char key;
-
-//	do	{
-//		std::cin >> key;
-
-//		switch (key)	{
-//			case '\b': //backspace pressed
-//				if(password .length() > 0)	{
-//					password .erase(password .length() - 1, 1);
-//					//Erase the last Character in password signs
-//					std::cout << '\b' << " " << '\b';
-//				}
-//				break;
-
-//			default:
-//				if(key > 31 && key < 127)	{   //Only no control characters are valid
-//					password .push_back(key);
-//					std::cout << displayChar;
-//				}
-//		}
-
-//	} while(key != '\r'); //Quit if Enter is Pressed
-}
-
-//#include <iostream>
-//#include <stdexcept>
-//#include <string>
-//#include <windows.h>
-//using namespace std;
-
-//string getpassword( const string& prompt = "Enter password> " )
-//{
-//	string result;
-
-//	// Set the console mode to no-echo, not-line-buffered input
-//	DWORD mode, count;
-//	HANDLE ih = GetStdHandle( STD_INPUT_HANDLE  );
-//	HANDLE oh = GetStdHandle( STD_OUTPUT_HANDLE );
-//	if (!GetConsoleMode( ih, &mode ))
-//		throw runtime_error(
-//				"getpassword: You must be connected to a console to use this program.\n"
-//				);
-//	SetConsoleMode( ih, mode & ~(ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT) );
-
-//	// Get the password string
-//	WriteConsoleA( oh, prompt.c_str(), prompt.length(), &count, NULL );
-//	char c;
-//	while (ReadConsoleA( ih, &c, 1, &count, NULL) && (c != '\r') && (c != '\n'))
-//	{
-//		if (c == '\b')
-//		{
-//			if (result.length())
-//			{
-//				WriteConsoleA( oh, "\b \b", 3, &count, NULL );
-//				result.erase( result.end() -1 );
-//			}
-//		}
-//		else
-//		{
-//			WriteConsoleA( oh, "*", 1, &count, NULL );
-//			result.push_back( c );
-//		}
-//	}
-
-//	// Restore the console mode
-//	SetConsoleMode( ih, mode );
-
-//	return result;
-//}
-
 
 PasswordFile::PasswordFile()
 {

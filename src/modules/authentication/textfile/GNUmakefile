@@ -21,7 +21,7 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = mod_auth_textfile.so
 
 PASSWD_OBJS = \
-	passwdFile.o
+	src/getPassword.o
 
 CPP_OBJS = \
 	TextFileAuthConfig.o \
@@ -39,7 +39,7 @@ wolfpasswd$(EXE): wolfpasswd.o $(PASSWD_OBJS)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
-local_all: $(PASSWD_OBJS)
+local_all:
 
 local_clean:
 

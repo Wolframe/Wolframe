@@ -82,6 +82,11 @@ clients/qt/HistoryLineEdit.hpp
 clients/qt/MainWindow.cpp
 clients/qt/MainWindow.hpp
 clients/qt/Makefile.W32
+clients/qt/moc_AbstractFormLoader.cpp
+clients/qt/moc_DebugTerminal.cpp
+clients/qt/moc_HistoryLineEdit.cpp
+clients/qt/moc_MainWindow.cpp
+clients/qt/moc_WolframeClient.cpp
 clients/qt/qtclient.cpp
 clients/qt/README
 clients/qt/TODOS
@@ -323,6 +328,7 @@ include/filter/token_filter.hpp
 include/filter/typedfilter.hpp
 include/filter/xmllite_filter.hpp
 include/FSMinterface.hpp
+include/getPassword.hpp
 include/GNUmakefile
 include/langbind/appConfig.hpp
 include/langbind/appConfig_struct.hpp
@@ -1082,7 +1088,6 @@ src/filter_textwolf_filter.cpp
 src/filter_token_filter.cpp
 src/filter_xmllite_filter.cpp
 src/getPassword.cpp
-src/getPassword.hpp
 src/GNUmakefile
 src/handlerConfig.hpp
 src/langbind_appConfig.cpp

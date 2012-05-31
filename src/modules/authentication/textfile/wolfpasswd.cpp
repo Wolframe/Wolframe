@@ -37,6 +37,7 @@
 #include <boost/program_options.hpp>
 #include <string>
 
+#include "getPassword.hpp"
 #include "passwdFile.hpp"
 
 namespace PO = boost::program_options;
@@ -149,8 +150,7 @@ int main( int argc, char* argv[] )
 			// do the job
 		}
 		else	{
-			std::string passwd;
-			WA::getPassword( passwd, "Password prompt", '*' );
+			std::string passwd = WA::getPassword();
 			std::cout << "Display only user '" << args[0] << "' with password '"
 				  << passwd << "'";
 			// do the job
