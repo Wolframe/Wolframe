@@ -43,7 +43,7 @@ INCLUDE_LIBS = \
 
 INCLUDE_CXXFLAGS = \
 	$(INCLUDE_CXXFLAGS) /DWITH_LUA
- 
+
 INCLUDE_DIRS = \
 	$(INCLUDE_DIRS) /I$(TOPDIR)\lua\src
 
@@ -64,7 +64,7 @@ INCLUDE_DIRS = \
 
 INCLUDE_LIBS = \
 	$(INCLUDE_LIBS) "$(LIBXML2_DIR)\lib\libxml2.lib"
-	
+
 !ENDIF
 
 # MS XML
@@ -78,7 +78,7 @@ INCLUDE_DIRS = \
 
 INCLUDE_LIBS = \
 	$(INCLUDE_LIBS)
-	
+
 !ENDIF
 
 # XmlLite
@@ -92,7 +92,7 @@ INCLUDE_DIRS = \
 
 INCLUDE_LIBS = \
 	$(INCLUDE_LIBS)
-	
+
 !ENDIF
 
 LOCAL_STATIC_LIB = \
@@ -132,7 +132,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	ddl_compilerInterface.obj \
 	ddl_compiler_simpleFormCompiler.obj \
 	acceptor.obj \
-	getPassword.obj \
 	connection.obj \
 	serverConfig.obj \
 	server.obj \

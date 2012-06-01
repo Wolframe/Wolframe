@@ -21,7 +21,6 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = mod_auth_textfile.so
 
 PASSWD_OBJS = \
-	src/getPassword.o
 
 CPP_OBJS = \
 	TextFileAuthConfig.o \
@@ -29,7 +28,10 @@ CPP_OBJS = \
 	TextFileAuthModule.o \
 	$(PASSWD_OBJS)
 
-PASSWD_LIBS = -lboost_program_options -lboost_system
+PASSWD_LIBS = \
+	$(TOPDIR)/src/libwolframe/libwolframe.a \
+	-lboost_program_options \
+	-lboost_system
 
 CPP_BINS = \
 	wolfpasswd$(EXE)

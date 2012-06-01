@@ -48,6 +48,7 @@ PROVIDER_OBJS = \
 CPP_OBJS = \
 	$(LOGGER_OBJS) \
 	$(PROVIDER_OBJS) \
+	getPassword.obj \
 	user.obj \
 	moduleDirectory.obj \
 	resolvePath.obj \
