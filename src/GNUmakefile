@@ -105,7 +105,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	ddl_compiler_simpleFormCompiler.o \
 	types_bignum.o \
 	acceptor.o \
-	getPassword.o \
 	serverEndpoint.o \
 	connection.o \
 	serverConfig.o \

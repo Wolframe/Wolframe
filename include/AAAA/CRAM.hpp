@@ -45,6 +45,7 @@ namespace AAAA {
 static const int CRAM_BLOCK_SIZE = 1024 / 8;
 static const int CRAM_DIGEST_SIZE = 512 / 8;
 static const int PASSWORD_DIGEST_SIZE = 224 / 8;
+static const int PASSWORD_SEED_SIZE = 128 / 8;
 static const int CRAM_CHALLENGE_SIZE = CRAM_BLOCK_SIZE;
 static const int CRAM_RESPONSE_SIZE = CRAM_DIGEST_SIZE;
 
@@ -53,8 +54,11 @@ class PasswordHash
 public:
 	PasswordHash( const std::string& password );
 	std::string toString();
+	std::string toBase64();
+	std::string salt();
 private:
 	unsigned char	m_hash[ PASSWORD_DIGEST_SIZE ];
+	unsigned char	m_salt[ PASSWORD_SEED_SIZE ];
 };
 
 

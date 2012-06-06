@@ -34,53 +34,35 @@
 //
 //
 
-#include <stdexcept>
-#include <boost/algorithm/string.hpp>
-#include "logger-v1.hpp"
-#include "DBauth.hpp"
+#ifndef _PASSWDFILE_HPP_INCLUDED
+#define _PASSWDFILE_HPP_INCLUDED
+
+#include <string>
+#include <cstdio>
 
 namespace _Wolframe {
 namespace AAAA {
 
-DBauthenticator::DBauthenticator( const std::string& Identifier, const std::string& dbLabel )
-	: AuthenticationUnit( Identifier ), m_dbLabel( dbLabel )
+class PasswordFile
 {
-	m_db = NULL;
-	if ( m_dbLabel.empty() )
-		throw std::logic_error( "Empty database reference in DBauthContainer" );
+public:
+	PasswordFile();
+	PasswordFile( const std::string& filename );
 
-	MOD_LOG_DEBUG << "Database authenticator '" << identifier()
-		      << "' created with database reference '" << m_dbLabel << "'";
-}
+	bool open();
+	bool open( const std::string& filename, bool create = false );
+	bool create( const std::string& filename );
 
-DBauthenticator::~DBauthenticator()
-{
-}
+	bool addUser( const std::string& user, const std::string& password,
+		      const std::string& userInfo, const std::string& comment );
+	bool modifyUser(const std::string& user, const std::string& password,
+			const std::string& userInfo, const std::string& comment );
+	bool addOrModifyUser(const std::string& user, const std::string& password,
+			     const std::string& userInfo, const std::string& comment );
+private:
+	const std::string	m_filename;
+};
 
+}} // namepspace _Wolframe::AAAA
 
-bool DBauthenticator::resolveDB( const db::DatabaseProvider& db )
-{
-	if ( m_db == NULL && ! m_dbLabel.empty() )	{
-		m_db = db.database( m_dbLabel );
-		if ( m_db )	{
-			MOD_LOG_TRACE << "Database authenticator: database reference '" << m_dbLabel << "' resolved";
-			return true;
-		}
-		else	{
-			MOD_LOG_ERROR << "Database authenticator: database labeled '" << m_dbLabel << "' not found !";
-			return false;
-		}
-	}
-	return true;
-}
-
-
-DBauthContainer::DBauthContainer( const DBAuthConfig& conf )
-{
-	m_auth = new DBauthenticator( conf.m_identifier, conf.m_dbLabel );
-	MOD_LOG_DEBUG << "Database authenticator container created for '"
-		      << conf.m_identifier << "'";
-}
-
-}} // namespace _Wolframe::AAAA
-
+#endif // _PASSWDFILE_HPP_INCLUDED

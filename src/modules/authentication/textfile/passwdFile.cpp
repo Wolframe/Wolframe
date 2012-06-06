@@ -34,53 +34,52 @@
 //
 //
 
-#include <stdexcept>
-#include <boost/algorithm/string.hpp>
-#include "logger-v1.hpp"
-#include "DBauth.hpp"
+#include <string>
+
+#include "passwdFile.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
 
-DBauthenticator::DBauthenticator( const std::string& Identifier, const std::string& dbLabel )
-	: AuthenticationUnit( Identifier ), m_dbLabel( dbLabel )
-{
-	m_db = NULL;
-	if ( m_dbLabel.empty() )
-		throw std::logic_error( "Empty database reference in DBauthContainer" );
-
-	MOD_LOG_DEBUG << "Database authenticator '" << identifier()
-		      << "' created with database reference '" << m_dbLabel << "'";
-}
-
-DBauthenticator::~DBauthenticator()
+PasswordFile::PasswordFile()
 {
 }
 
-
-bool DBauthenticator::resolveDB( const db::DatabaseProvider& db )
+PasswordFile::PasswordFile( const std::string& /*filename*/ )
 {
-	if ( m_db == NULL && ! m_dbLabel.empty() )	{
-		m_db = db.database( m_dbLabel );
-		if ( m_db )	{
-			MOD_LOG_TRACE << "Database authenticator: database reference '" << m_dbLabel << "' resolved";
-			return true;
-		}
-		else	{
-			MOD_LOG_ERROR << "Database authenticator: database labeled '" << m_dbLabel << "' not found !";
-			return false;
-		}
-	}
+}
+
+bool PasswordFile::open()
+{
 	return true;
 }
 
-
-DBauthContainer::DBauthContainer( const DBAuthConfig& conf )
+bool PasswordFile::open( const std::string& /*filename*/, bool /*create*/ )
 {
-	m_auth = new DBauthenticator( conf.m_identifier, conf.m_dbLabel );
-	MOD_LOG_DEBUG << "Database authenticator container created for '"
-		      << conf.m_identifier << "'";
+	return true;
 }
 
-}} // namespace _Wolframe::AAAA
+bool PasswordFile::create( const std::string& /*filename*/ )
+{
+	return true;
+}
 
+bool PasswordFile::addUser( const std::string& /*user*/, const std::string& /*password*/,
+			    const std::string& /*userInfo*/, const std::string& /*comment*/ )
+{
+	return true;
+}
+
+bool PasswordFile::modifyUser(const std::string& /*user*/, const std::string& /*password*/,
+			      const std::string& /*userInfo*/, const std::string& /*comment*/ )
+{
+	return true;
+}
+
+bool PasswordFile::addOrModifyUser(const std::string& /*user*/, const std::string& /*password*/,
+				   const std::string& /*userInfo*/, const std::string& /*comment*/ )
+{
+	return true;
+}
+
+}} // namepspace _Wolframe::AAAA

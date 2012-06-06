@@ -93,5 +93,4 @@ namespace AAAA {
 
 #endif // defined(_WIN32)
 
-
 }} // namespace _Wolframe::AAAA
