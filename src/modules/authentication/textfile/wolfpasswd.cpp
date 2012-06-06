@@ -144,17 +144,14 @@ int main( int argc, char* argv[] )
 		}
 
 		// All parameters are OK
-		if ( batchPwd )	{
-			std::cout << "Display only user '" << args[0] << "' with password '"
-				  << args[1] << "'";
-			// do the job
-		}
-		else	{
-			std::string passwd = WA::getPassword();
-			std::cout << "Display only user '" << args[0] << "' with password '"
-				  << passwd << "'";
-			// do the job
-		}
+		std::string passwd;
+		if ( ! batchPwd )
+			passwd = WA::getPassword();
+		else
+			passwd = args[1];
+		std::cout << "Display only user '" << args[0] << "' with password '"
+			  << passwd << "'";
+		// do the job
 	}
 	// delete user
 	else if ( delUser )	{
@@ -212,14 +209,14 @@ int main( int argc, char* argv[] )
 		// Al parameters are OK
 		if ( createFile )
 			std::cout << "Create password file '" << args[0] << "'\n";
-		if ( batchPwd )	{
-			std::cout << "Change / add user '" << args[1] << "', password file '"
-				  << args[0] << "', password '" << args[2] << "'";
-		}
-		else	{
-			std::cout << "Change / add user '" << args[1] << "', password file '"
-				  << args[0] << "'";
-		}
+		std::string passwd;
+		if ( ! batchPwd )
+			passwd = WA::getPassword();
+		else
+			passwd = args[2];
+
+		std::cout << "Change / add user '" << args[1] << "', password file '"
+			  << args[0] << "', password '" << passwd << "'";
 		// do the job
 	}
 	std::cout << "\nDone.\n\n";
