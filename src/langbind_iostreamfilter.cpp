@@ -34,7 +34,6 @@
 ///\brief Implementation for a pipe (istream|ostream) through wolframe mappings like filters, forms, functions
 
 #include "logger-v1.hpp"
-#include "langbind/appObjects.hpp"
 #include "langbind/appGlobalContext.hpp"
 #include "langbind/iostreamfilter.hpp"
 #include "serialize/ddl/filtermapDDLParse.hpp"
@@ -42,6 +41,7 @@
 #include "filter/token_filter.hpp"
 #if WITH_LUA
 #include "cmdbind/luaCommandHandler.hpp"
+#include "langbind/luaObjects.hpp"
 #endif
 #include <boost/algorithm/string.hpp>
 #include <string>
@@ -193,9 +193,14 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 	}
 #if WITH_LUA
 	{
-		LuaScriptInstanceR sc = createLuaScriptInstance( proc, flt.inputfilter(), flt.outputfilter());
-		if (sc.get())
+		LuaScriptInstanceR sc;
+		if (gc->getLuaScriptInstance( proc, sc))
 		{
+			if (!gc->initLuaScriptInstance( sc.get(), flt.inputfilter(), flt.outputfilter()))
+			{
+				LOG_ERROR << "error initializing lua script";
+				return false;
+			}
 			lua_getglobal( sc->thread(), proc.c_str());
 			int rt = lua_resume( sc->thread(), NULL, 0);
 			while (rt == LUA_YIELD)

@@ -41,17 +41,90 @@ Project Wolframe.
 extern "C" {
 	#include "lua.h"
 }
+#else
+#error Lua support not enabled
 #endif
 
 namespace _Wolframe {
 namespace langbind {
 
-///\brief Create the context for executing a Lua for the Lua command handler. Used for executing a script outside of the command handler in the same way
-///\param[in] name of the command to execute, referencing the script
-///\param[in] input_ input definition for the input to process
-///\param[in] output_ output definition for the output to print
-///\return instance of  Lua script with all basic system objects defined
-LuaScriptInstanceR createLuaScriptInstance( const std::string& name, const Input& input_, const Output& output_);
+class LuaScript
+{
+public:
+	struct Module
+	{
+		std::string m_name;
+		lua_CFunction m_initializer;
+
+		Module( const Module& o)				:m_name(o.m_name),m_initializer(o.m_initializer){}
+		Module( const std::string& n, const lua_CFunction f)	:m_name(n),m_initializer(f){}
+	};
+
+public:
+	LuaScript( const std::string& path_);
+	LuaScript( const LuaScript& o)
+		:m_modules(o.m_modules),m_path(o.m_path),m_content(o.m_content){}
+	~LuaScript(){}
+
+	void addModule( const std::string& n, lua_CFunction f)		{m_modules.push_back( Module( n, f));}
+
+	const std::vector<Module>& modules() const			{return m_modules;}
+	const std::string& path() const					{return m_path;}
+	const std::string& content() const				{return m_content;}
+
+private:
+	std::vector<Module> m_modules;
+	std::string m_path;
+	std::string m_content;
+};
+
+class LuaScriptInstance
+{
+public:
+	explicit LuaScriptInstance( const LuaScript* script);
+	~LuaScriptInstance();
+
+	lua_State* ls()				{return m_ls;}
+	lua_State* thread()			{return m_thread;}
+private:
+	lua_State* m_ls;
+	lua_State* m_thread;
+	int m_threadref;
+	const LuaScript* m_script;
+
+private:
+	LuaScriptInstance( const LuaScriptInstance&){}
+};
+
+typedef CountedReference<LuaScriptInstance> LuaScriptInstanceR;
+
+
+///\class LuaFunctionMap
+///\brief Map of available Lua functions
+class LuaFunctionMap
+{
+public:
+	LuaFunctionMap(){}
+	virtual ~LuaFunctionMap();
+
+	void defineLuaFunction( const std::string& procname, const LuaScript& script);
+	///\brief Get an empty the context for a Lua script
+	bool getLuaScriptInstance( const std::string& procname, LuaScriptInstanceR& rt) const;
+
+	///\brief Create the context for executing a Lua script with all objects initialized
+	///\param[in] lsi reference to lua script instance to initialize
+	///\param[in] input_ input definition for the input to process
+	///\param[in] output_ output definition for the output to print
+	///\return true on success, false else
+	bool initLuaScriptInstance( LuaScriptInstance* lsi, const Input& input_, const Output& output_);
+private:
+	LuaFunctionMap( const LuaFunctionMap&){}
+
+private:
+	std::vector<LuaScript*> m_ar;
+	std::map<std::string,std::size_t> m_pathmap;
+	std::map<std::string,std::size_t> m_procmap;
+};
 
 }}//namespace
 #endif

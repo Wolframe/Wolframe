@@ -44,11 +44,6 @@ Project Wolframe.
 #include <string>
 #include <algorithm>
 #include <boost/shared_ptr.hpp>
-#if WITH_LUA
-extern "C" {
-	#include "lua.h"
-}
-#endif
 
 namespace _Wolframe {
 namespace langbind {
@@ -224,12 +219,24 @@ public:
 
 	///\brief Default constructor
 	PluginFunction()
-		:m_state(-1),m_lastres(Error),m_call(0),m_api_param(0),m_api_result(0){}
+		:m_state(-1)
+		,m_lastres(Error)
+		,m_call(0)
+		,m_api_param(0)
+		,m_api_result(0){}
 
 	///\brief Copy constructor
 	///\param[in] o copied item
 	PluginFunction( const PluginFunction& o)
-		:m_state(o.m_state),m_lastres(o.m_lastres),m_data(o.m_data),m_call(o.m_call),m_api_param(o.m_api_param),m_api_result(o.m_api_result),m_parsestk(o.m_parsestk),m_printstk(o.m_printstk),m_ctx(o.m_ctx)
+		:m_state(o.m_state)
+		,m_lastres(o.m_lastres)
+		,m_data(o.m_data)
+		,m_call(o.m_call)
+		,m_api_param(o.m_api_param)
+		,m_api_result(o.m_api_result)
+		,m_parsestk(o.m_parsestk)
+		,m_printstk(o.m_printstk)
+		,m_ctx(o.m_ctx)
 	{
 		if (m_state > 0) throw std::runtime_error( "illegal copy of plugin function not in initial state");
 	}
@@ -380,79 +387,6 @@ private:
 	std::map<std::string,ddl::CompilerInterfaceR> m_map;
 };
 
-
-#if WITH_LUA
-class LuaScript
-{
-public:
-	struct Module
-	{
-		std::string m_name;
-		lua_CFunction m_initializer;
-
-		Module( const Module& o)				:m_name(o.m_name),m_initializer(o.m_initializer){}
-		Module( const std::string& n, const lua_CFunction f)	:m_name(n),m_initializer(f){}
-	};
-
-public:
-	LuaScript( const std::string& path_);
-	LuaScript( const LuaScript& o)
-		:m_modules(o.m_modules),m_path(o.m_path),m_content(o.m_content){}
-	~LuaScript(){}
-
-	void addModule( const std::string& n, lua_CFunction f)		{m_modules.push_back( Module( n, f));}
-
-	const std::vector<Module>& modules() const			{return m_modules;}
-	const std::string& path() const					{return m_path;}
-	const std::string& content() const				{return m_content;}
-
-private:
-	std::vector<Module> m_modules;
-	std::string m_path;
-	std::string m_content;
-};
-
-class LuaScriptInstance
-{
-public:
-	explicit LuaScriptInstance( const LuaScript* script);
-	~LuaScriptInstance();
-
-	lua_State* ls()				{return m_ls;}
-	lua_State* thread()			{return m_thread;}
-private:
-	lua_State* m_ls;
-	lua_State* m_thread;
-	int m_threadref;
-	const LuaScript* m_script;
-
-private:
-	LuaScriptInstance( const LuaScriptInstance&){}
-};
-
-typedef CountedReference<LuaScriptInstance> LuaScriptInstanceR;
-
-
-///\class LuaFunctionMap
-///\brief Map of available Lua functions
-class LuaFunctionMap
-{
-public:
-	LuaFunctionMap(){}
-	~LuaFunctionMap();
-
-	void defineLuaFunction( const std::string& procname, const LuaScript& script);
-	bool getLuaScriptInstance( const std::string& procname, LuaScriptInstanceR& rt) const;
-private:
-	LuaFunctionMap( const LuaFunctionMap&){}
-
-private:
-	std::vector<LuaScript*> m_ar;
-	std::map<std::string,std::size_t> m_pathmap;
-	std::map<std::string,std::size_t> m_procmap;
-};
-
-#endif
 }} //namespace
 #endif
 

@@ -35,6 +35,9 @@ Project Wolframe.
 #ifndef _Wolframe_langbind_APP_GLOBAL_CONTEXT_HPP_INCLUDED
 #define _Wolframe_langbind_APP_GLOBAL_CONTEXT_HPP_INCLUDED
 #include "langbind/appObjects.hpp"
+#if WITH_LUA
+#include "langbind/luaObjects.hpp"
+#endif
 #include "langbind/appConfig.hpp"
 
 namespace _Wolframe {
@@ -48,7 +51,9 @@ class GlobalContext
 	,public TransactionFunctionMap
 	,public DDLCompilerMap
 	,public PluginFunctionMap
+#if WITH_LUA
 	,public LuaFunctionMap
+#endif
 {
 public:
 	GlobalContext(){}

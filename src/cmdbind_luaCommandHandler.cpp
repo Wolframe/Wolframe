@@ -33,6 +33,7 @@ Project Wolframe.
 #include "langbind/luaDebug.hpp"
 #include "langbind/appObjects.hpp"
 #include "langbind/luaObjects.hpp"
+#include "langbind/appGlobalContext.hpp"
 #include "logger-v1.hpp"
 #include <stdexcept>
 #include <cstddef>
@@ -58,10 +59,17 @@ LuaCommandHandler::CallResult LuaCommandHandler::call( const char*& errorCode)
 	{
 		try
 		{
-			m_interp = createLuaScriptInstance( m_name, m_inputfilter, m_outputfilter);
-			if (!m_interp.get())
+			GlobalContext* gc = getGlobalContext();
+			LuaScriptInstanceR sc;
+			if (!gc->getLuaScriptInstance( m_name, m_interp))
 			{
-				LOG_ERROR << "Unknown lua script '" << m_name << "'";
+				LOG_ERROR << "unknown lua script '" << m_name << "'";
+				return Error;
+			}
+			if (!gc->initLuaScriptInstance( m_interp.get(), m_inputfilter, m_outputfilter))
+			{
+				LOG_ERROR << "error initializing lua script '" << m_name << "'";
+				return Error;
 			}
 		}
 		catch (const std::exception& e)
