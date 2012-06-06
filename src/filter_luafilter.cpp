@@ -240,7 +240,7 @@ bool LuaOutputFilter::pushValue( const Element& element)
 	switch (element.type)
 	{
 		case Element::bool_:
-			lua_pushboolean( m_ls, (lua_Number)element.value.bool_);
+			lua_pushboolean( m_ls, element.value.bool_);
 			return true;
 		case Element::double_:
 			lua_pushnumber( m_ls, (lua_Number)element.value.double_);
