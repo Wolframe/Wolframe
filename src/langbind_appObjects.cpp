@@ -32,7 +32,8 @@ Project Wolframe.
 ///\file langbind_appObjects.cpp
 ///\brief implementation of scripting language objects
 #include "langbind/appObjects.hpp"
-#include "serialize/ddl/filtermapSerialize.hpp"
+#include "serialize/ddl/filtermapDDLParse.hpp"
+#include "serialize/ddl/filtermapDDLPrint.hpp"
 #include "ddl/compiler/simpleFormCompiler.hpp"
 #include "logger-v1.hpp"
 #include "filter/filter.hpp"
@@ -154,7 +155,7 @@ bool DDLFormMap::getForm( const std::string& name, DDLFormR& rt) const
 	return getObject( m_map, name, *rt.get());
 }
 
-PluginFunction::CallResult PluginFunction::call( BufferingInputFilter& ifl, OutputFilter& ofl)
+PluginFunction::CallResult PluginFunction::call( InputFilter& ifl, OutputFilter& ofl)
 {
 	if (m_lastres == Error) return Error;
 	void* param_struct = m_data.get();
@@ -178,7 +179,7 @@ PluginFunction::CallResult PluginFunction::call( BufferingInputFilter& ifl, Outp
 			}
 			m_state = 2;
 		case 2:
-			if (!m_api_param->parse( param_struct, ifl, m_ctx))
+			if (!m_api_param->parse( param_struct, ifl, m_ctx, m_parsestk))
 			{
 				switch (ifl.state())
 				{
@@ -186,8 +187,9 @@ PluginFunction::CallResult PluginFunction::call( BufferingInputFilter& ifl, Outp
 						if (m_ctx.getLastError())
 						{
 							LOG_ERROR << "API parameter: " << m_ctx.getLastError();
+							return m_lastres=Error;
 						}
-						return m_lastres=Error;
+						break;
 
 					case InputFilter::EndOfMessage:
 						return m_lastres=Yield;
@@ -217,7 +219,7 @@ PluginFunction::CallResult PluginFunction::call( BufferingInputFilter& ifl, Outp
 			}
 			m_state = 4;
 		case 4:
-			if (!m_api_param->print( result_struct, ofl, m_ctx))
+			if (!m_api_param->print( result_struct, ofl, m_ctx, m_printstk))
 			{
 				switch (ofl.state())
 				{
@@ -287,19 +289,13 @@ bool TransactionFunction::call( const DDLForm& param, DDLForm& result)
 		LOG_ERROR << "incomplete transaction function call definition";
 		return false;
 	}
-	serialize::Context pctx;
-	if (!serialize::print( param.m_struct, *m_cmdwriter, pctx))
-	{
-		LOG_ERROR << "error writing transaction command: " << pctx.getLastError();
-		return false;
-	}
-	enum {inbufsize=1024, outbufsize=1024};
+	enum {inbufsize=4096, outbufsize=4096};
 	char inbuf[ inbufsize];
 	char outbuf[ outbufsize];
-	std::size_t ii = 0;
 
 	cmd->setInputBuffer( inbuf, inbufsize);
 	cmd->setOutputBuffer( outbuf, outbufsize, 0);
+	m_cmdwriter->setOutputBuffer( inbuf, inbufsize);
 
 	std::string resultstr;
 	cmdbind::CommandHandler::Operation op = cmdbind::CommandHandler::READ;
@@ -310,32 +306,49 @@ bool TransactionFunction::call( const DDLForm& param, DDLForm& result)
 		{
 			case cmdbind::CommandHandler::READ:
 			{
-				std::size_t rr = pctx.content().size()-ii;
-				if (rr > inbufsize) rr = inbufsize;
-				memcpy( inbuf, pctx.content().c_str()+ii, rr);
-				cmd->putInput( inbuf, rr);
+				if (!serialize::print( param.m_struct, *m_cmdwriter, m_ctx, m_printstk))
+				{
+					const char* err = m_ctx.getLastError();
+					if (err)
+					{
+						LOG_ERROR << "error in transaction function command write (" << err << ")";
+						return false;
+					}
+				}
+				cmd->putInput( inbuf, m_cmdwriter->getPosition());
 				op = cmd->nextOperation();
 				continue;
 			}
 			case cmdbind::CommandHandler::WRITE:
 			{
-				const void* oo;
-				std::size_t nn;
-				cmd->getOutput( oo, nn);
-				resultstr.append( (const char*)oo, nn);
+				const void* data;
+				std::size_t datasize;
+				cmd->getOutput( data, datasize);
+
+				m_resultreader->putInput( data, datasize, false);
+				if (!serialize::parse( result.m_struct, *m_resultreader, m_ctx, m_parsestk))
+				{
+					const char* err = m_ctx.getLastError();
+					if (err)
+					{
+						LOG_ERROR << "error in transaction function result read (" << err << ")";
+						return false;
+					}
+				}
 				op = cmd->nextOperation();
 				continue;
 			}
 			case cmdbind::CommandHandler::CLOSED:
 			{
-				serialize::Context rctx;
-				BufferingInputFilter rr( m_resultreader.get());
-				rr.putInput( resultstr.c_str(), resultstr.size(), true);
-
-				if (!serialize::parse( result.m_struct, rr, rctx))
+				m_resultreader->putInput( "", 0, true);
+				if (!serialize::parse( result.m_struct, *m_resultreader, m_ctx, m_parsestk))
 				{
-					LOG_ERROR << "error reading transaction result: " << rctx.getLastError();
-					return false;
+					const char* err = m_ctx.getLastError();
+					if (err)
+					{
+						LOG_ERROR << "error in transaction function result read (" << err << ")";
+						return false;
+					}
 				}
 				return true;
 			}
@@ -722,78 +735,6 @@ bool LuaFunctionMap::getLuaScriptInstance( const std::string& procname, LuaScrip
 	return true;
 }
 
-int LuaPluginFunction::call( lua_State* ls) const
-{
-	bool ok = true;
-	int rt = 0;
-	serialize::Context ctx;
-
-	void* dt = lua_newuserdata( ls, m_api_param->size() + m_api_result->size());
-	std::memset( dt, 0, m_api_param->size() + m_api_result->size());
-	void* param_struct = (void*)dt;
-	void* result_struct = (void*)((char*)dt + m_api_param->size());
-
-	if (!m_api_param->init( param_struct))
-	{
-		ctx.setError( 0, "Could not initialize api input object");
-		ok = false;
-		goto EXIT_FUNCTION1;
-	}
-	if (!m_api_result->init( result_struct))
-	{
-		m_api_param->done( param_struct);
-		ctx.setError( 0, "Could not initialize api result object");
-		ok = false;
-		goto EXIT_FUNCTION2;
-	}
-	if (!m_api_param->parse( param_struct, ls, &ctx))
-	{
-		ok = false;
-		goto EXIT_FUNCTION3;
-	}
-	try
-	{
-		rt = m_call( result_struct, param_struct);
-		if (rt != 0)
-		{
-			m_api_param->done( param_struct);
-			m_api_result->done( result_struct);
-			lua_pushnumber( ls, rt);
-			return 1;
-		}
-	}
-	catch (const std::exception& e)
-	{
-		ctx.setError( 0, e.what());
-		ok = false;
-		goto EXIT_FUNCTION3;
-	}
-	if (!m_api_param->print( result_struct, ls, &ctx))
-	{
-		ok = false;
-		goto EXIT_FUNCTION3;
-	}
-EXIT_FUNCTION3:
-	m_api_param->done( param_struct);
-EXIT_FUNCTION2:
-	m_api_result->done( result_struct);
-EXIT_FUNCTION1:
-	if (!ok)
-	{
-		luaL_error( ls, ctx.getLastError());
-	}
-	return 1;
-}
-
-void LuaPluginFunctionMap::defineLuaPluginFunction( const std::string& name, const LuaPluginFunction& f)
-{
-	defineObject( m_map, name, f);
-}
-
-bool LuaPluginFunctionMap::getLuaPluginFunction( const std::string& name, LuaPluginFunction& rt) const
-{
-	return getObject( m_map, name, rt);
-}
 
 #endif
 

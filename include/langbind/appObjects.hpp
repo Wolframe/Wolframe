@@ -37,6 +37,8 @@ Project Wolframe.
 #include "ddl/structType.hpp"
 #include "ddl/compilerInterface.hpp"
 #include "serialize/struct/filtermapBase.hpp"
+#include "serialize/ddl/filtermapDDLPrintStack.hpp"
+#include "serialize/ddl/filtermapDDLParseStack.hpp"
 #include "cmdbind/commandHandler.hpp"
 #include <stack>
 #include <string>
@@ -44,7 +46,6 @@ Project Wolframe.
 #include <boost/shared_ptr.hpp>
 #if WITH_LUA
 extern "C" {
-	#include "serialize/struct/luamapBase.hpp"
 	#include "lua.h"
 }
 #endif
@@ -228,7 +229,7 @@ public:
 	///\brief Copy constructor
 	///\param[in] o copied item
 	PluginFunction( const PluginFunction& o)
-		:m_state(o.m_state),m_lastres(o.m_lastres),m_data(o.m_data),m_call(o.m_call),m_api_param(o.m_api_param),m_api_result(o.m_api_result)
+		:m_state(o.m_state),m_lastres(o.m_lastres),m_data(o.m_data),m_call(o.m_call),m_api_param(o.m_api_param),m_api_result(o.m_api_result),m_parsestk(o.m_parsestk),m_printstk(o.m_printstk),m_ctx(o.m_ctx)
 	{
 		if (m_state > 0) throw std::runtime_error( "illegal copy of plugin function not in initial state");
 	}
@@ -251,10 +252,10 @@ public:
 		Error,		//< termination of call with error (not completed)
 		Yield		//< call interrupted with request for a network operation
 	};
-	CallResult call( BufferingInputFilter& ifl, OutputFilter& ofl);
+	CallResult call( InputFilter& ifl, OutputFilter& ofl);
 
 	const char* getLastError() const		{return m_ctx.getLastError();}
-	const std::string& content() const		{return m_ctx.content();}
+
 private:
 	int m_state;
 	CallResult m_lastres;
@@ -262,6 +263,8 @@ private:
 	Call* m_call;
 	const serialize::FiltermapDescriptionBase* m_api_param;
 	const serialize::FiltermapDescriptionBase* m_api_result;
+	serialize::FiltermapParseStateStack m_parsestk;
+	serialize::FiltermapPrintStateStack m_printstk;
 	serialize::Context m_ctx;
 };
 
@@ -290,7 +293,9 @@ public:
 	///\brief Copy constructor
 	///\param[in] o copied item
 	TransactionFunction( const TransactionFunction& o)
-		:m_cmdwriter(o.m_cmdwriter),m_resultreader(o.m_resultreader),m_cmd(o.m_cmd){}
+		:m_cmdwriter(o.m_cmdwriter)
+		,m_resultreader(o.m_resultreader)
+		,m_cmd(o.m_cmd){}
 
 	///\brief Constructor
 	///\param[in] w command input writer
@@ -313,9 +318,14 @@ public:
 	{
 		Definition(){}
 		Definition( const Definition& o)
-			:m_cmdwriter(o.m_cmdwriter),m_resultreader(o.m_resultreader),m_cmdconstructor(o.m_cmdconstructor){}
+			:m_cmdwriter(o.m_cmdwriter)
+			,m_resultreader(o.m_resultreader)
+			,m_cmdconstructor(o.m_cmdconstructor){}
+
 		Definition( const OutputFilterR& w, const InputFilterR& r, CreateCommandHandler c)
-			:m_cmdwriter(w),m_resultreader(r),m_cmdconstructor(c){}
+			:m_cmdwriter(w)
+			,m_resultreader(r)
+			,m_cmdconstructor(c){}
 
 		OutputFilterR m_cmdwriter;			//< command input writer
 		InputFilterR m_resultreader;			//< command result reader
@@ -335,6 +345,9 @@ private:
 	OutputFilterR m_cmdwriter;				//< command input writer
 	InputFilterR m_resultreader;				//< command result reader
 	cmdbind::CommandHandlerR m_cmd;				//< command execute handler
+	serialize::FiltermapDDLParseStateStack m_parsestk;	//< STM for result reader
+	serialize::FiltermapDDLPrintStateStack m_printstk;	//< STM for command writer
+	serialize::Context m_ctx;				//< serialization context
 };
 
 ///\class TransactionFunctionMap
@@ -438,53 +451,6 @@ private:
 	std::map<std::string,std::size_t> m_pathmap;
 	std::map<std::string,std::size_t> m_procmap;
 };
-
-///\class LuaPluginFunction
-class LuaPluginFunction
-{
-public:
-	typedef int (Call)( void* res, const void* param);
-
-	///\brief Default constructor
-	LuaPluginFunction() {}
-
-	///\brief Copy constructor
-	///\param[in] o copied item
-	LuaPluginFunction( const LuaPluginFunction& o)
-		:m_call(o.m_call),m_api_param(o.m_api_param),m_api_result(o.m_api_result){}
-
-	///\brief Constructor
-	///\param[in] c function to call
-	///\param[in] p part of the api describing the input
-	///\param[in] r part of the api describing the function result
-	LuaPluginFunction( Call c, const serialize::LuamapDescriptionBase* p, const serialize::LuamapDescriptionBase* r)
-		:m_call(c),m_api_param(p),m_api_result(r){}
-
-	int call( lua_State* ls) const;
-private:
-	Call* m_call;
-	const serialize::LuamapDescriptionBase* m_api_param;
-	const serialize::LuamapDescriptionBase* m_api_result;
-};
-
-///\class LuaPluginFunctionMap
-///\brief Map of available plugin functions seen from scripting language binding
-class LuaPluginFunctionMap
-{
-public:
-	LuaPluginFunctionMap(){}
-	~LuaPluginFunctionMap(){}
-
-	void defineLuaPluginFunction( const std::string& name, const LuaPluginFunction& f);
-	bool getLuaPluginFunction( const std::string& name, LuaPluginFunction& rt) const;
-private:
-	std::map<std::string,LuaPluginFunction> m_map;
-};
-
-#else
-
-struct LuaFunctionMap {};
-struct LuaPluginFunctionMap {};
 
 #endif
 }} //namespace

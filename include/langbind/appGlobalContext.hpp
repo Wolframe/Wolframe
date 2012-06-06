@@ -49,7 +49,6 @@ class GlobalContext
 	,public DDLCompilerMap
 	,public PluginFunctionMap
 	,public LuaFunctionMap
-	,public LuaPluginFunctionMap
 {
 public:
 	GlobalContext(){}

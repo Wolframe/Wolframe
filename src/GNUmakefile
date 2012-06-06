@@ -96,7 +96,8 @@ LOCAL_STATIC_LIB_OBJS = \
 	filter_line_filter.o \
 	filter_token_filter.o \
 	serialize_struct_filtermapBase.o \
-	serialize_ddl_filtermapSerialize.o \
+	serialize_ddl_filtermapPrint.o \
+	serialize_ddl_filtermapParse.o \
 	serialize_mapContext.o \
 	ddl_atomicType.o \
 	ddl_structType.o \
@@ -114,8 +115,7 @@ LOCAL_STATIC_LIB_OBJS = \
 #LUA
 ifeq ($(WITH_LUA),1)
 LOCAL_STATIC_LIB_OBJS += \
-	serialize_struct_luamapBase.o \
-	serialize_ddl_luamapSerialize.o \
+	filter_luafilter.o \
 	langbind_luaObjects.o \
 	langbind_luaDebug.o \
 	langbind_luaBignum.o \

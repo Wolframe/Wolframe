@@ -33,6 +33,7 @@ Project Wolframe.
 ///\brief implementation of serialization filters
 #include "filter/serializefilter.hpp"
 #include <boost/lexical_cast.hpp>
+#include <stdexcept>
 
 
 using namespace _Wolframe;
@@ -42,47 +43,60 @@ bool SerializeInputFilter::getNext( ElementType& type, Element& element)
 {
 	if (!m_inputfilter) return false;
 	element.type = TypedInputFilter::Element::string_;
-	return m_inputfilter->getNext( type, element.value.string_.ptr, element.value.string_.size);
+	bool rt = m_inputfilter->getNext( type, element.value.blob_.ptr, element.value.blob_.size);
+	if (!rt) setState( m_inputfilter->state(), m_inputfilter->getError());
+	return rt;
 }
-
 
 bool SerializeOutputFilter::print( ElementType type, const Element& element)
 {
-	std::string castelement;
+	bool rt = true;
 
+	if (!m_outputfilter) return false;
 	try
 	{
-		if (!m_outputfilter) return false;
+		std::string castelement;
 		switch (element.type)
 		{
 			case TypedOutputFilter::Element::bool_:
 				if (element.value.bool_)
 				{
-					return m_outputfilter->print( type, "true", 4);
+					rt = m_outputfilter->print( type, "true", 4);
+					break;
 				}
 				else
 				{
-					return m_outputfilter->print( type, "false", 5);
+					rt = m_outputfilter->print( type, "false", 5);
+					break;
 				}
 
 			case TypedOutputFilter::Element::double_:
 				castelement = boost::lexical_cast<std::string>( element.value.double_);
-				return m_outputfilter->print( type, castelement);
+				rt = m_outputfilter->print( type, castelement);
+				break;
 
 			case TypedOutputFilter::Element::int_:
 				castelement = boost::lexical_cast<std::string>( element.value.int_);
-				return m_outputfilter->print( type, castelement);
+				rt = m_outputfilter->print( type, castelement);
+				break;
 
 			case TypedOutputFilter::Element::uint_:
 				castelement = boost::lexical_cast<std::string>( element.value.uint_);
-				return m_outputfilter->print( type, castelement);
+				rt = m_outputfilter->print( type, castelement);
+				break;
 
 			case TypedOutputFilter::Element::string_:
-				return m_outputfilter->print( type, element.value.string_.ptr, element.value.string_.size);
+				rt = m_outputfilter->print( type, element.value.string_.ptr, element.value.string_.size);
+				break;
 		}
+		if (!rt) setState( m_outputfilter->state(), m_outputfilter->getError());
 	}
-	catch (boost::bad_lexical_cast&){}
-	return false;
+	catch (boost::bad_lexical_cast& e)
+	{
+		setState( OutputFilter::Error, e.what());
+		return false;
+	}
+	return rt;
 }
 
 

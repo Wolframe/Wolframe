@@ -34,7 +34,7 @@
 ///\brief Interface wolfilter test plugin function
 #ifndef _Wolframe_TESTS_WOLFILTER_employee_assignment_print_HPP_INCLUDED
 #define _Wolframe_TESTS_WOLFILTER_employee_assignment_print_HPP_INCLUDED
-#include "serialize/struct/mapStructure.hpp"
+#include "serialize/struct/filtermapDescription.hpp"
 #include <string>
 
 
@@ -42,49 +42,44 @@ namespace _Wolframe {
 namespace test {
 
 struct Task
-	:public serialize::StructureDefinition<Task>
 {
 	std::string title;
 	std::string key;
 	int customernumber;
 
-	static serialize::MapDescriptionBase* getMapDescription();
+	static const serialize::FiltermapDescriptionBase* getFiltermapDescription();
 };
 
 struct Employee
-	:public serialize::StructureDefinition<Employee>
 {
 	std::string firstname;
 	std::string surname;
 	std::string phone;
 
-	static serialize::MapDescriptionBase* getMapDescription();
+	static const serialize::FiltermapDescriptionBase* getFiltermapDescription();
 };
 
 struct Assignment
-	:public serialize::StructureDefinition<Assignment>
 {
 	std::vector<Task> task;
 	Employee employee;
 	std::string issuedate;
 
-	static serialize::MapDescriptionBase* getMapDescription();
+	static const serialize::FiltermapDescriptionBase* getFiltermapDescription();
 };
 
 struct AssignmentList
-	:public serialize::StructureDefinition<AssignmentList>
 {
 	std::vector<Assignment> assignment;
 
-	static serialize::MapDescriptionBase* getMapDescription();
+	static const serialize::FiltermapDescriptionBase* getFiltermapDescription();
 };
 
 struct AssignmentListDoc
-	:public serialize::StructureDefinition<AssignmentListDoc>
 {
 	AssignmentList assignmentlist;
 
-	static serialize::MapDescriptionBase* getMapDescription();
+	static const serialize::FiltermapDescriptionBase* getFiltermapDescription();
 	static int convert( AssignmentListDoc& res, const AssignmentListDoc& param);
 };
 

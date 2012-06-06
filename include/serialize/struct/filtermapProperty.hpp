@@ -29,23 +29,32 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/ddl/filtermapSerialize.hpp
-///\brief Defines the DDL structure serialization for filters
-
-#ifndef _Wolframe_SERIALIZE_DDL_FILTERMAP_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_DDL_FILTERMAP_HPP_INCLUDED
-#include "filter/inputfilter.hpp"
-#include "filter/outputfilter.hpp"
-#include "filter/bufferingfilter.hpp"
-#include "serialize/mapContext.hpp"
-#include "ddl/structType.hpp"
-#include <cstddef>
+///\file serialize/struct/filtermapProperty.hpp
+///\brief Defines the intrusive implementation of some parsing element properties
+#ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PROPERTY_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PROPERTY_HPP_INCLUDED
+#include "serialize/struct/filtermapTraits.hpp"
 
 namespace _Wolframe {
 namespace serialize {
 
-bool parse( ddl::StructType& st, langbind::BufferingInputFilter& flt, Context& ctx);
-bool print( const ddl::StructType& st, langbind::OutputFilter& out, Context& ctx);
+template <typename T>
+struct FiltermapIntrusiveProperty
+{
+private:
+	static FiltermapDescriptionBase::ElementType type_( const traits::struct_&)
+		{return FiltermapDescriptionBase::Struct;}
+	static FiltermapDescriptionBase::ElementType type_( const traits::vector_&)
+		{return FiltermapDescriptionBase::Vector;}
+	static FiltermapDescriptionBase::ElementType type_( const traits::atomic_&)
+		{return FiltermapDescriptionBase::Atomic;}
+public:
+	static FiltermapDescriptionBase::ElementType type()
+	{
+		const T* obj = 0;
+		return type_( traits::getFiltermapCategory(*obj));
+	}
+};
 
 }}//namespace
 #endif

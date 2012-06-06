@@ -41,29 +41,33 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-struct Context
+class Context
 {
-	Context();
+public:
+	enum Flags
+	{
+		None=0x00,
+		ValidateAttributes=0x01,
+		CheckComplete=0x02
+	};
+
+	Context( Flags f=None);
 	~Context(){}
 
 	const char* getLastError() const		{return m_lasterror[0]?m_lasterror:0;}
-	void append( const char* c, std::size_t n)	{m_content.append( c,n);}
 	void clear();
-	void followTagConsumed( bool v)			{m_followTagConsumed=v;}
-	bool followTagConsumed()			{return m_followTagConsumed;}
-	const std::string& content() const		{return m_content;}
-	std::string& content()				{return m_content;}
 
 	void setTag( const char* tag);
 	void setError( const char* msg, const char* msgparam=0);
-	bool printElem( langbind::OutputFilter::ElementType tp, const void* elem, std::size_t elemsize, langbind::OutputFilter& out);
+
+	bool flag( Flags f) const			{return ((int)f & (int)m_flags) == (int)f;}
 private:
 	char m_lasterror[ 256];
-	std::string m_content;
-	bool m_followTagConsumed;
+	Flags m_flags;
 
 	void setMsg( const char* m1, char dd, const char* m2, const char* m3=0);
 };
+
 
 }}
 #endif

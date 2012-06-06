@@ -38,9 +38,11 @@ Project Wolframe.
 #include "serialize/struct/filtermapTraits.hpp"
 #include "serialize/struct/filtermapParse.hpp"
 #include "serialize/struct/filtermapPrint.hpp"
-#include "logger-v1.hpp"
+#include "serialize/struct/filtermapProperty.hpp"
 #include <typeinfo>
 #include <exception>
+#include <stdexcept>
+#include <sstream>
 
 namespace _Wolframe {
 namespace serialize {
@@ -53,7 +55,7 @@ struct FiltermapDescription :public FiltermapDescriptionBase
 {
 	///\brief Constructor
 	FiltermapDescription()
-		:FiltermapDescriptionBase( &constructor, &destructor, getTypename<Structure>(), 0, sizeof(Structure), &FiltermapIntrusiveParser<Structure>::isAtomic, &FiltermapIntrusiveParser<Structure>::parse, &FiltermapIntrusivePrinter<Structure>::print){}
+		:FiltermapDescriptionBase( &constructor, &destructor, getTypename<Structure>(), 0, sizeof(Structure), FiltermapIntrusiveProperty<Structure>::type(), &FiltermapIntrusiveParser<Structure>::parse, &FiltermapIntrusivePrinter<Structure>::print){}
 
 	///\brief Operator to build the structure description element by element
 	///\tparam Element element type
@@ -64,12 +66,14 @@ struct FiltermapDescription :public FiltermapDescriptionBase
 	{
 		FiltermapDescriptionBase::Parse parse_ = &FiltermapIntrusiveParser<Element>::parse;
 		FiltermapDescriptionBase::Print print_ = &FiltermapIntrusivePrinter<Element>::print;
-		FiltermapDescriptionBase::IsAtomic isAtomic_ = &FiltermapIntrusiveParser<Element>::isAtomic;
+		FiltermapDescriptionBase::ElementType type_ = FiltermapIntrusiveProperty<Element>::type();
 		std::size_t pp = (std::size_t)&(((Structure*)0)->*eptr);
-		FiltermapDescriptionBase e( getTypename<Element>(), pp, sizeof(Element), isAtomic_, parse_, print_);
+		FiltermapDescriptionBase e( getTypename<Element>(), pp, sizeof(Element), type_, parse_, print_);
 		if (find( name) != end())
 		{
-			LOG_ERROR << "duplicate definition of " << name << " in structure";
+			std::ostringstream err;
+			err << "duplicate definition of " << name << " in structure";
+			throw std::runtime_error( err.str().c_str());
 		}
 		define( name, e);
 		return *this;

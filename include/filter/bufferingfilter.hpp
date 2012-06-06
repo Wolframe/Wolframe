@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filter/inputfilter.hpp
+///\file filter/bufferingfilter.hpp
 ///\brief Interface for input filter
 
 #ifndef _Wolframe_FILTER_BUFFERING_FILTER_INTERFACE_HPP_INCLUDED
@@ -62,10 +62,10 @@ public:
 	}
 
 	///\brief Implements InputFilter::putInput(const void*,std::size_t,bool)
-	virtual void putInput( const void* ptr, std::size_t size, bool end)
+	virtual void putInput( const void* ptr, std::size_t size, bool end_)
 	{
 		m_buf.append( (const char*)ptr, size);
-		if (end)
+		if (end_)
 		{
 			m_ref->putInput( m_buf.c_str(), m_buf.size(), m_end=true);
 		}
@@ -102,6 +102,11 @@ public:
 	InputFilter* reference() const
 	{
 		return m_ref;
+	}
+
+	bool end() const
+	{
+		return m_end;
 	}
 private:
 	InputFilter* m_ref;

@@ -37,7 +37,8 @@
 #include "langbind/appObjects.hpp"
 #include "langbind/appGlobalContext.hpp"
 #include "langbind/iostreamfilter.hpp"
-#include "serialize/ddl/filtermapSerialize.hpp"
+#include "serialize/ddl/filtermapDDLParse.hpp"
+#include "serialize/ddl/filtermapDDLPrint.hpp"
 #include "filter/token_filter.hpp"
 #if WITH_LUA
 #include "cmdbind/luaCommandHandler.hpp"
@@ -216,19 +217,18 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 		PluginFunction pf;
 		if (gc->getPluginFunction( proc.c_str(), pf))
 		{
-			BufferingInputFilter ff( flt.inputfilter().get());
-			langbind::PluginFunction::CallResult rt = pf.call( ff, *flt.outputfilter());
+			langbind::PluginFunction::CallResult rt = pf.call( *flt.inputfilter(), *flt.outputfilter());
 			while (rt == langbind::PluginFunction::Yield)
 			{
-				if (processIO( buf, &ff, flt.outputfilter().get(), is, os)
-				|| (ff.state() == InputFilter::Open && flt.outputfilter()->state() == OutputFilter::Open))
+				if (processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)
+				|| (flt.inputfilter()->state() == InputFilter::Open && flt.outputfilter()->state() == OutputFilter::Open))
 				{
-					rt = pf.call( ff, *flt.outputfilter());
+					rt = pf.call( *flt.inputfilter(), *flt.outputfilter());
 				}
 			}
 			if (rt == langbind::PluginFunction::Ok)
 			{
-				os.write( pf.content().c_str(), pf.content().size());
+				writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
 				return true;
 			}
 			else
@@ -242,29 +242,35 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 		DDLFormR df;
 		if (gc->getForm( proc.c_str(), df))
 		{
-			serialize::Context ictx;
-			BufferingInputFilter ff( flt.inputfilter().get());
-			bool rt;
-			for (;;)
-			{
-				rt = serialize::parse( df->m_struct, ff, ictx);
-				if (rt) break;
+			serialize::Context ctx;
+			serialize::FiltermapDDLParseStateStack parsestk;
+			serialize::FiltermapDDLPrintStateStack printstk;
 
-				if (ff.state() == InputFilter::EndOfMessage)
-				{
-					if (!processIO( buf, &ff, flt.outputfilter().get(), is, os)) break;
-					continue;
-				}
-				LOG_ERROR << "error in form serialization: '" << ictx.getLastError() << "'";
-			}
-			serialize::Context octx;
-			if (!serialize::print( df->m_struct, *flt.outputfilter(), octx))
+			while (!serialize::parse( df->m_struct, *flt.inputfilter(), ctx, parsestk))
 			{
-				LOG_ERROR << "error in form printing: '" << octx.getLastError() << "'";
-				return false;
+				const char* err = ctx.getLastError();
+				if (err)
+				{
+					LOG_ERROR << "error in DDL form map (" << err << ")";
+					return false;
+				}
+				if (!processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)) break;
+				continue;
 			}
-			os.write( octx.content().c_str(), octx.content().size());
-			return true;
+			while (!serialize::print( df->m_struct, *flt.outputfilter(), ctx, printstk))
+			{
+				const char* err = ctx.getLastError();
+				if (err)
+				{
+					LOG_ERROR << "error in DDL form map (" << err << ")";
+					return false;
+				}
+				if (!processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)) break;
+				continue;
+			}
+			writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
+			return	flt.inputfilter()->state() == InputFilter::Open
+				&& flt.outputfilter()->state() == OutputFilter::Open;
 		}
 	}
 	{

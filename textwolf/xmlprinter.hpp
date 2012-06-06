@@ -49,22 +49,6 @@
 ///\brief Toplevel namespace of the library
 namespace textwolf {
 
-// gcc 4.7: ../textwolf/xmlprinter.hpp:431:3: error: ‘parseEncoding’ 
-// was not declared in this scope, and no declarations were found by 
-// argument-dependent lookup at the point of instantiation [-fpermissive]
-static void parseEncoding( std::string& dest, const std::string& src)
-{
-	dest.clear();
-	std::string::const_iterator cc=src.begin();
-	for (; cc != src.end(); ++cc)
-	{
-		if (*cc <= ' ') continue;
-		if (*cc == '-') continue;
-		if (*cc == ' ') continue;
-		dest.push_back( ::tolower( *cc));
-	}
-}
-
 template <class BufferType>
 struct XMLPrinterBase
 {
@@ -86,6 +70,18 @@ struct XMLPrinterBase
 		MethodTable( const MethodTable& o)	:m_printOpenTag(o.m_printOpenTag),m_printCloseTag(o.m_printCloseTag),m_printAttribute(o.m_printAttribute),m_printValue(o.m_printValue),m_del(o.m_del),m_copy(o.m_copy){}
 	};
 
+	static void parseEncoding( std::string& dest, const std::string& src)
+	{
+		dest.clear();
+		std::string::const_iterator cc=src.begin();
+		for (; cc != src.end(); ++cc)
+		{
+			if (*cc <= ' ') continue;
+			if (*cc == '-') continue;
+			if (*cc == ' ') continue;
+			dest.push_back( ::tolower( *cc));
+		}
+	}
 };
 
 ///\class XMLPrinterObject
@@ -432,7 +428,7 @@ public:
 	bool createPrinter()
 	{
 		std::string enc;
-		parseEncoding( enc, m_attributes.getEncoding());
+		XMLPrinterBase<BufferType>::parseEncoding( enc, m_attributes.getEncoding());
 
 		if (m_obj)
 		{

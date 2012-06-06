@@ -34,10 +34,11 @@ Project Wolframe.
 
 #ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_BASE_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_BASE_HPP_INCLUDED
-#include "filter/inputfilter.hpp"
-#include "filter/outputfilter.hpp"
+#include "filter/typedfilter.hpp"
 #include "filter/bufferingfilter.hpp"
 #include "serialize/mapContext.hpp"
+#include "serialize/struct/filtermapParseStack.hpp"
+#include "serialize/struct/filtermapPrintStack.hpp"
 #include <cstddef>
 #include <string>
 #include <vector>
@@ -49,28 +50,33 @@ namespace serialize {
 class FiltermapDescriptionBase
 {
 public:
+	enum ElementType
+	{
+		Atomic,
+		Struct,
+		Vector
+	};
+
 	typedef std::vector<std::pair<std::string,FiltermapDescriptionBase> > Map;
-	typedef bool (*Parse)( void* obj, langbind::InputFilter& flt, Context& ctx, bool isinit);
-	typedef bool (*Print)( const char* tag, const void* obj, langbind::OutputFilter& out, Context& ctx);
+	typedef bool (*Parse)( langbind::TypedInputFilter& flt, Context& ctx, FiltermapParseStateStack& stk);
+	typedef bool (*Print)( langbind::TypedOutputFilter& out, Context& ctx, FiltermapPrintStateStack& stk);
 	typedef bool (*Constructor)( void* obj);
 	typedef void (*Destructor)( void* obj);
-	typedef bool (*IsAtomic)();
 
 	Parse parse() const		{return m_parse;}
 	Print print() const		{return m_print;}
-	bool isAtomic() const		{return m_isAtomic();}
 
-	FiltermapDescriptionBase( Constructor c, Destructor d, const char* tn, std::size_t os, std::size_t sz, IsAtomic ia, Parse pa, Print pr)
-		:m_constructor(c),m_destructor(d),m_typename(tn),m_ofs(os),m_size(sz),m_nof_attributes(std::numeric_limits<std::size_t>::max()),m_isAtomic(ia),m_parse(pa),m_print(pr){}
-	FiltermapDescriptionBase( const char* tn, std::size_t os, std::size_t sz, IsAtomic ia, Parse pa, Print pr)
-		:m_constructor(0),m_destructor(0),m_typename(tn),m_ofs(os),m_size(sz),m_nof_attributes(std::numeric_limits<std::size_t>::max()),m_isAtomic(ia),m_parse(pa),m_print(pr){}
+	FiltermapDescriptionBase( Constructor c, Destructor d, const char* tn, std::size_t os, std::size_t sz, ElementType t, Parse pa, Print pr)
+		:m_constructor(c),m_destructor(d),m_typename(tn),m_ofs(os),m_size(sz),m_nof_attributes(0),m_type(t),m_parse(pa),m_print(pr){}
+	FiltermapDescriptionBase( const char* tn, std::size_t os, std::size_t sz, ElementType t, Parse pa, Print pr)
+		:m_constructor(0),m_destructor(0),m_typename(tn),m_ofs(os),m_size(sz),m_nof_attributes(0),m_type(t),m_parse(pa),m_print(pr){}
 	FiltermapDescriptionBase( const FiltermapDescriptionBase& o)
-		:m_constructor(o.m_constructor),m_destructor(o.m_destructor),m_typename(o.m_typename),m_ofs(o.m_ofs),m_size(o.m_size),m_nof_attributes(o.m_nof_attributes),m_elem(o.m_elem),m_isAtomic(o.m_isAtomic),m_parse(o.m_parse),m_print(o.m_print){}
+		:m_constructor(o.m_constructor),m_destructor(o.m_destructor),m_typename(o.m_typename),m_ofs(o.m_ofs),m_size(o.m_size),m_nof_attributes(o.m_nof_attributes),m_elem(o.m_elem),m_type(o.m_type),m_parse(o.m_parse),m_print(o.m_print){}
 	FiltermapDescriptionBase()
-		:m_typename(0),m_ofs(0),m_size(0),m_nof_attributes(std::numeric_limits<std::size_t>::max()),m_isAtomic(0),m_parse(0),m_print(0){}
+		:m_typename(0),m_ofs(0),m_size(0),m_nof_attributes(0),m_type(Atomic),m_parse(0),m_print(0){}
 
-	bool parse( void* obj, langbind::BufferingInputFilter& in, Context& ctx) const;
-	bool print( const void* obj, langbind::OutputFilter& out, Context& ctx) const;
+	bool parse( void* obj, langbind::InputFilter& in, Context& ctx, FiltermapParseStateStack& stk) const;
+	bool print( const void* obj, langbind::OutputFilter& out, Context& ctx, FiltermapPrintStateStack& stk) const;
 
 	bool init( void* obj) const
 	{
@@ -90,6 +96,11 @@ public:
 	std::size_t ofs() const
 	{
 		return m_ofs;
+	}
+
+	ElementType type() const
+	{
+		return m_type;
 	}
 
 	Map::const_iterator find( const std::string& name) const
@@ -118,6 +129,17 @@ public:
 	{
 		m_nof_attributes = m_elem.size();
 	}
+
+	std::size_t nof_elements() const
+	{
+		return m_elem.size();
+	}
+
+	const char* typeName() const
+	{
+		return m_typename;
+	}
+
 private:
 	Constructor m_constructor;
 	Destructor m_destructor;
@@ -126,7 +148,7 @@ private:
 	std::size_t m_size;
 	std::size_t m_nof_attributes;
 	Map m_elem;
-	IsAtomic m_isAtomic;
+	ElementType m_type;
 	Parse m_parse;
 	Print m_print;
 };

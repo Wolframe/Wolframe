@@ -33,15 +33,15 @@
 ///\file wolfilter/src/employee_assignment_print.cpp
 ///\brief Implementation wolfilter test plugin function
 
-#include "serialize/struct/mapDescription.hpp"
+#include "serialize/struct/filtermapDescription.hpp"
 #include "wolfilter/src/employee_assignment_print.hpp"
 
 using namespace _Wolframe;
 using namespace test;
 
-serialize::MapDescriptionBase* Task::getMapDescription()
+const serialize::FiltermapDescriptionBase* Task::getFiltermapDescription()
 {
-	struct ThisDescription :public serialize::MapDescription<Task>
+	struct ThisDescription :public serialize::FiltermapDescription<Task>
 	{
 		ThisDescription()
 		{
@@ -55,9 +55,9 @@ serialize::MapDescriptionBase* Task::getMapDescription()
 	return &rt;
 }
 
-serialize::MapDescriptionBase* Employee::getMapDescription()
+const serialize::FiltermapDescriptionBase* Employee::getFiltermapDescription()
 {
-	struct ThisDescription :public serialize::MapDescription<Employee>
+	struct ThisDescription :public serialize::FiltermapDescription<Employee>
 	{
 		ThisDescription()
 		{
@@ -71,9 +71,9 @@ serialize::MapDescriptionBase* Employee::getMapDescription()
 	return &rt;
 }
 
-serialize::MapDescriptionBase* Assignment::getMapDescription()
+const serialize::FiltermapDescriptionBase* Assignment::getFiltermapDescription()
 {
-	struct ThisDescription :public serialize::MapDescription<Assignment>
+	struct ThisDescription :public serialize::FiltermapDescription<Assignment>
 	{
 		ThisDescription()
 		{
@@ -87,9 +87,9 @@ serialize::MapDescriptionBase* Assignment::getMapDescription()
 	return &rt;
 }
 
-serialize::MapDescriptionBase* AssignmentList::getMapDescription()
+const serialize::FiltermapDescriptionBase* AssignmentList::getFiltermapDescription()
 {
-	struct ThisDescription :public serialize::MapDescription<AssignmentList>
+	struct ThisDescription :public serialize::FiltermapDescription<AssignmentList>
 	{
 		ThisDescription()
 		{
@@ -101,9 +101,9 @@ serialize::MapDescriptionBase* AssignmentList::getMapDescription()
 	return &rt;
 }
 
-serialize::MapDescriptionBase* AssignmentListDoc::getMapDescription()
+const serialize::FiltermapDescriptionBase* AssignmentListDoc::getFiltermapDescription()
 {
-	struct ThisDescription :public serialize::MapDescription<AssignmentListDoc>
+	struct ThisDescription :public serialize::FiltermapDescription<AssignmentListDoc>
 	{
 		ThisDescription()
 		{

@@ -29,53 +29,22 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/struct/mapStructure.hpp
-///\brief Union of all mapping definition interfaces
-#ifndef _Wolframe_SERIALIZE_STRUCT_MAP_STRUCTURE_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_STRUCT_MAP_STRUCTURE_HPP_INCLUDED
-#include "serialize/struct/filtermapBase.hpp"
-#if WITH_LUA
-#include "serialize/struct/luamapBase.hpp"
-#endif
-#include "countedReference.hpp"
+///\file serialize/ddl/filtermapDDLParse.hpp
+///\brief Defines the DDL structure deserialization for filters
+
+#ifndef _Wolframe_SERIALIZE_DDL_FILTERMAP_PARSE_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_DDL_FILTERMAP_PARSE_HPP_INCLUDED
+#include "filter/inputfilter.hpp"
+#include "filter/outputfilter.hpp"
+#include "serialize/mapContext.hpp"
+#include "serialize/ddl/filtermapDDLParseStack.hpp"
+#include "ddl/structType.hpp"
+#include <cstddef>
 
 namespace _Wolframe {
 namespace serialize {
 
-class MapDescriptionBase
-{
-protected:
-	CountedReference<FiltermapDescriptionBase> m_filtermap;
-#if WITH_LUA
-	CountedReference<LuamapDescriptionBase> m_luamap;
-#endif
-
-public:
-	MapDescriptionBase( const MapDescriptionBase& o)
-		:m_filtermap(o.m_filtermap)
-#if WITH_LUA
-		,m_luamap(o.m_luamap)
-#endif
-		{}
-	MapDescriptionBase(){}
-
-	const FiltermapDescriptionBase* filtermap() const	{return m_filtermap.get();}
-#if WITH_LUA
-	const LuamapDescriptionBase* luamap() const		{return m_luamap.get();}
-#endif
-};
-
-template <class Structure>
-class StructureDefinition
-{
-public:
-	static const FiltermapDescriptionBase* getFiltermapDescription()	{return Structure::getMapDescription()->filtermap();}
-#if WITH_LUA
-	static const LuamapDescriptionBase* getLuamapDescription()		{return Structure::getMapDescription()->luamap();}
-#endif
-private:
-};
-
+bool parse( ddl::StructType& st, langbind::InputFilter& flt, Context& ctx, std::vector<FiltermapDDLParseState>& stk);
 
 }}//namespace
 #endif

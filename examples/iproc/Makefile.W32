@@ -119,18 +119,11 @@ TEST_CPP_BINS = \
 	tests\iprocHandlerXMLTest.exe \
 	tests\simpleFormCompilerTest.exe
 
-!IFDEF WITH_LUA
-TEST_CPP_BINS = \
-	$(TEST_CPP_BINS) \
-	tests\structLuamapTest.exe
-!ENDIF
-
 iprocd.exe: iprocd.obj $(TOPDIR)\src\wolframe.lib
 tests\iprocHandlerTest.exe: tests\iprocHandlerTest.obj $(TOPDIR)\src\wolframe.lib
 tests\iprocHandlerXMLTest.exe: tests\iprocHandlerXMLTest.obj $(TOPDIR)\src\wolframe.lib
 tests\simpleFormCompilerTest.exe: tests\simpleFormCompilerTest.obj $(TOPDIR)\src\wolframe.lib
 tests\structFiltermapTest.exe: tests\structFiltermapTest.obj $(TOPDIR)\src\wolframe.lib
-tests\structLuamapTest.exe: tests\structLuamapTest.obj $(TOPDIR)\src\wolframe.lib
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
