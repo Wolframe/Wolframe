@@ -36,6 +36,7 @@
 
 #include <boost/program_options.hpp>
 #include <string>
+#include <iostream>
 
 #include "getPassword.hpp"
 #include "passwdFile.hpp"
