@@ -804,7 +804,7 @@ private:
 	void expand( int stateidx)
 	{
 		while (stateidx!=-1)
-		{
+ 		{
 			const State& st = atm->states[ stateidx];
 			context.scope.mask.join( st.core.mask);
 			if (st.core.mask.empty() && st.core.typeidx != 0)
@@ -1078,8 +1078,7 @@ public:
 			///\brief state of the iterator
 			enum State
 			{
-				Ok,				//< normal
-				EndOfOutput,	//< end of output triggered
+				Ok,			//< normal
 				EndOfInput,		//< end of input triggered
 				ErrorState		//< error occurred (identifier as string is in the output token buffer)
 			};
@@ -1100,11 +1099,11 @@ public:
 			///\brief Get the size of the content of the currently visited element in bytes
 			unsigned int size() const		{return m_size;}
 		private:
-			friend class iterator;		//< friend to intialize the elements
-			State m_state;			//< current state
-			int m_type;			//< currently visited element type
-			const char* m_content;		//< currently visited element content
-			unsigned int m_size;		//< size of the content of the currently visited element in bytes
+			friend class iterator;			//< friend to intialize the elements
+			State m_state;				//< current state
+			int m_type;				//< currently visited element type
+			const char* m_content;			//< currently visited element content
+			unsigned int m_size;			//< size of the content of the currently visited element in bytes
 		};
 		typedef Element value_type;
 		typedef std::size_t difference_type;
@@ -1113,8 +1112,8 @@ public:
 		typedef std::input_iterator_tag iterator_category;
 
 	private:
-		Element element;		//< currently visited element
-		ThisXMLPathSelect* input;		//< producing XML path selection stream
+		Element element;				//< currently visited element
+		ThisXMLPathSelect* input;			//< producing XML path selection stream
 
 		///\brief Skip to next element
 		///\return *this
@@ -1142,15 +1141,8 @@ public:
 						}
 						if (et == XMLScannerBase::ErrorOccurred)
 						{
-							XMLScannerBase::Error err = input->scan.getError( &element.m_content);
-							if (err == XMLScannerBase::ErrOutputBufferTooSmall)
-							{
-								element.m_state = Element::EndOfOutput;
-							}
-							else
-							{
-								element.m_state = Element::ErrorState;
-							}
+							input->scan.getError( &element.m_content);
+							element.m_state = Element::ErrorState;
 							return *this;
 						}
 						input->initProcessElement( et, input->scan.getItem(), input->scan.getItemSize());

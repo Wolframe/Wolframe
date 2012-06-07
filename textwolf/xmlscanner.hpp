@@ -232,7 +232,6 @@ public:
 		ErrExpectedOpenTag,			//< expected an open tag in this state
 		ErrExpectedXMLTag,			//< expected an <?xml tag in this state
 		ErrUnexpectedEndOfText,			//< unexpected end of text in the middle of the XML definition
-		ErrOutputBufferTooSmall,		//< scaned element in XML to big to fit in the buffer provided for it
 		ErrSyntaxToken,				//< a specific string expected as token in XML but does not match
 		ErrStringNotTerminated,			//< attribute string in XML not terminated on the same line
 		ErrUndefinedCharacterEntity,		//< named entity is not defined in the entity map
@@ -825,15 +824,16 @@ public:
 	///\return true on success
 	bool skipToken( const IsTokenCharMap& isTok)
 	{
-		for (;;)
+		do
 		{
 			ControlCharacter ch;
 			while (isTok[ (unsigned char)(ch=m_src.control())] || ch == Amp)
 			{
 				m_src.skip();
 			}
-			if (m_src.control() != Any) return true;
 		}
+		while (m_src.control() == Any);
+		return true;
 	}
 
 	///\brief Parse a token that must be the same as a given string
