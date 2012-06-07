@@ -95,7 +95,7 @@ public:
 	}
 
 	TextScanner( const Iterator& p_iterator)
-			:start(p_iterator),input(p_iterator),val(0),cur(0),state(0)
+		:start(p_iterator),input(p_iterator),val(0),cur(0),state(0)
 	{
 		for (unsigned int ii=0; ii<sizeof(buf); ii++) buf[ii] = 0;
 	}
@@ -103,7 +103,11 @@ public:
 	///\brief Copy constructor
 	///\param [in] orig textscanner to copy
 	TextScanner( const TextScanner& orig)
-			:start(orig.start),input(orig.input),val(orig.val),cur(orig.cur),state(orig.state)
+		:start(orig.start)
+		,input(orig.input)
+		,val(orig.val)
+		,cur(orig.cur)
+		,state(orig.state)
 	{
 		for (unsigned int ii=0; ii<sizeof(buf); ii++) buf[ii]=orig.buf[ii];
 	}

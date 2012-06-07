@@ -38,6 +38,7 @@
 #include "textwolf/charset_interface.hpp"
 #include "textwolf/exception.hpp"
 #include "textwolf/textscanner.hpp"
+#include <map>
 #include <cstddef>
 
 namespace textwolf {

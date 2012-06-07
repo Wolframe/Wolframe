@@ -61,8 +61,12 @@ private:
 		LSB=(encoding==ByteOrder::BE),			//< least significant byte index (0 or 1)
 		MSB=(encoding==ByteOrder::LE),			//< most significant byte index (0 or 1)
 		Print1shift=(encoding==ByteOrder::BE)?8:0,	//< value to shift with to get the 1st character to print
-		Print2shift=(encoding==ByteOrder::LE)?8:0,	//< value to shift with to get the 2nd character to print
-		MaxChar=0x10FFFF
+		Print2shift=(encoding==ByteOrder::LE)?8:0	//< value to shift with to get the 2nd character to print
+	};
+public:
+	enum
+	{
+		MaxChar=0x10FFFF				//< maximum character in alphabet
 	};
 public:
 	///\brief Get the size of the current character in bytes (variable length encoding)
@@ -147,8 +151,16 @@ public:
 	{
 		if (ch <= 0xFFFF)
 		{
-			buf.push_back( (char)(unsigned char)((ch >> Print1shift) & 0xFF));
-			buf.push_back( (char)(unsigned char)((ch >> Print2shift) & 0xFF));
+			if ((ch - 0xD800) < 0x400)
+			{
+				//... reserved for encoding of characters in range [0xFFFF..0x10FFFF]
+			}
+			else
+			{
+				buf.push_back( (char)(unsigned char)((ch >> Print1shift) & 0xFF));
+				buf.push_back( (char)(unsigned char)((ch >> Print2shift) & 0xFF));
+				return;
+			}
 		}
 		else if (ch <= 0x10FFFF)
 		{
@@ -159,18 +171,16 @@ public:
 			buf.push_back( (char)(unsigned char)((hi >> Print2shift) & 0xFF));
 			buf.push_back( (char)(unsigned char)((lo >> Print1shift) & 0xFF));
 			buf.push_back( (char)(unsigned char)((lo >> Print2shift) & 0xFF));
+			return;
 		}
-		else
+		char tb[ 32];
+		char* cc = tb;
+		Encoder::encode( ch, tb, sizeof(tb));
+		while (*cc)
 		{
-			char tb[ 32];
-			char* cc = tb;
-			Encoder::encode( ch, tb, sizeof(tb));
-			while (*cc)
-			{
-				buf.push_back( (char)(unsigned char)(((UChar)*cc >> Print1shift) & 0xFF));
-				buf.push_back( (char)(unsigned char)(((UChar)*cc >> Print2shift) & 0xFF));
-				++cc;
-			}
+			buf.push_back( (char)(unsigned char)(((UChar)*cc >> Print1shift) & 0xFF));
+			buf.push_back( (char)(unsigned char)(((UChar)*cc >> Print2shift) & 0xFF));
+			++cc;
 		}
 	}
 };
