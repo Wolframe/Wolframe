@@ -35,6 +35,7 @@ Project Wolframe.
 #ifndef _Wolframe_LUA_FILTER_HPP_INCLUDED
 #define _Wolframe_LUA_FILTER_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
+#include "langbind/luaException.hpp"
 #include <vector>
 
 #if WITH_LUA
@@ -47,7 +48,7 @@ namespace langbind {
 
 ///\class class LuaInputFilter
 ///\brief Lua table as typed input filter
-class LuaInputFilter :public TypedInputFilter
+class LuaInputFilter :public TypedInputFilter, public LuaExceptionHandlerScope
 {
 public:
 	///\brief Constructor
@@ -57,13 +58,13 @@ public:
 
 	///\brief Copy constructor
 	LuaInputFilter( const LuaInputFilter& o)
-		:m_ls(o.m_ls)
-		,m_panicf(o.m_panicf)
+		:LuaExceptionHandlerScope(o)
+		,m_ls(o.m_ls)
 		,m_stk(o.m_stk){}
 
 	///\brief Destructor
 	///\remark Leaves the iterated table as top element (-1) on the lua stack
-	virtual ~LuaInputFilter();
+	virtual ~LuaInputFilter(){}
 
 	///\brief Implementation of TypedInputFilter::getNext(ElementType&,Element&)
 	virtual bool getNext( ElementType& type, Element& element);
@@ -92,14 +93,13 @@ private:
 
 private:
 	lua_State* m_ls;			//< lua state
-	lua_CFunction m_panicf;			//< panic function for not mixing C++/lua exception handling
 	std::vector<FetchState> m_stk;		//< stack of iterator states
 };
 
 
 ///\class class LuaOutputFilter
 ///\brief Lua table as typed output filter
-class LuaOutputFilter :public TypedOutputFilter
+class LuaOutputFilter :public TypedOutputFilter, public LuaExceptionHandlerScope
 {
 public:
 	///\brief Constructor
@@ -109,13 +109,13 @@ public:
 
 	///\brief Copy constructor
 	LuaOutputFilter( const LuaOutputFilter& o)
-		:m_ls(o.m_ls)
-		,m_panicf(o.m_panicf)
+		:LuaExceptionHandlerScope(o)
+		,m_ls(o.m_ls)
 		,m_depth(o.m_depth)
 		,m_type(o.m_type){}
 
 	///\brief Destructor
-	virtual ~LuaOutputFilter();
+	virtual ~LuaOutputFilter(){}
 
 	///\brief Implementation of TypedOutputFilter::print( ElementType type, const Element& element)
 	virtual bool print( ElementType type, const Element& element);
@@ -128,7 +128,6 @@ private:
 
 private:
 	lua_State* m_ls;
-	lua_CFunction m_panicf;
 	int m_depth;
 	ElementType m_type;
 };

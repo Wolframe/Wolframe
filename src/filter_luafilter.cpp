@@ -45,26 +45,14 @@ extern "C" {
 using namespace _Wolframe;
 using namespace langbind;
 
-static int luaException( lua_State* ls)
-{
-	const char* errmsg = lua_tostring( ls, -1);
-	throw std::runtime_error( errmsg?errmsg:"unspecified lua exception");
-	return 0;
-}
-
 LuaInputFilter::LuaInputFilter( lua_State* ls)
-	:m_ls(ls)
-	,m_panicf(lua_atpanic( ls, luaException))
+	:LuaExceptionHandlerScope(ls)
+	,m_ls(ls)
 {
 	FetchState fs;
 	fs.id = FetchState::Init;
 	fs.tag = 0;
 	m_stk.push_back( fs);
-}
-
-LuaInputFilter::~LuaInputFilter()
-{
-	lua_atpanic( m_ls, m_panicf);
 }
 
 bool LuaInputFilter::getValue( int idx, TypedFilterBase::Element& element)
@@ -222,17 +210,12 @@ bool LuaInputFilter::getNext( ElementType& type, Element& element)
 }
 
 LuaOutputFilter::LuaOutputFilter( lua_State* ls)
-	:m_ls(ls)
-	,m_panicf(lua_atpanic( ls, luaException))
+	:LuaExceptionHandlerScope(ls)
+	,m_ls(ls)
 	,m_depth(0)
 	,m_type(OpenTag)
 {
 	lua_newtable( m_ls);
-}
-
-LuaOutputFilter::~LuaOutputFilter()
-{
-	lua_atpanic( m_ls, m_panicf);
 }
 
 bool LuaOutputFilter::pushValue( const Element& element)

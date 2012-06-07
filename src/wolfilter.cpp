@@ -35,6 +35,7 @@
 #include <iostream>
 #include <cstring>
 #include <cstdlib>
+#include <stdexcept>
 #include "langbind/iostreamfilter.hpp"
 
 using namespace _Wolframe;
@@ -54,62 +55,73 @@ static void printUsage()
 
 int main( int argc, const char **argv )
 {
-	std::string infiltername;
-	std::string outfiltername;
-	std::string procname;
-	std::size_t inputbufsize = 1024;
-	std::size_t outputbufsize = 1024;
+	try
+	{
+		std::string infiltername;
+		std::string outfiltername;
+		std::string procname;
+		std::size_t inputbufsize = 1024;
+		std::size_t outputbufsize = 1024;
 
-	if (argc == 4)
-	{
-		procname = argv[1];
-		infiltername = argv[2];
-		outfiltername = argv[3];
-	}
-	else if (argc == 3)
-	{
-		procname = argv[1];
-		infiltername = argv[2];
-		outfiltername = argv[2];
-	}
-	else if (argc > 4)
-	{
-		std::cerr << "too many arguments passed to " << argv[0] << std::endl;
-		printUsage();
-		return 1;
-	}
-	else if (argc < 3)
-	{
-		std::cerr << "too few arguments passed to " << argv[0] << std::endl;
-		printUsage();
-		return 2;
-	}
-	const char* bp;
+		if (argc == 4)
+		{
+			procname = argv[1];
+			infiltername = argv[2];
+			outfiltername = argv[3];
+		}
+		else if (argc == 3)
+		{
+			procname = argv[1];
+			infiltername = argv[2];
+			outfiltername = argv[2];
+		}
+		else if (argc > 4)
+		{
+			std::cerr << "too many arguments passed to " << argv[0] << std::endl;
+			printUsage();
+			return 1;
+		}
+		else if (argc < 3)
+		{
+			std::cerr << "too few arguments passed to " << argv[0] << std::endl;
+			printUsage();
+			return 2;
+		}
+		const char* bp;
 
-	bp = std::strchr( infiltername.c_str(), '/');
-	if (bp)
-	{
-		inputbufsize = (std::size_t)atoi( bp+1);
-		infiltername.resize( bp-infiltername.c_str());
+		bp = std::strchr( infiltername.c_str(), '/');
+		if (bp)
+		{
+			inputbufsize = (std::size_t)atoi( bp+1);
+			infiltername.resize( bp-infiltername.c_str());
+		}
+		bp = std::strchr( outfiltername.c_str(), '/');
+		if (bp)
+		{
+			outputbufsize = (std::size_t)atoi( bp+1);
+			outfiltername.resize( bp-outfiltername.c_str());
+		}
+		if ((int)inputbufsize <= 0)
+		{
+			std::cerr << "illegal size of input buffer: " << (int)inputbufsize << std::endl;
+		}
+		if ((int)outputbufsize <= 0)
+		{
+			std::cerr << "illegal size of output buffer: " << (int)outputbufsize << std::endl;
+		}
+		if (!langbind::iostreamfilter( procname, infiltername, inputbufsize, outfiltername, outputbufsize, std::cin, std::cout))
+		{
+			std::cerr << "conversion error" << std::endl;
+			return 3;
+		}
 	}
-	bp = std::strchr( outfiltername.c_str(), '/');
-	if (bp)
+	catch (const std::bad_alloc& e)
 	{
-		outputbufsize = (std::size_t)atoi( bp+1);
-		outfiltername.resize( bp-outfiltername.c_str());
+		std::cerr << "out of memory in wolfilter" << std::endl;
 	}
-	if ((int)inputbufsize <= 0)
+	catch (const std::exception& e)
 	{
-		std::cerr << "illegal size of input buffer: " << (int)inputbufsize << std::endl;
-	}
-	if ((int)outputbufsize <= 0)
-	{
-		std::cerr << "illegal size of output buffer: " << (int)outputbufsize << std::endl;
-	}
-	if (!langbind::iostreamfilter( procname, infiltername, inputbufsize, outfiltername, outputbufsize, std::cin, std::cout))
-	{
-		std::cerr << "conversion error" << std::endl;
-		return 3;
+		std::cerr << "error in wolfilter: " << e.what() << std::endl;
 	}
 	return 0;
 }

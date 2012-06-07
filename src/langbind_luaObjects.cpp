@@ -33,6 +33,7 @@ Project Wolframe.
 #include "langbind/appObjects.hpp"
 #include "langbind/appGlobalContext.hpp"
 #include "langbind/luaDebug.hpp"
+#include "langbind/luaException.hpp"
 #include "logger-v1.hpp"
 #include <fstream>
 #include <iostream>
@@ -742,42 +743,45 @@ LuaScriptInstance::LuaScriptInstance( const LuaScript* script_)
 	m_ls = luaL_newstate();
 	if (!m_ls) throw std::runtime_error( "failed to create lua state");
 
-	// create thread and prevent garbage collecting of it (http://permalink.gmane.org/gmane.comp.lang.lua.general/22680)
-	m_thread = lua_newthread( m_ls);
-	lua_pushvalue( m_ls, -1);
-	m_threadref = luaL_ref( m_ls, LUA_REGISTRYINDEX);
-
-	if (luaL_loadbuffer( m_ls, m_script->content().c_str(), m_script->content().size(), m_script->path().c_str()))
+	LuaExceptionHandlerScope luaThrows(m_ls);
 	{
-		std::ostringstream buf;
-		buf << "Failed to load script '" << m_script->path() << "':" << lua_tostring( m_ls, -1);
-		throw std::runtime_error( buf.str());
-	}
-	// open standard lua libraries
-	luaL_openlibs( m_ls);
+		// create thread and prevent garbage collecting of it (http://permalink.gmane.org/gmane.comp.lang.lua.general/22680)
+		m_thread = lua_newthread( m_ls);
+		lua_pushvalue( m_ls, -1);
+		m_threadref = luaL_ref( m_ls, LUA_REGISTRYINDEX);
 
-	// register logging function already here because then it can be used in the script initilization part
-	lua_pushcfunction( m_ls, &function_printlog);
-	lua_setglobal( m_ls, "printlog");
-
-	// open additional libraries defined for this script
-	std::vector<LuaScript::Module>::const_iterator ii=m_script->modules().begin(), ee=m_script->modules().end();
-	for (;ii!=ee; ++ii)
-	{
-		if (ii->m_initializer( m_ls))
+		if (luaL_loadbuffer( m_ls, m_script->content().c_str(), m_script->content().size(), m_script->path().c_str()))
 		{
 			std::ostringstream buf;
-			buf << "module '" << ii->m_name << "' initialization failed: " << lua_tostring( m_ls, -1);
+			buf << "Failed to load script '" << m_script->path() << "':" << lua_tostring( m_ls, -1);
 			throw std::runtime_error( buf.str());
 		}
-	}
+		// open standard lua libraries
+		luaL_openlibs( m_ls);
 
-	// call main, we may have to initialize LUA modules there
-	if (lua_pcall( m_ls, 0, LUA_MULTRET, 0) != 0)
-	{
-		std::ostringstream buf;
-		buf << "Unable to call main entry of script: " << lua_tostring( m_ls, -1 );
-		throw std::runtime_error( buf.str());
+		// register logging function already here because then it can be used in the script initilization part
+		lua_pushcfunction( m_ls, &function_printlog);
+		lua_setglobal( m_ls, "printlog");
+
+		// open additional libraries defined for this script
+		std::vector<LuaScript::Module>::const_iterator ii=m_script->modules().begin(), ee=m_script->modules().end();
+		for (;ii!=ee; ++ii)
+		{
+			if (ii->m_initializer( m_ls))
+			{
+				std::ostringstream buf;
+				buf << "module '" << ii->m_name << "' initialization failed: " << lua_tostring( m_ls, -1);
+				throw std::runtime_error( buf.str());
+			}
+		}
+
+		// call main, we may have to initialize LUA modules there
+		if (lua_pcall( m_ls, 0, LUA_MULTRET, 0) != 0)
+		{
+			std::ostringstream buf;
+			buf << "Unable to call main entry of script: " << lua_tostring( m_ls, -1 );
+			throw std::runtime_error( buf.str());
+		}
 	}
 }
 
@@ -849,15 +853,26 @@ bool LuaFunctionMap::initLuaScriptInstance( LuaScriptInstance* lsi, const Input&
 		return false;
 	}
 	lua_State* ls = lsi->ls();
-	LuaObject<Input>::createGlobal( ls, "input", input_, input_methodtable);
-	LuaObject<Output>::createGlobal( ls, "output", output_, output_methodtable);
-	LuaObject<Filter>::createMetatable( ls, &function__LuaObject__index<Filter>, &function__LuaObject__newindex<Filter>, 0);
-	LuaObject<InputFilterClosure>::createMetatable( ls, 0, 0, 0);
-	setGlobalSingletonPointer<GlobalContext>( ls, gc);
-	lua_pushcfunction( ls, &function_yield);
-	lua_setglobal( ls, "yield");
-	lua_pushcfunction( ls, &function_filter);
-	lua_setglobal( ls, "filter");
-	return true;
+	try
+	{
+		LuaExceptionHandlerScope luaThrows(ls);
+		{
+			LuaObject<Input>::createGlobal( ls, "input", input_, input_methodtable);
+			LuaObject<Output>::createGlobal( ls, "output", output_, output_methodtable);
+			LuaObject<Filter>::createMetatable( ls, &function__LuaObject__index<Filter>, &function__LuaObject__newindex<Filter>, 0);
+			LuaObject<InputFilterClosure>::createMetatable( ls, 0, 0, 0);
+			setGlobalSingletonPointer<GlobalContext>( ls, gc);
+			lua_pushcfunction( ls, &function_yield);
+			lua_setglobal( ls, "yield");
+			lua_pushcfunction( ls, &function_filter);
+			lua_setglobal( ls, "filter");
+		}
+		return true;
+	}
+	catch (const std::exception& e)
+	{
+		LOG_ERROR << "exception intializing lua script instance. " << e.what();
+	}
+	return false;
 }
 

@@ -117,6 +117,7 @@ LOCAL_STATIC_LIB_OBJS += \
 	filter_luafilter.o \
 	langbind_luaObjects.o \
 	langbind_luaDebug.o \
+	langbind_luaException.o \
 	langbind_luaBignum.o \
 	cmdbind_luaCommandHandler.o
 endif

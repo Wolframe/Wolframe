@@ -104,9 +104,9 @@ public:
 	int statusCode() const				{return m_statusCode;}
 
 protected:
-	std::string m_name;
-	std::vector< std::string > m_argBuffer;		///< buffer type for the command arguments
-	int m_statusCode;				///< error code of operation for the client
+	std::string m_name;				//< name of the command to execute
+	std::vector< std::string > m_argBuffer;		//< the command arguments
+	int m_statusCode;				//< error code of operation for the client
 };
 
 typedef CountedReference<CommandHandler> CommandHandlerR;
