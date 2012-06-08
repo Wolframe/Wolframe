@@ -46,15 +46,14 @@ Project Wolframe.
 
 namespace _Wolframe {
 namespace serialize {
-namespace filtertraits {
+namespace traits {
 
 struct struct_ {};		//< category tag for a structure with named elements
 struct vector_ {};		//< category tag for a std::vector of any type
-struct arithmetic_ {};		//< category tag for a type that is convertible from a string through boost::lexical_cast
-struct bool_ {};		//< category tag for a boolean type
+struct atomic_ {};		//< category tag for an atomic type
 
 ///\brief conditional template for detecting if a type is a class with a static/member method getFiltermapDescription() returning a const pointer to a structure description as defined in serialize/filtermapBase.hpp
-/// see http://drdobbs.com/article/print?articleId=227500449&siteSectionName= "Checking Concept Without Concepts in C++"
+///\remark see http://drdobbs.com/article/print?articleId=227500449&siteSectionName= "Checking Concept Without Concepts in C++"
 template<typename T,bool is_class_type=boost::is_class<T>::value>
 struct has_filtermap_description_method: boost::false_type {};
 
@@ -64,11 +63,8 @@ struct has_filtermap_description_method_noprm
 	typedef char small_type;
 	struct large_type {small_type dummy[2];};
 
-	template<const FiltermapDescriptionBase* (T::*)()> struct tester_member_signature;
 	template<const FiltermapDescriptionBase* (*)()> struct tester_static_signature;
 
-	template<typename U>
-	static small_type has_matching_member(tester_member_signature<&U::getFiltermapDescription>*);
 	template<typename U>
 	static small_type has_matching_member(tester_static_signature<&U::getFiltermapDescription>*);
 	template<typename U>
@@ -85,32 +81,25 @@ struct has_filtermap_description_method<T,true>:
 
 
 ///\brief get category vector_ for a type
-/// returns vector_ if  std::vector<T::value_type> EQUALS T. This is true, when T is a std::vector of any kind
+///\return vector_ if  std::vector<T::value_type> EQUALS T. This is true, when T is a std::vector of any kind
 template <typename T>
 typename boost::enable_if_c<
 	boost::is_same< std::vector< typename T::value_type> ,T>::value && !boost::is_same<std::string,T>::value
-	,const vector_&>::type getCategory( const T&) { static vector_ rt; return rt;}
+	,const vector_&>::type getFiltermapCategory( const T&) { static vector_ rt; return rt;}
 
 ///\brief get category struct_ for a type
-/// returns struct_ if T has a method description with no params returning a const pointer to a serialize::FiltermapDescriptionBase
+///\return struct_ if T has a method description with no params returning a const pointer to a serialize::FiltermapDescriptionBase
 template <typename T>
 typename boost::enable_if_c<
 	has_filtermap_description_method<T>::value
-	,const struct_&>::type getCategory( const T&) { static struct_ rt; return rt;}
+	,const struct_&>::type getFiltermapCategory( const T&) { static struct_ rt; return rt;}
 
-///\brief get category arithmetic_ for a type
-/// returns arithmetic_ if T fulfills the is_arithmetic condition or is a string
+///\brief get category atomic_ for a type
+///\return atomic_ if T fulfills the is_arithmetic condition or is a string
 template <typename T>
 typename boost::enable_if_c<
-	(boost::is_arithmetic<T>::value && !boost::is_same<bool,T>::value) || boost::is_same<std::string,T>::value
-	,const arithmetic_&>::type getCategory( const T&) { static arithmetic_ rt; return rt;}
-
-///\brief get category bool_ for a type
-/// returns bool_ if T is a bool
-template <typename T>
-typename boost::enable_if_c<
-	boost::is_same<bool,T>::value
-	,const bool_&>::type getCategory( const T&) { static bool_ rt; return rt;}
+	boost::is_arithmetic<T>::value || boost::is_same<std::string,T>::value
+	,const atomic_&>::type getFiltermapCategory( const T&) { static atomic_ rt; return rt;}
 
 }}}// end namespace
 #endif

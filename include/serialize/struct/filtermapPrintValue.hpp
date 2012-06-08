@@ -31,52 +31,97 @@ Project Wolframe.
 ************************************************************************/
 ///\file serialize/struct/filtermapPrintValue.hpp
 ///\brief Defines the intrucsive printing of a typed filter element for serialization
-#ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PARSE_VALUE_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PARSE_VALUE_HPP_INCLUDED
+#ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PRINT_VALUE_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PRINT_VALUE_HPP_INCLUDED
 #include <boost/lexical_cast.hpp>
-#include <boost/numeric_cast.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits.hpp>
+#include <string>
 
 namespace _Wolframe {
 namespace serialize {
 namespace traits {
 
-template <typename ValueType>
-typename boost::enable_if_c<boost::is_same<bool,ValueType>::value,bool>::type
-valuePush( const ValueType& val, TypedInputFilter::Element& element) const
+///\class PrintValueType
+///\brief type traits for print value types
+struct PrintValueType
 {
-	element.type = TypedInputFilter::Element::bool_;
+	struct string_ {};		//< atomic type category tag for string value to print
+	struct bool_ {};		//< atomic type category tag for a boolean value to print
+	struct double_ {};		//< atomic type category tag for double precision value to print
+	struct uint_ {};		//< atomic type category tag for unsinged integer value to print
+	struct int_ {};			//< atomic type category tag for integer value to print
+
+	///\brief get category string_ for a type
+	///\return string_ if T is a std:string
+	template <typename T>
+	static typename boost::enable_if_c<
+		boost::is_same<T,std::string>::value
+		,const string_&>::type get( const T&) { static string_ rt; return rt;}
+
+	///\brief get category bool_ for a type
+	///\return bool_ if T is a bool
+	template <typename T>
+	static typename boost::enable_if_c<
+		boost::is_same<T,bool>::value
+		,const bool_&>::type get( const T&) { static bool_ rt; return rt;}
+
+	///\brief get category double_ for a type
+	///\return double_ if T is a floating point number
+	template <typename T>
+	static typename boost::enable_if_c<
+		boost::is_floating_point<T>::value
+		,const double_&>::type get( const T&) { static double_ rt; return rt;}
+
+	///\brief get category int_ for a type
+	///\return int_ if T is a signed integer number
+	template <typename T>
+	static typename boost::enable_if_c<
+		boost::is_arithmetic<T>::value && boost::is_signed<T>::value && !boost::is_floating_point<T>::value
+		,const int_&>::type get( const T&) { static int_ rt; return rt;}
+
+	///\brief get category uint_ for a type
+	///\return uint_ if T is an unsigned integer number
+	template <typename T>
+	static typename boost::enable_if_c<
+		boost::is_arithmetic<T>::value && boost::is_unsigned<T>::value && !boost::is_floating_point<T>::value
+		,const uint_&>::type get( const T&) { static uint_ rt; return rt;}
+};
+
+
+
+template <typename ValueType>
+bool printValue_( const ValueType& val, const PrintValueType::bool_&, langbind::TypedInputFilter::Element& element)
+{
+	element.type = langbind::TypedInputFilter::Element::bool_;
 	element.value.bool_ = val;
 	return true;
 }
 
 template <typename ValueType>
-typename boost::enable_if_c<boost::is_same<std::string,ValueType>::value,bool>::type
-valuePush( const ValueType& val, TypedInputFilter::Element& element) const
+bool printValue_( const ValueType& val, const PrintValueType::string_&, langbind::TypedInputFilter::Element& element)
 {
-	element.type = TypedInputFilter::Element::string_;
+	element.type = langbind::TypedInputFilter::Element::string_;
 	element.value.string_.ptr = val.c_str();
 	element.value.string_.size = val.size();
 	return true;
 }
 
 template <typename ValueType>
-typename boost::enable_if_c<boost::is_floating_point<ValueType>::value,bool>::type
-valuePush( const ValueType& val, TypedInputFilter::Element& element) const
+bool printValue_( const ValueType& val, const PrintValueType::double_&, langbind::TypedInputFilter::Element& element)
 {
-	element.type = TypedInputFilter::Element::double_;
+	element.type = langbind::TypedInputFilter::Element::double_;
 	element.value.double_ = val;
 	return true;
 }
 
 template <typename ValueType>
-typename boost::enable_if_c<boost::is_arithmetic<ValueType>::value && boost::is_signed<ValueType>::value && !boost::is_floating_point<ValueType>::value,bool>::type
-valuePush( const ValueType& val, TypedInputFilter::Element& element) const
+bool printValue_( const ValueType& val, const PrintValueType::int_&, langbind::TypedInputFilter::Element& element)
 {
 	try
 	{
-		element.type = TypedInputFilter::Element::int_;
+		element.type = langbind::TypedInputFilter::Element::int_;
 		element.value.int_ = boost::numeric_cast<int>( val);
 		return true;
 	}
@@ -86,17 +131,22 @@ valuePush( const ValueType& val, TypedInputFilter::Element& element) const
 
 
 template <typename ValueType>
-typename boost::enable_if_c<boost::is_arithmetic<ValueType>::value && boost::is_unsigned<ValueType>::value && !boost::is_floating_point<ValueType>::value,bool>::type
-valuePush( const ValueType& val, TypedInputFilter::Element& element) const
+bool printValue_( const ValueType& val, const PrintValueType::uint_&, langbind::TypedInputFilter::Element& element)
 {
 	try
 	{
-		element.type = TypedInputFilter::Element::uint_;
+		element.type = langbind::TypedInputFilter::Element::uint_;
 		element.value.uint_ = boost::numeric_cast<unsigned int>( val);
 		return true;
 	}
 	catch (boost::bad_numeric_cast&){}
 	return false;
+}
+
+template <typename ValueType>
+bool printValue( const ValueType& val, langbind::TypedInputFilter::Element& element)
+{
+	return printValue_( val, PrintValueType::get(val), element);
 }
 
 }}}//namespace

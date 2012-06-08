@@ -35,7 +35,7 @@ Project Wolframe.
 #ifndef _Wolframe_FILTER_TYPEDFILTER_INTERFACE_HPP_INCLUDED
 #define _Wolframe_FILTER_TYPEDFILTER_INTERFACE_HPP_INCLUDED
 #include "countedReference.hpp"
-#include "filter/filterbase.hpp"
+#include "filter/typedfilterbase.hpp"
 #include "filter/inputfilter.hpp"
 #include "filter/outputfilter.hpp"
 #include <boost/shared_ptr.hpp>
@@ -49,6 +49,8 @@ namespace langbind {
 class TypedInputFilter :public TypedFilterBase
 {
 public:
+	typedef InputFilter::State State;
+
 	TypedInputFilter(){}
 	virtual ~TypedInputFilter(){}
 
@@ -58,6 +60,18 @@ public:
 	///\return true, if success, false, if not.
 	///\remark Check the state when false is returned
 	virtual bool getNext( ElementType& type, Element& element)=0;
+
+	///\brief Get the current state
+	///\return the current state
+	State state() const				{return m_state;}
+
+	///\brief Set input filter state with error message
+	///\param [in] s new state
+	///\param [in] msg (optional) error to set
+	void setState( State s, const char* msg=0)	{m_state=s; setError(msg);}
+
+private:
+	State m_state;					//< state
 };
 
 
@@ -66,6 +80,8 @@ public:
 class TypedOutputFilter :public TypedFilterBase
 {
 public:
+	typedef OutputFilter::State State;
+
 	TypedOutputFilter(){}
 	virtual ~TypedOutputFilter(){}
 
@@ -75,6 +91,18 @@ public:
 	///\return true, if success, false, if not.
 	///\remark Check the state when false is returned
 	virtual bool print( ElementType type, const Element& element)=0;
+
+	///\brief Get the current state
+	///\return the current state
+	State state() const				{return m_state;}
+
+	///\brief Set output filter state with error message
+	///\param [in] s new state
+	///\param [in] msg (optional) error to set
+	void setState( State s, const char* msg=0)	{m_state=s; setError(msg);}
+
+private:
+	State m_state;				//< state
 };
 
 

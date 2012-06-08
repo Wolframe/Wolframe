@@ -29,52 +29,63 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filter/serializefilter.hpp
-///\brief Typed input/output filter wrapper template
+///\file serialize/ddl/filtermapDDLPrintStack.hpp
+///\brief Defines the Parsing STM for DDL serialization for filters
 
-#ifndef _Wolframe_SERIALIZE_FILTER_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_FILTER_HPP_INCLUDED
-#include "filter/inputfilter.hpp"
-#include "filter/outputfilter.hpp"
+#ifndef _Wolframe_SERIALIZE_DDL_FILTERMAP_PRINT_STACK_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_DDL_FILTERMAP_PRINT_STACK_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
+#include "serialize/mapContext.hpp"
+#include "ddl/structType.hpp"
+#include <vector>
+#include <cstddef>
+#include <stdexcept>
 
 namespace _Wolframe {
-namespace langbind {
+namespace serialize {
 
-class SerializeInputFilter :public TypedInputFilter
+class FiltermapDDLPrintState
 {
 public:
-	SerializeInputFilter( InputFilter* inp=0)
-		:m_inputfilter(inp){}
-	SerializeInputFilter( const SerializeInputFilter& o)
-		:m_inputfilter(o.m_inputfilter){}
-	virtual ~SerializeInputFilter(){}
+	FiltermapDDLPrintState( const FiltermapDDLPrintState& o)
+		:m_value(o.m_value)
+		,m_stateidx(o.m_stateidx)
+		,m_tag(o.m_tag)
+		{}
 
-	///\brief Implementation of TypedInputFilter::getNext(ElementType&,Element&)
-	virtual bool getNext( ElementType& type, Element& element);
+	FiltermapDDLPrintState( const ddl::StructType* v, const langbind::TypedFilterBase::Element& t)
+		:m_value(v)
+		,m_stateidx(0)
+		,m_tag(t)
+		{}
+
+	const ddl::StructType* value() const
+	{
+		return m_value;
+	}
+
+	std::size_t state() const
+	{
+		return m_stateidx;
+	}
+
+	void state( std::size_t idx)
+	{
+		m_stateidx = idx;
+	}
+
+	const langbind::TypedFilterBase::Element& tag() const
+	{
+		return m_tag;
+	}
 
 private:
-	InputFilter* m_inputfilter;
+	const ddl::StructType* m_value;
+	std::size_t m_stateidx;
+	langbind::TypedFilterBase::Element m_tag;
 };
 
-
-class SerializeOutputFilter :public TypedOutputFilter
-{
-public:
-	SerializeOutputFilter( OutputFilter* out=0)
-		:m_outputfilter(out){}
-	SerializeOutputFilter( const SerializeOutputFilter& o)
-		:m_outputfilter(o.m_outputfilter){}
-	virtual ~SerializeOutputFilter(){}
-
-	///\brief Implementation of TypedOutputFilter::print( ElementType type, const Element& element)
-	virtual bool print( ElementType type, const Element& element);
-
-private:
-	OutputFilter* m_outputfilter;
-};
+typedef std::vector<FiltermapDDLPrintState> FiltermapDDLPrintStateStack;
 
 }}//namespace
 #endif
-
-

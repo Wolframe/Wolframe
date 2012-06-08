@@ -124,8 +124,8 @@ LOCAL_STATIC_LIB_OBJS = \
 	filter_token_filter.obj \
 	types_bignum.obj \
 	serialize_struct_filtermapBase.obj \
-	serialize_ddl_filtermapSerialize.obj \
-	serialize_ddl_luamapSerialize.obj \
+	serialize_ddl_filtermapPrint.obj \
+	serialize_ddl_filtermapParse.obj \
 	serialize_mapContext.obj \
 	ddl_atomicType.obj \
 	ddl_structType.obj \
@@ -146,7 +146,7 @@ LOCAL_STATIC_LIB_OBJS = \
 !IFDEF WITH_LUA
 LOCAL_STATIC_LIB_OBJS = \
 	$(LOCAL_STATIC_LIB_OBJS) \
-	serialize_struct_luamapBase.obj \
+	filter_luafilter.obj \
 	langbind_luaObjects.obj \
 	langbind_luaDebug.obj \
 	langbind_luaBignum.obj \

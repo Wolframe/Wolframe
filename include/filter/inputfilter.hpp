@@ -47,7 +47,7 @@ class InputFilter :public FilterBase
 {
 public:
 	///\enum State
-	///\brief State of the input filter used in the application processor iterating loop to decide what to do
+	///\brief State of the input filter
 	enum State
 	{
 		Open,		//< serving data - normal input processing

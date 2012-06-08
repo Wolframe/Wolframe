@@ -32,19 +32,32 @@ Project Wolframe.
 ///\file serialize/struct/filtermapBase.cpp
 ///\brief Implements the non intrusive base class of serialization/deserialization of filters
 #include "serialize/struct/filtermapBase.hpp"
+#include "filter/serializefilter.hpp"
 #include <cstring>
 #include <stdexcept>
 
 using namespace _Wolframe;
 using namespace serialize;
 
-bool FiltermapDescriptionBase::parse( void* obj, langbind::BufferingInputFilter& in, Context& ctx) const
+bool FiltermapDescriptionBase::parse( void* obj, langbind::InputFilter& in, Context& ctx, FiltermapParseStateStack& stk) const
 {
 	bool rt = true;
 	try
 	{
-		if (!m_parse) throw std::runtime_error( "null parser called");
-		rt = m_parse( obj, in, ctx, false);
+		langbind::SerializeInputFilter tin( &in);
+		if (stk.size() == 0)
+		{
+			if (!m_parse) throw std::runtime_error( "null parser called");
+			stk.push_back( FiltermapParseState( m_parse, obj));
+		}
+		while (rt && stk.size())
+		{
+			rt = stk.back().parse()( tin, ctx, stk);
+		}
+		if (tin.state() == langbind::InputFilter::Open && !ctx.getLastError() && stk.size() == 1)
+		{
+			return true;
+		}
 	}
 	catch (std::exception& e)
 	{
@@ -54,15 +67,25 @@ bool FiltermapDescriptionBase::parse( void* obj, langbind::BufferingInputFilter&
 	return rt;
 }
 
-bool FiltermapDescriptionBase::print( const void* obj, langbind::OutputFilter& out, Context& ctx) const
+bool FiltermapDescriptionBase::print( const void* obj, langbind::OutputFilter& out, Context& ctx, FiltermapPrintStateStack& stk) const
 {
 	bool rt = true;
 	try
 	{
-		if (!m_print) throw std::runtime_error( "null printer called");
-		char buf[ 4096];
-		out.setOutputBuffer( buf, sizeof( buf));
-		rt = m_print( 0, obj, out, ctx);
+		langbind::SerializeOutputFilter tout( &out);
+		if (stk.size() == 0)
+		{
+			if (!m_print) throw std::runtime_error( "null printer called");
+			stk.push_back( FiltermapPrintState( m_print, obj));
+		}
+		while (rt && stk.size())
+		{
+			rt = stk.back().print()( tout, ctx, stk);
+		}
+		if (tout.state() == langbind::OutputFilter::Open && !ctx.getLastError() && stk.size() == 1)
+		{
+			return true;
+		}
 	}
 	catch (std::exception& e)
 	{

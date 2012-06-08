@@ -31,11 +31,13 @@ Project Wolframe.
 ************************************************************************/
 ///\file serialize/struct/filtermapPrint.hpp
 ///\brief Defines the intrusive implementation of the printing part of serialization of filters
-
 #ifndef _Wolframe_SERLIALIZE_STRUCT_FILTERMAP_PRINT_HPP_INCLUDED
 #define _Wolframe_SERLIALIZE_STRUCT_FILTERMAP_PRINT_HPP_INCLUDED
+#include "filter/typedfilter.hpp"
 #include "serialize/struct/filtermapTraits.hpp"
 #include "serialize/struct/filtermapBase.hpp"
+#include "serialize/struct/filtermapPrintStack.hpp"
+#include "serialize/struct/filtermapPrintValue.hpp"
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -44,90 +46,132 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-template <typename T>
-static bool printObject( const char* tag, const T& obj, langbind::OutputFilter& out, Context& ctx);
-
-template <typename T>
-bool print_( const char* tag, const void* obj, const filtertraits::struct_&, langbind::OutputFilter& out, Context& ctx)
-{
-	static const FiltermapDescriptionBase* descr = T::getFiltermapDescription();
-	bool isContent = true;
-
-	if (tag && !ctx.printElem( langbind::OutputFilter::OpenTag, tag, std::strlen(tag), out)) return false;
-
-	FiltermapDescriptionBase::Map::const_iterator itr = descr->begin(),end = descr->end();
-	for (std::size_t idx=0; itr != end; ++itr,++idx)
-	{
-		if (itr->second.isAtomic() && !isContent && idx < descr->nof_attributes())
-		{
-			if (!ctx.printElem( langbind::OutputFilter::Attribute, itr->first.c_str(), itr->first.size(), out)
-			||  !itr->second.print()( itr->first.c_str(), (char*)obj+itr->second.ofs(), out, ctx))
-			{
-				if (tag) ctx.setTag( itr->first.c_str());
-				return false;
-			}
-		}
-		else
-		{
-			isContent = true;
-			if (!itr->second.print()( itr->first.c_str(), (char*)obj+itr->second.ofs(), out, ctx)) return false;
-		}
-	}
-	if (tag && !ctx.printElem( langbind::OutputFilter::CloseTag, "", 0, out)) return false;
-	return true;
-}
-
-template <typename T>
-bool print_( const char* tag, const void* obj, const filtertraits::arithmetic_&, langbind::OutputFilter& out, Context& ctx)
-{
-	if (tag && !ctx.printElem( langbind::OutputFilter::OpenTag, tag, std::strlen(tag), out)) return false;
-	std::string value( boost::lexical_cast<std::string>( *((T*)obj)));
-	if (!ctx.printElem( langbind::OutputFilter::Value, value.c_str(), value.size(), out)) return false;
-	if (tag && !ctx.printElem( langbind::OutputFilter::CloseTag, "", 0, out)) return false;
-	return true;
-}
-
-template <typename T>
-bool print_( const char* tag, const void* obj, const filtertraits::bool_&, langbind::OutputFilter& out, Context& ctx)
-{
-	if (tag && !ctx.printElem( langbind::OutputFilter::OpenTag, tag, std::strlen(tag), out)) return false;
-	if (!ctx.printElem( langbind::OutputFilter::Value, (*((T*)obj))?"t":"f", 1, out)) return false;
-	if (tag && !ctx.printElem( langbind::OutputFilter::CloseTag, "", 0, out)) return false;
-	return true;
-}
-
-template <typename T>
-bool print_( const char* tag, const void* obj, const filtertraits::vector_&, langbind::OutputFilter& out, Context& ctx)
-{
-	if (!tag)
-	{
-		ctx.setError( "non printable structure");
-		return false;
-	}
-	for (typename T::const_iterator itr=((T*)obj)->begin(); itr!=((T*)obj)->end(); itr++)
-	{
-		ctx.printElem( langbind::OutputFilter::OpenTag, tag, strlen(tag), out);
-		if (!printObject<typename T::value_type>( 0, *itr, out, ctx)) return false;
-		ctx.printElem( langbind::OutputFilter::CloseTag, "", 0, out);
-	}
-	return true;
-}
-
-template <typename T>
-static bool printObject( const char* tag, const T& obj, langbind::OutputFilter& out, Context& ctx)
-{
-	return print_<T>( tag, (void*)&obj, filtertraits::getCategory(obj), out, ctx);
-}
-
+// forward declaration
 template <typename T>
 struct FiltermapIntrusivePrinter
 {
-	static bool print( const char* tag, const void* obj, langbind::OutputFilter& out, Context& ctx)
+	static bool print( langbind::TypedOutputFilter& out, Context& ctx, FiltermapPrintStateStack& stk);
+};
+
+static bool printCloseTag( langbind::TypedOutputFilter& out, Context& ctx, FiltermapPrintStateStack& stk)
+{
+	if (!out.print( langbind::TypedOutputFilter::CloseTag, langbind::TypedFilterBase::Element()))
 	{
-		if (!print_<T>( tag, obj, filtertraits::getCategory(*(T*)obj), out, ctx)) return false;
+		ctx.setError( out.getError());
+		return false;
+	}
+	stk.pop_back();
+	return true;
+}
+
+template <typename T>
+static bool printObject_( const traits::struct_&, langbind::TypedOutputFilter& out, Context& ctx, FiltermapPrintStateStack& stk)
+{
+	const void* obj = stk.back().value();
+
+	static const FiltermapDescriptionBase* descr = T::getFiltermapDescription();
+	std::size_t idx = stk.back().state();
+	if (idx < descr->nof_elements())
+	{
+		FiltermapDescriptionBase::Map::const_iterator itr = descr->begin() + idx;
+
+		if (idx < descr->nof_attributes())
+		{
+			if (itr->second.type() != FiltermapDescriptionBase::Atomic)
+			{
+				ctx.setError( "atomic value expected for attribute");
+				return false;
+			}
+			langbind::TypedFilterBase::Element elem( itr->first.c_str(), itr->first.size());
+			if (!out.print( langbind::TypedOutputFilter::Attribute, elem))
+			{
+				ctx.setError( out.getError());
+				return false;
+			}
+			stk.back().state( idx+1);
+			stk.push_back( FiltermapPrintState( itr->second.print(), (char*)obj + itr->second.ofs()));
+		}
+		else
+		{
+			langbind::TypedFilterBase::Element elem( itr->first.c_str(), itr->first.size());
+			if (!out.print( langbind::TypedOutputFilter::OpenTag, elem))
+			{
+				ctx.setError( out.getError());
+				return false;
+			}
+			stk.back().state( idx+1);
+			stk.push_back( FiltermapPrintState( &printCloseTag, itr->first.c_str()));
+			stk.push_back( FiltermapPrintState( itr->second.print(), (char*)obj + itr->second.ofs()));
+		}
+	}
+	else
+	{
+		stk.pop_back();
+	}
+	return true;
+}
+
+template <typename T>
+static bool printObject_( const traits::atomic_&, langbind::TypedOutputFilter& out, Context& ctx, FiltermapPrintStateStack& stk)
+{
+	langbind::TypedInputFilter::Element element;
+	if (!traits::printValue( *(T*)stk.back().value(), element))
+	{
+		ctx.setError( "atomic value conversion error");
+		return false;
+	}
+	if (!out.print( langbind::TypedOutputFilter::Value, element))
+	{
+		ctx.setError( out.getError());
+		return false;
+	}
+	stk.pop_back();
+	return true;
+}
+
+template <typename T>
+static bool printObject_( const traits::vector_&, langbind::TypedOutputFilter& out, Context& ctx, FiltermapPrintStateStack& stk)
+{
+	typedef typename T::value_type Element;
+	std::vector<Element>* obj = (T*)stk.back().value();
+
+	std::size_t idx = stk.back().state()/2;
+	std::size_t sdx = stk.back().state() & 1;
+	if (idx >= obj->size())
+	{
+		stk.pop_back();
 		return true;
 	}
-};
+	if (idx >= 1)
+	{
+		langbind::TypedInputFilter::Element tag( (const char*)stk.at( stk.size()-2).value());
+		if (sdx == 0)
+		{
+			if (!out.print( langbind::TypedOutputFilter::CloseTag, tag))
+			{
+				ctx.setError( out.getError());
+				return false;
+			}
+		}
+		if (!out.print( langbind::TypedOutputFilter::OpenTag, tag))
+		{
+			stk.back().state( idx*2+1);
+			ctx.setError( out.getError());
+			return false;
+		}
+	}
+	stk.back().state( (idx+1)*2);
+	Element* ve = &(*obj)[ idx];
+	stk.push_back( FiltermapPrintState( &FiltermapIntrusivePrinter<Element>::print, ve));
+	return true;
+}
+
+template <typename T>
+bool FiltermapIntrusivePrinter<T>::print( langbind::TypedOutputFilter& out, Context& ctx, FiltermapPrintStateStack& stk)
+{
+	static T* t = 0;
+	return printObject_<T>( traits::getFiltermapCategory(*t), out, ctx, stk);
+}
 
 }}//namespace
 #endif

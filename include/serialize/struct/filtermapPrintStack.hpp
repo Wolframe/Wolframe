@@ -29,52 +29,65 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filter/serializefilter.hpp
-///\brief Typed input/output filter wrapper template
+///\file serialize/struct/filtermapPrintStack.hpp
+///\brief Defines the Parsing STM for serialization for filters
 
-#ifndef _Wolframe_SERIALIZE_FILTER_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_FILTER_HPP_INCLUDED
-#include "filter/inputfilter.hpp"
-#include "filter/outputfilter.hpp"
+#ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PRINT_STACK_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PRINT_STACK_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
+#include "serialize/mapContext.hpp"
+#include <vector>
+#include <cstddef>
+#include <stdexcept>
 
 namespace _Wolframe {
-namespace langbind {
+namespace serialize {
 
-class SerializeInputFilter :public TypedInputFilter
+class FiltermapPrintState
 {
 public:
-	SerializeInputFilter( InputFilter* inp=0)
-		:m_inputfilter(inp){}
-	SerializeInputFilter( const SerializeInputFilter& o)
-		:m_inputfilter(o.m_inputfilter){}
-	virtual ~SerializeInputFilter(){}
+	typedef bool (*Print)( langbind::TypedOutputFilter& inp, Context& ctx, std::vector<FiltermapPrintState>& stk);
 
-	///\brief Implementation of TypedInputFilter::getNext(ElementType&,Element&)
-	virtual bool getNext( ElementType& type, Element& element);
-
-private:
-	InputFilter* m_inputfilter;
-};
-
-
-class SerializeOutputFilter :public TypedOutputFilter
-{
 public:
-	SerializeOutputFilter( OutputFilter* out=0)
-		:m_outputfilter(out){}
-	SerializeOutputFilter( const SerializeOutputFilter& o)
-		:m_outputfilter(o.m_outputfilter){}
-	virtual ~SerializeOutputFilter(){}
+	FiltermapPrintState( const FiltermapPrintState& o)
+		:m_print(o.m_print)
+		,m_value(o.m_value)
+		,m_stateidx(o.m_stateidx)
+		{}
 
-	///\brief Implementation of TypedOutputFilter::print( ElementType type, const Element& element)
-	virtual bool print( ElementType type, const Element& element);
+	FiltermapPrintState( Print p, const void* v)
+		:m_print(p)
+		,m_value(v)
+		,m_stateidx(0)
+		{}
+
+	const void* value() const
+	{
+		return m_value;
+	}
+
+	Print print() const
+	{
+		return m_print;
+	}
+
+	std::size_t state() const
+	{
+		return m_stateidx;
+	}
+
+	void state( std::size_t idx)
+	{
+		m_stateidx = idx;
+	}
 
 private:
-	OutputFilter* m_outputfilter;
+	Print m_print;
+	const void* m_value;
+	std::size_t m_stateidx;
 };
+
+typedef std::vector<FiltermapPrintState> FiltermapPrintStateStack;
 
 }}//namespace
 #endif
-
-

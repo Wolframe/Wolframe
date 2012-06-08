@@ -39,17 +39,15 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace serialize;
 
-Context::Context()
-	:m_followTagConsumed(false)
+Context::Context( Flags f)
+	:m_flags(f)
 {
 	m_lasterror[0] = 0;
 }
 
 void Context::clear()
 {
-	m_content.clear();
 	m_lasterror[0] = 0;
-	m_followTagConsumed = false;
 }
 
 void Context::setError( const char* msg, const char* msgparam)
@@ -89,28 +87,6 @@ void Context::setMsg( const char* m1, char dd, const char* m2, const char* m3)
 		std::memcpy( m_lasterror, e.what(), nn);
 		m_lasterror[ nn] = 0;
 	}
-}
-
-bool Context::printElem( langbind::OutputFilter::ElementType tp, const void* elem, std::size_t elemsize, langbind::OutputFilter& out)
-{
-	char buf[ 2048];
-
-	if (out.getPosition()) throw std::runtime_error( "unconsumed output in filter serialization");
-	out.setOutputBuffer( (void*)buf, sizeof(buf));
-
-	while (!out.print( tp, elem, elemsize) && out.state() == langbind::OutputFilter::EndOfBuffer)
-	{
-		append( buf, out.getPosition());
-		out.setOutputBuffer( (void*)buf, sizeof(buf));
-	}
-	if (out.state() == langbind::OutputFilter::Error)
-	{
-		setError( out.getError());
-		return false;
-	}
-	append( buf, out.getPosition());
-	out.setOutputBuffer( (void*)buf, sizeof(buf));
-	return true;
 }
 
 

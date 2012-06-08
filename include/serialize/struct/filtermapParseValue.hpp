@@ -34,13 +34,44 @@ Project Wolframe.
 #ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PARSE_VALUE_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PARSE_VALUE_HPP_INCLUDED
 #include <boost/lexical_cast.hpp>
-#include <boost/numeric_cast.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits.hpp>
+#include <string>
 
 namespace _Wolframe {
 namespace serialize {
-namespace traits {
+
+///\class ParseValueType
+///\brief type traits for parse value types
+struct ParseValueType
+{
+	struct string_ {};		//< atomic type category tag for string value to parse
+	struct bool_ {};		//< atomic type category tag for a boolean value to parse
+	struct arithmetic_ {};		//< atomic type category tag for arithmertic value to parse
+
+	///\brief get category string_ for a type
+	///\return string_ if T is a std:string
+	template <typename T>
+	static typename boost::enable_if_c<
+		boost::is_same<T,std::string>::value
+		,const string_&>::type get( const T&) { static string_ rt; return rt;}
+
+	///\brief get category bool_ for a type
+	///\return bool_ if T is a bool
+	template <typename T>
+	static typename boost::enable_if_c<
+		boost::is_same<T,bool>::value
+		,const bool_&>::type get( const T&) { static bool_ rt; return rt;}
+
+	///\brief get category arithmetic_ for a type
+	///\return bool_ if T is a arithmetic but not a bool
+	template <typename T>
+	static typename boost::enable_if_c<
+		(boost::is_arithmetic<T>::value && !boost::is_same<T,bool>::value && !boost::is_same<T,std::string>::value)
+		,const arithmetic_&>::type get( const T&) { static arithmetic_ rt; return rt;}
+};
+
 
 static bool getBool( bool& val, int boolnum)
 {
@@ -58,36 +89,35 @@ static bool getBool( bool& val, int boolnum)
 }
 
 template <typename ValueType>
-typename boost::enable_if_c<boost::is_same<std::string,ValueType>::value,bool>::type
-valueCast( ValueType& val, const TypedInputFilter::Element& element) const
+static bool parseValue_( ValueType& val, const ParseValueType::string_&, const langbind::TypedInputFilter::Element& element)
 {
 	try
 	{
 		switch (element.type)
 		{
-			case TypedInputFilter::Element::bool_:
+			case langbind::TypedInputFilter::Element::bool_:
 				val = (element.value.bool_)?"true":"false";
 				return true;
 
-			case TypedInputFilter::Element::double_:
+			case langbind::TypedInputFilter::Element::double_:
 				val = boost::lexical_cast<ValueType>( element.value.double_);
 				return true;
 
-			case TypedInputFilter::Element::int_:
+			case langbind::TypedInputFilter::Element::int_:
 				val = boost::lexical_cast<ValueType>( element.value.int_);
 				return true;
 
-			case TypedInputFilter::Element::uint_:
+			case langbind::TypedInputFilter::Element::uint_:
 				val = boost::lexical_cast<ValueType>( element.value.uint_);
 				return true;
 
-			case TypedInputFilter::Element::string_:
+			case langbind::TypedInputFilter::Element::string_:
 				val.clear();
 				val.append( element.value.string_.ptr, element.value.string_.size);
 				return true;
 		}
 	}
-	catch (const std::bad_lexical_cast&)
+	catch (const boost::bad_lexical_cast&)
 	{
 		return false;
 	}
@@ -95,28 +125,26 @@ valueCast( ValueType& val, const TypedInputFilter::Element& element) const
 }
 
 template <typename ValueType>
-typename boost::enable_if_c<boost::is_same<bool,ValueType>::value,bool>::type
-valueCast( ValueType& val, const TypedInputFilter::Element& element) const
+static bool parseValue_( ValueType& val, const ParseValueType::bool_&, const langbind::TypedInputFilter::Element& element)
 {
 	try
 	{
 		switch (element.type)
 		{
-			case TypedInputFilter::Element::bool_:
+			case langbind::TypedInputFilter::Element::bool_:
 				val = element.value.bool_;
 				return true;
 
-			case TypedInputFilter::Element::double_:
+			case langbind::TypedInputFilter::Element::double_:
 				return getBool( val, boost::numeric_cast<int>( element.value.double_));
 
-			case TypedInputFilter::Element::int_:
+			case langbind::TypedInputFilter::Element::int_:
 				return getBool( val, boost::numeric_cast<ValueType>( element.value.int_));
 
-			case TypedInputFilter::Element::uint_:
+			case langbind::TypedInputFilter::Element::uint_:
 				return getBool( val, boost::numeric_cast<ValueType>( element.value.uint_));
-				return true;
 
-			case TypedInputFilter::Element::string_:
+			case langbind::TypedInputFilter::Element::string_:
 				if (element.value.string_.size == 4 && std::memcmp( element.value.string_.ptr, "true", 4) == 0)
 				{
 					val = true;
@@ -130,49 +158,55 @@ valueCast( ValueType& val, const TypedInputFilter::Element& element) const
 				return false;
 		}
 	}
-	catch (const std::bad_lexical_cast&)
+	catch (const boost::bad_lexical_cast&)
 	{
 		return false;
 	}
 }
 
 template <typename ValueType>
-typename boost::enable_if_c<(boost::is_arithmetic<ValueType>::value && !boost::is_same<bool,ValueType>::value),bool>::type
-valueCast( ValueType& val, const TypedInputFilter::Element& element) const
+static bool parseValue_( ValueType& val, const ParseValueType::arithmetic_&, const langbind::TypedInputFilter::Element& element)
 {
 	try
 	{
 		switch (element.type)
 		{
-			case TypedInputFilter::Element::bool_:
+			case langbind::TypedInputFilter::Element::bool_:
 				val = boost::numeric_cast<ValueType>( element.value.bool_);
 				return true;
 
-			case TypedInputFilter::Element::double_:
+			case langbind::TypedInputFilter::Element::double_:
 				val = boost::numeric_cast<ValueType>( element.value.double_);
 				return true;
 
-			case TypedInputFilter::Element::int_:
+			case langbind::TypedInputFilter::Element::int_:
 				val = boost::numeric_cast<ValueType>( element.value.int_);
 				return true;
 
-			case TypedInputFilter::Element::uint_:
+			case langbind::TypedInputFilter::Element::uint_:
 				val = boost::numeric_cast<ValueType>( element.value.uint_);
 				return true;
 
-			case TypedInputFilter::Element::string_:
+			case langbind::TypedInputFilter::Element::string_:
 				val = boost::lexical_cast<ValueType>( std::string( element.value.string_.ptr, element.value.string_.size));
 				return true;
 		}
 	}
-	catch (const std::bad_lexical_cast&)
+	catch (const boost::bad_lexical_cast&)
 	{
 		return false;
 	}
-	catch (const std::bad_numeric_cast&)
+	catch (const boost::bad_numeric_cast&)
 	{
 		return false;
 	}
+	return false;
+}
+
+template <typename ValueType>
+bool parseValue( ValueType& val, const langbind::TypedInputFilter::Element& element)
+{
+	return parseValue_( val, ParseValueType::get(val), element);
 }
 
 }}//namespace
