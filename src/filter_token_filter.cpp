@@ -81,7 +81,7 @@ struct OutputFilterImpl :public OutputFilter
 	///\brief Copy constructor
 	///\param [in] o output filter to copy
 	OutputFilterImpl( const OutputFilterImpl& o)
-		:OutputFilter(o),m_elemitr(o.m_elemitr){}
+		:OutputFilter(o),m_elembuf(o.m_elembuf),m_elemitr(o.m_elemitr){}
 
 	///\brief self copy
 	///\return copy of this
@@ -210,14 +210,12 @@ struct InputFilterImpl :public InputFilter
 	///\brief implement interface member InputFilter::getNext( typename InputFilter::ElementType&,const void*&,std::size_t&)
 	virtual bool getNext( typename InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
 	{
-		if (state() == Open)
+		if (m_linecomplete)
 		{
 			m_elembuf.clear();
+			m_linecomplete = false;
 		}
-		else
-		{
-			setState( Open);
-		}
+		setState( Open);
 		type = Value;
 		try
 		{
@@ -252,6 +250,7 @@ struct InputFilterImpl :public InputFilter
 					elementsize = m_elembuf.size();
 					++m_itr;
 					m_tag = '\0';
+					m_linecomplete = true;
 					return true;
 				}
 				else
@@ -264,6 +263,7 @@ struct InputFilterImpl :public InputFilter
 			{
 				element = m_elembuf.c_str();
 				elementsize = m_elembuf.size();
+				m_linecomplete = true;
 				return true;
 			}
 		}
@@ -280,6 +280,7 @@ private:
 	const char* m_src;		//< pointer to current chunk parsed
 	std::size_t m_srcsize;		//< size of the current chunk parsed in bytes
 	bool m_srcend;			//< true if end of message is in current chunk parsed
+	bool m_linecomplete;		//< true if the last getNext could complete a line
 };
 
 }//end anonymous namespace

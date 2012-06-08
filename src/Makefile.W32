@@ -122,6 +122,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	filter_char_filter.obj \
 	filter_line_filter.obj \
 	filter_token_filter.obj \
+	filter_expression_filter.obj \
 	types_bignum.obj \
 	serialize_struct_filtermapBase.obj \
 	serialize_ddl_filtermapPrint.obj \
