@@ -157,7 +157,7 @@ TEST_F( WolfilterTest, tests)
 		config::WolfilterCommandLine testOptions( cmdargc, cmdargv);
 
 		// [2.5] Call iostreamfilter
-		if (testOptions.help()) std::cerr << "ignored option --help" << std::endl;
+		if (testOptions.printhelp()) std::cerr << "ignored option --help" << std::endl;
 		if (testOptions.printversion()) std::cerr << "ignored option --version" << std::endl;
 		if (testOptions.inputfile().size()) std::cerr << "ignored option --inputfile" << std::endl;
 
