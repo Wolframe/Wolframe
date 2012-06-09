@@ -120,9 +120,12 @@ TEST_F( WolfilterTest, tests)
 	for (testno=0; itr != end; ++itr,++testno)
 	{
 		// [2.1] Remove old temporary files:
-		boost::filesystem::remove_all( boost::filesystem::current_path() / "temp" );
-		boost::filesystem::create_directory( boost::filesystem::current_path() / "temp");
-
+		boost::filesystem::path tempdir( boost::filesystem::current_path() / "temp");
+		if (boost::filesystem::exists( tempdir) && boost::filesystem::is_directory( tempdir))
+		{
+			boost::filesystem::remove_all( tempdir);
+			boost::filesystem::create_directory( tempdir);
+		}
 		wtest::TestDescription td( *itr);
 		if (td.requires.size())
 		{
