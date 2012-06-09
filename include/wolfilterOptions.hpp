@@ -30,26 +30,51 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file langbind/iostreamfilter.hpp
-///\brief Interface for mapping istream to ostream by filters, forms, functions
-#ifndef _Wolframe_langbind_IOSTREAMFILTER_HPP_INCLUDED
-#define _Wolframe_langbind_IOSTREAMFILTER_HPP_INCLUDED
+///\file wolfilterOptions.hpp
+///\brief Interface for the options of a wolfilter call
+#ifndef _Wolframe_WOLFILTER_OPTIONS_HPP_INCLUDED
+#define _Wolframe_WOLFILTER_OPTIONS_HPP_INCLUDED
 #include <string>
+#include <vector>
 #include <iostream>
 
 namespace _Wolframe {
-namespace langbind {
+namespace config {
 
-///\brief Maps input to output through a filter and a conversion procedure.
-///\param[in] proc conversion procedure name. emty for no conversion
-///\param[in] ifl input filter name
-///\param[in] ib input buffer size
-///\param[in] ofl output filter name
-///\param[in] ob output buffer size
-///\param[in,out] is input stream
-///\param[in,out] os output stream
-///\return true on success, false else
-bool iostreamfilter( const std::string& proc, const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& is, std::ostream& os);
+class WolfilterOptions
+{
+public:
+	WolfilterOptions( int argc, const char** argv);
+	WolfilterOptions( const WolfilterOptions& o)
+		:m_help(o.m_help)
+		,m_inputfile(o.m_inputfile)
+		,m_scripts(o.m_scripts)
+		,m_modules(o.m_modules){}
+	~WolfilterOptions(){}
+
+	bool help() const					{return m_help;}
+	bool printversion() const				{return m_printversion;}
+	const std::string& inputfile() const			{return m_inputfile;}
+	const std::vector<std::string>& scripts() const		{return m_scripts;}
+	const std::vector<std::string>& modules() const		{return m_modules;}
+	const std::string& cmd() const				{return m_cmd;}
+	const std::string& inputfilter() const			{return m_inputfilter;}
+	const std::string& outputfilter() const			{return m_outputfilter;}
+
+	void print(std::ostream &) const;
+
+private:
+	bool m_help;
+	bool m_printversion;
+	std::string m_inputfile;
+	std::vector<std::string> m_scripts;
+	std::vector<std::string> m_modules;
+	std::string m_cmd;
+	std::string m_inputfilter;
+	std::string m_outputfilter;
+	std::string m_helpstring;
+};
 
 }}//namespace
 #endif
+

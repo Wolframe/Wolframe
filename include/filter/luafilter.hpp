@@ -57,8 +57,10 @@ public:
 	LuaInputFilter( lua_State* ls);
 
 	///\brief Copy constructor
+	///\param[in] o lua input filter to copy
 	LuaInputFilter( const LuaInputFilter& o)
-		:LuaExceptionHandlerScope(o)
+		:TypedInputFilter(o)
+		,LuaExceptionHandlerScope(o)
 		,m_ls(o.m_ls)
 		,m_stk(o.m_stk){}
 
@@ -108,8 +110,10 @@ public:
 	LuaOutputFilter( lua_State* ls);
 
 	///\brief Copy constructor
+	///\param[in] o lua output filter to copy
 	LuaOutputFilter( const LuaOutputFilter& o)
-		:LuaExceptionHandlerScope(o)
+		:TypedOutputFilter(o)
+		,LuaExceptionHandlerScope(o)
 		,m_ls(o.m_ls)
 		,m_depth(o.m_depth)
 		,m_type(o.m_type){}

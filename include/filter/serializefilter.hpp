@@ -41,13 +41,19 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
+///\class SerializeInputFilter
+///\brief Typed fascade for input filter
 class SerializeInputFilter :public TypedInputFilter
 {
 public:
-	SerializeInputFilter( InputFilter* inp=0)
+	///\brief Constructor
+	explicit SerializeInputFilter( InputFilter* inp=0)
 		:m_inputfilter(inp){}
+	///\brief Copy constructor
+	///\param[in] o input filter to copy
 	SerializeInputFilter( const SerializeInputFilter& o)
-		:m_inputfilter(o.m_inputfilter){}
+		:TypedInputFilter(o),m_inputfilter(o.m_inputfilter){}
+	///\brief Destructor
 	virtual ~SerializeInputFilter(){}
 
 	///\brief Implementation of TypedInputFilter::getNext(ElementType&,Element&)
@@ -57,14 +63,19 @@ private:
 	InputFilter* m_inputfilter;
 };
 
-
+///\class SerializeOutputFilter
+///\brief Typed fascade for output filter
 class SerializeOutputFilter :public TypedOutputFilter
 {
 public:
+	///\brief Constructor
 	SerializeOutputFilter( OutputFilter* out=0)
 		:m_outputfilter(out){}
+	///\brief Copy constructor
+	///\param[in] o typed output filter to copy
 	SerializeOutputFilter( const SerializeOutputFilter& o)
-		:m_outputfilter(o.m_outputfilter){}
+		:TypedOutputFilter(o),m_outputfilter(o.m_outputfilter){}
+	///\brief Destructor
 	virtual ~SerializeOutputFilter(){}
 
 	///\brief Implementation of TypedOutputFilter::print( ElementType type, const Element& element)

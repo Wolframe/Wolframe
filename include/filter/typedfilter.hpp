@@ -51,7 +51,15 @@ class TypedInputFilter :public TypedFilterBase
 public:
 	typedef InputFilter::State State;
 
-	TypedInputFilter(){}
+	///\brief Constructor
+	TypedInputFilter()
+		:m_state(InputFilter::Open) {}
+	///\brief Copy constructor
+	///\param[in] o typed output filter to copy
+	TypedInputFilter( const TypedInputFilter& o)
+		:TypedFilterBase(o),m_state(o.m_state){}
+
+	///\brief Destructor
 	virtual ~TypedInputFilter(){}
 
 	///\brief Get next element
@@ -82,7 +90,14 @@ class TypedOutputFilter :public TypedFilterBase
 public:
 	typedef OutputFilter::State State;
 
-	TypedOutputFilter(){}
+	///\brief Constructor
+	TypedOutputFilter()
+		:m_state(OutputFilter::Open) {}
+	///\brief Copy constructor
+	///\param[in] o typed output filter to copy
+	TypedOutputFilter( const TypedOutputFilter& o)
+		:TypedFilterBase(o),m_state(o.m_state){}
+	///\brief Destructor
 	virtual ~TypedOutputFilter(){}
 
 	///\brief Get next element
