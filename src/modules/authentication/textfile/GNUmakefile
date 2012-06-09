@@ -37,7 +37,7 @@ CPP_BINS = \
 	wolfpasswd$(EXE)
 
 wolfpasswd$(EXE): wolfpasswd.o $(PASSWD_OBJS)
-	$(CXX_LINK) -o $@ $(ALL_LDFLAGS) $(PASSWD_OBJS) $< $(PASSWD_LIBS)
+	$(CXX_LINK) -o $@ $(ALL_LDFLAGS) $(PASSWD_OBJS) $< $(PASSWD_LIBS) $(LIBS_LT)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
