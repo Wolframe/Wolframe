@@ -30,7 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file wolfilterOptions.hpp
+///\file wolfilterCommandLine.hpp
 ///\brief Interface for the options of a wolfilter call
 #ifndef _Wolframe_WOLFILTER_OPTIONS_HPP_INCLUDED
 #define _Wolframe_WOLFILTER_OPTIONS_HPP_INCLUDED
@@ -41,18 +41,26 @@
 namespace _Wolframe {
 namespace config {
 
-class WolfilterOptions
+class WolfilterCommandLine
 {
 public:
-	WolfilterOptions( int argc, const char** argv);
-	WolfilterOptions( const WolfilterOptions& o)
-		:m_help(o.m_help)
+	WolfilterCommandLine( int argc, const char** argv);
+	WolfilterCommandLine( const WolfilterCommandLine& o)
+		:m_printhelp(o.m_printhelp)
+		,m_printversion(o.m_printversion)
 		,m_inputfile(o.m_inputfile)
 		,m_scripts(o.m_scripts)
-		,m_modules(o.m_modules){}
-	~WolfilterOptions(){}
+		,m_modules(o.m_modules)
+		,m_cmd(o.m_cmd)
+		,m_inputfilter(o.m_inputfilter)
+		,m_outputfilter(o.m_outputfilter)
+		,m_helpstring(o.m_helpstring)
+		,m_inbufsize(o.m_inbufsize)
+		,m_outbufsize(o.m_outbufsize)
+		{}
+	~WolfilterCommandLine(){}
 
-	bool help() const					{return m_help;}
+	bool printhelp() const					{return m_printhelp;}
 	bool printversion() const				{return m_printversion;}
 	const std::string& inputfile() const			{return m_inputfile;}
 	const std::vector<std::string>& scripts() const		{return m_scripts;}
@@ -63,8 +71,11 @@ public:
 
 	void print(std::ostream &) const;
 
+	std::size_t inbufsize() const				{return m_inbufsize;}
+	std::size_t outbufsize() const				{return m_outbufsize;}
+
 private:
-	bool m_help;
+	bool m_printhelp;
 	bool m_printversion;
 	std::string m_inputfile;
 	std::vector<std::string> m_scripts;
@@ -73,6 +84,8 @@ private:
 	std::string m_inputfilter;
 	std::string m_outputfilter;
 	std::string m_helpstring;
+	std::size_t m_inbufsize;
+	std::size_t m_outbufsize;
 };
 
 }}//namespace

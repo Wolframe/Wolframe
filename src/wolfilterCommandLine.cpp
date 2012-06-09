@@ -30,19 +30,22 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file wolfilterOptions.cpp
+///\file wolfilterCommandLine.cpp
 ///\brief Implementation of the options of a wolfilter call
-#include "wolfilterOptions.hpp"
+#include "wolfilterCommandLine.hpp"
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
 #include <sstream>
+#include <cstring>
 
 using namespace _Wolframe;
 using namespace config;
 
-WolfilterOptions::WolfilterOptions( int argc, const char** argv)
-	:m_help(false)
+WolfilterCommandLine::WolfilterCommandLine( int argc, const char** argv)
+	:m_printhelp(false)
 	,m_printversion(false)
+	,m_inbufsize(8<<10)
+	,m_outbufsize(8<<10)
 {
 	namespace po = boost::program_options;
 
@@ -68,7 +71,7 @@ WolfilterOptions::WolfilterOptions( int argc, const char** argv)
 	po::notify( vmap);
 
 	m_printversion = vmap.count( "version");
-	m_help = vmap.count( "help");
+	m_printhelp = vmap.count( "help");
 
 	if (vmap.count( "input")) m_inputfile = vmap["input"].as<std::string>();
 	if (vmap.count( "module")) m_modules = vmap["module"].as<std::vector<std::string> >();
@@ -81,12 +84,26 @@ WolfilterOptions::WolfilterOptions( int argc, const char** argv)
 	if (m_inputfilter.empty()) m_inputfilter = "xml:textwolf";		//... xml:textwolf as default input filter
 	if (m_outputfilter.empty()) m_outputfilter = m_inputfilter;		//... default same filter for input and output
 
+	const char* bp;
+	bp = std::strchr( m_inputfilter.c_str(), '/');
+	if (bp)
+	{
+		m_inbufsize = (std::size_t)atoi( bp+1);
+		m_inputfilter.resize( bp-m_inputfilter.c_str());
+	}
+	bp = std::strchr( m_outputfilter.c_str(), '/');
+	if (bp)
+	{
+		m_outbufsize = (std::size_t)atoi( bp+1);
+		m_outputfilter.resize( bp-m_outputfilter.c_str());
+	}
+
 	std::ostringstream dd;
 	dd << fopt;
 	m_helpstring = dd.str();
 }
 
-void WolfilterOptions::print(std::ostream& out) const
+void WolfilterCommandLine::print(std::ostream& out) const
 {
 	out << "Call:" << std::endl;
 	out << "\twolfilter [OPTION] <cmd> <inputfilter> <outputfilter>" << std::endl;

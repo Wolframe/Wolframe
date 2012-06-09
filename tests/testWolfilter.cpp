@@ -36,7 +36,7 @@
 #include "langbind/iostreamfilter.hpp"
 #include "logger-v1.hpp"
 #include "langbind/appGlobalContext.hpp"
-#include "wolfilterOptions.hpp"
+#include "wolfilterCommandLine.hpp"
 #include "wolfilter/src/employee_assignment_print.hpp"
 #include "gtest/gtest.h"
 #include "testDescription.hpp"
@@ -154,7 +154,7 @@ TEST_F( WolfilterTest, tests)
 		{
 			cmdargv[ci] = cmd[ci-1].c_str();
 		}
-		config::WolfilterOptions testOptions( cmdargc, cmdargv);
+		config::WolfilterCommandLine testOptions( cmdargc, cmdargv);
 
 		// [2.5] Call iostreamfilter
 		if (testOptions.help()) std::cerr << "ignored option --help" << std::endl;

@@ -74,7 +74,7 @@ LOCAL_STATIC_LIB = \
 LOCAL_STATIC_LIB_OBJS = \
 	version.o \
 	commandLine.o \
-	wolfilterOptions.o \
+	wolfilterCommandLine.o \
 	serviceConfig.o \
 	serviceBanner.o \
 	appConfig.o \
