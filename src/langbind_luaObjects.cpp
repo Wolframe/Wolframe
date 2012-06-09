@@ -57,6 +57,7 @@ namespace luaname
 	static const char* Output = "wolframe.Output";
 	static const char* Filter = "wolframe.Filter";
 	static const char* DDLForm = "wolframe.DDLForm";
+	static const char* FormFunction = "wolframe.FormFunction";
 	static const char* GlobalContext = "wolframe.ctx";
 	static const char* InputFilterClosure = "wolframe.InputFilterClosure";
 }
@@ -69,6 +70,7 @@ template <> const char* metaTableName<Input>()				{return luaname::Input;}
 template <> const char* metaTableName<Output>()				{return luaname::Output;}
 template <> const char* metaTableName<Filter>()				{return luaname::Filter;}
 template <> const char* metaTableName<DDLForm>()			{return luaname::DDLForm;}
+template <> const char* metaTableName<FormFunction>()			{return luaname::FormFunction;}
 template <> const char* metaTableName<GlobalContext>()			{return luaname::GlobalContext;}
 template <> const char* metaTableName<InputFilterClosure>()		{return luaname::InputFilterClosure;}
 }//anonymous namespace
@@ -529,8 +531,8 @@ static int function_output_closetag( lua_State* ls)
 static int function_filter( lua_State* ls)
 {
 	unsigned int nn = lua_gettop( ls);
-	if (nn == 0) return luaL_error( ls, "too few arguments for filter");
-	if (nn > 1) return luaL_error( ls, "too many arguments for filter");
+	if (nn == 0) return luaL_error( ls, "too few arguments for function 'filter'");
+	if (nn > 1) return luaL_error( ls, "too many arguments for function 'filter'");
 	if (!lua_isstring( ls, 1))
 	{
 		return luaL_error( ls, "invalid type of argument (string expected)");
@@ -539,7 +541,7 @@ static int function_filter( lua_State* ls)
 	GlobalContext* ctx = getGlobalSingletonPointer<GlobalContext>( ls);
 	if (!ctx)
 	{
-		return luaL_error( ls, "internal error. filter function got no global context");
+		return luaL_error( ls, "internal error. function 'filter' got no global context");
 	}
 	Filter flt;
 	try
@@ -551,9 +553,40 @@ static int function_filter( lua_State* ls)
 	}
 	catch (const std::exception& e)
 	{
-		return luaL_error( ls, "got exception in function filter: (%s)", e.what());
+		return luaL_error( ls, "got exception in function 'filter': (%s)", e.what());
 	}
 	LuaObject<Filter>::push_luastack( ls, flt);
+	return 1;
+}
+
+static int function_formfunction( lua_State* ls)
+{
+	unsigned int nn = lua_gettop( ls);
+	if (nn == 0) return luaL_error( ls, "too few arguments for function 'formfunction'");
+	if (nn > 1) return luaL_error( ls, "too many arguments for function 'formfunction'");
+	if (!lua_isstring( ls, 1))
+	{
+		return luaL_error( ls, "invalid type of argument (string expected)");
+	}
+	const char* name = lua_tostring( ls, 1);
+	GlobalContext* ctx = getGlobalSingletonPointer<GlobalContext>( ls);
+	if (!ctx)
+	{
+		return luaL_error( ls, "internal error. function 'formfunction' got no global context");
+	}
+	FormFunction func;
+	try
+	{
+		if (!ctx->getFormFunction( name, func))
+		{
+			return luaL_error( ls, "could not get form function '%s'", name);
+		}
+	}
+	catch (const std::exception& e)
+	{
+		return luaL_error( ls, "got exception in function 'formfunction': (%s)", e.what());
+	}
+	LuaObject<FormFunction>::push_luastack( ls, func);
 	return 1;
 }
 
@@ -866,6 +899,8 @@ bool LuaFunctionMap::initLuaScriptInstance( LuaScriptInstance* lsi, const Input&
 			lua_setglobal( ls, "yield");
 			lua_pushcfunction( ls, &function_filter);
 			lua_setglobal( ls, "filter");
+			lua_pushcfunction( ls, &function_formfunction);
+			lua_setglobal( ls, "formfunction");
 		}
 		return true;
 	}

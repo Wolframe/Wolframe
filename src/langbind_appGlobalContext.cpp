@@ -125,11 +125,11 @@ bool GlobalContext::load( const ApplicationEnvironmentConfig& config)
 	}
 #endif
 	{
-		std::vector<PluginModuleAPIConfigStruct>::const_iterator itr=config.data().plugin.begin(),end=config.data().plugin.end();
+		std::vector<FormFunctionConfigStruct>::const_iterator itr=config.data().formfunction.begin(),end=config.data().formfunction.end();
 		for (;itr!=end; ++itr)
 		{
-			LOG_INFO << "Loading plugin module function " << itr->name;
-			///TODO: load plugin module function from itr->modulepath
+			LOG_INFO << "Loading form function" << itr->name;
+			///TODO: load form function from itr->modulepath
 			///API for defining the function is not yet available !
 		}
 	}

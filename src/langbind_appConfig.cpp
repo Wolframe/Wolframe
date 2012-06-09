@@ -52,7 +52,7 @@ bool ApplicationEnvironmentConfig::check() const
 	std::map<std::string,bool> forms;
 	std::map<std::string,bool> functions;
 	std::map<std::string,bool> scripts;
-	std::map<std::string,bool> plugins;
+	std::map<std::string,bool> formfunctions;
 	{
 		compilers[ "simpleform"] = true;
 		std::vector<DDLCompilerConfigStruct>::const_iterator itr=m_config.DDL.begin(),end=m_config.DDL.end();
@@ -156,18 +156,18 @@ bool ApplicationEnvironmentConfig::check() const
 		}
 	}
 	{
-		std::vector<PluginModuleAPIConfigStruct>::const_iterator itr=m_config.plugin.begin(),end=m_config.plugin.end();
+		std::vector<FormFunctionConfigStruct>::const_iterator itr=m_config.formfunction.begin(),end=m_config.formfunction.end();
 		for (;itr!=end; ++itr)
 		{
-			if (plugins[ itr->name])
+			if (formfunctions[ itr->name])
 			{
-				LOG_ERROR << "Duplicate definition or using reserved name for transaction function " << itr->name;
+				LOG_ERROR << "Duplicate definition or using reserved name for form function " << itr->name;
 				rt = false;
 			}
-			plugins[ itr->name] = true;
+			formfunctions[ itr->name] = true;
 			if (!boost::filesystem::exists( itr->modulepath))
 			{
-				LOG_ERROR << "Path of plugin function module does not exist: " << itr->modulepath;
+				LOG_ERROR << "Path of form function module does not exist: " << itr->modulepath;
 				rt = false;
 			}
 		}
@@ -250,7 +250,7 @@ void ApplicationEnvironmentConfig::setCanonicalPathes( const std::string& refere
 		}
 	}
 	{
-		std::vector<PluginModuleAPIConfigStruct>::iterator itr=m_config.plugin.begin(),end=m_config.plugin.end();
+		std::vector<FormFunctionConfigStruct>::iterator itr=m_config.formfunction.begin(),end=m_config.formfunction.end();
 		for (;itr!=end; ++itr)
 		{
 			setCanonicalPath( itr->modulepath, referencePath);

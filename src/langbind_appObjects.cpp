@@ -147,101 +147,94 @@ bool DDLFormMap::getForm( const std::string& name, DDLFormR& rt) const
 	return getObject( m_map, name, *rt.get());
 }
 
-PluginFunction::CallResult PluginFunction::call( InputFilter& ifl, OutputFilter& ofl)
+FormFunction::CallResult FormFunction::call( InputFilter& ifl, OutputFilter& ofl, CallContext& ctx)
 {
-	if (m_lastres == Error) return Error;
-	void* param_struct = m_data.get();
-	void* result_struct = (void*)((char*)m_data.get() + m_api_param->size());
+	if (ctx.m_lastres == Error) return Error;
+	void* param_struct = ctx.m_data.get();
+	void* result_struct = (void*)((char*)ctx.m_data.get() + ctx.m_api_param->size());
 
-	switch (m_state)
+	switch (ctx.m_state)
 	{
 		case 0:
-			m_ctx.clear();
-			if (!m_api_param->init( param_struct))
+			ctx.m_ctx.clear();
+			if (!ctx.m_api_param->init( param_struct))
 			{
-				LOG_ERROR << "could not initialize api input object for plugin function";
-				return m_lastres=Error;
+				ctx.m_ctx.setError( "could not initialize api input object for form function");
+				return ctx.m_lastres=Error;
 			}
-			m_state = 1;
+			ctx.m_state = 1;
 		case 1:
-			if (!m_api_result->init( result_struct))
+			if (!ctx.m_api_result->init( result_struct))
 			{
-				LOG_ERROR << "could not initialize api result object for plugin function";
-				return m_lastres=Error;
+				ctx.m_ctx.setError( "could not initialize api result object for form function");
+				return ctx.m_lastres=Error;
 			}
-			m_state = 2;
+			ctx.m_state = 2;
 		case 2:
-			if (!m_api_param->parse( param_struct, ifl, m_ctx, m_parsestk))
+			if (!ctx.m_api_param->parse( param_struct, ifl, ctx.m_ctx, ctx.m_parsestk))
 			{
 				switch (ifl.state())
 				{
 					case InputFilter::Open:
-						if (m_ctx.getLastError())
+						if (ctx.m_ctx.getLastError())
 						{
-							LOG_ERROR << "API parameter: " << m_ctx.getLastError();
-							return m_lastres=Error;
+							return ctx.m_lastres=Error;
 						}
 						break;
 
 					case InputFilter::EndOfMessage:
-						return m_lastres=Yield;
+						return ctx.m_lastres=Yield;
 
 					case InputFilter::Error:
-						m_ctx.setError( ifl.getError());
-						LOG_ERROR << "input filter error: " << m_ctx.getLastError();
-						return m_lastres=Error;
+						ctx.m_ctx.setError( ifl.getError());
+						return ctx.m_lastres=Error;
 				}
 			}
-			m_state = 3;
+			ctx.m_state = 3;
 		case 3:
 			try
 			{
-				m_ctx.clear();
+				ctx.m_ctx.clear();
 				int rt = m_call( result_struct, param_struct);
 				if (rt != 0)
 				{
-					LOG_ERROR << "error in call of plugin function. error code = " << rt;
-					return m_lastres=Error;
+					ctx.m_ctx.setError( "error in call of form function");
+					return ctx.m_lastres=Error;
 				}
 			}
 			catch (const std::exception& e)
 			{
-				LOG_ERROR << "exception in plugin function call: " << e.what();
-				return m_lastres=Error;
+				ctx.m_ctx.setError( e.what());
+				return ctx.m_lastres=Error;
 			}
-			m_state = 4;
+			ctx.m_state = 4;
 		case 4:
-			if (!m_api_param->print( result_struct, ofl, m_ctx, m_printstk))
+			if (!ctx.m_api_param->print( result_struct, ofl, ctx.m_ctx, ctx.m_printstk))
 			{
 				switch (ofl.state())
 				{
 					case OutputFilter::Open:
-						if (m_ctx.getLastError())
-						{
-							LOG_ERROR << "API result: " << m_ctx.getLastError();
-						}
-						return m_lastres=Error;
+						return ctx.m_lastres=Error;
 
 					case OutputFilter::EndOfBuffer:
-						return m_lastres=Yield;
+						return ctx.m_lastres=Yield;
 
 					case OutputFilter::Error:
-						m_ctx.setError( ofl.getError());
-						LOG_ERROR << "output filter error: " << m_ctx.getLastError();
-						return m_lastres=Error;
+						ctx.m_ctx.setError( ofl.getError());
+						return ctx.m_lastres=Error;
 				}
 			}
-			m_state = 5;
+			ctx.m_state = 5;
 		case 5:
-			m_api_param->done( param_struct);
-			m_api_result->done( result_struct);
-			std::memset( m_data.get(), 0, m_api_param->size() + m_api_result->size());
-			m_state = 0;
+			ctx.m_api_param->done( param_struct);
+			ctx.m_api_result->done( result_struct);
+			std::memset( ctx.m_data.get(), 0, ctx.m_api_param->size() + ctx.m_api_result->size());
+			ctx.m_state = 0;
 	}
-	return m_lastres=Ok;
+	return ctx.m_lastres=Ok;
 }
 
-PluginFunction::~PluginFunction()
+FormFunction::CallContext::~CallContext()
 {
 	if (m_state >= 0)
 	{
@@ -263,12 +256,12 @@ PluginFunction::~PluginFunction()
 	}
 }
 
-void PluginFunctionMap::definePluginFunction( const std::string& name, const PluginFunction& f)
+void FormFunctionMap::defineFormFunction( const std::string& name, const FormFunction& f)
 {
 	defineObject( m_map, name, f);
 }
 
-bool PluginFunctionMap::getPluginFunction( const std::string& name, PluginFunction& rt) const
+bool FormFunctionMap::getFormFunction( const std::string& name, FormFunction& rt) const
 {
 	return getObject( m_map, name, rt);
 }

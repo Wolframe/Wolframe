@@ -59,8 +59,8 @@ using namespace _Wolframe;
 static void prepareTest()
 {
 	langbind::GlobalContext* gct = langbind::getGlobalContext();
-	gct->definePluginFunction( "employee_assignment_convert",
-					langbind::PluginFunction(
+	gct->defineFormFunction( "employee_assignment_convert",
+					langbind::FormFunction(
 						test::convertAssignmentListDoc,
 						test::AssignmentListDoc::getFiltermapDescription(),
 						test::AssignmentListDoc::getFiltermapDescription()));

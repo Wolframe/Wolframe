@@ -88,15 +88,15 @@ const config::DescriptionBase* FilterConfigStruct::description()
 }
 
 
-const config::DescriptionBase* PluginModuleAPIConfigStruct::description()
+const config::DescriptionBase* FormFunctionConfigStruct::description()
 {
-	struct ThisDescription :public config::Description<PluginModuleAPIConfigStruct>
+	struct ThisDescription :public config::Description<FormFunctionConfigStruct>
 	{
 		ThisDescription()
 		{
 			(*this)
-			( "name",		&PluginModuleAPIConfigStruct::name)
-			( "modulepath",		&PluginModuleAPIConfigStruct::modulepath)
+			( "name",		&FormFunctionConfigStruct::name)
+			( "modulepath",		&FormFunctionConfigStruct::modulepath)
 			;
 		}
 	};
@@ -151,7 +151,7 @@ const config::DescriptionBase* EnvironmentConfigStruct::description()
 #if WITH_LUA
 			( "script",		&EnvironmentConfigStruct::script)
 #endif
-			( "plugin",		&EnvironmentConfigStruct::plugin)
+			( "formfunction",	&EnvironmentConfigStruct::formfunction)
 			;
 		}
 	};

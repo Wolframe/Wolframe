@@ -219,26 +219,27 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 	}
 #endif
 	{
-		PluginFunction pf;
-		if (gc->getPluginFunction( proc.c_str(), pf))
+		FormFunction ffunc;
+		if (gc->getFormFunction( proc.c_str(), ffunc))
 		{
-			langbind::PluginFunction::CallResult rt = pf.call( *flt.inputfilter(), *flt.outputfilter());
-			while (rt == langbind::PluginFunction::Yield)
+			langbind::FormFunction::CallContext ctx( ffunc);
+			langbind::FormFunction::CallResult rt = ffunc.call( *flt.inputfilter(), *flt.outputfilter(), ctx);
+			while (rt == langbind::FormFunction::Yield)
 			{
 				if (processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)
 				|| (flt.inputfilter()->state() == InputFilter::Open && flt.outputfilter()->state() == OutputFilter::Open))
 				{
-					rt = pf.call( *flt.inputfilter(), *flt.outputfilter());
+					rt = ffunc.call( *flt.inputfilter(), *flt.outputfilter(), ctx);
 				}
 			}
-			if (rt == langbind::PluginFunction::Ok)
+			if (rt == langbind::FormFunction::Ok)
 			{
 				writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
 				return true;
 			}
 			else
 			{
-				LOG_ERROR << "error in plugin function: '" << pf.getLastError() << "'";
+				LOG_ERROR << "error in form function: '" << ctx.getLastError() << "'";
 				return false;
 			}
 		}
